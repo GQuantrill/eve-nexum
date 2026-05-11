@@ -33,7 +33,10 @@ authRouter.get('/login', (req, res) => {
     state,
   });
 
-  res.redirect(`${EVE_AUTH_URL}?${params}`);
+  req.session.save((err) => {
+    if (err) { res.status(500).send('Session error'); return; }
+    res.redirect(`${EVE_AUTH_URL}?${params}`);
+  });
 });
 
 // GET /auth/callback  — EVE SSO returns here
