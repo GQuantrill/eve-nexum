@@ -65,7 +65,7 @@ Traefik will handle TLS termination and HTTP→HTTPS redirects. The `docker-comp
 On first run the server auto-creates its tables. If you need to run migrations manually:
 
 ```bash
-docker compose exec server node dist/scripts/setup-db.js
+docker compose exec server node dist/src/scripts/setup-db.js
 ```
 
 ---
