@@ -4,6 +4,7 @@ import cors from 'cors';
 import session from 'express-session';
 import connectPgSimple from 'connect-pg-simple';
 import { db } from './db.js';
+import { migrate } from './migrate.js';
 import { systemsRouter } from './routes/systems.js';
 import { authRouter } from './routes/auth.js';
 import { mapsRouter } from './routes/maps.js';
@@ -44,6 +45,6 @@ app.use('/api/activity', activityRouter);
 
 app.get('/health', (_req, res) => res.json({ ok: true }));
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+migrate()
+  .then(() => app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`)))
+  .catch((err) => { console.error('Migration failed:', err); process.exit(1); });

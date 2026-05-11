@@ -62,7 +62,9 @@ Traefik will handle TLS termination and HTTP→HTTPS redirects. The `docker-comp
 
 **3. Database setup**
 
-On first run the server auto-creates its tables. If you need to run migrations manually:
+Application tables (`users`, `maps`, `signatures`, etc.) are created automatically on first startup — no manual step needed.
+
+The setup script is only required if you want system search and NPC station data (it imports the EVE Static Data Export). This is a one-time operation and takes several minutes:
 
 ```bash
 docker compose exec server node dist/src/scripts/setup-db.js

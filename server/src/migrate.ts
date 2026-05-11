@@ -1,0 +1,95 @@
+import { db } from './db.js';
+
+export async function migrate() {
+  await db.query(`
+    CREATE TABLE IF NOT EXISTS users (
+      id               SERIAL      PRIMARY KEY,
+      character_id     BIGINT      UNIQUE NOT NULL,
+      character_name   TEXT        NOT NULL,
+      access_token     TEXT,
+      refresh_token    TEXT,
+      token_expires_at TIMESTAMPTZ,
+      compact_mode     BOOLEAN     NOT NULL DEFAULT FALSE,
+      snap_to_grid     BOOLEAN     NOT NULL DEFAULT FALSE,
+      show_minimap     BOOLEAN     NOT NULL DEFAULT TRUE,
+      created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS compact_mode  BOOLEAN NOT NULL DEFAULT FALSE;
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS snap_to_grid  BOOLEAN NOT NULL DEFAULT FALSE;
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS show_minimap  BOOLEAN NOT NULL DEFAULT TRUE;
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS panel_order   TEXT[]  NOT NULL DEFAULT '{notes,signatures,structures,npcStations}';
+
+    CREATE TABLE IF NOT EXISTS maps (
+      id         UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+      user_id    INTEGER     NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      name       TEXT        NOT NULL DEFAULT 'New Map',
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
+    CREATE TABLE IF NOT EXISTS map_systems (
+      id            UUID        PRIMARY KEY,
+      map_id        UUID        NOT NULL REFERENCES maps(id) ON DELETE CASCADE,
+      eve_system_id INTEGER,
+      name          TEXT        NOT NULL,
+      system_class  TEXT        NOT NULL,
+      effect        TEXT        NOT NULL DEFAULT 'none',
+      statics       TEXT[]      NOT NULL DEFAULT '{}',
+      region_name   TEXT,
+      npc_type      TEXT,
+      position_x    REAL        NOT NULL DEFAULT 0,
+      position_y    REAL        NOT NULL DEFAULT 0,
+      status        TEXT        NOT NULL DEFAULT 'unknown',
+      is_home       BOOLEAN     NOT NULL DEFAULT FALSE,
+      locked        BOOLEAN     NOT NULL DEFAULT FALSE,
+      notes         TEXT        NOT NULL DEFAULT '',
+      created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
+    CREATE TABLE IF NOT EXISTS map_connections (
+      id              UUID        PRIMARY KEY,
+      map_id          UUID        NOT NULL REFERENCES maps(id) ON DELETE CASCADE,
+      source_id       UUID        NOT NULL REFERENCES map_systems(id) ON DELETE CASCADE,
+      target_id       UUID        NOT NULL REFERENCES map_systems(id) ON DELETE CASCADE,
+      source_handle   TEXT,
+      target_handle   TEXT,
+      connection_type TEXT        NOT NULL DEFAULT 'standard',
+      mass_status     TEXT,
+      time_status     TEXT,
+      size            TEXT        NOT NULL DEFAULT 'large',
+      created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
+    CREATE TABLE IF NOT EXISTS map_signatures (
+      id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+      system_id   UUID        NOT NULL REFERENCES map_systems(id) ON DELETE CASCADE,
+      sig_id      TEXT        NOT NULL DEFAULT '',
+      sig_type    TEXT        NOT NULL DEFAULT 'unknown',
+      name        TEXT        NOT NULL DEFAULT '',
+      notes       TEXT        NOT NULL DEFAULT '',
+      wh_type     TEXT        NOT NULL DEFAULT '',
+      wh_leads_to TEXT        NOT NULL DEFAULT '',
+      created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
+    CREATE TABLE IF NOT EXISTS map_structures (
+      id             UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+      system_id      UUID        NOT NULL REFERENCES map_systems(id) ON DELETE CASCADE,
+      name           TEXT        NOT NULL DEFAULT '',
+      structure_type TEXT        NOT NULL DEFAULT 'unknown',
+      owner_corp     TEXT        NOT NULL DEFAULT '',
+      eve_id         BIGINT,
+      notes          TEXT        NOT NULL DEFAULT '',
+      created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_maps_user            ON maps (user_id);
+    CREATE INDEX IF NOT EXISTS idx_map_systems_map      ON map_systems (map_id);
+    CREATE INDEX IF NOT EXISTS idx_map_connections_map  ON map_connections (map_id);
+    CREATE INDEX IF NOT EXISTS idx_map_signatures_system ON map_signatures (system_id);
+    CREATE INDEX IF NOT EXISTS idx_map_structures_system ON map_structures (system_id);
+  `);
+}
