@@ -36,6 +36,5 @@ services:
 
 networks:
   internal:
-    internal: true
   traefik-public:
     external: true
