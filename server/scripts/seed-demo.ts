@@ -40,8 +40,8 @@ async function pickKspace(cls: string, exclude: number[] = []) {
   const excClause = exclude.length
     ? `AND ss.id NOT IN (${exclude.join(',')})`
     : '';
-  const { rows } = await db.query<{ id: number; name: string }>(
-    `SELECT ss.id, ss.name
+  const { rows } = await db.query<{ id: number; name: string; effect: string | null; statics: string[] }>(
+    `SELECT ss.id, ss.name, NULL::text AS effect, ARRAY[]::text[] AS statics
      FROM solar_systems ss
      WHERE ss.class = $1 ${excClause}
        AND ss.security > 0.45
