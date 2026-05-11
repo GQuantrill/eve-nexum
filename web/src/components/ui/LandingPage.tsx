@@ -169,6 +169,15 @@ export function LandingPage() {
 
   return (
     <div className="landing">
+      <title>Nexum — EVE Online Wormhole Mapper</title>
+      <meta name="description" content="Nexum is a wormhole mapping tool for EVE Online. Track your chain, manage signatures, monitor kills and jumps, and coordinate with your fleet in real time." />
+      <meta property="og:title"       content="Nexum — EVE Online Wormhole Mapper" />
+      <meta property="og:description" content="Track your wormhole chain, manage signatures, monitor kills and jumps, and coordinate with your fleet in real time." />
+      <meta property="og:url"         content="https://nexum.area404.org/" />
+      <meta property="og:image"       content="https://nexum.area404.org/hero.png" />
+      <meta name="twitter:title"       content="Nexum — EVE Online Wormhole Mapper" />
+      <meta name="twitter:description" content="Track your wormhole chain, manage signatures, monitor kills and jumps, and coordinate with your fleet in real time." />
+
       <header className="landing__header">
         <canvas ref={canvasRef} className="landing__canvas" />
         <div className="landing__header-fade" />
