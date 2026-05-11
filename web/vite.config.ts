@@ -10,6 +10,10 @@ export default defineConfig({
         target: process.env.API_TARGET ?? 'http://localhost:3001',
         changeOrigin: true,
       },
+      '/auth': {
+        target: process.env.API_TARGET ?? 'http://localhost:3001',
+        changeOrigin: true,
+      },
     },
   },
 })

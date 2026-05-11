@@ -1,6 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { apiUrl } from '../../api/client';
-
+import demoMapImg from '../../assets/demo-map.png';
+import menuImg from '../../assets/Menu.png';
+import quickSystemImg from '../../assets/quick-system.png';
+import showSigsImg from '../../assets/show-sigs.png';
+import portraitImg from '../../assets/portrait.jpeg';
 interface LastCharacter { characterId: number; characterName: string; }
 
 const FEATURES = [
@@ -197,6 +201,10 @@ export function LandingPage() {
           ))}
         </section>
 
+        <div className="landing__demo">
+          <img src={demoMapImg} alt="Nexum demo map" className="landing__demo-img" />
+        </div>
+
         <div className="landing__cta">
           {lastChar ? (
             <>
@@ -233,6 +241,154 @@ export function LandingPage() {
             </>
           )}
         </div>
+
+        {/* ── About Nexum ───────────────────────────────────── */}
+        <section className="landing__section" id="about-nexum">
+          <h2 className="landing__section-title">About Nexum</h2>
+          <p className="landing__section-body">
+            Nexum is a wormhole and exploration tool.  It can be used for mapping routes and logging signatures. It was heavily inspired by Pathfinder but as this is no longer in development.
+            Because of this, rather than complain about it, Nexum was created.
+          </p>
+          <p className="landing__section-body">Key Features
+            <ul>
+              <li>Dynamic mapping based on where you character is in eve.  The map updates when you move from system to system</li>
+              <li>Store Signatures against the systems.  Don't waste time re-scanning already known sigs</li>
+              <li>See Wormhole effects at a glance</li>
+              <li>See which systems have NPC stations and which services are offered there</li>
+              <li>zKillboard integration</li>
+            </ul>
+            <div className="landing__screenshot-grid">
+              <figure className="landing__screenshot-figure">
+                <img src={menuImg} alt="System menu" className="landing__screenshot landing__screenshot--sm" />
+                <figcaption className="landing__screenshot-caption">Easy to customize options</figcaption>
+              </figure>
+              <figure className="landing__screenshot-figure">
+                <img src={quickSystemImg} alt="Quick system add" className="landing__screenshot" />
+                <figcaption className="landing__screenshot-caption">See key data at a glance</figcaption>
+              </figure>
+            </div>
+            <div className="landing__screenshot-single">
+              <p className="landing__screenshot-subtitle">You can copy and paste signatures directly from the Probe scanner in Eve</p>
+              <figure className="landing__screenshot-figure">
+                <img src={showSigsImg} alt="Signature panel" className="landing__screenshot" />
+                <figcaption className="landing__screenshot-caption">Cut and paste signatures from game to map</figcaption>
+              </figure>
+            </div>
+          </p>
+        </section>
+
+        {/* ── About Me ──────────────────────────────────────── */}
+        <section className="landing__section" id="about-me">
+          <h2 className="landing__section-title">About Me</h2>
+          <div className="landing__about-me">
+            <p className="landing__section-body">
+              Nexum is written by Addelee as a solo project.  I've played eve since Beta back in 2003. You might see me hanging out in the Help channels or the Scanning channel.  I've played in all areas of space from living in wormholes and thera, running missions in High Sec, gate camping in lowsec and now, null life with Goonswarm.
+              <br/><br/>As a day job, I am a programmer and run <a href='https://area404.org' target="_blank" className="landing__faq-link">Area 404</a>.  Because of this, I decided I'd write this tool.  I'm an avid explorer in Eve therefore I wanted a tool that worked for me.
+              <br/><br/>Nexum is open source and I welcome anyone to contribute.  I would definitely appreciate feedback and any bugs you encounter so please flag things on <a href="https://github.com/GQuantrill/eve-nexum/issues" target='_blank' className="landing__faq-link"> GitHub</a>
+            </p>
+            
+            <img src={portraitImg} alt="Portrait" className="landing__portrait" />
+          </div>
+        </section>
+
+        {/* ── Tech Stack ────────────────────────────────────── */}
+        <section className="landing__section" id="tech-stack">
+          <h2 className="landing__section-title">Tech Stack</h2>
+          <p className="landing__section-body">
+            Nexum is held together with the finest space-age materials money and caffeine can buy.
+            The frontend is <strong>React</strong> with <strong>TypeScript</strong> — because arguing with a compiler
+            is still more productive than arguing with a nullsec alliance.
+            Maps are rendered with <strong>ReactFlow</strong>, which handles all the node-dragging
+            shenanigans so I didn't have to.
+            State is managed by <strong>Zustand</strong>, which is delightfully small and has never once
+            told me to "just use Redux".
+          </p>
+          <p className="landing__section-body">
+            The backend is <strong>Node.js</strong> with <strong>Express</strong> — proven, boring, and it works.
+            Data lives in <strong>PostgreSQL</strong>, seeded with CCP's Static Data Export so Nexum
+            actually knows what J213422 is without asking the ESI every five seconds.
+            Authentication is handled by <strong>EVE Online SSO</strong> — your credentials never touch
+            this server, which is exactly how it should be.
+          </p>
+          <p className="landing__section-body">
+            Live system intelligence comes from the <strong>EVE ESI</strong> (CCP's official API) and kill
+            data from <strong>zKillboard</strong>. The whole thing is containerised with <strong>Docker </strong>
+             and proxied through <strong>nginx</strong>, because someone has to keep the lights on while
+            you're getting evicted from your wormhole.
+          </p>
+        </section>
+
+        {/* ── FAQs ──────────────────────────────────────────── */}
+        <section className="landing__section" id="faqs">
+          <h2 className="landing__section-title">FAQs</h2>
+          <div className="landing__faq-list">
+
+            <div className="landing__faq-item">
+              <h3 className="landing__faq-q">Can I use multiple accounts?</h3>
+              <p className="landing__faq-a">
+                Yes — each EVE character gets their own set of maps. Just log in with a different character
+                via EVE SSO and Nexum will keep their maps completely separate. No cross-contamination,
+                no accidental sharing of your super-secret wormhole chain with your alt corp.
+              </p>
+            </div>
+
+            <div className="landing__faq-item">
+              <h3 className="landing__faq-q">Is my data safe?</h3>
+              <p className="landing__faq-a">
+                Nexum never sees your EVE password — authentication is handled entirely by CCP's EVE SSO.
+                The only thing stored is your character identity and the maps you build. Your map data
+                lives in a private database and is not shared with anyone. That said, don't use Nexum
+                for your alliance's top-secret invasion route — no tool on the internet is a substitute
+                for good operational security.
+              </p>
+            </div>
+
+            <div className="landing__faq-item">
+              <h3 className="landing__faq-q">Can I report bugs, add feedback and request features?</h3>
+              <p className="landing__faq-a">
+                Absolutely. The project is open source on{' '}
+                <a href="https://github.com/GQuantrill/eve-nexum" target="_blank" rel="noopener noreferrer" className="landing__faq-link">
+                  GitHub
+                </a>
+                {' '}— open an issue for bugs or feature requests, or submit a pull request if you're feeling
+                brave. Feedback via in-game mail to the character tied to this account also works if GitHub
+                isn't your thing.
+              </p>
+            </div>
+
+            <div className="landing__faq-item">
+              <h3 className="landing__faq-q">Can I run this myself?</h3>
+              <p className="landing__faq-a">
+                Yes — Nexum is fully self-hostable. The source is on{' '}
+                <a href="https://github.com/GQuantrill/eve-nexum" target="_blank" rel="noopener noreferrer" className="landing__faq-link">
+                  GitHub
+                </a>
+                {' '}and the whole stack spins up with a single <code>docker compose up</code>.
+                You'll need to register your own EVE application on the{' '}
+                <a href="https://developers.eveonline.com" target="_blank" rel="noopener noreferrer" className="landing__faq-link">
+                  CCP developer portal
+                </a>
+                {' '}to get SSO credentials, but beyond that the README covers everything —
+                including importing the EVE static data and pointing Traefik at it if that's your thing.
+                If something breaks, open an issue. If you fix it, please open a PR.
+
+                <br/><br/>It isn't the most technical thing to run up but I'd recommend you have basic knownledge of docker and whatever server your running on (Linux?)
+              </p>
+            </div>
+
+            <div className="landing__faq-item">
+              <h3 className="landing__faq-q">But you're a Goon, why would we trust you?</h3>
+              <p className="landing__faq-a">
+                Fair question, and honestly the correct instinct to have in New Eden. The code is fully
+                open source — you're welcome to read every line, run it yourself, or have someone you trust
+                audit it. Nexum has no interest in your scouting routes, your corp's killboard shame, or
+                whatever you've got parked in that C5. The worst thing a Goon has ever done in a wormhole
+                is get evicted from one, and I'd like to help you avoid that fate.
+              </p>
+            </div>
+
+          </div>
+        </section>
 
         <footer className="landing__footer">
           Nexum is not affiliated with CCP Games or EVE Online.

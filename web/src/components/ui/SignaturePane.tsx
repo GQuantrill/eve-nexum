@@ -286,6 +286,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
       />
     )}
     <div className="sig-pane">
+      <p className="sig-pane__hint">You can copy and paste signatures directly from the Probe scanner in Eve. To do this, open your probe scanner.  Press control A to select them all, then control C to copy.  Use control V to paste them here</p>
       <div className="sig-pane__toolbar">
         <button className="icon-btn" onClick={addSig} title="Add signature">Add signature</button>
         {selected.size > 0 && (

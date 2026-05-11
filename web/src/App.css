@@ -1234,6 +1234,14 @@ div.system-node__easy-handle {
   gap: 6px;
 }
 
+.sig-pane__hint {
+  font-size: 13px;
+  color: #c8d0e0;
+  margin: 0 0 6px;
+  font-style: italic;
+  margin: 10px;
+}
+
 .sig-pane__toolbar {
   display: flex;
   justify-content: flex-end;
@@ -2178,6 +2186,70 @@ div.system-node__easy-handle {
   width: 100%;
 }
 
+.landing__demo {
+  position: relative;
+  width: 100%;
+  margin: 16px 0;
+}
+
+.landing__demo-img {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid #1a2535;
+  display: block;
+}
+
+.landing__screenshot-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.landing__screenshot-single {
+  margin-top: 12px;
+  display: flex;
+  justify-content: center;
+}
+
+.landing__screenshot-single .landing__screenshot {
+  max-width: 100%;
+}
+
+.landing__screenshot {
+  width: 100%;
+  border-radius: 6px;
+  border: 1px solid #1a2535;
+  display: block;
+}
+
+.landing__screenshot--sm {
+  width: auto;
+  max-width: 200px;
+  margin: 0 auto;
+}
+
+.landing__screenshot-figure {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.landing__screenshot-caption {
+  font-size: 12px;
+  color: #5a7090;
+  text-align: center;
+}
+
+.landing__screenshot-subtitle {
+  font-size: 13px;
+  color: #8a9ab8;
+  margin: 0 0 12px;
+  text-align: center;
+}
+
 .landing__feature {
   background: rgba(13, 20, 35, 0.8);
   border: 1px solid #1a2840;
@@ -2289,6 +2361,79 @@ div.system-node__easy-handle {
   transition: color 0.15s, border-color 0.15s;
 }
 .landing__switch-link:hover { color: #4d9de0; border-color: #4d9de0; }
+
+.landing__section {
+  width: 100%;
+  padding: 48px 0;
+  border-top: 1px solid #1a2535;
+}
+
+.landing__section-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: #c8d8f0;
+  margin-bottom: 16px;
+}
+
+.landing__section-body {
+  font-size: 15px;
+  color: #5a7090;
+  line-height: 1.7;
+}
+
+.landing__about-me {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.landing__about-me .landing__section-body {
+  flex: 1;
+  margin: 0;
+}
+
+.landing__portrait {
+  width: 240px;
+  height: 240px;
+  border-radius: 10%;
+  border: 2px solid #1a2840;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.landing__faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.landing__faq-item {
+  border-left: 2px solid #1a2840;
+  padding-left: 16px;
+}
+
+.landing__faq-q {
+  font-size: 15px;
+  font-weight: 600;
+  color: #c8d8f0;
+  margin: 0 0 6px;
+}
+
+.landing__faq-a {
+  font-size: 14px;
+  color: #5a7090;
+  line-height: 1.7;
+  margin: 0;
+}
+
+.landing__faq-link {
+  color: #4d9de0;
+  text-decoration: none;
+}
+
+.landing__faq-link:hover {
+  text-decoration: underline;
+}
 
 .landing__footer {
   font-size: 12px;

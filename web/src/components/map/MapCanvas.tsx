@@ -489,6 +489,7 @@ export function MapCanvas() {
         onPaneContextMenu={onPaneContextMenu}
         onNodeContextMenu={onNodeContextMenu}
         onEdgeContextMenu={onEdgeContextMenu}
+        proOptions={{ hideAttribution: true }}
         onSelectionContextMenu={onSelectionContextMenu}
         onPaneClick={onPaneClick}
         onSelectionChange={onSelectionChange}
