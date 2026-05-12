@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { api } from '../../api/client';
 import { useMapStore } from '../../store/mapStore';
 import type { Signature, SigType } from '../../types';
@@ -73,8 +73,9 @@ function elapsed(isoString: string | undefined, now: number): string {
 }
 
 export function SignaturePane({ systemId }: { systemId: string }) {
-  const activeMapId = useMapStore((s) => s.activeMapId);
-  const map         = useMapStore((s) => s.map);
+  const activeMapId     = useMapStore((s) => s.activeMapId);
+  const map             = useMapStore((s) => s.map);
+  const currentSystemId = useMapStore((s) => s.currentSystemId);
 
   const systemStatics = useMemo(
     () => map.systems.find((sys) => sys.id === systemId)?.statics ?? [],
@@ -119,10 +120,42 @@ export function SignaturePane({ systemId }: { systemId: string }) {
       .catch(() => {});
   }, [activeMapId, systemId]);
 
+  const processPaste = useCallback(async (parsed: ParsedSig[]) => {
+    if (!activeMapId) return;
+    const existing = sigsRef.current;
+    const toUpdate: { id: string; updates: Partial<Signature> }[] = [];
+    const toCreate: ParsedSig[] = [];
+
+    for (const p of parsed) {
+      const match = existing.find((s) => s.sigId === p.sigId);
+      if (match) {
+        const updates: Partial<Signature> = {};
+        if (p.sigType !== 'unknown') updates.sigType = p.sigType;
+        if (p.name) updates.name = p.name;
+        toUpdate.push({ id: match.id, updates });
+      } else {
+        toCreate.push(p);
+      }
+    }
+
+    for (const { id, updates } of toUpdate) updateSig(id, updates);
+
+    for (const p of toCreate) {
+      try {
+        const sig = await api<Signature>(
+          `/api/maps/${activeMapId}/systems/${systemId}/signatures`,
+          { method: 'POST', body: JSON.stringify({ sigId: p.sigId, sigType: p.sigType, name: p.name }) },
+        );
+        setSigs((prev) => [...prev, sig]);
+      } catch { /* ignore individual failures */ }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeMapId, systemId]);
+
   useEffect(() => {
     if (!activeMapId) return;
 
-    const handlePaste = async (e: ClipboardEvent) => {
+    const handlePaste = (e: ClipboardEvent) => {
       const target = e.target as HTMLElement;
       if (
         target.tagName === 'INPUT' ||
@@ -136,39 +169,23 @@ export function SignaturePane({ systemId }: { systemId: string }) {
 
       e.preventDefault();
 
-      const existing = sigsRef.current;
-      const toUpdate: { id: string; updates: Partial<Signature> }[] = [];
-      const toCreate: ParsedSig[] = [];
-
-      for (const p of parsed) {
-        const match = existing.find((s) => s.sigId === p.sigId);
-        if (match) {
-          const updates: Partial<Signature> = {};
-          if (p.sigType !== 'unknown') updates.sigType = p.sigType;
-          if (p.name) updates.name = p.name;
-          toUpdate.push({ id: match.id, updates });
-        } else {
-          toCreate.push(p);
-        }
+      // Warn if the character is in a different system than the one being edited
+      if (currentSystemId && currentSystemId !== systemId) {
+        const currentName  = map.systems.find((s) => s.id === currentSystemId)?.name  ?? 'unknown';
+        const selectedName = map.systems.find((s) => s.id === systemId)?.name ?? 'unknown';
+        setPendingAction({
+          message: `Your character is currently in ${currentName}, but you are pasting signatures into ${selectedName}. Continue?`,
+          fn: () => processPaste(parsed),
+        });
+        return;
       }
 
-      for (const { id, updates } of toUpdate) updateSig(id, updates);
-
-      for (const p of toCreate) {
-        try {
-          const sig = await api<Signature>(
-            `/api/maps/${activeMapId}/systems/${systemId}/signatures`,
-            { method: 'POST', body: JSON.stringify({ sigId: p.sigId, sigType: p.sigType, name: p.name }) },
-          );
-          setSigs((prev) => [...prev, sig]);
-        } catch { /* ignore individual failures */ }
-      }
+      processPaste(parsed);
     };
 
     window.addEventListener('paste', handlePaste);
     return () => window.removeEventListener('paste', handlePaste);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeMapId, systemId]);
+  }, [activeMapId, systemId, currentSystemId, map.systems, processPaste]);
 
   const addSig = async () => {
     if (!activeMapId) return;
