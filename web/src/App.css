@@ -1195,13 +1195,18 @@ div.system-node__easy-handle {
   flex-shrink: 0;
 }
 
+.info-card--collapsed .info-card__header {
+  border-bottom: none;
+}
+
 .info-card__header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 6px;
   padding: 5px 8px;
   border-bottom: 1px solid #1e2740;
   background: #0d1117;
+  cursor: pointer;
 }
 
 .info-card__title {
@@ -1210,6 +1215,31 @@ div.system-node__easy-handle {
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: #c0ccde;
+  flex: 1;
+}
+
+.info-card__collapse-btn {
+  background: none;
+  border: none;
+  color: #6a80a0;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+
+  &:hover { color: #c0ccde; }
+}
+
+.info-card__chevron {
+  display: inline-block;
+  font-size: 14px;
+  transition: transform 0.15s ease;
+  transform: rotate(0deg);
+}
+
+.info-card__chevron--collapsed {
+  transform: rotate(-90deg);
 }
 
 .info-card__drag-handle {
