@@ -94,11 +94,22 @@ export async function migrate() {
       created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
 
+    CREATE TABLE IF NOT EXISTS system_activity (
+      eve_system_id INTEGER     NOT NULL,
+      hour          TIMESTAMPTZ NOT NULL,
+      jumps         INTEGER     NOT NULL DEFAULT 0,
+      ship_kills    INTEGER     NOT NULL DEFAULT 0,
+      pod_kills     INTEGER     NOT NULL DEFAULT 0,
+      npc_kills     INTEGER     NOT NULL DEFAULT 0,
+      PRIMARY KEY (eve_system_id, hour)
+    );
+
     CREATE INDEX IF NOT EXISTS idx_maps_user             ON maps (user_id);
     CREATE INDEX IF NOT EXISTS idx_map_systems_map       ON map_systems (map_id);
     CREATE INDEX IF NOT EXISTS idx_map_connections_map   ON map_connections (map_id);
     CREATE INDEX IF NOT EXISTS idx_map_signatures_system ON map_signatures (system_id);
     CREATE INDEX IF NOT EXISTS idx_map_structures_system ON map_structures (system_id);
     CREATE INDEX IF NOT EXISTS idx_user_events_user      ON user_events (user_id, created_at);
+    CREATE INDEX IF NOT EXISTS idx_system_activity       ON system_activity (eve_system_id, hour DESC);
   `);
 }

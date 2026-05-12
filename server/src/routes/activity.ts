@@ -1,8 +1,9 @@
 import { Router } from 'express';
+import { db } from '../db.js';
 
 const router = Router();
-const ESI = 'https://esi.evetech.net/v1';
-const HOUR_MS = 60 * 60 * 1000;
+const ESI         = 'https://esi.evetech.net/v1';
+const HOUR_MS     = 60 * 60 * 1000;
 const MAX_HISTORY = 24;
 const ESI_CACHE_TTL = 5 * 60 * 1000;
 
@@ -62,11 +63,40 @@ async function fetchEsi(): Promise<EsiSnapshot | null> {
   }
 }
 
+async function loadFromDb(sysId: number): Promise<HourlyPoint[]> {
+  const cutoff = new Date(hourFloor() - (MAX_HISTORY - 1) * HOUR_MS);
+  const { rows } = await db.query<{
+    hour: Date; jumps: string; ship_kills: string; pod_kills: string; npc_kills: string;
+  }>(
+    `SELECT hour, jumps, ship_kills, pod_kills, npc_kills
+     FROM system_activity
+     WHERE eve_system_id = $1 AND hour >= $2
+     ORDER BY hour ASC`,
+    [sysId, cutoff],
+  );
+  return rows.map((r) => ({
+    hour:      r.hour.getTime(),
+    jumps:     parseInt(r.jumps,      10),
+    shipKills: parseInt(r.ship_kills, 10),
+    podKills:  parseInt(r.pod_kills,  10),
+    npcKills:  parseInt(r.npc_kills,  10),
+  }));
+}
+
+async function ensureHistory(sysId: number): Promise<void> {
+  if (systemHistory.has(sysId)) return;
+  const history = await loadFromDb(sysId);
+  systemHistory.set(sysId, history);
+  trackedSystems.add(sysId);
+}
+
 async function recordSnapshot(): Promise<void> {
   const snap = await fetchEsi();
   if (!snap) return;
 
-  const hour = hourFloor();
+  const hour     = hourFloor();
+  const hourDate = new Date(hour);
+
   for (const sysId of trackedSystems) {
     const kll = snap.kills.get(sysId);
     const point: HourlyPoint = {
@@ -85,25 +115,53 @@ async function recordSnapshot(): Promise<void> {
       if (history.length > MAX_HISTORY) history.shift();
     }
     systemHistory.set(sysId, history);
+
+    await db.query(
+      `INSERT INTO system_activity (eve_system_id, hour, jumps, ship_kills, pod_kills, npc_kills)
+       VALUES ($1, $2, $3, $4, $5, $6)
+       ON CONFLICT (eve_system_id, hour) DO UPDATE SET
+         jumps      = EXCLUDED.jumps,
+         ship_kills = EXCLUDED.ship_kills,
+         pod_kills  = EXCLUDED.pod_kills,
+         npc_kills  = EXCLUDED.npc_kills`,
+      [sysId, hourDate, point.jumps, point.shipKills, point.podKills, point.npcKills],
+    );
   }
 }
 
-// Poll 1 min after each server-side hour boundary
+async function pruneOldRows(): Promise<void> {
+  const cutoff = new Date(hourFloor() - MAX_HISTORY * HOUR_MS);
+  await db.query(`DELETE FROM system_activity WHERE hour < $1`, [cutoff]);
+}
+
+async function init(): Promise<void> {
+  try {
+    const { rows } = await db.query<{ eve_system_id: number }>(
+      `SELECT DISTINCT eve_system_id FROM system_activity`,
+    );
+    for (const row of rows) trackedSystems.add(row.eve_system_id);
+    await pruneOldRows();
+  } catch {
+    // Table not yet created — migrate() runs before any routes are hit
+  }
+}
+
 function scheduleNextPoll() {
-  const now   = Date.now();
-  const next  = Math.ceil(now / HOUR_MS) * HOUR_MS + 60_000;
+  const now  = Date.now();
+  const next = Math.ceil(now / HOUR_MS) * HOUR_MS + 60_000;
   setTimeout(async () => {
     await recordSnapshot();
     scheduleNextPoll();
   }, next - now);
 }
-scheduleNextPoll();
+
+init().then(() => scheduleNextPoll());
 
 router.get('/:systemId', async (req, res) => {
   const eveSystemId = parseInt(req.params.systemId, 10);
   if (isNaN(eveSystemId)) { res.status(400).json({ error: 'invalid system id' }); return; }
 
-  trackedSystems.add(eveSystemId);
+  await ensureHistory(eveSystemId);
   await recordSnapshot();
 
   res.json(systemHistory.get(eveSystemId) ?? []);
