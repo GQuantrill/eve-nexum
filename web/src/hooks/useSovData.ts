@@ -32,9 +32,10 @@ export interface SovResult {
   faction?:  { name: string; logoUrl: string };
 }
 
-const sovMap      = new Map<number, SovEntry>();
-const infoCache   = new Map<string, EntityInfo>();
-const factionsMap = new Map<number, FactionEntry>();
+const sovMap        = new Map<number, SovEntry>();
+const infoCache     = new Map<string, EntityInfo>();
+const infoInflight  = new Map<string, Promise<EntityInfo | null>>();
+const factionsMap   = new Map<number, FactionEntry>();
 let   sovLoad: Promise<void> | null      = null;
 let   factionsLoad: Promise<void> | null = null;
 
@@ -59,16 +60,23 @@ async function ensureFactions() {
 async function fetchEntityInfo(type: 'alliances' | 'corporations', id: number): Promise<EntityInfo | null> {
   const key = `${type}:${id}`;
   if (infoCache.has(key)) return infoCache.get(key)!;
-  try {
-    const r = await fetch(`${ESI}/${type}/${id}/`);
-    if (!r.ok) return null;
-    const d = await r.json() as { name: string; ticker: string };
-    const info: EntityInfo = { name: d.name, ticker: d.ticker };
-    infoCache.set(key, info);
-    return info;
-  } catch {
-    return null;
-  }
+  const existing = infoInflight.get(key);
+  if (existing) return existing;
+  const promise = fetch(`${ESI}/${type}/${id}/`)
+    .then((r) => {
+      if (!r.ok) return null;
+      return r.json() as Promise<{ name: string; ticker: string }>;
+    })
+    .then((d) => {
+      if (!d) return null;
+      const info: EntityInfo = { name: d.name, ticker: d.ticker };
+      infoCache.set(key, info);
+      return info;
+    })
+    .catch(() => null)
+    .finally(() => infoInflight.delete(key));
+  infoInflight.set(key, promise);
+  return promise;
 }
 
 export function useSovData(eveSystemId: number | null): SovResult | null {
@@ -81,7 +89,6 @@ export function useSovData(eveSystemId: number | null): SovResult | null {
     Promise.all([ensureSovMap(), ensureFactions()]).then(async () => {
       const entry = sovMap.get(eveSystemId);
       if (!entry || cancelled) return;
-      console.log(entry)
       const [allianceInfo, corpInfo] = await Promise.all([
         entry.alliance_id    ? fetchEntityInfo('alliances',    entry.alliance_id)    : Promise.resolve(null),
         entry.corporation_id ? fetchEntityInfo('corporations', entry.corporation_id) : Promise.resolve(null),
