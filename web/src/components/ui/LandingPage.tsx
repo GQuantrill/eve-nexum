@@ -9,34 +9,39 @@ interface LastCharacter { characterId: number; characterName: string; }
 
 const FEATURES = [
   {
-    icon: '◈',
-    title: 'Wormhole Chain Mapping',
-    desc: 'Drag-and-drop interactive map. Add systems, draw connections, and track your wormhole chain in real time.',
-  },
-  {
-    icon: '✦',
-    title: 'System Intelligence',
-    desc: 'ESI-powered data per system — security status, wormhole class, effects, statics, constellation, NPC type, and sovereignty.',
+    icon: '◎',
+    title: 'Live Character Tracking',
+    desc: 'Your current system updates across the EVE universe every 10 seconds via ESI. New systems appear on your map automatically and link back to where you came from.',
   },
   {
     icon: '◐',
-    title: 'Signature Management',
-    desc: 'Paste directly from the probe scanner. Track sig type, wormhole code, and destination — with smart dropdowns showing connected systems.',
+    title: 'Signature Capture',
+    desc: 'Paste straight from the probe scanner. Sig IDs, wormhole codes, destinations, and timestamps are kept across sessions — ready to use again later.',
+  },
+  {
+    icon: '⊞',
+    title: 'NPC Station Information',
+    desc: 'Per-system station list with available services and owning corporation. Set destination or add a waypoint in one click.',
   },
   {
     icon: '⚔',
-    title: 'Kill Intelligence',
-    desc: 'Live zKillboard feed per system. See recent kills with ship, pilot, corporation and alliance — with direct zkillboard links.',
+    title: 'zKill Integration',
+    desc: 'Live recent-kill feed per system — ship, pilot, corporation, alliance — with direct links back to zkillboard.com.',
   },
   {
-    icon: '⟷',
-    title: 'Connection Tracking',
-    desc: 'Monitor wormhole mass and time status on every connection. Mark connections as stable, destabilised, or critical.',
+    icon: '✦',
+    title: 'Thera Connections',
+    desc: 'EVE-Scout\'s live Thera signature list in your sidebar, sorted by jumps from your current location. Route preview and one-click destination set.',
   },
   {
-    icon: '⊕',
-    title: 'Secure EVE SSO',
-    desc: 'Log in with EVE Online SSO. No passwords stored — only your character identity is used to personalise your map.',
+    icon: '✦',
+    title: 'Turnur Connections',
+    desc: 'The same live coverage for Turnur, sorted by jumps from your location. Pre-plan your route in or out without scanning.',
+  },
+  {
+    icon: '★',
+    title: 'Find Your Closest A0 Sun',
+    desc: 'The 10 nearest A0 (Blue Small) suns to your current system, sorted by stargate jumps. Set destination or add a waypoint instantly.',
   },
 ];
 

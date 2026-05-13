@@ -117,6 +117,39 @@ The frontend is available at `http://localhost:5174`. The Vite dev server proxie
 
 ---
 
+## Static data files
+
+Some pre-computed lookups live in `server/data/` as plain JSON, derived once from the EVE Static Data Export (SDE). They're committed to the repo so a fresh install works without an extra step. You only need to regenerate them when CCP releases an SDE drop that adds or changes the underlying data.
+
+### `data/a0-systems.json`
+
+List of solar system IDs whose star is the visual "Sun A0 (Blue Small)" type (`typeID 3801` in the SDE). The server reads it at startup and exposes the list via `GET /api/systems/a0`; the client uses it to render a `★` icon on the matching system nodes. Currently 245 entries spanning both K-space and J-space.
+
+> Note: this is the canonical in-game "A0" classification (`typeID 3801`), not the SDE's `statistics.spectralClass` field. The two don't agree — a "Sun A0 (Blue Small)" system can carry a `spectralClass` value like `"F8 V"`. The `typeID` is what players actually see in-game and what other A0 tools filter on.
+
+To regenerate from the SDE zip in `server/data/`:
+
+```bash
+cd server
+unzip -p data/eve-online-static-data-*-jsonl.zip mapStars.jsonl | node -e "
+const lines = require('fs').readFileSync(0, 'utf8').split('\n').filter(Boolean);
+const ids = [];
+for (const l of lines) {
+  try {
+    const o = JSON.parse(l);
+    if (o.typeID === 3801) ids.push(o.solarSystemID);
+  } catch {}
+}
+ids.sort((a, b) => a - b);
+require('fs').writeFileSync('data/a0-systems.json', JSON.stringify(ids) + '\n');
+console.log('wrote ' + ids.length + ' A0 system IDs');
+"
+```
+
+Restart the server after regenerating — the file is read once at process start.
+
+---
+
 ## Technology Overview
 
 ### Frontend — `web/`

@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 import { Handle, Position, useConnection } from '@xyflow/react';
 import type { NodeProps } from '@xyflow/react';
 import type { MapSystem } from '../../types';
@@ -8,6 +8,8 @@ import { useSovData } from '../../hooks/useSovData';
 import { useEsiSystem } from '../../hooks/useEsiSystem';
 import { useIncursions, findIncursion } from '../../hooks/useIncursions';
 import { useInsurgency, findInsurgency } from '../../hooks/useInsurgency';
+import { useScoutConnections, findScoutConnections } from '../../hooks/useScoutConnections';
+import { useA0Systems } from '../../hooks/useA0Systems';
 import { truesecColor } from '../../utils/truesec';
 
 type SystemNodeData = MapSystem & { selected: boolean };
@@ -26,7 +28,23 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
   const incursion       = findIncursion(incursions, sys.eveSystemId);
   const insurgencies    = useInsurgency();
   const insurgency      = findInsurgency(insurgencies, sys.eveSystemId);
+  const scoutAll        = useScoutConnections();
+  const scoutMatches    = findScoutConnections(scoutAll, sys.eveSystemId);
+  const a0Systems       = useA0Systems();
+  const a0Ids           = useMemo(() => new Set(a0Systems.map(s => s.id)), [a0Systems]);
+  const isA0            = sys.eveSystemId !== null && a0Ids.has(sys.eveSystemId);
   const connection      = useConnection();
+
+  // Tooltip label: dedupe by scout system name (Thera / Turnur). Multiple
+  // connections from the same scout are summarised, mixed scouts are listed.
+  const scoutLabel = scoutMatches.length === 0
+    ? ''
+    : (() => {
+        const names = Array.from(new Set(scoutMatches.map(c => c.outSystemName)));
+        return names.length === 1
+          ? `${names[0]} connection${scoutMatches.length > 1 ? 's' : ''}`
+          : `${names.join(' & ')} connections`;
+      })();
   const isTarget        = connection.inProgress && connection.fromNode?.id !== sys.id;
 
   return (
@@ -76,6 +94,18 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
             <span className="system-node__insurgency-icon">
               ☠
               <span className="system-node__insurgency-tooltip">Insurgency System</span>
+            </span>
+          )}
+          {scoutMatches.length > 0 && (
+            <span className="system-node__scout-icon">
+              ✦
+              <span className="system-node__scout-tooltip">{scoutLabel}</span>
+            </span>
+          )}
+          {isA0 && (
+            <span className="system-node__a0-icon">
+              ★
+              <span className="system-node__a0-tooltip">A0 sun</span>
             </span>
           )}
           {sys.effect !== 'none' && (

@@ -115,15 +115,19 @@ export function NpcStationsPane({ eveSystemId }: { eveSystemId: number | null })
               )}
               <span className="npc-station-btns">
                 <button
-                  className="npc-wp-btn"
-                  data-tooltip="Set Destination"
+                  type="button"
+                  className="sys-btn"
                   onClick={(e) => { e.stopPropagation(); setDestination(s.id).catch(console.error); }}
-                >🎯</button>
+                >
+                  Set Destination
+                </button>
                 <button
-                  className="npc-wp-btn"
-                  data-tooltip="Add Waypoint"
+                  type="button"
+                  className="sys-btn"
                   onClick={(e) => { e.stopPropagation(); addWaypoint(s.id).catch(console.error); }}
-                >📍</button>
+                >
+                  + Waypoint
+                </button>
               </span>
             </span>
           </li>

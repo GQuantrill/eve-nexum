@@ -16,6 +16,9 @@ import activityRouter, { initActivity } from './routes/activity.js';
 import statsRouter      from './routes/stats.js';
 import incursionsRouter  from './routes/incursions.js';
 import insurgencyRouter  from './routes/insurgency.js';
+import scoutRouter        from './routes/scout.js';
+import routeRouter        from './routes/route.js';
+import { loadRouteGraph } from './services/routeGraph.js';
 import { adminRouter }   from './routes/admin.js';
 import { authLimiter, esiLimiter, publicLimiter } from './middleware/rateLimits.js';
 
@@ -53,6 +56,8 @@ app.use('/api/activity',  esiLimiter, activityRouter);
 app.use('/api/stats',      statsRouter);
 app.use('/api/incursions',  esiLimiter, incursionsRouter);
 app.use('/api/insurgency',  esiLimiter, insurgencyRouter);
+app.use('/api/scout',       esiLimiter, scoutRouter);
+app.use('/api/route',       esiLimiter, routeRouter);
 app.use('/api/admin',       adminRouter);
 
 app.get('/health', (_req, res) => res.json({ ok: true }));
@@ -72,6 +77,7 @@ migrate()
     await expireMaps();
     setInterval(expireMaps, 60 * 60 * 1000); // re-check hourly
     await initActivity();
+    await loadRouteGraph();
     app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
   })
   .catch((err) => { console.error('Migration failed:', err); process.exit(1); });

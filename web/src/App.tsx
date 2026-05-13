@@ -6,6 +6,7 @@ import { SystemPanel } from './components/ui/SystemPanel';
 import { ConnectionPanel } from './components/ui/ConnectionPanel';
 import { Toolbar } from './components/ui/Toolbar';
 import { MapSidebar } from './components/ui/MapSidebar';
+import { Sidebar } from './components/ui/Sidebar';
 import { LandingPage } from './components/ui/LandingPage';
 import { Toaster } from './components/ui/Toaster';
 import { useMapStore } from './store/mapStore';
@@ -37,10 +38,13 @@ function MapApp() {
       <div className="layout">
         <Toolbar />
         <div className="layout__body">
-          <MapCanvas />
-          <MapSidebar />
-          {selectedSystemId && <SystemPanel />}
-          {selectedConnectionId && <ConnectionPanel />}
+          <Sidebar />
+          <div className="layout__main">
+            <MapCanvas />
+            <MapSidebar />
+            {selectedSystemId && <SystemPanel />}
+            {selectedConnectionId && <ConnectionPanel />}
+          </div>
         </div>
       </div>
     </ReactFlowProvider>
