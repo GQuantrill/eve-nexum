@@ -1,7 +1,9 @@
 import { Router } from 'express';
 import { db } from '../db.js';
+import { createLogger } from '../utils/logger.js';
 
 export const systemsRouter = Router();
+const log = createLogger('systems');
 
 // GET /api/systems/search?q=<query>
 systemsRouter.get('/search', async (req, res) => {
@@ -23,7 +25,7 @@ systemsRouter.get('/search', async (req, res) => {
     );
     return res.json(rows);
   } catch (err) {
-    console.error(err);
+    log.error('Query failed:', err);
     return res.status(500).json({ error: 'Database query failed' });
   }
 });
@@ -44,7 +46,7 @@ systemsRouter.get('/:id(\\d+)', async (req, res) => {
     if (!rows.length) return res.status(404).json({ error: 'System not found' });
     return res.json(rows[0]);
   } catch (err) {
-    console.error(err);
+    log.error('Query failed:', err);
     return res.status(500).json({ error: 'Database query failed' });
   }
 });

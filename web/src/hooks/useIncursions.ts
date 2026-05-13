@@ -18,6 +18,10 @@ let moduleCache: { data: IncursionSystem[]; fetchedAt: number } | null = null;
 let inflight: Promise<IncursionSystem[]> | null = null;
 
 const subscribers = new Set<(d: IncursionSystem[]) => void>();
+// Single shared poll timer. Previously every subscribed component created its
+// own setInterval — 50 SystemNodes meant 50 timers all hitting /api/incursions
+// on the same cadence.
+let pollTimer: ReturnType<typeof setInterval> | null = null;
 
 function notify(d: IncursionSystem[]) {
   subscribers.forEach((fn) => fn(d));
@@ -44,10 +48,15 @@ export function useIncursions() {
       setData(moduleCache.data);
     }
 
-    const id = setInterval(load, POLL_MS);
+    // Start the shared timer on the first subscriber.
+    if (!pollTimer) pollTimer = setInterval(load, POLL_MS);
+
     return () => {
       subscribers.delete(setData);
-      clearInterval(id);
+      if (subscribers.size === 0 && pollTimer) {
+        clearInterval(pollTimer);
+        pollTimer = null;
+      }
     };
   }, []);
 

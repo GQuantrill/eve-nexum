@@ -57,6 +57,9 @@ export function ContextMenu({ x, y, items, onClose }: Props) {
   const [ready, setReady] = useState(false);
 
   const rowCount = items.filter((i) => !('separator' in i && i.separator)).length;
+  // 34 / 12 are the row height and bottom padding the .context-menu CSS uses.
+  // Brittle coupling — if the menu CSS changes, this placement math needs to
+  // change with it.
   const left = Math.min(x, window.innerWidth  - 200);
   const top  = Math.min(y, window.innerHeight - rowCount * 34 - 12);
 

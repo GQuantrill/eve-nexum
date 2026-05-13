@@ -7,6 +7,8 @@ import { NotesEditor } from './NotesEditor';
 import { ConfirmModal, shouldSkipConfirm } from './ConfirmModal';
 import { ContextMenu } from './ContextMenu';
 import { setDestination, addWaypoint } from '../../api/waypoint';
+import { toast } from './Toaster';
+import { useCanEdit } from '../../hooks/useCanEdit';
 
 const STRUCTURE_TYPE_LABELS: Record<StructureType, string> = {
   unknown:   'Unknown',
@@ -62,6 +64,7 @@ function parseStructureClipboard(text: string): ParsedStructure[] {
 
 export function StructuresPane({ systemId }: { systemId: string }) {
   const activeMapId = useMapStore((s) => s.activeMapId);
+  const canEdit     = useCanEdit();
   const [structures, setStructures] = useState<Structure[]>([]);
   const [pendingAction, setPendingAction] = useState<{ message: string; fn: () => void } | null>(null);
   const [ctx, setCtx] = useState<{ x: number; y: number; structure: Structure } | null>(null);
@@ -76,7 +79,7 @@ export function StructuresPane({ systemId }: { systemId: string }) {
     setStructures([]);
     api<Structure[]>(`/api/maps/${activeMapId}/systems/${systemId}/structures`)
       .then(setStructures)
-      .catch(() => {});
+      .catch(() => toast.error('Failed to load structures'));
   }, [activeMapId, systemId]);
 
   useEffect(() => {
@@ -103,16 +106,18 @@ export function StructuresPane({ systemId }: { systemId: string }) {
       e.preventDefault();
 
       const existing = structuresRef.current;
-      for (const p of parsed) {
-        if (existing.some((s) => s.eveId === p.eveId)) continue;
-        try {
-          const s = await api<Structure>(
+      const toCreate = parsed.filter((p) => !existing.some((s) => s.eveId === p.eveId));
+      // Parallel POSTs (n-up to ~dozens) instead of sequential await; the
+      // gather-then-set pattern also avoids N intermediate renders.
+      const created = (await Promise.all(
+        toCreate.map((p) =>
+          api<Structure>(
             `/api/maps/${activeMapId}/systems/${systemId}/structures`,
             { method: 'POST', body: JSON.stringify({ name: p.name, structureType: p.structureType, eveId: p.eveId }) },
-          );
-          setStructures((prev) => [...prev, s]);
-        } catch { /* ignore individual failures */ }
-      }
+          ).catch(() => null),
+        ),
+      )).filter((s): s is Structure => s !== null);
+      if (created.length) setStructures((prev) => [...prev, ...created]);
     };
 
     window.addEventListener('paste', handlePaste);
@@ -140,7 +145,7 @@ export function StructuresPane({ systemId }: { systemId: string }) {
       api(`/api/maps/${activeMapId}/systems/${systemId}/structures/${id}`, {
         method: 'PATCH',
         body: JSON.stringify(payload),
-      }).catch(console.error);
+      }).catch(() => toast.error('Failed to save structure'));
     }, 500));
   };
 
@@ -148,7 +153,7 @@ export function StructuresPane({ systemId }: { systemId: string }) {
     if (!activeMapId) return;
     setStructures((prev) => prev.filter((s) => s.id !== id));
     api(`/api/maps/${activeMapId}/systems/${systemId}/structures/${id}`, { method: 'DELETE' })
-      .catch(console.error);
+      .catch(() => toast.error('Failed to delete structure'));
   };
 
   const deleteAll = () => {
@@ -168,14 +173,16 @@ export function StructuresPane({ systemId }: { systemId: string }) {
         />
       )}
       <div className="sig-pane">
-        <div className="sig-pane__toolbar">
-          <button className="icon-btn" onClick={addStructure} title="Add structure">+</button>
-          {structures.length > 0 && (
-            <button className="sig-toolbar-btn sig-toolbar-btn--danger" onClick={deleteAll}>
-              Delete all
-            </button>
-          )}
-        </div>
+        {canEdit && (
+          <div className="sig-pane__toolbar">
+            <button className="icon-btn" onClick={addStructure} title="Add structure">+</button>
+            {structures.length > 0 && (
+              <button className="sig-toolbar-btn sig-toolbar-btn--danger" onClick={deleteAll}>
+                Delete all
+              </button>
+            )}
+          </div>
+        )}
 
         {structures.length === 0 ? (
           <div className="sig-pane__empty">No structures recorded</div>
@@ -256,11 +263,13 @@ export function StructuresPane({ systemId }: { systemId: string }) {
                     />
                   </td>
                   <td>
-                    <button
-                      className="icon-btn icon-btn--danger"
-                      onClick={() => deleteStructure(s.id)}
-                      title="Delete"
-                    >✕</button>
+                    {canEdit && (
+                      <button
+                        className="icon-btn icon-btn--danger"
+                        onClick={() => deleteStructure(s.id)}
+                        title="Delete"
+                      >✕</button>
+                    )}
                   </td>
                 </tr>
               ))}

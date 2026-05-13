@@ -6,8 +6,9 @@ import type { WormholeMap, MapSystem, MapConnection, SystemClass, WormholeEffect
 
 // Debounce position saves — fires max once per 500 ms per system
 const moveTimers = new Map<string, ReturnType<typeof setTimeout>>();
-// Debounce map name saves
-let nameTimer: ReturnType<typeof setTimeout> | null = null;
+// Debounce map name saves — keyed by mapId so two tabs renaming two different
+// maps don't clobber each other through a shared timer slot.
+const nameTimers = new Map<string, ReturnType<typeof setTimeout>>();
 
 function syncMove(mapId: string, systemId: string, position: { x: number; y: number }) {
   const key = `${mapId}:${systemId}`;
@@ -21,6 +22,11 @@ function syncMove(mapId: string, systemId: string, position: { x: number; y: num
   }, 500));
 }
 
+// Placeholder used before any map is loaded. `id: ''` is the unloaded
+// sentinel — guards everywhere check `!map.id` / `!activeMapId` before
+// writing. Switching to `null` would cascade type changes through every
+// consumer of WormholeMap, so we keep the empty string and centralise the
+// check here.
 const emptyMap = (): WormholeMap => ({
   id: '', name: '', systems: [], connections: [],
   createdAt: '', updatedAt: '',
@@ -156,16 +162,18 @@ export const useMapStore = create<MapStore>()((set, get) => {
             },
           };
         });
+        // System has to land first so connection FKs resolve; the connections
+        // themselves are independent and can race in parallel.
         await api(`/api/maps/${activeMapId}/systems`, {
           method: 'POST',
           body: JSON.stringify({ ...cmd.system }),
         }).catch(console.error);
-        for (const conn of cmd.connections) {
-          await api(`/api/maps/${activeMapId}/connections`, {
+        await Promise.all(cmd.connections.map((conn) =>
+          api(`/api/maps/${activeMapId}/connections`, {
             method: 'POST',
             body: JSON.stringify({ ...conn }),
-          }).catch(console.error);
-        }
+          }).catch(console.error),
+        ));
         break;
       }
 
@@ -310,6 +318,13 @@ export const useMapStore = create<MapStore>()((set, get) => {
     },
 
     switchMap: async (id) => {
+      // Cancel pending writes from the outgoing map — otherwise a debounced
+      // rename or position-save fires against the next map after switch.
+      for (const t of nameTimers.values()) clearTimeout(t);
+      nameTimers.clear();
+      for (const t of moveTimers.values()) clearTimeout(t);
+      moveTimers.clear();
+
       const map = await api<WormholeMap>(`/api/maps/${id}`);
       localStorage.setItem('nexum.lastMapId', id);
       set({ map, activeMapId: id, selectedSystemId: null, selectedConnectionId: null, currentSystemId: null, undoStack: [] });
@@ -343,10 +358,12 @@ export const useMapStore = create<MapStore>()((set, get) => {
       const { activeMapId } = get();
       set((s) => ({ map: { ...s.map, name } }));
       if (!activeMapId) return;
-      if (nameTimer) clearTimeout(nameTimer);
-      nameTimer = setTimeout(() => {
+      const existing = nameTimers.get(activeMapId);
+      if (existing) clearTimeout(existing);
+      nameTimers.set(activeMapId, setTimeout(() => {
+        nameTimers.delete(activeMapId);
         api(`/api/maps/${activeMapId}`, { method: 'PATCH', body: JSON.stringify({ name }) }).catch(console.error);
-      }, 800);
+      }, 800));
     },
 
     setSnapToGrid: (v) => {
@@ -378,10 +395,13 @@ export const useMapStore = create<MapStore>()((set, get) => {
       const id = uuid();
 
       set((s) => {
-        const duplicate = s.map.systems.some(
-          (sys) =>
-            (eveSystemId !== null && sys.eveSystemId === eveSystemId) ||
-            sys.name.toLowerCase() === name.toLowerCase(),
+        // Allow the same K-space hub to appear multiple times on a map (users
+        // do this to represent different paths into the same hub). Only block
+        // wormhole sigs that collide — those are genuinely the same wormhole.
+        const duplicate = s.map.systems.some((sys) =>
+          eveSystemId === null
+            ? sys.eveSystemId === null && sys.name.toLowerCase() === name.toLowerCase()
+            : false,
         );
         if (duplicate) return {};
         return {

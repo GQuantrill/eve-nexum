@@ -47,3 +47,23 @@ export function getEdgeParams(source: InternalNode, target: InternalNode) {
     tx: tp.x, ty: tp.y, targetPos: getEdgePosition(target, tp),
   };
 }
+
+// Picks the source/target handle pair ('top'|'right'|'bottom'|'left') for a
+// connection laid out between two positions. Used both by drag-stop auto-
+// routing in MapCanvas and the "Optimize Connections" button in MapSidebar.
+export function pickHandles(
+  src: { x: number; y: number },
+  tgt: { x: number; y: number },
+): { sourceHandle: 'top' | 'right' | 'bottom' | 'left'; targetHandle: 'top' | 'right' | 'bottom' | 'left' } {
+  const dx = tgt.x - src.x;
+  const dy = tgt.y - src.y;
+  const horizontal = Math.abs(dx) >= Math.abs(dy);
+  if (horizontal) {
+    return dx >= 0
+      ? { sourceHandle: 'right', targetHandle: 'left' }
+      : { sourceHandle: 'left',  targetHandle: 'right' };
+  }
+  return dy >= 0
+    ? { sourceHandle: 'bottom', targetHandle: 'top' }
+    : { sourceHandle: 'top',    targetHandle: 'bottom' };
+}

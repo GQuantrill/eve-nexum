@@ -2,7 +2,10 @@ import { useState, useEffect } from 'react';
 import { useMapStore } from '../../store/mapStore';
 import { useAuth } from '../../context/AuthContext';
 import { useOnlineStatus } from '../../hooks/useOnlineStatus';
+import { useCanEdit } from '../../hooks/useCanEdit';
 import { UserStatsModal } from './UserStatsModal';
+import { ConfirmModal } from './ConfirmModal';
+import { PromptModal } from './PromptModal';
 
 interface EveStatus {
   players:    number;
@@ -51,38 +54,48 @@ function formatCheckedAt(date: Date): string {
   return `${Math.floor(secs / 60)}m ago`;
 }
 
-// Ticks every 5 s so the "Xs ago" label stays fresh
-function useNow() {
+// Self-contained "checked Xs ago" label — owns its own 5 s tick so the rest of
+// the Toolbar doesn't re-render every five seconds along with it.
+function CheckedAtLabel({ checkedAt }: { checkedAt: Date }) {
   const [, setTick] = useState(0);
   useEffect(() => {
     const id = setInterval(() => setTick((n) => n + 1), 5_000);
     return () => clearInterval(id);
   }, []);
+  return <span className="toolbar__checked-at">checked {formatCheckedAt(checkedAt)}</span>;
 }
 
 export function Toolbar() {
-  const { map, maps, maxMaps, maxCorpMaps, corpMapCount, activeMapId, setMapName, switchMap, createMap, deleteMap,
-          mapOptionsOpen, setMapOptionsOpen } = useMapStore();
+  const mapName         = useMapStore((s) => s.map.name);
+  const isCorpActive    = useMapStore((s) => !!s.map.isCorpMap);
+  const systemCount     = useMapStore((s) => s.map.systems.length);
+  const connectionCount = useMapStore((s) => s.map.connections.length);
+  const maps            = useMapStore((s) => s.maps);
+  const maxMaps         = useMapStore((s) => s.maxMaps);
+  const maxCorpMaps     = useMapStore((s) => s.maxCorpMaps);
+  const corpMapCount    = useMapStore((s) => s.corpMapCount);
+  const activeMapId     = useMapStore((s) => s.activeMapId);
+  const setMapName      = useMapStore((s) => s.setMapName);
+  const switchMap       = useMapStore((s) => s.switchMap);
+  const createMap       = useMapStore((s) => s.createMap);
+  const deleteMap       = useMapStore((s) => s.deleteMap);
+  const mapOptionsOpen  = useMapStore((s) => s.mapOptionsOpen);
+  const setMapOptionsOpen = useMapStore((s) => s.setMapOptionsOpen);
+
   const atMapLimit      = maps.filter((m) => !m.isCorpMap).length >= maxMaps;
   const atCorpMapLimit  = corpMapCount >= maxCorpMaps;
   const { user, logout } = useAuth();
+  const canEdit = useCanEdit();
   const { online, checkedAt } = useOnlineStatus(!!user);
   const eveStatus = useEveServerStatus();
-  useNow();
   const [showMaps, setShowMaps]   = useState(false);
   const [showStats, setShowStats] = useState(false);
-
-  async function handleNewMap(isCorpMap: boolean) {
-    const label = isCorpMap ? 'Corp map name:' : 'Map name:';
-    const name = prompt(label, 'New Map');
-    if (name) await createMap(name, isCorpMap);
-  }
+  const [newMapPrompt, setNewMapPrompt] = useState<{ isCorpMap: boolean } | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
 
   async function handleDeleteMap() {
     if (!activeMapId) return;
-    if (confirm(`Delete "${map.name}"? This cannot be undone.`)) {
-      await deleteMap(activeMapId);
-    }
+    await deleteMap(activeMapId);
   }
 
   return (
@@ -106,7 +119,7 @@ export function Toolbar() {
               ? <span className="toolbar__map-type toolbar__map-type--corp">Corp</span>
               : <span className="toolbar__map-type toolbar__map-type--solo">Solo</span>;
           })()}
-          {map.name || 'No Map'}
+          {mapName || 'No Map'}
           <span className="toolbar__caret">▾</span>
         </button>
 
@@ -134,7 +147,7 @@ export function Toolbar() {
             >
               <button
                 className="map-dropdown__item map-dropdown__item--action"
-                onClick={() => { setShowMaps(false); handleNewMap(false); }}
+                onClick={() => { setShowMaps(false); setNewMapPrompt({ isCorpMap: false }); }}
                 disabled={atMapLimit}
               >
                 + Personal Map
@@ -146,7 +159,7 @@ export function Toolbar() {
                 >
                   <button
                     className="map-dropdown__item map-dropdown__item--action"
-                    onClick={() => { setShowMaps(false); handleNewMap(true); }}
+                    onClick={() => { setShowMaps(false); setNewMapPrompt({ isCorpMap: true }); }}
                     disabled={atCorpMapLimit}
                   >
                     + Corp Map
@@ -154,8 +167,8 @@ export function Toolbar() {
                 </span>
               )}
             </span>
-            {maps.length > 1 && (
-              <button className="map-dropdown__item map-dropdown__item--danger" onClick={() => { setShowMaps(false); handleDeleteMap(); }}>
+            {maps.length > 1 && (!isCorpActive || user?.role === 'admin') && (
+              <button className="map-dropdown__item map-dropdown__item--danger" onClick={() => { setShowMaps(false); setDeleteConfirm(true); }}>
                 Delete this map
               </button>
             )}
@@ -169,17 +182,18 @@ export function Toolbar() {
         <input
           id="map-name"
           className="toolbar__map-name"
-          value={map.name}
+          value={mapName}
           onChange={(e) => setMapName(e.target.value)}
           spellCheck={false}
+          readOnly={!canEdit}
         />
       </div>
 
       <div className="toolbar__spacer" />
 
       <div className="toolbar__stats">
-        <span>{map.systems.length} systems</span>
-        <span>{map.connections.length} connections</span>
+        <span>{systemCount} systems</span>
+        <span>{connectionCount} connections</span>
       </div>
 
       <div className="toolbar__spacer" />
@@ -246,11 +260,7 @@ export function Toolbar() {
           />
           <div className="toolbar__char-info">
             <span className="toolbar__char-name">{user.characterName}</span>
-            {checkedAt && (
-              <span className="toolbar__checked-at">
-                checked {formatCheckedAt(checkedAt)}
-              </span>
-            )}
+            {checkedAt && <CheckedAtLabel checkedAt={checkedAt} />}
           </div>
           <button className="btn btn--ghost btn--sm" onClick={logout}>Logout</button>
         </div>
@@ -258,6 +268,30 @@ export function Toolbar() {
     </header>
 
     {showStats && <UserStatsModal onClose={() => setShowStats(false)} />}
+    {newMapPrompt && (
+      <PromptModal
+        title={newMapPrompt.isCorpMap ? 'New Corp Map' : 'New Map'}
+        message="Enter a name for the new map."
+        defaultValue="New Map"
+        confirmLabel="Create"
+        onCancel={() => setNewMapPrompt(null)}
+        onConfirm={async (name) => {
+          const { isCorpMap } = newMapPrompt;
+          setNewMapPrompt(null);
+          await createMap(name, isCorpMap);
+        }}
+      />
+    )}
+    {deleteConfirm && (
+      <ConfirmModal
+        message={`Delete "${mapName}"? This cannot be undone.`}
+        onCancel={() => setDeleteConfirm(false)}
+        onConfirm={async () => {
+          setDeleteConfirm(false);
+          await handleDeleteMap();
+        }}
+      />
+    )}
     </>
   );
 }

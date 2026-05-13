@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import type { Response } from 'express';
+import type { Request, Response } from 'express';
 import { db } from '../db.js';
 import { requireAuth } from '../middleware/requireAuth.js';
 import { config } from '../config.js';
@@ -11,7 +11,8 @@ mapsRouter.use(requireAuth);
 
 interface MapMeta { userId: number; corpId: number | null; locked: boolean; }
 
-async function getMapAccess(mapId: string, userId: number): Promise<MapMeta | null> {
+async function getMapAccess(mapId: string, req: Request): Promise<MapMeta | null> {
+  const userId = req.session.userId!;
   const { rows } = await db.query<MapMeta>(
     `SELECT user_id AS "userId", corp_id AS "corpId", locked FROM maps WHERE id = $1`,
     [mapId],
@@ -24,16 +25,14 @@ async function getMapAccess(mapId: string, userId: number): Promise<MapMeta | nu
 }
 
 // Checks read access + write role + lock in one call. Returns null and sends
-// the appropriate error response if any check fails.
-async function requireMapWrite(
-  res: Response,
-  mapId: string,
-  userId: number,
-  role: string,
-): Promise<MapMeta | null> {
-  const access = await getMapAccess(mapId, userId);
+// the appropriate error response if any check fails. Centralises the
+// `req.session.role ?? 'readonly'` fallback that used to live at every call
+// site.
+async function requireMapWrite(res: Response, mapId: string, req: Request): Promise<MapMeta | null> {
+  const access = await getMapAccess(mapId, req);
   if (!access) { res.status(404).json({ error: 'Map not found' }); return null; }
 
+  const role = req.session.role ?? 'readonly';
   const isCorpMap = config.corpMode && access.corpId === config.corpId;
   if (isCorpMap && role !== 'member' && role !== 'admin') {
     res.status(403).json({ error: 'Write access required' }); return null;
@@ -172,36 +171,63 @@ mapsRouter.post('/import', async (req, res) => {
     );
     const mapId = mapRes.rows[0].id;
 
-    // Remap old system UUIDs → fresh ones to avoid any collisions on re-import
+    // Remap old system UUIDs → fresh ones to avoid any collisions on re-import.
+    // Build the rows up first, then bulk-insert in one round-trip each.
     const idMap = new Map<string, string>();
-    for (const sys of systems) {
-      const newId = crypto.randomUUID();
-      idMap.set(String(sys.id), newId);
-      const pos = (sys.position as { x: number; y: number }) ?? { x: 0, y: 0 };
+    if (systems.length > 0) {
+      const sysCols = 15;
+      const sysPlaceholders: string[] = [];
+      const sysValues: unknown[] = [];
+      for (const sys of systems) {
+        const newId = crypto.randomUUID();
+        idMap.set(String(sys.id), newId);
+        const pos = (sys.position as { x: number; y: number }) ?? { x: 0, y: 0 };
+        const base = sysValues.length;
+        sysPlaceholders.push(`(${Array.from({ length: sysCols }, (_, i) => `$${base + i + 1}`).join(',')})`);
+        sysValues.push(
+          newId, mapId, sys.eveSystemId ?? null, sys.name, sys.systemClass,
+          sys.effect ?? 'none', sys.statics ?? [], sys.regionName ?? null, sys.npcType ?? null,
+          pos.x, pos.y, sys.status ?? 'unknown', sys.isHome ?? false, sys.locked ?? false, sys.notes ?? '',
+        );
+      }
       await client.query(
         `INSERT INTO map_systems
            (id, map_id, eve_system_id, name, system_class, effect, statics, region_name, npc_type,
             position_x, position_y, status, is_home, locked, notes)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)`,
-        [newId, mapId, sys.eveSystemId ?? null, sys.name, sys.systemClass,
-         sys.effect ?? 'none', sys.statics ?? [], sys.regionName ?? null, sys.npcType ?? null,
-         pos.x, pos.y, sys.status ?? 'unknown', sys.isHome ?? false, sys.locked ?? false, sys.notes ?? ''],
+         VALUES ${sysPlaceholders.join(',')}`,
+        sysValues,
       );
     }
 
-    for (const conn of connections) {
-      const srcId = idMap.get(String(conn.sourceId));
-      const tgtId = idMap.get(String(conn.targetId));
-      if (!srcId || !tgtId) continue;
+    const validConns = connections
+      .map((conn) => {
+        const srcId = idMap.get(String(conn.sourceId));
+        const tgtId = idMap.get(String(conn.targetId));
+        if (!srcId || !tgtId) return null;
+        return { conn, srcId, tgtId };
+      })
+      .filter((c): c is { conn: Record<string, unknown>; srcId: string; tgtId: string } => c !== null);
+
+    if (validConns.length > 0) {
+      const connCols = 10;
+      const connPlaceholders: string[] = [];
+      const connValues: unknown[] = [];
+      for (const { conn, srcId, tgtId } of validConns) {
+        const base = connValues.length;
+        connPlaceholders.push(`(${Array.from({ length: connCols }, (_, i) => `$${base + i + 1}`).join(',')})`);
+        connValues.push(
+          crypto.randomUUID(), mapId, srcId, tgtId,
+          conn.sourceHandle ?? null, conn.targetHandle ?? null,
+          conn.connectionType ?? 'standard', conn.massStatus ?? null,
+          conn.timeStatus ?? null, conn.size ?? 'large',
+        );
+      }
       await client.query(
         `INSERT INTO map_connections
            (id, map_id, source_id, target_id, source_handle, target_handle,
             connection_type, mass_status, time_status, size)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
-        [crypto.randomUUID(), mapId, srcId, tgtId,
-         conn.sourceHandle ?? null, conn.targetHandle ?? null,
-         conn.connectionType ?? 'standard', conn.massStatus ?? null,
-         conn.timeStatus ?? null, conn.size ?? 'large'],
+         VALUES ${connPlaceholders.join(',')}`,
+        connValues,
       );
     }
 
@@ -218,34 +244,37 @@ mapsRouter.post('/import', async (req, res) => {
 // GET /api/maps/:mapId  — full map (systems + connections)
 mapsRouter.get('/:mapId', async (req, res) => {
   const { mapId } = req.params;
-  const access = await getMapAccess(mapId, req.session.userId!);
+  const access = await getMapAccess(mapId, req);
   if (!access) { res.status(404).json({ error: 'Map not found' }); return; }
 
-  const mapRows = await db.query(
-    `SELECT id, name, corp_id IS NOT NULL AS "isCorpMap", locked,
-            created_at AS "createdAt", updated_at AS "updatedAt"
-     FROM maps WHERE id = $1`,
-    [mapId],
-  );
+  // Three independent reads — parallelise so total latency is max(t) instead
+  // of sum(t).
+  const [mapRows, systems, connections] = await Promise.all([
+    db.query(
+      `SELECT id, name, corp_id IS NOT NULL AS "isCorpMap", locked,
+              created_at AS "createdAt", updated_at AS "updatedAt"
+       FROM maps WHERE id = $1`,
+      [mapId],
+    ),
+    db.query(
+      `SELECT id, eve_system_id AS "eveSystemId", name, system_class AS "systemClass",
+              effect, statics, region_name AS "regionName", npc_type AS "npcType",
+              position_x AS x, position_y AS y,
+              status, is_home AS "isHome", locked, notes
+       FROM map_systems WHERE map_id = $1`,
+      [mapId],
+    ),
+    db.query(
+      `SELECT id, source_id AS "sourceId", target_id AS "targetId",
+              source_handle AS "sourceHandle", target_handle AS "targetHandle",
+              connection_type AS "connectionType", mass_status AS "massStatus",
+              time_status AS "timeStatus", size, created_at AS "createdAt"
+       FROM map_connections WHERE map_id = $1`,
+      [mapId],
+    ),
+  ]);
+
   if (!mapRows.rows.length) { res.status(404).json({ error: 'Map not found' }); return; }
-
-  const systems = await db.query(
-    `SELECT id, eve_system_id AS "eveSystemId", name, system_class AS "systemClass",
-            effect, statics, region_name AS "regionName", npc_type AS "npcType",
-            position_x AS x, position_y AS y,
-            status, is_home AS "isHome", locked, notes
-     FROM map_systems WHERE map_id = $1`,
-    [mapId],
-  );
-
-  const connections = await db.query(
-    `SELECT id, source_id AS "sourceId", target_id AS "targetId",
-            source_handle AS "sourceHandle", target_handle AS "targetHandle",
-            connection_type AS "connectionType", mass_status AS "massStatus",
-            time_status AS "timeStatus", size, created_at AS "createdAt"
-     FROM map_connections WHERE map_id = $1`,
-    [mapId],
-  );
 
   res.json({
     ...mapRows.rows[0],
@@ -259,7 +288,7 @@ mapsRouter.patch('/:mapId', async (req, res) => {
   const { mapId } = req.params;
   const { name, locked } = req.body as { name?: string; locked?: boolean };
 
-  const access = await requireMapWrite(res, mapId, req.session.userId!, req.session.role ?? 'readonly');
+  const access = await requireMapWrite(res, mapId, req);
   if (!access) return;
 
   const sets: string[] = ['updated_at = NOW()'];
@@ -283,7 +312,8 @@ mapsRouter.patch('/:mapId', async (req, res) => {
 
 // DELETE /api/maps/:mapId — owner can delete personal maps; admin can delete any
 mapsRouter.delete('/:mapId', async (req, res) => {
-  const access = await getMapAccess(req.params.mapId, req.session.userId!);
+  const { mapId } = req.params;
+  const access = await getMapAccess(mapId, req);
   if (!access) { res.status(404).json({ error: 'Map not found' }); return; }
 
   const isOwner  = access.userId === req.session.userId;
@@ -296,7 +326,7 @@ mapsRouter.delete('/:mapId', async (req, res) => {
     res.status(403).json({ error: 'Not authorised' }); return;
   }
 
-  await db.query(`DELETE FROM maps WHERE id = $1`, [req.params.mapId]);
+  await db.query(`DELETE FROM maps WHERE id = $1`, [mapId]);
   res.json({ ok: true });
 });
 
@@ -304,7 +334,7 @@ mapsRouter.delete('/:mapId', async (req, res) => {
 
 mapsRouter.post('/:mapId/systems', async (req, res) => {
   const { mapId } = req.params;
-  const access = await requireMapWrite(res, mapId, req.session.userId!, req.session.role ?? 'readonly');
+  const access = await requireMapWrite(res, mapId, req);
   if (!access) return;
 
   const { id, eveSystemId, name, systemClass, effect, statics, regionName, npcType, position, status, isHome, locked, notes } = req.body;
@@ -358,7 +388,7 @@ mapsRouter.patch('/:mapId/systems/:systemId', async (req, res) => {
   if (!sets.length) { res.status(400).json({ error: 'Nothing to update' }); return; }
 
   // verify map ownership
-  const access = await requireMapWrite(res, mapId, req.session.userId!, req.session.role ?? 'readonly');
+  const access = await requireMapWrite(res, mapId, req);
   if (!access) return;
 
   await db.query(
@@ -371,7 +401,7 @@ mapsRouter.patch('/:mapId/systems/:systemId', async (req, res) => {
 
 mapsRouter.delete('/:mapId/systems/:systemId', async (req, res) => {
   const { mapId, systemId } = req.params;
-  const access = await requireMapWrite(res, mapId, req.session.userId!, req.session.role ?? 'readonly');
+  const access = await requireMapWrite(res, mapId, req);
   if (!access) return;
   await db.query(`DELETE FROM map_systems WHERE id = $1 AND map_id = $2`, [systemId, mapId]);
   await touchMap(mapId);
@@ -384,7 +414,7 @@ mapsRouter.post('/:mapId/connections', async (req, res) => {
   const { mapId } = req.params;
   const { id, sourceId, targetId, sourceHandle, targetHandle, connectionType, massStatus, timeStatus, size } = req.body;
 
-  const access = await requireMapWrite(res, mapId, req.session.userId!, req.session.role ?? 'readonly');
+  const access = await requireMapWrite(res, mapId, req);
   if (!access) return;
 
   await db.query(
@@ -403,7 +433,7 @@ mapsRouter.post('/:mapId/connections', async (req, res) => {
 mapsRouter.patch('/:mapId/connections/:connectionId', async (req, res) => {
   const { mapId, connectionId } = req.params;
 
-  const access = await requireMapWrite(res, mapId, req.session.userId!, req.session.role ?? 'readonly');
+  const access = await requireMapWrite(res, mapId, req);
   if (!access) return;
 
   const colMap: Record<string, string> = {
@@ -435,7 +465,7 @@ mapsRouter.patch('/:mapId/connections/:connectionId', async (req, res) => {
 
 mapsRouter.delete('/:mapId/connections/:connectionId', async (req, res) => {
   const { mapId, connectionId } = req.params;
-  const access = await requireMapWrite(res, mapId, req.session.userId!, req.session.role ?? 'readonly');
+  const access = await requireMapWrite(res, mapId, req);
   if (!access) return;
   await db.query(`DELETE FROM map_connections WHERE id = $1 AND map_id = $2`, [connectionId, mapId]);
   await touchMap(mapId);
@@ -446,7 +476,7 @@ mapsRouter.delete('/:mapId/connections/:connectionId', async (req, res) => {
 
 mapsRouter.get('/:mapId/systems/:systemId/signatures', async (req, res) => {
   const { mapId, systemId } = req.params;
-  const access = await getMapAccess(mapId, req.session.userId!);
+  const access = await getMapAccess(mapId, req);
   if (!access) { res.status(404).json({ error: 'Map not found' }); return; }
   if (!(await verifySystemInMap(res, systemId, mapId))) return;
   const { rows } = await db.query(
@@ -459,7 +489,7 @@ mapsRouter.get('/:mapId/systems/:systemId/signatures', async (req, res) => {
 
 mapsRouter.post('/:mapId/systems/:systemId/signatures', async (req, res) => {
   const { mapId, systemId } = req.params;
-  const access = await requireMapWrite(res, mapId, req.session.userId!, req.session.role ?? 'readonly');
+  const access = await requireMapWrite(res, mapId, req);
   if (!access) return;
   if (!(await verifySystemInMap(res, systemId, mapId))) return;
   const { sigId = '', sigType = 'unknown', name = '', notes = '', whType = '', whLeadsTo = '' } = req.body as Record<string, string>;
@@ -478,7 +508,7 @@ mapsRouter.post('/:mapId/systems/:systemId/signatures', async (req, res) => {
 
 mapsRouter.patch('/:mapId/systems/:systemId/signatures/:sigId', async (req, res) => {
   const { mapId, systemId, sigId } = req.params;
-  const access = await requireMapWrite(res, mapId, req.session.userId!, req.session.role ?? 'readonly');
+  const access = await requireMapWrite(res, mapId, req);
   if (!access) return;
   if (!(await verifySystemInMap(res, systemId, mapId))) return;
 
@@ -500,7 +530,7 @@ mapsRouter.patch('/:mapId/systems/:systemId/signatures/:sigId', async (req, res)
 
 mapsRouter.delete('/:mapId/systems/:systemId/signatures/:sigId', async (req, res) => {
   const { mapId, systemId, sigId } = req.params;
-  const access = await requireMapWrite(res, mapId, req.session.userId!, req.session.role ?? 'readonly');
+  const access = await requireMapWrite(res, mapId, req);
   if (!access) return;
   if (!(await verifySystemInMap(res, systemId, mapId))) return;
   await db.query(`DELETE FROM map_signatures WHERE id = $1 AND system_id = $2`, [sigId, systemId]);
@@ -511,7 +541,7 @@ mapsRouter.delete('/:mapId/systems/:systemId/signatures/:sigId', async (req, res
 
 mapsRouter.get('/:mapId/systems/:systemId/structures', async (req, res) => {
   const { mapId, systemId } = req.params;
-  const access = await getMapAccess(mapId, req.session.userId!);
+  const access = await getMapAccess(mapId, req);
   if (!access) { res.status(404).json({ error: 'Map not found' }); return; }
   if (!(await verifySystemInMap(res, systemId, mapId))) return;
   const { rows } = await db.query(
@@ -524,7 +554,7 @@ mapsRouter.get('/:mapId/systems/:systemId/structures', async (req, res) => {
 
 mapsRouter.post('/:mapId/systems/:systemId/structures', async (req, res) => {
   const { mapId, systemId } = req.params;
-  const access = await requireMapWrite(res, mapId, req.session.userId!, req.session.role ?? 'readonly');
+  const access = await requireMapWrite(res, mapId, req);
   if (!access) return;
   if (!(await verifySystemInMap(res, systemId, mapId))) return;
   const { name = '', structureType = 'unknown', ownerCorp = '', notes = '', eveId = null } = req.body as Record<string, string>;
@@ -539,7 +569,7 @@ mapsRouter.post('/:mapId/systems/:systemId/structures', async (req, res) => {
 
 mapsRouter.patch('/:mapId/systems/:systemId/structures/:structureId', async (req, res) => {
   const { mapId, systemId, structureId } = req.params;
-  const access = await requireMapWrite(res, mapId, req.session.userId!, req.session.role ?? 'readonly');
+  const access = await requireMapWrite(res, mapId, req);
   if (!access) return;
   if (!(await verifySystemInMap(res, systemId, mapId))) return;
 
@@ -561,7 +591,7 @@ mapsRouter.patch('/:mapId/systems/:systemId/structures/:structureId', async (req
 
 mapsRouter.delete('/:mapId/systems/:systemId/structures/:structureId', async (req, res) => {
   const { mapId, systemId, structureId } = req.params;
-  const access = await requireMapWrite(res, mapId, req.session.userId!, req.session.role ?? 'readonly');
+  const access = await requireMapWrite(res, mapId, req);
   if (!access) return;
   if (!(await verifySystemInMap(res, systemId, mapId))) return;
   await db.query(`DELETE FROM map_structures WHERE id = $1 AND system_id = $2`, [structureId, systemId]);

@@ -1,34 +1,44 @@
 import { useRef } from 'react';
 import { useMapStore } from '../../store/mapStore';
 import { api } from '../../api/client';
+import { toast } from './Toaster';
+import { pickHandles } from '../map/edgeUtils';
 import type { WormholeMap } from '../../types';
 
 export function MapSidebar() {
   const importInputRef = useRef<HTMLInputElement>(null);
 
-  const {
-    map, maps, maxMaps,
-    snapToGrid, setSnapToGrid,
-    compactMode, setCompactMode,
-    showMinimap, setShowMinimap,
-    easyConnect, setEasyConnect,
-    mapOptionsOpen, setMapOptionsOpen,
-    edgeStyle, setEdgeStyle,
-    updateConnection, requestAutoLayout,
-  } = useMapStore();
+  const maps             = useMapStore((s) => s.maps);
+  const maxMaps          = useMapStore((s) => s.maxMaps);
+  const snapToGrid       = useMapStore((s) => s.snapToGrid);
+  const setSnapToGrid    = useMapStore((s) => s.setSnapToGrid);
+  const compactMode      = useMapStore((s) => s.compactMode);
+  const setCompactMode   = useMapStore((s) => s.setCompactMode);
+  const showMinimap      = useMapStore((s) => s.showMinimap);
+  const setShowMinimap   = useMapStore((s) => s.setShowMinimap);
+  const easyConnect      = useMapStore((s) => s.easyConnect);
+  const setEasyConnect   = useMapStore((s) => s.setEasyConnect);
+  const mapOptionsOpen   = useMapStore((s) => s.mapOptionsOpen);
+  const setMapOptionsOpen = useMapStore((s) => s.setMapOptionsOpen);
+  const edgeStyle        = useMapStore((s) => s.edgeStyle);
+  const setEdgeStyle     = useMapStore((s) => s.setEdgeStyle);
+  const updateConnection = useMapStore((s) => s.updateConnection);
+  const requestAutoLayout = useMapStore((s) => s.requestAutoLayout);
+  const connectionCount  = useMapStore((s) => s.map.connections.length);
+  const systemCount      = useMapStore((s) => s.map.systems.length);
 
   const atMapLimit = maps.length >= maxMaps;
 
   function handleOptimizeConnections() {
+    // Reach into the live store snapshot — operating on per-render selectors
+    // here would lock us into the snapshot captured at button-click time.
+    const { map } = useMapStore.getState();
     const systemMap = new Map(map.systems.map((s) => [s.id, s.position]));
     for (const conn of map.connections) {
       const src = systemMap.get(conn.sourceId);
       const tgt = systemMap.get(conn.targetId);
       if (!src || !tgt) continue;
-      const dx = tgt.x - src.x;
-      const dy = tgt.y - src.y;
-      const sourceHandle = Math.abs(dx) >= Math.abs(dy) ? (dx >= 0 ? 'right' : 'left') : (dy >= 0 ? 'bottom' : 'top');
-      const targetHandle = Math.abs(dx) >= Math.abs(dy) ? (dx >= 0 ? 'left' : 'right') : (dy >= 0 ? 'top' : 'bottom');
+      const { sourceHandle, targetHandle } = pickHandles(src, tgt);
       if (conn.sourceHandle !== sourceHandle || conn.targetHandle !== targetHandle) {
         updateConnection(conn.id, { sourceHandle, targetHandle });
       }
@@ -36,6 +46,7 @@ export function MapSidebar() {
   }
 
   function handleExport() {
+    const { map } = useMapStore.getState();
     const json = JSON.stringify(map, null, 2);
     const blob = new Blob([json], { type: 'application/json' });
     const url  = URL.createObjectURL(blob);
@@ -51,11 +62,11 @@ export function MapSidebar() {
     try {
       parsed = JSON.parse(await file.text()) as WormholeMap;
     } catch {
-      alert('Invalid JSON file.');
+      toast.error('Invalid JSON file.');
       return;
     }
     if (!parsed.systems || !parsed.connections) {
-      alert('File does not look like a Eve-Nexum map export.');
+      toast.error('File does not look like a Eve-Nexum map export.');
       return;
     }
     try {
@@ -66,7 +77,7 @@ export function MapSidebar() {
       await useMapStore.getState().loadMaps();
       await useMapStore.getState().switchMap(id);
     } catch (err) {
-      alert(`Import failed: ${err instanceof Error ? err.message : String(err)}`);
+      toast.error(`Import failed: ${err instanceof Error ? err.message : String(err)}`);
     }
   }
 
@@ -135,14 +146,14 @@ export function MapSidebar() {
           <button
             className="map-sidebar__action"
             onClick={handleOptimizeConnections}
-            disabled={map.connections.length === 0}
+            disabled={connectionCount === 0}
           >
             ⟳ Optimize Connections
           </button>
           <button
             className="map-sidebar__action"
             onClick={requestAutoLayout}
-            disabled={map.systems.length < 2}
+            disabled={systemCount < 2}
           >
             ⊞ Spread Nodes
           </button>

@@ -20,26 +20,46 @@ function emptyPeriod(): PeriodStats {
   };
 }
 
+type PeriodKey = 'forever' | 'year' | 'month' | 'week' | 'day';
+const PERIODS: PeriodKey[] = ['forever', 'year', 'month', 'week', 'day'];
+
+interface AggregatedRow {
+  event_type: string;
+  sig_type:   string | null;
+  forever:    string;
+  year:       string;
+  month:      string;
+  week:       string;
+  day:        string;
+}
+
 router.get('/', async (req, res) => {
   const userId = req.session.userId!;
 
-  const { rows } = await db.query<{ event_type: string; sig_type: string | null; created_at: Date }>(
-    `SELECT event_type, sig_type, created_at
+  const now   = new Date();
+  const day   = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+  const week  = new Date(now.getTime() - 7   * 24 * 60 * 60 * 1000);
+  const month = new Date(now.getTime() - 30  * 24 * 60 * 60 * 1000);
+  const year  = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+
+  // One aggregate query — Postgres FILTER clauses give us all five buckets in
+  // a single pass, replacing the previous "pull every event into JS" approach.
+  const { rows } = await db.query<AggregatedRow>(
+    `SELECT
+       event_type,
+       sig_type,
+       COUNT(*)::text                                        AS forever,
+       COUNT(*) FILTER (WHERE created_at >= $2)::text       AS year,
+       COUNT(*) FILTER (WHERE created_at >= $3)::text       AS month,
+       COUNT(*) FILTER (WHERE created_at >= $4)::text       AS week,
+       COUNT(*) FILTER (WHERE created_at >= $5)::text       AS day
      FROM user_events
      WHERE user_id = $1
-     ORDER BY created_at DESC`,
-    [userId],
+     GROUP BY event_type, sig_type`,
+    [userId, year, month, week, day],
   );
 
-  const now   = new Date();
-  const start = {
-    day:   new Date(now.getTime() - 24 * 60 * 60 * 1000),
-    week:  new Date(now.getTime() - 7  * 24 * 60 * 60 * 1000),
-    month: new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000),
-    year:  new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000),
-  };
-
-  const result: Record<string, PeriodStats> = {
+  const result: Record<PeriodKey, PeriodStats> = {
     forever: emptyPeriod(),
     year:    emptyPeriod(),
     month:   emptyPeriod(),
@@ -48,21 +68,22 @@ router.get('/', async (req, res) => {
   };
 
   for (const row of rows) {
-    const at = new Date(row.created_at);
-    const periods = ['forever'];
-    if (at >= start.year)  periods.push('year');
-    if (at >= start.month) periods.push('month');
-    if (at >= start.week)  periods.push('week');
-    if (at >= start.day)   periods.push('day');
+    const counts: Record<PeriodKey, number> = {
+      forever: parseInt(row.forever, 10),
+      year:    parseInt(row.year,    10),
+      month:   parseInt(row.month,   10),
+      week:    parseInt(row.week,    10),
+      day:     parseInt(row.day,     10),
+    };
 
-    for (const p of periods) {
-      if (row.event_type === 'jump') {
-        result[p].jumps++;
-      } else if (row.event_type === 'signature') {
-        result[p].signatures.total++;
-        const t = (row.sig_type ?? 'unknown') as SigType;
-        if (SIG_TYPES.includes(t)) result[p].signatures[t]++;
-        else result[p].signatures.unknown++;
+    if (row.event_type === 'jump') {
+      for (const p of PERIODS) result[p].jumps += counts[p];
+    } else if (row.event_type === 'signature') {
+      const t = (row.sig_type ?? 'unknown') as SigType;
+      const bucket: SigType = SIG_TYPES.includes(t) ? t : 'unknown';
+      for (const p of PERIODS) {
+        result[p].signatures.total += counts[p];
+        result[p].signatures[bucket] += counts[p];
       }
     }
   }

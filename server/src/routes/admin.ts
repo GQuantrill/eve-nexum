@@ -8,6 +8,9 @@ adminRouter.use(requireAdmin);
 
 // GET /api/admin/users — all users with activity stats
 adminRouter.get('/users', async (_req, res) => {
+  // Two pre-aggregated subqueries joined into users — avoids the cartesian
+  // explosion (COUNT(DISTINCT) over a triple-nested IN) the previous version
+  // produced for users with many maps and many signatures.
   const { rows } = await db.query(`
     SELECT
       u.id,
@@ -16,14 +19,19 @@ adminRouter.get('/users', async (_req, res) => {
       u.role,
       u.created_at     AS "createdAt",
       u.updated_at     AS "lastLogin",
-      COUNT(DISTINCT e.id)          AS "totalEvents",
-      COUNT(DISTINCT ms.id)         AS "totalSignatures"
+      COALESCE(e.cnt, 0) AS "totalEvents",
+      COALESCE(s.cnt, 0) AS "totalSignatures"
     FROM users u
-    LEFT JOIN user_events  e  ON e.user_id  = u.id
-    LEFT JOIN map_signatures ms ON ms.system_id IN (
-      SELECT id FROM map_systems WHERE map_id IN (SELECT id FROM maps WHERE user_id = u.id)
-    )
-    GROUP BY u.id
+    LEFT JOIN (
+      SELECT user_id, COUNT(*)::int AS cnt FROM user_events GROUP BY user_id
+    ) e ON e.user_id = u.id
+    LEFT JOIN (
+      SELECT m.user_id, COUNT(*)::int AS cnt
+      FROM map_signatures ms
+      JOIN map_systems sys ON sys.id = ms.system_id
+      JOIN maps m          ON m.id  = sys.map_id
+      GROUP BY m.user_id
+    ) s ON s.user_id = u.id
     ORDER BY u.updated_at DESC
   `);
   res.json({ users: rows });

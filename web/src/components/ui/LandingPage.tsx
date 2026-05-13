@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { apiUrl } from '../../api/client';
-import demoMapImg from '../../assets/demo-map.png';
+import { DemoMap } from './DemoMap';
 import menuImg from '../../assets/Menu.png';
 import quickSystemImg from '../../assets/quick-system.png';
 import showSigsImg from '../../assets/show-sigs.png';
@@ -174,8 +174,12 @@ export function LandingPage() {
 
   useEffect(() => {
     try {
-      const stored = localStorage.getItem('nexum:last_character');
+      // Migrate the older colon-separated key transparently so returning users
+      // don't lose their stored last-login chip.
+      const stored = localStorage.getItem('nexum.last_character')
+        ?? localStorage.getItem('nexum:last_character');
       if (stored) setLastChar(JSON.parse(stored) as LastCharacter);
+      localStorage.removeItem('nexum:last_character');
     } catch {}
   }, []);
 
@@ -210,7 +214,10 @@ export function LandingPage() {
         </section>
 
         <div className="landing__demo">
-          <img src={demoMapImg} alt="Nexum demo map" className="landing__demo-img" />
+          <p className="landing__demo-note">
+            ◈ Interactive demo — a simplified preview. Sign in to access signatures, kill feeds, connection tracking, activity history, and more.
+          </p>
+          <DemoMap />
         </div>
 
         <div className="landing__cta">

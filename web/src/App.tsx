@@ -7,20 +7,30 @@ import { ConnectionPanel } from './components/ui/ConnectionPanel';
 import { Toolbar } from './components/ui/Toolbar';
 import { MapSidebar } from './components/ui/MapSidebar';
 import { LandingPage } from './components/ui/LandingPage';
+import { Toaster } from './components/ui/Toaster';
 import { useMapStore } from './store/mapStore';
 import { useLocationTracking } from './hooks/useLocationTracking';
 import './App.css';
 
 function MapApp() {
   const { user } = useAuth();
-  const { map, selectedSystemId, selectedConnectionId, loadMaps, applyPreferences } = useMapStore();
+  const mapId               = useMapStore((s) => s.map.id);
+  const selectedSystemId    = useMapStore((s) => s.selectedSystemId);
+  const selectedConnectionId = useMapStore((s) => s.selectedConnectionId);
+  const loadMaps            = useMapStore((s) => s.loadMaps);
+  const applyPreferences    = useMapStore((s) => s.applyPreferences);
+
+  // Only re-run when the user's identity changes, not on every shape mutation
+  // of the user object (panel reorder, prefs toggle, etc).
+  const userId = user?.id;
 
   useEffect(() => {
     if (user) applyPreferences({ compactMode: user.compactMode, snapToGrid: user.snapToGrid, showMinimap: user.showMinimap, panelOrder: user.panelOrder });
     loadMaps();
-  }, [loadMaps, applyPreferences, user]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId, loadMaps, applyPreferences]);
 
-  useLocationTracking(!!map.id);
+  useLocationTracking(!!mapId);
 
   return (
     <ReactFlowProvider>
@@ -57,6 +67,7 @@ export default function App() {
   return (
     <AuthProvider>
       <AppShell />
+      <Toaster />
     </AuthProvider>
   );
 }

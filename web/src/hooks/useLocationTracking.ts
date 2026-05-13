@@ -31,6 +31,10 @@ export function useLocationTracking(enabled: boolean) {
       flushQueue();
       const { map, addSystem, addConnection, selectSystem, setCurrentSystem } = useMapStore.getState();
 
+      // No active map loaded yet (mid switchMap / first paint) — let the next
+      // tick try again rather than racing addSystem against an empty store.
+      if (!map.id) return;
+
       // Reset refs when the active map changes
       if (map.id !== lastActiveMapId.current) {
         lastActiveMapId.current = map.id;
@@ -47,7 +51,14 @@ export function useLocationTracking(enabled: boolean) {
 
       if (system.eveSystemId === lastEveSystemId.current) return;
 
-      const prevMapSystemId = lastMapSystemId.current;
+      let prevMapSystemId = lastMapSystemId.current;
+      // The previous system may have been removed from the map by another
+      // client while we were elsewhere — drop the stale ref so we fall through
+      // to the center-of-mass placement instead of `{x:200,y:0}`.
+      if (prevMapSystemId && !map.systems.some((s) => s.id === prevMapSystemId)) {
+        prevMapSystemId = null;
+        lastMapSystemId.current = null;
+      }
       lastEveSystemId.current = system.eveSystemId;
 
       let mapSystemId: string;
@@ -57,10 +68,8 @@ export function useLocationTracking(enabled: boolean) {
       } else {
         let position: { x: number; y: number };
         if (prevMapSystemId) {
-          const prevSys = map.systems.find((s) => s.id === prevMapSystemId);
-          position = prevSys
-            ? { x: prevSys.position.x + 200, y: prevSys.position.y }
-            : { x: 200, y: 0 };
+          const prevSys = map.systems.find((s) => s.id === prevMapSystemId)!;
+          position = { x: prevSys.position.x + 200, y: prevSys.position.y };
         } else {
           const cx = map.systems.length
             ? map.systems.reduce((sum, s) => sum + s.position.x, 0) / map.systems.length

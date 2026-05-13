@@ -1,6 +1,11 @@
 import { Router } from 'express';
+import { requireAuth } from '../middleware/requireAuth.js';
+import { createLogger } from '../utils/logger.js';
+import { TtlCache } from '../utils/cache.js';
 
 const router = Router();
+router.use(requireAuth);
+const log = createLogger('killboard');
 
 const ZKB_AGENT    = 'Eve-Nexum/1.0 (https://github.com/area404/eve-nexum; gq@area404.org)';
 const CACHE_TTL_MS = 5 * 60 * 1000;
@@ -52,47 +57,67 @@ export interface KillEntry {
   zkb: ZkbEntry['zkb'];
 }
 
-interface CacheEntry {
-  data:      KillEntry[];
-  fetchedAt: number;
-  etag?:     string;
+// Per-system kill cache. The shared TtlCache utility handles TTL + the
+// background sweep that used to live inline here.
+const cache = new TtlCache<string, KillEntry[]>(CACHE_TTL_MS, 15 * 60 * 1000);
+
+// Cap parallel ESI killmail fetches and share in-flight promises across
+// concurrent callers so two clients hitting the same system don't double the
+// load on ESI.
+const ESI_MAX_CONCURRENT = 6;
+let esiActive = 0;
+const esiQueue: Array<() => void> = [];
+const esiInflight = new Map<string, Promise<EsiKillmail | null>>();
+
+function acquireSlot(): Promise<void> {
+  if (esiActive < ESI_MAX_CONCURRENT) { esiActive++; return Promise.resolve(); }
+  return new Promise<void>((resolve) => { esiQueue.push(() => { esiActive++; resolve(); }); });
 }
 
-const cache = new Map<string, CacheEntry>();
-
-// Evict entries older than 2× TTL
-setInterval(() => {
-  const cutoff = Date.now() - CACHE_TTL_MS * 2;
-  for (const [key, entry] of cache) {
-    if (entry.fetchedAt < cutoff) cache.delete(key);
-  }
-}, 15 * 60 * 1000);
+function releaseSlot() {
+  esiActive--;
+  const next = esiQueue.shift();
+  if (next) next();
+}
 
 function withTimeout(ms: number): AbortSignal {
   return AbortSignal.timeout(ms);
 }
 
 async function fetchEsi(killmailId: number, hash: string): Promise<EsiKillmail | null> {
-  try {
-    const res = await fetch(
-      `https://esi.evetech.net/latest/killmails/${killmailId}/${hash}/`,
-      { headers: { 'User-Agent': ZKB_AGENT, Accept: 'application/json' }, signal: withTimeout(FETCH_TIMEOUT_MS) },
-    );
-    if (!res.ok) return null;
-    return (await res.json()) as EsiKillmail;
-  } catch {
-    return null;
-  }
+  const key = `${killmailId}/${hash}`;
+  const existing = esiInflight.get(key);
+  if (existing) return existing;
+
+  const promise = (async (): Promise<EsiKillmail | null> => {
+    await acquireSlot();
+    try {
+      const res = await fetch(
+        `https://esi.evetech.net/latest/killmails/${killmailId}/${hash}/`,
+        { headers: { 'User-Agent': ZKB_AGENT, Accept: 'application/json' }, signal: withTimeout(FETCH_TIMEOUT_MS) },
+      );
+      if (!res.ok) return null;
+      return (await res.json()) as EsiKillmail;
+    } catch {
+      return null;
+    } finally {
+      releaseSlot();
+      esiInflight.delete(key);
+    }
+  })();
+
+  esiInflight.set(key, promise);
+  return promise;
 }
 
 router.get('/:systemId(\\d+)', async (req, res) => {
   const { systemId } = req.params;
-  const now = Date.now();
 
-  const cached = cache.get(systemId);
-  if (cached && now - cached.fetchedAt < CACHE_TTL_MS) {
-    return res.json(cached.data);
-  }
+  // Fresh cache hit — return immediately. peek() falls back to any stale entry
+  // we can still serve from when the upstream is unhappy.
+  const fresh = cache.get(systemId);
+  if (fresh) return res.json(fresh.value);
+  const stale = cache.peek(systemId);
 
   // zKillboard: kills in the past 24 h, NPC kills excluded
   const zkbUrl = `https://zkillboard.com/api/kills/npc/0/solarSystemID/${systemId}/pastSeconds/86400/`;
@@ -100,28 +125,30 @@ router.get('/:systemId(\\d+)', async (req, res) => {
     'User-Agent': ZKB_AGENT,
     Accept:       'application/json',
   };
-  if (cached?.etag) zkbHeaders['If-None-Match'] = cached.etag;
+  const cachedEtag = typeof stale?.meta?.etag === 'string' ? stale.meta.etag : undefined;
+  if (cachedEtag) zkbHeaders['If-None-Match'] = cachedEtag;
 
   try {
     const zkbRes = await fetch(zkbUrl, { headers: zkbHeaders, signal: withTimeout(FETCH_TIMEOUT_MS) });
 
-    // zKillboard says nothing changed — bump TTL and return cached data
-    if (zkbRes.status === 304 && cached) {
-      cache.set(systemId, { ...cached, fetchedAt: now });
-      return res.json(cached.data);
+    // zKillboard says nothing changed — refresh the TTL on the existing entry
+    // and return it.
+    if (zkbRes.status === 304 && stale) {
+      cache.set(systemId, stale.value, stale.meta);
+      return res.json(stale.value);
     }
 
     if (!zkbRes.ok) {
-      if (cached) return res.json(cached.data);
-      console.warn(`[killboard] zKillboard returned ${zkbRes.status} for system ${systemId}`);
+      if (stale) return res.json(stale.value);
+      log.warn(`zKillboard returned ${zkbRes.status} for system ${systemId}`);
       return res.json([]);
     }
 
     const zkbBody = (await zkbRes.json()) as ZkbEntry[];
 
     if (!Array.isArray(zkbBody)) {
-      if (cached) return res.json(cached.data);
-      console.warn(`[killboard] Unexpected response from zKillboard for system ${systemId}`);
+      if (stale) return res.json(stale.value);
+      log.warn(`Unexpected response from zKillboard for system ${systemId}`);
       return res.json([]);
     }
 
@@ -154,11 +181,11 @@ router.get('/:systemId(\\d+)', async (req, res) => {
       })
       .filter((k): k is KillEntry => k !== null);
 
-    cache.set(systemId, { data: kills, fetchedAt: now, etag });
+    cache.set(systemId, kills, etag ? { etag } : undefined);
     return res.json(kills);
   } catch (err) {
-    console.warn(`[killboard] Failed to reach zKillboard for system ${systemId}:`, (err as Error).message);
-    if (cached) return res.json(cached.data);
+    log.warn(`Failed to reach zKillboard for system ${systemId}:`, (err as Error).message);
+    if (stale) return res.json(stale.value);
     return res.json([]);
   }
 });

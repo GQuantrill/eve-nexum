@@ -14,7 +14,9 @@ import { AddSystemModal } from '../ui/AddSystemModal';
 import { ContextMenu } from '../ui/ContextMenu';
 import type { MapSystem } from '../../types';
 import { CLASS_COLORS } from '../../data/wormholes';
+import { pickHandles } from './edgeUtils';
 import { setDestination, addWaypoint } from '../../api/waypoint';
+import { toast } from '../ui/Toaster';
 
 const NODE_TYPES = { system: SystemNode };
 
@@ -73,31 +75,47 @@ function systemToNode(sys: MapSystem, selectedId: string | null, easyConnect = f
 }
 
 export function MapCanvas() {
-  const { map, selectedSystemId, selectedConnectionId, snapToGrid, showMinimap, easyConnect, mapOptionsOpen, edgeStyle, addConnection, moveSystem, lockSystem, updateSystem, removeSystem, removeConnection, updateConnection, undo, autoLayoutPending, clearAutoLayoutPending, pushUndo } = useMapStore();
+  const systems              = useMapStore((s) => s.map.systems);
+  const connections          = useMapStore((s) => s.map.connections);
+  const selectedSystemId     = useMapStore((s) => s.selectedSystemId);
+  const selectedConnectionId = useMapStore((s) => s.selectedConnectionId);
+  const snapToGrid           = useMapStore((s) => s.snapToGrid);
+  const showMinimap          = useMapStore((s) => s.showMinimap);
+  const easyConnect          = useMapStore((s) => s.easyConnect);
+  const mapOptionsOpen       = useMapStore((s) => s.mapOptionsOpen);
+  const edgeStyle            = useMapStore((s) => s.edgeStyle);
+  const addConnection        = useMapStore((s) => s.addConnection);
+  const moveSystem           = useMapStore((s) => s.moveSystem);
+  const lockSystem           = useMapStore((s) => s.lockSystem);
+  const updateSystem         = useMapStore((s) => s.updateSystem);
+  const removeSystem         = useMapStore((s) => s.removeSystem);
+  const removeConnection     = useMapStore((s) => s.removeConnection);
+  const updateConnection     = useMapStore((s) => s.updateConnection);
+  const undo                 = useMapStore((s) => s.undo);
+  const autoLayoutPending    = useMapStore((s) => s.autoLayoutPending);
+  const clearAutoLayoutPending = useMapStore((s) => s.clearAutoLayoutPending);
+  const pushUndo             = useMapStore((s) => s.pushUndo);
   const { screenToFlowPosition, setViewport, getNode, getNodes, getZoom } = useReactFlow();
 
   const [pendingPosition, setPendingPosition] = useState<{ x: number; y: number } | null>(null);
   const [contextMenu, setContextMenu]         = useState<CtxMenu | null>(null);
 
-  const initialNodes = useMemo(
-    () => map.systems.map((s) => systemToNode(s, selectedSystemId, easyConnect)),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
-  );
-
-  const [nodes, setNodes] = useNodesState(initialNodes);
+  // Empty initial — the `systems` effect below replaces this on the next
+  // frame with the real node set. Starting empty avoids the dead useMemo that
+  // only ever ran once before being overwritten.
+  const [nodes, setNodes] = useNodesState<Node>([]);
 
   const onNodesChange = useCallback(
     (changes: NodeChange[]) => {
       changes.forEach((c) => {
         if (c.type === 'remove') {
-          const sys = map.systems.find((s) => s.id === c.id);
+          const sys = systems.find((s) => s.id === c.id);
           if (!sys?.locked) removeSystem(c.id);
         }
       });
       setNodes((nds) => applyNodeChanges(changes.filter((c) => c.type !== 'remove'), nds));
     },
-    [map.systems, removeSystem, setNodes],
+    [systems, removeSystem, setNodes],
   );
 
   // Preserve rubber-band selection when Shift is released before the mouse button.
@@ -125,7 +143,7 @@ export function MapCanvas() {
         const rfSelected = nodes.filter((n) => n.selected);
         if (rfSelected.length > 0) {
           rfSelected.forEach((n) => {
-            const sys = map.systems.find((s) => s.id === n.id);
+            const sys = systems.find((s) => s.id === n.id);
             if (!sys?.locked) removeSystem(n.id);
           });
           return;
@@ -133,7 +151,7 @@ export function MapCanvas() {
 
         // Single-click selected (panel open)
         if (selectedSystemId) {
-          const sys = map.systems.find((s) => s.id === selectedSystemId);
+          const sys = systems.find((s) => s.id === selectedSystemId);
           if (sys && !sys.locked) removeSystem(selectedSystemId);
         }
       }
@@ -157,15 +175,15 @@ export function MapCanvas() {
       window.removeEventListener('keyup',   onKeyUp);
       window.removeEventListener('blur',    onBlur);
     };
-  }, [nodes, selectedSystemId, map.systems, removeSystem, undo, setNodes]);
+  }, [nodes, selectedSystemId, systems, removeSystem, undo, setNodes]);
 
   const onSelectionChange = useCallback(({ nodes: sel }: { nodes: Node[] }) => {
     if (shiftHeld.current && sel.length > 0) pendingSelection.current = sel.map((n) => n.id);
   }, []);
 
   useEffect(() => {
-    setNodes(map.systems.map((s) => systemToNode(s, selectedSystemId, easyConnect)));
-  }, [map.systems, selectedSystemId, easyConnect, setNodes]);
+    setNodes(systems.map((s) => systemToNode(s, selectedSystemId, easyConnect)));
+  }, [systems, selectedSystemId, easyConnect, setNodes]);
 
   const centerOnSystem = useCallback((systemId: string) => {
     const node = getNode(systemId);
@@ -217,7 +235,7 @@ export function MapCanvas() {
       y: n.position.y,
       w: n.measured?.width  ?? 150,
       h: n.measured?.height ?? 100,
-      locked: map.systems.find((s) => s.id === n.id)?.locked ?? false,
+      locked: systems.find((s) => s.id === n.id)?.locked ?? false,
     }));
 
     const resolved = resolveOverlaps(items);
@@ -236,12 +254,12 @@ export function MapCanvas() {
     });
 
     toMove.forEach((r) => moveSystem(r.id, { x: r.x, y: r.y }, { skipUndo: true }));
-  }, [autoLayoutPending, clearAutoLayoutPending, getNodes, map.systems, moveSystem, pushUndo]);
+  }, [autoLayoutPending, clearAutoLayoutPending, getNodes, systems, moveSystem, pushUndo]);
 
   // Edges driven directly from store — no local duplicate state
   const edges = useMemo(
     () =>
-      map.connections.map((c) => ({
+      connections.map((c) => ({
         id: c.id,
         source: c.sourceId,
         target: c.targetId,
@@ -251,7 +269,7 @@ export function MapCanvas() {
         data: { ...c, edgeStyle } as unknown as Record<string, unknown>,
         selected: c.id === selectedConnectionId,
       })),
-    [map.connections, selectedConnectionId, edgeStyle],
+    [connections, selectedConnectionId, edgeStyle],
   );
 
   const onEdgesChange = useCallback(
@@ -283,24 +301,21 @@ export function MapCanvas() {
       const movedIds = new Set(movedNodes.map((n) => n.id));
       // Build position map from store, then override with the just-dragged positions
       // (store hasn't updated yet when this fires)
-      const posMap = new Map(map.systems.map((s) => [s.id, s.position]));
+      const posMap = new Map(systems.map((s) => [s.id, s.position]));
       movedNodes.forEach((n) => posMap.set(n.id, n.position));
 
-      for (const conn of map.connections) {
+      for (const conn of connections) {
         if (!movedIds.has(conn.sourceId) && !movedIds.has(conn.targetId)) continue;
         const src = posMap.get(conn.sourceId);
         const tgt = posMap.get(conn.targetId);
         if (!src || !tgt) continue;
-        const dx = tgt.x - src.x;
-        const dy = tgt.y - src.y;
-        const sourceHandle = Math.abs(dx) >= Math.abs(dy) ? (dx >= 0 ? 'right' : 'left') : (dy >= 0 ? 'bottom' : 'top');
-        const targetHandle = Math.abs(dx) >= Math.abs(dy) ? (dx >= 0 ? 'left' : 'right') : (dy >= 0 ? 'top' : 'bottom');
+        const { sourceHandle, targetHandle } = pickHandles(src, tgt);
         if (conn.sourceHandle !== sourceHandle || conn.targetHandle !== targetHandle) {
           updateConnection(conn.id, { sourceHandle, targetHandle });
         }
       }
     },
-    [moveSystem, map.systems, map.connections, updateConnection],
+    [moveSystem, systems, connections, updateConnection],
   );
 
   const nodeCtxFired = useRef(false);
@@ -355,7 +370,7 @@ export function MapCanvas() {
     if (!contextMenu) return [];
 
     if (contextMenu.edgeId) {
-      const conn = map.connections.find((c) => c.id === contextMenu.edgeId);
+      const conn = connections.find((c) => c.id === contextMenu.edgeId);
       const isJumpgate  = conn?.connectionType === 'jumpgate';
       const timeStatus  = conn?.timeStatus  ?? 'fresh';
       const massStatus  = conn?.massStatus  ?? 'stable';
@@ -431,7 +446,7 @@ export function MapCanvas() {
     }
 
     if (contextMenu.nodeId) {
-      const sys = map.systems.find((s) => s.id === contextMenu.nodeId);
+      const sys = systems.find((s) => s.id === contextMenu.nodeId);
       const selectedNodeIds = contextMenu.selectedNodeIds ?? [contextMenu.nodeId];
       const selectedNodes   = nodes.filter((n) => selectedNodeIds.includes(n.id));
       const multiSelected   = selectedNodes.length > 1;
@@ -441,12 +456,12 @@ export function MapCanvas() {
         {
           label: 'Set Destination',
           icon: '🎯',
-          action: () => setDestination(sys.eveSystemId!).catch(console.error),
+          action: () => setDestination(sys.eveSystemId!).catch(() => toast.error('Failed to set destination')),
         },
         {
           label: 'Add Waypoint',
           icon: '📍',
-          action: () => addWaypoint(sys.eveSystemId!).catch(console.error),
+          action: () => addWaypoint(sys.eveSystemId!).catch(() => toast.error('Failed to add waypoint')),
         },
       ] : [];
 
@@ -471,12 +486,12 @@ export function MapCanvas() {
           action: () => lockSystem(contextMenu.nodeId!),
         },
         ...(!sys?.locked ? [{
-          label: multiSelected ? `Remove ${selectedNodes.filter((n) => !map.systems.find((s) => s.id === n.id)?.locked).length} Systems` : 'Remove System',
+          label: multiSelected ? `Remove ${selectedNodes.filter((n) => !systems.find((s) => s.id === n.id)?.locked).length} Systems` : 'Remove System',
           icon: '✕',
           action: () => {
             if (multiSelected) {
               selectedNodes
-                .filter((n) => !map.systems.find((s) => s.id === n.id)?.locked)
+                .filter((n) => !systems.find((s) => s.id === n.id)?.locked)
                 .forEach((n) => removeSystem(n.id));
             } else {
               removeSystem(contextMenu.nodeId!);
@@ -543,7 +558,7 @@ export function MapCanvas() {
             pannable
             zoomable
             nodeColor={(n) => {
-              const sys = map.systems.find((s) => s.id === n.id);
+              const sys = systems.find((s) => s.id === n.id);
               return sys ? CLASS_COLORS[sys.systemClass] : '#333';
             }}
             maskColor="rgba(13,17,23,0.85)"

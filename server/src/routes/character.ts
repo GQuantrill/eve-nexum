@@ -2,9 +2,11 @@ import { Router } from 'express';
 import { db } from '../db.js';
 import { requireAuth } from '../middleware/requireAuth.js';
 import { getValidToken } from '../utils/eveToken.js';
+import { createLogger } from '../utils/logger.js';
 
 export const characterRouter = Router();
 characterRouter.use(requireAuth);
+const log = createLogger('character');
 
 // userId → last recorded eve system id — used to detect jumps
 const lastSeenSystem = new Map<number, number>();
@@ -70,7 +72,7 @@ characterRouter.get('/location', async (req, res) => {
     if (!rows.length) { res.json({ online: true, system: null }); return; }
     res.json({ online: true, system: rows[0] });
   } catch (err) {
-    console.error('Location check failed:', err);
+    log.error('Location check failed:', err);
     res.status(500).json({ error: 'Failed to get location' });
   }
 });
@@ -109,7 +111,7 @@ characterRouter.post('/waypoint', async (req, res) => {
     if (!esiRes.ok) { res.status(502).json({ error: `ESI returned ${esiRes.status}` }); return; }
     res.json({ ok: true });
   } catch (err) {
-    console.error('Waypoint set failed:', err);
+    log.error('Waypoint set failed:', err);
     res.status(500).json({ error: 'Failed to set waypoint' });
   }
 });
@@ -139,7 +141,7 @@ characterRouter.get('/online', async (req, res) => {
 
     if (!esiRes.ok) {
       const body = await esiRes.text();
-      console.error(`ESI online check: ${esiRes.status}`, body);
+      log.error(`ESI online check: ${esiRes.status}`, body);
       res.status(502).json({ error: `ESI returned ${esiRes.status}` });
       return;
     }
@@ -147,7 +149,7 @@ characterRouter.get('/online', async (req, res) => {
     const data = await esiRes.json() as { online: boolean; last_login?: string; last_logout?: string };
     res.json({ online: data.online });
   } catch (err) {
-    console.error('Online check failed:', err);
+    log.error('Online check failed:', err);
     res.status(500).json({ error: 'Failed to check online status' });
   }
 });

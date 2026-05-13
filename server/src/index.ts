@@ -12,7 +12,7 @@ import { authRouter } from './routes/auth.js';
 import { mapsRouter } from './routes/maps.js';
 import { characterRouter } from './routes/character.js';
 import killboardRouter from './routes/killboard.js';
-import activityRouter  from './routes/activity.js';
+import activityRouter, { initActivity } from './routes/activity.js';
 import statsRouter      from './routes/stats.js';
 import incursionsRouter  from './routes/incursions.js';
 import insurgencyRouter  from './routes/insurgency.js';
@@ -71,6 +71,7 @@ migrate()
   .then(async () => {
     await expireMaps();
     setInterval(expireMaps, 60 * 60 * 1000); // re-check hourly
+    await initActivity();
     app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
   })
   .catch((err) => { console.error('Migration failed:', err); process.exit(1); });

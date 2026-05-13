@@ -19,6 +19,8 @@ let moduleCache: { data: InsurgencySystem[]; fetchedAt: number } | null = null;
 let inflight: Promise<InsurgencySystem[]> | null = null;
 
 const subscribers = new Set<(d: InsurgencySystem[]) => void>();
+// Single shared poll timer (see useIncursions for the same pattern).
+let pollTimer: ReturnType<typeof setInterval> | null = null;
 
 function notify(d: InsurgencySystem[]) {
   subscribers.forEach((fn) => fn(d));
@@ -45,10 +47,14 @@ export function useInsurgency() {
       setData(moduleCache.data);
     }
 
-    const id = setInterval(load, POLL_MS);
+    if (!pollTimer) pollTimer = setInterval(load, POLL_MS);
+
     return () => {
       subscribers.delete(setData);
-      clearInterval(id);
+      if (subscribers.size === 0 && pollTimer) {
+        clearInterval(pollTimer);
+        pollTimer = null;
+      }
     };
   }, []);
 

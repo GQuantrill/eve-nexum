@@ -138,6 +138,8 @@ export async function migrate() {
     CREATE INDEX IF NOT EXISTS idx_map_structures_system ON map_structures (system_id);
     CREATE INDEX IF NOT EXISTS idx_user_events_user      ON user_events (user_id, created_at);
     CREATE INDEX IF NOT EXISTS idx_system_activity       ON system_activity (eve_system_id, hour DESC);
+    CREATE INDEX IF NOT EXISTS idx_system_activity_hour  ON system_activity (hour);
+    CREATE INDEX IF NOT EXISTS idx_maps_last_active      ON maps (last_active_at) WHERE corp_id IS NOT NULL;
 
     CREATE TABLE IF NOT EXISTS admin_audit (
       id                  BIGSERIAL   PRIMARY KEY,

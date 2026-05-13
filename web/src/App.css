@@ -2807,6 +2807,201 @@ div.system-node__easy-handle {
   display: block;
 }
 
+.landing__demo-note {
+  font-size: 12px;
+  color: #8a9db8;
+  text-align: center;
+  margin: 0 0 8px;
+  letter-spacing: 0.01em;
+}
+
+/* ── Interactive demo map ─────────────────────────────────── */
+.demo-wrap {
+  display: flex;
+  gap: 0;
+  width: 100%;
+  height: 480px;
+  border: 1px solid #1a2535;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #08101a;
+}
+
+.demo-info {
+  width: 0;
+  flex-shrink: 0;
+  overflow: hidden;
+  transition: width 0.2s ease;
+  border-right: 0 solid #1a2535;
+  background: #0a1220;
+  display: flex;
+  flex-direction: column;
+}
+
+.demo-info--visible {
+  width: 220px;
+  border-right-width: 1px;
+}
+
+.demo-info__content {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.demo-info__name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #e2e8f8;
+  word-break: break-all;
+}
+
+.demo-info__class {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.demo-info__effect {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+}
+
+.demo-info__effect-mods {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 2px;
+}
+
+.demo-info__mod--good {
+  font-size: 12px;
+  color: #4caf50;
+}
+
+.demo-info__mod--bad {
+  font-size: 12px;
+  color: #e05050;
+}
+
+.demo-info__label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #5a6a8a;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 4px;
+}
+
+.demo-info__statics {
+  display: flex;
+  flex-direction: column;
+}
+
+.demo-info__static-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  padding: 2px 0;
+}
+
+.demo-info__static-code {
+  font-family: monospace;
+  color: #c0d0e8;
+}
+
+.demo-info__section {
+  display: flex;
+  flex-direction: column;
+  font-size: 13px;
+}
+
+.demo-info__remove {
+  margin-top: 8px;
+}
+
+.demo-info__more {
+  margin-top: auto;
+  background: #0d1421;
+  border: 1px solid #1e2740;
+  border-radius: 6px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+}
+
+.demo-info__more-icon {
+  font-size: 14px;
+  color: #4a7ab8;
+}
+
+.demo-info__more p {
+  font-size: 11px;
+  color: #4a6080;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.demo-map-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 170px;
+}
+
+.demo-map-actions__count {
+  font-size: 11px;
+  color: #3a5070;
+  text-align: center;
+  padding-top: 2px;
+}
+
+.demo-map-actions__count--limit {
+  color: #c07040;
+}
+
+.demo-info__hint-limit {
+  font-size: 11px;
+  color: #8a9db8;
+  margin-top: 4px;
+}
+
+.demo-info__hint {
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: #8a9db8;
+  font-size: 12px;
+  line-height: 1.5;
+  height: 100%;
+  justify-content: center;
+}
+
+.demo-info__hint-icon {
+  font-size: 24px;
+  color: #2a4a7a;
+  margin-bottom: 4px;
+}
+
+.demo-info__hint p {
+  margin: 0;
+}
+
+.demo-canvas-wrap {
+  flex: 1;
+  position: relative;
+  min-width: 0;
+}
+
 .landing__screenshot-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -3246,3 +3441,32 @@ div.system-node__easy-handle {
   background: rgba(40,160,80,0.2);
   color: #4ade80;
 }
+
+/* ── Toaster ─────────────────────────────────────────────── */
+.toaster {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.toast {
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  max-width: 360px;
+  pointer-events: auto;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  border-left: 3px solid;
+  background: #14181f;
+  color: #c8d0e0;
+}
+
+.toast--error   { border-left-color: #f87171; background: #1a1014; }
+.toast--info    { border-left-color: #60a5fa; background: #0f1620; }
+.toast--success { border-left-color: #4ade80; background: #0f1a14; }

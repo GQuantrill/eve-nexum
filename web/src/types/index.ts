@@ -84,6 +84,8 @@ export interface MapConnection {
 export interface WormholeMap {
   id: string;
   name: string;
+  isCorpMap?: boolean;
+  locked?: boolean;
   systems: MapSystem[];
   connections: MapConnection[];
   createdAt: string;

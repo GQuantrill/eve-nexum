@@ -24,9 +24,34 @@ const inflight = new Map<number, Promise<EsiSystemData>>();
 
 const constellationCache = new Map<number, string>();
 
+// Cap how many ESI requests are in flight at once. On initial map load a 50-
+// node map would otherwise issue 50 simultaneous /universe/systems/{id}/ calls;
+// ESI throttles us aggressively past ~20 parallel requests and we pay for it
+// in TCP setup overhead and 420 responses.
+const MAX_CONCURRENT = 6;
+let activeCount = 0;
+const queue: Array<() => void> = [];
+
+function acquireSlot(): Promise<void> {
+  if (activeCount < MAX_CONCURRENT) {
+    activeCount++;
+    return Promise.resolve();
+  }
+  return new Promise<void>((resolve) => {
+    queue.push(() => { activeCount++; resolve(); });
+  });
+}
+
+function releaseSlot() {
+  activeCount--;
+  const next = queue.shift();
+  if (next) next();
+}
+
 async function fetchConstellationName(constellationId: number): Promise<string | null> {
   const cached = constellationCache.get(constellationId);
   if (cached) return cached;
+  await acquireSlot();
   try {
     const res = await fetch(`${ESI}/universe/constellations/${constellationId}/`);
     if (!res.ok) return null;
@@ -35,6 +60,8 @@ async function fetchConstellationName(constellationId: number): Promise<string |
     return data.name;
   } catch {
     return null;
+  } finally {
+    releaseSlot();
   }
 }
 
@@ -46,6 +73,7 @@ async function loadSystem(eveSystemId: number): Promise<EsiSystemData> {
   if (existing) return existing;
 
   const promise = (async (): Promise<EsiSystemData> => {
+    await acquireSlot();
     try {
       const res = await fetch(`${ESI}/universe/systems/${eveSystemId}/`);
       if (!res.ok) return { stationIds: [], planetCount: 0, moonCount: 0, stargateCount: 0, securityStatus: null, constellationName: null };
@@ -56,6 +84,10 @@ async function loadSystem(eveSystemId: number): Promise<EsiSystemData> {
         security_status?: number;
         constellation_id?: number;
       };
+      // Release before the constellation fetch — that call acquires its own
+      // slot, and holding two slots per system would halve our effective
+      // concurrency.
+      releaseSlot();
       const constellationName = data.constellation_id
         ? await fetchConstellationName(data.constellation_id)
         : null;
@@ -68,9 +100,12 @@ async function loadSystem(eveSystemId: number): Promise<EsiSystemData> {
         constellationName,
       };
       cache.set(eveSystemId, result);
-      return result;
-    } finally {
       inflight.delete(eveSystemId);
+      return result;
+    } catch {
+      releaseSlot();
+      inflight.delete(eveSystemId);
+      return { stationIds: [], planetCount: 0, moonCount: 0, stargateCount: 0, securityStatus: null, constellationName: null };
     }
   })();
 

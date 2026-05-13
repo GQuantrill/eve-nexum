@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { api } from '../api/client';
 
 export interface SystemSearchResult {
   id: number;
@@ -15,9 +16,7 @@ export interface SystemDetail extends SystemSearchResult {
 }
 
 export async function fetchSystemDetail(id: number): Promise<SystemDetail> {
-  const res = await fetch(`/api/systems/${id}`);
-  if (!res.ok) throw new Error('System lookup failed');
-  return res.json();
+  return api<SystemDetail>(`/api/systems/${id}`);
 }
 
 export function useEsiSearch(query: string, debounceMs = 300) {
@@ -40,12 +39,11 @@ export function useEsiSearch(query: string, debounceMs = 300) {
       setError(null);
 
       try {
-        const res = await fetch(
+        const data = await api<SystemSearchResult[]>(
           `/api/systems/search?q=${encodeURIComponent(query)}`,
           { signal: abortRef.current.signal },
         );
-        if (!res.ok) throw new Error('Search failed');
-        setResults(await res.json());
+        setResults(data);
       } catch (e) {
         if ((e as Error).name !== 'AbortError') setError('Search failed');
       } finally {

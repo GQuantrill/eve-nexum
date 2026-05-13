@@ -1,6 +1,11 @@
 import { Router } from 'express';
+import { requireAuth } from '../middleware/requireAuth.js';
+import { createLogger } from '../utils/logger.js';
+import { TtlValue } from '../utils/cache.js';
 
 const router = Router();
+router.use(requireAuth);
+const log = createLogger('incursions');
 
 interface EsiFaction {
   faction_id: number;
@@ -33,8 +38,7 @@ export interface IncursionSystem {
 const CACHE_TTL_MS = 60 * 60 * 1000;
 
 let factionMap: Map<number, EsiFaction> | null = null;
-let cachedAt   = 0;
-let cachedData: IncursionSystem[] = [];
+const cache = new TtlValue<IncursionSystem[]>(CACHE_TTL_MS);
 
 async function loadFactions(): Promise<Map<number, EsiFaction>> {
   if (factionMap) return factionMap;
@@ -79,18 +83,16 @@ async function fetchAndBuild(): Promise<IncursionSystem[]> {
 }
 
 router.get('/', async (_req, res) => {
-  const now = Date.now();
-  if (now - cachedAt < CACHE_TTL_MS) {
-    res.json(cachedData);
-    return;
-  }
+  const fresh = cache.get();
+  if (fresh) { res.json(fresh); return; }
   try {
-    cachedData = await fetchAndBuild();
-    cachedAt   = now;
-    res.json(cachedData);
+    const data = await fetchAndBuild();
+    cache.set(data);
+    res.json(data);
   } catch (err) {
-    console.error('Incursions fetch failed:', err);
-    if (cachedData.length) { res.json(cachedData); return; }
+    log.error('Incursions fetch failed:', err);
+    const stale = cache.getStale();
+    if (stale) { res.json(stale); return; }
     res.status(502).json({ error: 'Failed to fetch incursions' });
   }
 });

@@ -5,20 +5,30 @@ import { SYSTEM_CLASSES, WORMHOLE_EFFECTS, CLASS_LABELS, EFFECT_LABELS } from '.
 import { useEsiSearch, fetchSystemDetail } from '../../hooks/useEsiSearch';
 import { useMapStore } from '../../store/mapStore';
 
+type SystemOpts = {
+  eveSystemId?: number | null;
+  effect?: WormholeEffect;
+  statics?: string[];
+  regionName?: string | null;
+  npcType?: string | null;
+};
+
 interface Props {
   position: { x: number; y: number };
   onClose: () => void;
+  /** When provided, called instead of the store's addSystem (e.g. demo mode). */
+  onSubmit?: (name: string, systemClass: SystemClass, position: { x: number; y: number }, opts: SystemOpts) => void;
 }
 
-export function AddSystemModal({ position, onClose }: Props) {
-  const addSystem = useMapStore((s) => s.addSystem);
-  const map       = useMapStore((s) => s.map);
+export function AddSystemModal({ position, onClose, onSubmit }: Props) {
+  const storeAddSystem = useMapStore((s) => s.addSystem);
+  const map            = useMapStore((s) => s.map);
 
-  // Build lookup sets once per render so dropdown items can check cheaply
   const onMapIds   = new Set(map.systems.map((s) => s.eveSystemId).filter((id): id is number => id !== null));
   const onMapNames = new Set(map.systems.map((s) => s.name.toLowerCase()));
 
   function isOnMap(id: number, name: string) {
+    if (onSubmit) return false;
     return onMapIds.has(id) || onMapNames.has(name.toLowerCase());
   }
 
@@ -33,6 +43,8 @@ export function AddSystemModal({ position, onClose }: Props) {
   const [loadingDetail, setLoadingDetail] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
+  const searchFieldRef = useRef<HTMLDivElement>(null);
+  const [dropdownPos, setDropdownPos] = useState<{ top: number; left: number; width: number } | null>(null);
 
   const { results, loading } = useEsiSearch(query);
 
@@ -46,6 +58,15 @@ export function AddSystemModal({ position, onClose }: Props) {
   }, []);
 
   useEffect(() => { setActiveIndex(-1); }, [results]);
+
+  useEffect(() => {
+    if (results.length > 0 && searchFieldRef.current) {
+      const r = searchFieldRef.current.getBoundingClientRect();
+      setDropdownPos({ top: r.bottom + 4, left: r.left, width: r.width });
+    } else {
+      setDropdownPos(null);
+    }
+  }, [results]);
 
   async function selectResult(id: number, name: string) {
     if (isOnMap(id, name)) return;
@@ -114,19 +135,26 @@ export function AddSystemModal({ position, onClose }: Props) {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!systemName) return;
-    addSystem(systemName, systemClass, position, {
+    const opts: SystemOpts = {
       eveSystemId: selectedId,
       effect,
       statics: statics.split(',').map((s) => s.trim()).filter(Boolean),
       regionName,
       npcType,
-    });
+    };
+    if (onSubmit) {
+      onSubmit(systemName, systemClass, position, opts);
+    } else {
+      storeAddSystem(systemName, systemClass, position, opts);
+    }
     onClose();
   }
 
   const isWormhole = ['C1','C2','C3','C4','C5','C6','Thera','Pochven','Drifter'].includes(systemClass);
 
-  return createPortal(
+  return (
+    <>
+    {createPortal(
     <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="modal" role="dialog" aria-modal="true">
         <div className="modal__header">
@@ -135,7 +163,7 @@ export function AddSystemModal({ position, onClose }: Props) {
         </div>
 
         <form className="modal__body" onSubmit={handleSubmit}>
-          <div className="search-field">
+          <div className="search-field" ref={searchFieldRef}>
             <label className="field__label">System name</label>
             <div className="search-field__wrap">
               <input
@@ -165,28 +193,6 @@ export function AddSystemModal({ position, onClose }: Props) {
               {loading && !isSelected && <span className="search-field__spinner" />}
             </div>
 
-            {showResults && (
-              <ul className="search-results" role="listbox">
-                {results.map((r, i) => {
-                  const alreadyOnMap = isOnMap(r.id, r.name);
-                  return (
-                    <li
-                      key={r.id}
-                      className={`search-results__item${i === activeIndex && !alreadyOnMap ? ' search-results__item--active' : ''}${alreadyOnMap ? ' search-results__item--disabled' : ''}`}
-                      role="option"
-                      aria-disabled={alreadyOnMap}
-                      onMouseDown={(e) => { e.preventDefault(); selectResult(r.id, r.name); }}
-                      onMouseEnter={() => !alreadyOnMap && setActiveIndex(i)}
-                    >
-                      <span>{r.name}</span>
-                      <span className="search-results__class">
-                        {alreadyOnMap ? 'on map' : r.systemClass}
-                      </span>
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
 
             {showEmpty && (
               <p className="search-field__empty">No systems found for "{query}"</p>
@@ -250,5 +256,34 @@ export function AddSystemModal({ position, onClose }: Props) {
       </div>
     </div>,
     document.body,
+    )}
+    {showResults && dropdownPos && createPortal(
+      <ul
+        className="search-results"
+        role="listbox"
+        style={{ position: 'fixed', top: dropdownPos.top, left: dropdownPos.left, width: dropdownPos.width, zIndex: 2000 }}
+      >
+        {results.map((r, i) => {
+          const alreadyOnMap = isOnMap(r.id, r.name);
+          return (
+            <li
+              key={r.id}
+              className={`search-results__item${i === activeIndex && !alreadyOnMap ? ' search-results__item--active' : ''}${alreadyOnMap ? ' search-results__item--disabled' : ''}`}
+              role="option"
+              aria-disabled={alreadyOnMap}
+              onMouseDown={(e) => { e.preventDefault(); selectResult(r.id, r.name); }}
+              onMouseEnter={() => !alreadyOnMap && setActiveIndex(i)}
+            >
+              <span>{r.name}</span>
+              <span className="search-results__class">
+                {alreadyOnMap ? 'on map' : r.systemClass}
+              </span>
+            </li>
+          );
+        })}
+      </ul>,
+      document.body,
+    )}
+    </>
   );
 }

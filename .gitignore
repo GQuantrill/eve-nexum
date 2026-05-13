@@ -38,3 +38,5 @@ pathfinder/
 # SDE download cache and local zip (too large for git)
 .sde-cache/
 server/data/*.zip
+
+changes.md

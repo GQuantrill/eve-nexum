@@ -1,7 +1,9 @@
 import { Router } from 'express';
 import { db } from '../db.js';
+import { requireAuth } from '../middleware/requireAuth.js';
 
 const router = Router();
+router.use(requireAuth);
 const ESI         = 'https://esi.evetech.net/v1';
 const HOUR_MS     = 60 * 60 * 1000;
 const MAX_HISTORY = 24;
@@ -26,7 +28,10 @@ interface EsiSnapshot {
 const systemHistory  = new Map<number, HourlyPoint[]>();
 const trackedSystems = new Set<number>();
 let   esiCache: EsiSnapshot | null = null;
-let   fetching = false;
+let   fetching: Promise<EsiSnapshot | null> | null = null;
+// Tracks the ESI snapshot timestamp that's already been written to the DB so
+// we don't keep INSERT...ON CONFLICTing the same rows on every request.
+let   lastWrittenFetchedAt = 0;
 
 function hourFloor(ts = Date.now()): number {
   return ts - (ts % HOUR_MS);
@@ -35,32 +40,36 @@ function hourFloor(ts = Date.now()): number {
 async function fetchEsi(): Promise<EsiSnapshot | null> {
   const now = Date.now();
   if (esiCache && now - esiCache.fetchedAt < ESI_CACHE_TTL) return esiCache;
-  if (fetching) return esiCache;
+  // Promise-cached so concurrent callers share one fetch (the old boolean
+  // soft-lock raced — two callers could both see fetching=false).
+  if (fetching) return fetching;
 
-  fetching = true;
-  try {
-    const [jRes, kRes] = await Promise.all([
-      fetch(`${ESI}/universe/system_jumps/?datasource=tranquility`),
-      fetch(`${ESI}/universe/system_kills/?datasource=tranquility`),
-    ]);
-    if (!jRes.ok || !kRes.ok) return esiCache;
+  fetching = (async () => {
+    try {
+      const [jRes, kRes] = await Promise.all([
+        fetch(`${ESI}/universe/system_jumps/?datasource=tranquility`),
+        fetch(`${ESI}/universe/system_kills/?datasource=tranquility`),
+      ]);
+      if (!jRes.ok || !kRes.ok) return esiCache;
 
-    const [jumps, kills] = await Promise.all([
-      jRes.json() as Promise<EsiJump[]>,
-      kRes.json() as Promise<EsiKill[]>,
-    ]);
+      const [jumps, kills] = await Promise.all([
+        jRes.json() as Promise<EsiJump[]>,
+        kRes.json() as Promise<EsiKill[]>,
+      ]);
 
-    esiCache = {
-      jumps:     new Map(jumps.map((j) => [j.system_id, j.ship_jumps])),
-      kills:     new Map(kills.map((k) => [k.system_id, k])),
-      fetchedAt: now,
-    };
-    return esiCache;
-  } catch {
-    return esiCache;
-  } finally {
-    fetching = false;
-  }
+      esiCache = {
+        jumps:     new Map(jumps.map((j) => [j.system_id, j.ship_jumps])),
+        kills:     new Map(kills.map((k) => [k.system_id, k])),
+        fetchedAt: now,
+      };
+      return esiCache;
+    } catch {
+      return esiCache;
+    } finally {
+      fetching = null;
+    }
+  })();
+  return fetching;
 }
 
 async function loadFromDb(sysId: number): Promise<HourlyPoint[]> {
@@ -92,10 +101,18 @@ async function ensureHistory(sysId: number): Promise<void> {
 
 async function recordSnapshot(): Promise<void> {
   const snap = await fetchEsi();
-  if (!snap) return;
+  if (!snap || trackedSystems.size === 0) return;
 
   const hour     = hourFloor();
   const hourDate = new Date(hour);
+
+  // Single pass: refresh the in-memory ring buffer and collect arrays for the
+  // bulk DB write.
+  const sysIds:    number[] = [];
+  const jumps:     number[] = [];
+  const shipKills: number[] = [];
+  const podKills:  number[] = [];
+  const npcKills:  number[] = [];
 
   for (const sysId of trackedSystems) {
     const kll = snap.kills.get(sysId);
@@ -106,7 +123,6 @@ async function recordSnapshot(): Promise<void> {
       podKills:  kll?.pod_kills  ?? 0,
       npcKills:  kll?.npc_kills  ?? 0,
     };
-
     const history = systemHistory.get(sysId) ?? [];
     if (history.length > 0 && history[history.length - 1].hour === hour) {
       history[history.length - 1] = point;
@@ -116,17 +132,34 @@ async function recordSnapshot(): Promise<void> {
     }
     systemHistory.set(sysId, history);
 
-    await db.query(
-      `INSERT INTO system_activity (eve_system_id, hour, jumps, ship_kills, pod_kills, npc_kills)
-       VALUES ($1, $2, $3, $4, $5, $6)
-       ON CONFLICT (eve_system_id, hour) DO UPDATE SET
-         jumps      = EXCLUDED.jumps,
-         ship_kills = EXCLUDED.ship_kills,
-         pod_kills  = EXCLUDED.pod_kills,
-         npc_kills  = EXCLUDED.npc_kills`,
-      [sysId, hourDate, point.jumps, point.shipKills, point.podKills, point.npcKills],
-    );
+    sysIds.push(sysId);
+    jumps.push(point.jumps);
+    shipKills.push(point.shipKills);
+    podKills.push(point.podKills);
+    npcKills.push(point.npcKills);
   }
+
+  // If we've already written this ESI snapshot to the DB, the rows wouldn't
+  // change — skip the round-trip entirely.
+  if (snap.fetchedAt === lastWrittenFetchedAt || sysIds.length === 0) return;
+
+  // Bulk INSERT...ON CONFLICT in one round-trip via unnest() arrays. Previously
+  // we did one INSERT per tracked system serially.
+  await db.query(
+    `INSERT INTO system_activity (eve_system_id, hour, jumps, ship_kills, pod_kills, npc_kills)
+     SELECT * FROM unnest(
+       $1::int[],
+       ARRAY(SELECT $2::timestamptz FROM unnest($1::int[])),
+       $3::int[], $4::int[], $5::int[], $6::int[]
+     )
+     ON CONFLICT (eve_system_id, hour) DO UPDATE SET
+       jumps      = EXCLUDED.jumps,
+       ship_kills = EXCLUDED.ship_kills,
+       pod_kills  = EXCLUDED.pod_kills,
+       npc_kills  = EXCLUDED.npc_kills`,
+    [sysIds, hourDate, jumps, shipKills, podKills, npcKills],
+  );
+  lastWrittenFetchedAt = snap.fetchedAt;
 }
 
 async function pruneOldRows(): Promise<void> {
@@ -134,16 +167,17 @@ async function pruneOldRows(): Promise<void> {
   await db.query(`DELETE FROM system_activity WHERE hour < $1`, [cutoff]);
 }
 
-async function init(): Promise<void> {
-  try {
-    const { rows } = await db.query<{ eve_system_id: number }>(
-      `SELECT DISTINCT eve_system_id FROM system_activity`,
-    );
-    for (const row of rows) trackedSystems.add(row.eve_system_id);
-    await pruneOldRows();
-  } catch {
-    // Table not yet created — migrate() runs before any routes are hit
-  }
+// Called from index.ts AFTER migrate() resolves — guarantees the
+// `system_activity` table exists by the time we read from it. The previous
+// fire-on-import pattern would swallow a "relation does not exist" error and
+// then race writes against the migration on cold start.
+export async function initActivity(): Promise<void> {
+  const { rows } = await db.query<{ eve_system_id: number }>(
+    `SELECT DISTINCT eve_system_id FROM system_activity`,
+  );
+  for (const row of rows) trackedSystems.add(row.eve_system_id);
+  await pruneOldRows();
+  scheduleNextPoll();
 }
 
 function scheduleNextPoll() {
@@ -155,9 +189,7 @@ function scheduleNextPoll() {
   }, next - now);
 }
 
-init().then(() => scheduleNextPoll());
-
-router.get('/:systemId', async (req, res) => {
+router.get('/:systemId(\\d+)', async (req, res) => {
   const eveSystemId = parseInt(req.params.systemId, 10);
   if (isNaN(eveSystemId)) { res.status(400).json({ error: 'invalid system id' }); return; }
 

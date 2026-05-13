@@ -17,6 +17,7 @@ import { ActivityPane } from './ActivityPane';
 import { truesecColor } from '../../utils/truesec';
 import { useIncursions, findIncursion } from '../../hooks/useIncursions';
 import { useInsurgency, findInsurgency } from '../../hooks/useInsurgency';
+import { useCanEdit } from '../../hooks/useCanEdit';
 
 function FlashingSkull({ color }: { color: string }) {
   const [dim, setDim] = useState(false);
@@ -50,7 +51,13 @@ function clamp(v: number) {
 
 
 export function SystemPanel() {
-  const { map, selectedSystemId, panelOrder, updateSystem, selectSystem, setPanelOrder } = useMapStore();
+  const systems          = useMapStore((s) => s.map.systems);
+  const selectedSystemId = useMapStore((s) => s.selectedSystemId);
+  const panelOrder       = useMapStore((s) => s.panelOrder);
+  const updateSystem     = useMapStore((s) => s.updateSystem);
+  const selectSystem     = useMapStore((s) => s.selectSystem);
+  const setPanelOrder    = useMapStore((s) => s.setPanelOrder);
+  const canEdit          = useCanEdit();
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
 
   const [height, setHeight] = useState(() => {
@@ -61,7 +68,7 @@ export function SystemPanel() {
 
   const [waypointStatus, setWaypointStatus] = useState<'idle' | 'ok' | 'err'>('idle');
 
-  const sys       = map.systems.find((s) => s.id === selectedSystemId);
+  const sys       = systems.find((s) => s.id === selectedSystemId);
   const sov       = useSovData(sys?.eveSystemId ?? null);
   const esiSys    = useEsiSystem(sys?.eveSystemId ?? null);
   const incursions   = useIncursions();
@@ -113,6 +120,7 @@ export function SystemPanel() {
       <NotesEditor
         value={sys.notes}
         onChange={(v) => updateSystem(sys.id, { notes: v }, { skipUndo: true })}
+        readOnly={!canEdit}
       />
     ),
     signatures:  <SignaturePane systemId={sys.id} />,

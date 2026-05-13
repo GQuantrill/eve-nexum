@@ -1,18 +1,25 @@
 import { useRef, useState } from 'react';
 import MDEditor from '@uiw/react-md-editor';
+import rehypeSanitize from 'rehype-sanitize';
 
 interface Props {
   value: string;
   onChange: (value: string) => void;
   compact?: boolean;
+  readOnly?: boolean;
 }
 
-export function NotesEditor({ value, onChange, compact = false }: Props) {
+// Notes are shared across users on corp maps, so the markdown preview has to
+// sanitize HTML before it lands in the DOM. Defining the plugin list once at
+// module scope avoids re-allocating it on every render.
+const PREVIEW_OPTIONS = { rehypePlugins: [rehypeSanitize] };
+
+export function NotesEditor({ value, onChange, compact = false, readOnly = false }: Props) {
   const [focused, setFocused] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const enterEdit = () => {
-    if (focused) return;
+    if (readOnly || focused) return;
     setFocused(true);
     setTimeout(() => {
       containerRef.current?.querySelector<HTMLTextAreaElement>('textarea')?.focus();
@@ -21,6 +28,7 @@ export function NotesEditor({ value, onChange, compact = false }: Props) {
 
   if (compact && !focused) {
     if (!value) {
+      if (readOnly) return <div className="notes-editor notes-editor--empty" />;
       return (
         <div className="notes-editor notes-editor--empty" onClick={enterEdit}>
           <span className="notes-editor__placeholder">Add note…</span>
@@ -46,11 +54,12 @@ export function NotesEditor({ value, onChange, compact = false }: Props) {
     >
       <MDEditor
         value={value}
-        onChange={(v) => onChange(v ?? '')}
-        preview={focused ? 'live' : 'preview'}
-        hideToolbar={!focused}
+        onChange={(v) => { if (!readOnly) onChange(v ?? ''); }}
+        preview={readOnly ? 'preview' : focused ? 'live' : 'preview'}
+        hideToolbar={readOnly || !focused}
         height={compact ? 120 : 80}
         visibleDragbar={false}
+        previewOptions={PREVIEW_OPTIONS}
       />
     </div>
   );

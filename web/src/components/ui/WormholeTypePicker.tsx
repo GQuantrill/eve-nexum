@@ -1,13 +1,12 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { CLASS_COLORS, CLASS_LABELS, WH_GROUPS, WORMHOLE_DESTINATIONS } from '../../data/wormholes';
+import { usePopover } from '../../hooks/usePopover';
 
 interface Props {
   value: string;
   onChange: (whType: string, leadsTo: string) => void;
   statics?: string[];
 }
-
-interface DropdownPos { top: number; left: number; }
 
 function DestBadge({ code }: { code: string }) {
   const dest = WORMHOLE_DESTINATIONS[code];
@@ -23,31 +22,15 @@ function DestBadge({ code }: { code: string }) {
 }
 
 export function WormholeTypePicker({ value, onChange, statics = [] }: Props) {
-  const [open, setOpen] = useState(false);
+  const { open, setOpen, pos, btnRef, dropdownRef, openAt } = usePopover();
   const [search, setSearch] = useState('');
-  const [pos, setPos] = useState<DropdownPos>({ top: 0, left: 0 });
-  const btnRef = useRef<HTMLButtonElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
 
   const openPicker = () => {
-    const rect = btnRef.current?.getBoundingClientRect();
-    if (rect) setPos({ top: rect.bottom + 2, left: rect.left });
     setSearch('');
-    setOpen(true);
+    openAt();
     setTimeout(() => searchRef.current?.focus(), 0);
   };
-
-  useEffect(() => {
-    if (!open) return;
-    const close = (e: MouseEvent) => {
-      const target = e.target as Node;
-      if (!btnRef.current?.contains(target) && !(document.getElementById('wh-picker-dropdown')?.contains(target))) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', close);
-    return () => document.removeEventListener('mousedown', close);
-  }, [open]);
 
   const select = (code: string) => {
     const leadsTo = code === 'K162' ? '' : (WORMHOLE_DESTINATIONS[code] ?? '');
@@ -92,7 +75,7 @@ export function WormholeTypePicker({ value, onChange, statics = [] }: Props) {
 
       {open && (
         <div
-          id="wh-picker-dropdown"
+          ref={dropdownRef}
           className="wh-picker__dropdown"
           style={{ position: 'fixed', top: pos.top, left: pos.left }}
         >

@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { api } from '../../api/client';
 import { useMapStore } from '../../store/mapStore';
+import { useCanEdit } from '../../hooks/useCanEdit';
 import type { Signature, SigType } from '../../types';
 import { ConfirmModal, shouldSkipConfirm } from './ConfirmModal';
 import { NotesEditor } from './NotesEditor';
 import { WormholeTypePicker } from './WormholeTypePicker';
 import { LeadsToDropdown } from './LeadsToDropdown';
+import { toast } from './Toaster';
 
 const SIG_TYPE_LABELS: Record<SigType, string> = {
   unknown:  'Unknown',
@@ -72,10 +74,43 @@ function elapsed(isoString: string | undefined, now: number): string {
   return `${h}h ${rm < 10 ? '0' : ''}${rm}m`;
 }
 
+// Single module-level 1 s tick shared across every ElapsedCell instance.
+// Previously each SignaturePane drove a state update every second, which
+// re-rendered every row including its embedded MDEditor — extremely expensive.
+let tickNow = Date.now();
+const tickSubs = new Set<() => void>();
+let tickTimer: ReturnType<typeof setInterval> | null = null;
+
+function startTickIfNeeded() {
+  if (tickTimer) return;
+  tickTimer = setInterval(() => {
+    tickNow = Date.now();
+    tickSubs.forEach((fn) => fn());
+  }, 1000);
+}
+
+function ElapsedCell({ iso, className }: { iso: string | undefined; className?: string }) {
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    const fn = () => setTick((n) => n + 1);
+    tickSubs.add(fn);
+    startTickIfNeeded();
+    return () => {
+      tickSubs.delete(fn);
+      if (tickSubs.size === 0 && tickTimer) {
+        clearInterval(tickTimer);
+        tickTimer = null;
+      }
+    };
+  }, []);
+  return <td className={className}>{elapsed(iso, tickNow)}</td>;
+}
+
 export function SignaturePane({ systemId }: { systemId: string }) {
   const activeMapId     = useMapStore((s) => s.activeMapId);
   const map             = useMapStore((s) => s.map);
   const currentSystemId = useMapStore((s) => s.currentSystemId);
+  const canEdit         = useCanEdit();
 
   const systemStatics = useMemo(
     () => map.systems.find((sys) => sys.id === systemId)?.statics ?? [],
@@ -99,12 +134,6 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   const [sortCol, setSortCol]         = useState<SortCol | null>(null);
   const [sortDir, setSortDir]         = useState<'asc' | 'desc'>('asc');
   const [colWidths, setColWidths]     = useState<Record<ColKey, number>>(DEFAULT_WIDTHS);
-  const [now, setNow]                 = useState(() => Date.now());
-
-  useEffect(() => {
-    const id = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(id);
-  }, []);
 
   const pendingUpdates = useRef<Map<string, Partial<Signature>>>(new Map());
   const debounceTimers = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
@@ -117,7 +146,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
     setSelected(new Set());
     api<Signature[]>(`/api/maps/${activeMapId}/systems/${systemId}/signatures`)
       .then(setSigs)
-      .catch(() => {});
+      .catch(() => toast.error('Failed to load signatures'));
   }, [activeMapId, systemId]);
 
   const updateSig = (id: string, updates: Partial<Signature>) => {
@@ -132,7 +161,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
       api(`/api/maps/${activeMapId}/systems/${systemId}/signatures/${id}`, {
         method: 'PATCH',
         body: JSON.stringify(payload),
-      }).catch(console.error);
+      }).catch(() => toast.error('Failed to save signature'));
     }, 500));
   };
 
@@ -141,7 +170,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
     setSigs((prev) => prev.filter((s) => s.id !== id));
     setSelected((prev) => { const next = new Set(prev); next.delete(id); return next; });
     api(`/api/maps/${activeMapId}/systems/${systemId}/signatures/${id}`, { method: 'DELETE' })
-      .catch(console.error);
+      .catch(() => toast.error('Failed to delete signature'));
   };
 
   const processPaste = useCallback(async (parsed: ParsedSig[]) => {
@@ -170,17 +199,20 @@ export function SignaturePane({ systemId }: { systemId: string }) {
 
     for (const { id, updates } of toUpdate) updateSig(id, updates);
 
-    for (const p of toCreate) {
-      try {
-        const sig = await api<Signature>(
+    // Fire all creates in parallel, gather the successes, then do ONE setSigs
+    // that includes the new rows and re-sorts. The previous version sorted
+    // before the per-sig setSigs callbacks had flushed, so newly-created
+    // entries weren't being sorted at all.
+    const created = (await Promise.all(
+      toCreate.map((p) =>
+        api<Signature>(
           `/api/maps/${activeMapId}/systems/${systemId}/signatures`,
           { method: 'POST', body: JSON.stringify({ sigId: p.sigId, sigType: p.sigType, name: p.name }) },
-        );
-        setSigs((prev) => [...prev, sig]);
-      } catch { /* ignore individual failures */ }
-    }
+        ).catch(() => null),
+      ),
+    )).filter((s): s is Signature => s !== null);
 
-    setSigs((prev) => [...prev].sort((a, b) => a.sigId.localeCompare(b.sigId)));
+    setSigs((prev) => [...prev, ...created].sort((a, b) => a.sigId.localeCompare(b.sigId)));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeMapId, systemId]);
 
@@ -316,19 +348,21 @@ export function SignaturePane({ systemId }: { systemId: string }) {
     )}
     <div className="sig-pane">
       <p className="sig-pane__hint">You can copy and paste signatures directly from the Probe scanner in Eve. To do this, open your probe scanner.  Press control A to select them all, then control C to copy.  Use control V to paste them here</p>
-      <div className="sig-pane__toolbar">
-        <button className="icon-btn" onClick={addSig} title="Add signature">Add signature</button>
-        {selected.size > 0 && (
-          <button className="sig-toolbar-btn sig-toolbar-btn--danger" onClick={deleteSelected}>
-            Delete selected ({selected.size})
-          </button>
-        )}
-        {sigs.length > 0 && (
-          <button className="sig-toolbar-btn sig-toolbar-btn--danger" onClick={deleteAll}>
-            Delete all
-          </button>
-        )}
-      </div>
+      {canEdit && (
+        <div className="sig-pane__toolbar">
+          <button className="icon-btn" onClick={addSig} title="Add signature">Add signature</button>
+          {selected.size > 0 && (
+            <button className="sig-toolbar-btn sig-toolbar-btn--danger" onClick={deleteSelected}>
+              Delete selected ({selected.size})
+            </button>
+          )}
+          {sigs.length > 0 && (
+            <button className="sig-toolbar-btn sig-toolbar-btn--danger" onClick={deleteAll}>
+              Delete all
+            </button>
+          )}
+        </div>
+      )}
 
       {sigs.length === 0 ? (
         <div className="sig-pane__empty">No signatures scanned — paste from probe scanner to import</div>
@@ -458,16 +492,19 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                     value={sig.notes}
                     onChange={(v) => updateSig(sig.id, { notes: v })}
                     compact
+                    readOnly={!canEdit}
                   />
                 </td>
-                <td className="sig-td--time">{elapsed(sig.createdAt, now)}</td>
-                <td className="sig-td--time sig-td--updated">{elapsed(sig.updatedAt, now)}</td>
+                <ElapsedCell iso={sig.createdAt} className="sig-td--time" />
+                <ElapsedCell iso={sig.updatedAt} className="sig-td--time sig-td--updated" />
                 <td>
-                  <button
-                    className="icon-btn icon-btn--danger"
-                    onClick={() => deleteSig(sig.id)}
-                    title="Delete"
-                  >✕</button>
+                  {canEdit && (
+                    <button
+                      className="icon-btn icon-btn--danger"
+                      onClick={() => deleteSig(sig.id)}
+                      title="Delete"
+                    >✕</button>
+                  )}
                 </td>
               </tr>
             ))}

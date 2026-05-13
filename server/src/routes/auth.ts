@@ -3,6 +3,9 @@ import { randomBytes } from 'node:crypto';
 import { db } from '../db.js';
 import { config } from '../config.js';
 import { encryptToken } from '../utils/tokenCrypto.js';
+import { createLogger } from '../utils/logger.js';
+
+const log = createLogger('auth');
 
 export const authRouter = Router();
 
@@ -37,7 +40,7 @@ authRouter.get('/login', (req, res) => {
   });
 
   req.session.save((err) => {
-    if (err) { res.status(500).send('Session error'); return; }
+    if (err) { res.status(500).json({ error: 'Session error' }); return; }
     res.redirect(`${EVE_AUTH_URL}?${params}`);
   });
 });
@@ -70,8 +73,8 @@ authRouter.get('/callback', async (req, res) => {
 
     if (!tokenRes.ok) {
       const err = await tokenRes.text();
-      console.error('Token exchange failed:', err);
-      res.status(502).send('Token exchange failed');
+      log.error('Token exchange failed:', err);
+      res.status(502).json({ error: 'Token exchange failed' });
       return;
     }
 
@@ -89,7 +92,7 @@ authRouter.get('/callback', async (req, res) => {
     // sub format: "CHARACTER:EVE:12345678"
     const characterId = parseInt(jwtPayload.sub.split(':')[2], 10);
     if (!characterId) {
-      res.status(502).send('Could not parse character ID from token');
+      res.status(502).json({ error: 'Could not parse character ID from token' });
       return;
     }
 
@@ -143,6 +146,13 @@ authRouter.get('/callback', async (req, res) => {
       [userId],
     );
 
+    // Snapshot prefs into the session so /auth/me can answer without a DB call.
+    const prefRows = await db.query<{ compact_mode: boolean; snap_to_grid: boolean; show_minimap: boolean; panel_order: string[] }>(
+      `SELECT compact_mode, snap_to_grid, show_minimap, panel_order FROM users WHERE id = $1`,
+      [userId],
+    );
+    const p = prefRows.rows[0];
+
     // Regenerate to a fresh session ID before assigning credentials — defends
     // against session fixation (a pre-login session ID lingering post-auth).
     await new Promise<void>((resolve, reject) => {
@@ -153,6 +163,12 @@ authRouter.get('/callback', async (req, res) => {
     req.session.characterId   = characterId;
     req.session.characterName = jwtPayload.name;
     req.session.role          = role;
+    req.session.prefs         = {
+      compactMode: p?.compact_mode ?? false,
+      snapToGrid:  p?.snap_to_grid ?? false,
+      showMinimap: p?.show_minimap ?? true,
+      panelOrder:  p?.panel_order  ?? ['notes', 'signatures'],
+    };
 
     await new Promise<void>((resolve, reject) => {
       req.session.save((err) => err ? reject(err) : resolve());
@@ -160,8 +176,8 @@ authRouter.get('/callback', async (req, res) => {
 
     res.redirect(FRONTEND_URL);
   } catch (err) {
-    console.error('Auth callback error:', err);
-    res.status(500).send('Authentication failed');
+    log.error('Auth callback error:', err);
+    res.status(500).json({ error: 'Authentication failed' });
   }
 });
 
@@ -178,24 +194,39 @@ authRouter.get('/me', async (req, res) => {
     res.json({ user: null });
     return;
   }
-  const { rows } = await db.query<{ compact_mode: boolean; snap_to_grid: boolean; show_minimap: boolean; panel_order: string[]; role: string }>(
-    `SELECT compact_mode, snap_to_grid, show_minimap, panel_order, role FROM users WHERE id = $1`,
-    [req.session.userId],
-  );
-  const prefs = rows[0] ?? { compact_mode: false, snap_to_grid: false, show_minimap: true, panel_order: ['notes', 'signatures'], role: 'readonly' };
-  // Keep session role in sync with DB
-  req.session.role = prefs.role as 'admin' | 'member' | 'readonly';
+
+  // Hot path: prefs cached in session by login / PATCH. Only fall back to the
+  // DB for pre-existing sessions that predate this caching change.
+  let prefs = req.session.prefs;
+  let role  = req.session.role ?? 'readonly';
+  if (!prefs) {
+    const { rows } = await db.query<{ compact_mode: boolean; snap_to_grid: boolean; show_minimap: boolean; panel_order: string[]; role: string }>(
+      `SELECT compact_mode, snap_to_grid, show_minimap, panel_order, role FROM users WHERE id = $1`,
+      [req.session.userId],
+    );
+    const row = rows[0];
+    prefs = {
+      compactMode: row?.compact_mode ?? false,
+      snapToGrid:  row?.snap_to_grid ?? false,
+      showMinimap: row?.show_minimap ?? true,
+      panelOrder:  row?.panel_order  ?? ['notes', 'signatures'],
+    };
+    role = (row?.role as 'admin' | 'member' | 'readonly') ?? 'readonly';
+    req.session.prefs = prefs;
+    req.session.role  = role;
+  }
+
   res.json({
     user: {
       id:            req.session.userId,
       characterId:   req.session.characterId,
       characterName: req.session.characterName,
-      role:          prefs.role,
+      role,
       corpMode:      config.corpMode,
-      compactMode:   prefs.compact_mode,
-      snapToGrid:    prefs.snap_to_grid,
-      showMinimap:   prefs.show_minimap,
-      panelOrder:    prefs.panel_order,
+      compactMode:   prefs.compactMode,
+      snapToGrid:    prefs.snapToGrid,
+      showMinimap:   prefs.showMinimap,
+      panelOrder:    prefs.panelOrder,
     },
   });
 });
@@ -227,5 +258,15 @@ authRouter.patch('/preferences', async (req, res) => {
     `UPDATE users SET ${sets.join(', ')}, updated_at = NOW() WHERE id = $${vals.length + 1}`,
     [...vals, req.session.userId],
   );
+
+  // Keep the session cache in sync so the next /auth/me reflects the change
+  // without going back to the DB.
+  if (req.session.prefs) {
+    if (typeof compactMode === 'boolean') req.session.prefs.compactMode = compactMode;
+    if (typeof snapToGrid  === 'boolean') req.session.prefs.snapToGrid  = snapToGrid;
+    if (typeof showMinimap === 'boolean') req.session.prefs.showMinimap = showMinimap;
+    if (Array.isArray(panelOrder))        req.session.prefs.panelOrder  = panelOrder as string[];
+  }
+
   res.json({ ok: true });
 });
