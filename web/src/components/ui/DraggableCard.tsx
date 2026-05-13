@@ -44,7 +44,7 @@ export function DraggableCard({ id, title, children }: Props) {
           ⠿
         </button>
       </div>
-      {!collapsed && <div className="info-card__body">{children}</div>}
+      {!collapsed && !isDragging && <div className="info-card__body">{children}</div>}
     </div>
   );
 }
