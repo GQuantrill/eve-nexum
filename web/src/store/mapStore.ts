@@ -411,7 +411,8 @@ export const useMapStore = create<MapStore>()((set, get) => {
             systems: [
               ...s.map.systems,
               { id, eveSystemId, name, systemClass, effect, statics, regionName, npcType,
-                position, status: 'unknown', isHome: s.map.systems.length === 0, locked: false, notes: '' },
+                position, status: 'unknown', isHome: s.map.systems.length === 0, locked: false, notes: '',
+                lastActivityAt: new Date().toISOString() },
             ],
           },
         };
