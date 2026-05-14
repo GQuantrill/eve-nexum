@@ -1,9 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
+import type { ReactNode } from 'react';
 import { useWormholeTypes } from '../../hooks/useWormholeTypes';
 import { CLASS_COLORS, CLASS_LABELS } from '../../data/wormholes';
 import type { SystemClass } from '../../types';
 
-interface Props { code: string | null | undefined }
+interface Props {
+  code: string | null | undefined;
+  /** When `children` are provided the children become the hover trigger
+   *  (popover shows on mouse-enter, hides on leave). When omitted, a small
+   *  `ⓘ` button is rendered and opens the popover on click. */
+  children?: ReactNode;
+}
 
 function formatMass(kg: number): string {
   if (kg >= 1_000_000_000) return `${(kg / 1_000_000_000).toFixed(2)} B kg`;
@@ -22,18 +29,15 @@ function classKey(raw: string): SystemClass | null {
   return null;
 }
 
-/**
- * Click the `ⓘ` button to pop a small card showing the spec for a wormhole
- * code (lead-to class, lifetime, total mass, max jump mass). Used wherever
- * a WH code appears so you don't have to leave the app to look it up.
- */
-export function WHTypeInfo({ code }: Props) {
+export function WHTypeInfo({ code, children }: Props) {
   const types = useWormholeTypes();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLSpanElement>(null);
+  const hoverMode = !!children;
 
+  // Click-mode: dismiss on outside click / Escape
   useEffect(() => {
-    if (!open) return;
+    if (!open || hoverMode) return;
     const onClick = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     };
@@ -44,12 +48,53 @@ export function WHTypeInfo({ code }: Props) {
       window.removeEventListener('mousedown', onClick);
       window.removeEventListener('keydown', onKey);
     };
-  }, [open]);
+  }, [open, hoverMode]);
 
-  if (!code) return null;
+  if (!code) return hoverMode ? <>{children}</> : null;
   const spec = types[code.toUpperCase()];
-  if (!spec) return null;
+  if (!spec) return hoverMode ? <>{children}</> : null;
   const dest = classKey(spec.dest);
+
+  const popover = open && (
+    <div className="wh-type-info__popover" role="dialog">
+      <div className="wh-type-info__header">{code.toUpperCase()}</div>
+      <div className="wh-type-info__row">
+        <span className="wh-type-info__label">Leads to</span>
+        <span
+          className="wh-type-info__value"
+          style={dest ? { color: CLASS_COLORS[dest] } : undefined}
+        >
+          {dest ? CLASS_LABELS[dest] : spec.dest.toUpperCase()}
+        </span>
+      </div>
+      <div className="wh-type-info__row">
+        <span className="wh-type-info__label">Lifetime</span>
+        <span className="wh-type-info__value">{spec.lifetimeHours}h</span>
+      </div>
+      <div className="wh-type-info__row">
+        <span className="wh-type-info__label">Total mass</span>
+        <span className="wh-type-info__value">{formatMass(spec.totalMass)}</span>
+      </div>
+      <div className="wh-type-info__row">
+        <span className="wh-type-info__label">Max jump</span>
+        <span className="wh-type-info__value">{formatMass(spec.maxJumpMass)}</span>
+      </div>
+    </div>
+  );
+
+  if (hoverMode) {
+    return (
+      <span
+        className="wh-type-info wh-type-info--inline"
+        ref={ref}
+        onMouseEnter={() => setOpen(true)}
+        onMouseLeave={() => setOpen(false)}
+      >
+        {children}
+        {popover}
+      </span>
+    );
+  }
 
   return (
     <span className="wh-type-info" ref={ref}>
@@ -62,32 +107,7 @@ export function WHTypeInfo({ code }: Props) {
       >
         ⓘ
       </button>
-      {open && (
-        <div className="wh-type-info__popover" role="dialog">
-          <div className="wh-type-info__header">{code.toUpperCase()}</div>
-          <div className="wh-type-info__row">
-            <span className="wh-type-info__label">Leads to</span>
-            <span
-              className="wh-type-info__value"
-              style={dest ? { color: CLASS_COLORS[dest] } : undefined}
-            >
-              {dest ? CLASS_LABELS[dest] : spec.dest.toUpperCase()}
-            </span>
-          </div>
-          <div className="wh-type-info__row">
-            <span className="wh-type-info__label">Lifetime</span>
-            <span className="wh-type-info__value">{spec.lifetimeHours}h</span>
-          </div>
-          <div className="wh-type-info__row">
-            <span className="wh-type-info__label">Total mass</span>
-            <span className="wh-type-info__value">{formatMass(spec.totalMass)}</span>
-          </div>
-          <div className="wh-type-info__row">
-            <span className="wh-type-info__label">Max jump</span>
-            <span className="wh-type-info__value">{formatMass(spec.maxJumpMass)}</span>
-          </div>
-        </div>
-      )}
+      {popover}
     </span>
   );
 }

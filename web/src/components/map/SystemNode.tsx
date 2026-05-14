@@ -13,6 +13,7 @@ import { useA0Systems } from '../../hooks/useA0Systems';
 import { useCurrentHourKills } from '../../hooks/useCurrentHourKills';
 import { useNow30s } from '../../hooks/useNow30s';
 import { useStaleThreshold } from '../../hooks/useStaleThreshold';
+import { WHTypeInfo } from '../ui/WHTypeInfo';
 import { truesecColor } from '../../utils/truesec';
 
 type SystemNodeData = MapSystem & { selected: boolean };
@@ -169,7 +170,8 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
           {sys.statics.map((s) => {
             const dest = WORMHOLE_DESTINATIONS[s];
             return (
-              <span key={s} className="system-node__static-tag">
+              <WHTypeInfo key={s} code={s}>
+              <span className="system-node__static-tag">
                 {s}
                 {dest && (
                   <span
@@ -180,6 +182,7 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
                   </span>
                 )}
               </span>
+              </WHTypeInfo>
             );
           })}
         </div>

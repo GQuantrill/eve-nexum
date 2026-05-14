@@ -329,6 +329,10 @@ export function MapSidebar() {
         <div className="map-sidebar__section">
           <div className="map-sidebar__section-title">Shortcuts</div>
           <div className="map-sidebar__shortcut">
+            <kbd>⌘/Ctrl + K</kbd>
+            <span>Search systems &amp; maps</span>
+          </div>
+          <div className="map-sidebar__shortcut">
             <kbd>H</kbd>
             <span>Centre on home system</span>
           </div>

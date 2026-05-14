@@ -58,6 +58,16 @@ const FEATURES = [
     title: 'Chain Hygiene',
     desc: 'Stale systems fade automatically after a configurable idle period. Multi-select with shift-click to lock, clear, or remove dead branches in bulk. PNG export bakes the current view to a shareable image.',
   },
+  {
+    icon: '⌘',
+    title: 'Command Palette',
+    desc: 'Hit ⌘/Ctrl + K to fuzzy-search systems across every map you own and jump straight to one. Pair with ⓘ-on-hover for any wormhole code to see lifetime, total mass, and max jump mass without leaving the page.',
+  },
+  {
+    icon: '✺',
+    title: 'Chain-wide Effect Digest',
+    desc: 'A one-line summary at the top of the system info panel lists every Pulsar / Wolf-Rayet / Magnetar / etc. on the current chain. Hover any chip for its full modifier list; click to centre on that system.',
+  },
 ];
 
 const VERT_SRC = `#version 300 es

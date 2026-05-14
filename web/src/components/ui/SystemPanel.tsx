@@ -18,6 +18,7 @@ import { truesecColor } from '../../utils/truesec';
 import { useIncursions, findIncursion } from '../../hooks/useIncursions';
 import { useInsurgency, findInsurgency } from '../../hooks/useInsurgency';
 import { useCanEdit } from '../../hooks/useCanEdit';
+import { WHTypeInfo } from './WHTypeInfo';
 
 function FlashingSkull({ color }: { color: string }) {
   const [dim, setDim] = useState(false);
@@ -177,6 +178,29 @@ export function SystemPanel() {
             )}
           </div>
 
+          {(() => {
+            // Chain-wide effect digest: list every system on this map that
+            // has a non-'none' effect. Compact, with each chip tooltip-able.
+            const chainEffects = systems.filter((s) => s.effect !== 'none');
+            if (chainEffects.length === 0) return null;
+            return (
+              <div className="sys-info__chain-fx">
+                <span className="sys-info__chain-fx__label">In chain:</span>
+                {chainEffects.map((s) => (
+                  <span
+                    key={s.id}
+                    className={`sys-info__chain-fx__chip${s.id === sys.id ? ' sys-info__chain-fx__chip--current' : ''}`}
+                    data-tooltip={EFFECT_MODIFIERS[s.effect]
+                      .map((m) => `${m.good ? '+' : '−'} ${m.label}`).join(' · ')}
+                    onClick={() => selectSystem(s.id)}
+                  >
+                    {EFFECT_LABELS[s.effect]} <span className="sys-info__chain-fx__sys">({s.name})</span>
+                  </span>
+                ))}
+              </div>
+            );
+          })()}
+
           {incursion && (
             <div className="sys-info__section sys-info__incursion">
               <div className="sys-info__section-label">Incursion</div>
@@ -269,14 +293,16 @@ export function SystemPanel() {
                 {sys.statics.map((s) => {
                   const dest = WORMHOLE_DESTINATIONS[s];
                   return (
-                    <span key={s} className="sys-info__static">
-                      {s}
-                      {dest && (
-                        <span className="sys-info__static-dest" style={{ color: CLASS_COLORS[dest] }}>
-                          {dest}
-                        </span>
-                      )}
-                    </span>
+                    <WHTypeInfo key={s} code={s}>
+                      <span className="sys-info__static">
+                        {s}
+                        {dest && (
+                          <span className="sys-info__static-dest" style={{ color: CLASS_COLORS[dest] }}>
+                            {dest}
+                          </span>
+                        )}
+                      </span>
+                    </WHTypeInfo>
                   );
                 })}
               </div>

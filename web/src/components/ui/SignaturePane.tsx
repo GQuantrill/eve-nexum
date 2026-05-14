@@ -292,6 +292,11 @@ export function SignaturePane({ systemId }: { systemId: string }) {
     () => { for (const id of selected) deleteSig(id); },
   );
 
+  // Bulk-assign a sig type to every selected row.
+  const setSelectedType = (type: SigType) => {
+    for (const id of selected) updateSig(id, { sigType: type });
+  };
+
   const deleteAll = () => confirm(
     `Delete all ${sigsRef.current.length} signature${sigsRef.current.length !== 1 ? 's' : ''}?`,
     () => { for (const sig of sigsRef.current) deleteSig(sig.id); },
@@ -372,9 +377,30 @@ export function SignaturePane({ systemId }: { systemId: string }) {
         <div className="sig-pane__toolbar">
           <button className="icon-btn" onClick={addSig} title="Add signature">Add signature</button>
           {selected.size > 0 && (
-            <button className="sig-toolbar-btn sig-toolbar-btn--danger" onClick={deleteSelected}>
-              Delete selected ({selected.size})
-            </button>
+            <>
+              <select
+                className="sig-toolbar-btn"
+                value=""
+                onChange={(e) => {
+                  if (!e.target.value) return;
+                  setSelectedType(e.target.value as SigType);
+                  e.target.value = '';
+                }}
+                aria-label="Set type for selected signatures"
+              >
+                <option value="">Set type ({selected.size})…</option>
+                <option value="unknown">Unknown</option>
+                <option value="wormhole">Wormhole</option>
+                <option value="data">Data</option>
+                <option value="relic">Relic</option>
+                <option value="combat">Combat</option>
+                <option value="gas">Gas</option>
+                <option value="ore">Ore</option>
+              </select>
+              <button className="sig-toolbar-btn sig-toolbar-btn--danger" onClick={deleteSelected}>
+                Delete selected ({selected.size})
+              </button>
+            </>
           )}
           {sigs.length > 0 && (
             <button className="sig-toolbar-btn sig-toolbar-btn--danger" onClick={deleteAll}>
