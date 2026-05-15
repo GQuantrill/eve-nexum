@@ -284,7 +284,7 @@ export function Toolbar() {
 
       <div className="toolbar__spacer" />
 
-              {user?.role === 'admin' && (
+      {user?.corpMode && user.role === 'admin' && (
         <button
           className="toolbar__toggle"
           onClick={() => { window.location.hash = '#/admin/users'; }}

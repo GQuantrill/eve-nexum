@@ -71,9 +71,10 @@ function AppShell() {
 
   if (!user) return <LandingPage />;
 
-  // Hash routes — only admins can reach /admin/*; everyone else falls through
-  // to the map view even if they typed the URL.
-  if (path.startsWith('/admin') && user.role === 'admin') {
+  // Hash routes — only admins in corp mode can reach /admin/*; in solo
+  // mode admin tooling is meaningless (no other users to manage) so the
+  // whole section is hidden even if the URL is typed directly.
+  if (path.startsWith('/admin') && user.role === 'admin' && user.corpMode) {
     return <AdminPage />;
   }
 
