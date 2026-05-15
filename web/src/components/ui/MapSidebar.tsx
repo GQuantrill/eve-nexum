@@ -331,6 +331,7 @@ export function MapSidebar() {
                 <option value={24}>24 hours</option>
                 <option value={48}>48 hours</option>
                 <option value={168}>1 week</option>
+                <option value={720}>1 month</option>
               </select>
             </div>
           </CollapsibleSection>
