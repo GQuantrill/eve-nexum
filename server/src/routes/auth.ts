@@ -121,8 +121,15 @@ authRouter.get('/callback', async (req, res) => {
 
     const expiresAt = new Date(Date.now() + tokens.expires_in * 1000);
 
-    // Determine role: ADMIN_CHAR_ID always gets admin; others keep existing role or default to standard
+    // Role policy:
+    //   - Solo mode (no CORP_ID set): no admin tooling matters because there
+    //     are no other users to manage. Default everyone to 'admin' and
+    //     force-upgrade existing rows on every login — otherwise users that
+    //     signed up while corp mode was on stay stuck at readonly.
+    //   - Corp mode: ADMIN_CHAR_ID is always pinned to admin; other new
+    //     users default to readonly so an admin has to promote them.
     const isAdminChar = characterId === config.adminCharId;
+    const defaultRole = (!config.corpMode || isAdminChar) ? 'admin' : 'readonly';
 
     const { rows } = await db.query<{ id: number; role: string; blocked: boolean }>(
       `INSERT INTO users (character_id, character_name, access_token, refresh_token, token_expires_at, role, corp_id)
@@ -133,11 +140,17 @@ authRouter.get('/callback', async (req, res) => {
          refresh_token    = EXCLUDED.refresh_token,
          token_expires_at = EXCLUDED.token_expires_at,
          corp_id          = COALESCE($8::int, users.corp_id),
-         role             = CASE WHEN $7::int IS NOT NULL AND users.character_id = $7::int THEN 'admin' ELSE users.role END,
+         role             = CASE
+           -- ADMIN_CHAR_ID is always pinned to admin regardless of mode
+           WHEN $7::int IS NOT NULL AND users.character_id = $7::int THEN 'admin'
+           -- Solo mode: everyone is admin (roles are meaningless without corp scope)
+           WHEN $9::bool THEN 'admin'
+           ELSE users.role
+         END,
          updated_at       = NOW()
        RETURNING id, role, blocked`,
       [characterId, jwtPayload.name, encryptToken(tokens.access_token), encryptToken(tokens.refresh_token), expiresAt,
-       isAdminChar ? 'admin' : 'readonly', config.adminCharId, userCorpId],
+       defaultRole, config.adminCharId, userCorpId, !config.corpMode],
     );
 
     const userId = rows[0].id;

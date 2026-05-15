@@ -357,12 +357,17 @@ export function Toolbar() {
           <div className="toolbar__char-info">
             <span className="toolbar__char-name">
               {user.characterName}
-              <span
-                className={`role-badge role-badge--${user.role}`}
-                title={`Role: ${user.role}`}
-              >
-                {user.role}
-              </span>
+              {/* Role only matters in corp mode — in solo deployments every
+                  user is implicitly admin of their own maps, so the badge
+                  just adds noise. */}
+              {user.corpMode && (
+                <span
+                  className={`role-badge role-badge--${user.role}`}
+                  title={`Role: ${user.role}`}
+                >
+                  {user.role}
+                </span>
+              )}
             </span>
             {checkedAt && <CheckedAtLabel checkedAt={checkedAt} />}
           </div>
