@@ -1,0 +1,7 @@
+# Canonical author identity for this repository. Past commits authored
+# under alias emails or with Co-Authored-By trailers are collapsed to
+# the line below so `git shortlog`, `git blame`, and GitHub's contributors
+# graph all attribute the work to a single identity.
+Graeme Quantrill <gq@area404.org>
+Graeme Quantrill <gq@area404.org> <graeme@snapp.team>
+Graeme Quantrill <gq@area404.org> <noreply@anthropic.com>
