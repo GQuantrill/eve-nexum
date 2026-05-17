@@ -22,6 +22,9 @@ import wormholesRouter    from './routes/wormholes.js';
 import { loadRouteGraph } from './services/routeGraph.js';
 import { adminRouter }   from './routes/admin.js';
 import { standingsRouter } from './routes/standings.js';
+import { knownStructuresRouter } from './routes/knownStructures.js';
+import { initCorpStructuresPoller } from './services/corpStructures.js';
+import { initPublicStructuresPoller } from './services/publicStructures.js';
 import { authLimiter, esiLimiter, publicLimiter } from './middleware/rateLimits.js';
 
 const PgStore = connectPgSimple(session);
@@ -61,8 +64,9 @@ app.use('/api/insurgency',  esiLimiter, insurgencyRouter);
 app.use('/api/scout',       esiLimiter, scoutRouter);
 app.use('/api/route',       esiLimiter, routeRouter);
 app.use('/api/wormholes',   esiLimiter, wormholesRouter);
-app.use('/api/admin',       adminRouter);
-app.use('/api/standings',   standingsRouter);
+app.use('/api/admin',             adminRouter);
+app.use('/api/standings',         standingsRouter);
+app.use('/api/known-structures',  knownStructuresRouter);
 
 app.get('/health', (_req, res) => res.json({ ok: true }));
 
@@ -82,6 +86,8 @@ migrate()
     setInterval(expireMaps, 60 * 60 * 1000); // re-check hourly
     await initActivity();
     await loadRouteGraph();
+    initCorpStructuresPoller();
+    initPublicStructuresPoller();
     app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
   })
   .catch((err) => { console.error('Migration failed:', err); process.exit(1); });

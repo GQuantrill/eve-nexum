@@ -122,15 +122,17 @@ function ProximityChip() {
   const { nearest, threshold } = useProximityAlerts();
   if (!nearest) return null;
   const inZone = nearest.jumps <= threshold;
-  const label  = nearest.kind === 'incursion' ? 'Incursion' : 'Insurgency';
+  const { label, icon } =
+    nearest.kind === 'incursion'   ? { label: 'Incursion',   icon: '⚠' } :
+    nearest.kind === 'insurgency'  ? { label: 'Insurgency',  icon: '☠' } :
+    nearest.kind === 'hostile-sov' ? { label: 'Hostile sov', icon: '✖' } :
+    { label: 'Threat', icon: '?' };
   return (
     <span
       className={`toolbar__proximity${inZone ? ' toolbar__proximity--alert' : ''}`}
       data-tooltip={`Closest ${label.toLowerCase()} system`}
     >
-      <span className="toolbar__proximity-icon">
-        {nearest.kind === 'incursion' ? '⚠' : '☠'}
-      </span>
+      <span className="toolbar__proximity-icon">{icon}</span>
       <span className="toolbar__proximity-text">
         {nearest.jumps === 0 ? 'IN' : `${nearest.jumps} jumps`} - {label}
       </span>

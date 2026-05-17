@@ -9,6 +9,32 @@ import { WormholeTypePicker } from './WormholeTypePicker';
 import { LeadsToDropdown } from './LeadsToDropdown';
 import { toast } from './Toaster';
 import { reevaluateConnectionsForSystem } from '../../utils/whAutoDetect';
+import { WORMHOLE_TYPES } from '../../data/wormholes';
+
+// Aging bands for wormhole signatures, anchored to the WH type's known
+// lifetime. K162 and unknown codes return '' (no tint) since we don't
+// know the real lifetime from this side. Other sig types are skipped.
+//
+//   < 50% of lifetime → fresh, no tint
+//   50–90%            → mid (yellow row)
+//   90–100%           → near EOL (orange)
+//   > 100%            → past expected lifetime (red — likely closed)
+function whAgeRowClass(
+  sigType: string,
+  whType: string,
+  createdAt: string | undefined,
+  now: number,
+): string {
+  if (sigType !== 'wormhole' || !whType || !createdAt) return '';
+  const wh = WORMHOLE_TYPES[whType.toUpperCase()];
+  if (!wh || wh.lifetimeH <= 0) return '';
+  const ageH = (now - new Date(createdAt).getTime()) / 3_600_000;
+  const pct  = ageH / wh.lifetimeH;
+  if (pct < 0.5)  return '';
+  if (pct < 0.9)  return 'sig-row--wh-mid';
+  if (pct < 1.0)  return 'sig-row--wh-eol';
+  return 'sig-row--wh-past';
+}
 
 const SIG_TYPE_LABELS: Record<SigType, string> = {
   unknown:  'Unknown',
@@ -474,7 +500,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
           </thead>
           <tbody>
             {sortedSigs.map((sig) => (
-              <tr key={sig.id} className={selected.has(sig.id) ? 'sig-row--selected' : ''}>
+              <tr key={sig.id} className={`${selected.has(sig.id) ? 'sig-row--selected' : ''} ${whAgeRowClass(sig.sigType, sig.whType, sig.createdAt, tickNow)}`}>
                 <td>
                   <input
                     type="checkbox"

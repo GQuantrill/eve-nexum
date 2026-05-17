@@ -131,6 +131,38 @@ export async function migrate() {
     ALTER TABLE map_signatures ADD COLUMN IF NOT EXISTS created_by_user_id INTEGER REFERENCES users(id) ON DELETE SET NULL;
     ALTER TABLE map_structures ADD COLUMN IF NOT EXISTS created_by_user_id INTEGER REFERENCES users(id) ON DELETE SET NULL;
 
+    -- Resolved owner corp ID for structures. Populated by ESI lookup when
+    -- the user supplies an eve_id (the structure's in-game ID) or when
+    -- the structure name parser finds a known corp/alliance. Lets the
+    -- structures pane apply standings-based tints per row.
+    ALTER TABLE map_structures ADD COLUMN IF NOT EXISTS owner_corp_id INTEGER;
+
+    -- Cluster-wide cache of structures auto-discovered via ESI or imported
+    -- from a public dataset. Distinct from map_structures (which is
+    -- per-map and user-managed) -- these are read-only intel surfaced
+    -- into the structures pane alongside the user's own entries.
+    --
+    -- source = 'corp-esi' or 'public-dataset'.
+    --
+    -- restricted_to_corp_id IS NOT NULL means "only members of that corp
+    -- can see this row" -- used for the corp-ESI source so each corp
+    -- only sees its own private citadel intel. Public-dataset rows have
+    -- restricted_to_corp_id NULL.
+    CREATE TABLE IF NOT EXISTS known_structures (
+      structure_id          BIGINT      PRIMARY KEY,
+      system_id             INTEGER     NOT NULL,
+      owner_corp_id         INTEGER,
+      alliance_id           INTEGER,
+      name                  TEXT        NOT NULL DEFAULT '',
+      type_id               INTEGER,
+      source                TEXT        NOT NULL,
+      restricted_to_corp_id INTEGER,
+      first_seen_at         TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      last_seen_at          TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+    CREATE INDEX IF NOT EXISTS idx_known_structures_system ON known_structures (system_id);
+    CREATE INDEX IF NOT EXISTS idx_known_structures_corp   ON known_structures (restricted_to_corp_id);
+
     -- Track which map a user_event belongs to, so the admin Users report
     -- can scope counts to corp maps. Nullable for compatibility with rows
     -- created before this migration; no FK because we want events to

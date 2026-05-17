@@ -29,6 +29,7 @@ interface StandingsResponse {
 // between systems on the map.
 let cache: StandingsResponse | null = null;
 let loading = false;
+let refreshing = false;
 const listeners = new Set<() => void>();
 
 function notify() { for (const l of listeners) l(); }
@@ -44,6 +45,37 @@ async function load() {
     cache = null;
   } finally {
     loading = false;
+    notify();
+  }
+}
+
+// Force-refresh: POSTs to /api/standings/refresh to re-pull from ESI
+// (bypassing the 6h server TTL), then reloads the cache. Returns the
+// refresh result so callers can show "X new contacts" or similar.
+async function refreshFromEsi(): Promise<{
+  ok: boolean;
+  counts?:    { character: number; corp: number; alliance: number };
+  succeeded?: { character: boolean; corp: boolean; alliance: boolean };
+} | null> {
+  if (refreshing) return null;
+  refreshing = true;
+  notify();
+  try {
+    const result = await api<{
+      ok: boolean;
+      counts:    { character: number; corp: number; alliance: number };
+      succeeded: { character: boolean; corp: boolean; alliance: boolean };
+    }>('/api/standings/refresh', { method: 'POST' });
+    // Force a re-pull of the GET endpoint so the cache reflects the
+    // freshly-written DB rows.
+    cache = null;
+    await load();
+    return result;
+  } catch (err) {
+    console.error('standings refresh failed:', err);
+    return null;
+  } finally {
+    refreshing = false;
     notify();
   }
 }
@@ -82,8 +114,10 @@ export function useStandings() {
 
   return {
     loaded: !!cache,
+    refreshing,
     getStanding,
     self: cache ? { characterId: cache.characterId, corpId: cache.corpId, allianceId: cache.allianceId } : null,
+    refresh: refreshFromEsi,
   };
 }
 

@@ -43,6 +43,12 @@ authRouter.get('/login', (req, res) => {
           'esi-characters.read_contacts.v1',
           'esi-corporations.read_contacts.v1',
           'esi-alliances.read_contacts.v1',
+          // Auto-discover corp-owned structures (citadels, refineries,
+          // etc.) so the Structures pane can pre-populate them per system
+          // without manual entry. Only works for characters with the
+          // Station Manager or Director role; the puller silently no-ops
+          // for everyone else.
+          'esi-corporations.read_structures.v1',
         ].join(' '),
     state,
   });

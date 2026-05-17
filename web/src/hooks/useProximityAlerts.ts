@@ -3,8 +3,10 @@ import { useCharacterLocation } from './useCharacterLocation';
 import { useIncursions } from './useIncursions';
 import { useInsurgency } from './useInsurgency';
 import { useRoute } from './useRoute';
+import { useStandings } from './useStandings';
+import { ensureSovLoaded, getSovEntries } from './useSovData';
 
-export type ThreatKind = 'incursion' | 'insurgency';
+export type ThreatKind = 'incursion' | 'insurgency' | 'hostile-sov';
 
 export interface NearestThreat {
   kind:        ThreatKind;
@@ -65,7 +67,11 @@ function playBeep() {
 function fireBrowserNotification(kind: ThreatKind, jumps: number, sysName: string) {
   if (typeof Notification === 'undefined') return;
   if (Notification.permission !== 'granted') return;
-  const title = kind === 'incursion' ? 'Incursion nearby' : 'Insurgency nearby';
+  const title =
+    kind === 'incursion'   ? 'Incursion nearby' :
+    kind === 'insurgency'  ? 'Insurgency nearby' :
+    kind === 'hostile-sov' ? 'Hostile sov nearby' :
+    'Threat nearby';
   const body  = jumps === 0 ? `You are in ${sysName}` : `${jumps} jump${jumps === 1 ? '' : 's'} from ${sysName}`;
   try { new Notification(title, { body, tag: `nexum-${kind}-${sysName}` }); } catch { /* ignore */ }
 }
@@ -84,7 +90,18 @@ export function useProximityAlerts(): {
   const location   = useCharacterLocation();
   const incursions = useIncursions();
   const insurgency = useInsurgency();
+  const standings  = useStandings();
   const [threshold] = useProximityThreshold();
+
+  // Cluster-wide sov data loads asynchronously the first time anyone
+  // consumes it. We need to know when it's ready so we can fold the
+  // hostile-sov systems into the target list. Re-runs only when standings
+  // become available — sov data itself is immutable per session after
+  // first fetch.
+  const [sovReady, setSovReady] = useState(false);
+  useEffect(() => {
+    ensureSovLoaded().then(() => setSovReady(true));
+  }, []);
 
   const { targetIds, kindMap, nameMap } = useMemo(() => {
     const ids = new Set<number>();
@@ -101,8 +118,25 @@ export function useProximityAlerts(): {
         kinds.set(i.systemId, 'insurgency');
       }
     }
+    // Hostile-sov: any sov-holding system where the user has any negative
+    // standing toward the corp OR alliance. We don't track standings here
+    // — that's just stored contacts — so this set can be tiny depending
+    // on the user's contact list. Incursion / insurgency win the tie so
+    // the more time-bounded threats take priority on the chip.
+    if (sovReady && standings.loaded) {
+      for (const [sysId, entry] of getSovEntries()) {
+        if (ids.has(sysId)) continue;
+        const corpStanding     = entry.corporation_id ? standings.getStanding('corporation', entry.corporation_id).effective : 0;
+        const allianceStanding = entry.alliance_id    ? standings.getStanding('alliance',    entry.alliance_id).effective    : 0;
+        const worst = Math.min(corpStanding, allianceStanding);
+        if (worst < 0) {
+          ids.add(sysId);
+          kinds.set(sysId, 'hostile-sov');
+        }
+      }
+    }
     return { targetIds: [...ids], kindMap: kinds, nameMap: names };
-  }, [incursions, insurgency]);
+  }, [incursions, insurgency, sovReady, standings]);
 
   const routes = useRoute(location.system?.eveSystemId ?? null, targetIds);
 

@@ -39,6 +39,11 @@ const FEATURE_SECTIONS: FeatureSection[] = [
         title: 'PNG export',
         desc: 'Render the current map — with sig counts, connections, and status — to a PNG you can drop into a fleet ping or a corp Discord.',
       },
+      {
+        icon: '⧖',
+        title: 'Wormhole sig aging',
+        desc: 'Wormhole sigs tint by their position in the WH type\'s known lifetime — yellow at 50%, orange at 90%, red past expected close. Catches forgotten chains before they collapse on someone.',
+      },
     ],
   },
   {
@@ -85,9 +90,14 @@ const FEATURE_SECTIONS: FeatureSection[] = [
         desc: 'Paste EVE overview data to import player-owned structures with names, types, owners, and notes in one operation.',
       },
       {
+        icon: '◬',
+        title: 'Auto-discovered structures',
+        desc: 'Your corp\'s citadels (via ESI when a member with the Station Manager role logs in) and any publicly-listed structures from a third-party feed appear automatically in the structures pane as read-only entries — already tinted by your standings toward the owner.',
+      },
+      {
         icon: '▤',
         title: 'Activity charts',
-        desc: '24-hour rolling history of jumps, ship / pod kills, and NPC kills per system, polled from ESI hourly.',
+        desc: '24-hour rolling history of jumps, ship / pod kills, and NPC kills per system, polled from ESI hourly. The poller persists data for every k-space system — not just ones someone has opened — so charts populate the moment you view a new system.',
       },
       {
         icon: '✦',
@@ -97,12 +107,17 @@ const FEATURE_SECTIONS: FeatureSection[] = [
       {
         icon: '⚔',
         title: 'Killboard pane',
-        desc: 'Recent zKillboard activity per system. Recent kills also bubble up as highlights on the map so dangerous systems stand out.',
+        desc: 'Recent zKillboard activity per system, with NPC-only kills hidden by default (toggle to include). Rows tint red when a hostile actor is in the chain or a blue gets killed; blue when a friendly scores or a hostile dies. Recent kills also bubble up as highlights on the map.',
       },
       {
         icon: '✺',
         title: 'Chain-wide effect digest',
         desc: 'A one-line summary at the top of the system info panel lists every Pulsar / Wolf-Rayet / Magnetar / etc. on the current chain. Hover for the modifier list; click to centre.',
+      },
+      {
+        icon: '⊕',
+        title: 'Standings overlay',
+        desc: 'Your EVE contact list (personal, corp, and alliance — fetched via ESI on login and re-pullable on demand) drives a chain-wide visual layer. Sov holders show inline P/C/A standing pills; structures resolved via their EVE structure ID tint by owner-corp standing; sov-holder system nodes get a coloured halo so hostile territory stands out on the map.',
       },
     ],
   },
@@ -122,7 +137,7 @@ const FEATURE_SECTIONS: FeatureSection[] = [
       {
         icon: '⚠',
         title: 'Proximity alerts',
-        desc: 'Browser notification plus an audio ping when you\'re within a configurable number of jumps of an active incursion or insurgency. Persistent toolbar chip shows the nearest threat.',
+        desc: 'Browser notification plus an audio ping when you\'re within a configurable number of jumps of an active incursion, pirate insurgency, or a sov-holding system whose corp / alliance you\'ve set to red. Persistent toolbar chip shows the nearest threat at a glance.',
       },
       {
         icon: '⤳',

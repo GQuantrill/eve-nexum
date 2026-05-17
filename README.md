@@ -16,6 +16,7 @@ A wormhole mapping tool for EVE Online. Track systems, signatures, structures, k
 - **Multi-select bulk operations** — shift-click to select multiple systems/signatures, then bulk-assign type, delete, or rename.
 - **PNG export** — render the current map (with sig counts, connections, status) to a PNG for sharing.
 - **Map PNG / clipboard** — copy or download the current chain as an image for pings.
+- **Wormhole sig aging** — wormhole signatures tint by their position in the WH type's known lifetime (yellow ≥50%, orange ≥90%, red past expected close). K162s stay neutral since the lifetime isn't knowable from this side.
 
 #### Personal & corp maps
 
@@ -29,16 +30,18 @@ A wormhole mapping tool for EVE Online. Track systems, signatures, structures, k
 - **System panel** — per-system cards for signatures, structures, NPC stations, notes, killboard, and activity charts; cards are reorderable via drag-and-drop and persist per-user.
 - **Signature management** — paste EVE scan results directly; tracks created/updated age per signature; auto-deletes sigs missing from a re-paste; bulk type assignment for multi-select.
 - **Structure import** — paste EVE overview data to import player-owned structures.
-- **Activity charts** — 24-hour rolling history of jumps, ship/pod kills, and NPC kills, polled from ESI hourly.
+- **Auto-discovered structures** — citadels you own (via ESI, if the logged-in character has the Station Manager / Director role) and publicly-listed structures (via `PUBLIC_STRUCTURES_URL`) appear automatically in the structures pane as read-only entries with `Corp` / `Public` badges. Standings tints apply the same as manual entries. Corp-ESI rows are scoped per-corp; public-dataset rows are visible to everyone. See [Auto-discovered structures](#auto-discovered-structures).
+- **Activity charts** — 24-hour rolling history of jumps, ship/pod kills, and NPC kills, polled hourly from ESI. The poller persists **every k-space system** (not just ones a Nexum user has opened), so chart data accumulates cluster-wide and survives server restarts.
 - **Sovereignty & station data** — live alliance/corp/faction sov info and NPC station services with in-game waypoint/destination actions.
-- **Killboard pane** — recent zKillboard activity per system; recent kills also bubble up as highlights on the map.
+- **Killboard pane** — recent zKillboard activity per system; recent kills also bubble up as highlights on the map. NPC-only kills (CONCORD, rats, etc.) are hidden by default with a toggle to include them.
+- **Standings overlay** — your EVE contact list (personal, corp, and alliance — fetched via ESI on login and re-pullable on demand from the sov header) drives a chain-wide visual layer. Sov holders show inline P/C/A pills with EVE-palette colour tiers; killboard rows tint red when a hostile actor is in the chain or a blue gets killed, blue when a friendly scores or a hostile dies; structures resolved via ESI tint by their owner corp's standing; sov-holder systems on the map gain a coloured halo. Nothing is sent off-instance — all logic runs against your own contacts.
 - **Chain effect summary** — at-a-glance view of all wormhole effects currently present in the chain.
 
 #### Live ops
 
 - **Scout connections** — Thera and Turnur public Eve-Scout connections surfaced into the sidebar so you can jump straight to known holes.
 - **A0 sun detection** — auto-flags systems with A0 (yellow) suns visible via ESI for capital-friendly skirmish planning.
-- **Proximity alerts** — incursions and pirate insurgencies appear as a toolbar chip showing the closest threat in jumps; configurable threshold with browser notification + beep on entry/exit.
+- **Proximity alerts** — incursions, pirate insurgencies, **and hostile-sov-holder systems** (any sov-holding system where you've set the corp or alliance to a negative standing) appear as a toolbar chip showing the closest threat in jumps. Configurable threshold with browser notification + audio ping when you cross into the zone.
 - **Route planner** — server-side BFS over stargates + your live chain, so a route through a wormhole hop is a single click.
 - **Location tracking** — opt-in live character location dot in the toolbar plus per-map "you are here" indicator.
 - **Online status** — toolbar dot shows whether each user is currently logged into EVE Online.
@@ -100,6 +103,7 @@ Edit `.env` and fill in the required values:
 | `CORP_MAP_TIME` | Optional | Days an idle corp map can sit untouched before it's auto-archived. Default `30`. |
 | `MAX_USER_MAPS` | Optional | Max number of personal maps per user. Default `5`. |
 | `MAX_CORP_MAPS` | Optional | Max number of corp maps per corp. Default `5`. |
+| `PUBLIC_STRUCTURES_URL` | Optional | HTTP(S) URL to a JSON feed of public structures (citadels, refineries, etc.) for the "auto-discovered structures" feature. Imported daily into `known_structures`. Leave unset to disable the public-dataset path. See [Auto-discovered structures](#auto-discovered-structures) for the expected format. |
 
 **EVE developer app scopes**
 
@@ -118,6 +122,7 @@ When registering your application at [developers.eveonline.com](https://develope
 | `esi-characters.read_contacts.v1` | Read the character's personal contact list (standings) — used to colour-tag hostile / friendly entities in the Standings card, Killboard, Sov holder, and map node halos. |
 | `esi-corporations.read_contacts.v1` | Read the **corporation's** shared contact list. Only succeeds for characters with the in-game **Contact Manager** role; the call is gracefully skipped for anyone else. When it does succeed, the entire corp benefits from the pulled standings until the next refresh. |
 | `esi-alliances.read_contacts.v1` | Read the **alliance's** shared contact list. Requires the character to be in the alliance executor corp with the right role; almost always denied for normal members, and that's fine — the call no-ops without breaking login. |
+| `esi-corporations.read_structures.v1` | Read the **corporation's** owned structures (citadels, refineries, etc.). Requires the in-game **Station Manager** or **Director** role. When granted, structures auto-populate per system in the structures pane; when denied (the common case), the call no-ops silently. |
 
 **2. Build and start**
 
@@ -317,6 +322,40 @@ Each tab is also reachable at its own hash route (`#/admin/maps`, `#/admin/audit
 - Demote themselves (use another admin).
 - Demote or block the character whose ID is in `ADMIN_CHAR_ID` — that character is the safety hatch.
 - Force-terminate an existing live session. A blocked user stays signed in until they log out or their session cookie expires; the next login then fails. If you need someone offline *right now*, blocking + revoking their EVE OAuth in CCP's developer panel is the immediate path.
+
+---
+
+## Auto-discovered structures
+
+The structures pane combines two sources of structure intel and shows them alongside the user's manual entries:
+
+1. **Your corp's structures (via ESI).** Hourly, Nexum picks a logged-in member of each corp it knows about and calls `GET /v3/corporations/{corp_id}/structures/`. If that character has the in-game **Station Manager** or **Director** role, the call succeeds and every citadel / refinery / etc. the corp owns is upserted into the `known_structures` table. These rows are scoped to the owning corp (`restricted_to_corp_id`) so members of other corps sharing the same Nexum deployment never see them. If no logged-in member has the role, ESI returns 403 and the puller silently no-ops.
+
+2. **Publicly-listed structures (via a third-party feed).** Set `PUBLIC_STRUCTURES_URL` to an HTTPS endpoint that returns JSON in either of these shapes and Nexum will fetch it daily, normalising and upserting into the same table with no corp-scope restriction.
+
+**Accepted JSON formats:**
+
+```jsonc
+// Array form
+[
+  { "structure_id": 1027564925148, "system_id": 30000142, "owner_id": 98000001, "type_id": 35832, "name": "Jita - Wormholers Inc." },
+  ...
+]
+
+// Object form (keyed by structure ID)
+{
+  "1027564925148": { "system_id": 30000142, "owner_id": 98000001, "type_id": 35832, "name": "..." },
+  ...
+}
+```
+
+Field aliases are accepted: `structureID` / `id` for `structure_id`, `systemID` / `solar_system_id` for `system_id`, `corp_id` for `owner_id`, `typeID` for `type_id`. Anything else is ignored.
+
+**Where they appear in the UI:** the structures pane renders auto-discovered rows below your manual entries in a read-only "Auto-discovered" section with `Corp` / `Public` badges. Entries that already exist as manual rows (matched by `eve_id`) are not duplicated. Standings tints apply the same way as manual entries — hostile owners get red rows, friendlies get blue.
+
+**Admin overrides:** admins can force-refresh from the Admin UI (or `POST /api/known-structures/refresh-corp` to re-pull this corp's ESI structures right now, and `POST /api/known-structures/import-public` with `{ "url": "..." }` to trigger an immediate dataset import).
+
+**Precedence:** when a `corp-esi` row and a `public-dataset` row collide on the same `structure_id`, the corp-ESI row wins on every field — it's authoritative and fresher.
 
 ---
 

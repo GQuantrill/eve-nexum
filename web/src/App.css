@@ -1723,6 +1723,31 @@ div.system-node__easy-handle {
   color: #6a80a0;
   text-transform: uppercase;
   letter-spacing: 0.08em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sys-info__refresh-btn {
+  background: transparent;
+  border: 1px solid #2a3550;
+  color: #6a80a0;
+  border-radius: 3px;
+  padding: 0 5px;
+  font-size: 11px;
+  line-height: 1.4;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, transform 0.4s ease;
+}
+.sys-info__refresh-btn:hover     { color: #c0d0e0; border-color: #3a4a6a; }
+.sys-info__refresh-btn:disabled  { cursor: wait; opacity: 0.7; }
+.sys-info__refresh-btn--busy     { animation: sys-info-refresh-spin 0.8s linear infinite; }
+.sys-info__refresh-btn--ok       { color: #4ade80; border-color: rgba(74,222,128,0.35); }
+.sys-info__refresh-btn--err      { color: #e74c3c; border-color: rgba(231,76,60,0.4); }
+
+@keyframes sys-info-refresh-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }
 
 .sys-info__row {
@@ -2282,6 +2307,52 @@ div.system-node__easy-handle {
 .sig-row--selected td {
   background: #0a1525 !important;
 }
+
+/* Wormhole-sig aging. Tints anchored to WORMHOLE_TYPES.lifetimeH:
+   --wh-mid  50–90% of lifetime (yellow)
+   --wh-eol  90–100%            (orange)
+   --wh-past >100%              (red — likely closed)
+   Selected rows still win because their rule uses !important. */
+.sig-row--wh-mid  td { background: rgba(245,166,35,0.05); }
+.sig-row--wh-eol  td { background: rgba(245,140,35,0.12); }
+.sig-row--wh-past td { background: rgba(231,76,60,0.14); }
+
+/* Structures pane row tints, mirroring the EVE standings palette used
+   by the sov pills and killboard rows. owner_corp_id is resolved via
+   ESI on insert (and only when an eve_id was supplied), so rows without
+   a resolved owner stay neutral. */
+.structure-row--hostile  td { background: rgba(231,76,60,0.14); }
+.structure-row--bad      td { background: rgba(245,166,35,0.08); }
+.structure-row--good     td { background: rgba(143,200,255,0.08); }
+.structure-row--friendly td { background: rgba(91,155,255,0.12); }
+
+/* Auto-discovered structures section below the user-managed table.
+   Treats the rows as inert intel — no edit controls. */
+.known-structures            { margin-top: 16px; padding-top: 10px; border-top: 1px dashed #1e2a44; }
+.known-structures__heading {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #6a80a0;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.known-structures__hint     { font-size: 11px; text-transform: none; letter-spacing: 0; color: #4a5670; }
+.known-structures__table    { width: 100%; }
+.known-structures__source   { width: 60px; }
+.known-structures__badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 1px 6px;
+  border-radius: 3px;
+}
+.known-structures__badge--corp-esi       { background: rgba(91,155,255,0.15);  color: #8fc8ff; border: 1px solid rgba(91,155,255,0.4); }
+.known-structures__badge--public-dataset { background: rgba(122,138,168,0.15); color: #c8d0e0; border: 1px solid rgba(122,138,168,0.4); }
 
 .sig-input {
   background: transparent;

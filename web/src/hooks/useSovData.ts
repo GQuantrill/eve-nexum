@@ -39,7 +39,13 @@ export interface SovResult {
   faction?:  { name: string; logoUrl: string };
 }
 
+// Exported so other hooks (e.g. useProximityAlerts) can iterate the
+// cluster-wide sov data without re-fetching. Use via the exported
+// `ensureSovLoaded()` + `getSovEntries()` helpers — callers shouldn't
+// touch the map mutably.
 const sovMap        = new Map<number, SovEntry>();
+export function getSovEntries(): ReadonlyMap<number, Readonly<SovEntry>> { return sovMap; }
+export function ensureSovLoaded(): Promise<void> { return ensureSovMap(); }
 const infoCache     = new Map<string, EntityInfo>();
 const infoInflight  = new Map<string, Promise<EntityInfo | null>>();
 const factionsMap   = new Map<number, FactionEntry>();

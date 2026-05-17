@@ -16,6 +16,7 @@ import { NotesEditor } from './NotesEditor';
 import { KillboardPane } from './KillboardPane';
 import { ActivityPane } from './ActivityPane';
 import { useStandings, type ContactKind } from '../../hooks/useStandings';
+import { toast } from './Toaster';
 import { truesecColor } from '../../utils/truesec';
 import { useIncursions, findIncursion } from '../../hooks/useIncursions';
 import { useInsurgency, findInsurgency } from '../../hooks/useInsurgency';
@@ -404,7 +405,10 @@ export function SystemPanel() {
 
           {sov && (sov.alliance || sov.corp || sov.faction) && (
             <div className="sys-info__section">
-              <div className="sys-info__section-label">Sovereignty</div>
+              <div className="sys-info__section-label">
+                Sovereignty
+                <StandingsRefreshButton standings={standings} />
+              </div>
             <div className="sys-info__sov-block">
               {sov.alliance && sov.allianceId !== undefined && (
                 <div className="sys-info__row sys-info__sov">
@@ -464,6 +468,42 @@ export function SystemPanel() {
         </SortableContext>
       </DndContext>
     </aside>
+  );
+}
+
+// Tiny refresh button rendered next to the "Sovereignty" header. Calls
+// the manual standings refresh endpoint, which re-pulls personal / corp /
+// alliance contacts from ESI (bypassing the 6h server TTL) and then
+// updates the in-memory cache so every consumer re-renders.
+function StandingsRefreshButton({ standings }: { standings: ReturnType<typeof useStandings> }) {
+  const [status, setStatus] = useState<'idle' | 'ok' | 'err'>('idle');
+  const busy = standings.refreshing || status === 'idle' && false; // placeholder, see onClick
+
+  async function onClick() {
+    const r = await standings.refresh();
+    if (!r) { setStatus('err'); }
+    else if (r.succeeded?.character || r.succeeded?.corp || r.succeeded?.alliance) {
+      toast.success(
+        `Standings refreshed — ${r.counts?.character ?? 0} personal · ${r.counts?.corp ?? 0} corp · ${r.counts?.alliance ?? 0} alliance contacts`
+      );
+      setStatus('ok');
+    } else {
+      toast.error('No contacts could be refreshed. Token may be missing the read_contacts scope — log out and back in.');
+      setStatus('err');
+    }
+    setTimeout(() => setStatus('idle'), 2000);
+  }
+
+  return (
+    <button
+      type="button"
+      className={`sys-info__refresh-btn${standings.refreshing ? ' sys-info__refresh-btn--busy' : ''}${status === 'ok' ? ' sys-info__refresh-btn--ok' : ''}${status === 'err' ? ' sys-info__refresh-btn--err' : ''}`}
+      data-tooltip="Refresh standings from ESI now (bypasses the 6h TTL)"
+      onClick={onClick}
+      disabled={standings.refreshing || busy}
+    >
+      ↻
+    </button>
   );
 }
 

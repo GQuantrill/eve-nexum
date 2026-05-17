@@ -55,6 +55,7 @@ export interface Structure {
   name: string;
   structureType: StructureType;
   ownerCorp: string;
+  ownerCorpId: number | null; // resolved via ESI on insert; powers standings tint
   eveId: number | null;
   notes: string;
   createdAt: string;

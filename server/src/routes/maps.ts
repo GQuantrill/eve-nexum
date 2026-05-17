@@ -3,6 +3,42 @@ import type { Request, Response } from 'express';
 import { db } from '../db.js';
 import { requireAuth } from '../middleware/requireAuth.js';
 import { config } from '../config.js';
+import { decryptToken } from '../utils/tokenCrypto.js';
+import { createLogger } from '../utils/logger.js';
+
+const log = createLogger('maps');
+
+// Best-effort ESI lookup of a player structure's owner corp ID. Requires
+// the user's `esi-universe.read_structures.v1` scope and access to the
+// structure itself (member of the owning corp or its alliance, or it
+// being a public structure). 403/404 just means "we can't resolve it",
+// not an error.
+async function resolveStructureOwnerCorp(
+  userId: number,
+  eveStructureId: number,
+): Promise<number | null> {
+  try {
+    const { rows } = await db.query<{ access_token: string }>(
+      `SELECT access_token FROM users WHERE id = $1`, [userId],
+    );
+    if (!rows.length) return null;
+    const token = decryptToken(rows[0].access_token);
+    const r = await fetch(`https://esi.evetech.net/v2/universe/structures/${eveStructureId}/`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!r.ok) {
+      if (r.status !== 403 && r.status !== 404) {
+        log.warn(`ESI structure ${eveStructureId} returned ${r.status}`);
+      }
+      return null;
+    }
+    const data = await r.json() as { owner_id?: number };
+    return data.owner_id ?? null;
+  } catch (err) {
+    log.error('resolveStructureOwnerCorp failed:', err);
+    return null;
+  }
+}
 
 export const mapsRouter = Router();
 mapsRouter.use(requireAuth);
@@ -634,7 +670,7 @@ mapsRouter.get('/:mapId/systems/:systemId/structures', async (req, res) => {
   if (!access) { res.status(404).json({ error: 'Map not found' }); return; }
   if (!(await verifySystemInMap(res, systemId, mapId))) return;
   const { rows } = await db.query(
-    `SELECT id, name, structure_type AS "structureType", owner_corp AS "ownerCorp", eve_id AS "eveId", notes, created_at AS "createdAt"
+    `SELECT id, name, structure_type AS "structureType", owner_corp AS "ownerCorp", eve_id AS "eveId", notes, created_at AS "createdAt", owner_corp_id AS "ownerCorpId"
      FROM map_structures WHERE system_id = $1 ORDER BY created_at`,
     [systemId],
   );
@@ -647,11 +683,20 @@ mapsRouter.post('/:mapId/systems/:systemId/structures', async (req, res) => {
   if (!access) return;
   if (!(await verifySystemInMap(res, systemId, mapId))) return;
   const { name = '', structureType = 'unknown', ownerCorp = '', notes = '', eveId = null } = req.body as Record<string, string>;
+  const eveIdNum = eveId ? Number(eveId) : null;
+
+  // Block briefly on ESI to resolve the owner corp when an eve_id is
+  // supplied. If the call fails (private structure / missing scope /
+  // bad ID) we just leave owner_corp_id NULL — the row still goes in.
+  const ownerCorpId = eveIdNum && req.session.userId
+    ? await resolveStructureOwnerCorp(req.session.userId, eveIdNum)
+    : null;
+
   const { rows } = await db.query(
-    `INSERT INTO map_structures (system_id, name, structure_type, owner_corp, eve_id, notes, created_by_user_id)
-     VALUES ($1, $2, $3, $4, $5, $6, $7)
-     RETURNING id, name, structure_type AS "structureType", owner_corp AS "ownerCorp", eve_id AS "eveId", notes, created_at AS "createdAt"`,
-    [systemId, name, structureType, ownerCorp, eveId || null, notes, req.session.userId],
+    `INSERT INTO map_structures (system_id, name, structure_type, owner_corp, eve_id, notes, created_by_user_id, owner_corp_id)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+     RETURNING id, name, structure_type AS "structureType", owner_corp AS "ownerCorp", eve_id AS "eveId", notes, created_at AS "createdAt", owner_corp_id AS "ownerCorpId"`,
+    [systemId, name, structureType, ownerCorp, eveIdNum, notes, req.session.userId, ownerCorpId],
   );
   res.status(201).json(rows[0]);
 });
