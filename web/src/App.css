@@ -4680,10 +4680,13 @@ div.system-node__easy-handle {
   color: #7a8aa8;
 }
 
-.sys-info__sov-standing--hostile  { color: #f87171; background: rgba(248,113,113,0.10); border-color: rgba(248,113,113,0.30); }
-.sys-info__sov-standing--bad      { color: #f5a06a; background: rgba(245,160,106,0.08); border-color: rgba(245,160,106,0.25); }
-.sys-info__sov-standing--friendly { color: #4ade80; background: rgba(74,222,128,0.10);  border-color: rgba(74,222,128,0.30); }
-.sys-info__sov-standing--good     { color: #7ad08a; background: rgba(122,208,138,0.08); border-color: rgba(122,208,138,0.25); }
+/* EVE in-game standings palette: dark blue at +10 (excellent), light blue
+   at +5 (good), orange at -5 (bad), red at -10 (terrible). Neutral falls
+   through to the base pill colours. */
+.sys-info__sov-standing--friendly { color: #5b9bff; background: rgba(91,155,255,0.12); border-color: rgba(91,155,255,0.35); }  /* +10 dark blue */
+.sys-info__sov-standing--good     { color: #8fc8ff; background: rgba(143,200,255,0.10); border-color: rgba(143,200,255,0.30); }  /* +5  light blue */
+.sys-info__sov-standing--bad      { color: #f5a623; background: rgba(245,166,35,0.10);  border-color: rgba(245,166,35,0.35); }  /* -5  orange */
+.sys-info__sov-standing--hostile  { color: #e74c3c; background: rgba(231,76,60,0.12);   border-color: rgba(231,76,60,0.40); }   /* -10 red */
 .sys-info__sov-standing--none     { color: #4a5670; }
 .sys-info__sov-standing--none .sys-info__sov-standing-label { color: #3a4254; }
 

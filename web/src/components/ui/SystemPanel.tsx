@@ -541,11 +541,15 @@ function labelFor(short: string): string {
   }
 }
 
+// Mirrors EVE's in-game standings flag bands. -5 sits in the "bad" /
+// orange band; only values *below* -5 (e.g. -6, -10) flip to the red
+// "terrible" band. Same logic on the positive side: +5 is light-blue
+// "good"; +10 (or anywhere above +5) is the dark-blue "excellent" tier.
 function standingClass(value: number | null): string {
-  if (value === null)   return 'sys-info__sov-standing--none';
-  if (value <= -5)      return 'sys-info__sov-standing--hostile';
-  if (value < 0)        return 'sys-info__sov-standing--bad';
-  if (value >= 5)       return 'sys-info__sov-standing--friendly';
-  if (value > 0)        return 'sys-info__sov-standing--good';
+  if (value === null) return 'sys-info__sov-standing--none';
+  if (value < -5)     return 'sys-info__sov-standing--hostile';   // -10 zone (red)
+  if (value < 0)      return 'sys-info__sov-standing--bad';       // -5 zone (orange)
+  if (value > 5)      return 'sys-info__sov-standing--friendly';  // +10 zone (dark blue)
+  if (value > 0)      return 'sys-info__sov-standing--good';      // +5 zone (light blue)
   return 'sys-info__sov-standing--neutral';
 }

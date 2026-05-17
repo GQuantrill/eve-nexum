@@ -8,8 +8,8 @@ export interface StandingsLookup {
   corp:      number | null;
   alliance:  number | null;
   effective: number;   // most negative non-null across the three, 0 if none
-  isHostile:  boolean; // effective <= -5 (matches in-game red-cross convention)
-  isFriendly: boolean; // effective >= 5  (matches in-game blue convention)
+  isHostile:  boolean; // effective < -5 — red "terrible" band (-10 territory)
+  isFriendly: boolean; // effective >  5 — dark-blue "excellent" band (+10 territory)
   isNeutral:  boolean; // not hostile and not friendly
 }
 
@@ -74,9 +74,9 @@ export function useStandings() {
     const effective = values.length ? Math.min(...values) : 0;
     return {
       character, corp, alliance, effective,
-      isHostile:  effective <= -5,
-      isFriendly: effective >= 5,
-      isNeutral:  effective > -5 && effective < 5,
+      isHostile:  effective < -5,
+      isFriendly: effective >  5,
+      isNeutral:  effective >= -5 && effective <= 5,
     };
   }
 
