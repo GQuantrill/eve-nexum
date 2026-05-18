@@ -71,10 +71,10 @@ function AppShell() {
 
   if (!user) return <LandingPage />;
 
-  // Hash routes — only admins in corp mode can reach /admin/*; in solo
-  // mode admin tooling is meaningless (no other users to manage) so the
-  // whole section is hidden even if the URL is typed directly.
-  if (path.startsWith('/admin') && (user.role === 'admin' || user.canViewReports) && user.corpMode) {
+  // Hash routes — admins reach /admin/* in corp mode (solo mode has no
+  // other users to manage, so the section is hidden). The reports
+  // character is always allowed regardless of corp mode.
+  if (path.startsWith('/admin') && (user.canViewReports || (user.role === 'admin' && user.corpMode))) {
     return <AdminPage />;
   }
 
