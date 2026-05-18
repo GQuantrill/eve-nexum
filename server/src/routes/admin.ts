@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { db } from '../db.js';
 import { requireAdmin } from '../middleware/requireAdmin.js';
+import { requireAdminRead } from '../middleware/requireAdminRead.js';
 import { requireReportsAccess } from '../middleware/requireReportsAccess.js';
 import { config } from '../config.js';
 import { createLogger } from '../utils/logger.js';
@@ -9,6 +10,9 @@ const log = createLogger('admin');
 
 export const adminRouter = Router();
 adminRouter.use(requireAdmin);
+
+export const adminReadRouter = Router();
+adminReadRouter.use(requireAdminRead);
 
 export const reportsRouter = Router();
 reportsRouter.use(requireReportsAccess);
@@ -76,7 +80,7 @@ async function audit(
 }
 
 // GET /api/admin/users — all users with activity stats + corp/blocked status
-adminRouter.get('/users', async (_req, res) => {
+adminReadRouter.get('/users', async (_req, res) => {
   // Two pre-aggregated subqueries joined into users — avoids the cartesian
   // explosion (COUNT(DISTINCT) over a triple-nested IN) the previous version
   // produced for users with many maps and many signatures.
