@@ -28,12 +28,17 @@ const ALL_TABS: { key: Tab; label: string; path: string }[] = [
 export function AdminPage() {
   const [path, navigate] = useHashRoute();
   const { user } = useAuth();
+  const isAdmin = user?.role === 'admin';
   const canSeeReports = !!user?.canViewReports;
   const tabs = useMemo(
-    () => ALL_TABS.filter((t) => t.key !== 'reports' || canSeeReports),
-    [canSeeReports],
+    () => ALL_TABS.filter((t) => {
+      if (t.key === 'reports') return canSeeReports;
+      if (t.key === 'users')   return isAdmin || canSeeReports;
+      return isAdmin;
+    }),
+    [isAdmin, canSeeReports],
   );
-  const tab = pathToTab(path, canSeeReports);
+  const tab = pathToTab(path, isAdmin, canSeeReports);
 
   return (
     <div className="admin-page">
@@ -54,20 +59,21 @@ export function AdminPage() {
       </aside>
 
       <main className="admin-page__content">
-        {tab === 'users'   && <UsersTab />}
-        {tab === 'maps'    && <MapsTab />}
+        {tab === 'users'   && (isAdmin || canSeeReports) && <UsersTab />}
+        {tab === 'maps'    && isAdmin       && <MapsTab />}
         {tab === 'reports' && canSeeReports && <ReportsTab />}
-        {tab === 'audit'   && <AuditTab />}
+        {tab === 'audit'   && isAdmin       && <AuditTab />}
       </main>
     </div>
   );
 }
 
-function pathToTab(path: string, canSeeReports: boolean): Tab {
-  if (path.startsWith('/admin/maps'))    return 'maps';
-  if (path.startsWith('/admin/reports')) return canSeeReports ? 'reports' : 'users';
-  if (path.startsWith('/admin/audit'))   return 'audit';
-  return 'users';
+function pathToTab(path: string, isAdmin: boolean, canSeeReports: boolean): Tab {
+  const fallback: Tab = isAdmin || canSeeReports ? 'users' : 'reports';
+  if (path.startsWith('/admin/maps'))    return isAdmin       ? 'maps'    : fallback;
+  if (path.startsWith('/admin/reports')) return canSeeReports ? 'reports' : fallback;
+  if (path.startsWith('/admin/audit'))   return isAdmin       ? 'audit'   : fallback;
+  return fallback;
 }
 
 // ── Users tab ───────────────────────────────────────────────────────────────
@@ -89,6 +95,7 @@ interface AdminUser {
 
 function UsersTab() {
   const { user: self } = useAuth();
+  const canEdit = self?.role === 'admin';
   const [users, setUsers]     = useState<AdminUser[] | null>(null);
   const [error, setError]     = useState<string | null>(null);
   const [busyId, setBusyId]   = useState<number | null>(null);
@@ -162,7 +169,7 @@ function UsersTab() {
               <th>Role</th>
               <th>Status</th>
               <th>Last login</th>
-              <th />
+              {canEdit && <th />}
             </tr>
           </thead>
           <tbody>
@@ -186,14 +193,18 @@ function UsersTab() {
                       : <span className="admin-modal__mono">{u.corpId ?? '—'}</span>}
                   </td>
                   <td>
-                    <select
-                      className="admin-modal__role-select"
-                      value={u.role}
-                      disabled={isBusy || isSelf}
-                      onChange={(e) => changeRole(u, e.target.value as Role)}
-                    >
-                      {ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
-                    </select>
+                    {canEdit ? (
+                      <select
+                        className="admin-modal__role-select"
+                        value={u.role}
+                        disabled={isBusy || isSelf}
+                        onChange={(e) => changeRole(u, e.target.value as Role)}
+                      >
+                        {ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
+                      </select>
+                    ) : (
+                      <span className="admin-modal__mono">{u.role}</span>
+                    )}
                   </td>
                   <td>
                     {u.blocked
@@ -201,29 +212,31 @@ function UsersTab() {
                       : <span className="admin-modal__pill admin-modal__pill--ok">active</span>}
                   </td>
                   <td className="admin-modal__when">{formatRelative(u.lastLogin)}</td>
-                  <td className="admin-modal__actions">
-                    {u.blocked ? (
-                      <button className="btn btn--ghost btn--sm" disabled={isBusy} onClick={() => setBlocked(u, false)}>
-                        Unblock
-                      </button>
-                    ) : (
+                  {canEdit && (
+                    <td className="admin-modal__actions">
+                      {u.blocked ? (
+                        <button className="btn btn--ghost btn--sm" disabled={isBusy} onClick={() => setBlocked(u, false)}>
+                          Unblock
+                        </button>
+                      ) : (
+                        <button
+                          className="btn btn--ghost btn--sm admin-modal__danger"
+                          disabled={isBusy || isSelf}
+                          onClick={() => setBlockTarget(u)}
+                        >
+                          Block
+                        </button>
+                      )}
                       <button
-                        className="btn btn--ghost btn--sm admin-modal__danger"
-                        disabled={isBusy || isSelf}
-                        onClick={() => setBlockTarget(u)}
+                        className="btn btn--ghost btn--sm"
+                        disabled={isBusy}
+                        onClick={() => recheckCorp(u)}
+                        title="Re-query ESI for this user's current corp"
                       >
-                        Block
+                        Recheck
                       </button>
-                    )}
-                    <button
-                      className="btn btn--ghost btn--sm"
-                      disabled={isBusy}
-                      onClick={() => recheckCorp(u)}
-                      title="Re-query ESI for this user's current corp"
-                    >
-                      Recheck
-                    </button>
-                  </td>
+                    </td>
+                  )}
                 </tr>
               );
             })}
