@@ -18,7 +18,7 @@ const ROLES: Role[] = ['admin', 'full', 'edit', 'readonly'];
 
 type Tab = 'users' | 'maps' | 'reports' | 'audit';
 
-const TABS: { key: Tab; label: string; path: string }[] = [
+const ALL_TABS: { key: Tab; label: string; path: string }[] = [
   { key: 'users',   label: 'Users',     path: '/admin/users'   },
   { key: 'maps',    label: 'Maps',      path: '/admin/maps'    },
   { key: 'reports', label: 'Reports',   path: '/admin/reports' },
@@ -27,7 +27,13 @@ const TABS: { key: Tab; label: string; path: string }[] = [
 
 export function AdminPage() {
   const [path, navigate] = useHashRoute();
-  const tab = pathToTab(path);
+  const { user } = useAuth();
+  const canSeeReports = !!user?.canViewReports;
+  const tabs = useMemo(
+    () => ALL_TABS.filter((t) => t.key !== 'reports' || canSeeReports),
+    [canSeeReports],
+  );
+  const tab = pathToTab(path, canSeeReports);
 
   return (
     <div className="admin-page">
@@ -35,7 +41,7 @@ export function AdminPage() {
         <button className="admin-page__back" onClick={() => navigate('/')}>← Back to maps</button>
         <h1 className="admin-page__title">Admin</h1>
         <nav className="admin-page__tabs">
-          {TABS.map((t) => (
+          {tabs.map((t) => (
             <button
               key={t.key}
               className={`admin-page__tab${tab === t.key ? ' admin-page__tab--active' : ''}`}
@@ -50,16 +56,16 @@ export function AdminPage() {
       <main className="admin-page__content">
         {tab === 'users'   && <UsersTab />}
         {tab === 'maps'    && <MapsTab />}
-        {tab === 'reports' && <ReportsTab />}
+        {tab === 'reports' && canSeeReports && <ReportsTab />}
         {tab === 'audit'   && <AuditTab />}
       </main>
     </div>
   );
 }
 
-function pathToTab(path: string): Tab {
+function pathToTab(path: string, canSeeReports: boolean): Tab {
   if (path.startsWith('/admin/maps'))    return 'maps';
-  if (path.startsWith('/admin/reports')) return 'reports';
+  if (path.startsWith('/admin/reports')) return canSeeReports ? 'reports' : 'users';
   if (path.startsWith('/admin/audit'))   return 'audit';
   return 'users';
 }

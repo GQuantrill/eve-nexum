@@ -199,6 +199,7 @@ export function StructuresPane({ systemId }: { systemId: string }) {
         />
       )}
       <div className="sig-pane">
+        <p className="sig-pane__hint">You can copy and paste structures directly from your Overview in EVE. In space, right-click anywhere in your Overview window and choose "Copy Selected Rows" (or select the lines and Ctrl+C). Paste here with Ctrl+V — the structure ID, name, and type are imported automatically.</p>
         {canEdit && (
           <div className="sig-pane__toolbar">
             <button className="icon-btn" onClick={addStructure} title="Add structure">+</button>

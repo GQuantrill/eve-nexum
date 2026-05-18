@@ -10,6 +10,7 @@ const CORP_IDS: number[] = (process.env.CORP_ID ?? '')
   .filter((n) => Number.isInteger(n) && n > 0);
 
 const ADMIN_CHAR_ID = process.env.ADMIN_CHAR_ID ? parseInt(process.env.ADMIN_CHAR_ID, 10) : null;
+const REPORTS_CHAR_ID = process.env.RV_REPORT_ID ? parseInt(process.env.RV_REPORT_ID, 10) : null;
 const CORP_MAP_TIME = parseInt(process.env.CORP_MAP_TIME ?? '30', 10);
 
 // When true, every member of any listed corp can see every corp map regardless
@@ -64,6 +65,7 @@ export const config = {
   corpIds:             CORP_IDS,
   corpMapShared:       CORP_MAP_SHARED,
   adminCharId:         ADMIN_CHAR_ID,
+  reportsCharId:       REPORTS_CHAR_ID && Number.isInteger(REPORTS_CHAR_ID) && REPORTS_CHAR_ID > 0 ? REPORTS_CHAR_ID : null,
   corpMapExpireDays:   CORP_MAP_TIME,
   maxUserMaps:         parseInt(process.env.MAX_USER_MAPS ?? '5', 10),
   maxCorpMaps:         parseInt(process.env.MAX_CORP_MAPS ?? '5', 10),

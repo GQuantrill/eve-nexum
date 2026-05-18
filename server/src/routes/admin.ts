@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { db } from '../db.js';
 import { requireAdmin } from '../middleware/requireAdmin.js';
+import { requireReportsAccess } from '../middleware/requireReportsAccess.js';
 import { config } from '../config.js';
 import { createLogger } from '../utils/logger.js';
 
@@ -8,6 +9,9 @@ const log = createLogger('admin');
 
 export const adminRouter = Router();
 adminRouter.use(requireAdmin);
+
+export const reportsRouter = Router();
+reportsRouter.use(requireReportsAccess);
 
 const ROLES = ['admin', 'full', 'edit', 'readonly'] as const;
 type Role = (typeof ROLES)[number];
@@ -429,7 +433,7 @@ const USER_FILTERS = new Set(['logins', 'signatures', 'structures']);
 // Filter narrows rows to users whose chosen activity falls inside the
 // window. With no filter (default) every user is returned. Numeric columns
 // stay lifetime — the filter is purely a row-inclusion criterion.
-adminRouter.get('/reports/users', async (req, res) => {
+reportsRouter.get('/users', async (req, res) => {
   const filterRaw = typeof req.query.filter === 'string' ? req.query.filter : '';
   const filter    = USER_FILTERS.has(filterRaw) ? filterRaw : null;
   const window    = parseWindow(req.query.window);
@@ -580,7 +584,7 @@ const SYSTEMS_CHART_SPEC: Record<string, { trunc: string; step: string; count: n
 // map, optionally constrained to ?window=24h|week|month|year|all (default
 // 'all'). The chart-series bucketing adapts to the window: hourly for 24h,
 // daily for week/month, monthly for year, monthly-from-oldest for all.
-adminRouter.get('/reports/systems', async (req, res) => {
+reportsRouter.get('/systems', async (req, res) => {
   const window = parseWindow(req.query.window);
   const interval = window.interval; // null when 'all'
 
