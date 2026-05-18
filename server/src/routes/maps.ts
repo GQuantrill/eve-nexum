@@ -5,6 +5,7 @@ import { requireAuth } from '../middleware/requireAuth.js';
 import { config } from '../config.js';
 import { decryptToken } from '../utils/tokenCrypto.js';
 import { createLogger } from '../utils/logger.js';
+import { recordGhostSiteIfMatch } from '../services/ghostSites.js';
 
 const log = createLogger('maps');
 
@@ -626,6 +627,7 @@ mapsRouter.post('/:mapId/systems/:systemId/signatures', async (req, res) => {
     [req.session.userId, sigType],
   ).catch(console.error);
   db.query(`UPDATE map_systems SET last_activity_at = NOW() WHERE id = $1`, [systemId]).catch(console.error);
+  recordGhostSiteIfMatch(systemId, name);
   res.status(201).json(rows[0]);
 });
 
@@ -649,6 +651,7 @@ mapsRouter.patch('/:mapId/systems/:systemId/signatures/:sigId', async (req, res)
     [...vals, sigId, systemId],
   );
   db.query(`UPDATE map_systems SET last_activity_at = NOW() WHERE id = $1`, [systemId]).catch(console.error);
+  if (typeof updates.name === 'string') recordGhostSiteIfMatch(systemId, updates.name);
   res.json({ ok: true });
 });
 

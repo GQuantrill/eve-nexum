@@ -706,6 +706,29 @@ reportsRouter.get('/systems', async (req, res) => {
   });
 });
 
+// GET /api/admin/reports/ghost-sites — every K-space system where a sig
+// ending in "Covert Research Facility" has been observed, with the
+// metadata captured at first sighting (sun type, planet/moon counts).
+reportsRouter.get('/ghost-sites', async (_req, res) => {
+  const { rows } = await db.query(`
+    SELECT
+      eve_system_id      AS "eveSystemId",
+      system_name        AS "systemName",
+      constellation_name AS "constellationName",
+      region_name        AS "regionName",
+      system_class       AS "systemClass",
+      sun_type           AS "sunType",
+      planet_count       AS "planetCount",
+      moon_count         AS "moonCount",
+      observations,
+      first_seen_at      AS "firstSeenAt",
+      last_seen_at       AS "lastSeenAt"
+    FROM ghost_site_systems
+    ORDER BY region_name, constellation_name, system_name
+  `);
+  res.json({ rows });
+});
+
 // GET /api/admin/audit — recent admin actions (newest first)
 adminRouter.get('/audit', async (_req, res) => {
   const { rows } = await db.query(`

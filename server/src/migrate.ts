@@ -177,6 +177,25 @@ export async function migrate() {
       created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
 
+    -- Cluster-wide log of K-space systems where a Covert Research Facility
+    -- signature ("Ghost site") has been observed. One row per system, with
+    -- observation count + first/last seen for spawn-rate analysis. Static
+    -- columns (sun_type, planet/moon counts) are filled once via ESI on
+    -- first detection — they never change.
+    CREATE TABLE IF NOT EXISTS ghost_site_systems (
+      eve_system_id      INTEGER     PRIMARY KEY,
+      system_name        TEXT        NOT NULL,
+      constellation_name TEXT,
+      region_name        TEXT,
+      system_class       TEXT        NOT NULL,
+      sun_type           TEXT,
+      planet_count       INTEGER,
+      moon_count         INTEGER,
+      observations       INTEGER     NOT NULL DEFAULT 1,
+      first_seen_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      last_seen_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
     CREATE TABLE IF NOT EXISTS system_activity (
       eve_system_id INTEGER     NOT NULL,
       hour          TIMESTAMPTZ NOT NULL,
