@@ -411,11 +411,12 @@ function MapsTab() {
 
 // ── Reports tab ─────────────────────────────────────────────────────────────
 
-type ReportKind = 'users' | 'systems';
+type ReportKind = 'users' | 'systems' | 'ghost-sites';
 
 const REPORTS: { key: ReportKind; label: string }[] = [
-  { key: 'users',   label: 'Users'   },
-  { key: 'systems', label: 'Systems' },
+  { key: 'users',       label: 'Users'       },
+  { key: 'systems',     label: 'Systems'     },
+  { key: 'ghost-sites', label: 'Ghost sites' },
 ];
 
 type WindowKey = 'all' | '24h' | 'week' | 'month' | 'year';
@@ -467,14 +468,16 @@ function ReportsTab() {
         ))}
       </div>
 
-      {kind === 'users'   && <UsersReport />}
-      {kind === 'systems' && <SystemsReport />}
+      {kind === 'users'       && <UsersReport />}
+      {kind === 'systems'     && <SystemsReport />}
+      {kind === 'ghost-sites' && <GhostSitesReport />}
     </>
   );
 }
 
 function pathToReport(path: string): ReportKind {
-  if (path.startsWith('/admin/reports/systems')) return 'systems';
+  if (path.startsWith('/admin/reports/systems'))     return 'systems';
+  if (path.startsWith('/admin/reports/ghost-sites')) return 'ghost-sites';
   return 'users';
 }
 
@@ -936,6 +939,105 @@ function StatCard({ label, value, accent = false }: { label: string; value: numb
       <span className="admin-page__stat-card-value">{value.toLocaleString()}</span>
       <span className="admin-page__stat-card-label">{label}</span>
     </div>
+  );
+}
+
+// ── Ghost sites report ──────────────────────────────────────────────────────
+
+interface GhostSiteRow {
+  eveSystemId:       number;
+  systemName:        string;
+  constellationName: string | null;
+  regionName:        string | null;
+  systemClass:       string;
+  sunType:           string | null;
+  planetCount:       number | null;
+  moonCount:         number | null;
+  observations:      number;
+  firstSeenAt:       string;
+  lastSeenAt:        string;
+}
+
+type GhostSortKey =
+  | 'region' | 'constellation' | 'system' | 'class'
+  | 'sunType' | 'planets' | 'moons' | 'observations' | 'lastSeen';
+
+const GHOST_ACCESSORS: Record<GhostSortKey, (r: GhostSiteRow) => string | number | null> = {
+  region:        (r) => r.regionName?.toLowerCase()        ?? null,
+  constellation: (r) => r.constellationName?.toLowerCase() ?? null,
+  system:        (r) => r.systemName.toLowerCase(),
+  class:         (r) => r.systemClass,
+  sunType:       (r) => r.sunType?.toLowerCase() ?? null,
+  planets:       (r) => r.planetCount  ?? null,
+  moons:         (r) => r.moonCount    ?? null,
+  observations:  (r) => r.observations,
+  lastSeen:      (r) => new Date(r.lastSeenAt).getTime(),
+};
+
+function GhostSitesReport() {
+  const [rows, setRows]   = useState<GhostSiteRow[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [sort, setSort]   = useState<{ key: GhostSortKey; dir: SortDir }>({ key: 'region', dir: 'asc' });
+
+  useEffect(() => {
+    api<{ rows: GhostSiteRow[] }>('/api/admin/reports/ghost-sites')
+      .then((d) => setRows(d.rows))
+      .catch((e) => setError(e instanceof Error ? e.message : 'Failed to load ghost sites report'));
+  }, []);
+
+  const sorted = useMemo(() => {
+    if (!rows) return null;
+    const acc = GHOST_ACCESSORS[sort.key];
+    return [...rows].sort((a, b) => compareValues(acc(a), acc(b), sort.dir));
+  }, [rows, sort]);
+
+  function onSort(key: GhostSortKey) {
+    setSort((prev) => prev.key === key
+      ? { key, dir: prev.dir === 'asc' ? 'desc' : 'asc' }
+      : { key, dir: key === 'observations' || key === 'lastSeen' ? 'desc' : 'asc' });
+  }
+
+  if (error)   return <div className="admin-page__error">{error}</div>;
+  if (!sorted) return <div className="admin-page__loading">Loading…</div>;
+
+  return (
+    <>
+      <h3 className="admin-page__report-heading">Covert Research Facility observations</h3>
+      {sorted.length === 0 ? (
+        <div className="admin-page__empty">No K-space ghost sites recorded yet.</div>
+      ) : (
+        <table className="admin-modal__table admin-page__sortable">
+          <thead>
+            <tr>
+              <SortHeader label="Region"        colKey="region"        sort={sort} onSort={onSort} />
+              <SortHeader label="Constellation" colKey="constellation" sort={sort} onSort={onSort} />
+              <SortHeader label="System"        colKey="system"        sort={sort} onSort={onSort} />
+              <SortHeader label="Class"         colKey="class"         sort={sort} onSort={onSort} />
+              <SortHeader label="Sun"           colKey="sunType"       sort={sort} onSort={onSort} />
+              <SortHeader label="Planets"       colKey="planets"       sort={sort} onSort={onSort} />
+              <SortHeader label="Moons"         colKey="moons"         sort={sort} onSort={onSort} />
+              <SortHeader label="Observations"  colKey="observations"  sort={sort} onSort={onSort} />
+              <SortHeader label="Last seen"     colKey="lastSeen"      sort={sort} onSort={onSort} />
+            </tr>
+          </thead>
+          <tbody>
+            {sorted.map((r) => (
+              <tr key={r.eveSystemId}>
+                <td>{r.regionName        ?? '—'}</td>
+                <td>{r.constellationName ?? '—'}</td>
+                <td className="admin-modal__mono">{r.systemName}</td>
+                <td>{r.systemClass}</td>
+                <td>{r.sunType     ?? '—'}</td>
+                <td className="admin-modal__num">{r.planetCount ?? '—'}</td>
+                <td className="admin-modal__num">{r.moonCount   ?? '—'}</td>
+                <td className="admin-modal__num">{r.observations}</td>
+                <td>{new Date(r.lastSeenAt).toLocaleString()}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </>
   );
 }
 
