@@ -5,6 +5,7 @@ import { config } from '../config.js';
 import { encryptToken } from '../utils/tokenCrypto.js';
 import { createLogger } from '../utils/logger.js';
 import { refreshStandingsForUser } from '../services/standings.js';
+import { seedDemoMap } from '../services/demoMap.js';
 
 const log = createLogger('auth');
 
@@ -187,13 +188,9 @@ authRouter.get('/callback', async (req, res) => {
       return;
     }
 
-    // Create a default personal map if this is a new user
-    await db.query(
-      `INSERT INTO maps (user_id, name)
-       SELECT $1, 'My Map'
-       WHERE NOT EXISTS (SELECT 1 FROM maps WHERE user_id = $1)`,
-      [userId],
-    );
+    // First login: seed a starter "Demo Map" so the canvas isn't blank.
+    // No-op when the user already has a map.
+    await seedDemoMap(userId);
 
     // Snapshot prefs into the session so /auth/me can answer without a DB call.
     const prefRows = await db.query<{ compact_mode: boolean; snap_to_grid: boolean; show_minimap: boolean; panel_order: string[] }>(
