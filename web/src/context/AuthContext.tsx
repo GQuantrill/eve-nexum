@@ -11,6 +11,7 @@ export interface AuthUser {
   snapToGrid: boolean;
   showMinimap: boolean;
   panelOrder: string[];
+  canViewReports: boolean;
 }
 
 interface AuthContextValue {

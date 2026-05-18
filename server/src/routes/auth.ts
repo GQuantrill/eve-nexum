@@ -289,6 +289,7 @@ authRouter.get('/me', async (req, res) => {
       snapToGrid:    prefs.snapToGrid,
       showMinimap:   prefs.showMinimap,
       panelOrder:    prefs.panelOrder,
+      canViewReports: config.reportsCharId !== null && req.session.characterId === config.reportsCharId,
     },
   });
 });
