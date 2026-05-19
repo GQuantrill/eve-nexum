@@ -32,7 +32,7 @@ export function AdminPage() {
   const canSeeReports = !!user?.canViewReports;
   const tabs = useMemo(
     () => ALL_TABS.filter((t) => {
-      if (t.key === 'reports') return canSeeReports;
+      if (t.key === 'reports') return isAdmin || canSeeReports;
       if (t.key === 'users')   return isAdmin || canSeeReports;
       return isAdmin;
     }),
@@ -61,7 +61,7 @@ export function AdminPage() {
       <main className="admin-page__content">
         {tab === 'users'   && (isAdmin || canSeeReports) && <UsersTab />}
         {tab === 'maps'    && isAdmin       && <MapsTab />}
-        {tab === 'reports' && canSeeReports && <ReportsTab />}
+        {tab === 'reports' && (isAdmin || canSeeReports) && <ReportsTab />}
         {tab === 'audit'   && isAdmin       && <AuditTab />}
       </main>
     </div>
@@ -71,7 +71,7 @@ export function AdminPage() {
 function pathToTab(path: string, isAdmin: boolean, canSeeReports: boolean): Tab {
   const fallback: Tab = isAdmin || canSeeReports ? 'users' : 'reports';
   if (path.startsWith('/admin/maps'))    return isAdmin       ? 'maps'    : fallback;
-  if (path.startsWith('/admin/reports')) return canSeeReports ? 'reports' : fallback;
+  if (path.startsWith('/admin/reports')) return (isAdmin || canSeeReports) ? 'reports' : fallback;
   if (path.startsWith('/admin/audit'))   return isAdmin       ? 'audit'   : fallback;
   return fallback;
 }
@@ -451,13 +451,19 @@ const USER_FILTER_OPTIONS: { value: UserFilterKey; label: string }[] = [
 
 function ReportsTab() {
   const [path, navigate] = useHashRoute();
-  const kind = pathToReport(path);
+  const { user } = useAuth();
+  const canSeeReports = !!user?.canViewReports;
+  const visibleReports = useMemo(
+    () => REPORTS.filter((r) => r.key !== 'ghost-sites' || canSeeReports),
+    [canSeeReports],
+  );
+  const kind = pathToReport(path, canSeeReports);
 
   return (
     <>
       <h2 className="admin-page__section-title">Reports</h2>
       <div className="admin-page__subtabs">
-        {REPORTS.map((r) => (
+        {visibleReports.map((r) => (
           <button
             key={r.key}
             className={`admin-page__subtab${kind === r.key ? ' admin-page__subtab--active' : ''}`}
@@ -470,14 +476,14 @@ function ReportsTab() {
 
       {kind === 'users'       && <UsersReport />}
       {kind === 'systems'     && <SystemsReport />}
-      {kind === 'ghost-sites' && <GhostSitesReport />}
+      {kind === 'ghost-sites' && canSeeReports && <GhostSitesReport />}
     </>
   );
 }
 
-function pathToReport(path: string): ReportKind {
-  if (path.startsWith('/admin/reports/systems'))     return 'systems';
-  if (path.startsWith('/admin/reports/ghost-sites')) return 'ghost-sites';
+function pathToReport(path: string, canSeeReports: boolean): ReportKind {
+  if (path.startsWith('/admin/reports/systems'))                       return 'systems';
+  if (path.startsWith('/admin/reports/ghost-sites') && canSeeReports)  return 'ghost-sites';
   return 'users';
 }
 
@@ -822,7 +828,7 @@ function SystemsReport() {
 
   if (error) return <>{controls}<div className="admin-page__error">{error}</div></>;
   if (!data || !sortedWh) return <>{controls}<div className="admin-page__loading">Loading…</div></>;
-  if (data.total === 0) return <>{controls}<div className="admin-page__empty">No corp-map signatures in this window.</div></>;
+  if (data.total === 0) return <>{controls}<div className="admin-page__empty">No signatures in this window.</div></>;
 
   const donutEntries = SIG_TYPE_ORDER
     .map((t) => ({ key: t.key, label: t.label, count: data.byType[t.key] ?? 0 }))
@@ -831,7 +837,7 @@ function SystemsReport() {
   return (
     <>
       {controls}
-      <h3 className="admin-page__report-heading">Signatures across corp maps</h3>
+      <h3 className="admin-page__report-heading">Signatures across all maps</h3>
       <div className="admin-page__stat-grid">
         <StatCard label="Total" value={data.total} accent />
         {SIG_TYPE_ORDER.map((t) => (
