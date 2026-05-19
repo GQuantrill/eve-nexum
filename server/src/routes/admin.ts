@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { db } from '../db.js';
 import { requireAdmin } from '../middleware/requireAdmin.js';
 import { requireAdminRead } from '../middleware/requireAdminRead.js';
-import { requireReportsAccess } from '../middleware/requireReportsAccess.js';
+import { requireReportsAccess, isReportsCharacter, corpScopeFor } from '../middleware/requireReportsAccess.js';
 import { config } from '../config.js';
 import { createLogger } from '../utils/logger.js';
 
@@ -438,58 +438,67 @@ const USER_FILTERS = new Set(['logins', 'signatures', 'structures']);
 // window. With no filter (default) every user is returned. Numeric columns
 // stay lifetime — the filter is purely a row-inclusion criterion.
 reportsRouter.get('/users', async (req, res) => {
+  const scope = corpScopeFor(req);
+  if (scope === null) { res.status(403).json({ error: 'No corp affiliation' }); return; }
   const filterRaw = typeof req.query.filter === 'string' ? req.query.filter : '';
   const filter    = USER_FILTERS.has(filterRaw) ? filterRaw : null;
   const window    = parseWindow(req.query.window);
 
-  // Build the row-inclusion WHERE clause based on filter + window. When
-  // window is 'all' no time predicate applies; a filter without a window
-  // is the same as "this activity ever happened".
-  let inclusionWhere = '';
-  const params: unknown[] = [];
+  // Corp scope is $1 if present (admin); reports character has no scope
+  // param and the predicate collapses to TRUE. Subsequent params start
+  // immediately after.
+  const params: unknown[] = scope.param !== null ? [scope.param] : [];
+  const corpSql = scope.sql(1);
+  // Admins additionally only see users in their corp; reports char sees all.
+  const userScope = scope.param !== null ? `u.corp_id = $1` : null;
+
+  // Row-inclusion conditions (user-scope + filter EXISTS). Joined with AND.
+  const conditions: string[] = [];
+  if (userScope) conditions.push(userScope);
   if (filter && window.interval) {
     params.push(window.interval);
     const intervalParam = `$${params.length}::interval`;
     if (filter === 'logins') {
-      inclusionWhere = `WHERE u.updated_at >= NOW() - ${intervalParam}`;
+      conditions.push(`u.updated_at >= NOW() - ${intervalParam}`);
     } else if (filter === 'signatures') {
-      inclusionWhere = `WHERE EXISTS (
+      conditions.push(`EXISTS (
         SELECT 1 FROM map_signatures s
         JOIN map_systems sys ON sys.id = s.system_id
         JOIN maps        m   ON m.id   = sys.map_id
         WHERE s.created_by_user_id = u.id
-          AND m.corp_id IS NOT NULL
+          AND ${corpSql}
           AND s.created_at >= NOW() - ${intervalParam}
-      )`;
+      )`);
     } else if (filter === 'structures') {
-      inclusionWhere = `WHERE EXISTS (
+      conditions.push(`EXISTS (
         SELECT 1 FROM map_structures st
         JOIN map_systems sys ON sys.id = st.system_id
         JOIN maps        m   ON m.id   = sys.map_id
         WHERE st.created_by_user_id = u.id
-          AND m.corp_id IS NOT NULL
+          AND ${corpSql}
           AND st.created_at >= NOW() - ${intervalParam}
-      )`;
+      )`);
     }
   } else if (filter && !window.interval) {
     // filter + 'all' window → at least one such activity ever
     if (filter === 'signatures') {
-      inclusionWhere = `WHERE EXISTS (
+      conditions.push(`EXISTS (
         SELECT 1 FROM map_signatures s
         JOIN map_systems sys ON sys.id = s.system_id
         JOIN maps        m   ON m.id   = sys.map_id
-        WHERE s.created_by_user_id = u.id AND m.corp_id IS NOT NULL
-      )`;
+        WHERE s.created_by_user_id = u.id AND ${corpSql}
+      )`);
     } else if (filter === 'structures') {
-      inclusionWhere = `WHERE EXISTS (
+      conditions.push(`EXISTS (
         SELECT 1 FROM map_structures st
         JOIN map_systems sys ON sys.id = st.system_id
         JOIN maps        m   ON m.id   = sys.map_id
-        WHERE st.created_by_user_id = u.id AND m.corp_id IS NOT NULL
-      )`;
+        WHERE st.created_by_user_id = u.id AND ${corpSql}
+      )`);
     }
-    // logins + all → all users; no extra clause
+    // logins + all → no extra activity predicate (user-scope still applies)
   }
+  const inclusionWhere = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
   const { rows } = await db.query(`
     WITH last_corp_sig AS (
@@ -497,7 +506,7 @@ reportsRouter.get('/users', async (req, res) => {
       FROM map_signatures s
       JOIN map_systems sys ON sys.id = s.system_id
       JOIN maps         m  ON m.id   = sys.map_id
-      WHERE m.corp_id IS NOT NULL AND s.created_by_user_id IS NOT NULL
+      WHERE ${corpSql} AND s.created_by_user_id IS NOT NULL
       GROUP BY s.created_by_user_id
     ),
     last_corp_struct AS (
@@ -505,7 +514,7 @@ reportsRouter.get('/users', async (req, res) => {
       FROM map_structures st
       JOIN map_systems sys ON sys.id = st.system_id
       JOIN maps         m  ON m.id   = sys.map_id
-      WHERE m.corp_id IS NOT NULL AND st.created_by_user_id IS NOT NULL
+      WHERE ${corpSql} AND st.created_by_user_id IS NOT NULL
       GROUP BY st.created_by_user_id
     ),
     sig_breakdown AS (
@@ -519,7 +528,7 @@ reportsRouter.get('/users', async (req, res) => {
       FROM user_events e
       JOIN maps m ON m.id = e.map_id
       WHERE e.event_type IN ('system_add', 'system_delete')
-        AND m.corp_id IS NOT NULL
+        AND ${corpSql}
       GROUP BY e.user_id, e.event_type
     )
     SELECT
@@ -584,18 +593,25 @@ const SYSTEMS_CHART_SPEC: Record<string, { trunc: string; step: string; count: n
   'all':   'all',
 };
 
-// GET /api/admin/reports/systems — aggregate signatures across every corp
-// map, optionally constrained to ?window=24h|week|month|year|all (default
-// 'all'). The chart-series bucketing adapts to the window: hourly for 24h,
+// GET /api/admin/reports/systems — aggregate signatures across every map
+// (personal + corp), optionally constrained to ?window=24h|week|month|year|all
+// (default 'all'). The chart-series bucketing adapts to the window: hourly for 24h,
 // daily for week/month, monthly for year, monthly-from-oldest for all.
 reportsRouter.get('/systems', async (req, res) => {
+  const scope = corpScopeFor(req);
+  if (scope === null) { res.status(403).json({ error: 'No corp affiliation' }); return; }
   const window = parseWindow(req.query.window);
   const interval = window.interval; // null when 'all'
 
-  // Predicate the four count queries share. Build once with the interval
-  // as $1 if applicable.
+  // Build per-query params. Corp scope param (if any) is always $1, so
+  // subsequent params start at $2. Each query rebuilds its own params
+  // array to keep indices straightforward.
+  const scopeParams: unknown[] = scope.param !== null ? [scope.param] : [];
+  const corpSql = scope.sql(1); // 'TRUE' for reports char; 'm.corp_id = $1' for admin
+  const buildBase = (extra: unknown[] = []) => [...scopeParams, ...extra];
+  const intervalIdx = scopeParams.length + 1;
+  const windowClause = interval ? `AND s.created_at >= NOW() - $${intervalIdx}::interval` : '';
   const windowParams: unknown[] = interval ? [interval] : [];
-  const windowClause = interval ? `AND s.created_at >= NOW() - $1::interval` : '';
 
   const [typeRows, whRows, totalRows] = await Promise.all([
     db.query<{ sig_type: string; cnt: number }>(`
@@ -603,28 +619,28 @@ reportsRouter.get('/systems', async (req, res) => {
       FROM map_signatures s
       JOIN map_systems sys ON sys.id = s.system_id
       JOIN maps         m  ON m.id   = sys.map_id
-      WHERE m.corp_id IS NOT NULL ${windowClause}
+      WHERE ${corpSql} ${windowClause}
       GROUP BY s.sig_type
-    `, windowParams),
+    `, buildBase(windowParams)),
     db.query<{ wh_type: string; cnt: number }>(`
       SELECT UPPER(s.wh_type) AS wh_type, COUNT(*)::int AS cnt
       FROM map_signatures s
       JOIN map_systems sys ON sys.id = s.system_id
       JOIN maps         m  ON m.id   = sys.map_id
-      WHERE m.corp_id IS NOT NULL
+      WHERE ${corpSql}
         AND s.sig_type = 'wormhole'
         AND COALESCE(NULLIF(TRIM(s.wh_type), ''), NULL) IS NOT NULL
         ${windowClause}
       GROUP BY UPPER(s.wh_type)
       ORDER BY cnt DESC, wh_type
-    `, windowParams),
+    `, buildBase(windowParams)),
     db.query<{ total: number }>(`
       SELECT COUNT(*)::int AS total
       FROM map_signatures s
       JOIN map_systems sys ON sys.id = s.system_id
       JOIN maps         m  ON m.id   = sys.map_id
-      WHERE m.corp_id IS NOT NULL ${windowClause}
-    `, windowParams),
+      WHERE ${corpSql} ${windowClause}
+    `, buildBase(windowParams)),
   ]);
 
   // Build the time series for the chart. Bucket size adapts to the window.
@@ -632,7 +648,7 @@ reportsRouter.get('/systems', async (req, res) => {
   let dailyTotals: Array<{ day: string; count: number }>;
 
   if (spec === 'all') {
-    // Span from the oldest corp-map sig, bucketed monthly. No-op if there
+    // Span from the oldest visible sig, bucketed monthly. No-op if there
     // aren't any sigs yet — return an empty series.
     const { rows: dailyRows } = await db.query<{ day: string; count: number }>(`
       WITH bounds AS (
@@ -640,7 +656,7 @@ reportsRouter.get('/systems', async (req, res) => {
         FROM map_signatures s
         JOIN map_systems sys ON sys.id = s.system_id
         JOIN maps         m  ON m.id   = sys.map_id
-        WHERE m.corp_id IS NOT NULL
+        WHERE ${corpSql}
       ),
       months AS (
         SELECT generate_series(
@@ -654,7 +670,7 @@ reportsRouter.get('/systems', async (req, res) => {
         FROM map_signatures s
         JOIN map_systems sys ON sys.id = s.system_id
         JOIN maps         m  ON m.id   = sys.map_id
-        WHERE m.corp_id IS NOT NULL
+        WHERE ${corpSql}
         GROUP BY 1
       )
       SELECT to_char(months.bucket, 'MM-YYYY') AS day,
@@ -662,13 +678,15 @@ reportsRouter.get('/systems', async (req, res) => {
       FROM months
       LEFT JOIN sig_counts ON sig_counts.bucket = months.bucket
       ORDER BY months.bucket
-    `);
+    `, scopeParams);
     dailyTotals = dailyRows.map((r) => ({ day: r.day, count: r.count }));
   } else {
+    // spec.count comes after the corp scope param (if any).
+    const countIdx = scopeParams.length + 1;
     const { rows: dailyRows } = await db.query<{ day: string; count: number }>(`
       WITH buckets AS (
         SELECT generate_series(
-          date_trunc('${spec.trunc}', NOW()) - ($1::int - 1) * INTERVAL '${spec.step}',
+          date_trunc('${spec.trunc}', NOW()) - ($${countIdx}::int - 1) * INTERVAL '${spec.step}',
           date_trunc('${spec.trunc}', NOW()),
           INTERVAL '${spec.step}'
         ) AS bucket
@@ -678,8 +696,8 @@ reportsRouter.get('/systems', async (req, res) => {
         FROM map_signatures s
         JOIN map_systems sys ON sys.id = s.system_id
         JOIN maps         m  ON m.id   = sys.map_id
-        WHERE m.corp_id IS NOT NULL
-          AND s.created_at >= date_trunc('${spec.trunc}', NOW()) - ($1::int - 1) * INTERVAL '${spec.step}'
+        WHERE ${corpSql}
+          AND s.created_at >= date_trunc('${spec.trunc}', NOW()) - ($${countIdx}::int - 1) * INTERVAL '${spec.step}'
         GROUP BY 1
       )
       SELECT to_char(buckets.bucket, '${spec.label}') AS day,
@@ -687,7 +705,7 @@ reportsRouter.get('/systems', async (req, res) => {
       FROM buckets
       LEFT JOIN sig_counts ON sig_counts.bucket = buckets.bucket
       ORDER BY buckets.bucket
-    `, [spec.count]);
+    `, [...scopeParams, spec.count]);
     dailyTotals = dailyRows.map((r) => ({ day: r.day, count: r.count }));
   }
 
@@ -709,7 +727,13 @@ reportsRouter.get('/systems', async (req, res) => {
 // GET /api/admin/reports/ghost-sites — every K-space system where a sig
 // ending in "Covert Research Facility" has been observed, with the
 // metadata captured at first sighting (sun type, planet/moon counts).
-reportsRouter.get('/ghost-sites', async (_req, res) => {
+// Cluster-wide intel — reports character only; corp admins can't see
+// this view (they'd only see noise from their own members anyway).
+reportsRouter.get('/ghost-sites', async (req, res) => {
+  if (!isReportsCharacter(req)) {
+    res.status(403).json({ error: 'Forbidden' });
+    return;
+  }
   const { rows } = await db.query(`
     SELECT
       eve_system_id      AS "eveSystemId",
