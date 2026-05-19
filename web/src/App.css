@@ -27,13 +27,32 @@
 
 /* ── Workspace sidebar ───────────────────────────────────── */
 .sidebar {
-  width: 20vw;
-  min-width: 200px;
-  max-width: 400px;
+  width: 18vw;
+  min-width: 180px;
+  max-width: 360px;
   background: #0d1117;
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
+  position: relative;
+}
+
+.sidebar__resize-handle {
+  position: absolute;
+  top: 0;
+  width: 6px;
+  height: 100%;
+  cursor: col-resize;
+  z-index: 10;
+  touch-action: none;
+}
+
+.sidebar__resize-handle--left  { right: -3px; }
+.sidebar__resize-handle--right { left: -3px; }
+
+.sidebar__resize-handle:hover,
+.sidebar__resize-handle:active {
+  background: rgba(122, 180, 240, 0.25);
 }
 
 .sidebar--left {

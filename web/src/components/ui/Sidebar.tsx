@@ -10,6 +10,19 @@ import { A0Pane } from './A0Pane';
 const SIDE_KEY      = 'nexum.sidebar.side';
 const COLLAPSED_KEY = 'nexum.sidebar.collapsed';
 const ORDER_KEY     = 'nexum.sidebar.order';
+const WIDTH_KEY     = 'nexum.sidebar.width';
+
+const MIN_WIDTH = 180;
+const MAX_WIDTH = 360;
+const DEFAULT_WIDTH = 240;
+
+function loadWidth(): number {
+  const raw = localStorage.getItem(WIDTH_KEY);
+  if (!raw) return DEFAULT_WIDTH;
+  const n = parseInt(raw, 10);
+  if (!Number.isFinite(n)) return DEFAULT_WIDTH;
+  return Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, n));
+}
 
 type Side    = 'left' | 'right';
 type PanelId = 'thera' | 'turnur' | 'a0';
@@ -46,12 +59,39 @@ export function Sidebar() {
     localStorage.getItem(COLLAPSED_KEY) === 'true',
   );
   const [order, setOrder] = useState<PanelId[]>(loadOrder);
+  const [width, setWidth] = useState<number>(loadWidth);
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
 
   useEffect(() => { localStorage.setItem(SIDE_KEY, side); }, [side]);
   useEffect(() => { localStorage.setItem(COLLAPSED_KEY, String(collapsed)); }, [collapsed]);
   useEffect(() => { localStorage.setItem(ORDER_KEY, JSON.stringify(order)); }, [order]);
+  useEffect(() => { localStorage.setItem(WIDTH_KEY, String(width)); }, [width]);
+
+  const startResize = (e: React.PointerEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const handle = e.currentTarget;
+    handle.setPointerCapture(e.pointerId);
+    const startX = e.clientX;
+    const startW = width;
+    const onMove = (ev: PointerEvent) => {
+      const dx = ev.clientX - startX;
+      // Drag direction is reversed when the sidebar lives on the right —
+      // dragging the handle leftward should widen the panel in that case.
+      const delta = side === 'left' ? dx : -dx;
+      setWidth(Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, startW + delta)));
+    };
+    const onUp = () => {
+      handle.removeEventListener('pointermove', onMove);
+      handle.removeEventListener('pointerup', onUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+    handle.addEventListener('pointermove', onMove);
+    handle.addEventListener('pointerup', onUp);
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  };
 
   const swapSide = () => setSide(s => (s === 'left' ? 'right' : 'left'));
 
@@ -86,7 +126,14 @@ export function Sidebar() {
   };
 
   return (
-    <aside className={`sidebar sidebar--${side}`}>
+    <aside className={`sidebar sidebar--${side}`} style={{ width }}>
+      <div
+        className={`sidebar__resize-handle sidebar__resize-handle--${side}`}
+        onPointerDown={startResize}
+        role="separator"
+        aria-orientation="vertical"
+        aria-label="Resize sidebar"
+      />
       <div className="sidebar__header">
         <button
           type="button"
