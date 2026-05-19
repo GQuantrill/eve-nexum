@@ -135,6 +135,11 @@ const FEATURE_SECTIONS: FeatureSection[] = [
         desc: 'Auto-flags systems with A0 (yellow) suns visible via ESI for capital-friendly skirmish planning.',
       },
       {
+        icon: '⚡',
+        title: 'Storm tracking',
+        desc: 'Active null-sec storms — Electric, Gamma, Exotic, Plasma — sourced from the community-maintained EveScout Rescue stormtrack feed surface as a colour-coded ⚡ on matching system nodes. Tooltip shows storm name, last report, and reporter. Refreshed every 30 minutes.',
+      },
+      {
         icon: '⚠',
         title: 'Proximity alerts',
         desc: 'Browser notification plus an audio ping when you\'re within a configurable number of jumps of an active incursion, pirate insurgency, or a sov-holding system whose corp / alliance you\'ve set to red. Persistent toolbar chip shows the nearest threat at a glance.',
