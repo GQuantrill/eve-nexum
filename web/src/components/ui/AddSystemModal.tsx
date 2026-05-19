@@ -276,7 +276,7 @@ export function AddSystemModal({ position, onClose, onSubmit }: Props) {
             >
               <span>{r.name}</span>
               <span className="search-results__class">
-                {alreadyOnMap ? 'on map' : r.systemClass}
+                {alreadyOnMap ? 'on map' : (r.regionName ?? r.systemClass)}
               </span>
             </li>
           );
