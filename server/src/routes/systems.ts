@@ -50,6 +50,58 @@ systemsRouter.get('/a0', async (_req, res) => {
   }
 });
 
+// Solar systems that spawn ice anomalies. Committed as a list of names
+// keyed by faction quarter so it's easy to maintain by hand; we resolve
+// the names to eve_system_ids once at first request and cache forever
+// (the list never changes mid-run). Null-sec coverage is intentionally
+// absent for now — see the _note field in the JSON.
+const ICE_PATH = join(process.cwd(), 'data', 'ice-belt-systems.json');
+let iceBeltNames: string[] = [];
+try {
+  const raw = JSON.parse(readFileSync(ICE_PATH, 'utf8')) as Record<string, unknown>;
+  iceBeltNames = Object.entries(raw)
+    .filter(([k, v]) => !k.startsWith('_') && Array.isArray(v))
+    .flatMap(([, v]) => v as string[]);
+  log.info(`Loaded ${iceBeltNames.length} ice-belt system names`);
+} catch (err) {
+  log.error('Failed to load ice-belt system list:', err);
+}
+
+let iceBeltIds: number[] | null = null;
+let iceBeltInflight: Promise<number[]> | null = null;
+
+async function loadIceBeltIds(): Promise<number[]> {
+  if (iceBeltIds) return iceBeltIds;
+  if (iceBeltInflight) return iceBeltInflight;
+  iceBeltInflight = (async () => {
+    if (iceBeltNames.length === 0) { iceBeltIds = []; iceBeltInflight = null; return []; }
+    const { rows } = await db.query<{ id: number; name: string }>(
+      `SELECT id, name FROM solar_systems WHERE name = ANY($1::text[])`,
+      [iceBeltNames],
+    );
+    iceBeltIds = rows.map((r) => r.id);
+    const unresolved = iceBeltNames.length - rows.length;
+    if (unresolved > 0) {
+      const got = new Set(rows.map((r) => r.name));
+      const missing = iceBeltNames.filter((n) => !got.has(n));
+      log.warn(`Ice-belt resolution: ${unresolved} unresolved name(s): ${missing.slice(0, 8).join(', ')}${missing.length > 8 ? '…' : ''}`);
+    }
+    iceBeltInflight = null;
+    return iceBeltIds;
+  })();
+  return iceBeltInflight;
+}
+
+// GET /api/systems/ice-belts — flat array of eve_system_ids that spawn ice
+systemsRouter.get('/ice-belts', async (_req, res) => {
+  try {
+    res.json(await loadIceBeltIds());
+  } catch (err) {
+    log.error('Ice-belt lookup failed:', err);
+    res.status(500).json({ error: 'Ice-belt list unavailable' });
+  }
+});
+
 // GET /api/systems/search?q=<query>
 systemsRouter.get('/search', async (req, res) => {
   const q = String(req.query.q ?? '').trim();

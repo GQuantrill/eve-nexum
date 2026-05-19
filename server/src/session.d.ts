@@ -14,6 +14,8 @@ declare module 'express-session' {
       compactMode: boolean;
       snapToGrid:  boolean;
       showMinimap: boolean;
+      uniformSize: boolean;
+      showStatics: boolean;
       panelOrder:  string[];
     };
   }

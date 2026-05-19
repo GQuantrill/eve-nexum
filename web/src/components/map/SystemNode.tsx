@@ -1,4 +1,4 @@
-import { memo, useMemo } from 'react';
+import { memo, useEffect, useMemo, useRef } from 'react';
 import { Handle, Position, useConnection } from '@xyflow/react';
 import type { NodeProps } from '@xyflow/react';
 import type { MapSystem } from '../../types';
@@ -12,6 +12,7 @@ import { useInsurgency, findInsurgency } from '../../hooks/useInsurgency';
 import { useStorms, findStorm } from '../../hooks/useStorms';
 import { useScoutConnections, findScoutConnections } from '../../hooks/useScoutConnections';
 import { useA0Systems } from '../../hooks/useA0Systems';
+import { useIceBeltSystems, hasIceBelt } from '../../hooks/useIceBeltSystems';
 import { useCurrentHourKills } from '../../hooks/useCurrentHourKills';
 import { useNow30s } from '../../hooks/useNow30s';
 import { useStaleThreshold } from '../../hooks/useStaleThreshold';
@@ -25,6 +26,12 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
   const color = CLASS_COLORS[sys.systemClass];
   const selectSystem    = useMapStore((s) => s.selectSystem);
   const compactMode     = useMapStore((s) => s.compactMode);
+  const uniformSize     = useMapStore((s) => s.uniformSize);
+  const showStatics     = useMapStore((s) => s.showStatics);
+  const uniformWidth    = useMapStore((s) => s.uniformWidth);
+  const uniformHeight   = useMapStore((s) => s.uniformHeight);
+  const reportNodeSize  = useMapStore((s) => s.reportNodeSize);
+  const forgetNodeSize  = useMapStore((s) => s.forgetNodeSize);
   const easyConnect     = useMapStore((s) => s.easyConnect);
   const currentSystemId = useMapStore((s) => s.currentSystemId);
   const isCurrent       = sys.id === currentSystemId;
@@ -59,6 +66,8 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
   const a0Systems       = useA0Systems();
   const a0Ids           = useMemo(() => new Set(a0Systems.map(s => s.id)), [a0Systems]);
   const isA0            = sys.eveSystemId !== null && a0Ids.has(sys.eveSystemId);
+  const iceBeltSystems  = useIceBeltSystems();
+  const isIceBelt       = hasIceBelt(iceBeltSystems, sys.eveSystemId);
   const allKills        = useCurrentHourKills();
   const myKills         = sys.eveSystemId !== null ? allKills.get(sys.eveSystemId) : undefined;
   const hotKills        = !!myKills && myKills.shipKills + myKills.podKills > 0;
@@ -80,10 +89,37 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
       })();
   const isTarget        = connection.inProgress && connection.fromNode?.id !== sys.id;
 
+  // Measure the node so the map store can compute the largest natural
+  // width/height across all visible nodes — that becomes the min size
+  // applied to everyone when uniform mode is on.
+  const nodeRef = useRef<HTMLDivElement | null>(null);
+  // Systems with statics (WH chains) can be 6× taller than a K-space
+  // node — exclude them from the height max so a single Drifter doesn't
+  // force every node on the map to be hundreds of pixels tall. When the
+  // user has hidden statics on the map, the WH nodes shrink to the same
+  // shape as K-space nodes, so they re-enter the height computation.
+  const countHeight = sys.statics.length === 0 || !showStatics;
+  useEffect(() => {
+    const el = nodeRef.current;
+    if (!el) return;
+    const obs = new ResizeObserver((entries) => {
+      const r = entries[0]?.contentRect;
+      if (!r) return;
+      reportNodeSize(sys.id, r.width, r.height, countHeight);
+    });
+    obs.observe(el);
+    return () => { obs.disconnect(); forgetNodeSize(sys.id); };
+  }, [sys.id, countHeight, reportNodeSize, forgetNodeSize]);
+
   return (
     <div
-      className={`system-node${sys.locked ? ' nopan' : ''}${isTarget ? ' system-node--connect-target' : ''}${isStale ? ' system-node--stale' : ''}${isSovHostile ? ' system-node--sov-hostile' : ''}${isSovBlue ? ' system-node--sov-blue' : ''}`}
-      style={{ '--class-color': color } as React.CSSProperties}
+      ref={nodeRef}
+      className={`system-node${sys.locked ? ' nopan' : ''}${isTarget ? ' system-node--connect-target' : ''}${isStale ? ' system-node--stale' : ''}${isSovHostile ? ' system-node--sov-hostile' : ''}${isSovBlue ? ' system-node--sov-blue' : ''}${uniformSize ? ' system-node--uniform' : ''}${compactMode ? ' system-node--compact' : ''}`}
+      style={{
+        '--class-color': color,
+        ...(uniformSize && uniformWidth  > 0 ? { minWidth:  uniformWidth  } : null),
+        ...(uniformSize && uniformHeight > 0 ? { minHeight: uniformHeight } : null),
+      } as React.CSSProperties}
       data-selected={selected}
       data-status={sys.status}
       data-home={sys.isHome}
@@ -161,6 +197,12 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
               <span className="system-node__a0-tooltip">A0 sun</span>
             </span>
           )}
+          {isIceBelt && (
+            <span className="system-node__ice-icon">
+              ❄
+              <span className="system-node__ice-tooltip">Ice belt system</span>
+            </span>
+          )}
           {incursion && (
             <span className="system-node__incursion-icon">
               ⚠
@@ -215,7 +257,7 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
         </div>
       )}
 
-      {!compactMode && sys.statics.length > 0 && (
+      {!compactMode && showStatics && sys.statics.length > 0 && (
         <div className="system-node__statics">
           <div className="title">Statics</div>
           {sys.statics.map((s) => {

@@ -6,6 +6,28 @@ import type { WormholeMap, MapSystem, MapConnection, SystemClass, WormholeEffect
 
 // Debounce position saves — fires max once per 500 ms per system
 const moveTimers = new Map<string, ReturnType<typeof setTimeout>>();
+// Per-node measured dimensions, kept out of reactive state so individual
+// ResizeObserver fires don't trigger re-renders across the whole map.
+// `countHeight` is false for systems with statics — those WH systems can
+// be 6× taller than a K-space node and would otherwise force every node
+// to that height in uniform mode. The width max still considers them so
+// long J-codes / station names participate as expected.
+const nodeSizes = new Map<string, { w: number; h: number; countHeight: boolean }>();
+function recomputeUniformMax(): { w: number; h: number } {
+  let w = 0, h = 0, hAll = 0;
+  let anyHeightEligible = false;
+  for (const s of nodeSizes.values()) {
+    if (s.w > w) w = s.w;
+    if (s.h > hAll) hAll = s.h;
+    if (s.countHeight) {
+      anyHeightEligible = true;
+      if (s.h > h) h = s.h;
+    }
+  }
+  // Fall back to the global max if every node has statics — without this
+  // the height would lock at 0 and the inline minHeight would never apply.
+  return { w, h: anyHeightEligible ? h : hAll };
+}
 // Debounce map name saves — keyed by mapId so two tabs renaming two different
 // maps don't clobber each other through a shared timer slot.
 const nameTimers = new Map<string, ReturnType<typeof setTimeout>>();
@@ -69,6 +91,17 @@ interface MapStore {
   snapToGrid: boolean;
   compactMode: boolean;
   showMinimap: boolean;
+  uniformSize: boolean;
+  showStatics: boolean;
+  trackJumps: boolean;
+  // Largest natural node dimensions seen so far — used as the min-width /
+  // min-height for every node when uniformSize is on. Each SystemNode
+  // reports its rendered size via reportNodeSize; the store keeps a Map
+  // keyed by node id and recomputes the max on every update.
+  uniformWidth:  number;
+  uniformHeight: number;
+  reportNodeSize: (id: string, width: number, height: number, countHeight: boolean) => void;
+  forgetNodeSize: (id: string) => void;
   easyConnect: boolean;
   mapOptionsOpen: boolean;
   edgeStyle: 'bezier' | 'straight' | 'smoothstep';
@@ -82,9 +115,12 @@ interface MapStore {
   undo: () => Promise<void>;
 
   panelOrder: string[];
-  applyPreferences: (prefs: { compactMode: boolean; snapToGrid: boolean; showMinimap: boolean; panelOrder: string[] }) => void;
+  applyPreferences: (prefs: { compactMode: boolean; snapToGrid: boolean; showMinimap: boolean; uniformSize: boolean; showStatics: boolean; panelOrder: string[] }) => void;
   setPanelOrder: (order: string[]) => void;
   setShowMinimap: (v: boolean) => void;
+  setUniformSize: (v: boolean) => void;
+  setShowStatics: (v: boolean) => void;
+  setTrackJumps: (v: boolean) => void;
   setEasyConnect: (v: boolean) => void;
   setMapOptionsOpen: (v: boolean) => void;
   setEdgeStyle: (v: MapStore['edgeStyle']) => void;
@@ -273,6 +309,11 @@ export const useMapStore = create<MapStore>()((set, get) => {
     snapToGrid: false,
     compactMode: false,
     showMinimap: true,
+    uniformSize: false,
+    showStatics: true,
+    trackJumps:  (typeof localStorage !== 'undefined' ? localStorage.getItem('nexum.trackJumps') : null) !== 'false',
+    uniformWidth:  0,
+    uniformHeight: 0,
     easyConnect: false,
     mapOptionsOpen: false,
     edgeStyle: 'bezier',
@@ -291,7 +332,7 @@ export const useMapStore = create<MapStore>()((set, get) => {
       await applyUndo(cmd);
     },
 
-    applyPreferences: ({ compactMode, snapToGrid, showMinimap, panelOrder }) => {
+    applyPreferences: ({ compactMode, snapToGrid, showMinimap, uniformSize, showStatics, panelOrder }) => {
       // Whitelist of valid panel keys. `standings` was briefly a panel here
       // — kept in the filter so any persisted occurrence is silently
       // dropped on load now that standings live inline in the sov section.
@@ -300,7 +341,7 @@ export const useMapStore = create<MapStore>()((set, get) => {
         ...panelOrder.filter((p) => all.includes(p)),
         ...all.filter((p) => !panelOrder.includes(p)),
       ];
-      set({ compactMode, snapToGrid, showMinimap, panelOrder: merged });
+      set({ compactMode, snapToGrid, showMinimap, uniformSize, showStatics, panelOrder: merged });
     },
 
     setPanelOrder: (order) => {
@@ -387,6 +428,46 @@ export const useMapStore = create<MapStore>()((set, get) => {
     setShowMinimap: (v) => {
       set({ showMinimap: v });
       api('/auth/preferences', { method: 'PATCH', body: JSON.stringify({ showMinimap: v }) }).catch(console.error);
+    },
+
+    setUniformSize: (v) => {
+      set({ uniformSize: v });
+      api('/auth/preferences', { method: 'PATCH', body: JSON.stringify({ uniformSize: v }) }).catch(console.error);
+    },
+
+    setShowStatics: (v) => {
+      set({ showStatics: v });
+      api('/auth/preferences', { method: 'PATCH', body: JSON.stringify({ showStatics: v }) }).catch(console.error);
+    },
+
+    setTrackJumps: (v) => {
+      set({ trackJumps: v });
+      localStorage.setItem('nexum.trackJumps', String(v));
+    },
+
+    reportNodeSize: (id, width, height, countHeight) => {
+      // Round + dedupe: ResizeObserver fires sub-pixel updates we don't
+      // care about; ignore changes smaller than 1px on either axis and a
+      // flag change that doesn't move dimensions.
+      const prev = nodeSizes.get(id);
+      if (prev
+          && Math.abs(prev.w - width) < 1
+          && Math.abs(prev.h - height) < 1
+          && prev.countHeight === countHeight) return;
+      nodeSizes.set(id, { w: width, h: height, countHeight });
+      const { w, h } = recomputeUniformMax();
+      const cur = get();
+      if (cur.uniformWidth !== w || cur.uniformHeight !== h) {
+        set({ uniformWidth: w, uniformHeight: h });
+      }
+    },
+    forgetNodeSize: (id) => {
+      if (!nodeSizes.delete(id)) return;
+      const { w, h } = recomputeUniformMax();
+      const cur = get();
+      if (cur.uniformWidth !== w || cur.uniformHeight !== h) {
+        set({ uniformWidth: w, uniformHeight: h });
+      }
     },
 
     setEasyConnect: (v) => set({ easyConnect: v }),
