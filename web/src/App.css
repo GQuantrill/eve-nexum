@@ -964,7 +964,14 @@
 .system-node__header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.system-node__meta-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   margin-bottom: 4px;
 }
 
@@ -989,8 +996,10 @@
 }
 
 .system-node__home-icon {
-  font-size: 13px;
   color: #f0c040;
+  margin-right: 4px;
+  display: inline-block;
+  vertical-align: middle;
 }
 
 .system-node__current-dot {
@@ -1056,8 +1065,6 @@
 }
 
 .system-node__name {
-  display: flex;
-  align-items: center;
   font-size: 13px;
   font-weight: 600;
   color: #e2e8f8;
@@ -1113,8 +1120,8 @@
 .system-node__sov-logo-wrap {
   position: relative;
   display: flex;
-  justify-content: flex-end;
-  padding: 2px 6px 4px;
+  align-items: center;
+  margin-left: auto;
 }
 
 .system-node__sov-logo {
@@ -1284,6 +1291,52 @@
 }
 
 .react-flow__node:has(.system-node__incursion-icon:hover) {
+  z-index: 9999 !important;
+}
+
+.system-node__storm-icon {
+  font-size: 13px;
+  cursor: default;
+  position: relative;
+  line-height: 1;
+}
+
+.system-node__storm-icon--electric { color: #5a9af8; filter: drop-shadow(0 0 3px #5a9af888); }
+.system-node__storm-icon--gamma    { color: #8ad08a; filter: drop-shadow(0 0 3px #8ad08a88); }
+.system-node__storm-icon--exotic   { color: #c084fc; filter: drop-shadow(0 0 3px #c084fc88); }
+.system-node__storm-icon--plasma   { color: #f5793a; filter: drop-shadow(0 0 3px #f5793a88); }
+.system-node__storm-icon--unknown  { color: #c0ccde; }
+
+.system-node__storm-tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #111827;
+  border: 1px solid #2e3f60;
+  border-radius: 6px;
+  padding: 5px 10px;
+  white-space: nowrap;
+  font-size: 13px;
+  color: #c8d4f0;
+  font-weight: 500;
+  pointer-events: none;
+  z-index: 9999;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.system-node__storm-tooltip__title {
+  color: #e2e8f8;
+  font-weight: 600;
+}
+
+.system-node__storm-icon:hover .system-node__storm-tooltip {
+  display: flex;
+}
+
+.react-flow__node:has(.system-node__storm-icon:hover) {
   z-index: 9999 !important;
 }
 

@@ -9,6 +9,7 @@ import { useStandings } from '../../hooks/useStandings';
 import { useEsiSystem } from '../../hooks/useEsiSystem';
 import { useIncursions, findIncursion } from '../../hooks/useIncursions';
 import { useInsurgency, findInsurgency } from '../../hooks/useInsurgency';
+import { useStorms, findStorm } from '../../hooks/useStorms';
 import { useScoutConnections, findScoutConnections } from '../../hooks/useScoutConnections';
 import { useA0Systems } from '../../hooks/useA0Systems';
 import { useCurrentHourKills } from '../../hooks/useCurrentHourKills';
@@ -51,6 +52,8 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
   const incursion       = findIncursion(incursions, sys.eveSystemId);
   const insurgencies    = useInsurgency();
   const insurgency      = findInsurgency(insurgencies, sys.eveSystemId);
+  const storms          = useStorms();
+  const storm           = findStorm(storms, sys.eveSystemId);
   const scoutAll        = useScoutConnections();
   const scoutMatches    = findScoutConnections(scoutAll, sys.eveSystemId);
   const a0Systems       = useA0Systems();
@@ -112,21 +115,69 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
       )}
 
       <div className="system-node__header">
-        <span className="system-node__class-badge">{CLASS_LABELS[sys.systemClass]}</span>
+        {isCurrent && <span className="system-node__current-dot" />}
+        {sys.isHome && (
+          <svg
+            className="system-node__home-icon"
+            viewBox="0 0 16 16"
+            width="13"
+            height="13"
+            aria-label="Home system"
+          >
+            <path d="M8 2 L2 7 L2 14 L6 14 L6 10 L10 10 L10 14 L14 14 L14 7 Z" fill="currentColor" />
+          </svg>
+        )}
+        <span className="system-node__name">{sys.name || 'Unknown'}</span>
         {esiSys?.securityStatus != null && (
           <span className="system-node__truesec" style={{ color: truesecColor(esiSys.securityStatus) }}>
             {esiSys.securityStatus.toFixed(1)}
           </span>
         )}
+        {sov?.logoUrl && (
+          <div className="system-node__sov-logo-wrap">
+            <img className="system-node__sov-logo" src={sov.logoUrl} alt={sov.controller} />
+            <span className="system-node__sov-tooltip">
+              {sov.controller}
+              {sov.ticker && <span className="system-node__sov-tooltip__ticker">[{sov.ticker}]</span>}
+            </span>
+          </div>
+        )}
+      </div>
+
+      <div className="system-node__meta-row">
+        <span className="system-node__class-badge">{CLASS_LABELS[sys.systemClass]}</span>
         <div className="system-node__icons">
-          {sys.locked && <span className="system-node__lock-icon">🔒</span>}
-          {sys.isHome && <span className="system-node__home-icon">⌂</span>}
+          {hotKills && myKills && (
+            <span className="system-node__kill-icon">
+              ⚔
+              <span className="system-node__kill-tooltip">
+                {myKills.shipKills} ship · {myKills.podKills} pod kills this hour
+              </span>
+            </span>
+          )}
+          {isA0 && (
+            <span className="system-node__a0-icon">
+              ★
+              <span className="system-node__a0-tooltip">A0 sun</span>
+            </span>
+          )}
           {incursion && (
             <span className="system-node__incursion-icon">
               ⚠
               <span className="system-node__incursion-tooltip">Incursion System</span>
             </span>
           )}
+          {storm && (
+            <span className={`system-node__storm-icon system-node__storm-icon--${storm.stormType}`}>
+              ⚡
+              <span className="system-node__storm-tooltip">
+                <span className="system-node__storm-tooltip__title">{storm.stormName} storm</span>
+                <span>Last report: {storm.lastReport}</span>
+                {storm.reportedBy && <span>By: {storm.reportedBy}</span>}
+              </span>
+            </span>
+          )}
+          {sys.locked && <span className="system-node__lock-icon">🔒</span>}
           {insurgency && (
             <span className="system-node__insurgency-icon">
               ☠
@@ -137,20 +188,6 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
             <span className="system-node__scout-icon">
               ✦
               <span className="system-node__scout-tooltip">{scoutLabel}</span>
-            </span>
-          )}
-          {isA0 && (
-            <span className="system-node__a0-icon">
-              ★
-              <span className="system-node__a0-tooltip">A0 sun</span>
-            </span>
-          )}
-          {hotKills && myKills && (
-            <span className="system-node__kill-icon">
-              ⚔
-              <span className="system-node__kill-tooltip">
-                {myKills.shipKills} ship · {myKills.podKills} pod kills this hour
-              </span>
             </span>
           )}
           {sys.effect !== 'none' && (
@@ -170,11 +207,6 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
             </span>
           )}
         </div>
-      </div>
-
-      <div className="system-node__name">
-        {isCurrent && <span className="system-node__current-dot" />}
-        {sys.name || 'Unknown'}
       </div>
 
       {!compactMode && sys.regionName && (
@@ -204,16 +236,6 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
               </WHTypeInfo>
             );
           })}
-        </div>
-      )}
-
-      {!compactMode && sov?.logoUrl && (
-        <div className="system-node__sov-logo-wrap">
-          <img className="system-node__sov-logo" src={sov.logoUrl} alt={sov.controller} />
-          <span className="system-node__sov-tooltip">
-            {sov.controller}
-            {sov.ticker && <span className="system-node__sov-tooltip__ticker">[{sov.ticker}]</span>}
-          </span>
         </div>
       )}
 
