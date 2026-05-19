@@ -103,9 +103,17 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
     const el = nodeRef.current;
     if (!el) return;
     const obs = new ResizeObserver((entries) => {
-      const r = entries[0]?.contentRect;
-      if (!r) return;
-      reportNodeSize(sys.id, r.width, r.height, countHeight);
+      const entry = entries[0];
+      if (!entry) return;
+      // Use the border-box (= offsetWidth/Height) so minWidth/minHeight
+      // applied to *this* element actually engages. contentRect excludes
+      // the node's 8–12px padding + 1.5px border, so reporting that
+      // value back as the min would always be smaller than the rendered
+      // size and the constraint would be a no-op.
+      const bb = entry.borderBoxSize?.[0];
+      const w = bb ? bb.inlineSize : el.offsetWidth;
+      const h = bb ? bb.blockSize  : el.offsetHeight;
+      reportNodeSize(sys.id, w, h, countHeight);
     });
     obs.observe(el);
     return () => { obs.disconnect(); forgetNodeSize(sys.id); };

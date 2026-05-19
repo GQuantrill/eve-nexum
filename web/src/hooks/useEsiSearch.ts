@@ -6,6 +6,7 @@ export interface SystemSearchResult {
   name: string;
   security: number;
   systemClass: string;
+  regionName?: string | null;
 }
 
 export interface SystemDetail extends SystemSearchResult {
