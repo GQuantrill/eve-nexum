@@ -3,6 +3,7 @@ import { useScoutConnections } from '../../hooks/useScoutConnections';
 import { useCharacterLocation } from '../../hooks/useCharacterLocation';
 import { useRoute } from '../../hooks/useRoute';
 import { setWaypoint, RouteSquares, KSPACE_CLASSES } from './routeUi';
+import { truesecColor } from '../../utils/truesec';
 
 interface Props {
   scoutSystem: 'Thera' | 'Turnur';
@@ -20,6 +21,20 @@ const SIZE_LABELS: Record<string, string> = {
 function isWormholeClass(cls: string | null): boolean {
   if (!cls) return false;
   return /^c\d+$/i.test(cls) || cls.toLowerCase() === 'thera' || cls.toLowerCase() === 'drifter';
+}
+
+// Colour the HS / LS / NS class chip the same way truesec values are
+// coloured elsewhere — picks a representative security inside each band
+// so the visual matches what you'd see on a system node. Wormhole /
+// Thera / Drifter / Pochven keep their default styling (they don't have
+// a real security number to map from).
+function secClassColor(cls: string | null): string | undefined {
+  if (!cls) return undefined;
+  const upper = cls.toUpperCase();
+  if (upper === 'HS') return truesecColor(0.7);
+  if (upper === 'LS') return truesecColor(0.3);
+  if (upper === 'NS') return truesecColor(0.0);
+  return undefined;
 }
 
 function formatRemaining(hours: number): string {
@@ -46,20 +61,16 @@ export function ScoutConnectionsPane({ scoutSystem }: Props) {
   const targetIds = useMemo(() => filtered.map(c => c.inSystemId), [filtered]);
   const routes = useRoute(canRoute ? location.system!.eveSystemId : null, targetIds);
 
+  // Sort by remaining time descending — freshest holes at the top, the
+  // soon-to-collapse ones drop to the bottom. Name is a stable tiebreaker.
   const sorted = useMemo(() => {
     const arr = [...filtered];
-    if (!canRoute) {
-      arr.sort((a, b) => a.inSystemName.localeCompare(b.inSystemName));
-      return arr;
-    }
     arr.sort((a, b) => {
-      const ja = routes[String(a.inSystemId)]?.jumps ?? Infinity;
-      const jb = routes[String(b.inSystemId)]?.jumps ?? Infinity;
-      if (ja !== jb) return ja - jb;
+      if (a.remainingHours !== b.remainingHours) return b.remainingHours - a.remainingHours;
       return a.inSystemName.localeCompare(b.inSystemName);
     });
     return arr;
-  }, [filtered, routes, canRoute]);
+  }, [filtered]);
 
   function toggleExpanded(id: string) {
     setExpanded(prev => {
@@ -87,7 +98,12 @@ export function ScoutConnectionsPane({ scoutSystem }: Props) {
             <div className="scout-row__sys">
               <span className="scout-row__name">{c.inSystemName}</span>
               {c.inSystemClass && (
-                <span className="scout-row__class">{c.inSystemClass.toUpperCase()}</span>
+                <span
+                  className="scout-row__class"
+                  style={{ color: secClassColor(c.inSystemClass) }}
+                >
+                  {c.inSystemClass.toUpperCase()}
+                </span>
               )}
               <span className="scout-row__time">{formatRemaining(c.remainingHours)}</span>
             </div>

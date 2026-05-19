@@ -30,7 +30,7 @@ function MapApp() {
   const userId = user?.id;
 
   useEffect(() => {
-    if (user) applyPreferences({ compactMode: user.compactMode, snapToGrid: user.snapToGrid, showMinimap: user.showMinimap, panelOrder: user.panelOrder });
+    if (user) applyPreferences({ compactMode: user.compactMode, snapToGrid: user.snapToGrid, showMinimap: user.showMinimap, uniformSize: user.uniformSize, showStatics: user.showStatics, panelOrder: user.panelOrder });
     loadMaps();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId, loadMaps, applyPreferences]);

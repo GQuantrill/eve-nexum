@@ -193,8 +193,8 @@ authRouter.get('/callback', async (req, res) => {
     await seedDemoMap(userId);
 
     // Snapshot prefs into the session so /auth/me can answer without a DB call.
-    const prefRows = await db.query<{ compact_mode: boolean; snap_to_grid: boolean; show_minimap: boolean; panel_order: string[] }>(
-      `SELECT compact_mode, snap_to_grid, show_minimap, panel_order FROM users WHERE id = $1`,
+    const prefRows = await db.query<{ compact_mode: boolean; snap_to_grid: boolean; show_minimap: boolean; uniform_size: boolean; show_statics: boolean; panel_order: string[] }>(
+      `SELECT compact_mode, snap_to_grid, show_minimap, uniform_size, show_statics, panel_order FROM users WHERE id = $1`,
       [userId],
     );
     const p = prefRows.rows[0];
@@ -214,6 +214,8 @@ authRouter.get('/callback', async (req, res) => {
       compactMode: p?.compact_mode ?? false,
       snapToGrid:  p?.snap_to_grid ?? false,
       showMinimap: p?.show_minimap ?? true,
+      uniformSize: p?.uniform_size ?? false,
+      showStatics: p?.show_statics ?? true,
       panelOrder:  p?.panel_order  ?? ['notes', 'signatures'],
     };
 
@@ -259,8 +261,8 @@ authRouter.get('/me', async (req, res) => {
   let prefs = req.session.prefs;
   let role  = req.session.role ?? 'readonly';
   if (!prefs) {
-    const { rows } = await db.query<{ compact_mode: boolean; snap_to_grid: boolean; show_minimap: boolean; panel_order: string[]; role: string }>(
-      `SELECT compact_mode, snap_to_grid, show_minimap, panel_order, role FROM users WHERE id = $1`,
+    const { rows } = await db.query<{ compact_mode: boolean; snap_to_grid: boolean; show_minimap: boolean; uniform_size: boolean; show_statics: boolean; panel_order: string[]; role: string }>(
+      `SELECT compact_mode, snap_to_grid, show_minimap, uniform_size, show_statics, panel_order, role FROM users WHERE id = $1`,
       [req.session.userId],
     );
     const row = rows[0];
@@ -268,6 +270,8 @@ authRouter.get('/me', async (req, res) => {
       compactMode: row?.compact_mode ?? false,
       snapToGrid:  row?.snap_to_grid ?? false,
       showMinimap: row?.show_minimap ?? true,
+      uniformSize: row?.uniform_size ?? false,
+      showStatics: row?.show_statics ?? true,
       panelOrder:  row?.panel_order  ?? ['notes', 'signatures'],
     };
     role = (row?.role as 'admin' | 'full' | 'edit' | 'readonly') ?? 'readonly';
@@ -285,6 +289,11 @@ authRouter.get('/me', async (req, res) => {
       compactMode:   prefs.compactMode,
       snapToGrid:    prefs.snapToGrid,
       showMinimap:   prefs.showMinimap,
+      uniformSize:   prefs.uniformSize ?? false,
+      // Default to true for sessions that predate this field — the cached
+      // prefs object on disk doesn't carry it, so the literal value would
+      // be undefined and the UI would mistakenly read it as "off".
+      showStatics:   prefs.showStatics ?? true,
       panelOrder:    prefs.panelOrder,
       canViewReports: config.reportsCharId !== null && req.session.characterId === config.reportsCharId,
     },
@@ -297,13 +306,15 @@ const MAX_PANEL_KEY_LEN = 64;
 
 authRouter.patch('/preferences', async (req, res) => {
   if (!req.session.userId) { res.status(401).json({ error: 'Not authenticated' }); return; }
-  const { compactMode, snapToGrid, showMinimap, panelOrder } = req.body as { compactMode?: boolean; snapToGrid?: boolean; showMinimap?: boolean; panelOrder?: unknown };
+  const { compactMode, snapToGrid, showMinimap, uniformSize, showStatics, panelOrder } = req.body as { compactMode?: boolean; snapToGrid?: boolean; showMinimap?: boolean; uniformSize?: boolean; showStatics?: boolean; panelOrder?: unknown };
 
   const sets: string[] = [];
   const vals: unknown[] = [];
   if (typeof compactMode === 'boolean') { sets.push(`compact_mode = $${vals.length + 1}`); vals.push(compactMode); }
   if (typeof snapToGrid  === 'boolean') { sets.push(`snap_to_grid = $${vals.length + 1}`); vals.push(snapToGrid); }
   if (typeof showMinimap === 'boolean') { sets.push(`show_minimap = $${vals.length + 1}`); vals.push(showMinimap); }
+  if (typeof uniformSize === 'boolean') { sets.push(`uniform_size = $${vals.length + 1}`); vals.push(uniformSize); }
+  if (typeof showStatics === 'boolean') { sets.push(`show_statics = $${vals.length + 1}`); vals.push(showStatics); }
   if (panelOrder !== undefined) {
     if (!Array.isArray(panelOrder) || panelOrder.length > MAX_PANELS ||
         !panelOrder.every((p) => typeof p === 'string' && p.length > 0 && p.length <= MAX_PANEL_KEY_LEN)) {
@@ -325,6 +336,8 @@ authRouter.patch('/preferences', async (req, res) => {
     if (typeof compactMode === 'boolean') req.session.prefs.compactMode = compactMode;
     if (typeof snapToGrid  === 'boolean') req.session.prefs.snapToGrid  = snapToGrid;
     if (typeof showMinimap === 'boolean') req.session.prefs.showMinimap = showMinimap;
+    if (typeof uniformSize === 'boolean') req.session.prefs.uniformSize = uniformSize;
+    if (typeof showStatics === 'boolean') req.session.prefs.showStatics = showStatics;
     if (Array.isArray(panelOrder))        req.session.prefs.panelOrder  = panelOrder as string[];
   }
 

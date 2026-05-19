@@ -107,6 +107,10 @@ export function MapSidebar() {
   const setCompactMode   = useMapStore((s) => s.setCompactMode);
   const showMinimap      = useMapStore((s) => s.showMinimap);
   const setShowMinimap   = useMapStore((s) => s.setShowMinimap);
+  const uniformSize      = useMapStore((s) => s.uniformSize);
+  const setUniformSize   = useMapStore((s) => s.setUniformSize);
+  const showStatics      = useMapStore((s) => s.showStatics);
+  const setShowStatics   = useMapStore((s) => s.setShowStatics);
   const easyConnect      = useMapStore((s) => s.easyConnect);
   const setEasyConnect   = useMapStore((s) => s.setEasyConnect);
   const mapOptionsOpen   = useMapStore((s) => s.mapOptionsOpen);
@@ -196,6 +200,19 @@ export function MapSidebar() {
           </div>
 
           <div className="map-sidebar__row">
+            <label className="map-sidebar__label">Minimap</label>
+            <button
+              className={`toolbar__toggle${showMinimap ? ' toolbar__toggle--on' : ''}`}
+              onClick={() => setShowMinimap(!showMinimap)}
+              aria-pressed={showMinimap}
+            >
+              {showMinimap ? 'On' : 'Off'}
+            </button>
+          </div>
+        </CollapsibleSection>
+
+        <CollapsibleSection title="System Options" storageKey="nexum.mapSidebar.systemOptions">
+          <div className="map-sidebar__row">
             <label className="map-sidebar__label">Compact</label>
             <button
               className={`toolbar__toggle${compactMode ? ' toolbar__toggle--on' : ''}`}
@@ -207,13 +224,24 @@ export function MapSidebar() {
           </div>
 
           <div className="map-sidebar__row">
-            <label className="map-sidebar__label">Minimap</label>
+            <label className="map-sidebar__label">Uniform Size</label>
             <button
-              className={`toolbar__toggle${showMinimap ? ' toolbar__toggle--on' : ''}`}
-              onClick={() => setShowMinimap(!showMinimap)}
-              aria-pressed={showMinimap}
+              className={`toolbar__toggle${uniformSize ? ' toolbar__toggle--on' : ''}`}
+              onClick={() => setUniformSize(!uniformSize)}
+              aria-pressed={uniformSize}
             >
-              {showMinimap ? 'On' : 'Off'}
+              {uniformSize ? 'On' : 'Off'}
+            </button>
+          </div>
+
+          <div className="map-sidebar__row">
+            <label className="map-sidebar__label">Show Static WHs</label>
+            <button
+              className={`toolbar__toggle${showStatics ? ' toolbar__toggle--on' : ''}`}
+              onClick={() => setShowStatics(!showStatics)}
+              aria-pressed={showStatics}
+            >
+              {showStatics ? 'On' : 'Off'}
             </button>
           </div>
 

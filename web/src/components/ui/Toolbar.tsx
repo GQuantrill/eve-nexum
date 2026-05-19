@@ -156,6 +156,8 @@ export function Toolbar() {
   const deleteMap       = useMapStore((s) => s.deleteMap);
   const mapOptionsOpen  = useMapStore((s) => s.mapOptionsOpen);
   const setMapOptionsOpen = useMapStore((s) => s.setMapOptionsOpen);
+  const trackJumps      = useMapStore((s) => s.trackJumps);
+  const setTrackJumps   = useMapStore((s) => s.setTrackJumps);
 
   const atMapLimit      = maps.filter((m) => !m.isCorpMap).length >= maxMaps;
   const atCorpMapLimit  = corpMapCount >= maxCorpMaps;
@@ -309,6 +311,18 @@ export function Toolbar() {
         aria-pressed={mapOptionsOpen}
       >
         Map Options
+      </button>
+
+      <button
+        className={`toolbar__toggle${trackJumps ? ' toolbar__toggle--on' : ''}`}
+        onClick={() => setTrackJumps(!trackJumps)}
+        aria-pressed={trackJumps}
+        title={trackJumps
+          ? 'Tracking jumps: new systems are added to the map as you move'
+          : 'Not tracking jumps: only existing systems on the map get the you-are-here indicator'}
+      >
+        <span className={`toolbar__toggle-led${trackJumps ? ' toolbar__toggle-led--on' : ' toolbar__toggle-led--off'}`} />
+        Track Jumps
       </button>
 
       <div className="toolbar__server-status">

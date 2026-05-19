@@ -54,6 +54,7 @@ export function useLocationTracking(enabled: boolean) {
 
     let mapSystemId: string;
     const existing = map.systems.find((s) => s.eveSystemId === system.eveSystemId);
+    const trackJumps = useMapStore.getState().trackJumps;
     if (existing) {
       mapSystemId = existing.id;
     } else {
@@ -61,7 +62,8 @@ export function useLocationTracking(enabled: boolean) {
       // includes admins, who can still place systems manually via the
       // canvas but shouldn't sprout them just by hopping through EVE.
       // Readonly / no-topology-permission users are also blocked here.
-      if (map.locked || !canEdit) {
+      // Track-jumps off explicitly opts the user out of the auto-add.
+      if (!trackJumps || map.locked || !canEdit) {
         lastMapSystemId.current = null;
         setCurrentSystem(null);
         return;
@@ -94,7 +96,7 @@ export function useLocationTracking(enabled: boolean) {
       );
     }
 
-    if (canEdit && !map.locked && prevMapSystemId && prevMapSystemId !== mapSystemId) {
+    if (trackJumps && canEdit && !map.locked && prevMapSystemId && prevMapSystemId !== mapSystemId) {
       const freshConnections = useMapStore.getState().map.connections;
       const alreadyConnected = freshConnections.some(
         (c) =>

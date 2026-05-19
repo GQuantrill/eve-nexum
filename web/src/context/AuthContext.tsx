@@ -10,6 +10,8 @@ export interface AuthUser {
   compactMode: boolean;
   snapToGrid: boolean;
   showMinimap: boolean;
+  uniformSize: boolean;
+  showStatics: boolean;
   panelOrder: string[];
   canViewReports: boolean;
 }

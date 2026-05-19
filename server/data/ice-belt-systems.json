@@ -1,0 +1,33 @@
+{
+  "_note": "Solar systems known to spawn ice anomalies (Empire space only). Source: https://wiki.eveuniversity.org/Ice_Harvesting. Null-sec ice systems are not yet included — every null sec system spawns enriched-variant ice on a 4h cycle but we don't have a clean static list of which. To extend, append names to the appropriate region array. Names must match server/data/solar_systems exactly.",
+  "amarr": [
+    "Afivad", "Anath", "Avada", "Bashakru", "Bordan", "Bourar", "Cabeki", "Chanoun", "Claini", "Dantan",
+    "Dihra", "Enal", "Erkinen", "Esteban", "Feshur", "Gasavak", "Gemodi", "Gosalav", "Haras", "Hezere",
+    "Hoseen", "Illi", "Jarzalad", "Jerma", "Kamih", "Kothe", "Menri", "Miah", "Modun", "Moutid",
+    "Naguton", "Nebian", "Oberen", "Ordion", "Pemsah", "Raravoss", "Riavayed", "Sadana", "Schmaeel", "Seil",
+    "Sosala", "Sosan", "Talidal", "Tannakan", "Tisot", "Upt", "Ussad", "Vezila", "Warouh", "Yahyerer",
+    "Zatamaka", "Zazamye", "Zorenyen"
+  ],
+  "caldari": [
+    "Aakari", "Ahtulaima", "Dantumi", "Elonaya", "Fuskunen", "Gekutami", "Halaima", "Hallanen", "Hasama",
+    "Hentogaira", "Hurtoken", "Hysera", "Jotenen", "Kehjari", "Kiskoken", "Mitsolen", "Obe", "Oishami",
+    "Osmon", "Oto", "Outuni", "Passari", "Pavanakka", "Piekura", "Prism", "Reitsato", "Silen", "Sirseshin",
+    "Teimo", "Uchomida", "Uotila", "Vattuolen", "Wuos", "Yoma"
+  ],
+  "gallente": [
+    "Actee", "Aeschee", "Agoze", "Alachene", "Alparena", "Alsavoinon", "Antollare", "Ardallabier",
+    "Atlulle", "Aubenall", "Avaux", "Aydoteaux", "Brapelille", "Cadelanne", "Carirgnottin", "Carrou",
+    "Chelien", "Costolle", "Cumemare", "Deninard", "Eugales", "Fliet", "Gallusiene", "Indregulle",
+    "Jaschercis", "Lamadent", "Mannar", "Maut", "Mercomesier", "Misneden", "Niballe", "Palmon", "Rancer",
+    "Ratillose", "Ruerrotta", "Stegette", "Thelan", "Tolle", "Uphallant", "Vaurent", "Vevelonel"
+  ],
+  "minmatar": [
+    "Abudban", "Asgeir", "Barkrik", "Dantbeinn", "Egmar", "Emolgranlan", "Endrulf", "Eszur", "Eygfe",
+    "Finanar", "Gedugaud", "Hegfunden", "Helgatild", "Hodrold", "Hrokkur", "Nakugard", "Nein", "Oddelulf",
+    "Oppold", "Osvetur", "Sirekur", "Teonusude", "Todifrauan", "Turnur", "Uisper", "Vard", "Varigne",
+    "Weld", "Wiskeber"
+  ],
+  "ammatar": [
+    "Astabih", "Faspera", "Gamis", "Gelhan", "Kenobanala", "Lilmad", "Mahti", "Majamar", "Nakah", "Yishinoon"
+  ]
+}
