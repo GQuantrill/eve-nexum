@@ -402,4 +402,94 @@ The frontend is a fully static SPA after build. In production it is served by ng
 | Container orchestration | Docker Compose |
 | Database | PostgreSQL 16 (Alpine) |
 
+---
+
+## Troubleshooting
+
+The stack has three services — `web` (nginx), `server` (Node API), and `postgres`. Most issues are isolated to one of them; figure out which is failing first, then pull its logs.
+
+### 1. Which service is failing?
+
+```bash
+docker compose ps
+```
+
+Look at the **STATUS** column:
+
+| Status | Meaning |
+|---|---|
+| `Up` / `Up (healthy)` | running normally |
+| `Restarting` | crashing on boot — see logs |
+| `Exit 1` | failed to start — see logs |
+| (missing) | never started — `docker compose up -d` |
+
+You can also probe each layer directly:
+
+```bash
+# Web (nginx serving the SPA + proxying /api & /auth)
+curl -I http://localhost           # expect HTTP/1.1 200
+
+# Server (Express API)
+curl http://localhost:3001/health  # expect {"ok":true}
+
+# Database
+docker compose exec postgres pg_isready -U "$PG_USER" -d "$PG_DB"
+```
+
+If `curl :3001/health` fails but `docker compose ps` shows the server `Up`, the container is running but the app crashed inside it — check its logs.
+
+### 2. Viewing logs
+
+```bash
+# Live tail for one service (Ctrl-C to exit)
+docker compose logs -f server
+docker compose logs -f web
+docker compose logs -f postgres
+
+# Last 200 lines, then exit
+docker compose logs --tail=200 server
+
+# Everything in time order across all services (useful for race conditions)
+docker compose logs -f --timestamps
+```
+
+Server logs are tagged by subsystem — grep for the prefix to narrow the noise:
+
+```bash
+docker compose logs server | grep -E '\[(auth|maps|admin|standings|ghost-sites|storms|activity|incursions)\]'
+```
+
+### 3. Common failure patterns
+
+| Symptom | Likely cause | Where to look |
+|---|---|---|
+| `Migration failed:` in server logs, container restarts | DB unreachable or wrong creds | `docker compose logs postgres`; verify `PG_*` in `.env` |
+| Login redirect loop / `Authentication failed` | `EVE_CALLBACK_URL` in `.env` doesn't match the URL registered on the EVE Developer app | server logs (`[auth]` lines) |
+| Login works but cookies don't persist | `FRONTEND_URL` mismatch, or reverse-proxy stripping `Cookie` header | browser DevTools → Application → Cookies; server logs |
+| Blank page on the SPA | nginx serving 404 for `/index.html`, build artifacts missing | `docker compose logs web`; rebuild with `docker compose build web` |
+| `502 Bad Gateway` from nginx | `server` container is down | check `docker compose ps`; then server logs |
+| Admin page / Reports tab not visible | role isn't `admin` (or `canViewReports`), `CORP_ID` is unset for admin routes | DevTools → Network → `/auth/me` response shows `role` and `canViewReports` |
+| ESI features stale (kills, structures, sov) | ESI rate-limited or down | server logs; `https://esi.evetech.net/ui/` for service status |
+| Storm / ghost-site lookups not appearing | scraper fetch failed (502 fallback used) | server logs (`[storms]` / `[ghost-sites]`) |
+
+### 4. Local-dev variant
+
+In local-dev mode (`npm run dev` in `server/` and `web/` separately) there are no containers — logs stream straight to the terminal you started them from. Browser-side errors appear in DevTools Console; network failures show in DevTools Network. The Vite dev server proxies `/api` and `/auth` to the local API, so a 502 in the browser network tab means the API process exited.
+
+### 5. Health-check shortcuts
+
+```bash
+# Count the rows the server should have populated at boot
+docker compose exec postgres psql -U "$PG_USER" -d "$PG_DB" \
+  -c "SELECT 'solar_systems' AS t, COUNT(*) FROM solar_systems
+      UNION ALL SELECT 'map_regions',  COUNT(*) FROM map_regions
+      UNION ALL SELECT 'item_types',   COUNT(*) FROM item_types;"
+
+# Decode a session cookie's user id (paste cookie value as $SID)
+docker compose exec postgres psql -U "$PG_USER" -d "$PG_DB" \
+  -c "SELECT sess->>'userId' AS user_id, expire FROM sessions WHERE sid = '$SID';"
+```
+
+If `solar_systems` is empty the SDE import never ran — re-run `npm run setup-db` inside the `server` container.
+
 
