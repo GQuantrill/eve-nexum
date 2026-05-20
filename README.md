@@ -142,6 +142,12 @@ docker compose -f docker-compose.yml -f docker-compose.traefik.yml up -d --build
 ```
 Traefik will handle TLS termination and HTTP→HTTPS redirects. The `docker-compose.traefik.yml` overlay assumes a Traefik network named `traefik-public` and a cert resolver named `letsencrypt`.
 
+> **Tip — avoid retyping the overlay.** Every `docker compose ...` command below uses the standard form. If you run with the Traefik overlay, either prefix each command with `-f docker-compose.yml -f docker-compose.traefik.yml`, or set it once per shell session:
+> ```bash
+> export COMPOSE_FILE=docker-compose.yml:docker-compose.traefik.yml
+> ```
+> After that, plain `docker compose ...` automatically loads both files. Add the export to `~/.bashrc` / `~/.zshrc` if it's the only deployment on that host.
+
 **3. Database setup**
 
 Application tables (`users`, `maps`, `signatures`, etc.) are created automatically on first startup — no manual step needed.
@@ -149,12 +155,45 @@ Application tables (`users`, `maps`, `signatures`, etc.) are created automatical
 The setup script is only required if you want system search and NPC station data (it imports the EVE Static Data Export). This is a one-time operation and takes several minutes:
 
 ```bash
-# Standard
 docker compose exec server node dist/scripts/setup-db.js
-
-# With Traefik overlay
-docker compose -f docker-compose.yml -f docker-compose.traefik.yml exec server node dist/scripts/setup-db.js
 ```
+
+**4. Updating the SDE (after a CCP data drop)**
+
+When CCP ships an SDE update (new systems, NPC stations, item types, wormholes, etc.) you need to re-run the importer against the new zip. The runtime image ships without `scripts/` or `tsx`, so use a one-off container that mounts your local `server/` source:
+
+```bash
+# 1) Drop the new SDE in server/data/ and remove the old zip — the importer
+#    picks the first .zip it finds, so leaving both confuses it.
+curl -L -o server/data/eve-online-static-data-latest-jsonl.zip \
+  https://developers.eveonline.com/static-data/eve-online-static-data-latest-jsonl.zip
+rm server/data/eve-online-static-data-<old-version>-jsonl.zip
+
+# 2) Run the importer in a one-off container. NODE_ENV=development is
+#    required so yarn installs devDependencies (tsx lives there).
+docker compose run --rm \
+  -v "$PWD/server:/app" \
+  -w /app \
+  -e NODE_ENV=development \
+  --entrypoint sh \
+  server -c "yarn install --frozen-lockfile && yarn setup-db"
+
+# 3) Refresh the wormhole metadata too — picks up any new WH types from
+#    the same SDE pull. See "Static data files" for what it does.
+docker compose run --rm \
+  -v "$PWD/server:/app" \
+  -w /app \
+  -e NODE_ENV=development \
+  --entrypoint sh \
+  server -c "yarn install --frozen-lockfile && yarn extract-wormholes"
+
+# 4) Rebuild + restart so the new zip is baked into the next deploy AND
+#    the nginx inside the web container re-resolves the server's IP.
+docker compose build server
+docker compose up -d
+```
+
+The importer is upsert-only (`ON CONFLICT DO UPDATE` on every table), so re-running is safe — your user data (maps, signatures, structures, sessions, etc.) lives in other tables and is never touched.
 
 ---
 
