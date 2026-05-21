@@ -43,22 +43,20 @@ if (isProd && !process.env.EVE_CLIENT_SECRET) {
   process.exit(1);
 }
 
-// 32 bytes (64 hex) for AES-256. Required in prod; derived from SESSION_SECRET
-// in dev so first-run developers don't have to generate one. If you change
-// SESSION_SECRET in dev, existing encrypted tokens will be unreadable — that's
-// fine, they'll be re-issued on next login.
-const TOKEN_ENC_HEX = process.env.TOKEN_ENCRYPTION_KEY;
-if (isProd && (!TOKEN_ENC_HEX || TOKEN_ENC_HEX.length !== 64)) {
-  console.error('FATAL: TOKEN_ENCRYPTION_KEY must be 64 hex chars in production (openssl rand -hex 32)');
+// AES-256 needs a 32-byte key. Accept any non-empty string from the env
+// and derive a deterministic 32-byte key from it via SHA-256. The one
+// special case is "exactly 64 hex characters" — those are used verbatim
+// so deployments that previously ran `openssl rand -hex 32` keep the
+// same key bytes and existing encrypted tokens still decrypt.
+const TOKEN_ENC_RAW = process.env.TOKEN_ENCRYPTION_KEY;
+if (!TOKEN_ENC_RAW) {
+  console.error('FATAL: TOKEN_ENCRYPTION_KEY must be set (any non-empty string is accepted)');
   process.exit(1);
 }
-const tokenEncryptionKey = TOKEN_ENC_HEX
-  ?? createHash('sha256').update(`dev-token-key:${process.env.SESSION_SECRET ?? 'dev'}`).digest('hex');
-
-if (tokenEncryptionKey.length !== 64) {
-  console.error('FATAL: TOKEN_ENCRYPTION_KEY must be 64 hex characters');
-  process.exit(1);
-}
+const HEX_64 = /^[0-9a-fA-F]{64}$/;
+const tokenEncryptionKey = HEX_64.test(TOKEN_ENC_RAW)
+  ? TOKEN_ENC_RAW.toLowerCase()
+  : createHash('sha256').update(TOKEN_ENC_RAW).digest('hex');
 
 export const config = {
   corpMode:            CORP_IDS.length > 0,

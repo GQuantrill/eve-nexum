@@ -29,14 +29,24 @@ export function ProximityOptInModal() {
   }
 
   function enable() {
-    // requestPermission can resolve with 'default' if the user dismisses the
-    // OS prompt without choosing. Either way, mark as asked so we don't ask
-    // again on every load. Also broadcast so the Map Options sidebar's
-    // "Enable" button flips to "Enabled" immediately.
-    Notification.requestPermission().finally(() => {
+    // Close the modal first — the user has committed to a choice by
+    // clicking, regardless of what the OS prompt does next. If we leave
+    // dismiss() inside the Promise chain and requestPermission either
+    // throws or returns the legacy callback-style undefined, the modal
+    // gets stuck open with no obvious recovery.
+    dismiss();
+    try {
+      const maybe = Notification.requestPermission() as unknown;
+      if (maybe && typeof (maybe as Promise<unknown>).then === 'function') {
+        (maybe as Promise<unknown>).finally(() => notifyPermissionChanged());
+      } else {
+        // Legacy callback-style API — the browser has already updated
+        // Notification.permission by the time the call returns.
+        notifyPermissionChanged();
+      }
+    } catch {
       notifyPermissionChanged();
-      dismiss();
-    });
+    }
   }
 
   if (!show) return null;

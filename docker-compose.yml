@@ -9,7 +9,9 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      # Host-side port from PG_PORT (default 5432). Inside the network
+      # Postgres always listens on 5432 — that's what the server reaches.
+      - "${PG_PORT:-5432}:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${PG_USER:-nexum} -d ${PG_DB:-eve_nexum}"]
       interval: 5s
@@ -23,10 +25,16 @@ services:
     restart: unless-stopped
     env_file: .env
     environment:
+      # Inside the Docker network the server reaches Postgres at
+      # postgres:5432 regardless of any host-side port remapping the
+      # user did via PG_PORT in .env.
       PG_HOST: postgres
+      PG_PORT: 5432
       NODE_ENV: production
     ports:
-      - "3001:3001"
+      # Server listens on whatever PORT says. Host port matches so
+      # EVE_CALLBACK_URL=http://localhost:${PORT}/auth/callback works.
+      - "${PORT:-3001}:${PORT:-3001}"
     depends_on:
       postgres:
         condition: service_healthy
@@ -36,8 +44,14 @@ services:
       context: ./web
       dockerfile: Dockerfile
     restart: unless-stopped
+    environment:
+      # Tells nginx which port to proxy /api/* and /auth/* to inside the
+      # docker network. Must match the server's PORT — otherwise the
+      # proxy returns 502 because nginx is asking a port nobody answers.
+      API_PORT: ${PORT:-3001}
     ports:
-      - "80:80"
+      # Host-side WEB_PORT (default 80). nginx inside always listens on 80.
+      - "${WEB_PORT:-80}:80"
     depends_on:
       - server
 

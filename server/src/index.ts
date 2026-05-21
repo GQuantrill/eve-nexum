@@ -40,6 +40,12 @@ app.use(cors({
 }));
 app.use(express.json({ limit: '2mb' }));
 
+// Derive cookie.secure from FRONTEND_URL's protocol rather than NODE_ENV.
+// Tying it to NODE_ENV breaks the common "production build running over plain
+// HTTP on localhost or a LAN box" case — the browser silently drops Secure
+// cookies served over HTTP and OAuth state checks fail with a 400.
+const frontendIsHttps = (process.env.FRONTEND_URL ?? '').startsWith('https://');
+
 app.use(session({
   store: new PgStore({ pool: db, tableName: 'sessions', createTableIfMissing: true }),
   secret: config.sessionSecret,
@@ -47,7 +53,7 @@ app.use(session({
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
-    secure: config.isProd,
+    secure: frontendIsHttps,
     sameSite: 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   },

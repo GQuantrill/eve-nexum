@@ -209,12 +209,6 @@ export async function migrate() {
     CREATE INDEX IF NOT EXISTS idx_known_structures_system ON known_structures (system_id);
     CREATE INDEX IF NOT EXISTS idx_known_structures_corp   ON known_structures (restricted_to_corp_id);
 
-    -- Track which map a user_event belongs to, so the admin Users report
-    -- can scope counts to corp maps. Nullable for compatibility with rows
-    -- created before this migration; no FK because we want events to
-    -- survive even after the map is force-deleted.
-    ALTER TABLE user_events ADD COLUMN IF NOT EXISTS map_id UUID;
-
     CREATE TABLE IF NOT EXISTS user_events (
       id          BIGSERIAL   PRIMARY KEY,
       user_id     INTEGER     NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -222,6 +216,12 @@ export async function migrate() {
       sig_type    TEXT,
       created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
+
+    -- Track which map a user_event belongs to, so the admin Users report
+    -- can scope counts to corp maps. Nullable for compatibility with rows
+    -- created before this migration; no FK because we want events to
+    -- survive even after the map is force-deleted.
+    ALTER TABLE user_events ADD COLUMN IF NOT EXISTS map_id UUID;
 
     -- Cluster-wide log of K-space systems where a Covert Research Facility
     -- signature ("Ghost site") has been observed. One row per system, with

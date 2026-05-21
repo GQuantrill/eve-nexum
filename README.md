@@ -126,19 +126,36 @@ When registering your application at [developers.eveonline.com](https://develope
 | `esi-alliances.read_contacts.v1` | Read the **alliance's** shared contact list. Requires the character to be in the alliance executor corp with the right role; almost always denied for normal members, and that's fine — the call no-ops without breaking login. |
 | `esi-corporations.read_structures.v1` | Read the **corporation's** owned structures (citadels, refineries, etc.). Requires the in-game **Station Manager** or **Director** role. When granted, structures auto-populate per system in the structures pane; when denied (the common case), the call no-ops silently. |
 
-**2. Build and start**
+**2. Build images and import the SDE**
+
+The server depends on the EVE Static Data Export (SDE) tables (`map_stargates`, `solar_systems`, `item_types`, …) at boot — without them, route-graph initialisation throws and the container crash-loops. So the very first thing to do on a fresh DB is bring up Postgres alone and run the importer as a one-off.
+
+```bash
+# Build the images first so the importer is available to run.
+docker compose build
+
+# Bring up only Postgres. The server intentionally stays down for now.
+docker compose up -d postgres
+
+# Import the EVE SDE into the running Postgres. Downloads the latest zip
+# from CCP (~hundreds of MB) and populates the static tables. Takes a
+# few minutes; logs progress per table.
+docker compose run --rm server node dist/scripts/setup-db.js
+```
+
+**3. Start the app**
 
 **Standard (direct ports):**
 ```bash
-docker compose up -d --build
+docker compose up -d
 ```
-The app will be available on port `80`.
+The app will be available on port `${WEB_PORT:-80}` (defaults to `80`).
 
 **With Traefik reverse proxy:**
 
 Add `DOMAIN=nexum.yourdomain.com` to your `.env`, then:
 ```bash
-docker compose -f docker-compose.yml -f docker-compose.traefik.yml up -d --build
+docker compose -f docker-compose.yml -f docker-compose.traefik.yml up -d
 ```
 Traefik will handle TLS termination and HTTP→HTTPS redirects. The `docker-compose.traefik.yml` overlay assumes a Traefik network named `traefik-public` and a cert resolver named `letsencrypt`.
 
@@ -148,15 +165,7 @@ Traefik will handle TLS termination and HTTP→HTTPS redirects. The `docker-comp
 > ```
 > After that, plain `docker compose ...` automatically loads both files. Add the export to `~/.bashrc` / `~/.zshrc` if it's the only deployment on that host.
 
-**3. Database setup**
-
-Application tables (`users`, `maps`, `signatures`, etc.) are created automatically on first startup — no manual step needed.
-
-The setup script is only required if you want system search and NPC station data (it imports the EVE Static Data Export). This is a one-time operation and takes several minutes:
-
-```bash
-docker compose exec server node dist/scripts/setup-db.js
-```
+App-schema migrations (`users`, `maps`, `map_signatures`, etc.) layer on automatically the first time the server boots — no manual step.
 
 **4. Updating the SDE (after a CCP data drop)**
 
