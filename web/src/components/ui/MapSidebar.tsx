@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useRef, type ReactNode } from 'react';
 import { useNotificationPermission, notifyPermissionChanged } from '../../hooks/useNotificationPermission';
 import { useMapStore } from '../../store/mapStore';
 import { useAuth } from '../../context/AuthContext';
