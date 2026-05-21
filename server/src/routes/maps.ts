@@ -9,6 +9,25 @@ import { recordGhostSiteIfMatch } from '../services/ghostSites.js';
 
 const log = createLogger('maps');
 
+// EVE system name → numeric ID lookup against the SDE-seeded solar_systems
+// table. Used to backfill eve_system_id at write time when the client posts
+// a system with only a name (e.g. wormhole picker / sig-paste paths that
+// recognise the name but never resolved the ID). Returns null for unknown
+// names, the existing ID if the caller already passed one in, or null on
+// empty input. Idempotent and cheap — a single indexed equality lookup.
+async function resolveEveSystemId(
+  given: number | null | undefined,
+  name: string | null | undefined,
+): Promise<number | null> {
+  if (typeof given === 'number' && Number.isFinite(given)) return given;
+  if (!name) return null;
+  const { rows } = await db.query<{ id: number }>(
+    `SELECT id FROM solar_systems WHERE name = $1`,
+    [name],
+  );
+  return rows[0]?.id ?? null;
+}
+
 // Best-effort ESI lookup of a player structure's owner corp ID. Requires
 // the user's `esi-universe.read_structures.v1` scope and access to the
 // structure itself (member of the owning corp or its alliance, or it
@@ -280,12 +299,29 @@ mapsRouter.post('/import', async (req, res) => {
     // re-attach correctly to the survivor.
     const idMap = new Map<string, string>();
     if (systems.length > 0) {
+      // Batch-resolve names → eve_system_id for any row that arrived without
+      // an ID. One SELECT amortised over the whole import beats N round-trips.
+      const namesNeedingResolve = [...new Set(
+        systems
+          .filter((s) => s.eveSystemId == null && typeof s.name === 'string' && s.name)
+          .map((s) => s.name as string),
+      )];
+      const nameToId = new Map<string, number>();
+      if (namesNeedingResolve.length > 0) {
+        const { rows } = await client.query<{ id: number; name: string }>(
+          `SELECT id, name FROM solar_systems WHERE name = ANY($1::text[])`,
+          [namesNeedingResolve],
+        );
+        for (const r of rows) nameToId.set(r.name, r.id);
+      }
+
       const eveToNewId = new Map<number, string>();
       const sysCols = 15;
       const sysPlaceholders: string[] = [];
       const sysValues: unknown[] = [];
       for (const sys of systems) {
-        const eveId = (sys.eveSystemId as number | null | undefined) ?? null;
+        const eveId = (sys.eveSystemId as number | null | undefined)
+          ?? (typeof sys.name === 'string' ? nameToId.get(sys.name) ?? null : null);
         if (eveId != null && eveToNewId.has(eveId)) {
           // Already inserted for this map — alias the old UUID to the winner.
           idMap.set(String(sys.id), eveToNewId.get(eveId)!);
@@ -465,6 +501,8 @@ mapsRouter.post('/:mapId/systems', async (req, res) => {
 
   const { id, eveSystemId, name, systemClass, effect, statics, regionName, npcType, position, status, isHome, locked, notes } = req.body;
 
+  const resolvedEveId = await resolveEveSystemId(eveSystemId, name);
+
   try {
     await db.query(
       `INSERT INTO map_systems
@@ -472,7 +510,7 @@ mapsRouter.post('/:mapId/systems', async (req, res) => {
           position_x, position_y, status, is_home, locked, notes)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
        ON CONFLICT (id) DO NOTHING`,
-      [id, mapId, eveSystemId ?? null, name, systemClass, effect ?? 'none',
+      [id, mapId, resolvedEveId, name, systemClass, effect ?? 'none',
        statics ?? [], regionName ?? null, npcType ?? null,
        position?.x ?? 0, position?.y ?? 0,
        status ?? 'unknown', isHome ?? false, locked ?? false, notes ?? ''],
@@ -482,10 +520,10 @@ mapsRouter.post('/:mapId/systems', async (req, res) => {
     // trying to add a system that's already on the map. Return the
     // canonical id so the client can swap its local placeholder for the
     // real node instead of producing a duplicate.
-    if ((err as { code?: string }).code === '23505' && eveSystemId != null) {
+    if ((err as { code?: string }).code === '23505' && resolvedEveId != null) {
       const { rows } = await db.query<{ id: string }>(
         `SELECT id FROM map_systems WHERE map_id = $1 AND eve_system_id = $2`,
-        [mapId, eveSystemId],
+        [mapId, resolvedEveId],
       );
       res.status(409).json({ error: 'System already on map', existingId: rows[0]?.id });
       return;

@@ -103,6 +103,10 @@ const HEIGHT_KEY = 'nexum.panelHeight';
 const MIN_H      = 80;
 const DEFAULT_H  = 300;
 
+// Classes for which a Dotlan #npc_delta map is meaningful. Wormhole and
+// Drifter systems get no link — dotlan has those pages but no NPC data.
+const DOTLAN_CLASSES = new Set(['HS', 'LS', 'NS', 'Thera', 'Pochven']);
+
 function clamp(v: number) {
   return Math.min(Math.floor(window.innerHeight * 0.85), Math.max(MIN_H, v));
 }
@@ -370,6 +374,65 @@ export function SystemPanel() {
                 {sys.regionName    && <><span className="sys-info__kv-key">Region</span><span className="sys-info__kv-val">{sys.regionName}</span></>}
                 {esiSys?.constellationName && <><span className="sys-info__kv-key">Constellation</span><span className="sys-info__kv-val">{esiSys.constellationName}</span></>}
                 {sys.npcType       && <><span className="sys-info__kv-key">NPC</span><span className="sys-info__kv-val">{sys.npcType}</span></>}
+              </div>
+            </div>
+          )}
+
+          {(sys.name || sys.eveSystemId) && (
+            <div className="sys-info__section">
+              <div className="sys-info__section-label">Links</div>
+              <div className="sys-info__links">
+                {/* Dotlan only needs the name. K-space goes to the NPC-delta
+                    map (uses Region + System); j-space and unlinked systems
+                    fall back to the plain /system/<name> URL. */}
+                {sys.name && DOTLAN_CLASSES.has(sys.systemClass) && sys.regionName && (
+                  <a
+                    href={`https://evemaps.dotlan.net/map/${encodeURIComponent(sys.regionName.replace(/ /g, '_'))}/${encodeURIComponent(sys.name.replace(/ /g, '_'))}#npc_delta`}
+                    target="_blank"
+                    rel="noreferrer"
+                    data-tooltip="Open NPC delta on Dotlan"
+                    className="sys-info__ext-link"
+                  >
+                    <img
+                      src="https://evemaps.dotlan.net/favicon.ico"
+                      alt="Dotlan"
+                      className="sys-info__ext-icon"
+                      loading="lazy"
+                    />
+                  </a>
+                )}
+                {sys.name && !(DOTLAN_CLASSES.has(sys.systemClass) && sys.regionName) && (
+                  <a
+                    href={`https://evemaps.dotlan.net/system/${encodeURIComponent(sys.name.replace(/ /g, '_'))}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    data-tooltip="Open system on Dotlan"
+                    className="sys-info__ext-link"
+                  >
+                    <img
+                      src="https://evemaps.dotlan.net/favicon.ico"
+                      alt="Dotlan"
+                      className="sys-info__ext-icon"
+                      loading="lazy"
+                    />
+                  </a>
+                )}
+                {sys.eveSystemId && (
+                  <a
+                    href={`https://zkillboard.com/system/${sys.eveSystemId}/`}
+                    target="_blank"
+                    rel="noreferrer"
+                    data-tooltip="Open system on zKillboard"
+                    className="sys-info__ext-link"
+                  >
+                    <img
+                      src="https://zkillboard.com/img/wreck.png"
+                      alt="zKillboard"
+                      className="sys-info__ext-icon"
+                      loading="lazy"
+                    />
+                  </a>
+                )}
               </div>
             </div>
           )}

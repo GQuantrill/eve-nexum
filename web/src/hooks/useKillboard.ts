@@ -5,16 +5,23 @@ export interface ZkbKill {
   killmail_id: number;
   killmail_time: string;
   victim: {
-    character_id?:   number;
-    corporation_id?: number;
-    alliance_id?:    number;
-    ship_type_id:    number;
+    character_id?:     number;
+    character_name?:   string;
+    corporation_id?:   number;
+    corporation_name?: string;
+    alliance_id?:      number;
+    alliance_name?:    string;
+    ship_type_id:      number;
   };
   attackers: Array<{
-    character_id?:   number;
-    corporation_id?: number;
-    alliance_id?:    number;
-    final_blow:      boolean;
+    character_id?:     number;
+    character_name?:   string;
+    corporation_id?:   number;
+    corporation_name?: string;
+    alliance_id?:      number;
+    alliance_name?:    string;
+    ship_type_id?:     number;
+    final_blow:        boolean;
   }>;
   zkb: {
     hash: string;

@@ -390,6 +390,21 @@ export async function migrate() {
     CREATE INDEX IF NOT EXISTS idx_char_standings_target     ON character_standings (contact_kind, contact_id);
     CREATE INDEX IF NOT EXISTS idx_corp_standings_target     ON corp_standings     (contact_kind, contact_id);
     CREATE INDEX IF NOT EXISTS idx_alliance_standings_target ON alliance_standings (contact_kind, contact_id);
+
+    -- Cluster-wide name cache for EVE entities (characters, corps, alliances,
+    -- and anything else ESI /universe/names/ returns). Populated lazily on
+    -- demand by resolveEntityNames(); used to label killmails, standings,
+    -- structure owners, etc. without paying the ESI cost every render.
+    --
+    -- Names are effectively immutable for chars/corps; alliances rename
+    -- rarely. fetched_at lets callers apply a staleness policy if they care
+    -- (most don't — a 30-day re-resolve is more than enough).
+    CREATE TABLE IF NOT EXISTS entity_names (
+      id          BIGINT      PRIMARY KEY,
+      name        TEXT        NOT NULL,
+      category    TEXT        NOT NULL,
+      fetched_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
   `);
 
   await encryptLegacyTokens();

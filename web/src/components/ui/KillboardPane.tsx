@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { CaretLeftIcon, CaretRightIcon } from '@phosphor-icons/react';
+import { useEffect, useState } from 'react';
 import { useKillboard } from '../../hooks/useKillboard';
 import { useStandings } from '../../hooks/useStandings';
 import { useUserSetting } from '../../hooks/useUserSetting';
@@ -7,6 +6,9 @@ import type { ZkbKill } from '../../hooks/useKillboard';
 
 const NPC_TOGGLE_KEY = 'nexum.killboardIncludeNpc';
 
+// How many kills to reveal initially and per "Load more" click. Sized to
+// match what fit on a single page under the old paginator so the default
+// view density hasn't changed.
 const PAGE_SIZE = 5;
 
 const EVE_IMG = 'https://images.evetech.net';
@@ -42,33 +44,53 @@ function ZkbLink({ href, tip, children }: { href: string; tip: string; children:
   );
 }
 
-function EntityCol({ characterId, corporationId, allianceId, label }: {
-  characterId?:   number;
-  corporationId?: number;
-  allianceId?:    number;
-  label:          string;
+function EntityCol({ characterId, characterName, corporationId, corporationName, allianceId, allianceName, label, align }: {
+  characterId?:     number;
+  characterName?:   string;
+  corporationId?:   number;
+  corporationName?: string;
+  allianceId?:      number;
+  allianceName?:    string;
+  label:            string;
+  /** Text alignment for the name column — 'left' for victim, 'right' for attacker. */
+  align:            'left' | 'right';
 }) {
-  return (
-    <div className="zkb-kill__entity-col">
-      {characterId ? (
-        <ZkbLink href={`${ZKB}/character/${characterId}/`} tip={`${label} on zKillboard`}>
-          <img className="zkb-kill__icon" src={`${EVE_IMG}/characters/${characterId}/portrait?size=32`} alt="" loading="lazy" />
-        </ZkbLink>
-      ) : corporationId ? (
-        <ZkbLink href={`${ZKB}/corporation/${corporationId}/`} tip={`${label} corporation on zKillboard`}>
-          <img className="zkb-kill__icon" src={`${EVE_IMG}/corporations/${corporationId}/logo?size=32`} alt="" loading="lazy" />
-        </ZkbLink>
-      ) : null}
+  // Row layout: portrait, then a names column with character on top and
+  // corp / alliance lines beneath. Affiliation icons render with the
+  // names so the eye can scan icons or text equally well.
+  const portrait = characterId && (
+    <ZkbLink href={`${ZKB}/character/${characterId}/`} tip={`${label} on zKillboard`}>
+      <img className="zkb-kill__icon zkb-kill__icon--portrait" src={`${EVE_IMG}/characters/${characterId}/portrait?size=64`} alt="" loading="lazy" />
+    </ZkbLink>
+  );
+
+  const names = (characterId || corporationId || allianceId) ? (
+    <div className={`zkb-kill__names zkb-kill__names--${align}`}>
+      {characterId && (
+        <a href={`${ZKB}/character/${characterId}/`} target="_blank" rel="noreferrer" className="zkb-kill__name zkb-kill__name--char">
+          {characterName ?? '…'}
+        </a>
+      )}
       {corporationId && (
-        <ZkbLink href={`${ZKB}/corporation/${corporationId}/`} tip="Corporation on zKillboard">
-          <img className="zkb-kill__icon" src={`${EVE_IMG}/corporations/${corporationId}/logo?size=32`} alt="" loading="lazy" />
-        </ZkbLink>
+        <a href={`${ZKB}/corporation/${corporationId}/`} target="_blank" rel="noreferrer" className="zkb-kill__name zkb-kill__name--affil">
+          <img className="zkb-kill__name-icon" src={`${EVE_IMG}/corporations/${corporationId}/logo?size=32`} alt="" loading="lazy" />
+          <span>{corporationName ?? '…'}</span>
+        </a>
       )}
       {allianceId && (
-        <ZkbLink href={`${ZKB}/alliance/${allianceId}/`} tip="Alliance on zKillboard">
-          <img className="zkb-kill__icon" src={`${EVE_IMG}/alliances/${allianceId}/logo?size=32`} alt="" loading="lazy" />
-        </ZkbLink>
+        <a href={`${ZKB}/alliance/${allianceId}/`} target="_blank" rel="noreferrer" className="zkb-kill__name zkb-kill__name--affil">
+          <img className="zkb-kill__name-icon" src={`${EVE_IMG}/alliances/${allianceId}/logo?size=32`} alt="" loading="lazy" />
+          <span>{allianceName ?? '…'}</span>
+        </a>
       )}
+    </div>
+  ) : null;
+
+  return (
+    <div className={`zkb-kill__entity-col zkb-kill__entity-col--${align}`}>
+      {align === 'left'
+        ? <>{portrait}{names}</>
+        : <>{names}{portrait}</>}
     </div>
   );
 }
@@ -115,12 +137,13 @@ function KillRow({ kill, standings }: { kill: ZkbKill; standings: ReturnType<typ
 
   return (
     <div className={`zkb-kill${isPod ? ' zkb-kill--pod' : ''}${tint ? ` ${tint}` : ''}`}>
+      {/* Victim side: victim ship → victim affiliations */}
       <a
         href={`${ZKB}/kill/${kill.killmail_id}/`}
         target="_blank"
         rel="noreferrer"
         data-tip="View killmail on zKillboard"
-        className="zkb-kill__icon-link"
+        className="zkb-kill__ship-wrap zkb-kill__icon-link"
       >
         <img
           className="zkb-kill__ship"
@@ -128,39 +151,58 @@ function KillRow({ kill, standings }: { kill: ZkbKill; standings: ReturnType<typ
           alt=""
           loading="lazy"
         />
+        {kill.zkb.solo ? (
+          <span className="zkb-kill__count zkb-kill__count--solo" data-tip="Solo kill">1</span>
+        ) : kill.attackers.length > 1 ? (
+          <span className="zkb-kill__count" data-tip={`${kill.attackers.length} attackers`}>{kill.attackers.length}</span>
+        ) : null}
       </a>
 
-      <div className="zkb-kill__info">
-        <div className="zkb-kill__row1">
-          <EntityCol
-            characterId={v.character_id}
-            corporationId={v.corporation_id}
-            allianceId={v.alliance_id}
-            label="Victim"
-          />
-          {kill.zkb.solo && (
-            <span className="zkb-kill__badge zkb-kill__badge--solo">Solo</span>
-          )}
-          {!kill.zkb.solo && kill.attackers.length > 1 && (
-            <span className="zkb-kill__badge">+{kill.attackers.length}</span>
-          )}
-        </div>
-        <div className="zkb-kill__row2">
+      <EntityCol
+        characterId={v.character_id}
+        characterName={v.character_name}
+        corporationId={v.corporation_id}
+        corporationName={v.corporation_name}
+        allianceId={v.alliance_id}
+        allianceName={v.alliance_name}
+        label="Victim"
+        align="left"
+      />
+
+      {/* Right cluster: attacker block (if any) + ISK/time meta. Wrapping
+          keeps the layout sane when there's no final-blow attacker — the
+          cluster's margin-left:auto pushes meta to the right edge by itself. */}
+      <div className="zkb-kill__right">
+        {fbAttacker && (
+          <div className="zkb-kill__attacker">
+            <EntityCol
+              characterId={fbAttacker.character_id}
+              characterName={fbAttacker.character_name}
+              corporationId={fbAttacker.corporation_id}
+              corporationName={fbAttacker.corporation_name}
+              allianceId={fbAttacker.alliance_id}
+              allianceName={fbAttacker.alliance_name}
+              label="Final blow"
+              align="right"
+            />
+            {fbAttacker.ship_type_id && (
+              <span className="zkb-kill__ship-wrap" data-tip="Final-blow ship">
+                <img
+                  className="zkb-kill__ship zkb-kill__ship--attacker"
+                  src={`${EVE_IMG}/types/${fbAttacker.ship_type_id}/render?size=64`}
+                  alt=""
+                  loading="lazy"
+                />
+              </span>
+            )}
+          </div>
+        )}
+
+        <div className="zkb-kill__meta">
           <span className="zkb-kill__value">{formatIsk(kill.zkb.totalValue)} ISK</span>
-        </div>
-        <div className="zkb-kill__row3">
           <span className="zkb-kill__time">{timeAgo(kill.killmail_time)}</span>
         </div>
       </div>
-
-      {fbAttacker && (
-        <EntityCol
-          characterId={fbAttacker.character_id}
-          corporationId={fbAttacker.corporation_id}
-          allianceId={fbAttacker.alliance_id}
-          label="Final blow"
-        />
-      )}
     </div>
   );
 }
@@ -174,15 +216,19 @@ export function KillboardPane({ eveSystemId }: Props) {
 
   const { kills, loading, error, lastUpdated, npcCount, refresh } = useKillboard(eveSystemId, { includeNpc });
   const standings = useStandings();
-  const [page, setPage] = useState(0);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+
+  // Reset the lazy window whenever the system or filter changes — otherwise
+  // a system with 8 visible kills carries over its expanded count to the
+  // next system the user clicks on, which is jarring.
+  useEffect(() => { setVisibleCount(PAGE_SIZE); }, [eveSystemId, includeNpc]);
 
   if (!eveSystemId) {
     return <p className="zkb-state">No EVE system linked.</p>;
   }
 
-  const totalPages = Math.max(1, Math.ceil(kills.length / PAGE_SIZE));
-  const safePage   = Math.min(page, totalPages - 1);
-  const pageKills  = kills.slice(safePage * PAGE_SIZE, safePage * PAGE_SIZE + PAGE_SIZE);
+  const visibleKills = kills.slice(0, visibleCount);
+  const hasMore      = visibleCount < kills.length;
 
   // Render the meta row (with the NPC toggle) regardless of whether there
   // are kills to show — otherwise the user has no way to flip the toggle
@@ -205,7 +251,6 @@ export function KillboardPane({ eveSystemId }: Props) {
             checked={includeNpc}
             onChange={(e) => {
               setIncludeNpc(e.target.checked);
-              setPage(0);
               // Toggling is also a signal of "show me what's actually
               // there" — force a refetch so the user isn't looking at
               // stale data from the 5-minute cache.
@@ -214,23 +259,6 @@ export function KillboardPane({ eveSystemId }: Props) {
           />
           <span>Show NPC kills</span>
         </label>
-        {totalPages > 1 && (
-          <span className="zkb-pane__pages">
-            <button
-              type="button"
-              className="zkb-page-btn"
-              onClick={() => setPage((p) => Math.max(0, p - 1))}
-              disabled={safePage === 0}
-            ><CaretLeftIcon size={14} weight="bold" /></button>
-            <span className="zkb-pane__page-label">{safePage + 1} / {totalPages}</span>
-            <button
-              type="button"
-              className="zkb-page-btn"
-              onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
-              disabled={safePage === totalPages - 1}
-            ><CaretRightIcon size={14} weight="bold" /></button>
-          </span>
-        )}
       </div>
 
       {loading && kills.length === 0 ? (
@@ -247,7 +275,16 @@ export function KillboardPane({ eveSystemId }: Props) {
         </p>
       ) : (
         <div className="zkb-pane__list">
-          {pageKills.map((k) => <KillRow key={k.killmail_id} kill={k} standings={standings} />)}
+          {visibleKills.map((k) => <KillRow key={k.killmail_id} kill={k} standings={standings} />)}
+          {hasMore && (
+            <button
+              type="button"
+              className="zkb-pane__load-more"
+              onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
+            >
+              Load more ({kills.length - visibleCount} remaining)
+            </button>
+          )}
         </div>
       )}
     </div>

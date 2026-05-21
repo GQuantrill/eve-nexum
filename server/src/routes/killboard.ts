@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { requireAuth } from '../middleware/requireAuth.js';
 import { createLogger } from '../utils/logger.js';
 import { TtlCache } from '../utils/cache.js';
+import { resolveEntityNames } from '../services/entityNames.js';
 
 const router = Router();
 router.use(requireAuth);
@@ -9,7 +10,6 @@ const log = createLogger('killboard');
 
 const ZKB_AGENT    = 'Eve-Nexum/1.0 (https://github.com/area404/eve-nexum; gq@area404.org)';
 const CACHE_TTL_MS = 5 * 60 * 1000;
-const MAX_KILLS    = 25;
 const FETCH_TIMEOUT_MS = 8_000;
 
 interface ZkbEntry {
@@ -35,6 +35,7 @@ interface EsiKillmail {
     character_id?:   number;
     corporation_id?: number;
     alliance_id?:    number;
+    ship_type_id?:   number;
     final_blow:      boolean;
   }>;
 }
@@ -43,16 +44,23 @@ export interface KillEntry {
   killmail_id:   number;
   killmail_time: string;
   victim: {
-    character_id?:   number;
-    corporation_id?: number;
-    alliance_id?:    number;
-    ship_type_id:    number;
+    character_id?:     number;
+    character_name?:   string;
+    corporation_id?:   number;
+    corporation_name?: string;
+    alliance_id?:      number;
+    alliance_name?:    string;
+    ship_type_id:      number;
   };
   attackers: Array<{
-    character_id?:   number;
-    corporation_id?: number;
-    alliance_id?:    number;
-    final_blow:      boolean;
+    character_id?:     number;
+    character_name?:   string;
+    corporation_id?:   number;
+    corporation_name?: string;
+    alliance_id?:      number;
+    alliance_name?:    string;
+    ship_type_id?:     number;
+    final_blow:        boolean;
   }>;
   zkb: ZkbEntry['zkb'];
 }
@@ -156,15 +164,16 @@ router.get('/:systemId(\\d+)', async (req, res) => {
       return res.json([]);
     }
 
-    const limited = zkbBody.slice(0, MAX_KILLS);
-    const etag    = zkbRes.headers.get('etag') ?? undefined;
+    const etag = zkbRes.headers.get('etag') ?? undefined;
 
-    // Fetch full killmail details from ESI in parallel
+    // Fetch full killmail details from ESI in parallel. ESI concurrency is
+    // capped at ESI_MAX_CONCURRENT so a busy system (Jita, active null)
+    // queues rather than thundering CCP.
     const esiResults = await Promise.all(
-      limited.map((k) => fetchEsi(k.killmail_id, k.zkb.hash)),
+      zkbBody.map((k) => fetchEsi(k.killmail_id, k.zkb.hash)),
     );
 
-    const kills = limited
+    const kills = zkbBody
       .map((zkb, i) => {
         const esi = esiResults[i];
         if (!esi) return null;
@@ -177,6 +186,7 @@ router.get('/:systemId(\\d+)', async (req, res) => {
             character_id:   a.character_id,
             corporation_id: a.corporation_id,
             alliance_id:    a.alliance_id,
+            ship_type_id:   a.ship_type_id,
             final_blow:     a.final_blow,
           })),
           zkb: zkb.zkb,
@@ -184,6 +194,28 @@ router.get('/:systemId(\\d+)', async (req, res) => {
         return entry;
       })
       .filter((k): k is KillEntry => k !== null);
+
+    // Resolve every char/corp/alliance ID in one batch and decorate the
+    // entries in-place with human names. Cache hits stay zero-cost; misses
+    // pay one bounded ESI call per unique missing entity, ever.
+    const nameIds: number[] = [];
+    for (const k of kills) {
+      nameIds.push(k.victim.character_id!, k.victim.corporation_id!, k.victim.alliance_id!);
+      for (const a of k.attackers) {
+        nameIds.push(a.character_id!, a.corporation_id!, a.alliance_id!);
+      }
+    }
+    const names = await resolveEntityNames(nameIds);
+    for (const k of kills) {
+      if (k.victim.character_id)   k.victim.character_name   = names.get(k.victim.character_id)?.name;
+      if (k.victim.corporation_id) k.victim.corporation_name = names.get(k.victim.corporation_id)?.name;
+      if (k.victim.alliance_id)    k.victim.alliance_name    = names.get(k.victim.alliance_id)?.name;
+      for (const a of k.attackers) {
+        if (a.character_id)   a.character_name   = names.get(a.character_id)?.name;
+        if (a.corporation_id) a.corporation_name = names.get(a.corporation_id)?.name;
+        if (a.alliance_id)    a.alliance_name    = names.get(a.alliance_id)?.name;
+      }
+    }
 
     cache.set(systemId, kills, etag ? { etag } : undefined);
     return res.json(kills);
