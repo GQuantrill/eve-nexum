@@ -2965,17 +2965,26 @@ div.system-node__easy-handle {
 
 /* Read-only twin of .sig-input, used in share mode where the row cells
    become plain text instead of inputs/selects. Same typography so column
-   widths stay stable when switching modes. */
+   widths stay stable when switching modes. nowrap prevents short
+   monospaced sig IDs (e.g. "DSC-380") from breaking onto two lines
+   when the column happens to be narrower than the saved colWidths. */
 .sig-text {
   color: #c8d0e0;
   font-size: calc(14px * var(--font-scale, 1));
   font-family: inherit;
   display: inline-block;
   width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .sig-text--id {
   font-family: 'Courier New', monospace;
+  /* Wide enough for the standard "ABC-123" sig-ID format. The column's
+     saved width is set in editable mode where the <input> reserves its
+     own min-width; the plain text variant needs the floor explicitly. */
+  min-width: 64px;
 }
 
 .sig-text--type {
