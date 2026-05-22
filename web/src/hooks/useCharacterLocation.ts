@@ -17,6 +17,8 @@ export interface CharacterShip {
   typeId:   number;
   typeName: string;
   shipName: string;
+  /** Ship mass in kg from EVE SDE. null if the SDE row is missing. */
+  mass:     number | null;
 }
 
 export interface CharacterLocation {

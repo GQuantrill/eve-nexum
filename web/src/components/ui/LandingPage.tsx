@@ -528,7 +528,7 @@ export function LandingPage() {
             <p className="landing__section-body">
               Nexum is written by Addelee as a solo project.  I've played eve since Beta back in 2003. You might see me hanging out in the Help channels or the Scanning channel.  I've played in all areas of space from living in wormholes and thera, running missions in High Sec, gate camping in lowsec and now, null life with Goonswarm.
               <br/><br/>As a day job, I am a programmer and run <a href='https://area404.org' target="_blank" className="landing__faq-link">Area 404</a>.  Because of this, I decided I'd write this tool.  I'm an avid explorer in Eve therefore I wanted a tool that worked for me.
-              <br/><br/>Nexum is open source and I welcome anyone to contribute.  I would definitely appreciate feedback and any bugs you encounter so please flag things on <a href="https://github.com/GQuantrill/eve-nexum/issues" target='_blank' className="landing__faq-link"> GitHub</a>
+              <br/><br/>Nexum is open source and I welcome anyone to contribute.  I would definitely appreciate feedback and any bugs you encounter so please flag things on <a href="https://codeberg.org/GQuantrill/eve-nexum/issues" target='_blank' className="landing__faq-link"> Codeberg</a>
             </p>
             
             <img src={portraitImg} alt="Portrait" className="landing__portrait" />
@@ -600,11 +600,11 @@ export function LandingPage() {
               <h3 className="landing__faq-q">Can I report bugs, add feedback and request features?</h3>
               <p className="landing__faq-a">
                 Absolutely. The project is open source on{' '}
-                <a href="https://github.com/GQuantrill/eve-nexum" target="_blank" rel="noopener noreferrer" className="landing__faq-link">
-                  GitHub
+                <a href="https://codeberg.org/GQuantrill/eve-nexum" target="_blank" rel="noopener noreferrer" className="landing__faq-link">
+                  Codeberg
                 </a>
                 {' '}— open an issue for bugs or feature requests, or submit a pull request if you're feeling
-                brave. Feedback via in-game mail to the character tied to this account also works if GitHub
+                brave. Feedback via in-game mail to the character tied to this account also works if Codeberg
                 isn't your thing.
               </p>
             </div>
@@ -613,8 +613,8 @@ export function LandingPage() {
               <h3 className="landing__faq-q">Can I run this myself?</h3>
               <p className="landing__faq-a">
                 Yes — Nexum is fully self-hostable. The source is on{' '}
-                <a href="https://github.com/GQuantrill/eve-nexum" target="_blank" rel="noopener noreferrer" className="landing__faq-link">
-                  GitHub
+                <a href="https://codeberg.org/GQuantrill/eve-nexum" target="_blank" rel="noopener noreferrer" className="landing__faq-link">
+                  Codeberg
                 </a>
                 {' '}and the whole stack spins up with a single <code>docker compose up</code>.
                 You'll need to register your own EVE application on the{' '}

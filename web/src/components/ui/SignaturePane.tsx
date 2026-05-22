@@ -11,6 +11,7 @@ import { XIcon } from '@phosphor-icons/react';
 import { LeadsToDropdown } from './LeadsToDropdown';
 import { toast } from './Toaster';
 import { reevaluateConnectionsForSystem } from '../../utils/whAutoDetect';
+import { alertInboundK162 } from '../../utils/k162Alert';
 import { WORMHOLE_TYPES } from '../../data/wormholes';
 
 // Aging bands for wormhole signatures, anchored to the WH type's known
@@ -194,14 +195,26 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   }, [activeMapId, systemId, isShareMode]);
 
   const updateSig = (id: string, updates: Partial<Signature>) => {
+    const existing = sigsRef.current.find((s) => s.id === id);
     const withTs = { ...updates, updatedAt: new Date().toISOString() };
     setSigs((prev) => prev.map((s) => s.id === id ? { ...s, ...withTs } : s));
+
+    // Inbound K162 alert: fire once when a sig's whType transitions INTO K162
+    // (anything else, including blank, → K162). Strong intel signal that
+    // something just connected to this system from outside the chain.
+    if (
+      'whType' in updates &&
+      updates.whType?.toUpperCase() === 'K162' &&
+      existing?.whType?.toUpperCase() !== 'K162'
+    ) {
+      const sysName = map.systems.find((s) => s.id === systemId)?.name ?? 'unknown system';
+      alertInboundK162(sysName);
+    }
 
     // Re-evaluate connections whenever whType or whLeadsTo changes — either
     // to fill / upgrade the connection, or to clear it if this edit removed
     // the only backing sig.
     if ('whType' in updates || 'whLeadsTo' in updates) {
-      const existing = sigsRef.current.find((s) => s.id === id);
       const nextSigs = sigsRef.current.map((s) => (s.id === id ? { ...s, ...updates } : s));
       reevaluateConnectionsForSystem(systemId, nextSigs, existing);
     }

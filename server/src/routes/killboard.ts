@@ -8,7 +8,7 @@ const router = Router();
 router.use(optionalAuth);
 const log = createLogger('killboard');
 
-const ZKB_AGENT    = 'Eve-Nexum/1.0 (https://github.com/area404/eve-nexum; gq@area404.org)';
+const ZKB_AGENT    = 'Eve-Nexum/1.0 (https://codeberg.org/GQuantrill/eve-nexum; gq@area404.org)';
 const CACHE_TTL_MS = 5 * 60 * 1000;
 const FETCH_TIMEOUT_MS = 8_000;
 

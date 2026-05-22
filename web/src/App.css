@@ -1149,6 +1149,79 @@
   color: #ff8a80;
 }
 
+.chain-exits__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 2px 0;
+}
+
+.chain-exits__chip {
+  font-size: calc(11px * var(--font-scale, 1));
+  padding: 2px 8px;
+  border: 1px solid;
+  border-radius: 999px;
+  background: rgba(8, 9, 15, 0.4);
+}
+
+.chain-exits__chip strong {
+  font-weight: 700;
+  margin-right: 3px;
+}
+
+.chain-exits__nearest {
+  font-size: calc(12px * var(--font-scale, 1));
+  color: #c8d4f0;
+  padding: 4px 8px;
+  background: rgba(110, 160, 255, 0.06);
+  border-left: 2px solid #6ea0ff;
+  border-radius: 0 3px 3px 0;
+}
+
+.chain-exits__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 180px;
+  overflow-y: auto;
+  border: 1px solid #1e2740;
+  border-radius: 4px;
+}
+
+.chain-exits__row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  font-size: calc(12px * var(--font-scale, 1));
+  border-bottom: 1px solid #131a2a;
+}
+
+.chain-exits__row:last-child {
+  border-bottom: none;
+}
+
+.chain-exits__dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.chain-exits__name {
+  flex: 1;
+  color: #c8d4f0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chain-exits__jumps {
+  color: #8a9ab8;
+  font-variant-numeric: tabular-nums;
+}
+
 /* Read-only display of a generated share URL. Monospace so the UUID
    tail stays scannable; truncated with ellipsis if the origin is long. */
 .map-sidebar__share-url {
@@ -3689,6 +3762,28 @@ select.sig-toolbar-btn option {
   color: #6a7898;
 }
 
+.mass-tracker__budget {
+  font-size: calc(12px * var(--font-scale, 1));
+  color: #6ea0ff;
+  padding: 4px 8px;
+  background: rgba(110, 160, 255, 0.06);
+  border-left: 2px solid #6ea0ff;
+  border-radius: 0 3px 3px 0;
+  margin-top: 2px;
+}
+
+.mass-tracker__budget--empty {
+  color: #f0a030;
+  background: rgba(240, 160, 48, 0.06);
+  border-left-color: #f0a030;
+}
+
+.mass-tracker__budget--blocked {
+  color: #e05a5a;
+  background: rgba(224, 90, 90, 0.06);
+  border-left-color: #e05a5a;
+}
+
 .mass-tracker__buttons {
   display: flex;
   flex-wrap: wrap;
@@ -4002,6 +4097,32 @@ select.sig-toolbar-btn option {
   border-radius: 3px;
   transition: width 0.3s ease;
   min-width: 0;
+}
+
+.stats-modal__spark {
+  position: relative;
+  border: 1px solid #1e2740;
+  border-radius: 6px;
+  padding: 4px;
+  background: #08090f;
+}
+
+.stats-modal__spark-svg {
+  display: block;
+  width: 100%;
+  height: 80px;
+}
+
+.stats-modal__spark-tooltip {
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  font-size: calc(11px * var(--font-scale, 1));
+  color: #c8d0e0;
+  background: rgba(8, 9, 15, 0.85);
+  padding: 2px 6px;
+  border-radius: 3px;
+  pointer-events: none;
 }
 
 .confirm-modal__message {

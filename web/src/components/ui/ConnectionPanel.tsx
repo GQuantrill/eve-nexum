@@ -3,6 +3,7 @@ import { useMapStore } from '../../store/mapStore';
 import { useWormholeTypes } from '../../hooks/useWormholeTypes';
 import { useNow30s } from '../../hooks/useNow30s';
 import { useCanEdit } from '../../hooks/useCanEdit';
+import { useCharacterLocation } from '../../hooks/useCharacterLocation';
 import { WHTypeInfo } from './WHTypeInfo';
 import { XIcon } from '@phosphor-icons/react';
 import { api } from '../../api/client';
@@ -70,6 +71,7 @@ export function ConnectionPanel() {
   const whTypes = useWormholeTypes();
   const now     = useNow30s();
   const canEdit = useCanEdit();
+  const location = useCharacterLocation();
 
   // No-op the mutation calls when the user lacks topology permission. The
   // panel still renders so readonly users can inspect the connection.
@@ -218,6 +220,27 @@ export function ConnectionPanel() {
           <div className="mass-tracker__remaining">
             {formatMass(remaining)} remaining · max jump {formatMass(whSpec.maxJumpMass)}
           </div>
+
+          {(() => {
+            const ship = location.ship;
+            if (!ship || ship.mass == null || ship.mass <= 0) return null;
+            // Ship too heavy → this hole won't let it through at all.
+            if (ship.mass > whSpec.maxJumpMass) {
+              return (
+                <div className="mass-tracker__budget mass-tracker__budget--blocked">
+                  Your {ship.typeName} ({formatMass(ship.mass)}) is too heavy for this hole
+                </div>
+              );
+            }
+            const jumps = Math.floor(remaining / ship.mass);
+            return (
+              <div className={`mass-tracker__budget${jumps <= 0 ? ' mass-tracker__budget--empty' : ''}`}>
+                {jumps <= 0
+                  ? <>Not enough mass left for one {ship.typeName} jump ({formatMass(ship.mass)})</>
+                  : <>~{jumps} more {ship.typeName} jump{jumps === 1 ? '' : 's'} ({formatMass(ship.mass)} each)</>}
+              </div>
+            );
+          })()}
           <div className="mass-tracker__buttons">
             {PRESETS
               .filter(p => p.kg <= whSpec.maxJumpMass || p.kg < 200_000_000)

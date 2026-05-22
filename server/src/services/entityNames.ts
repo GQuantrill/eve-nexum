@@ -6,7 +6,7 @@ const log = createLogger('entityNames');
 // ESI POST /universe/names/ accepts up to 1000 IDs per call.
 const ESI_BATCH_SIZE = 1000;
 const ESI_TIMEOUT_MS = 8_000;
-const ESI_AGENT      = 'Eve-Nexum/1.0 (https://github.com/area404/eve-nexum; gq@area404.org)';
+const ESI_AGENT      = 'Eve-Nexum/1.0 (https://codeberg.org/GQuantrill/eve-nexum; gq@area404.org)';
 
 export interface EntityName {
   name:     string;

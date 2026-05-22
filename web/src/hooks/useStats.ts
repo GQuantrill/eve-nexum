@@ -19,7 +19,10 @@ export interface PeriodStats {
   signatures: SigBreakdown;
 }
 
-export type StatsResponse = Record<StatPeriod, PeriodStats>;
+export type StatsResponse = Record<StatPeriod, PeriodStats> & {
+  /** Sig counts per day for the last 30 days, oldest first, today last. */
+  daily: number[];
+};
 
 export function useStats(open: boolean) {
   const [stats, setStats]     = useState<StatsResponse | null>(null);

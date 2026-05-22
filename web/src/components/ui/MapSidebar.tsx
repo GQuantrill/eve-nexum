@@ -17,6 +17,7 @@ import {
 import { useUserSetting } from "../../hooks/useUserSetting";
 import { toPng } from "html-to-image";
 import { CaretLeftIcon, CaretRightIcon } from "@phosphor-icons/react";
+import { ChainExitsSection } from "./ChainExitsSection";
 import type { WormholeMap } from "../../types";
 
 // Single labelled checkbox row backed by useUserSetting so the on/off
@@ -89,6 +90,7 @@ type SectionId =
   | "systemOptions"
   | "connections"
   | "route"
+  | "chainExits"
   | "proximityAlerts"
   | "activity"
   | "fleet"
@@ -780,6 +782,13 @@ export function MapSidebar() {
             high-sec, detour through low/null only when no high-sec path is
             available.
           </p>
+        </CollapsibleSection>
+
+        <CollapsibleSection
+          title="Chain Exits"
+          {...sectionProps("chainExits")}
+        >
+          <ChainExitsSection />
         </CollapsibleSection>
 
         <CollapsibleSection

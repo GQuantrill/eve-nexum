@@ -55,17 +55,23 @@ characterRouter.get('/location', async (req, res) => {
     // Ship is best-effort — a transient ESI hiccup on /ship/ shouldn't
     // hide the rest of the location payload. Look up the type name from
     // the SDE-seeded item_types so the client gets a ready-to-render label.
-    let ship: { typeId: number; typeName: string; shipName: string } | null = null;
+    let ship: { typeId: number; typeName: string; shipName: string; mass: number | null } | null = null;
     if (shipRes.ok) {
       const shipData = await shipRes.json() as { ship_type_id: number; ship_name: string };
-      const { rows: typeRows } = await db.query<{ name: string }>(
-        `SELECT name FROM item_types WHERE id = $1`,
+      const { rows: typeRows } = await db.query<{ name: string; mass: string | null }>(
+        `SELECT name, mass FROM item_types WHERE id = $1`,
         [shipData.ship_type_id],
       );
+      // item_types.mass is NUMERIC (parsed back as string by node-pg). Cast to
+      // number for the wire; null when the SDE row is missing or massless
+      // (capsule has 32k kg, so it'll have a value).
+      const massRaw = typeRows[0]?.mass;
+      const massNum = massRaw == null ? null : Number(massRaw);
       ship = {
         typeId:   shipData.ship_type_id,
         typeName: typeRows[0]?.name ?? `Type ${shipData.ship_type_id}`,
         shipName: shipData.ship_name,
+        mass:     massNum != null && Number.isFinite(massNum) ? massNum : null,
       };
     }
 
