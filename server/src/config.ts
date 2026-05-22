@@ -48,6 +48,7 @@ if (isProd && !process.env.EVE_CLIENT_SECRET) {
 // special case is "exactly 64 hex characters" — those are used verbatim
 // so deployments that previously ran `openssl rand -hex 32` keep the
 // same key bytes and existing encrypted tokens still decrypt.
+
 const TOKEN_ENC_RAW = process.env.TOKEN_ENCRYPTION_KEY;
 if (!TOKEN_ENC_RAW) {
   console.error('FATAL: TOKEN_ENCRYPTION_KEY must be set (any non-empty string is accepted)');
