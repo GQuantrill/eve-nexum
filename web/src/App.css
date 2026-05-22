@@ -2905,6 +2905,25 @@ div.system-node__easy-handle {
 .known-structures__badge--corp-esi       { background: rgba(91,155,255,0.15);  color: #8fc8ff; border: 1px solid rgba(91,155,255,0.4); }
 .known-structures__badge--public-dataset { background: rgba(122,138,168,0.15); color: #c8d0e0; border: 1px solid rgba(122,138,168,0.4); }
 
+/* Read-only twin of .sig-input, used in share mode where the row cells
+   become plain text instead of inputs/selects. Same typography so column
+   widths stay stable when switching modes. */
+.sig-text {
+  color: #c8d0e0;
+  font-size: calc(14px * var(--font-scale, 1));
+  font-family: inherit;
+  display: inline-block;
+  width: 100%;
+}
+
+.sig-text--id {
+  font-family: 'Courier New', monospace;
+}
+
+.sig-text--type {
+  text-transform: capitalize;
+}
+
 .sig-input {
   background: transparent;
   border: none;
@@ -3133,9 +3152,14 @@ select.sig-toolbar-btn option {
    than its labels survive (~220px). flex-basis 240px combined with wrap
    lets the row pack: 4-up on wide screens, 2-up on mid, 1-up on narrow. */
 .activity-chart {
-  flex: 1 1 240px;
-  min-width: 220px;
-  max-width: 100%;
+  /* Cap each chart at ~360px so the last chart on a wrapped row doesn't
+     stretch to fill the entire pane. flex-basis matches the cap so
+     widths stay consistent across rows (the wrap-to-next-row case used
+     to balloon NPC Delta to ~1100px while the row above it was ~280px
+     per chart). */
+  flex: 0 1 360px;
+  min-width: 240px;
+  max-width: 360px;
   display: flex;
   flex-direction: column;
   border: 1px solid #1a2535;

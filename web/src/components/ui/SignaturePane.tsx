@@ -472,15 +472,17 @@ export function SignaturePane({ systemId }: { systemId: string }) {
           </colgroup>
           <thead>
             <tr>
-              <th>
-                <input
-                  type="checkbox"
-                  className="sig-checkbox"
-                  checked={allChecked}
-                  ref={(el) => { if (el) el.indeterminate = someChecked; }}
-                  onChange={toggleAll}
-                />
-              </th>
+              {!isShareMode && (
+                <th>
+                  <input
+                    type="checkbox"
+                    className="sig-checkbox"
+                    checked={allChecked}
+                    ref={(el) => { if (el) el.indeterminate = someChecked; }}
+                    onChange={toggleAll}
+                  />
+                </th>
+              )}
               <th className="sig-th sig-th--sortable" onClick={() => handleSort('sigId')}>
                 ID{sortInd('sigId')}
                 <div className="sig-th__resize" onMouseDown={(e) => startResize('id', e)} />
@@ -513,69 +515,89 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                 Updated{sortInd('updatedAt')}
                 <div className="sig-th__resize" onMouseDown={(e) => startResize('updated', e)} />
               </th>
-              <th />
+              {!isShareMode && <th />}
             </tr>
           </thead>
           <tbody>
             {sortedSigs.map((sig) => (
               <tr key={sig.id} className={`${selected.has(sig.id) ? 'sig-row--selected' : ''} ${sig.sigType === 'unknown' ? 'sig-row--unknown' : ''} ${whAgeRowClass(sig.sigType, sig.whType, sig.createdAt, tickNow)}`}>
-                <td>
-                  <input
-                    type="checkbox"
-                    className="sig-checkbox"
-                    checked={selected.has(sig.id)}
-                    onChange={() => toggleSelect(sig.id)}
-                  />
-                </td>
-                <td>
-                  <input
-                    className="sig-input sig-input--id"
-                    value={sig.sigId}
-                    onChange={(e) => updateSig(sig.id, { sigId: e.target.value.toUpperCase() })}
-                    placeholder="ABC-123"
-                    maxLength={7}
-                    spellCheck={false}
-                  />
-                </td>
-                <td>
-                  <select
-                    className={`sig-select sig-select--type sig-select--type-${sig.sigType}`}
-                    value={sig.sigType}
-                    onChange={(e) => updateSig(sig.id, { sigType: e.target.value as SigType })}
-                  >
-                    {(Object.keys(SIG_TYPE_LABELS) as SigType[]).map((t) => (
-                      <option key={t} value={t}>{SIG_TYPE_LABELS[t]}</option>
-                    ))}
-                  </select>
-                </td>
-                <td className="sig-td--wh">
-                  {sig.sigType === 'wormhole' && (
-                    <WormholeTypePicker
-                      value={sig.whType}
-                      statics={systemStatics}
-                      onChange={(whType, leadsTo) => updateSig(sig.id, {
-                        whType,
-                        ...(!sig.whLeadsTo && leadsTo ? { whLeadsTo: leadsTo } : {}),
-                      })}
+                {!isShareMode && (
+                  <td>
+                    <input
+                      type="checkbox"
+                      className="sig-checkbox"
+                      checked={selected.has(sig.id)}
+                      onChange={() => toggleSelect(sig.id)}
                     />
-                  )}
-                </td>
-                <td className="sig-td--wh">
-                  {sig.sigType === 'wormhole' && (
-                    <LeadsToDropdown
-                      value={sig.whLeadsTo}
-                      connectedSystems={connectedSystems}
-                      onChange={(leadsTo) => updateSig(sig.id, { whLeadsTo: leadsTo })}
+                  </td>
+                )}
+                <td>
+                  {isShareMode ? (
+                    <span className="sig-text sig-text--id">{sig.sigId}</span>
+                  ) : (
+                    <input
+                      className="sig-input sig-input--id"
+                      value={sig.sigId}
+                      onChange={(e) => updateSig(sig.id, { sigId: e.target.value.toUpperCase() })}
+                      placeholder="ABC-123"
+                      maxLength={7}
+                      spellCheck={false}
                     />
                   )}
                 </td>
                 <td>
-                  <input
-                    className="sig-input"
-                    value={sig.name}
-                    onChange={(e) => updateSig(sig.id, { name: e.target.value })}
-                    placeholder="Site name"
-                  />
+                  {isShareMode ? (
+                    <span className={`sig-text sig-text--type sig-select--type-${sig.sigType}`}>
+                      {SIG_TYPE_LABELS[sig.sigType]}
+                    </span>
+                  ) : (
+                    <select
+                      className={`sig-select sig-select--type sig-select--type-${sig.sigType}`}
+                      value={sig.sigType}
+                      onChange={(e) => updateSig(sig.id, { sigType: e.target.value as SigType })}
+                    >
+                      {(Object.keys(SIG_TYPE_LABELS) as SigType[]).map((t) => (
+                        <option key={t} value={t}>{SIG_TYPE_LABELS[t]}</option>
+                      ))}
+                    </select>
+                  )}
+                </td>
+                <td className="sig-td--wh">
+                  {sig.sigType === 'wormhole' && (
+                    isShareMode
+                      ? <span className="sig-text">{sig.whType || ''}</span>
+                      : <WormholeTypePicker
+                          value={sig.whType}
+                          statics={systemStatics}
+                          onChange={(whType, leadsTo) => updateSig(sig.id, {
+                            whType,
+                            ...(!sig.whLeadsTo && leadsTo ? { whLeadsTo: leadsTo } : {}),
+                          })}
+                        />
+                  )}
+                </td>
+                <td className="sig-td--wh">
+                  {sig.sigType === 'wormhole' && (
+                    isShareMode
+                      ? <span className="sig-text">{sig.whLeadsTo || ''}</span>
+                      : <LeadsToDropdown
+                          value={sig.whLeadsTo}
+                          connectedSystems={connectedSystems}
+                          onChange={(leadsTo) => updateSig(sig.id, { whLeadsTo: leadsTo })}
+                        />
+                  )}
+                </td>
+                <td>
+                  {isShareMode ? (
+                    <span className="sig-text">{sig.name}</span>
+                  ) : (
+                    <input
+                      className="sig-input"
+                      value={sig.name}
+                      onChange={(e) => updateSig(sig.id, { name: e.target.value })}
+                      placeholder="Site name"
+                    />
+                  )}
                 </td>
                 <td className="sig-notes-cell">
                   <NotesEditor
@@ -587,15 +609,17 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                 </td>
                 <ElapsedCell iso={sig.createdAt} className="sig-td--time" />
                 <ElapsedCell iso={sig.updatedAt} className="sig-td--time sig-td--updated" />
-                <td>
-                  {canEdit && (
-                    <button
-                      className="icon-btn icon-btn--danger"
-                      onClick={() => deleteSig(sig.id)}
-                      title="Delete"
-                    ><XIcon size={12} weight="bold" /></button>
-                  )}
-                </td>
+                {!isShareMode && (
+                  <td>
+                    {canEdit && (
+                      <button
+                        className="icon-btn icon-btn--danger"
+                        onClick={() => deleteSig(sig.id)}
+                        title="Delete"
+                      ><XIcon size={12} weight="bold" /></button>
+                    )}
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>

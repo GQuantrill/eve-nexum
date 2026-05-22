@@ -120,8 +120,14 @@ shareRouter.get('/:token', async (req, res) => {
         [mapId],
       ),
       db.query(
+        // Aliases match the owner-side /api/maps/:mapId/.../signatures
+        // shape exactly so the SignaturePane consumes them with the same
+        // field names — otherwise sigType arrives undefined and every
+        // row renders as "unknown".
         `SELECT s.id, s.system_id AS "systemId", s.sig_id AS "sigId",
-                s.name, s.sig_type AS "type", s.created_at AS "createdAt"
+                s.sig_type AS "sigType", s.name, s.notes,
+                s.wh_type AS "whType", s.wh_leads_to AS "whLeadsTo",
+                s.created_at AS "createdAt", s.updated_at AS "updatedAt"
          FROM map_signatures s
          JOIN map_systems sys ON sys.id = s.system_id
          WHERE sys.map_id = $1`,
