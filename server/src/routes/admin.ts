@@ -128,6 +128,7 @@ adminReadRouter.get('/users', async (_req, res) => {
     characterName:   string;
     role:            string;
     corpId:          number | null;
+    allianceId:      number | null;
     blocked:         boolean;
     createdAt:       string;
     lastLogin:       string;
@@ -140,6 +141,7 @@ adminReadRouter.get('/users', async (_req, res) => {
       u.character_name AS "characterName",
       u.role,
       u.corp_id        AS "corpId",
+      u.alliance_id    AS "allianceId",
       u.blocked,
       u.created_at     AS "createdAt",
       u.updated_at     AS "lastLogin",
@@ -159,13 +161,19 @@ adminReadRouter.get('/users', async (_req, res) => {
     ORDER BY u.updated_at DESC
   `);
 
-  const corpInfo = await resolveCorps(rows.map((r) => r.corpId).filter((id): id is number => id !== null));
+  const [corpInfo, allianceInfo] = await Promise.all([
+    resolveCorps(rows.map((r) => r.corpId).filter((id): id is number => id !== null)),
+    resolveAlliances(rows.map((r) => r.allianceId).filter((id): id is number => id !== null)),
+  ]);
   const users = rows.map((r) => {
-    const info = r.corpId !== null ? corpInfo.get(r.corpId) : null;
+    const cInfo = r.corpId     !== null ? corpInfo.get(r.corpId)         : null;
+    const aInfo = r.allianceId !== null ? allianceInfo.get(r.allianceId) : null;
     return {
       ...r,
-      corpTicker: info?.ticker ?? null,
-      corpName:   info?.name   ?? null,
+      corpTicker:     cInfo?.ticker ?? null,
+      corpName:       cInfo?.name   ?? null,
+      allianceTicker: aInfo?.ticker ?? null,
+      allianceName:   aInfo?.name   ?? null,
     };
   });
 

@@ -24,6 +24,7 @@ import { loadRouteGraph } from './services/routeGraph.js';
 import { adminRouter, adminReadRouter, reportsRouter } from './routes/admin.js';
 import { standingsRouter } from './routes/standings.js';
 import { knownStructuresRouter } from './routes/knownStructures.js';
+import { shareRouter } from './routes/share.js';
 import { initCorpStructuresPoller } from './services/corpStructures.js';
 import { initPublicStructuresPoller } from './services/publicStructures.js';
 import { authLimiter, esiLimiter, publicLimiter } from './middleware/rateLimits.js';
@@ -62,6 +63,9 @@ app.use(session({
 app.use('/auth', authLimiter, authRouter);
 app.use('/api/systems', publicLimiter, systemsRouter);
 app.use('/api/maps', mapsRouter);
+// Public read-only share endpoint — no auth, validates the share_token
+// itself. Rate-limited under publicLimiter alongside other unauthed routes.
+app.use('/api/share', publicLimiter, shareRouter);
 app.use('/api/character', esiLimiter, characterRouter);
 app.use('/api/killboard', esiLimiter, killboardRouter);
 app.use('/api/activity',  esiLimiter, activityRouter);

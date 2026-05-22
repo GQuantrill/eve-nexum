@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api/client';
+import { useShareMode } from '../context/ShareModeContext';
 
 export interface FleetMember {
   characterId:   number;
@@ -74,9 +75,15 @@ function load() {
  * SystemNode to another doesn't multiply the ESI cost.
  */
 export function useFleet(): FleetState {
+  const { isShareMode } = useShareMode();
   const [data, setData] = useState<FleetState>(moduleCache?.data ?? EMPTY);
 
   useEffect(() => {
+    // Share viewers don't have a session; the /api/character/fleet endpoint
+    // would 401. Short-circuit to the empty state so the SystemNode dot
+    // never renders for a guest.
+    if (isShareMode) return;
+
     subscribers.add(setData);
     const now = Date.now();
     if (!moduleCache || now - moduleCache.fetchedAt >= POLL_MS) load();
@@ -89,7 +96,7 @@ export function useFleet(): FleetState {
         pollTimer = null;
       }
     };
-  }, []);
+  }, [isShareMode]);
 
-  return data;
+  return isShareMode ? EMPTY : data;
 }

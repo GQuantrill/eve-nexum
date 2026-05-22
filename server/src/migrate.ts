@@ -106,6 +106,12 @@ export async function migrate() {
     ALTER TABLE maps ADD COLUMN IF NOT EXISTS corp_id        INTEGER;
     ALTER TABLE maps ADD COLUMN IF NOT EXISTS locked         BOOLEAN     NOT NULL DEFAULT FALSE;
     ALTER TABLE maps ADD COLUMN IF NOT EXISTS last_active_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
+    -- Read-only share links. Token is the only thing in the URL; the
+    -- expiry column is the source of truth for "still valid" — a NULL
+    -- token means sharing has been revoked outright.
+    ALTER TABLE maps ADD COLUMN IF NOT EXISTS share_token      UUID;
+    ALTER TABLE maps ADD COLUMN IF NOT EXISTS share_expires_at TIMESTAMPTZ;
+    CREATE UNIQUE INDEX IF NOT EXISTS uq_maps_share_token ON maps (share_token) WHERE share_token IS NOT NULL;
 
     CREATE TABLE IF NOT EXISTS map_systems (
       id            UUID        PRIMARY KEY,

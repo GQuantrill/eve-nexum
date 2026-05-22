@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import { db } from '../db.js';
-import { requireAuth } from '../middleware/requireAuth.js';
+import { optionalAuth } from '../middleware/optionalAuth.js';
 
 const router = Router();
-router.use(requireAuth);
+router.use(optionalAuth);
 const ESI         = 'https://esi.evetech.net/v1';
 const HOUR_MS     = 60 * 60 * 1000;
 const MAX_HISTORY = 24;

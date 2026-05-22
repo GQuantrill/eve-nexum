@@ -21,6 +21,7 @@ import { truesecColor } from '../../utils/truesec';
 import { useIncursions, findIncursion } from '../../hooks/useIncursions';
 import { useInsurgency, findInsurgency } from '../../hooks/useInsurgency';
 import { useCanEditContent } from '../../hooks/useCanEditContent';
+import { useShareMode } from '../../context/ShareModeContext';
 import { WHTypeInfo } from './WHTypeInfo';
 
 /**
@@ -120,6 +121,7 @@ export function SystemPanel() {
   const selectSystem     = useMapStore((s) => s.selectSystem);
   const setPanelOrder    = useMapStore((s) => s.setPanelOrder);
   const canEdit          = useCanEditContent();
+  const { isShareMode }  = useShareMode();
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
 
   const [height, setHeight] = useState(() => {
@@ -201,7 +203,7 @@ export function SystemPanel() {
         <div className="system-panel__header">
           <h2 className="system-panel__title">{sys.name || 'Unknown System'}</h2>
           <div className="system-panel__actions">
-            {sys.eveSystemId && (
+            {sys.eveSystemId && !isShareMode && (
               <>
                 <button
                   type="button"
@@ -522,11 +524,16 @@ export function SystemPanel() {
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={panelOrder} strategy={verticalListSortingStrategy}>
           <div className="panel-stack">
-            {panelOrder.map((id) => (
-              <DraggableCard key={id} id={id} title={PANEL_TITLES[id] ?? id}>
-                {cards[id]}
-              </DraggableCard>
-            ))}
+            {panelOrder
+              // Notes and Structures are not part of the public share
+              // payload (notes are stripped, structures are never queried).
+              // Hide their tabs so a guest never sees an empty pane.
+              .filter((id) => !isShareMode || (id !== 'notes' && id !== 'structures'))
+              .map((id) => (
+                <DraggableCard key={id} id={id} title={PANEL_TITLES[id] ?? id}>
+                  {cards[id]}
+                </DraggableCard>
+              ))}
           </div>
         </SortableContext>
       </DndContext>

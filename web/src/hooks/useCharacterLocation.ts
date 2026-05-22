@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api/client';
 import { flushQueue } from '../store/pendingQueue';
+import { useShareMode } from '../context/ShareModeContext';
 
 export interface CharacterLocationSystem {
   eveSystemId: number;
@@ -62,9 +63,13 @@ function load() {
 }
 
 export function useCharacterLocation(): CharacterLocation {
+  const { isShareMode } = useShareMode();
   const [data, setData] = useState<CharacterLocation>(moduleCache?.data ?? EMPTY);
 
   useEffect(() => {
+    // No session in share mode — nothing to poll and nobody to be located.
+    if (isShareMode) return;
+
     subscribers.add(setData);
     const now = Date.now();
     if (!moduleCache || now - moduleCache.fetchedAt >= POLL_MS) load();
@@ -77,7 +82,7 @@ export function useCharacterLocation(): CharacterLocation {
         pollTimer = null;
       }
     };
-  }, []);
+  }, [isShareMode]);
 
-  return data;
+  return isShareMode ? EMPTY : data;
 }

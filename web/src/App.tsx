@@ -13,6 +13,7 @@ import { CommandPaletteModal } from './components/ui/CommandPaletteModal';
 import { LandingPage } from './components/ui/LandingPage';
 import { Toaster } from './components/ui/Toaster';
 import { AdminPage } from './components/ui/AdminPage';
+import { SharedMapView } from './components/ui/SharedMapView';
 import { useMapStore } from './store/mapStore';
 import { useLocationTracking } from './hooks/useLocationTracking';
 import { useHashRoute } from './hooks/useHashRoute';
@@ -87,6 +88,12 @@ function MapApp() {
 function AppShell() {
   const { user, loading } = useAuth();
   const [path] = useHashRoute();
+
+  // Share links bypass the entire auth gate — a guest with the URL should
+  // be able to load the map without ever seeing the landing page. Match
+  // BEFORE the user/loading checks below.
+  const shareMatch = path.match(/^\/share\/([0-9a-fA-F-]{36})$/);
+  if (shareMatch) return <SharedMapView token={shareMatch[1]} />;
 
   if (loading) {
     return (

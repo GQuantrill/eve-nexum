@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import * as cheerio from 'cheerio';
 import { db } from '../db.js';
-import { requireAuth } from '../middleware/requireAuth.js';
+import { optionalAuth } from '../middleware/optionalAuth.js';
 import { createLogger } from '../utils/logger.js';
 import { TtlValue } from '../utils/cache.js';
 
@@ -11,7 +11,7 @@ import { TtlValue } from '../utils/cache.js';
 // fetch on cache miss, fall back to stale on upstream errors.
 
 const router = Router();
-router.use(requireAuth);
+router.use(optionalAuth);
 const log = createLogger('storms');
 
 const SOURCE_URL    = 'https://evescoutrescue.com/home/stormtrack.php';

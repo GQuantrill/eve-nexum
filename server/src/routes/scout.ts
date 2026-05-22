@@ -1,10 +1,10 @@
 import { Router } from 'express';
-import { requireAuth } from '../middleware/requireAuth.js';
+import { optionalAuth } from '../middleware/optionalAuth.js';
 import { createLogger } from '../utils/logger.js';
 import { TtlValue } from '../utils/cache.js';
 
 const router = Router();
-router.use(requireAuth);
+router.use(optionalAuth);
 const log = createLogger('scout');
 
 export interface ScoutConnection {

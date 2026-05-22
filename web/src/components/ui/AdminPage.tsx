@@ -87,11 +87,58 @@ interface AdminUser {
   corpId:          number | null;
   corpTicker:      string | null;
   corpName:        string | null;
+  allianceId:      number | null;
+  allianceTicker:  string | null;
+  allianceName:    string | null;
   blocked:         boolean;
   createdAt:       string;
   lastLogin:       string;
   totalEvents:     number;
   totalSignatures: number;
+}
+
+type UserSortKey = 'characterName' | 'corpTicker' | 'allianceTicker' | 'role' | 'blocked' | 'lastLogin';
+interface UserSort { key: UserSortKey; dir: 'asc' | 'desc' }
+
+// Click-to-sort header cell. Shows an arrow on the currently-sorted column,
+// faded indicator on the others to hint at the affordance.
+function SortableTh({ col, label, sort, onToggle }: {
+  col:      UserSortKey;
+  label:    string;
+  sort:     UserSort;
+  onToggle: (k: UserSortKey) => void;
+}) {
+  const active = sort.key === col;
+  const arrow  = active ? (sort.dir === 'asc' ? '↑' : '↓') : '↕';
+  return (
+    <th
+      className={`admin-modal__th-sort${active ? ' admin-modal__th-sort--active' : ''}`}
+      onClick={() => onToggle(col)}
+      role="button"
+      aria-sort={active ? (sort.dir === 'asc' ? 'ascending' : 'descending') : 'none'}
+    >
+      {label} <span className="admin-modal__th-sort-arrow">{arrow}</span>
+    </th>
+  );
+}
+
+// Compare helper — keeps nulls at the bottom on asc, top on desc so the
+// "no alliance" rows don't get scattered through the middle of the list.
+function compareUsers(a: AdminUser, b: AdminUser, sort: UserSort): number {
+  const dir = sort.dir === 'asc' ? 1 : -1;
+  const av  = a[sort.key];
+  const bv  = b[sort.key];
+  if (av === null && bv === null) return 0;
+  if (av === null) return 1;   // nulls always last regardless of dir
+  if (bv === null) return -1;
+  if (typeof av === 'string' && typeof bv === 'string') {
+    return av.localeCompare(bv, undefined, { sensitivity: 'base' }) * dir;
+  }
+  if (typeof av === 'boolean' && typeof bv === 'boolean') {
+    return (Number(av) - Number(bv)) * dir;
+  }
+  // Last login arrives as ISO string but should sort lexicographically anyway.
+  return String(av).localeCompare(String(bv)) * dir;
 }
 
 function UsersTab() {
@@ -101,6 +148,19 @@ function UsersTab() {
   const [error, setError]     = useState<string | null>(null);
   const [busyId, setBusyId]   = useState<number | null>(null);
   const [blockTarget, setBlockTarget] = useState<AdminUser | null>(null);
+  // Default: most recent login first (matches the server's ORDER BY).
+  const [sort, setSort] = useState<UserSort>({ key: 'lastLogin', dir: 'desc' });
+
+  function toggleSort(key: UserSortKey) {
+    setSort((prev) => prev.key === key
+      ? { key, dir: prev.dir === 'asc' ? 'desc' : 'asc' }
+      : { key, dir: 'asc' });
+  }
+
+  const sortedUsers = useMemo(
+    () => (users ? [...users].sort((a, b) => compareUsers(a, b, sort)) : null),
+    [users, sort],
+  );
 
   const load = useCallback(async () => {
     setError(null);
@@ -165,16 +225,17 @@ function UsersTab() {
         <table className="admin-modal__table">
           <thead>
             <tr>
-              <th>Character</th>
-              <th>Corp</th>
-              <th>Role</th>
-              <th>Status</th>
-              <th>Last login</th>
+              <SortableTh col="characterName"  label="Character"  sort={sort} onToggle={toggleSort} />
+              <SortableTh col="corpTicker"     label="Corp"       sort={sort} onToggle={toggleSort} />
+              <SortableTh col="allianceTicker" label="Alliance"   sort={sort} onToggle={toggleSort} />
+              <SortableTh col="role"           label="Role"       sort={sort} onToggle={toggleSort} />
+              <SortableTh col="blocked"        label="Status"     sort={sort} onToggle={toggleSort} />
+              <SortableTh col="lastLogin"      label="Last login" sort={sort} onToggle={toggleSort} />
               {canEdit && <th />}
             </tr>
           </thead>
           <tbody>
-            {users.map((u) => {
+            {(sortedUsers ?? users).map((u) => {
               const isSelf = self?.id === u.id;
               const isBusy = busyId === u.id;
               return (
@@ -192,6 +253,11 @@ function UsersTab() {
                     {u.corpTicker
                       ? <span className="admin-modal__ticker">[{u.corpTicker}]</span>
                       : <span className="admin-modal__mono">{u.corpId ?? '—'}</span>}
+                  </td>
+                  <td title={u.allianceName ?? undefined}>
+                    {u.allianceTicker
+                      ? <span className="admin-modal__ticker">[{u.allianceTicker}]</span>
+                      : <span className="admin-modal__mono">—</span>}
                   </td>
                   <td>
                     {canEdit ? (

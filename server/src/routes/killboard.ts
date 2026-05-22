@@ -1,11 +1,11 @@
 import { Router } from 'express';
-import { requireAuth } from '../middleware/requireAuth.js';
+import { optionalAuth } from '../middleware/optionalAuth.js';
 import { createLogger } from '../utils/logger.js';
 import { TtlCache } from '../utils/cache.js';
 import { resolveEntityNames } from '../services/entityNames.js';
 
 const router = Router();
-router.use(requireAuth);
+router.use(optionalAuth);
 const log = createLogger('killboard');
 
 const ZKB_AGENT    = 'Eve-Nexum/1.0 (https://github.com/area404/eve-nexum; gq@area404.org)';

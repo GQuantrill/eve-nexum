@@ -67,7 +67,14 @@ mapsRouter.use(requireAuth);
 
 interface MapMeta { userId: number; corpId: number | null; locked: boolean; }
 
+// UUID-shape guard. The maps router takes :mapId straight from the URL,
+// and Postgres' uuid type throws a 22P02 on malformed input — which would
+// crash the whole process as an unhandled async rejection. Cheap regex
+// up front keeps that case as a clean 404.
+const UUID_RE = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+
 async function getMapAccess(mapId: string, req: Request): Promise<MapMeta | null> {
+  if (!UUID_RE.test(mapId)) return null;
   const userId = req.session.userId!;
   const { rows } = await db.query<MapMeta>(
     `SELECT user_id AS "userId", corp_id AS "corpId", locked FROM maps WHERE id = $1`,
@@ -410,6 +417,8 @@ mapsRouter.get('/:mapId', async (req, res) => {
   const [mapRows, systems, connections] = await Promise.all([
     db.query(
       `SELECT id, name, corp_id IS NOT NULL AS "isCorpMap", locked,
+              share_token      AS "shareToken",
+              share_expires_at AS "shareExpiresAt",
               created_at AS "createdAt", updated_at AS "updatedAt"
        FROM maps WHERE id = $1`,
       [mapId],
@@ -820,6 +829,69 @@ mapsRouter.delete('/:mapId/systems/:systemId/structures/:structureId', async (re
   if (!access) return;
   if (!(await verifySystemInMap(res, systemId, mapId))) return;
   await db.query(`DELETE FROM map_structures WHERE id = $1 AND system_id = $2`, [structureId, systemId]);
+  res.json({ ok: true });
+});
+
+// ── Share links ───────────────────────────────────────────────────────────────
+
+// Sharing has stricter permissions than editing. Anyone with edit access can
+// modify a corp map, but only an admin can hand out a public read-only link.
+// Personal maps still belong to their owner — only they can share.
+async function requireShareAdmin(res: Response, mapId: string, req: Request): Promise<MapMeta | null> {
+  const access = await getMapAccess(mapId, req);
+  if (!access) { res.status(404).json({ error: 'Map not found' }); return null; }
+
+  const role = req.session.role ?? 'readonly';
+  const userId = req.session.userId!;
+  const isCorpMap = config.corpMode
+    && access.corpId !== null
+    && config.corpIds.includes(access.corpId);
+
+  if (isCorpMap) {
+    if (role !== 'admin') {
+      res.status(403).json({ error: 'Only an admin can share a corp map' });
+      return null;
+    }
+  } else if (access.userId !== userId) {
+    res.status(403).json({ error: 'Only the owner can share this map' });
+    return null;
+  }
+  return access;
+}
+
+// POST /api/maps/:mapId/share
+// Generates a fresh share token (or replaces an existing one) and stamps
+// expires_at = NOW() + 48h. One token per map by design — regenerate to
+// rotate. Returns the full share URL ready to copy to clipboard.
+mapsRouter.post('/:mapId/share', async (req, res) => {
+  const { mapId } = req.params;
+  if (!(await requireShareAdmin(res, mapId, req))) return;
+
+  const token = crypto.randomUUID();
+  const { rows } = await db.query<{ expiresAt: string }>(
+    `UPDATE maps
+        SET share_token      = $1,
+            share_expires_at = NOW() + INTERVAL '48 hours'
+      WHERE id = $2
+      RETURNING share_expires_at AS "expiresAt"`,
+    [token, mapId],
+  );
+  const origin = (process.env.FRONTEND_URL ?? '').replace(/\/+$/, '');
+  res.json({
+    token,
+    url:       `${origin}/#/share/${token}`,
+    expiresAt: rows[0]?.expiresAt ?? null,
+  });
+});
+
+// DELETE /api/maps/:mapId/share
+mapsRouter.delete('/:mapId/share', async (req, res) => {
+  const { mapId } = req.params;
+  if (!(await requireShareAdmin(res, mapId, req))) return;
+  await db.query(
+    `UPDATE maps SET share_token = NULL, share_expires_at = NULL WHERE id = $1`,
+    [mapId],
+  );
   res.json({ ok: true });
 });
 

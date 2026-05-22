@@ -5,6 +5,7 @@ import { ContextMenu } from './ContextMenu';
 import { PathIcon, MapPinSimpleIcon } from '@phosphor-icons/react';
 import { setDestination, addWaypoint } from '../../api/waypoint';
 import { loadSystem } from '../../hooks/useEsiSystem';
+import { useShareMode } from '../../context/ShareModeContext';
 
 const ESI = 'https://esi.evetech.net/latest';
 
@@ -67,6 +68,7 @@ export function NpcStationsPane({ eveSystemId }: { eveSystemId: number | null })
   const [ctx, setCtx]           = useState<CtxState | null>(null);
   const ctxRef                  = useRef<CtxState | null>(null);
   ctxRef.current = ctx;
+  const { isShareMode } = useShareMode();
 
   useEffect(() => {
     if (!eveSystemId) return;
@@ -98,7 +100,11 @@ export function NpcStationsPane({ eveSystemId }: { eveSystemId: number | null })
     <>
       <ul className="npc-station-list">
         {stations.map((s) => (
-          <li key={s.id} className="npc-station-item" onContextMenu={(e) => onContextMenu(e, s)}>
+          <li
+            key={s.id}
+            className="npc-station-item"
+            onContextMenu={isShareMode ? undefined : (e) => onContextMenu(e, s)}
+          >
             <span className="npc-station-name">{s.name}</span>
             <span className="npc-station-actions">
               {s.services.length > 0 && (
@@ -114,28 +120,30 @@ export function NpcStationsPane({ eveSystemId }: { eveSystemId: number | null })
                   })}
                 </span>
               )}
-              <span className="npc-station-btns">
-                <button
-                  type="button"
-                  className="sys-btn"
-                  onClick={(e) => { e.stopPropagation(); setDestination(s.id).catch(console.error); }}
-                >
-                  Set Destination
-                </button>
-                <button
-                  type="button"
-                  className="sys-btn"
-                  onClick={(e) => { e.stopPropagation(); addWaypoint(s.id).catch(console.error); }}
-                >
-                  + Waypoint
-                </button>
-              </span>
+              {!isShareMode && (
+                <span className="npc-station-btns">
+                  <button
+                    type="button"
+                    className="sys-btn"
+                    onClick={(e) => { e.stopPropagation(); setDestination(s.id).catch(console.error); }}
+                  >
+                    Set Destination
+                  </button>
+                  <button
+                    type="button"
+                    className="sys-btn"
+                    onClick={(e) => { e.stopPropagation(); addWaypoint(s.id).catch(console.error); }}
+                  >
+                    + Waypoint
+                  </button>
+                </span>
+              )}
             </span>
           </li>
         ))}
       </ul>
 
-      {ctx && createPortal(
+      {ctx && !isShareMode && createPortal(
         <ContextMenu
           x={ctx.x}
           y={ctx.y}

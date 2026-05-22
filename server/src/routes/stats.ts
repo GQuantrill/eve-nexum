@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import { db } from '../db.js';
-import { requireAuth } from '../middleware/requireAuth.js';
+import { optionalAuth } from '../middleware/optionalAuth.js';
 
 const router = Router();
-router.use(requireAuth);
+router.use(optionalAuth);
 
 const SIG_TYPES = ['data', 'relic', 'gas', 'ore', 'combat', 'wormhole', 'unknown'] as const;
 type SigType = typeof SIG_TYPES[number];

@@ -9,6 +9,100 @@
   user-select: none;
 }
 
+/* Shared-view header strip — replaces the regular Toolbar when a guest
+   loads a read-only map link. Slim, just enough to identify the map and
+   credit the owner. */
+.share-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px;
+  height: 36px;
+  background: #0d1117;
+  border-bottom: 1px solid #1e2740;
+  flex-shrink: 0;
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #8693ad;
+}
+
+.share-header__title {
+  font-weight: 600;
+  color: #e2e8f8;
+}
+
+.share-header__meta strong {
+  color: #c8d4f0;
+  font-weight: 500;
+}
+
+.share-header__sep {
+  color: #2e3f60;
+}
+
+/* Right-aligned recruit button. margin-left:auto pulls it to the edge so
+   the meta cluster on the left stays naturally packed. */
+.share-header__cta {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  background: #1d3a6b;
+  border: 1px solid #2e4a7a;
+  border-radius: 4px;
+  color: #e2e8f8;
+  text-decoration: none;
+  font-size: calc(12px * var(--font-scale, 1));
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  transition: background 120ms ease, border-color 120ms ease;
+}
+
+.share-header__cta:hover {
+  background: #2e4a7a;
+  border-color: #5a9af8;
+}
+
+/* Branded error card shown when a share link is expired or not found. */
+.share-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: #08090f;
+  color: #c8d0e0;
+  font-family: 'Inter', system-ui, sans-serif;
+  padding: 16px;
+}
+
+.share-error__card {
+  max-width: 460px;
+  background: #0d1117;
+  border: 1px solid #1e2740;
+  border-radius: 10px;
+  padding: 28px 32px;
+  text-align: center;
+}
+
+.share-error__title {
+  font-size: calc(18px * var(--font-scale, 1));
+  font-weight: 600;
+  color: #e2e8f8;
+  margin-bottom: 16px;
+}
+
+.share-error__body {
+  font-size: calc(14px * var(--font-scale, 1));
+  color: #c0ccde;
+  line-height: 1.5;
+  margin: 8px 0;
+}
+
+.share-error__hint {
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #7a8aa8;
+  margin-top: 16px;
+}
+
 .layout__body {
   display: flex;
   flex-direction: row;
@@ -991,6 +1085,31 @@
   color: #8a9ab8;
   line-height: 1.4;
   padding: 4px 0 0;
+}
+
+.map-sidebar__hint--error {
+  color: #ff8a80;
+}
+
+/* Read-only display of a generated share URL. Monospace so the UUID
+   tail stays scannable; truncated with ellipsis if the origin is long. */
+.map-sidebar__share-url {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: calc(11px * var(--font-scale, 1));
+  color: #c8d4f0;
+  background: #08101a;
+  border: 1px solid #1e2740;
+  border-radius: 4px;
+  padding: 6px 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.map-sidebar__share-meta {
+  font-size: calc(11px * var(--font-scale, 1));
+  color: #7a8aa8;
+  padding: 2px 0;
 }
 
 .map-sidebar__shortcut {
@@ -2649,6 +2768,13 @@ div.system-node__easy-handle {
   padding: 4px 0;
 }
 
+/* Share-mode variant: there's no toolbar or hint above this message, so
+   center it in the empty pane instead of letting it hug the top-left. */
+.sig-pane__empty--shared {
+  text-align: center;
+  padding: 24px 0;
+}
+
 .sig-table {
   border-collapse: collapse;
   font-size: calc(14px * var(--font-scale, 1));
@@ -3137,6 +3263,7 @@ select.sig-toolbar-btn option {
 
 .npc-svc-icon {
   position: relative;
+  z-index: 0;
   font-size: calc(32px * var(--font-scale, 1));
   color: #8090a8;
   cursor: default;
@@ -3144,27 +3271,42 @@ select.sig-toolbar-btn option {
   transition: color 0.1s;
 }
 
+/* Lift the hovered icon (and therefore its ::after tooltip) above sibling
+   icons in the same row — without this the tooltip plate gets painted
+   under the neighbouring icons. */
 .npc-svc-icon:hover {
   color: #7ab4f0;
+  z-index: 9999;
 }
 
 .npc-svc-icon::after {
   content: attr(data-tooltip);
   position: absolute;
-  bottom: calc(100% + 4px);
+  /* Position the tooltip BELOW the icon. The global [data-tooltip]::after
+     rule already sets `top: calc(100% + 6px)`; if we set `bottom` here
+     without zeroing that out, both axes constrain the box and the
+     background plate ends up the wrong size while the text overflows. */
+  top: calc(100% + 6px);
+  bottom: auto;
   left: 50%;
   transform: translateX(-50%);
-  background: #0d1117;
-  border: 1px solid #2e4a7a;
+  /* Opaque-black plate with a subtle blue rim — distinct from the panel
+     background (#0d1117) so the label reads cleanly against either the
+     station row or the panel chrome. Drop shadow adds a bit more visual
+     separation from busy content underneath. */
+  background: #050810;
+  border: 1px solid #4a6ea8;
   border-radius: 4px;
-  color: #c8d0e0;
+  color: #f0f4ff;
   font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 500;
   white-space: nowrap;
-  padding: 3px 7px;
+  padding: 4px 9px;
   pointer-events: none;
   opacity: 0;
   transition: opacity 0s;
-  z-index: 100;
+  z-index: 9999;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
 }
 
 .npc-svc-icon:hover::after {
@@ -5027,6 +5169,31 @@ select.sig-toolbar-btn option {
   padding: 8px 10px;
   text-align: left;
   border-bottom: 1px solid #1e2740;
+}
+
+.admin-modal__th-sort {
+  cursor: pointer;
+  user-select: none;
+  transition: color 120ms ease;
+}
+
+.admin-modal__th-sort:hover {
+  color: #c0ccde;
+}
+
+.admin-modal__th-sort--active {
+  color: #c0ccde;
+}
+
+.admin-modal__th-sort-arrow {
+  display: inline-block;
+  margin-left: 4px;
+  opacity: 0.4;
+  transition: opacity 120ms ease;
+}
+
+.admin-modal__th-sort--active .admin-modal__th-sort-arrow {
+  opacity: 1;
 }
 
 .admin-modal__table tbody tr {

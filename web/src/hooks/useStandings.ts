@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api/client';
+import { useShareMode } from '../context/ShareModeContext';
 
 export type ContactKind = 'character' | 'corporation' | 'alliance' | 'faction';
 
@@ -87,13 +88,18 @@ const EMPTY: StandingsLookup = {
 
 export function useStandings() {
   const [, setTick] = useState(0);
+  const { isShareMode } = useShareMode();
 
   useEffect(() => {
+    // Share viewers don't have a session and standings are intentionally
+    // private — the load() call would 401 and the data wouldn't be
+    // meaningful even if it succeeded.
+    if (isShareMode) return;
     const listener = () => setTick((n) => n + 1);
     listeners.add(listener);
     if (!cache) load();
     return () => { listeners.delete(listener); };
-  }, []);
+  }, [isShareMode]);
 
   function getStanding(kind: ContactKind, id: number): StandingsLookup {
     if (!cache) return EMPTY;

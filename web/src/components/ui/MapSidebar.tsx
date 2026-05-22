@@ -1,4 +1,4 @@
-import { useRef, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { useNotificationPermission, notifyPermissionChanged } from '../../hooks/useNotificationPermission';
 import { useMapStore } from '../../store/mapStore';
 import { useAuth } from '../../context/AuthContext';
@@ -7,6 +7,7 @@ import { toast } from './Toaster';
 import { pickHandles } from '../map/edgeUtils';
 import { useProximityThreshold } from '../../hooks/useProximityAlerts';
 import { useStaleThreshold } from '../../hooks/useStaleThreshold';
+import { useMinimapPosition, type MinimapPosition } from '../../hooks/useMinimapPosition';
 import { useUserSetting } from '../../hooks/useUserSetting';
 import { toPng } from 'html-to-image';
 import { CaretLeftIcon, CaretRightIcon } from '@phosphor-icons/react';
@@ -73,10 +74,124 @@ type SectionId =
   | 'proximityAlerts'
   | 'activity'
   | 'fleet'
+  | 'share'
   | 'staleFade'
   | 'export'
   | 'shortcuts'
   | null;
+
+// Share permissions mirror the server's requireShareAdmin: corp maps are
+// admin-only, personal maps are owner-only (and any personal map the user
+// is looking at is by definition their own — the server already gates
+// visibility).
+function canShareThisMap(user: { role?: string } | null | undefined, isCorpMap: boolean): boolean {
+  if (!user) return false;
+  if (isCorpMap) return user.role === 'admin';
+  return true;
+}
+
+function ShareSection() {
+  const map = useMapStore((s) => s.map);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [now, setNow] = useState(() => Date.now());
+
+  // 1-minute heartbeat so the countdown label stays roughly accurate
+  // without taxing the render loop. Hovering granularity isn't useful
+  // for a 48-hour countdown anyway.
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 60_000);
+    return () => clearInterval(id);
+  }, []);
+
+  const expiresAt = map.shareExpiresAt ? new Date(map.shareExpiresAt).getTime() : 0;
+  const isActive  = !!map.shareToken && expiresAt > now;
+  const url       = isActive
+    ? `${window.location.origin}/#/share/${map.shareToken}`
+    : '';
+
+  async function generate() {
+    setBusy(true);
+    setError(null);
+    try {
+      const r = await api<{ token: string; url: string; expiresAt: string }>(
+        `/api/maps/${map.id}/share`,
+        { method: 'POST' },
+      );
+      useMapStore.setState((s) => ({
+        map: { ...s.map, shareToken: r.token, shareExpiresAt: r.expiresAt },
+      }));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to create share link');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function revoke() {
+    setBusy(true);
+    setError(null);
+    try {
+      await api(`/api/maps/${map.id}/share`, { method: 'DELETE' });
+      useMapStore.setState((s) => ({
+        map: { ...s.map, shareToken: null, shareExpiresAt: null },
+      }));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to revoke share link');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function copyUrl() {
+    if (!url) return;
+    navigator.clipboard.writeText(url).then(
+      () => toast.success('Share link copied'),
+      () => toast.error('Copy failed — select and copy manually'),
+    );
+  }
+
+  function formatRemaining(): string {
+    const ms = expiresAt - now;
+    if (ms <= 0) return 'expired';
+    const h = Math.floor(ms / 3_600_000);
+    const m = Math.floor((ms % 3_600_000) / 60_000);
+    if (h > 0) return `expires in ${h}h ${m}m`;
+    return `expires in ${m}m`;
+  }
+
+  if (!isActive) {
+    return (
+      <>
+        <div className="map-sidebar__hint">
+          Create a read-only link anyone can open without an account. Shows the map and signatures; hides notes and structures. Link expires after 48 hours.
+        </div>
+        <button
+          className="map-sidebar__action"
+          onClick={generate}
+          disabled={busy}
+        >
+          {busy ? 'Working…' : 'Create share link'}
+        </button>
+        {error && <div className="map-sidebar__hint map-sidebar__hint--error">{error}</div>}
+      </>
+    );
+  }
+
+  return (
+    <>
+      <div className="map-sidebar__share-url" title={url}>{url}</div>
+      <div className="map-sidebar__share-meta">{formatRemaining()}</div>
+      <button className="map-sidebar__action" onClick={copyUrl} disabled={busy}>
+        Copy link
+      </button>
+      <button className="map-sidebar__action" onClick={revoke} disabled={busy}>
+        {busy ? 'Working…' : 'Revoke'}
+      </button>
+      {error && <div className="map-sidebar__hint map-sidebar__hint--error">{error}</div>}
+    </>
+  );
+}
 
 export function MapSidebar() {
   const importInputRef = useRef<HTMLInputElement>(null);
@@ -141,6 +256,7 @@ export function MapSidebar() {
   const setCompactMode   = useMapStore((s) => s.setCompactMode);
   const showMinimap      = useMapStore((s) => s.showMinimap);
   const setShowMinimap   = useMapStore((s) => s.setShowMinimap);
+  const [minimapPosition, setMinimapPosition] = useMinimapPosition();
   const uniformSize      = useMapStore((s) => s.uniformSize);
   const setUniformSize   = useMapStore((s) => s.setUniformSize);
   const showStatics      = useMapStore((s) => s.showStatics);
@@ -249,6 +365,23 @@ export function MapSidebar() {
               {showMinimap ? 'On' : 'Off'}
             </button>
           </div>
+
+          {showMinimap && (
+            <div className="map-sidebar__row">
+              <label className="map-sidebar__label" htmlFor="minimap-position">Position</label>
+              <select
+                id="minimap-position"
+                className="map-sidebar__select"
+                value={minimapPosition}
+                onChange={(e) => setMinimapPosition(e.target.value as MinimapPosition)}
+              >
+                <option value="bottom-right">Bottom right</option>
+                <option value="bottom-left">Bottom left</option>
+                <option value="top-right">Top right</option>
+                <option value="top-left">Top left</option>
+              </select>
+            </div>
+          )}
 
           <div className="map-sidebar__row">
             <label className="map-sidebar__label" htmlFor="ui-zoom">Font Size</label>
@@ -460,6 +593,12 @@ export function MapSidebar() {
           </div>
           <SettingToggle settingKey="nexum.fleet.showMembers" label="Show fleet members" />
         </CollapsibleSection>
+
+        {canShareThisMap(user, isCorpMap) && (
+          <CollapsibleSection title="Share" {...sectionProps('share')}>
+            <ShareSection />
+          </CollapsibleSection>
+        )}
 
         {!hideTopologyTools && (
           <CollapsibleSection title="Stale System Fade" {...sectionProps('staleFade')}>

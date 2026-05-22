@@ -9,6 +9,8 @@ import '@xyflow/react/dist/style.css';
 
 import { useMapStore } from '../../store/mapStore';
 import { useCanEdit } from '../../hooks/useCanEdit';
+import { useMinimapPosition } from '../../hooks/useMinimapPosition';
+import { useShareMode } from '../../context/ShareModeContext';
 import { SystemNode } from './SystemNode';
 import { ConnectionEdge } from './ConnectionEdge';
 import { AddSystemModal } from '../ui/AddSystemModal';
@@ -86,6 +88,14 @@ export function MapCanvas() {
   const selectedConnectionId = useMapStore((s) => s.selectedConnectionId);
   const snapToGrid           = useMapStore((s) => s.snapToGrid);
   const showMinimap          = useMapStore((s) => s.showMinimap);
+  const [minimapPosition]    = useMinimapPosition();
+  // React Flow's <Controls> usually sits bottom-left. When the user docks
+  // the minimap into the same corner, push the zoom buttons to the
+  // opposite bottom corner so they don't overlap.
+  const controlsPosition     = minimapPosition === 'bottom-left' ? 'bottom-right' : 'bottom-left';
+  // Sidebar opens from the right and overlaps anything anchored to the
+  // right edge; only the right-side minimap variants need to dodge it.
+  const minimapDodgesSidebar = minimapPosition === 'bottom-right' || minimapPosition === 'top-right';
   const easyConnect          = useMapStore((s) => s.easyConnect);
   const mapOptionsOpen       = useMapStore((s) => s.mapOptionsOpen);
   const edgeStyle            = useMapStore((s) => s.edgeStyle);
@@ -252,12 +262,30 @@ export function MapCanvas() {
       id: n.id,
       x: n.position.x,
       y: n.position.y,
-      w: n.measured?.width  ?? 150,
-      h: n.measured?.height ?? 100,
+      // Fallbacks matter: react-flow's measured.{width,height} is set by a
+      // ResizeObserver after the node renders. If we hit spread before a
+      // node has been measured (or while a re-render has cleared the
+      // measurement), the fallback drives overlap detection. A typical
+      // SystemNode renders ~170×180 once it has sov logo + statics + sigs,
+      // so we err on the generous side — better to space nodes a bit too
+      // far apart than to compute a phantom 100px tall box that crashes
+      // into a real 180px neighbour.
+      w: n.measured?.width  ?? 200,
+      h: n.measured?.height ?? 200,
       locked: systems.find((s) => s.id === n.id)?.locked ?? false,
     }));
 
-    const resolved = resolveOverlaps(items);
+    // Snap the spread output to the same 20px grid the canvas uses for
+    // snapToGrid. Spread is a "tidy this up" action; aligning to the grid
+    // after de-overlapping keeps the layout uniform regardless of where
+    // the user happened to drop nodes before.
+    const SNAP = 20;
+    const snap = (v: number) => Math.round(v / SNAP) * SNAP;
+    const resolved = resolveOverlaps(items).map((r) => ({
+      ...r,
+      x: snap(r.x),
+      y: snap(r.y),
+    }));
 
     const toMove = resolved.filter((r, i) =>
       Math.abs(r.x - items[i].x) > 0.5 || Math.abs(r.y - items[i].y) > 0.5,
@@ -369,8 +397,14 @@ export function MapCanvas() {
 
   const nodeCtxFired = useRef(false);
 
+  const { isShareMode } = useShareMode();
+
   const onNodeContextMenu = useCallback(
     (e: React.MouseEvent, node: Node) => {
+      // Share-mode guests have nothing to do via the context menu — every
+      // item in there is an edit action. Let the browser's native menu
+      // through instead of intercepting.
+      if (isShareMode) return;
       e.preventDefault();
       e.stopPropagation();
       nodeCtxFired.current = true;
@@ -378,21 +412,23 @@ export function MapCanvas() {
       const selectedNodeIds = nodes.filter((n) => n.selected).map((n) => n.id);
       setContextMenu({ screenX: e.clientX, screenY: e.clientY, flowX: 0, flowY: 0, nodeId: node.id, selectedNodeIds });
     },
-    [nodes],
+    [nodes, isShareMode],
   );
 
   const onPaneContextMenu = useCallback(
     (e: React.MouseEvent | MouseEvent) => {
+      if (isShareMode) return;
       if (nodeCtxFired.current) return;
       e.preventDefault();
       const flow = screenToFlowPosition({ x: e.clientX, y: e.clientY });
       setContextMenu({ screenX: e.clientX, screenY: e.clientY, flowX: flow.x, flowY: flow.y });
     },
-    [screenToFlowPosition],
+    [screenToFlowPosition, isShareMode],
   );
 
   const onSelectionContextMenu = useCallback(
     (e: React.MouseEvent, selectedNodes: Node[]) => {
+      if (isShareMode) return;
       e.preventDefault();
       e.stopPropagation();
       nodeCtxFired.current = true;
@@ -401,7 +437,7 @@ export function MapCanvas() {
       // Use the first node as the "primary" so single-node items still work
       setContextMenu({ screenX: e.clientX, screenY: e.clientY, flowX: 0, flowY: 0, nodeId: selectedNodeIds[0], selectedNodeIds });
     },
-    [],
+    [isShareMode],
   );
 
   const onEdgeContextMenu = useCallback(
@@ -690,11 +726,12 @@ export function MapCanvas() {
           size={snapToGrid ? 1 : 1}
           color={snapToGrid ? '#1a2240' : '#1a2040'}
         />
-        <Controls />
+        <Controls position={controlsPosition} />
         {showMinimap && (
           <MiniMap
             pannable
             zoomable
+            position={minimapPosition}
             nodeColor={(n) => {
               const sys = systems.find((s) => s.id === n.id);
               return sys ? CLASS_COLORS[sys.systemClass] : '#333';
@@ -714,8 +751,12 @@ export function MapCanvas() {
               background: '#0d1117',
               border: '3px solid #1e2740',
               borderRadius: '8px',
-              right: mapOptionsOpen ? 228 : 8,
-              transition: 'right 0.2s ease',
+              // The sidebar opens from the right and overlaps anything in
+              // the right two corners; left-anchored minimaps don't need
+              // the dodge.
+              ...(minimapDodgesSidebar
+                ? { right: mapOptionsOpen ? 228 : 8, transition: 'right 0.2s ease' }
+                : {}),
             }}
           />
         )}

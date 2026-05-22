@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { api } from '../../api/client';
 import { useMapStore } from '../../store/mapStore';
 import { useCanEditContent } from '../../hooks/useCanEditContent';
+import { useShareMode } from '../../context/ShareModeContext';
 import type { Signature, SigType } from '../../types';
 import { ConfirmModal, shouldSkipConfirm } from './ConfirmModal';
 import { NotesEditor } from './NotesEditor';
@@ -170,14 +171,27 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   const sigsRef        = useRef<Signature[]>([]);
   sigsRef.current = sigs;
 
+  const { isShareMode } = useShareMode();
   useEffect(() => {
     if (!activeMapId) return;
     setSigs([]);
     setSelected(new Set());
+
+    // Share viewers have the sigs already embedded in the per-system store
+    // payload (SharedMapView populates them on hydrate). The /api/maps/...
+    // route would 22P02-crash on the placeholder "shared" mapId and isn't
+    // exposed via optionalAuth anyway, so skip the fetch entirely.
+    if (isShareMode) {
+      const sys = useMapStore.getState().map.systems.find((s) => s.id === systemId);
+      const embedded = (sys as { signatures?: Signature[] } | undefined)?.signatures ?? [];
+      setSigs(embedded);
+      return;
+    }
+
     api<Signature[]>(`/api/maps/${activeMapId}/systems/${systemId}/signatures`)
       .then(setSigs)
       .catch(() => toast.error('Failed to load signatures'));
-  }, [activeMapId, systemId]);
+  }, [activeMapId, systemId, isShareMode]);
 
   const updateSig = (id: string, updates: Partial<Signature>) => {
     const withTs = { ...updates, updatedAt: new Date().toISOString() };
@@ -398,8 +412,10 @@ export function SignaturePane({ systemId }: { systemId: string }) {
       />
     )}
     <div className="sig-pane">
-      <p className="sig-pane__hint">You can copy and paste signatures directly from the Probe scanner in Eve. To do this, open your probe scanner.  Press control A to select them all, then control C to copy.  Use control V to paste them here</p>
-      {canEdit && (
+      {!isShareMode && (
+        <p className="sig-pane__hint">You can copy and paste signatures directly from the Probe scanner in Eve. To do this, open your probe scanner.  Press control A to select them all, then control C to copy.  Use control V to paste them here</p>
+      )}
+      {canEdit && !isShareMode && (
         <div className="sig-pane__toolbar">
           <button className="icon-btn" onClick={addSig} title="Add signature">Add signature</button>
           {selected.size > 0 && (
@@ -437,7 +453,9 @@ export function SignaturePane({ systemId }: { systemId: string }) {
       )}
 
       {sigs.length === 0 ? (
-        <div className="sig-pane__empty">No signatures scanned — paste from probe scanner to import</div>
+        <div className={`sig-pane__empty${isShareMode ? ' sig-pane__empty--shared' : ''}`}>
+          {isShareMode ? 'No signatures scanned' : 'No signatures scanned — paste from probe scanner to import'}
+        </div>
       ) : (
         <table className="sig-table">
           <colgroup>

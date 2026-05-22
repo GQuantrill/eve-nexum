@@ -90,6 +90,11 @@ export interface WormholeMap {
   name: string;
   isCorpMap?: boolean;
   locked?: boolean;
+  /** Present when the map has an active or expired share link. The token
+   *  itself is in shareToken; shareExpiresAt is the cutoff. The owner UI
+   *  treats an expired token as "no link" — regenerate to share again. */
+  shareToken?:     string | null;
+  shareExpiresAt?: string | null;
   systems: MapSystem[];
   connections: MapConnection[];
   createdAt: string;
