@@ -442,11 +442,15 @@ export function MapCanvas() {
 
   const onEdgeContextMenu = useCallback(
     (e: React.MouseEvent, edge: Edge) => {
+      // Share viewers have nothing to do here — every connection action
+      // (set type, set mass/time status, delete) is an edit. Skip the
+      // intercept so the browser's native menu fires instead.
+      if (isShareMode) return;
       e.preventDefault();
       e.stopPropagation();
       setContextMenu({ screenX: e.clientX, screenY: e.clientY, flowX: 0, flowY: 0, edgeId: edge.id });
     },
-    [],
+    [isShareMode],
   );
 
   // Click on the SVG edge path itself (the curve) selects the connection so
