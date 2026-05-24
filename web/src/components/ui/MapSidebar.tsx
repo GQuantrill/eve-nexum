@@ -966,7 +966,7 @@ export function MapSidebar() {
 
         {canManageShareGrants && (
           <CollapsibleSection
-            title="Share With Characters"
+            title="Share Map"
             {...sectionProps("shareGrants")}
           >
             <MapSharesSection />

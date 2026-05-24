@@ -1272,6 +1272,15 @@
   font-size: calc(12px * var(--font-scale, 1));
 }
 
+.map-shares__avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 3px;
+  background: #08090f;
+  flex-shrink: 0;
+  object-fit: cover;
+}
+
 .map-shares__kind {
   font-size: calc(10px * var(--font-scale, 1));
   padding: 1px 5px;
