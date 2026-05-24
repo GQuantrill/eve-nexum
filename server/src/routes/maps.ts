@@ -6,6 +6,7 @@ import { config } from '../config.js';
 import { decryptToken } from '../utils/tokenCrypto.js';
 import { createLogger } from '../utils/logger.js';
 import { recordGhostSiteIfMatch } from '../services/ghostSites.js';
+import { resolveEntityNames } from '../services/entityNames.js';
 
 const log = createLogger('maps');
 
@@ -65,7 +66,18 @@ mapsRouter.use(requireAuth);
 
 // ── Access control helpers ────────────────────────────────────────────────────
 
-interface MapMeta { userId: number; corpId: number | null; locked: boolean; }
+// How the current user can see this map. Determines which writes are allowed:
+//   - owner        : their personal map (or a corp map they happened to create)
+//   - corp_member  : visible via corp membership; role-gated for writes
+//   - shared       : explicit map_shares grant (character or corp) — full edit,
+//                    no role check, but lock + owner-only ops still apply
+type AccessKind = 'owner' | 'corp_member' | 'shared';
+interface MapMeta {
+  userId:     number;
+  corpId:     number | null;
+  locked:     boolean;
+  accessKind: AccessKind;
+}
 
 // UUID-shape guard. The maps router takes :mapId straight from the URL,
 // and Postgres' uuid type throws a 22P02 on malformed input — which would
@@ -75,22 +87,72 @@ const UUID_RE = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0
 
 async function getMapAccess(mapId: string, req: Request): Promise<MapMeta | null> {
   if (!UUID_RE.test(mapId)) return null;
-  const userId = req.session.userId!;
-  const { rows } = await db.query<MapMeta>(
-    `SELECT user_id AS "userId", corp_id AS "corpId", locked FROM maps WHERE id = $1`,
-    [mapId],
+  const userId     = req.session.userId!;
+  const userCorpId = req.session.userCorpId ?? null;
+
+  // Pull map + caller's EVE character id in one round-trip; the latter is
+  // needed to match against map_shares.target_character_id.
+  const { rows } = await db.query<{
+    userId:     number;
+    corpId:     number | null;
+    locked:     boolean;
+    callerChar: number;
+  }>(
+    `SELECT m.user_id AS "userId",
+            m.corp_id AS "corpId",
+            m.locked,
+            u.character_id AS "callerChar"
+       FROM maps m
+       JOIN users u ON u.id = $2
+      WHERE m.id = $1`,
+    [mapId, userId],
   );
   if (!rows.length) return null;
   const m = rows[0];
-  const isOwner   = m.userId === userId;
-  // A corp map is visible if the user is in the same corp as the map's
-  // creator (or CORP_MAP_SHARED is true, in which case any member of any
-  // listed corp can see it).
+
+  if (m.userId === userId) {
+    return { userId: m.userId, corpId: m.corpId, locked: m.locked, accessKind: 'owner' };
+  }
+
   const isCorpMap = config.corpMode
     && m.corpId !== null
     && config.corpIds.includes(m.corpId)
-    && (config.corpMapShared || m.corpId === (req.session.userCorpId ?? null));
-  return (isOwner || isCorpMap) ? m : null;
+    && (config.corpMapShared || m.corpId === userCorpId);
+  if (isCorpMap) {
+    return { userId: m.userId, corpId: m.corpId, locked: m.locked, accessKind: 'corp_member' };
+  }
+
+  // Personal map shared with this character or their corp? Personal-map only —
+  // corp maps don't accept individual grants. Corp grants resolve against the
+  // caller's *current* corp_id; switching corps moves access with them.
+  if (m.corpId === null) {
+    const { rowCount } = await db.query(
+      `SELECT 1 FROM map_shares
+         WHERE map_id = $1
+           AND ( target_character_id = $2
+              OR ($3::int IS NOT NULL AND target_corp_id = $3) )
+         LIMIT 1`,
+      [mapId, m.callerChar, userCorpId],
+    );
+    if (rowCount && rowCount > 0) {
+      return { userId: m.userId, corpId: m.corpId, locked: m.locked, accessKind: 'shared' };
+    }
+  }
+
+  return null;
+}
+
+// Strict owner gate. Used for the handful of operations that cross the
+// "this is yours" line — rename, delete, lock, manage grants, generate
+// public share links. Shared recipients explicitly cannot do these.
+async function requireMapOwner(res: Response, mapId: string, req: Request): Promise<MapMeta | null> {
+  const access = await getMapAccess(mapId, req);
+  if (!access) { res.status(404).json({ error: 'Map not found' }); return null; }
+  if (access.accessKind !== 'owner') {
+    res.status(403).json({ error: 'Only the owner can perform this action' });
+    return null;
+  }
+  return access;
 }
 
 // Two tiers of write permission:
@@ -110,13 +172,12 @@ async function requireMapContentWrite(res: Response, mapId: string, req: Request
   if (!access) { res.status(404).json({ error: 'Map not found' }); return null; }
 
   const role = req.session.role ?? 'readonly';
-  const isCorpMap = config.corpMode
-    && access.corpId !== null
-    && config.corpIds.includes(access.corpId);
 
-  // Corp maps: any role except readonly can edit (edit / full / admin).
-  // Personal maps: owner is allowed regardless of role.
-  if (isCorpMap && role === 'readonly') {
+  // Owners and explicit-share recipients always get write access. A share
+  // grant is a deliberate invitation by the owner — honouring it shouldn't
+  // depend on the recipient's general role. Corp-map writes still go through
+  // the role check so readonly corp members can't silently edit.
+  if (access.accessKind === 'corp_member' && role === 'readonly') {
     res.status(403).json({ error: 'Write access required' }); return null;
   }
   return access;
@@ -151,34 +212,59 @@ const MAX_IMPORT_CONNECTIONS = 2000;
 
 // GET /api/maps
 mapsRouter.get('/', async (req, res) => {
-  let query: string;
-  let params: unknown[];
+  const userId     = req.session.userId!;
+  const userCorpId = req.session.userCorpId ?? null;
+  // Need the caller's EVE character id to match against map_shares.
+  // One small query up front beats a CTE — there's only one user row.
+  const { rows: meRows } = await db.query<{ characterId: number }>(
+    `SELECT character_id AS "characterId" FROM users WHERE id = $1`,
+    [userId],
+  );
+  const callerChar = meRows[0]?.characterId ?? null;
 
-  if (config.corpMode && config.corpIds.length > 0) {
-    // Personal maps owned by this user + visible corp maps. When
-    // CORP_MAP_SHARED is true, every member of any listed corp sees every
-    // corp map. When false, only the user's own corp's maps are visible.
-    const visibleCorpIds = config.corpMapShared
-      ? config.corpIds
-      : (req.session.userCorpId ? [req.session.userCorpId] : []);
-    query = `SELECT id, name, corp_id IS NOT NULL AS "isCorpMap", locked,
-                    last_active_at AS "lastActiveAt", created_at AS "createdAt", updated_at AS "updatedAt"
-             FROM maps
-             WHERE (user_id = $1 AND corp_id IS NULL) OR corp_id = ANY($2::int[])
-             ORDER BY corp_id NULLS LAST, name`;
-    params = [req.session.userId, visibleCorpIds];
-  } else {
-    query = `SELECT id, name, FALSE AS "isCorpMap", locked,
-                    last_active_at AS "lastActiveAt", created_at AS "createdAt", updated_at AS "updatedAt"
-             FROM maps WHERE user_id = $1 ORDER BY created_at`;
-    params = [req.session.userId];
-  }
+  // Corp visibility set: own corp when CORP_MAP_SHARED=false, every listed
+  // corp otherwise. Empty array if corp mode is off entirely.
+  const visibleCorpIds = config.corpMode && config.corpIds.length > 0
+    ? (config.corpMapShared ? config.corpIds : (userCorpId ? [userCorpId] : []))
+    : [];
 
-  const { rows } = await db.query(query, params);
+  // One query, three OR'd visibility clauses:
+  //   1. personal maps owned by this user
+  //   2. corp maps in visibleCorpIds (when corp mode active)
+  //   3. personal maps explicitly shared with this character or their corp
+  // The LEFT JOIN to map_shares + DISTINCT collapses any rows that match
+  // both the corp clause AND a share (which shouldn't happen because shares
+  // are personal-map-only, but the DISTINCT keeps it safe).
+  const { rows } = await db.query<{
+    id: string; name: string; isCorpMap: boolean; sharedWithMe: boolean;
+    locked: boolean; lastActiveAt: string; createdAt: string; updatedAt: string;
+  }>(
+    `SELECT DISTINCT
+            m.id,
+            m.name,
+            m.corp_id IS NOT NULL AS "isCorpMap",
+            (m.user_id <> $1
+              AND (m.corp_id IS NULL OR NOT m.corp_id = ANY($2::int[]))
+            ) AS "sharedWithMe",
+            m.locked,
+            m.last_active_at AS "lastActiveAt",
+            m.created_at     AS "createdAt",
+            m.updated_at     AS "updatedAt"
+       FROM maps m
+       LEFT JOIN map_shares s ON s.map_id = m.id
+            AND ( s.target_character_id = $3
+               OR ($4::int IS NOT NULL AND s.target_corp_id = $4) )
+      WHERE (m.user_id = $1 AND m.corp_id IS NULL)
+         OR m.corp_id = ANY($2::int[])
+         OR (s.id IS NOT NULL AND m.corp_id IS NULL)
+      ORDER BY "sharedWithMe", "isCorpMap", m.name`,
+    [userId, visibleCorpIds, callerChar, userCorpId],
+  );
+
   // Count corp maps for the user's own corp (the per-corp limit applies to
   // each corp independently — Corp A's slots are separate from Corp B's).
-  const corpMapCount = config.corpMode && req.session.userCorpId
-    ? (await db.query(`SELECT 1 FROM maps WHERE corp_id = $1`, [req.session.userCorpId])).rowCount ?? 0
+  const corpMapCount = config.corpMode && userCorpId
+    ? (await db.query(`SELECT 1 FROM maps WHERE corp_id = $1`, [userCorpId])).rowCount ?? 0
     : 0;
 
   res.json({ maps: rows, maxMaps: config.maxUserMaps, maxCorpMaps: config.maxCorpMaps, corpMapCount });
@@ -458,7 +544,7 @@ mapsRouter.get('/:mapId', async (req, res) => {
   });
 });
 
-// PATCH /api/maps/:mapId  — rename or lock (lock: admin only)
+// PATCH /api/maps/:mapId  — rename (corp/owner only) or lock (admin only)
 mapsRouter.patch('/:mapId', async (req, res) => {
   const { mapId } = req.params;
   const { name, locked } = req.body as { name?: string; locked?: boolean };
@@ -470,6 +556,13 @@ mapsRouter.patch('/:mapId', async (req, res) => {
   const vals: unknown[] = [];
 
   if (name !== undefined) {
+    // Shared recipients have edit access but not rename — the title is
+    // an identity-level property only the map's true owner / corp should
+    // change. Without this guard a shared user could quietly rename
+    // someone else's map from their map list.
+    if (access.accessKind === 'shared') {
+      res.status(403).json({ error: 'Only the owner can rename this map' }); return;
+    }
     const trimmed = String(name).slice(0, MAX_MAP_NAME_LEN);
     if (!trimmed) { res.status(400).json({ error: 'name cannot be empty' }); return; }
     sets.push(`name = $${vals.length + 1}`); vals.push(trimmed);
@@ -964,6 +1057,155 @@ mapsRouter.delete('/:mapId/share', async (req, res) => {
     `UPDATE maps SET share_token = NULL, share_expires_at = NULL WHERE id = $1`,
     [mapId],
   );
+  res.json({ ok: true });
+});
+
+// ── Per-user / per-corp share grants ──────────────────────────────────────────
+//
+// Separate from the public share-link feature above: these grants give
+// edit access to a specific EVE character or to every member of a specific
+// corp. Personal maps only — corp maps are by definition already shared
+// via corp membership.
+
+const MAX_SHARES_PER_MAP = 50;
+
+// GET /api/maps/:mapId/shares — owner-only list of current grants.
+// Returns the EVE id, target kind, when it was granted, and a resolved
+// human-readable name so the picker UI doesn't have to fan out to ESI.
+mapsRouter.get('/:mapId/shares', async (req, res) => {
+  const { mapId } = req.params;
+  const access = await requireMapOwner(res, mapId, req);
+  if (!access) return;
+  if (access.corpId !== null) {
+    res.status(400).json({ error: 'Corp maps cannot have per-character shares' });
+    return;
+  }
+
+  const { rows } = await db.query<{
+    id: string;
+    targetCharacterId: number | null;
+    targetCorpId:      number | null;
+    createdAt:         string;
+  }>(
+    `SELECT id,
+            target_character_id AS "targetCharacterId",
+            target_corp_id      AS "targetCorpId",
+            created_at          AS "createdAt"
+       FROM map_shares
+      WHERE map_id = $1
+      ORDER BY created_at`,
+    [mapId],
+  );
+
+  // Resolve all referenced EVE ids in a single batched call.
+  const ids = rows.flatMap((r) => [r.targetCharacterId, r.targetCorpId])
+    .filter((x): x is number => x != null);
+  const names = await resolveEntityNames(ids);
+
+  res.json({
+    shares: rows.map((r) => ({
+      id:                  r.id,
+      kind:                r.targetCharacterId != null ? 'character' : 'corp',
+      targetId:            (r.targetCharacterId ?? r.targetCorpId)!,
+      name:                names.get((r.targetCharacterId ?? r.targetCorpId)!)?.name ?? null,
+      createdAt:           r.createdAt,
+    })),
+  });
+});
+
+// POST /api/maps/:mapId/shares — owner-only grant create.
+// Body: { kind: 'character' | 'corp', targetId: number }
+// Returns the resolved name + canonical row so the client can show it
+// immediately without re-fetching the whole list.
+mapsRouter.post('/:mapId/shares', async (req, res) => {
+  const { mapId } = req.params;
+  const access = await requireMapOwner(res, mapId, req);
+  if (!access) return;
+  if (access.corpId !== null) {
+    res.status(400).json({ error: 'Corp maps cannot have per-character shares' });
+    return;
+  }
+
+  const { kind, targetId } = req.body as { kind?: unknown; targetId?: unknown };
+  if (kind !== 'character' && kind !== 'corp') {
+    res.status(400).json({ error: 'kind must be "character" or "corp"' });
+    return;
+  }
+  const idNum = Number(targetId);
+  if (!Number.isInteger(idNum) || idNum <= 0 || idNum > 2_147_483_647) {
+    res.status(400).json({ error: 'targetId must be a positive integer' });
+    return;
+  }
+
+  // Self-share guard: owner can't grant their own character access (they
+  // already have it). Cheap because we already loaded their character_id
+  // shape in getMapAccess implicitly — but cheaper to just compare the
+  // user_id we have on `access`.
+  if (kind === 'character') {
+    const { rows } = await db.query<{ characterId: number }>(
+      `SELECT character_id AS "characterId" FROM users WHERE id = $1`,
+      [req.session.userId],
+    );
+    if (rows[0]?.characterId === idNum) {
+      res.status(400).json({ error: 'You already have access to this map' });
+      return;
+    }
+  }
+
+  // Enforce a hard ceiling so a runaway client can't pile thousands of
+  // grants onto one map.
+  const { rowCount: existing } = await db.query(
+    `SELECT 1 FROM map_shares WHERE map_id = $1`,
+    [mapId],
+  );
+  if ((existing ?? 0) >= MAX_SHARES_PER_MAP) {
+    res.status(403).json({ error: `Maximum shares per map reached (${MAX_SHARES_PER_MAP})` });
+    return;
+  }
+
+  try {
+    const { rows } = await db.query<{ id: string; createdAt: string }>(
+      kind === 'character'
+        ? `INSERT INTO map_shares (map_id, target_character_id, granted_by_user_id)
+                VALUES ($1, $2, $3)
+             RETURNING id, created_at AS "createdAt"`
+        : `INSERT INTO map_shares (map_id, target_corp_id, granted_by_user_id)
+                VALUES ($1, $2, $3)
+             RETURNING id, created_at AS "createdAt"`,
+      [mapId, idNum, req.session.userId],
+    );
+
+    // Best-effort name resolve so the client can render immediately.
+    const names = await resolveEntityNames([idNum]);
+    res.status(201).json({
+      id:        rows[0].id,
+      kind,
+      targetId:  idNum,
+      name:      names.get(idNum)?.name ?? null,
+      createdAt: rows[0].createdAt,
+    });
+  } catch (err) {
+    // 23505 = unique violation (already shared with this target)
+    if ((err as { code?: string }).code === '23505') {
+      res.status(409).json({ error: 'Already shared with this target' });
+      return;
+    }
+    throw err;
+  }
+});
+
+// DELETE /api/maps/:mapId/shares/:shareId — owner-only revoke.
+mapsRouter.delete('/:mapId/shares/:shareId', async (req, res) => {
+  const { mapId, shareId } = req.params;
+  if (!UUID_RE.test(shareId)) { res.status(404).json({ error: 'Share not found' }); return; }
+  const access = await requireMapOwner(res, mapId, req);
+  if (!access) return;
+
+  const { rowCount } = await db.query(
+    `DELETE FROM map_shares WHERE id = $1 AND map_id = $2`,
+    [shareId, mapId],
+  );
+  if (!rowCount) { res.status(404).json({ error: 'Share not found' }); return; }
   res.json({ ok: true });
 });
 

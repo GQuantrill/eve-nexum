@@ -858,6 +858,7 @@
 }
 .toolbar__map-type--solo { background: rgba(74,222,128,0.12); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
 .toolbar__map-type--corp { background: rgba(100,160,255,0.15); color: #7ab0f0; border: 1px solid rgba(100,160,255,0.3); }
+.toolbar__map-type--shared { background: rgba(192,132,252,0.15); color: #c084fc; border: 1px solid rgba(192,132,252,0.3); }
 
 .toolbar__locked-chip {
   display: inline-flex;
@@ -981,6 +982,7 @@
 }
 .map-dropdown__badge--solo { background: rgba(74,222,128,0.12); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
 .map-dropdown__badge--corp { background: rgba(100,160,255,0.15); color: #7ab0f0; border: 1px solid rgba(100,160,255,0.3); }
+.map-dropdown__badge--shared { background: rgba(192,132,252,0.15); color: #c084fc; border: 1px solid rgba(192,132,252,0.3); }
 .map-dropdown__badge--lock { background: transparent; border: none; font-size: calc(12px * var(--font-scale, 1)); }
 
 .toolbar__actions { display: flex; gap: 8px; }
@@ -1220,6 +1222,98 @@
 .chain-exits__jumps {
   color: #8a9ab8;
   font-variant-numeric: tabular-nums;
+}
+
+.map-shares__picker {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.map-shares__input {
+  width: 100%;
+  background: #0a0e1a;
+  border: 1px solid #1e2740;
+  border-radius: 4px;
+  padding: 5px 8px;
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #c8d4f0;
+  outline: none;
+}
+
+.map-shares__input:focus {
+  border-color: #6ea0ff;
+}
+
+.map-shares__match {
+  min-height: calc(16px * var(--font-scale, 1));
+  font-size: calc(11px * var(--font-scale, 1));
+}
+
+.map-shares__match--hint { color: #6a7898; }
+.map-shares__match--ok   { color: #4ade80; }
+.map-shares__match--miss { color: #f0a030; }
+
+.map-shares__list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 4px;
+}
+
+.map-shares__row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 6px;
+  background: #0a0e1a;
+  border: 1px solid #1e2740;
+  border-radius: 4px;
+  font-size: calc(12px * var(--font-scale, 1));
+}
+
+.map-shares__kind {
+  font-size: calc(10px * var(--font-scale, 1));
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.map-shares__kind--character {
+  background: rgba(192,132,252,0.15);
+  color: #c084fc;
+  border: 1px solid rgba(192,132,252,0.3);
+}
+
+.map-shares__kind--corp {
+  background: rgba(100,160,255,0.15);
+  color: #7ab0f0;
+  border: 1px solid rgba(100,160,255,0.3);
+}
+
+.map-shares__name {
+  flex: 1;
+  color: #c8d4f0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.map-shares__revoke {
+  background: transparent;
+  border: 1px solid #3a2030;
+  color: #d88a8a;
+  border-radius: 3px;
+  padding: 2px 4px;
+  cursor: pointer;
+  line-height: 0;
+  flex-shrink: 0;
+}
+
+.map-shares__revoke:hover {
+  background: rgba(224,90,90,0.1);
+  color: #e05a5a;
 }
 
 /* Read-only display of a generated share URL. Monospace so the UUID

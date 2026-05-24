@@ -12,6 +12,7 @@ A wormhole mapping tool for EVE Online. Track systems, signatures, structures, k
 
 - **Interactive map** — drag systems, draw connections, set wormhole class/type/status per connection. Snap-to-grid, optional minimap.
 - **Wormhole intel** — per-connection mass tracker (≤10% / ≤50% / critical), end-of-life flag with countdown, K162-aware static identification, frig-hole and gas-site auto-tagging from sig type.
+- **Personal mass budget** — the connection panel reads your currently-flown ship's mass from ESI and projects how many more jumps the hole will take before crit ("~4 more Hecate jumps"). Switches to an amber warning when the next jump won't fit and a red block when the ship's too heavy to pass at all.
 - **Wormhole type picker** — searchable popover for assigning the exact wormhole type to a connection; statics quick-info on hover shows destination class, mass, lifetime.
 - **Multi-select bulk operations** — shift-click to select multiple systems/signatures, then bulk-assign type, delete, or rename.
 - **PNG export** — render the current map (with sig counts, connections, status) to a PNG for sharing.
@@ -21,6 +22,7 @@ A wormhole mapping tool for EVE Online. Track systems, signatures, structures, k
 #### Personal & corp maps
 
 - **Solo / Corp split** — every user has personal maps that are always private; in corp mode each corp also gets shared corp maps. Cross-corp visibility is opt-in via `CORP_MAP_SHARED` (see [Corp mode](#corp-mode)).
+- **Share a personal map with another character or corp** — owners can grant edit access to a specific EVE character or an entire corp from the map sidebar. Recipients can edit signatures, structures, notes, and topology like a corp member but can't rename, delete, or re-share the map. Grants target raw EVE IDs, so they take effect on the recipient's very first Nexum login — no pre-registration required. The map appears in their switcher under a distinct "Shared" badge. Personal maps only; corp maps are already shared via membership.
 - **Multi-map support** — each character (or corp) can maintain multiple independent maps up to configured limits (`MAX_USER_MAPS` / `MAX_CORP_MAPS`).
 - **Map locking** — admins can freeze a corp map's topology. Systems, connections, and the map name lock for non-admins, but signatures, structures, and per-system notes stay editable so ops can continue while the layout is pinned. The toolbar shows an amber 🔒 chip while the lock is active, and passive location tracking won't auto-add new systems on a locked map.
 - **Role-based access** — `admin` / `full` / `edit` / `readonly`. Roles only restrict corp-map actions; every user owns their personal maps regardless of role. See [Roles](#roles) for the full matrix.
@@ -44,6 +46,8 @@ A wormhole mapping tool for EVE Online. Track systems, signatures, structures, k
 - **Ice belt systems** — Empire-space systems that spawn ice anomalies get a ❄ icon. Static list in `server/data/ice-belt-systems.json` (sourced from the EVE University wiki), resolved to `eve_system_id` at startup against the SDE. Null-sec ice tracking will come later via the scraped respawn feed.
 - **Storm tracking** — active null-sec storms (Electric / Gamma / Exotic / Plasma) from the community-maintained [EveScout Rescue stormtrack](https://evescoutrescue.com/home/stormtrack.php) feed surface as a colour-coded ⚡ icon on matching system nodes, with a tooltip showing last report and reporter. Refreshed every 30 minutes. (ESI doesn't expose stellar phenomena yet; this scrapes the public community feed and will swap to ESI when CCP ships one.)
 - **Proximity alerts** — incursions, pirate insurgencies, **and hostile-sov-holder systems** (any sov-holding system where you've set the corp or alliance to a negative standing) appear as a toolbar chip showing the closest threat in jumps. Configurable threshold with browser notification + audio ping when you cross into the zone.
+- **Inbound K162 alert** — when a signature's wormhole type is set to K162 anywhere on the map, a toast + browser notification + distinct audio ping fire immediately. K162 means "the other side opened this hole", so it's a strong intel signal that something just connected into your chain.
+- **Chain exit summary** — sidebar widget that counts every K-space exit currently on the map by security class (HS / LS / NS) as coloured chips, and pinpoints the nearest gate route to Jita ("Nearest Jita: 7j via Amarr") so loot runs and logistics planning don't need a manual route check.
 - **Route planner** — server-side BFS over stargates + your live chain, so a route through a wormhole hop is a single click.
 - **Location tracking** — opt-in live character location dot in the toolbar plus per-map "you are here" indicator.
 - **Online status** — toolbar dot shows whether each user is currently logged into EVE Online.
@@ -53,7 +57,7 @@ A wormhole mapping tool for EVE Online. Track systems, signatures, structures, k
 - **Command palette** — `Cmd/Ctrl + K` opens a fuzzy search across systems, sigs, and actions (jump to system, set waypoint, toggle panes).
 - **Home hotkey** — jump the viewport back to the home system from any panel.
 - **Recent-kill highlights** — systems with kills in the last hour get a coloured halo so you can see fresh activity at a glance.
-- **User stats modal** — per-character totals: jumps, signatures by type, broken down by day/week/month/year/forever.
+- **User stats modal** — per-character totals: jumps, signatures by type, broken down by day/week/month/year/forever, plus a 30-day daily sparkline of scanning activity with hover tooltips.
 - **Server status widget** — live Tranquility server status, player count, and ESI health in the toolbar.
 - **Demo map** — the landing page mounts a non-editable demo map so visitors can see what the tool does before logging in.
 - **Collapsible sidebar** — Map Options, Connections, Proximity Alerts, Stale System Fade, and Shortcuts each expand or collapse independently. Per-section open/closed state persists per browser via `localStorage`.
@@ -356,6 +360,8 @@ Roles are stored per-user in the database. New users default to `readonly`; an a
 Rules differ for personal (solo) maps vs corp maps. Personal maps are scoped to a single user; corp maps are shared infrastructure and gated more tightly.
 
 **Personal maps** — every user can create their own personal maps (up to `MAX_USER_MAPS`) and edit everything inside them, regardless of role. A `readonly` user is "readonly" only with respect to other people's maps; their own personal map is theirs.
+
+**Shared-in personal maps** — when another user has shared their personal map with you (or with your corp), you can edit signatures, structures, notes, and topology regardless of your global role — the grant is an explicit invitation by the owner. You cannot rename the map, delete it, generate a public share link, or change who else has access; those stay with the owner. Lock state still applies: if the owner is also an admin and locks the map, your topology edits are frozen the same as a locked corp map.
 
 **Corp maps:**
 

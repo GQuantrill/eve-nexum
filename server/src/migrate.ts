@@ -421,6 +421,30 @@ export async function migrate() {
       category    TEXT        NOT NULL,
       fetched_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
+
+    -- Per-map grants of edit access to either an individual EVE character or
+    -- an entire corp. Targets are stored as raw EVE IDs (not user_ids) so a
+    -- share survives the recipient not having logged into Nexum yet — their
+    -- first login resolves to a user row whose character_id matches.
+    --
+    -- Exactly one of target_character_id / target_corp_id is non-NULL; the
+    -- CHECK enforces XOR. ON DELETE CASCADE on both map and granter so a
+    -- deleted map / owner cleans up its grants automatically.
+    CREATE TABLE IF NOT EXISTS map_shares (
+      id                   UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+      map_id               UUID        NOT NULL REFERENCES maps(id) ON DELETE CASCADE,
+      target_character_id  INTEGER,
+      target_corp_id       INTEGER,
+      granted_by_user_id   INTEGER     NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      created_at           TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      CHECK ((target_character_id IS NOT NULL) <> (target_corp_id IS NOT NULL))
+    );
+    -- One grant per (map, target). Partial unique indexes are easier than a
+    -- single composite that has to deal with NULLs.
+    CREATE UNIQUE INDEX IF NOT EXISTS uq_map_shares_char ON map_shares (map_id, target_character_id) WHERE target_character_id IS NOT NULL;
+    CREATE UNIQUE INDEX IF NOT EXISTS uq_map_shares_corp ON map_shares (map_id, target_corp_id)      WHERE target_corp_id      IS NOT NULL;
+    CREATE INDEX IF NOT EXISTS idx_map_shares_char ON map_shares (target_character_id) WHERE target_character_id IS NOT NULL;
+    CREATE INDEX IF NOT EXISTS idx_map_shares_corp ON map_shares (target_corp_id)      WHERE target_corp_id      IS NOT NULL;
   `);
 
   await encryptLegacyTokens();

@@ -25,6 +25,7 @@ import { adminRouter, adminReadRouter, reportsRouter } from './routes/admin.js';
 import { standingsRouter } from './routes/standings.js';
 import { knownStructuresRouter } from './routes/knownStructures.js';
 import { shareRouter } from './routes/share.js';
+import searchRouter from './routes/search.js';
 import { initCorpStructuresPoller } from './services/corpStructures.js';
 import { initPublicStructuresPoller } from './services/publicStructures.js';
 import { authLimiter, esiLimiter, publicLimiter } from './middleware/rateLimits.js';
@@ -81,6 +82,7 @@ app.use('/api/admin',             adminReadRouter);
 app.use('/api/admin',             adminRouter);
 app.use('/api/standings',         standingsRouter);
 app.use('/api/known-structures',  knownStructuresRouter);
+app.use('/api/search',            esiLimiter, searchRouter);
 
 app.get('/health', (_req, res) => res.json({ ok: true }));
 
