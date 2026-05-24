@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useOnlineStatus } from '../../hooks/useOnlineStatus';
 import { useCharacterLocation } from '../../hooks/useCharacterLocation';
 import { useCanEdit } from '../../hooks/useCanEdit';
+import { useIsMapOwner } from '../../hooks/useIsMapOwner';
 import { useCanCreateMaps } from '../../hooks/useCanCreateMaps';
 import { UserStatsModal } from './UserStatsModal';
 import { ConfirmModal } from './ConfirmModal';
@@ -170,6 +171,7 @@ export function Toolbar() {
   const atCorpMapLimit  = corpMapCount >= maxCorpMaps;
   const { user, logout } = useAuth();
   const canEdit       = useCanEdit();
+  const isMapOwner    = useIsMapOwner();
   const canManageMaps = useCanCreateMaps();
   const { online, checkedAt } = useOnlineStatus(!!user);
   // Ship comes from the same poll that drives passive location tracking, so
@@ -200,9 +202,13 @@ export function Toolbar() {
           onClick={() => setShowMaps((v) => !v)}
           title="Switch map"
         >
-          {user?.corpMode && (() => {
+          {(() => {
             const active = maps.find((m) => m.id === activeMapId);
             if (!active) return null;
+            if (active.sharedWithMe) {
+              return <span className="toolbar__map-type toolbar__map-type--shared">Shared</span>;
+            }
+            if (!user?.corpMode) return null;
             return active.isCorpMap
               ? <span className="toolbar__map-type toolbar__map-type--corp">Corp</span>
               : <span className="toolbar__map-type toolbar__map-type--solo">Solo</span>;
@@ -224,7 +230,11 @@ export function Toolbar() {
         {showMaps && (
           <div className="map-dropdown" onMouseLeave={() => setShowMaps(false)}>
             {[...maps].sort((a, b) => {
-              if (a.isCorpMap !== b.isCorpMap) return a.isCorpMap ? 1 : -1;
+              // Three-tier ordering: own personal → corp → shared-with-me.
+              // Inside a tier, alphabetical by name.
+              const aTier = a.sharedWithMe ? 2 : a.isCorpMap ? 1 : 0;
+              const bTier = b.sharedWithMe ? 2 : b.isCorpMap ? 1 : 0;
+              if (aTier !== bTier) return aTier - bTier;
               return a.name.localeCompare(b.name);
             }).map((m) => (
               <button
@@ -232,8 +242,12 @@ export function Toolbar() {
                 className={`map-dropdown__item${m.id === activeMapId ? ' map-dropdown__item--active' : ''}`}
                 onClick={() => { switchMap(m.id); setShowMaps(false); }}
               >
-                {user?.corpMode && !m.isCorpMap && <span className="map-dropdown__badge map-dropdown__badge--solo">Solo</span>}
-                {m.isCorpMap && <span className="map-dropdown__badge map-dropdown__badge--corp">Corp</span>}
+                {m.sharedWithMe
+                  ? <span className="map-dropdown__badge map-dropdown__badge--shared">Shared</span>
+                  : user?.corpMode && !m.isCorpMap
+                    ? <span className="map-dropdown__badge map-dropdown__badge--solo">Solo</span>
+                    : null}
+                {!m.sharedWithMe && m.isCorpMap && <span className="map-dropdown__badge map-dropdown__badge--corp">Corp</span>}
                 {m.locked    && <span className="map-dropdown__badge map-dropdown__badge--lock">🔒</span>}
                 {m.name}
               </button>
@@ -265,7 +279,7 @@ export function Toolbar() {
                 </span>
               )}
             </span>
-            {canManageMaps && maps.length > 1 && (
+            {canManageMaps && maps.length > 1 && !maps.find((m) => m.id === activeMapId)?.sharedWithMe && (
               <button className="map-dropdown__item map-dropdown__item--danger" onClick={() => { setShowMaps(false); setDeleteConfirm(true); }}>
                 Delete this map
               </button>
@@ -283,7 +297,7 @@ export function Toolbar() {
           value={mapName}
           onChange={(e) => setMapName(e.target.value)}
           spellCheck={false}
-          readOnly={!canEdit}
+          readOnly={!canEdit || !isMapOwner}
         />
       </div>
 

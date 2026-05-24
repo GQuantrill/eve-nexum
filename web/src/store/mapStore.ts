@@ -3,6 +3,7 @@ import { readUserSetting, writeUserSetting } from '../hooks/useUserSetting';
 import { v4 as uuid } from 'uuid';
 import { api } from '../api/client';
 import { enqueue } from './pendingQueue';
+import { toast } from '../components/ui/Toaster';
 import type { WormholeMap, MapSystem, MapConnection, SystemClass, WormholeEffect } from '../types';
 
 // Debounce position saves — fires max once per 500 ms per system
@@ -59,6 +60,9 @@ export interface MapListItem {
   id: string;
   name: string;
   isCorpMap: boolean;
+  /** True when this map isn't owned by the caller and isn't a corp map they
+   *  belong to — i.e. it reached their list via an explicit map_shares grant. */
+  sharedWithMe?: boolean;
   locked: boolean;
   createdAt: string;
   updatedAt: string;
@@ -375,11 +379,29 @@ export const useMapStore = create<MapStore>()((set, get) => {
 
     loadMaps: async () => {
       const { maps, maxMaps, maxCorpMaps, corpMapCount } = await api<{ maps: MapListItem[]; maxMaps: number; maxCorpMaps: number; corpMapCount: number }>('/api/maps');
+      const activeId = get().activeMapId;
       set({ maps, maxMaps, maxCorpMaps, corpMapCount });
-      if (maps.length > 0 && !get().activeMapId) {
+
+      // Pick an initial map if none is active yet, falling back to the
+      // user's last-viewed id when it's still in the list.
+      if (maps.length > 0 && !activeId) {
         const savedId = localStorage.getItem('nexum.lastMapId');
         const target = savedId && maps.find((m) => m.id === savedId) ? savedId : maps[0].id;
         await get().switchMap(target);
+        return;
+      }
+
+      // Revocation detection: if the active map vanished from the list
+      // since last refresh, the owner has revoked the user's grant (or
+      // deleted the map). Toast and switch to whatever's still available.
+      if (activeId && !maps.find((m) => m.id === activeId)) {
+        toast.info('Your access to that map was revoked');
+        if (maps.length > 0) {
+          await get().switchMap(maps[0].id);
+        } else {
+          set({ map: emptyMap(), activeMapId: null });
+          localStorage.removeItem('nexum.lastMapId');
+        }
       }
     },
 
@@ -391,9 +413,21 @@ export const useMapStore = create<MapStore>()((set, get) => {
       for (const t of moveTimers.values()) clearTimeout(t);
       moveTimers.clear();
 
-      const map = await api<WormholeMap>(`/api/maps/${id}`);
-      localStorage.setItem('nexum.lastMapId', id);
-      set({ map, activeMapId: id, selectedSystemId: null, selectedConnectionId: null, currentSystemId: null, undoStack: [] });
+      try {
+        const map = await api<WormholeMap>(`/api/maps/${id}`);
+        localStorage.setItem('nexum.lastMapId', id);
+        set({ map, activeMapId: id, selectedSystemId: null, selectedConnectionId: null, currentSystemId: null, undoStack: [] });
+      } catch (err) {
+        // 403/404 — the grant was revoked, or the map was deleted. Reload
+        // the list (which will trigger the revocation-detection path above
+        // if the active map really is gone) and bail out of the switch.
+        const msg = err instanceof Error ? err.message : '';
+        if (/→ 40[34]/.test(msg)) {
+          await get().loadMaps();
+          return;
+        }
+        throw err;
+      }
     },
 
     createMap: async (name = 'New Map', isCorpMap = false) => {

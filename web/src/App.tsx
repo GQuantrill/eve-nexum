@@ -63,6 +63,17 @@ function MapApp() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId, loadMaps, applyPreferences]);
 
+  // Re-fetch the maps list whenever the tab regains focus. Catches the
+  // case where a map owner revoked a grant while the recipient had the
+  // tab in the background — loadMaps' revocation-detection then bumps
+  // them out of the now-inaccessible map automatically.
+  useEffect(() => {
+    if (!userId) return;
+    const onFocus = () => { loadMaps(); };
+    window.addEventListener('focus', onFocus);
+    return () => window.removeEventListener('focus', onFocus);
+  }, [userId, loadMaps]);
+
   useLocationTracking(!!mapId);
 
   return (

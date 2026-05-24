@@ -18,6 +18,8 @@ import { useUserSetting } from "../../hooks/useUserSetting";
 import { toPng } from "html-to-image";
 import { CaretLeftIcon, CaretRightIcon } from "@phosphor-icons/react";
 import { ChainExitsSection } from "./ChainExitsSection";
+import { MapSharesSection } from "./MapSharesSection";
+import { useIsMapOwner } from "../../hooks/useIsMapOwner";
 import type { WormholeMap } from "../../types";
 
 // Single labelled checkbox row backed by useUserSetting so the on/off
@@ -95,22 +97,25 @@ type SectionId =
   | "activity"
   | "fleet"
   | "share"
+  | "shareGrants"
   | "staleFade"
   | "export"
   | "shortcuts"
   | null;
 
 // Share permissions mirror the server's requireShareAdmin: corp maps are
-// admin-only, personal maps are owner-only (and any personal map the user
-// is looking at is by definition their own — the server already gates
-// visibility).
+// admin-only, personal maps are owner-only. A personal map can now reach
+// the user via a map_shares grant (sharedWithMe = true), in which case
+// they're a recipient — not the owner — and must not see the share-link
+// controls.
 function canShareThisMap(
   user: { role?: string } | null | undefined,
   isCorpMap: boolean,
+  isMapOwner: boolean,
 ): boolean {
   if (!user) return false;
   if (isCorpMap) return user.role === "admin";
-  return true;
+  return isMapOwner;
 }
 
 // Expiry windows offered to the share-link generator. Mirror the server's
@@ -415,6 +420,11 @@ export function MapSidebar() {
   const notifPermission = useNotificationPermission();
   const { user } = useAuth();
   const isCorpMap = useMapStore((s) => !!s.map.isCorpMap);
+  const isMapOwner = useIsMapOwner();
+  // Per-character / per-corp share grants are personal-map only and
+  // owner-only. Hide the section anywhere else so it doesn't suggest
+  // an action that would fail at the server.
+  const canManageShareGrants = isMapOwner && !isCorpMap;
   // The map-management buttons (optimize / spread / JSON / PNG / stale fade)
   // are hidden only when a readonly user is looking at a corp map. On their
   // own personal map a readonly user still owns the layout and can use the
@@ -945,12 +955,21 @@ export function MapSidebar() {
           </CollapsibleSection>
         )}
 
-        {canShareThisMap(user, isCorpMap) && (
+        {canShareThisMap(user, isCorpMap, isMapOwner) && (
           <CollapsibleSection
             title="Live Map Sharing"
             {...sectionProps("share")}
           >
             <ShareSection />
+          </CollapsibleSection>
+        )}
+
+        {canManageShareGrants && (
+          <CollapsibleSection
+            title="Share With Characters"
+            {...sectionProps("shareGrants")}
+          >
+            <MapSharesSection />
           </CollapsibleSection>
         )}
 
