@@ -3,6 +3,7 @@ import { api } from '../../api/client';
 import { useMapStore } from '../../store/mapStore';
 import { useCanEditContent } from '../../hooks/useCanEditContent';
 import { useShareMode } from '../../context/ShareModeContext';
+import { useUserSetting } from '../../hooks/useUserSetting';
 import type { Signature, SigType } from '../../types';
 import { ConfirmModal, shouldSkipConfirm } from './ConfirmModal';
 import { NotesEditor } from './NotesEditor';
@@ -165,7 +166,21 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   // alphabetical position. User clicks on column headers override this.
   const [sortCol, setSortCol]         = useState<SortCol | null>('sigId');
   const [sortDir, setSortDir]         = useState<'asc' | 'desc'>('asc');
-  const [colWidths, setColWidths]     = useState<Record<ColKey, number>>(DEFAULT_WIDTHS);
+  // Persist column widths so a user-tuned layout follows them from one
+  // system to the next (and across reloads). Stored under a single
+  // ui_settings key — drag-resize re-saves on every mousemove tick, but
+  // useUserSetting debounces the server PATCH by 500ms so the burst
+  // collapses to one round-trip.
+  const [savedColWidths, setColWidths] = useUserSetting<Partial<Record<ColKey, number>>>(
+    'nexum.sigPane.colWidths',
+    {},
+  );
+  // Merge with defaults at read time so a later-added column gracefully
+  // picks up its default width without invalidating the saved layout.
+  const colWidths = useMemo(
+    () => ({ ...DEFAULT_WIDTHS, ...savedColWidths }) as Record<ColKey, number>,
+    [savedColWidths],
+  );
 
   const pendingUpdates = useRef<Map<string, Partial<Signature>>>(new Map());
   const debounceTimers = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
