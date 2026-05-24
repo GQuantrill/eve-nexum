@@ -163,6 +163,14 @@ export function MapSharesSection() {
             ? <div className="map-sidebar__hint">No active shares.</div>
             : shares.map((s) => (
                 <div key={s.id} className="map-shares__row">
+                  <img
+                    className="map-shares__avatar"
+                    src={s.kind === 'character'
+                      ? `https://images.evetech.net/characters/${s.targetId}/portrait?size=32`
+                      : `https://images.evetech.net/corporations/${s.targetId}/logo?size=32`}
+                    alt=""
+                    loading="lazy"
+                  />
                   <span className={`map-shares__kind map-shares__kind--${s.kind}`}>
                     {s.kind === 'character' ? 'Char' : 'Corp'}
                   </span>
