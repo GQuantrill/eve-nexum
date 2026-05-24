@@ -40,40 +40,19 @@ function whAgeRowClass(
   return 'sig-row--wh-past';
 }
 
-// Threshold (hours) past which a non-wormhole sig's age cell goes red.
-// Combat / data / relic / gas / ore sites don't have a hard TTL, so this
-// is just a "you scanned this three days ago, it's probably gone" heuristic.
+// Threshold (hours) past which any signature's age cell goes red. Flat
+// "you scanned this three days ago, it's probably gone" heuristic applied
+// uniformly — wormholes included, regardless of TTL.
 const STALE_AGE_HOURS = 72;
 
-// Longest known wormhole lifetime — used as the staleness threshold for
-// wormhole sigs whose specific WH code isn't filled in yet. Conservative
-// upper bound: if the hole would have decayed by now even at its most
-// generous TTL, it's safe to call it stale.
-const MAX_WH_LIFETIME_H = Math.max(
-  ...Object.values(WORMHOLE_TYPES).map((w) => w.lifetimeH),
-  0,
-);
-
-// True when a sig has aged past what it should realistically still be
-// valid for. Anchored on createdAt (i.e. the AGE column) because that's
-// the real "how long has this thing existed" clock:
-//   - wormholes with a known type: that type's full lifetime
-//   - wormholes with no/unknown type code: the longest known WH lifetime
-//   - everything else: STALE_AGE_HOURS
 function isSigStale(
-  sigType: string,
-  whType: string,
+  _sigType: string,
+  _whType: string,
   createdAt: string | undefined,
   now: number,
 ): boolean {
   if (!createdAt) return false;
   const ageH = (now - new Date(createdAt).getTime()) / 3_600_000;
-  if (sigType === 'wormhole') {
-    const wh = whType ? WORMHOLE_TYPES[whType.toUpperCase()] : undefined;
-    const threshold = wh && wh.lifetimeH > 0 ? wh.lifetimeH : MAX_WH_LIFETIME_H;
-    if (threshold <= 0) return false;
-    return ageH >= threshold;
-  }
   return ageH >= STALE_AGE_HOURS;
 }
 
