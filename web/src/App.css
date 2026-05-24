@@ -3275,7 +3275,7 @@ select.sig-toolbar-btn option {
   color: #f0a030;
 }
 
-.sig-td--updated-stale {
+.sig-td--age-stale {
   color: #e05a5a;
 }
 

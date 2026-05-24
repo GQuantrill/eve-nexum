@@ -40,11 +40,10 @@ function whAgeRowClass(
   return 'sig-row--wh-past';
 }
 
-// Threshold (hours) past which a non-wormhole sig's "updated" cell goes red.
-// Combat / data / relic / gas / ore sites don't have a hard TTL, so this is
-// just a "you haven't refreshed this in three days, it's probably stale"
-// heuristic.
-const STALE_UPDATED_HOURS = 72;
+// Threshold (hours) past which a non-wormhole sig's age cell goes red.
+// Combat / data / relic / gas / ore sites don't have a hard TTL, so this
+// is just a "you scanned this three days ago, it's probably gone" heuristic.
+const STALE_AGE_HOURS = 72;
 
 // Longest known wormhole lifetime — used as the staleness threshold for
 // wormhole sigs whose specific WH code isn't filled in yet. Conservative
@@ -55,28 +54,27 @@ const MAX_WH_LIFETIME_H = Math.max(
   0,
 );
 
-// True when a sig's last-updated time is older than what the row should
-// realistically still be valid for:
+// True when a sig has aged past what it should realistically still be
+// valid for. Anchored on createdAt (i.e. the AGE column) because that's
+// the real "how long has this thing existed" clock:
 //   - wormholes with a known type: that type's full lifetime
 //   - wormholes with no/unknown type code: the longest known WH lifetime
-//   - everything else: STALE_UPDATED_HOURS
-// Returns false only when we genuinely have nothing to anchor against
-// (no updatedAt timestamp).
-function isUpdatedStale(
+//   - everything else: STALE_AGE_HOURS
+function isSigStale(
   sigType: string,
   whType: string,
-  updatedAt: string | undefined,
+  createdAt: string | undefined,
   now: number,
 ): boolean {
-  if (!updatedAt) return false;
-  const ageH = (now - new Date(updatedAt).getTime()) / 3_600_000;
+  if (!createdAt) return false;
+  const ageH = (now - new Date(createdAt).getTime()) / 3_600_000;
   if (sigType === 'wormhole') {
     const wh = whType ? WORMHOLE_TYPES[whType.toUpperCase()] : undefined;
     const threshold = wh && wh.lifetimeH > 0 ? wh.lifetimeH : MAX_WH_LIFETIME_H;
     if (threshold <= 0) return false;
     return ageH >= threshold;
   }
-  return ageH >= STALE_UPDATED_HOURS;
+  return ageH >= STALE_AGE_HOURS;
 }
 
 const SIG_TYPE_LABELS: Record<SigType, string> = {
@@ -678,15 +676,15 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                     readOnly={!canEdit || isShareMode}
                   />
                 </td>
-                <ElapsedCell iso={sig.createdAt} className="sig-td--time" />
                 <ElapsedCell
-                  iso={sig.updatedAt}
-                  className={`sig-td--time sig-td--updated${
-                    isUpdatedStale(sig.sigType, sig.whType, sig.updatedAt, tickNow)
-                      ? ' sig-td--updated-stale'
+                  iso={sig.createdAt}
+                  className={`sig-td--time${
+                    isSigStale(sig.sigType, sig.whType, sig.createdAt, tickNow)
+                      ? ' sig-td--age-stale'
                       : ''
                   }`}
                 />
+                <ElapsedCell iso={sig.updatedAt} className="sig-td--time sig-td--updated" />
                 {!isShareMode && (
                   <td>
                     {canEdit && (
