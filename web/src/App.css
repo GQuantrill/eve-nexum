@@ -3272,7 +3272,11 @@ select.sig-toolbar-btn option {
 }
 
 .sig-td--updated {
-  color: #5a7a5a;
+  color: #f0a030;
+}
+
+.sig-td--updated-stale {
+  color: #e05a5a;
 }
 
 /* ── WH Type Picker ──────────────────────────────────────── */

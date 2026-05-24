@@ -40,6 +40,45 @@ function whAgeRowClass(
   return 'sig-row--wh-past';
 }
 
+// Threshold (hours) past which a non-wormhole sig's "updated" cell goes red.
+// Combat / data / relic / gas / ore sites don't have a hard TTL, so this is
+// just a "you haven't refreshed this in three days, it's probably stale"
+// heuristic.
+const STALE_UPDATED_HOURS = 72;
+
+// Longest known wormhole lifetime — used as the staleness threshold for
+// wormhole sigs whose specific WH code isn't filled in yet. Conservative
+// upper bound: if the hole would have decayed by now even at its most
+// generous TTL, it's safe to call it stale.
+const MAX_WH_LIFETIME_H = Math.max(
+  ...Object.values(WORMHOLE_TYPES).map((w) => w.lifetimeH),
+  0,
+);
+
+// True when a sig's last-updated time is older than what the row should
+// realistically still be valid for:
+//   - wormholes with a known type: that type's full lifetime
+//   - wormholes with no/unknown type code: the longest known WH lifetime
+//   - everything else: STALE_UPDATED_HOURS
+// Returns false only when we genuinely have nothing to anchor against
+// (no updatedAt timestamp).
+function isUpdatedStale(
+  sigType: string,
+  whType: string,
+  updatedAt: string | undefined,
+  now: number,
+): boolean {
+  if (!updatedAt) return false;
+  const ageH = (now - new Date(updatedAt).getTime()) / 3_600_000;
+  if (sigType === 'wormhole') {
+    const wh = whType ? WORMHOLE_TYPES[whType.toUpperCase()] : undefined;
+    const threshold = wh && wh.lifetimeH > 0 ? wh.lifetimeH : MAX_WH_LIFETIME_H;
+    if (threshold <= 0) return false;
+    return ageH >= threshold;
+  }
+  return ageH >= STALE_UPDATED_HOURS;
+}
+
 const SIG_TYPE_LABELS: Record<SigType, string> = {
   unknown:  'Unknown',
   wormhole: 'Wormhole',
@@ -640,7 +679,14 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                   />
                 </td>
                 <ElapsedCell iso={sig.createdAt} className="sig-td--time" />
-                <ElapsedCell iso={sig.updatedAt} className="sig-td--time sig-td--updated" />
+                <ElapsedCell
+                  iso={sig.updatedAt}
+                  className={`sig-td--time sig-td--updated${
+                    isUpdatedStale(sig.sigType, sig.whType, sig.updatedAt, tickNow)
+                      ? ' sig-td--updated-stale'
+                      : ''
+                  }`}
+                />
                 {!isShareMode && (
                   <td>
                     {canEdit && (
