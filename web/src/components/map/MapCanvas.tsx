@@ -17,13 +17,15 @@ import { AddSystemModal } from '../ui/AddSystemModal';
 import { ContextMenu } from '../ui/ContextMenu';
 import {
   PathIcon, MapPinSimpleIcon, HouseIcon, LockIcon, LockOpenIcon,
-  XIcon, CheckIcon, PlusIcon, SelectionAllIcon,
+  XIcon, CheckIcon, PlusIcon, SelectionAllIcon, EyeIcon,
 } from '@phosphor-icons/react';
-import type { MapSystem } from '../../types';
+import type { MapSystem, SystemIntel } from '../../types';
 import { CLASS_COLORS } from '../../data/wormholes';
 import { pickHandles } from './edgeUtils';
 import { setDestination, addWaypoint } from '../../api/waypoint';
 import { toast } from '../ui/Toaster';
+import { useCustomIntel } from '../../hooks/useCustomIntel';
+import { resolveIntelColor } from '../../utils/intelColors';
 
 const NODE_TYPES = { system: SystemNode };
 
@@ -117,6 +119,7 @@ export function MapCanvas() {
 
   const [pendingPosition, setPendingPosition] = useState<{ x: number; y: number } | null>(null);
   const [contextMenu, setContextMenu]         = useState<CtxMenu | null>(null);
+  const [customIntel] = useCustomIntel();
 
   // Empty initial — the `systems` effect below replaces this on the next
   // frame with the real node set. Starting empty avoids the dead useMemo that
@@ -651,6 +654,73 @@ export function MapCanvas() {
             },
       ] : [];
 
+      // Manual intel tag. Built-in options + the user's custom intels, each
+      // rendered with a colored swatch via an inline span. Submenu shows a
+      // check mark next to the currently-applied tag so the user can
+      // recognise their choice at a glance.
+      const BUILTIN_INTEL: Array<{ value: SystemIntel; label: string }> = [
+        { value: 'friendly', label: 'Friendly' },
+        { value: 'hostile',  label: 'Hostile' },
+        { value: 'occupied', label: 'Occupied' },
+        { value: 'empty',    label: 'Empty' },
+      ];
+      const intelSwatch = (value: SystemIntel) => {
+        const c = resolveIntelColor(value, customIntel);
+        if (!c) return undefined;
+        return <span className="intel-swatch" style={{ background: c }} aria-hidden="true" />;
+      };
+      const customEntries = customIntel.map((ci) => ({ value: ci.id, label: ci.label || '(unnamed)' }));
+      const intelItem = !multiSelected ? [
+        {
+          label: 'Set Intel',
+          icon:  <EyeIcon size={16} weight="regular" color="#6ea0ff" />,
+          submenu: [
+            ...BUILTIN_INTEL.map((o) => ({
+              label:   o.label,
+              icon:    intelSwatch(o.value),
+              checked: sys?.intel === o.value,
+              action:  () => updateSystem(contextMenu.nodeId!, { intel: o.value }),
+            })),
+            ...(customEntries.length > 0 ? [{ separator: true as const }] : []),
+            ...customEntries.map((o) => ({
+              label:   o.label,
+              icon:    intelSwatch(o.value),
+              checked: sys?.intel === o.value,
+              action:  () => updateSystem(contextMenu.nodeId!, { intel: o.value }),
+            })),
+            { separator: true as const },
+            {
+              label:   'Clear Intel',
+              checked: !sys?.intel,
+              action:  () => updateSystem(contextMenu.nodeId!, { intel: null }),
+            },
+          ],
+        },
+      ] : [
+        {
+          label: `Set Intel for ${selectedNodes.length}`,
+          icon:  <EyeIcon size={16} weight="regular" color="#6ea0ff" />,
+          submenu: [
+            ...BUILTIN_INTEL.map((o) => ({
+              label:  o.label,
+              icon:   intelSwatch(o.value),
+              action: () => selectedNodes.forEach((n) => updateSystem(n.id, { intel: o.value })),
+            })),
+            ...(customEntries.length > 0 ? [{ separator: true as const }] : []),
+            ...customEntries.map((o) => ({
+              label:  o.label,
+              icon:   intelSwatch(o.value),
+              action: () => selectedNodes.forEach((n) => updateSystem(n.id, { intel: o.value })),
+            })),
+            { separator: true as const },
+            {
+              label:  'Clear Intel',
+              action: () => selectedNodes.forEach((n) => updateSystem(n.id, { intel: null })),
+            },
+          ],
+        },
+      ];
+
       return [
         {
           label: sys?.locked ? 'Unlock System' : 'Lock System',
@@ -673,6 +743,7 @@ export function MapCanvas() {
           },
         }] : []),
         ...homeItem,
+        ...intelItem,
         ...multiItems,
         ...waypointItems,
       ];

@@ -517,7 +517,7 @@ mapsRouter.get('/:mapId', async (req, res) => {
       `SELECT id, eve_system_id AS "eveSystemId", name, system_class AS "systemClass",
               effect, statics, region_name AS "regionName", npc_type AS "npcType",
               position_x AS x, position_y AS y,
-              status, is_home AS "isHome", locked, notes,
+              status, intel, is_home AS "isHome", locked, notes,
               last_activity_at AS "lastActivityAt"
        FROM map_systems WHERE map_id = $1`,
       [mapId],
@@ -648,9 +648,6 @@ mapsRouter.patch('/:mapId/systems/:systemId', async (req, res) => {
   const { mapId, systemId } = req.params;
   const updates = req.body as Record<string, unknown>;
 
-  const allowed = ['name','system_class','effect','statics','region_name','npc_type',
-                   'position_x','position_y','status','is_home','locked','notes'];
-
   // map camelCase → snake_case for the DB columns we accept
   const colMap: Record<string, string> = {
     name: 'name', systemClass: 'system_class', effect: 'effect', statics: 'statics',
@@ -666,6 +663,24 @@ mapsRouter.patch('/:mapId/systems/:systemId', async (req, res) => {
       sets.push(`${col} = $${vals.length + 1}`);
       vals.push(updates[key]);
     }
+  }
+
+  // Intel tag. Accepts:
+  //   - null              → clears the tag
+  //   - 'friendly' | 'hostile' | 'occupied' | 'empty'  → built-ins
+  //   - any [A-Za-z0-9-]{1,64} string                  → user-defined custom
+  //     intel id (UUID generated client-side; label + colour live in
+  //     ui_settings.nexum.customIntel for the user that set the tag).
+  // The charset cap stops a stale client from stuffing arbitrary text into
+  // a `data-intel` attribute that selector rules might choke on.
+  if ('intel' in updates) {
+    const v = updates.intel;
+    const VALID_INTEL_RE = /^[A-Za-z0-9-]{1,64}$/;
+    if (v !== null && !(typeof v === 'string' && VALID_INTEL_RE.test(v))) {
+      res.status(400).json({ error: 'invalid intel value' }); return;
+    }
+    sets.push(`intel = $${vals.length + 1}`);
+    vals.push(v);
   }
 
   // handle position separately

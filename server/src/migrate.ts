@@ -160,6 +160,12 @@ export async function migrate() {
     ALTER TABLE map_connections ADD COLUMN IF NOT EXISTS eol_at    TIMESTAMPTZ;
     ALTER TABLE map_systems     ADD COLUMN IF NOT EXISTS last_activity_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
 
+    -- Manual intel tag a user can apply to a system via right-click. Distinct
+    -- from status (which is exploration state -- visited / cleared) -- this
+    -- is who-is-home intel: friendly, hostile, occupied (neutral residents),
+    -- empty. NULL means no tag.
+    ALTER TABLE map_systems     ADD COLUMN IF NOT EXISTS intel TEXT;
+
     CREATE TABLE IF NOT EXISTS map_signatures (
       id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
       system_id   UUID        NOT NULL REFERENCES map_systems(id) ON DELETE CASCADE,

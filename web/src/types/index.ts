@@ -12,6 +12,24 @@ export type TimeStatus = 'fresh' | 'eol' | 'lessThan24h' | 'lessThan4h' | 'lessT
 export type ConnectionSize = 'xl' | 'large' | 'medium' | 'small';
 export type SystemStatus = 'unknown' | 'visited' | 'cleared';
 
+/** Built-in intel tag values. User-defined custom intel adds arbitrary
+ *  ids (UUIDs) alongside these. */
+export type BuiltinIntel = 'friendly' | 'hostile' | 'occupied' | 'empty';
+
+/** Manual intel tag — applied by the user via the system right-click menu.
+ *  Drives a soft background tint on the node. Distinct from [[SystemStatus]],
+ *  which tracks exploration state. */
+export type SystemIntel = BuiltinIntel | string;
+
+/** A user-defined intel option stored in their preferences. The id is a
+ *  stable UUID — labels and colours can be edited without orphaning the
+ *  systems already tagged with it. */
+export interface CustomIntel {
+  id:    string;
+  label: string;
+  color: string;
+}
+
 export interface MapSystem {
   id: string;
   eveSystemId: number | null;
@@ -23,6 +41,9 @@ export interface MapSystem {
   npcType: string | null;
   position: { x: number; y: number };
   status: SystemStatus;
+  /** Optional intel tag (friendly/hostile/occupied/empty). Absent on
+   *  shared-link views — intel is private to the owning user's chain. */
+  intel?: SystemIntel | null;
   isHome: boolean;
   locked: boolean;
   notes: string;

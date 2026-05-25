@@ -19,6 +19,7 @@ import { toPng } from "html-to-image";
 import { CaretLeftIcon, CaretRightIcon } from "@phosphor-icons/react";
 import { ChainExitsSection } from "./ChainExitsSection";
 import { MapSharesSection } from "./MapSharesSection";
+import { CustomIntelBlock } from "./CustomIntelBlock";
 import { useIsMapOwner } from "../../hooks/useIsMapOwner";
 import type { WormholeMap } from "../../types";
 
@@ -700,6 +701,8 @@ export function MapSidebar() {
               {easyConnect ? "On" : "Off"}
             </button>
           </div>
+
+          <CustomIntelBlock />
         </CollapsibleSection>
 
         <CollapsibleSection
