@@ -415,6 +415,7 @@ const SETTINGS_ALLOWLIST = new Set<string>([
   'nexum.panel.collapsed.thera',
   'nexum.panel.collapsed.turnur',
   'nexum.proximityThreshold',
+  'nexum.customIntel',
   'nexum.sidebar.collapsed',
   'nexum.sidebar.order',
   'nexum.sidebar.side',

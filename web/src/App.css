@@ -1325,6 +1325,93 @@
   color: #e05a5a;
 }
 
+/* ── Custom intel ─────────────────────────────────────────── */
+.custom-intel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.custom-intel__list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.custom-intel__row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.custom-intel__swatch {
+  position: relative;
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  border: 1px solid #1e2740;
+  flex-shrink: 0;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+/* The actual <input type="color"> is invisible but covers the swatch so
+   clicks open the OS colour picker. */
+.custom-intel__swatch input[type="color"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.custom-intel__label-input {
+  flex: 1;
+  min-width: 0;
+  background: #0a0e1a;
+  border: 1px solid #1e2740;
+  border-radius: 4px;
+  padding: 4px 6px;
+  font-size: calc(12px * var(--font-scale, 1));
+  color: #c8d4f0;
+  outline: none;
+}
+
+.custom-intel__label-input:focus {
+  border-color: #6ea0ff;
+}
+
+.custom-intel__remove {
+  background: transparent;
+  border: 1px solid #3a2030;
+  color: #d88a8a;
+  border-radius: 4px;
+  padding: 3px 5px;
+  cursor: pointer;
+  line-height: 0;
+  flex-shrink: 0;
+}
+
+.custom-intel__remove:hover {
+  background: rgba(224,90,90,0.10);
+  color: #e05a5a;
+}
+
+/* Right-click submenu swatch — tiny rounded square that sits where the
+   icon normally goes for built-in intel options. */
+.intel-swatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
 /* Read-only display of a generated share URL. Monospace so the UUID
    tail stays scannable; truncated with ellipsis if the origin is long. */
 .map-sidebar__share-url {
@@ -1430,6 +1517,9 @@
   text-align: left;
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 
   &:hover {
     background: #1a2440;
@@ -1516,6 +1606,28 @@
    readable even at small node sizes. */
 .system-node--sov-hostile { box-shadow: 0 0 0 2px #e74c3c, 0 0 10px rgba(231,76,60,0.55); }
 .system-node--sov-blue    { box-shadow: 0 0 0 2px #5b9bff, 0 0 10px rgba(91,155,255,0.45); }
+
+/* Manual intel tag — replaces the default class-color border with a
+   thicker, fully-saturated intel colour so the tag reads at a glance
+   even when the node is unhovered. The class is still legible via the
+   class-badge inside the header, so swapping the border doesn't lose
+   information. The colour comes from --intel-color, which SystemNode
+   sets inline based on the resolved tag (built-in palette or the user's
+   CustomIntel entry).
+   Hover/selected stay on the intel colour rather than reverting to the
+   class colour — toggling between two borders on hover was visually
+   jumpy and made the intel state read as "less important" than hover.
+   The class-color box-shadow on hover/selected still fires, so the
+   feedback is preserved. */
+.system-node[data-intel] {
+  border-color: var(--intel-color);
+  border-width: 2.5px;
+
+  &:hover,
+  &[data-selected='true'] {
+    border-color: var(--intel-color);
+  }
+}
 
 .system-node {
   min-width: 150px;
@@ -2589,6 +2701,28 @@ div.system-node__easy-handle {
   font-style: italic;
   color: #7a8aaa;
   font-size: calc(13px * var(--font-scale, 1));
+}
+
+/* Current intel chip — pill in the system-info headline. Border colour
+   matches the intel tag so it visually pairs with the node's border on
+   the canvas. Swatch is a small filled square inside the pill. */
+.sys-info__intel {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 1px 8px 1px 5px;
+  border: 1px solid;
+  border-radius: 999px;
+  font-size: calc(12px * var(--font-scale, 1));
+  color: #c8d4f0;
+  background: rgba(8, 9, 15, 0.6);
+}
+
+.sys-info__intel-swatch {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
 }
 
 .sys-info__effect-mods {

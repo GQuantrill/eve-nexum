@@ -23,6 +23,8 @@ import { useIceBeltSystems, hasIceBelt } from '../../hooks/useIceBeltSystems';
 import { useCurrentHourKills } from '../../hooks/useCurrentHourKills';
 import { useNow30s } from '../../hooks/useNow30s';
 import { useStaleThreshold } from '../../hooks/useStaleThreshold';
+import { useCustomIntel } from '../../hooks/useCustomIntel';
+import { resolveIntelColor } from '../../utils/intelColors';
 import { WHTypeInfo } from '../ui/WHTypeInfo';
 import { truesecColor } from '../../utils/truesec';
 
@@ -98,6 +100,8 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
   const isStale         = !!sys.lastActivityAt &&
                           (now - new Date(sys.lastActivityAt).getTime()) > staleHours * 3_600_000;
   const connection      = useConnection();
+  const [customIntel]   = useCustomIntel();
+  const intelColor      = resolveIntelColor(sys.intel, customIntel);
 
   // Tooltip label: dedupe by scout system name (Thera / Turnur). Multiple
   // connections from the same scout are summarised, mixed scouts are listed.
@@ -147,11 +151,13 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
       className={`system-node${sys.locked ? ' nopan' : ''}${isTarget ? ' system-node--connect-target' : ''}${isStale ? ' system-node--stale' : ''}${isSovHostile ? ' system-node--sov-hostile' : ''}${isSovBlue ? ' system-node--sov-blue' : ''}${uniformSize ? ' system-node--uniform' : ''}${compactMode ? ' system-node--compact' : ''}`}
       style={{
         '--class-color': color,
+        ...(intelColor ? { '--intel-color': intelColor } : null),
         ...(uniformSize && uniformWidth  > 0 ? { minWidth:  uniformWidth  } : null),
         ...(uniformSize && uniformHeight > 0 ? { minHeight: uniformHeight } : null),
       } as React.CSSProperties}
       data-selected={selected}
       data-status={sys.status}
+      data-intel={sys.intel ?? undefined}
       data-home={sys.isHome}
       data-current={isCurrent}
       onClick={(e) => {

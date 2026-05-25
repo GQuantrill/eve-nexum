@@ -22,6 +22,8 @@ import { useIncursions, findIncursion } from '../../hooks/useIncursions';
 import { useInsurgency, findInsurgency } from '../../hooks/useInsurgency';
 import { useCanEditContent } from '../../hooks/useCanEditContent';
 import { useShareMode } from '../../context/ShareModeContext';
+import { useCustomIntel } from '../../hooks/useCustomIntel';
+import { resolveIntelColor, resolveIntelLabel } from '../../utils/intelColors';
 import { WHTypeInfo } from './WHTypeInfo';
 import { Tooltip } from './Tooltip';
 
@@ -144,9 +146,12 @@ export function SystemPanel() {
   const esiSys    = useEsiSystem(sys?.eveSystemId ?? null);
   const incursions   = useIncursions();
   const insurgencies = useInsurgency();
+  const [customIntel] = useCustomIntel();
   if (!sys) return null;
   const incursion  = findIncursion(incursions, sys.eveSystemId);
   const insurgency = findInsurgency(insurgencies, sys.eveSystemId);
+  const intelColor = resolveIntelColor(sys.intel, customIntel);
+  const intelLabel = resolveIntelLabel(sys.intel, customIntel);
 
   const setWaypoint = (clearOtherWaypoints: boolean) => {
     if (!sys.eveSystemId) return;
@@ -245,6 +250,16 @@ export function SystemPanel() {
             )}
             {sys.effect !== 'none' && (
               <span className="sys-info__effect">{EFFECT_LABELS[sys.effect]}</span>
+            )}
+            {/* Current intel tag — only rendered when the user has actually
+                set one. Pulls colour + label from the same resolver used by
+                the node border + right-click menu so all three stay in
+                sync if the user edits a custom intel definition. */}
+            {sys.intel && intelLabel && (
+              <span className="sys-info__intel" style={{ borderColor: intelColor ?? '#445' }}>
+                <span className="sys-info__intel-swatch" style={{ background: intelColor ?? '#445' }} />
+                {intelLabel}
+              </span>
             )}
           </div>
 
