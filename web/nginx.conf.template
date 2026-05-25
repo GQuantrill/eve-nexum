@@ -49,6 +49,16 @@ server {
         proxy_pass_header  Set-Cookie;
     }
 
+    # Vendored third-party link icons (Dotlan favicon, zKillboard wreck),
+    # self-hosted under /vendor/ so they need no CSP img-src exception.
+    # Cached hard since they effectively never change. Using `expires`
+    # (not `add_header Cache-Control`) so the server-level security headers
+    # above are still inherited here.
+    location ^~ /vendor/ {
+        expires 30d;
+        access_log off;
+    }
+
     # SPA fallback
     location / {
         try_files $uri $uri/ /index.html;
