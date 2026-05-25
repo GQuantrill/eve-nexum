@@ -24,11 +24,8 @@ import wormholesRouter    from './routes/wormholes.js';
 import { loadRouteGraph } from './services/routeGraph.js';
 import { adminRouter, adminReadRouter, reportsRouter } from './routes/admin.js';
 import { standingsRouter } from './routes/standings.js';
-import { knownStructuresRouter } from './routes/knownStructures.js';
 import { shareRouter } from './routes/share.js';
 import searchRouter from './routes/search.js';
-import { initCorpStructuresPoller } from './services/corpStructures.js';
-import { initPublicStructuresPoller } from './services/publicStructures.js';
 import { authLimiter, esiLimiter, publicLimiter, appLimiter } from './middleware/rateLimits.js';
 import { originGuard } from './middleware/originGuard.js';
 import { createLogger } from './utils/logger.js';
@@ -103,7 +100,6 @@ app.use('/api/admin/reports',     appLimiter, reportsRouter);
 app.use('/api/admin',             appLimiter, adminReadRouter);
 app.use('/api/admin',             appLimiter, adminRouter);
 app.use('/api/standings',         appLimiter, standingsRouter);
-app.use('/api/known-structures',  appLimiter, knownStructuresRouter);
 app.use('/api/search',            esiLimiter, searchRouter);
 
 app.get('/health', (_req, res) => res.json({ ok: true }));
@@ -142,8 +138,6 @@ migrate()
     setInterval(expireMaps, 60 * 60 * 1000); // re-check hourly
     await initActivity();
     await loadRouteGraph();
-    initCorpStructuresPoller();
-    initPublicStructuresPoller();
     app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
   })
   .catch((err) => { console.error('Migration failed:', err); process.exit(1); });

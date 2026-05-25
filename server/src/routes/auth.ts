@@ -44,12 +44,6 @@ authRouter.get('/login', (req, res) => {
           'esi-characters.read_contacts.v1',
           'esi-corporations.read_contacts.v1',
           'esi-alliances.read_contacts.v1',
-          // Auto-discover corp-owned structures (citadels, refineries,
-          // etc.) so the Structures pane can pre-populate them per system
-          // without manual entry. Only works for characters with the
-          // Station Manager or Director role; the puller silently no-ops
-          // for everyone else.
-          'esi-corporations.read_structures.v1',
           // Fleet member tracking — show fleet-mate locations on the map as
           // purple dots. Requires the character to be the fleet boss or a
           // wing/squad commander; ESI returns 403 to everyone else and the
@@ -198,8 +192,8 @@ authRouter.get('/callback', async (req, res) => {
     await seedDemoMap(userId);
 
     // Snapshot prefs into the session so /auth/me can answer without a DB call.
-    const prefRows = await db.query<{ compact_mode: boolean; snap_to_grid: boolean; show_minimap: boolean; uniform_size: boolean; show_statics: boolean; connection_thickness: string; route_mode: string; route_include_bridges: boolean; ui_zoom: string; ui_settings: Record<string, unknown>; panel_order: string[] }>(
-      `SELECT compact_mode, snap_to_grid, show_minimap, uniform_size, show_statics, connection_thickness, route_mode, route_include_bridges, ui_zoom, ui_settings, panel_order FROM users WHERE id = $1`,
+    const prefRows = await db.query<{ compact_mode: boolean; snap_to_grid: boolean; show_minimap: boolean; uniform_size: boolean; show_statics: boolean; connection_thickness: string; route_mode: string; ui_zoom: string; ui_settings: Record<string, unknown>; panel_order: string[] }>(
+      `SELECT compact_mode, snap_to_grid, show_minimap, uniform_size, show_statics, connection_thickness, route_mode, ui_zoom, ui_settings, panel_order FROM users WHERE id = $1`,
       [userId],
     );
     const p = prefRows.rows[0];
@@ -223,7 +217,6 @@ authRouter.get('/callback', async (req, res) => {
       showStatics: p?.show_statics ?? true,
       connectionThickness: p?.connection_thickness ?? 'standard',
       routeMode:   p?.route_mode ?? 'shortest',
-      routeIncludeBridges: p?.route_include_bridges ?? false,
       uiZoom:      p?.ui_zoom != null ? Number(p.ui_zoom) : 1,
       uiSettings:  p?.ui_settings ?? {},
       panelOrder:  p?.panel_order  ?? ['notes', 'signatures'],
@@ -271,8 +264,8 @@ authRouter.get('/me', async (req, res) => {
   let prefs = req.session.prefs;
   let role  = req.session.role ?? 'readonly';
   if (!prefs) {
-    const { rows } = await db.query<{ compact_mode: boolean; snap_to_grid: boolean; show_minimap: boolean; uniform_size: boolean; show_statics: boolean; connection_thickness: string; route_mode: string; route_include_bridges: boolean; ui_zoom: string; ui_settings: Record<string, unknown>; panel_order: string[]; role: string }>(
-      `SELECT compact_mode, snap_to_grid, show_minimap, uniform_size, show_statics, connection_thickness, route_mode, route_include_bridges, ui_zoom, ui_settings, panel_order, role FROM users WHERE id = $1`,
+    const { rows } = await db.query<{ compact_mode: boolean; snap_to_grid: boolean; show_minimap: boolean; uniform_size: boolean; show_statics: boolean; connection_thickness: string; route_mode: string; ui_zoom: string; ui_settings: Record<string, unknown>; panel_order: string[]; role: string }>(
+      `SELECT compact_mode, snap_to_grid, show_minimap, uniform_size, show_statics, connection_thickness, route_mode, ui_zoom, ui_settings, panel_order, role FROM users WHERE id = $1`,
       [req.session.userId],
     );
     const row = rows[0];
@@ -284,7 +277,6 @@ authRouter.get('/me', async (req, res) => {
       showStatics: row?.show_statics ?? true,
       connectionThickness: row?.connection_thickness ?? 'standard',
       routeMode:   row?.route_mode ?? 'shortest',
-      routeIncludeBridges: row?.route_include_bridges ?? false,
       uiZoom:      row?.ui_zoom != null ? Number(row.ui_zoom) : 1,
       uiSettings:  row?.ui_settings ?? {},
       panelOrder:  row?.panel_order  ?? ['notes', 'signatures'],
@@ -311,7 +303,6 @@ authRouter.get('/me', async (req, res) => {
       showStatics:   prefs.showStatics ?? true,
       connectionThickness: prefs.connectionThickness ?? 'standard',
       routeMode:     prefs.routeMode ?? 'shortest',
-      routeIncludeBridges: prefs.routeIncludeBridges ?? false,
       uiZoom:        prefs.uiZoom ?? 1,
       uiSettings:    prefs.uiSettings ?? {},
       panelOrder:    prefs.panelOrder,
@@ -326,7 +317,7 @@ const MAX_PANEL_KEY_LEN = 64;
 
 authRouter.patch('/preferences', async (req, res) => {
   if (!req.session.userId) { res.status(401).json({ error: 'Not authenticated' }); return; }
-  const { compactMode, snapToGrid, showMinimap, uniformSize, showStatics, connectionThickness, routeMode, routeIncludeBridges, uiZoom, panelOrder } = req.body as { compactMode?: boolean; snapToGrid?: boolean; showMinimap?: boolean; uniformSize?: boolean; showStatics?: boolean; connectionThickness?: string; routeMode?: string; routeIncludeBridges?: boolean; uiZoom?: number; panelOrder?: unknown };
+  const { compactMode, snapToGrid, showMinimap, uniformSize, showStatics, connectionThickness, routeMode, uiZoom, panelOrder } = req.body as { compactMode?: boolean; snapToGrid?: boolean; showMinimap?: boolean; uniformSize?: boolean; showStatics?: boolean; connectionThickness?: string; routeMode?: string; uiZoom?: number; panelOrder?: unknown };
   const VALID_THICKNESS = new Set(['thin', 'standard', 'thick', 'extra']);
   const VALID_ROUTE_MODE = new Set(['shortest', 'secure']);
 
@@ -342,9 +333,6 @@ authRouter.patch('/preferences', async (req, res) => {
   }
   if (typeof routeMode === 'string' && VALID_ROUTE_MODE.has(routeMode)) {
     sets.push(`route_mode = $${vals.length + 1}`); vals.push(routeMode);
-  }
-  if (typeof routeIncludeBridges === 'boolean') {
-    sets.push(`route_include_bridges = $${vals.length + 1}`); vals.push(routeIncludeBridges);
   }
   if (typeof uiZoom === 'number' && Number.isFinite(uiZoom)) {
     const clamped = Math.min(1.5, Math.max(0.8, uiZoom));
@@ -378,9 +366,6 @@ authRouter.patch('/preferences', async (req, res) => {
     }
     if (typeof routeMode === 'string' && VALID_ROUTE_MODE.has(routeMode)) {
       req.session.prefs.routeMode = routeMode;
-    }
-    if (typeof routeIncludeBridges === 'boolean') {
-      req.session.prefs.routeIncludeBridges = routeIncludeBridges;
     }
     if (typeof uiZoom === 'number' && Number.isFinite(uiZoom)) {
       req.session.prefs.uiZoom = Math.min(1.5, Math.max(0.8, uiZoom));
