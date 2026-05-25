@@ -23,6 +23,7 @@
     "express": "^4.19.2",
     "express-rate-limit": "^8.5.1",
     "express-session": "^1.19.0",
+    "helmet": "^8.2.0",
     "pg": "^8.11.5",
     "unzipper": "^0.12.3"
   },

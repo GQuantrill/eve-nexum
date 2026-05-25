@@ -7,6 +7,31 @@ server {
     # not at startup (avoids "host not found" when server starts slowly)
     resolver 127.0.0.11 valid=30s;
 
+    # ── Security headers ─────────────────────────────────────────────
+    # always = applied to error responses too (default omits 4xx/5xx).
+    #
+    # CSP: locked down for the SPA. img-src needs the EVE image server
+    # (portraits + corp/alliance logos). style-src needs 'unsafe-inline'
+    # because React's `style` prop emits inline styles; we don't use
+    # inline <script>, so script-src stays strict. connect-src is just
+    # 'self' — every external API (ESI, zKillboard, EveScout, etc.) is
+    # proxied through /api on this same origin.
+    add_header Content-Security-Policy "default-src 'self'; img-src 'self' data: https://images.evetech.net; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; font-src 'self' data:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'" always;
+
+    # Clickjacking + MIME-sniff defenses. frame-ancestors above is the
+    # modern equivalent of X-Frame-Options, but legacy browsers still
+    # need the old header.
+    add_header X-Frame-Options "DENY" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()" always;
+
+    # HSTS — only meaningful when served over HTTPS, but harmless via
+    # HTTP (browsers ignore it). Traefik terminates TLS in the
+    # recommended deployment; if running plain HTTP behind a different
+    # proxy, the header is a no-op.
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+
     # Proxy API and auth calls to the server container. The upstream
     # port is substituted at container start from $API_PORT so it
     # tracks whatever PORT the user set in .env.

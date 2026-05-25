@@ -27,3 +27,16 @@ export const publicLimiter = rateLimit({
   legacyHeaders: false,
   message: { error: 'Too many requests, please slow down.' },
 });
+
+// Authenticated app routes (maps, stats, standings, structures). Higher
+// ceiling than esiLimiter because a busy mapping session legitimately
+// fires many requests (sig save bursts, position drags, structure imports).
+// 6/sec sustained is well above any realistic single-user need but stops a
+// runaway / compromised account from saturating the DB pool.
+export const appLimiter = rateLimit({
+  windowMs: 60_000,
+  limit: 360,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  message: { error: 'Too many requests, please slow down.' },
+});

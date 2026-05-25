@@ -5,6 +5,7 @@ import { requireAdminRead } from '../middleware/requireAdminRead.js';
 import { requireReportsAccess, isReportsCharacter, corpScopeFor } from '../middleware/requireReportsAccess.js';
 import { config } from '../config.js';
 import { createLogger } from '../utils/logger.js';
+import { invalidateSessionsForUser } from '../utils/sessionInvalidate.js';
 
 const log = createLogger('admin');
 
@@ -253,8 +254,11 @@ adminRouter.post('/users/:id/block', async (req, res) => {
 
   await db.query(`UPDATE users SET blocked = TRUE, updated_at = NOW() WHERE id = $1`, [userId]);
   await audit(req, userId, target.character_id, 'block', 'false', 'true');
+  // Kill any live sessions so the block takes effect immediately rather than
+  // waiting up to the cookie TTL for the user to log out and back in.
+  const killed = await invalidateSessionsForUser(userId);
 
-  res.json({ ok: true });
+  res.json({ ok: true, sessionsKilled: killed });
 });
 
 // POST /api/admin/users/:id/unblock
@@ -329,6 +333,9 @@ adminRouter.post('/users/:id/recheck-corp', async (req, res) => {
   if (shouldBlock && !target.blocked) {
     await db.query(`UPDATE users SET blocked = TRUE WHERE id = $1`, [userId]);
     await audit(req, userId, target.character_id, 'auto_block_corp_left', 'false', 'true');
+    // Live sessions outlive the block flag — drop them so the user can't keep
+    // working past their corp departure.
+    await invalidateSessionsForUser(userId);
   }
 
   res.json({
