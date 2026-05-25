@@ -112,6 +112,30 @@ function formatCheckedAt(date: Date): string {
   return `${Math.floor(secs / 60)}m ago`;
 }
 
+// Build the tooltip for the online-status dot. When ESI reports online we
+// surface the TQ session-start timestamp + how long ago it was, so an
+// orphan session ("online for 6 hours but I crashed at lunchtime") is
+// instantly recognisable from the tooltip alone.
+function onlineTooltip(online: boolean | null, lastLoginIso: string | null): string {
+  if (online === false) return 'Offline';
+  if (online === null)  return 'Status unknown';
+  if (!lastLoginIso)    return 'Online in EVE';
+  const ts = new Date(lastLoginIso);
+  if (!Number.isFinite(ts.getTime())) return 'Online in EVE';
+  // DD-MM-YYYY HH:MM UTC matches the rest of the app's date display.
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const stamp = `${pad(ts.getUTCDate())}-${pad(ts.getUTCMonth() + 1)}-${ts.getUTCFullYear()} ${pad(ts.getUTCHours())}:${pad(ts.getUTCMinutes())} UTC`;
+  // Rough age — minutes for the first hour, then hours, then days. Plenty
+  // good enough for "is this session weirdly old?" at a glance.
+  const ageMin = Math.floor((Date.now() - ts.getTime()) / 60_000);
+  let age: string;
+  if (ageMin < 1)        age = 'just now';
+  else if (ageMin < 60)  age = `${ageMin}m ago`;
+  else if (ageMin < 24 * 60) age = `${Math.floor(ageMin / 60)}h ago`;
+  else                   age = `${Math.floor(ageMin / (24 * 60))}d ago`;
+  return `Online in EVE since ${stamp} (${age})`;
+}
+
 // Self-contained "checked Xs ago" label — owns its own 5 s tick so the rest of
 // the Toolbar doesn't re-render every five seconds along with it.
 function CheckedAtLabel({ checkedAt }: { checkedAt: Date }) {
@@ -173,7 +197,7 @@ export function Toolbar() {
   const canEdit       = useCanEdit();
   const isMapOwner    = useIsMapOwner();
   const canManageMaps = useCanCreateMaps();
-  const { online, checkedAt } = useOnlineStatus(!!user);
+  const { online, checkedAt, lastLogin } = useOnlineStatus(!!user);
   // Ship comes from the same poll that drives passive location tracking, so
   // no extra ESI traffic — we just surface a field that's already on hand.
   const { ship } = useCharacterLocation();
@@ -398,7 +422,7 @@ export function Toolbar() {
         <div className="toolbar__user">
           <span
             className={`toolbar__online-dot${online === true ? ' toolbar__online-dot--on' : online === false ? ' toolbar__online-dot--off' : ''}`}
-            title={online === true ? 'Online in EVE' : online === false ? 'Offline' : 'Status unknown'}
+            title={onlineTooltip(online, lastLogin)}
           />
           <img
             className="toolbar__avatar"
