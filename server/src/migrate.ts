@@ -57,7 +57,8 @@ export async function migrate() {
     ALTER TABLE users ADD COLUMN IF NOT EXISTS show_statics  BOOLEAN NOT NULL DEFAULT TRUE;
     ALTER TABLE users ADD COLUMN IF NOT EXISTS connection_thickness TEXT NOT NULL DEFAULT 'standard';
     ALTER TABLE users ADD COLUMN IF NOT EXISTS route_mode           TEXT NOT NULL DEFAULT 'shortest';
-    ALTER TABLE users ADD COLUMN IF NOT EXISTS route_include_bridges BOOLEAN NOT NULL DEFAULT FALSE;
+    -- route_include_bridges backed the removed Ansiblex jump-bridge routing.
+    ALTER TABLE users DROP COLUMN IF EXISTS route_include_bridges;
     ALTER TABLE users ADD COLUMN IF NOT EXISTS ui_zoom NUMERIC(3,2) NOT NULL DEFAULT 1.00;
 
     -- Cross-device UI settings (sidebar order, panel collapsed states,
@@ -66,23 +67,9 @@ export async function migrate() {
     -- hook reads from /auth/me and PATCHes via /auth/settings.
     ALTER TABLE users ADD COLUMN IF NOT EXISTS ui_settings JSONB NOT NULL DEFAULT '{}'::jsonb;
 
-    -- Player-owned Ansiblex jump bridges. One row per Ansiblex structure;
-    -- destination is parsed from the structure name (community convention:
-    -- "Source » Destination"). to_system_id is nullable for bridges whose
-    -- name we can't parse — those stay registered but aren't used by the
-    -- router until renamed. Populated from known_structures by the
-    -- ansiblexBridges service after every corp-structures refresh.
-    CREATE TABLE IF NOT EXISTS ansiblex_bridges (
-      structure_id     BIGINT      PRIMARY KEY,
-      from_system_id   INTEGER     NOT NULL,
-      to_system_id     INTEGER,
-      to_system_name   TEXT,
-      owner_corp_id    INTEGER     NOT NULL,
-      name             TEXT        NOT NULL DEFAULT '',
-      updated_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    );
-    CREATE INDEX IF NOT EXISTS idx_ansiblex_owner ON ansiblex_bridges (owner_corp_id);
-    CREATE INDEX IF NOT EXISTS idx_ansiblex_from  ON ansiblex_bridges (from_system_id);
+    -- Removed: ansiblex_bridges backed the Ansiblex jump-bridge routing,
+    -- which was derived from the (also removed) structure auto-discovery.
+    DROP TABLE IF EXISTS ansiblex_bridges;
     ALTER TABLE users ADD COLUMN IF NOT EXISTS panel_order   TEXT[]  NOT NULL DEFAULT '{notes,signatures,structures,npcStations}';
     ALTER TABLE users ADD COLUMN IF NOT EXISTS role          TEXT    NOT NULL DEFAULT 'readonly';
     UPDATE users SET role = 'readonly' WHERE role = 'standard';
@@ -205,31 +192,11 @@ export async function migrate() {
     -- structures pane apply standings-based tints per row.
     ALTER TABLE map_structures ADD COLUMN IF NOT EXISTS owner_corp_id INTEGER;
 
-    -- Cluster-wide cache of structures auto-discovered via ESI or imported
-    -- from a public dataset. Distinct from map_structures (which is
-    -- per-map and user-managed) -- these are read-only intel surfaced
-    -- into the structures pane alongside the user's own entries.
-    --
-    -- source = 'corp-esi' or 'public-dataset'.
-    --
-    -- restricted_to_corp_id IS NOT NULL means "only members of that corp
-    -- can see this row" -- used for the corp-ESI source so each corp
-    -- only sees its own private citadel intel. Public-dataset rows have
-    -- restricted_to_corp_id NULL.
-    CREATE TABLE IF NOT EXISTS known_structures (
-      structure_id          BIGINT      PRIMARY KEY,
-      system_id             INTEGER     NOT NULL,
-      owner_corp_id         INTEGER,
-      alliance_id           INTEGER,
-      name                  TEXT        NOT NULL DEFAULT '',
-      type_id               INTEGER,
-      source                TEXT        NOT NULL,
-      restricted_to_corp_id INTEGER,
-      first_seen_at         TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      last_seen_at          TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    );
-    CREATE INDEX IF NOT EXISTS idx_known_structures_system ON known_structures (system_id);
-    CREATE INDEX IF NOT EXISTS idx_known_structures_corp   ON known_structures (restricted_to_corp_id);
+    -- Removed: known_structures was the cluster-wide cache of structures
+    -- auto-discovered via corp ESI / a public dataset. The feature (and the
+    -- Ansiblex routing derived from it) has been dropped; manual per-map
+    -- structures live in map_structures and are unaffected.
+    DROP TABLE IF EXISTS known_structures;
 
     CREATE TABLE IF NOT EXISTS user_events (
       id          BIGSERIAL   PRIMARY KEY,

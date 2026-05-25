@@ -33,56 +33,6 @@ const BLACKLISTED_SYSTEMS = new Set<number>([
 let adjacency:  Map<number, number[]>                          | null = null;
 let systemInfo: Map<number, { name: string; security: number }> | null = null;
 
-// Lazy-loaded jump-bridge adjacency, keyed by owner_corp_id so each
-// route request can restrict to bridges the caller actually has access
-// to. The map is `corp → from-system → to-system[]`. Invalidated by
-// services/ansiblexBridges after each ESI refresh.
-let bridgesByCorp: Map<number, Map<number, number[]>> | null = null;
-let bridgesLoading: Promise<void> | null = null;
-export function invalidateBridgeGraph(): void { bridgesByCorp = null; }
-
-async function loadBridges(): Promise<void> {
-  if (bridgesByCorp) return;
-  if (bridgesLoading) return bridgesLoading;
-  bridgesLoading = (async () => {
-    const { rows } = await db.query<{ from_system_id: number; to_system_id: number; owner_corp_id: number }>(
-      `SELECT from_system_id, to_system_id, owner_corp_id
-         FROM ansiblex_bridges
-        WHERE to_system_id IS NOT NULL`,
-    );
-    const map = new Map<number, Map<number, number[]>>();
-    for (const r of rows) {
-      let perCorp = map.get(r.owner_corp_id);
-      if (!perCorp) { perCorp = new Map(); map.set(r.owner_corp_id, perCorp); }
-      let list = perCorp.get(r.from_system_id);
-      if (!list) { list = []; perCorp.set(r.from_system_id, list); }
-      list.push(r.to_system_id);
-    }
-    bridgesByCorp = map;
-    bridgesLoading = null;
-    log.info(`loaded ansiblex bridges from ${map.size} corp(s)`);
-  })();
-  return bridgesLoading;
-}
-
-// Build a flat from-system→to-system[] adjacency by unioning bridges
-// from every corp in `allowedCorps`. Stable per request.
-async function bridgeAdjacencyFor(allowedCorps: Set<number>): Promise<Map<number, number[]>> {
-  if (allowedCorps.size === 0) return new Map();
-  await loadBridges();
-  const result = new Map<number, number[]>();
-  for (const corpId of allowedCorps) {
-    const perCorp = bridgesByCorp!.get(corpId);
-    if (!perCorp) continue;
-    for (const [from, tos] of perCorp) {
-      let list = result.get(from);
-      if (!list) { list = [...tos]; result.set(from, list); }
-      else list.push(...tos);
-    }
-  }
-  return result;
-}
-
 /**
  * Build the in-memory stargate adjacency list from map_stargates, and load
  * { name, security } for every system that participates in the graph.
@@ -138,29 +88,15 @@ export async function shortestRoutes(
   source: number,
   targets: number[],
   mode: RouteMode = 'shortest',
-  allowedBridgeCorps: Set<number> = new Set(),
 ): Promise<Record<number, RouteEntry>> {
   if (!adjacency || !systemInfo) throw new Error('Route graph not loaded');
 
-  // Bridges may add `source` to the routable set even if it's not in
-  // the stargate graph (rare but possible for systems CCP doesn't gate).
-  // The bridge map is built up-front so we can treat its edges as
-  // first-class neighbours below.
-  const bridgeAdj = await bridgeAdjacencyFor(allowedBridgeCorps);
-  if (!adjacency.has(source) && !bridgeAdj.has(source)) return {};
+  if (!adjacency.has(source)) return {};
 
-  // A target is reachable if it sits in either graph.
-  const targetSet = new Set(targets.filter(t => adjacency!.has(t) || bridgeAdj.has(t)));
+  const targetSet = new Set(targets.filter(t => adjacency!.has(t)));
   if (targetSet.size === 0) return {};
 
-  // Combined neighbour lookup. Bridges layer on top of stargates with no
-  // de-duplication required — gate hops and Ansiblex hops are distinct
-  // ways of reaching the same destination, both cost 1 in shortest mode.
-  const neighborsOf = (node: number): number[] => {
-    const gates = adjacency!.get(node) ?? [];
-    const bridges = bridgeAdj.get(node);
-    return bridges ? gates.concat(bridges) : gates;
-  };
+  const neighborsOf = (node: number): number[] => adjacency!.get(node) ?? [];
 
   const dist = new Map<number, number>();
   const prev = new Map<number, number>();

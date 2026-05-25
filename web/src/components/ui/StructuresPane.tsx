@@ -65,25 +65,11 @@ function parseStructureClipboard(text: string): ParsedStructure[] {
     });
 }
 
-interface KnownStructure {
-  structureId: string;
-  systemId:    number;
-  ownerCorpId: number | null;
-  name:        string;
-  typeId:      number | null;
-  source:      'corp-esi' | 'public-dataset';
-  lastSeenAt:  string;
-}
-
 export function StructuresPane({ systemId }: { systemId: string }) {
   const activeMapId = useMapStore((s) => s.activeMapId);
   const canEdit     = useCanEditContent();
   const standings   = useStandings();
-  // Look up the EVE solar_system_id for this map system — known-structures
-  // are keyed by that, not by the map-system UUID.
-  const eveSystemId = useMapStore((s) => s.map.systems.find((sys) => sys.id === systemId)?.eveSystemId ?? null);
   const [structures, setStructures] = useState<Structure[]>([]);
-  const [knownStructures, setKnownStructures] = useState<KnownStructure[]>([]);
   const [pendingAction, setPendingAction] = useState<{ message: string; fn: () => void } | null>(null);
   const [ctx, setCtx] = useState<{ x: number; y: number; structure: Structure } | null>(null);
 
@@ -111,16 +97,6 @@ export function StructuresPane({ systemId }: { systemId: string }) {
       .then(setStructures)
       .catch(() => toast.error('Failed to load structures'));
   }, [activeMapId, systemId, isShareMode]);
-
-  // Pull cached known structures (corp-ESI + public-dataset). Filtered by
-  // eveSystemId, then deduped against the user's manual entries by eve_id
-  // at render time so we don't show the same citadel twice.
-  useEffect(() => {
-    if (!eveSystemId) { setKnownStructures([]); return; }
-    api<KnownStructure[]>(`/api/known-structures/${eveSystemId}`)
-      .then(setKnownStructures)
-      .catch(() => setKnownStructures([]));
-  }, [eveSystemId]);
 
   useEffect(() => {
     const close = () => setCtx(null);
@@ -350,11 +326,6 @@ export function StructuresPane({ systemId }: { systemId: string }) {
             </tbody>
           </table>
         )}
-        <KnownStructuresList
-          known={knownStructures}
-          manual={structures}
-          standings={standings}
-        />
       </div>
 
       {ctx && createPortal(
@@ -378,65 +349,5 @@ export function StructuresPane({ systemId }: { systemId: string }) {
         document.body,
       )}
     </>
-  );
-}
-
-// Read-only list of auto-discovered structures (corp ESI + public dataset).
-// Deduped against the user's manual entries by eve_id so the same citadel
-// doesn't appear twice. Owner-corp standing drives the row tint, same as
-// the manual table.
-function KnownStructuresList({
-  known,
-  manual,
-  standings,
-}: {
-  known:    KnownStructure[];
-  manual:   Structure[];
-  standings: ReturnType<typeof useStandings>;
-}) {
-  const manualEveIds = new Set(manual.map((s) => s.eveId).filter((id): id is number => id !== null));
-  const rows = known.filter((k) => !manualEveIds.has(Number(k.structureId)));
-  if (rows.length === 0) return null;
-
-  return (
-    <div className="known-structures">
-      <div className="known-structures__heading">
-        Auto-discovered ({rows.length})
-        <span className="known-structures__hint">read-only · paste an in-game structure list to import as your own</span>
-      </div>
-      <table className="sig-table known-structures__table">
-        <thead>
-          <tr>
-            <th>Source</th>
-            <th>Name</th>
-            <th>Owner</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((k) => {
-            const ownerStanding = k.ownerCorpId && standings.loaded
-              ? standings.getStanding('corporation', k.ownerCorpId).effective
-              : 0;
-            const tintClass =
-              ownerStanding <  -5 ? 'structure-row--hostile'  :
-              ownerStanding <   0 ? 'structure-row--bad'      :
-              ownerStanding >   5 ? 'structure-row--friendly' :
-              ownerStanding >   0 ? 'structure-row--good'     :
-                                    '';
-            return (
-              <tr key={k.structureId} className={tintClass}>
-                <td className="known-structures__source">
-                  <span className={`known-structures__badge known-structures__badge--${k.source}`}>
-                    {k.source === 'corp-esi' ? 'Corp' : 'Public'}
-                  </span>
-                </td>
-                <td>{k.name || `#${k.structureId}`}</td>
-                <td>{k.ownerCorpId ? `Corp #${k.ownerCorpId}` : '—'}</td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
   );
 }
