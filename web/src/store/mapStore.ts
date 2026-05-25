@@ -100,7 +100,6 @@ interface MapStore {
   showStatics: boolean;
   connectionThickness: 'thin' | 'standard' | 'thick' | 'extra';
   routeMode: 'shortest' | 'secure';
-  routeIncludeBridges: boolean;
   uiZoom: number;
   trackJumps: boolean;
   // Largest natural node dimensions seen so far — used as the min-width /
@@ -125,14 +124,13 @@ interface MapStore {
   undo: () => Promise<void>;
 
   panelOrder: string[];
-  applyPreferences: (prefs: { compactMode: boolean; snapToGrid: boolean; showMinimap: boolean; uniformSize: boolean; showStatics: boolean; connectionThickness: string; routeMode: string; routeIncludeBridges: boolean; uiZoom: number; panelOrder: string[] }) => void;
+  applyPreferences: (prefs: { compactMode: boolean; snapToGrid: boolean; showMinimap: boolean; uniformSize: boolean; showStatics: boolean; connectionThickness: string; routeMode: string; uiZoom: number; panelOrder: string[] }) => void;
   setPanelOrder: (order: string[]) => void;
   setShowMinimap: (v: boolean) => void;
   setUniformSize: (v: boolean) => void;
   setShowStatics: (v: boolean) => void;
   setConnectionThickness: (v: 'thin' | 'standard' | 'thick' | 'extra') => void;
   setRouteMode: (v: 'shortest' | 'secure') => void;
-  setRouteIncludeBridges: (v: boolean) => void;
   setUiZoom: (v: number) => void;
   setTrackJumps: (v: boolean) => void;
   setEasyConnect: (v: boolean) => void;
@@ -327,7 +325,6 @@ export const useMapStore = create<MapStore>()((set, get) => {
     showStatics: true,
     connectionThickness: 'standard',
     routeMode:   'shortest',
-    routeIncludeBridges: false,
     uiZoom: 1,
     // Initial value is read from localStorage (pre-hydration) and then
     // updated by the user-settings hydrate when /auth/me arrives. The
@@ -353,7 +350,7 @@ export const useMapStore = create<MapStore>()((set, get) => {
       await applyUndo(cmd);
     },
 
-    applyPreferences: ({ compactMode, snapToGrid, showMinimap, uniformSize, showStatics, connectionThickness, routeMode, routeIncludeBridges, uiZoom, panelOrder }) => {
+    applyPreferences: ({ compactMode, snapToGrid, showMinimap, uniformSize, showStatics, connectionThickness, routeMode, uiZoom, panelOrder }) => {
       // Whitelist of valid panel keys. `standings` was briefly a panel here
       // — kept in the filter so any persisted occurrence is silently
       // dropped on load now that standings live inline in the sov section.
@@ -367,7 +364,7 @@ export const useMapStore = create<MapStore>()((set, get) => {
       const VALID_ROUTE = new Set(['shortest', 'secure']);
       const safeRouteMode = (VALID_ROUTE.has(routeMode) ? routeMode : 'shortest') as 'shortest' | 'secure';
       const safeZoom = Number.isFinite(uiZoom) ? Math.min(1.5, Math.max(0.8, uiZoom)) : 1;
-      set({ compactMode, snapToGrid, showMinimap, uniformSize, showStatics, connectionThickness: safeThickness, routeMode: safeRouteMode, routeIncludeBridges: Boolean(routeIncludeBridges), uiZoom: safeZoom, panelOrder: merged });
+      set({ compactMode, snapToGrid, showMinimap, uniformSize, showStatics, connectionThickness: safeThickness, routeMode: safeRouteMode, uiZoom: safeZoom, panelOrder: merged });
     },
 
     setPanelOrder: (order) => {
@@ -504,11 +501,6 @@ export const useMapStore = create<MapStore>()((set, get) => {
     setRouteMode: (v) => {
       set({ routeMode: v });
       api('/auth/preferences', { method: 'PATCH', body: JSON.stringify({ routeMode: v }) }).catch(console.error);
-    },
-
-    setRouteIncludeBridges: (v) => {
-      set({ routeIncludeBridges: v });
-      api('/auth/preferences', { method: 'PATCH', body: JSON.stringify({ routeIncludeBridges: v }) }).catch(console.error);
     },
 
     setUiZoom: (v) => {
