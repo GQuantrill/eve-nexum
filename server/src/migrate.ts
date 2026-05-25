@@ -110,6 +110,12 @@ export async function migrate() {
     ALTER TABLE maps ALTER COLUMN share_include_bridges SET DEFAULT FALSE;
     CREATE UNIQUE INDEX IF NOT EXISTS uq_maps_share_token ON maps (share_token) WHERE share_token IS NOT NULL;
 
+    -- Corp maps can opt in to being used as the *source* of a map merge.
+    -- Default FALSE: a corp map stays private to its corp until a full/admin
+    -- member explicitly enables it. Solo maps ignore this flag — their owner
+    -- and share recipients can always merge from them.
+    ALTER TABLE maps ADD COLUMN IF NOT EXISTS allow_as_merge_source BOOLEAN NOT NULL DEFAULT FALSE;
+
     CREATE TABLE IF NOT EXISTS map_systems (
       id            UUID        PRIMARY KEY,
       map_id        UUID        NOT NULL REFERENCES maps(id) ON DELETE CASCADE,

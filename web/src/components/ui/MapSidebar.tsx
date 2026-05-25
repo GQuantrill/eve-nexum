@@ -19,6 +19,7 @@ import { toPng } from "html-to-image";
 import { CaretLeftIcon, CaretRightIcon } from "@phosphor-icons/react";
 import { ChainExitsSection } from "./ChainExitsSection";
 import { MapSharesSection } from "./MapSharesSection";
+import { MergeMapModal } from "./MergeMapModal";
 import { CustomIntelBlock } from "./CustomIntelBlock";
 import { useIsMapOwner } from "../../hooks/useIsMapOwner";
 import type { WormholeMap } from "../../types";
@@ -99,6 +100,7 @@ type SectionId =
   | "fleet"
   | "share"
   | "shareGrants"
+  | "mergeMaps"
   | "staleFade"
   | "export"
   | "shortcuts"
@@ -400,6 +402,87 @@ function ShareSection() {
           {error}
         </div>
       )}
+    </>
+  );
+}
+
+// Merge entry point. Opens the merge modal, and — for full/admin members
+// looking at a corp map — exposes the "allow as merge source" opt-in that
+// lets that corp map be used as a merge source by the corp.
+function MergeSection() {
+  const map = useMapStore((s) => s.map);
+  const mapCount = useMapStore((s) => s.maps.length);
+  const { user } = useAuth();
+  const role = user?.role ?? "readonly";
+  const isCorpMap = !!map.isCorpMap;
+  const canToggleSource = isCorpMap && (role === "full" || role === "admin");
+
+  const [open, setOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+  // Read straight from the store (no mirrored local state) so switching maps
+  // always shows the right value, and toggle optimistically + revert on error.
+  const allowSource = !!map.allowAsMergeSource;
+
+  function setAllowInStore(value: boolean) {
+    useMapStore.setState((s) => ({
+      map: { ...s.map, allowAsMergeSource: value },
+      maps: s.maps.map((m) =>
+        m.id === map.id ? { ...m, allowAsMergeSource: value } : m,
+      ),
+    }));
+  }
+
+  async function toggleSource(next: boolean) {
+    setSaving(true);
+    setAllowInStore(next);
+    try {
+      await api(`/api/maps/${map.id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ allowAsMergeSource: next }),
+      });
+    } catch (e) {
+      setAllowInStore(!next);
+      toast.error(e instanceof Error ? e.message : "Failed to update setting");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <>
+      <div className="map-sidebar__hint">
+        Combine another map into one of yours. The destination keeps its
+        existing systems; missing systems, links, and the data you select are
+        added or updated. This can't be undone.
+      </div>
+      <button
+        className="map-sidebar__action"
+        onClick={() => setOpen(true)}
+        disabled={mapCount < 2}
+      >
+        ⇲ Merge maps…
+      </button>
+
+      {canToggleSource && (
+        <>
+          <label className="map-sidebar__row map-sidebar__toggle-row">
+            <span className="map-sidebar__label">Allow as merge source</span>
+            <input
+              type="checkbox"
+              className="map-sidebar__toggle-input"
+              checked={allowSource}
+              disabled={saving}
+              onChange={(e) => toggleSource(e.target.checked)}
+            />
+          </label>
+          <div className="map-sidebar__hint">
+            When on, corp members can use this corp map as the <em>source</em> of
+            a merge into another map.
+          </div>
+        </>
+      )}
+
+      {open && <MergeMapModal onClose={() => setOpen(false)} />}
     </>
   );
 }
@@ -957,6 +1040,10 @@ export function MapSidebar() {
             </div>
           </CollapsibleSection>
         )}
+
+        <CollapsibleSection title="Merge Maps" {...sectionProps("mergeMaps")}>
+          <MergeSection />
+        </CollapsibleSection>
 
         {canShareThisMap(user, isCorpMap, isMapOwner) && (
           <CollapsibleSection
