@@ -17,12 +17,6 @@ export function useRoute(from: number | null, targets: number[]): Record<string,
   const [data, setData] = useState<Record<string, RouteEntry>>({});
   const routeMode = useMapStore((s) => s.routeMode);
 
-  // Bridges are temporarily disabled in the UI — every request goes out
-  // with includeBridges=false until the discovery story is sorted.
-  // Server / store still carries the preference so re-enabling is just
-  // re-wiring this hook + restoring the toggle in MapSidebar.
-  const includeBridges = false;
-
   const targetsKey = [...targets].sort((a, b) => a - b).join(',');
 
   useEffect(() => {
@@ -31,7 +25,7 @@ export function useRoute(from: number | null, targets: number[]): Record<string,
       return;
     }
     let cancelled = false;
-    const url = `/api/route?from=${from}&to=${targetsKey}&mode=${routeMode}&includeBridges=${includeBridges}`;
+    const url = `/api/route?from=${from}&to=${targetsKey}&mode=${routeMode}`;
     api<Record<string, RouteEntry>>(url)
       .then(r => { if (!cancelled) setData(r); })
       .catch(() => { if (!cancelled) setData({}); });
