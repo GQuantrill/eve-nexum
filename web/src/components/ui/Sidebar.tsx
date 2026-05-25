@@ -100,9 +100,14 @@ export function Sidebar() {
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
-    setOrder(prev =>
-      arrayMove(prev, prev.indexOf(active.id as PanelId), prev.indexOf(over.id as PanelId)),
-    );
+    // Reorder the *sanitised* order the user actually sees — not the raw
+    // stored value, which may be missing panels added since they last saved
+    // (sanitiseOrder appends those at the bottom). Operating on the raw value
+    // makes indexOf return -1 for an appended panel, so its drags never stick.
+    const from = order.indexOf(active.id as PanelId);
+    const to   = order.indexOf(over.id as PanelId);
+    if (from === -1 || to === -1) return;
+    setOrder(arrayMove(order, from, to));
   };
 
   if (collapsed) {
