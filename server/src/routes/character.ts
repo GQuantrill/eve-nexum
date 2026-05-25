@@ -13,6 +13,32 @@ const log = createLogger('character');
 // userId → last recorded eve system id — used to detect jumps
 const lastSeenSystem = new Map<number, number>();
 
+// ESI's `/characters/{id}/online/` is notoriously stale on log-out — the
+// `online` flag often keeps returning true for many minutes (sometimes
+// hours) after the character actually logged off. Cross-checking against
+// `last_login` vs `last_logout` catches that case: those timestamps update
+// immediately on transition, while `online` lags behind CCP's cache.
+//
+// Rule: a character is only really online when ESI says they are AND their
+// last_login is at or after their last_logout. Any other shape → offline.
+interface EsiOnlineResponse {
+  online?:      boolean;
+  last_login?:  string;
+  last_logout?: string;
+  logins?:      number;
+}
+function isReallyOnline(data: EsiOnlineResponse): boolean {
+  if (!data?.online) return false;
+  // If either timestamp is missing we trust `online` as-is — the cross-
+  // check only catches the specific "online=true but logged out more
+  // recently" staleness pattern.
+  if (!data.last_login || !data.last_logout) return true;
+  const login  = new Date(data.last_login).getTime();
+  const logout = new Date(data.last_logout).getTime();
+  if (!Number.isFinite(login) || !Number.isFinite(logout)) return true;
+  return login >= logout;
+}
+
 // GET /api/character/location
 // Returns the character's current system if online, or { online: false }
 characterRouter.get('/location', async (req, res) => {
@@ -34,8 +60,8 @@ characterRouter.get('/location', async (req, res) => {
     if (!onlineRes.ok || onlineRes.status === 401 || onlineRes.status === 403) {
       res.json({ online: false }); return;
     }
-    const { online } = await onlineRes.json() as { online: boolean };
-    if (!online) {
+    const onlineData = await onlineRes.json() as EsiOnlineResponse;
+    if (!isReallyOnline(onlineData)) {
       lastSeenSystem.delete(req.session.userId!);
       res.json({ online: false }); return;
     }
@@ -174,8 +200,19 @@ characterRouter.get('/online', async (req, res) => {
       return;
     }
 
-    const data = await esiRes.json() as { online: boolean; last_login?: string; last_logout?: string };
-    res.json({ online: data.online });
+    const data = await esiRes.json() as EsiOnlineResponse;
+    const resolved = isReallyOnline(data);
+    // Diagnostic log when ESI claims online — lets us catch the
+    // stale-true case in the wild. The raw timestamps are right there to
+    // verify whether the cross-check should have caught it. Drop once
+    // we're confident the helper is correct.
+    if (data?.online) {
+      log.info(`online check char=${characterId} esi.online=${data.online} last_login=${data.last_login ?? '-'} last_logout=${data.last_logout ?? '-'} resolved=${resolved}`);
+    }
+    // Pass `lastLogin` through to the client so the toolbar can show a
+    // session-start timestamp in its tooltip. Useful for spotting orphan
+    // TQ sessions ("online since 4 hours ago even though I logged out").
+    res.json({ online: resolved, lastLogin: data?.last_login ?? null });
   } catch (err) {
     log.error('Online check failed:', err);
     res.status(500).json({ error: 'Failed to check online status' });
