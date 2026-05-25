@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
-import type { DragEndEvent } from '@dnd-kit/core';
+import type { DragEndEvent, Modifier } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 import { DraggableCard } from './DraggableCard';
 import { ScoutConnectionsPane } from './ScoutConnectionsPane';
@@ -38,6 +38,13 @@ const PANEL_TITLES: Record<PanelId, string> = {
   closest: 'Closest Systems',
 };
 const VALID_PANEL_IDS: ReadonlySet<PanelId> = new Set(DEFAULT_ORDER);
+
+// The panels form a single vertical column, so a drag should only ever move a
+// card up or down. Zeroing the X component locks dragging to the vertical axis
+// — both the card's visual transform and dnd-kit's collision detection. This
+// is the same one-liner @dnd-kit/modifiers' restrictToVerticalAxis ships, kept
+// inline to avoid the extra dependency.
+const restrictToVerticalAxis: Modifier = ({ transform }) => ({ ...transform, x: 0 });
 
 function sanitiseOrder(raw: unknown): PanelId[] {
   if (!Array.isArray(raw)) return DEFAULT_ORDER;
@@ -157,7 +164,7 @@ export function Sidebar() {
         </button>
       </div>
 
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+      <DndContext sensors={sensors} collisionDetection={closestCenter} modifiers={[restrictToVerticalAxis]} onDragEnd={handleDragEnd}>
         <SortableContext items={order} strategy={verticalListSortingStrategy}>
           <div className="sidebar__content">
             {order.map(id => (
