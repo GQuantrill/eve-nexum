@@ -394,6 +394,38 @@ mapsRouter.post('/from-region', async (req, res) => {
   }
   const scale = TARGET_GAP / (medianNN > 0 ? medianNN : 1);
 
+  // Project to screen coordinates (flip Y for north-up).
+  const coords = sysRes.rows.map((s) => ({
+    x: ((s.x2 as number) - minX) * scale,
+    y: (maxY - (s.y2 as number)) * scale,
+  }));
+
+  // Enforce a minimum spacing. The median-based scale sets the *typical* gap,
+  // but atypically-close systems (near-coincident in position2D) can still
+  // overlap. A few relaxation passes push apart only pairs closer than
+  // MIN_DIST, leaving the rest of the layout untouched.
+  const MIN_DIST = 150;
+  const n = coords.length;
+  for (let pass = 0; pass < 12; pass++) {
+    let moved = false;
+    for (let i = 0; i < n; i++) {
+      for (let j = i + 1; j < n; j++) {
+        let dx = coords[j].x - coords[i].x;
+        let dy = coords[j].y - coords[i].y;
+        let d = Math.hypot(dx, dy);
+        if (d === 0) { dx = 1; dy = 0; d = 1; } // coincident → separate horizontally
+        if (d < MIN_DIST) {
+          const push = (MIN_DIST - d) / 2;
+          const ux = dx / d, uy = dy / d;
+          coords[i].x -= ux * push; coords[i].y -= uy * push;
+          coords[j].x += ux * push; coords[j].y += uy * push;
+          moved = true;
+        }
+      }
+    }
+    if (!moved) break;
+  }
+
   const client = await db.connect();
   try {
     await client.query('BEGIN');
@@ -408,11 +440,10 @@ mapsRouter.post('/from-region', async (req, res) => {
     const idByEve = new Map<number, string>();
     const sysCols = 15;
     const sysPh: string[] = []; const sysVals: unknown[] = [];
-    for (const s of sysRes.rows) {
+    sysRes.rows.forEach((s, idx) => {
       const newId = crypto.randomUUID();
       idByEve.set(s.id, newId);
-      const x = ((s.x2 as number) - minX) * scale;
-      const y = (maxY - (s.y2 as number)) * scale;
+      const { x, y } = coords[idx];
       const base = sysVals.length;
       sysPh.push(`(${Array.from({ length: sysCols }, (_, i) => `$${base + i + 1}`).join(',')})`);
       sysVals.push(
@@ -420,7 +451,7 @@ mapsRouter.post('/from-region', async (req, res) => {
         s.effect ?? 'none', s.statics ?? [], regionName, null,
         x, y, 'unknown', false, false, '',
       );
-    }
+    });
     await client.query(
       `INSERT INTO map_systems
          (id, map_id, eve_system_id, name, system_class, effect, statics, region_name, npc_type,
