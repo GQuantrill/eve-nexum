@@ -308,12 +308,22 @@ export function MapCanvas() {
     toMove.forEach((r) => moveSystem(r.id, { x: r.x, y: r.y }, { skipUndo: true }));
   }, [autoLayoutPending, clearAutoLayoutPending, getNodes, systems, moveSystem, pushUndo]);
 
-  // Fit/centre the whole map in view on request (e.g. after a region seed).
+  // Fit/centre the whole map in view on request (region seed, or selecting a
+  // map from the list). Defer over two frames so React Flow has committed the
+  // incoming map's nodes — on a plain map switch the flag flips before the new
+  // nodes mount, so fitting immediately would read a stale/empty node set.
   useEffect(() => {
     if (!fitViewPending) return;
-    clearFitView();
-    if (getNodes().length === 0) return;
-    fitView({ padding: 0.2, duration: 400 });
+    let raf2 = 0;
+    const raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(() => {
+        if (getNodes().length > 0) fitView({ padding: 0.08, duration: 400 });
+        // Clear only after fitting — clearing up front flips the flag, re-runs
+        // this effect, and its cleanup would cancel the rAF before it fires.
+        clearFitView();
+      });
+    });
+    return () => { cancelAnimationFrame(raf1); cancelAnimationFrame(raf2); };
   }, [fitViewPending, clearFitView, fitView, getNodes]);
 
   // Sweep expired EOL connections every minute. A connection is considered

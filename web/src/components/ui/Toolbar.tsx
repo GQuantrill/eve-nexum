@@ -184,6 +184,7 @@ export function Toolbar() {
   const activeMapId     = useMapStore((s) => s.activeMapId);
   const setMapName      = useMapStore((s) => s.setMapName);
   const switchMap       = useMapStore((s) => s.switchMap);
+  const requestFitView  = useMapStore((s) => s.requestFitView);
   const deleteMap       = useMapStore((s) => s.deleteMap);
   const mapOptionsOpen  = useMapStore((s) => s.mapOptionsOpen);
   const setMapOptionsOpen = useMapStore((s) => s.setMapOptionsOpen);
@@ -267,7 +268,7 @@ export function Toolbar() {
               <button
                 key={m.id}
                 className={`map-dropdown__item${m.id === activeMapId ? ' map-dropdown__item--active' : ''}`}
-                onClick={() => { switchMap(m.id); setShowMaps(false); }}
+                onClick={async () => { setShowMaps(false); await switchMap(m.id); requestFitView(); }}
               >
                 {m.sharedWithMe
                   ? <span className="map-dropdown__badge map-dropdown__badge--shared">Shared</span>

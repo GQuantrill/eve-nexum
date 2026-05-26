@@ -65,6 +65,12 @@ export interface MapListItem {
    *  belong to — i.e. it reached their list via an explicit map_shares grant. */
   sharedWithMe?: boolean;
   locked: boolean;
+  /** Owning character's name — shown in the merge picker to disambiguate maps. */
+  ownerName?: string | null;
+  /** Corp maps only: opted in as a merge *source* by a full/admin member. */
+  allowAsMergeSource?: boolean;
+  /** Corp maps only: opted in as a merge *destination* by a full/admin member. */
+  allowAsMergeDestination?: boolean;
   createdAt: string;
   updatedAt: string;
 }

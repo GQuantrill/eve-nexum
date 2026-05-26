@@ -25,6 +25,7 @@ A wormhole mapping tool for EVE Online. Track systems, signatures, structures, k
 - **Solo / Corp split** — every user has personal maps that are always private; in corp mode each corp also gets shared corp maps. Cross-corp visibility is opt-in via `CORP_MAP_SHARED` (see [Corp mode](#corp-mode)).
 - **Share a personal map with another character or corp** — owners can grant edit access to a specific EVE character or an entire corp from the map sidebar. Recipients can edit signatures, structures, notes, and topology like a corp member but can't rename, delete, or re-share the map. Grants target raw EVE IDs, so they take effect on the recipient's very first Nexum login — no pre-registration required. The map appears in their switcher under a distinct "Shared" badge. Personal maps only; corp maps are already shared via membership.
 - **Multi-map support** — each character (or corp) can maintain multiple independent maps up to configured limits (`MAX_USER_MAPS` / `MAX_CORP_MAPS`).
+- **Merge maps** — fold one map's contents into another. The destination is the source of truth: existing systems are kept and only missing systems and connections are added, while signatures, structures, and notes are merged in (each toggleable in the merge dialog). New systems are aligned into the destination's existing layout near the systems they connect to, rather than dumped off to one side. Corp maps must be explicitly opted in — separately as a merge **source** and/or **destination** — and any merge touching a corp map is recorded in the audit log. See [Merging maps](#merging-maps) for the roles involved.
 - **Map locking** — admins can freeze a corp map's topology. Systems, connections, and the map name lock for non-admins, but signatures, structures, and per-system notes stay editable so ops can continue while the layout is pinned. The toolbar shows an amber 🔒 chip while the lock is active, and passive location tracking won't auto-add new systems on a locked map.
 - **Role-based access** — `admin` / `full` / `edit` / `readonly`. Roles only restrict corp-map actions; every user owns their personal maps regardless of role. See [Roles](#roles) for the full matrix.
 
@@ -73,7 +74,7 @@ These features only matter once `CORP_ID` is set — see [Corp mode](#corp-mode)
 - **Map management** — admins see every corp map (solo maps are excluded by design) with owner avatar, corp ticker, system / connection counts, lock state, and last-active time. Force-lock, force-unlock, and force-delete are one-click each.
 - **Users report** — per-character last-login, systems added / deleted, structures added, signatures broken down by type, and last-corp-activity timestamps. Every column sortable, filterable by activity (logins / signatures / structures) and time window (24h / week / month / year / all), exportable as CSV.
 - **Systems report** — aggregate corp-map signatures with a sig-type donut, daily / monthly activity line chart (bucketing adapts to the window), and a sortable wormhole-type breakdown.
-- **Audit log** — every admin action (role change, block, force-lock, force-unlock, force-delete, ESI corp change, auto-block on departure) is recorded with actor, target, old → new value, and timestamp. Exportable as CSV.
+- **Audit log** — every admin action (role change, block, force-lock, force-unlock, force-delete, ESI corp change, auto-block on departure, corp-map merge as source/destination) is recorded with actor, target, old → new value, and timestamp. Exportable as CSV.
 - **Corp ticker resolution** — corp IDs in the Users and Maps reports are resolved to in-game tickers via ESI (`/v5/corporations/{id}/`), with a 1-hour in-memory cache to keep the report loads cheap.
 - **Per-character attribution** — sigs, structures, and system add / delete actions are recorded with the user who made them, so reports can answer "who has been scanning what" with no manual logging.
 
@@ -213,7 +214,7 @@ The importer is upsert-only (`ON CONFLICT DO UPDATE` on every table), so re-runn
 
 Pulling a new Nexum release into a running instance:
 
-- **App-schema changes apply automatically.** New columns and tables (e.g. the map-merge `allow_as_merge_source` flag, the solar-system coordinate columns) are added by the migration that runs on every server boot — just rebuild and restart:
+- **App-schema changes apply automatically.** New columns and tables (e.g. the map-merge `allow_as_merge_source` / `allow_as_merge_destination` flags, the solar-system coordinate columns) are added by the migration that runs on every server boot — just rebuild and restart:
   ```bash
   docker compose build server && docker compose up -d
   ```
@@ -402,6 +403,25 @@ Admins can lock any corp map from the **Admin → Maps** page. A locked map keep
 A locked map also stops auto-growing from passive location tracking: even an admin walking through EVE won't sprout new systems on a locked chain (admins can still add manually via the canvas right-click). This is intentional — locking is what you do when you want the layout pinned, including against your own movements.
 
 `force_lock_map` and `force_unlock_map` actions are written to the audit log.
+
+### Merging maps
+
+Merging folds a **source** map's contents into a **destination** map. The destination is treated as the source of truth — its systems are never overwritten; only missing systems and connections are added, with signatures, structures, and notes merged in (each toggleable in the merge dialog). Open it from the map sidebar's **Merge Maps** section.
+
+**Who can merge what** — solo and corp maps are gated differently:
+
+- **Solo maps** — you can always merge *from* or *into* a personal map you own, or one that's been shared with you. No special role needed; it's your map (or an explicit grant).
+- **Corp maps** are opt-in and gated by role:
+
+| Action | Requirement |
+|---|---|
+| Use a corp map as a merge **source** | The map has **Allow as merge source** enabled. Any corp member who can view it may then merge *from* it. |
+| Use a corp map as a merge **destination** | The map has **Allow as merge destination** enabled **and** the user has `edit` / `full` / `admin` (the same write access as any other corp-map edit). Locked corp maps are excluded for non-admins, since a merge changes topology. |
+| Toggle either flag | `full` or `admin` only. |
+
+Both flags default to **off** — a corp map is neither a merge source nor destination until a `full`/`admin` member turns it on. The two toggles live in the same **Merge Maps** sidebar section and are independent: a map can be a source, a destination, both, or neither. The toggles only appear on corp maps; solo maps ignore them.
+
+Every merge that involves a corp map on either side writes an audit entry (`corp_map_merge_source` / `corp_map_merge_destination`) recording who performed it and the source → destination map names. The merge runs in a single transaction, so a failure leaves the destination untouched (no audit entry either).
 
 ### What happens when a user leaves the corp
 

@@ -6,6 +6,7 @@ import { requireReportsAccess, isReportsCharacter, corpScopeFor } from '../middl
 import { config } from '../config.js';
 import { createLogger } from '../utils/logger.js';
 import { invalidateSessionsForUser } from '../utils/sessionInvalidate.js';
+import { audit } from '../services/audit.js';
 
 const log = createLogger('admin');
 
@@ -99,23 +100,6 @@ async function resolveAlliances(ids: number[]): Promise<Map<number, CorpInfo | n
   }));
 
   return out;
-}
-
-// Helper: write an audit entry. Wraps the verbose 6-column insert.
-async function audit(
-  req: { session: { userId?: number; characterId?: number } },
-  targetUserId: number,
-  targetCharacterId: number,
-  action: string,
-  oldValue: string | null,
-  newValue: string | null,
-) {
-  await db.query(
-    `INSERT INTO admin_audit
-       (actor_user_id, actor_character_id, target_user_id, target_character_id, action, old_value, new_value)
-     VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-    [req.session.userId, req.session.characterId, targetUserId, targetCharacterId, action, oldValue, newValue],
-  );
 }
 
 // GET /api/admin/users — all users with activity stats + corp/blocked status
