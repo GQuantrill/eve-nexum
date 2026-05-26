@@ -138,7 +138,7 @@ adminReadRouter.get('/users', async (_req, res) => {
     ) e ON e.user_id = u.id
     LEFT JOIN (
       SELECT m.user_id, COUNT(*)::int AS cnt
-      FROM map_signatures ms
+      FROM reportable_signatures ms
       JOIN map_systems sys ON sys.id = ms.system_id
       JOIN maps m          ON m.id  = sys.map_id
       GROUP BY m.user_id
@@ -499,7 +499,7 @@ reportsRouter.get('/users', async (req, res) => {
       conditions.push(`u.updated_at >= NOW() - ${intervalParam}`);
     } else if (filter === 'signatures') {
       conditions.push(`EXISTS (
-        SELECT 1 FROM map_signatures s
+        SELECT 1 FROM reportable_signatures s
         JOIN map_systems sys ON sys.id = s.system_id
         JOIN maps        m   ON m.id   = sys.map_id
         WHERE s.created_by_user_id = u.id
@@ -520,7 +520,7 @@ reportsRouter.get('/users', async (req, res) => {
     // filter + 'all' window → at least one such activity ever
     if (filter === 'signatures') {
       conditions.push(`EXISTS (
-        SELECT 1 FROM map_signatures s
+        SELECT 1 FROM reportable_signatures s
         JOIN map_systems sys ON sys.id = s.system_id
         JOIN maps        m   ON m.id   = sys.map_id
         WHERE s.created_by_user_id = u.id AND ${corpSql}
@@ -540,7 +540,7 @@ reportsRouter.get('/users', async (req, res) => {
   const { rows } = await db.query(`
     WITH last_corp_sig AS (
       SELECT s.created_by_user_id AS user_id, MAX(s.created_at) AS ts
-      FROM map_signatures s
+      FROM reportable_signatures s
       JOIN map_systems sys ON sys.id = s.system_id
       JOIN maps         m  ON m.id   = sys.map_id
       WHERE ${corpSql} AND s.created_by_user_id IS NOT NULL
@@ -559,7 +559,7 @@ reportsRouter.get('/users', async (req, res) => {
       -- are reflected. corp scope applies via the maps join so an admin
       -- viewing the report only sees activity on their corp's maps.
       SELECT s.created_by_user_id AS user_id, s.sig_type, COUNT(*)::int AS cnt
-      FROM map_signatures s
+      FROM reportable_signatures s
       JOIN map_systems sys ON sys.id = s.system_id
       JOIN maps         m  ON m.id   = sys.map_id
       WHERE s.created_by_user_id IS NOT NULL
@@ -667,7 +667,7 @@ reportsRouter.get('/systems', async (req, res) => {
   const [typeRows, whRows, totalRows] = await Promise.all([
     db.query<{ sig_type: string; cnt: number }>(`
       SELECT s.sig_type, COUNT(*)::int AS cnt
-      FROM map_signatures s
+      FROM reportable_signatures s
       JOIN map_systems sys ON sys.id = s.system_id
       JOIN maps         m  ON m.id   = sys.map_id
       WHERE ${corpSql} ${windowClause}
@@ -675,7 +675,7 @@ reportsRouter.get('/systems', async (req, res) => {
     `, buildBase(windowParams)),
     db.query<{ wh_type: string; cnt: number }>(`
       SELECT UPPER(s.wh_type) AS wh_type, COUNT(*)::int AS cnt
-      FROM map_signatures s
+      FROM reportable_signatures s
       JOIN map_systems sys ON sys.id = s.system_id
       JOIN maps         m  ON m.id   = sys.map_id
       WHERE ${corpSql}
@@ -687,7 +687,7 @@ reportsRouter.get('/systems', async (req, res) => {
     `, buildBase(windowParams)),
     db.query<{ total: number }>(`
       SELECT COUNT(*)::int AS total
-      FROM map_signatures s
+      FROM reportable_signatures s
       JOIN map_systems sys ON sys.id = s.system_id
       JOIN maps         m  ON m.id   = sys.map_id
       WHERE ${corpSql} ${windowClause}
@@ -704,7 +704,7 @@ reportsRouter.get('/systems', async (req, res) => {
     const { rows: dailyRows } = await db.query<{ day: string; count: number }>(`
       WITH bounds AS (
         SELECT date_trunc('month', MIN(s.created_at)) AS start_month
-        FROM map_signatures s
+        FROM reportable_signatures s
         JOIN map_systems sys ON sys.id = s.system_id
         JOIN maps         m  ON m.id   = sys.map_id
         WHERE ${corpSql}
@@ -718,7 +718,7 @@ reportsRouter.get('/systems', async (req, res) => {
       ),
       sig_counts AS (
         SELECT date_trunc('month', s.created_at) AS bucket, COUNT(*)::int AS cnt
-        FROM map_signatures s
+        FROM reportable_signatures s
         JOIN map_systems sys ON sys.id = s.system_id
         JOIN maps         m  ON m.id   = sys.map_id
         WHERE ${corpSql}
@@ -744,7 +744,7 @@ reportsRouter.get('/systems', async (req, res) => {
       ),
       sig_counts AS (
         SELECT date_trunc('${spec.trunc}', s.created_at) AS bucket, COUNT(*)::int AS cnt
-        FROM map_signatures s
+        FROM reportable_signatures s
         JOIN map_systems sys ON sys.id = s.system_id
         JOIN maps         m  ON m.id   = sys.map_id
         WHERE ${corpSql}
