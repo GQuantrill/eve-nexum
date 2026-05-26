@@ -113,9 +113,11 @@ export function MapCanvas() {
   const undo                 = useMapStore((s) => s.undo);
   const autoLayoutPending    = useMapStore((s) => s.autoLayoutPending);
   const clearAutoLayoutPending = useMapStore((s) => s.clearAutoLayoutPending);
+  const fitViewPending       = useMapStore((s) => s.fitViewPending);
+  const clearFitView         = useMapStore((s) => s.clearFitView);
   const pushUndo             = useMapStore((s) => s.pushUndo);
   const canEdit              = useCanEdit();
-  const { screenToFlowPosition, setViewport, getNode, getNodes, getZoom } = useReactFlow();
+  const { screenToFlowPosition, setViewport, getNode, getNodes, getZoom, fitView } = useReactFlow();
 
   const [pendingPosition, setPendingPosition] = useState<{ x: number; y: number } | null>(null);
   const [contextMenu, setContextMenu]         = useState<CtxMenu | null>(null);
@@ -305,6 +307,14 @@ export function MapCanvas() {
 
     toMove.forEach((r) => moveSystem(r.id, { x: r.x, y: r.y }, { skipUndo: true }));
   }, [autoLayoutPending, clearAutoLayoutPending, getNodes, systems, moveSystem, pushUndo]);
+
+  // Fit/centre the whole map in view on request (e.g. after a region seed).
+  useEffect(() => {
+    if (!fitViewPending) return;
+    clearFitView();
+    if (getNodes().length === 0) return;
+    fitView({ padding: 0.2, duration: 400 });
+  }, [fitViewPending, clearFitView, fitView, getNodes]);
 
   // Sweep expired EOL connections every minute. A connection is considered
   // expired 4 h + 30 min grace after the user marked it EOL. The 30 min grace
