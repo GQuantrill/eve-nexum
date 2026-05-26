@@ -651,6 +651,19 @@ function UsersReport() {
       compareValues(userReportAccessor(sort.key, a), userReportAccessor(sort.key, b), sort.dir));
   }, [rows, sort]);
 
+  // Headline counts over the currently-filtered set. Unique corps/alliances
+  // count distinct non-null IDs, so users with no corp/alliance don't inflate.
+  const summary = useMemo(() => {
+    if (!rows) return { users: 0, corps: 0, alliances: 0 };
+    const corps = new Set<number>();
+    const alliances = new Set<number>();
+    for (const u of rows) {
+      if (u.corpId !== null) corps.add(u.corpId);
+      if (u.allianceId !== null) alliances.add(u.allianceId);
+    }
+    return { users: rows.length, corps: corps.size, alliances: alliances.size };
+  }, [rows]);
+
   function handleSort(key: UserReportSortKey) {
     setSort((prev) => prev.key === key
       ? { key, dir: prev.dir === 'asc' ? 'desc' : 'asc' }
@@ -737,6 +750,11 @@ function UsersReport() {
   return (
     <>
     {controls}
+    <div className="admin-page__stat-grid">
+      <StatCard label="Total users"      value={summary.users}     accent />
+      <StatCard label="Unique corps"     value={summary.corps} />
+      <StatCard label="Unique alliances" value={summary.alliances} />
+    </div>
     <table className="admin-modal__table admin-page__sortable">
       <thead>
         <tr>
@@ -924,9 +942,17 @@ function SystemsReport() {
       <h3 className="admin-page__report-heading">Signatures across all maps</h3>
       <div className="admin-page__stat-grid">
         <StatCard label="Total" value={data.total} accent />
-        {SIG_TYPE_ORDER.map((t) => (
-          <StatCard key={t.key} label={t.label} value={data.byType[t.key] ?? 0} />
-        ))}
+        {SIG_TYPE_ORDER.map((t) => {
+          const count = data.byType[t.key] ?? 0;
+          return (
+            <StatCard
+              key={t.key}
+              label={t.label}
+              value={count}
+              pct={data.total > 0 ? (count / data.total) * 100 : 0}
+            />
+          );
+        })}
       </div>
 
       <div className="admin-page__chart-row">
@@ -1023,10 +1049,11 @@ function SystemsReport() {
   );
 }
 
-function StatCard({ label, value, accent = false }: { label: string; value: number; accent?: boolean }) {
+function StatCard({ label, value, accent = false, pct }: { label: string; value: number; accent?: boolean; pct?: number | null }) {
   return (
     <div className={`admin-page__stat-card${accent ? ' admin-page__stat-card--accent' : ''}`}>
       <span className="admin-page__stat-card-value">{value.toLocaleString()}</span>
+      {pct != null && <span className="admin-page__stat-card-pct">{pct.toFixed(1)}%</span>}
       <span className="admin-page__stat-card-label">{label}</span>
     </div>
   );

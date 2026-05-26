@@ -417,7 +417,7 @@ export function SystemPanel() {
                       className="sys-info__ext-link"
                     >
                       <img
-                        src="https://evemaps.dotlan.net/favicon.ico"
+                        src="/vendor/dotlan.ico"
                         alt="Dotlan"
                         className="sys-info__ext-icon"
                         loading="lazy"
@@ -434,7 +434,7 @@ export function SystemPanel() {
                       className="sys-info__ext-link"
                     >
                       <img
-                        src="https://evemaps.dotlan.net/favicon.ico"
+                        src="/vendor/dotlan.ico"
                         alt="Dotlan"
                         className="sys-info__ext-icon"
                         loading="lazy"
@@ -451,7 +451,7 @@ export function SystemPanel() {
                       className="sys-info__ext-link"
                     >
                       <img
-                        src="https://zkillboard.com/img/wreck.png"
+                        src="/vendor/zkillboard-wreck.png"
                         alt="zKillboard"
                         className="sys-info__ext-icon"
                         loading="lazy"

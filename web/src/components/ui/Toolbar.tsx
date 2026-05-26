@@ -8,7 +8,7 @@ import { useIsMapOwner } from '../../hooks/useIsMapOwner';
 import { useCanCreateMaps } from '../../hooks/useCanCreateMaps';
 import { UserStatsModal } from './UserStatsModal';
 import { ConfirmModal } from './ConfirmModal';
-import { PromptModal } from './PromptModal';
+import { CreateMapModal } from './CreateMapModal';
 import { useProximityAlerts } from '../../hooks/useProximityAlerts';
 import {
   WarningIcon, SkullIcon, XCircleIcon, QuestionIcon,
@@ -184,7 +184,6 @@ export function Toolbar() {
   const activeMapId     = useMapStore((s) => s.activeMapId);
   const setMapName      = useMapStore((s) => s.setMapName);
   const switchMap       = useMapStore((s) => s.switchMap);
-  const createMap       = useMapStore((s) => s.createMap);
   const deleteMap       = useMapStore((s) => s.deleteMap);
   const mapOptionsOpen  = useMapStore((s) => s.mapOptionsOpen);
   const setMapOptionsOpen = useMapStore((s) => s.setMapOptionsOpen);
@@ -197,6 +196,10 @@ export function Toolbar() {
   const canEdit       = useCanEdit();
   const isMapOwner    = useIsMapOwner();
   const canManageMaps = useCanCreateMaps();
+  const canCorpCreate = !!user?.corpMode && canManageMaps;
+  // No creatable option = personal slots full AND (can't make corp maps, or
+  // corp slots full too). Gates the single "+ New Map" action.
+  const noCreateOption = atMapLimit && (!canCorpCreate || atCorpMapLimit);
   const { online, checkedAt, lastLogin } = useOnlineStatus(!!user);
   // Ship comes from the same poll that drives passive location tracking, so
   // no extra ESI traffic — we just surface a field that's already on hand.
@@ -204,7 +207,7 @@ export function Toolbar() {
   const eveStatus = useEveServerStatus();
   const [showMaps, setShowMaps]   = useState(false);
   const [showStats, setShowStats] = useState(false);
-  const [newMapPrompt, setNewMapPrompt] = useState<{ isCorpMap: boolean } | null>(null);
+  const [showCreate, setShowCreate] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
 
   async function handleDeleteMap() {
@@ -278,30 +281,16 @@ export function Toolbar() {
             ))}
             <div className="map-dropdown__divider" />
             <span
-              className={`map-dropdown__new-wrap${atMapLimit ? ' map-dropdown__new-wrap--disabled' : ''}`}
-              data-disabled-reason={atMapLimit ? `Personal map limit reached (${maxMaps})` : undefined}
+              className={`map-dropdown__new-wrap${noCreateOption ? ' map-dropdown__new-wrap--disabled' : ''}`}
+              data-disabled-reason={noCreateOption ? 'Map limit reached' : undefined}
             >
               <button
                 className="map-dropdown__item map-dropdown__item--action"
-                onClick={() => { setShowMaps(false); setNewMapPrompt({ isCorpMap: false }); }}
-                disabled={atMapLimit}
+                onClick={() => { setShowMaps(false); setShowCreate(true); }}
+                disabled={noCreateOption}
               >
-                + Personal Map
+                + New Map
               </button>
-              {user?.corpMode && canManageMaps && (
-                <span
-                  className={`map-dropdown__new-wrap${atCorpMapLimit ? ' map-dropdown__new-wrap--disabled' : ''}`}
-                  data-disabled-reason={atCorpMapLimit ? `Corp map limit reached (${maxCorpMaps})` : undefined}
-                >
-                  <button
-                    className="map-dropdown__item map-dropdown__item--action"
-                    onClick={() => { setShowMaps(false); setNewMapPrompt({ isCorpMap: true }); }}
-                    disabled={atCorpMapLimit}
-                  >
-                    + Corp Map
-                  </button>
-                </span>
-              )}
             </span>
             {canManageMaps && maps.length > 1 && !maps.find((m) => m.id === activeMapId)?.sharedWithMe && (
               <button className="map-dropdown__item map-dropdown__item--danger" onClick={() => { setShowMaps(false); setDeleteConfirm(true); }}>
@@ -473,20 +462,7 @@ export function Toolbar() {
     </header>
 
     {showStats && <UserStatsModal onClose={() => setShowStats(false)} />}
-    {newMapPrompt && (
-      <PromptModal
-        title={newMapPrompt.isCorpMap ? 'New Corp Map' : 'New Map'}
-        message="Enter a name for the new map."
-        defaultValue="New Map"
-        confirmLabel="Create"
-        onCancel={() => setNewMapPrompt(null)}
-        onConfirm={async (name) => {
-          const { isCorpMap } = newMapPrompt;
-          setNewMapPrompt(null);
-          await createMap(name, isCorpMap);
-        }}
-      />
-    )}
+    {showCreate && <CreateMapModal onClose={() => setShowCreate(false)} />}
     {deleteConfirm && (
       <ConfirmModal
         message={`Delete "${mapName}"? This cannot be undone.`}
