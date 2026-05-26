@@ -69,6 +69,8 @@ export interface MapListItem {
   ownerName?: string | null;
   /** Corp maps only: opted in as a merge *source* by a full/admin member. */
   allowAsMergeSource?: boolean;
+  /** Corp maps only: opted in as a merge *destination* by a full/admin member. */
+  allowAsMergeDestination?: boolean;
   createdAt: string;
   updatedAt: string;
 }

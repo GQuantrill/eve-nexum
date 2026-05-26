@@ -31,12 +31,13 @@ export function MergeMapModal({ onClose }: { onClose: () => void }) {
 
   // Source: any solo map the user can see (owned or shared), or a corp map
   // explicitly flagged as a merge source. Destination: maps the user can write
-  // to — solo always, corp only with an editor role. Locked maps are excluded
-  // as destinations unless we're admin. The server re-checks all of this.
+  // to — solo always, corp only with an editor role AND flagged as a merge
+  // destination. Locked maps are excluded as destinations unless we're admin.
+  // The server re-checks all of this.
   const sourceOptions = maps.filter((m) => (m.isCorpMap ? m.allowAsMergeSource === true : true));
   const destOptions   = maps.filter((m) => {
     if (m.locked && !isAdmin) return false;
-    return m.isCorpMap ? CORP_WRITE_ROLES.has(role) : true;
+    return m.isCorpMap ? (CORP_WRITE_ROLES.has(role) && m.allowAsMergeDestination === true) : true;
   });
 
   const [sourceId, setSourceId] = useState('');

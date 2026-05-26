@@ -148,8 +148,8 @@ function UsersTab() {
   const [error, setError]     = useState<string | null>(null);
   const [busyId, setBusyId]   = useState<number | null>(null);
   const [blockTarget, setBlockTarget] = useState<AdminUser | null>(null);
-  // Default: most recent login first (matches the server's ORDER BY).
-  const [sort, setSort] = useState<UserSort>({ key: 'lastLogin', dir: 'desc' });
+  // Default: alphabetical by character name.
+  const [sort, setSort] = useState<UserSort>({ key: 'characterName', dir: 'asc' });
 
   function toggleSort(key: UserSortKey) {
     setSort((prev) => prev.key === key

@@ -113,6 +113,8 @@ export interface WormholeMap {
   locked?: boolean;
   /** Corp maps only: whether this map is opted in as a merge source. */
   allowAsMergeSource?: boolean;
+  /** Corp maps only: whether this map is opted in as a merge destination. */
+  allowAsMergeDestination?: boolean;
   /** Present when the map has an active or expired share link. The token
    *  itself is in shareToken; shareExpiresAt is the cutoff. The owner UI
    *  treats an expired token as "no link" — regenerate to share again.

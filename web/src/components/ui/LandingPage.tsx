@@ -1,4 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
+import type { Icon } from '@phosphor-icons/react';
+import {
+  GraphIcon, MapTrifoldIcon, GaugeIcon, MagnifyingGlassIcon, SelectionIcon, ImageIcon, HourglassIcon,
+  UsersIcon, StackIcon, ArrowsMergeIcon, LockIcon, ShieldCheckIcon,
+  CardsIcon, WaveformIcon, BuildingsIcon, SparkleIcon, ChartLineIcon, FlagBannerIcon, SwordIcon, HandshakeIcon,
+  PathIcon, StarIcon, SnowflakeIcon, LightningIcon, WarningIcon, NavigationArrowIcon, MapPinIcon, BroadcastIcon,
+  CommandIcon, HouseIcon, SkullIcon, ChartBarIcon, PulseIcon, EyeIcon, SidebarIcon,
+  SquaresFourIcon, UserGearIcon, TableIcon, ChartDonutIcon, ClockIcon, ClipboardTextIcon, TagIcon, IdentificationCardIcon,
+} from '@phosphor-icons/react';
 import { apiUrl } from '../../api/client';
 import { DemoMap } from './DemoMap';
 import portraitImg from '../../assets/portrait.jpeg';
@@ -7,7 +16,7 @@ interface LastCharacter { characterId: number; characterName: string; }
 // Categorised feature sections that mirror the README's Key features tree.
 // Cards still render through the same `landing__feature` template; each
 // section gets a heading rendered above its grid.
-interface FeatureItem { icon: string; title: string; desc: string }
+interface FeatureItem { icon: Icon; title: string; desc: string }
 interface FeatureSection { title: string; items: FeatureItem[] }
 
 const FEATURE_SECTIONS: FeatureSection[] = [
@@ -15,32 +24,37 @@ const FEATURE_SECTIONS: FeatureSection[] = [
     title: 'Mapping',
     items: [
       {
-        icon: '◈',
+        icon: GraphIcon,
         title: 'Interactive map',
         desc: 'Drag systems, draw connections, set wormhole class / type / status per connection. Snap-to-grid and an optional minimap.',
       },
       {
-        icon: '⧗',
+        icon: MapTrifoldIcon,
+        title: 'Seed a map from a region',
+        desc: 'Spin up a new map pre-populated with an entire EVE region — every system laid out from CCP\'s 2D star-map projection (a Dotlan-style layout) with all stargate connections drawn. Pick a region when creating a map, or leave it blank for an empty one.',
+      },
+      {
+        icon: GaugeIcon,
         title: 'Wormhole intel',
         desc: 'Per-connection mass tracker (≤10% / ≤50% / critical), end-of-life flag with countdown, K162-aware static identification, and frig-hole / gas-site auto-tagging from sig type.',
       },
       {
-        icon: '▸',
+        icon: MagnifyingGlassIcon,
         title: 'Wormhole type picker',
         desc: 'Searchable popover for assigning the exact wormhole type to a connection. Statics quick-info on hover shows destination class, mass, and lifetime.',
       },
       {
-        icon: '⊟',
+        icon: SelectionIcon,
         title: 'Multi-select bulk operations',
         desc: 'Shift-click to select multiple systems or signatures, then bulk-assign type, delete, or rename in a single action.',
       },
       {
-        icon: '⎙',
+        icon: ImageIcon,
         title: 'PNG export',
         desc: 'Render the current map — with sig counts, connections, and status — to a PNG you can drop into a fleet ping or a corp Discord.',
       },
       {
-        icon: '⧖',
+        icon: HourglassIcon,
         title: 'Wormhole sig aging',
         desc: 'Wormhole sigs tint by their position in the WH type\'s known lifetime — yellow at 50%, orange at 90%, red past expected close. Catches forgotten chains before they collapse on someone.',
       },
@@ -50,22 +64,27 @@ const FEATURE_SECTIONS: FeatureSection[] = [
     title: 'Personal & corp maps',
     items: [
       {
-        icon: '⊕',
+        icon: UsersIcon,
         title: 'Solo / Corp split',
         desc: 'Every user has personal maps that are always private; in corp mode each corp also gets shared corp maps. Cross-corp visibility is opt-in via a single env flag.',
       },
       {
-        icon: '▦',
+        icon: StackIcon,
         title: 'Multi-map support',
         desc: 'Each character (or corp) can maintain multiple independent maps up to configured limits — separate chains for separate ops without losing context.',
       },
       {
-        icon: '🔒',
+        icon: ArrowsMergeIcon,
+        title: 'Merge maps',
+        desc: 'Fold one map into another. The destination is kept as the source of truth — only missing systems and connections are added, with signatures, structures, and notes merged in, and new systems slotted into the existing layout. Corp maps opt in per role as a merge source and/or destination.',
+      },
+      {
+        icon: LockIcon,
         title: 'Map locking',
         desc: 'Admins can freeze a corp map\'s topology. Systems and connections lock for non-admins, but signatures, structures, and per-system notes stay editable so ops continue while the layout is pinned.',
       },
       {
-        icon: '⌬',
+        icon: ShieldCheckIcon,
         title: 'Role-based access',
         desc: 'Four tiers — readonly, edit, full, admin — gating corp-map actions. Personal maps stay yours regardless of role.',
       },
@@ -75,47 +94,47 @@ const FEATURE_SECTIONS: FeatureSection[] = [
     title: 'System intelligence',
     items: [
       {
-        icon: '⎘',
+        icon: CardsIcon,
         title: 'System panel',
         desc: 'Per-system cards for signatures, structures, NPC stations, notes, killboard, and activity charts. Cards are reorderable via drag-and-drop and persist per-user.',
       },
       {
-        icon: '◐',
+        icon: WaveformIcon,
         title: 'Signature management',
         desc: 'Paste straight from the probe scanner. Tracks created / updated age per signature, auto-deletes sigs missing from a re-paste, and supports bulk type assignment for multi-select.',
       },
       {
-        icon: '⊠',
+        icon: BuildingsIcon,
         title: 'Structure import',
         desc: 'Paste EVE overview data to import player-owned structures with names, types, owners, and notes in one operation.',
       },
       {
-        icon: '◬',
+        icon: SparkleIcon,
         title: 'Auto-discovered structures',
         desc: 'Your corp\'s citadels (via ESI when a member with the Station Manager role logs in) and any publicly-listed structures from a third-party feed appear automatically in the structures pane as read-only entries — already tinted by your standings toward the owner.',
       },
       {
-        icon: '▤',
+        icon: ChartLineIcon,
         title: 'Activity charts',
         desc: '24-hour rolling history of jumps, ship / pod kills, and NPC kills per system, polled from ESI hourly. The poller persists data for every k-space system — not just ones someone has opened — so charts populate the moment you view a new system.',
       },
       {
-        icon: '✦',
+        icon: FlagBannerIcon,
         title: 'Sovereignty & station data',
         desc: 'Live alliance / corp / faction sov info and NPC station services, with in-game waypoint and destination actions.',
       },
       {
-        icon: '⚔',
+        icon: SwordIcon,
         title: 'Killboard pane',
         desc: 'Recent zKillboard activity per system, with NPC-only kills hidden by default (toggle to include). Rows tint red when a hostile actor is in the chain or a blue gets killed; blue when a friendly scores or a hostile dies. Recent kills also bubble up as highlights on the map.',
       },
       {
-        icon: '✺',
+        icon: SparkleIcon,
         title: 'Chain-wide effect digest',
         desc: 'A one-line summary at the top of the system info panel lists every Pulsar / Wolf-Rayet / Magnetar / etc. on the current chain. Hover for the modifier list; click to centre.',
       },
       {
-        icon: '⊕',
+        icon: HandshakeIcon,
         title: 'Standings overlay',
         desc: 'Your EVE contact list (personal, corp, and alliance — fetched via ESI on login and re-pullable on demand) drives a chain-wide visual layer. Sov holders show inline P/C/A standing pills; structures resolved via their EVE structure ID tint by owner-corp standing; sov-holder system nodes get a coloured halo so hostile territory stands out on the map.',
       },
@@ -125,42 +144,42 @@ const FEATURE_SECTIONS: FeatureSection[] = [
     title: 'Live ops',
     items: [
       {
-        icon: '⟿',
+        icon: PathIcon,
         title: 'Scout connections',
         desc: 'Thera and Turnur public Eve-Scout connections surfaced into the sidebar so you can jump straight to known holes.',
       },
       {
-        icon: '★',
+        icon: StarIcon,
         title: 'A0 sun detection',
         desc: 'Auto-flags systems with A0 (yellow) suns visible via ESI for capital-friendly skirmish planning.',
       },
       {
-        icon: '❄',
+        icon: SnowflakeIcon,
         title: 'Ice belt systems',
         desc: 'Flags Empire-space systems that spawn ice anomalies with a ❄ icon — handy when staging mining ops or looking for an alternate harvest spot. Static dataset committed in-repo and resolved to system IDs at startup.',
       },
       {
-        icon: '⚡',
+        icon: LightningIcon,
         title: 'Storm tracking',
         desc: 'Active null-sec storms — Electric, Gamma, Exotic, Plasma — sourced from the community-maintained EveScout Rescue stormtrack feed surface as a colour-coded ⚡ on matching system nodes. Tooltip shows storm name, last report, and reporter. Refreshed every 30 minutes.',
       },
       {
-        icon: '⚠',
+        icon: WarningIcon,
         title: 'Proximity alerts',
         desc: 'Browser notification plus an audio ping when you\'re within a configurable number of jumps of an active incursion, pirate insurgency, or a sov-holding system whose corp / alliance you\'ve set to red. Persistent toolbar chip shows the nearest threat at a glance.',
       },
       {
-        icon: '⤳',
+        icon: NavigationArrowIcon,
         title: 'Route planner',
         desc: 'Server-side BFS over stargates plus your live chain, so a route through a wormhole hop is a single click.',
       },
       {
-        icon: '◎',
+        icon: MapPinIcon,
         title: 'Location tracking',
         desc: 'Opt-in live character location dot in the toolbar, plus a per-map "you are here" indicator that updates every 10 seconds via ESI.',
       },
       {
-        icon: '◉',
+        icon: BroadcastIcon,
         title: 'Online status',
         desc: 'Toolbar dot shows whether each logged-in user is currently signed into EVE Online, so you can see at a glance who\'s actually on grid.',
       },
@@ -170,37 +189,37 @@ const FEATURE_SECTIONS: FeatureSection[] = [
     title: 'Productivity & UX',
     items: [
       {
-        icon: '⌘',
+        icon: CommandIcon,
         title: 'Command palette',
         desc: '⌘ / Ctrl + K opens a fuzzy search across systems, sigs, and actions — jump to a system, set a waypoint, or toggle a pane without touching the mouse.',
       },
       {
-        icon: '⌂',
+        icon: HouseIcon,
         title: 'Home hotkey',
         desc: 'Hit H to jump the viewport back to your home system from any panel. Right-click a system to set or change which one is home.',
       },
       {
-        icon: '⚔',
+        icon: SkullIcon,
         title: 'Recent-kill highlights',
         desc: 'Systems with kills in the last hour get a coloured halo so you can see fresh activity at a glance across the chain.',
       },
       {
-        icon: '▦',
+        icon: ChartBarIcon,
         title: 'User stats modal',
         desc: 'Per-character totals: jumps, signatures by type, broken down by day / week / month / year / forever.',
       },
       {
-        icon: '◍',
+        icon: PulseIcon,
         title: 'Server status widget',
         desc: 'Live Tranquility server status, player count, and ESI health in the toolbar. Cross-tab cached so all your open windows share a single ESI poll.',
       },
       {
-        icon: '▣',
+        icon: EyeIcon,
         title: 'Demo map',
         desc: 'The landing page mounts a non-editable demo map so visitors can see what the tool does before logging in.',
       },
       {
-        icon: '⊟',
+        icon: SidebarIcon,
         title: 'Collapsible sidebar',
         desc: 'Map Options, Connections, Proximity Alerts, Stale System Fade, and Shortcuts each expand or collapse independently. Per-section state persists per browser via localStorage.',
       },
@@ -212,52 +231,52 @@ const FEATURE_SECTIONS: FeatureSection[] = [
 // CORP_ID at the deployment level; admin-only at the UI level.
 const CORP_FEATURES: FeatureItem[] = [
   {
-    icon: '⊠',
+    icon: BuildingsIcon,
     title: 'Multi-corp deployments',
     desc: 'CORP_ID accepts a comma-separated list of corporation IDs. One Nexum instance can host several corps; each corp\'s maps stay scoped to its own members unless CORP_MAP_SHARED=true.',
   },
   {
-    icon: '⌗',
+    icon: SquaresFourIcon,
     title: 'Admin dashboard',
     desc: 'A dedicated /admin page with four tabs: Users, Maps, Reports, and Audit log. Admins reach it from the toolbar\'s Admin button.',
   },
   {
-    icon: '◈',
+    icon: UserGearIcon,
     title: 'User management',
     desc: 'Change roles, block / unblock, and force an ESI corp-membership re-check on demand. Self-block, self-demote, and changes to ADMIN_CHAR_ID are guarded against.',
   },
   {
-    icon: '▦',
+    icon: MapTrifoldIcon,
     title: 'Map management',
     desc: 'Admins see every corp map with owner avatar, corp ticker, system / connection counts, lock state, and last-active time. Force-lock, force-unlock, and force-delete are one-click each.',
   },
   {
-    icon: '⌗',
+    icon: TableIcon,
     title: 'Users report',
     desc: 'Per-character last login, systems added / deleted, structures added, signatures broken down by type, and last-corp-activity timestamps. Sortable, filterable by activity and time window, exportable as CSV.',
   },
   {
-    icon: '◐',
+    icon: ChartDonutIcon,
     title: 'Systems report',
     desc: 'Aggregate corp-map signatures with a sig-type donut, a daily / monthly activity line chart (bucketing adapts to the window), and a sortable wormhole-type breakdown.',
   },
   {
-    icon: '⏱',
+    icon: ClockIcon,
     title: 'Time-windowed reporting',
     desc: 'Every report can be scoped to past 24 hours, week, month, year, or all time. Chart bucketing adapts automatically: hourly for 24h, daily for week / month, monthly for year and all-time.',
   },
   {
-    icon: '⌖',
+    icon: ClipboardTextIcon,
     title: 'Audit log',
     desc: 'Every admin action — role change, block / unblock, force-lock, force-delete, ESI corp change, auto-block on corp departure — is recorded with actor, target, old → new value, and timestamp. Exportable as CSV.',
   },
   {
-    icon: '⌥',
+    icon: TagIcon,
     title: 'Corp ticker resolution',
     desc: 'Corp IDs in the Users and Maps reports are resolved to in-game tickers via ESI, with a 1-hour in-memory cache to keep report loads cheap.',
   },
   {
-    icon: '↓',
+    icon: IdentificationCardIcon,
     title: 'Per-character attribution',
     desc: 'Sigs, structures, and system add / delete actions are recorded with the user who made them, so reports can answer "who has been scanning what" with no manual logging.',
   },
@@ -479,13 +498,16 @@ export function LandingPage() {
           <section key={section.title} className="landing__section landing__section--features">
             <h2 className="landing__section-title">{section.title}</h2>
             <section className="landing__features">
-              {section.items.map((f) => (
-                <div key={f.title} className="landing__feature">
-                  <span className="landing__feature-icon">{f.icon}</span>
-                  <h3 className="landing__feature-title">{f.title}</h3>
-                  <p className="landing__feature-desc">{f.desc}</p>
-                </div>
-              ))}
+              {section.items.map((f) => {
+                const Icon = f.icon;
+                return (
+                  <div key={f.title} className="landing__feature">
+                    <span className="landing__feature-icon"><Icon size="1em" weight="duotone" /></span>
+                    <h3 className="landing__feature-title">{f.title}</h3>
+                    <p className="landing__feature-desc">{f.desc}</p>
+                  </div>
+                );
+              })}
             </section>
           </section>
         ))}
@@ -499,13 +521,16 @@ export function LandingPage() {
             role-based permissions, admin tooling, and per-character activity reporting.
           </p>
           <section className="landing__features">
-            {CORP_FEATURES.map((f) => (
-              <div key={f.title} className="landing__feature">
-                <span className="landing__feature-icon">{f.icon}</span>
-                <h3 className="landing__feature-title">{f.title}</h3>
-                <p className="landing__feature-desc">{f.desc}</p>
-              </div>
-            ))}
+            {CORP_FEATURES.map((f) => {
+              const Icon = f.icon;
+              return (
+                <div key={f.title} className="landing__feature">
+                  <span className="landing__feature-icon"><Icon size="1em" weight="duotone" /></span>
+                  <h3 className="landing__feature-title">{f.title}</h3>
+                  <p className="landing__feature-desc">{f.desc}</p>
+                </div>
+              );
+            })}
           </section>
         </section>
 

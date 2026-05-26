@@ -115,6 +115,10 @@ export async function migrate() {
     -- member explicitly enables it. Solo maps ignore this flag — their owner
     -- and share recipients can always merge from them.
     ALTER TABLE maps ADD COLUMN IF NOT EXISTS allow_as_merge_source BOOLEAN NOT NULL DEFAULT FALSE;
+    -- Likewise, corp maps must opt in to being a merge *destination* before
+    -- another map can be folded into them. Same full/admin gate; solo maps
+    -- ignore it (owner / share recipients can always merge into them).
+    ALTER TABLE maps ADD COLUMN IF NOT EXISTS allow_as_merge_destination BOOLEAN NOT NULL DEFAULT FALSE;
 
     CREATE TABLE IF NOT EXISTS map_systems (
       id            UUID        PRIMARY KEY,

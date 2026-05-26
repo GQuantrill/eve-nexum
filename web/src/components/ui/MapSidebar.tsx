@@ -421,26 +421,25 @@ function MergeSection() {
   // Read straight from the store (no mirrored local state) so switching maps
   // always shows the right value, and toggle optimistically + revert on error.
   const allowSource = !!map.allowAsMergeSource;
+  const allowDestination = !!map.allowAsMergeDestination;
 
-  function setAllowInStore(value: boolean) {
+  function setFlagInStore(field: "allowAsMergeSource" | "allowAsMergeDestination", value: boolean) {
     useMapStore.setState((s) => ({
-      map: { ...s.map, allowAsMergeSource: value },
-      maps: s.maps.map((m) =>
-        m.id === map.id ? { ...m, allowAsMergeSource: value } : m,
-      ),
+      map: { ...s.map, [field]: value },
+      maps: s.maps.map((m) => (m.id === map.id ? { ...m, [field]: value } : m)),
     }));
   }
 
-  async function toggleSource(next: boolean) {
+  async function toggleFlag(field: "allowAsMergeSource" | "allowAsMergeDestination", next: boolean) {
     setSaving(true);
-    setAllowInStore(next);
+    setFlagInStore(field, next);
     try {
       await api(`/api/maps/${map.id}`, {
         method: "PATCH",
-        body: JSON.stringify({ allowAsMergeSource: next }),
+        body: JSON.stringify({ [field]: next }),
       });
     } catch (e) {
-      setAllowInStore(!next);
+      setFlagInStore(field, !next);
       toast.error(e instanceof Error ? e.message : "Failed to update setting");
     } finally {
       setSaving(false);
@@ -471,12 +470,22 @@ function MergeSection() {
               className="map-sidebar__toggle-input"
               checked={allowSource}
               disabled={saving}
-              onChange={(e) => toggleSource(e.target.checked)}
+              onChange={(e) => toggleFlag("allowAsMergeSource", e.target.checked)}
+            />
+          </label>
+          <label className="map-sidebar__row map-sidebar__toggle-row">
+            <span className="map-sidebar__label">Allow as merge destination</span>
+            <input
+              type="checkbox"
+              className="map-sidebar__toggle-input"
+              checked={allowDestination}
+              disabled={saving}
+              onChange={(e) => toggleFlag("allowAsMergeDestination", e.target.checked)}
             />
           </label>
           <div className="map-sidebar__hint">
-            When on, corp members can use this corp map as the <em>source</em> of
-            a merge into another map.
+            When on, corp members can use this corp map as the <em>source</em> or{" "}
+            <em>destination</em> of a merge.
           </div>
         </>
       )}

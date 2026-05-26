@@ -239,7 +239,7 @@ mapsRouter.get('/', async (req, res) => {
   const { rows } = await db.query<{
     id: string; name: string; isCorpMap: boolean; sharedWithMe: boolean;
     locked: boolean; lastActiveAt: string; createdAt: string; updatedAt: string;
-    ownerName: string | null; allowAsMergeSource: boolean;
+    ownerName: string | null; allowAsMergeSource: boolean; allowAsMergeDestination: boolean;
   }>(
     `SELECT DISTINCT
             m.id,
@@ -249,8 +249,9 @@ mapsRouter.get('/', async (req, res) => {
               AND (m.corp_id IS NULL OR NOT m.corp_id = ANY($2::int[]))
             ) AS "sharedWithMe",
             m.locked,
-            ou.character_name        AS "ownerName",
-            m.allow_as_merge_source  AS "allowAsMergeSource",
+            ou.character_name             AS "ownerName",
+            m.allow_as_merge_source       AS "allowAsMergeSource",
+            m.allow_as_merge_destination  AS "allowAsMergeDestination",
             m.last_active_at AS "lastActiveAt",
             m.created_at     AS "createdAt",
             m.updated_at     AS "updatedAt"
@@ -726,14 +727,14 @@ mapsRouter.post('/:mapId/merge', async (req, res) => {
   const srcAccess = await getMapAccess(sourceId, req);
   if (!srcAccess) { res.status(404).json({ error: 'Source map not found' }); return; }
 
-  // Names + owners (+ merge-source flag) for both maps in one round-trip —
-  // for the corp-source gate and the audit entries.
+  // Names + owners (+ merge opt-in flags) for both maps in one round-trip —
+  // for the corp source/destination gates and the audit entries.
   const metaRes = await db.query<{
     id: string; name: string; user_id: number; owner_char: number;
-    corp_id: number | null; allow_as_merge_source: boolean;
+    corp_id: number | null; allow_as_merge_source: boolean; allow_as_merge_destination: boolean;
   }>(
     `SELECT m.id, m.name, m.user_id, u.character_id AS owner_char,
-            m.corp_id, m.allow_as_merge_source
+            m.corp_id, m.allow_as_merge_source, m.allow_as_merge_destination
        FROM maps m JOIN users u ON u.id = m.user_id
       WHERE m.id = ANY($1::uuid[])`,
     [[sourceId, destId]],
@@ -745,6 +746,11 @@ mapsRouter.post('/:mapId/merge', async (req, res) => {
   // A corp map may only be a merge *source* when explicitly enabled.
   if (srcMeta.corp_id !== null && !srcMeta.allow_as_merge_source) {
     res.status(403).json({ error: 'This corp map is not enabled as a merge source' });
+    return;
+  }
+  // …and only a merge *destination* when explicitly enabled.
+  if (destMeta.corp_id !== null && !destMeta.allow_as_merge_destination) {
+    res.status(403).json({ error: 'This corp map is not enabled as a merge destination' });
     return;
   }
 
@@ -783,12 +789,13 @@ mapsRouter.post('/:mapId/merge', async (req, res) => {
       return;
     }
 
-    // ── Destination lookup (truth) + bounding box for node placement ─────
-    const destByEve  = new Map<number, { id: string; notes: string }>();
-    const destByName = new Map<string, { id: string; notes: string }>();
+    // ── Destination lookup (truth) — keep each system's position so we can
+    // align incoming systems into the destination's coordinate frame ────────
+    const destByEve  = new Map<number, { id: string; notes: string; x: number; y: number }>();
+    const destByName = new Map<string, { id: string; notes: string; x: number; y: number }>();
     let destMaxX = -Infinity, destMinY = Infinity;
     for (const d of destSysRes.rows) {
-      const ref = { id: d.id, notes: d.notes };
+      const ref = { id: d.id, notes: d.notes, x: d.x, y: d.y };
       if (d.eveSystemId != null) destByEve.set(d.eveSystemId, ref);
       destByName.set(d.name.toLowerCase(), ref);
       destMaxX = Math.max(destMaxX, d.x);
@@ -796,21 +803,14 @@ mapsRouter.post('/:mapId/merge', async (req, res) => {
     }
     const hasDest = destSysRes.rows.length > 0;
 
-    // Drop incoming new nodes to the right of the destination's bounding box
-    // so they don't overlap, preserving their relative layout.
-    const GAP = 300;
-    let srcMinX = Infinity, srcMinY = Infinity;
-    for (const s of srcSysRes.rows) { srcMinX = Math.min(srcMinX, s.x); srcMinY = Math.min(srcMinY, s.y); }
-    const offsetX = hasDest ? destMaxX + GAP - srcMinX : 0;
-    const offsetY = hasDest ? destMinY - srcMinY       : 0;
-
-    // ── Map every source system → a destination system UUID ─────────────
+    // ── Classify source systems: matched (dedup) vs new (to insert) ─────────
+    // Collect matched (source position → destination position) pairs so we can
+    // fit a transform and drop new systems where they belong relative to the
+    // systems both maps share — rather than as a far-away block.
     const idMap = new Map<string, string>();                 // srcSystemId → destSystemId
     const noteMerges: { destSysId: string; notes: string }[] = [];
-    const sysCols = 15;
-    const sysPlaceholders: string[] = [];
-    const sysValues: unknown[] = [];
-    let addedSystems = 0;
+    const matchedPairs: { sx: number; sy: number; dx: number; dy: number }[] = [];
+    const newSystems: { row: typeof srcSysRes.rows[number]; newId: string }[] = [];
 
     for (const s of srcSysRes.rows) {
       const matched =
@@ -819,23 +819,92 @@ mapsRouter.post('/:mapId/merge', async (req, res) => {
 
       if (matched) {
         idMap.set(s.id, matched.id);
+        matchedPairs.push({ sx: s.x, sy: s.y, dx: matched.x, dy: matched.y });
         if (include.notes) {
           const merged = mergeSystemNote(matched.notes, s.notes, srcMeta.name);
           if (merged !== null) noteMerges.push({ destSysId: matched.id, notes: merged });
         }
         continue;
       }
-      const newId = crypto.randomUUID();
-      idMap.set(s.id, newId);
+      newSystems.push({ row: s, newId: crypto.randomUUID() });
+      idMap.set(s.id, newSystems[newSystems.length - 1].newId);
+    }
+    const addedSystems = newSystems.length;
+
+    // ── Place the new systems ───────────────────────────────────────────────
+    // Preferred: fit translation + uniform scale from the matched pairs (both
+    // maps came from the same region projection, so this aligns the incoming
+    // layout to the destination's frame). Fallback (no shared systems): drop
+    // the source cluster to the right of the destination's bounding box.
+    const placed = newSystems.map(({ row, newId }) => ({ row, newId, x: row.x, y: row.y }));
+    if (matchedPairs.length > 0) {
+      let msx = 0, msy = 0, mdx = 0, mdy = 0;
+      for (const p of matchedPairs) { msx += p.sx; msy += p.sy; mdx += p.dx; mdy += p.dy; }
+      const n = matchedPairs.length;
+      msx /= n; msy /= n; mdx /= n; mdy /= n;
+      let srcVar = 0, destVar = 0;
+      for (const p of matchedPairs) {
+        srcVar  += (p.sx - msx) ** 2 + (p.sy - msy) ** 2;
+        destVar += (p.dx - mdx) ** 2 + (p.dy - mdy) ** 2;
+      }
+      // Uniform scale from the ratio of spreads; needs ≥2 spread-ful pairs,
+      // else translation-only (the region projection already shares a scale).
+      const s = (n >= 2 && srcVar > 0) ? Math.sqrt(destVar / srcVar) : 1;
+      for (const p of placed) {
+        p.x = s * (p.row.x - msx) + mdx;
+        p.y = s * (p.row.y - msy) + mdy;
+      }
+    } else if (hasDest) {
+      const GAP = 300;
+      let srcMinX = Infinity, srcMinY = Infinity;
+      for (const s of srcSysRes.rows) { srcMinX = Math.min(srcMinX, s.x); srcMinY = Math.min(srcMinY, s.y); }
+      const offsetX = destMaxX + GAP - srcMinX;
+      const offsetY = destMinY - srcMinY;
+      for (const p of placed) { p.x = p.row.x + offsetX; p.y = p.row.y + offsetY; }
+    }
+
+    // De-overlap the new nodes against the existing (fixed) destination nodes
+    // and each other, so aligned positions that land on a neighbour separate
+    // out without disturbing the user's existing layout.
+    const MIN_DIST = 150;
+    const fixed = destSysRes.rows.map((d) => ({ x: d.x, y: d.y }));
+    for (let pass = 0; pass < 12; pass++) {
+      let moved = false;
+      for (const a of placed) {
+        for (const f of fixed) {
+          let dx = a.x - f.x, dy = a.y - f.y, d = Math.hypot(dx, dy);
+          if (d === 0) { dx = 1; dy = 0; d = 1; }
+          if (d < MIN_DIST) { a.x += dx / d * (MIN_DIST - d); a.y += dy / d * (MIN_DIST - d); moved = true; }
+        }
+      }
+      for (let i = 0; i < placed.length; i++) {
+        for (let j = i + 1; j < placed.length; j++) {
+          const a = placed[i], b = placed[j];
+          let dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy);
+          if (d === 0) { dx = 1; dy = 0; d = 1; }
+          if (d < MIN_DIST) {
+            const push = (MIN_DIST - d) / 2, ux = dx / d, uy = dy / d;
+            a.x -= ux * push; a.y -= uy * push; b.x += ux * push; b.y += uy * push;
+            moved = true;
+          }
+        }
+      }
+      if (!moved) break;
+    }
+
+    // ── Insert the new systems ───────────────────────────────────────────────
+    const sysCols = 15;
+    const sysPlaceholders: string[] = [];
+    const sysValues: unknown[] = [];
+    for (const { row, newId, x, y } of placed) {
       const base = sysValues.length;
       sysPlaceholders.push(`(${Array.from({ length: sysCols }, (_, i) => `$${base + i + 1}`).join(',')})`);
       sysValues.push(
-        newId, destId, s.eveSystemId, s.name, s.systemClass,
-        s.effect ?? 'none', s.statics ?? [], s.regionName ?? null, s.npcType ?? null,
-        s.x + offsetX, s.y + offsetY, s.status ?? 'unknown', false, false,
-        include.notes ? (s.notes ?? '') : '',
+        newId, destId, row.eveSystemId, row.name, row.systemClass,
+        row.effect ?? 'none', row.statics ?? [], row.regionName ?? null, row.npcType ?? null,
+        x, y, row.status ?? 'unknown', false, false,
+        include.notes ? (row.notes ?? '') : '',
       );
-      addedSystems++;
     }
 
     if (sysPlaceholders.length > 0) {
@@ -1018,7 +1087,8 @@ mapsRouter.get('/:mapId', async (req, res) => {
   const [mapRows, systems, connections] = await Promise.all([
     db.query(
       `SELECT id, name, corp_id IS NOT NULL AS "isCorpMap", locked,
-              allow_as_merge_source    AS "allowAsMergeSource",
+              allow_as_merge_source       AS "allowAsMergeSource",
+              allow_as_merge_destination  AS "allowAsMergeDestination",
               share_token              AS "shareToken",
               share_expires_at         AS "shareExpiresAt",
               share_include_sigs       AS "shareIncludeSigs",
@@ -1064,8 +1134,8 @@ mapsRouter.get('/:mapId', async (req, res) => {
 // toggle merge-source eligibility (corp maps, full/admin only)
 mapsRouter.patch('/:mapId', async (req, res) => {
   const { mapId } = req.params;
-  const { name, locked, allowAsMergeSource } = req.body as {
-    name?: string; locked?: boolean; allowAsMergeSource?: boolean;
+  const { name, locked, allowAsMergeSource, allowAsMergeDestination } = req.body as {
+    name?: string; locked?: boolean; allowAsMergeSource?: boolean; allowAsMergeDestination?: boolean;
   };
 
   const access = await requireMapWrite(res, mapId, req);
@@ -1074,17 +1144,22 @@ mapsRouter.patch('/:mapId', async (req, res) => {
   const sets: string[] = ['updated_at = NOW()'];
   const vals: unknown[] = [];
 
-  if (allowAsMergeSource !== undefined) {
-    // Merge-source opt-in is a corp-map sharing policy: only meaningful on a
-    // corp map, and gated above ordinary edit access to full/admin.
+  // Merge opt-in flags are corp-map sharing policy: only meaningful on a corp
+  // map, and gated above ordinary edit access to full/admin.
+  if (allowAsMergeSource !== undefined || allowAsMergeDestination !== undefined) {
     if (access.corpId === null) {
-      res.status(400).json({ error: 'Only corp maps can be flagged as a merge source' }); return;
+      res.status(400).json({ error: 'Only corp maps can be flagged as a merge source/destination' }); return;
     }
     const role = req.session.role ?? 'readonly';
     if (role !== 'full' && role !== 'admin') {
       res.status(403).json({ error: 'Full-edit or admin role required' }); return;
     }
-    sets.push(`allow_as_merge_source = $${vals.length + 1}`); vals.push(allowAsMergeSource === true);
+    if (allowAsMergeSource !== undefined) {
+      sets.push(`allow_as_merge_source = $${vals.length + 1}`); vals.push(allowAsMergeSource === true);
+    }
+    if (allowAsMergeDestination !== undefined) {
+      sets.push(`allow_as_merge_destination = $${vals.length + 1}`); vals.push(allowAsMergeDestination === true);
+    }
   }
 
   if (name !== undefined) {
