@@ -985,14 +985,17 @@ mapsRouter.post('/:mapId/merge', async (req, res) => {
           updatedSignatures++;
         } else {
           const base = sigVals.length;
-          sigPh.push(`(${Array.from({ length: 8 }, (_, i) => `$${base + i + 1}`).join(',')})`);
-          sigVals.push(destSysId, sg.sigId, sg.sigType, sg.name, sg.notes, sg.whType, sg.whLeadsTo, req.session.userId);
+          sigPh.push(`(${Array.from({ length: 9 }, (_, i) => `$${base + i + 1}`).join(',')})`);
+          // from_merge = TRUE → excluded from user stats / admin reporting; the
+          // sig was copied in, not scanned. (The update branch above leaves
+          // pre-existing dest sigs as-is, so they stay countable.)
+          sigVals.push(destSysId, sg.sigId, sg.sigType, sg.name, sg.notes, sg.whType, sg.whLeadsTo, req.session.userId, true);
           addedSignatures++;
         }
       }
       if (sigPh.length > 0) {
         await client.query(
-          `INSERT INTO map_signatures (system_id, sig_id, sig_type, name, notes, wh_type, wh_leads_to, created_by_user_id)
+          `INSERT INTO map_signatures (system_id, sig_id, sig_type, name, notes, wh_type, wh_leads_to, created_by_user_id, from_merge)
            VALUES ${sigPh.join(',')}`, sigVals,
         );
       }

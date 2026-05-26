@@ -196,6 +196,15 @@ export async function migrate() {
     ALTER TABLE map_signatures ADD COLUMN IF NOT EXISTS created_by_user_id INTEGER REFERENCES users(id) ON DELETE SET NULL;
     ALTER TABLE map_structures ADD COLUMN IF NOT EXISTS created_by_user_id INTEGER REFERENCES users(id) ON DELETE SET NULL;
 
+    -- Signatures copied in by a map merge are flagged so they don't count as
+    -- scanning activity. The reportable_signatures view is map_signatures minus
+    -- those rows; user stats and admin reports read from the view, while the
+    -- live signature pane still reads the real table (merged sigs show on the
+    -- map, they just don't inflate anyone's numbers).
+    ALTER TABLE map_signatures ADD COLUMN IF NOT EXISTS from_merge BOOLEAN NOT NULL DEFAULT FALSE;
+    CREATE OR REPLACE VIEW reportable_signatures AS
+      SELECT * FROM map_signatures WHERE from_merge = FALSE;
+
     -- Resolved owner corp ID for structures. Populated by ESI lookup when
     -- the user supplies an eve_id (the structure's in-game ID) or when
     -- the structure name parser finds a known corp/alliance. Lets the

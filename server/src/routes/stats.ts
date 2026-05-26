@@ -68,7 +68,7 @@ router.get('/', async (req, res) => {
          COUNT(*) FILTER (WHERE created_at >= $3)::text AS month,
          COUNT(*) FILTER (WHERE created_at >= $4)::text AS week,
          COUNT(*) FILTER (WHERE created_at >= $5)::text AS day
-       FROM map_signatures
+       FROM reportable_signatures
        WHERE created_by_user_id = $1
        GROUP BY sig_type`,
       bucketParams,
@@ -76,7 +76,7 @@ router.get('/', async (req, res) => {
     db.query<{ bucket: string; count: string }>(
       `SELECT date_trunc('day', created_at AT TIME ZONE 'UTC')::date::text AS bucket,
               COUNT(*)::text                                                AS count
-         FROM map_signatures
+         FROM reportable_signatures
         WHERE created_by_user_id = $1
           AND created_at >= $2
         GROUP BY bucket`,
