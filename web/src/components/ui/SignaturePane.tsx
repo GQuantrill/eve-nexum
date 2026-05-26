@@ -456,7 +456,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
       />
     )}
     <div className="sig-pane">
-      {!isShareMode && (
+      {!isShareMode && sigs.length === 0 && (
         <p className="sig-pane__hint">You can copy and paste signatures directly from the Probe scanner in Eve. To do this, open your probe scanner.  Press control A to select them all, then control C to copy.  Use control V to paste them here</p>
       )}
       {canEdit && !isShareMode && (
