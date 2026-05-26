@@ -924,9 +924,17 @@ function SystemsReport() {
       <h3 className="admin-page__report-heading">Signatures across all maps</h3>
       <div className="admin-page__stat-grid">
         <StatCard label="Total" value={data.total} accent />
-        {SIG_TYPE_ORDER.map((t) => (
-          <StatCard key={t.key} label={t.label} value={data.byType[t.key] ?? 0} />
-        ))}
+        {SIG_TYPE_ORDER.map((t) => {
+          const count = data.byType[t.key] ?? 0;
+          return (
+            <StatCard
+              key={t.key}
+              label={t.label}
+              value={count}
+              pct={data.total > 0 ? (count / data.total) * 100 : 0}
+            />
+          );
+        })}
       </div>
 
       <div className="admin-page__chart-row">
@@ -1023,10 +1031,11 @@ function SystemsReport() {
   );
 }
 
-function StatCard({ label, value, accent = false }: { label: string; value: number; accent?: boolean }) {
+function StatCard({ label, value, accent = false, pct }: { label: string; value: number; accent?: boolean; pct?: number | null }) {
   return (
     <div className={`admin-page__stat-card${accent ? ' admin-page__stat-card--accent' : ''}`}>
       <span className="admin-page__stat-card-value">{value.toLocaleString()}</span>
+      {pct != null && <span className="admin-page__stat-card-pct">{pct.toFixed(1)}%</span>}
       <span className="admin-page__stat-card-label">{label}</span>
     </div>
   );
