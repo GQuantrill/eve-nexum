@@ -316,6 +316,160 @@ mapsRouter.post('/', async (req, res) => {
   res.status(201).json({ id: rows[0].id });
 });
 
+// POST /api/maps/from-region — create a new map pre-populated with an entire
+// K-space region: every system positioned by its EVE coordinates (Dotlan-style
+// projection of x/z) plus all intra-region stargate links. Blank-map creation
+// stays on POST /api/maps; this is only the seeded path. See
+// region_map_feature.md.
+mapsRouter.post('/from-region', async (req, res) => {
+  const body     = req.body as { regionId?: unknown; name?: unknown; isCorpMap?: unknown };
+  const regionId = Number(body.regionId);
+  if (!Number.isInteger(regionId)) { res.status(400).json({ error: 'regionId is required' }); return; }
+
+  const isCorpMap = config.corpMode && body.isCorpMap === true;
+  const role      = req.session.role ?? 'readonly';
+
+  // Quota + role — mirrors POST /api/maps and /import.
+  if (isCorpMap) {
+    if (role !== 'full' && role !== 'admin') {
+      res.status(403).json({ error: 'Corp map creation requires full-edit or admin role' }); return;
+    }
+    if (!req.session.userCorpId) {
+      res.status(403).json({ error: 'Cannot create corp map: user has no corp affiliation' }); return;
+    }
+    const { rowCount } = await db.query(`SELECT 1 FROM maps WHERE corp_id = $1`, [req.session.userCorpId]);
+    if ((rowCount ?? 0) >= config.maxCorpMaps) { res.status(403).json({ error: 'Maximum corp maps reached' }); return; }
+  } else {
+    const { rowCount } = await db.query(`SELECT 1 FROM maps WHERE user_id = $1 AND corp_id IS NULL`, [req.session.userId]);
+    if ((rowCount ?? 0) >= config.maxUserMaps) { res.status(403).json({ error: 'Maximum maps reached' }); return; }
+  }
+
+  // Region systems (with coordinates) + region name.
+  const [sysRes, regionRes] = await Promise.all([
+    db.query<{
+      id: number; name: string; systemClass: string | null; effect: string | null;
+      statics: string[]; x2: number | null; y2: number | null;
+    }>(
+      `SELECT id, name, class AS "systemClass", effect, statics,
+              pos2d_x AS "x2", pos2d_y AS "y2"
+         FROM solar_systems WHERE region_id = $1`,
+      [regionId],
+    ),
+    db.query<{ name: string }>(`SELECT name FROM map_regions WHERE id = $1`, [regionId]),
+  ]);
+
+  if (sysRes.rows.length === 0)                  { res.status(404).json({ error: 'Region not found or has no systems' }); return; }
+  if (sysRes.rows.length > MAX_IMPORT_SYSTEMS)   { res.status(413).json({ error: `Region too large (max ${MAX_IMPORT_SYSTEMS} systems)` }); return; }
+  if (sysRes.rows.some((s) => s.x2 === null || s.y2 === null)) {
+    res.status(503).json({ error: 'Region coordinates not seeded yet — run `npm run backfill-coords` (or re-run setup-db).' });
+    return;
+  }
+
+  const regionName = regionRes.rows[0]?.name ?? 'Region';
+  const mapName    = String(typeof body.name === 'string' && body.name.trim() ? body.name : regionName).slice(0, MAX_MAP_NAME_LEN);
+
+  // Lay out from CCP's 2D star-map projection (position2D) so stargate-connected
+  // systems sit adjacent the way the in-game map / Dotlan show them. Scale is
+  // derived from the median nearest-neighbour distance → a target on-screen gap,
+  // so typical adjacent systems land ~TARGET_GAP px apart regardless of region.
+  // Y is flipped so north is up.
+  const pts = sysRes.rows.map((s) => ({ x: s.x2 as number, y: s.y2 as number }));
+  const minX = Math.min(...pts.map((p) => p.x));
+  const maxY = Math.max(...pts.map((p) => p.y));
+
+  const TARGET_GAP = 190; // px between typical adjacent systems
+  let medianNN = 1;
+  if (pts.length > 1) {
+    const nn = pts.map((a, i) => {
+      let best = Infinity;
+      for (let j = 0; j < pts.length; j++) {
+        if (j === i) continue;
+        const dx = a.x - pts[j].x, dy = a.y - pts[j].y;
+        const d = dx * dx + dy * dy;
+        if (d < best) best = d;
+      }
+      return Math.sqrt(best);
+    }).sort((a, b) => a - b);
+    medianNN = nn[Math.floor(nn.length / 2)] || 1;
+  }
+  const scale = TARGET_GAP / (medianNN > 0 ? medianNN : 1);
+
+  const client = await db.connect();
+  try {
+    await client.query('BEGIN');
+
+    const mapRes = await client.query<{ id: string }>(
+      `INSERT INTO maps (user_id, name, corp_id) VALUES ($1, $2, $3) RETURNING id`,
+      [req.session.userId, mapName, isCorpMap ? (req.session.userCorpId ?? null) : null],
+    );
+    const mapId = mapRes.rows[0].id;
+
+    // Insert systems; remember eve_system_id → new UUID for wiring connections.
+    const idByEve = new Map<number, string>();
+    const sysCols = 15;
+    const sysPh: string[] = []; const sysVals: unknown[] = [];
+    for (const s of sysRes.rows) {
+      const newId = crypto.randomUUID();
+      idByEve.set(s.id, newId);
+      const x = ((s.x2 as number) - minX) * scale;
+      const y = (maxY - (s.y2 as number)) * scale;
+      const base = sysVals.length;
+      sysPh.push(`(${Array.from({ length: sysCols }, (_, i) => `$${base + i + 1}`).join(',')})`);
+      sysVals.push(
+        newId, mapId, s.id, s.name, s.systemClass ?? 'unknown',
+        s.effect ?? 'none', s.statics ?? [], regionName, null,
+        x, y, 'unknown', false, false, '',
+      );
+    }
+    await client.query(
+      `INSERT INTO map_systems
+         (id, map_id, eve_system_id, name, system_class, effect, statics, region_name, npc_type,
+          position_x, position_y, status, is_home, locked, notes)
+       VALUES ${sysPh.join(',')}`,
+      sysVals,
+    );
+
+    // Intra-region stargates → connections. Each gate has a reverse twin, so
+    // dedup by undirected pair; drop self-loops.
+    const eveIds = [...idByEve.keys()];
+    const gateRes = await client.query<{ a: number; b: number }>(
+      `SELECT system_id AS a, destination_system_id AS b
+         FROM map_stargates
+        WHERE system_id = ANY($1::int[]) AND destination_system_id = ANY($1::int[])`,
+      [eveIds],
+    );
+    const seen = new Set<string>();
+    const connPh: string[] = []; const connVals: unknown[] = [];
+    for (const g of gateRes.rows) {
+      const src = idByEve.get(g.a);
+      const tgt = idByEve.get(g.b);
+      if (!src || !tgt || src === tgt) continue;
+      const key = src < tgt ? `${src}|${tgt}` : `${tgt}|${src}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      const base = connVals.length;
+      connPh.push(`($${base + 1},$${base + 2},$${base + 3},$${base + 4},$${base + 5},$${base + 6})`);
+      connVals.push(crypto.randomUUID(), mapId, src, tgt, 'standard', 'large');
+    }
+    if (connPh.length > 0) {
+      await client.query(
+        `INSERT INTO map_connections (id, map_id, source_id, target_id, connection_type, size)
+         VALUES ${connPh.join(',')}`,
+        connVals,
+      );
+    }
+
+    await client.query('COMMIT');
+    res.status(201).json({ id: mapId, systems: sysRes.rows.length, connections: connPh.length });
+  } catch (err) {
+    await client.query('ROLLBACK');
+    log.error('map from-region failed:', err);
+    throw err;
+  } finally {
+    client.release();
+  }
+});
+
 // POST /api/maps/import
 mapsRouter.post('/import', async (req, res) => {
   const isCorpImport = config.corpMode && (req.body as Record<string, unknown>).isCorpMap === true;

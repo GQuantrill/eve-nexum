@@ -128,6 +128,14 @@ async function createTables() {
     ALTER TABLE map_regions ADD COLUMN IF NOT EXISTS npc_type TEXT;
     ALTER TABLE solar_systems ADD COLUMN IF NOT EXISTS constellation_id INTEGER;
     ALTER TABLE solar_systems ADD COLUMN IF NOT EXISTS region_id INTEGER;
+    -- Universe coordinates (metres) from the mapSolarSystems position object,
+    -- plus CCP's 2D star-map projection (position2D) used for region map
+    -- layouts — connected systems sit adjacent like the in-game map / Dotlan.
+    ALTER TABLE solar_systems ADD COLUMN IF NOT EXISTS pos_x DOUBLE PRECISION;
+    ALTER TABLE solar_systems ADD COLUMN IF NOT EXISTS pos_y DOUBLE PRECISION;
+    ALTER TABLE solar_systems ADD COLUMN IF NOT EXISTS pos_z DOUBLE PRECISION;
+    ALTER TABLE solar_systems ADD COLUMN IF NOT EXISTS pos2d_x DOUBLE PRECISION;
+    ALTER TABLE solar_systems ADD COLUMN IF NOT EXISTS pos2d_y DOUBLE PRECISION;
 
     CREATE TABLE IF NOT EXISTS map_stargates (
       id                    INTEGER PRIMARY KEY,
@@ -402,7 +410,7 @@ async function importConstellations(zip: Zip, constellationRegion: Map<number, n
 async function importSolarSystems(zip: Zip, whMap: Map<number, WhData>, constellationRegion: Map<number, number>) {
   process.stdout.write('Importing solar systems... ');
   const lines   = await readJsonl(zip, 'mapSolarSystems.jsonl');
-  const systems: [number, string, number, number|null, number|null, string|null, string|null, string[]][] = [];
+  const systems: [number, string, number, number|null, number|null, string|null, string|null, string[], number|null, number|null, number|null, number|null, number|null][] = [];
 
   for (const line of lines) {
     try {
@@ -415,6 +423,15 @@ async function importSolarSystems(zip: Zip, whMap: Map<number, WhData>, constell
       const constellationId = o.constellationID ?? null;
       const regionId        = constellationId ? (constellationRegion.get(constellationId) ?? null) : null;
       const wh              = whMap.get(id);
+      // `position` is the {x, y, z} universe coordinate in metres; `position2D`
+      // is CCP's flattened star-map projection used for region map layouts.
+      const p               = o.position;
+      const posX            = typeof p?.x === 'number' ? p.x : null;
+      const posY            = typeof p?.y === 'number' ? p.y : null;
+      const posZ            = typeof p?.z === 'number' ? p.z : null;
+      const p2              = o.position2D;
+      const pos2dX          = typeof p2?.x === 'number' ? p2.x : null;
+      const pos2dY          = typeof p2?.y === 'number' ? p2.y : null;
 
       systems.push([
         id, name, security,
@@ -422,6 +439,7 @@ async function importSolarSystems(zip: Zip, whMap: Map<number, WhData>, constell
         wh?.class   ?? deriveClass(security, name),
         wh?.effect  ?? null,
         wh?.statics ?? [],
+        posX, posY, posZ, pos2dX, pos2dY,
       ]);
     } catch { /* skip */ }
   }
@@ -429,13 +447,13 @@ async function importSolarSystems(zip: Zip, whMap: Map<number, WhData>, constell
   const BATCH = 500;
   for (let i = 0; i < systems.length; i += BATCH) {
     const batch  = systems.slice(i, i + BATCH);
-    const cols   = 8;
+    const cols   = 13;
     const values = batch.map((_, j) =>
-      `($${j*cols+1},$${j*cols+2},$${j*cols+3},$${j*cols+4},$${j*cols+5},$${j*cols+6},$${j*cols+7},$${j*cols+8})`
+      `(${Array.from({ length: cols }, (_, k) => `$${j*cols+k+1}`).join(',')})`
     ).join(',');
 
     await db.query(
-      `INSERT INTO solar_systems (id, name, security, constellation_id, region_id, class, effect, statics)
+      `INSERT INTO solar_systems (id, name, security, constellation_id, region_id, class, effect, statics, pos_x, pos_y, pos_z, pos2d_x, pos2d_y)
        VALUES ${values}
        ON CONFLICT (id) DO UPDATE SET
          name             = EXCLUDED.name,
@@ -444,7 +462,12 @@ async function importSolarSystems(zip: Zip, whMap: Map<number, WhData>, constell
          region_id        = EXCLUDED.region_id,
          class            = EXCLUDED.class,
          effect           = EXCLUDED.effect,
-         statics          = EXCLUDED.statics`,
+         statics          = EXCLUDED.statics,
+         pos_x            = EXCLUDED.pos_x,
+         pos_y            = EXCLUDED.pos_y,
+         pos_z            = EXCLUDED.pos_z,
+         pos2d_x          = EXCLUDED.pos2d_x,
+         pos2d_y          = EXCLUDED.pos2d_y`,
       batch.flatMap(s => s),
     );
     process.stdout.write(`\r  ${Math.min(i + BATCH, systems.length)} / ${systems.length}  `);

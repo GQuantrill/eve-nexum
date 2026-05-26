@@ -198,6 +198,21 @@ export async function migrate() {
     -- structures live in map_structures and are unaffected.
     DROP TABLE IF EXISTS known_structures;
 
+    -- EVE universe coordinates (metres) for each solar system, from the SDE
+    -- mapSolarSystems position object. Used to lay out region maps Dotlan-style
+    -- (project x/z onto the galactic plane; y is "up" and dropped). The table
+    -- is created by the SDE seed (setup-db), so guard with IF EXISTS; columns
+    -- are backfilled by setup-db / scripts/backfill-coords.ts.
+    ALTER TABLE IF EXISTS solar_systems ADD COLUMN IF NOT EXISTS pos_x DOUBLE PRECISION;
+    ALTER TABLE IF EXISTS solar_systems ADD COLUMN IF NOT EXISTS pos_y DOUBLE PRECISION;
+    ALTER TABLE IF EXISTS solar_systems ADD COLUMN IF NOT EXISTS pos_z DOUBLE PRECISION;
+    -- CCP's official 2D star-map projection (mapSolarSystems position2D). This
+    -- is what region maps lay out from — connected systems sit adjacent the way
+    -- the in-game map / Dotlan show them, unlike a raw x/z projection of the 3D
+    -- position which drops the vertical axis.
+    ALTER TABLE IF EXISTS solar_systems ADD COLUMN IF NOT EXISTS pos2d_x DOUBLE PRECISION;
+    ALTER TABLE IF EXISTS solar_systems ADD COLUMN IF NOT EXISTS pos2d_y DOUBLE PRECISION;
+
     CREATE TABLE IF NOT EXISTS user_events (
       id          BIGSERIAL   PRIMARY KEY,
       user_id     INTEGER     NOT NULL REFERENCES users(id) ON DELETE CASCADE,

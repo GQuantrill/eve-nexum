@@ -5,6 +5,7 @@ import { api } from '../api/client';
 import { enqueue } from './pendingQueue';
 import { toast } from '../components/ui/Toaster';
 import type { WormholeMap, MapSystem, MapConnection, SystemClass, WormholeEffect } from '../types';
+import { pickHandles } from '../components/map/edgeUtils';
 
 // Debounce position saves — fires max once per 500 ms per system
 const moveTimers = new Map<string, ReturnType<typeof setTimeout>>();
@@ -117,6 +118,11 @@ interface MapStore {
   autoLayoutPending: boolean;
   requestAutoLayout: () => void;
   clearAutoLayoutPending: () => void;
+  // Signals the canvas to fit/centre the whole map in view (e.g. after a
+  // region seed). Mirrors the autoLayout flag pattern.
+  fitViewPending: boolean;
+  requestFitView: () => void;
+  clearFitView: () => void;
 
   // Undo
   undoStack: UndoCommand[];
@@ -142,6 +148,7 @@ interface MapStore {
   loadMaps: () => Promise<void>;
   switchMap: (id: string) => Promise<void>;
   createMap: (name?: string, isCorpMap?: boolean) => Promise<void>;
+  createFromRegion: (regionId: number, name: string, isCorpMap: boolean) => Promise<void>;
   deleteMap: (id: string) => Promise<void>;
 
   // Map metadata
@@ -165,6 +172,9 @@ interface MapStore {
   addConnection: (sourceId: string, targetId: string, sourceHandle?: string | null, targetHandle?: string | null) => string;
   updateConnection: (id: string, updates: Partial<Omit<MapConnection, 'id'>>) => void;
   removeConnection: (id: string) => void;
+  // Re-route every connection's handles to the nearest sides given current
+  // node positions. Used by the sidebar button and after a region seed.
+  optimizeConnections: () => void;
 
   // Selection
   selectSystem: (id: string | null) => void;
@@ -336,6 +346,7 @@ export const useMapStore = create<MapStore>()((set, get) => {
     mapOptionsOpen: false,
     edgeStyle: 'bezier',
     autoLayoutPending: false,
+    fitViewPending: false,
     panelOrder: ['activity', 'killboard', 'notes', 'signatures', 'structures', 'npcStations'],
     undoStack: [],
 
@@ -434,6 +445,26 @@ export const useMapStore = create<MapStore>()((set, get) => {
       });
       await get().loadMaps();
       await get().switchMap(id);
+    },
+
+    createFromRegion: async (regionId, name, isCorpMap) => {
+      const { id } = await api<{ id: string }>('/api/maps/from-region', {
+        method: 'POST',
+        body: JSON.stringify({ regionId, name, isCorpMap }),
+      });
+      await get().loadMaps();
+      await get().switchMap(id);
+      // The position2D layout already places stargate-connected systems
+      // adjacent (like the in-game map / Dotlan), so we deliberately do NOT run
+      // the overlap-spread here — it would push connected systems apart and
+      // undo that. Just re-route connection handles to the seeded positions and
+      // fit the whole region in view. Deferred so the canvas has mounted the
+      // freshly-seeded nodes first. (Users can still hit "Spread Nodes"
+      // manually if a region renders too tightly.)
+      setTimeout(() => {
+        get().optimizeConnections();
+        get().requestFitView();
+      }, 500);
     },
 
     deleteMap: async (id) => {
@@ -557,6 +588,8 @@ export const useMapStore = create<MapStore>()((set, get) => {
     setEdgeStyle: (v) => set({ edgeStyle: v }),
     requestAutoLayout: () => set({ autoLayoutPending: true }),
     clearAutoLayoutPending: () => set({ autoLayoutPending: false }),
+    requestFitView: () => set({ fitViewPending: true }),
+    clearFitView: () => set({ fitViewPending: false }),
 
     // ── Systems ───────────────────────────────────────────────────────────────
 
@@ -766,6 +799,20 @@ export const useMapStore = create<MapStore>()((set, get) => {
         api(url, { method: 'PATCH', body }).catch(() =>
           enqueue(`updateConnection:${id}`, url, 'PATCH', body),
         );
+      }
+    },
+
+    optimizeConnections: () => {
+      const { map } = get();
+      const posById = new Map(map.systems.map((s) => [s.id, s.position] as const));
+      for (const conn of map.connections) {
+        const src = posById.get(conn.sourceId);
+        const tgt = posById.get(conn.targetId);
+        if (!src || !tgt) continue;
+        const { sourceHandle, targetHandle } = pickHandles(src, tgt);
+        if (conn.sourceHandle !== sourceHandle || conn.targetHandle !== targetHandle) {
+          get().updateConnection(conn.id, { sourceHandle, targetHandle });
+        }
       }
     },
 
