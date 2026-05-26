@@ -3084,6 +3084,13 @@ div.system-node__easy-handle {
   .w-md-editor-bar { display: none; }
 }
 
+/* Show MDEditor's drag handle only on the full Notes pane, so users can pull
+   it taller. Compact row notes (signatures / structures) stay handle-free.
+   Same specificity as the hide rule above; wins by source order. */
+.notes-editor--full .w-md-editor-bar {
+  display: block;
+}
+
 .notes-editor--empty {
   cursor: text;
   padding: 3px 6px;

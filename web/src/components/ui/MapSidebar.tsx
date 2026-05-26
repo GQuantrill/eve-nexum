@@ -993,7 +993,7 @@ export function MapSidebar() {
         )}
 
         {!hideTopologyTools && (
-          <CollapsibleSection title="Export" {...sectionProps("export")}>
+          <CollapsibleSection title="Import / Export" {...sectionProps("export")}>
             <div className="map-sidebar__section">
               <button className="map-sidebar__action" onClick={handleExport}>
                 ↓ Export as JSON

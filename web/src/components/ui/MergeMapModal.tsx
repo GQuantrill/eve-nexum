@@ -24,6 +24,7 @@ export function MergeMapModal({ onClose }: { onClose: () => void }) {
   const activeMapId = useMapStore((s) => s.activeMapId);
   const switchMap   = useMapStore((s) => s.switchMap);
   const loadMaps    = useMapStore((s) => s.loadMaps);
+  const requestFitView = useMapStore((s) => s.requestFitView);
   const { user }    = useAuth();
   const role    = user?.role ?? 'readonly';
   const isAdmin = role === 'admin';
@@ -73,6 +74,7 @@ export function MergeMapModal({ onClose }: { onClose: () => void }) {
       );
       await loadMaps();
       await switchMap(destId);
+      requestFitView();
       onClose();
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Merge failed');
