@@ -6080,6 +6080,14 @@ select.sig-toolbar-btn option {
 
 .admin-page__stat-card--accent .admin-page__stat-card-value { color: #7ab4f0; }
 
+.admin-page__stat-card-pct {
+  font-size: calc(12px * var(--font-scale, 1));
+  font-weight: 600;
+  color: #9aa8c0;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
 .admin-page__stat-card-label {
   font-size: calc(11px * var(--font-scale, 1));
   color: #7a8aa8;
