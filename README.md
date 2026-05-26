@@ -11,6 +11,7 @@ A wormhole mapping tool for EVE Online. Track systems, signatures, structures, k
 #### Mapping
 
 - **Interactive map** — drag systems, draw connections, set wormhole class/type/status per connection. Snap-to-grid, optional minimap.
+- **Seed a map from a region** — when creating a map you can optionally pick an EVE region (searchable). The new map is pre-populated with every system in that region, laid out from CCP's 2D star-map projection (a Dotlan-style layout where stargate-connected systems sit adjacent), with all in-region stargate connections pre-drawn. Leave the region blank for an empty map. Requires solar-system coordinates in the SDE tables — see [Installation](#installation).
 - **Wormhole intel** — per-connection mass tracker (≤10% / ≤50% / critical), end-of-life flag with countdown, K162-aware static identification, frig-hole and gas-site auto-tagging from sig type.
 - **Personal mass budget** — the connection panel reads your currently-flown ship's mass from ESI and projects how many more jumps the hole will take before crit ("~4 more Hecate jumps"). Switches to an amber warning when the next jump won't fit and a red block when the ship's too heavy to pass at all.
 - **Wormhole type picker** — searchable popover for assigning the exact wormhole type to a connection; statics quick-info on hover shows destination class, mass, lifetime.
@@ -145,6 +146,8 @@ docker compose up -d postgres
 docker compose run --rm server node dist/scripts/setup-db.js
 ```
 
+The importer also stores each system's universe coordinates and CCP's 2D star-map projection (`position` / `position2D`), which power the [Seed a map from a region](#key-features) feature. Fresh imports include them automatically; existing deployments that imported the SDE before this feature need a one-time backfill — see [Upgrading an existing deployment](#upgrading-an-existing-deployment).
+
 **3. Start the app**
 
 **Standard (direct ports):**
@@ -206,6 +209,25 @@ docker compose up -d
 
 The importer is upsert-only (`ON CONFLICT DO UPDATE` on every table), so re-running is safe — your user data (maps, signatures, structures, sessions, etc.) lives in other tables and is never touched.
 
+**5. Upgrading an existing deployment**
+
+Pulling a new Nexum release into a running instance:
+
+- **App-schema changes apply automatically.** New columns and tables (e.g. the map-merge `allow_as_merge_source` flag, the solar-system coordinate columns) are added by the migration that runs on every server boot — just rebuild and restart:
+  ```bash
+  docker compose build server && docker compose up -d
+  ```
+- **Region maps need solar-system coordinates.** If your SDE was imported before the [Seed a map from a region](#key-features) feature shipped, the coordinate columns exist but are empty, and seeding a region returns a clear error until they're populated. Backfill them once from the SDE zip already in `server/data/` — no full re-import needed:
+  ```bash
+  docker compose run --rm \
+    -v "$PWD/server:/app" \
+    -w /app \
+    -e NODE_ENV=development \
+    --entrypoint sh \
+    server -c "yarn install --frozen-lockfile && yarn backfill-coords"
+  ```
+  (Re-running the full SDE importer — step 4 above — also populates them. The backfill is just the lighter option.)
+
 ---
 
 ### Option 2 — Local development
@@ -244,6 +266,8 @@ yarn dev
 ```
 
 The frontend is available at `http://localhost:5174`. The Vite dev server proxies `/api` and `/auth` to `http://localhost:3001`.
+
+> The server needs the EVE SDE imported into Postgres before it will boot — run `cd server && yarn setup-db` once (downloads the latest SDE and populates the static tables, including system coordinates). If you set up the database before the [Seed a map from a region](#key-features) feature shipped, populate the coordinate columns with the lighter one-shot backfill instead of a full re-import: `cd server && yarn backfill-coords`.
 
 ---
 

@@ -7,7 +7,6 @@ import { useMapStore } from "../../store/mapStore";
 import { useAuth } from "../../context/AuthContext";
 import { api } from "../../api/client";
 import { toast } from "./Toaster";
-import { pickHandles } from "../map/edgeUtils";
 import { useProximityThreshold } from "../../hooks/useProximityAlerts";
 import { useStaleThreshold } from "../../hooks/useStaleThreshold";
 import {
@@ -500,31 +499,13 @@ export function MapSidebar() {
   const setRouteMode = useMapStore((s) => s.setRouteMode);
   const uiZoom = useMapStore((s) => s.uiZoom);
   const setUiZoom = useMapStore((s) => s.setUiZoom);
-  const updateConnection = useMapStore((s) => s.updateConnection);
+  const optimizeConnections = useMapStore((s) => s.optimizeConnections);
   const requestAutoLayout = useMapStore((s) => s.requestAutoLayout);
   const connectionCount = useMapStore((s) => s.map.connections.length);
   const systemCount = useMapStore((s) => s.map.systems.length);
 
   const atMapLimit = maps.length >= maxMaps;
 
-  function handleOptimizeConnections() {
-    // Reach into the live store snapshot — operating on per-render selectors
-    // here would lock us into the snapshot captured at button-click time.
-    const { map } = useMapStore.getState();
-    const systemMap = new Map(map.systems.map((s) => [s.id, s.position]));
-    for (const conn of map.connections) {
-      const src = systemMap.get(conn.sourceId);
-      const tgt = systemMap.get(conn.targetId);
-      if (!src || !tgt) continue;
-      const { sourceHandle, targetHandle } = pickHandles(src, tgt);
-      if (
-        conn.sourceHandle !== sourceHandle ||
-        conn.targetHandle !== targetHandle
-      ) {
-        updateConnection(conn.id, { sourceHandle, targetHandle });
-      }
-    }
-  }
 
   function handleExport() {
     const { map } = useMapStore.getState();
@@ -756,7 +737,7 @@ export function MapSidebar() {
             <>
               <button
                 className="map-sidebar__action"
-                onClick={handleOptimizeConnections}
+                onClick={optimizeConnections}
                 disabled={connectionCount === 0}
               >
                 ⟳ Optimize Connections
