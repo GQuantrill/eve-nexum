@@ -204,6 +204,9 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   sigsRef.current = sigs;
 
   const { isShareMode } = useShareMode();
+  // Bumped when another client changes this system's sigs (live sync).
+  const sigRev = useMapStore((s) => s.sigRev[systemId] ?? 0);
+
   useEffect(() => {
     if (!activeMapId) return;
     setSigs([]);
@@ -224,6 +227,16 @@ export function SignaturePane({ systemId }: { systemId: string }) {
       .then(setSigs)
       .catch(() => toast.error('Failed to load signatures'));
   }, [activeMapId, systemId, isShareMode]);
+
+  // Live sync: when a remote client changes this system's sigs, re-fetch in
+  // place (no clear/flicker, keeps selection). Guarded so it doesn't fire on
+  // the initial mount (rev starts at 0).
+  useEffect(() => {
+    if (!activeMapId || isShareMode || sigRev === 0) return;
+    api<Signature[]>(`/api/maps/${activeMapId}/systems/${systemId}/signatures`)
+      .then(setSigs)
+      .catch(() => {});
+  }, [sigRev, activeMapId, systemId, isShareMode]);
 
   const updateSig = (id: string, updates: Partial<Signature>) => {
     const existing = sigsRef.current.find((s) => s.id === id);

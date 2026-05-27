@@ -79,6 +79,9 @@ export function StructuresPane({ systemId }: { systemId: string }) {
   structuresRef.current = structures;
 
   const { isShareMode } = useShareMode();
+  // Bumped when another client changes this system's structures (live sync).
+  const structRev = useMapStore((s) => s.structRev[systemId] ?? 0);
+
   useEffect(() => {
     if (!activeMapId) return;
     setStructures([]);
@@ -97,6 +100,15 @@ export function StructuresPane({ systemId }: { systemId: string }) {
       .then(setStructures)
       .catch(() => toast.error('Failed to load structures'));
   }, [activeMapId, systemId, isShareMode]);
+
+  // Live sync: re-fetch in place when a remote client changes this system's
+  // structures. Guarded so it doesn't fire on the initial mount (rev 0).
+  useEffect(() => {
+    if (!activeMapId || isShareMode || structRev === 0) return;
+    api<Structure[]>(`/api/maps/${activeMapId}/systems/${systemId}/structures`)
+      .then(setStructures)
+      .catch(() => {});
+  }, [structRev, activeMapId, systemId, isShareMode]);
 
   useEffect(() => {
     const close = () => setCtx(null);

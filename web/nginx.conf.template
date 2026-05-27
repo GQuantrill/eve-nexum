@@ -35,6 +35,21 @@ server {
     # proxy, the header is a no-op.
     add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
 
+    # Live map-edit SSE stream. Must disable proxy buffering or nginx holds the
+    # event frames until the response ends (which never happens on a long-lived
+    # stream). Matched before the generic /api block below.
+    location ~ ^/api/maps/[^/]+/events$ {
+        set $sse_backend http://server:${API_PORT};
+        proxy_pass         $sse_backend;
+        proxy_http_version 1.1;
+        proxy_set_header   Host $host;
+        proxy_set_header   Cookie $http_cookie;
+        proxy_set_header   Connection '';
+        proxy_buffering    off;
+        proxy_cache        off;
+        proxy_read_timeout 1h;
+    }
+
     # Proxy API and auth calls to the server container. The upstream
     # port is substituted at container start from $API_PORT so it
     # tracks whatever PORT the user set in .env.
