@@ -503,8 +503,10 @@ export function LandingPage() {
             <>
               <a href={apiUrl('/auth/login')} className="landing__login-wrap">
                 <img
-                  src="https://web.ccpgamescdn.com/eveonlineassets/developers/eve-sso-login-white-large.png"
+                  src="/vendor/eve-sso-login-white-large.png"
                   alt="Log in with EVE Online"
+                  width="270"
+                  height="45"
                   className="landing__eve-btn"
                 />
               </a>
