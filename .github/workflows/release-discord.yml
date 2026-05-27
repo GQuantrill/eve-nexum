@@ -1,0 +1,101 @@
+name: Patch notes to Discord
+
+# When `release` is merged into `main` (a push to main), post the patch notes
+# to the Discord #patch-notes channel.
+#
+# Notes = titles of the PRs that merged into the `release` branch and arrived in
+# this push (base = release). Filtering on base = release naturally excludes the
+# release->main promotion PR itself, and any direct pushes to main.
+#
+# Requires repo secret DISCORD_WEBHOOK_URL = the patch-notes channel webhook.
+# (This is a GitHub Actions secret, independent of the app's runtime
+# DISCORD_WEBHOOK_URL env var — make sure it's the public patch-notes webhook.)
+#
+# VERSIONING (later): once tags/versions exist, replace the git-log note
+# generation below with the tag-based `gh api .../releases/generate-notes`
+# (which also honours .github/release.yml categorisation), and trigger on the
+# published release/tag instead of push.
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  patch-notes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0          # full history so we can diff the pushed range
+
+      - name: Build and post patch notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          WEBHOOK:  ${{ secrets.DISCORD_WEBHOOK_URL }}
+          BEFORE:   ${{ github.event.before }}
+          AFTER:    ${{ github.event.after }}
+          COMPARE:  ${{ github.event.compare }}
+        run: |
+          set -euo pipefail
+          if [ -z "${WEBHOOK:-}" ]; then
+            echo "::error::DISCORD_WEBHOOK_URL secret is not set"; exit 1
+          fi
+
+          # Range of commits introduced by this push. Guard the zero-SHA case
+          # (first push / force-push) by falling back to the latest commit.
+          ZERO="0000000000000000000000000000000000000000"
+          if [ "$BEFORE" = "$ZERO" ] || ! git cat-file -e "${BEFORE}^{commit}" 2>/dev/null; then
+            RANGE="${AFTER}~1..${AFTER}"
+          else
+            RANGE="${BEFORE}..${AFTER}"
+          fi
+
+          # PR numbers referenced by merge commits in this push.
+          mapfile -t PRS < <(git log --merges --pretty=format:'%s' "$RANGE" \
+                               | grep -oE '#[0-9]+' | tr -d '#' | sort -un || true)
+
+          # Keep only PRs whose base was `release` (the actual features); this
+          # drops the release->main promotion PR (base = main). PR titles come
+          # from the API and are JSON-encoded via jq below — never shell-eval'd.
+          NOTES=""
+          for pr in "${PRS[@]:-}"; do
+            [ -z "$pr" ] && continue
+            base=$(gh pr view "$pr" --json baseRefName -q .baseRefName 2>/dev/null || echo "")
+            if [ "$base" = "release" ]; then
+              title=$(gh pr view "$pr" --json title -q .title 2>/dev/null || echo "PR #$pr")
+              NOTES="${NOTES}- ${title} (#${pr})"$'\n'
+            fi
+          done
+
+          # Fallback: no qualifying PRs (e.g. a direct push) — use commit subjects.
+          if [ -z "$NOTES" ]; then
+            NOTES="$(git log --no-merges --pretty=format:'- %s' "$RANGE" | head -n 30 || true)"
+          fi
+          if [ -z "$NOTES" ]; then
+            echo "Nothing to announce for $RANGE"; exit 0
+          fi
+
+          # Discord embed descriptions cap at ~4096 chars.
+          if [ "${#NOTES}" -gt 3800 ]; then
+            NOTES="${NOTES:0:3800}"$'\n'"… and more — ${COMPARE}"
+          fi
+
+          DATE="$(date -u +%Y-%m-%d)"
+          payload=$(jq -n \
+            --arg title "◈ Nexum update — ${DATE}" \
+            --arg desc  "$NOTES" \
+            --arg url   "${COMPARE}" \
+            '{ embeds: [ {
+                 title: $title,
+                 url: $url,
+                 description: $desc,
+                 color: 6003711,
+                 footer: { text: "Nexum • eve-nexum.com" }
+            } ] }')
+
+          curl -fsSL -X POST -H "Content-Type: application/json" -d "$payload" "$WEBHOOK"
+          echo "Posted patch notes for $RANGE"

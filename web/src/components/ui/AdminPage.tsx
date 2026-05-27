@@ -17,12 +17,13 @@ ChartJS.register(ArcElement, CategoryScale, LinearScale, PointElement, LineEleme
 type Role = 'admin' | 'full' | 'edit' | 'readonly';
 const ROLES: Role[] = ['admin', 'full', 'edit', 'readonly'];
 
-type Tab = 'users' | 'maps' | 'reports' | 'audit';
+type Tab = 'users' | 'maps' | 'reports' | 'audit' | 'discord';
 
 const ALL_TABS: { key: Tab; label: string; path: string }[] = [
   { key: 'users',   label: 'Users',     path: '/admin/users'   },
   { key: 'maps',    label: 'Maps',      path: '/admin/maps'    },
   { key: 'reports', label: 'Reports',   path: '/admin/reports' },
+  { key: 'discord', label: 'Discord',   path: '/admin/discord' },
   { key: 'audit',   label: 'Audit log', path: '/admin/audit'   },
 ];
 
@@ -63,6 +64,7 @@ export function AdminPage() {
         {tab === 'users'   && (isAdmin || canSeeReports) && <UsersTab />}
         {tab === 'maps'    && isAdmin       && <MapsTab />}
         {tab === 'reports' && (isAdmin || canSeeReports) && <ReportsTab />}
+        {tab === 'discord' && isAdmin       && <DiscordTab />}
         {tab === 'audit'   && isAdmin       && <AuditTab />}
       </main>
     </div>
@@ -73,6 +75,7 @@ function pathToTab(path: string, isAdmin: boolean, canSeeReports: boolean): Tab 
   const fallback: Tab = isAdmin || canSeeReports ? 'users' : 'reports';
   if (path.startsWith('/admin/maps'))    return isAdmin       ? 'maps'    : fallback;
   if (path.startsWith('/admin/reports')) return (isAdmin || canSeeReports) ? 'reports' : fallback;
+  if (path.startsWith('/admin/discord')) return isAdmin       ? 'discord' : fallback;
   if (path.startsWith('/admin/audit'))   return isAdmin       ? 'audit'   : fallback;
   return fallback;
 }
@@ -163,15 +166,19 @@ function UsersTab() {
   );
 
   const load = useCallback(async () => {
-    setError(null);
     try {
       const r = await api<{ users: AdminUser[] }>('/api/admin/users');
       setUsers(r.users);
+      setError(null);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to load users');
     }
   }, []);
 
+  // load() is async and only setStates after its await (never synchronously),
+  // so this fetch-on-mount of a reusable loader is safe; the rule is a false
+  // positive here.
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { load(); }, [load]);
 
   async function changeRole(u: AdminUser, role: Role) {
@@ -347,15 +354,19 @@ function MapsTab() {
   const [deleteTarget, setDeleteTarget] = useState<AdminMap | null>(null);
 
   const load = useCallback(async () => {
-    setError(null);
     try {
       const r = await api<{ maps: AdminMap[] }>('/api/admin/maps');
       setMaps(r.maps);
+      setError(null);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to load maps');
     }
   }, []);
 
+  // load() is async and only setStates after its await (never synchronously),
+  // so this fetch-on-mount of a reusable loader is safe; the rule is a false
+  // positive here.
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { load(); }, [load]);
 
   async function setLock(m: AdminMap, locked: boolean) {
@@ -633,16 +644,26 @@ function UsersReport() {
   const [filter, setFilter] = useState<UserFilterKey>('all');
   const [window, setWindow] = useState<WindowKey>('all');
 
-  useEffect(() => {
+  // Reset to the loading state during render when the query changes, so the
+  // fetch effect below performs no synchronous setState.
+  const reqKey = `${filter}|${window}`;
+  const [prevKey, setPrevKey] = useState(reqKey);
+  if (prevKey !== reqKey) {
+    setPrevKey(reqKey);
     setRows(null);
     setError(null);
+  }
+
+  useEffect(() => {
+    let cancelled = false;
     const params = new URLSearchParams();
     if (filter !== 'all') params.set('filter', filter);
     if (window !== 'all') params.set('window', window);
     const qs = params.toString();
     api<{ users: UserReportRow[] }>(`/api/admin/reports/users${qs ? `?${qs}` : ''}`)
-      .then((r) => setRows(r.users))
-      .catch((e) => setError(e instanceof Error ? e.message : 'Failed to load users report'));
+      .then((r) => { if (!cancelled) setRows(r.users); })
+      .catch((e) => { if (!cancelled) setError(e instanceof Error ? e.message : 'Failed to load users report'); });
+    return () => { cancelled = true; };
   }, [filter, window]);
 
   const sortedRows = useMemo(() => {
@@ -890,13 +911,22 @@ function SystemsReport() {
   const [whSort, setWhSort] = useState<{ key: WhSortKey; dir: SortDir }>({ key: 'count', dir: 'desc' });
   const [window, setWindow] = useState<WindowKey>('month');
 
-  useEffect(() => {
+  // Reset to the loading state during render when the window changes, so the
+  // fetch effect below performs no synchronous setState.
+  const [prevWindow, setPrevWindow] = useState(window);
+  if (prevWindow !== window) {
+    setPrevWindow(window);
     setData(null);
     setError(null);
+  }
+
+  useEffect(() => {
+    let cancelled = false;
     const qs = window === 'all' ? '' : `?window=${window}`;
     api<SystemsReportData>(`/api/admin/reports/systems${qs}`)
-      .then(setData)
-      .catch((e) => setError(e instanceof Error ? e.message : 'Failed to load systems report'));
+      .then((d) => { if (!cancelled) setData(d); })
+      .catch((e) => { if (!cancelled) setError(e instanceof Error ? e.message : 'Failed to load systems report'); });
+    return () => { cancelled = true; };
   }, [window]);
 
   const sortedWh = useMemo(() => {
@@ -1276,4 +1306,174 @@ function formatEuropeanDate(date: Date): string {
 function csvEscape(value: string): string {
   if (/[",\r\n]/.test(value)) return `"${value.replace(/"/g, '""')}"`;
   return value;
+}
+
+// ── Discord tab ───────────────────────────────────────────────────────────────
+interface DiscordSettings {
+  corpId:     number | null;
+  allRegions: boolean;
+  regions:    string[];
+  maps:       { id: string; name: string; excluded: boolean }[];
+}
+interface RegionOption { id: number; name: string }
+
+function DiscordTab() {
+  const [data, setData]           = useState<DiscordSettings | null>(null);
+  const [regionOpts, setRegionOpts] = useState<RegionOption[]>([]);
+  const [error, setError]         = useState<string | null>(null);
+  const [saving, setSaving]       = useState(false);
+  const [saved, setSaved]         = useState(false);
+
+  // Editable copy of the region filter.
+  const [allRegions, setAllRegions] = useState(true);
+  const [regions, setRegions]       = useState<string[]>([]);
+  const [query, setQuery]           = useState('');
+
+  const load = useCallback(async () => {
+    try {
+      const [s, r] = await Promise.all([
+        api<DiscordSettings>('/api/admin/discord'),
+        api<{ regions: RegionOption[] }>('/api/regions'),
+      ]);
+      setData(s);
+      setAllRegions(s.allRegions);
+      setRegions(s.regions);
+      setRegionOpts(r.regions);
+      setError(null);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to load Discord settings');
+    }
+  }, []);
+  // load() is async and only setStates after its await (never synchronously),
+  // so this fetch-on-mount of a reusable loader is safe; the rule is a false
+  // positive here.
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { load(); }, [load]);
+
+  async function saveRegions() {
+    setSaving(true); setSaved(false);
+    try {
+      await api('/api/admin/discord', { method: 'PUT', body: JSON.stringify({ allRegions, regions }) });
+      setData((d) => (d ? { ...d, allRegions, regions } : d));
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Save failed');
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function toggleMap(id: string, excluded: boolean) {
+    setData((d) => (d ? { ...d, maps: d.maps.map((m) => (m.id === id ? { ...m, excluded } : m)) } : d));
+    try {
+      await api(`/api/admin/maps/${id}/discord`, { method: 'PATCH', body: JSON.stringify({ excluded }) });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Update failed');
+      load(); // reload to revert the optimistic toggle
+    }
+  }
+
+  const addRegion    = (name: string) => { if (!regions.includes(name)) setRegions([...regions, name]); setQuery(''); };
+  const removeRegion = (name: string) => setRegions(regions.filter((r) => r !== name));
+
+  const q = query.trim().toLowerCase();
+  const matches = q
+    ? regionOpts.filter((o) => o.name.toLowerCase().includes(q) && !regions.includes(o.name)).slice(0, 8)
+    : [];
+
+  if (!data && error) return (<><h2 className="admin-page__section-title">Discord</h2><div className="admin-page__error">{error}</div></>);
+  if (!data)          return (<><h2 className="admin-page__section-title">Discord</h2><div className="admin-page__loading">Loading…</div></>);
+  if (data.corpId == null) {
+    return (<><h2 className="admin-page__section-title">Discord</h2>
+      <div className="admin-page__empty">No corp context — Discord notifications apply to corp maps only.</div></>);
+  }
+
+  const dirty = allRegions !== data.allRegions || regions.slice().sort().join('|') !== data.regions.slice().sort().join('|');
+
+  return (
+    <>
+      <h2 className="admin-page__section-title">Discord notifications</h2>
+      {error && <div className="admin-page__error">{error}</div>}
+      <p className="discord-admin__hint">
+        Controls which wormhole notifications this corp&apos;s maps post to Discord. The webhook itself is set
+        server-side (DISCORD_WEBHOOK_URL). By default every map and region notifies — these settings only subtract.
+      </p>
+
+      <section className="discord-admin__section">
+        <h3 className="discord-admin__heading">Regions</h3>
+        <label className="discord-admin__radio">
+          <input type="radio" name="discord-regions" checked={allRegions} onChange={() => setAllRegions(true)} />
+          Notify for all regions
+        </label>
+        <label className="discord-admin__radio">
+          <input type="radio" name="discord-regions" checked={!allRegions} onChange={() => setAllRegions(false)} />
+          Only selected regions
+        </label>
+
+        {!allRegions && (
+          <div className="discord-admin__regions">
+            <div className="discord-admin__chips">
+              {regions.length === 0
+                ? <span className="admin-page__empty">No regions selected — nothing will notify until you add some.</span>
+                : regions.map((r) => (
+                    <span key={r} className="discord-admin__chip">
+                      {r}
+                      <button type="button" onClick={() => removeRegion(r)} aria-label={`Remove ${r}`}>×</button>
+                    </span>
+                  ))}
+            </div>
+            <input
+              type="text"
+              className="discord-admin__search"
+              placeholder="Type to search regions…"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+            {matches.length > 0 && (
+              <ul className="discord-admin__results">
+                {matches.map((o) => (
+                  <li key={o.id}><button type="button" onClick={() => addRegion(o.name)}>{o.name}</button></li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
+
+        <div className="discord-admin__actions">
+          <button className="btn btn--primary" disabled={!dirty || saving} onClick={saveRegions}>
+            {saving ? 'Saving…' : 'Save regions'}
+          </button>
+          {saved && <span className="discord-admin__saved">Saved</span>}
+        </div>
+      </section>
+
+      <section className="discord-admin__section">
+        <h3 className="discord-admin__heading">Excluded maps</h3>
+        <p className="discord-admin__hint">All maps notify by default. Tick a map to exclude it from Discord.</p>
+        {data.maps.length === 0
+          ? <div className="admin-page__empty">No corp maps yet.</div>
+          : (
+            <table className="admin-modal__table">
+              <thead><tr><th>Map</th><th>Exclude</th></tr></thead>
+              <tbody>
+                {data.maps.map((m) => (
+                  <tr key={m.id}>
+                    <td>{m.name}</td>
+                    <td>
+                      <input
+                        type="checkbox"
+                        className="sig-checkbox"
+                        checked={m.excluded}
+                        onChange={(e) => toggleMap(m.id, e.target.checked)}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+      </section>
+    </>
+  );
 }

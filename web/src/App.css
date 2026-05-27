@@ -6137,6 +6137,102 @@ select.sig-toolbar-btn option {
   padding: 24px 0;
 }
 
+/* ---- Admin Discord tab ---- */
+.discord-admin__hint {
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #8090a8;
+  max-width: 640px;
+  line-height: 1.5;
+  margin: 6px 0 18px;
+}
+.discord-admin__section {
+  margin: 0 0 28px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #1a2535;
+}
+.discord-admin__heading {
+  font-size: calc(15px * var(--font-scale, 1));
+  color: #c8d8f0;
+  margin: 0 0 10px;
+}
+.discord-admin__radio {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: calc(14px * var(--font-scale, 1));
+  color: #c8d2e6;
+  margin: 6px 0;
+  cursor: pointer;
+}
+.discord-admin__regions {
+  margin: 10px 0 4px;
+  padding-left: 24px;
+  max-width: 520px;
+  position: relative;
+}
+.discord-admin__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.discord-admin__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 6px 3px 10px;
+  background: rgba(91, 155, 255, 0.12);
+  color: #aecbff;
+  border-radius: 12px;
+  font-size: calc(13px * var(--font-scale, 1));
+}
+.discord-admin__chip button {
+  background: none;
+  border: none;
+  color: #aecbff;
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 1;
+  padding: 0 2px;
+}
+.discord-admin__chip button:hover { color: #fff; }
+.discord-admin__search {
+  width: 100%;
+  box-sizing: border-box;
+}
+.discord-admin__results {
+  list-style: none;
+  margin: 2px 0 0;
+  padding: 4px;
+  background: #0e1626;
+  border: 1px solid #1e2740;
+  border-radius: 6px;
+  max-width: 520px;
+}
+.discord-admin__results li button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  color: #c8d2e6;
+  padding: 6px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: calc(13px * var(--font-scale, 1));
+}
+.discord-admin__results li button:hover { background: rgba(91, 155, 255, 0.12); }
+.discord-admin__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+}
+.discord-admin__saved {
+  color: #3ddc84;
+  font-size: calc(13px * var(--font-scale, 1));
+}
+
 .admin-page__error {
   font-size: calc(13px * var(--font-scale, 1));
   color: #e05a5a;

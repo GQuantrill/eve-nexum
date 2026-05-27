@@ -449,6 +449,86 @@ adminRouter.delete('/maps/:id', async (req, res) => {
   res.json({ ok: true });
 });
 
+// ── Discord notification settings ─────────────────────────────────────────────
+// Per-corp region filter + per-map exclusions for the Discord webhook
+// notifications. Scoped to the admin's own corp (req.session.userCorpId). See
+// discord_filters_feature.md.
+
+// GET /api/admin/discord — current settings + this corp's maps with their
+// excluded state (excluded = NOT discord_notify).
+adminRouter.get('/discord', async (req, res) => {
+  const corpId = req.session.userCorpId ?? null;
+  if (corpId == null) {
+    res.json({ corpId: null, allRegions: true, regions: [], maps: [] });
+    return;
+  }
+  const [settings, maps] = await Promise.all([
+    db.query<{ allRegions: boolean; regions: string[] }>(
+      `SELECT all_regions AS "allRegions", regions FROM corp_discord_settings WHERE corp_id = $1`,
+      [corpId],
+    ),
+    db.query<{ id: string; name: string; excluded: boolean }>(
+      `SELECT id, name, NOT discord_notify AS excluded FROM maps WHERE corp_id = $1 ORDER BY name`,
+      [corpId],
+    ),
+  ]);
+  const row = settings.rows[0];
+  res.json({
+    corpId,
+    allRegions: row?.allRegions ?? true,
+    regions:    row?.regions ?? [],
+    maps:       maps.rows,
+  });
+});
+
+// PUT /api/admin/discord — set the region filter for the admin's corp.
+adminRouter.put('/discord', async (req, res) => {
+  const corpId = req.session.userCorpId ?? null;
+  if (corpId == null) { res.status(400).json({ error: 'No corp context' }); return; }
+
+  const body = req.body as { allRegions?: unknown; regions?: unknown };
+  const allRegions = body.allRegions !== false; // default true
+  let regions = Array.isArray(body.regions)
+    ? body.regions.filter((r): r is string => typeof r === 'string')
+    : [];
+
+  // Validate region names against the known region list (drop anything bogus).
+  if (regions.length) {
+    const { rows } = await db.query<{ name: string }>(
+      `SELECT name FROM map_regions WHERE name = ANY($1::text[])`, [regions],
+    );
+    const valid = new Set(rows.map((r) => r.name));
+    regions = [...new Set(regions.filter((r) => valid.has(r)))];
+  }
+
+  await db.query(
+    `INSERT INTO corp_discord_settings (corp_id, all_regions, regions, updated_at)
+     VALUES ($1, $2, $3, NOW())
+     ON CONFLICT (corp_id) DO UPDATE
+       SET all_regions = EXCLUDED.all_regions, regions = EXCLUDED.regions, updated_at = NOW()`,
+    [corpId, allRegions, regions],
+  );
+  res.json({ ok: true, allRegions, regions });
+});
+
+// PATCH /api/admin/maps/:id/discord — exclude / re-include one of the corp's
+// maps from Discord notifications. Maps notify by default, so this manages the
+// exceptions. Scoped to the admin's corp.
+adminRouter.patch('/maps/:id/discord', async (req, res) => {
+  const mapId  = req.params.id;
+  const corpId = req.session.userCorpId ?? null;
+  if (!mapId)            { res.status(400).json({ error: 'invalid map id' }); return; }
+  if (corpId == null)    { res.status(400).json({ error: 'No corp context' }); return; }
+  const excluded = (req.body as { excluded?: unknown }).excluded === true;
+
+  const { rowCount } = await db.query(
+    `UPDATE maps SET discord_notify = $1, updated_at = NOW() WHERE id = $2 AND corp_id = $3`,
+    [!excluded, mapId, corpId],
+  );
+  if (!rowCount) { res.status(404).json({ error: 'Map not found' }); return; }
+  res.json({ ok: true, excluded });
+});
+
 // Maps a window query-param value to a Postgres interval string. NULL means
 // "no time bound" — used for the 'all' window. Keys are the only values the
 // frontend is allowed to send.

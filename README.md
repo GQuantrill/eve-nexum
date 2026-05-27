@@ -53,7 +53,7 @@
 - **Storm tracking** — active null-sec storms (Electric / Gamma / Exotic / Plasma) from the community-maintained [EveScout Rescue stormtrack](https://evescoutrescue.com/home/stormtrack.php) feed surface as a colour-coded ⚡ icon on matching system nodes, with a tooltip showing last report and reporter. Refreshed every 30 minutes. (ESI doesn't expose stellar phenomena yet; this scrapes the public community feed and will swap to ESI when CCP ships one.)
 - **Proximity alerts** — incursions, pirate insurgencies, **and hostile-sov-holder systems** (any sov-holding system where you've set the corp or alliance to a negative standing) appear as a toolbar chip showing the closest threat in jumps. Configurable threshold with browser notification + audio ping when you cross into the zone.
 - **Inbound K162 alert** — when a signature's wormhole type is set to K162 anywhere on the map, a toast + browser notification + distinct audio ping fire immediately. K162 means "the other side opened this hole", so it's a strong intel signal that something just connected into your chain.
-- **Discord notifications** — push corp chain intel to a Discord channel so alerts land even when nobody's watching the tab. Fires server-side on an inbound K162 and on a new wormhole connection, scoped to corp maps and configured per corp via a webhook URL (`DISCORD_WEBHOOK_URL`). Best-effort and rate-limit-aware; bulk operations like region seeding never spam the channel. See [Discord notifications](#discord-notifications).
+- **Discord notifications** — push corp chain intel to a Discord channel so alerts land even when nobody's watching the tab. Fires server-side on an inbound K162 and on a new wormhole connection, scoped to corp maps and configured per corp via a webhook URL (`DISCORD_WEBHOOK_URL`). Admins can narrow which regions and maps notify from the **Discord** tab in the admin panel. Best-effort and rate-limit-aware; bulk operations like region seeding never spam the channel. See [Discord notifications](#discord-notifications).
 - **Chain exit summary** — sidebar widget that counts every K-space exit currently on the map by security class (HS / LS / NS) as coloured chips, and pinpoints the nearest gate route to Jita ("Nearest Jita: 7j via Amarr") so loot runs and logistics planning don't need a manual route check.
 - **Route planner** — server-side BFS over stargates + your live chain, so a route through a wormhole hop is a single click.
 - **Location tracking** — opt-in live character location dot in the toolbar plus per-map "you are here" indicator.
@@ -117,7 +117,7 @@ Edit `.env` and fill in the required values:
 | `CORP_MAP_TIME` | Optional | Days an idle corp map can sit untouched before it's auto-archived. Default `30`. |
 | `MAX_USER_MAPS` | Optional | Max number of personal maps per user. Default `5`. |
 | `MAX_CORP_MAPS` | Optional | Max number of corp maps per corp. Default `5`. |
-| `DISCORD_WEBHOOK_URL` | Optional | Discord webhook(s) for corp-intel notifications (inbound K162, new connections). One URL fires for **every** corp map; for multi-corp deployments use `corpId=URL` pairs (comma-separated) to route each corp to its own channel — e.g. `98000001=https://discord.com/api/webhooks/…,98000002=https://discord.com/api/webhooks/…`. Personal maps never notify. Leave unset to disable. See [Discord notifications](#discord-notifications). |
+| `DISCORD_WEBHOOK_URL` | Optional | Discord webhook(s) for corp-intel notifications (inbound K162, new connections). One URL fires for **every** corp map; for multi-corp deployments use `corpId=URL` pairs (comma-separated) to route each corp to its own channel — e.g. `98000001=https://discord.com/api/webhooks/…,98000002=https://discord.com/api/webhooks/…`. Personal maps never notify. Leave unset to disable. Which regions/maps actually notify is then filtered per corp in the admin **Discord** tab. See [Discord notifications](#discord-notifications). |
 
 **EVE developer app scopes**
 
@@ -472,13 +472,21 @@ DISCORD_WEBHOOK_URL=98000001=https://discord.com/api/webhooks/1/a,98000002=https
 
 The webhook URL is a secret: it lives only in the server env, is never sent to the browser, and is masked in logs. Changing it takes effect on the next server restart. Leave it unset to disable notifications entirely.
 
+**Filtering (admin).** By default every corp map and region notifies. The **Discord** tab in the admin panel lets an admin narrow this per corp, without touching the webhook:
+
+- **Regions** — notify for all regions (default), or only a chosen allowlist. The wormhole's system region is checked at send time; for a new connection, either endpoint's region qualifies.
+- **Excluded maps** — every map notifies by default; tick maps to exclude them.
+
+These settings only ever *subtract* from the default, and new maps are always included automatically, so nothing silently goes dark.
+
 ### Admin operations
 
-Admins reach the dashboard from the **Admin** button in the toolbar, which lands them at `#/admin/users`. The page has four tabs:
+Admins reach the dashboard from the **Admin** button in the toolbar, which lands them at `#/admin/users`. The page has five tabs:
 
 - **Users** — role select, block / unblock, recheck corp via ESI.
 - **Maps** — every corp map across every listed corp. Force-lock, force-unlock, force-delete. Solo maps are deliberately excluded — they belong to individual users.
 - **Reports** — placeholder for future ops reports.
+- **Discord** — per-corp notification filters: a region allowlist and per-map exclusions (see [Discord notifications](#discord-notifications)).
 - **Audit log** — last 200 admin actions, newest first.
 
 Each tab is also reachable at its own hash route (`#/admin/maps`, `#/admin/audit`, …). All mutating actions write to the `admin_audit` table with the actor, target, old value, and new value.

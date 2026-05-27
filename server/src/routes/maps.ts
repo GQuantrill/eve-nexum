@@ -13,6 +13,7 @@ import { reportPresence, removePresence, presenceSnapshot } from '../services/pr
 import { notifyDiscord, webhookFor, k162Embed, connectionEmbed } from '../services/discord.js';
 
 const log = createLogger('maps');
+const discordLog = createLogger('discord');
 
 // EVE system name → numeric ID lookup against the SDE-seeded solar_systems
 // table. Used to backfill eve_system_id at write time when the client posts
@@ -203,36 +204,131 @@ async function requireMapWrite(res: Response, mapId: string, req: Request): Prom
 // (a webhook failure must not affect the user's action). Hooked into the
 // interactive handlers — never the bulk seed/merge paths — so a region seed
 // can't flood the channel. See discord_webhooks_feature.md.
+//
+// Per-corp region + per-map filtering (see discord_filters_feature.md) is
+// applied at send time: a notification goes out only if the map isn't excluded
+// AND the corp accepts the event's region. `regionAllowed` is the region half —
+// pass on `all_regions`, or if any of the event's system regions is allowlisted.
+function regionAllowed(allRegions: boolean, allow: string[], names: (string | null)[]): boolean {
+  if (allRegions) return true;
+  return names.some((n) => n != null && allow.includes(n));
+}
 
-function dispatchK162(meta: MapMeta, systemId: string, actor: string | null): void {
-  if (!webhookFor(meta.corpId)) return; // off, or personal map (corpId === null)
-  db.query<{ name: string; systemClass: string; mapName: string }>(
-    `SELECT s.name, s.system_class AS "systemClass", m.name AS "mapName"
-       FROM map_systems s JOIN maps m ON m.id = s.map_id
-      WHERE s.id = $1`,
-    [systemId],
-  ).then(({ rows }) => {
+// K162 notifications are deferred briefly so a follow-up edit — most usefully
+// the wormhole's "leads to" — can be picked up and included. The send is keyed
+// by signature id; at fire time we re-read the signature and send whatever it
+// is *then* (skipping it if it's no longer a K162). A fixed cap means we never
+// wait longer than this, and a second detection for an already-pending sig is
+// ignored so the original deadline stands.
+const K162_DEFER_MS = 10_000;
+interface PendingK162 { timer: ReturnType<typeof setTimeout>; corpId: number | null; actor: string | null; }
+const pendingK162 = new Map<string, PendingK162>();
+
+function dispatchK162(meta: MapMeta, sigId: string, systemId: string, actor: string | null): void {
+  if (!webhookFor(meta.corpId)) {
+    discordLog.info(`K162 detected (system ${systemId}) but not sending — no webhook for corpId=${meta.corpId ?? 'null (personal map; webhooks are corp-maps only)'}`);
+    return;
+  }
+  if (pendingK162.has(sigId)) {
+    discordLog.info(`K162 (sig ${sigId}) already pending — keeping the existing ${K162_DEFER_MS / 1000}s window`);
+    return;
+  }
+  discordLog.info(`K162 on corp map (corpId=${meta.corpId}, sig ${sigId}) — deferring ${K162_DEFER_MS / 1000}s to catch a leads-to`);
+  const timer = setTimeout(() => {
+    pendingK162.delete(sigId);
+    void fireK162(meta.corpId, sigId, actor);
+  }, K162_DEFER_MS);
+  pendingK162.set(sigId, { timer, corpId: meta.corpId, actor });
+}
+
+// Send a pending K162 immediately — e.g. once its leads-to has been filled in —
+// instead of waiting out the rest of the defer window. No-op if nothing is
+// pending for this signature. Fires with the original detection's context.
+function flushK162(sigId: string): void {
+  const p = pendingK162.get(sigId);
+  if (!p) return;
+  clearTimeout(p.timer);
+  pendingK162.delete(sigId);
+  discordLog.info(`K162 (sig ${sigId}) leads-to set — sending now instead of waiting`);
+  void fireK162(p.corpId, sigId, p.actor);
+}
+
+// Re-read the signature now (after the defer window) and send if it's still a
+// K162, including the leads-to if one was set in the meantime.
+async function fireK162(corpId: number | null, sigId: string, actor: string | null): Promise<void> {
+  try {
+    const { rows } = await db.query<{
+      whType: string | null; leadsTo: string | null; system: string; systemClass: string;
+      region: string | null; mapName: string; mapEnabled: boolean; allRegions: boolean; regions: string[];
+    }>(
+      `SELECT sg.wh_type AS "whType", sg.wh_leads_to AS "leadsTo",
+              s.name AS "system", s.system_class AS "systemClass", s.region_name AS "region",
+              m.name AS "mapName", m.discord_notify AS "mapEnabled",
+              COALESCE(cds.all_regions, TRUE)        AS "allRegions",
+              COALESCE(cds.regions, '{}'::text[])    AS "regions"
+         FROM map_signatures sg
+         JOIN map_systems s ON s.id = sg.system_id
+         JOIN maps m ON m.id = s.map_id
+         LEFT JOIN corp_discord_settings cds ON cds.corp_id = $2
+        WHERE sg.id = $1`,
+      [sigId, corpId],
+    );
     const r = rows[0];
-    if (r) notifyDiscord(meta.corpId, k162Embed({ system: r.name, systemClass: r.systemClass, mapName: r.mapName, actor }));
-  }).catch(() => { /* best-effort */ });
+    if (!r) { discordLog.info(`K162 (sig ${sigId}) removed before send — skipping`); return; }
+    if ((r.whType ?? '').toUpperCase() !== 'K162') {
+      discordLog.info(`K162 (sig ${sigId}) changed to "${r.whType ?? ''}" before send — skipping`);
+      return;
+    }
+    if (!r.mapEnabled) {
+      discordLog.info(`K162 (sig ${sigId}) suppressed — map "${r.mapName}" is excluded from Discord`);
+      return;
+    }
+    if (!regionAllowed(r.allRegions, r.regions, [r.region])) {
+      discordLog.info(`K162 (sig ${sigId}) suppressed — region "${r.region ?? 'unknown'}" not in the corp filter`);
+      return;
+    }
+    notifyDiscord(corpId, k162Embed({ system: r.system, systemClass: r.systemClass, leadsTo: r.leadsTo, mapName: r.mapName, actor }));
+  } catch (e) {
+    discordLog.warn(`K162 deferred dispatch failed: ${(e as Error).message}`);
+  }
 }
 
 function dispatchNewConnection(
   meta: MapMeta, mapId: string, sourceId: string, targetId: string,
   whType: string | null, size: string | null, actor: string | null,
 ): void {
-  if (!webhookFor(meta.corpId)) return;
-  db.query<{ a: string; b: string; mapName: string }>(
-    `SELECT a.name AS a, b.name AS b, m.name AS "mapName"
+  if (!webhookFor(meta.corpId)) {
+    discordLog.info(`new connection but not sending — no webhook for corpId=${meta.corpId ?? 'null (personal map; webhooks are corp-maps only)'}`);
+    return;
+  }
+  discordLog.info(`new connection on corp map (corpId=${meta.corpId}) — building notification`);
+  db.query<{
+    a: string; b: string; regionA: string | null; regionB: string | null;
+    mapName: string; mapEnabled: boolean; allRegions: boolean; regions: string[];
+  }>(
+    `SELECT a.name AS a, b.name AS b, a.region_name AS "regionA", b.region_name AS "regionB",
+            m.name AS "mapName", m.discord_notify AS "mapEnabled",
+            COALESCE(cds.all_regions, TRUE)     AS "allRegions",
+            COALESCE(cds.regions, '{}'::text[]) AS "regions"
        FROM maps m
        JOIN map_systems a ON a.id = $2
        JOIN map_systems b ON b.id = $3
+       LEFT JOIN corp_discord_settings cds ON cds.corp_id = $4
       WHERE m.id = $1`,
-    [mapId, sourceId, targetId],
+    [mapId, sourceId, targetId, meta.corpId],
   ).then(({ rows }) => {
     const r = rows[0];
-    if (r) notifyDiscord(meta.corpId, connectionEmbed({ a: r.a, b: r.b, whType, size, mapName: r.mapName, actor }));
-  }).catch(() => { /* best-effort */ });
+    if (!r) { discordLog.warn(`connection dispatch: endpoints not found`); return; }
+    if (!r.mapEnabled) {
+      discordLog.info(`new connection suppressed — map "${r.mapName}" is excluded from Discord`);
+      return;
+    }
+    if (!regionAllowed(r.allRegions, r.regions, [r.regionA, r.regionB])) {
+      discordLog.info(`new connection suppressed — neither region (${r.regionA ?? '?'} / ${r.regionB ?? '?'}) in the corp filter`);
+      return;
+    }
+    notifyDiscord(meta.corpId, connectionEmbed({ a: r.a, b: r.b, whType, size, mapName: r.mapName, actor }));
+  }).catch((e) => discordLog.warn(`connection dispatch query failed: ${(e as Error).message}`));
 }
 
 // Confirms a system UUID actually belongs to the supplied map; prevents
@@ -1612,7 +1708,8 @@ mapsRouter.post('/:mapId/systems/:systemId/signatures', async (req, res) => {
   db.query(`UPDATE map_systems SET last_activity_at = NOW() WHERE id = $1`, [systemId]).catch(console.error);
   recordGhostSiteIfMatch(systemId, name);
   publishToMap(mapId, { type: 'sig.changed', actor: req.get('x-client-id') ?? null, systemId });
-  if ((whType ?? '').toUpperCase() === 'K162') dispatchK162(access, systemId, req.session.characterName ?? null);
+  if (whType) discordLog.info(`sig POST on system ${systemId}: whType="${whType}"`);
+  if ((whType ?? '').toUpperCase() === 'K162') dispatchK162(access, rows[0].id, systemId, req.session.characterName ?? null);
   res.status(201).json(rows[0]);
 });
 
@@ -1634,6 +1731,9 @@ mapsRouter.patch('/:mapId/systems/:systemId/signatures/:sigId', async (req, res)
       `SELECT wh_type FROM map_signatures WHERE id = $1 AND system_id = $2`, [sigId, systemId]);
     prevWasK162 = (prev[0]?.wh_type ?? '').toUpperCase() === 'K162';
   }
+  if (typeof updates.whType === 'string') {
+    discordLog.info(`sig PATCH on system ${systemId}: whType="${updates.whType}" (settingK162=${settingK162}, prevWasK162=${prevWasK162})`);
+  }
 
   const sets: string[] = ['updated_at = NOW()'];
   const vals: unknown[] = [];
@@ -1649,7 +1749,10 @@ mapsRouter.patch('/:mapId/systems/:systemId/signatures/:sigId', async (req, res)
   db.query(`UPDATE map_systems SET last_activity_at = NOW() WHERE id = $1`, [systemId]).catch(console.error);
   if (typeof updates.name === 'string') recordGhostSiteIfMatch(systemId, updates.name);
   publishToMap(mapId, { type: 'sig.changed', actor: req.get('x-client-id') ?? null, systemId });
-  if (settingK162 && !prevWasK162) dispatchK162(access, systemId, req.session.characterName ?? null);
+  if (settingK162 && !prevWasK162) dispatchK162(access, sigId, systemId, req.session.characterName ?? null);
+  // If the leads-to was just filled in, send any pending K162 now rather than
+  // waiting out the rest of the window — the intel we were waiting for is here.
+  if (typeof updates.whLeadsTo === 'string' && updates.whLeadsTo.trim()) flushK162(sigId);
   res.json({ ok: true });
 });
 
