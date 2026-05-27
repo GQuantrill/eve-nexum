@@ -53,9 +53,13 @@ function MiniLineChart({ title, values, color, signed = false }: {
 
   const baselineY = signed ? yOf(0)   : (n > 0 ? yOf(avg) : PAD.top + IH);
   const baselineColor = signed ? '#3a4a68' : '#f0a030';
-  const yTicks = signed
-    ? [-maxVal, -maxVal / 2, 0, maxVal / 2, maxVal].map((v) => Math.round(v))
-    : [0, 1, 2, 3].map((t) => Math.round((maxVal / 3) * t));
+  // Dedupe — at low maxVal the rounding collapses adjacent ticks to the same
+  // integer (e.g. [0,0,1,1]), which would also produce duplicate React keys.
+  const yTicks = [...new Set(
+    signed
+      ? [-maxVal, -maxVal / 2, 0, maxVal / 2, maxVal].map((v) => Math.round(v))
+      : [0, 1, 2, 3].map((t) => Math.round((maxVal / 3) * t)),
+  )];
   const polyline = values.map((v, i) => `${xOfIdx(i).toFixed(1)},${yOf(v).toFixed(1)}`).join(' ');
 
   return (

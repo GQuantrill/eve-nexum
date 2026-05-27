@@ -23,7 +23,7 @@ function SigSparkline({ values }: { values: number[] }) {
     : '';
 
   // Y ticks: 0, mid, max
-  const yTicks = [0, Math.round(maxVal / 2), maxVal];
+  const yTicks = [...new Set([0, Math.round(maxVal / 2), maxVal])];
   // X ticks: 30d ago (left) and today (right)
   const xLabels: { x: number; label: string }[] = n > 0 ? [
     { x: xOf(0),     label: `${n - 1}d ago` },
