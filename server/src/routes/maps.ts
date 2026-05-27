@@ -10,6 +10,7 @@ import { resolveEntityNames } from '../services/entityNames.js';
 import { audit } from '../services/audit.js';
 import { subscribeMap, publishToMap } from '../services/mapEvents.js';
 import { reportPresence, removePresence, presenceSnapshot } from '../services/presence.js';
+import { notifyDiscord, webhookFor, k162Embed, connectionEmbed } from '../services/discord.js';
 
 const log = createLogger('maps');
 
@@ -194,6 +195,44 @@ async function requireMapWrite(res: Response, mapId: string, req: Request): Prom
     res.status(403).json({ error: 'Map is locked' }); return null;
   }
   return access;
+}
+
+// ── Discord intel webhooks ────────────────────────────────────────────────────
+// Best-effort, corp-maps-only notifications. These resolve the human-readable
+// names off the request path and enqueue; they never block the handler or throw
+// (a webhook failure must not affect the user's action). Hooked into the
+// interactive handlers — never the bulk seed/merge paths — so a region seed
+// can't flood the channel. See discord_webhooks_feature.md.
+
+function dispatchK162(meta: MapMeta, systemId: string, actor: string | null): void {
+  if (!webhookFor(meta.corpId)) return; // off, or personal map (corpId === null)
+  db.query<{ name: string; systemClass: string; mapName: string }>(
+    `SELECT s.name, s.system_class AS "systemClass", m.name AS "mapName"
+       FROM map_systems s JOIN maps m ON m.id = s.map_id
+      WHERE s.id = $1`,
+    [systemId],
+  ).then(({ rows }) => {
+    const r = rows[0];
+    if (r) notifyDiscord(meta.corpId, k162Embed({ system: r.name, systemClass: r.systemClass, mapName: r.mapName, actor }));
+  }).catch(() => { /* best-effort */ });
+}
+
+function dispatchNewConnection(
+  meta: MapMeta, mapId: string, sourceId: string, targetId: string,
+  whType: string | null, size: string | null, actor: string | null,
+): void {
+  if (!webhookFor(meta.corpId)) return;
+  db.query<{ a: string; b: string; mapName: string }>(
+    `SELECT a.name AS a, b.name AS b, m.name AS "mapName"
+       FROM maps m
+       JOIN map_systems a ON a.id = $2
+       JOIN map_systems b ON b.id = $3
+      WHERE m.id = $1`,
+    [mapId, sourceId, targetId],
+  ).then(({ rows }) => {
+    const r = rows[0];
+    if (r) notifyDiscord(meta.corpId, connectionEmbed({ a: r.a, b: r.b, whType, size, mapName: r.mapName, actor }));
+  }).catch(() => { /* best-effort */ });
 }
 
 // Confirms a system UUID actually belongs to the supplied map; prevents
@@ -1449,8 +1488,9 @@ mapsRouter.post('/:mapId/connections', async (req, res) => {
   const access = await requireMapWrite(res, mapId, req);
   if (!access) return;
 
+  let inserted = 0;
   try {
-    await db.query(
+    const ins = await db.query(
       `INSERT INTO map_connections
          (id, map_id, source_id, target_id, source_handle, target_handle,
           connection_type, mass_status, time_status, size)
@@ -1459,6 +1499,7 @@ mapsRouter.post('/:mapId/connections', async (req, res) => {
       [id, mapId, sourceId, targetId, sourceHandle ?? null, targetHandle ?? null,
        connectionType ?? 'standard', massStatus ?? null, timeStatus ?? null, size ?? 'large'],
     );
+    inserted = ins.rowCount ?? 0;
   } catch (err) {
     // FK violation = one of the endpoint systems doesn't exist on the
     // server (likely a client race: connection POST arrived before its
@@ -1483,6 +1524,11 @@ mapsRouter.post('/:mapId/connections', async (req, res) => {
   ).then(({ rows }) => {
     if (rows[0]) publishToMap(mapId, { type: 'connection.add', actor: req.get('x-client-id') ?? null, connection: rows[0] });
   }).catch(console.error);
+  // Only notify on a genuinely new wormhole connection — not a duplicate-id
+  // retry, and not an in-game stargate (jumpgate) link.
+  if (inserted > 0 && (connectionType ?? 'standard') !== 'jumpgate') {
+    dispatchNewConnection(access, mapId, sourceId, targetId, null, size ?? 'large', req.session.characterName ?? null);
+  }
   res.status(201).json({ ok: true });
 });
 
@@ -1566,6 +1612,7 @@ mapsRouter.post('/:mapId/systems/:systemId/signatures', async (req, res) => {
   db.query(`UPDATE map_systems SET last_activity_at = NOW() WHERE id = $1`, [systemId]).catch(console.error);
   recordGhostSiteIfMatch(systemId, name);
   publishToMap(mapId, { type: 'sig.changed', actor: req.get('x-client-id') ?? null, systemId });
+  if ((whType ?? '').toUpperCase() === 'K162') dispatchK162(access, systemId, req.session.characterName ?? null);
   res.status(201).json(rows[0]);
 });
 
@@ -1577,6 +1624,17 @@ mapsRouter.patch('/:mapId/systems/:systemId/signatures/:sigId', async (req, res)
 
   const colMap: Record<string, string> = { sigId: 'sig_id', sigType: 'sig_type', name: 'name', notes: 'notes', whType: 'wh_type', whLeadsTo: 'wh_leads_to' };
   const updates = req.body as Record<string, unknown>;
+
+  // Detect a transition *into* K162 (not a re-save of one already K162) so the
+  // Discord notice fires once, matching the client's inbound-K162 alert.
+  const settingK162 = typeof updates.whType === 'string' && updates.whType.toUpperCase() === 'K162';
+  let prevWasK162 = false;
+  if (settingK162) {
+    const { rows: prev } = await db.query<{ wh_type: string | null }>(
+      `SELECT wh_type FROM map_signatures WHERE id = $1 AND system_id = $2`, [sigId, systemId]);
+    prevWasK162 = (prev[0]?.wh_type ?? '').toUpperCase() === 'K162';
+  }
+
   const sets: string[] = ['updated_at = NOW()'];
   const vals: unknown[] = [];
 
@@ -1591,6 +1649,7 @@ mapsRouter.patch('/:mapId/systems/:systemId/signatures/:sigId', async (req, res)
   db.query(`UPDATE map_systems SET last_activity_at = NOW() WHERE id = $1`, [systemId]).catch(console.error);
   if (typeof updates.name === 'string') recordGhostSiteIfMatch(systemId, updates.name);
   publishToMap(mapId, { type: 'sig.changed', actor: req.get('x-client-id') ?? null, systemId });
+  if (settingK162 && !prevWasK162) dispatchK162(access, systemId, req.session.characterName ?? null);
   res.json({ ok: true });
 });
 

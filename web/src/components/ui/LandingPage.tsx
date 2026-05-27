@@ -4,7 +4,7 @@ import {
   GraphIcon, MapTrifoldIcon, GaugeIcon, MagnifyingGlassIcon, SelectionIcon, ImageIcon, HourglassIcon,
   UsersIcon, StackIcon, ArrowsMergeIcon, ArrowsClockwiseIcon, LockIcon, ShieldCheckIcon,
   CardsIcon, WaveformIcon, BuildingsIcon, SparkleIcon, ChartLineIcon, FlagBannerIcon, SwordIcon, HandshakeIcon,
-  PathIcon, StarIcon, SnowflakeIcon, LightningIcon, WarningIcon, NavigationArrowIcon, MapPinIcon, BroadcastIcon,
+  PathIcon, StarIcon, SnowflakeIcon, LightningIcon, WarningIcon, NavigationArrowIcon, MapPinIcon, BroadcastIcon, BellRingingIcon,
   CommandIcon, HouseIcon, SkullIcon, ChartBarIcon, PulseIcon, EyeIcon, SidebarIcon,
   SquaresFourIcon, UserGearIcon, TableIcon, ChartDonutIcon, ClockIcon, ClipboardTextIcon, TagIcon, IdentificationCardIcon,
 } from '@phosphor-icons/react';
@@ -177,6 +177,11 @@ const FEATURE_SECTIONS: FeatureSection[] = [
         icon: WarningIcon,
         title: 'Proximity alerts',
         desc: 'Browser notification plus an audio ping when you\'re within a configurable number of jumps of an active incursion, pirate insurgency, or a sov-holding system whose corp / alliance you\'ve set to red. Persistent toolbar chip shows the nearest threat at a glance.',
+      },
+      {
+        icon: BellRingingIcon,
+        title: 'Discord notifications',
+        desc: 'Push corp chain intel to a Discord channel so alerts land even when nobody\'s watching the tab. Fires server-side on an inbound K162 or a new wormhole connection, scoped to corp maps and configured per corp via a webhook URL. Best-effort and rate-limit-aware; bulk operations like region seeding never spam the channel.',
       },
       {
         icon: NavigationArrowIcon,

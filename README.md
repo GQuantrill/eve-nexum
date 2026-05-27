@@ -49,6 +49,7 @@ A wormhole mapping tool for EVE Online. Track systems, signatures, structures, k
 - **Storm tracking** — active null-sec storms (Electric / Gamma / Exotic / Plasma) from the community-maintained [EveScout Rescue stormtrack](https://evescoutrescue.com/home/stormtrack.php) feed surface as a colour-coded ⚡ icon on matching system nodes, with a tooltip showing last report and reporter. Refreshed every 30 minutes. (ESI doesn't expose stellar phenomena yet; this scrapes the public community feed and will swap to ESI when CCP ships one.)
 - **Proximity alerts** — incursions, pirate insurgencies, **and hostile-sov-holder systems** (any sov-holding system where you've set the corp or alliance to a negative standing) appear as a toolbar chip showing the closest threat in jumps. Configurable threshold with browser notification + audio ping when you cross into the zone.
 - **Inbound K162 alert** — when a signature's wormhole type is set to K162 anywhere on the map, a toast + browser notification + distinct audio ping fire immediately. K162 means "the other side opened this hole", so it's a strong intel signal that something just connected into your chain.
+- **Discord notifications** — push corp chain intel to a Discord channel so alerts land even when nobody's watching the tab. Fires server-side on an inbound K162 and on a new wormhole connection, scoped to corp maps and configured per corp via a webhook URL (`DISCORD_WEBHOOK_URL`). Best-effort and rate-limit-aware; bulk operations like region seeding never spam the channel. See [Discord notifications](#discord-notifications).
 - **Chain exit summary** — sidebar widget that counts every K-space exit currently on the map by security class (HS / LS / NS) as coloured chips, and pinpoints the nearest gate route to Jita ("Nearest Jita: 7j via Amarr") so loot runs and logistics planning don't need a manual route check.
 - **Route planner** — server-side BFS over stargates + your live chain, so a route through a wormhole hop is a single click.
 - **Location tracking** — opt-in live character location dot in the toolbar plus per-map "you are here" indicator.
@@ -112,6 +113,7 @@ Edit `.env` and fill in the required values:
 | `CORP_MAP_TIME` | Optional | Days an idle corp map can sit untouched before it's auto-archived. Default `30`. |
 | `MAX_USER_MAPS` | Optional | Max number of personal maps per user. Default `5`. |
 | `MAX_CORP_MAPS` | Optional | Max number of corp maps per corp. Default `5`. |
+| `DISCORD_WEBHOOK_URL` | Optional | Discord webhook(s) for corp-intel notifications (inbound K162, new connections). One URL fires for **every** corp map; for multi-corp deployments use `corpId=URL` pairs (comma-separated) to route each corp to its own channel — e.g. `98000001=https://discord.com/api/webhooks/…,98000002=https://discord.com/api/webhooks/…`. Personal maps never notify. Leave unset to disable. See [Discord notifications](#discord-notifications). |
 
 **EVE developer app scopes**
 
@@ -438,6 +440,33 @@ The corp gate is fail-closed and **does not exempt `ADMIN_CHAR_ID`**. If your bo
 3. Edit the `users` table directly (last resort).
 
 If you want a permanent break-glass, run a second `ADMIN_CHAR_ID`-eligible character in a corp you control and don't plan to leave.
+
+### Discord notifications
+
+Set `DISCORD_WEBHOOK_URL` to push chain intel into a Discord channel so alerts reach people who aren't watching Nexum. It fires **server-side**, so it doesn't depend on anyone having the map open.
+
+**What fires:**
+
+- **Inbound K162** — a signature's wormhole type is set to K162 (something just connected into the chain).
+- **New wormhole connection** — a connection is drawn between two systems.
+
+**Scope and behaviour:**
+
+- **Corp maps only.** Personal maps never notify — their scanning stays private.
+- **Bulk operations are excluded.** Seeding a region or merging maps creates many connections at once and deliberately does *not* post to Discord; only interactive edits do.
+- **Best-effort.** A webhook failure (Discord down, timeout, rate-limit) is logged and dropped — it never affects the edit that triggered it. Delivery is paced and honours Discord's rate limits.
+
+**Configuration** — create a webhook in your Discord channel (Channel → Edit → Integrations → Webhooks) and set the URL:
+
+```bash
+# One channel for every corp map:
+DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/123/abc
+
+# Multi-corp: route each corp to its own channel (corpId=URL, comma-separated):
+DISCORD_WEBHOOK_URL=98000001=https://discord.com/api/webhooks/1/a,98000002=https://discord.com/api/webhooks/2/b
+```
+
+The webhook URL is a secret: it lives only in the server env, is never sent to the browser, and is masked in logs. Changing it takes effect on the next server restart. Leave it unset to disable notifications entirely.
 
 ### Admin operations
 
