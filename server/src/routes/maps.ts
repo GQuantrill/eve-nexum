@@ -385,7 +385,7 @@ mapsRouter.post('/from-region', async (req, res) => {
   const minX = Math.min(...pts.map((p) => p.x));
   const maxY = Math.max(...pts.map((p) => p.y));
 
-  const TARGET_GAP = 190; // px between typical adjacent systems
+  const TARGET_GAP = 220; // px between typical adjacent systems (≈ node width + a 2-square gap)
   let medianNN = 1;
   if (pts.length > 1) {
     const nn = pts.map((a, i) => {
@@ -408,27 +408,37 @@ mapsRouter.post('/from-region', async (req, res) => {
     y: (maxY - (s.y2 as number)) * scale,
   }));
 
-  // Enforce a minimum spacing. The median-based scale sets the *typical* gap,
-  // but atypically-close systems (near-coincident in position2D) can still
-  // overlap. A few relaxation passes push apart only pairs closer than
-  // MIN_DIST, leaving the rest of the layout untouched.
-  const MIN_DIST = 150;
+  // Enforce a minimum gap between nodes. System nodes are much wider than they
+  // are tall, so a single circular distance can't space both axes — it leaves
+  // horizontal neighbours touching while vertical ones look fine. Instead we
+  // separate their *bounding boxes* (positions are top-left corners), keeping at
+  // least GRID*2 (two snap-grid squares) of clear space on whichever axis two
+  // boxes are closest, resolving each overlap along its shallower axis. Only the
+  // too-close pairs move; the rest of the projected layout is preserved.
+  const GRID = 20;          // matches the canvas snapGrid={[20,20]}
+  const NODE_W = 200;       // assumed rendered node width  (min-width 150 + padding + content)
+  const NODE_H = 120;       // assumed rendered node height
+  const MIN_X = NODE_W + GRID * 2; // ≥2 grid squares of horizontal gap
+  const MIN_Y = NODE_H + GRID * 2; // ≥2 grid squares of vertical gap
   const n = coords.length;
-  for (let pass = 0; pass < 12; pass++) {
+  for (let pass = 0; pass < 20; pass++) {
     let moved = false;
     for (let i = 0; i < n; i++) {
       for (let j = i + 1; j < n; j++) {
-        let dx = coords[j].x - coords[i].x;
-        let dy = coords[j].y - coords[i].y;
-        let d = Math.hypot(dx, dy);
-        if (d === 0) { dx = 1; dy = 0; d = 1; } // coincident → separate horizontally
-        if (d < MIN_DIST) {
-          const push = (MIN_DIST - d) / 2;
-          const ux = dx / d, uy = dy / d;
-          coords[i].x -= ux * push; coords[i].y -= uy * push;
-          coords[j].x += ux * push; coords[j].y += uy * push;
-          moved = true;
+        const dx = coords[j].x - coords[i].x;
+        const dy = coords[j].y - coords[i].y;
+        const ox = MIN_X - Math.abs(dx); // >0 ⇒ boxes overlap (incl. gap) in X
+        const oy = MIN_Y - Math.abs(dy); // >0 ⇒ boxes overlap (incl. gap) in Y
+        if (ox <= 0 || oy <= 0) continue; // already clear on at least one axis
+        // Push apart along the shallower axis (smallest move that separates them).
+        if (ox <= oy) {
+          const s = (dx < 0 ? -1 : 1) * (ox / 2); // dx===0 → push +x
+          coords[i].x -= s; coords[j].x += s;
+        } else {
+          const s = (dy < 0 ? -1 : 1) * (oy / 2); // dy===0 → push +y
+          coords[i].y -= s; coords[j].y += s;
         }
+        moved = true;
       }
     }
     if (!moved) break;
