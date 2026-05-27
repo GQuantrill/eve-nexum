@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import MDEditor, { getCommands } from '@uiw/react-md-editor';
 import rehypeSanitize from 'rehype-sanitize';
 
@@ -29,6 +29,11 @@ const NOTES_HEIGHT_KEY = 'nexum.notesEditorHeight';
 const DEFAULT_NOTES_HEIGHT = 80;
 const MIN_NOTES_HEIGHT = 80;
 
+// Notes save (the parent onChange) is debounced so we don't write to the
+// server on every keystroke; pending edits are flushed immediately on blur
+// and on unmount so nothing is lost.
+const SAVE_DEBOUNCE_MS = 600;
+
 function readNotesHeight(): number {
   try {
     const v = parseInt(localStorage.getItem(NOTES_HEIGHT_KEY) ?? '', 10);
@@ -42,6 +47,45 @@ export function NotesEditor({ value, onChange, compact = false, readOnly = false
   // Initial height for the full pane, read once from localStorage at mount.
   const [initialHeight] = useState(readNotesHeight);
 
+  // Local draft so typing stays instant while the parent save is debounced.
+  const [draft, setDraft] = useState(value);
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pending   = useRef<string | null>(null);
+  // Keep the latest onChange in a ref so the debounced flush never goes stale.
+  const onChangeRef = useRef(onChange);
+  useEffect(() => { onChangeRef.current = onChange; }, [onChange]);
+
+  const flush = useCallback(() => {
+    if (saveTimer.current) { clearTimeout(saveTimer.current); saveTimer.current = null; }
+    if (pending.current !== null) {
+      onChangeRef.current(pending.current);
+      pending.current = null;
+    }
+  }, []);
+
+  // Adopt external updates (e.g. a remote edit) when the value prop actually
+  // changes — but never while the user is actively editing, which would clobber
+  // their typing. Done during render (React's recommended "adjust state on prop
+  // change" pattern) rather than in an effect, so there's no extra render pass
+  // and no risk of reverting an in-flight edit on blur.
+  const [seenValue, setSeenValue] = useState(value);
+  if (value !== seenValue) {
+    setSeenValue(value);
+    if (!focused) setDraft(value);
+  }
+
+  // Flush any pending save when the editor unmounts.
+  useEffect(() => () => flush(), [flush]);
+
+  const handleEditorChange = (v: string | undefined) => {
+    if (readOnly) return;
+    const next = v ?? '';
+    setDraft(next);
+    pending.current = next;
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(flush, SAVE_DEBOUNCE_MS);
+  };
+
   const enterEdit = () => {
     if (readOnly || focused) return;
     setFocused(true);
@@ -51,7 +95,7 @@ export function NotesEditor({ value, onChange, compact = false, readOnly = false
   };
 
   if (compact && !focused) {
-    if (!value) {
+    if (!draft) {
       if (readOnly) return <div className="notes-editor notes-editor--empty" />;
       return (
         <div className="notes-editor notes-editor--empty" onClick={enterEdit}>
@@ -60,8 +104,8 @@ export function NotesEditor({ value, onChange, compact = false, readOnly = false
       );
     }
     return (
-      <div className="notes-editor notes-editor--preview" onClick={enterEdit} title={value}>
-        {value}
+      <div className="notes-editor notes-editor--preview" onClick={enterEdit} title={draft}>
+        {draft}
       </div>
     );
   }
@@ -73,12 +117,12 @@ export function NotesEditor({ value, onChange, compact = false, readOnly = false
       data-color-mode="dark"
       onClick={enterEdit}
       onBlur={(e) => {
-        if (!e.currentTarget.contains(e.relatedTarget as Node)) setFocused(false);
+        if (!e.currentTarget.contains(e.relatedTarget as Node)) { flush(); setFocused(false); }
       }}
     >
       <MDEditor
-        value={value}
-        onChange={(v) => { if (!readOnly) onChange(v ?? ''); }}
+        value={draft}
+        onChange={handleEditorChange}
         // Compact notes (signature / structure rows) read as a plain text
         // field: no markdown toolbar and a bare textarea (no live preview
         // split). The full Notes pane keeps the toolbar + live preview.

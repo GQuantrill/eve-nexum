@@ -6,6 +6,16 @@ import { createLogger } from '../utils/logger.js';
 
 const log = createLogger('discord');
 
+// Log the configuration once at startup so a misconfigured DISCORD_WEBHOOK_URL
+// is obvious in the logs. URLs are secrets, so we log presence, not values.
+{
+  const corps = Object.keys(config.discord.byCorp);
+  const enabled = !!config.discord.defaultUrl || corps.length > 0;
+  log.info(enabled
+    ? `enabled — default webhook: ${config.discord.defaultUrl ? 'set' : 'none'}; per-corp overrides: [${corps.join(', ') || 'none'}]`
+    : 'disabled — DISCORD_WEBHOOK_URL is not set (no notifications will be sent)');
+}
+
 // Resolve the webhook for a map's corp: per-corp override, else the default,
 // else null (feature off, or a personal map with corpId === null).
 export function webhookFor(corpId: number | null): string | null {
@@ -32,12 +42,16 @@ let draining = false;
 // Enqueue a notification. No-op when no webhook is configured for the corp.
 export function notifyDiscord(corpId: number | null, embed: DiscordEmbed): void {
   const url = webhookFor(corpId);
-  if (!url) return;
+  if (!url) {
+    log.info(`skip "${embed.title}" — no webhook resolved for corpId=${corpId ?? 'null (personal map)'}`);
+    return;
+  }
   if (queue.length >= MAX_QUEUE) {
-    log.warn(`queue full (${MAX_QUEUE}) — dropping a notification`);
+    log.warn(`queue full (${MAX_QUEUE}) — dropping "${embed.title}"`);
     return;
   }
   queue.push({ url, embed });
+  log.info(`queued "${embed.title}" for corpId=${corpId} (queue depth: ${queue.length})`);
   void drain();
 }
 
@@ -69,7 +83,12 @@ async function deliver(item: QueueItem, attempt = 0): Promise<void> {
       await sleep(waitMs);
       return deliver(item, attempt + 1);
     }
-    if (!r.ok) log.warn(`webhook POST failed: ${r.status}`);
+    if (!r.ok) {
+      const body = await r.text().catch(() => '');
+      log.warn(`webhook POST failed: ${r.status} ${body.slice(0, 200)}`);
+      return;
+    }
+    log.info(`delivered "${item.embed.title}" (${r.status})`);
   } catch (err) {
     // Timeout / network / Discord down — drop it. Intel is ephemeral; never
     // let a webhook failure bubble into the request path.
@@ -84,12 +103,15 @@ const AMBER = 0xf0a030;
 const BLUE  = 0x5b9bff;
 
 export function k162Embed(p: {
-  system: string; systemClass: string; mapName: string; actor: string | null;
+  system: string; systemClass: string; leadsTo?: string | null; mapName: string; actor: string | null;
 }): DiscordEmbed {
+  const fields: NonNullable<DiscordEmbed['fields']> = [];
+  if (p.leadsTo) fields.push({ name: 'Leads to', value: p.leadsTo, inline: true });
   return {
     title:       '⚠️ Inbound K162',
     description: `New **K162** in **${p.system}** (${p.systemClass}) — something just connected into **${p.mapName}**.`,
     color:       AMBER,
+    fields:      fields.length ? fields : undefined,
     footer:      p.actor ? { text: `set by ${p.actor}` } : undefined,
     timestamp:   new Date().toISOString(),
   };
