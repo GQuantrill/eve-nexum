@@ -13,6 +13,9 @@ const PAGE_SIZE = 5;
 
 const EVE_IMG = 'https://images.evetech.net';
 const ZKB     = 'https://zkillboard.com';
+// At or above this many attackers a kill is treated as a "gank" (overwhelming
+// force) rather than a small gang. Tune to taste.
+const GANK_THRESHOLD = 10;
 
 function formatIsk(v: number): string {
   if (v >= 1e9) return `${(v / 1e9).toFixed(1)}B`;
@@ -44,7 +47,7 @@ function ZkbLink({ href, tip, children }: { href: string; tip: string; children:
   );
 }
 
-function EntityCol({ characterId, characterName, corporationId, corporationName, allianceId, allianceName, label, align }: {
+function EntityCol({ characterId, characterName, corporationId, corporationName, allianceId, allianceName, label, align, nameSuffix }: {
   characterId?:     number;
   characterName?:   string;
   corporationId?:   number;
@@ -54,6 +57,8 @@ function EntityCol({ characterId, characterName, corporationId, corporationName,
   label:            string;
   /** Text alignment for the name column — 'left' for victim, 'right' for attacker. */
   align:            'left' | 'right';
+  /** Optional text after the character name, e.g. "+14" for the other attackers. */
+  nameSuffix?:      string;
 }) {
   // Row layout: portrait, then a names column with character on top and
   // corp / alliance lines beneath. Affiliation icons render with the
@@ -68,7 +73,7 @@ function EntityCol({ characterId, characterName, corporationId, corporationName,
     <div className={`zkb-kill__names zkb-kill__names--${align}`}>
       {characterId && (
         <a href={`${ZKB}/character/${characterId}/`} target="_blank" rel="noreferrer" className="zkb-kill__name zkb-kill__name--char">
-          {characterName ?? '…'}
+          {characterName ?? '…'}{nameSuffix && <span className="zkb-kill__name-suffix"> {nameSuffix}</span>}
         </a>
       )}
       {corporationId && (
@@ -138,25 +143,36 @@ function KillRow({ kill, standings }: { kill: ZkbKill; standings: ReturnType<typ
   return (
     <div className={`zkb-kill${isPod ? ' zkb-kill--pod' : ''}${tint ? ` ${tint}` : ''}`}>
       {/* Victim side: victim ship → victim affiliations */}
-      <a
-        href={`${ZKB}/kill/${kill.killmail_id}/`}
-        target="_blank"
-        rel="noreferrer"
-        data-tip="View killmail on zKillboard"
-        className="zkb-kill__ship-wrap zkb-kill__icon-link"
-      >
-        <img
-          className="zkb-kill__ship"
-          src={`${EVE_IMG}/types/${v.ship_type_id}/render?size=64`}
-          alt=""
-          loading="lazy"
-        />
-        {kill.zkb.solo ? (
+      <span className="zkb-kill__ship-wrap">
+        <a
+          href={`${ZKB}/kill/${kill.killmail_id}/`}
+          target="_blank"
+          rel="noreferrer"
+          data-tip="View killmail on zKillboard"
+          className="zkb-kill__icon-link"
+        >
+          <img
+            className="zkb-kill__ship"
+            src={`${EVE_IMG}/types/${v.ship_type_id}/render?size=64`}
+            alt=""
+            loading="lazy"
+          />
+        </a>
+        {kill.zkb.solo || kill.attackers.length === 1 ? (
           <span className="zkb-kill__count zkb-kill__count--solo" data-tip="Solo kill">1</span>
         ) : kill.attackers.length > 1 ? (
-          <span className="zkb-kill__count" data-tip={`${kill.attackers.length} attackers`}>{kill.attackers.length}</span>
+          <span
+            className={`zkb-kill__count${kill.attackers.length >= GANK_THRESHOLD ? ' zkb-kill__count--gank' : ''}`}
+            data-tip={
+              kill.attackers.length >= GANK_THRESHOLD
+                ? `Gank — ${kill.attackers.length} attackers`
+                : `${kill.attackers.length} attackers`
+            }
+          >
+            {kill.attackers.length}
+          </span>
         ) : null}
-      </a>
+      </span>
 
       <EntityCol
         characterId={v.character_id}
@@ -184,6 +200,7 @@ function KillRow({ kill, standings }: { kill: ZkbKill; standings: ReturnType<typ
               allianceName={fbAttacker.alliance_name}
               label="Final blow"
               align="right"
+              nameSuffix={kill.attackers.length > 1 ? `+${kill.attackers.length - 1}` : undefined}
             />
             {fbAttacker.ship_type_id && (
               <span className="zkb-kill__ship-wrap" data-tip="Final-blow ship">

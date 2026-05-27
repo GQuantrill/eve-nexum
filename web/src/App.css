@@ -5363,6 +5363,37 @@ select.sig-toolbar-btn option {
   color: #ffffff;
 }
 
+.zkb-kill__count--gank {
+  background: rgba(200,60,60,0.9);
+  color: #ffffff;
+}
+
+/* The count badge sits outside the killmail link, so it owns its own tooltip
+   (hovering it no longer surfaces the link's "View killmail" tip). */
+.zkb-kill__count[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #111827;
+  border: 1px solid #2e3f60;
+  border-radius: 5px;
+  color: #c8d4f0;
+  font-size: calc(11px * var(--font-scale, 1));
+  padding: 3px 7px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 9999;
+}
+.zkb-kill__count[data-tip]:hover::after { opacity: 1; }
+
+.zkb-kill__name-suffix {
+  color: #8a98b8;
+  font-weight: 600;
+}
+
 /* Victim portrait + corp/alliance affiliation stack. Portrait on the
    left, corp + alliance logos stacked vertically to its right. */
 .zkb-kill__entity-col {
