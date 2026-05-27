@@ -570,8 +570,7 @@ export function LandingPage() {
         <section className="landing__section" id="about-nexum">
           <h2 className="landing__section-title">About Nexum</h2>
           <p className="landing__section-body">
-            Nexum is a wormhole and exploration tool.  It can be used for mapping routes and logging signatures. It was heavily inspired by Pathfinder but as this is no longer in development.
-            Because of this, rather than complain about it, Nexum was created.
+            Nexum is a wormhole and exploration tool. It can be used for mapping routes and logging signatures. It was heavily inspired by Pathfinder — but with Pathfinder no longer actively developed (no new release since 2020), rather than complain about it, Nexum was created.
           </p>
           <p className="landing__section-body">
             Nexum is built by a single developer.  I'm adding features as we go but get in contact if you want support or feature requests
