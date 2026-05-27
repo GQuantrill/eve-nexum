@@ -8,6 +8,7 @@ import { createLogger } from '../utils/logger.js';
 import { recordGhostSiteIfMatch } from '../services/ghostSites.js';
 import { resolveEntityNames } from '../services/entityNames.js';
 import { audit } from '../services/audit.js';
+import { subscribeMap, publishToMap } from '../services/mapEvents.js';
 
 const log = createLogger('maps');
 
@@ -1066,6 +1067,11 @@ mapsRouter.post('/:mapId/merge', async (req, res) => {
     await client.query(`UPDATE maps SET updated_at = NOW() WHERE id = $1`, [destId]);
     await client.query('COMMIT');
 
+    // A merge touches many rows — tell other viewers of the destination to
+    // re-fetch rather than streaming hundreds of deltas. The initiator already
+    // reloads in the merge modal, so it's echo-suppressed.
+    publishToMap(destId, { type: 'map.resync', actor: req.get('x-client-id') ?? null });
+
     res.json({
       added:   { systems: addedSystems, connections: addedConnections, signatures: addedSignatures, structures: addedStructures },
       updated: { signatures: updatedSignatures, structures: updatedStructures, systemNotes: noteMerges.length },
@@ -1134,6 +1140,29 @@ mapsRouter.get('/:mapId', async (req, res) => {
   });
 });
 
+// GET /api/maps/:mapId/events — SSE stream of live edits for this map. Scoped
+// per map and access-checked, so a client only ever receives events for a map
+// it's allowed to see. See realtime_sync_feature.md.
+mapsRouter.get('/:mapId/events', async (req, res) => {
+  const { mapId } = req.params;
+  const access = await getMapAccess(mapId, req);
+  if (!access) { res.status(404).json({ error: 'Map not found' }); return; }
+
+  res.set({
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache, no-transform',
+    Connection: 'keep-alive',
+  });
+  res.flushHeaders?.();
+  res.write(': connected\n\n');
+
+  const unsubscribe = subscribeMap(mapId, res);
+  // Heartbeat keeps intermediaries from closing an idle stream.
+  const heartbeat = setInterval(() => { try { res.write(': ping\n\n'); } catch { /* closed */ } }, 25_000);
+
+  req.on('close', () => { clearInterval(heartbeat); unsubscribe(); });
+});
+
 // PATCH /api/maps/:mapId  — rename (corp/owner only), lock (admin only), or
 // toggle merge-source eligibility (corp maps, full/admin only)
 mapsRouter.patch('/:mapId', async (req, res) => {
@@ -1186,6 +1215,16 @@ mapsRouter.patch('/:mapId', async (req, res) => {
   if (sets.length === 1) { res.status(400).json({ error: 'Nothing to update' }); return; }
 
   await db.query(`UPDATE maps SET ${sets.join(', ')} WHERE id = $${vals.length + 1}`, [...vals, mapId]);
+  // Live-sync rename / lock to other viewers (the only map-level fields the
+  // canvas shows). Merge-source flags are sidebar-only, so not pushed.
+  if (name !== undefined || locked !== undefined) {
+    publishToMap(mapId, {
+      type: 'map.meta',
+      actor: req.get('x-client-id') ?? null,
+      ...(name !== undefined ? { name: String(name).slice(0, MAX_MAP_NAME_LEN) } : {}),
+      ...(locked !== undefined ? { locked } : {}),
+    });
+  }
   res.json({ ok: true });
 });
 
@@ -1252,6 +1291,25 @@ mapsRouter.post('/:mapId/systems', async (req, res) => {
     [req.session.userId, mapId],
   ).catch(console.error);
   await touchMap(mapId);
+
+  // Push the new system to other viewers of this map (live sync). Re-read the
+  // canonical row so the payload matches a fresh map load exactly (resolved
+  // eve id, security, etc.). actor = originating client → echo-suppressed.
+  db.query(
+    `SELECT id, eve_system_id AS "eveSystemId", name, system_class AS "systemClass", effect, statics,
+            region_name AS "regionName", npc_type AS "npcType", position_x AS x, position_y AS y,
+            status, intel, is_home AS "isHome", locked, notes,
+            (SELECT ss.security::float8 FROM solar_systems ss WHERE ss.id = map_systems.eve_system_id) AS "security",
+            last_activity_at AS "lastActivityAt"
+       FROM map_systems WHERE id = $1 AND map_id = $2`,
+    [id, mapId],
+  ).then(({ rows }) => {
+    const r = rows[0] as ({ x: number; y: number } & Record<string, unknown>) | undefined;
+    if (!r) return;
+    const { x, y, ...rest } = r;
+    publishToMap(mapId, { type: 'system.add', actor: req.get('x-client-id') ?? null, system: { ...rest, position: { x, y } } });
+  }).catch(console.error);
+
   res.status(201).json({ ok: true });
 });
 
@@ -1318,6 +1376,7 @@ mapsRouter.patch('/:mapId/systems/:systemId', async (req, res) => {
     [...vals, systemId, mapId],
   );
   await touchMap(mapId);
+  publishToMap(mapId, { type: 'system.update', actor: req.get('x-client-id') ?? null, id: systemId, updates });
   res.json({ ok: true });
 });
 
@@ -1331,6 +1390,7 @@ mapsRouter.delete('/:mapId/systems/:systemId', async (req, res) => {
       `INSERT INTO user_events (user_id, event_type, map_id) VALUES ($1, 'system_delete', $2)`,
       [req.session.userId, mapId],
     ).catch(console.error);
+    publishToMap(mapId, { type: 'system.remove', actor: req.get('x-client-id') ?? null, id: systemId });
   }
   await touchMap(mapId);
   res.json({ ok: true });
@@ -1368,6 +1428,17 @@ mapsRouter.post('/:mapId/connections', async (req, res) => {
     throw err;
   }
   await touchMap(mapId);
+  // Re-read the canonical row so remote clients get the full MapConnection shape.
+  db.query(
+    `SELECT id, source_id AS "sourceId", target_id AS "targetId", source_handle AS "sourceHandle",
+            target_handle AS "targetHandle", connection_type AS "connectionType", mass_status AS "massStatus",
+            time_status AS "timeStatus", size, wh_type AS "type", COALESCE(mass_used, 0)::float8 AS "massUsed",
+            eol_at AS "eolAt", created_at AS "createdAt"
+       FROM map_connections WHERE id = $1 AND map_id = $2`,
+    [id, mapId],
+  ).then(({ rows }) => {
+    if (rows[0]) publishToMap(mapId, { type: 'connection.add', actor: req.get('x-client-id') ?? null, connection: rows[0] });
+  }).catch(console.error);
   res.status(201).json({ ok: true });
 });
 
@@ -1403,6 +1474,7 @@ mapsRouter.patch('/:mapId/connections/:connectionId', async (req, res) => {
     [...vals, connectionId, mapId],
   );
   await touchMap(mapId);
+  publishToMap(mapId, { type: 'connection.update', actor: req.get('x-client-id') ?? null, id: connectionId, updates });
   res.json({ ok: true });
 });
 
@@ -1412,6 +1484,7 @@ mapsRouter.delete('/:mapId/connections/:connectionId', async (req, res) => {
   if (!access) return;
   await db.query(`DELETE FROM map_connections WHERE id = $1 AND map_id = $2`, [connectionId, mapId]);
   await touchMap(mapId);
+  publishToMap(mapId, { type: 'connection.remove', actor: req.get('x-client-id') ?? null, id: connectionId });
   res.json({ ok: true });
 });
 
@@ -1448,6 +1521,7 @@ mapsRouter.post('/:mapId/systems/:systemId/signatures', async (req, res) => {
   ).catch(console.error);
   db.query(`UPDATE map_systems SET last_activity_at = NOW() WHERE id = $1`, [systemId]).catch(console.error);
   recordGhostSiteIfMatch(systemId, name);
+  publishToMap(mapId, { type: 'sig.changed', actor: req.get('x-client-id') ?? null, systemId });
   res.status(201).json(rows[0]);
 });
 
@@ -1472,6 +1546,7 @@ mapsRouter.patch('/:mapId/systems/:systemId/signatures/:sigId', async (req, res)
   );
   db.query(`UPDATE map_systems SET last_activity_at = NOW() WHERE id = $1`, [systemId]).catch(console.error);
   if (typeof updates.name === 'string') recordGhostSiteIfMatch(systemId, updates.name);
+  publishToMap(mapId, { type: 'sig.changed', actor: req.get('x-client-id') ?? null, systemId });
   res.json({ ok: true });
 });
 
@@ -1482,6 +1557,7 @@ mapsRouter.delete('/:mapId/systems/:systemId/signatures/:sigId', async (req, res
   if (!(await verifySystemInMap(res, systemId, mapId))) return;
   await db.query(`DELETE FROM map_signatures WHERE id = $1 AND system_id = $2`, [sigId, systemId]);
   db.query(`UPDATE map_systems SET last_activity_at = NOW() WHERE id = $1`, [systemId]).catch(console.error);
+  publishToMap(mapId, { type: 'sig.changed', actor: req.get('x-client-id') ?? null, systemId });
   res.json({ ok: true });
 });
 
@@ -1521,6 +1597,7 @@ mapsRouter.post('/:mapId/systems/:systemId/structures', async (req, res) => {
      RETURNING id, name, structure_type AS "structureType", owner_corp AS "ownerCorp", eve_id AS "eveId", notes, created_at AS "createdAt", owner_corp_id AS "ownerCorpId"`,
     [systemId, name, structureType, ownerCorp, eveIdNum, notes, req.session.userId, ownerCorpId],
   );
+  publishToMap(mapId, { type: 'structure.changed', actor: req.get('x-client-id') ?? null, systemId });
   res.status(201).json(rows[0]);
 });
 
@@ -1543,6 +1620,7 @@ mapsRouter.patch('/:mapId/systems/:systemId/structures/:structureId', async (req
     `UPDATE map_structures SET ${sets.join(', ')} WHERE id = $${vals.length + 1} AND system_id = $${vals.length + 2}`,
     [...vals, structureId, systemId],
   );
+  publishToMap(mapId, { type: 'structure.changed', actor: req.get('x-client-id') ?? null, systemId });
   res.json({ ok: true });
 });
 
@@ -1552,6 +1630,7 @@ mapsRouter.delete('/:mapId/systems/:systemId/structures/:structureId', async (re
   if (!access) return;
   if (!(await verifySystemInMap(res, systemId, mapId))) return;
   await db.query(`DELETE FROM map_structures WHERE id = $1 AND system_id = $2`, [structureId, systemId]);
+  publishToMap(mapId, { type: 'structure.changed', actor: req.get('x-client-id') ?? null, systemId });
   res.json({ ok: true });
 });
 

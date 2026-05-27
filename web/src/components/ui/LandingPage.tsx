@@ -79,6 +79,11 @@ const FEATURE_SECTIONS: FeatureSection[] = [
         desc: 'Fold one map into another. The destination is kept as the source of truth — only missing systems and connections are added, with signatures, structures, and notes merged in, and new systems slotted into the existing layout. Corp maps opt in per role as a merge source and/or destination.',
       },
       {
+        icon: BroadcastIcon,
+        title: 'Real-time collaboration',
+        desc: 'Edits sync live to everyone viewing the same map — systems, connections, rename/lock, signatures, structures, and merges all appear for other viewers within moments, no refresh. Streamed per map (you only get events for maps you can see), with your own changes echo-suppressed and an auto-resync on reconnect.',
+      },
+      {
         icon: LockIcon,
         title: 'Map locking',
         desc: 'Admins can freeze a corp map\'s topology. Systems and connections lock for non-admins, but signatures, structures, and per-system notes stay editable so ops continue while the layout is pinned.',

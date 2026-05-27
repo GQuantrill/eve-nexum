@@ -16,6 +16,7 @@ import { AdminPage } from './components/ui/AdminPage';
 import { SharedMapView } from './components/ui/SharedMapView';
 import { useMapStore } from './store/mapStore';
 import { useLocationTracking } from './hooks/useLocationTracking';
+import { useMapEventStream } from './hooks/useMapEventStream';
 import { useHashRoute } from './hooks/useHashRoute';
 import './App.css';
 
@@ -75,6 +76,7 @@ function MapApp() {
   }, [userId, loadMaps]);
 
   useLocationTracking(!!mapId);
+  useMapEventStream();
 
   return (
     <ReactFlowProvider>

@@ -1,3 +1,5 @@
+import { CLIENT_ID } from './clientId';
+
 const BASE = import.meta.env.VITE_API_URL ?? '';
 
 // Module-level share-token holder. Set by ShareModeContext on mount and
@@ -25,10 +27,13 @@ export async function api<T = unknown>(path: string, options?: RequestInit): Pro
     finalPath = path + (path.includes('?') ? '&' : '?') + `shareToken=${encodeURIComponent(shareToken)}`;
   }
 
+  const { headers: optHeaders, ...rest } = options ?? {};
   const res = await fetch(`${BASE}${finalPath}`, {
     credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
-    ...options,
+    ...rest,
+    // Merge last so Content-Type / client id survive even when a caller passes
+    // its own headers (previously `...options` could replace them wholesale).
+    headers: { 'Content-Type': 'application/json', 'X-Client-Id': CLIENT_ID, ...optHeaders },
   });
   if (!res.ok) throw new Error(`API ${path} → ${res.status}`);
   return res.json() as Promise<T>;

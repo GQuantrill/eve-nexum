@@ -185,7 +185,30 @@ interface MapStore {
   // Selection
   selectSystem: (id: string | null) => void;
   selectConnection: (id: string | null) => void;
+
+  // Per-system revision counters bumped when a remote client changes that
+  // system's signatures/structures. The open pane watches its system's value
+  // and re-fetches when it ticks (sigs/structures live in pane state, not here).
+  sigRev: Record<string, number>;
+  structRev: Record<string, number>;
+
+  // Realtime: apply an edit pushed from another client (no persist, no undo).
+  applyRemote: (event: RemoteEvent) => void;
 }
+
+// Events pushed over the live map stream. Mirror the server's publishToMap
+// payloads in server/src/routes/maps.ts.
+export type RemoteEvent =
+  | { type: 'system.add';        system: MapSystem }
+  | { type: 'system.update';     id: string; updates: Partial<MapSystem> }
+  | { type: 'system.remove';     id: string }
+  | { type: 'connection.add';    connection: MapConnection }
+  | { type: 'connection.update'; id: string; updates: Partial<MapConnection> }
+  | { type: 'connection.remove'; id: string }
+  | { type: 'map.meta';          name?: string; locked?: boolean }
+  | { type: 'map.resync' }
+  | { type: 'sig.changed';       systemId: string }
+  | { type: 'structure.changed'; systemId: string };
 
 export const useMapStore = create<MapStore>()((set, get) => {
 
@@ -353,6 +376,8 @@ export const useMapStore = create<MapStore>()((set, get) => {
     edgeStyle: 'bezier',
     autoLayoutPending: false,
     fitViewPending: false,
+    sigRev: {},
+    structRev: {},
     panelOrder: ['activity', 'killboard', 'notes', 'signatures', 'structures', 'npcStations'],
     undoStack: [],
 
@@ -846,5 +871,85 @@ export const useMapStore = create<MapStore>()((set, get) => {
     selectSystem: (id) => set({ selectedSystemId: id, selectedConnectionId: null }),
     selectConnection: (id) => set({ selectedConnectionId: id, selectedSystemId: null }),
     setCurrentSystem: (id) => set({ currentSystemId: id }),
+
+    applyRemote: (event) => {
+      // Surgical state updates only — no API call, no undo entry. Each branch
+      // dedupes / no-ops so a stray or out-of-order event can't corrupt state.
+      switch (event.type) {
+        case 'system.add': {
+          const sys = event.system;
+          set((s) => s.map.systems.some((x) => x.id === sys.id)
+            ? s
+            : { map: { ...s.map, systems: [...s.map.systems, sys] } });
+          break;
+        }
+        case 'system.update': {
+          set((s) => ({
+            map: { ...s.map, systems: s.map.systems.map((x) => x.id === event.id ? { ...x, ...event.updates } : x) },
+          }));
+          break;
+        }
+        case 'system.remove': {
+          set((s) => ({
+            selectedSystemId: s.selectedSystemId === event.id ? null : s.selectedSystemId,
+            map: {
+              ...s.map,
+              systems: s.map.systems.filter((x) => x.id !== event.id),
+              connections: s.map.connections.filter((c) => c.sourceId !== event.id && c.targetId !== event.id),
+            },
+          }));
+          break;
+        }
+        case 'connection.add': {
+          const conn = event.connection;
+          set((s) => s.map.connections.some((c) => c.id === conn.id)
+            ? s
+            : { map: { ...s.map, connections: [...s.map.connections, conn] } });
+          break;
+        }
+        case 'connection.update': {
+          set((s) => ({
+            map: { ...s.map, connections: s.map.connections.map((c) => c.id === event.id ? { ...c, ...event.updates } : c) },
+          }));
+          break;
+        }
+        case 'connection.remove': {
+          set((s) => ({
+            selectedConnectionId: s.selectedConnectionId === event.id ? null : s.selectedConnectionId,
+            map: { ...s.map, connections: s.map.connections.filter((c) => c.id !== event.id) },
+          }));
+          break;
+        }
+        case 'map.meta': {
+          set((s) => ({
+            map: {
+              ...s.map,
+              ...(event.name   !== undefined ? { name:   event.name }   : {}),
+              ...(event.locked !== undefined ? { locked: event.locked } : {}),
+            },
+            maps: s.maps.map((m) => m.id === s.activeMapId
+              ? { ...m,
+                  ...(event.name   !== undefined ? { name:   event.name }   : {}),
+                  ...(event.locked !== undefined ? { locked: event.locked } : {}) }
+              : m),
+          }));
+          break;
+        }
+        case 'map.resync': {
+          // Bulk change (merge) — re-fetch the active map authoritatively.
+          const id = get().activeMapId;
+          if (id) void get().switchMap(id);
+          break;
+        }
+        case 'sig.changed': {
+          set((s) => ({ sigRev: { ...s.sigRev, [event.systemId]: (s.sigRev[event.systemId] ?? 0) + 1 } }));
+          break;
+        }
+        case 'structure.changed': {
+          set((s) => ({ structRev: { ...s.structRev, [event.systemId]: (s.structRev[event.systemId] ?? 0) + 1 } }));
+          break;
+        }
+      }
+    },
   };
 });
