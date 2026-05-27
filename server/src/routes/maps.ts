@@ -204,6 +204,15 @@ async function requireMapWrite(res: Response, mapId: string, req: Request): Prom
 // (a webhook failure must not affect the user's action). Hooked into the
 // interactive handlers — never the bulk seed/merge paths — so a region seed
 // can't flood the channel. See discord_webhooks_feature.md.
+//
+// Per-corp region + per-map filtering (see discord_filters_feature.md) is
+// applied at send time: a notification goes out only if the map isn't excluded
+// AND the corp accepts the event's region. `regionAllowed` is the region half —
+// pass on `all_regions`, or if any of the event's system regions is allowlisted.
+function regionAllowed(allRegions: boolean, allow: string[], names: (string | null)[]): boolean {
+  if (allRegions) return true;
+  return names.some((n) => n != null && allow.includes(n));
+}
 
 // K162 notifications are deferred briefly so a follow-up edit — most usefully
 // the wormhole's "leads to" — can be picked up and included. The send is keyed
@@ -248,19 +257,34 @@ function flushK162(sigId: string): void {
 // K162, including the leads-to if one was set in the meantime.
 async function fireK162(corpId: number | null, sigId: string, actor: string | null): Promise<void> {
   try {
-    const { rows } = await db.query<{ whType: string | null; leadsTo: string | null; system: string; systemClass: string; mapName: string }>(
+    const { rows } = await db.query<{
+      whType: string | null; leadsTo: string | null; system: string; systemClass: string;
+      region: string | null; mapName: string; mapEnabled: boolean; allRegions: boolean; regions: string[];
+    }>(
       `SELECT sg.wh_type AS "whType", sg.wh_leads_to AS "leadsTo",
-              s.name AS "system", s.system_class AS "systemClass", m.name AS "mapName"
+              s.name AS "system", s.system_class AS "systemClass", s.region_name AS "region",
+              m.name AS "mapName", m.discord_notify AS "mapEnabled",
+              COALESCE(cds.all_regions, TRUE)        AS "allRegions",
+              COALESCE(cds.regions, '{}'::text[])    AS "regions"
          FROM map_signatures sg
          JOIN map_systems s ON s.id = sg.system_id
          JOIN maps m ON m.id = s.map_id
+         LEFT JOIN corp_discord_settings cds ON cds.corp_id = $2
         WHERE sg.id = $1`,
-      [sigId],
+      [sigId, corpId],
     );
     const r = rows[0];
     if (!r) { discordLog.info(`K162 (sig ${sigId}) removed before send — skipping`); return; }
     if ((r.whType ?? '').toUpperCase() !== 'K162') {
       discordLog.info(`K162 (sig ${sigId}) changed to "${r.whType ?? ''}" before send — skipping`);
+      return;
+    }
+    if (!r.mapEnabled) {
+      discordLog.info(`K162 (sig ${sigId}) suppressed — map "${r.mapName}" is excluded from Discord`);
+      return;
+    }
+    if (!regionAllowed(r.allRegions, r.regions, [r.region])) {
+      discordLog.info(`K162 (sig ${sigId}) suppressed — region "${r.region ?? 'unknown'}" not in the corp filter`);
       return;
     }
     notifyDiscord(corpId, k162Embed({ system: r.system, systemClass: r.systemClass, leadsTo: r.leadsTo, mapName: r.mapName, actor }));
@@ -278,16 +302,31 @@ function dispatchNewConnection(
     return;
   }
   discordLog.info(`new connection on corp map (corpId=${meta.corpId}) — building notification`);
-  db.query<{ a: string; b: string; mapName: string }>(
-    `SELECT a.name AS a, b.name AS b, m.name AS "mapName"
+  db.query<{
+    a: string; b: string; regionA: string | null; regionB: string | null;
+    mapName: string; mapEnabled: boolean; allRegions: boolean; regions: string[];
+  }>(
+    `SELECT a.name AS a, b.name AS b, a.region_name AS "regionA", b.region_name AS "regionB",
+            m.name AS "mapName", m.discord_notify AS "mapEnabled",
+            COALESCE(cds.all_regions, TRUE)     AS "allRegions",
+            COALESCE(cds.regions, '{}'::text[]) AS "regions"
        FROM maps m
        JOIN map_systems a ON a.id = $2
        JOIN map_systems b ON b.id = $3
+       LEFT JOIN corp_discord_settings cds ON cds.corp_id = $4
       WHERE m.id = $1`,
-    [mapId, sourceId, targetId],
+    [mapId, sourceId, targetId, meta.corpId],
   ).then(({ rows }) => {
     const r = rows[0];
     if (!r) { discordLog.warn(`connection dispatch: endpoints not found`); return; }
+    if (!r.mapEnabled) {
+      discordLog.info(`new connection suppressed — map "${r.mapName}" is excluded from Discord`);
+      return;
+    }
+    if (!regionAllowed(r.allRegions, r.regions, [r.regionA, r.regionB])) {
+      discordLog.info(`new connection suppressed — neither region (${r.regionA ?? '?'} / ${r.regionB ?? '?'}) in the corp filter`);
+      return;
+    }
     notifyDiscord(meta.corpId, connectionEmbed({ a: r.a, b: r.b, whType, size, mapName: r.mapName, actor }));
   }).catch((e) => discordLog.warn(`connection dispatch query failed: ${(e as Error).message}`));
 }

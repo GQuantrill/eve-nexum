@@ -120,6 +120,21 @@ export async function migrate() {
     -- ignore it (owner / share recipients can always merge into them).
     ALTER TABLE maps ADD COLUMN IF NOT EXISTS allow_as_merge_destination BOOLEAN NOT NULL DEFAULT FALSE;
 
+    -- Per-map opt-out for Discord notifications. DEFAULT TRUE means every map —
+    -- existing and future — notifies unless an admin explicitly excludes it
+    -- (fail-open, so a new map never silently goes dark).
+    ALTER TABLE maps ADD COLUMN IF NOT EXISTS discord_notify BOOLEAN NOT NULL DEFAULT TRUE;
+
+    -- Per-corp Discord notification settings (region filter). No row => the
+    -- defaults below => notify for every region. The regions column holds
+    -- region NAMES, matched directly against map_systems.region_name.
+    CREATE TABLE IF NOT EXISTS corp_discord_settings (
+      corp_id     INTEGER     PRIMARY KEY,
+      all_regions BOOLEAN     NOT NULL DEFAULT TRUE,
+      regions     TEXT[]      NOT NULL DEFAULT '{}',
+      updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
     CREATE TABLE IF NOT EXISTS map_systems (
       id            UUID        PRIMARY KEY,
       map_id        UUID        NOT NULL REFERENCES maps(id) ON DELETE CASCADE,

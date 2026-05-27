@@ -181,7 +181,7 @@ const FEATURE_SECTIONS: FeatureSection[] = [
       {
         icon: BellRingingIcon,
         title: 'Discord notifications',
-        desc: 'Push corp chain intel to a Discord channel so alerts land even when nobody\'s watching the tab. Fires server-side on an inbound K162 or a new wormhole connection, scoped to corp maps and configured per corp via a webhook URL. Best-effort and rate-limit-aware; bulk operations like region seeding never spam the channel.',
+        desc: 'Push corp chain intel to a Discord channel so alerts land even when nobody\'s watching the tab. Fires server-side on an inbound K162 or a new wormhole connection, scoped to corp maps. Admins filter which regions and maps notify from the admin panel. Best-effort and rate-limit-aware; bulk operations like region seeding never spam the channel.',
       },
       {
         icon: NavigationArrowIcon,
