@@ -8,6 +8,7 @@ import type { NodeProps } from '@xyflow/react';
 import type { MapSystem } from '../../types';
 import { CLASS_COLORS, CLASS_LABELS, EFFECT_ICONS, EFFECT_LABELS, EFFECT_MODIFIERS, WORMHOLE_DESTINATIONS } from '../../data/wormholes';
 import { useMapStore } from '../../store/mapStore';
+import { usePresenceStore } from '../../store/presenceStore';
 import { useSovData } from '../../hooks/useSovData';
 import { useStandings } from '../../hooks/useStandings';
 import { useFleet } from '../../hooks/useFleet';
@@ -60,6 +61,18 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
     const myId = user?.characterId;
     return myId ? all.filter((m) => m.characterId !== myId) : all;
   }, [showFleetMembers, fleet.bySystem, sys.eveSystemId, user?.characterId]);
+
+  // Other people viewing this map who are currently in this system (presence).
+  // Excludes self — the green you-are-here dot covers that.
+  const presenceViewers = usePresenceStore((s) => s.viewers);
+  const presenceHere    = useMemo(() => {
+    if (sys.eveSystemId == null) return undefined;
+    const myId = user?.characterId;
+    const here = Object.values(presenceViewers).filter(
+      (v) => v.eveSystemId === sys.eveSystemId && v.characterId !== myId,
+    );
+    return here.length ? here : undefined;
+  }, [presenceViewers, sys.eveSystemId, user?.characterId]);
 
   // Halo around any sov-holder system based on the user's contact bands.
   // Threshold is just "negative or positive" rather than the strict ≤-5
@@ -193,6 +206,18 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
               {fleetHere.map((m) => (
                 <span key={m.characterId} className="system-node__fleet-tooltip-row">
                   {m.characterName ?? `Character ${m.characterId}`}
+                </span>
+              ))}
+            </span>
+          </span>
+        )}
+        {presenceHere && (
+          <span className="system-node__presence-dot-wrap">
+            <span className="system-node__presence-dot" />
+            <span className="system-node__presence-tooltip">
+              {presenceHere.map((v) => (
+                <span key={v.characterId} className="system-node__presence-tooltip-row">
+                  {v.characterName || `Character ${v.characterId}`}
                 </span>
               ))}
             </span>

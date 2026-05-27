@@ -9,6 +9,7 @@ import { recordGhostSiteIfMatch } from '../services/ghostSites.js';
 import { resolveEntityNames } from '../services/entityNames.js';
 import { audit } from '../services/audit.js';
 import { subscribeMap, publishToMap } from '../services/mapEvents.js';
+import { reportPresence, removePresence, presenceSnapshot } from '../services/presence.js';
 
 const log = createLogger('maps');
 
@@ -1160,7 +1161,40 @@ mapsRouter.get('/:mapId/events', async (req, res) => {
   // Heartbeat keeps intermediaries from closing an idle stream.
   const heartbeat = setInterval(() => { try { res.write(': ping\n\n'); } catch { /* closed */ } }, 25_000);
 
-  req.on('close', () => { clearInterval(heartbeat); unsubscribe(); });
+  // Hand the new viewer the current presence roster so it sees who's already
+  // here without waiting for the next heartbeat round.
+  try {
+    res.write(`data: ${JSON.stringify({ type: 'presence.snapshot', viewers: presenceSnapshot(mapId) })}\n\n`);
+  } catch { /* closed */ }
+
+  req.on('close', () => {
+    clearInterval(heartbeat);
+    unsubscribe();
+    // Closing the stream = left the map → drop this viewer's presence (TTL is
+    // the backstop for unclean disconnects / multiple tabs).
+    if (req.session.characterId) removePresence(mapId, req.session.characterId);
+  });
+});
+
+// POST /api/maps/:mapId/presence — a viewer reports its current location.
+// Identity comes from the session (never trusted from the body). Viewing access
+// is enough (even readonly corp members show presence). See presence_feature.md.
+mapsRouter.post('/:mapId/presence', async (req, res) => {
+  const { mapId } = req.params;
+  const access = await getMapAccess(mapId, req);
+  if (!access) { res.status(404).json({ error: 'Map not found' }); return; }
+  const characterId   = req.session.characterId;
+  const characterName = req.session.characterName;
+  if (!characterId || !characterName) { res.status(401).json({ error: 'No character on session' }); return; }
+
+  const body = req.body as { eveSystemId?: unknown; shipTypeId?: unknown };
+  reportPresence(mapId, {
+    characterId,
+    characterName,
+    eveSystemId: typeof body.eveSystemId === 'number' ? body.eveSystemId : null,
+    shipTypeId:  typeof body.shipTypeId  === 'number' ? body.shipTypeId  : null,
+  }, req.get('x-client-id') ?? null);
+  res.status(204).end();
 });
 
 // PATCH /api/maps/:mapId  — rename (corp/owner only), lock (admin only), or

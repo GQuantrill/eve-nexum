@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useMapStore, type RemoteEvent } from '../store/mapStore';
+import { usePresenceStore, type PresenceViewer } from '../store/presenceStore';
 import { apiUrl } from '../api/client';
 import { CLIENT_ID } from '../api/clientId';
 
@@ -15,6 +16,7 @@ export function useMapEventStream(): void {
   useEffect(() => {
     if (!activeMapId) return;
     openedOnce.current = false;
+    usePresenceStore.getState().reset(); // clear last map's roster; snapshot repopulates
 
     const es = new EventSource(apiUrl(`/api/maps/${activeMapId}/events`), { withCredentials: true });
 
@@ -30,9 +32,24 @@ export function useMapEventStream(): void {
 
     es.onmessage = (e) => {
       try {
-        const data = JSON.parse(e.data) as RemoteEvent & { actor?: string | null };
+        const data = JSON.parse(e.data) as { type: string; actor?: string | null } & Record<string, unknown>;
+        const presence = usePresenceStore.getState();
+        // Presence events are ephemeral UI state — route to the presence store,
+        // not mapStore. (snapshot/leave carry no actor; only update is echoed.)
+        switch (data.type) {
+          case 'presence.snapshot':
+            presence.snapshot((data.viewers as PresenceViewer[] | undefined) ?? []);
+            return;
+          case 'presence.update':
+            if (data.actor !== CLIENT_ID) presence.upsert(data as unknown as PresenceViewer);
+            return;
+          case 'presence.leave':
+            presence.remove(data.characterId as number);
+            return;
+        }
+
         if (data.actor === CLIENT_ID) return; // our own echo — already applied
-        useMapStore.getState().applyRemote(data);
+        useMapStore.getState().applyRemote(data as unknown as RemoteEvent);
       } catch { /* ignore malformed frame */ }
     };
 

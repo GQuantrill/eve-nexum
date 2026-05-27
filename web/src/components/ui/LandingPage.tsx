@@ -184,6 +184,11 @@ const FEATURE_SECTIONS: FeatureSection[] = [
         desc: 'Opt-in live character location dot in the toolbar, plus a per-map "you are here" indicator that updates every 10 seconds via ESI.',
       },
       {
+        icon: UsersIcon,
+        title: 'Pilot presence',
+        desc: 'See where everyone viewing the same map is right now — a blue dot (pilot name on hover) marks each other viewer\'s current system, live as they jump. Covers anyone with the map open, not just your fleet; opt-in and nothing is stored.',
+      },
+      {
         icon: BroadcastIcon,
         title: 'Online status',
         desc: 'Toolbar dot shows whether each logged-in user is currently signed into EVE Online, so you can see at a glance who\'s actually on grid.',

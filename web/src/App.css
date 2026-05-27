@@ -1783,6 +1783,55 @@
   display: block;
 }
 
+/* Presence: other pilots viewing this map who are in this system. Blue, to
+   distinguish from the purple fleet dot; hover reveals their names. */
+.system-node__presence-dot-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  margin-right: 4px;
+}
+
+.system-node__presence-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4d9de0;
+  box-shadow: 0 0 5px #4d9de0;
+  flex-shrink: 0;
+  cursor: help;
+}
+
+.system-node__presence-tooltip {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  background: #111827;
+  border: 1px solid #2e3f60;
+  border-radius: 6px;
+  padding: 5px 8px;
+  white-space: nowrap;
+  z-index: 9999;
+  flex-direction: column;
+  gap: 2px;
+  pointer-events: none;
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #c8d4f0;
+}
+
+.system-node__presence-dot-wrap:hover .system-node__presence-tooltip {
+  display: flex;
+}
+
+.react-flow__node:has(.system-node__presence-dot-wrap:hover) {
+  z-index: 9999 !important;
+}
+
+.system-node__presence-tooltip-row {
+  display: block;
+}
+
 .system-node__lock-icon {
   font-size: calc(13px * var(--font-scale, 1));
   opacity: 0.7;

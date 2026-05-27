@@ -52,6 +52,7 @@ A wormhole mapping tool for EVE Online. Track systems, signatures, structures, k
 - **Chain exit summary** — sidebar widget that counts every K-space exit currently on the map by security class (HS / LS / NS) as coloured chips, and pinpoints the nearest gate route to Jita ("Nearest Jita: 7j via Amarr") so loot runs and logistics planning don't need a manual route check.
 - **Route planner** — server-side BFS over stargates + your live chain, so a route through a wormhole hop is a single click.
 - **Location tracking** — opt-in live character location dot in the toolbar plus per-map "you are here" indicator.
+- **Pilot presence** — see where everyone *viewing the same map* is right now: a blue dot (pilot name on hover) marks each other viewer's current system, live as they jump. Unlike fleet dots it covers anyone with the map open, not just your fleet. Opt-in via location sharing, scoped to maps you can see, and ephemeral (nothing stored).
 - **Online status** — toolbar dot shows whether each user is currently logged into EVE Online.
 
 #### Productivity & UX

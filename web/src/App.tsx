@@ -17,6 +17,7 @@ import { SharedMapView } from './components/ui/SharedMapView';
 import { useMapStore } from './store/mapStore';
 import { useLocationTracking } from './hooks/useLocationTracking';
 import { useMapEventStream } from './hooks/useMapEventStream';
+import { useMapPresence } from './hooks/useMapPresence';
 import { useHashRoute } from './hooks/useHashRoute';
 import './App.css';
 
@@ -77,6 +78,7 @@ function MapApp() {
 
   useLocationTracking(!!mapId);
   useMapEventStream();
+  useMapPresence();
 
   return (
     <ReactFlowProvider>
