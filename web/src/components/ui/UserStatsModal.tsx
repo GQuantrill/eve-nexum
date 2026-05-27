@@ -40,7 +40,7 @@ function SigSparkline({ values }: { values: number[] }) {
       >
         {/* Grid lines + Y labels */}
         {yTicks.map((v) => (
-          <g key={v}>
+          <g key={`tick-${v}`}>
             <line
               x1={SPARK_PAD.left} y1={yOf(v)} x2={SPARK_PAD.left + iw} y2={yOf(v)}
               stroke="#1a2535" strokeWidth={0.5}
@@ -71,7 +71,7 @@ function SigSparkline({ values }: { values: number[] }) {
           const cy = yOf(v);
           const isActive = hover?.index === i;
           return (
-            <g key={i}>
+            <g key={`pt-${i}`}>
               <circle cx={cx} cy={cy} r={isActive ? 3 : 1.8}
                 fill={SPARK_COLOR} stroke="#08090f" strokeWidth={0.6}
                 pointerEvents="none" />

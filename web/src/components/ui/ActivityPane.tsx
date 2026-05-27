@@ -70,7 +70,7 @@ function MiniLineChart({ title, values, color, signed = false }: {
       >
         {/* Grid + Y labels */}
         {yTicks.map((v) => (
-          <g key={v}>
+          <g key={`tick-${v}`}>
             <line
               x1={PAD.left} y1={yOf(v)} x2={PAD.left + IW} y2={yOf(v)}
               stroke="#1a2535" strokeWidth={0.5}
@@ -119,7 +119,7 @@ function MiniLineChart({ title, values, color, signed = false }: {
           const cy = yOf(v);
           const isActive = hover?.index === i;
           return (
-            <g key={i}>
+            <g key={`pt-${i}`}>
               <circle cx={cx} cy={cy} r={isActive ? 3.4 : 2.2}
                 fill={color} stroke="#08090f" strokeWidth={0.8}
                 pointerEvents="none" />

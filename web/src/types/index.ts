@@ -34,6 +34,9 @@ export interface MapSystem {
   id: string;
   eveSystemId: number | null;
   name: string;
+  /** True-security status from the SDE (solar_systems.security). Served with
+   *  the map so nodes don't each hit ESI. Null for legacy rows with no eve id. */
+  security?: number | null;
   systemClass: SystemClass;
   effect: WormholeEffect;
   statics: string[];          // e.g. ['C247', 'Z971']

@@ -10,7 +10,6 @@ import { CLASS_COLORS, CLASS_LABELS, EFFECT_ICONS, EFFECT_LABELS, EFFECT_MODIFIE
 import { useMapStore } from '../../store/mapStore';
 import { useSovData } from '../../hooks/useSovData';
 import { useStandings } from '../../hooks/useStandings';
-import { useEsiSystem } from '../../hooks/useEsiSystem';
 import { useFleet } from '../../hooks/useFleet';
 import { useAuth } from '../../context/AuthContext';
 import { useUserSetting } from '../../hooks/useUserSetting';
@@ -46,7 +45,6 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
   const isCurrent       = sys.id === currentSystemId;
   const sov             = useSovData(sys.eveSystemId);
   const standings       = useStandings();
-  const esiSys          = useEsiSystem(sys.eveSystemId);
   const fleet                = useFleet();
   const { user }             = useAuth();
   const [showFleetMembers]   = useUserSetting<boolean>('nexum.fleet.showMembers', true);
@@ -206,9 +204,9 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
           </span>
         )}
         <span className="system-node__name">{sys.name || 'Unknown'}</span>
-        {esiSys?.securityStatus != null && (
-          <span className="system-node__truesec" style={{ color: truesecColor(esiSys.securityStatus) }}>
-            {esiSys.securityStatus.toFixed(1)}
+        {sys.security != null && Number.isFinite(Number(sys.security)) && (
+          <span className="system-node__truesec" style={{ color: truesecColor(Number(sys.security)) }}>
+            {Number(sys.security).toFixed(1)}
           </span>
         )}
         {sov?.logoUrl && (
