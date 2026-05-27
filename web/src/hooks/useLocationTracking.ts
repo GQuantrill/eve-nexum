@@ -19,7 +19,7 @@ export function useLocationTracking(enabled: boolean) {
 
   useEffect(() => {
     if (!enabled) return;
-    const { map, addSystem, addConnection, selectSystem, setCurrentSystem } = useMapStore.getState();
+    const { map, addSystem, addConnection, selectSystem, setCurrentSystem, uniformWidth } = useMapStore.getState();
 
     // No active map loaded yet (mid switchMap / first paint) — wait for the
     // next location update rather than racing addSystem against an empty store.
@@ -68,10 +68,15 @@ export function useLocationTracking(enabled: boolean) {
         setCurrentSystem(null);
         return;
       }
+      // Offset by the widest node seen + a gap so an auto-added system never
+      // overlaps the one it's placed next to (positions are top-left corners;
+      // a flat +200 touched because nodes are ~200 wide). Falls back to a
+      // generous constant before any node has been measured.
+      const stepX = (uniformWidth || 220) + 60;
       let position: { x: number; y: number };
       if (prevMapSystemId) {
         const prevSys = map.systems.find((s) => s.id === prevMapSystemId)!;
-        position = { x: prevSys.position.x + 200, y: prevSys.position.y };
+        position = { x: prevSys.position.x + stepX, y: prevSys.position.y };
       } else {
         const cx = map.systems.length
           ? map.systems.reduce((sum, s) => sum + s.position.x, 0) / map.systems.length
@@ -79,7 +84,7 @@ export function useLocationTracking(enabled: boolean) {
         const cy = map.systems.length
           ? map.systems.reduce((sum, s) => sum + s.position.y, 0) / map.systems.length
           : 0;
-        position = { x: cx + 200, y: cy };
+        position = { x: cx + stepX, y: cy };
       }
 
       mapSystemId = addSystem(
