@@ -19,7 +19,7 @@ export function useLocationTracking(enabled: boolean) {
 
   useEffect(() => {
     if (!enabled) return;
-    const { map, addSystem, addConnection, selectSystem, setCurrentSystem, uniformWidth } = useMapStore.getState();
+    const { map, addSystem, addConnection, optimizeConnections, selectSystem, setCurrentSystem, uniformWidth } = useMapStore.getState();
 
     // No active map loaded yet (mid switchMap / first paint) — wait for the
     // next location update rather than racing addSystem against an empty store.
@@ -108,7 +108,14 @@ export function useLocationTracking(enabled: boolean) {
           (c.sourceId === prevMapSystemId && c.targetId === mapSystemId) ||
           (c.sourceId === mapSystemId && c.targetId === prevMapSystemId),
       );
-      if (!alreadyConnected) addConnection(prevMapSystemId, mapSystemId, 'right', 'left');
+      if (!alreadyConnected) {
+        addConnection(prevMapSystemId, mapSystemId, 'right', 'left');
+        // The handles above are a default; re-pick the optimal source/target
+        // sides for every connection now that the new system is in place, so
+        // an auto-added jump doesn't end up with a connection drawn through
+        // the system on the wrong side.
+        optimizeConnections();
+      }
     }
 
     lastMapSystemId.current = mapSystemId;
