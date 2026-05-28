@@ -8,11 +8,59 @@
 
 ---
 
-## Overview
+## Quick start
 
-### Key features
+Get a local Nexum running in about ten minutes. You'll need:
 
-#### Mapping
+- **Docker** with Compose.
+- **An EVE Online developer application** — register at [developers.eveonline.com](https://developers.eveonline.com) (free, ~2 minutes). Use `http://localhost/auth/callback` as the callback URL and enable the scopes listed in [EVE developer app scopes](#eve-developer-app-scopes).
+
+Clone and configure:
+
+```bash
+git clone https://github.com/GQuantrill/eve-nexum.git
+cd eve-nexum
+cp .env.example .env
+```
+
+Open `.env` and set, at minimum:
+
+```dotenv
+EVE_CLIENT_ID=…           # from your EVE developer app
+EVE_CLIENT_SECRET=…       # from your EVE developer app
+EVE_CALLBACK_URL=http://localhost/auth/callback
+FRONTEND_URL=http://localhost
+PG_PASSWORD=…             # any strong password
+
+# Generate each with `openssl rand -hex 32` and paste the result:
+SESSION_SECRET=…
+TOKEN_ENCRYPTION_KEY=…
+```
+
+Leave `CORP_ID` unset for now — that opens login to any EVE character. To restrict to one or more corps later, see [Corp mode](#corp-mode).
+
+Bring up Postgres, import the EVE Static Data Export (one-off, a few minutes), then start the rest of the stack:
+
+```bash
+docker compose build
+docker compose up -d postgres
+docker compose run --rm server node dist/scripts/setup-db.js
+docker compose up -d
+```
+
+Open <http://localhost> and click **Log in with EVE Online**. That's it.
+
+**Next steps**
+
+- Restrict logins to your corp, set up roles, locking, merges, or Discord notifications → [Corp mode](#corp-mode).
+- Production deployment (TLS via Traefik, a public URL, periodic SDE refreshes, upgrades) → [Installation](#installation).
+- Something not coming up → [Troubleshooting](#troubleshooting).
+
+---
+
+## Features
+
+### Mapping
 
 - **Interactive map** — drag systems, draw connections, set wormhole class/type/status per connection. Snap-to-grid, optional minimap.
 - **Seed a map from a region** — when creating a map you can optionally pick an EVE region (searchable). The new map is pre-populated with every system in that region, laid out from CCP's 2D star-map projection (a Dotlan-style layout where stargate-connected systems sit adjacent), with all in-region stargate connections pre-drawn. Leave the region blank for an empty map. Requires solar-system coordinates in the SDE tables — see [Installation](#installation).
@@ -24,7 +72,7 @@
 - **Map PNG / clipboard** — copy or download the current chain as an image for pings.
 - **Wormhole sig aging** — wormhole signatures tint by their position in the WH type's known lifetime (yellow ≥50%, orange ≥90%, red past expected close). K162s stay neutral since the lifetime isn't knowable from this side.
 
-#### Personal & corp maps
+### Personal & corp maps
 
 - **Solo / Corp split** — every user has personal maps that are always private; in corp mode each corp also gets shared corp maps. Cross-corp visibility is opt-in via `CORP_MAP_SHARED` (see [Corp mode](#corp-mode)).
 - **Share a personal map with another character or corp** — owners can grant edit access to a specific EVE character or an entire corp from the map sidebar. Recipients can edit signatures, structures, notes, and topology like a corp member but can't rename, delete, or re-share the map. Grants target raw EVE IDs, so they take effect on the recipient's very first Nexum login — no pre-registration required. The map appears in their switcher under a distinct "Shared" badge. Personal maps only; corp maps are already shared via membership.
@@ -34,7 +82,7 @@
 - **Map locking** — admins can freeze a corp map's topology. Systems, connections, and the map name lock for non-admins, but signatures, structures, and per-system notes stay editable so ops can continue while the layout is pinned. The toolbar shows an amber 🔒 chip while the lock is active, and passive location tracking won't auto-add new systems on a locked map.
 - **Role-based access** — `admin` / `full` / `edit` / `readonly`. Roles only restrict corp-map actions; every user owns their personal maps regardless of role. See [Roles](#roles) for the full matrix.
 
-#### System intelligence
+### System intelligence
 
 - **System panel** — per-system cards for signatures, structures, NPC stations, notes, killboard, and activity charts; cards are reorderable via drag-and-drop and persist per-user.
 - **Signature management** — paste EVE scan results directly; tracks created/updated age per signature; auto-deletes sigs missing from a re-paste; bulk type assignment for multi-select.
@@ -45,7 +93,7 @@
 - **Standings overlay** — your EVE contact list (personal, corp, and alliance — fetched via ESI on login and re-pullable on demand from the sov header) drives a chain-wide visual layer. Sov holders show inline P/C/A pills with EVE-palette colour tiers; killboard rows tint red when a hostile actor is in the chain or a blue gets killed, blue when a friendly scores or a hostile dies; structures resolved via ESI tint by their owner corp's standing; sov-holder systems on the map gain a coloured halo. Nothing is sent off-instance — all logic runs against your own contacts.
 - **Chain effect summary** — at-a-glance view of all wormhole effects currently present in the chain.
 
-#### Live ops
+### Live ops
 
 - **Scout connections** — Thera and Turnur public Eve-Scout connections surfaced into the sidebar so you can jump straight to known holes.
 - **A0 sun detection** — auto-flags systems with A0 (yellow) suns visible via ESI for capital-friendly skirmish planning.
@@ -60,7 +108,7 @@
 - **Pilot presence** — see where everyone *viewing the same map* is right now: a blue dot (pilot name on hover) marks each other viewer's current system, live as they jump. Unlike fleet dots it covers anyone with the map open, not just your fleet. Opt-in via location sharing, scoped to maps you can see, and ephemeral (nothing stored).
 - **Online status** — toolbar dot shows whether each user is currently logged into EVE Online.
 
-#### Productivity & UX
+### Productivity & UX
 
 - **Command palette** — `Cmd/Ctrl + K` opens a fuzzy search across systems, sigs, and actions (jump to system, set waypoint, toggle panes).
 - **Home hotkey** — jump the viewport back to the home system from any panel.
@@ -71,12 +119,12 @@
 - **Collapsible sidebar** — Map Options, Connections, Proximity Alerts, Stale System Fade, and Shortcuts each expand or collapse independently. Per-section open/closed state persists per browser via `localStorage`.
 - **European date format** — DD-MM-YYYY everywhere a date is displayed (chart axes, relative-time fallbacks for events older than a month). ISO timestamps are still used in CSV exports for spreadsheet sortability.
 
-#### For corporations
+### For corporations
 
 These features only matter once `CORP_ID` is set — see [Corp mode](#corp-mode) for the full configuration.
 
 - **Multi-corp deployments** — `CORP_ID` accepts a comma-separated list of corporation IDs. One Nexum instance can host several corps; each corp's maps stay scoped to its own members unless `CORP_MAP_SHARED=true`.
-- **Admin dashboard** — a dedicated `#/admin` page with four tabs: Users, Maps, Reports, Audit log. Admins reach it from the toolbar's Admin button.
+- **Admin dashboard** — a dedicated `#/admin` page with five tabs: Users, Maps, Reports, Discord, Audit log. Admins reach it from the toolbar's Admin button.
 - **User management** — change roles, block / unblock, and force an ESI corp-membership re-check on demand. Self-block / self-demote and changes to `ADMIN_CHAR_ID` are guarded against. Anyone who has left every listed corp is auto-blocked on the next login or recheck.
 - **Map management** — admins see every corp map (solo maps are excluded by design) with owner avatar, corp ticker, system / connection counts, lock state, and last-active time. Force-lock, force-unlock, and force-delete are one-click each.
 - **Users report** — per-character last-login, systems added / deleted, structures added, signatures broken down by type, and last-corp-activity timestamps. Every column sortable, filterable by activity (logins / signatures / structures) and time window (24h / week / month / year / all), exportable as CSV.
@@ -84,6 +132,8 @@ These features only matter once `CORP_ID` is set — see [Corp mode](#corp-mode)
 - **Audit log** — every admin action (role change, block, force-lock, force-unlock, force-delete, ESI corp change, auto-block on departure, corp-map merge as source/destination) is recorded with actor, target, old → new value, and timestamp. Exportable as CSV.
 - **Corp ticker resolution** — corp IDs in the Users and Maps reports are resolved to in-game tickers via ESI (`/v5/corporations/{id}/`), with a 1-hour in-memory cache to keep the report loads cheap.
 - **Per-character attribution** — sigs, structures, and system add / delete actions are recorded with the user who made them, so reports can answer "who has been scanning what" with no manual logging.
+
+---
 
 ## Installation
 
@@ -119,7 +169,7 @@ Edit `.env` and fill in the required values:
 | `MAX_CORP_MAPS` | Optional | Max number of corp maps per corp. Default `5`. |
 | `DISCORD_WEBHOOK_URL` | Optional | Discord webhook(s) for corp-intel notifications (inbound K162, new connections). One URL fires for **every** corp map; for multi-corp deployments use `corpId=URL` pairs (comma-separated) to route each corp to its own channel — e.g. `98000001=https://discord.com/api/webhooks/…,98000002=https://discord.com/api/webhooks/…`. Personal maps never notify. Leave unset to disable. Which regions/maps actually notify is then filtered per corp in the admin **Discord** tab. See [Discord notifications](#discord-notifications). |
 
-**EVE developer app scopes**
+#### EVE developer app scopes
 
 When registering your application at [developers.eveonline.com](https://developers.eveonline.com), enable the following scopes:
 
@@ -155,7 +205,7 @@ docker compose up -d postgres
 docker compose run --rm server node dist/scripts/setup-db.js
 ```
 
-The importer also stores each system's universe coordinates and CCP's 2D star-map projection (`position` / `position2D`), which power the [Seed a map from a region](#key-features) feature. Fresh imports include them automatically; existing deployments that imported the SDE before this feature need a one-time backfill — see [Upgrading an existing deployment](#upgrading-an-existing-deployment).
+The importer also stores each system's universe coordinates and CCP's 2D star-map projection (`position` / `position2D`), which power the [Seed a map from a region](#features) feature. Fresh imports include them automatically; existing deployments that imported the SDE before this feature need a one-time backfill — see [Upgrading an existing deployment](#upgrading-an-existing-deployment).
 
 **3. Start the app**
 
@@ -218,7 +268,7 @@ docker compose up -d
 
 The importer is upsert-only (`ON CONFLICT DO UPDATE` on every table), so re-running is safe — your user data (maps, signatures, structures, sessions, etc.) lives in other tables and is never touched.
 
-**5. Upgrading an existing deployment**
+#### Upgrading an existing deployment
 
 Pulling a new Nexum release into a running instance:
 
@@ -226,7 +276,7 @@ Pulling a new Nexum release into a running instance:
   ```bash
   docker compose build server && docker compose up -d
   ```
-- **Region maps need solar-system coordinates.** If your SDE was imported before the [Seed a map from a region](#key-features) feature shipped, the coordinate columns exist but are empty, and seeding a region returns a clear error until they're populated. Backfill them once from the SDE zip already in `server/data/` — no full re-import needed:
+- **Region maps need solar-system coordinates.** If your SDE was imported before the [Seed a map from a region](#features) feature shipped, the coordinate columns exist but are empty, and seeding a region returns a clear error until they're populated. Backfill them once from the SDE zip already in `server/data/` — no full re-import needed:
   ```bash
   docker compose run --rm \
     -v "$PWD/server:/app" \
@@ -276,86 +326,7 @@ yarn dev
 
 The frontend is available at `http://localhost:5174`. The Vite dev server proxies `/api` and `/auth` to `http://localhost:3001`.
 
-> The server needs the EVE SDE imported into Postgres before it will boot — run `cd server && yarn setup-db` once (downloads the latest SDE and populates the static tables, including system coordinates). If you set up the database before the [Seed a map from a region](#key-features) feature shipped, populate the coordinate columns with the lighter one-shot backfill instead of a full re-import: `cd server && yarn backfill-coords`.
-
----
-
-## Static data files
-
-Some pre-computed lookups live in `server/data/` as plain JSON, derived once from the EVE Static Data Export (SDE). They're committed to the repo so a fresh install works without an extra step. You only need to regenerate them when CCP releases an SDE drop that adds or changes the underlying data.
-
-### `data/a0-systems.json`
-
-List of solar system IDs whose star is the visual "Sun A0 (Blue Small)" type (`typeID 3801` in the SDE). The server reads it at startup and exposes the list via `GET /api/systems/a0`; the client uses it to render a `★` icon on the matching system nodes. Currently 245 entries spanning both K-space and J-space.
-
-> Note: this is the canonical in-game "A0" classification (`typeID 3801`), not the SDE's `statistics.spectralClass` field. The two don't agree — a "Sun A0 (Blue Small)" system can carry a `spectralClass` value like `"F8 V"`. The `typeID` is what players actually see in-game and what other A0 tools filter on.
-
-To regenerate from the SDE zip in `server/data/`:
-
-```bash
-cd server
-unzip -p data/eve-online-static-data-*-jsonl.zip mapStars.jsonl | node -e "
-const lines = require('fs').readFileSync(0, 'utf8').split('\n').filter(Boolean);
-const ids = [];
-for (const l of lines) {
-  try {
-    const o = JSON.parse(l);
-    if (o.typeID === 3801) ids.push(o.solarSystemID);
-  } catch {}
-}
-ids.sort((a, b) => a - b);
-require('fs').writeFileSync('data/a0-systems.json', JSON.stringify(ids) + '\n');
-console.log('wrote ' + ids.length + ' A0 system IDs');
-"
-```
-
-Restart the server after regenerating — the file is read once at process start.
-
-### `data/wormholes.json`
-
-Per-wormhole-type metadata for every connection signature (T405, R943, K162, …) keyed by the in-game 3-letter code. Each entry carries the destination class, mass limits, lifetime, mass-regen, source classes, static-flag, sibling groups, and the EVE `typeID`. The client uses it for the wormhole type picker, sig aging tints, and the WH-type info popover; the server uses it for the demo-map seeder and a few admin-side lookups.
-
-Schema follows the [exodus4d/Pathfinder](https://github.com/exodus4d/pathfinder) shape — that project is the original source of the file and is bundled at the repo root for licensing/attribution. CCP rebalancing or new wormhole types (e.g. recent additions that exodus4d/Pathfinder no longer mirrors) require this file to be refreshed.
-
-**Refreshing from the SDE.** Most fields can be pulled deterministically from dogma attributes on the `Wormhole XXX` item types:
-
-| Field | Source |
-|---|---|
-| `dest` | dogma attribute `1381` (`wormholeTargetSystemClass`) |
-| `total_mass` | dogma attribute `1382` (`massWormholeTotal`) |
-| `max_mass_per_jump` | dogma attribute `1383` (`massWormholeMaxJumpable`) |
-| `mass_regen` | dogma attribute `1384` (`massWormholeMassRegeneration`) |
-| `lifetime` | dogma attribute `1503` (`wormholeMaxStableTime`, seconds — converted to hours) |
-
-What CCP does **not** encode in dogma is the `src` array — "where can this wormhole appear" is community/observation knowledge, not data. The refresh script preserves existing `src`, `static`, and `sibling_groups` values from the current `wormholes.json` and only flags brand-new codes for manual review.
-
-Run it after a fresh `yarn setup-db`:
-
-```bash
-cd server
-PG_HOST=localhost yarn extract-wormholes
-```
-
-Or inside Docker via a one-off container (matching the SDE refresh recipe in the Troubleshooting section):
-
-```bash
-docker compose run --rm \
-  -v "$PWD/server:/app" \
-  -w /app \
-  -e NODE_ENV=development \
-  --entrypoint sh \
-  server -c "yarn install --frozen-lockfile && yarn extract-wormholes"
-```
-
-The script prints three lists at the end:
-
-- **New codes** since last run — these have `src: []` and `static: false` filled in as placeholders; review them against CCP's patch notes (or the WH's in-game description) and edit by hand.
-- **Orphaned codes** — present in old JSON but absent from current SDE. Usually means CCP removed the type (very rare).
-- **Unmapped destination classes** — printed only if CCP adds a new class enum we don't know about; if you see this, extend `CLASS_MAP` at the top of `scripts/extract-wormholes.ts`.
-
-K162 is special-cased: it's preserved untouched because it has no single destination class (it's the "return side" of every other connection).
-
-Restart the server after regenerating.
+> The server needs the EVE SDE imported into Postgres before it will boot — run `cd server && yarn setup-db` once (downloads the latest SDE and populates the static tables, including system coordinates). If you set up the database before the [Seed a map from a region](#features) feature shipped, populate the coordinate columns with the lighter one-shot backfill instead of a full re-import: `cd server && yarn backfill-coords`.
 
 ---
 
@@ -512,7 +483,86 @@ Each tab is also reachable at its own hash route (`#/admin/maps`, `#/admin/audit
 
 ---
 
-## Technology Overview
+## Static data files
+
+Some pre-computed lookups live in `server/data/` as plain JSON, derived once from the EVE Static Data Export (SDE). They're committed to the repo so a fresh install works without an extra step. You only need to regenerate them when CCP releases an SDE drop that adds or changes the underlying data.
+
+### `data/a0-systems.json`
+
+List of solar system IDs whose star is the visual "Sun A0 (Blue Small)" type (`typeID 3801` in the SDE). The server reads it at startup and exposes the list via `GET /api/systems/a0`; the client uses it to render a `★` icon on the matching system nodes. Currently 245 entries spanning both K-space and J-space.
+
+> Note: this is the canonical in-game "A0" classification (`typeID 3801`), not the SDE's `statistics.spectralClass` field. The two don't agree — a "Sun A0 (Blue Small)" system can carry a `spectralClass` value like `"F8 V"`. The `typeID` is what players actually see in-game and what other A0 tools filter on.
+
+To regenerate from the SDE zip in `server/data/`:
+
+```bash
+cd server
+unzip -p data/eve-online-static-data-*-jsonl.zip mapStars.jsonl | node -e "
+const lines = require('fs').readFileSync(0, 'utf8').split('\n').filter(Boolean);
+const ids = [];
+for (const l of lines) {
+  try {
+    const o = JSON.parse(l);
+    if (o.typeID === 3801) ids.push(o.solarSystemID);
+  } catch {}
+}
+ids.sort((a, b) => a - b);
+require('fs').writeFileSync('data/a0-systems.json', JSON.stringify(ids) + '\n');
+console.log('wrote ' + ids.length + ' A0 system IDs');
+"
+```
+
+Restart the server after regenerating — the file is read once at process start.
+
+### `data/wormholes.json`
+
+Per-wormhole-type metadata for every connection signature (T405, R943, K162, …) keyed by the in-game 3-letter code. Each entry carries the destination class, mass limits, lifetime, mass-regen, source classes, static-flag, sibling groups, and the EVE `typeID`. The client uses it for the wormhole type picker, sig aging tints, and the WH-type info popover; the server uses it for the demo-map seeder and a few admin-side lookups.
+
+Schema follows the [exodus4d/Pathfinder](https://github.com/exodus4d/pathfinder) shape — that project is the original source of the file and is bundled at the repo root for licensing/attribution. CCP rebalancing or new wormhole types (e.g. recent additions that exodus4d/Pathfinder no longer mirrors) require this file to be refreshed.
+
+**Refreshing from the SDE.** Most fields can be pulled deterministically from dogma attributes on the `Wormhole XXX` item types:
+
+| Field | Source |
+|---|---|
+| `dest` | dogma attribute `1381` (`wormholeTargetSystemClass`) |
+| `total_mass` | dogma attribute `1382` (`massWormholeTotal`) |
+| `max_mass_per_jump` | dogma attribute `1383` (`massWormholeMaxJumpable`) |
+| `mass_regen` | dogma attribute `1384` (`massWormholeMassRegeneration`) |
+| `lifetime` | dogma attribute `1503` (`wormholeMaxStableTime`, seconds — converted to hours) |
+
+What CCP does **not** encode in dogma is the `src` array — "where can this wormhole appear" is community/observation knowledge, not data. The refresh script preserves existing `src`, `static`, and `sibling_groups` values from the current `wormholes.json` and only flags brand-new codes for manual review.
+
+Run it after a fresh `yarn setup-db`:
+
+```bash
+cd server
+PG_HOST=localhost yarn extract-wormholes
+```
+
+Or inside Docker via a one-off container (matching the SDE refresh recipe in the Troubleshooting section):
+
+```bash
+docker compose run --rm \
+  -v "$PWD/server:/app" \
+  -w /app \
+  -e NODE_ENV=development \
+  --entrypoint sh \
+  server -c "yarn install --frozen-lockfile && yarn extract-wormholes"
+```
+
+The script prints three lists at the end:
+
+- **New codes** since last run — these have `src: []` and `static: false` filled in as placeholders; review them against CCP's patch notes (or the WH's in-game description) and edit by hand.
+- **Orphaned codes** — present in old JSON but absent from current SDE. Usually means CCP removed the type (very rare).
+- **Unmapped destination classes** — printed only if CCP adds a new class enum we don't know about; if you see this, extend `CLASS_MAP` at the top of `scripts/extract-wormholes.ts`.
+
+K162 is special-cased: it's preserved untouched because it has no single destination class (it's the "return side" of every other connection).
+
+Restart the server after regenerating.
+
+---
+
+## Technology overview
 
 ### Frontend — `web/`
 
@@ -643,6 +693,8 @@ docker compose exec postgres psql -U "$PG_USER" -d "$PG_DB" \
 
 If `solar_systems` is empty the SDE import never ran — re-run `npm run setup-db` inside the `server` container.
 
+---
+
 ## License
 
 Nexum is free software licensed under the [GNU General Public License v3.0 or later](LICENSE) (`GPL-3.0-or-later`). You're free to use, study, modify, and redistribute it; if you distribute a modified version, that version must also be released under the GPL. See [LICENSE](LICENSE) for the full text.
@@ -652,4 +704,3 @@ Nexum is free software licensed under the [GNU General Public License v3.0 or la
 EVE Online and the EVE logo are the registered trademarks of CCP hf. All rights are reserved worldwide. All other trademarks are the property of their respective owners. EVE Online, the EVE logo, EVE and all associated logos and designs are the intellectual property of CCP hf. All artwork, screenshots, characters, vehicles, storylines, world facts or other recognizable features of the intellectual property relating to these trademarks are likewise the intellectual property of CCP hf.
 
 CCP hf. has granted permission to Nexum to use EVE Online and all associated logos and designs for promotional and information purposes on its website but does not endorse, and is not in any way affiliated with, Nexum. CCP is in no way responsible for the content on or functioning of this software, nor can it be liable for any damage arising from the use of this software.
-
