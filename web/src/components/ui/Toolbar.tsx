@@ -152,8 +152,10 @@ function CheckedAtLabel({ checkedAt }: { checkedAt: Date }) {
 // on threshold crossings — Toolbar is rendered once for every logged-in user).
 function ProximityChip() {
   const { nearest, threshold } = useProximityAlerts();
-  if (!nearest) return null;
-  const inZone = nearest.jumps <= threshold;
+  // The user's configurable threshold gates both display and the alert state —
+  // if the chip is shown, the threat is in-zone by definition. Filters out the
+  // permanent "20 jumps — …" noise on most maps.
+  if (!nearest || nearest.jumps > threshold) return null;
   const { label, Icon }: { label: string; Icon: PhosphorIcon } =
     nearest.kind === 'incursion'   ? { label: 'Incursion',   Icon: WarningIcon } :
     nearest.kind === 'insurgency'  ? { label: 'Insurgency',  Icon: SkullIcon } :
@@ -161,7 +163,7 @@ function ProximityChip() {
     { label: 'Threat', Icon: QuestionIcon };
   return (
     <span
-      className={`toolbar__proximity${inZone ? ' toolbar__proximity--alert' : ''}`}
+      className="toolbar__proximity toolbar__proximity--alert"
       data-tooltip={`Closest ${label.toLowerCase()} system`}
     >
       <span className="toolbar__proximity-icon"><Icon size={14} weight="bold" /></span>
