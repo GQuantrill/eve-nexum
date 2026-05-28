@@ -4,7 +4,7 @@ import {
   GraphIcon, MapTrifoldIcon, GaugeIcon, MagnifyingGlassIcon, SelectionIcon, ImageIcon, HourglassIcon,
   UsersIcon, StackIcon, ArrowsMergeIcon, ArrowsClockwiseIcon, LockIcon, ShieldCheckIcon,
   CardsIcon, WaveformIcon, BuildingsIcon, SparkleIcon, ChartLineIcon, FlagBannerIcon, SwordIcon, HandshakeIcon,
-  PathIcon, StarIcon, SnowflakeIcon, LightningIcon, WarningIcon, NavigationArrowIcon, MapPinIcon, BroadcastIcon, BellRingingIcon,
+  PathIcon, StarIcon, SnowflakeIcon, LightningIcon, WarningIcon, NavigationArrowIcon, MapPinIcon, BroadcastIcon, BellRingingIcon, DiscordLogoIcon,
   CommandIcon, HouseIcon, SkullIcon, ChartBarIcon, PulseIcon, EyeIcon, SidebarIcon,
   SquaresFourIcon, UserGearIcon, TableIcon, ChartDonutIcon, ClockIcon, ClipboardTextIcon, TagIcon, IdentificationCardIcon,
 } from '@phosphor-icons/react';
@@ -515,6 +515,15 @@ export function LandingPage() {
               </p>
             </>
           )}
+          <a
+            href="https://discord.gg/vXzFRCYpQ"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="landing__discord-btn"
+          >
+            <DiscordLogoIcon size={20} weight="fill" />
+            <span>Join the Nexum Discord</span>
+          </a>
         </div>
         {FEATURE_SECTIONS.map((section) => (
           <section key={section.title} className="landing__section landing__section--features">

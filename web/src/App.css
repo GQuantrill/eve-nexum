@@ -5283,6 +5283,26 @@ select.sig-toolbar-btn option {
 }
 .landing__switch-link:hover { color: #4d9de0; border-color: #4d9de0; }
 
+/* "Join the Discord" button under the EVE SSO login - Discord blurple. */
+.landing__discord-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+  padding: 10px 18px;
+  background: #5865f2;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: calc(14px * var(--font-scale, 1));
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background 0.15s, transform 0.15s;
+}
+.landing__discord-btn:hover {
+  background: #4752c4;
+  transform: translateY(-1px);
+}
+
 .landing__section {
   width: 100%;
   padding: 48px 0;
