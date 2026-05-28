@@ -452,6 +452,30 @@ export async function migrate() {
     CREATE UNIQUE INDEX IF NOT EXISTS uq_map_shares_corp ON map_shares (map_id, target_corp_id)      WHERE target_corp_id      IS NOT NULL;
     CREATE INDEX IF NOT EXISTS idx_map_shares_char ON map_shares (target_character_id) WHERE target_character_id IS NOT NULL;
     CREATE INDEX IF NOT EXISTS idx_map_shares_corp ON map_shares (target_corp_id)      WHERE target_corp_id      IS NOT NULL;
+
+    -- ── Corp structures (ESI-sourced) ──────────────────────────────────
+    CREATE TABLE IF NOT EXISTS corp_structures (
+      structure_id      BIGINT      PRIMARY KEY,
+      corporation_id    INT         NOT NULL,
+      system_id         INT         NOT NULL,
+      type_id           INT         NOT NULL,
+      name              TEXT        NOT NULL DEFAULT '',
+      state             TEXT        NOT NULL DEFAULT 'unknown',
+      fuel_expires      TIMESTAMPTZ,
+      services          JSONB       NOT NULL DEFAULT '[]',
+      reinforce_hour    INT,
+      state_timer_start TIMESTAMPTZ,
+      state_timer_end   TIMESTAMPTZ,
+      unanchors_at      TIMESTAMPTZ,
+      last_polled       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      removed_at        TIMESTAMPTZ,
+      fuel_alert_sent_at TIMESTAMPTZ
+    );
+    CREATE INDEX IF NOT EXISTS idx_corp_structures_corp   ON corp_structures (corporation_id);
+    CREATE INDEX IF NOT EXISTS idx_corp_structures_system ON corp_structures (system_id);
+
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS has_structures_scope BOOLEAN NOT NULL DEFAULT FALSE;
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS has_station_manager  BOOLEAN NOT NULL DEFAULT FALSE;
   `);
 
   await encryptLegacyTokens();

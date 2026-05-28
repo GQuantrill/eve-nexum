@@ -8,6 +8,7 @@ declare module 'express-session' {
     role: 'admin' | 'full' | 'edit' | 'readonly';
     userCorpId?: number | null;
     oauthState: string;
+    scopeGrant?: boolean;
     // Cached UI preferences — kept in sync by PATCH /auth/preferences so
     // /auth/me doesn't have to hit the DB on every page load.
     prefs: {

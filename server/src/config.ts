@@ -12,6 +12,7 @@ const CORP_IDS: number[] = (process.env.CORP_ID ?? '')
 const ADMIN_CHAR_ID = process.env.ADMIN_CHAR_ID ? parseInt(process.env.ADMIN_CHAR_ID, 10) : null;
 const REPORTS_CHAR_ID = process.env.RV_REPORT_ID ? parseInt(process.env.RV_REPORT_ID, 10) : null;
 const CORP_MAP_TIME = parseInt(process.env.CORP_MAP_TIME ?? '30', 10);
+const FUEL_ALERT_HOURS = Math.max(1, parseInt(process.env.FUEL_ALERT_HOURS ?? '72', 10) || 72);
 
 // When true, every member of any listed corp can see every corp map regardless
 // of which corp created it. When false (default), corp maps are visible only
@@ -94,6 +95,7 @@ export const config = {
   maxUserMaps:         parseInt(process.env.MAX_USER_MAPS ?? '5', 10),
   maxCorpMaps:         parseInt(process.env.MAX_CORP_MAPS ?? '5', 10),
   discord:             DISCORD_WEBHOOKS,
+  fuelAlertHours:      FUEL_ALERT_HOURS,
   sessionSecret:       process.env.SESSION_SECRET ?? 'dev-secret-change-me',
   tokenEncryptionKey,
   isProd,

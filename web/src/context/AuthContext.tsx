@@ -18,6 +18,8 @@ export interface AuthUser {
   uiSettings: Record<string, unknown>;
   panelOrder: string[];
   canViewReports: boolean;
+  hasStationManager: boolean;
+  hasStructuresScope: boolean;
 }
 
 interface AuthContextValue {

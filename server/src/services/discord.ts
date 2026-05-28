@@ -110,3 +110,16 @@ export function connectionEmbed(p: {
     timestamp:   new Date().toISOString(),
   };
 }
+
+const RED = 0xff4444;
+
+export function fuelAlertEmbed(p: {
+  structureName: string; systemName: string; hoursLeft: number;
+}): DiscordEmbed {
+  return {
+    title:       '⛽ Low Fuel',
+    description: `**${p.structureName}** in **${p.systemName}** has ~${p.hoursLeft}h of fuel remaining.`,
+    color:       p.hoursLeft <= 24 ? RED : AMBER,
+    timestamp:   new Date().toISOString(),
+  };
+}

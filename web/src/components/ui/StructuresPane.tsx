@@ -12,6 +12,38 @@ import { setDestination, addWaypoint } from '../../api/waypoint';
 import { toast } from './Toaster';
 import { useCanEditContent } from '../../hooks/useCanEditContent';
 import { useStandings } from '../../hooks/useStandings';
+import { useAuth } from '../../context/AuthContext';
+
+interface ESICorpStructure {
+  structure_id: number;
+  corporation_id: number;
+  system_id: number;
+  type_id: number;
+  name: string;
+  state: string;
+  fuel_expires: string | null;
+  services: { name: string; state: string }[];
+  reinforce_hour: number | null;
+  state_timer_start: string | null;
+  state_timer_end: string | null;
+  unanchors_at: string | null;
+  last_polled: string;
+  type_name: string | null;
+}
+
+function fuelStatus(fuelExpires: string | null): { label: string; className: string } | null {
+  if (!fuelExpires) return null;
+  const hoursLeft = (new Date(fuelExpires).getTime() - Date.now()) / (1000 * 60 * 60);
+  if (hoursLeft <= 0) return { label: 'EMPTY', className: 'fuel--empty' };
+  if (hoursLeft < 24) return { label: `${Math.round(hoursLeft)}h`, className: 'fuel--critical' };
+  if (hoursLeft < 72) {
+    const d = Math.floor(hoursLeft / 24);
+    const h = Math.round(hoursLeft % 24);
+    return { label: `${d}d ${h}h`, className: 'fuel--warning' };
+  }
+  if (hoursLeft < 168) return { label: `${Math.round(hoursLeft / 24)}d`, className: 'fuel--caution' };
+  return { label: `${Math.round(hoursLeft / 24)}d`, className: 'fuel--ok' };
+}
 
 const STRUCTURE_TYPE_LABELS: Record<StructureType, string> = {
   unknown:   'Unknown',
@@ -69,7 +101,9 @@ export function StructuresPane({ systemId }: { systemId: string }) {
   const activeMapId = useMapStore((s) => s.activeMapId);
   const canEdit     = useCanEditContent();
   const standings   = useStandings();
+  const { user }    = useAuth();
   const [structures, setStructures] = useState<Structure[]>([]);
+  const [esiStructures, setEsiStructures] = useState<ESICorpStructure[]>([]);
   const [pendingAction, setPendingAction] = useState<{ message: string; fn: () => void } | null>(null);
   const [ctx, setCtx] = useState<{ x: number; y: number; structure: Structure } | null>(null);
 
@@ -109,6 +143,18 @@ export function StructuresPane({ systemId }: { systemId: string }) {
       .then(setStructures)
       .catch(() => {});
   }, [structRev, activeMapId, systemId, isShareMode]);
+
+  const eveSystemId = useMapStore((s) => {
+    const sys = s.map.systems.find((sys) => sys.id === systemId);
+    return sys?.eveSystemId ?? null;
+  });
+
+  useEffect(() => {
+    if (!eveSystemId || isShareMode || !user?.corpMode) return;
+    api<ESICorpStructure[]>(`/api/corp-structures/by-system/${eveSystemId}`)
+      .then(setEsiStructures)
+      .catch(() => setEsiStructures([]));
+  }, [eveSystemId, isShareMode, user?.corpMode]);
 
   useEffect(() => {
     const close = () => setCtx(null);
@@ -201,7 +247,15 @@ export function StructuresPane({ systemId }: { systemId: string }) {
         />
       )}
       <div className="sig-pane">
-        {!isShareMode && structures.length === 0 && (
+        {user?.corpMode && user.hasStationManager && !user.hasStructuresScope && (
+          <div className="structures-pane__grant-banner">
+            <span>Enable structure tracking for your corp</span>
+            <a href="/auth/grant-structures" className="structures-pane__grant-link">
+              Authorize with EVE Online
+            </a>
+          </div>
+        )}
+        {!isShareMode && structures.length === 0 && esiStructures.length === 0 && (
           <p className="sig-pane__hint">You can copy and paste structures directly from your Overview in EVE. In space, right-click anywhere in your Overview window and choose "Copy Selected Rows" (or select the lines and Ctrl+C). Paste here with Ctrl+V — the structure ID, name, and type are imported automatically.</p>
         )}
         {canEdit && !isShareMode && (
@@ -215,7 +269,7 @@ export function StructuresPane({ systemId }: { systemId: string }) {
           </div>
         )}
 
-        {structures.length === 0 ? (
+        {structures.length === 0 && esiStructures.length === 0 ? (
           <div className="sig-pane__empty">No structures recorded</div>
         ) : (
           <table className="sig-table">
@@ -335,6 +389,35 @@ export function StructuresPane({ systemId }: { systemId: string }) {
                 </tr>
                 );
               })}
+              {esiStructures
+                .filter((esi) => !structures.some((s) => s.eveId === esi.structure_id))
+                .map((esi) => {
+                  const fuel = fuelStatus(esi.fuel_expires);
+                  return (
+                    <tr key={`esi-${esi.structure_id}`} className="structures-pane__row--esi">
+                      <td>{esi.name}</td>
+                      <td>{esi.type_name ?? `Type ${esi.type_id}`}</td>
+                      <td>
+                        <span className={`structures-pane__state structures-pane__state--${esi.state}`}>
+                          {esi.state.replace(/_/g, ' ')}
+                        </span>
+                      </td>
+                      <td>
+                        {fuel && <span className={`structures-pane__fuel ${fuel.className}`}>{fuel.label}</span>}
+                      </td>
+                      <td>
+                        {(esi.services ?? []).map((svc) => (
+                          <span key={svc.name} className={`structures-pane__service structures-pane__service--${svc.state}`}>
+                            {svc.name}
+                          </span>
+                        ))}
+                      </td>
+                      {!isShareMode && (
+                        <td><span className="structures-pane__esi-tag">ESI</span></td>
+                      )}
+                    </tr>
+                  );
+                })}
             </tbody>
           </table>
         )}

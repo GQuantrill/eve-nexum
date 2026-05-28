@@ -10,6 +10,7 @@ import { UserStatsModal } from './UserStatsModal';
 import { ConfirmModal } from './ConfirmModal';
 import { CreateMapModal } from './CreateMapModal';
 import { useProximityAlerts } from '../../hooks/useProximityAlerts';
+import { FuelAlertChip } from './FuelAlertChip';
 import {
   WarningIcon, SkullIcon, XCircleIcon, QuestionIcon,
   ShieldStarIcon, ChartBarIcon, SlidersHorizontalIcon, FootprintsIcon,
@@ -329,6 +330,7 @@ export function Toolbar() {
       </div>
 
       <ProximityChip />
+      <FuelAlertChip />
 
       <div className="toolbar__spacer" />
 

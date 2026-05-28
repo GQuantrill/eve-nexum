@@ -23,10 +23,12 @@ import scoutRouter        from './routes/scout.js';
 import routeRouter        from './routes/route.js';
 import wormholesRouter    from './routes/wormholes.js';
 import { loadRouteGraph } from './services/routeGraph.js';
+import { initCorpStructures } from './services/corpStructures.js';
 import { adminRouter, adminReadRouter, reportsRouter } from './routes/admin.js';
 import { standingsRouter } from './routes/standings.js';
 import { shareRouter } from './routes/share.js';
 import searchRouter from './routes/search.js';
+import corpStructuresRouter from './routes/corpStructures.js';
 import { authLimiter, esiLimiter, publicLimiter, appLimiter } from './middleware/rateLimits.js';
 import { originGuard } from './middleware/originGuard.js';
 import { createLogger } from './utils/logger.js';
@@ -103,6 +105,7 @@ app.use('/api/admin',             appLimiter, adminReadRouter);
 app.use('/api/admin',             appLimiter, adminRouter);
 app.use('/api/standings',         appLimiter, standingsRouter);
 app.use('/api/search',            esiLimiter, searchRouter);
+app.use('/api/corp-structures',   esiLimiter, corpStructuresRouter);
 
 app.get('/health', (_req, res) => res.json({ ok: true }));
 
@@ -139,6 +142,7 @@ migrate()
     await expireMaps();
     setInterval(expireMaps, 60 * 60 * 1000); // re-check hourly
     await initActivity();
+    await initCorpStructures();
     await loadRouteGraph();
     app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
   })

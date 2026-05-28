@@ -19,6 +19,23 @@ const FRONTEND_URL  = process.env.FRONTEND_URL ?? 'http://localhost:5174';
 const EVE_AUTH_URL  = 'https://login.eveonline.com/v2/oauth/authorize';
 const EVE_TOKEN_URL = 'https://login.eveonline.com/v2/oauth/token';
 
+const BASE_SCOPES = [
+  'esi-location.read_location.v1',
+  'esi-location.read_ship_type.v1',
+  'esi-structures.read_structures.v1',
+  'esi-corporations.read_corporation_membership.v1',
+  'esi-ui.open_window.v1',
+  'esi-ui.write_waypoint.v1',
+  'esi-characters.read_corporation_roles.v1',
+  'esi-location.read_online.v1',
+  'esi-characters.read_contacts.v1',
+  'esi-corporations.read_contacts.v1',
+  'esi-alliances.read_contacts.v1',
+  'esi-fleets.read_fleet.v1',
+];
+
+const STRUCTURES_SCOPE = 'esi-corporations.read_structures.v1';
+
 // GET /auth/login  — redirect to EVE SSO
 authRouter.get('/login', (req, res) => {
   const state = randomBytes(32).toString('hex');
@@ -28,28 +45,32 @@ authRouter.get('/login', (req, res) => {
     response_type: 'code',
     redirect_uri:  CALLBACK_URL,
     client_id:     CLIENT_ID,
-    scope: [
-          'esi-location.read_location.v1',
-          'esi-location.read_ship_type.v1',
-          'esi-universe.read_structures.v1',
-          'esi-corporations.read_corporation_membership.v1',
-          'esi-ui.open_window.v1',
-          'esi-ui.write_waypoint.v1',
-          'esi-characters.read_corporation_roles.v1',
-          'esi-location.read_online.v1',
-          // Read player standings (contacts) so the UI can colour-tag
-          // structures / killboard / sov by your standing toward each
-          // entity. Corp / alliance reads only succeed for characters with
-          // the Contact Manager role; reads gracefully no-op otherwise.
-          'esi-characters.read_contacts.v1',
-          'esi-corporations.read_contacts.v1',
-          'esi-alliances.read_contacts.v1',
-          // Fleet member tracking — show fleet-mate locations on the map as
-          // purple dots. Requires the character to be the fleet boss or a
-          // wing/squad commander; ESI returns 403 to everyone else and the
-          // UI degrades silently to "no fleet visibility".
-          'esi-fleets.read_fleet.v1',
-        ].join(' '),
+    scope: BASE_SCOPES.join(' '),
+    state,
+  });
+
+  req.session.save((err) => {
+    if (err) { res.status(500).json({ error: 'Session error' }); return; }
+    res.redirect(`${EVE_AUTH_URL}?${params}`);
+  });
+});
+
+// GET /auth/grant-structures — optional scope grant for ESI corp structures
+authRouter.get('/grant-structures', (req, res) => {
+  if (!req.session.userId) {
+    res.redirect(`${FRONTEND_URL}?error=not_logged_in`);
+    return;
+  }
+
+  const state = randomBytes(32).toString('hex');
+  req.session.oauthState = state;
+  req.session.scopeGrant = true;
+
+  const params = new URLSearchParams({
+    response_type: 'code',
+    redirect_uri:  CALLBACK_URL,
+    client_id:     CLIENT_ID,
+    scope:         [...BASE_SCOPES, STRUCTURES_SCOPE].join(' '),
     state,
   });
 
@@ -69,6 +90,8 @@ authRouter.get('/callback', async (req, res) => {
     return;
   }
   delete req.session.oauthState;
+  const isScopeGrant = req.session.scopeGrant === true;
+  delete req.session.scopeGrant;
 
   try {
     // Exchange code for tokens
@@ -97,6 +120,18 @@ authRouter.get('/callback', async (req, res) => {
       refresh_token: string;
       expires_in: number;
     };
+
+    if (isScopeGrant && req.session.userId) {
+      await db.query(
+        `UPDATE users SET access_token = $1, refresh_token = $2, token_expires_at = $3,
+                has_structures_scope = TRUE, updated_at = NOW()
+         WHERE id = $4`,
+        [encryptToken(tokens.access_token), encryptToken(tokens.refresh_token),
+         new Date(Date.now() + tokens.expires_in * 1000), req.session.userId],
+      );
+      res.redirect(FRONTEND_URL);
+      return;
+    }
 
     // Decode the JWT payload to extract character info (EVE SSO v2)
     const jwtPayload = JSON.parse(
@@ -141,6 +176,23 @@ authRouter.get('/callback', async (req, res) => {
       }
     }
 
+    // Check if character has Station_Manager corp role (needed for structure ESI).
+    let hasStationManager = false;
+    if (userCorpId) {
+      try {
+        const rolesRes = await fetch(
+          `https://esi.evetech.net/v2/characters/${characterId}/roles/`,
+          { headers: { Authorization: `Bearer ${tokens.access_token}` } },
+        );
+        if (rolesRes.ok) {
+          const rolesData = await rolesRes.json() as { roles?: string[] };
+          hasStationManager = (rolesData.roles ?? []).includes('Station_Manager');
+        }
+      } catch {
+        // Non-fatal
+      }
+    }
+
     const expiresAt = new Date(Date.now() + tokens.expires_in * 1000);
 
     // Role policy:
@@ -154,8 +206,8 @@ authRouter.get('/callback', async (req, res) => {
     const defaultRole = (!config.corpMode || isAdminChar) ? 'admin' : 'readonly';
 
     const { rows } = await db.query<{ id: number; role: string; blocked: boolean }>(
-      `INSERT INTO users (character_id, character_name, access_token, refresh_token, token_expires_at, role, corp_id, alliance_id)
-       VALUES ($1, $2, $3, $4, $5, $6, $8, $10)
+      `INSERT INTO users (character_id, character_name, access_token, refresh_token, token_expires_at, role, corp_id, alliance_id, has_station_manager)
+       VALUES ($1, $2, $3, $4, $5, $6, $8, $10, $11)
        ON CONFLICT (character_id) DO UPDATE SET
          character_name   = EXCLUDED.character_name,
          access_token     = EXCLUDED.access_token,
@@ -163,6 +215,7 @@ authRouter.get('/callback', async (req, res) => {
          token_expires_at = EXCLUDED.token_expires_at,
          corp_id          = COALESCE($8::int,  users.corp_id),
          alliance_id      = COALESCE($10::int, users.alliance_id),
+         has_station_manager = EXCLUDED.has_station_manager,
          role             = CASE
            -- ADMIN_CHAR_ID is always pinned to admin regardless of mode
            WHEN $7::int IS NOT NULL AND users.character_id = $7::int THEN 'admin'
@@ -173,7 +226,7 @@ authRouter.get('/callback', async (req, res) => {
          updated_at       = NOW()
        RETURNING id, role, blocked`,
       [characterId, jwtPayload.name, encryptToken(tokens.access_token), encryptToken(tokens.refresh_token), expiresAt,
-       defaultRole, config.adminCharId, userCorpId, !config.corpMode, userAllianceId],
+       defaultRole, config.adminCharId, userCorpId, !config.corpMode, userAllianceId, hasStationManager],
     );
 
     const userId = rows[0].id;
@@ -286,6 +339,11 @@ authRouter.get('/me', async (req, res) => {
     req.session.role  = role;
   }
 
+  const structFlags = await db.query<{ has_station_manager: boolean; has_structures_scope: boolean }>(
+    `SELECT has_station_manager, has_structures_scope FROM users WHERE id = $1`,
+    [req.session.userId],
+  );
+
   res.json({
     user: {
       id:            req.session.userId,
@@ -307,6 +365,8 @@ authRouter.get('/me', async (req, res) => {
       uiSettings:    prefs.uiSettings ?? {},
       panelOrder:    prefs.panelOrder,
       canViewReports: config.reportsCharId !== null && req.session.characterId === config.reportsCharId,
+      hasStationManager:  structFlags.rows[0]?.has_station_manager ?? false,
+      hasStructuresScope: structFlags.rows[0]?.has_structures_scope ?? false,
     },
   });
 });
