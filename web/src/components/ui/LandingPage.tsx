@@ -4,7 +4,7 @@ import {
   GraphIcon, MapTrifoldIcon, GaugeIcon, MagnifyingGlassIcon, SelectionIcon, ImageIcon, HourglassIcon,
   UsersIcon, StackIcon, ArrowsMergeIcon, ArrowsClockwiseIcon, LockIcon, ShieldCheckIcon,
   CardsIcon, WaveformIcon, BuildingsIcon, SparkleIcon, ChartLineIcon, FlagBannerIcon, SwordIcon, HandshakeIcon,
-  PathIcon, StarIcon, SnowflakeIcon, LightningIcon, WarningIcon, NavigationArrowIcon, MapPinIcon, BroadcastIcon, BellRingingIcon,
+  PathIcon, StarIcon, SnowflakeIcon, LightningIcon, WarningIcon, NavigationArrowIcon, MapPinIcon, BroadcastIcon, BellRingingIcon, DiscordLogoIcon,
   CommandIcon, HouseIcon, SkullIcon, ChartBarIcon, PulseIcon, EyeIcon, SidebarIcon,
   SquaresFourIcon, UserGearIcon, TableIcon, ChartDonutIcon, ClockIcon, ClipboardTextIcon, TagIcon, IdentificationCardIcon,
 } from '@phosphor-icons/react';
@@ -515,6 +515,15 @@ export function LandingPage() {
               </p>
             </>
           )}
+          <a
+            href="https://discord.gg/vXzFRCYpQ"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="landing__discord-btn"
+          >
+            <DiscordLogoIcon size={20} weight="fill" />
+            <span>Join the Nexum Discord</span>
+          </a>
         </div>
         {FEATURE_SECTIONS.map((section) => (
           <section key={section.title} className="landing__section landing__section--features">
@@ -565,6 +574,24 @@ export function LandingPage() {
           </p>
           <a href="/compare/" className="landing__compare-link">
             Compare Nexum vs Pathfinder, Tripwire &amp; Wanderer →
+          </a>
+        </section>
+
+        {/* ── Discord CTA ──────────────────────────────────── */}
+        <section className="landing__section landing__compare">
+          <h2 className="landing__section-title">Got questions, ideas, or bugs?</h2>
+          <p className="landing__section-body">
+            Drop into the Nexum Discord — feedback, feature requests, scanning
+            chat and o7s all welcome.
+          </p>
+          <a
+            href="https://discord.gg/vXzFRCYpQ"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="landing__discord-btn"
+          >
+            <DiscordLogoIcon size={20} weight="fill" />
+            <span>Join the Nexum Discord</span>
           </a>
         </section>
 
