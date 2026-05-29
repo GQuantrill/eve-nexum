@@ -22,6 +22,7 @@
   - [Docker (recommended)](#option-1--docker-recommended)
   - [Local development](#option-2--local-development)
   - [EVE developer app scopes](#eve-developer-app-scopes)
+  - [Refreshing wormhole types](#refreshing-wormhole-types)
   - [Upgrading an existing deployment](#upgrading-an-existing-deployment)
 - [Corp mode](#corp-mode)
   - [Allowing multiple corporations](#allowing-multiple-corporations)
@@ -70,12 +71,10 @@ TOKEN_ENCRYPTION_KEY=…
 
 Leave `CORP_ID` unset for now — that opens login to any EVE character. To restrict to one or more corps later, see [Corp mode](#corp-mode).
 
-Bring up Postgres, import the EVE Static Data Export (one-off, a few minutes), then start the rest of the stack:
+Build and start the stack. On first run an `importer` service downloads the EVE Static Data Export and populates Postgres (a one-off, a few minutes) before the server boots; later runs detect the data is already there and skip straight through:
 
 ```bash
 docker compose build
-docker compose up -d postgres
-docker compose run --rm server node dist/scripts/setup-db.js
 docker compose up -d
 ```
 
@@ -220,36 +219,24 @@ When registering your application at [developers.eveonline.com](https://develope
 | `esi-alliances.read_contacts.v1` | Read the **alliance's** shared contact list. Requires the character to be in the alliance executor corp with the right role; almost always denied for normal members, and that's fine — the call no-ops without breaking login. |
 | `esi-fleets.read_fleet.v1` | Read the character's current fleet composition (members + their solar systems) so fleet-mates show up as purple dots on the map with a hover tooltip listing names. Member-list reads require the character to be the **fleet boss**; wing/squad commanders see "in a fleet, no member visibility" and the UI degrades silently. |
 
-**2. Build images and import the SDE**
+**2. Build and start the stack**
 
-The server depends on the EVE Static Data Export (SDE) tables (`map_stargates`, `solar_systems`, `item_types`, …) at boot — without them, route-graph initialisation throws and the container crash-loops. So the very first thing to do on a fresh DB is bring up Postgres alone and run the importer as a one-off.
+The server depends on the EVE Static Data Export (SDE) tables (`map_stargates`, `solar_systems`, `item_types`, …) at boot — without them, route-graph initialisation throws and the container crash-loops. A dedicated `importer` service handles this: it runs once after Postgres is healthy, downloads the SDE (~hundreds of MB from CCP, a few minutes; logs progress per table), populates the static tables, then exits. The server waits for it to finish (`service_completed_successfully`) before booting, so a single command brings everything up in the right order.
 
 ```bash
-# Build the images first so the importer is available to run.
 docker compose build
-
-# Bring up only Postgres. The server intentionally stays down for now.
-docker compose up -d postgres
-
-# Import the EVE SDE into the running Postgres. Downloads the latest zip
-# from CCP (~hundreds of MB) and populates the static tables. Takes a
-# few minutes; logs progress per table.
-docker compose run --rm server node dist/scripts/setup-db.js
-```
-
-The importer also stores each system's universe coordinates and CCP's 2D star-map projection (`position` / `position2D`), which power the [Seed a map from a region](#features) feature. Fresh imports include them automatically; existing deployments that imported the SDE before this feature need a one-time backfill — see [Upgrading an existing deployment](#upgrading-an-existing-deployment).
-
-**3. Start the app**
-
-**Standard (direct ports):**
-```bash
 docker compose up -d
 ```
+
 The app will be available on port `${WEB_PORT:-80}` (defaults to `80`).
 
-**With Traefik reverse proxy:**
+The import is self-skipping: on every later `up` or restart the importer sees the static tables are already populated and exits in a second without re-downloading. So the two commands above are also your update flow. To force a re-import (e.g. after a CCP SDE drop), see [Updating the SDE](#installation) below.
 
-Add `DOMAIN=nexum.yourdomain.com` to your `.env`, then:
+The importer also stores each system's universe coordinates and CCP's 2D star-map projection (`position` / `position2D`), which power the [Seed a map from a region](#features) feature.
+
+**3. Reverse proxy (optional)**
+
+To front the stack with Traefik for TLS and a public URL, add `DOMAIN=nexum.yourdomain.com` to your `.env`, then:
 ```bash
 docker compose -f docker-compose.yml -f docker-compose.traefik.yml up -d
 ```
@@ -265,40 +252,39 @@ App-schema migrations (`users`, `maps`, `map_signatures`, etc.) layer on automat
 
 **4. Updating the SDE (after a CCP data drop)**
 
-When CCP ships an SDE update (new systems, NPC stations, item types, wormholes, etc.) you need to re-run the importer against the new zip. The runtime image ships without `scripts/` or `tsx`, so use a one-off container that mounts your local `server/` source:
+This is automatic — you don't normally do anything. The server checks once a day (default **11:30 UTC**, just after the 11:00 downtime when CCP publishes the new export) whether a newer SDE build exists. The check is cheap: a single `HEAD` request reads the build number from CCP's "latest" redirect (`…/eve-online-static-data-<build>-jsonl.zip`) and compares it to the build recorded in the `sde_meta` table. If — and only if — the build changed, the server downloads the new export, re-seeds the static tables, and reloads its in-memory route graph in place. No new build, no download; a re-seed needs no restart.
+
+The re-seed is upsert-only (`ON CONFLICT DO UPDATE` on every table), so it's safe — your user data (maps, signatures, structures, sessions, etc.) lives in other tables and is never touched.
+
+Tune it via `.env`:
+
+| Variable | Default | Effect |
+|---|---|---|
+| `SDE_AUTO_UPDATE` | `1` (on) | Set to `0` to disable the daily check entirely. |
+| `SDE_CHECK_UTC` | `11:30` | Time of day (HH:MM, UTC) to run the check. |
+
+To force a re-import immediately (e.g. to test, or if you disabled the daily check), run the importer with `FORCE_SDE_IMPORT=1`:
 
 ```bash
-# 1) Drop the new SDE in server/data/ and remove the old zip — the importer
-#    picks the first .zip it finds, so leaving both confuses it.
-curl -L -o server/data/eve-online-static-data-latest-jsonl.zip \
-  https://developers.eveonline.com/static-data/eve-online-static-data-latest-jsonl.zip
-rm server/data/eve-online-static-data-<old-version>-jsonl.zip
-
-# 2) Run the importer in a one-off container. NODE_ENV=development is
-#    required so yarn installs devDependencies (tsx lives there).
-docker compose run --rm \
-  -v "$PWD/server:/app" \
-  -w /app \
-  -e NODE_ENV=development \
-  --entrypoint sh \
-  server -c "yarn install --frozen-lockfile && yarn setup-db"
-
-# 3) Refresh the wormhole metadata too — picks up any new WH types from
-#    the same SDE pull. See "Static data files" for what it does.
-docker compose run --rm \
-  -v "$PWD/server:/app" \
-  -w /app \
-  -e NODE_ENV=development \
-  --entrypoint sh \
-  server -c "yarn install --frozen-lockfile && yarn extract-wormholes"
-
-# 4) Rebuild + restart so the new zip is baked into the next deploy AND
-#    the nginx inside the web container re-resolves the server's IP.
-docker compose build server
-docker compose up -d
+docker compose run --rm -e FORCE_SDE_IMPORT=1 importer
 ```
 
-The importer is upsert-only (`ON CONFLICT DO UPDATE` on every table), so re-running is safe — your user data (maps, signatures, structures, sessions, etc.) lives in other tables and is never touched.
+#### Refreshing wormhole types
+
+Mostly automatic. Wormhole stats (destination class, mass limits, lifetime, mass-regen) are derived live from the imported SDE dogma, so a CCP **rebalance** flows in on the next daily re-seed with no action — no `extract-wormholes`, no rebuild.
+
+The only thing the SDE can't provide is `src` ("where can this WH appear") — community knowledge curated in `data/wormholes.json`. When CCP adds a **brand-new WH type** (rare — usually a major expansion), it auto-appears in `/api/wormholes/types` with its derived stats and an empty `src`, and the server logs it as needing curation. To fill in `src`, add the code to `data/wormholes.json` and rebuild:
+
+```bash
+# Optional: scaffold any new codes (preserves existing curation, fills new
+# entries with placeholder src). Then edit data/wormholes.json by hand.
+docker compose run --rm \
+  -v "$PWD/server:/app" -w /app -e NODE_ENV=development \
+  --entrypoint sh server -c "yarn install --frozen-lockfile && yarn extract-wormholes"
+docker compose build server && docker compose up -d
+```
+
+See [Static data files](#static-data-files) for what `extract-wormholes` does and the fields involved.
 
 #### Upgrading an existing deployment
 
@@ -308,16 +294,6 @@ Pulling a new Nexum release into a running instance:
   ```bash
   docker compose build server && docker compose up -d
   ```
-- **Region maps need solar-system coordinates.** If your SDE was imported before the [Seed a map from a region](#features) feature shipped, the coordinate columns exist but are empty, and seeding a region returns a clear error until they're populated. Backfill them once from the SDE zip already in `server/data/` — no full re-import needed:
-  ```bash
-  docker compose run --rm \
-    -v "$PWD/server:/app" \
-    -w /app \
-    -e NODE_ENV=development \
-    --entrypoint sh \
-    server -c "yarn install --frozen-lockfile && yarn backfill-coords"
-  ```
-  (Re-running the full SDE importer — step 4 above — also populates them. The backfill is just the lighter option.)
 
 ---
 
@@ -358,7 +334,7 @@ yarn dev
 
 The frontend is available at `http://localhost:5174`. The Vite dev server proxies `/api` and `/auth` to `http://localhost:3001`.
 
-> The server needs the EVE SDE imported into Postgres before it will boot — run `cd server && yarn setup-db` once (downloads the latest SDE and populates the static tables, including system coordinates). If you set up the database before the [Seed a map from a region](#features) feature shipped, populate the coordinate columns with the lighter one-shot backfill instead of a full re-import: `cd server && yarn backfill-coords`.
+> The server needs the EVE SDE imported into Postgres before it will boot — run `cd server && yarn setup-db` once (downloads the latest SDE and populates the static tables, including system coordinates).
 
 ---
 
@@ -519,40 +495,13 @@ Each tab is also reachable at its own hash route (`#/admin/maps`, `#/admin/audit
 
 Some pre-computed lookups live in `server/data/` as plain JSON, derived once from the EVE Static Data Export (SDE). They're committed to the repo so a fresh install works without an extra step. You only need to regenerate them when CCP releases an SDE drop that adds or changes the underlying data.
 
-### `data/a0-systems.json`
-
-List of solar system IDs whose star is the visual "Sun A0 (Blue Small)" type (`typeID 3801` in the SDE). The server reads it at startup and exposes the list via `GET /api/systems/a0`; the client uses it to render a `★` icon on the matching system nodes. Currently 245 entries spanning both K-space and J-space.
-
-> Note: this is the canonical in-game "A0" classification (`typeID 3801`), not the SDE's `statistics.spectralClass` field. The two don't agree — a "Sun A0 (Blue Small)" system can carry a `spectralClass` value like `"F8 V"`. The `typeID` is what players actually see in-game and what other A0 tools filter on.
-
-To regenerate from the SDE zip in `server/data/`:
-
-```bash
-cd server
-unzip -p data/eve-online-static-data-*-jsonl.zip mapStars.jsonl | node -e "
-const lines = require('fs').readFileSync(0, 'utf8').split('\n').filter(Boolean);
-const ids = [];
-for (const l of lines) {
-  try {
-    const o = JSON.parse(l);
-    if (o.typeID === 3801) ids.push(o.solarSystemID);
-  } catch {}
-}
-ids.sort((a, b) => a - b);
-require('fs').writeFileSync('data/a0-systems.json', JSON.stringify(ids) + '\n');
-console.log('wrote ' + ids.length + ' A0 system IDs');
-"
-```
-
-Restart the server after regenerating — the file is read once at process start.
+> **A0 sun systems** (`typeID 3801`, "Sun A0 (Blue Small)") used to live here as `data/a0-systems.json`. They're now flagged on `solar_systems.is_a0` directly by the SDE importer (from `mapStars.jsonl`) and served via `GET /api/systems/a0`, so they refresh automatically on every SDE re-seed — no committed file, no manual regen. Note this is the in-game A0 classification (`typeID 3801`), not the SDE's `statistics.spectralClass` field; the two don't agree.
 
 ### `data/wormholes.json`
 
-Per-wormhole-type metadata for every connection signature (T405, R943, K162, …) keyed by the in-game 3-letter code. Each entry carries the destination class, mass limits, lifetime, mass-regen, source classes, static-flag, sibling groups, and the EVE `typeID`. The client uses it for the wormhole type picker, sig aging tints, and the WH-type info popover; the server uses it for the demo-map seeder and a few admin-side lookups.
+Per-wormhole-type metadata for every connection signature (T405, R943, K162, …) keyed by the in-game 3-letter code, served via `GET /api/wormholes/types` (the client uses it for the wormhole type picker, sig aging tints, and the WH-type info popover).
 
-Schema follows the [exodus4d/Pathfinder](https://github.com/exodus4d/pathfinder) shape — that project is the original source of the file and is bundled at the repo root for licensing/attribution. CCP rebalancing or new wormhole types (e.g. recent additions that exodus4d/Pathfinder no longer mirrors) require this file to be refreshed.
-
-**Refreshing from the SDE.** Most fields can be pulled deterministically from dogma attributes on the `Wormhole XXX` item types:
+The numeric stats are **not** read from this file at runtime — the server derives them live from the imported SDE dogma each time it builds the spec list (and rebuilds after every re-seed), so CCP rebalances apply automatically. The deterministic fields and their dogma sources:
 
 | Field | Source |
 |---|---|
@@ -562,9 +511,9 @@ Schema follows the [exodus4d/Pathfinder](https://github.com/exodus4d/pathfinder)
 | `mass_regen` | dogma attribute `1384` (`massWormholeMassRegeneration`) |
 | `lifetime` | dogma attribute `1503` (`wormholeMaxStableTime`, seconds — converted to hours) |
 
-What CCP does **not** encode in dogma is the `src` array — "where can this wormhole appear" is community/observation knowledge, not data. The refresh script preserves existing `src`, `static`, and `sibling_groups` values from the current `wormholes.json` and only flags brand-new codes for manual review.
+What this file **does** provide is the one thing CCP doesn't encode anywhere: the `src` array — "where can this wormhole appear" is community/observation knowledge, not data. (`static` and `sibling_groups` live here too but aren't currently served.) The schema follows the [exodus4d/Pathfinder](https://github.com/exodus4d/pathfinder) shape — that project is the original source of the file and is bundled at the repo root for licensing/attribution. A brand-new WH code auto-appears with derived stats and an empty `src`, logged as needing curation; fill it in here and rebuild.
 
-Run it after a fresh `yarn setup-db`:
+**`extract-wormholes` (optional maintainer helper).** Regenerates this file from the imported SDE — preserving existing `src` / `static` / `sibling_groups` and scaffolding new codes with placeholders — so you have a starting point to curate. The server no longer depends on the stat fields it writes; it's purely for maintaining `src`. Run it after a fresh `yarn setup-db`:
 
 ```bash
 cd server
@@ -588,9 +537,9 @@ The script prints three lists at the end:
 - **Orphaned codes** — present in old JSON but absent from current SDE. Usually means CCP removed the type (very rare).
 - **Unmapped destination classes** — printed only if CCP adds a new class enum we don't know about; if you see this, extend `CLASS_MAP` at the top of `scripts/extract-wormholes.ts`.
 
-K162 is special-cased: it's preserved untouched because it has no single destination class (it's the "return side" of every other connection).
+K162 is special-cased: it has no single destination class (it's the "return side" of every other connection), so it isn't in dogma; the server serves it from this file verbatim.
 
-Restart the server after regenerating.
+Rebuild and restart (`docker compose build server && docker compose up -d`) after editing the file so the new `src` is baked into the image.
 
 ---
 
@@ -723,7 +672,7 @@ docker compose exec postgres psql -U "$PG_USER" -d "$PG_DB" \
   -c "SELECT sess->>'userId' AS user_id, expire FROM sessions WHERE sid = '$SID';"
 ```
 
-If `solar_systems` is empty the SDE import never ran — re-run `npm run setup-db` inside the `server` container.
+If `solar_systems` is empty the SDE import never ran — check the importer's logs (`docker compose logs importer`) and re-run it with `docker compose run --rm -e FORCE_SDE_IMPORT=1 importer`.
 
 ---
 

@@ -23,6 +23,7 @@ import scoutRouter        from './routes/scout.js';
 import routeRouter        from './routes/route.js';
 import wormholesRouter    from './routes/wormholes.js';
 import { loadRouteGraph } from './services/routeGraph.js';
+import { startSdeAutoUpdate } from './services/sdeUpdate.js';
 import { adminRouter, adminReadRouter, reportsRouter } from './routes/admin.js';
 import { standingsRouter } from './routes/standings.js';
 import { shareRouter } from './routes/share.js';
@@ -141,5 +142,6 @@ migrate()
     await initActivity();
     await loadRouteGraph();
     app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+    startSdeAutoUpdate();
   })
   .catch((err) => { console.error('Migration failed:', err); process.exit(1); });

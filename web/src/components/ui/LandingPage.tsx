@@ -516,7 +516,7 @@ export function LandingPage() {
             </>
           )}
           <a
-            href="https://discord.gg/vXzFRCYpQ"
+            href="https://discord.gg/KG8SMXrhZ4"
             target="_blank"
             rel="noopener noreferrer"
             className="landing__discord-btn"
@@ -585,7 +585,7 @@ export function LandingPage() {
             chat and o7s all welcome.
           </p>
           <a
-            href="https://discord.gg/vXzFRCYpQ"
+            href="https://discord.gg/KG8SMXrhZ4"
             target="_blank"
             rel="noopener noreferrer"
             className="landing__discord-btn"
