@@ -49,6 +49,15 @@ if (CORP_IDS.length > 0 && ADMIN_CHAR_ID === null) {
   process.exit(1);
 }
 
+// Daily SDE auto-update. On by default — the server checks once a day for a new
+// CCP SDE build and re-seeds only if it changed. Disable with SDE_AUTO_UPDATE=0.
+// SDE_CHECK_UTC (HH:MM, default 11:30) is when to check: EVE downtime is 11:00
+// UTC and CCP publishes the export shortly after, so we look a little later.
+const SDE_AUTO_UPDATE = !/^(0|false|no|off)$/i.test(process.env.SDE_AUTO_UPDATE ?? '');
+const SDE_CHECK_UTC   = /^\d{1,2}:\d{2}$/.test(process.env.SDE_CHECK_UTC ?? '')
+  ? process.env.SDE_CHECK_UTC!
+  : '11:30';
+
 const isProd = process.env.NODE_ENV === 'production';
 
 // Session secret must be explicitly set in production — a guessable default
@@ -94,6 +103,8 @@ export const config = {
   maxUserMaps:         parseInt(process.env.MAX_USER_MAPS ?? '5', 10),
   maxCorpMaps:         parseInt(process.env.MAX_CORP_MAPS ?? '5', 10),
   discord:             DISCORD_WEBHOOKS,
+  sdeAutoUpdate:       SDE_AUTO_UPDATE,
+  sdeCheckUtc:         SDE_CHECK_UTC,
   sessionSecret:       process.env.SESSION_SECRET ?? 'dev-secret-change-me',
   tokenEncryptionKey,
   isProd,

@@ -7,20 +7,20 @@ import { createLogger } from '../utils/logger.js';
 export const systemsRouter = Router();
 const log = createLogger('systems');
 
-// Static list of solar systems with A0-class stars (extracted from the SDE
-// once and committed to data/). Never changes within a server's lifetime.
-const A0_PATH = join(process.cwd(), 'data', 'a0-systems.json');
-let a0SystemIds: number[] = [];
-try {
-  a0SystemIds = JSON.parse(readFileSync(A0_PATH, 'utf8')) as number[];
-  log.info(`Loaded ${a0SystemIds.length} A0 system IDs`);
-} catch (err) {
-  log.error('Failed to load A0 system list:', err);
-}
-
+// Solar systems with A0-class stars ("Sun A0 (Blue Small)", typeID 3801) drive
+// the ★ icon on system nodes. The set is flagged on solar_systems.is_a0 by the
+// SDE importer, so it stays current across SDE re-seeds. Enriched with names +
+// region on first request and cached for the server's lifetime.
 interface A0System { id: number; name: string; regionName: string }
 let a0Enriched: A0System[] | null = null;
 let a0Inflight: Promise<A0System[]> | null = null;
+
+// Drop the cached A0 list so the next request rebuilds it from the DB. Called
+// after an SDE re-seed, which may have changed which systems carry an A0 star.
+export function resetA0Cache(): void {
+  a0Enriched = null;
+  a0Inflight = null;
+}
 
 async function loadA0Enriched(): Promise<A0System[]> {
   if (a0Enriched) return a0Enriched;
@@ -30,8 +30,7 @@ async function loadA0Enriched(): Promise<A0System[]> {
       `SELECT s.id, s.name, r.name AS region_name
          FROM solar_systems s
          LEFT JOIN map_regions r ON r.id = s.region_id
-        WHERE s.id = ANY($1::int[])`,
-      [a0SystemIds],
+        WHERE s.is_a0`,
     );
     a0Enriched = rows.map(r => ({ id: r.id, name: r.name, regionName: r.region_name ?? '' }));
     a0Inflight = null;

@@ -57,14 +57,48 @@ async function main() {
   await mkdir(CACHE, { recursive: true });
   await createTables();
 
-  const zipPath = await resolveZip();
-  console.log(`\nUsing SDE: ${zipPath}\n`);
-  const zip = await unzipper.Open.file(zipPath);
+  // The import downloads ~80 MB and takes minutes, so skip it when the data is
+  // already present AND matches the latest SDE build. This makes the script
+  // safe to run on every `docker compose up` and on the daily auto-update
+  // check — most days it's just one cheap HEAD request and an early return.
+  const force        = process.env.FORCE_SDE_IMPORT === '1';
+  const { rows }     = await db.query('SELECT count(*)::int AS n FROM solar_systems');
+  const haveData     = rows[0].n > 0;
+  const remoteVer    = await fetchSdeVersion();
+  const storedVer    = await getStoredSdeVersion();
+
+  if (!force && haveData) {
+    if (!remoteVer) {
+      // Couldn't reach CCP to confirm the latest build — never blow away good
+      // data on a transient network blip. Leave what's there and bail.
+      console.log('Could not check the latest SDE build; data already present, skipping.');
+      await db.end();
+      return;
+    }
+    if (remoteVer === storedVer) {
+      console.log(`SDE up to date (build ${remoteVer}). Skipping.`);
+      console.log('Set FORCE_SDE_IMPORT=1 to re-import anyway.');
+      await db.end();
+      return;
+    }
+    console.log(`New SDE build detected: have ${storedVer ?? 'unknown'}, latest ${remoteVer}. Re-importing.\n`);
+  }
+
+  // On an existing DB we always pull a fresh copy: a stale zip baked into the
+  // image or left in .sde-cache would silently re-import the old build.
+  const resolved = await resolveZip(haveData);
+  // Record the build we actually import — which may be an older zip baked into
+  // the image, not the latest remote build. Recording remoteVer here would make
+  // the daily check think we're current and never pull the newer data.
+  const importedVer = resolved.version ?? remoteVer;
+  console.log(`\nUsing SDE: ${resolved.path}\n`);
+  const zip = await unzipper.Open.file(resolved.path);
 
   const whMap               = loadWhSystems();
   const constellationRegion = await importRegions(zip);
   await importConstellations(zip, constellationRegion);
   await importSolarSystems(zip, whMap, constellationRegion);
+  await importStars(zip);
   await importStargates(zip);
   await importCategories(zip);
   await importGroups(zip);
@@ -75,18 +109,72 @@ async function main() {
   await importMetaGroups(zip);
   await seedRegionNpcTypes();
 
+  if (importedVer) await setStoredSdeVersion(importedVer);
+
   await db.end();
-  console.log('\nSetup complete.');
+  console.log(`\nSetup complete${importedVer ? ` (SDE build ${importedVer})` : ''}.`);
 }
 
 // ─── Zip resolution ──────────────────────────────────────────────────────────
 
-async function resolveZip(): Promise<string> {
+// Pull the CCP build number out of an SDE filename or URL, e.g.
+// `eve-online-static-data-3365090-jsonl.zip` → "3365090".
+function parseBuild(s: string): string | null {
+  return s.match(/static-data-(\d+)-jsonl/)?.[1] ?? null;
+}
+
+async function resolveZip(preferFresh = false): Promise<{ path: string; version: string | null }> {
+  // preferFresh (used when re-importing an existing DB): always download the
+  // latest, bypassing any baked-in or cached zip that may be stale.
+  if (preferFresh) {
+    const version = await downloadSde();
+    return { path: SDE_ZIP, version };
+  }
+  // A versioned zip baked into the image (server/data/) is used as-is on a
+  // fresh install for speed — its filename tells us which build it is. We
+  // deliberately don't reuse an unversioned .sde-cache/sde.zip here: we can't
+  // know its build, so we download instead (which gives us the build number).
   const local = readdirSync(DATA_DIR).find(f => f.endsWith('.zip'));
-  if (local) return join(DATA_DIR, local);
-  if (existsSync(SDE_ZIP)) return SDE_ZIP;
-  await downloadSde();
-  return SDE_ZIP;
+  if (local) return { path: join(DATA_DIR, local), version: parseBuild(local) };
+  const version = await downloadSde();
+  return { path: SDE_ZIP, version };
+}
+
+// ─── SDE version (build number) ────────────────────────────────────────────────
+
+/**
+ * Determine the latest SDE build without downloading it. CCP's "latest" URL
+ * 302-redirects to a versioned filename embedding the build number, e.g.
+ * `…/eve-online-static-data-3365090-jsonl.zip` → "3365090". One HEAD request,
+ * no body. Falls back to the resolved file's ETag if the URL shape changes.
+ * Returns null on any network error so callers can fail safe.
+ */
+async function fetchSdeVersion(): Promise<string | null> {
+  try {
+    const res = await fetch(SDE_URL, { method: 'HEAD', redirect: 'manual' });
+    const build = parseBuild(res.headers.get('location') ?? '');
+    if (build) return build;
+    const head = await fetch(SDE_URL, { method: 'HEAD' });
+    return head.headers.get('etag') ?? head.headers.get('last-modified');
+  } catch (err) {
+    console.warn(`Could not determine latest SDE build: ${(err as Error).message}`);
+    return null;
+  }
+}
+
+async function getStoredSdeVersion(): Promise<string | null> {
+  const { rows } = await db.query<{ value: string }>(
+    `SELECT value FROM sde_meta WHERE key = 'sde_version'`,
+  );
+  return rows[0]?.value ?? null;
+}
+
+async function setStoredSdeVersion(version: string): Promise<void> {
+  await db.query(
+    `INSERT INTO sde_meta (key, value, updated_at) VALUES ('sde_version', $1, NOW())
+       ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW()`,
+    [version],
+  );
 }
 
 // ─── Setup helpers ───────────────────────────────────────────────────────────
@@ -136,6 +224,11 @@ async function createTables() {
     ALTER TABLE solar_systems ADD COLUMN IF NOT EXISTS pos_z DOUBLE PRECISION;
     ALTER TABLE solar_systems ADD COLUMN IF NOT EXISTS pos2d_x DOUBLE PRECISION;
     ALTER TABLE solar_systems ADD COLUMN IF NOT EXISTS pos2d_y DOUBLE PRECISION;
+    -- True for systems whose star is "Sun A0 (Blue Small)" (typeID 3801) — the
+    -- in-game A0 classification (distinct from statistics.spectralClass, which
+    -- doesn't agree with it). Drives the ★ icon on system nodes. Set by
+    -- importStars from mapStars.jsonl, so it refreshes on every SDE re-seed.
+    ALTER TABLE solar_systems ADD COLUMN IF NOT EXISTS is_a0 BOOLEAN NOT NULL DEFAULT FALSE;
 
     CREATE TABLE IF NOT EXISTS map_stargates (
       id                    INTEGER PRIMARY KEY,
@@ -190,6 +283,15 @@ async function createTables() {
     CREATE TABLE IF NOT EXISTS meta_groups (
       id   INTEGER PRIMARY KEY,
       name TEXT    NOT NULL
+    );
+
+    -- Small key/value table. 'sde_version' records the CCP build number of the
+    -- last successful import, so we can detect a new SDE drop without
+    -- re-importing (see fetchSdeVersion / the daily auto-update check).
+    CREATE TABLE IF NOT EXISTS sde_meta (
+      key        TEXT PRIMARY KEY,
+      value      TEXT NOT NULL,
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
   `);
 
@@ -309,7 +411,7 @@ async function createTables() {
 
 // ─── SDE download (fallback) ─────────────────────────────────────────────────
 
-async function downloadSde() {
+async function downloadSde(): Promise<string | null> {
   console.log('Downloading EVE SDE...');
   const res = await fetch(SDE_URL);
   if (!res.ok || !res.body) throw new Error(`SDE download failed: ${res.status}`);
@@ -328,6 +430,8 @@ async function downloadSde() {
 
   await pipeline(Readable.fromWeb(res.body as any), progress, createWriteStream(SDE_ZIP));
   console.log('\n  done');
+  // res.url is the final URL after CCP's redirect — it embeds the build number.
+  return parseBuild(res.url);
 }
 
 // ─── WH seed loader ──────────────────────────────────────────────────────────
@@ -473,6 +577,26 @@ async function importSolarSystems(zip: Zip, whMap: Map<number, WhData>, constell
     process.stdout.write(`\r  ${Math.min(i + BATCH, systems.length)} / ${systems.length}  `);
   }
   console.log(`\n  ${systems.length} solar systems`);
+}
+
+// Flag systems with an A0-class star (typeID 3801). Reads mapStars.jsonl and
+// sets solar_systems.is_a0. Reset-then-set so a re-seed reflects the latest
+// classification exactly (no stale flags if CCP ever reclassifies a star).
+async function importStars(zip: Zip) {
+  process.stdout.write('Importing A0 stars... ');
+  const lines = await readJsonl(zip, 'mapStars.jsonl');
+  const ids: number[] = [];
+  for (const line of lines) {
+    try {
+      const o = JSON.parse(line);
+      if (o.typeID === 3801 && o.solarSystemID) ids.push(o.solarSystemID as number);
+    } catch { /* skip */ }
+  }
+  await db.query('UPDATE solar_systems SET is_a0 = FALSE WHERE is_a0 = TRUE');
+  if (ids.length) {
+    await db.query('UPDATE solar_systems SET is_a0 = TRUE WHERE id = ANY($1::int[])', [ids]);
+  }
+  console.log(`${ids.length} A0 systems`);
 }
 
 async function importStargates(zip: Zip) {

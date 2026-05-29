@@ -9,6 +9,10 @@ services:
     networks:
       - internal
 
+  importer:
+    networks:
+      - internal
+
   server:
     ports: !reset []          # remove the direct 3001 binding
     networks:

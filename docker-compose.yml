@@ -18,6 +18,27 @@ services:
       timeout: 5s
       retries: 5
 
+  # One-shot job: imports the EVE SDE into Postgres, then exits. Reuses the
+  # server image. The import skips itself when the static tables are already
+  # populated, so this is safe to run on every `up` (no re-download). Set
+  # FORCE_SDE_IMPORT=1 to force a re-import after a new CCP SDE release.
+  importer:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    env_file: .env
+    environment:
+      PG_HOST: postgres
+      PG_PORT: 5432
+      NODE_ENV: production
+    command: ["node", "dist/scripts/setup-db.js"]
+    volumes:
+      # Persist the downloaded SDE zip so re-imports don't re-fetch it.
+      - sde_cache:/app/.sde-cache
+    depends_on:
+      postgres:
+        condition: service_healthy
+
   server:
     build:
       context: ./server
@@ -35,9 +56,15 @@ services:
       # Server listens on whatever PORT says. Host port matches so
       # EVE_CALLBACK_URL=http://localhost:${PORT}/auth/callback works.
       - "${PORT:-3001}:${PORT:-3001}"
+    volumes:
+      # The daily auto-update check spawns the importer in this container; its
+      # SDE download lands here rather than bloating the container layer.
+      - sde_cache:/app/.sde-cache
     depends_on:
       postgres:
         condition: service_healthy
+      importer:
+        condition: service_completed_successfully
 
   web:
     build:
@@ -57,3 +84,4 @@ services:
 
 volumes:
   postgres_data:
+  sde_cache:
