@@ -1,0 +1,16 @@
+{
+  "language": {
+    "label": "Language"
+  },
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "copy": "Copy",
+    "close": "Close"
+  },
+  "units": {
+    "jumps_one": "{{count}} jump",
+    "jumps_other": "{{count}} jumps"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "language": {
+    "label": "Sprache"
+  },
+  "actions": {
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "copy": "Kopieren",
+    "close": "Schließen"
+  },
+  "units": {
+    "jumps_one": "{{count}} Sprung",
+    "jumps_other": "{{count}} Sprünge"
+  }
+}

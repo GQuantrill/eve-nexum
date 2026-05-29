@@ -9,6 +9,7 @@ import { useCanCreateMaps } from '../../hooks/useCanCreateMaps';
 import { UserStatsModal } from './UserStatsModal';
 import { ConfirmModal } from './ConfirmModal';
 import { CreateMapModal } from './CreateMapModal';
+import { LanguageSwitcher } from './LanguageSwitcher';
 import { useProximityAlerts } from '../../hooks/useProximityAlerts';
 import {
   WarningIcon, SkullIcon, XCircleIcon, QuestionIcon,
@@ -362,6 +363,8 @@ export function Toolbar() {
       >
         <SlidersHorizontalIcon size={18} weight="regular" />
       </button>
+
+      <LanguageSwitcher />
 
       <div className="toolbar__server-status">
         <div className="toolbar__server-row">
