@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 import { api } from '../../api/client';
 import { useMapStore } from '../../store/mapStore';
 import { useShareMode } from '../../context/ShareModeContext';
@@ -66,6 +67,9 @@ function parseStructureClipboard(text: string): ParsedStructure[] {
 }
 
 export function StructuresPane({ systemId }: { systemId: string }) {
+  const { t } = useTranslation();
+  const typeLabel = (type: StructureType) =>
+    type === 'unknown' ? t('structures.unknown') : STRUCTURE_TYPE_LABELS[type];
   const activeMapId = useMapStore((s) => s.activeMapId);
   const canEdit     = useCanEditContent();
   const standings   = useStandings();
@@ -98,7 +102,7 @@ export function StructuresPane({ systemId }: { systemId: string }) {
 
     api<Structure[]>(`/api/maps/${activeMapId}/systems/${systemId}/structures`)
       .then(setStructures)
-      .catch(() => toast.error('Failed to load structures'));
+      .catch(() => toast.error(t('structures.loadFailed')));
   }, [activeMapId, systemId, isShareMode]);
 
   // Live sync: re-fetch in place when a remote client changes this system's
@@ -173,7 +177,7 @@ export function StructuresPane({ systemId }: { systemId: string }) {
       api(`/api/maps/${activeMapId}/systems/${systemId}/structures/${id}`, {
         method: 'PATCH',
         body: JSON.stringify(payload),
-      }).catch(() => toast.error('Failed to save structure'));
+      }).catch(() => toast.error(t('structures.saveFailed')));
     }, 500));
   };
 
@@ -181,14 +185,14 @@ export function StructuresPane({ systemId }: { systemId: string }) {
     if (!activeMapId) return;
     setStructures((prev) => prev.filter((s) => s.id !== id));
     api(`/api/maps/${activeMapId}/systems/${systemId}/structures/${id}`, { method: 'DELETE' })
-      .catch(() => toast.error('Failed to delete structure'));
+      .catch(() => toast.error(t('structures.deleteFailed')));
   };
 
   const deleteAll = () => {
     const count = structuresRef.current.length;
     const action = () => { for (const s of structuresRef.current) deleteStructure(s.id); };
     if (shouldSkipConfirm()) { action(); return; }
-    setPendingAction({ message: `Delete all ${count} structure${count !== 1 ? 's' : ''}?`, fn: action });
+    setPendingAction({ message: t('structures.deleteAllConfirm', { count }), fn: action });
   };
 
   return (
@@ -202,21 +206,21 @@ export function StructuresPane({ systemId }: { systemId: string }) {
       )}
       <div className="sig-pane">
         {!isShareMode && structures.length === 0 && (
-          <p className="sig-pane__hint">You can copy and paste structures directly from your Overview in EVE. In space, right-click anywhere in your Overview window and choose "Copy Selected Rows" (or select the lines and Ctrl+C). Paste here with Ctrl+V — the structure ID, name, and type are imported automatically.</p>
+          <p className="sig-pane__hint">{t('structures.pasteHint')}</p>
         )}
         {canEdit && !isShareMode && (
           <div className="sig-pane__toolbar">
-            <button className="icon-btn" onClick={addStructure} title="Add structure">+</button>
+            <button className="icon-btn" onClick={addStructure} title={t('structures.addStructure')}>+</button>
             {structures.length > 0 && (
               <button className="sig-toolbar-btn sig-toolbar-btn--danger" onClick={deleteAll}>
-                Delete all
+                {t('structures.deleteAll')}
               </button>
             )}
           </div>
         )}
 
         {structures.length === 0 ? (
-          <div className="sig-pane__empty">No structures recorded</div>
+          <div className="sig-pane__empty">{t('structures.none')}</div>
         ) : (
           <table className="sig-table">
             <colgroup>
@@ -229,11 +233,11 @@ export function StructuresPane({ systemId }: { systemId: string }) {
             </colgroup>
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Type</th>
-                <th>Owner Corp</th>
-                <th title="EVE structure ID for waypoint navigation">EVE ID</th>
-                <th>Notes</th>
+                <th>{t('structures.name')}</th>
+                <th>{t('structures.type')}</th>
+                <th>{t('structures.ownerCorp')}</th>
+                <th title={t('structures.eveIdTooltip')}>{t('structures.eveId')}</th>
+                <th>{t('structures.notes')}</th>
                 {!isShareMode && <th />}
               </tr>
             </thead>
@@ -267,21 +271,21 @@ export function StructuresPane({ systemId }: { systemId: string }) {
                         className="sig-input"
                         value={s.name}
                         onChange={(e) => updateStructure(s.id, { name: e.target.value })}
-                        placeholder="Structure name"
+                        placeholder={t('structures.namePlaceholder')}
                       />
                     )}
                   </td>
                   <td>
                     {isShareMode ? (
-                      <span className="sig-text">{STRUCTURE_TYPE_LABELS[s.structureType]}</span>
+                      <span className="sig-text">{typeLabel(s.structureType)}</span>
                     ) : (
                       <select
                         className="sig-select"
                         value={s.structureType}
                         onChange={(e) => updateStructure(s.id, { structureType: e.target.value as StructureType })}
                       >
-                        {(Object.keys(STRUCTURE_TYPE_LABELS) as StructureType[]).map((t) => (
-                          <option key={t} value={t}>{STRUCTURE_TYPE_LABELS[t]}</option>
+                        {(Object.keys(STRUCTURE_TYPE_LABELS) as StructureType[]).map((st) => (
+                          <option key={st} value={st}>{typeLabel(st)}</option>
                         ))}
                       </select>
                     )}
@@ -294,7 +298,7 @@ export function StructuresPane({ systemId }: { systemId: string }) {
                         className="sig-input"
                         value={s.ownerCorp}
                         onChange={(e) => updateStructure(s.id, { ownerCorp: e.target.value })}
-                        placeholder="Corp name"
+                        placeholder={t('structures.corpPlaceholder')}
                       />
                     )}
                   </td>
@@ -309,7 +313,7 @@ export function StructuresPane({ systemId }: { systemId: string }) {
                           const v = e.target.value.replace(/\D/g, '');
                           updateStructure(s.id, { eveId: v ? Number(v) : null });
                         }}
-                        placeholder="Optional"
+                        placeholder={t('structures.optionalPlaceholder')}
                       />
                     )}
                   </td>
@@ -327,7 +331,7 @@ export function StructuresPane({ systemId }: { systemId: string }) {
                         <button
                           className="icon-btn icon-btn--danger"
                           onClick={() => deleteStructure(s.id)}
-                          title="Delete"
+                          title={t('actions.delete')}
                         ><XIcon size={12} weight="bold" /></button>
                       )}
                     </td>
@@ -347,12 +351,12 @@ export function StructuresPane({ systemId }: { systemId: string }) {
           onClose={() => setCtx(null)}
           items={[
             {
-              label: 'Set Destination',
+              label: t('waypoint.setDestination'),
               icon: <MapPinSimpleIcon size={16} weight="regular" color="#3ddc84" />,
               action: () => setDestination(ctx.structure.eveId!).catch(console.error),
             },
             {
-              label: 'Add Waypoint',
+              label: t('waypoint.addWaypoint'),
               icon: <PathIcon size={16} weight="regular" color="#5a9af8" />,
               action: () => addWaypoint(ctx.structure.eveId!).catch(console.error),
             },
