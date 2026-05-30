@@ -147,6 +147,9 @@ function ElapsedCell({ iso, className }: { iso: string | undefined; className?: 
 }
 
 export function SignaturePane({ systemId }: { systemId: string }) {
+  const { t } = useTranslation();
+  const sigTypeLabel = (type: SigType) =>
+    type === 'unknown' ? t('sigType.unknown') : SIG_TYPE_LABELS[type];
   const activeMapId     = useMapStore((s) => s.activeMapId);
   const map             = useMapStore((s) => s.map);
   const currentSystemId = useMapStore((s) => s.currentSystemId);
@@ -218,7 +221,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
 
     api<Signature[]>(`/api/maps/${activeMapId}/systems/${systemId}/signatures`)
       .then(setSigs)
-      .catch(() => toast.error('Failed to load signatures'));
+      .catch(() => toast.error(t('signatures.loadFailed')));
   }, [activeMapId, systemId, isShareMode]);
 
   // Live sync: when a remote client changes this system's sigs, re-fetch in
@@ -265,7 +268,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
       api(`/api/maps/${activeMapId}/systems/${systemId}/signatures/${id}`, {
         method: 'PATCH',
         body: JSON.stringify(payload),
-      }).catch(() => toast.error('Failed to save signature'));
+      }).catch(() => toast.error(t('signatures.saveFailed')));
     }, 500));
   };
 
@@ -283,7 +286,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
     }
 
     api(`/api/maps/${activeMapId}/systems/${systemId}/signatures/${id}`, { method: 'DELETE' })
-      .catch(() => toast.error('Failed to delete signature'));
+      .catch(() => toast.error(t('signatures.deleteFailed')));
   };
 
   const processPaste = useCallback(async (parsed: ParsedSig[]) => {
@@ -348,9 +351,9 @@ export function SignaturePane({ systemId }: { systemId: string }) {
         const currentName  = map.systems.find((s) => s.id === currentSystemId)?.name  ?? 'unknown';
         const selectedName = map.systems.find((s) => s.id === systemId)?.name ?? 'unknown';
         setPendingAction({
-          message: `Your character is currently in ${currentName}, but you are pasting signatures into ${selectedName}. Continue?`,
+          message: t('signatures.pasteDifferentSystem', { current: currentName, selected: selectedName }),
           fn: () => processPaste(parsed),
-          confirmLabel: 'Ok',
+          confirmLabel: t('actions.ok'),
           showDontAskAgain: false,
         });
         return;
@@ -361,7 +364,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
 
     window.addEventListener('paste', handlePaste);
     return () => window.removeEventListener('paste', handlePaste);
-  }, [activeMapId, systemId, currentSystemId, map.systems, processPaste]);
+  }, [activeMapId, systemId, currentSystemId, map.systems, processPaste, t]);
 
   const addSig = async () => {
     if (!activeMapId) return;
@@ -378,7 +381,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   };
 
   const deleteSelected = () => confirm(
-    `Delete ${selected.size} selected signature${selected.size !== 1 ? 's' : ''}?`,
+    t('signatures.deleteSelectedConfirm', { count: selected.size }),
     () => { for (const id of selected) deleteSig(id); },
   );
 
@@ -388,7 +391,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   };
 
   const deleteAll = () => confirm(
-    `Delete all ${sigsRef.current.length} signature${sigsRef.current.length !== 1 ? 's' : ''}?`,
+    t('signatures.deleteAllConfirm', { count: sigsRef.current.length }),
     () => { for (const sig of sigsRef.current) deleteSig(sig.id); },
   );
 
@@ -463,11 +466,11 @@ export function SignaturePane({ systemId }: { systemId: string }) {
     )}
     <div className="sig-pane">
       {!isShareMode && sigs.length === 0 && (
-        <p className="sig-pane__hint">You can copy and paste signatures directly from the Probe scanner in Eve. To do this, open your probe scanner.  Press control A to select them all, then control C to copy.  Use control V to paste them here</p>
+        <p className="sig-pane__hint">{t('signatures.pasteHint')}</p>
       )}
       {canEdit && !isShareMode && (
         <div className="sig-pane__toolbar">
-          <button className="icon-btn" onClick={addSig} title="Add signature">Add signature</button>
+          <button className="icon-btn" onClick={addSig} title={t('signatures.addSignature')}>{t('signatures.addSignature')}</button>
           {selected.size > 0 && (
             <>
               <select
@@ -478,25 +481,25 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                   setSelectedType(e.target.value as SigType);
                   e.target.value = '';
                 }}
-                aria-label="Set type for selected signatures"
+                aria-label={t('signatures.setTypeAria')}
               >
-                <option value="">Set type ({selected.size})…</option>
-                <option value="unknown">Unknown</option>
-                <option value="wormhole">Wormhole</option>
-                <option value="data">Data</option>
-                <option value="relic">Relic</option>
-                <option value="combat">Combat</option>
-                <option value="gas">Gas</option>
-                <option value="ore">Ore</option>
+                <option value="">{t('signatures.setType', { count: selected.size })}</option>
+                <option value="unknown">{t('sigType.unknown')}</option>
+                <option value="wormhole">{t('sigType.wormhole')}</option>
+                <option value="data">{t('sigType.data')}</option>
+                <option value="relic">{t('sigType.relic')}</option>
+                <option value="combat">{t('sigType.combat')}</option>
+                <option value="gas">{t('sigType.gas')}</option>
+                <option value="ore">{t('sigType.ore')}</option>
               </select>
               <button className="sig-toolbar-btn sig-toolbar-btn--danger" onClick={deleteSelected}>
-                Delete selected ({selected.size})
+                {t('signatures.deleteSelected', { count: selected.size })}
               </button>
             </>
           )}
           {sigs.length > 0 && (
             <button className="sig-toolbar-btn sig-toolbar-btn--danger" onClick={deleteAll}>
-              Delete all
+              {t('signatures.deleteAll')}
             </button>
           )}
         </div>
@@ -504,7 +507,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
 
       {sigs.length === 0 ? (
         <div className={`sig-pane__empty${isShareMode ? ' sig-pane__empty--shared' : ''}`}>
-          {isShareMode ? 'No signatures scanned' : 'No signatures scanned — paste from probe scanner to import'}
+          {isShareMode ? t('signatures.emptyShared') : t('signatures.empty')}
         </div>
       ) : (
         <table className="sig-table">
@@ -538,35 +541,35 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                 </th>
               )}
               <th className="sig-th sig-th--sortable" onClick={() => handleSort('sigId')}>
-                ID{sortInd('sigId')}
+                {t('signatures.colId')}{sortInd('sigId')}
                 <div className="sig-th__resize" onMouseDown={(e) => startResize('id', e)} />
               </th>
               <th className="sig-th sig-th--sortable" onClick={() => handleSort('sigType')}>
-                Type{sortInd('sigType')}
+                {t('signatures.colType')}{sortInd('sigType')}
                 <div className="sig-th__resize" onMouseDown={(e) => startResize('type', e)} />
               </th>
               <th className="sig-th sig-th--sortable" onClick={() => handleSort('whType')}>
-                WH{sortInd('whType')}
+                {t('signatures.colWh')}{sortInd('whType')}
                 <div className="sig-th__resize" onMouseDown={(e) => startResize('whtype', e)} />
               </th>
               <th className="sig-th sig-th--sortable" onClick={() => handleSort('whLeadsTo')}>
-                Leads To{sortInd('whLeadsTo')}
+                {t('signatures.colLeadsTo')}{sortInd('whLeadsTo')}
                 <div className="sig-th__resize" onMouseDown={(e) => startResize('leadsto', e)} />
               </th>
               <th className="sig-th sig-th--sortable" onClick={() => handleSort('name')}>
-                Name{sortInd('name')}
+                {t('signatures.colName')}{sortInd('name')}
                 <div className="sig-th__resize" onMouseDown={(e) => startResize('name', e)} />
               </th>
               <th className="sig-th">
-                Notes
+                {t('signatures.colNotes')}
                 <div className="sig-th__resize" onMouseDown={(e) => startResize('notes', e)} />
               </th>
               <th className="sig-th sig-th--sortable sig-th--time" onClick={() => handleSort('createdAt')}>
-                Age{sortInd('createdAt')}
+                {t('signatures.colAge')}{sortInd('createdAt')}
                 <div className="sig-th__resize" onMouseDown={(e) => startResize('created', e)} />
               </th>
               <th className="sig-th sig-th--sortable sig-th--time" onClick={() => handleSort('updatedAt')}>
-                Updated{sortInd('updatedAt')}
+                {t('signatures.colUpdated')}{sortInd('updatedAt')}
                 <div className="sig-th__resize" onMouseDown={(e) => startResize('updated', e)} />
               </th>
               {!isShareMode && <th />}
@@ -602,7 +605,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                 <td>
                   {isShareMode ? (
                     <span className={`sig-text sig-text--type sig-select--type-${sig.sigType}`}>
-                      {SIG_TYPE_LABELS[sig.sigType]}
+                      {sigTypeLabel(sig.sigType)}
                     </span>
                   ) : (
                     <select
@@ -610,8 +613,8 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                       value={sig.sigType}
                       onChange={(e) => updateSig(sig.id, { sigType: e.target.value as SigType })}
                     >
-                      {(Object.keys(SIG_TYPE_LABELS) as SigType[]).map((t) => (
-                        <option key={t} value={t}>{SIG_TYPE_LABELS[t]}</option>
+                      {(Object.keys(SIG_TYPE_LABELS) as SigType[]).map((st) => (
+                        <option key={st} value={st}>{sigTypeLabel(st)}</option>
                       ))}
                     </select>
                   )}
@@ -649,7 +652,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                       className="sig-input"
                       value={sig.name}
                       onChange={(e) => updateSig(sig.id, { name: e.target.value })}
-                      placeholder="Site name"
+                      placeholder={t('signatures.namePlaceholder')}
                     />
                   )}
                 </td>
@@ -676,7 +679,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                       <button
                         className="icon-btn icon-btn--danger"
                         onClick={() => deleteSig(sig.id)}
-                        title="Delete"
+                        title={t('actions.delete')}
                       ><XIcon size={12} weight="bold" /></button>
                     )}
                   </td>
