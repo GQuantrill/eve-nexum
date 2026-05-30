@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import MDEditor, { getCommands } from '@uiw/react-md-editor';
 import rehypeSanitize from 'rehype-sanitize';
 
@@ -42,6 +43,7 @@ function readNotesHeight(): number {
 }
 
 export function NotesEditor({ value, onChange, compact = false, readOnly = false }: Props) {
+  const { t } = useTranslation();
   const [focused, setFocused] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   // Initial height for the full pane, read once from localStorage at mount.
@@ -99,7 +101,7 @@ export function NotesEditor({ value, onChange, compact = false, readOnly = false
       if (readOnly) return <div className="notes-editor notes-editor--empty" />;
       return (
         <div className="notes-editor notes-editor--empty" onClick={enterEdit}>
-          <span className="notes-editor__placeholder">Add note…</span>
+          <span className="notes-editor__placeholder">{t('panes.addNote')}</span>
         </div>
       );
     }

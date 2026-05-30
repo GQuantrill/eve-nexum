@@ -245,6 +245,29 @@
     "addFailed": "Freigabe konnte nicht hinzugefügt werden",
     "revokeFailed": "Freigabe konnte nicht widerrufen werden"
   },
+  "panes": {
+    "noEveSystem": "Kein EVE-System verknüpft",
+    "addNote": "Notiz hinzufügen…"
+  },
+  "waypoint": {
+    "setDestination": "Ziel festlegen",
+    "addWaypoint": "Wegpunkt hinzufügen"
+  },
+  "a0": {
+    "signIn": "Melde dich an und docke in K-Space, um nahe A0-Systeme zu sehen.",
+    "computing": "Berechne Routen…",
+    "noneReachable": "Keine A0-Systeme erreichbar.",
+    "showing": "Die {{count}} nächsten A0-Systeme werden angezeigt.",
+    "showRoute": "{{mode}} Route anzeigen",
+    "hideRoute": "{{mode}} Route ausblenden",
+    "modeShortest": "kürzeste",
+    "modeSecure": "sichere"
+  },
+  "activity": {
+    "thisHour": "diese Stunde",
+    "allHidden": "Alle Diagramme ausgeblendet. Aktiviere sie unter Kartenoptionen → Aktivität.",
+    "loading": "Aktivität wird geladen…"
+  },
   "sigType": {
     "wormhole": "Wurmloch",
     "data": "Daten",
