@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { api } from '../../api/client';
 import { useUserSetting } from '../../hooks/useUserSetting';
 
@@ -31,6 +33,7 @@ function MiniLineChart({ title, values, color, signed = false }: {
    *  series where the sign carries meaning. */
   signed?: boolean;
 }) {
+  const { t } = useTranslation();
   const [hover, setHover] = useState<HoverState | null>(null);
   const n      = values.length;
   const avg    = n > 0 ? values.reduce((s, v) => s + v, 0) / n : 0;
@@ -160,7 +163,7 @@ function MiniLineChart({ title, values, color, signed = false }: {
           }}
         >
           <span className="activity-chart__tooltip-value">{hover.value.toLocaleString()}</span>
-          <span className="activity-chart__tooltip-when">{hoursAgoLabel(SLOTS - 1 - slotOfIdx(hover.index))}</span>
+          <span className="activity-chart__tooltip-when">{hoursAgoLabel(t, SLOTS - 1 - slotOfIdx(hover.index))}</span>
         </div>
       )}
       </div>
@@ -168,13 +171,13 @@ function MiniLineChart({ title, values, color, signed = false }: {
   );
 }
 
-function hoursAgoLabel(h: number): string {
-  if (h <= 0) return 'this hour';
-  if (h === 1) return '1h ago';
-  return `${h}h ago`;
+function hoursAgoLabel(t: TFunction, h: number): string {
+  if (h <= 0) return t('activity.thisHour');
+  return t('time.hoursAgo', { value: h });
 }
 
 function ActivityChartsView({ data }: { data: HourlyPoint[] }) {
+  const { t } = useTranslation();
   // Per-chart visibility — defaults on, persisted cross-device via
   // users.ui_settings. Keys mirror the toggle labels in Map Options.
   const [showJumps]     = useUserSetting<boolean>('nexum.activity.showJumps',     true);
@@ -193,42 +196,42 @@ function ActivityChartsView({ data }: { data: HourlyPoint[] }) {
 
   const anyVisible = showJumps || showShipKills || showPodKills || showNpcKills || showNpcDelta;
   if (!anyVisible) {
-    return <div className="sig-pane__empty">All charts hidden. Toggle them on in Map Options → Activity.</div>;
+    return <div className="sig-pane__empty">{t('activity.allHidden')}</div>;
   }
 
   return (
     <div className="activity-pane">
       {showJumps && (
         <MiniLineChart
-          title="Jumps"
+          title={t('mapSidebar.activityJumps')}
           values={data.map((p) => p.jumps)}
           color="#4dd9ac"
         />
       )}
       {showShipKills && (
         <MiniLineChart
-          title="Ship Kills"
+          title={t('mapSidebar.activityShipKills')}
           values={data.map((p) => p.shipKills)}
           color="#e05a5a"
         />
       )}
       {showPodKills && (
         <MiniLineChart
-          title="Pod Kills"
+          title={t('mapSidebar.activityPodKills')}
           values={data.map((p) => p.podKills)}
           color="#c084fc"
         />
       )}
       {showNpcKills && (
         <MiniLineChart
-          title="NPC Kills"
+          title={t('mapSidebar.activityNpcKills')}
           values={data.map((p) => p.npcKills)}
           color="#5a9af8"
         />
       )}
       {showNpcDelta && (
         <MiniLineChart
-          title="NPC Delta"
+          title={t('mapSidebar.activityNpcDelta')}
           values={npcDelta}
           color="#f59e0b"
           signed
@@ -239,6 +242,7 @@ function ActivityChartsView({ data }: { data: HourlyPoint[] }) {
 }
 
 export function ActivityPane({ eveSystemId }: { eveSystemId: number | null }) {
+  const { t } = useTranslation();
   const [data, setData]       = useState<HourlyPoint[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -258,8 +262,8 @@ export function ActivityPane({ eveSystemId }: { eveSystemId: number | null }) {
     return () => clearInterval(id);
   }, [eveSystemId]);
 
-  if (!eveSystemId) return <div className="sig-pane__empty">No EVE system linked</div>;
-  if (loading)      return <div className="sig-pane__empty">Loading activity…</div>;
+  if (!eveSystemId) return <div className="sig-pane__empty">{t('panes.noEveSystem')}</div>;
+  if (loading)      return <div className="sig-pane__empty">{t('activity.loading')}</div>;
 
   return <ActivityChartsView data={data} />;
 }

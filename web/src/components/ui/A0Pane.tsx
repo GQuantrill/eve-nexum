@@ -46,22 +46,22 @@ export function A0Pane() {
   if (!canRoute) {
     return (
       <div className="scout-pane__empty">
-        Sign in and dock in K-space to see nearby A0 systems.
+        {t('a0.signIn')}
       </div>
     );
   }
 
   if (all.length === 0 || (closest.length === 0 && Object.keys(routes).length === 0)) {
-    return <div className="scout-pane__empty">Computing routes…</div>;
+    return <div className="scout-pane__empty">{t('a0.computing')}</div>;
   }
 
   if (closest.length === 0) {
-    return <div className="scout-pane__empty">No A0 systems reachable.</div>;
+    return <div className="scout-pane__empty">{t('a0.noneReachable')}</div>;
   }
 
   return (
     <div className="scout-pane">
-      <div className="scout-pane__note">Showing the {TOP_N} closest A0 systems.</div>
+      <div className="scout-pane__note">{t('a0.showing', { count: TOP_N })}</div>
       {closest.map(s => {
         const route   = routes[String(s.id)];
         const isOpen  = expanded.has(s.id);
@@ -79,8 +79,8 @@ export function A0Pane() {
                 type="button"
                 className="sys-btn scout-row__btn scout-row__btn--icon"
                 onClick={() => setWaypoint(s.id, s.name, true)}
-                aria-label="Set Destination"
-                data-tooltip="Set Destination"
+                aria-label={t('waypoint.setDestination')}
+                data-tooltip={t('waypoint.setDestination')}
               >
                 <MapPinSimpleIcon size={14} weight="regular" color="#3ddc84" />
               </button>
@@ -88,8 +88,8 @@ export function A0Pane() {
                 type="button"
                 className="sys-btn scout-row__btn scout-row__btn--icon"
                 onClick={() => setWaypoint(s.id, s.name, false)}
-                aria-label="Add Waypoint"
-                data-tooltip="Add Waypoint"
+                aria-label={t('waypoint.addWaypoint')}
+                data-tooltip={t('waypoint.addWaypoint')}
               >
                 <PathIcon size={14} weight="regular" color="#5a9af8" />
               </button>
@@ -100,7 +100,10 @@ export function A0Pane() {
                   onClick={() => toggleExpanded(s.id)}
                   aria-expanded={isOpen}
                 >
-                  {isOpen ? `Hide ${routeMode} route` : `Show ${routeMode} route`}
+                  {(() => {
+                    const mode = routeMode === 'secure' ? t('a0.modeSecure') : t('a0.modeShortest');
+                    return isOpen ? t('a0.hideRoute', { mode }) : t('a0.showRoute', { mode });
+                  })()}
                 </button>
               )}
             </div>

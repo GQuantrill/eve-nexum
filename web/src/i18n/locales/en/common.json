@@ -245,6 +245,29 @@
     "addFailed": "Failed to add share",
     "revokeFailed": "Failed to revoke share"
   },
+  "panes": {
+    "noEveSystem": "No EVE system linked",
+    "addNote": "Add note…"
+  },
+  "waypoint": {
+    "setDestination": "Set Destination",
+    "addWaypoint": "Add Waypoint"
+  },
+  "a0": {
+    "signIn": "Sign in and dock in K-space to see nearby A0 systems.",
+    "computing": "Computing routes…",
+    "noneReachable": "No A0 systems reachable.",
+    "showing": "Showing the {{count}} closest A0 systems.",
+    "showRoute": "Show {{mode}} route",
+    "hideRoute": "Hide {{mode}} route",
+    "modeShortest": "shortest",
+    "modeSecure": "secure"
+  },
+  "activity": {
+    "thisHour": "this hour",
+    "allHidden": "All charts hidden. Toggle them on in Map Options → Activity.",
+    "loading": "Loading activity…"
+  },
   "sigType": {
     "wormhole": "Wormhole",
     "data": "Data",
