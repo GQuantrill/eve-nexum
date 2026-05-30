@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { XIcon } from '@phosphor-icons/react';
 import { useStats, type StatPeriod, type SigBreakdown } from '../../hooks/useStats';
 
@@ -8,6 +9,7 @@ const SPARK_PAD  = { top: 6, right: 6, bottom: 18, left: 28 };
 const SPARK_COLOR = '#6ea0ff';
 
 function SigSparkline({ values }: { values: number[] }) {
+  const { t } = useTranslation();
   const n      = values.length;
   const iw     = SPARK_VB_W - SPARK_PAD.left - SPARK_PAD.right;
   const ih     = SPARK_VB_H - SPARK_PAD.top  - SPARK_PAD.bottom;
@@ -26,8 +28,8 @@ function SigSparkline({ values }: { values: number[] }) {
   const yTicks = [...new Set([0, Math.round(maxVal / 2), maxVal])];
   // X ticks: 30d ago (left) and today (right)
   const xLabels: { x: number; label: string }[] = n > 0 ? [
-    { x: xOf(0),     label: `${n - 1}d ago` },
-    { x: xOf(n - 1), label: 'today' },
+    { x: xOf(0),     label: t('time.daysAgo', { value: n - 1 }) },
+    { x: xOf(n - 1), label: t('time.today') },
   ] : [];
 
   return (
@@ -92,7 +94,7 @@ function SigSparkline({ values }: { values: number[] }) {
       </svg>
       {hover && (
         <div className="stats-modal__spark-tooltip">
-          <strong>{hover.value.toLocaleString()}</strong> sigs · {n - 1 - hover.index === 0 ? 'today' : `${n - 1 - hover.index}d ago`}
+          <strong>{hover.value.toLocaleString()}</strong> sigs · {n - 1 - hover.index === 0 ? t('time.today') : t('time.daysAgo', { value: n - 1 - hover.index })}
         </div>
       )}
     </div>

@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 import {
   useNotificationPermission,
   notifyPermissionChanged,
 } from "../../hooks/useNotificationPermission";
+import { expiresIn } from "../../i18n/format";
 import { useMapStore } from "../../store/mapStore";
 import { useAuth } from "../../context/AuthContext";
 import { api } from "../../api/client";
@@ -132,6 +134,7 @@ const SHARE_EXPIRY_OPTIONS: Array<{ hours: number; label: string }> = [
 const SHARE_EXPIRY_DEFAULT = 24;
 
 function ShareSection() {
+  const { t } = useTranslation();
   const map = useMapStore((s) => s.map);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -252,12 +255,7 @@ function ShareSection() {
   }
 
   function formatRemaining(): string {
-    const ms = expiresAt - now;
-    if (ms <= 0) return "expired";
-    const h = Math.floor(ms / 3_600_000);
-    const m = Math.floor((ms % 3_600_000) / 60_000);
-    if (h > 0) return `expires in ${h}h ${m}m`;
-    return `expires in ${m}m`;
+    return expiresIn(t, expiresAt - now);
   }
 
   // Update toggle state locally and, if a link is live, push a PATCH so

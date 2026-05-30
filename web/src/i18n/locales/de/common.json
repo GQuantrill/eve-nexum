@@ -12,5 +12,28 @@
   "units": {
     "jumps_one": "{{count}} Sprung",
     "jumps_other": "{{count}} Sprünge"
+  },
+  "time": {
+    "justNow": "gerade eben",
+    "secondsAgo": "vor {{value}}s",
+    "minutesAgo": "vor {{value}}m",
+    "hoursAgo": "vor {{value}}h",
+    "daysAgo": "vor {{value}}t",
+    "today": "heute"
+  },
+  "duration": {
+    "seconds": "{{value}}s",
+    "minutesSeconds": "{{minutes}}m {{seconds}}s",
+    "hoursMinutes": "{{hours}}h {{minutes}}m"
+  },
+  "share": {
+    "expired": "abgelaufen",
+    "expiresInHM": "läuft in {{hours}}h {{minutes}}m ab",
+    "expiresInM": "läuft in {{minutes}}m ab"
+  },
+  "mass": {
+    "billionKg": "{{value}} Mrd. kg",
+    "millionKg": "{{value}} Mio. kg",
+    "kg": "{{value}} kg"
   }
 }

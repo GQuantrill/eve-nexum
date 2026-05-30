@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { MapPinSimpleIcon, PathIcon } from '@phosphor-icons/react';
+import { jumps } from '../../i18n/format';
 import { useA0Systems } from '../../hooks/useA0Systems';
 import { useCharacterLocation } from '../../hooks/useCharacterLocation';
 import { useRoute } from '../../hooks/useRoute';
@@ -9,6 +11,7 @@ import { useMapStore } from '../../store/mapStore';
 const TOP_N = 10;
 
 export function A0Pane() {
+  const { t } = useTranslation();
   const all      = useA0Systems();
   const routeMode = useMapStore((s) => s.routeMode);
   const location = useCharacterLocation();
@@ -71,7 +74,7 @@ export function A0Pane() {
             <div className="scout-row__region">{s.regionName}</div>
 
             <div className="scout-row__actions">
-              <span className="scout-row__jumps">{s.jumps} jumps</span>
+              <span className="scout-row__jumps">{jumps(t, s.jumps)}</span>
               <button
                 type="button"
                 className="sys-btn scout-row__btn scout-row__btn--icon"

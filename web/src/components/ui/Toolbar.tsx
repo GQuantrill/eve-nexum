@@ -1,4 +1,7 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
+import { timeAgo, jumps } from '../../i18n/format';
 import { useMapStore } from '../../store/mapStore';
 import { useAuth } from '../../context/AuthContext';
 import { useOnlineStatus } from '../../hooks/useOnlineStatus';
@@ -106,18 +109,11 @@ function useEveServerStatus(): EveStatus | null {
   return status;
 }
 
-function formatCheckedAt(date: Date): string {
-  const secs = Math.floor((Date.now() - date.getTime()) / 1000);
-  if (secs < 5)  return 'just now';
-  if (secs < 60) return `${secs}s ago`;
-  return `${Math.floor(secs / 60)}m ago`;
-}
-
 // Build the tooltip for the online-status dot. When ESI reports online we
 // surface the TQ session-start timestamp + how long ago it was, so an
 // orphan session ("online for 6 hours but I crashed at lunchtime") is
 // instantly recognisable from the tooltip alone.
-function onlineTooltip(online: boolean | null, lastLoginIso: string | null): string {
+function onlineTooltip(t: TFunction, online: boolean | null, lastLoginIso: string | null): string {
   if (online === false) return 'Offline';
   if (online === null)  return 'Status unknown';
   if (!lastLoginIso)    return 'Online in EVE';
@@ -126,26 +122,19 @@ function onlineTooltip(online: boolean | null, lastLoginIso: string | null): str
   // DD-MM-YYYY HH:MM UTC matches the rest of the app's date display.
   const pad = (n: number) => String(n).padStart(2, '0');
   const stamp = `${pad(ts.getUTCDate())}-${pad(ts.getUTCMonth() + 1)}-${ts.getUTCFullYear()} ${pad(ts.getUTCHours())}:${pad(ts.getUTCMinutes())} UTC`;
-  // Rough age — minutes for the first hour, then hours, then days. Plenty
-  // good enough for "is this session weirdly old?" at a glance.
-  const ageMin = Math.floor((Date.now() - ts.getTime()) / 60_000);
-  let age: string;
-  if (ageMin < 1)        age = 'just now';
-  else if (ageMin < 60)  age = `${ageMin}m ago`;
-  else if (ageMin < 24 * 60) age = `${Math.floor(ageMin / 60)}h ago`;
-  else                   age = `${Math.floor(ageMin / (24 * 60))}d ago`;
-  return `Online in EVE since ${stamp} (${age})`;
+  return `Online in EVE since ${stamp} (${timeAgo(t, ts)})`;
 }
 
 // Self-contained "checked Xs ago" label — owns its own 5 s tick so the rest of
 // the Toolbar doesn't re-render every five seconds along with it.
 function CheckedAtLabel({ checkedAt }: { checkedAt: Date }) {
+  const { t } = useTranslation();
   const [, setTick] = useState(0);
   useEffect(() => {
     const id = setInterval(() => setTick((n) => n + 1), 5_000);
     return () => clearInterval(id);
   }, []);
-  return <span className="toolbar__checked-at">checked {formatCheckedAt(checkedAt)}</span>;
+  return <span className="toolbar__checked-at">checked {timeAgo(t, checkedAt)}</span>;
 }
 
 // Persistent indicator for the nearest live threat (incursion / insurgency).
@@ -153,6 +142,7 @@ function CheckedAtLabel({ checkedAt }: { checkedAt: Date }) {
 // on threshold crossings — Toolbar is rendered once for every logged-in user).
 function ProximityChip() {
   const { nearest, threshold } = useProximityAlerts();
+  const { t } = useTranslation();
   // The user's configurable threshold gates both display and the alert state —
   // if the chip is shown, the threat is in-zone by definition. Filters out the
   // permanent "20 jumps — …" noise on most maps.
@@ -169,13 +159,14 @@ function ProximityChip() {
     >
       <span className="toolbar__proximity-icon"><Icon size={14} weight="bold" /></span>
       <span className="toolbar__proximity-text">
-        {nearest.jumps === 0 ? 'IN' : `${nearest.jumps} jumps`} - {label}
+        {nearest.jumps === 0 ? 'IN' : jumps(t, nearest.jumps)} - {label}
       </span>
     </span>
   );
 }
 
 export function Toolbar() {
+  const { t } = useTranslation();
   const mapName         = useMapStore((s) => s.map.name);
   const mapLocked       = useMapStore((s) => !!s.map.locked);
   const systemCount     = useMapStore((s) => s.map.systems.length);
@@ -417,7 +408,7 @@ export function Toolbar() {
         <div className="toolbar__user">
           <span
             className={`toolbar__online-dot${online === true ? ' toolbar__online-dot--on' : online === false ? ' toolbar__online-dot--off' : ''}`}
-            title={onlineTooltip(online, lastLogin)}
+            title={onlineTooltip(t, online, lastLogin)}
           />
           <img
             className="toolbar__avatar"

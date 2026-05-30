@@ -45,6 +45,25 @@ t('units.jumps', { count: n })   // "1 jump" / "3 jumps"
 Define plural forms with the `_one` / `_other` suffixes (see `units.jumps` in
 `common.json`); i18next picks the right one per language's plural rules.
 
+## Formatters
+
+Shared, i18n-aware formatters live in `format.ts` — use these instead of
+re-inventing per-component helpers:
+
+```tsx
+import { timeAgo, duration, expiresIn, mass, abbreviateValue, jumps } from '../../i18n/format';
+
+timeAgo(t, date)          // "just now" / "5m ago" / "2d ago"
+duration(t, seconds)      // "0s" / "5m 03s" / "2h 09m"  (counting up)
+expiresIn(t, ms)          // "expires in 2h 14m" / "expired"
+mass(t, kg)               // "1.44 B kg" / "500 M kg"
+abbreviateValue(value)    // "2.5B" / "500M" / "12K"  (pure, no t)
+jumps(t, n)               // "1 jump" / "3 jumps"
+```
+
+Pass the `t` from `useTranslation()`. For an absolute-date fallback past some
+age, branch yourself and call `europeanDate(date)`.
+
 ## Adding a string
 
 1. Add the key to `locales/en/common.json` (and the same key to every other
@@ -60,9 +79,9 @@ Define plural forms with the `_one` / `_other` suffixes (see `units.jumps` in
 
 ## Migration plan
 
-1. ~~Foundation: library, init, language switcher~~ ✅ (this scaffolding)
-2. Consolidate the scattered relative-time / mass / pluralisation formatters into
-   i18n-aware helpers (the trickiest part — do before mass extraction).
+1. ~~Foundation: library, init, language switcher~~ ✅
+2. ~~Consolidate the scattered relative-time / mass / pluralisation formatters into
+   i18n-aware helpers (`format.ts`)~~ ✅
 3. Extract strings component-by-component into `common.json` (split into feature
    namespaces as it grows).
 4. Add a real second language end-to-end to flush out text-overflow / format bugs.

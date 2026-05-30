@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useKillboard } from '../../hooks/useKillboard';
 import { useStandings } from '../../hooks/useStandings';
 import { useUserSetting } from '../../hooks/useUserSetting';
+import { abbreviateValue } from '../../i18n/format';
 import type { ZkbKill } from '../../hooks/useKillboard';
 
 const NPC_TOGGLE_KEY = 'nexum.killboardIncludeNpc';
@@ -16,13 +17,6 @@ const ZKB     = 'https://zkillboard.com';
 // At or above this many attackers a kill is treated as a "gank" (overwhelming
 // force) rather than a small gang. Tune to taste.
 const GANK_THRESHOLD = 10;
-
-function formatIsk(v: number): string {
-  if (v >= 1e9) return `${(v / 1e9).toFixed(1)}B`;
-  if (v >= 1e6) return `${(v / 1e6).toFixed(1)}M`;
-  if (v >= 1e3) return `${(v / 1e3).toFixed(0)}K`;
-  return String(Math.round(v));
-}
 
 function timeAgo(iso: string): string {
   const diffMs = Date.now() - new Date(iso).getTime();
@@ -216,7 +210,7 @@ function KillRow({ kill, standings }: { kill: ZkbKill; standings: ReturnType<typ
         )}
 
         <div className="zkb-kill__meta">
-          <span className="zkb-kill__value">{formatIsk(kill.zkb.totalValue)} ISK</span>
+          <span className="zkb-kill__value">{abbreviateValue(kill.zkb.totalValue)} ISK</span>
           <span className="zkb-kill__time">{timeAgo(kill.killmail_time)}</span>
         </div>
       </div>

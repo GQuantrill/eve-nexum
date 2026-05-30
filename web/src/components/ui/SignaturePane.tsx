@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { api } from '../../api/client';
 import { useMapStore } from '../../store/mapStore';
 import { useCanEditContent } from '../../hooks/useCanEditContent';
@@ -14,6 +15,7 @@ import { toast } from './Toaster';
 import { reevaluateConnectionsForSystem } from '../../utils/whAutoDetect';
 import { alertInboundK162 } from '../../utils/k162Alert';
 import { WORMHOLE_TYPES } from '../../data/wormholes';
+import { duration, DASH } from '../../i18n/format';
 
 // Aging bands for wormhole signatures, anchored to the WH type's known
 // lifetime. K162 and unknown codes return '' (no tint) since we don't
@@ -108,19 +110,6 @@ const DEFAULT_WIDTHS: Record<ColKey, number> = {
   updated: 80,
 };
 
-function elapsed(isoString: string | undefined, now: number): string {
-  if (!isoString) return '—';
-  const diff = Math.floor((now - new Date(isoString).getTime()) / 1000);
-  if (diff < 0) return '0s';
-  if (diff < 60) return `${diff}s`;
-  const m = Math.floor(diff / 60);
-  const s = diff % 60;
-  if (m < 60) return `${m}m ${s < 10 ? '0' : ''}${s}s`;
-  const h = Math.floor(m / 60);
-  const rm = m % 60;
-  return `${h}h ${rm < 10 ? '0' : ''}${rm}m`;
-}
-
 // Single module-level 1 s tick shared across every ElapsedCell instance.
 // Previously each SignaturePane drove a state update every second, which
 // re-rendered every row including its embedded MDEditor — extremely expensive.
@@ -137,6 +126,7 @@ function startTickIfNeeded() {
 }
 
 function ElapsedCell({ iso, className }: { iso: string | undefined; className?: string }) {
+  const { t } = useTranslation();
   const [, setTick] = useState(0);
   useEffect(() => {
     const fn = () => setTick((n) => n + 1);
@@ -150,7 +140,10 @@ function ElapsedCell({ iso, className }: { iso: string | undefined; className?: 
       }
     };
   }, []);
-  return <td className={className}>{elapsed(iso, tickNow)}</td>;
+  const text = iso
+    ? duration(t, Math.floor((tickNow - new Date(iso).getTime()) / 1000))
+    : DASH;
+  return <td className={className}>{text}</td>;
 }
 
 export function SignaturePane({ systemId }: { systemId: string }) {

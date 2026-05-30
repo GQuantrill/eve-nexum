@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { api } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { useHashRoute } from '../../hooks/useHashRoute';
+import { timeAgo, europeanDate, DASH } from '../../i18n/format';
 import { ConfirmModal } from './ConfirmModal';
 import {
   Chart as ChartJS,
@@ -145,6 +148,7 @@ function compareUsers(a: AdminUser, b: AdminUser, sort: UserSort): number {
 }
 
 function UsersTab() {
+  const { t } = useTranslation();
   const { user: self } = useAuth();
   const canEdit = self?.role === 'admin';
   const [users, setUsers]     = useState<AdminUser[] | null>(null);
@@ -285,7 +289,7 @@ function UsersTab() {
                       ? <span className="admin-modal__pill admin-modal__pill--blocked">blocked</span>
                       : <span className="admin-modal__pill admin-modal__pill--ok">active</span>}
                   </td>
-                  <td className="admin-modal__when">{formatRelative(u.lastLogin)}</td>
+                  <td className="admin-modal__when">{formatRelative(t, u.lastLogin)}</td>
                   {canEdit && (
                     <td className="admin-modal__actions">
                       {u.blocked ? (
@@ -348,6 +352,7 @@ interface AdminMap {
 }
 
 function MapsTab() {
+  const { t } = useTranslation();
   const [maps, setMaps]   = useState<AdminMap[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -440,7 +445,7 @@ function MapsTab() {
                       ? <span className="admin-modal__pill admin-modal__pill--blocked">locked</span>
                       : <span className="admin-modal__pill admin-modal__pill--ok">open</span>}
                   </td>
-                  <td className="admin-modal__when">{formatRelative(m.lastActiveAt)}</td>
+                  <td className="admin-modal__when">{formatRelative(t, m.lastActiveAt)}</td>
                   <td className="admin-modal__actions">
                     {m.locked ? (
                       <button
@@ -638,6 +643,7 @@ function compareValues(a: string | number | null, b: string | number | null, dir
 }
 
 function UsersReport() {
+  const { t } = useTranslation();
   const [rows, setRows]   = useState<UserReportRow[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [sort, setSort]   = useState<{ key: UserReportSortKey; dir: SortDir }>({ key: 'name', dir: 'asc' });
@@ -826,12 +832,12 @@ function UsersReport() {
                     ? <span className="admin-modal__mono">{u.allianceId}</span>
                     : '—'}
               </td>
-              <td className="admin-modal__when">{u.lastLogin ? formatRelative(u.lastLogin) : '—'}</td>
+              <td className="admin-modal__when">{u.lastLogin ? formatRelative(t, u.lastLogin) : '—'}</td>
               <td className="admin-modal__num">{u.systemsAdded   > 0 ? u.systemsAdded   : '—'}</td>
               <td className="admin-modal__num">{u.systemsDeleted > 0 ? u.systemsDeleted : '—'}</td>
-              <td className="admin-modal__when">{u.lastCorpStructAt ? formatRelative(u.lastCorpStructAt) : '—'}</td>
+              <td className="admin-modal__when">{u.lastCorpStructAt ? formatRelative(t, u.lastCorpStructAt) : '—'}</td>
               <td className="admin-modal__num">{u.totalCorpStructures > 0 ? u.totalCorpStructures : '—'}</td>
-              <td className="admin-modal__when">{u.lastCorpSigAt ? formatRelative(u.lastCorpSigAt) : '—'}</td>
+              <td className="admin-modal__when">{u.lastCorpSigAt ? formatRelative(t, u.lastCorpSigAt) : '—'}</td>
               <td className="admin-modal__num">{total > 0 ? total : '—'}</td>
               {SIG_TYPE_ORDER.map((t) => {
                 const n = u.sigTypeCounts[t.key] ?? 0;
@@ -1203,6 +1209,7 @@ interface AuditEntry {
 }
 
 function AuditTab() {
+  const { t } = useTranslation();
   const [entries, setEntries] = useState<AuditEntry[] | null>(null);
   const [error, setError]     = useState<string | null>(null);
 
@@ -1262,7 +1269,7 @@ function AuditTab() {
           <tbody>
             {entries.map((e) => (
               <tr key={e.id}>
-                <td className="admin-modal__when">{formatRelative(e.createdAt)}</td>
+                <td className="admin-modal__when">{formatRelative(t, e.createdAt)}</td>
                 <td>{e.actorCharacterName ?? '—'}</td>
                 <td><span className="admin-modal__action">{e.action}</span></td>
                 <td>{e.targetCharacterName ?? '—'}</td>
@@ -1280,25 +1287,14 @@ function AuditTab() {
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
-function formatRelative(iso: string): string {
+function formatRelative(t: TFunction, iso: string): string {
   const date = new Date(iso);
   const then = date.getTime();
-  if (Number.isNaN(then)) return '—';
-  const secs = Math.floor((Date.now() - then) / 1000);
-  if (secs < 60)              return `${secs}s ago`;
-  if (secs < 3600)            return `${Math.floor(secs / 60)}m ago`;
-  if (secs < 86400)           return `${Math.floor(secs / 3600)}h ago`;
-  if (secs < 86400 * 30)      return `${Math.floor(secs / 86400)}d ago`;
+  if (Number.isNaN(then)) return DASH;
   // Anything older than ~a month is more useful as an absolute European
   // date (DD-MM-YYYY) than "65d ago".
-  return formatEuropeanDate(date);
-}
-
-function formatEuropeanDate(date: Date): string {
-  const dd   = String(date.getDate()).padStart(2, '0');
-  const mm   = String(date.getMonth() + 1).padStart(2, '0');
-  const yyyy = date.getFullYear();
-  return `${dd}-${mm}-${yyyy}`;
+  if (Date.now() - then >= 86400 * 30 * 1000) return europeanDate(date);
+  return timeAgo(t, date);
 }
 
 // RFC 4180 CSV escaping: wrap in double quotes if the field contains a
