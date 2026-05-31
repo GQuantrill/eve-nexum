@@ -122,6 +122,7 @@ function resolveOverlaps(
 // ── demo node ────────────────────────────────────────────────
 
 function DemoSystemNode({ data, selected }: NodeProps) {
+  const { t } = useTranslation();
   const sys = data as unknown as DemoSys;
   const color = CLASS_COLORS[sys.systemClass];
   const connection = useConnection();
@@ -147,11 +148,11 @@ function DemoSystemNode({ data, selected }: NodeProps) {
         )}
       </div>
 
-      <div className="system-node__name">{sys.name || 'Unknown'}</div>
+      <div className="system-node__name">{sys.name || t('mapNode.unknown')}</div>
 
       {sys.statics.length > 0 && (
         <div className="system-node__statics">
-          <div className="title">Statics</div>
+          <div className="title">{t('systemPanel.statics')}</div>
           {sys.statics.map(s => {
             const dest = WORMHOLE_DESTINATIONS[s];
             return (
@@ -174,6 +175,7 @@ function DemoSystemNode({ data, selected }: NodeProps) {
 // ── info panel ───────────────────────────────────────────────
 
 function DemoInfoPanel({ sys, onRemove }: { sys: DemoSys; onRemove: () => void }) {
+  const { t } = useTranslation();
   const color = CLASS_COLORS[sys.systemClass];
   const effectIcon = EFFECT_ICONS[sys.effect];
   const effectLabel = EFFECT_LABELS[sys.effect];
@@ -206,7 +208,7 @@ function DemoInfoPanel({ sys, onRemove }: { sys: DemoSys; onRemove: () => void }
 
       {sys.statics.length > 0 && (
         <div className="demo-info__statics">
-          <div className="demo-info__label">Statics</div>
+          <div className="demo-info__label">{t('systemPanel.statics')}</div>
           {sys.statics.map(s => {
             const dest = WORMHOLE_DESTINATIONS[s];
             return (
@@ -225,30 +227,31 @@ function DemoInfoPanel({ sys, onRemove }: { sys: DemoSys; onRemove: () => void }
 
       {sys.regionName && (
         <div className="demo-info__section">
-          <div className="demo-info__label">Region</div>
+          <div className="demo-info__label">{t('systemPanel.region')}</div>
           <div>{sys.regionName}</div>
         </div>
       )}
 
       <div className="demo-info__more">
         <div className="demo-info__more-icon">✦</div>
-        <p>Sign in to view kills, signatures, structures, activity, sovereignty, and more.</p>
+        <p>{t('demo.signInMore')}</p>
       </div>
 
       <button type="button" className="btn btn--ghost demo-info__remove" onClick={onRemove}>
-        Remove System
+        {t('ctxMenu.removeSystem')}
       </button>
     </div>
   );
 }
 
 function DemoInfoHint() {
+  const { t } = useTranslation();
   return (
     <div className="demo-info__hint">
-      <p>Click a system to view its details here.</p>
-      <p>Right-click the map to add a system.</p>
-      <p>Drag from a node handle to connect systems.</p>
-      <p className="demo-info__hint-limit">Demo limited to {DEMO_MAX_SYSTEMS} systems — no limit when signed in.</p>
+      <p>{t('demo.hintClick')}</p>
+      <p>{t('demo.hintAdd')}</p>
+      <p>{t('demo.hintConnect')}</p>
+      <p className="demo-info__hint-limit">{t('demo.hintLimit', { count: DEMO_MAX_SYSTEMS })}</p>
     </div>
   );
 }
@@ -380,8 +383,8 @@ function DemoMapInner() {
   }, [setNodes, setEdges, selectedId]);
 
   const ctxItems: ContextMenuItem[] = ctxMenu?.nodeId
-    ? [{ label: 'Remove System', icon: '✕', action: () => removeNode(ctxMenu.nodeId!) }]
-    : [{ label: atLimit ? `Add System (limit ${DEMO_MAX_SYSTEMS} reached)` : 'Add System here', icon: '+', action: openAddForm, disabled: atLimit }];
+    ? [{ label: t('ctxMenu.removeSystem'), icon: '✕', action: () => removeNode(ctxMenu.nodeId!) }]
+    : [{ label: atLimit ? t('demo.addSystemLimit', { max: DEMO_MAX_SYSTEMS }) : t('demo.addSystemHere'), icon: '+', action: openAddForm, disabled: atLimit }];
 
   return (
     <div className="demo-wrap">
@@ -418,11 +421,11 @@ function DemoMapInner() {
           <Controls showInteractive={false} />
           <Panel position="top-right">
             <div className="demo-map-actions">
-              <button type="button" className="map-sidebar__action" onClick={spreadNodes} disabled={nodes.length < 2} data-tooltip="Adjust system nodes to stop overlap">
-                ⊞ Spread Nodes
+              <button type="button" className="map-sidebar__action" onClick={spreadNodes} disabled={nodes.length < 2} data-tooltip={t('mapSidebar.spreadNodesTooltip')}>
+                {t('mapSidebar.spreadNodes')}
               </button>
               <span className={`demo-map-actions__count${atLimit ? ' demo-map-actions__count--limit' : ''}`}>
-                {nodes.length} / {DEMO_MAX_SYSTEMS} systems
+                {t('demo.systemsCount', { count: nodes.length, max: DEMO_MAX_SYSTEMS })}
               </span>
             </div>
           </Panel>

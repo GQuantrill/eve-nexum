@@ -485,6 +485,16 @@
     "fitView": "Ajuster la vue",
     "interactive": "Basculer l'interactivité"
   },
+  "demo": {
+    "hintClick": "Cliquez sur un système pour voir ses détails ici.",
+    "hintAdd": "Clic droit sur la carte pour ajouter un système.",
+    "hintConnect": "Glissez depuis une poignée de nœud pour connecter des systèmes.",
+    "hintLimit": "Démo limitée à {{count}} systèmes — aucune limite une fois connecté.",
+    "systemsCount": "{{count}} / {{max}} systèmes",
+    "signInMore": "Connectez-vous pour voir les kills, signatures, structures, l'activité, la souveraineté et plus encore.",
+    "addSystemHere": "Ajouter un système ici",
+    "addSystemLimit": "Ajouter un système (limite de {{max}} atteinte)"
+  },
   "ctxMenu": {
     "disconnect": "Déconnecter",
     "jumpType": "Type de saut",
