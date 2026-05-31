@@ -31,6 +31,13 @@ void i18n
     resources,
     fallbackLng: 'en',
     supportedLngs: SUPPORTED_LANGUAGES,
+    // Map regional browser locales to the base language we ship, so a visitor
+    // whose browser reports e.g. es-ES / es-MX / en-GB / fr-CA / de-AT is
+    // auto-detected as es / en / fr / de rather than missing and falling back
+    // to English. (`load` strips the region from the resolved language; the
+    // navigator detector still reads navigator.languages in priority order.)
+    load: 'languageOnly',
+    nonExplicitSupportedLngs: true,
     defaultNS: 'common',
     ns: ['common'],
     detection: {
