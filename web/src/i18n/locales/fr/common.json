@@ -616,6 +616,10 @@
     "modeShortest": "le plus court",
     "modeSecure": "sécurisé"
   },
+  "scout": {
+    "noConnections": "Aucune connexion {{system}}.",
+    "expiring": "expire"
+  },
   "activity": {
     "thisHour": "cette heure",
     "allHidden": "Tous les graphiques sont masqués. Activez-les dans Options de carte → Activité.",
