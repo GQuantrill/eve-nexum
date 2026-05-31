@@ -1,4 +1,6 @@
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { useScoutConnections } from '../../hooks/useScoutConnections';
 import { useCharacterLocation } from '../../hooks/useCharacterLocation';
 import { useRoute } from '../../hooks/useRoute';
@@ -39,13 +41,14 @@ function secClassColor(cls: string | null): string | undefined {
   return undefined;
 }
 
-function formatRemaining(hours: number): string {
-  if (hours <= 0) return 'expiring';
+function formatRemaining(t: TFunction, hours: number): string {
+  if (hours <= 0) return t('scout.expiring');
   if (hours < 1)  return '<1h';
   return `${Math.floor(hours)}h`;
 }
 
 export function ScoutConnectionsPane({ scoutSystem }: Props) {
+  const { t }    = useTranslation();
   const all      = useScoutConnections();
   const location = useCharacterLocation();
   const routeMode = useMapStore((s) => s.routeMode);
@@ -85,7 +88,7 @@ export function ScoutConnectionsPane({ scoutSystem }: Props) {
   }
 
   if (sorted.length === 0) {
-    return <div className="scout-pane__empty">No {scoutSystem} connections.</div>;
+    return <div className="scout-pane__empty">{t('scout.noConnections', { system: scoutSystem })}</div>;
   }
 
   return (
@@ -108,7 +111,7 @@ export function ScoutConnectionsPane({ scoutSystem }: Props) {
                   {c.inSystemClass.toUpperCase()}
                 </span>
               )}
-              <span className="scout-row__time">{formatRemaining(c.remainingHours)}</span>
+              <span className="scout-row__time">{formatRemaining(t, c.remainingHours)}</span>
             </div>
             <div className="scout-row__region">{c.inRegionName}</div>
             <div className="scout-row__meta">
@@ -120,15 +123,15 @@ export function ScoutConnectionsPane({ scoutSystem }: Props) {
             </div>
 
             <div className="scout-row__actions">
-              {route && <span className="scout-row__jumps">{route.jumps} jumps</span>}
+              {route && <span className="scout-row__jumps">{t('units.jumps', { count: route.jumps })}</span>}
               {isKspaceTarget && (
                 <>
                   <button
                     type="button"
                     className="sys-btn scout-row__btn scout-row__btn--icon"
                     onClick={() => setWaypoint(c.inSystemId, c.inSystemName, true)}
-                    aria-label="Set Destination"
-                    data-tooltip="Set Destination"
+                    aria-label={t('waypoint.setDestination')}
+                    data-tooltip={t('waypoint.setDestination')}
                   >
                     <MapPinSimpleIcon size={14} weight="regular" color="#3ddc84" />
                   </button>
@@ -136,8 +139,8 @@ export function ScoutConnectionsPane({ scoutSystem }: Props) {
                     type="button"
                     className="sys-btn scout-row__btn scout-row__btn--icon"
                     onClick={() => setWaypoint(c.inSystemId, c.inSystemName, false)}
-                    aria-label="Add Waypoint"
-                    data-tooltip="Add Waypoint"
+                    aria-label={t('waypoint.addWaypoint')}
+                    data-tooltip={t('waypoint.addWaypoint')}
                   >
                     <PathIcon size={14} weight="regular" color="#5a9af8" />
                   </button>
@@ -150,7 +153,9 @@ export function ScoutConnectionsPane({ scoutSystem }: Props) {
                   onClick={() => toggleExpanded(c.id)}
                   aria-expanded={isOpen}
                 >
-                  {isOpen ? `Hide ${routeMode} route` : `Show ${routeMode} route`}
+                  {t(isOpen ? 'a0.hideRoute' : 'a0.showRoute', {
+                    mode: t(routeMode === 'secure' ? 'a0.modeSecure' : 'a0.modeShortest'),
+                  })}
                 </button>
               )}
             </div>

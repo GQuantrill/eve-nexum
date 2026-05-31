@@ -616,6 +616,10 @@
     "modeShortest": "kürzeste",
     "modeSecure": "sichere"
   },
+  "scout": {
+    "noConnections": "Keine {{system}}-Verbindungen.",
+    "expiring": "läuft ab"
+  },
   "activity": {
     "thisHour": "diese Stunde",
     "allHidden": "Alle Diagramme ausgeblendet. Aktiviere sie unter Kartenoptionen → Aktivität.",
