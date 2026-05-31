@@ -777,5 +777,31 @@
       "threat": "Threat",
       "closest": "Closest {{label}} system"
     }
+  },
+  "mapNode": {
+    "unknown": "Unknown",
+    "homeSystem": "Home system",
+    "characterFallback": "Character {{id}}",
+    "killsTooltip": "{{ships}} ship · {{pods}} pod kills this hour",
+    "a0Sun": "A0 sun",
+    "iceBelt": "Ice belt system",
+    "incursion": "Incursion System",
+    "insurgency": "Insurgency System",
+    "stormTitle": "{{name}} storm",
+    "stormLastReport": "Last report: {{value}}",
+    "stormReportedBy": "By: {{value}}",
+    "statics": "Statics",
+    "staging": "Staging",
+    "incursionBadge": "Incursion",
+    "corrupted": "Corrupted",
+    "suppressed": "Suppressed",
+    "scoutConnections_one": "{{name}} connection",
+    "scoutConnections_other": "{{name}} connections",
+    "scoutConnectionsMulti": "{{names}} connections"
+  },
+  "mapEdge": {
+    "lessThan24h": "< 24h",
+    "lessThan4h": "< 4 hrs",
+    "lessThan1h": "< 1 hr"
   }
 }

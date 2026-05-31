@@ -777,5 +777,31 @@
       "threat": "Bedrohung",
       "closest": "Nächstes {{label}}-System"
     }
+  },
+  "mapNode": {
+    "unknown": "Unbekannt",
+    "homeSystem": "Heimatsystem",
+    "characterFallback": "Charakter {{id}}",
+    "killsTooltip": "{{ships}} Schiff · {{pods}} Pod-Kills diese Stunde",
+    "a0Sun": "A0-Sonne",
+    "iceBelt": "Eisgürtel-System",
+    "incursion": "Inkursionssystem",
+    "insurgency": "Aufstandssystem",
+    "stormTitle": "{{name}}-Sturm",
+    "stormLastReport": "Letzte Meldung: {{value}}",
+    "stormReportedBy": "Von: {{value}}",
+    "statics": "Statics",
+    "staging": "Staging",
+    "incursionBadge": "Inkursion",
+    "corrupted": "Korrumpiert",
+    "suppressed": "Unterdrückt",
+    "scoutConnections_one": "{{name}}-Verbindung",
+    "scoutConnections_other": "{{name}}-Verbindungen",
+    "scoutConnectionsMulti": "{{names}}-Verbindungen"
+  },
+  "mapEdge": {
+    "lessThan24h": "< 24 Std",
+    "lessThan4h": "< 4 Std",
+    "lessThan1h": "< 1 Std"
   }
 }
