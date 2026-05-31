@@ -1,4 +1,5 @@
 import { memo, useEffect, useMemo, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Handle, Position, useConnection } from '@xyflow/react';
 import {
   HouseIcon, LockIcon, WarningIcon, SkullIcon, LightningIcon,
@@ -31,6 +32,7 @@ import { truesecColor } from '../../utils/truesec';
 type SystemNodeData = MapSystem & { selected: boolean };
 
 export const SystemNode = memo(({ data, selected }: NodeProps) => {
+  const { t } = useTranslation();
   const sys = data as unknown as SystemNodeData;
   const color = CLASS_COLORS[sys.systemClass];
   const selectSystem    = useMapStore((s) => s.selectSystem);
@@ -121,8 +123,8 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
     : (() => {
         const names = Array.from(new Set(scoutMatches.map(c => c.outSystemName)));
         return names.length === 1
-          ? `${names[0]} connection${scoutMatches.length > 1 ? 's' : ''}`
-          : `${names.join(' & ')} connections`;
+          ? t('mapNode.scoutConnections', { name: names[0], count: scoutMatches.length })
+          : t('mapNode.scoutConnectionsMulti', { names: names.join(' & ') });
       })();
   const isTarget        = connection.inProgress && connection.fromNode?.id !== sys.id;
 
@@ -205,7 +207,7 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
             <span className="system-node__fleet-tooltip">
               {fleetHere.map((m) => (
                 <span key={m.characterId} className="system-node__fleet-tooltip-row">
-                  {m.characterName ?? `Character ${m.characterId}`}
+                  {m.characterName ?? t('mapNode.characterFallback', { id: m.characterId })}
                 </span>
               ))}
             </span>
@@ -217,18 +219,18 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
             <span className="system-node__presence-tooltip">
               {presenceHere.map((v) => (
                 <span key={v.characterId} className="system-node__presence-tooltip-row">
-                  {v.characterName || `Character ${v.characterId}`}
+                  {v.characterName || t('mapNode.characterFallback', { id: v.characterId })}
                 </span>
               ))}
             </span>
           </span>
         )}
         {sys.isHome && (
-          <span className="system-node__home-icon" aria-label="Home system">
+          <span className="system-node__home-icon" aria-label={t('mapNode.homeSystem')}>
             <HouseIcon size={14} weight="regular" />
           </span>
         )}
-        <span className="system-node__name">{sys.name || 'Unknown'}</span>
+        <span className="system-node__name">{sys.name || t('mapNode.unknown')}</span>
         {sys.security != null && Number.isFinite(Number(sys.security)) && (
           <span className="system-node__truesec" style={{ color: truesecColor(Number(sys.security)) }}>
             {Number(sys.security).toFixed(1)}
@@ -252,35 +254,35 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
             <span className="system-node__kill-icon">
               <SwordIcon size={14} weight="regular" />
               <span className="system-node__kill-tooltip">
-                {myKills.shipKills} ship · {myKills.podKills} pod kills this hour
+                {t('mapNode.killsTooltip', { ships: myKills.shipKills, pods: myKills.podKills })}
               </span>
             </span>
           )}
           {isA0 && (
             <span className="system-node__a0-icon">
               <SunIcon size={14} weight="regular" />
-              <span className="system-node__a0-tooltip">A0 sun</span>
+              <span className="system-node__a0-tooltip">{t('mapNode.a0Sun')}</span>
             </span>
           )}
           {isIceBelt && (
             <span className="system-node__ice-icon">
               <SnowflakeIcon size={14} weight="regular" />
-              <span className="system-node__ice-tooltip">Ice belt system</span>
+              <span className="system-node__ice-tooltip">{t('mapNode.iceBelt')}</span>
             </span>
           )}
           {incursion && (
             <span className="system-node__incursion-icon">
               <WarningIcon size={14} weight="regular" />
-              <span className="system-node__incursion-tooltip">Incursion System</span>
+              <span className="system-node__incursion-tooltip">{t('mapNode.incursion')}</span>
             </span>
           )}
           {storm && (
             <span className={`system-node__storm-icon system-node__storm-icon--${storm.stormType}`}>
               <LightningIcon size={14} weight="regular" />
               <span className="system-node__storm-tooltip">
-                <span className="system-node__storm-tooltip__title">{storm.stormName} storm</span>
-                <span>Last report: {storm.lastReport}</span>
-                {storm.reportedBy && <span>By: {storm.reportedBy}</span>}
+                <span className="system-node__storm-tooltip__title">{t('mapNode.stormTitle', { name: storm.stormName })}</span>
+                <span>{t('mapNode.stormLastReport', { value: storm.lastReport })}</span>
+                {storm.reportedBy && <span>{t('mapNode.stormReportedBy', { value: storm.reportedBy })}</span>}
               </span>
             </span>
           )}
@@ -292,7 +294,7 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
           {insurgency && (
             <span className="system-node__insurgency-icon">
               <SkullIcon size={14} weight="regular" />
-              <span className="system-node__insurgency-tooltip">Insurgency System</span>
+              <span className="system-node__insurgency-tooltip">{t('mapNode.insurgency')}</span>
             </span>
           )}
           {scoutMatches.length > 0 && (
@@ -328,7 +330,7 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
 
       {!compactMode && showStatics && sys.statics.length > 0 && (
         <div className="system-node__statics">
-          <div className="title">Statics</div>
+          <div className="title">{t('mapNode.statics')}</div>
           {sys.statics.map((s) => {
             const dest = WORMHOLE_DESTINATIONS[s];
             return (
@@ -356,7 +358,7 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
             <img className="system-node__incursion-logo" src={incursion.factionLogoUrl} alt={incursion.factionName} />
           )}
           <span className="system-node__incursion-label">
-            {incursion.isStaging ? 'Staging' : 'Incursion'}
+            {incursion.isStaging ? t('mapNode.staging') : t('mapNode.incursionBadge')}
             <span className="system-node__incursion-badge-tooltip">{incursion.factionName}</span>
           </span>
         </div>
@@ -368,7 +370,7 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
             <img className="system-node__insurgency-logo" src={insurgency.factionLogoUrl} alt={insurgency.factionName} />
           )}
           <span className="system-node__insurgency-label">
-            {insurgency.corruptionState > 0 ? 'Corrupted' : 'Suppressed'}
+            {insurgency.corruptionState > 0 ? t('mapNode.corrupted') : t('mapNode.suppressed')}
             <span className="system-node__insurgency-badge-tooltip">{insurgency.factionName}</span>
           </span>
         </div>

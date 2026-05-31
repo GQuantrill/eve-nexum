@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   getBezierPath, getStraightPath, getSmoothStepPath,
   EdgeLabelRenderer, BaseEdge,
@@ -49,6 +50,7 @@ export const ConnectionEdge = memo(({
   id, sourceX, sourceY, targetX, targetY,
   sourcePosition, targetPosition, data, selected,
 }: EdgeProps) => {
+  const { t } = useTranslation();
   const conn = data as unknown as MapConnection & { edgeStyle?: string; connectionThickness?: 'thin' | 'standard' | 'thick' | 'extra' };
   const selectConnection = useMapStore((s) => s.selectConnection);
   const now = useNow30s();
@@ -89,9 +91,9 @@ export const ConnectionEdge = memo(({
   const timeLabel = (() => {
     if (eolState) return { text: eolState.label, cls: eolState.cls };
     switch (timeStatus) {
-      case 'lessThan24h': return { text: '< 24h',  cls: 'connection-label__eol' };
-      case 'lessThan4h':  return { text: '< 4 hrs', cls: 'connection-label__eol' };
-      case 'lessThan1h':  return { text: '< 1 hr',  cls: 'connection-label__eol' };
+      case 'lessThan24h': return { text: t('mapEdge.lessThan24h'), cls: 'connection-label__eol' };
+      case 'lessThan4h':  return { text: t('mapEdge.lessThan4h'),  cls: 'connection-label__eol' };
+      case 'lessThan1h':  return { text: t('mapEdge.lessThan1h'),  cls: 'connection-label__eol' };
       case 'expired':     return { text: '!',        cls: 'connection-label__crit' };
       default:            return null;
     }

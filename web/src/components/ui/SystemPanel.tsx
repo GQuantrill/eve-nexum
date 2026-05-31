@@ -154,7 +154,7 @@ export function SystemPanel() {
   const incursion  = findIncursion(incursions, sys.eveSystemId);
   const insurgency = findInsurgency(insurgencies, sys.eveSystemId);
   const intelColor = resolveIntelColor(sys.intel, customIntel);
-  const intelLabel = resolveIntelLabel(sys.intel, customIntel);
+  const intelLabel = resolveIntelLabel(sys.intel, customIntel, t);
 
   const setWaypoint = (clearOtherWaypoints: boolean) => {
     if (!sys.eveSystemId) return;
