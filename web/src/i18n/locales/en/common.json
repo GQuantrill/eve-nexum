@@ -616,6 +616,10 @@
     "modeShortest": "shortest",
     "modeSecure": "secure"
   },
+  "scout": {
+    "noConnections": "No {{system}} connections.",
+    "expiring": "expiring"
+  },
   "activity": {
     "thisHour": "this hour",
     "allHidden": "All charts hidden. Toggle them on in Map Options → Activity.",

@@ -7,6 +7,7 @@ import { SUPPORTED_LANGUAGES, type SupportedLanguage } from '../../i18n';
 const LANGUAGE_NAMES: Record<SupportedLanguage, string> = {
   en: '🇬🇧 English',
   de: '🇩🇪 Deutsch',
+  fr: '🇫🇷 Français',
 };
 
 export function LanguageSwitcher() {
