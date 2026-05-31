@@ -10,7 +10,9 @@
     "close": "Fermer",
     "ok": "OK",
     "on": "Activé",
-    "off": "Désactivé"
+    "off": "Désactivé",
+    "expand": "Développer",
+    "collapse": "Réduire"
   },
   "confirm": {
     "title": "Êtes-vous sûr ?",
@@ -1078,6 +1080,63 @@
       }
     },
     "footer": "EVE Online et le logo EVE sont des marques déposées de CCP hf. Tous droits réservés dans le monde entier. Nexum est un outil tiers et n'est ni affilié à CCP hf ni approuvé par lui. · <license>Mention de licence & PI EVE</license>"
+  },
+  "whInfo": {
+    "leadsTo": "Mène à",
+    "lifetime": "Durée de vie",
+    "totalMass": "Masse totale",
+    "maxJump": "Saut max",
+    "infoAria": "Infos {{code}}",
+    "specTooltip": "Spéc. {{code}}"
+  },
+  "whPicker": {
+    "searchPlaceholder": "Rechercher…",
+    "connectedSystems": "Systèmes connectés",
+    "other": "Autre",
+    "inbound": "entrant"
+  },
+  "npcStations": {
+    "loading": "Chargement des stations…",
+    "none": "Aucune station PNJ dans ce système",
+    "services": {
+      "market": "Marché",
+      "repairFacilities": "Installations de réparation",
+      "fitting": "Équipement",
+      "factory": "Usine",
+      "laboratory": "Laboratoire",
+      "reprocessingPlant": "Usine de retraitement",
+      "cloning": "Clonage",
+      "cloneBay": "Baie de clonage",
+      "insurance": "Assurance",
+      "loyaltyPointStore": "Boutique de points de fidélité",
+      "navyOffices": "Bureaux de la marine",
+      "securityOffices": "Bureaux de sécurité",
+      "bountyMissions": "Missions de prime",
+      "bountyOffice": "Bureau des primes",
+      "assayOffice": "Bureau d'analyse",
+      "officeRental": "Location de bureau",
+      "stockExchange": "Bourse",
+      "commodityTrading": "Négoce de marchandises",
+      "news": "Actualités",
+      "docking": "Amarrage",
+      "exploration": "Exploration",
+      "blackMarket": "Marché noir",
+      "mentoring": "Mentorat"
+    }
+  },
+  "shareView": {
+    "expiredTitle": "Lien de partage expiré",
+    "expiredBody": "Cette vue partagée de <strong>{{map}}</strong> a été publiée par <strong>{{owner}}</strong> et a expiré le <strong>{{date}}</strong>.",
+    "expiredHint": "Demandez un nouveau lien à {{owner}}.",
+    "notFoundTitle": "Lien de partage introuvable",
+    "notFoundBody": "Ce lien ne correspond à aucune carte partagée connue. Il a peut-être été révoqué, ou l'URL est incorrecte.",
+    "sharedBy": "partagé par <strong>{{owner}}</strong>",
+    "cta": "Créez des cartes avec Nexum dès aujourd'hui !"
+  },
+  "routeToast": {
+    "destinationSet": "Destination définie sur {{system}}",
+    "waypointAdded": "Point de cheminement ajouté : {{system}}",
+    "failed": "Échec de la définition du point de cheminement — votre personnage est-il en ligne ?"
   },
   "mapNode": {
     "unknown": "Inconnu",

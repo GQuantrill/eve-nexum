@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ArrowRightIcon, CaretDownIcon, CaretUpIcon } from '@phosphor-icons/react';
 import { CLASS_COLORS, CLASS_LABELS, WORMHOLE_DESTINATIONS } from '../../data/wormholes';
 import { useWormholeTypes } from '../../hooks/useWormholeTypes';
@@ -59,6 +60,7 @@ function DestBadge({ code, types }: { code: string; types: ReturnType<typeof use
 }
 
 export function WormholeTypePicker({ value, onChange, statics = [] }: Props) {
+  const { t } = useTranslation();
   const types = useWormholeTypes();
   const { open, setOpen, pos, btnRef, dropdownRef, openAt } = usePopover();
   const [search, setSearch] = useState('');
@@ -142,7 +144,7 @@ export function WormholeTypePicker({ value, onChange, statics = [] }: Props) {
             <DestBadge code={value} types={types} />
           </span>
         ) : (
-          <span className="wh-picker__placeholder">Unknown</span>
+          <span className="wh-picker__placeholder">{t('mapNode.unknown')}</span>
         )}
         <span className="wh-picker__chevron">
           {open ? <CaretUpIcon size={11} weight="bold" /> : <CaretDownIcon size={11} weight="bold" />}
@@ -160,7 +162,7 @@ export function WormholeTypePicker({ value, onChange, statics = [] }: Props) {
             className="wh-picker__search"
             value={search}
             onChange={e => setSearch(e.target.value)}
-            placeholder="Search..."
+            placeholder={t('whPicker.searchPlaceholder')}
             spellCheck={false}
           />
           <div className="wh-picker__list">
@@ -168,12 +170,12 @@ export function WormholeTypePicker({ value, onChange, statics = [] }: Props) {
               className={`wh-picker__option${!value ? ' wh-picker__option--active' : ''}`}
               onMouseDown={() => { onChange('', ''); setOpen(false); }}
             >
-              <span className="wh-picker__placeholder">Unknown</span>
+              <span className="wh-picker__placeholder">{t('mapNode.unknown')}</span>
             </div>
             {groups.map(group => (
               <div key={group.key}>
                 <div className="wh-picker__group-hdr">
-                  {group.label}
+                  {group.key === '__other' ? t('whPicker.other') : group.label}
                   <span className="wh-picker__group-count">({group.totalCount})</span>
                 </div>
                 {group.types.map(code => (
@@ -185,7 +187,7 @@ export function WormholeTypePicker({ value, onChange, statics = [] }: Props) {
                     <span className="wh-picker__code">{code}</span>
                     <DestBadge code={code} types={types} />
                     {code === 'K162' && (
-                      <span className="wh-picker__inbound">inbound</span>
+                      <span className="wh-picker__inbound">{t('whPicker.inbound')}</span>
                     )}
                   </div>
                 ))}

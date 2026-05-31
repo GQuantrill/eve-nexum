@@ -10,7 +10,9 @@
     "close": "Schließen",
     "ok": "OK",
     "on": "An",
-    "off": "Aus"
+    "off": "Aus",
+    "expand": "Erweitern",
+    "collapse": "Einklappen"
   },
   "confirm": {
     "title": "Bist du sicher?",
@@ -1078,6 +1080,63 @@
       }
     },
     "footer": "EVE Online und das EVE-Logo sind eingetragene Marken von CCP hf. Alle Rechte weltweit vorbehalten. Nexum ist ein Drittanbieter-Tool und steht in keiner Verbindung zu CCP hf und wird von ihnen nicht unterstützt. · <license>Lizenz- & EVE-IP-Hinweis</license>"
+  },
+  "whInfo": {
+    "leadsTo": "Führt zu",
+    "lifetime": "Lebensdauer",
+    "totalMass": "Gesamtmasse",
+    "maxJump": "Max. Sprung",
+    "infoAria": "{{code}} Info",
+    "specTooltip": "{{code}} Spezifikation"
+  },
+  "whPicker": {
+    "searchPlaceholder": "Suchen…",
+    "connectedSystems": "Verbundene Systeme",
+    "other": "Andere",
+    "inbound": "eingehend"
+  },
+  "npcStations": {
+    "loading": "Lade Stationen…",
+    "none": "Keine NPC-Stationen in diesem System",
+    "services": {
+      "market": "Markt",
+      "repairFacilities": "Reparatureinrichtungen",
+      "fitting": "Fitting",
+      "factory": "Fabrik",
+      "laboratory": "Labor",
+      "reprocessingPlant": "Wiederaufbereitungsanlage",
+      "cloning": "Klonen",
+      "cloneBay": "Klonanlage",
+      "insurance": "Versicherung",
+      "loyaltyPointStore": "Treuepunkt-Shop",
+      "navyOffices": "Marinebüros",
+      "securityOffices": "Sicherheitsbüros",
+      "bountyMissions": "Kopfgeld-Missionen",
+      "bountyOffice": "Kopfgeldbüro",
+      "assayOffice": "Prüfbüro",
+      "officeRental": "Büromiete",
+      "stockExchange": "Börse",
+      "commodityTrading": "Warenhandel",
+      "news": "Nachrichten",
+      "docking": "Andocken",
+      "exploration": "Erkundung",
+      "blackMarket": "Schwarzmarkt",
+      "mentoring": "Mentoring"
+    }
+  },
+  "shareView": {
+    "expiredTitle": "Freigabe-Link abgelaufen",
+    "expiredBody": "Diese geteilte Ansicht von <strong>{{map}}</strong> wurde von <strong>{{owner}}</strong> veröffentlicht und ist am <strong>{{date}}</strong> abgelaufen.",
+    "expiredHint": "Bitte {{owner}} um einen neuen Link.",
+    "notFoundTitle": "Freigabe-Link nicht gefunden",
+    "notFoundBody": "Dieser Link passt zu keiner bekannten geteilten Karte. Er wurde möglicherweise widerrufen oder die URL ist falsch.",
+    "sharedBy": "geteilt von <strong>{{owner}}</strong>",
+    "cta": "Erstelle noch heute Karten mit Nexum!"
+  },
+  "routeToast": {
+    "destinationSet": "Ziel festgelegt auf {{system}}",
+    "waypointAdded": "Wegpunkt hinzugefügt: {{system}}",
+    "failed": "Wegpunkt konnte nicht gesetzt werden — ist dein Charakter online?"
   },
   "mapNode": {
     "unknown": "Unbekannt",

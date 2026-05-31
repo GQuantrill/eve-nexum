@@ -1,5 +1,6 @@
 import { api } from '../../api/client';
 import { toast } from './Toaster';
+import i18n from '../../i18n';
 import { truesecColor } from '../../utils/truesec';
 import type { RouteEntry } from '../../hooks/useRoute';
 
@@ -9,8 +10,10 @@ export function setWaypoint(systemId: number, systemName: string, clear: boolean
     method: 'POST',
     body:   JSON.stringify({ destinationId: systemId, clearOtherWaypoints: clear }),
   })
-    .then(() => toast.success(clear ? `Destination set to ${systemName}` : `Waypoint added: ${systemName}`))
-    .catch(() => toast.error('Failed to set waypoint — is your character online?'));
+    .then(() => toast.success(clear
+      ? i18n.t('routeToast.destinationSet', { system: systemName })
+      : i18n.t('routeToast.waypointAdded', { system: systemName })))
+    .catch(() => toast.error(i18n.t('routeToast.failed')));
 }
 
 /** Wrap-friendly row of coloured squares, one per system on the path. */

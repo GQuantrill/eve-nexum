@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useUserSetting } from '../../hooks/useUserSetting';
@@ -12,6 +13,7 @@ interface Props {
 function storageKey(id: string) { return `nexum.panel.collapsed.${id}`; }
 
 export function DraggableCard({ id, title, children }: Props) {
+  const { t } = useTranslation();
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
 
   const [collapsed, setCollapsed] = useUserSetting<boolean>(storageKey(id), false);
@@ -33,7 +35,7 @@ export function DraggableCard({ id, title, children }: Props) {
           type="button"
           className="info-card__collapse-btn"
           onClick={(e) => { e.stopPropagation(); toggle(); }}
-          title={collapsed ? 'Expand' : 'Collapse'}
+          title={collapsed ? t('actions.expand') : t('actions.collapse')}
         >
           <span className={`info-card__chevron${collapsed ? ' info-card__chevron--collapsed' : ''}`}>▾</span>
         </button>
@@ -44,7 +46,7 @@ export function DraggableCard({ id, title, children }: Props) {
           {...listeners}
           {...attributes}
           onClick={(e) => e.stopPropagation()}
-          title="Drag to reorder"
+          title={t('closest.dragToReorder')}
         >
           ⠿
         </button>

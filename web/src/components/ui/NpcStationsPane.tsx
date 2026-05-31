@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
 import type { NpcStation } from '../../types';
 import { ContextMenu } from './ContextMenu';
@@ -9,30 +10,39 @@ import { useShareMode } from '../../context/ShareModeContext';
 
 const ESI = 'https://esi.evetech.net/latest';
 
-const SERVICE_ICONS: Record<string, { icon: string; label: string }> = {
-  'market':              { icon: '◈', label: 'Market' },
-  'repair-facilities':   { icon: '⚙', label: 'Repair Facilities' },
-  'fitting':             { icon: '⊕', label: 'Fitting' },
-  'factory':             { icon: '⬡', label: 'Factory' },
-  'labratory':           { icon: '⌬', label: 'Laboratory' },
-  'reprocessing-plant':  { icon: '⟲', label: 'Reprocessing Plant' },
-  'cloning':             { icon: '◑', label: 'Cloning' },
-  'clones':              { icon: '◑', label: 'Clone Bay' },
-  'insurance':           { icon: '◎', label: 'Insurance' },
-  'loyalty-point-store': { icon: '✦', label: 'Loyalty Point Store' },
-  'navy-offices':        { icon: '⚔', label: 'Navy Offices' },
-  'security-offices':    { icon: '◉', label: 'Security Offices' },
-  'bounty-missions':     { icon: '⊛', label: 'Bounty Missions' },
-  'bounty-office':       { icon: '⊛', label: 'Bounty Office' },
-  'assay-offices':       { icon: '⌖', label: 'Assay Office' },
-  'office-rental':       { icon: '⊞', label: 'Office Rental' },
-  'stock-exchange':      { icon: '⇅', label: 'Stock Exchange' },
-  'commodity-trading':   { icon: '⇄', label: 'Commodity Trading' },
-  'news':                { icon: '◫', label: 'News' },
-  'docking':             { icon: '⬒', label: 'Docking' },
-  'exploration':         { icon: '⟁', label: 'Exploration' },
-  'black-market':        { icon: '◆', label: 'Black Market' },
-  'mentoring':           { icon: '⊙', label: 'Mentoring' },
+// `key` indexes into the npcStations.services.* i18n namespace; the union type
+// keeps the dynamic t(`npcStations.services.${key}`) lookup type-checked.
+type NpcServiceKey =
+  | 'market' | 'repairFacilities' | 'fitting' | 'factory' | 'laboratory'
+  | 'reprocessingPlant' | 'cloning' | 'cloneBay' | 'insurance' | 'loyaltyPointStore'
+  | 'navyOffices' | 'securityOffices' | 'bountyMissions' | 'bountyOffice' | 'assayOffice'
+  | 'officeRental' | 'stockExchange' | 'commodityTrading' | 'news' | 'docking'
+  | 'exploration' | 'blackMarket' | 'mentoring';
+
+const SERVICE_ICONS: Record<string, { icon: string; key: NpcServiceKey }> = {
+  'market':              { icon: '◈', key: 'market' },
+  'repair-facilities':   { icon: '⚙', key: 'repairFacilities' },
+  'fitting':             { icon: '⊕', key: 'fitting' },
+  'factory':             { icon: '⬡', key: 'factory' },
+  'labratory':           { icon: '⌬', key: 'laboratory' },
+  'reprocessing-plant':  { icon: '⟲', key: 'reprocessingPlant' },
+  'cloning':             { icon: '◑', key: 'cloning' },
+  'clones':              { icon: '◑', key: 'cloneBay' },
+  'insurance':           { icon: '◎', key: 'insurance' },
+  'loyalty-point-store': { icon: '✦', key: 'loyaltyPointStore' },
+  'navy-offices':        { icon: '⚔', key: 'navyOffices' },
+  'security-offices':    { icon: '◉', key: 'securityOffices' },
+  'bounty-missions':     { icon: '⊛', key: 'bountyMissions' },
+  'bounty-office':       { icon: '⊛', key: 'bountyOffice' },
+  'assay-offices':       { icon: '⌖', key: 'assayOffice' },
+  'office-rental':       { icon: '⊞', key: 'officeRental' },
+  'stock-exchange':      { icon: '⇅', key: 'stockExchange' },
+  'commodity-trading':   { icon: '⇄', key: 'commodityTrading' },
+  'news':                { icon: '◫', key: 'news' },
+  'docking':             { icon: '⬒', key: 'docking' },
+  'exploration':         { icon: '⟁', key: 'exploration' },
+  'black-market':        { icon: '◆', key: 'blackMarket' },
+  'mentoring':           { icon: '⊙', key: 'mentoring' },
 };
 
 const stationCache = new Map<number, NpcStation[]>();
@@ -63,6 +73,7 @@ async function fetchStations(eveSystemId: number): Promise<NpcStation[]> {
 interface CtxState { x: number; y: number; station: NpcStation }
 
 export function NpcStationsPane({ eveSystemId }: { eveSystemId: number | null }) {
+  const { t } = useTranslation();
   const [stations, setStations] = useState<NpcStation[]>([]);
   const [loading, setLoading]   = useState(false);
   const [ctx, setCtx]           = useState<CtxState | null>(null);
@@ -92,9 +103,9 @@ export function NpcStationsPane({ eveSystemId }: { eveSystemId: number | null })
     setCtx({ x: e.clientX, y: e.clientY, station });
   };
 
-  if (!eveSystemId) return <div className="sig-pane__empty">No EVE system linked</div>;
-  if (loading)      return <div className="sig-pane__empty">Loading stations…</div>;
-  if (stations.length === 0) return <div className="sig-pane__empty">No NPC stations in this system</div>;
+  if (!eveSystemId) return <div className="sig-pane__empty">{t('panes.noEveSystem')}</div>;
+  if (loading)      return <div className="sig-pane__empty">{t('npcStations.loading')}</div>;
+  if (stations.length === 0) return <div className="sig-pane__empty">{t('npcStations.none')}</div>;
 
   return (
     <>
@@ -113,7 +124,7 @@ export function NpcStationsPane({ eveSystemId }: { eveSystemId: number | null })
                     const def = SERVICE_ICONS[svc];
                     if (!def) return null;
                     return (
-                      <span key={svc} className="npc-svc-icon" data-tooltip={def.label}>
+                      <span key={svc} className="npc-svc-icon" data-tooltip={t(`npcStations.services.${def.key}`)}>
                         {def.icon}
                       </span>
                     );
@@ -127,14 +138,14 @@ export function NpcStationsPane({ eveSystemId }: { eveSystemId: number | null })
                     className="sys-btn"
                     onClick={(e) => { e.stopPropagation(); setDestination(s.id).catch(console.error); }}
                   >
-                    Set Destination
+                    {t('waypoint.setDestination')}
                   </button>
                   <button
                     type="button"
                     className="sys-btn"
                     onClick={(e) => { e.stopPropagation(); addWaypoint(s.id).catch(console.error); }}
                   >
-                    + Waypoint
+                    {t('systemPanel.addWaypointBtn')}
                   </button>
                 </span>
               )}
@@ -150,12 +161,12 @@ export function NpcStationsPane({ eveSystemId }: { eveSystemId: number | null })
           onClose={() => setCtx(null)}
           items={[
             {
-              label: 'Set Destination',
+              label: t('waypoint.setDestination'),
               icon: <MapPinSimpleIcon size={16} weight="regular" color="#3ddc84" />,
               action: () => setDestination(ctx.station.id).catch(console.error),
             },
             {
-              label: 'Add Waypoint',
+              label: t('waypoint.addWaypoint'),
               icon: <PathIcon size={16} weight="regular" color="#5a9af8" />,
               action: () => addWaypoint(ctx.station.id).catch(console.error),
             },
