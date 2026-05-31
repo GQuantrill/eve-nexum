@@ -152,6 +152,7 @@
           <option value="de">🇩🇪 Deutsch</option>
           <option value="fr">🇫🇷 Français</option>
           <option value="es">🇪🇸 Español</option>
+          <option value="pt">🇵🇹 Português</option>
         </select>
       </nav>
 
@@ -437,7 +438,7 @@
 
           // Languages with a translation dictionary below. English is the
           // untranslated source, so it has no entry.
-          var SUPPORTED = { de: 1, fr: 1, es: 1 };
+          var SUPPORTED = { de: 1, fr: 1, es: 1, pt: 1 };
 
           // Wire up the language picker regardless of the current language so a
           // visitor can switch between any language (including back to English).
@@ -736,6 +737,101 @@
             ctaGh: 'Conseguirlo en GitHub',
             footP1: 'Comparativa mantenida por el equipo de Nexum · última verificación en mayo de 2026. Los detalles de la competencia cambian con el tiempo — sigue los enlaces de arriba para confirmar las funciones actuales. ¿Detectaste una imprecisión? <a href="https://github.com/GQuantrill/eve-nexum/issues">Abre un issue</a>.',
             footP2: 'EVE Online y el logotipo de EVE son marcas registradas de CCP hf. Todos los derechos reservados en todo el mundo. Nexum es una herramienta de terceros y no está afiliada a CCP hf., Pathfinder, Tripwire ni Wanderer, ni cuenta con su respaldo. Consulta el <a href="/license/">aviso de licencia y de PI de EVE</a> completo.'
+          };
+
+          // Portuguese — uses the typographic ’ (U+2019) for apostrophes (rare
+          // in pt, but kept consistent with the de/fr/es dictionaries).
+          DICTS.pt = {
+            __title: 'Comparação de mapeadores de buracos de minhoca do EVE Online: Nexum vs Pathfinder vs Tripwire vs Wanderer (2026)',
+            nav: '&larr; Início do Nexum',
+            h1: 'Comparação de mapeadores de buracos de minhoca do EVE Online:<br />Nexum vs Pathfinder vs Tripwire vs Wanderer',
+            sub: 'Um olhar honesto sobre as principais ferramentas de mapeamento de buracos de minhoca para o EVE Online.',
+            upd: 'Última atualização a 27 de maio de 2026 · mantido pela equipa do Nexum',
+            lede: 'Se fazes de scout ou vives em J-space, um bom mapeador de buracos de minhoca é essencial. O <strong>Nexum</strong> é um mapeador moderno e de código aberto — usa a versão alojada gratuita ou auto-aloja-o — que cobre todo o fluxo de trabalho: mapeamento de cadeias em tempo real, assinaturas e seguimento de massa, e depois vai mais além com uma calculadora de rolling a sério, a sementeira de regiões inteiras, sobreposições de standings e sov e alertas do Discord. Abaixo é comparado com as outras opções habituais — <strong>Tripwire</strong>, <strong>Pathfinder</strong> e <strong>Wanderer</strong>. Nós fazemos o Nexum, por isso naturalmente consideramo-lo a melhor escolha para a maioria das corps — mas mantivemos os dados sobre a concorrência precisos e ligados para que possas julgar por ti mesmo.',
+
+            h2Glance: 'Num relance',
+            cap1: 'Comparação básica. Verificada em maio de 2026 — as funcionalidades da concorrência mudam; segue as ligações para confirmar.',
+            gOpenSource: 'Código aberto',
+            gSelfHost: 'Auto-alojável',
+            gCloud: 'Opção de nuvem gerida',
+            gSso: 'Início de sessão com EVE SSO',
+            gSync: 'Sync multiutilizador em tempo real',
+            gSigPaste: 'Colagem e seguimento de assinaturas',
+            gMass: 'Massa / rolling de buracos de minhoca',
+            gTech: 'Stack tecnológico',
+            gCost: 'Custo',
+            yes: '<span class="yes">Sim</span>',
+            yesMit: '<span class="yes">Sim</span> (MIT)',
+            yesDocker: '<span class="yes">Sim</span> (Docker)',
+            yesCe: '<span class="yes">Sim</span> (Community Edition)',
+            free: '<span class="yes">Grátis</span>',
+            freeBoth: '<span class="yes">Grátis</span> (alojado e auto-alojado)',
+            gCloudN: '<span class="yes">Sim</span> — instância pública gratuita em eve-nexum.com, além de auto-alojamento',
+            gCloudP: '<span class="meh">Instâncias geridas pela comunidade</span>',
+            gCloudT: '<span class="meh">Host público fechado em 2024</span>',
+            gCloudW: '<span class="yes">Sim</span> — «Wanderer Cloud» oficial, gerido pelos programadores',
+            gMassN: 'Calculadora de rolling dedicada (variância de ±10%, avisos de bloqueio)',
+            massStatus: 'Seguimento do estado de massa',
+
+            h2Further: 'Onde o Nexum vai mais além',
+            furtherIntro: 'Os quatro lidam bem com o básico. Estas são as capacidades que o Nexum integra e que os outros geralmente não oferecem como funcionalidades documentadas e prontas a usar — as razões pelas quais as corps o escolhem:',
+            cap2: 'Funcionalidades distintivas do Nexum. «—» significa que não é uma funcionalidade de destaque documentada e integrada dessas ferramentas (as funcionalidades mudam — usa as ligações abaixo para verificar).',
+            fFeature: 'Funcionalidade',
+            f1h: 'Wormhole <strong>calculadora de rolling</strong> — modela a variância de massa de ±10%, roller frio/quente com seguimento de lado, e avisa antes de uma passagem deixar o teu roller preso ou colapsar o buraco',
+            f1o: 'Seguimento básico do estado de massa',
+            f2h: '<strong>Gerar um mapa a partir de uma região inteira de EVE</strong> — disposição automática ao estilo Dotlan com cada portão estelar da região pré-desenhado',
+            f3h: '<strong>Fundir dois mapas</strong> num só, eliminando sistemas duplicados e integrando assinaturas, estruturas e notas',
+            f4h: '<strong>Notificações do Discord</strong> — alertas de K162 de entrada e de nova conexão enviados para o teu canal, mesmo quando ninguém está a ver o mapa',
+            f5h: '<strong>Sobreposição de standings e soberania</strong> impulsionada pelos teus próprios contactos de EVE — tingimento hostil/amigável por toda a cadeia, killboard e halos de sov',
+            f6h: '<strong>Presença em direto dos espectadores do mapa</strong> — um ponto por cada pessoa a ver o mapa, não só a tua frota — além das posições da frota',
+            f6o: 'As posições da frota variam',
+            f7h: '<strong>Camadas de inteligência ambiental</strong> — tempestades de null-sec, sóis A0, cinturões de gelo, efeitos de buraco de minhoca da cadeia, e alertas de proximidade de incursão / insurgência',
+            f8h: '<strong>Suite de corp</strong> — funções, mapas partilhados, painel de administração, relatórios de utilizadores e sistemas, registo de auditoria e atribuição por personagem',
+            f8o: 'Variável',
+
+            h2Detail: 'As ferramentas em detalhe',
+            twP: 'O mapeador de buracos de minhoca clássico, centrado em assinaturas, com o qual uma grande parte dos jogadores de J-space cresceu. É rápido, focado, e o fluxo de trabalho é memória muscular para os veteranos. A longeva instância pública (tripwire.eve-apps.com) fechou em meados de 2024, mas o Tripwire é de código aberto, por isso sobrevive através do auto-alojamento e das instâncias geridas pela comunidade.',
+            twBest: '<strong>Ideal para:</strong> grupos que querem o familiar fluxo de assinaturas do Tripwire e estão dispostos a auto-alojar. <a href="https://bitbucket.org/daimian/tripwire">Fonte &rarr;</a>',
+            pfP: 'O mapeador auto-alojado mais maduro e com mais funcionalidades. Foi pioneiro de muito do que os wormholers esperam — dados ricos de buracos de minhoca, conexões de Thera via EVE-Scout, um killstream do zKillboard em direto, uma API de plugins e mais. O compromisso é o peso operacional: é uma stack PHP/MySQL que exige mais esforço para instalar e manter atualizada do que uma app de um só contentor.',
+            pfBest: '<strong>Ideal para:</strong> grupos que querem o máximo de funcionalidades e não se importam de executar uma stack mais pesada. <a href="https://github.com/exodus4d/pathfinder">GitHub &rarr;</a>',
+            wdP: 'O desafiante moderno, apresentado como uma alternativa leve e rápida ao Pathfinder. Construído sobre Elixir/Phoenix com um frontend em React e de código aberto sob MIT, é o único dos quatro com uma versão <em>de nuvem gerida oficial</em> — para que um grupo o possa usar sem executar qualquer infraestrutura — mantendo ainda uma Community Edition auto-alojada gratuita.',
+            wdBest: '<strong>Ideal para:</strong> grupos que querem uma interface polida e a opção de saltar por completo o auto-alojamento. <a href="https://wanderer.ltd/">Site &rarr;</a> · <a href="https://github.com/wanderer-industries/wanderer">GitHub &rarr;</a>',
+            nxP: 'Um mapeador moderno, de código aberto e auto-alojado, pensado primeiro para corps. Cobre o fluxo de trabalho básico — mapeamento colaborativo em tempo real (edições em direto para todos no mapa), colagem de assinaturas com envelhecimento de buracos de minhoca, e seguimento de conexões — e acrescenta extras orientados a gerir a cadeia de uma corp:',
+            nxLi1: '<strong>Calculadora de rolling</strong> que modela a variância de massa de ±10%, prevê cada passagem como segura / pode-colapsar / vai-colapsar, e avisa antes de uma passagem deixar o teu roller preso.',
+            nxLi2: '<strong>Gerar uma região inteira de EVE</strong> como mapa ao estilo Dotlan, e <strong>fundir mapas</strong>.',
+            nxLi3: '<strong>Sobreposições de standings e soberania</strong>, um killboard em direto e gráficos de atividade de saltos/kills.',
+            nxLi4: '<strong>Presença de pilotos e posições de frota</strong> no mapa, além de seguimento de localização opcional.',
+            nxLi5: '<strong>Thera e Turnur</strong> conexões públicas do EVE-Scout.',
+            nxLi6: '<strong>Modo corp</strong>: funções, mapas partilhados, relatórios de admin, um registo de auditoria, e <strong>notificações do Discord</strong> para K162 de entrada e novas conexões.',
+            nxP2: 'Executa como uma pequena stack de Docker (React + Node + Postgres) e inicia sessão com EVE SSO — usa a instância pública gratuita em eve-nexum.com, ou auto-aloja-o. Sendo o mais recente dos quatro, tem uma comunidade mais pequena.',
+            nxBest: '<strong>Ideal para:</strong> corps que querem um mapeador moderno com rolling, sementeira de regiões, standings e Discord integrados — alojado para ti ou auto-alojado. <a href="/">Começa agora &rarr;</a> · <a href="https://github.com/GQuantrill/eve-nexum">GitHub &rarr;</a>',
+
+            h2Choose: 'Qual deves escolher?',
+            chooseP1: '<strong>Para a maioria das corps que começam do zero, começaríamos com o Nexum.</strong> É moderno, fica de pé em minutos com Docker, e agrupa a calculadora de rolling, a sementeira de regiões, as sobreposições de standings e os alertas do Discord que de outra forma terias de montar por conta própria — tudo num mapa colaborativo em tempo real. <a href="/">Começa agora</a> e comprova por ti mesmo.',
+            chooseP2: 'Os outros também são boas ferramentas, e podem encaixar melhor em casos concretos:',
+            chooseLi1: '<strong>Já dominas o fluxo de assinaturas clássico do Tripwire?</strong> O Tripwire continua a fazê-lo bem — agora auto-alojado.',
+            chooseLi2: '<strong>Precisas do conjunto de funcionalidades mais profundo e maduro e não te importas de executar uma stack PHP mais pesada?</strong> Pathfinder.',
+            chooseLi3: '<strong>Não queres executar nenhum servidor?</strong> Usa a instância pública gratuita do Nexum, ou a nuvem do Wanderer.',
+
+            h2Faq: 'Perguntas frequentes',
+            faqQ1: 'Qual é o melhor mapeador de buracos de minhoca para o EVE Online?',
+            faqA1: 'Depende do teu grupo, mas para uma configuração auto-alojada moderna recomendaríamos o Nexum — agrupa a maior quantidade de funcionalidades integradas (uma calculadora de rolling, a sementeira de mapas de região inteira, sobreposições de standings e alertas do Discord) num mapa colaborativo em tempo real. O Tripwire continua a ser a ferramenta de assinaturas clássica, o Pathfinder é a opção mais madura e com mais funcionalidades, e o Wanderer acrescenta uma versão de nuvem gerida.',
+            faqQ2: 'O Tripwire ainda está disponível?',
+            faqA2: 'A longeva instância pública fechou em meados de 2024, mas o Tripwire é de código aberto, por isso podes auto-alojá-lo ou usar uma instância gerida pela comunidade.',
+            faqQ3: 'O Pathfinder ainda está em desenvolvimento?',
+            faqA3: 'Não — não de forma ativa. O Pathfinder original (de exodus4d) não tem um lançamento novo desde 2020, e o fork comunitário que o continuou teve o seu último commit no início de 2025, sem lançamento desde então. O desenvolvimento ativo parou na prática — uma das razões pelas quais existem mapeadores mais recentes e mantidos ativamente como o Nexum.',
+            faqQ4: 'Qual é uma boa alternativa de código aberto ao Pathfinder e ao Tripwire?',
+            faqA4: 'O Nexum e o Wanderer são ambos mapeadores de código aberto modernos. O Nexum é auto-alojado com EVE SSO, colaboração em tempo real e ferramentas de corp; o Wanderer tem licença MIT e oferece auto-alojamento além de uma versão de nuvem gerida.',
+            faqQ5: 'Posso auto-alojar um mapeador de buracos de minhoca do EVE Online?',
+            faqA5: 'Sim — o Nexum, o Pathfinder, o Tripwire e a Community Edition do Wanderer podem ser todos auto-alojados. O Nexum executa com Docker sobre Postgres e inicia sessão com EVE SSO.',
+            faqQ6: 'Estes mapeadores de buracos de minhoca são gratuitos?',
+            faqA6: 'Sim — os quatro são gratuitos. O Pathfinder e o Tripwire são auto-alojados; o Nexum e o Wanderer oferecem cada um tanto uma versão pública alojada gratuita como auto-alojamento.',
+
+            ctaP: '<strong>O Nexum é grátis.</strong> Usa a versão alojada ou auto-aloja a cadeia da tua corp em minutos.',
+            ctaBtn: 'Começa agora',
+            ctaGh: 'Obtê-lo no GitHub',
+            footP1: 'Comparação mantida pela equipa do Nexum · última verificação em maio de 2026. Os detalhes da concorrência mudam com o tempo — segue as ligações acima para confirmar as funcionalidades atuais. Detetaste uma imprecisão? <a href="https://github.com/GQuantrill/eve-nexum/issues">Abre um issue</a>.',
+            footP2: 'EVE Online e o logótipo EVE são marcas registadas da CCP hf. Todos os direitos reservados em todo o mundo. O Nexum é uma ferramenta de terceiros e não está afiliada à CCP hf., Pathfinder, Tripwire ou Wanderer, nem conta com o seu apoio. Consulta o <a href="/license/">aviso de licença e de PI de EVE</a> completo.'
           };
 
           var DICT = DICTS[lang];

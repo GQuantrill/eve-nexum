@@ -9,6 +9,7 @@ const LANGUAGE_NAMES: Record<SupportedLanguage, string> = {
   de: '🇩🇪 Deutsch',
   fr: '🇫🇷 Français',
   es: '🇪🇸 Español',
+  pt: '🇵🇹 Português',
 };
 
 export function LanguageSwitcher() {

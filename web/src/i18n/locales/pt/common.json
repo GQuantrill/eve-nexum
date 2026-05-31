@@ -1,0 +1,1167 @@
+{
+  "language": {
+    "label": "Idioma"
+  },
+  "actions": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "copy": "Copiar",
+    "close": "Fechar",
+    "ok": "OK",
+    "on": "Ligado",
+    "off": "Desligado",
+    "expand": "Expandir",
+    "collapse": "Recolher"
+  },
+  "confirm": {
+    "title": "Tens a certeza?",
+    "dontShowAgain": "Não mostrar novamente"
+  },
+  "admin": {
+    "back": "Voltar aos mapas",
+    "title": "Administração",
+    "tabs": {
+      "users": "Utilizadores",
+      "maps": "Mapas",
+      "reports": "Relatórios",
+      "discord": "Discord",
+      "audit": "Registo de auditoria"
+    },
+    "loading": "A carregar…",
+    "exportCsv": "Exportar como CSV",
+    "users": {
+      "title": "Utilizadores",
+      "none": "Ainda não há utilizadores.",
+      "colCharacter": "Personagem",
+      "colCorp": "Corp",
+      "colAlliance": "Aliança",
+      "colRole": "Função",
+      "colStatus": "Estado",
+      "colLastLogin": "Último acesso",
+      "you": "tu",
+      "blocked": "bloqueado",
+      "active": "ativo",
+      "unblock": "Desbloquear",
+      "block": "Bloquear",
+      "recheck": "Reverificar",
+      "recheckTitle": "Reconsultar a ESI para a corp atual deste utilizador",
+      "blockConfirm": "Bloquear {{name}}? A sessão será terminada no próximo pedido.",
+      "loadFailed": "Falha ao carregar os utilizadores",
+      "roleChangeFailed": "Falha ao alterar a função",
+      "blockChangeFailed": "Falha ao alterar o bloqueio",
+      "recheckFailed": "Falha na reverificação"
+    },
+    "maps": {
+      "title": "Mapas",
+      "none": "Ainda não há mapas.",
+      "colName": "Nome",
+      "colOwner": "Proprietário",
+      "colCorp": "Corp",
+      "colSystems": "Sistemas",
+      "colConnections": "Conexões",
+      "colLock": "Bloqueio",
+      "colLastActive": "Última atividade",
+      "locked": "bloqueado",
+      "open": "aberto",
+      "unlock": "Desbloquear",
+      "unlockTitle": "Desbloqueia o mapa; os sistemas e conexões voltam a ser editáveis",
+      "lock": "Bloquear",
+      "lockTitle": "Congela sistemas e conexões; assinaturas/estruturas/notas continuam editáveis",
+      "deleteConfirm": "Forçar a eliminação de «{{name}}» (de {{owner}})? Esta ação não pode ser desfeita.",
+      "loadFailed": "Falha ao carregar os mapas",
+      "lockChangeFailed": "Falha ao alterar o bloqueio",
+      "deleteFailed": "Falha ao eliminar"
+    },
+    "audit": {
+      "title": "Registo de auditoria",
+      "none": "Ainda não há ações de admin.",
+      "colWhen": "Quando",
+      "colActor": "Ator",
+      "colAction": "Ação",
+      "colTarget": "Alvo",
+      "colChange": "Alteração",
+      "loadFailed": "Falha ao carregar o registo de auditoria"
+    },
+    "reports": {
+      "title": "Relatórios",
+      "tabs": {
+        "users": "Utilizadores",
+        "systems": "Sistemas",
+        "ghostSites": "Sites fantasma"
+      },
+      "filter": "Filtro",
+      "window": "Período",
+      "windowHint": "Escolhe um filtro para aplicar um período",
+      "windowOptions": {
+        "all": "Todo o tempo",
+        "24h": "Últimas 24 horas",
+        "week": "Última semana",
+        "month": "Último mês",
+        "year": "Último ano"
+      },
+      "userFilters": {
+        "all": "Todos os utilizadores",
+        "logins": "Acessos",
+        "signatures": "Assinaturas",
+        "structures": "Estruturas"
+      },
+      "sig": {
+        "data": "Dados",
+        "relic": "Relíquia",
+        "wormhole": "WH",
+        "gas": "Gás",
+        "ore": "Minério",
+        "combat": "Combate",
+        "unknown": "Desconhecido"
+      },
+      "users": {
+        "loadFailed": "Falha ao carregar o relatório de utilizadores",
+        "empty": "Nenhum utilizador corresponde ao filtro atual.",
+        "totalUsers": "Total de utilizadores",
+        "uniqueCorps": "Corps distintas",
+        "uniqueAlliances": "Alianças distintas",
+        "colCharacter": "Personagem",
+        "colCorp": "Corp",
+        "colAlliance": "Aliança",
+        "colLastLogin": "Último acesso",
+        "colSystemsAdded": "Sistemas adicionados",
+        "colSystemsDeleted": "Sistemas eliminados",
+        "colLastCorpStructure": "Última estrutura corp",
+        "colTotalStructures": "Total de estruturas",
+        "colLastCorpSignature": "Última assinatura corp",
+        "colTotalSignatures": "Total de assinaturas"
+      },
+      "systems": {
+        "loadFailed": "Falha ao carregar o relatório de sistemas",
+        "empty": "Não há assinaturas neste período.",
+        "heading": "Assinaturas em todos os mapas",
+        "total": "Total",
+        "typeMix": "Distribuição por tipo de assinatura",
+        "sigLabel": "Assinaturas",
+        "chart": {
+          "hour24": "Assinaturas por hora (últimas 24 horas)",
+          "dayWeek": "Assinaturas por dia (última semana)",
+          "dayMonth": "Assinaturas por dia (último mês)",
+          "monthYear": "Assinaturas por mês (último ano)",
+          "monthAll": "Assinaturas por mês (todo o tempo)"
+        },
+        "whHeading": "Tipos de buraco de minhoca",
+        "whEmpty": "Ainda não há assinaturas de buraco de minhoca com um tipo registado.",
+        "colType": "Tipo",
+        "colCount": "Quantidade"
+      },
+      "ghost": {
+        "loadFailed": "Falha ao carregar o relatório de sites fantasma",
+        "heading": "Observações de Covert Research Facility",
+        "empty": "Ainda não foram registados sites fantasma de K-space.",
+        "colRegion": "Região",
+        "colConstellation": "Constelação",
+        "colSystem": "Sistema",
+        "colClass": "Classe",
+        "colSun": "Sol",
+        "colPlanets": "Planetas",
+        "colMoons": "Luas",
+        "colObservations": "Observações",
+        "colLastSeen": "Visto pela última vez"
+      }
+    },
+    "discord": {
+      "title": "Discord",
+      "titleNotifications": "Notificações do Discord",
+      "loadFailed": "Falha ao carregar as definições do Discord",
+      "saveFailed": "Falha ao guardar",
+      "updateFailed": "Falha ao atualizar",
+      "noCorp": "Sem contexto de corp — as notificações do Discord só se aplicam a mapas de corp.",
+      "hint": "Controla que notificações de buraco de minhoca os mapas desta corp enviam para o Discord. O webhook é configurado no servidor (DISCORD_WEBHOOK_URL). Por defeito cada mapa e região notifica — estas definições apenas restringem.",
+      "regions": "Regiões",
+      "notifyAll": "Notificar para todas as regiões",
+      "notifySelected": "Apenas regiões selecionadas",
+      "noRegionsSelected": "Nenhuma região selecionada — nada será notificado até adicionares alguma.",
+      "removeRegion": "Remover {{name}}",
+      "searchPlaceholder": "Escreve para procurar regiões…",
+      "saving": "A guardar…",
+      "saveRegions": "Guardar regiões",
+      "saved": "Guardado",
+      "excludedMaps": "Mapas excluídos",
+      "excludedHint": "Todos os mapas notificam por defeito. Marca um mapa para o excluir do Discord.",
+      "noCorpMaps": "Ainda não há mapas de corp.",
+      "colMap": "Mapa",
+      "colExclude": "Excluir"
+    }
+  },
+  "proximityOptIn": {
+    "title": "Ativar alertas de ameaça?",
+    "body": "New Eden é um lugar perigoso. O Nexum pode dar-te uma notificação no ambiente de trabalho e um breve aviso sonoro quando estiveres a poucos saltos de uma <strong>incursão</strong> ou <strong>insurgência</strong> ativa — para que não entres numa às cegas com o piloto automático.",
+    "sub": "Podes alterar o limiar ou desativar isto a qualquer momento em <em>Opções de mapa → Alertas de proximidade</em>.",
+    "maybeLater": "Talvez mais tarde",
+    "enable": "Ativar notificações"
+  },
+  "units": {
+    "jumps_one": "{{count}} salto",
+    "jumps_other": "{{count}} saltos",
+    "systems_one": "{{count}} sistema",
+    "systems_other": "{{count}} sistemas",
+    "kills_one": "{{count}} kill",
+    "kills_other": "{{count}} kills",
+    "hours_one": "{{count}} hora",
+    "hours_other": "{{count}} horas",
+    "days_one": "{{count}} dia",
+    "days_other": "{{count}} dias",
+    "weeks_one": "{{count}} semana",
+    "weeks_other": "{{count}} semanas",
+    "months_one": "{{count}} mês",
+    "months_other": "{{count}} meses"
+  },
+  "createMap": {
+    "title": "Novo mapa",
+    "mapName": "Nome do mapa",
+    "namePlaceholder": "Novo mapa",
+    "type": "Tipo",
+    "personal": "Pessoal",
+    "corp": "Corp",
+    "regionLabel": "Região (opcional — vazio para um mapa em branco)",
+    "regionPlaceholder": "Escreve para procurar regiões…",
+    "clearRegion": "Limpar região",
+    "regionHint": "Gera {{count}} sistemas de {{region}}, posicionados pelas suas coordenadas no jogo com todas as ligações de portão estelar.",
+    "corpLimit": "Limite de mapas de corp atingido ({{max}}).",
+    "personalLimit": "Limite de mapas pessoais atingido ({{max}}).",
+    "createFailed": "Falha ao criar o mapa",
+    "created": "«{{name}}» criado a partir de {{region}}",
+    "creating": "A criar…",
+    "create": "Criar mapa"
+  },
+  "addSystem": {
+    "title": "Adicionar sistema",
+    "systemName": "Nome do sistema",
+    "searchPlaceholder": "Escreve para procurar sistemas de EVE…",
+    "clearSelection": "Limpar seleção",
+    "noResults": "Não foram encontrados sistemas para «{{query}}»",
+    "class": "Classe",
+    "effect": "Efeito",
+    "effectNone": "Nenhum",
+    "statics": "Statics",
+    "staticsPlaceholder": "preenchido automaticamente a partir da base de dados",
+    "loading": "A carregar…",
+    "add": "Adicionar sistema",
+    "onMap": "no mapa"
+  },
+  "commandPalette": {
+    "placeholder": "Procurar sistemas e mapas…",
+    "search": "Procurar",
+    "noMatches": "Sem resultados",
+    "openMap": "↪ abrir mapa: {{name}}",
+    "switchMap": "(mudar de mapa)",
+    "navigate": "navegar",
+    "open": "abrir",
+    "close": "fechar"
+  },
+  "merge": {
+    "title": "Fundir mapas",
+    "corp": "Corp",
+    "solo": "Solo",
+    "sourceMap": "Mapa de origem (fundir a partir de)",
+    "destMap": "Mapa de destino (fundir em)",
+    "selectSource": "Escolhe uma origem…",
+    "selectDest": "Escolhe um destino…",
+    "differentMaps": "A origem e o destino têm de ser mapas diferentes.",
+    "include": "Incluir",
+    "signatures": "Assinaturas",
+    "structures": "Estruturas",
+    "notes": "Notas",
+    "hint": "Os sistemas que já estão no destino mantêm-se como fonte de verdade — apenas os sistemas, ligações e dados selecionados em falta são adicionados ou atualizados. <strong>Esta ação não pode ser desfeita.</strong>",
+    "merging": "A fundir…",
+    "merge": "Fundir",
+    "merged": "Fundido: +{{systems}} sistemas, +{{connections}} ligações, +{{signatures}} assinaturas, +{{structures}} estruturas",
+    "mergeFailed": "Falha na fusão"
+  },
+  "mapSidebar": {
+    "openOptions": "Opções de mapa",
+    "closeOptions": "Fechar opções de mapa",
+    "sections": {
+      "mapOptions": "Opções de mapa",
+      "systemOptions": "Opções de sistema",
+      "connections": "Conexões",
+      "route": "Rota",
+      "chainExits": "Saídas da cadeia",
+      "proximityAlerts": "Alertas de proximidade",
+      "activity": "Atividade",
+      "fleet": "Frota",
+      "staleFade": "Esmaecer sistemas obsoletos",
+      "importExport": "Importar / Exportar",
+      "mergeMaps": "Fundir mapas",
+      "liveSharing": "Partilha de mapa em direto",
+      "shareMap": "Partilhar mapa",
+      "shortcuts": "Atalhos"
+    },
+    "snapToGrid": "Ajustar à grade",
+    "minimap": "Minimapa",
+    "position": "Posição",
+    "minimapPos": {
+      "bottomRight": "Inferior direito",
+      "bottomLeft": "Inferior esquerdo",
+      "topRight": "Superior direito",
+      "topLeft": "Superior esquerdo"
+    },
+    "fontSize": "Tamanho da letra",
+    "resetZoom": "Repor para 100 %",
+    "compact": "Compacto",
+    "uniformSize": "Tamanho uniforme",
+    "showStaticWhs": "Mostrar WH estáticos",
+    "easyConnect": "Conexão fácil",
+    "connectionStyle": "Estilo de conexão",
+    "edgeStyle": { "bezier": "Padrão", "straight": "Reta", "smoothstep": "Degrau" },
+    "connectionThickness": "Espessura das conexões",
+    "thickness": { "thin": "Fina", "standard": "Padrão", "thick": "Grossa", "extra": "Muito grossa" },
+    "optimizeConnections": "⟳ Otimizar conexões",
+    "spreadNodes": "⊞ Espaçar nós",
+    "spreadNodesTooltip": "Ajustar os nós de sistema para evitar sobreposições",
+    "routePreference": "Preferência de rota",
+    "routeShortest": "Mais curta",
+    "routeSecure": "Segura",
+    "routeHint": "Mais curta: menos saltos independentemente da segurança. Segura: prioriza high-sec, desvia por low/null apenas quando não há rota por high-sec disponível.",
+    "proximityHint": "Avisar quando um sistema de incursão, insurgência ou sov hostil estiver dentro do alcance da tua localização atual.",
+    "threshold": "Limiar",
+    "proximityInSystem": "0 saltos (no sistema)",
+    "proximityLe_one": "≤ {{count}} salto",
+    "proximityLe_other": "≤ {{count}} saltos",
+    "browserNotifications": "Notificações do navegador",
+    "notifEnabled": "Ativadas",
+    "notifBlocked": "Bloqueadas",
+    "notifEnable": "Ativar",
+    "notifBlockedTooltip": "Clica no ícone de cadeado / info do site na barra de endereços → Notificações → Permitir, depois recarrega.",
+    "notifBlockedHint": "O navegador está a bloquear as notificações deste site. Clica no ícone de cadeado na barra de endereços → Notificações → Permitir → recarrega a página.",
+    "activityHint": "Mostrar gráficos do seguinte:",
+    "activityJumps": "Saltos",
+    "activityShipKills": "Naves destruídas",
+    "activityPodKills": "Cápsulas destruídas",
+    "activityNpcKills": "PNJ destruídos",
+    "activityNpcDelta": "Delta de PNJ",
+    "fleetHint": "Mostra os companheiros de frota como pontos roxos no sistema em que estão. Passa o rato sobre um ponto para ver os nomes.",
+    "showFleetMembers": "Mostrar membros da frota",
+    "staleHint": "Esmaece visualmente os sistemas que não foram atualizados no intervalo escolhido, para detetar de relance os restos de cadeias antigas.",
+    "exportJson": "↓ Exportar como JSON",
+    "importJson": "↑ Importar de JSON",
+    "exportPng": "⎙ Exportar como PNG",
+    "mergeHint": "Combina outro mapa com um dos teus. O destino mantém os seus sistemas existentes; os sistemas, ligações e dados que selecionares são adicionados ou atualizados. Isto não pode ser desfeito.",
+    "mergeButton": "⇲ Fundir mapas…",
+    "allowMergeSource": "Permitir como origem de fusão",
+    "allowMergeDest": "Permitir como destino de fusão",
+    "mergeFlagHint": "Quando ativado, os membros da corp podem usar este mapa de corp como <em>origem</em> ou <em>destino</em> de uma fusão.",
+    "updateSettingFailed": "Falha ao atualizar a definição",
+    "shareActiveHint": "Ligação de partilha em direto. Alterna abaixo o que os convidados veem. Se já foi gerada uma ligação, as alterações têm efeito automaticamente e NÃO precisas de a regenerar.",
+    "shareInactiveHint": "Cria uma ligação só de leitura que qualquer pessoa pode abrir sem conta. Escolhe as categorias a expor e um período de expiração — qualquer pessoa com o URL dentro desse período pode ver tudo o que partilhaste.",
+    "linkExpiresAfter": "A ligação expira após",
+    "includeSignatures": "Incluir assinaturas",
+    "showJumpBridges": "Mostrar jump bridges",
+    "includeStructures": "Incluir estruturas",
+    "includeNotes": "Incluir notas",
+    "copyLink": "Copiar ligação",
+    "working": "A processar…",
+    "revoke": "Revogar",
+    "createShareLink": "Criar ligação de partilha",
+    "createShareFailed": "Falha ao criar a ligação de partilha",
+    "revokeShareFailed": "Falha ao revogar a ligação de partilha",
+    "updateShareFailed": "Falha ao atualizar as opções de partilha",
+    "linkCopied": "Ligação de mapa em direto copiada",
+    "copyFailed": "Falha ao copiar — seleciona e copia manualmente",
+    "shortcut": {
+      "searchSystems": "Procurar sistemas e mapas",
+      "centreHome": "Centrar no sistema de origem",
+      "removeSelected": "Remover sistemas selecionados",
+      "undo": "Desfazer",
+      "multiSelect": "Seleção múltipla de sistemas",
+      "rubberBand": "Seleção por retângulo"
+    },
+    "canvasNotFound": "Não foi possível encontrar a tela do mapa",
+    "exportFailed": "Falha na exportação: {{error}}",
+    "invalidJson": "Ficheiro JSON inválido.",
+    "notNexumMap": "O ficheiro não parece uma exportação de mapa do Eve-Nexum.",
+    "importFailed": "Falha na importação: {{error}}"
+  },
+  "customIntel": {
+    "title": "Intel personalizada",
+    "hint": "Define as tuas próprias etiquetas de intel com uma cor. Aparecem no menu de contexto do sistema junto às integradas.",
+    "newItem": "Nova intel",
+    "labelPlaceholder": "Etiqueta",
+    "remove": "Remover opção de intel",
+    "max": "Máximo de {{count}} etiquetas de intel personalizadas",
+    "add": "Adicionar intel"
+  },
+  "chainExits": {
+    "noExits": "Não há saídas de K-space nesta cadeia.",
+    "hint": "Sistemas de K-space atualmente no mapa, por classe de segurança. A rota para Jita é só por portões — os atalhos por buraco de minhoca não são contados.",
+    "highSec": "High-sec",
+    "lowSec": "Low-sec",
+    "nullSec": "Null-sec",
+    "nearestJita": "Jita mais próximo:",
+    "via": "via"
+  },
+  "mapShares": {
+    "hint": "Concede a outra personagem — ou a todos os membros de uma corp — acesso de edição a este mapa pessoal. Os destinatários podem editar o conteúdo e a topologia mas não podem renomeá-lo, eliminá-lo ou voltar a partilhá-lo.",
+    "character": "Personagem",
+    "corp": "Corp",
+    "placeholderChar": "Nome exato da personagem",
+    "placeholderCorp": "Nome exato da corp",
+    "typeAtLeast3": "Escreve pelo menos 3 caracteres",
+    "searching": "A procurar…",
+    "found": "Encontrado: {{name}}",
+    "noMatch": "Sem correspondência exata",
+    "adding": "A adicionar…",
+    "share": "Partilhar",
+    "loading": "A carregar…",
+    "none": "Não há partilhas ativas.",
+    "badgeChar": "Pers",
+    "badgeCorp": "Corp",
+    "unknownTarget": "({{kind}} desconhecido n.º {{id}})",
+    "revokeAccess": "Revogar acesso",
+    "sharedWith": "Partilhado com {{name}}",
+    "accessRevoked": "Acesso revogado",
+    "accessRevokedFor": "Acesso revogado para {{name}}",
+    "addFailed": "Falha ao adicionar a partilha",
+    "revokeFailed": "Falha ao revogar a partilha"
+  },
+  "panes": {
+    "noEveSystem": "Nenhum sistema de EVE associado",
+    "addNote": "Adicionar nota…"
+  },
+  "connPanel": {
+    "whType": "Tipo de buraco de minhoca",
+    "whTypePlaceholder": "K162, C247…",
+    "massStatus": "Estado de massa",
+    "stable": "Estável",
+    "destabilized": "Desestabilizado (<50%)",
+    "critical": "Crítico (<10%)",
+    "timeStatus": "Estado temporal",
+    "fresh": "Recente",
+    "lessThan1d": "Menos de 1 dia restante",
+    "lessThan4h": "Menos de 4 horas restantes",
+    "lessThan1h": "Menos de 1 hora restante",
+    "expired": "Expirado",
+    "size": "Tamanho",
+    "sizeXl": "XL (Cargueiro)",
+    "sizeLarge": "Grande (Couraçado)",
+    "sizeMedium": "Médio (Cruzador)",
+    "sizeSmall": "Pequeno (Fragata)",
+    "rollingCalculator": "Calculadora de rolling",
+    "custom": "Personalizado",
+    "collapse": { "open": "Aberto", "maybe": "Possivelmente colapsado", "collapsed": "Colapsado" },
+    "remaining": "{{worst}}–{{best}} restante · {{used}} usado · salto máx {{max}}",
+    "useMyShip": "Usar a minha nave",
+    "useMyShipTitle": "Frio = {{ship}} ({{mass}}), quente = +prop",
+    "noCurrentShip": "Sem nave atual",
+    "cold": "Frio",
+    "hot": "Quente",
+    "tooHeavyCold": "O roller ({{mass}}) é demasiado pesado para este buraco (salto máx {{max}}).",
+    "roller": "Roller:",
+    "home": "Origem",
+    "far": "Oposto",
+    "homeSideLabel": "Lado de origem",
+    "farSideLabel": "Lado oposto",
+    "tooHeavyHotTitle": "Demasiado pesado para passar a quente — usa a frio",
+    "passTitle": "+{{mass}} · termina {{side}}",
+    "passHot": "Passagem — quente (+{{mass}})",
+    "passCold": "Passagem — frio (+{{mass}})",
+    "guidanceCollapsed": "Passou massa suficiente para colapsar. Reinicia assim que for novamente analisado.",
+    "guidanceSafe_one": "Seguro continuar o rolling. ≈ {{min}}–{{max}} passagem restante.",
+    "guidanceSafe_other": "Seguro continuar o rolling. ≈ {{min}}–{{max}} passagens restantes.",
+    "guidanceRiskyFar": "A próxima passagem pode colapsar o buraco — o teu roller ficaria preso no lado oposto. Fá-la uma passagem de entrada (a terminar na origem).",
+    "guidanceRiskyHome": "A próxima passagem pode colapsar o buraco — mas termina no teu lado de origem, por isso é seguro tentar.",
+    "guidanceDangerFar": "A próxima passagem provavelmente colapsará o buraco — e deixará o teu roller preso no lado oposto.",
+    "guidanceDangerHome": "A próxima passagem provavelmente colapsará o buraco — o teu roller termina na origem.",
+    "undoPass": "Anular passagem",
+    "reset": "Reiniciar",
+    "otherShips": "Outras naves que passaram",
+    "noMassData": "Sem dados de massa para o tipo «{{type}}».",
+    "enterWhType": "Introduz um tipo de buraco de minhoca acima para ativar o seguimento de massa.",
+    "collapseConfirm": "Esta passagem (+{{mass}}) provavelmente colapsará o buraco.",
+    "collapseConfirmStrand": " O teu roller ficaria preso no lado oposto.",
+    "collapseConfirmHome": " O teu roller termina no lado de origem.",
+    "rollIt": "Fazer a passagem",
+    "removeConnection": "Remover conexão"
+  },
+  "mapControls": {
+    "panel": "Painel de controlo",
+    "zoomIn": "Aproximar",
+    "zoomOut": "Afastar",
+    "fitView": "Ajustar a vista",
+    "interactive": "Alternar interatividade"
+  },
+  "demo": {
+    "hintClick": "Clica num sistema para ver aqui os seus detalhes.",
+    "hintAdd": "Clica com o botão direito no mapa para adicionar um sistema.",
+    "hintConnect": "Arrasta a partir de uma pega de nó para conectar sistemas.",
+    "hintLimit": "Demo limitada a {{count}} sistemas — sem limite ao iniciar sessão.",
+    "systemsCount": "{{count}} / {{max}} sistemas",
+    "signInMore": "Inicia sessão para ver kills, assinaturas, estruturas, atividade, soberania e muito mais.",
+    "addSystemHere": "Adicionar sistema aqui",
+    "addSystemLimit": "Adicionar sistema (limite de {{max}} atingido)"
+  },
+  "ctxMenu": {
+    "disconnect": "Desconectar",
+    "jumpType": "Tipo de salto",
+    "standardJump": "Salto padrão",
+    "jumpgate": "Jump gate",
+    "whLifetime": "Vida útil do buraco de minhoca",
+    "lifeFresh": "Recente",
+    "life1d": "Menos de 1 dia restante",
+    "life4h": "Menos de 4 horas restantes",
+    "life1h": "Menos de 1 hora restante",
+    "lifeExpired": "Expirado, fecho iminente",
+    "massStability": "Estabilidade de massa",
+    "massStable": "Mais de 50% restante",
+    "massDestab": "Menos de 50% restante",
+    "massCrit": "Menos de 10% restante",
+    "lockSelected": "Bloquear {{count}} selecionados",
+    "unlockSelected": "Desbloquear {{count}} selecionados",
+    "markCleared": "Marcar {{count}} como limpos",
+    "unsetHome": "Remover origem",
+    "setHome": "Definir como origem (H para centrar)",
+    "setIntel": "Definir intel",
+    "setIntelFor": "Definir intel para {{count}}",
+    "intelFriendly": "Amigável",
+    "intelHostile": "Hostil",
+    "intelOccupied": "Ocupado",
+    "intelEmpty": "Vazio",
+    "intelUnnamed": "(sem nome)",
+    "clearIntel": "Limpar intel",
+    "lockSystem": "Bloquear sistema",
+    "unlockSystem": "Desbloquear sistema",
+    "removeSystem": "Remover sistema",
+    "removeSystems": "Remover {{count}} sistemas",
+    "addSystem": "Adicionar sistema",
+    "selectAll": "Selecionar tudo",
+    "noHomeSet": "Nenhum sistema de origem definido. Clica com o botão direito num sistema → «Definir como origem».",
+    "failSetDest": "Falha ao definir o destino",
+    "failAddWaypoint": "Falha ao adicionar o ponto de rota",
+    "canvasHint": "Clique direito na tela para adicionar sistema · Arrasta entre as pegas para conectar · Shift+clique ou arrastar para seleção múltipla · Clique direito num sistema para interagir"
+  },
+  "panel": {
+    "notes": "Notas",
+    "signatures": "Assinaturas",
+    "structures": "Estruturas",
+    "npcStations": "Estações PNJ",
+    "killboard": "zKillboard",
+    "activity": "Atividade"
+  },
+  "systemPanel": {
+    "unknownSystem": "Sistema desconhecido",
+    "addWaypointBtn": "+ Ponto",
+    "inChain": "Na cadeia:",
+    "incursion": "Incursão",
+    "staging": "Concentração",
+    "bossPresent": "Chefe presente",
+    "influence": "{{pct}}% de influência",
+    "incursionState": {
+      "established": "Estabelecida",
+      "mobilizing": "Mobilização",
+      "withdrawing": "Retirada"
+    },
+    "insurgency": "Insurgência — {{faction}}",
+    "corruption": "Corrupção",
+    "suppression": "Supressão",
+    "stage": "Fase {{stage}}",
+    "systemEffects": "Efeitos do sistema",
+    "statics": "Statics",
+    "location": "Localização",
+    "region": "Região",
+    "constellation": "Constelação",
+    "npc": "PNJ",
+    "links": "Ligações",
+    "openNpcDelta": "Abrir delta de PNJ no Dotlan",
+    "openDotlan": "Abrir sistema no Dotlan",
+    "openZkb": "Abrir sistema no zKillboard",
+    "celestials": "Corpos celestes",
+    "planets_one": "planeta",
+    "planets_other": "planetas",
+    "moons_one": "lua",
+    "moons_other": "luas",
+    "belts_one": "cinturão",
+    "belts_other": "cinturões",
+    "gates_one": "portão",
+    "gates_other": "portões",
+    "sovereignty": "Soberania",
+    "alliance": "Aliança",
+    "corp": "Corp",
+    "faction": "Facção",
+    "personal": "Pessoal",
+    "refreshStandings": "Atualizar standings da ESI agora (ignora o TTL de 6 h)",
+    "standingsRefreshed": "Standings atualizados — {{personal}} pessoais · {{corp}} corp · {{alliance}} contactos de aliança",
+    "noContactsRefreshed": "Não foi possível atualizar nenhum contacto. O token pode não ter o scope read_contacts — termina a sessão e volta a entrar.",
+    "standingsNotLoaded": "Standings ainda não carregados. Se isto persistir, termina a sessão e volta a entrar para conceder os scopes read_contacts.",
+    "standingNotInBucket": "{{label}}: não estás em nenhum",
+    "standingNotSet": "{{label}}: sem standing definido",
+    "standingValue": "{{label}}: {{value}}"
+  },
+  "sidebar": {
+    "thera": "Conexões de Thera",
+    "turnur": "Conexões de Turnur",
+    "a0": "Sóis A0 próximos",
+    "closest": "Sistemas mais próximos",
+    "expand": "Expandir barra lateral",
+    "resize": "Redimensionar barra lateral",
+    "collapse": "Recolher barra lateral",
+    "moveToLeft": "Mover barra lateral para a esquerda",
+    "moveToRight": "Mover barra lateral para a direita"
+  },
+  "waypoint": {
+    "setDestination": "Definir destino",
+    "addWaypoint": "Adicionar ponto de rota"
+  },
+  "closest": {
+    "dragToReorder": "Arrasta para reordenar",
+    "home": "Origem",
+    "noJumps": "— saltos",
+    "removeFromList": "Remover da lista",
+    "signIn": "Inicia sessão e atraca em K-space para ver os saltos até aos hubs.",
+    "searchPlaceholder": "Procurar nome de sistema…",
+    "onList": "na lista",
+    "noMatch": "Nenhum sistema corresponde a «{{query}}»"
+  },
+  "a0": {
+    "signIn": "Inicia sessão e atraca em K-space para ver os sistemas A0 próximos.",
+    "computing": "A calcular rotas…",
+    "noneReachable": "Nenhum sistema A0 alcançável.",
+    "showing": "A mostrar os {{count}} sistemas A0 mais próximos.",
+    "showRoute": "Mostrar rota {{mode}}",
+    "hideRoute": "Ocultar rota {{mode}}",
+    "modeShortest": "mais curta",
+    "modeSecure": "segura"
+  },
+  "scout": {
+    "noConnections": "Não há conexões de {{system}}.",
+    "expiring": "a expirar"
+  },
+  "activity": {
+    "thisHour": "esta hora",
+    "allHidden": "Todos os gráficos ocultos. Ativa-os em Opções de mapa → Atividade.",
+    "loading": "A carregar atividade…"
+  },
+  "structures": {
+    "unknown": "Desconhecido",
+    "loadFailed": "Falha ao carregar as estruturas",
+    "saveFailed": "Falha ao guardar a estrutura",
+    "deleteFailed": "Falha ao eliminar a estrutura",
+    "deleteAllConfirm_one": "Eliminar {{count}} estrutura?",
+    "deleteAllConfirm_other": "Eliminar as {{count}} estruturas?",
+    "pasteHint": "Podes copiar e colar estruturas diretamente da tua Visão geral no EVE. No espaço, clica com o botão direito em qualquer parte da janela Visão geral e escolhe «Copiar linhas selecionadas» (ou seleciona as linhas e Ctrl+C). Cola aqui com Ctrl+V — o ID da estrutura, o nome e o tipo são importados automaticamente.",
+    "addStructure": "Adicionar estrutura",
+    "deleteAll": "Eliminar tudo",
+    "none": "Nenhuma estrutura registada",
+    "name": "Nome",
+    "type": "Tipo",
+    "ownerCorp": "Corp proprietária",
+    "eveId": "ID de EVE",
+    "eveIdTooltip": "ID de estrutura de EVE para navegação por pontos de rota",
+    "notes": "Notas",
+    "namePlaceholder": "Nome da estrutura",
+    "corpPlaceholder": "Nome da corp",
+    "optionalPlaceholder": "Opcional"
+  },
+  "killboard": {
+    "hoursMinutesAgo": "há {{hours}}h {{minutes}}m",
+    "viewKillmail": "Ver killmail no zKillboard",
+    "soloKill": "Kill a solo",
+    "gank": "Gank — {{count}} atacantes",
+    "attackers": "{{count}} atacantes",
+    "victim": "Vítima",
+    "finalBlow": "Golpe final",
+    "onZkb": "{{label}} no zKillboard",
+    "finalBlowShip": "Nave do golpe final",
+    "npcHidden": "{{count}} PNJ ocultos",
+    "npcHiddenTooltip": "Kills só de PNJ (CONCORD, rats, etc.) ocultos",
+    "updated": "atualizado {{time}}",
+    "includeNpcTooltip": "Incluir killmails só de PNJ no feed",
+    "showNpcKills": "Mostrar kills de PNJ",
+    "loading": "A carregar kills…",
+    "noKills": "Sem kills nas últimas 24h.",
+    "noKillsNpc": "Sem kills nas últimas 24h — {{count}} só de PNJ ocultos.",
+    "showThem": "Mostrá-los",
+    "loadMore": "Carregar mais ({{count}} restantes)"
+  },
+  "sigType": {
+    "unknown": "Desconhecido",
+    "wormhole": "Buraco de minhoca",
+    "data": "Dados",
+    "relic": "Relíquia",
+    "gas": "Gás",
+    "ore": "Minério",
+    "combat": "Combate"
+  },
+  "signatures": {
+    "pasteHint": "Podes copiar e colar assinaturas diretamente do scanner de sondas no EVE. Para isso, abre o teu scanner de sondas. Prime Ctrl+A para selecionar todas, depois Ctrl+C para copiar. Usa Ctrl+V para as colar aqui.",
+    "pasteDifferentSystem": "A tua personagem está atualmente em {{current}}, mas estás a colar assinaturas em {{selected}}. Continuar?",
+    "loadFailed": "Falha ao carregar as assinaturas",
+    "saveFailed": "Falha ao guardar a assinatura",
+    "deleteFailed": "Falha ao eliminar a assinatura",
+    "deleteSelectedConfirm_one": "Eliminar {{count}} assinatura selecionada?",
+    "deleteSelectedConfirm_other": "Eliminar {{count}} assinaturas selecionadas?",
+    "deleteAllConfirm_one": "Eliminar {{count}} assinatura?",
+    "deleteAllConfirm_other": "Eliminar as {{count}} assinaturas?",
+    "addSignature": "Adicionar assinatura",
+    "setTypeAria": "Definir o tipo das assinaturas selecionadas",
+    "setType": "Definir tipo ({{count}})…",
+    "deleteSelected": "Eliminar selecionadas ({{count}})",
+    "deleteAll": "Eliminar tudo",
+    "emptyShared": "Nenhuma assinatura analisada",
+    "empty": "Nenhuma assinatura analisada — cola do scanner de sondas para importar",
+    "colId": "ID",
+    "colType": "Tipo",
+    "colWh": "WH",
+    "colLeadsTo": "Leva a",
+    "colName": "Nome",
+    "colNotes": "Notas",
+    "colAge": "Idade",
+    "colUpdated": "Atualizado",
+    "namePlaceholder": "Nome do site"
+  },
+  "stats": {
+    "title": "Estatísticas de utilizador",
+    "loading": "A carregar…",
+    "jumps": "Saltos",
+    "signatures": "Assinaturas",
+    "dailyActivity": "Atividade diária — últimos 30 dias",
+    "byType": "Assinaturas por tipo",
+    "type": "Tipo",
+    "count": "Quantidade",
+    "period": {
+      "day": "Hoje",
+      "week": "Esta semana",
+      "month": "Este mês",
+      "year": "Este ano",
+      "forever": "Todo o tempo"
+    }
+  },
+  "time": {
+    "justNow": "agora mesmo",
+    "secondsAgo": "há {{value}}s",
+    "minutesAgo": "há {{value}}m",
+    "hoursAgo": "há {{value}}h",
+    "daysAgo": "há {{value}}d",
+    "today": "hoje"
+  },
+  "duration": {
+    "seconds": "{{value}}s",
+    "minutesSeconds": "{{minutes}}m {{seconds}}s",
+    "hoursMinutes": "{{hours}}h {{minutes}}m"
+  },
+  "share": {
+    "expired": "expirado",
+    "expiresInHM": "expira em {{hours}}h {{minutes}}m",
+    "expiresInM": "expira em {{minutes}}m"
+  },
+  "mass": {
+    "billionKg": "{{value}} mil M kg",
+    "millionKg": "{{value}} M kg",
+    "kg": "{{value}} kg"
+  },
+  "toolbar": {
+    "switchMap": "Mudar de mapa",
+    "noMap": "Sem mapa",
+    "mapType": {
+      "shared": "Partilhado",
+      "corp": "Corp",
+      "solo": "Solo"
+    },
+    "lockedTooltip": "O mapa está bloqueado — sistemas e conexões congelados. As assinaturas, estruturas e notas ainda podem ser editadas.",
+    "locked": "Bloqueado",
+    "mapLimitReached": "Limite de mapas atingido",
+    "newMap": "+ Novo mapa",
+    "deleteThisMap": "Eliminar este mapa",
+    "name": "Nome do mapa",
+    "totalSystems": "Total de sistemas",
+    "totalConnections": "Total de conexões",
+    "admin": "Administração",
+    "userStats": "Estatísticas de utilizador",
+    "mapOptions": "Opções de mapa",
+    "checking": "A verificar…",
+    "tqOnline": "Tranquility: Online",
+    "tqOffline": "Tranquility: Offline",
+    "esiOnline": "ESI: Online",
+    "esiOffline": "ESI: Offline",
+    "trackJumpsOn": "Seguir saltos: ligado",
+    "trackJumpsOff": "Seguir saltos: desligado",
+    "trackJumpsTooltipOn": "A seguir saltos — novos sistemas são adicionados à medida que te moves",
+    "trackJumpsTooltipOff": "Sem seguir saltos — apenas os sistemas existentes recebem o indicador de posição",
+    "signOut": "Terminar sessão",
+    "role": "Função: {{role}}",
+    "checkedAgo": "verificado {{time}}",
+    "deleteMapConfirm": "Eliminar «{{name}}»? Esta ação não pode ser desfeita.",
+    "online": {
+      "offline": "Offline",
+      "statusUnknown": "Estado desconhecido",
+      "onlineInEve": "Online no EVE",
+      "onlineSince": "Online no EVE desde {{stamp}} ({{age}})"
+    },
+    "proximity": {
+      "incursion": "Incursão",
+      "insurgency": "Insurgência",
+      "hostileSov": "Sov hostil",
+      "threat": "Ameaça",
+      "closest": "Sistema {{label}} mais próximo"
+    }
+  },
+  "landing": {
+    "tagline": "Cartografia de cadeias de buracos de minhoca para EVE Online",
+    "demoNote": "◈ Demo interativa — uma pré-visualização simplificada. Inicia sessão para aceder a assinaturas, feeds de kills, seguimento de conexões, histórico de atividade e muito mais.",
+    "cta": {
+      "continueAs": "Continuar como",
+      "sessionExpired": "Sessão expirada — clica no teu retrato para voltar a iniciar sessão via EVE SSO.",
+      "switchChar": "Iniciar sessão com outra personagem",
+      "secureLogin": "Início de sessão seguro com EVE SSO — sem palavras-passe armazenadas. Apenas a identidade da personagem.",
+      "loginAlt": "Iniciar sessão com EVE Online",
+      "joinDiscord": "Junta-te ao Discord do Nexum"
+    },
+    "errors": {
+      "not_in_corp": "A tua personagem não é membro da corporação que gere esta instância do Nexum. O acesso está restrito a membros da corp.",
+      "corp_check_failed": "Não foi possível verificar a tua pertença à corporação devido a um erro da ESI. Tenta novamente daqui a um momento.",
+      "unknown": "Ocorreu um erro desconhecido. Tenta novamente."
+    },
+    "sections": {
+      "mapping": "Cartografia",
+      "personalCorp": "Mapas pessoais e de corp",
+      "sysIntel": "Inteligência de sistemas",
+      "liveOps": "Operações em direto",
+      "productivity": "Produtividade e UX",
+      "forCorps": "Para corporações",
+      "compare": "Como se compara o Nexum?",
+      "discordCta": "Perguntas, ideias ou bugs?",
+      "about": "Sobre o Nexum",
+      "aboutMe": "Sobre mim",
+      "techStack": "Stack tecnológico",
+      "faqs": "Perguntas frequentes"
+    },
+    "features": {
+      "interactiveMap": {
+        "title": "Mapa interativo",
+        "desc": "Arrasta sistemas, traça conexões, define a classe / tipo / estado do buraco de minhoca por conexão. Ajuste à grade e minimapa opcional."
+      },
+      "seedRegion": {
+        "title": "Gerar um mapa a partir de uma região",
+        "desc": "Cria um mapa novo pré-preenchido com uma região inteira de EVE — cada sistema disposto segundo a projeção 2D do mapa estelar da CCP (uma disposição ao estilo Dotlan) com todas as conexões de portão estelar traçadas. Escolhe uma região ao criar um mapa, ou deixa em branco para um vazio."
+      },
+      "whIntel": {
+        "title": "Inteligência de buracos de minhoca",
+        "desc": "Estado de massa por conexão (estável / desestabilizado / crítico), marca de fim de vida com contagem decrescente, identificação de statics consciente dos K162, e etiquetagem automática de frig-hole / site de gás conforme o tipo de assinatura."
+      },
+      "rollingCalc": {
+        "title": "Calculadora de rolling",
+        "desc": "Planeia e acompanha o colapso de um buraco a partir do seu painel de conexão. Modela a variância de massa de ±10% e prevê cada passagem como segura / pode-colapsar / vai-colapsar face ao pior caso. Define uma nave roller (massa a frio + propulsor ligado, ou traz a tua nave pilotada da ESI), percorre as passagens com um seguimento de lado que te avisa antes de uma passagem te deixar preso no lado oposto, e obtém uma estimativa de «≈ N passagens restantes». A massa acumulada sincroniza em direto com todos os que veem o buraco."
+      },
+      "whPicker": {
+        "title": "Seletor de tipo de buraco de minhoca",
+        "desc": "Popover pesquisável para atribuir o tipo exato de buraco de minhoca a uma conexão. A info rápida dos statics ao passar o rato mostra a classe de destino, a massa e a vida útil."
+      },
+      "multiSelect": {
+        "title": "Operações em lote por seleção múltipla",
+        "desc": "Shift+clique para selecionar vários sistemas ou assinaturas, depois atribui tipo, elimina ou renomeia numa só ação."
+      },
+      "pngExport": {
+        "title": "Exportação para PNG",
+        "desc": "Renderiza o mapa atual — com contagens de assinaturas, conexões e estado — para um PNG que podes largar num ping de frota ou num Discord de corp."
+      },
+      "sigAging": {
+        "title": "Envelhecimento das assinaturas de buraco de minhoca",
+        "desc": "As assinaturas de buraco de minhoca tingem-se conforme a sua posição na vida útil conhecida do tipo de WH — amarelo aos 50%, laranja aos 90%, vermelho passado o fecho previsto. Deteta cadeias esquecidas antes que colapsem sobre alguém."
+      },
+      "soloCorp": {
+        "title": "Separação Solo / Corp",
+        "desc": "Cada utilizador tem mapas pessoais que são sempre privados; no modo corp cada corp obtém também mapas de corp partilhados. A visibilidade entre corps é ativada através de uma única variável de ambiente."
+      },
+      "multiMap": {
+        "title": "Suporte multimapa",
+        "desc": "Cada personagem (ou corp) pode manter vários mapas independentes até aos limites configurados — cadeias separadas para operações separadas sem perder o contexto."
+      },
+      "mergeMaps": {
+        "title": "Fundir mapas",
+        "desc": "Integra um mapa noutro. O destino mantém-se como fonte de verdade — apenas os sistemas e conexões em falta são adicionados, com as assinaturas, estruturas e notas fundidas, e os novos sistemas encaixados na disposição existente. Os mapas de corp habilitam-se por função como origem e/ou destino de fusão."
+      },
+      "realtime": {
+        "title": "Colaboração em tempo real",
+        "desc": "As edições sincronizam em direto com todos os que veem o mesmo mapa — sistemas, conexões, renomear/bloquear, assinaturas, estruturas e fusões aparecem para os outros em instantes, sem recarregar. Transmitido por mapa (só recebes eventos dos mapas que podes ver), com as tuas próprias alterações suprimidas por eco e ressincronização automática ao reconectar."
+      },
+      "mapLocking": {
+        "title": "Bloqueio de mapa",
+        "desc": "Os admins podem congelar a topologia de um mapa de corp. Sistemas e conexões bloqueiam-se para os não admins, mas as assinaturas, estruturas e notas por sistema continuam editáveis para que as operações prossigam enquanto a disposição está fixada."
+      },
+      "rbac": {
+        "title": "Acesso baseado em funções",
+        "desc": "Quatro níveis — readonly, edit, full, admin — que regem as ações sobre mapas de corp. Os mapas pessoais continuam a ser teus seja qual for a função."
+      },
+      "systemPanel": {
+        "title": "Painel de sistema",
+        "desc": "Mosaicos por sistema para assinaturas, estruturas, estações PNJ, notas, killboard e gráficos de atividade. Os mosaicos reordenam-se arrastando e largando e mantêm-se por utilizador."
+      },
+      "sigMgmt": {
+        "title": "Gestão de assinaturas",
+        "desc": "Cola diretamente do scanner de sondas. Acompanha a idade de criação / atualização por assinatura, elimina automaticamente as assinaturas ausentes numa nova colagem e suporta a atribuição de tipo em lote para a seleção múltipla."
+      },
+      "structImport": {
+        "title": "Importação de estruturas",
+        "desc": "Cola os dados de visão geral do EVE para importar estruturas de jogadores com nomes, tipos, proprietários e notas numa só operação."
+      },
+      "autoStruct": {
+        "title": "Estruturas detetadas automaticamente",
+        "desc": "As citadelas da tua corp (via ESI quando um membro com a função Station Manager inicia sessão) e quaisquer estruturas listadas publicamente por um feed de terceiros aparecem automaticamente no painel de estruturas como entradas só de leitura — já tingidas conforme o teu standing com o proprietário."
+      },
+      "activityCharts": {
+        "title": "Gráficos de atividade",
+        "desc": "Histórico móvel de 24 horas de saltos, kills de naves / cápsulas e kills de PNJ por sistema, consultado da ESI de hora a hora. O recoletor mantém os dados de cada sistema de K-space — não só dos que alguém abriu — para que os gráficos se preencham assim que vires um sistema novo."
+      },
+      "sovStation": {
+        "title": "Dados de soberania e de estação",
+        "desc": "Info de sov em direto de aliança / corp / facção e serviços de estação PNJ, com ações de ponto de rota e destino no jogo."
+      },
+      "killboard": {
+        "title": "Painel de killboard",
+        "desc": "Atividade recente do zKillboard por sistema, com os kills só de PNJ ocultos por defeito (alternável). As linhas tingem-se de vermelho quando um ator hostil está na cadeia ou matam um azul; de azul quando um amigo pontua ou morre um hostil. Os kills recentes também se destacam no mapa."
+      },
+      "effectDigest": {
+        "title": "Resumo de efeitos da cadeia",
+        "desc": "Um resumo de uma linha no topo do painel de informação do sistema lista cada Pulsar / Wolf-Rayet / Magnetar / etc. da cadeia atual. Passa o rato para a lista de modificadores; clica para centrar."
+      },
+      "standings": {
+        "title": "Sobreposição de standings",
+        "desc": "A tua lista de contactos de EVE (pessoal, corp e aliança — obtida via ESI ao iniciar sessão e reatualizável a pedido) impulsiona uma camada visual em toda a cadeia. Os detentores de sov mostram pílulas de standing P/C/A inline; as estruturas resolvidas pelo seu ID de estrutura de EVE tingem-se conforme o standing da corp proprietária; os nós de sistemas com sov recebem um halo colorido para que o território hostil se destaque no mapa."
+      },
+      "scout": {
+        "title": "Conexões de scout",
+        "desc": "As conexões públicas do Eve-Scout de Thera e Turnur aparecem na barra lateral para que saltes diretamente para buracos conhecidos."
+      },
+      "a0": {
+        "title": "Deteção de sóis A0",
+        "desc": "Marca automaticamente os sistemas com sóis A0 (amarelos) visíveis via ESI, para planear escaramuças adequadas a capitais."
+      },
+      "iceBelt": {
+        "title": "Sistemas com cinturão de gelo",
+        "desc": "Marca os sistemas do espaço do Império que geram anomalias de gelo com um ícone ❄ — útil ao preparar operações de mineração ou procurar um ponto de recolha alternativo. Conjunto de dados estático incluído no repo e resolvido para IDs de sistema ao arrancar."
+      },
+      "storms": {
+        "title": "Seguimento de tempestades",
+        "desc": "As tempestades ativas de null-sec — Electric, Gamma, Exotic, Plasma — obtidas do feed stormtrack do EveScout Rescue mantido pela comunidade aparecem como um ⚡ com código de cor nos nós de sistema correspondentes. A dica mostra o nome da tempestade, o último reporte e o relator. Atualizado a cada 30 minutos."
+      },
+      "proximity": {
+        "title": "Alertas de proximidade",
+        "desc": "Notificação do navegador mais um aviso sonoro quando estiveres a um número configurável de saltos de uma incursão ativa, uma insurgência pirata, ou um sistema com sov cuja corp / aliança tenhas marcado a vermelho. Uma pílula persistente na barra de ferramentas mostra a ameaça mais próxima de relance."
+      },
+      "discordNotif": {
+        "title": "Notificações do Discord",
+        "desc": "Envia a inteligência de cadeia da corp para um canal do Discord para que os alertas cheguem mesmo quando ninguém está a ver o separador. Dispara no servidor perante um K162 de entrada ou uma nova conexão de buraco de minhoca, limitado a mapas de corp. Os admins filtram que regiões e mapas notificam a partir do painel de administração. Best-effort e consciente dos limites de taxa; as operações em lote como a sementeira de regiões nunca saturam o canal."
+      },
+      "routePlanner": {
+        "title": "Planeador de rotas",
+        "desc": "BFS no servidor sobre os portões estelares mais a tua cadeia em direto, para que uma rota que passa por um salto de buraco de minhoca seja um só clique."
+      },
+      "locationTracking": {
+        "title": "Seguimento de localização",
+        "desc": "Ponto opcional de localização da personagem em direto na barra de ferramentas, mais um indicador de «estás aqui» por mapa que se atualiza a cada 10 segundos via ESI."
+      },
+      "presence": {
+        "title": "Presença de pilotos",
+        "desc": "Vê onde estão neste momento todos os que veem o mesmo mapa — um ponto azul (nome do piloto ao passar o rato) marca o sistema atual de cada outro espectador, em direto à medida que saltam. Cobre qualquer pessoa com o mapa aberto, não só a tua frota; opcional e nada é armazenado."
+      },
+      "onlineStatus": {
+        "title": "Estado online",
+        "desc": "Um ponto na barra de ferramentas indica se cada utilizador com sessão iniciada está atualmente ligado ao EVE Online, para que vejas de relance quem está realmente ativo."
+      },
+      "commandPalette": {
+        "title": "Paleta de comandos",
+        "desc": "⌘ / Ctrl + K abre uma pesquisa difusa por sistemas, assinaturas e ações — salta para um sistema, define um ponto de rota ou alterna um painel sem tocar no rato."
+      },
+      "homeHotkey": {
+        "title": "Atalho de origem",
+        "desc": "Prime H para voltar a vista ao teu sistema de origem a partir de qualquer painel. Clica com o botão direito num sistema para definir ou alterar qual é a origem."
+      },
+      "killHighlights": {
+        "title": "Destaque de kills recentes",
+        "desc": "Os sistemas com kills na última hora recebem um halo colorido para que vejas de relance a atividade fresca em toda a cadeia."
+      },
+      "userStats": {
+        "title": "Janela de estatísticas de utilizador",
+        "desc": "Totais por personagem: saltos, assinaturas por tipo, repartidos por dia / semana / mês / ano / total."
+      },
+      "serverStatus": {
+        "title": "Widget de estado do servidor",
+        "desc": "Estado em direto do servidor Tranquility, número de jogadores e saúde da ESI na barra de ferramentas. Em cache entre separadores para que todas as tuas janelas abertas partilhem uma só consulta à ESI."
+      },
+      "demoMap": {
+        "title": "Mapa de demonstração",
+        "desc": "A página inicial monta um mapa de demonstração não editável para que os visitantes vejam o que a ferramenta faz antes de iniciar sessão."
+      },
+      "sidebar": {
+        "title": "Barra lateral recolhível",
+        "desc": "Opções de mapa, Conexões, Alertas de proximidade, Esmaecer sistemas obsoletos e Atalhos expandem ou recolhem de forma independente. O estado por secção mantém-se por navegador via localStorage."
+      }
+    },
+    "corpFeatures": {
+      "multiCorp": {
+        "title": "Implementações multi-corp",
+        "desc": "CORP_ID aceita uma lista de IDs de corporação separados por vírgulas. Uma instância do Nexum pode alojar várias corps; os mapas de cada corp ficam limitados aos seus próprios membros, salvo se CORP_MAP_SHARED=true."
+      },
+      "adminDash": {
+        "title": "Painel de administração",
+        "desc": "Uma página /admin dedicada com quatro separadores: Utilizadores, Mapas, Relatórios e Registo de auditoria. Os admins acedem a ela a partir do botão Administração da barra de ferramentas."
+      },
+      "userMgmt": {
+        "title": "Gestão de utilizadores",
+        "desc": "Altera funções, bloqueia / desbloqueia e força uma reverificação de pertença à corp via ESI a pedido. O autobloqueio, a autodespromoção e as alterações a ADMIN_CHAR_ID estão protegidos."
+      },
+      "mapMgmt": {
+        "title": "Gestão de mapas",
+        "desc": "Os admins veem cada mapa de corp com o avatar do proprietário, o ticker da corp, as contagens de sistemas / conexões, o estado de bloqueio e a hora da última atividade. Forçar bloqueio, desbloqueio e eliminação são um clique cada um."
+      },
+      "usersReport": {
+        "title": "Relatório de utilizadores",
+        "desc": "Por personagem: último acesso, sistemas adicionados / eliminados, estruturas adicionadas, assinaturas repartidas por tipo e marcas de tempo da última atividade de corp. Ordenável, filtrável por atividade e período, exportável como CSV."
+      },
+      "systemsReport": {
+        "title": "Relatório de sistemas",
+        "desc": "Assinaturas agregadas dos mapas de corp com um donut por tipo de assinatura, um gráfico de linhas de atividade diária / mensal (o agrupamento adapta-se ao período) e uma repartição ordenável por tipo de buraco de minhoca."
+      },
+      "timeWindowed": {
+        "title": "Relatórios por período",
+        "desc": "Cada relatório pode ser limitado às últimas 24 horas, à semana, ao mês, ao ano ou a todo o tempo. O agrupamento dos gráficos adapta-se automaticamente: por hora para 24h, por dia para semana / mês, por mês para ano e todo o tempo."
+      },
+      "auditLog": {
+        "title": "Registo de auditoria",
+        "desc": "Cada ação de admin — alteração de função, bloqueio / desbloqueio, bloqueio forçado, eliminação forçada, alteração de corp na ESI, autobloqueio ao sair da corp — é registada com o ator, o alvo, o valor antigo → novo e a marca de tempo. Exportável como CSV."
+      },
+      "corpTicker": {
+        "title": "Resolução de tickers de corp",
+        "desc": "Os IDs de corp nos relatórios de Utilizadores e Mapas são resolvidos para tickers do jogo via ESI, com uma cache em memória de 1 hora para manter baixas as cargas dos relatórios."
+      },
+      "perCharAttr": {
+        "title": "Atribuição por personagem",
+        "desc": "As assinaturas, estruturas e as ações de adicionar / eliminar sistemas são registadas com o utilizador que as realizou, para que os relatórios possam responder a «quem tem andado a analisar o quê» sem registo manual."
+      }
+    },
+    "forCorpsBody": "Executa o Nexum como uma implementação partilhada para a tua corp ou aliança. Os membros obtêm mapas de cadeia visíveis para a corp e mapas pessoais privados numa só ferramenta, com permissões baseadas em funções, ferramentas de administração e relatórios de atividade por personagem.",
+    "compareBody": "Descobre como o Nexum se compara com o Pathfinder, o Tripwire e o Wanderer — funcionalidades, alojamento e custo, lado a lado.",
+    "compareLink": "Comparar Nexum vs Pathfinder, Tripwire e Wanderer →",
+    "discordCtaBody": "Passa pelo Discord do Nexum — comentários, pedidos de funcionalidades, conversa de scanning e o7 são todos bem-vindos.",
+    "aboutBody1": "O Nexum é uma ferramenta de buracos de minhoca e exploração. Serve para cartografar rotas e registar assinaturas. Foi fortemente inspirado pelo Pathfinder — mas como o Pathfinder já não está em desenvolvimento ativo (nenhum lançamento novo desde 2020), em vez de se queixar disso, criou-se o Nexum.",
+    "aboutBody2": "O Nexum é desenvolvido por uma única pessoa. Vou adicionando funcionalidades à medida que avanço, mas entra em contacto se quiseres suporte ou pedidos de funcionalidades.",
+    "aboutMe": "O Nexum é escrito por Addelee como projeto a solo. Jogo EVE desde a beta lá em 2003. Talvez me vejas a passar tempo nos canais de Help ou no canal de Scanning. Joguei em todos os recantos do espaço — desde viver em buracos de minhoca e Thera, fazer missões em High Sec, gate-camping em lowsec e agora, vida em null com a Goonswarm.<br></br><br></br>No meu trabalho, sou programador e dirijo a <area404>Area 404</area404>. Por isso decidi escrever esta ferramenta. Sou um explorador entusiasta no EVE, por isso queria uma ferramenta que funcionasse para mim.<br></br><br></br>O Nexum é de código aberto e dou as boas-vindas a quem quiser contribuir. Agradeceria muito os teus comentários e qualquer bug que encontres, por isso reporta as coisas no <gh>GitHub</gh>",
+    "techStack1": "O Nexum mantém-se unido com os melhores materiais da era espacial que o dinheiro e a cafeína podem comprar. O frontend é <strong>React</strong> com <strong>TypeScript</strong> — porque discutir com um compilador continua a ser mais produtivo do que discutir com uma aliança de nullsec. Os mapas são renderizados com <strong>ReactFlow</strong>, que trata de toda a confusão de arrastar nós para que eu não tivesse de o fazer. O estado é gerido pelo <strong>Zustand</strong>, que é deliciosamente pequeno e nunca me disse para «simplesmente usar o Redux».",
+    "techStack2": "O backend é <strong>Node.js</strong> com <strong>Express</strong> — comprovado, aborrecido e funciona. Os dados vivem no <strong>PostgreSQL</strong>, alimentado com o Static Data Export da CCP para que o Nexum saiba mesmo o que é J213422 sem perguntar à ESI a cada cinco segundos. A autenticação é gerida pelo <strong>EVE Online SSO</strong> — as tuas credenciais nunca tocam neste servidor, exatamente como deve ser.",
+    "techStack3": "A inteligência de sistemas em direto vem da <strong>ESI do EVE</strong> (a API oficial da CCP) e os dados de kills do <strong>zKillboard</strong>. Tudo está em contentores com <strong>Docker</strong> e servido por trás de um proxy <strong>nginx</strong>, porque alguém tem de manter as luzes acesas enquanto te expulsam do teu buraco de minhoca.",
+    "faq": {
+      "whyNexum": {
+        "q": "Porquê Nexum?",
+        "a": "Nexum é a palavra latina para um vínculo ou conexão — o que pareceu apropriado para uma ferramenta construída em torno de cartografar as conexões entre sistemas de buracos de minhoca. Também soa vagamente a algo que encontrarias a flutuar num magnetar de C6, o que foi na verdade o fator decisivo."
+      },
+      "multipleAccounts": {
+        "q": "Posso usar várias contas?",
+        "a": "Sim — cada personagem de EVE obtém o seu próprio conjunto de mapas. Basta iniciar sessão com outra personagem via EVE SSO e o Nexum manterá os mapas delas completamente separados. Sem misturas, sem partilhar por acidente a tua cadeia de buracos de minhoca ultrassecreta com a tua corp de alt."
+      },
+      "dataSafe": {
+        "q": "Os meus dados estão seguros?",
+        "a": "O Nexum nunca vê a tua palavra-passe do EVE — a autenticação é gerida inteiramente pelo EVE SSO da CCP. A única coisa armazenada é a identidade da tua personagem e os mapas que constróis. Os dados dos teus mapas vivem numa base de dados privada e não são partilhados com ninguém. Dito isto, não uses o Nexum para a rota de invasão ultrassecreta da tua aliança — nenhuma ferramenta na internet substitui uma boa segurança operacional."
+      },
+      "reportBugs": {
+        "q": "Posso reportar bugs, dar comentários e pedir funcionalidades?",
+        "a": "Sem dúvida. O projeto é de código aberto no <gh>GitHub</gh> — abre um issue para bugs ou pedidos de funcionalidades, ou envia um pull request se te sentires corajoso. Comentários por correio no jogo para a personagem associada a esta conta também funcionam se o GitHub não for a tua cena."
+      },
+      "runYourself": {
+        "q": "Posso alojar isto eu mesmo?",
+        "a": "Sim — o Nexum é totalmente auto-alojável. O código-fonte está no <gh>GitHub</gh> e toda a stack arranca com um único <code>docker compose up</code>. Vais precisar de registar a tua própria aplicação de EVE no <devportal>portal de programadores da CCP</devportal> para obter credenciais de SSO, mas para além disso o README cobre tudo — incluindo importar os dados estáticos do EVE e apontar o Traefik para isso, se for a tua cena. Se algo se partir, abre um issue. Se o corrigires, abre um PR por favor.<br></br><br></br>Não é a coisa mais técnica de montar, mas recomendo que tenhas conhecimentos básicos de docker e do servidor em que o executas (Linux?)"
+      },
+      "goonTrust": {
+        "q": "Mas és um Goon, porque confiaríamos em ti?",
+        "a": "Pergunta justa, e honestamente o instinto certo a ter em New Eden. O código é totalmente de código aberto — és livre de ler cada linha, executá-lo tu mesmo, ou pedir a alguém de confiança que o audite. O Nexum não tem qualquer interesse nas tuas rotas de scout, na vergonha do killboard da tua corp, ou no que quer que tenhas estacionado nesse C5. A pior coisa que um Goon alguma vez fez num buraco de minhoca foi ser expulso de um, e gostaria de te ajudar a evitar esse destino."
+      },
+      "roadmap": {
+        "q": "Tens um roadmap para novas funcionalidades?",
+        "a": "Vagamente. Atualmente o sistema só funciona com jogadores a solo. O passo seguinte lógico seria implementá-lo para corporações e alianças. Assim que resolver os bugs deste lançamento inicial, começarei a trabalhar nisso.<br></br>Isto assume que a vida real não se atravesse!<br></br><br></br>Se houver uma funcionalidade que te interesse mesmo, escreve-me no jogo e conversamos."
+      },
+      "donateIsk": {
+        "q": "Posso doar ISK?",
+        "a": "Preferia que não, a sério. Não faço isto pelas ISK, por isso guarda-as e gasta-as em algo com que voar pelos ares ou fazer voar outra pessoa!"
+      }
+    },
+    "footer": "EVE Online e o logótipo EVE são marcas registadas da CCP hf. Todos os direitos reservados em todo o mundo. O Nexum é uma ferramenta de terceiros e não está afiliada à CCP hf nem conta com o seu apoio. · <license>Aviso de licença e de PI de EVE</license>"
+  },
+  "whInfo": {
+    "leadsTo": "Leva a",
+    "lifetime": "Vida útil",
+    "totalMass": "Massa total",
+    "maxJump": "Salto máx",
+    "infoAria": "Info de {{code}}",
+    "specTooltip": "Espec. de {{code}}"
+  },
+  "whPicker": {
+    "searchPlaceholder": "Procurar…",
+    "connectedSystems": "Sistemas conectados",
+    "other": "Outros",
+    "inbound": "de entrada"
+  },
+  "npcStations": {
+    "loading": "A carregar estações…",
+    "none": "Não há estações PNJ neste sistema",
+    "services": {
+      "market": "Mercado",
+      "repairFacilities": "Instalações de reparação",
+      "fitting": "Equipamento",
+      "factory": "Fábrica",
+      "laboratory": "Laboratório",
+      "reprocessingPlant": "Central de reprocessamento",
+      "cloning": "Clonagem",
+      "cloneBay": "Baía de clones",
+      "insurance": "Seguro",
+      "loyaltyPointStore": "Loja de pontos de lealdade",
+      "navyOffices": "Gabinetes da marinha",
+      "securityOffices": "Gabinetes de segurança",
+      "bountyMissions": "Missões de recompensa",
+      "bountyOffice": "Gabinete de recompensas",
+      "assayOffice": "Gabinete de ensaio",
+      "officeRental": "Aluguer de escritórios",
+      "stockExchange": "Bolsa de valores",
+      "commodityTrading": "Comércio de mercadorias",
+      "news": "Notícias",
+      "docking": "Atracagem",
+      "exploration": "Exploração",
+      "blackMarket": "Mercado negro",
+      "mentoring": "Mentoria"
+    }
+  },
+  "shareView": {
+    "expiredTitle": "Ligação de partilha expirada",
+    "expiredBody": "Esta vista partilhada de <strong>{{map}}</strong> foi publicada por <strong>{{owner}}</strong> e expirou a <strong>{{date}}</strong>.",
+    "expiredHint": "Pede uma nova ligação a {{owner}}.",
+    "notFoundTitle": "Ligação de partilha não encontrada",
+    "notFoundBody": "Esta ligação não corresponde a nenhum mapa partilhado conhecido. Pode ter sido revogada, ou o URL pode estar incorreto.",
+    "sharedBy": "partilhado por <strong>{{owner}}</strong>",
+    "cta": "Cria mapas com o Nexum hoje mesmo!"
+  },
+  "routeToast": {
+    "destinationSet": "Destino definido para {{system}}",
+    "waypointAdded": "Ponto de rota adicionado: {{system}}",
+    "failed": "Falha ao definir o ponto de rota — a tua personagem está online?"
+  },
+  "mapNode": {
+    "unknown": "Desconhecido",
+    "homeSystem": "Sistema de origem",
+    "characterFallback": "Personagem {{id}}",
+    "killsTooltip": "{{ships}} nave · {{pods}} cápsula destruídas esta hora",
+    "a0Sun": "Sol A0",
+    "iceBelt": "Sistema com cinturão de gelo",
+    "incursion": "Sistema de incursão",
+    "insurgency": "Sistema de insurgência",
+    "stormTitle": "Tempestade {{name}}",
+    "stormLastReport": "Último reporte: {{value}}",
+    "stormReportedBy": "Por: {{value}}",
+    "statics": "Statics",
+    "staging": "Concentração",
+    "incursionBadge": "Incursão",
+    "corrupted": "Corrompido",
+    "suppressed": "Suprimido",
+    "scoutConnections_one": "Conexão de {{name}}",
+    "scoutConnections_other": "Conexões de {{name}}",
+    "scoutConnectionsMulti": "Conexões de {{names}}"
+  },
+  "mapEdge": {
+    "lessThan24h": "< 24h",
+    "lessThan4h": "< 4 h",
+    "lessThan1h": "< 1 h"
+  }
+}
