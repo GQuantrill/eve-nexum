@@ -147,9 +147,10 @@
     <div class="wrap">
       <nav class="topnav">
         <a href="/" data-i18n="nav">&larr; Nexum home</a>
-        <select id="lang-select" class="lang-select" aria-label="Language / Sprache">
+        <select id="lang-select" class="lang-select" aria-label="Language / Sprache / Langue">
           <option value="en">🇬🇧 English</option>
           <option value="de">🇩🇪 Deutsch</option>
+          <option value="fr">🇫🇷 Français</option>
         </select>
       </nav>
 
@@ -423,9 +424,9 @@
       so it can't use react-i18next. When the visitor's saved language is German
       — the same `nexum.lang` localStorage key the app's language detector uses,
       falling back to the browser language — we replace the text of every
-      [data-i18n] element with its German equivalent. SEO crawlers index the
-      English source only (see the canonical / og:locale above); this is purely
-      for German-speaking visitors arriving from the app.
+      [data-i18n] element with its translated equivalent (German or French).
+      SEO crawlers index the English source only (see the canonical / og:locale
+      above); this is purely for non-English visitors arriving from the app.
     -->
     <script>
       (function () {
@@ -433,21 +434,27 @@
           var lang = localStorage.getItem('nexum.lang');
           if (!lang) lang = (navigator.language || '').slice(0, 2) === 'de' ? 'de' : 'en';
 
-          // Wire up the language picker regardless of the current language so
-          // a German visitor can switch back to English too. Persists to the
-          // same nexum.lang key the app uses, then reloads to re-run the swap.
+          // Languages with a translation dictionary below. English is the
+          // untranslated source, so it has no entry.
+          var SUPPORTED = { de: 1, fr: 1 };
+
+          // Wire up the language picker regardless of the current language so a
+          // visitor can switch between any language (including back to English).
+          // Persists to the same nexum.lang key the app uses, then reloads to
+          // re-run the swap.
           var sel = document.getElementById('lang-select');
           if (sel) {
-            sel.value = (lang === 'de') ? 'de' : 'en';
+            sel.value = SUPPORTED[lang] ? lang : 'en';
             sel.addEventListener('change', function () {
               try { localStorage.setItem('nexum.lang', sel.value); } catch (e) { /* ignore */ }
               location.reload();
             });
           }
 
-          if (lang !== 'de') return;
+          if (!SUPPORTED[lang]) return;
 
-          var DE = {
+          var DICTS = {};
+          DICTS.de = {
             __title: 'EVE Online Wurmloch-Mapper-Vergleich: Nexum vs Pathfinder vs Tripwire vs Wanderer (2026)',
             nav: '&larr; Nexum Startseite',
             h1: 'EVE Online Wurmloch-Mapper-Vergleich:<br />Nexum vs Pathfinder vs Tripwire vs Wanderer',
@@ -540,11 +547,107 @@
             footP2: 'EVE Online und das EVE-Logo sind eingetragene Marken von CCP hf. Alle Rechte weltweit vorbehalten. Nexum ist ein Drittanbieter-Tool und steht in keiner Verbindung zu CCP hf., Pathfinder, Tripwire oder Wanderer und wird von ihnen nicht unterstützt. Siehe den vollständigen <a href="/license/">Lizenz- &amp; EVE-IP-Hinweis</a>.'
           };
 
-          document.documentElement.lang = 'de';
-          if (DE.__title) document.title = DE.__title;
+          // French — apostrophes use the typographic ’ (U+2019) so they don’t
+          // terminate these single-quoted strings.
+          DICTS.fr = {
+            __title: 'Comparatif des mappers de trous de ver EVE Online : Nexum vs Pathfinder vs Tripwire vs Wanderer (2026)',
+            nav: '&larr; Accueil Nexum',
+            h1: 'Comparatif des mappers de trous de ver EVE Online :<br />Nexum vs Pathfinder vs Tripwire vs Wanderer',
+            sub: 'Un regard honnête sur les principaux outils de cartographie de trous de ver pour EVE Online.',
+            upd: 'Dernière mise à jour le 27 mai 2026 · maintenu par l’équipe Nexum',
+            lede: 'Si vous scoutez ou vivez en J-space, un bon mapper de trous de ver est essentiel. <strong>Nexum</strong> est un mapper moderne et open source — utilisez la version hébergée gratuite ou auto-hébergez la vôtre — qui couvre tout le workflow : cartographie de chaîne en temps réel, signatures et suivi de masse, puis va plus loin avec un véritable calculateur de rolling, le seeding de régions entières, des surcouches de standings &amp; sov et des alertes Discord. Ci-dessous, il est comparé aux autres choix courants — <strong>Tripwire</strong>, <strong>Pathfinder</strong> et <strong>Wanderer</strong>. Nous développons Nexum, donc nous le considérons naturellement comme le meilleur choix pour la plupart des corps — mais nous avons gardé les faits sur la concurrence exacts et liés pour que vous puissiez juger par vous-même.',
+
+            h2Glance: 'En un coup d’œil',
+            cap1: 'Comparatif de base. Vérifié en mai 2026 — les fonctionnalités de la concurrence changent ; suivez les liens pour confirmer.',
+            gOpenSource: 'Open source',
+            gSelfHost: 'Auto-hébergeable',
+            gCloud: 'Option cloud gérée',
+            gSso: 'Connexion EVE SSO',
+            gSync: 'Sync multi-utilisateur en temps réel',
+            gSigPaste: 'Collage &amp; suivi des signatures',
+            gMass: 'Masse / rolling de trou de ver',
+            gTech: 'Stack technique',
+            gCost: 'Coût',
+            yes: '<span class="yes">Oui</span>',
+            yesMit: '<span class="yes">Oui</span> (MIT)',
+            yesDocker: '<span class="yes">Oui</span> (Docker)',
+            yesCe: '<span class="yes">Oui</span> (Community Edition)',
+            free: '<span class="yes">Gratuit</span>',
+            freeBoth: '<span class="yes">Gratuit</span> (hébergé &amp; auto-hébergé)',
+            gCloudN: '<span class="yes">Oui</span> — instance publique gratuite sur eve-nexum.com, plus auto-hébergement',
+            gCloudP: '<span class="meh">Instances gérées par la communauté</span>',
+            gCloudT: '<span class="meh">Hôte public fermé en 2024</span>',
+            gCloudW: '<span class="yes">Oui</span> — « Wanderer Cloud » officiel, géré par les développeurs',
+            gMassN: 'Calculateur de rolling dédié (variance de ±10 %, alertes de blocage)',
+            massStatus: 'Suivi de l’état de masse',
+
+            h2Further: 'Là où Nexum va plus loin',
+            furtherIntro: 'Les quatre gèrent bien les bases. Voici les capacités que Nexum intègre et que les autres n’offrent généralement pas comme fonctionnalités documentées et prêtes à l’emploi — les raisons pour lesquelles les corps le choisissent :',
+            cap2: 'Fonctionnalités distinctives de Nexum. « — » signifie que ce n’est pas une fonctionnalité phare documentée et intégrée de ces outils (les fonctionnalités changent — utilisez les liens ci-dessous pour vérifier).',
+            fFeature: 'Fonctionnalité',
+            f1h: 'Wormhole <strong>calculateur de rolling</strong> — modélise la variance de masse de ±10 %, roller froid/chaud avec suivi de côté, et avertit avant qu’un passage ne bloque votre roller ou n’effondre le trou',
+            f1o: 'Suivi de base de l’état de masse',
+            f2h: '<strong>Générer une carte depuis une région EVE entière</strong> — agencement automatique façon Dotlan avec chaque portail intra-région prédessiné',
+            f3h: '<strong>Fusionner deux cartes</strong> en une, en dédupliquant les systèmes et en intégrant signatures, structures et notes',
+            f4h: '<strong>Notifications Discord</strong> — alertes de K162 entrant et de nouvelle connexion poussées vers votre canal, même quand personne ne regarde la carte',
+            f5h: '<strong>Surcouche de standings &amp; de souveraineté</strong> pilotée par vos propres contacts EVE — teinte hostile/amie sur toute la chaîne, killboard et halos de sov',
+            f6h: '<strong>Présence en direct des spectateurs de la carte</strong> — un point pour chaque personne regardant la carte, pas seulement votre flotte — plus les positions de flotte',
+            f6o: 'Les positions de flotte varient',
+            f7h: '<strong>Couches de renseignement environnemental</strong> — tempêtes null-sec, soleils A0, ceintures de glace, effets de trou de ver de chaîne, et alertes de proximité d’incursion / insurrection',
+            f8h: '<strong>Suite corp</strong> — rôles, cartes partagées, tableau de bord d’admin, rapports utilisateurs &amp; systèmes, journal d’audit et attribution par personnage',
+            f8o: 'Variable',
+
+            h2Detail: 'Les outils en détail',
+            twP: 'Le mapper de trous de ver classique, axé signatures, avec lequel une grande partie des joueurs de J-space ont grandi. Il est rapide, ciblé, et le workflow est dans les réflexes des vétérans. L’instance publique de longue date (tripwire.eve-apps.com) a fermé mi-2024, mais Tripwire est open source, il survit donc via l’auto-hébergement et les instances gérées par la communauté.',
+            twBest: '<strong>Idéal pour :</strong> les groupes qui veulent le workflow de signatures familier de Tripwire et sont prêts à auto-héberger. <a href="https://bitbucket.org/daimian/tripwire">Source &rarr;</a>',
+            pfP: 'Le mapper auto-hébergé le plus mature et le plus riche en fonctionnalités. Il a été pionnier de beaucoup de ce qu’attendent les wormholers — données riches de trous de ver, connexions Thera via EVE-Scout, un flux de kills zKillboard en direct, une API de plugins et plus encore. Le compromis, c’est le poids opérationnel : c’est une stack PHP/MySQL qui demande plus d’efforts à installer et à maintenir à jour qu’une appli mono-conteneur.',
+            pfBest: '<strong>Idéal pour :</strong> les groupes qui veulent un maximum de fonctionnalités et ne craignent pas d’exploiter une stack plus lourde. <a href="https://github.com/exodus4d/pathfinder">GitHub &rarr;</a>',
+            wdP: 'Le challenger moderne, présenté comme une alternative légère et rapide à Pathfinder. Construit sur Elixir/Phoenix avec un frontend React et open-sourcé sous MIT, c’est le seul des quatre avec une version <em>cloud gérée officielle</em> — pour qu’un groupe puisse l’utiliser sans exploiter aucune infrastructure — tout en proposant une Community Edition auto-hébergée gratuite.',
+            wdBest: '<strong>Idéal pour :</strong> les groupes qui veulent une interface soignée et l’option d’éviter complètement l’auto-hébergement. <a href="https://wanderer.ltd/">Site web &rarr;</a> · <a href="https://github.com/wanderer-industries/wanderer">GitHub &rarr;</a>',
+            nxP: 'Un mapper moderne, open source et auto-hébergé, pensé corp d’abord. Il couvre le workflow de base — cartographie collaborative en temps réel (modifications en direct pour tous sur la carte), collage de signatures avec vieillissement des trous de ver, et suivi des connexions — et y ajoute des extras pour gérer la chaîne d’une corp :',
+            nxLi1: '<strong>Calculateur de rolling</strong> qui modélise la variance de masse de ±10 %, prévoit chaque passage comme sûr / peut-effondrer / va-effondrer, et avertit avant qu’un passage ne bloque votre roller.',
+            nxLi2: '<strong>Générer une région EVE entière</strong> en carte façon Dotlan, et <strong>fusionner des cartes</strong> ensemble.',
+            nxLi3: '<strong>Surcouches de standings &amp; de souveraineté</strong>, un killboard en direct et des graphiques d’activité saut/kill.',
+            nxLi4: '<strong>Présence des pilotes et positions de flotte</strong> sur la carte, plus un suivi de position optionnel.',
+            nxLi5: '<strong>Thera &amp; Turnur</strong> connexions publiques d’EVE-Scout.',
+            nxLi6: '<strong>Mode corp</strong> : rôles, cartes partagées, rapports d’admin, un journal d’audit, et des <strong>notifications Discord</strong> pour les K162 entrants et les nouvelles connexions.',
+            nxP2: 'Il tourne comme une petite stack Docker (React + Node + Postgres) et se connecte avec EVE SSO — utilisez l’instance publique gratuite sur eve-nexum.com, ou auto-hébergez la vôtre. Étant le plus récent des quatre, il a une communauté plus petite.',
+            nxBest: '<strong>Idéal pour :</strong> les corps qui veulent un mapper moderne avec rolling, seeding de région, standings et Discord intégrés — hébergé pour vous ou auto-hébergé. <a href="/">Commencer maintenant &rarr;</a> · <a href="https://github.com/GQuantrill/eve-nexum">GitHub &rarr;</a>',
+
+            h2Choose: 'Lequel choisir ?',
+            chooseP1: '<strong>Pour la plupart des corps qui démarrent à neuf, nous commencerions par Nexum.</strong> Il est moderne, se met en place en quelques minutes avec Docker, et regroupe le calculateur de rolling, le seeding de région, les surcouches de standings et les alertes Discord que vous devriez sinon assembler vous-même — le tout dans une carte collaborative en temps réel. <a href="/">Commencer maintenant</a> et constatez par vous-même.',
+            chooseP2: 'Les autres sont aussi de bons outils, et peuvent mieux convenir dans des cas précis :',
+            chooseLi1: '<strong>Déjà à l’aise avec le workflow de signatures classique de Tripwire ?</strong> Tripwire fait toujours ça bien — désormais auto-hébergé.',
+            chooseLi2: '<strong>Besoin du jeu de fonctionnalités le plus profond et le plus mature, et content d’exploiter une stack PHP plus lourde ?</strong> Pathfinder.',
+            chooseLi3: '<strong>Vous ne voulez exploiter aucun serveur ?</strong> Utilisez l’instance publique gratuite de Nexum, ou le cloud de Wanderer.',
+
+            h2Faq: 'Foire aux questions',
+            faqQ1: 'Quel est le meilleur mapper de trous de ver pour EVE Online ?',
+            faqA1: 'Cela dépend de votre groupe, mais pour une configuration auto-hébergée moderne nous recommanderions Nexum — il regroupe le plus de fonctionnalités intégrées (un calculateur de rolling, le seeding de carte de région entière, des surcouches de standings et des alertes Discord) dans une carte collaborative en temps réel. Tripwire reste l’outil de signatures classique, Pathfinder est l’option la plus mature et la plus riche, et Wanderer ajoute une version cloud gérée.',
+            faqQ2: 'Tripwire est-il toujours disponible ?',
+            faqA2: 'L’instance publique de longue date a fermé mi-2024, mais Tripwire est open source, vous pouvez donc l’auto-héberger ou utiliser une instance gérée par la communauté.',
+            faqQ3: 'Pathfinder est-il encore en développement ?',
+            faqA3: 'Non — pas activement. Le Pathfinder original (par exodus4d) n’a pas eu de nouvelle version depuis 2020, et le fork communautaire qui l’a poursuivi a vu son dernier commit début 2025, sans version depuis. Le développement actif s’est en pratique arrêté — l’une des raisons pour lesquelles des mappers plus récents et activement maintenus comme Nexum existent.',
+            faqQ4: 'Quelle est une bonne alternative open source à Pathfinder et Tripwire ?',
+            faqA4: 'Nexum et Wanderer sont tous deux des mappers open source modernes. Nexum est auto-hébergé avec EVE SSO, collaboration en temps réel et outils de corp ; Wanderer est sous licence MIT et propose l’auto-hébergement plus une version cloud gérée.',
+            faqQ5: 'Puis-je auto-héberger un mapper de trous de ver EVE Online ?',
+            faqA5: 'Oui — Nexum, Pathfinder, Tripwire et la Community Edition de Wanderer peuvent tous être auto-hébergés. Nexum tourne avec Docker sur Postgres et se connecte avec EVE SSO.',
+            faqQ6: 'Ces mappers de trous de ver sont-ils gratuits ?',
+            faqA6: 'Oui — les quatre sont gratuits. Pathfinder et Tripwire sont auto-hébergés ; Nexum et Wanderer proposent chacun à la fois une version hébergée publique gratuite et l’auto-hébergement.',
+
+            ctaP: '<strong>Nexum est gratuit.</strong> Utilisez la version hébergée ou auto-hébergez la chaîne de votre corp en quelques minutes.',
+            ctaBtn: 'Commencer maintenant',
+            ctaGh: 'L’obtenir sur GitHub',
+            footP1: 'Comparatif maintenu par l’équipe Nexum · dernière vérification en mai 2026. Les détails de la concurrence changent avec le temps — suivez les liens ci-dessus pour confirmer les fonctionnalités actuelles. Vous avez repéré une inexactitude ? <a href="https://github.com/GQuantrill/eve-nexum/issues">Ouvrez une issue</a>.',
+            footP2: 'EVE Online et le logo EVE sont des marques déposées de CCP hf. Tous droits réservés dans le monde entier. Nexum est un outil tiers et n’est ni affilié à CCP hf., Pathfinder, Tripwire ou Wanderer, ni approuvé par eux. Voir la <a href="/license/">mention de licence &amp; PI EVE</a> complète.'
+          };
+
+          var DICT = DICTS[lang];
+          document.documentElement.lang = lang;
+          if (DICT.__title) document.title = DICT.__title;
           document.querySelectorAll('[data-i18n]').forEach(function (el) {
             var key = el.getAttribute('data-i18n');
-            if (DE[key] != null) el.innerHTML = DE[key];
+            if (DICT[key] != null) el.innerHTML = DICT[key];
           });
         } catch (e) { /* leave the English page intact on any failure */ }
       })();

@@ -4,11 +4,12 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 
 import enCommon from './locales/en/common.json';
 import deCommon from './locales/de/common.json';
+import frCommon from './locales/fr/common.json';
 
 // Languages we ship translations for. Add a code here AND a matching
 // locales/<code>/common.json file to add a language. Native language names
 // live in the LanguageSwitcher (they read the same in every locale).
-export const SUPPORTED_LANGUAGES = ['en', 'de'] as const;
+export const SUPPORTED_LANGUAGES = ['en', 'de', 'fr'] as const;
 export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
 
 // One namespace ('common') for now. Split into feature namespaces
@@ -16,6 +17,7 @@ export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
 export const resources = {
   en: { common: enCommon },
   de: { common: deCommon },
+  fr: { common: frCommon },
 } as const;
 
 // NOTE: EVE game data (system names, ship types, wormhole codes like C1/HS/K162)
