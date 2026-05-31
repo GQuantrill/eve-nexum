@@ -117,8 +117,8 @@
         "loadFailed": "Benutzerbericht konnte nicht geladen werden",
         "empty": "Keine Benutzer entsprechen dem aktuellen Filter.",
         "totalUsers": "Benutzer gesamt",
-        "uniqueCorps": "Eindeutige Corps",
-        "uniqueAlliances": "Eindeutige Allianzen",
+        "uniqueCorps": "Verschiedene Corps",
+        "uniqueAlliances": "Verschiedene Allianzen",
         "colCharacter": "Charakter",
         "colCorp": "Corp",
         "colAlliance": "Allianz",
@@ -226,7 +226,7 @@
     "personalLimit": "Persönliches Kartenlimit erreicht ({{max}}).",
     "createFailed": "Karte konnte nicht erstellt werden",
     "created": "\"{{name}}\" aus {{region}} erstellt",
-    "creating": "Erstelle…",
+    "creating": "Erstellt…",
     "create": "Karte erstellen"
   },
   "addSystem": {
@@ -268,7 +268,7 @@
     "structures": "Strukturen",
     "notes": "Notizen",
     "hint": "Systeme, die bereits auf der Zielkarte sind, bleiben maßgeblich — nur fehlende Systeme, Verbindungen und die gewählten Daten werden hinzugefügt oder aktualisiert. <strong>Diese Aktion kann nicht rückgängig gemacht werden.</strong>",
-    "merging": "Führe zusammen…",
+    "merging": "Führt zusammen…",
     "merge": "Zusammenführen",
     "merged": "Zusammengeführt: +{{systems}} Systeme, +{{connections}} Verbindungen, +{{signatures}} Sigs, +{{structures}} Strukturen",
     "mergeFailed": "Zusammenführen fehlgeschlagen"
@@ -355,7 +355,7 @@
     "includeStructures": "Strukturen einschließen",
     "includeNotes": "Notizen einschließen",
     "copyLink": "Link kopieren",
-    "working": "Arbeite…",
+    "working": "Arbeitet…",
     "revoke": "Widerrufen",
     "createShareLink": "Freigabe-Link erstellen",
     "createShareFailed": "Freigabe-Link konnte nicht erstellt werden",
@@ -402,10 +402,10 @@
     "placeholderChar": "Exakter Charaktername",
     "placeholderCorp": "Exakter Corp-Name",
     "typeAtLeast3": "Mindestens 3 Zeichen eingeben",
-    "searching": "Suche…",
+    "searching": "Sucht…",
     "found": "Gefunden: {{name}}",
     "noMatch": "Keine exakte Übereinstimmung",
-    "adding": "Füge hinzu…",
+    "adding": "Fügt hinzu…",
     "share": "Teilen",
     "loading": "Lädt…",
     "none": "Keine aktiven Freigaben.",
@@ -601,7 +601,7 @@
   },
   "a0": {
     "signIn": "Melde dich an und docke in K-Space, um nahe A0-Systeme zu sehen.",
-    "computing": "Berechne Routen…",
+    "computing": "Berechnet Routen…",
     "noneReachable": "Keine A0-Systeme erreichbar.",
     "showing": "Die {{count}} nächsten A0-Systeme werden angezeigt.",
     "showRoute": "{{mode}} Route anzeigen",
@@ -650,7 +650,7 @@
     "updated": "aktualisiert {{time}}",
     "includeNpcTooltip": "NPC-only-Killmails im Feed einschließen",
     "showNpcKills": "NPC-Kills anzeigen",
-    "loading": "Lade Kills…",
+    "loading": "Lädt Kills…",
     "noKills": "Keine Kills in den letzten 24h.",
     "noKillsNpc": "Keine Kills in den letzten 24h — {{count}} NPC-only ausgeblendet.",
     "showThem": "Anzeigen",
@@ -751,7 +751,7 @@
     "admin": "Verwaltung",
     "userStats": "Benutzerstatistik",
     "mapOptions": "Kartenoptionen",
-    "checking": "Prüfe…",
+    "checking": "Prüft…",
     "tqOnline": "Tranquility: Online",
     "tqOffline": "Tranquility: Offline",
     "esiOnline": "ESI: Online",
@@ -855,7 +855,7 @@
       },
       "realtime": {
         "title": "Echtzeit-Zusammenarbeit",
-        "desc": "Änderungen werden live mit allen synchronisiert, die dieselbe Karte betrachten — Systeme, Verbindungen, Umbenennen/Sperren, Signaturen, Strukturen und Zusammenführungen erscheinen für andere Betrachter binnen Momenten, ohne Neuladen. Pro Karte gestreamt (du erhältst nur Ereignisse für Karten, die du sehen kannst), mit echo-unterdrückten eigenen Änderungen und automatischer Resynchronisierung beim erneuten Verbinden."
+        "desc": "Änderungen werden live mit allen synchronisiert, die dieselbe Karte betrachten — Systeme, Verbindungen, Umbenennen/Sperren, Signaturen, Strukturen und Zusammenführungen erscheinen für andere Betrachter innerhalb von Augenblicken, ohne Neuladen. Pro Karte gestreamt (du erhältst nur Ereignisse für Karten, die du sehen kannst), mit echo-unterdrückten eigenen Änderungen und automatischer Resynchronisierung beim erneuten Verbinden."
       },
       "mapLocking": {
         "title": "Karten-Sperre",
@@ -867,7 +867,7 @@
       },
       "systemPanel": {
         "title": "System-Panel",
-        "desc": "Karten pro System für Signaturen, Strukturen, NPC-Stationen, Notizen, Killboard und Aktivitätsdiagramme. Die Karten sind per Drag-and-Drop umsortierbar und bleiben pro Benutzer erhalten."
+        "desc": "Kacheln pro System für Signaturen, Strukturen, NPC-Stationen, Notizen, Killboard und Aktivitätsdiagramme. Die Kacheln sind per Drag-and-Drop umsortierbar und bleiben pro Benutzer erhalten."
       },
       "sigMgmt": {
         "title": "Signaturverwaltung",
@@ -899,7 +899,7 @@
       },
       "standings": {
         "title": "Standings-Overlay",
-        "desc": "Deine EVE-Kontaktliste (persönlich, Corp und Allianz — bei der Anmeldung über ESI abgerufen und auf Anfrage erneut abrufbar) treibt eine kettenweite visuelle Ebene an. Sov-Halter zeigen inline P/C/A-Standing-Pillen; Strukturen, die über ihre EVE-Struktur-ID aufgelöst werden, färben sich nach dem Standing der Besitzer-Corp; Knoten von Sov-Halter-Systemen erhalten einen farbigen Heiligenschein, damit feindliches Territorium auf der Karte heraussticht."
+        "desc": "Deine EVE-Kontaktliste (persönlich, Corp und Allianz — bei der Anmeldung über ESI abgerufen und auf Anfrage erneut abrufbar) treibt eine kettenweite visuelle Ebene an. Sov-Halter zeigen inline P/C/A-Standing-Pillen; Strukturen, die über ihre EVE-Struktur-ID aufgelöst werden, färben sich nach dem Standing der Besitzer-Corp; Knoten von Sov-Halter-Systemen erhalten einen farbigen Halo, damit feindliches Territorium auf der Karte heraussticht."
       },
       "scout": {
         "title": "Scout-Verbindungen",
@@ -918,7 +918,7 @@
         "desc": "Aktive Nullsec-Stürme — Electric, Gamma, Exotic, Plasma — bezogen aus dem von der Community gepflegten EveScout-Rescue-Stormtrack-Feed erscheinen als farbcodiertes ⚡ an passenden Systemknoten. Der Tooltip zeigt Sturmname, letzte Meldung und Melder. Alle 30 Minuten aktualisiert."
       },
       "proximity": {
-        "title": "Näherungsalarme",
+        "title": "Näherungswarnungen",
         "desc": "Browser-Benachrichtigung plus ein Audio-Ping, wenn du innerhalb einer konfigurierbaren Anzahl von Sprüngen einer aktiven Inkursion, eines Piratenaufstands oder eines Sov-haltenden Systems bist, dessen Corp / Allianz du auf rot gesetzt hast. Ein dauerhafter Toolbar-Chip zeigt die nächste Bedrohung auf einen Blick."
       },
       "discordNotif": {
@@ -951,7 +951,7 @@
       },
       "killHighlights": {
         "title": "Hervorhebung aktueller Kills",
-        "desc": "Systeme mit Kills in der letzten Stunde erhalten einen farbigen Heiligenschein, sodass du frische Aktivität auf einen Blick über die ganze Kette siehst."
+        "desc": "Systeme mit Kills in der letzten Stunde erhalten einen farbigen Halo, sodass du frische Aktivität auf einen Blick über die ganze Kette siehst."
       },
       "userStats": {
         "title": "Benutzerstatistik-Fenster",
@@ -967,7 +967,7 @@
       },
       "sidebar": {
         "title": "Einklappbare Seitenleiste",
-        "desc": "Kartenoptionen, Verbindungen, Näherungsalarme, Verblassen veralteter Systeme und Tastenkürzel lassen sich jeweils unabhängig auf- oder zuklappen. Der Zustand pro Abschnitt bleibt pro Browser über localStorage erhalten."
+        "desc": "Kartenoptionen, Verbindungen, Näherungswarnungen, Veraltete Systeme abblenden und Tastenkürzel lassen sich jeweils unabhängig auf- oder zuklappen. Der Zustand pro Abschnitt bleibt pro Browser über localStorage erhalten."
       }
     },
     "corpFeatures": {
@@ -1012,7 +1012,7 @@
         "desc": "Sigs, Strukturen sowie System-Hinzufügen- / -Löschen-Aktionen werden mit dem Benutzer erfasst, der sie ausgeführt hat, sodass Berichte ohne manuelle Protokollierung beantworten können, \"wer was gescannt hat\"."
       }
     },
-    "forCorpsBody": "Betreibe Nexum als gemeinsames Deployment für deine Corp oder Allianz. Mitglieder erhalten für die Corp sichtbare Kettenkarten und private persönliche Karten in einem Tool, mit rollenbasierten Berechtigungen, Admin-Werkzeugen und Aktivitätsberichten pro Charakter.",
+    "forCorpsBody": "Betreibe Nexum als gemeinsames Deployment für deine Corp oder Allianz. Mitglieder erhalten für die Corp sichtbare Kettenkarten und private persönliche Karten in einem Tool, mit rollenbasierten Berechtigungen, Admin-Tools und Aktivitätsberichten pro Charakter.",
     "compareBody": "Sieh, wie sich Nexum gegen Pathfinder, Tripwire und Wanderer schlägt — Funktionen, Hosting und Kosten, direkt nebeneinander.",
     "compareLink": "Nexum vs Pathfinder, Tripwire & Wanderer vergleichen →",
     "discordCtaBody": "Komm in den Nexum-Discord — Feedback, Feature-Wünsche, Scanning-Chat und o7s sind alle willkommen.",
@@ -1071,7 +1071,7 @@
     "stormLastReport": "Letzte Meldung: {{value}}",
     "stormReportedBy": "Von: {{value}}",
     "statics": "Statics",
-    "staging": "Staging",
+    "staging": "Sammelpunkt",
     "incursionBadge": "Inkursion",
     "corrupted": "Korrumpiert",
     "suppressed": "Unterdrückt",
