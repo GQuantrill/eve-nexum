@@ -123,7 +123,7 @@
 .sidebar {
   width: 18vw;
   min-width: 180px;
-  max-width: 360px;
+  max-width: 300px;
   background: #0d1117;
   display: flex;
   flex-direction: column;
@@ -1064,6 +1064,8 @@
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: #5a6a8a;
+  text-align: start;
+
 }
 
 .map-sidebar__section-header {
