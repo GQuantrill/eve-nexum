@@ -22,15 +22,16 @@ const ROLES: Role[] = ['admin', 'full', 'edit', 'readonly'];
 
 type Tab = 'users' | 'maps' | 'reports' | 'audit' | 'discord';
 
-const ALL_TABS: { key: Tab; label: string; path: string }[] = [
-  { key: 'users',   label: 'Users',     path: '/admin/users'   },
-  { key: 'maps',    label: 'Maps',      path: '/admin/maps'    },
-  { key: 'reports', label: 'Reports',   path: '/admin/reports' },
-  { key: 'discord', label: 'Discord',   path: '/admin/discord' },
-  { key: 'audit',   label: 'Audit log', path: '/admin/audit'   },
+const ALL_TABS: { key: Tab; path: string }[] = [
+  { key: 'users',   path: '/admin/users'   },
+  { key: 'maps',    path: '/admin/maps'    },
+  { key: 'reports', path: '/admin/reports' },
+  { key: 'discord', path: '/admin/discord' },
+  { key: 'audit',   path: '/admin/audit'   },
 ];
 
 export function AdminPage() {
+  const { t } = useTranslation();
   const [path, navigate] = useHashRoute();
   const { user } = useAuth();
   const isAdmin = user?.role === 'admin';
@@ -48,16 +49,16 @@ export function AdminPage() {
   return (
     <div className="admin-page">
       <aside className="admin-page__nav">
-        <button className="admin-page__back" onClick={() => navigate('/')}>← Back to maps</button>
-        <h1 className="admin-page__title">Admin</h1>
+        <button className="admin-page__back" onClick={() => navigate('/')}>← {t('admin.back')}</button>
+        <h1 className="admin-page__title">{t('admin.title')}</h1>
         <nav className="admin-page__tabs">
-          {tabs.map((t) => (
+          {tabs.map((tb) => (
             <button
-              key={t.key}
-              className={`admin-page__tab${tab === t.key ? ' admin-page__tab--active' : ''}`}
-              onClick={() => navigate(t.path)}
+              key={tb.key}
+              className={`admin-page__tab${tab === tb.key ? ' admin-page__tab--active' : ''}`}
+              onClick={() => navigate(tb.path)}
             >
-              {t.label}
+              {t(`admin.tabs.${tb.key}`)}
             </button>
           ))}
         </nav>
@@ -175,9 +176,9 @@ function UsersTab() {
       setUsers(r.users);
       setError(null);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to load users');
+      setError(e instanceof Error ? e.message : t('admin.users.loadFailed'));
     }
-  }, []);
+  }, [t]);
 
   // load() is async and only setStates after its await (never synchronously),
   // so this fetch-on-mount of a reusable loader is safe; the rule is a false
@@ -195,7 +196,7 @@ function UsersTab() {
       });
       await load();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Role change failed');
+      setError(e instanceof Error ? e.message : t('admin.users.roleChangeFailed'));
     } finally {
       setBusyId(null);
     }
@@ -207,7 +208,7 @@ function UsersTab() {
       await api(`/api/admin/users/${u.id}/${blocked ? 'block' : 'unblock'}`, { method: 'POST' });
       await load();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Block change failed');
+      setError(e instanceof Error ? e.message : t('admin.users.blockChangeFailed'));
     } finally {
       setBusyId(null);
       setBlockTarget(null);
@@ -220,7 +221,7 @@ function UsersTab() {
       await api(`/api/admin/users/${u.id}/recheck-corp`, { method: 'POST' });
       await load();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Recheck failed');
+      setError(e instanceof Error ? e.message : t('admin.users.recheckFailed'));
     } finally {
       setBusyId(null);
     }
@@ -228,20 +229,20 @@ function UsersTab() {
 
   return (
     <>
-      <h2 className="admin-page__section-title">Users</h2>
+      <h2 className="admin-page__section-title">{t('admin.users.title')}</h2>
       {error && <div className="admin-page__error">{error}</div>}
-      {!users && !error && <div className="admin-page__loading">Loading…</div>}
-      {users && !users.length && <div className="admin-page__empty">No users yet.</div>}
+      {!users && !error && <div className="admin-page__loading">{t('admin.loading')}</div>}
+      {users && !users.length && <div className="admin-page__empty">{t('admin.users.none')}</div>}
       {users && users.length > 0 && (
         <table className="admin-modal__table">
           <thead>
             <tr>
-              <SortableTh col="characterName"  label="Character"  sort={sort} onToggle={toggleSort} />
-              <SortableTh col="corpTicker"     label="Corp"       sort={sort} onToggle={toggleSort} />
-              <SortableTh col="allianceTicker" label="Alliance"   sort={sort} onToggle={toggleSort} />
-              <SortableTh col="role"           label="Role"       sort={sort} onToggle={toggleSort} />
-              <SortableTh col="blocked"        label="Status"     sort={sort} onToggle={toggleSort} />
-              <SortableTh col="lastLogin"      label="Last login" sort={sort} onToggle={toggleSort} />
+              <SortableTh col="characterName"  label={t('admin.users.colCharacter')} sort={sort} onToggle={toggleSort} />
+              <SortableTh col="corpTicker"     label={t('admin.users.colCorp')}      sort={sort} onToggle={toggleSort} />
+              <SortableTh col="allianceTicker" label={t('admin.users.colAlliance')}  sort={sort} onToggle={toggleSort} />
+              <SortableTh col="role"           label={t('admin.users.colRole')}      sort={sort} onToggle={toggleSort} />
+              <SortableTh col="blocked"        label={t('admin.users.colStatus')}    sort={sort} onToggle={toggleSort} />
+              <SortableTh col="lastLogin"      label={t('admin.users.colLastLogin')} sort={sort} onToggle={toggleSort} />
               {canEdit && <th />}
             </tr>
           </thead>
@@ -258,7 +259,7 @@ function UsersTab() {
                       alt=""
                     />
                     <span>{u.characterName}</span>
-                    {isSelf && <span className="admin-modal__self-tag">you</span>}
+                    {isSelf && <span className="admin-modal__self-tag">{t('admin.users.you')}</span>}
                   </td>
                   <td title={u.corpName ?? undefined}>
                     {u.corpTicker
@@ -286,15 +287,15 @@ function UsersTab() {
                   </td>
                   <td>
                     {u.blocked
-                      ? <span className="admin-modal__pill admin-modal__pill--blocked">blocked</span>
-                      : <span className="admin-modal__pill admin-modal__pill--ok">active</span>}
+                      ? <span className="admin-modal__pill admin-modal__pill--blocked">{t('admin.users.blocked')}</span>
+                      : <span className="admin-modal__pill admin-modal__pill--ok">{t('admin.users.active')}</span>}
                   </td>
                   <td className="admin-modal__when">{formatRelative(t, u.lastLogin)}</td>
                   {canEdit && (
                     <td className="admin-modal__actions">
                       {u.blocked ? (
                         <button className="btn btn--ghost btn--sm" disabled={isBusy} onClick={() => setBlocked(u, false)}>
-                          Unblock
+                          {t('admin.users.unblock')}
                         </button>
                       ) : (
                         <button
@@ -302,16 +303,16 @@ function UsersTab() {
                           disabled={isBusy || isSelf}
                           onClick={() => setBlockTarget(u)}
                         >
-                          Block
+                          {t('admin.users.block')}
                         </button>
                       )}
                       <button
                         className="btn btn--ghost btn--sm"
                         disabled={isBusy}
                         onClick={() => recheckCorp(u)}
-                        title="Re-query ESI for this user's current corp"
+                        title={t('admin.users.recheckTitle')}
                       >
-                        Recheck
+                        {t('admin.users.recheck')}
                       </button>
                     </td>
                   )}
@@ -324,7 +325,7 @@ function UsersTab() {
 
       {blockTarget && (
         <ConfirmModal
-          message={`Block ${blockTarget.characterName}? They'll be signed out at their next request.`}
+          message={t('admin.users.blockConfirm', { name: blockTarget.characterName })}
           onCancel={() => setBlockTarget(null)}
           onConfirm={() => setBlocked(blockTarget, true)}
         />
@@ -364,9 +365,9 @@ function MapsTab() {
       setMaps(r.maps);
       setError(null);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to load maps');
+      setError(e instanceof Error ? e.message : t('admin.maps.loadFailed'));
     }
-  }, []);
+  }, [t]);
 
   // load() is async and only setStates after its await (never synchronously),
   // so this fetch-on-mount of a reusable loader is safe; the rule is a false
@@ -380,7 +381,7 @@ function MapsTab() {
       await api(`/api/admin/maps/${m.id}/${locked ? 'lock' : 'unlock'}`, { method: 'POST' });
       await load();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Lock change failed');
+      setError(e instanceof Error ? e.message : t('admin.maps.lockChangeFailed'));
     } finally {
       setBusyId(null);
     }
@@ -392,7 +393,7 @@ function MapsTab() {
       await api(`/api/admin/maps/${m.id}`, { method: 'DELETE' });
       await load();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Delete failed');
+      setError(e instanceof Error ? e.message : t('admin.maps.deleteFailed'));
     } finally {
       setBusyId(null);
       setDeleteTarget(null);
@@ -401,21 +402,21 @@ function MapsTab() {
 
   return (
     <>
-      <h2 className="admin-page__section-title">Maps</h2>
+      <h2 className="admin-page__section-title">{t('admin.maps.title')}</h2>
       {error && <div className="admin-page__error">{error}</div>}
-      {!maps && !error && <div className="admin-page__loading">Loading…</div>}
-      {maps && !maps.length && <div className="admin-page__empty">No maps yet.</div>}
+      {!maps && !error && <div className="admin-page__loading">{t('admin.loading')}</div>}
+      {maps && !maps.length && <div className="admin-page__empty">{t('admin.maps.none')}</div>}
       {maps && maps.length > 0 && (
         <table className="admin-modal__table">
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Owner</th>
-              <th>Corp</th>
-              <th>Systems</th>
-              <th>Connections</th>
-              <th>Lock</th>
-              <th>Last active</th>
+              <th>{t('admin.maps.colName')}</th>
+              <th>{t('admin.maps.colOwner')}</th>
+              <th>{t('admin.maps.colCorp')}</th>
+              <th>{t('admin.maps.colSystems')}</th>
+              <th>{t('admin.maps.colConnections')}</th>
+              <th>{t('admin.maps.colLock')}</th>
+              <th>{t('admin.maps.colLastActive')}</th>
               <th />
             </tr>
           </thead>
@@ -442,8 +443,8 @@ function MapsTab() {
                   <td className="admin-modal__num">{m.connectionCount}</td>
                   <td>
                     {m.locked
-                      ? <span className="admin-modal__pill admin-modal__pill--blocked">locked</span>
-                      : <span className="admin-modal__pill admin-modal__pill--ok">open</span>}
+                      ? <span className="admin-modal__pill admin-modal__pill--blocked">{t('admin.maps.locked')}</span>
+                      : <span className="admin-modal__pill admin-modal__pill--ok">{t('admin.maps.open')}</span>}
                   </td>
                   <td className="admin-modal__when">{formatRelative(t, m.lastActiveAt)}</td>
                   <td className="admin-modal__actions">
@@ -452,18 +453,18 @@ function MapsTab() {
                         className="btn btn--ghost btn--sm"
                         disabled={isBusy}
                         onClick={() => setLock(m, false)}
-                        title="Unfreeze the map; systems and connections become editable again"
+                        title={t('admin.maps.unlockTitle')}
                       >
-                        Unlock
+                        {t('admin.maps.unlock')}
                       </button>
                     ) : (
                       <button
                         className="btn btn--ghost btn--sm"
                         disabled={isBusy}
                         onClick={() => setLock(m, true)}
-                        title="Freeze systems and connections; signatures/structures/notes stay editable"
+                        title={t('admin.maps.lockTitle')}
                       >
-                        Lock
+                        {t('admin.maps.lock')}
                       </button>
                     )}
                     <button
@@ -471,7 +472,7 @@ function MapsTab() {
                       disabled={isBusy}
                       onClick={() => setDeleteTarget(m)}
                     >
-                      Delete
+                      {t('actions.delete')}
                     </button>
                   </td>
                 </tr>
@@ -483,7 +484,7 @@ function MapsTab() {
 
       {deleteTarget && (
         <ConfirmModal
-          message={`Force-delete "${deleteTarget.name}" (owned by ${deleteTarget.ownerCharacterName})? This cannot be undone.`}
+          message={t('admin.maps.deleteConfirm', { name: deleteTarget.name, owner: deleteTarget.ownerCharacterName })}
           onCancel={() => setDeleteTarget(null)}
           onConfirm={() => destroy(deleteTarget)}
         />
@@ -1216,8 +1217,8 @@ function AuditTab() {
   useEffect(() => {
     api<{ entries: AuditEntry[] }>('/api/admin/audit')
       .then((r) => setEntries(r.entries))
-      .catch((e) => setError(e instanceof Error ? e.message : 'Failed to load audit log'));
-  }, []);
+      .catch((e) => setError(e instanceof Error ? e.message : t('admin.audit.loadFailed')));
+  }, [t]);
 
   function downloadCsv() {
     if (!entries) return;
@@ -1245,25 +1246,25 @@ function AuditTab() {
   return (
     <>
       <div className="admin-page__section-bar">
-        <h2 className="admin-page__section-title">Audit log</h2>
+        <h2 className="admin-page__section-title">{t('admin.audit.title')}</h2>
         {entries && entries.length > 0 && (
           <button className="btn btn--ghost btn--sm" onClick={downloadCsv}>
-            ↓ Export as CSV
+            ↓ {t('admin.exportCsv')}
           </button>
         )}
       </div>
       {error && <div className="admin-page__error">{error}</div>}
-      {!entries && !error && <div className="admin-page__loading">Loading…</div>}
-      {entries && !entries.length && <div className="admin-page__empty">No admin actions yet.</div>}
+      {!entries && !error && <div className="admin-page__loading">{t('admin.loading')}</div>}
+      {entries && !entries.length && <div className="admin-page__empty">{t('admin.audit.none')}</div>}
       {entries && entries.length > 0 && (
         <table className="admin-modal__table">
           <thead>
             <tr>
-              <th>When</th>
-              <th>Actor</th>
-              <th>Action</th>
-              <th>Target</th>
-              <th>Change</th>
+              <th>{t('admin.audit.colWhen')}</th>
+              <th>{t('admin.audit.colActor')}</th>
+              <th>{t('admin.audit.colAction')}</th>
+              <th>{t('admin.audit.colTarget')}</th>
+              <th>{t('admin.audit.colChange')}</th>
             </tr>
           </thead>
           <tbody>
