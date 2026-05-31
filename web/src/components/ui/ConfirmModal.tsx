@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 
 const SKIP_KEY = 'nexum.skipDeleteConfirm';
 
@@ -15,8 +16,13 @@ interface Props {
   showDontAskAgain?: boolean;
 }
 
-export function ConfirmModal({ message, onConfirm, onCancel, confirmLabel = 'Delete', showDontAskAgain = true }: Props) {
+export function ConfirmModal({ message, onConfirm, onCancel, confirmLabel, showDontAskAgain = true }: Props) {
+  const { t } = useTranslation();
   const [dontShowAgain, setDontShowAgain] = useState(false);
+
+  // No custom label → the default "delete" action, which gets danger styling.
+  const isDelete = confirmLabel === undefined;
+  const label = confirmLabel ?? t('actions.delete');
 
   const handleConfirm = () => {
     if (showDontAskAgain && dontShowAgain) localStorage.setItem(SKIP_KEY, 'true');
@@ -27,7 +33,7 @@ export function ConfirmModal({ message, onConfirm, onCancel, confirmLabel = 'Del
     <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) onCancel(); }}>
       <div className="modal confirm-modal">
         <div className="modal__header">
-          <h2 className="modal__title">Are you sure?</h2>
+          <h2 className="modal__title">{t('confirm.title')}</h2>
         </div>
         <div className="modal__body">
           <p className="confirm-modal__message">{message}</p>
@@ -39,16 +45,16 @@ export function ConfirmModal({ message, onConfirm, onCancel, confirmLabel = 'Del
                 checked={dontShowAgain}
                 onChange={(e) => setDontShowAgain(e.target.checked)}
               />
-              Don't show this again
+              {t('confirm.dontShowAgain')}
             </label>
           )}
           <div className="modal__actions">
-            <button className="btn btn--ghost" onClick={onCancel}>Cancel</button>
+            <button className="btn btn--ghost" onClick={onCancel}>{t('actions.cancel')}</button>
             <button
-              className={confirmLabel === 'Delete' ? 'btn btn--danger' : 'btn btn--primary'}
+              className={isDelete ? 'btn btn--danger' : 'btn btn--primary'}
               onClick={handleConfirm}
             >
-              {confirmLabel}
+              {label}
             </button>
           </div>
         </div>

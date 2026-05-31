@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import type { DragEndEvent } from '@dnd-kit/core';
 import { SortableContext, useSortable, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
@@ -12,6 +13,7 @@ import { useEsiSearch } from '../../hooks/useEsiSearch';
 import { useMapStore } from '../../store/mapStore';
 import { useUserSetting } from '../../hooks/useUserSetting';
 import { setWaypoint, RouteSquares, KSPACE_CLASSES } from './routeUi';
+import { jumps as jumpsLabel } from '../../i18n/format';
 
 // EVE system IDs for the major trade hubs. Used as the initial seed only —
 // once the user has touched the list, theirs wins.
@@ -67,6 +69,7 @@ interface RowProps {
 }
 
 function Row({ item, route, isOpen, onToggle, onRemove, routeMode }: RowProps) {
+  const { t } = useTranslation();
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: String(item.id) });
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -79,7 +82,7 @@ function Row({ item, route, isOpen, onToggle, onRemove, routeMode }: RowProps) {
         <button
           type="button"
           className="scout-row__drag"
-          title="Drag to reorder"
+          title={t('closest.dragToReorder')}
           {...listeners}
           {...attributes}
         >
@@ -87,7 +90,7 @@ function Row({ item, route, isOpen, onToggle, onRemove, routeMode }: RowProps) {
         </button>
         <span className="scout-row__name">{item.name}</span>
         {item.isHome && (
-          <span className="scout-row__home" aria-label="Home" data-tooltip="Home">
+          <span className="scout-row__home" aria-label={t('closest.home')} data-tooltip={t('closest.home')}>
             <HouseIcon size={14} weight="regular" color="#f0c040" />
           </span>
         )}
@@ -95,14 +98,14 @@ function Row({ item, route, isOpen, onToggle, onRemove, routeMode }: RowProps) {
 
       <div className="scout-row__actions">
         <span className="scout-row__jumps">
-          {route ? `${route.jumps} jumps` : '— jumps'}
+          {route ? jumpsLabel(t, route.jumps) : t('closest.noJumps')}
         </span>
         <button
           type="button"
           className="sys-btn scout-row__btn scout-row__btn--icon"
           onClick={() => setWaypoint(item.id, item.name, true)}
-          aria-label="Set Destination"
-          data-tooltip="Set Destination"
+          aria-label={t('waypoint.setDestination')}
+          data-tooltip={t('waypoint.setDestination')}
         >
           <MapPinSimpleIcon size={14} weight="regular" color="#3ddc84" />
         </button>
@@ -110,8 +113,8 @@ function Row({ item, route, isOpen, onToggle, onRemove, routeMode }: RowProps) {
           type="button"
           className="sys-btn scout-row__btn scout-row__btn--icon"
           onClick={() => setWaypoint(item.id, item.name, false)}
-          aria-label="Add Waypoint"
-          data-tooltip="Add Waypoint"
+          aria-label={t('waypoint.addWaypoint')}
+          data-tooltip={t('waypoint.addWaypoint')}
         >
           <PathIcon size={14} weight="regular" color="#5a9af8" />
         </button>
@@ -122,7 +125,10 @@ function Row({ item, route, isOpen, onToggle, onRemove, routeMode }: RowProps) {
             onClick={onToggle}
             aria-expanded={isOpen}
           >
-            {isOpen ? `Hide ${routeMode} route` : `Show ${routeMode} route`}
+            {(() => {
+              const mode = routeMode === 'secure' ? t('a0.modeSecure') : t('a0.modeShortest');
+              return isOpen ? t('a0.hideRoute', { mode }) : t('a0.showRoute', { mode });
+            })()}
           </button>
         )}
         {onRemove && (
@@ -130,8 +136,8 @@ function Row({ item, route, isOpen, onToggle, onRemove, routeMode }: RowProps) {
             type="button"
             className="sys-btn scout-row__btn scout-row__btn--icon"
             onClick={onRemove}
-            aria-label="Remove from list"
-            data-tooltip="Remove from list"
+            aria-label={t('closest.removeFromList')}
+            data-tooltip={t('closest.removeFromList')}
           >
             <XIcon size={14} weight="regular" color="#e25a5a" />
           </button>
@@ -144,6 +150,7 @@ function Row({ item, route, isOpen, onToggle, onRemove, routeMode }: RowProps) {
 }
 
 export function ClosestSystemsPane() {
+  const { t } = useTranslation();
   const location  = useCharacterLocation();
   const routeMode = useMapStore((s) => s.routeMode);
   const homeSystem = useMapStore(useShallow((s) => {
@@ -263,7 +270,7 @@ export function ClosestSystemsPane() {
   if (!canRoute) {
     return (
       <div className="scout-pane__empty">
-        Sign in and dock in K-space to see jumps to hubs.
+        {t('closest.signIn')}
       </div>
     );
   }
@@ -327,7 +334,7 @@ export function ClosestSystemsPane() {
           className="sys-btn scout-pane__add"
           onClick={() => setAdding(true)}
         >
-          <PlusIcon size={14} weight="bold" /> Add System
+          <PlusIcon size={14} weight="bold" /> {t('addSystem.add')}
         </button>
       ) : (
         <div className="scout-pane__add-row" ref={addRowRef}>
@@ -335,7 +342,7 @@ export function ClosestSystemsPane() {
             ref={inputRef}
             className="scout-pane__add-input"
             type="text"
-            placeholder="Search system name…"
+            placeholder={t('closest.searchPlaceholder')}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleAddKeyDown}
@@ -346,8 +353,8 @@ export function ClosestSystemsPane() {
             className="sys-btn scout-row__btn scout-row__btn--icon"
             onMouseDown={(e) => e.preventDefault()}
             onClick={() => { setAdding(false); setQuery(''); }}
-            aria-label="Cancel"
-            data-tooltip="Cancel"
+            aria-label={t('actions.cancel')}
+            data-tooltip={t('actions.cancel')}
           >
             <XIcon size={14} weight="regular" color="#e25a5a" />
           </button>
@@ -378,7 +385,7 @@ export function ClosestSystemsPane() {
               >
                 <span className="scout-pane__add-result-name">{r.name}</span>
                 <span className="scout-pane__add-result-region">
-                  {already ? 'on list' : (r.regionName ?? r.systemClass)}
+                  {already ? t('closest.onList') : (r.regionName ?? r.systemClass)}
                 </span>
               </li>
             );
@@ -392,7 +399,7 @@ export function ClosestSystemsPane() {
           className="scout-pane__add-empty"
           style={{ position: 'fixed', top: dropdownPos.top, left: dropdownPos.left, width: dropdownPos.width }}
         >
-          No systems match "{query}"
+          {t('closest.noMatch', { query })}
         </div>,
         document.body,
       )}

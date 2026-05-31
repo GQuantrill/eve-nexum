@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 import { XIcon } from '@phosphor-icons/react';
 import { api } from '../../api/client';
 import { useMapStore } from '../../store/mapStore';
@@ -21,6 +22,7 @@ const MAX_REGION_RESULTS = 8;
 // systems + stargates (POST /api/maps/from-region). Replaces the old dual
 // "+ Personal/Corp Map" buttons and the name PromptModal.
 export function CreateMapModal({ onClose }: { onClose: () => void }) {
+  const { t } = useTranslation();
   const maps         = useMapStore((s) => s.maps);
   const maxMaps      = useMapStore((s) => s.maxMaps);
   const maxCorpMaps  = useMapStore((s) => s.maxCorpMaps);
@@ -81,13 +83,13 @@ export function CreateMapModal({ onClose }: { onClose: () => void }) {
       const trimmed = name.trim();
       if (region) {
         await createFromRegion(region.id, trimmed, isCorp);
-        toast.success(`Created "${trimmed}" from ${region.name}`);
+        toast.success(t('createMap.created', { name: trimmed, region: region.name }));
       } else {
         await createMap(trimmed, isCorp);
       }
       onClose();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to create map');
+      setError(e instanceof Error ? e.message : t('createMap.createFailed'));
     } finally {
       setBusy(false);
     }
@@ -97,20 +99,20 @@ export function CreateMapModal({ onClose }: { onClose: () => void }) {
     <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="modal" role="dialog" aria-modal="true">
         <div className="modal__header">
-          <h2 className="modal__title">New Map</h2>
-          <button className="icon-btn" onClick={onClose} aria-label="Close">
+          <h2 className="modal__title">{t('createMap.title')}</h2>
+          <button className="icon-btn" onClick={onClose} aria-label={t('actions.close')}>
             <XIcon size={16} weight="bold" />
           </button>
         </div>
 
         <div className="modal__body">
           <label className="field">
-            <span>Map name</span>
+            <span>{t('createMap.mapName')}</span>
             <input
               type="text"
               value={name}
               autoFocus
-              placeholder="New Map"
+              placeholder={t('createMap.namePlaceholder')}
               onChange={(e) => { setName(e.target.value); setNameTouched(true); }}
               maxLength={200}
             />
@@ -118,29 +120,29 @@ export function CreateMapModal({ onClose }: { onClose: () => void }) {
 
           {canCorp && (
             <label className="field">
-              <span>Type</span>
+              <span>{t('createMap.type')}</span>
               <select value={isCorp ? 'corp' : 'personal'} onChange={(e) => setIsCorp(e.target.value === 'corp')}>
-                <option value="personal">Personal</option>
-                <option value="corp">Corp</option>
+                <option value="personal">{t('createMap.personal')}</option>
+                <option value="corp">{t('createMap.corp')}</option>
               </select>
             </label>
           )}
 
           <div className="field">
-            <span>Region (optional — blank for an empty map)</span>
+            <span>{t('createMap.regionLabel')}</span>
             <div className="search-field">
               <div className="search-field__wrap">
                 <input
                   type="text"
                   className={`search-field__input${region ? ' search-field__input--selected' : ''}`}
                   value={query}
-                  placeholder="Type to search regions…"
+                  placeholder={t('createMap.regionPlaceholder')}
                   autoComplete="off"
                   readOnly={!!region}
                   onChange={(e) => setQuery(e.target.value)}
                 />
                 {region && (
-                  <button type="button" className="search-field__clear" onClick={clearRegion} aria-label="Clear region">
+                  <button type="button" className="search-field__clear" onClick={clearRegion} aria-label={t('createMap.clearRegion')}>
                     ✕
                   </button>
                 )}
@@ -156,7 +158,7 @@ export function CreateMapModal({ onClose }: { onClose: () => void }) {
                       onMouseDown={(e) => { e.preventDefault(); selectRegion(r); }}
                     >
                       <span>{r.name}</span>
-                      <span className="search-results__class">{r.systemCount} systems</span>
+                      <span className="search-results__class">{t('units.systems', { count: r.systemCount })}</span>
                     </li>
                   ))}
                 </ul>
@@ -166,21 +168,20 @@ export function CreateMapModal({ onClose }: { onClose: () => void }) {
 
           {region && (
             <div className="map-sidebar__hint">
-              Seeds {region.systemCount} systems from {region.name}, positioned by their
-              in-game coordinates with all stargate links.
+              {t('createMap.regionHint', { count: region.systemCount, region: region.name })}
             </div>
           )}
           {limitForChoice && (
             <div className="map-sidebar__hint map-sidebar__hint--error">
-              {isCorp ? `Corp map limit reached (${maxCorpMaps}).` : `Personal map limit reached (${maxMaps}).`}
+              {isCorp ? t('createMap.corpLimit', { max: maxCorpMaps }) : t('createMap.personalLimit', { max: maxMaps })}
             </div>
           )}
           {error && <div className="map-sidebar__hint map-sidebar__hint--error">{error}</div>}
 
           <div className="modal__actions">
-            <button type="button" className="btn btn--ghost" onClick={onClose} disabled={busy}>Cancel</button>
+            <button type="button" className="btn btn--ghost" onClick={onClose} disabled={busy}>{t('actions.cancel')}</button>
             <button type="button" className="btn btn--primary" onClick={submit} disabled={!canSubmit}>
-              {busy ? 'Creating…' : 'Create map'}
+              {busy ? t('createMap.creating') : t('createMap.create')}
             </button>
           </div>
         </div>

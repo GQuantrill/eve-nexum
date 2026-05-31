@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useMapStore } from '../../store/mapStore';
 import { useRoute } from '../../hooks/useRoute';
 import type { SystemClass } from '../../types';
@@ -10,11 +11,6 @@ const JITA_SYSTEM_ID = 30000142;
 type ExitClass = 'HS' | 'LS' | 'NS';
 
 const EXIT_CLASSES: ExitClass[] = ['HS', 'LS', 'NS'];
-const EXIT_LABEL: Record<ExitClass, string> = {
-  HS: 'High-sec',
-  LS: 'Low-sec',
-  NS: 'Null-sec',
-};
 const EXIT_COLOR: Record<ExitClass, string> = {
   HS: '#4dd9ac',
   LS: '#f0a030',
@@ -34,7 +30,13 @@ interface ExitRow {
 }
 
 export function ChainExitsSection() {
+  const { t } = useTranslation();
   const systems = useMapStore((s) => s.map.systems);
+  const exitLabel: Record<ExitClass, string> = {
+    HS: t('chainExits.highSec'),
+    LS: t('chainExits.lowSec'),
+    NS: t('chainExits.nullSec'),
+  };
 
   // Pull every K-space system on the map that has a resolved EVE id (synthetic
   // systems without one can't be routed). Ordering doesn't matter here —
@@ -92,7 +94,7 @@ export function ChainExitsSection() {
   if (exits.length === 0) {
     return (
       <div className="map-sidebar__hint">
-        No K-space exits in this chain.
+        {t('chainExits.noExits')}
       </div>
     );
   }
@@ -100,8 +102,7 @@ export function ChainExitsSection() {
   return (
     <>
       <div className="map-sidebar__hint">
-        K-space systems currently on the map, by security class. Jita route is
-        gates-only — wormhole shortcuts not counted.
+        {t('chainExits.hint')}
       </div>
 
       <div className="chain-exits__chips">
@@ -111,15 +112,15 @@ export function ChainExitsSection() {
             className="chain-exits__chip"
             style={{ borderColor: EXIT_COLOR[c], color: EXIT_COLOR[c] }}
           >
-            <strong>{counts[c]}</strong> {EXIT_LABEL[c]}
+            <strong>{counts[c]}</strong> {exitLabel[c]}
           </span>
         ))}
       </div>
 
       {nearest && (
         <div className="chain-exits__nearest">
-          Nearest Jita:{' '}
-          <strong>{nearest.jumps}j</strong> via{' '}
+          {t('chainExits.nearestJita')}{' '}
+          <strong>{nearest.jumps}j</strong> {t('chainExits.via')}{' '}
           <span style={{ color: EXIT_COLOR[nearest.klass] }}>{nearest.name}</span>
         </div>
       )}

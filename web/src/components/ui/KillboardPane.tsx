@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { useKillboard } from '../../hooks/useKillboard';
 import { useStandings } from '../../hooks/useStandings';
 import { useUserSetting } from '../../hooks/useUserSetting';
+import { abbreviateValue } from '../../i18n/format';
 import type { ZkbKill } from '../../hooks/useKillboard';
 
 const NPC_TOGGLE_KEY = 'nexum.killboardIncludeNpc';
@@ -17,20 +20,13 @@ const ZKB     = 'https://zkillboard.com';
 // force) rather than a small gang. Tune to taste.
 const GANK_THRESHOLD = 10;
 
-function formatIsk(v: number): string {
-  if (v >= 1e9) return `${(v / 1e9).toFixed(1)}B`;
-  if (v >= 1e6) return `${(v / 1e6).toFixed(1)}M`;
-  if (v >= 1e3) return `${(v / 1e3).toFixed(0)}K`;
-  return String(Math.round(v));
-}
-
-function timeAgo(iso: string): string {
+function timeAgo(t: TFunction, iso: string): string {
   const diffMs = Date.now() - new Date(iso).getTime();
   const h = Math.floor(diffMs / 3_600_000);
   const m = Math.floor((diffMs % 3_600_000) / 60_000);
-  if (h >= 24) return `${Math.floor(h / 24)}d ago`;
-  if (h > 0)   return `${h}h ${m}m ago`;
-  return m <= 0 ? 'just now' : `${m}m ago`;
+  if (h >= 24) return t('time.daysAgo', { value: Math.floor(h / 24) });
+  if (h > 0)   return t('killboard.hoursMinutesAgo', { hours: h, minutes: m });
+  return m <= 0 ? t('time.justNow') : t('time.minutesAgo', { value: m });
 }
 
 function ZkbLink({ href, tip, children }: { href: string; tip: string; children: React.ReactNode }) {
@@ -60,11 +56,12 @@ function EntityCol({ characterId, characterName, corporationId, corporationName,
   /** Optional text after the character name, e.g. "+14" for the other attackers. */
   nameSuffix?:      string;
 }) {
+  const { t } = useTranslation();
   // Row layout: portrait, then a names column with character on top and
   // corp / alliance lines beneath. Affiliation icons render with the
   // names so the eye can scan icons or text equally well.
   const portrait = characterId && (
-    <ZkbLink href={`${ZKB}/character/${characterId}/`} tip={`${label} on zKillboard`}>
+    <ZkbLink href={`${ZKB}/character/${characterId}/`} tip={t('killboard.onZkb', { label })}>
       <img className="zkb-kill__icon zkb-kill__icon--portrait" src={`${EVE_IMG}/characters/${characterId}/portrait?size=64`} alt="" loading="lazy" />
     </ZkbLink>
   );
@@ -132,6 +129,7 @@ function killRowTint(victim: number, killer: number): '' | 'zkb-kill--bad' | 'zk
 }
 
 function KillRow({ kill, standings }: { kill: ZkbKill; standings: ReturnType<typeof useStandings> }) {
+  const { t } = useTranslation();
   const isPod      = kill.victim.ship_type_id === 670;
   const v          = kill.victim;
   const fbAttacker = kill.attackers.find((a) => a.final_blow);
@@ -148,7 +146,7 @@ function KillRow({ kill, standings }: { kill: ZkbKill; standings: ReturnType<typ
           href={`${ZKB}/kill/${kill.killmail_id}/`}
           target="_blank"
           rel="noreferrer"
-          data-tip="View killmail on zKillboard"
+          data-tip={t('killboard.viewKillmail')}
           className="zkb-kill__icon-link"
         >
           <img
@@ -159,14 +157,14 @@ function KillRow({ kill, standings }: { kill: ZkbKill; standings: ReturnType<typ
           />
         </a>
         {kill.zkb.solo || kill.attackers.length === 1 ? (
-          <span className="zkb-kill__count zkb-kill__count--solo" data-tip="Solo kill">1</span>
+          <span className="zkb-kill__count zkb-kill__count--solo" data-tip={t('killboard.soloKill')}>1</span>
         ) : kill.attackers.length > 1 ? (
           <span
             className={`zkb-kill__count${kill.attackers.length >= GANK_THRESHOLD ? ' zkb-kill__count--gank' : ''}`}
             data-tip={
               kill.attackers.length >= GANK_THRESHOLD
-                ? `Gank — ${kill.attackers.length} attackers`
-                : `${kill.attackers.length} attackers`
+                ? t('killboard.gank', { count: kill.attackers.length })
+                : t('killboard.attackers', { count: kill.attackers.length })
             }
           >
             {kill.attackers.length}
@@ -181,7 +179,7 @@ function KillRow({ kill, standings }: { kill: ZkbKill; standings: ReturnType<typ
         corporationName={v.corporation_name}
         allianceId={v.alliance_id}
         allianceName={v.alliance_name}
-        label="Victim"
+        label={t('killboard.victim')}
         align="left"
       />
 
@@ -198,12 +196,12 @@ function KillRow({ kill, standings }: { kill: ZkbKill; standings: ReturnType<typ
               corporationName={fbAttacker.corporation_name}
               allianceId={fbAttacker.alliance_id}
               allianceName={fbAttacker.alliance_name}
-              label="Final blow"
+              label={t('killboard.finalBlow')}
               align="right"
               nameSuffix={kill.attackers.length > 1 ? `+${kill.attackers.length - 1}` : undefined}
             />
             {fbAttacker.ship_type_id && (
-              <span className="zkb-kill__ship-wrap" data-tip="Final-blow ship">
+              <span className="zkb-kill__ship-wrap" data-tip={t('killboard.finalBlowShip')}>
                 <img
                   className="zkb-kill__ship zkb-kill__ship--attacker"
                   src={`${EVE_IMG}/types/${fbAttacker.ship_type_id}/render?size=64`}
@@ -216,8 +214,8 @@ function KillRow({ kill, standings }: { kill: ZkbKill; standings: ReturnType<typ
         )}
 
         <div className="zkb-kill__meta">
-          <span className="zkb-kill__value">{formatIsk(kill.zkb.totalValue)} ISK</span>
-          <span className="zkb-kill__time">{timeAgo(kill.killmail_time)}</span>
+          <span className="zkb-kill__value">{abbreviateValue(kill.zkb.totalValue)} ISK</span>
+          <span className="zkb-kill__time">{timeAgo(t, kill.killmail_time)}</span>
         </div>
       </div>
     </div>
@@ -229,6 +227,7 @@ interface Props {
 }
 
 export function KillboardPane({ eveSystemId }: Props) {
+  const { t } = useTranslation();
   const [includeNpc, setIncludeNpc] = useUserSetting<boolean>(NPC_TOGGLE_KEY, false);
 
   const { kills, loading, error, lastUpdated, npcCount, refresh } = useKillboard(eveSystemId, { includeNpc });
@@ -241,7 +240,7 @@ export function KillboardPane({ eveSystemId }: Props) {
   useEffect(() => { setVisibleCount(PAGE_SIZE); }, [eveSystemId, includeNpc]);
 
   if (!eveSystemId) {
-    return <p className="zkb-state">No EVE system linked.</p>;
+    return <p className="zkb-state">{t('panes.noEveSystem')}</p>;
   }
 
   const visibleKills = kills.slice(0, visibleCount);
@@ -254,15 +253,15 @@ export function KillboardPane({ eveSystemId }: Props) {
     <div className="zkb-pane">
       <div className="zkb-pane__meta">
         <span>
-          {kills.length} kill{kills.length !== 1 ? 's' : ''}
+          {t('units.kills', { count: kills.length })}
           {!includeNpc && npcCount > 0 && (
-            <span className="zkb-pane__npc-hidden" data-tooltip="NPC-only kills (CONCORD, rats, etc.) hidden">
-              {' '}· {npcCount} NPC hidden
+            <span className="zkb-pane__npc-hidden" data-tooltip={t('killboard.npcHiddenTooltip')}>
+              {' '}· {t('killboard.npcHidden', { count: npcCount })}
             </span>
           )}
-          {lastUpdated && <> · updated {timeAgo(lastUpdated.toISOString())}</>}
+          {lastUpdated && <> · {t('killboard.updated', { time: timeAgo(t, lastUpdated.toISOString()) })}</>}
         </span>
-        <label className="zkb-pane__npc-toggle" data-tooltip="Include NPC-only killmails in the feed">
+        <label className="zkb-pane__npc-toggle" data-tooltip={t('killboard.includeNpcTooltip')}>
           <input
             type="checkbox"
             checked={includeNpc}
@@ -274,21 +273,24 @@ export function KillboardPane({ eveSystemId }: Props) {
               refresh(true);
             }}
           />
-          <span>Show NPC kills</span>
+          <span>{t('killboard.showNpcKills')}</span>
         </label>
       </div>
 
       {loading && kills.length === 0 ? (
-        <p className="zkb-state">Loading kills…</p>
+        <p className="zkb-state">{t('killboard.loading')}</p>
       ) : error ? (
         <p className="zkb-state zkb-state--error">{error}</p>
       ) : kills.length === 0 ? (
         <p className="zkb-state">
-          No kills in the last 24h
-          {!includeNpc && npcCount > 0 && (
-            <> — {npcCount} NPC-only hidden. <button type="button" className="zkb-pane__inline-toggle" onClick={() => { setIncludeNpc(true); refresh(true); }}>Show them</button></>
+          {!includeNpc && npcCount > 0 ? (
+            <>
+              {t('killboard.noKillsNpc', { count: npcCount })}{' '}
+              <button type="button" className="zkb-pane__inline-toggle" onClick={() => { setIncludeNpc(true); refresh(true); }}>{t('killboard.showThem')}</button>
+            </>
+          ) : (
+            t('killboard.noKills')
           )}
-          .
         </p>
       ) : (
         <div className="zkb-pane__list">
@@ -299,7 +301,7 @@ export function KillboardPane({ eveSystemId }: Props) {
               className="zkb-pane__load-more"
               onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
             >
-              Load more ({kills.length - visibleCount} remaining)
+              {t('killboard.loadMore', { count: kills.length - visibleCount })}
             </button>
           )}
         </div>

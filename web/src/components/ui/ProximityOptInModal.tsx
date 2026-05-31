@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { Trans, useTranslation } from 'react-i18next';
 import { notifyPermissionChanged } from '../../hooks/useNotificationPermission';
 
 const ASKED_KEY = 'nexum.proximityOptInAsked';
@@ -14,6 +15,7 @@ const ASKED_KEY = 'nexum.proximityOptInAsked';
  *  - The user has already responded to this prompt (tracked in localStorage)
  */
 export function ProximityOptInModal() {
+  const { t } = useTranslation();
   const [show, setShow] = useState(false);
 
   useEffect(() => {
@@ -55,26 +57,19 @@ export function ProximityOptInModal() {
     <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) dismiss(); }}>
       <div className="modal" role="dialog" aria-modal="true">
         <div className="modal__header">
-          <h2 className="modal__title">Enable threat alerts?</h2>
+          <h2 className="modal__title">{t('proximityOptIn.title')}</h2>
         </div>
 
         <div className="modal__body proximity-optin__body">
-          <p>
-            New Eden is a dangerous place. Nexum can give you a desktop notification and
-            a short audio ping when you’re within a few jumps of an active <strong>incursion</strong>
-            {' '}or <strong>insurgency</strong> — so you don’t blindly autopilot into one.
-          </p>
-          <p className="proximity-optin__sub">
-            You can change the threshold or turn this off at any time in <em>Map Options →
-            Proximity Alerts</em>.
-          </p>
+          <p><Trans i18nKey="proximityOptIn.body" /></p>
+          <p className="proximity-optin__sub"><Trans i18nKey="proximityOptIn.sub" /></p>
 
           <div className="modal__actions">
             <button type="button" className="btn btn--ghost" onClick={dismiss}>
-              Maybe later
+              {t('proximityOptIn.maybeLater')}
             </button>
             <button type="button" className="btn btn--primary" onClick={enable}>
-              Enable notifications
+              {t('proximityOptIn.enable')}
             </button>
           </div>
         </div>

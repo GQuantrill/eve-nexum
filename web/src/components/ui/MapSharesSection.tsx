@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { api } from '../../api/client';
 import { useMapStore } from '../../store/mapStore';
 import { toast } from './Toaster';
@@ -22,6 +23,7 @@ interface ResolvedMatch {
 const DEBOUNCE_MS = 350;
 
 export function MapSharesSection() {
+  const { t } = useTranslation();
   const mapId  = useMapStore((s) => s.activeMapId);
   const [shares, setShares] = useState<ShareRow[]>([]);
   const [loading, setLoading] = useState(false);
@@ -80,9 +82,9 @@ export function MapSharesSection() {
       setShares((prev) => [...prev, row]);
       setQuery('');
       setMatch(null);
-      toast.success(`Shared with ${row.name ?? match.name}`);
+      toast.success(t('mapShares.sharedWith', { name: row.name ?? match.name }));
     } catch (e) {
-      const msg = e instanceof Error ? e.message : 'Failed to add share';
+      const msg = e instanceof Error ? e.message : t('mapShares.addFailed');
       setError(msg);
     } finally {
       setSubmitting(false);
@@ -95,11 +97,11 @@ export function MapSharesSection() {
     setShares((prev) => prev.filter((s) => s.id !== shareId));
     try {
       await api(`/api/maps/${mapId}/shares/${shareId}`, { method: 'DELETE' });
-      toast.info(`Access revoked${target?.name ? ` for ${target.name}` : ''}`);
+      toast.info(target?.name ? t('mapShares.accessRevokedFor', { name: target.name }) : t('mapShares.accessRevoked'));
     } catch (e) {
       // Restore the row so the UI doesn't lie about state.
       if (target) setShares((prev) => [...prev, target].sort((a, b) => a.createdAt.localeCompare(b.createdAt)));
-      setError(e instanceof Error ? e.message : 'Failed to revoke share');
+      setError(e instanceof Error ? e.message : t('mapShares.revokeFailed'));
     }
   }
 
@@ -108,9 +110,7 @@ export function MapSharesSection() {
   return (
     <>
       <div className="map-sidebar__hint">
-        Grant another character — or every member of a corp — edit access to
-        this personal map. Recipients can edit content and topology but
-        can't rename, delete, or re-share it.
+        {t('mapShares.hint')}
       </div>
 
       <div className="map-shares__picker">
@@ -122,14 +122,14 @@ export function MapSharesSection() {
               className={`map-sidebar__btn-group-item${kind === k ? ' map-sidebar__btn-group-item--active' : ''}`}
               onClick={() => { setKind(k); setMatch(null); }}
             >
-              {k === 'character' ? 'Character' : 'Corp'}
+              {k === 'character' ? t('mapShares.character') : t('mapShares.corp')}
             </button>
           ))}
         </div>
 
         <input
           className="map-shares__input"
-          placeholder={kind === 'character' ? 'Exact character name' : 'Exact corp name'}
+          placeholder={kind === 'character' ? t('mapShares.placeholderChar') : t('mapShares.placeholderCorp')}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           maxLength={50}
@@ -138,12 +138,12 @@ export function MapSharesSection() {
 
         <div className="map-shares__match">
           {query.trim().length < 3
-            ? <span className="map-shares__match--hint">Type at least 3 characters</span>
+            ? <span className="map-shares__match--hint">{t('mapShares.typeAtLeast3')}</span>
             : searching
-              ? <span className="map-shares__match--hint">Searching…</span>
+              ? <span className="map-shares__match--hint">{t('mapShares.searching')}</span>
               : match
-                ? <span className="map-shares__match--ok">Found: {match.name}</span>
-                : <span className="map-shares__match--miss">No exact match</span>}
+                ? <span className="map-shares__match--ok">{t('mapShares.found', { name: match.name })}</span>
+                : <span className="map-shares__match--miss">{t('mapShares.noMatch')}</span>}
         </div>
 
         <button
@@ -152,15 +152,15 @@ export function MapSharesSection() {
           onClick={addShare}
           disabled={!canAdd}
         >
-          {submitting ? 'Adding…' : 'Share'}
+          {submitting ? t('mapShares.adding') : t('mapShares.share')}
         </button>
       </div>
 
       <div className="map-shares__list">
         {loading
-          ? <div className="map-sidebar__hint">Loading…</div>
+          ? <div className="map-sidebar__hint">{t('mapShares.loading')}</div>
           : shares.length === 0
-            ? <div className="map-sidebar__hint">No active shares.</div>
+            ? <div className="map-sidebar__hint">{t('mapShares.none')}</div>
             : shares.map((s) => (
                 <div key={s.id} className="map-shares__row">
                   <img
@@ -172,16 +172,16 @@ export function MapSharesSection() {
                     loading="lazy"
                   />
                   <span className={`map-shares__kind map-shares__kind--${s.kind}`}>
-                    {s.kind === 'character' ? 'Char' : 'Corp'}
+                    {s.kind === 'character' ? t('mapShares.badgeChar') : t('mapShares.badgeCorp')}
                   </span>
                   <span className="map-shares__name" title={String(s.targetId)}>
-                    {s.name ?? `(unknown ${s.kind} #${s.targetId})`}
+                    {s.name ?? t('mapShares.unknownTarget', { kind: s.kind, id: s.targetId })}
                   </span>
                   <button
                     type="button"
                     className="map-shares__revoke"
                     onClick={() => revokeShare(s.id)}
-                    title="Revoke access"
+                    title={t('mapShares.revokeAccess')}
                   >
                     <XIcon size={12} weight="bold" />
                   </button>

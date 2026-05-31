@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 import { useMapStore } from '../../store/mapStore';
 
 interface Result {
@@ -18,6 +19,7 @@ interface Result {
  * which map each hit lives in.
  */
 export function CommandPaletteModal() {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [active, setActive] = useState(0);
@@ -82,7 +84,7 @@ export function CommandPaletteModal() {
           mapId:        m.id,
           mapName:      m.name,
           systemId:     '',
-          systemName:   `↪ open map: ${m.name}`,
+          systemName:   t('commandPalette.openMap', { name: m.name }),
           systemClass:  '',
           regionName:   null,
           isCurrentMap: false,
@@ -97,7 +99,7 @@ export function CommandPaletteModal() {
       return a.systemName.localeCompare(b.systemName);
     });
     return out.slice(0, 30);
-  }, [open, query, currentMap, maps]);
+  }, [open, query, currentMap, maps, t]);
 
   function commit(r: Result) {
     if (r.systemId) {
@@ -123,15 +125,15 @@ export function CommandPaletteModal() {
           ref={inputRef}
           className="command-palette__input"
           type="text"
-          placeholder="Search systems and maps…"
+          placeholder={t('commandPalette.placeholder')}
           value={query}
           onChange={(e) => { setQuery(e.target.value); setActive(0); }}
           onKeyDown={onKeyInside}
-          aria-label="Search"
+          aria-label={t('commandPalette.search')}
         />
         <div className="command-palette__list" role="listbox">
           {results.length === 0 && query && (
-            <div className="command-palette__empty">No matches</div>
+            <div className="command-palette__empty">{t('commandPalette.noMatches')}</div>
           )}
           {results.map((r, i) => (
             <div
@@ -148,13 +150,13 @@ export function CommandPaletteModal() {
               )}
               <span className="command-palette__meta">
                 {r.regionName ? `${r.regionName} · ` : ''}
-                {r.isCurrentMap ? r.mapName : '(switch map)'}
+                {r.isCurrentMap ? r.mapName : t('commandPalette.switchMap')}
               </span>
             </div>
           ))}
         </div>
         <div className="command-palette__hint">
-          <kbd>↑↓</kbd> navigate <kbd>↵</kbd> open <kbd>Esc</kbd> close
+          <kbd>↑↓</kbd> {t('commandPalette.navigate')} <kbd>↵</kbd> {t('commandPalette.open')} <kbd>Esc</kbd> {t('commandPalette.close')}
         </div>
       </div>
     </div>,

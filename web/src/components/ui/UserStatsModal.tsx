@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { XIcon } from '@phosphor-icons/react';
 import { useStats, type StatPeriod, type SigBreakdown } from '../../hooks/useStats';
 
@@ -8,6 +9,7 @@ const SPARK_PAD  = { top: 6, right: 6, bottom: 18, left: 28 };
 const SPARK_COLOR = '#6ea0ff';
 
 function SigSparkline({ values }: { values: number[] }) {
+  const { t } = useTranslation();
   const n      = values.length;
   const iw     = SPARK_VB_W - SPARK_PAD.left - SPARK_PAD.right;
   const ih     = SPARK_VB_H - SPARK_PAD.top  - SPARK_PAD.bottom;
@@ -26,8 +28,8 @@ function SigSparkline({ values }: { values: number[] }) {
   const yTicks = [...new Set([0, Math.round(maxVal / 2), maxVal])];
   // X ticks: 30d ago (left) and today (right)
   const xLabels: { x: number; label: string }[] = n > 0 ? [
-    { x: xOf(0),     label: `${n - 1}d ago` },
-    { x: xOf(n - 1), label: 'today' },
+    { x: xOf(0),     label: t('time.daysAgo', { value: n - 1 }) },
+    { x: xOf(n - 1), label: t('time.today') },
   ] : [];
 
   return (
@@ -92,44 +94,61 @@ function SigSparkline({ values }: { values: number[] }) {
       </svg>
       {hover && (
         <div className="stats-modal__spark-tooltip">
-          <strong>{hover.value.toLocaleString()}</strong> sigs · {n - 1 - hover.index === 0 ? 'today' : `${n - 1 - hover.index}d ago`}
+          <strong>{hover.value.toLocaleString()}</strong> sigs · {n - 1 - hover.index === 0 ? t('time.today') : t('time.daysAgo', { value: n - 1 - hover.index })}
         </div>
       )}
     </div>
   );
 }
 
-const PERIODS: { key: StatPeriod; label: string }[] = [
-  { key: 'day',     label: 'Today' },
-  { key: 'week',    label: 'This Week' },
-  { key: 'month',   label: 'This Month' },
-  { key: 'year',    label: 'This Year' },
-  { key: 'forever', label: 'All Time' },
+const PERIODS: { key: StatPeriod }[] = [
+  { key: 'day' },
+  { key: 'week' },
+  { key: 'month' },
+  { key: 'year' },
+  { key: 'forever' },
 ];
 
-const SIG_ROWS: { key: keyof SigBreakdown; label: string }[] = [
-  { key: 'wormhole', label: 'Wormhole' },
-  { key: 'data',     label: 'Data' },
-  { key: 'relic',    label: 'Relic' },
-  { key: 'gas',      label: 'Gas' },
-  { key: 'ore',      label: 'Ore' },
-  { key: 'combat',   label: 'Combat' },
+const SIG_ROWS: { key: keyof SigBreakdown }[] = [
+  { key: 'wormhole' },
+  { key: 'data' },
+  { key: 'relic' },
+  { key: 'gas' },
+  { key: 'ore' },
+  { key: 'combat' },
 ];
 
 interface Props { onClose: () => void; }
 
 export function UserStatsModal({ onClose }: Props) {
+  const { t } = useTranslation();
   const [period, setPeriod] = useState<StatPeriod>('day');
   const { stats, loading, error } = useStats(true);
 
   const current = stats?.[period];
+
+  const periodLabels: Record<StatPeriod, string> = {
+    day:     t('stats.period.day'),
+    week:    t('stats.period.week'),
+    month:   t('stats.period.month'),
+    year:    t('stats.period.year'),
+    forever: t('stats.period.forever'),
+  };
+  const sigLabels: Record<string, string> = {
+    wormhole: t('sigType.wormhole'),
+    data:     t('sigType.data'),
+    relic:    t('sigType.relic'),
+    gas:      t('sigType.gas'),
+    ore:      t('sigType.ore'),
+    combat:   t('sigType.combat'),
+  };
 
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal stats-modal" onClick={(e) => e.stopPropagation()}>
 
         <div className="modal__header">
-          <h2 className="modal__title">User Stats</h2>
+          <h2 className="modal__title">{t('stats.title')}</h2>
           <button className="modal__close" onClick={onClose}><XIcon size={14} weight="bold" /></button>
         </div>
 
@@ -140,13 +159,13 @@ export function UserStatsModal({ onClose }: Props) {
               className={`stats-modal__period-btn${period === p.key ? ' stats-modal__period-btn--active' : ''}`}
               onClick={() => setPeriod(p.key)}
             >
-              {p.label}
+              {periodLabels[p.key]}
             </button>
           ))}
         </div>
 
         <div className="modal__body">
-          {loading && <div className="stats-modal__loading">Loading…</div>}
+          {loading && <div className="stats-modal__loading">{t('stats.loading')}</div>}
           {error   && <div className="stats-modal__error">{error}</div>}
 
           {current && (
@@ -154,27 +173,27 @@ export function UserStatsModal({ onClose }: Props) {
               <div className="stats-modal__summary">
                 <div className="stats-modal__card">
                   <span className="stats-modal__card-value">{current.jumps.toLocaleString()}</span>
-                  <span className="stats-modal__card-label">Jumps</span>
+                  <span className="stats-modal__card-label">{t('stats.jumps')}</span>
                 </div>
                 <div className="stats-modal__card">
                   <span className="stats-modal__card-value">{current.signatures.total.toLocaleString()}</span>
-                  <span className="stats-modal__card-label">Signatures</span>
+                  <span className="stats-modal__card-label">{t('stats.signatures')}</span>
                 </div>
               </div>
 
               {stats?.daily && stats.daily.some((v) => v > 0) && (
                 <>
-                  <h3 className="stats-modal__section-title">Daily activity — last 30 days</h3>
+                  <h3 className="stats-modal__section-title">{t('stats.dailyActivity')}</h3>
                   <SigSparkline values={stats.daily} />
                 </>
               )}
 
-              <h3 className="stats-modal__section-title">Signatures by type</h3>
+              <h3 className="stats-modal__section-title">{t('stats.byType')}</h3>
               <table className="stats-modal__table">
                 <thead>
                   <tr className="stats-modal__head-row">
-                    <th className="stats-modal__th stats-modal__th--type">Type</th>
-                    <th className="stats-modal__th stats-modal__th--count">Count</th>
+                    <th className="stats-modal__th stats-modal__th--type">{t('stats.type')}</th>
+                    <th className="stats-modal__th stats-modal__th--count">{t('stats.count')}</th>
                     <th className="stats-modal__th stats-modal__th--pct">%</th>
                     <th className="stats-modal__th stats-modal__th--bar" />
                   </tr>
@@ -187,7 +206,7 @@ export function UserStatsModal({ onClose }: Props) {
                       : 0;
                     return (
                       <tr key={r.key} className="stats-modal__row">
-                        <td className="stats-modal__row-label">{r.label}</td>
+                        <td className="stats-modal__row-label">{sigLabels[r.key]}</td>
                         <td className="stats-modal__row-value">{count.toLocaleString()}</td>
                         <td className="stats-modal__row-pct">{pct}%</td>
                         <td className="stats-modal__row-bar">

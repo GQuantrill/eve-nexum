@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { useSovData } from '../../hooks/useSovData';
 import { useEsiSystem } from '../../hooks/useEsiSystem';
 import { api } from '../../api/client';
@@ -94,14 +96,6 @@ function FlashingSkull({ color }: { color: string }) {
   );
 }
 
-const PANEL_TITLES: Record<string, string> = {
-  notes:       'Notes',
-  signatures:  'Signatures',
-  structures:  'Structures',
-  npcStations: 'NPC Stations',
-  killboard:   'zKillboard',
-  activity:    'Activity',
-};
 
 const HEIGHT_KEY = 'nexum.panelHeight';
 const MIN_H      = 80;
@@ -117,6 +111,15 @@ function clamp(v: number) {
 
 
 export function SystemPanel() {
+  const { t } = useTranslation();
+  const panelTitle: Record<string, string> = {
+    notes:       t('panel.notes'),
+    signatures:  t('panel.signatures'),
+    structures:  t('panel.structures'),
+    npcStations: t('panel.npcStations'),
+    killboard:   t('panel.killboard'),
+    activity:    t('panel.activity'),
+  };
   const systems          = useMapStore((s) => s.map.systems);
   const selectedSystemId = useMapStore((s) => s.selectedSystemId);
   const panelOrder       = useMapStore((s) => s.panelOrder);
@@ -151,7 +154,7 @@ export function SystemPanel() {
   const incursion  = findIncursion(incursions, sys.eveSystemId);
   const insurgency = findInsurgency(insurgencies, sys.eveSystemId);
   const intelColor = resolveIntelColor(sys.intel, customIntel);
-  const intelLabel = resolveIntelLabel(sys.intel, customIntel);
+  const intelLabel = resolveIntelLabel(sys.intel, customIntel, t);
 
   const setWaypoint = (clearOtherWaypoints: boolean) => {
     if (!sys.eveSystemId) return;
@@ -212,7 +215,7 @@ export function SystemPanel() {
 
       <div className="system-panel__left">
         <div className="system-panel__header">
-          <h2 className="system-panel__title">{sys.name || 'Unknown System'}</h2>
+          <h2 className="system-panel__title">{sys.name || t('systemPanel.unknownSystem')}</h2>
           <div className="system-panel__actions">
             {sys.eveSystemId && !isShareMode && (
               <>
@@ -220,21 +223,21 @@ export function SystemPanel() {
                   type="button"
                   className={`sys-btn${waypointStatus === 'ok' ? ' sys-btn--ok' : waypointStatus === 'err' ? ' sys-btn--err' : ''}`}
                   onClick={() => setWaypoint(true)}
-                  title="Set Destination"
+                  title={t('waypoint.setDestination')}
                 >
-                  Set Destination
+                  {t('waypoint.setDestination')}
                 </button>
                 <button
                   type="button"
                   className={`sys-btn${waypointStatus === 'ok' ? ' sys-btn--ok' : waypointStatus === 'err' ? ' sys-btn--err' : ''}`}
                   onClick={() => setWaypoint(false)}
-                  title="Add Waypoint"
+                  title={t('waypoint.addWaypoint')}
                 >
-                  + Waypoint
+                  {t('systemPanel.addWaypointBtn')}
                 </button>
               </>
             )}
-            <button type="button" className="icon-btn" onClick={() => selectSystem(null)} title="Close">✕</button>
+            <button type="button" className="icon-btn" onClick={() => selectSystem(null)} title={t('actions.close')}>✕</button>
           </div>
         </div>
 
@@ -268,7 +271,7 @@ export function SystemPanel() {
             if (chainEffects.length === 0) return null;
             return (
               <div className="sys-info__chain-fx">
-                <span className="sys-info__chain-fx__label">In chain:</span>
+                <span className="sys-info__chain-fx__label">{t('systemPanel.inChain')}</span>
                 {chainEffects.map((s) => (
                   <ChainEffectChip
                     key={s.id}
@@ -284,7 +287,7 @@ export function SystemPanel() {
 
           {incursion && (
             <div className="sys-info__section sys-info__incursion">
-              <div className="sys-info__section-label">Incursion</div>
+              <div className="sys-info__section-label">{t('systemPanel.incursion')}</div>
               <div className="sys-info__incursion-card">
                 {incursion.factionLogoUrl && (
                   <img className="sys-info__incursion-logo" src={incursion.factionLogoUrl} alt={incursion.factionName} />
@@ -293,16 +296,19 @@ export function SystemPanel() {
                   <span className="sys-info__incursion-faction">{incursion.factionName}</span>
                   <div className="sys-info__incursion-meta">
                     <span className={`sys-info__incursion-state sys-info__incursion-state--${incursion.state}`}>
-                      {incursion.state.charAt(0).toUpperCase() + incursion.state.slice(1)}
+                      {incursion.state === 'established' ? t('systemPanel.incursionState.established')
+                        : incursion.state === 'mobilizing' ? t('systemPanel.incursionState.mobilizing')
+                        : incursion.state === 'withdrawing' ? t('systemPanel.incursionState.withdrawing')
+                        : incursion.state.charAt(0).toUpperCase() + incursion.state.slice(1)}
                     </span>
-                    {incursion.isStaging && <span className="sys-info__incursion-staging">Staging</span>}
-                    {incursion.hasBoss && <span className="sys-info__incursion-boss">Boss Present</span>}
+                    {incursion.isStaging && <span className="sys-info__incursion-staging">{t('systemPanel.staging')}</span>}
+                    {incursion.hasBoss && <span className="sys-info__incursion-boss">{t('systemPanel.bossPresent')}</span>}
                   </div>
                   <div className="sys-info__incursion-influence">
                     <div className="sys-info__incursion-bar-track">
                       <div className="sys-info__incursion-bar" style={{ width: `${Math.round(incursion.influence * 100)}%` }} />
                     </div>
-                    <span className="sys-info__incursion-pct">{Math.round(incursion.influence * 100)}% influence</span>
+                    <span className="sys-info__incursion-pct">{t('systemPanel.influence', { pct: Math.round(incursion.influence * 100) })}</span>
                   </div>
                 </div>
               </div>
@@ -311,11 +317,11 @@ export function SystemPanel() {
 
           {insurgency && (
             <div className="sys-info__section">
-              <div className="sys-info__section-label">Insurgency — {insurgency.factionName}</div>
+              <div className="sys-info__section-label">{t('systemPanel.insurgency', { faction: insurgency.factionName })}</div>
               <div className="sys-info__insurgency-rings">
                 {[
-                  { label: 'Corruption',  pct: insurgency.corruptionPct,  stage: insurgency.corruptionState,  color: '#4ade80', icon: '☣' },
-                  { label: 'Suppression', pct: insurgency.suppressionPct, stage: insurgency.suppressionState, color: '#c8d0e0', icon: '⊕' },
+                  { label: t('systemPanel.corruption'),  pct: insurgency.corruptionPct,  stage: insurgency.corruptionState,  color: '#4ade80', icon: '☣' },
+                  { label: t('systemPanel.suppression'), pct: insurgency.suppressionPct, stage: insurgency.suppressionState, color: '#c8d0e0', icon: '⊕' },
                 ].map(({ label, pct, stage, color, icon }) => {
                   const R = 22;
                   const circ = 2 * Math.PI * R;
@@ -344,7 +350,7 @@ export function SystemPanel() {
                       </svg>
                       <div className="sys-info__insurgency-ring-info">
                         <span className="sys-info__insurgency-ring-label">{label}</span>
-                        <span className="sys-info__insurgency-ring-stage" style={{ color }}>Stage {stage}</span>
+                        <span className="sys-info__insurgency-ring-stage" style={{ color }}>{t('systemPanel.stage', { stage })}</span>
                         <span className="sys-info__insurgency-ring-pct">{Math.round(pct)}%</span>
                       </div>
                     </div>
@@ -356,7 +362,7 @@ export function SystemPanel() {
 
           {sys.effect !== 'none' && EFFECT_MODIFIERS[sys.effect].length > 0 && (
             <div className="sys-info__section">
-              <div className="sys-info__section-label">System Effects</div>
+              <div className="sys-info__section-label">{t('systemPanel.systemEffects')}</div>
               <div className="sys-info__effect-mods">
                 {EFFECT_MODIFIERS[sys.effect].map(({ label, good }) => (
                   <span key={label} className={`sys-info__effect-mod${good ? ' sys-info__effect-mod--good' : ' sys-info__effect-mod--bad'}`}>
@@ -369,7 +375,7 @@ export function SystemPanel() {
 
           {sys.statics.length > 0 && (
             <div className="sys-info__section">
-              <div className="sys-info__section-label">Statics</div>
+              <div className="sys-info__section-label">{t('systemPanel.statics')}</div>
               <div className="sys-info__row">
                 {sys.statics.map((s) => {
                   const dest = WORMHOLE_DESTINATIONS[s];
@@ -392,24 +398,24 @@ export function SystemPanel() {
 
           {(sys.regionName || sys.npcType) && (
             <div className="sys-info__section">
-              <div className="sys-info__section-label">Location</div>
+              <div className="sys-info__section-label">{t('systemPanel.location')}</div>
               <div className="sys-info__kv-grid">
-                {sys.regionName    && <><span className="sys-info__kv-key">Region</span><span className="sys-info__kv-val">{sys.regionName}</span></>}
-                {esiSys?.constellationName && <><span className="sys-info__kv-key">Constellation</span><span className="sys-info__kv-val">{esiSys.constellationName}</span></>}
-                {sys.npcType       && <><span className="sys-info__kv-key">NPC</span><span className="sys-info__kv-val">{sys.npcType}</span></>}
+                {sys.regionName    && <><span className="sys-info__kv-key">{t('systemPanel.region')}</span><span className="sys-info__kv-val">{sys.regionName}</span></>}
+                {esiSys?.constellationName && <><span className="sys-info__kv-key">{t('systemPanel.constellation')}</span><span className="sys-info__kv-val">{esiSys.constellationName}</span></>}
+                {sys.npcType       && <><span className="sys-info__kv-key">{t('systemPanel.npc')}</span><span className="sys-info__kv-val">{sys.npcType}</span></>}
               </div>
             </div>
           )}
 
           {(sys.name || sys.eveSystemId) && (
             <div className="sys-info__section">
-              <div className="sys-info__section-label">Links</div>
+              <div className="sys-info__section-label">{t('systemPanel.links')}</div>
               <div className="sys-info__links">
                 {/* Dotlan only needs the name. K-space goes to the NPC-delta
                     map (uses Region + System); j-space and unlinked systems
                     fall back to the plain /system/<name> URL. */}
                 {sys.name && DOTLAN_CLASSES.has(sys.systemClass) && sys.regionName && (
-                  <Tooltip label="Open NPC delta on Dotlan" placement="right">
+                  <Tooltip label={t('systemPanel.openNpcDelta')} placement="right">
                     <a
                       href={`https://evemaps.dotlan.net/map/${encodeURIComponent(sys.regionName.replace(/ /g, '_'))}/${encodeURIComponent(sys.name.replace(/ /g, '_'))}#npc_delta`}
                       target="_blank"
@@ -426,7 +432,7 @@ export function SystemPanel() {
                   </Tooltip>
                 )}
                 {sys.name && !(DOTLAN_CLASSES.has(sys.systemClass) && sys.regionName) && (
-                  <Tooltip label="Open system on Dotlan" placement="right">
+                  <Tooltip label={t('systemPanel.openDotlan')} placement="right">
                     <a
                       href={`https://evemaps.dotlan.net/system/${encodeURIComponent(sys.name.replace(/ /g, '_'))}`}
                       target="_blank"
@@ -443,7 +449,7 @@ export function SystemPanel() {
                   </Tooltip>
                 )}
                 {sys.eveSystemId && (
-                  <Tooltip label="Open system on zKillboard" placement="right">
+                  <Tooltip label={t('systemPanel.openZkb')} placement="right">
                     <a
                       href={`https://zkillboard.com/system/${sys.eveSystemId}/`}
                       target="_blank"
@@ -465,34 +471,34 @@ export function SystemPanel() {
 
           {esiSys && (esiSys.planetCount > 0 || esiSys.moonCount > 0 || esiSys.beltCount > 0 || esiSys.stargateCount > 0) && (
             <div className="sys-info__section">
-              <div className="sys-info__section-label">Celestials</div>
+              <div className="sys-info__section-label">{t('systemPanel.celestials')}</div>
               <div className="sys-info__celestials">
                 {esiSys.planetCount > 0 && (
                   <div className="sys-info__celestial">
                     <span className="sys-info__celestial-icon">◎</span>
                     <span>{esiSys.planetCount}</span>
-                    <span className="sys-info__celestial-label">planet{esiSys.planetCount !== 1 ? 's' : ''}</span>
+                    <span className="sys-info__celestial-label">{t('systemPanel.planets', { count: esiSys.planetCount })}</span>
                   </div>
                 )}
                 {esiSys.moonCount > 0 && (
                   <div className="sys-info__celestial">
                     <span className="sys-info__celestial-icon">○</span>
                     <span>{esiSys.moonCount}</span>
-                    <span className="sys-info__celestial-label">moon{esiSys.moonCount !== 1 ? 's' : ''}</span>
+                    <span className="sys-info__celestial-label">{t('systemPanel.moons', { count: esiSys.moonCount })}</span>
                   </div>
                 )}
                 {esiSys.beltCount > 0 && (
                   <div className="sys-info__celestial">
                     <span className="sys-info__celestial-icon">⁂</span>
                     <span>{esiSys.beltCount}</span>
-                    <span className="sys-info__celestial-label">belt{esiSys.beltCount !== 1 ? 's' : ''}</span>
+                    <span className="sys-info__celestial-label">{t('systemPanel.belts', { count: esiSys.beltCount })}</span>
                   </div>
                 )}
                 {esiSys.stargateCount > 0 && (
                   <div className="sys-info__celestial">
                     <span className="sys-info__celestial-icon">⬡</span>
                     <span>{esiSys.stargateCount}</span>
-                    <span className="sys-info__celestial-label">gate{esiSys.stargateCount !== 1 ? 's' : ''}</span>
+                    <span className="sys-info__celestial-label">{t('systemPanel.gates', { count: esiSys.stargateCount })}</span>
                   </div>
                 )}
               </div>
@@ -502,7 +508,7 @@ export function SystemPanel() {
           {sov && (sov.alliance || sov.corp || sov.faction) && (
             <div className="sys-info__section">
               <div className="sys-info__section-label">
-                Sovereignty
+                {t('systemPanel.sovereignty')}
                 <StandingsRefreshButton standings={standings} />
               </div>
             <div className="sys-info__sov-block">
@@ -510,7 +516,7 @@ export function SystemPanel() {
                 <div className="sys-info__row sys-info__sov">
                   <img className="sys-info__sov-logo" src={sov.alliance.logoUrl} alt={sov.alliance.name} />
                   <div className="sys-info__sov-text">
-                    <span className="sys-info__sov-label">Alliance</span>
+                    <span className="sys-info__sov-label">{t('systemPanel.alliance')}</span>
                     <span className="sys-info__sov-name">{sov.alliance.name}</span>
                     <span className="sys-info__sov-ticker">[{sov.alliance.ticker}]</span>
                   </div>
@@ -525,7 +531,7 @@ export function SystemPanel() {
                 <div className="sys-info__row sys-info__sov">
                   <img className="sys-info__sov-logo" src={sov.corp.logoUrl} alt={sov.corp.name} />
                   <div className="sys-info__sov-text">
-                    <span className="sys-info__sov-label">Corp</span>
+                    <span className="sys-info__sov-label">{t('systemPanel.corp')}</span>
                     <span className="sys-info__sov-name">{sov.corp.name}</span>
                     <span className="sys-info__sov-ticker">[{sov.corp.ticker}]</span>
                   </div>
@@ -540,7 +546,7 @@ export function SystemPanel() {
                 <div className="sys-info__row sys-info__sov">
                   <img className="sys-info__sov-logo" src={sov.faction.logoUrl} alt={sov.faction.name} />
                   <div className="sys-info__sov-text">
-                    <span className="sys-info__sov-label">Faction</span>
+                    <span className="sys-info__sov-label">{t('systemPanel.faction')}</span>
                     <span className="sys-info__sov-name">{sov.faction.name}</span>
                   </div>
                 </div>
@@ -568,7 +574,7 @@ export function SystemPanel() {
                 return true;
               })
               .map((id) => (
-                <DraggableCard key={id} id={id} title={PANEL_TITLES[id] ?? id}>
+                <DraggableCard key={id} id={id} title={panelTitle[id] ?? id}>
                   {cards[id]}
                 </DraggableCard>
               ))}
@@ -584,6 +590,7 @@ export function SystemPanel() {
 // alliance contacts from ESI (bypassing the 6h server TTL) and then
 // updates the in-memory cache so every consumer re-renders.
 function StandingsRefreshButton({ standings }: { standings: ReturnType<typeof useStandings> }) {
+  const { t } = useTranslation();
   const [status, setStatus] = useState<'idle' | 'ok' | 'err'>('idle');
   const busy = standings.refreshing || status === 'idle' && false; // placeholder, see onClick
 
@@ -592,18 +599,22 @@ function StandingsRefreshButton({ standings }: { standings: ReturnType<typeof us
     if (!r) { setStatus('err'); }
     else if (r.succeeded?.character || r.succeeded?.corp || r.succeeded?.alliance) {
       toast.success(
-        `Standings refreshed — ${r.counts?.character ?? 0} personal · ${r.counts?.corp ?? 0} corp · ${r.counts?.alliance ?? 0} alliance contacts`
+        t('systemPanel.standingsRefreshed', {
+          personal: r.counts?.character ?? 0,
+          corp: r.counts?.corp ?? 0,
+          alliance: r.counts?.alliance ?? 0,
+        })
       );
       setStatus('ok');
     } else {
-      toast.error('No contacts could be refreshed. Token may be missing the read_contacts scope — log out and back in.');
+      toast.error(t('systemPanel.noContactsRefreshed'));
       setStatus('err');
     }
     setTimeout(() => setStatus('idle'), 2000);
   }
 
   return (
-    <Tooltip label="Refresh standings from ESI now (bypasses the 6h TTL)" placement="above">
+    <Tooltip label={t('systemPanel.refreshStandings')} placement="above">
       <button
         type="button"
         className={`sys-info__refresh-btn${standings.refreshing ? ' sys-info__refresh-btn--busy' : ''}${status === 'ok' ? ' sys-info__refresh-btn--ok' : ''}${status === 'err' ? ' sys-info__refresh-btn--err' : ''}`}
@@ -629,6 +640,7 @@ function StandingsBadges({
   kind: ContactKind;
   id: number;
 }) {
+  const { t } = useTranslation();
   // Always render the container so the row layout is stable. When the
   // standings call hasn't returned yet, show a single "…" pill instead of
   // disappearing — makes it obvious whether the issue is "no data" vs
@@ -638,7 +650,7 @@ function StandingsBadges({
       <div className="sys-info__sov-standings">
         <span
           className="sys-info__sov-standing sys-info__sov-standing--none"
-          data-tooltip="Standings not loaded yet. If this stays here, log out and back in to grant the read_contacts scopes."
+          data-tooltip={t('systemPanel.standingsNotLoaded')}
         >
           <span className="sys-info__sov-standing-value">…</span>
         </span>
@@ -659,11 +671,12 @@ function StandingsBadges({
     <div className="sys-info__sov-standings">
       {entries.map((e) => {
         const cls = !e.hasBucket || e.value === null ? 'sys-info__sov-standing--none' : standingClass(e.value);
+        const lbl = labelFor(t, e.label);
         const tooltip = !e.hasBucket
-          ? `${labelFor(e.label)}: you are not in one`
+          ? t('systemPanel.standingNotInBucket', { label: lbl })
           : e.value === null
-            ? `${labelFor(e.label)}: no standing set`
-            : `${labelFor(e.label)}: ${e.value.toFixed(1)}`;
+            ? t('systemPanel.standingNotSet', { label: lbl })
+            : t('systemPanel.standingValue', { label: lbl, value: e.value.toFixed(1) });
         return (
           <span
             key={e.label}
@@ -681,11 +694,11 @@ function StandingsBadges({
   );
 }
 
-function labelFor(short: string): string {
+function labelFor(t: TFunction, short: string): string {
   switch (short) {
-    case 'P': return 'Personal';
-    case 'C': return 'Corp';
-    case 'A': return 'Alliance';
+    case 'P': return t('systemPanel.personal');
+    case 'C': return t('systemPanel.corp');
+    case 'A': return t('systemPanel.alliance');
     default:  return short;
   }
 }

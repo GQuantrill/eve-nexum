@@ -24,9 +24,12 @@
     "@xyflow/react": "^12.10.2",
     "chart.js": "^4.5.1",
     "html-to-image": "^1.11.13",
+    "i18next": "^26.3.0",
+    "i18next-browser-languagedetector": "^8.2.1",
     "react": "^19.2.5",
     "react-chartjs-2": "^5.3.1",
     "react-dom": "^19.2.5",
+    "react-i18next": "^17.0.8",
     "rehype-sanitize": "^6.0.0",
     "uuid": "^14.0.0",
     "zustand": "^5.0.13"

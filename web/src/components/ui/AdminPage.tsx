@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { api } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { useHashRoute } from '../../hooks/useHashRoute';
+import { timeAgo, europeanDate, DASH } from '../../i18n/format';
 import { ConfirmModal } from './ConfirmModal';
 import {
   Chart as ChartJS,
@@ -19,15 +22,16 @@ const ROLES: Role[] = ['admin', 'full', 'edit', 'readonly'];
 
 type Tab = 'users' | 'maps' | 'reports' | 'audit' | 'discord';
 
-const ALL_TABS: { key: Tab; label: string; path: string }[] = [
-  { key: 'users',   label: 'Users',     path: '/admin/users'   },
-  { key: 'maps',    label: 'Maps',      path: '/admin/maps'    },
-  { key: 'reports', label: 'Reports',   path: '/admin/reports' },
-  { key: 'discord', label: 'Discord',   path: '/admin/discord' },
-  { key: 'audit',   label: 'Audit log', path: '/admin/audit'   },
+const ALL_TABS: { key: Tab; path: string }[] = [
+  { key: 'users',   path: '/admin/users'   },
+  { key: 'maps',    path: '/admin/maps'    },
+  { key: 'reports', path: '/admin/reports' },
+  { key: 'discord', path: '/admin/discord' },
+  { key: 'audit',   path: '/admin/audit'   },
 ];
 
 export function AdminPage() {
+  const { t } = useTranslation();
   const [path, navigate] = useHashRoute();
   const { user } = useAuth();
   const isAdmin = user?.role === 'admin';
@@ -45,16 +49,16 @@ export function AdminPage() {
   return (
     <div className="admin-page">
       <aside className="admin-page__nav">
-        <button className="admin-page__back" onClick={() => navigate('/')}>← Back to maps</button>
-        <h1 className="admin-page__title">Admin</h1>
+        <button className="admin-page__back" onClick={() => navigate('/')}>← {t('admin.back')}</button>
+        <h1 className="admin-page__title">{t('admin.title')}</h1>
         <nav className="admin-page__tabs">
-          {tabs.map((t) => (
+          {tabs.map((tb) => (
             <button
-              key={t.key}
-              className={`admin-page__tab${tab === t.key ? ' admin-page__tab--active' : ''}`}
-              onClick={() => navigate(t.path)}
+              key={tb.key}
+              className={`admin-page__tab${tab === tb.key ? ' admin-page__tab--active' : ''}`}
+              onClick={() => navigate(tb.path)}
             >
-              {t.label}
+              {t(`admin.tabs.${tb.key}`)}
             </button>
           ))}
         </nav>
@@ -145,6 +149,7 @@ function compareUsers(a: AdminUser, b: AdminUser, sort: UserSort): number {
 }
 
 function UsersTab() {
+  const { t } = useTranslation();
   const { user: self } = useAuth();
   const canEdit = self?.role === 'admin';
   const [users, setUsers]     = useState<AdminUser[] | null>(null);
@@ -171,9 +176,9 @@ function UsersTab() {
       setUsers(r.users);
       setError(null);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to load users');
+      setError(e instanceof Error ? e.message : t('admin.users.loadFailed'));
     }
-  }, []);
+  }, [t]);
 
   // load() is async and only setStates after its await (never synchronously),
   // so this fetch-on-mount of a reusable loader is safe; the rule is a false
@@ -191,7 +196,7 @@ function UsersTab() {
       });
       await load();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Role change failed');
+      setError(e instanceof Error ? e.message : t('admin.users.roleChangeFailed'));
     } finally {
       setBusyId(null);
     }
@@ -203,7 +208,7 @@ function UsersTab() {
       await api(`/api/admin/users/${u.id}/${blocked ? 'block' : 'unblock'}`, { method: 'POST' });
       await load();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Block change failed');
+      setError(e instanceof Error ? e.message : t('admin.users.blockChangeFailed'));
     } finally {
       setBusyId(null);
       setBlockTarget(null);
@@ -216,7 +221,7 @@ function UsersTab() {
       await api(`/api/admin/users/${u.id}/recheck-corp`, { method: 'POST' });
       await load();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Recheck failed');
+      setError(e instanceof Error ? e.message : t('admin.users.recheckFailed'));
     } finally {
       setBusyId(null);
     }
@@ -224,20 +229,20 @@ function UsersTab() {
 
   return (
     <>
-      <h2 className="admin-page__section-title">Users</h2>
+      <h2 className="admin-page__section-title">{t('admin.users.title')}</h2>
       {error && <div className="admin-page__error">{error}</div>}
-      {!users && !error && <div className="admin-page__loading">Loading…</div>}
-      {users && !users.length && <div className="admin-page__empty">No users yet.</div>}
+      {!users && !error && <div className="admin-page__loading">{t('admin.loading')}</div>}
+      {users && !users.length && <div className="admin-page__empty">{t('admin.users.none')}</div>}
       {users && users.length > 0 && (
         <table className="admin-modal__table">
           <thead>
             <tr>
-              <SortableTh col="characterName"  label="Character"  sort={sort} onToggle={toggleSort} />
-              <SortableTh col="corpTicker"     label="Corp"       sort={sort} onToggle={toggleSort} />
-              <SortableTh col="allianceTicker" label="Alliance"   sort={sort} onToggle={toggleSort} />
-              <SortableTh col="role"           label="Role"       sort={sort} onToggle={toggleSort} />
-              <SortableTh col="blocked"        label="Status"     sort={sort} onToggle={toggleSort} />
-              <SortableTh col="lastLogin"      label="Last login" sort={sort} onToggle={toggleSort} />
+              <SortableTh col="characterName"  label={t('admin.users.colCharacter')} sort={sort} onToggle={toggleSort} />
+              <SortableTh col="corpTicker"     label={t('admin.users.colCorp')}      sort={sort} onToggle={toggleSort} />
+              <SortableTh col="allianceTicker" label={t('admin.users.colAlliance')}  sort={sort} onToggle={toggleSort} />
+              <SortableTh col="role"           label={t('admin.users.colRole')}      sort={sort} onToggle={toggleSort} />
+              <SortableTh col="blocked"        label={t('admin.users.colStatus')}    sort={sort} onToggle={toggleSort} />
+              <SortableTh col="lastLogin"      label={t('admin.users.colLastLogin')} sort={sort} onToggle={toggleSort} />
               {canEdit && <th />}
             </tr>
           </thead>
@@ -254,7 +259,7 @@ function UsersTab() {
                       alt=""
                     />
                     <span>{u.characterName}</span>
-                    {isSelf && <span className="admin-modal__self-tag">you</span>}
+                    {isSelf && <span className="admin-modal__self-tag">{t('admin.users.you')}</span>}
                   </td>
                   <td title={u.corpName ?? undefined}>
                     {u.corpTicker
@@ -282,15 +287,15 @@ function UsersTab() {
                   </td>
                   <td>
                     {u.blocked
-                      ? <span className="admin-modal__pill admin-modal__pill--blocked">blocked</span>
-                      : <span className="admin-modal__pill admin-modal__pill--ok">active</span>}
+                      ? <span className="admin-modal__pill admin-modal__pill--blocked">{t('admin.users.blocked')}</span>
+                      : <span className="admin-modal__pill admin-modal__pill--ok">{t('admin.users.active')}</span>}
                   </td>
-                  <td className="admin-modal__when">{formatRelative(u.lastLogin)}</td>
+                  <td className="admin-modal__when">{formatRelative(t, u.lastLogin)}</td>
                   {canEdit && (
                     <td className="admin-modal__actions">
                       {u.blocked ? (
                         <button className="btn btn--ghost btn--sm" disabled={isBusy} onClick={() => setBlocked(u, false)}>
-                          Unblock
+                          {t('admin.users.unblock')}
                         </button>
                       ) : (
                         <button
@@ -298,16 +303,16 @@ function UsersTab() {
                           disabled={isBusy || isSelf}
                           onClick={() => setBlockTarget(u)}
                         >
-                          Block
+                          {t('admin.users.block')}
                         </button>
                       )}
                       <button
                         className="btn btn--ghost btn--sm"
                         disabled={isBusy}
                         onClick={() => recheckCorp(u)}
-                        title="Re-query ESI for this user's current corp"
+                        title={t('admin.users.recheckTitle')}
                       >
-                        Recheck
+                        {t('admin.users.recheck')}
                       </button>
                     </td>
                   )}
@@ -320,7 +325,7 @@ function UsersTab() {
 
       {blockTarget && (
         <ConfirmModal
-          message={`Block ${blockTarget.characterName}? They'll be signed out at their next request.`}
+          message={t('admin.users.blockConfirm', { name: blockTarget.characterName })}
           onCancel={() => setBlockTarget(null)}
           onConfirm={() => setBlocked(blockTarget, true)}
         />
@@ -348,6 +353,7 @@ interface AdminMap {
 }
 
 function MapsTab() {
+  const { t } = useTranslation();
   const [maps, setMaps]   = useState<AdminMap[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -359,9 +365,9 @@ function MapsTab() {
       setMaps(r.maps);
       setError(null);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to load maps');
+      setError(e instanceof Error ? e.message : t('admin.maps.loadFailed'));
     }
-  }, []);
+  }, [t]);
 
   // load() is async and only setStates after its await (never synchronously),
   // so this fetch-on-mount of a reusable loader is safe; the rule is a false
@@ -375,7 +381,7 @@ function MapsTab() {
       await api(`/api/admin/maps/${m.id}/${locked ? 'lock' : 'unlock'}`, { method: 'POST' });
       await load();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Lock change failed');
+      setError(e instanceof Error ? e.message : t('admin.maps.lockChangeFailed'));
     } finally {
       setBusyId(null);
     }
@@ -387,7 +393,7 @@ function MapsTab() {
       await api(`/api/admin/maps/${m.id}`, { method: 'DELETE' });
       await load();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Delete failed');
+      setError(e instanceof Error ? e.message : t('admin.maps.deleteFailed'));
     } finally {
       setBusyId(null);
       setDeleteTarget(null);
@@ -396,21 +402,21 @@ function MapsTab() {
 
   return (
     <>
-      <h2 className="admin-page__section-title">Maps</h2>
+      <h2 className="admin-page__section-title">{t('admin.maps.title')}</h2>
       {error && <div className="admin-page__error">{error}</div>}
-      {!maps && !error && <div className="admin-page__loading">Loading…</div>}
-      {maps && !maps.length && <div className="admin-page__empty">No maps yet.</div>}
+      {!maps && !error && <div className="admin-page__loading">{t('admin.loading')}</div>}
+      {maps && !maps.length && <div className="admin-page__empty">{t('admin.maps.none')}</div>}
       {maps && maps.length > 0 && (
         <table className="admin-modal__table">
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Owner</th>
-              <th>Corp</th>
-              <th>Systems</th>
-              <th>Connections</th>
-              <th>Lock</th>
-              <th>Last active</th>
+              <th>{t('admin.maps.colName')}</th>
+              <th>{t('admin.maps.colOwner')}</th>
+              <th>{t('admin.maps.colCorp')}</th>
+              <th>{t('admin.maps.colSystems')}</th>
+              <th>{t('admin.maps.colConnections')}</th>
+              <th>{t('admin.maps.colLock')}</th>
+              <th>{t('admin.maps.colLastActive')}</th>
               <th />
             </tr>
           </thead>
@@ -437,28 +443,28 @@ function MapsTab() {
                   <td className="admin-modal__num">{m.connectionCount}</td>
                   <td>
                     {m.locked
-                      ? <span className="admin-modal__pill admin-modal__pill--blocked">locked</span>
-                      : <span className="admin-modal__pill admin-modal__pill--ok">open</span>}
+                      ? <span className="admin-modal__pill admin-modal__pill--blocked">{t('admin.maps.locked')}</span>
+                      : <span className="admin-modal__pill admin-modal__pill--ok">{t('admin.maps.open')}</span>}
                   </td>
-                  <td className="admin-modal__when">{formatRelative(m.lastActiveAt)}</td>
+                  <td className="admin-modal__when">{formatRelative(t, m.lastActiveAt)}</td>
                   <td className="admin-modal__actions">
                     {m.locked ? (
                       <button
                         className="btn btn--ghost btn--sm"
                         disabled={isBusy}
                         onClick={() => setLock(m, false)}
-                        title="Unfreeze the map; systems and connections become editable again"
+                        title={t('admin.maps.unlockTitle')}
                       >
-                        Unlock
+                        {t('admin.maps.unlock')}
                       </button>
                     ) : (
                       <button
                         className="btn btn--ghost btn--sm"
                         disabled={isBusy}
                         onClick={() => setLock(m, true)}
-                        title="Freeze systems and connections; signatures/structures/notes stay editable"
+                        title={t('admin.maps.lockTitle')}
                       >
-                        Lock
+                        {t('admin.maps.lock')}
                       </button>
                     )}
                     <button
@@ -466,7 +472,7 @@ function MapsTab() {
                       disabled={isBusy}
                       onClick={() => setDeleteTarget(m)}
                     >
-                      Delete
+                      {t('actions.delete')}
                     </button>
                   </td>
                 </tr>
@@ -478,7 +484,7 @@ function MapsTab() {
 
       {deleteTarget && (
         <ConfirmModal
-          message={`Force-delete "${deleteTarget.name}" (owned by ${deleteTarget.ownerCharacterName})? This cannot be undone.`}
+          message={t('admin.maps.deleteConfirm', { name: deleteTarget.name, owner: deleteTarget.ownerCharacterName })}
           onCancel={() => setDeleteTarget(null)}
           onConfirm={() => destroy(deleteTarget)}
         />
@@ -491,43 +497,52 @@ function MapsTab() {
 
 type ReportKind = 'users' | 'systems' | 'ghost-sites';
 
-const REPORTS: { key: ReportKind; label: string }[] = [
-  { key: 'users',       label: 'Users'       },
-  { key: 'systems',     label: 'Systems'     },
-  { key: 'ghost-sites', label: 'Ghost sites' },
+const REPORTS: { key: ReportKind }[] = [
+  { key: 'users'       },
+  { key: 'systems'     },
+  { key: 'ghost-sites' },
 ];
 
+// 'ghost-sites' doesn't map cleanly onto a dotted i18n key, so spell the
+// sub-tab labels out rather than building keys dynamically.
+const REPORT_TAB_KEY: Record<ReportKind, 'admin.reports.tabs.users' | 'admin.reports.tabs.systems' | 'admin.reports.tabs.ghostSites'> = {
+  users:         'admin.reports.tabs.users',
+  systems:       'admin.reports.tabs.systems',
+  'ghost-sites': 'admin.reports.tabs.ghostSites',
+};
+
 type WindowKey = 'all' | '24h' | 'week' | 'month' | 'year';
-const WINDOW_OPTIONS: { value: WindowKey; label: string }[] = [
-  { value: 'all',   label: 'All time'   },
-  { value: '24h',   label: 'Past 24 hours' },
-  { value: 'week',  label: 'Past week'  },
-  { value: 'month', label: 'Past month' },
-  { value: 'year',  label: 'Past year'  },
+const WINDOW_OPTIONS: { value: WindowKey }[] = [
+  { value: 'all'   },
+  { value: '24h'   },
+  { value: 'week'  },
+  { value: 'month' },
+  { value: 'year'  },
 ];
 
 // Match the server's bucket choice: 24h → hourly, week/month → daily,
 // year/all → monthly. The chart title narrates whichever bucket is in play
 // so admins aren't reading "per day" against monthly points.
-function chartTitleFor(window: WindowKey): string {
+function chartTitleFor(t: TFunction, window: WindowKey): string {
   switch (window) {
-    case '24h':   return 'Signatures per hour (past 24 hours)';
-    case 'week':  return 'Signatures per day (past week)';
-    case 'month': return 'Signatures per day (past month)';
-    case 'year':  return 'Signatures per month (past year)';
-    case 'all':   return 'Signatures per month (all time)';
+    case '24h':   return t('admin.reports.systems.chart.hour24');
+    case 'week':  return t('admin.reports.systems.chart.dayWeek');
+    case 'month': return t('admin.reports.systems.chart.dayMonth');
+    case 'year':  return t('admin.reports.systems.chart.monthYear');
+    case 'all':   return t('admin.reports.systems.chart.monthAll');
   }
 }
 
 type UserFilterKey = 'all' | 'logins' | 'signatures' | 'structures';
-const USER_FILTER_OPTIONS: { value: UserFilterKey; label: string }[] = [
-  { value: 'all',        label: 'All users'   },
-  { value: 'logins',     label: 'Logins'      },
-  { value: 'signatures', label: 'Signatures'  },
-  { value: 'structures', label: 'Structures'  },
+const USER_FILTER_OPTIONS: { value: UserFilterKey }[] = [
+  { value: 'all'        },
+  { value: 'logins'     },
+  { value: 'signatures' },
+  { value: 'structures' },
 ];
 
 function ReportsTab() {
+  const { t } = useTranslation();
   const [path, navigate] = useHashRoute();
   const { user } = useAuth();
   const canSeeReports = !!user?.canViewReports;
@@ -539,7 +554,7 @@ function ReportsTab() {
 
   return (
     <>
-      <h2 className="admin-page__section-title">Reports</h2>
+      <h2 className="admin-page__section-title">{t('admin.reports.title')}</h2>
       <div className="admin-page__subtabs">
         {visibleReports.map((r) => (
           <button
@@ -547,7 +562,7 @@ function ReportsTab() {
             className={`admin-page__subtab${kind === r.key ? ' admin-page__subtab--active' : ''}`}
             onClick={() => navigate(`/admin/reports/${r.key}`)}
           >
-            {r.label}
+            {t(REPORT_TAB_KEY[r.key])}
           </button>
         ))}
       </div>
@@ -587,7 +602,8 @@ interface UserReportRow {
   sigTypeCounts:        Record<string, number>;
 }
 
-const SIG_TYPE_ORDER: { key: string; label: string }[] = [
+type SigTypeKey = 'data' | 'relic' | 'wormhole' | 'gas' | 'ore' | 'combat' | 'unknown';
+const SIG_TYPE_ORDER: { key: SigTypeKey; label: string }[] = [
   { key: 'data',     label: 'Data'     },
   { key: 'relic',    label: 'Relic'    },
   { key: 'wormhole', label: 'WH'       },
@@ -638,6 +654,7 @@ function compareValues(a: string | number | null, b: string | number | null, dir
 }
 
 function UsersReport() {
+  const { t } = useTranslation();
   const [rows, setRows]   = useState<UserReportRow[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [sort, setSort]   = useState<{ key: UserReportSortKey; dir: SortDir }>({ key: 'name', dir: 'asc' });
@@ -662,9 +679,9 @@ function UsersReport() {
     const qs = params.toString();
     api<{ users: UserReportRow[] }>(`/api/admin/reports/users${qs ? `?${qs}` : ''}`)
       .then((r) => { if (!cancelled) setRows(r.users); })
-      .catch((e) => { if (!cancelled) setError(e instanceof Error ? e.message : 'Failed to load users report'); });
+      .catch((e) => { if (!cancelled) setError(e instanceof Error ? e.message : t('admin.reports.users.loadFailed')); });
     return () => { cancelled = true; };
-  }, [filter, window]);
+  }, [filter, window, t]);
 
   const sortedRows = useMemo(() => {
     if (!rows) return null;
@@ -699,7 +716,7 @@ function UsersReport() {
       'Systems added', 'Systems deleted',
       'Last corp structure (ISO)', 'Total structures',
       'Last corp signature (ISO)', 'Total signatures',
-      ...SIG_TYPE_ORDER.map((t) => t.label),
+      ...SIG_TYPE_ORDER.map((st) => st.label),
     ];
     const rows = sortedRows.map((u) => {
       const total = Object.values(u.sigTypeCounts).reduce((a, b) => a + b, 0);
@@ -718,7 +735,7 @@ function UsersReport() {
         String(u.totalCorpStructures),
         u.lastCorpSigAt    ?? '',
         String(total),
-        ...SIG_TYPE_ORDER.map((t) => String(u.sigTypeCounts[t.key] ?? 0)),
+        ...SIG_TYPE_ORDER.map((st) => String(u.sigTypeCounts[st.key] ?? 0)),
       ];
     });
     const csv = [header, ...rows].map((r) => r.map(csvEscape).join(',')).join('\r\n');
@@ -734,66 +751,66 @@ function UsersReport() {
   const controls = (
     <div className="admin-page__filter-bar">
       <div className="admin-page__filter-group">
-        <label className="admin-page__filter-label">Filter</label>
+        <label className="admin-page__filter-label">{t('admin.reports.filter')}</label>
         <select
           className="admin-modal__role-select"
           value={filter}
           onChange={(e) => setFilter(e.target.value as UserFilterKey)}
         >
-          {USER_FILTER_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+          {USER_FILTER_OPTIONS.map((o) => <option key={o.value} value={o.value}>{t(`admin.reports.userFilters.${o.value}`)}</option>)}
         </select>
       </div>
       <div className="admin-page__filter-group">
-        <label className="admin-page__filter-label">Window</label>
+        <label className="admin-page__filter-label">{t('admin.reports.window')}</label>
         <select
           className="admin-modal__role-select"
           value={window}
           onChange={(e) => setWindow(e.target.value as WindowKey)}
           disabled={filter === 'all'}
-          title={filter === 'all' ? 'Pick a filter to apply a window' : ''}
+          title={filter === 'all' ? t('admin.reports.windowHint') : ''}
         >
-          {WINDOW_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+          {WINDOW_OPTIONS.map((o) => <option key={o.value} value={o.value}>{t(`admin.reports.windowOptions.${o.value}`)}</option>)}
         </select>
       </div>
       <div className="admin-page__filter-spacer" />
       {sortedRows && sortedRows.length > 0 && (
         <button className="btn btn--ghost btn--sm" onClick={downloadCsv}>
-          ↓ Export as CSV
+          ↓ {t('admin.exportCsv')}
         </button>
       )}
     </div>
   );
 
   if (error) return <>{controls}<div className="admin-page__error">{error}</div></>;
-  if (!sortedRows) return <>{controls}<div className="admin-page__loading">Loading…</div></>;
-  if (!sortedRows.length) return <>{controls}<div className="admin-page__empty">No users match the current filter.</div></>;
+  if (!sortedRows) return <>{controls}<div className="admin-page__loading">{t('admin.loading')}</div></>;
+  if (!sortedRows.length) return <>{controls}<div className="admin-page__empty">{t('admin.reports.users.empty')}</div></>;
 
   return (
     <>
     {controls}
     <div className="admin-page__stat-grid">
-      <StatCard label="Total users"      value={summary.users}     accent />
-      <StatCard label="Unique corps"     value={summary.corps} />
-      <StatCard label="Unique alliances" value={summary.alliances} />
+      <StatCard label={t('admin.reports.users.totalUsers')}      value={summary.users}     accent />
+      <StatCard label={t('admin.reports.users.uniqueCorps')}     value={summary.corps} />
+      <StatCard label={t('admin.reports.users.uniqueAlliances')} value={summary.alliances} />
     </div>
     <table className="admin-modal__table admin-page__sortable">
       <thead>
         <tr>
-          <SortHeader label="Character"          colKey="name"           sort={sort} onSort={handleSort} />
-          <SortHeader label="Corp"               colKey="corp"           sort={sort} onSort={handleSort} />
-          <SortHeader label="Alliance"           colKey="alliance"       sort={sort} onSort={handleSort} />
-          <SortHeader label="Last login"           colKey="lastLogin"      sort={sort} onSort={handleSort} />
-          <SortHeader label="Systems added"        colKey="systemsAdded"   sort={sort} onSort={handleSort} />
-          <SortHeader label="Systems deleted"      colKey="systemsDeleted" sort={sort} onSort={handleSort} />
-          <SortHeader label="Last corp structure"  colKey="lastCorpStruct" sort={sort} onSort={handleSort} />
-          <SortHeader label="Total structures"     colKey="structTotal"    sort={sort} onSort={handleSort} />
-          <SortHeader label="Last corp signature"  colKey="lastCorpSig"    sort={sort} onSort={handleSort} />
-          <SortHeader label="Total signatures"     colKey="sigTotal"       sort={sort} onSort={handleSort} />
-          {SIG_TYPE_ORDER.map((t) => (
+          <SortHeader label={t('admin.reports.users.colCharacter')}         colKey="name"           sort={sort} onSort={handleSort} />
+          <SortHeader label={t('admin.reports.users.colCorp')}              colKey="corp"           sort={sort} onSort={handleSort} />
+          <SortHeader label={t('admin.reports.users.colAlliance')}          colKey="alliance"       sort={sort} onSort={handleSort} />
+          <SortHeader label={t('admin.reports.users.colLastLogin')}         colKey="lastLogin"      sort={sort} onSort={handleSort} />
+          <SortHeader label={t('admin.reports.users.colSystemsAdded')}      colKey="systemsAdded"   sort={sort} onSort={handleSort} />
+          <SortHeader label={t('admin.reports.users.colSystemsDeleted')}    colKey="systemsDeleted" sort={sort} onSort={handleSort} />
+          <SortHeader label={t('admin.reports.users.colLastCorpStructure')} colKey="lastCorpStruct" sort={sort} onSort={handleSort} />
+          <SortHeader label={t('admin.reports.users.colTotalStructures')}   colKey="structTotal"    sort={sort} onSort={handleSort} />
+          <SortHeader label={t('admin.reports.users.colLastCorpSignature')} colKey="lastCorpSig"    sort={sort} onSort={handleSort} />
+          <SortHeader label={t('admin.reports.users.colTotalSignatures')}   colKey="sigTotal"       sort={sort} onSort={handleSort} />
+          {SIG_TYPE_ORDER.map((st) => (
             <SortHeader
-              key={t.key}
-              label={t.label}
-              colKey={`sig:${t.key}` as UserReportSortKey}
+              key={st.key}
+              label={t(`admin.reports.sig.${st.key}`)}
+              colKey={`sig:${st.key}` as UserReportSortKey}
               sort={sort}
               onSort={handleSort}
               align="center"
@@ -826,17 +843,17 @@ function UsersReport() {
                     ? <span className="admin-modal__mono">{u.allianceId}</span>
                     : '—'}
               </td>
-              <td className="admin-modal__when">{u.lastLogin ? formatRelative(u.lastLogin) : '—'}</td>
+              <td className="admin-modal__when">{u.lastLogin ? formatRelative(t, u.lastLogin) : '—'}</td>
               <td className="admin-modal__num">{u.systemsAdded   > 0 ? u.systemsAdded   : '—'}</td>
               <td className="admin-modal__num">{u.systemsDeleted > 0 ? u.systemsDeleted : '—'}</td>
-              <td className="admin-modal__when">{u.lastCorpStructAt ? formatRelative(u.lastCorpStructAt) : '—'}</td>
+              <td className="admin-modal__when">{u.lastCorpStructAt ? formatRelative(t, u.lastCorpStructAt) : '—'}</td>
               <td className="admin-modal__num">{u.totalCorpStructures > 0 ? u.totalCorpStructures : '—'}</td>
-              <td className="admin-modal__when">{u.lastCorpSigAt ? formatRelative(u.lastCorpSigAt) : '—'}</td>
+              <td className="admin-modal__when">{u.lastCorpSigAt ? formatRelative(t, u.lastCorpSigAt) : '—'}</td>
               <td className="admin-modal__num">{total > 0 ? total : '—'}</td>
-              {SIG_TYPE_ORDER.map((t) => {
-                const n = u.sigTypeCounts[t.key] ?? 0;
+              {SIG_TYPE_ORDER.map((st) => {
+                const n = u.sigTypeCounts[st.key] ?? 0;
                 return (
-                  <td key={t.key} className="admin-modal__num--center">
+                  <td key={st.key} className="admin-modal__num--center">
                     {n > 0 ? n : <span className="admin-modal__mono">—</span>}
                   </td>
                 );
@@ -906,6 +923,7 @@ const SIG_TYPE_COLORS: Record<string, string> = {
 type WhSortKey = 'whType' | 'count';
 
 function SystemsReport() {
+  const { t } = useTranslation();
   const [data, setData]   = useState<SystemsReportData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [whSort, setWhSort] = useState<{ key: WhSortKey; dir: SortDir }>({ key: 'count', dir: 'desc' });
@@ -925,9 +943,9 @@ function SystemsReport() {
     const qs = window === 'all' ? '' : `?window=${window}`;
     api<SystemsReportData>(`/api/admin/reports/systems${qs}`)
       .then((d) => { if (!cancelled) setData(d); })
-      .catch((e) => { if (!cancelled) setError(e instanceof Error ? e.message : 'Failed to load systems report'); });
+      .catch((e) => { if (!cancelled) setError(e instanceof Error ? e.message : t('admin.reports.systems.loadFailed')); });
     return () => { cancelled = true; };
-  }, [window]);
+  }, [window, t]);
 
   const sortedWh = useMemo(() => {
     if (!data) return null;
@@ -946,38 +964,38 @@ function SystemsReport() {
   const controls = (
     <div className="admin-page__filter-bar">
       <div className="admin-page__filter-group">
-        <label className="admin-page__filter-label">Window</label>
+        <label className="admin-page__filter-label">{t('admin.reports.window')}</label>
         <select
           className="admin-modal__role-select"
           value={window}
           onChange={(e) => setWindow(e.target.value as WindowKey)}
         >
-          {WINDOW_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+          {WINDOW_OPTIONS.map((o) => <option key={o.value} value={o.value}>{t(`admin.reports.windowOptions.${o.value}`)}</option>)}
         </select>
       </div>
     </div>
   );
 
   if (error) return <>{controls}<div className="admin-page__error">{error}</div></>;
-  if (!data || !sortedWh) return <>{controls}<div className="admin-page__loading">Loading…</div></>;
-  if (data.total === 0) return <>{controls}<div className="admin-page__empty">No signatures in this window.</div></>;
+  if (!data || !sortedWh) return <>{controls}<div className="admin-page__loading">{t('admin.loading')}</div></>;
+  if (data.total === 0) return <>{controls}<div className="admin-page__empty">{t('admin.reports.systems.empty')}</div></>;
 
   const donutEntries = SIG_TYPE_ORDER
-    .map((t) => ({ key: t.key, label: t.label, count: data.byType[t.key] ?? 0 }))
+    .map((st) => ({ key: st.key, label: t(`admin.reports.sig.${st.key}`), count: data.byType[st.key] ?? 0 }))
     .filter((e) => e.count > 0);
 
   return (
     <>
       {controls}
-      <h3 className="admin-page__report-heading">Signatures across all maps</h3>
+      <h3 className="admin-page__report-heading">{t('admin.reports.systems.heading')}</h3>
       <div className="admin-page__stat-grid">
-        <StatCard label="Total" value={data.total} accent />
-        {SIG_TYPE_ORDER.map((t) => {
-          const count = data.byType[t.key] ?? 0;
+        <StatCard label={t('admin.reports.systems.total')} value={data.total} accent />
+        {SIG_TYPE_ORDER.map((st) => {
+          const count = data.byType[st.key] ?? 0;
           return (
             <StatCard
-              key={t.key}
-              label={t.label}
+              key={st.key}
+              label={t(`admin.reports.sig.${st.key}`)}
               value={count}
               pct={data.total > 0 ? (count / data.total) * 100 : 0}
             />
@@ -987,7 +1005,7 @@ function SystemsReport() {
 
       <div className="admin-page__chart-row">
         <div className="admin-page__chart-card">
-          <div className="admin-page__chart-title">Signature type mix</div>
+          <div className="admin-page__chart-title">{t('admin.reports.systems.typeMix')}</div>
           <div className="admin-page__chart-canvas">
             <Doughnut
               data={{
@@ -1013,13 +1031,13 @@ function SystemsReport() {
         </div>
 
         <div className="admin-page__chart-card">
-          <div className="admin-page__chart-title">{chartTitleFor(window)}</div>
+          <div className="admin-page__chart-title">{chartTitleFor(t, window)}</div>
           <div className="admin-page__chart-canvas">
             <Line
               data={{
                 labels: data.dailyTotals.map((d) => d.day),
                 datasets: [{
-                  label:           'Signatures',
+                  label:           t('admin.reports.systems.sigLabel'),
                   data:            data.dailyTotals.map((d) => d.count),
                   borderColor:     '#7ab4f0',
                   backgroundColor: 'rgba(122,180,240,0.12)',
@@ -1054,15 +1072,15 @@ function SystemsReport() {
         </div>
       </div>
 
-      <h3 className="admin-page__report-heading">Wormhole types</h3>
+      <h3 className="admin-page__report-heading">{t('admin.reports.systems.whHeading')}</h3>
       {sortedWh.length === 0 ? (
-        <div className="admin-page__empty">No wormhole signatures with a recorded type yet.</div>
+        <div className="admin-page__empty">{t('admin.reports.systems.whEmpty')}</div>
       ) : (
         <table className="admin-modal__table admin-page__sortable admin-page__wh-table">
           <thead>
             <tr>
-              <SortHeader label="Type"  colKey="whType" sort={whSort} onSort={handleWhSort} />
-              <SortHeader label="Count" colKey="count"  sort={whSort} onSort={handleWhSort} />
+              <SortHeader label={t('admin.reports.systems.colType')}  colKey="whType" sort={whSort} onSort={handleWhSort} />
+              <SortHeader label={t('admin.reports.systems.colCount')} colKey="count"  sort={whSort} onSort={handleWhSort} />
             </tr>
           </thead>
           <tbody>
@@ -1122,6 +1140,7 @@ const GHOST_ACCESSORS: Record<GhostSortKey, (r: GhostSiteRow) => string | number
 };
 
 function GhostSitesReport() {
+  const { t } = useTranslation();
   const [rows, setRows]   = useState<GhostSiteRow[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [sort, setSort]   = useState<{ key: GhostSortKey; dir: SortDir }>({ key: 'region', dir: 'asc' });
@@ -1129,8 +1148,8 @@ function GhostSitesReport() {
   useEffect(() => {
     api<{ rows: GhostSiteRow[] }>('/api/admin/reports/ghost-sites')
       .then((d) => setRows(d.rows))
-      .catch((e) => setError(e instanceof Error ? e.message : 'Failed to load ghost sites report'));
-  }, []);
+      .catch((e) => setError(e instanceof Error ? e.message : t('admin.reports.ghost.loadFailed')));
+  }, [t]);
 
   const sorted = useMemo(() => {
     if (!rows) return null;
@@ -1145,26 +1164,26 @@ function GhostSitesReport() {
   }
 
   if (error)   return <div className="admin-page__error">{error}</div>;
-  if (!sorted) return <div className="admin-page__loading">Loading…</div>;
+  if (!sorted) return <div className="admin-page__loading">{t('admin.loading')}</div>;
 
   return (
     <>
-      <h3 className="admin-page__report-heading">Covert Research Facility observations</h3>
+      <h3 className="admin-page__report-heading">{t('admin.reports.ghost.heading')}</h3>
       {sorted.length === 0 ? (
-        <div className="admin-page__empty">No K-space ghost sites recorded yet.</div>
+        <div className="admin-page__empty">{t('admin.reports.ghost.empty')}</div>
       ) : (
         <table className="admin-modal__table admin-page__sortable">
           <thead>
             <tr>
-              <SortHeader label="Region"        colKey="region"        sort={sort} onSort={onSort} />
-              <SortHeader label="Constellation" colKey="constellation" sort={sort} onSort={onSort} />
-              <SortHeader label="System"        colKey="system"        sort={sort} onSort={onSort} />
-              <SortHeader label="Class"         colKey="class"         sort={sort} onSort={onSort} />
-              <SortHeader label="Sun"           colKey="sunType"       sort={sort} onSort={onSort} />
-              <SortHeader label="Planets"       colKey="planets"       sort={sort} onSort={onSort} />
-              <SortHeader label="Moons"         colKey="moons"         sort={sort} onSort={onSort} />
-              <SortHeader label="Observations"  colKey="observations"  sort={sort} onSort={onSort} />
-              <SortHeader label="Last seen"     colKey="lastSeen"      sort={sort} onSort={onSort} />
+              <SortHeader label={t('admin.reports.ghost.colRegion')}        colKey="region"        sort={sort} onSort={onSort} />
+              <SortHeader label={t('admin.reports.ghost.colConstellation')} colKey="constellation" sort={sort} onSort={onSort} />
+              <SortHeader label={t('admin.reports.ghost.colSystem')}        colKey="system"        sort={sort} onSort={onSort} />
+              <SortHeader label={t('admin.reports.ghost.colClass')}         colKey="class"         sort={sort} onSort={onSort} />
+              <SortHeader label={t('admin.reports.ghost.colSun')}           colKey="sunType"       sort={sort} onSort={onSort} />
+              <SortHeader label={t('admin.reports.ghost.colPlanets')}       colKey="planets"       sort={sort} onSort={onSort} />
+              <SortHeader label={t('admin.reports.ghost.colMoons')}         colKey="moons"         sort={sort} onSort={onSort} />
+              <SortHeader label={t('admin.reports.ghost.colObservations')}  colKey="observations"  sort={sort} onSort={onSort} />
+              <SortHeader label={t('admin.reports.ghost.colLastSeen')}      colKey="lastSeen"      sort={sort} onSort={onSort} />
             </tr>
           </thead>
           <tbody>
@@ -1203,14 +1222,15 @@ interface AuditEntry {
 }
 
 function AuditTab() {
+  const { t } = useTranslation();
   const [entries, setEntries] = useState<AuditEntry[] | null>(null);
   const [error, setError]     = useState<string | null>(null);
 
   useEffect(() => {
     api<{ entries: AuditEntry[] }>('/api/admin/audit')
       .then((r) => setEntries(r.entries))
-      .catch((e) => setError(e instanceof Error ? e.message : 'Failed to load audit log'));
-  }, []);
+      .catch((e) => setError(e instanceof Error ? e.message : t('admin.audit.loadFailed')));
+  }, [t]);
 
   function downloadCsv() {
     if (!entries) return;
@@ -1238,31 +1258,31 @@ function AuditTab() {
   return (
     <>
       <div className="admin-page__section-bar">
-        <h2 className="admin-page__section-title">Audit log</h2>
+        <h2 className="admin-page__section-title">{t('admin.audit.title')}</h2>
         {entries && entries.length > 0 && (
           <button className="btn btn--ghost btn--sm" onClick={downloadCsv}>
-            ↓ Export as CSV
+            ↓ {t('admin.exportCsv')}
           </button>
         )}
       </div>
       {error && <div className="admin-page__error">{error}</div>}
-      {!entries && !error && <div className="admin-page__loading">Loading…</div>}
-      {entries && !entries.length && <div className="admin-page__empty">No admin actions yet.</div>}
+      {!entries && !error && <div className="admin-page__loading">{t('admin.loading')}</div>}
+      {entries && !entries.length && <div className="admin-page__empty">{t('admin.audit.none')}</div>}
       {entries && entries.length > 0 && (
         <table className="admin-modal__table">
           <thead>
             <tr>
-              <th>When</th>
-              <th>Actor</th>
-              <th>Action</th>
-              <th>Target</th>
-              <th>Change</th>
+              <th>{t('admin.audit.colWhen')}</th>
+              <th>{t('admin.audit.colActor')}</th>
+              <th>{t('admin.audit.colAction')}</th>
+              <th>{t('admin.audit.colTarget')}</th>
+              <th>{t('admin.audit.colChange')}</th>
             </tr>
           </thead>
           <tbody>
             {entries.map((e) => (
               <tr key={e.id}>
-                <td className="admin-modal__when">{formatRelative(e.createdAt)}</td>
+                <td className="admin-modal__when">{formatRelative(t, e.createdAt)}</td>
                 <td>{e.actorCharacterName ?? '—'}</td>
                 <td><span className="admin-modal__action">{e.action}</span></td>
                 <td>{e.targetCharacterName ?? '—'}</td>
@@ -1280,25 +1300,14 @@ function AuditTab() {
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
-function formatRelative(iso: string): string {
+function formatRelative(t: TFunction, iso: string): string {
   const date = new Date(iso);
   const then = date.getTime();
-  if (Number.isNaN(then)) return '—';
-  const secs = Math.floor((Date.now() - then) / 1000);
-  if (secs < 60)              return `${secs}s ago`;
-  if (secs < 3600)            return `${Math.floor(secs / 60)}m ago`;
-  if (secs < 86400)           return `${Math.floor(secs / 3600)}h ago`;
-  if (secs < 86400 * 30)      return `${Math.floor(secs / 86400)}d ago`;
+  if (Number.isNaN(then)) return DASH;
   // Anything older than ~a month is more useful as an absolute European
   // date (DD-MM-YYYY) than "65d ago".
-  return formatEuropeanDate(date);
-}
-
-function formatEuropeanDate(date: Date): string {
-  const dd   = String(date.getDate()).padStart(2, '0');
-  const mm   = String(date.getMonth() + 1).padStart(2, '0');
-  const yyyy = date.getFullYear();
-  return `${dd}-${mm}-${yyyy}`;
+  if (Date.now() - then >= 86400 * 30 * 1000) return europeanDate(date);
+  return timeAgo(t, date);
 }
 
 // RFC 4180 CSV escaping: wrap in double quotes if the field contains a
@@ -1318,6 +1327,7 @@ interface DiscordSettings {
 interface RegionOption { id: number; name: string }
 
 function DiscordTab() {
+  const { t } = useTranslation();
   const [data, setData]           = useState<DiscordSettings | null>(null);
   const [regionOpts, setRegionOpts] = useState<RegionOption[]>([]);
   const [error, setError]         = useState<string | null>(null);
@@ -1341,9 +1351,9 @@ function DiscordTab() {
       setRegionOpts(r.regions);
       setError(null);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to load Discord settings');
+      setError(e instanceof Error ? e.message : t('admin.discord.loadFailed'));
     }
-  }, []);
+  }, [t]);
   // load() is async and only setStates after its await (never synchronously),
   // so this fetch-on-mount of a reusable loader is safe; the rule is a false
   // positive here.
@@ -1358,7 +1368,7 @@ function DiscordTab() {
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Save failed');
+      setError(e instanceof Error ? e.message : t('admin.discord.saveFailed'));
     } finally {
       setSaving(false);
     }
@@ -1369,7 +1379,7 @@ function DiscordTab() {
     try {
       await api(`/api/admin/maps/${id}/discord`, { method: 'PATCH', body: JSON.stringify({ excluded }) });
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Update failed');
+      setError(e instanceof Error ? e.message : t('admin.discord.updateFailed'));
       load(); // reload to revert the optimistic toggle
     }
   }
@@ -1382,51 +1392,48 @@ function DiscordTab() {
     ? regionOpts.filter((o) => o.name.toLowerCase().includes(q) && !regions.includes(o.name)).slice(0, 8)
     : [];
 
-  if (!data && error) return (<><h2 className="admin-page__section-title">Discord</h2><div className="admin-page__error">{error}</div></>);
-  if (!data)          return (<><h2 className="admin-page__section-title">Discord</h2><div className="admin-page__loading">Loading…</div></>);
+  if (!data && error) return (<><h2 className="admin-page__section-title">{t('admin.discord.title')}</h2><div className="admin-page__error">{error}</div></>);
+  if (!data)          return (<><h2 className="admin-page__section-title">{t('admin.discord.title')}</h2><div className="admin-page__loading">{t('admin.loading')}</div></>);
   if (data.corpId == null) {
-    return (<><h2 className="admin-page__section-title">Discord</h2>
-      <div className="admin-page__empty">No corp context — Discord notifications apply to corp maps only.</div></>);
+    return (<><h2 className="admin-page__section-title">{t('admin.discord.title')}</h2>
+      <div className="admin-page__empty">{t('admin.discord.noCorp')}</div></>);
   }
 
   const dirty = allRegions !== data.allRegions || regions.slice().sort().join('|') !== data.regions.slice().sort().join('|');
 
   return (
     <>
-      <h2 className="admin-page__section-title">Discord notifications</h2>
+      <h2 className="admin-page__section-title">{t('admin.discord.titleNotifications')}</h2>
       {error && <div className="admin-page__error">{error}</div>}
-      <p className="discord-admin__hint">
-        Controls which wormhole notifications this corp&apos;s maps post to Discord. The webhook itself is set
-        server-side (DISCORD_WEBHOOK_URL). By default every map and region notifies — these settings only subtract.
-      </p>
+      <p className="discord-admin__hint">{t('admin.discord.hint')}</p>
 
       <section className="discord-admin__section">
-        <h3 className="discord-admin__heading">Regions</h3>
+        <h3 className="discord-admin__heading">{t('admin.discord.regions')}</h3>
         <label className="discord-admin__radio">
           <input type="radio" name="discord-regions" checked={allRegions} onChange={() => setAllRegions(true)} />
-          Notify for all regions
+          {t('admin.discord.notifyAll')}
         </label>
         <label className="discord-admin__radio">
           <input type="radio" name="discord-regions" checked={!allRegions} onChange={() => setAllRegions(false)} />
-          Only selected regions
+          {t('admin.discord.notifySelected')}
         </label>
 
         {!allRegions && (
           <div className="discord-admin__regions">
             <div className="discord-admin__chips">
               {regions.length === 0
-                ? <span className="admin-page__empty">No regions selected — nothing will notify until you add some.</span>
+                ? <span className="admin-page__empty">{t('admin.discord.noRegionsSelected')}</span>
                 : regions.map((r) => (
                     <span key={r} className="discord-admin__chip">
                       {r}
-                      <button type="button" onClick={() => removeRegion(r)} aria-label={`Remove ${r}`}>×</button>
+                      <button type="button" onClick={() => removeRegion(r)} aria-label={t('admin.discord.removeRegion', { name: r })}>×</button>
                     </span>
                   ))}
             </div>
             <input
               type="text"
               className="discord-admin__search"
-              placeholder="Type to search regions…"
+              placeholder={t('admin.discord.searchPlaceholder')}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
@@ -1442,20 +1449,20 @@ function DiscordTab() {
 
         <div className="discord-admin__actions">
           <button className="btn btn--primary" disabled={!dirty || saving} onClick={saveRegions}>
-            {saving ? 'Saving…' : 'Save regions'}
+            {saving ? t('admin.discord.saving') : t('admin.discord.saveRegions')}
           </button>
-          {saved && <span className="discord-admin__saved">Saved</span>}
+          {saved && <span className="discord-admin__saved">{t('admin.discord.saved')}</span>}
         </div>
       </section>
 
       <section className="discord-admin__section">
-        <h3 className="discord-admin__heading">Excluded maps</h3>
-        <p className="discord-admin__hint">All maps notify by default. Tick a map to exclude it from Discord.</p>
+        <h3 className="discord-admin__heading">{t('admin.discord.excludedMaps')}</h3>
+        <p className="discord-admin__hint">{t('admin.discord.excludedHint')}</p>
         {data.maps.length === 0
-          ? <div className="admin-page__empty">No corp maps yet.</div>
+          ? <div className="admin-page__empty">{t('admin.discord.noCorpMaps')}</div>
           : (
             <table className="admin-modal__table">
-              <thead><tr><th>Map</th><th>Exclude</th></tr></thead>
+              <thead><tr><th>{t('admin.discord.colMap')}</th><th>{t('admin.discord.colExclude')}</th></tr></thead>
               <tbody>
                 {data.maps.map((m) => (
                   <tr key={m.id}>

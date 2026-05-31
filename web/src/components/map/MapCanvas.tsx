@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   ReactFlow, Background, Controls, MiniMap,
   useNodesState, BackgroundVariant, useReactFlow, ConnectionMode,
@@ -84,6 +85,7 @@ function systemToNode(sys: MapSystem, selectedId: string | null, easyConnect = f
 }
 
 export function MapCanvas() {
+  const { t } = useTranslation();
   const systems              = useMapStore((s) => s.map.systems);
   const connections          = useMapStore((s) => s.map.connections);
   const selectedSystemId     = useMapStore((s) => s.selectedSystemId);
@@ -122,6 +124,17 @@ export function MapCanvas() {
   const [pendingPosition, setPendingPosition] = useState<{ x: number; y: number } | null>(null);
   const [contextMenu, setContextMenu]         = useState<CtxMenu | null>(null);
   const [customIntel] = useCustomIntel();
+
+  // React Flow's <Controls> buttons read their hover title + aria-label from
+  // ariaLabelConfig (merged with the library defaults), so this translates the
+  // zoom / fit / lock tooltips without re-implementing the buttons.
+  const ariaLabelConfig = useMemo(() => ({
+    'controls.ariaLabel':            t('mapControls.panel'),
+    'controls.zoomIn.ariaLabel':     t('mapControls.zoomIn'),
+    'controls.zoomOut.ariaLabel':    t('mapControls.zoomOut'),
+    'controls.fitView.ariaLabel':    t('mapControls.fitView'),
+    'controls.interactive.ariaLabel': t('mapControls.interactive'),
+  }), [t]);
 
   // Empty initial — the `systems` effect below replaces this on the next
   // frame with the real node set. Starting empty avoids the dead useMemo that
@@ -213,7 +226,7 @@ export function MapCanvas() {
         if (home) {
           centerOnSystem(home.id);
         } else {
-          toast.info('No home system set. Right-click a system → "Set as home".');
+          toast.info(t('ctxMenu.noHomeSet'));
         }
       }
     };
@@ -500,21 +513,21 @@ export function MapCanvas() {
         if (!sys?.eveSystemId) return [];
         return [
           {
-            label: 'Set Destination',
+            label: t('waypoint.setDestination'),
             icon: <MapPinSimpleIcon size={16} weight="regular" color="#3ddc84" />,
-            action: () => setDestination(sys.eveSystemId!).catch(() => toast.error('Failed to set destination')),
+            action: () => setDestination(sys.eveSystemId!).catch(() => toast.error(t('ctxMenu.failSetDest'))),
           },
           {
-            label: 'Add Waypoint',
+            label: t('waypoint.addWaypoint'),
             icon: <PathIcon size={16} weight="regular" color="#5a9af8" />,
-            action: () => addWaypoint(sys.eveSystemId!).catch(() => toast.error('Failed to add waypoint')),
+            action: () => addWaypoint(sys.eveSystemId!).catch(() => toast.error(t('ctxMenu.failAddWaypoint'))),
           },
         ];
       }
       // Pane menu — only "Select All" survives.
       return [
         {
-          label: 'Select All',
+          label: t('ctxMenu.selectAll'),
           icon: <SelectionAllIcon size={16} weight="regular" />,
           action: () => setNodes((ns) => ns.map((n) => ({ ...n, selected: true }))),
           disabled: nodes.length === 0,
@@ -530,28 +543,28 @@ export function MapCanvas() {
       const eid = contextMenu.edgeId;
       return [
         {
-          label: 'Disconnect',
+          label: t('ctxMenu.disconnect'),
           icon: <XIcon size={16} weight="regular" color="#e25a5a" />,
           action: () => removeConnection(eid),
         },
         { separator: true as const },
         {
-          label: 'Jump Type',
+          label: t('ctxMenu.jumpType'),
           submenu: [
             {
-              label: 'Standard Jump',
+              label: t('ctxMenu.standardJump'),
               checked: !isJumpgate,
               action: () => updateConnection(eid, { connectionType: 'standard' }),
             },
             {
-              label: 'Jumpgate',
+              label: t('ctxMenu.jumpgate'),
               checked: isJumpgate,
               action: () => updateConnection(eid, { connectionType: 'jumpgate' }),
             },
           ],
         },
         {
-          label: 'Wormhole Lifetime',
+          label: t('ctxMenu.whLifetime'),
           submenu: (() => {
             // The submenu's checked indicator reflects what the user last
             // selected (categorical), not the live derived stage. Live stage
@@ -565,46 +578,46 @@ export function MapCanvas() {
               new Date(Date.now() - hrsBack * 3_600_000).toISOString();
             return [
               {
-                label: 'Fresh',
+                label: t('ctxMenu.lifeFresh'),
                 checked: stage === 'fresh',
                 action: () => updateConnection(eid, { timeStatus: 'fresh', eolAt: null }),
               },
               {
-                label: 'Less than 1 day remaining',
+                label: t('ctxMenu.life1d'),
                 checked: stage === 'lessThan24h',
                 action: () => updateConnection(eid, { timeStatus: 'lessThan24h', eolAt: null }),
               },
               {
-                label: 'Less than 4 hours remaining',
+                label: t('ctxMenu.life4h'),
                 checked: stage === 'eol',
                 action: () => updateConnection(eid, { timeStatus: 'eol', eolAt: eolFromOffset(0) }),
               },
               {
-                label: 'Less than 1 hour remaining',
+                label: t('ctxMenu.life1h'),
                 action: () => updateConnection(eid, { timeStatus: 'eol', eolAt: eolFromOffset(3) }),
               },
               {
-                label: 'Expired, closure imminent',
+                label: t('ctxMenu.lifeExpired'),
                 action: () => updateConnection(eid, { timeStatus: 'eol', eolAt: eolFromOffset(4) }),
               },
             ];
           })(),
         },
         {
-          label: 'Mass Stability',
+          label: t('ctxMenu.massStability'),
           submenu: [
             {
-              label: 'More than 50% remaining',
+              label: t('ctxMenu.massStable'),
               checked: massStatus === 'stable',
               action: () => updateConnection(eid, { massStatus: 'stable' }),
             },
             {
-              label: 'Less than 50% remaining',
+              label: t('ctxMenu.massDestab'),
               checked: massStatus === 'destabilized',
               action: () => updateConnection(eid, { massStatus: 'destabilized' }),
             },
             {
-              label: 'Less than 10% remaining',
+              label: t('ctxMenu.massCrit'),
               checked: massStatus === 'critical',
               action: () => updateConnection(eid, { massStatus: 'critical' }),
             },
@@ -622,31 +635,31 @@ export function MapCanvas() {
       const waypointItems = !multiSelected && sys?.eveSystemId ? [
         { separator: true as const },
         {
-          label: 'Set Destination',
+          label: t('waypoint.setDestination'),
           icon: <MapPinSimpleIcon size={16} weight="regular" color="#3ddc84" />,
-          action: () => setDestination(sys.eveSystemId!).catch(() => toast.error('Failed to set destination')),
+          action: () => setDestination(sys.eveSystemId!).catch(() => toast.error(t('ctxMenu.failSetDest'))),
         },
         {
-          label: 'Add Waypoint',
+          label: t('waypoint.addWaypoint'),
           icon: <PathIcon size={16} weight="regular" color="#5a9af8" />,
-          action: () => addWaypoint(sys.eveSystemId!).catch(() => toast.error('Failed to add waypoint')),
+          action: () => addWaypoint(sys.eveSystemId!).catch(() => toast.error(t('ctxMenu.failAddWaypoint'))),
         },
       ] : [];
 
       const multiItems = multiSelected ? [
         { separator: true as const },
         {
-          label: `Lock ${selectedNodes.length} Selected`,
+          label: t("ctxMenu.lockSelected", { count: selectedNodes.length }),
           icon: <LockIcon size={16} weight="regular" color="#f5c518" />,
           action: () => selectedNodes.forEach((n) => updateSystem(n.id, { locked: true })),
         },
         {
-          label: `Unlock ${selectedNodes.length} Selected`,
+          label: t("ctxMenu.unlockSelected", { count: selectedNodes.length }),
           icon: <LockOpenIcon size={16} weight="regular" color="#f5c518" />,
           action: () => selectedNodes.forEach((n) => updateSystem(n.id, { locked: false })),
         },
         {
-          label: `Mark ${selectedNodes.length} as Cleared`,
+          label: t("ctxMenu.markCleared", { count: selectedNodes.length }),
           icon: <CheckIcon size={16} weight="regular" />,
           action: () => selectedNodes.forEach((n) => updateSystem(n.id, { status: 'cleared' })),
         },
@@ -657,12 +670,12 @@ export function MapCanvas() {
       const homeItem = !multiSelected ? [
         sys?.isHome
           ? {
-              label: 'Unset home',
+              label: t('ctxMenu.unsetHome'),
               icon:  <HouseIcon size={16} weight="regular" color="#f0a040" />,
               action: () => updateSystem(contextMenu.nodeId!, { isHome: false }),
             }
           : {
-              label: 'Set as home (H to centre)',
+              label: t('ctxMenu.setHome'),
               icon:  <HouseIcon size={16} weight="regular" color="#f0a040" />,
               action: () => {
                 // Clear any previously-set home so only one exists at a time.
@@ -679,20 +692,20 @@ export function MapCanvas() {
       // check mark next to the currently-applied tag so the user can
       // recognise their choice at a glance.
       const BUILTIN_INTEL: Array<{ value: SystemIntel; label: string }> = [
-        { value: 'friendly', label: 'Friendly' },
-        { value: 'hostile',  label: 'Hostile' },
-        { value: 'occupied', label: 'Occupied' },
-        { value: 'empty',    label: 'Empty' },
+        { value: 'friendly', label: t('ctxMenu.intelFriendly') },
+        { value: 'hostile',  label: t('ctxMenu.intelHostile') },
+        { value: 'occupied', label: t('ctxMenu.intelOccupied') },
+        { value: 'empty',    label: t('ctxMenu.intelEmpty') },
       ];
       const intelSwatch = (value: SystemIntel) => {
         const c = resolveIntelColor(value, customIntel);
         if (!c) return undefined;
         return <span className="intel-swatch" style={{ background: c }} aria-hidden="true" />;
       };
-      const customEntries = customIntel.map((ci) => ({ value: ci.id, label: ci.label || '(unnamed)' }));
+      const customEntries = customIntel.map((ci) => ({ value: ci.id, label: ci.label || t('ctxMenu.intelUnnamed') }));
       const intelItem = !multiSelected ? [
         {
-          label: 'Set Intel',
+          label: t('ctxMenu.setIntel'),
           icon:  <EyeIcon size={16} weight="regular" color="#6ea0ff" />,
           submenu: [
             ...BUILTIN_INTEL.map((o) => ({
@@ -710,7 +723,7 @@ export function MapCanvas() {
             })),
             { separator: true as const },
             {
-              label:   'Clear Intel',
+              label:   t('ctxMenu.clearIntel'),
               checked: !sys?.intel,
               action:  () => updateSystem(contextMenu.nodeId!, { intel: null }),
             },
@@ -718,7 +731,7 @@ export function MapCanvas() {
         },
       ] : [
         {
-          label: `Set Intel for ${selectedNodes.length}`,
+          label: t("ctxMenu.setIntelFor", { count: selectedNodes.length }),
           icon:  <EyeIcon size={16} weight="regular" color="#6ea0ff" />,
           submenu: [
             ...BUILTIN_INTEL.map((o) => ({
@@ -734,7 +747,7 @@ export function MapCanvas() {
             })),
             { separator: true as const },
             {
-              label:  'Clear Intel',
+              label:  t('ctxMenu.clearIntel'),
               action: () => selectedNodes.forEach((n) => updateSystem(n.id, { intel: null })),
             },
           ],
@@ -743,14 +756,14 @@ export function MapCanvas() {
 
       return [
         {
-          label: sys?.locked ? 'Unlock System' : 'Lock System',
+          label: sys?.locked ? t('ctxMenu.unlockSystem') : t('ctxMenu.lockSystem'),
           icon:  sys?.locked
             ? <LockOpenIcon size={16} weight="regular" color="#f5c518" />
             : <LockIcon     size={16} weight="regular" color="#f5c518" />,
           action: () => lockSystem(contextMenu.nodeId!),
         },
         ...(!sys?.locked ? [{
-          label: multiSelected ? `Remove ${selectedNodes.filter((n) => !systems.find((s) => s.id === n.id)?.locked).length} Systems` : 'Remove System',
+          label: multiSelected ? t('ctxMenu.removeSystems', { count: selectedNodes.filter((n) => !systems.find((s) => s.id === n.id)?.locked).length }) : t('ctxMenu.removeSystem'),
           icon: <XIcon size={16} weight="regular" color="#e25a5a" />,
           action: () => {
             if (multiSelected) {
@@ -771,12 +784,12 @@ export function MapCanvas() {
 
     return [
       {
-        label: 'Add System',
+        label: t('ctxMenu.addSystem'),
         icon: <PlusIcon size={16} weight="regular" />,
         action: () => setPendingPosition({ x: contextMenu.flowX - 75, y: contextMenu.flowY - 40 }),
       },
       {
-        label: 'Select All',
+        label: t('ctxMenu.selectAll'),
         icon: <SelectionAllIcon size={14} weight="regular" />,
         action: () => setNodes((ns) => ns.map((n) => ({ ...n, selected: true }))),
         disabled: nodes.length === 0,
@@ -787,6 +800,7 @@ export function MapCanvas() {
   return (
     <div className="map-canvas">
       <ReactFlow
+        ariaLabelConfig={ariaLabelConfig}
         nodes={nodes}
         edges={edges}
         onNodesChange={onNodesChange}
@@ -857,7 +871,7 @@ export function MapCanvas() {
         )}
       </ReactFlow>
 
-      <div className="map-canvas__hint">Right-click canvas to add system · Drag between handles to connect · Shift+click or drag to multi-select · Right click system to interact</div>
+      <div className="map-canvas__hint">{t('ctxMenu.canvasHint')}</div>
 
       {contextMenu && (
         <ContextMenu

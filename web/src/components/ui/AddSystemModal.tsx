@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 import type { SystemClass, WormholeEffect } from '../../types';
 import { SYSTEM_CLASSES, WORMHOLE_EFFECTS, CLASS_LABELS, EFFECT_LABELS } from '../../data/wormholes';
 import { useEsiSearch, fetchSystemDetail } from '../../hooks/useEsiSearch';
@@ -21,6 +22,7 @@ interface Props {
 }
 
 export function AddSystemModal({ position, onClose, onSubmit }: Props) {
+  const { t } = useTranslation();
   const storeAddSystem = useMapStore((s) => s.addSystem);
   const map            = useMapStore((s) => s.map);
 
@@ -158,13 +160,13 @@ export function AddSystemModal({ position, onClose, onSubmit }: Props) {
     <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="modal" role="dialog" aria-modal="true">
         <div className="modal__header">
-          <h2 className="modal__title">Add System</h2>
+          <h2 className="modal__title">{t('addSystem.title')}</h2>
           <button className="icon-btn" onClick={onClose}>✕</button>
         </div>
 
         <form className="modal__body" onSubmit={handleSubmit}>
           <div className="search-field" ref={searchFieldRef}>
-            <label className="field__label">System name</label>
+            <label className="field__label">{t('addSystem.systemName')}</label>
             <div className="search-field__wrap">
               <input
                 ref={inputRef}
@@ -173,7 +175,7 @@ export function AddSystemModal({ position, onClose, onSubmit }: Props) {
                 value={query}
                 onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
-                placeholder="Type to search EVE systems…"
+                placeholder={t('addSystem.searchPlaceholder')}
                 autoComplete="off"
                 role="combobox"
                 aria-expanded={showResults}
@@ -185,7 +187,7 @@ export function AddSystemModal({ position, onClose, onSubmit }: Props) {
                   type="button"
                   className="search-field__clear"
                   onClick={clearSelection}
-                  aria-label="Clear selection"
+                  aria-label={t('addSystem.clearSelection')}
                 >
                   ✕
                 </button>
@@ -195,14 +197,14 @@ export function AddSystemModal({ position, onClose, onSubmit }: Props) {
 
 
             {showEmpty && (
-              <p className="search-field__empty">No systems found for "{query}"</p>
+              <p className="search-field__empty">{t('addSystem.noResults', { query })}</p>
             )}
           </div>
 
           {isSelected && isWormhole && (
           <div className="modal__row">
             <label className="field">
-              <span>Class</span>
+              <span>{t('addSystem.class')}</span>
               <select
                 value={systemClass}
                 onChange={(e) => setSystemClass(e.target.value as SystemClass)}
@@ -215,14 +217,14 @@ export function AddSystemModal({ position, onClose, onSubmit }: Props) {
             </label>
 
             <label className="field">
-              <span>Effect</span>
+              <span>{t('addSystem.effect')}</span>
               <select
                 value={effect}
                 onChange={(e) => setEffect(e.target.value as WormholeEffect)}
                 disabled={loadingDetail}
               >
                 {WORMHOLE_EFFECTS.map((ef) => (
-                  <option key={ef} value={ef}>{EFFECT_LABELS[ef] || 'None'}</option>
+                  <option key={ef} value={ef}>{EFFECT_LABELS[ef] || t('addSystem.effectNone')}</option>
                 ))}
               </select>
             </label>
@@ -231,25 +233,25 @@ export function AddSystemModal({ position, onClose, onSubmit }: Props) {
 
           {isSelected && isWormhole && (
             <label className="field">
-              <span>Statics</span>
+              <span>{t('addSystem.statics')}</span>
               <input
                 type="text"
                 value={statics}
                 onChange={(e) => setStatics(e.target.value)}
-                placeholder="auto-filled from database"
+                placeholder={t('addSystem.staticsPlaceholder')}
                 disabled={loadingDetail || !isSelected}
               />
             </label>
           )}
 
           <div className="modal__actions">
-            <button type="button" className="btn btn--ghost" onClick={onClose}>Cancel</button>
+            <button type="button" className="btn btn--ghost" onClick={onClose}>{t('actions.cancel')}</button>
             <button
               type="submit"
               className="btn btn--primary"
               disabled={!systemName || loadingDetail}
             >
-              {loadingDetail ? 'Loading…' : 'Add System'}
+              {loadingDetail ? t('addSystem.loading') : t('addSystem.add')}
             </button>
           </div>
         </form>
@@ -276,7 +278,7 @@ export function AddSystemModal({ position, onClose, onSubmit }: Props) {
             >
               <span>{r.name}</span>
               <span className="search-results__class">
-                {alreadyOnMap ? 'on map' : (r.regionName ?? r.systemClass)}
+                {alreadyOnMap ? t('addSystem.onMap') : (r.regionName ?? r.systemClass)}
               </span>
             </li>
           );

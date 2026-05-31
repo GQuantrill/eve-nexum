@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useWormholeTypes } from '../../hooks/useWormholeTypes';
 import { CLASS_COLORS, CLASS_LABELS } from '../../data/wormholes';
+import { mass } from '../../i18n/format';
 import type { SystemClass } from '../../types';
 
 interface Props {
@@ -10,13 +12,6 @@ interface Props {
    *  (popover shows on mouse-enter, hides on leave). When omitted, a small
    *  `ⓘ` button is rendered and opens the popover on click. */
   children?: ReactNode;
-}
-
-function formatMass(kg: number): string {
-  if (kg >= 1_000_000_000) return `${(kg / 1_000_000_000).toFixed(2)} B kg`;
-  if (kg >= 1_000_000)     return `${(kg / 1_000_000).toFixed(0)} M kg`;
-  if (kg > 0)              return `${kg.toLocaleString()} kg`;
-  return '—';
 }
 
 function classKey(raw: string): SystemClass | null {
@@ -30,6 +25,7 @@ function classKey(raw: string): SystemClass | null {
 }
 
 export function WHTypeInfo({ code, children }: Props) {
+  const { t } = useTranslation();
   const types = useWormholeTypes();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLSpanElement>(null);
@@ -73,11 +69,11 @@ export function WHTypeInfo({ code, children }: Props) {
       </div>
       <div className="wh-type-info__row">
         <span className="wh-type-info__label">Total mass</span>
-        <span className="wh-type-info__value">{formatMass(spec.totalMass)}</span>
+        <span className="wh-type-info__value">{mass(t, spec.totalMass)}</span>
       </div>
       <div className="wh-type-info__row">
         <span className="wh-type-info__label">Max jump</span>
-        <span className="wh-type-info__value">{formatMass(spec.maxJumpMass)}</span>
+        <span className="wh-type-info__value">{mass(t, spec.maxJumpMass)}</span>
       </div>
     </div>
   );

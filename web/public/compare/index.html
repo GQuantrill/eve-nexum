@@ -100,8 +100,18 @@
       }
       .wrap { max-width: 920px; margin: 0 auto; padding: 32px 20px 64px; }
       a { color: var(--accent); }
-      .topnav { font-size: 14px; }
+      .topnav { font-size: 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
       .topnav a { color: var(--muted); text-decoration: none; }
+      .lang-select {
+        background: var(--panel2); color: var(--text); border: 1px solid var(--border);
+        border-radius: 4px; padding: 4px 8px; font-size: 13px; font-family: inherit; cursor: pointer;
+        transition: border-color 0.15s ease;
+      }
+      .lang-select:hover { border-color: var(--accent); }
+      .lang-select:focus-visible {
+        outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px rgba(91,155,255,0.25);
+      }
+      .lang-select option { background: var(--panel); color: var(--text); }
       header.hero { text-align: center; margin: 28px 0 8px; }
       .logo { font-size: 34px; color: var(--accent); line-height: 1; }
       h1 { color: var(--head); font-size: 30px; line-height: 1.25; margin: 12px 0 6px; }
@@ -135,16 +145,22 @@
   </head>
   <body>
     <div class="wrap">
-      <nav class="topnav"><a href="/">&larr; Nexum home</a></nav>
+      <nav class="topnav">
+        <a href="/" data-i18n="nav">&larr; Nexum home</a>
+        <select id="lang-select" class="lang-select" aria-label="Language / Sprache">
+          <option value="en">🇬🇧 English</option>
+          <option value="de">🇩🇪 Deutsch</option>
+        </select>
+      </nav>
 
       <header class="hero">
         <div class="logo" aria-hidden="true">◈</div>
-        <h1>EVE Online Wormhole Mapper Comparison:<br />Nexum vs Pathfinder vs Tripwire vs Wanderer</h1>
-        <p class="sub">An honest look at the leading wormhole mapping tools for EVE Online.</p>
+        <h1 data-i18n="h1">EVE Online Wormhole Mapper Comparison:<br />Nexum vs Pathfinder vs Tripwire vs Wanderer</h1>
+        <p class="sub" data-i18n="sub">An honest look at the leading wormhole mapping tools for EVE Online.</p>
       </header>
-      <p class="updated">Last updated 27 May 2026 · maintained by the Nexum team</p>
+      <p class="updated" data-i18n="upd">Last updated 27 May 2026 · maintained by the Nexum team</p>
 
-      <p class="lede">
+      <p class="lede" data-i18n="lede">
         If you scout or live in J-space, a good wormhole mapper is essential.
         <strong>Nexum</strong> is a modern, open-source mapper — use the free
         hosted version or self-host your own — that covers the full workflow:
@@ -157,10 +173,10 @@
         accurate and linked so you can judge for yourself.
       </p>
 
-      <h2>At a glance</h2>
+      <h2 data-i18n="h2Glance">At a glance</h2>
       <div class="table-scroll">
         <table>
-          <caption>Core comparison. Verified May 2026 — competitor features change; follow the links to confirm.</caption>
+          <caption data-i18n="cap1">Core comparison. Verified May 2026 — competitor features change; follow the links to confirm.</caption>
           <thead>
             <tr>
               <th scope="col">&nbsp;</th>
@@ -172,234 +188,366 @@
           </thead>
           <tbody>
             <tr>
-              <th scope="row">Open source</th>
-              <td class="nexum"><span class="yes">Yes</span></td>
-              <td><span class="yes">Yes</span></td>
-              <td><span class="yes">Yes</span></td>
-              <td><span class="yes">Yes</span> (MIT)</td>
+              <th scope="row" data-i18n="gOpenSource">Open source</th>
+              <td class="nexum" data-i18n="yes"><span class="yes">Yes</span></td>
+              <td data-i18n="yes"><span class="yes">Yes</span></td>
+              <td data-i18n="yes"><span class="yes">Yes</span></td>
+              <td data-i18n="yesMit"><span class="yes">Yes</span> (MIT)</td>
             </tr>
             <tr>
-              <th scope="row">Self-hostable</th>
-              <td class="nexum"><span class="yes">Yes</span> (Docker)</td>
-              <td><span class="yes">Yes</span></td>
-              <td><span class="yes">Yes</span> (Docker)</td>
-              <td><span class="yes">Yes</span> (Community Edition)</td>
+              <th scope="row" data-i18n="gSelfHost">Self-hostable</th>
+              <td class="nexum" data-i18n="yesDocker"><span class="yes">Yes</span> (Docker)</td>
+              <td data-i18n="yes"><span class="yes">Yes</span></td>
+              <td data-i18n="yesDocker"><span class="yes">Yes</span> (Docker)</td>
+              <td data-i18n="yesCe"><span class="yes">Yes</span> (Community Edition)</td>
             </tr>
             <tr>
-              <th scope="row">Managed cloud option</th>
-              <td class="nexum"><span class="yes">Yes</span> — free public instance at eve-nexum.com, plus self-host</td>
-              <td><span class="meh">Community-run instances</span></td>
-              <td><span class="meh">Public host closed 2024</span></td>
-              <td><span class="yes">Yes</span> — official “Wanderer Cloud”, managed by the devs</td>
+              <th scope="row" data-i18n="gCloud">Managed cloud option</th>
+              <td class="nexum" data-i18n="gCloudN"><span class="yes">Yes</span> — free public instance at eve-nexum.com, plus self-host</td>
+              <td data-i18n="gCloudP"><span class="meh">Community-run instances</span></td>
+              <td data-i18n="gCloudT"><span class="meh">Public host closed 2024</span></td>
+              <td data-i18n="gCloudW"><span class="yes">Yes</span> — official “Wanderer Cloud”, managed by the devs</td>
             </tr>
             <tr>
-              <th scope="row">EVE SSO login</th>
-              <td class="nexum"><span class="yes">Yes</span></td>
-              <td><span class="yes">Yes</span></td>
-              <td><span class="yes">Yes</span></td>
-              <td><span class="yes">Yes</span></td>
+              <th scope="row" data-i18n="gSso">EVE SSO login</th>
+              <td class="nexum" data-i18n="yes"><span class="yes">Yes</span></td>
+              <td data-i18n="yes"><span class="yes">Yes</span></td>
+              <td data-i18n="yes"><span class="yes">Yes</span></td>
+              <td data-i18n="yes"><span class="yes">Yes</span></td>
             </tr>
             <tr>
-              <th scope="row">Real-time multi-user sync</th>
-              <td class="nexum"><span class="yes">Yes</span></td>
-              <td><span class="yes">Yes</span></td>
-              <td><span class="yes">Yes</span></td>
-              <td><span class="yes">Yes</span></td>
+              <th scope="row" data-i18n="gSync">Real-time multi-user sync</th>
+              <td class="nexum" data-i18n="yes"><span class="yes">Yes</span></td>
+              <td data-i18n="yes"><span class="yes">Yes</span></td>
+              <td data-i18n="yes"><span class="yes">Yes</span></td>
+              <td data-i18n="yes"><span class="yes">Yes</span></td>
             </tr>
             <tr>
-              <th scope="row">Signature paste &amp; tracking</th>
-              <td class="nexum"><span class="yes">Yes</span></td>
-              <td><span class="yes">Yes</span></td>
-              <td><span class="yes">Yes</span></td>
-              <td><span class="yes">Yes</span></td>
+              <th scope="row" data-i18n="gSigPaste">Signature paste &amp; tracking</th>
+              <td class="nexum" data-i18n="yes"><span class="yes">Yes</span></td>
+              <td data-i18n="yes"><span class="yes">Yes</span></td>
+              <td data-i18n="yes"><span class="yes">Yes</span></td>
+              <td data-i18n="yes"><span class="yes">Yes</span></td>
             </tr>
             <tr>
-              <th scope="row">Wormhole mass / rolling</th>
-              <td class="nexum">Dedicated rolling calculator (±10% variance, stranding warnings)</td>
-              <td>Mass status tracking</td>
-              <td>Mass status tracking</td>
-              <td>Mass status tracking</td>
+              <th scope="row" data-i18n="gMass">Wormhole mass / rolling</th>
+              <td class="nexum" data-i18n="gMassN">Dedicated rolling calculator (±10% variance, stranding warnings)</td>
+              <td data-i18n="massStatus">Mass status tracking</td>
+              <td data-i18n="massStatus">Mass status tracking</td>
+              <td data-i18n="massStatus">Mass status tracking</td>
             </tr>
             <tr>
-              <th scope="row">Tech stack</th>
+              <th scope="row" data-i18n="gTech">Tech stack</th>
               <td class="nexum">TypeScript · React · Node · Postgres</td>
               <td>PHP · MySQL</td>
               <td>PHP · MySQL</td>
               <td>Elixir · React · Postgres</td>
             </tr>
             <tr>
-              <th scope="row">Cost</th>
-              <td class="nexum"><span class="yes">Free</span></td>
-              <td><span class="yes">Free</span></td>
-              <td><span class="yes">Free</span></td>
-              <td><span class="yes">Free</span> (hosted &amp; self-host)</td>
+              <th scope="row" data-i18n="gCost">Cost</th>
+              <td class="nexum" data-i18n="free"><span class="yes">Free</span></td>
+              <td data-i18n="free"><span class="yes">Free</span></td>
+              <td data-i18n="free"><span class="yes">Free</span></td>
+              <td data-i18n="freeBoth"><span class="yes">Free</span> (hosted &amp; self-host)</td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      <h2>Where Nexum goes further</h2>
-      <p>
+      <h2 data-i18n="h2Further">Where Nexum goes further</h2>
+      <p data-i18n="furtherIntro">
         All four handle the basics well. These are the capabilities Nexum builds
         in that the others generally don't offer as documented, out-of-the-box
         features — the reasons corps choose it:
       </p>
       <div class="table-scroll">
         <table>
-          <caption>Nexum's distinctive features. “—” means it isn't a documented, built-in headline feature of those tools (features change — use the links below to verify).</caption>
+          <caption data-i18n="cap2">Nexum's distinctive features. “—” means it isn't a documented, built-in headline feature of those tools (features change — use the links below to verify).</caption>
           <thead>
             <tr>
-              <th scope="col">Feature</th>
+              <th scope="col" data-i18n="fFeature">Feature</th>
               <th scope="col" class="nexum">Nexum</th>
               <th scope="col">Pathfinder · Tripwire · Wanderer</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <th scope="row">Wormhole <strong>rolling calculator</strong> — models the ±10% mass variance, cold/hot roller with side tracking, and warns before a pass strands your roller or collapses the hole</th>
+              <th scope="row" data-i18n="f1h">Wormhole <strong>rolling calculator</strong> — models the ±10% mass variance, cold/hot roller with side tracking, and warns before a pass strands your roller or collapses the hole</th>
               <td class="nexum"><span class="yes">✓</span></td>
-              <td>Basic mass-status tracking</td>
+              <td data-i18n="f1o">Basic mass-status tracking</td>
             </tr>
             <tr>
-              <th scope="row"><strong>Seed a map from an entire EVE region</strong> — Dotlan-style auto-layout with every in-region stargate pre-drawn</th>
+              <th scope="row" data-i18n="f2h"><strong>Seed a map from an entire EVE region</strong> — Dotlan-style auto-layout with every in-region stargate pre-drawn</th>
               <td class="nexum"><span class="yes">✓</span></td>
               <td>—</td>
             </tr>
             <tr>
-              <th scope="row"><strong>Merge two maps</strong> into one, de-duplicating systems and folding in signatures, structures and notes</th>
+              <th scope="row" data-i18n="f3h"><strong>Merge two maps</strong> into one, de-duplicating systems and folding in signatures, structures and notes</th>
               <td class="nexum"><span class="yes">✓</span></td>
               <td>—</td>
             </tr>
             <tr>
-              <th scope="row"><strong>Discord notifications</strong> — inbound K162 and new-connection alerts pushed to your channel, even when no one's watching the map</th>
+              <th scope="row" data-i18n="f4h"><strong>Discord notifications</strong> — inbound K162 and new-connection alerts pushed to your channel, even when no one's watching the map</th>
               <td class="nexum"><span class="yes">✓</span></td>
               <td>—</td>
             </tr>
             <tr>
-              <th scope="row"><strong>Standings &amp; sovereignty overlay</strong> driven by your own EVE contacts — hostile/friendly tinting across the chain, killboard and sov halos</th>
+              <th scope="row" data-i18n="f5h"><strong>Standings &amp; sovereignty overlay</strong> driven by your own EVE contacts — hostile/friendly tinting across the chain, killboard and sov halos</th>
               <td class="nexum"><span class="yes">✓</span></td>
               <td>—</td>
             </tr>
             <tr>
-              <th scope="row"><strong>Live map-viewer presence</strong> — a dot for everyone viewing the map, not just your fleet — plus fleet positions</th>
+              <th scope="row" data-i18n="f6h"><strong>Live map-viewer presence</strong> — a dot for everyone viewing the map, not just your fleet — plus fleet positions</th>
               <td class="nexum"><span class="yes">✓</span></td>
-              <td>Fleet positions vary</td>
+              <td data-i18n="f6o">Fleet positions vary</td>
             </tr>
             <tr>
-              <th scope="row"><strong>Environmental intel layers</strong> — null-sec storms, A0 suns, ice belts, chain wormhole effects, and incursion / insurgency proximity alerts</th>
+              <th scope="row" data-i18n="f7h"><strong>Environmental intel layers</strong> — null-sec storms, A0 suns, ice belts, chain wormhole effects, and incursion / insurgency proximity alerts</th>
               <td class="nexum"><span class="yes">✓</span></td>
               <td>—</td>
             </tr>
             <tr>
-              <th scope="row"><strong>Corp suite</strong> — roles, shared maps, admin dashboard, users &amp; systems reports, audit log, and per-character attribution</th>
+              <th scope="row" data-i18n="f8h"><strong>Corp suite</strong> — roles, shared maps, admin dashboard, users &amp; systems reports, audit log, and per-character attribution</th>
               <td class="nexum"><span class="yes">✓</span></td>
-              <td>Varies</td>
+              <td data-i18n="f8o">Varies</td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      <h2>The tools in detail</h2>
+      <h2 data-i18n="h2Detail">The tools in detail</h2>
 
       <div class="card tw">
         <h3>Tripwire</h3>
-        <p>
+        <p data-i18n="twP">
           The classic, signature-first wormhole mapper a huge share of J-space
           players grew up with. It's fast, focused, and the workflow is muscle
           memory for veterans. The long-running public instance
           (tripwire.eve-apps.com) shut down in mid-2024, but Tripwire is open
           source, so it lives on through self-hosting and community-run instances.
         </p>
-        <p><strong>Best for:</strong> groups who want the familiar Tripwire signature workflow and are willing to self-host. <a href="https://bitbucket.org/daimian/tripwire">Source &rarr;</a></p>
+        <p data-i18n="twBest"><strong>Best for:</strong> groups who want the familiar Tripwire signature workflow and are willing to self-host. <a href="https://bitbucket.org/daimian/tripwire">Source &rarr;</a></p>
       </div>
 
       <div class="card pf">
         <h3>Pathfinder</h3>
-        <p>
+        <p data-i18n="pfP">
           The most mature and feature-dense self-hosted mapper. It pioneered a lot
           of what wormholers expect — rich wormhole data, Thera connections via
           EVE-Scout, a live zKillboard killstream, a plugin API and more. The
           trade-off is operational weight: it's a PHP/MySQL stack that takes more
           effort to set up and keep updated than a single-container app.
         </p>
-        <p><strong>Best for:</strong> groups who want maximum features and don't mind running a heavier stack. <a href="https://github.com/exodus4d/pathfinder">GitHub &rarr;</a></p>
+        <p data-i18n="pfBest"><strong>Best for:</strong> groups who want maximum features and don't mind running a heavier stack. <a href="https://github.com/exodus4d/pathfinder">GitHub &rarr;</a></p>
       </div>
 
       <div class="card wd">
         <h3>Wanderer</h3>
-        <p>
+        <p data-i18n="wdP">
           The modern challenger, billed as a light, fast alternative to Pathfinder.
           Built on Elixir/Phoenix with a React front end and open-sourced under MIT,
           it's the only one of the four with an <em>official managed cloud</em>
           version — so a group can use it without running any infrastructure — while
           still offering a free self-hosted Community Edition.
         </p>
-        <p><strong>Best for:</strong> groups who want a polished UI and the option to skip self-hosting entirely. <a href="https://wanderer.ltd/">Website &rarr;</a> · <a href="https://github.com/wanderer-industries/wanderer">GitHub &rarr;</a></p>
+        <p data-i18n="wdBest"><strong>Best for:</strong> groups who want a polished UI and the option to skip self-hosting entirely. <a href="https://wanderer.ltd/">Website &rarr;</a> · <a href="https://github.com/wanderer-industries/wanderer">GitHub &rarr;</a></p>
       </div>
 
       <div class="card">
         <h3>Nexum</h3>
-        <p>
+        <p data-i18n="nxP">
           A modern, open-source, self-hosted mapper built corp-first. It covers the
           core workflow — real-time collaborative mapping (live edits for everyone
           on the map), signature paste with wormhole aging, and connection tracking —
           and layers on extras aimed at running a corp's chain:
         </p>
         <ul>
-          <li><strong>Wormhole rolling calculator</strong> that models the ±10% mass variance, forecasts each pass as safe / may-collapse / will-collapse, and warns before a pass would strand your roller.</li>
-          <li><strong>Seed a whole EVE region</strong> as a Dotlan-style map, and <strong>merge maps</strong> together.</li>
-          <li><strong>Standings &amp; sovereignty overlays</strong>, a live killboard and jump/kill activity charts.</li>
-          <li><strong>Pilot presence and fleet positions</strong> on the map, plus opt-in location tracking.</li>
-          <li><strong>Thera &amp; Turnur</strong> public connections from EVE-Scout.</li>
-          <li><strong>Corp mode</strong>: roles, shared maps, admin reports, an audit log, and <strong>Discord notifications</strong> for inbound K162s and new connections.</li>
+          <li data-i18n="nxLi1"><strong>Wormhole rolling calculator</strong> that models the ±10% mass variance, forecasts each pass as safe / may-collapse / will-collapse, and warns before a pass would strand your roller.</li>
+          <li data-i18n="nxLi2"><strong>Seed a whole EVE region</strong> as a Dotlan-style map, and <strong>merge maps</strong> together.</li>
+          <li data-i18n="nxLi3"><strong>Standings &amp; sovereignty overlays</strong>, a live killboard and jump/kill activity charts.</li>
+          <li data-i18n="nxLi4"><strong>Pilot presence and fleet positions</strong> on the map, plus opt-in location tracking.</li>
+          <li data-i18n="nxLi5"><strong>Thera &amp; Turnur</strong> public connections from EVE-Scout.</li>
+          <li data-i18n="nxLi6"><strong>Corp mode</strong>: roles, shared maps, admin reports, an audit log, and <strong>Discord notifications</strong> for inbound K162s and new connections.</li>
         </ul>
-        <p>
+        <p data-i18n="nxP2">
           It runs as a small Docker stack (React + Node + Postgres) and logs in with
           EVE SSO — use the free public instance at eve-nexum.com, or self-host
           your own. As the newest of the four it has a smaller community.
         </p>
-        <p><strong>Best for:</strong> corps who want a modern mapper with rolling, region seeding, standings and Discord built in — hosted for you or self-hosted. <a href="/">Get started now &rarr;</a> · <a href="https://github.com/GQuantrill/eve-nexum">GitHub &rarr;</a></p>
+        <p data-i18n="nxBest"><strong>Best for:</strong> corps who want a modern mapper with rolling, region seeding, standings and Discord built in — hosted for you or self-hosted. <a href="/">Get started now &rarr;</a> · <a href="https://github.com/GQuantrill/eve-nexum">GitHub &rarr;</a></p>
       </div>
 
-      <h2>Which should you choose?</h2>
-      <p>
+      <h2 data-i18n="h2Choose">Which should you choose?</h2>
+      <p data-i18n="chooseP1">
         <strong>For most corps setting up fresh, we'd start with Nexum.</strong>
         It's modern, stands up in minutes with Docker, and bundles the rolling
         calculator, region seeding, standings overlays and Discord alerts you'd
         otherwise have to piece together — all in a real-time, collaborative map.
         <a href="/">Get started now</a> and see for yourself.
       </p>
-      <p>The others are good tools too, and may fit better in specific cases:</p>
+      <p data-i18n="chooseP2">The others are good tools too, and may fit better in specific cases:</p>
       <ul>
-        <li><strong>Already fluent in the classic Tripwire signature workflow?</strong> Tripwire still does that well — now self-hosted.</li>
-        <li><strong>Need the deepest, most mature feature set and happy running a heavier PHP stack?</strong> Pathfinder.</li>
-        <li><strong>Don't want to run any server at all?</strong> Use Nexum's free public instance, or Wanderer's cloud.</li>
+        <li data-i18n="chooseLi1"><strong>Already fluent in the classic Tripwire signature workflow?</strong> Tripwire still does that well — now self-hosted.</li>
+        <li data-i18n="chooseLi2"><strong>Need the deepest, most mature feature set and happy running a heavier PHP stack?</strong> Pathfinder.</li>
+        <li data-i18n="chooseLi3"><strong>Don't want to run any server at all?</strong> Use Nexum's free public instance, or Wanderer's cloud.</li>
       </ul>
 
-      <h2>Frequently asked questions</h2>
-      <h3>What is the best wormhole mapper for EVE Online?</h3>
-      <p>It depends on your group, but for a modern self-hosted setup we'd recommend Nexum — it bundles the most built-in features (a wormhole rolling calculator, whole-region map seeding, standings overlays and Discord alerts) in a real-time, collaborative map. Tripwire is still the classic signature tool, Pathfinder is the most mature and feature-dense option, and Wanderer adds a managed cloud version.</p>
-      <h3>Is Tripwire still available?</h3>
-      <p>The long-running public instance shut down in mid-2024, but Tripwire is open source, so you can self-host it or use a community-run instance.</p>
-      <h3>Is Pathfinder still in development?</h3>
-      <p>No — not actively. The original Pathfinder (by exodus4d) has had no new release since 2020, and the community fork that continued it last saw a commit in early 2025, with no release since. Active development has effectively stopped — one of the reasons newer, actively-maintained mappers like Nexum exist.</p>
-      <h3>What is a good open-source alternative to Pathfinder and Tripwire?</h3>
-      <p>Nexum and Wanderer are both modern open-source mappers. Nexum is self-hosted with EVE SSO, real-time collaboration and corp tools; Wanderer is MIT-licensed and offers self-hosting plus a managed cloud version.</p>
-      <h3>Can I self-host an EVE Online wormhole mapper?</h3>
-      <p>Yes — Nexum, Pathfinder, Tripwire and Wanderer's Community Edition can all be self-hosted. Nexum runs with Docker on Postgres and logs in with EVE SSO.</p>
-      <h3>Are these wormhole mappers free?</h3>
-      <p>Yes — all four are free. Pathfinder and Tripwire are self-hosted; Nexum and Wanderer each offer both a free public hosted version and self-hosting.</p>
+      <h2 data-i18n="h2Faq">Frequently asked questions</h2>
+      <h3 data-i18n="faqQ1">What is the best wormhole mapper for EVE Online?</h3>
+      <p data-i18n="faqA1">It depends on your group, but for a modern self-hosted setup we'd recommend Nexum — it bundles the most built-in features (a wormhole rolling calculator, whole-region map seeding, standings overlays and Discord alerts) in a real-time, collaborative map. Tripwire is still the classic signature tool, Pathfinder is the most mature and feature-dense option, and Wanderer adds a managed cloud version.</p>
+      <h3 data-i18n="faqQ2">Is Tripwire still available?</h3>
+      <p data-i18n="faqA2">The long-running public instance shut down in mid-2024, but Tripwire is open source, so you can self-host it or use a community-run instance.</p>
+      <h3 data-i18n="faqQ3">Is Pathfinder still in development?</h3>
+      <p data-i18n="faqA3">No — not actively. The original Pathfinder (by exodus4d) has had no new release since 2020, and the community fork that continued it last saw a commit in early 2025, with no release since. Active development has effectively stopped — one of the reasons newer, actively-maintained mappers like Nexum exist.</p>
+      <h3 data-i18n="faqQ4">What is a good open-source alternative to Pathfinder and Tripwire?</h3>
+      <p data-i18n="faqA4">Nexum and Wanderer are both modern open-source mappers. Nexum is self-hosted with EVE SSO, real-time collaboration and corp tools; Wanderer is MIT-licensed and offers self-hosting plus a managed cloud version.</p>
+      <h3 data-i18n="faqQ5">Can I self-host an EVE Online wormhole mapper?</h3>
+      <p data-i18n="faqA5">Yes — Nexum, Pathfinder, Tripwire and Wanderer's Community Edition can all be self-hosted. Nexum runs with Docker on Postgres and logs in with EVE SSO.</p>
+      <h3 data-i18n="faqQ6">Are these wormhole mappers free?</h3>
+      <p data-i18n="faqA6">Yes — all four are free. Pathfinder and Tripwire are self-hosted; Nexum and Wanderer each offer both a free public hosted version and self-hosting.</p>
 
       <div class="cta">
-        <p><strong>Nexum is free.</strong> Use the hosted version or self-host your corp's chain in minutes.</p>
-        <a class="btn" href="/">Get started now</a>
-        &nbsp; <a href="https://github.com/GQuantrill/eve-nexum">Get it on GitHub</a>
+        <p data-i18n="ctaP"><strong>Nexum is free.</strong> Use the hosted version or self-host your corp's chain in minutes.</p>
+        <a class="btn" href="/" data-i18n="ctaBtn">Get started now</a>
+        &nbsp; <a href="https://github.com/GQuantrill/eve-nexum" data-i18n="ctaGh">Get it on GitHub</a>
       </div>
 
       <footer>
-        <p>Comparison maintained by the Nexum team · last verified May 2026. Competitor details change over time — follow the links above to confirm current features. Spotted an inaccuracy? <a href="https://github.com/GQuantrill/eve-nexum/issues">Open an issue</a>.</p>
-        <p>EVE Online and the EVE logo are the registered trademarks of CCP hf. All rights reserved worldwide. Nexum is a third-party tool and is not affiliated with or endorsed by CCP hf., Pathfinder, Tripwire or Wanderer. See the full <a href="/license/">license &amp; EVE IP notice</a>.</p>
+        <p data-i18n="footP1">Comparison maintained by the Nexum team · last verified May 2026. Competitor details change over time — follow the links above to confirm current features. Spotted an inaccuracy? <a href="https://github.com/GQuantrill/eve-nexum/issues">Open an issue</a>.</p>
+        <p data-i18n="footP2">EVE Online and the EVE logo are the registered trademarks of CCP hf. All rights reserved worldwide. Nexum is a third-party tool and is not affiliated with or endorsed by CCP hf., Pathfinder, Tripwire or Wanderer. See the full <a href="/license/">license &amp; EVE IP notice</a>.</p>
       </footer>
     </div>
+
+    <!--
+      Runtime German swap. This page is static HTML (not part of the React SPA),
+      so it can't use react-i18next. When the visitor's saved language is German
+      — the same `nexum.lang` localStorage key the app's language detector uses,
+      falling back to the browser language — we replace the text of every
+      [data-i18n] element with its German equivalent. SEO crawlers index the
+      English source only (see the canonical / og:locale above); this is purely
+      for German-speaking visitors arriving from the app.
+    -->
+    <script>
+      (function () {
+        try {
+          var lang = localStorage.getItem('nexum.lang');
+          if (!lang) lang = (navigator.language || '').slice(0, 2) === 'de' ? 'de' : 'en';
+
+          // Wire up the language picker regardless of the current language so
+          // a German visitor can switch back to English too. Persists to the
+          // same nexum.lang key the app uses, then reloads to re-run the swap.
+          var sel = document.getElementById('lang-select');
+          if (sel) {
+            sel.value = (lang === 'de') ? 'de' : 'en';
+            sel.addEventListener('change', function () {
+              try { localStorage.setItem('nexum.lang', sel.value); } catch (e) { /* ignore */ }
+              location.reload();
+            });
+          }
+
+          if (lang !== 'de') return;
+
+          var DE = {
+            __title: 'EVE Online Wurmloch-Mapper-Vergleich: Nexum vs Pathfinder vs Tripwire vs Wanderer (2026)',
+            nav: '&larr; Nexum Startseite',
+            h1: 'EVE Online Wurmloch-Mapper-Vergleich:<br />Nexum vs Pathfinder vs Tripwire vs Wanderer',
+            sub: 'Ein ehrlicher Blick auf die führenden Wurmloch-Kartierungstools für EVE Online.',
+            upd: 'Zuletzt aktualisiert am 27. Mai 2026 · gepflegt vom Nexum-Team',
+            lede: 'Wenn du in J-Space scoutest oder lebst, ist ein guter Wurmloch-Mapper unverzichtbar. <strong>Nexum</strong> ist ein moderner Open-Source-Mapper — nutze die kostenlose gehostete Version oder hoste selbst — der den gesamten Workflow abdeckt: Echtzeit-Kettenkartierung, Signaturen und Massenverfolgung, und dann geht er weiter mit einem echten Wurmloch-Rolling-Rechner, dem Seeding ganzer Regionen, Standings- &amp; Sov-Overlays und Discord-Alarmen. Unten wird er mit den anderen gängigen Optionen verglichen — <strong>Tripwire</strong>, <strong>Pathfinder</strong> und <strong>Wanderer</strong>. Wir entwickeln Nexum, also halten wir es natürlich für die stärkste Wahl für die meisten Corps — aber wir haben die Fakten zur Konkurrenz korrekt und verlinkt gehalten, damit du selbst urteilen kannst.',
+
+            h2Glance: 'Auf einen Blick',
+            cap1: 'Kernvergleich. Verifiziert im Mai 2026 — die Funktionen der Konkurrenz ändern sich; folge den Links zur Bestätigung.',
+            gOpenSource: 'Open Source',
+            gSelfHost: 'Selbst hostbar',
+            gCloud: 'Verwaltete Cloud-Option',
+            gSso: 'EVE-SSO-Login',
+            gSync: 'Echtzeit-Mehrbenutzer-Sync',
+            gSigPaste: 'Signatur-Einfügen &amp; -Verfolgung',
+            gMass: 'Wurmloch-Masse / Rolling',
+            gTech: 'Tech-Stack',
+            gCost: 'Kosten',
+            yes: '<span class="yes">Ja</span>',
+            yesMit: '<span class="yes">Ja</span> (MIT)',
+            yesDocker: '<span class="yes">Ja</span> (Docker)',
+            yesCe: '<span class="yes">Ja</span> (Community Edition)',
+            free: '<span class="yes">Kostenlos</span>',
+            freeBoth: '<span class="yes">Kostenlos</span> (gehostet &amp; selbst gehostet)',
+            gCloudN: '<span class="yes">Ja</span> — kostenlose öffentliche Instanz auf eve-nexum.com, plus Selbst-Hosting',
+            gCloudP: '<span class="meh">Von der Community betriebene Instanzen</span>',
+            gCloudT: '<span class="meh">Öffentlicher Host 2024 geschlossen</span>',
+            gCloudW: '<span class="yes">Ja</span> — offizielle „Wanderer Cloud“, von den Entwicklern verwaltet',
+            gMassN: 'Dedizierter Rolling-Rechner (±10% Varianz, Strandungswarnungen)',
+            massStatus: 'Massenstatus-Verfolgung',
+
+            h2Further: 'Wo Nexum weiter geht',
+            furtherIntro: 'Alle vier beherrschen die Grundlagen gut. Dies sind die Fähigkeiten, die Nexum eingebaut hat und die die anderen in der Regel nicht als dokumentierte, sofort einsatzbereite Funktionen bieten — die Gründe, warum Corps es wählen:',
+            cap2: 'Nexums besondere Funktionen. „—“ bedeutet, dass es keine dokumentierte, eingebaute Kernfunktion dieser Tools ist (Funktionen ändern sich — nutze die Links unten zur Überprüfung).',
+            fFeature: 'Funktion',
+            f1h: 'Wurmloch-<strong>Rolling-Rechner</strong> — modelliert die ±10%-Massenvarianz, kalter/heißer Roller mit Seitenverfolgung und warnt, bevor ein Durchflug deinen Roller strandet oder das Loch schließt',
+            f1o: 'Grundlegende Massenstatus-Verfolgung',
+            f2h: '<strong>Karte aus einer ganzen EVE-Region erzeugen</strong> — Dotlan-artiges Auto-Layout mit jedem regionsinternen Stargate vorgezeichnet',
+            f3h: '<strong>Zwei Karten zusammenführen</strong> zu einer, mit Entdoppelung von Systemen und Einarbeitung von Signaturen, Strukturen und Notizen',
+            f4h: '<strong>Discord-Benachrichtigungen</strong> — Alarme bei eingehendem K162 und neuer Verbindung in deinen Kanal geschoben, selbst wenn niemand die Karte beobachtet',
+            f5h: '<strong>Standings- &amp; Souveränitäts-Overlay</strong> angetrieben von deinen eigenen EVE-Kontakten — feindlich/freundlich-Einfärbung über die Kette, Killboard und Sov-Halos',
+            f6h: '<strong>Live-Präsenz der Kartenbetrachter</strong> — ein Punkt für jeden, der die Karte betrachtet, nicht nur deine Flotte — plus Flottenpositionen',
+            f6o: 'Flottenpositionen variieren',
+            f7h: '<strong>Umgebungs-Intel-Ebenen</strong> — Nullsec-Stürme, A0-Sonnen, Eisgürtel, Ketten-Wurmlocheffekte und Näherungswarnungen für Inkursion / Aufstand',
+            f8h: '<strong>Corp-Suite</strong> — Rollen, gemeinsame Karten, Admin-Dashboard, Benutzer- &amp; System-Berichte, Audit-Log und Zuordnung pro Charakter',
+            f8o: 'Variiert',
+
+            h2Detail: 'Die Tools im Detail',
+            twP: 'Der klassische, signaturorientierte Wurmloch-Mapper, mit dem ein großer Teil der J-Space-Spieler aufgewachsen ist. Er ist schnell, fokussiert, und der Workflow sitzt bei Veteranen im Muskelgedächtnis. Die langlebige öffentliche Instanz (tripwire.eve-apps.com) wurde Mitte 2024 abgeschaltet, aber Tripwire ist Open Source und lebt daher durch Selbst-Hosting und von der Community betriebene Instanzen weiter.',
+            twBest: '<strong>Am besten für:</strong> Gruppen, die den vertrauten Tripwire-Signatur-Workflow wollen und bereit sind, selbst zu hosten. <a href="https://bitbucket.org/daimian/tripwire">Quelle &rarr;</a>',
+            pfP: 'Der ausgereifteste und funktionsreichste selbst gehostete Mapper. Er hat vieles geprägt, was Wurmlochbewohner erwarten — reichhaltige Wurmlochdaten, Thera-Verbindungen über EVE-Scout, einen Live-zKillboard-Killstream, eine Plugin-API und mehr. Der Kompromiss ist der Betriebsaufwand: Es ist ein PHP/MySQL-Stack, der mehr Aufwand zum Einrichten und Aktualisieren erfordert als eine Single-Container-App.',
+            pfBest: '<strong>Am besten für:</strong> Gruppen, die maximale Funktionen wollen und nichts dagegen haben, einen schwereren Stack zu betreiben. <a href="https://github.com/exodus4d/pathfinder">GitHub &rarr;</a>',
+            wdP: 'Der moderne Herausforderer, angepriesen als leichte, schnelle Alternative zu Pathfinder. Gebaut auf Elixir/Phoenix mit einem React-Frontend und unter MIT quelloffen, ist er der einzige der vier mit einer <em>offiziellen verwalteten Cloud</em>-Version — sodass eine Gruppe ihn nutzen kann, ohne jegliche Infrastruktur zu betreiben — und bietet trotzdem eine kostenlose selbst gehostete Community Edition.',
+            wdBest: '<strong>Am besten für:</strong> Gruppen, die eine polierte Oberfläche wollen und die Option, das Selbst-Hosting ganz zu überspringen. <a href="https://wanderer.ltd/">Webseite &rarr;</a> · <a href="https://github.com/wanderer-industries/wanderer">GitHub &rarr;</a>',
+            nxP: 'Ein moderner, quelloffener, selbst gehosteter Mapper, der zuerst für Corps gebaut wurde. Er deckt den Kern-Workflow ab — Echtzeit-Zusammenarbeit bei der Kartierung (Live-Änderungen für alle auf der Karte), Signatur-Einfügen mit Wurmloch-Alterung und Verbindungsverfolgung — und legt Extras obendrauf, die auf das Betreiben der Kette einer Corp abzielen:',
+            nxLi1: '<strong>Wurmloch-Rolling-Rechner</strong>, der die ±10%-Massenvarianz modelliert, jeden Durchflug als sicher / könnte-schließen / wird-schließen prognostiziert und warnt, bevor ein Durchflug deinen Roller stranden würde.',
+            nxLi2: '<strong>Eine ganze EVE-Region als Dotlan-artige Karte erzeugen</strong> und <strong>Karten zusammenführen</strong>.',
+            nxLi3: '<strong>Standings- &amp; Souveränitäts-Overlays</strong>, ein Live-Killboard und Sprung-/Kill-Aktivitätsdiagramme.',
+            nxLi4: '<strong>Piloten-Präsenz und Flottenpositionen</strong> auf der Karte, plus optionale Standortverfolgung.',
+            nxLi5: '<strong>Thera &amp; Turnur</strong> öffentliche Verbindungen von EVE-Scout.',
+            nxLi6: '<strong>Corp-Modus</strong>: Rollen, gemeinsame Karten, Admin-Berichte, ein Audit-Log und <strong>Discord-Benachrichtigungen</strong> bei eingehenden K162s und neuen Verbindungen.',
+            nxP2: 'Er läuft als kleiner Docker-Stack (React + Node + Postgres) und meldet sich mit EVE SSO an — nutze die kostenlose öffentliche Instanz auf eve-nexum.com oder hoste selbst. Als der jüngste der vier hat er eine kleinere Community.',
+            nxBest: '<strong>Am besten für:</strong> Corps, die einen modernen Mapper mit Rolling, Regions-Seeding, Standings und Discord eingebaut wollen — für dich gehostet oder selbst gehostet. <a href="/">Jetzt loslegen &rarr;</a> · <a href="https://github.com/GQuantrill/eve-nexum">GitHub &rarr;</a>',
+
+            h2Choose: 'Welches solltest du wählen?',
+            chooseP1: '<strong>Für die meisten Corps, die frisch aufsetzen, würden wir mit Nexum beginnen.</strong> Es ist modern, steht mit Docker in Minuten, und bündelt den Rolling-Rechner, das Regions-Seeding, Standings-Overlays und Discord-Alarme, die du dir sonst zusammenstückeln müsstest — alles in einer Echtzeit-Karte für die Zusammenarbeit. <a href="/">Jetzt loslegen</a> und selbst überzeugen.',
+            chooseP2: 'Die anderen sind auch gute Tools und passen in bestimmten Fällen vielleicht besser:',
+            chooseLi1: '<strong>Schon fließend im klassischen Tripwire-Signatur-Workflow?</strong> Tripwire macht das immer noch gut — jetzt selbst gehostet.',
+            chooseLi2: '<strong>Brauchst du den tiefsten, ausgereiftesten Funktionsumfang und betreibst gern einen schwereren PHP-Stack?</strong> Pathfinder.',
+            chooseLi3: '<strong>Willst du gar keinen Server betreiben?</strong> Nutze Nexums kostenlose öffentliche Instanz oder Wanderers Cloud.',
+
+            h2Faq: 'Häufig gestellte Fragen',
+            faqQ1: 'Was ist der beste Wurmloch-Mapper für EVE Online?',
+            faqA1: 'Es hängt von deiner Gruppe ab, aber für ein modernes selbst gehostetes Setup würden wir Nexum empfehlen — es bündelt die meisten eingebauten Funktionen (einen Wurmloch-Rolling-Rechner, das Seeding ganzer Regionen, Standings-Overlays und Discord-Alarme) in einer Echtzeit-Karte für die Zusammenarbeit. Tripwire ist nach wie vor das klassische Signatur-Tool, Pathfinder ist die ausgereifteste und funktionsreichste Option, und Wanderer ergänzt eine verwaltete Cloud-Version.',
+            faqQ2: 'Ist Tripwire noch verfügbar?',
+            faqA2: 'Die langlebige öffentliche Instanz wurde Mitte 2024 abgeschaltet, aber Tripwire ist Open Source, sodass du es selbst hosten oder eine von der Community betriebene Instanz nutzen kannst.',
+            faqQ3: 'Wird Pathfinder noch entwickelt?',
+            faqA3: 'Nein — nicht aktiv. Das originale Pathfinder (von exodus4d) hatte seit 2020 kein neues Release, und der Community-Fork, der es weiterführte, hatte zuletzt Anfang 2025 einen Commit, seitdem kein Release. Die aktive Entwicklung ist faktisch eingestellt — einer der Gründe, warum neuere, aktiv gepflegte Mapper wie Nexum existieren.',
+            faqQ4: 'Was ist eine gute Open-Source-Alternative zu Pathfinder und Tripwire?',
+            faqA4: 'Nexum und Wanderer sind beide moderne Open-Source-Mapper. Nexum ist selbst gehostet mit EVE SSO, Echtzeit-Zusammenarbeit und Corp-Tools; Wanderer ist MIT-lizenziert und bietet Selbst-Hosting plus eine verwaltete Cloud-Version.',
+            faqQ5: 'Kann ich einen EVE-Online-Wurmloch-Mapper selbst hosten?',
+            faqA5: 'Ja — Nexum, Pathfinder, Tripwire und Wanderers Community Edition lassen sich alle selbst hosten. Nexum läuft mit Docker auf Postgres und meldet sich mit EVE SSO an.',
+            faqQ6: 'Sind diese Wurmloch-Mapper kostenlos?',
+            faqA6: 'Ja — alle vier sind kostenlos. Pathfinder und Tripwire sind selbst gehostet; Nexum und Wanderer bieten jeweils sowohl eine kostenlose öffentlich gehostete Version als auch Selbst-Hosting.',
+
+            ctaP: '<strong>Nexum ist kostenlos.</strong> Nutze die gehostete Version oder hoste die Kette deiner Corp in Minuten selbst.',
+            ctaBtn: 'Jetzt loslegen',
+            ctaGh: 'Auf GitHub holen',
+            footP1: 'Vergleich gepflegt vom Nexum-Team · zuletzt verifiziert im Mai 2026. Details der Konkurrenz ändern sich mit der Zeit — folge den Links oben, um die aktuellen Funktionen zu bestätigen. Eine Ungenauigkeit entdeckt? <a href="https://github.com/GQuantrill/eve-nexum/issues">Eröffne ein Issue</a>.',
+            footP2: 'EVE Online und das EVE-Logo sind eingetragene Marken von CCP hf. Alle Rechte weltweit vorbehalten. Nexum ist ein Drittanbieter-Tool und steht in keiner Verbindung zu CCP hf., Pathfinder, Tripwire oder Wanderer und wird von ihnen nicht unterstützt. Siehe den vollständigen <a href="/license/">Lizenz- &amp; EVE-IP-Hinweis</a>.'
+          };
+
+          document.documentElement.lang = 'de';
+          if (DE.__title) document.title = DE.__title;
+          document.querySelectorAll('[data-i18n]').forEach(function (el) {
+            var key = el.getAttribute('data-i18n');
+            if (DE[key] != null) el.innerHTML = DE[key];
+          });
+        } catch (e) { /* leave the English page intact on any failure */ }
+      })();
+    </script>
   </body>
 </html>

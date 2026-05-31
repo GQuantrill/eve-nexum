@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   title:         string;
@@ -13,7 +14,8 @@ interface Props {
 
 // Modal replacement for native prompt() — same purpose but composable with
 // the rest of the app's styling and z-index stacking.
-export function PromptModal({ title, message, defaultValue = '', placeholder, confirmLabel = 'OK', onConfirm, onCancel }: Props) {
+export function PromptModal({ title, message, defaultValue = '', placeholder, confirmLabel, onConfirm, onCancel }: Props) {
+  const { t } = useTranslation();
   const [value, setValue] = useState(defaultValue);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -48,9 +50,9 @@ export function PromptModal({ title, message, defaultValue = '', placeholder, co
             style={{ width: '100%', marginTop: 8 }}
           />
           <div className="modal__actions">
-            <button className="btn btn--ghost" onClick={onCancel}>Cancel</button>
+            <button className="btn btn--ghost" onClick={onCancel}>{t('actions.cancel')}</button>
             <button className="btn btn--primary" onClick={submit} disabled={!value.trim()}>
-              {confirmLabel}
+              {confirmLabel ?? t('actions.ok')}
             </button>
           </div>
         </div>

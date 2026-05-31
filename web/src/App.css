@@ -123,7 +123,7 @@
 .sidebar {
   width: 18vw;
   min-width: 180px;
-  max-width: 360px;
+  max-width: 300px;
   background: #0d1117;
   display: flex;
   flex-direction: column;
@@ -1064,6 +1064,8 @@
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: #5a6a8a;
+  text-align: start;
+
 }
 
 .map-sidebar__section-header {
@@ -3437,6 +3439,33 @@ select.sig-toolbar-btn {
 select.sig-toolbar-btn option {
   background: #0d1117;
   color: #c0ccde;
+}
+
+/* Language picker (toolbar + landing hero). Matches the site's dark
+   selects; native option rows forced dark so the dropdown panel isn't
+   light on a dark page. */
+.toolbar__lang-select {
+  background: #0a0e1a;
+  border: 1px solid #1e2740;
+  border-radius: 4px;
+  color: #c8d0e0;
+  font-family: inherit;
+  font-size: calc(13px * var(--font-scale, 1));
+  padding: 4px 8px;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+.toolbar__lang-select:hover {
+  border-color: #4d9de0;
+}
+.toolbar__lang-select:focus-visible {
+  outline: none;
+  border-color: #4d9de0;
+  box-shadow: 0 0 0 2px rgba(77, 157, 224, 0.25);
+}
+.toolbar__lang-select option {
+  background: #0d1117;
+  color: #c8d0e0;
 }
 
 .sig-notes-cell {

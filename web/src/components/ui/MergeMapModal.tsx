@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
+import { Trans, useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { XIcon } from '@phosphor-icons/react';
 import { api } from '../../api/client';
 import { useMapStore, type MapListItem } from '../../store/mapStore';
@@ -14,12 +16,13 @@ interface MergeResult {
 // Roles that can write to a corp map (and therefore use one as a destination).
 const CORP_WRITE_ROLES = new Set(['edit', 'full', 'admin']);
 
-function mapLabel(m: MapListItem): string {
-  const kind = m.isCorpMap ? 'Corp' : 'Solo';
+function mapLabel(t: TFunction, m: MapListItem): string {
+  const kind = m.isCorpMap ? t('merge.corp') : t('merge.solo');
   return m.ownerName ? `${m.name} — ${kind} · ${m.ownerName}` : `${m.name} — ${kind}`;
 }
 
 export function MergeMapModal({ onClose }: { onClose: () => void }) {
+  const { t } = useTranslation();
   const maps        = useMapStore((s) => s.maps);
   const activeMapId = useMapStore((s) => s.activeMapId);
   const switchMap   = useMapStore((s) => s.switchMap);
@@ -71,14 +74,14 @@ export function MergeMapModal({ onClose }: { onClose: () => void }) {
       });
       const a = r.added;
       toast.success(
-        `Merged: +${a.systems} systems, +${a.connections} links, +${a.signatures} sigs, +${a.structures} structures`,
+        t('merge.merged', { systems: a.systems, connections: a.connections, signatures: a.signatures, structures: a.structures }),
       );
       await loadMaps();
       await switchMap(destId);
       requestFitView();
       onClose();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Merge failed');
+      setError(e instanceof Error ? e.message : t('merge.mergeFailed'));
     } finally {
       setBusy(false);
     }
@@ -88,43 +91,43 @@ export function MergeMapModal({ onClose }: { onClose: () => void }) {
     <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="modal" role="dialog" aria-modal="true">
         <div className="modal__header">
-          <h2 className="modal__title">Merge Maps</h2>
-          <button className="icon-btn" onClick={onClose} aria-label="Close">
+          <h2 className="modal__title">{t('merge.title')}</h2>
+          <button className="icon-btn" onClick={onClose} aria-label={t('actions.close')}>
             <XIcon size={16} weight="bold" />
           </button>
         </div>
 
         <div className="modal__body">
           <label className="field">
-            <span>Source map (merge from)</span>
+            <span>{t('merge.sourceMap')}</span>
             <select value={sourceId} onChange={(e) => setSourceId(e.target.value)}>
-              <option value="">Select a source…</option>
+              <option value="">{t('merge.selectSource')}</option>
               {sourceOptions.map((m) => (
-                <option key={m.id} value={m.id}>{mapLabel(m)}</option>
+                <option key={m.id} value={m.id}>{mapLabel(t, m)}</option>
               ))}
             </select>
           </label>
 
           <label className="field">
-            <span>Destination map (merge into)</span>
+            <span>{t('merge.destMap')}</span>
             <select value={destId} onChange={(e) => setDestId(e.target.value)}>
-              <option value="">Select a destination…</option>
+              <option value="">{t('merge.selectDest')}</option>
               {destOptions.map((m) => (
-                <option key={m.id} value={m.id}>{mapLabel(m)}</option>
+                <option key={m.id} value={m.id}>{mapLabel(t, m)}</option>
               ))}
             </select>
           </label>
 
           {sameMap && (
             <div className="map-sidebar__hint map-sidebar__hint--error">
-              Source and destination must be different maps.
+              {t('merge.differentMaps')}
             </div>
           )}
 
           <div className="field">
-            <span>Include</span>
+            <span>{t('merge.include')}</span>
             <label className="map-sidebar__row map-sidebar__toggle-row">
-              <span className="map-sidebar__label">Signatures</span>
+              <span className="map-sidebar__label">{t('merge.signatures')}</span>
               <input
                 type="checkbox"
                 className="map-sidebar__toggle-input"
@@ -133,7 +136,7 @@ export function MergeMapModal({ onClose }: { onClose: () => void }) {
               />
             </label>
             <label className="map-sidebar__row map-sidebar__toggle-row">
-              <span className="map-sidebar__label">Structures</span>
+              <span className="map-sidebar__label">{t('merge.structures')}</span>
               <input
                 type="checkbox"
                 className="map-sidebar__toggle-input"
@@ -142,7 +145,7 @@ export function MergeMapModal({ onClose }: { onClose: () => void }) {
               />
             </label>
             <label className="map-sidebar__row map-sidebar__toggle-row">
-              <span className="map-sidebar__label">Notes</span>
+              <span className="map-sidebar__label">{t('merge.notes')}</span>
               <input
                 type="checkbox"
                 className="map-sidebar__toggle-input"
@@ -153,19 +156,17 @@ export function MergeMapModal({ onClose }: { onClose: () => void }) {
           </div>
 
           <div className="map-sidebar__hint">
-            Systems already on the destination are kept as the source of truth —
-            only missing systems, links, and the selected data are added or
-            updated. <strong>This action cannot be undone.</strong>
+            <Trans i18nKey="merge.hint" />
           </div>
 
           {error && <div className="map-sidebar__hint map-sidebar__hint--error">{error}</div>}
 
           <div className="modal__actions">
             <button type="button" className="btn btn--ghost" onClick={onClose} disabled={busy}>
-              Cancel
+              {t('actions.cancel')}
             </button>
             <button type="button" className="btn btn--primary" onClick={doMerge} disabled={!canMerge}>
-              {busy ? 'Merging…' : 'Merge'}
+              {busy ? t('merge.merging') : t('merge.merge')}
             </button>
           </div>
         </div>

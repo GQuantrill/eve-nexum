@@ -1,8 +1,11 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { Trans, useTranslation } from "react-i18next";
+import type { TFunction } from "i18next";
 import {
   useNotificationPermission,
   notifyPermissionChanged,
 } from "../../hooks/useNotificationPermission";
+import { expiresIn } from "../../i18n/format";
 import { useMapStore } from "../../store/mapStore";
 import { useAuth } from "../../context/AuthContext";
 import { api } from "../../api/client";
@@ -122,16 +125,17 @@ function canShareThisMap(
 
 // Expiry windows offered to the share-link generator. Mirror the server's
 // SHARE_EXPIRY_HOURS_ALLOWED — anything not on this list is rejected.
-const SHARE_EXPIRY_OPTIONS: Array<{ hours: number; label: string }> = [
-  { hours: 1, label: "1 hour" },
-  { hours: 12, label: "12 hours" },
-  { hours: 24, label: "1 day" },
-  { hours: 72, label: "3 days" },
-  { hours: 168, label: "1 week" },
+const SHARE_EXPIRY_OPTIONS: Array<{ hours: number; label: (t: TFunction) => string }> = [
+  { hours: 1, label: (t) => t("units.hours", { count: 1 }) },
+  { hours: 12, label: (t) => t("units.hours", { count: 12 }) },
+  { hours: 24, label: (t) => t("units.days", { count: 1 }) },
+  { hours: 72, label: (t) => t("units.days", { count: 3 }) },
+  { hours: 168, label: (t) => t("units.weeks", { count: 1 }) },
 ];
 const SHARE_EXPIRY_DEFAULT = 24;
 
 function ShareSection() {
+  const { t } = useTranslation();
   const map = useMapStore((s) => s.map);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -222,7 +226,7 @@ function ShareSection() {
         },
       }));
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to create share link");
+      setError(e instanceof Error ? e.message : t("mapSidebar.createShareFailed"));
     } finally {
       setBusy(false);
     }
@@ -237,7 +241,7 @@ function ShareSection() {
         map: { ...s.map, shareToken: null, shareExpiresAt: null },
       }));
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to revoke share link");
+      setError(e instanceof Error ? e.message : t("mapSidebar.revokeShareFailed"));
     } finally {
       setBusy(false);
     }
@@ -246,18 +250,13 @@ function ShareSection() {
   function copyUrl() {
     if (!url) return;
     navigator.clipboard.writeText(url).then(
-      () => toast.success("Live map link copied"),
-      () => toast.error("Copy failed — select and copy manually"),
+      () => toast.success(t("mapSidebar.linkCopied")),
+      () => toast.error(t("mapSidebar.copyFailed")),
     );
   }
 
   function formatRemaining(): string {
-    const ms = expiresAt - now;
-    if (ms <= 0) return "expired";
-    const h = Math.floor(ms / 3_600_000);
-    const m = Math.floor((ms % 3_600_000) / 60_000);
-    if (h > 0) return `expires in ${h}h ${m}m`;
-    return `expires in ${m}m`;
+    return expiresIn(t, expiresAt - now);
   }
 
   // Update toggle state locally and, if a link is live, push a PATCH so
@@ -295,7 +294,7 @@ function ShareSection() {
       }));
     } catch (e) {
       setError(
-        e instanceof Error ? e.message : "Failed to update share options",
+        e instanceof Error ? e.message : t("mapSidebar.updateShareFailed"),
       );
     }
   }
@@ -304,14 +303,14 @@ function ShareSection() {
     <>
       <div className="map-sidebar__hint">
         {isActive
-          ? "Live share link. Toggle below to change what guests see. If a link was previously generated, the changes will take effect automatically and you DO NOT need to regenerate."
-          : "Create a read-only link anyone can open without an account. Pick categories to expose and an expiry window — anyone holding the URL within that window can see everything you opted in."}
+          ? t("mapSidebar.shareActiveHint")
+          : t("mapSidebar.shareInactiveHint")}
       </div>
 
       {!isActive && (
         <div className="map-sidebar__row">
           <label className="map-sidebar__label" htmlFor="share-expiry">
-            Link expires after
+            {t("mapSidebar.linkExpiresAfter")}
           </label>
           <select
             id="share-expiry"
@@ -321,7 +320,7 @@ function ShareSection() {
           >
             {SHARE_EXPIRY_OPTIONS.map((o) => (
               <option key={o.hours} value={o.hours}>
-                {o.label}
+                {o.label(t)}
               </option>
             ))}
           </select>
@@ -329,7 +328,7 @@ function ShareSection() {
       )}
 
       <label className="map-sidebar__row map-sidebar__toggle-row">
-        <span className="map-sidebar__label">Include signatures</span>
+        <span className="map-sidebar__label">{t("mapSidebar.includeSignatures")}</span>
         <input
           type="checkbox"
           className="map-sidebar__toggle-input"
@@ -338,7 +337,7 @@ function ShareSection() {
         />
       </label>
       <label className="map-sidebar__row map-sidebar__toggle-row">
-        <span className="map-sidebar__label">Show jump bridges</span>
+        <span className="map-sidebar__label">{t("mapSidebar.showJumpBridges")}</span>
         <input
           type="checkbox"
           className="map-sidebar__toggle-input"
@@ -347,7 +346,7 @@ function ShareSection() {
         />
       </label>
       <label className="map-sidebar__row map-sidebar__toggle-row">
-        <span className="map-sidebar__label">Include structures</span>
+        <span className="map-sidebar__label">{t("mapSidebar.includeStructures")}</span>
         <input
           type="checkbox"
           className="map-sidebar__toggle-input"
@@ -356,7 +355,7 @@ function ShareSection() {
         />
       </label>
       <label className="map-sidebar__row map-sidebar__toggle-row">
-        <span className="map-sidebar__label">Include notes</span>
+        <span className="map-sidebar__label">{t("mapSidebar.includeNotes")}</span>
         <input
           type="checkbox"
           className="map-sidebar__toggle-input"
@@ -376,14 +375,14 @@ function ShareSection() {
             onClick={copyUrl}
             disabled={busy}
           >
-            Copy link
+            {t("mapSidebar.copyLink")}
           </button>
           <button
             className="map-sidebar__action"
             onClick={revoke}
             disabled={busy}
           >
-            {busy ? "Working…" : "Revoke"}
+            {busy ? t("mapSidebar.working") : t("mapSidebar.revoke")}
           </button>
         </>
       ) : (
@@ -392,7 +391,7 @@ function ShareSection() {
           onClick={generate}
           disabled={busy}
         >
-          {busy ? "Working…" : "Create share link"}
+          {busy ? t("mapSidebar.working") : t("mapSidebar.createShareLink")}
         </button>
       )}
 
@@ -409,6 +408,7 @@ function ShareSection() {
 // looking at a corp map — exposes the "allow as merge source" opt-in that
 // lets that corp map be used as a merge source by the corp.
 function MergeSection() {
+  const { t } = useTranslation();
   const map = useMapStore((s) => s.map);
   const mapCount = useMapStore((s) => s.maps.length);
   const { user } = useAuth();
@@ -440,7 +440,7 @@ function MergeSection() {
       });
     } catch (e) {
       setFlagInStore(field, !next);
-      toast.error(e instanceof Error ? e.message : "Failed to update setting");
+      toast.error(e instanceof Error ? e.message : t("mapSidebar.updateSettingFailed"));
     } finally {
       setSaving(false);
     }
@@ -449,22 +449,20 @@ function MergeSection() {
   return (
     <>
       <div className="map-sidebar__hint">
-        Combine another map into one of yours. The destination keeps its
-        existing systems; missing systems, links, and the data you select are
-        added or updated. This can't be undone.
+        {t("mapSidebar.mergeHint")}
       </div>
       <button
         className="map-sidebar__action"
         onClick={() => setOpen(true)}
         disabled={mapCount < 2}
       >
-        ⇲ Merge maps…
+        {t("mapSidebar.mergeButton")}
       </button>
 
       {canToggleSource && (
         <>
           <label className="map-sidebar__row map-sidebar__toggle-row">
-            <span className="map-sidebar__label">Allow as merge source</span>
+            <span className="map-sidebar__label">{t("mapSidebar.allowMergeSource")}</span>
             <input
               type="checkbox"
               className="map-sidebar__toggle-input"
@@ -474,7 +472,7 @@ function MergeSection() {
             />
           </label>
           <label className="map-sidebar__row map-sidebar__toggle-row">
-            <span className="map-sidebar__label">Allow as merge destination</span>
+            <span className="map-sidebar__label">{t("mapSidebar.allowMergeDest")}</span>
             <input
               type="checkbox"
               className="map-sidebar__toggle-input"
@@ -484,8 +482,7 @@ function MergeSection() {
             />
           </label>
           <div className="map-sidebar__hint">
-            When on, corp members can use this corp map as the <em>source</em> or{" "}
-            <em>destination</em> of a merge.
+            <Trans i18nKey="mapSidebar.mergeFlagHint" />
           </div>
         </>
       )}
@@ -496,6 +493,7 @@ function MergeSection() {
 }
 
 export function MapSidebar() {
+  const { t } = useTranslation();
   const importInputRef = useRef<HTMLInputElement>(null);
   const [threshold, setThreshold] = useProximityThreshold();
   const [staleHours, setStaleHours] = useStaleThreshold();
@@ -535,7 +533,7 @@ export function MapSidebar() {
     const flow = document.querySelector<HTMLElement>(".react-flow");
     const target = viewport ?? flow;
     if (!target) {
-      toast.error("Could not find the map canvas");
+      toast.error(t("mapSidebar.canvasNotFound"));
       return;
     }
     try {
@@ -561,7 +559,7 @@ export function MapSidebar() {
       link.click();
     } catch (err) {
       toast.error(
-        `Export failed: ${err instanceof Error ? err.message : String(err)}`,
+        t("mapSidebar.exportFailed", { error: err instanceof Error ? err.message : String(err) }),
       );
     }
   }
@@ -616,11 +614,11 @@ export function MapSidebar() {
     try {
       parsed = JSON.parse(await file.text()) as WormholeMap;
     } catch {
-      toast.error("Invalid JSON file.");
+      toast.error(t("mapSidebar.invalidJson"));
       return;
     }
     if (!parsed.systems || !parsed.connections) {
-      toast.error("File does not look like a Eve-Nexum map export.");
+      toast.error(t("mapSidebar.notNexumMap"));
       return;
     }
     try {
@@ -636,7 +634,7 @@ export function MapSidebar() {
       await useMapStore.getState().switchMap(id);
     } catch (err) {
       toast.error(
-        `Import failed: ${err instanceof Error ? err.message : String(err)}`,
+        t("mapSidebar.importFailed", { error: err instanceof Error ? err.message : String(err) }),
       );
     }
   }
@@ -646,7 +644,7 @@ export function MapSidebar() {
       <button
         className="map-sidebar__tab"
         onClick={() => setMapOptionsOpen(!mapOptionsOpen)}
-        title={mapOptionsOpen ? "Close map options" : "Map options"}
+        title={mapOptionsOpen ? t("mapSidebar.closeOptions") : t("mapSidebar.openOptions")}
       >
         {mapOptionsOpen ? (
           <CaretRightIcon size={14} weight="bold" />
@@ -656,33 +654,33 @@ export function MapSidebar() {
       </button>
 
       <div className="map-sidebar__content">
-        <CollapsibleSection title="Map Options" {...sectionProps("mapOptions")}>
+        <CollapsibleSection title={t("mapSidebar.sections.mapOptions")} {...sectionProps("mapOptions")}>
           <div className="map-sidebar__row">
-            <label className="map-sidebar__label">Snap to Grid</label>
+            <label className="map-sidebar__label">{t("mapSidebar.snapToGrid")}</label>
             <button
               className={`toolbar__toggle${snapToGrid ? " toolbar__toggle--on" : ""}`}
               onClick={() => setSnapToGrid(!snapToGrid)}
               aria-pressed={snapToGrid}
             >
-              {snapToGrid ? "On" : "Off"}
+              {snapToGrid ? t("actions.on") : t("actions.off")}
             </button>
           </div>
 
           <div className="map-sidebar__row">
-            <label className="map-sidebar__label">Minimap</label>
+            <label className="map-sidebar__label">{t("mapSidebar.minimap")}</label>
             <button
               className={`toolbar__toggle${showMinimap ? " toolbar__toggle--on" : ""}`}
               onClick={() => setShowMinimap(!showMinimap)}
               aria-pressed={showMinimap}
             >
-              {showMinimap ? "On" : "Off"}
+              {showMinimap ? t("actions.on") : t("actions.off")}
             </button>
           </div>
 
           {showMinimap && (
             <div className="map-sidebar__row">
               <label className="map-sidebar__label" htmlFor="minimap-position">
-                Position
+                {t("mapSidebar.position")}
               </label>
               <select
                 id="minimap-position"
@@ -692,17 +690,17 @@ export function MapSidebar() {
                   setMinimapPosition(e.target.value as MinimapPosition)
                 }
               >
-                <option value="bottom-right">Bottom right</option>
-                <option value="bottom-left">Bottom left</option>
-                <option value="top-right">Top right</option>
-                <option value="top-left">Top left</option>
+                <option value="bottom-right">{t("mapSidebar.minimapPos.bottomRight")}</option>
+                <option value="bottom-left">{t("mapSidebar.minimapPos.bottomLeft")}</option>
+                <option value="top-right">{t("mapSidebar.minimapPos.topRight")}</option>
+                <option value="top-left">{t("mapSidebar.minimapPos.topLeft")}</option>
               </select>
             </div>
           )}
 
           <div className="map-sidebar__row">
             <label className="map-sidebar__label" htmlFor="ui-zoom">
-              Font Size
+              {t("mapSidebar.fontSize")}
             </label>
             <div className="map-sidebar__zoom">
               <input
@@ -719,7 +717,7 @@ export function MapSidebar() {
                 type="button"
                 className="map-sidebar__zoom-value"
                 onClick={() => setUiZoom(1)}
-                title="Reset to 100%"
+                title={t("mapSidebar.resetZoom")}
               >
                 {Math.round(uiZoom * 100)}%
               </button>
@@ -728,50 +726,50 @@ export function MapSidebar() {
         </CollapsibleSection>
 
         <CollapsibleSection
-          title="System Options"
+          title={t("mapSidebar.sections.systemOptions")}
           {...sectionProps("systemOptions")}
         >
           <div className="map-sidebar__row">
-            <label className="map-sidebar__label">Compact</label>
+            <label className="map-sidebar__label">{t("mapSidebar.compact")}</label>
             <button
               className={`toolbar__toggle${compactMode ? " toolbar__toggle--on" : ""}`}
               onClick={() => setCompactMode(!compactMode)}
               aria-pressed={compactMode}
             >
-              {compactMode ? "On" : "Off"}
+              {compactMode ? t("actions.on") : t("actions.off")}
             </button>
           </div>
 
           <div className="map-sidebar__row">
-            <label className="map-sidebar__label">Uniform Size</label>
+            <label className="map-sidebar__label">{t("mapSidebar.uniformSize")}</label>
             <button
               className={`toolbar__toggle${uniformSize ? " toolbar__toggle--on" : ""}`}
               onClick={() => setUniformSize(!uniformSize)}
               aria-pressed={uniformSize}
             >
-              {uniformSize ? "On" : "Off"}
+              {uniformSize ? t("actions.on") : t("actions.off")}
             </button>
           </div>
 
           <div className="map-sidebar__row">
-            <label className="map-sidebar__label">Show Static WHs</label>
+            <label className="map-sidebar__label">{t("mapSidebar.showStaticWhs")}</label>
             <button
               className={`toolbar__toggle${showStatics ? " toolbar__toggle--on" : ""}`}
               onClick={() => setShowStatics(!showStatics)}
               aria-pressed={showStatics}
             >
-              {showStatics ? "On" : "Off"}
+              {showStatics ? t("actions.on") : t("actions.off")}
             </button>
           </div>
 
           <div className="map-sidebar__row">
-            <label className="map-sidebar__label">Easy Connect</label>
+            <label className="map-sidebar__label">{t("mapSidebar.easyConnect")}</label>
             <button
               className={`toolbar__toggle${easyConnect ? " toolbar__toggle--on" : ""}`}
               onClick={() => setEasyConnect(!easyConnect)}
               aria-pressed={easyConnect}
             >
-              {easyConnect ? "On" : "Off"}
+              {easyConnect ? t("actions.on") : t("actions.off")}
             </button>
           </div>
 
@@ -779,16 +777,16 @@ export function MapSidebar() {
         </CollapsibleSection>
 
         <CollapsibleSection
-          title="Connections"
+          title={t("mapSidebar.sections.connections")}
           {...sectionProps("connections")}
         >
-          <div className="map-sidebar__label">Connection Style</div>
+          <div className="map-sidebar__label">{t("mapSidebar.connectionStyle")}</div>
           <div className="map-sidebar__btn-group">
             {(
               [
-                { value: "bezier", label: "Standard" },
-                { value: "straight", label: "Straight" },
-                { value: "smoothstep", label: "Step" },
+                { value: "bezier", label: t("mapSidebar.edgeStyle.bezier") },
+                { value: "straight", label: t("mapSidebar.edgeStyle.straight") },
+                { value: "smoothstep", label: t("mapSidebar.edgeStyle.smoothstep") },
               ] as const
             ).map(({ value, label }) => (
               <button
@@ -806,7 +804,7 @@ export function MapSidebar() {
               className="map-sidebar__label"
               htmlFor="connection-thickness"
             >
-              Connection Thickness
+              {t("mapSidebar.connectionThickness")}
             </label>
             <select
               id="connection-thickness"
@@ -818,10 +816,10 @@ export function MapSidebar() {
                 )
               }
             >
-              <option value="thin">Thin</option>
-              <option value="standard">Standard</option>
-              <option value="thick">Thick</option>
-              <option value="extra">Extra Thick</option>
+              <option value="thin">{t("mapSidebar.thickness.thin")}</option>
+              <option value="standard">{t("mapSidebar.thickness.standard")}</option>
+              <option value="thick">{t("mapSidebar.thickness.thick")}</option>
+              <option value="extra">{t("mapSidebar.thickness.extra")}</option>
             </select>
           </div>
 
@@ -832,24 +830,24 @@ export function MapSidebar() {
                 onClick={optimizeConnections}
                 disabled={connectionCount === 0}
               >
-                ⟳ Optimize Connections
+                {t("mapSidebar.optimizeConnections")}
               </button>
               <button
                 className="map-sidebar__action"
                 onClick={requestAutoLayout}
                 disabled={systemCount < 2}
-                data-tooltip="Adjust system nodes to stop overlapping"
+                data-tooltip={t("mapSidebar.spreadNodesTooltip")}
               >
-                ⊞ Spread Nodes
+                {t("mapSidebar.spreadNodes")}
               </button>
             </>
           )}
         </CollapsibleSection>
 
-        <CollapsibleSection title="Route" {...sectionProps("route")}>
+        <CollapsibleSection title={t("mapSidebar.sections.route")} {...sectionProps("route")}>
           <div className="map-sidebar__row">
             <label className="map-sidebar__label" htmlFor="route-mode">
-              Route Preference
+              {t("mapSidebar.routePreference")}
             </label>
             <select
               id="route-mode"
@@ -859,35 +857,32 @@ export function MapSidebar() {
                 setRouteMode(e.target.value as "shortest" | "secure")
               }
             >
-              <option value="shortest">Shortest</option>
-              <option value="secure">Secure</option>
+              <option value="shortest">{t("mapSidebar.routeShortest")}</option>
+              <option value="secure">{t("mapSidebar.routeSecure")}</option>
             </select>
           </div>
           <p className="map-sidebar__hint">
-            Shortest: fewest jumps regardless of security. Secure: prefer
-            high-sec, detour through low/null only when no high-sec path is
-            available.
+            {t("mapSidebar.routeHint")}
           </p>
         </CollapsibleSection>
 
         <CollapsibleSection
-          title="Chain Exits"
+          title={t("mapSidebar.sections.chainExits")}
           {...sectionProps("chainExits")}
         >
           <ChainExitsSection />
         </CollapsibleSection>
 
         <CollapsibleSection
-          title="Proximity Alerts"
+          title={t("mapSidebar.sections.proximityAlerts")}
           {...sectionProps("proximityAlerts")}
         >
           <div className="map-sidebar__hint">
-            Ping when an incursion, insurgency, or hostile-sov system is within
-            range of your current location.
+            {t("mapSidebar.proximityHint")}
           </div>
           <div className="map-sidebar__row">
             <label className="map-sidebar__label" htmlFor="proximity-threshold">
-              Threshold
+              {t("mapSidebar.threshold")}
             </label>
             <select
               id="proximity-threshold"
@@ -895,27 +890,27 @@ export function MapSidebar() {
               value={threshold}
               onChange={(e) => setThreshold(parseInt(e.target.value, 10))}
             >
-              <option value={0}>0 jumps (in system)</option>
-              <option value={1}>≤ 1 jump</option>
-              <option value={2}>≤ 2 jumps</option>
-              <option value={3}>≤ 3 jumps</option>
-              <option value={4}>≤ 4 jumps</option>
-              <option value={5}>≤ 5 jumps</option>
+              <option value={0}>{t("mapSidebar.proximityInSystem")}</option>
+              <option value={1}>{t("mapSidebar.proximityLe", { count: 1 })}</option>
+              <option value={2}>{t("mapSidebar.proximityLe", { count: 2 })}</option>
+              <option value={3}>{t("mapSidebar.proximityLe", { count: 3 })}</option>
+              <option value={4}>{t("mapSidebar.proximityLe", { count: 4 })}</option>
+              <option value={5}>{t("mapSidebar.proximityLe", { count: 5 })}</option>
             </select>
           </div>
 
           <div className="map-sidebar__row">
-            <label className="map-sidebar__label">Browser Notifications</label>
+            <label className="map-sidebar__label">{t("mapSidebar.browserNotifications")}</label>
             {notifPermission === "granted" ? (
               <span className="map-sidebar__status map-sidebar__status--ok">
-                Enabled
+                {t("mapSidebar.notifEnabled")}
               </span>
             ) : notifPermission === "denied" ? (
               <span
                 className="map-sidebar__status map-sidebar__status--err"
-                data-tooltip="Click the lock / site-info icon in your address bar → Notifications → Allow, then reload."
+                data-tooltip={t("mapSidebar.notifBlockedTooltip")}
               >
-                Blocked
+                {t("mapSidebar.notifBlocked")}
               </span>
             ) : (
               <button
@@ -923,65 +918,61 @@ export function MapSidebar() {
                 className="toolbar__toggle"
                 onClick={requestNotifPermission}
               >
-                Enable
+                {t("mapSidebar.notifEnable")}
               </button>
             )}
           </div>
           {notifPermission === "denied" && (
             <div className="map-sidebar__hint">
-              Browser is blocking notifications for this site. Click the lock
-              icon in your address bar → Notifications → Allow → reload the
-              page.
+              {t("mapSidebar.notifBlockedHint")}
             </div>
           )}
         </CollapsibleSection>
 
-        <CollapsibleSection title="Activity" {...sectionProps("activity")}>
+        <CollapsibleSection title={t("mapSidebar.sections.activity")} {...sectionProps("activity")}>
           <div className="map-sidebar__hint">
-            Show graphs for the following:
+            {t("mapSidebar.activityHint")}
           </div>
-          <SettingToggle settingKey="nexum.activity.showJumps" label="Jumps" />
+          <SettingToggle settingKey="nexum.activity.showJumps" label={t("mapSidebar.activityJumps")} />
           <SettingToggle
             settingKey="nexum.activity.showShipKills"
-            label="Ship Kills"
+            label={t("mapSidebar.activityShipKills")}
           />
           <SettingToggle
             settingKey="nexum.activity.showPodKills"
-            label="Pod Kills"
+            label={t("mapSidebar.activityPodKills")}
           />
           <SettingToggle
             settingKey="nexum.activity.showNpcKills"
-            label="NPC Kills"
+            label={t("mapSidebar.activityNpcKills")}
           />
           <SettingToggle
             settingKey="nexum.activity.showNpcDelta"
-            label="NPC Delta"
+            label={t("mapSidebar.activityNpcDelta")}
           />
         </CollapsibleSection>
 
-        <CollapsibleSection title="Fleet" {...sectionProps("fleet")}>
+        <CollapsibleSection title={t("mapSidebar.sections.fleet")} {...sectionProps("fleet")}>
           <div className="map-sidebar__hint">
-            Render fleet-mates as purple dots on the system they're in. Hover a
-            dot to see the names.
+            {t("mapSidebar.fleetHint")}
           </div>
           <SettingToggle
             settingKey="nexum.fleet.showMembers"
-            label="Show fleet members"
+            label={t("mapSidebar.showFleetMembers")}
           />
         </CollapsibleSection>
 
         {!hideTopologyTools && (
           <CollapsibleSection
-            title="Stale System Fade"
+            title={t("mapSidebar.sections.staleFade")}
             {...sectionProps("staleFade")}
           >
             <div className="map-sidebar__hint">
-              Visually dim systems that haven't been updated for the chosen
-              interval, so old chain residue is easy to spot at a glance.
+              {t("mapSidebar.staleHint")}
             </div>
             <div className="map-sidebar__row">
               <label className="map-sidebar__label" htmlFor="stale-threshold">
-                Threshold
+                {t("mapSidebar.threshold")}
               </label>
               <select
                 id="stale-threshold"
@@ -989,23 +980,23 @@ export function MapSidebar() {
                 value={staleHours}
                 onChange={(e) => setStaleHours(parseInt(e.target.value, 10))}
               >
-                <option value={1}>1 hour</option>
-                <option value={4}>4 hours</option>
-                <option value={12}>12 hours</option>
-                <option value={24}>24 hours</option>
-                <option value={48}>48 hours</option>
-                <option value={168}>1 week</option>
-                <option value={720}>1 month</option>
+                <option value={1}>{t("units.hours", { count: 1 })}</option>
+                <option value={4}>{t("units.hours", { count: 4 })}</option>
+                <option value={12}>{t("units.hours", { count: 12 })}</option>
+                <option value={24}>{t("units.hours", { count: 24 })}</option>
+                <option value={48}>{t("units.hours", { count: 48 })}</option>
+                <option value={168}>{t("units.weeks", { count: 1 })}</option>
+                <option value={720}>{t("units.months", { count: 1 })}</option>
               </select>
             </div>
           </CollapsibleSection>
         )}
 
         {!hideTopologyTools && (
-          <CollapsibleSection title="Import / Export" {...sectionProps("export")}>
+          <CollapsibleSection title={t("mapSidebar.sections.importExport")} {...sectionProps("export")}>
             <div className="map-sidebar__section">
               <button className="map-sidebar__action" onClick={handleExport}>
-                ↓ Export as JSON
+                {t("mapSidebar.exportJson")}
               </button>
 
               <div
@@ -1016,7 +1007,7 @@ export function MapSidebar() {
                   onClick={() => importInputRef.current?.click()}
                   disabled={atMapLimit}
                 >
-                  ↑ Import from JSON
+                  {t("mapSidebar.importJson")}
                 </button>
               </div>
               <button
@@ -1025,19 +1016,19 @@ export function MapSidebar() {
                 onClick={handleExportPng}
                 disabled={systemCount === 0}
               >
-                ⎙ Export as PNG
+                {t("mapSidebar.exportPng")}
               </button>
             </div>
           </CollapsibleSection>
         )}
 
-        <CollapsibleSection title="Merge Maps" {...sectionProps("mergeMaps")}>
+        <CollapsibleSection title={t("mapSidebar.sections.mergeMaps")} {...sectionProps("mergeMaps")}>
           <MergeSection />
         </CollapsibleSection>
 
         {canShareThisMap(user, isCorpMap, isMapOwner) && (
           <CollapsibleSection
-            title="Live Map Sharing"
+            title={t("mapSidebar.sections.liveSharing")}
             {...sectionProps("share")}
           >
             <ShareSection />
@@ -1046,37 +1037,37 @@ export function MapSidebar() {
 
         {canManageShareGrants && (
           <CollapsibleSection
-            title="Share Map"
+            title={t("mapSidebar.sections.shareMap")}
             {...sectionProps("shareGrants")}
           >
             <MapSharesSection />
           </CollapsibleSection>
         )}
 
-        <CollapsibleSection title="Shortcuts" {...sectionProps("shortcuts")}>
+        <CollapsibleSection title={t("mapSidebar.sections.shortcuts")} {...sectionProps("shortcuts")}>
           <div className="map-sidebar__shortcut">
             <kbd>⌘/Ctrl + K</kbd>
-            <span>Search systems &amp; maps</span>
+            <span>{t("mapSidebar.shortcut.searchSystems")}</span>
           </div>
           <div className="map-sidebar__shortcut">
             <kbd>H</kbd>
-            <span>Centre on home system</span>
+            <span>{t("mapSidebar.shortcut.centreHome")}</span>
           </div>
           <div className="map-sidebar__shortcut">
             <kbd>Del</kbd>
-            <span>Remove selected systems</span>
+            <span>{t("mapSidebar.shortcut.removeSelected")}</span>
           </div>
           <div className="map-sidebar__shortcut">
             <kbd>⌘/Ctrl + Z</kbd>
-            <span>Undo</span>
+            <span>{t("mapSidebar.shortcut.undo")}</span>
           </div>
           <div className="map-sidebar__shortcut">
             <kbd>Shift + click</kbd>
-            <span>Multi-select systems</span>
+            <span>{t("mapSidebar.shortcut.multiSelect")}</span>
           </div>
           <div className="map-sidebar__shortcut">
             <kbd>Shift + drag</kbd>
-            <span>Rubber-band select systems</span>
+            <span>{t("mapSidebar.shortcut.rubberBand")}</span>
           </div>
         </CollapsibleSection>
       </div>
