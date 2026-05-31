@@ -100,8 +100,12 @@
       }
       .wrap { max-width: 920px; margin: 0 auto; padding: 32px 20px 64px; }
       a { color: var(--accent); }
-      .topnav { font-size: 14px; }
+      .topnav { font-size: 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
       .topnav a { color: var(--muted); text-decoration: none; }
+      .lang-select {
+        background: var(--panel2); color: var(--text); border: 1px solid var(--border);
+        border-radius: 6px; padding: 4px 8px; font-size: 13px; font-family: inherit; cursor: pointer;
+      }
       header.hero { text-align: center; margin: 28px 0 8px; }
       .logo { font-size: 34px; color: var(--accent); line-height: 1; }
       h1 { color: var(--head); font-size: 30px; line-height: 1.25; margin: 12px 0 6px; }
@@ -135,7 +139,13 @@
   </head>
   <body>
     <div class="wrap">
-      <nav class="topnav"><a href="/" data-i18n="nav">&larr; Nexum home</a></nav>
+      <nav class="topnav">
+        <a href="/" data-i18n="nav">&larr; Nexum home</a>
+        <select id="lang-select" class="lang-select" aria-label="Language / Sprache">
+          <option value="en">English</option>
+          <option value="de">Deutsch</option>
+        </select>
+      </nav>
 
       <header class="hero">
         <div class="logo" aria-hidden="true">◈</div>
@@ -416,6 +426,19 @@
         try {
           var lang = localStorage.getItem('nexum.lang');
           if (!lang) lang = (navigator.language || '').slice(0, 2) === 'de' ? 'de' : 'en';
+
+          // Wire up the language picker regardless of the current language so
+          // a German visitor can switch back to English too. Persists to the
+          // same nexum.lang key the app uses, then reloads to re-run the swap.
+          var sel = document.getElementById('lang-select');
+          if (sel) {
+            sel.value = (lang === 'de') ? 'de' : 'en';
+            sel.addEventListener('change', function () {
+              try { localStorage.setItem('nexum.lang', sel.value); } catch (e) { /* ignore */ }
+              location.reload();
+            });
+          }
+
           if (lang !== 'de') return;
 
           var DE = {
