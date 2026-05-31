@@ -251,6 +251,17 @@
     "noEveSystem": "Kein EVE-System verknüpft",
     "addNote": "Notiz hinzufügen…"
   },
+  "sidebar": {
+    "thera": "Thera-Verbindungen",
+    "turnur": "Turnur-Verbindungen",
+    "a0": "Nahe A0-Sonnen",
+    "closest": "Nächste Systeme",
+    "expand": "Seitenleiste ausklappen",
+    "resize": "Seitenleiste anpassen",
+    "collapse": "Seitenleiste einklappen",
+    "moveToLeft": "Seitenleiste nach links verschieben",
+    "moveToRight": "Seitenleiste nach rechts verschieben"
+  },
   "waypoint": {
     "setDestination": "Ziel festlegen",
     "addWaypoint": "Wegpunkt hinzufügen"

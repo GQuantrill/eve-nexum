@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import type { DragEndEvent, Modifier } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
@@ -31,12 +32,6 @@ type Side    = 'left' | 'right';
 type PanelId = 'thera' | 'turnur' | 'a0' | 'closest';
 
 const DEFAULT_ORDER: PanelId[] = ['closest', 'thera', 'turnur', 'a0'];
-const PANEL_TITLES: Record<PanelId, string> = {
-  thera:   'Thera Connections',
-  turnur:  'Turnur Connections',
-  a0:      'Nearby A0 Suns',
-  closest: 'Closest Systems',
-};
 const VALID_PANEL_IDS: ReadonlySet<PanelId> = new Set(DEFAULT_ORDER);
 
 // The panels form a single vertical column, so a drag should only ever move a
@@ -56,6 +51,13 @@ function sanitiseOrder(raw: unknown): PanelId[] {
 }
 
 export function Sidebar() {
+  const { t } = useTranslation();
+  const panelTitle: Record<PanelId, string> = {
+    thera:   t('sidebar.thera'),
+    turnur:  t('sidebar.turnur'),
+    a0:      t('sidebar.a0'),
+    closest: t('sidebar.closest'),
+  };
   // Cross-device prefs via useUserSetting (server-backed JSONB).
   const [sideRaw,      setSide]      = useUserSetting<Side>(SIDE_KEY, 'left');
   const side: Side = sideRaw === 'right' ? 'right' : 'left';
@@ -117,8 +119,8 @@ export function Sidebar() {
           type="button"
           className="sidebar__expand-tab"
           onClick={() => setCollapsed(false)}
-          data-tooltip="Expand sidebar"
-          aria-label="Expand sidebar"
+          data-tooltip={t('sidebar.expand')}
+          aria-label={t('sidebar.expand')}
         >
           {side === 'left'
             ? <CaretRightIcon size={14} weight="bold" />
@@ -142,15 +144,15 @@ export function Sidebar() {
         onPointerDown={startResize}
         role="separator"
         aria-orientation="vertical"
-        aria-label="Resize sidebar"
+        aria-label={t('sidebar.resize')}
       />
       <div className="sidebar__header">
         <button
           type="button"
           className="icon-btn"
           onClick={swapSide}
-          data-tooltip={`Move sidebar to ${side === 'left' ? 'right' : 'left'}`}
-          aria-label={`Move sidebar to ${side === 'left' ? 'right' : 'left'}`}
+          data-tooltip={side === 'left' ? t('sidebar.moveToRight') : t('sidebar.moveToLeft')}
+          aria-label={side === 'left' ? t('sidebar.moveToRight') : t('sidebar.moveToLeft')}
         >
           {side === 'left'
             ? <ArrowLineRightIcon size={14} weight="bold" />
@@ -160,8 +162,8 @@ export function Sidebar() {
           type="button"
           className="icon-btn"
           onClick={() => setCollapsed(true)}
-          data-tooltip="Collapse sidebar"
-          aria-label="Collapse sidebar"
+          data-tooltip={t('sidebar.collapse')}
+          aria-label={t('sidebar.collapse')}
         >
           {side === 'left'
             ? <CaretLeftIcon  size={14} weight="bold" />
@@ -173,7 +175,7 @@ export function Sidebar() {
         <SortableContext items={order} strategy={verticalListSortingStrategy}>
           <div className="sidebar__content">
             {order.map(id => (
-              <DraggableCard key={id} id={id} title={PANEL_TITLES[id]}>
+              <DraggableCard key={id} id={id} title={panelTitle[id]}>
                 {cards[id]}
               </DraggableCard>
             ))}

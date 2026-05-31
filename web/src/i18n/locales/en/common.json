@@ -251,6 +251,17 @@
     "noEveSystem": "No EVE system linked",
     "addNote": "Add note…"
   },
+  "sidebar": {
+    "thera": "Thera Connections",
+    "turnur": "Turnur Connections",
+    "a0": "Nearby A0 Suns",
+    "closest": "Closest Systems",
+    "expand": "Expand sidebar",
+    "resize": "Resize sidebar",
+    "collapse": "Collapse sidebar",
+    "moveToLeft": "Move sidebar to left",
+    "moveToRight": "Move sidebar to right"
+  },
   "waypoint": {
     "setDestination": "Set Destination",
     "addWaypoint": "Add Waypoint"
