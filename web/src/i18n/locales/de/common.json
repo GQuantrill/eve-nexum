@@ -478,6 +478,13 @@
     "rollIt": "Durchrollen",
     "removeConnection": "Verbindung entfernen"
   },
+  "mapControls": {
+    "panel": "Steuerungsfeld",
+    "zoomIn": "Vergrößern",
+    "zoomOut": "Verkleinern",
+    "fitView": "Ansicht einpassen",
+    "interactive": "Interaktivität umschalten"
+  },
   "ctxMenu": {
     "disconnect": "Trennen",
     "jumpType": "Sprungtyp",

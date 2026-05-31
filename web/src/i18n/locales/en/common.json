@@ -478,6 +478,13 @@
     "rollIt": "Roll it",
     "removeConnection": "Remove Connection"
   },
+  "mapControls": {
+    "panel": "Control panel",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "fitView": "Fit view",
+    "interactive": "Toggle interactivity"
+  },
   "ctxMenu": {
     "disconnect": "Disconnect",
     "jumpType": "Jump Type",

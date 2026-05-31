@@ -125,6 +125,17 @@ export function MapCanvas() {
   const [contextMenu, setContextMenu]         = useState<CtxMenu | null>(null);
   const [customIntel] = useCustomIntel();
 
+  // React Flow's <Controls> buttons read their hover title + aria-label from
+  // ariaLabelConfig (merged with the library defaults), so this translates the
+  // zoom / fit / lock tooltips without re-implementing the buttons.
+  const ariaLabelConfig = useMemo(() => ({
+    'controls.ariaLabel':            t('mapControls.panel'),
+    'controls.zoomIn.ariaLabel':     t('mapControls.zoomIn'),
+    'controls.zoomOut.ariaLabel':    t('mapControls.zoomOut'),
+    'controls.fitView.ariaLabel':    t('mapControls.fitView'),
+    'controls.interactive.ariaLabel': t('mapControls.interactive'),
+  }), [t]);
+
   // Empty initial — the `systems` effect below replaces this on the next
   // frame with the real node set. Starting empty avoids the dead useMemo that
   // only ever ran once before being overwritten.
@@ -789,6 +800,7 @@ export function MapCanvas() {
   return (
     <div className="map-canvas">
       <ReactFlow
+        ariaLabelConfig={ariaLabelConfig}
         nodes={nodes}
         edges={edges}
         onNodesChange={onNodesChange}

@@ -1,4 +1,5 @@
-import { memo, useCallback, useRef, useState } from 'react';
+import { memo, useCallback, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   ReactFlow, ReactFlowProvider, Background, Controls, Panel,
   useNodesState, useEdgesState, addEdge, BackgroundVariant,
@@ -262,9 +263,18 @@ interface CtxMenu { x: number; y: number; nodeId?: string }
 interface AddFormState { flowX: number; flowY: number }
 
 function DemoMapInner() {
+  const { t } = useTranslation();
   const [nodes, setNodes, onNodesChange] = useNodesState(INITIAL_NODES);
   const [edges, setEdges, onEdgesChange] = useEdgesState(INITIAL_EDGES);
   const { screenToFlowPosition, getNodes } = useReactFlow();
+
+  // Translate the zoom / fit control tooltips (see MapCanvas for the same).
+  const ariaLabelConfig = useMemo(() => ({
+    'controls.ariaLabel':         t('mapControls.panel'),
+    'controls.zoomIn.ariaLabel':  t('mapControls.zoomIn'),
+    'controls.zoomOut.ariaLabel': t('mapControls.zoomOut'),
+    'controls.fitView.ariaLabel': t('mapControls.fitView'),
+  }), [t]);
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [ctxMenu, setCtxMenu] = useState<CtxMenu | null>(null);
@@ -384,6 +394,7 @@ function DemoMapInner() {
 
       <div className="demo-canvas-wrap">
         <ReactFlow
+          ariaLabelConfig={ariaLabelConfig}
           nodes={nodes}
           edges={edges}
           onNodesChange={onNodesChange}
