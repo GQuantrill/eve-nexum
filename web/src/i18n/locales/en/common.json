@@ -485,6 +485,16 @@
     "fitView": "Fit view",
     "interactive": "Toggle interactivity"
   },
+  "demo": {
+    "hintClick": "Click a system to view its details here.",
+    "hintAdd": "Right-click the map to add a system.",
+    "hintConnect": "Drag from a node handle to connect systems.",
+    "hintLimit": "Demo limited to {{count}} systems — no limit when signed in.",
+    "systemsCount": "{{count}} / {{max}} systems",
+    "signInMore": "Sign in to view kills, signatures, structures, activity, sovereignty, and more.",
+    "addSystemHere": "Add System here",
+    "addSystemLimit": "Add System (limit {{max}} reached)"
+  },
   "ctxMenu": {
     "disconnect": "Disconnect",
     "jumpType": "Jump Type",
