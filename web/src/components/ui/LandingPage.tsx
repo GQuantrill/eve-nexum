@@ -11,6 +11,7 @@ import {
 } from '@phosphor-icons/react';
 import { apiUrl } from '../../api/client';
 import { DemoMap } from './DemoMap';
+import { LanguageSwitcher } from './LanguageSwitcher';
 import portraitImg from '../../assets/portrait.jpeg';
 interface LastCharacter { characterId: number; characterName: string; }
 
@@ -280,6 +281,9 @@ export function LandingPage() {
       <header className="landing__header">
         <canvas ref={canvasRef} className="landing__canvas" />
         <div className="landing__header-fade" />
+        <div style={{ position: 'absolute', top: 16, right: 16, zIndex: 3 }}>
+          <LanguageSwitcher />
+        </div>
         <div className="landing__logo">◈</div>
         <h1 className="landing__title">Nexum</h1>
         <p className="landing__tagline">{t('landing.tagline')}</p>
@@ -431,8 +435,8 @@ export function LandingPage() {
               <Trans
                 i18nKey="landing.aboutMe"
                 components={{
-                  area404: <a href="https://area404.org" target="_blank" className="landing__faq-link" />,
-                  gh: <a href="https://github.com/GQuantrill/eve-nexum/issues" target="_blank" className="landing__faq-link" />,
+                  area404: <a href="https://area404.org" target="_blank" rel="noopener noreferrer" className="landing__faq-link" />,
+                  gh: <a href="https://github.com/GQuantrill/eve-nexum/issues" target="_blank" rel="noopener noreferrer" className="landing__faq-link" />,
                 }}
               />
             </p>
