@@ -251,9 +251,30 @@
     "noEveSystem": "Kein EVE-System verknüpft",
     "addNote": "Notiz hinzufügen…"
   },
+  "sidebar": {
+    "thera": "Thera-Verbindungen",
+    "turnur": "Turnur-Verbindungen",
+    "a0": "Nahe A0-Sonnen",
+    "closest": "Nächste Systeme",
+    "expand": "Seitenleiste ausklappen",
+    "resize": "Seitenleiste anpassen",
+    "collapse": "Seitenleiste einklappen",
+    "moveToLeft": "Seitenleiste nach links verschieben",
+    "moveToRight": "Seitenleiste nach rechts verschieben"
+  },
   "waypoint": {
     "setDestination": "Ziel festlegen",
     "addWaypoint": "Wegpunkt hinzufügen"
+  },
+  "closest": {
+    "dragToReorder": "Zum Neuordnen ziehen",
+    "home": "Heimat",
+    "noJumps": "— Sprünge",
+    "removeFromList": "Aus Liste entfernen",
+    "signIn": "Melde dich an und docke in K-Space, um Sprünge zu Hubs zu sehen.",
+    "searchPlaceholder": "Systemname suchen…",
+    "onList": "auf Liste",
+    "noMatch": "Keine Systeme passen zu \"{{query}}\""
   },
   "a0": {
     "signIn": "Melde dich an und docke in K-Space, um nahe A0-Systeme zu sehen.",
@@ -313,12 +334,40 @@
     "loadMore": "Mehr laden ({{count}} verbleibend)"
   },
   "sigType": {
+    "unknown": "Unbekannt",
     "wormhole": "Wurmloch",
     "data": "Daten",
     "relic": "Relikt",
     "gas": "Gas",
     "ore": "Erz",
     "combat": "Kampf"
+  },
+  "signatures": {
+    "pasteHint": "Du kannst Signaturen direkt aus dem Sondenscanner in EVE kopieren und einfügen. Öffne dazu deinen Sondenscanner. Drücke Strg+A, um alle auszuwählen, dann Strg+C zum Kopieren. Mit Strg+V hier einfügen.",
+    "pasteDifferentSystem": "Dein Charakter ist derzeit in {{current}}, aber du fügst Signaturen in {{selected}} ein. Fortfahren?",
+    "loadFailed": "Signaturen konnten nicht geladen werden",
+    "saveFailed": "Signatur konnte nicht gespeichert werden",
+    "deleteFailed": "Signatur konnte nicht gelöscht werden",
+    "deleteSelectedConfirm_one": "{{count}} ausgewählte Signatur löschen?",
+    "deleteSelectedConfirm_other": "{{count}} ausgewählte Signaturen löschen?",
+    "deleteAllConfirm_one": "Alle {{count}} Signatur löschen?",
+    "deleteAllConfirm_other": "Alle {{count}} Signaturen löschen?",
+    "addSignature": "Signatur hinzufügen",
+    "setTypeAria": "Typ für ausgewählte Signaturen festlegen",
+    "setType": "Typ festlegen ({{count}})…",
+    "deleteSelected": "Ausgewählte löschen ({{count}})",
+    "deleteAll": "Alle löschen",
+    "emptyShared": "Keine Signaturen gescannt",
+    "empty": "Keine Signaturen gescannt — aus dem Sondenscanner einfügen, um zu importieren",
+    "colId": "ID",
+    "colType": "Typ",
+    "colWh": "WH",
+    "colLeadsTo": "Führt zu",
+    "colName": "Name",
+    "colNotes": "Notizen",
+    "colAge": "Alter",
+    "colUpdated": "Aktualisiert",
+    "namePlaceholder": "Seitenname"
   },
   "stats": {
     "title": "Benutzerstatistik",

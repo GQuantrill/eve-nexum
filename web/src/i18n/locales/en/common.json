@@ -251,9 +251,30 @@
     "noEveSystem": "No EVE system linked",
     "addNote": "Add note…"
   },
+  "sidebar": {
+    "thera": "Thera Connections",
+    "turnur": "Turnur Connections",
+    "a0": "Nearby A0 Suns",
+    "closest": "Closest Systems",
+    "expand": "Expand sidebar",
+    "resize": "Resize sidebar",
+    "collapse": "Collapse sidebar",
+    "moveToLeft": "Move sidebar to left",
+    "moveToRight": "Move sidebar to right"
+  },
   "waypoint": {
     "setDestination": "Set Destination",
     "addWaypoint": "Add Waypoint"
+  },
+  "closest": {
+    "dragToReorder": "Drag to reorder",
+    "home": "Home",
+    "noJumps": "— jumps",
+    "removeFromList": "Remove from list",
+    "signIn": "Sign in and dock in K-space to see jumps to hubs.",
+    "searchPlaceholder": "Search system name…",
+    "onList": "on list",
+    "noMatch": "No systems match \"{{query}}\""
   },
   "a0": {
     "signIn": "Sign in and dock in K-space to see nearby A0 systems.",
@@ -313,12 +334,40 @@
     "loadMore": "Load more ({{count}} remaining)"
   },
   "sigType": {
+    "unknown": "Unknown",
     "wormhole": "Wormhole",
     "data": "Data",
     "relic": "Relic",
     "gas": "Gas",
     "ore": "Ore",
     "combat": "Combat"
+  },
+  "signatures": {
+    "pasteHint": "You can copy and paste signatures directly from the Probe scanner in Eve. To do this, open your probe scanner.  Press control A to select them all, then control C to copy.  Use control V to paste them here",
+    "pasteDifferentSystem": "Your character is currently in {{current}}, but you are pasting signatures into {{selected}}. Continue?",
+    "loadFailed": "Failed to load signatures",
+    "saveFailed": "Failed to save signature",
+    "deleteFailed": "Failed to delete signature",
+    "deleteSelectedConfirm_one": "Delete {{count}} selected signature?",
+    "deleteSelectedConfirm_other": "Delete {{count}} selected signatures?",
+    "deleteAllConfirm_one": "Delete all {{count}} signature?",
+    "deleteAllConfirm_other": "Delete all {{count}} signatures?",
+    "addSignature": "Add signature",
+    "setTypeAria": "Set type for selected signatures",
+    "setType": "Set type ({{count}})…",
+    "deleteSelected": "Delete selected ({{count}})",
+    "deleteAll": "Delete all",
+    "emptyShared": "No signatures scanned",
+    "empty": "No signatures scanned — paste from probe scanner to import",
+    "colId": "ID",
+    "colType": "Type",
+    "colWh": "WH",
+    "colLeadsTo": "Leads To",
+    "colName": "Name",
+    "colNotes": "Notes",
+    "colAge": "Age",
+    "colUpdated": "Updated",
+    "namePlaceholder": "Site name"
   },
   "stats": {
     "title": "User Stats",
