@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { ReactFlowProvider } from '@xyflow/react';
 import { useMapStore } from '../../store/mapStore';
 import { MapCanvas } from '../map/MapCanvas';
@@ -41,16 +43,17 @@ function formatLocal(iso: string): string {
   } catch { return iso; }
 }
 
-function formatRemaining(iso: string): string {
+function formatRemaining(t: TFunction, iso: string): string {
   const ms = new Date(iso).getTime() - Date.now();
-  if (ms <= 0) return 'expired';
+  if (ms <= 0) return t('share.expired');
   const h = Math.floor(ms / 3_600_000);
   const m = Math.floor((ms % 3_600_000) / 60_000);
-  if (h > 0) return `${h}h ${m}m left`;
-  return `${m}m left`;
+  if (h > 0) return t('share.expiresInHM', { hours: h, minutes: m });
+  return t('share.expiresInM', { minutes: m });
 }
 
 export function SharedMapView({ token }: { token: string }) {
+  const { t } = useTranslation();
   const [state, setState] = useState<LoadState>({ kind: 'loading' });
 
   // Hydrate the map store directly from the share payload. The store's
@@ -114,14 +117,19 @@ export function SharedMapView({ token }: { token: string }) {
     return (
       <div className="share-error">
         <div className="share-error__card">
-          <div className="share-error__title">Share link expired</div>
+          <div className="share-error__title">{t('shareView.expiredTitle')}</div>
           <p className="share-error__body">
-            This shared view of <strong>{state.payload.mapName}</strong> was
-            published by <strong>{state.payload.ownerName}</strong> and expired
-            on <strong>{formatLocal(state.payload.expiredAt)}</strong>.
+            <Trans
+              i18nKey="shareView.expiredBody"
+              values={{
+                map: state.payload.mapName,
+                owner: state.payload.ownerName,
+                date: formatLocal(state.payload.expiredAt),
+              }}
+            />
           </p>
           <p className="share-error__hint">
-            Ask {state.payload.ownerName} for a fresh link.
+            {t('shareView.expiredHint', { owner: state.payload.ownerName })}
           </p>
         </div>
       </div>
@@ -132,10 +140,9 @@ export function SharedMapView({ token }: { token: string }) {
     return (
       <div className="share-error">
         <div className="share-error__card">
-          <div className="share-error__title">Share link not found</div>
+          <div className="share-error__title">{t('shareView.notFoundTitle')}</div>
           <p className="share-error__body">
-            This link doesn't match a known shared map. It may have been
-            revoked, or the URL may be incorrect.
+            {t('shareView.notFoundBody')}
           </p>
         </div>
       </div>
@@ -153,6 +160,7 @@ export function SharedMapView({ token }: { token: string }) {
 }
 
 function SharedMapLayout({ payload }: { payload: SharePayload }) {
+  const { t } = useTranslation();
   // Subscribed via the hook so the system panel opens/closes reactively
   // when the viewer clicks a system on the canvas.
   const selectedSystemId = useMapStore((s) => s.selectedSystemId);
@@ -161,13 +169,13 @@ function SharedMapLayout({ payload }: { payload: SharePayload }) {
       <div className="share-header">
         <span className="share-header__title">{payload.mapName}</span>
         <span className="share-header__sep">·</span>
-        <span className="share-header__meta">shared by <strong>{payload.ownerName}</strong></span>
+        <span className="share-header__meta"><Trans i18nKey="shareView.sharedBy" values={{ owner: payload.ownerName }} /></span>
         <span className="share-header__sep">·</span>
-        <span className="share-header__meta">{formatRemaining(payload.expiresAt)}</span>
+        <span className="share-header__meta">{formatRemaining(t, payload.expiresAt)}</span>
         {/* CTA — sits in the top right, recruits the viewer back to the
             landing page. Strips the share hash so the SPA lands on the
             normal app shell instead of bouncing straight back here. */}
-        <a className="share-header__cta" href="/">Create maps with Nexum today!</a>
+        <a className="share-header__cta" href="/">{t('shareView.cta')}</a>
       </div>
       <div className="layout__body">
         <div className="layout__main">

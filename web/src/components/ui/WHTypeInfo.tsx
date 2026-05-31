@@ -55,7 +55,7 @@ export function WHTypeInfo({ code, children }: Props) {
     <div className="wh-type-info__popover" role="dialog">
       <div className="wh-type-info__header">{code.toUpperCase()}</div>
       <div className="wh-type-info__row">
-        <span className="wh-type-info__label">Leads to</span>
+        <span className="wh-type-info__label">{t('whInfo.leadsTo')}</span>
         <span
           className="wh-type-info__value"
           style={dest ? { color: CLASS_COLORS[dest] } : undefined}
@@ -64,15 +64,15 @@ export function WHTypeInfo({ code, children }: Props) {
         </span>
       </div>
       <div className="wh-type-info__row">
-        <span className="wh-type-info__label">Lifetime</span>
+        <span className="wh-type-info__label">{t('whInfo.lifetime')}</span>
         <span className="wh-type-info__value">{spec.lifetimeHours}h</span>
       </div>
       <div className="wh-type-info__row">
-        <span className="wh-type-info__label">Total mass</span>
+        <span className="wh-type-info__label">{t('whInfo.totalMass')}</span>
         <span className="wh-type-info__value">{mass(t, spec.totalMass)}</span>
       </div>
       <div className="wh-type-info__row">
-        <span className="wh-type-info__label">Max jump</span>
+        <span className="wh-type-info__label">{t('whInfo.maxJump')}</span>
         <span className="wh-type-info__value">{mass(t, spec.maxJumpMass)}</span>
       </div>
     </div>
@@ -98,8 +98,8 @@ export function WHTypeInfo({ code, children }: Props) {
         type="button"
         className="wh-type-info__btn"
         onClick={(e) => { e.stopPropagation(); setOpen((o) => !o); }}
-        aria-label={`${code} info`}
-        data-tooltip={`${code} spec`}
+        aria-label={t('whInfo.infoAria', { code })}
+        data-tooltip={t('whInfo.specTooltip', { code })}
       >
         ⓘ
       </button>

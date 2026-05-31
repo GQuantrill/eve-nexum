@@ -10,7 +10,9 @@
     "close": "Close",
     "ok": "OK",
     "on": "On",
-    "off": "Off"
+    "off": "Off",
+    "expand": "Expand",
+    "collapse": "Collapse"
   },
   "confirm": {
     "title": "Are you sure?",
@@ -1078,6 +1080,63 @@
       }
     },
     "footer": "EVE Online and the EVE logo are the registered trademarks of CCP hf. All rights reserved worldwide. Nexum is a third-party tool and is not affiliated with or endorsed by CCP hf. · <license>License & EVE IP notice</license>"
+  },
+  "whInfo": {
+    "leadsTo": "Leads to",
+    "lifetime": "Lifetime",
+    "totalMass": "Total mass",
+    "maxJump": "Max jump",
+    "infoAria": "{{code}} info",
+    "specTooltip": "{{code}} spec"
+  },
+  "whPicker": {
+    "searchPlaceholder": "Search…",
+    "connectedSystems": "Connected Systems",
+    "other": "Other",
+    "inbound": "inbound"
+  },
+  "npcStations": {
+    "loading": "Loading stations…",
+    "none": "No NPC stations in this system",
+    "services": {
+      "market": "Market",
+      "repairFacilities": "Repair Facilities",
+      "fitting": "Fitting",
+      "factory": "Factory",
+      "laboratory": "Laboratory",
+      "reprocessingPlant": "Reprocessing Plant",
+      "cloning": "Cloning",
+      "cloneBay": "Clone Bay",
+      "insurance": "Insurance",
+      "loyaltyPointStore": "Loyalty Point Store",
+      "navyOffices": "Navy Offices",
+      "securityOffices": "Security Offices",
+      "bountyMissions": "Bounty Missions",
+      "bountyOffice": "Bounty Office",
+      "assayOffice": "Assay Office",
+      "officeRental": "Office Rental",
+      "stockExchange": "Stock Exchange",
+      "commodityTrading": "Commodity Trading",
+      "news": "News",
+      "docking": "Docking",
+      "exploration": "Exploration",
+      "blackMarket": "Black Market",
+      "mentoring": "Mentoring"
+    }
+  },
+  "shareView": {
+    "expiredTitle": "Share link expired",
+    "expiredBody": "This shared view of <strong>{{map}}</strong> was published by <strong>{{owner}}</strong> and expired on <strong>{{date}}</strong>.",
+    "expiredHint": "Ask {{owner}} for a fresh link.",
+    "notFoundTitle": "Share link not found",
+    "notFoundBody": "This link doesn't match a known shared map. It may have been revoked, or the URL may be incorrect.",
+    "sharedBy": "shared by <strong>{{owner}}</strong>",
+    "cta": "Create maps with Nexum today!"
+  },
+  "routeToast": {
+    "destinationSet": "Destination set to {{system}}",
+    "waypointAdded": "Waypoint added: {{system}}",
+    "failed": "Failed to set waypoint — is your character online?"
   },
   "mapNode": {
     "unknown": "Unknown",

@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ArrowRightIcon, CaretDownIcon, CaretUpIcon } from '@phosphor-icons/react';
 import type { MapSystem, SystemClass } from '../../types';
 import { CLASS_COLORS, CLASS_LABELS } from '../../data/wormholes';
@@ -14,6 +15,7 @@ const J_SPACE: SystemClass[] = ['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C13', 'Ther
 const K_SPACE: SystemClass[] = ['HS', 'LS', 'NS'];
 
 export function LeadsToDropdown({ value, onChange, connectedSystems = [] }: Props) {
+  const { t } = useTranslation();
   const { open, setOpen, pos, btnRef, dropdownRef, openAt } = usePopover();
   const [search, setSearch] = useState('');
   const searchRef = useRef<HTMLInputElement>(null);
@@ -63,7 +65,7 @@ export function LeadsToDropdown({ value, onChange, connectedSystems = [] }: Prop
             )}
           </span>
         ) : (
-          <span className="wh-picker__placeholder">Unknown</span>
+          <span className="wh-picker__placeholder">{t('mapNode.unknown')}</span>
         )}
         <span className="wh-picker__chevron">
           {open ? <CaretUpIcon size={11} weight="bold" /> : <CaretDownIcon size={11} weight="bold" />}
@@ -81,7 +83,7 @@ export function LeadsToDropdown({ value, onChange, connectedSystems = [] }: Prop
             className="wh-picker__search"
             value={search}
             onChange={e => setSearch(e.target.value)}
-            placeholder="Search..."
+            placeholder={t('whPicker.searchPlaceholder')}
             spellCheck={false}
           />
           <div className="wh-picker__list">
@@ -89,13 +91,13 @@ export function LeadsToDropdown({ value, onChange, connectedSystems = [] }: Prop
               className={`wh-picker__option${!value ? ' wh-picker__option--active' : ''}`}
               onMouseDown={() => select('')}
             >
-              <span className="wh-picker__placeholder">Unknown</span>
+              <span className="wh-picker__placeholder">{t('mapNode.unknown')}</span>
             </div>
 
             {filteredConnected.length > 0 && (
               <>
                 <div className="wh-picker__group-hdr">
-                  Connected Systems
+                  {t('whPicker.connectedSystems')}
                   <span className="wh-picker__group-count">({connectedSystems.length})</span>
                 </div>
                 {filteredConnected.map(sys => (
@@ -105,7 +107,7 @@ export function LeadsToDropdown({ value, onChange, connectedSystems = [] }: Prop
                     onMouseDown={() => select(sys.name || sys.id)}
                   >
                     <span className="wh-picker__code" style={{ color: '#c0d0e8', minWidth: 'auto', marginRight: 4 }}>
-                      {sys.name || 'Unknown'}
+                      {sys.name || t('mapNode.unknown')}
                     </span>
                     <span className="wh-picker__arrow"><ArrowRightIcon size={11} weight="bold" /></span>
                     <span className="wh-picker__dest" style={{ color: CLASS_COLORS[sys.systemClass] }}>
