@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { mass } from '../../i18n/format';
 import { useMapStore } from '../../store/mapStore';
 import { useWormholeTypes } from '../../hooks/useWormholeTypes';
 import { useNow30s } from '../../hooks/useNow30s';
@@ -26,23 +28,11 @@ const PRESETS: Array<{ label: string; kg: number }> = [
   { label: '+ Dread (1300)',   kg: 1_300_000_000 },
 ];
 
-function formatMass(kg: number): string {
-  if (kg >= 1_000_000_000) return `${(kg / 1_000_000_000).toFixed(2)} B kg`;
-  if (kg >= 1_000_000)     return `${(kg / 1_000_000).toFixed(0)} M kg`;
-  return `${kg.toLocaleString()} kg`;
-}
-
 // Compact mass for button labels: "200M", "1.3B".
 function massShort(kg: number): string {
   if (kg >= 1_000_000_000) return `${(kg / 1_000_000_000).toFixed(1)}B`;
   return `${Math.round(kg / 1_000_000)}M`;
 }
-
-const COLLAPSE_LABEL: Record<string, string> = {
-  open:      'Open',
-  maybe:     'May have collapsed',
-  collapsed: 'Collapsed',
-};
 
 function deriveStatus(remainingFraction: number): MassStatus {
   if (remainingFraction <= 0.10) return 'critical';
@@ -85,6 +75,13 @@ function detectWhType(
 }
 
 export function ConnectionPanel() {
+  const { t } = useTranslation();
+  const fmtMass = (kg: number) => mass(t, kg);
+  const collapseLabel: Record<string, string> = {
+    open:      t('connPanel.collapse.open'),
+    maybe:     t('connPanel.collapse.maybe'),
+    collapsed: t('connPanel.collapse.collapsed'),
+  };
   const { map, selectedConnectionId, updateConnection: rawUpdate, removeConnection: rawRemove, selectConnection } =
     useMapStore();
   const whTypes = useWormholeTypes();
@@ -210,33 +207,33 @@ export function ConnectionPanel() {
         <h2 className="system-panel__title">
           {src?.name ?? '?'} → {tgt?.name ?? '?'}
         </h2>
-        <button className="icon-btn" onClick={() => selectConnection(null)} title="Close"><XIcon size={14} weight="bold" /></button>
+        <button className="icon-btn" onClick={() => selectConnection(null)} title={t('actions.close')}><XIcon size={14} weight="bold" /></button>
       </div>
 
       <label className="field">
-        <span>Wormhole type <WHTypeInfo code={conn.type} /></span>
+        <span>{t('connPanel.whType')} <WHTypeInfo code={conn.type} /></span>
         <input
           type="text"
           value={conn.type ?? ''}
           onChange={(e) => update({ type: e.target.value.toUpperCase() })}
-          placeholder="K162, C247…"
+          placeholder={t('connPanel.whTypePlaceholder')}
         />
       </label>
 
       <label className="field">
-        <span>Mass status</span>
+        <span>{t('connPanel.massStatus')}</span>
         <select
           value={conn.massStatus ?? ''}
           onChange={(e) => update({ massStatus: e.target.value as MassStatus })}
         >
-          <option value="stable">Stable</option>
-          <option value="destabilized">Destabilized (&lt;50%)</option>
-          <option value="critical">Critical (&lt;10%)</option>
+          <option value="stable">{t('connPanel.stable')}</option>
+          <option value="destabilized">{t('connPanel.destabilized')}</option>
+          <option value="critical">{t('connPanel.critical')}</option>
         </select>
       </label>
 
       <label className="field">
-        <span>Time status</span>
+        <span>{t('connPanel.timeStatus')}</span>
         <select
           value={(() => {
             // Derive the live stage from eolAt + timeStatus so the dropdown
@@ -262,24 +259,24 @@ export function ConnectionPanel() {
             }
           }}
         >
-          <option value="fresh">Fresh</option>
-          <option value="lessThan24h">Less than 1 day remaining</option>
-          <option value="lessThan4h">Less than 4 hours remaining</option>
-          <option value="lessThan1h">Less than 1 hour remaining</option>
-          <option value="expired">Expired</option>
+          <option value="fresh">{t('connPanel.fresh')}</option>
+          <option value="lessThan24h">{t('connPanel.lessThan1d')}</option>
+          <option value="lessThan4h">{t('connPanel.lessThan4h')}</option>
+          <option value="lessThan1h">{t('connPanel.lessThan1h')}</option>
+          <option value="expired">{t('connPanel.expired')}</option>
         </select>
       </label>
 
       <label className="field">
-        <span>Size</span>
+        <span>{t('connPanel.size')}</span>
         <select
           value={conn.size}
           onChange={(e) => update({ size: e.target.value as ConnectionSize })}
         >
-          <option value="xl">XL (Freighter)</option>
-          <option value="large">Large (Battleship)</option>
-          <option value="medium">Medium (Cruiser)</option>
-          <option value="small">Small (Frigate)</option>
+          <option value="xl">{t('connPanel.sizeXl')}</option>
+          <option value="large">{t('connPanel.sizeLarge')}</option>
+          <option value="medium">{t('connPanel.sizeMedium')}</option>
+          <option value="small">{t('connPanel.sizeSmall')}</option>
         </select>
       </label>
 
@@ -305,19 +302,19 @@ export function ConnectionPanel() {
         let guidanceText: string;
         if (cState === 'collapsed') {
           guidanceLevel = 'danger';
-          guidanceText  = 'Enough mass to collapse has gone through. Reset once it’s re-scanned.';
+          guidanceText  = t('connPanel.guidanceCollapsed');
         } else if (lightOutcome === 'safe') {
-          guidanceText  = `Safe to keep rolling. ≈ ${passes.min}–${passes.max} more pass${passes.max === 1 ? '' : 'es'} left.`;
+          guidanceText  = t('connPanel.guidanceSafe', { min: passes.min, max: passes.max, count: passes.max });
         } else if (lightOutcome === 'risky') {
           guidanceLevel = nextEndsFar ? 'danger' : 'warn';
           guidanceText  = nextEndsFar
-            ? 'Next pass may collapse the hole — your roller would be stranded on the Far side. Make it an inbound (Home-ending) pass.'
-            : 'Next pass may collapse the hole — but it ends on your Home side, so it’s safe to attempt.';
+            ? t('connPanel.guidanceRiskyFar')
+            : t('connPanel.guidanceRiskyHome');
         } else {
           guidanceLevel = 'danger';
           guidanceText  = nextEndsFar
-            ? 'Next pass will likely collapse the hole — and strand your roller on the Far side.'
-            : 'Next pass will likely collapse the hole — your roller ends Home.';
+            ? t('connPanel.guidanceDangerFar')
+            : t('connPanel.guidanceDangerHome');
         }
 
         const myShip = location.ship;
@@ -329,8 +326,8 @@ export function ConnectionPanel() {
         return (
         <div className="mass-tracker">
           <div className="mass-tracker__header">
-            <span className="mass-tracker__label">Rolling calculator</span>
-            <span className={`roll-pill roll-pill--${cState}`}>{COLLAPSE_LABEL[cState]}</span>
+            <span className="mass-tracker__label">{t('connPanel.rollingCalculator')}</span>
+            <span className={`roll-pill roll-pill--${cState}`}>{collapseLabel[cState]}</span>
           </div>
 
           <div className="mass-tracker__bar">
@@ -338,7 +335,12 @@ export function ConnectionPanel() {
             <div className={`mass-tracker__fill mass-tracker__fill--${fillStatus}`} style={{ width: `${fillPct}%` }} />
           </div>
           <div className="mass-tracker__remaining">
-            {formatMass(range.worstRemaining)}–{formatMass(range.bestRemaining)} left · {formatMass(massUsed)} used · max jump {formatMass(whSpec.maxJumpMass)}
+            {t('connPanel.remaining', {
+              worst: fmtMass(range.worstRemaining),
+              best: fmtMass(range.bestRemaining),
+              used: fmtMass(massUsed),
+              max: fmtMass(whSpec.maxJumpMass),
+            })}
           </div>
 
           {/* Roller ship config (per-pilot, persisted) */}
@@ -352,27 +354,27 @@ export function ConnectionPanel() {
                 }}
               >
                 {ROLLER_PRESETS.map(p => <option key={p.name} value={p.name}>{p.name}</option>)}
-                <option value="Custom">Custom</option>
+                <option value="Custom">{t('connPanel.custom')}</option>
               </select>
               <button
                 type="button"
                 className="sys-btn"
                 disabled={!canUseMyShip}
-                title={canUseMyShip ? `Cold = ${myShip!.typeName} (${formatMass(myShip!.mass!)}), hot = +prop` : 'No current ship'}
+                title={canUseMyShip ? t('connPanel.useMyShipTitle', { ship: myShip!.typeName, mass: fmtMass(myShip!.mass!) }) : t('connPanel.noCurrentShip')}
                 onClick={() => canUseMyShip && setRoller({ name: myShip!.typeName, coldKg: myShip!.mass!, hotKg: myShip!.mass! + PROP_MASS })}
               >
-                Use my ship
+                {t('connPanel.useMyShip')}
               </button>
             </div>
             <div className="roller__masses">
               <label className="roller__mass">
-                <span>Cold</span>
+                <span>{t('connPanel.cold')}</span>
                 <input type="number" min={0} step={5} value={roller.coldKg / 1_000_000}
                   onChange={(e) => { const m = parseFloat(e.target.value); if (!isNaN(m)) setMass('coldKg', m); }} />
                 <span className="roller__unit">M</span>
               </label>
               <label className="roller__mass">
-                <span>Hot</span>
+                <span>{t('connPanel.hot')}</span>
                 <input type="number" min={0} step={5} value={roller.hotKg / 1_000_000}
                   onChange={(e) => { const m = parseFloat(e.target.value); if (!isNaN(m)) setMass('hotKg', m); }} />
                 <span className="roller__unit">M</span>
@@ -382,13 +384,13 @@ export function ConnectionPanel() {
 
           {tooHeavyCold ? (
             <div className="mass-tracker__budget mass-tracker__budget--blocked">
-              Roller ({formatMass(roller.coldKg)}) is too heavy for this hole (max jump {formatMass(whSpec.maxJumpMass)}).
+              {t('connPanel.tooHeavyCold', { mass: fmtMass(roller.coldKg), max: fmtMass(whSpec.maxJumpMass) })}
             </div>
           ) : (
             <>
               <div className="roll-side">
-                Roller: <span className={`roll-side__dot roll-side__dot--${side}`} />
-                <strong>{side === 'home' ? 'Home' : 'Far'}</strong> side
+                {t('connPanel.roller')} <span className={`roll-side__dot roll-side__dot--${side}`} />
+                <strong>{side === 'home' ? t('connPanel.homeSideLabel') : t('connPanel.farSideLabel')}</strong>
               </div>
 
               <div className="roll-pass">
@@ -396,19 +398,19 @@ export function ConnectionPanel() {
                   type="button"
                   className={`sys-btn roll-pass__btn roll-pass__btn--${hotOutcome}`}
                   disabled={!canEdit || tooHeavyHot}
-                  title={tooHeavyHot ? 'Too heavy to pass hot — use cold' : `+${formatMass(roller.hotKg)} · ends ${nextEndsFar ? 'Far' : 'Home'}`}
+                  title={tooHeavyHot ? t('connPanel.tooHeavyHotTitle') : t('connPanel.passTitle', { mass: fmtMass(roller.hotKg), side: nextEndsFar ? t('connPanel.far') : t('connPanel.home') })}
                   onClick={() => onPass(roller.hotKg)}
                 >
-                  Pass — hot (+{massShort(roller.hotKg)})
+                  {t('connPanel.passHot', { mass: massShort(roller.hotKg) })}
                 </button>
                 <button
                   type="button"
                   className={`sys-btn roll-pass__btn roll-pass__btn--${coldOutcome}`}
                   disabled={!canEdit}
-                  title={`+${formatMass(roller.coldKg)} · ends ${nextEndsFar ? 'Far' : 'Home'}`}
+                  title={t('connPanel.passTitle', { mass: fmtMass(roller.coldKg), side: nextEndsFar ? t('connPanel.far') : t('connPanel.home') })}
                   onClick={() => onPass(roller.coldKg)}
                 >
-                  Pass — cold (+{massShort(roller.coldKg)})
+                  {t('connPanel.passCold', { mass: massShort(roller.coldKg) })}
                 </button>
               </div>
 
@@ -416,10 +418,10 @@ export function ConnectionPanel() {
 
               <div className="roll-actions">
                 <button type="button" className="sys-btn" disabled={!canEdit || stack.length === 0} onClick={undoPass}>
-                  Undo pass
+                  {t('connPanel.undoPass')}
                 </button>
                 <button type="button" className="sys-btn mass-tracker__reset" disabled={!canEdit} onClick={resetRoll}>
-                  Reset
+                  {t('connPanel.reset')}
                 </button>
               </div>
             </>
@@ -427,7 +429,7 @@ export function ConnectionPanel() {
 
           {/* Other ships passed (not your roller — feed the same total, no side flip) */}
           <details className="roll-other">
-            <summary>Other ships passed</summary>
+            <summary>{t('connPanel.otherShips')}</summary>
             <div className="mass-tracker__buttons">
               {PRESETS
                 .filter(p => p.kg <= whSpec.maxJumpMass || p.kg < 200_000_000)
@@ -442,15 +444,15 @@ export function ConnectionPanel() {
         </div>
         );
       })() : conn.type ? (
-        <div className="mass-tracker__hint">No mass data for type "{conn.type}".</div>
+        <div className="mass-tracker__hint">{t('connPanel.noMassData', { type: conn.type })}</div>
       ) : (
-        <div className="mass-tracker__hint">Enter a wormhole type above to enable mass tracking.</div>
+        <div className="mass-tracker__hint">{t('connPanel.enterWhType')}</div>
       )}
 
       {pendingPass && (
         <ConfirmModal
-          message={`This pass (+${formatMass(pendingPass.kg)}) will likely collapse the hole.${pendingPass.strand ? ' Your roller would be stranded on the Far side.' : ' Your roller ends on the Home side.'}`}
-          confirmLabel="Roll it"
+          message={t('connPanel.collapseConfirm', { mass: fmtMass(pendingPass.kg) }) + (pendingPass.strand ? t('connPanel.collapseConfirmStrand') : t('connPanel.collapseConfirmHome'))}
+          confirmLabel={t('connPanel.rollIt')}
           showDontAskAgain={false}
           onConfirm={() => { applyPass(pendingPass.kg); setPendingPass(null); }}
           onCancel={() => setPendingPass(null)}
@@ -461,7 +463,7 @@ export function ConnectionPanel() {
         className="btn btn--danger"
         onClick={() => { removeConnection(conn.id); }}
       >
-        Remove Connection
+        {t('connPanel.removeConnection')}
       </button>
     </aside>
   );
