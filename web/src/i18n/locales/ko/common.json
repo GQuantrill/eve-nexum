@@ -1,0 +1,1167 @@
+{
+  "language": {
+    "label": "언어"
+  },
+  "actions": {
+    "save": "저장",
+    "cancel": "취소",
+    "delete": "삭제",
+    "copy": "복사",
+    "close": "닫기",
+    "ok": "확인",
+    "on": "켜짐",
+    "off": "꺼짐",
+    "expand": "펼치기",
+    "collapse": "접기"
+  },
+  "confirm": {
+    "title": "정말입니까?",
+    "dontShowAgain": "다시 표시하지 않기"
+  },
+  "admin": {
+    "back": "지도로 돌아가기",
+    "title": "관리",
+    "tabs": {
+      "users": "사용자",
+      "maps": "지도",
+      "reports": "보고서",
+      "discord": "Discord",
+      "audit": "감사 로그"
+    },
+    "loading": "불러오는 중…",
+    "exportCsv": "CSV로 내보내기",
+    "users": {
+      "title": "사용자",
+      "none": "아직 사용자가 없습니다.",
+      "colCharacter": "캐릭터",
+      "colCorp": "군단",
+      "colAlliance": "연합",
+      "colRole": "권한",
+      "colStatus": "상태",
+      "colLastLogin": "마지막 접속",
+      "you": "나",
+      "blocked": "차단됨",
+      "active": "활성",
+      "unblock": "차단 해제",
+      "block": "차단",
+      "recheck": "다시 확인",
+      "recheckTitle": "이 사용자의 현재 군단을 ESI로 다시 조회",
+      "blockConfirm": "{{name}} 님을 차단할까요? 다음 요청 시 로그아웃됩니다.",
+      "loadFailed": "사용자를 불러오지 못했습니다",
+      "roleChangeFailed": "권한 변경 실패",
+      "blockChangeFailed": "차단 상태 변경 실패",
+      "recheckFailed": "다시 확인 실패"
+    },
+    "maps": {
+      "title": "지도",
+      "none": "아직 지도가 없습니다.",
+      "colName": "이름",
+      "colOwner": "소유자",
+      "colCorp": "군단",
+      "colSystems": "성계",
+      "colConnections": "연결",
+      "colLock": "잠금",
+      "colLastActive": "마지막 활동",
+      "locked": "잠김",
+      "open": "열림",
+      "unlock": "잠금 해제",
+      "unlockTitle": "지도 잠금을 해제합니다; 성계와 연결을 다시 편집할 수 있게 됩니다",
+      "lock": "잠금",
+      "lockTitle": "성계와 연결을 동결합니다; 시그니처/구조물/노트는 계속 편집 가능합니다",
+      "deleteConfirm": "“{{name}}”(소유자: {{owner}})을(를) 강제 삭제할까요? 이 작업은 취소할 수 없습니다.",
+      "loadFailed": "지도를 불러오지 못했습니다",
+      "lockChangeFailed": "잠금 상태 변경 실패",
+      "deleteFailed": "삭제 실패"
+    },
+    "audit": {
+      "title": "감사 로그",
+      "none": "아직 관리 작업이 없습니다.",
+      "colWhen": "시각",
+      "colActor": "수행자",
+      "colAction": "작업",
+      "colTarget": "대상",
+      "colChange": "변경",
+      "loadFailed": "감사 로그를 불러오지 못했습니다"
+    },
+    "reports": {
+      "title": "보고서",
+      "tabs": {
+        "users": "사용자",
+        "systems": "성계",
+        "ghostSites": "고스트 사이트"
+      },
+      "filter": "필터",
+      "window": "기간",
+      "windowHint": "기간을 적용하려면 필터를 선택하세요",
+      "windowOptions": {
+        "all": "전체 기간",
+        "24h": "지난 24시간",
+        "week": "지난 한 주",
+        "month": "지난 한 달",
+        "year": "지난 1년"
+      },
+      "userFilters": {
+        "all": "모든 사용자",
+        "logins": "접속",
+        "signatures": "시그니처",
+        "structures": "구조물"
+      },
+      "sig": {
+        "data": "데이터",
+        "relic": "유물",
+        "wormhole": "WH",
+        "gas": "가스",
+        "ore": "광석",
+        "combat": "전투",
+        "unknown": "알 수 없음"
+      },
+      "users": {
+        "loadFailed": "사용자 보고서를 불러오지 못했습니다",
+        "empty": "현재 필터에 맞는 사용자가 없습니다.",
+        "totalUsers": "전체 사용자",
+        "uniqueCorps": "고유 군단 수",
+        "uniqueAlliances": "고유 연합 수",
+        "colCharacter": "캐릭터",
+        "colCorp": "군단",
+        "colAlliance": "연합",
+        "colLastLogin": "마지막 접속",
+        "colSystemsAdded": "추가한 성계",
+        "colSystemsDeleted": "삭제한 성계",
+        "colLastCorpStructure": "마지막 군단 구조물",
+        "colTotalStructures": "전체 구조물",
+        "colLastCorpSignature": "마지막 군단 시그니처",
+        "colTotalSignatures": "전체 시그니처"
+      },
+      "systems": {
+        "loadFailed": "성계 보고서를 불러오지 못했습니다",
+        "empty": "이 기간에 시그니처가 없습니다.",
+        "heading": "모든 지도의 시그니처",
+        "total": "합계",
+        "typeMix": "시그니처 유형 분포",
+        "sigLabel": "시그니처",
+        "chart": {
+          "hour24": "시간당 시그니처 (지난 24시간)",
+          "dayWeek": "일별 시그니처 (지난 한 주)",
+          "dayMonth": "일별 시그니처 (지난 한 달)",
+          "monthYear": "월별 시그니처 (지난 1년)",
+          "monthAll": "월별 시그니처 (전체 기간)"
+        },
+        "whHeading": "웜홀 유형",
+        "whEmpty": "아직 유형이 기록된 웜홀 시그니처가 없습니다.",
+        "colType": "유형",
+        "colCount": "개수"
+      },
+      "ghost": {
+        "loadFailed": "고스트 사이트 보고서를 불러오지 못했습니다",
+        "heading": "은밀 연구 시설 관측 기록",
+        "empty": "아직 기록된 K-스페이스 고스트 사이트가 없습니다.",
+        "colRegion": "지역",
+        "colConstellation": "성단",
+        "colSystem": "성계",
+        "colClass": "등급",
+        "colSun": "항성",
+        "colPlanets": "행성",
+        "colMoons": "위성",
+        "colObservations": "관측 횟수",
+        "colLastSeen": "마지막 발견"
+      }
+    },
+    "discord": {
+      "title": "Discord",
+      "titleNotifications": "Discord 알림",
+      "loadFailed": "Discord 설정을 불러오지 못했습니다",
+      "saveFailed": "저장 실패",
+      "updateFailed": "업데이트 실패",
+      "noCorp": "군단 컨텍스트 없음 — Discord 알림은 군단 지도에만 적용됩니다.",
+      "hint": "이 군단의 지도가 Discord로 어떤 웜홀 알림을 보낼지 제어합니다. 웹훅 자체는 서버 측에서 설정됩니다(DISCORD_WEBHOOK_URL). 기본적으로 모든 지도와 지역이 알림을 보냅니다 — 이 설정은 그것을 빼기만 합니다.",
+      "regions": "지역",
+      "notifyAll": "모든 지역에 알림",
+      "notifySelected": "선택한 지역만",
+      "noRegionsSelected": "선택된 지역 없음 — 추가하기 전까지는 아무 알림도 가지 않습니다.",
+      "removeRegion": "{{name}} 제거",
+      "searchPlaceholder": "지역을 검색하려면 입력하세요…",
+      "saving": "저장 중…",
+      "saveRegions": "지역 저장",
+      "saved": "저장됨",
+      "excludedMaps": "제외된 지도",
+      "excludedHint": "모든 지도가 기본적으로 알림을 보냅니다. 지도를 체크하면 Discord에서 제외됩니다.",
+      "noCorpMaps": "아직 군단 지도가 없습니다.",
+      "colMap": "지도",
+      "colExclude": "제외"
+    }
+  },
+  "proximityOptIn": {
+    "title": "위협 경보를 활성화할까요?",
+    "body": "뉴 에덴은 위험한 곳입니다. 활성화된 <strong>인커전</strong>이나 <strong>반란</strong>에서 몇 점프 이내에 있을 때 Nexum이 데스크톱 알림과 짧은 경고음을 줄 수 있습니다 — 자동 조종으로 무작정 들어가지 않도록.",
+    "sub": "임계값을 변경하거나 이 기능을 끄려면 언제든지 <em>지도 옵션 → 근접 경보</em>에서 할 수 있습니다.",
+    "maybeLater": "나중에",
+    "enable": "알림 활성화"
+  },
+  "units": {
+    "jumps_one": "{{count}} 점프",
+    "jumps_other": "{{count}} 점프",
+    "systems_one": "{{count}}개 성계",
+    "systems_other": "{{count}}개 성계",
+    "kills_one": "{{count}} 킬",
+    "kills_other": "{{count}} 킬",
+    "hours_one": "{{count}}시간",
+    "hours_other": "{{count}}시간",
+    "days_one": "{{count}}일",
+    "days_other": "{{count}}일",
+    "weeks_one": "{{count}}주",
+    "weeks_other": "{{count}}주",
+    "months_one": "{{count}}개월",
+    "months_other": "{{count}}개월"
+  },
+  "createMap": {
+    "title": "새 지도",
+    "mapName": "지도 이름",
+    "namePlaceholder": "새 지도",
+    "type": "유형",
+    "personal": "개인",
+    "corp": "군단",
+    "regionLabel": "지역 (선택 — 비워두면 빈 지도)",
+    "regionPlaceholder": "지역을 검색하려면 입력하세요…",
+    "clearRegion": "지역 지우기",
+    "regionHint": "{{region}}에서 {{count}}개 성계를 생성하며, 게임 내 좌표에 따라 배치하고 모든 스타게이트 연결을 그립니다.",
+    "corpLimit": "군단 지도 한도에 도달했습니다 ({{max}}).",
+    "personalLimit": "개인 지도 한도에 도달했습니다 ({{max}}).",
+    "createFailed": "지도 생성 실패",
+    "created": "{{region}}에서 “{{name}}” 생성됨",
+    "creating": "생성 중…",
+    "create": "지도 생성"
+  },
+  "addSystem": {
+    "title": "성계 추가",
+    "systemName": "성계 이름",
+    "searchPlaceholder": "EVE 성계를 검색하려면 입력하세요…",
+    "clearSelection": "선택 해제",
+    "noResults": "“{{query}}”에 대한 성계를 찾을 수 없습니다",
+    "class": "등급",
+    "effect": "효과",
+    "effectNone": "없음",
+    "statics": "고정홀",
+    "staticsPlaceholder": "데이터베이스에서 자동 채움",
+    "loading": "불러오는 중…",
+    "add": "성계 추가",
+    "onMap": "지도에 있음"
+  },
+  "commandPalette": {
+    "placeholder": "성계와 지도 검색…",
+    "search": "검색",
+    "noMatches": "일치 항목 없음",
+    "openMap": "↪ 지도 열기: {{name}}",
+    "switchMap": "(지도 전환)",
+    "navigate": "이동",
+    "open": "열기",
+    "close": "닫기"
+  },
+  "merge": {
+    "title": "지도 병합",
+    "corp": "군단",
+    "solo": "개인",
+    "sourceMap": "원본 지도 (여기서 병합)",
+    "destMap": "대상 지도 (여기로 병합)",
+    "selectSource": "원본 선택…",
+    "selectDest": "대상 선택…",
+    "differentMaps": "원본과 대상은 서로 다른 지도여야 합니다.",
+    "include": "포함",
+    "signatures": "시그니처",
+    "structures": "구조물",
+    "notes": "노트",
+    "hint": "대상에 이미 있는 성계는 기준 원본으로 유지됩니다 — 누락된 성계, 연결, 선택한 데이터만 추가되거나 업데이트됩니다. <strong>이 작업은 취소할 수 없습니다.</strong>",
+    "merging": "병합 중…",
+    "merge": "병합",
+    "merged": "병합 완료: +{{systems}} 성계, +{{connections}} 연결, +{{signatures}} 시그니처, +{{structures}} 구조물",
+    "mergeFailed": "병합 실패"
+  },
+  "mapSidebar": {
+    "openOptions": "지도 옵션",
+    "closeOptions": "지도 옵션 닫기",
+    "sections": {
+      "mapOptions": "지도 옵션",
+      "systemOptions": "성계 옵션",
+      "connections": "연결",
+      "route": "경로",
+      "chainExits": "체인 출구",
+      "proximityAlerts": "근접 경보",
+      "activity": "활동",
+      "fleet": "함대",
+      "staleFade": "오래된 성계 흐리기",
+      "importExport": "가져오기 / 내보내기",
+      "mergeMaps": "지도 병합",
+      "liveSharing": "실시간 지도 공유",
+      "shareMap": "지도 공유",
+      "shortcuts": "단축키"
+    },
+    "snapToGrid": "격자에 맞추기",
+    "minimap": "미니맵",
+    "position": "위치",
+    "minimapPos": {
+      "bottomRight": "오른쪽 아래",
+      "bottomLeft": "왼쪽 아래",
+      "topRight": "오른쪽 위",
+      "topLeft": "왼쪽 위"
+    },
+    "fontSize": "글꼴 크기",
+    "resetZoom": "100%로 재설정",
+    "compact": "간결",
+    "uniformSize": "균일 크기",
+    "showStaticWhs": "고정 웜홀 표시",
+    "easyConnect": "간편 연결",
+    "connectionStyle": "연결 스타일",
+    "edgeStyle": { "bezier": "표준", "straight": "직선", "smoothstep": "계단" },
+    "connectionThickness": "연결 두께",
+    "thickness": { "thin": "얇게", "standard": "표준", "thick": "굵게", "extra": "매우 굵게" },
+    "optimizeConnections": "⟳ 연결 최적화",
+    "spreadNodes": "⊞ 노드 펼치기",
+    "spreadNodesTooltip": "겹치지 않도록 성계 노드 조정",
+    "routePreference": "경로 선호",
+    "routeShortest": "최단",
+    "routeSecure": "안전",
+    "routeHint": "최단: 보안 등급과 무관하게 점프 수가 가장 적은 경로. 안전: 하이섹을 우선하고, 하이섹 경로가 없을 때만 로우/널로 우회합니다.",
+    "proximityHint": "인커전, 반란, 또는 적대 주권 성계가 현재 위치의 사정거리 내에 있을 때 알립니다.",
+    "threshold": "임계값",
+    "proximityInSystem": "0 점프 (같은 성계)",
+    "proximityLe_one": "≤ {{count}} 점프",
+    "proximityLe_other": "≤ {{count}} 점프",
+    "browserNotifications": "브라우저 알림",
+    "notifEnabled": "활성화됨",
+    "notifBlocked": "차단됨",
+    "notifEnable": "활성화",
+    "notifBlockedTooltip": "주소 표시줄의 자물쇠 / 사이트 정보 아이콘 → 알림 → 허용을 누른 뒤 새로고침하세요.",
+    "notifBlockedHint": "브라우저가 이 사이트의 알림을 차단하고 있습니다. 주소 표시줄의 자물쇠 아이콘 → 알림 → 허용 → 페이지 새로고침을 하세요.",
+    "activityHint": "다음 그래프 표시:",
+    "activityJumps": "점프",
+    "activityShipKills": "함선 킬",
+    "activityPodKills": "캡슐 킬",
+    "activityNpcKills": "NPC 킬",
+    "activityNpcDelta": "NPC 변화량",
+    "fleetHint": "함대원을 그들이 있는 성계 위에 보라색 점으로 표시합니다. 점에 마우스를 올리면 이름을 볼 수 있습니다.",
+    "showFleetMembers": "함대원 표시",
+    "staleHint": "선택한 간격 동안 업데이트되지 않은 성계를 시각적으로 흐리게 하여, 오래된 체인 잔재를 한눈에 알아볼 수 있게 합니다.",
+    "exportJson": "↓ JSON으로 내보내기",
+    "importJson": "↑ JSON에서 가져오기",
+    "exportPng": "⎙ PNG로 내보내기",
+    "mergeHint": "다른 지도를 내 지도 중 하나에 결합합니다. 대상은 기존 성계를 유지하며; 누락된 성계, 연결, 선택한 데이터가 추가되거나 업데이트됩니다. 이 작업은 취소할 수 없습니다.",
+    "mergeButton": "⇲ 지도 병합…",
+    "allowMergeSource": "병합 원본으로 허용",
+    "allowMergeDest": "병합 대상으로 허용",
+    "mergeFlagHint": "켜면, 군단원이 이 군단 지도를 병합의 <em>원본</em> 또는 <em>대상</em>으로 사용할 수 있습니다.",
+    "updateSettingFailed": "설정 업데이트 실패",
+    "shareActiveHint": "실시간 공유 링크. 아래에서 게스트가 보는 내용을 전환하세요. 이전에 링크가 생성되었다면 변경 사항이 자동으로 적용되며 다시 생성할 필요가 없습니다.",
+    "shareInactiveHint": "계정 없이 누구나 열 수 있는 읽기 전용 링크를 만듭니다. 공개할 카테고리와 만료 기간을 선택하세요 — 그 기간 내에 URL을 가진 누구나 당신이 공유한 모든 것을 볼 수 있습니다.",
+    "linkExpiresAfter": "링크 만료 시간",
+    "includeSignatures": "시그니처 포함",
+    "showJumpBridges": "점프 브리지 표시",
+    "includeStructures": "구조물 포함",
+    "includeNotes": "노트 포함",
+    "copyLink": "링크 복사",
+    "working": "처리 중…",
+    "revoke": "취소",
+    "createShareLink": "공유 링크 생성",
+    "createShareFailed": "공유 링크 생성 실패",
+    "revokeShareFailed": "공유 링크 취소 실패",
+    "updateShareFailed": "공유 옵션 업데이트 실패",
+    "linkCopied": "실시간 지도 링크 복사됨",
+    "copyFailed": "복사 실패 — 직접 선택하여 복사하세요",
+    "shortcut": {
+      "searchSystems": "성계 및 지도 검색",
+      "centreHome": "홈 성계로 중앙 정렬",
+      "removeSelected": "선택한 성계 제거",
+      "undo": "실행 취소",
+      "multiSelect": "성계 다중 선택",
+      "rubberBand": "드래그로 성계 선택"
+    },
+    "canvasNotFound": "지도 캔버스를 찾을 수 없습니다",
+    "exportFailed": "내보내기 실패: {{error}}",
+    "invalidJson": "잘못된 JSON 파일입니다.",
+    "notNexumMap": "이 파일은 Eve-Nexum 지도 내보내기 파일이 아닌 것 같습니다.",
+    "importFailed": "가져오기 실패: {{error}}"
+  },
+  "customIntel": {
+    "title": "사용자 지정 인텔",
+    "hint": "색상이 있는 나만의 인텔 태그를 정의하세요. 성계 우클릭 메뉴에서 기본 태그와 함께 나타납니다.",
+    "newItem": "새 인텔",
+    "labelPlaceholder": "라벨",
+    "remove": "인텔 옵션 제거",
+    "max": "사용자 지정 인텔 태그 최대 {{count}}개",
+    "add": "인텔 추가"
+  },
+  "chainExits": {
+    "noExits": "이 체인에 K-스페이스 출구가 없습니다.",
+    "hint": "현재 지도에 있는 K-스페이스 성계를 보안 등급별로 표시합니다. Jita 경로는 게이트 전용입니다 — 웜홀 지름길은 계산하지 않습니다.",
+    "highSec": "하이섹",
+    "lowSec": "로우섹",
+    "nullSec": "널섹",
+    "nearestJita": "가장 가까운 Jita:",
+    "via": "경유"
+  },
+  "mapShares": {
+    "hint": "다른 캐릭터 — 또는 군단의 모든 구성원 — 에게 이 개인 지도의 편집 권한을 부여합니다. 수신자는 내용과 토폴로지를 편집할 수 있지만 이름 변경, 삭제, 재공유는 할 수 없습니다.",
+    "character": "캐릭터",
+    "corp": "군단",
+    "placeholderChar": "정확한 캐릭터 이름",
+    "placeholderCorp": "정확한 군단 이름",
+    "typeAtLeast3": "최소 3자 이상 입력하세요",
+    "searching": "검색 중…",
+    "found": "찾음: {{name}}",
+    "noMatch": "정확히 일치하는 항목 없음",
+    "adding": "추가 중…",
+    "share": "공유",
+    "loading": "불러오는 중…",
+    "none": "활성 공유가 없습니다.",
+    "badgeChar": "캐릭터",
+    "badgeCorp": "군단",
+    "unknownTarget": "(알 수 없는 {{kind}} #{{id}})",
+    "revokeAccess": "접근 취소",
+    "sharedWith": "{{name}} 님과 공유됨",
+    "accessRevoked": "접근이 취소됨",
+    "accessRevokedFor": "{{name}} 님의 접근이 취소됨",
+    "addFailed": "공유 추가 실패",
+    "revokeFailed": "공유 취소 실패"
+  },
+  "panes": {
+    "noEveSystem": "연결된 EVE 성계 없음",
+    "addNote": "노트 추가…"
+  },
+  "connPanel": {
+    "whType": "웜홀 유형",
+    "whTypePlaceholder": "K162, C247…",
+    "massStatus": "질량 상태",
+    "stable": "안정",
+    "destabilized": "불안정 (<50%)",
+    "critical": "위급 (<10%)",
+    "timeStatus": "시간 상태",
+    "fresh": "신선",
+    "lessThan1d": "1일 미만 남음",
+    "lessThan4h": "4시간 미만 남음",
+    "lessThan1h": "1시간 미만 남음",
+    "expired": "만료됨",
+    "size": "크기",
+    "sizeXl": "XL (화물선)",
+    "sizeLarge": "대형 (전함)",
+    "sizeMedium": "중형 (순양함)",
+    "sizeSmall": "소형 (프리깃)",
+    "rollingCalculator": "롤링 계산기",
+    "custom": "사용자 지정",
+    "collapse": { "open": "열림", "maybe": "붕괴되었을 수 있음", "collapsed": "붕괴됨" },
+    "remaining": "{{worst}}–{{best}} 남음 · {{used}} 사용 · 최대 점프 {{max}}",
+    "useMyShip": "내 함선 사용",
+    "useMyShipTitle": "콜드 = {{ship}} ({{mass}}), 핫 = +프롭",
+    "noCurrentShip": "현재 함선 없음",
+    "cold": "콜드",
+    "hot": "핫",
+    "tooHeavyCold": "롤러 ({{mass}})가 이 홀에 너무 무겁습니다 (최대 점프 {{max}}).",
+    "roller": "롤러:",
+    "home": "홈",
+    "far": "반대편",
+    "homeSideLabel": "홈 쪽",
+    "farSideLabel": "반대편 쪽",
+    "tooHeavyHotTitle": "핫으로 통과하기엔 너무 무거움 — 콜드를 사용하세요",
+    "passTitle": "+{{mass}} · {{side}}에서 종료",
+    "passHot": "통과 — 핫 (+{{mass}})",
+    "passCold": "통과 — 콜드 (+{{mass}})",
+    "guidanceCollapsed": "붕괴시킬 만큼의 질량이 통과했습니다. 다시 스캔되면 재설정하세요.",
+    "guidanceSafe_one": "계속 롤링해도 안전합니다. 약 {{min}}–{{max}}회 통과 남음.",
+    "guidanceSafe_other": "계속 롤링해도 안전합니다. 약 {{min}}–{{max}}회 통과 남음.",
+    "guidanceRiskyFar": "다음 통과로 홀이 붕괴될 수 있습니다 — 당신의 롤러가 반대편에 고립될 수 있습니다. 들어오는(홈에서 종료되는) 통과로 만드세요.",
+    "guidanceRiskyHome": "다음 통과로 홀이 붕괴될 수 있습니다 — 하지만 당신의 홈 쪽에서 종료되므로 시도해도 안전합니다.",
+    "guidanceDangerFar": "다음 통과로 홀이 붕괴될 가능성이 높습니다 — 그리고 당신의 롤러를 반대편에 고립시킵니다.",
+    "guidanceDangerHome": "다음 통과로 홀이 붕괴될 가능성이 높습니다 — 당신의 롤러는 홈에서 종료됩니다.",
+    "undoPass": "통과 실행 취소",
+    "reset": "재설정",
+    "otherShips": "통과한 다른 함선",
+    "noMassData": "유형 “{{type}}”에 대한 질량 데이터가 없습니다.",
+    "enterWhType": "질량 추적을 활성화하려면 위에 웜홀 유형을 입력하세요.",
+    "collapseConfirm": "이 통과 (+{{mass}})로 홀이 붕괴될 가능성이 높습니다.",
+    "collapseConfirmStrand": " 당신의 롤러가 반대편에 고립될 수 있습니다.",
+    "collapseConfirmHome": " 당신의 롤러는 홈 쪽에서 종료됩니다.",
+    "rollIt": "통과 실행",
+    "removeConnection": "연결 제거"
+  },
+  "mapControls": {
+    "panel": "제어판",
+    "zoomIn": "확대",
+    "zoomOut": "축소",
+    "fitView": "화면에 맞추기",
+    "interactive": "상호작용 전환"
+  },
+  "demo": {
+    "hintClick": "성계를 클릭하면 여기에서 세부 정보를 볼 수 있습니다.",
+    "hintAdd": "지도에서 우클릭하여 성계를 추가하세요.",
+    "hintConnect": "노드의 핸들에서 드래그하여 성계를 연결하세요.",
+    "hintLimit": "데모는 {{count}}개 성계로 제한됩니다 — 로그인하면 제한 없음.",
+    "systemsCount": "{{count}} / {{max}} 성계",
+    "signInMore": "로그인하면 킬, 시그니처, 구조물, 활동, 주권 등 더 많은 정보를 볼 수 있습니다.",
+    "addSystemHere": "여기에 성계 추가",
+    "addSystemLimit": "성계 추가 ({{max}} 한도 도달)"
+  },
+  "ctxMenu": {
+    "disconnect": "연결 끊기",
+    "jumpType": "점프 유형",
+    "standardJump": "표준 점프",
+    "jumpgate": "점프 게이트",
+    "whLifetime": "웜홀 수명",
+    "lifeFresh": "신선",
+    "life1d": "1일 미만 남음",
+    "life4h": "4시간 미만 남음",
+    "life1h": "1시간 미만 남음",
+    "lifeExpired": "만료됨, 곧 닫힘",
+    "massStability": "질량 안정성",
+    "massStable": "50% 초과 남음",
+    "massDestab": "50% 미만 남음",
+    "massCrit": "10% 미만 남음",
+    "lockSelected": "선택한 {{count}}개 잠금",
+    "unlockSelected": "선택한 {{count}}개 잠금 해제",
+    "markCleared": "{{count}}개를 정리됨으로 표시",
+    "unsetHome": "홈 해제",
+    "setHome": "홈으로 설정 (H로 중앙 정렬)",
+    "setIntel": "인텔 설정",
+    "setIntelFor": "{{count}}개에 인텔 설정",
+    "intelFriendly": "우호",
+    "intelHostile": "적대",
+    "intelOccupied": "점유됨",
+    "intelEmpty": "비어 있음",
+    "intelUnnamed": "(이름 없음)",
+    "clearIntel": "인텔 지우기",
+    "lockSystem": "성계 잠금",
+    "unlockSystem": "성계 잠금 해제",
+    "removeSystem": "성계 제거",
+    "removeSystems": "{{count}}개 성계 제거",
+    "addSystem": "성계 추가",
+    "selectAll": "전체 선택",
+    "noHomeSet": "설정된 홈 성계가 없습니다. 성계를 우클릭 → “홈으로 설정”.",
+    "failSetDest": "목적지 설정 실패",
+    "failAddWaypoint": "경유지 추가 실패",
+    "canvasHint": "캔버스를 우클릭하여 성계 추가 · 핸들 사이를 드래그하여 연결 · Shift+클릭 또는 드래그로 다중 선택 · 성계를 우클릭하여 상호작용"
+  },
+  "panel": {
+    "notes": "노트",
+    "signatures": "시그니처",
+    "structures": "구조물",
+    "npcStations": "NPC 정거장",
+    "killboard": "zKillboard",
+    "activity": "활동"
+  },
+  "systemPanel": {
+    "unknownSystem": "알 수 없는 성계",
+    "addWaypointBtn": "+ 경유지",
+    "inChain": "체인 내:",
+    "incursion": "인커전",
+    "staging": "집결",
+    "bossPresent": "보스 존재",
+    "influence": "{{pct}}% 영향력",
+    "incursionState": {
+      "established": "구축됨",
+      "mobilizing": "동원 중",
+      "withdrawing": "철수 중"
+    },
+    "insurgency": "반란 — {{faction}}",
+    "corruption": "부패",
+    "suppression": "진압",
+    "stage": "단계 {{stage}}",
+    "systemEffects": "성계 효과",
+    "statics": "고정홀",
+    "location": "위치",
+    "region": "지역",
+    "constellation": "성단",
+    "npc": "NPC",
+    "links": "링크",
+    "openNpcDelta": "Dotlan에서 NPC 변화량 열기",
+    "openDotlan": "Dotlan에서 성계 열기",
+    "openZkb": "zKillboard에서 성계 열기",
+    "celestials": "천체",
+    "planets_one": "행성",
+    "planets_other": "행성",
+    "moons_one": "위성",
+    "moons_other": "위성",
+    "belts_one": "벨트",
+    "belts_other": "벨트",
+    "gates_one": "게이트",
+    "gates_other": "게이트",
+    "sovereignty": "주권",
+    "alliance": "연합",
+    "corp": "군단",
+    "faction": "팩션",
+    "personal": "개인",
+    "refreshStandings": "지금 ESI에서 스탠딩 새로 고침 (6시간 TTL 무시)",
+    "standingsRefreshed": "스탠딩 새로 고침됨 — 개인 {{personal}} · 군단 {{corp}} · 연합 연락처 {{alliance}}",
+    "noContactsRefreshed": "연락처를 새로 고칠 수 없습니다. 토큰에 read_contacts 스코프가 없을 수 있습니다 — 로그아웃 후 다시 로그인하세요.",
+    "standingsNotLoaded": "스탠딩이 아직 로드되지 않았습니다. 계속 이 상태라면, 로그아웃 후 다시 로그인하여 read_contacts 스코프를 부여하세요.",
+    "standingNotInBucket": "{{label}}: 어느 쪽에도 속하지 않음",
+    "standingNotSet": "{{label}}: 스탠딩이 설정되지 않음",
+    "standingValue": "{{label}}: {{value}}"
+  },
+  "sidebar": {
+    "thera": "Thera 연결",
+    "turnur": "Turnur 연결",
+    "a0": "주변 A0 항성",
+    "closest": "가장 가까운 성계",
+    "expand": "사이드바 펼치기",
+    "resize": "사이드바 크기 조정",
+    "collapse": "사이드바 접기",
+    "moveToLeft": "사이드바를 왼쪽으로 이동",
+    "moveToRight": "사이드바를 오른쪽으로 이동"
+  },
+  "waypoint": {
+    "setDestination": "목적지 설정",
+    "addWaypoint": "경유지 추가"
+  },
+  "closest": {
+    "dragToReorder": "드래그하여 순서 변경",
+    "home": "홈",
+    "noJumps": "— 점프",
+    "removeFromList": "목록에서 제거",
+    "signIn": "로그인하고 K-스페이스에 도킹하면 허브까지의 점프 수를 볼 수 있습니다.",
+    "searchPlaceholder": "성계 이름 검색…",
+    "onList": "목록에 있음",
+    "noMatch": "“{{query}}”와 일치하는 성계가 없습니다"
+  },
+  "a0": {
+    "signIn": "로그인하고 K-스페이스에 도킹하면 주변 A0 성계를 볼 수 있습니다.",
+    "computing": "경로 계산 중…",
+    "noneReachable": "도달 가능한 A0 성계가 없습니다.",
+    "showing": "가장 가까운 A0 성계 {{count}}개를 표시합니다.",
+    "showRoute": "{{mode}} 경로 표시",
+    "hideRoute": "{{mode}} 경로 숨기기",
+    "modeShortest": "최단",
+    "modeSecure": "안전"
+  },
+  "scout": {
+    "noConnections": "{{system}} 연결이 없습니다.",
+    "expiring": "만료 임박"
+  },
+  "activity": {
+    "thisHour": "이번 시간",
+    "allHidden": "모든 그래프가 숨겨져 있습니다. 지도 옵션 → 활동에서 켜세요.",
+    "loading": "활동을 불러오는 중…"
+  },
+  "structures": {
+    "unknown": "알 수 없음",
+    "loadFailed": "구조물을 불러오지 못했습니다",
+    "saveFailed": "구조물을 저장하지 못했습니다",
+    "deleteFailed": "구조물을 삭제하지 못했습니다",
+    "deleteAllConfirm_one": "{{count}}개 구조물을 모두 삭제할까요?",
+    "deleteAllConfirm_other": "{{count}}개 구조물을 모두 삭제할까요?",
+    "pasteHint": "EVE의 오버뷰에서 직접 구조물을 복사하여 붙여넣을 수 있습니다. 우주에서 오버뷰 창의 아무 곳이나 우클릭하고 “선택한 행 복사”를 선택하세요 (또는 행을 선택하고 Ctrl+C). 여기에 Ctrl+V로 붙여넣으면 — 구조물 ID, 이름, 유형이 자동으로 가져와집니다.",
+    "addStructure": "구조물 추가",
+    "deleteAll": "전체 삭제",
+    "none": "기록된 구조물 없음",
+    "name": "이름",
+    "type": "유형",
+    "ownerCorp": "소유 군단",
+    "eveId": "EVE ID",
+    "eveIdTooltip": "경유지 내비게이션용 EVE 구조물 ID",
+    "notes": "노트",
+    "namePlaceholder": "구조물 이름",
+    "corpPlaceholder": "군단 이름",
+    "optionalPlaceholder": "선택 사항"
+  },
+  "killboard": {
+    "hoursMinutesAgo": "{{hours}}시간 {{minutes}}분 전",
+    "viewKillmail": "zKillboard에서 킬메일 보기",
+    "soloKill": "솔로 킬",
+    "gank": "갱크 — 공격자 {{count}}명",
+    "attackers": "공격자 {{count}}명",
+    "victim": "피해자",
+    "finalBlow": "막타",
+    "onZkb": "zKillboard에서 {{label}} 보기",
+    "finalBlowShip": "막타 함선",
+    "npcHidden": "NPC {{count}}개 숨김",
+    "npcHiddenTooltip": "NPC 전용 킬 (CONCORD, 랫 등) 숨김",
+    "updated": "{{time}} 업데이트됨",
+    "includeNpcTooltip": "피드에 NPC 전용 킬메일 포함",
+    "showNpcKills": "NPC 킬 표시",
+    "loading": "킬 불러오는 중…",
+    "noKills": "지난 24시간 내 킬 없음.",
+    "noKillsNpc": "지난 24시간 내 킬 없음 — NPC 전용 {{count}}개 숨김.",
+    "showThem": "표시",
+    "loadMore": "더 불러오기 ({{count}}개 남음)"
+  },
+  "sigType": {
+    "unknown": "알 수 없음",
+    "wormhole": "웜홀",
+    "data": "데이터",
+    "relic": "유물",
+    "gas": "가스",
+    "ore": "광석",
+    "combat": "전투"
+  },
+  "signatures": {
+    "pasteHint": "EVE의 탐사 스캐너에서 직접 시그니처를 복사하여 붙여넣을 수 있습니다. 그러려면 탐사 스캐너를 여세요. Ctrl+A로 모두 선택한 다음 Ctrl+C로 복사하세요. Ctrl+V로 여기에 붙여넣으세요.",
+    "pasteDifferentSystem": "당신의 캐릭터는 현재 {{current}}에 있지만, {{selected}}에 시그니처를 붙여넣고 있습니다. 계속할까요?",
+    "loadFailed": "시그니처를 불러오지 못했습니다",
+    "saveFailed": "시그니처를 저장하지 못했습니다",
+    "deleteFailed": "시그니처를 삭제하지 못했습니다",
+    "deleteSelectedConfirm_one": "선택한 시그니처 {{count}}개를 삭제할까요?",
+    "deleteSelectedConfirm_other": "선택한 시그니처 {{count}}개를 삭제할까요?",
+    "deleteAllConfirm_one": "{{count}}개 시그니처를 모두 삭제할까요?",
+    "deleteAllConfirm_other": "{{count}}개 시그니처를 모두 삭제할까요?",
+    "addSignature": "시그니처 추가",
+    "setTypeAria": "선택한 시그니처의 유형 설정",
+    "setType": "유형 설정 ({{count}})…",
+    "deleteSelected": "선택 항목 삭제 ({{count}})",
+    "deleteAll": "전체 삭제",
+    "emptyShared": "스캔된 시그니처 없음",
+    "empty": "스캔된 시그니처 없음 — 탐사 스캐너에서 붙여넣어 가져오세요",
+    "colId": "ID",
+    "colType": "유형",
+    "colWh": "WH",
+    "colLeadsTo": "연결 대상",
+    "colName": "이름",
+    "colNotes": "노트",
+    "colAge": "경과",
+    "colUpdated": "업데이트",
+    "namePlaceholder": "사이트 이름"
+  },
+  "stats": {
+    "title": "사용자 통계",
+    "loading": "불러오는 중…",
+    "jumps": "점프",
+    "signatures": "시그니처",
+    "dailyActivity": "일별 활동 — 지난 30일",
+    "byType": "유형별 시그니처",
+    "type": "유형",
+    "count": "개수",
+    "period": {
+      "day": "오늘",
+      "week": "이번 주",
+      "month": "이번 달",
+      "year": "올해",
+      "forever": "전체 기간"
+    }
+  },
+  "time": {
+    "justNow": "방금",
+    "secondsAgo": "{{value}}초 전",
+    "minutesAgo": "{{value}}분 전",
+    "hoursAgo": "{{value}}시간 전",
+    "daysAgo": "{{value}}일 전",
+    "today": "오늘"
+  },
+  "duration": {
+    "seconds": "{{value}}s",
+    "minutesSeconds": "{{minutes}}m {{seconds}}s",
+    "hoursMinutes": "{{hours}}h {{minutes}}m"
+  },
+  "share": {
+    "expired": "만료됨",
+    "expiresInHM": "{{hours}}시간 {{minutes}}분 후 만료",
+    "expiresInM": "{{minutes}}분 후 만료"
+  },
+  "mass": {
+    "billionKg": "{{value}}십억 kg",
+    "millionKg": "{{value}}백만 kg",
+    "kg": "{{value}} kg"
+  },
+  "toolbar": {
+    "switchMap": "지도 전환",
+    "noMap": "지도 없음",
+    "mapType": {
+      "shared": "공유",
+      "corp": "군단",
+      "solo": "개인"
+    },
+    "lockedTooltip": "지도가 잠겨 있습니다 — 성계와 연결이 동결되었습니다. 시그니처, 구조물, 노트는 여전히 편집할 수 있습니다.",
+    "locked": "잠김",
+    "mapLimitReached": "지도 한도 도달",
+    "newMap": "+ 새 지도",
+    "deleteThisMap": "이 지도 삭제",
+    "name": "지도 이름",
+    "totalSystems": "전체 성계",
+    "totalConnections": "전체 연결",
+    "admin": "관리",
+    "userStats": "사용자 통계",
+    "mapOptions": "지도 옵션",
+    "checking": "확인 중…",
+    "tqOnline": "Tranquility: 온라인",
+    "tqOffline": "Tranquility: 오프라인",
+    "esiOnline": "ESI: 온라인",
+    "esiOffline": "ESI: 오프라인",
+    "trackJumpsOn": "점프 추적: 켜짐",
+    "trackJumpsOff": "점프 추적: 꺼짐",
+    "trackJumpsTooltipOn": "점프 추적 중 — 이동함에 따라 새 성계가 추가됩니다",
+    "trackJumpsTooltipOff": "점프 추적 안 함 — 기존 성계만 “현재 위치” 표시를 받습니다",
+    "signOut": "로그아웃",
+    "role": "권한: {{role}}",
+    "checkedAgo": "{{time}} 확인됨",
+    "deleteMapConfirm": "“{{name}}”을(를) 삭제할까요? 이 작업은 취소할 수 없습니다.",
+    "online": {
+      "offline": "오프라인",
+      "statusUnknown": "상태 알 수 없음",
+      "onlineInEve": "EVE에 온라인",
+      "onlineSince": "{{stamp}}부터 EVE에 온라인 ({{age}})"
+    },
+    "proximity": {
+      "incursion": "인커전",
+      "insurgency": "반란",
+      "hostileSov": "적대 주권",
+      "threat": "위협",
+      "closest": "가장 가까운 {{label}} 성계"
+    }
+  },
+  "landing": {
+    "tagline": "EVE Online을 위한 웜홀 체인 지도 작성",
+    "demoNote": "◈ 인터랙티브 데모 — 단순화된 미리보기. 로그인하면 시그니처, 킬 피드, 연결 추적, 활동 기록 등을 사용할 수 있습니다.",
+    "cta": {
+      "continueAs": "다음 계정으로 계속",
+      "sessionExpired": "세션이 만료되었습니다 — 초상화를 클릭하여 EVE SSO로 다시 로그인하세요.",
+      "switchChar": "다른 캐릭터로 로그인",
+      "secureLogin": "안전한 EVE SSO 로그인 — 비밀번호를 저장하지 않습니다. 캐릭터 신원만 사용합니다.",
+      "loginAlt": "EVE Online으로 로그인",
+      "joinDiscord": "Nexum Discord 참여"
+    },
+    "errors": {
+      "not_in_corp": "당신의 캐릭터는 이 Nexum 인스턴스를 운영하는 군단의 구성원이 아닙니다. 접근은 군단 구성원으로 제한됩니다.",
+      "corp_check_failed": "ESI 오류로 인해 군단 구성원 여부를 확인할 수 없습니다. 잠시 후 다시 시도하세요.",
+      "unknown": "알 수 없는 오류가 발생했습니다. 다시 시도하세요."
+    },
+    "sections": {
+      "mapping": "지도 작성",
+      "personalCorp": "개인 및 군단 지도",
+      "sysIntel": "성계 인텔리전스",
+      "liveOps": "실시간 작전",
+      "productivity": "생산성 및 UX",
+      "forCorps": "군단용",
+      "compare": "Nexum은 어떻게 비교되나요?",
+      "discordCta": "질문, 아이디어 또는 버그가 있나요?",
+      "about": "Nexum 소개",
+      "aboutMe": "개발자 소개",
+      "techStack": "기술 스택",
+      "faqs": "자주 묻는 질문"
+    },
+    "features": {
+      "interactiveMap": {
+        "title": "인터랙티브 지도",
+        "desc": "성계를 드래그하고, 연결을 그리고, 연결마다 웜홀 등급 / 유형 / 상태를 설정하세요. 격자 맞춤과 선택적 미니맵을 지원합니다."
+      },
+      "seedRegion": {
+        "title": "지역에서 지도 생성",
+        "desc": "EVE 지역 전체로 미리 채워진 새 지도를 만드세요 — 모든 성계가 CCP의 2D 성도 투영(Dotlan 스타일 배치)에 따라 배치되고 모든 스타게이트 연결이 그려집니다. 지도 생성 시 지역을 선택하거나, 빈 지도를 원하면 비워두세요."
+      },
+      "whIntel": {
+        "title": "웜홀 인텔",
+        "desc": "연결별 질량 상태(안정 / 불안정 / 위급), 카운트다운이 있는 수명 종료 표시, K162를 인식하는 고정홀 식별, 그리고 시그니처 유형에 따른 소형홀 / 가스 사이트 자동 태깅."
+      },
+      "rollingCalc": {
+        "title": "롤링 계산기",
+        "desc": "연결 패널에서 홀 붕괴를 계획하고 추적하세요. ±10% 질량 분산을 모델링하고 최악의 경우에 대비해 각 통과를 안전 / 붕괴 가능 / 붕괴 예정으로 예측합니다. 롤러 함선을 정의하고(콜드 + 프롭 온 질량, 또는 ESI에서 탑승 중인 함선 가져오기), 어떤 통과가 당신을 반대편에 고립시키기 전에 경고하는 사이드 추적과 함께 통과를 진행하며, “≈ N회 통과 남음” 추정치를 확인하세요. 누적 질량은 홀을 보고 있는 모든 사람에게 실시간으로 동기화됩니다."
+      },
+      "whPicker": {
+        "title": "웜홀 유형 선택기",
+        "desc": "연결에 정확한 웜홀 유형을 지정하는 검색 가능한 팝오버. 마우스를 올렸을 때의 고정홀 빠른 정보는 목적지 등급, 질량, 수명을 보여줍니다."
+      },
+      "multiSelect": {
+        "title": "다중 선택 일괄 작업",
+        "desc": "Shift+클릭으로 여러 성계나 시그니처를 선택한 다음, 단일 작업으로 유형을 일괄 지정, 삭제 또는 이름 변경하세요."
+      },
+      "pngExport": {
+        "title": "PNG 내보내기",
+        "desc": "현재 지도를 — 시그니처 수, 연결, 상태와 함께 — 함대 핑이나 군단 Discord에 올릴 수 있는 PNG로 렌더링하세요."
+      },
+      "sigAging": {
+        "title": "웜홀 시그니처 노화",
+        "desc": "웜홀 시그니처는 해당 WH 유형의 알려진 수명에서의 위치에 따라 색이 입혀집니다 — 50%에 노랑, 90%에 주황, 예상 닫힘 이후 빨강. 누군가에게 붕괴되기 전에 잊힌 체인을 잡아냅니다."
+      },
+      "soloCorp": {
+        "title": "개인 / 군단 분리",
+        "desc": "모든 사용자는 항상 비공개인 개인 지도를 가집니다; 군단 모드에서는 각 군단이 공유 군단 지도도 갖습니다. 군단 간 가시성은 단일 환경 변수 플래그로 선택 활성화됩니다."
+      },
+      "multiMap": {
+        "title": "다중 지도 지원",
+        "desc": "각 캐릭터(또는 군단)는 구성된 한도 내에서 여러 독립 지도를 유지할 수 있습니다 — 컨텍스트를 잃지 않고 별도 작전을 위한 별도 체인."
+      },
+      "mergeMaps": {
+        "title": "지도 병합",
+        "desc": "한 지도를 다른 지도에 접어 넣습니다. 대상이 기준 원본으로 유지됩니다 — 누락된 성계와 연결만 추가되고, 시그니처, 구조물, 노트가 병합되며, 새 성계는 기존 배치에 끼워집니다. 군단 지도는 권한별로 병합 원본 및/또는 대상으로 선택 활성화됩니다."
+      },
+      "realtime": {
+        "title": "실시간 협업",
+        "desc": "편집은 같은 지도를 보고 있는 모든 사람에게 실시간으로 동기화됩니다 — 성계, 연결, 이름 변경/잠금, 시그니처, 구조물, 병합이 모두 새로고침 없이 잠깐 사이에 다른 사람에게 나타납니다. 지도별로 스트리밍되며(볼 수 있는 지도의 이벤트만 받음), 자신의 변경은 에코 억제되고 재연결 시 자동 재동기화됩니다."
+      },
+      "mapLocking": {
+        "title": "지도 잠금",
+        "desc": "관리자는 군단 지도의 토폴로지를 동결할 수 있습니다. 성계와 연결은 비관리자에게 잠기지만, 시그니처, 구조물, 성계별 노트는 편집 가능하게 유지되어 배치가 고정된 동안에도 작전이 계속됩니다."
+      },
+      "rbac": {
+        "title": "역할 기반 접근",
+        "desc": "네 단계 — readonly, edit, full, admin — 가 군단 지도 작업을 제어합니다. 개인 지도는 권한과 무관하게 당신의 것으로 유지됩니다."
+      },
+      "systemPanel": {
+        "title": "성계 패널",
+        "desc": "시그니처, 구조물, NPC 정거장, 노트, killboard, 활동 차트를 위한 성계별 카드. 카드는 드래그 앤 드롭으로 순서를 바꿀 수 있고 사용자별로 유지됩니다."
+      },
+      "sigMgmt": {
+        "title": "시그니처 관리",
+        "desc": "탐사 스캐너에서 바로 붙여넣으세요. 시그니처별 생성 / 업데이트 경과를 추적하고, 다시 붙여넣을 때 누락된 시그니처를 자동 삭제하며, 다중 선택에 대한 일괄 유형 지정을 지원합니다."
+      },
+      "structImport": {
+        "title": "구조물 가져오기",
+        "desc": "EVE 오버뷰 데이터를 붙여넣어 플레이어 소유 구조물을 이름, 유형, 소유자, 노트와 함께 한 번에 가져오세요."
+      },
+      "autoStruct": {
+        "title": "자동 발견된 구조물",
+        "desc": "당신 군단의 시타델(Station Manager 권한을 가진 구성원이 로그인할 때 ESI를 통해)과 제3자 피드에 공개 등록된 구조물이 구조물 패널에 읽기 전용 항목으로 자동으로 나타납니다 — 이미 소유자에 대한 당신의 스탠딩에 따라 색이 입혀져 있습니다."
+      },
+      "activityCharts": {
+        "title": "활동 차트",
+        "desc": "성계별 점프, 함선 / 캡슐 킬, NPC 킬의 24시간 롤링 기록을 매시간 ESI에서 폴링합니다. 폴러는 누군가 연 성계만이 아니라 모든 K-스페이스 성계의 데이터를 보존하므로, 새 성계를 보는 순간 차트가 채워집니다."
+      },
+      "sovStation": {
+        "title": "주권 및 정거장 데이터",
+        "desc": "실시간 연합 / 군단 / 팩션 주권 정보와 NPC 정거장 서비스, 그리고 게임 내 경유지 및 목적지 작업."
+      },
+      "killboard": {
+        "title": "Killboard 패널",
+        "desc": "성계별 최근 zKillboard 활동, NPC 전용 킬은 기본 숨김(포함하려면 전환). 적대 행위자가 체인에 있거나 블루가 죽으면 행이 빨강으로, 우호 측이 득점하거나 적대 측이 죽으면 파랑으로 색이 입혀집니다. 최근 킬은 지도에도 하이라이트로 떠오릅니다."
+      },
+      "effectDigest": {
+        "title": "체인 전체 효과 요약",
+        "desc": "성계 정보 패널 상단의 한 줄 요약이 현재 체인의 모든 펄사 / 울프-레이엣 / 마그네타 / 등을 나열합니다. 마우스를 올리면 보정치 목록을, 클릭하면 중앙 정렬을."
+      },
+      "standings": {
+        "title": "스탠딩 오버레이",
+        "desc": "당신의 EVE 연락처 목록(개인, 군단, 연합 — 로그인 시 ESI로 가져오고 필요 시 다시 가져올 수 있음)이 체인 전체 시각 레이어를 구동합니다. 주권 보유자는 인라인 P/C/A 스탠딩 칩을 표시하고; EVE 구조물 ID로 해석된 구조물은 소유 군단 스탠딩에 따라 색이 입혀지며; 주권 보유 성계 노드는 색상 후광을 받아 적대 영역이 지도에서 눈에 띕니다."
+      },
+      "scout": {
+        "title": "스카우트 연결",
+        "desc": "Thera와 Turnur의 Eve-Scout 공개 연결이 사이드바에 표시되어 알려진 홀로 바로 점프할 수 있습니다."
+      },
+      "a0": {
+        "title": "A0 항성 감지",
+        "desc": "ESI를 통해 보이는 A0(노란) 항성을 가진 성계를 자동으로 표시하여, 캐피탈 친화적인 소규모 교전 계획에 활용합니다."
+      },
+      "iceBelt": {
+        "title": "얼음 벨트 성계",
+        "desc": "얼음 변칙을 생성하는 제국 우주 성계를 ❄ 아이콘으로 표시합니다 — 채굴 작전을 준비하거나 대체 채집 지점을 찾을 때 유용합니다. 정적 데이터 세트가 저장소에 커밋되어 있고 시작 시 성계 ID로 해석됩니다."
+      },
+      "storms": {
+        "title": "폭풍 추적",
+        "desc": "활성 널섹 폭풍 — Electric, Gamma, Exotic, Plasma — 을 커뮤니티가 관리하는 EveScout Rescue 폭풍 추적 피드에서 가져와 일치하는 성계 노드에 색상 코드 ⚡ 로 표시합니다. 툴팁은 폭풍 이름, 마지막 보고, 보고자를 보여줍니다. 30분마다 갱신됩니다."
+      },
+      "proximity": {
+        "title": "근접 경보",
+        "desc": "활성 인커전, 해적 반란, 또는 당신이 군단 / 연합을 적색으로 설정한 주권 보유 성계로부터 구성 가능한 점프 수 이내에 있을 때 브라우저 알림과 경고음을 줍니다. 상시 표시되는 툴바 칩이 가장 가까운 위협을 한눈에 보여줍니다."
+      },
+      "discordNotif": {
+        "title": "Discord 알림",
+        "desc": "군단 체인 인텔을 Discord 채널로 보내, 아무도 탭을 보고 있지 않을 때에도 경보가 도착하게 합니다. 들어오는 K162나 새 웜홀 연결 시 서버 측에서 발동되며, 군단 지도로 한정됩니다. 관리자는 관리 패널에서 어떤 지역과 지도가 알림을 보낼지 필터링합니다. 최선 노력 방식이며 속도 제한을 인식합니다; 지역 생성 같은 일괄 작업은 절대 채널을 도배하지 않습니다."
+      },
+      "routePlanner": {
+        "title": "경로 플래너",
+        "desc": "스타게이트와 당신의 실시간 체인에 대한 서버 측 BFS로, 웜홀 홉을 거치는 경로도 한 번의 클릭으로."
+      },
+      "locationTracking": {
+        "title": "위치 추적",
+        "desc": "툴바의 선택적 실시간 캐릭터 위치 점, 그리고 ESI를 통해 10초마다 업데이트되는 지도별 “현재 위치” 표시."
+      },
+      "presence": {
+        "title": "파일럿 재실",
+        "desc": "같은 지도를 보고 있는 모두가 지금 어디 있는지 확인하세요 — 파란 점(마우스를 올리면 파일럿 이름)이 다른 각 관람자의 현재 성계를, 그들이 점프함에 따라 실시간으로 표시합니다. 당신의 함대뿐 아니라 지도를 연 누구나 포함하며; 선택 활성화이고 아무것도 저장되지 않습니다."
+      },
+      "onlineStatus": {
+        "title": "온라인 상태",
+        "desc": "툴바 점이 로그인한 각 사용자가 현재 EVE Online에 접속 중인지 보여주어, 누가 실제로 접속해 있는지 한눈에 알 수 있습니다."
+      },
+      "commandPalette": {
+        "title": "명령 팔레트",
+        "desc": "⌘ / Ctrl + K 로 성계, 시그니처, 작업에 대한 퍼지 검색을 엽니다 — 마우스를 만지지 않고 성계로 점프하거나, 경유지를 설정하거나, 패널을 전환하세요."
+      },
+      "homeHotkey": {
+        "title": "홈 단축키",
+        "desc": "H를 누르면 어느 패널에서든 뷰포트를 홈 성계로 되돌립니다. 성계를 우클릭하여 어느 것이 홈인지 설정하거나 변경하세요."
+      },
+      "killHighlights": {
+        "title": "최근 킬 하이라이트",
+        "desc": "지난 한 시간 내에 킬이 있는 성계는 색상 후광을 받아 체인 전체의 신선한 활동을 한눈에 볼 수 있습니다."
+      },
+      "userStats": {
+        "title": "사용자 통계 창",
+        "desc": "캐릭터별 합계: 점프, 유형별 시그니처, 일 / 주 / 월 / 년 / 전체로 분류."
+      },
+      "serverStatus": {
+        "title": "서버 상태 위젯",
+        "desc": "툴바의 실시간 Tranquility 서버 상태, 접속자 수, ESI 상태. 탭 간 캐시되어 열려 있는 모든 창이 단일 ESI 폴링을 공유합니다."
+      },
+      "demoMap": {
+        "title": "데모 지도",
+        "desc": "랜딩 페이지는 편집 불가능한 데모 지도를 띄워, 방문자가 로그인 전에 도구가 무엇을 하는지 볼 수 있게 합니다."
+      },
+      "sidebar": {
+        "title": "접을 수 있는 사이드바",
+        "desc": "지도 옵션, 연결, 근접 경보, 오래된 성계 흐리기, 단축키가 각각 독립적으로 펼쳐지거나 접힙니다. 섹션별 상태는 localStorage를 통해 브라우저별로 유지됩니다."
+      }
+    },
+    "corpFeatures": {
+      "multiCorp": {
+        "title": "다중 군단 배포",
+        "desc": "CORP_ID는 쉼표로 구분된 군단 ID 목록을 받습니다. 하나의 Nexum 인스턴스가 여러 군단을 호스팅할 수 있으며; CORP_MAP_SHARED=true가 아닌 한 각 군단의 지도는 자기 구성원으로 한정됩니다."
+      },
+      "adminDash": {
+        "title": "관리 대시보드",
+        "desc": "사용자, 지도, 보고서, 감사 로그의 네 탭이 있는 전용 /admin 페이지. 관리자는 툴바의 관리 버튼에서 접근합니다."
+      },
+      "userMgmt": {
+        "title": "사용자 관리",
+        "desc": "권한 변경, 차단 / 해제, 그리고 필요 시 ESI 군단 멤버십 재확인을 강제합니다. 자기 차단, 자기 강등, ADMIN_CHAR_ID 변경은 방지됩니다."
+      },
+      "mapMgmt": {
+        "title": "지도 관리",
+        "desc": "관리자는 소유자 아바타, 군단 티커, 성계 / 연결 수, 잠금 상태, 마지막 활동 시간과 함께 모든 군단 지도를 봅니다. 강제 잠금, 강제 해제, 강제 삭제가 각각 한 번의 클릭."
+      },
+      "usersReport": {
+        "title": "사용자 보고서",
+        "desc": "캐릭터별 마지막 접속, 추가 / 삭제한 성계, 추가한 구조물, 유형별로 분류된 시그니처, 그리고 마지막 군단 활동 타임스탬프. 정렬 가능, 활동 및 기간으로 필터링 가능, CSV로 내보내기 가능."
+      },
+      "systemsReport": {
+        "title": "성계 보고서",
+        "desc": "시그니처 유형 도넛, 일별 / 월별 활동 선 차트(버킷팅이 기간에 맞춰 조정됨), 정렬 가능한 웜홀 유형 분류와 함께 군단 지도 시그니처를 집계합니다."
+      },
+      "timeWindowed": {
+        "title": "기간별 보고",
+        "desc": "모든 보고서는 지난 24시간, 한 주, 한 달, 1년 또는 전체 기간으로 한정할 수 있습니다. 차트 버킷팅이 자동으로 조정됩니다: 24시간은 시간별, 한 주 / 한 달은 일별, 1년과 전체 기간은 월별."
+      },
+      "auditLog": {
+        "title": "감사 로그",
+        "desc": "모든 관리 작업 — 권한 변경, 차단 / 해제, 강제 잠금, 강제 삭제, ESI 군단 변경, 군단 탈퇴 시 자동 차단 — 이 수행자, 대상, 이전 → 새 값, 타임스탬프와 함께 기록됩니다. CSV로 내보내기 가능."
+      },
+      "corpTicker": {
+        "title": "군단 티커 해석",
+        "desc": "사용자 및 지도 보고서의 군단 ID는 ESI를 통해 게임 내 티커로 해석되며, 보고서 로드를 저렴하게 유지하기 위해 1시간 메모리 캐시를 사용합니다."
+      },
+      "perCharAttr": {
+        "title": "캐릭터별 귀속",
+        "desc": "시그니처, 구조물, 성계 추가 / 삭제 작업이 수행한 사용자와 함께 기록되므로, 보고서가 수동 기록 없이 “누가 무엇을 스캔해 왔는지”에 답할 수 있습니다."
+      }
+    },
+    "forCorpsBody": "Nexum을 당신의 군단이나 연합을 위한 공유 배포로 운영하세요. 구성원은 하나의 도구에서 군단에 보이는 체인 지도와 비공개 개인 지도를 얻으며, 역할 기반 권한, 관리 도구, 캐릭터별 활동 보고가 함께 제공됩니다.",
+    "compareBody": "Nexum이 Pathfinder, Tripwire, Wanderer와 어떻게 비교되는지 보세요 — 기능, 호스팅, 비용을 나란히.",
+    "compareLink": "Nexum vs Pathfinder, Tripwire 및 Wanderer 비교 →",
+    "discordCtaBody": "Nexum Discord에 들러주세요 — 피드백, 기능 요청, 스캔 잡담, o7 모두 환영합니다.",
+    "aboutBody1": "Nexum은 웜홀 및 탐사 도구입니다. 경로를 지도로 그리고 시그니처를 기록하는 데 사용할 수 있습니다. Pathfinder에서 큰 영향을 받았지만 — Pathfinder가 더 이상 활발히 개발되지 않으면서(2020년 이후 새 릴리스 없음), 그것에 대해 불평하기보다 Nexum을 만들었습니다.",
+    "aboutBody2": "Nexum은 한 명의 개발자가 만듭니다. 진행하면서 기능을 추가하고 있지만, 지원이나 기능 요청이 필요하면 연락 주세요.",
+    "aboutMe": "Nexum은 Addelee가 개인 프로젝트로 작성합니다. 2003년 베타 때부터 EVE를 해왔습니다. Help 채널이나 Scanning 채널에서 어슬렁거리는 저를 볼지도 모릅니다. 웜홀과 Thera에 살기, 하이섹에서 미션 돌리기, 로우섹에서 게이트 캠핑, 그리고 지금은 Goonswarm과 함께하는 널 생활까지 — 우주의 모든 영역에서 플레이했습니다.<br></br><br></br>본업으로 저는 프로그래머이며 <area404>Area 404</area404>를 운영합니다. 그래서 이 도구를 쓰기로 결심했습니다. 저는 EVE의 열성적인 탐험가라서 저에게 맞는 도구를 원했습니다.<br></br><br></br>Nexum은 오픈 소스이며 누구든 기여를 환영합니다. 여러분의 피드백과 마주친 버그를 정말 감사히 여기니 <gh>GitHub</gh>에 알려 주세요.",
+    "techStack1": "Nexum은 돈과 카페인으로 살 수 있는 최고의 우주 시대 재료로 엮여 있습니다. 프론트엔드는 <strong>React</strong>와 <strong>TypeScript</strong>입니다 — 컴파일러와 다투는 것이 그래도 널섹 연합과 다투는 것보다는 생산적이니까요. 지도는 <strong>ReactFlow</strong>로 렌더링되며, 노드를 끄는 온갖 번거로운 일을 처리해 줘서 제가 안 해도 됐습니다. 상태는 <strong>Zustand</strong>가 관리하는데, 기분 좋게 작고 단 한 번도 저에게 “그냥 Redux 써”라고 말한 적이 없습니다.",
+    "techStack2": "백엔드는 <strong>Node.js</strong>와 <strong>Express</strong>입니다 — 검증되고, 지루하며, 잘 작동합니다. 데이터는 <strong>PostgreSQL</strong>에 있으며 CCP의 정적 데이터 내보내기로 채워져, Nexum이 J213422가 무엇인지 ESI에 5초마다 묻지 않고도 진짜로 압니다. 인증은 <strong>EVE Online SSO</strong>가 처리합니다 — 당신의 자격 증명은 이 서버에 절대 닿지 않으며, 바로 그래야 마땅합니다.",
+    "techStack3": "실시간 성계 인텔리전스는 <strong>EVE ESI</strong>(CCP의 공식 API)에서, 킬 데이터는 <strong>zKillboard</strong>에서 옵니다. 전체는 <strong>Docker</strong>로 컨테이너화되고 <strong>nginx</strong> 프록시를 거치는데, 당신이 웜홀에서 쫓겨나는 동안 누군가는 불을 켜 두어야 하니까요.",
+    "faq": {
+      "whyNexum": {
+        "q": "왜 Nexum인가요?",
+        "a": "Nexum은 유대나 연결을 뜻하는 라틴어입니다 — 웜홀 성계 사이의 연결을 지도로 그리는 것을 중심으로 만든 도구에 어울려 보였습니다. 또한 C6 마그네타에 떠다니는 무언가처럼 어렴풋이 들리기도 하는데, 사실 그게 결정적인 요인이었습니다."
+      },
+      "multipleAccounts": {
+        "q": "여러 계정을 사용할 수 있나요?",
+        "a": "네 — 각 EVE 캐릭터는 자신만의 지도 세트를 가집니다. EVE SSO로 다른 캐릭터로 로그인하기만 하면 Nexum이 그들의 지도를 완전히 분리해 둡니다. 교차 오염도, 당신의 극비 웜홀 체인을 부캐 군단과 실수로 공유하는 일도 없습니다."
+      },
+      "dataSafe": {
+        "q": "내 데이터는 안전한가요?",
+        "a": "Nexum은 당신의 EVE 비밀번호를 절대 보지 않습니다 — 인증은 전적으로 CCP의 EVE SSO가 처리합니다. 저장되는 것은 당신의 캐릭터 신원과 당신이 만든 지도뿐입니다. 당신의 지도 데이터는 비공개 데이터베이스에 있으며 누구와도 공유되지 않습니다. 그렇긴 해도, 당신 연합의 극비 침공 경로에는 Nexum을 쓰지 마세요 — 인터넷의 어떤 도구도 좋은 작전 보안을 대신할 수 없습니다."
+      },
+      "reportBugs": {
+        "q": "버그를 보고하고, 피드백을 추가하고, 기능을 요청할 수 있나요?",
+        "a": "물론입니다. 이 프로젝트는 <gh>GitHub</gh>에서 오픈 소스입니다 — 버그나 기능 요청은 이슈를 열거나, 용감하다면 풀 리퀘스트를 제출하세요. GitHub이 취향이 아니라면 이 계정에 연결된 캐릭터로 게임 내 메일을 통한 피드백도 됩니다."
+      },
+      "runYourself": {
+        "q": "직접 운영할 수 있나요?",
+        "a": "네 — Nexum은 완전히 자체 호스팅 가능합니다. 소스는 <gh>GitHub</gh>에 있고 전체 스택은 단 한 번의 <code>docker compose up</code>으로 올라옵니다. SSO 자격 증명을 얻으려면 <devportal>CCP 개발자 포털</devportal>에서 자신의 EVE 애플리케이션을 등록해야 하지만, 그 외에는 README가 모든 것을 다룹니다 — EVE 정적 데이터 가져오기와, 원한다면 Traefik을 거기에 가리키는 것까지 포함해서요. 무언가 깨지면 이슈를 여세요. 고쳤다면 PR을 열어 주세요.<br></br><br></br>올리는 데 가장 기술적인 일은 아니지만, docker와 당신이 운영하는 서버(Linux?)에 대한 기본 지식은 갖추기를 권합니다."
+      },
+      "goonTrust": {
+        "q": "그런데 당신은 Goon이잖아요, 왜 믿어야 하죠?",
+        "a": "타당한 질문이고, 솔직히 뉴 에덴에서 가져야 할 올바른 직감입니다. 코드는 완전히 오픈 소스입니다 — 한 줄 한 줄 읽어도, 직접 운영해도, 믿는 사람에게 감사를 맡겨도 됩니다. Nexum은 당신의 스카우트 경로, 당신 군단의 killboard 흑역사, 또는 그 C5에 박아 둔 무언가에 아무 관심도 없습니다. Goon이 웜홀에서 한 가장 나쁜 일이라곤 거기서 쫓겨난 것뿐이고, 저는 당신이 그 운명을 피하도록 돕고 싶습니다."
+      },
+      "roadmap": {
+        "q": "새 기능에 대한 로드맵이 있나요?",
+        "a": "느슨하게요. 현재 시스템은 솔로 플레이어만 지원합니다. 다음으로 논리적인 일은 이것을 군단과 연합용으로 구현하는 것입니다. 이번 초기 출시의 버그를 다듬고 나면 그 작업을 시작하겠습니다.<br></br>물론 현실 일이 방해하지 않는다는 전제하에요!<br></br><br></br>꼭 원하는 기능이 있으면 게임 내에서 메시지를 주시면 이야기 나눠요."
+      },
+      "donateIsk": {
+        "q": "ISK를 기부할 수 있나요?",
+        "a": "안 하시는 편이 좋겠어요, 정말로. 저는 ISK를 위해 이걸 하는 게 아니니, 가지고 계시다가 뭔가를 타고 터지거나 남을 터뜨리는 데 쓰세요!"
+      }
+    },
+    "footer": "EVE Online과 EVE 로고는 CCP hf.의 등록 상표입니다. 전 세계 모든 권리 보유. Nexum은 제3자 도구이며 CCP hf.와 제휴하거나 그로부터 보증받지 않았습니다. · <license>라이선스 및 EVE IP 고지</license>"
+  },
+  "whInfo": {
+    "leadsTo": "연결 대상",
+    "lifetime": "수명",
+    "totalMass": "총 질량",
+    "maxJump": "최대 점프",
+    "infoAria": "{{code}} 정보",
+    "specTooltip": "{{code}} 사양"
+  },
+  "whPicker": {
+    "searchPlaceholder": "검색…",
+    "connectedSystems": "연결된 성계",
+    "other": "기타",
+    "inbound": "들어오는"
+  },
+  "npcStations": {
+    "loading": "정거장 불러오는 중…",
+    "none": "이 성계에 NPC 정거장이 없습니다",
+    "services": {
+      "market": "마켓",
+      "repairFacilities": "수리 시설",
+      "fitting": "피팅",
+      "factory": "공장",
+      "laboratory": "연구소",
+      "reprocessingPlant": "재처리 시설",
+      "cloning": "클로닝",
+      "cloneBay": "클론 베이",
+      "insurance": "보험",
+      "loyaltyPointStore": "로열티 포인트 상점",
+      "navyOffices": "해군 사무소",
+      "securityOffices": "보안 사무소",
+      "bountyMissions": "현상금 미션",
+      "bountyOffice": "현상금 사무소",
+      "assayOffice": "감정 사무소",
+      "officeRental": "사무소 임대",
+      "stockExchange": "증권 거래소",
+      "commodityTrading": "상품 거래",
+      "news": "뉴스",
+      "docking": "도킹",
+      "exploration": "탐사",
+      "blackMarket": "암시장",
+      "mentoring": "멘토링"
+    }
+  },
+  "shareView": {
+    "expiredTitle": "공유 링크 만료됨",
+    "expiredBody": "<strong>{{map}}</strong>의 이 공유 보기는 <strong>{{owner}}</strong> 님이 게시했으며 <strong>{{date}}</strong>에 만료되었습니다.",
+    "expiredHint": "{{owner}} 님에게 새 링크를 요청하세요.",
+    "notFoundTitle": "공유 링크를 찾을 수 없음",
+    "notFoundBody": "이 링크는 알려진 공유 지도와 일치하지 않습니다. 취소되었거나 URL이 잘못되었을 수 있습니다.",
+    "sharedBy": "<strong>{{owner}}</strong> 님이 공유함",
+    "cta": "지금 Nexum으로 지도를 만드세요!"
+  },
+  "routeToast": {
+    "destinationSet": "목적지가 {{system}}(으)로 설정됨",
+    "waypointAdded": "경유지 추가됨: {{system}}",
+    "failed": "경유지 설정 실패 — 당신의 캐릭터가 온라인인가요?"
+  },
+  "mapNode": {
+    "unknown": "알 수 없음",
+    "homeSystem": "홈 성계",
+    "characterFallback": "캐릭터 {{id}}",
+    "killsTooltip": "이번 시간 {{ships}} 함선 · {{pods}} 캡슐 킬",
+    "a0Sun": "A0 항성",
+    "iceBelt": "얼음 벨트 성계",
+    "incursion": "인커전 성계",
+    "insurgency": "반란 성계",
+    "stormTitle": "{{name}} 폭풍",
+    "stormLastReport": "마지막 보고: {{value}}",
+    "stormReportedBy": "보고자: {{value}}",
+    "statics": "고정홀",
+    "staging": "집결",
+    "incursionBadge": "인커전",
+    "corrupted": "부패됨",
+    "suppressed": "진압됨",
+    "scoutConnections_one": "{{name}} 연결",
+    "scoutConnections_other": "{{name}} 연결",
+    "scoutConnectionsMulti": "{{names}} 연결"
+  },
+  "mapEdge": {
+    "lessThan24h": "< 24h",
+    "lessThan4h": "< 4h",
+    "lessThan1h": "< 1h"
+  }
+}
