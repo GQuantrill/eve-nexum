@@ -206,7 +206,7 @@ function useShaderCanvas(canvasRef: React.RefObject<HTMLCanvasElement | null>) {
     const resLoc  = gl.getUniformLocation(prog, 'resolution');
 
     let rafId = 0;
-    let startTime = performance.now();
+    const startTime = performance.now();
 
     const resize = () => {
       canvas.width  = canvas.clientWidth  * devicePixelRatio;
@@ -249,7 +249,19 @@ function loginErrorKey(param: string): 'landing.errors.not_in_corp' | 'landing.e
 
 export function LandingPage() {
   const { t } = useTranslation();
-  const [lastChar, setLastChar] = useState<LastCharacter | null>(null);
+  // Read the stored last-login chip eagerly so it paints on first render (no
+  // null -> value flash). Also reads the older colon-separated key so returning
+  // users don't lose their chip; that legacy key is cleaned up in the effect below.
+  const [lastChar] = useState<LastCharacter | null>(() => {
+    try {
+      const stored = localStorage.getItem('nexum.last_character')
+        ?? localStorage.getItem('nexum:last_character');
+      return stored ? (JSON.parse(stored) as LastCharacter) : null;
+    } catch {
+      // localStorage may be unavailable or hold malformed JSON — fall back to none.
+      return null;
+    }
+  });
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useShaderCanvas(canvasRef);
@@ -257,15 +269,14 @@ export function LandingPage() {
   const errorParam = new URLSearchParams(window.location.search).get('error');
   const errorMessage = errorParam ? t(loginErrorKey(errorParam)) : null;
 
+  // One-time migration: drop the older colon-separated key now that its value
+  // (if any) has been folded into state above.
   useEffect(() => {
     try {
-      // Migrate the older colon-separated key transparently so returning users
-      // don't lose their stored last-login chip.
-      const stored = localStorage.getItem('nexum.last_character')
-        ?? localStorage.getItem('nexum:last_character');
-      if (stored) setLastChar(JSON.parse(stored) as LastCharacter);
       localStorage.removeItem('nexum:last_character');
-    } catch {}
+    } catch {
+      // ignore — storage may be unavailable (private mode, etc.)
+    }
   }, []);
 
   return (
