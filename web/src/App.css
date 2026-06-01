@@ -3441,6 +3441,15 @@ div.system-node__easy-handle {
     color: #e25a5a;
     &:hover { border-color: #e25a5a; color: #ff6b6b; }
   }
+
+  /* Toggle-on state (e.g. overwrite-on-paste): filled accent so the active
+     mode is obvious at a glance. */
+  &--active {
+    border-color: #5a9af8;
+    background: rgba(90, 154, 248, 0.16);
+    color: #cfe0ff;
+    &:hover { border-color: #7ab0ff; color: #e8f0ff; }
+  }
 }
 
 /* Native <select> uses the page background for the dropdown panel and OS

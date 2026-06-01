@@ -699,6 +699,8 @@
     "deleteAllConfirm_one": "Alle {{count}} Signatur löschen?",
     "deleteAllConfirm_other": "Alle {{count}} Signaturen löschen?",
     "addSignature": "Signatur hinzufügen",
+    "overwriteToggle": "Beim Einfügen überschreiben",
+    "overwriteTooltip": "Wenn aktiv, ersetzt das Einfügen die Liste — Signaturen, die nicht mehr im Scan sind, werden entfernt. Oder halte beim Einfügen Umschalt gedrückt, um nur einmal zu überschreiben.",
     "setTypeAria": "Typ für ausgewählte Signaturen festlegen",
     "setType": "Typ festlegen ({{count}})…",
     "deleteSelected": "Ausgewählte löschen ({{count}})",

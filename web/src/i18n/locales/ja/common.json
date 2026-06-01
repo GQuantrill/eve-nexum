@@ -699,6 +699,8 @@
     "deleteAllConfirm_one": "{{count}} 件のシグネチャをすべて削除しますか？",
     "deleteAllConfirm_other": "{{count}} 件のシグネチャをすべて削除しますか？",
     "addSignature": "シグネチャを追加",
+    "overwriteToggle": "貼り付け時に上書き",
+    "overwriteTooltip": "オンにすると、貼り付けでリストを置き換えます — スキャンに存在しなくなったシグネチャは削除されます。または貼り付け時に Shift を押すと一度だけ上書きします。",
     "setTypeAria": "選択したシグネチャのタイプを設定",
     "setType": "タイプを設定（{{count}}）…",
     "deleteSelected": "選択を削除（{{count}}）",

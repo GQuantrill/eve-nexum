@@ -699,6 +699,8 @@
     "deleteAllConfirm_one": "Delete all {{count}} signature?",
     "deleteAllConfirm_other": "Delete all {{count}} signatures?",
     "addSignature": "Add signature",
+    "overwriteToggle": "Overwrite on paste",
+    "overwriteTooltip": "When on, pasting replaces the list — signatures no longer in the scan are removed. Or hold Shift while pasting to overwrite just once.",
     "setTypeAria": "Set type for selected signatures",
     "setType": "Set type ({{count}})…",
     "deleteSelected": "Delete selected ({{count}})",

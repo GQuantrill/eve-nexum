@@ -699,6 +699,8 @@
     "deleteAllConfirm_one": "删除全部 {{count}} 个信号？",
     "deleteAllConfirm_other": "删除全部 {{count}} 个信号？",
     "addSignature": "添加信号",
+    "overwriteToggle": "粘贴时覆盖",
+    "overwriteTooltip": "开启后，粘贴会替换列表——扫描中已不存在的信号会被移除。或在粘贴时按住 Shift 仅覆盖一次。",
     "setTypeAria": "为选定信号设置类型",
     "setType": "设置类型（{{count}}）…",
     "deleteSelected": "删除选定（{{count}}）",

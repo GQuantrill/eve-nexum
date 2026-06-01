@@ -699,6 +699,8 @@
     "deleteAllConfirm_one": "{{count}}개 시그니처를 모두 삭제할까요?",
     "deleteAllConfirm_other": "{{count}}개 시그니처를 모두 삭제할까요?",
     "addSignature": "시그니처 추가",
+    "overwriteToggle": "붙여넣기 시 덮어쓰기",
+    "overwriteTooltip": "켜면 붙여넣기가 목록을 대체합니다 — 스캔에 더 이상 없는 시그니처는 제거됩니다. 또는 붙여넣을 때 Shift를 누르면 한 번만 덮어씁니다.",
     "setTypeAria": "선택한 시그니처의 유형 설정",
     "setType": "유형 설정 ({{count}})…",
     "deleteSelected": "선택 항목 삭제 ({{count}})",

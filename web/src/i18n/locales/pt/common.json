@@ -699,6 +699,8 @@
     "deleteAllConfirm_one": "Eliminar {{count}} assinatura?",
     "deleteAllConfirm_other": "Eliminar as {{count}} assinaturas?",
     "addSignature": "Adicionar assinatura",
+    "overwriteToggle": "Substituir ao colar",
+    "overwriteTooltip": "Quando ativo, colar substitui a lista — as assinaturas que já não estão no scan são removidas. Ou mantenha Shift ao colar para substituir apenas uma vez.",
     "setTypeAria": "Definir o tipo das assinaturas selecionadas",
     "setType": "Definir tipo ({{count}})…",
     "deleteSelected": "Eliminar selecionadas ({{count}})",
