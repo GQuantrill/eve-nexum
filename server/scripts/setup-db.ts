@@ -17,7 +17,7 @@
 
 import 'dotenv/config';
 import { createWriteStream, existsSync, readdirSync, readFileSync } from 'node:fs';
-import { mkdir } from 'node:fs/promises';
+import { mkdir, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { pipeline } from 'node:stream/promises';
 import { Readable, Transform } from 'node:stream';
@@ -110,6 +110,16 @@ async function main() {
   await seedRegionNpcTypes();
 
   if (importedVer) await setStoredSdeVersion(importedVer);
+
+  // Reclaim disk: drop the downloaded zip now that it's imported. The re-import
+  // path always re-downloads a fresh copy, so the cached zip is never reused
+  // between runs — keeping it just wastes ~80 MB. Only the runtime download is
+  // removed; the versioned zip baked into the image under data/ is left alone.
+  if (resolved.path === SDE_ZIP) {
+    await rm(SDE_ZIP, { force: true }).catch((err) => {
+      console.warn(`Could not remove cached SDE zip: ${(err as Error).message}`);
+    });
+  }
 
   await db.end();
   console.log(`\nSetup complete${importedVer ? ` (SDE build ${importedVer})` : ''}.`);
