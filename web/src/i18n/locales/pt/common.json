@@ -637,6 +637,9 @@
     "sortShortest": "Rota mais curta",
     "sortSecure": "Rota segura"
   },
+  "route": {
+    "fromLastKnown": "Saltos a partir de {{system}} (última localização conhecida)"
+  },
   "activity": {
     "thisHour": "esta hora",
     "allHidden": "Todos os gráficos ocultos. Ativa-os em Opções de mapa → Atividade.",

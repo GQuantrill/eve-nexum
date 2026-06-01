@@ -637,6 +637,9 @@
     "sortShortest": "最短ルート",
     "sortSecure": "安全ルート"
   },
+  "route": {
+    "fromLastKnown": "{{system}} からのジャンプ数（最後に確認された位置）"
+  },
   "activity": {
     "thisHour": "今時間",
     "allHidden": "すべてのグラフが非表示です。マップオプション → アクティビティ でオンにしてください。",

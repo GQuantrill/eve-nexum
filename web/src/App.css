@@ -464,6 +464,14 @@
   font-style: italic;
   border-bottom: 1px solid #141c2e;
 }
+/* Shown when jump counts are computed from the pilot's last known system
+   (offline) rather than their live location — flag it so stale jumps are
+   obvious. */
+.scout-pane__note--lastknown {
+  color: #c8a45a;
+  font-style: normal;
+  background: rgba(200, 164, 90, 0.08);
+}
 
 /* ── Toolbar ─────────────────────────────────────────────── */
 .toolbar {

@@ -637,6 +637,9 @@
     "sortShortest": "最短路线",
     "sortSecure": "安全路线"
   },
+  "route": {
+    "fromLastKnown": "从 {{system}} 起的跳跃数（最后已知位置）"
+  },
   "activity": {
     "thisHour": "本小时",
     "allHidden": "所有图表已隐藏。在地图选项 → 活动中开启它们。",

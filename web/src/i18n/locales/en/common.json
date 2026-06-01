@@ -637,6 +637,9 @@
     "sortShortest": "Shortest route",
     "sortSecure": "Secure route"
   },
+  "route": {
+    "fromLastKnown": "Jumps from {{system}} (last known location)"
+  },
   "activity": {
     "thisHour": "this hour",
     "allHidden": "All charts hidden. Toggle them on in Map Options → Activity.",

@@ -637,6 +637,9 @@
     "sortShortest": "Kürzeste Route",
     "sortSecure": "Sichere Route"
   },
+  "route": {
+    "fromLastKnown": "Sprünge ab {{system}} (letzter bekannter Standort)"
+  },
   "activity": {
     "thisHour": "diese Stunde",
     "allHidden": "Alle Diagramme ausgeblendet. Aktiviere sie unter Kartenoptionen → Aktivität.",

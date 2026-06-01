@@ -637,6 +637,9 @@
     "sortShortest": "최단 경로",
     "sortSecure": "안전 경로"
   },
+  "route": {
+    "fromLastKnown": "{{system}}에서의 점프 (마지막으로 확인된 위치)"
+  },
   "activity": {
     "thisHour": "이번 시간",
     "allHidden": "모든 그래프가 숨겨져 있습니다. 지도 옵션 → 활동에서 켜세요.",
