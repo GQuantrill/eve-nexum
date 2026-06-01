@@ -22,6 +22,7 @@
   - [Docker (recommended)](#option-1--docker-recommended)
   - [Local development](#option-2--local-development)
   - [EVE developer app scopes](#eve-developer-app-scopes)
+  - [Updating the SDE](#updating-the-sde)
   - [Refreshing wormhole types](#refreshing-wormhole-types)
   - [Upgrading an existing deployment](#upgrading-an-existing-deployment)
 - [Corp mode](#corp-mode)
@@ -232,7 +233,7 @@ docker compose up -d
 
 The app will be available on port `${WEB_PORT:-80}` (defaults to `80`).
 
-The import is self-skipping: on every later `up` or restart the importer sees the static tables are already populated and exits in a second without re-downloading. So the two commands above are also your update flow. To force a re-import (e.g. after a CCP SDE drop), see [Updating the SDE](#installation) below.
+The import is self-skipping: on every later `up` or restart the importer sees the static tables are already populated and exits in a second without re-downloading. So the two commands above are also your update flow. To force a re-import (e.g. after a CCP SDE drop), see [Updating the SDE](#updating-the-sde) below.
 
 The importer also stores each system's universe coordinates and CCP's 2D star-map projection (`position` / `position2D`), which power the [Seed a map from a region](#features) feature.
 
@@ -252,9 +253,11 @@ Traefik will handle TLS termination and HTTP→HTTPS redirects. The `docker-comp
 
 App-schema migrations (`users`, `maps`, `map_signatures`, etc.) layer on automatically the first time the server boots — no manual step.
 
-**4. Updating the SDE (after a CCP data drop)**
+#### Updating the SDE
 
-This is automatic — you don't normally do anything. The server checks once a day (default **11:30 UTC**, just after the 11:00 downtime when CCP publishes the new export) whether a newer SDE build exists. The check is cheap: a single `HEAD` request reads the build number from CCP's "latest" redirect (`…/eve-online-static-data-<build>-jsonl.zip`) and compares it to the build recorded in the `sde_meta` table. If — and only if — the build changed, the server downloads the new export, re-seeds the static tables, and reloads its in-memory route graph in place. No new build, no download; a re-seed needs no restart.
+The static data (systems, stargates, item types, dogma — everything CCP ships in the Static Data Export) is imported into Postgres at first boot and kept current from there. Here's how it stays up to date, how to force it, and how to check which build you're on.
+
+**Automatic (the default — you normally do nothing).** The server checks once a day (default **11:30 UTC**, just after the 11:00 downtime when CCP publishes the new export) — plus a catch-up a few minutes after every restart, so a deploy that missed the daily slot, or a build CCP publishes off-cycle, doesn't leave you stale for ~24h. The check is cheap: a single `HEAD` request reads the build number from CCP's "latest" redirect (`…/eve-online-static-data-<build>-jsonl.zip`) and compares it to the build recorded in the `sde_meta` table. If — and only if — the build changed, the server downloads the new export, re-seeds the static tables, reloads its in-memory route graph in place, then **deletes the downloaded zip** so it doesn't sit on disk. No new build, no download; a re-seed needs no restart.
 
 The re-seed is upsert-only (`ON CONFLICT DO UPDATE` on every table), so it's safe — your user data (maps, signatures, structures, sessions, etc.) lives in other tables and is never touched.
 
@@ -265,11 +268,36 @@ Tune it via `.env`:
 | `SDE_AUTO_UPDATE` | `1` (on) | Set to `0` to disable the daily check entirely. |
 | `SDE_CHECK_UTC` | `11:30` | Time of day (HH:MM, UTC) to run the check. |
 
-To force a re-import immediately (e.g. to test, or if you disabled the daily check), run the importer with `FORCE_SDE_IMPORT=1`:
+**Forcing an update now** (e.g. to test, right after a known CCP drop, or if you disabled the daily check). Run the importer with `FORCE_SDE_IMPORT=1` — it downloads the latest export and re-seeds regardless of the recorded build:
 
 ```bash
+# Docker
 docker compose run --rm -e FORCE_SDE_IMPORT=1 importer
 ```
+
+```bash
+# Local development (Postgres on localhost)
+cd server && FORCE_SDE_IMPORT=1 yarn setup-db
+```
+
+**Checking which build you're on.** `GET /api/sde/version` is public and browser-callable — it reports the build this instance is running against the latest CCP currently offers, so you can confirm an update landed (or see that one is pending):
+
+```jsonc
+// GET /api/sde/version
+{
+  "installed":   "3365090",                  // build imported into this DB (null if never seeded)
+  "installedAt": "2026-05-29T11:29:00.000Z", // when that build was imported
+  "latest":      "3368760",                  // latest build CCP offers (null if CCP unreachable)
+  "latestCheckedAt": "2026-06-02T11:30:00.000Z", // when THIS endpoint last queried CCP (cached)
+  "upToDate":    false,                       // true | false | null (unknown)
+  "autoUpdate":  true,                        // is the daily auto-update enabled?
+  "autoCheck": { "at": "2026-06-02T11:30:12.000Z", "result": "updated" } // last auto-update run (null until one fires)
+}
+```
+
+`installed` vs `latest` are directly comparable — both are CCP build numbers from the same source the importer uses. `upToDate` is `null` ("unknown") rather than a misleading `false` when either build can't be determined (CCP unreachable, or a never-seeded DB).
+
+Two timestamps that are easy to confuse: **`latestCheckedAt`** is when *this endpoint* last asked CCP for the latest build (cached — a single `HEAD`, 1 h on success / 5 min after a failure, so the endpoint is cheap to poll). **`autoCheck`** is when the *auto-updater* itself last ran and what it did (`updated` / `unchanged` / `error` / `skipped`) — that's the field to watch to confirm the daily check is actually firing. It's `null` until the first check runs in the current process. For the full picture, the server also logs each run under the `sde-update` tag (`docker compose logs server | grep sde-update`).
 
 #### Refreshing wormhole types
 
@@ -496,6 +524,8 @@ Each tab is also reachable at its own hash route (`#/admin/maps`, `#/admin/audit
 ## Static data files
 
 Some pre-computed lookups live in `server/data/` as plain JSON, derived once from the EVE Static Data Export (SDE). They're committed to the repo so a fresh install works without an extra step. You only need to regenerate them when CCP releases an SDE drop that adds or changes the underlying data.
+
+The SDE tables themselves (systems, stargates, dogma, …) are imported into Postgres separately and kept current automatically — see [Updating the SDE](#updating-the-sde) for how that works, how to force it, and the `GET /api/sde/version` endpoint for checking which build you're on.
 
 > **A0 sun systems** (`typeID 3801`, "Sun A0 (Blue Small)") used to live here as `data/a0-systems.json`. They're now flagged on `solar_systems.is_a0` directly by the SDE importer (from `mapStars.jsonl`) and served via `GET /api/systems/a0`, so they refresh automatically on every SDE re-seed — no committed file, no manual regen. Note this is the in-game A0 classification (`typeID 3801`), not the SDE's `statistics.spectralClass` field; the two don't agree.
 
