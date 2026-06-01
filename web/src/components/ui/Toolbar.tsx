@@ -179,6 +179,8 @@ export function Toolbar() {
   const mapName         = useMapStore((s) => s.map.name);
   const mapLocked       = useMapStore((s) => !!s.map.locked);
   const systemCount     = useMapStore((s) => s.map.systems.length);
+  const mapSystems      = useMapStore((s) => s.map.systems);
+  const requestCenterOnEveSystem = useMapStore((s) => s.requestCenterOnEveSystem);
   const connectionCount = useMapStore((s) => s.map.connections.length);
   const maps            = useMapStore((s) => s.maps);
   const maxMaps         = useMapStore((s) => s.maxMaps);
@@ -212,6 +214,10 @@ export function Toolbar() {
   // in EVE, otherwise the last known system from their profile.
   const shownSystem = (locOnline && liveSystem?.name) ? liveSystem.name : (user?.lastKnownSystem?.name ?? null);
   const shownSystemIsLast = !(locOnline && liveSystem?.name);
+  const shownSystemEveId = (locOnline && liveSystem?.eveSystemId) ? liveSystem.eveSystemId : (user?.lastKnownSystem?.id ?? null);
+  // Clicking the system centres the map on it — but only when it's actually on
+  // the current map.
+  const shownSystemOnMap = shownSystemEveId != null && mapSystems.some((s) => s.eveSystemId === shownSystemEveId);
   const eveStatus = useEveServerStatus();
   const [showMaps, setShowMaps]   = useState(false);
   const [showStats, setShowStats] = useState(false);
@@ -456,7 +462,17 @@ export function Toolbar() {
               )}
             </span>
             <div className="toolbar__char-sub">
-              {shownSystem && (
+              {shownSystem && (shownSystemOnMap ? (
+                <button
+                  type="button"
+                  className="toolbar__char-system toolbar__char-system--clickable"
+                  data-tooltip={t('toolbar.centerOnSystem', { system: shownSystem })}
+                  onClick={() => { if (shownSystemEveId != null) requestCenterOnEveSystem(shownSystemEveId); }}
+                >
+                  <MapPinIcon size={11} weight="fill" />
+                  {shownSystem}
+                </button>
+              ) : (
                 <span
                   className="toolbar__char-system"
                   data-tooltip={shownSystemIsLast ? t('toolbar.lastKnownSystem') : t('toolbar.currentSystem')}
@@ -464,7 +480,7 @@ export function Toolbar() {
                   <MapPinIcon size={11} weight="fill" />
                   {shownSystem}
                 </span>
-              )}
+              ))}
               {checkedAt && <CheckedAtIcon checkedAt={checkedAt} />}
             </div>
           </div>

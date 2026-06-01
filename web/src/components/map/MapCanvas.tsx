@@ -118,6 +118,8 @@ export function MapCanvas() {
   const clearAutoLayoutPending = useMapStore((s) => s.clearAutoLayoutPending);
   const fitViewPending       = useMapStore((s) => s.fitViewPending);
   const clearFitView         = useMapStore((s) => s.clearFitView);
+  const centerRequestEveId   = useMapStore((s) => s.centerRequestEveId);
+  const clearCenterRequest   = useMapStore((s) => s.clearCenterRequest);
   const pushUndo             = useMapStore((s) => s.pushUndo);
   const canEdit              = useCanEdit();
   const { screenToFlowPosition, setViewport, getNode, getNodes, getZoom, fitView } = useReactFlow();
@@ -156,11 +158,11 @@ export function MapCanvas() {
     [systems, removeSystem, setNodes, canEdit],
   );
 
-  const centerOnSystem = useCallback((systemId: string) => {
+  const centerOnSystem = useCallback((systemId: string, zoomOverride?: number) => {
     const node = getNode(systemId);
     if (!node) return false;
 
-    const zoom   = getZoom();
+    const zoom   = zoomOverride ?? getZoom();
     const flowX  = node.position.x + (node.measured?.width  ?? 150) / 2;
     const flowY  = node.position.y + (node.measured?.height ?? 80)  / 2;
 
@@ -197,6 +199,20 @@ export function MapCanvas() {
     });
     return () => cancelAnimationFrame(raf);
   }, [lastKnownSystemId, nodes, systems, centerOnSystem, clearFitView]);
+
+  // Centre + zoom on an explicitly requested system (e.g. clicking the pilot's
+  // location in the toolbar). Zooms in if currently zoomed out; no-op when the
+  // system isn't on this map. Clears the request either way.
+  useEffect(() => {
+    if (centerRequestEveId == null) return;
+    const target = systems.find((s) => s.eveSystemId === centerRequestEveId);
+    const zoom = Math.max(getZoom(), 1.1);
+    const raf = requestAnimationFrame(() => {
+      if (target) centerOnSystem(target.id, zoom);
+      clearCenterRequest();
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [centerRequestEveId, systems, centerOnSystem, getZoom, clearCenterRequest]);
 
   // Preserve rubber-band selection when Shift is released before the mouse button.
   // React Flow clears the selection on Shift keyup, so we capture it just before.

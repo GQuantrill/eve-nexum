@@ -806,6 +806,7 @@
     "checkedAgo": "geprüft {{time}}",
     "lastKnownSystem": "Letztes bekanntes System",
     "currentSystem": "Aktuelles System",
+    "centerOnSystem": "Karte auf {{system}} zentrieren",
     "deleteMapConfirm": "\"{{name}}\" löschen? Dies kann nicht rückgängig gemacht werden.",
     "online": {
       "offline": "Offline",

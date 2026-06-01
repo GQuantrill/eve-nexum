@@ -806,6 +806,7 @@
     "checkedAgo": "checked {{time}}",
     "lastKnownSystem": "Last known system",
     "currentSystem": "Current system",
+    "centerOnSystem": "Centre the map on {{system}}",
     "deleteMapConfirm": "Delete \"{{name}}\"? This cannot be undone.",
     "online": {
       "offline": "Offline",

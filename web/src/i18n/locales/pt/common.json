@@ -806,6 +806,7 @@
     "checkedAgo": "verificado {{time}}",
     "lastKnownSystem": "Último sistema conhecido",
     "currentSystem": "Sistema atual",
+    "centerOnSystem": "Centrar o mapa em {{system}}",
     "deleteMapConfirm": "Eliminar «{{name}}»? Esta ação não pode ser desfeita.",
     "online": {
       "offline": "Offline",

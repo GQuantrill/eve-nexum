@@ -806,6 +806,7 @@
     "checkedAgo": "vérifié {{time}}",
     "lastKnownSystem": "Dernier système connu",
     "currentSystem": "Système actuel",
+    "centerOnSystem": "Centrer la carte sur {{system}}",
     "deleteMapConfirm": "Supprimer « {{name}} » ? Cette action est irréversible.",
     "online": {
       "offline": "Hors ligne",

@@ -838,6 +838,7 @@
     "checkedAgo": "проверено {{time}}",
     "lastKnownSystem": "Последняя известная система",
     "currentSystem": "Текущая система",
+    "centerOnSystem": "Центрировать карту на {{system}}",
     "deleteMapConfirm": "Удалить «{{name}}»? Это нельзя отменить.",
     "online": {
       "offline": "Офлайн",

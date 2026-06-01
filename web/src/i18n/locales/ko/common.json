@@ -806,6 +806,7 @@
     "checkedAgo": "{{time}} 확인됨",
     "lastKnownSystem": "마지막으로 확인된 성계",
     "currentSystem": "현재 성계",
+    "centerOnSystem": "지도를 {{system}}(으)로 이동",
     "deleteMapConfirm": "“{{name}}”을(를) 삭제할까요? 이 작업은 취소할 수 없습니다.",
     "online": {
       "offline": "오프라인",

@@ -806,6 +806,7 @@
     "checkedAgo": "检查于 {{time}}",
     "lastKnownSystem": "最后已知星系",
     "currentSystem": "当前星系",
+    "centerOnSystem": "将地图居中到 {{system}}",
     "deleteMapConfirm": "删除「{{name}}」？此操作无法撤销。",
     "online": {
       "offline": "离线",

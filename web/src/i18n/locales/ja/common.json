@@ -806,6 +806,7 @@
     "checkedAgo": "{{time}} 確認",
     "lastKnownSystem": "最後に確認されたシステム",
     "currentSystem": "現在のシステム",
+    "centerOnSystem": "マップを {{system}} に移動",
     "deleteMapConfirm": "「{{name}}」を削除しますか？この操作は取り消せません。",
     "online": {
       "offline": "オフライン",
