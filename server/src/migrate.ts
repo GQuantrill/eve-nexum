@@ -467,6 +467,25 @@ export async function migrate() {
     CREATE UNIQUE INDEX IF NOT EXISTS uq_map_shares_corp ON map_shares (map_id, target_corp_id)      WHERE target_corp_id      IS NOT NULL;
     CREATE INDEX IF NOT EXISTS idx_map_shares_char ON map_shares (target_character_id) WHERE target_character_id IS NOT NULL;
     CREATE INDEX IF NOT EXISTS idx_map_shares_corp ON map_shares (target_corp_id)      WHERE target_corp_id      IS NOT NULL;
+
+    -- Last known solar system per user, updated from the ESI location poll as
+    -- the pilot jumps. Lets the profile remember where they were last seen.
+    -- INTEGER to match solar_systems.id (SDE-seeded); nullable until the first
+    -- poll lands. No FK — system ids are immutable SDE data.
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS last_known_system_id INTEGER;
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS last_known_system_at TIMESTAMPTZ;
+    -- Normalise the column to INTEGER for any DB that got the earlier BIGINT
+    -- definition (BIGINT comes back from node-pg as a string, which breaks the
+    -- numeric id comparison on the client). Guarded so it only rewrites once.
+    DO $$
+    BEGIN
+      IF EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_name = 'users' AND column_name = 'last_known_system_id' AND data_type = 'bigint'
+      ) THEN
+        ALTER TABLE users ALTER COLUMN last_known_system_id TYPE INTEGER;
+      END IF;
+    END $$;
   `);
 
   await encryptLegacyTokens();

@@ -39,6 +39,7 @@
       "colRole": "Роль",
       "colStatus": "Статус",
       "colLastLogin": "Последний вход",
+      "colLastKnown": "Последняя известная система",
       "you": "вы",
       "blocked": "заблокирован",
       "active": "активен",
@@ -125,6 +126,7 @@
         "colCorp": "Корп",
         "colAlliance": "Альянс",
         "colLastLogin": "Последний вход",
+        "colLastKnown": "Последняя известная система",
         "colSystemsAdded": "Систем добавлено",
         "colSystemsDeleted": "Систем удалено",
         "colLastCorpStructure": "Последняя корп-структура",
@@ -663,6 +665,9 @@
     "sortShortest": "Кратчайший маршрут",
     "sortSecure": "Безопасный маршрут"
   },
+  "route": {
+    "fromLastKnown": "Прыжки от {{system}} (последнее известное местоположение)"
+  },
   "activity": {
     "thisHour": "за этот час",
     "allHidden": "Все графики скрыты. Включите их в Параметры карты → Активность.",
@@ -831,6 +836,9 @@
     "signOut": "Выйти",
     "role": "Роль: {{role}}",
     "checkedAgo": "проверено {{time}}",
+    "lastKnownSystem": "Последняя известная система",
+    "currentSystem": "Текущая система",
+    "centerOnSystem": "Центрировать карту на {{system}}",
     "deleteMapConfirm": "Удалить «{{name}}»? Это нельзя отменить.",
     "online": {
       "offline": "Офлайн",

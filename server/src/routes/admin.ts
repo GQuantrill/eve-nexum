@@ -119,6 +119,9 @@ adminReadRouter.get('/users', async (_req, res) => {
     lastLogin:       string;
     totalEvents:     number;
     totalSignatures: number;
+    lastKnownSystemId:   number | null;
+    lastKnownSystemName: string | null;
+    lastKnownSystemAt:   string | null;
   }>(`
     SELECT
       u.id,
@@ -131,8 +134,12 @@ adminReadRouter.get('/users', async (_req, res) => {
       u.created_at     AS "createdAt",
       u.updated_at     AS "lastLogin",
       COALESCE(e.cnt, 0) AS "totalEvents",
-      COALESCE(s.cnt, 0) AS "totalSignatures"
+      COALESCE(s.cnt, 0) AS "totalSignatures",
+      u.last_known_system_id AS "lastKnownSystemId",
+      lks.name               AS "lastKnownSystemName",
+      u.last_known_system_at AS "lastKnownSystemAt"
     FROM users u
+    LEFT JOIN solar_systems lks ON lks.id = u.last_known_system_id
     LEFT JOIN (
       SELECT user_id, COUNT(*)::int AS cnt FROM user_events GROUP BY user_id
     ) e ON e.user_id = u.id
@@ -663,6 +670,8 @@ reportsRouter.get('/users', async (req, res) => {
       u.corp_id        AS "corpId",
       u.alliance_id    AS "allianceId",
       u.updated_at     AS "lastLogin",
+      u.last_known_system_id AS "lastKnownSystemId",
+      lks.name               AS "lastKnownSystemName",
       lcs.ts           AS "lastCorpSigAt",
       lcst.ts          AS "lastCorpStructAt",
       COALESCE(lcst.cnt, 0) AS "totalCorpStructures",
@@ -682,6 +691,7 @@ reportsRouter.get('/users', async (req, res) => {
         '{}'::jsonb
       ) AS "sigTypeCounts"
     FROM users u
+    LEFT JOIN solar_systems    lks  ON lks.id       = u.last_known_system_id
     LEFT JOIN last_corp_sig    lcs  ON lcs.user_id  = u.id
     LEFT JOIN last_corp_struct lcst ON lcst.user_id = u.id
     ${inclusionWhere}

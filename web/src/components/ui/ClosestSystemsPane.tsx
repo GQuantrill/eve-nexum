@@ -7,12 +7,12 @@ import { SortableContext, useSortable, verticalListSortingStrategy, arrayMove } 
 import { CSS } from '@dnd-kit/utilities';
 import { MapPinSimpleIcon, PathIcon, XIcon, PlusIcon, HouseIcon } from '@phosphor-icons/react';
 import { useShallow } from 'zustand/react/shallow';
-import { useCharacterLocation } from '../../hooks/useCharacterLocation';
 import { useRoute, type RouteEntry } from '../../hooks/useRoute';
 import { useEsiSearch } from '../../hooks/useEsiSearch';
 import { useMapStore } from '../../store/mapStore';
 import { useUserSetting } from '../../hooks/useUserSetting';
-import { setWaypoint, RouteSquares, KSPACE_CLASSES } from './routeUi';
+import { setWaypoint, RouteSquares } from './routeUi';
+import { useRouteOrigin } from '../../hooks/useRouteOrigin';
 import { jumps as jumpsLabel } from '../../i18n/format';
 
 // EVE system IDs for the major trade hubs. Used as the initial seed only —
@@ -151,7 +151,7 @@ function Row({ item, route, isOpen, onToggle, onRemove, routeMode }: RowProps) {
 
 export function ClosestSystemsPane() {
   const { t } = useTranslation();
-  const location  = useCharacterLocation();
+  const origin    = useRouteOrigin();
   const routeMode = useMapStore((s) => s.routeMode);
   const homeSystem = useMapStore(useShallow((s) => {
     const found = s.map.systems.find((sys) => sys.isHome && sys.eveSystemId != null);
@@ -194,10 +194,7 @@ export function ClosestSystemsPane() {
     };
   }, [adding, results, query]);
 
-  const canRoute =
-    location.online &&
-    location.system !== null &&
-    KSPACE_CLASSES.has(location.system.systemClass);
+  const canRoute = origin.systemId !== null;
 
   // Items = home (auto, if present and not in list and not hidden) ++
   // user list. Every row is removable. Removing the auto-home row hides
@@ -218,7 +215,7 @@ export function ClosestSystemsPane() {
   }, [list, homeSystem, hiddenHome]);
 
   const targetIds = useMemo(() => items.map((i) => i.id), [items]);
-  const routes    = useRoute(canRoute ? location.system!.eveSystemId : null, targetIds);
+  const routes    = useRoute(origin.systemId, targetIds);
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
 
@@ -312,6 +309,9 @@ export function ClosestSystemsPane() {
 
   return (
     <div className="scout-pane">
+      {origin.fromLastKnown && origin.name && (
+        <div className="scout-pane__note scout-pane__note--lastknown">{t('route.fromLastKnown', { system: origin.name })}</div>
+      )}
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
         <SortableContext items={items.map((i) => String(i.id))} strategy={verticalListSortingStrategy}>
           {items.map((i) => (

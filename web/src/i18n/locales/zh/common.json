@@ -39,6 +39,7 @@
       "colRole": "权限",
       "colStatus": "状态",
       "colLastLogin": "上次登录",
+      "colLastKnown": "最后已知星系",
       "you": "你",
       "blocked": "已封禁",
       "active": "活跃",
@@ -125,6 +126,7 @@
         "colCorp": "军团",
         "colAlliance": "联盟",
         "colLastLogin": "上次登录",
+        "colLastKnown": "最后已知星系",
         "colSystemsAdded": "添加的星系",
         "colSystemsDeleted": "删除的星系",
         "colLastCorpStructure": "上次军团建筑",
@@ -637,6 +639,9 @@
     "sortShortest": "最短路线",
     "sortSecure": "安全路线"
   },
+  "route": {
+    "fromLastKnown": "从 {{system}} 起的跳跃数（最后已知位置）"
+  },
   "activity": {
     "thisHour": "本小时",
     "allHidden": "所有图表已隐藏。在地图选项 → 活动中开启它们。",
@@ -799,6 +804,9 @@
     "signOut": "登出",
     "role": "权限：{{role}}",
     "checkedAgo": "检查于 {{time}}",
+    "lastKnownSystem": "最后已知星系",
+    "currentSystem": "当前星系",
+    "centerOnSystem": "将地图居中到 {{system}}",
     "deleteMapConfirm": "删除「{{name}}」？此操作无法撤销。",
     "online": {
       "offline": "离线",

@@ -39,6 +39,7 @@
       "colRole": "Rolle",
       "colStatus": "Status",
       "colLastLogin": "Letzter Login",
+      "colLastKnown": "Letztes bekanntes System",
       "you": "du",
       "blocked": "gesperrt",
       "active": "aktiv",
@@ -125,6 +126,7 @@
         "colCorp": "Corp",
         "colAlliance": "Allianz",
         "colLastLogin": "Letzter Login",
+        "colLastKnown": "Letztes bekanntes System",
         "colSystemsAdded": "Systeme hinzugefügt",
         "colSystemsDeleted": "Systeme gelöscht",
         "colLastCorpStructure": "Letzte Corp-Struktur",
@@ -637,6 +639,9 @@
     "sortShortest": "Kürzeste Route",
     "sortSecure": "Sichere Route"
   },
+  "route": {
+    "fromLastKnown": "Sprünge ab {{system}} (letzter bekannter Standort)"
+  },
   "activity": {
     "thisHour": "diese Stunde",
     "allHidden": "Alle Diagramme ausgeblendet. Aktiviere sie unter Kartenoptionen → Aktivität.",
@@ -799,6 +804,9 @@
     "signOut": "Abmelden",
     "role": "Rolle: {{role}}",
     "checkedAgo": "geprüft {{time}}",
+    "lastKnownSystem": "Letztes bekanntes System",
+    "currentSystem": "Aktuelles System",
+    "centerOnSystem": "Karte auf {{system}} zentrieren",
     "deleteMapConfirm": "\"{{name}}\" löschen? Dies kann nicht rückgängig gemacht werden.",
     "online": {
       "offline": "Offline",

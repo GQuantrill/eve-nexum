@@ -102,9 +102,12 @@ interface AdminUser {
   lastLogin:       string;
   totalEvents:     number;
   totalSignatures: number;
+  lastKnownSystemId:   number | null;
+  lastKnownSystemName: string | null;
+  lastKnownSystemAt:   string | null;
 }
 
-type UserSortKey = 'characterName' | 'corpTicker' | 'allianceTicker' | 'role' | 'blocked' | 'lastLogin';
+type UserSortKey = 'characterName' | 'corpTicker' | 'allianceTicker' | 'role' | 'blocked' | 'lastLogin' | 'lastKnownSystemName';
 interface UserSort { key: UserSortKey; dir: 'asc' | 'desc' }
 
 // Click-to-sort header cell. Shows an arrow on the currently-sorted column,
@@ -243,6 +246,7 @@ function UsersTab() {
               <SortableTh col="role"           label={t('admin.users.colRole')}      sort={sort} onToggle={toggleSort} />
               <SortableTh col="blocked"        label={t('admin.users.colStatus')}    sort={sort} onToggle={toggleSort} />
               <SortableTh col="lastLogin"      label={t('admin.users.colLastLogin')} sort={sort} onToggle={toggleSort} />
+              <SortableTh col="lastKnownSystemName" label={t('admin.users.colLastKnown')} sort={sort} onToggle={toggleSort} />
               {canEdit && <th />}
             </tr>
           </thead>
@@ -291,6 +295,9 @@ function UsersTab() {
                       : <span className="admin-modal__pill admin-modal__pill--ok">{t('admin.users.active')}</span>}
                   </td>
                   <td className="admin-modal__when">{formatRelative(t, u.lastLogin)}</td>
+                  <td title={u.lastKnownSystemAt ? formatRelative(t, u.lastKnownSystemAt) : undefined}>
+                    {u.lastKnownSystemName ?? '—'}
+                  </td>
                   {canEdit && (
                     <td className="admin-modal__actions">
                       {u.blocked ? (
@@ -594,6 +601,8 @@ interface UserReportRow {
   allianceTicker:       string | null;
   allianceName:         string | null;
   lastLogin:            string | null;
+  lastKnownSystemId:    number | null;
+  lastKnownSystemName:  string | null;
   lastCorpSigAt:        string | null;
   lastCorpStructAt:     string | null;
   totalCorpStructures:  number;
@@ -614,7 +623,7 @@ const SIG_TYPE_ORDER: { key: SigTypeKey; label: string }[] = [
 ];
 
 type UserReportFixedKey =
-  | 'name' | 'corp' | 'alliance' | 'lastLogin' | 'lastCorpSig' | 'lastCorpStruct'
+  | 'name' | 'corp' | 'alliance' | 'lastLogin' | 'lastKnown' | 'lastCorpSig' | 'lastCorpStruct'
   | 'sigTotal' | 'structTotal' | 'systemsAdded' | 'systemsDeleted';
 type UserReportSortKey  = UserReportFixedKey | `sig:${string}`;
 type SortDir = 'asc' | 'desc';
@@ -628,6 +637,7 @@ const USER_REPORT_FIXED_ACCESSORS: Record<UserReportFixedKey, (r: UserReportRow)
   corp:           (r) => r.corpTicker     ?? (r.corpId     !== null ? String(r.corpId)     : ''),
   alliance:       (r) => r.allianceTicker ?? (r.allianceId !== null ? String(r.allianceId) : ''),
   lastLogin:      (r) => r.lastLogin        ? new Date(r.lastLogin).getTime()        : null,
+  lastKnown:      (r) => r.lastKnownSystemName?.toLowerCase() ?? null,
   lastCorpSig:    (r) => r.lastCorpSigAt    ? new Date(r.lastCorpSigAt).getTime()    : null,
   lastCorpStruct: (r) => r.lastCorpStructAt ? new Date(r.lastCorpStructAt).getTime() : null,
   sigTotal:       (r) => Object.values(r.sigTypeCounts).reduce((a, b) => a + b, 0),
@@ -712,7 +722,7 @@ function UsersReport() {
     if (!sortedRows) return;
     const header = [
       'Character', 'Character ID', 'Corp ticker', 'Corp ID', 'Alliance ticker', 'Alliance ID', 'Role',
-      'Last login (ISO)',
+      'Last login (ISO)', 'Last known system',
       'Systems added', 'Systems deleted',
       'Last corp structure (ISO)', 'Total structures',
       'Last corp signature (ISO)', 'Total signatures',
@@ -729,6 +739,7 @@ function UsersReport() {
         u.allianceId !== null ? String(u.allianceId) : '',
         u.role,
         u.lastLogin        ?? '',
+        u.lastKnownSystemName ?? '',
         String(u.systemsAdded),
         String(u.systemsDeleted),
         u.lastCorpStructAt ?? '',
@@ -800,6 +811,7 @@ function UsersReport() {
           <SortHeader label={t('admin.reports.users.colCorp')}              colKey="corp"           sort={sort} onSort={handleSort} />
           <SortHeader label={t('admin.reports.users.colAlliance')}          colKey="alliance"       sort={sort} onSort={handleSort} />
           <SortHeader label={t('admin.reports.users.colLastLogin')}         colKey="lastLogin"      sort={sort} onSort={handleSort} />
+          <SortHeader label={t('admin.reports.users.colLastKnown')}         colKey="lastKnown"      sort={sort} onSort={handleSort} />
           <SortHeader label={t('admin.reports.users.colSystemsAdded')}      colKey="systemsAdded"   sort={sort} onSort={handleSort} />
           <SortHeader label={t('admin.reports.users.colSystemsDeleted')}    colKey="systemsDeleted" sort={sort} onSort={handleSort} />
           <SortHeader label={t('admin.reports.users.colLastCorpStructure')} colKey="lastCorpStruct" sort={sort} onSort={handleSort} />
@@ -844,6 +856,7 @@ function UsersReport() {
                     : '—'}
               </td>
               <td className="admin-modal__when">{u.lastLogin ? formatRelative(t, u.lastLogin) : '—'}</td>
+              <td>{u.lastKnownSystemName ?? '—'}</td>
               <td className="admin-modal__num">{u.systemsAdded   > 0 ? u.systemsAdded   : '—'}</td>
               <td className="admin-modal__num">{u.systemsDeleted > 0 ? u.systemsDeleted : '—'}</td>
               <td className="admin-modal__when">{u.lastCorpStructAt ? formatRelative(t, u.lastCorpStructAt) : '—'}</td>

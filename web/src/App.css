@@ -464,6 +464,14 @@
   font-style: italic;
   border-bottom: 1px solid #141c2e;
 }
+/* Shown when jump counts are computed from the pilot's last known system
+   (offline) rather than their live location — flag it so stale jumps are
+   obvious. */
+.scout-pane__note--lastknown {
+  color: #c8a45a;
+  font-style: normal;
+  background: rgba(200, 164, 90, 0.08);
+}
 
 /* ── Toolbar ─────────────────────────────────────────────── */
 .toolbar {
@@ -674,6 +682,37 @@
   font-size: calc(13px * var(--font-scale, 1));
   color: #6a80a0;
   white-space: nowrap;
+}
+
+/* Second line under the character name: last-known/current system + a small
+   "last checked" clock icon (replaces the old text label). */
+.toolbar__char-sub {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.toolbar__char-system {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: calc(12px * var(--font-scale, 1));
+  color: #7a90a8;
+  white-space: nowrap;
+  /* Button reset so the clickable variant matches the plain span. */
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+}
+.toolbar__char-system svg { color: #5a9af8; flex-shrink: 0; }
+.toolbar__char-system--clickable { cursor: pointer; }
+.toolbar__char-system--clickable:hover { color: #c8d8f0; }
+.toolbar__char-system--clickable:hover svg { color: #7ab0ff; }
+.toolbar__checked-icon {
+  display: inline-flex;
+  align-items: center;
+  color: #5a6a85;
+  cursor: default;
 }
 
 

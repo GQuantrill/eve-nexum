@@ -130,6 +130,12 @@ interface MapStore {
   requestFitView: () => void;
   clearFitView: () => void;
 
+  // EVE system id the map should centre/zoom on (e.g. clicking the pilot's
+  // location in the toolbar). MapCanvas consumes + clears it. null = no request.
+  centerRequestEveId: number | null;
+  requestCenterOnEveSystem: (eveSystemId: number) => void;
+  clearCenterRequest: () => void;
+
   // Undo
   undoStack: UndoCommand[];
   pushUndo: (cmd: UndoCommand) => void;
@@ -376,6 +382,7 @@ export const useMapStore = create<MapStore>()((set, get) => {
     edgeStyle: 'bezier',
     autoLayoutPending: false,
     fitViewPending: false,
+    centerRequestEveId: null,
     sigRev: {},
     structRev: {},
     panelOrder: ['activity', 'killboard', 'notes', 'signatures', 'structures', 'npcStations'],
@@ -621,6 +628,9 @@ export const useMapStore = create<MapStore>()((set, get) => {
     clearAutoLayoutPending: () => set({ autoLayoutPending: false }),
     requestFitView: () => set({ fitViewPending: true }),
     clearFitView: () => set({ fitViewPending: false }),
+
+    requestCenterOnEveSystem: (eveSystemId) => set({ centerRequestEveId: eveSystemId }),
+    clearCenterRequest: () => set({ centerRequestEveId: null }),
 
     // ── Systems ───────────────────────────────────────────────────────────────
 

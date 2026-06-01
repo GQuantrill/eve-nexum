@@ -286,12 +286,29 @@ authRouter.get('/me', async (req, res) => {
     req.session.role  = role;
   }
 
+  // Last known system is dynamic (updated as the pilot jumps), so it's read
+  // fresh from the DB rather than the session prefs cache. Joined to
+  // solar_systems for a ready-to-render name + class.
+  const { rows: lksRows } = await db.query<{ id: number | null; name: string | null; systemClass: string | null; at: string | null }>(
+    `SELECT u.last_known_system_id AS id, s.name, s.class AS "systemClass", u.last_known_system_at AS at
+     FROM users u LEFT JOIN solar_systems s ON s.id = u.last_known_system_id
+     WHERE u.id = $1`,
+    [req.session.userId],
+  );
+  const lk = lksRows[0];
+  // Number() guards against node-pg returning the id as a string (it does for
+  // BIGINT columns) — the client compares it numerically against map system ids.
+  const lastKnownSystem = lk?.id != null
+    ? { id: Number(lk.id), name: lk.name, systemClass: lk.systemClass, at: lk.at }
+    : null;
+
   res.json({
     user: {
       id:            req.session.userId,
       characterId:   req.session.characterId,
       characterName: req.session.characterName,
       role,
+      lastKnownSystem,
       corpMode:      config.corpMode,
       compactMode:   prefs.compactMode,
       snapToGrid:    prefs.snapToGrid,

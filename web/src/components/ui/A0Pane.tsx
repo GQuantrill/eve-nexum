@@ -3,9 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { MapPinSimpleIcon, PathIcon } from '@phosphor-icons/react';
 import { jumps } from '../../i18n/format';
 import { useA0Systems } from '../../hooks/useA0Systems';
-import { useCharacterLocation } from '../../hooks/useCharacterLocation';
+import { useRouteOrigin } from '../../hooks/useRouteOrigin';
 import { useRoute } from '../../hooks/useRoute';
-import { setWaypoint, RouteSquares, KSPACE_CLASSES } from './routeUi';
+import { setWaypoint, RouteSquares } from './routeUi';
 import { useMapStore } from '../../store/mapStore';
 
 const TOP_N = 10;
@@ -14,16 +14,12 @@ export function A0Pane() {
   const { t } = useTranslation();
   const all      = useA0Systems();
   const routeMode = useMapStore((s) => s.routeMode);
-  const location = useCharacterLocation();
+  const origin   = useRouteOrigin();
+  const canRoute = origin.systemId !== null;
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
 
-  const canRoute =
-    location.online &&
-    location.system !== null &&
-    KSPACE_CLASSES.has(location.system.systemClass);
-
   const targetIds = useMemo(() => all.map(s => s.id), [all]);
-  const routes = useRoute(canRoute ? location.system!.eveSystemId : null, targetIds);
+  const routes = useRoute(origin.systemId, targetIds);
 
   const closest = useMemo(() => {
     if (!canRoute) return [];
@@ -61,6 +57,9 @@ export function A0Pane() {
 
   return (
     <div className="scout-pane">
+      {origin.fromLastKnown && origin.name && (
+        <div className="scout-pane__note scout-pane__note--lastknown">{t('route.fromLastKnown', { system: origin.name })}</div>
+      )}
       <div className="scout-pane__note">{t('a0.showing', { count: TOP_N })}</div>
       {closest.map(s => {
         const route   = routes[String(s.id)];

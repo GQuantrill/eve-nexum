@@ -39,6 +39,7 @@
       "colRole": "Função",
       "colStatus": "Estado",
       "colLastLogin": "Último acesso",
+      "colLastKnown": "Último sistema conhecido",
       "you": "tu",
       "blocked": "bloqueado",
       "active": "ativo",
@@ -125,6 +126,7 @@
         "colCorp": "Corp",
         "colAlliance": "Aliança",
         "colLastLogin": "Último acesso",
+        "colLastKnown": "Último sistema conhecido",
         "colSystemsAdded": "Sistemas adicionados",
         "colSystemsDeleted": "Sistemas eliminados",
         "colLastCorpStructure": "Última estrutura corp",
@@ -637,6 +639,9 @@
     "sortShortest": "Rota mais curta",
     "sortSecure": "Rota segura"
   },
+  "route": {
+    "fromLastKnown": "Saltos a partir de {{system}} (última localização conhecida)"
+  },
   "activity": {
     "thisHour": "esta hora",
     "allHidden": "Todos os gráficos ocultos. Ativa-os em Opções de mapa → Atividade.",
@@ -799,6 +804,9 @@
     "signOut": "Terminar sessão",
     "role": "Função: {{role}}",
     "checkedAgo": "verificado {{time}}",
+    "lastKnownSystem": "Último sistema conhecido",
+    "currentSystem": "Sistema atual",
+    "centerOnSystem": "Centrar o mapa em {{system}}",
     "deleteMapConfirm": "Eliminar «{{name}}»? Esta ação não pode ser desfeita.",
     "online": {
       "offline": "Offline",

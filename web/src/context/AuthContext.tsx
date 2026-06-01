@@ -1,12 +1,21 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { api } from '../api/client';
 
+export interface LastKnownSystem {
+  id: number;
+  name: string | null;
+  systemClass: string | null;
+  at: string | null;
+}
+
 export interface AuthUser {
   id: number;
   characterId: number;
   characterName: string;
   role: 'admin' | 'full' | 'edit' | 'readonly';
   corpMode: boolean;
+  /** Where the pilot was last seen (updated as they jump). null until first ESI poll. */
+  lastKnownSystem: LastKnownSystem | null;
   compactMode: boolean;
   snapToGrid: boolean;
   showMinimap: boolean;

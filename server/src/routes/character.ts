@@ -110,6 +110,15 @@ characterRouter.get('/location', async (req, res) => {
         [userId],
       ).catch(console.error);
     }
+    // Persist the last known system to the user profile whenever it's new or
+    // changed (first poll of the session, or after a jump). Steady-state polls
+    // in the same system don't write. Best-effort — never blocks the response.
+    if (prevSys !== loc.solar_system_id) {
+      db.query(
+        `UPDATE users SET last_known_system_id = $1, last_known_system_at = NOW() WHERE id = $2`,
+        [loc.solar_system_id, userId],
+      ).catch(console.error);
+    }
     lastSeenSystem.set(userId, loc.solar_system_id);
 
     // Look up system details in our DB

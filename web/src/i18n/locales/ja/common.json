@@ -39,6 +39,7 @@
       "colRole": "権限",
       "colStatus": "ステータス",
       "colLastLogin": "最終ログイン",
+      "colLastKnown": "最後に確認されたシステム",
       "you": "あなた",
       "blocked": "ブロック済み",
       "active": "アクティブ",
@@ -125,6 +126,7 @@
         "colCorp": "コーポ",
         "colAlliance": "アライアンス",
         "colLastLogin": "最終ログイン",
+        "colLastKnown": "最後に確認されたシステム",
         "colSystemsAdded": "追加した星系",
         "colSystemsDeleted": "削除した星系",
         "colLastCorpStructure": "最終コーポストラクチャ",
@@ -637,6 +639,9 @@
     "sortShortest": "最短ルート",
     "sortSecure": "安全ルート"
   },
+  "route": {
+    "fromLastKnown": "{{system}} からのジャンプ数（最後に確認された位置）"
+  },
   "activity": {
     "thisHour": "今時間",
     "allHidden": "すべてのグラフが非表示です。マップオプション → アクティビティ でオンにしてください。",
@@ -799,6 +804,9 @@
     "signOut": "ログアウト",
     "role": "権限: {{role}}",
     "checkedAgo": "{{time}} 確認",
+    "lastKnownSystem": "最後に確認されたシステム",
+    "currentSystem": "現在のシステム",
+    "centerOnSystem": "マップを {{system}} に移動",
     "deleteMapConfirm": "「{{name}}」を削除しますか？この操作は取り消せません。",
     "online": {
       "offline": "オフライン",

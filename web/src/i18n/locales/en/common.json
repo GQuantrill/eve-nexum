@@ -39,6 +39,7 @@
       "colRole": "Role",
       "colStatus": "Status",
       "colLastLogin": "Last login",
+      "colLastKnown": "Last known system",
       "you": "you",
       "blocked": "blocked",
       "active": "active",
@@ -125,6 +126,7 @@
         "colCorp": "Corp",
         "colAlliance": "Alliance",
         "colLastLogin": "Last login",
+        "colLastKnown": "Last known system",
         "colSystemsAdded": "Systems added",
         "colSystemsDeleted": "Systems deleted",
         "colLastCorpStructure": "Last corp structure",
@@ -637,6 +639,9 @@
     "sortShortest": "Shortest route",
     "sortSecure": "Secure route"
   },
+  "route": {
+    "fromLastKnown": "Jumps from {{system}} (last known location)"
+  },
   "activity": {
     "thisHour": "this hour",
     "allHidden": "All charts hidden. Toggle them on in Map Options → Activity.",
@@ -799,6 +804,9 @@
     "signOut": "Sign out",
     "role": "Role: {{role}}",
     "checkedAgo": "checked {{time}}",
+    "lastKnownSystem": "Last known system",
+    "currentSystem": "Current system",
+    "centerOnSystem": "Centre the map on {{system}}",
     "deleteMapConfirm": "Delete \"{{name}}\"? This cannot be undone.",
     "online": {
       "offline": "Offline",

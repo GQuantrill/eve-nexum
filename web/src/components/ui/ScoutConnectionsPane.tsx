@@ -2,9 +2,9 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { useScoutConnections } from '../../hooks/useScoutConnections';
-import { useCharacterLocation } from '../../hooks/useCharacterLocation';
+import { useRouteOrigin } from '../../hooks/useRouteOrigin';
 import { useRoute } from '../../hooks/useRoute';
-import { setWaypoint, RouteSquares, KSPACE_CLASSES } from './routeUi';
+import { setWaypoint, RouteSquares } from './routeUi';
 import { truesecColor } from '../../utils/truesec';
 import { useMapStore } from '../../store/mapStore';
 import { MapPinSimpleIcon, PathIcon } from '@phosphor-icons/react';
@@ -62,7 +62,7 @@ function formatRemaining(t: TFunction, hours: number): string {
 export function ScoutConnectionsPane({ scoutSystem }: Props) {
   const { t }    = useTranslation();
   const all      = useScoutConnections();
-  const location = useCharacterLocation();
+  const origin   = useRouteOrigin();
   const routeMode = useMapStore((s) => s.routeMode);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [sortBy, setSortBy] = useState<ScoutSort>(() => readScoutSort(scoutSystem));
@@ -81,13 +81,10 @@ export function ScoutConnectionsPane({ scoutSystem }: Props) {
     [all, scoutSystem],
   );
 
-  const canRoute =
-    location.online &&
-    location.system !== null &&
-    KSPACE_CLASSES.has(location.system.systemClass);
+  const canRoute = origin.systemId !== null;
 
   const targetIds = useMemo(() => filtered.map(c => c.inSystemId), [filtered]);
-  const routes = useRoute(canRoute ? location.system!.eveSystemId : null, targetIds);
+  const routes = useRoute(origin.systemId, targetIds);
 
   // Two sort modes:
   //  - 'age'     : remaining time descending — freshest holes at the top, the
@@ -130,6 +127,9 @@ export function ScoutConnectionsPane({ scoutSystem }: Props) {
 
   return (
     <div className="scout-pane">
+      {origin.fromLastKnown && origin.name && (
+        <div className="scout-pane__note scout-pane__note--lastknown">{t('route.fromLastKnown', { system: origin.name })}</div>
+      )}
       <div className="scout-pane__sort">
         <label className="scout-pane__sort-label" htmlFor={`scout-sort-${scoutSystem}`}>
           {t('scout.sortLabel')}

@@ -9,6 +9,7 @@ import type { Connection, Node, Edge, EdgeChange, NodeChange } from '@xyflow/rea
 import '@xyflow/react/dist/style.css';
 
 import { useMapStore } from '../../store/mapStore';
+import { useAuth } from '../../context/AuthContext';
 import { useCanEdit } from '../../hooks/useCanEdit';
 import { useMinimapPosition } from '../../hooks/useMinimapPosition';
 import { useShareMode } from '../../context/ShareModeContext';
@@ -117,6 +118,8 @@ export function MapCanvas() {
   const clearAutoLayoutPending = useMapStore((s) => s.clearAutoLayoutPending);
   const fitViewPending       = useMapStore((s) => s.fitViewPending);
   const clearFitView         = useMapStore((s) => s.clearFitView);
+  const centerRequestEveId   = useMapStore((s) => s.centerRequestEveId);
+  const clearCenterRequest   = useMapStore((s) => s.clearCenterRequest);
   const pushUndo             = useMapStore((s) => s.pushUndo);
   const canEdit              = useCanEdit();
   const { screenToFlowPosition, setViewport, getNode, getNodes, getZoom, fitView } = useReactFlow();
@@ -155,11 +158,11 @@ export function MapCanvas() {
     [systems, removeSystem, setNodes, canEdit],
   );
 
-  const centerOnSystem = useCallback((systemId: string) => {
+  const centerOnSystem = useCallback((systemId: string, zoomOverride?: number) => {
     const node = getNode(systemId);
     if (!node) return false;
 
-    const zoom   = getZoom();
+    const zoom   = zoomOverride ?? getZoom();
     const flowX  = node.position.x + (node.measured?.width  ?? 150) / 2;
     const flowY  = node.position.y + (node.measured?.height ?? 80)  / 2;
 
@@ -179,6 +182,37 @@ export function MapCanvas() {
     );
     return true;
   }, [getNode, getZoom, setViewport]);
+
+  // On first load after login, centre the viewport on the pilot's last known
+  // system (from /auth/me) if it's present on this map — so you land where you
+  // last were, even when offline. Runs once; falls back to the normal fitView
+  // when the system isn't on the map.
+  const lastKnownSystemId = useAuth().user?.lastKnownSystem?.id ?? null;
+  const didInitialCentre = useRef(false);
+  useEffect(() => {
+    if (didInitialCentre.current || lastKnownSystemId == null || nodes.length === 0) return;
+    const target = systems.find((s) => s.eveSystemId === lastKnownSystemId);
+    if (!target) { didInitialCentre.current = true; return; } // not on this map
+    clearFitView(); // don't let the fit-whole-map effect fight the centre
+    const raf = requestAnimationFrame(() => {
+      if (centerOnSystem(target.id)) didInitialCentre.current = true;
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [lastKnownSystemId, nodes, systems, centerOnSystem, clearFitView]);
+
+  // Centre + zoom on an explicitly requested system (e.g. clicking the pilot's
+  // location in the toolbar). Zooms in if currently zoomed out; no-op when the
+  // system isn't on this map. Clears the request either way.
+  useEffect(() => {
+    if (centerRequestEveId == null) return;
+    const target = systems.find((s) => s.eveSystemId === centerRequestEveId);
+    const zoom = Math.max(getZoom(), 1.1);
+    const raf = requestAnimationFrame(() => {
+      if (target) centerOnSystem(target.id, zoom);
+      clearCenterRequest();
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [centerRequestEveId, systems, centerOnSystem, getZoom, clearCenterRequest]);
 
   // Preserve rubber-band selection when Shift is released before the mouse button.
   // React Flow clears the selection on Shift keyup, so we capture it just before.

@@ -39,6 +39,7 @@
       "colRole": "Rôle",
       "colStatus": "Statut",
       "colLastLogin": "Dernière connexion",
+      "colLastKnown": "Dernier système connu",
       "you": "vous",
       "blocked": "bloqué",
       "active": "actif",
@@ -125,6 +126,7 @@
         "colCorp": "Corp",
         "colAlliance": "Alliance",
         "colLastLogin": "Dernière connexion",
+        "colLastKnown": "Dernier système connu",
         "colSystemsAdded": "Systèmes ajoutés",
         "colSystemsDeleted": "Systèmes supprimés",
         "colLastCorpStructure": "Dernière structure corp",
@@ -637,6 +639,9 @@
     "sortShortest": "Route la plus courte",
     "sortSecure": "Route sécurisée"
   },
+  "route": {
+    "fromLastKnown": "Sauts depuis {{system}} (dernière position connue)"
+  },
   "activity": {
     "thisHour": "cette heure",
     "allHidden": "Tous les graphiques sont masqués. Activez-les dans Options de carte → Activité.",
@@ -799,6 +804,9 @@
     "signOut": "Se déconnecter",
     "role": "Rôle : {{role}}",
     "checkedAgo": "vérifié {{time}}",
+    "lastKnownSystem": "Dernier système connu",
+    "currentSystem": "Système actuel",
+    "centerOnSystem": "Centrer la carte sur {{system}}",
     "deleteMapConfirm": "Supprimer « {{name}} » ? Cette action est irréversible.",
     "online": {
       "offline": "Hors ligne",
