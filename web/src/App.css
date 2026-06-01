@@ -3479,6 +3479,30 @@ div.system-node__easy-handle {
   }
 }
 
+/* Overwrite-on-paste toggle: a labelled checkbox styled to sit inline with
+   the sig toolbar buttons. The native checkbox (accent-coloured) gives an
+   unambiguous on/off tick; the active outline reinforces it. */
+.sig-overwrite-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #2e4a7a;
+  border-radius: 4px;
+  padding: 2px 10px;
+  color: #c0ccde;
+  font-size: calc(14px * var(--font-scale, 1));
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.sig-overwrite-toggle:hover { border-color: #5a9af8; }
+.sig-overwrite-toggle--active {
+  border-color: #5a9af8;
+  background: rgba(90, 154, 248, 0.16);
+  color: #e8f0ff;
+}
+.sig-overwrite-toggle .map-sidebar__toggle-input { cursor: pointer; }
+
 /* Native <select> uses the page background for the dropdown panel and OS
    defaults for option rows — both render as light on a dark theme. Force
    the dark palette explicitly. */

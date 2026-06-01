@@ -371,7 +371,8 @@
       "removeSelected": "Supprimer les systèmes sélectionnés",
       "undo": "Annuler",
       "multiSelect": "Sélection multiple de systèmes",
-      "rubberBand": "Sélection par rectangle"
+      "rubberBand": "Sélection par rectangle",
+      "overwriteSigs": "Coller les signatures en mode écrasement (supprimer les disparues)"
     },
     "canvasNotFound": "Impossible de trouver le canvas de la carte",
     "exportFailed": "Échec de l'export : {{error}}",
@@ -703,6 +704,8 @@
     "deleteAllConfirm_one": "Supprimer {{count}} signature ?",
     "deleteAllConfirm_other": "Supprimer les {{count}} signatures ?",
     "addSignature": "Ajouter une signature",
+    "overwriteToggle": "Écraser au collage",
+    "overwriteTooltip": "Si activé, le collage remplace la liste — les signatures absentes du scan sont supprimées. Ou maintenez Maj en collant pour écraser une seule fois.",
     "setTypeAria": "Définir le type des signatures sélectionnées",
     "setType": "Définir le type ({{count}})…",
     "deleteSelected": "Supprimer la sélection ({{count}})",

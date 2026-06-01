@@ -1069,6 +1069,10 @@ export function MapSidebar() {
             <kbd>Shift + drag</kbd>
             <span>{t("mapSidebar.shortcut.rubberBand")}</span>
           </div>
+          <div className="map-sidebar__shortcut">
+            <kbd>Shift + ⌘/Ctrl + V</kbd>
+            <span>{t("mapSidebar.shortcut.overwriteSigs")}</span>
+          </div>
         </CollapsibleSection>
       </div>
 

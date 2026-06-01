@@ -371,7 +371,8 @@
       "removeSelected": "選択した星系を削除",
       "undo": "元に戻す",
       "multiSelect": "星系を複数選択",
-      "rubberBand": "ドラッグで星系を選択"
+      "rubberBand": "ドラッグで星系を選択",
+      "overwriteSigs": "上書きモードでシグネチャを貼り付け（消滅したものを削除）"
     },
     "canvasNotFound": "マップキャンバスが見つかりませんでした",
     "exportFailed": "エクスポートに失敗しました: {{error}}",
@@ -703,6 +704,8 @@
     "deleteAllConfirm_one": "{{count}} 件のシグネチャをすべて削除しますか？",
     "deleteAllConfirm_other": "{{count}} 件のシグネチャをすべて削除しますか？",
     "addSignature": "シグネチャを追加",
+    "overwriteToggle": "貼り付け時に上書き",
+    "overwriteTooltip": "オンにすると、貼り付けでリストを置き換えます — スキャンに存在しなくなったシグネチャは削除されます。または貼り付け時に Shift を押すと一度だけ上書きします。",
     "setTypeAria": "選択したシグネチャのタイプを設定",
     "setType": "タイプを設定（{{count}}）…",
     "deleteSelected": "選択を削除（{{count}}）",

@@ -199,6 +199,34 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   const sigsRef        = useRef<Signature[]>([]);
   sigsRef.current = sigs;
 
+  // Overwrite-on-paste mode. When on (or when Shift is held during a paste),
+  // a paste also deletes signatures whose ID is absent from the pasted scan —
+  // for re-scanning a system after sites have despawned. Off by default so the
+  // long-standing additive behaviour is preserved.
+  const [overwriteOnPaste, setOverwriteOnPaste] = useUserSetting<boolean>(
+    'nexum.sigPane.overwriteOnPaste',
+    false,
+  );
+  // Shift is tracked in a ref because the `paste` ClipboardEvent carries no
+  // modifier state, so Shift+Ctrl+V is detected via this.
+  const shiftHeldRef = useRef(false);
+
+  // Track whether Shift is physically held — the `paste` ClipboardEvent itself
+  // carries no modifier state, so Shift+Ctrl+V is detected via this ref.
+  useEffect(() => {
+    const onDown = (e: KeyboardEvent) => { if (e.key === 'Shift') shiftHeldRef.current = true; };
+    const onUp   = (e: KeyboardEvent) => { if (e.key === 'Shift') shiftHeldRef.current = false; };
+    const reset  = () => { shiftHeldRef.current = false; };
+    window.addEventListener('keydown', onDown);
+    window.addEventListener('keyup', onUp);
+    window.addEventListener('blur', reset);
+    return () => {
+      window.removeEventListener('keydown', onDown);
+      window.removeEventListener('keyup', onUp);
+      window.removeEventListener('blur', reset);
+    };
+  }, []);
+
   const { isShareMode } = useShareMode();
   // Bumped when another client changes this system's sigs (live sync).
   const sigRev = useMapStore((s) => s.sigRev[systemId] ?? 0);
@@ -289,7 +317,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
       .catch(() => toast.error(t('signatures.deleteFailed')));
   };
 
-  const processPaste = useCallback(async (parsed: ParsedSig[]) => {
+  const processPaste = useCallback(async (parsed: ParsedSig[], overwrite: boolean) => {
     if (!activeMapId) return;
     const existing = sigsRef.current;
     const toUpdate: { id: string; updates: Partial<Signature> }[] = [];
@@ -307,8 +335,17 @@ export function SignaturePane({ systemId }: { systemId: string }) {
       }
     }
 
-    // Sigs not present in the paste are left alone — pastes are additive.
-    // If you want to clear stale sigs, use the toolbar's delete buttons.
+    // In overwrite mode, drop scanned sigs that are no longer in the paste
+    // (despawned since the last scan). Rows still present keep their age,
+    // type, and connection links — only the genuinely-gone ones are removed.
+    // Blank/manually-added rows (no sig ID) are left alone. Default (additive)
+    // mode leaves all existing sigs untouched, as before.
+    if (overwrite) {
+      const pastedIds = new Set(parsed.map((p) => p.sigId));
+      for (const s of existing) {
+        if (s.sigId && !pastedIds.has(s.sigId)) deleteSig(s.id);
+      }
+    }
 
     for (const { id, updates } of toUpdate) updateSig(id, updates);
 
@@ -346,25 +383,28 @@ export function SignaturePane({ systemId }: { systemId: string }) {
 
       e.preventDefault();
 
+      // Overwrite when the mode is toggled on OR Shift is held for this paste.
+      const overwrite = overwriteOnPaste || shiftHeldRef.current;
+
       // Warn if the character is in a different system than the one being edited
       if (currentSystemId && currentSystemId !== systemId) {
         const currentName  = map.systems.find((s) => s.id === currentSystemId)?.name  ?? 'unknown';
         const selectedName = map.systems.find((s) => s.id === systemId)?.name ?? 'unknown';
         setPendingAction({
           message: t('signatures.pasteDifferentSystem', { current: currentName, selected: selectedName }),
-          fn: () => processPaste(parsed),
+          fn: () => processPaste(parsed, overwrite),
           confirmLabel: t('actions.ok'),
           showDontAskAgain: false,
         });
         return;
       }
 
-      processPaste(parsed);
+      processPaste(parsed, overwrite);
     };
 
     window.addEventListener('paste', handlePaste);
     return () => window.removeEventListener('paste', handlePaste);
-  }, [activeMapId, systemId, currentSystemId, map.systems, processPaste, t]);
+  }, [activeMapId, systemId, currentSystemId, map.systems, processPaste, overwriteOnPaste, t]);
 
   const addSig = async () => {
     if (!activeMapId) return;
@@ -471,6 +511,18 @@ export function SignaturePane({ systemId }: { systemId: string }) {
       {canEdit && !isShareMode && (
         <div className="sig-pane__toolbar">
           <button className="icon-btn" onClick={addSig} title={t('signatures.addSignature')}>{t('signatures.addSignature')}</button>
+          <label
+            className={`sig-overwrite-toggle${overwriteOnPaste ? ' sig-overwrite-toggle--active' : ''}`}
+            data-tooltip={t('signatures.overwriteTooltip')}
+          >
+            <input
+              type="checkbox"
+              className="map-sidebar__toggle-input"
+              checked={overwriteOnPaste}
+              onChange={(e) => setOverwriteOnPaste(e.target.checked)}
+            />
+            <span>{t('signatures.overwriteToggle')}</span>
+          </label>
           {selected.size > 0 && (
             <>
               <select

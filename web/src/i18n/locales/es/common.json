@@ -371,7 +371,8 @@
       "removeSelected": "Eliminar sistemas seleccionados",
       "undo": "Deshacer",
       "multiSelect": "Selección múltiple de sistemas",
-      "rubberBand": "Selección por recuadro"
+      "rubberBand": "Selección por recuadro",
+      "overwriteSigs": "Pegar firmas en modo sobrescritura (eliminar las desaparecidas)"
     },
     "canvasNotFound": "No se pudo encontrar el lienzo del mapa",
     "exportFailed": "Error al exportar: {{error}}",
@@ -703,6 +704,8 @@
     "deleteAllConfirm_one": "¿Eliminar {{count}} firma?",
     "deleteAllConfirm_other": "¿Eliminar las {{count}} firmas?",
     "addSignature": "Añadir firma",
+    "overwriteToggle": "Sobrescribir al pegar",
+    "overwriteTooltip": "Cuando está activo, pegar reemplaza la lista — se eliminan las firmas que ya no están en el escaneo. O mantén Mayús al pegar para sobrescribir solo una vez.",
     "setTypeAria": "Establecer el tipo de las firmas seleccionadas",
     "setType": "Establecer tipo ({{count}})…",
     "deleteSelected": "Eliminar seleccionadas ({{count}})",
