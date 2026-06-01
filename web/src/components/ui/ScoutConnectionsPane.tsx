@@ -127,9 +127,11 @@ export function ScoutConnectionsPane({ scoutSystem }: Props) {
 
   return (
     <div className="scout-pane">
-      {origin.fromLastKnown && origin.name && (
+      {origin.characterName && origin.name ? (
+        <div className="scout-pane__note scout-pane__note--lastknown">{t('route.fromCharacter', { character: origin.characterName, system: origin.name })}</div>
+      ) : origin.fromLastKnown && origin.name ? (
         <div className="scout-pane__note scout-pane__note--lastknown">{t('route.fromLastKnown', { system: origin.name })}</div>
-      )}
+      ) : null}
       <div className="scout-pane__sort">
         <label className="scout-pane__sort-label" htmlFor={`scout-sort-${scoutSystem}`}>
           {t('scout.sortLabel')}

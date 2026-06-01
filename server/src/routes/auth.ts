@@ -417,10 +417,10 @@ authRouter.get('/me', async (req, res) => {
   // All characters linked to this account, for the character switcher.
   const ownerId = await ensureOwnerId(req);
   const { rows: charRows } = ownerId != null
-    ? await db.query<{ id: number; characterId: number; characterName: string; role: string; corpId: number | null; blocked: boolean; lksId: number | null; lksName: string | null }>(
+    ? await db.query<{ id: number; characterId: number; characterName: string; role: string; corpId: number | null; blocked: boolean; lksId: number | null; lksName: string | null; lksClass: string | null }>(
         `SELECT u.id, u.character_id AS "characterId", u.character_name AS "characterName", u.role,
                 u.corp_id AS "corpId", u.blocked,
-                u.last_known_system_id AS "lksId", s.name AS "lksName"
+                u.last_known_system_id AS "lksId", s.name AS "lksName", s.class AS "lksClass"
          FROM users u LEFT JOIN solar_systems s ON s.id = u.last_known_system_id
          WHERE u.owner_id = $1 ORDER BY u.character_name`,
         [ownerId])
@@ -434,6 +434,7 @@ authRouter.get('/me', async (req, res) => {
     blocked:             c.blocked,
     lastKnownSystemId:   c.lksId != null ? Number(c.lksId) : null,
     lastKnownSystemName: c.lksName,
+    lastKnownSystemClass: c.lksClass,
     active:              c.id === req.session.userId,
   }));
 

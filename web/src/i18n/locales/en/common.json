@@ -6,7 +6,10 @@
     "switchCharacter": "Switch character",
     "addCharacter": "Add character",
     "blocked": "blocked",
-    "characterAdded": "Added {{name}}"
+    "characterAdded": "Added {{name}}",
+    "switchTo": "Switch to {{name}}",
+    "focusLocation": "Centre & route from {{name}}",
+    "noLocation": "No known location for {{name}}"
   },
   "actions": {
     "save": "Save",
@@ -646,7 +649,8 @@
     "sortSecure": "Secure route"
   },
   "route": {
-    "fromLastKnown": "Jumps from {{system}} (last known location)"
+    "fromLastKnown": "Jumps from {{system}} (last known location)",
+    "fromCharacter": "Jumps from {{character}} — {{system}}"
   },
   "activity": {
     "thisHour": "this hour",

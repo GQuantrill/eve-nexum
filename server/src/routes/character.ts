@@ -5,6 +5,7 @@ import { getValidToken } from '../utils/eveToken.js';
 import { createLogger } from '../utils/logger.js';
 import { TtlCache } from '../utils/cache.js';
 import { resolveEntityNames } from '../services/entityNames.js';
+import { resolveOwnerId } from '../utils/owner.js';
 
 export const characterRouter = Router();
 characterRouter.use(requireAuth);
@@ -39,104 +40,107 @@ function isReallyOnline(data: EsiOnlineResponse): boolean {
   return login >= logout;
 }
 
-// GET /api/character/location
-// Returns the character's current system if online, or { online: false }
+// Read a character's live location (online + current system + ship) by Nexum
+// user id, using that character's own stored token. Records a jump + persists
+// last_known_system keyed by userId, so reading any of an account's characters
+// keeps its profile fresh. Returns the wire payload; throws on token/ESI errors.
+type LocationPayload =
+  | { online: false }
+  | { online: true; system: Record<string, unknown> | null; ship: { typeId: number; typeName: string; shipName: string; mass: number | null } | null };
+
+async function getLocationPayload(userId: number): Promise<LocationPayload> {
+  const { rows: userRows } = await db.query<{ character_id: number }>(
+    `SELECT character_id FROM users WHERE id = $1`, [userId]);
+  if (!userRows.length) return { online: false };
+
+  const token       = await getValidToken(userId);
+  const characterId = userRows[0].character_id;
+
+  const onlineRes = await fetch(
+    `https://esi.evetech.net/latest/characters/${characterId}/online/`,
+    { headers: { Authorization: `Bearer ${token}` } },
+  );
+  if (!onlineRes.ok || onlineRes.status === 401 || onlineRes.status === 403) return { online: false };
+  const onlineData = await onlineRes.json() as EsiOnlineResponse;
+  if (!isReallyOnline(onlineData)) { lastSeenSystem.delete(userId); return { online: false }; }
+
+  const [locRes, shipRes] = await Promise.all([
+    fetch(`https://esi.evetech.net/latest/characters/${characterId}/location/`,
+      { headers: { Authorization: `Bearer ${token}` } }),
+    fetch(`https://esi.evetech.net/latest/characters/${characterId}/ship/`,
+      { headers: { Authorization: `Bearer ${token}` } }),
+  ]);
+  if (!locRes.ok) return { online: true, system: null, ship: null };
+
+  const loc = await locRes.json() as { solar_system_id: number };
+
+  // Ship is best-effort — a transient ESI hiccup on /ship/ shouldn't hide the
+  // rest of the payload. Type name comes from SDE-seeded item_types.
+  let ship: { typeId: number; typeName: string; shipName: string; mass: number | null } | null = null;
+  if (shipRes.ok) {
+    const shipData = await shipRes.json() as { ship_type_id: number; ship_name: string };
+    const { rows: typeRows } = await db.query<{ name: string; mass: string | null }>(
+      `SELECT name, mass FROM item_types WHERE id = $1`, [shipData.ship_type_id]);
+    const massRaw = typeRows[0]?.mass;
+    const massNum = massRaw == null ? null : Number(massRaw);
+    ship = {
+      typeId:   shipData.ship_type_id,
+      typeName: typeRows[0]?.name ?? `Type ${shipData.ship_type_id}`,
+      shipName: shipData.ship_name,
+      mass:     massNum != null && Number.isFinite(massNum) ? massNum : null,
+    };
+  }
+
+  // Jump event + last-known persistence, keyed per character.
+  const prevSys = lastSeenSystem.get(userId);
+  if (prevSys !== undefined && prevSys !== loc.solar_system_id) {
+    db.query(`INSERT INTO user_events (user_id, event_type) VALUES ($1, 'jump')`, [userId]).catch(console.error);
+  }
+  if (prevSys !== loc.solar_system_id) {
+    db.query(`UPDATE users SET last_known_system_id = $1, last_known_system_at = NOW() WHERE id = $2`,
+      [loc.solar_system_id, userId]).catch(console.error);
+  }
+  lastSeenSystem.set(userId, loc.solar_system_id);
+
+  const { rows } = await db.query(
+    `SELECT s.id AS "eveSystemId", s.name, s.class AS "systemClass",
+            COALESCE(s.effect, 'none') AS effect, s.statics,
+            r.name AS "regionName", r.npc_type AS "npcType"
+     FROM solar_systems s
+     LEFT JOIN map_regions r ON r.id = s.region_id
+     WHERE s.id = $1`,
+    [loc.solar_system_id],
+  );
+  return { online: true, system: rows.length ? rows[0] : null, ship };
+}
+
+// GET /api/character/location — the active character's location.
 characterRouter.get('/location', async (req, res) => {
   try {
-    const { rows: userRows } = await db.query<{ character_id: number }>(
-      `SELECT character_id FROM users WHERE id = $1`,
-      [req.session.userId],
-    );
-    if (!userRows.length) { res.status(404).json({ error: 'User not found' }); return; }
-
-    const token       = await getValidToken(req.session.userId!);
-    const characterId = userRows[0].character_id;
-
-    // Check online status first
-    const onlineRes = await fetch(
-      `https://esi.evetech.net/latest/characters/${characterId}/online/`,
-      { headers: { Authorization: `Bearer ${token}` } },
-    );
-    if (!onlineRes.ok || onlineRes.status === 401 || onlineRes.status === 403) {
-      res.json({ online: false }); return;
-    }
-    const onlineData = await onlineRes.json() as EsiOnlineResponse;
-    if (!isReallyOnline(onlineData)) {
-      lastSeenSystem.delete(req.session.userId!);
-      res.json({ online: false }); return;
-    }
-
-    // Fetch current location + ship in parallel — both gated on the same
-    // token and online check, no point serialising them.
-    const [locRes, shipRes] = await Promise.all([
-      fetch(`https://esi.evetech.net/latest/characters/${characterId}/location/`,
-        { headers: { Authorization: `Bearer ${token}` } }),
-      fetch(`https://esi.evetech.net/latest/characters/${characterId}/ship/`,
-        { headers: { Authorization: `Bearer ${token}` } }),
-    ]);
-    if (!locRes.ok) { res.json({ online: true, system: null, ship: null }); return; }
-
-    const loc = await locRes.json() as { solar_system_id: number };
-
-    // Ship is best-effort — a transient ESI hiccup on /ship/ shouldn't
-    // hide the rest of the location payload. Look up the type name from
-    // the SDE-seeded item_types so the client gets a ready-to-render label.
-    let ship: { typeId: number; typeName: string; shipName: string; mass: number | null } | null = null;
-    if (shipRes.ok) {
-      const shipData = await shipRes.json() as { ship_type_id: number; ship_name: string };
-      const { rows: typeRows } = await db.query<{ name: string; mass: string | null }>(
-        `SELECT name, mass FROM item_types WHERE id = $1`,
-        [shipData.ship_type_id],
-      );
-      // item_types.mass is NUMERIC (parsed back as string by node-pg). Cast to
-      // number for the wire; null when the SDE row is missing or massless
-      // (capsule has 32k kg, so it'll have a value).
-      const massRaw = typeRows[0]?.mass;
-      const massNum = massRaw == null ? null : Number(massRaw);
-      ship = {
-        typeId:   shipData.ship_type_id,
-        typeName: typeRows[0]?.name ?? `Type ${shipData.ship_type_id}`,
-        shipName: shipData.ship_name,
-        mass:     massNum != null && Number.isFinite(massNum) ? massNum : null,
-      };
-    }
-
-    // Record a jump when the system changes
-    const userId  = req.session.userId!;
-    const prevSys = lastSeenSystem.get(userId);
-    if (prevSys !== undefined && prevSys !== loc.solar_system_id) {
-      db.query(
-        `INSERT INTO user_events (user_id, event_type) VALUES ($1, 'jump')`,
-        [userId],
-      ).catch(console.error);
-    }
-    // Persist the last known system to the user profile whenever it's new or
-    // changed (first poll of the session, or after a jump). Steady-state polls
-    // in the same system don't write. Best-effort — never blocks the response.
-    if (prevSys !== loc.solar_system_id) {
-      db.query(
-        `UPDATE users SET last_known_system_id = $1, last_known_system_at = NOW() WHERE id = $2`,
-        [loc.solar_system_id, userId],
-      ).catch(console.error);
-    }
-    lastSeenSystem.set(userId, loc.solar_system_id);
-
-    // Look up system details in our DB
-    const { rows } = await db.query(
-      `SELECT s.id AS "eveSystemId", s.name, s.class AS "systemClass",
-              COALESCE(s.effect, 'none') AS effect, s.statics,
-              r.name AS "regionName", r.npc_type AS "npcType"
-       FROM solar_systems s
-       LEFT JOIN map_regions r ON r.id = s.region_id
-       WHERE s.id = $1`,
-      [loc.solar_system_id],
-    );
-
-    if (!rows.length) { res.json({ online: true, system: null, ship }); return; }
-    res.json({ online: true, system: rows[0], ship });
+    res.json(await getLocationPayload(req.session.userId!));
   } catch (err) {
     log.error('Location check failed:', err);
     res.status(500).json({ error: 'Failed to get location' });
+  }
+});
+
+// GET /api/character/:userId/location — location of another character on the
+// SAME account. Used to centre/route from an alt that isn't logged into Nexum
+// (e.g. a scout sitting on the chain exit). Authorised by owner ownership; a
+// revoked/expired alt token degrades to { online: false } rather than erroring.
+characterRouter.get('/:targetUserId/location', async (req, res) => {
+  const targetUserId = Number(req.params.targetUserId);
+  if (!Number.isInteger(targetUserId)) { res.status(400).json({ error: 'Invalid user id' }); return; }
+  const ownerId = await resolveOwnerId(req);
+  if (ownerId == null) { res.status(401).json({ error: 'Not authenticated' }); return; }
+  const { rows } = await db.query<{ owner_id: number | null }>(
+    `SELECT owner_id FROM users WHERE id = $1`, [targetUserId]);
+  if (!rows.length || rows[0].owner_id !== ownerId) { res.status(403).json({ error: 'Not your character' }); return; }
+  try {
+    res.json(await getLocationPayload(targetUserId));
+  } catch (err) {
+    log.error(`Location check failed for character ${targetUserId}:`, err);
+    res.json({ online: false });
   }
 });
 

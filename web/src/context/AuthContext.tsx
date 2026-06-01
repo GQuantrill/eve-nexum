@@ -18,6 +18,7 @@ export interface AccountCharacter {
   blocked: boolean;
   lastKnownSystemId: number | null;
   lastKnownSystemName: string | null;
+  lastKnownSystemClass: string | null;
   active: boolean;
 }
 

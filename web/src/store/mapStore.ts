@@ -7,6 +7,15 @@ import { toast } from '../components/ui/Toaster';
 import type { WormholeMap, MapSystem, MapConnection, SystemClass, WormholeEffect } from '../types';
 import { pickHandles } from '../components/map/edgeUtils';
 
+// Another of the account's characters chosen as the route/centre origin.
+export interface RouteOriginOverride {
+  charId:        number;          // users.id of the reference character
+  characterName: string;
+  eveSystemId:   number;          // the system to route from / centre on
+  systemName:    string;
+  systemClass:   string | null;   // for the k-space gate in useRouteOrigin
+}
+
 // Debounce position saves — fires max once per 500 ms per system
 const moveTimers = new Map<string, ReturnType<typeof setTimeout>>();
 // Per-node measured dimensions, kept out of reactive state so individual
@@ -135,6 +144,12 @@ interface MapStore {
   centerRequestEveId: number | null;
   requestCenterOnEveSystem: (eveSystemId: number) => void;
   clearCenterRequest: () => void;
+
+  // Route/centre origin override: point jump calcs + centring at another of
+  // the account's characters (e.g. a scout on the chain exit) instead of the
+  // active character. null = use the active character's live location.
+  routeOrigin: RouteOriginOverride | null;
+  setRouteOrigin: (o: RouteOriginOverride | null) => void;
 
   // Undo
   undoStack: UndoCommand[];
@@ -383,6 +398,7 @@ export const useMapStore = create<MapStore>()((set, get) => {
     autoLayoutPending: false,
     fitViewPending: false,
     centerRequestEveId: null,
+    routeOrigin: null,
     sigRev: {},
     structRev: {},
     panelOrder: ['activity', 'killboard', 'notes', 'signatures', 'structures', 'npcStations'],
@@ -631,6 +647,8 @@ export const useMapStore = create<MapStore>()((set, get) => {
 
     requestCenterOnEveSystem: (eveSystemId) => set({ centerRequestEveId: eveSystemId }),
     clearCenterRequest: () => set({ centerRequestEveId: null }),
+
+    setRouteOrigin: (o) => set({ routeOrigin: o }),
 
     // ── Systems ───────────────────────────────────────────────────────────────
 

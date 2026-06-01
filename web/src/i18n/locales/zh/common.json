@@ -6,7 +6,10 @@
     "switchCharacter": "切换角色",
     "addCharacter": "添加角色",
     "blocked": "已封禁",
-    "characterAdded": "已添加 {{name}}"
+    "characterAdded": "已添加 {{name}}",
+    "switchTo": "切换到 {{name}}",
+    "focusLocation": "以 {{name}} 为中心并从其位置规划路线",
+    "noLocation": "没有 {{name}} 的已知位置"
   },
   "actions": {
     "save": "保存",
@@ -646,7 +649,8 @@
     "sortSecure": "安全路线"
   },
   "route": {
-    "fromLastKnown": "从 {{system}} 起的跳跃数（最后已知位置）"
+    "fromLastKnown": "从 {{system}} 起的跳跃数（最后已知位置）",
+    "fromCharacter": "从 {{character}} 起的跳跃数 — {{system}}"
   },
   "activity": {
     "thisHour": "本小时",

@@ -6,7 +6,10 @@
     "switchCharacter": "Cambiar de personaje",
     "addCharacter": "Añadir personaje",
     "blocked": "bloqueado",
-    "characterAdded": "{{name}} añadido"
+    "characterAdded": "{{name}} añadido",
+    "switchTo": "Cambiar a {{name}}",
+    "focusLocation": "Centrar y rutar desde {{name}}",
+    "noLocation": "No hay ubicación conocida de {{name}}"
   },
   "actions": {
     "save": "Guardar",
@@ -646,7 +649,8 @@
     "sortSecure": "Ruta segura"
   },
   "route": {
-    "fromLastKnown": "Saltos desde {{system}} (última ubicación conocida)"
+    "fromLastKnown": "Saltos desde {{system}} (última ubicación conocida)",
+    "fromCharacter": "Saltos desde {{character}} — {{system}}"
   },
   "activity": {
     "thisHour": "esta hora",

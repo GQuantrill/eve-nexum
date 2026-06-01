@@ -6,7 +6,10 @@
     "switchCharacter": "Сменить персонажа",
     "addCharacter": "Добавить персонажа",
     "blocked": "заблокирован",
-    "characterAdded": "{{name}} добавлен"
+    "characterAdded": "{{name}} добавлен",
+    "switchTo": "Переключиться на {{name}}",
+    "focusLocation": "Центрировать и строить маршрут от {{name}}",
+    "noLocation": "Нет известного местоположения {{name}}"
   },
   "actions": {
     "save": "Сохранить",
@@ -672,7 +675,8 @@
     "sortSecure": "Безопасный маршрут"
   },
   "route": {
-    "fromLastKnown": "Прыжки от {{system}} (последнее известное местоположение)"
+    "fromLastKnown": "Прыжки от {{system}} (последнее известное местоположение)",
+    "fromCharacter": "Прыжки от {{character}} — {{system}}"
   },
   "activity": {
     "thisHour": "за этот час",

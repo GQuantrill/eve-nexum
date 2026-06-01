@@ -6,7 +6,10 @@
     "switchCharacter": "Charakter wechseln",
     "addCharacter": "Charakter hinzufügen",
     "blocked": "blockiert",
-    "characterAdded": "{{name}} hinzugefügt"
+    "characterAdded": "{{name}} hinzugefügt",
+    "switchTo": "Zu {{name}} wechseln",
+    "focusLocation": "Karte auf {{name}} zentrieren und von dort routen",
+    "noLocation": "Kein bekannter Standort für {{name}}"
   },
   "actions": {
     "save": "Speichern",
@@ -646,7 +649,8 @@
     "sortSecure": "Sichere Route"
   },
   "route": {
-    "fromLastKnown": "Sprünge ab {{system}} (letzter bekannter Standort)"
+    "fromLastKnown": "Sprünge ab {{system}} (letzter bekannter Standort)",
+    "fromCharacter": "Sprünge von {{character}} — {{system}}"
   },
   "activity": {
     "thisHour": "diese Stunde",

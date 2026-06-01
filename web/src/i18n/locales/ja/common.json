@@ -6,7 +6,10 @@
     "switchCharacter": "キャラクター切り替え",
     "addCharacter": "キャラクターを追加",
     "blocked": "ブロック中",
-    "characterAdded": "{{name}} を追加しました"
+    "characterAdded": "{{name}} を追加しました",
+    "switchTo": "{{name}} に切り替え",
+    "focusLocation": "{{name}} を中心に表示し、そこからルート計算",
+    "noLocation": "{{name}} の既知の位置がありません"
   },
   "actions": {
     "save": "保存",
@@ -646,7 +649,8 @@
     "sortSecure": "安全ルート"
   },
   "route": {
-    "fromLastKnown": "{{system}} からのジャンプ数（最後に確認された位置）"
+    "fromLastKnown": "{{system}} からのジャンプ数（最後に確認された位置）",
+    "fromCharacter": "{{character}} からのジャンプ数 — {{system}}"
   },
   "activity": {
     "thisHour": "今時間",

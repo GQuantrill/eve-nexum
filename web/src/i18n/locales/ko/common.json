@@ -6,7 +6,10 @@
     "switchCharacter": "캐릭터 전환",
     "addCharacter": "캐릭터 추가",
     "blocked": "차단됨",
-    "characterAdded": "{{name}} 추가됨"
+    "characterAdded": "{{name}} 추가됨",
+    "switchTo": "{{name}}(으)로 전환",
+    "focusLocation": "{{name}} 위치로 이동하고 경로 계산",
+    "noLocation": "{{name}}의 알려진 위치 없음"
   },
   "actions": {
     "save": "저장",
@@ -646,7 +649,8 @@
     "sortSecure": "안전 경로"
   },
   "route": {
-    "fromLastKnown": "{{system}}에서의 점프 (마지막으로 확인된 위치)"
+    "fromLastKnown": "{{system}}에서의 점프 (마지막으로 확인된 위치)",
+    "fromCharacter": "{{character}}에서의 점프 — {{system}}"
   },
   "activity": {
     "thisHour": "이번 시간",
