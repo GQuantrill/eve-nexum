@@ -153,6 +153,7 @@
           <option value="fr">🇫🇷 Français</option>
           <option value="es">🇪🇸 Español</option>
           <option value="pt">🇵🇹 Português</option>
+          <option value="zh">🇨🇳 简体中文</option>
         </select>
       </nav>
 
@@ -438,7 +439,7 @@
 
           // Languages with a translation dictionary below. English is the
           // untranslated source, so it has no entry.
-          var SUPPORTED = { de: 1, fr: 1, es: 1, pt: 1 };
+          var SUPPORTED = { de: 1, fr: 1, es: 1, pt: 1, zh: 1 };
 
           // Wire up the language picker regardless of the current language so a
           // visitor can switch between any language (including back to English).
@@ -832,6 +833,100 @@
             ctaGh: 'Obtê-lo no GitHub',
             footP1: 'Comparação mantida pela equipa do Nexum · última verificação em maio de 2026. Os detalhes da concorrência mudam com o tempo — segue as ligações acima para confirmar as funcionalidades atuais. Detetaste uma imprecisão? <a href="https://github.com/GQuantrill/eve-nexum/issues">Abre um issue</a>.',
             footP2: 'EVE Online e o logótipo EVE são marcas registadas da CCP hf. Todos os direitos reservados em todo o mundo. O Nexum é uma ferramenta de terceiros e não está afiliada à CCP hf., Pathfinder, Tripwire ou Wanderer, nem conta com o seu apoio. Consulta o <a href="/license/">aviso de licença e de PI de EVE</a> completo.'
+          };
+
+          // Simplified Chinese.
+          DICTS.zh = {
+            __title: 'EVE Online 虫洞绘图工具对比：Nexum vs Pathfinder vs Tripwire vs Wanderer（2026）',
+            nav: '&larr; Nexum 主页',
+            h1: 'EVE Online 虫洞绘图工具对比：<br />Nexum vs Pathfinder vs Tripwire vs Wanderer',
+            sub: '对 EVE Online 主流虫洞绘图工具的一次坦诚审视。',
+            upd: '最后更新于 2026 年 5 月 27 日 · 由 Nexum 团队维护',
+            lede: '如果你在 J空间侦察或居住，一款好的虫洞绘图工具必不可少。<strong>Nexum</strong> 是一款现代的开源绘图工具 — 使用免费的托管版本或自行托管 — 它覆盖完整的工作流程：实时链路绘图、信号与质量跟踪，并进一步提供真正的关洞计算器、整星域地图生成、声望与主权叠加层以及 Discord 警报。下面将它与其他常见选择进行对比 — <strong>Tripwire</strong>、<strong>Pathfinder</strong> 和 <strong>Wanderer</strong>。Nexum 由我们制作，所以我们自然认为它是大多数军团的最强选择 — 但我们已让竞品的事实保持准确并附上链接，方便你自行判断。',
+
+            h2Glance: '一览',
+            cap1: '核心对比。验证于 2026 年 5 月 — 竞品功能会变化；请按链接确认。',
+            gOpenSource: '开源',
+            gSelfHost: '可自托管',
+            gCloud: '托管云选项',
+            gSso: 'EVE SSO 登录',
+            gSync: '实时多用户同步',
+            gSigPaste: '信号粘贴与跟踪',
+            gMass: '虫洞质量 / 关洞',
+            gTech: '技术栈',
+            gCost: '成本',
+            yes: '<span class="yes">是</span>',
+            yesMit: '<span class="yes">是</span>（MIT）',
+            yesDocker: '<span class="yes">是</span>（Docker）',
+            yesCe: '<span class="yes">是</span>（Community Edition）',
+            free: '<span class="yes">免费</span>',
+            freeBoth: '<span class="yes">免费</span>（托管与自托管）',
+            gCloudN: '<span class="yes">是</span> — eve-nexum.com 上的免费公共实例，外加自托管',
+            gCloudP: '<span class="meh">社区运营的实例</span>',
+            gCloudT: '<span class="meh">公共主机已于 2024 年关闭</span>',
+            gCloudW: '<span class="yes">是</span> — 官方「Wanderer Cloud」，由开发者管理',
+            gMassN: '专用关洞计算器（±10% 方差、搁浅警告）',
+            massStatus: '质量状态跟踪',
+
+            h2Further: 'Nexum 更进一步之处',
+            furtherIntro: '四者都能很好地处理基础功能。以下是 Nexum 内置而其他工具通常不作为文档化、开箱即用功能提供的能力 — 也是军团选择它的原因：',
+            cap2: 'Nexum 的独特功能。「—」表示它并非那些工具文档化、内置的招牌功能（功能会变化 — 请用下方链接核实）。',
+            fFeature: '功能',
+            f1h: 'Wormhole <strong>关洞计算器</strong> — 建模 ±10% 质量方差、带侧别跟踪的冷/热关洞船，并在某次通过会困住你的关洞船或坍塌该洞之前发出警告',
+            f1o: '基础质量状态跟踪',
+            f2h: '<strong>从整个 EVE 星域生成地图</strong> — Dotlan 风格自动布局，预先绘制区域内每个星门',
+            f3h: '<strong>将两个地图合并</strong>为一个，去重星系并并入信号、建筑和笔记',
+            f4h: '<strong>Discord 通知</strong> — 入向 K162 和新连接警报推送到你的频道，即使无人在看地图',
+            f5h: '<strong>由你自己的 EVE 联系人驱动的声望与主权叠加层</strong> — 全链的敌对/友好着色、killboard 和主权光环',
+            f6h: '<strong>地图查看者实时在场</strong> — 为每个查看地图的人显示一个圆点，不仅是你的舰队 — 外加舰队位置',
+            f6o: '舰队位置各不相同',
+            f7h: '<strong>环境情报图层</strong> — 零安风暴、A0 恒星、冰带、链虫洞效应，以及入侵 / 叛乱的接近警报',
+            f8h: '<strong>军团套件</strong> — 权限、共享地图、管理仪表盘、用户与星系报告、审计日志和按角色归因',
+            f8o: '各不相同',
+
+            h2Detail: '工具详解',
+            twP: '经典的、以信号为先的虫洞绘图工具，很大一部分 J空间玩家就是用它成长起来的。它快速、专注，其工作流程对老手而言已是肌肉记忆。长期运营的公共实例（tripwire.eve-apps.com）于 2024 年中关闭，但 Tripwire 是开源的，所以它通过自托管和社区运营的实例延续了下来。',
+            twBest: '<strong>最适合：</strong>想要熟悉的 Tripwire 信号工作流程且愿意自托管的团队。<a href="https://bitbucket.org/daimian/tripwire">源码 &rarr;</a>',
+            pfP: '最成熟、功能最密集的自托管绘图工具。它开创了许多虫洞玩家所期待的东西 — 丰富的虫洞数据、经由 EVE-Scout 的 Thera 连接、实时 zKillboard 击杀流、插件 API 等。代价是运维负担：它是 PHP/MySQL 栈，比单容器应用更费力去搭建和保持更新。',
+            pfBest: '<strong>最适合：</strong>想要最多功能且不介意运行更重栈的团队。<a href="https://github.com/exodus4d/pathfinder">GitHub &rarr;</a>',
+            wdP: '现代的挑战者，被宣传为 Pathfinder 的轻量、快速替代品。基于 Elixir/Phoenix 构建，配 React 前端，并以 MIT 开源，它是四者中唯一拥有<em>官方托管云</em>版本的 — 让团队无需运行任何基础设施即可使用 — 同时仍提供免费的自托管 Community Edition。',
+            wdBest: '<strong>最适合：</strong>想要精致界面并希望完全省去自托管的团队。<a href="https://wanderer.ltd/">网站 &rarr;</a> · <a href="https://github.com/wanderer-industries/wanderer">GitHub &rarr;</a>',
+            nxP: '一款现代、开源、自托管、以军团为先的绘图工具。它覆盖核心工作流程 — 实时协作绘图（地图上所有人实时编辑）、带虫洞老化的信号粘贴，以及连接跟踪 — 并叠加了面向运营军团链的额外功能：',
+            nxLi1: '<strong>关洞计算器</strong>，建模 ±10% 质量方差，将每次通过预测为安全 / 可能坍塌 / 将会坍塌，并在某次通过会困住你的关洞船之前发出警告。',
+            nxLi2: '<strong>将整个 EVE 星域生成</strong>为 Dotlan 风格的地图，并<strong>合并地图</strong>。',
+            nxLi3: '<strong>声望与主权叠加层</strong>、实时 killboard 和跳跃/击杀活动图表。',
+            nxLi4: '地图上的<strong>飞行员在场与舰队位置</strong>，外加可选的位置跟踪。',
+            nxLi5: '来自 EVE-Scout 的 <strong>Thera 与 Turnur</strong> 公开连接。',
+            nxLi6: '<strong>军团模式</strong>：权限、共享地图、管理报告、审计日志，以及针对入向 K162 和新连接的 <strong>Discord 通知</strong>。',
+            nxP2: '它作为一个小型 Docker 栈运行（React + Node + Postgres），并用 EVE SSO 登录 — 使用 eve-nexum.com 上的免费公共实例，或自行托管。作为四者中最新的，它的社区规模较小。',
+            nxBest: '<strong>最适合：</strong>想要一款内置关洞、星域生成、声望和 Discord 的现代绘图工具的军团 — 由我们托管或自托管。<a href="/">立即开始 &rarr;</a> · <a href="https://github.com/GQuantrill/eve-nexum">GitHub &rarr;</a>',
+
+            h2Choose: '你该选哪个？',
+            chooseP1: '<strong>对大多数从零开始搭建的军团，我们会从 Nexum 入手。</strong>它很现代，用 Docker 几分钟就能立起来，并把关洞计算器、星域生成、声望叠加层和 Discord 警报打包在一起 — 这些你本来得自己拼凑 — 全部都在一个实时协作地图中。<a href="/">立即开始</a>，自己看看。',
+            chooseP2: '其他几款也是好工具，在特定情况下可能更合适：',
+            chooseLi1: '<strong>已经熟练掌握经典的 Tripwire 信号工作流程？</strong>Tripwire 仍然把这件事做得很好 — 现在改为自托管。',
+            chooseLi2: '<strong>需要最深入、最成熟的功能集，且乐于运行更重的 PHP 栈？</strong>Pathfinder。',
+            chooseLi3: '<strong>完全不想运行任何服务器？</strong>使用 Nexum 的免费公共实例，或 Wanderer 的云。',
+
+            h2Faq: '常见问题',
+            faqQ1: 'EVE Online 最好的虫洞绘图工具是哪个？',
+            faqA1: '这取决于你的团队，但对于现代的自托管方案，我们会推荐 Nexum — 它在一个实时协作地图中打包了最多的内置功能（虫洞关洞计算器、整星域地图生成、声望叠加层和 Discord 警报）。Tripwire 仍是经典的信号工具，Pathfinder 是最成熟、功能最密集的选择，而 Wanderer 增加了托管云版本。',
+            faqQ2: 'Tripwire 还可用吗？',
+            faqA2: '长期运营的公共实例于 2024 年中关闭，但 Tripwire 是开源的，所以你可以自托管它或使用社区运营的实例。',
+            faqQ3: 'Pathfinder 还在开发吗？',
+            faqA3: '不 — 没有在积极开发。最初的 Pathfinder（由 exodus4d 开发）自 2020 年以来没有新版本，而延续它的社区分支最后一次提交在 2025 年初，此后没有发布。积极开发实际上已经停止 — 这也是像 Nexum 这样更新、积极维护的绘图工具存在的原因之一。',
+            faqQ4: 'Pathfinder 和 Tripwire 有什么好的开源替代品？',
+            faqA4: 'Nexum 和 Wanderer 都是现代的开源绘图工具。Nexum 是自托管的，带 EVE SSO、实时协作和军团工具；Wanderer 采用 MIT 许可，提供自托管以及一个托管云版本。',
+            faqQ5: '我可以自托管一款 EVE Online 虫洞绘图工具吗？',
+            faqA5: '可以 — Nexum、Pathfinder、Tripwire 以及 Wanderer 的 Community Edition 都可以自托管。Nexum 用 Docker 在 Postgres 上运行，并用 EVE SSO 登录。',
+            faqQ6: '这些虫洞绘图工具免费吗？',
+            faqA6: '是 — 四者都免费。Pathfinder 和 Tripwire 是自托管的；Nexum 和 Wanderer 各自既提供免费的公共托管版本，也提供自托管。',
+
+            ctaP: '<strong>Nexum 免费。</strong>使用托管版本，或在几分钟内自托管你军团的链。',
+            ctaBtn: '立即开始',
+            ctaGh: '在 GitHub 上获取',
+            footP1: '对比由 Nexum 团队维护 · 最后核实于 2026 年 5 月。竞品细节会随时间变化 — 请按上方链接确认当前功能。发现不准确之处？<a href="https://github.com/GQuantrill/eve-nexum/issues">开一个 issue</a>。',
+            footP2: 'EVE Online 和 EVE 标志是 CCP hf. 的注册商标。保留全球所有权利。Nexum 是第三方工具，与 CCP hf.、Pathfinder、Tripwire 或 Wanderer 无关，也未获其认可。请查看完整的 <a href="/license/">许可证与 EVE 知识产权声明</a>。'
           };
 
           var DICT = DICTS[lang];
