@@ -1,0 +1,1167 @@
+{
+  "language": {
+    "label": "言語"
+  },
+  "actions": {
+    "save": "保存",
+    "cancel": "キャンセル",
+    "delete": "削除",
+    "copy": "コピー",
+    "close": "閉じる",
+    "ok": "OK",
+    "on": "オン",
+    "off": "オフ",
+    "expand": "展開",
+    "collapse": "折りたたむ"
+  },
+  "confirm": {
+    "title": "よろしいですか？",
+    "dontShowAgain": "今後表示しない"
+  },
+  "admin": {
+    "back": "マップに戻る",
+    "title": "管理",
+    "tabs": {
+      "users": "ユーザー",
+      "maps": "マップ",
+      "reports": "レポート",
+      "discord": "Discord",
+      "audit": "監査ログ"
+    },
+    "loading": "読み込み中…",
+    "exportCsv": "CSV としてエクスポート",
+    "users": {
+      "title": "ユーザー",
+      "none": "まだユーザーがいません。",
+      "colCharacter": "キャラクター",
+      "colCorp": "コーポ",
+      "colAlliance": "アライアンス",
+      "colRole": "権限",
+      "colStatus": "ステータス",
+      "colLastLogin": "最終ログイン",
+      "you": "あなた",
+      "blocked": "ブロック済み",
+      "active": "アクティブ",
+      "unblock": "ブロック解除",
+      "block": "ブロック",
+      "recheck": "再確認",
+      "recheckTitle": "このユーザーの現在のコーポを ESI で再照会",
+      "blockConfirm": "{{name}} をブロックしますか？次のリクエスト時にログアウトされます。",
+      "loadFailed": "ユーザーの読み込みに失敗しました",
+      "roleChangeFailed": "権限の変更に失敗しました",
+      "blockChangeFailed": "ブロック状態の変更に失敗しました",
+      "recheckFailed": "再確認に失敗しました"
+    },
+    "maps": {
+      "title": "マップ",
+      "none": "まだマップがありません。",
+      "colName": "名前",
+      "colOwner": "所有者",
+      "colCorp": "コーポ",
+      "colSystems": "星系",
+      "colConnections": "接続",
+      "colLock": "ロック",
+      "colLastActive": "最終アクティブ",
+      "locked": "ロック中",
+      "open": "オープン",
+      "unlock": "ロック解除",
+      "unlockTitle": "マップのロックを解除します。星系と接続が再び編集可能になります",
+      "lock": "ロック",
+      "lockTitle": "星系と接続を凍結します。シグネチャ/ストラクチャ/メモは引き続き編集可能です",
+      "deleteConfirm": "「{{name}}」（所有者: {{owner}}）を強制削除しますか？この操作は取り消せません。",
+      "loadFailed": "マップの読み込みに失敗しました",
+      "lockChangeFailed": "ロック状態の変更に失敗しました",
+      "deleteFailed": "削除に失敗しました"
+    },
+    "audit": {
+      "title": "監査ログ",
+      "none": "まだ管理操作がありません。",
+      "colWhen": "日時",
+      "colActor": "実行者",
+      "colAction": "操作",
+      "colTarget": "対象",
+      "colChange": "変更",
+      "loadFailed": "監査ログの読み込みに失敗しました"
+    },
+    "reports": {
+      "title": "レポート",
+      "tabs": {
+        "users": "ユーザー",
+        "systems": "星系",
+        "ghostSites": "ゴーストサイト"
+      },
+      "filter": "フィルター",
+      "window": "期間",
+      "windowHint": "期間を適用するにはフィルターを選択してください",
+      "windowOptions": {
+        "all": "全期間",
+        "24h": "過去24時間",
+        "week": "過去1週間",
+        "month": "過去1ヶ月",
+        "year": "過去1年"
+      },
+      "userFilters": {
+        "all": "すべてのユーザー",
+        "logins": "ログイン",
+        "signatures": "シグネチャ",
+        "structures": "ストラクチャ"
+      },
+      "sig": {
+        "data": "データ",
+        "relic": "レリック",
+        "wormhole": "WH",
+        "gas": "ガス",
+        "ore": "鉱石",
+        "combat": "コンバット",
+        "unknown": "不明"
+      },
+      "users": {
+        "loadFailed": "ユーザーレポートの読み込みに失敗しました",
+        "empty": "現在のフィルターに一致するユーザーがいません。",
+        "totalUsers": "総ユーザー数",
+        "uniqueCorps": "ユニークコーポ数",
+        "uniqueAlliances": "ユニークアライアンス数",
+        "colCharacter": "キャラクター",
+        "colCorp": "コーポ",
+        "colAlliance": "アライアンス",
+        "colLastLogin": "最終ログイン",
+        "colSystemsAdded": "追加した星系",
+        "colSystemsDeleted": "削除した星系",
+        "colLastCorpStructure": "最終コーポストラクチャ",
+        "colTotalStructures": "総ストラクチャ数",
+        "colLastCorpSignature": "最終コーポシグネチャ",
+        "colTotalSignatures": "総シグネチャ数"
+      },
+      "systems": {
+        "loadFailed": "星系レポートの読み込みに失敗しました",
+        "empty": "この期間にシグネチャはありません。",
+        "heading": "全マップのシグネチャ",
+        "total": "合計",
+        "typeMix": "シグネチャタイプの分布",
+        "sigLabel": "シグネチャ",
+        "chart": {
+          "hour24": "時間あたりシグネチャ（過去24時間）",
+          "dayWeek": "日あたりシグネチャ（過去1週間）",
+          "dayMonth": "日あたりシグネチャ（過去1ヶ月）",
+          "monthYear": "月あたりシグネチャ（過去1年）",
+          "monthAll": "月あたりシグネチャ（全期間）"
+        },
+        "whHeading": "ワームホールタイプ",
+        "whEmpty": "タイプが記録されたワームホールシグネチャはまだありません。",
+        "colType": "タイプ",
+        "colCount": "数"
+      },
+      "ghost": {
+        "loadFailed": "ゴーストサイトレポートの読み込みに失敗しました",
+        "heading": "秘匿研究施設の観測記録",
+        "empty": "記録された Kスペースのゴーストサイトはまだありません。",
+        "colRegion": "リージョン",
+        "colConstellation": "コンステレーション",
+        "colSystem": "星系",
+        "colClass": "クラス",
+        "colSun": "恒星",
+        "colPlanets": "惑星",
+        "colMoons": "衛星",
+        "colObservations": "観測回数",
+        "colLastSeen": "最終確認"
+      }
+    },
+    "discord": {
+      "title": "Discord",
+      "titleNotifications": "Discord 通知",
+      "loadFailed": "Discord 設定の読み込みに失敗しました",
+      "saveFailed": "保存に失敗しました",
+      "updateFailed": "更新に失敗しました",
+      "noCorp": "コーポのコンテキストがありません — Discord 通知はコーポマップにのみ適用されます。",
+      "hint": "このコーポのマップが Discord に送信するワームホール通知を制御します。Webhook 自体はサーバー側で設定されます（DISCORD_WEBHOOK_URL）。デフォルトではすべてのマップとリージョンが通知します — これらの設定は差し引くだけです。",
+      "regions": "リージョン",
+      "notifyAll": "すべてのリージョンに通知",
+      "notifySelected": "選択したリージョンのみ",
+      "noRegionsSelected": "リージョンが選択されていません — 追加するまで何も通知されません。",
+      "removeRegion": "{{name}} を削除",
+      "searchPlaceholder": "入力してリージョンを検索…",
+      "saving": "保存中…",
+      "saveRegions": "リージョンを保存",
+      "saved": "保存しました",
+      "excludedMaps": "除外したマップ",
+      "excludedHint": "すべてのマップがデフォルトで通知します。マップにチェックを入れると Discord から除外されます。",
+      "noCorpMaps": "まだコーポマップがありません。",
+      "colMap": "マップ",
+      "colExclude": "除外"
+    }
+  },
+  "proximityOptIn": {
+    "title": "脅威アラートを有効にしますか？",
+    "body": "ニューエデンは危険な場所です。アクティブな<strong>インカージョン</strong>や<strong>反乱</strong>から数ジャンプ以内にいるとき、Nexum はデスクトップ通知と短い通知音を鳴らせます — オートパイロットで何も知らずに突っ込まないように。",
+    "sub": "しきい値の変更やこの機能のオフは、いつでも<em>マップオプション → 近接アラート</em>で行えます。",
+    "maybeLater": "後で",
+    "enable": "通知を有効にする"
+  },
+  "units": {
+    "jumps_one": "{{count}} ジャンプ",
+    "jumps_other": "{{count}} ジャンプ",
+    "systems_one": "{{count}} 星系",
+    "systems_other": "{{count}} 星系",
+    "kills_one": "{{count}} キル",
+    "kills_other": "{{count}} キル",
+    "hours_one": "{{count}} 時間",
+    "hours_other": "{{count}} 時間",
+    "days_one": "{{count}} 日",
+    "days_other": "{{count}} 日",
+    "weeks_one": "{{count}} 週間",
+    "weeks_other": "{{count}} 週間",
+    "months_one": "{{count}} ヶ月",
+    "months_other": "{{count}} ヶ月"
+  },
+  "createMap": {
+    "title": "新規マップ",
+    "mapName": "マップ名",
+    "namePlaceholder": "新規マップ",
+    "type": "タイプ",
+    "personal": "個人",
+    "corp": "コーポ",
+    "regionLabel": "リージョン（任意 — 空にすると空のマップ）",
+    "regionPlaceholder": "入力してリージョンを検索…",
+    "clearRegion": "リージョンをクリア",
+    "regionHint": "{{region}} から {{count}} 個の星系を生成し、ゲーム内座標に従って配置し、すべてのスターゲート接続を描画します。",
+    "corpLimit": "コーポマップの上限に達しました（{{max}}）。",
+    "personalLimit": "個人マップの上限に達しました（{{max}}）。",
+    "createFailed": "マップの作成に失敗しました",
+    "created": "{{region}} から「{{name}}」を作成しました",
+    "creating": "作成中…",
+    "create": "マップを作成"
+  },
+  "addSystem": {
+    "title": "星系を追加",
+    "systemName": "星系名",
+    "searchPlaceholder": "入力して EVE 星系を検索…",
+    "clearSelection": "選択をクリア",
+    "noResults": "「{{query}}」に一致する星系が見つかりません",
+    "class": "クラス",
+    "effect": "エフェクト",
+    "effectNone": "なし",
+    "statics": "スタティック",
+    "staticsPlaceholder": "データベースから自動入力",
+    "loading": "読み込み中…",
+    "add": "星系を追加",
+    "onMap": "マップ上"
+  },
+  "commandPalette": {
+    "placeholder": "星系とマップを検索…",
+    "search": "検索",
+    "noMatches": "一致なし",
+    "openMap": "↪ マップを開く: {{name}}",
+    "switchMap": "（マップ切り替え）",
+    "navigate": "移動",
+    "open": "開く",
+    "close": "閉じる"
+  },
+  "merge": {
+    "title": "マップを統合",
+    "corp": "コーポ",
+    "solo": "ソロ",
+    "sourceMap": "ソースマップ（統合元）",
+    "destMap": "宛先マップ（統合先）",
+    "selectSource": "ソースを選択…",
+    "selectDest": "宛先を選択…",
+    "differentMaps": "ソースと宛先は異なるマップである必要があります。",
+    "include": "含める",
+    "signatures": "シグネチャ",
+    "structures": "ストラクチャ",
+    "notes": "メモ",
+    "hint": "宛先に既にある星系は信頼できる情報源として保持されます — 不足している星系、接続、選択したデータのみが追加または更新されます。<strong>この操作は取り消せません。</strong>",
+    "merging": "統合中…",
+    "merge": "統合",
+    "merged": "統合完了: +{{systems}} 星系、+{{connections}} 接続、+{{signatures}} シグネチャ、+{{structures}} ストラクチャ",
+    "mergeFailed": "統合に失敗しました"
+  },
+  "mapSidebar": {
+    "openOptions": "マップオプション",
+    "closeOptions": "マップオプションを閉じる",
+    "sections": {
+      "mapOptions": "マップオプション",
+      "systemOptions": "星系オプション",
+      "connections": "接続",
+      "route": "ルート",
+      "chainExits": "チェーン出口",
+      "proximityAlerts": "近接アラート",
+      "activity": "アクティビティ",
+      "fleet": "フリート",
+      "staleFade": "古い星系のフェード",
+      "importExport": "インポート / エクスポート",
+      "mergeMaps": "マップを統合",
+      "liveSharing": "ライブマップ共有",
+      "shareMap": "マップを共有",
+      "shortcuts": "ショートカット"
+    },
+    "snapToGrid": "グリッドに合わせる",
+    "minimap": "ミニマップ",
+    "position": "位置",
+    "minimapPos": {
+      "bottomRight": "右下",
+      "bottomLeft": "左下",
+      "topRight": "右上",
+      "topLeft": "左上"
+    },
+    "fontSize": "フォントサイズ",
+    "resetZoom": "100% にリセット",
+    "compact": "コンパクト",
+    "uniformSize": "均一サイズ",
+    "showStaticWhs": "スタティック WH を表示",
+    "easyConnect": "簡単接続",
+    "connectionStyle": "接続スタイル",
+    "edgeStyle": { "bezier": "標準", "straight": "直線", "smoothstep": "ステップ" },
+    "connectionThickness": "接続の太さ",
+    "thickness": { "thin": "細い", "standard": "標準", "thick": "太い", "extra": "極太" },
+    "optimizeConnections": "⟳ 接続を最適化",
+    "spreadNodes": "⊞ ノードを広げる",
+    "spreadNodesTooltip": "重なりを避けるため星系ノードを調整",
+    "routePreference": "ルート設定",
+    "routeShortest": "最短",
+    "routeSecure": "安全",
+    "routeHint": "最短: セキュリティに関係なく最少ジャンプ。安全: ハイセクを優先し、ハイセクの経路がない場合のみロー/ヌルを迂回します。",
+    "proximityHint": "インカージョン、反乱、または敵対主権の星系が現在地の範囲内にあるときに通知します。",
+    "threshold": "しきい値",
+    "proximityInSystem": "0 ジャンプ（同一星系）",
+    "proximityLe_one": "≤ {{count}} ジャンプ",
+    "proximityLe_other": "≤ {{count}} ジャンプ",
+    "browserNotifications": "ブラウザ通知",
+    "notifEnabled": "有効",
+    "notifBlocked": "ブロック中",
+    "notifEnable": "有効にする",
+    "notifBlockedTooltip": "アドレスバーの鍵 / サイト情報アイコン → 通知 → 許可 をクリックし、再読み込みしてください。",
+    "notifBlockedHint": "ブラウザがこのサイトの通知をブロックしています。アドレスバーの鍵アイコン → 通知 → 許可 → ページを再読み込み してください。",
+    "activityHint": "次のグラフを表示:",
+    "activityJumps": "ジャンプ",
+    "activityShipKills": "艦船キル",
+    "activityPodKills": "ポッドキル",
+    "activityNpcKills": "NPC キル",
+    "activityNpcDelta": "NPC 差分",
+    "fleetHint": "フリートメンバーを、いる星系の上に紫の点として表示します。点にカーソルを合わせると名前が表示されます。",
+    "showFleetMembers": "フリートメンバーを表示",
+    "staleHint": "選択した間隔の間更新されていない星系を視覚的に暗くし、古いチェーンの残りを一目で見つけられるようにします。",
+    "exportJson": "↓ JSON としてエクスポート",
+    "importJson": "↑ JSON からインポート",
+    "exportPng": "⎙ PNG としてエクスポート",
+    "mergeHint": "別のマップをあなたのマップの1つに結合します。宛先は既存の星系を保持し、不足している星系、接続、選択したデータが追加または更新されます。この操作は取り消せません。",
+    "mergeButton": "⇲ マップを統合…",
+    "allowMergeSource": "統合ソースとして許可",
+    "allowMergeDest": "統合宛先として許可",
+    "mergeFlagHint": "オンにすると、コーポメンバーがこのコーポマップを統合の<em>ソース</em>または<em>宛先</em>として使用できます。",
+    "updateSettingFailed": "設定の更新に失敗しました",
+    "shareActiveHint": "ライブ共有リンク。下でゲストに見せる内容を切り替えてください。以前にリンクを生成済みの場合、変更は自動的に反映され、再生成は不要です。",
+    "shareInactiveHint": "アカウントなしで誰でも開ける読み取り専用リンクを作成します。公開するカテゴリと有効期限を選択してください — その期間内に URL を持つ誰もが、共有を有効にしたすべてを見られます。",
+    "linkExpiresAfter": "リンクの有効期限",
+    "includeSignatures": "シグネチャを含める",
+    "showJumpBridges": "ジャンプブリッジを表示",
+    "includeStructures": "ストラクチャを含める",
+    "includeNotes": "メモを含める",
+    "copyLink": "リンクをコピー",
+    "working": "処理中…",
+    "revoke": "取り消し",
+    "createShareLink": "共有リンクを作成",
+    "createShareFailed": "共有リンクの作成に失敗しました",
+    "revokeShareFailed": "共有リンクの取り消しに失敗しました",
+    "updateShareFailed": "共有オプションの更新に失敗しました",
+    "linkCopied": "ライブマップリンクをコピーしました",
+    "copyFailed": "コピーに失敗しました — 手動で選択してコピーしてください",
+    "shortcut": {
+      "searchSystems": "星系とマップを検索",
+      "centreHome": "ホーム星系を中央に",
+      "removeSelected": "選択した星系を削除",
+      "undo": "元に戻す",
+      "multiSelect": "星系を複数選択",
+      "rubberBand": "ドラッグで星系を選択"
+    },
+    "canvasNotFound": "マップキャンバスが見つかりませんでした",
+    "exportFailed": "エクスポートに失敗しました: {{error}}",
+    "invalidJson": "無効な JSON ファイルです。",
+    "notNexumMap": "このファイルは Eve-Nexum のマップエクスポートではないようです。",
+    "importFailed": "インポートに失敗しました: {{error}}"
+  },
+  "customIntel": {
+    "title": "カスタムインテル",
+    "hint": "色付きの独自インテルタグを定義します。星系の右クリックメニューに組み込みタグと並んで表示されます。",
+    "newItem": "新規インテル",
+    "labelPlaceholder": "ラベル",
+    "remove": "インテルオプションを削除",
+    "max": "カスタムインテルタグは最大 {{count}} 個",
+    "add": "インテルを追加"
+  },
+  "chainExits": {
+    "noExits": "このチェーンに Kスペース出口はありません。",
+    "hint": "現在マップ上にある Kスペース星系を、セキュリティクラス別に表示します。Jita へのルートはゲートのみ — ワームホールの近道は数えません。",
+    "highSec": "ハイセク",
+    "lowSec": "ローセク",
+    "nullSec": "ヌルセク",
+    "nearestJita": "最寄りの Jita:",
+    "via": "経由"
+  },
+  "mapShares": {
+    "hint": "別のキャラクター — またはコーポの全メンバー — にこの個人マップの編集アクセスを付与します。受信者は内容とトポロジーを編集できますが、名前変更、削除、再共有はできません。",
+    "character": "キャラクター",
+    "corp": "コーポ",
+    "placeholderChar": "正確なキャラクター名",
+    "placeholderCorp": "正確なコーポ名",
+    "typeAtLeast3": "3文字以上入力してください",
+    "searching": "検索中…",
+    "found": "見つかりました: {{name}}",
+    "noMatch": "完全一致なし",
+    "adding": "追加中…",
+    "share": "共有",
+    "loading": "読み込み中…",
+    "none": "アクティブな共有はありません。",
+    "badgeChar": "キャラ",
+    "badgeCorp": "コーポ",
+    "unknownTarget": "（不明な {{kind}} #{{id}}）",
+    "revokeAccess": "アクセスを取り消す",
+    "sharedWith": "{{name}} と共有中",
+    "accessRevoked": "アクセスを取り消しました",
+    "accessRevokedFor": "{{name}} のアクセスを取り消しました",
+    "addFailed": "共有の追加に失敗しました",
+    "revokeFailed": "共有の取り消しに失敗しました"
+  },
+  "panes": {
+    "noEveSystem": "EVE 星系が関連付けられていません",
+    "addNote": "メモを追加…"
+  },
+  "connPanel": {
+    "whType": "ワームホールタイプ",
+    "whTypePlaceholder": "K162、C247…",
+    "massStatus": "質量ステータス",
+    "stable": "安定",
+    "destabilized": "不安定化（<50%）",
+    "critical": "危機的（<10%）",
+    "timeStatus": "時間ステータス",
+    "fresh": "新鮮",
+    "lessThan1d": "残り1日未満",
+    "lessThan4h": "残り4時間未満",
+    "lessThan1h": "残り1時間未満",
+    "expired": "期限切れ",
+    "size": "サイズ",
+    "sizeXl": "XL（フレイター）",
+    "sizeLarge": "大（バトルシップ）",
+    "sizeMedium": "中（クルーザー）",
+    "sizeSmall": "小（フリゲート）",
+    "rollingCalculator": "ロール計算機",
+    "custom": "カスタム",
+    "collapse": { "open": "オープン", "maybe": "崩壊した可能性", "collapsed": "崩壊済み" },
+    "remaining": "残り {{worst}}–{{best}} · 使用 {{used}} · 最大ジャンプ {{max}}",
+    "useMyShip": "自分の艦船を使用",
+    "useMyShipTitle": "コールド = {{ship}}（{{mass}}）、ホット = +プロップ",
+    "noCurrentShip": "現在の艦船なし",
+    "cold": "コールド",
+    "hot": "ホット",
+    "tooHeavyCold": "ローラー（{{mass}}）はこのホールには重すぎます（最大ジャンプ {{max}}）。",
+    "roller": "ローラー:",
+    "home": "ホーム",
+    "far": "向こう側",
+    "homeSideLabel": "ホーム側",
+    "farSideLabel": "向こう側",
+    "tooHeavyHotTitle": "ホットで通過するには重すぎます — コールドを使用",
+    "passTitle": "+{{mass}} · {{side}}で終了",
+    "passHot": "通過 — ホット（+{{mass}}）",
+    "passCold": "通過 — コールド（+{{mass}}）",
+    "guidanceCollapsed": "崩壊に十分な質量が通過しました。再スキャンしたらリセットしてください。",
+    "guidanceSafe_one": "ロールを続けても安全です。残り約 {{min}}–{{max}} 回の通過。",
+    "guidanceSafe_other": "ロールを続けても安全です。残り約 {{min}}–{{max}} 回の通過。",
+    "guidanceRiskyFar": "次の通過でホールが崩壊する可能性があります — あなたのローラーが向こう側に取り残されます。ホーム側で終わる（入ってくる）通過にしてください。",
+    "guidanceRiskyHome": "次の通過でホールが崩壊する可能性があります — ただしあなたのホーム側で終わるので、試しても安全です。",
+    "guidanceDangerFar": "次の通過でホールが崩壊する可能性が高く — あなたのローラーが向こう側に取り残されます。",
+    "guidanceDangerHome": "次の通過でホールが崩壊する可能性が高く — あなたのローラーはホームで終わります。",
+    "undoPass": "通過を元に戻す",
+    "reset": "リセット",
+    "otherShips": "通過した他の艦船",
+    "noMassData": "タイプ「{{type}}」の質量データがありません。",
+    "enterWhType": "質量トラッキングを有効にするには、上にワームホールタイプを入力してください。",
+    "collapseConfirm": "この通過（+{{mass}}）でホールが崩壊する可能性が高いです。",
+    "collapseConfirmStrand": " あなたのローラーが向こう側に取り残されます。",
+    "collapseConfirmHome": " あなたのローラーはホーム側で終わります。",
+    "rollIt": "通過を実行",
+    "removeConnection": "接続を削除"
+  },
+  "mapControls": {
+    "panel": "コントロールパネル",
+    "zoomIn": "拡大",
+    "zoomOut": "縮小",
+    "fitView": "画面に合わせる",
+    "interactive": "操作のオン/オフ"
+  },
+  "demo": {
+    "hintClick": "星系をクリックすると、ここに詳細が表示されます。",
+    "hintAdd": "マップを右クリックして星系を追加します。",
+    "hintConnect": "ノードのハンドルからドラッグして星系を接続します。",
+    "hintLimit": "デモは {{count}} 星系に制限されています — ログインすると無制限。",
+    "systemsCount": "{{count}} / {{max}} 星系",
+    "signInMore": "ログインすると、キル、シグネチャ、ストラクチャ、アクティビティ、主権などを表示できます。",
+    "addSystemHere": "ここに星系を追加",
+    "addSystemLimit": "星系を追加（上限 {{max}} に到達）"
+  },
+  "ctxMenu": {
+    "disconnect": "接続を切断",
+    "jumpType": "ジャンプタイプ",
+    "standardJump": "標準ジャンプ",
+    "jumpgate": "ジャンプゲート",
+    "whLifetime": "ワームホール寿命",
+    "lifeFresh": "新鮮",
+    "life1d": "残り1日未満",
+    "life4h": "残り4時間未満",
+    "life1h": "残り1時間未満",
+    "lifeExpired": "期限切れ、まもなく閉鎖",
+    "massStability": "質量安定性",
+    "massStable": "残り50%超",
+    "massDestab": "残り50%未満",
+    "massCrit": "残り10%未満",
+    "lockSelected": "選択した {{count}} 件をロック",
+    "unlockSelected": "選択した {{count}} 件をロック解除",
+    "markCleared": "{{count}} 件をクリア済みにする",
+    "unsetHome": "ホームを解除",
+    "setHome": "ホームに設定（H で中央へ）",
+    "setIntel": "インテルを設定",
+    "setIntelFor": "{{count}} 件にインテルを設定",
+    "intelFriendly": "フレンドリー",
+    "intelHostile": "ホスタイル",
+    "intelOccupied": "占有",
+    "intelEmpty": "空き",
+    "intelUnnamed": "（無名）",
+    "clearIntel": "インテルをクリア",
+    "lockSystem": "星系をロック",
+    "unlockSystem": "星系をロック解除",
+    "removeSystem": "星系を削除",
+    "removeSystems": "{{count}} 星系を削除",
+    "addSystem": "星系を追加",
+    "selectAll": "すべて選択",
+    "noHomeSet": "ホーム星系が設定されていません。星系を右クリック →「ホームに設定」。",
+    "failSetDest": "目的地の設定に失敗しました",
+    "failAddWaypoint": "ウェイポイントの追加に失敗しました",
+    "canvasHint": "キャンバスを右クリックで星系追加 · ハンドル間をドラッグで接続 · Shift+クリックまたはドラッグで複数選択 · 星系を右クリックで操作"
+  },
+  "panel": {
+    "notes": "メモ",
+    "signatures": "シグネチャ",
+    "structures": "ストラクチャ",
+    "npcStations": "NPC ステーション",
+    "killboard": "zKillboard",
+    "activity": "アクティビティ"
+  },
+  "systemPanel": {
+    "unknownSystem": "不明な星系",
+    "addWaypointBtn": "+ ウェイポイント",
+    "inChain": "チェーン内:",
+    "incursion": "インカージョン",
+    "staging": "集結",
+    "bossPresent": "ボス存在",
+    "influence": "{{pct}}% 影響力",
+    "incursionState": {
+      "established": "確立",
+      "mobilizing": "動員中",
+      "withdrawing": "撤退中"
+    },
+    "insurgency": "反乱 — {{faction}}",
+    "corruption": "腐敗",
+    "suppression": "鎮圧",
+    "stage": "ステージ {{stage}}",
+    "systemEffects": "星系エフェクト",
+    "statics": "スタティック",
+    "location": "位置",
+    "region": "リージョン",
+    "constellation": "コンステレーション",
+    "npc": "NPC",
+    "links": "リンク",
+    "openNpcDelta": "Dotlan で NPC 差分を開く",
+    "openDotlan": "Dotlan で星系を開く",
+    "openZkb": "zKillboard で星系を開く",
+    "celestials": "天体",
+    "planets_one": "惑星",
+    "planets_other": "惑星",
+    "moons_one": "衛星",
+    "moons_other": "衛星",
+    "belts_one": "ベルト",
+    "belts_other": "ベルト",
+    "gates_one": "ゲート",
+    "gates_other": "ゲート",
+    "sovereignty": "主権",
+    "alliance": "アライアンス",
+    "corp": "コーポ",
+    "faction": "ファクション",
+    "personal": "個人",
+    "refreshStandings": "今すぐ ESI からスタンディングを更新（6時間 TTL を回避）",
+    "standingsRefreshed": "スタンディングを更新しました — 個人 {{personal}} · コーポ {{corp}} · アライアンス連絡先 {{alliance}}",
+    "noContactsRefreshed": "連絡先を更新できませんでした。トークンに read_contacts スコープがない可能性があります — ログアウトして再ログインしてください。",
+    "standingsNotLoaded": "スタンディングがまだ読み込まれていません。これが続く場合は、ログアウトして再ログインし read_contacts スコープを付与してください。",
+    "standingNotInBucket": "{{label}}: どれにも属していません",
+    "standingNotSet": "{{label}}: スタンディング未設定",
+    "standingValue": "{{label}}: {{value}}"
+  },
+  "sidebar": {
+    "thera": "Thera 接続",
+    "turnur": "Turnur 接続",
+    "a0": "近くの A0 恒星",
+    "closest": "最も近い星系",
+    "expand": "サイドバーを展開",
+    "resize": "サイドバーのサイズ変更",
+    "collapse": "サイドバーを折りたたむ",
+    "moveToLeft": "サイドバーを左へ移動",
+    "moveToRight": "サイドバーを右へ移動"
+  },
+  "waypoint": {
+    "setDestination": "目的地に設定",
+    "addWaypoint": "ウェイポイントを追加"
+  },
+  "closest": {
+    "dragToReorder": "ドラッグで並べ替え",
+    "home": "ホーム",
+    "noJumps": "— ジャンプ",
+    "removeFromList": "リストから削除",
+    "signIn": "ログインして Kスペースにドックすると、ハブまでのジャンプ数が表示されます。",
+    "searchPlaceholder": "星系名を検索…",
+    "onList": "リスト内",
+    "noMatch": "「{{query}}」に一致する星系はありません"
+  },
+  "a0": {
+    "signIn": "ログインして Kスペースにドックすると、近くの A0 星系が表示されます。",
+    "computing": "ルートを計算中…",
+    "noneReachable": "到達可能な A0 星系はありません。",
+    "showing": "最も近い A0 星系 {{count}} 件を表示しています。",
+    "showRoute": "{{mode}}ルートを表示",
+    "hideRoute": "{{mode}}ルートを非表示",
+    "modeShortest": "最短",
+    "modeSecure": "安全"
+  },
+  "scout": {
+    "noConnections": "{{system}} の接続はありません。",
+    "expiring": "まもなく期限切れ"
+  },
+  "activity": {
+    "thisHour": "今時間",
+    "allHidden": "すべてのグラフが非表示です。マップオプション → アクティビティ でオンにしてください。",
+    "loading": "アクティビティを読み込み中…"
+  },
+  "structures": {
+    "unknown": "不明",
+    "loadFailed": "ストラクチャの読み込みに失敗しました",
+    "saveFailed": "ストラクチャの保存に失敗しました",
+    "deleteFailed": "ストラクチャの削除に失敗しました",
+    "deleteAllConfirm_one": "{{count}} 件のストラクチャをすべて削除しますか？",
+    "deleteAllConfirm_other": "{{count}} 件のストラクチャをすべて削除しますか？",
+    "pasteHint": "EVE のオーバービューからストラクチャを直接コピー＆ペーストできます。宇宙でオーバービューウィンドウ内を右クリックし「選択した行をコピー」を選ぶ（または行を選択して Ctrl+C）。ここで Ctrl+V で貼り付けると — ストラクチャ ID、名前、タイプが自動的にインポートされます。",
+    "addStructure": "ストラクチャを追加",
+    "deleteAll": "すべて削除",
+    "none": "記録されたストラクチャはありません",
+    "name": "名前",
+    "type": "タイプ",
+    "ownerCorp": "所有コーポ",
+    "eveId": "EVE ID",
+    "eveIdTooltip": "ウェイポイントナビゲーション用の EVE ストラクチャ ID",
+    "notes": "メモ",
+    "namePlaceholder": "ストラクチャ名",
+    "corpPlaceholder": "コーポ名",
+    "optionalPlaceholder": "任意"
+  },
+  "killboard": {
+    "hoursMinutesAgo": "{{hours}}時間{{minutes}}分前",
+    "viewKillmail": "zKillboard でキルメールを表示",
+    "soloKill": "ソロキル",
+    "gank": "ガンク — 攻撃者 {{count}} 名",
+    "attackers": "攻撃者 {{count}} 名",
+    "victim": "被害者",
+    "finalBlow": "ファイナルブロー",
+    "onZkb": "zKillboard で {{label}} を表示",
+    "finalBlowShip": "ファイナルブロー艦船",
+    "npcHidden": "{{count}} 件の NPC を非表示",
+    "npcHiddenTooltip": "NPC のみのキル（CONCORD、ラットなど）を非表示",
+    "updated": "{{time}} 更新",
+    "includeNpcTooltip": "フィードに NPC のみのキルメールを含める",
+    "showNpcKills": "NPC キルを表示",
+    "loading": "キルを読み込み中…",
+    "noKills": "過去24時間にキルはありません。",
+    "noKillsNpc": "過去24時間にキルはありません — NPC のみ {{count}} 件を非表示。",
+    "showThem": "表示する",
+    "loadMore": "さらに読み込む（残り {{count}}）"
+  },
+  "sigType": {
+    "unknown": "不明",
+    "wormhole": "ワームホール",
+    "data": "データ",
+    "relic": "レリック",
+    "gas": "ガス",
+    "ore": "鉱石",
+    "combat": "コンバット"
+  },
+  "signatures": {
+    "pasteHint": "EVE のプローブスキャナーからシグネチャを直接コピー＆ペーストできます。それには、プローブスキャナーを開いてください。Ctrl+A ですべて選択し、Ctrl+C でコピー。Ctrl+V でここに貼り付けてください。",
+    "pasteDifferentSystem": "あなたのキャラクターは現在 {{current}} にいますが、{{selected}} にシグネチャを貼り付けています。続行しますか？",
+    "loadFailed": "シグネチャの読み込みに失敗しました",
+    "saveFailed": "シグネチャの保存に失敗しました",
+    "deleteFailed": "シグネチャの削除に失敗しました",
+    "deleteSelectedConfirm_one": "選択した {{count}} 件のシグネチャを削除しますか？",
+    "deleteSelectedConfirm_other": "選択した {{count}} 件のシグネチャを削除しますか？",
+    "deleteAllConfirm_one": "{{count}} 件のシグネチャをすべて削除しますか？",
+    "deleteAllConfirm_other": "{{count}} 件のシグネチャをすべて削除しますか？",
+    "addSignature": "シグネチャを追加",
+    "setTypeAria": "選択したシグネチャのタイプを設定",
+    "setType": "タイプを設定（{{count}}）…",
+    "deleteSelected": "選択を削除（{{count}}）",
+    "deleteAll": "すべて削除",
+    "emptyShared": "スキャンされたシグネチャはありません",
+    "empty": "スキャンされたシグネチャはありません — プローブスキャナーから貼り付けてインポート",
+    "colId": "ID",
+    "colType": "タイプ",
+    "colWh": "WH",
+    "colLeadsTo": "接続先",
+    "colName": "名前",
+    "colNotes": "メモ",
+    "colAge": "経過",
+    "colUpdated": "更新",
+    "namePlaceholder": "サイト名"
+  },
+  "stats": {
+    "title": "ユーザー統計",
+    "loading": "読み込み中…",
+    "jumps": "ジャンプ",
+    "signatures": "シグネチャ",
+    "dailyActivity": "日別アクティビティ — 過去30日",
+    "byType": "タイプ別シグネチャ",
+    "type": "タイプ",
+    "count": "数",
+    "period": {
+      "day": "今日",
+      "week": "今週",
+      "month": "今月",
+      "year": "今年",
+      "forever": "全期間"
+    }
+  },
+  "time": {
+    "justNow": "たった今",
+    "secondsAgo": "{{value}}秒前",
+    "minutesAgo": "{{value}}分前",
+    "hoursAgo": "{{value}}時間前",
+    "daysAgo": "{{value}}日前",
+    "today": "今日"
+  },
+  "duration": {
+    "seconds": "{{value}}s",
+    "minutesSeconds": "{{minutes}}m {{seconds}}s",
+    "hoursMinutes": "{{hours}}h {{minutes}}m"
+  },
+  "share": {
+    "expired": "期限切れ",
+    "expiresInHM": "{{hours}}時間{{minutes}}分で期限切れ",
+    "expiresInM": "{{minutes}}分で期限切れ"
+  },
+  "mass": {
+    "billionKg": "{{value}}十億 kg",
+    "millionKg": "{{value}}百万 kg",
+    "kg": "{{value}} kg"
+  },
+  "toolbar": {
+    "switchMap": "マップ切り替え",
+    "noMap": "マップなし",
+    "mapType": {
+      "shared": "共有",
+      "corp": "コーポ",
+      "solo": "ソロ"
+    },
+    "lockedTooltip": "マップはロックされています — 星系と接続は凍結されています。シグネチャ、ストラクチャ、メモは引き続き編集できます。",
+    "locked": "ロック中",
+    "mapLimitReached": "マップ上限に到達",
+    "newMap": "+ 新規マップ",
+    "deleteThisMap": "このマップを削除",
+    "name": "マップ名",
+    "totalSystems": "総星系数",
+    "totalConnections": "総接続数",
+    "admin": "管理",
+    "userStats": "ユーザー統計",
+    "mapOptions": "マップオプション",
+    "checking": "確認中…",
+    "tqOnline": "Tranquility: オンライン",
+    "tqOffline": "Tranquility: オフライン",
+    "esiOnline": "ESI: オンライン",
+    "esiOffline": "ESI: オフライン",
+    "trackJumpsOn": "ジャンプ追跡: オン",
+    "trackJumpsOff": "ジャンプ追跡: オフ",
+    "trackJumpsTooltipOn": "ジャンプを追跡中 — 移動に合わせて新しい星系が追加されます",
+    "trackJumpsTooltipOff": "ジャンプを追跡していません — 既存の星系のみ「現在地」表示が付きます",
+    "signOut": "ログアウト",
+    "role": "権限: {{role}}",
+    "checkedAgo": "{{time}} 確認",
+    "deleteMapConfirm": "「{{name}}」を削除しますか？この操作は取り消せません。",
+    "online": {
+      "offline": "オフライン",
+      "statusUnknown": "ステータス不明",
+      "onlineInEve": "EVE にオンライン",
+      "onlineSince": "{{stamp}} から EVE にオンライン（{{age}}）"
+    },
+    "proximity": {
+      "incursion": "インカージョン",
+      "insurgency": "反乱",
+      "hostileSov": "敵対主権",
+      "threat": "脅威",
+      "closest": "最も近い{{label}}星系"
+    }
+  },
+  "landing": {
+    "tagline": "EVE Online のためのワームホールチェーン・マッピング",
+    "demoNote": "◈ インタラクティブデモ — 簡略化されたプレビュー。ログインすると、シグネチャ、キルフィード、接続追跡、アクティビティ履歴などにアクセスできます。",
+    "cta": {
+      "continueAs": "次として続行",
+      "sessionExpired": "セッションが期限切れです — ポートレートをクリックして EVE SSO で再ログインしてください。",
+      "switchChar": "別のキャラクターでログイン",
+      "secureLogin": "安全な EVE SSO ログイン — パスワードは保存されません。キャラクターの識別情報のみ。",
+      "loginAlt": "EVE Online でログイン",
+      "joinDiscord": "Nexum Discord に参加"
+    },
+    "errors": {
+      "not_in_corp": "あなたのキャラクターは、この Nexum インスタンスを運営するコーポレーションのメンバーではありません。アクセスはコーポメンバーに限定されています。",
+      "corp_check_failed": "ESI エラーのため、コーポレーションの所属を確認できませんでした。少し後にもう一度お試しください。",
+      "unknown": "不明なエラーが発生しました。もう一度お試しください。"
+    },
+    "sections": {
+      "mapping": "マッピング",
+      "personalCorp": "個人＆コーポマップ",
+      "sysIntel": "星系インテリジェンス",
+      "liveOps": "ライブ作戦",
+      "productivity": "生産性＆UX",
+      "forCorps": "コーポ向け",
+      "compare": "Nexum はどう比較される？",
+      "discordCta": "質問、アイデア、バグは？",
+      "about": "Nexum について",
+      "aboutMe": "開発者について",
+      "techStack": "技術スタック",
+      "faqs": "よくある質問"
+    },
+    "features": {
+      "interactiveMap": {
+        "title": "インタラクティブマップ",
+        "desc": "星系をドラッグし、接続を描き、接続ごとにワームホールのクラス / タイプ / ステータスを設定します。グリッドスナップと任意のミニマップ。"
+      },
+      "seedRegion": {
+        "title": "リージョンからマップを生成",
+        "desc": "EVE リージョン全体であらかじめ埋められた新しいマップを立ち上げます — 各星系は CCP の 2D 星図投影（Dotlan 風のレイアウト）に従って配置され、すべてのスターゲート接続が描画されます。マップ作成時にリージョンを選ぶか、空のマップにするには空欄のままにします。"
+      },
+      "whIntel": {
+        "title": "ワームホールインテル",
+        "desc": "接続ごとの質量ステータス（安定 / 不安定化 / 危機的）、カウントダウン付きの寿命終了フラグ、K162 を認識するスタティック判定、そしてシグネチャタイプによるフリッグホール / ガスサイトの自動タグ付け。"
+      },
+      "rollingCalc": {
+        "title": "ロール計算機",
+        "desc": "接続パネルからホールの崩壊を計画・追跡します。±10% の質量分散をモデル化し、最悪のケースに対して各通過を安全 / 崩壊の可能性 / 崩壊確実として予測します。ローラー艦船を定義し（コールド＋プロップオン質量、または ESI から搭乗中の艦船を取り込む）、ある通過が向こう側にあなたを取り残す前に警告するサイド追跡とともに通過を進め、「≈ 残り N 回の通過」の推定を確認します。累積質量はホールを見ている全員にライブで同期されます。"
+      },
+      "whPicker": {
+        "title": "ワームホールタイプ選択",
+        "desc": "接続に正確なワームホールタイプを割り当てる検索可能なポップオーバー。ホバー時のスタティック簡易情報は、宛先クラス、質量、寿命を表示します。"
+      },
+      "multiSelect": {
+        "title": "複数選択の一括操作",
+        "desc": "Shift+クリックで複数の星系やシグネチャを選択し、1 つの操作でタイプの一括割り当て、削除、名前変更ができます。"
+      },
+      "pngExport": {
+        "title": "PNG エクスポート",
+        "desc": "現在のマップを — シグネチャ数、接続、ステータスとともに — フリートピングやコーポ Discord に貼れる PNG にレンダリングします。"
+      },
+      "sigAging": {
+        "title": "ワームホールシグネチャの経年",
+        "desc": "ワームホールシグネチャは、その WH タイプの既知の寿命における位置に応じて色付けされます — 50% で黄、90% で橙、予想閉鎖を過ぎると赤。忘れられたチェーンが誰かの上で崩壊する前に見つけます。"
+      },
+      "soloCorp": {
+        "title": "ソロ / コーポ分離",
+        "desc": "すべてのユーザーは常に非公開の個人マップを持ちます。コーポモードでは各コーポが共有のコーポマップも得ます。コーポ間の可視性は単一の環境フラグでオプトイン式に有効化されます。"
+      },
+      "multiMap": {
+        "title": "複数マップ対応",
+        "desc": "各キャラクター（またはコーポ）は、設定された上限まで複数の独立したマップを維持できます — コンテキストを失わずに、別々の作戦のための別々のチェーン。"
+      },
+      "mergeMaps": {
+        "title": "マップを統合",
+        "desc": "あるマップを別のマップに折り込みます。宛先が信頼できる情報源として保持され — 不足している星系と接続のみが追加され、シグネチャ、ストラクチャ、メモが統合され、新しい星系が既存のレイアウトに収まります。コーポマップは権限ごとに統合のソースおよび/または宛先としてオプトインします。"
+      },
+      "realtime": {
+        "title": "リアルタイムコラボレーション",
+        "desc": "編集は同じマップを見ている全員にライブで同期されます — 星系、接続、名前変更/ロック、シグネチャ、ストラクチャ、統合のすべてが、リロードなしで他の閲覧者にすぐ反映されます。マップごとにストリーミングされ（見られるマップのイベントのみ受信）、自分の変更はエコー抑制され、再接続時に自動再同期されます。"
+      },
+      "mapLocking": {
+        "title": "マップロック",
+        "desc": "管理者はコーポマップのトポロジーを凍結できます。星系と接続は非管理者にはロックされますが、シグネチャ、ストラクチャ、星系ごとのメモは編集可能なままで、レイアウトを固定したまま作戦を続けられます。"
+      },
+      "rbac": {
+        "title": "ロールベースアクセス",
+        "desc": "4 段階 — readonly、edit、full、admin — がコーポマップの操作を制御します。個人マップは権限に関係なくあなたのものです。"
+      },
+      "systemPanel": {
+        "title": "星系パネル",
+        "desc": "シグネチャ、ストラクチャ、NPC ステーション、メモ、killboard、アクティビティチャートのための星系ごとのカード。カードはドラッグ＆ドロップで並べ替え可能で、ユーザーごとに保存されます。"
+      },
+      "sigMgmt": {
+        "title": "シグネチャ管理",
+        "desc": "プローブスキャナーから直接貼り付け。シグネチャごとの作成 / 更新経過を追跡し、再貼り付けで欠けたシグネチャを自動削除し、複数選択の一括タイプ割り当てに対応します。"
+      },
+      "structImport": {
+        "title": "ストラクチャインポート",
+        "desc": "EVE のオーバービューデータを貼り付けて、プレイヤー所有のストラクチャを名前、タイプ、所有者、メモとともに 1 回の操作でインポートします。"
+      },
+      "autoStruct": {
+        "title": "自動検出されたストラクチャ",
+        "desc": "あなたのコーポのシタデル（Station Manager 権限を持つメンバーがログインしたとき ESI 経由）や、サードパーティフィードに公開掲載されたストラクチャが、ストラクチャペインに読み取り専用エントリとして自動的に表示されます — 所有者へのあなたのスタンディングに応じて既に色付けされています。"
+      },
+      "activityCharts": {
+        "title": "アクティビティチャート",
+        "desc": "星系ごとのジャンプ、艦船 / ポッドキル、NPC キルの 24 時間ローリング履歴を、毎時 ESI からポーリングします。ポーラーは、誰かが開いた星系だけでなくすべての Kスペース星系のデータを保持するため、新しい星系を見た瞬間にチャートが埋まります。"
+      },
+      "sovStation": {
+        "title": "主権＆ステーションデータ",
+        "desc": "ライブのアライアンス / コーポ / ファクション主権情報と NPC ステーションサービス、そしてゲーム内のウェイポイントと目的地の操作。"
+      },
+      "killboard": {
+        "title": "Killboard ペイン",
+        "desc": "星系ごとの最近の zKillboard アクティビティ。NPC のみのキルはデフォルトで非表示（切り替えで含める）。チェーンに敵対者がいるかブルーが倒されると行が赤に、フレンドリーが得点するか敵対者が倒れると青に色付けされます。最近のキルはマップ上にもハイライトとして浮かびます。"
+      },
+      "effectDigest": {
+        "title": "チェーン全体のエフェクト要約",
+        "desc": "星系情報パネル上部の 1 行要約が、現在のチェーン上のすべてのパルサー / ウォルフ・ライエ / マグネター / などを列挙します。ホバーで修正リスト、クリックで中央へ。"
+      },
+      "standings": {
+        "title": "スタンディングオーバーレイ",
+        "desc": "あなたの EVE コンタクトリスト（個人、コーポ、アライアンス — ログイン時に ESI 経由で取得し、必要に応じて再取得可能）がチェーン全体のビジュアルレイヤーを駆動します。主権保有者はインラインの P/C/A スタンディングピルを表示し、EVE ストラクチャ ID で解決されたストラクチャは所有コーポのスタンディングに応じて色付けされ、主権保有星系のノードは色付きのハローを得て、敵対領域がマップ上で際立ちます。"
+      },
+      "scout": {
+        "title": "スカウト接続",
+        "desc": "Thera と Turnur の Eve-Scout 公開接続がサイドバーに表示され、既知のホールへ直接ジャンプできます。"
+      },
+      "a0": {
+        "title": "A0 恒星検出",
+        "desc": "ESI 経由で見える A0（黄色）恒星を持つ星系を自動的にフラグし、キャピタル向けの小競り合い計画に役立てます。"
+      },
+      "iceBelt": {
+        "title": "アイスベルト星系",
+        "desc": "アイスアノマリーが湧くエンパイア空間の星系を ❄ アイコンでフラグします — 採掘作戦の準備や代替採取地点を探すときに便利です。静的データセットはリポジトリにコミットされ、起動時に星系 ID に解決されます。"
+      },
+      "storms": {
+        "title": "ストーム追跡",
+        "desc": "アクティブなヌルセクストーム — Electric、Gamma、Exotic、Plasma — を、コミュニティ管理の EveScout Rescue ストームトラックフィードから取得し、一致する星系ノードに色分けされた ⚡ で表示します。ツールチップはストーム名、最終報告、報告者を表示します。30 分ごとに更新。"
+      },
+      "proximity": {
+        "title": "近接アラート",
+        "desc": "アクティブなインカージョン、海賊の反乱、またはコーポ / アライアンスを赤に設定した主権保有星系から、設定可能なジャンプ数以内にいるとき、ブラウザ通知と通知音を出します。常駐のツールバーチップが最も近い脅威を一目で表示します。"
+      },
+      "discordNotif": {
+        "title": "Discord 通知",
+        "desc": "コーポのチェーンインテルを Discord チャンネルにプッシュし、誰もタブを見ていないときでもアラートが届くようにします。入ってくる K162 や新しいワームホール接続でサーバー側で発火し、コーポマップに限定されます。管理者は管理パネルからどのリージョンとマップが通知するかをフィルターします。ベストエフォートでレート制限を考慮し、リージョン生成のような一括操作はチャンネルを荒らしません。"
+      },
+      "routePlanner": {
+        "title": "ルートプランナー",
+        "desc": "スターゲートとあなたのライブチェーンに対するサーバー側 BFS により、ワームホールホップを経由するルートも 1 クリックです。"
+      },
+      "locationTracking": {
+        "title": "位置追跡",
+        "desc": "ツールバーの任意のライブキャラクター位置ドット、そして ESI 経由で 10 秒ごとに更新されるマップごとの「現在地」表示。"
+      },
+      "presence": {
+        "title": "パイロットの在席",
+        "desc": "同じマップを見ている全員が今どこにいるかを確認できます — 青いドット（ホバーでパイロット名）が、他の各閲覧者の現在の星系を、ジャンプに合わせてライブで示します。あなたのフリートだけでなくマップを開いている誰でも対象で、オプトイン式で何も保存されません。"
+      },
+      "onlineStatus": {
+        "title": "オンラインステータス",
+        "desc": "ツールバーのドットが、ログイン中の各ユーザーが現在 EVE Online にサインインしているかを示し、誰が実際にオンラインかを一目で確認できます。"
+      },
+      "commandPalette": {
+        "title": "コマンドパレット",
+        "desc": "⌘ / Ctrl + K で星系、シグネチャ、操作にまたがるあいまい検索を開きます — マウスに触れずに星系へジャンプ、ウェイポイント設定、ペインの切り替えができます。"
+      },
+      "homeHotkey": {
+        "title": "ホームホットキー",
+        "desc": "H を押すと、どのパネルからでもビューポートをホーム星系に戻します。星系を右クリックして、どれをホームにするか設定または変更します。"
+      },
+      "killHighlights": {
+        "title": "最近のキルのハイライト",
+        "desc": "過去 1 時間にキルがあった星系は色付きのハローを得て、チェーン全体の新鮮なアクティビティを一目で確認できます。"
+      },
+      "userStats": {
+        "title": "ユーザー統計モーダル",
+        "desc": "キャラクターごとの合計: ジャンプ、タイプ別シグネチャを、日 / 週 / 月 / 年 / 全期間で分類。"
+      },
+      "serverStatus": {
+        "title": "サーバーステータスウィジェット",
+        "desc": "ツールバーのライブ Tranquility サーバーステータス、プレイヤー数、ESI の健全性。タブ間でキャッシュされ、開いているすべてのウィンドウが単一の ESI ポーリングを共有します。"
+      },
+      "demoMap": {
+        "title": "デモマップ",
+        "desc": "ランディングページは編集不可のデモマップをマウントし、訪問者がログイン前にツールの動作を確認できるようにします。"
+      },
+      "sidebar": {
+        "title": "折りたたみ可能なサイドバー",
+        "desc": "マップオプション、接続、近接アラート、古い星系のフェード、ショートカットが、それぞれ独立して展開または折りたたみされます。セクションごとの状態は localStorage でブラウザごとに保持されます。"
+      }
+    },
+    "corpFeatures": {
+      "multiCorp": {
+        "title": "マルチコーポ展開",
+        "desc": "CORP_ID はカンマ区切りのコーポレーション ID リストを受け付けます。1 つの Nexum インスタンスで複数のコーポをホストでき、CORP_MAP_SHARED=true でない限り、各コーポのマップは自分のメンバーに限定されます。"
+      },
+      "adminDash": {
+        "title": "管理ダッシュボード",
+        "desc": "ユーザー、マップ、レポート、監査ログの 4 タブを持つ専用の /admin ページ。管理者はツールバーの管理ボタンから到達します。"
+      },
+      "userMgmt": {
+        "title": "ユーザー管理",
+        "desc": "権限の変更、ブロック / 解除、そして必要に応じて ESI コーポ所属の再チェックを強制します。自己ブロック、自己降格、ADMIN_CHAR_ID への変更は保護されています。"
+      },
+      "mapMgmt": {
+        "title": "マップ管理",
+        "desc": "管理者は、所有者アバター、コーポティッカー、星系 / 接続数、ロック状態、最終アクティブ時刻とともにすべてのコーポマップを見られます。強制ロック、強制解除、強制削除はそれぞれ 1 クリックです。"
+      },
+      "usersReport": {
+        "title": "ユーザーレポート",
+        "desc": "キャラクターごとの最終ログイン、追加 / 削除した星系、追加したストラクチャ、タイプ別に分類したシグネチャ、そして最終コーポアクティビティのタイムスタンプ。並べ替え可能、アクティビティと期間でフィルター可能、CSV としてエクスポート可能。"
+      },
+      "systemsReport": {
+        "title": "星系レポート",
+        "desc": "シグネチャタイプのドーナツ、日別 / 月別アクティビティの折れ線グラフ（バケット化は期間に適応）、並べ替え可能なワームホールタイプの内訳とともに、コーポマップのシグネチャを集計します。"
+      },
+      "timeWindowed": {
+        "title": "期間別レポート",
+        "desc": "すべてのレポートは、過去24時間、1週間、1ヶ月、1年、または全期間に絞り込めます。チャートのバケット化は自動的に適応します: 24時間は時間別、1週間 / 1ヶ月は日別、1年と全期間は月別。"
+      },
+      "auditLog": {
+        "title": "監査ログ",
+        "desc": "すべての管理操作 — 権限変更、ブロック / 解除、強制ロック、強制削除、ESI コーポ変更、コーポ離脱時の自動ブロック — が、実行者、対象、旧 → 新値、タイムスタンプとともに記録されます。CSV としてエクスポート可能。"
+      },
+      "corpTicker": {
+        "title": "コーポティッカー解決",
+        "desc": "ユーザーレポートとマップレポートのコーポ ID は ESI 経由でゲーム内ティッカーに解決され、レポートの読み込みを安価に保つため 1 時間のメモリキャッシュを使用します。"
+      },
+      "perCharAttr": {
+        "title": "キャラクターごとの帰属",
+        "desc": "シグネチャ、ストラクチャ、星系の追加 / 削除操作は実行したユーザーとともに記録されるため、レポートは手動ログなしで「誰が何をスキャンしてきたか」に答えられます。"
+      }
+    },
+    "forCorpsBody": "Nexum をコーポやアライアンスのための共有デプロイとして運用しましょう。メンバーは 1 つのツールの中で、コーポに見えるチェーンマップと非公開の個人マップを得て、ロールベースの権限、管理ツール、キャラクターごとのアクティビティレポートが付きます。",
+    "compareBody": "Nexum が Pathfinder、Tripwire、Wanderer とどう比較されるかをご覧ください — 機能、ホスティング、コストを並べて。",
+    "compareLink": "Nexum vs Pathfinder、Tripwire、Wanderer を比較 →",
+    "discordCtaBody": "Nexum Discord に立ち寄ってください — フィードバック、機能リクエスト、スキャン雑談、o7 すべて歓迎です。",
+    "aboutBody1": "Nexum はワームホールと探検のツールです。ルートのマッピングやシグネチャの記録に使えます。Pathfinder に大きく影響を受けましたが — Pathfinder がもはや活発に開発されていない（2020 年以降新リリースなし）ため、それに不平を言うより Nexum を作りました。",
+    "aboutBody2": "Nexum は 1 人の開発者が作っています。進めながら機能を追加していますが、サポートや機能リクエストが必要なら連絡してください。",
+    "aboutMe": "Nexum は Addelee が個人プロジェクトとして書いています。2003 年のベータから EVE をプレイしています。Help チャンネルや Scanning チャンネルでうろついている私を見かけるかもしれません。ワームホールや Thera に住むことから、ハイセクでのミッション、ローセクでのゲートキャンプ、そして今は Goonswarm とのヌル生活まで — 宇宙のあらゆる領域でプレイしてきました。<br></br><br></br>本業ではプログラマーで、<area404>Area 404</area404> を運営しています。だからこのツールを書こうと決めました。私は EVE の熱心な探検家なので、自分に合うツールが欲しかったのです。<br></br><br></br>Nexum はオープンソースで、どなたの貢献も歓迎します。フィードバックや遭遇したバグはとてもありがたいので、<gh>GitHub</gh> で報告してください。",
+    "techStack1": "Nexum は、お金とカフェインで買える最高の宇宙時代の素材でまとまっています。フロントエンドは <strong>React</strong> と <strong>TypeScript</strong> です — コンパイラと言い争う方が、ヌルセクのアライアンスと言い争うよりまだ生産的だからです。マップは <strong>ReactFlow</strong> でレンダリングされ、ノードをドラッグするあれこれを処理してくれるので、私がやらずに済みました。状態は <strong>Zustand</strong> が管理し、嬉しいほど小さく、一度も私に「Redux を使えば」と言ったことがありません。",
+    "techStack2": "バックエンドは <strong>Node.js</strong> と <strong>Express</strong> です — 実績があり、退屈で、動きます。データは <strong>PostgreSQL</strong> にあり、CCP の Static Data Export で埋められているので、Nexum は 5 秒ごとに ESI に尋ねることなく J213422 が何かを本当に知っています。認証は <strong>EVE Online SSO</strong> が処理します — あなたの認証情報がこのサーバーに触れることはなく、まさにそうあるべきです。",
+    "techStack3": "ライブの星系インテリジェンスは <strong>EVE ESI</strong>（CCP の公式 API）から、キルデータは <strong>zKillboard</strong> から来ます。全体は <strong>Docker</strong> でコンテナ化され <strong>nginx</strong> でプロキシされています。あなたがワームホールから追い出されている間、誰かが明かりを点けておかなければならないからです。",
+    "faq": {
+      "whyNexum": {
+        "q": "なぜ Nexum なの？",
+        "a": "Nexum は絆やつながりを意味するラテン語です — ワームホール星系間のつながりをマッピングすることを軸に作られたツールにふさわしく感じました。C6 のマグネターに漂っていそうな何かにも漠然と聞こえ、それが実は決め手でした。"
+      },
+      "multipleAccounts": {
+        "q": "複数のアカウントを使えますか？",
+        "a": "はい — 各 EVE キャラクターは自分専用のマップセットを持ちます。EVE SSO で別のキャラクターでログインするだけで、Nexum はそれらのマップを完全に分けて保ちます。混ざることも、超機密のワームホールチェーンをうっかりサブのコーポと共有することもありません。"
+      },
+      "dataSafe": {
+        "q": "私のデータは安全ですか？",
+        "a": "Nexum はあなたの EVE パスワードを決して見ません — 認証は完全に CCP の EVE SSO が処理します。保存されるのはあなたのキャラクターの識別情報と、あなたが作ったマップだけです。あなたのマップデータは非公開データベースにあり、誰とも共有されません。とはいえ、アライアンスの超機密の侵攻ルートに Nexum を使わないでください — インターネット上のどんなツールも、良い運用セキュリティの代わりにはなりません。"
+      },
+      "reportBugs": {
+        "q": "バグ報告、フィードバック、機能リクエストはできますか？",
+        "a": "もちろんです。このプロジェクトは <gh>GitHub</gh> でオープンソースです — バグや機能リクエストには issue を開くか、勇気があればプルリクエストを送ってください。GitHub が苦手なら、このアカウントに紐づくキャラクターへのゲーム内メールでのフィードバックも有効です。"
+      },
+      "runYourself": {
+        "q": "自分で運用できますか？",
+        "a": "はい — Nexum は完全にセルフホスト可能です。ソースは <gh>GitHub</gh> にあり、スタック全体は 1 回の <code>docker compose up</code> で立ち上がります。SSO 認証情報を得るには <devportal>CCP デベロッパーポータル</devportal>で自分の EVE アプリケーションを登録する必要がありますが、それ以外は README がすべてをカバーしています — EVE 静的データのインポートや、お好みなら Traefik をそこに向けることも含めて。何か壊れたら issue を開いてください。直したら PR を開いてください。<br></br><br></br>立ち上げるのに最も技術的なものではありませんが、docker と運用するサーバー（Linux？）の基本的な知識は持っておくことをお勧めします。"
+      },
+      "goonTrust": {
+        "q": "でもあなたは Goon でしょう、なぜ信用すべき？",
+        "a": "もっともな質問で、正直ニューエデンで持つべき正しい直感です。コードは完全にオープンソースです — どの行も読んで、自分で動かして、信頼する誰かに監査してもらって構いません。Nexum はあなたのスカウトルート、コーポの killboard の恥、あるいはその C5 に停めてある何かに何の関心もありません。Goon がワームホールでやった最悪のことは、そこから追い出されたことくらいで、私はあなたがその運命を避ける手助けをしたいのです。"
+      },
+      "roadmap": {
+        "q": "新機能のロードマップはありますか？",
+        "a": "ゆるくは。現在システムはソロプレイヤーのみに対応しています。次の論理的なステップは、これをコーポレーションとアライアンス向けに実装することです。この初回ローンチのバグを片付けたら、それに着手します。<br></br>もちろん実生活が邪魔しなければ！<br></br><br></br>どうしても欲しい機能があれば、ゲーム内でメッセージをください。話しましょう。"
+      },
+      "donateIsk": {
+        "q": "ISK を寄付できますか？",
+        "a": "できればしないでほしいです、本当に。ISK のためにこれをやっているわけではないので、取っておいて、何かを吹き飛ばすか、誰かを吹き飛ばすものに使ってください！"
+      }
+    },
+    "footer": "EVE Online と EVE ロゴは CCP hf. の登録商標です。世界中で全権利を留保します。Nexum はサードパーティのツールであり、CCP hf. と提携しておらず、その承認も受けていません。· <license>ライセンスおよび EVE 知的財産に関する注意</license>"
+  },
+  "whInfo": {
+    "leadsTo": "接続先",
+    "lifetime": "寿命",
+    "totalMass": "総質量",
+    "maxJump": "最大ジャンプ",
+    "infoAria": "{{code}} 情報",
+    "specTooltip": "{{code}} スペック"
+  },
+  "whPicker": {
+    "searchPlaceholder": "検索…",
+    "connectedSystems": "接続された星系",
+    "other": "その他",
+    "inbound": "インバウンド"
+  },
+  "npcStations": {
+    "loading": "ステーションを読み込み中…",
+    "none": "この星系に NPC ステーションはありません",
+    "services": {
+      "market": "マーケット",
+      "repairFacilities": "修理施設",
+      "fitting": "フィッティング",
+      "factory": "工場",
+      "laboratory": "研究所",
+      "reprocessingPlant": "再処理プラント",
+      "cloning": "クローニング",
+      "cloneBay": "クローンベイ",
+      "insurance": "保険",
+      "loyaltyPointStore": "ロイヤリティポイントストア",
+      "navyOffices": "海軍オフィス",
+      "securityOffices": "セキュリティオフィス",
+      "bountyMissions": "賞金ミッション",
+      "bountyOffice": "賞金オフィス",
+      "assayOffice": "鑑定オフィス",
+      "officeRental": "オフィスレンタル",
+      "stockExchange": "証券取引所",
+      "commodityTrading": "商品取引",
+      "news": "ニュース",
+      "docking": "ドッキング",
+      "exploration": "探検",
+      "blackMarket": "ブラックマーケット",
+      "mentoring": "メンタリング"
+    }
+  },
+  "shareView": {
+    "expiredTitle": "共有リンクの期限切れ",
+    "expiredBody": "<strong>{{map}}</strong> のこの共有ビューは <strong>{{owner}}</strong> が公開し、<strong>{{date}}</strong> に期限切れになりました。",
+    "expiredHint": "{{owner}} に新しいリンクを依頼してください。",
+    "notFoundTitle": "共有リンクが見つかりません",
+    "notFoundBody": "このリンクは既知の共有マップと一致しません。取り消されたか、URL が間違っている可能性があります。",
+    "sharedBy": "<strong>{{owner}}</strong> が共有",
+    "cta": "今すぐ Nexum でマップを作成！"
+  },
+  "routeToast": {
+    "destinationSet": "目的地を {{system}} に設定しました",
+    "waypointAdded": "ウェイポイントを追加しました: {{system}}",
+    "failed": "ウェイポイントの設定に失敗しました — キャラクターはオンラインですか？"
+  },
+  "mapNode": {
+    "unknown": "不明",
+    "homeSystem": "ホーム星系",
+    "characterFallback": "キャラクター {{id}}",
+    "killsTooltip": "今時間 {{ships}} 艦船 · {{pods}} ポッドキル",
+    "a0Sun": "A0 恒星",
+    "iceBelt": "アイスベルト星系",
+    "incursion": "インカージョン星系",
+    "insurgency": "反乱星系",
+    "stormTitle": "{{name}} ストーム",
+    "stormLastReport": "最終報告: {{value}}",
+    "stormReportedBy": "報告者: {{value}}",
+    "statics": "スタティック",
+    "staging": "集結",
+    "incursionBadge": "インカージョン",
+    "corrupted": "腐敗",
+    "suppressed": "鎮圧",
+    "scoutConnections_one": "{{name}} 接続",
+    "scoutConnections_other": "{{name}} 接続",
+    "scoutConnectionsMulti": "{{names}} 接続"
+  },
+  "mapEdge": {
+    "lessThan24h": "< 24h",
+    "lessThan4h": "< 4h",
+    "lessThan1h": "< 1h"
+  }
+}
