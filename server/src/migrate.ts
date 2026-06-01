@@ -486,6 +486,35 @@ export async function migrate() {
         ALTER TABLE users ALTER COLUMN last_known_system_id TYPE INTEGER;
       END IF;
     END $$;
+
+    -- ── Multi-character (alt) support, phase 1 ───────────────────────────────
+    -- An "owner" is one human; each users row (an EVE character) links to an
+    -- owner. Personal maps will move to owner scope so a pilot's chain is
+    -- visible across all their alts. Phase 1 only adds the columns + a 1:1
+    -- backfill — nothing reads owner_id yet, so behaviour is unchanged.
+    CREATE TABLE IF NOT EXISTS owners (
+      id         SERIAL      PRIMARY KEY,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS owner_id INTEGER REFERENCES owners(id) ON DELETE SET NULL;
+    ALTER TABLE maps  ADD COLUMN IF NOT EXISTS owner_id INTEGER REFERENCES owners(id) ON DELETE SET NULL;
+
+    -- One-time 1:1 backfill: an owner per existing character, then point each
+    -- map at its character's owner. Idempotent — only touches NULL rows, so
+    -- re-runs are no-ops and characters linked later keep their owner.
+    DO $$
+    DECLARE r RECORD; oid INTEGER;
+    BEGIN
+      FOR r IN SELECT id FROM users WHERE owner_id IS NULL LOOP
+        INSERT INTO owners DEFAULT VALUES RETURNING id INTO oid;
+        UPDATE users SET owner_id = oid WHERE id = r.id;
+      END LOOP;
+      UPDATE maps m SET owner_id = u.owner_id
+        FROM users u WHERE m.user_id = u.id AND m.owner_id IS NULL;
+    END $$;
+
+    CREATE INDEX IF NOT EXISTS idx_users_owner ON users (owner_id);
+    CREATE INDEX IF NOT EXISTS idx_maps_owner  ON maps  (owner_id);
   `);
 
   await encryptLegacyTokens();
