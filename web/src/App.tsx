@@ -11,7 +11,8 @@ import { Sidebar } from './components/ui/Sidebar';
 import { ProximityOptInModal } from './components/ui/ProximityOptInModal';
 import { CommandPaletteModal } from './components/ui/CommandPaletteModal';
 import { LandingPage } from './components/ui/LandingPage';
-import { Toaster } from './components/ui/Toaster';
+import { Toaster, toast } from './components/ui/Toaster';
+import i18n from './i18n';
 import { TooltipLayer } from './components/ui/TooltipLayer';
 import { AdminPage } from './components/ui/AdminPage';
 import { SharedMapView } from './components/ui/SharedMapView';
@@ -104,6 +105,17 @@ function MapApp() {
 function AppShell() {
   const { user, loading } = useAuth();
   const [path] = useHashRoute();
+
+  // After the add-character SSO flow the server redirects with ?added=<name>.
+  // Confirm it once, then strip the param so a refresh doesn't re-toast.
+  useEffect(() => {
+    const added = new URLSearchParams(window.location.search).get('added');
+    if (!added) return;
+    toast.success(i18n.t('account.characterAdded', { name: added }));
+    const url = new URL(window.location.href);
+    url.searchParams.delete('added');
+    window.history.replaceState({}, '', url.toString());
+  }, []);
 
   // Share links bypass the entire auth gate — a guest with the URL should
   // be able to load the map without ever seeing the landing page. Match

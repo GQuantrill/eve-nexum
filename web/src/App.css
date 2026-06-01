@@ -715,6 +715,72 @@
   cursor: default;
 }
 
+/* ── Character (account) switcher ─────────────────────────── */
+.character-switcher { position: relative; display: inline-flex; }
+.character-switcher__trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  background: transparent;
+  border: 1px solid #1e2740;
+  border-radius: 4px;
+  color: #8a9ab5;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.character-switcher__trigger:hover { border-color: #4d9de0; color: #c8d0e0; }
+.character-switcher__menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 1000;
+  min-width: 200px;
+  background: #0d1117;
+  border: 1px solid #1e2740;
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.character-switcher__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 5px 8px;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: #c0ccde;
+  font-family: inherit;
+  font-size: calc(13px * var(--font-scale, 1));
+  cursor: pointer;
+  text-align: left;
+}
+.character-switcher__item:hover:not(:disabled) { background: #162032; }
+.character-switcher__item:disabled { cursor: default; }
+.character-switcher__item--active { color: #e8f0ff; }
+.character-switcher__avatar { width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0; }
+.character-switcher__name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.character-switcher__blocked { margin-left: 6px; color: #e25a5a; font-size: 0.85em; }
+.character-switcher__add {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  margin-top: 2px;
+  border-top: 1px solid #1a2535;
+  color: #5a9af8;
+  font-size: calc(13px * var(--font-scale, 1));
+  text-decoration: none;
+  border-radius: 4px;
+}
+.character-switcher__add:hover { background: #162032; color: #7ab0ff; }
+
 
 .toolbar__online-dot {
   width: 8px;

@@ -2,6 +2,12 @@
   "language": {
     "label": "语言"
   },
+  "account": {
+    "switchCharacter": "切换角色",
+    "addCharacter": "添加角色",
+    "blocked": "已封禁",
+    "characterAdded": "已添加 {{name}}"
+  },
   "actions": {
     "save": "保存",
     "cancel": "取消",

@@ -2,6 +2,12 @@
   "language": {
     "label": "언어"
   },
+  "account": {
+    "switchCharacter": "캐릭터 전환",
+    "addCharacter": "캐릭터 추가",
+    "blocked": "차단됨",
+    "characterAdded": "{{name}} 추가됨"
+  },
   "actions": {
     "save": "저장",
     "cancel": "취소",

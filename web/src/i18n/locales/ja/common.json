@@ -2,6 +2,12 @@
   "language": {
     "label": "言語"
   },
+  "account": {
+    "switchCharacter": "キャラクター切り替え",
+    "addCharacter": "キャラクターを追加",
+    "blocked": "ブロック中",
+    "characterAdded": "{{name}} を追加しました"
+  },
   "actions": {
     "save": "保存",
     "cancel": "キャンセル",

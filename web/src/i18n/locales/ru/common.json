@@ -2,6 +2,12 @@
   "language": {
     "label": "Язык"
   },
+  "account": {
+    "switchCharacter": "Сменить персонажа",
+    "addCharacter": "Добавить персонажа",
+    "blocked": "заблокирован",
+    "characterAdded": "{{name}} добавлен"
+  },
   "actions": {
     "save": "Сохранить",
     "cancel": "Отмена",

@@ -8,12 +8,29 @@ export interface LastKnownSystem {
   at: string | null;
 }
 
+// A character linked to the same account (owner), for the character switcher.
+export interface AccountCharacter {
+  id: number;                 // users.id
+  characterId: number;        // EVE character id (for the portrait)
+  characterName: string;
+  role: 'admin' | 'full' | 'edit' | 'readonly';
+  corpId: number | null;
+  blocked: boolean;
+  lastKnownSystemId: number | null;
+  lastKnownSystemName: string | null;
+  active: boolean;
+}
+
 export interface AuthUser {
   id: number;
   characterId: number;
   characterName: string;
   role: 'admin' | 'full' | 'edit' | 'readonly';
   corpMode: boolean;
+  /** Account (human) this character belongs to; groups all linked alts. */
+  ownerId: number | null;
+  /** Every character linked to this account, for the switcher. */
+  characters: AccountCharacter[];
   /** Where the pilot was last seen (updated as they jump). null until first ESI poll. */
   lastKnownSystem: LastKnownSystem | null;
   compactMode: boolean;
