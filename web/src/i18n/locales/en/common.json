@@ -630,7 +630,10 @@
   },
   "scout": {
     "noConnections": "No {{system}} connections.",
-    "expiring": "expiring"
+    "expiring": "expiring",
+    "sortLabel": "Sort",
+    "sortAge": "WH age",
+    "sortClosest": "Closest"
   },
   "activity": {
     "thisHour": "this hour",

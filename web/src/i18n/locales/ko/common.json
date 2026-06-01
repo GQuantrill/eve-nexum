@@ -630,7 +630,10 @@
   },
   "scout": {
     "noConnections": "{{system}} 연결이 없습니다.",
-    "expiring": "만료 임박"
+    "expiring": "만료 임박",
+    "sortLabel": "정렬",
+    "sortAge": "WH 수명",
+    "sortClosest": "가장 가까움"
   },
   "activity": {
     "thisHour": "이번 시간",

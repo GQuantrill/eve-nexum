@@ -630,7 +630,10 @@
   },
   "scout": {
     "noConnections": "Aucune connexion {{system}}.",
-    "expiring": "expire"
+    "expiring": "expire",
+    "sortLabel": "Trier",
+    "sortAge": "Âge du WH",
+    "sortClosest": "Plus proche"
   },
   "activity": {
     "thisHour": "cette heure",

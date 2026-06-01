@@ -630,7 +630,10 @@
   },
   "scout": {
     "noConnections": "没有 {{system}} 连接。",
-    "expiring": "即将过期"
+    "expiring": "即将过期",
+    "sortLabel": "排序",
+    "sortAge": "WH 时长",
+    "sortClosest": "最近"
   },
   "activity": {
     "thisHour": "本小时",

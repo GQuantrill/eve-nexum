@@ -630,7 +630,10 @@
   },
   "scout": {
     "noConnections": "{{system}} の接続はありません。",
-    "expiring": "まもなく期限切れ"
+    "expiring": "まもなく期限切れ",
+    "sortLabel": "並び替え",
+    "sortAge": "WH 寿命",
+    "sortClosest": "最も近い"
   },
   "activity": {
     "thisHour": "今時間",
