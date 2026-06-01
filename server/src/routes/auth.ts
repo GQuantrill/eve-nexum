@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, type Request, type Response } from 'express';
 import { randomBytes } from 'node:crypto';
 import { db } from '../db.js';
 import { config } from '../config.js';
@@ -19,44 +19,76 @@ const FRONTEND_URL  = process.env.FRONTEND_URL ?? 'http://localhost:5174';
 const EVE_AUTH_URL  = 'https://login.eveonline.com/v2/oauth/authorize';
 const EVE_TOKEN_URL = 'https://login.eveonline.com/v2/oauth/token';
 
-// GET /auth/login  — redirect to EVE SSO
-authRouter.get('/login', (req, res) => {
+const SSO_SCOPES = [
+  'esi-location.read_location.v1',
+  'esi-location.read_ship_type.v1',
+  'esi-universe.read_structures.v1',
+  'esi-corporations.read_corporation_membership.v1',
+  'esi-ui.open_window.v1',
+  'esi-ui.write_waypoint.v1',
+  'esi-characters.read_corporation_roles.v1',
+  'esi-location.read_online.v1',
+  // Read player standings (contacts) so the UI can colour-tag structures /
+  // killboard / sov by your standing toward each entity. Corp / alliance reads
+  // only succeed for characters with the Contact Manager role; reads gracefully
+  // no-op otherwise.
+  'esi-characters.read_contacts.v1',
+  'esi-corporations.read_contacts.v1',
+  'esi-alliances.read_contacts.v1',
+  // Fleet member tracking — show fleet-mate locations on the map as purple
+  // dots. Requires the character to be the fleet boss or a wing/squad
+  // commander; ESI returns 403 to everyone else and the UI degrades silently.
+  'esi-fleets.read_fleet.v1',
+].join(' ');
+
+// Build the SSO authorize redirect with a fresh CSRF state and send the user.
+function beginSso(req: Request, res: Response): void {
   const state = randomBytes(32).toString('hex');
   req.session.oauthState = state;
-
   const params = new URLSearchParams({
     response_type: 'code',
     redirect_uri:  CALLBACK_URL,
     client_id:     CLIENT_ID,
-    scope: [
-          'esi-location.read_location.v1',
-          'esi-location.read_ship_type.v1',
-          'esi-universe.read_structures.v1',
-          'esi-corporations.read_corporation_membership.v1',
-          'esi-ui.open_window.v1',
-          'esi-ui.write_waypoint.v1',
-          'esi-characters.read_corporation_roles.v1',
-          'esi-location.read_online.v1',
-          // Read player standings (contacts) so the UI can colour-tag
-          // structures / killboard / sov by your standing toward each
-          // entity. Corp / alliance reads only succeed for characters with
-          // the Contact Manager role; reads gracefully no-op otherwise.
-          'esi-characters.read_contacts.v1',
-          'esi-corporations.read_contacts.v1',
-          'esi-alliances.read_contacts.v1',
-          // Fleet member tracking — show fleet-mate locations on the map as
-          // purple dots. Requires the character to be the fleet boss or a
-          // wing/squad commander; ESI returns 403 to everyone else and the
-          // UI degrades silently to "no fleet visibility".
-          'esi-fleets.read_fleet.v1',
-        ].join(' '),
+    scope:         SSO_SCOPES,
     state,
   });
-
   req.session.save((err) => {
     if (err) { res.status(500).json({ error: 'Session error' }); return; }
     res.redirect(`${EVE_AUTH_URL}?${params}`);
   });
+}
+
+// Resolve the session's owner (account) id, lazily backfilling it from the DB
+// for sessions created before multi-account support shipped.
+async function ensureOwnerId(req: Request): Promise<number | null> {
+  if (req.session.ownerId != null) return req.session.ownerId;
+  if (!req.session.userId) return null;
+  const { rows } = await db.query<{ owner_id: number | null }>(
+    `SELECT owner_id FROM users WHERE id = $1`, [req.session.userId],
+  );
+  const oid = rows[0]?.owner_id ?? null;
+  if (oid != null) req.session.ownerId = oid;
+  return oid;
+}
+
+// GET /auth/login  — redirect to EVE SSO for a fresh login
+authRouter.get('/login', (req, res) => {
+  // A normal login must never carry an add-character link from a stale session.
+  delete req.session.addCharacterOwnerId;
+  beginSso(req, res);
+});
+
+// GET /auth/add-character — link another character to the current account.
+// Only an authenticated session may do this; the callback reads
+// addCharacterOwnerId to attach the returning character to this owner.
+authRouter.get('/add-character', async (req, res) => {
+  const ownerId = await ensureOwnerId(req);
+  if (!req.session.userId || ownerId == null) {
+    res.redirect(`${FRONTEND_URL}?error=not_authenticated`);
+    return;
+  }
+  req.session.addCharacterOwnerId = ownerId;
+  beginSso(req, res);
 });
 
 // GET /auth/callback  — EVE SSO returns here
@@ -69,6 +101,10 @@ authRouter.get('/callback', async (req, res) => {
     return;
   }
   delete req.session.oauthState;
+  // Captured before any session.regenerate(): if set, this SSO round-trip is
+  // an authenticated "add character" link, not a fresh login.
+  const addCharacterOwnerId = req.session.addCharacterOwnerId;
+  delete req.session.addCharacterOwnerId;
 
   try {
     // Exchange code for tokens
@@ -187,6 +223,44 @@ authRouter.get('/callback', async (req, res) => {
       return;
     }
 
+    // Fire-and-forget standings refresh. Raw access token (not the
+    // encrypted-at-rest version) since it's already in memory; the service
+    // swallows its own errors so a bad ESI response never breaks the flow.
+    const kickStandings = () => refreshStandingsForUser({
+      userId, characterId, corpId: userCorpId, allianceId: userAllianceId,
+      accessToken: tokens.access_token,
+    }).catch((err) => log.error('standings refresh kickoff failed:', err));
+
+    // ── Add-character link ────────────────────────────────────────────────
+    // Authenticated "add character" flow: attach this character to the
+    // initiating account and return WITHOUT touching the active session — no
+    // regenerate, no active-character change. The character's maps follow it
+    // onto the owner (merge); the per-owner map cap is enforced at creation
+    // time (phase 3) so nothing is deleted here.
+    if (addCharacterOwnerId != null) {
+      if (!req.session.userId) { res.redirect(`${FRONTEND_URL}?error=not_authenticated`); return; }
+      await db.query(`UPDATE users SET owner_id = $1 WHERE id = $2`, [addCharacterOwnerId, userId]);
+      await db.query(`UPDATE maps  SET owner_id = $1 WHERE user_id = $2`, [addCharacterOwnerId, userId]);
+      req.session.ownerId = addCharacterOwnerId;
+      await new Promise<void>((resolve, reject) => { req.session.save((err) => err ? reject(err) : resolve()); });
+      kickStandings();
+      res.redirect(`${FRONTEND_URL}?added=${encodeURIComponent(jwtPayload.name)}`);
+      return;
+    }
+
+    // ── Fresh login ───────────────────────────────────────────────────────
+    // Ensure the character has an owner: the one backfilled in phase 1, or a
+    // brand-new account for a first-ever login.
+    const { rows: ownerRows } = await db.query<{ owner_id: number | null }>(
+      `SELECT owner_id FROM users WHERE id = $1`, [userId]);
+    let ownerId = ownerRows[0]?.owner_id ?? null;
+    if (ownerId == null) {
+      const { rows: created } = await db.query<{ id: number }>(`INSERT INTO owners DEFAULT VALUES RETURNING id`);
+      ownerId = created[0].id;
+      await db.query(`UPDATE users SET owner_id = $1 WHERE id = $2`, [ownerId, userId]);
+      await db.query(`UPDATE maps SET owner_id = $1 WHERE user_id = $2 AND owner_id IS NULL`, [ownerId, userId]);
+    }
+
     // First login: seed a starter "Demo Map" so the canvas isn't blank.
     // No-op when the user already has a map.
     await seedDemoMap(userId);
@@ -209,6 +283,7 @@ authRouter.get('/callback', async (req, res) => {
     req.session.characterName = jwtPayload.name;
     req.session.role          = role;
     req.session.userCorpId    = userCorpId;
+    req.session.ownerId       = ownerId;
     req.session.prefs         = {
       compactMode: p?.compact_mode ?? false,
       snapToGrid:  p?.snap_to_grid ?? false,
@@ -226,18 +301,7 @@ authRouter.get('/callback', async (req, res) => {
       req.session.save((err) => err ? reject(err) : resolve());
     });
 
-    // Fire-and-forget standings refresh. We pass the *raw* access token
-    // here (not the encrypted-at-rest version) since it's already in
-    // memory and avoids a decrypt round-trip. The service swallows its
-    // own errors so a bad ESI response doesn't break login.
-    refreshStandingsForUser({
-      userId,
-      characterId,
-      corpId:      userCorpId,
-      allianceId:  userAllianceId,
-      accessToken: tokens.access_token,
-    }).catch((err) => log.error('standings refresh kickoff failed:', err));
-
+    kickStandings();
     res.redirect(FRONTEND_URL);
   } catch (err) {
     log.error('Auth callback error:', err);
@@ -250,6 +314,54 @@ authRouter.post('/logout', (req, res) => {
   req.session.destroy(() => {
     res.json({ ok: true });
   });
+});
+
+// POST /auth/switch-character — make another character on the same account the
+// active one. No SSO: the target's tokens are already stored from when it was
+// added. Authorised strictly by owner ownership.
+authRouter.post('/switch-character', async (req, res) => {
+  const ownerId = await ensureOwnerId(req);
+  if (!req.session.userId || ownerId == null) { res.status(401).json({ error: 'Not authenticated' }); return; }
+  const targetId = Number((req.body as { userId?: unknown }).userId);
+  if (!Number.isInteger(targetId)) { res.status(400).json({ error: 'Invalid userId' }); return; }
+
+  const { rows } = await db.query<{
+    owner_id: number | null; character_id: number; character_name: string; role: string;
+    corp_id: number | null; blocked: boolean;
+    compact_mode: boolean; snap_to_grid: boolean; show_minimap: boolean; uniform_size: boolean;
+    show_statics: boolean; connection_thickness: string; route_mode: string; ui_zoom: string;
+    ui_settings: Record<string, unknown>; panel_order: string[];
+  }>(
+    `SELECT owner_id, character_id, character_name, role, corp_id, blocked,
+            compact_mode, snap_to_grid, show_minimap, uniform_size, show_statics,
+            connection_thickness, route_mode, ui_zoom, ui_settings, panel_order
+     FROM users WHERE id = $1`,
+    [targetId],
+  );
+  const u = rows[0];
+  // Must belong to the same account, and you can't switch into a blocked char.
+  if (!u || u.owner_id !== ownerId) { res.status(403).json({ error: 'Not your character' }); return; }
+  if (u.blocked && u.character_id !== config.adminCharId) { res.status(403).json({ error: 'Character is blocked' }); return; }
+
+  req.session.userId        = targetId;
+  req.session.characterId   = u.character_id;
+  req.session.characterName = u.character_name;
+  req.session.role          = u.role as 'admin' | 'full' | 'edit' | 'readonly';
+  req.session.userCorpId    = u.corp_id;
+  req.session.prefs         = {
+    compactMode: u.compact_mode ?? false,
+    snapToGrid:  u.snap_to_grid ?? false,
+    showMinimap: u.show_minimap ?? true,
+    uniformSize: u.uniform_size ?? true,
+    showStatics: u.show_statics ?? true,
+    connectionThickness: u.connection_thickness ?? 'standard',
+    routeMode:   u.route_mode ?? 'shortest',
+    uiZoom:      u.ui_zoom != null ? Number(u.ui_zoom) : 1,
+    uiSettings:  u.ui_settings ?? {},
+    panelOrder:  u.panel_order  ?? ['notes', 'signatures'],
+  };
+  await new Promise<void>((resolve, reject) => { req.session.save((err) => err ? reject(err) : resolve()); });
+  res.json({ ok: true });
 });
 
 // GET /auth/me
@@ -302,12 +414,37 @@ authRouter.get('/me', async (req, res) => {
     ? { id: Number(lk.id), name: lk.name, systemClass: lk.systemClass, at: lk.at }
     : null;
 
+  // All characters linked to this account, for the character switcher.
+  const ownerId = await ensureOwnerId(req);
+  const { rows: charRows } = ownerId != null
+    ? await db.query<{ id: number; characterId: number; characterName: string; role: string; corpId: number | null; blocked: boolean; lksId: number | null; lksName: string | null }>(
+        `SELECT u.id, u.character_id AS "characterId", u.character_name AS "characterName", u.role,
+                u.corp_id AS "corpId", u.blocked,
+                u.last_known_system_id AS "lksId", s.name AS "lksName"
+         FROM users u LEFT JOIN solar_systems s ON s.id = u.last_known_system_id
+         WHERE u.owner_id = $1 ORDER BY u.character_name`,
+        [ownerId])
+    : { rows: [] };
+  const characters = charRows.map((c) => ({
+    id:                  c.id,
+    characterId:         c.characterId,
+    characterName:       c.characterName,
+    role:                c.role,
+    corpId:              c.corpId,
+    blocked:             c.blocked,
+    lastKnownSystemId:   c.lksId != null ? Number(c.lksId) : null,
+    lastKnownSystemName: c.lksName,
+    active:              c.id === req.session.userId,
+  }));
+
   res.json({
     user: {
       id:            req.session.userId,
       characterId:   req.session.characterId,
       characterName: req.session.characterName,
       role,
+      ownerId,
+      characters,
       lastKnownSystem,
       corpMode:      config.corpMode,
       compactMode:   prefs.compactMode,
