@@ -715,6 +715,112 @@
   cursor: default;
 }
 
+/* ── Character (account) switcher ─────────────────────────── */
+.character-switcher { position: relative; display: inline-flex; }
+.character-switcher__trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  background: transparent;
+  border: 1px solid #1e2740;
+  border-radius: 4px;
+  color: #8a9ab5;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.character-switcher__trigger:hover { border-color: #4d9de0; color: #c8d0e0; }
+.character-switcher__menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 1000;
+  min-width: 200px;
+  background: #0d1117;
+  border: 1px solid #1e2740;
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.character-switcher__row { display: flex; align-items: center; border-radius: 4px; }
+.character-switcher__row:hover { background: #162032; }
+.character-switcher__row--active .character-switcher__name { color: #e8f0ff; }
+.character-switcher__switch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  padding: 5px 8px;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: #c0ccde;
+  font-family: inherit;
+  font-size: calc(13px * var(--font-scale, 1));
+  cursor: pointer;
+  text-align: left;
+}
+.character-switcher__switch:disabled { cursor: default; }
+.character-switcher__avatar { width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0; }
+.character-switcher__identity { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.character-switcher__name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.character-switcher__blocked { margin-left: 6px; color: #e25a5a; font-size: 0.85em; }
+.character-switcher__location { font-size: 0.82em; color: #6f8197; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.character-switcher__focus {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  margin-right: 4px;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: #7a90a8;
+  cursor: pointer;
+}
+.character-switcher__focus:hover:not(:disabled) { color: #5a9af8; background: #1c2940; }
+.character-switcher__focus:disabled { opacity: 0.4; cursor: default; }
+.character-switcher__focus--on { color: #5a9af8; }
+.character-switcher__remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  margin-right: 4px;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: #7a90a8;
+  cursor: pointer;
+}
+.character-switcher__remove:hover:not(:disabled) { color: #ff6b6b; background: #2a1820; }
+.character-switcher__remove:disabled { opacity: 0.4; cursor: default; }
+/* Occupies the remove button's slot on the active row so the track pins
+   stay aligned in the rightmost column across every row. */
+.character-switcher__remove-spacer { width: 26px; margin-right: 4px; flex-shrink: 0; }
+.character-switcher__add {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  margin-top: 2px;
+  border-top: 1px solid #1a2535;
+  color: #5a9af8;
+  font-size: calc(13px * var(--font-scale, 1));
+  text-decoration: none;
+  border-radius: 4px;
+}
+.character-switcher__add:hover { background: #162032; color: #7ab0ff; }
+
 
 .toolbar__online-dot {
   width: 8px;
@@ -1874,6 +1980,46 @@
 .system-node__fleet-tooltip-row {
   display: block;
 }
+
+/* Account characters (your own alts) in this system. Gold — distinct from the
+   purple fleet dot and blue presence dot. Offline alts (shown at their last
+   known system) get a "(last known)" qualifier. */
+.system-node__alt-dot-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  margin-right: 4px;
+}
+.system-node__alt-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #f5b96a;
+  box-shadow: 0 0 5px #f5b96a;
+  flex-shrink: 0;
+  cursor: help;
+}
+.system-node__alt-tooltip {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  background: #111827;
+  border: 1px solid #5a4a2e;
+  border-radius: 6px;
+  padding: 5px 8px;
+  white-space: nowrap;
+  z-index: 9999;
+  flex-direction: column;
+  gap: 2px;
+  pointer-events: none;
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #f0e2c8;
+}
+.system-node__alt-dot-wrap:hover .system-node__alt-tooltip { display: flex; }
+.react-flow__node:has(.system-node__alt-dot-wrap:hover) { z-index: 9999 !important; }
+.system-node__alt-tooltip-row { display: block; }
+.system-node__alt-offline { margin-left: 6px; color: #8a7a5a; font-size: 0.85em; }
 
 /* Presence: other pilots viewing this map who are in this system. Blue, to
    distinguish from the purple fleet dot; hover reveals their names. */
@@ -6015,7 +6161,7 @@ select.sig-toolbar-btn option {
 /* ── Toaster ─────────────────────────────────────────────── */
 .toaster {
   position: fixed;
-  bottom: 16px;
+  top: 16px;
   right: 16px;
   display: flex;
   flex-direction: column;

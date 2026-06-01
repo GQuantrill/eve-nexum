@@ -2,6 +2,23 @@
   "language": {
     "label": "言語"
   },
+  "account": {
+    "switchCharacter": "キャラクター切り替え",
+    "addCharacter": "キャラクターを追加",
+    "blocked": "ブロック中",
+    "characterAdded": "{{name}} を追加しました",
+    "switchTo": "{{name}} に切り替え",
+    "focusLocation": "{{name}} を中心に表示し、そこからルート計算",
+    "noLocation": "{{name}} の既知の位置がありません",
+    "linkFailedNotInCorp": "そのキャラクターを追加できませんでした — コーポに所属していません。",
+    "linkFailed": "そのキャラクターを追加できませんでした。もう一度お試しください。",
+    "remove": "削除",
+    "removeCharacter": "{{name}} を削除",
+    "removeConfirm": "{{name}} をアカウントから削除しますか？後でキャラクターを再度リンクできます。",
+    "characterRemoved": "{{name}} を削除しました",
+    "removeFailed": "そのキャラクターを削除できませんでした。もう一度お試しください。",
+    "locationUnknown": "現在地不明"
+  },
   "actions": {
     "save": "保存",
     "cancel": "キャンセル",
@@ -341,6 +358,7 @@
     "activityNpcDelta": "NPC 差分",
     "fleetHint": "フリートメンバーを、いる星系の上に紫の点として表示します。点にカーソルを合わせると名前が表示されます。",
     "showFleetMembers": "フリートメンバーを表示",
+    "showAccountChars": "自分のキャラクターを表示",
     "staleHint": "選択した間隔の間更新されていない星系を視覚的に暗くし、古いチェーンの残りを一目で見つけられるようにします。",
     "exportJson": "↓ JSON としてエクスポート",
     "importJson": "↑ JSON からインポート",
@@ -640,7 +658,8 @@
     "sortSecure": "安全ルート"
   },
   "route": {
-    "fromLastKnown": "{{system}} からのジャンプ数（最後に確認された位置）"
+    "fromLastKnown": "{{system}} からのジャンプ数（最後に確認された位置）",
+    "fromCharacter": "{{character}} からのジャンプ数 — {{system}}"
   },
   "activity": {
     "thisHour": "今時間",
@@ -889,6 +908,10 @@
       "soloCorp": {
         "title": "ソロ / コーポ分離",
         "desc": "すべてのユーザーは常に非公開の個人マップを持ちます。コーポモードでは各コーポが共有のコーポマップも得ます。コーポ間の可視性は単一の環境フラグでオプトイン式に有効化されます。"
+      },
+      "multiCharacter": {
+        "title": "マルチキャラクターアカウント",
+        "desc": "サブキャラを1つのアカウントに紐付け、再ログインせずに切り替えられます — 紐付け時に各キャラのマップが統合されます。メインを操作しながらサブキャラの現在地を追跡でき、キャラの紐付けはいつでも解除できます。"
       },
       "multiMap": {
         "title": "複数マップ対応",
@@ -1158,13 +1181,14 @@
   },
   "routeToast": {
     "destinationSet": "目的地を {{system}} に設定しました",
-    "waypointAdded": "ウェイポイントを追加しました: {{system}}",
+    "waypointAdded": "{{system}} を経由地に追加しました。",
     "failed": "ウェイポイントの設定に失敗しました — キャラクターはオンラインですか？"
   },
   "mapNode": {
     "unknown": "不明",
     "homeSystem": "ホーム星系",
     "characterFallback": "キャラクター {{id}}",
+    "altLastKnown": "（最後の確認）",
     "killsTooltip": "今時間 {{ships}} 艦船 · {{pods}} ポッドキル",
     "a0Sun": "A0 恒星",
     "iceBelt": "アイスベルト星系",

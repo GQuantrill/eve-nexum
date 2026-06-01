@@ -2,6 +2,23 @@
   "language": {
     "label": "Sprache"
   },
+  "account": {
+    "switchCharacter": "Charakter wechseln",
+    "addCharacter": "Charakter hinzufügen",
+    "blocked": "blockiert",
+    "characterAdded": "{{name}} hinzugefügt",
+    "switchTo": "Zu {{name}} wechseln",
+    "focusLocation": "Karte auf {{name}} zentrieren und von dort routen",
+    "noLocation": "Kein bekannter Standort für {{name}}",
+    "linkFailedNotInCorp": "Charakter konnte nicht hinzugefügt werden — er ist nicht in der Corp.",
+    "linkFailed": "Charakter konnte nicht hinzugefügt werden. Bitte erneut versuchen.",
+    "remove": "Entfernen",
+    "removeCharacter": "{{name}} entfernen",
+    "removeConfirm": "{{name}} aus deinem Konto entfernen? Du kannst den Charakter später wieder verknüpfen.",
+    "characterRemoved": "{{name}} entfernt",
+    "removeFailed": "Charakter konnte nicht entfernt werden. Bitte erneut versuchen.",
+    "locationUnknown": "Standort unbekannt"
+  },
   "actions": {
     "save": "Speichern",
     "cancel": "Abbrechen",
@@ -341,6 +358,7 @@
     "activityNpcDelta": "NPC-Delta",
     "fleetHint": "Flottenmitglieder als violette Punkte auf ihrem System anzeigen. Punkt überfahren, um die Namen zu sehen.",
     "showFleetMembers": "Flottenmitglieder anzeigen",
+    "showAccountChars": "Meine Charaktere anzeigen",
     "staleHint": "Systeme abblenden, die im gewählten Intervall nicht aktualisiert wurden, damit alte Kettenreste auf einen Blick erkennbar sind.",
     "exportJson": "↓ Als JSON exportieren",
     "importJson": "↑ Aus JSON importieren",
@@ -640,7 +658,8 @@
     "sortSecure": "Sichere Route"
   },
   "route": {
-    "fromLastKnown": "Sprünge ab {{system}} (letzter bekannter Standort)"
+    "fromLastKnown": "Sprünge ab {{system}} (letzter bekannter Standort)",
+    "fromCharacter": "Sprünge von {{character}} — {{system}}"
   },
   "activity": {
     "thisHour": "diese Stunde",
@@ -889,6 +908,10 @@
       "soloCorp": {
         "title": "Solo- / Corp-Trennung",
         "desc": "Jeder Benutzer hat persönliche Karten, die immer privat sind; im Corp-Modus erhält jede Corp zusätzlich gemeinsame Corp-Karten. Corp-übergreifende Sichtbarkeit ist über eine einzige Umgebungsvariable aktivierbar."
+      },
+      "multiCharacter": {
+        "title": "Konten mit mehreren Charakteren",
+        "desc": "Verknüpfe deine Twinks mit einem Konto und wechsle zwischen ihnen, ohne dich erneut anzumelden — die Karten jedes Charakters werden beim Verknüpfen zusammengeführt. Folge dem Live-Standort eines Twinks, während du deinen Main fliegst, und löse einen Charakter jederzeit wieder."
       },
       "multiMap": {
         "title": "Mehrkarten-Unterstützung",
@@ -1158,13 +1181,14 @@
   },
   "routeToast": {
     "destinationSet": "Ziel festgelegt auf {{system}}",
-    "waypointAdded": "Wegpunkt hinzugefügt: {{system}}",
+    "waypointAdded": "{{system}} erfolgreich zu den Wegpunkten hinzugefügt.",
     "failed": "Wegpunkt konnte nicht gesetzt werden — ist dein Charakter online?"
   },
   "mapNode": {
     "unknown": "Unbekannt",
     "homeSystem": "Heimatsystem",
     "characterFallback": "Charakter {{id}}",
+    "altLastKnown": "(zuletzt bekannt)",
     "killsTooltip": "{{ships}} Schiff · {{pods}} Pod-Kills diese Stunde",
     "a0Sun": "A0-Sonne",
     "iceBelt": "Eisgürtel-System",

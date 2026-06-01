@@ -2,6 +2,23 @@
   "language": {
     "label": "언어"
   },
+  "account": {
+    "switchCharacter": "캐릭터 전환",
+    "addCharacter": "캐릭터 추가",
+    "blocked": "차단됨",
+    "characterAdded": "{{name}} 추가됨",
+    "switchTo": "{{name}}(으)로 전환",
+    "focusLocation": "{{name}} 위치로 이동하고 경로 계산",
+    "noLocation": "{{name}}의 알려진 위치 없음",
+    "linkFailedNotInCorp": "해당 캐릭터를 추가할 수 없습니다 — 군단에 속해 있지 않습니다.",
+    "linkFailed": "해당 캐릭터를 추가할 수 없습니다. 다시 시도해 주세요.",
+    "remove": "제거",
+    "removeCharacter": "{{name}} 제거",
+    "removeConfirm": "{{name}}을(를) 계정에서 제거할까요? 나중에 캐릭터를 다시 연결할 수 있습니다.",
+    "characterRemoved": "{{name}} 제거됨",
+    "removeFailed": "해당 캐릭터를 제거할 수 없습니다. 다시 시도해 주세요.",
+    "locationUnknown": "위치 알 수 없음"
+  },
   "actions": {
     "save": "저장",
     "cancel": "취소",
@@ -341,6 +358,7 @@
     "activityNpcDelta": "NPC 변화량",
     "fleetHint": "함대원을 그들이 있는 성계 위에 보라색 점으로 표시합니다. 점에 마우스를 올리면 이름을 볼 수 있습니다.",
     "showFleetMembers": "함대원 표시",
+    "showAccountChars": "내 캐릭터 표시",
     "staleHint": "선택한 간격 동안 업데이트되지 않은 성계를 시각적으로 흐리게 하여, 오래된 체인 잔재를 한눈에 알아볼 수 있게 합니다.",
     "exportJson": "↓ JSON으로 내보내기",
     "importJson": "↑ JSON에서 가져오기",
@@ -640,7 +658,8 @@
     "sortSecure": "안전 경로"
   },
   "route": {
-    "fromLastKnown": "{{system}}에서의 점프 (마지막으로 확인된 위치)"
+    "fromLastKnown": "{{system}}에서의 점프 (마지막으로 확인된 위치)",
+    "fromCharacter": "{{character}}에서의 점프 — {{system}}"
   },
   "activity": {
     "thisHour": "이번 시간",
@@ -889,6 +908,10 @@
       "soloCorp": {
         "title": "개인 / 군단 분리",
         "desc": "모든 사용자는 항상 비공개인 개인 지도를 가집니다; 군단 모드에서는 각 군단이 공유 군단 지도도 갖습니다. 군단 간 가시성은 단일 환경 변수 플래그로 선택 활성화됩니다."
+      },
+      "multiCharacter": {
+        "title": "멀티 캐릭터 계정",
+        "desc": "부캐를 하나의 계정에 연결하고 다시 로그인하지 않고 전환하세요 — 연결 시 각 캐릭터의 맵이 병합됩니다. 본캐를 운용하는 동안 부캐의 실시간 위치를 추적하고, 언제든 캐릭터 연결을 해제할 수 있습니다."
       },
       "multiMap": {
         "title": "다중 지도 지원",
@@ -1158,13 +1181,14 @@
   },
   "routeToast": {
     "destinationSet": "목적지가 {{system}}(으)로 설정됨",
-    "waypointAdded": "경유지 추가됨: {{system}}",
+    "waypointAdded": "{{system}}이(가) 경유지에 추가되었습니다.",
     "failed": "경유지 설정 실패 — 당신의 캐릭터가 온라인인가요?"
   },
   "mapNode": {
     "unknown": "알 수 없음",
     "homeSystem": "홈 성계",
     "characterFallback": "캐릭터 {{id}}",
+    "altLastKnown": "(마지막 확인)",
     "killsTooltip": "이번 시간 {{ships}} 함선 · {{pods}} 캡슐 킬",
     "a0Sun": "A0 항성",
     "iceBelt": "얼음 벨트 성계",

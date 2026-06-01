@@ -2,6 +2,23 @@
   "language": {
     "label": "Idioma"
   },
+  "account": {
+    "switchCharacter": "Mudar de personagem",
+    "addCharacter": "Adicionar personagem",
+    "blocked": "bloqueado",
+    "characterAdded": "{{name}} adicionado",
+    "switchTo": "Mudar para {{name}}",
+    "focusLocation": "Centrar e traçar rota a partir de {{name}}",
+    "noLocation": "Nenhuma localização conhecida de {{name}}",
+    "linkFailedNotInCorp": "Não foi possível adicionar esse personagem — não está na corporação.",
+    "linkFailed": "Não foi possível adicionar esse personagem. Tenta novamente.",
+    "remove": "Remover",
+    "removeCharacter": "Remover {{name}}",
+    "removeConfirm": "Remover {{name}} da tua conta? Podes voltar a vincular o personagem mais tarde.",
+    "characterRemoved": "{{name}} removido",
+    "removeFailed": "Não foi possível remover esse personagem. Tenta novamente.",
+    "locationUnknown": "Localização desconhecida"
+  },
   "actions": {
     "save": "Guardar",
     "cancel": "Cancelar",
@@ -341,6 +358,7 @@
     "activityNpcDelta": "Delta de PNJ",
     "fleetHint": "Mostra os companheiros de frota como pontos roxos no sistema em que estão. Passa o rato sobre um ponto para ver os nomes.",
     "showFleetMembers": "Mostrar membros da frota",
+    "showAccountChars": "Mostrar os meus personagens",
     "staleHint": "Esmaece visualmente os sistemas que não foram atualizados no intervalo escolhido, para detetar de relance os restos de cadeias antigas.",
     "exportJson": "↓ Exportar como JSON",
     "importJson": "↑ Importar de JSON",
@@ -640,7 +658,8 @@
     "sortSecure": "Rota segura"
   },
   "route": {
-    "fromLastKnown": "Saltos a partir de {{system}} (última localização conhecida)"
+    "fromLastKnown": "Saltos a partir de {{system}} (última localização conhecida)",
+    "fromCharacter": "Saltos a partir de {{character}} — {{system}}"
   },
   "activity": {
     "thisHour": "esta hora",
@@ -889,6 +908,10 @@
       "soloCorp": {
         "title": "Separação Solo / Corp",
         "desc": "Cada utilizador tem mapas pessoais que são sempre privados; no modo corp cada corp obtém também mapas de corp partilhados. A visibilidade entre corps é ativada através de uma única variável de ambiente."
+      },
+      "multiCharacter": {
+        "title": "Contas com vários personagens",
+        "desc": "Vincula os teus alts a uma única conta e alterna entre eles sem voltar a iniciar sessão — os mapas de cada personagem são fundidos ao vincular. Segue a localização em tempo real de um alt enquanto pilotas o teu principal e desvincula um personagem quando quiseres."
       },
       "multiMap": {
         "title": "Suporte multimapa",
@@ -1158,13 +1181,14 @@
   },
   "routeToast": {
     "destinationSet": "Destino definido para {{system}}",
-    "waypointAdded": "Ponto de rota adicionado: {{system}}",
+    "waypointAdded": "{{system}} adicionado aos pontos de passagem com sucesso.",
     "failed": "Falha ao definir o ponto de rota — a tua personagem está online?"
   },
   "mapNode": {
     "unknown": "Desconhecido",
     "homeSystem": "Sistema de origem",
     "characterFallback": "Personagem {{id}}",
+    "altLastKnown": "(última conhecida)",
     "killsTooltip": "{{ships}} nave · {{pods}} cápsula destruídas esta hora",
     "a0Sun": "Sol A0",
     "iceBelt": "Sistema com cinturão de gelo",

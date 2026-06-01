@@ -41,6 +41,10 @@ export function Toaster() {
 
   useEffect(() => {
     subscribers.add(setToasts);
+    // Sync immediately in case a toast was emitted before this subscribe ran
+    // — e.g. AppShell's on-load ?added / ?link_error effect fires before the
+    // Toaster's effect (tree order), so without this the queued toast is lost.
+    setToasts(current);
     return () => { subscribers.delete(setToasts); };
   }, []);
 

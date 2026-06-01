@@ -11,7 +11,8 @@ import { Sidebar } from './components/ui/Sidebar';
 import { ProximityOptInModal } from './components/ui/ProximityOptInModal';
 import { CommandPaletteModal } from './components/ui/CommandPaletteModal';
 import { LandingPage } from './components/ui/LandingPage';
-import { Toaster } from './components/ui/Toaster';
+import { Toaster, toast } from './components/ui/Toaster';
+import i18n from './i18n';
 import { TooltipLayer } from './components/ui/TooltipLayer';
 import { AdminPage } from './components/ui/AdminPage';
 import { SharedMapView } from './components/ui/SharedMapView';
@@ -104,6 +105,30 @@ function MapApp() {
 function AppShell() {
   const { user, loading } = useAuth();
   const [path] = useHashRoute();
+
+  // After the add-character SSO flow the server redirects with ?added=<name>
+  // on success or ?link_error=<code> on failure (e.g. the character isn't in
+  // the corp). Toast the outcome once, then strip the params so a refresh
+  // doesn't re-toast.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const added = params.get('added');
+    const linkError = params.get('link_error');
+    if (!added && !linkError) return;
+    // Strip the params synchronously so a refresh — or StrictMode's dev
+    // re-run of this effect — doesn't repeat the toast.
+    const url = new URL(window.location.href);
+    url.searchParams.delete('added');
+    url.searchParams.delete('link_error');
+    window.history.replaceState({}, '', url.toString());
+    // Emit on a macrotask so the Toaster (a sibling) has subscribed before we
+    // notify, and deliberately do NOT clear it on cleanup — otherwise
+    // StrictMode's mount/unmount/remount would cancel it and nothing shows.
+    setTimeout(() => {
+      if (added) toast.success(i18n.t('account.characterAdded', { name: added }));
+      if (linkError) toast.error(i18n.t(linkError === 'not_in_corp' ? 'account.linkFailedNotInCorp' : 'account.linkFailed'));
+    }, 0);
+  }, []);
 
   // Share links bypass the entire auth gate — a guest with the URL should
   // be able to load the map without ever seeing the landing page. Match

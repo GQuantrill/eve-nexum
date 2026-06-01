@@ -10,6 +10,7 @@ import '@xyflow/react/dist/style.css';
 
 import { useMapStore } from '../../store/mapStore';
 import { useAuth } from '../../context/AuthContext';
+import { useAccountLocations } from '../../hooks/useAccountLocations';
 import { useCanEdit } from '../../hooks/useCanEdit';
 import { useMinimapPosition } from '../../hooks/useMinimapPosition';
 import { useShareMode } from '../../context/ShareModeContext';
@@ -120,6 +121,10 @@ export function MapCanvas() {
   const clearFitView         = useMapStore((s) => s.clearFitView);
   const centerRequestEveId   = useMapStore((s) => s.centerRequestEveId);
   const clearCenterRequest   = useMapStore((s) => s.clearCenterRequest);
+  const routeOrigin          = useMapStore((s) => s.routeOrigin);
+  const setRouteOrigin       = useMapStore((s) => s.setRouteOrigin);
+  const requestCenterOnEveSystem = useMapStore((s) => s.requestCenterOnEveSystem);
+  const accountLocations     = useAccountLocations();
   const pushUndo             = useMapStore((s) => s.pushUndo);
   const canEdit              = useCanEdit();
   const { screenToFlowPosition, setViewport, getNode, getNodes, getZoom, fitView } = useReactFlow();
@@ -213,6 +218,24 @@ export function MapCanvas() {
     });
     return () => cancelAnimationFrame(raf);
   }, [centerRequestEveId, systems, centerOnSystem, getZoom, clearCenterRequest]);
+
+  // Follow a tracked character: when routing/centring is pinned to another of
+  // the account's characters and they jump, update the origin to their new
+  // system and re-centre on them. Driven by the account-locations poll.
+  useEffect(() => {
+    if (!routeOrigin) return;
+    const cur = accountLocations.byChar.get(routeOrigin.charId);
+    if (cur && cur.eveSystemId !== routeOrigin.eveSystemId) {
+      setRouteOrigin({
+        charId:        routeOrigin.charId,
+        characterName: routeOrigin.characterName,
+        eveSystemId:   cur.eveSystemId,
+        systemName:    cur.systemName ?? '',
+        systemClass:   cur.systemClass,
+      });
+      requestCenterOnEveSystem(cur.eveSystemId);
+    }
+  }, [accountLocations, routeOrigin, setRouteOrigin, requestCenterOnEveSystem]);
 
   // Preserve rubber-band selection when Shift is released before the mouse button.
   // React Flow clears the selection on Shift keyup, so we capture it just before.
@@ -549,12 +572,12 @@ export function MapCanvas() {
           {
             label: t('waypoint.setDestination'),
             icon: <MapPinSimpleIcon size={16} weight="regular" color="#3ddc84" />,
-            action: () => setDestination(sys.eveSystemId!).catch(() => toast.error(t('ctxMenu.failSetDest'))),
+            action: () => { setDestination(sys.eveSystemId!, sys.name).catch(() => {}); },
           },
           {
             label: t('waypoint.addWaypoint'),
             icon: <PathIcon size={16} weight="regular" color="#5a9af8" />,
-            action: () => addWaypoint(sys.eveSystemId!).catch(() => toast.error(t('ctxMenu.failAddWaypoint'))),
+            action: () => { addWaypoint(sys.eveSystemId!, sys.name).catch(() => {}); },
           },
         ];
       }
@@ -671,12 +694,12 @@ export function MapCanvas() {
         {
           label: t('waypoint.setDestination'),
           icon: <MapPinSimpleIcon size={16} weight="regular" color="#3ddc84" />,
-          action: () => setDestination(sys.eveSystemId!).catch(() => toast.error(t('ctxMenu.failSetDest'))),
+          action: () => { setDestination(sys.eveSystemId!, sys.name).catch(() => {}); },
         },
         {
           label: t('waypoint.addWaypoint'),
           icon: <PathIcon size={16} weight="regular" color="#5a9af8" />,
-          action: () => addWaypoint(sys.eveSystemId!).catch(() => toast.error(t('ctxMenu.failAddWaypoint'))),
+          action: () => { addWaypoint(sys.eveSystemId!, sys.name).catch(() => {}); },
         },
       ] : [];
 

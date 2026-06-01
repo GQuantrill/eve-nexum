@@ -57,9 +57,11 @@ export function A0Pane() {
 
   return (
     <div className="scout-pane">
-      {origin.fromLastKnown && origin.name && (
+      {origin.characterName && origin.name ? (
+        <div className="scout-pane__note scout-pane__note--lastknown">{t('route.fromCharacter', { character: origin.characterName, system: origin.name })}</div>
+      ) : origin.fromLastKnown && origin.name ? (
         <div className="scout-pane__note scout-pane__note--lastknown">{t('route.fromLastKnown', { system: origin.name })}</div>
-      )}
+      ) : null}
       <div className="scout-pane__note">{t('a0.showing', { count: TOP_N })}</div>
       {closest.map(s => {
         const route   = routes[String(s.id)];

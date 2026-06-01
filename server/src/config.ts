@@ -102,6 +102,11 @@ export const config = {
   corpMapExpireDays:   CORP_MAP_TIME,
   maxUserMaps:         parseInt(process.env.MAX_USER_MAPS ?? '5', 10),
   maxCorpMaps:         parseInt(process.env.MAX_CORP_MAPS ?? '5', 10),
+  // Background last-known-location poller (multi-account). 0 / unset = disabled
+  // (opt-in at the deployment level). When > 0, every linked character's
+  // last_known_system is refreshed from ESI on this cadence so positions stay
+  // current without anyone being logged into Nexum.
+  locationPollMinutes: Math.max(0, parseInt(process.env.LOCATION_POLL_MINUTES ?? '0', 10) || 0),
   discord:             DISCORD_WEBHOOKS,
   sdeAutoUpdate:       SDE_AUTO_UPDATE,
   sdeCheckUtc:         SDE_CHECK_UTC,

@@ -2,6 +2,23 @@
   "language": {
     "label": "Langue"
   },
+  "account": {
+    "switchCharacter": "Changer de personnage",
+    "addCharacter": "Ajouter un personnage",
+    "blocked": "bloqué",
+    "characterAdded": "{{name}} ajouté",
+    "switchTo": "Basculer vers {{name}}",
+    "focusLocation": "Centrer et router depuis {{name}}",
+    "noLocation": "Aucune position connue pour {{name}}",
+    "linkFailedNotInCorp": "Impossible d'ajouter ce personnage — il n'est pas dans la corporation.",
+    "linkFailed": "Impossible d'ajouter ce personnage. Veuillez réessayer.",
+    "remove": "Retirer",
+    "removeCharacter": "Retirer {{name}}",
+    "removeConfirm": "Retirer {{name}} de votre compte ? Vous pourrez le réassocier plus tard.",
+    "characterRemoved": "{{name}} retiré",
+    "removeFailed": "Impossible de retirer ce personnage. Veuillez réessayer.",
+    "locationUnknown": "Position inconnue"
+  },
   "actions": {
     "save": "Enregistrer",
     "cancel": "Annuler",
@@ -341,6 +358,7 @@
     "activityNpcDelta": "Delta PNJ",
     "fleetHint": "Afficher les membres de la flotte sous forme de points violets sur leur système. Survolez un point pour voir les noms.",
     "showFleetMembers": "Afficher les membres de la flotte",
+    "showAccountChars": "Afficher mes personnages",
     "staleHint": "Atténue visuellement les systèmes non mis à jour depuis l'intervalle choisi, pour repérer d'un coup d'œil les résidus de chaîne.",
     "exportJson": "↓ Exporter en JSON",
     "importJson": "↑ Importer depuis JSON",
@@ -640,7 +658,8 @@
     "sortSecure": "Route sécurisée"
   },
   "route": {
-    "fromLastKnown": "Sauts depuis {{system}} (dernière position connue)"
+    "fromLastKnown": "Sauts depuis {{system}} (dernière position connue)",
+    "fromCharacter": "Sauts depuis {{character}} — {{system}}"
   },
   "activity": {
     "thisHour": "cette heure",
@@ -889,6 +908,10 @@
       "soloCorp": {
         "title": "Séparation Solo / Corp",
         "desc": "Chaque utilisateur a des cartes personnelles toujours privées ; en mode corp, chaque corp obtient aussi des cartes de corp partagées. La visibilité inter-corp est activable via un seul drapeau d'environnement."
+      },
+      "multiCharacter": {
+        "title": "Comptes multi-personnages",
+        "desc": "Associez vos alts à un seul compte et passez de l'un à l'autre sans vous reconnecter — les cartes de chaque personnage sont fusionnées lors de l'association. Suivez la position en direct d'un alt pendant que vous pilotez votre main, et dissociez un personnage quand vous le souhaitez."
       },
       "multiMap": {
         "title": "Prise en charge multi-cartes",
@@ -1158,13 +1181,14 @@
   },
   "routeToast": {
     "destinationSet": "Destination définie sur {{system}}",
-    "waypointAdded": "Point de cheminement ajouté : {{system}}",
+    "waypointAdded": "{{system}} ajouté aux points de passage avec succès.",
     "failed": "Échec de la définition du point de cheminement — votre personnage est-il en ligne ?"
   },
   "mapNode": {
     "unknown": "Inconnu",
     "homeSystem": "Système d'origine",
     "characterFallback": "Personnage {{id}}",
+    "altLastKnown": "(dernière connue)",
     "killsTooltip": "{{ships}} vaisseau · {{pods}} capsule détruits cette heure",
     "a0Sun": "Soleil A0",
     "iceBelt": "Système à ceinture de glace",

@@ -353,12 +353,12 @@ export function StructuresPane({ systemId }: { systemId: string }) {
             {
               label: t('waypoint.setDestination'),
               icon: <MapPinSimpleIcon size={16} weight="regular" color="#3ddc84" />,
-              action: () => setDestination(ctx.structure.eveId!).catch(console.error),
+              action: () => setDestination(ctx.structure.eveId!, ctx.structure.name).catch(() => {}),
             },
             {
               label: t('waypoint.addWaypoint'),
               icon: <PathIcon size={16} weight="regular" color="#5a9af8" />,
-              action: () => addWaypoint(ctx.structure.eveId!).catch(console.error),
+              action: () => addWaypoint(ctx.structure.eveId!, ctx.structure.name).catch(() => {}),
             },
           ]}
         />,

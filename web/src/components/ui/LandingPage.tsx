@@ -3,7 +3,7 @@ import { Trans, useTranslation } from 'react-i18next';
 import type { Icon } from '@phosphor-icons/react';
 import {
   GraphIcon, MapTrifoldIcon, GaugeIcon, MagnifyingGlassIcon, SelectionIcon, ImageIcon, HourglassIcon,
-  UsersIcon, StackIcon, ArrowsMergeIcon, ArrowsClockwiseIcon, LockIcon, ShieldCheckIcon,
+  UsersIcon, UsersThreeIcon, StackIcon, ArrowsMergeIcon, ArrowsClockwiseIcon, LockIcon, ShieldCheckIcon,
   CardsIcon, WaveformIcon, BuildingsIcon, SparkleIcon, ChartLineIcon, FlagBannerIcon, SwordIcon, HandshakeIcon,
   PathIcon, StarIcon, SnowflakeIcon, LightningIcon, WarningIcon, NavigationArrowIcon, MapPinIcon, BroadcastIcon, BellRingingIcon, DiscordLogoIcon,
   CommandIcon, HouseIcon, SkullIcon, ChartBarIcon, PulseIcon, EyeIcon, SidebarIcon,
@@ -24,7 +24,7 @@ type SectionId = 'mapping' | 'personalCorp' | 'sysIntel' | 'liveOps' | 'producti
 type FeatureId =
   | 'interactiveMap' | 'seedRegion' | 'whIntel' | 'rollingCalc' | 'whPicker'
   | 'multiSelect' | 'pngExport' | 'sigAging'
-  | 'soloCorp' | 'multiMap' | 'mergeMaps' | 'realtime' | 'mapLocking' | 'rbac'
+  | 'soloCorp' | 'multiCharacter' | 'multiMap' | 'mergeMaps' | 'realtime' | 'mapLocking' | 'rbac'
   | 'systemPanel' | 'sigMgmt' | 'structImport' | 'autoStruct' | 'activityCharts'
   | 'sovStation' | 'killboard' | 'effectDigest' | 'standings'
   | 'scout' | 'a0' | 'iceBelt' | 'storms' | 'proximity' | 'discordNotif'
@@ -55,8 +55,9 @@ const FEATURE_SECTIONS: FeatureSection[] = [
   {
     id: 'personalCorp',
     items: [
-      { icon: UsersIcon,       id: 'soloCorp'   },
-      { icon: StackIcon,       id: 'multiMap'   },
+      { icon: UsersIcon,       id: 'soloCorp'       },
+      { icon: UsersThreeIcon,  id: 'multiCharacter' },
+      { icon: StackIcon,       id: 'multiMap'       },
       { icon: ArrowsMergeIcon, id: 'mergeMaps'  },
       { icon: BroadcastIcon,   id: 'realtime'   },
       { icon: LockIcon,        id: 'mapLocking' },

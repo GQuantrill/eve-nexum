@@ -309,9 +309,11 @@ export function ClosestSystemsPane() {
 
   return (
     <div className="scout-pane">
-      {origin.fromLastKnown && origin.name && (
+      {origin.characterName && origin.name ? (
+        <div className="scout-pane__note scout-pane__note--lastknown">{t('route.fromCharacter', { character: origin.characterName, system: origin.name })}</div>
+      ) : origin.fromLastKnown && origin.name ? (
         <div className="scout-pane__note scout-pane__note--lastknown">{t('route.fromLastKnown', { system: origin.name })}</div>
-      )}
+      ) : null}
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
         <SortableContext items={items.map((i) => String(i.id))} strategy={verticalListSortingStrategy}>
           {items.map((i) => (

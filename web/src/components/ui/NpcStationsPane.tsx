@@ -136,14 +136,14 @@ export function NpcStationsPane({ eveSystemId }: { eveSystemId: number | null })
                   <button
                     type="button"
                     className="sys-btn"
-                    onClick={(e) => { e.stopPropagation(); setDestination(s.id).catch(console.error); }}
+                    onClick={(e) => { e.stopPropagation(); setDestination(s.id, s.name).catch(() => {}); }}
                   >
                     {t('waypoint.setDestination')}
                   </button>
                   <button
                     type="button"
                     className="sys-btn"
-                    onClick={(e) => { e.stopPropagation(); addWaypoint(s.id).catch(console.error); }}
+                    onClick={(e) => { e.stopPropagation(); addWaypoint(s.id, s.name).catch(() => {}); }}
                   >
                     {t('systemPanel.addWaypointBtn')}
                   </button>
@@ -163,12 +163,12 @@ export function NpcStationsPane({ eveSystemId }: { eveSystemId: number | null })
             {
               label: t('waypoint.setDestination'),
               icon: <MapPinSimpleIcon size={16} weight="regular" color="#3ddc84" />,
-              action: () => setDestination(ctx.station.id).catch(console.error),
+              action: () => setDestination(ctx.station.id, ctx.station.name).catch(() => {}),
             },
             {
               label: t('waypoint.addWaypoint'),
               icon: <PathIcon size={16} weight="regular" color="#5a9af8" />,
-              action: () => addWaypoint(ctx.station.id).catch(console.error),
+              action: () => addWaypoint(ctx.station.id, ctx.station.name).catch(() => {}),
             },
           ]}
         />,

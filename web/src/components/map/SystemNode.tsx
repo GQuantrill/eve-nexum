@@ -10,6 +10,7 @@ import type { MapSystem } from '../../types';
 import { CLASS_COLORS, CLASS_LABELS, EFFECT_ICONS, EFFECT_LABELS, EFFECT_MODIFIERS, WORMHOLE_DESTINATIONS } from '../../data/wormholes';
 import { useMapStore } from '../../store/mapStore';
 import { usePresenceStore } from '../../store/presenceStore';
+import { useAccountLocations } from '../../hooks/useAccountLocations';
 import { useSovData } from '../../hooks/useSovData';
 import { useStandings } from '../../hooks/useStandings';
 import { useFleet } from '../../hooks/useFleet';
@@ -63,6 +64,17 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
     const myId = user?.characterId;
     return myId ? all.filter((m) => m.characterId !== myId) : all;
   }, [showFleetMembers, fleet.bySystem, sys.eveSystemId, user?.characterId]);
+
+  // The account's other characters (alts) located in this system — live when
+  // online, else their last known position. The active character has its own
+  // you-are-here dot, so it's excluded server-side.
+  const accountLocations     = useAccountLocations();
+  const [showAccountChars]   = useUserSetting<boolean>('nexum.account.showOnMap', true);
+  const accountHere = useMemo(() => {
+    if (!showAccountChars || sys.eveSystemId == null) return undefined;
+    const here = accountLocations.bySystem.get(sys.eveSystemId);
+    return here && here.length ? here : undefined;
+  }, [showAccountChars, accountLocations.bySystem, sys.eveSystemId]);
 
   // Other people viewing this map who are currently in this system (presence).
   // Excludes self — the green you-are-here dot covers that.
@@ -208,6 +220,19 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
               {fleetHere.map((m) => (
                 <span key={m.characterId} className="system-node__fleet-tooltip-row">
                   {m.characterName ?? t('mapNode.characterFallback', { id: m.characterId })}
+                </span>
+              ))}
+            </span>
+          </span>
+        )}
+        {accountHere && (
+          <span className="system-node__alt-dot-wrap">
+            <span className="system-node__alt-dot" />
+            <span className="system-node__alt-tooltip">
+              {accountHere.map((c) => (
+                <span key={c.charId} className="system-node__alt-tooltip-row">
+                  {c.characterName}
+                  {!c.online && <span className="system-node__alt-offline">{t('mapNode.altLastKnown')}</span>}
                 </span>
               ))}
             </span>

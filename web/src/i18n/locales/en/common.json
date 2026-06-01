@@ -2,6 +2,23 @@
   "language": {
     "label": "Language"
   },
+  "account": {
+    "switchCharacter": "Switch character",
+    "addCharacter": "Add character",
+    "blocked": "blocked",
+    "characterAdded": "Added {{name}}",
+    "switchTo": "Switch to {{name}}",
+    "focusLocation": "Centre & route from {{name}}",
+    "noLocation": "No known location for {{name}}",
+    "linkFailedNotInCorp": "Couldn't add that character — they're not in the corporation.",
+    "linkFailed": "Couldn't add that character. Please try again.",
+    "remove": "Remove",
+    "removeCharacter": "Remove {{name}}",
+    "removeConfirm": "Remove {{name}} from your account? You can add them again later by linking the character.",
+    "characterRemoved": "Removed {{name}}",
+    "removeFailed": "Couldn't remove that character. Please try again.",
+    "locationUnknown": "Location unknown"
+  },
   "actions": {
     "save": "Save",
     "cancel": "Cancel",
@@ -341,6 +358,7 @@
     "activityNpcDelta": "NPC Delta",
     "fleetHint": "Render fleet-mates as purple dots on the system they're in. Hover a dot to see the names.",
     "showFleetMembers": "Show fleet members",
+    "showAccountChars": "Show my characters",
     "staleHint": "Visually dim systems that haven't been updated for the chosen interval, so old chain residue is easy to spot at a glance.",
     "exportJson": "↓ Export as JSON",
     "importJson": "↑ Import from JSON",
@@ -640,7 +658,8 @@
     "sortSecure": "Secure route"
   },
   "route": {
-    "fromLastKnown": "Jumps from {{system}} (last known location)"
+    "fromLastKnown": "Jumps from {{system}} (last known location)",
+    "fromCharacter": "Jumps from {{character}} — {{system}}"
   },
   "activity": {
     "thisHour": "this hour",
@@ -889,6 +908,10 @@
       "soloCorp": {
         "title": "Solo / Corp split",
         "desc": "Every user has personal maps that are always private; in corp mode each corp also gets shared corp maps. Cross-corp visibility is opt-in via a single env flag."
+      },
+      "multiCharacter": {
+        "title": "Multi-character accounts",
+        "desc": "Link your alts to one account and switch between them without logging in again — each character's maps merge in on link. Follow an alt's live location while you fly your main, and unlink a character whenever you like."
       },
       "multiMap": {
         "title": "Multi-map support",
@@ -1158,13 +1181,14 @@
   },
   "routeToast": {
     "destinationSet": "Destination set to {{system}}",
-    "waypointAdded": "Waypoint added: {{system}}",
+    "waypointAdded": "{{system}} successfully added to waypoints.",
     "failed": "Failed to set waypoint — is your character online?"
   },
   "mapNode": {
     "unknown": "Unknown",
     "homeSystem": "Home system",
     "characterFallback": "Character {{id}}",
+    "altLastKnown": "(last known)",
     "killsTooltip": "{{ships}} ship · {{pods}} pod kills this hour",
     "a0Sun": "A0 sun",
     "iceBelt": "Ice belt system",

@@ -2,6 +2,23 @@
   "language": {
     "label": "语言"
   },
+  "account": {
+    "switchCharacter": "切换角色",
+    "addCharacter": "添加角色",
+    "blocked": "已封禁",
+    "characterAdded": "已添加 {{name}}",
+    "switchTo": "切换到 {{name}}",
+    "focusLocation": "以 {{name}} 为中心并从其位置规划路线",
+    "noLocation": "没有 {{name}} 的已知位置",
+    "linkFailedNotInCorp": "无法添加该角色——其不在该军团中。",
+    "linkFailed": "无法添加该角色，请重试。",
+    "remove": "移除",
+    "removeCharacter": "移除 {{name}}",
+    "removeConfirm": "要从你的账户中移除 {{name}} 吗？你之后可以重新关联该角色。",
+    "characterRemoved": "已移除 {{name}}",
+    "removeFailed": "无法移除该角色，请重试。",
+    "locationUnknown": "位置未知"
+  },
   "actions": {
     "save": "保存",
     "cancel": "取消",
@@ -341,6 +358,7 @@
     "activityNpcDelta": "NPC 增量",
     "fleetHint": "将舰队成员显示为其所在星系上的紫色圆点。悬停圆点可查看名称。",
     "showFleetMembers": "显示舰队成员",
+    "showAccountChars": "显示我的角色",
     "staleHint": "将在选定间隔内未更新的星系视觉上淡化，以便一眼看出旧链残留。",
     "exportJson": "↓ 导出为 JSON",
     "importJson": "↑ 从 JSON 导入",
@@ -640,7 +658,8 @@
     "sortSecure": "安全路线"
   },
   "route": {
-    "fromLastKnown": "从 {{system}} 起的跳跃数（最后已知位置）"
+    "fromLastKnown": "从 {{system}} 起的跳跃数（最后已知位置）",
+    "fromCharacter": "从 {{character}} 起的跳跃数 — {{system}}"
   },
   "activity": {
     "thisHour": "本小时",
@@ -889,6 +908,10 @@
       "soloCorp": {
         "title": "个人 / 军团分离",
         "desc": "每个用户都有始终私密的个人地图；在军团模式下，每个军团还会获得共享的军团地图。跨军团可见性通过单个环境变量开关启用。"
+      },
+      "multiCharacter": {
+        "title": "多角色账户",
+        "desc": "将你的小号关联到一个账户，无需重新登录即可在它们之间切换——关联时每个角色的地图会合并进来。在驾驶主号时跟踪小号的实时位置，并可随时解除某个角色的关联。"
       },
       "multiMap": {
         "title": "多地图支持",
@@ -1158,13 +1181,14 @@
   },
   "routeToast": {
     "destinationSet": "目的地已设为 {{system}}",
-    "waypointAdded": "已添加航路点：{{system}}",
+    "waypointAdded": "{{system}} 已成功添加到航点。",
     "failed": "设置航路点失败 — 你的角色在线吗？"
   },
   "mapNode": {
     "unknown": "未知",
     "homeSystem": "母星系",
     "characterFallback": "角色 {{id}}",
+    "altLastKnown": "（最后已知）",
     "killsTooltip": "本小时 {{ships}} 舰船 · {{pods}} 太空舱击杀",
     "a0Sun": "A0 恒星",
     "iceBelt": "冰带星系",

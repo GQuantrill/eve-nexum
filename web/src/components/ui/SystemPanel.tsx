@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { useSovData } from '../../hooks/useSovData';
 import { useEsiSystem } from '../../hooks/useEsiSystem';
-import { api } from '../../api/client';
+import { setDestination, addWaypoint } from '../../api/waypoint';
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import type { DragEndEvent } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
@@ -158,10 +158,11 @@ export function SystemPanel() {
 
   const setWaypoint = (clearOtherWaypoints: boolean) => {
     if (!sys.eveSystemId) return;
-    api('/api/character/waypoint', {
-      method: 'POST',
-      body: JSON.stringify({ destinationId: sys.eveSystemId, clearOtherWaypoints }),
-    })
+    // Shared helper toasts the outcome; we also flash the button state here.
+    const req = clearOtherWaypoints
+      ? setDestination(sys.eveSystemId, sys.name)
+      : addWaypoint(sys.eveSystemId, sys.name);
+    req
       .then(() => { setWaypointStatus('ok'); setTimeout(() => setWaypointStatus('idle'), 2000); })
       .catch(() => { setWaypointStatus('err'); setTimeout(() => setWaypointStatus('idle'), 2000); });
   };

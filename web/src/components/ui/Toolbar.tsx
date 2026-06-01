@@ -13,6 +13,7 @@ import { UserStatsModal } from './UserStatsModal';
 import { ConfirmModal } from './ConfirmModal';
 import { CreateMapModal } from './CreateMapModal';
 import { LanguageSwitcher } from './LanguageSwitcher';
+import { CharacterSwitcher } from './CharacterSwitcher';
 import { useProximityAlerts } from '../../hooks/useProximityAlerts';
 import {
   WarningIcon, SkullIcon, XCircleIcon, QuestionIcon,
@@ -484,6 +485,7 @@ export function Toolbar() {
               {checkedAt && <CheckedAtIcon checkedAt={checkedAt} />}
             </div>
           </div>
+          <CharacterSwitcher />
           <LanguageSwitcher />
           <button
             className="toolbar__toggle toolbar__toggle--icon toolbar__toggle--prominent"

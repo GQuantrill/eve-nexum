@@ -24,6 +24,7 @@ import routeRouter        from './routes/route.js';
 import wormholesRouter    from './routes/wormholes.js';
 import { loadRouteGraph } from './services/routeGraph.js';
 import { startSdeAutoUpdate } from './services/sdeUpdate.js';
+import { startLocationPoller } from './services/locationPoll.js';
 import { adminRouter, adminReadRouter, reportsRouter } from './routes/admin.js';
 import { standingsRouter } from './routes/standings.js';
 import { shareRouter } from './routes/share.js';
@@ -82,7 +83,14 @@ app.use(session({
 // catches the residual cases.
 app.use(originGuard(process.env.FRONTEND_URL ?? 'http://localhost:5174'));
 
-app.use('/auth', authLimiter, authRouter);
+// Tight limiter ONLY on the SSO brute-force surface (login spam, state
+// guessing). The rest of /auth — /me, /preferences, /settings,
+// /switch-character, /logout — is normal authenticated traffic (fires on every
+// load, character switch, map-option toggle and column-resize drag), so it gets
+// the higher app ceiling. Putting the tight 20/min cap on all of /auth made a
+// busy session (or rapid character switching) trip "too many requests".
+app.use(['/auth/login', '/auth/callback', '/auth/add-character'], authLimiter);
+app.use('/auth', appLimiter, authRouter);
 app.use('/api/systems', publicLimiter, systemsRouter);
 app.use('/api/regions', appLimiter, regionsRouter);
 app.use('/api/maps', appLimiter, mapsRouter);
@@ -143,5 +151,6 @@ migrate()
     await loadRouteGraph();
     app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
     startSdeAutoUpdate();
+    startLocationPoller();
   })
   .catch((err) => { console.error('Migration failed:', err); process.exit(1); });

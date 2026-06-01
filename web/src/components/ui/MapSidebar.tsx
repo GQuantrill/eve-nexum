@@ -960,6 +960,10 @@ export function MapSidebar() {
             settingKey="nexum.fleet.showMembers"
             label={t("mapSidebar.showFleetMembers")}
           />
+          <SettingToggle
+            settingKey="nexum.account.showOnMap"
+            label={t("mapSidebar.showAccountChars")}
+          />
         </CollapsibleSection>
 
         {!hideTopologyTools && (
