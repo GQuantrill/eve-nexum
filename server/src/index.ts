@@ -9,6 +9,7 @@ import { db } from './db.js';
 import { config } from './config.js';
 import { migrate } from './migrate.js';
 import { systemsRouter } from './routes/systems.js';
+import { sdeRouter } from './routes/sde.js';
 import { regionsRouter } from './routes/regions.js';
 import { authRouter } from './routes/auth.js';
 import { mapsRouter } from './routes/maps.js';
@@ -92,6 +93,7 @@ app.use(originGuard(process.env.FRONTEND_URL ?? 'http://localhost:5174'));
 app.use(['/auth/login', '/auth/callback', '/auth/add-character'], authLimiter);
 app.use('/auth', appLimiter, authRouter);
 app.use('/api/systems', publicLimiter, systemsRouter);
+app.use('/api/sde', publicLimiter, sdeRouter);
 app.use('/api/regions', appLimiter, regionsRouter);
 app.use('/api/maps', appLimiter, mapsRouter);
 // Public read-only share endpoint — no auth, validates the share_token

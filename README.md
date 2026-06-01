@@ -497,6 +497,22 @@ Each tab is also reachable at its own hash route (`#/admin/maps`, `#/admin/audit
 
 Some pre-computed lookups live in `server/data/` as plain JSON, derived once from the EVE Static Data Export (SDE). They're committed to the repo so a fresh install works without an extra step. You only need to regenerate them when CCP releases an SDE drop that adds or changes the underlying data.
 
+**Checking the SDE build** — `GET /api/sde/version` (public, browser-callable) reports the SDE build this instance is running against the latest CCP offers:
+
+```jsonc
+// GET /api/sde/version
+{
+  "installed":   "3365090",                 // build imported into this DB (null if never seeded)
+  "installedAt": "2026-05-29T11:29:00.000Z", // when that build was imported
+  "latest":      "3368760",                 // latest build CCP currently offers (null if unreachable)
+  "latestCheckedAt": "2026-06-02T11:30:00.000Z",
+  "upToDate":    false,                      // true | false | null (unknown)
+  "autoUpdate":  true                        // daily auto-update enabled?
+}
+```
+
+The remote `latest` lookup is a single cached HEAD to CCP (hourly), so the endpoint is cheap to poll. The daily auto-update keeps `installed` current on its own; this endpoint just lets you see where things stand.
+
 > **A0 sun systems** (`typeID 3801`, "Sun A0 (Blue Small)") used to live here as `data/a0-systems.json`. They're now flagged on `solar_systems.is_a0` directly by the SDE importer (from `mapStars.jsonl`) and served via `GET /api/systems/a0`, so they refresh automatically on every SDE re-seed — no committed file, no manual regen. Note this is the in-game A0 classification (`typeID 3801`), not the SDE's `statistics.spectralClass` field; the two don't agree.
 
 ### `data/wormholes.json`

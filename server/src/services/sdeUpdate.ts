@@ -14,17 +14,71 @@ const log = createLogger('sde-update');
 // SDE_CHECK_UTC) so the export is up by the time we look.
 const DAY_MS = 24 * 60 * 60 * 1000;
 
+// CCP's "latest" SDE URL 302-redirects to a versioned filename embedding the
+// build number, e.g. `…/eve-online-static-data-3365090-jsonl.zip`. Same URL the
+// importer uses; kept here so the server can report the available build too.
+const SDE_URL = 'https://developers.eveonline.com/static-data/eve-online-static-data-latest-jsonl.zip';
+
 let running = false;
 
+// Pull the CCP build number out of an SDE filename/URL → "3365090".
+function parseBuild(s: string): string | null {
+  return s.match(/static-data-(\d+)-jsonl/)?.[1] ?? null;
+}
+
 async function storedVersion(): Promise<string | null> {
+  return (await getInstalledSde()).version;
+}
+
+/**
+ * The SDE build currently imported into this DB, plus when it was recorded.
+ * Returns nulls on a never-seeded DB (table may not exist yet).
+ */
+export async function getInstalledSde(): Promise<{ version: string | null; updatedAt: string | null }> {
   try {
-    const { rows } = await db.query<{ value: string }>(
-      `SELECT value FROM sde_meta WHERE key = 'sde_version'`,
+    const { rows } = await db.query<{ value: string; updated_at: string }>(
+      `SELECT value, updated_at FROM sde_meta WHERE key = 'sde_version'`,
     );
-    return rows[0]?.value ?? null;
+    return { version: rows[0]?.value ?? null, updatedAt: rows[0]?.updated_at ?? null };
   } catch {
-    return null; // table may not exist yet on a never-seeded DB
+    return { version: null, updatedAt: null };
   }
+}
+
+// Cache the remote-build lookup so a burst of callers makes at most one HEAD to
+// CCP. Successes are good for an hour (the SDE changes ~daily); failures retry
+// after 5 min so a brief CCP outage doesn't pin "unknown" for an hour.
+const LATEST_TTL_OK_MS  = 60 * 60 * 1000;
+const LATEST_TTL_ERR_MS = 5 * 60 * 1000;
+let latestCache: { build: string | null; at: number } | null = null;
+
+async function fetchRemoteBuild(): Promise<string | null> {
+  try {
+    const res = await fetch(SDE_URL, { method: 'HEAD', redirect: 'manual' });
+    const build = parseBuild(res.headers.get('location') ?? '');
+    if (build) return build;
+    // URL shape changed — fall back to a stable content identifier.
+    const head = await fetch(SDE_URL, { method: 'HEAD' });
+    return head.headers.get('etag') ?? head.headers.get('last-modified');
+  } catch (err) {
+    log.warn(`could not determine latest SDE build: ${(err as Error).message}`);
+    return null;
+  }
+}
+
+/**
+ * The latest SDE build CCP currently offers, without downloading it. Cached;
+ * `at` is when the value was actually fetched. `build` is null if CCP was
+ * unreachable.
+ */
+export async function fetchLatestSdeBuild(): Promise<{ build: string | null; at: number }> {
+  const now = Date.now();
+  if (latestCache) {
+    const ttl = latestCache.build ? LATEST_TTL_OK_MS : LATEST_TTL_ERR_MS;
+    if (now - latestCache.at < ttl) return latestCache;
+  }
+  latestCache = { build: await fetchRemoteBuild(), at: now };
+  return latestCache;
 }
 
 // Run the compiled importer as a child process. It lives in the same image, so
