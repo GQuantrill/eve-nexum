@@ -630,7 +630,11 @@
   },
   "scout": {
     "noConnections": "No hay conexiones de {{system}}.",
-    "expiring": "caducando"
+    "expiring": "caducando",
+    "sortLabel": "Ordenar",
+    "sortAge": "Edad del WH",
+    "sortShortest": "Ruta más corta",
+    "sortSecure": "Ruta segura"
   },
   "activity": {
     "thisHour": "esta hora",

@@ -656,7 +656,11 @@
   },
   "scout": {
     "noConnections": "Нет соединений {{system}}.",
-    "expiring": "истекает"
+    "expiring": "истекает",
+    "sortLabel": "Сортировка",
+    "sortAge": "Возраст ЧД",
+    "sortShortest": "Кратчайший маршрут",
+    "sortSecure": "Безопасный маршрут"
   },
   "activity": {
     "thisHour": "за этот час",

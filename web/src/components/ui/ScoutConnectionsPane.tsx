@@ -13,6 +13,18 @@ interface Props {
   scoutSystem: 'Thera' | 'Turnur';
 }
 
+type ScoutSort = 'age' | 'closest';
+
+// Per-panel sort preference, remembered client-side. Thera and Turnur keep
+// independent choices under their own key.
+function readScoutSort(system: string): ScoutSort {
+  try {
+    return localStorage.getItem(`nexum.scoutSort.${system}`) === 'closest' ? 'closest' : 'age';
+  } catch {
+    return 'age';
+  }
+}
+
 const SIZE_LABELS: Record<string, string> = {
   small:  'S',
   medium: 'M',
@@ -53,6 +65,16 @@ export function ScoutConnectionsPane({ scoutSystem }: Props) {
   const location = useCharacterLocation();
   const routeMode = useMapStore((s) => s.routeMode);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const [sortBy, setSortBy] = useState<ScoutSort>(() => readScoutSort(scoutSystem));
+
+  function changeSort(v: ScoutSort) {
+    setSortBy(v);
+    try {
+      localStorage.setItem(`nexum.scoutSort.${scoutSystem}`, v);
+    } catch {
+      // storage may be unavailable (private mode, etc.) — keep the in-memory choice.
+    }
+  }
 
   const filtered = useMemo(
     () => all.filter(c => c.outSystemName === scoutSystem),
@@ -67,16 +89,31 @@ export function ScoutConnectionsPane({ scoutSystem }: Props) {
   const targetIds = useMemo(() => filtered.map(c => c.inSystemId), [filtered]);
   const routes = useRoute(canRoute ? location.system!.eveSystemId : null, targetIds);
 
-  // Sort by remaining time descending — freshest holes at the top, the
-  // soon-to-collapse ones drop to the bottom. Name is a stable tiebreaker.
+  // Two sort modes:
+  //  - 'age'     : remaining time descending — freshest holes at the top, the
+  //                soon-to-collapse ones drop to the bottom.
+  //  - 'closest' : fewest jumps via the active route preference (shortest /
+  //                secure) ascending. Connections without a usable route (no
+  //                k-space location, or wormhole-class target) fall to the
+  //                bottom. Age then name break ties in both modes.
   const sorted = useMemo(() => {
-    const arr = [...filtered];
-    arr.sort((a, b) => {
+    const byAge = (a: typeof filtered[number], b: typeof filtered[number]) => {
       if (a.remainingHours !== b.remainingHours) return b.remainingHours - a.remainingHours;
       return a.inSystemName.localeCompare(b.inSystemName);
-    });
+    };
+    const arr = [...filtered];
+    if (sortBy === 'closest') {
+      arr.sort((a, b) => {
+        const ja = routes[String(a.inSystemId)]?.jumps ?? Infinity;
+        const jb = routes[String(b.inSystemId)]?.jumps ?? Infinity;
+        if (ja !== jb) return ja - jb;
+        return byAge(a, b);
+      });
+    } else {
+      arr.sort(byAge);
+    }
     return arr;
-  }, [filtered]);
+  }, [filtered, sortBy, routes]);
 
   function toggleExpanded(id: string) {
     setExpanded(prev => {
@@ -93,6 +130,22 @@ export function ScoutConnectionsPane({ scoutSystem }: Props) {
 
   return (
     <div className="scout-pane">
+      <div className="scout-pane__sort">
+        <label className="scout-pane__sort-label" htmlFor={`scout-sort-${scoutSystem}`}>
+          {t('scout.sortLabel')}
+        </label>
+        <select
+          id={`scout-sort-${scoutSystem}`}
+          className="scout-pane__sort-select"
+          value={sortBy}
+          onChange={(e) => changeSort(e.target.value as ScoutSort)}
+        >
+          <option value="age">{t('scout.sortAge')}</option>
+          <option value="closest">
+            {t(routeMode === 'secure' ? 'scout.sortSecure' : 'scout.sortShortest')}
+          </option>
+        </select>
+      </div>
       {sorted.map(c => {
         const route   = canRoute ? routes[String(c.inSystemId)] : undefined;
         const isOpen  = expanded.has(c.id);
