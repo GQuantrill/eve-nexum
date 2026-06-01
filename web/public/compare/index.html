@@ -155,6 +155,7 @@
           <option value="pt">🇵🇹 Português</option>
           <option value="zh">🇨🇳 简体中文</option>
           <option value="ko">🇰🇷 한국어</option>
+          <option value="ja">🇯🇵 日本語</option>
         </select>
       </nav>
 
@@ -440,7 +441,7 @@
 
           // Languages with a translation dictionary below. English is the
           // untranslated source, so it has no entry.
-          var SUPPORTED = { de: 1, fr: 1, es: 1, pt: 1, zh: 1, ko: 1 };
+          var SUPPORTED = { de: 1, fr: 1, es: 1, pt: 1, zh: 1, ko: 1, ja: 1 };
 
           // Wire up the language picker regardless of the current language so a
           // visitor can switch between any language (including back to English).
@@ -1022,6 +1023,100 @@
             ctaGh: 'GitHub에서 받기',
             footP1: '비교는 Nexum 팀이 관리 · 최종 검증 2026년 5월. 경쟁 제품 세부 정보는 시간이 지나면 바뀝니다 — 위의 링크를 따라가 현재 기능을 확인하세요. 부정확한 점을 발견했나요? <a href="https://github.com/GQuantrill/eve-nexum/issues">이슈를 여세요</a>.',
             footP2: 'EVE Online과 EVE 로고는 CCP hf.의 등록 상표입니다. 전 세계 모든 권리 보유. Nexum은 제3자 도구이며 CCP hf., Pathfinder, Tripwire 또는 Wanderer와 제휴하거나 그로부터 보증받지 않았습니다. 전체 <a href="/license/">라이선스 및 EVE IP 고지</a>를 참조하세요.'
+          };
+
+          // Japanese.
+          DICTS.ja = {
+            __title: 'EVE Online ワームホールマッパー比較: Nexum vs Pathfinder vs Tripwire vs Wanderer（2026）',
+            nav: '&larr; Nexum ホーム',
+            h1: 'EVE Online ワームホールマッパー比較:<br />Nexum vs Pathfinder vs Tripwire vs Wanderer',
+            sub: 'EVE Online の主要なワームホールマッピングツールを率直に見つめます。',
+            upd: '最終更新 2026年5月27日 · Nexum チームが管理',
+            lede: 'J-スペースでスカウトしたり住んだりするなら、良いワームホールマッパーは必須です。<strong>Nexum</strong> はモダンなオープンソースのマッパーで — 無料のホスティング版を使うか自分でホストできます — フルワークフローをカバーします: リアルタイムのチェーンマッピング、シグネチャと質量の追跡、さらに本格的なロール計算機、リージョン全体のマップ生成、スタンディングと主権のオーバーレイ、Discord アラートまで。以下では、他のよくある選択肢 — <strong>Tripwire</strong>、<strong>Pathfinder</strong>、<strong>Wanderer</strong> — と比較します。Nexum は私たちが作っているので、当然ほとんどのコーポにとって最強の選択だと考えていますが、競合の事実は正確かつリンク付きで保ち、ご自身で判断できるようにしています。',
+
+            h2Glance: '一目で',
+            cap1: '基本比較。2026年5月検証 — 競合の機能は変わります。リンクをたどって確認してください。',
+            gOpenSource: 'オープンソース',
+            gSelfHost: 'セルフホスト可',
+            gCloud: 'マネージドクラウドオプション',
+            gSso: 'EVE SSO ログイン',
+            gSync: 'リアルタイムマルチユーザー同期',
+            gSigPaste: 'シグネチャの貼り付けと追跡',
+            gMass: 'ワームホール質量 / ロール',
+            gTech: '技術スタック',
+            gCost: 'コスト',
+            yes: '<span class="yes">はい</span>',
+            yesMit: '<span class="yes">はい</span>（MIT）',
+            yesDocker: '<span class="yes">はい</span>（Docker）',
+            yesCe: '<span class="yes">はい</span>（Community Edition）',
+            free: '<span class="yes">無料</span>',
+            freeBoth: '<span class="yes">無料</span>（ホスティングおよびセルフホスト）',
+            gCloudN: '<span class="yes">はい</span> — eve-nexum.com の無料パブリックインスタンス、さらにセルフホスト',
+            gCloudP: '<span class="meh">コミュニティ運営のインスタンス</span>',
+            gCloudT: '<span class="meh">パブリックホストは 2024 年に閉鎖</span>',
+            gCloudW: '<span class="yes">はい</span> — 公式「Wanderer Cloud」、開発者が管理',
+            gMassN: '専用ロール計算機（±10% 分散、座礁警告）',
+            massStatus: '質量ステータス追跡',
+
+            h2Further: 'Nexum がさらに進んでいる点',
+            furtherIntro: '4 つとも基本はうまく扱います。以下は Nexum が組み込んでいて、他のツールが一般にドキュメント化された標準機能として提供していない能力です — コーポがそれを選ぶ理由です:',
+            cap2: 'Nexum の際立った機能。「—」は、それらのツールのドキュメント化された組み込みの目玉機能ではないことを意味します（機能は変わります — 下のリンクで確認してください）。',
+            fFeature: '機能',
+            f1h: 'Wormhole <strong>ロール計算機</strong> — ±10% の質量分散をモデル化し、サイド追跡付きのコールド/ホットローラー、そしてある通過があなたのローラーを座礁させたりホールを崩壊させたりする前に警告',
+            f1o: '基本的な質量ステータス追跡',
+            f2h: '<strong>EVE リージョン全体からマップを生成</strong> — リージョン内のすべてのスターゲートをあらかじめ描いた Dotlan 風の自動レイアウト',
+            f3h: '<strong>2 つのマップを 1 つに統合</strong>、星系を重複排除し、シグネチャ、ストラクチャ、メモを折り込む',
+            f4h: '<strong>Discord 通知</strong> — 入ってくる K162 や新接続のアラートをチャンネルにプッシュ、誰もマップを見ていなくても',
+            f5h: '<strong>あなた自身の EVE コンタクトで駆動するスタンディングと主権のオーバーレイ</strong> — チェーン全体の敵対/友好の色分け、killboard、主権ハロー',
+            f6h: '<strong>マップ閲覧者のライブ在席</strong> — あなたのフリートだけでなくマップを見ている全員に点 — さらにフリート位置',
+            f6o: 'フリート位置はまちまち',
+            f7h: '<strong>環境インテルレイヤー</strong> — ヌルセクストーム、A0 恒星、アイスベルト、チェーンのワームホールエフェクト、インカージョン / 反乱の近接アラート',
+            f8h: '<strong>コーポスイート</strong> — 権限、共有マップ、管理ダッシュボード、ユーザーと星系のレポート、監査ログ、キャラクターごとの帰属',
+            f8o: 'まちまち',
+
+            h2Detail: 'ツールの詳細',
+            twP: 'J-スペースのプレイヤーの大きな割合が共に育った、古典的でシグネチャ優先のワームホールマッパー。速く、集中していて、ワークフローはベテランには体に染みついています。長く運営されたパブリックインスタンス（tripwire.eve-apps.com）は 2024 年半ばに閉鎖されましたが、Tripwire はオープンソースなので、セルフホストとコミュニティ運営のインスタンスを通じて生き続けています。',
+            twBest: '<strong>最適:</strong> 慣れた Tripwire のシグネチャワークフローを望み、セルフホストをいとわないグループ。<a href="https://bitbucket.org/daimian/tripwire">ソース &rarr;</a>',
+            pfP: '最も成熟し機能が豊富なセルフホストマッパー。ワームホール住民が期待する多くのことを切り開きました — 豊富なワームホールデータ、EVE-Scout 経由の Thera 接続、ライブの zKillboard キルストリーム、プラグイン API など。トレードオフは運用の重さです: 単一コンテナのアプリより、セットアップと更新の維持に手がかかる PHP/MySQL スタックです。',
+            pfBest: '<strong>最適:</strong> 最大限の機能を望み、より重いスタックの運用をいとわないグループ。<a href="https://github.com/exodus4d/pathfinder">GitHub &rarr;</a>',
+            wdP: 'モダンな挑戦者で、Pathfinder の軽量で高速な代替として宣伝されています。Elixir/Phoenix 上に React フロントエンドで構築され MIT でオープンソース化され、4 つの中で唯一<em>公式マネージドクラウド</em>版を持ち — グループがインフラを一切運用せずに使えるようにし — 同時に無料のセルフホスト Community Edition も提供します。',
+            wdBest: '<strong>最適:</strong> 洗練された UI と、セルフホストを完全に省く選択肢を望むグループ。<a href="https://wanderer.ltd/">ウェブサイト &rarr;</a> · <a href="https://github.com/wanderer-industries/wanderer">GitHub &rarr;</a>',
+            nxP: 'コーポ優先で作られた、モダンでオープンソースのセルフホストマッパー。コアワークフローをカバーします — リアルタイム共同マッピング（マップ上の全員にライブ編集）、ワームホール経年付きのシグネチャ貼り付け、接続追跡 — そしてコーポのチェーン運用に向けた追加機能を重ねます:',
+            nxLi1: '±10% の質量分散をモデル化し、各通過を安全 / 崩壊の可能性 / 崩壊確実として予測し、ある通過があなたのローラーを座礁させる前に警告する<strong>ロール計算機</strong>。',
+            nxLi2: '<strong>EVE リージョン全体を Dotlan 風のマップとして生成</strong>し、<strong>マップを統合</strong>。',
+            nxLi3: '<strong>スタンディングと主権のオーバーレイ</strong>、ライブ killboard、ジャンプ/キルのアクティビティチャート。',
+            nxLi4: 'マップ上の<strong>パイロットの在席とフリート位置</strong>、さらに任意の位置追跡。',
+            nxLi5: 'EVE-Scout の <strong>Thera と Turnur</strong> のパブリック接続。',
+            nxLi6: '<strong>コーポモード</strong>: 権限、共有マップ、管理レポート、監査ログ、そして入ってくる K162 と新接続の <strong>Discord 通知</strong>。',
+            nxP2: '小さな Docker スタック（React + Node + Postgres）として動作し、EVE SSO でログインします — eve-nexum.com の無料パブリックインスタンスを使うか、自分でホストしてください。4 つの中で最も新しいため、コミュニティは小さめです。',
+            nxBest: '<strong>最適:</strong> ロール、リージョン生成、スタンディング、Discord が組み込まれたモダンなマッパーを望むコーポ — 私たちがホストするか、セルフホスト。<a href="/">今すぐ始める &rarr;</a> · <a href="https://github.com/GQuantrill/eve-nexum">GitHub &rarr;</a>',
+
+            h2Choose: 'どれを選ぶべき？',
+            chooseP1: '<strong>新しく立ち上げるほとんどのコーポには、Nexum から始めます。</strong>モダンで、Docker で数分で立ち上がり、本来なら自分で寄せ集める必要のあるロール計算機、リージョン生成、スタンディングオーバーレイ、Discord アラートを 1 つにまとめています — すべてリアルタイムの共同マップの中で。<a href="/">今すぐ始めて</a>、自分で確かめてください。',
+            chooseP2: '他のものも良いツールで、特定のケースではよりフィットするかもしれません:',
+            chooseLi1: '<strong>すでに古典的な Tripwire のシグネチャワークフローに精通していますか？</strong>Tripwire は今もそれをうまくやります — 今やセルフホストで。',
+            chooseLi2: '<strong>最も深く成熟した機能セットが必要で、より重い PHP スタックの運用が平気ですか？</strong>Pathfinder。',
+            chooseLi3: '<strong>サーバーを一切運用したくないですか？</strong>Nexum の無料パブリックインスタンス、または Wanderer のクラウドを使ってください。',
+
+            h2Faq: 'よくある質問',
+            faqQ1: 'EVE Online に最適なワームホールマッパーは？',
+            faqA1: 'グループ次第ですが、モダンなセルフホスト構成なら Nexum をお勧めします — 最も多くの組み込み機能（ワームホールロール計算機、リージョン全体のマップ生成、スタンディングオーバーレイ、Discord アラート）をリアルタイムの共同マップにまとめています。Tripwire は今も古典的なシグネチャツールで、Pathfinder は最も成熟し機能が豊富な選択肢、Wanderer はマネージドクラウド版を加えます。',
+            faqQ2: 'Tripwire はまだ使えますか？',
+            faqA2: '長く運営されたパブリックインスタンスは 2024 年半ばに閉鎖されましたが、Tripwire はオープンソースなので、自分でホストするかコミュニティ運営のインスタンスを使えます。',
+            faqQ3: 'Pathfinder はまだ開発されていますか？',
+            faqA3: 'いいえ — 活発にはされていません。オリジナルの Pathfinder（exodus4d 作）は 2020 年以降新リリースがなく、それを引き継いだコミュニティフォークも 2025 年初頭の最後のコミット以降リリースがありません。活発な開発は事実上止まりました — Nexum のようなより新しく活発に保守されるマッパーが存在する理由の 1 つです。',
+            faqQ4: 'Pathfinder と Tripwire の良いオープンソース代替は？',
+            faqA4: 'Nexum と Wanderer はどちらもモダンなオープンソースマッパーです。Nexum は EVE SSO、リアルタイム共同作業、コーポツールを備えたセルフホストで、Wanderer は MIT ライセンスでセルフホストに加えマネージドクラウド版を提供します。',
+            faqQ5: 'EVE Online のワームホールマッパーをセルフホストできますか？',
+            faqA5: 'はい — Nexum、Pathfinder、Tripwire、そして Wanderer の Community Edition はすべてセルフホストできます。Nexum は Postgres 上で Docker で動作し、EVE SSO でログインします。',
+            faqQ6: 'これらのワームホールマッパーは無料ですか？',
+            faqA6: 'はい — 4 つとも無料です。Pathfinder と Tripwire はセルフホスト、Nexum と Wanderer はそれぞれ無料のパブリックホスティング版とセルフホストの両方を提供します。',
+
+            ctaP: '<strong>Nexum は無料です。</strong>ホスティング版を使うか、数分でコーポのチェーンをセルフホストしてください。',
+            ctaBtn: '今すぐ始める',
+            ctaGh: 'GitHub で入手',
+            footP1: '比較は Nexum チームが管理 · 最終確認 2026年5月。競合の詳細は時間とともに変わります — 上のリンクをたどって現在の機能を確認してください。不正確な点を見つけましたか？<a href="https://github.com/GQuantrill/eve-nexum/issues">issue を開いてください</a>。',
+            footP2: 'EVE Online と EVE ロゴは CCP hf. の登録商標です。世界中で全権利を留保します。Nexum はサードパーティのツールであり、CCP hf.、Pathfinder、Tripwire、Wanderer と提携しておらず、その承認も受けていません。完全な <a href="/license/">ライセンスおよび EVE 知的財産に関する注意</a>をご覧ください。'
           };
 
           var DICT = DICTS[lang];
