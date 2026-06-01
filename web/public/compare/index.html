@@ -154,6 +154,7 @@
           <option value="es">🇪🇸 Español</option>
           <option value="pt">🇵🇹 Português</option>
           <option value="zh">🇨🇳 简体中文</option>
+          <option value="ko">🇰🇷 한국어</option>
         </select>
       </nav>
 
@@ -439,7 +440,7 @@
 
           // Languages with a translation dictionary below. English is the
           // untranslated source, so it has no entry.
-          var SUPPORTED = { de: 1, fr: 1, es: 1, pt: 1, zh: 1 };
+          var SUPPORTED = { de: 1, fr: 1, es: 1, pt: 1, zh: 1, ko: 1 };
 
           // Wire up the language picker regardless of the current language so a
           // visitor can switch between any language (including back to English).
@@ -927,6 +928,100 @@
             ctaGh: '在 GitHub 上获取',
             footP1: '对比由 Nexum 团队维护 · 最后核实于 2026 年 5 月。竞品细节会随时间变化 — 请按上方链接确认当前功能。发现不准确之处？<a href="https://github.com/GQuantrill/eve-nexum/issues">开一个 issue</a>。',
             footP2: 'EVE Online 和 EVE 标志是 CCP hf. 的注册商标。保留全球所有权利。Nexum 是第三方工具，与 CCP hf.、Pathfinder、Tripwire 或 Wanderer 无关，也未获其认可。请查看完整的 <a href="/license/">许可证与 EVE 知识产权声明</a>。'
+          };
+
+          // Korean.
+          DICTS.ko = {
+            __title: 'EVE Online 웜홀 지도 도구 비교: Nexum vs Pathfinder vs Tripwire vs Wanderer (2026)',
+            nav: '&larr; Nexum 홈',
+            h1: 'EVE Online 웜홀 지도 도구 비교:<br />Nexum vs Pathfinder vs Tripwire vs Wanderer',
+            sub: 'EVE Online을 위한 주요 웜홀 지도 도구에 대한 솔직한 시선.',
+            upd: '최종 업데이트 2026년 5월 27일 · Nexum 팀 관리',
+            lede: 'J-스페이스에서 스카우트하거나 거주한다면 좋은 웜홀 지도 도구는 필수입니다. <strong>Nexum</strong>은 현대적인 오픈 소스 지도 도구로 — 무료 호스팅 버전을 쓰거나 직접 호스팅하세요 — 전체 워크플로를 다룹니다: 실시간 체인 지도, 시그니처 및 질량 추적, 그리고 더 나아가 제대로 된 롤링 계산기, 지역 전체 지도 생성, 스탠딩 및 주권 오버레이, Discord 경보까지. 아래에서 다른 흔한 선택지인 <strong>Tripwire</strong>, <strong>Pathfinder</strong>, <strong>Wanderer</strong>와 비교합니다. Nexum은 저희가 만들기에 당연히 대부분의 군단에게 가장 강력한 선택이라고 생각합니다 — 하지만 경쟁 제품의 사실을 정확하게 유지하고 링크해 두어 직접 판단할 수 있게 했습니다.',
+
+            h2Glance: '한눈에 보기',
+            cap1: '핵심 비교. 2026년 5월 검증 — 경쟁 제품 기능은 변합니다; 링크를 따라가 확인하세요.',
+            gOpenSource: '오픈 소스',
+            gSelfHost: '자체 호스팅 가능',
+            gCloud: '관리형 클라우드 옵션',
+            gSso: 'EVE SSO 로그인',
+            gSync: '실시간 다중 사용자 동기화',
+            gSigPaste: '시그니처 붙여넣기 및 추적',
+            gMass: '웜홀 질량 / 롤링',
+            gTech: '기술 스택',
+            gCost: '비용',
+            yes: '<span class="yes">예</span>',
+            yesMit: '<span class="yes">예</span> (MIT)',
+            yesDocker: '<span class="yes">예</span> (Docker)',
+            yesCe: '<span class="yes">예</span> (Community Edition)',
+            free: '<span class="yes">무료</span>',
+            freeBoth: '<span class="yes">무료</span> (호스팅 및 자체 호스팅)',
+            gCloudN: '<span class="yes">예</span> — eve-nexum.com의 무료 공개 인스턴스, 그리고 자체 호스팅',
+            gCloudP: '<span class="meh">커뮤니티 운영 인스턴스</span>',
+            gCloudT: '<span class="meh">공개 호스트 2024년 종료</span>',
+            gCloudW: '<span class="yes">예</span> — 공식 「Wanderer Cloud」, 개발자 관리',
+            gMassN: '전용 롤링 계산기 (±10% 분산, 고립 경고)',
+            massStatus: '질량 상태 추적',
+
+            h2Further: 'Nexum이 더 나아가는 지점',
+            furtherIntro: '네 가지 모두 기본은 잘 처리합니다. 다음은 Nexum이 내장하지만 다른 도구들은 일반적으로 문서화된 기본 제공 기능으로 제공하지 않는 능력들입니다 — 군단이 그것을 선택하는 이유입니다:',
+            cap2: 'Nexum의 차별화된 기능. 「—」는 해당 도구들의 문서화된 내장 대표 기능이 아님을 뜻합니다 (기능은 변합니다 — 아래 링크로 확인하세요).',
+            fFeature: '기능',
+            f1h: 'Wormhole <strong>롤링 계산기</strong> — ±10% 질량 분산을 모델링하고, 사이드 추적이 있는 콜드/핫 롤러, 그리고 어떤 통과가 당신의 롤러를 고립시키거나 홀을 붕괴시키기 전에 경고',
+            f1o: '기본 질량 상태 추적',
+            f2h: '<strong>EVE 지역 전체에서 지도 생성</strong> — 지역 내 모든 스타게이트가 미리 그려진 Dotlan 스타일 자동 배치',
+            f3h: '<strong>두 지도를 하나로 병합</strong>, 성계를 중복 제거하고 시그니처, 구조물, 노트를 접어 넣음',
+            f4h: '<strong>Discord 알림</strong> — 들어오는 K162 및 새 연결 경보를 채널로 전송, 아무도 지도를 보고 있지 않을 때에도',
+            f5h: '<strong>당신 자신의 EVE 연락처로 구동되는 스탠딩 및 주권 오버레이</strong> — 체인 전체의 적대/우호 색상, killboard, 주권 후광',
+            f6h: '<strong>실시간 지도 관람자 재실</strong> — 당신의 함대뿐 아니라 지도를 보는 모든 사람마다 점 — 그리고 함대 위치',
+            f6o: '함대 위치는 제각각',
+            f7h: '<strong>환경 인텔 레이어</strong> — 널섹 폭풍, A0 항성, 얼음 벨트, 체인 웜홀 효과, 인커전 / 반란 근접 경보',
+            f8h: '<strong>군단 스위트</strong> — 권한, 공유 지도, 관리 대시보드, 사용자 및 성계 보고서, 감사 로그, 캐릭터별 귀속',
+            f8o: '제각각',
+
+            h2Detail: '도구 상세',
+            twP: '엄청난 비율의 J-스페이스 플레이어가 함께 자란 고전적인, 시그니처 우선 웜홀 지도 도구. 빠르고, 집중적이며, 워크플로는 베테랑에게 근육 기억입니다. 오래 운영된 공개 인스턴스(tripwire.eve-apps.com)는 2024년 중반에 종료되었지만, Tripwire는 오픈 소스라 자체 호스팅과 커뮤니티 운영 인스턴스를 통해 살아 있습니다.',
+            twBest: '<strong>가장 적합:</strong> 익숙한 Tripwire 시그니처 워크플로를 원하고 자체 호스팅할 의향이 있는 그룹. <a href="https://bitbucket.org/daimian/tripwire">소스 &rarr;</a>',
+            pfP: '가장 성숙하고 기능이 풍부한 자체 호스팅 지도 도구. 웜홀 유저가 기대하는 많은 것을 개척했습니다 — 풍부한 웜홀 데이터, EVE-Scout를 통한 Thera 연결, 실시간 zKillboard 킬스트림, 플러그인 API 등. 절충점은 운영 부담입니다: 단일 컨테이너 앱보다 설치하고 최신으로 유지하는 데 더 손이 가는 PHP/MySQL 스택입니다.',
+            pfBest: '<strong>가장 적합:</strong> 최대한의 기능을 원하고 더 무거운 스택 운영을 꺼리지 않는 그룹. <a href="https://github.com/exodus4d/pathfinder">GitHub &rarr;</a>',
+            wdP: '현대의 도전자로, Pathfinder의 가볍고 빠른 대안으로 홍보됩니다. Elixir/Phoenix 위에 React 프론트엔드로 구축되고 MIT로 오픈 소스화되었으며, 넷 중 유일하게 <em>공식 관리형 클라우드</em> 버전을 갖춰 — 그룹이 어떤 인프라도 운영하지 않고 사용할 수 있게 합니다 — 동시에 무료 자체 호스팅 Community Edition도 제공합니다.',
+            wdBest: '<strong>가장 적합:</strong> 세련된 UI와 자체 호스팅을 완전히 건너뛸 선택지를 원하는 그룹. <a href="https://wanderer.ltd/">웹사이트 &rarr;</a> · <a href="https://github.com/wanderer-industries/wanderer">GitHub &rarr;</a>',
+            nxP: '군단 우선으로 만든 현대적인, 오픈 소스, 자체 호스팅 지도 도구. 핵심 워크플로를 다룹니다 — 실시간 협업 지도 작성(지도 위 모두에게 실시간 편집), 웜홀 노화가 포함된 시그니처 붙여넣기, 연결 추적 — 그리고 군단의 체인을 운영하기 위한 추가 기능을 더합니다:',
+            nxLi1: '±10% 질량 분산을 모델링하고, 각 통과를 안전 / 붕괴 가능 / 붕괴 예정으로 예측하며, 어떤 통과가 당신의 롤러를 고립시키기 전에 경고하는 <strong>롤링 계산기</strong>.',
+            nxLi2: '<strong>EVE 지역 전체를 Dotlan 스타일 지도로 생성</strong>하고 <strong>지도를 병합</strong>.',
+            nxLi3: '<strong>스탠딩 및 주권 오버레이</strong>, 실시간 killboard, 점프/킬 활동 차트.',
+            nxLi4: '지도 위 <strong>파일럿 재실 및 함대 위치</strong>, 그리고 선택적 위치 추적.',
+            nxLi5: 'EVE-Scout의 <strong>Thera 및 Turnur</strong> 공개 연결.',
+            nxLi6: '<strong>군단 모드</strong>: 권한, 공유 지도, 관리 보고서, 감사 로그, 그리고 들어오는 K162와 새 연결에 대한 <strong>Discord 알림</strong>.',
+            nxP2: '작은 Docker 스택(React + Node + Postgres)으로 실행되고 EVE SSO로 로그인합니다 — eve-nexum.com의 무료 공개 인스턴스를 쓰거나 직접 호스팅하세요. 넷 중 가장 최신이라 커뮤니티가 더 작습니다.',
+            nxBest: '<strong>가장 적합:</strong> 롤링, 지역 생성, 스탠딩, Discord가 내장된 현대적 지도 도구를 원하는 군단 — 저희가 호스팅하거나 직접 호스팅. <a href="/">지금 시작하기 &rarr;</a> · <a href="https://github.com/GQuantrill/eve-nexum">GitHub &rarr;</a>',
+
+            h2Choose: '어느 것을 선택해야 할까요?',
+            chooseP1: '<strong>새로 시작하는 대부분의 군단에게는 Nexum으로 시작하겠습니다.</strong> 현대적이고, Docker로 몇 분이면 서며, 그렇지 않으면 직접 짜 맞춰야 할 롤링 계산기, 지역 생성, 스탠딩 오버레이, Discord 경보를 한데 묶었습니다 — 모두 실시간 협업 지도 안에서. <a href="/">지금 시작하기</a>, 그리고 직접 확인하세요.',
+            chooseP2: '다른 것들도 좋은 도구이며, 특정 경우에는 더 잘 맞을 수 있습니다:',
+            chooseLi1: '<strong>이미 고전적인 Tripwire 시그니처 워크플로에 능숙한가요?</strong> Tripwire는 여전히 그것을 잘합니다 — 이제 자체 호스팅으로.',
+            chooseLi2: '<strong>가장 깊고 성숙한 기능 세트가 필요하고 더 무거운 PHP 스택 운영이 괜찮은가요?</strong> Pathfinder.',
+            chooseLi3: '<strong>서버를 전혀 운영하고 싶지 않나요?</strong> Nexum의 무료 공개 인스턴스, 또는 Wanderer의 클라우드를 쓰세요.',
+
+            h2Faq: '자주 묻는 질문',
+            faqQ1: 'EVE Online에 가장 좋은 웜홀 지도 도구는 무엇인가요?',
+            faqA1: '그룹에 따라 다르지만, 현대적인 자체 호스팅 구성이라면 Nexum을 추천하겠습니다 — 가장 많은 내장 기능(웜홀 롤링 계산기, 지역 전체 지도 생성, 스탠딩 오버레이, Discord 경보)을 실시간 협업 지도 안에 묶었습니다. Tripwire는 여전히 고전적인 시그니처 도구이고, Pathfinder는 가장 성숙하고 기능이 풍부한 선택지이며, Wanderer는 관리형 클라우드 버전을 더합니다.',
+            faqQ2: 'Tripwire는 아직 사용할 수 있나요?',
+            faqA2: '오래 운영된 공개 인스턴스는 2024년 중반에 종료되었지만, Tripwire는 오픈 소스라 직접 호스팅하거나 커뮤니티 운영 인스턴스를 쓸 수 있습니다.',
+            faqQ3: 'Pathfinder는 아직 개발 중인가요?',
+            faqA3: '아니요 — 활발히는 아닙니다. 원래의 Pathfinder(exodus4d 제작)는 2020년 이후 새 릴리스가 없고, 그것을 이어간 커뮤니티 포크는 2025년 초 마지막 커밋 이후 릴리스가 없습니다. 활발한 개발은 사실상 멈췄습니다 — Nexum 같은 더 새롭고 활발히 관리되는 지도 도구가 존재하는 이유 중 하나입니다.',
+            faqQ4: 'Pathfinder와 Tripwire의 좋은 오픈 소스 대안은 무엇인가요?',
+            faqA4: 'Nexum과 Wanderer 모두 현대적인 오픈 소스 지도 도구입니다. Nexum은 EVE SSO, 실시간 협업, 군단 도구를 갖춘 자체 호스팅이고; Wanderer는 MIT 라이선스이며 자체 호스팅과 관리형 클라우드 버전을 제공합니다.',
+            faqQ5: 'EVE Online 웜홀 지도 도구를 직접 호스팅할 수 있나요?',
+            faqA5: '네 — Nexum, Pathfinder, Tripwire, 그리고 Wanderer의 Community Edition 모두 자체 호스팅할 수 있습니다. Nexum은 Postgres 위에서 Docker로 실행되고 EVE SSO로 로그인합니다.',
+            faqQ6: '이 웜홀 지도 도구들은 무료인가요?',
+            faqA6: '네 — 넷 모두 무료입니다. Pathfinder와 Tripwire는 자체 호스팅이고; Nexum과 Wanderer는 각각 무료 공개 호스팅 버전과 자체 호스팅 둘 다를 제공합니다.',
+
+            ctaP: '<strong>Nexum은 무료입니다.</strong> 호스팅 버전을 쓰거나 몇 분 만에 군단의 체인을 직접 호스팅하세요.',
+            ctaBtn: '지금 시작하기',
+            ctaGh: 'GitHub에서 받기',
+            footP1: '비교는 Nexum 팀이 관리 · 최종 검증 2026년 5월. 경쟁 제품 세부 정보는 시간이 지나면 바뀝니다 — 위의 링크를 따라가 현재 기능을 확인하세요. 부정확한 점을 발견했나요? <a href="https://github.com/GQuantrill/eve-nexum/issues">이슈를 여세요</a>.',
+            footP2: 'EVE Online과 EVE 로고는 CCP hf.의 등록 상표입니다. 전 세계 모든 권리 보유. Nexum은 제3자 도구이며 CCP hf., Pathfinder, Tripwire 또는 Wanderer와 제휴하거나 그로부터 보증받지 않았습니다. 전체 <a href="/license/">라이선스 및 EVE IP 고지</a>를 참조하세요.'
           };
 
           var DICT = DICTS[lang];
