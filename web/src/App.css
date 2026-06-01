@@ -786,6 +786,22 @@
 .character-switcher__focus:hover:not(:disabled) { color: #5a9af8; background: #1c2940; }
 .character-switcher__focus:disabled { opacity: 0.4; cursor: default; }
 .character-switcher__focus--on { color: #5a9af8; }
+.character-switcher__remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  margin-right: 4px;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: #7a90a8;
+  cursor: pointer;
+}
+.character-switcher__remove:hover:not(:disabled) { color: #ff6b6b; background: #2a1820; }
+.character-switcher__remove:disabled { opacity: 0.4; cursor: default; }
 .character-switcher__add {
   display: flex;
   align-items: center;

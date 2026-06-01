@@ -11,7 +11,12 @@
     "focusLocation": "Karte auf {{name}} zentrieren und von dort routen",
     "noLocation": "Kein bekannter Standort für {{name}}",
     "linkFailedNotInCorp": "Charakter konnte nicht hinzugefügt werden — er ist nicht in der Corp.",
-    "linkFailed": "Charakter konnte nicht hinzugefügt werden. Bitte erneut versuchen."
+    "linkFailed": "Charakter konnte nicht hinzugefügt werden. Bitte erneut versuchen.",
+    "remove": "Entfernen",
+    "removeCharacter": "{{name}} entfernen",
+    "removeConfirm": "{{name}} aus deinem Konto entfernen? Du kannst den Charakter später wieder verknüpfen.",
+    "characterRemoved": "{{name}} entfernt",
+    "removeFailed": "Charakter konnte nicht entfernt werden. Bitte erneut versuchen."
   },
   "actions": {
     "save": "Speichern",

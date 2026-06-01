@@ -11,7 +11,12 @@
     "focusLocation": "Centre & route from {{name}}",
     "noLocation": "No known location for {{name}}",
     "linkFailedNotInCorp": "Couldn't add that character — they're not in the corporation.",
-    "linkFailed": "Couldn't add that character. Please try again."
+    "linkFailed": "Couldn't add that character. Please try again.",
+    "remove": "Remove",
+    "removeCharacter": "Remove {{name}}",
+    "removeConfirm": "Remove {{name}} from your account? You can add them again later by linking the character.",
+    "characterRemoved": "Removed {{name}}",
+    "removeFailed": "Couldn't remove that character. Please try again."
   },
   "actions": {
     "save": "Save",

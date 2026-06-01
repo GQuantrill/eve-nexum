@@ -11,7 +11,12 @@
     "focusLocation": "以 {{name}} 为中心并从其位置规划路线",
     "noLocation": "没有 {{name}} 的已知位置",
     "linkFailedNotInCorp": "无法添加该角色——其不在该军团中。",
-    "linkFailed": "无法添加该角色，请重试。"
+    "linkFailed": "无法添加该角色，请重试。",
+    "remove": "移除",
+    "removeCharacter": "移除 {{name}}",
+    "removeConfirm": "要从你的账户中移除 {{name}} 吗？你之后可以重新关联该角色。",
+    "characterRemoved": "已移除 {{name}}",
+    "removeFailed": "无法移除该角色，请重试。"
   },
   "actions": {
     "save": "保存",

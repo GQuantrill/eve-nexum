@@ -11,7 +11,12 @@
     "focusLocation": "{{name}} を中心に表示し、そこからルート計算",
     "noLocation": "{{name}} の既知の位置がありません",
     "linkFailedNotInCorp": "そのキャラクターを追加できませんでした — コーポに所属していません。",
-    "linkFailed": "そのキャラクターを追加できませんでした。もう一度お試しください。"
+    "linkFailed": "そのキャラクターを追加できませんでした。もう一度お試しください。",
+    "remove": "削除",
+    "removeCharacter": "{{name}} を削除",
+    "removeConfirm": "{{name}} をアカウントから削除しますか？後でキャラクターを再度リンクできます。",
+    "characterRemoved": "{{name}} を削除しました",
+    "removeFailed": "そのキャラクターを削除できませんでした。もう一度お試しください。"
   },
   "actions": {
     "save": "保存",

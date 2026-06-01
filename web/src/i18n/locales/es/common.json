@@ -11,7 +11,12 @@
     "focusLocation": "Centrar y rutar desde {{name}}",
     "noLocation": "No hay ubicación conocida de {{name}}",
     "linkFailedNotInCorp": "No se pudo añadir ese personaje: no está en la corporación.",
-    "linkFailed": "No se pudo añadir ese personaje. Inténtalo de nuevo."
+    "linkFailed": "No se pudo añadir ese personaje. Inténtalo de nuevo.",
+    "remove": "Quitar",
+    "removeCharacter": "Quitar a {{name}}",
+    "removeConfirm": "¿Quitar a {{name}} de tu cuenta? Puedes volver a vincular el personaje más tarde.",
+    "characterRemoved": "{{name}} quitado",
+    "removeFailed": "No se pudo quitar ese personaje. Inténtalo de nuevo."
   },
   "actions": {
     "save": "Guardar",

@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CaretDownIcon, PlusIcon, CheckIcon, MapPinIcon } from '@phosphor-icons/react';
+import { CaretDownIcon, PlusIcon, CheckIcon, MapPinIcon, TrashIcon } from '@phosphor-icons/react';
 import { useAuth } from '../../context/AuthContext';
 import { useMapStore } from '../../store/mapStore';
 import { api, apiUrl } from '../../api/client';
 import { toast } from './Toaster';
+import { ConfirmModal } from './ConfirmModal';
 
 interface CharLocationResponse {
   online: boolean;
@@ -21,12 +22,13 @@ interface CharLocationResponse {
  */
 export function CharacterSwitcher() {
   const { t } = useTranslation();
-  const { user } = useAuth();
+  const { user, refresh } = useAuth();
   const routeOrigin = useMapStore((s) => s.routeOrigin);
   const setRouteOrigin = useMapStore((s) => s.setRouteOrigin);
   const requestCenter = useMapStore((s) => s.requestCenterOnEveSystem);
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [pendingRemove, setPendingRemove] = useState<{ id: number; characterName: string } | null>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -84,6 +86,25 @@ export function CharacterSwitcher() {
     }
   }
 
+  // Unlink an alt from the account. The server forbids removing the active
+  // character, so this only ever runs for the others. Refresh the list in
+  // place and drop any route-origin override that pointed at it.
+  async function removeChar(c: { id: number; characterName: string }) {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await api('/auth/remove-character', { method: 'POST', body: JSON.stringify({ userId: c.id }) });
+      if (routeOrigin?.charId === c.id) setRouteOrigin(null);
+      toast.success(t('account.characterRemoved', { name: c.characterName }));
+      await refresh();
+    } catch {
+      toast.error(t('account.removeFailed'));
+    } finally {
+      setBusy(false);
+      setPendingRemove(null);
+    }
+  }
+
   return (
     <div className="character-switcher" ref={wrapRef}>
       <button
@@ -132,6 +153,18 @@ export function CharacterSwitcher() {
                 >
                   <MapPinIcon size={14} weight={isOrigin ? 'fill' : 'regular'} />
                 </button>
+                {!c.active && (
+                  <button
+                    type="button"
+                    className="character-switcher__remove"
+                    disabled={busy}
+                    onClick={() => setPendingRemove({ id: c.id, characterName: c.characterName })}
+                    data-tooltip={t('account.removeCharacter', { name: c.characterName })}
+                    aria-label={t('account.removeCharacter', { name: c.characterName })}
+                  >
+                    <TrashIcon size={14} />
+                  </button>
+                )}
               </div>
             );
           })}
@@ -140,6 +173,15 @@ export function CharacterSwitcher() {
             {t('account.addCharacter')}
           </a>
         </div>
+      )}
+      {pendingRemove && (
+        <ConfirmModal
+          message={t('account.removeConfirm', { name: pendingRemove.characterName })}
+          confirmLabel={t('account.remove')}
+          showDontAskAgain={false}
+          onConfirm={() => removeChar(pendingRemove)}
+          onCancel={() => setPendingRemove(null)}
+        />
       )}
     </div>
   );

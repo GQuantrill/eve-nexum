@@ -11,7 +11,12 @@
     "focusLocation": "Centrar e traçar rota a partir de {{name}}",
     "noLocation": "Nenhuma localização conhecida de {{name}}",
     "linkFailedNotInCorp": "Não foi possível adicionar esse personagem — não está na corporação.",
-    "linkFailed": "Não foi possível adicionar esse personagem. Tenta novamente."
+    "linkFailed": "Não foi possível adicionar esse personagem. Tenta novamente.",
+    "remove": "Remover",
+    "removeCharacter": "Remover {{name}}",
+    "removeConfirm": "Remover {{name}} da tua conta? Podes voltar a vincular o personagem mais tarde.",
+    "characterRemoved": "{{name}} removido",
+    "removeFailed": "Não foi possível remover esse personagem. Tenta novamente."
   },
   "actions": {
     "save": "Guardar",

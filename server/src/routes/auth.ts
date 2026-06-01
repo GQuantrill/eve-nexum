@@ -371,6 +371,28 @@ authRouter.post('/switch-character', async (req, res) => {
   res.json({ ok: true });
 });
 
+// POST /auth/remove-character — unlink a character from the current account.
+// Detaches by clearing owner_id: the character keeps its own data and, on a
+// later fresh login, becomes its own standalone account again. Maps already
+// merged onto the account stay with it (a merge is one-way). You cannot remove
+// the currently-active character — switch away first — which also guarantees an
+// account can never strip out its last remaining character.
+authRouter.post('/remove-character', async (req, res) => {
+  const ownerId = await ensureOwnerId(req);
+  if (!req.session.userId || ownerId == null) { res.status(401).json({ error: 'Not authenticated' }); return; }
+  const targetId = Number((req.body as { userId?: unknown }).userId);
+  if (!Number.isInteger(targetId)) { res.status(400).json({ error: 'Invalid userId' }); return; }
+  if (targetId === req.session.userId) { res.status(400).json({ error: 'Cannot remove the active character' }); return; }
+
+  // Scope the UPDATE to this owner so you can only ever detach your own alts.
+  const { rowCount } = await db.query(
+    `UPDATE users SET owner_id = NULL WHERE id = $1 AND owner_id = $2`,
+    [targetId, ownerId],
+  );
+  if (!rowCount) { res.status(403).json({ error: 'Not your character' }); return; }
+  res.json({ ok: true });
+});
+
 // GET /auth/me
 authRouter.get('/me', async (req, res) => {
   if (!req.session.userId) {

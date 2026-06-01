@@ -51,12 +51,14 @@ interface AuthContextValue {
   user: AuthUser | null;
   loading: boolean;
   logout: () => Promise<void>;
+  refresh: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue>({
   user: null,
   loading: true,
   logout: async () => {},
+  refresh: async () => {},
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -83,9 +85,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
   }, []);
 
+  // Re-pull /auth/me without a full reload — e.g. after the character list
+  // changes (linking handled via redirect; removal stays in-page).
+  const refresh = useCallback(async () => {
+    try {
+      const d = await api<{ user: AuthUser | null }>('/auth/me');
+      setUser(d.user);
+    } catch { /* keep the current user on a transient failure */ }
+  }, []);
+
   // Memoize so consumers don't re-render every time AuthProvider re-renders
-  // for an unrelated reason. logout is stable via useCallback.
-  const value = useMemo(() => ({ user, loading, logout }), [user, loading, logout]);
+  // for an unrelated reason. logout / refresh are stable via useCallback.
+  const value = useMemo(() => ({ user, loading, logout, refresh }), [user, loading, logout, refresh]);
 
   return (
     <AuthContext.Provider value={value}>
