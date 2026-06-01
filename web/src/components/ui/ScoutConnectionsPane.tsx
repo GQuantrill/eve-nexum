@@ -141,7 +141,9 @@ export function ScoutConnectionsPane({ scoutSystem }: Props) {
           onChange={(e) => changeSort(e.target.value as ScoutSort)}
         >
           <option value="age">{t('scout.sortAge')}</option>
-          <option value="closest">{t('scout.sortClosest')}</option>
+          <option value="closest">
+            {t(routeMode === 'secure' ? 'scout.sortSecure' : 'scout.sortShortest')}
+          </option>
         </select>
       </div>
       {sorted.map(c => {

@@ -633,7 +633,8 @@
     "expiring": "a expirar",
     "sortLabel": "Ordenar",
     "sortAge": "Idade do WH",
-    "sortClosest": "Mais próximo"
+    "sortShortest": "Rota mais curta",
+    "sortSecure": "Rota segura"
   },
   "activity": {
     "thisHour": "esta hora",

@@ -659,7 +659,8 @@
     "expiring": "истекает",
     "sortLabel": "Сортировка",
     "sortAge": "Возраст ЧД",
-    "sortClosest": "Ближайшие"
+    "sortShortest": "Кратчайший маршрут",
+    "sortSecure": "Безопасный маршрут"
   },
   "activity": {
     "thisHour": "за этот час",

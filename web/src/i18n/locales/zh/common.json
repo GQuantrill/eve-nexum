@@ -633,7 +633,8 @@
     "expiring": "即将过期",
     "sortLabel": "排序",
     "sortAge": "WH 时长",
-    "sortClosest": "最近"
+    "sortShortest": "最短路线",
+    "sortSecure": "安全路线"
   },
   "activity": {
     "thisHour": "本小时",

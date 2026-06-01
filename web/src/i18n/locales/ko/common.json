@@ -633,7 +633,8 @@
     "expiring": "만료 임박",
     "sortLabel": "정렬",
     "sortAge": "WH 수명",
-    "sortClosest": "가장 가까움"
+    "sortShortest": "최단 경로",
+    "sortSecure": "안전 경로"
   },
   "activity": {
     "thisHour": "이번 시간",
