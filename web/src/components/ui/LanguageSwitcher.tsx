@@ -13,6 +13,7 @@ const LANGUAGE_NAMES: Record<SupportedLanguage, string> = {
   zh: '🇨🇳 简体中文',
   ko: '🇰🇷 한국어',
   ja: '🇯🇵 日本語',
+  ru: '🇷🇺 Русский',
 };
 
 export function LanguageSwitcher() {

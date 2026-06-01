@@ -10,11 +10,12 @@ import ptCommon from './locales/pt/common.json';
 import zhCommon from './locales/zh/common.json';
 import koCommon from './locales/ko/common.json';
 import jaCommon from './locales/ja/common.json';
+import ruCommon from './locales/ru/common.json';
 
 // Languages we ship translations for. Add a code here AND a matching
 // locales/<code>/common.json file to add a language. Native language names
 // live in the LanguageSwitcher (they read the same in every locale).
-export const SUPPORTED_LANGUAGES = ['en', 'de', 'fr', 'es', 'pt', 'zh', 'ko', 'ja'] as const;
+export const SUPPORTED_LANGUAGES = ['en', 'de', 'fr', 'es', 'pt', 'zh', 'ko', 'ja', 'ru'] as const;
 export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
 
 // One namespace ('common') for now. Split into feature namespaces
@@ -28,6 +29,7 @@ export const resources = {
   zh: { common: zhCommon },
   ko: { common: koCommon },
   ja: { common: jaCommon },
+  ru: { common: ruCommon },
 } as const;
 
 // NOTE: EVE game data (system names, ship types, wormhole codes like C1/HS/K162)
