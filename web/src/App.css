@@ -5399,6 +5399,35 @@ select.sig-toolbar-btn option {
   transform: translateY(-1px);
 }
 
+/* ── Multi-lingual section ───────────────────────────────── */
+.landing__languages {
+  text-align: center;
+}
+.landing__languages .landing__section-body {
+  max-width: 620px;
+  margin: 0 auto 20px;
+}
+.landing__lang-list {
+  list-style: none;
+  margin: 0 auto;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  max-width: 680px;
+}
+.landing__lang-chip {
+  padding: 7px 14px;
+  background: rgba(91, 155, 255, 0.08);
+  border: 1px solid rgba(91, 155, 255, 0.28);
+  border-radius: 999px;
+  color: #c8d8f0;
+  font-size: calc(14px * var(--font-scale, 1));
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 .landing__portrait {
   width: 240px;
   height: 240px;

@@ -10,6 +10,7 @@ import {
   SquaresFourIcon, UserGearIcon, TableIcon, ChartDonutIcon, ClockIcon, ClipboardTextIcon, TagIcon, IdentificationCardIcon,
 } from '@phosphor-icons/react';
 import { apiUrl } from '../../api/client';
+import { SUPPORTED_LANGUAGES, LANGUAGE_NAMES } from '../../i18n';
 import { DemoMap } from './DemoMap';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import portraitImg from '../../assets/portrait.jpeg';
@@ -386,6 +387,19 @@ export function LandingPage() {
               );
             })}
           </section>
+        </section>
+
+        {/* ── Multi-lingual ─────────────────────────────────── */}
+        <section className="landing__section landing__languages" id="languages">
+          <h2 className="landing__section-title">{t('landing.sections.languages')}</h2>
+          <p className="landing__section-body">
+            {t('landing.languagesBody')}
+          </p>
+          <ul className="landing__lang-list">
+            {SUPPORTED_LANGUAGES.map((lng) => (
+              <li key={lng} className="landing__lang-chip">{LANGUAGE_NAMES[lng]}</li>
+            ))}
+          </ul>
         </section>
 
         {/* ── Compare CTA ───────────────────────────────────── */}

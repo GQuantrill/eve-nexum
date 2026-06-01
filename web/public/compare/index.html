@@ -140,6 +140,9 @@
       li { margin: 4px 0; }
       .cta { background: var(--panel2); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; margin: 36px 0 0; text-align: center; }
       .cta a.btn { display: inline-block; margin-top: 8px; padding: 9px 18px; background: var(--accent); color: #04060c; border-radius: 8px; text-decoration: none; font-weight: 700; }
+      .langs { background: var(--panel2); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; margin: 36px 0 0; text-align: center; }
+      .lang-chips { list-style: none; padding: 0; margin: 14px 0 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 9px; }
+      .lang-chips li { margin: 0; padding: 6px 13px; background: rgba(91,155,255,0.08); border: 1px solid rgba(91,155,255,0.28); border-radius: 999px; color: var(--text); font-size: 14px; font-weight: 600; white-space: nowrap; }
       footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--border); color: var(--muted2); font-size: 13px; }
     </style>
   </head>
@@ -413,6 +416,22 @@
       <h3 data-i18n="faqQ6">Are these wormhole mappers free?</h3>
       <p data-i18n="faqA6">Yes — all four are free. Pathfinder and Tripwire are self-hosted; Nexum and Wanderer each offer both a free public hosted version and self-hosting.</p>
 
+      <div class="langs">
+        <h2 data-i18n="h2Languages">Available in your language</h2>
+        <p data-i18n="langP">Nexum is fully translated into nine languages — with your language auto-detected from your browser the first time you visit. Read this comparison, and use Nexum, in:</p>
+        <ul class="lang-chips">
+          <li>🇬🇧 English</li>
+          <li>🇩🇪 Deutsch</li>
+          <li>🇫🇷 Français</li>
+          <li>🇪🇸 Español</li>
+          <li>🇵🇹 Português</li>
+          <li>🇨🇳 简体中文</li>
+          <li>🇰🇷 한국어</li>
+          <li>🇯🇵 日本語</li>
+          <li>🇷🇺 Русский</li>
+        </ul>
+      </div>
+
       <div class="cta">
         <p data-i18n="ctaP"><strong>Nexum is free.</strong> Use the hosted version or self-host your corp's chain in minutes.</p>
         <a class="btn" href="/" data-i18n="ctaBtn">Get started now</a>
@@ -546,6 +565,8 @@
             faqQ6: 'Sind diese Wurmloch-Mapper kostenlos?',
             faqA6: 'Ja — alle vier sind kostenlos. Pathfinder und Tripwire sind selbst gehostet; Nexum und Wanderer bieten jeweils sowohl eine kostenlose öffentlich gehostete Version als auch Selbst-Hosting.',
 
+            h2Languages: 'In deiner Sprache verfügbar',
+            langP: 'Nexum ist vollständig in neun Sprachen übersetzt — wobei deine Sprache beim ersten Besuch automatisch anhand deines Browsers erkannt wird. Lies diesen Vergleich und nutze Nexum in:',
             ctaP: '<strong>Nexum ist kostenlos.</strong> Nutze die gehostete Version oder hoste die Kette deiner Corp in Minuten selbst.',
             ctaBtn: 'Jetzt loslegen',
             ctaGh: 'Auf GitHub holen',
@@ -641,6 +662,8 @@
             faqQ6: 'Ces mappers de trous de ver sont-ils gratuits ?',
             faqA6: 'Oui — les quatre sont gratuits. Pathfinder et Tripwire sont auto-hébergés ; Nexum et Wanderer proposent chacun à la fois une version hébergée publique gratuite et l’auto-hébergement.',
 
+            h2Languages: 'Disponible dans votre langue',
+            langP: 'Nexum est entièrement traduit en neuf langues — votre langue étant détectée automatiquement depuis votre navigateur lors de votre première visite. Lisez ce comparatif, et utilisez Nexum, en :',
             ctaP: '<strong>Nexum est gratuit.</strong> Utilisez la version hébergée ou auto-hébergez la chaîne de votre corp en quelques minutes.',
             ctaBtn: 'Commencer maintenant',
             ctaGh: 'L’obtenir sur GitHub',
@@ -736,6 +759,8 @@
             faqQ6: '¿Son gratuitos estos mapeadores de agujeros de gusano?',
             faqA6: 'Sí — los cuatro son gratuitos. Pathfinder y Tripwire son autoalojados; Nexum y Wanderer ofrecen cada uno tanto una versión pública alojada gratuita como autoalojamiento.',
 
+            h2Languages: 'Disponible en tu idioma',
+            langP: 'Nexum está totalmente traducido a nueve idiomas — con tu idioma detectado automáticamente desde tu navegador la primera vez que lo visitas. Lee esta comparativa, y usa Nexum, en:',
             ctaP: '<strong>Nexum es gratis.</strong> Usa la versión alojada o autoaloja la cadena de tu corp en minutos.',
             ctaBtn: 'Empieza ahora',
             ctaGh: 'Conseguirlo en GitHub',
@@ -831,6 +856,8 @@
             faqQ6: 'Estes mapeadores de buracos de minhoca são gratuitos?',
             faqA6: 'Sim — os quatro são gratuitos. O Pathfinder e o Tripwire são auto-alojados; o Nexum e o Wanderer oferecem cada um tanto uma versão pública alojada gratuita como auto-alojamento.',
 
+            h2Languages: 'Disponível no seu idioma',
+            langP: 'O Nexum está totalmente traduzido para nove idiomas — com o seu idioma detetado automaticamente a partir do navegador na primeira visita. Leia esta comparação, e use o Nexum, em:',
             ctaP: '<strong>O Nexum é grátis.</strong> Usa a versão alojada ou auto-aloja a cadeia da tua corp em minutos.',
             ctaBtn: 'Começa agora',
             ctaGh: 'Obtê-lo no GitHub',
@@ -925,6 +952,8 @@
             faqQ6: '这些虫洞绘图工具免费吗？',
             faqA6: '是 — 四者都免费。Pathfinder 和 Tripwire 是自托管的；Nexum 和 Wanderer 各自既提供免费的公共托管版本，也提供自托管。',
 
+            h2Languages: '支持您的语言',
+            langP: 'Nexum 已完整翻译为九种语言——并在您首次访问时根据浏览器自动检测您的语言。您可以用以下语言阅读本对比并使用 Nexum：',
             ctaP: '<strong>Nexum 免费。</strong>使用托管版本，或在几分钟内自托管你军团的链。',
             ctaBtn: '立即开始',
             ctaGh: '在 GitHub 上获取',
@@ -1019,6 +1048,8 @@
             faqQ6: '이 웜홀 지도 도구들은 무료인가요?',
             faqA6: '네 — 넷 모두 무료입니다. Pathfinder와 Tripwire는 자체 호스팅이고; Nexum과 Wanderer는 각각 무료 공개 호스팅 버전과 자체 호스팅 둘 다를 제공합니다.',
 
+            h2Languages: '당신의 언어로 제공됩니다',
+            langP: 'Nexum은 아홉 개 언어로 완전히 번역되어 있으며, 처음 방문할 때 브라우저에서 사용자의 언어를 자동으로 감지합니다. 다음 언어로 이 비교를 읽고 Nexum을 사용하세요:',
             ctaP: '<strong>Nexum은 무료입니다.</strong> 호스팅 버전을 쓰거나 몇 분 만에 군단의 체인을 직접 호스팅하세요.',
             ctaBtn: '지금 시작하기',
             ctaGh: 'GitHub에서 받기',
@@ -1113,6 +1144,8 @@
             faqQ6: 'これらのワームホールマッパーは無料ですか？',
             faqA6: 'はい — 4 つとも無料です。Pathfinder と Tripwire はセルフホスト、Nexum と Wanderer はそれぞれ無料のパブリックホスティング版とセルフホストの両方を提供します。',
 
+            h2Languages: 'あなたの言語で使えます',
+            langP: 'Nexum は9つの言語に完全に翻訳されており、初回アクセス時にブラウザからあなたの言語を自動検出します。次の言語でこの比較を読み、Nexum を使えます：',
             ctaP: '<strong>Nexum は無料です。</strong>ホスティング版を使うか、数分でコーポのチェーンをセルフホストしてください。',
             ctaBtn: '今すぐ始める',
             ctaGh: 'GitHub で入手',
@@ -1207,6 +1240,8 @@
             faqQ6: 'Бесплатны ли эти мапперы червоточин?',
             faqA6: 'Да — все четыре бесплатны. Pathfinder и Tripwire — самостоятельный хостинг, а Nexum и Wanderer предлагают и бесплатную публичную хостинг-версию, и самостоятельный хостинг.',
 
+            h2Languages: 'Доступен на вашем языке',
+            langP: 'Nexum полностью переведён на девять языков — ваш язык определяется автоматически по браузеру при первом визите. Читайте это сравнение и пользуйтесь Nexum на:',
             ctaP: '<strong>Nexum бесплатен.</strong> Используйте хостинг-версию или поднимите цепочку своей корпорации самостоятельно за минуты.',
             ctaBtn: 'Начать сейчас',
             ctaGh: 'Взять на GitHub',

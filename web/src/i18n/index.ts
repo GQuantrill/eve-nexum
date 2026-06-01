@@ -18,6 +18,22 @@ import ruCommon from './locales/ru/common.json';
 export const SUPPORTED_LANGUAGES = ['en', 'de', 'fr', 'es', 'pt', 'zh', 'ko', 'ja', 'ru'] as const;
 export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
 
+// Native language names, each prefixed with a flag emoji. These read the same
+// in every locale (English is always "English", Deutsch always "Deutsch") so
+// they are NOT translated. English uses the GB flag (the app's English is
+// en-GB). Used by the LanguageSwitcher and the landing-page language section.
+export const LANGUAGE_NAMES: Record<SupportedLanguage, string> = {
+  en: '🇬🇧 English',
+  de: '🇩🇪 Deutsch',
+  fr: '🇫🇷 Français',
+  es: '🇪🇸 Español',
+  pt: '🇵🇹 Português',
+  zh: '🇨🇳 简体中文',
+  ko: '🇰🇷 한국어',
+  ja: '🇯🇵 日本語',
+  ru: '🇷🇺 Русский',
+};
+
 // One namespace ('common') for now. Split into feature namespaces
 // (sidebar, toolbar, admin, …) as the string count grows.
 export const resources = {
