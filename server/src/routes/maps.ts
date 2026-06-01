@@ -6,6 +6,7 @@ import { config } from '../config.js';
 import { decryptToken } from '../utils/tokenCrypto.js';
 import { createLogger } from '../utils/logger.js';
 import { recordGhostSiteIfMatch } from '../services/ghostSites.js';
+import { resolveOwnerId } from '../utils/owner.js';
 import { resolveEntityNames } from '../services/entityNames.js';
 import { audit } from '../services/audit.js';
 import { subscribeMap, publishToMap } from '../services/mapEvents.js';
@@ -102,11 +103,15 @@ async function getMapAccess(mapId: string, req: Request): Promise<MapMeta | null
     corpId:     number | null;
     locked:     boolean;
     callerChar: number;
+    mapOwner:    number | null;
+    callerOwner: number | null;
   }>(
     `SELECT m.user_id AS "userId",
             m.corp_id AS "corpId",
             m.locked,
-            u.character_id AS "callerChar"
+            m.owner_id AS "mapOwner",
+            u.character_id AS "callerChar",
+            u.owner_id AS "callerOwner"
        FROM maps m
        JOIN users u ON u.id = $2
       WHERE m.id = $1`,
@@ -115,7 +120,11 @@ async function getMapAccess(mapId: string, req: Request): Promise<MapMeta | null
   if (!rows.length) return null;
   const m = rows[0];
 
-  if (m.userId === userId) {
+  // Owner = this account. A map belongs to the account that owns it (any of
+  // the account's characters), with a defensive fall back to the creating
+  // character so you can never lose access to a map you made even if owner_id
+  // is somehow unset.
+  if (m.userId === userId || (m.mapOwner != null && m.callerOwner != null && m.mapOwner === m.callerOwner)) {
     return { userId: m.userId, corpId: m.corpId, locked: m.locked, accessKind: 'owner' };
   }
 
@@ -352,6 +361,10 @@ const MAX_IMPORT_CONNECTIONS = 2000;
 mapsRouter.get('/', async (req, res) => {
   const userId     = req.session.userId!;
   const userCorpId = req.session.userCorpId ?? null;
+  // Personal maps are scoped to the account (owner), so every linked alt sees
+  // the same chain. -1 is an impossible owner id (so the clause matches nothing
+  // rather than everything) when somehow unauthenticated for ownership.
+  const ownerId = (await resolveOwnerId(req)) ?? -1;
   // Need the caller's EVE character id to match against map_shares.
   // One small query up front beats a CTE — there's only one user row.
   const { rows: meRows } = await db.query<{ characterId: number }>(
@@ -382,7 +395,7 @@ mapsRouter.get('/', async (req, res) => {
             m.id,
             m.name,
             m.corp_id IS NOT NULL AS "isCorpMap",
-            (m.user_id <> $1
+            (m.user_id <> $1 AND m.owner_id IS DISTINCT FROM $5::int
               AND (m.corp_id IS NULL OR NOT m.corp_id = ANY($2::int[]))
             ) AS "sharedWithMe",
             m.locked,
@@ -397,11 +410,11 @@ mapsRouter.get('/', async (req, res) => {
        LEFT JOIN map_shares s ON s.map_id = m.id
             AND ( s.target_character_id = $3
                OR ($4::int IS NOT NULL AND s.target_corp_id = $4) )
-      WHERE (m.user_id = $1 AND m.corp_id IS NULL)
+      WHERE ((m.owner_id = $5::int OR m.user_id = $1) AND m.corp_id IS NULL)
          OR m.corp_id = ANY($2::int[])
          OR (s.id IS NOT NULL AND m.corp_id IS NULL)
       ORDER BY "sharedWithMe", "isCorpMap", m.name`,
-    [userId, visibleCorpIds, callerChar, userCorpId],
+    [userId, visibleCorpIds, callerChar, userCorpId, ownerId],
   );
 
   // Count corp maps for the user's own corp (the per-corp limit applies to
@@ -439,9 +452,13 @@ mapsRouter.post('/', async (req, res) => {
       return;
     }
   } else {
+    // Per-account personal-map cap, counted by owner. Enforced only here at
+    // creation, so an account that merged past the cap keeps its maps and just
+    // can't make new ones until it deletes back under.
+    const ownerId = await resolveOwnerId(req);
     const { rowCount } = await db.query(
-      `SELECT 1 FROM maps WHERE user_id = $1 AND corp_id IS NULL`,
-      [req.session.userId],
+      `SELECT 1 FROM maps WHERE owner_id = $1 AND corp_id IS NULL`,
+      [ownerId],
     );
     if ((rowCount ?? 0) >= config.maxUserMaps) {
       res.status(403).json({ error: 'Maximum maps reached' });
@@ -449,12 +466,13 @@ mapsRouter.post('/', async (req, res) => {
     }
   }
 
-  const name   = String(req.body.name ?? 'New Map').slice(0, MAX_MAP_NAME_LEN);
-  const corpId = isCorpMap ? (req.session.userCorpId ?? null) : null;
+  const name    = String(req.body.name ?? 'New Map').slice(0, MAX_MAP_NAME_LEN);
+  const corpId  = isCorpMap ? (req.session.userCorpId ?? null) : null;
+  const ownerId = await resolveOwnerId(req);
 
   const { rows } = await db.query<{ id: string }>(
-    `INSERT INTO maps (user_id, name, corp_id) VALUES ($1, $2, $3) RETURNING id`,
-    [req.session.userId, name, corpId],
+    `INSERT INTO maps (user_id, owner_id, name, corp_id) VALUES ($1, $2, $3, $4) RETURNING id`,
+    [req.session.userId, ownerId, name, corpId],
   );
   res.status(201).json({ id: rows[0].id });
 });
@@ -483,7 +501,8 @@ mapsRouter.post('/from-region', async (req, res) => {
     const { rowCount } = await db.query(`SELECT 1 FROM maps WHERE corp_id = $1`, [req.session.userCorpId]);
     if ((rowCount ?? 0) >= config.maxCorpMaps) { res.status(403).json({ error: 'Maximum corp maps reached' }); return; }
   } else {
-    const { rowCount } = await db.query(`SELECT 1 FROM maps WHERE user_id = $1 AND corp_id IS NULL`, [req.session.userId]);
+    const oid = await resolveOwnerId(req);
+    const { rowCount } = await db.query(`SELECT 1 FROM maps WHERE owner_id = $1 AND corp_id IS NULL`, [oid]);
     if ((rowCount ?? 0) >= config.maxUserMaps) { res.status(403).json({ error: 'Maximum maps reached' }); return; }
   }
 
@@ -583,9 +602,10 @@ mapsRouter.post('/from-region', async (req, res) => {
   try {
     await client.query('BEGIN');
 
+    const ownerId = await resolveOwnerId(req);
     const mapRes = await client.query<{ id: string }>(
-      `INSERT INTO maps (user_id, name, corp_id) VALUES ($1, $2, $3) RETURNING id`,
-      [req.session.userId, mapName, isCorpMap ? (req.session.userCorpId ?? null) : null],
+      `INSERT INTO maps (user_id, owner_id, name, corp_id) VALUES ($1, $2, $3, $4) RETURNING id`,
+      [req.session.userId, ownerId, mapName, isCorpMap ? (req.session.userCorpId ?? null) : null],
     );
     const mapId = mapRes.rows[0].id;
 
@@ -682,9 +702,10 @@ mapsRouter.post('/import', async (req, res) => {
       return;
     }
   } else {
+    const oid = await resolveOwnerId(req);
     const { rowCount } = await db.query(
-      `SELECT 1 FROM maps WHERE user_id = $1 AND corp_id IS NULL`,
-      [req.session.userId],
+      `SELECT 1 FROM maps WHERE owner_id = $1 AND corp_id IS NULL`,
+      [oid],
     );
     if ((rowCount ?? 0) >= config.maxUserMaps) {
       res.status(403).json({ error: 'Maximum maps reached' });
@@ -716,9 +737,10 @@ mapsRouter.post('/import', async (req, res) => {
     await client.query('BEGIN');
 
     const importName = String(name ?? 'Imported Map').slice(0, MAX_MAP_NAME_LEN);
+    const ownerId = await resolveOwnerId(req);
     const mapRes = await client.query<{ id: string }>(
-      `INSERT INTO maps (user_id, name, corp_id) VALUES ($1, $2, $3) RETURNING id`,
-      [req.session.userId, importName, isCorpImport ? (req.session.userCorpId ?? null) : null],
+      `INSERT INTO maps (user_id, owner_id, name, corp_id) VALUES ($1, $2, $3, $4) RETURNING id`,
+      [req.session.userId, ownerId, importName, isCorpImport ? (req.session.userCorpId ?? null) : null],
     );
     const mapId = mapRes.rows[0].id;
 

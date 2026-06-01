@@ -14,9 +14,12 @@ export async function seedDemoMap(userId: number): Promise<void> {
   try {
     await client.query('BEGIN');
 
+    // owner_id is taken from the user's account so the starter map is
+    // owner-scoped like every other map (the account exists by the time this
+    // runs on first login).
     const mapRows = await client.query<{ id: string }>(
-      `INSERT INTO maps (user_id, name)
-       SELECT $1, 'Demo Map'
+      `INSERT INTO maps (user_id, owner_id, name)
+       SELECT $1, (SELECT owner_id FROM users WHERE id = $1), 'Demo Map'
        WHERE NOT EXISTS (SELECT 1 FROM maps WHERE user_id = $1)
        RETURNING id`,
       [userId],
