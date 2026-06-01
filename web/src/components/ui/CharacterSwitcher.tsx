@@ -143,17 +143,9 @@ export function CharacterSwitcher() {
                   </span>
                   {c.active && <CheckIcon size={13} weight="bold" />}
                 </button>
-                <button
-                  type="button"
-                  className={`character-switcher__focus${isOrigin ? ' character-switcher__focus--on' : ''}`}
-                  disabled={busy || c.blocked}
-                  onClick={() => focusOn(c)}
-                  data-tooltip={t('account.focusLocation', { name: c.characterName })}
-                  aria-label={t('account.focusLocation', { name: c.characterName })}
-                >
-                  <MapPinIcon size={14} weight={isOrigin ? 'fill' : 'regular'} />
-                </button>
-                {!c.active && (
+                {c.active ? (
+                  <span className="character-switcher__remove-spacer" aria-hidden="true" />
+                ) : (
                   <button
                     type="button"
                     className="character-switcher__remove"
@@ -165,6 +157,16 @@ export function CharacterSwitcher() {
                     <TrashIcon size={14} />
                   </button>
                 )}
+                <button
+                  type="button"
+                  className={`character-switcher__focus${isOrigin ? ' character-switcher__focus--on' : ''}`}
+                  disabled={busy || c.blocked}
+                  onClick={() => focusOn(c)}
+                  data-tooltip={t('account.focusLocation', { name: c.characterName })}
+                  aria-label={t('account.focusLocation', { name: c.characterName })}
+                >
+                  <MapPinIcon size={14} weight={isOrigin ? 'fill' : 'regular'} />
+                </button>
               </div>
             );
           })}

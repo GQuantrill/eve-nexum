@@ -802,6 +802,9 @@
 }
 .character-switcher__remove:hover:not(:disabled) { color: #ff6b6b; background: #2a1820; }
 .character-switcher__remove:disabled { opacity: 0.4; cursor: default; }
+/* Occupies the remove button's slot on the active row so the track pins
+   stay aligned in the rightmost column across every row. */
+.character-switcher__remove-spacer { width: 26px; margin-right: 4px; flex-shrink: 0; }
 .character-switcher__add {
   display: flex;
   align-items: center;
