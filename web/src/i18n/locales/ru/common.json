@@ -812,7 +812,8 @@
   "duration": {
     "seconds": "{{value}} с",
     "minutesSeconds": "{{minutes}} мин {{seconds}} с",
-    "hoursMinutes": "{{hours}} ч {{minutes}} мин"
+    "hoursMinutes": "{{hours}} ч {{minutes}} мин",
+    "daysHoursMinutes": "{{days}} д {{hours}} ч {{minutes}} мин"
   },
   "share": {
     "expired": "истекла",

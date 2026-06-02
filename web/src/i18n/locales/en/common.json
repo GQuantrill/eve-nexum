@@ -780,7 +780,8 @@
   "duration": {
     "seconds": "{{value}}s",
     "minutesSeconds": "{{minutes}}m {{seconds}}s",
-    "hoursMinutes": "{{hours}}h {{minutes}}m"
+    "hoursMinutes": "{{hours}}h {{minutes}}m",
+    "daysHoursMinutes": "{{days}}d {{hours}}h {{minutes}}m"
   },
   "share": {
     "expired": "expired",

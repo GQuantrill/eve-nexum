@@ -31,8 +31,8 @@ export function europeanDate(date: Date): string {
 }
 
 /**
- * Elapsed duration (counting up): "0s" / "42s" / "5m 03s" / "2h 09m".
- * Negative inputs clamp to 0.
+ * Elapsed duration (counting up): "0s" / "42s" / "5m 03s" / "2h 09m" /
+ * "3d 02h 09m" once past 24h. Negative inputs clamp to 0.
  */
 export function duration(t: TFunction, totalSeconds: number): string {
   const s = totalSeconds < 0 ? 0 : totalSeconds;
@@ -40,7 +40,9 @@ export function duration(t: TFunction, totalSeconds: number): string {
   const m = Math.floor(s / 60);
   if (m < 60) return t('duration.minutesSeconds', { minutes: m, seconds: pad2(s % 60) });
   const h = Math.floor(m / 60);
-  return t('duration.hoursMinutes', { hours: h, minutes: pad2(m % 60) });
+  if (h < 24) return t('duration.hoursMinutes', { hours: h, minutes: pad2(m % 60) });
+  const d = Math.floor(h / 24);
+  return t('duration.daysHoursMinutes', { days: d, hours: pad2(h % 24), minutes: pad2(m % 60) });
 }
 
 /** "expires in 2h 14m" / "expires in 14m" / "expired" from a millisecond remainder. */
