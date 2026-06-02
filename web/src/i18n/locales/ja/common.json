@@ -340,6 +340,11 @@
       "topLeft": "左上"
     },
     "fontSize": "フォントサイズ",
+    "placement": "新規システムの配置",
+    "placementOptions": {
+      "horizontal": "水平（右）",
+      "vertical": "垂直（下）"
+    },
     "resetZoom": "100% にリセット",
     "compact": "コンパクト",
     "uniformSize": "均一サイズ",

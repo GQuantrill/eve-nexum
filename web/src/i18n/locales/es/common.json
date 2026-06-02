@@ -340,6 +340,11 @@
       "topLeft": "Arriba a la izquierda"
     },
     "fontSize": "Tamaño de fuente",
+    "placement": "Colocación de sistemas nuevos",
+    "placementOptions": {
+      "horizontal": "Horizontal (derecha)",
+      "vertical": "Vertical (abajo)"
+    },
     "resetZoom": "Restablecer al 100 %",
     "compact": "Compacto",
     "uniformSize": "Tamaño uniforme",
