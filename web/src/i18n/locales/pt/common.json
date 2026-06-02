@@ -372,6 +372,7 @@
     "activityNpcDelta": "Delta de PNJ",
     "fleetHint": "Mostra os companheiros de frota como pontos roxos no sistema em que estão. Passa o rato sobre um ponto para ver os nomes.",
     "showFleetMembers": "Mostrar membros da frota",
+    "fleetHeatmap": "Mapa de calor da frota",
     "showAccountChars": "Mostrar os meus personagens",
     "staleHint": "Esmaece visualmente os sistemas que não foram atualizados no intervalo escolhido, para detetar de relance os restos de cadeias antigas.",
     "exportJson": "↓ Exportar como JSON",

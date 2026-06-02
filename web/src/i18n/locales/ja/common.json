@@ -372,6 +372,7 @@
     "activityNpcDelta": "NPC 差分",
     "fleetHint": "フリートメンバーを、いる星系の上に紫の点として表示します。点にカーソルを合わせると名前が表示されます。",
     "showFleetMembers": "フリートメンバーを表示",
+    "fleetHeatmap": "フリートヒートマップ",
     "showAccountChars": "自分のキャラクターを表示",
     "staleHint": "選択した間隔の間更新されていない星系を視覚的に暗くし、古いチェーンの残りを一目で見つけられるようにします。",
     "exportJson": "↓ JSON としてエクスポート",
