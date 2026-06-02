@@ -12,8 +12,10 @@ function boxesOverlap(ax: number, ay: number, bx: number, by: number, w: number,
 }
 
 // Pick a position for a newly auto-added system: the intended spot if it's
-// clear, otherwise the nearest free slot on an expanding grid around it. Stops
-// a second jump out of the same system from landing on top of the first one.
+// clear, otherwise stack straight down beneath it into the first free slot
+// (so repeated jumps out of one system form a tidy column). Only if that whole
+// column is blocked do we spread outward. Stops a second jump out of the same
+// system from landing on top of the first one.
 function findFreePosition(
   start: { x: number; y: number },
   systems: Box[],
@@ -23,12 +25,17 @@ function findFreePosition(
 ): { x: number; y: number } {
   const collides = (x: number, y: number) =>
     systems.some((s) => boxesOverlap(x, y, s.position.x, s.position.y, w, h, gap));
-  if (!collides(start.x, start.y)) return start;
 
   const stepX = w + gap;
   const stepY = h + gap;
-  // Search rings (Chebyshev distance) outward so we return the closest free
-  // slot to the intended position.
+
+  // Prefer the intended spot, then directly below it, then further down.
+  for (let i = 0; i < 20; i++) {
+    const y = start.y + i * stepY;
+    if (!collides(start.x, y)) return { x: start.x, y };
+  }
+
+  // Column full — spread outward in rings (Chebyshev) as a fallback.
   for (let ring = 1; ring <= 12; ring++) {
     for (let dy = -ring; dy <= ring; dy++) {
       for (let dx = -ring; dx <= ring; dx++) {
