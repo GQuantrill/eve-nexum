@@ -21,6 +21,7 @@ import { useLocationTracking } from './hooks/useLocationTracking';
 import { useMapEventStream } from './hooks/useMapEventStream';
 import { useMapPresence } from './hooks/useMapPresence';
 import { useHashRoute } from './hooks/useHashRoute';
+import { useIdleLogout } from './hooks/useIdleLogout';
 import './App.css';
 
 function MapApp() {
@@ -105,6 +106,10 @@ function MapApp() {
 function AppShell() {
   const { user, loading } = useAuth();
   const [path] = useHashRoute();
+
+  // Sign out after 30 min idle (only while logged in). Keeps "last login"
+  // meaningful and stops idle tabs from polling ESI in the background.
+  useIdleLogout(!!user);
 
   // After the add-character SSO flow the server redirects with ?added=<name>
   // on success or ?link_error=<code> on failure (e.g. the character isn't in

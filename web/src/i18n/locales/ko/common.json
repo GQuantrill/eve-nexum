@@ -1,4 +1,7 @@
 {
+  "session": {
+    "idleLogout": "비활성으로 인해 로그아웃되었습니다."
+  },
   "fleet": {
     "notInFleet": "플릿에 속해 있지 않음",
     "noMembers": "표시할 플릿 멤버 없음",

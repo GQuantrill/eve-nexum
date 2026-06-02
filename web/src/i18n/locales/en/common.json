@@ -1,4 +1,7 @@
 {
+  "session": {
+    "idleLogout": "Signed out due to inactivity."
+  },
   "fleet": {
     "notInFleet": "Not in a fleet",
     "noMembers": "No fleet members visible",
