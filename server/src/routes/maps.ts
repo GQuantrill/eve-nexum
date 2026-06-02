@@ -1766,8 +1766,11 @@ mapsRouter.patch('/:mapId/systems/:systemId/signatures/:sigId', async (req, res)
   }
 
   await db.query(
-    `UPDATE map_signatures SET ${sets.join(', ')} WHERE id = $${vals.length + 1} AND system_id = $${vals.length + 2}`,
-    [...vals, sigId, systemId],
+    // map_id scoping is defence-in-depth: verifySystemInMap above already
+    // guarantees systemId is in this map, but enforcing it in SQL too means a
+    // future refactor can't open a cross-map write.
+    `UPDATE map_signatures SET ${sets.join(', ')} WHERE id = $${vals.length + 1} AND system_id = $${vals.length + 2} AND system_id IN (SELECT id FROM map_systems WHERE map_id = $${vals.length + 3})`,
+    [...vals, sigId, systemId, mapId],
   );
   db.query(`UPDATE map_systems SET last_activity_at = NOW() WHERE id = $1`, [systemId]).catch(console.error);
   if (typeof updates.name === 'string') recordGhostSiteIfMatch(systemId, updates.name);
@@ -1784,7 +1787,7 @@ mapsRouter.delete('/:mapId/systems/:systemId/signatures/:sigId', async (req, res
   const access = await requireMapContentWrite(res, mapId, req);
   if (!access) return;
   if (!(await verifySystemInMap(res, systemId, mapId))) return;
-  await db.query(`DELETE FROM map_signatures WHERE id = $1 AND system_id = $2`, [sigId, systemId]);
+  await db.query(`DELETE FROM map_signatures WHERE id = $1 AND system_id = $2 AND system_id IN (SELECT id FROM map_systems WHERE map_id = $3)`, [sigId, systemId, mapId]);
   db.query(`UPDATE map_systems SET last_activity_at = NOW() WHERE id = $1`, [systemId]).catch(console.error);
   publishToMap(mapId, { type: 'sig.changed', actor: req.get('x-client-id') ?? null, systemId });
   res.json({ ok: true });
@@ -1846,8 +1849,9 @@ mapsRouter.patch('/:mapId/systems/:systemId/structures/:structureId', async (req
   }
 
   await db.query(
-    `UPDATE map_structures SET ${sets.join(', ')} WHERE id = $${vals.length + 1} AND system_id = $${vals.length + 2}`,
-    [...vals, structureId, systemId],
+    // map_id scoping is defence-in-depth (see the signature PATCH above).
+    `UPDATE map_structures SET ${sets.join(', ')} WHERE id = $${vals.length + 1} AND system_id = $${vals.length + 2} AND system_id IN (SELECT id FROM map_systems WHERE map_id = $${vals.length + 3})`,
+    [...vals, structureId, systemId, mapId],
   );
   publishToMap(mapId, { type: 'structure.changed', actor: req.get('x-client-id') ?? null, systemId });
   res.json({ ok: true });
@@ -1858,7 +1862,7 @@ mapsRouter.delete('/:mapId/systems/:systemId/structures/:structureId', async (re
   const access = await requireMapContentWrite(res, mapId, req);
   if (!access) return;
   if (!(await verifySystemInMap(res, systemId, mapId))) return;
-  await db.query(`DELETE FROM map_structures WHERE id = $1 AND system_id = $2`, [structureId, systemId]);
+  await db.query(`DELETE FROM map_structures WHERE id = $1 AND system_id = $2 AND system_id IN (SELECT id FROM map_systems WHERE map_id = $3)`, [structureId, systemId, mapId]);
   publishToMap(mapId, { type: 'structure.changed', actor: req.get('x-client-id') ?? null, systemId });
   res.json({ ok: true });
 });
