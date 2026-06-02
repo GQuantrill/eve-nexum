@@ -3,9 +3,10 @@ import { api } from '../api/client';
 import { useShareMode } from '../context/ShareModeContext';
 
 export interface FleetMember {
-  characterId:   number;
-  characterName: string | null;
-  solarSystemId: number;
+  characterId:     number;
+  characterName:   string | null;
+  solarSystemId:   number;
+  solarSystemName: string | null;
 }
 
 export interface FleetState {
@@ -19,9 +20,10 @@ export interface FleetState {
 interface RawResponse {
   inFleet: boolean;
   members: Array<{
-    character_id:    number;
-    character_name?: string;
-    solar_system_id: number;
+    character_id:      number;
+    character_name?:   string;
+    solar_system_id:   number;
+    solar_system_name?: string | null;
   }>;
 }
 
@@ -52,9 +54,10 @@ function load() {
   inflight = api<RawResponse>('/api/character/fleet')
     .then((r) => {
       const members: FleetMember[] = r.members.map((m) => ({
-        characterId:   m.character_id,
-        characterName: m.character_name ?? null,
-        solarSystemId: m.solar_system_id,
+        characterId:     m.character_id,
+        characterName:   m.character_name ?? null,
+        solarSystemId:   m.solar_system_id,
+        solarSystemName: m.solar_system_name ?? null,
       }));
       const data: FleetState = { inFleet: r.inFleet, members, bySystem: indexBySystem(members) };
       moduleCache = { data, fetchedAt: Date.now() };

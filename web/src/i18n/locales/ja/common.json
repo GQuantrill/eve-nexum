@@ -1,4 +1,16 @@
 {
+  "fleet": {
+    "notInFleet": "フリートに参加していません",
+    "noMembers": "表示できるフリートメンバーがいません",
+    "sortDistance": "距離",
+    "sortName": "名前",
+    "ascending": "昇順",
+    "descending": "降順",
+    "unknownLoc": "不明",
+    "unknownPilot": "不明なパイロット",
+    "searchPlaceholder": "パイロットまたはシステムで絞り込み",
+    "noMatches": "一致なし"
+  },
   "language": {
     "label": "言語"
   },
@@ -621,6 +633,7 @@
     "turnur": "Turnur 接続",
     "a0": "近くの A0 恒星",
     "closest": "最も近い星系",
+    "fleet": "フリート",
     "expand": "サイドバーを展開",
     "resize": "サイドバーのサイズ変更",
     "collapse": "サイドバーを折りたたむ",

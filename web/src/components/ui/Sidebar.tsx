@@ -8,6 +8,7 @@ import { DraggableCard } from './DraggableCard';
 import { ScoutConnectionsPane } from './ScoutConnectionsPane';
 import { A0Pane } from './A0Pane';
 import { ClosestSystemsPane } from './ClosestSystemsPane';
+import { FleetPane } from './FleetPane';
 import { CaretLeftIcon, CaretRightIcon, ArrowLineLeftIcon, ArrowLineRightIcon } from '@phosphor-icons/react';
 import { useUserSetting } from '../../hooks/useUserSetting';
 
@@ -29,9 +30,9 @@ function loadWidth(): number {
 }
 
 type Side    = 'left' | 'right';
-type PanelId = 'thera' | 'turnur' | 'a0' | 'closest';
+type PanelId = 'thera' | 'turnur' | 'a0' | 'closest' | 'fleet';
 
-const DEFAULT_ORDER: PanelId[] = ['closest', 'thera', 'turnur', 'a0'];
+const DEFAULT_ORDER: PanelId[] = ['closest', 'thera', 'turnur', 'fleet', 'a0'];
 const VALID_PANEL_IDS: ReadonlySet<PanelId> = new Set(DEFAULT_ORDER);
 
 // The panels form a single vertical column, so a drag should only ever move a
@@ -57,6 +58,7 @@ export function Sidebar() {
     turnur:  t('sidebar.turnur'),
     a0:      t('sidebar.a0'),
     closest: t('sidebar.closest'),
+    fleet:   t('sidebar.fleet'),
   };
   // Cross-device prefs via useUserSetting (server-backed JSONB).
   const [sideRaw,      setSide]      = useUserSetting<Side>(SIDE_KEY, 'left');
@@ -135,6 +137,7 @@ export function Sidebar() {
     turnur:  <ScoutConnectionsPane scoutSystem="Turnur" />,
     a0:      <A0Pane />,
     closest: <ClosestSystemsPane />,
+    fleet:   <FleetPane />,
   };
 
   return (

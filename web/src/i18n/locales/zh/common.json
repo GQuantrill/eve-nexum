@@ -1,4 +1,16 @@
 {
+  "fleet": {
+    "notInFleet": "未加入舰队",
+    "noMembers": "没有可见的舰队成员",
+    "sortDistance": "距离",
+    "sortName": "名称",
+    "ascending": "升序",
+    "descending": "降序",
+    "unknownLoc": "未知",
+    "unknownPilot": "未知飞行员",
+    "searchPlaceholder": "按飞行员或星系筛选",
+    "noMatches": "无匹配项"
+  },
   "language": {
     "label": "语言"
   },
@@ -621,6 +633,7 @@
     "turnur": "Turnur 连接",
     "a0": "附近的 A0 恒星",
     "closest": "最近的星系",
+    "fleet": "舰队",
     "expand": "展开侧栏",
     "resize": "调整侧栏大小",
     "collapse": "收起侧栏",

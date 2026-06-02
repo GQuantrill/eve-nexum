@@ -1,4 +1,16 @@
 {
+  "fleet": {
+    "notInFleet": "플릿에 속해 있지 않음",
+    "noMembers": "표시할 플릿 멤버 없음",
+    "sortDistance": "거리",
+    "sortName": "이름",
+    "ascending": "오름차순",
+    "descending": "내림차순",
+    "unknownLoc": "알 수 없음",
+    "unknownPilot": "알 수 없는 파일럿",
+    "searchPlaceholder": "파일럿 또는 시스템으로 필터",
+    "noMatches": "일치 항목 없음"
+  },
   "language": {
     "label": "언어"
   },
@@ -621,6 +633,7 @@
     "turnur": "Turnur 연결",
     "a0": "주변 A0 항성",
     "closest": "가장 가까운 성계",
+    "fleet": "플릿",
     "expand": "사이드바 펼치기",
     "resize": "사이드바 크기 조정",
     "collapse": "사이드바 접기",

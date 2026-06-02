@@ -1,4 +1,16 @@
 {
+  "fleet": {
+    "notInFleet": "Not in a fleet",
+    "noMembers": "No fleet members visible",
+    "sortDistance": "Distance",
+    "sortName": "Name",
+    "ascending": "Ascending",
+    "descending": "Descending",
+    "unknownLoc": "Unknown",
+    "unknownPilot": "Unknown pilot",
+    "searchPlaceholder": "Filter by pilot or system",
+    "noMatches": "No matches"
+  },
   "language": {
     "label": "Language"
   },
@@ -621,6 +633,7 @@
     "turnur": "Turnur Connections",
     "a0": "Nearby A0 Suns",
     "closest": "Closest Systems",
+    "fleet": "Fleet",
     "expand": "Expand sidebar",
     "resize": "Resize sidebar",
     "collapse": "Collapse sidebar",

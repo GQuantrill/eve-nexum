@@ -1,4 +1,16 @@
 {
+  "fleet": {
+    "notInFleet": "In keiner Flotte",
+    "noMembers": "Keine Flottenmitglieder sichtbar",
+    "sortDistance": "Distanz",
+    "sortName": "Name",
+    "ascending": "Aufsteigend",
+    "descending": "Absteigend",
+    "unknownLoc": "Unbekannt",
+    "unknownPilot": "Unbekannter Pilot",
+    "searchPlaceholder": "Nach Pilot oder System filtern",
+    "noMatches": "Keine Treffer"
+  },
   "language": {
     "label": "Sprache"
   },
@@ -621,6 +633,7 @@
     "turnur": "Turnur-Verbindungen",
     "a0": "Nahe A0-Sonnen",
     "closest": "Nächste Systeme",
+    "fleet": "Flotte",
     "expand": "Seitenleiste ausklappen",
     "resize": "Seitenleiste anpassen",
     "collapse": "Seitenleiste einklappen",

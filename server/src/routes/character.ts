@@ -386,9 +386,20 @@ characterRouter.get('/fleet', async (req, res) => {
     // 3) Resolve names — entity_names cache makes this effectively free
     //    after the first time we see each member.
     const names = await resolveEntityNames(members.map((m) => m.character_id));
+
+    // 4) Resolve each member's solar-system name from the SDE so the client can
+    //    show a location even for w-space (which has no stargate route, so the
+    //    route lookup can't supply a name). One batch query, deduped.
+    const sysIds = [...new Set(members.map((m) => m.solar_system_id))];
+    const { rows: sysRows } = await db.query<{ id: number; name: string }>(
+      `SELECT id, name FROM solar_systems WHERE id = ANY($1)`, [sysIds],
+    );
+    const sysName = new Map(sysRows.map((r) => [Number(r.id), r.name]));
+
     const enriched = members.map((m) => ({
       ...m,
-      character_name: names.get(m.character_id)?.name,
+      character_name:    names.get(m.character_id)?.name,
+      solar_system_name: sysName.get(m.solar_system_id) ?? null,
     }));
 
     res.json({ inFleet: true, members: enriched });

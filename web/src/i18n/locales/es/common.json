@@ -1,4 +1,16 @@
 {
+  "fleet": {
+    "notInFleet": "No estás en una flota",
+    "noMembers": "No hay miembros de flota visibles",
+    "sortDistance": "Distancia",
+    "sortName": "Nombre",
+    "ascending": "Ascendente",
+    "descending": "Descendente",
+    "unknownLoc": "Desconocido",
+    "unknownPilot": "Piloto desconocido",
+    "searchPlaceholder": "Filtrar por piloto o sistema",
+    "noMatches": "Sin coincidencias"
+  },
   "language": {
     "label": "Idioma"
   },
@@ -621,6 +633,7 @@
     "turnur": "Conexiones de Turnur",
     "a0": "Soles A0 cercanos",
     "closest": "Sistemas más cercanos",
+    "fleet": "Flota",
     "expand": "Desplegar barra lateral",
     "resize": "Redimensionar barra lateral",
     "collapse": "Plegar barra lateral",
