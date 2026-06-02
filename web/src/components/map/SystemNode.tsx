@@ -26,7 +26,7 @@ import { useCurrentHourKills } from '../../hooks/useCurrentHourKills';
 import { useNow30s } from '../../hooks/useNow30s';
 import { useStaleThreshold } from '../../hooks/useStaleThreshold';
 import { useCustomIntel } from '../../hooks/useCustomIntel';
-import { resolveIntelColor } from '../../utils/intelColors';
+import { resolveIntelColor, resolveIntelLabel } from '../../utils/intelColors';
 import { WHTypeInfo } from '../ui/WHTypeInfo';
 import { truesecColor } from '../../utils/truesec';
 
@@ -127,6 +127,7 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
   const connection      = useConnection();
   const [customIntel]   = useCustomIntel();
   const intelColor      = resolveIntelColor(sys.intel, customIntel);
+  const intelLabel      = resolveIntelLabel(sys.intel, customIntel, t);
 
   // Tooltip label: dedupe by scout system name (Thera / Turnur). Multiple
   // connections from the same scout are summarised, mixed scouts are listed.
@@ -199,6 +200,16 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
       <Handle type="source" position={Position.Right}  id="right"  className={easyConnect ? 'system-handle system-handle--ghost' : 'system-handle'} />
       <Handle type="source" position={Position.Bottom} id="bottom" className={easyConnect ? 'system-handle system-handle--ghost' : 'system-handle'} />
       <Handle type="source" position={Position.Left}   id="left"   className={easyConnect ? 'system-handle system-handle--ghost' : 'system-handle'} />
+
+      {/* Top-right intel marker. Real element (not a ::after) so it can carry
+          a tooltip showing the intel label on hover. */}
+      {sys.intel && (
+        <span
+          className="system-node__intel-corner"
+          data-tooltip={intelLabel ?? undefined}
+          aria-label={intelLabel ?? undefined}
+        />
+      )}
 
       {easyConnect && (
         <>

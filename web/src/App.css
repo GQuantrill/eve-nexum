@@ -1606,7 +1606,7 @@
   width: 12px;
   height: 12px;
   border-radius: 3px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 5px solid rgba(255, 255, 255, 0.15);
 }
 
 /* Read-only display of a generated share URL. Monospace so the UUID
@@ -1818,12 +1818,29 @@
    feedback is preserved. */
 .system-node[data-intel] {
   border-color: var(--intel-color);
-  border-width: 2.5px;
+  border-width: 4px;
 
   &:hover,
   &[data-selected='true'] {
     border-color: var(--intel-color);
   }
+}
+
+/* Folded-corner triangle in the top-right when intel is set — a second,
+   shape-based cue alongside the coloured border. A real element (rendered by
+   SystemNode) rather than a ::after so it can carry a tooltip with the intel
+   label on hover; pointer-events enabled for exactly that. Uses the same
+   --intel-color SystemNode sets inline. */
+.system-node__intel-corner {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-top: 16px solid var(--intel-color);
+  border-left: 16px solid transparent;
+  border-top-right-radius: 6px;
+  pointer-events: auto;
 }
 
 .system-node {
