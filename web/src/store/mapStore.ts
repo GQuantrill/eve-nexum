@@ -25,6 +25,14 @@ const moveTimers = new Map<string, ReturnType<typeof setTimeout>>();
 // to that height in uniform mode. The width max still considers them so
 // long J-codes / station names participate as expected.
 const nodeSizes = new Map<string, { w: number; h: number; countHeight: boolean }>();
+// Snap-grid size — must match MapCanvas's snapGrid. Uniform node dimensions are
+// rounded UP to whole grid squares so that, with the top-left snapped to the
+// grid, the bottom-right edge lands on a grid line too (nodes tile cleanly and
+// don't finish part-way through a square). Border-box is global, so a min-width
+// of N renders an N-px outer box.
+const GRID = 20;
+const snapUpToGrid = (n: number) => (n > 0 ? Math.ceil(n / GRID) * GRID : 0);
+
 function recomputeUniformMax(): { w: number; h: number } {
   let w = 0, h = 0, hAll = 0;
   let anyHeightEligible = false;
@@ -38,7 +46,7 @@ function recomputeUniformMax(): { w: number; h: number } {
   }
   // Fall back to the global max if every node has statics — without this
   // the height would lock at 0 and the inline minHeight would never apply.
-  return { w, h: anyHeightEligible ? h : hAll };
+  return { w: snapUpToGrid(w), h: snapUpToGrid(anyHeightEligible ? h : hAll) };
 }
 // Debounce map name saves — keyed by mapId so two tabs renaming two different
 // maps don't clobber each other through a shared timer slot.

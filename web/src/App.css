@@ -2022,8 +2022,8 @@
 }
 
 .system-node {
-  min-width: 150px;
-  min-height: 80px; /* at least 4 snap-grid squares tall */
+  min-width: 160px;  /* 8 snap-grid squares — keep node size a grid multiple */
+  min-height: 80px;  /* 4 snap-grid squares tall */
   background: #111827;
   border: 1.5px solid color-mix(in srgb, var(--class-color) 40%, #1e2740);
   border-radius: 8px;
