@@ -1,4 +1,5 @@
 import { db } from '../db.js';
+import { esiFetch } from '../utils/esi.js';
 import { createLogger } from '../utils/logger.js';
 
 const log = createLogger('standings');
@@ -22,7 +23,7 @@ async function fetchAllContacts(url: string, token: string): Promise<EsiContact[
   const all: EsiContact[] = [];
   let page = 1;
   while (true) {
-    const r = await fetch(`${url}?page=${page}`, {
+    const r = await esiFetch(`${url}?page=${page}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     if (r.status === 403) return { error: 'forbidden',    status: 403 };

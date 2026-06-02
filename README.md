@@ -177,7 +177,7 @@ These features only matter once `CORP_ID` is set — see [Corp mode](#corp-mode)
 **1. Clone and configure**
 
 ```bash
-git clone https://codeberg.org/GQuantrill/eve-nexum.git
+git clone https://github.com/GQuantrill/eve-nexum.git
 cd eve-nexum
 cp .env.example .env
 ```
@@ -334,7 +334,7 @@ Pulling a new Nexum release into a running instance:
 **1. Clone and configure**
 
 ```bash
-git clone https://codeberg.org/GQuantrill/eve-nexum.git
+git clone https://github.com/GQuantrill/eve-nexum.git
 cd eve-nexum
 cp .env.example .env
 ```

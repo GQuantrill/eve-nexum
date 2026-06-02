@@ -1,4 +1,5 @@
 import { db } from '../db.js';
+import { esiFetch } from '../utils/esi.js';
 import { createLogger } from '../utils/logger.js';
 
 const log = createLogger('ghost-sites');
@@ -101,7 +102,7 @@ interface EsiSystemInfo {
 
 async function fetchEsiSystemInfo(eveSystemId: number): Promise<EsiSystemInfo | null> {
   try {
-    const res = await fetch(`https://esi.evetech.net/latest/universe/systems/${eveSystemId}/?datasource=tranquility`);
+    const res = await esiFetch(`https://esi.evetech.net/latest/universe/systems/${eveSystemId}/?datasource=tranquility`);
     if (!res.ok) return null;
     const json = await res.json() as { star_id?: number; planets?: Array<{ planet_id: number; moons?: number[] }> };
     const planets = Array.isArray(json.planets) ? json.planets : [];
@@ -115,7 +116,7 @@ async function fetchEsiSystemInfo(eveSystemId: number): Promise<EsiSystemInfo | 
 
 async function resolveSunType(starId: number): Promise<string | null> {
   try {
-    const res = await fetch(`https://esi.evetech.net/latest/universe/stars/${starId}/?datasource=tranquility`);
+    const res = await esiFetch(`https://esi.evetech.net/latest/universe/stars/${starId}/?datasource=tranquility`);
     if (!res.ok) return null;
     const json = await res.json() as { type_id?: number; spectral_class?: string };
     if (!json.type_id) return json.spectral_class ?? null;

@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { esiFetch } from '../utils/esi.js';
 import type { Request, Response } from 'express';
 import { db } from '../db.js';
 import { requireAuth } from '../middleware/requireAuth.js';
@@ -50,7 +51,7 @@ async function resolveStructureOwnerCorp(
     );
     if (!rows.length) return null;
     const token = decryptToken(rows[0].access_token);
-    const r = await fetch(`https://esi.evetech.net/v2/universe/structures/${eveStructureId}/`, {
+    const r = await esiFetch(`https://esi.evetech.net/v2/universe/structures/${eveStructureId}/`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     if (!r.ok) {

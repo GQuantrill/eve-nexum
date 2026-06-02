@@ -1,4 +1,5 @@
 import { db } from '../db.js';
+import { esiFetch } from '../utils/esi.js';
 import { createLogger } from '../utils/logger.js';
 
 const log = createLogger('entityNames');
@@ -6,7 +7,6 @@ const log = createLogger('entityNames');
 // ESI POST /universe/names/ accepts up to 1000 IDs per call.
 const ESI_BATCH_SIZE = 1000;
 const ESI_TIMEOUT_MS = 8_000;
-const ESI_AGENT      = 'Eve-Nexum/1.0 (https://codeberg.org/GQuantrill/eve-nexum; gq@area404.org)';
 
 export interface EntityName {
   name:     string;
@@ -60,13 +60,9 @@ export async function resolveEntityNames(rawIds: Array<number | null | undefined
   for (let i = 0; i < missing.length; i += ESI_BATCH_SIZE) {
     const chunk = missing.slice(i, i + ESI_BATCH_SIZE);
     try {
-      const res = await fetch('https://esi.evetech.net/latest/universe/names/', {
+      const res = await esiFetch('https://esi.evetech.net/latest/universe/names/', {
         method:  'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'User-Agent':   ESI_AGENT,
-          Accept:         'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify(chunk),
         signal:  AbortSignal.timeout(ESI_TIMEOUT_MS),
       });

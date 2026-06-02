@@ -3,12 +3,13 @@ import { optionalAuth } from '../middleware/optionalAuth.js';
 import { createLogger } from '../utils/logger.js';
 import { TtlCache } from '../utils/cache.js';
 import { resolveEntityNames } from '../services/entityNames.js';
+import { esiFetch } from '../utils/esi.js';
 
 const router = Router();
 router.use(optionalAuth);
 const log = createLogger('killboard');
 
-const ZKB_AGENT    = 'Eve-Nexum/1.0 (https://codeberg.org/GQuantrill/eve-nexum; gq@area404.org)';
+const ZKB_AGENT    = 'Eve-Nexum/1.0 (https://github.com/GQuantrill/eve-nexum; gq@area404.org)';
 const CACHE_TTL_MS = 5 * 60 * 1000;
 const FETCH_TIMEOUT_MS = 8_000;
 
@@ -100,9 +101,9 @@ async function fetchEsi(killmailId: number, hash: string): Promise<EsiKillmail |
   const promise = (async (): Promise<EsiKillmail | null> => {
     await acquireSlot();
     try {
-      const res = await fetch(
+      const res = await esiFetch(
         `https://esi.evetech.net/latest/killmails/${killmailId}/${hash}/`,
-        { headers: { 'User-Agent': ZKB_AGENT, Accept: 'application/json' }, signal: withTimeout(FETCH_TIMEOUT_MS) },
+        { signal: withTimeout(FETCH_TIMEOUT_MS) },
       );
       if (!res.ok) return null;
       return (await res.json()) as EsiKillmail;

@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { esiFetch } from '../utils/esi.js';
 import { db } from '../db.js';
 import { optionalAuth } from '../middleware/optionalAuth.js';
 
@@ -51,8 +52,8 @@ async function fetchEsi(): Promise<EsiSnapshot | null> {
   fetching = (async () => {
     try {
       const [jRes, kRes] = await Promise.all([
-        fetch(`${ESI}/universe/system_jumps/?datasource=tranquility`),
-        fetch(`${ESI}/universe/system_kills/?datasource=tranquility`),
+        esiFetch(`${ESI}/universe/system_jumps/?datasource=tranquility`),
+        esiFetch(`${ESI}/universe/system_kills/?datasource=tranquility`),
       ]);
       if (!jRes.ok || !kRes.ok) return esiCache;
 

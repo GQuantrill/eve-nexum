@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { esiFetch } from '../utils/esi.js';
 import { db } from '../db.js';
 import { requireAdmin } from '../middleware/requireAdmin.js';
 import { requireAdminRead } from '../middleware/requireAdminRead.js';
@@ -43,7 +44,7 @@ async function resolveCorps(ids: number[]): Promise<Map<number, CorpInfo | null>
 
   await Promise.all(todo.map(async (id) => {
     try {
-      const r = await fetch(`https://esi.evetech.net/v5/corporations/${id}/`);
+      const r = await esiFetch(`https://esi.evetech.net/v5/corporations/${id}/`);
       if (!r.ok) {
         corpCache.set(id, { value: null, at: now });
         out.set(id, null);
@@ -81,7 +82,7 @@ async function resolveAlliances(ids: number[]): Promise<Map<number, CorpInfo | n
 
   await Promise.all(todo.map(async (id) => {
     try {
-      const r = await fetch(`https://esi.evetech.net/v3/alliances/${id}/`);
+      const r = await esiFetch(`https://esi.evetech.net/v3/alliances/${id}/`);
       if (!r.ok) {
         allianceCache.set(id, { value: null, at: now });
         out.set(id, null);
@@ -297,7 +298,7 @@ adminRouter.post('/users/:id/recheck-corp', async (req, res) => {
 
   let liveCorpId: number | null = null;
   try {
-    const r = await fetch(`https://esi.evetech.net/v4/characters/${target.character_id}/`);
+    const r = await esiFetch(`https://esi.evetech.net/v4/characters/${target.character_id}/`);
     if (!r.ok) {
       res.status(502).json({ error: `ESI returned ${r.status}` });
       return;

@@ -1,4 +1,5 @@
 import { db } from '../db.js';
+import { esiFetch } from '../utils/esi.js';
 import { getValidToken } from '../utils/eveToken.js';
 import { config } from '../config.js';
 import { createLogger } from '../utils/logger.js';
@@ -24,14 +25,14 @@ const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 // background detection shouldn't inflate a pilot's activity stats.
 async function pollOne(userId: number, characterId: number): Promise<void> {
   const token = await getValidToken(userId); // throws on a dead/revoked token
-  const onlineRes = await fetch(
+  const onlineRes = await esiFetch(
     `https://esi.evetech.net/latest/characters/${characterId}/online/`,
     { headers: { Authorization: `Bearer ${token}` } },
   );
   if (!onlineRes.ok) return;
   if (!reallyOnline(await onlineRes.json() as OnlineResp)) return;
 
-  const locRes = await fetch(
+  const locRes = await esiFetch(
     `https://esi.evetech.net/latest/characters/${characterId}/location/`,
     { headers: { Authorization: `Bearer ${token}` } },
   );

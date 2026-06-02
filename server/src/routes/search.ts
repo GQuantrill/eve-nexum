@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { esiFetch } from '../utils/esi.js';
 import { requireAuth } from '../middleware/requireAuth.js';
 import { createLogger } from '../utils/logger.js';
 import { TtlCache } from '../utils/cache.js';
@@ -10,7 +11,6 @@ export const searchRouter = Router();
 searchRouter.use(requireAuth);
 
 const ESI_TIMEOUT_MS = 8_000;
-const ESI_AGENT      = 'Eve-Nexum/1.0 (https://codeberg.org/GQuantrill/eve-nexum; gq@area404.org)';
 
 // Cache exact-name lookups for 24h. Character / corp names are effectively
 // immutable; this stops a debounced search-as-you-type UI from hammering ESI.
@@ -28,13 +28,9 @@ interface IdsResponse {
 // for an interactive picker.
 async function lookupExactName(name: string): Promise<IdsResponse | null> {
   try {
-    const res = await fetch('https://esi.evetech.net/latest/universe/ids/', {
+    const res = await esiFetch('https://esi.evetech.net/latest/universe/ids/', {
       method:  'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'User-Agent':   ESI_AGENT,
-        Accept:         'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify([name]),
       signal:  AbortSignal.timeout(ESI_TIMEOUT_MS),
     });

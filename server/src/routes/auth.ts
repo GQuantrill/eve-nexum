@@ -4,6 +4,7 @@ import { db } from '../db.js';
 import { config } from '../config.js';
 import { encryptToken } from '../utils/tokenCrypto.js';
 import { createLogger } from '../utils/logger.js';
+import { esiFetch } from '../utils/esi.js';
 import { refreshStandingsForUser } from '../services/standings.js';
 import { seedDemoMap } from '../services/demoMap.js';
 
@@ -160,7 +161,7 @@ authRouter.get('/callback', async (req, res) => {
     let userCorpId: number | null = null;
     let userAllianceId: number | null = null;
     try {
-      const esiChar = await fetch(`https://esi.evetech.net/v4/characters/${characterId}/`);
+      const esiChar = await esiFetch(`https://esi.evetech.net/v4/characters/${characterId}/`);
       if (!esiChar.ok) {
         if (config.corpMode) {
           res.redirect(failUrl('corp_check_failed'));

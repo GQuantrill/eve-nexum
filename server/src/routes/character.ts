@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { esiFetch } from '../utils/esi.js';
 import { db } from '../db.js';
 import { requireAuth } from '../middleware/requireAuth.js';
 import { getValidToken } from '../utils/eveToken.js';
@@ -56,7 +57,7 @@ async function getLocationPayload(userId: number): Promise<LocationPayload> {
   const token       = await getValidToken(userId);
   const characterId = userRows[0].character_id;
 
-  const onlineRes = await fetch(
+  const onlineRes = await esiFetch(
     `https://esi.evetech.net/latest/characters/${characterId}/online/`,
     { headers: { Authorization: `Bearer ${token}` } },
   );
@@ -65,9 +66,9 @@ async function getLocationPayload(userId: number): Promise<LocationPayload> {
   if (!isReallyOnline(onlineData)) { lastSeenSystem.delete(userId); return { online: false }; }
 
   const [locRes, shipRes] = await Promise.all([
-    fetch(`https://esi.evetech.net/latest/characters/${characterId}/location/`,
+    esiFetch(`https://esi.evetech.net/latest/characters/${characterId}/location/`,
       { headers: { Authorization: `Bearer ${token}` } }),
-    fetch(`https://esi.evetech.net/latest/characters/${characterId}/ship/`,
+    esiFetch(`https://esi.evetech.net/latest/characters/${characterId}/ship/`,
       { headers: { Authorization: `Bearer ${token}` } }),
   ]);
   if (!locRes.ok) return { online: true, system: null, ship: null };
@@ -149,11 +150,11 @@ characterRouter.get('/:targetUserId/location', async (req, res) => {
 // Refreshes last_known as a free side effect. Throws on a dead token.
 async function readCharacterSystem(userId: number, characterId: number): Promise<{ online: boolean; eveSystemId: number; name: string; systemClass: string | null } | null> {
   const token = await getValidToken(userId);
-  const onlineRes = await fetch(`https://esi.evetech.net/latest/characters/${characterId}/online/`,
+  const onlineRes = await esiFetch(`https://esi.evetech.net/latest/characters/${characterId}/online/`,
     { headers: { Authorization: `Bearer ${token}` } });
   if (!onlineRes.ok) return null;
   if (!isReallyOnline(await onlineRes.json() as EsiOnlineResponse)) return null;
-  const locRes = await fetch(`https://esi.evetech.net/latest/characters/${characterId}/location/`,
+  const locRes = await esiFetch(`https://esi.evetech.net/latest/characters/${characterId}/location/`,
     { headers: { Authorization: `Bearer ${token}` } });
   if (!locRes.ok) return null;
   const { solar_system_id } = await locRes.json() as { solar_system_id: number };
@@ -220,7 +221,7 @@ characterRouter.post('/waypoint', async (req, res) => {
       clear_other_waypoints: String(clearOtherWaypoints),
       destination_id:       String(destNum),
     });
-    const esiRes = await fetch(
+    const esiRes = await esiFetch(
       `https://esi.evetech.net/latest/ui/autopilot/waypoint/?${params}`,
       { method: 'POST', headers: { Authorization: `Bearer ${token}` } },
     );
@@ -244,7 +245,7 @@ characterRouter.get('/online', async (req, res) => {
     const token = await getValidToken(req.session.userId!);
     const characterId = rows[0].character_id;
 
-    const esiRes = await fetch(
+    const esiRes = await esiFetch(
       `https://esi.evetech.net/latest/characters/${characterId}/online/`,
       { headers: { Authorization: `Bearer ${token}` } },
     );
@@ -326,7 +327,7 @@ characterRouter.get('/fleet', async (req, res) => {
 
     // 1) Which fleet (if any) is this character in? ESI returns 404 when
     //    the character isn't in a fleet — that's expected, not an error.
-    const fleetRes = await fetch(
+    const fleetRes = await esiFetch(
       `https://esi.evetech.net/latest/characters/${characterId}/fleet/`,
       { headers: { Authorization: `Bearer ${token}` } },
     );
@@ -356,7 +357,7 @@ characterRouter.get('/fleet', async (req, res) => {
     if (isFresh && entry) {
       members = entry.value;
     } else if (isBoss) {
-      const memRes = await fetch(
+      const memRes = await esiFetch(
         `https://esi.evetech.net/latest/fleets/${fleetInfo.fleet_id}/members/`,
         { headers: { Authorization: `Bearer ${token}` } },
       );

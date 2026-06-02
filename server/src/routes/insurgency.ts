@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { optionalAuth } from '../middleware/optionalAuth.js';
 import { createLogger } from '../utils/logger.js';
 import { TtlValue } from '../utils/cache.js';
+import { esiFetch } from '../utils/esi.js';
 
 const router = Router();
 router.use(optionalAuth);
@@ -58,7 +59,7 @@ const cache = new TtlValue<InsurgencySystem[]>(CACHE_TTL_MS);
 
 async function loadFactions(): Promise<Map<number, EsiFaction>> {
   if (factionMap) return factionMap;
-  const res = await fetch('https://esi.evetech.net/latest/universe/factions/?datasource=tranquility');
+  const res = await esiFetch('https://esi.evetech.net/latest/universe/factions/?datasource=tranquility');
   if (!res.ok) throw new Error(`ESI factions ${res.status}`);
   const list = await res.json() as EsiFaction[];
   factionMap = new Map(list.map((f) => [f.faction_id, f]));

@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { esiFetch } from '../utils/esi.js';
 import { optionalAuth } from '../middleware/optionalAuth.js';
 import { createLogger } from '../utils/logger.js';
 import { TtlValue } from '../utils/cache.js';
@@ -42,7 +43,7 @@ const cache = new TtlValue<IncursionSystem[]>(CACHE_TTL_MS);
 
 async function loadFactions(): Promise<Map<number, EsiFaction>> {
   if (factionMap) return factionMap;
-  const res = await fetch('https://esi.evetech.net/latest/universe/factions/?datasource=tranquility');
+  const res = await esiFetch('https://esi.evetech.net/latest/universe/factions/?datasource=tranquility');
   if (!res.ok) throw new Error(`ESI factions ${res.status}`);
   const list = await res.json() as EsiFaction[];
   factionMap = new Map(list.map((f) => [f.faction_id, f]));
@@ -51,7 +52,7 @@ async function loadFactions(): Promise<Map<number, EsiFaction>> {
 
 async function fetchAndBuild(): Promise<IncursionSystem[]> {
   const [incRes, factions] = await Promise.all([
-    fetch('https://esi.evetech.net/latest/incursions/?datasource=tranquility'),
+    esiFetch('https://esi.evetech.net/latest/incursions/?datasource=tranquility'),
     loadFactions(),
   ]);
   if (!incRes.ok) throw new Error(`ESI incursions ${incRes.status}`);
