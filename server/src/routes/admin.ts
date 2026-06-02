@@ -132,7 +132,7 @@ adminReadRouter.get('/users', async (_req, res) => {
       u.alliance_id    AS "allianceId",
       u.blocked,
       u.created_at     AS "createdAt",
-      u.updated_at     AS "lastLogin",
+      u.last_login_at  AS "lastLogin",
       COALESCE(e.cnt, 0) AS "totalEvents",
       COALESCE(s.cnt, 0) AS "totalSignatures",
       u.last_known_system_id AS "lastKnownSystemId",
@@ -150,7 +150,7 @@ adminReadRouter.get('/users', async (_req, res) => {
       JOIN maps m          ON m.id  = sys.map_id
       GROUP BY m.user_id
     ) s ON s.user_id = u.id
-    ORDER BY u.updated_at DESC
+    ORDER BY u.last_login_at DESC NULLS LAST
   `);
 
   const [corpInfo, allianceInfo] = await Promise.all([
@@ -669,7 +669,7 @@ reportsRouter.get('/users', async (req, res) => {
       u.role,
       u.corp_id        AS "corpId",
       u.alliance_id    AS "allianceId",
-      u.updated_at     AS "lastLogin",
+      u.last_login_at  AS "lastLogin",
       u.last_known_system_id AS "lastKnownSystemId",
       lks.name               AS "lastKnownSystemName",
       lcs.ts           AS "lastCorpSigAt",

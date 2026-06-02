@@ -197,13 +197,14 @@ authRouter.get('/callback', async (req, res) => {
     const defaultRole = (!config.corpMode || isAdminChar) ? 'admin' : 'readonly';
 
     const { rows } = await db.query<{ id: number; role: string; blocked: boolean }>(
-      `INSERT INTO users (character_id, character_name, access_token, refresh_token, token_expires_at, role, corp_id, alliance_id)
-       VALUES ($1, $2, $3, $4, $5, $6, $8, $10)
+      `INSERT INTO users (character_id, character_name, access_token, refresh_token, token_expires_at, role, corp_id, alliance_id, last_login_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $8, $10, NOW())
        ON CONFLICT (character_id) DO UPDATE SET
          character_name   = EXCLUDED.character_name,
          access_token     = EXCLUDED.access_token,
          refresh_token    = EXCLUDED.refresh_token,
          token_expires_at = EXCLUDED.token_expires_at,
+         last_login_at    = NOW(),
          corp_id          = COALESCE($8::int,  users.corp_id),
          alliance_id      = COALESCE($10::int, users.alliance_id),
          role             = CASE

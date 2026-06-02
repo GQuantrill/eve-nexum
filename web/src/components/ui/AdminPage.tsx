@@ -1313,7 +1313,8 @@ function AuditTab() {
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
-function formatRelative(t: TFunction, iso: string): string {
+function formatRelative(t: TFunction, iso: string | null | undefined): string {
+  if (!iso) return DASH;
   const date = new Date(iso);
   const then = date.getTime();
   if (Number.isNaN(then)) return DASH;
