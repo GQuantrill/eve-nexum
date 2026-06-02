@@ -1283,6 +1283,12 @@
           var DICT = DICTS[lang];
           document.documentElement.lang = lang;
           if (DICT.__title) document.title = DICT.__title;
+          // SECURITY: innerHTML is used because these strings intentionally
+          // contain markup (<a>, <span>, <br>). This is ONLY safe because every
+          // value in DICTS is a hard-coded, trusted literal in this file. Do NOT
+          // ever populate DICTS from user input, a CMS, an API, or URL params —
+          // that would make this a stored/DOM XSS sink. Add new translations as
+          // static literals above; never interpolate untrusted data here.
           document.querySelectorAll('[data-i18n]').forEach(function (el) {
             var key = el.getAttribute('data-i18n');
             if (DICT[key] != null) el.innerHTML = DICT[key];
