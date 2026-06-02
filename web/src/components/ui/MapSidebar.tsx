@@ -972,6 +972,11 @@ export function MapSidebar() {
             label={t("mapSidebar.showFleetMembers")}
           />
           <SettingToggle
+            settingKey="nexum.fleet.heatmap"
+            label={t("mapSidebar.fleetHeatmap")}
+            defaultOn={false}
+          />
+          <SettingToggle
             settingKey="nexum.account.showOnMap"
             label={t("mapSidebar.showAccountChars")}
           />

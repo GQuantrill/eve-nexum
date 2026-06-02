@@ -372,6 +372,7 @@
     "activityNpcDelta": "NPC 변화량",
     "fleetHint": "함대원을 그들이 있는 성계 위에 보라색 점으로 표시합니다. 점에 마우스를 올리면 이름을 볼 수 있습니다.",
     "showFleetMembers": "함대원 표시",
+    "fleetHeatmap": "플릿 히트맵",
     "showAccountChars": "내 캐릭터 표시",
     "staleHint": "선택한 간격 동안 업데이트되지 않은 성계를 시각적으로 흐리게 하여, 오래된 체인 잔재를 한눈에 알아볼 수 있게 합니다.",
     "exportJson": "↓ JSON으로 내보내기",

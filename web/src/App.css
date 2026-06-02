@@ -1957,6 +1957,24 @@
   pointer-events: auto;
 }
 
+/* Fleet heatmap: a purple halo behind any node with fleet members in it, its
+   size + opacity scaled by --fleet-heat (0..1, set by SystemNode from the
+   headcount). Toggled by the data-fleet-heat attribute. Drawn on ::before
+   behind the node so it doesn't fight the node's own border box-shadows
+   (hover / selected / current / sov). */
+.system-node[data-fleet-heat]::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  z-index: -1;
+  pointer-events: none;
+  box-shadow:
+    0 0 calc(10px + var(--fleet-heat, 0) * 36px)
+        calc(2px + var(--fleet-heat, 0) * 12px)
+        rgba(192, 132, 252, calc(0.25 + var(--fleet-heat, 0) * 0.5));
+}
+
 .system-node {
   min-width: 150px;
   min-height: 80px; /* at least 4 snap-grid squares tall */

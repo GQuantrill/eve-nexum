@@ -372,6 +372,7 @@
     "activityNpcDelta": "NPC-Delta",
     "fleetHint": "Flottenmitglieder als violette Punkte auf ihrem System anzeigen. Punkt überfahren, um die Namen zu sehen.",
     "showFleetMembers": "Flottenmitglieder anzeigen",
+    "fleetHeatmap": "Flotten-Heatmap",
     "showAccountChars": "Meine Charaktere anzeigen",
     "staleHint": "Systeme abblenden, die im gewählten Intervall nicht aktualisiert wurden, damit alte Kettenreste auf einen Blick erkennbar sind.",
     "exportJson": "↓ Als JSON exportieren",

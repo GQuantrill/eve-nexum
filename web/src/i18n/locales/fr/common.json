@@ -372,6 +372,7 @@
     "activityNpcDelta": "Delta PNJ",
     "fleetHint": "Afficher les membres de la flotte sous forme de points violets sur leur système. Survolez un point pour voir les noms.",
     "showFleetMembers": "Afficher les membres de la flotte",
+    "fleetHeatmap": "Carte de chaleur de flotte",
     "showAccountChars": "Afficher mes personnages",
     "staleHint": "Atténue visuellement les systèmes non mis à jour depuis l'intervalle choisi, pour repérer d'un coup d'œil les résidus de chaîne.",
     "exportJson": "↓ Exporter en JSON",
