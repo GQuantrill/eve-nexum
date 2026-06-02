@@ -395,6 +395,7 @@
 
 .scout-row__meta {
   display: flex;
+  align-items: center;
   gap: 8px;
   color: #8a9ab8;
   font-size: calc(13px * var(--font-scale, 1));
