@@ -246,6 +246,18 @@ export async function migrate() {
     -- position which drops the vertical axis.
     ALTER TABLE IF EXISTS solar_systems ADD COLUMN IF NOT EXISTS pos2d_x DOUBLE PRECISION;
     ALTER TABLE IF EXISTS solar_systems ADD COLUMN IF NOT EXISTS pos2d_y DOUBLE PRECISION;
+    -- Static celestial metadata for the system-info panel, all SDE-derived so it
+    -- never needs a live ESI call once seeded: sun_type is the star's item_types
+    -- name (e.g. "Sun K3 (Yellow Small)"); the *_count columns are tallies from
+    -- mapPlanets/Moons/AsteroidBelts/Stargates. Added here (IF EXISTS) so an
+    -- already-running install gets the columns on boot; they stay NULL until the
+    -- next setup-db re-seed fills them, and the panel falls back to live ESI for
+    -- any system whose counts are still NULL.
+    ALTER TABLE IF EXISTS solar_systems ADD COLUMN IF NOT EXISTS sun_type       TEXT;
+    ALTER TABLE IF EXISTS solar_systems ADD COLUMN IF NOT EXISTS planet_count   INTEGER;
+    ALTER TABLE IF EXISTS solar_systems ADD COLUMN IF NOT EXISTS moon_count     INTEGER;
+    ALTER TABLE IF EXISTS solar_systems ADD COLUMN IF NOT EXISTS belt_count     INTEGER;
+    ALTER TABLE IF EXISTS solar_systems ADD COLUMN IF NOT EXISTS stargate_count INTEGER;
 
     CREATE TABLE IF NOT EXISTS user_events (
       id          BIGSERIAL   PRIMARY KEY,

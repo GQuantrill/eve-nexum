@@ -2998,6 +2998,49 @@ div.system-node__easy-handle {
   &:hover::after { background: #5a9af8; }
 }
 
+/* Vertical divider between the system-info column and the panel-stack; drag to
+   resize the column. Mirrors the horizontal (height) handle above. */
+.system-panel__col-resize {
+  flex-shrink: 0;
+  width: 6px;
+  align-self: stretch;
+  cursor: ew-resize;
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 2px;
+    transform: translateY(-50%);
+    width: 2px;
+    height: 40px;
+    border-radius: 1px;
+    background: #2e4a7a;
+    transition: background 0.15s;
+  }
+
+  &:hover::after { background: #5a9af8; }
+}
+
+/* Slim rail shown when the system-info column is fully collapsed; click to
+   bring it back. The panel-stack fills the rest of the width meanwhile. */
+.system-panel__expand {
+  flex-shrink: 0;
+  align-self: stretch;
+  width: 18px;
+  margin-top: 12px;
+  background: #0d1421;
+  border: 1px solid #1e2740;
+  border-radius: 4px;
+  color: #6a80a0;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+
+  &:hover { background: #16213a; color: #a0ccf8; }
+}
+
 .system-panel__left {
   display: flex;
   flex-direction: column;
@@ -3066,7 +3109,9 @@ div.system-node__easy-handle {
   flex-direction: column;
   gap: 10px;
   font-size: calc(13px * var(--font-scale, 1));
-  width: 400px;
+  /* Fills the (now resizable) system-panel__left column; the column's inline
+     width is what drives the size. */
+  width: 100%;
   padding-bottom: 4px;
 }
 
@@ -3094,6 +3139,47 @@ div.system-node__easy-handle {
   display: flex;
   align-items: center;
   gap: 6px;
+}
+
+/* The clickable part of a collapsible section's label — styled to look exactly
+   like the static label text, just with a caret and a pointer. */
+.sys-info__section-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+  text-transform: inherit;
+  letter-spacing: inherit;
+
+  &:hover { color: #9ab0d0; }
+}
+
+.sys-info__section-caret {
+  font-size: 9px;
+  color: #5a6a85;
+  width: 9px;
+  text-align: center;
+}
+
+/* Sun-type chip on its own line above the celestial counts (so the planet /
+   moon / belt / gate chips share a single row). */
+.sys-info__sun {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: 4px;
+  background: #0d1421;
+  border: 1px solid #1a2535;
+  border-radius: 4px;
+  padding: 3px 8px;
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #c8d0e0;
 }
 
 .sys-info__refresh-btn {
@@ -3188,6 +3274,10 @@ div.system-node__easy-handle {
 .sys-info__celestial-icon {
   color: #7a90a8;
   font-size: calc(13px * var(--font-scale, 1));
+}
+
+.sys-info__celestial-icon--sun {
+  color: #f5c542;
 }
 
 .sys-info__celestial-label {

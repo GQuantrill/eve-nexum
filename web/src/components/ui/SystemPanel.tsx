@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { useSovData } from '../../hooks/useSovData';
-import { useEsiSystem } from '../../hooks/useEsiSystem';
+import { useSystemInfo } from '../../hooks/useSystemInfo';
 import { setDestination, addWaypoint } from '../../api/waypoint';
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import type { DragEndEvent } from '@dnd-kit/core';
@@ -97,9 +97,67 @@ function FlashingSkull({ color }: { color: string }) {
 }
 
 
+// Per-section collapse state for the system-info sections, persisted
+// per-device (like the panel height) so a user's preferred layout sticks.
+const COLLAPSE_PREFIX = 'nexum.sysinfo.collapse.';
+function useSectionCollapse(id: string): [boolean, () => void] {
+  const key = COLLAPSE_PREFIX + id;
+  const [collapsed, setCollapsed] = useState(() => localStorage.getItem(key) === '1');
+  const toggle = () => setCollapsed((c) => {
+    const next = !c;
+    localStorage.setItem(key, next ? '1' : '0');
+    return next;
+  });
+  return [collapsed, toggle];
+}
+
+// A system-info section whose body collapses under a clickable label. The
+// header stays visible (with a caret) so the section can be reopened; an
+// optional `headerExtra` rides alongside the label (e.g. the sov refresh
+// button).
+function InfoSection({
+  id, title, headerExtra, children,
+}: {
+  id: string;
+  title: string;
+  headerExtra?: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  const [collapsed, toggle] = useSectionCollapse(id);
+  return (
+    <div className="sys-info__section">
+      <div className="sys-info__section-label">
+        <button
+          type="button"
+          className="sys-info__section-toggle"
+          onClick={toggle}
+          aria-expanded={!collapsed}
+        >
+          <span className="sys-info__section-caret">{collapsed ? '▸' : '▾'}</span>
+          {title}
+        </button>
+        {headerExtra}
+      </div>
+      {!collapsed && children}
+    </div>
+  );
+}
+
 const HEIGHT_KEY = 'nexum.panelHeight';
+const WIDTH_KEY  = 'nexum.panelInfoWidth';
+const COLLAPSE_KEY = 'nexum.panelInfoCollapsed';
 const MIN_H      = 80;
 const DEFAULT_H  = 300;
+// System-info column width: the previous fixed 400px is the max; users can drag
+// it narrower down to a still-readable minimum, and the panel-stack fills the
+// space freed up (or the whole panel when the column is fully collapsed).
+const MIN_W      = 280;
+const MAX_W      = 400;
+const DEFAULT_W  = 400;
+
+function clampWidth(v: number) {
+  return Math.min(MAX_W, Math.max(MIN_W, v));
+}
 
 // Classes for which a Dotlan #npc_delta map is meaningful. Wormhole and
 // Drifter systems get no link — dotlan has those pages but no NPC data.
@@ -141,12 +199,25 @@ export function SystemPanel() {
   });
   const heightRef = useRef(height);
 
+  const [infoWidth, setInfoWidth] = useState(() => {
+    const v = localStorage.getItem(WIDTH_KEY);
+    return v ? clampWidth(parseInt(v, 10)) : DEFAULT_W;
+  });
+  const infoWidthRef = useRef(infoWidth);
+
+  const [infoCollapsed, setInfoCollapsed] = useState(() => localStorage.getItem(COLLAPSE_KEY) === '1');
+  const toggleInfoCollapsed = () => setInfoCollapsed((c) => {
+    const next = !c;
+    localStorage.setItem(COLLAPSE_KEY, next ? '1' : '0');
+    return next;
+  });
+
   const [waypointStatus, setWaypointStatus] = useState<'idle' | 'ok' | 'err'>('idle');
 
   const sys       = systems.find((s) => s.id === selectedSystemId);
   const sov       = useSovData(sys?.eveSystemId ?? null);
   const standings = useStandings();
-  const esiSys    = useEsiSystem(sys?.eveSystemId ?? null);
+  const esiSys    = useSystemInfo(sys?.eveSystemId ?? null);
   const incursions   = useIncursions();
   const insurgencies = useInsurgency();
   const [customIntel] = useCustomIntel();
@@ -195,6 +266,30 @@ export function SystemPanel() {
     document.addEventListener('mouseup', onUp);
   };
 
+  // Horizontal drag on the divider between the system-info column and the
+  // panel-stack: widen/narrow the info column (clamped MIN_W..MAX_W); the
+  // stack flexes to fill whatever's left.
+  const onColResizeMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const startX = e.clientX;
+    const startW = infoWidthRef.current;
+
+    const onMove = (ev: MouseEvent) => {
+      const next = clampWidth(startW + (ev.clientX - startX));
+      infoWidthRef.current = next;
+      setInfoWidth(next);
+    };
+
+    const onUp = () => {
+      localStorage.setItem(WIDTH_KEY, String(infoWidthRef.current));
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+    };
+
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+  };
+
   const cards: Record<string, React.ReactNode> = {
     notes: (
       <NotesEditor
@@ -214,7 +309,18 @@ export function SystemPanel() {
     <aside className="system-panel" style={{ height }}>
       <div className="system-panel__resize-handle" onMouseDown={onResizeMouseDown} />
 
-      <div className="system-panel__left">
+      {infoCollapsed ? (
+        <button
+          type="button"
+          className="system-panel__expand"
+          onClick={toggleInfoCollapsed}
+          title={t('systemPanel.expandInfo')}
+        >
+          ›
+        </button>
+      ) : (
+      <>
+      <div className="system-panel__left" style={{ width: infoWidth }}>
         <div className="system-panel__header">
           <h2 className="system-panel__title">{sys.name || t('systemPanel.unknownSystem')}</h2>
           <div className="system-panel__actions">
@@ -238,6 +344,7 @@ export function SystemPanel() {
                 </button>
               </>
             )}
+            <button type="button" className="icon-btn" onClick={toggleInfoCollapsed} title={t('systemPanel.collapseInfo')}>‹</button>
             <button type="button" className="icon-btn" onClick={() => selectSystem(null)} title={t('actions.close')}>✕</button>
           </div>
         </div>
@@ -397,82 +504,24 @@ export function SystemPanel() {
             </div>
           )}
 
-          {(sys.regionName || sys.npcType) && (
-            <div className="sys-info__section">
-              <div className="sys-info__section-label">{t('systemPanel.location')}</div>
+          {(sys.regionName || sys.npcType || esiSys?.constellationName) && (
+            <InfoSection id="location" title={t('systemPanel.location')}>
               <div className="sys-info__kv-grid">
                 {sys.regionName    && <><span className="sys-info__kv-key">{t('systemPanel.region')}</span><span className="sys-info__kv-val">{sys.regionName}</span></>}
                 {esiSys?.constellationName && <><span className="sys-info__kv-key">{t('systemPanel.constellation')}</span><span className="sys-info__kv-val">{esiSys.constellationName}</span></>}
                 {sys.npcType       && <><span className="sys-info__kv-key">{t('systemPanel.npc')}</span><span className="sys-info__kv-val">{sys.npcType}</span></>}
               </div>
-            </div>
+            </InfoSection>
           )}
 
-          {(sys.name || sys.eveSystemId) && (
-            <div className="sys-info__section">
-              <div className="sys-info__section-label">{t('systemPanel.links')}</div>
-              <div className="sys-info__links">
-                {/* Dotlan only needs the name. K-space goes to the NPC-delta
-                    map (uses Region + System); j-space and unlinked systems
-                    fall back to the plain /system/<name> URL. */}
-                {sys.name && DOTLAN_CLASSES.has(sys.systemClass) && sys.regionName && (
-                  <Tooltip label={t('systemPanel.openNpcDelta')} placement="right">
-                    <a
-                      href={`https://evemaps.dotlan.net/map/${encodeURIComponent(sys.regionName.replace(/ /g, '_'))}/${encodeURIComponent(sys.name.replace(/ /g, '_'))}#npc_delta`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="sys-info__ext-link"
-                    >
-                      <img
-                        src="/vendor/dotlan.ico"
-                        alt="Dotlan"
-                        className="sys-info__ext-icon"
-                        loading="lazy"
-                      />
-                    </a>
-                  </Tooltip>
-                )}
-                {sys.name && !(DOTLAN_CLASSES.has(sys.systemClass) && sys.regionName) && (
-                  <Tooltip label={t('systemPanel.openDotlan')} placement="right">
-                    <a
-                      href={`https://evemaps.dotlan.net/system/${encodeURIComponent(sys.name.replace(/ /g, '_'))}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="sys-info__ext-link"
-                    >
-                      <img
-                        src="/vendor/dotlan.ico"
-                        alt="Dotlan"
-                        className="sys-info__ext-icon"
-                        loading="lazy"
-                      />
-                    </a>
-                  </Tooltip>
-                )}
-                {sys.eveSystemId && (
-                  <Tooltip label={t('systemPanel.openZkb')} placement="right">
-                    <a
-                      href={`https://zkillboard.com/system/${sys.eveSystemId}/`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="sys-info__ext-link"
-                    >
-                      <img
-                        src="/vendor/zkillboard-wreck.png"
-                        alt="zKillboard"
-                        className="sys-info__ext-icon"
-                        loading="lazy"
-                      />
-                    </a>
-                  </Tooltip>
-                )}
-              </div>
-            </div>
-          )}
-
-          {esiSys && (esiSys.planetCount > 0 || esiSys.moonCount > 0 || esiSys.beltCount > 0 || esiSys.stargateCount > 0) && (
-            <div className="sys-info__section">
-              <div className="sys-info__section-label">{t('systemPanel.celestials')}</div>
+          {esiSys && (esiSys.sunType || esiSys.planetCount > 0 || esiSys.moonCount > 0 || esiSys.beltCount > 0 || esiSys.stargateCount > 0) && (
+            <InfoSection id="celestials" title={t('systemPanel.celestials')}>
+              {esiSys.sunType && (
+                <div className="sys-info__sun" title={t('systemPanel.sunType')}>
+                  <span className="sys-info__celestial-icon sys-info__celestial-icon--sun">☀</span>
+                  <span>{esiSys.sunType}</span>
+                </div>
+              )}
               <div className="sys-info__celestials">
                 {esiSys.planetCount > 0 && (
                   <div className="sys-info__celestial">
@@ -503,15 +552,15 @@ export function SystemPanel() {
                   </div>
                 )}
               </div>
-            </div>
+            </InfoSection>
           )}
 
           {sov && (sov.alliance || sov.corp || sov.faction) && (
-            <div className="sys-info__section">
-              <div className="sys-info__section-label">
-                {t('systemPanel.sovereignty')}
-                <StandingsRefreshButton standings={standings} />
-              </div>
+            <InfoSection
+              id="sov"
+              title={t('systemPanel.sovereignty')}
+              headerExtra={<StandingsRefreshButton standings={standings} />}
+            >
             <div className="sys-info__sov-block">
               {sov.alliance && sov.allianceId !== undefined && (
                 <div className="sys-info__row sys-info__sov">
@@ -553,11 +602,64 @@ export function SystemPanel() {
                 </div>
               )}
             </div>
-            </div>
+            </InfoSection>
+          )}
+
+          {(sys.name || sys.eveSystemId) && (
+            <InfoSection id="links" title={t('systemPanel.links')}>
+              <div className="sys-info__links">
+                {/* Dotlan only needs the name. K-space goes to the NPC-delta
+                    map (uses Region + System); j-space and unlinked systems
+                    fall back to the plain /system/<name> URL. */}
+                {sys.name && DOTLAN_CLASSES.has(sys.systemClass) && sys.regionName && (
+                  <Tooltip label={t('systemPanel.openNpcDelta')} placement="right">
+                    <a
+                      href={`https://evemaps.dotlan.net/map/${encodeURIComponent(sys.regionName.replace(/ /g, '_'))}/${encodeURIComponent(sys.name.replace(/ /g, '_'))}#npc_delta`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="sys-info__ext-link"
+                    >
+                      <img src="/vendor/dotlan.ico" alt="Dotlan" className="sys-info__ext-icon" loading="lazy" />
+                    </a>
+                  </Tooltip>
+                )}
+                {sys.name && !(DOTLAN_CLASSES.has(sys.systemClass) && sys.regionName) && (
+                  <Tooltip label={t('systemPanel.openDotlan')} placement="right">
+                    <a
+                      href={`https://evemaps.dotlan.net/system/${encodeURIComponent(sys.name.replace(/ /g, '_'))}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="sys-info__ext-link"
+                    >
+                      <img src="/vendor/dotlan.ico" alt="Dotlan" className="sys-info__ext-icon" loading="lazy" />
+                    </a>
+                  </Tooltip>
+                )}
+                {sys.eveSystemId && (
+                  <Tooltip label={t('systemPanel.openZkb')} placement="right">
+                    <a
+                      href={`https://zkillboard.com/system/${sys.eveSystemId}/`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="sys-info__ext-link"
+                    >
+                      <img src="/vendor/zkillboard-wreck.png" alt="zKillboard" className="sys-info__ext-icon" loading="lazy" />
+                    </a>
+                  </Tooltip>
+                )}
+              </div>
+            </InfoSection>
           )}
 
         </div>
       </div>
+      <div
+        className="system-panel__col-resize"
+        onMouseDown={onColResizeMouseDown}
+        title={t('systemPanel.resizeInfo')}
+      />
+      </>
+      )}
 
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={panelOrder} strategy={verticalListSortingStrategy}>

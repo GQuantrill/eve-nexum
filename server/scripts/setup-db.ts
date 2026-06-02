@@ -98,11 +98,14 @@ async function main() {
   const constellationRegion = await importRegions(zip);
   await importConstellations(zip, constellationRegion);
   await importSolarSystems(zip, whMap, constellationRegion);
-  await importStars(zip);
   await importStargates(zip);
   await importCategories(zip);
   await importGroups(zip);
   await importTypes(zip);
+  // After importTypes: importStars resolves each star's typeID to its item_types
+  // name for sun_type, and importCelestialCounts needs the gates from above.
+  await importStars(zip);
+  await importCelestialCounts(zip);
   await importDogmaAttributes(zip);
   await importItemDogma(zip);
   await importFactions(zip);
@@ -239,6 +242,14 @@ async function createTables() {
     -- doesn't agree with it). Drives the ★ icon on system nodes. Set by
     -- importStars from mapStars.jsonl, so it refreshes on every SDE re-seed.
     ALTER TABLE solar_systems ADD COLUMN IF NOT EXISTS is_a0 BOOLEAN NOT NULL DEFAULT FALSE;
+    -- Static celestial metadata for the system-info panel (sun type + planet /
+    -- moon / belt / stargate counts), filled by importSolarSystems, importStars
+    -- and importCelestialCounts. Lets the panel render without a live ESI call.
+    ALTER TABLE solar_systems ADD COLUMN IF NOT EXISTS sun_type       TEXT;
+    ALTER TABLE solar_systems ADD COLUMN IF NOT EXISTS planet_count   INTEGER;
+    ALTER TABLE solar_systems ADD COLUMN IF NOT EXISTS moon_count     INTEGER;
+    ALTER TABLE solar_systems ADD COLUMN IF NOT EXISTS belt_count     INTEGER;
+    ALTER TABLE solar_systems ADD COLUMN IF NOT EXISTS stargate_count INTEGER;
 
     CREATE TABLE IF NOT EXISTS map_stargates (
       id                    INTEGER PRIMARY KEY,
@@ -524,7 +535,7 @@ async function importConstellations(zip: Zip, constellationRegion: Map<number, n
 async function importSolarSystems(zip: Zip, whMap: Map<number, WhData>, constellationRegion: Map<number, number>) {
   process.stdout.write('Importing solar systems... ');
   const lines   = await readJsonl(zip, 'mapSolarSystems.jsonl');
-  const systems: [number, string, number, number|null, number|null, string|null, string|null, string[], number|null, number|null, number|null, number|null, number|null][] = [];
+  const systems: [number, string, number, number|null, number|null, string|null, string|null, string[], number|null, number|null, number|null, number|null, number|null, number][] = [];
 
   for (const line of lines) {
     try {
@@ -546,6 +557,8 @@ async function importSolarSystems(zip: Zip, whMap: Map<number, WhData>, constell
       const p2              = o.position2D;
       const pos2dX          = typeof p2?.x === 'number' ? p2.x : null;
       const pos2dY          = typeof p2?.y === 'number' ? p2.y : null;
+      // Planet count is right here in the system record — no extra file needed.
+      const planetCount     = Array.isArray(o.planetIDs) ? o.planetIDs.length : 0;
 
       systems.push([
         id, name, security,
@@ -554,6 +567,7 @@ async function importSolarSystems(zip: Zip, whMap: Map<number, WhData>, constell
         wh?.effect  ?? null,
         wh?.statics ?? [],
         posX, posY, posZ, pos2dX, pos2dY,
+        planetCount,
       ]);
     } catch { /* skip */ }
   }
@@ -561,13 +575,13 @@ async function importSolarSystems(zip: Zip, whMap: Map<number, WhData>, constell
   const BATCH = 500;
   for (let i = 0; i < systems.length; i += BATCH) {
     const batch  = systems.slice(i, i + BATCH);
-    const cols   = 13;
+    const cols   = 14;
     const values = batch.map((_, j) =>
       `(${Array.from({ length: cols }, (_, k) => `$${j*cols+k+1}`).join(',')})`
     ).join(',');
 
     await db.query(
-      `INSERT INTO solar_systems (id, name, security, constellation_id, region_id, class, effect, statics, pos_x, pos_y, pos_z, pos2d_x, pos2d_y)
+      `INSERT INTO solar_systems (id, name, security, constellation_id, region_id, class, effect, statics, pos_x, pos_y, pos_z, pos2d_x, pos2d_y, planet_count)
        VALUES ${values}
        ON CONFLICT (id) DO UPDATE SET
          name             = EXCLUDED.name,
@@ -581,7 +595,8 @@ async function importSolarSystems(zip: Zip, whMap: Map<number, WhData>, constell
          pos_y            = EXCLUDED.pos_y,
          pos_z            = EXCLUDED.pos_z,
          pos2d_x          = EXCLUDED.pos2d_x,
-         pos2d_y          = EXCLUDED.pos2d_y`,
+         pos2d_y          = EXCLUDED.pos2d_y,
+         planet_count     = EXCLUDED.planet_count`,
       batch.flatMap(s => s),
     );
     process.stdout.write(`\r  ${Math.min(i + BATCH, systems.length)} / ${systems.length}  `);
@@ -589,24 +604,111 @@ async function importSolarSystems(zip: Zip, whMap: Map<number, WhData>, constell
   console.log(`\n  ${systems.length} solar systems`);
 }
 
-// Flag systems with an A0-class star (typeID 3801). Reads mapStars.jsonl and
-// sets solar_systems.is_a0. Reset-then-set so a re-seed reflects the latest
-// classification exactly (no stale flags if CCP ever reclassifies a star).
+// Reads mapStars.jsonl and writes two things back onto solar_systems:
+//   • is_a0   — true for the "Sun A0 (Blue Small)" star (typeID 3801), drives
+//               the ★ node icon. Reset-then-set so a re-seed reflects the latest
+//               classification exactly (no stale flags if CCP reclassifies).
+//   • sun_type — the star's item_types name (e.g. "Sun K3 (Yellow Small)"),
+//               shown in the system-info panel. Resolved via a join on the
+//               star's typeID, so this MUST run after importTypes.
 async function importStars(zip: Zip) {
-  process.stdout.write('Importing A0 stars... ');
+  process.stdout.write('Importing stars (A0 flags + sun types)... ');
   const lines = await readJsonl(zip, 'mapStars.jsonl');
-  const ids: number[] = [];
+  const a0Ids: number[]   = [];
+  const sysIds: number[]  = [];
+  const typeIds: number[] = [];
   for (const line of lines) {
     try {
-      const o = JSON.parse(line);
-      if (o.typeID === 3801 && o.solarSystemID) ids.push(o.solarSystemID as number);
+      const o   = JSON.parse(line);
+      const sys = o.solarSystemID as number | undefined;
+      const typ = o.typeID as number | undefined;
+      if (!sys) continue;
+      if (typ === 3801) a0Ids.push(sys);
+      if (typ) { sysIds.push(sys); typeIds.push(typ); }
     } catch { /* skip */ }
   }
+
   await db.query('UPDATE solar_systems SET is_a0 = FALSE WHERE is_a0 = TRUE');
-  if (ids.length) {
-    await db.query('UPDATE solar_systems SET is_a0 = TRUE WHERE id = ANY($1::int[])', [ids]);
+  if (a0Ids.length) {
+    await db.query('UPDATE solar_systems SET is_a0 = TRUE WHERE id = ANY($1::int[])', [a0Ids]);
   }
-  console.log(`${ids.length} A0 systems`);
+
+  // Resolve typeID → item_types.name and stamp sun_type. Batched so the
+  // unnested parameter arrays stay a sane size.
+  let sunSet = 0;
+  const B = 2000;
+  for (let i = 0; i < sysIds.length; i += B) {
+    const r = await db.query(
+      `UPDATE solar_systems s
+          SET sun_type = it.name
+         FROM (SELECT unnest($1::int[]) AS sys, unnest($2::int[]) AS typ) m
+         JOIN item_types it ON it.id = m.typ
+        WHERE s.id = m.sys`,
+      [sysIds.slice(i, i + B), typeIds.slice(i, i + B)],
+    );
+    sunSet += r.rowCount ?? 0;
+  }
+  console.log(`${a0Ids.length} A0, ${sunSet} sun types`);
+}
+
+// Per-system celestial counts for the system-info panel. planet_count is set
+// inline by importSolarSystems; this fills moon_count + belt_count (tallied
+// from the mapMoons / mapAsteroidBelts records, which are large — hundreds of
+// thousands of rows — so we extract solarSystemID with a regex instead of
+// JSON.parse) and stargate_count (straight from the already-imported gates).
+// Runs after importStargates. All static, so it only re-runs on a re-seed.
+async function importCelestialCounts(zip: Zip) {
+  process.stdout.write('Counting celestials (moons, belts, gates)... ');
+  const moonCounts = tallyBySystem(await readJsonl(zip, 'mapMoons.jsonl'));
+  await applyCounts('moon_count', moonCounts);
+  const beltCounts = tallyBySystem(await readJsonl(zip, 'mapAsteroidBelts.jsonl'));
+  await applyCounts('belt_count', beltCounts);
+
+  await db.query(`
+    UPDATE solar_systems s
+       SET stargate_count = c.n
+      FROM (SELECT system_id, COUNT(*)::int AS n FROM map_stargates GROUP BY system_id) c
+     WHERE s.id = c.system_id`);
+
+  // Systems with no moons / belts / gates should read 0 (seeded), not NULL
+  // (which the panel treats as "fall back to ESI"). planet_count is already
+  // non-null for every system from importSolarSystems.
+  await db.query(`
+    UPDATE solar_systems
+       SET moon_count     = COALESCE(moon_count, 0),
+           belt_count     = COALESCE(belt_count, 0),
+           stargate_count = COALESCE(stargate_count, 0)`);
+  console.log(`${moonCounts.size} w/ moons, ${beltCounts.size} w/ belts`);
+}
+
+// Tally records by their solarSystemID. Pulls the id out with a regex to skip
+// JSON.parse over the giant moon/belt files; falls back to a parse on a miss.
+function tallyBySystem(lines: string[]): Map<number, number> {
+  const counts = new Map<number, number>();
+  for (const line of lines) {
+    const m   = line.match(/"solarSystemID":\s*(\d+)/);
+    let   sys = m ? parseInt(m[1], 10) : 0;
+    if (!sys) { try { sys = JSON.parse(line).solarSystemID ?? 0; } catch { sys = 0; } }
+    if (sys) counts.set(sys, (counts.get(sys) ?? 0) + 1);
+  }
+  return counts;
+}
+
+// Bulk-write a single count column from a system→count map. `col` is a
+// hard-coded literal (never user input), so interpolating it is safe.
+async function applyCounts(col: 'moon_count' | 'belt_count', counts: Map<number, number>) {
+  const sysIds = Array.from(counts.keys());
+  const vals   = Array.from(counts.values());
+  const B = 2000;
+  for (let i = 0; i < sysIds.length; i += B) {
+    await db.query(
+      `UPDATE solar_systems s
+          SET ${col} = m.n
+         FROM (SELECT unnest($1::int[]) AS sys, unnest($2::int[]) AS n) m
+        WHERE s.id = m.sys`,
+      [sysIds.slice(i, i + B), vals.slice(i, i + B)],
+    );
+  }
 }
 
 async function importStargates(zip: Zip) {

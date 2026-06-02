@@ -3,9 +3,77 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { db } from '../db.js';
 import { createLogger } from '../utils/logger.js';
+import { esiFetch } from '../utils/esi.js';
 
 export const systemsRouter = Router();
 const log = createLogger('systems');
+
+const ESI = 'https://esi.evetech.net/latest';
+
+// Static celestial metadata for the system-info panel. Served from the SDE
+// columns on solar_systems (filled by setup-db); for an install that hasn't
+// re-seeded since these columns were added, the counts are NULL and we fall
+// back to live ESI once per system, caching the result for the process lifetime.
+interface Celestials {
+  securityStatus:    number | null;
+  constellationName: string | null;
+  sunType:           string | null;
+  planetCount:       number;
+  moonCount:         number;
+  beltCount:         number;
+  stargateCount:     number;
+}
+
+const celestialCache    = new Map<number, Celestials>();
+const celestialInflight = new Map<number, Promise<Celestials | null>>();
+
+// Resolve a star's typeID to its SDE name (e.g. "Sun K3 (Yellow Small)"),
+// matching how setup-db stamps sun_type so the ESI fallback reads identically.
+async function resolveSunTypeName(typeId: number): Promise<string | null> {
+  const { rows } = await db.query<{ name: string }>(`SELECT name FROM item_types WHERE id = $1`, [typeId]);
+  return rows[0]?.name ?? null;
+}
+
+// Live-ESI fallback: one /universe/systems call for the counts + star_id, then
+// one /universe/stars call for the sun type. security + constellation already
+// came from our DB, so they're passed in rather than re-fetched.
+async function fetchCelestialsFromEsi(
+  id: number,
+  base: { securityStatus: number | null; constellationName: string | null },
+): Promise<Celestials | null> {
+  try {
+    const sysRes = await esiFetch(`${ESI}/universe/systems/${id}/?datasource=tranquility`);
+    if (!sysRes.ok) return null;
+    const sys = await sysRes.json() as {
+      planets?: Array<{ moons?: number[]; asteroid_belts?: number[] }>;
+      stargates?: number[];
+      star_id?: number;
+      security_status?: number;
+    };
+    let sunType: string | null = null;
+    if (sys.star_id) {
+      const starRes = await esiFetch(`${ESI}/universe/stars/${sys.star_id}/?datasource=tranquility`);
+      if (starRes.ok) {
+        const star = await starRes.json() as { type_id?: number; spectral_class?: string };
+        sunType = star.type_id
+          ? (await resolveSunTypeName(star.type_id)) ?? star.spectral_class ?? null
+          : star.spectral_class ?? null;
+      }
+    }
+    return {
+      securityStatus:    base.securityStatus ?? sys.security_status ?? null,
+      constellationName: base.constellationName,
+      sunType,
+      planetCount:   sys.planets?.length ?? 0,
+      moonCount:     sys.planets?.reduce((n, p) => n + (p.moons?.length ?? 0), 0) ?? 0,
+      beltCount:     sys.planets?.reduce((n, p) => n + (p.asteroid_belts?.length ?? 0), 0) ?? 0,
+      stargateCount: sys.stargates?.length ?? 0,
+    };
+  } catch (err) {
+    log.warn('ESI celestials fallback failed', err);
+    return null;
+  }
+}
 
 // Solar systems with A0-class stars ("Sun A0 (Blue Small)", typeID 3801) drive
 // the ★ icon on system nodes. The set is flagged on solar_systems.is_a0 by the
@@ -122,6 +190,69 @@ systemsRouter.get('/search', async (req, res) => {
     return res.json(rows);
   } catch (err) {
     log.error('Query failed:', err);
+    return res.status(500).json({ error: 'Database query failed' });
+  }
+});
+
+// GET /api/systems/:id/celestials — static celestial metadata for the panel
+// (security, constellation, sun type, planet/moon/belt/gate counts). DB-first;
+// live-ESI fallback (cached) only for systems not yet filled by a re-seed.
+systemsRouter.get('/:id(\\d+)/celestials', async (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  try {
+    const { rows } = await db.query<{
+      securityStatus: string | null; sunType: string | null;
+      planetCount: number | null; moonCount: number | null;
+      beltCount: number | null; stargateCount: number | null;
+      constellationName: string | null;
+    }>(
+      `SELECT s.security       AS "securityStatus",
+              s.sun_type       AS "sunType",
+              s.planet_count   AS "planetCount",
+              s.moon_count     AS "moonCount",
+              s.belt_count     AS "beltCount",
+              s.stargate_count AS "stargateCount",
+              c.name           AS "constellationName"
+         FROM solar_systems s
+         LEFT JOIN map_constellations c ON c.id = s.constellation_id
+        WHERE s.id = $1`,
+      [id],
+    );
+    const row = rows[0];
+    if (!row) return res.status(404).json({ error: 'System not found' });
+
+    const securityStatus    = row.securityStatus != null ? Number(row.securityStatus) : null;
+    const constellationName = row.constellationName ?? null;
+
+    // planet_count is the canary: importSolarSystems sets it for every system,
+    // so a non-null value means this row was seeded and we serve from the DB.
+    if (row.planetCount != null) {
+      return res.json({
+        securityStatus,
+        constellationName,
+        sunType:       row.sunType ?? null,
+        planetCount:   row.planetCount,
+        moonCount:     row.moonCount   ?? 0,
+        beltCount:     row.beltCount    ?? 0,
+        stargateCount: row.stargateCount ?? 0,
+      } satisfies Celestials);
+    }
+
+    // Un-reseeded install: fill counts + sun type from ESI once, then cache.
+    const cached = celestialCache.get(id);
+    if (cached) return res.json(cached);
+    let inflight = celestialInflight.get(id);
+    if (!inflight) {
+      inflight = fetchCelestialsFromEsi(id, { securityStatus, constellationName })
+        .finally(() => celestialInflight.delete(id));
+      celestialInflight.set(id, inflight);
+    }
+    const result = await inflight;
+    if (!result) return res.status(502).json({ error: 'Celestials unavailable' });
+    celestialCache.set(id, result);
+    return res.json(result);
+  } catch (err) {
+    log.error('Celestials query failed:', err);
     return res.status(500).json({ error: 'Database query failed' });
   }
 });
