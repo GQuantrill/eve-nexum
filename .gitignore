@@ -43,6 +43,3 @@ server/data/*.zip
 .claude/
 
 changes.md
-
-# Local ops scripts kept outside the public OSS distribution.
-scripts/backup-db.sh

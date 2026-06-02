@@ -25,6 +25,7 @@
   - [Updating the SDE](#updating-the-sde)
   - [Refreshing wormhole types](#refreshing-wormhole-types)
   - [Upgrading an existing deployment](#upgrading-an-existing-deployment)
+  - [Backup & restore](#backup--restore)
 - [Corp mode](#corp-mode)
   - [Allowing multiple corporations](#allowing-multiple-corporations)
   - [How corp map visibility works](#how-corp-map-visibility-works)
@@ -324,6 +325,27 @@ Pulling a new Nexum release into a running instance:
   ```bash
   docker compose build server && docker compose up -d
   ```
+
+#### Backup & restore
+
+Two scripts under `scripts/` handle the Postgres database for a docker-compose deployment. Both read `PG_USER` / `PG_DB` from your `.env`, so they stay in sync with the running stack. Paths are configurable via env vars (`NEXUM_PROJECT_DIR`, `NEXUM_BACKUP_DIR`, `NEXUM_KEEP`, `NEXUM_FORCE`).
+
+**Backup** — `scripts/backup-db.sh` runs `pg_dump`, gzips it, writes atomically, and prunes to the last `NEXUM_KEEP` (default 7). Safe under cron:
+```bash
+# one-off
+./scripts/backup-db.sh
+# daily at 05:00, as the user that owns the compose project
+0 5 * * *  /opt/eve-nexum/scripts/backup-db.sh >> /var/log/nexum-backup.log 2>&1
+```
+
+**Restore** — `scripts/restore-db.sh` restores a dump (a given file, or the most recent in `NEXUM_BACKUP_DIR`). It's **destructive** (the dumps are `--clean --if-exists`, so it drops & recreates the dumped objects), so it prompts for confirmation and stops the server for the duration:
+```bash
+./scripts/restore-db.sh                                   # newest backup
+./scripts/restore-db.sh /var/backups/nexum/nexum-2026-06-02.sql.gz
+NEXUM_FORCE=1 ./scripts/restore-db.sh <file>              # skip the prompt (cron/automation)
+```
+
+The dump includes the EVE SDE tables (systems, stargates, dogma, …) alongside your user data — simplest and self-contained. The app schema applies on the next server boot and the SDE re-seeds if missing, so a restore heals itself even against a newer build.
 
 ---
 
