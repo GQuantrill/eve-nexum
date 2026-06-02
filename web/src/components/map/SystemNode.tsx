@@ -226,7 +226,7 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
         {isCurrent && <span className="system-node__current-dot" />}
         {fleetHere && fleetHere.length > 0 && (
           <span className="system-node__fleet-dot-wrap">
-            <span className="system-node__fleet-dot" />
+            <span className="system-node__fleet-count">{fleetHere.length}</span>
             <span className="system-node__fleet-tooltip">
               {fleetHere.map((m) => (
                 <span key={m.characterId} className="system-node__fleet-tooltip-row">
@@ -238,7 +238,7 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
         )}
         {accountHere && (
           <span className="system-node__alt-dot-wrap">
-            <span className="system-node__alt-dot" />
+            <span className="system-node__alt-count">{accountHere.length}</span>
             <span className="system-node__alt-tooltip">
               {accountHere.map((c) => (
                 <span key={c.charId} className="system-node__alt-tooltip-row">

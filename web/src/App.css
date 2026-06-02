@@ -2072,12 +2072,26 @@
   margin-right: 4px;
 }
 
-.system-node__fleet-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #c084fc;
-  box-shadow: 0 0 5px #c084fc;
+/* Count badge: how many fleet members are in this system, inside a purple
+   ring. Circular for a single digit, expands to a pill for larger counts
+   (fleets run big). */
+.system-node__fleet-count {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  border: 1.5px solid #c084fc;
+  background: rgba(192, 132, 252, 0.15);
+  box-shadow: 0 0 5px rgba(192, 132, 252, 0.5);
+  color: #e7d6ff;
+  font-size: calc(11px * var(--font-scale, 1));
+  font-weight: 600;
+  line-height: 18px;
+  font-variant-numeric: tabular-nums;
   flex-shrink: 0;
   cursor: help;
 }
@@ -2121,12 +2135,24 @@
   align-items: center;
   margin-right: 4px;
 }
-.system-node__alt-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #f5b96a;
-  box-shadow: 0 0 5px #f5b96a;
+/* Count badge: how many of your alts are in this system, inside a gold ring. */
+.system-node__alt-count {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  border: 1.5px solid #f5b96a;
+  background: rgba(245, 185, 106, 0.15);
+  box-shadow: 0 0 5px rgba(245, 185, 106, 0.5);
+  color: #f5e3c8;
+  font-size: calc(11px * var(--font-scale, 1));
+  font-weight: 600;
+  line-height: 18px;
+  font-variant-numeric: tabular-nums;
   flex-shrink: 0;
   cursor: help;
 }
