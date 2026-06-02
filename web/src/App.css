@@ -1945,20 +1945,22 @@
    ring. Circular for a single digit, expands to a pill for larger counts
    (fleets run big). */
 .system-node__fleet-count {
+  box-sizing: border-box;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 16px;
-  height: 16px;
-  padding: 0 4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
   border-radius: 999px;
   border: 1.5px solid #c084fc;
   background: rgba(192, 132, 252, 0.15);
   box-shadow: 0 0 5px rgba(192, 132, 252, 0.5);
   color: #e7d6ff;
-  font-size: calc(10px * var(--font-scale, 1));
+  font-size: calc(11px * var(--font-scale, 1));
   font-weight: 600;
-  line-height: 1;
+  line-height: 18px;
+  font-variant-numeric: tabular-nums;
   flex-shrink: 0;
   cursor: help;
 }
@@ -2004,20 +2006,22 @@
 }
 /* Count badge: how many of your alts are in this system, inside a gold ring. */
 .system-node__alt-count {
+  box-sizing: border-box;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 16px;
-  height: 16px;
-  padding: 0 4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
   border-radius: 999px;
   border: 1.5px solid #f5b96a;
   background: rgba(245, 185, 106, 0.15);
   box-shadow: 0 0 5px rgba(245, 185, 106, 0.5);
   color: #f5e3c8;
-  font-size: calc(10px * var(--font-scale, 1));
+  font-size: calc(11px * var(--font-scale, 1));
   font-weight: 600;
-  line-height: 1;
+  line-height: 18px;
+  font-variant-numeric: tabular-nums;
   flex-shrink: 0;
   cursor: help;
 }
