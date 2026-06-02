@@ -122,6 +122,10 @@ function formatDelay(sec: number): string {
 // Order the type-filter chips most-useful-first. Covers every SigType.
 const SIG_TYPE_FILTER_ORDER: SigType[] = ['wormhole', 'data', 'relic', 'gas', 'ore', 'combat', 'unknown'];
 
+// Signature-type <select> options, alphabetical by label. Used for both the
+// per-row type picker and the bulk "set type" dropdown.
+const SIG_TYPE_OPTIONS: SigType[] = ['combat', 'data', 'gas', 'ore', 'relic', 'unknown', 'wormhole'];
+
 // Single module-level 1 s tick shared across every ElapsedCell instance.
 // Previously each SignaturePane drove a state update every second, which
 // re-rendered every row including its embedded MDEditor — extremely expensive.
@@ -630,13 +634,9 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                 aria-label={t('signatures.setTypeAria')}
               >
                 <option value="">{t('signatures.setType', { count: selected.size })}</option>
-                <option value="unknown">{t('sigType.unknown')}</option>
-                <option value="wormhole">{t('sigType.wormhole')}</option>
-                <option value="data">{t('sigType.data')}</option>
-                <option value="relic">{t('sigType.relic')}</option>
-                <option value="combat">{t('sigType.combat')}</option>
-                <option value="gas">{t('sigType.gas')}</option>
-                <option value="ore">{t('sigType.ore')}</option>
+                {SIG_TYPE_OPTIONS.map((type) => (
+                  <option key={type} value={type}>{t(`sigType.${type}`)}</option>
+                ))}
               </select>
               <button className="sig-toolbar-btn sig-toolbar-btn--danger" onClick={deleteSelected}>
                 {t('signatures.deleteSelected', { count: selected.size })}
@@ -787,7 +787,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                       value={sig.sigType}
                       onChange={(e) => updateSig(sig.id, { sigType: e.target.value as SigType })}
                     >
-                      {(Object.keys(SIG_TYPE_LABELS) as SigType[]).map((st) => (
+                      {SIG_TYPE_OPTIONS.map((st) => (
                         <option key={st} value={st}>{sigTypeLabel(st)}</option>
                       ))}
                     </select>
