@@ -14,6 +14,7 @@ import { ConfirmModal } from './ConfirmModal';
 import { CreateMapModal } from './CreateMapModal';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { CharacterSwitcher } from './CharacterSwitcher';
+import { HeatmapMenu } from './HeatmapMenu';
 import { useProximityAlerts } from '../../hooks/useProximityAlerts';
 import {
   WarningIcon, SkullIcon, XCircleIcon, QuestionIcon,
@@ -364,6 +365,8 @@ export function Toolbar() {
       >
         <ChartBarIcon size={18} weight="regular" />
       </button>
+
+      <HeatmapMenu />
 
       <button
         className={`toolbar__toggle toolbar__toggle--icon toolbar__toggle--prominent${mapOptionsOpen ? ' toolbar__toggle--on' : ''}`}

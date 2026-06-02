@@ -1016,6 +1016,46 @@
 .toolbar__toggle-led--on  { background: #3ddc84; box-shadow: 0 0 4px #3ddc8466; }
 .toolbar__toggle-led--off { background: #e05a5a; box-shadow: 0 0 4px #e05a5a66; }
 
+/* Heatmap toolbar control — icon button + horizontal popover (type + intensity). */
+.heatmap-menu { position: relative; display: inline-flex; }
+.heatmap-menu__pop {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  background: #0d1117;
+  border: 1px solid #1e2740;
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+  padding: 8px 10px;
+}
+.heatmap-menu__label { color: #8a9ab5; font-size: calc(12px * var(--font-scale, 1)); }
+.heatmap-menu__select {
+  background: #0a0e1a;
+  border: 1px solid #1e2740;
+  border-radius: 4px;
+  color: #c8d0e0;
+  font-family: inherit;
+  font-size: calc(12px * var(--font-scale, 1));
+  padding: 3px 6px;
+  cursor: pointer;
+}
+.heatmap-menu__slider { width: 110px; }
+.heatmap-menu__value {
+  background: transparent;
+  border: 1px solid #1e2740;
+  border-radius: 4px;
+  color: #c8d0e0;
+  font-size: calc(11px * var(--font-scale, 1));
+  padding: 2px 6px;
+  min-width: 46px;
+  cursor: pointer;
+}
+
 /* ── Generic instant tooltip ─────────────────────────────── */
 [data-tooltip] {
   position: relative;
