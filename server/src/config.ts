@@ -59,11 +59,21 @@ const SDE_CHECK_UTC   = /^\d{1,2}:\d{2}$/.test(process.env.SDE_CHECK_UTC ?? '')
   : '11:30';
 
 const isProd = process.env.NODE_ENV === 'production';
+const isDev  = process.env.NODE_ENV === 'development';
 
-// Session secret must be explicitly set in production — a guessable default
-// is a critical session-forgery risk.
-if (isProd && !process.env.SESSION_SECRET) {
-  console.error('FATAL: SESSION_SECRET must be set in production');
+// Session secret must be explicitly set unless we're explicitly in development
+// — the guessable dev fallback below is a session-forgery risk, so it must
+// never apply just because NODE_ENV happens to be unset on a real deployment.
+if (!isDev && !process.env.SESSION_SECRET) {
+  console.error('FATAL: SESSION_SECRET must be set (NODE_ENV is not "development")');
+  process.exit(1);
+}
+
+// FRONTEND_URL builds post-login redirects and seeds the CSRF origin check, so
+// a malformed value would silently break auth / weaken that check. Validate the
+// effective value (default is the local dev URL) before anything uses it.
+if (!URL.canParse(process.env.FRONTEND_URL ?? 'http://localhost:5174')) {
+  console.error('FATAL: FRONTEND_URL is not a valid URL');
   process.exit(1);
 }
 
