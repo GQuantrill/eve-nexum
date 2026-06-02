@@ -299,6 +299,7 @@
     "closeOptions": "マップオプションを閉じる",
     "sections": {
       "mapOptions": "マップオプション",
+      "mapControls": "マップ操作",
       "systemOptions": "星系オプション",
       "connections": "接続",
       "route": "ルート",
@@ -314,6 +315,7 @@
       "shortcuts": "ショートカット"
     },
     "snapToGrid": "グリッドに合わせる",
+    "invertZoom": "ズーム反転（マウス/トラックパッド）",
     "minimap": "ミニマップ",
     "position": "位置",
     "minimapPos": {

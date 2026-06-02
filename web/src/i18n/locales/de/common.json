@@ -299,6 +299,7 @@
     "closeOptions": "Kartenoptionen schließen",
     "sections": {
       "mapOptions": "Kartenoptionen",
+      "mapControls": "Kartensteuerung",
       "systemOptions": "Systemoptionen",
       "connections": "Verbindungen",
       "route": "Route",
@@ -314,6 +315,7 @@
       "shortcuts": "Tastenkürzel"
     },
     "snapToGrid": "Am Raster ausrichten",
+    "invertZoom": "Zoom umkehren (Maus/Trackpad)",
     "minimap": "Minikarte",
     "position": "Position",
     "minimapPos": {

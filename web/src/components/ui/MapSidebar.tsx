@@ -33,11 +33,13 @@ import type { WormholeMap } from "../../types";
 function SettingToggle({
   settingKey,
   label,
+  defaultOn = true,
 }: {
   settingKey: string;
   label: string;
+  defaultOn?: boolean;
 }) {
-  const [enabled, setEnabled] = useUserSetting<boolean>(settingKey, true);
+  const [enabled, setEnabled] = useUserSetting<boolean>(settingKey, defaultOn);
   return (
     <label className="map-sidebar__row map-sidebar__toggle-row">
       <span className="map-sidebar__label">{label}</span>
@@ -93,6 +95,7 @@ function CollapsibleSection({
 // shared "which section is open" setting; null means everything collapsed.
 type SectionId =
   | "mapOptions"
+  | "mapControls"
   | "systemOptions"
   | "connections"
   | "route"
@@ -723,6 +726,14 @@ export function MapSidebar() {
               </button>
             </div>
           </div>
+        </CollapsibleSection>
+
+        <CollapsibleSection title={t("mapSidebar.sections.mapControls")} {...sectionProps("mapControls")}>
+          <SettingToggle
+            settingKey="nexum.map.invertZoom"
+            label={t("mapSidebar.invertZoom")}
+            defaultOn={false}
+          />
         </CollapsibleSection>
 
         <CollapsibleSection

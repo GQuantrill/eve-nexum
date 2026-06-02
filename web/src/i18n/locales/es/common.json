@@ -299,6 +299,7 @@
     "closeOptions": "Cerrar opciones de mapa",
     "sections": {
       "mapOptions": "Opciones de mapa",
+      "mapControls": "Controles del mapa",
       "systemOptions": "Opciones de sistema",
       "connections": "Conexiones",
       "route": "Ruta",
@@ -314,6 +315,7 @@
       "shortcuts": "Atajos"
     },
     "snapToGrid": "Ajustar a la cuadrícula",
+    "invertZoom": "Invertir zoom (ratón/trackpad)",
     "minimap": "Minimapa",
     "position": "Posición",
     "minimapPos": {

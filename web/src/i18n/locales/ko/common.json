@@ -299,6 +299,7 @@
     "closeOptions": "지도 옵션 닫기",
     "sections": {
       "mapOptions": "지도 옵션",
+      "mapControls": "지도 컨트롤",
       "systemOptions": "성계 옵션",
       "connections": "연결",
       "route": "경로",
@@ -314,6 +315,7 @@
       "shortcuts": "단축키"
     },
     "snapToGrid": "격자에 맞추기",
+    "invertZoom": "확대/축소 반전 (마우스/트랙패드)",
     "minimap": "미니맵",
     "position": "위치",
     "minimapPos": {

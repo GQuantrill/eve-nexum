@@ -313,6 +313,7 @@
     "closeOptions": "Закрыть параметры карты",
     "sections": {
       "mapOptions": "Параметры карты",
+      "mapControls": "Управление картой",
       "systemOptions": "Параметры системы",
       "connections": "Соединения",
       "route": "Маршрут",
@@ -328,6 +329,7 @@
       "shortcuts": "Горячие клавиши"
     },
     "snapToGrid": "Привязка к сетке",
+    "invertZoom": "Инвертировать масштаб (мышь/трекпад)",
     "minimap": "Миникарта",
     "position": "Положение",
     "minimapPos": {
