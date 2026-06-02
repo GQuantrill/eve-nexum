@@ -1969,10 +1969,16 @@
   border-radius: inherit;
   z-index: -1;
   pointer-events: none;
+  /* Two layers: a tight bright inner ring + a soft wide outer halo, both
+     scaled by --fleet-heat (0..1), so even a low headcount reads clearly and
+     the colour stays distinct from the blue selected/sov glows. */
   box-shadow:
-    0 0 calc(10px + var(--fleet-heat, 0) * 36px)
-        calc(2px + var(--fleet-heat, 0) * 12px)
-        rgba(192, 132, 252, calc(0.25 + var(--fleet-heat, 0) * 0.5));
+    0 0 calc(8px  + var(--fleet-heat, 0) * 22px)
+        calc(2px  + var(--fleet-heat, 0) * 6px)
+        rgba(192, 132, 252, calc(0.55 + var(--fleet-heat, 0) * 0.4)),
+    0 0 calc(20px + var(--fleet-heat, 0) * 50px)
+        calc(6px  + var(--fleet-heat, 0) * 16px)
+        rgba(168, 85,  247, calc(0.30 + var(--fleet-heat, 0) * 0.4));
 }
 
 .system-node {

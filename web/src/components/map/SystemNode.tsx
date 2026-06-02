@@ -75,7 +75,8 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
     if (!all || all.length === 0) return 0;
     const myId = user?.characterId;
     const count = myId ? all.filter((m) => m.characterId !== myId).length : all.length;
-    return count === 0 ? 0 : Math.min(1, Math.max(0.25, count / 8));
+    // Floor at 0.45 so a single pilot is already a clear halo; saturates ~6+.
+    return count === 0 ? 0 : Math.min(1, Math.max(0.45, count / 6));
   }, [fleetHeatmap, fleet.bySystem, sys.eveSystemId, user?.characterId]);
 
   // The account's other characters (alts) located in this system — live when
