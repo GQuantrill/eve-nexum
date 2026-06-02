@@ -1,4 +1,14 @@
 {
+  "fleet": {
+    "notInFleet": "Não estás numa frota",
+    "noMembers": "Nenhum membro da frota visível",
+    "sortDistance": "Distância",
+    "sortName": "Nome",
+    "ascending": "Crescente",
+    "descending": "Decrescente",
+    "unknownLoc": "Desconhecido",
+    "unknownPilot": "Piloto desconhecido"
+  },
   "language": {
     "label": "Idioma"
   },
@@ -619,6 +629,7 @@
     "turnur": "Conexões de Turnur",
     "a0": "Sóis A0 próximos",
     "closest": "Sistemas mais próximos",
+    "fleet": "Frota",
     "expand": "Expandir barra lateral",
     "resize": "Redimensionar barra lateral",
     "collapse": "Recolher barra lateral",
