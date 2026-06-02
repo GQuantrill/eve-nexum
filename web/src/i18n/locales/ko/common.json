@@ -340,6 +340,11 @@
       "topLeft": "왼쪽 위"
     },
     "fontSize": "글꼴 크기",
+    "placement": "새 시스템 배치",
+    "placementOptions": {
+      "horizontal": "수평 (오른쪽)",
+      "vertical": "수직 (아래)"
+    },
     "resetZoom": "100%로 재설정",
     "compact": "간결",
     "uniformSize": "균일 크기",

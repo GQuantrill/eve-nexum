@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useMapStore } from '../store/mapStore';
 import { useCharacterLocation } from './useCharacterLocation';
 import { useCanEdit } from './useCanEdit';
+import { readUserSetting } from './useUserSetting';
 import type { SystemClass, WormholeEffect } from '../types';
 
 interface Box { position: { x: number; y: number } }
@@ -11,40 +12,47 @@ function boxesOverlap(ax: number, ay: number, bx: number, by: number, w: number,
   return ax < bx + w + gap && ax + w + gap > bx && ay < by + h + gap && ay + h + gap > by;
 }
 
-// Slots around the source, clockwise from the right (+y is down): the four
-// cardinals first (right, below, left, above), then the diagonals. Scaled by
-// `ring` for distance, so once the immediate eight are taken we keep rotating
-// clockwise on a wider ring.
-const PLACEMENT_OFFSETS: [number, number][] = [
+// Slots around the source, both clockwise (+y is down): cardinals first, then
+// diagonals, scaled by `ring` for distance. The user's default-placement pref
+// picks the starting direction — horizontal begins at the right, vertical at
+// the bottom — and rotation continues clockwise from there.
+const OFFSETS_HORIZONTAL: [number, number][] = [
   [1, 0], [0, 1], [-1, 0], [0, -1],   // E, S, W, N
   [1, 1], [-1, 1], [-1, -1], [1, -1], // SE, SW, NW, NE
 ];
+const OFFSETS_VERTICAL: [number, number][] = [
+  [0, 1], [-1, 0], [0, -1], [1, 0],   // S, W, N, E
+  [-1, 1], [-1, -1], [1, -1], [1, 1], // SW, NW, NE, SE
+];
 
 // Pick a position for a newly auto-added system by rotating clockwise around
-// the system it was jumped from: right of the source if free, otherwise
-// directly below it, then left, above, the diagonals, and outward on wider
-// rings. Each candidate is collision-checked against every node, so it also
-// dodges unrelated systems that happen to sit in a slot.
+// the system it was jumped from, starting in the preferred direction (right of
+// the source when horizontal, below it when vertical), then the rest of the
+// ring, then outward on wider rings. Each candidate is collision-checked
+// against every node, so it also dodges unrelated systems sitting in a slot.
 function findFreePosition(
   source: { x: number; y: number },
   systems: Box[],
   w: number,
   h: number,
   gap: number,
+  vertical: boolean,
 ): { x: number; y: number } {
   const collides = (x: number, y: number) =>
     systems.some((s) => boxesOverlap(x, y, s.position.x, s.position.y, w, h, gap));
 
+  const offsets = vertical ? OFFSETS_VERTICAL : OFFSETS_HORIZONTAL;
   const stepX = w + gap;
   const stepY = h + gap;
   for (let ring = 1; ring <= 6; ring++) {
-    for (const [dx, dy] of PLACEMENT_OFFSETS) {
+    for (const [dx, dy] of offsets) {
       const x = source.x + dx * ring * stepX;
       const y = source.y + dy * ring * stepY;
       if (!collides(x, y)) return { x, y };
     }
   }
-  return { x: source.x + stepX, y: source.y }; // dense map — fall back to "right of source"
+  // Dense map — fall back to the preferred direction.
+  return vertical ? { x: source.x, y: source.y + stepY } : { x: source.x + stepX, y: source.y };
 }
 
 /**
@@ -130,7 +138,8 @@ export function useLocationTracking(enabled: boolean) {
           y: map.systems.length ? map.systems.reduce((sum, s) => sum + s.position.y, 0) / map.systems.length : 0,
         };
       }
-      const position = findFreePosition(source, map.systems, w, h, gap);
+      const vertical = readUserSetting<string>('nexum.map.placement', 'horizontal') === 'vertical';
+      const position = findFreePosition(source, map.systems, w, h, gap, vertical);
 
       mapSystemId = addSystem(
         system.name,

@@ -340,6 +340,11 @@
       "topLeft": "左上"
     },
     "fontSize": "字体大小",
+    "placement": "新星系放置",
+    "placementOptions": {
+      "horizontal": "水平（右侧）",
+      "vertical": "垂直（下方）"
+    },
     "resetZoom": "重置为 100%",
     "compact": "紧凑",
     "uniformSize": "统一大小",

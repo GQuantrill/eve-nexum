@@ -354,6 +354,11 @@
       "topLeft": "Сверху слева"
     },
     "fontSize": "Размер шрифта",
+    "placement": "Размещение новых систем",
+    "placementOptions": {
+      "horizontal": "Горизонтально (справа)",
+      "vertical": "Вертикально (снизу)"
+    },
     "resetZoom": "Сбросить до 100%",
     "compact": "Компактно",
     "uniformSize": "Единый размер",

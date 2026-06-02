@@ -340,6 +340,11 @@
       "topLeft": "Top left"
     },
     "fontSize": "Font Size",
+    "placement": "New system placement",
+    "placementOptions": {
+      "horizontal": "Horizontal (right)",
+      "vertical": "Vertical (below)"
+    },
     "resetZoom": "Reset to 100%",
     "compact": "Compact",
     "uniformSize": "Uniform Size",
