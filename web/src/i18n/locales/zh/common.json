@@ -1,4 +1,7 @@
 {
+  "session": {
+    "idleLogout": "因长时间未操作已退出登录。"
+  },
   "fleet": {
     "notInFleet": "未加入舰队",
     "noMembers": "没有可见的舰队成员",

@@ -1,4 +1,7 @@
 {
+  "session": {
+    "idleLogout": "非アクティブのためサインアウトしました。"
+  },
   "fleet": {
     "notInFleet": "フリートに参加していません",
     "noMembers": "表示できるフリートメンバーがいません",

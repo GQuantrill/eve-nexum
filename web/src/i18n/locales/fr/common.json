@@ -1,4 +1,7 @@
 {
+  "session": {
+    "idleLogout": "Déconnecté pour inactivité."
+  },
   "fleet": {
     "notInFleet": "Pas dans une flotte",
     "noMembers": "Aucun membre de flotte visible",
