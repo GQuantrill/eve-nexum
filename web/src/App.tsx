@@ -21,6 +21,7 @@ import { useLocationTracking } from './hooks/useLocationTracking';
 import { useMapEventStream } from './hooks/useMapEventStream';
 import { useMapPresence } from './hooks/useMapPresence';
 import { useHashRoute } from './hooks/useHashRoute';
+import { usePageviewTracking } from './hooks/usePageviewTracking';
 import { useIdleLogout } from './hooks/useIdleLogout';
 import './App.css';
 
@@ -107,6 +108,25 @@ function AppShell() {
   const { user, loading } = useAuth();
   const [path] = useHashRoute();
 
+  // Share links bypass the auth gate (see the early return below); computed up
+  // here so the analytics page label can account for them too.
+  const shareMatch = path.match(/^\/share\/([0-9a-fA-F-]{36})$/);
+
+  // Logical page for GA4. Landing and map share the same '/' URL, so we send a
+  // view-derived path rather than the raw URL: '/landing' when signed out,
+  // '/map' for the map, the real path under '/admin', '/share' for share
+  // links. null while auth is still loading, so we never log the wrong view.
+  const analyticsPage = loading
+    ? null
+    : shareMatch
+      ? '/share'
+      : !user
+        ? '/landing'
+        : path.startsWith('/admin') && (user.canViewReports || (user.role === 'admin' && user.corpMode))
+          ? path
+          : '/map';
+  usePageviewTracking(analyticsPage);
+
   // Sign out after 30 min idle (only while logged in). Keeps "last login"
   // meaningful and stops idle tabs from polling ESI in the background.
   useIdleLogout(!!user);
@@ -147,9 +167,8 @@ function AppShell() {
   }, []);
 
   // Share links bypass the entire auth gate — a guest with the URL should
-  // be able to load the map without ever seeing the landing page. Match
-  // BEFORE the user/loading checks below.
-  const shareMatch = path.match(/^\/share\/([0-9a-fA-F-]{36})$/);
+  // be able to load the map without ever seeing the landing page. Matched
+  // (shareMatch is computed above) BEFORE the user/loading checks below.
   if (shareMatch) return <SharedMapView token={shareMatch[1]} />;
 
   if (loading) {
