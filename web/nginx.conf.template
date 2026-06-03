@@ -12,14 +12,20 @@ server {
     #
     # CSP: locked down for the SPA. img-src needs the EVE image server
     # (portraits + corp/alliance logos). style-src needs 'unsafe-inline'
-    # because React's `style` prop emits inline styles; we don't use
-    # inline <script>, so script-src stays strict. connect-src allows
+    # because React's `style` prop emits inline styles. connect-src allows
     # 'self' (most external APIs are proxied through /api) plus
     # esi.evetech.net, which the SPA fetches directly from the browser
     # for TQ server status, system/sov data, NPC stations and entity
     # name resolution (Toolbar, useEsiSystem, useSovData, NpcStationsPane,
     # esiEntities). Without it those calls are blocked in production.
-    add_header Content-Security-Policy "default-src 'self'; img-src 'self' data: https://images.evetech.net; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self' https://esi.evetech.net; font-src 'self' data:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'" always;
+    #
+    # Google Tag Manager / Analytics (GTM-NXX5CRPH -> GA4): GTM ships an
+    # inline bootstrap <script> and injects more scripts at runtime, so
+    # script-src needs 'unsafe-inline' + googletagmanager.com. GA4 sends
+    # hits to *.google-analytics.com (connect + img beacons), and the GTM
+    # noscript fallback frames googletagmanager.com. This deliberately
+    # loosens the formerly-strict script-src — the price of running GTM.
+    add_header Content-Security-Policy "default-src 'self'; img-src 'self' data: https://images.evetech.net https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com; connect-src 'self' https://esi.evetech.net https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com; font-src 'self' data:; frame-src https://www.googletagmanager.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'" always;
 
     # Clickjacking + MIME-sniff defenses. frame-ancestors above is the
     # modern equivalent of X-Frame-Options, but legacy browsers still
