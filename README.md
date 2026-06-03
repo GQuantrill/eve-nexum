@@ -18,6 +18,7 @@
   - [Live ops](#live-ops)
   - [Productivity & UX](#productivity--ux)
   - [For corporations](#for-corporations)
+- [Wormhole bookmarks](#wormhole-bookmarks)
 - [Installation](#installation)
   - [Docker (recommended)](#option-1--docker-recommended)
   - [Local development](#option-2--local-development)
@@ -167,6 +168,36 @@ These features only matter once `CORP_ID` is set — see [Corp mode](#corp-mode)
 - **Audit log** — every admin action (role change, block, force-lock, force-unlock, force-delete, ESI corp change, auto-block on departure, corp-map merge as source/destination) is recorded with actor, target, old → new value, and timestamp. Exportable as CSV.
 - **Corp ticker resolution** — corp IDs in the Users and Maps reports are resolved to in-game tickers via ESI (`/v5/corporations/{id}/`), with a 1-hour in-memory cache to keep the report loads cheap.
 - **Per-character attribution** — sigs, structures, and system add / delete actions are recorded with the user who made them, so reports can answer "who has been scanning what" with no manual logging.
+
+---
+
+## Wormhole bookmarks
+
+Generate a consistent, paste-ready name for a wormhole and drop it straight into your in-game bookmark, so your Locations window reads the same way for everyone in the chain.
+
+**How to use it.** In the signatures pane, every wormhole signature row has a copy button. Click it and the generated name is copied to your clipboard — alt-tab into EVE, bookmark the hole, and paste the name into the bookmark's name field. The exact text that was copied is shown in a toast.
+
+**Choosing the format.** The name is built from a token template you can change in the sidebar under **Map Options → Signature bookmark** (it's saved to your account, so it follows you across devices). Hover the field's label to see the full token list. The default is:
+
+```
+{sig} {dest_type} {size}        →  e.g.  ABC-123 C5 M
+```
+
+**Available tokens** (any token that can't be filled in just disappears, and extra spaces are collapsed, so partly-scanned holes still come out tidy):
+
+| Token | Example | Meaning |
+|---|---|---|
+| `{sig}` | `ABC-123` | Full signature ID |
+| `{sig_letters}` | `ABC` | First three characters of the ID |
+| `{type}` | `D382` | Wormhole type code |
+| `{dest_type}` | `C5`, `HS` | Destination class |
+| `{size}` | `S` / `M` / `L` / `XL` | Hole size (from max jump mass) |
+| `{mass}` | `3.0` | Total mass, in billions of kg |
+| `{age}` | `2h` | Hours since the sig was first seen |
+| `{name}` | | The signature's name field |
+| `{notes}` | | The signature's notes field |
+
+> Tip: `{age}` reflects when the signature was *first scanned*, so it reads `0h` right after you add a hole — useful for re-copying an older bookmark later, but most people leave it out of the default.
 
 ---
 

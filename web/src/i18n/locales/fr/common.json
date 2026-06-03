@@ -341,6 +341,7 @@
     },
     "fontSize": "Taille de police",
     "placement": "Placement des nouveaux systèmes",
+    "sigBookmark": "Nom de favori de signature",
     "placementOptions": {
       "horizontal": "Horizontal (à droite)",
       "vertical": "Vertical (en dessous)"
@@ -782,6 +783,9 @@
     "emptyShared": "Aucune signature scannée",
     "empty": "Aucune signature scannée — collez depuis le scanner de sondes pour importer",
     "colId": "ID",
+    "copyBookmark": "Copier le nom du favori",
+    "bookmarkCopied": "Copié : {{name}}",
+    "bookmarkCopyFailed": "Échec de la copie dans le presse-papiers",
     "colType": "Type",
     "colWh": "WH",
     "colLeadsTo": "Mène à",

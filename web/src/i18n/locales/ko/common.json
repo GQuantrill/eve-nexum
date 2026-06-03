@@ -341,6 +341,7 @@
     },
     "fontSize": "글꼴 크기",
     "placement": "새 시스템 배치",
+    "sigBookmark": "시그니처 북마크",
     "placementOptions": {
       "horizontal": "수평 (오른쪽)",
       "vertical": "수직 (아래)"
@@ -782,6 +783,9 @@
     "emptyShared": "스캔된 시그니처 없음",
     "empty": "스캔된 시그니처 없음 — 탐사 스캐너에서 붙여넣어 가져오세요",
     "colId": "ID",
+    "copyBookmark": "북마크 이름 복사",
+    "bookmarkCopied": "복사됨: {{name}}",
+    "bookmarkCopyFailed": "클립보드에 복사하지 못했습니다",
     "colType": "유형",
     "colWh": "WH",
     "colLeadsTo": "연결 대상",

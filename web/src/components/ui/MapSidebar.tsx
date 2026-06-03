@@ -17,6 +17,7 @@ import {
   type MinimapPosition,
 } from "../../hooks/useMinimapPosition";
 import { useUserSetting } from "../../hooks/useUserSetting";
+import { DEFAULT_BOOKMARK_FORMAT, BOOKMARK_TOKENS } from "../../utils/signatureBookmark";
 import { toPng } from "html-to-image";
 import { CaretLeftIcon, CaretRightIcon } from "@phosphor-icons/react";
 import { ChainExitsSection } from "./ChainExitsSection";
@@ -577,6 +578,7 @@ export function MapSidebar() {
   const setShowMinimap = useMapStore((s) => s.setShowMinimap);
   const [minimapPosition, setMinimapPosition] = useMinimapPosition();
   const [placement, setPlacement] = useUserSetting<string>("nexum.map.placement", "horizontal");
+  const [sigBookmarkFmt, setSigBookmarkFmt] = useUserSetting<string>("nexum.sig.bookmarkFormat", DEFAULT_BOOKMARK_FORMAT);
   const uniformSize = useMapStore((s) => s.uniformSize);
   const setUniformSize = useMapStore((s) => s.setUniformSize);
   const showStatics = useMapStore((s) => s.showStatics);
@@ -739,6 +741,25 @@ export function MapSidebar() {
               <option value="horizontal">{t("mapSidebar.placementOptions.horizontal")}</option>
               <option value="vertical">{t("mapSidebar.placementOptions.vertical")}</option>
             </select>
+          </div>
+
+          <div className="map-sidebar__row">
+            <label
+              className="map-sidebar__label"
+              htmlFor="sig-bookmark-fmt"
+              title={BOOKMARK_TOKENS.map((b) => `${b.token}  ${b.desc}`).join("\n")}
+            >
+              {t("mapSidebar.sigBookmark")}
+            </label>
+            <input
+              id="sig-bookmark-fmt"
+              className="map-sidebar__select"
+              type="text"
+              spellCheck={false}
+              value={sigBookmarkFmt}
+              onChange={(e) => setSigBookmarkFmt(e.target.value)}
+              placeholder={DEFAULT_BOOKMARK_FORMAT}
+            />
           </div>
         </CollapsibleSection>
 

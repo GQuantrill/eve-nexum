@@ -341,6 +341,7 @@
     },
     "fontSize": "フォントサイズ",
     "placement": "新規システムの配置",
+    "sigBookmark": "シグネチャのブックマーク",
     "placementOptions": {
       "horizontal": "水平（右）",
       "vertical": "垂直（下）"
@@ -782,6 +783,9 @@
     "emptyShared": "スキャンされたシグネチャはありません",
     "empty": "スキャンされたシグネチャはありません — プローブスキャナーから貼り付けてインポート",
     "colId": "ID",
+    "copyBookmark": "ブックマーク名をコピー",
+    "bookmarkCopied": "コピーしました: {{name}}",
+    "bookmarkCopyFailed": "クリップボードにコピーできませんでした",
     "colType": "タイプ",
     "colWh": "WH",
     "colLeadsTo": "接続先",

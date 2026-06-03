@@ -341,6 +341,7 @@
     },
     "fontSize": "Font Size",
     "placement": "New system placement",
+    "sigBookmark": "Signature bookmark",
     "placementOptions": {
       "horizontal": "Horizontal (right)",
       "vertical": "Vertical (below)"
@@ -782,6 +783,9 @@
     "emptyShared": "No signatures scanned",
     "empty": "No signatures scanned — paste from probe scanner to import",
     "colId": "ID",
+    "copyBookmark": "Copy bookmark name",
+    "bookmarkCopied": "Copied: {{name}}",
+    "bookmarkCopyFailed": "Couldn't copy to clipboard",
     "colType": "Type",
     "colWh": "WH",
     "colLeadsTo": "Leads To",

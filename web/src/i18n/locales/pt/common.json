@@ -341,6 +341,7 @@
     },
     "fontSize": "Tamanho da letra",
     "placement": "Posicionamento de novos sistemas",
+    "sigBookmark": "Marcador de assinatura",
     "placementOptions": {
       "horizontal": "Horizontal (direita)",
       "vertical": "Vertical (abaixo)"
@@ -782,6 +783,9 @@
     "emptyShared": "Nenhuma assinatura analisada",
     "empty": "Nenhuma assinatura analisada — cola do scanner de sondas para importar",
     "colId": "ID",
+    "copyBookmark": "Copiar nome do marcador",
+    "bookmarkCopied": "Copiado: {{name}}",
+    "bookmarkCopyFailed": "Falha ao copiar para a área de transferência",
     "colType": "Tipo",
     "colWh": "WH",
     "colLeadsTo": "Leva a",

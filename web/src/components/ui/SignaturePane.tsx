@@ -9,12 +9,13 @@ import type { Signature, SigType } from '../../types';
 import { ConfirmModal, shouldSkipConfirm } from './ConfirmModal';
 import { NotesEditor } from './NotesEditor';
 import { WormholeTypePicker } from './WormholeTypePicker';
-import { XIcon } from '@phosphor-icons/react';
+import { XIcon, CopyIcon } from '@phosphor-icons/react';
 import { LeadsToDropdown } from './LeadsToDropdown';
 import { toast } from './Toaster';
 import { reevaluateConnectionsForSystem } from '../../utils/whAutoDetect';
 import { alertInboundK162 } from '../../utils/k162Alert';
 import { WORMHOLE_TYPES } from '../../data/wormholes';
+import { formatBookmarkName, DEFAULT_BOOKMARK_FORMAT } from '../../utils/signatureBookmark';
 import { duration, DASH } from '../../i18n/format';
 
 // Aging bands for wormhole signatures, anchored to the WH type's known
@@ -246,6 +247,17 @@ export function SignaturePane({ systemId }: { systemId: string }) {
     'nexum.sigPane.overwriteDelay',
     OVERWRITE_DELAY_DEFAULT,
   );
+  // Token format for the per-row "copy bookmark name" button. Edited in the
+  // sidebar's Map Options; read here to build the pasted name.
+  const [bookmarkFormat] = useUserSetting<string>('nexum.sig.bookmarkFormat', DEFAULT_BOOKMARK_FORMAT);
+
+  const copyBookmark = useCallback((sig: Signature) => {
+    const name = formatBookmarkName(bookmarkFormat, sig);
+    if (!name) return;
+    navigator.clipboard.writeText(name)
+      .then(() => toast.success(t('signatures.bookmarkCopied', { name })))
+      .catch(() => toast.error(t('signatures.bookmarkCopyFailed')));
+  }, [bookmarkFormat, t]);
   // Sigs currently shown with the pending-removal indicator, plus the timers
   // that delete them once the grace period elapses.
   const [removing, setRemoving] = useState<Set<string>>(new Set());
@@ -849,6 +861,13 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                 <ElapsedCell iso={sig.updatedAt} className="sig-td--time sig-td--updated" />
                 {!isShareMode && (
                   <td className="sig-cell--actions">
+                    {sig.sigType === 'wormhole' && (
+                      <button
+                        className="icon-btn"
+                        onClick={() => copyBookmark(sig)}
+                        title={t('signatures.copyBookmark')}
+                      ><CopyIcon size={12} weight="bold" /></button>
+                    )}
                     {canEdit && (
                       <button
                         className="icon-btn icon-btn--danger"
