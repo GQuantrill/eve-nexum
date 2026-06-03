@@ -35,6 +35,7 @@
   - [What happens when a user leaves the corp](#what-happens-when-a-user-leaves-the-corp)
   - [Discord notifications](#discord-notifications)
   - [Admin operations](#admin-operations)
+- [Analytics & telemetry](#analytics--telemetry)
 - [Static data files](#static-data-files)
 - [Technology overview](#technology-overview)
 - [Troubleshooting](#troubleshooting)
@@ -540,6 +541,42 @@ Each tab is also reachable at its own hash route (`#/admin/maps`, `#/admin/audit
 - Demote themselves (use another admin).
 - Demote or block the character whose ID is in `ADMIN_CHAR_ID` — that character is the safety hatch.
 - Force-terminate an existing live session. A blocked user stays signed in until they log out or their session cookie expires; the next login then fails. If you need someone offline *right now*, blocking + revoking their EVE OAuth in CCP's developer panel is the immediate path.
+
+---
+
+## Analytics & telemetry
+
+**By default a self-hosted Nexum reports to no one.** No analytics, no tracking, no phone-home. Both of the following are off until *you* turn them on, and neither sends any user, character, or map data.
+
+### Frontend analytics (Google Tag Manager) — off by default
+
+The web build only loads Google Tag Manager if you provide a container ID at build time via `VITE_GTM_ID`. Leave it unset (the default) and the built site contains no analytics whatsoever — no GTM, no Google Analytics, nothing.
+
+To enable it **for your own deployment**, set your own container ID in `.env` and rebuild the web image:
+
+```bash
+VITE_GTM_ID=GTM-XXXXXXX        # in .env
+docker compose build web && docker compose up -d
+```
+
+Only ever use a container ID you own. The ID is inlined at build time, so a rebuild is required to change it.
+
+### Deployment telemetry (version ping) — opt-in
+
+So the project can gauge how many people self-host and which versions are live, the server can send a tiny **opt-in** ping. It is **off unless you set `NEXUM_TELEMETRY=1`**, and when enabled it sends, once a day:
+
+- the app **version** (e.g. `0.1.0`)
+- a **random per-instance id** (generated once, stored locally), so repeat pings count as one install
+
+That's the entire payload. It contains **no** user data, character names, corp IDs, map data, or settings, and the receiver **does not store your IP**. To enable it:
+
+```bash
+NEXUM_TELEMETRY=1                                  # in .env
+# optional: send to your own collector instead of the project's
+# NEXUM_TELEMETRY_URL=https://your-host/api/telemetry
+```
+
+Unset `NEXUM_TELEMETRY` (the default) and the server never makes the call. The receiving endpoint (`POST /api/telemetry`) exists on every deployment but stays empty unless instances are pointed at it.
 
 ---
 

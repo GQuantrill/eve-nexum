@@ -26,6 +26,8 @@ import wormholesRouter    from './routes/wormholes.js';
 import { loadRouteGraph } from './services/routeGraph.js';
 import { startSdeAutoUpdate } from './services/sdeUpdate.js';
 import { startLocationPoller } from './services/locationPoll.js';
+import { startTelemetry } from './services/telemetry.js';
+import { telemetryRouter } from './routes/telemetry.js';
 import { adminRouter, adminReadRouter, reportsRouter } from './routes/admin.js';
 import { standingsRouter } from './routes/standings.js';
 import { shareRouter } from './routes/share.js';
@@ -94,6 +96,7 @@ app.use(['/auth/login', '/auth/callback', '/auth/add-character'], authLimiter);
 app.use('/auth', appLimiter, authRouter);
 app.use('/api/systems', publicLimiter, systemsRouter);
 app.use('/api/sde', publicLimiter, sdeRouter);
+app.use('/api/telemetry', publicLimiter, telemetryRouter);
 app.use('/api/regions', appLimiter, regionsRouter);
 app.use('/api/maps', appLimiter, mapsRouter);
 // Public read-only share endpoint — no auth, validates the share_token
@@ -154,5 +157,6 @@ migrate()
     app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
     startSdeAutoUpdate();
     startLocationPoller();
+    void startTelemetry();
   })
   .catch((err) => { console.error('Migration failed:', err); process.exit(1); });

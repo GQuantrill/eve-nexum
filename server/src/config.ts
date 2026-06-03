@@ -103,6 +103,13 @@ const tokenEncryptionKey = HEX_64.test(TOKEN_ENC_RAW)
   ? TOKEN_ENC_RAW.toLowerCase()
   : createHash('sha256').update(TOKEN_ENC_RAW).digest('hex');
 
+// Opt-in anonymous deployment ping. OFF by default — a self-hosted instance
+// phones home to nobody unless the operator sets NEXUM_TELEMETRY=1. When on,
+// the server sends only { version, instanceId } once a day so the project can
+// count active installs. NEXUM_TELEMETRY_URL overrides the collector endpoint.
+const TELEMETRY_ENABLED = /^(1|true|yes|on)$/i.test(process.env.NEXUM_TELEMETRY ?? '');
+const TELEMETRY_URL = process.env.NEXUM_TELEMETRY_URL?.trim() || 'https://eve-nexum.com/api/telemetry';
+
 export const config = {
   corpMode:            CORP_IDS.length > 0,
   corpIds:             CORP_IDS,
@@ -120,6 +127,7 @@ export const config = {
   discord:             DISCORD_WEBHOOKS,
   sdeAutoUpdate:       SDE_AUTO_UPDATE,
   sdeCheckUtc:         SDE_CHECK_UTC,
+  telemetry:           { enabled: TELEMETRY_ENABLED, url: TELEMETRY_URL },
   sessionSecret:       process.env.SESSION_SECRET ?? 'dev-secret-change-me',
   tokenEncryptionKey,
   isProd,

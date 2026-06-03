@@ -259,6 +259,18 @@ export async function migrate() {
     ALTER TABLE IF EXISTS solar_systems ADD COLUMN IF NOT EXISTS belt_count     INTEGER;
     ALTER TABLE IF EXISTS solar_systems ADD COLUMN IF NOT EXISTS stargate_count INTEGER;
 
+    -- Opt-in anonymous deployment pings (NEXUM_TELEMETRY). One row per install,
+    -- keyed by a random per-instance id; stores only the app version and seen
+    -- timestamps — deliberately NO IP and no user/map data. On most installs
+    -- this stays empty; only the project's central collector receives pings.
+    CREATE TABLE IF NOT EXISTS telemetry_pings (
+      instance_id TEXT        PRIMARY KEY,
+      version     TEXT,
+      first_seen  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      last_seen   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      ping_count  INTEGER     NOT NULL DEFAULT 1
+    );
+
     CREATE TABLE IF NOT EXISTS user_events (
       id          BIGSERIAL   PRIMARY KEY,
       user_id     INTEGER     NOT NULL REFERENCES users(id) ON DELETE CASCADE,
