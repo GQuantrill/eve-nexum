@@ -8,10 +8,6 @@ services:
       POSTGRES_PASSWORD: ${PG_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    ports:
-      # Host-side port from PG_PORT (default 5432). Inside the network
-      # Postgres always listens on 5432 — that's what the server reaches.
-      - "${PG_PORT:-5432}:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${PG_USER:-nexum} -d ${PG_DB:-eve_nexum}"]
       interval: 5s
