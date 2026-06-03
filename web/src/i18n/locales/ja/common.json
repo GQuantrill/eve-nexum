@@ -1,6 +1,10 @@
 {
   "session": {
-    "idleLogout": "非アクティブのためサインアウトしました。"
+    "idleLogout": "非アクティブのためサインアウトしました。",
+    "lockedTitle": "一時停止中",
+    "lockedHint": "操作がなかったためマップを一時停止しました。ログインは有効なままです。",
+    "resumeAs": "{{name}} として続ける",
+    "logOut": "ログアウト"
   },
   "fleet": {
     "notInFleet": "フリートに参加していません",

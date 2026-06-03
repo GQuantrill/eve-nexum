@@ -1,6 +1,10 @@
 {
   "session": {
-    "idleLogout": "비활성으로 인해 로그아웃되었습니다."
+    "idleLogout": "비활성으로 인해 로그아웃되었습니다.",
+    "lockedTitle": "일시정지됨",
+    "lockedHint": "활동이 없어 맵이 일시정지되었습니다. 로그인은 여전히 유효합니다.",
+    "resumeAs": "{{name}}(으)로 계속",
+    "logOut": "로그아웃"
   },
   "fleet": {
     "notInFleet": "플릿에 속해 있지 않음",

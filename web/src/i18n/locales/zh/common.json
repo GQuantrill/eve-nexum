@@ -1,6 +1,10 @@
 {
   "session": {
-    "idleLogout": "因长时间未操作已退出登录。"
+    "idleLogout": "因长时间未操作已退出登录。",
+    "lockedTitle": "已暂停",
+    "lockedHint": "您处于空闲状态，地图已暂停。您的登录仍然有效。",
+    "resumeAs": "以 {{name}} 继续",
+    "logOut": "退出登录"
   },
   "fleet": {
     "notInFleet": "未加入舰队",

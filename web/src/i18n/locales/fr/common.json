@@ -1,6 +1,10 @@
 {
   "session": {
-    "idleLogout": "Déconnecté pour inactivité."
+    "idleLogout": "Déconnecté pour inactivité.",
+    "lockedTitle": "En pause",
+    "lockedHint": "Vous étiez inactif, la carte a donc été mise en pause. Votre connexion est toujours active.",
+    "resumeAs": "Continuer en tant que {{name}}",
+    "logOut": "Se déconnecter"
   },
   "fleet": {
     "notInFleet": "Pas dans une flotte",

@@ -1,6 +1,10 @@
 {
   "session": {
-    "idleLogout": "Sesión cerrada por inactividad."
+    "idleLogout": "Sesión cerrada por inactividad.",
+    "lockedTitle": "En pausa",
+    "lockedHint": "Estuviste inactivo, así que el mapa se pausó. Tu sesión sigue activa.",
+    "resumeAs": "Continuar como {{name}}",
+    "logOut": "Cerrar sesión"
   },
   "fleet": {
     "notInFleet": "No estás en una flota",

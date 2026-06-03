@@ -1,23 +1,22 @@
 import { useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { toast } from '../components/ui/Toaster';
-import i18n from '../i18n';
 
-// Sign the pilot out after this long with no interaction. Long-lived sessions
-// otherwise keep "last login" stale (we never kick anyone) — an idle gap forces
-// a fresh SSO login, and last_login_at, when they come back.
-const IDLE_LOGOUT_MS = 30 * 60 * 1000;
+// Pause the UI (idle-lock) after this long with no interaction. Unlike a full
+// logout, the session stays valid — the lock screen's "Continue" resumes
+// instantly with no SSO round-trip. While locked the map unmounts, so its ESI
+// polling stops too (see useCharacterLocation's subscriber count).
+const IDLE_LOCK_MS   = 30 * 60 * 1000;
 const CHECK_MS       = 30 * 1000;   // how often we test for idleness
 const WRITE_THROTTLE = 5 * 1000;    // min gap between activity timestamp writes
 
 // Any of these counts as "interacting". Stamped to localStorage so activity in
-// ANY open tab keeps every tab alive — a backgrounded idle tab won't sign you
-// out while you're working in another.
+// ANY open tab keeps every tab alive — a backgrounded idle tab won't lock while
+// you're working in another.
 const ACTIVITY_EVENTS = ['pointerdown', 'keydown', 'wheel', 'mousemove', 'touchstart', 'scroll'] as const;
 const KEY = 'nexum.lastActivity';
 
-export function useIdleLogout(enabled: boolean): void {
-  const { logout } = useAuth();
+export function useIdleLock(enabled: boolean): void {
+  const { lock } = useAuth();
 
   useEffect(() => {
     if (!enabled) return;
@@ -38,16 +37,15 @@ export function useIdleLogout(enabled: boolean): void {
 
     const id = window.setInterval(() => {
       const last = read() || Date.now();
-      if (Date.now() - last < IDLE_LOGOUT_MS) return;
+      if (Date.now() - last < IDLE_LOCK_MS) return;
       window.clearInterval(id);
       ACTIVITY_EVENTS.forEach((e) => window.removeEventListener(e, bump));
-      toast.info(i18n.t('session.idleLogout'));
-      void logout();
+      lock();
     }, CHECK_MS);
 
     return () => {
       window.clearInterval(id);
       ACTIVITY_EVENTS.forEach((e) => window.removeEventListener(e, bump));
     };
-  }, [enabled, logout]);
+  }, [enabled, lock]);
 }

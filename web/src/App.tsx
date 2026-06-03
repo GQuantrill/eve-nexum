@@ -22,7 +22,8 @@ import { useMapEventStream } from './hooks/useMapEventStream';
 import { useMapPresence } from './hooks/useMapPresence';
 import { useHashRoute } from './hooks/useHashRoute';
 import { usePageviewTracking } from './hooks/usePageviewTracking';
-import { useIdleLogout } from './hooks/useIdleLogout';
+import { useIdleLock } from './hooks/useIdleLock';
+import { LockScreen } from './components/ui/LockScreen';
 import './App.css';
 
 function MapApp() {
@@ -105,7 +106,7 @@ function MapApp() {
 }
 
 function AppShell() {
-  const { user, loading } = useAuth();
+  const { user, loading, locked, unlock, logout } = useAuth();
   const [path] = useHashRoute();
 
   // Share links bypass the auth gate (see the early return below); computed up
@@ -127,9 +128,10 @@ function AppShell() {
           : '/map';
   usePageviewTracking(analyticsPage);
 
-  // Sign out after 30 min idle (only while logged in). Keeps "last login"
-  // meaningful and stops idle tabs from polling ESI in the background.
-  useIdleLogout(!!user);
+  // Idle-lock after 30 min (only while logged in and not already locked).
+  // Pauses the UI without ending the session, so "Continue" resumes with no
+  // SSO; the map unmounts while locked, stopping its ESI polling.
+  useIdleLock(!!user && !locked);
 
   // After the add-character SSO flow the server redirects with ?added=<name>
   // on success or ?link_error=<code> on failure (e.g. the character isn't in
@@ -180,6 +182,11 @@ function AppShell() {
   }
 
   if (!user) return <LandingPage />;
+
+  // Idle-locked: session is still valid, the UI is just paused. Rendering this
+  // instead of the map unmounts the map (and its ESI polling); "Continue"
+  // resumes instantly with no SSO.
+  if (locked) return <LockScreen user={user} onResume={unlock} onLogout={logout} />;
 
   // Hash routes — admins reach /admin/* in corp mode (solo mode has no
   // other users to manage, so the section is hidden). The reports
