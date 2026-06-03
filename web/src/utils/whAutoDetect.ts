@@ -25,6 +25,8 @@ export function reevaluateConnectionsForSystem(
   oldSig:   Signature | undefined,
 ): void {
   const { map, updateConnection } = useMapStore.getState();
+  const oldType  = oldSig?.whType?.toUpperCase();
+  const oldLeads = oldSig?.whLeadsTo?.toUpperCase();
 
   for (const conn of map.connections) {
     const otherId =
@@ -45,27 +47,32 @@ export function reevaluateConnectionsForSystem(
     }
     const best = backingCodes.find(t => t !== 'K162') ?? backingCodes[0];
 
-    if (best) {
-      // A sig backs this connection — fill if empty, upgrade K162 → real code.
-      if (conn.type === null) {
-        updateConnection(conn.id, { type: best });
-      } else if (conn.type.toUpperCase() === 'K162' && best !== 'K162') {
-        updateConnection(conn.id, { type: best });
-      }
-      // else: '' (user cleared) or already a real code — leave it.
-      continue;
-    }
-
-    // No sig backs the connection. If the old sig USED to back it and
-    // conn.type still matches what the old sig had, treat as orphaned
-    // auto-fill and clear.
-    const oldType  = oldSig?.whType?.toUpperCase();
-    const oldLeads = oldSig?.whLeadsTo?.toUpperCase();
-    if (
+    // True when this connection's current type was auto-filled from the sig
+    // being re-evaluated (its OLD whType still equals conn.type, and its old
+    // leadsTo pointed at the other endpoint). Lets us follow edits to that sig
+    // without clobbering a type the user typed by hand.
+    const oldBackedThis = !!(
       oldType && oldLeads &&
       (oldLeads === oc || oldLeads === on) &&
       conn.type && conn.type.toUpperCase() === oldType
-    ) {
+    );
+
+    if (best) {
+      if (conn.type === null || (conn.type.toUpperCase() === 'K162' && best !== 'K162')) {
+        // Empty, or a K162 placeholder being upgraded to a real code.
+        updateConnection(conn.id, { type: best });
+      } else if (oldBackedThis && conn.type.toUpperCase() !== best.toUpperCase()) {
+        // The sig that auto-filled this connection had its WH type changed —
+        // follow it so editing a sig's type updates the map label too.
+        updateConnection(conn.id, { type: best });
+      }
+      // else: '' (user cleared) or a manual real code — leave it.
+      continue;
+    }
+
+    // No sig backs the connection any more. If this sig used to back it,
+    // clear the now-orphaned auto-filled type.
+    if (oldBackedThis) {
       updateConnection(conn.id, { type: null });
     }
   }
