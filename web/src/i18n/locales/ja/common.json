@@ -429,7 +429,8 @@
       "undo": "元に戻す",
       "multiSelect": "星系を複数選択",
       "rubberBand": "ドラッグで星系を選択",
-      "overwriteSigs": "上書きモードでシグネチャを貼り付け（消滅したものを削除）"
+      "overwriteSigs": "上書きモードでシグネチャを貼り付け（消滅したものを削除）",
+      "vivaldiNote": "Vivaldi（および一部のブラウザ）は Ctrl+Shift+V を独自のコマンドに割り当てるため、Nexum には届きません。「貼り付け時に上書き」をオンにして Ctrl+V を使うか、ブラウザのキーボード設定でショートカットを再設定してください。"
     },
     "canvasNotFound": "マップキャンバスが見つかりませんでした",
     "exportFailed": "エクスポートに失敗しました: {{error}}",
@@ -786,8 +787,6 @@
     "empty": "スキャンされたシグネチャはありません — プローブスキャナーから貼り付けてインポート",
     "colId": "ID",
     "copyBookmark": "ブックマーク名をコピー",
-    "vivaldiNotice": "Vivaldi は Ctrl+Shift+V を横取りするため、Shift+貼り付けの上書きが Nexum に届きません。下の\\\"貼り付け時に上書き\\\"をオンにして Ctrl+V で貼り付けるか、Vivaldi のキーボード設定で Ctrl+Shift+V を再設定してください。",
-    "vivaldiDismiss": "了解、今後表示しない",
     "bookmarkCopied": "コピーしました: {{name}}",
     "bookmarkCopyFailed": "クリップボードにコピーできませんでした",
     "colType": "タイプ",

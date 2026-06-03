@@ -1127,6 +1127,7 @@ export function MapSidebar() {
             <kbd>Shift + ⌘/Ctrl + V</kbd>
             <span>{t("mapSidebar.shortcut.overwriteSigs")}</span>
           </div>
+          <p className="map-sidebar__shortcut-note">{t("mapSidebar.shortcut.vivaldiNote")}</p>
         </CollapsibleSection>
       </div>
 
