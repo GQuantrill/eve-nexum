@@ -314,6 +314,7 @@
     "closeOptions": "Close map options",
     "sections": {
       "mapOptions": "Map Options",
+      "wormholeBookmarks": "Wormhole bookmarks",
       "mapControls": "Map Controls",
       "systemOptions": "System Options",
       "connections": "Connections",
@@ -342,6 +343,7 @@
     "fontSize": "Font Size",
     "placement": "New system placement",
     "sigBookmark": "Signature bookmark",
+    "bookmarkHelp": "On a wormhole signature row, click the copy icon to copy a paste-ready bookmark name, then paste it into the in-game bookmark. Build the name with these tokens:",
     "placementOptions": {
       "horizontal": "Horizontal (right)",
       "vertical": "Vertical (below)"

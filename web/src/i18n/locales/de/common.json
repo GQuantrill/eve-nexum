@@ -314,6 +314,7 @@
     "closeOptions": "Kartenoptionen schließen",
     "sections": {
       "mapOptions": "Kartenoptionen",
+      "wormholeBookmarks": "Wurmloch-Lesezeichen",
       "mapControls": "Kartensteuerung",
       "systemOptions": "Systemoptionen",
       "connections": "Verbindungen",
@@ -342,6 +343,7 @@
     "fontSize": "Schriftgröße",
     "placement": "Platzierung neuer Systeme",
     "sigBookmark": "Signatur-Lesezeichen",
+    "bookmarkHelp": "Klicke in der Zeile einer Wurmloch-Signatur auf das Kopiersymbol, um einen fertigen Lesezeichennamen zu kopieren, und füge ihn in das Ingame-Lesezeichen ein. Erstelle den Namen mit diesen Tokens:",
     "placementOptions": {
       "horizontal": "Horizontal (rechts)",
       "vertical": "Vertikal (unten)"

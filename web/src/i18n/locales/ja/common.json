@@ -314,6 +314,7 @@
     "closeOptions": "マップオプションを閉じる",
     "sections": {
       "mapOptions": "マップオプション",
+      "wormholeBookmarks": "ワームホールのブックマーク",
       "mapControls": "マップ操作",
       "systemOptions": "星系オプション",
       "connections": "接続",
@@ -342,6 +343,7 @@
     "fontSize": "フォントサイズ",
     "placement": "新規システムの配置",
     "sigBookmark": "シグネチャのブックマーク",
+    "bookmarkHelp": "ワームホールのシグネチャ行でコピーアイコンをクリックすると、貼り付け可能なブックマーク名がコピーされます。ゲーム内のブックマークに貼り付けてください。次のトークンで名前を作成します：",
     "placementOptions": {
       "horizontal": "水平（右）",
       "vertical": "垂直（下）"

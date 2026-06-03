@@ -314,6 +314,7 @@
     "closeOptions": "关闭地图选项",
     "sections": {
       "mapOptions": "地图选项",
+      "wormholeBookmarks": "虫洞书签",
       "mapControls": "地图控制",
       "systemOptions": "星系选项",
       "connections": "连接",
@@ -342,6 +343,7 @@
     "fontSize": "字体大小",
     "placement": "新星系放置",
     "sigBookmark": "信号书签格式",
+    "bookmarkHelp": "在虫洞信号行点击复制图标，即可复制可直接粘贴的书签名称，然后粘贴到游戏内书签中。使用以下变量构建名称：",
     "placementOptions": {
       "horizontal": "水平（右侧）",
       "vertical": "垂直（下方）"

@@ -314,6 +314,7 @@
     "closeOptions": "Fermer les options de carte",
     "sections": {
       "mapOptions": "Options de carte",
+      "wormholeBookmarks": "Favoris de trous de ver",
       "mapControls": "Commandes de carte",
       "systemOptions": "Options de système",
       "connections": "Connexions",
@@ -342,6 +343,7 @@
     "fontSize": "Taille de police",
     "placement": "Placement des nouveaux systèmes",
     "sigBookmark": "Nom de favori de signature",
+    "bookmarkHelp": "Sur la ligne d'une signature de trou de ver, cliquez sur l'icône de copie pour copier un nom de favori prêt à coller, puis collez-le dans le favori en jeu. Composez le nom avec ces variables :",
     "placementOptions": {
       "horizontal": "Horizontal (à droite)",
       "vertical": "Vertical (en dessous)"

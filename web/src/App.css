@@ -1846,6 +1846,34 @@
   cursor: pointer;
 }
 
+/* Help text + token legend under the wormhole-bookmark format field. */
+.map-sidebar__help {
+  margin: 8px 0 6px;
+  font-size: calc(12px * var(--font-scale, 1));
+  line-height: 1.45;
+  color: #8a98b0;
+}
+
+.map-sidebar__tokens {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: calc(12px * var(--font-scale, 1));
+  color: #8a98b0;
+}
+
+.map-sidebar__tokens code {
+  color: #9ec1ff;
+  background: #11192b;
+  border: 1px solid #1e2740;
+  border-radius: 3px;
+  padding: 0 4px;
+  font-size: calc(11px * var(--font-scale, 1));
+}
+
 .map-sidebar__toggle-input {
   accent-color: #5b9bff;
   cursor: pointer;

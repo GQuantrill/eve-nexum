@@ -314,6 +314,7 @@
     "closeOptions": "Fechar opções de mapa",
     "sections": {
       "mapOptions": "Opções de mapa",
+      "wormholeBookmarks": "Marcadores de buracos de minhoca",
       "mapControls": "Controlos do mapa",
       "systemOptions": "Opções de sistema",
       "connections": "Conexões",
@@ -342,6 +343,7 @@
     "fontSize": "Tamanho da letra",
     "placement": "Posicionamento de novos sistemas",
     "sigBookmark": "Marcador de assinatura",
+    "bookmarkHelp": "Na linha de uma assinatura de buraco de minhoca, clique no ícone de copiar para copiar um nome de marcador pronto e cole-o no marcador do jogo. Monte o nome com estes tokens:",
     "placementOptions": {
       "horizontal": "Horizontal (direita)",
       "vertical": "Vertical (abaixo)"

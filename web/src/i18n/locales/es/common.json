@@ -314,6 +314,7 @@
     "closeOptions": "Cerrar opciones de mapa",
     "sections": {
       "mapOptions": "Opciones de mapa",
+      "wormholeBookmarks": "Marcadores de agujeros de gusano",
       "mapControls": "Controles del mapa",
       "systemOptions": "Opciones de sistema",
       "connections": "Conexiones",
@@ -342,6 +343,7 @@
     "fontSize": "Tamaño de fuente",
     "placement": "Colocación de sistemas nuevos",
     "sigBookmark": "Marcador de firma",
+    "bookmarkHelp": "En la fila de una firma de agujero de gusano, haz clic en el icono de copiar para copiar un nombre de marcador listo, y pégalo en el marcador del juego. Crea el nombre con estos tokens:",
     "placementOptions": {
       "horizontal": "Horizontal (derecha)",
       "vertical": "Vertical (abajo)"

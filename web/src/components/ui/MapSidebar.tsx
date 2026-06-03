@@ -96,6 +96,7 @@ function CollapsibleSection({
 // shared "which section is open" setting; null means everything collapsed.
 type SectionId =
   | "mapOptions"
+  | "wormholeBookmarks"
   | "mapControls"
   | "systemOptions"
   | "connections"
@@ -743,14 +744,11 @@ export function MapSidebar() {
             </select>
           </div>
 
+        </CollapsibleSection>
+
+        <CollapsibleSection title={t("mapSidebar.sections.wormholeBookmarks")} {...sectionProps("wormholeBookmarks")}>
           <div className="map-sidebar__row">
-            <label
-              className="map-sidebar__label"
-              htmlFor="sig-bookmark-fmt"
-              title={BOOKMARK_TOKENS.map((b) => `${b.token}  ${b.desc}`).join("\n")}
-            >
-              {t("mapSidebar.sigBookmark")}
-            </label>
+            <label className="map-sidebar__label" htmlFor="sig-bookmark-fmt">{t("mapSidebar.sigBookmark")}</label>
             <input
               id="sig-bookmark-fmt"
               className="map-sidebar__select"
@@ -761,6 +759,12 @@ export function MapSidebar() {
               placeholder={DEFAULT_BOOKMARK_FORMAT}
             />
           </div>
+          <p className="map-sidebar__help">{t("mapSidebar.bookmarkHelp")}</p>
+          <ul className="map-sidebar__tokens">
+            {BOOKMARK_TOKENS.map((b) => (
+              <li key={b.token}><code>{b.token}</code> - {b.desc}</li>
+            ))}
+          </ul>
         </CollapsibleSection>
 
         <CollapsibleSection title={t("mapSidebar.sections.mapControls")} {...sectionProps("mapControls")}>
