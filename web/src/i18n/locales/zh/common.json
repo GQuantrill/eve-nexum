@@ -786,6 +786,8 @@
     "empty": "未扫描到信号 — 从探针扫描器粘贴以导入",
     "colId": "ID",
     "copyBookmark": "复制书签名称",
+    "vivaldiNotice": "Vivaldi 会拦截 Ctrl+Shift+V，因此 Shift+粘贴 的覆盖操作无法传到 Nexum。请在下方开启\\\"粘贴时覆盖\\\"并改用 Ctrl+V 粘贴，或在 Vivaldi 的键盘设置中重新绑定 Ctrl+Shift+V。",
+    "vivaldiDismiss": "知道了，不再显示",
     "bookmarkCopied": "已复制：{{name}}",
     "bookmarkCopyFailed": "复制到剪贴板失败",
     "colType": "类型",

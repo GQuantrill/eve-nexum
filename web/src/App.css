@@ -3750,6 +3750,37 @@ div.system-node__easy-handle {
   gap: 6px;
 }
 
+/* One-time Vivaldi paste-conflict notice at the top of the signatures pane. */
+.sig-pane__vivaldi {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 8px;
+  padding: 8px 10px;
+  border: 1px solid #6b5a1e;
+  border-left: 3px solid #d9b13b;
+  border-radius: 4px;
+  background: #221d10;
+  color: #e6dcc0;
+  font-size: calc(12px * var(--font-scale, 1));
+  line-height: 1.45;
+}
+
+.sig-pane__vivaldi-dismiss {
+  flex-shrink: 0;
+  align-self: center;
+  background: transparent;
+  border: 1px solid #6b5a1e;
+  border-radius: 4px;
+  color: #e6dcc0;
+  cursor: pointer;
+  font-size: calc(11px * var(--font-scale, 1));
+  padding: 3px 8px;
+  white-space: nowrap;
+
+  &:hover { background: #2e2714; border-color: #d9b13b; }
+}
+
 .sig-pane__hint {
   font-size: calc(13px * var(--font-scale, 1));
   color: #c8d0e0;

@@ -786,6 +786,8 @@
     "empty": "Keine Signaturen gescannt — aus dem Sondenscanner einfügen, um zu importieren",
     "colId": "ID",
     "copyBookmark": "Lesezeichenname kopieren",
+    "vivaldiNotice": "Vivaldi fängt Strg+Umschalt+V ab, daher erreicht das Überschreiben per Umschalt+Einfügen Nexum nicht. Aktiviere unten \\\"Beim Einfügen überschreiben\\\" und füge mit Strg+V ein, oder ändere Strg+Umschalt+V in den Tastatureinstellungen von Vivaldi.",
+    "vivaldiDismiss": "Verstanden, nicht mehr anzeigen",
     "bookmarkCopied": "Kopiert: {{name}}",
     "bookmarkCopyFailed": "Kopieren in die Zwischenablage fehlgeschlagen",
     "colType": "Typ",

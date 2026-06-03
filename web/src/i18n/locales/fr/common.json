@@ -786,6 +786,8 @@
     "empty": "Aucune signature scannée — collez depuis le scanner de sondes pour importer",
     "colId": "ID",
     "copyBookmark": "Copier le nom du favori",
+    "vivaldiNotice": "Vivaldi intercepte Ctrl+Maj+V, donc l'écrasement par Maj+coller n'atteint pas Nexum. Activez \\\"Écraser au collage\\\" ci-dessous et collez avec Ctrl+V, ou réattribuez Ctrl+Maj+V dans les paramètres clavier de Vivaldi.",
+    "vivaldiDismiss": "Compris, ne plus afficher",
     "bookmarkCopied": "Copié : {{name}}",
     "bookmarkCopyFailed": "Échec de la copie dans le presse-papiers",
     "colType": "Type",

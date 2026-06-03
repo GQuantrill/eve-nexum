@@ -786,6 +786,8 @@
     "empty": "No hay firmas escaneadas — pega desde el escáner de sondas para importar",
     "colId": "ID",
     "copyBookmark": "Copiar nombre de marcador",
+    "vivaldiNotice": "Vivaldi intercepta Ctrl+Mayús+V, por lo que el sobrescribir con Mayús+pegar no llega a Nexum. Activa \\\"Sobrescribir al pegar\\\" abajo y pega con Ctrl+V, o reasigna Ctrl+Mayús+V en los ajustes de teclado de Vivaldi.",
+    "vivaldiDismiss": "Entendido, no mostrar de nuevo",
     "bookmarkCopied": "Copiado: {{name}}",
     "bookmarkCopyFailed": "No se pudo copiar al portapapeles",
     "colType": "Tipo",

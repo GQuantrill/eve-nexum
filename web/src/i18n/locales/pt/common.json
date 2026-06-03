@@ -786,6 +786,8 @@
     "empty": "Nenhuma assinatura analisada — cola do scanner de sondas para importar",
     "colId": "ID",
     "copyBookmark": "Copiar nome do marcador",
+    "vivaldiNotice": "O Vivaldi intercepta Ctrl+Shift+V, então a sobrescrita com Shift+colar não chega ao Nexum. Ative \\\"Sobrescrever ao colar\\\" abaixo e cole com Ctrl+V, ou remapeie Ctrl+Shift+V nas configurações de teclado do Vivaldi.",
+    "vivaldiDismiss": "Entendi, não mostrar novamente",
     "bookmarkCopied": "Copiado: {{name}}",
     "bookmarkCopyFailed": "Falha ao copiar para a área de transferência",
     "colType": "Tipo",

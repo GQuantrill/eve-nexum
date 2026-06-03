@@ -786,6 +786,8 @@
     "empty": "스캔된 시그니처 없음 — 탐사 스캐너에서 붙여넣어 가져오세요",
     "colId": "ID",
     "copyBookmark": "북마크 이름 복사",
+    "vivaldiNotice": "Vivaldi가 Ctrl+Shift+V를 가로채므로 Shift+붙여넣기 덮어쓰기가 Nexum에 전달되지 않습니다. 아래의 \\\"붙여넣기 시 덮어쓰기\\\"를 켜고 Ctrl+V로 붙여넣거나, Vivaldi 키보드 설정에서 Ctrl+Shift+V를 다시 지정하세요.",
+    "vivaldiDismiss": "확인, 다시 표시 안 함",
     "bookmarkCopied": "복사됨: {{name}}",
     "bookmarkCopyFailed": "클립보드에 복사하지 못했습니다",
     "colType": "유형",
