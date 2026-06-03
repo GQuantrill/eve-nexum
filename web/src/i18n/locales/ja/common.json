@@ -786,7 +786,7 @@
     "empty": "スキャンされたシグネチャはありません — プローブスキャナーから貼り付けてインポート",
     "colId": "ID",
     "copyBookmark": "ブックマーク名をコピー",
-    "vivaldiNotice": "Vivaldi は Ctrl+Shift+V を横取りするため、Shift+貼り付けの上書きが Nexum に届きません。下の\\\"貼り付け時に上書き\\\"をオンにして Ctrl+V で貼り付けるか、Vivaldi のキーボード設定で Ctrl+Shift+V を再設定してください。",
+    "vivaldiNotice": "ブラウザが Ctrl+Shift+V を横取りしたため、Shift+貼り付けの上書きが Nexum に届きませんでした（Vivaldi は既定でこの動作です）。下の「貼り付け時に上書き」をオンにして Ctrl+V で貼り付けるか、ブラウザの設定でショートカットを再設定してください。",
     "vivaldiDismiss": "了解、今後表示しない",
     "bookmarkCopied": "コピーしました: {{name}}",
     "bookmarkCopyFailed": "クリップボードにコピーできませんでした",

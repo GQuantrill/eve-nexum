@@ -786,7 +786,7 @@
     "empty": "No signatures scanned — paste from probe scanner to import",
     "colId": "ID",
     "copyBookmark": "Copy bookmark name",
-    "vivaldiNotice": "Vivaldi intercepts Ctrl+Shift+V, so Shift+paste overwrite won't reach Nexum. Turn on \\\"Overwrite on paste\\\" below and paste with Ctrl+V instead, or rebind Ctrl+Shift+V in Vivaldi's keyboard settings.",
+    "vivaldiNotice": "Your browser intercepted Ctrl+Shift+V, so the Shift+paste overwrite didn't reach Nexum (Vivaldi does this by default). Turn on \"Overwrite on paste\" below and paste with Ctrl+V instead, or rebind the shortcut in your browser settings.",
     "vivaldiDismiss": "Got it, don't show again",
     "bookmarkCopied": "Copied: {{name}}",
     "bookmarkCopyFailed": "Couldn't copy to clipboard",

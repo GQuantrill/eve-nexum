@@ -127,11 +127,12 @@ const SIG_TYPE_FILTER_ORDER: SigType[] = ['wormhole', 'data', 'relic', 'gas', 'o
 // per-row type picker and the bulk "set type" dropdown.
 const SIG_TYPE_OPTIONS: SigType[] = ['combat', 'data', 'gas', 'ore', 'relic', 'unknown', 'wormhole'];
 
-// Vivaldi binds Ctrl+Shift+V to its own command, so the Shift+paste overwrite
-// gesture never reaches the page. We show those users a one-time notice
-// pointing them at the Overwrite toggle (works with plain Ctrl+V).
-const IS_VIVALDI = typeof navigator !== 'undefined' && / Vivaldi/.test(navigator.userAgent);
-const VIVALDI_NOTICE_KEY = 'nexum.sigPane.vivaldiNoticeDismissed';
+// Some browsers (notably Vivaldi, which masks its user-agent so it can't be
+// feature-detected) bind Ctrl+Shift+V to their own command, swallowing the
+// Shift+paste overwrite gesture. We detect that behaviourally rather than by
+// browser: if Ctrl/Cmd+Shift+V is pressed but no paste event follows, the
+// shortcut was intercepted — then we surface a one-time, dismissible notice.
+const PASTE_NOTICE_KEY = 'nexum.sigPane.pasteConflictDismissed';
 
 // Single module-level 1 s tick shared across every ElapsedCell instance.
 // Previously each SignaturePane drove a state update every second, which
@@ -265,14 +266,36 @@ export function SignaturePane({ systemId }: { systemId: string }) {
       .catch(() => toast.error(t('signatures.bookmarkCopyFailed')));
   }, [bookmarkFormat, t]);
 
-  // One-time Vivaldi paste-conflict notice (see IS_VIVALDI above).
-  const [vivaldiDismissed, setVivaldiDismissed] = useState(
-    () => localStorage.getItem(VIVALDI_NOTICE_KEY) === '1',
+  // One-time paste-shortcut-conflict notice (see PASTE_NOTICE_KEY above).
+  const [pasteNoticeDismissed, setPasteNoticeDismissed] = useState(
+    () => localStorage.getItem(PASTE_NOTICE_KEY) === '1',
   );
-  const dismissVivaldiNotice = () => {
-    localStorage.setItem(VIVALDI_NOTICE_KEY, '1');
-    setVivaldiDismissed(true);
+  const [pasteSwallowed, setPasteSwallowed] = useState(false);
+  const pasteWatchdog = useRef<number | null>(null);
+  const dismissPasteNotice = () => {
+    localStorage.setItem(PASTE_NOTICE_KEY, '1');
+    setPasteNoticeDismissed(true);
+    setPasteSwallowed(false);
   };
+
+  // If Ctrl/Cmd+Shift+V is pressed but no paste event lands shortly after, the
+  // browser grabbed the shortcut for itself — flag it so the notice shows.
+  useEffect(() => {
+    if (pasteNoticeDismissed) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (!((e.ctrlKey || e.metaKey) && e.shiftKey && e.code === 'KeyV')) return;
+      if (pasteWatchdog.current) window.clearTimeout(pasteWatchdog.current);
+      pasteWatchdog.current = window.setTimeout(() => {
+        pasteWatchdog.current = null;
+        setPasteSwallowed(true);
+      }, 400);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      if (pasteWatchdog.current) window.clearTimeout(pasteWatchdog.current);
+    };
+  }, [pasteNoticeDismissed]);
   // Sigs currently shown with the pending-removal indicator, plus the timers
   // that delete them once the grace period elapses.
   const [removing, setRemoving] = useState<Set<string>>(new Set());
@@ -480,6 +503,9 @@ export function SignaturePane({ systemId }: { systemId: string }) {
     if (!activeMapId) return;
 
     const handlePaste = (e: ClipboardEvent) => {
+      // A paste landed, so the Ctrl+Shift+V "swallowed shortcut" watchdog
+      // (if any) was a false alarm — cancel it.
+      if (pasteWatchdog.current) { window.clearTimeout(pasteWatchdog.current); pasteWatchdog.current = null; }
       const target = e.target as HTMLElement;
       if (
         target.tagName === 'INPUT' ||
@@ -617,10 +643,10 @@ export function SignaturePane({ systemId }: { systemId: string }) {
       />
     )}
     <div className="sig-pane">
-      {IS_VIVALDI && !vivaldiDismissed && !isShareMode && canEdit && (
+      {pasteSwallowed && !pasteNoticeDismissed && !isShareMode && canEdit && (
         <div className="sig-pane__vivaldi" role="note">
           <span>{t('signatures.vivaldiNotice')}</span>
-          <button type="button" className="sig-pane__vivaldi-dismiss" onClick={dismissVivaldiNotice}>
+          <button type="button" className="sig-pane__vivaldi-dismiss" onClick={dismissPasteNotice}>
             {t('signatures.vivaldiDismiss')}
           </button>
         </div>
