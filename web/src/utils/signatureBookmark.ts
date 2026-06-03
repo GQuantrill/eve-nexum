@@ -1,5 +1,5 @@
 import type { Signature } from '../types';
-import { WORMHOLE_TYPES } from '../data/wormholes';
+import type { WormholeSpec } from '../hooks/useWormholeTypes';
 
 // Tokens the bookmark-name format understands. Also drives the legend shown
 // next to the format setting.
@@ -38,9 +38,16 @@ const TOKEN_RE = /\{sig_letters\}|\{sig\}|\{type\}|\{dest_type\}|\{size\}|\{mass
  * string. Unfillable tokens collapse to empty and surrounding whitespace is
  * squeezed, so a partially-known sig still yields a tidy, paste-ready name.
  */
-export function formatBookmarkName(format: string, sig: Signature, now: number = Date.now()): string {
-  const wh   = sig.whType ? WORMHOLE_TYPES[sig.whType] : undefined;
-  const dest = sig.whLeadsTo || wh?.leadsTo || '';
+export function formatBookmarkName(
+  format: string,
+  sig: Signature,
+  whTypes: Record<string, WormholeSpec> = {},
+  now: number = Date.now(),
+): string {
+  // The full wormhole catalog (useWormholeTypes) keyed by type code — the small
+  // static map only covers k-space statics, so most holes (e.g. A641) miss it.
+  const wh   = sig.whType ? whTypes[sig.whType] : undefined;
+  const dest = sig.whLeadsTo || wh?.dest || '';
   const ageH = sig.createdAt
     ? Math.max(0, Math.floor((now - new Date(sig.createdAt).getTime()) / 3_600_000))
     : null;
@@ -50,8 +57,8 @@ export function formatBookmarkName(format: string, sig: Signature, now: number =
     '{sig_letters}': (sig.sigId ?? '').slice(0, 3).toUpperCase(),
     '{type}':        sig.whType ?? '',
     '{dest_type}':   dest,
-    '{size}':        wh ? sizeLetter(wh.jumpMassKg) : '',
-    '{mass}':        wh && wh.maxMassKg ? String(Number((wh.maxMassKg / 1_000_000_000).toFixed(1))) : '',
+    '{size}':        wh ? sizeLetter(wh.maxJumpMass) : '',
+    '{mass}':        wh && wh.totalMass ? String(Number((wh.totalMass / 1_000_000_000).toFixed(1))) : '',
     '{age}':         ageH != null ? `${ageH}h` : '',
     '{name}':        sig.name ?? '',
     '{notes}':       sig.notes ?? '',
