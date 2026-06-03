@@ -341,6 +341,7 @@
     },
     "fontSize": "字体大小",
     "placement": "新星系放置",
+    "sigBookmark": "信号书签格式",
     "placementOptions": {
       "horizontal": "水平（右侧）",
       "vertical": "垂直（下方）"
@@ -782,6 +783,9 @@
     "emptyShared": "未扫描到信号",
     "empty": "未扫描到信号 — 从探针扫描器粘贴以导入",
     "colId": "ID",
+    "copyBookmark": "复制书签名称",
+    "bookmarkCopied": "已复制：{{name}}",
+    "bookmarkCopyFailed": "复制到剪贴板失败",
     "colType": "类型",
     "colWh": "WH",
     "colLeadsTo": "通往",

@@ -341,6 +341,7 @@
     },
     "fontSize": "Schriftgröße",
     "placement": "Platzierung neuer Systeme",
+    "sigBookmark": "Signatur-Lesezeichen",
     "placementOptions": {
       "horizontal": "Horizontal (rechts)",
       "vertical": "Vertikal (unten)"
@@ -782,6 +783,9 @@
     "emptyShared": "Keine Signaturen gescannt",
     "empty": "Keine Signaturen gescannt — aus dem Sondenscanner einfügen, um zu importieren",
     "colId": "ID",
+    "copyBookmark": "Lesezeichenname kopieren",
+    "bookmarkCopied": "Kopiert: {{name}}",
+    "bookmarkCopyFailed": "Kopieren in die Zwischenablage fehlgeschlagen",
     "colType": "Typ",
     "colWh": "WH",
     "colLeadsTo": "Führt zu",

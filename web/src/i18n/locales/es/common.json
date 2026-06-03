@@ -341,6 +341,7 @@
     },
     "fontSize": "Tamaño de fuente",
     "placement": "Colocación de sistemas nuevos",
+    "sigBookmark": "Marcador de firma",
     "placementOptions": {
       "horizontal": "Horizontal (derecha)",
       "vertical": "Vertical (abajo)"
@@ -782,6 +783,9 @@
     "emptyShared": "No hay firmas escaneadas",
     "empty": "No hay firmas escaneadas — pega desde el escáner de sondas para importar",
     "colId": "ID",
+    "copyBookmark": "Copiar nombre de marcador",
+    "bookmarkCopied": "Copiado: {{name}}",
+    "bookmarkCopyFailed": "No se pudo copiar al portapapeles",
     "colType": "Tipo",
     "colWh": "WH",
     "colLeadsTo": "Lleva a",
