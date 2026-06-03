@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { Trans, useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 import {
@@ -1019,7 +1020,7 @@ export function MapSidebar() {
         }}
       />
 
-      {settingsOpen && (
+      {settingsOpen && createPortal(
         <div className="settings-modal__overlay" onClick={() => setSettingsOpen(false)}>
           <div className="settings-modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
             <div className="settings-modal__head">
@@ -1113,7 +1114,8 @@ export function MapSidebar() {
               )}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </div>
   );
