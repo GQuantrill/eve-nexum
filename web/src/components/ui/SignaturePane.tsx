@@ -127,12 +127,6 @@ const SIG_TYPE_FILTER_ORDER: SigType[] = ['wormhole', 'data', 'relic', 'gas', 'o
 // per-row type picker and the bulk "set type" dropdown.
 const SIG_TYPE_OPTIONS: SigType[] = ['combat', 'data', 'gas', 'ore', 'relic', 'unknown', 'wormhole'];
 
-// Vivaldi binds Ctrl+Shift+V to its own command, so the Shift+paste overwrite
-// gesture never reaches the page. We show those users a one-time notice
-// pointing them at the Overwrite toggle (works with plain Ctrl+V).
-const IS_VIVALDI = typeof navigator !== 'undefined' && / Vivaldi/.test(navigator.userAgent);
-const VIVALDI_NOTICE_KEY = 'nexum.sigPane.vivaldiNoticeDismissed';
-
 // Single module-level 1 s tick shared across every ElapsedCell instance.
 // Previously each SignaturePane drove a state update every second, which
 // re-rendered every row including its embedded MDEditor — extremely expensive.
@@ -265,14 +259,6 @@ export function SignaturePane({ systemId }: { systemId: string }) {
       .catch(() => toast.error(t('signatures.bookmarkCopyFailed')));
   }, [bookmarkFormat, t]);
 
-  // One-time Vivaldi paste-conflict notice (see IS_VIVALDI above).
-  const [vivaldiDismissed, setVivaldiDismissed] = useState(
-    () => localStorage.getItem(VIVALDI_NOTICE_KEY) === '1',
-  );
-  const dismissVivaldiNotice = () => {
-    localStorage.setItem(VIVALDI_NOTICE_KEY, '1');
-    setVivaldiDismissed(true);
-  };
   // Sigs currently shown with the pending-removal indicator, plus the timers
   // that delete them once the grace period elapses.
   const [removing, setRemoving] = useState<Set<string>>(new Set());
@@ -617,14 +603,6 @@ export function SignaturePane({ systemId }: { systemId: string }) {
       />
     )}
     <div className="sig-pane">
-      {IS_VIVALDI && !vivaldiDismissed && !isShareMode && canEdit && (
-        <div className="sig-pane__vivaldi" role="note">
-          <span>{t('signatures.vivaldiNotice')}</span>
-          <button type="button" className="sig-pane__vivaldi-dismiss" onClick={dismissVivaldiNotice}>
-            {t('signatures.vivaldiDismiss')}
-          </button>
-        </div>
-      )}
       {!isShareMode && sigs.length === 0 && (
         <p className="sig-pane__hint">{t('signatures.pasteHint')}</p>
       )}

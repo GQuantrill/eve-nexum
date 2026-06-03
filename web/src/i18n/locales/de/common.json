@@ -429,7 +429,8 @@
       "undo": "Rückgängig",
       "multiSelect": "Mehrfachauswahl von Systemen",
       "rubberBand": "Systeme per Auswahlrahmen markieren",
-      "overwriteSigs": "Signaturen im Überschreibmodus einfügen (verschwundene entfernen)"
+      "overwriteSigs": "Signaturen im Überschreibmodus einfügen (verschwundene entfernen)",
+      "vivaldiNote": "Vivaldi (und einige andere Browser) belegen Strg+Umschalt+V mit einem eigenen Befehl, sodass es Nexum nie erreicht. Aktiviere 'Beim Einfügen überschreiben' und nutze einfach Strg+V, oder ändere das Kürzel in den Tastatureinstellungen deines Browsers."
     },
     "canvasNotFound": "Karten-Canvas konnte nicht gefunden werden",
     "exportFailed": "Export fehlgeschlagen: {{error}}",
@@ -786,8 +787,6 @@
     "empty": "Keine Signaturen gescannt — aus dem Sondenscanner einfügen, um zu importieren",
     "colId": "ID",
     "copyBookmark": "Lesezeichenname kopieren",
-    "vivaldiNotice": "Vivaldi fängt Strg+Umschalt+V ab, daher erreicht das Überschreiben per Umschalt+Einfügen Nexum nicht. Aktiviere unten \\\"Beim Einfügen überschreiben\\\" und füge mit Strg+V ein, oder ändere Strg+Umschalt+V in den Tastatureinstellungen von Vivaldi.",
-    "vivaldiDismiss": "Verstanden, nicht mehr anzeigen",
     "bookmarkCopied": "Kopiert: {{name}}",
     "bookmarkCopyFailed": "Kopieren in die Zwischenablage fehlgeschlagen",
     "colType": "Typ",

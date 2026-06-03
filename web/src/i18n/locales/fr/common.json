@@ -429,7 +429,8 @@
       "undo": "Annuler",
       "multiSelect": "Sélection multiple de systèmes",
       "rubberBand": "Sélection par rectangle",
-      "overwriteSigs": "Coller les signatures en mode écrasement (supprimer les disparues)"
+      "overwriteSigs": "Coller les signatures en mode écrasement (supprimer les disparues)",
+      "vivaldiNote": "Vivaldi (et certains autres navigateurs) attribuent Ctrl+Maj+V à leur propre commande, il n'atteint donc jamais Nexum. Activez « Écraser au collage » et utilisez simplement Ctrl+V, ou réattribuez le raccourci dans les paramètres clavier de votre navigateur."
     },
     "canvasNotFound": "Impossible de trouver le canvas de la carte",
     "exportFailed": "Échec de l'export : {{error}}",
@@ -786,8 +787,6 @@
     "empty": "Aucune signature scannée — collez depuis le scanner de sondes pour importer",
     "colId": "ID",
     "copyBookmark": "Copier le nom du favori",
-    "vivaldiNotice": "Vivaldi intercepte Ctrl+Maj+V, donc l'écrasement par Maj+coller n'atteint pas Nexum. Activez \\\"Écraser au collage\\\" ci-dessous et collez avec Ctrl+V, ou réattribuez Ctrl+Maj+V dans les paramètres clavier de Vivaldi.",
-    "vivaldiDismiss": "Compris, ne plus afficher",
     "bookmarkCopied": "Copié : {{name}}",
     "bookmarkCopyFailed": "Échec de la copie dans le presse-papiers",
     "colType": "Type",

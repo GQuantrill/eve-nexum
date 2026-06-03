@@ -429,7 +429,8 @@
       "undo": "Undo",
       "multiSelect": "Multi-select systems",
       "rubberBand": "Rubber-band select systems",
-      "overwriteSigs": "Paste signatures in overwrite mode (remove despawned)"
+      "overwriteSigs": "Paste signatures in overwrite mode (remove despawned)",
+      "vivaldiNote": "Vivaldi (and some other browsers) bind Ctrl+Shift+V to their own command, so it never reaches Nexum. Turn on 'Overwrite on paste' and use plain Ctrl+V instead, or rebind the shortcut in your browser's keyboard settings."
     },
     "canvasNotFound": "Could not find the map canvas",
     "exportFailed": "Export failed: {{error}}",
@@ -786,8 +787,6 @@
     "empty": "No signatures scanned — paste from probe scanner to import",
     "colId": "ID",
     "copyBookmark": "Copy bookmark name",
-    "vivaldiNotice": "Vivaldi intercepts Ctrl+Shift+V, so Shift+paste overwrite won't reach Nexum. Turn on \\\"Overwrite on paste\\\" below and paste with Ctrl+V instead, or rebind Ctrl+Shift+V in Vivaldi's keyboard settings.",
-    "vivaldiDismiss": "Got it, don't show again",
     "bookmarkCopied": "Copied: {{name}}",
     "bookmarkCopyFailed": "Couldn't copy to clipboard",
     "colType": "Type",

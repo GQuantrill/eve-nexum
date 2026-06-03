@@ -429,7 +429,8 @@
       "undo": "Deshacer",
       "multiSelect": "Selección múltiple de sistemas",
       "rubberBand": "Selección por recuadro",
-      "overwriteSigs": "Pegar firmas en modo sobrescritura (eliminar las desaparecidas)"
+      "overwriteSigs": "Pegar firmas en modo sobrescritura (eliminar las desaparecidas)",
+      "vivaldiNote": "Vivaldi (y algunos otros navegadores) asignan Ctrl+Mayús+V a su propio comando, por lo que nunca llega a Nexum. Activa 'Sobrescribir al pegar' y usa simplemente Ctrl+V, o reasigna el atajo en los ajustes de teclado de tu navegador."
     },
     "canvasNotFound": "No se pudo encontrar el lienzo del mapa",
     "exportFailed": "Error al exportar: {{error}}",
@@ -786,8 +787,6 @@
     "empty": "No hay firmas escaneadas — pega desde el escáner de sondas para importar",
     "colId": "ID",
     "copyBookmark": "Copiar nombre de marcador",
-    "vivaldiNotice": "Vivaldi intercepta Ctrl+Mayús+V, por lo que el sobrescribir con Mayús+pegar no llega a Nexum. Activa \\\"Sobrescribir al pegar\\\" abajo y pega con Ctrl+V, o reasigna Ctrl+Mayús+V en los ajustes de teclado de Vivaldi.",
-    "vivaldiDismiss": "Entendido, no mostrar de nuevo",
     "bookmarkCopied": "Copiado: {{name}}",
     "bookmarkCopyFailed": "No se pudo copiar al portapapeles",
     "colType": "Tipo",
