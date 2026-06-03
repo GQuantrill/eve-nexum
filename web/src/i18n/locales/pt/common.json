@@ -1,6 +1,10 @@
 {
   "session": {
-    "idleLogout": "Sessão terminada por inatividade."
+    "idleLogout": "Sessão terminada por inatividade.",
+    "lockedTitle": "Em pausa",
+    "lockedHint": "Você ficou inativo, então o mapa foi pausado. Seu login continua ativo.",
+    "resumeAs": "Continuar como {{name}}",
+    "logOut": "Sair"
   },
   "fleet": {
     "notInFleet": "Não estás numa frota",

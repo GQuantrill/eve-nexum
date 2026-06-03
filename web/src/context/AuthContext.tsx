@@ -50,6 +50,10 @@ export interface AuthUser {
 interface AuthContextValue {
   user: AuthUser | null;
   loading: boolean;
+  /** Idle-lock: the session is still valid, the UI is just paused. */
+  locked: boolean;
+  lock: () => void;
+  unlock: () => void;
   logout: () => Promise<void>;
   refresh: () => Promise<void>;
 }
@@ -57,6 +61,9 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue>({
   user: null,
   loading: true,
+  locked: false,
+  lock: () => {},
+  unlock: () => {},
   logout: async () => {},
   refresh: async () => {},
 });
@@ -64,6 +71,11 @@ const AuthContext = createContext<AuthContextValue>({
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
+  // Idle-lock pauses the UI without ending the session — clicking "Continue"
+  // resumes instantly, no SSO round-trip. Cleared on real logout / no session.
+  const [locked, setLocked] = useState(false);
+  const lock = useCallback(() => setLocked(true), []);
+  const unlock = useCallback(() => setLocked(false), []);
 
   useEffect(() => {
     api<{ user: AuthUser | null }>('/auth/me')
@@ -81,6 +93,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const logout = useCallback(async () => {
+    setLocked(false);
     await api('/auth/logout', { method: 'POST' });
     setUser(null);
   }, []);
@@ -96,7 +109,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Memoize so consumers don't re-render every time AuthProvider re-renders
   // for an unrelated reason. logout / refresh are stable via useCallback.
-  const value = useMemo(() => ({ user, loading, logout, refresh }), [user, loading, logout, refresh]);
+  const value = useMemo(
+    () => ({ user, loading, locked, lock, unlock, logout, refresh }),
+    [user, loading, locked, lock, unlock, logout, refresh],
+  );
 
   return (
     <AuthContext.Provider value={value}>

@@ -1,6 +1,10 @@
 {
   "session": {
-    "idleLogout": "Signed out due to inactivity."
+    "idleLogout": "Signed out due to inactivity.",
+    "lockedTitle": "Paused",
+    "lockedHint": "You were idle, so mapping was paused. Your login is still active.",
+    "resumeAs": "Continue as {{name}}",
+    "logOut": "Log out"
   },
   "fleet": {
     "notInFleet": "Not in a fleet",

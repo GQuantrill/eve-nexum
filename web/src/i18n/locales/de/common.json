@@ -1,6 +1,10 @@
 {
   "session": {
-    "idleLogout": "Wegen Inaktivität abgemeldet."
+    "idleLogout": "Wegen Inaktivität abgemeldet.",
+    "lockedTitle": "Pausiert",
+    "lockedHint": "Du warst inaktiv, daher wurde die Karte pausiert. Deine Anmeldung ist noch aktiv.",
+    "resumeAs": "Weiter als {{name}}",
+    "logOut": "Abmelden"
   },
   "fleet": {
     "notInFleet": "In keiner Flotte",
