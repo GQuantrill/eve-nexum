@@ -311,7 +311,9 @@ authRouter.get('/callback', async (req, res) => {
     });
 
     kickStandings();
-    res.redirect(FRONTEND_URL);
+    // ?login=success lets the frontend fire a one-time analytics "login" event
+    // (it's only present on the post-callback redirect, not on normal loads).
+    res.redirect(`${FRONTEND_URL}?login=success`);
   } catch (err) {
     log.error('Auth callback error:', err);
     res.status(500).json({ error: 'Authentication failed' });

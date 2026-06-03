@@ -119,13 +119,24 @@ function AppShell() {
     const params = new URLSearchParams(window.location.search);
     const added = params.get('added');
     const linkError = params.get('link_error');
-    if (!added && !linkError) return;
+    // The server adds ?login=success only on the redirect right after a real
+    // EVE SSO login — so this fires once per login, not on every page load.
+    const loggedIn = params.get('login') === 'success';
+    if (!added && !linkError && !loggedIn) return;
     // Strip the params synchronously so a refresh — or StrictMode's dev
-    // re-run of this effect — doesn't repeat the toast.
+    // re-run of this effect — doesn't repeat the toast / re-fire analytics.
     const url = new URL(window.location.href);
     url.searchParams.delete('added');
     url.searchParams.delete('link_error');
+    url.searchParams.delete('login');
     window.history.replaceState({}, '', url.toString());
+
+    // Push a GTM "login" event so a tag can record the sign-in. dataLayer is
+    // created by the GTM snippet in index.html; guard in case it's absent.
+    if (loggedIn) {
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({ event: 'login', method: 'eve_sso' });
+    }
     // Emit on a macrotask so the Toaster (a sibling) has subscribed before we
     // notify, and deliberately do NOT clear it on cleanup — otherwise
     // StrictMode's mount/unmount/remount would cancel it and nothing shows.
