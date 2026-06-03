@@ -21,6 +21,7 @@ import { useLocationTracking } from './hooks/useLocationTracking';
 import { useMapEventStream } from './hooks/useMapEventStream';
 import { useMapPresence } from './hooks/useMapPresence';
 import { useHashRoute } from './hooks/useHashRoute';
+import { usePageviewTracking } from './hooks/usePageviewTracking';
 import { useIdleLogout } from './hooks/useIdleLogout';
 import './App.css';
 
@@ -106,6 +107,10 @@ function MapApp() {
 function AppShell() {
   const { user, loading } = useAuth();
   const [path] = useHashRoute();
+
+  // Send a GA4 virtual page_view on each hash-route change (the initial load
+  // is counted by the GA4 config tag; this covers in-app navigation).
+  usePageviewTracking(path);
 
   // Sign out after 30 min idle (only while logged in). Keeps "last login"
   // meaningful and stops idle tabs from polling ESI in the background.
