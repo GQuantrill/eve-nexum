@@ -70,6 +70,11 @@ services:
     build:
       context: ./web
       dockerfile: Dockerfile
+      args:
+        # Optional GTM container ID baked into the build. Unset => no analytics
+        # (the default for self-hosters). Set VITE_GTM_ID in .env to enable it
+        # for your own deployment only.
+        VITE_GTM_ID: ${VITE_GTM_ID:-}
     restart: unless-stopped
     environment:
       # Tells nginx which port to proxy /api/* and /auth/* to inside the

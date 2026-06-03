@@ -4,13 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-NXX5CRPH');</script>
-    <!-- End Google Tag Manager -->
+    <!-- Google Tag Manager is injected at build time by vite.config.ts, and
+         ONLY when VITE_GTM_ID is set. Self-hosters get no analytics unless
+         they configure their own container, so this deployment never reports
+         anyone else's instance. -->
 
     <title>Nexum — EVE Online Wormhole Mapper (open-source Pathfinder/Tripwire alternative)</title>
     <meta name="description" content="Nexum is a free, open-source, self-hosted wormhole mapping tool for EVE Online — a Pathfinder and Tripwire alternative. Map your chain in real time, manage signatures, track kills and jumps, plan wormhole rolls, and coordinate with your corp and fleet." />
@@ -127,11 +124,6 @@
     </style>
   </head>
   <body>
-    <!-- Google Tag Manager (noscript) -->
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NXX5CRPH"
-    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-    <!-- End Google Tag Manager (noscript) -->
-
     <div id="root">
       <!-- Static fallback: first paint for users, and the content crawlers / AI
            bots (which don't run JavaScript) read. The React app replaces this. -->
