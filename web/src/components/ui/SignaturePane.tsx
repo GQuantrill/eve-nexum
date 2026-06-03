@@ -16,6 +16,7 @@ import { reevaluateConnectionsForSystem } from '../../utils/whAutoDetect';
 import { alertInboundK162 } from '../../utils/k162Alert';
 import { WORMHOLE_TYPES } from '../../data/wormholes';
 import { formatBookmarkName, DEFAULT_BOOKMARK_FORMAT } from '../../utils/signatureBookmark';
+import { useWormholeTypes } from '../../hooks/useWormholeTypes';
 import { duration, DASH } from '../../i18n/format';
 
 // Aging bands for wormhole signatures, anchored to the WH type's known
@@ -250,14 +251,17 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   // Token format for the per-row "copy bookmark name" button. Edited in the
   // sidebar's Map Options; read here to build the pasted name.
   const [bookmarkFormat] = useUserSetting<string>('nexum.sig.bookmarkFormat', DEFAULT_BOOKMARK_FORMAT);
+  // Full wormhole catalog — needed so size/mass tokens resolve for every WH
+  // type (the static map only covers k-space statics).
+  const whTypes = useWormholeTypes();
 
   const copyBookmark = useCallback((sig: Signature) => {
-    const name = formatBookmarkName(bookmarkFormat, sig);
+    const name = formatBookmarkName(bookmarkFormat, sig, whTypes);
     if (!name) return;
     navigator.clipboard.writeText(name)
       .then(() => toast.success(t('signatures.bookmarkCopied', { name })))
       .catch(() => toast.error(t('signatures.bookmarkCopyFailed')));
-  }, [bookmarkFormat, t]);
+  }, [bookmarkFormat, whTypes, t]);
 
   // Sigs currently shown with the pending-removal indicator, plus the timers
   // that delete them once the grace period elapses.
