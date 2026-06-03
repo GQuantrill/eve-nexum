@@ -39,15 +39,39 @@ export function TooltipLayer() {
   // `[data-tooltip]` in the tree — current and future — without per-element wiring.
   useEffect(() => {
     let active: Element | null = null;
+    // When we show a custom chip for a plain `title`, we strip the title for the
+    // duration of the hover so the browser's own (slow, ~0.5-1.5s) native
+    // tooltip doesn't fire too. It's restored the moment the hover ends, so the
+    // element's accessible name is intact at rest.
+    let strippedTitle: string | null = null;
+
+    // Trigger off both the app's `data-tooltip` markers and any native `title`,
+    // so every titled control gets the instant, styled, viewport-clamped chip
+    // instead of the browser's delayed one.
+    const SEL = '[data-tooltip], [title]';
 
     const placementFor = (el: Element): Placement =>
       el.classList.contains('tooltip-right') ? 'right'
         : el.classList.contains('tooltip-above') ? 'above'
           : 'below';
 
-    const open = (el: Element) => {
-      const text = el.getAttribute('data-tooltip');
-      if (!text) return;
+    const restoreTitle = () => {
+      if (active && strippedTitle != null) active.setAttribute('title', strippedTitle);
+      strippedTitle = null;
+    };
+
+    // stripTitle is true for mouse hover (suppress the native tooltip) and false
+    // for keyboard focus — no native tooltip fires on focus, and keeping `title`
+    // preserves the accessible name while the control is focused.
+    const open = (el: Element, stripTitle: boolean) => {
+      restoreTitle(); // put back any title taken from a previous trigger
+      let text = el.getAttribute('data-tooltip');
+      if (!text) {
+        const tt = el.getAttribute('title');
+        if (!tt) return;
+        text = tt;
+        if (stripTitle) { strippedTitle = tt; el.removeAttribute('title'); }
+      }
       active = el;
       setPos(null); // hide until measured at the new size
       setTrigger({ text, rect: el.getBoundingClientRect(), placement: placementFor(el) });
@@ -55,14 +79,19 @@ export function TooltipLayer() {
 
     const close = () => {
       if (!active) return;
+      restoreTitle();
       active = null;
       setTrigger(null);
       setPos(null);
     };
 
     const onOver = (e: Event) => {
-      const el = (e.target as Element | null)?.closest?.('[data-tooltip]') ?? null;
-      if (el && el !== active) open(el);
+      const target = e.target as Element | null;
+      // Still inside the active trigger (whose `title` we may have stripped, so
+      // it no longer matches SEL) — keep it open.
+      if (active && target && active.contains(target)) return;
+      const el = target?.closest?.(SEL) ?? null;
+      if (el && el !== active) open(el, true);
       else if (!el && active) close();
     };
     const onOut = (e: MouseEvent) => {
@@ -72,8 +101,8 @@ export function TooltipLayer() {
       if (!to || !active.contains(to)) close();
     };
     const onFocusIn = (e: Event) => {
-      const el = (e.target as Element | null)?.closest?.('[data-tooltip]') ?? null;
-      if (el) open(el); else close();
+      const el = (e.target as Element | null)?.closest?.(SEL) ?? null;
+      if (el) open(el, false); else close();
     };
 
     document.addEventListener('mouseover', onOver, true);
