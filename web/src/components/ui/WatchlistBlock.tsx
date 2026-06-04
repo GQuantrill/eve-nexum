@@ -60,50 +60,53 @@ export function WatchlistBlock() {
             const onMap = it.query.trim() !== '' && presentNames.has(it.query.trim().toLowerCase());
             return (
               <div key={it.id} className="watchlist__row">
+                {/* Vendored icon swatch (shows the chosen marker) sits beside a
+                    text-only <select> — an <option> can't host an SVG, so the
+                    icon lives outside the control. */}
+                <span className="watchlist__marker-icon" style={{ color: def.color }} title={t(`watchMarker.${it.marker}`)}>
+                  <def.Icon size={16} weight="fill" />
+                </span>
                 <select
                   className="watchlist__marker"
                   value={it.marker}
                   onChange={(e) => updateItem(it.id, { marker: e.target.value as WatchMarkerKind })}
                   title={t(`watchMarker.${it.marker}`)}
-                  style={{ color: def.color }}
                   aria-label={t('watchlist.markerAria')}
                 >
                   {WATCH_MARKERS.map((m) => (
                     <option key={m.kind} value={m.kind}>
-                      {m.glyph} {t(`watchMarker.${m.kind}`)}
+                      {t(`watchMarker.${m.kind}`)}
                     </option>
                   ))}
                 </select>
-                <div className="watchlist__fields">
-                  <div className="watchlist__query-wrap">
-                    <input
-                      type="text"
-                      className="watchlist__query"
-                      value={it.query}
-                      maxLength={48}
-                      onChange={(e) => updateItem(it.id, { query: e.target.value })}
-                      placeholder={t('watchlist.queryPlaceholder')}
-                      spellCheck={false}
-                      ref={(el) => {
-                        if (el && autoFocusId === it.id) {
-                          el.focus();
-                          setAutoFocusId(null);
-                        }
-                      }}
-                    />
-                    {onMap && (
-                      <span className="watchlist__onmap" title={t('watchlist.onMap')} aria-label={t('watchlist.onMap')} />
-                    )}
-                  </div>
+                <div className="watchlist__query-wrap">
                   <input
                     type="text"
-                    className="watchlist__note"
-                    value={it.note}
-                    maxLength={120}
-                    onChange={(e) => updateItem(it.id, { note: e.target.value })}
-                    placeholder={t('watchlist.notePlaceholder')}
+                    className="watchlist__query"
+                    value={it.query}
+                    maxLength={48}
+                    onChange={(e) => updateItem(it.id, { query: e.target.value })}
+                    placeholder={t('watchlist.queryPlaceholder')}
+                    spellCheck={false}
+                    ref={(el) => {
+                      if (el && autoFocusId === it.id) {
+                        el.focus();
+                        setAutoFocusId(null);
+                      }
+                    }}
                   />
+                  {onMap && (
+                    <span className="watchlist__onmap" title={t('watchlist.onMap')} aria-label={t('watchlist.onMap')} />
+                  )}
                 </div>
+                <input
+                  type="text"
+                  className="watchlist__note"
+                  value={it.note}
+                  maxLength={120}
+                  onChange={(e) => updateItem(it.id, { note: e.target.value })}
+                  placeholder={t('watchlist.notePlaceholder')}
+                />
                 <button
                   type="button"
                   className="watchlist__remove"
