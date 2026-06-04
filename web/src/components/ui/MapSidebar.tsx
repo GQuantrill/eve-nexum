@@ -26,7 +26,6 @@ import { ChainExitsSection } from "./ChainExitsSection";
 import { MapSharesSection } from "./MapSharesSection";
 import { MergeMapModal } from "./MergeMapModal";
 import { CustomIntelBlock } from "./CustomIntelBlock";
-import { WatchlistBlock } from "./WatchlistBlock";
 import { useIsMapOwner } from "../../hooks/useIsMapOwner";
 import type { WormholeMap } from "../../types";
 
@@ -102,7 +101,6 @@ type SectionId =
   | "wormholeBookmarks"
   | "mapControls"
   | "systemOptions"
-  | "watchlist"
   | "connections"
   | "route"
   | "chainExits"
@@ -725,13 +723,6 @@ export function MapSidebar() {
           </div>
 
           <CustomIntelBlock />
-        </CollapsibleSection>
-
-        <CollapsibleSection
-          title={t("mapSidebar.sections.watchlist")}
-          {...sectionProps("watchlist")}
-        >
-          <WatchlistBlock />
         </CollapsibleSection>
 
         <CollapsibleSection

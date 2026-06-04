@@ -74,36 +74,34 @@ export function WatchlistBlock() {
                     </option>
                   ))}
                 </select>
-                <div className="watchlist__fields">
-                  <div className="watchlist__query-wrap">
-                    <input
-                      type="text"
-                      className="watchlist__query"
-                      value={it.query}
-                      maxLength={48}
-                      onChange={(e) => updateItem(it.id, { query: e.target.value })}
-                      placeholder={t('watchlist.queryPlaceholder')}
-                      spellCheck={false}
-                      ref={(el) => {
-                        if (el && autoFocusId === it.id) {
-                          el.focus();
-                          setAutoFocusId(null);
-                        }
-                      }}
-                    />
-                    {onMap && (
-                      <span className="watchlist__onmap" title={t('watchlist.onMap')} aria-label={t('watchlist.onMap')} />
-                    )}
-                  </div>
+                <div className="watchlist__query-wrap">
                   <input
                     type="text"
-                    className="watchlist__note"
-                    value={it.note}
-                    maxLength={120}
-                    onChange={(e) => updateItem(it.id, { note: e.target.value })}
-                    placeholder={t('watchlist.notePlaceholder')}
+                    className="watchlist__query"
+                    value={it.query}
+                    maxLength={48}
+                    onChange={(e) => updateItem(it.id, { query: e.target.value })}
+                    placeholder={t('watchlist.queryPlaceholder')}
+                    spellCheck={false}
+                    ref={(el) => {
+                      if (el && autoFocusId === it.id) {
+                        el.focus();
+                        setAutoFocusId(null);
+                      }
+                    }}
                   />
+                  {onMap && (
+                    <span className="watchlist__onmap" title={t('watchlist.onMap')} aria-label={t('watchlist.onMap')} />
+                  )}
                 </div>
+                <input
+                  type="text"
+                  className="watchlist__note"
+                  value={it.note}
+                  maxLength={120}
+                  onChange={(e) => updateItem(it.id, { note: e.target.value })}
+                  placeholder={t('watchlist.notePlaceholder')}
+                />
                 <button
                   type="button"
                   className="watchlist__remove"

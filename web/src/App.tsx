@@ -7,6 +7,7 @@ import { SystemPanel } from './components/ui/SystemPanel';
 import { ConnectionPanel } from './components/ui/ConnectionPanel';
 import { Toolbar } from './components/ui/Toolbar';
 import { MapSidebar } from './components/ui/MapSidebar';
+import { WatchlistPanel } from './components/ui/WatchlistPanel';
 import { Sidebar } from './components/ui/Sidebar';
 import { ProximityOptInModal } from './components/ui/ProximityOptInModal';
 import { CommandPaletteModal } from './components/ui/CommandPaletteModal';
@@ -93,6 +94,7 @@ function MapApp() {
           <Sidebar />
           <div className="layout__main">
             <MapCanvas />
+            <WatchlistPanel />
             <MapSidebar />
             {selectedSystemId && <SystemPanel />}
             {selectedConnectionId && <ConnectionPanel />}
