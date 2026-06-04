@@ -250,7 +250,7 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
           data-tooltip={watchTip}
           aria-label={watchTip}
         >
-          {watchDef.glyph}
+          <watchDef.Icon size={11} weight="fill" />
         </span>
       )}
 

@@ -1854,14 +1854,23 @@
   gap: 6px;
 }
 
+.watchlist__marker-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+}
+
 .watchlist__marker {
   flex-shrink: 0;
-  width: 88px;
+  width: 82px;
   background: #0a0e1a;
   border: 1px solid #1e2740;
   border-radius: 4px;
   padding: 4px 2px;
-  font-size: calc(13px * var(--font-scale, 1));
+  font-size: calc(12px * var(--font-scale, 1));
+  color: #c8d4f0;
   outline: none;
   cursor: pointer;
 }
@@ -2321,10 +2330,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
   line-height: 1;
   border-radius: 50%;
   background: #0a0e1a;
+  color: var(--watch-color, #6ea0ff);
   border: 1px solid var(--watch-color, #6ea0ff);
   box-shadow: 0 0 6px var(--watch-color, #6ea0ff);
   pointer-events: auto;

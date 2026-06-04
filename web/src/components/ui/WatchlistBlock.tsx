@@ -60,17 +60,22 @@ export function WatchlistBlock() {
             const onMap = it.query.trim() !== '' && presentNames.has(it.query.trim().toLowerCase());
             return (
               <div key={it.id} className="watchlist__row">
+                {/* Vendored icon swatch (shows the chosen marker) sits beside a
+                    text-only <select> — an <option> can't host an SVG, so the
+                    icon lives outside the control. */}
+                <span className="watchlist__marker-icon" style={{ color: def.color }} title={t(`watchMarker.${it.marker}`)}>
+                  <def.Icon size={16} weight="fill" />
+                </span>
                 <select
                   className="watchlist__marker"
                   value={it.marker}
                   onChange={(e) => updateItem(it.id, { marker: e.target.value as WatchMarkerKind })}
                   title={t(`watchMarker.${it.marker}`)}
-                  style={{ color: def.color }}
                   aria-label={t('watchlist.markerAria')}
                 >
                   {WATCH_MARKERS.map((m) => (
                     <option key={m.kind} value={m.kind}>
-                      {m.glyph} {t(`watchMarker.${m.kind}`)}
+                      {t(`watchMarker.${m.kind}`)}
                     </option>
                   ))}
                 </select>
