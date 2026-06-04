@@ -102,12 +102,11 @@ const HEX_64 = /^[0-9a-fA-F]{64}$/;
 const isHex64Key = HEX_64.test(TOKEN_ENC_RAW);
 // A short passphrase SHA-256s into a low-entropy, brute-forceable key that
 // protects every stored EVE refresh token. The strong form is 64 hex chars
-// (`openssl rand -hex 32`); a >=32-char passphrase is tolerated as a fallback,
-// but anything weaker is refused in production and warned about in dev.
+// (`openssl rand -hex 32`). We only WARN about weaker keys — never refuse to
+// boot — so self-hosted deployments that already run with a short passphrase
+// keep starting. Operators are nudged to upgrade but not locked out.
 if (!isHex64Key && TOKEN_ENC_RAW.length < 32) {
-  const msg = 'TOKEN_ENCRYPTION_KEY is too weak — use 64 hex chars (openssl rand -hex 32) or at least a 32-character passphrase';
-  if (isProd) { console.error(`FATAL: ${msg}`); process.exit(1); }
-  else console.warn(`WARNING: ${msg}`);
+  console.warn('WARNING: TOKEN_ENCRYPTION_KEY is weak — for stronger token encryption use 64 hex chars (openssl rand -hex 32) or at least a 32-character passphrase');
 }
 const tokenEncryptionKey = isHex64Key
   ? TOKEN_ENC_RAW.toLowerCase()
