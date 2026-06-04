@@ -360,9 +360,18 @@
     "showStaticWhs": "Mostrar WH estáticos",
     "easyConnect": "Conexión fácil",
     "connectionStyle": "Estilo de conexión",
-    "edgeStyle": { "bezier": "Estándar", "straight": "Recta", "smoothstep": "Escalón" },
+    "edgeStyle": {
+      "bezier": "Estándar",
+      "straight": "Recta",
+      "smoothstep": "Escalón"
+    },
     "connectionThickness": "Grosor de las conexiones",
-    "thickness": { "thin": "Fino", "standard": "Estándar", "thick": "Grueso", "extra": "Muy grueso" },
+    "thickness": {
+      "thin": "Fino",
+      "standard": "Estándar",
+      "thick": "Grueso",
+      "extra": "Muy grueso"
+    },
     "optimizeConnections": "⟳ Optimizar conexiones",
     "spreadNodes": "⊞ Separar nodos",
     "spreadNodesTooltip": "Ajustar los nodos de sistema para evitar solapamientos",
@@ -510,7 +519,11 @@
     "sizeSmall": "Pequeño (Fragata)",
     "rollingCalculator": "Calculadora de rolling",
     "custom": "Personalizado",
-    "collapse": { "open": "Abierto", "maybe": "Posiblemente colapsado", "collapsed": "Colapsado" },
+    "collapse": {
+      "open": "Abierto",
+      "maybe": "Posiblemente colapsado",
+      "collapsed": "Colapsado"
+    },
     "remaining": "{{worst}}–{{best}} restante · {{used}} usado · salto máx {{max}}",
     "useMyShip": "Usar mi nave",
     "useMyShipTitle": "Frío = {{ship}} ({{mass}}), caliente = +prop",
@@ -604,6 +617,7 @@
   "panel": {
     "notes": "Notas",
     "signatures": "Firmas",
+    "anomalies": "Anomalías",
     "structures": "Estructuras",
     "npcStations": "Estaciones PNJ",
     "killboard": "zKillboard",
@@ -766,6 +780,12 @@
     "ore": "Mineral",
     "combat": "Combate"
   },
+  "anomType": {
+    "unknown": "Desconocido",
+    "combat": "Combate",
+    "ore": "Mineral",
+    "gas": "Gas"
+  },
   "signatures": {
     "pasteHint": "Puedes copiar y pegar firmas directamente desde el escáner de sondas en EVE. Para ello, abre tu escáner de sondas. Pulsa Ctrl+A para seleccionarlas todas, luego Ctrl+C para copiar. Usa Ctrl+V para pegarlas aquí.",
     "pasteDifferentSystem": "Tu personaje está actualmente en {{current}}, pero estás pegando firmas en {{selected}}. ¿Continuar?",
@@ -803,6 +823,36 @@
     "colAge": "Antigüedad",
     "colUpdated": "Actualizado",
     "namePlaceholder": "Nombre del sitio"
+  },
+  "anomalies": {
+    "pasteHint": "Puedes copiar y pegar anomalías directamente desde el escáner de sondas en EVE. Abre tu escáner de sondas, pulsa Ctrl+A para seleccionarlas todas, Ctrl+C para copiar y luego Ctrl+V para pegarlas aquí. Las firmas y anomalías pegadas juntas se ordenan automáticamente en el panel correcto.",
+    "pasteDifferentSystem": "Tu personaje está actualmente en {{current}}, pero estás pegando anomalías en {{selected}}. ¿Continuar?",
+    "loadFailed": "No se pudieron cargar las anomalías",
+    "saveFailed": "No se pudo guardar la anomalía",
+    "deleteFailed": "No se pudo eliminar la anomalía",
+    "deleteSelectedConfirm_one": "¿Eliminar {{count}} anomalía seleccionada?",
+    "deleteSelectedConfirm_other": "¿Eliminar {{count}} anomalías seleccionadas?",
+    "deleteAllConfirm_one": "¿Eliminar {{count}} anomalía?",
+    "deleteAllConfirm_other": "¿Eliminar las {{count}} anomalías?",
+    "addAnomaly": "Añadir anomalía",
+    "overwriteToggle": "Sobrescribir al pegar",
+    "overwriteTooltip": "Cuando está activo, pegar reemplaza la lista — se eliminan las anomalías que ya no están en el escaneo. O mantén Mayús al pegar para sobrescribir solo una vez.",
+    "removeDelayLabel": "Retardo de eliminación",
+    "removeDelayTooltip": "Cuánto tiempo permanece visible (tachada) una anomalía desaparecida antes de que un pegado en sobrescritura la elimine — tiempo para borrar su marcador en el juego.",
+    "removeDelayInstant": "Inmediato",
+    "filterLabel": "Filtrar por tipo",
+    "filterClear": "Limpiar",
+    "noMatchFilter": "Ninguna anomalía coincide con el filtro",
+    "setTypeAria": "Establecer el tipo de las anomalías seleccionadas",
+    "setType": "Establecer tipo ({{count}})…",
+    "deleteSelected": "Eliminar seleccionadas ({{count}})",
+    "deleteAll": "Eliminar todo",
+    "empty": "No hay anomalías — pega desde el escáner de sondas para importar",
+    "colId": "ID",
+    "colType": "Tipo",
+    "colName": "Nombre",
+    "colNotes": "Notas",
+    "namePlaceholder": "Nombre de la anomalía"
   },
   "stats": {
     "title": "Estadísticas de usuario",

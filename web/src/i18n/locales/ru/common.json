@@ -374,9 +374,18 @@
     "showStaticWhs": "Показывать статик-ЧД",
     "easyConnect": "Лёгкое соединение",
     "connectionStyle": "Стиль соединений",
-    "edgeStyle": { "bezier": "Стандартный", "straight": "Прямой", "smoothstep": "Ступенчатый" },
+    "edgeStyle": {
+      "bezier": "Стандартный",
+      "straight": "Прямой",
+      "smoothstep": "Ступенчатый"
+    },
     "connectionThickness": "Толщина соединений",
-    "thickness": { "thin": "Тонкая", "standard": "Стандартная", "thick": "Толстая", "extra": "Очень толстая" },
+    "thickness": {
+      "thin": "Тонкая",
+      "standard": "Стандартная",
+      "thick": "Толстая",
+      "extra": "Очень толстая"
+    },
     "optimizeConnections": "⟳ Оптимизировать соединения",
     "spreadNodes": "⊞ Разнести узлы",
     "spreadNodesTooltip": "Передвинуть узлы систем, чтобы они не перекрывались",
@@ -526,7 +535,11 @@
     "sizeSmall": "Малый (фрегат)",
     "rollingCalculator": "Калькулятор роллинга",
     "custom": "Свой",
-    "collapse": { "open": "Открыта", "maybe": "Возможно, схлопнулась", "collapsed": "Схлопнулась" },
+    "collapse": {
+      "open": "Открыта",
+      "maybe": "Возможно, схлопнулась",
+      "collapsed": "Схлопнулась"
+    },
     "remaining": "осталось {{worst}}–{{best}} · использовано {{used}} · макс. прыжок {{max}}",
     "useMyShip": "Использовать мой корабль",
     "useMyShipTitle": "Холодный = {{ship}} ({{mass}}), горячий = +проп",
@@ -622,6 +635,7 @@
   "panel": {
     "notes": "Заметки",
     "signatures": "Сигнатуры",
+    "anomalies": "Аномалии",
     "structures": "Структуры",
     "npcStations": "Станции NPC",
     "killboard": "zKillboard",
@@ -794,6 +808,12 @@
     "ore": "Руда",
     "combat": "Бой"
   },
+  "anomType": {
+    "unknown": "Неизвестно",
+    "combat": "Бой",
+    "ore": "Руда",
+    "gas": "Газ"
+  },
   "signatures": {
     "pasteHint": "Вы можете копировать и вставлять сигнатуры прямо из Сканера зондов в EVE. Для этого откройте сканер зондов. Нажмите Ctrl+A, чтобы выделить все, затем Ctrl+C, чтобы скопировать. Используйте Ctrl+V, чтобы вставить их сюда",
     "pasteDifferentSystem": "Ваш персонаж сейчас в {{current}}, но вы вставляете сигнатуры в {{selected}}. Продолжить?",
@@ -835,6 +855,40 @@
     "colAge": "Возраст",
     "colUpdated": "Обновлено",
     "namePlaceholder": "Название сайта"
+  },
+  "anomalies": {
+    "pasteHint": "Вы можете копировать и вставлять аномалии прямо из Сканера зондов в EVE. Откройте сканер зондов, нажмите Ctrl+A, чтобы выделить все, Ctrl+C, чтобы скопировать, затем Ctrl+V, чтобы вставить их сюда. Сигнатуры и аномалии, вставленные вместе, автоматически распределяются по нужной панели.",
+    "pasteDifferentSystem": "Ваш персонаж сейчас в {{current}}, но вы вставляете аномалии в {{selected}}. Продолжить?",
+    "loadFailed": "Не удалось загрузить аномалии",
+    "saveFailed": "Не удалось сохранить аномалию",
+    "deleteFailed": "Не удалось удалить аномалию",
+    "deleteSelectedConfirm_one": "Удалить {{count}} выбранную аномалию?",
+    "deleteSelectedConfirm_few": "Удалить {{count}} выбранные аномалии?",
+    "deleteSelectedConfirm_many": "Удалить {{count}} выбранных аномалий?",
+    "deleteSelectedConfirm_other": "Удалить {{count}} выбранных аномалий?",
+    "deleteAllConfirm_one": "Удалить все {{count}} аномалию?",
+    "deleteAllConfirm_few": "Удалить все {{count}} аномалии?",
+    "deleteAllConfirm_many": "Удалить все {{count}} аномалий?",
+    "deleteAllConfirm_other": "Удалить все {{count}} аномалий?",
+    "addAnomaly": "Добавить аномалию",
+    "overwriteToggle": "Перезаписать при вставке",
+    "overwriteTooltip": "Когда включено, вставка заменяет список — аномалии, которых больше нет в скане, удаляются. Или удерживайте Shift при вставке, чтобы перезаписать один раз.",
+    "removeDelayLabel": "Задержка удаления",
+    "removeDelayTooltip": "Сколько исчезнувшая аномалия остаётся видимой (зачёркнутой) до удаления при вставке с перезаписью — время, чтобы убрать её закладку в игре.",
+    "removeDelayInstant": "Сразу",
+    "filterLabel": "Фильтр по типу",
+    "filterClear": "Сбросить",
+    "noMatchFilter": "Нет аномалий, соответствующих фильтру",
+    "setTypeAria": "Задать тип для выбранных аномалий",
+    "setType": "Задать тип ({{count}})…",
+    "deleteSelected": "Удалить выбранные ({{count}})",
+    "deleteAll": "Удалить все",
+    "empty": "Аномалии не отсканированы — вставьте из сканера зондов для импорта",
+    "colId": "ID",
+    "colType": "Тип",
+    "colName": "Название",
+    "colNotes": "Заметки",
+    "namePlaceholder": "Название аномалии"
   },
   "stats": {
     "title": "Статистика пользователя",

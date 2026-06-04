@@ -360,9 +360,18 @@
     "showStaticWhs": "Afficher les WH statiques",
     "easyConnect": "Connexion facile",
     "connectionStyle": "Style de connexion",
-    "edgeStyle": { "bezier": "Standard", "straight": "Droite", "smoothstep": "Palier" },
+    "edgeStyle": {
+      "bezier": "Standard",
+      "straight": "Droite",
+      "smoothstep": "Palier"
+    },
     "connectionThickness": "Épaisseur des connexions",
-    "thickness": { "thin": "Fine", "standard": "Standard", "thick": "Épaisse", "extra": "Très épaisse" },
+    "thickness": {
+      "thin": "Fine",
+      "standard": "Standard",
+      "thick": "Épaisse",
+      "extra": "Très épaisse"
+    },
     "optimizeConnections": "⟳ Optimiser les connexions",
     "spreadNodes": "⊞ Espacer les nœuds",
     "spreadNodesTooltip": "Ajuster les nœuds de système pour éviter les chevauchements",
@@ -510,7 +519,11 @@
     "sizeSmall": "Petit (Frégate)",
     "rollingCalculator": "Calculateur de rolling",
     "custom": "Personnalisé",
-    "collapse": { "open": "Ouvert", "maybe": "Peut-être effondré", "collapsed": "Effondré" },
+    "collapse": {
+      "open": "Ouvert",
+      "maybe": "Peut-être effondré",
+      "collapsed": "Effondré"
+    },
     "remaining": "{{worst}}–{{best}} restant · {{used}} utilisé · saut max {{max}}",
     "useMyShip": "Utiliser mon vaisseau",
     "useMyShipTitle": "Froid = {{ship}} ({{mass}}), chaud = +prop",
@@ -604,6 +617,7 @@
   "panel": {
     "notes": "Notes",
     "signatures": "Signatures",
+    "anomalies": "Anomalies",
     "structures": "Structures",
     "npcStations": "Stations PNJ",
     "killboard": "zKillboard",
@@ -766,6 +780,12 @@
     "ore": "Minerai",
     "combat": "Combat"
   },
+  "anomType": {
+    "unknown": "Inconnu",
+    "combat": "Combat",
+    "ore": "Minerai",
+    "gas": "Gaz"
+  },
   "signatures": {
     "pasteHint": "Vous pouvez copier-coller des signatures directement depuis le scanner de sondes dans EVE. Pour cela, ouvrez votre scanner de sondes. Appuyez sur Ctrl+A pour tout sélectionner, puis Ctrl+C pour copier. Utilisez Ctrl+V pour les coller ici.",
     "pasteDifferentSystem": "Votre personnage est actuellement dans {{current}}, mais vous collez des signatures dans {{selected}}. Continuer ?",
@@ -803,6 +823,36 @@
     "colAge": "Âge",
     "colUpdated": "Mis à jour",
     "namePlaceholder": "Nom du site"
+  },
+  "anomalies": {
+    "pasteHint": "Vous pouvez copier-coller des anomalies directement depuis le scanner de sondes dans EVE. Ouvrez votre scanner de sondes, appuyez sur Ctrl+A pour tout sélectionner, Ctrl+C pour copier, puis Ctrl+V pour les coller ici. Les signatures et anomalies collées ensemble sont automatiquement triées dans le bon panneau.",
+    "pasteDifferentSystem": "Votre personnage est actuellement dans {{current}}, mais vous collez des anomalies dans {{selected}}. Continuer ?",
+    "loadFailed": "Échec du chargement des anomalies",
+    "saveFailed": "Échec de l'enregistrement de l'anomalie",
+    "deleteFailed": "Échec de la suppression de l'anomalie",
+    "deleteSelectedConfirm_one": "Supprimer {{count}} anomalie sélectionnée ?",
+    "deleteSelectedConfirm_other": "Supprimer {{count}} anomalies sélectionnées ?",
+    "deleteAllConfirm_one": "Supprimer {{count}} anomalie ?",
+    "deleteAllConfirm_other": "Supprimer les {{count}} anomalies ?",
+    "addAnomaly": "Ajouter une anomalie",
+    "overwriteToggle": "Écraser au collage",
+    "overwriteTooltip": "Si activé, le collage remplace la liste — les anomalies absentes du scan sont supprimées. Ou maintenez Maj en collant pour écraser une seule fois.",
+    "removeDelayLabel": "Délai de suppression",
+    "removeDelayTooltip": "Durée pendant laquelle une anomalie disparue reste visible (barrée) avant qu'un collage en écrasement ne la supprime — le temps d'effacer son signet en jeu.",
+    "removeDelayInstant": "Immédiat",
+    "filterLabel": "Filtrer par type",
+    "filterClear": "Effacer",
+    "noMatchFilter": "Aucune anomalie ne correspond au filtre",
+    "setTypeAria": "Définir le type des anomalies sélectionnées",
+    "setType": "Définir le type ({{count}})…",
+    "deleteSelected": "Supprimer la sélection ({{count}})",
+    "deleteAll": "Tout supprimer",
+    "empty": "Aucune anomalie — collez depuis le scanner de sondes pour importer",
+    "colId": "ID",
+    "colType": "Type",
+    "colName": "Nom",
+    "colNotes": "Notes",
+    "namePlaceholder": "Nom de l'anomalie"
   },
   "stats": {
     "title": "Statistiques utilisateur",

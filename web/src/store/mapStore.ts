@@ -220,6 +220,7 @@ interface MapStore {
   // and re-fetches when it ticks (sigs/structures live in pane state, not here).
   sigRev: Record<string, number>;
   structRev: Record<string, number>;
+  anomRev: Record<string, number>;
 
   // Realtime: apply an edit pushed from another client (no persist, no undo).
   applyRemote: (event: RemoteEvent) => void;
@@ -237,7 +238,8 @@ export type RemoteEvent =
   | { type: 'map.meta';          name?: string; locked?: boolean }
   | { type: 'map.resync' }
   | { type: 'sig.changed';       systemId: string }
-  | { type: 'structure.changed'; systemId: string };
+  | { type: 'structure.changed'; systemId: string }
+  | { type: 'anom.changed';      systemId: string };
 
 export const useMapStore = create<MapStore>()((set, get) => {
 
@@ -409,7 +411,8 @@ export const useMapStore = create<MapStore>()((set, get) => {
     routeOrigin: null,
     sigRev: {},
     structRev: {},
-    panelOrder: ['activity', 'killboard', 'notes', 'signatures', 'structures', 'npcStations'],
+    anomRev: {},
+    panelOrder: ['activity', 'killboard', 'notes', 'signatures', 'anomalies', 'structures', 'npcStations'],
     undoStack: [],
 
     pushUndo: (cmd) =>
@@ -427,7 +430,7 @@ export const useMapStore = create<MapStore>()((set, get) => {
       // Whitelist of valid panel keys. `standings` was briefly a panel here
       // — kept in the filter so any persisted occurrence is silently
       // dropped on load now that standings live inline in the sov section.
-      const all = ['activity', 'killboard', 'notes', 'signatures', 'structures', 'npcStations'];
+      const all = ['activity', 'killboard', 'notes', 'signatures', 'anomalies', 'structures', 'npcStations'];
       const merged = [
         ...panelOrder.filter((p) => all.includes(p)),
         ...all.filter((p) => !panelOrder.includes(p)),
@@ -983,6 +986,10 @@ export const useMapStore = create<MapStore>()((set, get) => {
         }
         case 'structure.changed': {
           set((s) => ({ structRev: { ...s.structRev, [event.systemId]: (s.structRev[event.systemId] ?? 0) + 1 } }));
+          break;
+        }
+        case 'anom.changed': {
+          set((s) => ({ anomRev: { ...s.anomRev, [event.systemId]: (s.anomRev[event.systemId] ?? 0) + 1 } }));
           break;
         }
       }

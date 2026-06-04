@@ -203,6 +203,22 @@ export async function migrate() {
       updated_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
 
+    -- Cosmic anomalies (no scanning required — already 100% on the probe
+    -- scanner). Separate from map_signatures: anomalies have no wormhole
+    -- type / leads-to, never back a connection, and aren't part of scan
+    -- stats. Brand-new table, so created_by_user_id is included up front.
+    CREATE TABLE IF NOT EXISTS map_anomalies (
+      id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+      system_id   UUID        NOT NULL REFERENCES map_systems(id) ON DELETE CASCADE,
+      anom_id     TEXT        NOT NULL DEFAULT '',
+      anom_type   TEXT        NOT NULL DEFAULT 'unknown',
+      name        TEXT        NOT NULL DEFAULT '',
+      notes       TEXT        NOT NULL DEFAULT '',
+      created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      created_by_user_id INTEGER REFERENCES users(id) ON DELETE SET NULL
+    );
+
     -- Attribute sigs and structures to the user who created them, so the
     -- admin Users report can answer "last time X added a sig/struct on a
     -- corp map". Nullable: rows created before this migration stay NULL,
@@ -394,6 +410,8 @@ export async function migrate() {
     -- index they sequential-scan the whole table.
     CREATE INDEX IF NOT EXISTS idx_map_signatures_creator ON map_signatures (created_by_user_id);
     CREATE INDEX IF NOT EXISTS idx_map_structures_creator ON map_structures (created_by_user_id);
+    CREATE INDEX IF NOT EXISTS idx_map_anomalies_system  ON map_anomalies (system_id);
+    CREATE INDEX IF NOT EXISTS idx_map_anomalies_creator ON map_anomalies (created_by_user_id);
     CREATE INDEX IF NOT EXISTS idx_user_events_map         ON user_events (map_id);
     CREATE INDEX IF NOT EXISTS idx_maps_corp               ON maps (corp_id);
 

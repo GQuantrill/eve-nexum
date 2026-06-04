@@ -67,6 +67,18 @@ export interface Signature {
   updatedAt: string;
 }
 
+export type AnomType = 'unknown' | 'combat' | 'ore' | 'gas';
+
+export interface Anomaly {
+  id: string;
+  anomId: string;
+  anomType: AnomType;
+  name: string;
+  notes: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export type StructureType =
   | 'unknown'
   | 'astrahus' | 'fortizar' | 'keepstar'

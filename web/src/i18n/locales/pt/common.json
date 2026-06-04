@@ -360,9 +360,18 @@
     "showStaticWhs": "Mostrar WH estáticos",
     "easyConnect": "Conexão fácil",
     "connectionStyle": "Estilo de conexão",
-    "edgeStyle": { "bezier": "Padrão", "straight": "Reta", "smoothstep": "Degrau" },
+    "edgeStyle": {
+      "bezier": "Padrão",
+      "straight": "Reta",
+      "smoothstep": "Degrau"
+    },
     "connectionThickness": "Espessura das conexões",
-    "thickness": { "thin": "Fina", "standard": "Padrão", "thick": "Grossa", "extra": "Muito grossa" },
+    "thickness": {
+      "thin": "Fina",
+      "standard": "Padrão",
+      "thick": "Grossa",
+      "extra": "Muito grossa"
+    },
     "optimizeConnections": "⟳ Otimizar conexões",
     "spreadNodes": "⊞ Espaçar nós",
     "spreadNodesTooltip": "Ajustar os nós de sistema para evitar sobreposições",
@@ -510,7 +519,11 @@
     "sizeSmall": "Pequeno (Fragata)",
     "rollingCalculator": "Calculadora de rolling",
     "custom": "Personalizado",
-    "collapse": { "open": "Aberto", "maybe": "Possivelmente colapsado", "collapsed": "Colapsado" },
+    "collapse": {
+      "open": "Aberto",
+      "maybe": "Possivelmente colapsado",
+      "collapsed": "Colapsado"
+    },
     "remaining": "{{worst}}–{{best}} restante · {{used}} usado · salto máx {{max}}",
     "useMyShip": "Usar a minha nave",
     "useMyShipTitle": "Frio = {{ship}} ({{mass}}), quente = +prop",
@@ -604,6 +617,7 @@
   "panel": {
     "notes": "Notas",
     "signatures": "Assinaturas",
+    "anomalies": "Anomalias",
     "structures": "Estruturas",
     "npcStations": "Estações PNJ",
     "killboard": "zKillboard",
@@ -766,6 +780,12 @@
     "ore": "Minério",
     "combat": "Combate"
   },
+  "anomType": {
+    "unknown": "Desconhecido",
+    "combat": "Combate",
+    "ore": "Minério",
+    "gas": "Gás"
+  },
   "signatures": {
     "pasteHint": "Podes copiar e colar assinaturas diretamente do scanner de sondas no EVE. Para isso, abre o teu scanner de sondas. Prime Ctrl+A para selecionar todas, depois Ctrl+C para copiar. Usa Ctrl+V para as colar aqui.",
     "pasteDifferentSystem": "A tua personagem está atualmente em {{current}}, mas estás a colar assinaturas em {{selected}}. Continuar?",
@@ -803,6 +823,36 @@
     "colAge": "Idade",
     "colUpdated": "Atualizado",
     "namePlaceholder": "Nome do site"
+  },
+  "anomalies": {
+    "pasteHint": "Podes copiar e colar anomalias diretamente do scanner de sondas no EVE. Abre o teu scanner de sondas, prime Ctrl+A para selecionar todas, Ctrl+C para copiar e depois Ctrl+V para as colar aqui. Assinaturas e anomalias coladas em conjunto são automaticamente organizadas no painel correto.",
+    "pasteDifferentSystem": "A tua personagem está atualmente em {{current}}, mas estás a colar anomalias em {{selected}}. Continuar?",
+    "loadFailed": "Falha ao carregar as anomalias",
+    "saveFailed": "Falha ao guardar a anomalia",
+    "deleteFailed": "Falha ao eliminar a anomalia",
+    "deleteSelectedConfirm_one": "Eliminar {{count}} anomalia selecionada?",
+    "deleteSelectedConfirm_other": "Eliminar {{count}} anomalias selecionadas?",
+    "deleteAllConfirm_one": "Eliminar {{count}} anomalia?",
+    "deleteAllConfirm_other": "Eliminar as {{count}} anomalias?",
+    "addAnomaly": "Adicionar anomalia",
+    "overwriteToggle": "Substituir ao colar",
+    "overwriteTooltip": "Quando ativo, colar substitui a lista — as anomalias que já não estão no scan são removidas. Ou mantenha Shift ao colar para substituir apenas uma vez.",
+    "removeDelayLabel": "Atraso de remoção",
+    "removeDelayTooltip": "Quanto tempo uma anomalia desaparecida permanece visível (riscada) antes de uma colagem em substituição a apagar — tempo para limpar o seu marcador no jogo.",
+    "removeDelayInstant": "Imediato",
+    "filterLabel": "Filtrar por tipo",
+    "filterClear": "Limpar",
+    "noMatchFilter": "Nenhuma anomalia corresponde ao filtro",
+    "setTypeAria": "Definir o tipo das anomalias selecionadas",
+    "setType": "Definir tipo ({{count}})…",
+    "deleteSelected": "Eliminar selecionadas ({{count}})",
+    "deleteAll": "Eliminar tudo",
+    "empty": "Nenhuma anomalia — cola do scanner de sondas para importar",
+    "colId": "ID",
+    "colType": "Tipo",
+    "colName": "Nome",
+    "colNotes": "Notas",
+    "namePlaceholder": "Nome da anomalia"
   },
   "stats": {
     "title": "Estatísticas de utilizador",

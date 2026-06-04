@@ -1793,6 +1793,79 @@ mapsRouter.delete('/:mapId/systems/:systemId/signatures/:sigId', async (req, res
   res.json({ ok: true });
 });
 
+// ── Anomalies ─────────────────────────────────────────────────────────────────
+// Cosmic anomalies pasted from the probe scanner. Same shape as the signature
+// routes but simpler: no wormhole type / leads-to, no K162 dispatch, no ghost
+// site recording, and they don't back map connections.
+
+mapsRouter.get('/:mapId/systems/:systemId/anomalies', async (req, res) => {
+  const { mapId, systemId } = req.params;
+  const access = await getMapAccess(mapId, req);
+  if (!access) { res.status(404).json({ error: 'Map not found' }); return; }
+  if (!(await verifySystemInMap(res, systemId, mapId))) return;
+  const { rows } = await db.query(
+    `SELECT id, anom_id AS "anomId", anom_type AS "anomType", name, notes, created_at AS "createdAt", updated_at AS "updatedAt"
+     FROM map_anomalies WHERE system_id = $1 ORDER BY created_at`,
+    [systemId],
+  );
+  res.json(rows);
+});
+
+mapsRouter.post('/:mapId/systems/:systemId/anomalies', async (req, res) => {
+  const { mapId, systemId } = req.params;
+  const access = await requireMapContentWrite(res, mapId, req);
+  if (!access) return;
+  if (!(await verifySystemInMap(res, systemId, mapId))) return;
+  const { anomId = '', anomType = 'unknown', name = '', notes = '' } = req.body as Record<string, string>;
+  const { rows } = await db.query(
+    `INSERT INTO map_anomalies (system_id, anom_id, anom_type, name, notes, created_by_user_id)
+     VALUES ($1, $2, $3, $4, $5, $6)
+     RETURNING id, anom_id AS "anomId", anom_type AS "anomType", name, notes, created_at AS "createdAt", updated_at AS "updatedAt"`,
+    [systemId, anomId, anomType, name, notes, req.session.userId],
+  );
+  db.query(`UPDATE map_systems SET last_activity_at = NOW() WHERE id = $1`, [systemId]).catch(console.error);
+  publishToMap(mapId, { type: 'anom.changed', actor: req.get('x-client-id') ?? null, systemId });
+  res.status(201).json(rows[0]);
+});
+
+mapsRouter.patch('/:mapId/systems/:systemId/anomalies/:anomId', async (req, res) => {
+  const { mapId, systemId, anomId } = req.params;
+  const access = await requireMapContentWrite(res, mapId, req);
+  if (!access) return;
+  if (!(await verifySystemInMap(res, systemId, mapId))) return;
+
+  const colMap: Record<string, string> = { anomId: 'anom_id', anomType: 'anom_type', name: 'name', notes: 'notes' };
+  const updates = req.body as Record<string, unknown>;
+
+  const sets: string[] = ['updated_at = NOW()'];
+  const vals: unknown[] = [];
+  for (const [key, col] of Object.entries(colMap)) {
+    if (key in updates) { sets.push(`${col} = $${vals.length + 1}`); vals.push(updates[key]); }
+  }
+
+  await db.query(
+    // map_id scoping is defence-in-depth: verifySystemInMap above already
+    // guarantees systemId is in this map, but enforcing it in SQL too means a
+    // future refactor can't open a cross-map write.
+    `UPDATE map_anomalies SET ${sets.join(', ')} WHERE id = $${vals.length + 1} AND system_id = $${vals.length + 2} AND system_id IN (SELECT id FROM map_systems WHERE map_id = $${vals.length + 3})`,
+    [...vals, anomId, systemId, mapId],
+  );
+  db.query(`UPDATE map_systems SET last_activity_at = NOW() WHERE id = $1`, [systemId]).catch(console.error);
+  publishToMap(mapId, { type: 'anom.changed', actor: req.get('x-client-id') ?? null, systemId });
+  res.json({ ok: true });
+});
+
+mapsRouter.delete('/:mapId/systems/:systemId/anomalies/:anomId', async (req, res) => {
+  const { mapId, systemId, anomId } = req.params;
+  const access = await requireMapContentWrite(res, mapId, req);
+  if (!access) return;
+  if (!(await verifySystemInMap(res, systemId, mapId))) return;
+  await db.query(`DELETE FROM map_anomalies WHERE id = $1 AND system_id = $2 AND system_id IN (SELECT id FROM map_systems WHERE map_id = $3)`, [anomId, systemId, mapId]);
+  db.query(`UPDATE map_systems SET last_activity_at = NOW() WHERE id = $1`, [systemId]).catch(console.error);
+  publishToMap(mapId, { type: 'anom.changed', actor: req.get('x-client-id') ?? null, systemId });
+  res.json({ ok: true });
+});
+
 // ── Structures (manual player structures) ─────────────────────────────────────
 
 mapsRouter.get('/:mapId/systems/:systemId/structures', async (req, res) => {
