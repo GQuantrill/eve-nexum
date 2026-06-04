@@ -852,6 +852,8 @@
     "colType": "タイプ",
     "colName": "名前",
     "colNotes": "メモ",
+    "colAge": "経過",
+    "colUpdated": "更新",
     "namePlaceholder": "アノマリー名"
   },
   "stats": {
