@@ -31,14 +31,28 @@ export interface CustomIntel {
 }
 
 /** A user's personal "holes I'm hunting" watchlist. Stored per-user (not per
- *  map) so it follows them everywhere. `query` is matched case-insensitively
- *  against a system's name (J-code or k-space name) — a manually-typed list,
- *  not a paste. `marker` picks the glyph/colour/cue from WATCH_MARKERS. */
+ *  map) so it follows them everywhere. `marker` picks the icon/colour/cue from
+ *  WATCH_MARKERS. */
 export type WatchMarkerKind = 'target' | 'honeypot' | 'avoid' | 'friendly' | 'watch';
+
+/** What a watch entry matches against. A discriminated union so one list can
+ *  cover specific systems, wormhole types, and general characteristics:
+ *   - system:   a system by name / J-code (case-insensitive)
+ *   - whType:   a wormhole type code (matches a system's static AND any
+ *               connection of that type in the chain)
+ *   - class:    a system class — 'C13' is used for "shattered"
+ *   - effect:   a system effect (wolf_rayet, pulsar, …)
+ *   - frigHole: a frigate-sized wormhole (small connection / frig static) */
+export type WatchMatch =
+  | { by: 'system';   query: string }
+  | { by: 'whType';   code: string }
+  | { by: 'class';    cls: SystemClass }
+  | { by: 'effect';   effect: WormholeEffect }
+  | { by: 'frigHole' };
 
 export interface WatchEntry {
   id:     string;
-  query:  string;
+  match:  WatchMatch;
   note:   string;
   marker: WatchMarkerKind;
 }

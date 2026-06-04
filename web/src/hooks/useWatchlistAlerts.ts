@@ -2,7 +2,8 @@ import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMapStore } from '../store/mapStore';
 import { useUserSetting } from './useUserSetting';
-import { useWatchIndex } from './useWatchlist';
+import { useWatchlist } from './useWatchlist';
+import { matchSystem, matchConnection } from '../utils/watchMatch';
 import { toast } from '../components/ui/Toaster';
 
 // Lazily-created shared audio context (autoplay policy: only on first sound).
@@ -27,58 +28,64 @@ function playWatchChime() {
   } catch { /* audio blocked / unavailable — silent fail */ }
 }
 
-function nameKey(name: string | undefined): string {
-  return (name ?? '').trim().toLowerCase();
-}
-
 /**
- * Mounted once (in MapCanvas). Watches the active map's systems against the
- * user's watchlist and fires a one-shot toast + chime the first time a watched
- * hole *appears* on the map. On a map switch (or first load) the currently
- * present watched systems are seeded silently, so loading a map that already
- * contains a watched hole doesn't barrage you — only genuine new appearances
- * chime. A watched system that leaves the map re-arms, so it alerts again if
- * it reappears.
+ * Mounted once (in MapCanvas). Watches the active map's systems AND connections
+ * against the watchlist and fires a one-shot toast + chime the first time a
+ * watched thing *appears*. Match targets are keyed by id (system id / connection
+ * id) so a match is alerted once. On a map switch — or whenever the watchlist
+ * entries themselves change (e.g. you tick a characteristic) — the present
+ * matches are seeded silently, so neither loading a map nor editing the list
+ * barrages you; only genuine new appearances chime. A target that leaves
+ * re-arms.
  */
 export function useWatchlistAlerts() {
   const { t } = useTranslation();
   const systems     = useMapStore((s) => s.map.systems);
+  const connections = useMapStore((s) => s.map.connections);
   const activeMapId = useMapStore((s) => s.activeMapId);
-  const index       = useWatchIndex();
+  const [entries]   = useWatchlist();
   const [soundOn]   = useUserSetting<boolean>('nexum.watchlist.sound', true);
 
-  const stateRef = useRef<{ mapId: string | null; alerted: Set<string> }>({ mapId: null, alerted: new Set() });
+  const stateRef = useRef<{ mapId: string | null; entries: unknown; alerted: Set<string> }>({
+    mapId: null, entries: null, alerted: new Set(),
+  });
 
   useEffect(() => {
-    const present = new Set<string>();
-    for (const s of systems) {
-      const key = nameKey(s.name);
-      if (key && index.has(key)) present.add(key);
-    }
-
-    const st = stateRef.current;
-    // Map switch / first run: seed silently.
-    if (st.mapId !== activeMapId) {
-      stateRef.current = { mapId: activeMapId, alerted: new Set(present) };
+    if (entries.length === 0) {
+      stateRef.current = { mapId: activeMapId, entries, alerted: new Set() };
       return;
     }
 
-    // Newly-appeared watched holes → alert once each.
-    for (const key of present) {
+    // Present matches, keyed by target id, with the label/marker to announce.
+    const present = new Map<string, { name: string; marker: string }>();
+    for (const sys of systems) {
+      const e = matchSystem(entries, sys);
+      if (e) present.set(`sys:${sys.id}`, { name: sys.name || '?', marker: t(`watchMarker.${e.marker}`) });
+    }
+    for (const conn of connections) {
+      const e = matchConnection(entries, conn);
+      if (e) {
+        const label = conn.type || t('watchMarker.watch');
+        present.set(`conn:${conn.id}`, { name: label, marker: t(`watchMarker.${e.marker}`) });
+      }
+    }
+
+    const st = stateRef.current;
+    // Map switch or watchlist edit → reseed silently (compare entries identity;
+    // useWatchlist returns a fresh array whenever the stored value changes).
+    if (st.mapId !== activeMapId || st.entries !== entries) {
+      stateRef.current = { mapId: activeMapId, entries, alerted: new Set(present.keys()) };
+      return;
+    }
+
+    for (const [key, info] of present) {
       if (st.alerted.has(key)) continue;
       st.alerted.add(key);
-      const entry = index.get(key);
-      if (!entry) continue;
-      const sys = systems.find((s) => nameKey(s.name) === key);
-      toast.info(t('watchlist.appeared', {
-        name:   sys?.name ?? entry.query,
-        marker: t(`watchMarker.${entry.marker}`),
-      }));
+      toast.info(t('watchlist.appeared', { name: info.name, marker: info.marker }));
       if (soundOn) playWatchChime();
     }
-    // Watched holes that left → re-arm so they can alert again next time.
     for (const key of Array.from(st.alerted)) {
       if (!present.has(key)) st.alerted.delete(key);
     }
-  }, [systems, activeMapId, index, soundOn, t]);
+  }, [systems, connections, activeMapId, entries, soundOn, t]);
 }

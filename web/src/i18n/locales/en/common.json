@@ -462,9 +462,14 @@
     "watch": "Watch"
   },
   "watchlist": {
-    "hint": "Holes you're hunting for. Add a system name or J-code; when it appears on the map its node is highlighted (and chimes once, if enabled).",
+    "hint": "Holes you're hunting for. Watch a system, a wormhole type, or a characteristic (shattered, an effect, frig holes); matches are highlighted on the map (and chime once, if enabled).",
     "chimeToggle": "Chime when a watched system appears",
     "markerAria": "Marker",
+    "matchByAria": "Match by",
+    "matchSystem": "System",
+    "matchWhType": "Wormhole type",
+    "quickAdd": "Quick add",
+    "whPlaceholder": "WH type, e.g. C247",
     "queryPlaceholder": "System name / J-code",
     "notePlaceholder": "Note (optional)",
     "onMap": "On the map now",

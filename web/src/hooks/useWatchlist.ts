@@ -1,6 +1,5 @@
-import { useMemo } from 'react';
 import { useUserSetting } from './useUserSetting';
-import type { WatchEntry, WatchMarkerKind } from '../types';
+import type { WatchEntry, WatchMatch, WatchMarkerKind } from '../types';
 
 const SETTING_KEY = 'nexum.watchlist';
 
@@ -10,44 +9,39 @@ export const MAX_WATCH = 50;
 
 const VALID_MARKERS: WatchMarkerKind[] = ['target', 'honeypot', 'avoid', 'friendly', 'watch'];
 
-function normalize(s: string): string {
-  return s.trim().toLowerCase();
+function isValidMatch(m: unknown): m is WatchMatch {
+  if (m == null || typeof m !== 'object') return false;
+  const by = (m as { by?: unknown }).by;
+  switch (by) {
+    case 'system':   return typeof (m as { query?: unknown }).query === 'string';
+    case 'whType':   return typeof (m as { code?: unknown }).code === 'string';
+    case 'class':    return typeof (m as { cls?: unknown }).cls === 'string';
+    case 'effect':   return typeof (m as { effect?: unknown }).effect === 'string';
+    case 'frigHole': return true;
+    default:         return false;
+  }
+}
+
+// Migrate the original watchlist shape ({ id, query, note, marker }) to the
+// generalised one ({ id, match, note, marker }). Runs on every read; the new
+// shape is written back the next time the user edits the list.
+function coerce(v: unknown): WatchEntry | null {
+  if (v == null || typeof v !== 'object') return null;
+  const o = v as Record<string, unknown>;
+  if (typeof o.id !== 'string' || typeof o.note !== 'string') return null;
+  if (!VALID_MARKERS.includes(o.marker as WatchMarkerKind)) return null;
+  let match: WatchMatch | null = null;
+  if (isValidMatch(o.match)) match = o.match as WatchMatch;
+  else if (typeof o.query === 'string') match = { by: 'system', query: o.query }; // legacy
+  if (!match) return null;
+  return { id: o.id, match, note: o.note, marker: o.marker as WatchMarkerKind };
 }
 
 export function useWatchlist(): [WatchEntry[], (next: WatchEntry[] | ((prev: WatchEntry[]) => WatchEntry[])) => void] {
   const [value, setValue] = useUserSetting<WatchEntry[]>(SETTING_KEY, []);
-  // Defensive read: ui_settings JSONB could hold a malformed shape written by
-  // a different client version. Keep only well-formed entries.
+  // Defensive read: ui_settings JSONB could hold a malformed or legacy shape.
   const safe = Array.isArray(value)
-    ? value.filter((v): v is WatchEntry =>
-        v != null
-        && typeof v === 'object'
-        && typeof (v as WatchEntry).id === 'string'
-        && typeof (v as WatchEntry).query === 'string'
-        && typeof (v as WatchEntry).note === 'string'
-        && VALID_MARKERS.includes((v as WatchEntry).marker))
+    ? value.map(coerce).filter((e): e is WatchEntry => e !== null)
     : [];
   return [safe, setValue];
-}
-
-/** Memoised name -> entry lookup. Built from the (normalised) query of each
- *  entry that has a non-empty query; first entry wins on a clash. System nodes
- *  use this to decide whether they're being watched without rescanning the
- *  whole list per node. */
-export function useWatchIndex(): Map<string, WatchEntry> {
-  const [items] = useWatchlist();
-  return useMemo(() => {
-    const m = new Map<string, WatchEntry>();
-    for (const it of items) {
-      const key = normalize(it.query);
-      if (key && !m.has(key)) m.set(key, it);
-    }
-    return m;
-  }, [items]);
-}
-
-/** The watch entry for a system name, if any. */
-export function matchWatch(index: Map<string, WatchEntry>, name: string | undefined): WatchEntry | null {
-  if (!name) return null;
-  return index.get(normalize(name)) ?? null;
 }
