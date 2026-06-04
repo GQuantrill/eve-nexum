@@ -216,7 +216,11 @@ router.get('/:systemId(\\d+)', async (req, res) => {
   if (isNaN(eveSystemId)) { res.status(400).json({ error: 'invalid system id' }); return; }
 
   await ensureHistory(eveSystemId);
-  await recordSnapshot();
+  // Persist a snapshot opportunistically, but don't block this per-system read
+  // on a cluster-wide write — when a new ESI snapshot has landed, recordSnapshot
+  // bulk-inserts every system. It's also driven by the background poller, so a
+  // dropped one here is harmless. Fire-and-forget.
+  void recordSnapshot().catch((err) => console.error('[activity] snapshot failed:', err));
 
   res.json(systemHistory.get(eveSystemId) ?? []);
 });

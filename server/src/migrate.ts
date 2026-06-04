@@ -389,6 +389,13 @@ export async function migrate() {
     CREATE INDEX IF NOT EXISTS idx_system_activity       ON system_activity (eve_system_id, hour DESC);
     CREATE INDEX IF NOT EXISTS idx_system_activity_hour  ON system_activity (hour);
     CREATE INDEX IF NOT EXISTS idx_maps_last_active      ON maps (last_active_at) WHERE corp_id IS NOT NULL;
+    -- Per-creator attribution (stats dashboard + admin reports) and corp-scoped
+    -- lookups (quota counts, corp map listing) hit these columns; without an
+    -- index they sequential-scan the whole table.
+    CREATE INDEX IF NOT EXISTS idx_map_signatures_creator ON map_signatures (created_by_user_id);
+    CREATE INDEX IF NOT EXISTS idx_map_structures_creator ON map_structures (created_by_user_id);
+    CREATE INDEX IF NOT EXISTS idx_user_events_map         ON user_events (map_id);
+    CREATE INDEX IF NOT EXISTS idx_maps_corp               ON maps (corp_id);
 
     CREATE TABLE IF NOT EXISTS admin_audit (
       id                  BIGSERIAL   PRIMARY KEY,

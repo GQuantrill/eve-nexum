@@ -425,6 +425,10 @@ async function createTables() {
     CREATE INDEX IF NOT EXISTS idx_map_connections_map         ON map_connections (map_id);
     CREATE INDEX IF NOT EXISTS idx_map_signatures_system       ON map_signatures (system_id);
     CREATE INDEX IF NOT EXISTS idx_map_structures_system       ON map_structures (system_id);
+    CREATE INDEX IF NOT EXISTS idx_map_signatures_creator      ON map_signatures (created_by_user_id);
+    CREATE INDEX IF NOT EXISTS idx_map_structures_creator      ON map_structures (created_by_user_id);
+    CREATE INDEX IF NOT EXISTS idx_user_events_map             ON user_events (map_id);
+    CREATE INDEX IF NOT EXISTS idx_maps_corp                   ON maps (corp_id);
   `);
 
   console.log('done');
