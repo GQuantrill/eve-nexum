@@ -334,10 +334,6 @@ export function AnomalyPane({ systemId }: { systemId: string }) {
     () => { for (const id of selected) deleteAnom(id); },
   );
 
-  const setSelectedType = (type: AnomType) => {
-    for (const id of selected) updateAnom(id, { anomType: type });
-  };
-
   const deleteAll = () => confirm(
     t('anomalies.deleteAllConfirm', { count: anomsRef.current.length }),
     () => { for (const a of anomsRef.current) deleteAnom(a.id); },
@@ -446,26 +442,9 @@ export function AnomalyPane({ systemId }: { systemId: string }) {
             ))}
           </select>
           {selected.size > 0 && (
-            <>
-              <select
-                className="sig-toolbar-btn"
-                value=""
-                onChange={(e) => {
-                  if (!e.target.value) return;
-                  setSelectedType(e.target.value as AnomType);
-                  e.target.value = '';
-                }}
-                aria-label={t('anomalies.setTypeAria')}
-              >
-                <option value="">{t('anomalies.setType', { count: selected.size })}</option>
-                {ANOM_TYPE_OPTIONS.map((type) => (
-                  <option key={type} value={type}>{t(`anomType.${type}`)}</option>
-                ))}
-              </select>
-              <button className="sig-toolbar-btn sig-toolbar-btn--danger" onClick={deleteSelected}>
-                {t('anomalies.deleteSelected', { count: selected.size })}
-              </button>
-            </>
+            <button className="sig-toolbar-btn sig-toolbar-btn--danger" onClick={deleteSelected}>
+              {t('anomalies.deleteSelected', { count: selected.size })}
+            </button>
           )}
           {anoms.length > 0 && (
             <button className="sig-toolbar-btn sig-toolbar-btn--danger" onClick={deleteAll}>
