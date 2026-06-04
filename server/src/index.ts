@@ -141,11 +141,13 @@ app.use((err: Error & { status?: number; type?: string }, req: express.Request, 
 async function expireMaps() {
   if (!config.corpMode) return;
   const cutoff = new Date(Date.now() - config.corpMapExpireDays * 24 * 60 * 60 * 1000);
+  // Corp maps only — a member's idle personal maps must never be auto-deleted
+  // by the corp-map expiry (matches the partial idx_maps_last_active index).
   const { rowCount } = await db.query(
-    `DELETE FROM maps WHERE last_active_at < $1`,
+    `DELETE FROM maps WHERE last_active_at < $1 AND corp_id IS NOT NULL`,
     [cutoff],
   );
-  if (rowCount) console.log(`Expired ${rowCount} inactive map(s)`);
+  if (rowCount) console.log(`Expired ${rowCount} inactive corp map(s)`);
 }
 
 migrate()
