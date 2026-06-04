@@ -322,6 +322,7 @@
       "wormholeBookmarks": "虫洞书签",
       "mapControls": "地图控制",
       "systemOptions": "星系选项",
+      "watchlist": "关注列表",
       "connections": "连接",
       "route": "路线",
       "chainExits": "链出口",
@@ -461,6 +462,25 @@
     "remove": "移除情报选项",
     "max": "最多 {{count}} 个自定义情报标签",
     "add": "添加情报"
+  },
+  "watchMarker": {
+    "target": "目标",
+    "honeypot": "诱饵",
+    "avoid": "回避",
+    "friendly": "友好",
+    "watch": "监视"
+  },
+  "watchlist": {
+    "hint": "你正在搜寻的虫洞。添加星系名称或 J-code；当它出现在地图上时，其节点会被高亮显示（如已启用，会响一次提示音）。",
+    "chimeToggle": "关注的星系出现时播放提示音",
+    "markerAria": "标记",
+    "queryPlaceholder": "星系名称 / J-code",
+    "notePlaceholder": "备注（可选）",
+    "onMap": "现已在地图上",
+    "remove": "从关注列表移除",
+    "max": "关注列表最多 {{count}} 条",
+    "add": "添加到关注列表",
+    "appeared": "关注列表：{{name}}（{{marker}}）已出现在地图上"
   },
   "chainExits": {
     "noExits": "此链中没有 K空间出口。",

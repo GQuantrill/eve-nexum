@@ -322,6 +322,7 @@
       "wormholeBookmarks": "웜홀 북마크",
       "mapControls": "지도 컨트롤",
       "systemOptions": "성계 옵션",
+      "watchlist": "관심 목록",
       "connections": "연결",
       "route": "경로",
       "chainExits": "체인 출구",
@@ -461,6 +462,25 @@
     "remove": "인텔 옵션 제거",
     "max": "사용자 지정 인텔 태그 최대 {{count}}개",
     "add": "인텔 추가"
+  },
+  "watchMarker": {
+    "target": "표적",
+    "honeypot": "미끼",
+    "avoid": "회피",
+    "friendly": "우호",
+    "watch": "감시"
+  },
+  "watchlist": {
+    "hint": "찾고 있는 웜홀입니다. 성계 이름이나 J-code를 추가하면 맵에 나타날 때 해당 노드가 강조됩니다(활성화된 경우 한 번 알림음이 울립니다).",
+    "chimeToggle": "감시 중인 성계가 나타나면 알림음 재생",
+    "markerAria": "마커",
+    "queryPlaceholder": "성계 이름 / J-code",
+    "notePlaceholder": "메모(선택)",
+    "onMap": "현재 맵에 있음",
+    "remove": "관심 목록에서 제거",
+    "max": "관심 목록 항목 최대 {{count}}개",
+    "add": "관심 목록에 추가",
+    "appeared": "관심 목록: {{name}}({{marker}})이(가) 맵에 있습니다"
   },
   "chainExits": {
     "noExits": "이 체인에 K-스페이스 출구가 없습니다.",

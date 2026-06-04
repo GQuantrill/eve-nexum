@@ -322,6 +322,7 @@
       "wormholeBookmarks": "Marcadores de agujeros de gusano",
       "mapControls": "Controles del mapa",
       "systemOptions": "Opciones de sistema",
+      "watchlist": "Lista de seguimiento",
       "connections": "Conexiones",
       "route": "Ruta",
       "chainExits": "Salidas de la cadena",
@@ -461,6 +462,25 @@
     "remove": "Quitar opción de intel",
     "max": "Máximo {{count}} etiquetas de intel personalizadas",
     "add": "Añadir intel"
+  },
+  "watchMarker": {
+    "target": "Objetivo",
+    "honeypot": "Señuelo",
+    "avoid": "Evitar",
+    "friendly": "Amistoso",
+    "watch": "Vigilar"
+  },
+  "watchlist": {
+    "hint": "Agujeros que estás buscando. Añade un nombre de sistema o un J-code; cuando aparezca en el mapa, su nodo se resalta (y suena una vez, si está activado).",
+    "chimeToggle": "Sonar cuando aparezca un sistema vigilado",
+    "markerAria": "Marcador",
+    "queryPlaceholder": "Nombre de sistema / J-code",
+    "notePlaceholder": "Nota (opcional)",
+    "onMap": "Ahora en el mapa",
+    "remove": "Quitar de la lista de seguimiento",
+    "max": "Máximo {{count}} entradas en la lista de seguimiento",
+    "add": "Añadir a la lista de seguimiento",
+    "appeared": "Lista de seguimiento: {{name}} ({{marker}}) está en el mapa"
   },
   "chainExits": {
     "noExits": "No hay salidas de K-space en esta cadena.",

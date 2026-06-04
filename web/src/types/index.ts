@@ -30,6 +30,19 @@ export interface CustomIntel {
   color: string;
 }
 
+/** A user's personal "holes I'm hunting" watchlist. Stored per-user (not per
+ *  map) so it follows them everywhere. `query` is matched case-insensitively
+ *  against a system's name (J-code or k-space name) — a manually-typed list,
+ *  not a paste. `marker` picks the glyph/colour/cue from WATCH_MARKERS. */
+export type WatchMarkerKind = 'target' | 'honeypot' | 'avoid' | 'friendly' | 'watch';
+
+export interface WatchEntry {
+  id:     string;
+  query:  string;
+  note:   string;
+  marker: WatchMarkerKind;
+}
+
 export interface MapSystem {
   id: string;
   eveSystemId: number | null;

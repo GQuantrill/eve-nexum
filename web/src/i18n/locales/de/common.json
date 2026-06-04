@@ -322,6 +322,7 @@
       "wormholeBookmarks": "Wurmloch-Lesezeichen",
       "mapControls": "Kartensteuerung",
       "systemOptions": "Systemoptionen",
+      "watchlist": "Beobachtungsliste",
       "connections": "Verbindungen",
       "route": "Route",
       "chainExits": "Ketten-Ausgänge",
@@ -461,6 +462,25 @@
     "remove": "Intel-Option entfernen",
     "max": "Maximal {{count}} eigene Intel-Tags",
     "add": "Intel hinzufügen"
+  },
+  "watchMarker": {
+    "target": "Ziel",
+    "honeypot": "Honigtopf",
+    "avoid": "Meiden",
+    "friendly": "Freundlich",
+    "watch": "Beobachten"
+  },
+  "watchlist": {
+    "hint": "Löcher, nach denen du jagst. Füge einen Systemnamen oder J-Code hinzu; sobald es auf der Karte erscheint, wird sein Knoten hervorgehoben (und gibt einmal einen Ton aus, falls aktiviert).",
+    "chimeToggle": "Ton abspielen, wenn ein beobachtetes System erscheint",
+    "markerAria": "Markierung",
+    "queryPlaceholder": "Systemname / J-Code",
+    "notePlaceholder": "Notiz (optional)",
+    "onMap": "Jetzt auf der Karte",
+    "remove": "Aus Beobachtungsliste entfernen",
+    "max": "Maximal {{count}} Einträge in der Beobachtungsliste",
+    "add": "Zur Beobachtungsliste hinzufügen",
+    "appeared": "Beobachtungsliste: {{name}} ({{marker}}) ist auf der Karte"
   },
   "chainExits": {
     "noExits": "Keine K-Space-Ausgänge in dieser Kette.",

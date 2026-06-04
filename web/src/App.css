@@ -1754,6 +1754,110 @@
   color: #e05a5a;
 }
 
+/* ── Watchlist sidebar panel ─────────────────────────────────────────────── */
+.watchlist {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.watchlist__sound {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: calc(12px * var(--font-scale, 1));
+  color: #aeb9d6;
+  cursor: pointer;
+}
+
+.watchlist__list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.watchlist__row {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.watchlist__marker {
+  flex-shrink: 0;
+  width: 56px;
+  background: #0a0e1a;
+  border: 1px solid #1e2740;
+  border-radius: 4px;
+  padding: 4px 2px;
+  font-size: calc(14px * var(--font-scale, 1));
+  outline: none;
+  cursor: pointer;
+}
+
+.watchlist__fields {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+  min-width: 0;
+}
+
+.watchlist__query-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.watchlist__query,
+.watchlist__note {
+  width: 100%;
+  min-width: 0;
+  background: #0a0e1a;
+  border: 1px solid #1e2740;
+  border-radius: 4px;
+  padding: 4px 6px;
+  font-size: calc(12px * var(--font-scale, 1));
+  color: #c8d4f0;
+  outline: none;
+}
+
+.watchlist__query { padding-right: 18px; }
+.watchlist__note { color: #9aa6c4; }
+
+.watchlist__query:focus,
+.watchlist__note:focus {
+  border-color: #6ea0ff;
+}
+
+/* Small dot inside the query field marking "this hole is on the map right now". */
+.watchlist__onmap {
+  position: absolute;
+  right: 6px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #4ade80;
+  box-shadow: 0 0 5px #4ade80;
+  pointer-events: none;
+}
+
+.watchlist__remove {
+  background: transparent;
+  border: 1px solid #3a2030;
+  color: #d88a8a;
+  border-radius: 4px;
+  padding: 3px 5px;
+  cursor: pointer;
+  line-height: 0;
+  flex-shrink: 0;
+}
+
+.watchlist__remove:hover {
+  background: rgba(224,90,90,0.10);
+  color: #e05a5a;
+}
+
 /* Right-click submenu swatch — tiny rounded square that sits where the
    icon normally goes for built-in intel options. */
 .intel-swatch {
@@ -2134,6 +2238,32 @@
   border-left: 16px solid transparent;
   border-top-right-radius: 6px;
   pointer-events: auto;
+}
+
+/* Watchlist: a coloured ring around any node whose system is on the user's
+   watchlist, plus a glyph badge in the top-left corner. --watch-color is set
+   inline by SystemNode from the marker definition. */
+.system-node--watched {
+  box-shadow: 0 0 0 2px var(--watch-color, #6ea0ff), 0 0 10px 1px var(--watch-color, #6ea0ff);
+}
+
+.system-node__watch-corner {
+  position: absolute;
+  top: -9px;
+  left: -9px;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  line-height: 1;
+  border-radius: 50%;
+  background: #0a0e1a;
+  border: 1px solid var(--watch-color, #6ea0ff);
+  box-shadow: 0 0 6px var(--watch-color, #6ea0ff);
+  pointer-events: auto;
+  z-index: 3;
 }
 
 /* Heatmap halo behind any node with a value for the active metric. Intensity

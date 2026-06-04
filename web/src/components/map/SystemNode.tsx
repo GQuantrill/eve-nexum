@@ -27,6 +27,8 @@ import { useNow30s } from '../../hooks/useNow30s';
 import { useStaleThreshold } from '../../hooks/useStaleThreshold';
 import { useCustomIntel } from '../../hooks/useCustomIntel';
 import { resolveIntelColor, resolveIntelLabel } from '../../utils/intelColors';
+import { useWatchIndex, matchWatch } from '../../hooks/useWatchlist';
+import { watchMarker } from '../../data/watchMarkers';
 import { useHeatmap } from '../../context/HeatmapContext';
 import { heatValue, heatColor } from '../../utils/heatmap';
 import { WHTypeInfo } from '../ui/WHTypeInfo';
@@ -149,6 +151,12 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
   const [customIntel]   = useCustomIntel();
   const intelColor      = resolveIntelColor(sys.intel, customIntel);
   const intelLabel      = resolveIntelLabel(sys.intel, customIntel, t);
+  // Personal watchlist: highlight + corner glyph when this system's name is on
+  // the user's hunting list. Matched by name (case-insensitive).
+  const watchIndex      = useWatchIndex();
+  const watch           = matchWatch(watchIndex, sys.name);
+  const watchDef        = watch ? watchMarker(watch.marker) : null;
+  const watchTip        = watch ? (watch.note?.trim() || t(`watchMarker.${watch.marker}`)) : undefined;
 
   // Tooltip label: dedupe by scout system name (Thera / Turnur). Multiple
   // connections from the same scout are summarised, mixed scouts are listed.
@@ -194,10 +202,11 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
   return (
     <div
       ref={nodeRef}
-      className={`system-node${sys.locked ? ' nopan' : ''}${isTarget ? ' system-node--connect-target' : ''}${isStale ? ' system-node--stale' : ''}${isSovHostile ? ' system-node--sov-hostile' : ''}${isSovBlue ? ' system-node--sov-blue' : ''}${uniformSize ? ' system-node--uniform' : ''}${compactMode ? ' system-node--compact' : ''}`}
+      className={`system-node${sys.locked ? ' nopan' : ''}${isTarget ? ' system-node--connect-target' : ''}${isStale ? ' system-node--stale' : ''}${isSovHostile ? ' system-node--sov-hostile' : ''}${isSovBlue ? ' system-node--sov-blue' : ''}${uniformSize ? ' system-node--uniform' : ''}${compactMode ? ' system-node--compact' : ''}${watchDef ? ' system-node--watched' : ''}`}
       style={{
         '--class-color': color,
         ...(intelColor ? { '--intel-color': intelColor } : null),
+        ...(watchDef ? { '--watch-color': watchDef.color } : null),
         ...(heat ? { '--heat': heat.glow, '--heat-color': heat.color } : null),
         ...(uniformSize && uniformWidth  > 0 ? { minWidth:  uniformWidth  } : null),
         ...(uniformSize && uniformHeight > 0 ? { minHeight: uniformHeight } : null),
@@ -231,6 +240,18 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
           data-tooltip={intelLabel ?? undefined}
           aria-label={intelLabel ?? undefined}
         />
+      )}
+
+      {/* Top-left watchlist marker — the glyph for the marker kind, with the
+          entry's note (or marker name) as the tooltip. */}
+      {watchDef && (
+        <span
+          className="system-node__watch-corner"
+          data-tooltip={watchTip}
+          aria-label={watchTip}
+        >
+          {watchDef.glyph}
+        </span>
       )}
 
       {easyConnect && (

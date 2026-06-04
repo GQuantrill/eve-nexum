@@ -322,6 +322,7 @@
       "wormholeBookmarks": "Wormhole bookmarks",
       "mapControls": "Map Controls",
       "systemOptions": "System Options",
+      "watchlist": "Watchlist",
       "connections": "Connections",
       "route": "Route",
       "chainExits": "Chain Exits",
@@ -452,6 +453,25 @@
     "remove": "Remove intel option",
     "max": "Maximum {{count}} custom intel tags",
     "add": "Add intel"
+  },
+  "watchMarker": {
+    "target": "Target",
+    "honeypot": "Honeypot",
+    "avoid": "Avoid",
+    "friendly": "Friendly",
+    "watch": "Watch"
+  },
+  "watchlist": {
+    "hint": "Holes you're hunting for. Add a system name or J-code; when it appears on the map its node is highlighted (and chimes once, if enabled).",
+    "chimeToggle": "Chime when a watched system appears",
+    "markerAria": "Marker",
+    "queryPlaceholder": "System name / J-code",
+    "notePlaceholder": "Note (optional)",
+    "onMap": "On the map now",
+    "remove": "Remove from watchlist",
+    "max": "Maximum {{count}} watchlist entries",
+    "add": "Add to watchlist",
+    "appeared": "Watchlist: {{name}} ({{marker}}) is on the map"
   },
   "chainExits": {
     "noExits": "No K-space exits in this chain.",

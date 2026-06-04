@@ -322,6 +322,7 @@
       "wormholeBookmarks": "Marcadores de buracos de minhoca",
       "mapControls": "Controlos do mapa",
       "systemOptions": "Opções de sistema",
+      "watchlist": "Lista de observação",
       "connections": "Conexões",
       "route": "Rota",
       "chainExits": "Saídas da cadeia",
@@ -461,6 +462,25 @@
     "remove": "Remover opção de intel",
     "max": "Máximo de {{count}} etiquetas de intel personalizadas",
     "add": "Adicionar intel"
+  },
+  "watchMarker": {
+    "target": "Alvo",
+    "honeypot": "Isca",
+    "avoid": "Evitar",
+    "friendly": "Amigável",
+    "watch": "Vigiar"
+  },
+  "watchlist": {
+    "hint": "Buracos que estás a caçar. Adiciona um nome de sistema ou um J-code; quando aparecer no mapa, o seu nó é destacado (e toca uma vez, se ativado).",
+    "chimeToggle": "Tocar quando um sistema observado aparecer",
+    "markerAria": "Marcador",
+    "queryPlaceholder": "Nome de sistema / J-code",
+    "notePlaceholder": "Nota (opcional)",
+    "onMap": "Agora no mapa",
+    "remove": "Remover da lista de observação",
+    "max": "Máximo de {{count}} entradas na lista de observação",
+    "add": "Adicionar à lista de observação",
+    "appeared": "Lista de observação: {{name}} ({{marker}}) está no mapa"
   },
   "chainExits": {
     "noExits": "Não há saídas de K-space nesta cadeia.",

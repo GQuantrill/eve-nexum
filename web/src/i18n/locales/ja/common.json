@@ -322,6 +322,7 @@
       "wormholeBookmarks": "ワームホールのブックマーク",
       "mapControls": "マップ操作",
       "systemOptions": "星系オプション",
+      "watchlist": "ウォッチリスト",
       "connections": "接続",
       "route": "ルート",
       "chainExits": "チェーン出口",
@@ -461,6 +462,25 @@
     "remove": "インテルオプションを削除",
     "max": "カスタムインテルタグは最大 {{count}} 個",
     "add": "インテルを追加"
+  },
+  "watchMarker": {
+    "target": "ターゲット",
+    "honeypot": "おとり",
+    "avoid": "回避",
+    "friendly": "フレンドリー",
+    "watch": "監視"
+  },
+  "watchlist": {
+    "hint": "探しているホールを登録します。星系名または J-code を追加すると、マップ上に現れたときにそのノードがハイライトされます（有効なら一度チャイムが鳴ります）。",
+    "chimeToggle": "監視中の星系が現れたらチャイムを鳴らす",
+    "markerAria": "マーカー",
+    "queryPlaceholder": "星系名 / J-code",
+    "notePlaceholder": "メモ（任意）",
+    "onMap": "現在マップ上",
+    "remove": "ウォッチリストから削除",
+    "max": "ウォッチリストの登録は最大 {{count}} 件",
+    "add": "ウォッチリストに追加",
+    "appeared": "ウォッチリスト：{{name}}（{{marker}}）がマップ上にあります"
   },
   "chainExits": {
     "noExits": "このチェーンに Kスペース出口はありません。",
