@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { optionalAuth } from '../middleware/optionalAuth.js';
 import { createLogger } from '../utils/logger.js';
-import { TtlValue } from '../utils/cache.js';
+import { TtlValue, cachedJsonHandler } from '../utils/cache.js';
 
 const router = Router();
 router.use(optionalAuth);
@@ -73,19 +73,8 @@ async function fetchAndBuild(): Promise<ScoutConnection[]> {
     }));
 }
 
-router.get('/', async (_req, res) => {
-  const fresh = cache.get();
-  if (fresh) { res.json(fresh); return; }
-  try {
-    const data = await fetchAndBuild();
-    cache.set(data);
-    res.json(data);
-  } catch (err) {
-    log.error('Scout fetch failed:', err);
-    const stale = cache.getStale();
-    if (stale) { res.json(stale); return; }
-    res.status(502).json({ error: 'Failed to fetch scout signatures' });
-  }
-});
+router.get('/', cachedJsonHandler(cache, fetchAndBuild, {
+  log, logMsg: 'Scout fetch failed:', errorMsg: 'Failed to fetch scout signatures',
+}));
 
 export default router;

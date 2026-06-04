@@ -1,18 +1,12 @@
 import { Router } from 'express';
 import { optionalAuth } from '../middleware/optionalAuth.js';
 import { createLogger } from '../utils/logger.js';
-import { TtlValue } from '../utils/cache.js';
-import { esiFetch } from '../utils/esi.js';
+import { TtlValue, cachedJsonHandler } from '../utils/cache.js';
+import { loadFactions, factionLogoUrl } from '../utils/esiFactions.js';
 
 const router = Router();
 router.use(optionalAuth);
 const log = createLogger('insurgency');
-
-interface EsiFaction {
-  faction_id:     number;
-  name:           string;
-  corporation_id?: number;
-}
 
 interface SolarSystemEntry {
   id:              number;
@@ -52,19 +46,7 @@ export interface InsurgencySystem {
   suppressionState: number;
 }
 
-const CACHE_TTL_MS = 60 * 60 * 1000;
-
-let factionMap: Map<number, EsiFaction> | null = null;
-const cache = new TtlValue<InsurgencySystem[]>(CACHE_TTL_MS);
-
-async function loadFactions(): Promise<Map<number, EsiFaction>> {
-  if (factionMap) return factionMap;
-  const res = await esiFetch('https://esi.evetech.net/latest/universe/factions/?datasource=tranquility');
-  if (!res.ok) throw new Error(`ESI factions ${res.status}`);
-  const list = await res.json() as EsiFaction[];
-  factionMap = new Map(list.map((f) => [f.faction_id, f]));
-  return factionMap;
-}
+const cache = new TtlValue<InsurgencySystem[]>(60 * 60 * 1000);
 
 async function fetchAndBuild(): Promise<InsurgencySystem[]> {
   const [warzoneRes, factions] = await Promise.all([
@@ -79,10 +61,8 @@ async function fetchAndBuild(): Promise<InsurgencySystem[]> {
   for (const campaign of campaigns) {
     if (campaign.state !== 'ACTIVE') continue;
     const faction = factions.get(campaign.pirateFactionId);
-    const factionName    = faction?.name ?? 'Unknown';
-    const factionLogoUrl = faction?.corporation_id
-      ? `https://images.evetech.net/corporations/${faction.corporation_id}/logo?size=64`
-      : '';
+    const factionName = faction?.name ?? 'Unknown';
+    const logoUrl     = factionLogoUrl(faction);
 
     for (const ins of campaign.insurgencies) {
       result.push({
@@ -90,7 +70,7 @@ async function fetchAndBuild(): Promise<InsurgencySystem[]> {
         campaignId:       campaign.campaignId,
         factionId:        campaign.pirateFactionId,
         factionName,
-        factionLogoUrl,
+        factionLogoUrl:   logoUrl,
         corruptionPct:    ins.corruptionPercentage,
         corruptionState:  ins.corruptionState,
         suppressionPct:   ins.suppressionPercentage,
@@ -102,19 +82,8 @@ async function fetchAndBuild(): Promise<InsurgencySystem[]> {
   return result;
 }
 
-router.get('/', async (_req, res) => {
-  const fresh = cache.get();
-  if (fresh) { res.json(fresh); return; }
-  try {
-    const data = await fetchAndBuild();
-    cache.set(data);
-    res.json(data);
-  } catch (err) {
-    log.error('Insurgency fetch failed:', err);
-    const stale = cache.getStale();
-    if (stale) { res.json(stale); return; }
-    res.status(502).json({ error: 'Failed to fetch insurgency data' });
-  }
-});
+router.get('/', cachedJsonHandler(cache, fetchAndBuild, {
+  log, logMsg: 'Insurgency fetch failed:', errorMsg: 'Failed to fetch insurgency data',
+}));
 
 export default router;

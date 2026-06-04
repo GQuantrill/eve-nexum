@@ -3,7 +3,7 @@ import * as cheerio from 'cheerio';
 import { db } from '../db.js';
 import { optionalAuth } from '../middleware/optionalAuth.js';
 import { createLogger } from '../utils/logger.js';
-import { TtlValue } from '../utils/cache.js';
+import { TtlValue, cachedJsonHandler } from '../utils/cache.js';
 
 // Scrapes the EveScout Rescue stormtrack page — the only public-facing
 // source for null-sec storm locations right now (ESI doesn't expose
@@ -118,19 +118,8 @@ async function fetchAndParse(): Promise<StormSystem[]> {
   return raw.map((r) => ({ ...r, eveSystemId: idMap.get(r.systemName) ?? null }));
 }
 
-router.get('/', async (_req, res) => {
-  const fresh = cache.get();
-  if (fresh) { res.json(fresh); return; }
-  try {
-    const data = await fetchAndParse();
-    cache.set(data);
-    res.json(data);
-  } catch (err) {
-    log.error('storm scrape failed:', err);
-    const stale = cache.getStale();
-    if (stale) { res.json(stale); return; }
-    res.status(502).json({ error: 'Failed to fetch storms' });
-  }
-});
+router.get('/', cachedJsonHandler(cache, fetchAndParse, {
+  log, logMsg: 'storm scrape failed:', errorMsg: 'Failed to fetch storms',
+}));
 
 export default router;

@@ -1,3 +1,5 @@
+import type { Request, Response } from 'express';
+
 // Two small TTL cache primitives used by routes that proxy ESI / zKillboard.
 //
 // - TtlValue<V>: a single TTL-guarded slot with last-success fallback. Used by
@@ -74,4 +76,28 @@ export class TtlCache<K, V> {
       if (entry.fetchedAt < cutoff) this.store.delete(k);
     }
   }
+}
+
+// Express handler for the "serve from a TtlValue, refresh on miss, fall back to
+// stale on error, else 502" shape that the incursions/insurgency/storms/scout
+// proxy routes all repeated verbatim.
+export function cachedJsonHandler<V>(
+  cache: TtlValue<V>,
+  build: () => Promise<V>,
+  opts: { log: { error: (msg: string, ...rest: unknown[]) => void }; logMsg: string; errorMsg: string },
+) {
+  return async (_req: Request, res: Response): Promise<void> => {
+    const fresh = cache.get();
+    if (fresh) { res.json(fresh); return; }
+    try {
+      const data = await build();
+      cache.set(data);
+      res.json(data);
+    } catch (err) {
+      opts.log.error(opts.logMsg, err);
+      const stale = cache.getStale();
+      if (stale) { res.json(stale); return; }
+      res.status(502).json({ error: opts.errorMsg });
+    }
+  };
 }
