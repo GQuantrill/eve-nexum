@@ -406,9 +406,21 @@ async function createTables() {
       updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
 
+    CREATE TABLE IF NOT EXISTS map_anomalies (
+      id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+      system_id   UUID        NOT NULL REFERENCES map_systems(id) ON DELETE CASCADE,
+      anom_id     TEXT        NOT NULL DEFAULT '',
+      anom_type   TEXT        NOT NULL DEFAULT 'unknown',
+      name        TEXT        NOT NULL DEFAULT '',
+      notes       TEXT        NOT NULL DEFAULT '',
+      created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      created_by_user_id INTEGER REFERENCES users(id) ON DELETE SET NULL
+    );
+
     ALTER TABLE map_structures ADD COLUMN IF NOT EXISTS eve_id BIGINT;
 
-    ALTER TABLE users ALTER COLUMN panel_order SET DEFAULT '{notes,signatures,structures,npcStations}';
+    ALTER TABLE users ALTER COLUMN panel_order SET DEFAULT '{notes,signatures,anomalies,structures,npcStations}';
   `);
 
   // Step 2: indexes (columns guaranteed to exist after step 1)
@@ -427,6 +439,8 @@ async function createTables() {
     CREATE INDEX IF NOT EXISTS idx_map_structures_system       ON map_structures (system_id);
     CREATE INDEX IF NOT EXISTS idx_map_signatures_creator      ON map_signatures (created_by_user_id);
     CREATE INDEX IF NOT EXISTS idx_map_structures_creator      ON map_structures (created_by_user_id);
+    CREATE INDEX IF NOT EXISTS idx_map_anomalies_system        ON map_anomalies (system_id);
+    CREATE INDEX IF NOT EXISTS idx_map_anomalies_creator       ON map_anomalies (created_by_user_id);
     CREATE INDEX IF NOT EXISTS idx_user_events_map             ON user_events (map_id);
     CREATE INDEX IF NOT EXISTS idx_maps_corp                   ON maps (corp_id);
   `);

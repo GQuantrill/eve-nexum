@@ -360,9 +360,18 @@
     "showStaticWhs": "显示固定虫洞",
     "easyConnect": "便捷连接",
     "connectionStyle": "连接样式",
-    "edgeStyle": { "bezier": "标准", "straight": "直线", "smoothstep": "折线" },
+    "edgeStyle": {
+      "bezier": "标准",
+      "straight": "直线",
+      "smoothstep": "折线"
+    },
     "connectionThickness": "连接粗细",
-    "thickness": { "thin": "细", "standard": "标准", "thick": "粗", "extra": "超粗" },
+    "thickness": {
+      "thin": "细",
+      "standard": "标准",
+      "thick": "粗",
+      "extra": "超粗"
+    },
     "optimizeConnections": "⟳ 优化连接",
     "spreadNodes": "⊞ 分散节点",
     "spreadNodesTooltip": "调整星系节点以避免重叠",
@@ -510,7 +519,11 @@
     "sizeSmall": "小（护卫舰）",
     "rollingCalculator": "关洞计算器",
     "custom": "自定义",
-    "collapse": { "open": "开放", "maybe": "可能已坍塌", "collapsed": "已坍塌" },
+    "collapse": {
+      "open": "开放",
+      "maybe": "可能已坍塌",
+      "collapsed": "已坍塌"
+    },
     "remaining": "剩余 {{worst}}–{{best}} · 已用 {{used}} · 最大单跳 {{max}}",
     "useMyShip": "使用我的舰船",
     "useMyShipTitle": "冷 = {{ship}}（{{mass}}），热 = +推进",
@@ -604,6 +617,7 @@
   "panel": {
     "notes": "笔记",
     "signatures": "信号",
+    "anomalies": "异常空间",
     "structures": "建筑",
     "npcStations": "NPC 空间站",
     "killboard": "zKillboard",
@@ -766,6 +780,12 @@
     "ore": "矿石",
     "combat": "战斗"
   },
+  "anomType": {
+    "unknown": "未知",
+    "combat": "战斗",
+    "ore": "矿石",
+    "gas": "气云"
+  },
   "signatures": {
     "pasteHint": "你可以直接从 EVE 中的探针扫描器复制并粘贴信号。为此，打开你的探针扫描器。按 Ctrl+A 全选，然后按 Ctrl+C 复制。用 Ctrl+V 粘贴到此处。",
     "pasteDifferentSystem": "你的角色当前在 {{current}}，但你正在将信号粘贴到 {{selected}}。继续吗？",
@@ -803,6 +823,36 @@
     "colAge": "存在时长",
     "colUpdated": "更新时间",
     "namePlaceholder": "站点名称"
+  },
+  "anomalies": {
+    "pasteHint": "你可以直接从 EVE 中的探针扫描器复制并粘贴异常空间。打开你的探针扫描器，按 Ctrl+A 全选，Ctrl+C 复制，然后按 Ctrl+V 粘贴到此处。一起粘贴的信号和异常空间会自动分类到正确的面板。",
+    "pasteDifferentSystem": "你的角色当前在 {{current}}，但你正在将异常空间粘贴到 {{selected}}。继续吗？",
+    "loadFailed": "加载异常空间失败",
+    "saveFailed": "保存异常空间失败",
+    "deleteFailed": "删除异常空间失败",
+    "deleteSelectedConfirm_one": "删除选定的 {{count}} 个异常空间？",
+    "deleteSelectedConfirm_other": "删除选定的 {{count}} 个异常空间？",
+    "deleteAllConfirm_one": "删除全部 {{count}} 个异常空间？",
+    "deleteAllConfirm_other": "删除全部 {{count}} 个异常空间？",
+    "addAnomaly": "添加异常空间",
+    "overwriteToggle": "粘贴时覆盖",
+    "overwriteTooltip": "开启后，粘贴会替换列表——扫描中已不存在的异常空间会被移除。或在粘贴时按住 Shift 仅覆盖一次。",
+    "removeDelayLabel": "移除延迟",
+    "removeDelayTooltip": "已消失的异常空间在覆盖粘贴将其删除前保持可见（带删除线）的时长——便于清理其游戏内书签。",
+    "removeDelayInstant": "立即",
+    "filterLabel": "按类型筛选",
+    "filterClear": "清除",
+    "noMatchFilter": "没有异常空间符合筛选条件",
+    "setTypeAria": "为选定异常空间设置类型",
+    "setType": "设置类型（{{count}}）…",
+    "deleteSelected": "删除选定（{{count}}）",
+    "deleteAll": "全部删除",
+    "empty": "没有异常空间 — 从探针扫描器粘贴以导入",
+    "colId": "ID",
+    "colType": "类型",
+    "colName": "名称",
+    "colNotes": "笔记",
+    "namePlaceholder": "异常空间名称"
   },
   "stats": {
     "title": "用户统计",

@@ -360,9 +360,18 @@
     "showStaticWhs": "スタティック WH を表示",
     "easyConnect": "簡単接続",
     "connectionStyle": "接続スタイル",
-    "edgeStyle": { "bezier": "標準", "straight": "直線", "smoothstep": "ステップ" },
+    "edgeStyle": {
+      "bezier": "標準",
+      "straight": "直線",
+      "smoothstep": "ステップ"
+    },
     "connectionThickness": "接続の太さ",
-    "thickness": { "thin": "細い", "standard": "標準", "thick": "太い", "extra": "極太" },
+    "thickness": {
+      "thin": "細い",
+      "standard": "標準",
+      "thick": "太い",
+      "extra": "極太"
+    },
     "optimizeConnections": "⟳ 接続を最適化",
     "spreadNodes": "⊞ ノードを広げる",
     "spreadNodesTooltip": "重なりを避けるため星系ノードを調整",
@@ -510,7 +519,11 @@
     "sizeSmall": "小（フリゲート）",
     "rollingCalculator": "ロール計算機",
     "custom": "カスタム",
-    "collapse": { "open": "オープン", "maybe": "崩壊した可能性", "collapsed": "崩壊済み" },
+    "collapse": {
+      "open": "オープン",
+      "maybe": "崩壊した可能性",
+      "collapsed": "崩壊済み"
+    },
     "remaining": "残り {{worst}}–{{best}} · 使用 {{used}} · 最大ジャンプ {{max}}",
     "useMyShip": "自分の艦船を使用",
     "useMyShipTitle": "コールド = {{ship}}（{{mass}}）、ホット = +プロップ",
@@ -604,6 +617,7 @@
   "panel": {
     "notes": "メモ",
     "signatures": "シグネチャ",
+    "anomalies": "アノマリー",
     "structures": "ストラクチャ",
     "npcStations": "NPC ステーション",
     "killboard": "zKillboard",
@@ -766,6 +780,12 @@
     "ore": "鉱石",
     "combat": "コンバット"
   },
+  "anomType": {
+    "unknown": "不明",
+    "combat": "コンバット",
+    "ore": "鉱石",
+    "gas": "ガス"
+  },
   "signatures": {
     "pasteHint": "EVE のプローブスキャナーからシグネチャを直接コピー＆ペーストできます。それには、プローブスキャナーを開いてください。Ctrl+A ですべて選択し、Ctrl+C でコピー。Ctrl+V でここに貼り付けてください。",
     "pasteDifferentSystem": "あなたのキャラクターは現在 {{current}} にいますが、{{selected}} にシグネチャを貼り付けています。続行しますか？",
@@ -803,6 +823,36 @@
     "colAge": "経過",
     "colUpdated": "更新",
     "namePlaceholder": "サイト名"
+  },
+  "anomalies": {
+    "pasteHint": "EVE のプローブスキャナーからアノマリーを直接コピー＆ペーストできます。プローブスキャナーを開き、Ctrl+A ですべて選択、Ctrl+C でコピーし、Ctrl+V でここに貼り付けてください。シグネチャとアノマリーを一緒に貼り付けると、自動的に正しいパネルに振り分けられます。",
+    "pasteDifferentSystem": "あなたのキャラクターは現在 {{current}} にいますが、{{selected}} にアノマリーを貼り付けています。続行しますか？",
+    "loadFailed": "アノマリーの読み込みに失敗しました",
+    "saveFailed": "アノマリーの保存に失敗しました",
+    "deleteFailed": "アノマリーの削除に失敗しました",
+    "deleteSelectedConfirm_one": "選択した {{count}} 件のアノマリーを削除しますか？",
+    "deleteSelectedConfirm_other": "選択した {{count}} 件のアノマリーを削除しますか？",
+    "deleteAllConfirm_one": "{{count}} 件のアノマリーをすべて削除しますか？",
+    "deleteAllConfirm_other": "{{count}} 件のアノマリーをすべて削除しますか？",
+    "addAnomaly": "アノマリーを追加",
+    "overwriteToggle": "貼り付け時に上書き",
+    "overwriteTooltip": "オンにすると、貼り付けでリストを置き換えます — スキャンに存在しなくなったアノマリーは削除されます。または貼り付け時に Shift を押すと一度だけ上書きします。",
+    "removeDelayLabel": "削除までの猶予",
+    "removeDelayTooltip": "消滅したアノマリーが上書き貼り付けで削除されるまで（取り消し線付きで）表示される時間 — ゲーム内ブックマークを整理する時間です。",
+    "removeDelayInstant": "即時",
+    "filterLabel": "タイプで絞り込み",
+    "filterClear": "クリア",
+    "noMatchFilter": "フィルターに一致するアノマリーはありません",
+    "setTypeAria": "選択したアノマリーのタイプを設定",
+    "setType": "タイプを設定（{{count}}）…",
+    "deleteSelected": "選択を削除（{{count}}）",
+    "deleteAll": "すべて削除",
+    "empty": "アノマリーはありません — プローブスキャナーから貼り付けてインポート",
+    "colId": "ID",
+    "colType": "タイプ",
+    "colName": "名前",
+    "colNotes": "メモ",
+    "namePlaceholder": "アノマリー名"
   },
   "stats": {
     "title": "ユーザー統計",

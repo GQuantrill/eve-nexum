@@ -360,9 +360,18 @@
     "showStaticWhs": "Statische WHs anzeigen",
     "easyConnect": "Einfaches Verbinden",
     "connectionStyle": "Verbindungsstil",
-    "edgeStyle": { "bezier": "Standard", "straight": "Gerade", "smoothstep": "Stufe" },
+    "edgeStyle": {
+      "bezier": "Standard",
+      "straight": "Gerade",
+      "smoothstep": "Stufe"
+    },
     "connectionThickness": "Verbindungsstärke",
-    "thickness": { "thin": "Dünn", "standard": "Standard", "thick": "Dick", "extra": "Extra dick" },
+    "thickness": {
+      "thin": "Dünn",
+      "standard": "Standard",
+      "thick": "Dick",
+      "extra": "Extra dick"
+    },
     "optimizeConnections": "⟳ Verbindungen optimieren",
     "spreadNodes": "⊞ Knoten verteilen",
     "spreadNodesTooltip": "Systemknoten anpassen, um Überlappungen zu vermeiden",
@@ -510,7 +519,11 @@
     "sizeSmall": "Klein (Fregatte)",
     "rollingCalculator": "Rolling-Rechner",
     "custom": "Benutzerdefiniert",
-    "collapse": { "open": "Offen", "maybe": "Möglicherweise kollabiert", "collapsed": "Kollabiert" },
+    "collapse": {
+      "open": "Offen",
+      "maybe": "Möglicherweise kollabiert",
+      "collapsed": "Kollabiert"
+    },
     "remaining": "{{worst}}–{{best}} übrig · {{used}} verbraucht · max. Sprung {{max}}",
     "useMyShip": "Mein Schiff verwenden",
     "useMyShipTitle": "Kalt = {{ship}} ({{mass}}), heiß = +Prop",
@@ -604,6 +617,7 @@
   "panel": {
     "notes": "Notizen",
     "signatures": "Signaturen",
+    "anomalies": "Anomalien",
     "structures": "Strukturen",
     "npcStations": "NPC-Stationen",
     "killboard": "zKillboard",
@@ -766,6 +780,12 @@
     "ore": "Erz",
     "combat": "Kampf"
   },
+  "anomType": {
+    "unknown": "Unbekannt",
+    "combat": "Kampf",
+    "ore": "Erz",
+    "gas": "Gas"
+  },
   "signatures": {
     "pasteHint": "Du kannst Signaturen direkt aus dem Sondenscanner in EVE kopieren und einfügen. Öffne dazu deinen Sondenscanner. Drücke Strg+A, um alle auszuwählen, dann Strg+C zum Kopieren. Mit Strg+V hier einfügen.",
     "pasteDifferentSystem": "Dein Charakter ist derzeit in {{current}}, aber du fügst Signaturen in {{selected}} ein. Fortfahren?",
@@ -803,6 +823,36 @@
     "colAge": "Alter",
     "colUpdated": "Aktualisiert",
     "namePlaceholder": "Seitenname"
+  },
+  "anomalies": {
+    "pasteHint": "Du kannst Anomalien direkt aus dem Sondenscanner in EVE kopieren und einfügen. Öffne deinen Sondenscanner, drücke Strg+A, um alle auszuwählen, Strg+C zum Kopieren und dann Strg+V, um sie hier einzufügen. Zusammen eingefügte Signaturen und Anomalien werden automatisch ins richtige Panel sortiert.",
+    "pasteDifferentSystem": "Dein Charakter ist derzeit in {{current}}, aber du fügst Anomalien in {{selected}} ein. Fortfahren?",
+    "loadFailed": "Anomalien konnten nicht geladen werden",
+    "saveFailed": "Anomalie konnte nicht gespeichert werden",
+    "deleteFailed": "Anomalie konnte nicht gelöscht werden",
+    "deleteSelectedConfirm_one": "{{count}} ausgewählte Anomalie löschen?",
+    "deleteSelectedConfirm_other": "{{count}} ausgewählte Anomalien löschen?",
+    "deleteAllConfirm_one": "Alle {{count}} Anomalie löschen?",
+    "deleteAllConfirm_other": "Alle {{count}} Anomalien löschen?",
+    "addAnomaly": "Anomalie hinzufügen",
+    "overwriteToggle": "Beim Einfügen überschreiben",
+    "overwriteTooltip": "Wenn aktiv, ersetzt das Einfügen die Liste — Anomalien, die nicht mehr im Scan sind, werden entfernt. Oder halte beim Einfügen Umschalt gedrückt, um nur einmal zu überschreiben.",
+    "removeDelayLabel": "Löschverzögerung",
+    "removeDelayTooltip": "Wie lange eine verschwundene Anomalie (durchgestrichen) sichtbar bleibt, bevor ein Überschreib-Einfügen sie löscht — Zeit, um ihr Lesezeichen im Spiel zu entfernen.",
+    "removeDelayInstant": "Sofort",
+    "filterLabel": "Nach Typ filtern",
+    "filterClear": "Zurücksetzen",
+    "noMatchFilter": "Keine Anomalien entsprechen dem Filter",
+    "setTypeAria": "Typ für ausgewählte Anomalien festlegen",
+    "setType": "Typ festlegen ({{count}})…",
+    "deleteSelected": "Ausgewählte löschen ({{count}})",
+    "deleteAll": "Alle löschen",
+    "empty": "Keine Anomalien — aus dem Sondenscanner einfügen, um zu importieren",
+    "colId": "ID",
+    "colType": "Typ",
+    "colName": "Name",
+    "colNotes": "Notizen",
+    "namePlaceholder": "Anomalie-Name"
   },
   "stats": {
     "title": "Benutzerstatistik",

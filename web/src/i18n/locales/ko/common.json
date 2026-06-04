@@ -360,9 +360,18 @@
     "showStaticWhs": "고정 웜홀 표시",
     "easyConnect": "간편 연결",
     "connectionStyle": "연결 스타일",
-    "edgeStyle": { "bezier": "표준", "straight": "직선", "smoothstep": "계단" },
+    "edgeStyle": {
+      "bezier": "표준",
+      "straight": "직선",
+      "smoothstep": "계단"
+    },
     "connectionThickness": "연결 두께",
-    "thickness": { "thin": "얇게", "standard": "표준", "thick": "굵게", "extra": "매우 굵게" },
+    "thickness": {
+      "thin": "얇게",
+      "standard": "표준",
+      "thick": "굵게",
+      "extra": "매우 굵게"
+    },
     "optimizeConnections": "⟳ 연결 최적화",
     "spreadNodes": "⊞ 노드 펼치기",
     "spreadNodesTooltip": "겹치지 않도록 성계 노드 조정",
@@ -510,7 +519,11 @@
     "sizeSmall": "소형 (프리깃)",
     "rollingCalculator": "롤링 계산기",
     "custom": "사용자 지정",
-    "collapse": { "open": "열림", "maybe": "붕괴되었을 수 있음", "collapsed": "붕괴됨" },
+    "collapse": {
+      "open": "열림",
+      "maybe": "붕괴되었을 수 있음",
+      "collapsed": "붕괴됨"
+    },
     "remaining": "{{worst}}–{{best}} 남음 · {{used}} 사용 · 최대 점프 {{max}}",
     "useMyShip": "내 함선 사용",
     "useMyShipTitle": "콜드 = {{ship}} ({{mass}}), 핫 = +프롭",
@@ -604,6 +617,7 @@
   "panel": {
     "notes": "노트",
     "signatures": "시그니처",
+    "anomalies": "어노말리",
     "structures": "구조물",
     "npcStations": "NPC 정거장",
     "killboard": "zKillboard",
@@ -766,6 +780,12 @@
     "ore": "광석",
     "combat": "전투"
   },
+  "anomType": {
+    "unknown": "알 수 없음",
+    "combat": "전투",
+    "ore": "광석",
+    "gas": "가스"
+  },
   "signatures": {
     "pasteHint": "EVE의 탐사 스캐너에서 직접 시그니처를 복사하여 붙여넣을 수 있습니다. 그러려면 탐사 스캐너를 여세요. Ctrl+A로 모두 선택한 다음 Ctrl+C로 복사하세요. Ctrl+V로 여기에 붙여넣으세요.",
     "pasteDifferentSystem": "당신의 캐릭터는 현재 {{current}}에 있지만, {{selected}}에 시그니처를 붙여넣고 있습니다. 계속할까요?",
@@ -803,6 +823,36 @@
     "colAge": "경과",
     "colUpdated": "업데이트",
     "namePlaceholder": "사이트 이름"
+  },
+  "anomalies": {
+    "pasteHint": "EVE의 탐사 스캐너에서 직접 어노말리를 복사하여 붙여넣을 수 있습니다. 탐사 스캐너를 열고 Ctrl+A로 모두 선택, Ctrl+C로 복사한 다음 Ctrl+V로 여기에 붙여넣으세요. 시그니처와 어노말리를 함께 붙여넣으면 자동으로 올바른 패널로 분류됩니다.",
+    "pasteDifferentSystem": "당신의 캐릭터는 현재 {{current}}에 있지만, {{selected}}에 어노말리를 붙여넣고 있습니다. 계속할까요?",
+    "loadFailed": "어노말리를 불러오지 못했습니다",
+    "saveFailed": "어노말리를 저장하지 못했습니다",
+    "deleteFailed": "어노말리를 삭제하지 못했습니다",
+    "deleteSelectedConfirm_one": "선택한 어노말리 {{count}}개를 삭제할까요?",
+    "deleteSelectedConfirm_other": "선택한 어노말리 {{count}}개를 삭제할까요?",
+    "deleteAllConfirm_one": "{{count}}개 어노말리를 모두 삭제할까요?",
+    "deleteAllConfirm_other": "{{count}}개 어노말리를 모두 삭제할까요?",
+    "addAnomaly": "어노말리 추가",
+    "overwriteToggle": "붙여넣기 시 덮어쓰기",
+    "overwriteTooltip": "켜면 붙여넣기가 목록을 대체합니다 — 스캔에 더 이상 없는 어노말리는 제거됩니다. 또는 붙여넣을 때 Shift를 누르면 한 번만 덮어씁니다.",
+    "removeDelayLabel": "제거 지연",
+    "removeDelayTooltip": "사라진 어노말리가 덮어쓰기 붙여넣기로 삭제되기 전까지 (취소선과 함께) 표시되는 시간 — 게임 내 북마크를 정리할 시간입니다.",
+    "removeDelayInstant": "즉시",
+    "filterLabel": "유형별 필터",
+    "filterClear": "지우기",
+    "noMatchFilter": "필터와 일치하는 어노말리가 없습니다",
+    "setTypeAria": "선택한 어노말리의 유형 설정",
+    "setType": "유형 설정 ({{count}})…",
+    "deleteSelected": "선택 항목 삭제 ({{count}})",
+    "deleteAll": "전체 삭제",
+    "empty": "어노말리 없음 — 탐사 스캐너에서 붙여넣어 가져오세요",
+    "colId": "ID",
+    "colType": "유형",
+    "colName": "이름",
+    "colNotes": "노트",
+    "namePlaceholder": "어노말리 이름"
   },
   "stats": {
     "title": "사용자 통계",

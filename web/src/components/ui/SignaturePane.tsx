@@ -90,6 +90,11 @@ function parseSigClipboard(text: string): ParsedSig[] {
       const parts = line.split('\t');
       const sigId = parts[0]?.trim().toUpperCase() ?? '';
       if (!/^[A-Z]{3}-\d{3}$/.test(sigId)) return [];
+      // Skip cosmic anomalies — they live in the Anomalies pane. The scanner's
+      // group column ("Cosmic Anomaly" vs "Cosmic Signature") lets a single
+      // Ctrl+A/Ctrl+C of the whole window route each row to the right pane.
+      // Rows without a group column (partial/manual pastes) still pass through.
+      if ((parts[1]?.trim().toLowerCase() ?? '') === 'cosmic anomaly') return [];
       const group = parts[2]?.trim() ?? '';
       const sigType = EVE_GROUP_TO_TYPE[group.toLowerCase()] ?? 'unknown';
       const col3 = parts[3]?.trim() ?? '';

@@ -12,6 +12,7 @@ import { useMapStore } from '../../store/mapStore';
 import { CLASS_COLORS, CLASS_LABELS, EFFECT_LABELS, EFFECT_MODIFIERS, WORMHOLE_DESTINATIONS } from '../../data/wormholes';
 import { DraggableCard } from './DraggableCard';
 import { SignaturePane } from './SignaturePane';
+import { AnomalyPane } from './AnomalyPane';
 import { StructuresPane } from './StructuresPane';
 import { NpcStationsPane } from './NpcStationsPane';
 import { NotesEditor } from './NotesEditor';
@@ -173,6 +174,7 @@ export function SystemPanel() {
   const panelTitle: Record<string, string> = {
     notes:       t('panel.notes'),
     signatures:  t('panel.signatures'),
+    anomalies:   t('panel.anomalies'),
     structures:  t('panel.structures'),
     npcStations: t('panel.npcStations'),
     killboard:   t('panel.killboard'),
@@ -299,6 +301,7 @@ export function SystemPanel() {
       />
     ),
     signatures:  <SignaturePane systemId={sys.id} />,
+    anomalies:   <AnomalyPane systemId={sys.id} />,
     structures:  <StructuresPane systemId={sys.id} />,
     npcStations: <NpcStationsPane eveSystemId={sys.eveSystemId} />,
     killboard:   <KillboardPane eveSystemId={sys.eveSystemId} />,
@@ -674,6 +677,9 @@ export function SystemPanel() {
                 if (id === 'notes')      return shareIncludesNotes;
                 if (id === 'structures') return shareIncludesStructures;
                 if (id === 'signatures') return shareIncludesSigs;
+                // Anomalies aren't embedded in the share payload yet, so the
+                // pane would always be empty for a guest — hide it for now.
+                if (id === 'anomalies')  return false;
                 return true;
               })
               .map((id) => (

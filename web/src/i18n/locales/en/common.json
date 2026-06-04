@@ -604,6 +604,7 @@
   "panel": {
     "notes": "Notes",
     "signatures": "Signatures",
+    "anomalies": "Anomalies",
     "structures": "Structures",
     "npcStations": "NPC Stations",
     "killboard": "zKillboard",
@@ -766,6 +767,12 @@
     "ore": "Ore",
     "combat": "Combat"
   },
+  "anomType": {
+    "unknown": "Unknown",
+    "combat": "Combat",
+    "ore": "Ore",
+    "gas": "Gas"
+  },
   "signatures": {
     "pasteHint": "You can copy and paste signatures directly from the Probe scanner in Eve. To do this, open your probe scanner.  Press control A to select them all, then control C to copy.  Use control V to paste them here",
     "pasteDifferentSystem": "Your character is currently in {{current}}, but you are pasting signatures into {{selected}}. Continue?",
@@ -803,6 +810,36 @@
     "colAge": "Age",
     "colUpdated": "Updated",
     "namePlaceholder": "Site name"
+  },
+  "anomalies": {
+    "pasteHint": "You can copy and paste anomalies directly from the Probe scanner in Eve. Open your probe scanner, press Ctrl+A to select all, Ctrl+C to copy, then Ctrl+V to paste them here. Signatures and anomalies pasted together are sorted into the right panel automatically.",
+    "pasteDifferentSystem": "Your character is currently in {{current}}, but you are pasting anomalies into {{selected}}. Continue?",
+    "loadFailed": "Failed to load anomalies",
+    "saveFailed": "Failed to save anomaly",
+    "deleteFailed": "Failed to delete anomaly",
+    "deleteSelectedConfirm_one": "Delete {{count}} selected anomaly?",
+    "deleteSelectedConfirm_other": "Delete {{count}} selected anomalies?",
+    "deleteAllConfirm_one": "Delete all {{count}} anomaly?",
+    "deleteAllConfirm_other": "Delete all {{count}} anomalies?",
+    "addAnomaly": "Add anomaly",
+    "overwriteToggle": "Overwrite on paste",
+    "overwriteTooltip": "When on, pasting replaces the list — anomalies no longer in the scan are removed. Or hold Shift while pasting to overwrite just once.",
+    "removeDelayLabel": "Removal delay",
+    "removeDelayTooltip": "How long an absent anomaly stays visible (struck through) before an overwrite paste deletes it — time to clear its in-game bookmark.",
+    "removeDelayInstant": "Instant",
+    "filterLabel": "Filter by type",
+    "filterClear": "Clear",
+    "noMatchFilter": "No anomalies match the filter",
+    "setTypeAria": "Set type for selected anomalies",
+    "setType": "Set type ({{count}})…",
+    "deleteSelected": "Delete selected ({{count}})",
+    "deleteAll": "Delete all",
+    "empty": "No anomalies — paste from probe scanner to import",
+    "colId": "ID",
+    "colType": "Type",
+    "colName": "Name",
+    "colNotes": "Notes",
+    "namePlaceholder": "Anomaly name"
   },
   "stats": {
     "title": "User Stats",
