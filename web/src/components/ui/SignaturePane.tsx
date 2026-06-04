@@ -227,7 +227,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   const pendingUpdates = useRef<Map<string, Partial<Signature>>>(new Map());
   const debounceTimers = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
   const sigsRef        = useRef<Signature[]>([]);
-  sigsRef.current = sigs;
+  useEffect(() => { sigsRef.current = sigs; }, [sigs]);
 
   // Overwrite-on-paste mode. When on (or when Shift is held during a paste),
   // a paste also deletes signatures whose ID is absent from the pasted scan —
@@ -539,7 +539,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   const toggleSelect = (id: string) => {
     setSelected((prev) => {
       const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
+      if (next.has(id)) next.delete(id); else next.add(id);
       return next;
     });
   };

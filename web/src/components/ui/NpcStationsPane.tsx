@@ -78,7 +78,7 @@ export function NpcStationsPane({ eveSystemId }: { eveSystemId: number | null })
   const [loading, setLoading]   = useState(false);
   const [ctx, setCtx]           = useState<CtxState | null>(null);
   const ctxRef                  = useRef<CtxState | null>(null);
-  ctxRef.current = ctx;
+  useEffect(() => { ctxRef.current = ctx; }, [ctx]);
   const { isShareMode } = useShareMode();
 
   useEffect(() => {

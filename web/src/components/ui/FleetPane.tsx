@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { charPortrait } from '../../utils/eveImages';
 import { useTranslation } from 'react-i18next';
 import { ArrowUpIcon, ArrowDownIcon } from '@phosphor-icons/react';
 import { useFleet } from '../../hooks/useFleet';
@@ -151,7 +152,7 @@ export function FleetPane() {
           <li key={r.key} className="fleet-pane__row">
             <img
               className="fleet-pane__avatar"
-              src={`https://images.evetech.net/characters/${r.avatarId}/portrait?size=32`}
+              src={charPortrait(r.avatarId, 32)}
               alt=""
               loading="lazy"
             />

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { charPortrait } from '../../utils/eveImages';
 import { Trans, useTranslation } from 'react-i18next';
 import type { Icon } from '@phosphor-icons/react';
 import {
@@ -322,7 +323,7 @@ export function LandingPage() {
             <>
               <a href={apiUrl('/auth/login')} className="landing__returning">
                 <img
-                  src={`https://images.evetech.net/characters/${lastChar.characterId}/portrait?size=128`}
+                  src={charPortrait(lastChar.characterId, 128)}
                   alt={lastChar.characterName}
                   className="landing__returning-avatar"
                 />

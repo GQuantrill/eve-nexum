@@ -18,6 +18,7 @@ import {
   type MinimapPosition,
 } from "../../hooks/useMinimapPosition";
 import { useUserSetting } from "../../hooks/useUserSetting";
+import { useResettableState } from "../../hooks/useResettableState";
 import { DEFAULT_BOOKMARK_FORMAT, BOOKMARK_TOKENS } from "../../utils/signatureBookmark";
 import { toPng } from "html-to-image";
 import { CaretLeftIcon, CaretRightIcon, GearIcon } from "@phosphor-icons/react";
@@ -161,26 +162,16 @@ function ShareSection() {
   const effectiveStructures = activeFlags
     ? map.shareIncludeStructures === true
     : false;
-  const [includeSigs, setIncludeSigs] = useState(effectiveSigs);
-  const [includeBridges, setIncludeBridges] = useState(effectiveBridges);
-  const [includeNotes, setIncludeNotes] = useState(effectiveNotes);
-  const [includeStructures, setIncludeStructures] =
-    useState(effectiveStructures);
+  // These mirror the map's persisted share flags but are user-toggleable, so
+  // they reset to the effective value whenever the map's flags change (link
+  // created/changed) — via render-phase adjustment, not a syncing effect.
+  const [includeSigs, setIncludeSigs] = useResettableState(effectiveSigs);
+  const [includeBridges, setIncludeBridges] = useResettableState(effectiveBridges);
+  const [includeNotes, setIncludeNotes] = useResettableState(effectiveNotes);
+  const [includeStructures, setIncludeStructures] = useResettableState(effectiveStructures);
   // Expiry is generation-time only — it doesn't sync from the map state
   // because once a link exists its expiry is just shown as a countdown.
   const [expiryHours, setExpiryHours] = useState<number>(SHARE_EXPIRY_DEFAULT);
-  useEffect(() => {
-    setIncludeSigs(effectiveSigs);
-  }, [effectiveSigs]);
-  useEffect(() => {
-    setIncludeBridges(effectiveBridges);
-  }, [effectiveBridges]);
-  useEffect(() => {
-    setIncludeNotes(effectiveNotes);
-  }, [effectiveNotes]);
-  useEffect(() => {
-    setIncludeStructures(effectiveStructures);
-  }, [effectiveStructures]);
 
   // 1-minute heartbeat so the countdown label stays roughly accurate
   // without taxing the render loop. Hovering granularity isn't useful

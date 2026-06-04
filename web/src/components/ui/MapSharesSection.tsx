@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { charPortrait, corpLogo } from '../../utils/eveImages';
 import { useTranslation } from 'react-i18next';
 import { api } from '../../api/client';
 import { useMapStore } from '../../store/mapStore';
@@ -166,8 +167,8 @@ export function MapSharesSection() {
                   <img
                     className="map-shares__avatar"
                     src={s.kind === 'character'
-                      ? `https://images.evetech.net/characters/${s.targetId}/portrait?size=32`
-                      : `https://images.evetech.net/corporations/${s.targetId}/logo?size=32`}
+                      ? charPortrait(s.targetId, 32)
+                      : corpLogo(s.targetId, 32)}
                     alt=""
                     loading="lazy"
                   />

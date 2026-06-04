@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { charPortrait } from '../../utils/eveImages';
 import { useTranslation } from 'react-i18next';
 import { CaretDownIcon, PlusIcon, CheckIcon, MapPinIcon, TrashIcon } from '@phosphor-icons/react';
 import { useAuth } from '../../context/AuthContext';
@@ -134,7 +135,7 @@ export function CharacterSwitcher() {
                 >
                   <img
                     className="character-switcher__avatar"
-                    src={`https://images.evetech.net/characters/${c.characterId}/portrait?size=32`}
+                    src={charPortrait(c.characterId, 32)}
                     alt=""
                   />
                   <span className="character-switcher__identity">

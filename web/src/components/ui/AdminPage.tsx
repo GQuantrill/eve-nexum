@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { charPortrait } from '../../utils/eveImages';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { api } from '../../api/client';
@@ -247,7 +248,7 @@ function UsersTab() {
               <SortableTh col="blocked"        label={t('admin.users.colStatus')}    sort={sort} onToggle={toggleSort} />
               <SortableTh col="lastLogin"      label={t('admin.users.colLastLogin')} sort={sort} onToggle={toggleSort} />
               <SortableTh col="lastKnownSystemName" label={t('admin.users.colLastKnown')} sort={sort} onToggle={toggleSort} />
-              {canEdit && <th />}
+              {canEdit && <th aria-label={t('actions.column')} />}
             </tr>
           </thead>
           <tbody>
@@ -259,7 +260,7 @@ function UsersTab() {
                   <td className="admin-modal__name-cell">
                     <img
                       className="admin-modal__avatar"
-                      src={`https://images.evetech.net/characters/${u.characterId}/portrait?size=32`}
+                      src={charPortrait(u.characterId, 32)}
                       alt=""
                     />
                     <span>{u.characterName}</span>
@@ -424,7 +425,7 @@ function MapsTab() {
               <th>{t('admin.maps.colConnections')}</th>
               <th>{t('admin.maps.colLock')}</th>
               <th>{t('admin.maps.colLastActive')}</th>
-              <th />
+              <th aria-label={t('actions.column')} />
             </tr>
           </thead>
           <tbody>
@@ -436,7 +437,7 @@ function MapsTab() {
                   <td className="admin-modal__name-cell">
                     <img
                       className="admin-modal__avatar"
-                      src={`https://images.evetech.net/characters/${m.ownerCharacterId}/portrait?size=32`}
+                      src={charPortrait(m.ownerCharacterId, 32)}
                       alt=""
                     />
                     <span>{m.ownerCharacterName}</span>
@@ -838,7 +839,7 @@ function UsersReport() {
               <td className="admin-modal__name-cell">
                 <img
                   className="admin-modal__avatar"
-                  src={`https://images.evetech.net/characters/${u.characterId}/portrait?size=32`}
+                  src={charPortrait(u.characterId, 32)}
                   alt=""
                 />
                 <span>{u.characterName}</span>

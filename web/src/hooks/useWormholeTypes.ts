@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react';
-import { api } from '../api/client';
+import { createStaticResource } from './createStaticResource';
 
 export interface WormholeSpec {
   totalMass:     number;
@@ -13,28 +12,5 @@ export interface WormholeSpec {
 type WhMap = Record<string, WormholeSpec>;
 
 // Static cluster data — load once per page, never refresh.
-let cache: WhMap | null = null;
-let inflight: Promise<WhMap> | null = null;
-const EMPTY: WhMap = {};
-
-function load(): Promise<WhMap> {
-  if (cache)    return Promise.resolve(cache);
-  if (inflight) return inflight;
-  inflight = api<WhMap>('/api/wormholes/types')
-    .then(rows => { cache = rows; inflight = null; return cache; })
-    .catch(() => { inflight = null; return cache ?? EMPTY; });
-  return inflight;
-}
-
-export function useWormholeTypes(): WhMap {
-  const [data, setData] = useState<WhMap>(cache ?? EMPTY);
-
-  useEffect(() => {
-    if (cache) { setData(cache); return; }
-    let cancelled = false;
-    load().then(d => { if (!cancelled) setData(d); });
-    return () => { cancelled = true; };
-  }, []);
-
-  return data;
-}
+const { useResource } = createStaticResource<WhMap>('/api/wormholes/types', {});
+export const useWormholeTypes = useResource;

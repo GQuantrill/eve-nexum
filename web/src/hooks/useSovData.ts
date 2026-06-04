@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { allianceLogo, corpLogo } from '../utils/eveImages';
 
 const ESI = 'https://esi.evetech.net/latest';
 
@@ -112,19 +113,20 @@ export function useSovData(eveSystemId: number | null): SovResult | null {
       const alliance = allianceInfo && entry.alliance_id ? {
         name:    allianceInfo.name,
         ticker:  allianceInfo.ticker,
-        logoUrl: `https://images.evetech.net/alliances/${entry.alliance_id}/logo?size=64`,
+        logoUrl: allianceLogo(entry.alliance_id, 64),
       } : undefined;
 
       const corp = corpInfo && entry.corporation_id ? {
         name:    corpInfo.name,
         ticker:  corpInfo.ticker,
-        logoUrl: `https://images.evetech.net/corporations/${entry.corporation_id}/logo?size=64`,
+        logoUrl: corpLogo(entry.corporation_id, 64),
       } : undefined;
 
-      const factionEntry = entry.faction_id ? factionsMap.get(entry.faction_id) : undefined;
-      const faction = factionEntry ? {
+      const factionId = entry.faction_id;
+      const factionEntry = factionId ? factionsMap.get(factionId) : undefined;
+      const faction = factionEntry && factionId ? {
         name:    factionEntry.name,
-        logoUrl: `https://images.evetech.net/corporations/${entry.faction_id}/logo?size=64`,
+        logoUrl: corpLogo(factionId, 64),
       } : undefined;
 
       // Primary controller: alliance > corp > faction

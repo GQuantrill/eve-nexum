@@ -80,7 +80,7 @@ export function StructuresPane({ systemId }: { systemId: string }) {
   const pendingUpdates = useRef<Map<string, Partial<Structure>>>(new Map());
   const debounceTimers = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
   const structuresRef = useRef<Structure[]>([]);
-  structuresRef.current = structures;
+  useEffect(() => { structuresRef.current = structures; }, [structures]);
 
   const { isShareMode } = useShareMode();
   // Bumped when another client changes this system's structures (live sync).
@@ -238,7 +238,7 @@ export function StructuresPane({ systemId }: { systemId: string }) {
                 <th>{t('structures.ownerCorp')}</th>
                 <th title={t('structures.eveIdTooltip')}>{t('structures.eveId')}</th>
                 <th>{t('structures.notes')}</th>
-                {!isShareMode && <th />}
+                {!isShareMode && <th aria-label={t('actions.column')} />}
               </tr>
             </thead>
             <tbody>

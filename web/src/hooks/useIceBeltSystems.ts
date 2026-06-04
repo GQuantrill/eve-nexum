@@ -1,39 +1,13 @@
-import { useEffect, useState } from 'react';
-import { api } from '../api/client';
+import { createStaticResource } from './createStaticResource';
 
-// Static cluster data — load once per page, never refresh.
-let cache: Set<number> | null = null;
-let inflight: Promise<Set<number>> | null = null;
-const EMPTY: Set<number> = new Set();
-
-function load(): Promise<Set<number>> {
-  if (cache)    return Promise.resolve(cache);
-  if (inflight) return inflight;
-  inflight = api<number[]>('/api/systems/ice-belts')
-    .then((ids) => {
-      cache = new Set(ids);
-      inflight = null;
-      return cache;
-    })
-    .catch(() => {
-      inflight = null;
-      return cache ?? EMPTY;
-    });
-  return inflight;
-}
-
-export function useIceBeltSystems(): Set<number> {
-  const [data, setData] = useState<Set<number>>(cache ?? EMPTY);
-
-  useEffect(() => {
-    if (cache) { setData(cache); return; }
-    let cancelled = false;
-    load().then((s) => { if (!cancelled) setData(s); });
-    return () => { cancelled = true; };
-  }, []);
-
-  return data;
-}
+// Static cluster data — load once per page, never refresh. The id list is
+// transformed into a Set for O(1) membership checks.
+const { useResource } = createStaticResource<number[], Set<number>>(
+  '/api/systems/ice-belts',
+  new Set<number>(),
+  (ids) => new Set(ids),
+);
+export const useIceBeltSystems = useResource;
 
 export function hasIceBelt(set: Set<number>, eveSystemId: number | null): boolean {
   return !!eveSystemId && set.has(eveSystemId);

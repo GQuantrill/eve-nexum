@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import type { AuthUser } from '../../context/AuthContext';
+import { charPortrait } from '../../utils/eveImages';
 
 /**
  * Idle-lock screen. Shown when the session is still valid but the UI has been
@@ -21,7 +22,7 @@ export function LockScreen({
       <div className="lock-screen__card">
         <img
           className="lock-screen__avatar"
-          src={`https://images.evetech.net/characters/${user.characterId}/portrait?size=128`}
+          src={charPortrait(user.characterId, 128)}
           alt=""
         />
         <h1 className="lock-screen__title">{t('session.lockedTitle')}</h1>

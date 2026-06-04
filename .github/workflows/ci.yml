@@ -1,0 +1,46 @@
+name: CI
+
+# Lint + typecheck/build on every PR and on pushes to the integration branches.
+# ESLint fails the job on errors only (warnings are allowed through), so the
+# accumulated warnings don't block while they're being worked down.
+on:
+  pull_request:
+  push:
+    branches: [release, main]
+
+permissions:
+  contents: read
+
+jobs:
+  web:
+    name: web (lint + build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+          cache-dependency-path: web/yarn.lock
+      - run: yarn install --frozen-lockfile
+      - run: yarn lint
+      - run: yarn build
+
+  server:
+    name: server (typecheck)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+          cache-dependency-path: server/yarn.lock
+      - run: yarn install --frozen-lockfile
+      - run: npx tsc --noEmit

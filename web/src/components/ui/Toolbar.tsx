@@ -22,6 +22,7 @@ import {
   SignOutIcon, PlanetIcon, LinkSimpleIcon, ClockCountdownIcon, MapPinIcon,
 } from '@phosphor-icons/react';
 import type { Icon as PhosphorIcon } from '@phosphor-icons/react';
+import { charPortrait, typeIcon } from '../../utils/eveImages';
 
 interface EveStatus {
   players:    number;
@@ -433,7 +434,7 @@ export function Toolbar() {
           />
           <img
             className="toolbar__avatar"
-            src={`https://images.evetech.net/characters/${user.characterId}/portrait?size=64`}
+            src={charPortrait(user.characterId, 64)}
             alt={user.characterName}
           />
           {ship && (
@@ -445,7 +446,7 @@ export function Toolbar() {
             >
               <img
                 className="toolbar__ship"
-                src={`https://images.evetech.net/types/${ship.typeId}/icon?size=64`}
+                src={typeIcon(ship.typeId, 64)}
                 alt={ship.typeName}
               />
             </span>

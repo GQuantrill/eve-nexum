@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { api } from '../api/client';
 import { useShareMode } from '../context/ShareModeContext';
 
@@ -87,7 +87,10 @@ const EMPTY: StandingsLookup = {
 };
 
 export function useStandings() {
-  const [, setTick] = useState(0);
+  // Increments on every standings change (notify) — used as the memo key so
+  // the returned object updates exactly when the data changes and is otherwise
+  // referentially stable, letting consumers (every map node) memoize cleanly.
+  const [tick, setTick] = useState(0);
   const { isShareMode } = useShareMode();
 
   useEffect(() => {
@@ -101,7 +104,9 @@ export function useStandings() {
     return () => { listeners.delete(listener); };
   }, [isShareMode]);
 
-  function getStanding(kind: ContactKind, id: number): StandingsLookup {
+  // Stable identity; reads the module cache at call time so it stays correct
+  // as the cache updates without forcing a new closure each render.
+  const getStanding = useCallback((kind: ContactKind, id: number): StandingsLookup => {
     if (!cache) return EMPTY;
     const key = `${kind}:${id}`;
     const character = cache.character[key] ?? null;
@@ -116,15 +121,16 @@ export function useStandings() {
       isFriendly: effective >  5,
       isNeutral:  effective >= -5 && effective <= 5,
     };
-  }
+  }, []);
 
-  return {
+  return useMemo(() => ({
     loaded: !!cache,
     refreshing,
     getStanding,
     self: cache ? { characterId: cache.characterId, corpId: cache.corpId, allianceId: cache.allianceId } : null,
     refresh: refreshFromEsi,
-  };
+  // `tick` (bumped by notify) is the data-version key; getStanding is stable.
+  }), [tick, getStanding]);
 }
 
 // Convenience for code that only needs the loader (no per-target lookups).
