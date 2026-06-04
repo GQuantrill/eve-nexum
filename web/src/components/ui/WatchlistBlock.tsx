@@ -30,6 +30,7 @@ export function WatchlistBlock() {
 
   const systems     = useMapStore((s) => s.map.systems);
   const connections = useMapStore((s) => s.map.connections);
+  const sigTypesBySystem = useMapStore((s) => s.sigTypesBySystem);
 
   // How many things on the active map each entry currently matches — drives the
   // "on map now" dot. Cheap: a handful of entries over the map's systems/edges.
@@ -37,12 +38,12 @@ export function WatchlistBlock() {
     const counts = new Map<string, number>();
     for (const it of items) {
       let n = 0;
-      for (const s of systems) if (systemMatchesEntry(it, s)) n++;
+      for (const s of systems) if (systemMatchesEntry(it, s, sigTypesBySystem[s.id])) n++;
       for (const c of connections) if (connectionMatchesEntry(it, c)) n++;
       counts.set(it.id, n);
     }
     return counts;
-  }, [items, systems, connections]);
+  }, [items, systems, connections, sigTypesBySystem]);
 
   const activeKeys = useMemo(() => new Set(items.map((it) => matchKey(it.match))), [items]);
 

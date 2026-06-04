@@ -155,7 +155,8 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
   // Personal watchlist: highlight + corner icon when this system matches an
   // entry (by name, class, effect, or a static wormhole type / frig hole).
   const [watchEntries]  = useWatchlist();
-  const watch           = matchSystem(watchEntries, sys);
+  const watchSigTypes   = useMapStore((s) => s.sigTypesBySystem[sys.id]);
+  const watch           = matchSystem(watchEntries, sys, watchSigTypes);
   const watchDef        = watch ? watchMarker(watch.marker) : null;
   const watchTip        = watch ? (watch.note.trim() || t(`watchMarker.${watch.marker}`)) : undefined;
 

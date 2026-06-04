@@ -1793,6 +1793,24 @@ mapsRouter.delete('/:mapId/systems/:systemId/signatures/:sigId', async (req, res
   res.json({ ok: true });
 });
 
+// Lightweight map-wide index of scanned wormhole-signature types, so the client
+// watchlist can match "alert me when I scan a C247 / frig hole anywhere in the
+// chain" without opening every system's sig pane. Only sigs with a wh_type are
+// returned, and only the (systemId, whType) pair — not the full row.
+mapsRouter.get('/:mapId/signatures', async (req, res) => {
+  const { mapId } = req.params;
+  const access = await getMapAccess(mapId, req);
+  if (!access) { res.status(404).json({ error: 'Map not found' }); return; }
+  const { rows } = await db.query(
+    `SELECT s.system_id AS "systemId", s.wh_type AS "whType"
+     FROM map_signatures s
+     JOIN map_systems ms ON ms.id = s.system_id
+     WHERE ms.map_id = $1 AND s.wh_type <> ''`,
+    [mapId],
+  );
+  res.json(rows);
+});
+
 // ── Anomalies ─────────────────────────────────────────────────────────────────
 // Cosmic anomalies pasted from the probe scanner. Same shape as the signature
 // routes but simpler: no wormhole type / leads-to, no K162 dispatch, no ghost

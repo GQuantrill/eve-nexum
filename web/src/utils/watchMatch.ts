@@ -21,20 +21,23 @@ export function matchKey(m: WatchMatch): string {
   }
 }
 
-/** Does a system satisfy an entry? (whType also matches via the system's
- *  statics; frigHole matches a frigate static.) */
-export function systemMatchesEntry(e: WatchEntry, sys: MapSystem): boolean {
+/** Does a system satisfy an entry? whType / frigHole match the system's statics
+ *  AND its scanned wormhole-sig types (passed in from the map-wide index), so a
+ *  freshly-scanned sig counts even before it's resolved into a connection. */
+export function systemMatchesEntry(e: WatchEntry, sys: MapSystem, sigTypes?: string[]): boolean {
   const m = e.match;
   switch (m.by) {
     case 'system':   return m.query.trim() !== '' && norm(sys.name) === norm(m.query);
     case 'whType': {
       if (m.code.trim() === '') return false;
       const code = m.code.trim().toUpperCase();
-      return sys.statics.some((s) => s.toUpperCase() === code);
+      return sys.statics.some((s) => s.toUpperCase() === code)
+        || (sigTypes?.some((s) => s.toUpperCase() === code) ?? false);
     }
     case 'class':    return sys.systemClass === m.cls;
     case 'effect':   return sys.effect === m.effect;
-    case 'frigHole': return sys.statics.some((s) => FRIG_WH_TYPES.has(s.toUpperCase()));
+    case 'frigHole': return sys.statics.some((s) => FRIG_WH_TYPES.has(s.toUpperCase()))
+        || (sigTypes?.some((s) => FRIG_WH_TYPES.has(s.toUpperCase())) ?? false);
   }
 }
 
@@ -50,8 +53,8 @@ export function connectionMatchesEntry(e: WatchEntry, conn: MapConnection): bool
 }
 
 /** First entry (list order) that matches this system, or null. */
-export function matchSystem(entries: WatchEntry[], sys: MapSystem): WatchEntry | null {
-  for (const e of entries) if (systemMatchesEntry(e, sys)) return e;
+export function matchSystem(entries: WatchEntry[], sys: MapSystem, sigTypes?: string[]): WatchEntry | null {
+  for (const e of entries) if (systemMatchesEntry(e, sys, sigTypes)) return e;
   return null;
 }
 

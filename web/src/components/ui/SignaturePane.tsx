@@ -176,6 +176,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   const activeMapId     = useMapStore((s) => s.activeMapId);
   const map             = useMapStore((s) => s.map);
   const currentSystemId = useMapStore((s) => s.currentSystemId);
+  const setSystemSigTypes = useMapStore((s) => s.setSystemSigTypes);
   const canEdit         = useCanEditContent();
 
   const systemStatics = useMemo(
@@ -233,6 +234,13 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   const debounceTimers = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
   const sigsRef        = useRef<Signature[]>([]);
   useEffect(() => { sigsRef.current = sigs; }, [sigs]);
+
+  // Feed this system's scanned wormhole-sig types into the map-wide index so the
+  // watchlist can match them live — the user's own edits don't bump sigRev, so
+  // the bulk loader wouldn't otherwise see them until a reload.
+  useEffect(() => {
+    setSystemSigTypes(systemId, sigs.filter((s) => s.whType).map((s) => s.whType.toUpperCase()));
+  }, [sigs, systemId, setSystemSigTypes]);
 
   // Overwrite-on-paste mode. When on (or when Shift is held during a paste),
   // a paste also deletes signatures whose ID is absent from the pasted scan —

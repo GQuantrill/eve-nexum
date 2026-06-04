@@ -222,6 +222,14 @@ interface MapStore {
   structRev: Record<string, number>;
   anomRev: Record<string, number>;
 
+  // Map-wide index of scanned wormhole-signature types per system (uppercased
+  // wh_type codes), so the watchlist can match a scanned sig anywhere in the
+  // chain — not just connections/statics. Loaded in bulk on map switch and
+  // kept fresh by the open sig pane + remote sig.changed events.
+  sigTypesBySystem: Record<string, string[]>;
+  setSigTypesBulk: (next: Record<string, string[]>) => void;
+  setSystemSigTypes: (systemId: string, types: string[]) => void;
+
   // Realtime: apply an edit pushed from another client (no persist, no undo).
   applyRemote: (event: RemoteEvent) => void;
 }
@@ -412,6 +420,11 @@ export const useMapStore = create<MapStore>()((set, get) => {
     sigRev: {},
     structRev: {},
     anomRev: {},
+    sigTypesBySystem: {},
+    setSigTypesBulk: (next) => set({ sigTypesBySystem: next }),
+    setSystemSigTypes: (systemId, types) => set((s) => ({
+      sigTypesBySystem: { ...s.sigTypesBySystem, [systemId]: types },
+    })),
     panelOrder: ['activity', 'killboard', 'notes', 'signatures', 'anomalies', 'structures', 'npcStations'],
     undoStack: [],
 
@@ -489,7 +502,7 @@ export const useMapStore = create<MapStore>()((set, get) => {
       try {
         const map = await api<WormholeMap>(`/api/maps/${id}`);
         localStorage.setItem('nexum.lastMapId', id);
-        set({ map, activeMapId: id, selectedSystemId: null, selectedConnectionId: null, currentSystemId: null, undoStack: [] });
+        set({ map, activeMapId: id, selectedSystemId: null, selectedConnectionId: null, currentSystemId: null, undoStack: [], sigTypesBySystem: {} });
       } catch (err) {
         // 403/404 — the grant was revoked, or the map was deleted. Reload
         // the list (which will trigger the revocation-detection path above

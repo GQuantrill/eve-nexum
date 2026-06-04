@@ -38,28 +38,35 @@ function playWatchChime() {
  * barrages you; only genuine new appearances chime. A target that leaves
  * re-arms.
  */
+// Settling window after a reseed (map switch / watchlist edit) during which
+// matches are absorbed silently. The map-wide sig index bulk-loads just after a
+// map switch, so without this every previously-scanned watched sig would chime
+// at once. A genuine new scan after the window chimes normally.
+const ARM_DELAY_MS = 1500;
+
 export function useWatchlistAlerts() {
   const { t } = useTranslation();
   const systems     = useMapStore((s) => s.map.systems);
   const connections = useMapStore((s) => s.map.connections);
   const activeMapId = useMapStore((s) => s.activeMapId);
+  const sigTypesBySystem = useMapStore((s) => s.sigTypesBySystem);
   const [entries]   = useWatchlist();
   const [soundOn]   = useUserSetting<boolean>('nexum.watchlist.sound', true);
 
-  const stateRef = useRef<{ mapId: string | null; entries: unknown; alerted: Set<string> }>({
-    mapId: null, entries: null, alerted: new Set(),
+  const stateRef = useRef<{ mapId: string | null; entries: unknown; alerted: Set<string>; armAt: number }>({
+    mapId: null, entries: null, alerted: new Set(), armAt: 0,
   });
 
   useEffect(() => {
     if (entries.length === 0) {
-      stateRef.current = { mapId: activeMapId, entries, alerted: new Set() };
+      stateRef.current = { mapId: activeMapId, entries, alerted: new Set(), armAt: 0 };
       return;
     }
 
     // Present matches, keyed by target id, with the label/marker to announce.
     const present = new Map<string, { name: string; marker: string }>();
     for (const sys of systems) {
-      const e = matchSystem(entries, sys);
+      const e = matchSystem(entries, sys, sigTypesBySystem[sys.id]);
       if (e) present.set(`sys:${sys.id}`, { name: sys.name || '?', marker: t(`watchMarker.${e.marker}`) });
     }
     for (const conn of connections) {
@@ -71,10 +78,14 @@ export function useWatchlistAlerts() {
     }
 
     const st = stateRef.current;
-    // Map switch or watchlist edit → reseed silently (compare entries identity;
-    // useWatchlist returns a fresh array whenever the stored value changes).
+    // Map switch or watchlist edit → start a fresh settling window.
     if (st.mapId !== activeMapId || st.entries !== entries) {
-      stateRef.current = { mapId: activeMapId, entries, alerted: new Set(present.keys()) };
+      stateRef.current = { mapId: activeMapId, entries, alerted: new Set(present.keys()), armAt: Date.now() + ARM_DELAY_MS };
+      return;
+    }
+    // Still settling (e.g. the sig index is loading) → absorb silently.
+    if (Date.now() < st.armAt) {
+      st.alerted = new Set(present.keys());
       return;
     }
 
@@ -87,5 +98,5 @@ export function useWatchlistAlerts() {
     for (const key of Array.from(st.alerted)) {
       if (!present.has(key)) st.alerted.delete(key);
     }
-  }, [systems, connections, activeMapId, entries, soundOn, t]);
+  }, [systems, connections, activeMapId, sigTypesBySystem, entries, soundOn, t]);
 }
