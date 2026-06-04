@@ -106,19 +106,22 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
   }, [standings, sov]);
   const isSovHostile = sovEffective < 0;
   const isSovBlue    = sovEffective > 0;
+  // Each of these scans a cluster-wide array; memoize per-node so the O(n)
+  // find/filter only runs when the array or this system's id changes, not on
+  // every (re-)render of every node.
   const incursions      = useIncursions();
-  const incursion       = findIncursion(incursions, sys.eveSystemId);
+  const incursion       = useMemo(() => findIncursion(incursions, sys.eveSystemId), [incursions, sys.eveSystemId]);
   const insurgencies    = useInsurgency();
-  const insurgency      = findInsurgency(insurgencies, sys.eveSystemId);
+  const insurgency      = useMemo(() => findInsurgency(insurgencies, sys.eveSystemId), [insurgencies, sys.eveSystemId]);
   const storms          = useStorms();
-  const storm           = findStorm(storms, sys.eveSystemId);
+  const storm           = useMemo(() => findStorm(storms, sys.eveSystemId), [storms, sys.eveSystemId]);
   const scoutAll        = useScoutConnections();
-  const scoutMatches    = findScoutConnections(scoutAll, sys.eveSystemId);
+  const scoutMatches    = useMemo(() => findScoutConnections(scoutAll, sys.eveSystemId), [scoutAll, sys.eveSystemId]);
   const a0Systems       = useA0Systems();
   const a0Ids           = useMemo(() => new Set(a0Systems.map(s => s.id)), [a0Systems]);
   const isA0            = sys.eveSystemId !== null && a0Ids.has(sys.eveSystemId);
   const iceBeltSystems  = useIceBeltSystems();
-  const isIceBelt       = hasIceBelt(iceBeltSystems, sys.eveSystemId);
+  const isIceBelt       = useMemo(() => hasIceBelt(iceBeltSystems, sys.eveSystemId), [iceBeltSystems, sys.eveSystemId]);
   const allKills        = useCurrentHourKills();
   const myKills         = sys.eveSystemId !== null ? allKills.get(sys.eveSystemId) : undefined;
   const hotKills        = !!myKills && myKills.shipKills + myKills.podKills > 0;
@@ -149,14 +152,13 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
 
   // Tooltip label: dedupe by scout system name (Thera / Turnur). Multiple
   // connections from the same scout are summarised, mixed scouts are listed.
-  const scoutLabel = scoutMatches.length === 0
-    ? ''
-    : (() => {
-        const names = Array.from(new Set(scoutMatches.map(c => c.outSystemName)));
-        return names.length === 1
-          ? t('mapNode.scoutConnections', { name: names[0], count: scoutMatches.length })
-          : t('mapNode.scoutConnectionsMulti', { names: names.join(' & ') });
-      })();
+  const scoutLabel = useMemo(() => {
+    if (scoutMatches.length === 0) return '';
+    const names = Array.from(new Set(scoutMatches.map(c => c.outSystemName)));
+    return names.length === 1
+      ? t('mapNode.scoutConnections', { name: names[0], count: scoutMatches.length })
+      : t('mapNode.scoutConnectionsMulti', { names: names.join(' & ') });
+  }, [scoutMatches, t]);
   const isTarget        = connection.inProgress && connection.fromNode?.id !== sys.id;
 
   // Measure the node so the map store can compute the largest natural
