@@ -852,6 +852,8 @@
     "colType": "Tipo",
     "colName": "Nombre",
     "colNotes": "Notas",
+    "colAge": "Antigüedad",
+    "colUpdated": "Actualizado",
     "namePlaceholder": "Nombre de la anomalía"
   },
   "stats": {

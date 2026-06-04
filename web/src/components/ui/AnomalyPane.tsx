@@ -10,6 +10,7 @@ import { ConfirmModal, shouldSkipConfirm } from './ConfirmModal';
 import { NotesEditor } from './NotesEditor';
 import { XIcon } from '@phosphor-icons/react';
 import { toast } from './Toaster';
+import { duration, DASH } from '../../i18n/format';
 
 // Cosmic anomalies don't need scanning — the probe scanner lists them at 100%
 // straight away. The scanner's "group" column is "Cosmic Anomaly" (vs "Cosmic
@@ -55,13 +56,15 @@ function parseAnomClipboard(text: string): ParsedAnom[] {
 }
 
 type SortCol = 'anomId' | 'anomType' | 'name' | 'createdAt' | 'updatedAt';
-type ColKey  = 'id' | 'type' | 'name' | 'notes';
+type ColKey  = 'id' | 'type' | 'name' | 'notes' | 'created' | 'updated';
 
 const DEFAULT_WIDTHS: Record<ColKey, number> = {
-  id:    72,
-  type:  108,
-  name:  200,
-  notes: 220,
+  id:      72,
+  type:    108,
+  name:    200,
+  notes:   220,
+  created: 80,
+  updated: 80,
 };
 
 // Grace-period choices (seconds) offered before an overwrite-paste actually
@@ -76,6 +79,42 @@ function formatDelay(sec: number): string {
 // which already cover combat / ore / gas / unknown.
 const ANOM_TYPE_FILTER_ORDER: AnomType[] = ['combat', 'ore', 'gas', 'unknown'];
 const ANOM_TYPE_OPTIONS: AnomType[] = ['combat', 'gas', 'ore', 'unknown'];
+
+// Single module-level 1 s tick shared across every ElapsedCell instance, so the
+// age/updated cells refresh without each pane driving its own per-second state
+// update (which would re-render every row including its MDEditor).
+let tickNow = Date.now();
+const tickSubs = new Set<() => void>();
+let tickTimer: ReturnType<typeof setInterval> | null = null;
+
+function startTickIfNeeded() {
+  if (tickTimer) return;
+  tickTimer = setInterval(() => {
+    tickNow = Date.now();
+    tickSubs.forEach((fn) => fn());
+  }, 1000);
+}
+
+function ElapsedCell({ iso, className }: { iso: string | undefined; className?: string }) {
+  const { t } = useTranslation();
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    const fn = () => setTick((n) => n + 1);
+    tickSubs.add(fn);
+    startTickIfNeeded();
+    return () => {
+      tickSubs.delete(fn);
+      if (tickSubs.size === 0 && tickTimer) {
+        clearInterval(tickTimer);
+        tickTimer = null;
+      }
+    };
+  }, []);
+  const text = iso
+    ? duration(t, Math.floor((tickNow - new Date(iso).getTime()) / 1000))
+    : DASH;
+  return <td className={className}>{text}</td>;
+}
 
 export function AnomalyPane({ systemId }: { systemId: string }) {
   const { t } = useTranslation();
@@ -488,6 +527,8 @@ export function AnomalyPane({ systemId }: { systemId: string }) {
             <col style={{ width: colWidths.type }} />
             <col style={{ width: colWidths.name }} />
             <col style={{ width: colWidths.notes }} />
+            <col style={{ width: colWidths.created }} />
+            <col style={{ width: colWidths.updated }} />
             <col className="sig-col--actions" />
           </colgroup>
           <thead>
@@ -516,6 +557,14 @@ export function AnomalyPane({ systemId }: { systemId: string }) {
               <th className="sig-th">
                 {t('anomalies.colNotes')}
                 <div className="sig-th__resize" onMouseDown={(e) => startResize('notes', e)} />
+              </th>
+              <th className="sig-th sig-th--sortable sig-th--time" onClick={() => handleSort('createdAt')}>
+                {t('anomalies.colAge')}{sortInd('createdAt')}
+                <div className="sig-th__resize" onMouseDown={(e) => startResize('created', e)} />
+              </th>
+              <th className="sig-th sig-th--sortable sig-th--time" onClick={() => handleSort('updatedAt')}>
+                {t('anomalies.colUpdated')}{sortInd('updatedAt')}
+                <div className="sig-th__resize" onMouseDown={(e) => startResize('updated', e)} />
               </th>
               <th className="sig-cell--actions" />
             </tr>
@@ -572,6 +621,8 @@ export function AnomalyPane({ systemId }: { systemId: string }) {
                     readOnly={!canEdit}
                   />
                 </td>
+                <ElapsedCell iso={anom.createdAt} className="sig-td--time" />
+                <ElapsedCell iso={anom.updatedAt} className="sig-td--time sig-td--updated" />
                 <td className="sig-cell--actions">
                   {canEdit && (
                     <button

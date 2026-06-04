@@ -852,6 +852,8 @@
     "colType": "类型",
     "colName": "名称",
     "colNotes": "笔记",
+    "colAge": "存在时长",
+    "colUpdated": "更新时间",
     "namePlaceholder": "异常空间名称"
   },
   "stats": {

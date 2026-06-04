@@ -888,6 +888,8 @@
     "colType": "Тип",
     "colName": "Название",
     "colNotes": "Заметки",
+    "colAge": "Возраст",
+    "colUpdated": "Обновлено",
     "namePlaceholder": "Название аномалии"
   },
   "stats": {

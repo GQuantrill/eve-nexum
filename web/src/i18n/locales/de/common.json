@@ -852,6 +852,8 @@
     "colType": "Typ",
     "colName": "Name",
     "colNotes": "Notizen",
+    "colAge": "Alter",
+    "colUpdated": "Aktualisiert",
     "namePlaceholder": "Anomalie-Name"
   },
   "stats": {
