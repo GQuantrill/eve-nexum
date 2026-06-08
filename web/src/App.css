@@ -1962,6 +1962,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 3px;
   background: rgba(74,222,128,0.10);
   border: 1px solid #2c6e49;
   color: #4ade80;
@@ -1971,9 +1972,44 @@
   line-height: 0;
 }
 
-.watchlist__locate:hover {
+.watchlist__locate:hover,
+.watchlist__locate--open {
   background: rgba(74,222,128,0.20);
   color: #6ef0a0;
+}
+
+.watchlist__locate-count {
+  font-size: calc(10px * var(--font-scale, 1));
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* Expanded list of matches for an entry with more than one on the map. */
+.watchlist__matches {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 0 2px 26px;
+}
+
+.watchlist__match {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  text-align: start;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  padding: 3px 6px;
+  font-size: calc(12px * var(--font-scale, 1));
+  color: #aeb9d6;
+  cursor: pointer;
+}
+
+.watchlist__match:hover {
+  background: rgba(110,160,255,0.12);
+  color: #cfe0ff;
 }
 
 .watchlist__remove {

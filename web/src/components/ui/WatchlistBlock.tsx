@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { v4 as uuid } from 'uuid';
 import { TrashIcon, PlusIcon, CrosshairIcon } from '@phosphor-icons/react';
@@ -33,33 +33,38 @@ export function WatchlistBlock() {
   const sigTypesBySystem = useMapStore((s) => s.sigTypesBySystem);
   const requestCenterOnNode = useMapStore((s) => s.requestCenterOnNode);
 
-  // Map node ids each entry currently matches — drives the "show on map" button.
-  // For connection matches we centre on an endpoint node (connections have no
-  // node of their own). Cheap: a few entries over the map's systems/edges.
+  const sysById = useMemo(() => new Map(systems.map((s) => [s.id, s])), [systems]);
+
+  // The map nodes each entry currently matches (with a display label) — drives
+  // the "show on map" button + its expandable list. Connection matches centre
+  // on an endpoint node, since connections have no node of their own. Cheap: a
+  // few entries over the map's systems/edges.
   const matchTargets = useMemo(() => {
-    const m = new Map<string, string[]>();
+    const m = new Map<string, { nodeId: string; label: string }[]>();
     for (const it of items) {
-      const ids: string[] = [];
-      for (const s of systems) if (systemMatchesEntry(it, s, sigTypesBySystem[s.id])) ids.push(s.id);
-      for (const c of connections) {
-        if (!connectionMatchesEntry(it, c)) continue;
-        const nodeId = c.sourceId || c.targetId;
-        if (nodeId && !ids.includes(nodeId)) ids.push(nodeId);
-      }
-      m.set(it.id, ids);
+      const seen = new Set<string>();
+      const targets: { nodeId: string; label: string }[] = [];
+      const push = (nodeId: string | undefined) => {
+        if (!nodeId || seen.has(nodeId)) return;
+        seen.add(nodeId);
+        targets.push({ nodeId, label: sysById.get(nodeId)?.name || '?' });
+      };
+      for (const s of systems) if (systemMatchesEntry(it, s, sigTypesBySystem[s.id])) push(s.id);
+      for (const c of connections) if (connectionMatchesEntry(it, c)) push(c.sourceId || c.targetId);
+      targets.sort((a, b) => a.label.localeCompare(b.label));
+      m.set(it.id, targets);
     }
     return m;
-  }, [items, systems, connections, sigTypesBySystem]);
+  }, [items, systems, connections, sigTypesBySystem, sysById]);
 
-  // Remember where each entry's "show on map" last jumped, so repeated clicks
-  // cycle through all of that entry's matches (e.g. every shattered system).
-  const cycleRef = useRef<Map<string, number>>(new Map());
+  // Which entry's match list is expanded (only relevant when an entry has >1
+  // match). A single match jumps straight to it; multiple toggle the list.
+  const [expandedId, setExpandedId] = useState<string | null>(null);
   function locate(entryId: string) {
-    const ids = matchTargets.get(entryId);
-    if (!ids || ids.length === 0) return;
-    const next = ((cycleRef.current.get(entryId) ?? -1) + 1) % ids.length;
-    cycleRef.current.set(entryId, next);
-    requestCenterOnNode(ids[next]);
+    const targets = matchTargets.get(entryId);
+    if (!targets || targets.length === 0) return;
+    if (targets.length === 1) { requestCenterOnNode(targets[0].nodeId); return; }
+    setExpandedId((cur) => (cur === entryId ? null : entryId));
   }
 
   const activeKeys = useMemo(() => new Set(items.map((it) => matchKey(it.match))), [items]);
@@ -170,12 +175,14 @@ export function WatchlistBlock() {
                   {onMap && (
                     <button
                       type="button"
-                      className="watchlist__locate"
+                      className={`watchlist__locate${expandedId === it.id ? ' watchlist__locate--open' : ''}`}
                       onClick={() => locate(it.id)}
                       title={targets.length > 1 ? `${t('watchlist.locate')} (${targets.length})` : t('watchlist.locate')}
                       aria-label={t('watchlist.locate')}
+                      aria-expanded={targets.length > 1 ? expandedId === it.id : undefined}
                     >
                       <CrosshairIcon size={14} weight="bold" />
+                      {targets.length > 1 && <span className="watchlist__locate-count">{targets.length}</span>}
                     </button>
                   )}
                   <button
@@ -221,6 +228,22 @@ export function WatchlistBlock() {
                     placeholder={t('watchlist.notePlaceholder')}
                   />
                 </div>
+
+                {expandedId === it.id && targets.length > 1 && (
+                  <div className="watchlist__matches">
+                    {targets.map((tgt) => (
+                      <button
+                        key={tgt.nodeId}
+                        type="button"
+                        className="watchlist__match"
+                        onClick={() => requestCenterOnNode(tgt.nodeId)}
+                      >
+                        <CrosshairIcon size={11} weight="bold" />
+                        {tgt.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             );
           })}
