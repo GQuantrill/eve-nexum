@@ -323,6 +323,7 @@
       "mapControls": "Controles del mapa",
       "systemOptions": "Opciones de sistema",
       "watchlist": "Lista de seguimiento",
+      "contentFilter": "Filtro de contenido",
       "connections": "Conexiones",
       "route": "Ruta",
       "chainExits": "Salidas de la cadena",
@@ -464,6 +465,15 @@
     "remove": "Quitar opción de intel",
     "max": "Máximo {{count}} etiquetas de intel personalizadas",
     "add": "Añadir intel"
+  },
+  "contentFilter": {
+    "hint": "Resalta sistemas por su contenido escaneado. Elige tipos de firma o anomalía, o busca el nombre de un sitio; los sistemas que coinciden permanecen iluminados y el resto se atenúa.",
+    "sigs": "Firmas",
+    "anoms": "Anomalías",
+    "namePlaceholder": "El nombre del sitio contiene…",
+    "matchCount_one": "{{count}} sistema coincide",
+    "matchCount_other": "{{count}} sistemas coinciden",
+    "clear": "Limpiar filtro"
   },
   "watchMarker": {
     "target": "Objetivo",

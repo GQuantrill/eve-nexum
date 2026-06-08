@@ -323,6 +323,7 @@
       "mapControls": "Kartensteuerung",
       "systemOptions": "Systemoptionen",
       "watchlist": "Beobachtungsliste",
+      "contentFilter": "Inhaltsfilter",
       "connections": "Verbindungen",
       "route": "Route",
       "chainExits": "Ketten-Ausgänge",
@@ -464,6 +465,15 @@
     "remove": "Intel-Option entfernen",
     "max": "Maximal {{count}} eigene Intel-Tags",
     "add": "Intel hinzufügen"
+  },
+  "contentFilter": {
+    "hint": "Systeme nach gescanntem Inhalt hervorheben. Wähle Signatur- oder Anomalie-Typen oder suche einen Site-Namen; passende Systeme bleiben hell, der Rest wird ausgeblendet.",
+    "sigs": "Signaturen",
+    "anoms": "Anomalien",
+    "namePlaceholder": "Site-Name enthält…",
+    "matchCount_one": "{{count}} System passt",
+    "matchCount_other": "{{count}} Systeme passen",
+    "clear": "Filter löschen"
   },
   "watchMarker": {
     "target": "Ziel",

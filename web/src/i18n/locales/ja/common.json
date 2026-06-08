@@ -323,6 +323,7 @@
       "mapControls": "マップ操作",
       "systemOptions": "星系オプション",
       "watchlist": "ウォッチリスト",
+      "contentFilter": "コンテンツフィルター",
       "connections": "接続",
       "route": "ルート",
       "chainExits": "チェーン出口",
@@ -464,6 +465,15 @@
     "remove": "インテルオプションを削除",
     "max": "カスタムインテルタグは最大 {{count}} 個",
     "add": "インテルを追加"
+  },
+  "contentFilter": {
+    "hint": "スキャンしたコンテンツでシステムを強調表示します。シグネチャやアノマリーのタイプを選ぶか、サイト名を検索します。一致するシステムは点灯したまま、それ以外は薄く表示されます。",
+    "sigs": "シグネチャ",
+    "anoms": "アノマリー",
+    "namePlaceholder": "サイト名を含む…",
+    "matchCount_one": "{{count}} 件のシステムが一致",
+    "matchCount_other": "{{count}} 件のシステムが一致",
+    "clear": "フィルターをクリア"
   },
   "watchMarker": {
     "target": "ターゲット",

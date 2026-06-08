@@ -104,6 +104,21 @@ export type UndoCommand =
 
 const MAX_UNDO = 50;
 
+// Per-system scanned content for the content filter. sigTypes/anomTypes are the
+// distinct type strings present; names are all sig + anomaly site names,
+// lowercased for substring search.
+export interface SystemContent {
+  sigTypes:  string[];
+  anomTypes: string[];
+  names:     string[];
+}
+
+export interface ContentFilter {
+  sigTypes:  string[];
+  anomTypes: string[];
+  nameQuery: string;
+}
+
 interface MapStore {
   // Maps list
   maps: MapListItem[];
@@ -233,6 +248,19 @@ interface MapStore {
   sigTypesBySystem: Record<string, string[]>;
   setSigTypesBulk: (next: Record<string, string[]>) => void;
   setSystemSigTypes: (systemId: string, types: string[]) => void;
+
+  // Map-wide content index per system for the content filter: the set of
+  // signature types and anomaly types present, plus all site names (lowercased
+  // for substring search). Loaded alongside the sig-type index.
+  contentBySystem: Record<string, SystemContent>;
+  setContentBulk: (next: Record<string, SystemContent>) => void;
+
+  // Transient (not persisted) content filter. A system "matches" if it has any
+  // selected sig/anom type or a name containing the query; non-matching nodes
+  // fade. Empty on all three = filter off.
+  contentFilter: ContentFilter;
+  setContentFilter: (next: Partial<ContentFilter>) => void;
+  clearContentFilter: () => void;
 
   // Realtime: apply an edit pushed from another client (no persist, no undo).
   applyRemote: (event: RemoteEvent) => void;
@@ -430,6 +458,11 @@ export const useMapStore = create<MapStore>()((set, get) => {
     setSystemSigTypes: (systemId, types) => set((s) => ({
       sigTypesBySystem: { ...s.sigTypesBySystem, [systemId]: types },
     })),
+    contentBySystem: {},
+    setContentBulk: (next) => set({ contentBySystem: next }),
+    contentFilter: { sigTypes: [], anomTypes: [], nameQuery: '' },
+    setContentFilter: (next) => set((s) => ({ contentFilter: { ...s.contentFilter, ...next } })),
+    clearContentFilter: () => set({ contentFilter: { sigTypes: [], anomTypes: [], nameQuery: '' } }),
     panelOrder: ['activity', 'killboard', 'notes', 'signatures', 'anomalies', 'structures', 'npcStations'],
     undoStack: [],
 
@@ -507,7 +540,7 @@ export const useMapStore = create<MapStore>()((set, get) => {
       try {
         const map = await api<WormholeMap>(`/api/maps/${id}`);
         localStorage.setItem('nexum.lastMapId', id);
-        set({ map, activeMapId: id, selectedSystemId: null, selectedConnectionId: null, currentSystemId: null, undoStack: [], sigTypesBySystem: {} });
+        set({ map, activeMapId: id, selectedSystemId: null, selectedConnectionId: null, currentSystemId: null, undoStack: [], sigTypesBySystem: {}, contentBySystem: {}, contentFilter: { sigTypes: [], anomTypes: [], nameQuery: '' } });
       } catch (err) {
         // 403/404 — the grant was revoked, or the map was deleted. Reload
         // the list (which will trigger the revocation-detection path above

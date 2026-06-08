@@ -323,6 +323,7 @@
       "mapControls": "Controlos do mapa",
       "systemOptions": "Opções de sistema",
       "watchlist": "Lista de observação",
+      "contentFilter": "Filtro de conteúdo",
       "connections": "Conexões",
       "route": "Rota",
       "chainExits": "Saídas da cadeia",
@@ -464,6 +465,15 @@
     "remove": "Remover opção de intel",
     "max": "Máximo de {{count}} etiquetas de intel personalizadas",
     "add": "Adicionar intel"
+  },
+  "contentFilter": {
+    "hint": "Destaque sistemas pelo conteúdo escaneado. Escolha tipos de assinatura ou anomalia, ou pesquise o nome de um site; os sistemas correspondentes permanecem acesos e o resto desaparece.",
+    "sigs": "Assinaturas",
+    "anoms": "Anomalias",
+    "namePlaceholder": "O nome do site contém…",
+    "matchCount_one": "{{count}} sistema corresponde",
+    "matchCount_other": "{{count}} sistemas correspondem",
+    "clear": "Limpar filtro"
   },
   "watchMarker": {
     "target": "Alvo",

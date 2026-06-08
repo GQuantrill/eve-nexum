@@ -323,6 +323,7 @@
       "mapControls": "지도 컨트롤",
       "systemOptions": "성계 옵션",
       "watchlist": "관심 목록",
+      "contentFilter": "콘텐츠 필터",
       "connections": "연결",
       "route": "경로",
       "chainExits": "체인 출구",
@@ -464,6 +465,15 @@
     "remove": "인텔 옵션 제거",
     "max": "사용자 지정 인텔 태그 최대 {{count}}개",
     "add": "인텔 추가"
+  },
+  "contentFilter": {
+    "hint": "스캔한 콘텐츠로 시스템을 강조합니다. 시그니처나 어노말리 유형을 선택하거나 사이트 이름을 검색하세요. 일치하는 시스템은 밝게 유지되고 나머지는 흐려집니다.",
+    "sigs": "시그니처",
+    "anoms": "어노말리",
+    "namePlaceholder": "사이트 이름 포함…",
+    "matchCount_one": "{{count}}개 시스템 일치",
+    "matchCount_other": "{{count}}개 시스템 일치",
+    "clear": "필터 지우기"
   },
   "watchMarker": {
     "target": "표적",

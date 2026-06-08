@@ -29,6 +29,7 @@ import { useCustomIntel } from '../../hooks/useCustomIntel';
 import { resolveIntelColor, resolveIntelLabel } from '../../utils/intelColors';
 import { useWatchlist } from '../../hooks/useWatchlist';
 import { matchSystem } from '../../utils/watchMatch';
+import { contentFilterActive, systemMatchesContent } from '../../utils/contentMatch';
 import { watchMarker } from '../../data/watchMarkers';
 import { useHeatmap } from '../../context/HeatmapContext';
 import { heatValue, heatColor } from '../../utils/heatmap';
@@ -160,6 +161,15 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
   const watchDef        = watch ? watchMarker(watch.marker) : null;
   const watchTip        = watch ? (watch.note.trim() || t(`watchMarker.${watch.marker}`)) : undefined;
 
+  // Content filter (map-wide spotlight): when active, systems whose scanned
+  // content doesn't match the selected sig/anom types or name fade out; the
+  // matching ones stay lit.
+  const contentFilter   = useMapStore((s) => s.contentFilter);
+  const sysContent      = useMapStore((s) => s.contentBySystem[sys.id]);
+  const filterOn        = contentFilterActive(contentFilter);
+  const contentMatch    = filterOn && systemMatchesContent(sysContent, contentFilter);
+  const filteredOut     = filterOn && !contentMatch;
+
   // Tooltip label: dedupe by scout system name (Thera / Turnur). Multiple
   // connections from the same scout are summarised, mixed scouts are listed.
   const scoutLabel = useMemo(() => {
@@ -204,7 +214,7 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
   return (
     <div
       ref={nodeRef}
-      className={`system-node${sys.locked ? ' nopan' : ''}${isTarget ? ' system-node--connect-target' : ''}${isStale ? ' system-node--stale' : ''}${isSovHostile ? ' system-node--sov-hostile' : ''}${isSovBlue ? ' system-node--sov-blue' : ''}${uniformSize ? ' system-node--uniform' : ''}${compactMode ? ' system-node--compact' : ''}${watchDef ? ' system-node--watched' : ''}`}
+      className={`system-node${sys.locked ? ' nopan' : ''}${isTarget ? ' system-node--connect-target' : ''}${isStale ? ' system-node--stale' : ''}${isSovHostile ? ' system-node--sov-hostile' : ''}${isSovBlue ? ' system-node--sov-blue' : ''}${uniformSize ? ' system-node--uniform' : ''}${compactMode ? ' system-node--compact' : ''}${watchDef ? ' system-node--watched' : ''}${filteredOut ? ' system-node--filtered-out' : ''}${contentMatch ? ' system-node--content-match' : ''}`}
       style={{
         '--class-color': color,
         ...(intelColor ? { '--intel-color': intelColor } : null),

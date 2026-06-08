@@ -1796,19 +1796,35 @@ mapsRouter.delete('/:mapId/systems/:systemId/signatures/:sigId', async (req, res
   res.json({ ok: true });
 });
 
-// Lightweight map-wide index of scanned wormhole-signature types, so the client
-// watchlist can match "alert me when I scan a C247 / frig hole anywhere in the
-// chain" without opening every system's sig pane. Only sigs with a wh_type are
-// returned, and only the (systemId, whType) pair — not the full row.
+// Lightweight map-wide index of scanned signatures, so the client can match
+// content anywhere in the chain without opening every system's sig pane —
+// powers the watchlist (wh_type matching) and the content filter (sig type +
+// name). Returns only the (systemId, sigType, name, whType) tuple per sig.
 mapsRouter.get('/:mapId/signatures', async (req, res) => {
   const { mapId } = req.params;
   const access = await getMapAccess(mapId, req);
   if (!access) { res.status(404).json({ error: 'Map not found' }); return; }
   const { rows } = await db.query(
-    `SELECT s.system_id AS "systemId", s.wh_type AS "whType"
+    `SELECT s.system_id AS "systemId", s.sig_type AS "sigType", s.name, s.wh_type AS "whType"
      FROM map_signatures s
      JOIN map_systems ms ON ms.id = s.system_id
-     WHERE ms.map_id = $1 AND s.wh_type <> ''`,
+     WHERE ms.map_id = $1`,
+    [mapId],
+  );
+  res.json(rows);
+});
+
+// Map-wide index of scanned anomalies (systemId, anomType, name) for the
+// content filter — the anomaly counterpart of the bulk /signatures route.
+mapsRouter.get('/:mapId/anomalies', async (req, res) => {
+  const { mapId } = req.params;
+  const access = await getMapAccess(mapId, req);
+  if (!access) { res.status(404).json({ error: 'Map not found' }); return; }
+  const { rows } = await db.query(
+    `SELECT a.system_id AS "systemId", a.anom_type AS "anomType", a.name
+     FROM map_anomalies a
+     JOIN map_systems ms ON ms.id = a.system_id
+     WHERE ms.map_id = $1`,
     [mapId],
   );
   res.json(rows);

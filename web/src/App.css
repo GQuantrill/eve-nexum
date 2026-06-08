@@ -2365,6 +2365,24 @@
   filter: none;
 }
 
+/* Content filter (map-wide spotlight): systems whose scanned content doesn't
+   match the active filter fade right back; matches stay lit with a soft accent
+   ring so they pop against the dimmed map. Hovering a faded node restores it. */
+.system-node--filtered-out {
+  opacity: 0.45;
+  filter: saturate(0.5);
+  transition: opacity 0.18s ease, filter 0.18s ease;
+}
+
+.system-node--filtered-out:hover {
+  opacity: 0.85;
+  filter: none;
+}
+
+.system-node--content-match {
+  box-shadow: 0 0 0 2px var(--accent, #5b9bff), 0 0 12px 1px rgba(91,155,255,0.45);
+}
+
 /* Hostile / friendly sov halos. Box-shadow only — doesn't displace the
    layout the way a thicker border would. The map-canvas zoom keeps these
    readable even at small node sizes. */
@@ -4182,6 +4200,63 @@ div.system-node__easy-handle {
   gap: 6px;
   padding: 4px 0 6px;
 }
+/* ── Content filter sidebar panel ────────────────────────────────────────── */
+.content-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.content-filter__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 2px;
+}
+
+.content-filter__name {
+  width: 100%;
+  background: #0a0e1a;
+  border: 1px solid #1e2740;
+  border-radius: 4px;
+  padding: 5px 8px;
+  margin-top: 4px;
+  font-size: calc(12px * var(--font-scale, 1));
+  color: #c8d4f0;
+  outline: none;
+}
+
+.content-filter__name:focus { border-color: #6ea0ff; }
+
+.content-filter__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.content-filter__count {
+  font-size: calc(12px * var(--font-scale, 1));
+  color: #8aa0c8;
+}
+
+.content-filter__clear {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  border: 1px solid #3a2030;
+  color: #d88a8a;
+  border-radius: 4px;
+  padding: 3px 8px;
+  font-size: calc(12px * var(--font-scale, 1));
+  cursor: pointer;
+}
+
+.content-filter__clear:hover { background: rgba(224,90,90,0.10); color: #e05a5a; }
+
 .sig-filter-chip {
   background: transparent;
   border: 1px solid #2e3a52;
