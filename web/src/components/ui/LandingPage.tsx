@@ -26,7 +26,7 @@ type SectionId = 'mapping' | 'personalCorp' | 'sysIntel' | 'liveOps' | 'producti
 type FeatureId =
   | 'interactiveMap' | 'seedRegion' | 'whIntel' | 'rollingCalc' | 'whPicker'
   | 'multiSelect' | 'pngExport' | 'sigAging'
-  | 'soloCorp' | 'multiCharacter' | 'multiMap' | 'mergeMaps' | 'realtime' | 'mapLocking' | 'rbac'
+  | 'soloCorp' | 'multiCharacter' | 'multiMap' | 'mergeMaps' | 'crossMapSync' | 'realtime' | 'mapLocking' | 'rbac'
   | 'systemPanel' | 'sigMgmt' | 'structImport' | 'autoStruct' | 'activityCharts'
   | 'sovStation' | 'killboard' | 'effectDigest' | 'standings'
   | 'scout' | 'a0' | 'iceBelt' | 'storms' | 'proximity' | 'discordNotif' | 'watchlist'
@@ -61,6 +61,7 @@ const FEATURE_SECTIONS: FeatureSection[] = [
       { icon: UsersThreeIcon,  id: 'multiCharacter' },
       { icon: StackIcon,       id: 'multiMap'       },
       { icon: ArrowsMergeIcon, id: 'mergeMaps'  },
+      { icon: ArrowsClockwiseIcon, id: 'crossMapSync' },
       { icon: BroadcastIcon,   id: 'realtime'   },
       { icon: LockIcon,        id: 'mapLocking' },
       { icon: ShieldCheckIcon, id: 'rbac'       },

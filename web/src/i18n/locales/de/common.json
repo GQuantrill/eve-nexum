@@ -1054,6 +1054,10 @@
         "title": "Karten zusammenführen",
         "desc": "Füge eine Karte in eine andere ein. Das Ziel bleibt die maßgebliche Quelle — nur fehlende Systeme und Verbindungen werden hinzugefügt, mit eingearbeiteten Signaturen, Strukturen und Notizen, und neue Systeme werden in das bestehende Layout eingefügt. Corp-Karten geben sich pro Rolle als Zusammenführungsquelle und/oder -ziel frei."
       },
+      "crossMapSync": {
+        "title": "Karten-übergreifende Synchronisierung",
+        "desc": "Dasselbe System auf mehreren Karten? Aktiviere die Option, und wenn du es auf einer Karte scannst, werden seine Signaturen und Anomalien auf dasselbe System auf deinen anderen Karten kopiert — persönliche Karten synchronisieren mit deinen anderen persönlichen Karten, Corp-Karten mit denen der Corp. Nicht-destruktiv: Es werden nur fehlende Einträge ergänzt und Lücken gefüllt, niemals bereits eingegebene Daten überschrieben oder etwas gelöscht."
+      },
       "realtime": {
         "title": "Echtzeit-Zusammenarbeit",
         "desc": "Änderungen werden live mit allen synchronisiert, die dieselbe Karte betrachten — Systeme, Verbindungen, Umbenennen/Sperren, Signaturen, Strukturen und Zusammenführungen erscheinen für andere Betrachter innerhalb von Augenblicken, ohne Neuladen. Pro Karte gestreamt (du erhältst nur Ereignisse für Karten, die du sehen kannst), mit echo-unterdrückten eigenen Änderungen und automatischer Resynchronisierung beim erneuten Verbinden."

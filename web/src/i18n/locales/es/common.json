@@ -1054,6 +1054,10 @@
         "title": "Fusionar mapas",
         "desc": "Integra un mapa en otro. El destino se mantiene como fuente de verdad — solo se añaden los sistemas y conexiones que faltan, con las firmas, estructuras y notas fusionadas, y los nuevos sistemas encajados en la disposición existente. Los mapas de corp se habilitan por rol como origen y/o destino de fusión."
       },
+      "crossMapSync": {
+        "title": "Sincronización entre mapas",
+        "desc": "¿Tienes el mismo sistema en varios mapas? Actívalo y, al escanearlo en un mapa, sus firmas y anomalías se copian al mismo sistema en tus otros mapas — los mapas personales se sincronizan con tus otros mapas personales, y los de corp con los de la corp. No destructivo: solo añade entradas que faltan y rellena huecos, nunca sobrescribe lo que ya has introducido ni borra nada."
+      },
       "realtime": {
         "title": "Colaboración en tiempo real",
         "desc": "Las ediciones se sincronizan en vivo con todos los que miran el mismo mapa — sistemas, conexiones, renombrar/bloquear, firmas, estructuras y fusiones aparecen para los demás en instantes, sin recargar. Transmitido por mapa (solo recibes eventos de los mapas que puedes ver), con tus propios cambios suprimidos por eco y resincronización automática al reconectar."

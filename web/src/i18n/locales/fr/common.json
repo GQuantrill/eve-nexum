@@ -1054,6 +1054,10 @@
         "title": "Fusionner les cartes",
         "desc": "Intégrez une carte dans une autre. La destination fait foi — seuls les systèmes et connexions manquants sont ajoutés, avec les signatures, structures et notes fusionnées, et les nouveaux systèmes insérés dans l'agencement existant. Les cartes de corp s'y autorisent par rôle comme source et/ou destination de fusion."
       },
+      "crossMapSync": {
+        "title": "Synchronisation entre cartes",
+        "desc": "Le même système sur plusieurs cartes ? Activez l'option et, en le scannant sur une carte, ses signatures et anomalies sont copiées vers le même système sur vos autres cartes — les cartes personnelles se synchronisent avec vos autres cartes personnelles, celles de corpo avec celles de la corpo. Non destructif : seules les entrées manquantes sont ajoutées et les blancs comblés, sans jamais écraser ce que vous avez déjà saisi ni rien supprimer."
+      },
       "realtime": {
         "title": "Collaboration en temps réel",
         "desc": "Les modifications se synchronisent en direct pour tous ceux qui regardent la même carte — systèmes, connexions, renommage/verrouillage, signatures, structures et fusions apparaissent pour les autres en quelques instants, sans rechargement. Diffusé par carte (vous ne recevez que les événements des cartes que vous pouvez voir), avec vos propres changements dédupliqués et une resynchronisation automatique à la reconnexion."
