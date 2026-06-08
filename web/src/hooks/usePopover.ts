@@ -17,14 +17,18 @@ export function usePopover() {
 
   useEffect(() => {
     if (!open) return;
-    const close = (e: MouseEvent) => {
+    const close = (e: Event) => {
       const target = e.target as Node;
       if (!btnRef.current?.contains(target) && !dropdownRef.current?.contains(target)) {
         setOpen(false);
       }
     };
-    document.addEventListener('mousedown', close);
-    return () => document.removeEventListener('mousedown', close);
+    // Capture phase so the dropdown closes on a pointer-down ANYWHERE — including
+    // the map canvas, which stops pointer-event propagation in the bubble phase
+    // (a plain bubbling listener never fired for clicks out there). The target
+    // check above keeps clicks inside the button/dropdown from closing it.
+    document.addEventListener('pointerdown', close, true);
+    return () => document.removeEventListener('pointerdown', close, true);
   }, [open]);
 
   return { open, setOpen, pos, btnRef, dropdownRef, openAt };

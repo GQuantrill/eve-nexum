@@ -80,6 +80,18 @@ export function ContextMenu({ x, y, items, onClose }: Props) {
     return () => window.removeEventListener('keydown', onKey);
   }, [onClose]);
 
+  // Close on a pointer-down anywhere outside the menu — capture phase so it
+  // also fires over the map canvas, which stops pointer propagation in the
+  // bubble phase. The containment check keeps clicks on the menu's own items
+  // (and submenus, which render inside it) from closing it before they run.
+  useEffect(() => {
+    function onDown(e: Event) {
+      if (ref.current && !ref.current.contains(e.target as Node)) onClose();
+    }
+    document.addEventListener('pointerdown', onDown, true);
+    return () => document.removeEventListener('pointerdown', onDown, true);
+  }, [onClose]);
+
   return (
     <ul
       ref={ref}
