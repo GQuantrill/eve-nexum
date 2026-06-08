@@ -351,6 +351,8 @@
     "placement": "New system placement",
     "sigBookmark": "Signature bookmark",
     "bookmarkHelp": "On a wormhole signature row, click the copy icon to copy a paste-ready bookmark name, then paste it into the in-game bookmark. Build the name with these tokens:",
+    "crossMapSync": "Sync system data across my maps",
+    "crossMapSyncHelp": "When you add or edit signatures and anomalies on a system, copy them to the same system on your other maps (personal maps sync with your other personal maps; corp maps with the corp's other maps). Non-destructive: it only fills in missing or blank entries — it never overwrites data you've already entered or deletes anything.",
     "placementOptions": {
       "horizontal": "Horizontal (right)",
       "vertical": "Vertical (below)"

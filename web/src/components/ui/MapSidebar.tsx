@@ -1088,6 +1088,9 @@ export function MapSidebar() {
                       <li key={b.token}><code>{b.token}</code> - {b.desc}</li>
                     ))}
                   </ul>
+                  <hr className="map-sidebar__divider" />
+                  <SettingToggle settingKey="nexum.crossMapSync" label={t("mapSidebar.crossMapSync")} defaultOn={false} />
+                  <p className="map-sidebar__help">{t("mapSidebar.crossMapSyncHelp")}</p>
                 </>
               )}
 
