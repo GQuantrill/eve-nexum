@@ -114,6 +114,8 @@ export function ConnectionPanel() {
   // clearing to '' — are never overwritten. Already-set K162 may be upgraded.
   useEffect(() => {
     if (!conn || !src || !tgt || !map.id) return;
+    // Jumpgate (stargate) links are never wormholes — never auto-type them.
+    if (conn.connectionType === 'jumpgate') return;
     if (conn.type !== null && conn.type.toUpperCase() !== 'K162') return;
     let cancelled = false;
     Promise.all([
