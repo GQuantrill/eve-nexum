@@ -351,6 +351,8 @@
     "placement": "Colocación de sistemas nuevos",
     "sigBookmark": "Marcador de firma",
     "bookmarkHelp": "En la fila de una firma de agujero de gusano, haz clic en el icono de copiar para copiar un nombre de marcador listo, y pégalo en el marcador del juego. Crea el nombre con estos tokens:",
+    "crossMapSync": "Sincronizar datos del sistema entre mis mapas",
+    "crossMapSyncHelp": "Cuando añades o editas firmas y anomalías en un sistema, se copian al mismo sistema en tus otros mapas (los mapas personales se sincronizan con tus otros mapas personales; los de corp con los demás mapas de la corp). No destructivo: solo rellena entradas que faltan o están vacías — nunca sobrescribe datos que ya hayas introducido ni borra nada.",
     "placementOptions": {
       "horizontal": "Horizontal (derecha)",
       "vertical": "Vertical (abajo)"
@@ -1051,6 +1053,10 @@
       "mergeMaps": {
         "title": "Fusionar mapas",
         "desc": "Integra un mapa en otro. El destino se mantiene como fuente de verdad — solo se añaden los sistemas y conexiones que faltan, con las firmas, estructuras y notas fusionadas, y los nuevos sistemas encajados en la disposición existente. Los mapas de corp se habilitan por rol como origen y/o destino de fusión."
+      },
+      "crossMapSync": {
+        "title": "Sincronización entre mapas",
+        "desc": "¿Tienes el mismo sistema en varios mapas? Actívalo y, al escanearlo en un mapa, sus firmas y anomalías se copian al mismo sistema en tus otros mapas — los mapas personales se sincronizan con tus otros mapas personales, y los de corp con los de la corp. No destructivo: solo añade entradas que faltan y rellena huecos, nunca sobrescribe lo que ya has introducido ni borra nada."
       },
       "realtime": {
         "title": "Colaboración en tiempo real",

@@ -351,6 +351,8 @@
     "placement": "New system placement",
     "sigBookmark": "Signature bookmark",
     "bookmarkHelp": "On a wormhole signature row, click the copy icon to copy a paste-ready bookmark name, then paste it into the in-game bookmark. Build the name with these tokens:",
+    "crossMapSync": "Sync system data across my maps",
+    "crossMapSyncHelp": "When you add or edit signatures and anomalies on a system, copy them to the same system on your other maps (personal maps sync with your other personal maps; corp maps with the corp's other maps). Non-destructive: it only fills in missing or blank entries — it never overwrites data you've already entered or deletes anything.",
     "placementOptions": {
       "horizontal": "Horizontal (right)",
       "vertical": "Vertical (below)"
@@ -1038,6 +1040,10 @@
       "mergeMaps": {
         "title": "Merge maps",
         "desc": "Fold one map into another. The destination is kept as the source of truth — only missing systems and connections are added, with signatures, structures, and notes merged in, and new systems slotted into the existing layout. Corp maps opt in per role as a merge source and/or destination."
+      },
+      "crossMapSync": {
+        "title": "Cross-map sync",
+        "desc": "Have the same system on several maps? Opt in and scanning it on one map copies its signatures and anomalies to the same system on your others — personal maps sync with your other personal maps, corp maps with the corp's. Non-destructive: it only adds missing entries and fills blanks, never overwriting what you've already entered or deleting anything."
       },
       "realtime": {
         "title": "Real-time collaboration",

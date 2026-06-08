@@ -351,6 +351,8 @@
     "placement": "Platzierung neuer Systeme",
     "sigBookmark": "Signatur-Lesezeichen",
     "bookmarkHelp": "Klicke in der Zeile einer Wurmloch-Signatur auf das Kopiersymbol, um einen fertigen Lesezeichennamen zu kopieren, und füge ihn in das Ingame-Lesezeichen ein. Erstelle den Namen mit diesen Tokens:",
+    "crossMapSync": "Systemdaten über meine Karten synchronisieren",
+    "crossMapSyncHelp": "Wenn du Signaturen und Anomalien an einem System hinzufügst oder bearbeitest, werden sie auf das gleiche System auf deinen anderen Karten kopiert (persönliche Karten mit deinen anderen persönlichen Karten; Corp-Karten mit den anderen Karten der Corp). Nicht-destruktiv: Es füllt nur fehlende oder leere Einträge — vorhandene Daten werden nie überschrieben oder gelöscht.",
     "placementOptions": {
       "horizontal": "Horizontal (rechts)",
       "vertical": "Vertikal (unten)"
@@ -1051,6 +1053,10 @@
       "mergeMaps": {
         "title": "Karten zusammenführen",
         "desc": "Füge eine Karte in eine andere ein. Das Ziel bleibt die maßgebliche Quelle — nur fehlende Systeme und Verbindungen werden hinzugefügt, mit eingearbeiteten Signaturen, Strukturen und Notizen, und neue Systeme werden in das bestehende Layout eingefügt. Corp-Karten geben sich pro Rolle als Zusammenführungsquelle und/oder -ziel frei."
+      },
+      "crossMapSync": {
+        "title": "Karten-übergreifende Synchronisierung",
+        "desc": "Dasselbe System auf mehreren Karten? Aktiviere die Option, und wenn du es auf einer Karte scannst, werden seine Signaturen und Anomalien auf dasselbe System auf deinen anderen Karten kopiert — persönliche Karten synchronisieren mit deinen anderen persönlichen Karten, Corp-Karten mit denen der Corp. Nicht-destruktiv: Es werden nur fehlende Einträge ergänzt und Lücken gefüllt, niemals bereits eingegebene Daten überschrieben oder etwas gelöscht."
       },
       "realtime": {
         "title": "Echtzeit-Zusammenarbeit",

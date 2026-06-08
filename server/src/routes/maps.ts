@@ -11,6 +11,7 @@ import { resolveOwnerId } from '../utils/owner.js';
 import { resolveEntityNames } from '../services/entityNames.js';
 import { audit } from '../services/audit.js';
 import { subscribeMap, publishToMap } from '../services/mapEvents.js';
+import { syncSignature, syncAnomaly } from '../services/crossMapSync.js';
 import { reportPresence, removePresence, presenceSnapshot } from '../services/presence.js';
 import { notifyDiscord, webhookFor, k162Embed, connectionEmbed } from '../services/discord.js';
 
@@ -1733,6 +1734,7 @@ mapsRouter.post('/:mapId/systems/:systemId/signatures', async (req, res) => {
   publishToMap(mapId, { type: 'sig.changed', actor: req.get('x-client-id') ?? null, systemId });
   if (whType) discordLog.info(`sig POST on system ${systemId}: whType="${whType}"`);
   if ((whType ?? '').toUpperCase() === 'K162') dispatchK162(access, rows[0].id, systemId, req.session.characterName ?? null);
+  syncSignature(mapId, systemId, rows[0].id, req.session.userId);
   res.status(201).json(rows[0]);
 });
 
@@ -1779,6 +1781,7 @@ mapsRouter.patch('/:mapId/systems/:systemId/signatures/:sigId', async (req, res)
   // If the leads-to was just filled in, send any pending K162 now rather than
   // waiting out the rest of the window — the intel we were waiting for is here.
   if (typeof updates.whLeadsTo === 'string' && updates.whLeadsTo.trim()) flushK162(sigId);
+  syncSignature(mapId, systemId, sigId, req.session.userId);
   res.json({ ok: true });
 });
 
@@ -1843,6 +1846,7 @@ mapsRouter.post('/:mapId/systems/:systemId/anomalies', async (req, res) => {
   );
   db.query(`UPDATE map_systems SET last_activity_at = NOW() WHERE id = $1`, [systemId]).catch(console.error);
   publishToMap(mapId, { type: 'anom.changed', actor: req.get('x-client-id') ?? null, systemId });
+  syncAnomaly(mapId, systemId, rows[0].id, req.session.userId);
   res.status(201).json(rows[0]);
 });
 
@@ -1870,6 +1874,7 @@ mapsRouter.patch('/:mapId/systems/:systemId/anomalies/:anomId', async (req, res)
   );
   db.query(`UPDATE map_systems SET last_activity_at = NOW() WHERE id = $1`, [systemId]).catch(console.error);
   publishToMap(mapId, { type: 'anom.changed', actor: req.get('x-client-id') ?? null, systemId });
+  syncAnomaly(mapId, systemId, anomId, req.session.userId);
   res.json({ ok: true });
 });
 

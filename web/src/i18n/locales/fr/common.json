@@ -351,6 +351,8 @@
     "placement": "Placement des nouveaux systèmes",
     "sigBookmark": "Nom de favori de signature",
     "bookmarkHelp": "Sur la ligne d'une signature de trou de ver, cliquez sur l'icône de copie pour copier un nom de favori prêt à coller, puis collez-le dans le favori en jeu. Composez le nom avec ces variables :",
+    "crossMapSync": "Synchroniser les données système entre mes cartes",
+    "crossMapSyncHelp": "Lorsque vous ajoutez ou modifiez des signatures et anomalies sur un système, elles sont copiées vers le même système sur vos autres cartes (les cartes personnelles avec vos autres cartes personnelles ; les cartes de corpo avec les autres cartes de la corpo). Non destructif : il ne remplit que les entrées manquantes ou vides — il n'écrase jamais les données déjà saisies et ne supprime rien.",
     "placementOptions": {
       "horizontal": "Horizontal (à droite)",
       "vertical": "Vertical (en dessous)"
@@ -1051,6 +1053,10 @@
       "mergeMaps": {
         "title": "Fusionner les cartes",
         "desc": "Intégrez une carte dans une autre. La destination fait foi — seuls les systèmes et connexions manquants sont ajoutés, avec les signatures, structures et notes fusionnées, et les nouveaux systèmes insérés dans l'agencement existant. Les cartes de corp s'y autorisent par rôle comme source et/ou destination de fusion."
+      },
+      "crossMapSync": {
+        "title": "Synchronisation entre cartes",
+        "desc": "Le même système sur plusieurs cartes ? Activez l'option et, en le scannant sur une carte, ses signatures et anomalies sont copiées vers le même système sur vos autres cartes — les cartes personnelles se synchronisent avec vos autres cartes personnelles, celles de corpo avec celles de la corpo. Non destructif : seules les entrées manquantes sont ajoutées et les blancs comblés, sans jamais écraser ce que vous avez déjà saisi ni rien supprimer."
       },
       "realtime": {
         "title": "Collaboration en temps réel",

@@ -672,6 +672,12 @@ export function MapSidebar() {
             label={t("mapSidebar.invertZoom")}
             defaultOn={false}
           />
+          <SettingToggle
+            settingKey="nexum.crossMapSync"
+            label={t("mapSidebar.crossMapSync")}
+            defaultOn={false}
+          />
+          <p className="map-sidebar__help">{t("mapSidebar.crossMapSyncHelp")}</p>
         </CollapsibleSection>
 
         <CollapsibleSection

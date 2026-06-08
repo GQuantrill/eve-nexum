@@ -351,6 +351,8 @@
     "placement": "Posicionamento de novos sistemas",
     "sigBookmark": "Marcador de assinatura",
     "bookmarkHelp": "Na linha de uma assinatura de buraco de minhoca, clique no ícone de copiar para copiar um nome de marcador pronto e cole-o no marcador do jogo. Monte o nome com estes tokens:",
+    "crossMapSync": "Sincronizar dados do sistema entre os meus mapas",
+    "crossMapSyncHelp": "Quando adicionas ou editas assinaturas e anomalias num sistema, elas são copiadas para o mesmo sistema nos teus outros mapas (mapas pessoais sincronizam com os teus outros mapas pessoais; mapas de corp com os outros mapas da corp). Não destrutivo: apenas preenche entradas em falta ou vazias — nunca substitui dados já introduzidos nem apaga nada.",
     "placementOptions": {
       "horizontal": "Horizontal (direita)",
       "vertical": "Vertical (abaixo)"
@@ -1051,6 +1053,10 @@
       "mergeMaps": {
         "title": "Fundir mapas",
         "desc": "Integra um mapa noutro. O destino mantém-se como fonte de verdade — apenas os sistemas e conexões em falta são adicionados, com as assinaturas, estruturas e notas fundidas, e os novos sistemas encaixados na disposição existente. Os mapas de corp habilitam-se por função como origem e/ou destino de fusão."
+      },
+      "crossMapSync": {
+        "title": "Sincronização entre mapas",
+        "desc": "Tens o mesmo sistema em vários mapas? Ativa a opção e, ao examiná-lo num mapa, as suas assinaturas e anomalias são copiadas para o mesmo sistema nos teus outros mapas — os mapas pessoais sincronizam com os teus outros mapas pessoais, os de corp com os da corp. Não destrutivo: apenas adiciona entradas em falta e preenche espaços em branco, nunca substituindo o que já introduziste nem apagando nada."
       },
       "realtime": {
         "title": "Colaboração em tempo real",

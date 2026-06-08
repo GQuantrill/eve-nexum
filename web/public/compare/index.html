@@ -240,6 +240,13 @@
               <td data-i18n="yes"><span class="yes">Yes</span></td>
             </tr>
             <tr>
+              <th scope="row" data-i18n="gWatchlist">Signature / wormhole / system watchlist</th>
+              <td class="nexum" data-i18n="yes"><span class="yes">Yes</span></td>
+              <td data-i18n="no"><span class="no">No</span></td>
+              <td data-i18n="no"><span class="no">No</span></td>
+              <td data-i18n="no"><span class="no">No</span></td>
+            </tr>
+            <tr>
               <th scope="row" data-i18n="gMass">Wormhole mass / rolling</th>
               <td class="nexum" data-i18n="gMassN">Dedicated rolling calculator (±10% variance, stranding warnings)</td>
               <td data-i18n="massStatus">Mass status tracking</td>
@@ -300,6 +307,11 @@
             </tr>
             <tr>
               <th scope="row" data-i18n="f3h"><strong>Merge two maps</strong> into one, de-duplicating systems and folding in signatures, structures and notes</th>
+              <td class="nexum"><span class="yes">✓</span></td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <th scope="row" data-i18n="f9h"><strong>Cross-map sync</strong> — scanning a system on one map auto-fills its signatures and anomalies onto the same system on your other maps, non-destructively (personal maps with your personal maps, corp maps with the corp's)</th>
               <td class="nexum"><span class="yes">✓</span></td>
               <td>—</td>
             </tr>
@@ -502,6 +514,7 @@
             gSso: 'EVE-SSO-Login',
             gSync: 'Echtzeit-Mehrbenutzer-Sync',
             gSigPaste: 'Signatur-Einfügen &amp; -Verfolgung',
+            gWatchlist: 'Signatur-/Wurmloch-/System-Beobachtungsliste',
             gMass: 'Wurmloch-Masse / Rolling',
             gMultiLingual: 'Mehrsprachig',
             gMultiLingualN: '<span class="yes">Ja</span> — derzeit 9 Sprachen',
@@ -536,6 +549,7 @@
             f7h: '<strong>Umgebungs-Intel-Ebenen</strong> — Nullsec-Stürme, A0-Sonnen, Eisgürtel, Ketten-Wurmlocheffekte und Näherungswarnungen für Inkursion / Aufstand',
             f8h: '<strong>Corp-Suite</strong> — Rollen, gemeinsame Karten, Admin-Dashboard, Benutzer- &amp; System-Berichte, Audit-Log und Zuordnung pro Charakter',
             f8o: 'Variiert',
+            f9h: '<strong>Karten-übergreifende Synchronisierung</strong> — beim Scannen eines Systems auf einer Karte werden seine Signaturen und Anomalien zerstörungsfrei in dasselbe System auf deinen anderen Karten übernommen (persönliche Karten mit deinen persönlichen Karten, Corp-Karten mit denen der Corp)',
 
             h2Detail: 'Die Tools im Detail',
             twP: 'Der klassische, signaturorientierte Wurmloch-Mapper, mit dem ein großer Teil der J-Space-Spieler aufgewachsen ist. Er ist schnell, fokussiert, und der Workflow sitzt bei Veteranen im Muskelgedächtnis. Die langlebige öffentliche Instanz (tripwire.eve-apps.com) wurde Mitte 2024 abgeschaltet, aber Tripwire ist Open Source und lebt daher durch Selbst-Hosting und von der Community betriebene Instanzen weiter.',
@@ -602,6 +616,7 @@
             gSso: 'Connexion EVE SSO',
             gSync: 'Sync multi-utilisateur en temps réel',
             gSigPaste: 'Collage &amp; suivi des signatures',
+            gWatchlist: 'Liste de surveillance de signatures / trous de ver / systèmes',
             gMass: 'Masse / rolling de trou de ver',
             gMultiLingual: 'Multilingue',
             gMultiLingualN: '<span class="yes">Oui</span> — actuellement 9 langues',
@@ -636,6 +651,7 @@
             f7h: '<strong>Couches de renseignement environnemental</strong> — tempêtes null-sec, soleils A0, ceintures de glace, effets de trou de ver de chaîne, et alertes de proximité d’incursion / insurrection',
             f8h: '<strong>Suite corp</strong> — rôles, cartes partagées, tableau de bord d’admin, rapports utilisateurs &amp; systèmes, journal d’audit et attribution par personnage',
             f8o: 'Variable',
+            f9h: '<strong>Synchronisation inter-cartes</strong> — scanner un système sur une carte remplit automatiquement ses signatures et anomalies sur le même système de vos autres cartes, de façon non destructive (cartes personnelles avec vos cartes personnelles, cartes de corp avec celles de la corp)',
 
             h2Detail: 'Les outils en détail',
             twP: 'Le mapper de trous de ver classique, axé signatures, avec lequel une grande partie des joueurs de J-space ont grandi. Il est rapide, ciblé, et le workflow est dans les réflexes des vétérans. L’instance publique de longue date (tripwire.eve-apps.com) a fermé mi-2024, mais Tripwire est open source, il survit donc via l’auto-hébergement et les instances gérées par la communauté.',
@@ -702,6 +718,7 @@
             gSso: 'Inicio de sesión con EVE SSO',
             gSync: 'Sync multiusuario en tiempo real',
             gSigPaste: 'Pegado y seguimiento de firmas',
+            gWatchlist: 'Lista de seguimiento de firmas / agujeros de gusano / sistemas',
             gMass: 'Masa / rolling de agujeros de gusano',
             gMultiLingual: 'Multilingüe',
             gMultiLingualN: '<span class="yes">Sí</span> — actualmente 9 idiomas',
@@ -736,6 +753,7 @@
             f7h: '<strong>Capas de inteligencia ambiental</strong> — tormentas de null-sec, soles A0, cinturones de hielo, efectos de agujero de gusano de la cadena, y alertas de proximidad de incursión / insurgencia',
             f8h: '<strong>Suite de corp</strong> — roles, mapas compartidos, panel de administración, informes de usuarios y sistemas, registro de auditoría y atribución por personaje',
             f8o: 'Variable',
+            f9h: '<strong>Sincronización entre mapas</strong> — escanear un sistema en un mapa rellena automáticamente sus firmas y anomalías en el mismo sistema de tus otros mapas, de forma no destructiva (mapas personales con tus mapas personales, mapas de corp con los de la corp)',
 
             h2Detail: 'Las herramientas en detalle',
             twP: 'El mapeador de agujeros de gusano clásico, centrado en firmas, con el que creció una gran parte de los jugadores de J-space. Es rápido, enfocado, y el flujo de trabajo es memoria muscular para los veteranos. La longeva instancia pública (tripwire.eve-apps.com) cerró a mediados de 2024, pero Tripwire es de código abierto, así que sobrevive mediante el autoalojamiento y las instancias gestionadas por la comunidad.',
@@ -802,6 +820,7 @@
             gSso: 'Início de sessão com EVE SSO',
             gSync: 'Sync multiutilizador em tempo real',
             gSigPaste: 'Colagem e seguimento de assinaturas',
+            gWatchlist: 'Lista de vigilância de assinaturas / buracos de minhoca / sistemas',
             gMass: 'Massa / rolling de buracos de minhoca',
             gMultiLingual: 'Multilíngue',
             gMultiLingualN: '<span class="yes">Sim</span> — atualmente 9 idiomas',
@@ -836,6 +855,7 @@
             f7h: '<strong>Camadas de inteligência ambiental</strong> — tempestades de null-sec, sóis A0, cinturões de gelo, efeitos de buraco de minhoca da cadeia, e alertas de proximidade de incursão / insurgência',
             f8h: '<strong>Suite de corp</strong> — funções, mapas partilhados, painel de administração, relatórios de utilizadores e sistemas, registo de auditoria e atribuição por personagem',
             f8o: 'Variável',
+            f9h: '<strong>Sincronização entre mapas</strong> — ao scanear um sistema num mapa, as suas assinaturas e anomalias são preenchidas automaticamente no mesmo sistema dos teus outros mapas, de forma não destrutiva (mapas pessoais com os teus mapas pessoais, mapas de corp com os da corp)',
 
             h2Detail: 'As ferramentas em detalhe',
             twP: 'O mapeador de buracos de minhoca clássico, centrado em assinaturas, com o qual uma grande parte dos jogadores de J-space cresceu. É rápido, focado, e o fluxo de trabalho é memória muscular para os veteranos. A longeva instância pública (tripwire.eve-apps.com) fechou em meados de 2024, mas o Tripwire é de código aberto, por isso sobrevive através do auto-alojamento e das instâncias geridas pela comunidade.',
@@ -901,6 +921,7 @@
             gSso: 'EVE SSO 登录',
             gSync: '实时多用户同步',
             gSigPaste: '信号粘贴与跟踪',
+            gWatchlist: '信号 / 虫洞 / 星系关注列表',
             gMass: '虫洞质量 / 关洞',
             gMultiLingual: '多语言',
             gMultiLingualN: '<span class="yes">是</span> — 目前支持 9 种语言',
@@ -935,6 +956,7 @@
             f7h: '<strong>环境情报图层</strong> — 零安风暴、A0 恒星、冰带、链虫洞效应，以及入侵 / 叛乱的接近警报',
             f8h: '<strong>军团套件</strong> — 权限、共享地图、管理仪表盘、用户与星系报告、审计日志和按角色归因',
             f8o: '各不相同',
+            f9h: '<strong>跨地图同步</strong> — 在一张地图上扫描某个星系时，会以非破坏性方式将其信号和异常自动填入你其他地图上的同一星系（个人地图与你的个人地图同步，军团地图与军团地图同步）',
 
             h2Detail: '工具详解',
             twP: '经典的、以信号为先的虫洞绘图工具，很大一部分 J空间玩家就是用它成长起来的。它快速、专注，其工作流程对老手而言已是肌肉记忆。长期运营的公共实例（tripwire.eve-apps.com）于 2024 年中关闭，但 Tripwire 是开源的，所以它通过自托管和社区运营的实例延续了下来。',
@@ -1000,6 +1022,7 @@
             gSso: 'EVE SSO 로그인',
             gSync: '실시간 다중 사용자 동기화',
             gSigPaste: '시그니처 붙여넣기 및 추적',
+            gWatchlist: '시그니처 / 웜홀 / 성계 관심 목록',
             gMass: '웜홀 질량 / 롤링',
             gMultiLingual: '다국어 지원',
             gMultiLingualN: '<span class="yes">예</span> — 현재 9개 언어',
@@ -1034,6 +1057,7 @@
             f7h: '<strong>환경 인텔 레이어</strong> — 널섹 폭풍, A0 항성, 얼음 벨트, 체인 웜홀 효과, 인커전 / 반란 근접 경보',
             f8h: '<strong>군단 스위트</strong> — 권한, 공유 지도, 관리 대시보드, 사용자 및 성계 보고서, 감사 로그, 캐릭터별 귀속',
             f8o: '제각각',
+            f9h: '<strong>지도 간 동기화</strong> — 한 지도에서 성계를 스캔하면 해당 시그니처와 어노말리가 다른 지도의 같은 성계에 비파괴적으로 자동 입력됨 (개인 지도는 본인의 개인 지도끼리, 콥 지도는 콥 지도끼리)',
 
             h2Detail: '도구 상세',
             twP: '엄청난 비율의 J-스페이스 플레이어가 함께 자란 고전적인, 시그니처 우선 웜홀 지도 도구. 빠르고, 집중적이며, 워크플로는 베테랑에게 근육 기억입니다. 오래 운영된 공개 인스턴스(tripwire.eve-apps.com)는 2024년 중반에 종료되었지만, Tripwire는 오픈 소스라 자체 호스팅과 커뮤니티 운영 인스턴스를 통해 살아 있습니다.',
@@ -1099,6 +1123,7 @@
             gSso: 'EVE SSO ログイン',
             gSync: 'リアルタイムマルチユーザー同期',
             gSigPaste: 'シグネチャの貼り付けと追跡',
+            gWatchlist: 'シグネチャ / ワームホール / 星系のウォッチリスト',
             gMass: 'ワームホール質量 / ロール',
             gMultiLingual: '多言語対応',
             gMultiLingualN: '<span class="yes">はい</span> — 現在9言語',
@@ -1133,6 +1158,7 @@
             f7h: '<strong>環境インテルレイヤー</strong> — ヌルセクストーム、A0 恒星、アイスベルト、チェーンのワームホールエフェクト、インカージョン / 反乱の近接アラート',
             f8h: '<strong>コーポスイート</strong> — 権限、共有マップ、管理ダッシュボード、ユーザーと星系のレポート、監査ログ、キャラクターごとの帰属',
             f8o: 'まちまち',
+            f9h: '<strong>マップ間同期</strong> — あるマップで星系をスキャンすると、そのシグネチャとアノマリーが他のマップ上の同じ星系に非破壊的に自動入力される（個人マップは自分の個人マップ同士、コープマップはコープのマップ同士）',
 
             h2Detail: 'ツールの詳細',
             twP: 'J-スペースのプレイヤーの大きな割合が共に育った、古典的でシグネチャ優先のワームホールマッパー。速く、集中していて、ワークフローはベテランには体に染みついています。長く運営されたパブリックインスタンス（tripwire.eve-apps.com）は 2024 年半ばに閉鎖されましたが、Tripwire はオープンソースなので、セルフホストとコミュニティ運営のインスタンスを通じて生き続けています。',
@@ -1198,6 +1224,7 @@
             gSso: 'Вход через EVE SSO',
             gSync: 'Многопользовательская синхронизация в реальном времени',
             gSigPaste: 'Вставка и отслеживание сигнатур',
+            gWatchlist: 'Список наблюдения за сигнатурами / червоточинами / системами',
             gMass: 'Масса / роллинг червоточин',
             gMultiLingual: 'Многоязычность',
             gMultiLingualN: '<span class="yes">Да</span> — сейчас 9 языков',
@@ -1232,6 +1259,7 @@
             f7h: '<strong>Слой интела окружения</strong> — штормы нулсека, звёзды A0, ледяные пояса, эффекты червоточин по цепочке, оповещения о близости инкурсий / мятежей',
             f8h: '<strong>Корп-набор</strong> — права, общие карты, админ-панели, отчёты по пользователям и системам, журналы аудита, атрибуция по персонажам',
             f8o: 'По-разному',
+            f9h: '<strong>Синхронизация между картами</strong> — при сканировании системы на одной карте её сигнатуры и аномалии без перезаписи автоматически переносятся в ту же систему на ваших других картах (личные карты с вашими личными картами, корп-карты с картами корпорации)',
 
             h2Detail: 'Инструменты подробнее',
             twP: 'Классический сигнатуро-ориентированный маппер червоточин, на котором выросла большая часть игроков J-спейса. Быстрый, сфокусированный, и его рабочий процесс намертво в мышечной памяти у ветеранов. Долго работавший публичный экземпляр (tripwire.eve-apps.com) закрылся в середине 2024 года, но Tripwire с открытым кодом, поэтому живёт через самостоятельный хостинг и экземпляры сообщества.',
