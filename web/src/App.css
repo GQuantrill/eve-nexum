@@ -3421,7 +3421,10 @@ div.system-node__easy-handle {
   flex-direction: row;
   align-items: stretch;
   gap: 12px;
-  padding: 0 16px 12px;
+  /* Extra left padding clears the watchlist panel's left-edge tab (a persistent
+     ~38px handle, vertically centred) so it never overlaps the system name /
+     panel content when the panel is tall. */
+  padding: 0 16px 12px 48px;
   overflow: hidden;
   flex-shrink: 0;
   position: relative;
@@ -3513,7 +3516,10 @@ div.system-node__easy-handle {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 8px 12px;
+  /* When the panel is narrowed, the action buttons wrap to a second line
+     rather than crushing the system name — the title keeps its own line. */
+  flex-wrap: wrap;
 }
 
 .system-panel__title {
@@ -3524,7 +3530,10 @@ div.system-node__easy-handle {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  flex: 1;
+  flex: 1 1 auto;
+  /* Keep the name readable; once it + the buttons no longer fit, the buttons
+     wrap below instead of the name shrinking to an ellipsis. */
+  min-width: 130px;
 }
 
 .system-panel__actions {
