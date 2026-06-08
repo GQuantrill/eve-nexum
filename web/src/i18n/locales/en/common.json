@@ -796,7 +796,8 @@
   "anomType": {
     "unknown": "Unknown",
     "combat": "Combat",
-    "ore": "Ore"
+    "ore": "Ore",
+    "homefront": "Homefront"
   },
   "signatures": {
     "pasteHint": "You can copy and paste signatures directly from the Probe scanner in Eve. To do this, open your probe scanner.  Press control A to select them all, then control C to copy.  Use control V to paste them here",

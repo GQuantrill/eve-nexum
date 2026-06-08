@@ -809,7 +809,8 @@
   "anomType": {
     "unknown": "Inconnu",
     "combat": "Combat",
-    "ore": "Minerai"
+    "ore": "Minerai",
+    "homefront": "Front intérieur"
   },
   "signatures": {
     "pasteHint": "Vous pouvez copier-coller des signatures directement depuis le scanner de sondes dans EVE. Pour cela, ouvrez votre scanner de sondes. Appuyez sur Ctrl+A pour tout sélectionner, puis Ctrl+C pour copier. Utilisez Ctrl+V pour les coller ici.",

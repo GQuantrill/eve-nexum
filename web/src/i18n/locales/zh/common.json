@@ -809,7 +809,8 @@
   "anomType": {
     "unknown": "未知",
     "combat": "战斗",
-    "ore": "矿石"
+    "ore": "矿石",
+    "homefront": "家园战线"
   },
   "signatures": {
     "pasteHint": "你可以直接从 EVE 中的探针扫描器复制并粘贴信号。为此，打开你的探针扫描器。按 Ctrl+A 全选，然后按 Ctrl+C 复制。用 Ctrl+V 粘贴到此处。",

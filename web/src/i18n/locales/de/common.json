@@ -809,7 +809,8 @@
   "anomType": {
     "unknown": "Unbekannt",
     "combat": "Kampf",
-    "ore": "Erz"
+    "ore": "Erz",
+    "homefront": "Heimatfront"
   },
   "signatures": {
     "pasteHint": "Du kannst Signaturen direkt aus dem Sondenscanner in EVE kopieren und einfügen. Öffne dazu deinen Sondenscanner. Drücke Strg+A, um alle auszuwählen, dann Strg+C zum Kopieren. Mit Strg+V hier einfügen.",

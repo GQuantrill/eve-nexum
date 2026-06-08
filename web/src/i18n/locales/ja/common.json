@@ -809,7 +809,8 @@
   "anomType": {
     "unknown": "不明",
     "combat": "コンバット",
-    "ore": "鉱石"
+    "ore": "鉱石",
+    "homefront": "ホームフロント"
   },
   "signatures": {
     "pasteHint": "EVE のプローブスキャナーからシグネチャを直接コピー＆ペーストできます。それには、プローブスキャナーを開いてください。Ctrl+A ですべて選択し、Ctrl+C でコピー。Ctrl+V でここに貼り付けてください。",

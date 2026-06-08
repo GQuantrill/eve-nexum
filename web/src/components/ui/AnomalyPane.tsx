@@ -20,16 +20,18 @@ import { duration, DASH } from '../../i18n/format';
 const ANOM_GROUP = 'cosmic anomaly';
 
 const ANOM_TYPE_LABELS: Record<AnomType, string> = {
-  unknown: 'Unknown',
-  combat:  'Combat',
-  ore:     'Ore',
+  unknown:   'Unknown',
+  combat:    'Combat',
+  ore:       'Ore',
+  homefront: 'Homefront',
 };
 
-// Scanner "type" column → our enum. Anomalies are only ever "Combat Site" or
-// "Ore Site" (ice belts also report as Ore Sites — only the name differs).
+// Scanner "type" column → our enum. Combat Site / Ore Site (ice belts also
+// report as Ore Sites — only the name differs) / Homefront Operations.
 const EVE_ANOM_TYPE: Record<string, AnomType> = {
-  'combat site': 'combat',
-  'ore site':    'ore',
+  'combat site':         'combat',
+  'ore site':            'ore',
+  'homefront operations': 'homefront',
 };
 
 interface ParsedAnom { anomId: string; anomType: AnomType; name: string; }
@@ -76,8 +78,8 @@ function formatDelay(sec: number): string {
 
 // Filter chips + type-select options. Reuses the sig-* type colour classes,
 // which already cover combat / ore / unknown.
-const ANOM_TYPE_FILTER_ORDER: AnomType[] = ['combat', 'ore', 'unknown'];
-const ANOM_TYPE_OPTIONS: AnomType[] = ['combat', 'ore', 'unknown'];
+const ANOM_TYPE_FILTER_ORDER: AnomType[] = ['combat', 'ore', 'homefront', 'unknown'];
+const ANOM_TYPE_OPTIONS: AnomType[] = ['combat', 'ore', 'homefront', 'unknown'];
 
 // Single module-level 1 s tick shared across every ElapsedCell instance, so the
 // age/updated cells refresh without each pane driving its own per-second state

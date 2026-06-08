@@ -809,7 +809,8 @@
   "anomType": {
     "unknown": "Desconhecido",
     "combat": "Combate",
-    "ore": "Minério"
+    "ore": "Minério",
+    "homefront": "Frente interna"
   },
   "signatures": {
     "pasteHint": "Podes copiar e colar assinaturas diretamente do scanner de sondas no EVE. Para isso, abre o teu scanner de sondas. Prime Ctrl+A para selecionar todas, depois Ctrl+C para copiar. Usa Ctrl+V para as colar aqui.",
