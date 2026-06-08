@@ -347,9 +347,10 @@ export function SystemPanel() {
                 </button>
               </>
             )}
-            <button type="button" className="icon-btn" onClick={toggleInfoCollapsed} title={t('systemPanel.collapseInfo')}>‹</button>
-            <button type="button" className="icon-btn" onClick={() => selectSystem(null)} title={t('actions.close')}>✕</button>
           </div>
+          {/* Collapse caret pinned to the panel's top-right corner, independent
+              of the Set Destination / Waypoint buttons (which wrap below). */}
+          <button type="button" className="icon-btn system-panel__collapse" onClick={toggleInfoCollapsed} title={t('systemPanel.collapseInfo')}>‹</button>
         </div>
 
         <div className="sys-info">

@@ -14,7 +14,8 @@ interface Props {
   children?: ReactNode;
 }
 
-function classKey(raw: string): SystemClass | null {
+function classKey(raw: string | null | undefined): SystemClass | null {
+  if (!raw) return null;
   const up = raw.toUpperCase();
   if (/^C\d+$/.test(up))                                    return up as SystemClass;
   if (up === 'HS' || up === 'LS' || up === 'NS')            return up as SystemClass;
@@ -60,7 +61,7 @@ export function WHTypeInfo({ code, children }: Props) {
           className="wh-type-info__value"
           style={dest ? { color: CLASS_COLORS[dest] } : undefined}
         >
-          {dest ? CLASS_LABELS[dest] : spec.dest.toUpperCase()}
+          {dest ? CLASS_LABELS[dest] : (spec.dest ? spec.dest.toUpperCase() : '?')}
         </span>
       </div>
       <div className="wh-type-info__row">

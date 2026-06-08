@@ -115,12 +115,6 @@ export function StructuresPane({ systemId }: { systemId: string }) {
   }, [structRev, activeMapId, systemId, isShareMode]);
 
   useEffect(() => {
-    const close = () => setCtx(null);
-    window.addEventListener('mousedown', close);
-    return () => window.removeEventListener('mousedown', close);
-  }, []);
-
-  useEffect(() => {
     if (!activeMapId) return;
 
     const handlePaste = async (e: ClipboardEvent) => {
