@@ -348,7 +348,6 @@ export function SystemPanel() {
               </>
             )}
             <button type="button" className="icon-btn" onClick={toggleInfoCollapsed} title={t('systemPanel.collapseInfo')}>‹</button>
-            <button type="button" className="icon-btn" onClick={() => selectSystem(null)} title={t('actions.close')}>✕</button>
           </div>
         </div>
 
