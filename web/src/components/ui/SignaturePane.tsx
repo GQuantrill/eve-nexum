@@ -381,6 +381,42 @@ export function SignaturePane({ systemId }: { systemId: string }) {
     }, 500));
   };
 
+  // Annotate K162 (return-side) wormhole sigs with the real source type. The
+  // scanned sig on this side only ever reads "K162"; the shared connection,
+  // however, has already resolved to the originating code (e.g. B449) via
+  // whAutoDetect. Drop that into the sig's notes so the source hole is visible
+  // from the K162 system without clicking the connection line. Only fills an
+  // empty notes field (never clobbers a user-typed one) and matches the sig to
+  // its connection by leads-to, so a system with several holes fills the right
+  // row.
+  useEffect(() => {
+    if (!canEdit || isShareMode) return;
+    for (const sig of sigs) {
+      if (sig.notes) continue;
+      if (sig.sigType !== 'wormhole') continue;
+      if (sig.whType?.toUpperCase() !== 'K162') continue;
+      const leads = sig.whLeadsTo?.toUpperCase();
+      if (!leads) continue;
+      let source: string | null = null;
+      for (const conn of map.connections) {
+        if (conn.connectionType === 'jumpgate') continue;
+        const otherId =
+          conn.sourceId === systemId ? conn.targetId :
+          conn.targetId === systemId ? conn.sourceId : null;
+        if (!otherId) continue;
+        const other = map.systems.find((s) => s.id === otherId);
+        if (!other) continue;
+        const oc = other.systemClass.toUpperCase();
+        const on = (other.name ?? '').toUpperCase();
+        if (leads !== oc && leads !== on) continue;
+        const t = conn.type?.toUpperCase();
+        if (t && t !== 'K162') { source = conn.type; break; }
+      }
+      if (source) updateSig(sig.id, { notes: source });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sigs, map.connections, map.systems, systemId, canEdit, isShareMode]);
+
   // Drop any pending overwrite-removal timer/indicator for this id (the row is
   // being deleted now, whether by the timer firing or a manual delete).
   const clearRemoval = (id: string) => {
