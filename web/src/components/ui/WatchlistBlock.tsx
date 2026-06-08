@@ -195,6 +195,22 @@ export function WatchlistBlock() {
                   </button>
                 </div>
 
+                {expandedId === it.id && targets.length > 1 && (
+                  <div className="watchlist__matches">
+                    {targets.map((tgt) => (
+                      <button
+                        key={tgt.nodeId}
+                        type="button"
+                        className="watchlist__match"
+                        onClick={() => requestCenterOnNode(tgt.nodeId)}
+                      >
+                        <CrosshairIcon size={11} weight="bold" />
+                        {tgt.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
                 <div className="watchlist__row-bottom">
                   {it.match.by === 'system' && (
                     <input
@@ -228,22 +244,6 @@ export function WatchlistBlock() {
                     placeholder={t('watchlist.notePlaceholder')}
                   />
                 </div>
-
-                {expandedId === it.id && targets.length > 1 && (
-                  <div className="watchlist__matches">
-                    {targets.map((tgt) => (
-                      <button
-                        key={tgt.nodeId}
-                        type="button"
-                        className="watchlist__match"
-                        onClick={() => requestCenterOnNode(tgt.nodeId)}
-                      >
-                        <CrosshairIcon size={11} weight="bold" />
-                        {tgt.label}
-                      </button>
-                    ))}
-                  </div>
-                )}
               </div>
             );
           })}
