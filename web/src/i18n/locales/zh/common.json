@@ -323,6 +323,7 @@
       "mapControls": "地图控制",
       "systemOptions": "星系选项",
       "watchlist": "关注列表",
+      "contentFilter": "内容筛选",
       "connections": "连接",
       "route": "路线",
       "chainExits": "链出口",
@@ -464,6 +465,15 @@
     "remove": "移除情报选项",
     "max": "最多 {{count}} 个自定义情报标签",
     "add": "添加情报"
+  },
+  "contentFilter": {
+    "hint": "按扫描到的内容突出显示星系。选择信号或异常空间类型，或搜索地点名称；匹配的星系保持高亮，其余的淡出。",
+    "sigs": "信号",
+    "anoms": "异常空间",
+    "namePlaceholder": "地点名称包含…",
+    "matchCount_one": "{{count}} 个星系匹配",
+    "matchCount_other": "{{count}} 个星系匹配",
+    "clear": "清除筛选"
   },
   "watchMarker": {
     "target": "目标",

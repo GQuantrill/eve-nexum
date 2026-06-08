@@ -1,43 +1,68 @@
 import { useEffect } from 'react';
 import { api } from '../api/client';
 import { useMapStore } from '../store/mapStore';
+import type { SystemContent } from '../store/mapStore';
 import { useShareMode } from '../context/ShareModeContext';
 
-interface SigTypeRow { systemId: string; whType: string }
+interface SigRow { systemId: string; sigType: string; name: string; whType: string }
+interface AnomRow { systemId: string; anomType: string; name: string }
+
+function uniqPush(arr: string[], v: string) {
+  if (v && !arr.includes(v)) arr.push(v);
+}
 
 /**
- * Mounted once (in MapCanvas). Keeps the store's map-wide signature-type index
- * fresh so the watchlist can match scanned wormhole sigs anywhere in the chain.
- * Bulk-fetches on map switch and re-fetches whenever any system's sigs change
- * remotely (sigRev ticks). The open sig pane pushes its own edits directly into
- * the index, so the user's own scans reflect instantly without a round-trip.
+ * Mounted once (in MapCanvas). Keeps two map-wide indexes fresh without opening
+ * every system's pane:
+ *  - sigTypesBySystem: the scanned wormhole-type codes per system (watchlist).
+ *  - contentBySystem:  the sig types, anomaly types and site names per system,
+ *    powering the content filter.
+ * Bulk-fetches on map switch and re-fetches whenever any system's sigs/anoms
+ * change remotely (sigRev/anomRev tick). The open sig pane also pushes its own
+ * edits straight into sigTypesBySystem so the user's scans reflect instantly.
  */
 export function useMapSignatureIndex() {
   const activeMapId = useMapStore((s) => s.activeMapId);
   const setSigTypesBulk = useMapStore((s) => s.setSigTypesBulk);
+  const setContentBulk = useMapStore((s) => s.setContentBulk);
   const { isShareMode } = useShareMode();
-  // Sum of all per-system sig revisions — bumps when any remote sig change
-  // arrives, so we re-pull the index. Cheap; the map's system set is small.
-  const sigRevTotal = useMapStore((s) => {
+  // Sum of all per-system sig + anom revisions — bumps when any remote change
+  // arrives, so we re-pull. Cheap; the map's system set is small.
+  const rev = useMapStore((s) => {
     let n = 0;
     for (const k in s.sigRev) n += s.sigRev[k];
+    for (const k in s.anomRev) n += s.anomRev[k];
     return n;
   });
 
   useEffect(() => {
-    if (!activeMapId || isShareMode) { setSigTypesBulk({}); return; }
+    if (!activeMapId || isShareMode) { setSigTypesBulk({}); setContentBulk({}); return; }
     let cancelled = false;
-    api<SigTypeRow[]>(`/api/maps/${activeMapId}/signatures`)
-      .then((rows) => {
+    Promise.all([
+      api<SigRow[]>(`/api/maps/${activeMapId}/signatures`).catch(() => [] as SigRow[]),
+      api<AnomRow[]>(`/api/maps/${activeMapId}/anomalies`).catch(() => [] as AnomRow[]),
+    ])
+      .then(([sigs, anoms]) => {
         if (cancelled) return;
-        const bySystem: Record<string, string[]> = {};
-        for (const r of rows) {
-          if (!r.whType) continue;
-          (bySystem[r.systemId] ??= []).push(r.whType.toUpperCase());
+        const whBySystem: Record<string, string[]> = {};
+        const content: Record<string, SystemContent> = {};
+        const ensure = (id: string): SystemContent => (content[id] ??= { sigTypes: [], anomTypes: [], names: [] });
+
+        for (const r of sigs) {
+          if (r.whType) (whBySystem[r.systemId] ??= []).push(r.whType.toUpperCase());
+          const c = ensure(r.systemId);
+          uniqPush(c.sigTypes, r.sigType);
+          if (r.name) uniqPush(c.names, r.name.toLowerCase());
         }
-        setSigTypesBulk(bySystem);
+        for (const r of anoms) {
+          const c = ensure(r.systemId);
+          uniqPush(c.anomTypes, r.anomType);
+          if (r.name) uniqPush(c.names, r.name.toLowerCase());
+        }
+        setSigTypesBulk(whBySystem);
+        setContentBulk(content);
       })
-      .catch(() => { /* non-fatal — watchlist just won't match unopened sigs */ });
+      .catch(() => { /* non-fatal — filter/watchlist just won't see unopened content */ });
     return () => { cancelled = true; };
-  }, [activeMapId, isShareMode, sigRevTotal, setSigTypesBulk]);
+  }, [activeMapId, isShareMode, rev, setSigTypesBulk, setContentBulk]);
 }

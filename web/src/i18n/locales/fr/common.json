@@ -323,6 +323,7 @@
       "mapControls": "Commandes de carte",
       "systemOptions": "Options de système",
       "watchlist": "Liste de surveillance",
+      "contentFilter": "Filtre de contenu",
       "connections": "Connexions",
       "route": "Itinéraire",
       "chainExits": "Sorties de chaîne",
@@ -464,6 +465,15 @@
     "remove": "Retirer l'option d'intel",
     "max": "Maximum {{count}} tags d'intel personnalisés",
     "add": "Ajouter une intel"
+  },
+  "contentFilter": {
+    "hint": "Mettez en évidence les systèmes selon leur contenu scanné. Choisissez des types de signature ou d'anomalie, ou recherchez un nom de site ; les systèmes correspondants restent éclairés et les autres s'estompent.",
+    "sigs": "Signatures",
+    "anoms": "Anomalies",
+    "namePlaceholder": "Le nom du site contient…",
+    "matchCount_one": "{{count}} système correspond",
+    "matchCount_other": "{{count}} systèmes correspondent",
+    "clear": "Effacer le filtre"
   },
   "watchMarker": {
     "target": "Cible",

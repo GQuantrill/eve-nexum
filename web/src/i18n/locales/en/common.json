@@ -323,6 +323,7 @@
       "mapControls": "Map Controls",
       "systemOptions": "System Options",
       "watchlist": "Watchlist",
+      "contentFilter": "Content Filter",
       "connections": "Connections",
       "route": "Route",
       "chainExits": "Chain Exits",
@@ -455,6 +456,15 @@
     "remove": "Remove intel option",
     "max": "Maximum {{count}} custom intel tags",
     "add": "Add intel"
+  },
+  "contentFilter": {
+    "hint": "Spotlight systems by their scanned content. Pick signature or anomaly types, or search a site name; matching systems stay lit and the rest fade out.",
+    "sigs": "Signatures",
+    "anoms": "Anomalies",
+    "namePlaceholder": "Site name contains…",
+    "matchCount_one": "{{count}} system matches",
+    "matchCount_other": "{{count}} systems match",
+    "clear": "Clear filter"
   },
   "watchMarker": {
     "target": "Target",
