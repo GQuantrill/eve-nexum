@@ -366,6 +366,7 @@ export function LandingPage() {
             <DiscordLogoIcon size={20} weight="fill" />
             <span>{t('landing.cta.joinDiscord')}</span>
           </a>
+          <a href="/help/" className="landing__switch-link">{t('landing.helpLink')}</a>
         </div>
         {FEATURE_SECTIONS.map((section) => (
           <section key={section.id} className="landing__section landing__section--features">
