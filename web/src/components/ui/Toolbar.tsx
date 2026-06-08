@@ -367,6 +367,17 @@ export function Toolbar() {
         <ChartBarIcon size={18} weight="regular" />
       </button>
 
+      <a
+        className="toolbar__toggle toolbar__toggle--icon toolbar__toggle--prominent"
+        href="/help/"
+        target="_blank"
+        rel="noopener noreferrer"
+        data-tooltip={t('toolbar.help')}
+        aria-label={t('toolbar.help')}
+      >
+        <QuestionIcon size={18} weight="regular" />
+      </a>
+
       <HeatmapMenu />
 
       <button
