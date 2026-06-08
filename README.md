@@ -800,7 +800,7 @@ If `solar_systems` is empty the SDE import never ran — check the importer's lo
 
 ## License
 
-Nexum is free software licensed under the [GNU General Public License v3.0 or later](LICENSE) (`GPL-3.0-or-later`). You're free to use, study, modify, and redistribute it; if you distribute a modified version, that version must also be released under the GPL. See [LICENSE](LICENSE) for the full text.
+Nexum is free software licensed under the [GNU Affero General Public License v3.0 or later](LICENSE) (`AGPL-3.0-or-later`). You're free to use, study, modify, and redistribute it. The copyleft covers network use: if you run a modified version as a network service, you must also offer that version's source to its users (AGPL section 13), and any redistributed version must likewise be released under the AGPL. See [LICENSE](LICENSE) for the full text.
 
 ### EVE Online IP notice
 
