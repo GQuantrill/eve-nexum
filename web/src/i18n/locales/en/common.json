@@ -462,12 +462,18 @@
     "watch": "Watch"
   },
   "watchlist": {
-    "hint": "Holes you're hunting for. Add a system name or J-code; when it appears on the map its node is highlighted (and chimes once, if enabled).",
+    "hint": "Holes you're hunting for. Watch a system, a wormhole type, or a characteristic (shattered, an effect, frig holes); matches are highlighted on the map (and chime once, if enabled).",
     "chimeToggle": "Chime when a watched system appears",
     "markerAria": "Marker",
+    "matchByAria": "Match by",
+    "matchSystem": "System",
+    "matchWhType": "Wormhole type",
+    "quickAdd": "Quick add",
+    "whPlaceholder": "WH type, e.g. C247",
     "queryPlaceholder": "System name / J-code",
     "notePlaceholder": "Note (optional)",
     "onMap": "On the map now",
+    "locate": "Show on map",
     "remove": "Remove from watchlist",
     "max": "Maximum {{count}} watchlist entries",
     "add": "Add to watchlist",
@@ -1099,6 +1105,10 @@
       "proximity": {
         "title": "Proximity alerts",
         "desc": "Browser notification plus an audio ping when you're within a configurable number of jumps of an active incursion, pirate insurgency, or a sov-holding system whose corp / alliance you've set to red. Persistent toolbar chip shows the nearest threat at a glance."
+      },
+      "watchlist": {
+        "title": "Watchlist",
+        "desc": "A personal, hand-edited list of holes you're hunting — a specific system, a wormhole type, or a characteristic (shattered, an effect, frig holes). Matches are highlighted on the map with your chosen marker and chime when they appear; one click jumps the view to any match."
       },
       "discordNotif": {
         "title": "Discord notifications",

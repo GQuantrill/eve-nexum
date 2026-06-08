@@ -474,9 +474,15 @@
     "hint": "Trous que vous recherchez. Ajoutez un nom de système ou un J-code ; lorsqu'il apparaît sur la carte, son nœud est mis en évidence (et émet un signal sonore une fois, si activé).",
     "chimeToggle": "Émettre un son quand un système surveillé apparaît",
     "markerAria": "Marqueur",
+    "matchByAria": "Critère",
+    "matchSystem": "Système",
+    "matchWhType": "Type de trou",
+    "quickAdd": "Ajout rapide",
+    "whPlaceholder": "Type de TL, ex. C247",
     "queryPlaceholder": "Nom de système / J-code",
     "notePlaceholder": "Note (facultatif)",
     "onMap": "Sur la carte maintenant",
+    "locate": "Afficher sur la carte",
     "remove": "Retirer de la liste de surveillance",
     "max": "Maximum {{count}} entrées dans la liste de surveillance",
     "add": "Ajouter à la liste de surveillance",
@@ -1112,6 +1118,10 @@
       "proximity": {
         "title": "Alertes de proximité",
         "desc": "Notification du navigateur plus un signal sonore lorsque vous êtes à un nombre de sauts configurable d'une incursion active, d'une insurrection pirate, ou d'un système détenteur de sov dont vous avez mis la corp / l'alliance en rouge. Une pastille persistante dans la barre d'outils montre la menace la plus proche en un coup d'œil."
+      },
+      "watchlist": {
+        "title": "Liste de surveillance",
+        "desc": "Une liste personnelle, éditée à la main, de trous que vous recherchez — un système précis, un type de trou de ver, ou une caractéristique (shattered, un effet, frig-holes). Les correspondances sont mises en évidence sur la carte avec le marqueur que vous avez choisi et émettent un signal sonore lorsqu'elles apparaissent ; un clic amène la vue sur n'importe quelle correspondance."
       },
       "discordNotif": {
         "title": "Notifications Discord",

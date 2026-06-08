@@ -151,6 +151,10 @@ interface MapStore {
   // location in the toolbar). MapCanvas consumes + clears it. null = no request.
   centerRequestEveId: number | null;
   requestCenterOnEveSystem: (eveSystemId: number) => void;
+  // Map node id to centre/zoom on (e.g. the watchlist "show on map" button).
+  // Distinct from the eve-id request so it works for custom systems too.
+  centerRequestNodeId: string | null;
+  requestCenterOnNode: (nodeId: string) => void;
   clearCenterRequest: () => void;
 
   // Route/centre origin override: point jump calcs + centring at another of
@@ -221,6 +225,14 @@ interface MapStore {
   sigRev: Record<string, number>;
   structRev: Record<string, number>;
   anomRev: Record<string, number>;
+
+  // Map-wide index of scanned wormhole-signature types per system (uppercased
+  // wh_type codes), so the watchlist can match a scanned sig anywhere in the
+  // chain — not just connections/statics. Loaded in bulk on map switch and
+  // kept fresh by the open sig pane + remote sig.changed events.
+  sigTypesBySystem: Record<string, string[]>;
+  setSigTypesBulk: (next: Record<string, string[]>) => void;
+  setSystemSigTypes: (systemId: string, types: string[]) => void;
 
   // Realtime: apply an edit pushed from another client (no persist, no undo).
   applyRemote: (event: RemoteEvent) => void;
@@ -408,10 +420,16 @@ export const useMapStore = create<MapStore>()((set, get) => {
     autoLayoutPending: false,
     fitViewPending: false,
     centerRequestEveId: null,
+    centerRequestNodeId: null,
     routeOrigin: null,
     sigRev: {},
     structRev: {},
     anomRev: {},
+    sigTypesBySystem: {},
+    setSigTypesBulk: (next) => set({ sigTypesBySystem: next }),
+    setSystemSigTypes: (systemId, types) => set((s) => ({
+      sigTypesBySystem: { ...s.sigTypesBySystem, [systemId]: types },
+    })),
     panelOrder: ['activity', 'killboard', 'notes', 'signatures', 'anomalies', 'structures', 'npcStations'],
     undoStack: [],
 
@@ -489,7 +507,7 @@ export const useMapStore = create<MapStore>()((set, get) => {
       try {
         const map = await api<WormholeMap>(`/api/maps/${id}`);
         localStorage.setItem('nexum.lastMapId', id);
-        set({ map, activeMapId: id, selectedSystemId: null, selectedConnectionId: null, currentSystemId: null, undoStack: [] });
+        set({ map, activeMapId: id, selectedSystemId: null, selectedConnectionId: null, currentSystemId: null, undoStack: [], sigTypesBySystem: {} });
       } catch (err) {
         // 403/404 — the grant was revoked, or the map was deleted. Reload
         // the list (which will trigger the revocation-detection path above
@@ -657,7 +675,8 @@ export const useMapStore = create<MapStore>()((set, get) => {
     clearFitView: () => set({ fitViewPending: false }),
 
     requestCenterOnEveSystem: (eveSystemId) => set({ centerRequestEveId: eveSystemId }),
-    clearCenterRequest: () => set({ centerRequestEveId: null }),
+    requestCenterOnNode: (nodeId) => set({ centerRequestNodeId: nodeId }),
+    clearCenterRequest: () => set({ centerRequestEveId: null, centerRequestNodeId: null }),
 
     setRouteOrigin: (o) => set({ routeOrigin: o }),
 

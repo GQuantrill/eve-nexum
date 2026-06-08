@@ -6,7 +6,7 @@ import {
   GraphIcon, MapTrifoldIcon, GaugeIcon, MagnifyingGlassIcon, SelectionIcon, ImageIcon, HourglassIcon,
   UsersIcon, UsersThreeIcon, StackIcon, ArrowsMergeIcon, ArrowsClockwiseIcon, LockIcon, ShieldCheckIcon,
   CardsIcon, WaveformIcon, BuildingsIcon, SparkleIcon, ChartLineIcon, FlagBannerIcon, SwordIcon, HandshakeIcon,
-  PathIcon, StarIcon, SnowflakeIcon, LightningIcon, WarningIcon, NavigationArrowIcon, MapPinIcon, BroadcastIcon, BellRingingIcon, DiscordLogoIcon,
+  PathIcon, StarIcon, SnowflakeIcon, LightningIcon, WarningIcon, NavigationArrowIcon, MapPinIcon, BroadcastIcon, BellRingingIcon, DiscordLogoIcon, BinocularsIcon,
   CommandIcon, HouseIcon, SkullIcon, ChartBarIcon, PulseIcon, EyeIcon, SidebarIcon,
   SquaresFourIcon, UserGearIcon, TableIcon, ChartDonutIcon, ClockIcon, ClipboardTextIcon, TagIcon, IdentificationCardIcon,
 } from '@phosphor-icons/react';
@@ -29,7 +29,7 @@ type FeatureId =
   | 'soloCorp' | 'multiCharacter' | 'multiMap' | 'mergeMaps' | 'realtime' | 'mapLocking' | 'rbac'
   | 'systemPanel' | 'sigMgmt' | 'structImport' | 'autoStruct' | 'activityCharts'
   | 'sovStation' | 'killboard' | 'effectDigest' | 'standings'
-  | 'scout' | 'a0' | 'iceBelt' | 'storms' | 'proximity' | 'discordNotif'
+  | 'scout' | 'a0' | 'iceBelt' | 'storms' | 'proximity' | 'discordNotif' | 'watchlist'
   | 'routePlanner' | 'locationTracking' | 'presence' | 'onlineStatus'
   | 'commandPalette' | 'homeHotkey' | 'killHighlights' | 'userStats'
   | 'serverStatus' | 'demoMap' | 'sidebar';
@@ -88,6 +88,7 @@ const FEATURE_SECTIONS: FeatureSection[] = [
       { icon: SnowflakeIcon,       id: 'iceBelt'          },
       { icon: LightningIcon,       id: 'storms'           },
       { icon: WarningIcon,         id: 'proximity'        },
+      { icon: BinocularsIcon,      id: 'watchlist'        },
       { icon: BellRingingIcon,     id: 'discordNotif'     },
       { icon: NavigationArrowIcon, id: 'routePlanner'     },
       { icon: MapPinIcon,          id: 'locationTracking' },

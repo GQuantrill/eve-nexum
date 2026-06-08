@@ -8,6 +8,9 @@ import type { EdgeProps } from '@xyflow/react';
 import type { MapConnection } from '../../types';
 import { useMapStore } from '../../store/mapStore';
 import { useNow30s } from '../../hooks/useNow30s';
+import { useWatchlist } from '../../hooks/useWatchlist';
+import { matchConnection } from '../../utils/watchMatch';
+import { watchMarker } from '../../data/watchMarkers';
 
 const STANDARD_COLOR = '#8a9ab8';
 const JUMPGATE_COLOR  = '#4db8c4';
@@ -54,6 +57,12 @@ export const ConnectionEdge = memo(({
   const conn = data as unknown as MapConnection & { edgeStyle?: string; connectionThickness?: 'thin' | 'standard' | 'thick' | 'extra' };
   const selectConnection = useMapStore((s) => s.selectConnection);
   const now = useNow30s();
+
+  // Watchlist: a connection whose wormhole type (or frig-hole size) is on the
+  // user's watchlist gets a coloured glow in the marker colour.
+  const [watchEntries] = useWatchlist();
+  const watch = conn ? matchConnection(watchEntries, conn) : null;
+  const watchColor = watch ? watchMarker(watch.marker).color : null;
 
   const [edgePath, labelX, labelY] = (() => {
     const args = { sourceX, sourceY, sourcePosition, targetX, targetY, targetPosition };
@@ -106,10 +115,13 @@ export const ConnectionEdge = memo(({
         path={edgePath}
         style={{
           stroke: color,
-          strokeWidth,
+          strokeWidth: watchColor ? strokeWidth + 1 : strokeWidth,
           strokeDasharray: isJumpgate ? '10 5' : undefined,
-          filter: selected ? `drop-shadow(0 0 6px ${color})` : undefined,
-          opacity: selected ? 1 : 0.85,
+          filter: [
+            selected ? `drop-shadow(0 0 6px ${color})` : null,
+            watchColor ? `drop-shadow(0 0 5px ${watchColor}) drop-shadow(0 0 2px ${watchColor})` : null,
+          ].filter(Boolean).join(' ') || undefined,
+          opacity: selected || watchColor ? 1 : 0.85,
         }}
         markerEnd={undefined}
       />

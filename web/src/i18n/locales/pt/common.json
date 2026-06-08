@@ -474,9 +474,15 @@
     "hint": "Buracos que estás a caçar. Adiciona um nome de sistema ou um J-code; quando aparecer no mapa, o seu nó é destacado (e toca uma vez, se ativado).",
     "chimeToggle": "Tocar quando um sistema observado aparecer",
     "markerAria": "Marcador",
+    "matchByAria": "Corresponder por",
+    "matchSystem": "Sistema",
+    "matchWhType": "Tipo de buraco",
+    "quickAdd": "Adição rápida",
+    "whPlaceholder": "Tipo de BV, ex. C247",
     "queryPlaceholder": "Nome de sistema / J-code",
     "notePlaceholder": "Nota (opcional)",
     "onMap": "Agora no mapa",
+    "locate": "Mostrar no mapa",
     "remove": "Remover da lista de observação",
     "max": "Máximo de {{count}} entradas na lista de observação",
     "add": "Adicionar à lista de observação",
@@ -1112,6 +1118,10 @@
       "proximity": {
         "title": "Alertas de proximidade",
         "desc": "Notificação do navegador mais um aviso sonoro quando estiveres a um número configurável de saltos de uma incursão ativa, uma insurgência pirata, ou um sistema com sov cuja corp / aliança tenhas marcado a vermelho. Uma pílula persistente na barra de ferramentas mostra a ameaça mais próxima de relance."
+      },
+      "watchlist": {
+        "title": "Lista de observação",
+        "desc": "Uma lista pessoal, editada à mão, de buracos que estás a caçar — um sistema específico, um tipo de buraco de minhoca, ou uma característica (shattered, um efeito, frig-holes). As correspondências são destacadas no mapa com o marcador que escolheres e tocam quando aparecem; um clique salta a vista para qualquer correspondência."
       },
       "discordNotif": {
         "title": "Notificações do Discord",

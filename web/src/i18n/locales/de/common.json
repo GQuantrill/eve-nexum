@@ -474,9 +474,15 @@
     "hint": "Löcher, nach denen du jagst. Füge einen Systemnamen oder J-Code hinzu; sobald es auf der Karte erscheint, wird sein Knoten hervorgehoben (und gibt einmal einen Ton aus, falls aktiviert).",
     "chimeToggle": "Ton abspielen, wenn ein beobachtetes System erscheint",
     "markerAria": "Markierung",
+    "matchByAria": "Abgleichen nach",
+    "matchSystem": "System",
+    "matchWhType": "Wurmlochtyp",
+    "quickAdd": "Schnell hinzufügen",
+    "whPlaceholder": "WH-Typ, z. B. C247",
     "queryPlaceholder": "Systemname / J-Code",
     "notePlaceholder": "Notiz (optional)",
     "onMap": "Jetzt auf der Karte",
+    "locate": "Auf Karte zeigen",
     "remove": "Aus Beobachtungsliste entfernen",
     "max": "Maximal {{count}} Einträge in der Beobachtungsliste",
     "add": "Zur Beobachtungsliste hinzufügen",
@@ -1112,6 +1118,10 @@
       "proximity": {
         "title": "Näherungswarnungen",
         "desc": "Browser-Benachrichtigung plus ein Audio-Ping, wenn du innerhalb einer konfigurierbaren Anzahl von Sprüngen einer aktiven Inkursion, eines Piratenaufstands oder eines Sov-haltenden Systems bist, dessen Corp / Allianz du auf rot gesetzt hast. Ein dauerhafter Toolbar-Chip zeigt die nächste Bedrohung auf einen Blick."
+      },
+      "watchlist": {
+        "title": "Beobachtungsliste",
+        "desc": "Eine persönliche, von Hand gepflegte Liste von Löchern, nach denen du jagst — ein bestimmtes System, ein Wurmlochtyp oder ein Merkmal (shattered, ein Effekt, Frig-Holes). Treffer werden auf der Karte mit deiner gewählten Markierung hervorgehoben und geben einen Ton aus, sobald sie erscheinen; ein Klick springt mit der Ansicht zu jedem Treffer."
       },
       "discordNotif": {
         "title": "Discord-Benachrichtigungen",

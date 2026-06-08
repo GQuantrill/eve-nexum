@@ -27,7 +27,8 @@ import { useNow30s } from '../../hooks/useNow30s';
 import { useStaleThreshold } from '../../hooks/useStaleThreshold';
 import { useCustomIntel } from '../../hooks/useCustomIntel';
 import { resolveIntelColor, resolveIntelLabel } from '../../utils/intelColors';
-import { useWatchIndex, matchWatch } from '../../hooks/useWatchlist';
+import { useWatchlist } from '../../hooks/useWatchlist';
+import { matchSystem } from '../../utils/watchMatch';
 import { watchMarker } from '../../data/watchMarkers';
 import { useHeatmap } from '../../context/HeatmapContext';
 import { heatValue, heatColor } from '../../utils/heatmap';
@@ -151,12 +152,13 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
   const [customIntel]   = useCustomIntel();
   const intelColor      = resolveIntelColor(sys.intel, customIntel);
   const intelLabel      = resolveIntelLabel(sys.intel, customIntel, t);
-  // Personal watchlist: highlight + corner glyph when this system's name is on
-  // the user's hunting list. Matched by name (case-insensitive).
-  const watchIndex      = useWatchIndex();
-  const watch           = matchWatch(watchIndex, sys.name);
+  // Personal watchlist: highlight + corner icon when this system matches an
+  // entry (by name, class, effect, or a static wormhole type / frig hole).
+  const [watchEntries]  = useWatchlist();
+  const watchSigTypes   = useMapStore((s) => s.sigTypesBySystem[sys.id]);
+  const watch           = matchSystem(watchEntries, sys, watchSigTypes);
   const watchDef        = watch ? watchMarker(watch.marker) : null;
-  const watchTip        = watch ? (watch.note?.trim() || t(`watchMarker.${watch.marker}`)) : undefined;
+  const watchTip        = watch ? (watch.note.trim() || t(`watchMarker.${watch.marker}`)) : undefined;
 
   // Tooltip label: dedupe by scout system name (Thera / Turnur). Multiple
   // connections from the same scout are summarised, mixed scouts are listed.

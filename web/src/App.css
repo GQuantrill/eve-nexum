@@ -1379,17 +1379,17 @@
 /* Tab handle on the panel's right edge — the only bit visible when closed. */
 .watchlist-panel__tab {
   position: absolute;
-  right: -28px;
+  right: -38px;
   top: 50%;
   transform: translateY(-50%);
-  width: 28px;
-  min-height: 56px;
-  padding: 6px 0;
+  width: 38px;
+  min-height: 64px;
+  padding: 8px 0;
   background: #0d1117;
   border: 1px solid #1e2740;
   border-left: none;
   border-radius: 0 6px 6px 0;
-  color: #c0ccde;
+  color: #6ea0ff;
   cursor: pointer;
   display: flex;
   flex-direction: column;
@@ -1840,15 +1840,60 @@
   cursor: pointer;
 }
 
+/* Quick-add characteristic palette: tick a chip to drop a matching row in. */
+.watchlist__quickadd {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.watchlist__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.watchlist__chip {
+  background: #0a0e1a;
+  border: 1px solid #1e2740;
+  border-radius: 12px;
+  padding: 2px 9px;
+  font-size: calc(11px * var(--font-scale, 1));
+  color: #9aa6c4;
+  cursor: pointer;
+  transition: color 0.12s, border-color 0.12s, background 0.12s;
+}
+
+.watchlist__chip:hover { color: #c8d4f0; }
+
+.watchlist__chip--active {
+  color: #cfe0ff;
+  border-color: #3b5a98;
+  background: rgba(110,160,255,0.14);
+}
+
 .watchlist__list {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 12px;
+  margin-top: 2px;
 }
 
-/* One entry per row: marker | name | note | delete. Lives in the wide
-   left-docked panel, so everything fits on a single line. */
+/* Each entry is a small card: a top line (marker | what | delete) and a
+   bottom line (value + note). The left-docked panel is wide enough for this
+   to read comfortably without clipping. */
 .watchlist__row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid #18223a;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.02);
+}
+
+.watchlist__row-top,
+.watchlist__row-bottom {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -1862,9 +1907,9 @@
   width: 20px;
 }
 
-.watchlist__marker {
+.watchlist__marker,
+.watchlist__by {
   flex-shrink: 0;
-  width: 82px;
   background: #0a0e1a;
   border: 1px solid #1e2740;
   border-radius: 4px;
@@ -1875,16 +1920,22 @@
   cursor: pointer;
 }
 
-.watchlist__query-wrap {
-  position: relative;
-  display: flex;
-  align-items: center;
-  flex: 1.1;
+.watchlist__marker { width: 82px; }
+.watchlist__by { flex: 1; min-width: 0; }
+
+.watchlist__char-label {
+  flex: 1;
   min-width: 0;
+  font-size: calc(12px * var(--font-scale, 1));
+  color: #c8d4f0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.watchlist__query,
+.watchlist__value,
 .watchlist__note {
+  flex: 1;
   width: 100%;
   min-width: 0;
   background: #0a0e1a;
@@ -1896,24 +1947,69 @@
   outline: none;
 }
 
-.watchlist__query { padding-right: 18px; }
-.watchlist__note { flex: 1; min-width: 0; color: #9aa6c4; }
+.watchlist__note { color: #9aa6c4; }
 
-.watchlist__query:focus,
+.watchlist__value:focus,
 .watchlist__note:focus {
   border-color: #6ea0ff;
 }
 
-/* Small dot inside the query field marking "this hole is on the map right now". */
-.watchlist__onmap {
-  position: absolute;
-  right: 6px;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #4ade80;
-  box-shadow: 0 0 5px #4ade80;
-  pointer-events: none;
+/* "Show on map" button — only present when the entry matches something on the
+   current map. Green to read as "it's here, jump to it". Repeated clicks cycle
+   through all matches. */
+.watchlist__locate {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  background: rgba(74,222,128,0.10);
+  border: 1px solid #2c6e49;
+  color: #4ade80;
+  border-radius: 4px;
+  padding: 3px 5px;
+  cursor: pointer;
+  line-height: 0;
+}
+
+.watchlist__locate:hover,
+.watchlist__locate--open {
+  background: rgba(74,222,128,0.20);
+  color: #6ef0a0;
+}
+
+.watchlist__locate-count {
+  font-size: calc(10px * var(--font-scale, 1));
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* Expanded list of matches for an entry with more than one on the map. */
+.watchlist__matches {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 0 2px 26px;
+}
+
+.watchlist__match {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  text-align: start;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  padding: 3px 6px;
+  font-size: calc(12px * var(--font-scale, 1));
+  color: #aeb9d6;
+  cursor: pointer;
+}
+
+.watchlist__match:hover {
+  background: rgba(110,160,255,0.12);
+  color: #cfe0ff;
 }
 
 .watchlist__remove {

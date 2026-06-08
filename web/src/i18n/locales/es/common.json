@@ -474,9 +474,15 @@
     "hint": "Agujeros que estás buscando. Añade un nombre de sistema o un J-code; cuando aparezca en el mapa, su nodo se resalta (y suena una vez, si está activado).",
     "chimeToggle": "Sonar cuando aparezca un sistema vigilado",
     "markerAria": "Marcador",
+    "matchByAria": "Coincidir por",
+    "matchSystem": "Sistema",
+    "matchWhType": "Tipo de agujero",
+    "quickAdd": "Añadir rápido",
+    "whPlaceholder": "Tipo de AG, p. ej. C247",
     "queryPlaceholder": "Nombre de sistema / J-code",
     "notePlaceholder": "Nota (opcional)",
     "onMap": "Ahora en el mapa",
+    "locate": "Mostrar en el mapa",
     "remove": "Quitar de la lista de seguimiento",
     "max": "Máximo {{count}} entradas en la lista de seguimiento",
     "add": "Añadir a la lista de seguimiento",
@@ -1112,6 +1118,10 @@
       "proximity": {
         "title": "Alertas de proximidad",
         "desc": "Notificación del navegador más un aviso sonoro cuando estés a un número configurable de saltos de una incursión activa, una insurgencia pirata, o un sistema con sov cuya corp / alianza hayas marcado en rojo. Una píldora persistente en la barra de herramientas muestra la amenaza más cercana de un vistazo."
+      },
+      "watchlist": {
+        "title": "Lista de seguimiento",
+        "desc": "Una lista personal, editada a mano, de agujeros que estás buscando — un sistema concreto, un tipo de agujero de gusano, o una característica (shattered, un efecto, frig-holes). Las coincidencias se resaltan en el mapa con el marcador que elijas y suenan al aparecer; un clic salta la vista a cualquier coincidencia."
       },
       "discordNotif": {
         "title": "Notificaciones de Discord",

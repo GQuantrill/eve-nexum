@@ -1,6 +1,6 @@
 {
   "name": "nexum-server",
-  "license": "GPL-3.0-or-later",
+  "license": "AGPL-3.0-or-later",
   "author": {
     "name": "Graeme Quantrill",
     "email": "gq@area404.org",
