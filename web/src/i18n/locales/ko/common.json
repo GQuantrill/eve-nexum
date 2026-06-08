@@ -482,6 +482,7 @@
     "queryPlaceholder": "성계 이름 / J-code",
     "notePlaceholder": "메모(선택)",
     "onMap": "현재 맵에 있음",
+    "locate": "지도에 표시",
     "remove": "관심 목록에서 제거",
     "max": "관심 목록 항목 최대 {{count}}개",
     "add": "관심 목록에 추가",

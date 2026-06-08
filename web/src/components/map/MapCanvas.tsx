@@ -133,6 +133,7 @@ export function MapCanvas() {
   const fitViewPending       = useMapStore((s) => s.fitViewPending);
   const clearFitView         = useMapStore((s) => s.clearFitView);
   const centerRequestEveId   = useMapStore((s) => s.centerRequestEveId);
+  const centerRequestNodeId  = useMapStore((s) => s.centerRequestNodeId);
   const clearCenterRequest   = useMapStore((s) => s.clearCenterRequest);
   const routeOrigin          = useMapStore((s) => s.routeOrigin);
   const setRouteOrigin       = useMapStore((s) => s.setRouteOrigin);
@@ -291,6 +292,18 @@ export function MapCanvas() {
     });
     return () => cancelAnimationFrame(raf);
   }, [centerRequestEveId, systems, centerOnSystem, getZoom, clearCenterRequest]);
+
+  // Centre + zoom on an explicitly requested map node (e.g. the watchlist
+  // "show on map" button). Keyed by node id so it works for custom systems too.
+  useEffect(() => {
+    if (centerRequestNodeId == null) return;
+    const zoom = Math.max(getZoom(), 1.1);
+    const raf = requestAnimationFrame(() => {
+      centerOnSystem(centerRequestNodeId, zoom);
+      clearCenterRequest();
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [centerRequestNodeId, centerOnSystem, getZoom, clearCenterRequest]);
 
   // Follow a tracked character: when routing/centring is pinned to another of
   // the account's characters and they jump, update the origin to their new

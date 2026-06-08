@@ -1954,15 +1954,26 @@
   border-color: #6ea0ff;
 }
 
-/* "On the map now" dot on the top line. */
-.watchlist__onmap {
+/* "Show on map" button — only present when the entry matches something on the
+   current map. Green to read as "it's here, jump to it". Repeated clicks cycle
+   through all matches. */
+.watchlist__locate {
   flex-shrink: 0;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #4ade80;
-  box-shadow: 0 0 5px #4ade80;
-  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(74,222,128,0.10);
+  border: 1px solid #2c6e49;
+  color: #4ade80;
+  border-radius: 4px;
+  padding: 3px 5px;
+  cursor: pointer;
+  line-height: 0;
+}
+
+.watchlist__locate:hover {
+  background: rgba(74,222,128,0.20);
+  color: #6ef0a0;
 }
 
 .watchlist__remove {

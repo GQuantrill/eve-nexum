@@ -482,6 +482,7 @@
     "queryPlaceholder": "星系名 / J-code",
     "notePlaceholder": "メモ（任意）",
     "onMap": "現在マップ上",
+    "locate": "マップに表示",
     "remove": "ウォッチリストから削除",
     "max": "ウォッチリストの登録は最大 {{count}} 件",
     "add": "ウォッチリストに追加",

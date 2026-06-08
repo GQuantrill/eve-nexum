@@ -482,6 +482,7 @@
     "queryPlaceholder": "星系名称 / J-code",
     "notePlaceholder": "备注（可选）",
     "onMap": "现已在地图上",
+    "locate": "在地图上显示",
     "remove": "从关注列表移除",
     "max": "关注列表最多 {{count}} 条",
     "add": "添加到关注列表",

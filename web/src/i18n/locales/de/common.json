@@ -482,6 +482,7 @@
     "queryPlaceholder": "Systemname / J-Code",
     "notePlaceholder": "Notiz (optional)",
     "onMap": "Jetzt auf der Karte",
+    "locate": "Auf Karte zeigen",
     "remove": "Aus Beobachtungsliste entfernen",
     "max": "Maximal {{count}} Einträge in der Beobachtungsliste",
     "add": "Zur Beobachtungsliste hinzufügen",

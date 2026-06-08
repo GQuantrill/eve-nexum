@@ -1,7 +1,7 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { v4 as uuid } from 'uuid';
-import { TrashIcon, PlusIcon } from '@phosphor-icons/react';
+import { TrashIcon, PlusIcon, CrosshairIcon } from '@phosphor-icons/react';
 import { useMapStore } from '../../store/mapStore';
 import { useWatchlist, MAX_WATCH } from '../../hooks/useWatchlist';
 import { useUserSetting } from '../../hooks/useUserSetting';
@@ -31,19 +31,36 @@ export function WatchlistBlock() {
   const systems     = useMapStore((s) => s.map.systems);
   const connections = useMapStore((s) => s.map.connections);
   const sigTypesBySystem = useMapStore((s) => s.sigTypesBySystem);
+  const requestCenterOnNode = useMapStore((s) => s.requestCenterOnNode);
 
-  // How many things on the active map each entry currently matches — drives the
-  // "on map now" dot. Cheap: a handful of entries over the map's systems/edges.
-  const matchCounts = useMemo(() => {
-    const counts = new Map<string, number>();
+  // Map node ids each entry currently matches — drives the "show on map" button.
+  // For connection matches we centre on an endpoint node (connections have no
+  // node of their own). Cheap: a few entries over the map's systems/edges.
+  const matchTargets = useMemo(() => {
+    const m = new Map<string, string[]>();
     for (const it of items) {
-      let n = 0;
-      for (const s of systems) if (systemMatchesEntry(it, s, sigTypesBySystem[s.id])) n++;
-      for (const c of connections) if (connectionMatchesEntry(it, c)) n++;
-      counts.set(it.id, n);
+      const ids: string[] = [];
+      for (const s of systems) if (systemMatchesEntry(it, s, sigTypesBySystem[s.id])) ids.push(s.id);
+      for (const c of connections) {
+        if (!connectionMatchesEntry(it, c)) continue;
+        const nodeId = c.sourceId || c.targetId;
+        if (nodeId && !ids.includes(nodeId)) ids.push(nodeId);
+      }
+      m.set(it.id, ids);
     }
-    return counts;
+    return m;
   }, [items, systems, connections, sigTypesBySystem]);
+
+  // Remember where each entry's "show on map" last jumped, so repeated clicks
+  // cycle through all of that entry's matches (e.g. every shattered system).
+  const cycleRef = useRef<Map<string, number>>(new Map());
+  function locate(entryId: string) {
+    const ids = matchTargets.get(entryId);
+    if (!ids || ids.length === 0) return;
+    const next = ((cycleRef.current.get(entryId) ?? -1) + 1) % ids.length;
+    cycleRef.current.set(entryId, next);
+    requestCenterOnNode(ids[next]);
+  }
 
   const activeKeys = useMemo(() => new Set(items.map((it) => matchKey(it.match))), [items]);
 
@@ -117,7 +134,8 @@ export function WatchlistBlock() {
         <div className="watchlist__list">
           {items.map((it) => {
             const def = watchMarker(it.marker);
-            const onMap = (matchCounts.get(it.id) ?? 0) > 0;
+            const targets = matchTargets.get(it.id) ?? [];
+            const onMap = targets.length > 0;
             const manual = it.match.by === 'system' || it.match.by === 'whType';
             return (
               <div key={it.id} className="watchlist__row">
@@ -149,7 +167,17 @@ export function WatchlistBlock() {
                   ) : (
                     <span className="watchlist__char-label">{matchLabel(it.match)}</span>
                   )}
-                  {onMap && <span className="watchlist__onmap" title={t('watchlist.onMap')} aria-label={t('watchlist.onMap')} />}
+                  {onMap && (
+                    <button
+                      type="button"
+                      className="watchlist__locate"
+                      onClick={() => locate(it.id)}
+                      title={targets.length > 1 ? `${t('watchlist.locate')} (${targets.length})` : t('watchlist.locate')}
+                      aria-label={t('watchlist.locate')}
+                    >
+                      <CrosshairIcon size={14} weight="bold" />
+                    </button>
+                  )}
                   <button
                     type="button"
                     className="watchlist__remove"

@@ -473,6 +473,7 @@
     "queryPlaceholder": "System name / J-code",
     "notePlaceholder": "Note (optional)",
     "onMap": "On the map now",
+    "locate": "Show on map",
     "remove": "Remove from watchlist",
     "max": "Maximum {{count}} watchlist entries",
     "add": "Add to watchlist",

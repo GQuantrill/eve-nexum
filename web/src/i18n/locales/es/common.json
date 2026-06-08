@@ -482,6 +482,7 @@
     "queryPlaceholder": "Nombre de sistema / J-code",
     "notePlaceholder": "Nota (opcional)",
     "onMap": "Ahora en el mapa",
+    "locate": "Mostrar en el mapa",
     "remove": "Quitar de la lista de seguimiento",
     "max": "Máximo {{count}} entradas en la lista de seguimiento",
     "add": "Añadir a la lista de seguimiento",

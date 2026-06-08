@@ -151,6 +151,10 @@ interface MapStore {
   // location in the toolbar). MapCanvas consumes + clears it. null = no request.
   centerRequestEveId: number | null;
   requestCenterOnEveSystem: (eveSystemId: number) => void;
+  // Map node id to centre/zoom on (e.g. the watchlist "show on map" button).
+  // Distinct from the eve-id request so it works for custom systems too.
+  centerRequestNodeId: string | null;
+  requestCenterOnNode: (nodeId: string) => void;
   clearCenterRequest: () => void;
 
   // Route/centre origin override: point jump calcs + centring at another of
@@ -416,6 +420,7 @@ export const useMapStore = create<MapStore>()((set, get) => {
     autoLayoutPending: false,
     fitViewPending: false,
     centerRequestEveId: null,
+    centerRequestNodeId: null,
     routeOrigin: null,
     sigRev: {},
     structRev: {},
@@ -670,7 +675,8 @@ export const useMapStore = create<MapStore>()((set, get) => {
     clearFitView: () => set({ fitViewPending: false }),
 
     requestCenterOnEveSystem: (eveSystemId) => set({ centerRequestEveId: eveSystemId }),
-    clearCenterRequest: () => set({ centerRequestEveId: null }),
+    requestCenterOnNode: (nodeId) => set({ centerRequestNodeId: nodeId }),
+    clearCenterRequest: () => set({ centerRequestEveId: null, centerRequestNodeId: null }),
 
     setRouteOrigin: (o) => set({ routeOrigin: o }),
 
