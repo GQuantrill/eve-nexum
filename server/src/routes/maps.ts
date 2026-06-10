@@ -1363,6 +1363,33 @@ mapsRouter.post('/:mapId/presence', async (req, res) => {
     eveSystemId: typeof body.eveSystemId === 'number' ? body.eveSystemId : null,
     shipTypeId:  typeof body.shipTypeId  === 'number' ? body.shipTypeId  : null,
   }, req.get('x-client-id') ?? null);
+
+  // A character physically in a mapped system keeps it "active" so it never
+  // shows as stale while occupied — independent of whether any sigs/anoms are
+  // touched. Throttled to the last_activity_at column itself: the UPDATE only
+  // matches (and only then broadcasts) when activity is already older than a few
+  // minutes, so the 25 s presence heartbeat doesn't write/broadcast every tick.
+  // Fire-and-forget — never block the presence ack.
+  if (typeof body.eveSystemId === 'number') {
+    db.query(
+      `UPDATE map_systems SET last_activity_at = NOW()
+         WHERE map_id = $1 AND eve_system_id = $2
+           AND last_activity_at < NOW() - INTERVAL '5 minutes'
+       RETURNING id, last_activity_at`,
+      [mapId, body.eveSystemId],
+    ).then((r) => {
+      const row = r.rows[0] as { id: string; last_activity_at: Date } | undefined;
+      if (row) {
+        publishToMap(mapId, {
+          type: 'system.update',
+          actor: null,
+          id: row.id,
+          updates: { lastActivityAt: new Date(row.last_activity_at).toISOString() },
+        });
+      }
+    }).catch(() => { /* best-effort: a failed activity bump must not break presence */ });
+  }
+
   res.status(204).end();
 });
 
