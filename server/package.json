@@ -17,6 +17,9 @@
     "seed-demo": "tsx scripts/seed-demo.ts",
     "extract-wormholes": "tsx scripts/extract-wormholes.ts"
   },
+  "resolutions": {
+    "qs": "^6.15.2"
+  },
   "dependencies": {
     "cheerio": "^1.2.0",
     "connect-pg-simple": "^10.0.0",

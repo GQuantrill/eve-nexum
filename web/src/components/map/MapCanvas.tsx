@@ -501,20 +501,34 @@ export function MapCanvas() {
     return () => clearInterval(id);
   }, [removeConnection]);
 
-  // Edges driven directly from store — no local duplicate state
+  // Live handle re-anchoring while a node is being dragged. The committed
+  // sourceHandle/targetHandle only change on drag-stop; these local overrides
+  // let the edge visually snap to the optimal handle pair *during* the drag
+  // without writing to the store/server on every frame. Keyed by connection
+  // id; merged into the edges memo (below) and cleared on drag-stop. Declared
+  // here, before the edges memo that reads it, to avoid a TDZ error.
+  const [dragHandles, setDragHandles] = useState<
+    Map<string, { sourceHandle: string; targetHandle: string }>
+  >(new Map());
+
+  // Edges driven directly from store — no local duplicate state, except for
+  // the live drag-handle overrides above.
   const edges = useMemo(
     () =>
-      connections.map((c) => ({
-        id: c.id,
-        source: c.sourceId,
-        target: c.targetId,
-        sourceHandle: c.sourceHandle ?? undefined,
-        targetHandle: c.targetHandle ?? undefined,
-        type: 'connection',
-        data: { ...c, edgeStyle, connectionThickness } as unknown as Record<string, unknown>,
-        selected: c.id === selectedConnectionId,
-      })),
-    [connections, selectedConnectionId, edgeStyle, connectionThickness],
+      connections.map((c) => {
+        const ov = dragHandles.get(c.id);
+        return {
+          id: c.id,
+          source: c.sourceId,
+          target: c.targetId,
+          sourceHandle: ov?.sourceHandle ?? c.sourceHandle ?? undefined,
+          targetHandle: ov?.targetHandle ?? c.targetHandle ?? undefined,
+          type: 'connection',
+          data: { ...c, edgeStyle, connectionThickness } as unknown as Record<string, unknown>,
+          selected: c.id === selectedConnectionId,
+        };
+      }),
+    [connections, selectedConnectionId, edgeStyle, connectionThickness, dragHandles],
   );
 
   const onEdgesChange = useCallback(
@@ -549,6 +563,36 @@ export function MapCanvas() {
     [addConnection, canEdit, systems],
   );
 
+  const onNodeDrag = useCallback(
+    (_: React.MouseEvent, _node: Node, movedNodes: Node[]) => {
+      if (!canEdit) return;
+      const movedIds = new Set(movedNodes.map((n) => n.id));
+      // Live positions: store positions overridden by the in-flight drag.
+      const posMap = new Map(systems.map((s) => [s.id, s.position]));
+      movedNodes.forEach((n) => posMap.set(n.id, n.position));
+
+      setDragHandles((prev) => {
+        let next = prev;
+        for (const conn of connections) {
+          if (!movedIds.has(conn.sourceId) && !movedIds.has(conn.targetId)) continue;
+          const src = posMap.get(conn.sourceId);
+          const tgt = posMap.get(conn.targetId);
+          if (!src || !tgt) continue;
+          const { sourceHandle, targetHandle } = pickHandles(src, tgt);
+          const cur = next.get(conn.id);
+          if (!cur || cur.sourceHandle !== sourceHandle || cur.targetHandle !== targetHandle) {
+            if (next === prev) next = new Map(prev);
+            next.set(conn.id, { sourceHandle, targetHandle });
+          }
+        }
+        // Returning the same reference when nothing flipped avoids a re-render,
+        // so this only costs a render when a handle actually changes side.
+        return next;
+      });
+    },
+    [canEdit, systems, connections],
+  );
+
   const onNodeDragStop = useCallback(
     (_: React.MouseEvent, _node: Node, movedNodes: Node[]) => {
       if (!canEdit) return;
@@ -570,6 +614,9 @@ export function MapCanvas() {
           updateConnection(conn.id, { sourceHandle, targetHandle });
         }
       }
+      // The committed handles now match what the live override was showing, so
+      // drop the overrides (no flicker — the store write above is synchronous).
+      setDragHandles((prev) => (prev.size ? new Map() : prev));
     },
     [moveSystem, systems, connections, updateConnection, canEdit],
   );
@@ -950,6 +997,7 @@ export function MapCanvas() {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
+        onNodeDrag={onNodeDrag}
         onNodeDragStop={onNodeDragStop}
         onPaneContextMenu={onPaneContextMenu}
         onNodeContextMenu={onNodeContextMenu}
