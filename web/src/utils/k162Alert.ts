@@ -1,4 +1,5 @@
 import { toast } from '../components/ui/Toaster';
+import { NOTIFY, notifyOn, fireDesktopNotification } from './notificationPrefs';
 
 // Audio context is created lazily on first use to avoid autoplay-policy issues.
 let audioCtx: AudioContext | null = null;
@@ -22,20 +23,16 @@ function playBeep() {
   } catch { /* audio blocked / unavailable — silent fail */ }
 }
 
-function fireBrowserNotification(sysName: string) {
-  if (typeof Notification === 'undefined') return;
-  if (Notification.permission !== 'granted') return;
-  try {
-    new Notification('Inbound K162', {
-      body:  `New K162 wormhole identified in ${sysName}`,
-      tag:   `nexum-k162-${sysName}`,
-    });
-  } catch { /* ignore */ }
-}
-
-/** Fire the in-app toast, browser push, and audio ping for a newly-identified K162. */
+/**
+ * Fire the in-app toast, plus the browser push and audio ping for a
+ * newly-identified K162 — the latter two only if the user has those channels
+ * enabled (Notifications section in the sidebar). The toast is in-app feedback
+ * and always shows.
+ */
 export function alertInboundK162(sysName: string) {
   toast.info(`Inbound K162 in ${sysName}`);
-  fireBrowserNotification(sysName);
-  playBeep();
+  if (notifyOn(NOTIFY.k162Desktop)) {
+    fireDesktopNotification('Inbound K162', `New K162 wormhole identified in ${sysName}`, `nexum-k162-${sysName}`);
+  }
+  if (notifyOn(NOTIFY.k162Sound)) playBeep();
 }

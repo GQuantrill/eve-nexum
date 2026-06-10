@@ -5,6 +5,7 @@ import { useUserSetting } from './useUserSetting';
 import { useWatchlist } from './useWatchlist';
 import { matchSystem, matchConnection } from '../utils/watchMatch';
 import { toast } from '../components/ui/Toaster';
+import { NOTIFY, fireDesktopNotification } from '../utils/notificationPrefs';
 
 // Lazily-created shared audio context (autoplay policy: only on first sound).
 let audioCtx: AudioContext | null = null;
@@ -54,7 +55,8 @@ export function useWatchlistAlerts() {
   const activeMapId = useMapStore((s) => s.activeMapId);
   const sigTypesBySystem = useMapStore((s) => s.sigTypesBySystem);
   const [entries]   = useWatchlist();
-  const [soundOn]   = useUserSetting<boolean>('nexum.watchlist.sound', true);
+  const [soundOn]   = useUserSetting<boolean>(NOTIFY.watchlistSound, true);
+  const [desktopOn] = useUserSetting<boolean>(NOTIFY.watchlistDesktop, false);
 
   const stateRef = useRef<{ mapId: string | null; entries: unknown; alerted: Set<string>; armAt: number }>({
     mapId: null, entries: null, alerted: new Set(), armAt: 0,
@@ -106,9 +108,12 @@ export function useWatchlistAlerts() {
       st.alerted.add(key);
       toast.info(t('watchlist.appeared', { name: info.name, marker: info.marker }));
       if (soundOn) playWatchChime();
+      if (desktopOn) {
+        fireDesktopNotification(t('watchlist.notifTitle'), `${info.marker}: ${info.name}`, `nexum-watch-${key}`);
+      }
     }
     for (const key of Array.from(st.alerted)) {
       if (!present.has(key)) st.alerted.delete(key);
     }
-  }, [systems, connections, activeMapId, sigTypesBySystem, entries, soundOn, t]);
+  }, [systems, connections, activeMapId, sigTypesBySystem, entries, soundOn, desktopOn, t]);
 }

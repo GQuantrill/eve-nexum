@@ -2406,6 +2406,46 @@
   margin: 0;
 }
 
+/* Notifications section — per-event desktop / sound checkbox grid. */
+.notif-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 6px;
+}
+
+.notif-grid__head,
+.notif-grid__row {
+  display: grid;
+  grid-template-columns: 1fr 58px 58px;
+  align-items: center;
+}
+
+.notif-grid__head {
+  padding-bottom: 3px;
+  border-bottom: 1px solid #1e2740;
+  margin-bottom: 2px;
+}
+
+.notif-grid__head span:nth-child(n + 2) {
+  justify-self: center;
+  color: #6b7a99;
+  font-size: calc(11px * var(--font-scale, 1));
+}
+
+.notif-grid__row {
+  padding: 3px 0;
+}
+
+.notif-grid__row .map-sidebar__toggle-input {
+  justify-self: center;
+}
+
+.notif-grid__label {
+  color: #c8d4f0;
+  font-size: calc(13px * var(--font-scale, 1));
+}
+
 .map-sidebar__divider {
   height: 1px;
   background: #1e2740;
