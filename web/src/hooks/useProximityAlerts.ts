@@ -6,6 +6,7 @@ import { useRoute } from './useRoute';
 import { useStandings } from './useStandings';
 import { ensureSovLoaded, getSovEntries } from './useSovData';
 import { useUserSetting, readUserSetting, writeUserSetting } from './useUserSetting';
+import { NOTIFY, notifyOn } from '../utils/notificationPrefs';
 
 export type ThreatKind = 'incursion' | 'insurgency' | 'hostile-sov';
 
@@ -156,8 +157,8 @@ export function useProximityAlerts(): {
     const inZone = !!nearest && nearest.jumps <= threshold;
     if (inZone && !inZoneRef.current && nearest) {
       const sysName = nameMap.get(nearest.systemId) ?? String(nearest.systemId);
-      fireBrowserNotification(nearest.kind, nearest.jumps, sysName);
-      playBeep();
+      if (notifyOn(NOTIFY.proximityDesktop)) fireBrowserNotification(nearest.kind, nearest.jumps, sysName);
+      if (notifyOn(NOTIFY.proximitySound)) playBeep();
       inZoneRef.current = true;
     } else if (!inZone) {
       inZoneRef.current = false;

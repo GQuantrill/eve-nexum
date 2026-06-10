@@ -18,6 +18,7 @@ import {
   type MinimapPosition,
 } from "../../hooks/useMinimapPosition";
 import { useUserSetting } from "../../hooks/useUserSetting";
+import { NOTIFY } from "../../utils/notificationPrefs";
 import { useResettableState } from "../../hooks/useResettableState";
 import { DEFAULT_BOOKMARK_FORMAT, BOOKMARK_TOKENS } from "../../utils/signatureBookmark";
 import { toPng } from "html-to-image";
@@ -54,6 +55,40 @@ function SettingToggle({
         onChange={(e) => setEnabled(e.target.checked)}
       />
     </label>
+  );
+}
+
+// One event row in the Notifications grid: an event label with independent
+// desktop + sound checkboxes, each backed by its own ui_settings key.
+function NotifRow({
+  label, desktopKey, soundKey, desktopDefault = true, soundDefault = true,
+}: {
+  label: string;
+  desktopKey: string;
+  soundKey: string;
+  desktopDefault?: boolean;
+  soundDefault?: boolean;
+}) {
+  const [desktop, setDesktop] = useUserSetting<boolean>(desktopKey, desktopDefault);
+  const [sound, setSound]     = useUserSetting<boolean>(soundKey, soundDefault);
+  return (
+    <div className="notif-grid__row">
+      <span className="notif-grid__label">{label}</span>
+      <input
+        type="checkbox"
+        className="map-sidebar__toggle-input"
+        checked={desktop}
+        onChange={(e) => setDesktop(e.target.checked)}
+        aria-label={`${label} — desktop`}
+      />
+      <input
+        type="checkbox"
+        className="map-sidebar__toggle-input"
+        checked={sound}
+        onChange={(e) => setSound(e.target.checked)}
+        aria-label={`${label} — sound`}
+      />
+    </div>
   );
 }
 
@@ -107,6 +142,7 @@ type SectionId =
   | "route"
   | "chainExits"
   | "proximityAlerts"
+  | "notifications"
   | "activity"
   | "fleet"
   | "share"
@@ -862,6 +898,16 @@ export function MapSidebar() {
               <option value={5}>{t("mapSidebar.proximityLe", { count: 5 })}</option>
             </select>
           </div>
+          <div className="map-sidebar__hint">
+            {t("mapSidebar.proximityNotifyHint")}
+          </div>
+        </CollapsibleSection>
+
+        <CollapsibleSection
+          title={t("mapSidebar.sections.notifications")}
+          {...sectionProps("notifications")}
+        >
+          <div className="map-sidebar__hint">{t("mapSidebar.notifHint")}</div>
 
           <div className="map-sidebar__row">
             <label className="map-sidebar__label">{t("mapSidebar.browserNotifications")}</label>
@@ -887,10 +933,32 @@ export function MapSidebar() {
             )}
           </div>
           {notifPermission === "denied" && (
-            <div className="map-sidebar__hint">
-              {t("mapSidebar.notifBlockedHint")}
-            </div>
+            <div className="map-sidebar__hint">{t("mapSidebar.notifBlockedHint")}</div>
           )}
+
+          <div className="notif-grid">
+            <div className="notif-grid__head">
+              <span />
+              <span>{t("mapSidebar.notifColDesktop")}</span>
+              <span>{t("mapSidebar.notifColSound")}</span>
+            </div>
+            <NotifRow
+              label={t("mapSidebar.notifK162")}
+              desktopKey={NOTIFY.k162Desktop}
+              soundKey={NOTIFY.k162Sound}
+            />
+            <NotifRow
+              label={t("mapSidebar.notifProximity")}
+              desktopKey={NOTIFY.proximityDesktop}
+              soundKey={NOTIFY.proximitySound}
+            />
+            <NotifRow
+              label={t("mapSidebar.notifWatchlist")}
+              desktopKey={NOTIFY.watchlistDesktop}
+              soundKey={NOTIFY.watchlistSound}
+              desktopDefault={false}
+            />
+          </div>
         </CollapsibleSection>
 
         <CollapsibleSection title={t("mapSidebar.sections.activity")} {...sectionProps("activity")}>
