@@ -36,6 +36,13 @@ export async function api<T = unknown>(path: string, options?: RequestInit): Pro
     headers: { 'Content-Type': 'application/json', 'X-Client-Id': CLIENT_ID, ...optHeaders },
   });
   if (!res.ok) throw new Error(`API ${path} → ${res.status}`);
+  // A 204 (or otherwise empty) response has no body to parse — calling
+  // res.json() on it throws "Unexpected end of JSON input". Treat no-content
+  // responses as a successful undefined so callers that don't read the body
+  // (DELETEs, etc.) don't surface a bogus error.
+  if (res.status === 204 || res.headers.get('content-length') === '0') {
+    return undefined as T;
+  }
   return res.json() as Promise<T>;
 }
 
