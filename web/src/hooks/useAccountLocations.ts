@@ -26,7 +26,11 @@ interface RawResponse {
   }>;
 }
 
-const POLL_MS = 30_000;
+// Matches the active character's location cadence (useCharacterLocation) so a
+// tracked alt's dot keeps up gate-to-gate instead of lagging ~30 s behind. The
+// endpoint already fans out to ESI per character, and ESI caches location, so a
+// 10 s cadence is in line with what the main character already does.
+const POLL_MS = 10_000;
 const EMPTY: AccountLocations = { bySystem: new Map(), byChar: new Map() };
 
 let moduleCache: { data: AccountLocations; fetchedAt: number } | null = null;

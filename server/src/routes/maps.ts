@@ -1261,7 +1261,7 @@ mapsRouter.post('/:mapId/presence', async (req, res) => {
   const characterName = req.session.characterName;
   if (!characterId || !characterName) { res.status(401).json({ error: 'No character on session' }); return; }
 
-  const body = req.body as { eveSystemId?: unknown; shipTypeId?: unknown };
+  const body = req.body as { eveSystemId?: unknown; shipTypeId?: unknown; presentSystemIds?: unknown };
   reportPresence(mapId, {
     characterId,
     characterName,
@@ -1271,20 +1271,29 @@ mapsRouter.post('/:mapId/presence', async (req, res) => {
 
   // A character physically in a mapped system keeps it "active" so it never
   // shows as stale while occupied — independent of whether any sigs/anoms are
-  // touched. Throttled to the last_activity_at column itself: the UPDATE only
-  // matches (and only then broadcasts) when activity is already older than a few
-  // minutes, so the 25 s presence heartbeat doesn't write/broadcast every tick.
-  // Fire-and-forget — never block the presence ack.
-  if (typeof body.eveSystemId === 'number') {
+  // touched, and independent of which character is the active viewer. The client
+  // sends presentSystemIds = every system one of the account's *online*
+  // characters is in right now (active viewer + any online alt), so a tracked
+  // alt — or an alt flying a different route — revives its own system too. Older
+  // clients send only eveSystemId; fold it in for back-compat.
+  // Throttled at the column: the UPDATE only matches (and only then broadcasts)
+  // systems whose activity is already older than a few minutes, so the 25 s
+  // heartbeat doesn't write/broadcast every tick. Fire-and-forget — never block
+  // the presence ack.
+  const presentIds = new Set<number>();
+  if (Array.isArray(body.presentSystemIds)) {
+    for (const id of body.presentSystemIds) if (typeof id === 'number') presentIds.add(id);
+  }
+  if (typeof body.eveSystemId === 'number') presentIds.add(body.eveSystemId);
+  if (presentIds.size) {
     db.query(
       `UPDATE map_systems SET last_activity_at = NOW()
-         WHERE map_id = $1 AND eve_system_id = $2
+         WHERE map_id = $1 AND eve_system_id = ANY($2::int[])
            AND last_activity_at < NOW() - INTERVAL '5 minutes'
        RETURNING id, last_activity_at`,
-      [mapId, body.eveSystemId],
+      [mapId, [...presentIds]],
     ).then((r) => {
-      const row = r.rows[0] as { id: string; last_activity_at: Date } | undefined;
-      if (row) {
+      for (const row of r.rows as Array<{ id: string; last_activity_at: Date }>) {
         publishToMap(mapId, {
           type: 'system.update',
           actor: null,
