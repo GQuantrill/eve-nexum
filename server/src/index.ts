@@ -35,6 +35,8 @@ import { startTelemetry } from './services/telemetry.js';
 import { telemetryRouter } from './routes/telemetry.js';
 import { adminRouter, adminReadRouter, reportsRouter } from './routes/admin.js';
 import { standingsRouter } from './routes/standings.js';
+import { keysRouter } from './routes/keys.js';
+import { apiV1Router } from './routes/apiV1.js';
 import { shareRouter } from './routes/share.js';
 import searchRouter from './routes/search.js';
 import { authLimiter, esiLimiter, publicLimiter, appLimiter } from './middleware/rateLimits.js';
@@ -121,6 +123,10 @@ app.use('/api/admin/reports',     appLimiter, reportsRouter);
 app.use('/api/admin',             appLimiter, adminReadRouter);
 app.use('/api/admin',             appLimiter, adminRouter);
 app.use('/api/standings',         appLimiter, standingsRouter);
+app.use('/api/keys',              appLimiter, keysRouter);
+// External read API (Bearer key or session). Reuses the app limiter for now;
+// a per-key limiter (keyed on token id) is a planned safety follow-up.
+app.use('/api/v1',                appLimiter, apiV1Router);
 app.use('/api/search',            esiLimiter, searchRouter);
 
 app.get('/health', (_req, res) => res.json({ ok: true }));

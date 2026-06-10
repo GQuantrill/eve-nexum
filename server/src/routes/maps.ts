@@ -3,6 +3,7 @@ import { esiFetch } from '../utils/esi.js';
 import type { Request, Response } from 'express';
 import { db } from '../db.js';
 import { requireAuth } from '../middleware/requireAuth.js';
+import { authUser } from '../middleware/authContext.js';
 import { config } from '../config.js';
 import { decryptToken } from '../utils/tokenCrypto.js';
 import { createLogger } from '../utils/logger.js';
@@ -11,6 +12,7 @@ import { resolveOwnerId } from '../utils/owner.js';
 import { resolveEntityNames } from '../services/entityNames.js';
 import { audit } from '../services/audit.js';
 import { subscribeMap, publishToMap } from '../services/mapEvents.js';
+import { listVisibleMaps, loadFullMap, loadSystemSignatures, loadSystemAnomalies, loadSystemStructures } from '../services/mapRead.js';
 import { syncSignature, syncAnomaly } from '../services/crossMapSync.js';
 import { reportPresence, removePresence, presenceSnapshot } from '../services/presence.js';
 import { notifyDiscord, webhookFor, k162Embed, connectionEmbed } from '../services/discord.js';
@@ -79,8 +81,8 @@ mapsRouter.use(requireAuth);
 //   - corp_member  : visible via corp membership; role-gated for writes
 //   - shared       : explicit map_shares grant (character or corp) — full edit,
 //                    no role check, but lock + owner-only ops still apply
-type AccessKind = 'owner' | 'corp_member' | 'shared';
-interface MapMeta {
+export type AccessKind = 'owner' | 'corp_member' | 'shared';
+export interface MapMeta {
   userId:     number;
   corpId:     number | null;
   locked:     boolean;
@@ -93,10 +95,13 @@ interface MapMeta {
 // up front keeps that case as a clean 404.
 const UUID_RE = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
 
-async function getMapAccess(mapId: string, req: Request): Promise<MapMeta | null> {
+export async function getMapAccess(mapId: string, req: Request): Promise<MapMeta | null> {
   if (!UUID_RE.test(mapId)) return null;
-  const userId     = req.session.userId!;
-  const userCorpId = req.session.userCorpId ?? null;
+  // Resolve identity from EITHER the session or an API-key context (req.apiAuth),
+  // so the same access logic serves cookie clients and external API keys.
+  const auth       = authUser(req);
+  const userId     = auth.userId;
+  const userCorpId = auth.corpId;
 
   // Pull map + caller's EVE character id in one round-trip; the latter is
   // needed to match against map_shares.target_character_id.
@@ -187,7 +192,13 @@ async function requireMapContentWrite(res: Response, mapId: string, req: Request
   const access = await getMapAccess(mapId, req);
   if (!access) { res.status(404).json({ error: 'Map not found' }); return null; }
 
-  const role = req.session.role ?? 'readonly';
+  const acting = authUser(req);
+  // API keys are read-only in v1 — no key scope grants writes yet, so any
+  // key-authenticated mutation is refused here regardless of the character's
+  // role. (Write scopes will gate on acting.apiScope when added.)
+  if (acting.apiScope) { res.status(403).json({ error: 'This API key is read-only' }); return null; }
+
+  const role = acting.role;
 
   // Owners and explicit-share recipients always get write access. A share
   // grant is a deliberate invitation by the owner — honouring it shouldn't
@@ -203,7 +214,7 @@ async function requireMapWrite(res: Response, mapId: string, req: Request): Prom
   const access = await requireMapContentWrite(res, mapId, req);
   if (!access) return null;
 
-  if (access.locked && req.session.role !== 'admin') {
+  if (access.locked && authUser(req).role !== 'admin') {
     res.status(403).json({ error: 'Map is locked' }); return null;
   }
   return access;
@@ -375,49 +386,9 @@ mapsRouter.get('/', async (req, res) => {
   );
   const callerChar = meRows[0]?.characterId ?? null;
 
-  // Corp visibility set: own corp when CORP_MAP_SHARED=false, every listed
-  // corp otherwise. Empty array if corp mode is off entirely.
-  const visibleCorpIds = config.corpMode && config.corpIds.length > 0
-    ? (config.corpMapShared ? config.corpIds : (userCorpId ? [userCorpId] : []))
-    : [];
-
-  // One query, three OR'd visibility clauses:
-  //   1. personal maps owned by this user
-  //   2. corp maps in visibleCorpIds (when corp mode active)
-  //   3. personal maps explicitly shared with this character or their corp
-  // The LEFT JOIN to map_shares + DISTINCT collapses any rows that match
-  // both the corp clause AND a share (which shouldn't happen because shares
-  // are personal-map-only, but the DISTINCT keeps it safe).
-  const { rows } = await db.query<{
-    id: string; name: string; isCorpMap: boolean; sharedWithMe: boolean;
-    locked: boolean; lastActiveAt: string; createdAt: string; updatedAt: string;
-    ownerName: string | null; allowAsMergeSource: boolean; allowAsMergeDestination: boolean;
-  }>(
-    `SELECT DISTINCT
-            m.id,
-            m.name,
-            m.corp_id IS NOT NULL AS "isCorpMap",
-            (m.user_id <> $1 AND m.owner_id IS DISTINCT FROM $5::int
-              AND (m.corp_id IS NULL OR NOT m.corp_id = ANY($2::int[]))
-            ) AS "sharedWithMe",
-            m.locked,
-            ou.character_name             AS "ownerName",
-            m.allow_as_merge_source       AS "allowAsMergeSource",
-            m.allow_as_merge_destination  AS "allowAsMergeDestination",
-            m.last_active_at AS "lastActiveAt",
-            m.created_at     AS "createdAt",
-            m.updated_at     AS "updatedAt"
-       FROM maps m
-       JOIN users ou ON ou.id = m.user_id
-       LEFT JOIN map_shares s ON s.map_id = m.id
-            AND ( s.target_character_id = $3
-               OR ($4::int IS NOT NULL AND s.target_corp_id = $4) )
-      WHERE ((m.owner_id = $5::int OR m.user_id = $1) AND m.corp_id IS NULL)
-         OR m.corp_id = ANY($2::int[])
-         OR (s.id IS NOT NULL AND m.corp_id IS NULL)
-      ORDER BY "sharedWithMe", "isCorpMap", m.name`,
-    [userId, visibleCorpIds, callerChar, userCorpId, ownerId],
-  );
+  // Visibility query (personal + corp + shared) lives in the shared map-read
+  // module so the external /api/v1 list returns the identical set.
+  const rows = await listVisibleMaps({ userId, ownerId, userCorpId, callerChar });
 
   // Count corp maps for the user's own corp (the per-corp limit applies to
   // each corp independently — Corp A's slots are separate from Corp B's).
@@ -1261,53 +1232,10 @@ mapsRouter.get('/:mapId', async (req, res) => {
   const access = await getMapAccess(mapId, req);
   if (!access) { res.status(404).json({ error: 'Map not found' }); return; }
 
-  // Three independent reads — parallelise so total latency is max(t) instead
-  // of sum(t).
-  const [mapRows, systems, connections] = await Promise.all([
-    db.query(
-      `SELECT id, name, corp_id IS NOT NULL AS "isCorpMap", locked,
-              allow_as_merge_source       AS "allowAsMergeSource",
-              allow_as_merge_destination  AS "allowAsMergeDestination",
-              share_token              AS "shareToken",
-              share_expires_at         AS "shareExpiresAt",
-              share_include_sigs       AS "shareIncludeSigs",
-              share_include_bridges    AS "shareIncludeBridges",
-              share_include_notes      AS "shareIncludeNotes",
-              share_include_structures AS "shareIncludeStructures",
-              created_at AS "createdAt", updated_at AS "updatedAt"
-       FROM maps WHERE id = $1`,
-      [mapId],
-    ),
-    db.query(
-      `SELECT id, eve_system_id AS "eveSystemId", name, system_class AS "systemClass",
-              effect, statics, region_name AS "regionName", npc_type AS "npcType",
-              position_x AS x, position_y AS y,
-              status, intel, is_home AS "isHome", locked, notes,
-              (SELECT ss.security::float8 FROM solar_systems ss WHERE ss.id = map_systems.eve_system_id) AS "security",
-              last_activity_at AS "lastActivityAt"
-       FROM map_systems WHERE map_id = $1`,
-      [mapId],
-    ),
-    db.query(
-      `SELECT id, source_id AS "sourceId", target_id AS "targetId",
-              source_handle AS "sourceHandle", target_handle AS "targetHandle",
-              connection_type AS "connectionType", mass_status AS "massStatus",
-              time_status AS "timeStatus", size, wh_type AS "type",
-              COALESCE(mass_used, 0)::float8 AS "massUsed",
-              eol_at AS "eolAt",
-              created_at AS "createdAt"
-       FROM map_connections WHERE map_id = $1`,
-      [mapId],
-    ),
-  ]);
-
-  if (!mapRows.rows.length) { res.status(404).json({ error: 'Map not found' }); return; }
-
-  res.json({
-    ...mapRows.rows[0],
-    systems: systems.rows.map((s) => ({ ...s, position: { x: s.x, y: s.y } })),
-    connections: connections.rows,
-  });
+  // Full map (meta + systems + connections). Loader is shared with /api/v1.
+  const full = await loadFullMap(mapId);
+  if (!full) { res.status(404).json({ error: 'Map not found' }); return; }
+  res.json(full);
 });
 
 // GET /api/maps/:mapId/events — SSE stream of live edits for this map. Scoped
@@ -1732,12 +1660,7 @@ mapsRouter.get('/:mapId/systems/:systemId/signatures', async (req, res) => {
   const access = await getMapAccess(mapId, req);
   if (!access) { res.status(404).json({ error: 'Map not found' }); return; }
   if (!(await verifySystemInMap(res, systemId, mapId))) return;
-  const { rows } = await db.query(
-    `SELECT id, sig_id AS "sigId", sig_type AS "sigType", name, notes, wh_type AS "whType", wh_leads_to AS "whLeadsTo", created_at AS "createdAt"
-     FROM map_signatures WHERE system_id = $1 ORDER BY created_at`,
-    [systemId],
-  );
-  res.json(rows);
+  res.json(await loadSystemSignatures(systemId));
 });
 
 mapsRouter.post('/:mapId/systems/:systemId/signatures', async (req, res) => {
@@ -1867,12 +1790,7 @@ mapsRouter.get('/:mapId/systems/:systemId/anomalies', async (req, res) => {
   const access = await getMapAccess(mapId, req);
   if (!access) { res.status(404).json({ error: 'Map not found' }); return; }
   if (!(await verifySystemInMap(res, systemId, mapId))) return;
-  const { rows } = await db.query(
-    `SELECT id, anom_id AS "anomId", anom_type AS "anomType", name, notes, created_at AS "createdAt", updated_at AS "updatedAt"
-     FROM map_anomalies WHERE system_id = $1 ORDER BY created_at`,
-    [systemId],
-  );
-  res.json(rows);
+  res.json(await loadSystemAnomalies(systemId));
 });
 
 mapsRouter.post('/:mapId/systems/:systemId/anomalies', async (req, res) => {
@@ -1939,12 +1857,7 @@ mapsRouter.get('/:mapId/systems/:systemId/structures', async (req, res) => {
   const access = await getMapAccess(mapId, req);
   if (!access) { res.status(404).json({ error: 'Map not found' }); return; }
   if (!(await verifySystemInMap(res, systemId, mapId))) return;
-  const { rows } = await db.query(
-    `SELECT id, name, structure_type AS "structureType", owner_corp AS "ownerCorp", eve_id AS "eveId", notes, created_at AS "createdAt", owner_corp_id AS "ownerCorpId"
-     FROM map_structures WHERE system_id = $1 ORDER BY created_at`,
-    [systemId],
-  );
-  res.json(rows);
+  res.json(await loadSystemStructures(systemId));
 });
 
 mapsRouter.post('/:mapId/systems/:systemId/structures', async (req, res) => {
