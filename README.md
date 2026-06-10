@@ -209,7 +209,7 @@ Generate a consistent, paste-ready name for a wormhole and drop it straight into
 
 Read your maps programmatically — pull the live chain into a fleet bot, an intel aggregator, a "is home open to highsec?" checker, or your own scripts. Authenticated with a long-lived **API key** you generate, instead of a browser session.
 
-**Generate a key.** Click the 🔑 icon in the toolbar (next to the language switcher). Give it a name, pick which of your characters it **acts as** (the key sees exactly what that character sees — same maps, same role), and optionally set an expiry. The key is shown **once** at creation — copy it then; it's stored only as a hash and can't be retrieved again. Revoke any key from the same panel and any tool using it loses access immediately.
+**Generate a key.** Click the 🔑 icon in the toolbar (next to the language switcher). Give it a name, pick which of your characters it **acts as** (the key sees exactly what that character sees — same maps, same role), choose its **access** (*Read only*, or *Read + live events* to also allow the event stream below), and optionally set an expiry. The key is shown **once** at creation — copy it then; it's stored only as a hash and can't be retrieved again. Revoke any key from the same panel and any tool using it loses access immediately.
 
 **Authenticate.** Send the key as a Bearer token:
 
@@ -217,7 +217,7 @@ Read your maps programmatically — pull the live chain into a fleet bot, an int
 curl -H "Authorization: Bearer nxm_…" https://yourdomain.com/api/v1/maps
 ```
 
-**Endpoints** (v1 is **read-only**):
+**Endpoints** (reads; v1 has **no write endpoints**):
 
 | Endpoint | Returns |
 |---|---|
@@ -226,8 +226,30 @@ curl -H "Authorization: Bearer nxm_…" https://yourdomain.com/api/v1/maps
 | `GET /api/v1/maps/:mapId/systems/:systemId/signatures` | Scanned signatures in a system |
 | `GET /api/v1/maps/:mapId/systems/:systemId/anomalies` | Cosmic anomalies in a system |
 | `GET /api/v1/maps/:mapId/systems/:systemId/structures` | Player structures in a system |
+| `GET /api/v1/maps/:mapId/events` | **Live event stream** (SSE) — requires a *Read + live events* key |
 
-**Scope and safety.** Keys are **account-scoped** — a key reads everything its account can see, so treat it as a secret. It's read-only (no writes in v1), can be given an expiry, records a *last used* time so you can spot a stale or leaked key, and is one-click revocable. Share-link tokens are never returned through the API.
+### Live event stream
+
+`GET /api/v1/maps/:mapId/events` is a [Server-Sent Events](https://developer.mozilla.org/docs/Web/API/Server-sent_events) stream of the same live edits the web client receives — so a tool can stay in sync without polling. It needs a key with the **Read + live events** scope (a plain read key gets `403`). On connect it sends a `presence.snapshot`, then one JSON event per edit; lines beginning `:` are heartbeat/keep-alive comments.
+
+```bash
+curl -N -H "Authorization: Bearer nxm_…" \
+  https://yourdomain.com/api/v1/maps/<mapId>/events
+```
+
+Each `data:` line is a JSON object with a `type` and a type-specific payload. The published event types (the public contract):
+
+| Type | Meaning |
+|---|---|
+| `system.add` / `system.update` / `system.remove` | A system was added, changed (status, notes, position, activity), or removed |
+| `connection.add` / `connection.update` / `connection.remove` | A connection was drawn, retyped (mass/EOL/type), or deleted |
+| `sig.changed` / `anom.changed` / `structure.changed` | A system's signatures / anomalies / structures changed |
+| `map.meta` / `map.resync` | Map metadata (name, lock) changed / clients should refetch |
+| `presence.snapshot` / `presence.update` / `presence.leave` | Who's viewing the map and where (ephemeral) |
+
+> Single-process delivery: the stream is served in-memory by one instance, the same as the in-app live sync. A multi-replica deployment would need the documented Postgres `LISTEN/NOTIFY` swap — see the realtime-sync notes.
+
+**Scope and safety.** Keys are **account-scoped** — a key reads everything its account can see, so treat it as a secret. There are no write endpoints; the strongest scope (*events*) still only reads and subscribes. Keys can be given an expiry, record a *last used* time so you can spot a stale or leaked key, and are one-click revocable. Share-link tokens are never returned through the API.
 
 ---
 

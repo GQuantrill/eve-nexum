@@ -1849,6 +1849,26 @@
   flex-shrink: 0;
 }
 
+.api-keys__scope {
+  font-size: calc(10px * var(--font-scale, 1));
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.api-keys__scope--read {
+  background: rgba(100,160,255,0.12);
+  color: #7ab0f0;
+  border: 1px solid rgba(100,160,255,0.3);
+}
+
+.api-keys__scope--events {
+  background: rgba(120,200,140,0.12);
+  color: #6fc98a;
+  border: 1px solid rgba(120,200,140,0.3);
+}
+
 .api-keys__meta {
   display: flex;
   flex-direction: column;

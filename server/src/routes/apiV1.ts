@@ -3,6 +3,7 @@ import type { Request, Response, NextFunction } from 'express';
 import { apiKeyAuth } from '../middleware/apiKeyAuth.js';
 import { authUser } from '../middleware/authContext.js';
 import { getMapAccess } from './maps.js';
+import { streamMapEvents } from '../services/mapStream.js';
 import {
   listVisibleMaps, loadFullMap, isSystemInMap,
   loadSystemSignatures, loadSystemAnomalies, loadSystemStructures,
@@ -80,4 +81,20 @@ apiV1Router.get('/maps/:mapId/systems/:systemId/anomalies', async (req, res) => 
 apiV1Router.get('/maps/:mapId/systems/:systemId/structures', async (req, res) => {
   if (!(await systemScope(req, res))) return;
   res.json(await loadSystemStructures(req.params.systemId));
+});
+
+// GET /api/v1/maps/:mapId/events — live SSE stream of map edits, the same feed
+// the web client uses. Key clients need the 'events' scope (a plain 'read' key
+// is refused); a logged-in session is also accepted. Document the event
+// taxonomy as the public contract.
+apiV1Router.get('/maps/:mapId/events', async (req, res) => {
+  // Scope gate: 'read' keys can pull snapshots but not subscribe to the stream.
+  // Session requests have no apiAuth and pass through.
+  if (req.apiAuth && req.apiAuth.apiScope !== 'events') {
+    res.status(403).json({ error: "API key needs the 'events' scope" });
+    return;
+  }
+  const { mapId } = req.params;
+  if (!(await getMapAccess(mapId, req))) { res.status(404).json({ error: 'Map not found' }); return; }
+  streamMapEvents(req, res, mapId);
 });

@@ -42,6 +42,7 @@ export function ApiKeysModal({ onClose }: { onClose: () => void }) {
   const [charId, setCharId]       = useState<number | null>(
     () => (characters.find((c) => c.active) ?? characters[0])?.characterId ?? null,
   );
+  const [scope, setScope]         = useState<'read' | 'events'>('read');
   const [expiryDays, setExpiry]   = useState<number>(0);
   const [creating, setCreating]   = useState(false);
   // The raw secret, surfaced exactly once right after creation.
@@ -69,7 +70,7 @@ export function ApiKeysModal({ onClose }: { onClose: () => void }) {
         : null;
       const created = await api<{ name: string; key: string }>('/api/keys', {
         method: 'POST',
-        body:   JSON.stringify({ name: name.trim(), contextCharacterId: charId, expiresAt }),
+        body:   JSON.stringify({ name: name.trim(), contextCharacterId: charId, scope, expiresAt }),
       });
       // Re-fetch so the new row carries the canonical shape (bound character
       // name, etc.) the POST response doesn't include.
@@ -157,6 +158,13 @@ export function ApiKeysModal({ onClose }: { onClose: () => void }) {
               </select>
             </label>
             <label className="field">
+              <span>{t('apiKeys.scope')}</span>
+              <select value={scope} onChange={(e) => setScope(e.target.value as 'read' | 'events')}>
+                <option value="read">{t('apiKeys.scopeRead')}</option>
+                <option value="events">{t('apiKeys.scopeEvents')}</option>
+              </select>
+            </label>
+            <label className="field">
               <span>{t('apiKeys.expiry')}</span>
               <select value={expiryDays} onChange={(e) => setExpiry(Number(e.target.value))}>
                 {EXPIRY_OPTIONS.map((d) => (
@@ -187,6 +195,9 @@ export function ApiKeysModal({ onClose }: { onClose: () => void }) {
                         <div className="api-keys__main">
                           <span className="api-keys__name">{k.name}</span>
                           <code className="api-keys__prefix">{k.tokenPrefix}…</code>
+                          <span className={`api-keys__scope api-keys__scope--${k.scope}`}>
+                            {k.scope === 'events' ? t('apiKeys.scopeEventsBadge') : t('apiKeys.scopeReadBadge')}
+                          </span>
                           {(expired || inert) && (
                             <span className="api-keys__flag">
                               {expired ? t('apiKeys.flagExpired') : t('apiKeys.flagInert')}

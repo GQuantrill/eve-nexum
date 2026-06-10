@@ -11,10 +11,11 @@ import { recordGhostSiteIfMatch } from '../services/ghostSites.js';
 import { resolveOwnerId } from '../utils/owner.js';
 import { resolveEntityNames } from '../services/entityNames.js';
 import { audit } from '../services/audit.js';
-import { subscribeMap, publishToMap } from '../services/mapEvents.js';
+import { publishToMap } from '../services/mapEvents.js';
+import { streamMapEvents } from '../services/mapStream.js';
 import { listVisibleMaps, loadFullMap, loadSystemSignatures, loadSystemAnomalies, loadSystemStructures } from '../services/mapRead.js';
 import { syncSignature, syncAnomaly } from '../services/crossMapSync.js';
-import { reportPresence, removePresence, presenceSnapshot } from '../services/presence.js';
+import { reportPresence } from '../services/presence.js';
 import { notifyDiscord, webhookFor, k162Embed, connectionEmbed } from '../services/discord.js';
 
 const log = createLogger('maps');
@@ -1245,32 +1246,8 @@ mapsRouter.get('/:mapId/events', async (req, res) => {
   const { mapId } = req.params;
   const access = await getMapAccess(mapId, req);
   if (!access) { res.status(404).json({ error: 'Map not found' }); return; }
-
-  res.set({
-    'Content-Type': 'text/event-stream',
-    'Cache-Control': 'no-cache, no-transform',
-    Connection: 'keep-alive',
-  });
-  res.flushHeaders?.();
-  res.write(': connected\n\n');
-
-  const unsubscribe = subscribeMap(mapId, res);
-  // Heartbeat keeps intermediaries from closing an idle stream.
-  const heartbeat = setInterval(() => { try { res.write(': ping\n\n'); } catch { /* closed */ } }, 25_000);
-
-  // Hand the new viewer the current presence roster so it sees who's already
-  // here without waiting for the next heartbeat round.
-  try {
-    res.write(`data: ${JSON.stringify({ type: 'presence.snapshot', viewers: presenceSnapshot(mapId) })}\n\n`);
-  } catch { /* closed */ }
-
-  req.on('close', () => {
-    clearInterval(heartbeat);
-    unsubscribe();
-    // Closing the stream = left the map → drop this viewer's presence (TTL is
-    // the backstop for unclean disconnects / multiple tabs).
-    if (req.session.characterId) removePresence(mapId, req.session.characterId);
-  });
+  // Shared with the API-key stream at /api/v1/maps/:id/events.
+  streamMapEvents(req, res, mapId);
 });
 
 // POST /api/maps/:mapId/presence — a viewer reports its current location.
