@@ -572,6 +572,28 @@ export async function migrate() {
 
     CREATE INDEX IF NOT EXISTS idx_users_owner ON users (owner_id);
     CREATE INDEX IF NOT EXISTS idx_maps_owner  ON maps  (owner_id);
+
+    -- Account-scoped API keys for the external read API. A key acts as one
+    -- owner (account) with one bound character supplying role/corp context, so
+    -- a key request resolves to exactly what that character sees in the app.
+    -- We store a one-way sha-256 of the raw key (only ever compared, never
+    -- decrypted — unlike the AES-GCM EVE tokens); the raw key is shown once at
+    -- creation. See external_api_feature.md.
+    CREATE TABLE IF NOT EXISTS api_tokens (
+      id                 UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+      owner_id           INTEGER     NOT NULL REFERENCES owners(id) ON DELETE CASCADE,
+      -- character whose role/corp this key acts with; NULL if that char is removed
+      context_user_id    INTEGER     REFERENCES users(id) ON DELETE SET NULL,
+      token_hash         TEXT        NOT NULL UNIQUE,  -- sha-256 hex of the raw key
+      token_prefix       TEXT        NOT NULL,         -- first chars, for display only
+      name               TEXT        NOT NULL,         -- user label ("fleet bot")
+      scope              TEXT        NOT NULL DEFAULT 'read',  -- 'read' | 'events'
+      last_used_at       TIMESTAMPTZ,
+      expires_at         TIMESTAMPTZ,                  -- NULL = no expiry
+      created_by_user_id INTEGER     REFERENCES users(id) ON DELETE SET NULL,
+      created_at         TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+    CREATE INDEX IF NOT EXISTS idx_api_tokens_owner ON api_tokens (owner_id);
   `);
 
   await encryptLegacyTokens();

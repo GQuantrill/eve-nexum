@@ -12,6 +12,7 @@ import { useCanCreateMaps } from '../../hooks/useCanCreateMaps';
 import { UserStatsModal } from './UserStatsModal';
 import { ConfirmModal } from './ConfirmModal';
 import { CreateMapModal } from './CreateMapModal';
+import { ApiKeysModal } from './ApiKeysModal';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { CharacterSwitcher } from './CharacterSwitcher';
 import { HeatmapMenu } from './HeatmapMenu';
@@ -20,6 +21,7 @@ import {
   WarningIcon, SkullIcon, XCircleIcon, QuestionIcon,
   ShieldStarIcon, ChartBarIcon, SlidersHorizontalIcon, FootprintsIcon,
   SignOutIcon, PlanetIcon, LinkSimpleIcon, ClockCountdownIcon, MapPinIcon,
+  KeyIcon,
 } from '@phosphor-icons/react';
 import type { Icon as PhosphorIcon } from '@phosphor-icons/react';
 import { charPortrait, typeIcon } from '../../utils/eveImages';
@@ -225,6 +227,7 @@ export function Toolbar() {
   const [showMaps, setShowMaps]   = useState(false);
   const [showStats, setShowStats] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
+  const [showKeys, setShowKeys] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
 
   async function handleDeleteMap() {
@@ -503,6 +506,14 @@ export function Toolbar() {
           <CharacterSwitcher />
           <LanguageSwitcher />
           <button
+            className="toolbar__toggle toolbar__toggle--icon"
+            onClick={() => setShowKeys(true)}
+            data-tooltip={t('apiKeys.title')}
+            aria-label={t('apiKeys.title')}
+          >
+            <KeyIcon size={18} weight="regular" />
+          </button>
+          <button
             className="toolbar__toggle toolbar__toggle--icon toolbar__toggle--prominent"
             onClick={logout}
             data-tooltip={t('toolbar.signOut')}
@@ -516,6 +527,7 @@ export function Toolbar() {
 
     {showStats && <UserStatsModal onClose={() => setShowStats(false)} />}
     {showCreate && <CreateMapModal onClose={() => setShowCreate(false)} />}
+    {showKeys && <ApiKeysModal onClose={() => setShowKeys(false)} />}
     {deleteConfirm && (
       <ConfirmModal
         message={t('toolbar.deleteMapConfirm', { name: mapName })}
