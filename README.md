@@ -19,6 +19,7 @@
   - [Productivity & UX](#productivity--ux)
   - [For corporations](#for-corporations)
 - [Wormhole bookmarks](#wormhole-bookmarks)
+- [External API](#external-api)
 - [Installation](#installation)
   - [Docker (recommended)](#option-1--docker-recommended)
   - [Local development](#option-2--local-development)
@@ -117,6 +118,7 @@ Open <http://localhost> and click **Log in with EVE Online**. That's it.
 - **Cross-map sync** — opt-in (Map Controls → *Sync system data across my maps*). When the same EVE system appears on several of your maps, adding or editing its signatures and anomalies on one map copies them to the same system on your others — personal maps sync with your other personal maps, corp maps with the corp's other maps. Non-destructive: missing entries are inserted and blank fields filled, but data you've already entered is never overwritten and nothing is ever deleted (deletes and overwrite-paste removals stay local). Matches by EVE system id, so custom systems are skipped.
 - **Map locking** — admins can freeze a corp map's topology. Systems, connections, and the map name lock for non-admins, but signatures, structures, and per-system notes stay editable so ops can continue while the layout is pinned. The toolbar shows an amber 🔒 chip while the lock is active, and passive location tracking won't auto-add new systems on a locked map.
 - **Role-based access** — `admin` / `full` / `edit` / `readonly`. Roles only restrict corp-map actions; every user owns their personal maps regardless of role. See [Roles](#roles) for the full matrix.
+- **External API** — generate a long-lived API key (🔑 in the toolbar) to read your maps programmatically from your own tools and scripts. Read-only, account-scoped, acts as a chosen character, revocable. See [External API](#external-api).
 
 ### System intelligence
 
@@ -200,6 +202,32 @@ Generate a consistent, paste-ready name for a wormhole and drop it straight into
 | `{notes}` | | The signature's notes field |
 
 > Tip: `{age}` reflects when the signature was *first scanned*, so it reads `0h` right after you add a hole — useful for re-copying an older bookmark later, but most people leave it out of the default.
+
+---
+
+## External API
+
+Read your maps programmatically — pull the live chain into a fleet bot, an intel aggregator, a "is home open to highsec?" checker, or your own scripts. Authenticated with a long-lived **API key** you generate, instead of a browser session.
+
+**Generate a key.** Click the 🔑 icon in the toolbar (next to the language switcher). Give it a name, pick which of your characters it **acts as** (the key sees exactly what that character sees — same maps, same role), and optionally set an expiry. The key is shown **once** at creation — copy it then; it's stored only as a hash and can't be retrieved again. Revoke any key from the same panel and any tool using it loses access immediately.
+
+**Authenticate.** Send the key as a Bearer token:
+
+```bash
+curl -H "Authorization: Bearer nxm_…" https://yourdomain.com/api/v1/maps
+```
+
+**Endpoints** (v1 is **read-only**):
+
+| Endpoint | Returns |
+|---|---|
+| `GET /api/v1/maps` | Maps visible to the key's account |
+| `GET /api/v1/maps/:mapId` | Full map — systems + connections |
+| `GET /api/v1/maps/:mapId/systems/:systemId/signatures` | Scanned signatures in a system |
+| `GET /api/v1/maps/:mapId/systems/:systemId/anomalies` | Cosmic anomalies in a system |
+| `GET /api/v1/maps/:mapId/systems/:systemId/structures` | Player structures in a system |
+
+**Scope and safety.** Keys are **account-scoped** — a key reads everything its account can see, so treat it as a secret. It's read-only (no writes in v1), can be given an expiry, records a *last used* time so you can spot a stale or leaked key, and is one-click revocable. Share-link tokens are never returned through the API.
 
 ---
 
