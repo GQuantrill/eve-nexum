@@ -1778,14 +1778,13 @@
   font-weight: 600;
 }
 
-.api-keys__reveal-row {
+.api-keys__reveal-actions {
   display: flex;
-  align-items: center;
   gap: 8px;
 }
 
 .api-keys__secret {
-  flex: 1;
+  display: block;
   padding: 6px 8px;
   background: #08090f;
   border: 1px solid #1e2740;
@@ -1793,7 +1792,7 @@
   color: #c8d4f0;
   font-family: monospace;
   font-size: calc(12px * var(--font-scale, 1));
-  word-break: break-all;
+  overflow-wrap: anywhere;
   user-select: all;
 }
 

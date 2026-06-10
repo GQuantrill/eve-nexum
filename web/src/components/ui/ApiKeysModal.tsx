@@ -125,15 +125,15 @@ export function ApiKeysModal({ onClose }: { onClose: () => void }) {
                 <WarningIcon size={14} weight="fill" />
                 {t('apiKeys.copyNow')}
               </div>
-              <div className="api-keys__reveal-row">
-                <code className="api-keys__secret">{newKey.key}</code>
-                <button type="button" className="map-sidebar__action" onClick={() => copyKey(newKey.key)}>
+              <code className="api-keys__secret">{newKey.key}</code>
+              <div className="api-keys__reveal-actions">
+                <button type="button" className="btn btn--primary" onClick={() => copyKey(newKey.key)}>
                   <CopyIcon size={14} weight="regular" /> {t('actions.copy')}
                 </button>
+                <button type="button" className="btn btn--ghost" onClick={() => setNewKey(null)}>
+                  {t('apiKeys.dismiss')}
+                </button>
               </div>
-              <button type="button" className="btn btn--ghost" onClick={() => setNewKey(null)}>
-                {t('apiKeys.dismiss')}
-              </button>
             </div>
           )}
 
