@@ -588,6 +588,13 @@ const SETTINGS_ALLOWLIST = new Set<string>([
   'nexum.panel.collapsed.thera',
   'nexum.panel.collapsed.turnur',
   'nexum.proximityThreshold',
+  // Per-event notification channels (Notifications sidebar section). Watchlist
+  // sound stays under its original key 'nexum.watchlist.sound' below.
+  'nexum.notify.k162.desktop',
+  'nexum.notify.k162.sound',
+  'nexum.notify.proximity.desktop',
+  'nexum.notify.proximity.sound',
+  'nexum.notify.watchlist.desktop',
   'nexum.customIntel',
   'nexum.crossMapSync',
   'nexum.watchlist',

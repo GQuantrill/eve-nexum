@@ -366,6 +366,7 @@
       "route": "Route",
       "chainExits": "Chain Exits",
       "proximityAlerts": "Proximity Alerts",
+      "notifications": "Notifications",
       "activity": "Activity",
       "fleet": "Fleet",
       "staleFade": "Stale System Fade",
@@ -423,6 +424,13 @@
     "notifEnable": "Enable",
     "notifBlockedTooltip": "Click the lock / site-info icon in your address bar → Notifications → Allow, then reload.",
     "notifBlockedHint": "Browser is blocking notifications for this site. Click the lock icon in your address bar → Notifications → Allow → reload the page.",
+    "proximityNotifyHint": "Toggle the desktop notification and sound for this in the Notifications section below.",
+    "notifHint": "Choose which events alert you, and how. Desktop notifications need the browser permission above.",
+    "notifColDesktop": "Desktop",
+    "notifColSound": "Sound",
+    "notifK162": "Inbound K162",
+    "notifProximity": "Proximity threats",
+    "notifWatchlist": "Watchlist match",
     "activityHint": "Show graphs for the following:",
     "activityJumps": "Jumps",
     "activityShipKills": "Ship Kills",
@@ -527,7 +535,8 @@
     "remove": "Remove from watchlist",
     "max": "Maximum {{count}} watchlist entries",
     "add": "Add to watchlist",
-    "appeared": "Watchlist: {{name}} ({{marker}}) is on the map"
+    "appeared": "Watchlist: {{name}} ({{marker}}) is on the map",
+    "notifTitle": "Watchlist match"
   },
   "chainExits": {
     "noExits": "No K-space exits in this chain.",
