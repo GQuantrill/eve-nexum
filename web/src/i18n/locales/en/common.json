@@ -1,10 +1,15 @@
 {
   "apiKeys": {
     "title": "API keys",
-    "hint": "Generate a key to let external tools read your maps via the API. A key acts as the selected character and can only read — never write.",
+    "hint": "Generate a key to let external tools read your maps via the API. A key acts as the selected character and can only read — never write. \"Read + live events\" keys can also subscribe to the live event stream.",
     "name": "Name",
     "namePlaceholder": "e.g. fleet bot",
     "character": "Acts as",
+    "scope": "Access",
+    "scopeRead": "Read only",
+    "scopeEvents": "Read + live events",
+    "scopeReadBadge": "read",
+    "scopeEventsBadge": "events",
     "expiry": "Expires",
     "expiryNever": "Never",
     "expiryDays": "{{count}} days",

@@ -143,5 +143,7 @@ keysRouter.delete('/:id', async (req, res) => {
   await audit(req, rows[0].contextUserId, null, 'api_key_revoke', rows[0].name, null)
     .catch((err) => log.warn(`audit api_key_revoke failed: ${err}`));
 
-  res.status(204).end();
+  // Return a JSON body (not 204) — the shared web api() client always parses
+  // the response as JSON, so an empty body would surface as a bogus error.
+  res.json({ ok: true });
 });
