@@ -56,24 +56,24 @@ export function SharedMapView({ token }: { token: string }) {
   const { t } = useTranslation();
   const [state, setState] = useState<LoadState>({ kind: 'loading' });
 
-  // Hydrate the map store directly from the share payload. The store's
+  // Hydrate the map store directly from the share payload, then keep it live:
+  // subscribe to the public change-ping stream and refetch the (already
+  // category-filtered) snapshot whenever the owner edits the map. The store's
   // public actions all write back to the server, which would fail in share
-  // mode — but reading state is fine, and MapCanvas / SystemPanel select
-  // from the store the same way they would in normal use.
+  // mode — but reading state is fine, and MapCanvas / SystemPanel select from
+  // the store the same way they would in normal use.
   useEffect(() => {
     let cancelled = false;
-    (async () => {
-      try {
-        const res = await fetch(`/api/share/${encodeURIComponent(token)}`);
-        const body = await res.json().catch(() => ({}));
-        if (cancelled) return;
+    let es: EventSource | null = null;
+    let debounce: ReturnType<typeof setTimeout> | null = null;
 
-        if (res.status === 410) { setState({ kind: 'expired',   payload: body as ExpiredPayload }); return; }
-        if (res.status === 404) { setState({ kind: 'not_found' }); return; }
-        if (!res.ok)             { setState({ kind: 'not_found' }); return; }
-
-        const payload = body as SharePayload;
-        useMapStore.setState({
+    function applyToStore(payload: SharePayload, isInitial: boolean) {
+      useMapStore.setState((prev) => {
+        // On a live refetch, keep the viewer's open system panel if that system
+        // still exists; drop it if it was removed.
+        const keepSel =
+          !isInitial && !!prev.selectedSystemId && payload.systems.some((s) => s.id === prev.selectedSystemId);
+        return {
           map: {
             id:                     'shared',
             name:                   payload.mapName,
@@ -81,7 +81,7 @@ export function SharedMapView({ token }: { token: string }) {
             locked:                 true,
             systems:                payload.systems,
             connections:            payload.connections,
-            createdAt:              new Date().toISOString(),
+            createdAt:              isInitial ? new Date().toISOString() : prev.map.createdAt,
             updatedAt:              payload.expiresAt,
             // Carry the link's category flags onto the map so panels
             // (SystemPanel tab filter, StructuresPane, NotesEditor) can
@@ -91,18 +91,49 @@ export function SharedMapView({ token }: { token: string }) {
             shareIncludeNotes:      payload.includeNotes,
             shareIncludeStructures: payload.includeStructures,
           },
-          activeMapId:        'shared',
-          selectedSystemId:   null,
-          selectedConnectionId: null,
-          currentSystemId:    null,
-          undoStack:          [],
-        });
+          activeMapId:          'shared',
+          selectedSystemId:     keepSel ? prev.selectedSystemId : null,
+          ...(isInitial ? { selectedConnectionId: null, currentSystemId: null, undoStack: [] } : {}),
+        };
+      });
+    }
+
+    async function load(isInitial: boolean) {
+      try {
+        const res = await fetch(`/api/share/${encodeURIComponent(token)}`);
+        const body = await res.json().catch(() => ({}));
+        if (cancelled) return;
+
+        if (res.status === 410) { setState({ kind: 'expired', payload: body as ExpiredPayload }); es?.close(); return; }
+        if (res.status === 404 || !res.ok) { setState({ kind: 'not_found' }); es?.close(); return; }
+
+        const payload = body as SharePayload;
+        applyToStore(payload, isInitial);
         setState({ kind: 'valid', payload });
+        if (isInitial) openStream();
       } catch {
-        if (!cancelled) setState({ kind: 'not_found' });
+        // A failed live refetch is transient — keep showing the last snapshot.
+        if (isInitial && !cancelled) setState({ kind: 'not_found' });
       }
-    })();
-    return () => { cancelled = true; };
+    }
+
+    function openStream() {
+      if (cancelled) return;
+      es = new EventSource(`/api/share/${encodeURIComponent(token)}/events`);
+      es.onmessage = () => {
+        // Coalesce bursts (a paste of many sigs, a merge) into one refetch.
+        if (debounce) clearTimeout(debounce);
+        debounce = setTimeout(() => { void load(false); }, 600);
+      };
+      // EventSource reconnects on its own after a drop; nothing to do on error.
+    }
+
+    void load(true);
+    return () => {
+      cancelled = true;
+      if (debounce) clearTimeout(debounce);
+      es?.close();
+    };
   }, [token]);
 
   if (state.kind === 'loading') {

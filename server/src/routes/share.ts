@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { db } from '../db.js';
+import { onMapEvent } from '../services/mapEvents.js';
 import { createLogger } from '../utils/logger.js';
 
 const log = createLogger('share');
@@ -88,6 +89,41 @@ export async function lookupShareToken(token: string): Promise<ShareTokenLookup>
     includeStructures: row.includeStructures,
   };
 }
+
+// GET /api/share/:token/events
+// Public live-update stream for a shared map. Authorised by the token only.
+// CRITICAL: this never forwards event payloads — a public client must not see
+// intel the link excludes. Instead every map change becomes a content-free
+// "changed" ping; the client refetches GET /api/share/:token, which already
+// applies all the include-* filters. So all privacy filtering stays in one
+// place and nothing sensitive can leak through an event body.
+shareRouter.get('/:token/events', async (req, res) => {
+  const lookup = await lookupShareToken(req.params.token);
+  if (lookup.status !== 'valid' || !lookup.mapId) {
+    res.status(lookup.status === 'expired' ? 410 : 404).json({ error: lookup.status });
+    return;
+  }
+  const mapId = lookup.mapId;
+
+  res.set({
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache, no-transform',
+    Connection: 'keep-alive',
+  });
+  res.flushHeaders?.();
+  res.write(': connected\n\n');
+
+  const heartbeat = setInterval(() => { try { res.write(': ping\n\n'); } catch { /* closed */ } }, 25_000);
+
+  // Presence events (viewer dots, heartbeats) aren't shown in the shared view
+  // and would otherwise trigger a refetch every ~25s — skip them.
+  const unsubscribe = onMapEvent(mapId, (event) => {
+    if (event.type.startsWith('presence')) return;
+    try { res.write('data: {"type":"changed"}\n\n'); } catch { /* closed */ }
+  });
+
+  req.on('close', () => { clearInterval(heartbeat); unsubscribe(); });
+});
 
 // GET /api/share/:token
 // Public, no auth. Returns the read-only map snapshot:
