@@ -11,7 +11,24 @@ interface Props {
   connectedSystems?: Pick<MapSystem, 'id' | 'name' | 'systemClass'>[];
 }
 
-const J_SPACE: SystemClass[] = ['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C13', 'Thera', 'Pochven', 'Drifter'];
+interface DestOption { value: string; label: string; color: string; }
+
+// Regular wormhole space (C1–C6) is grouped into the three bands EVE's
+// in-game "show info" actually tells you for an unscanned hole — "unknown"
+// (C1–C3), "dangerous unknown" (C4–C5) and "deadly unknown" (C6) — since you
+// can't distinguish the exact class without identifying the wormhole type
+// (which sets the leads-to precisely on its own). Each band is coloured by its
+// worst class so the threat reads green → orange → red. C13 / Thera / Pochven /
+// Drifter stay individual (their descriptions are distinct), as does K-space.
+const J_SPACE: DestOption[] = [
+  { value: 'C1-C3', label: 'C1-C3', color: CLASS_COLORS.C3 },
+  { value: 'C4-C5', label: 'C4-C5', color: CLASS_COLORS.C5 },
+  { value: 'C6',    label: 'C6',    color: CLASS_COLORS.C6 },
+  { value: 'C13',     label: CLASS_LABELS.C13,     color: CLASS_COLORS.C13 },
+  { value: 'Thera',   label: CLASS_LABELS.Thera,   color: CLASS_COLORS.Thera },
+  { value: 'Pochven', label: CLASS_LABELS.Pochven, color: CLASS_COLORS.Pochven },
+  { value: 'Drifter', label: CLASS_LABELS.Drifter, color: CLASS_COLORS.Drifter },
+];
 const K_SPACE: SystemClass[] = ['HS', 'LS', 'NS'];
 
 export function LeadsToDropdown({ value, onChange, connectedSystems = [] }: Props) {
@@ -34,7 +51,7 @@ export function LeadsToDropdown({ value, onChange, connectedSystems = [] }: Prop
     ), [connectedSystems, q]);
 
   const filteredJSpace = useMemo(() =>
-    J_SPACE.filter(c => !q || c.includes(q) || CLASS_LABELS[c].toUpperCase().includes(q)),
+    J_SPACE.filter(o => !q || o.value.toUpperCase().includes(q) || o.label.toUpperCase().includes(q)),
     [q]);
 
   const filteredKSpace = useMemo(() =>
@@ -43,7 +60,13 @@ export function LeadsToDropdown({ value, onChange, connectedSystems = [] }: Prop
 
   const select = (v: string) => { onChange(v); setOpen(false); };
 
+  // Resolve the button's label + colour for any stored value: a J-space band
+  // (C1-C3 / C4-C5 / C6), an exact class (incl. legacy values like a plain C2),
+  // or a free-form connected-system name (neutral).
+  const band = value ? J_SPACE.find((o) => o.value === value) : undefined;
   const isClass = value ? value in CLASS_LABELS : false;
+  const displayColor = band ? band.color : isClass ? CLASS_COLORS[value as SystemClass] : '#c0d0e8';
+  const displayLabel = band ? band.label : isClass ? CLASS_LABELS[value as SystemClass] : value;
 
   return (
     <div className="wh-picker">
@@ -56,13 +79,9 @@ export function LeadsToDropdown({ value, onChange, connectedSystems = [] }: Prop
       >
         {value ? (
           <span className="wh-picker__btn-inner">
-            {isClass ? (
-              <span style={{ color: CLASS_COLORS[value as SystemClass], fontSize: 'calc(13px * var(--font-scale, 1))' }}>
-                {CLASS_LABELS[value as SystemClass]}
-              </span>
-            ) : (
-              <span style={{ color: '#c0d0e8', fontSize: 'calc(13px * var(--font-scale, 1))' }}>{value}</span>
-            )}
+            <span style={{ color: displayColor, fontSize: 'calc(13px * var(--font-scale, 1))' }}>
+              {displayLabel}
+            </span>
           </span>
         ) : (
           <span className="wh-picker__placeholder">{t('mapNode.unknown')}</span>
@@ -124,14 +143,14 @@ export function LeadsToDropdown({ value, onChange, connectedSystems = [] }: Prop
                   J-Space
                   <span className="wh-picker__group-count">({J_SPACE.length})</span>
                 </div>
-                {filteredJSpace.map(cls => (
+                {filteredJSpace.map(o => (
                   <div
-                    key={cls}
-                    className={`wh-picker__option${value === cls ? ' wh-picker__option--active' : ''}`}
-                    onMouseDown={() => select(cls)}
+                    key={o.value}
+                    className={`wh-picker__option${value === o.value ? ' wh-picker__option--active' : ''}`}
+                    onMouseDown={() => select(o.value)}
                   >
-                    <span className="wh-picker__dest" style={{ color: CLASS_COLORS[cls] }}>
-                      {CLASS_LABELS[cls]}
+                    <span className="wh-picker__dest" style={{ color: o.color }}>
+                      {o.label}
                     </span>
                   </div>
                 ))}
