@@ -622,6 +622,12 @@ export const useMapStore = create<MapStore>()((set, get) => {
 
     setCompactMode: (v) => {
       set({ compactMode: v });
+      // Compact mode changes every node's natural size, so the cached
+      // measurements (and the uniform-size max derived from them) are stale.
+      // Without this, uniform mode ratchets up: toggling compact off grows the
+      // nodes, and the inflated min keeps them measuring big when compact comes
+      // back on. Reset forces a clean re-measure of the natural sizes.
+      get().resetUniformSizes();
       api('/auth/preferences', { method: 'PATCH', body: JSON.stringify({ compactMode: v }) }).catch(console.error);
     },
 
@@ -637,6 +643,9 @@ export const useMapStore = create<MapStore>()((set, get) => {
 
     setShowStatics: (v) => {
       set({ showStatics: v });
+      // Same as compact mode: showing/hiding statics changes WH nodes' natural
+      // height (and which nodes count toward the uniform max), so re-measure.
+      get().resetUniformSizes();
       api('/auth/preferences', { method: 'PATCH', body: JSON.stringify({ showStatics: v }) }).catch(console.error);
     },
 
