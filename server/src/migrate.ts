@@ -38,6 +38,7 @@ export async function migrate() {
     ALTER TABLE users ADD COLUMN IF NOT EXISTS snap_to_grid  BOOLEAN NOT NULL DEFAULT FALSE;
     ALTER TABLE users ADD COLUMN IF NOT EXISTS show_minimap  BOOLEAN NOT NULL DEFAULT TRUE;
     ALTER TABLE users ADD COLUMN IF NOT EXISTS uniform_size  BOOLEAN NOT NULL DEFAULT TRUE;
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS easy_connect  BOOLEAN NOT NULL DEFAULT FALSE;
 
     -- One-time: uniform_size shipped with a FALSE default originally;
     -- product decision later was that ON should be the out-of-the-box

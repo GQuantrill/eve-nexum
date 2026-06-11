@@ -275,8 +275,8 @@ authRouter.get('/callback', async (req, res) => {
     await seedDemoMap(userId);
 
     // Snapshot prefs into the session so /auth/me can answer without a DB call.
-    const prefRows = await db.query<{ compact_mode: boolean; snap_to_grid: boolean; show_minimap: boolean; uniform_size: boolean; show_statics: boolean; connection_thickness: string; route_mode: string; ui_zoom: string; ui_settings: Record<string, unknown>; panel_order: string[] }>(
-      `SELECT compact_mode, snap_to_grid, show_minimap, uniform_size, show_statics, connection_thickness, route_mode, ui_zoom, ui_settings, panel_order FROM users WHERE id = $1`,
+    const prefRows = await db.query<{ compact_mode: boolean; snap_to_grid: boolean; show_minimap: boolean; uniform_size: boolean; show_statics: boolean; easy_connect: boolean; connection_thickness: string; route_mode: string; ui_zoom: string; ui_settings: Record<string, unknown>; panel_order: string[] }>(
+      `SELECT compact_mode, snap_to_grid, show_minimap, uniform_size, show_statics, easy_connect, connection_thickness, route_mode, ui_zoom, ui_settings, panel_order FROM users WHERE id = $1`,
       [userId],
     );
     const p = prefRows.rows[0];
@@ -299,6 +299,7 @@ authRouter.get('/callback', async (req, res) => {
       showMinimap: p?.show_minimap ?? true,
       uniformSize: p?.uniform_size ?? true,
       showStatics: p?.show_statics ?? true,
+      easyConnect: p?.easy_connect ?? false,
       connectionThickness: p?.connection_thickness ?? 'standard',
       routeMode:   p?.route_mode ?? 'shortest',
       uiZoom:      p?.ui_zoom != null ? Number(p.ui_zoom) : 1,
@@ -340,11 +341,11 @@ authRouter.post('/switch-character', async (req, res) => {
     owner_id: number | null; character_id: number; character_name: string; role: string;
     corp_id: number | null; blocked: boolean;
     compact_mode: boolean; snap_to_grid: boolean; show_minimap: boolean; uniform_size: boolean;
-    show_statics: boolean; connection_thickness: string; route_mode: string; ui_zoom: string;
+    show_statics: boolean; easy_connect: boolean; connection_thickness: string; route_mode: string; ui_zoom: string;
     ui_settings: Record<string, unknown>; panel_order: string[];
   }>(
     `SELECT owner_id, character_id, character_name, role, corp_id, blocked,
-            compact_mode, snap_to_grid, show_minimap, uniform_size, show_statics,
+            compact_mode, snap_to_grid, show_minimap, uniform_size, show_statics, easy_connect,
             connection_thickness, route_mode, ui_zoom, ui_settings, panel_order
      FROM users WHERE id = $1`,
     [targetId],
@@ -365,6 +366,7 @@ authRouter.post('/switch-character', async (req, res) => {
     showMinimap: u.show_minimap ?? true,
     uniformSize: u.uniform_size ?? true,
     showStatics: u.show_statics ?? true,
+    easyConnect: u.easy_connect ?? false,
     connectionThickness: u.connection_thickness ?? 'standard',
     routeMode:   u.route_mode ?? 'shortest',
     uiZoom:      u.ui_zoom != null ? Number(u.ui_zoom) : 1,
@@ -409,8 +411,8 @@ authRouter.get('/me', async (req, res) => {
   let prefs = req.session.prefs;
   let role  = req.session.role ?? 'readonly';
   if (!prefs) {
-    const { rows } = await db.query<{ compact_mode: boolean; snap_to_grid: boolean; show_minimap: boolean; uniform_size: boolean; show_statics: boolean; connection_thickness: string; route_mode: string; ui_zoom: string; ui_settings: Record<string, unknown>; panel_order: string[]; role: string }>(
-      `SELECT compact_mode, snap_to_grid, show_minimap, uniform_size, show_statics, connection_thickness, route_mode, ui_zoom, ui_settings, panel_order, role FROM users WHERE id = $1`,
+    const { rows } = await db.query<{ compact_mode: boolean; snap_to_grid: boolean; show_minimap: boolean; uniform_size: boolean; show_statics: boolean; easy_connect: boolean; connection_thickness: string; route_mode: string; ui_zoom: string; ui_settings: Record<string, unknown>; panel_order: string[]; role: string }>(
+      `SELECT compact_mode, snap_to_grid, show_minimap, uniform_size, show_statics, easy_connect, connection_thickness, route_mode, ui_zoom, ui_settings, panel_order, role FROM users WHERE id = $1`,
       [req.session.userId],
     );
     const row = rows[0];
@@ -420,6 +422,7 @@ authRouter.get('/me', async (req, res) => {
       showMinimap: row?.show_minimap ?? true,
       uniformSize: row?.uniform_size ?? true,
       showStatics: row?.show_statics ?? true,
+      easyConnect: row?.easy_connect ?? false,
       connectionThickness: row?.connection_thickness ?? 'standard',
       routeMode:   row?.route_mode ?? 'shortest',
       uiZoom:      row?.ui_zoom != null ? Number(row.ui_zoom) : 1,
@@ -489,6 +492,7 @@ authRouter.get('/me', async (req, res) => {
       // prefs object on disk doesn't carry it, so the literal value would
       // be undefined and the UI would mistakenly read it as "off".
       showStatics:   prefs.showStatics ?? true,
+      easyConnect:   prefs.easyConnect ?? false,
       connectionThickness: prefs.connectionThickness ?? 'standard',
       routeMode:     prefs.routeMode ?? 'shortest',
       uiZoom:        prefs.uiZoom ?? 1,
@@ -505,7 +509,7 @@ const MAX_PANEL_KEY_LEN = 64;
 
 authRouter.patch('/preferences', async (req, res) => {
   if (!req.session.userId) { res.status(401).json({ error: 'Not authenticated' }); return; }
-  const { compactMode, snapToGrid, showMinimap, uniformSize, showStatics, connectionThickness, routeMode, uiZoom, panelOrder } = req.body as { compactMode?: boolean; snapToGrid?: boolean; showMinimap?: boolean; uniformSize?: boolean; showStatics?: boolean; connectionThickness?: string; routeMode?: string; uiZoom?: number; panelOrder?: unknown };
+  const { compactMode, snapToGrid, showMinimap, uniformSize, showStatics, easyConnect, connectionThickness, routeMode, uiZoom, panelOrder } = req.body as { compactMode?: boolean; snapToGrid?: boolean; showMinimap?: boolean; uniformSize?: boolean; showStatics?: boolean; easyConnect?: boolean; connectionThickness?: string; routeMode?: string; uiZoom?: number; panelOrder?: unknown };
   const VALID_THICKNESS = new Set(['thin', 'standard', 'thick', 'extra']);
   const VALID_ROUTE_MODE = new Set(['shortest', 'secure']);
 
@@ -516,6 +520,7 @@ authRouter.patch('/preferences', async (req, res) => {
   if (typeof showMinimap === 'boolean') { sets.push(`show_minimap = $${vals.length + 1}`); vals.push(showMinimap); }
   if (typeof uniformSize === 'boolean') { sets.push(`uniform_size = $${vals.length + 1}`); vals.push(uniformSize); }
   if (typeof showStatics === 'boolean') { sets.push(`show_statics = $${vals.length + 1}`); vals.push(showStatics); }
+  if (typeof easyConnect === 'boolean') { sets.push(`easy_connect = $${vals.length + 1}`); vals.push(easyConnect); }
   if (typeof connectionThickness === 'string' && VALID_THICKNESS.has(connectionThickness)) {
     sets.push(`connection_thickness = $${vals.length + 1}`); vals.push(connectionThickness);
   }
@@ -549,6 +554,7 @@ authRouter.patch('/preferences', async (req, res) => {
     if (typeof showMinimap === 'boolean') req.session.prefs.showMinimap = showMinimap;
     if (typeof uniformSize === 'boolean') req.session.prefs.uniformSize = uniformSize;
     if (typeof showStatics === 'boolean') req.session.prefs.showStatics = showStatics;
+    if (typeof easyConnect === 'boolean') req.session.prefs.easyConnect = easyConnect;
     if (typeof connectionThickness === 'string' && VALID_THICKNESS.has(connectionThickness)) {
       req.session.prefs.connectionThickness = connectionThickness;
     }

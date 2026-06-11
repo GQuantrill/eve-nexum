@@ -39,6 +39,7 @@ export interface AuthUser {
   showMinimap: boolean;
   uniformSize: boolean;
   showStatics: boolean;
+  easyConnect: boolean;
   connectionThickness: string;
   routeMode: string;
   uiZoom: number;

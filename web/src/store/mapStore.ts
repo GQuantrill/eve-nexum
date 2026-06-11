@@ -184,7 +184,7 @@ interface MapStore {
   undo: () => Promise<void>;
 
   panelOrder: string[];
-  applyPreferences: (prefs: { compactMode: boolean; snapToGrid: boolean; showMinimap: boolean; uniformSize: boolean; showStatics: boolean; connectionThickness: string; routeMode: string; uiZoom: number; panelOrder: string[] }) => void;
+  applyPreferences: (prefs: { compactMode: boolean; snapToGrid: boolean; showMinimap: boolean; uniformSize: boolean; showStatics: boolean; easyConnect: boolean; connectionThickness: string; routeMode: string; uiZoom: number; panelOrder: string[] }) => void;
   setPanelOrder: (order: string[]) => void;
   setShowMinimap: (v: boolean) => void;
   setUniformSize: (v: boolean) => void;
@@ -477,7 +477,7 @@ export const useMapStore = create<MapStore>()((set, get) => {
       await applyUndo(cmd);
     },
 
-    applyPreferences: ({ compactMode, snapToGrid, showMinimap, uniformSize, showStatics, connectionThickness, routeMode, uiZoom, panelOrder }) => {
+    applyPreferences: ({ compactMode, snapToGrid, showMinimap, uniformSize, showStatics, easyConnect, connectionThickness, routeMode, uiZoom, panelOrder }) => {
       // Whitelist of valid panel keys. `standings` was briefly a panel here
       // — kept in the filter so any persisted occurrence is silently
       // dropped on load now that standings live inline in the sov section.
@@ -491,7 +491,7 @@ export const useMapStore = create<MapStore>()((set, get) => {
       const VALID_ROUTE = new Set(['shortest', 'secure']);
       const safeRouteMode = (VALID_ROUTE.has(routeMode) ? routeMode : 'shortest') as 'shortest' | 'secure';
       const safeZoom = Number.isFinite(uiZoom) ? Math.min(1.5, Math.max(0.8, uiZoom)) : 1;
-      set({ compactMode, snapToGrid, showMinimap, uniformSize, showStatics, connectionThickness: safeThickness, routeMode: safeRouteMode, uiZoom: safeZoom, panelOrder: merged });
+      set({ compactMode, snapToGrid, showMinimap, uniformSize, showStatics, easyConnect, connectionThickness: safeThickness, routeMode: safeRouteMode, uiZoom: safeZoom, panelOrder: merged });
     },
 
     setPanelOrder: (order) => {
@@ -708,7 +708,10 @@ export const useMapStore = create<MapStore>()((set, get) => {
       }
     },
 
-    setEasyConnect: (v) => set({ easyConnect: v }),
+    setEasyConnect: (v) => {
+      set({ easyConnect: v });
+      api('/auth/preferences', { method: 'PATCH', body: JSON.stringify({ easyConnect: v }) }).catch(console.error);
+    },
     setMapOptionsOpen: (v) => set({ mapOptionsOpen: v }),
     setEdgeStyle: (v) => set({ edgeStyle: v }),
     requestAutoLayout: () => set({ autoLayoutPending: true }),
