@@ -27,6 +27,13 @@ import { useIdleLock } from './hooks/useIdleLock';
 import { LockScreen } from './components/ui/LockScreen';
 import './App.css';
 
+// Which signed-in user we've already hydrated prefs/settings for. MapApp
+// unmounts when you navigate away (e.g. to /admin) and re-mounts on return;
+// hydration must happen once per login, NOT on every mount, or the re-mount
+// would re-seed from the stale login-time user object and wipe any preference
+// changed in-session. Module-scoped so it survives MapApp unmount/remount.
+let hydratedForUserId: number | null = null;
+
 function MapApp() {
   const { user } = useAuth();
   const mapId               = useMapStore((s) => s.map.id);
@@ -59,13 +66,23 @@ function MapApp() {
   const userId = user?.id;
 
   useEffect(() => {
+    // Seed prefs/settings from the login-time user ONCE per signed-in user.
+    // Re-running on a MapApp re-mount (navigating to /admin and back) would
+    // re-apply the stale login-time values and clobber anything the user
+    // changed in-session — the reported "options reset on return" bug.
     if (user) {
-      applyPreferences({ compactMode: user.compactMode, snapToGrid: user.snapToGrid, showMinimap: user.showMinimap, uniformSize: user.uniformSize, showStatics: user.showStatics, connectionThickness: user.connectionThickness, routeMode: user.routeMode, uiZoom: user.uiZoom, panelOrder: user.panelOrder });
-      seedUserSettings(user.uiSettings ?? {});
-      // Push the now-canonical trackJumps from the hydrated user-settings
-      // cache into the map store. (mapStore's init runs before /auth/me
-      // resolves, so it pulled from localStorage only.)
-      useMapStore.setState({ trackJumps: readUserSetting<boolean>('nexum.trackJumps', true) });
+      if (hydratedForUserId !== user.id) {
+        hydratedForUserId = user.id;
+        applyPreferences({ compactMode: user.compactMode, snapToGrid: user.snapToGrid, showMinimap: user.showMinimap, uniformSize: user.uniformSize, showStatics: user.showStatics, connectionThickness: user.connectionThickness, routeMode: user.routeMode, uiZoom: user.uiZoom, panelOrder: user.panelOrder });
+        seedUserSettings(user.uiSettings ?? {});
+        // Push the now-canonical trackJumps from the hydrated user-settings
+        // cache into the map store. (mapStore's init runs before /auth/me
+        // resolves, so it pulled from localStorage only.)
+        useMapStore.setState({ trackJumps: readUserSetting<boolean>('nexum.trackJumps', true) });
+      }
+    } else {
+      // Logged out — allow the next login (even the same user) to re-hydrate.
+      hydratedForUserId = null;
     }
     loadMaps();
     // eslint-disable-next-line react-hooks/exhaustive-deps
