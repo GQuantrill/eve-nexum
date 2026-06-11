@@ -2675,10 +2675,14 @@
      the 4-square min-height floor (added for map-generation spacing) kept the
      node a fixed 80px tall, leaving empty space below the content. Opt compact
      nodes out of the floor so they hug their reduced content again — the
-     behaviour before the floor existed. Uniform sizing still wins via its
-     inline min-height when both are on. */
+     behaviour before the floor existed. Also drop the width floor by 2 grid
+     squares (160px → 120px, i.e. 8 → 6 squares) so compact nodes are narrower
+     too; still a snap-grid multiple, and content wider than that still grows
+     the node. Uniform sizing still wins via its inline min-width/height when
+     both modes are on. */
   &.system-node--compact {
     min-height: 0;
+    min-width: 120px;
   }
 
   &:hover {
