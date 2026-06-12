@@ -634,13 +634,32 @@ reportsRouter.get('/users', async (req, res) => {
       WHERE ${corpSql} AND s.created_by_user_id IS NOT NULL
       GROUP BY s.created_by_user_id
     ),
-    last_corp_struct AS (
-      SELECT st.created_by_user_id AS user_id, MAX(st.created_at) AS ts, COUNT(*)::int AS cnt
-      FROM map_structures st
-      JOIN map_systems sys ON sys.id = st.system_id
-      JOIN maps         m  ON m.id   = sys.map_id
-      WHERE ${corpSql} AND st.created_by_user_id IS NOT NULL
-      GROUP BY st.created_by_user_id
+    -- "Last active" = the most recent time a user did something of value on a
+    -- corp map: added or edited a signature, anomaly, or structure. Combined
+    -- with the user's last system-to-system move (last_known_system_at) in the
+    -- SELECT below. GREATEST(created_at, updated_at) per row catches edits, not
+    -- just the original add.
+    last_active AS (
+      SELECT user_id, MAX(ts) AS ts FROM (
+        SELECT s.created_by_user_id AS user_id, GREATEST(s.created_at, s.updated_at) AS ts
+          FROM reportable_signatures s
+          JOIN map_systems sys ON sys.id = s.system_id
+          JOIN maps         m  ON m.id   = sys.map_id
+          WHERE ${corpSql} AND s.created_by_user_id IS NOT NULL
+        UNION ALL
+        SELECT a.created_by_user_id, GREATEST(a.created_at, a.updated_at)
+          FROM map_anomalies a
+          JOIN map_systems sys ON sys.id = a.system_id
+          JOIN maps         m  ON m.id   = sys.map_id
+          WHERE ${corpSql} AND a.created_by_user_id IS NOT NULL
+        UNION ALL
+        SELECT st.created_by_user_id, GREATEST(st.created_at, st.updated_at)
+          FROM map_structures st
+          JOIN map_systems sys ON sys.id = st.system_id
+          JOIN maps         m  ON m.id   = sys.map_id
+          WHERE ${corpSql} AND st.created_by_user_id IS NOT NULL
+      ) acts
+      GROUP BY user_id
     ),
     sig_breakdown AS (
       -- Count live signatures (not the historical event log) so deletions
@@ -674,8 +693,7 @@ reportsRouter.get('/users', async (req, res) => {
       u.last_known_system_id AS "lastKnownSystemId",
       lks.name               AS "lastKnownSystemName",
       lcs.ts           AS "lastCorpSigAt",
-      lcst.ts          AS "lastCorpStructAt",
-      COALESCE(lcst.cnt, 0) AS "totalCorpStructures",
+      GREATEST(la.ts, u.last_known_system_at) AS "lastActive",
       COALESCE(
         (SELECT cnt FROM corp_system_events
           WHERE user_id = u.id AND event_type = 'system_add'),
@@ -694,7 +712,7 @@ reportsRouter.get('/users', async (req, res) => {
     FROM users u
     LEFT JOIN solar_systems    lks  ON lks.id       = u.last_known_system_id
     LEFT JOIN last_corp_sig    lcs  ON lcs.user_id  = u.id
-    LEFT JOIN last_corp_struct lcst ON lcst.user_id = u.id
+    LEFT JOIN last_active      la   ON la.user_id   = u.id
     ${inclusionWhere}
     ORDER BY u.character_name
   `, params);

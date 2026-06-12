@@ -204,8 +204,7 @@
         "colLastKnown": "Last known system",
         "colSystemsAdded": "Systems added",
         "colSystemsDeleted": "Systems deleted",
-        "colLastCorpStructure": "Last corp structure",
-        "colTotalStructures": "Total structures",
+        "colLastActive": "Last active",
         "colLastCorpSignature": "Last corp signature",
         "colTotalSignatures": "Total signatures"
       },
