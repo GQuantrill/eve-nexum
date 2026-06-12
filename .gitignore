@@ -43,3 +43,6 @@ server/data/*.zip
 .claude/
 
 changes.md
+
+# Local-only Compose overrides (e.g. publishing Postgres to the host for yarn-dev)
+docker-compose.override.yml
