@@ -606,6 +606,37 @@
   position: relative;
 }
 
+/* Responsive: the single 48px row needs ~1570px to fit every control. Below
+   that (vertical monitors, most laptops) wrap into two rows — map-editing
+   controls on row 1, stats/tools/user on row 2 — instead of clipping. The
+   --break spacer takes a full line so the secondary cluster drops cleanly,
+   and column-gap tightens (only while wrapped) so row 2 fits without a third
+   wrap; the desktop 24px gap is untouched. */
+@media (max-width: 1600px) {
+  .toolbar {
+    flex-wrap: wrap;
+    height: auto;
+    min-height: 48px;
+    row-gap: 4px;
+    column-gap: 14px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
+
+  .toolbar__spacer--break {
+    flex-basis: 100%;
+    height: 0;
+  }
+
+  /* Keep each cluster intact so a tight row 2 wraps whole units, not glyphs. */
+  .toolbar__stats,
+  .toolbar__proximity,
+  .toolbar__server-status,
+  .toolbar__user {
+    flex-shrink: 0;
+  }
+}
+
 .toolbar__brand {
   display: flex;
   align-items: center;
