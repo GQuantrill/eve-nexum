@@ -518,6 +518,19 @@
     "friendly": "Friendly",
     "watch": "Watch"
   },
+  "whChart": {
+    "open": "⊟ Wormhole reference",
+    "tooltip": "Look up any wormhole type — spawn, destination, ship size, mass and lifetime",
+    "title": "Wormhole type reference",
+    "searchPlaceholder": "Filter…",
+    "colWormholes": "Wormholes",
+    "colRespawn": "Respawn",
+    "colSpawnIn": "Spawn in",
+    "colLeadsTo": "Leads to",
+    "colShipSize": "Ship jump size",
+    "colTotalMass": "Total mass",
+    "colLifetime": "Lifetime"
+  },
   "watchlist": {
     "hint": "Holes you're hunting for. Watch a system, a wormhole type, or a characteristic (shattered, an effect, frig holes); matches are highlighted on the map (and chime once, if enabled).",
     "chimeToggle": "Chime when a watched system appears",

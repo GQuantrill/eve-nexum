@@ -16,12 +16,13 @@ import { ApiKeysModal } from './ApiKeysModal';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { CharacterSwitcher } from './CharacterSwitcher';
 import { HeatmapMenu } from './HeatmapMenu';
+import { WhTypeChartModal } from './WhTypeChartModal';
 import { useProximityAlerts } from '../../hooks/useProximityAlerts';
 import {
   WarningIcon, SkullIcon, XCircleIcon, QuestionIcon,
   ShieldStarIcon, ChartBarIcon, SlidersHorizontalIcon, FootprintsIcon,
   SignOutIcon, PlanetIcon, LinkSimpleIcon, ClockCountdownIcon, MapPinIcon,
-  KeyIcon,
+  KeyIcon, GraphIcon,
 } from '@phosphor-icons/react';
 import type { Icon as PhosphorIcon } from '@phosphor-icons/react';
 import { charPortrait, typeIcon } from '../../utils/eveImages';
@@ -228,6 +229,7 @@ export function Toolbar() {
   const [showStats, setShowStats] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
   const [showKeys, setShowKeys] = useState(false);
+  const [showWhChart, setShowWhChart] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
 
   async function handleDeleteMap() {
@@ -381,6 +383,15 @@ export function Toolbar() {
         <QuestionIcon size={18} weight="regular" />
       </a>
 
+      <button
+        className="toolbar__toggle toolbar__toggle--icon toolbar__toggle--prominent"
+        onClick={() => setShowWhChart(true)}
+        data-tooltip={t('whChart.tooltip')}
+        aria-label={t('whChart.title')}
+      >
+        <GraphIcon size={18} weight="regular" />
+      </button>
+
       <HeatmapMenu />
 
       <button
@@ -528,6 +539,7 @@ export function Toolbar() {
     {showStats && <UserStatsModal onClose={() => setShowStats(false)} />}
     {showCreate && <CreateMapModal onClose={() => setShowCreate(false)} />}
     {showKeys && <ApiKeysModal onClose={() => setShowKeys(false)} />}
+    {showWhChart && <WhTypeChartModal onClose={() => setShowWhChart(false)} />}
     {deleteConfirm && (
       <ConfirmModal
         message={t('toolbar.deleteMapConfirm', { name: mapName })}
