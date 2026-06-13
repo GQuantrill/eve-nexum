@@ -173,7 +173,10 @@ export function WhTypeChartModal({ onClose }: { onClose: () => void }) {
             key={key}
             ref={setRow(key)}
             className={`whchart__cell whchart__cell--hit${on ? ' whchart__cell--on' : ''}`}
-            style={on && c ? { color: c } : c && !on ? { color: c, opacity: 0.55 } : undefined}
+            // Dim non-highlighted colour via text alpha (#rrggbb + 8c ≈ 0.55),
+            // NOT element opacity — opacity would make the cell box translucent
+            // too and let connector lines show through it.
+            style={on && c ? { color: c } : c && !on ? { color: `${c}8c` } : undefined}
             onMouseEnter={() => hover({ kind: 'attr', col: keyPrefix, val: v })}
             onClick={() => toggle({ kind: 'attr', col: keyPrefix, val: v }, sameAttr(keyPrefix, v))}
           >
