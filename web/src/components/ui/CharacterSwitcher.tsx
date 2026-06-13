@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
+import { useClickOutside } from '../../hooks/useClickOutside';
 import { charPortrait } from '../../utils/eveImages';
 import { useTranslation } from 'react-i18next';
 import { CaretDownIcon, PlusIcon, CheckIcon, MapPinIcon, TrashIcon } from '@phosphor-icons/react';
@@ -32,14 +33,7 @@ export function CharacterSwitcher() {
   const [pendingRemove, setPendingRemove] = useState<{ id: number; characterName: string } | null>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (!open) return;
-    const onDown = (e: MouseEvent) => {
-      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener('mousedown', onDown);
-    return () => document.removeEventListener('mousedown', onDown);
-  }, [open]);
+  useClickOutside(open, wrapRef, () => setOpen(false));
 
   if (!user) return null;
   const characters = user.characters ?? [];

@@ -39,10 +39,12 @@ export function WHTypeInfo({ code, children }: Props) {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     };
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
-    window.addEventListener('mousedown', onClick);
+    // Capture phase: the react-flow map canvas swallows bubbling pointer events,
+    // so a bubbling listener wouldn't fire for clicks out on the map.
+    document.addEventListener('pointerdown', onClick, true);
     window.addEventListener('keydown', onKey);
     return () => {
-      window.removeEventListener('mousedown', onClick);
+      document.removeEventListener('pointerdown', onClick, true);
       window.removeEventListener('keydown', onKey);
     };
   }, [open, hoverMode]);
