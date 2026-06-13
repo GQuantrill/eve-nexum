@@ -8086,6 +8086,8 @@ select.sig-toolbar-btn option {
   padding-bottom: 4px;
   border-bottom: 1px solid #1e2740;
   margin-bottom: 4px;
+  /* Opaque (matches the modal) so connectors tuck behind the labels. */
+  background: #0d1117;
 }
 
 .whchart__cell {
@@ -8096,6 +8098,9 @@ select.sig-toolbar-btn option {
   overflow: hidden;
   text-overflow: ellipsis;
   transition: color 0.1s;
+  /* Opaque so transiting lines are occluded by the cell box rather than drawn
+     over the glyphs — the lines only show through the gaps between cells. */
+  background: #0d1117;
 }
 
 /* Highlighted target rows for the active code. */
@@ -8119,6 +8124,8 @@ select.sig-toolbar-btn option {
   border-radius: 3px;
   cursor: pointer;
   break-inside: avoid;
+  /* Opaque so connectors tuck behind the codes, showing only in the gaps. */
+  background: #0d1117;
 }
 
 .whchart__code:hover { background: #141c2e; color: #c8d4f0; }
