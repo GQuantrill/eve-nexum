@@ -591,7 +591,6 @@ export function Toolbar() {
           </div>
         </div>
         <CharacterSwitcher />
-        <LanguageSwitcher />
       </div>
     ) : null,
   };
@@ -625,6 +624,7 @@ export function Toolbar() {
               <ArrowCounterClockwiseIcon size={16} weight="regular" />
             </button>
           )}
+          <LanguageSwitcher />
           <button
             className="toolbar__toggle toolbar__toggle--icon"
             onClick={() => setShowKeys(true)}
