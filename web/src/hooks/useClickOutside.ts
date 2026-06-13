@@ -14,8 +14,10 @@ export function useClickOutside<T extends HTMLElement>(
   ref: RefObject<T | null>,
   onOutside: () => void,
 ) {
+  // Keep the latest callback without re-subscribing the listener every render.
+  // Written in an effect, not during render — refs are write-after-commit.
   const cb = useRef(onOutside);
-  cb.current = onOutside;
+  useEffect(() => { cb.current = onOutside; });
 
   useEffect(() => {
     if (!enabled) return;
