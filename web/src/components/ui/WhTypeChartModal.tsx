@@ -6,13 +6,21 @@ import { CLASS_COLORS } from '../../data/wormholes';
 import type { SystemClass } from '../../types';
 import {
   WH_CHART, RESPAWN_ORDER, SPAWN_ORDER, LEADS_ORDER, SHIP_ORDER, MASS_ORDER, LIFE_ORDER,
-  type WhChartEntry,
+  type WhChartEntry, type Respawn,
 } from '../../data/whTypeChart';
 
-// A Nexum take on whtype.info: pick a wormhole code and lines light up its
-// spawn / leads-to / ship size / total mass / lifetime across the columns.
+// A Nexum take on whtype.info: hover ANY cell — a wormhole code OR an attribute
+// value — and lines connect a code to its values (or a value to every code that
+// has it), with the matching cells highlighted.
 
 interface Line { d: string; color: string; }
+
+// Selection is either a wormhole code, or a value in one of the attribute
+// columns (identified by its column prefix + value).
+type Active =
+  | { kind: 'code'; code: string }
+  | { kind: 'attr'; col: string; val: string }
+  | null;
 
 // Map a spawn/leads label to a class colour where one exists, for the row text.
 function labelColor(label: string): string | undefined {
@@ -27,75 +35,114 @@ function labelColor(label: string): string | undefined {
   return key ? CLASS_COLORS[key] : undefined;
 }
 
-// Colour for a whole code's line bundle — by its destination class so the eye
-// can follow it. Drifter / special dests fall back to a neutral accent.
-function lineColorFor(entry: WhChartEntry): string {
-  return labelColor(entry.leads_to[0] ?? '') ?? '#5b9bff';
+const ACCENT = '#5b9bff';
+function codeLineColor(entry: WhChartEntry): string {
+  return labelColor(entry.leads_to[0] ?? '') ?? ACCENT;
+}
+
+// Does an entry occupy this attribute column's value?
+function entryHasAttr(e: WhChartEntry, col: string, val: string): boolean {
+  switch (col) {
+    case 'respawn': return e.respawn.includes(val as Respawn);
+    case 'spawn':   return e.spawn_in.includes(val);
+    case 'leads':   return e.leads_to.includes(val);
+    case 'ship':    return e.ship_size === val;
+    case 'mass':    return e.total_mass === val;
+    case 'life':    return e.life_time === val;
+    default:        return false;
+  }
+}
+
+// The attribute keys an entry connects to.
+function attrKeysFor(e: WhChartEntry): string[] {
+  return [
+    ...e.respawn.map((r) => `respawn:${r}`),
+    ...e.spawn_in.map((v) => `spawn:${v}`),
+    ...e.leads_to.map((v) => `leads:${v}`),
+    ...(e.ship_size  ? [`ship:${e.ship_size}`]  : []),
+    ...(e.total_mass ? [`mass:${e.total_mass}`] : []),
+    ...(e.life_time  ? [`life:${e.life_time}`]  : []),
+  ];
 }
 
 export function WhTypeChartModal({ onClose }: { onClose: () => void }) {
   const { t } = useTranslation();
-  const [active, setActive] = useState<string | null>(null);
+  const [active, setActive] = useState<Active>(null);
+  // Pinned (clicked) selections persist on mouse-out so you can read the
+  // highlighted result; hovering only previews while nothing is pinned.
+  const [pinned, setPinned] = useState(false);
   const [search, setSearch] = useState('');
+
+  const hover = (a: Active) => { if (!pinned) setActive(a); };
+  const toggle = (a: Active, isSame: boolean) => {
+    if (isSame && pinned) { setActive(null); setPinned(false); }
+    else { setActive(a); setPinned(true); }
+  };
 
   const bodyRef = useRef<HTMLDivElement | null>(null);
   const codeListRef = useRef<HTMLDivElement | null>(null);
-  // key -> row element, for measuring line endpoints.
   const rows = useRef<Map<string, HTMLElement>>(new Map());
   const setRow = (key: string) => (el: HTMLElement | null) => {
     if (el) rows.current.set(key, el); else rows.current.delete(key);
   };
-
-  const entry = useMemo(() => WH_CHART.find((w) => w.wormhole === active) ?? null, [active]);
 
   const codes = useMemo(() => {
     const q = search.trim().toUpperCase();
     return WH_CHART.filter((w) => !q || w.wormhole.toUpperCase().includes(q));
   }, [search]);
 
-  // Which column rows the active code touches (for highlighting).
-  const activeTargets = useMemo(() => {
-    const s = new Set<string>();
-    if (!entry) return s;
-    entry.respawn.forEach((r) => s.add(`respawn:${r}`));
-    entry.spawn_in.forEach((v) => s.add(`spawn:${v}`));
-    entry.leads_to.forEach((v) => s.add(`leads:${v}`));
-    if (entry.ship_size)  s.add(`ship:${entry.ship_size}`);
-    if (entry.total_mass) s.add(`mass:${entry.total_mass}`);
-    if (entry.life_time)  s.add(`life:${entry.life_time}`);
-    return s;
-  }, [entry]);
+  // From the active selection, compute the connection pairs (each = a code row
+  // to an attribute-value row), the highlight set, and the line colour. Works
+  // both directions: a code → its values, or a value → every code that has it.
+  const { pairs, highlight, lineColor } = useMemo(() => {
+    const pairs: Array<{ code: string; attrKey: string }> = [];
+    const hl = new Set<string>();
+    let color = ACCENT;
+    if (active?.kind === 'code') {
+      const e = WH_CHART.find((w) => w.wormhole === active.code);
+      if (e) {
+        color = codeLineColor(e);
+        hl.add(`code:${e.wormhole}`);
+        for (const k of attrKeysFor(e)) { hl.add(k); pairs.push({ code: e.wormhole, attrKey: k }); }
+      }
+    } else if (active?.kind === 'attr') {
+      const attrKey = `${active.col}:${active.val}`;
+      hl.add(attrKey);
+      color = labelColor(active.val) ?? ACCENT;
+      for (const e of WH_CHART) {
+        if (entryHasAttr(e, active.col, active.val)) {
+          hl.add(`code:${e.wormhole}`);
+          pairs.push({ code: e.wormhole, attrKey });
+        }
+      }
+    }
+    return { pairs, highlight: hl, lineColor: color };
+  }, [active]);
 
   const [lines, setLines] = useState<Line[]>([]);
 
-  // Recompute the connecting lines whenever the active code changes (and when
-  // the code list scrolls or the window resizes, so the source endpoint tracks
-  // the hovered row).
   useLayoutEffect(() => {
     function recompute() {
       const body = bodyRef.current;
-      const src = active ? rows.current.get(`code:${active}`) : null;
-      if (!body || !src || !entry) { setLines([]); return; }
+      if (!body || pairs.length === 0) { setLines([]); return; }
       const base = body.getBoundingClientRect();
-      const rel = (el: HTMLElement) => {
-        const r = el.getBoundingClientRect();
-        return { x: r.left - base.left, y: r.top - base.top + r.height / 2 };
-      };
-      const sr = src.getBoundingClientRect();
-      // Clamp the source Y to the visible code-list band so a scrolled-away
-      // code doesn't shoot a line off into space.
       const list = codeListRef.current?.getBoundingClientRect();
-      let sy = sr.top - base.top + sr.height / 2;
-      if (list) sy = Math.max(list.top - base.top, Math.min(list.bottom - base.top, sy));
-      const sx = sr.right - base.left;
-      const color = lineColorFor(entry);
       const out: Line[] = [];
-      for (const key of activeTargets) {
-        const el = rows.current.get(key);
-        if (!el) continue;
-        const { x: tx, y: ty } = rel(el);
+      for (const p of pairs) {
+        const codeEl = rows.current.get(`code:${p.code}`);
+        const attrEl = rows.current.get(p.attrKey);
+        if (!codeEl || !attrEl) continue;        // code may be filtered out by search
+        const cr = codeEl.getBoundingClientRect();
+        const ar = attrEl.getBoundingClientRect();
+        const sx = cr.right - base.left;
+        let sy = cr.top - base.top + cr.height / 2;
+        // Clamp the code endpoint to the visible scroll band so off-screen
+        // codes don't trail lines into space.
+        if (list) sy = Math.max(list.top - base.top, Math.min(list.bottom - base.top, sy));
+        const tx = ar.left - base.left;
+        const ty = ar.top - base.top + ar.height / 2;
         const dx = Math.max(40, (tx - sx) * 0.45);
-        out.push({ d: `M ${sx},${sy} C ${sx + dx},${sy} ${tx - dx},${ty} ${tx},${ty}`, color });
+        out.push({ d: `M ${sx},${sy} C ${sx + dx},${sy} ${tx - dx},${ty} ${tx},${ty}`, color: lineColor });
       }
       setLines(out);
     }
@@ -104,7 +151,10 @@ export function WhTypeChartModal({ onClose }: { onClose: () => void }) {
     list?.addEventListener('scroll', recompute);
     window.addEventListener('resize', recompute);
     return () => { list?.removeEventListener('scroll', recompute); window.removeEventListener('resize', recompute); };
-  }, [active, entry, activeTargets]);
+  }, [pairs, lineColor]);
+
+  const sameAttr = (col: string, v: string) =>
+    active?.kind === 'attr' && active.col === col && active.val === v;
 
   const col = (
     title: string,
@@ -116,14 +166,16 @@ export function WhTypeChartModal({ onClose }: { onClose: () => void }) {
       <div className="whchart__col-head">{title}</div>
       {values.map((v) => {
         const key = `${keyPrefix}:${v}`;
-        const on = activeTargets.has(key);
+        const on = highlight.has(key);
         const c = opts?.colorize ? labelColor(v) : undefined;
         return (
           <div
             key={key}
             ref={setRow(key)}
-            className={`whchart__cell${on ? ' whchart__cell--on' : ''}`}
+            className={`whchart__cell whchart__cell--hit${on ? ' whchart__cell--on' : ''}`}
             style={on && c ? { color: c } : c && !on ? { color: c, opacity: 0.55 } : undefined}
+            onMouseEnter={() => hover({ kind: 'attr', col: keyPrefix, val: v })}
+            onClick={() => toggle({ kind: 'attr', col: keyPrefix, val: v }, sameAttr(keyPrefix, v))}
           >
             {v}
           </div>
@@ -142,7 +194,7 @@ export function WhTypeChartModal({ onClose }: { onClose: () => void }) {
           </button>
         </div>
 
-        <div className="modal__body whchart__body" ref={bodyRef}>
+        <div className="modal__body whchart__body" ref={bodyRef} onMouseLeave={() => { if (!pinned) setActive(null); }}>
           <svg className="whchart__lines" aria-hidden="true">
             {lines.map((l, i) => (
               <path key={i} d={l.d} fill="none" stroke={l.color} strokeWidth={1.5} opacity={0.85} />
@@ -162,17 +214,20 @@ export function WhTypeChartModal({ onClose }: { onClose: () => void }) {
               />
             </div>
             <div className="whchart__codes" ref={codeListRef}>
-              {codes.map((w) => (
-                <div
-                  key={w.wormhole}
-                  ref={setRow(`code:${w.wormhole}`)}
-                  className={`whchart__code${active === w.wormhole ? ' whchart__code--active' : ''}`}
-                  onMouseEnter={() => setActive(w.wormhole)}
-                  onClick={() => setActive((cur) => (cur === w.wormhole ? null : w.wormhole))}
-                >
-                  {w.wormhole}
-                </div>
-              ))}
+              {codes.map((w) => {
+                const on = highlight.has(`code:${w.wormhole}`);
+                return (
+                  <div
+                    key={w.wormhole}
+                    ref={setRow(`code:${w.wormhole}`)}
+                    className={`whchart__code${on ? ' whchart__code--active' : ''}`}
+                    onMouseEnter={() => hover({ kind: 'code', code: w.wormhole })}
+                    onClick={() => toggle({ kind: 'code', code: w.wormhole }, active?.kind === 'code' && active.code === w.wormhole)}
+                  >
+                    {w.wormhole}
+                  </div>
+                );
+              })}
             </div>
           </div>
 

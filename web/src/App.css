@@ -8046,18 +8046,20 @@ select.sig-toolbar-btn option {
      side-by-side instead of stacking under the (full-width) code list. */
   flex-direction: row;
   gap: 10px;
-  height: 72vh;
+  height: auto;
+  max-height: 80vh;
   overflow: hidden;
 }
 
-/* SVG line overlay sits above the columns; never eats pointer events. */
+/* SVG line overlay sits BEHIND the column text (z-index 0); columns are lifted
+   to z-index 1 so the connectors read as running under the labels. */
 .whchart__lines {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   pointer-events: none;
-  z-index: 2;
+  z-index: 0;
 }
 
 .whchart__col {
@@ -8066,9 +8068,11 @@ select.sig-toolbar-btn option {
   gap: 2px;
   flex: 1;
   min-width: 0;
+  position: relative;
+  z-index: 1;
 }
 
-.whchart__col--codes { flex: 0 0 84px; }
+.whchart__col--codes { flex: 0 0 200px; }
 .whchart__col--narrow { flex: 0 0 110px; }
 
 .whchart__col-head {
@@ -8097,12 +8101,11 @@ select.sig-toolbar-btn option {
   font-weight: 600;
 }
 
+/* Codes flow top-to-bottom down each column (alphabetical within a column),
+   balanced across 4 columns so all ~101 fit without a scroll. */
 .whchart__codes {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  overflow-y: auto;
-  flex: 1;
+  column-count: 4;
+  column-gap: 6px;
 }
 
 .whchart__code {
@@ -8112,6 +8115,7 @@ select.sig-toolbar-btn option {
   padding: 1px 4px;
   border-radius: 3px;
   cursor: pointer;
+  break-inside: avoid;
 }
 
 .whchart__code:hover { background: #141c2e; color: #c8d4f0; }
