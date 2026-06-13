@@ -336,7 +336,9 @@ export function Toolbar() {
         />
       </div>
 
-      <div className="toolbar__spacer" />
+      {/* Wrap point on narrow screens: map-editing controls stay on row 1,
+          stats/tools/user drop to row 2 (see the toolbar media query). */}
+      <div className="toolbar__spacer toolbar__spacer--break" />
 
       <div className="toolbar__stats">
         <span className="toolbar__stat" data-tooltip={t('toolbar.totalSystems')}>
