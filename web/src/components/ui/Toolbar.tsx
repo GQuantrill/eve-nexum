@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { timeAgo, jumps } from '../../i18n/format';
@@ -18,6 +18,7 @@ import { CharacterSwitcher } from './CharacterSwitcher';
 import { HeatmapMenu } from './HeatmapMenu';
 import { WhTypeChartModal } from './WhTypeChartModal';
 import { useProximityAlerts } from '../../hooks/useProximityAlerts';
+import { useClickOutside } from '../../hooks/useClickOutside';
 import {
   WarningIcon, SkullIcon, XCircleIcon, QuestionIcon,
   ShieldStarIcon, ChartBarIcon, SlidersHorizontalIcon, FootprintsIcon,
@@ -231,6 +232,8 @@ export function Toolbar() {
   const [showKeys, setShowKeys] = useState(false);
   const [showWhChart, setShowWhChart] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const mapSwitcherRef = useRef<HTMLDivElement>(null);
+  useClickOutside(showMaps, mapSwitcherRef, () => setShowMaps(false));
 
   async function handleDeleteMap() {
     if (!activeMapId) return;
@@ -245,7 +248,7 @@ export function Toolbar() {
       </div>
 
       {/* Map switcher */}
-      <div className="toolbar__map-switcher">
+      <div className="toolbar__map-switcher" ref={mapSwitcherRef}>
         <button
           className="toolbar__map-name-btn"
           onClick={() => setShowMaps((v) => !v)}

@@ -93,8 +93,10 @@ export function NpcStationsPane({ eveSystemId }: { eveSystemId: number | null })
 
   useEffect(() => {
     const close = () => setCtx(null);
-    window.addEventListener('mousedown', close);
-    return () => window.removeEventListener('mousedown', close);
+    // Capture phase so a click on the map (whose canvas swallows bubbling
+    // pointer events) also dismisses the station context menu.
+    document.addEventListener('pointerdown', close, true);
+    return () => document.removeEventListener('pointerdown', close, true);
   }, []);
 
   const onContextMenu = (e: React.MouseEvent, station: NpcStation) => {

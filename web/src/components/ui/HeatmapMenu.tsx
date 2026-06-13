@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FireIcon } from '@phosphor-icons/react';
 import { useUserSetting } from '../../hooks/useUserSetting';
+import { useClickOutside } from '../../hooks/useClickOutside';
 import { HEAT_METRICS, type HeatMetric } from '../../utils/heatmap';
 
 /**
@@ -17,14 +18,7 @@ export function HeatmapMenu() {
   const [open, setOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (!open) return;
-    const onDown = (e: MouseEvent) => {
-      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener('mousedown', onDown);
-    return () => document.removeEventListener('mousedown', onDown);
-  }, [open]);
+  useClickOutside(open, wrapRef, () => setOpen(false));
 
   const active = metric !== 'none';
 

@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CaretDownIcon, CheckIcon } from '@phosphor-icons/react';
 import { SUPPORTED_LANGUAGES, LANGUAGE_NAMES, type SupportedLanguage } from '../../i18n';
+import { useClickOutside } from '../../hooks/useClickOutside';
 import { LangFlag } from './LangFlag';
 
 // Custom dropdown (not a native <select>) because native <option>s can't render
@@ -12,14 +13,7 @@ export function LanguageSwitcher() {
   const [open, setOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (!open) return;
-    const onDown = (e: MouseEvent) => {
-      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener('mousedown', onDown);
-    return () => document.removeEventListener('mousedown', onDown);
-  }, [open]);
+  useClickOutside(open, wrapRef, () => setOpen(false));
 
   const choose = (lng: SupportedLanguage) => {
     void i18n.changeLanguage(lng);
