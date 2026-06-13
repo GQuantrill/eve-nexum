@@ -8042,6 +8042,9 @@ select.sig-toolbar-btn option {
 .whchart__body {
   position: relative;
   display: flex;
+  /* .modal__body defaults to column — force row so the attribute columns sit
+     side-by-side instead of stacking under the (full-width) code list. */
+  flex-direction: row;
   gap: 10px;
   height: 72vh;
   overflow: hidden;
