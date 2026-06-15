@@ -647,7 +647,8 @@
     "zoomIn": "Zoom in",
     "zoomOut": "Zoom out",
     "fitView": "Fit view",
-    "interactive": "Toggle interactivity"
+    "interactive": "Toggle interactivity",
+    "centerOnMe": "Centre on my location"
   },
   "demo": {
     "hintClick": "Click a system to view its details here.",
