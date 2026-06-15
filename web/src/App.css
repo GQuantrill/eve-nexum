@@ -4120,7 +4120,9 @@ div.system-node__easy-handle {
 
 .sys-info__sov {
   display: flex;
-  flex-wrap: nowrap;
+  /* Wrap on a narrow panel so the P/C/A standings drop below the name instead
+     of squeezing the name column until it breaks character-by-character. */
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
   background: #0d1421;
@@ -4141,6 +4143,9 @@ div.system-node__easy-handle {
   display: flex;
   flex-direction: column;
   gap: 1px;
+  /* Claim ~120px so the standings wrap below once the row can't hold name +
+     badges; min-width: 0 still lets the name word-wrap when space is tight. */
+  flex: 1 1 120px;
   min-width: 0;
 }
 
@@ -7953,7 +7958,8 @@ select.sig-toolbar-btn option {
 .sys-info__sov-standings {
   display: flex;
   gap: 4px;
-  margin-left: auto;
+  /* No margin-left:auto — the grown text column pushes the badges right on a
+     shared line, and when they wrap to their own line they sit left-aligned. */
 }
 
 .sys-info__sov-standing {
