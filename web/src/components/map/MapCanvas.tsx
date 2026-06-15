@@ -135,6 +135,7 @@ export function MapCanvas() {
   const requestAutoLayout    = useMapStore((s) => s.requestAutoLayout);
   const optimizeConnections  = useMapStore((s) => s.optimizeConnections);
   const compactMode          = useMapStore((s) => s.compactMode);
+  const uniformSize          = useMapStore((s) => s.uniformSize);
   const fitViewPending       = useMapStore((s) => s.fitViewPending);
   const clearFitView         = useMapStore((s) => s.clearFitView);
   const centerRequestEveId   = useMapStore((s) => s.centerRequestEveId);
@@ -441,6 +442,27 @@ export function MapCanvas() {
       return () => clearTimeout(t);
     }
   }, [compactMode, canEdit, requestAutoLayout]);
+
+  // A system added while the tab is backgrounded never gets measured (the
+  // ResizeObserver is deferred for hidden tabs), so the uniform-size max can't
+  // see it. When the tab regains focus everything re-measures and that max can
+  // ratchet up — growing every node past the slots they were tiled into and
+  // leaving them overlapping. Re-run the (overlap-only, undoable) spread once
+  // the re-measure has settled, same as the compact-mode-off handler. No-op
+  // when nothing actually overlaps; only matters with uniform size on.
+  useEffect(() => {
+    if (!uniformSize || !canEdit) return;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const onVisible = () => {
+      if (document.visibilityState !== 'visible') return;
+      // Generous delay so re-measurement (and any SSE-reconnect map refetch)
+      // has finished before overlap detection runs.
+      clearTimeout(timer);
+      timer = setTimeout(() => requestAutoLayout(), 700);
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => { clearTimeout(timer); document.removeEventListener('visibilitychange', onVisible); };
+  }, [uniformSize, canEdit, requestAutoLayout]);
 
   useEffect(() => {
     if (!autoLayoutPending) return;
