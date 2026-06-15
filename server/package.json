@@ -6,7 +6,7 @@
     "email": "gq@area404.org",
     "url": "https://area404.org"
   },
-  "version": "1.5.0",
+  "version": "1.5.1",
   "private": true,
   "scripts": {
     "dev": "tsx watch src/index.ts",
@@ -18,7 +18,8 @@
     "extract-wormholes": "tsx scripts/extract-wormholes.ts"
   },
   "resolutions": {
-    "qs": "^6.15.2"
+    "qs": "^6.15.2",
+    "esbuild": "^0.28.1"
   },
   "dependencies": {
     "cheerio": "^1.2.0",
