@@ -13,6 +13,15 @@ function boxesOverlap(ax: number, ay: number, bx: number, by: number, w: number,
   return ax < bx + w + gap && ax + w + gap > bx && ay < by + h + gap && ay + h + gap > by;
 }
 
+// Snap-grid size — must match MapCanvas's snapGrid ([20,20]) and mapStore's GRID.
+const GRID = 20;
+// Auto-placed systems always sit a consistent 3 grid squares clear of the
+// system they're placed next to — rather than a node-width-dependent gap that
+// drifted as the uniform-size max grew.
+const PLACEMENT_GAP = 3 * GRID;
+const ceilToGrid  = (n: number) => Math.ceil(n / GRID) * GRID;
+const roundToGrid = (n: number) => Math.round(n / GRID) * GRID;
+
 // Slots around the source, both clockwise (+y is down): cardinals first, then
 // diagonals, scaled by `ring` for distance. The user's default-placement pref
 // picks the starting cardinal direction; rotation continues clockwise from
@@ -54,23 +63,28 @@ function findFreePosition(
   h: number,
   gap: number,
   direction: PlacementDirection,
+  snap: boolean,
 ): { x: number; y: number } {
   const collides = (x: number, y: number) =>
     systems.some((s) => boxesOverlap(x, y, s.position.x, s.position.y, w, h, gap));
 
+  // Grid-aligned step: a whole node footprint rounded up to the grid plus the
+  // fixed gap, so spacing is consistent instead of drifting with node width.
+  // When snap-to-grid is on, the final position is rounded onto the grid too.
+  const place = (x: number, y: number) =>
+    snap ? { x: roundToGrid(x), y: roundToGrid(y) } : { x, y };
   const offsets = OFFSETS_BY_DIR[direction];
-  const stepX = w + gap;
-  const stepY = h + gap;
+  const stepX = ceilToGrid(w) + gap;
+  const stepY = ceilToGrid(h) + gap;
   for (let ring = 1; ring <= 6; ring++) {
     for (const [dx, dy] of offsets) {
-      const x = source.x + dx * ring * stepX;
-      const y = source.y + dy * ring * stepY;
-      if (!collides(x, y)) return { x, y };
+      const c = place(source.x + dx * ring * stepX, source.y + dy * ring * stepY);
+      if (!collides(c.x, c.y)) return c;
     }
   }
   // Dense map — fall back to a single step in the preferred direction.
   const [fx, fy] = FALLBACK_BY_DIR[direction];
-  return { x: source.x + fx * stepX, y: source.y + fy * stepY };
+  return place(source.x + fx * stepX, source.y + fy * stepY);
 }
 
 /**
@@ -88,7 +102,7 @@ export function useLocationTracking(enabled: boolean) {
 
   useEffect(() => {
     if (!enabled) return;
-    const { map, addSystem, addConnection, selectSystem, setCurrentSystem, uniformWidth, uniformHeight } = useMapStore.getState();
+    const { map, addSystem, addConnection, selectSystem, setCurrentSystem, uniformWidth, uniformHeight, snapToGrid } = useMapStore.getState();
 
     // No active map loaded yet (mid switchMap / first paint) — wait for the
     // next location update rather than racing addSystem against an empty store.
@@ -137,13 +151,12 @@ export function useLocationTracking(enabled: boolean) {
         setCurrentSystem(null);
         return;
       }
-      // Offset by the widest node seen + a gap so an auto-added system never
-      // overlaps the one it's placed next to (positions are top-left corners;
-      // a flat +200 touched because nodes are ~200 wide). Falls back to a
-      // generous constant before any node has been measured.
+      // Offset by the widest node seen so an auto-added system never overlaps
+      // the one it's placed next to (positions are top-left corners). Falls back
+      // to a generous constant before any node has been measured.
       const w = uniformWidth || 220;
       const h = uniformHeight || 120;
-      const gap = 30;
+      const gap = PLACEMENT_GAP;
       // Anchor placement on the system we jumped from (or the map centroid for
       // the very first auto-add), then rotate clockwise around it into the
       // first free slot — right, below, left, above, diagonals, wider rings.
@@ -157,7 +170,7 @@ export function useLocationTracking(enabled: boolean) {
         };
       }
       const direction = normalizePlacement(readUserSetting<string>('nexum.map.placement', 'east'));
-      const position = findFreePosition(source, map.systems, w, h, gap, direction);
+      const position = findFreePosition(source, map.systems, w, h, gap, direction, snapToGrid);
 
       mapSystemId = addSystem(
         system.name,
