@@ -7,7 +7,7 @@ import {
   UsersIcon, UsersThreeIcon, StackIcon, ArrowsMergeIcon, ArrowsClockwiseIcon, LockIcon, ShieldCheckIcon,
   CardsIcon, WaveformIcon, BuildingsIcon, SparkleIcon, ChartLineIcon, FlagBannerIcon, SwordIcon, HandshakeIcon,
   PathIcon, StarIcon, SnowflakeIcon, LightningIcon, WarningIcon, NavigationArrowIcon, MapPinIcon, BroadcastIcon, BellRingingIcon, DiscordLogoIcon, BinocularsIcon,
-  CommandIcon, HouseIcon, SkullIcon, ChartBarIcon, PulseIcon, EyeIcon, SidebarIcon,
+  CommandIcon, HouseIcon, SkullIcon, ChartBarIcon, PulseIcon, EyeIcon, SidebarIcon, EyeglassesIcon,
   SquaresFourIcon, UserGearIcon, TableIcon, ChartDonutIcon, ClockIcon, ClipboardTextIcon, TagIcon, IdentificationCardIcon,
 } from '@phosphor-icons/react';
 import { apiUrl } from '../../api/client';
@@ -32,7 +32,7 @@ type FeatureId =
   | 'scout' | 'a0' | 'iceBelt' | 'storms' | 'proximity' | 'discordNotif' | 'watchlist'
   | 'routePlanner' | 'locationTracking' | 'presence' | 'onlineStatus'
   | 'commandPalette' | 'homeHotkey' | 'killHighlights' | 'userStats'
-  | 'serverStatus' | 'demoMap' | 'sidebar';
+  | 'serverStatus' | 'demoMap' | 'sidebar' | 'colorVision';
 type CorpFeatureId =
   | 'multiCorp' | 'adminDash' | 'userMgmt' | 'mapMgmt' | 'usersReport'
   | 'systemsReport' | 'timeWindowed' | 'auditLog' | 'corpTicker' | 'perCharAttr';
@@ -105,8 +105,9 @@ const FEATURE_SECTIONS: FeatureSection[] = [
       { icon: SkullIcon,    id: 'killHighlights' },
       { icon: ChartBarIcon, id: 'userStats'      },
       { icon: PulseIcon,    id: 'serverStatus'   },
-      { icon: EyeIcon,      id: 'demoMap'        },
-      { icon: SidebarIcon,  id: 'sidebar'        },
+      { icon: EyeIcon,        id: 'demoMap'     },
+      { icon: SidebarIcon,    id: 'sidebar'     },
+      { icon: EyeglassesIcon, id: 'colorVision' },
     ],
   },
 ];

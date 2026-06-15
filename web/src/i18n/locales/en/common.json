@@ -400,6 +400,13 @@
       "west": "Left (west)",
       "north": "Above (north)"
     },
+    "colorVision": "Colour vision",
+    "colorVisionOptions": {
+      "off": "Default colours",
+      "deuteranopia": "Deuteranopia (red-green)",
+      "protanopia": "Protanopia (red-green)",
+      "tritanopia": "Tritanopia (blue-yellow)"
+    },
     "resetZoom": "Reset to 100%",
     "compact": "Compact",
     "uniformSize": "Uniform Size",
@@ -1242,6 +1249,10 @@
       "sidebar": {
         "title": "Collapsible sidebar",
         "desc": "Map Options, Connections, Proximity Alerts, Stale System Fade, and Shortcuts each expand or collapse independently. Per-section state persists per browser via localStorage."
+      },
+      "colorVision": {
+        "title": "Colour-blind modes",
+        "desc": "Deuteranopia, protanopia and tritanopia palettes that re-map every status, class and standings colour across the app."
       }
     },
     "corpFeatures": {

@@ -1188,6 +1188,10 @@
       "sidebar": {
         "title": "Barra lateral recolhível",
         "desc": "Opções de mapa, Conexões, Alertas de proximidade, Esmaecer sistemas obsoletos e Atalhos expandem ou recolhem de forma independente. O estado por secção mantém-se por navegador via localStorage."
+      },
+      "colorVision": {
+        "title": "Modos para daltónicos",
+        "desc": "Paletas de deuteranopia, protanopia e tritanopia que remapeiam todas as cores de estado, classe e standings em toda a aplicação."
       }
     },
     "corpFeatures": {

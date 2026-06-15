@@ -27,6 +27,7 @@ import {
 } from '@phosphor-icons/react';
 import type { MapSystem, SystemIntel } from '../../types';
 import { CLASS_COLORS } from '../../data/wormholes';
+import { cssVarToHex } from '../../utils/cssVar';
 import { pickHandles } from './edgeUtils';
 import { setDestination, addWaypoint } from '../../api/waypoint';
 import { toast } from '../ui/Toaster';
@@ -149,6 +150,9 @@ export function MapCanvas() {
   const { screenToFlowPosition, setViewport, getViewport, getNode, getNodes, getZoom, fitView } = useReactFlow();
   // Invert mouse-wheel / trackpad zoom (per-user, cross-device). Off by default.
   const [invertZoom] = useUserSetting<boolean>('nexum.map.invertZoom', false);
+  // Subscribed so the canvas-painted MiniMap (which can't read CSS vars)
+  // re-resolves class colours when the colour-vision mode changes.
+  const [colorVision] = useUserSetting<string>('nexum.a11y.colorVision', 'off');
 
   // Active heatmap. The per-map max is computed once here and shared via
   // HeatmapContext so each node only divides its own value by it.
@@ -167,8 +171,8 @@ export function MapCanvas() {
     return max;
   }, [heatMetric, systems, heatKills, heatFleet, selfCharId]);
   const heatmapState = useMemo(
-    () => ({ metric: heatMetric, max: heatMax, intensity: heatIntensity }),
-    [heatMetric, heatMax, heatIntensity],
+    () => ({ metric: heatMetric, max: heatMax, intensity: heatIntensity, colorVision }),
+    [heatMetric, heatMax, heatIntensity, colorVision],
   );
 
   const [pendingPosition, setPendingPosition] = useState<{ x: number; y: number } | null>(null);
@@ -1079,12 +1083,13 @@ export function MapCanvas() {
         </Controls>
         {showMinimap && (
           <MiniMap
+            key={colorVision}
             pannable
             zoomable
             position={minimapPosition}
             nodeColor={(n) => {
               const sys = systems.find((s) => s.id === n.id);
-              return sys ? CLASS_COLORS[sys.systemClass] : '#333';
+              return sys ? cssVarToHex(CLASS_COLORS[sys.systemClass]) : '#333';
             }}
             maskColor="rgba(13,17,23,0.85)"
             onClick={(_e, position) => {

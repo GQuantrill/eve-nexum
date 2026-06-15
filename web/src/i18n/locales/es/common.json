@@ -1188,6 +1188,10 @@
       "sidebar": {
         "title": "Barra lateral plegable",
         "desc": "Opciones de mapa, Conexiones, Alertas de proximidad, Atenuar sistemas obsoletos y Atajos se despliegan o pliegan de forma independiente. El estado por sección se conserva por navegador vía localStorage."
+      },
+      "colorVision": {
+        "title": "Modos para daltónicos",
+        "desc": "Paletas de deuteranopía, protanopía y tritanopía que reasignan cada color de estado, clase y standing en toda la aplicación."
       }
     },
     "corpFeatures": {

@@ -143,8 +143,8 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
     // is that share times the user intensity, so the busiest system on the map
     // is the reference point and the slider just brightens/dims the rest.
     const raw = Math.min(1, v / heatmap.max);
-    return { glow: Math.min(1, raw * heatmap.intensity), color: heatColor(raw) };
-  }, [heatmap.metric, heatmap.max, heatmap.intensity, sys.eveSystemId, allKills, fleet, user?.characterId]);
+    return { glow: Math.min(1, raw * heatmap.intensity), color: heatColor(raw, heatmap.colorVision !== 'off') };
+  }, [heatmap.metric, heatmap.max, heatmap.intensity, heatmap.colorVision, sys.eveSystemId, allKills, fleet, user?.characterId]);
   const now             = useNow30s();
   const [staleHours]    = useStaleThreshold();
   const isStale         = !!sys.lastActivityAt &&

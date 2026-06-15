@@ -200,7 +200,7 @@ export function WhTypeChartModal({ onClose }: { onClose: () => void }) {
         <div className="modal__body whchart__body" ref={bodyRef} onMouseLeave={() => { if (!pinned) setActive(null); }}>
           <svg className="whchart__lines" aria-hidden="true">
             {lines.map((l, i) => (
-              <path key={i} d={l.d} fill="none" stroke={l.color} strokeWidth={1.5} opacity={0.85} />
+              <path key={i} d={l.d} fill="none" strokeWidth={1.5} opacity={0.85} style={{ stroke: l.color }} />
             ))}
           </svg>
 
