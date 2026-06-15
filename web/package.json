@@ -49,5 +49,8 @@
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.58.2",
     "vite": "^8.0.10"
+  },
+  "resolutions": {
+    "@babel/core": "^7.29.6"
   }
 }
