@@ -1188,6 +1188,10 @@
       "sidebar": {
         "title": "Barre latérale repliable",
         "desc": "Options de carte, Connexions, Alertes de proximité, Atténuation des systèmes obsolètes et Raccourcis se déplient ou se replient indépendamment. L'état par section persiste par navigateur via localStorage."
+      },
+      "colorVision": {
+        "title": "Modes daltoniens",
+        "desc": "Des palettes pour la deutéranopie, la protanopie et la tritanopie qui remappent chaque couleur de statut, de classe et de standing dans toute l’application."
       }
     },
     "corpFeatures": {

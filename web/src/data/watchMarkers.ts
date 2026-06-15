@@ -12,13 +12,15 @@ export interface WatchMarkerDef {
   color: string;   // highlight ring colour (CSS var --watch-color) + icon tint
 }
 
-// Order is the picker order, most-hunted first.
+// Order is the picker order, most-hunted first. Colours are CSS custom
+// properties (--cv-watch-* in App.css) so they re-map per colour-vision mode;
+// consumed in DOM styles / filter strings, so var() resolves.
 export const WATCH_MARKERS: WatchMarkerDef[] = [
-  { kind: 'target',   Icon: TargetIcon,    color: '#6ea0ff' }, // looking for / target
-  { kind: 'honeypot', Icon: MagnetIcon,    color: '#e0a64e' }, // honeypot / bait (lures them in)
-  { kind: 'avoid',    Icon: SkullIcon,     color: '#e0556e' }, // avoid at all costs
-  { kind: 'friendly', Icon: HandshakeIcon, color: '#4ade80' }, // friendly / staging
-  { kind: 'watch',    Icon: EyeIcon,       color: '#67e8f9' }, // keep an eye on
+  { kind: 'target',   Icon: TargetIcon,    color: 'var(--cv-watch-target)' },   // looking for / target
+  { kind: 'honeypot', Icon: MagnetIcon,    color: 'var(--cv-watch-honeypot)' }, // honeypot / bait (lures them in)
+  { kind: 'avoid',    Icon: SkullIcon,     color: 'var(--cv-watch-avoid)' },    // avoid at all costs
+  { kind: 'friendly', Icon: HandshakeIcon, color: 'var(--cv-watch-friendly)' }, // friendly / staging
+  { kind: 'watch',    Icon: EyeIcon,       color: 'var(--cv-watch-watch)' },    // keep an eye on
 ];
 
 const BY_KIND = new Map<WatchMarkerKind, WatchMarkerDef>(WATCH_MARKERS.map((m) => [m.kind, m]));

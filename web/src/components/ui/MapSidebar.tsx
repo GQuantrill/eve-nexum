@@ -614,6 +614,7 @@ export function MapSidebar() {
   const setShowMinimap = useMapStore((s) => s.setShowMinimap);
   const [minimapPosition, setMinimapPosition] = useMinimapPosition();
   const [placement, setPlacement] = useUserSetting<string>("nexum.map.placement", "east");
+  const [colorVision, setColorVision] = useUserSetting<string>("nexum.a11y.colorVision", "off");
   const [sigBookmarkFmt, setSigBookmarkFmt] = useUserSetting<string>("nexum.sig.bookmarkFormat", DEFAULT_BOOKMARK_FORMAT);
   const uniformSize = useMapStore((s) => s.uniformSize);
   const setUniformSize = useMapStore((s) => s.setUniformSize);
@@ -1157,6 +1158,15 @@ export function MapSidebar() {
                       <option value="south">{t("mapSidebar.placementOptions.south")}</option>
                       <option value="west">{t("mapSidebar.placementOptions.west")}</option>
                       <option value="north">{t("mapSidebar.placementOptions.north")}</option>
+                    </select>
+                  </div>
+                  <div className="map-sidebar__row">
+                    <label className="map-sidebar__label" htmlFor="color-vision">{t("mapSidebar.colorVision")}</label>
+                    <select id="color-vision" className="map-sidebar__select" value={colorVision} onChange={(e) => setColorVision(e.target.value)}>
+                      <option value="off">{t("mapSidebar.colorVisionOptions.off")}</option>
+                      <option value="deuteranopia">{t("mapSidebar.colorVisionOptions.deuteranopia")}</option>
+                      <option value="protanopia">{t("mapSidebar.colorVisionOptions.protanopia")}</option>
+                      <option value="tritanopia">{t("mapSidebar.colorVisionOptions.tritanopia")}</option>
                     </select>
                   </div>
                 </>

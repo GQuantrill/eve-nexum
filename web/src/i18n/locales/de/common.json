@@ -1188,6 +1188,10 @@
       "sidebar": {
         "title": "Einklappbare Seitenleiste",
         "desc": "Kartenoptionen, Verbindungen, Näherungswarnungen, Veraltete Systeme abblenden und Tastenkürzel lassen sich jeweils unabhängig auf- oder zuklappen. Der Zustand pro Abschnitt bleibt pro Browser über localStorage erhalten."
+      },
+      "colorVision": {
+        "title": "Farbenblind-Modi",
+        "desc": "Deuteranopie-, Protanopie- und Tritanopie-Paletten, die jede Status-, Klassen- und Standings-Farbe in der gesamten App neu zuordnen."
       }
     },
     "corpFeatures": {

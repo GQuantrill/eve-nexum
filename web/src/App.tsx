@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { ReactFlowProvider } from '@xyflow/react';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import { seedUserSettings, readUserSetting } from './hooks/useUserSetting';
+import { seedUserSettings, readUserSetting, useUserSetting } from './hooks/useUserSetting';
 import { MapCanvas } from './components/map/MapCanvas';
 import { SystemPanel } from './components/ui/SystemPanel';
 import { ConnectionPanel } from './components/ui/ConnectionPanel';
@@ -60,6 +60,17 @@ function MapApp() {
     resetUniformSizes();
     return () => { document.documentElement.style.removeProperty('--font-scale'); };
   }, [uiZoom, resetUniformSizes]);
+
+  // Colour-vision mode → data attribute on <html>; the --cv-* palette
+  // overrides in App.css key off it. 'off' (or unset) leaves the defaults.
+  const [colorVision] = useUserSetting<string>('nexum.a11y.colorVision', 'off');
+  useEffect(() => {
+    if (colorVision && colorVision !== 'off') {
+      document.documentElement.dataset.colorVision = colorVision;
+    } else {
+      delete document.documentElement.dataset.colorVision;
+    }
+  }, [colorVision]);
 
   // Only re-run when the user's identity changes, not on every shape mutation
   // of the user object (panel reorder, prefs toggle, etc).

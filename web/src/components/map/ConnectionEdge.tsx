@@ -12,16 +12,18 @@ import { useWatchlist } from '../../hooks/useWatchlist';
 import { matchConnection } from '../../utils/watchMatch';
 import { watchMarker } from '../../data/watchMarkers';
 
-const STANDARD_COLOR = '#8a9ab8';
-const JUMPGATE_COLOR  = '#4db8c4';
+// CSS custom properties (resolved via the edge path's inline `style`) so the
+// colour-vision palettes (--cv-conn-* in App.css) re-map connection colours.
+const STANDARD_COLOR = 'var(--cv-conn-standard)';
+const JUMPGATE_COLOR  = 'var(--cv-conn-jumpgate)';
 
 const EOL_LIFE_MS    = 4 * 60 * 60 * 1000;
 const EOL_LESS_1H_MS = 60 * 60 * 1000;
 
 const TIME_COLORS: Record<string, string> = {
-  lessThan4h: '#f0c040',
-  lessThan1h: '#ff9800',
-  expired:    '#f44336',
+  lessThan4h: 'var(--cv-conn-4h)',
+  lessThan1h: 'var(--cv-conn-1h)',
+  expired:    'var(--cv-conn-expired)',
 };
 
 const MASS_LABELS: Record<string, { text: string; cls: string }> = {

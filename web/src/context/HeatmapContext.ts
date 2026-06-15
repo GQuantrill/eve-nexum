@@ -9,8 +9,11 @@ export interface HeatmapState {
   max:       number;
   /** User intensity multiplier on the glow strength (1 = default). */
   intensity: number;
+  /** Active colour-vision mode ('off' = default ramp). Switches the heat ramp
+   *  to a colour-blind-safe one, since the heat colour is computed in JS. */
+  colorVision: string;
 }
 
-export const HeatmapContext = createContext<HeatmapState>({ metric: 'none', max: 0, intensity: 1 });
+export const HeatmapContext = createContext<HeatmapState>({ metric: 'none', max: 0, intensity: 1, colorVision: 'off' });
 
 export const useHeatmap = (): HeatmapState => useContext(HeatmapContext);

@@ -3,11 +3,14 @@ import type { BuiltinIntel, CustomIntel, SystemIntel } from '../types';
 
 /** Canonical colour for each built-in intel value. Used as the base for
  *  the background tint and the swatch in the right-click submenu. */
+// CSS custom properties so the colour-vision palettes (--cv-intel-* in
+// App.css) re-map built-in intel colours per mode. Custom user intel tags
+// keep their own stored hex.
 const BUILTIN_COLORS: Record<BuiltinIntel, string> = {
-  friendly: '#5b9bff',
-  hostile:  '#e05a5a',
-  occupied: '#f0a030',
-  empty:    '#8c98ac',
+  friendly: 'var(--cv-intel-friendly)',
+  hostile:  'var(--cv-intel-hostile)',
+  occupied: 'var(--cv-intel-occupied)',
+  empty:    'var(--cv-intel-empty)',
 };
 
 const BUILTIN_KEYS = new Set<string>(['friendly', 'hostile', 'occupied', 'empty']);

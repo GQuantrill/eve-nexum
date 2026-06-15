@@ -5,6 +5,8 @@ import type { TFunction } from 'i18next';
 import { api } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { useHashRoute } from '../../hooks/useHashRoute';
+import { useUserSetting } from '../../hooks/useUserSetting';
+import { cssVarToHex } from '../../utils/cssVar';
 import { timeAgo, europeanDate, DASH } from '../../i18n/format';
 import { ConfirmModal } from './ConfirmModal';
 import {
@@ -919,20 +921,26 @@ interface SystemsReportData {
 }
 
 // Stable palette for the sig-type donut so colours don't shuffle on refresh.
+// CSS custom properties (--cv-sig-* in App.css) for colour-vision support.
+// Resolved to hex via cssVarToHex where consumed, since the donut paints to a
+// <canvas> (chart.js) which can't read var().
 const SIG_TYPE_COLORS: Record<string, string> = {
-  data:     '#7ab4f0',
-  relic:    '#f0a8c0',
-  wormhole: '#c084fc',
-  gas:      '#8ad08a',
-  ore:      '#f5b96a',
-  combat:   '#f87171',
-  unknown:  '#7a8aa8',
+  data:     'var(--cv-sig-data)',
+  relic:    'var(--cv-sig-relic)',
+  wormhole: 'var(--cv-sig-wormhole)',
+  gas:      'var(--cv-sig-gas)',
+  ore:      'var(--cv-sig-ore)',
+  combat:   'var(--cv-sig-combat)',
+  unknown:  'var(--cv-sig-unknown)',
 };
 
 type WhSortKey = 'whType' | 'count';
 
 function SystemsReport() {
   const { t } = useTranslation();
+  // Subscribed so the canvas donut re-resolves its slice colours (which can't
+  // read CSS vars) when the colour-vision mode changes.
+  const [colorVision] = useUserSetting<string>('nexum.a11y.colorVision', 'off');
   const [data, setData]   = useState<SystemsReportData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [whSort, setWhSort] = useState<{ key: WhSortKey; dir: SortDir }>({ key: 'count', dir: 'desc' });
@@ -1017,11 +1025,12 @@ function SystemsReport() {
           <div className="admin-page__chart-title">{t('admin.reports.systems.typeMix')}</div>
           <div className="admin-page__chart-canvas">
             <Doughnut
+              key={colorVision}
               data={{
                 labels:   donutEntries.map((e) => e.label),
                 datasets: [{
                   data: donutEntries.map((e) => e.count),
-                  backgroundColor: donutEntries.map((e) => SIG_TYPE_COLORS[e.key] ?? '#7a8aa8'),
+                  backgroundColor: donutEntries.map((e) => cssVarToHex(SIG_TYPE_COLORS[e.key] ?? SIG_TYPE_COLORS.unknown)),
                   borderColor: '#0d1117',
                   borderWidth: 2,
                 }],

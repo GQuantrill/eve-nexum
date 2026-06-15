@@ -15,12 +15,22 @@ const HEAT_STOPS: [number, number, number][] = [
   [249, 115, 22],  // #f97316 orange
   [220, 38,  38],  // #dc2626 red
 ];
-export function heatColor(level: number): string {
+// Colour-blind-safe ramp (viridis): perceptually uniform + monotonic in
+// lightness, so it stays distinguishable under all three CVD types. The
+// heatmap colour is computed in JS (not a static var()), so it can't piggyback
+// on the App.css palette overrides — `cvd` switches the ramp here instead.
+const HEAT_STOPS_CVD: [number, number, number][] = [
+  [68,  1,  84],   // #440154 dark purple (low)
+  [33, 145, 140],  // #21918c teal (mid)
+  [253, 231, 37],  // #fde725 yellow (high)
+];
+export function heatColor(level: number, cvd = false): string {
+  const stops = cvd ? HEAT_STOPS_CVD : HEAT_STOPS;
   const l = Math.min(1, Math.max(0, level));
   const seg = l <= 0.5 ? 0 : 1;
   const t   = l <= 0.5 ? l / 0.5 : (l - 0.5) / 0.5;
-  const [r1, g1, b1] = HEAT_STOPS[seg];
-  const [r2, g2, b2] = HEAT_STOPS[seg + 1];
+  const [r1, g1, b1] = stops[seg];
+  const [r2, g2, b2] = stops[seg + 1];
   return `rgb(${lerp(r1, r2, t)}, ${lerp(g1, g2, t)}, ${lerp(b1, b2, t)})`;
 }
 
