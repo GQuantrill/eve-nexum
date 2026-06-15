@@ -18,6 +18,7 @@ import {
   type MinimapPosition,
 } from "../../hooks/useMinimapPosition";
 import { useUserSetting } from "../../hooks/useUserSetting";
+import { normalizePlacement } from "../../hooks/useLocationTracking";
 import { NOTIFY } from "../../utils/notificationPrefs";
 import { useResettableState } from "../../hooks/useResettableState";
 import { DEFAULT_BOOKMARK_FORMAT, BOOKMARK_TOKENS } from "../../utils/signatureBookmark";
@@ -612,7 +613,7 @@ export function MapSidebar() {
   const showMinimap = useMapStore((s) => s.showMinimap);
   const setShowMinimap = useMapStore((s) => s.setShowMinimap);
   const [minimapPosition, setMinimapPosition] = useMinimapPosition();
-  const [placement, setPlacement] = useUserSetting<string>("nexum.map.placement", "horizontal");
+  const [placement, setPlacement] = useUserSetting<string>("nexum.map.placement", "east");
   const [sigBookmarkFmt, setSigBookmarkFmt] = useUserSetting<string>("nexum.sig.bookmarkFormat", DEFAULT_BOOKMARK_FORMAT);
   const uniformSize = useMapStore((s) => s.uniformSize);
   const setUniformSize = useMapStore((s) => s.setUniformSize);
@@ -1151,9 +1152,11 @@ export function MapSidebar() {
                   </div>
                   <div className="map-sidebar__row">
                     <label className="map-sidebar__label" htmlFor="placement-dir">{t("mapSidebar.placement")}</label>
-                    <select id="placement-dir" className="map-sidebar__select" value={placement} onChange={(e) => setPlacement(e.target.value)}>
-                      <option value="horizontal">{t("mapSidebar.placementOptions.horizontal")}</option>
-                      <option value="vertical">{t("mapSidebar.placementOptions.vertical")}</option>
+                    <select id="placement-dir" className="map-sidebar__select" value={normalizePlacement(placement)} onChange={(e) => setPlacement(e.target.value)}>
+                      <option value="east">{t("mapSidebar.placementOptions.east")}</option>
+                      <option value="south">{t("mapSidebar.placementOptions.south")}</option>
+                      <option value="west">{t("mapSidebar.placementOptions.west")}</option>
+                      <option value="north">{t("mapSidebar.placementOptions.north")}</option>
                     </select>
                   </div>
                 </>
