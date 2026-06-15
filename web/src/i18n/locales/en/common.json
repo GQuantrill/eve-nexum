@@ -394,7 +394,11 @@
     "crossMapSyncHelp": "When you add or edit signatures and anomalies on a system, copy them to the same system on your other maps (personal maps sync with your other personal maps; corp maps with the corp's other maps). Non-destructive: it only fills in missing or blank entries — it never overwrites data you've already entered or deletes anything.",
     "placementOptions": {
       "horizontal": "Horizontal (right)",
-      "vertical": "Vertical (below)"
+      "vertical": "Vertical (below)",
+      "east": "Right (east)",
+      "south": "Below (south)",
+      "west": "Left (west)",
+      "north": "Above (north)"
     },
     "resetZoom": "Reset to 100%",
     "compact": "Compact",

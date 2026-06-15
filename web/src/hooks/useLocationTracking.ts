@@ -15,16 +15,32 @@ function boxesOverlap(ax: number, ay: number, bx: number, by: number, w: number,
 
 // Slots around the source, both clockwise (+y is down): cardinals first, then
 // diagonals, scaled by `ring` for distance. The user's default-placement pref
-// picks the starting direction — horizontal begins at the right, vertical at
-// the bottom — and rotation continues clockwise from there.
-const OFFSETS_HORIZONTAL: [number, number][] = [
-  [1, 0], [0, 1], [-1, 0], [0, -1],   // E, S, W, N
-  [1, 1], [-1, 1], [-1, -1], [1, -1], // SE, SW, NW, NE
-];
-const OFFSETS_VERTICAL: [number, number][] = [
-  [0, 1], [-1, 0], [0, -1], [1, 0],   // S, W, N, E
-  [-1, 1], [-1, -1], [1, -1], [1, 1], // SW, NW, NE, SE
-];
+// picks the starting cardinal direction; rotation continues clockwise from
+// there. Legacy 'horizontal'/'vertical' settings map to east/south.
+export type PlacementDirection = 'east' | 'south' | 'west' | 'north';
+
+export function normalizePlacement(v: string | null | undefined): PlacementDirection {
+  switch (v) {
+    case 'south':
+    case 'vertical': return 'south';
+    case 'west':     return 'west';
+    case 'north':    return 'north';
+    default:         return 'east'; // 'east' / 'horizontal' / unset
+  }
+}
+
+// Slot rings keyed by the preferred start: that cardinal first, then clockwise
+// through the rest, diagonals last.
+const OFFSETS_BY_DIR: Record<PlacementDirection, [number, number][]> = {
+  east:  [[1, 0], [0, 1], [-1, 0], [0, -1], [1, 1], [-1, 1], [-1, -1], [1, -1]],
+  south: [[0, 1], [-1, 0], [0, -1], [1, 0], [-1, 1], [-1, -1], [1, -1], [1, 1]],
+  west:  [[-1, 0], [0, -1], [1, 0], [0, 1], [-1, -1], [1, -1], [1, 1], [-1, 1]],
+  north: [[0, -1], [1, 0], [0, 1], [-1, 0], [1, -1], [1, 1], [-1, 1], [-1, -1]],
+};
+// Dense-map fallback: a single step in the preferred direction.
+const FALLBACK_BY_DIR: Record<PlacementDirection, [number, number]> = {
+  east: [1, 0], south: [0, 1], west: [-1, 0], north: [0, -1],
+};
 
 // Pick a position for a newly auto-added system by rotating clockwise around
 // the system it was jumped from, starting in the preferred direction (right of
@@ -37,12 +53,12 @@ function findFreePosition(
   w: number,
   h: number,
   gap: number,
-  vertical: boolean,
+  direction: PlacementDirection,
 ): { x: number; y: number } {
   const collides = (x: number, y: number) =>
     systems.some((s) => boxesOverlap(x, y, s.position.x, s.position.y, w, h, gap));
 
-  const offsets = vertical ? OFFSETS_VERTICAL : OFFSETS_HORIZONTAL;
+  const offsets = OFFSETS_BY_DIR[direction];
   const stepX = w + gap;
   const stepY = h + gap;
   for (let ring = 1; ring <= 6; ring++) {
@@ -52,8 +68,9 @@ function findFreePosition(
       if (!collides(x, y)) return { x, y };
     }
   }
-  // Dense map — fall back to the preferred direction.
-  return vertical ? { x: source.x, y: source.y + stepY } : { x: source.x + stepX, y: source.y };
+  // Dense map — fall back to a single step in the preferred direction.
+  const [fx, fy] = FALLBACK_BY_DIR[direction];
+  return { x: source.x + fx * stepX, y: source.y + fy * stepY };
 }
 
 /**
@@ -139,8 +156,8 @@ export function useLocationTracking(enabled: boolean) {
           y: map.systems.length ? map.systems.reduce((sum, s) => sum + s.position.y, 0) / map.systems.length : 0,
         };
       }
-      const vertical = readUserSetting<string>('nexum.map.placement', 'horizontal') === 'vertical';
-      const position = findFreePosition(source, map.systems, w, h, gap, vertical);
+      const direction = normalizePlacement(readUserSetting<string>('nexum.map.placement', 'east'));
+      const position = findFreePosition(source, map.systems, w, h, gap, direction);
 
       mapSystemId = addSystem(
         system.name,
