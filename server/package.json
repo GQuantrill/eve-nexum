@@ -18,7 +18,8 @@
     "extract-wormholes": "tsx scripts/extract-wormholes.ts"
   },
   "resolutions": {
-    "qs": "^6.15.2"
+    "qs": "^6.15.2",
+    "esbuild": "^0.28.1"
   },
   "dependencies": {
     "cheerio": "^1.2.0",
