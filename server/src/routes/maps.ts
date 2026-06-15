@@ -1446,25 +1446,36 @@ mapsRouter.post('/:mapId/systems', async (req, res) => {
   ).catch(console.error);
   await touchMap(mapId);
 
-  // Push the new system to other viewers of this map (live sync). Re-read the
-  // canonical row so the payload matches a fresh map load exactly (resolved
-  // eve id, security, etc.). actor = originating client → echo-suppressed.
-  db.query(
-    `SELECT id, eve_system_id AS "eveSystemId", name, system_class AS "systemClass", effect, statics,
-            region_name AS "regionName", npc_type AS "npcType", position_x AS x, position_y AS y,
-            status, intel, is_home AS "isHome", locked, notes,
-            (SELECT ss.security::float8 FROM solar_systems ss WHERE ss.id = map_systems.eve_system_id) AS "security",
-            last_activity_at AS "lastActivityAt"
-       FROM map_systems WHERE id = $1 AND map_id = $2`,
-    [id, mapId],
-  ).then(({ rows }) => {
+  // Re-read the canonical row so BOTH the live-sync payload and the response
+  // match a fresh map load exactly (resolved eve id, SDE security, etc.).
+  // Returning it lets the originating client backfill server-derived fields
+  // (e.g. security) onto its optimistic node — it's echo-suppressed from the
+  // broadcast below, so without this its node would lack sec status until a
+  // full reload.
+  let system: ({ position: { x: number; y: number } } & Record<string, unknown>) | null = null;
+  try {
+    const { rows } = await db.query(
+      `SELECT id, eve_system_id AS "eveSystemId", name, system_class AS "systemClass", effect, statics,
+              region_name AS "regionName", npc_type AS "npcType", position_x AS x, position_y AS y,
+              status, intel, is_home AS "isHome", locked, notes,
+              (SELECT ss.security::float8 FROM solar_systems ss WHERE ss.id = map_systems.eve_system_id) AS "security",
+              last_activity_at AS "lastActivityAt"
+         FROM map_systems WHERE id = $1 AND map_id = $2`,
+      [id, mapId],
+    );
     const r = rows[0] as ({ x: number; y: number } & Record<string, unknown>) | undefined;
-    if (!r) return;
-    const { x, y, ...rest } = r;
-    publishToMap(mapId, { type: 'system.add', actor: req.get('x-client-id') ?? null, system: { ...rest, position: { x, y } } });
-  }).catch(console.error);
+    if (r) {
+      const { x, y, ...rest } = r;
+      system = { ...rest, position: { x, y } };
+      // Push to other viewers of this map (live sync). actor = originating
+      // client → echo-suppressed.
+      publishToMap(mapId, { type: 'system.add', actor: req.get('x-client-id') ?? null, system });
+    }
+  } catch (err) {
+    console.error(err);
+  }
 
-  res.status(201).json({ ok: true });
+  res.status(201).json({ ok: true, system });
 });
 
 mapsRouter.patch('/:mapId/systems/:systemId', async (req, res) => {

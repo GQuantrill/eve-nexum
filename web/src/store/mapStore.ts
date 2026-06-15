@@ -763,9 +763,29 @@ export const useMapStore = create<MapStore>()((set, get) => {
         if (activeMapId) {
           const url  = `/api/maps/${activeMapId}/systems`;
           const body = JSON.stringify({ ...added });
-          api(url, { method: 'POST', body }).catch(() =>
-            enqueue(`addSystem:${added.name}`, url, 'POST', body),
-          );
+          api<{ system?: { security?: number | null; eveSystemId?: number | null } }>(url, { method: 'POST', body })
+            .then((resp) => {
+              // Backfill server-derived fields (SDE security, resolved eve id)
+              // onto the optimistic node — addSystem can't know these, and the
+              // live-sync echo is suppressed for the originating client, so
+              // without this the node would lack sec status until a reload.
+              const srv = resp?.system;
+              if (!srv) return;
+              set((s) => ({
+                map: {
+                  ...s.map,
+                  systems: s.map.systems.map((sys) =>
+                    sys.id === id
+                      ? {
+                          ...sys,
+                          ...(srv.security != null ? { security: srv.security } : {}),
+                          ...(srv.eveSystemId != null ? { eveSystemId: srv.eveSystemId } : {}),
+                        }
+                      : sys),
+                },
+              }));
+            })
+            .catch(() => enqueue(`addSystem:${added.name}`, url, 'POST', body));
         }
       }
 
