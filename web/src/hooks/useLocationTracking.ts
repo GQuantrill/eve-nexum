@@ -3,6 +3,7 @@ import { useMapStore } from '../store/mapStore';
 import { useCharacterLocation } from './useCharacterLocation';
 import { useCanEdit } from './useCanEdit';
 import { readUserSetting } from './useUserSetting';
+import { pickHandles } from '../components/map/edgeUtils';
 import type { SystemClass, WormholeEffect } from '../types';
 
 interface Box { position: { x: number; y: number } }
@@ -70,7 +71,7 @@ export function useLocationTracking(enabled: boolean) {
 
   useEffect(() => {
     if (!enabled) return;
-    const { map, addSystem, addConnection, optimizeConnections, selectSystem, setCurrentSystem, uniformWidth, uniformHeight } = useMapStore.getState();
+    const { map, addSystem, addConnection, selectSystem, setCurrentSystem, uniformWidth, uniformHeight } = useMapStore.getState();
 
     // No active map loaded yet (mid switchMap / first paint) — wait for the
     // next location update rather than racing addSystem against an empty store.
@@ -163,12 +164,17 @@ export function useLocationTracking(enabled: boolean) {
           (c.sourceId === mapSystemId && c.targetId === prevMapSystemId),
       );
       if (!alreadyConnected) {
-        addConnection(prevMapSystemId, mapSystemId, 'right', 'left');
-        // The handles above are a default; re-pick the optimal source/target
-        // sides for every connection now that the new system is in place, so
-        // an auto-added jump doesn't end up with a connection drawn through
-        // the system on the wrong side.
-        optimizeConnections();
+        // Pick the optimal source/target sides from the two systems' actual
+        // positions so the auto-added connection attaches cleanly — bottom→top
+        // for a vertical layout, right→left for a horizontal one — instead of a
+        // fixed right→left that cuts diagonally across vertically-stacked nodes.
+        const placed = useMapStore.getState().map.systems;
+        const srcPos = placed.find((s) => s.id === prevMapSystemId)?.position;
+        const tgtPos = placed.find((s) => s.id === mapSystemId)?.position;
+        const { sourceHandle, targetHandle } = srcPos && tgtPos
+          ? pickHandles(srcPos, tgtPos)
+          : { sourceHandle: 'right' as const, targetHandle: 'left' as const };
+        addConnection(prevMapSystemId, mapSystemId, sourceHandle, targetHandle);
       }
     }
 
