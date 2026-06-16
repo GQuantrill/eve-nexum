@@ -723,9 +723,9 @@
   cursor: grab;
   padding: 2px 6px;
   border-radius: 6px;
-  /* margin-left carries the saved "gap before"; animate it so a drop settles
-     smoothly. Not transitioning transform — that must track the cursor 1:1. */
-  transition: background 0.12s, margin-left 0.14s ease;
+  /* Placed sections get position:absolute + left/top inline; the transform
+     (set inline) tracks the cursor 1:1 while dragging, so don't transition it. */
+  transition: background 0.12s;
   touch-action: none;
 }
 /* Hover chip + brighter grip = "this block is draggable". */
@@ -748,13 +748,16 @@
 .toolbar__section:hover .toolbar__section-grip { opacity: 0.85; color: #8a9bc4; }
 .toolbar__section--dragging .toolbar__section-grip { opacity: 1; color: #a9b8dc; }
 
-/* Fixed account actions pinned to the far right (not part of the drag set). */
+/* Fixed account actions pinned to the far right (not part of the drag set).
+   align-self keeps them in the top row even when the bar grows for a 2nd row. */
 .toolbar__anchor-right {
   display: flex;
   align-items: center;
   gap: 8px;
   flex-shrink: 0;
   margin-left: auto;
+  align-self: flex-start;
+  height: 48px;
 }
 
 /* Narrow screens (vertical monitors, smaller laptops): tighten the inter-section
@@ -772,6 +775,9 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  /* Stays in the top row even when the bar grows for a dragged 2nd-row section. */
+  align-self: flex-start;
+  height: 48px;
 }
 
 .toolbar__logo {

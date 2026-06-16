@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, type ReactNode } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef, type ReactNode, type CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { timeAgo, jumps } from '../../i18n/format';
@@ -189,17 +189,9 @@ function ProximityChip() {
 // The reorderable toolbar groups, in their default left-to-right order. The
 // brand (far left) and the account actions — API keys + sign out (far right) —
 // are fixed and deliberately NOT in this list.
+// Default left-to-right order of the freely-placeable sections (used for the
+// flow layout that seeds their default positions).
 const DEFAULT_TOOLBAR_ORDER = ['map', 'status', 'tools', 'server', 'account'];
-
-// Reconcile a saved order with the sections we actually ship: drop unknown ids
-// and append any newly-added sections, so an order saved by an older build
-// never hides a control or leaves dnd-kit referencing a missing section.
-function reconcileToolbarOrder(saved: string[]): string[] {
-  const known = new Set(DEFAULT_TOOLBAR_ORDER);
-  const kept = saved.filter((id) => known.has(id));
-  const missing = DEFAULT_TOOLBAR_ORDER.filter((id) => !kept.includes(id));
-  return [...kept, ...missing];
-}
 
 // One freely-placeable toolbar group. Always draggable, no separate handle: the
 // 6px pointer activation distance (see the DndContext sensor) means a tap still
@@ -208,23 +200,24 @@ function reconcileToolbarOrder(saved: string[]): string[] {
 // margin-left so the group keeps the empty space you dropped it with, and the
 // left-to-right flow makes overlap impossible.
 function ToolbarSection({
-  id, gap, registerRef, children,
+  id, pos, registerRef, children,
 }: {
   id: string;
-  gap: number;
+  // Absolute position once known; null while it's still in flow (pre-measure).
+  pos: { x: number; y: number } | null;
   registerRef: (id: string, el: HTMLElement | null) => void;
   children: ReactNode;
 }) {
   const { setNodeRef, listeners, transform, isDragging } = useDraggable({ id });
+  const moved = transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined;
+  const style: CSSProperties = pos
+    ? { position: 'absolute', left: pos.x, top: pos.y, transform: moved, zIndex: isDragging ? 50 : undefined }
+    : { transform: moved, zIndex: isDragging ? 50 : undefined };
   return (
     <div
       ref={(el) => { setNodeRef(el); registerRef(id, el); }}
-      className={`toolbar__section${isDragging ? ' toolbar__section--dragging' : ''}`}
-      style={{
-        marginLeft: gap || undefined,
-        transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
-        zIndex: isDragging ? 50 : undefined,
-      }}
+      className={`toolbar__section${isDragging ? ' toolbar__section--dragging' : ''}${pos ? ' toolbar__section--placed' : ''}`}
+      style={style}
       {...listeners}
     >
       {/* Drag affordance: faint at rest, brightens on hover (the whole section
@@ -291,74 +284,63 @@ export function Toolbar() {
   const mapSwitcherRef = useRef<HTMLDivElement>(null);
   useClickOutside(showMaps, mapSwitcherRef, () => setShowMaps(false));
 
-  // Per-user, cross-device layout. `order` is the left-to-right sequence; `gaps`
-  // is a margin-left (px) before each section so a dragged group keeps the empty
-  // space you dropped it with. Left-to-right flow makes overlap impossible.
-  const [savedSectionOrder, setSavedSectionOrder] =
-    useUserSetting<string[]>('nexum.toolbar.sections', DEFAULT_TOOLBAR_ORDER);
-  const [sectionGaps, setSectionGaps] =
-    useUserSetting<Record<string, number>>('nexum.toolbar.gaps', {});
-  const sectionOrder = reconcileToolbarOrder(savedSectionOrder);
-  const atDefaultLayout =
-    sectionOrder.length === DEFAULT_TOOLBAR_ORDER.length
-    && sectionOrder.every((id, i) => id === DEFAULT_TOOLBAR_ORDER[i])
-    && Object.values(sectionGaps).every((g) => !g);
-  const resetLayout = () => { setSavedSectionOrder(DEFAULT_TOOLBAR_ORDER); setSectionGaps({}); };
+  // Per-user, cross-device toolbar layout. Each reorderable section is freely
+  // placed: an absolute {x,y} relative to the bar. `savedPositions` holds only
+  // the sections the user has actually dragged; everything else falls back to a
+  // measured default — a tidy left-to-right row laid out in flow, then captured
+  // (and re-captured on resize so it stays responsive). Reset clears the saved
+  // positions and drops back to those defaults.
+  const [savedPositions, setSavedPositions] =
+    useUserSetting<Record<string, { x: number; y: number }>>('nexum.toolbar.positions', {});
+  const [defaultPositions, setDefaultPositions] = useState<Record<string, { x: number; y: number }>>({});
+  const posOf = (id: string): { x: number; y: number } | null =>
+    savedPositions[id] ?? defaultPositions[id] ?? null;
+  const atDefaultLayout = Object.keys(savedPositions).length === 0;
+  const resetLayout = () => setSavedPositions({});
 
   const dragSensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
   const toolbarRef = useRef<HTMLElement>(null);
-  const brandRef = useRef<HTMLDivElement>(null);
   const sectionEls = useRef<Map<string, HTMLElement>>(new Map());
   const registerSectionRef = (id: string, el: HTMLElement | null) => {
     if (el) sectionEls.current.set(id, el); else sectionEls.current.delete(id);
   };
-  // Section rects snapshotted at drag start (before the dragged element gets a
-  // transform), so the drop maths isn't polluted by its live position.
-  const dragSnapshot = useRef<{ rects: Map<string, DOMRect>; brandRight: number; maxGap: number } | null>(null);
 
-  const onSectionDragStart = () => {
-    const rects = new Map<string, DOMRect>();
-    sectionEls.current.forEach((el, id) => rects.set(id, el.getBoundingClientRect()));
-    const brandRight = brandRef.current?.getBoundingClientRect().right ?? 0;
-    const maxGap = toolbarRef.current?.getBoundingClientRect().width ?? 600;
-    dragSnapshot.current = { rects, brandRight, maxGap };
-  };
+  // Seed the default position of any section that doesn't have one yet by
+  // measuring where it lands in flow (it renders in flow, vertically centred,
+  // until placed). Runs after layout; a no-op once every section has a position.
+  useLayoutEffect(() => {
+    const tb = toolbarRef.current?.getBoundingClientRect();
+    if (!tb) return;
+    let patch: Record<string, { x: number; y: number }> | null = null;
+    sectionEls.current.forEach((el, id) => {
+      if (savedPositions[id] || defaultPositions[id]) return;
+      const r = el.getBoundingClientRect();
+      (patch ??= {})[id] = { x: Math.round(r.left - tb.left), y: Math.round(r.top - tb.top) };
+    });
+    if (patch) setDefaultPositions((d) => ({ ...d, ...patch }));
+  }, [savedPositions, defaultPositions, user]);
+
+  // On resize, drop the measured defaults so un-customised sections re-flow and
+  // re-seed at the new width. User-dragged (saved) positions are left alone.
+  useEffect(() => {
+    let t: ReturnType<typeof setTimeout>;
+    const onResize = () => { clearTimeout(t); t = setTimeout(() => setDefaultPositions({}), 150); };
+    window.addEventListener('resize', onResize);
+    return () => { clearTimeout(t); window.removeEventListener('resize', onResize); };
+  }, []);
 
   const onSectionDragEnd = (e: DragEndEvent) => {
-    const snap = dragSnapshot.current;
-    dragSnapshot.current = null;
     const id = e.active.id as string;
-    const dragged = snap?.rects.get(id);
-    if (!snap || !dragged) return;
-
-    // Where the dragged group's left edge / centre ended up.
-    const dropLeft = dragged.left + e.delta.x;
-    const dropCx   = dragged.left + dragged.width / 2 + e.delta.x;
-    const dropCy   = dragged.top + dragged.height / 2 + e.delta.y;
-
-    // Insertion point among the other sections, in reading order: an earlier row
-    // (or the same row but to the left of a section's centre) comes first.
-    const others = sectionOrder.filter((s) => s !== id);
-    let insertAt = others.length;
-    for (let i = 0; i < others.length; i++) {
-      const r = snap.rects.get(others[i]);
-      if (!r) continue;
-      const earlierRow = dropCy < r.top;
-      const sameRow = dropCy >= r.top && dropCy <= r.bottom;
-      if (earlierRow || (sameRow && dropCx < r.left + r.width / 2)) { insertAt = i; break; }
-    }
-    const newOrder = [...others.slice(0, insertAt), id, ...others.slice(insertAt)];
-
-    // Gap before the dropped group = how far right of the previous element it
-    // landed (>= 0 so groups never overlap; capped to the bar width).
-    const prevId = insertAt > 0 ? others[insertAt - 1] : null;
-    const prevRight = prevId ? (snap.rects.get(prevId)?.right ?? snap.brandRight) : snap.brandRight;
-    const gap = Math.max(0, Math.min(Math.round(dropLeft - prevRight), snap.maxGap));
-
-    const orderChanged = newOrder.length !== sectionOrder.length
-      || newOrder.some((s, i) => s !== sectionOrder[i]);
-    if (orderChanged) setSavedSectionOrder(newOrder);
-    if ((sectionGaps[id] ?? 0) !== gap) setSectionGaps({ ...sectionGaps, [id]: gap });
+    const cur = posOf(id);
+    const tb = toolbarRef.current?.getBoundingClientRect();
+    const el = sectionEls.current.get(id);
+    if (!cur || !tb || !el) return;
+    // Land exactly where dropped (start + drag delta); clamp to stay on the bar
+    // and within ~two rows. Absolute placement means no reflow — it stays put.
+    const maxX = Math.max(0, tb.width - el.offsetWidth);
+    const x = Math.min(Math.max(0, Math.round(cur.x + e.delta.x)), maxX);
+    const y = Math.min(Math.max(0, Math.round(cur.y + e.delta.y)), 56);
+    setSavedPositions({ ...savedPositions, [id]: { x, y } });
   };
 
   async function handleDeleteMap() {
@@ -654,18 +636,23 @@ export function Toolbar() {
     ) : null,
   };
 
-  const renderOrder = sectionOrder.filter((id) => sections[id] != null);
+  const renderOrder = DEFAULT_TOOLBAR_ORDER.filter((id) => sections[id] != null);
+  // Grow the bar to fit the lowest-placed section (so a second row isn't clipped).
+  // ROW_H is a generous single-row height — erring tall just adds a little slack.
+  const ROW_H = 52;
+  const maxY = renderOrder.reduce((m, id) => Math.max(m, posOf(id)?.y ?? 0), 0);
+  const toolbarMinHeight = Math.max(ROW_H, maxY + ROW_H);
 
   return (
     <>
-    <header className="toolbar" ref={toolbarRef}>
-      <div className="toolbar__brand" ref={brandRef}>
+    <header className="toolbar toolbar--free" ref={toolbarRef} style={{ minHeight: toolbarMinHeight }}>
+      <div className="toolbar__brand">
         <span className="toolbar__logo">◈</span>
       </div>
 
-      <DndContext sensors={dragSensors} onDragStart={onSectionDragStart} onDragEnd={onSectionDragEnd}>
+      <DndContext sensors={dragSensors} onDragEnd={onSectionDragEnd}>
         {renderOrder.map((id) => (
-          <ToolbarSection key={id} id={id} gap={sectionGaps[id] || 0} registerRef={registerSectionRef}>
+          <ToolbarSection key={id} id={id} pos={posOf(id)} registerRef={registerSectionRef}>
             {sections[id]}
           </ToolbarSection>
         ))}
