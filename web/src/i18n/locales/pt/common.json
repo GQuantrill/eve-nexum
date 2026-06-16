@@ -933,10 +933,10 @@
     "type": "Tipo",
     "count": "Quantidade",
     "period": {
-      "day": "Hoje",
-      "week": "Esta semana",
-      "month": "Este mês",
-      "year": "Este ano",
+      "day": "Últimas 24 h",
+      "week": "Últimos 7 dias",
+      "month": "Últimos 30 dias",
+      "year": "Últimos 365 dias",
       "forever": "Todo o tempo"
     }
   },
