@@ -181,7 +181,7 @@ shareRouter.get('/:token', async (req, res) => {
                 connection_type AS "connectionType", mass_status AS "massStatus",
                 time_status AS "timeStatus", size, wh_type AS "type",
                 COALESCE(mass_used, 0)::float8 AS "massUsed",
-                eol_at AS "eolAt",
+                eol_at AS "eolAt", broken,
                 created_at AS "createdAt"
          FROM map_connections ${connectionWhere}`,
         [mapId],

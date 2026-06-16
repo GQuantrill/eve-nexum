@@ -23,6 +23,11 @@ export function reevaluateConnectionsForSystem(
   systemId: string,
   allSigs:  Signature[],
   oldSig:   Signature | undefined,
+  // When true, a connection that this (deleted) sig used to back is QUARANTINED
+  // — flagged `broken` rather than just having its type cleared — because a sig
+  // vanishing means the wormhole collapsed. Used by sig deletion / overwrite-
+  // paste; sig edits pass false and keep the old "clear the type" behaviour.
+  breakOnOrphan = false,
 ): void {
   const { map, updateConnection } = useMapStore.getState();
   const oldType  = oldSig?.whType?.toUpperCase();
@@ -62,7 +67,11 @@ export function reevaluateConnectionsForSystem(
     );
 
     if (best) {
-      if (conn.type === null || (conn.type.toUpperCase() === 'K162' && best !== 'K162')) {
+      if (conn.broken) {
+        // A sig backs this link again (e.g. it reappeared in a re-scan) —
+        // un-quarantine it and restore the type.
+        updateConnection(conn.id, { broken: false, type: best });
+      } else if (conn.type === null || (conn.type.toUpperCase() === 'K162' && best !== 'K162')) {
         // Empty, or a K162 placeholder being upgraded to a real code.
         updateConnection(conn.id, { type: best });
       } else if (oldBackedThis && conn.type.toUpperCase() !== best.toUpperCase()) {
@@ -74,10 +83,12 @@ export function reevaluateConnectionsForSystem(
       continue;
     }
 
-    // No sig backs the connection any more. If this sig used to back it,
-    // clear the now-orphaned auto-filled type.
-    if (oldBackedThis) {
-      updateConnection(conn.id, { type: null });
+    // No sig backs the connection any more. If this sig used to back it:
+    //  - on a delete (breakOnOrphan), quarantine it — the hole collapsed, so
+    //    sever the chain visually but keep it traceable;
+    //  - on an edit, just clear the orphaned auto-filled type as before.
+    if (oldBackedThis && !conn.broken) {
+      updateConnection(conn.id, breakOnOrphan ? { broken: true } : { type: null });
     }
   }
 }

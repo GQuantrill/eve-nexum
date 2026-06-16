@@ -20,10 +20,11 @@ import { SystemNode } from './SystemNode';
 import { ConnectionEdge } from './ConnectionEdge';
 import { AddSystemModal } from '../ui/AddSystemModal';
 import { ContextMenu } from '../ui/ContextMenu';
+import { ConfirmModal, shouldSkipConfirm } from '../ui/ConfirmModal';
 import {
   PathIcon, MapPinSimpleIcon, HouseIcon, LockIcon, LockOpenIcon,
   XIcon, CheckIcon, PlusIcon, SelectionAllIcon, EyeIcon, CrosshairSimpleIcon,
-  LinkSimpleIcon, ArrowsOutIcon,
+  LinkSimpleIcon, LinkBreakIcon, ArrowsOutIcon,
 } from '@phosphor-icons/react';
 import type { MapSystem, SystemIntel } from '../../types';
 import { CLASS_COLORS } from '../../data/wormholes';
@@ -178,6 +179,8 @@ export function MapCanvas() {
 
   const [pendingPosition, setPendingPosition] = useState<{ x: number; y: number } | null>(null);
   const [contextMenu, setContextMenu]         = useState<CtxMenu | null>(null);
+  // Pending "remove orphan systems" sweep, held while the confirm modal is up.
+  const [orphanConfirm, setOrphanConfirm]     = useState<{ ids: string[] } | null>(null);
   const [customIntel] = useCustomIntel();
   const wrapperRef = useRef<HTMLDivElement>(null);
 
@@ -1024,6 +1027,15 @@ export function MapCanvas() {
       ];
     }
 
+    // Orphans: systems with no *valid* connection — either no connection at all,
+    // or only broken (quarantined) ones. Home and locked systems are protected.
+    const orphanIds = systems
+      .filter((s) =>
+        !s.isHome && !s.locked &&
+        !connections.some((c) => !c.broken && (c.sourceId === s.id || c.targetId === s.id)),
+      )
+      .map((s) => s.id);
+
     return [
       {
         label: t('ctxMenu.addSystem'),
@@ -1047,6 +1059,17 @@ export function MapCanvas() {
         icon: <ArrowsOutIcon size={15} weight="regular" />,
         action: () => requestAutoLayout(),
         disabled: nodes.length === 0,
+      },
+      { separator: true as const },
+      {
+        label: t('ctxMenu.removeOrphans', { count: orphanIds.length }),
+        icon: <LinkBreakIcon size={15} weight="regular" color="#e25a5a" />,
+        action: () => {
+          if (orphanIds.length === 0) return;
+          if (shouldSkipConfirm()) orphanIds.forEach((id) => removeSystem(id));
+          else setOrphanConfirm({ ids: orphanIds });
+        },
+        disabled: orphanIds.length === 0,
       },
     ];
   })();
@@ -1152,6 +1175,17 @@ export function MapCanvas() {
 
       {pendingPosition && (
         <AddSystemModal position={pendingPosition} onClose={() => setPendingPosition(null)} />
+      )}
+
+      {orphanConfirm && (
+        <ConfirmModal
+          message={t('ctxMenu.removeOrphansConfirm', { count: orphanConfirm.ids.length })}
+          onConfirm={() => {
+            orphanConfirm.ids.forEach((id) => removeSystem(id));
+            setOrphanConfirm(null);
+          }}
+          onCancel={() => setOrphanConfirm(null)}
+        />
       )}
     </div>
     </HeatmapContext.Provider>

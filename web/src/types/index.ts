@@ -148,6 +148,10 @@ export interface MapConnection {
   size: ConnectionSize;
   massUsed: number; // kg — total mass jumped through this connection
   eolAt: string | null; // ISO timestamp when EOL was marked (null = fresh)
+  /** True once the backing wormhole sig was deleted (hole collapsed). The
+   *  connection is kept on the map but quarantined — rendered severed and
+   *  excluded from routing — so the chain is still traceable. */
+  broken: boolean;
   createdAt: string;
 }
 

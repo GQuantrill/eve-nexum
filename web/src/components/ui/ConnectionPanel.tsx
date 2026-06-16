@@ -212,6 +212,21 @@ export function ConnectionPanel() {
         <button className="icon-btn" onClick={() => selectConnection(null)} title={t('actions.close')}><XIcon size={14} weight="bold" /></button>
       </div>
 
+      {conn.broken && (
+        <div className="conn-broken-banner">
+          <span className="conn-broken-banner__text">{t('connPanel.brokenNotice')}</span>
+          <button
+            type="button"
+            className="sys-btn"
+            disabled={!canEdit}
+            onClick={() => update({ broken: false })}
+            title={t('connPanel.restoreTitle')}
+          >
+            {t('connPanel.restore')}
+          </button>
+        </div>
+      )}
+
       <label className="field">
         <span>{t('connPanel.whType')} <WHTypeInfo code={conn.type} /></span>
         <input

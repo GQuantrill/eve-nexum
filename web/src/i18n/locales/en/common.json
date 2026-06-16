@@ -599,6 +599,9 @@
     "addNote": "Add note…"
   },
   "connPanel": {
+    "brokenNotice": "Connection broken — the backing wormhole sig was deleted. Kept on the map but quarantined from routing.",
+    "restore": "Restore",
+    "restoreTitle": "Clear the broken flag and treat this as a live connection again",
     "whType": "Wormhole type",
     "whTypePlaceholder": "K162, C247…",
     "massStatus": "Mass status",
@@ -705,6 +708,8 @@
     "unlockSystem": "Unlock System",
     "removeSystem": "Remove System",
     "removeSystems": "Remove {{count}} Systems",
+    "removeOrphans": "Remove Orphan Systems ({{count}})",
+    "removeOrphansConfirm": "Remove {{count}} orphan system(s)? These have no valid connection (none, or only broken ones). Home and locked systems are kept. This can be undone.",
     "addSystem": "Add System",
     "selectAll": "Select All",
     "noHomeSet": "No home system set. Right-click a system → \"Set as home\".",
@@ -1427,6 +1432,7 @@
   "mapEdge": {
     "lessThan24h": "< 24h",
     "lessThan4h": "< 4 hrs",
-    "lessThan1h": "< 1 hr"
+    "lessThan1h": "< 1 hr",
+    "broken": "Connection broken — the wormhole sig was deleted (hole collapsed)"
   }
 }

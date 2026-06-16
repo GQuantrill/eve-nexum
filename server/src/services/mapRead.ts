@@ -88,7 +88,7 @@ export async function loadFullMap(mapId: string) {
               connection_type AS "connectionType", mass_status AS "massStatus",
               time_status AS "timeStatus", size, wh_type AS "type",
               COALESCE(mass_used, 0)::float8 AS "massUsed",
-              eol_at AS "eolAt",
+              eol_at AS "eolAt", broken,
               created_at AS "createdAt"
        FROM map_connections WHERE map_id = $1`,
       [mapId],

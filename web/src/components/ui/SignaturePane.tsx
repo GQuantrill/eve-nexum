@@ -435,11 +435,11 @@ export function SignaturePane({ systemId }: { systemId: string }) {
     setSigs((prev) => prev.filter((s) => s.id !== id));
     setSelected((prev) => { const next = new Set(prev); next.delete(id); return next; });
 
-    // If the deleted sig was backing a connection, re-evaluate so we can clear
-    // the now-orphaned connection type.
+    // If the deleted sig was backing a connection, quarantine it — the hole
+    // collapsed, so the connection is severed (broken) but kept on the map.
     if (deleted && deleted.whType && deleted.whLeadsTo) {
       const nextSigs = sigsRef.current.filter((s) => s.id !== id);
-      reevaluateConnectionsForSystem(systemId, nextSigs, deleted);
+      reevaluateConnectionsForSystem(systemId, nextSigs, deleted, true);
     }
 
     api(`/api/maps/${activeMapId}/systems/${systemId}/signatures/${id}`, { method: 'DELETE' })
