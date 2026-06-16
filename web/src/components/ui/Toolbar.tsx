@@ -316,7 +316,11 @@ export function Toolbar() {
   const posOf = (id: string): { x: number; y: number } | null =>
     savedPositions[id] ?? defaultPositions[id] ?? null;
   const atDefaultLayout = Object.keys(savedPositions).length === 0;
-  const resetLayout = () => setSavedPositions({});
+  // Clear the measured defaults too, so EVERY section re-flows into a clean
+  // tidy row and re-seeds. Clearing only the saved positions would leave the
+  // sections you'd dragged with no default (back to flow) while the rest stayed
+  // absolute at their old defaults — and the two would overlap.
+  const resetLayout = () => { setSavedPositions({}); setDefaultPositions({}); };
 
   const dragSensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
   const toolbarRef = useRef<HTMLElement>(null);
