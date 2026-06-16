@@ -171,6 +171,10 @@ export async function migrate() {
     ALTER TABLE map_connections ADD COLUMN IF NOT EXISTS wh_type   TEXT;
     ALTER TABLE map_connections ADD COLUMN IF NOT EXISTS mass_used BIGINT NOT NULL DEFAULT 0;
     ALTER TABLE map_connections ADD COLUMN IF NOT EXISTS eol_at    TIMESTAMPTZ;
+    -- "Broken" = the backing wormhole sig was deleted (hole collapsed): the
+    -- connection is kept on the map but quarantined (rendered severed, excluded
+    -- from routing) so the chain is still traceable. See broken_chain_feature.
+    ALTER TABLE map_connections ADD COLUMN IF NOT EXISTS broken    BOOLEAN NOT NULL DEFAULT FALSE;
     ALTER TABLE map_systems     ADD COLUMN IF NOT EXISTS last_activity_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
 
     -- Manual intel tag a user can apply to a system via right-click. Distinct

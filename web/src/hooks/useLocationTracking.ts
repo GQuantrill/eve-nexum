@@ -102,7 +102,7 @@ export function useLocationTracking(enabled: boolean) {
 
   useEffect(() => {
     if (!enabled) return;
-    const { map, addSystem, addConnection, selectSystem, setCurrentSystem, uniformWidth, uniformHeight, snapToGrid } = useMapStore.getState();
+    const { map, addSystem, addConnection, updateConnection, selectSystem, setCurrentSystem, uniformWidth, uniformHeight, snapToGrid } = useMapStore.getState();
 
     // No active map loaded yet (mid switchMap / first paint) — wait for the
     // next location update rather than racing addSystem against an empty store.
@@ -188,12 +188,16 @@ export function useLocationTracking(enabled: boolean) {
 
     if (trackJumps && canEdit && !map.locked && prevMapSystemId && prevMapSystemId !== mapSystemId) {
       const freshConnections = useMapStore.getState().map.connections;
-      const alreadyConnected = freshConnections.some(
+      const existing = freshConnections.find(
         (c) =>
           (c.sourceId === prevMapSystemId && c.targetId === mapSystemId) ||
           (c.sourceId === mapSystemId && c.targetId === prevMapSystemId),
       );
-      if (!alreadyConnected) {
+      if (existing) {
+        // Physically jumping the link is definitive proof it's live — if it was
+        // quarantined (backing sig deleted), un-break it so the map stays honest.
+        if (existing.broken) updateConnection(existing.id, { broken: false });
+      } else {
         // Pick the optimal source/target sides from the two systems' actual
         // positions so the auto-added connection attaches cleanly — bottom→top
         // for a vertical layout, right→left for a horizontal one — instead of a

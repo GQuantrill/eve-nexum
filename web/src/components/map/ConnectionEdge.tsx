@@ -76,6 +76,10 @@ export const ConnectionEdge = memo(({
   })();
 
   const isJumpgate = conn?.connectionType === 'jumpgate';
+  // Quarantined: the backing wormhole sig was deleted (hole collapsed). Kept on
+  // the map but rendered severed (dashed/red + a ✂ marker) so the chain is
+  // still traceable but clearly no longer an active link.
+  const broken = !!conn?.broken;
 
   // Live EOL state takes priority over the legacy categorical timeStatus.
   const eolState   = !isJumpgate ? computeEolState(conn?.eolAt, now) : null;
@@ -116,19 +120,29 @@ export const ConnectionEdge = memo(({
         id={id}
         path={edgePath}
         style={{
-          stroke: color,
+          stroke: broken ? 'var(--cv-conn-expired)' : color,
           strokeWidth: watchColor ? strokeWidth + 1 : strokeWidth,
-          strokeDasharray: isJumpgate ? '10 5' : undefined,
+          strokeDasharray: broken ? '5 7' : isJumpgate ? '10 5' : undefined,
           filter: [
-            selected ? `drop-shadow(0 0 6px ${color})` : null,
+            selected ? `drop-shadow(0 0 6px ${broken ? 'var(--cv-conn-expired)' : color})` : null,
             watchColor ? `drop-shadow(0 0 5px ${watchColor}) drop-shadow(0 0 2px ${watchColor})` : null,
           ].filter(Boolean).join(' ') || undefined,
-          opacity: selected || watchColor ? 1 : 0.85,
+          opacity: broken ? 0.7 : selected || watchColor ? 1 : 0.85,
         }}
         markerEnd={undefined}
       />
       <EdgeLabelRenderer>
-        {(() => {
+        {broken && (
+          <div
+            className="connection-break"
+            title={t('mapEdge.broken')}
+            style={{ transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)` }}
+            onClick={() => selectConnection(id)}
+          >
+            &#9986;
+          </div>
+        )}
+        {!broken && (() => {
           const typeNode = isJumpgate
             ? <span className="connection-label__jumpgate">JG</span>
             : conn?.type

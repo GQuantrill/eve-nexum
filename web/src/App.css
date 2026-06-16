@@ -3789,6 +3789,45 @@ div.system-node__easy-handle {
   }
 }
 
+/* Severed-connection marker: a ✂ badge dropped at the midpoint of a broken
+   (quarantined) connection. The dashed red edge plus this badge make a
+   collapsed chain obvious without removing it from the map. */
+.connection-break {
+  position: absolute;
+  pointer-events: all;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(20px * var(--font-scale, 1));
+  height: calc(20px * var(--font-scale, 1));
+  font-size: calc(13px * var(--font-scale, 1));
+  line-height: 1;
+  color: var(--cv-conn-expired);
+  background: color-mix(in srgb, var(--cv-conn-expired) 18%, #0b0e16);
+  border: 1px solid color-mix(in srgb, var(--cv-conn-expired) 55%, #0b0e16);
+  border-radius: 50%;
+}
+
+/* Broken-connection banner in the connection side panel. */
+.conn-broken-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 10px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  color: var(--cv-conn-expired);
+  background: color-mix(in srgb, var(--cv-conn-expired) 12%, #0b0e16);
+  border: 1px solid color-mix(in srgb, var(--cv-conn-expired) 40%, #0b0e16);
+}
+
+.conn-broken-banner__text {
+  flex: 1;
+  font-size: calc(12px * var(--font-scale, 1));
+  line-height: 1.35;
+}
+
 /* ── Side panel ──────────────────────────────────────────── */
 .system-panel {
   background: #0d1117;
