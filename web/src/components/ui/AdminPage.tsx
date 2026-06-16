@@ -997,7 +997,13 @@ function SystemsReport() {
   if (!data || !sortedWh) return <>{controls}<div className="admin-page__loading">{t('admin.loading')}</div></>;
   if (data.total === 0) return <>{controls}<div className="admin-page__empty">{t('admin.reports.systems.empty')}</div></>;
 
-  const donutEntries = SIG_TYPE_ORDER
+  // Exclude unidentified ("unknown") signatures from the sig-type breakdown —
+  // they're not a real type, so they're left out of the stat cards, the donut,
+  // and the percentage denominator (percentages are of identified sigs only).
+  const knownTypes = SIG_TYPE_ORDER.filter((st) => st.key !== 'unknown');
+  const knownTotal = knownTypes.reduce((sum, st) => sum + (data.byType[st.key] ?? 0), 0);
+
+  const donutEntries = knownTypes
     .map((st) => ({ key: st.key, label: t(`admin.reports.sig.${st.key}`), count: data.byType[st.key] ?? 0 }))
     .filter((e) => e.count > 0);
 
@@ -1006,15 +1012,15 @@ function SystemsReport() {
       {controls}
       <h3 className="admin-page__report-heading">{t('admin.reports.systems.heading')}</h3>
       <div className="admin-page__stat-grid">
-        <StatCard label={t('admin.reports.systems.total')} value={data.total} accent />
-        {SIG_TYPE_ORDER.map((st) => {
+        <StatCard label={t('admin.reports.systems.total')} value={knownTotal} accent />
+        {knownTypes.map((st) => {
           const count = data.byType[st.key] ?? 0;
           return (
             <StatCard
               key={st.key}
               label={t(`admin.reports.sig.${st.key}`)}
               value={count}
-              pct={data.total > 0 ? (count / data.total) * 100 : 0}
+              pct={knownTotal > 0 ? (count / knownTotal) * 100 : 0}
             />
           );
         })}
