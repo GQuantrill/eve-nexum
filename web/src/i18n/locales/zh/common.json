@@ -166,10 +166,9 @@
         "colLastKnown": "最后已知星系",
         "colSystemsAdded": "添加的星系",
         "colSystemsDeleted": "删除的星系",
-        "colLastCorpStructure": "上次军团建筑",
-        "colTotalStructures": "建筑总数",
         "colLastCorpSignature": "上次军团信号",
-        "colTotalSignatures": "信号总数"
+        "colTotalSignatures": "信号总数",
+        "colLastActive": "最后活跃"
       },
       "systems": {
         "loadFailed": "加载星系报告失败",
@@ -335,7 +334,8 @@
       "mergeMaps": "合并地图",
       "liveSharing": "实时地图广播",
       "shareMap": "共享地图",
-      "shortcuts": "快捷键"
+      "shortcuts": "快捷键",
+      "notifications": "通知"
     },
     "snapToGrid": "对齐网格",
     "settings": "设置",
@@ -356,7 +356,11 @@
     "crossMapSyncHelp": "当你在某个星系添加或编辑信号与异常空间时，它们会被复制到你其他地图上的同一星系（个人地图与你的其他个人地图同步；军团地图与该军团的其他地图同步）。非破坏性：仅填充缺失或空白的条目，绝不覆盖你已输入的数据，也不会删除任何内容。",
     "placementOptions": {
       "horizontal": "水平（右侧）",
-      "vertical": "垂直（下方）"
+      "vertical": "垂直（下方）",
+      "east": "右侧（东）",
+      "south": "下方（南）",
+      "west": "左侧（西）",
+      "north": "上方（北）"
     },
     "resetZoom": "重置为 100%",
     "compact": "紧凑",
@@ -455,7 +459,23 @@
     "exportFailed": "导出失败：{{error}}",
     "invalidJson": "无效的 JSON 文件。",
     "notNexumMap": "该文件看起来不像 Eve-Nexum 地图导出文件。",
-    "importFailed": "导入失败：{{error}}"
+    "importFailed": "导入失败：{{error}}",
+    "colorVision": "色觉",
+    "colorVisionOptions": {
+      "off": "默认颜色",
+      "deuteranopia": "绿色盲（红绿）",
+      "protanopia": "红色盲（红绿）",
+      "tritanopia": "蓝黄色盲（蓝黄）"
+    },
+    "lazyRemoveWh": "自动移除过期虫洞",
+    "lazyRemoveWhHint": "定期移除超过其类型最大寿命的虫洞信号。如果该信号支撑着一条没有其他东西维系的连接，该连接会被标记为断开（隔离）而非删除。在服务器端运行，因此即使地图未打开也会生效。",
+    "proximityNotifyHint": "在下方的通知部分切换此项的桌面通知和声音。",
+    "notifHint": "选择哪些事件提醒你，以及如何提醒。桌面通知需要上方的浏览器权限。",
+    "notifColDesktop": "桌面",
+    "notifColSound": "声音",
+    "notifK162": "传入 K162",
+    "notifProximity": "邻近威胁",
+    "notifWatchlist": "监视列表匹配"
   },
   "customIntel": {
     "title": "自定义情报",
@@ -498,7 +518,8 @@
     "remove": "从关注列表移除",
     "max": "关注列表最多 {{count}} 条",
     "add": "添加到关注列表",
-    "appeared": "关注列表：{{name}}（{{marker}}）已出现在地图上"
+    "appeared": "关注列表：{{name}}（{{marker}}）已出现在地图上",
+    "notifTitle": "监视列表匹配"
   },
   "chainExits": {
     "noExits": "此链中没有 K空间出口。",
@@ -594,14 +615,18 @@
     "collapseConfirmStrand": " 你的关洞船会被困在对侧。",
     "collapseConfirmHome": " 你的关洞船停在本侧。",
     "rollIt": "执行通过",
-    "removeConnection": "移除连接"
+    "removeConnection": "移除连接",
+    "brokenNotice": "连接已断开——支撑它的虫洞信号已被删除。保留在地图上，但已从路由中隔离。",
+    "restore": "恢复",
+    "restoreTitle": "清除断开标记，重新将其视为活动连接"
   },
   "mapControls": {
     "panel": "控制面板",
     "zoomIn": "放大",
     "zoomOut": "缩小",
     "fitView": "适应视图",
-    "interactive": "切换可交互性"
+    "interactive": "切换可交互性",
+    "centerOnMe": "居中到我的位置"
   },
   "demo": {
     "hintClick": "点击一个星系以在此查看其详情。",
@@ -650,7 +675,11 @@
     "noHomeSet": "未设置母星系。右键点击一个星系 →「设为母星系」。",
     "failSetDest": "设置目的地失败",
     "failAddWaypoint": "添加航路点失败",
-    "canvasHint": "右键画布添加星系 · 在连接点之间拖动以连接 · Shift+点击或拖动进行多选 · 右键星系进行交互"
+    "canvasHint": "右键画布添加星系 · 在连接点之间拖动以连接 · Shift+点击或拖动进行多选 · 右键星系进行交互",
+    "optimizeConnections": "优化连接",
+    "spreadNodes": "散开节点",
+    "removeOrphans": "移除孤立星系 ({{count}})",
+    "removeOrphansConfirm": "移除 {{count}} 个孤立星系？它们没有有效连接（没有连接，或只有断开的连接）。母星系和锁定星系将保留。此操作可撤销。"
   },
   "panel": {
     "notes": "笔记",
@@ -983,7 +1012,8 @@
       "hostileSov": "敌对主权",
       "threat": "威胁",
       "closest": "最近的{{label}}星系"
-    }
+    },
+    "resetLayout": "重置工具栏布局"
   },
   "landing": {
     "tagline": "EVE Online 的虫洞链路绘图",
@@ -1192,6 +1222,18 @@
       "colorVision": {
         "title": "色盲模式",
         "desc": "绿色盲、红色盲和蓝黄色盲调色板，在整个应用中重新映射所有状态、星系等级和声望颜色。"
+      },
+      "brokenChain": {
+        "title": "断链检测",
+        "desc": "删除一个虫洞信号后，它所支撑的连接不会被悄悄保留为相连状态——而是被隔离：保留在地图上，但显示为断开（带 ✂ 标记的红色虚线）并从路由中排除，让坍塌的链一目了然，而非看似完整。如果有信号再次支撑该链接或你跳跃通过它，将自动恢复。"
+      },
+      "orphanCleanup": {
+        "title": "孤立星系清理",
+        "desc": "右键一次扫除孤立星系——没有活动连接，或只有断开连接的星系——同时保护你的母星系和任何锁定星系。无需手动追查零散星系，即可保持运行中的链整洁。"
+      },
+      "lazyWhRemoval": {
+        "title": "自动移除过期虫洞",
+        "desc": "按地图选用：服务器端扫描会在虫洞信号超过其类型最大寿命后将其移除，并隔离它们所支撑的任何连接。即使无人打开地图也会运行，因此同步地图和军团链会自行保持最新。"
       }
     },
     "corpFeatures": {
@@ -1366,6 +1408,58 @@
   "mapEdge": {
     "lessThan24h": "< 24h",
     "lessThan4h": "< 4h",
-    "lessThan1h": "< 1h"
+    "lessThan1h": "< 1h",
+    "broken": "连接已断开——虫洞信号已被删除（虫洞坍塌）"
+  },
+  "apiKeys": {
+    "title": "API 密钥",
+    "hint": "生成密钥，让外部工具通过 API 使用你的地图。密钥以所选角色身份运行——只能做该角色能做的事。「读取 + 实时事件」密钥还可订阅实时事件流；「读取 + 写入内容」密钥还可添加和编辑信号、异常和建筑（绝不包括地图拓扑）。",
+    "name": "名称",
+    "namePlaceholder": "例如 舰队机器人",
+    "character": "运行身份",
+    "scope": "访问权限",
+    "scopeRead": "仅读取",
+    "scopeEvents": "读取 + 实时事件",
+    "scopeWrite": "读取 + 写入内容",
+    "scopeReadBadge": "读取",
+    "scopeEventsBadge": "事件",
+    "scopeWriteBadge": "写入",
+    "expiry": "到期",
+    "expiryNever": "永不",
+    "expiryDays": "{{count}} 天",
+    "create": "创建密钥",
+    "creating": "正在创建…",
+    "created": "已创建「{{name}}」",
+    "createFailed": "无法创建密钥。请重试。",
+    "copyNow": "立即复制此密钥——不会再次显示。",
+    "dismiss": "完成",
+    "keyCopied": "密钥已复制到剪贴板",
+    "copyFailed": "无法复制——请手动选择并复制。",
+    "loading": "正在加载密钥…",
+    "none": "尚无 API 密钥。",
+    "boundTo": "以 {{name}} 身份运行",
+    "lastUsed": "上次使用 {{ago}}",
+    "neverUsed": "从未使用",
+    "expires": "{{date}} 到期",
+    "noExpiry": "无到期",
+    "flagExpired": "已过期",
+    "flagInert": "未激活",
+    "revoke": "撤销",
+    "revokeConfirm": "撤销「{{name}}」？使用此密钥的任何工具将立即失去访问权限。",
+    "revoked": "已撤销「{{name}}」",
+    "revokeFailed": "无法撤销密钥。请重试。"
+  },
+  "whChart": {
+    "open": "⊟ 虫洞参考",
+    "tooltip": "查询任何虫洞类型——生成、目的地、舰船尺寸、质量和寿命",
+    "title": "虫洞类型参考",
+    "searchPlaceholder": "筛选…",
+    "colWormholes": "虫洞",
+    "colRespawn": "重生",
+    "colSpawnIn": "生成于",
+    "colLeadsTo": "通向",
+    "colShipSize": "舰船跳跃尺寸",
+    "colTotalMass": "总质量",
+    "colLifetime": "寿命"
   }
 }

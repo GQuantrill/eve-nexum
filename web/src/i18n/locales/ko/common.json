@@ -166,10 +166,9 @@
         "colLastKnown": "마지막으로 확인된 성계",
         "colSystemsAdded": "추가한 성계",
         "colSystemsDeleted": "삭제한 성계",
-        "colLastCorpStructure": "마지막 군단 구조물",
-        "colTotalStructures": "전체 구조물",
         "colLastCorpSignature": "마지막 군단 시그니처",
-        "colTotalSignatures": "전체 시그니처"
+        "colTotalSignatures": "전체 시그니처",
+        "colLastActive": "마지막 활동"
       },
       "systems": {
         "loadFailed": "성계 보고서를 불러오지 못했습니다",
@@ -335,7 +334,8 @@
       "mergeMaps": "지도 병합",
       "liveSharing": "실시간 지도 송출",
       "shareMap": "지도 공유",
-      "shortcuts": "단축키"
+      "shortcuts": "단축키",
+      "notifications": "알림"
     },
     "snapToGrid": "격자에 맞추기",
     "settings": "설정",
@@ -356,7 +356,11 @@
     "crossMapSyncHelp": "어떤 시스템에 시그니처나 어노말리를 추가/편집하면 내 다른 맵의 같은 시스템에도 복사됩니다(개인 맵은 다른 개인 맵과, 군단 맵은 군단의 다른 맵과 동기화). 비파괴적: 비어 있거나 누락된 항목만 채우며, 이미 입력한 데이터를 덮어쓰거나 삭제하지 않습니다.",
     "placementOptions": {
       "horizontal": "수평 (오른쪽)",
-      "vertical": "수직 (아래)"
+      "vertical": "수직 (아래)",
+      "east": "오른쪽 (동)",
+      "south": "아래 (남)",
+      "west": "왼쪽 (서)",
+      "north": "위 (북)"
     },
     "resetZoom": "100%로 재설정",
     "compact": "간결",
@@ -455,7 +459,23 @@
     "exportFailed": "내보내기 실패: {{error}}",
     "invalidJson": "잘못된 JSON 파일입니다.",
     "notNexumMap": "이 파일은 Eve-Nexum 지도 내보내기 파일이 아닌 것 같습니다.",
-    "importFailed": "가져오기 실패: {{error}}"
+    "importFailed": "가져오기 실패: {{error}}",
+    "colorVision": "색각",
+    "colorVisionOptions": {
+      "off": "기본 색상",
+      "deuteranopia": "녹색맹 (적록)",
+      "protanopia": "적색맹 (적록)",
+      "tritanopia": "청황색맹 (청황)"
+    },
+    "lazyRemoveWh": "오래된 웜홀 자동 제거",
+    "lazyRemoveWhHint": "해당 유형의 최대 수명을 초과한 웜홀 시그니처를 주기적으로 제거합니다. 시그니처가 다른 것이 잡아주지 않는 연결을 지탱하고 있었다면, 그 연결은 삭제되지 않고 끊김(격리)으로 표시됩니다. 서버에서 실행되므로 맵을 열지 않아도 적용됩니다.",
+    "proximityNotifyHint": "이에 대한 데스크톱 알림과 소리는 아래 알림 섹션에서 전환하세요.",
+    "notifHint": "어떤 이벤트가 어떻게 알릴지 선택하세요. 데스크톱 알림에는 위의 브라우저 권한이 필요합니다.",
+    "notifColDesktop": "데스크톱",
+    "notifColSound": "소리",
+    "notifK162": "수신 K162",
+    "notifProximity": "근접 위협",
+    "notifWatchlist": "워치리스트 일치"
   },
   "customIntel": {
     "title": "사용자 지정 인텔",
@@ -498,7 +518,8 @@
     "remove": "관심 목록에서 제거",
     "max": "관심 목록 항목 최대 {{count}}개",
     "add": "관심 목록에 추가",
-    "appeared": "관심 목록: {{name}}({{marker}})이(가) 맵에 있습니다"
+    "appeared": "관심 목록: {{name}}({{marker}})이(가) 맵에 있습니다",
+    "notifTitle": "워치리스트 일치"
   },
   "chainExits": {
     "noExits": "이 체인에 K-스페이스 출구가 없습니다.",
@@ -594,14 +615,18 @@
     "collapseConfirmStrand": " 당신의 롤러가 반대편에 고립될 수 있습니다.",
     "collapseConfirmHome": " 당신의 롤러는 홈 쪽에서 종료됩니다.",
     "rollIt": "통과 실행",
-    "removeConnection": "연결 제거"
+    "removeConnection": "연결 제거",
+    "brokenNotice": "연결 끊김 — 이를 지탱하던 웜홀 시그니처가 삭제되었습니다. 맵에는 남아 있지만 라우팅에서 격리됩니다.",
+    "restore": "복원",
+    "restoreTitle": "끊김 플래그를 해제하고 다시 활성 연결로 처리합니다"
   },
   "mapControls": {
     "panel": "제어판",
     "zoomIn": "확대",
     "zoomOut": "축소",
     "fitView": "화면에 맞추기",
-    "interactive": "상호작용 전환"
+    "interactive": "상호작용 전환",
+    "centerOnMe": "내 위치를 중앙에"
   },
   "demo": {
     "hintClick": "성계를 클릭하면 여기에서 세부 정보를 볼 수 있습니다.",
@@ -650,7 +675,11 @@
     "noHomeSet": "설정된 홈 성계가 없습니다. 성계를 우클릭 → “홈으로 설정”.",
     "failSetDest": "목적지 설정 실패",
     "failAddWaypoint": "경유지 추가 실패",
-    "canvasHint": "캔버스를 우클릭하여 성계 추가 · 핸들 사이를 드래그하여 연결 · Shift+클릭 또는 드래그로 다중 선택 · 성계를 우클릭하여 상호작용"
+    "canvasHint": "캔버스를 우클릭하여 성계 추가 · 핸들 사이를 드래그하여 연결 · Shift+클릭 또는 드래그로 다중 선택 · 성계를 우클릭하여 상호작용",
+    "optimizeConnections": "연결 최적화",
+    "spreadNodes": "노드 펼치기",
+    "removeOrphans": "고립 성계 제거 ({{count}})",
+    "removeOrphansConfirm": "{{count}}개의 고립 성계를 제거하시겠습니까? 이들은 유효한 연결이 없습니다(없거나 끊긴 것만). 홈과 잠긴 성계는 유지됩니다. 실행 취소할 수 있습니다."
   },
   "panel": {
     "notes": "노트",
@@ -983,7 +1012,8 @@
       "hostileSov": "적대 주권",
       "threat": "위협",
       "closest": "가장 가까운 {{label}} 성계"
-    }
+    },
+    "resetLayout": "툴바 레이아웃 초기화"
   },
   "landing": {
     "tagline": "EVE Online을 위한 웜홀 체인 지도 작성",
@@ -1192,6 +1222,18 @@
       "colorVision": {
         "title": "색맹 모드",
         "desc": "녹색맹·적색맹·청황색맹 팔레트로 앱 전체의 모든 상태·등급·관계도 색상을 다시 매핑합니다."
+      },
+      "brokenChain": {
+        "title": "끊긴 체인 감지",
+        "desc": "웜홀 시그니처를 삭제해도 그것이 지탱하던 연결이 조용히 연결된 채로 남지 않습니다 — 격리됩니다. 맵에는 남지만 끊긴 상태(✂ 표시가 있는 빨간 점선)로 표시되고 라우팅에서 제외되어, 붕괴된 체인이 완전해 보이는 대신 한눈에 드러납니다. 시그니처가 다시 연결을 지탱하거나 점프하면 자동으로 복원됩니다."
+      },
+      "orphanCleanup": {
+        "title": "고립 성계 정리",
+        "desc": "오른쪽 클릭 한 번으로 고립된 성계 — 활성 연결이 없거나 끊긴 연결만 있는 것 — 를 제거하면서 홈과 잠긴 성계는 보호합니다. 흩어진 것들을 직접 찾지 않아도 작동 중인 체인을 깔끔하게 유지합니다."
+      },
+      "lazyWhRemoval": {
+        "title": "오래된 웜홀 자동 제거",
+        "desc": "맵별 선택 사항: 서버 측 스윕이 웜홀 시그니처를 해당 유형의 최대 수명을 넘기면 제거하고, 그것이 지탱하던 연결을 격리합니다. 아무도 맵을 열지 않아도 실행되므로 동기화 및 군단 체인이 스스로 최신 상태를 유지합니다."
       }
     },
     "corpFeatures": {
@@ -1366,6 +1408,58 @@
   "mapEdge": {
     "lessThan24h": "< 24h",
     "lessThan4h": "< 4h",
-    "lessThan1h": "< 1h"
+    "lessThan1h": "< 1h",
+    "broken": "연결 끊김 — 웜홀 시그니처가 삭제되었습니다(홀 붕괴)"
+  },
+  "apiKeys": {
+    "title": "API 키",
+    "hint": "외부 도구가 API를 통해 맵을 사용할 수 있도록 키를 생성합니다. 키는 선택한 캐릭터로 동작하며, 그 캐릭터가 할 수 있는 것만 할 수 있습니다. \"읽기 + 라이브 이벤트\" 키는 라이브 이벤트 스트림도 구독할 수 있습니다. \"읽기 + 콘텐츠 쓰기\" 키는 시그니처, 어노말리, 건축물도 추가하고 편집할 수 있습니다(맵 토폴로지는 불가).",
+    "name": "이름",
+    "namePlaceholder": "예: 플릿 봇",
+    "character": "동작 캐릭터",
+    "scope": "접근 권한",
+    "scopeRead": "읽기 전용",
+    "scopeEvents": "읽기 + 라이브 이벤트",
+    "scopeWrite": "읽기 + 콘텐츠 쓰기",
+    "scopeReadBadge": "읽기",
+    "scopeEventsBadge": "이벤트",
+    "scopeWriteBadge": "쓰기",
+    "expiry": "만료",
+    "expiryNever": "없음",
+    "expiryDays": "{{count}}일",
+    "create": "키 생성",
+    "creating": "생성 중…",
+    "created": "\"{{name}}\" 생성됨",
+    "createFailed": "키를 생성할 수 없습니다. 다시 시도하세요.",
+    "copyNow": "지금 이 키를 복사하세요 — 다시 표시되지 않습니다.",
+    "dismiss": "완료",
+    "keyCopied": "키를 클립보드에 복사했습니다",
+    "copyFailed": "복사할 수 없습니다 — 직접 선택하여 복사하세요.",
+    "loading": "키 불러오는 중…",
+    "none": "아직 API 키가 없습니다.",
+    "boundTo": "{{name}}(으)로 동작",
+    "lastUsed": "마지막 사용 {{ago}}",
+    "neverUsed": "사용 안 함",
+    "expires": "{{date}}에 만료",
+    "noExpiry": "만료 없음",
+    "flagExpired": "만료됨",
+    "flagInert": "비활성",
+    "revoke": "취소",
+    "revokeConfirm": "\"{{name}}\"을(를) 취소하시겠습니까? 이 키를 사용하는 모든 도구가 즉시 접근을 잃습니다.",
+    "revoked": "\"{{name}}\" 취소됨",
+    "revokeFailed": "키를 취소할 수 없습니다. 다시 시도하세요."
+  },
+  "whChart": {
+    "open": "⊟ 웜홀 참조",
+    "tooltip": "모든 웜홀 유형 조회 — 생성, 목적지, 함선 크기, 질량 및 수명",
+    "title": "웜홀 유형 참조",
+    "searchPlaceholder": "필터…",
+    "colWormholes": "웜홀",
+    "colRespawn": "재생성",
+    "colSpawnIn": "생성 위치",
+    "colLeadsTo": "연결 대상",
+    "colShipSize": "함선 점프 크기",
+    "colTotalMass": "총 질량",
+    "colLifetime": "수명"
   }
 }

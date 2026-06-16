@@ -166,10 +166,9 @@
         "colLastKnown": "Último sistema conocido",
         "colSystemsAdded": "Sistemas añadidos",
         "colSystemsDeleted": "Sistemas eliminados",
-        "colLastCorpStructure": "Última estructura corp",
-        "colTotalStructures": "Estructuras totales",
         "colLastCorpSignature": "Última firma corp",
-        "colTotalSignatures": "Firmas totales"
+        "colTotalSignatures": "Firmas totales",
+        "colLastActive": "Última actividad"
       },
       "systems": {
         "loadFailed": "No se pudo cargar el informe de sistemas",
@@ -335,7 +334,8 @@
       "mergeMaps": "Fusionar mapas",
       "liveSharing": "Transmisión de mapa en vivo",
       "shareMap": "Compartir mapa",
-      "shortcuts": "Atajos"
+      "shortcuts": "Atajos",
+      "notifications": "Notificaciones"
     },
     "snapToGrid": "Ajustar a la cuadrícula",
     "settings": "Ajustes",
@@ -356,7 +356,11 @@
     "crossMapSyncHelp": "Cuando añades o editas firmas y anomalías en un sistema, se copian al mismo sistema en tus otros mapas (los mapas personales se sincronizan con tus otros mapas personales; los de corp con los demás mapas de la corp). No destructivo: solo rellena entradas que faltan o están vacías — nunca sobrescribe datos que ya hayas introducido ni borra nada.",
     "placementOptions": {
       "horizontal": "Horizontal (derecha)",
-      "vertical": "Vertical (abajo)"
+      "vertical": "Vertical (abajo)",
+      "east": "Derecha (este)",
+      "south": "Abajo (sur)",
+      "west": "Izquierda (oeste)",
+      "north": "Arriba (norte)"
     },
     "resetZoom": "Restablecer al 100 %",
     "compact": "Compacto",
@@ -455,7 +459,23 @@
     "exportFailed": "Error al exportar: {{error}}",
     "invalidJson": "Archivo JSON no válido.",
     "notNexumMap": "El archivo no parece una exportación de mapa de Eve-Nexum.",
-    "importFailed": "Error al importar: {{error}}"
+    "importFailed": "Error al importar: {{error}}",
+    "colorVision": "Visión del color",
+    "colorVisionOptions": {
+      "off": "Colores predeterminados",
+      "deuteranopia": "Deuteranopía (rojo-verde)",
+      "protanopia": "Protanopía (rojo-verde)",
+      "tritanopia": "Tritanopía (azul-amarillo)"
+    },
+    "lazyRemoveWh": "Eliminar automáticamente agujeros de gusano caducados",
+    "lazyRemoveWhHint": "Elimina periódicamente las firmas de agujero de gusano más antiguas que la vida útil máxima de su tipo. Si la firma sostenía una conexión sin nada más que la mantuviera, la conexión se marca como rota (en cuarentena) en lugar de eliminarse. Se ejecuta en el servidor, así que se aplica incluso cuando el mapa no está abierto.",
+    "proximityNotifyHint": "Activa la notificación de escritorio y el sonido para esto en la sección Notificaciones de abajo.",
+    "notifHint": "Elige qué eventos te avisan, y cómo. Las notificaciones de escritorio necesitan el permiso del navegador de arriba.",
+    "notifColDesktop": "Escritorio",
+    "notifColSound": "Sonido",
+    "notifK162": "K162 entrante",
+    "notifProximity": "Amenazas de proximidad",
+    "notifWatchlist": "Coincidencia de lista de seguimiento"
   },
   "customIntel": {
     "title": "Intel personalizada",
@@ -498,7 +518,8 @@
     "remove": "Quitar de la lista de seguimiento",
     "max": "Máximo {{count}} entradas en la lista de seguimiento",
     "add": "Añadir a la lista de seguimiento",
-    "appeared": "Lista de seguimiento: {{name}} ({{marker}}) está en el mapa"
+    "appeared": "Lista de seguimiento: {{name}} ({{marker}}) está en el mapa",
+    "notifTitle": "Coincidencia de lista de seguimiento"
   },
   "chainExits": {
     "noExits": "No hay salidas de K-space en esta cadena.",
@@ -594,14 +615,18 @@
     "collapseConfirmStrand": " Tu roller quedaría atrapado en el lado opuesto.",
     "collapseConfirmHome": " Tu roller termina en el lado de origen.",
     "rollIt": "Realizar la pasada",
-    "removeConnection": "Quitar conexión"
+    "removeConnection": "Quitar conexión",
+    "brokenNotice": "Conexión rota — la firma de agujero de gusano que la sostenía fue eliminada. Se mantiene en el mapa pero en cuarentena del enrutamiento.",
+    "restore": "Restaurar",
+    "restoreTitle": "Quitar la marca de rota y volver a tratarla como una conexión activa"
   },
   "mapControls": {
     "panel": "Panel de control",
     "zoomIn": "Acercar",
     "zoomOut": "Alejar",
     "fitView": "Ajustar la vista",
-    "interactive": "Alternar interactividad"
+    "interactive": "Alternar interactividad",
+    "centerOnMe": "Centrar en mi ubicación"
   },
   "demo": {
     "hintClick": "Haz clic en un sistema para ver aquí sus detalles.",
@@ -650,7 +675,11 @@
     "noHomeSet": "No hay sistema de origen establecido. Clic derecho en un sistema → «Establecer como origen».",
     "failSetDest": "No se pudo establecer el destino",
     "failAddWaypoint": "No se pudo añadir el punto de ruta",
-    "canvasHint": "Clic derecho en el lienzo para añadir sistema · Arrastra entre las asas para conectar · Mayús+clic o arrastrar para selección múltiple · Clic derecho en un sistema para interactuar"
+    "canvasHint": "Clic derecho en el lienzo para añadir sistema · Arrastra entre las asas para conectar · Mayús+clic o arrastrar para selección múltiple · Clic derecho en un sistema para interactuar",
+    "optimizeConnections": "Optimizar conexiones",
+    "spreadNodes": "Distribuir nodos",
+    "removeOrphans": "Eliminar sistemas huérfanos ({{count}})",
+    "removeOrphansConfirm": "¿Eliminar {{count}} sistema(s) huérfano(s)? No tienen ninguna conexión válida (ninguna, o solo rotas). Los sistemas de origen y bloqueados se conservan. Esto se puede deshacer."
   },
   "panel": {
     "notes": "Notas",
@@ -983,7 +1012,8 @@
       "hostileSov": "Sov hostil",
       "threat": "Amenaza",
       "closest": "Sistema {{label}} más cercano"
-    }
+    },
+    "resetLayout": "Restablecer disposición de la barra de herramientas"
   },
   "landing": {
     "tagline": "Cartografía de cadenas de agujeros de gusano para EVE Online",
@@ -1192,6 +1222,18 @@
       "colorVision": {
         "title": "Modos para daltónicos",
         "desc": "Paletas de deuteranopía, protanopía y tritanopía que reasignan cada color de estado, clase y standing en toda la aplicación."
+      },
+      "brokenChain": {
+        "title": "Detección de cadena rota",
+        "desc": "Elimina una firma de agujero de gusano y la conexión que sostenía no queda unida en silencio — se pone en cuarentena: se mantiene en el mapa pero se muestra cortada (línea roja discontinua con un marcador ✂) y se excluye del enrutamiento, para que una cadena colapsada sea evidente en lugar de parecer completa. Se restaura automáticamente si una firma vuelve a sostener el enlace o si lo saltas."
+      },
+      "orphanCleanup": {
+        "title": "Limpieza de huérfanos",
+        "desc": "Un barrido con clic derecho elimina los sistemas huérfanos — los que no tienen conexión activa, o solo rotas — protegiendo tu sistema de origen y cualquier sistema bloqueado. Mantiene una cadena activa ordenada sin buscar los perdidos a mano."
+      },
+      "lazyWhRemoval": {
+        "title": "Eliminar automáticamente agujeros de gusano caducados",
+        "desc": "Opcional por mapa: un barrido en el servidor elimina las firmas de agujero de gusano una vez que superan la vida útil máxima de su tipo, poniendo en cuarentena cualquier conexión que sostuvieran. Se ejecuta incluso cuando nadie tiene el mapa abierto, para que las cadenas sincronizadas y de corp se mantengan al día por sí solas."
       }
     },
     "corpFeatures": {
@@ -1366,6 +1408,58 @@
   "mapEdge": {
     "lessThan24h": "< 24h",
     "lessThan4h": "< 4 h",
-    "lessThan1h": "< 1 h"
+    "lessThan1h": "< 1 h",
+    "broken": "Conexión rota — la firma de agujero de gusano fue eliminada (agujero colapsado)"
+  },
+  "apiKeys": {
+    "title": "Claves API",
+    "hint": "Genera una clave para permitir que herramientas externas usen tus mapas a través de la API. Una clave actúa como el personaje seleccionado — solo puede hacer lo que ese personaje puede. Las claves «Lectura + eventos en vivo» también pueden suscribirse al flujo de eventos en vivo; las claves «Lectura + escritura de contenido» también pueden añadir y editar firmas, anomalías y estructuras (nunca la topología del mapa).",
+    "name": "Nombre",
+    "namePlaceholder": "p. ej. bot de flota",
+    "character": "Actúa como",
+    "scope": "Acceso",
+    "scopeRead": "Solo lectura",
+    "scopeEvents": "Lectura + eventos en vivo",
+    "scopeWrite": "Lectura + escritura de contenido",
+    "scopeReadBadge": "lectura",
+    "scopeEventsBadge": "eventos",
+    "scopeWriteBadge": "escritura",
+    "expiry": "Caduca",
+    "expiryNever": "Nunca",
+    "expiryDays": "{{count}} días",
+    "create": "Crear clave",
+    "creating": "Creando…",
+    "created": "«{{name}}» creada",
+    "createFailed": "No se pudo crear la clave. Inténtalo de nuevo.",
+    "copyNow": "Copia esta clave ahora — no se volverá a mostrar.",
+    "dismiss": "Hecho",
+    "keyCopied": "Clave copiada al portapapeles",
+    "copyFailed": "No se pudo copiar — selecciónala y cópiala manualmente.",
+    "loading": "Cargando claves…",
+    "none": "Aún no hay claves API.",
+    "boundTo": "Actúa como {{name}}",
+    "lastUsed": "Último uso {{ago}}",
+    "neverUsed": "Nunca usada",
+    "expires": "Caduca {{date}}",
+    "noExpiry": "Sin caducidad",
+    "flagExpired": "caducada",
+    "flagInert": "inactiva",
+    "revoke": "Revocar",
+    "revokeConfirm": "¿Revocar «{{name}}»? Cualquier herramienta que use esta clave perderá el acceso inmediatamente.",
+    "revoked": "«{{name}}» revocada",
+    "revokeFailed": "No se pudo revocar la clave. Inténtalo de nuevo."
+  },
+  "whChart": {
+    "open": "⊟ Referencia de agujeros de gusano",
+    "tooltip": "Consulta cualquier tipo de agujero de gusano — aparición, destino, tamaño de nave, masa y vida útil",
+    "title": "Referencia de tipos de agujero de gusano",
+    "searchPlaceholder": "Filtrar…",
+    "colWormholes": "Agujeros de gusano",
+    "colRespawn": "Reaparición",
+    "colSpawnIn": "Aparece en",
+    "colLeadsTo": "Lleva a",
+    "colShipSize": "Tamaño de salto de nave",
+    "colTotalMass": "Masa total",
+    "colLifetime": "Vida útil"
   }
 }
