@@ -87,6 +87,83 @@ function findFreePosition(
   return place(source.x + fx * stepX, source.y + fy * stepY);
 }
 
+export interface JumpSystem {
+  eveSystemId: number;
+  name:        string;
+  systemClass: string;
+  effect:      string;
+  statics:     string[];
+  regionName:  string | null;
+  npcType:     string | null;
+}
+
+/**
+ * Apply one "the player is now in `system`, arriving from `prevMapSystemId`"
+ * jump to the active map: reuse the system if it's already placed, otherwise
+ * auto-add it at the next free slot around the source (same clockwise
+ * findFreePosition logic live tracking uses), then add or un-break the
+ * connection. Returns the resulting map-system id, or null when the system
+ * isn't on the map and `canAdd` is false (locked / no edit / tracking off).
+ *
+ * Shared by the live tracker below and `nexumDebug.simulateJumps`, so the
+ * console debug tool drives the exact same placement code as a real jump.
+ */
+export function applyJump(system: JumpSystem, prevMapSystemId: string | null, canAdd: boolean): string | null {
+  const { map, addSystem, addConnection, updateConnection, uniformWidth, uniformHeight, snapToGrid } = useMapStore.getState();
+
+  let mapSystemId: string;
+  const existing = map.systems.find((s) => s.eveSystemId === system.eveSystemId);
+  if (existing) {
+    mapSystemId = existing.id;
+  } else {
+    if (!canAdd) return null;
+    const w = uniformWidth || 220;
+    const h = uniformHeight || 120;
+    const gap = PLACEMENT_GAP;
+    let source: { x: number; y: number };
+    if (prevMapSystemId && map.systems.some((s) => s.id === prevMapSystemId)) {
+      source = map.systems.find((s) => s.id === prevMapSystemId)!.position;
+    } else {
+      source = {
+        x: map.systems.length ? map.systems.reduce((sum, s) => sum + s.position.x, 0) / map.systems.length : 0,
+        y: map.systems.length ? map.systems.reduce((sum, s) => sum + s.position.y, 0) / map.systems.length : 0,
+      };
+    }
+    const direction = normalizePlacement(readUserSetting<string>('nexum.map.placement', 'east'));
+    const position = findFreePosition(source, map.systems, w, h, gap, direction, snapToGrid);
+    mapSystemId = addSystem(system.name, system.systemClass as SystemClass, position, {
+      eveSystemId: system.eveSystemId,
+      effect:      system.effect as WormholeEffect,
+      statics:     system.statics,
+      regionName:  system.regionName,
+      npcType:     system.npcType,
+    });
+  }
+
+  if (canAdd && prevMapSystemId && prevMapSystemId !== mapSystemId && map.systems.some((s) => s.id === prevMapSystemId)) {
+    const freshConnections = useMapStore.getState().map.connections;
+    const existingConn = freshConnections.find(
+      (c) =>
+        (c.sourceId === prevMapSystemId && c.targetId === mapSystemId) ||
+        (c.sourceId === mapSystemId && c.targetId === prevMapSystemId),
+    );
+    if (existingConn) {
+      // Physically jumping the link is proof it's live — un-quarantine if broken.
+      if (existingConn.broken) updateConnection(existingConn.id, { broken: false });
+    } else {
+      const placed = useMapStore.getState().map.systems;
+      const srcPos = placed.find((s) => s.id === prevMapSystemId)?.position;
+      const tgtPos = placed.find((s) => s.id === mapSystemId)?.position;
+      const { sourceHandle, targetHandle } = srcPos && tgtPos
+        ? pickHandles(srcPos, tgtPos)
+        : { sourceHandle: 'right' as const, targetHandle: 'left' as const };
+      addConnection(prevMapSystemId, mapSystemId, sourceHandle, targetHandle);
+    }
+  }
+
+  return mapSystemId;
+}
+
 /**
  * Map-side reaction to character location changes. The actual polling lives
  * in `useCharacterLocation` (10s, module-level, shared with the sidebar);
@@ -102,7 +179,7 @@ export function useLocationTracking(enabled: boolean) {
 
   useEffect(() => {
     if (!enabled) return;
-    const { map, addSystem, addConnection, updateConnection, selectSystem, setCurrentSystem, uniformWidth, uniformHeight, snapToGrid } = useMapStore.getState();
+    const { map, selectSystem, setCurrentSystem } = useMapStore.getState();
 
     // No active map loaded yet (mid switchMap / first paint) — wait for the
     // next location update rather than racing addSystem against an empty store.
@@ -135,81 +212,28 @@ export function useLocationTracking(enabled: boolean) {
     }
     lastEveSystemId.current = system.eveSystemId;
 
-    let mapSystemId: string;
-    const existing = map.systems.find((s) => s.eveSystemId === system.eveSystemId);
+    // A locked map never grows from passive tracking, nor does one a readonly /
+    // no-topology user is viewing; track-jumps off opts out of auto-add too.
     const trackJumps = useMapStore.getState().trackJumps;
-    if (existing) {
-      mapSystemId = existing.id;
-    } else {
-      // A locked map never grows from passive location tracking — that
-      // includes admins, who can still place systems manually via the
-      // canvas but shouldn't sprout them just by hopping through EVE.
-      // Readonly / no-topology-permission users are also blocked here.
-      // Track-jumps off explicitly opts the user out of the auto-add.
-      if (!trackJumps || map.locked || !canEdit) {
-        lastMapSystemId.current = null;
-        setCurrentSystem(null);
-        return;
-      }
-      // Offset by the widest node seen so an auto-added system never overlaps
-      // the one it's placed next to (positions are top-left corners). Falls back
-      // to a generous constant before any node has been measured.
-      const w = uniformWidth || 220;
-      const h = uniformHeight || 120;
-      const gap = PLACEMENT_GAP;
-      // Anchor placement on the system we jumped from (or the map centroid for
-      // the very first auto-add), then rotate clockwise around it into the
-      // first free slot — right, below, left, above, diagonals, wider rings.
-      let source: { x: number; y: number };
-      if (prevMapSystemId) {
-        source = map.systems.find((s) => s.id === prevMapSystemId)!.position;
-      } else {
-        source = {
-          x: map.systems.length ? map.systems.reduce((sum, s) => sum + s.position.x, 0) / map.systems.length : 0,
-          y: map.systems.length ? map.systems.reduce((sum, s) => sum + s.position.y, 0) / map.systems.length : 0,
-        };
-      }
-      const direction = normalizePlacement(readUserSetting<string>('nexum.map.placement', 'east'));
-      const position = findFreePosition(source, map.systems, w, h, gap, direction, snapToGrid);
-
-      mapSystemId = addSystem(
-        system.name,
-        system.systemClass as SystemClass,
-        position,
-        {
-          eveSystemId: system.eveSystemId,
-          effect:      system.effect as WormholeEffect,
-          statics:     system.statics,
-          regionName:  system.regionName,
-          npcType:     system.npcType,
-        },
-      );
-    }
-
-    if (trackJumps && canEdit && !map.locked && prevMapSystemId && prevMapSystemId !== mapSystemId) {
-      const freshConnections = useMapStore.getState().map.connections;
-      const existing = freshConnections.find(
-        (c) =>
-          (c.sourceId === prevMapSystemId && c.targetId === mapSystemId) ||
-          (c.sourceId === mapSystemId && c.targetId === prevMapSystemId),
-      );
-      if (existing) {
-        // Physically jumping the link is definitive proof it's live — if it was
-        // quarantined (backing sig deleted), un-break it so the map stays honest.
-        if (existing.broken) updateConnection(existing.id, { broken: false });
-      } else {
-        // Pick the optimal source/target sides from the two systems' actual
-        // positions so the auto-added connection attaches cleanly — bottom→top
-        // for a vertical layout, right→left for a horizontal one — instead of a
-        // fixed right→left that cuts diagonally across vertically-stacked nodes.
-        const placed = useMapStore.getState().map.systems;
-        const srcPos = placed.find((s) => s.id === prevMapSystemId)?.position;
-        const tgtPos = placed.find((s) => s.id === mapSystemId)?.position;
-        const { sourceHandle, targetHandle } = srcPos && tgtPos
-          ? pickHandles(srcPos, tgtPos)
-          : { sourceHandle: 'right' as const, targetHandle: 'left' as const };
-        addConnection(prevMapSystemId, mapSystemId, sourceHandle, targetHandle);
-      }
+    const canAdd = trackJumps && !map.locked && canEdit;
+    const mapSystemId = applyJump(
+      {
+        eveSystemId: system.eveSystemId,
+        name:        system.name,
+        systemClass: system.systemClass,
+        effect:      system.effect,
+        statics:     system.statics,
+        regionName:  system.regionName ?? null,
+        npcType:     system.npcType ?? null,
+      },
+      prevMapSystemId,
+      canAdd,
+    );
+    if (mapSystemId === null) {
+      // Not on the map and not allowed to add — record nothing, just clear.
+      lastMapSystemId.current = null;
+      setCurrentSystem(null);
+      return;
     }
 
     lastMapSystemId.current = mapSystemId;

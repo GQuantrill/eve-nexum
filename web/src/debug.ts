@@ -96,6 +96,71 @@ const nexumDebug = {
     });
   },
 
+  // ── Jump simulator ──────────────────────────────────────────────────────
+  // Replays a player route through the active map, one hop every `intervalMs`,
+  // driving the SAME applyJump() code path as live location tracking so node
+  // placement / connection behaviour matches a real jump. Use it to reproduce
+  // positioning bugs (e.g. jumping in and out of the same system).
+  //   nexumDebug.simulateJumps(['Jita', 'Perimeter', 'Jita', 'New Caldari'])
+  //   nexumDebug.stopJumps()
+  // Names are EVE system names / J-codes; each is resolved via the systems API.
+  // NOTE: this mutates the active map for real (adds systems + connections).
+  _jumpTimer: null as ReturnType<typeof setInterval> | null,
+
+  async simulateJumps(names: string[], intervalMs = 2000) {
+    if (!Array.isArray(names) || names.some((n) => typeof n !== 'string')) {
+      console.error('[nexum] simulateJumps(names[], intervalMs?) — names must be an array of system names.');
+      return;
+    }
+    const [{ applyJump }, store, esi] = await Promise.all([
+      import('./hooks/useLocationTracking'),
+      import('./store/mapStore'),
+      import('./hooks/useEsiSearch'),
+    ]);
+    const { useMapStore } = store;
+
+    const resolve = async (name: string) => {
+      const results = await (await fetch(
+        `${(await import('./api/client')).apiUrl(`/api/systems/search?q=${encodeURIComponent(name)}`)}`,
+        { credentials: 'include' },
+      )).json() as Array<{ id: number; name: string }>;
+      const hit = results.find((r) => r.name.toLowerCase() === name.toLowerCase()) ?? results[0];
+      if (!hit) return null;
+      const d = await esi.fetchSystemDetail(hit.id);
+      return {
+        eveSystemId: d.id, name: d.name, systemClass: d.systemClass, effect: d.effect,
+        statics: d.statics ?? [], regionName: d.regionName ?? null, npcType: d.npcType ?? null,
+      };
+    };
+
+    if (this._jumpTimer) { clearInterval(this._jumpTimer); this._jumpTimer = null; }
+    let prev = useMapStore.getState().currentSystemId;
+    let i = 0;
+    console.log(`[nexum] Simulating ${names.length} jumps, one every ${intervalMs}ms. nexumDebug.stopJumps() to cancel.`);
+
+    const step = async () => {
+      if (i >= names.length) { this.stopJumps(); console.log('[nexum] Jump simulation complete.'); return; }
+      const name = names[i++];
+      const sys = await resolve(name);
+      if (!sys) { console.warn(`[nexum] Could not resolve "${name}" — skipping.`); return; }
+      const id = applyJump(sys, prev, true);
+      if (id) {
+        prev = id;
+        useMapStore.getState().setCurrentSystem(id);
+        useMapStore.getState().selectSystem(id);
+        const pos = useMapStore.getState().map.systems.find((s) => s.id === id)?.position;
+        console.log(`[nexum] jump ${i}/${names.length} → ${sys.name}  @ (${pos?.x}, ${pos?.y})`);
+      }
+    };
+    await step();
+    this._jumpTimer = setInterval(() => { void step(); }, intervalMs);
+  },
+
+  stopJumps() {
+    if (this._jumpTimer) { clearInterval(this._jumpTimer); this._jumpTimer = null; console.log('[nexum] Jump simulation stopped.'); }
+    else console.log('[nexum] No jump simulation running.');
+  },
+
   clear() {
     log.length = 0;
     console.log('[nexum] Debug log cleared.');
@@ -109,6 +174,8 @@ const nexumDebug = {
     console.log('nexumDebug.mapState()  — current map store snapshot');
     console.log('nexumDebug.queue()     — show pending write queue');
     console.log('nexumDebug.flush()     — manually flush the write queue');
+    console.log("nexumDebug.simulateJumps(['Jita','Perimeter','Jita'], 2000) — replay a route, one hop / interval");
+    console.log('nexumDebug.stopJumps() — cancel a running jump simulation');
     console.log('nexumDebug.clear()     — clear the log buffer');
     console.groupEnd();
   },
