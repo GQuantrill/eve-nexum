@@ -443,6 +443,54 @@ function ShareSection() {
 // Merge entry point. Opens the merge modal, and — for full/admin members
 // looking at a corp map — exposes the "allow as merge source" opt-in that
 // lets that corp map be used as a merge source by the corp.
+// Per-map opt-in for the server-side lazy WH-removal sweep. Mirrors the merge
+// flags' optimistic-PATCH-with-revert pattern. Any editor can toggle it.
+function LazyWhSweepToggle() {
+  const { t } = useTranslation();
+  const map = useMapStore((s) => s.map);
+  const enabled = !!map.lazyRemoveWormholes;
+  const [saving, setSaving] = useState(false);
+
+  function setInStore(value: boolean) {
+    useMapStore.setState((s) => ({
+      map: { ...s.map, lazyRemoveWormholes: value },
+      maps: s.maps.map((m) => (m.id === map.id ? { ...m, lazyRemoveWormholes: value } : m)),
+    }));
+  }
+
+  async function toggle(next: boolean) {
+    setSaving(true);
+    setInStore(next);
+    try {
+      await api(`/api/maps/${map.id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ lazyRemoveWormholes: next }),
+      });
+    } catch (e) {
+      setInStore(!next);
+      toast.error(e instanceof Error ? e.message : t("mapSidebar.updateSettingFailed"));
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <>
+      <label className="map-sidebar__row map-sidebar__toggle-row">
+        <span className="map-sidebar__label">{t("mapSidebar.lazyRemoveWh")}</span>
+        <input
+          type="checkbox"
+          className="map-sidebar__toggle-input"
+          checked={enabled}
+          disabled={saving}
+          onChange={(e) => toggle(e.target.checked)}
+        />
+      </label>
+      <div className="map-sidebar__hint">{t("mapSidebar.lazyRemoveWhHint")}</div>
+    </>
+  );
+}
+
 function MergeSection() {
   const { t } = useTranslation();
   const map = useMapStore((s) => s.map);
@@ -842,6 +890,7 @@ export function MapSidebar() {
               >
                 {t("mapSidebar.spreadNodes")}
               </button>
+              <LazyWhSweepToggle />
             </>
           )}
         </CollapsibleSection>

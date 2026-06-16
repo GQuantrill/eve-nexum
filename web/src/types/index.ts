@@ -164,6 +164,9 @@ export interface WormholeMap {
   allowAsMergeSource?: boolean;
   /** Corp maps only: whether this map is opted in as a merge destination. */
   allowAsMergeDestination?: boolean;
+  /** Opt-in: a server-side sweep removes wormhole sigs older than their type's
+   *  max lifetime and quarantines (marks broken) any connection they backed. */
+  lazyRemoveWormholes?: boolean;
   /** Present when the map has an active or expired share link. The token
    *  itself is in shareToken; shareExpiresAt is the cutoff. The owner UI
    *  treats an expired token as "no link" — regenerate to share again.

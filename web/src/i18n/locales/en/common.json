@@ -419,6 +419,8 @@
     "optimizeConnections": "⟳ Optimize Connections",
     "spreadNodes": "⊞ Spread Nodes",
     "spreadNodesTooltip": "Adjust system nodes to stop overlapping",
+    "lazyRemoveWh": "Auto-remove aged wormholes",
+    "lazyRemoveWhHint": "Periodically removes wormhole signatures older than their type's maximum lifetime. If the sig backed a connection with nothing else holding it, the connection is marked broken (quarantined) rather than deleted. Runs server-side, so it applies even when the map isn't open.",
     "routePreference": "Route Preference",
     "routeShortest": "Shortest",
     "routeSecure": "Secure",

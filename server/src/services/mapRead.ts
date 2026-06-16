@@ -37,6 +37,7 @@ export async function listVisibleMaps(p: VisibleMapsParams) {
             ou.character_name             AS "ownerName",
             m.allow_as_merge_source       AS "allowAsMergeSource",
             m.allow_as_merge_destination  AS "allowAsMergeDestination",
+            m.lazy_remove_wormholes       AS "lazyRemoveWormholes",
             m.last_active_at AS "lastActiveAt",
             m.created_at     AS "createdAt",
             m.updated_at     AS "updatedAt"
@@ -62,6 +63,7 @@ export async function loadFullMap(mapId: string) {
       `SELECT id, name, corp_id IS NOT NULL AS "isCorpMap", locked,
               allow_as_merge_source       AS "allowAsMergeSource",
               allow_as_merge_destination  AS "allowAsMergeDestination",
+              lazy_remove_wormholes       AS "lazyRemoveWormholes",
               share_token              AS "shareToken",
               share_expires_at         AS "shareExpiresAt",
               share_include_sigs       AS "shareIncludeSigs",

@@ -133,6 +133,13 @@ export const config = {
   // last_known_system is refreshed from ESI on this cadence so positions stay
   // current without anyone being logged into Nexum.
   locationPollMinutes: Math.max(0, parseInt(process.env.LOCATION_POLL_MINUTES ?? '0', 10) || 0),
+  // Cadence (minutes) of the lazy wormhole-removal sweep, which deletes aged-out
+  // WH sigs (and quarantines the connections they backed) on maps that have
+  // opted in. Default 15; set to 0 to disable the sweep globally.
+  lazyWhSweepMinutes:  (() => {
+    const n = parseInt(process.env.LAZY_WH_SWEEP_MINUTES ?? '15', 10);
+    return Number.isFinite(n) && n >= 0 ? n : 15;
+  })(),
   discord:             DISCORD_WEBHOOKS,
   sdeAutoUpdate:       SDE_AUTO_UPDATE,
   sdeCheckUtc:         SDE_CHECK_UTC,

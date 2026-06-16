@@ -126,6 +126,12 @@ export async function migrate() {
     -- (fail-open, so a new map never silently goes dark).
     ALTER TABLE maps ADD COLUMN IF NOT EXISTS discord_notify BOOLEAN NOT NULL DEFAULT TRUE;
 
+    -- Per-map opt-in for the lazy wormhole-removal sweep. When TRUE, a periodic
+    -- server job (services/whSweep.ts) deletes WH sigs older than their type's
+    -- max lifetime and quarantines (marks broken) any connection they backed.
+    -- DEFAULT FALSE — purely opt-in, nothing auto-deletes until enabled.
+    ALTER TABLE maps ADD COLUMN IF NOT EXISTS lazy_remove_wormholes BOOLEAN NOT NULL DEFAULT FALSE;
+
     -- Per-corp Discord notification settings (region filter). No row => the
     -- defaults below => notify for every region. The regions column holds
     -- region NAMES, matched directly against map_systems.region_name.

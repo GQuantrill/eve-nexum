@@ -31,6 +31,7 @@ import wormholesRouter    from './routes/wormholes.js';
 import { loadRouteGraph } from './services/routeGraph.js';
 import { startSdeAutoUpdate } from './services/sdeUpdate.js';
 import { startLocationPoller } from './services/locationPoll.js';
+import { startWhSweeper } from './services/whSweep.js';
 import { startTelemetry } from './services/telemetry.js';
 import { telemetryRouter } from './routes/telemetry.js';
 import { adminRouter, adminReadRouter, reportsRouter } from './routes/admin.js';
@@ -170,6 +171,7 @@ migrate()
     app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
     startSdeAutoUpdate();
     startLocationPoller();
+    startWhSweeper();
     void startTelemetry();
   })
   .catch((err) => { console.error('Migration failed:', err); process.exit(1); });

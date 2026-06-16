@@ -1321,8 +1321,9 @@ mapsRouter.post('/:mapId/presence', async (req, res) => {
 // toggle merge-source eligibility (corp maps, full/admin only)
 mapsRouter.patch('/:mapId', async (req, res) => {
   const { mapId } = req.params;
-  const { name, locked, allowAsMergeSource, allowAsMergeDestination } = req.body as {
+  const { name, locked, allowAsMergeSource, allowAsMergeDestination, lazyRemoveWormholes } = req.body as {
     name?: string; locked?: boolean; allowAsMergeSource?: boolean; allowAsMergeDestination?: boolean;
+    lazyRemoveWormholes?: boolean;
   };
 
   const access = await requireMapWrite(res, mapId, req);
@@ -1364,6 +1365,11 @@ mapsRouter.patch('/:mapId', async (req, res) => {
   if (locked !== undefined) {
     if (req.session.role !== 'admin') { res.status(403).json({ error: 'Admin access required' }); return; }
     sets.push(`locked = $${vals.length + 1}`); vals.push(locked);
+  }
+  // Lazy WH-removal opt-in: a plain per-map behaviour toggle any editor can set
+  // (no corp/admin gate). The sweep itself runs server-side on this cadence.
+  if (lazyRemoveWormholes !== undefined) {
+    sets.push(`lazy_remove_wormholes = $${vals.length + 1}`); vals.push(lazyRemoveWormholes === true);
   }
 
   if (sets.length === 1) { res.status(400).json({ error: 'Nothing to update' }); return; }
