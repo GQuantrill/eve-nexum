@@ -6031,7 +6031,7 @@ select.sig-toolbar-btn option {
 
 /* ── User Stats Modal ────────────────────────────────────── */
 .stats-modal {
-  width: 480px;
+  width: 560px;
 }
 
 .stats-modal__periods {
@@ -6051,6 +6051,7 @@ select.sig-toolbar-btn option {
   font-family: inherit;
   font-size: calc(13px * var(--font-scale, 1));
   padding: 4px 0;
+  white-space: nowrap;
 }
 
 .stats-modal__period-btn:hover { background: #1a2240; color: #c8d0e0; }
