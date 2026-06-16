@@ -971,10 +971,10 @@
     "type": "Type",
     "count": "Count",
     "period": {
-      "day": "Today",
-      "week": "This Week",
-      "month": "This Month",
-      "year": "This Year",
+      "day": "Last 24h",
+      "week": "Last 7 days",
+      "month": "Last 30 days",
+      "year": "Last 365 days",
       "forever": "All Time"
     }
   },

@@ -51,13 +51,16 @@ router.get('/', async (req, res) => {
   dailySince.setUTCHours(0, 0, 0, 0);
   dailySince.setUTCDate(dailySince.getUTCDate() - (DAILY_DAYS - 1));
 
-  // Three parallel queries:
-  //   jumps  — append-only log in user_events; deleting a sig doesn't roll
-  //            jumps back, so we keep using the event log
-  //   sigs   — live count from map_signatures, so deletions are reflected.
-  //            Rows older than the created_by_user_id migration carry NULL
-  //            and won't attribute to anyone (acceptable).
-  //   daily  — per-day sig count for the last DAILY_DAYS days (sparkline)
+  // Three parallel queries. Both jumps and sigs read the append-only
+  // user_events log (event_type 'jump' / 'signature'), so the figures are a
+  // record of ACTIVITY — how much you scanned/jumped in the window — and are
+  // immune to later deletions or overwrite-paste removals. (Earlier the sig
+  // counts came from the live map_signatures table, which undercounted: a
+  // heavy scan yesterday that was since re-scanned/cleared vanished, so "this
+  // week" could read the same as "last 24h".) The sig_type recorded is the
+  // type at scan time; rows logged before the sig_type column carry NULL and
+  // bucket as 'unknown'.
+  //   daily — per-day scan count for the last DAILY_DAYS days (sparkline)
   const [jumpRes, sigRes, dailyRes] = await Promise.all([
     db.query<{ forever: string; year: string; month: string; week: string; day: string }>(
       `SELECT
@@ -78,16 +81,16 @@ router.get('/', async (req, res) => {
          COUNT(*) FILTER (WHERE created_at >= $3)::text AS month,
          COUNT(*) FILTER (WHERE created_at >= $4)::text AS week,
          COUNT(*) FILTER (WHERE created_at >= $5)::text AS day
-       FROM reportable_signatures
-       WHERE created_by_user_id = $1
+       FROM user_events
+       WHERE user_id = $1 AND event_type = 'signature'
        GROUP BY sig_type`,
       bucketParams,
     ),
     db.query<{ bucket: string; count: string }>(
       `SELECT date_trunc('day', created_at AT TIME ZONE 'UTC')::date::text AS bucket,
               COUNT(*)::text                                                AS count
-         FROM reportable_signatures
-        WHERE created_by_user_id = $1
+         FROM user_events
+        WHERE user_id = $1 AND event_type = 'signature'
           AND created_at >= $2
         GROUP BY bucket`,
       [userId, dailySince],

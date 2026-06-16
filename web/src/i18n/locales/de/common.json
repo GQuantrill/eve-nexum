@@ -933,10 +933,10 @@
     "type": "Typ",
     "count": "Anzahl",
     "period": {
-      "day": "Heute",
-      "week": "Diese Woche",
-      "month": "Dieser Monat",
-      "year": "Dieses Jahr",
+      "day": "Letzte 24 Std.",
+      "week": "Letzte 7 Tage",
+      "month": "Letzte 30 Tage",
+      "year": "Letzte 365 Tage",
       "forever": "Gesamt"
     }
   },
