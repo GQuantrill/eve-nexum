@@ -1,16 +1,29 @@
 import { useEffect, useRef } from 'react';
-import { useMapStore } from '../store/mapStore';
+import { useMapStore, getNodeSize } from '../store/mapStore';
 import { useCharacterLocation } from './useCharacterLocation';
 import { useCanEdit } from './useCanEdit';
 import { readUserSetting } from './useUserSetting';
 import { pickHandles } from '../components/map/edgeUtils';
 import type { SystemClass, WormholeEffect } from '../types';
 
-interface Box { position: { x: number; y: number } }
+interface PlacedBox { id: string; position: { x: number; y: number } }
+interface Size { w: number; h: number }
 
-// AABB overlap test between two top-left-anchored w×h boxes, padded by `gap`.
-function boxesOverlap(ax: number, ay: number, bx: number, by: number, w: number, h: number, gap: number): boolean {
-  return ax < bx + w + gap && ax + w + gap > bx && ay < by + h + gap && ay + h + gap > by;
+// Fallback footprint for nodes we can't measure (none reported yet) and as the
+// candidate estimate when uniform sizing is off — collision against each node's
+// real size does the precise dodging, so this only needs to be a sane nominal.
+const DEFAULT_W = 220;
+const DEFAULT_H = 120;
+
+// AABB overlap test between two top-left-anchored boxes (each with its own w/h),
+// padded by `gap`. Per-box dimensions let us pack against nodes' real sizes
+// instead of treating every node as the single uniform max.
+function boxesOverlap(
+  ax: number, ay: number, aw: number, ah: number,
+  bx: number, by: number, bw: number, bh: number,
+  gap: number,
+): boolean {
+  return ax < bx + bw + gap && ax + aw + gap > bx && ay < by + bh + gap && ay + ah + gap > by;
 }
 
 // Snap-grid size — must match MapCanvas's snapGrid ([20,20]) and mapStore's GRID.
@@ -58,24 +71,33 @@ const FALLBACK_BY_DIR: Record<PlacementDirection, [number, number]> = {
 // against every node, so it also dodges unrelated systems sitting in a slot.
 function findFreePosition(
   source: { x: number; y: number },
-  systems: Box[],
-  w: number,
-  h: number,
+  sourceSize: Size,
+  candidate: Size,
+  systems: PlacedBox[],
+  sizeOf: (id: string) => Size | undefined,
   gap: number,
   direction: PlacementDirection,
   snap: boolean,
 ): { x: number; y: number } {
+  // Collide the candidate's footprint against each existing node's *real*
+  // measured size (uniform max when uniform sizing is on, natural size when
+  // off) so small nodes don't reserve big-node margins and tall nodes still
+  // get cleared. Unmeasured nodes fall back to the candidate footprint.
   const collides = (x: number, y: number) =>
-    systems.some((s) => boxesOverlap(x, y, s.position.x, s.position.y, w, h, gap));
+    systems.some((s) => {
+      const sz = sizeOf(s.id) ?? candidate;
+      return boxesOverlap(x, y, candidate.w, candidate.h, s.position.x, s.position.y, sz.w, sz.h, gap);
+    });
 
-  // Grid-aligned step: a whole node footprint rounded up to the grid plus the
-  // fixed gap, so spacing is consistent instead of drifting with node width.
+  // Step by the SOURCE node's footprint so the first ring always clears the
+  // node we placed next to; spacing follows the real layout rather than the
+  // single global max (which grew mid-run and gapped around small nodes).
   // When snap-to-grid is on, the final position is rounded onto the grid too.
   const place = (x: number, y: number) =>
     snap ? { x: roundToGrid(x), y: roundToGrid(y) } : { x, y };
   const offsets = OFFSETS_BY_DIR[direction];
-  const stepX = ceilToGrid(w) + gap;
-  const stepY = ceilToGrid(h) + gap;
+  const stepX = ceilToGrid(sourceSize.w) + gap;
+  const stepY = ceilToGrid(sourceSize.h) + gap;
   for (let ring = 1; ring <= 6; ring++) {
     for (const [dx, dy] of offsets) {
       const c = place(source.x + dx * ring * stepX, source.y + dy * ring * stepY);
@@ -109,7 +131,7 @@ export interface JumpSystem {
  * console debug tool drives the exact same placement code as a real jump.
  */
 export function applyJump(system: JumpSystem, prevMapSystemId: string | null, canAdd: boolean): string | null {
-  const { map, addSystem, addConnection, updateConnection, uniformWidth, uniformHeight, snapToGrid } = useMapStore.getState();
+  const { map, addSystem, addConnection, updateConnection, uniformSize, uniformWidth, uniformHeight, snapToGrid } = useMapStore.getState();
 
   let mapSystemId: string;
   const existing = map.systems.find((s) => s.eveSystemId === system.eveSystemId);
@@ -117,8 +139,14 @@ export function applyJump(system: JumpSystem, prevMapSystemId: string | null, ca
     mapSystemId = existing.id;
   } else {
     if (!canAdd) return null;
-    const w = uniformWidth || 220;
-    const h = uniformHeight || 120;
+    // The new node hasn't rendered, so its real size is unknown. In uniform
+    // mode every node is clamped to the same max, so estimate with that;
+    // otherwise a nominal default — collision against each existing node's real
+    // size handles the precise spacing.
+    const candidate: Size = {
+      w: uniformSize && uniformWidth  > 0 ? uniformWidth  : DEFAULT_W,
+      h: uniformSize && uniformHeight > 0 ? uniformHeight : DEFAULT_H,
+    };
     const gap = PLACEMENT_GAP;
     let source: { x: number; y: number };
     if (prevMapSystemId && map.systems.some((s) => s.id === prevMapSystemId)) {
@@ -129,8 +157,11 @@ export function applyJump(system: JumpSystem, prevMapSystemId: string | null, ca
         y: map.systems.length ? map.systems.reduce((sum, s) => sum + s.position.y, 0) / map.systems.length : 0,
       };
     }
+    // Clear the node we're placing next to: use its real measured size when we
+    // have it, else the candidate estimate.
+    const sourceSize: Size = (prevMapSystemId ? getNodeSize(prevMapSystemId) : undefined) ?? candidate;
     const direction = normalizePlacement(readUserSetting<string>('nexum.map.placement', 'east'));
-    const position = findFreePosition(source, map.systems, w, h, gap, direction, snapToGrid);
+    const position = findFreePosition(source, sourceSize, candidate, map.systems, getNodeSize, gap, direction, snapToGrid);
     mapSystemId = addSystem(system.name, system.systemClass as SystemClass, position, {
       eveSystemId: system.eveSystemId,
       effect:      system.effect as WormholeEffect,

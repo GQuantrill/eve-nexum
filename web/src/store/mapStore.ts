@@ -33,6 +33,15 @@ const nodeSizes = new Map<string, { w: number; h: number; countHeight: boolean }
 const GRID = 20;
 const snapUpToGrid = (n: number) => (n > 0 ? Math.ceil(n / GRID) * GRID : 0);
 
+// Per-node measured border-box size, for callers that need each node's real
+// footprint rather than the uniform max — notably auto-placement, which packs
+// against actual sizes when uniform sizing is off. Returns undefined for a node
+// that hasn't reported a size yet (not yet rendered).
+export function getNodeSize(id: string): { w: number; h: number } | undefined {
+  const s = nodeSizes.get(id);
+  return s ? { w: s.w, h: s.h } : undefined;
+}
+
 function recomputeUniformMax(): { w: number; h: number } {
   let w = 0, h = 0, hAll = 0;
   let anyHeightEligible = false;
