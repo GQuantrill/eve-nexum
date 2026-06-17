@@ -263,7 +263,8 @@ systemsRouter.get('/:id(\\d+)', async (req, res) => {
 
   try {
     const { rows } = await db.query(
-      `SELECT s.id, s.name, s.security, s.class AS "systemClass", s.effect, s.statics,
+      `SELECT s.id, s.name, s.security, s.class AS "systemClass",
+              COALESCE(s.effect, 'none') AS effect, s.statics,
               r.name AS "regionName", r.npc_type AS "npcType"
        FROM solar_systems s
        LEFT JOIN map_regions r ON r.id = s.region_id
