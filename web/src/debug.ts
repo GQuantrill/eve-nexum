@@ -102,20 +102,25 @@ const nexumDebug = {
   // placement / connection behaviour matches a real jump. Use it to reproduce
   // positioning bugs (e.g. jumping in and out of the same system).
   //   nexumDebug.simulateJumps(['Jita', 'Perimeter', 'Jita', 'New Caldari'])
+  //   nexumDebug.simulateJumps(['Jita', 'Perimeter'], 1000, { dryRun: true })
   //   nexumDebug.stopJumps()
   // Names are EVE system names / J-codes; each is resolved via the systems API.
   // NOTE: this mutates the active map for real (adds systems + connections).
+  // Pass { dryRun: true } to exercise placement locally without firing (or
+  // queuing) any server writes — useful when logged out or without a saved map.
   _jumpTimer: null as ReturnType<typeof setInterval> | null,
 
-  async simulateJumps(names: string[], intervalMs = 2000) {
+  async simulateJumps(names: string[], intervalMs = 2000, opts: { dryRun?: boolean } = {}) {
     if (!Array.isArray(names) || names.some((n) => typeof n !== 'string')) {
-      console.error('[nexum] simulateJumps(names[], intervalMs?) — names must be an array of system names.');
+      console.error('[nexum] simulateJumps(names[], intervalMs?, { dryRun? }) — names must be an array of system names.');
       return;
     }
-    const [{ applyJump }, store, esi] = await Promise.all([
+    const { dryRun = false } = opts;
+    const [{ applyJump }, store, esi, client] = await Promise.all([
       import('./hooks/useLocationTracking'),
       import('./store/mapStore'),
       import('./hooks/useEsiSearch'),
+      import('./api/client'),
     ]);
     const { useMapStore } = store;
 
@@ -136,14 +141,22 @@ const nexumDebug = {
     if (this._jumpTimer) { clearInterval(this._jumpTimer); this._jumpTimer = null; }
     let prev = useMapStore.getState().currentSystemId;
     let i = 0;
-    console.log(`[nexum] Simulating ${names.length} jumps, one every ${intervalMs}ms. nexumDebug.stopJumps() to cancel.`);
+    console.log(`[nexum] Simulating ${names.length} jumps, one every ${intervalMs}ms${dryRun ? ' (dry run — no server writes)' : ''}. nexumDebug.stopJumps() to cancel.`);
 
     const step = async () => {
       if (i >= names.length) { this.stopJumps(); console.log('[nexum] Jump simulation complete.'); return; }
       const name = names[i++];
       const sys = await resolve(name);
       if (!sys) { console.warn(`[nexum] Could not resolve "${name}" — skipping.`); return; }
-      const id = applyJump(sys, prev, true);
+      // applyJump's writes are dispatched synchronously (the suppression check
+      // runs before fetch), so toggling around this call captures them all.
+      if (dryRun) client.setWritesSuppressed(true);
+      let id: string | null;
+      try {
+        id = applyJump(sys, prev, true);
+      } finally {
+        if (dryRun) client.setWritesSuppressed(false);
+      }
       if (id) {
         prev = id;
         useMapStore.getState().setCurrentSystem(id);
@@ -175,6 +188,7 @@ const nexumDebug = {
     console.log('nexumDebug.queue()     — show pending write queue');
     console.log('nexumDebug.flush()     — manually flush the write queue');
     console.log("nexumDebug.simulateJumps(['Jita','Perimeter','Jita'], 2000) — replay a route, one hop / interval");
+    console.log("nexumDebug.simulateJumps([...], 1000, { dryRun: true }) — replay without firing server writes (logged-out safe)");
     console.log('nexumDebug.stopJumps() — cancel a running jump simulation');
     console.log('nexumDebug.clear()     — clear the log buffer');
     console.groupEnd();

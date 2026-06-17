@@ -12,10 +12,27 @@ export function setShareToken(token: string | null): void {
   shareToken = token;
 }
 
+// When true, write requests (POST/PATCH/PUT/DELETE) are short-circuited to a
+// resolved no-op instead of hitting the network. Used by nexumDebug's
+// simulateJumps({ dryRun: true }) so the placement code can be exercised
+// (e.g. logged out) without firing — or queuing — doomed map writes. The
+// promise RESOLVES (not rejects), so callers' .catch(enqueue) never runs.
+let writesSuppressed = false;
+
+export function setWritesSuppressed(suppressed: boolean): void {
+  writesSuppressed = suppressed;
+}
+
 const WRITE_METHODS = new Set(['POST', 'PATCH', 'PUT', 'DELETE']);
 
 export async function api<T = unknown>(path: string, options?: RequestInit): Promise<T> {
   const method = (options?.method ?? 'GET').toUpperCase();
+
+  // Dry-run: swallow writes before any network work so they neither send nor
+  // enqueue. Resolves undefined, matching a 204/empty response.
+  if (writesSuppressed && WRITE_METHODS.has(method)) {
+    return undefined as T;
+  }
 
   // In share mode: block writes outright (no edits without an account) and
   // append the token to every read so the server can authorise it.
