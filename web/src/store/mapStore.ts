@@ -949,9 +949,18 @@ export const useMapStore = create<MapStore>()((set, get) => {
         if (activeMapId) {
           const url  = `/api/maps/${activeMapId}/connections`;
           const body = JSON.stringify({ ...conn });
-          api(url, { method: 'POST', body }).catch(() =>
-            enqueue(`addConnection:${id}`, url, 'POST', body),
-          );
+          api<{ ok: boolean; connectionType?: string }>(url, { method: 'POST', body })
+            .then((r) => {
+              // Server may auto-classify a gate (stargate-adjacent systems).
+              // Reflect it locally so the chain/edge updates without a reload.
+              if (r?.connectionType && r.connectionType !== 'standard') {
+                set((s) => ({
+                  map: { ...s.map, connections: s.map.connections.map((c) =>
+                    c.id === id ? { ...c, connectionType: r.connectionType as MapConnection['connectionType'] } : c) },
+                }));
+              }
+            })
+            .catch(() => enqueue(`addConnection:${id}`, url, 'POST', body));
         }
       }
 

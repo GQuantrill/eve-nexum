@@ -1576,6 +1576,29 @@ mapsRouter.post('/:mapId/connections', async (req, res) => {
   const access = await requireMapWrite(res, mapId, req);
   if (!access) return;
 
+  // Auto-classify gate links: a connection between two stargate-adjacent SDE
+  // systems is a gate, not a wormhole. Only when the client didn't already say
+  // 'jumpgate' (a fresh connection never carries a wh type yet, so there's
+  // nothing to protect). Failures (e.g. map_stargates not seeded) leave it as-is.
+  let effectiveType: string = connectionType ?? 'standard';
+  if (effectiveType !== 'jumpgate') {
+    try {
+      const adj = await db.query(
+        `SELECT 1 FROM map_systems s, map_systems t
+          WHERE s.id = $1 AND t.id = $2
+            AND s.eve_system_id IS NOT NULL AND t.eve_system_id IS NOT NULL
+            AND EXISTS (
+              SELECT 1 FROM map_stargates g
+               WHERE (g.system_id = s.eve_system_id AND g.destination_system_id = t.eve_system_id)
+                  OR (g.system_id = t.eve_system_id AND g.destination_system_id = s.eve_system_id)
+            )
+          LIMIT 1`,
+        [sourceId, targetId],
+      );
+      if ((adj.rowCount ?? 0) > 0) effectiveType = 'jumpgate';
+    } catch { /* stargate table absent / query failed — keep client's type */ }
+  }
+
   let inserted = 0;
   try {
     const ins = await db.query(
@@ -1585,7 +1608,7 @@ mapsRouter.post('/:mapId/connections', async (req, res) => {
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
        ON CONFLICT (id) DO NOTHING`,
       [id, mapId, sourceId, targetId, sourceHandle ?? null, targetHandle ?? null,
-       connectionType ?? 'standard', massStatus ?? null, timeStatus ?? null, size ?? 'large'],
+       effectiveType, massStatus ?? null, timeStatus ?? null, size ?? 'large'],
     );
     inserted = ins.rowCount ?? 0;
   } catch (err) {
@@ -1616,10 +1639,12 @@ mapsRouter.post('/:mapId/connections', async (req, res) => {
   }).catch(console.error);
   // Only notify on a genuinely new wormhole connection — not a duplicate-id
   // retry, and not an in-game stargate (jumpgate) link.
-  if (inserted > 0 && (connectionType ?? 'standard') !== 'jumpgate') {
+  if (inserted > 0 && effectiveType !== 'jumpgate') {
     dispatchNewConnection(access, mapId, sourceId, targetId, null, size ?? 'large', req.session.characterName ?? null);
   }
-  res.status(201).json({ ok: true });
+  // Return the resolved type so the originating client can reflect an
+  // auto-classified gate without waiting for a reload.
+  res.status(201).json({ ok: true, connectionType: effectiveType });
 });
 
 mapsRouter.patch('/:mapId/connections/:connectionId', async (req, res) => {
