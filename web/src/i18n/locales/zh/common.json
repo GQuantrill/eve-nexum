@@ -520,6 +520,7 @@
     "watch": "监视"
   },
   "watchlist": {
+    "sections": { "markers": "标记" },
     "hint": "你正在搜寻的虫洞。添加星系名称或 J-code；当它出现在地图上时，其节点会被高亮显示（如已启用，会响一次提示音）。",
     "chimeToggle": "关注的星系出现时播放提示音",
     "markerAria": "标记",

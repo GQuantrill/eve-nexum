@@ -562,6 +562,7 @@
     "colLifetime": "Lifetime"
   },
   "watchlist": {
+    "sections": { "markers": "Markers" },
     "hint": "Holes you're hunting for. Watch a system, a wormhole type, or a characteristic (shattered, an effect, frig holes); matches are highlighted on the map (and chime once, if enabled).",
     "chimeToggle": "Chime when a watched system appears",
     "markerAria": "Marker",

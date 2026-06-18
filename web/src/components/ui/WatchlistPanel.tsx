@@ -3,6 +3,7 @@ import { CaretLeftIcon, BinocularsIcon } from '@phosphor-icons/react';
 import { useUserSetting } from '../../hooks/useUserSetting';
 import { useWatchlist } from '../../hooks/useWatchlist';
 import { WatchlistBlock } from './WatchlistBlock';
+import { WatchlistSection } from './WatchlistSection';
 
 // Dedicated left-docked watchlist panel. Slides in from the left edge of the
 // map area; a tab handle on its right edge toggles it. Open state is per-user
@@ -12,6 +13,10 @@ import { WatchlistBlock } from './WatchlistBlock';
 export function WatchlistPanel() {
   const { t } = useTranslation();
   const [open, setOpen] = useUserSetting<boolean>('nexum.watchlist.panelOpen', false);
+  // Content fold state, separate from dock/undock: clicking the title bar
+  // collapses everything below it to just the header (panel stays docked),
+  // mirroring a sidebar section header. Persisted per-user.
+  const [collapsed, setCollapsed] = useUserSetting<boolean>('nexum.watchlist.collapsed', false);
   const [items] = useWatchlist();
   const title = t('mapSidebar.sections.watchlist');
 
@@ -36,7 +41,18 @@ export function WatchlistPanel() {
 
       <div className="watchlist-panel__content">
         <div className="watchlist-panel__header">
-          <span className="map-sidebar__section-title">{title}</span>
+          {/* Title bar doubles as the content collapse toggle (like a sidebar
+              section header); the caret reflects the folded state. */}
+          <button
+            type="button"
+            className="watchlist-panel__title-btn"
+            onClick={() => setCollapsed(!collapsed)}
+            aria-expanded={!collapsed}
+            title={title}
+          >
+            <span className={`map-sidebar__caret${collapsed ? '' : ' map-sidebar__caret--open'}`}>▾</span>
+            <span className="map-sidebar__section-title">{title}</span>
+          </button>
           <button
             type="button"
             className="icon-btn"
@@ -47,7 +63,14 @@ export function WatchlistPanel() {
             <CaretLeftIcon size={14} weight="bold" />
           </button>
         </div>
-        <WatchlistBlock />
+
+        {!collapsed && (
+          <div className="watchlist-panel__sections">
+            <WatchlistSection id="markers" title={t('watchlist.sections.markers')}>
+              <WatchlistBlock />
+            </WatchlistSection>
+          </div>
+        )}
       </div>
     </div>
   );

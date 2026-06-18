@@ -520,6 +520,7 @@
     "watch": "Vigilar"
   },
   "watchlist": {
+    "sections": { "markers": "Marcadores" },
     "hint": "Agujeros que estás buscando. Añade un nombre de sistema o un J-code; cuando aparezca en el mapa, su nodo se resalta (y suena una vez, si está activado).",
     "chimeToggle": "Sonar cuando aparezca un sistema vigilado",
     "markerAria": "Marcador",

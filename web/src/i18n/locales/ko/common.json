@@ -520,6 +520,7 @@
     "watch": "감시"
   },
   "watchlist": {
+    "sections": { "markers": "마커" },
     "hint": "찾고 있는 웜홀입니다. 성계 이름이나 J-code를 추가하면 맵에 나타날 때 해당 노드가 강조됩니다(활성화된 경우 한 번 알림음이 울립니다).",
     "chimeToggle": "감시 중인 성계가 나타나면 알림음 재생",
     "markerAria": "마커",

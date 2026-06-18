@@ -520,6 +520,7 @@
     "watch": "Vigiar"
   },
   "watchlist": {
+    "sections": { "markers": "Marcadores" },
     "hint": "Buracos que estás a caçar. Adiciona um nome de sistema ou um J-code; quando aparecer no mapa, o seu nó é destacado (e toca uma vez, se ativado).",
     "chimeToggle": "Tocar quando um sistema observado aparecer",
     "markerAria": "Marcador",

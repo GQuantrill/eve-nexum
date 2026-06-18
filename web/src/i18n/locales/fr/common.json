@@ -520,6 +520,7 @@
     "watch": "Surveiller"
   },
   "watchlist": {
+    "sections": { "markers": "Marqueurs" },
     "hint": "Trous que vous recherchez. Ajoutez un nom de système ou un J-code ; lorsqu'il apparaît sur la carte, son nœud est mis en évidence (et émet un signal sonore une fois, si activé).",
     "chimeToggle": "Émettre un son quand un système surveillé apparaît",
     "markerAria": "Marqueur",

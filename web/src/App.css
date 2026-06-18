@@ -1605,6 +1605,28 @@
   justify-content: space-between;
 }
 
+/* Title bar doubles as the content-collapse toggle. */
+.watchlist-panel__title-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  font-family: inherit;
+}
+.watchlist-panel__title-btn:hover .map-sidebar__section-title { color: #c8d0e0; }
+
+.watchlist-panel__sections {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .map-sidebar {
   position: absolute;
   top: 0;

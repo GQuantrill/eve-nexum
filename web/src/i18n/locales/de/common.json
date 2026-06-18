@@ -520,6 +520,7 @@
     "watch": "Beobachten"
   },
   "watchlist": {
+    "sections": { "markers": "Markierungen" },
     "hint": "Löcher, nach denen du jagst. Füge einen Systemnamen oder J-Code hinzu; sobald es auf der Karte erscheint, wird sein Knoten hervorgehoben (und gibt einmal einen Ton aus, falls aktiviert).",
     "chimeToggle": "Ton abspielen, wenn ein beobachtetes System erscheint",
     "markerAria": "Markierung",
