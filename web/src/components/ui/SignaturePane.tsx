@@ -399,7 +399,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
       if (!leads) continue;
       let source: string | null = null;
       for (const conn of map.connections) {
-        if (conn.connectionType === 'jumpgate') continue;
+        if (conn.connectionType !== 'standard') continue;
         const otherId =
           conn.sourceId === systemId ? conn.targetId :
           conn.targetId === systemId ? conn.sourceId : null;

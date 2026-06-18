@@ -166,6 +166,11 @@ export function ChainsPane() {
                               <ArrowBendUpRightIcon size={11} weight="bold" />
                               {t('chains.viaGate')}
                             </span>
+                          ) : step.kind === 'jumpgate' ? (
+                            <span className="chain-step__warp">
+                              <ArrowBendUpRightIcon size={11} weight="bold" />
+                              {t('chains.viaJumpBridge')}
+                            </span>
                           ) : (
                             <span className="chain-step__warp">
                               <ArrowBendUpRightIcon size={11} weight="bold" />

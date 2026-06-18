@@ -114,9 +114,9 @@ export function ConnectionPanel() {
   // Fetch the signatures on both endpoint systems whenever the selected
   // connection (or its endpoints) changes. Held in state so both the WH-type
   // auto-detect and the link dropdowns read the same list. Cleared for
-  // jumpgate links, which are never wormholes.
+  // gate / Ansiblex links, which are never wormholes.
   useEffect(() => {
-    if (!conn || !src || !tgt || !map.id || conn.connectionType === 'jumpgate') {
+    if (!conn || !src || !tgt || !map.id || conn.connectionType !== 'standard') {
       setEndpointSigs({ src: [], tgt: [] });
       return;
     }
@@ -134,7 +134,7 @@ export function ConnectionPanel() {
   // manual clearing to '' — are never overwritten. Already-set K162 may be
   // upgraded to the real code from the other side.
   useEffect(() => {
-    if (!conn || !src || !tgt || conn.connectionType === 'jumpgate') return;
+    if (!conn || !src || !tgt || conn.connectionType !== 'standard') return;
     if (conn.type !== null && conn.type.toUpperCase() !== 'K162') return;
     const detected = detectWhType(endpointSigs.src, endpointSigs.tgt, src, tgt);
     if (!detected) return;
@@ -256,7 +256,7 @@ export function ConnectionPanel() {
         />
       </label>
 
-      {conn.connectionType !== 'jumpgate' && (
+      {conn.connectionType === 'standard' && (
         <div className="conn-siglink">
           <div className="conn-siglink__label">{t('connPanel.sigLink')}</div>
           <label className="field">

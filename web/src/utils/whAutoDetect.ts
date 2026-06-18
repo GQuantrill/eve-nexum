@@ -34,10 +34,10 @@ export function reevaluateConnectionsForSystem(
   const oldLeads = oldSig?.whLeadsTo?.toUpperCase();
 
   for (const conn of map.connections) {
-    // Jumpgate (stargate) connections are never wormholes — skip them so a
-    // sig that leads to a bare class ("HS") can't stamp a WH code onto a gate
-    // link to a same-class neighbour.
-    if (conn.connectionType === 'jumpgate') continue;
+    // Only wormhole ('standard') connections carry a WH type — skip gates and
+    // Ansiblex links so a sig that leads to a bare class ("HS") can't stamp a
+    // WH code onto a gate link to a same-class neighbour.
+    if (conn.connectionType !== 'standard') continue;
     const otherId =
       conn.sourceId === systemId ? conn.targetId :
       conn.targetId === systemId ? conn.sourceId :

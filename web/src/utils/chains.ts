@@ -53,7 +53,9 @@ export function buildChainPath(map: WormholeMap, fromId: string, toId: string): 
   return { systemIds, connectionIds };
 }
 
-export type ChainStepKind = 'gate' | 'wormhole';
+// gate = in-game stargate (warp to gate), wormhole = warp to its sig,
+// jumpgate = player Ansiblex bridge (take the jump bridge).
+export type ChainStepKind = 'gate' | 'wormhole' | 'jumpgate';
 
 // One leg of a saved chain, resolved against the live map for display.
 export interface ChainStep {
@@ -92,7 +94,9 @@ export function buildChainSteps(
     let broken = true;
 
     if (conn) {
-      kind   = conn.connectionType === 'jumpgate' ? 'gate' : 'wormhole';
+      kind   = conn.connectionType === 'gate' ? 'gate'
+             : conn.connectionType === 'jumpgate' ? 'jumpgate'
+             : 'wormhole';
       whType = conn.type ?? null;
       broken = conn.broken;
       if (!broken && kind === 'wormhole') {

@@ -276,6 +276,42 @@ export async function migrate() {
     );
     CREATE INDEX IF NOT EXISTS idx_map_routes_map ON map_routes (map_id);
 
+    -- Tracks one-shot data migrations that must NOT re-run on every boot
+    -- (unlike the idempotent DDL above) — e.g. a backfill we don't want to
+    -- keep re-applying over later manual edits.
+    CREATE TABLE IF NOT EXISTS applied_migrations (
+      name       TEXT        PRIMARY KEY,
+      applied_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
+    -- One-time: classify existing connections that are really in-game gates.
+    -- A 'standard' (wormhole-default) connection whose two endpoints are
+    -- stargate-adjacent in the SDE and which carries no wormhole type is a
+    -- gate. Only 'standard' rows are touched — connections the user marked
+    -- 'jumpgate' stay Ansiblex, and an explicit wormhole type is preserved.
+    -- Guarded by applied_migrations so it runs once and never re-flips a manual
+    -- correction. New connections are classified the same way at creation time.
+    DO $gateclassify$
+    BEGIN
+      IF to_regclass('public.map_stargates') IS NOT NULL
+         AND NOT EXISTS (SELECT 1 FROM applied_migrations WHERE name = 'gate_classify_v1') THEN
+        UPDATE map_connections c
+           SET connection_type = 'gate'
+          FROM map_systems s, map_systems t
+         WHERE c.source_id = s.id AND c.target_id = t.id
+           AND c.connection_type = 'standard'
+           AND COALESCE(c.wh_type, '') = ''
+           AND s.eve_system_id IS NOT NULL AND t.eve_system_id IS NOT NULL
+           AND EXISTS (
+             SELECT 1 FROM map_stargates g
+              WHERE (g.system_id = s.eve_system_id AND g.destination_system_id = t.eve_system_id)
+                 OR (g.system_id = t.eve_system_id AND g.destination_system_id = s.eve_system_id)
+           );
+        INSERT INTO applied_migrations(name) VALUES ('gate_classify_v1');
+      END IF;
+    END
+    $gateclassify$;
+
     -- Resolved owner corp ID for structures. Populated by ESI lookup when
     -- the user supplies an eve_id (the structure's in-game ID) or when
     -- the structure name parser finds a known corp/alliance. Lets the

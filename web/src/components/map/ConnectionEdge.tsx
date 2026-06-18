@@ -16,6 +16,7 @@ import { watchMarker } from '../../data/watchMarkers';
 // colour-vision palettes (--cv-conn-* in App.css) re-map connection colours.
 const STANDARD_COLOR = 'var(--cv-conn-standard)';
 const JUMPGATE_COLOR  = 'var(--cv-conn-jumpgate)';
+const GATE_COLOR      = 'var(--cv-conn-gate)';
 const HIGHLIGHT_COLOR = 'var(--cv-conn-highlight)';
 
 // Perpendicular spacing between multiple connections that share the same pair
@@ -115,18 +116,22 @@ export const ConnectionEdge = memo(({
     }
   }
 
-  const isJumpgate = conn?.connectionType === 'jumpgate';
+  const isJumpgate = conn?.connectionType === 'jumpgate'; // player Ansiblex bridge
+  const isGate     = conn?.connectionType === 'gate';     // in-game stargate
+  // Stargates and Ansiblex bridges are permanent in-game infrastructure — no
+  // wormhole lifetime or mass to track.
+  const noLifetime = isJumpgate || isGate;
   // Quarantined: the backing wormhole sig was deleted (hole collapsed). Kept on
   // the map but rendered severed (dashed/red + a ✂ marker) so the chain is
   // still traceable but clearly no longer an active link.
   const broken = !!conn?.broken;
 
   // Live EOL state takes priority over the legacy categorical timeStatus.
-  const eolState   = !isJumpgate ? computeEolState(conn?.eolAt, now) : null;
+  const eolState   = !noLifetime ? computeEolState(conn?.eolAt, now) : null;
   const timeStatus = conn?.timeStatus ?? null;
 
-  const color = isJumpgate
-    ? JUMPGATE_COLOR
+  const color = isJumpgate ? JUMPGATE_COLOR
+    : isGate ? GATE_COLOR
     : (eolState?.color ?? TIME_COLORS[timeStatus ?? ''] ?? STANDARD_COLOR);
   // Final stroke: broken keeps severed-red; otherwise a highlighted link (its
   // system is hovered/selected) takes the highlight hue, else its own state colour.
@@ -144,7 +149,7 @@ export const ConnectionEdge = memo(({
     4
   );
   const strokeWidth = emphasized ? baseWidth + 2 : baseWidth;
-  const massLabel   = !isJumpgate && conn?.massStatus ? (MASS_LABELS[conn.massStatus] ?? null) : null;
+  const massLabel   = !noLifetime && conn?.massStatus ? (MASS_LABELS[conn.massStatus] ?? null) : null;
 
   // Prefer the live countdown label; fall back to the static category label
   // if a connection has a legacy timeStatus value but no eolAt.
@@ -193,13 +198,15 @@ export const ConnectionEdge = memo(({
         {!broken && (() => {
           const typeNode = isJumpgate
             ? <span className="connection-label__jumpgate">JG</span>
-            : conn?.type
-              ? <span className="connection-label__type">{conn.type}</span>
-              : null;
-          const massNode = !isJumpgate && massLabel
+            : isGate
+              ? <span className="connection-label__gate">G</span>
+              : conn?.type
+                ? <span className="connection-label__type">{conn.type}</span>
+                : null;
+          const massNode = !noLifetime && massLabel
             ? <span className={massLabel.cls}>{massLabel.text}</span>
             : null;
-          const timeNode = timeLabel
+          const timeNode = !noLifetime && timeLabel
             ? <span className={timeLabel.cls}>{timeLabel.text}</span>
             : null;
           const count = (typeNode ? 1 : 0) + (massNode ? 1 : 0) + (timeNode ? 1 : 0);

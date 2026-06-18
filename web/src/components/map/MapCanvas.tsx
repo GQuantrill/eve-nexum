@@ -809,7 +809,7 @@ export function MapCanvas() {
 
     if (contextMenu.edgeId) {
       const conn = connections.find((c) => c.id === contextMenu.edgeId);
-      const isJumpgate  = conn?.connectionType === 'jumpgate';
+      const connType    = conn?.connectionType ?? 'standard';
       const timeStatus  = conn?.timeStatus  ?? 'fresh';
       const massStatus  = conn?.massStatus  ?? 'stable';
       const eid = contextMenu.edgeId;
@@ -824,13 +824,18 @@ export function MapCanvas() {
           label: t('ctxMenu.jumpType'),
           submenu: [
             {
-              label: t('ctxMenu.standardJump'),
-              checked: !isJumpgate,
+              label: t('ctxMenu.jumpWormhole'),
+              checked: connType === 'standard',
               action: () => updateConnection(eid, { connectionType: 'standard' }),
             },
             {
-              label: t('ctxMenu.jumpgate'),
-              checked: isJumpgate,
+              label: t('ctxMenu.jumpStargate'),
+              checked: connType === 'gate',
+              action: () => updateConnection(eid, { connectionType: 'gate' }),
+            },
+            {
+              label: t('ctxMenu.jumpAnsiblex'),
+              checked: connType === 'jumpgate',
               action: () => updateConnection(eid, { connectionType: 'jumpgate' }),
             },
           ],
