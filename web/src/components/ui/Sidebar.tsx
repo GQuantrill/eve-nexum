@@ -10,6 +10,7 @@ import { A0Pane } from './A0Pane';
 import { ClosestSystemsPane } from './ClosestSystemsPane';
 import { FleetPane } from './FleetPane';
 import { WatchlistBlock } from './WatchlistBlock';
+import { ChainsPane } from './ChainsPane';
 import { CaretLeftIcon, CaretRightIcon, ArrowLineLeftIcon, ArrowLineRightIcon } from '@phosphor-icons/react';
 import { useUserSetting } from '../../hooks/useUserSetting';
 
@@ -31,9 +32,9 @@ function loadWidth(): number {
 }
 
 type Side    = 'left' | 'right';
-type PanelId = 'watchlist' | 'thera' | 'turnur' | 'a0' | 'closest' | 'fleet';
+type PanelId = 'watchlist' | 'chains' | 'thera' | 'turnur' | 'a0' | 'closest' | 'fleet';
 
-const DEFAULT_ORDER: PanelId[] = ['watchlist', 'closest', 'thera', 'turnur', 'fleet', 'a0'];
+const DEFAULT_ORDER: PanelId[] = ['watchlist', 'chains', 'closest', 'thera', 'turnur', 'fleet', 'a0'];
 const VALID_PANEL_IDS: ReadonlySet<PanelId> = new Set(DEFAULT_ORDER);
 
 // The panels form a single vertical column, so a drag should only ever move a
@@ -56,6 +57,7 @@ export function Sidebar() {
   const { t } = useTranslation();
   const panelTitle: Record<PanelId, string> = {
     watchlist: t('sidebar.watchlist'),
+    chains:  t('sidebar.chains'),
     thera:   t('sidebar.thera'),
     turnur:  t('sidebar.turnur'),
     a0:      t('sidebar.a0'),
@@ -136,6 +138,7 @@ export function Sidebar() {
 
   const cards: Record<PanelId, ReactNode> = {
     watchlist: <WatchlistBlock />,
+    chains:  <ChainsPane />,
     thera:   <ScoutConnectionsPane scoutSystem="Thera" />,
     turnur:  <ScoutConnectionsPane scoutSystem="Turnur" />,
     a0:      <A0Pane />,

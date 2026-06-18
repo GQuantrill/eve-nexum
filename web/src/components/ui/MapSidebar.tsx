@@ -25,7 +25,6 @@ import { DEFAULT_BOOKMARK_FORMAT, BOOKMARK_TOKENS } from "../../utils/signatureB
 import { toPng } from "html-to-image";
 import { CaretLeftIcon, CaretRightIcon, GearIcon } from "@phosphor-icons/react";
 import { ChainExitsSection } from "./ChainExitsSection";
-import { ChainsPane } from "./ChainsPane";
 import { MapSharesSection } from "./MapSharesSection";
 import { MergeMapModal } from "./MergeMapModal";
 import { CustomIntelBlock } from "./CustomIntelBlock";
@@ -142,7 +141,6 @@ type SectionId =
   | "contentFilter"
   | "connections"
   | "route"
-  | "chains"
   | "chainExits"
   | "proximityAlerts"
   | "notifications"
@@ -917,10 +915,6 @@ export function MapSidebar() {
           <p className="map-sidebar__hint">
             {t("mapSidebar.routeHint")}
           </p>
-        </CollapsibleSection>
-
-        <CollapsibleSection title={t("mapSidebar.sections.chains")} {...sectionProps("chains")}>
-          <ChainsPane />
         </CollapsibleSection>
 
         <CollapsibleSection
