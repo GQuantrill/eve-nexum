@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { useMapStore, getPlacementCell } from '../store/mapStore';
+import { useMapStore, getPlacementCell, registerPlacementFix } from '../store/mapStore';
 import { useCharacterLocation } from './useCharacterLocation';
 import { useCanEdit } from './useCanEdit';
 import { readUserSetting } from './useUserSetting';
@@ -143,6 +143,17 @@ export function applyJump(system: JumpSystem, prevMapSystemId: string | null, ca
       regionName:  system.regionName,
       npcType:     system.npcType,
     });
+
+    // If the node landed above/left of a real source, its true rendered size
+    // (unknown here) may be larger than the placement cell assumed — which
+    // would let it overlap the source. Schedule a one-shot gap fix that runs
+    // once the node has measured. Only relevant when placed relative to an
+    // actual source node (not the center-of-mass fallback).
+    if (prevMapSystemId && map.systems.some((s) => s.id === prevMapSystemId)) {
+      const fixY = position.y < source.y; // placed above the source
+      const fixX = position.x < source.x; // placed left of the source
+      if (fixY || fixX) registerPlacementFix(mapSystemId, prevMapSystemId, fixY, fixX);
+    }
   }
 
   if (canAdd && prevMapSystemId && prevMapSystemId !== mapSystemId && map.systems.some((s) => s.id === prevMapSystemId)) {

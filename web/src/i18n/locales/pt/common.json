@@ -1,4 +1,25 @@
 {
+  "chains": {
+    "from": "De…",
+    "to": "Para…",
+    "namePlaceholder": "Nome da cadeia (opcional)",
+    "create": "Salvar cadeia",
+    "noPath": "Nenhum caminho entre esses sistemas neste mapa.",
+    "empty": "Nenhuma cadeia salva ainda. Escolha um sistema inicial e final para registrar uma.",
+    "unnamed": "Cadeia sem título",
+    "hops": "{{count}} saltos",
+    "remove": "Excluir cadeia",
+    "centerOn": "Centralizar em {{system}}",
+    "brokenHop": "Salto quebrado — explore novamente",
+    "viaGate": "Warp para o portão estelar",
+    "viaJumpBridge": "Usar a ponte de salto",
+    "whTypeLabel": "Tipo",
+    "whSizeLabel": "Tamanho",
+    "warpSig": "Warp para {{sig}}",
+    "warpWormhole": "Warp para o buraco de minhoca",
+    "noMatch": "Nenhum sistema correspondente",
+    "clearSelection": "Limpar"
+  },
   "session": {
     "idleLogout": "Sessão terminada por inatividade.",
     "lockedTitle": "Em pausa",
@@ -325,6 +346,7 @@
       "contentFilter": "Filtro de conteúdo",
       "connections": "Conexões",
       "route": "Rota",
+      "chains": "Cadeias",
       "chainExits": "Saídas da cadeia",
       "proximityAlerts": "Alertas de proximidade",
       "activity": "Atividade",
@@ -561,6 +583,10 @@
   "connPanel": {
     "whType": "Tipo de buraco de minhoca",
     "whTypePlaceholder": "K162, C247…",
+    "sigLink": "Assinaturas associadas",
+    "sigInSystem": "Assinatura em {{system}}",
+    "sigNone": "Não vinculada",
+    "sigUnnamed": "Assinatura sem nome",
     "massStatus": "Estado de massa",
     "stable": "Estável",
     "destabilized": "Desestabilizado (<50%)",
@@ -642,6 +668,9 @@
     "disconnect": "Desconectar",
     "jumpType": "Tipo de salto",
     "standardJump": "Salto padrão",
+    "jumpWormhole": "Buraco de minhoca",
+    "jumpStargate": "Portão estelar",
+    "jumpAnsiblex": "Ansiblex jumpgate",
     "jumpgate": "Jump gate",
     "whLifetime": "Vida útil do buraco de minhoca",
     "lifeFresh": "Recente",
@@ -744,6 +773,8 @@
     "standingValue": "{{label}}: {{value}}"
   },
   "sidebar": {
+    "watchlist": "Lista de observação",
+    "chains": "Cadeias de buracos de minhoca",
     "thera": "Conexões de Thera",
     "turnur": "Conexões de Turnur",
     "a0": "Sóis A0 próximos",

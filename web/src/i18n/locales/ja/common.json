@@ -1,4 +1,25 @@
 {
+  "chains": {
+    "from": "出発…",
+    "to": "到着…",
+    "namePlaceholder": "チェーン名（任意）",
+    "create": "チェーンを保存",
+    "noPath": "このマップ上で、それらの星系間に経路がありません。",
+    "empty": "保存されたチェーンはまだありません。開始と終了の星系を選んで記録してください。",
+    "unnamed": "無題のチェーン",
+    "hops": "{{count}} ジャンプ",
+    "remove": "チェーンを削除",
+    "centerOn": "{{system}} を中央に表示",
+    "brokenHop": "ホップが切断 — 再スカウトが必要",
+    "viaGate": "スターゲートへワープ",
+    "viaJumpBridge": "ジャンプブリッジを使用",
+    "whTypeLabel": "タイプ",
+    "whSizeLabel": "サイズ",
+    "warpSig": "{{sig}} へワープ",
+    "warpWormhole": "ワームホールへワープ",
+    "noMatch": "一致する星系なし",
+    "clearSelection": "クリア"
+  },
   "session": {
     "idleLogout": "非アクティブのためサインアウトしました。",
     "lockedTitle": "一時停止中",
@@ -325,6 +346,7 @@
       "contentFilter": "コンテンツフィルター",
       "connections": "接続",
       "route": "ルート",
+      "chains": "チェーン",
       "chainExits": "チェーン出口",
       "proximityAlerts": "近接アラート",
       "activity": "アクティビティ",
@@ -561,6 +583,10 @@
   "connPanel": {
     "whType": "ワームホールタイプ",
     "whTypePlaceholder": "K162、C247…",
+    "sigLink": "関連シグネチャ",
+    "sigInSystem": "{{system}} のシグネチャ",
+    "sigNone": "未リンク",
+    "sigUnnamed": "名称未設定のシグネチャ",
     "massStatus": "質量ステータス",
     "stable": "安定",
     "destabilized": "不安定化（<50%）",
@@ -642,6 +668,9 @@
     "disconnect": "接続を切断",
     "jumpType": "ジャンプタイプ",
     "standardJump": "標準ジャンプ",
+    "jumpWormhole": "ワームホール",
+    "jumpStargate": "スターゲート",
+    "jumpAnsiblex": "Ansiblex ジャンプゲート",
     "jumpgate": "ジャンプゲート",
     "whLifetime": "ワームホール寿命",
     "lifeFresh": "新鮮",
@@ -744,6 +773,8 @@
     "standingValue": "{{label}}: {{value}}"
   },
   "sidebar": {
+    "watchlist": "ウォッチリスト",
+    "chains": "ワームホールチェーン",
     "thera": "Thera 接続",
     "turnur": "Turnur 接続",
     "a0": "近くの A0 恒星",

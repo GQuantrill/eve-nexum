@@ -590,9 +590,11 @@ export function MapCanvas() {
         const ov = dragHandles.get(c.id);
         const key = c.sourceId < c.targetId ? `${c.sourceId}|${c.targetId}` : `${c.targetId}|${c.sourceId}`;
         const group = pairGroups.get(key)!;
+        // Hover-only: a *selected* system would keep its links lit permanently
+        // (e.g. your located system on a 2-node map), which reads as a stuck
+        // hover effect — so highlight only follows the mouse.
         const highlighted =
-          (hoveredNodeId != null && (c.sourceId === hoveredNodeId || c.targetId === hoveredNodeId)) ||
-          (selectedSystemId != null && (c.sourceId === selectedSystemId || c.targetId === selectedSystemId));
+          hoveredNodeId != null && (c.sourceId === hoveredNodeId || c.targetId === hoveredNodeId);
         return {
           id: c.id,
           source: c.sourceId,
@@ -610,7 +612,7 @@ export function MapCanvas() {
         };
       });
     },
-    [connections, selectedConnectionId, edgeStyle, connectionThickness, dragHandles, hoveredNodeId, selectedSystemId],
+    [connections, selectedConnectionId, edgeStyle, connectionThickness, dragHandles, hoveredNodeId],
   );
 
   const onEdgesChange = useCallback(
@@ -809,7 +811,7 @@ export function MapCanvas() {
 
     if (contextMenu.edgeId) {
       const conn = connections.find((c) => c.id === contextMenu.edgeId);
-      const isJumpgate  = conn?.connectionType === 'jumpgate';
+      const connType    = conn?.connectionType ?? 'standard';
       const timeStatus  = conn?.timeStatus  ?? 'fresh';
       const massStatus  = conn?.massStatus  ?? 'stable';
       const eid = contextMenu.edgeId;
@@ -824,13 +826,18 @@ export function MapCanvas() {
           label: t('ctxMenu.jumpType'),
           submenu: [
             {
-              label: t('ctxMenu.standardJump'),
-              checked: !isJumpgate,
+              label: t('ctxMenu.jumpWormhole'),
+              checked: connType === 'standard',
               action: () => updateConnection(eid, { connectionType: 'standard' }),
             },
             {
-              label: t('ctxMenu.jumpgate'),
-              checked: isJumpgate,
+              label: t('ctxMenu.jumpStargate'),
+              checked: connType === 'gate',
+              action: () => updateConnection(eid, { connectionType: 'gate' }),
+            },
+            {
+              label: t('ctxMenu.jumpAnsiblex'),
+              checked: connType === 'jumpgate',
               action: () => updateConnection(eid, { connectionType: 'jumpgate' }),
             },
           ],

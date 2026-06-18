@@ -58,7 +58,7 @@ export async function listVisibleMaps(p: VisibleMapsParams) {
 // Full map: meta + systems (with {x,y} folded into position) + connections.
 // Returns null if the map row vanished between the access check and this load.
 export async function loadFullMap(mapId: string) {
-  const [mapRows, systems, connections] = await Promise.all([
+  const [mapRows, systems, connections, routes] = await Promise.all([
     db.query(
       `SELECT id, name, corp_id IS NOT NULL AS "isCorpMap", locked,
               allow_as_merge_source       AS "allowAsMergeSource",
@@ -91,8 +91,16 @@ export async function loadFullMap(mapId: string) {
               time_status AS "timeStatus", size, wh_type AS "type",
               COALESCE(mass_used, 0)::float8 AS "massUsed",
               eol_at AS "eolAt", broken,
+              source_signature_id AS "sourceSignatureId",
+              target_signature_id AS "targetSignatureId",
               created_at AS "createdAt"
        FROM map_connections WHERE map_id = $1`,
+      [mapId],
+    ),
+    db.query(
+      `SELECT id, name, system_ids AS "systemIds", connection_ids AS "connectionIds",
+              created_at AS "createdAt", updated_at AS "updatedAt"
+       FROM map_routes WHERE map_id = $1 ORDER BY created_at`,
       [mapId],
     ),
   ]);
@@ -102,6 +110,7 @@ export async function loadFullMap(mapId: string) {
     ...mapRows.rows[0],
     systems: systems.rows.map((s) => ({ ...s, position: { x: s.x, y: s.y } })),
     connections: connections.rows,
+    routes: routes.rows,
   };
 }
 

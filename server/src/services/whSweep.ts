@@ -118,7 +118,7 @@ async function sweepMap(mapId: string, expired: CandidateRow[]): Promise<void> {
     }
 
     brokenIds = connRes.rows
-      .filter((c) => c.connectionType !== 'jumpgate' && !c.broken)
+      .filter((c) => c.connectionType === 'standard' && !c.broken)
       .filter((c) => wasBackedByDeleted(c, expired, systemsById))
       .filter((c) => !isBacked(c, sigsBySystem, systemsById))
       .map((c) => c.id);

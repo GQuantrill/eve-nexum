@@ -16,7 +16,13 @@ const log = createLogger('wormholes');
 // appear"), which is community knowledge; that stays curated in
 // data/wormholes.json and is merged in here by code. (static / sibling_groups
 // live in that file too but aren't served by this endpoint.)
-const ATTR = { destClass: 1381, totalMass: 1382, maxJumpable: 1383, massRegen: 1384, maxTime: 1503 };
+// Dogma attribute ids (verified against the `dogma_attributes` name table):
+//   1381 wormholeTargetSystemClass
+//   1382 wormholeMaxStableTime  (MINUTES)
+//   1383 wormholeMaxStableMass  (total, kg)
+//   1384 wormholeMassRegeneration (kg)
+//   1385 wormholeMaxJumpMass    (per-jump cap, kg — the "size" determinant)
+const ATTR = { destClass: 1381, maxTime: 1382, totalMass: 1383, massRegen: 1384, maxJumpable: 1385 };
 
 // CCP's wormholeTargetSystemClass values → our destination codes.
 const CLASS_MAP: Record<number, string> = {
@@ -115,7 +121,7 @@ async function loadSpecs(): Promise<Record<string, WormholeSpec>> {
         maxJumpMass:   Math.round(parseFloat(row.max_jumpable ?? '0')),
         massRegen:     Math.round(parseFloat(row.mass_regen   ?? '0')),
         lifetimeHours: row.max_time != null
-                         ? Math.round(parseFloat(row.max_time) / 3600)
+                         ? Math.round(parseFloat(row.max_time) / 60) // attr is minutes
                          : cur?.lifetime ?? 0,
         dest,
         src:           cur?.src ?? [],

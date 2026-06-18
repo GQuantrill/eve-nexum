@@ -133,7 +133,11 @@ export interface NpcStation {
   services: string[];
 }
 
-export type ConnectionType = 'standard' | 'jumpgate';
+// 'standard' = wormhole (warp to its signature); 'gate' = in-game stargate
+// (warp to gate, jump); 'jumpgate' = player Ansiblex jump bridge. 'standard'
+// is kept (rather than renamed to 'wormhole') to avoid migrating every stored
+// row + call site — it remains the wormhole sentinel.
+export type ConnectionType = 'standard' | 'gate' | 'jumpgate';
 
 export interface MapConnection {
   id: string;
@@ -148,6 +152,13 @@ export interface MapConnection {
   size: ConnectionSize;
   massUsed: number; // kg — total mass jumped through this connection
   eolAt: string | null; // ISO timestamp when EOL was marked (null = fresh)
+  /** Optional links to the backing wormhole signature at each end: the sig you
+   *  warp to in the source system, and the (usually K162) sig in the target.
+   *  Powers the per-hop "warp to ABC-123" directions in saved chains. Null when
+   *  unlinked or for jumpgate connections. Cleared to null if the sig is
+   *  deleted (FK ON DELETE SET NULL). */
+  sourceSignatureId: string | null;
+  targetSignatureId: string | null;
   /** True once the backing wormhole sig was deleted (hole collapsed). The
    *  connection is kept on the map but quarantined — rendered severed and
    *  excluded from routing — so the chain is still traceable. */
@@ -180,6 +191,22 @@ export interface WormholeMap {
   shareIncludeStructures?:  boolean;
   systems: MapSystem[];
   connections: MapConnection[];
+  routes: SavedRoute[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** A named, user-recorded path through the map's own connections (wormhole or
+ *  gate hops). Stored as the explicit step sequence — ordered system ids plus
+ *  the connection traversed between each consecutive pair — so it can be shown
+ *  step-by-step and have individual hops flagged broken when a connection is
+ *  removed or quarantined, without silently re-routing. `connectionIds` has
+ *  length `systemIds.length - 1`. */
+export interface SavedRoute {
+  id: string;
+  name: string;
+  systemIds: string[];
+  connectionIds: string[];
   createdAt: string;
   updatedAt: string;
 }

@@ -6,8 +6,26 @@ import { CLASS_COLORS } from '../../data/wormholes';
 import type { SystemClass } from '../../types';
 import {
   WH_CHART, RESPAWN_ORDER, SPAWN_ORDER, LEADS_ORDER, SHIP_ORDER, MASS_ORDER, LIFE_ORDER,
-  type WhChartEntry, type Respawn,
+  type WhChartEntry, type Respawn, type ShipSize,
 } from '../../data/whTypeChart';
+import { useWormholeTypes } from '../../hooks/useWormholeTypes';
+
+// The chart's ship-size column is derived live from the SDE per-jump cap
+// (wormholeMaxJumpMass) so it can't drift from a CCP rebalance. Maps to the
+// chart's five descriptive tiers; null when a code has no dogma (keeps the
+// curated value).
+function shipSizeFromSde(
+  code: string,
+  whTypes: Record<string, { maxJumpMass?: number } | undefined>,
+): ShipSize | null {
+  const m = whTypes[code.toUpperCase()]?.maxJumpMass;
+  if (!m) return null;
+  if (m >= 2_000_000_000) return 'up to Capital';
+  if (m >= 1_000_000_000) return 'up to Freighter';
+  if (m >= 300_000_000)   return 'up to Battleship';
+  if (m >= 62_000_000)    return 'up to Battlecruiser';
+  return 'up to Destroyer';
+}
 
 // A Nexum take on whtype.info: hover ANY cell — a wormhole code OR an attribute
 // value — and lines connect a code to its values (or a value to every code that
@@ -67,6 +85,12 @@ function attrKeysFor(e: WhChartEntry): string[] {
 
 export function WhTypeChartModal({ onClose }: { onClose: () => void }) {
   const { t } = useTranslation();
+  const whTypes = useWormholeTypes();
+  // Override each entry's hardcoded ship_size with the SDE-derived size.
+  const chart = useMemo(
+    () => WH_CHART.map((e) => ({ ...e, ship_size: shipSizeFromSde(e.wormhole, whTypes) ?? e.ship_size })),
+    [whTypes],
+  );
   const [active, setActive] = useState<Active>(null);
   // Pinned (clicked) selections persist on mouse-out so you can read the
   // highlighted result; hovering only previews while nothing is pinned.
@@ -88,8 +112,8 @@ export function WhTypeChartModal({ onClose }: { onClose: () => void }) {
 
   const codes = useMemo(() => {
     const q = search.trim().toUpperCase();
-    return WH_CHART.filter((w) => !q || w.wormhole.toUpperCase().includes(q));
-  }, [search]);
+    return chart.filter((w) => !q || w.wormhole.toUpperCase().includes(q));
+  }, [search, chart]);
 
   // From the active selection, compute the connection pairs (each = a code row
   // to an attribute-value row), the highlight set, and the line colour. Works
@@ -99,7 +123,7 @@ export function WhTypeChartModal({ onClose }: { onClose: () => void }) {
     const hl = new Set<string>();
     let color = ACCENT;
     if (active?.kind === 'code') {
-      const e = WH_CHART.find((w) => w.wormhole === active.code);
+      const e = chart.find((w) => w.wormhole === active.code);
       if (e) {
         color = codeLineColor(e);
         hl.add(`code:${e.wormhole}`);
@@ -109,7 +133,7 @@ export function WhTypeChartModal({ onClose }: { onClose: () => void }) {
       const attrKey = `${active.col}:${active.val}`;
       hl.add(attrKey);
       color = labelColor(active.val) ?? ACCENT;
-      for (const e of WH_CHART) {
+      for (const e of chart) {
         if (entryHasAttr(e, active.col, active.val)) {
           hl.add(`code:${e.wormhole}`);
           pairs.push({ code: e.wormhole, attrKey });
@@ -117,7 +141,7 @@ export function WhTypeChartModal({ onClose }: { onClose: () => void }) {
       }
     }
     return { pairs, highlight: hl, lineColor: color };
-  }, [active]);
+  }, [active, chart]);
 
   const [lines, setLines] = useState<Line[]>([]);
 

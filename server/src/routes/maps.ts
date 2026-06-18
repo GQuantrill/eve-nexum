@@ -637,7 +637,8 @@ mapsRouter.post('/from-region', async (req, res) => {
       seen.add(key);
       const base = connVals.length;
       connPh.push(`($${base + 1},$${base + 2},$${base + 3},$${base + 4},$${base + 5},$${base + 6})`);
-      connVals.push(crypto.randomUUID(), mapId, src, tgt, 'standard', 'large');
+      // These come straight from map_stargates, so they ARE in-game gates.
+      connVals.push(crypto.randomUUID(), mapId, src, tgt, 'gate', 'large');
     }
     if (connPh.length > 0) {
       await client.query(
@@ -1576,6 +1577,30 @@ mapsRouter.post('/:mapId/connections', async (req, res) => {
   const access = await requireMapWrite(res, mapId, req);
   if (!access) return;
 
+  // Auto-classify in-game gates: a connection between two stargate-adjacent SDE
+  // systems is a gate, not a wormhole. Only when the client sent the default
+  // 'standard' (a fresh connection carries no wh type yet, so nothing to
+  // protect) — an explicit 'gate'/'jumpgate' from the client is respected.
+  // Failures (e.g. map_stargates not seeded) leave it as-is.
+  let effectiveType: string = connectionType ?? 'standard';
+  if (effectiveType === 'standard') {
+    try {
+      const adj = await db.query(
+        `SELECT 1 FROM map_systems s, map_systems t
+          WHERE s.id = $1 AND t.id = $2
+            AND s.eve_system_id IS NOT NULL AND t.eve_system_id IS NOT NULL
+            AND EXISTS (
+              SELECT 1 FROM map_stargates g
+               WHERE (g.system_id = s.eve_system_id AND g.destination_system_id = t.eve_system_id)
+                  OR (g.system_id = t.eve_system_id AND g.destination_system_id = s.eve_system_id)
+            )
+          LIMIT 1`,
+        [sourceId, targetId],
+      );
+      if ((adj.rowCount ?? 0) > 0) effectiveType = 'gate';
+    } catch { /* stargate table absent / query failed — keep client's type */ }
+  }
+
   let inserted = 0;
   try {
     const ins = await db.query(
@@ -1585,7 +1610,7 @@ mapsRouter.post('/:mapId/connections', async (req, res) => {
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
        ON CONFLICT (id) DO NOTHING`,
       [id, mapId, sourceId, targetId, sourceHandle ?? null, targetHandle ?? null,
-       connectionType ?? 'standard', massStatus ?? null, timeStatus ?? null, size ?? 'large'],
+       effectiveType, massStatus ?? null, timeStatus ?? null, size ?? 'large'],
     );
     inserted = ins.rowCount ?? 0;
   } catch (err) {
@@ -1606,18 +1631,22 @@ mapsRouter.post('/:mapId/connections', async (req, res) => {
     `SELECT id, source_id AS "sourceId", target_id AS "targetId", source_handle AS "sourceHandle",
             target_handle AS "targetHandle", connection_type AS "connectionType", mass_status AS "massStatus",
             time_status AS "timeStatus", size, wh_type AS "type", COALESCE(mass_used, 0)::float8 AS "massUsed",
-            eol_at AS "eolAt", broken, created_at AS "createdAt"
+            eol_at AS "eolAt", broken,
+            source_signature_id AS "sourceSignatureId", target_signature_id AS "targetSignatureId",
+            created_at AS "createdAt"
        FROM map_connections WHERE id = $1 AND map_id = $2`,
     [id, mapId],
   ).then(({ rows }) => {
     if (rows[0]) publishToMap(mapId, { type: 'connection.add', actor: req.get('x-client-id') ?? null, connection: rows[0] });
   }).catch(console.error);
   // Only notify on a genuinely new wormhole connection — not a duplicate-id
-  // retry, and not an in-game stargate (jumpgate) link.
-  if (inserted > 0 && (connectionType ?? 'standard') !== 'jumpgate') {
+  // retry, and not an in-game gate or Ansiblex link.
+  if (inserted > 0 && effectiveType === 'standard') {
     dispatchNewConnection(access, mapId, sourceId, targetId, null, size ?? 'large', req.session.characterName ?? null);
   }
-  res.status(201).json({ ok: true });
+  // Return the resolved type so the originating client can reflect an
+  // auto-classified gate without waiting for a reload.
+  res.status(201).json({ ok: true, connectionType: effectiveType });
 });
 
 mapsRouter.patch('/:mapId/connections/:connectionId', async (req, res) => {
@@ -1632,6 +1661,7 @@ mapsRouter.patch('/:mapId/connections/:connectionId', async (req, res) => {
     sourceHandle: 'source_handle', targetHandle: 'target_handle',
     type: 'wh_type', massUsed: 'mass_used',
     eolAt: 'eol_at', broken: 'broken',
+    sourceSignatureId: 'source_signature_id', targetSignatureId: 'target_signature_id',
   };
 
   const updates = req.body as Record<string, unknown>;
@@ -1663,6 +1693,75 @@ mapsRouter.delete('/:mapId/connections/:connectionId', async (req, res) => {
   await db.query(`DELETE FROM map_connections WHERE id = $1 AND map_id = $2`, [connectionId, mapId]);
   await touchMap(mapId);
   publishToMap(mapId, { type: 'connection.remove', actor: req.get('x-client-id') ?? null, id: connectionId });
+  res.json({ ok: true });
+});
+
+// ── Saved chains (routes) ──────────────────────────────────────────────────────
+// A chain is a named, recorded path A..B through the map's own connections.
+// Content-level permission (like signatures): it annotates the map, it doesn't
+// mutate topology. The step arrays are stored verbatim and validated against the
+// live map when rendered, so a removed hop is flagged rather than re-routed.
+
+const routeSelect =
+  `SELECT id, name, system_ids AS "systemIds", connection_ids AS "connectionIds",
+          created_at AS "createdAt", updated_at AS "updatedAt"
+     FROM map_routes`;
+
+mapsRouter.post('/:mapId/routes', async (req, res) => {
+  const { mapId } = req.params;
+  const access = await requireMapContentWrite(res, mapId, req);
+  if (!access) return;
+  const { id, name = '', systemIds = [], connectionIds = [] } = req.body as {
+    id?: string; name?: string; systemIds?: string[]; connectionIds?: string[];
+  };
+  if (!id || !Array.isArray(systemIds) || systemIds.length < 2) {
+    res.status(400).json({ error: 'A chain needs an id and at least two systems' });
+    return;
+  }
+  const me = authUser(req);
+  await db.query(
+    `INSERT INTO map_routes (id, map_id, name, system_ids, connection_ids, created_by_user_id)
+     VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT (id) DO NOTHING`,
+    [id, mapId, name, systemIds, connectionIds ?? [], me.userId],
+  );
+  await touchMap(mapId);
+  db.query(`${routeSelect} WHERE id = $1 AND map_id = $2`, [id, mapId])
+    .then(({ rows }) => {
+      if (rows[0]) publishToMap(mapId, { type: 'route.add', actor: req.get('x-client-id') ?? null, route: rows[0] });
+    }).catch(console.error);
+  res.status(201).json({ ok: true });
+});
+
+mapsRouter.patch('/:mapId/routes/:routeId', async (req, res) => {
+  const { mapId, routeId } = req.params;
+  const access = await requireMapContentWrite(res, mapId, req);
+  if (!access) return;
+  const colMap: Record<string, string> = {
+    name: 'name', systemIds: 'system_ids', connectionIds: 'connection_ids',
+  };
+  const updates = req.body as Record<string, unknown>;
+  const sets: string[] = [];
+  const vals: unknown[] = [];
+  for (const [key, col] of Object.entries(colMap)) {
+    if (key in updates) { sets.push(`${col} = $${vals.length + 1}`); vals.push(updates[key]); }
+  }
+  if (!sets.length) { res.status(400).json({ error: 'Nothing to update' }); return; }
+  await db.query(
+    `UPDATE map_routes SET ${sets.join(', ')}, updated_at = NOW() WHERE id = $${vals.length + 1} AND map_id = $${vals.length + 2}`,
+    [...vals, routeId, mapId],
+  );
+  await touchMap(mapId);
+  publishToMap(mapId, { type: 'route.update', actor: req.get('x-client-id') ?? null, id: routeId, updates });
+  res.json({ ok: true });
+});
+
+mapsRouter.delete('/:mapId/routes/:routeId', async (req, res) => {
+  const { mapId, routeId } = req.params;
+  const access = await requireMapContentWrite(res, mapId, req);
+  if (!access) return;
+  await db.query(`DELETE FROM map_routes WHERE id = $1 AND map_id = $2`, [routeId, mapId]);
+  await touchMap(mapId);
+  publishToMap(mapId, { type: 'route.remove', actor: req.get('x-client-id') ?? null, id: routeId });
   res.json({ ok: true });
 });
 

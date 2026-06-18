@@ -1,4 +1,25 @@
 {
+  "chains": {
+    "from": "출발…",
+    "to": "도착…",
+    "namePlaceholder": "체인 이름 (선택)",
+    "create": "체인 저장",
+    "noPath": "이 지도에서 해당 성계 사이에 경로가 없습니다.",
+    "empty": "저장된 체인이 없습니다. 시작 성계와 도착 성계를 선택해 기록하세요.",
+    "unnamed": "이름 없는 체인",
+    "hops": "{{count}}점프",
+    "remove": "체인 삭제",
+    "centerOn": "{{system}}(으)로 중심 이동",
+    "brokenHop": "끊긴 점프 — 재정찰 필요",
+    "viaGate": "스타게이트로 워프",
+    "viaJumpBridge": "점프 브리지 이용",
+    "whTypeLabel": "유형",
+    "whSizeLabel": "크기",
+    "warpSig": "{{sig}}(으)로 워프",
+    "warpWormhole": "웜홀로 워프",
+    "noMatch": "일치하는 성계 없음",
+    "clearSelection": "지우기"
+  },
   "session": {
     "idleLogout": "비활성으로 인해 로그아웃되었습니다.",
     "lockedTitle": "일시정지됨",
@@ -325,6 +346,7 @@
       "contentFilter": "콘텐츠 필터",
       "connections": "연결",
       "route": "경로",
+      "chains": "체인",
       "chainExits": "체인 출구",
       "proximityAlerts": "근접 경보",
       "activity": "활동",
@@ -561,6 +583,10 @@
   "connPanel": {
     "whType": "웜홀 유형",
     "whTypePlaceholder": "K162, C247…",
+    "sigLink": "연결된 시그니처",
+    "sigInSystem": "{{system}}의 시그니처",
+    "sigNone": "연결 안 됨",
+    "sigUnnamed": "이름 없는 시그니처",
     "massStatus": "질량 상태",
     "stable": "안정",
     "destabilized": "불안정 (<50%)",
@@ -642,6 +668,9 @@
     "disconnect": "연결 끊기",
     "jumpType": "점프 유형",
     "standardJump": "표준 점프",
+    "jumpWormhole": "웜홀",
+    "jumpStargate": "스타게이트",
+    "jumpAnsiblex": "Ansiblex 점프게이트",
     "jumpgate": "점프 게이트",
     "whLifetime": "웜홀 수명",
     "lifeFresh": "신선",
@@ -744,6 +773,8 @@
     "standingValue": "{{label}}: {{value}}"
   },
   "sidebar": {
+    "watchlist": "관심 목록",
+    "chains": "웜홀 체인",
     "thera": "Thera 연결",
     "turnur": "Turnur 연결",
     "a0": "주변 A0 항성",

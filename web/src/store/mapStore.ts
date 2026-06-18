@@ -4,7 +4,7 @@ import { v4 as uuid } from 'uuid';
 import { api } from '../api/client';
 import { enqueue } from './pendingQueue';
 import { toast } from '../components/ui/Toaster';
-import type { WormholeMap, MapSystem, MapConnection, SystemClass, WormholeEffect } from '../types';
+import type { WormholeMap, MapSystem, MapConnection, SavedRoute, SystemClass, WormholeEffect } from '../types';
 import { pickHandles } from '../components/map/edgeUtils';
 
 // Another of the account's characters chosen as the route/centre origin.
@@ -32,6 +32,18 @@ const nodeSizes = new Map<string, { w: number; h: number; countHeight: boolean }
 // of N renders an N-px outer box.
 const GRID = 20;
 const snapUpToGrid = (n: number) => (n > 0 ? Math.ceil(n / GRID) * GRID : 0);
+const roundToGrid  = (n: number) => Math.round(n / GRID) * GRID;
+const PLACEMENT_GAP = 3 * GRID; // keep in sync with useLocationTracking
+
+// One-shot post-measure placement fixes. A node auto-placed *above* or *left*
+// of its source can overlap it once it renders taller/wider than the placement
+// cell knew at the time (a brand-new max not yet measured — e.g. the first
+// statics-heavy WH node). Keyed by node id and consumed on first measure in
+// reportNodeSize, which nudges it back to the 3-square gap using its real size.
+const placementFixes = new Map<string, { sourceId: string; fixY: boolean; fixX: boolean }>();
+export function registerPlacementFix(nodeId: string, sourceId: string, fixY: boolean, fixX: boolean): void {
+  placementFixes.set(nodeId, { sourceId, fixY, fixX });
+}
 
 // Largest *full* node footprint seen so far (width and height, ungated by
 // countHeight), snapped up to the grid. This is the auto-placement cell: unlike
@@ -85,7 +97,7 @@ function syncMove(mapId: string, systemId: string, position: { x: number; y: num
 // consumer of WormholeMap, so we keep the empty string and centralise the
 // check here.
 const emptyMap = (): WormholeMap => ({
-  id: '', name: '', systems: [], connections: [],
+  id: '', name: '', systems: [], connections: [], routes: [],
   createdAt: '', updatedAt: '',
 });
 
@@ -245,6 +257,12 @@ interface MapStore {
   // node positions. Used by the sidebar button and after a region seed.
   optimizeConnections: () => void;
 
+  // Saved chains (map-scoped, named recorded paths). addRoute returns the new
+  // id, or null if the path is too short to save.
+  addRoute: (name: string, systemIds: string[], connectionIds: string[]) => string | null;
+  renameRoute: (id: string, name: string) => void;
+  removeRoute: (id: string) => void;
+
   // Selection
   selectSystem: (id: string | null) => void;
   selectConnection: (id: string | null) => void;
@@ -290,6 +308,9 @@ export type RemoteEvent =
   | { type: 'connection.add';    connection: MapConnection }
   | { type: 'connection.update'; id: string; updates: Partial<MapConnection> }
   | { type: 'connection.remove'; id: string }
+  | { type: 'route.add';         route: SavedRoute }
+  | { type: 'route.update';      id: string; updates: Partial<SavedRoute> }
+  | { type: 'route.remove';      id: string }
   | { type: 'map.meta';          name?: string; locked?: boolean }
   | { type: 'map.resync' }
   | { type: 'sig.changed';       systemId: string }
@@ -554,6 +575,9 @@ export const useMapStore = create<MapStore>()((set, get) => {
 
       try {
         const map = await api<WormholeMap>(`/api/maps/${id}`);
+        // Older payloads / share responses may omit routes — normalise so the
+        // chains slice can always read an array.
+        if (!Array.isArray(map.routes)) map.routes = [];
         localStorage.setItem('nexum.lastMapId', id);
         set({ map, activeMapId: id, selectedSystemId: null, selectedConnectionId: null, currentSystemId: null, undoStack: [], sigTypesBySystem: {}, contentBySystem: {}, contentFilter: { sigTypes: [], anomTypes: [], nameQuery: '' } });
       } catch (err) {
@@ -700,8 +724,39 @@ export const useMapStore = create<MapStore>()((set, get) => {
       if (cur.uniformWidth !== w || cur.uniformHeight !== h) {
         set({ uniformWidth: w, uniformHeight: h });
       }
+
+      // Consume a pending placement fix now we know this node's real size.
+      // Only ever moves the node FARTHER from the source (restores the gap when
+      // it overlapped); a node already clear of the source is left where the
+      // lattice put it, so aligned small nodes are untouched.
+      const fix = placementFixes.get(id);
+      if (fix) {
+        placementFixes.delete(id);
+        const st  = get();
+        const node = st.map.systems.find((s) => s.id === id);
+        const src  = st.map.systems.find((s) => s.id === fix.sourceId);
+        if (node && src) {
+          const snap = st.snapToGrid ? roundToGrid : (n: number) => n;
+          let { x, y } = node.position;
+          let moved = false;
+          if (fix.fixY && y + height > src.position.y - PLACEMENT_GAP) {
+            y = snap(src.position.y - PLACEMENT_GAP - height);
+            moved = true;
+          }
+          if (fix.fixX && x + width > src.position.x - PLACEMENT_GAP) {
+            x = snap(src.position.x - PLACEMENT_GAP - width);
+            moved = true;
+          }
+          if (moved) st.moveSystem(id, { x, y }, { skipUndo: true });
+        }
+      }
     },
     forgetNodeSize: (id) => {
+      // NB: do NOT drop a pending placementFix here. forgetNodeSize fires on
+      // every ResizeObserver-effect cleanup — including React StrictMode's
+      // setup/cleanup/setup double-invoke in dev — which would wipe the fix
+      // before the real measure consumes it. The fix is cleared in
+      // reportNodeSize (on apply) or removeSystem (on real removal).
       if (!nodeSizes.delete(id)) return;
       const { w, h } = recomputeUniformMax();
       const cur = get();
@@ -863,6 +918,7 @@ export const useMapStore = create<MapStore>()((set, get) => {
     },
 
     removeSystem: (id) => {
+      placementFixes.delete(id);
       const { activeMapId, map } = get();
       const sys = map.systems.find((s) => s.id === id);
       const affectedConns = map.connections.filter((c) => c.sourceId === id || c.targetId === id);
@@ -923,7 +979,8 @@ export const useMapStore = create<MapStore>()((set, get) => {
               { id, sourceId, targetId, sourceHandle, targetHandle,
                 type: null, connectionType: 'standard',
                 massStatus: null, timeStatus: null, size: 'large',
-                massUsed: 0, eolAt: null, broken: false,
+                massUsed: 0, eolAt: null,
+                sourceSignatureId: null, targetSignatureId: null, broken: false,
                 createdAt: new Date().toISOString() },
             ],
           },
@@ -936,9 +993,19 @@ export const useMapStore = create<MapStore>()((set, get) => {
         if (activeMapId) {
           const url  = `/api/maps/${activeMapId}/connections`;
           const body = JSON.stringify({ ...conn });
-          api(url, { method: 'POST', body }).catch(() =>
-            enqueue(`addConnection:${id}`, url, 'POST', body),
-          );
+          api<{ ok: boolean; connectionType?: string }>(url, { method: 'POST', body })
+            .then((r) => {
+              // Server may auto-classify an in-game gate (stargate-adjacent
+              // systems). Reflect it locally so the chain/edge updates without
+              // a reload.
+              if (r?.connectionType && r.connectionType !== 'standard') {
+                set((s) => ({
+                  map: { ...s.map, connections: s.map.connections.map((c) =>
+                    c.id === id ? { ...c, connectionType: r.connectionType as MapConnection['connectionType'] } : c) },
+                }));
+              }
+            })
+            .catch(() => enqueue(`addConnection:${id}`, url, 'POST', body));
         }
       }
 
@@ -1006,6 +1073,42 @@ export const useMapStore = create<MapStore>()((set, get) => {
       }
     },
 
+    addRoute: (name, systemIds, connectionIds) => {
+      if (systemIds.length < 2) return null;
+      const { activeMapId } = get();
+      const id = uuid();
+      const now = new Date().toISOString();
+      const route: SavedRoute = { id, name, systemIds, connectionIds, createdAt: now, updatedAt: now };
+      set((s) => ({ map: { ...s.map, routes: [...(s.map.routes ?? []), route] } }));
+      if (activeMapId) {
+        const url  = `/api/maps/${activeMapId}/routes`;
+        const body = JSON.stringify({ id, name, systemIds, connectionIds });
+        api(url, { method: 'POST', body }).catch(() => enqueue(`addRoute:${id}`, url, 'POST', body));
+      }
+      return id;
+    },
+
+    renameRoute: (id, name) => {
+      const { activeMapId } = get();
+      set((s) => ({
+        map: { ...s.map, routes: (s.map.routes ?? []).map((r) => r.id === id ? { ...r, name } : r) },
+      }));
+      if (activeMapId) {
+        const url  = `/api/maps/${activeMapId}/routes/${id}`;
+        const body = JSON.stringify({ name });
+        api(url, { method: 'PATCH', body }).catch(() => enqueue(`renameRoute:${id}`, url, 'PATCH', body));
+      }
+    },
+
+    removeRoute: (id) => {
+      const { activeMapId } = get();
+      set((s) => ({ map: { ...s.map, routes: (s.map.routes ?? []).filter((r) => r.id !== id) } }));
+      if (activeMapId) {
+        const url = `/api/maps/${activeMapId}/routes/${id}`;
+        api(url, { method: 'DELETE' }).catch(() => enqueue(`removeRoute:${id}`, url, 'DELETE', ''));
+      }
+    },
+
     selectSystem: (id) => set({ selectedSystemId: id, selectedConnectionId: null }),
     selectConnection: (id) => set({ selectedConnectionId: id, selectedSystemId: null }),
     setCurrentSystem: (id) => set({ currentSystemId: id }),
@@ -1055,6 +1158,25 @@ export const useMapStore = create<MapStore>()((set, get) => {
           set((s) => ({
             selectedConnectionId: s.selectedConnectionId === event.id ? null : s.selectedConnectionId,
             map: { ...s.map, connections: s.map.connections.filter((c) => c.id !== event.id) },
+          }));
+          break;
+        }
+        case 'route.add': {
+          const route = event.route;
+          set((s) => (s.map.routes ?? []).some((r) => r.id === route.id)
+            ? s
+            : { map: { ...s.map, routes: [...(s.map.routes ?? []), route] } });
+          break;
+        }
+        case 'route.update': {
+          set((s) => ({
+            map: { ...s.map, routes: (s.map.routes ?? []).map((r) => r.id === event.id ? { ...r, ...event.updates } : r) },
+          }));
+          break;
+        }
+        case 'route.remove': {
+          set((s) => ({
+            map: { ...s.map, routes: (s.map.routes ?? []).filter((r) => r.id !== event.id) },
           }));
           break;
         }

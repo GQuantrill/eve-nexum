@@ -1,4 +1,25 @@
 {
+  "chains": {
+    "from": "De…",
+    "to": "Vers…",
+    "namePlaceholder": "Nom de la chaîne (facultatif)",
+    "create": "Enregistrer la chaîne",
+    "noPath": "Aucun chemin entre ces systèmes sur cette carte.",
+    "empty": "Aucune chaîne enregistrée. Choisissez un système de départ et d'arrivée pour en enregistrer une.",
+    "unnamed": "Chaîne sans nom",
+    "hops": "{{count}} sauts",
+    "remove": "Supprimer la chaîne",
+    "centerOn": "Centrer sur {{system}}",
+    "brokenHop": "Saut rompu — à re-scanner",
+    "viaGate": "Warp vers la stargate",
+    "viaJumpBridge": "Emprunter le pont de saut",
+    "whTypeLabel": "Type",
+    "whSizeLabel": "Taille",
+    "warpSig": "Warp vers {{sig}}",
+    "warpWormhole": "Warp vers le trou de ver",
+    "noMatch": "Aucun système correspondant",
+    "clearSelection": "Effacer"
+  },
   "session": {
     "idleLogout": "Déconnecté pour inactivité.",
     "lockedTitle": "En pause",
@@ -325,6 +346,7 @@
       "contentFilter": "Filtre de contenu",
       "connections": "Connexions",
       "route": "Itinéraire",
+      "chains": "Chaînes",
       "chainExits": "Sorties de chaîne",
       "proximityAlerts": "Alertes de proximité",
       "activity": "Activité",
@@ -561,6 +583,10 @@
   "connPanel": {
     "whType": "Type de trou de ver",
     "whTypePlaceholder": "K162, C247…",
+    "sigLink": "Signatures associées",
+    "sigInSystem": "Signature dans {{system}}",
+    "sigNone": "Non liée",
+    "sigUnnamed": "Signature sans nom",
     "massStatus": "État de masse",
     "stable": "Stable",
     "destabilized": "Déstabilisé (<50%)",
@@ -642,6 +668,9 @@
     "disconnect": "Déconnecter",
     "jumpType": "Type de saut",
     "standardJump": "Saut standard",
+    "jumpWormhole": "Trou de ver",
+    "jumpStargate": "Stargate",
+    "jumpAnsiblex": "Jumpgate Ansiblex",
     "jumpgate": "Jump gate",
     "whLifetime": "Durée de vie du trou de ver",
     "lifeFresh": "Récent",
@@ -744,6 +773,8 @@
     "standingValue": "{{label}} : {{value}}"
   },
   "sidebar": {
+    "watchlist": "Liste de surveillance",
+    "chains": "Chaînes de trous de ver",
     "thera": "Connexions Thera",
     "turnur": "Connexions Turnur",
     "a0": "Soleils A0 à proximité",

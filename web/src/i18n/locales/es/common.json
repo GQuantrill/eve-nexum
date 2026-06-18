@@ -1,4 +1,25 @@
 {
+  "chains": {
+    "from": "Desde…",
+    "to": "Hasta…",
+    "namePlaceholder": "Nombre de la cadena (opcional)",
+    "create": "Guardar cadena",
+    "noPath": "No hay ruta entre esos sistemas en este mapa.",
+    "empty": "Aún no hay cadenas guardadas. Elige un sistema de inicio y fin para registrar una.",
+    "unnamed": "Cadena sin título",
+    "hops": "{{count}} saltos",
+    "remove": "Eliminar cadena",
+    "centerOn": "Centrar en {{system}}",
+    "brokenHop": "Salto roto — vuelve a explorar",
+    "viaGate": "Warp a la puerta estelar",
+    "viaJumpBridge": "Usar el puente de salto",
+    "whTypeLabel": "Tipo",
+    "whSizeLabel": "Tamaño",
+    "warpSig": "Warp a {{sig}}",
+    "warpWormhole": "Warp al agujero de gusano",
+    "noMatch": "Ningún sistema coincidente",
+    "clearSelection": "Borrar"
+  },
   "session": {
     "idleLogout": "Sesión cerrada por inactividad.",
     "lockedTitle": "En pausa",
@@ -325,6 +346,7 @@
       "contentFilter": "Filtro de contenido",
       "connections": "Conexiones",
       "route": "Ruta",
+      "chains": "Cadenas",
       "chainExits": "Salidas de la cadena",
       "proximityAlerts": "Alertas de proximidad",
       "activity": "Actividad",
@@ -561,6 +583,10 @@
   "connPanel": {
     "whType": "Tipo de agujero de gusano",
     "whTypePlaceholder": "K162, C247…",
+    "sigLink": "Firmas asociadas",
+    "sigInSystem": "Firma en {{system}}",
+    "sigNone": "Sin vincular",
+    "sigUnnamed": "Firma sin nombre",
     "massStatus": "Estado de masa",
     "stable": "Estable",
     "destabilized": "Desestabilizado (<50%)",
@@ -642,6 +668,9 @@
     "disconnect": "Desconectar",
     "jumpType": "Tipo de salto",
     "standardJump": "Salto estándar",
+    "jumpWormhole": "Agujero de gusano",
+    "jumpStargate": "Puerta estelar",
+    "jumpAnsiblex": "Ansiblex jumpgate",
     "jumpgate": "Jump gate",
     "whLifetime": "Vida útil del agujero de gusano",
     "lifeFresh": "Reciente",
@@ -744,6 +773,8 @@
     "standingValue": "{{label}}: {{value}}"
   },
   "sidebar": {
+    "watchlist": "Lista de seguimiento",
+    "chains": "Cadenas de agujeros de gusano",
     "thera": "Conexiones de Thera",
     "turnur": "Conexiones de Turnur",
     "a0": "Soles A0 cercanos",

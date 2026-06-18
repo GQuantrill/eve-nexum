@@ -1,4 +1,25 @@
 {
+  "chains": {
+    "from": "起点…",
+    "to": "终点…",
+    "namePlaceholder": "链路名称（可选）",
+    "create": "保存链路",
+    "noPath": "此地图上这些星系之间没有路径。",
+    "empty": "尚无保存的链路。选择起点和终点星系来记录一条。",
+    "unnamed": "未命名链路",
+    "hops": "{{count}} 跳",
+    "remove": "删除链路",
+    "centerOn": "居中显示 {{system}}",
+    "brokenHop": "该跳已断开 — 需重新探测",
+    "viaGate": "跃迁至星门",
+    "viaJumpBridge": "使用跳跃桥",
+    "whTypeLabel": "类型",
+    "whSizeLabel": "大小",
+    "warpSig": "跃迁至 {{sig}}",
+    "warpWormhole": "跃迁至虫洞",
+    "noMatch": "无匹配星系",
+    "clearSelection": "清除"
+  },
   "session": {
     "idleLogout": "因长时间未操作已退出登录。",
     "lockedTitle": "已暂停",
@@ -325,6 +346,7 @@
       "contentFilter": "内容筛选",
       "connections": "连接",
       "route": "路线",
+      "chains": "虫洞链",
       "chainExits": "链出口",
       "proximityAlerts": "接近警报",
       "activity": "活动",
@@ -561,6 +583,10 @@
   "connPanel": {
     "whType": "虫洞类型",
     "whTypePlaceholder": "K162、C247…",
+    "sigLink": "关联信号",
+    "sigInSystem": "{{system}} 中的信号",
+    "sigNone": "未关联",
+    "sigUnnamed": "未命名信号",
     "massStatus": "质量状态",
     "stable": "稳定",
     "destabilized": "已失稳（<50%）",
@@ -642,6 +668,9 @@
     "disconnect": "断开连接",
     "jumpType": "跳跃类型",
     "standardJump": "标准跳跃",
+    "jumpWormhole": "虫洞",
+    "jumpStargate": "星门",
+    "jumpAnsiblex": "Ansiblex 跳桥",
     "jumpgate": "跳桥",
     "whLifetime": "虫洞寿命",
     "lifeFresh": "新鲜",
@@ -744,6 +773,8 @@
     "standingValue": "{{label}}：{{value}}"
   },
   "sidebar": {
+    "watchlist": "关注列表",
+    "chains": "虫洞链",
     "thera": "Thera 连接",
     "turnur": "Turnur 连接",
     "a0": "附近的 A0 恒星",

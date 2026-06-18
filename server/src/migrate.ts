@@ -247,6 +247,71 @@ export async function migrate() {
     CREATE OR REPLACE VIEW reportable_signatures AS
       SELECT * FROM map_signatures WHERE from_merge = FALSE;
 
+    -- Optional links from a connection to the wormhole signature backing each
+    -- end: the sig you warp to in the source system, and the (usually K162) sig
+    -- in the target. Lets saved chains show exact "warp to ABC-123" directions.
+    -- ON DELETE SET NULL so deleting/quarantining a sig just unlinks the hop
+    -- rather than dropping the connection. Added after map_signatures exists so
+    -- the FK target is present; ADD COLUMN IF NOT EXISTS keeps it idempotent.
+    ALTER TABLE map_connections ADD COLUMN IF NOT EXISTS source_signature_id UUID REFERENCES map_signatures(id) ON DELETE SET NULL;
+    ALTER TABLE map_connections ADD COLUMN IF NOT EXISTS target_signature_id UUID REFERENCES map_signatures(id) ON DELETE SET NULL;
+
+    -- Saved chains: a named, user-recorded path through the map's own
+    -- connections (A..B). Stored as the explicit step sequence — ordered
+    -- system ids + the connection traversed between each pair — so hops can be
+    -- shown step-by-step and flagged broken when a connection goes away,
+    -- without silently re-routing. The id arrays reference map_systems /
+    -- map_connections by value (not FK arrays — Postgres has no per-element FK);
+    -- the app validates each hop against the live map when rendering. Rows are
+    -- map-scoped and cascade-deleted with the map.
+    CREATE TABLE IF NOT EXISTS map_routes (
+      id                 UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+      map_id             UUID        NOT NULL REFERENCES maps(id) ON DELETE CASCADE,
+      name               TEXT        NOT NULL DEFAULT '',
+      system_ids         UUID[]      NOT NULL DEFAULT '{}',
+      connection_ids     UUID[]      NOT NULL DEFAULT '{}',
+      created_by_user_id INTEGER     REFERENCES users(id) ON DELETE SET NULL,
+      created_at         TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at         TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+    CREATE INDEX IF NOT EXISTS idx_map_routes_map ON map_routes (map_id);
+
+    -- Tracks one-shot data migrations that must NOT re-run on every boot
+    -- (unlike the idempotent DDL above) — e.g. a backfill we don't want to
+    -- keep re-applying over later manual edits.
+    CREATE TABLE IF NOT EXISTS applied_migrations (
+      name       TEXT        PRIMARY KEY,
+      applied_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
+    -- One-time: classify existing connections that are really in-game gates.
+    -- A 'standard' (wormhole-default) connection whose two endpoints are
+    -- stargate-adjacent in the SDE and which carries no wormhole type is a
+    -- gate. Only 'standard' rows are touched — connections the user marked
+    -- 'jumpgate' stay Ansiblex, and an explicit wormhole type is preserved.
+    -- Guarded by applied_migrations so it runs once and never re-flips a manual
+    -- correction. New connections are classified the same way at creation time.
+    DO $gateclassify$
+    BEGIN
+      IF to_regclass('public.map_stargates') IS NOT NULL
+         AND NOT EXISTS (SELECT 1 FROM applied_migrations WHERE name = 'gate_classify_v2') THEN
+        UPDATE map_connections c
+           SET connection_type = 'gate'
+          FROM map_systems s, map_systems t
+         WHERE c.source_id = s.id AND c.target_id = t.id
+           AND c.connection_type = 'standard'
+           AND COALESCE(c.wh_type, '') = ''
+           AND s.eve_system_id IS NOT NULL AND t.eve_system_id IS NOT NULL
+           AND EXISTS (
+             SELECT 1 FROM map_stargates g
+              WHERE (g.system_id = s.eve_system_id AND g.destination_system_id = t.eve_system_id)
+                 OR (g.system_id = t.eve_system_id AND g.destination_system_id = s.eve_system_id)
+           );
+        INSERT INTO applied_migrations(name) VALUES ('gate_classify_v2');
+      END IF;
+    END
+    $gateclassify$;
+
     -- Resolved owner corp ID for structures. Populated by ESI lookup when
     -- the user supplies an eve_id (the structure's in-game ID) or when
     -- the structure name parser finds a known corp/alliance. Lets the

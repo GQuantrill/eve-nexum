@@ -1,4 +1,25 @@
 {
+  "chains": {
+    "from": "Откуда…",
+    "to": "Куда…",
+    "namePlaceholder": "Название цепочки (необязательно)",
+    "create": "Сохранить цепочку",
+    "noPath": "На этой карте нет пути между этими системами.",
+    "empty": "Сохранённых цепочек пока нет. Выберите начальную и конечную систему, чтобы записать её.",
+    "unnamed": "Цепочка без названия",
+    "hops": "{{count}} прыжков",
+    "remove": "Удалить цепочку",
+    "centerOn": "Центрировать на {{system}}",
+    "brokenHop": "Прыжок разорван — нужна разведка",
+    "viaGate": "Варп к старгейту",
+    "viaJumpBridge": "Использовать прыжковый мост",
+    "whTypeLabel": "Тип",
+    "whSizeLabel": "Размер",
+    "warpSig": "Варп к {{sig}}",
+    "warpWormhole": "Варп к червоточине",
+    "noMatch": "Нет подходящих систем",
+    "clearSelection": "Очистить"
+  },
   "session": {
     "idleLogout": "Выход из-за неактивности.",
     "lockedTitle": "Пауза",
@@ -339,6 +360,7 @@
       "contentFilter": "Фильтр содержимого",
       "connections": "Соединения",
       "route": "Маршрут",
+      "chains": "Цепочки",
       "chainExits": "Выходы из цепочки",
       "proximityAlerts": "Оповещения о близости",
       "activity": "Активность",
@@ -577,6 +599,10 @@
   "connPanel": {
     "whType": "Тип червоточины",
     "whTypePlaceholder": "K162, C247…",
+    "sigLink": "Связанные сигнатуры",
+    "sigInSystem": "Сигнатура в {{system}}",
+    "sigNone": "Не связано",
+    "sigUnnamed": "Сигнатура без имени",
     "massStatus": "Состояние массы",
     "stable": "Стабильна",
     "destabilized": "Дестабилизирована (<50%)",
@@ -660,6 +686,9 @@
     "disconnect": "Разъединить",
     "jumpType": "Тип прыжка",
     "standardJump": "Обычный прыжок",
+    "jumpWormhole": "Червоточина",
+    "jumpStargate": "Старгейт",
+    "jumpAnsiblex": "Ansiblex (прыжковые врата)",
     "jumpgate": "Прыжковые врата",
     "whLifetime": "Время жизни червоточины",
     "lifeFresh": "Свежая",
@@ -770,6 +799,8 @@
     "standingValue": "{{label}}: {{value}}"
   },
   "sidebar": {
+    "watchlist": "Список наблюдения",
+    "chains": "Цепочки червоточин",
     "thera": "Соединения Thera",
     "turnur": "Соединения Turnur",
     "a0": "Ближайшие звёзды A0",

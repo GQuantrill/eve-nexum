@@ -1,4 +1,25 @@
 {
+  "chains": {
+    "from": "Von…",
+    "to": "Nach…",
+    "namePlaceholder": "Kettenname (optional)",
+    "create": "Kette speichern",
+    "noPath": "Kein Pfad zwischen diesen Systemen auf dieser Karte.",
+    "empty": "Noch keine gespeicherten Ketten. Wähle ein Start- und Zielsystem, um eine aufzuzeichnen.",
+    "unnamed": "Unbenannte Kette",
+    "hops": "{{count}} Sprünge",
+    "remove": "Kette löschen",
+    "centerOn": "Auf {{system}} zentrieren",
+    "brokenHop": "Sprung unterbrochen – neu scouten",
+    "viaGate": "Zum Stargate warpen",
+    "viaJumpBridge": "Sprungbrücke nutzen",
+    "whTypeLabel": "Typ",
+    "whSizeLabel": "Größe",
+    "warpSig": "Zu {{sig}} warpen",
+    "warpWormhole": "Zum Wurmloch warpen",
+    "noMatch": "Kein passendes System",
+    "clearSelection": "Löschen"
+  },
   "session": {
     "idleLogout": "Wegen Inaktivität abgemeldet.",
     "lockedTitle": "Pausiert",
@@ -325,6 +346,7 @@
       "contentFilter": "Inhaltsfilter",
       "connections": "Verbindungen",
       "route": "Route",
+      "chains": "Ketten",
       "chainExits": "Ketten-Ausgänge",
       "proximityAlerts": "Näherungswarnungen",
       "activity": "Aktivität",
@@ -561,6 +583,10 @@
   "connPanel": {
     "whType": "Wurmlochtyp",
     "whTypePlaceholder": "K162, C247…",
+    "sigLink": "Verknüpfte Signaturen",
+    "sigInSystem": "Signatur in {{system}}",
+    "sigNone": "Nicht verknüpft",
+    "sigUnnamed": "Unbenannte Signatur",
     "massStatus": "Massenstatus",
     "stable": "Stabil",
     "destabilized": "Destabilisiert (<50%)",
@@ -642,6 +668,9 @@
     "disconnect": "Trennen",
     "jumpType": "Sprungtyp",
     "standardJump": "Standardsprung",
+    "jumpWormhole": "Wurmloch",
+    "jumpStargate": "Sternentor",
+    "jumpAnsiblex": "Ansiblex-Sprungtor",
     "jumpgate": "Sprungtor",
     "whLifetime": "Wurmloch-Lebensdauer",
     "lifeFresh": "Frisch",
@@ -744,6 +773,8 @@
     "standingValue": "{{label}}: {{value}}"
   },
   "sidebar": {
+    "watchlist": "Beobachtungsliste",
+    "chains": "Wurmloch-Ketten",
     "thera": "Thera-Verbindungen",
     "turnur": "Turnur-Verbindungen",
     "a0": "Nahe A0-Sonnen",
