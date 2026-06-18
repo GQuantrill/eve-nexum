@@ -187,6 +187,60 @@ async function sweepAll(): Promise<void> {
 }
 
 /**
+ * Quarantine orphaned wormhole connections across ALL maps (not just opt-in
+ * ones — this only flips `broken`, it never deletes anything). A live wormhole
+ * always shows as a sig on both ends, so a standard, typed, not-yet-broken
+ * connection whose endpoint has been SCANNED (has sigs) but carries NO wormhole
+ * sig has lost its hole. 'unknown' sigs count as possible wormholes so a
+ * mid-scan system isn't quarantined; typeless / freshly-tracked links (no
+ * wh_type) are left alone. Mirrors the client check in SignaturePane.
+ */
+async function quarantineOrphans(): Promise<void> {
+  let rows: Array<{ id: string; mapId: string }>;
+  try {
+    const res = await db.query<{ id: string; map_id: string }>(`
+      WITH sig_stats AS (
+        SELECT system_id,
+               COUNT(*) AS n,
+               COUNT(*) FILTER (
+                 WHERE sig_type IN ('wormhole','unknown') OR COALESCE(wh_type,'') <> ''
+               ) AS wh
+          FROM map_signatures
+         GROUP BY system_id
+      ),
+      scanned_no_wh AS (
+        SELECT system_id FROM sig_stats WHERE n > 0 AND wh = 0
+      )
+      UPDATE map_connections c
+         SET broken = TRUE
+       WHERE c.connection_type = 'standard'
+         AND c.broken = FALSE
+         AND COALESCE(c.wh_type, '') <> ''
+         AND (c.source_id IN (SELECT system_id FROM scanned_no_wh)
+           OR c.target_id IN (SELECT system_id FROM scanned_no_wh))
+      RETURNING c.id, c.map_id AS "map_id"`);
+    rows = res.rows.map((r) => ({ id: r.id, mapId: r.map_id }));
+  } catch (err) {
+    log.warn(`orphan quarantine failed: ${err instanceof Error ? err.message : String(err)}`);
+    return;
+  }
+  if (rows.length === 0) return;
+
+  const byMap = new Map<string, string[]>();
+  for (const r of rows) {
+    const list = byMap.get(r.mapId);
+    if (list) list.push(r.id); else byMap.set(r.mapId, [r.id]);
+  }
+  for (const [mapId, ids] of byMap) {
+    await db.query(`UPDATE maps SET updated_at = NOW() WHERE id = $1`, [mapId]).catch(() => {});
+    for (const id of ids) {
+      publishToMap(mapId, { type: 'connection.update', actor: null, id, updates: { broken: true } });
+    }
+  }
+  log.info(`quarantined ${rows.length} orphaned connection(s) across ${byMap.size} map(s)`);
+}
+
+/**
  * Start the periodic lazy WH-removal sweep. Cadence is config.lazyWhSweepMinutes
  * (env LAZY_WH_SWEEP_MINUTES, default 15); 0 disables it. First pass runs a
  * short while after boot so startup isn't competing with it.
@@ -195,6 +249,7 @@ export function startWhSweeper(): void {
   const mins = config.lazyWhSweepMinutes;
   if (mins <= 0) { log.info('lazy WH-removal sweep disabled (LAZY_WH_SWEEP_MINUTES=0)'); return; }
   log.info(`lazy WH-removal sweep enabled (every ${mins} min)`);
-  setTimeout(() => { void sweepAll(); }, 60_000);
-  setInterval(() => { void sweepAll(); }, mins * 60_000);
+  const tick = () => { void sweepAll(); void quarantineOrphans(); };
+  setTimeout(tick, 60_000);
+  setInterval(tick, mins * 60_000);
 }
