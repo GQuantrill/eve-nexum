@@ -765,6 +765,7 @@
     "standingValue": "{{label}}: {{value}}"
   },
   "sidebar": {
+    "watchlist": "ウォッチリスト",
     "thera": "Thera 接続",
     "turnur": "Turnur 接続",
     "a0": "近くの A0 恒星",

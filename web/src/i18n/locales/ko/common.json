@@ -765,6 +765,7 @@
     "standingValue": "{{label}}: {{value}}"
   },
   "sidebar": {
+    "watchlist": "관심 목록",
     "thera": "Thera 연결",
     "turnur": "Turnur 연결",
     "a0": "주변 A0 항성",

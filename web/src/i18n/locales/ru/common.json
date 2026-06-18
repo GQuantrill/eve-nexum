@@ -791,6 +791,7 @@
     "standingValue": "{{label}}: {{value}}"
   },
   "sidebar": {
+    "watchlist": "Список наблюдения",
     "thera": "Соединения Thera",
     "turnur": "Соединения Turnur",
     "a0": "Ближайшие звёзды A0",

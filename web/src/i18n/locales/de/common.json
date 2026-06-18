@@ -765,6 +765,7 @@
     "standingValue": "{{label}}: {{value}}"
   },
   "sidebar": {
+    "watchlist": "Beobachtungsliste",
     "thera": "Thera-Verbindungen",
     "turnur": "Turnur-Verbindungen",
     "a0": "Nahe A0-Sonnen",

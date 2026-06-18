@@ -803,6 +803,7 @@
     "standingValue": "{{label}}: {{value}}"
   },
   "sidebar": {
+    "watchlist": "Watchlist",
     "thera": "Thera Connections",
     "turnur": "Turnur Connections",
     "a0": "Nearby A0 Suns",
