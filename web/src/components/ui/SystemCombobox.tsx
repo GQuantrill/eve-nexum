@@ -53,17 +53,20 @@ export function SystemCombobox({ systems, value, onChange, placeholder, excludeI
     };
   }, [open, matches.length]);
 
-  // Close when clicking outside the field or the dropdown.
+  // Close when clicking outside the field or the dropdown. Listen in the
+  // capture phase for pointerdown: the React Flow canvas captures map clicks
+  // and stops propagation, so a bubble-phase document listener never sees them
+  // — capture fires on the way down, before the canvas can swallow it.
   useEffect(() => {
     if (!open) return;
-    const onDown = (e: MouseEvent) => {
+    const onDown = (e: PointerEvent) => {
       const tgt = e.target as Node;
       if (wrapRef.current?.contains(tgt)) return;
       if ((tgt as HTMLElement).closest?.('.system-combo__results')) return;
       setOpen(false);
     };
-    document.addEventListener('mousedown', onDown);
-    return () => document.removeEventListener('mousedown', onDown);
+    document.addEventListener('pointerdown', onDown, true);
+    return () => document.removeEventListener('pointerdown', onDown, true);
   }, [open]);
 
   function select(id: string) {
