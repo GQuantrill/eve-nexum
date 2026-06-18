@@ -13,7 +13,9 @@
     "brokenHop": "끊긴 점프 — 재정찰 필요",
     "viaGate": "스타게이트 점프",
     "warpSig": "{{sig}}(으)로 워프",
-    "warpWormhole": "웜홀로 워프"
+    "warpWormhole": "웜홀로 워프",
+    "noMatch": "일치하는 성계 없음",
+    "clearSelection": "지우기"
   },
   "session": {
     "idleLogout": "비활성으로 인해 로그아웃되었습니다.",

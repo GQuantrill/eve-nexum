@@ -13,7 +13,9 @@
     "brokenHop": "Hop broken — re-scout",
     "viaGate": "Jump the stargate",
     "warpSig": "Warp to {{sig}}",
-    "warpWormhole": "Warp to the wormhole"
+    "warpWormhole": "Warp to the wormhole",
+    "noMatch": "No matching system",
+    "clearSelection": "Clear"
   },
   "apiKeys": {
     "title": "API keys",

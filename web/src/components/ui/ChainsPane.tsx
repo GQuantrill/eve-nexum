@@ -5,6 +5,7 @@ import { useCanEdit } from '../../hooks/useCanEdit';
 import { api } from '../../api/client';
 import { toast } from './Toaster';
 import { buildChainPath, buildChainSteps } from '../../utils/chains';
+import { SystemCombobox } from './SystemCombobox';
 import type { Signature } from '../../types';
 import {
   CaretRightIcon, CaretDownIcon, TrashIcon, ArrowRightIcon,
@@ -77,17 +78,20 @@ export function ChainsPane() {
     <div className="chains-pane">
       {canEdit && (
         <div className="chains-new">
-          <div className="chains-new__row">
-            <select value={fromId} onChange={(e) => setFromId(e.target.value)}>
-              <option value="">{t('chains.from')}</option>
-              {sortedSystems.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
-            </select>
-            <ArrowRightIcon size={14} weight="bold" className="chains-new__arrow" />
-            <select value={toId} onChange={(e) => setToId(e.target.value)}>
-              <option value="">{t('chains.to')}</option>
-              {sortedSystems.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
-            </select>
-          </div>
+          <SystemCombobox
+            systems={sortedSystems}
+            value={fromId}
+            onChange={setFromId}
+            placeholder={t('chains.from')}
+            excludeId={toId}
+          />
+          <SystemCombobox
+            systems={sortedSystems}
+            value={toId}
+            onChange={setToId}
+            placeholder={t('chains.to')}
+            excludeId={fromId}
+          />
           <input
             className="chains-new__name"
             type="text"

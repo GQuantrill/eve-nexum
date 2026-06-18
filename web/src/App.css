@@ -3763,9 +3763,7 @@ div.system-node__easy-handle {
 .chains-pane { display: flex; flex-direction: column; gap: 10px; }
 
 .chains-new { display: flex; flex-direction: column; gap: 6px; }
-.chains-new__row { display: flex; align-items: center; gap: 6px; }
-.chains-new__row select { flex: 1; min-width: 0; }
-.chains-new__arrow { color: #8a9ab8; flex: none; }
+.system-combo { width: 100%; }
 .chains-new__name { width: 100%; }
 
 .chains-empty {

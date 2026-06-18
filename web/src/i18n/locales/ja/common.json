@@ -13,7 +13,9 @@
     "brokenHop": "ホップが切断 — 再スカウトが必要",
     "viaGate": "スターゲートをジャンプ",
     "warpSig": "{{sig}} へワープ",
-    "warpWormhole": "ワームホールへワープ"
+    "warpWormhole": "ワームホールへワープ",
+    "noMatch": "一致する星系なし",
+    "clearSelection": "クリア"
   },
   "session": {
     "idleLogout": "非アクティブのためサインアウトしました。",
