@@ -1,4 +1,20 @@
 {
+  "chains": {
+    "from": "De…",
+    "to": "Vers…",
+    "namePlaceholder": "Nom de la chaîne (facultatif)",
+    "create": "Enregistrer la chaîne",
+    "noPath": "Aucun chemin entre ces systèmes sur cette carte.",
+    "empty": "Aucune chaîne enregistrée. Choisissez un système de départ et d'arrivée pour en enregistrer une.",
+    "unnamed": "Chaîne sans nom",
+    "hops": "{{count}} sauts",
+    "remove": "Supprimer la chaîne",
+    "centerOn": "Centrer sur {{system}}",
+    "brokenHop": "Saut rompu — à re-scanner",
+    "viaGate": "Sauter le stargate",
+    "warpSig": "Warp vers {{sig}}",
+    "warpWormhole": "Warp vers le trou de ver"
+  },
   "session": {
     "idleLogout": "Déconnecté pour inactivité.",
     "lockedTitle": "En pause",
@@ -325,6 +341,7 @@
       "contentFilter": "Filtre de contenu",
       "connections": "Connexions",
       "route": "Itinéraire",
+      "chains": "Chaînes",
       "chainExits": "Sorties de chaîne",
       "proximityAlerts": "Alertes de proximité",
       "activity": "Activité",

@@ -1669,6 +1669,75 @@ mapsRouter.delete('/:mapId/connections/:connectionId', async (req, res) => {
   res.json({ ok: true });
 });
 
+// ── Saved chains (routes) ──────────────────────────────────────────────────────
+// A chain is a named, recorded path A..B through the map's own connections.
+// Content-level permission (like signatures): it annotates the map, it doesn't
+// mutate topology. The step arrays are stored verbatim and validated against the
+// live map when rendered, so a removed hop is flagged rather than re-routed.
+
+const routeSelect =
+  `SELECT id, name, system_ids AS "systemIds", connection_ids AS "connectionIds",
+          created_at AS "createdAt", updated_at AS "updatedAt"
+     FROM map_routes`;
+
+mapsRouter.post('/:mapId/routes', async (req, res) => {
+  const { mapId } = req.params;
+  const access = await requireMapContentWrite(res, mapId, req);
+  if (!access) return;
+  const { id, name = '', systemIds = [], connectionIds = [] } = req.body as {
+    id?: string; name?: string; systemIds?: string[]; connectionIds?: string[];
+  };
+  if (!id || !Array.isArray(systemIds) || systemIds.length < 2) {
+    res.status(400).json({ error: 'A chain needs an id and at least two systems' });
+    return;
+  }
+  const me = authUser(req);
+  await db.query(
+    `INSERT INTO map_routes (id, map_id, name, system_ids, connection_ids, created_by_user_id)
+     VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT (id) DO NOTHING`,
+    [id, mapId, name, systemIds, connectionIds ?? [], me.userId],
+  );
+  await touchMap(mapId);
+  db.query(`${routeSelect} WHERE id = $1 AND map_id = $2`, [id, mapId])
+    .then(({ rows }) => {
+      if (rows[0]) publishToMap(mapId, { type: 'route.add', actor: req.get('x-client-id') ?? null, route: rows[0] });
+    }).catch(console.error);
+  res.status(201).json({ ok: true });
+});
+
+mapsRouter.patch('/:mapId/routes/:routeId', async (req, res) => {
+  const { mapId, routeId } = req.params;
+  const access = await requireMapContentWrite(res, mapId, req);
+  if (!access) return;
+  const colMap: Record<string, string> = {
+    name: 'name', systemIds: 'system_ids', connectionIds: 'connection_ids',
+  };
+  const updates = req.body as Record<string, unknown>;
+  const sets: string[] = [];
+  const vals: unknown[] = [];
+  for (const [key, col] of Object.entries(colMap)) {
+    if (key in updates) { sets.push(`${col} = $${vals.length + 1}`); vals.push(updates[key]); }
+  }
+  if (!sets.length) { res.status(400).json({ error: 'Nothing to update' }); return; }
+  await db.query(
+    `UPDATE map_routes SET ${sets.join(', ')}, updated_at = NOW() WHERE id = $${vals.length + 1} AND map_id = $${vals.length + 2}`,
+    [...vals, routeId, mapId],
+  );
+  await touchMap(mapId);
+  publishToMap(mapId, { type: 'route.update', actor: req.get('x-client-id') ?? null, id: routeId, updates });
+  res.json({ ok: true });
+});
+
+mapsRouter.delete('/:mapId/routes/:routeId', async (req, res) => {
+  const { mapId, routeId } = req.params;
+  const access = await requireMapContentWrite(res, mapId, req);
+  if (!access) return;
+  await db.query(`DELETE FROM map_routes WHERE id = $1 AND map_id = $2`, [routeId, mapId]);
+  await touchMap(mapId);
+  publishToMap(mapId, { type: 'route.remove', actor: req.get('x-client-id') ?? null, id: routeId });
+  res.json({ ok: true });
+});
+
 // ── Signatures ────────────────────────────────────────────────────────────────
 
 mapsRouter.get('/:mapId/systems/:systemId/signatures', async (req, res) => {

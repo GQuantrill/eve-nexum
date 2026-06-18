@@ -1,4 +1,20 @@
 {
+  "chains": {
+    "from": "De…",
+    "to": "Para…",
+    "namePlaceholder": "Nome da cadeia (opcional)",
+    "create": "Salvar cadeia",
+    "noPath": "Nenhum caminho entre esses sistemas neste mapa.",
+    "empty": "Nenhuma cadeia salva ainda. Escolha um sistema inicial e final para registrar uma.",
+    "unnamed": "Cadeia sem título",
+    "hops": "{{count}} saltos",
+    "remove": "Excluir cadeia",
+    "centerOn": "Centralizar em {{system}}",
+    "brokenHop": "Salto quebrado — explore novamente",
+    "viaGate": "Saltar o stargate",
+    "warpSig": "Warp para {{sig}}",
+    "warpWormhole": "Warp para o buraco de minhoca"
+  },
   "session": {
     "idleLogout": "Sessão terminada por inatividade.",
     "lockedTitle": "Em pausa",
@@ -325,6 +341,7 @@
       "contentFilter": "Filtro de conteúdo",
       "connections": "Conexões",
       "route": "Rota",
+      "chains": "Cadeias",
       "chainExits": "Saídas da cadeia",
       "proximityAlerts": "Alertas de proximidade",
       "activity": "Atividade",

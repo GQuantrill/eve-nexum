@@ -1,4 +1,20 @@
 {
+  "chains": {
+    "from": "出発…",
+    "to": "到着…",
+    "namePlaceholder": "チェーン名（任意）",
+    "create": "チェーンを保存",
+    "noPath": "このマップ上で、それらの星系間に経路がありません。",
+    "empty": "保存されたチェーンはまだありません。開始と終了の星系を選んで記録してください。",
+    "unnamed": "無題のチェーン",
+    "hops": "{{count}} ジャンプ",
+    "remove": "チェーンを削除",
+    "centerOn": "{{system}} を中央に表示",
+    "brokenHop": "ホップが切断 — 再スカウトが必要",
+    "viaGate": "スターゲートをジャンプ",
+    "warpSig": "{{sig}} へワープ",
+    "warpWormhole": "ワームホールへワープ"
+  },
   "session": {
     "idleLogout": "非アクティブのためサインアウトしました。",
     "lockedTitle": "一時停止中",
@@ -325,6 +341,7 @@
       "contentFilter": "コンテンツフィルター",
       "connections": "接続",
       "route": "ルート",
+      "chains": "チェーン",
       "chainExits": "チェーン出口",
       "proximityAlerts": "近接アラート",
       "activity": "アクティビティ",

@@ -1,4 +1,20 @@
 {
+  "chains": {
+    "from": "Von…",
+    "to": "Nach…",
+    "namePlaceholder": "Kettenname (optional)",
+    "create": "Kette speichern",
+    "noPath": "Kein Pfad zwischen diesen Systemen auf dieser Karte.",
+    "empty": "Noch keine gespeicherten Ketten. Wähle ein Start- und Zielsystem, um eine aufzuzeichnen.",
+    "unnamed": "Unbenannte Kette",
+    "hops": "{{count}} Sprünge",
+    "remove": "Kette löschen",
+    "centerOn": "Auf {{system}} zentrieren",
+    "brokenHop": "Sprung unterbrochen – neu scouten",
+    "viaGate": "Stargate springen",
+    "warpSig": "Zu {{sig}} warpen",
+    "warpWormhole": "Zum Wurmloch warpen"
+  },
   "session": {
     "idleLogout": "Wegen Inaktivität abgemeldet.",
     "lockedTitle": "Pausiert",
@@ -325,6 +341,7 @@
       "contentFilter": "Inhaltsfilter",
       "connections": "Verbindungen",
       "route": "Route",
+      "chains": "Ketten",
       "chainExits": "Ketten-Ausgänge",
       "proximityAlerts": "Näherungswarnungen",
       "activity": "Aktivität",

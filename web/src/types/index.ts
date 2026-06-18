@@ -187,6 +187,22 @@ export interface WormholeMap {
   shareIncludeStructures?:  boolean;
   systems: MapSystem[];
   connections: MapConnection[];
+  routes: SavedRoute[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** A named, user-recorded path through the map's own connections (wormhole or
+ *  gate hops). Stored as the explicit step sequence — ordered system ids plus
+ *  the connection traversed between each consecutive pair — so it can be shown
+ *  step-by-step and have individual hops flagged broken when a connection is
+ *  removed or quarantined, without silently re-routing. `connectionIds` has
+ *  length `systemIds.length - 1`. */
+export interface SavedRoute {
+  id: string;
+  name: string;
+  systemIds: string[];
+  connectionIds: string[];
   createdAt: string;
   updatedAt: string;
 }

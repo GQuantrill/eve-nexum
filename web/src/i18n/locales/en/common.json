@@ -1,4 +1,20 @@
 {
+  "chains": {
+    "from": "From…",
+    "to": "To…",
+    "namePlaceholder": "Chain name (optional)",
+    "create": "Save chain",
+    "noPath": "No path between those systems on this map.",
+    "empty": "No saved chains yet. Pick a start and end system to record one.",
+    "unnamed": "Untitled chain",
+    "hops": "{{count}} hops",
+    "remove": "Delete chain",
+    "centerOn": "Centre on {{system}}",
+    "brokenHop": "Hop broken — re-scout",
+    "viaGate": "Jump the stargate",
+    "warpSig": "Warp to {{sig}}",
+    "warpWormhole": "Warp to the wormhole"
+  },
   "apiKeys": {
     "title": "API keys",
     "hint": "Generate a key to let external tools use your maps via the API. A key acts as the selected character — it can do only what that character can. \"Read + live events\" keys can also subscribe to the live event stream; \"Read + write content\" keys can also add and edit signatures, anomalies, and structures (never map topology).",
@@ -363,6 +379,7 @@
       "contentFilter": "Content Filter",
       "connections": "Connections",
       "route": "Route",
+      "chains": "Chains",
       "chainExits": "Chain Exits",
       "proximityAlerts": "Proximity Alerts",
       "notifications": "Notifications",
