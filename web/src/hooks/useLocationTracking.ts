@@ -152,7 +152,6 @@ export function applyJump(system: JumpSystem, prevMapSystemId: string | null, ca
     if (prevMapSystemId && map.systems.some((s) => s.id === prevMapSystemId)) {
       const fixY = position.y < source.y; // placed above the source
       const fixX = position.x < source.x; // placed left of the source
-      console.log('[pf] register', { id: mapSystemId, src: prevMapSystemId, fixY, fixX, posY: position.y, srcY: source.y });
       if (fixY || fixX) registerPlacementFix(mapSystemId, prevMapSystemId, fixY, fixX);
     }
   }

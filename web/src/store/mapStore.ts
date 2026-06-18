@@ -730,13 +730,11 @@ export const useMapStore = create<MapStore>()((set, get) => {
       // it overlapped); a node already clear of the source is left where the
       // lattice put it, so aligned small nodes are untouched.
       const fix = placementFixes.get(id);
-      if (fix) console.log('[pf] measure', { id, width, height, fix });
       if (fix) {
         placementFixes.delete(id);
         const st  = get();
         const node = st.map.systems.find((s) => s.id === id);
         const src  = st.map.systems.find((s) => s.id === fix.sourceId);
-        console.log('[pf] lookup', { node: !!node, src: !!src, nodeY: node?.position.y, srcY: src?.position.y });
         if (node && src) {
           const snap = st.snapToGrid ? roundToGrid : (n: number) => n;
           let { x, y } = node.position;
@@ -749,14 +747,16 @@ export const useMapStore = create<MapStore>()((set, get) => {
             x = snap(src.position.x - PLACEMENT_GAP - width);
             moved = true;
           }
-          console.log('[pf] correct', { moved, newY: y, newX: x });
           if (moved) st.moveSystem(id, { x, y }, { skipUndo: true });
         }
       }
     },
     forgetNodeSize: (id) => {
-      if (placementFixes.has(id)) console.log('[pf] forget deletes fix', id);
-      placementFixes.delete(id);
+      // NB: do NOT drop a pending placementFix here. forgetNodeSize fires on
+      // every ResizeObserver-effect cleanup — including React StrictMode's
+      // setup/cleanup/setup double-invoke in dev — which would wipe the fix
+      // before the real measure consumes it. The fix is cleared in
+      // reportNodeSize (on apply) or removeSystem (on real removal).
       if (!nodeSizes.delete(id)) return;
       const { w, h } = recomputeUniformMax();
       const cur = get();
@@ -918,6 +918,7 @@ export const useMapStore = create<MapStore>()((set, get) => {
     },
 
     removeSystem: (id) => {
+      placementFixes.delete(id);
       const { activeMapId, map } = get();
       const sys = map.systems.find((s) => s.id === id);
       const affectedConns = map.connections.filter((c) => c.sourceId === id || c.targetId === id);
