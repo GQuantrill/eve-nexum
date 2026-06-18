@@ -561,6 +561,10 @@
   "connPanel": {
     "whType": "Tipo de agujero de gusano",
     "whTypePlaceholder": "K162, C247…",
+    "sigLink": "Firmas asociadas",
+    "sigInSystem": "Firma en {{system}}",
+    "sigNone": "Sin vincular",
+    "sigUnnamed": "Firma sin nombre",
     "massStatus": "Estado de masa",
     "stable": "Estable",
     "destabilized": "Desestabilizado (<50%)",

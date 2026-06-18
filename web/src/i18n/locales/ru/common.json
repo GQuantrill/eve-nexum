@@ -577,6 +577,10 @@
   "connPanel": {
     "whType": "Тип червоточины",
     "whTypePlaceholder": "K162, C247…",
+    "sigLink": "Связанные сигнатуры",
+    "sigInSystem": "Сигнатура в {{system}}",
+    "sigNone": "Не связано",
+    "sigUnnamed": "Сигнатура без имени",
     "massStatus": "Состояние массы",
     "stable": "Стабильна",
     "destabilized": "Дестабилизирована (<50%)",

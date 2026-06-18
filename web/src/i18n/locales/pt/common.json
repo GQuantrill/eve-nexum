@@ -561,6 +561,10 @@
   "connPanel": {
     "whType": "Tipo de buraco de minhoca",
     "whTypePlaceholder": "K162, C247…",
+    "sigLink": "Assinaturas associadas",
+    "sigInSystem": "Assinatura em {{system}}",
+    "sigNone": "Não vinculada",
+    "sigUnnamed": "Assinatura sem nome",
     "massStatus": "Estado de massa",
     "stable": "Estável",
     "destabilized": "Desestabilizado (<50%)",

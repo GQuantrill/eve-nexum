@@ -1606,7 +1606,9 @@ mapsRouter.post('/:mapId/connections', async (req, res) => {
     `SELECT id, source_id AS "sourceId", target_id AS "targetId", source_handle AS "sourceHandle",
             target_handle AS "targetHandle", connection_type AS "connectionType", mass_status AS "massStatus",
             time_status AS "timeStatus", size, wh_type AS "type", COALESCE(mass_used, 0)::float8 AS "massUsed",
-            eol_at AS "eolAt", broken, created_at AS "createdAt"
+            eol_at AS "eolAt", broken,
+            source_signature_id AS "sourceSignatureId", target_signature_id AS "targetSignatureId",
+            created_at AS "createdAt"
        FROM map_connections WHERE id = $1 AND map_id = $2`,
     [id, mapId],
   ).then(({ rows }) => {
@@ -1632,6 +1634,7 @@ mapsRouter.patch('/:mapId/connections/:connectionId', async (req, res) => {
     sourceHandle: 'source_handle', targetHandle: 'target_handle',
     type: 'wh_type', massUsed: 'mass_used',
     eolAt: 'eol_at', broken: 'broken',
+    sourceSignatureId: 'source_signature_id', targetSignatureId: 'target_signature_id',
   };
 
   const updates = req.body as Record<string, unknown>;

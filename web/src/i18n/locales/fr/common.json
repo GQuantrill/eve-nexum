@@ -561,6 +561,10 @@
   "connPanel": {
     "whType": "Type de trou de ver",
     "whTypePlaceholder": "K162, C247…",
+    "sigLink": "Signatures associées",
+    "sigInSystem": "Signature dans {{system}}",
+    "sigNone": "Non liée",
+    "sigUnnamed": "Signature sans nom",
     "massStatus": "État de masse",
     "stable": "Stable",
     "destabilized": "Déstabilisé (<50%)",

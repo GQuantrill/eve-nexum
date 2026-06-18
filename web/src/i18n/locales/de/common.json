@@ -561,6 +561,10 @@
   "connPanel": {
     "whType": "Wurmlochtyp",
     "whTypePlaceholder": "K162, C247…",
+    "sigLink": "Verknüpfte Signaturen",
+    "sigInSystem": "Signatur in {{system}}",
+    "sigNone": "Nicht verknüpft",
+    "sigUnnamed": "Unbenannte Signatur",
     "massStatus": "Massenstatus",
     "stable": "Stabil",
     "destabilized": "Destabilisiert (<50%)",

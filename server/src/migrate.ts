@@ -247,6 +247,15 @@ export async function migrate() {
     CREATE OR REPLACE VIEW reportable_signatures AS
       SELECT * FROM map_signatures WHERE from_merge = FALSE;
 
+    -- Optional links from a connection to the wormhole signature backing each
+    -- end: the sig you warp to in the source system, and the (usually K162) sig
+    -- in the target. Lets saved chains show exact "warp to ABC-123" directions.
+    -- ON DELETE SET NULL so deleting/quarantining a sig just unlinks the hop
+    -- rather than dropping the connection. Added after map_signatures exists so
+    -- the FK target is present; ADD COLUMN IF NOT EXISTS keeps it idempotent.
+    ALTER TABLE map_connections ADD COLUMN IF NOT EXISTS source_signature_id UUID REFERENCES map_signatures(id) ON DELETE SET NULL;
+    ALTER TABLE map_connections ADD COLUMN IF NOT EXISTS target_signature_id UUID REFERENCES map_signatures(id) ON DELETE SET NULL;
+
     -- Resolved owner corp ID for structures. Populated by ESI lookup when
     -- the user supplies an eve_id (the structure's in-game ID) or when
     -- the structure name parser finds a known corp/alliance. Lets the
