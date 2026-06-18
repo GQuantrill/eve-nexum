@@ -417,6 +417,27 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sigs, map.connections, map.systems, systemId, canEdit, isShareMode]);
 
+  // Quarantine orphaned wormhole links. A live wormhole always shows as a sig
+  // on BOTH ends, so if this system has been scanned (has sigs) yet carries no
+  // wormhole signature at all, any established (typed) wormhole connection it
+  // has must have collapsed — flag it broken. Catches holes whose sigs were
+  // removed by any path, not just a delete that precisely matched the type.
+  // 'unknown' sigs (unresolved scans) count as possible wormholes so a
+  // mid-scan system isn't quarantined prematurely; typeless / freshly-tracked
+  // connections (no conn.type) are left alone.
+  useEffect(() => {
+    if (!canEdit || isShareMode || sigs.length === 0) return;
+    const hasWh = sigs.some((s) => s.sigType === 'wormhole' || s.sigType === 'unknown' || !!s.whType);
+    if (hasWh) return;
+    const { map: m, updateConnection } = useMapStore.getState();
+    for (const conn of m.connections) {
+      if (conn.connectionType !== 'standard' || conn.broken || !conn.type) continue;
+      if (conn.sourceId !== systemId && conn.targetId !== systemId) continue;
+      updateConnection(conn.id, { broken: true });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sigs, systemId, canEdit, isShareMode]);
+
   // Drop any pending overwrite-removal timer/indicator for this id (the row is
   // being deleted now, whether by the timer firing or a manual delete).
   const clearRemoval = (id: string) => {
