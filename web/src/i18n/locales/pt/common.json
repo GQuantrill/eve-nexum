@@ -11,7 +11,7 @@
     "remove": "Excluir cadeia",
     "centerOn": "Centralizar em {{system}}",
     "brokenHop": "Salto quebrado — explore novamente",
-    "viaGate": "Saltar o stargate",
+    "viaGate": "Warp para o portão estelar",
     "warpSig": "Warp para {{sig}}",
     "warpWormhole": "Warp para o buraco de minhoca",
     "noMatch": "Nenhum sistema correspondente",

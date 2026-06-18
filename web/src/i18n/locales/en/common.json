@@ -11,7 +11,7 @@
     "remove": "Delete chain",
     "centerOn": "Centre on {{system}}",
     "brokenHop": "Hop broken — re-scout",
-    "viaGate": "Jump the stargate",
+    "viaGate": "Warp to gate",
     "warpSig": "Warp to {{sig}}",
     "warpWormhole": "Warp to the wormhole",
     "noMatch": "No matching system",

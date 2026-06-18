@@ -11,7 +11,7 @@
     "remove": "체인 삭제",
     "centerOn": "{{system}}(으)로 중심 이동",
     "brokenHop": "끊긴 점프 — 재정찰 필요",
-    "viaGate": "스타게이트 점프",
+    "viaGate": "스타게이트로 워프",
     "warpSig": "{{sig}}(으)로 워프",
     "warpWormhole": "웜홀로 워프",
     "noMatch": "일치하는 성계 없음",

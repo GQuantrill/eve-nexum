@@ -162,7 +162,10 @@ export function ChainsPane() {
                               <WarningIcon size={11} weight="fill" /> {t('chains.brokenHop')}
                             </span>
                           ) : step.kind === 'gate' ? (
-                            <span>{t('chains.viaGate')}</span>
+                            <span className="chain-step__warp">
+                              <ArrowBendUpRightIcon size={11} weight="bold" />
+                              {t('chains.viaGate')}
+                            </span>
                           ) : (
                             <span className="chain-step__warp">
                               <ArrowBendUpRightIcon size={11} weight="bold" />

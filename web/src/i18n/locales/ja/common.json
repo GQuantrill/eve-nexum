@@ -11,7 +11,7 @@
     "remove": "チェーンを削除",
     "centerOn": "{{system}} を中央に表示",
     "brokenHop": "ホップが切断 — 再スカウトが必要",
-    "viaGate": "スターゲートをジャンプ",
+    "viaGate": "スターゲートへワープ",
     "warpSig": "{{sig}} へワープ",
     "warpWormhole": "ワームホールへワープ",
     "noMatch": "一致する星系なし",
