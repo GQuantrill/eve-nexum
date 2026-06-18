@@ -2672,6 +2672,13 @@
   filter: none;
 }
 
+/* Dimmed while a saved chain is hovered (everything not on its route). */
+.system-node--dimmed {
+  opacity: 0.12;
+  filter: saturate(0.4);
+  transition: opacity 0.15s ease, filter 0.15s ease;
+}
+
 .system-node--content-match {
   box-shadow: 0 0 0 2px var(--accent, #5b9bff), 0 0 12px 1px rgba(91,155,255,0.45);
 }

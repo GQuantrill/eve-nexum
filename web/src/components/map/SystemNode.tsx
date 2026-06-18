@@ -36,7 +36,7 @@ import { heatValue, heatColor } from '../../utils/heatmap';
 import { WHTypeInfo } from '../ui/WHTypeInfo';
 import { truesecColor } from '../../utils/truesec';
 
-type SystemNodeData = MapSystem & { selected: boolean };
+type SystemNodeData = MapSystem & { selected: boolean; dimmed?: boolean };
 
 export const SystemNode = memo(({ data, selected }: NodeProps) => {
   const { t } = useTranslation();
@@ -214,7 +214,7 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
   return (
     <div
       ref={nodeRef}
-      className={`system-node${sys.locked ? ' nopan' : ''}${isTarget ? ' system-node--connect-target' : ''}${isStale ? ' system-node--stale' : ''}${isSovHostile ? ' system-node--sov-hostile' : ''}${isSovBlue ? ' system-node--sov-blue' : ''}${uniformSize ? ' system-node--uniform' : ''}${compactMode ? ' system-node--compact' : ''}${watchDef ? ' system-node--watched' : ''}${filteredOut ? ' system-node--filtered-out' : ''}${contentMatch ? ' system-node--content-match' : ''}`}
+      className={`system-node${sys.locked ? ' nopan' : ''}${isTarget ? ' system-node--connect-target' : ''}${isStale ? ' system-node--stale' : ''}${isSovHostile ? ' system-node--sov-hostile' : ''}${isSovBlue ? ' system-node--sov-blue' : ''}${uniformSize ? ' system-node--uniform' : ''}${compactMode ? ' system-node--compact' : ''}${watchDef ? ' system-node--watched' : ''}${filteredOut ? ' system-node--filtered-out' : ''}${contentMatch ? ' system-node--content-match' : ''}${sys.dimmed ? ' system-node--dimmed' : ''}`}
       style={{
         '--class-color': color,
         ...(intelColor ? { '--intel-color': intelColor } : null),

@@ -24,6 +24,7 @@ export function ChainsPane() {
   const addRoute          = useMapStore((s) => s.addRoute);
   const removeRoute       = useMapStore((s) => s.removeRoute);
   const requestCenterOnNode = useMapStore((s) => s.requestCenterOnNode);
+  const setRouteHighlight = useMapStore((s) => s.setRouteHighlight);
   const canEdit           = useCanEdit();
   const whTypes           = useWormholeTypes();
 
@@ -128,7 +129,12 @@ export function ChainsPane() {
             const hops  = route.connectionIds.length;
             const steps = open ? buildChainSteps(route, map, sigsBySystem) : [];
             return (
-              <li key={route.id} className="chain-item">
+              <li
+                key={route.id}
+                className="chain-item"
+                onMouseEnter={() => setRouteHighlight({ systemIds: route.systemIds, connectionIds: route.connectionIds })}
+                onMouseLeave={() => setRouteHighlight(null)}
+              >
                 <div className="chain-item__head">
                   <button
                     type="button"
