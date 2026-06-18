@@ -11,9 +11,11 @@
     "remove": "Supprimer la chaîne",
     "centerOn": "Centrer sur {{system}}",
     "brokenHop": "Saut rompu — à re-scanner",
-    "viaGate": "Sauter le stargate",
+    "viaGate": "Warp vers la stargate",
     "warpSig": "Warp vers {{sig}}",
-    "warpWormhole": "Warp vers le trou de ver"
+    "warpWormhole": "Warp vers le trou de ver",
+    "noMatch": "Aucun système correspondant",
+    "clearSelection": "Effacer"
   },
   "session": {
     "idleLogout": "Déconnecté pour inactivité.",

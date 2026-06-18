@@ -11,9 +11,11 @@
     "remove": "Eliminar cadena",
     "centerOn": "Centrar en {{system}}",
     "brokenHop": "Salto roto — vuelve a explorar",
-    "viaGate": "Saltar la puerta estelar",
+    "viaGate": "Warp a la puerta estelar",
     "warpSig": "Warp a {{sig}}",
-    "warpWormhole": "Warp al agujero de gusano"
+    "warpWormhole": "Warp al agujero de gusano",
+    "noMatch": "Ningún sistema coincidente",
+    "clearSelection": "Borrar"
   },
   "session": {
     "idleLogout": "Sesión cerrada por inactividad.",
