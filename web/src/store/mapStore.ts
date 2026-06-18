@@ -4,7 +4,7 @@ import { v4 as uuid } from 'uuid';
 import { api } from '../api/client';
 import { enqueue } from './pendingQueue';
 import { toast } from '../components/ui/Toaster';
-import type { WormholeMap, MapSystem, MapConnection, SystemClass, WormholeEffect } from '../types';
+import type { WormholeMap, MapSystem, MapConnection, SavedRoute, SystemClass, WormholeEffect } from '../types';
 import { pickHandles } from '../components/map/edgeUtils';
 
 // Another of the account's characters chosen as the route/centre origin.
@@ -85,7 +85,7 @@ function syncMove(mapId: string, systemId: string, position: { x: number; y: num
 // consumer of WormholeMap, so we keep the empty string and centralise the
 // check here.
 const emptyMap = (): WormholeMap => ({
-  id: '', name: '', systems: [], connections: [],
+  id: '', name: '', systems: [], connections: [], routes: [],
   createdAt: '', updatedAt: '',
 });
 
@@ -245,6 +245,12 @@ interface MapStore {
   // node positions. Used by the sidebar button and after a region seed.
   optimizeConnections: () => void;
 
+  // Saved chains (map-scoped, named recorded paths). addRoute returns the new
+  // id, or null if the path is too short to save.
+  addRoute: (name: string, systemIds: string[], connectionIds: string[]) => string | null;
+  renameRoute: (id: string, name: string) => void;
+  removeRoute: (id: string) => void;
+
   // Selection
   selectSystem: (id: string | null) => void;
   selectConnection: (id: string | null) => void;
@@ -290,6 +296,9 @@ export type RemoteEvent =
   | { type: 'connection.add';    connection: MapConnection }
   | { type: 'connection.update'; id: string; updates: Partial<MapConnection> }
   | { type: 'connection.remove'; id: string }
+  | { type: 'route.add';         route: SavedRoute }
+  | { type: 'route.update';      id: string; updates: Partial<SavedRoute> }
+  | { type: 'route.remove';      id: string }
   | { type: 'map.meta';          name?: string; locked?: boolean }
   | { type: 'map.resync' }
   | { type: 'sig.changed';       systemId: string }
@@ -554,6 +563,9 @@ export const useMapStore = create<MapStore>()((set, get) => {
 
       try {
         const map = await api<WormholeMap>(`/api/maps/${id}`);
+        // Older payloads / share responses may omit routes — normalise so the
+        // chains slice can always read an array.
+        if (!Array.isArray(map.routes)) map.routes = [];
         localStorage.setItem('nexum.lastMapId', id);
         set({ map, activeMapId: id, selectedSystemId: null, selectedConnectionId: null, currentSystemId: null, undoStack: [], sigTypesBySystem: {}, contentBySystem: {}, contentFilter: { sigTypes: [], anomTypes: [], nameQuery: '' } });
       } catch (err) {
@@ -1007,6 +1019,42 @@ export const useMapStore = create<MapStore>()((set, get) => {
       }
     },
 
+    addRoute: (name, systemIds, connectionIds) => {
+      if (systemIds.length < 2) return null;
+      const { activeMapId } = get();
+      const id = uuid();
+      const now = new Date().toISOString();
+      const route: SavedRoute = { id, name, systemIds, connectionIds, createdAt: now, updatedAt: now };
+      set((s) => ({ map: { ...s.map, routes: [...(s.map.routes ?? []), route] } }));
+      if (activeMapId) {
+        const url  = `/api/maps/${activeMapId}/routes`;
+        const body = JSON.stringify({ id, name, systemIds, connectionIds });
+        api(url, { method: 'POST', body }).catch(() => enqueue(`addRoute:${id}`, url, 'POST', body));
+      }
+      return id;
+    },
+
+    renameRoute: (id, name) => {
+      const { activeMapId } = get();
+      set((s) => ({
+        map: { ...s.map, routes: (s.map.routes ?? []).map((r) => r.id === id ? { ...r, name } : r) },
+      }));
+      if (activeMapId) {
+        const url  = `/api/maps/${activeMapId}/routes/${id}`;
+        const body = JSON.stringify({ name });
+        api(url, { method: 'PATCH', body }).catch(() => enqueue(`renameRoute:${id}`, url, 'PATCH', body));
+      }
+    },
+
+    removeRoute: (id) => {
+      const { activeMapId } = get();
+      set((s) => ({ map: { ...s.map, routes: (s.map.routes ?? []).filter((r) => r.id !== id) } }));
+      if (activeMapId) {
+        const url = `/api/maps/${activeMapId}/routes/${id}`;
+        api(url, { method: 'DELETE' }).catch(() => enqueue(`removeRoute:${id}`, url, 'DELETE', ''));
+      }
+    },
+
     selectSystem: (id) => set({ selectedSystemId: id, selectedConnectionId: null }),
     selectConnection: (id) => set({ selectedConnectionId: id, selectedSystemId: null }),
     setCurrentSystem: (id) => set({ currentSystemId: id }),
@@ -1056,6 +1104,25 @@ export const useMapStore = create<MapStore>()((set, get) => {
           set((s) => ({
             selectedConnectionId: s.selectedConnectionId === event.id ? null : s.selectedConnectionId,
             map: { ...s.map, connections: s.map.connections.filter((c) => c.id !== event.id) },
+          }));
+          break;
+        }
+        case 'route.add': {
+          const route = event.route;
+          set((s) => (s.map.routes ?? []).some((r) => r.id === route.id)
+            ? s
+            : { map: { ...s.map, routes: [...(s.map.routes ?? []), route] } });
+          break;
+        }
+        case 'route.update': {
+          set((s) => ({
+            map: { ...s.map, routes: (s.map.routes ?? []).map((r) => r.id === event.id ? { ...r, ...event.updates } : r) },
+          }));
+          break;
+        }
+        case 'route.remove': {
+          set((s) => ({
+            map: { ...s.map, routes: (s.map.routes ?? []).filter((r) => r.id !== event.id) },
           }));
           break;
         }

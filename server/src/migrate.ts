@@ -256,6 +256,26 @@ export async function migrate() {
     ALTER TABLE map_connections ADD COLUMN IF NOT EXISTS source_signature_id UUID REFERENCES map_signatures(id) ON DELETE SET NULL;
     ALTER TABLE map_connections ADD COLUMN IF NOT EXISTS target_signature_id UUID REFERENCES map_signatures(id) ON DELETE SET NULL;
 
+    -- Saved chains: a named, user-recorded path through the map's own
+    -- connections (A..B). Stored as the explicit step sequence — ordered
+    -- system ids + the connection traversed between each pair — so hops can be
+    -- shown step-by-step and flagged broken when a connection goes away,
+    -- without silently re-routing. The id arrays reference map_systems /
+    -- map_connections by value (not FK arrays — Postgres has no per-element FK);
+    -- the app validates each hop against the live map when rendering. Rows are
+    -- map-scoped and cascade-deleted with the map.
+    CREATE TABLE IF NOT EXISTS map_routes (
+      id                 UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+      map_id             UUID        NOT NULL REFERENCES maps(id) ON DELETE CASCADE,
+      name               TEXT        NOT NULL DEFAULT '',
+      system_ids         UUID[]      NOT NULL DEFAULT '{}',
+      connection_ids     UUID[]      NOT NULL DEFAULT '{}',
+      created_by_user_id INTEGER     REFERENCES users(id) ON DELETE SET NULL,
+      created_at         TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at         TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+    CREATE INDEX IF NOT EXISTS idx_map_routes_map ON map_routes (map_id);
+
     -- Resolved owner corp ID for structures. Populated by ESI lookup when
     -- the user supplies an eve_id (the structure's in-game ID) or when
     -- the structure name parser finds a known corp/alliance. Lets the

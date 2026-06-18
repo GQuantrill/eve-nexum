@@ -81,6 +81,9 @@ export function SharedMapView({ token }: { token: string }) {
             locked:                 true,
             systems:                payload.systems,
             connections:            payload.connections,
+            // Saved chains aren't exposed over share links — keep empty so the
+            // shared map satisfies WormholeMap without leaking route data.
+            routes:                 [],
             createdAt:              isInitial ? new Date().toISOString() : prev.map.createdAt,
             updatedAt:              payload.expiresAt,
             // Carry the link's category flags onto the map so panels

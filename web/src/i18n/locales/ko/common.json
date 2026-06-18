@@ -1,4 +1,20 @@
 {
+  "chains": {
+    "from": "출발…",
+    "to": "도착…",
+    "namePlaceholder": "체인 이름 (선택)",
+    "create": "체인 저장",
+    "noPath": "이 지도에서 해당 성계 사이에 경로가 없습니다.",
+    "empty": "저장된 체인이 없습니다. 시작 성계와 도착 성계를 선택해 기록하세요.",
+    "unnamed": "이름 없는 체인",
+    "hops": "{{count}}점프",
+    "remove": "체인 삭제",
+    "centerOn": "{{system}}(으)로 중심 이동",
+    "brokenHop": "끊긴 점프 — 재정찰 필요",
+    "viaGate": "스타게이트 점프",
+    "warpSig": "{{sig}}(으)로 워프",
+    "warpWormhole": "웜홀로 워프"
+  },
   "session": {
     "idleLogout": "비활성으로 인해 로그아웃되었습니다.",
     "lockedTitle": "일시정지됨",
@@ -325,6 +341,7 @@
       "contentFilter": "콘텐츠 필터",
       "connections": "연결",
       "route": "경로",
+      "chains": "체인",
       "chainExits": "체인 출구",
       "proximityAlerts": "근접 경보",
       "activity": "활동",
