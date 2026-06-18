@@ -561,6 +561,10 @@
   "connPanel": {
     "whType": "ワームホールタイプ",
     "whTypePlaceholder": "K162、C247…",
+    "sigLink": "関連シグネチャ",
+    "sigInSystem": "{{system}} のシグネチャ",
+    "sigNone": "未リンク",
+    "sigUnnamed": "名称未設定のシグネチャ",
     "massStatus": "質量ステータス",
     "stable": "安定",
     "destabilized": "不安定化（<50%）",

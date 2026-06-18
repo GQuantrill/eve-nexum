@@ -98,6 +98,9 @@ export function ConnectionPanel() {
   const [stack,  setStack]  = useState<number[]>([]);
   const [pendingPass, setPendingPass] = useState<{ kg: number; strand: boolean } | null>(null);
   const [sessionConnId, setSessionConnId] = useState<string | undefined>(undefined);
+  // Signatures on the two endpoint systems — feeds both the WH-type auto-detect
+  // and the per-end "backing signature" link dropdowns below.
+  const [endpointSigs, setEndpointSigs] = useState<{ src: Signature[]; tgt: Signature[] }>({ src: [], tgt: [] });
 
   // No-op the mutation calls when the user lacks topology permission. The
   // panel still renders so readonly users can inspect the connection.
@@ -108,30 +111,37 @@ export function ConnectionPanel() {
   const src = conn ? map.systems.find((s) => s.id === conn.sourceId) : undefined;
   const tgt = conn ? map.systems.find((s) => s.id === conn.targetId) : undefined;
 
-  // Auto-detect the WH type from signatures on the two endpoint systems.
-  // Fires once when a new connection is selected. Only fills if conn.type is
-  // strictly `null` (never touched) so manual entries — including manual
-  // clearing to '' — are never overwritten. Already-set K162 may be upgraded.
+  // Fetch the signatures on both endpoint systems whenever the selected
+  // connection (or its endpoints) changes. Held in state so both the WH-type
+  // auto-detect and the link dropdowns read the same list. Cleared for
+  // jumpgate links, which are never wormholes.
   useEffect(() => {
-    if (!conn || !src || !tgt || !map.id) return;
-    // Jumpgate (stargate) links are never wormholes — never auto-type them.
-    if (conn.connectionType === 'jumpgate') return;
-    if (conn.type !== null && conn.type.toUpperCase() !== 'K162') return;
+    if (!conn || !src || !tgt || !map.id || conn.connectionType === 'jumpgate') {
+      setEndpointSigs({ src: [], tgt: [] });
+      return;
+    }
     let cancelled = false;
     Promise.all([
       api<Signature[]>(`/api/maps/${map.id}/systems/${src.id}/signatures`).catch(() => [] as Signature[]),
       api<Signature[]>(`/api/maps/${map.id}/systems/${tgt.id}/signatures`).catch(() => [] as Signature[]),
-    ]).then(([srcSigs, tgtSigs]) => {
-      if (cancelled || !conn) return;
-      const detected = detectWhType(srcSigs, tgtSigs, src, tgt);
-      if (!detected) return;
-      // Don't downgrade an existing K162 to itself, only to a real code.
-      if (conn.type && conn.type.toUpperCase() === 'K162' && detected === 'K162') return;
-      updateConnection(conn.id, { type: detected });
-    });
+    ]).then(([s, tg]) => { if (!cancelled) setEndpointSigs({ src: s, tgt: tg }); });
     return () => { cancelled = true; };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [conn?.id]);
+  }, [conn?.id, src?.id, tgt?.id, map.id, conn?.connectionType]);
+
+  // Auto-detect the WH type from the fetched endpoint signatures. Only fills if
+  // conn.type is strictly `null` (never touched) so manual entries — including
+  // manual clearing to '' — are never overwritten. Already-set K162 may be
+  // upgraded to the real code from the other side.
+  useEffect(() => {
+    if (!conn || !src || !tgt || conn.connectionType === 'jumpgate') return;
+    if (conn.type !== null && conn.type.toUpperCase() !== 'K162') return;
+    const detected = detectWhType(endpointSigs.src, endpointSigs.tgt, src, tgt);
+    if (!detected) return;
+    if (conn.type && conn.type.toUpperCase() === 'K162' && detected === 'K162') return;
+    updateConnection(conn.id, { type: detected });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conn?.id, endpointSigs]);
 
   // Persist the roller config whenever the pilot tweaks it.
   useEffect(() => { saveRoller(roller); }, [roller]);
@@ -152,6 +162,15 @@ export function ConnectionPanel() {
 
   const update = (updates: Parameters<typeof updateConnection>[1]) =>
     updateConnection(conn.id, updates);
+
+  // Candidate sigs for the per-end "backing signature" link: wormholes, plus
+  // unclassified sigs (an unscanned hole). Labelled by sig code + WH type.
+  const linkSigs = (list: Signature[]) =>
+    list.filter((s) => s.sigType === 'wormhole' || s.sigType === 'unknown');
+  const sigLabel = (s: Signature) => {
+    const code = s.sigId || t('connPanel.sigUnnamed');
+    return s.whType ? `${code} · ${s.whType}` : code;
+  };
 
   const whSpec = conn.type ? whTypes[conn.type.toUpperCase()] : undefined;
   const massUsed = conn.massUsed ?? 0;
@@ -236,6 +255,38 @@ export function ConnectionPanel() {
           placeholder={t('connPanel.whTypePlaceholder')}
         />
       </label>
+
+      {conn.connectionType !== 'jumpgate' && (
+        <div className="conn-siglink">
+          <div className="conn-siglink__label">{t('connPanel.sigLink')}</div>
+          <label className="field">
+            <span>{t('connPanel.sigInSystem', { system: src?.name ?? '?' })}</span>
+            <select
+              value={conn.sourceSignatureId ?? ''}
+              disabled={!canEdit}
+              onChange={(e) => update({ sourceSignatureId: e.target.value || null })}
+            >
+              <option value="">{t('connPanel.sigNone')}</option>
+              {linkSigs(endpointSigs.src).map((s) => (
+                <option key={s.id} value={s.id}>{sigLabel(s)}</option>
+              ))}
+            </select>
+          </label>
+          <label className="field">
+            <span>{t('connPanel.sigInSystem', { system: tgt?.name ?? '?' })}</span>
+            <select
+              value={conn.targetSignatureId ?? ''}
+              disabled={!canEdit}
+              onChange={(e) => update({ targetSignatureId: e.target.value || null })}
+            >
+              <option value="">{t('connPanel.sigNone')}</option>
+              {linkSigs(endpointSigs.tgt).map((s) => (
+                <option key={s.id} value={s.id}>{sigLabel(s)}</option>
+              ))}
+            </select>
+          </label>
+        </div>
+      )}
 
       <label className="field">
         <span>{t('connPanel.massStatus')}</span>

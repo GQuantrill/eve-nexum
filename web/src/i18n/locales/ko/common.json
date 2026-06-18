@@ -561,6 +561,10 @@
   "connPanel": {
     "whType": "웜홀 유형",
     "whTypePlaceholder": "K162, C247…",
+    "sigLink": "연결된 시그니처",
+    "sigInSystem": "{{system}}의 시그니처",
+    "sigNone": "연결 안 됨",
+    "sigUnnamed": "이름 없는 시그니처",
     "massStatus": "질량 상태",
     "stable": "안정",
     "destabilized": "불안정 (<50%)",

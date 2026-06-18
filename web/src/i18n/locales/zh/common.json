@@ -561,6 +561,10 @@
   "connPanel": {
     "whType": "虫洞类型",
     "whTypePlaceholder": "K162、C247…",
+    "sigLink": "关联信号",
+    "sigInSystem": "{{system}} 中的信号",
+    "sigNone": "未关联",
+    "sigUnnamed": "未命名信号",
     "massStatus": "质量状态",
     "stable": "稳定",
     "destabilized": "已失稳（<50%）",

@@ -148,6 +148,13 @@ export interface MapConnection {
   size: ConnectionSize;
   massUsed: number; // kg — total mass jumped through this connection
   eolAt: string | null; // ISO timestamp when EOL was marked (null = fresh)
+  /** Optional links to the backing wormhole signature at each end: the sig you
+   *  warp to in the source system, and the (usually K162) sig in the target.
+   *  Powers the per-hop "warp to ABC-123" directions in saved chains. Null when
+   *  unlinked or for jumpgate connections. Cleared to null if the sig is
+   *  deleted (FK ON DELETE SET NULL). */
+  sourceSignatureId: string | null;
+  targetSignatureId: string | null;
   /** True once the backing wormhole sig was deleted (hole collapsed). The
    *  connection is kept on the map but quarantined — rendered severed and
    *  excluded from routing — so the chain is still traceable. */
