@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { mass } from '../../i18n/format';
 import { useMapStore } from '../../store/mapStore';
@@ -7,6 +7,7 @@ import { useNow30s } from '../../hooks/useNow30s';
 import { useCanEdit } from '../../hooks/useCanEdit';
 import { useCharacterLocation } from '../../hooks/useCharacterLocation';
 import { WHTypeInfo } from './WHTypeInfo';
+import { whSizeForType } from '../../utils/wormholeSize';
 import { ConfirmModal } from './ConfirmModal';
 import { XIcon } from '@phosphor-icons/react';
 import { api } from '../../api/client';
@@ -142,6 +143,24 @@ export function ConnectionPanel() {
     updateConnection(conn.id, { type: detected });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conn?.id, endpointSigs]);
+
+  // Default the connection's size from its wormhole type's SDE max-jump-mass,
+  // once per (connection, type). Leaves manual size changes intact (the key
+  // only changes when the *type* changes), and never overrides a code we can't
+  // size yet (waits for the types to load). Wormhole connections only.
+  const sizeSyncedFor = useRef<string | null>(null);
+  useEffect(() => {
+    if (!conn || conn.connectionType !== 'standard') return;
+    const code = conn.type?.toUpperCase();
+    if (!code) return;
+    const key = `${conn.id}:${code}`;
+    if (key === sizeSyncedFor.current) return;
+    const cls = whSizeForType(code, whTypes);
+    if (!cls) return; // types not loaded yet / unknown code — retry on load
+    sizeSyncedFor.current = key;
+    if (cls !== conn.size) updateConnection(conn.id, { size: cls });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conn?.id, conn?.type, conn?.connectionType, whTypes]);
 
   // Persist the roller config whenever the pilot tweaks it.
   useEffect(() => { saveRoller(roller); }, [roller]);

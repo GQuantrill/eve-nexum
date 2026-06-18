@@ -6,6 +6,7 @@ import { useWormholeTypes } from '../../hooks/useWormholeTypes';
 import { api } from '../../api/client';
 import { toast } from './Toaster';
 import { buildChainPath, buildChainSteps } from '../../utils/chains';
+import { whSizeForType, whSizeLabel } from '../../utils/wormholeSize';
 import { SystemCombobox } from './SystemCombobox';
 import type { Signature } from '../../types';
 import {
@@ -64,18 +65,10 @@ export function ChainsPane() {
     return () => { cancelled = true; };
   }, [expandedId, map.id, map.routes]);
 
-  // Derive a wormhole's size class from its SDE max-jumpable-mass (attr 1383,
-  // served via /api/wormholes/types), mapped to the connection-panel size
-  // labels. Returns null for unknown codes (e.g. K162, which has no dogma).
+  // Wormhole size derived from the SDE per-jump cap (shared helper).
   const sizeLabel = (whType: string | null): string | null => {
-    if (!whType) return null;
-    const spec = whTypes[whType.toUpperCase()];
-    const m = spec?.maxJumpMass ?? 0;
-    if (!m) return null;
-    if (m >= 1_000_000_000) return t('connPanel.sizeXl');
-    if (m >= 300_000_000)   return t('connPanel.sizeLarge');
-    if (m >= 62_000_000)    return t('connPanel.sizeMedium');
-    return t('connPanel.sizeSmall');
+    const cls = whSizeForType(whType, whTypes);
+    return cls ? whSizeLabel(t, cls) : null;
   };
 
   const create = () => {

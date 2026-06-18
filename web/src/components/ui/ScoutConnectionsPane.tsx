@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { useScoutConnections } from '../../hooks/useScoutConnections';
+import { useWormholeTypes } from '../../hooks/useWormholeTypes';
+import { whSizeForType, whSizeShort } from '../../utils/wormholeSize';
 import { useRouteOrigin } from '../../hooks/useRouteOrigin';
 import { useRoute } from '../../hooks/useRoute';
 import { setWaypoint, RouteSquares } from './routeUi';
@@ -64,6 +66,7 @@ export function ScoutConnectionsPane({ scoutSystem }: Props) {
   const all      = useScoutConnections();
   const origin   = useRouteOrigin();
   const routeMode = useMapStore((s) => s.routeMode);
+  const whTypes  = useWormholeTypes();
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [sortBy, setSortBy] = useState<ScoutSort>(() => readScoutSort(scoutSystem));
 
@@ -172,7 +175,12 @@ export function ScoutConnectionsPane({ scoutSystem }: Props) {
             <div className="scout-row__meta">
               <span className="scout-row__wh">{c.whType}</span>
               <span className="scout-row__size">
-                {SIZE_LABELS[c.maxShipSize] ?? c.maxShipSize}
+                {/* Prefer the SDE-derived size from the WH type; fall back to
+                    eve-scout's own maxShipSize if the type isn't in our data. */}
+                {(() => {
+                  const cls = whSizeForType(c.whType, whTypes);
+                  return cls ? whSizeShort(cls) : (SIZE_LABELS[c.maxShipSize] ?? c.maxShipSize);
+                })()}
               </span>
               <span className="scout-row__sig">{c.inSignature}</span>
             </div>
