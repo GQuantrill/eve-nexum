@@ -1,4 +1,4 @@
-import type { WormholeMap, SavedRoute, Signature } from '../types';
+import type { WormholeMap, MapSystem, SavedRoute, Signature } from '../types';
 
 // A computed path through the map's own connections: the ordered system ids and
 // the connection traversed between each consecutive pair (length = systems - 1).
@@ -70,14 +70,22 @@ export interface ChainStep {
   broken: boolean;          // connection removed or quarantined — needs re-scouting
 }
 
-// Resolve a saved chain's stored step sequence against the current map (and a
-// uuid->Signature lookup for the linked backing sigs) into displayable steps.
-// A hop whose connection is gone or quarantined is flagged `broken` rather than
-// silently re-routed, so the user knows that leg needs re-scouting.
+// Does a signature's "leads to" point at the given system (by name or class)?
+function sigLeadsTo(sig: Signature, to: MapSystem | undefined): boolean {
+  if (!to || !sig.whLeadsTo) return false;
+  const t = sig.whLeadsTo.trim().toUpperCase();
+  return t === to.name.toUpperCase() || t === to.systemClass.toUpperCase();
+}
+
+// Resolve a saved chain's stored step sequence against the current map into
+// displayable steps. `sigsBySystem` is the wormhole/scan signatures per system
+// (the from-system's are used to name the sig to warp to). A hop whose
+// connection is gone or quarantined is flagged `broken` rather than silently
+// re-routed, so the user knows that leg needs re-scouting.
 export function buildChainSteps(
   route: SavedRoute,
   map: WormholeMap,
-  sigsById: Map<string, Signature>,
+  sigsBySystem: Map<string, Signature[]>,
 ): ChainStep[] {
   const sysById  = new Map(map.systems.map((s) => [s.id, s]));
   const connById = new Map(map.connections.map((c) => [c.id, c]));
@@ -100,12 +108,18 @@ export function buildChainSteps(
       whType = conn.type ?? null;
       broken = conn.broken;
       if (!broken && kind === 'wormhole') {
-        // The sig you warp to lives in the FROM system: pick the end of the
-        // connection that matches this hop's direction.
+        // The sig you warp to lives in the FROM system. Prefer the explicitly
+        // linked sig for this hop's direction; otherwise auto-match the
+        // from-system wormhole sig whose "leads to" points at the target.
+        const fromSigs = sigsBySystem.get(fromId) ?? [];
         const sigRef = conn.sourceId === fromId ? conn.sourceSignatureId
                      : conn.targetId === fromId ? conn.targetSignatureId
                      : null;
-        const sig = sigRef ? sigsById.get(sigRef) : undefined;
+        let sig = sigRef ? fromSigs.find((s) => s.id === sigRef) : undefined;
+        if (!sig) {
+          const to = sysById.get(toId);
+          sig = fromSigs.find((s) => s.sigType === 'wormhole' && sigLeadsTo(s, to));
+        }
         if (sig) sigId = sig.sigId || null;
       }
     }

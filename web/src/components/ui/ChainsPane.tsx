@@ -28,9 +28,9 @@ export function ChainsPane() {
   const [toId, setToId]     = useState('');
   const [name, setName]     = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  // uuid -> Signature for the expanded chain's endpoint systems, so steps can
-  // show the exact sig code you warp to.
-  const [sigsById, setSigsById] = useState<Map<string, Signature>>(new Map());
+  // systemId -> its signatures, for the expanded chain's from-systems, so steps
+  // can name the sig to warp to (explicit link or auto-matched by "leads to").
+  const [sigsBySystem, setSigsBySystem] = useState<Map<string, Signature[]>>(new Map());
 
   const sortedSystems = useMemo(
     () => [...map.systems].sort((a, b) => a.name.localeCompare(b.name)),
@@ -55,9 +55,9 @@ export function ChainsPane() {
       ),
     ).then((lists) => {
       if (cancelled) return;
-      const next = new Map<string, Signature>();
-      for (const list of lists) for (const sig of list) next.set(sig.id, sig);
-      setSigsById(next);
+      const next = new Map<string, Signature[]>();
+      fromSystems.forEach((sysId, i) => next.set(sysId, lists[i] ?? []));
+      setSigsBySystem(next);
     });
     return () => { cancelled = true; };
   }, [expandedId, map.id, map.routes]);
@@ -117,7 +117,7 @@ export function ChainsPane() {
           {map.routes.map((route) => {
             const open  = expandedId === route.id;
             const hops  = route.connectionIds.length;
-            const steps = open ? buildChainSteps(route, map, sigsById) : [];
+            const steps = open ? buildChainSteps(route, map, sigsBySystem) : [];
             return (
               <li key={route.id} className="chain-item">
                 <div className="chain-item__head">
