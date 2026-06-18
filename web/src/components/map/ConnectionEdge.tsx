@@ -202,7 +202,11 @@ export const ConnectionEdge = memo(({
               ? <span className="connection-label__gate">G</span>
               : conn?.type
                 ? <span className="connection-label__type">{conn.type}</span>
-                : null;
+                // Typeless wormhole normally shows no badge; surface a "WH" one
+                // while hovered so every traced link reveals its jump type.
+                : highlighted
+                  ? <span className="connection-label__type">WH</span>
+                  : null;
           const massNode = !noLifetime && massLabel
             ? <span className={massLabel.cls}>{massLabel.text}</span>
             : null;
