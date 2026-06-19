@@ -2152,6 +2152,16 @@
   gap: 6px;
 }
 
+.watchlist__drag-handle {
+  flex: none;
+  background: none; border: none;
+  color: #6a80a0; cursor: grab; user-select: none;
+  padding: 0 2px;
+  font-size: calc(13px * var(--font-scale, 1)); line-height: 1;
+}
+.watchlist__drag-handle:hover { color: #8a9ab8; }
+.watchlist__drag-handle:active { cursor: grabbing; }
+
 .watchlist__marker-icon {
   flex-shrink: 0;
   display: flex;
