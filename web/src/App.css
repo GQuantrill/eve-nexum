@@ -3790,6 +3790,15 @@ div.system-node__easy-handle {
 
 .chain-item { border: 1px solid #1a2240; border-radius: 6px; background: #0b0e16; }
 .chain-item__head { display: flex; align-items: center; }
+.chain-item__drag-handle {
+  flex: none;
+  background: none; border: none;
+  color: #6a80a0; cursor: grab; user-select: none;
+  padding: 0 2px 0 6px;
+  font-size: calc(13px * var(--font-scale, 1)); line-height: 1;
+}
+.chain-item__drag-handle:hover { color: #8a9ab8; }
+.chain-item__drag-handle:active { cursor: grabbing; }
 .chain-item__toggle {
   flex: 1; min-width: 0;
   display: flex; align-items: center; gap: 6px;

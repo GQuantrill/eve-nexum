@@ -1719,9 +1719,11 @@ mapsRouter.post('/:mapId/routes', async (req, res) => {
     return;
   }
   const me = authUser(req);
+  // New chains append to the bottom of the list (next sort_order for the map).
   await db.query(
-    `INSERT INTO map_routes (id, map_id, name, system_ids, connection_ids, created_by_user_id)
-     VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT (id) DO NOTHING`,
+    `INSERT INTO map_routes (id, map_id, name, system_ids, connection_ids, created_by_user_id, sort_order)
+     SELECT $1,$2,$3,$4,$5,$6, COALESCE(MAX(sort_order) + 1, 0) FROM map_routes WHERE map_id = $2
+     ON CONFLICT (id) DO NOTHING`,
     [id, mapId, name, systemIds, connectionIds ?? [], me.userId],
   );
   await touchMap(mapId);
@@ -1752,6 +1754,30 @@ mapsRouter.patch('/:mapId/routes/:routeId', async (req, res) => {
   );
   await touchMap(mapId);
   publishToMap(mapId, { type: 'route.update', actor: req.get('x-client-id') ?? null, id: routeId, updates });
+  res.json({ ok: true });
+});
+
+// Persist a drag-and-drop reorder of the chains list. Writes sort_order = the
+// position in `orderedIds` for every chain that belongs to the map; ids not in
+// the map are ignored, ids omitted keep their old sort_order (harmless tie).
+mapsRouter.put('/:mapId/routes/order', async (req, res) => {
+  const { mapId } = req.params;
+  const access = await requireMapContentWrite(res, mapId, req);
+  if (!access) return;
+  const { orderedIds } = req.body as { orderedIds?: string[] };
+  if (!Array.isArray(orderedIds) || !orderedIds.length) {
+    res.status(400).json({ error: 'orderedIds must be a non-empty array' });
+    return;
+  }
+  await db.query(
+    `UPDATE map_routes AS r
+        SET sort_order = o.ord - 1, updated_at = NOW()
+       FROM unnest($1::uuid[]) WITH ORDINALITY AS o(id, ord)
+      WHERE r.id = o.id AND r.map_id = $2`,
+    [orderedIds, mapId],
+  );
+  await touchMap(mapId);
+  publishToMap(mapId, { type: 'route.reorder', actor: req.get('x-client-id') ?? null, orderedIds });
   res.json({ ok: true });
 });
 

@@ -100,7 +100,7 @@ export async function loadFullMap(mapId: string) {
     db.query(
       `SELECT id, name, system_ids AS "systemIds", connection_ids AS "connectionIds",
               created_at AS "createdAt", updated_at AS "updatedAt"
-       FROM map_routes WHERE map_id = $1 ORDER BY created_at`,
+       FROM map_routes WHERE map_id = $1 ORDER BY sort_order, created_at`,
       [mapId],
     ),
   ]);
