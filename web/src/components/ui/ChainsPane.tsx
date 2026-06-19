@@ -24,6 +24,7 @@ export function ChainsPane() {
   const addRoute          = useMapStore((s) => s.addRoute);
   const removeRoute       = useMapStore((s) => s.removeRoute);
   const requestCenterOnNode = useMapStore((s) => s.requestCenterOnNode);
+  const setRouteHighlight = useMapStore((s) => s.setRouteHighlight);
   const canEdit           = useCanEdit();
   const whTypes           = useWormholeTypes();
 
@@ -128,7 +129,12 @@ export function ChainsPane() {
             const hops  = route.connectionIds.length;
             const steps = open ? buildChainSteps(route, map, sigsBySystem) : [];
             return (
-              <li key={route.id} className="chain-item">
+              <li
+                key={route.id}
+                className="chain-item"
+                onMouseEnter={() => setRouteHighlight({ systemIds: route.systemIds, connectionIds: route.connectionIds })}
+                onMouseLeave={() => setRouteHighlight(null)}
+              >
                 <div className="chain-item__head">
                   <button
                     type="button"
@@ -154,7 +160,20 @@ export function ChainsPane() {
                 {open && (
                   <ol className="chain-steps">
                     {steps.map((step) => (
-                      <li key={step.index} className={`chain-step${step.broken ? ' chain-step--broken' : ''}`}>
+                      <li
+                        key={step.index}
+                        className={`chain-step${step.broken ? ' chain-step--broken' : ''}`}
+                        // Narrow the map highlight to just this hop on hover;
+                        // back to the whole chain on leave (still in the row).
+                        onMouseEnter={() => setRouteHighlight({
+                          systemIds: [step.fromId, step.toId],
+                          connectionIds: [route.connectionIds[step.index - 1]],
+                        })}
+                        onMouseLeave={() => setRouteHighlight({
+                          systemIds: route.systemIds,
+                          connectionIds: route.connectionIds,
+                        })}
+                      >
                         <button
                           type="button"
                           className="chain-step__systems"

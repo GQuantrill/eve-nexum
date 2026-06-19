@@ -89,12 +89,12 @@ interface CtxMenu {
   selectedNodeIds?: string[]; // snapshot taken at right-click time before RF resets selection
 }
 
-function systemToNode(sys: MapSystem, selectedId: string | null, easyConnect = false, canEdit = true): Node {
+function systemToNode(sys: MapSystem, selectedId: string | null, easyConnect = false, canEdit = true, dimmed = false, routeHighlighted = false): Node {
   return {
     id: sys.id,
     type: 'system',
     position: sys.position,
-    data: { ...sys, selected: sys.id === selectedId },
+    data: { ...sys, selected: sys.id === selectedId, dimmed, routeHighlighted },
     draggable: canEdit && !sys.locked,
     dragHandle: easyConnect ? '.drag-handle' : undefined,
   };
@@ -108,6 +108,7 @@ export function MapCanvas() {
   const connections          = useMapStore((s) => s.map.connections);
   const selectedSystemId     = useMapStore((s) => s.selectedSystemId);
   const selectedConnectionId = useMapStore((s) => s.selectedConnectionId);
+  const routeHighlight       = useMapStore((s) => s.routeHighlight);
   const snapToGrid           = useMapStore((s) => s.snapToGrid);
   const showMinimap          = useMapStore((s) => s.showMinimap);
   const [minimapPosition]    = useMinimapPosition();
@@ -418,8 +419,12 @@ export function MapCanvas() {
   }, []);
 
   useEffect(() => {
-    setNodes(systems.map((s) => systemToNode(s, selectedSystemId, easyConnect, canEdit)));
-  }, [systems, selectedSystemId, easyConnect, setNodes, canEdit]);
+    const hl = routeHighlight ? new Set(routeHighlight.systemIds) : null;
+    setNodes(systems.map((s) => {
+      const inRoute = !!hl && hl.has(s.id);
+      return systemToNode(s, selectedSystemId, easyConnect, canEdit, !!hl && !inRoute, inRoute);
+    }));
+  }, [systems, selectedSystemId, easyConnect, setNodes, canEdit, routeHighlight]);
 
   useEffect(() => {
     if (!selectedSystemId) return;
@@ -586,6 +591,8 @@ export function MapCanvas() {
         if (g) g.push(c.id);
         else pairGroups.set(key, [c.id]);
       }
+      // While a saved chain is hovered, dim every edge that isn't on its route.
+      const routeConns = routeHighlight ? new Set(routeHighlight.connectionIds) : null;
       return connections.map((c) => {
         const ov = dragHandles.get(c.id);
         const key = c.sourceId < c.targetId ? `${c.sourceId}|${c.targetId}` : `${c.targetId}|${c.sourceId}`;
@@ -593,8 +600,10 @@ export function MapCanvas() {
         // Hover-only: a *selected* system would keep its links lit permanently
         // (e.g. your located system on a 2-node map), which reads as a stuck
         // hover effect — so highlight only follows the mouse.
+        const inRoute = !!routeConns && routeConns.has(c.id);
         const highlighted =
-          hoveredNodeId != null && (c.sourceId === hoveredNodeId || c.targetId === hoveredNodeId);
+          inRoute || (hoveredNodeId != null && (c.sourceId === hoveredNodeId || c.targetId === hoveredNodeId));
+        const dimmed = !!routeConns && !inRoute;
         return {
           id: c.id,
           source: c.sourceId,
@@ -605,14 +614,14 @@ export function MapCanvas() {
           // Lift highlighted edges above the rest so the traced link sits on top.
           zIndex: highlighted ? 10 : 0,
           data: {
-            ...c, edgeStyle, connectionThickness, highlighted,
+            ...c, edgeStyle, connectionThickness, highlighted, dimmed,
             parallelIndex: group.indexOf(c.id), parallelCount: group.length,
           } as unknown as Record<string, unknown>,
           selected: c.id === selectedConnectionId,
         };
       });
     },
-    [connections, selectedConnectionId, edgeStyle, connectionThickness, dragHandles, hoveredNodeId],
+    [connections, selectedConnectionId, edgeStyle, connectionThickness, dragHandles, hoveredNodeId, routeHighlight],
   );
 
   const onEdgesChange = useCallback(

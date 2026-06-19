@@ -66,6 +66,7 @@ export const ConnectionEdge = memo(({
     edgeStyle?: string;
     connectionThickness?: 'thin' | 'standard' | 'thick' | 'extra';
     highlighted?: boolean;
+    dimmed?: boolean;
     parallelIndex?: number;
     parallelCount?: number;
   };
@@ -180,7 +181,7 @@ export const ConnectionEdge = memo(({
             emphasized ? `drop-shadow(0 0 6px ${strokeColor})` : null,
             watchColor ? `drop-shadow(0 0 5px ${watchColor}) drop-shadow(0 0 2px ${watchColor})` : null,
           ].filter(Boolean).join(' ') || undefined,
-          opacity: broken ? 0.7 : emphasized || watchColor ? 1 : 0.85,
+          opacity: conn?.dimmed ? 0.1 : broken ? 0.7 : emphasized || watchColor ? 1 : 0.85,
         }}
         markerEnd={undefined}
       />

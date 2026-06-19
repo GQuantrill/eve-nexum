@@ -199,6 +199,12 @@ interface MapStore {
   requestCenterOnNode: (nodeId: string) => void;
   clearCenterRequest: () => void;
 
+  // Transient "highlight this saved chain on the map" — set while a chain row
+  // is hovered in the sidebar; the canvas dims every system/connection that
+  // isn't part of the route. null = nothing highlighted.
+  routeHighlight: { systemIds: string[]; connectionIds: string[] } | null;
+  setRouteHighlight: (v: { systemIds: string[]; connectionIds: string[] } | null) => void;
+
   // Route/centre origin override: point jump calcs + centring at another of
   // the account's characters (e.g. a scout on the chain exit) instead of the
   // active character. null = use the active character's live location.
@@ -485,6 +491,7 @@ export const useMapStore = create<MapStore>()((set, get) => {
     fitViewPending: false,
     centerRequestEveId: null,
     centerRequestNodeId: null,
+    routeHighlight: null,
     routeOrigin: null,
     sigRev: {},
     structRev: {},
@@ -792,6 +799,7 @@ export const useMapStore = create<MapStore>()((set, get) => {
     requestCenterOnEveSystem: (eveSystemId) => set({ centerRequestEveId: eveSystemId }),
     requestCenterOnNode: (nodeId) => set({ centerRequestNodeId: nodeId }),
     clearCenterRequest: () => set({ centerRequestEveId: null, centerRequestNodeId: null }),
+    setRouteHighlight: (v) => set({ routeHighlight: v }),
 
     setRouteOrigin: (o) => set({ routeOrigin: o }),
 
