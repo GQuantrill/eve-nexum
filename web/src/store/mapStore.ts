@@ -268,6 +268,7 @@ interface MapStore {
   addRoute: (name: string, systemIds: string[], connectionIds: string[]) => string | null;
   renameRoute: (id: string, name: string) => void;
   removeRoute: (id: string) => void;
+  reorderRoutes: (orderedIds: string[]) => void;
 
   // Selection
   selectSystem: (id: string | null) => void;
@@ -317,6 +318,7 @@ export type RemoteEvent =
   | { type: 'route.add';         route: SavedRoute }
   | { type: 'route.update';      id: string; updates: Partial<SavedRoute> }
   | { type: 'route.remove';      id: string }
+  | { type: 'route.reorder';     orderedIds: string[] }
   | { type: 'map.meta';          name?: string; locked?: boolean }
   | { type: 'map.resync' }
   | { type: 'sig.changed';       systemId: string }
@@ -1117,6 +1119,24 @@ export const useMapStore = create<MapStore>()((set, get) => {
       }
     },
 
+    reorderRoutes: (orderedIds) => {
+      const { activeMapId } = get();
+      // Optimistically re-sort the local list to match the dropped order; any
+      // route id not in orderedIds (shouldn't happen) keeps its relative tail
+      // position so nothing silently disappears.
+      set((s) => {
+        const byId = new Map((s.map.routes ?? []).map((r) => [r.id, r]));
+        const ordered = orderedIds.map((id) => byId.get(id)).filter((r): r is SavedRoute => !!r);
+        const rest = (s.map.routes ?? []).filter((r) => !orderedIds.includes(r.id));
+        return { map: { ...s.map, routes: [...ordered, ...rest] } };
+      });
+      if (activeMapId) {
+        const url  = `/api/maps/${activeMapId}/routes/order`;
+        const body = JSON.stringify({ orderedIds });
+        api(url, { method: 'PUT', body }).catch(() => enqueue(`reorderRoutes:${activeMapId}`, url, 'PUT', body));
+      }
+    },
+
     selectSystem: (id) => set({ selectedSystemId: id, selectedConnectionId: null }),
     selectConnection: (id) => set({ selectedConnectionId: id, selectedSystemId: null }),
     setCurrentSystem: (id) => set({ currentSystemId: id }),
@@ -1186,6 +1206,15 @@ export const useMapStore = create<MapStore>()((set, get) => {
           set((s) => ({
             map: { ...s.map, routes: (s.map.routes ?? []).filter((r) => r.id !== event.id) },
           }));
+          break;
+        }
+        case 'route.reorder': {
+          set((s) => {
+            const byId = new Map((s.map.routes ?? []).map((r) => [r.id, r]));
+            const ordered = event.orderedIds.map((id) => byId.get(id)).filter((r): r is SavedRoute => !!r);
+            const rest = (s.map.routes ?? []).filter((r) => !event.orderedIds.includes(r.id));
+            return { map: { ...s.map, routes: [...ordered, ...rest] } };
+          });
           break;
         }
         case 'map.meta': {

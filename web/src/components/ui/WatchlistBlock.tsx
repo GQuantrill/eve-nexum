@@ -1,7 +1,14 @@
 import { useMemo, useState } from 'react';
+import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { v4 as uuid } from 'uuid';
 import { TrashIcon, PlusIcon, CrosshairIcon } from '@phosphor-icons/react';
+import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import type { DragEndEvent, Modifier } from '@dnd-kit/core';
+import {
+  SortableContext, verticalListSortingStrategy, arrayMove, useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { useMapStore } from '../../store/mapStore';
 import { useWatchlist, MAX_WATCH } from '../../hooks/useWatchlist';
 import { useUserSetting } from '../../hooks/useUserSetting';
@@ -10,6 +17,36 @@ import { WATCH_CHARACTERISTICS } from '../../data/watchCharacteristics';
 import { matchKey, systemMatchesEntry, connectionMatchesEntry } from '../../utils/watchMatch';
 import { CLASS_LABELS, EFFECT_LABELS } from '../../data/wormholes';
 import type { WatchEntry, WatchMatch, WatchMarkerKind } from '../../types';
+
+// Watchlist rows reorder on the vertical axis only — zero the X component so
+// the drag transform and collision detection both lock vertically (matching
+// the sidebar panel reorder and the chains list).
+const restrictToVerticalAxis: Modifier = ({ transform }) => ({ ...transform, x: 0 });
+
+// Thin sortable wrapper: owns the row's drag plumbing (ref/transform) but hands
+// the drag-handle props back via render-prop, so all the row's controls and
+// closures stay in WatchlistBlock instead of being threaded through props.
+function SortableWatchRow(
+  { id, disabled, children }:
+  { id: string; disabled: boolean; children: (p: { handleProps: Record<string, unknown> }) => ReactNode },
+) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
+    useSortable({ id, disabled });
+  return (
+    <div
+      ref={setNodeRef}
+      className="watchlist__row"
+      style={{
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.4 : 1,
+        zIndex: isDragging ? 10 : undefined,
+      }}
+    >
+      {children({ handleProps: { ...listeners, ...attributes } })}
+    </div>
+  );
+}
 
 // Human label for a non-typed (characteristic) match — shown read-only on the
 // row, since those are added/removed via the quick-add palette.
@@ -100,6 +137,19 @@ export function WatchlistBlock() {
     setItems(items.filter((it) => it.id !== id));
   }
 
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
+  const itemIds = useMemo(() => items.map((it) => it.id), [items]);
+  const draggable = items.length > 1;
+
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const from = itemIds.indexOf(String(active.id));
+    const to   = itemIds.indexOf(String(over.id));
+    if (from === -1 || to === -1) return;
+    setItems(arrayMove(items, from, to));
+  }
+
   return (
     <div className="watchlist">
       <div className="map-sidebar__hint">{t('watchlist.hint')}</div>
@@ -136,15 +186,34 @@ export function WatchlistBlock() {
       </div>
 
       {items.length > 0 && (
-        <div className="watchlist__list">
-          {items.map((it) => {
-            const def = watchMarker(it.marker);
-            const targets = matchTargets.get(it.id) ?? [];
-            const onMap = targets.length > 0;
-            const manual = it.match.by === 'system' || it.match.by === 'whType';
-            return (
-              <div key={it.id} className="watchlist__row">
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          modifiers={[restrictToVerticalAxis]}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext items={itemIds} strategy={verticalListSortingStrategy}>
+            <div className="watchlist__list">
+              {items.map((it) => {
+                const def = watchMarker(it.marker);
+                const targets = matchTargets.get(it.id) ?? [];
+                const onMap = targets.length > 0;
+                const manual = it.match.by === 'system' || it.match.by === 'whType';
+                return (
+                  <SortableWatchRow key={it.id} id={it.id} disabled={!draggable}>
+                    {({ handleProps }) => (
+                      <>
                 <div className="watchlist__row-top">
+                  {draggable && (
+                    <button
+                      type="button"
+                      className="watchlist__drag-handle"
+                      {...handleProps}
+                      title={t('closest.dragToReorder')}
+                    >
+                      ⠿
+                    </button>
+                  )}
                   <span className="watchlist__marker-icon" style={{ color: def.color }} title={t(`watchMarker.${it.marker}`)}>
                     <def.Icon size={16} weight="fill" />
                   </span>
@@ -244,10 +313,14 @@ export function WatchlistBlock() {
                     placeholder={t('watchlist.notePlaceholder')}
                   />
                 </div>
-              </div>
-            );
-          })}
-        </div>
+                      </>
+                    )}
+                  </SortableWatchRow>
+                );
+              })}
+            </div>
+          </SortableContext>
+        </DndContext>
       )}
 
       <button

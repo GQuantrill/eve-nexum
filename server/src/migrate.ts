@@ -275,6 +275,10 @@ export async function migrate() {
       updated_at         TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
     CREATE INDEX IF NOT EXISTS idx_map_routes_map ON map_routes (map_id);
+    -- User-defined ordering for the chains list (drag-and-drop reorder).
+    -- Existing rows default to 0 and fall back to created_at, preserving their
+    -- current order until the user reorders.
+    ALTER TABLE map_routes ADD COLUMN IF NOT EXISTS sort_order INTEGER NOT NULL DEFAULT 0;
 
     -- Tracks one-shot data migrations that must NOT re-run on every boot
     -- (unlike the idempotent DDL above) — e.g. a backfill we don't want to
