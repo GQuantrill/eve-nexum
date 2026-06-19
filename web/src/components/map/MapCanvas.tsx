@@ -89,12 +89,12 @@ interface CtxMenu {
   selectedNodeIds?: string[]; // snapshot taken at right-click time before RF resets selection
 }
 
-function systemToNode(sys: MapSystem, selectedId: string | null, easyConnect = false, canEdit = true, dimmed = false): Node {
+function systemToNode(sys: MapSystem, selectedId: string | null, easyConnect = false, canEdit = true, dimmed = false, routeHighlighted = false): Node {
   return {
     id: sys.id,
     type: 'system',
     position: sys.position,
-    data: { ...sys, selected: sys.id === selectedId, dimmed },
+    data: { ...sys, selected: sys.id === selectedId, dimmed, routeHighlighted },
     draggable: canEdit && !sys.locked,
     dragHandle: easyConnect ? '.drag-handle' : undefined,
   };
@@ -420,7 +420,10 @@ export function MapCanvas() {
 
   useEffect(() => {
     const hl = routeHighlight ? new Set(routeHighlight.systemIds) : null;
-    setNodes(systems.map((s) => systemToNode(s, selectedSystemId, easyConnect, canEdit, !!hl && !hl.has(s.id))));
+    setNodes(systems.map((s) => {
+      const inRoute = !!hl && hl.has(s.id);
+      return systemToNode(s, selectedSystemId, easyConnect, canEdit, !!hl && !inRoute, inRoute);
+    }));
   }, [systems, selectedSystemId, easyConnect, setNodes, canEdit, routeHighlight]);
 
   useEffect(() => {
@@ -597,9 +600,10 @@ export function MapCanvas() {
         // Hover-only: a *selected* system would keep its links lit permanently
         // (e.g. your located system on a 2-node map), which reads as a stuck
         // hover effect — so highlight only follows the mouse.
+        const inRoute = !!routeConns && routeConns.has(c.id);
         const highlighted =
-          hoveredNodeId != null && (c.sourceId === hoveredNodeId || c.targetId === hoveredNodeId);
-        const dimmed = !!routeConns && !routeConns.has(c.id);
+          inRoute || (hoveredNodeId != null && (c.sourceId === hoveredNodeId || c.targetId === hoveredNodeId));
+        const dimmed = !!routeConns && !inRoute;
         return {
           id: c.id,
           source: c.sourceId,

@@ -160,7 +160,20 @@ export function ChainsPane() {
                 {open && (
                   <ol className="chain-steps">
                     {steps.map((step) => (
-                      <li key={step.index} className={`chain-step${step.broken ? ' chain-step--broken' : ''}`}>
+                      <li
+                        key={step.index}
+                        className={`chain-step${step.broken ? ' chain-step--broken' : ''}`}
+                        // Narrow the map highlight to just this hop on hover;
+                        // back to the whole chain on leave (still in the row).
+                        onMouseEnter={() => setRouteHighlight({
+                          systemIds: [step.fromId, step.toId],
+                          connectionIds: [route.connectionIds[step.index - 1]],
+                        })}
+                        onMouseLeave={() => setRouteHighlight({
+                          systemIds: route.systemIds,
+                          connectionIds: route.connectionIds,
+                        })}
+                      >
                         <button
                           type="button"
                           className="chain-step__systems"

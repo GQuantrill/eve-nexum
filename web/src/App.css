@@ -2679,6 +2679,13 @@
   transition: opacity 0.15s ease, filter 0.15s ease;
 }
 
+/* A system that IS on the hovered chain's route — lift it with a glow ring. */
+.system-node--route {
+  box-shadow: 0 0 0 2px var(--cv-conn-highlight),
+              0 0 14px 2px color-mix(in srgb, var(--cv-conn-highlight) 55%, transparent);
+  transition: box-shadow 0.15s ease;
+}
+
 .system-node--content-match {
   box-shadow: 0 0 0 2px var(--accent, #5b9bff), 0 0 12px 1px rgba(91,155,255,0.45);
 }
