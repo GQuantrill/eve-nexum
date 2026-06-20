@@ -3475,6 +3475,40 @@
   z-index: 9999 !important;
 }
 
+.system-node__shattered-icon {
+  color: #d9a8ff;
+  font-size: calc(13px * var(--font-scale, 1));
+  cursor: default;
+  filter: drop-shadow(0 0 3px #d9a8ffaa);
+  position: relative;
+}
+
+.system-node__shattered-tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #111827;
+  border: 1px solid #2e3f60;
+  border-radius: 6px;
+  padding: 4px 10px;
+  white-space: nowrap;
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #d9a8ff;
+  font-weight: 600;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.system-node__shattered-icon:hover .system-node__shattered-tooltip {
+  display: block;
+}
+
+.react-flow__node:has(.system-node__shattered-icon:hover) {
+  z-index: 9999 !important;
+}
+
 .system-node__ice-icon {
   color: #9ed7f5;
   font-size: calc(13px * var(--font-scale, 1));

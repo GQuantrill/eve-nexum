@@ -1459,6 +1459,7 @@
     "altLastKnown": "(last known)",
     "killsTooltip": "{{ships}} ship · {{pods}} pod kills this hour",
     "a0Sun": "A0 sun",
+    "shattered": "Shattered",
     "iceBelt": "Ice belt system",
     "incursion": "Incursion System",
     "insurgency": "Insurgency System",

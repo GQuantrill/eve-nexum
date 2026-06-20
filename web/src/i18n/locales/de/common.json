@@ -1421,6 +1421,7 @@
     "altLastKnown": "(zuletzt bekannt)",
     "killsTooltip": "{{ships}} Schiff · {{pods}} Pod-Kills diese Stunde",
     "a0Sun": "A0-Sonne",
+    "shattered": "Zerschmettert",
     "iceBelt": "Eisgürtel-System",
     "incursion": "Inkursionssystem",
     "insurgency": "Aufstandssystem",
