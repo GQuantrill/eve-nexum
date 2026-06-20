@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Handle, Position, useConnection } from '@xyflow/react';
 import {
   HouseIcon, LockIcon, WarningIcon, SkullIcon, LightningIcon,
-  SunIcon, SnowflakeIcon, SwordIcon, SparkleIcon,
+  SunIcon, SnowflakeIcon, SwordIcon, SparkleIcon, DiamondsFourIcon,
 } from '@phosphor-icons/react';
 import type { NodeProps } from '@xyflow/react';
 import type { MapSystem } from '../../types';
@@ -21,6 +21,7 @@ import { useInsurgency, findInsurgency } from '../../hooks/useInsurgency';
 import { useStorms, findStorm } from '../../hooks/useStorms';
 import { useScoutConnections, findScoutConnections } from '../../hooks/useScoutConnections';
 import { useA0Systems } from '../../hooks/useA0Systems';
+import { useShatteredSystems } from '../../hooks/useShatteredSystems';
 import { useIceBeltSystems, hasIceBelt } from '../../hooks/useIceBeltSystems';
 import { useCurrentHourKills } from '../../hooks/useCurrentHourKills';
 import { useNow30s } from '../../hooks/useNow30s';
@@ -124,6 +125,9 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
   const a0Systems       = useA0Systems();
   const a0Ids           = useMemo(() => new Set(a0Systems.map(s => s.id)), [a0Systems]);
   const isA0            = sys.eveSystemId !== null && a0Ids.has(sys.eveSystemId);
+  const shatteredSystems = useShatteredSystems();
+  const shatteredIds    = useMemo(() => new Set(shatteredSystems.map(s => s.id)), [shatteredSystems]);
+  const isShattered     = sys.eveSystemId !== null && shatteredIds.has(sys.eveSystemId);
   const iceBeltSystems  = useIceBeltSystems();
   const isIceBelt       = useMemo(() => hasIceBelt(iceBeltSystems, sys.eveSystemId), [iceBeltSystems, sys.eveSystemId]);
   const allKills        = useCurrentHourKills();
@@ -353,6 +357,12 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
             <span className="system-node__a0-icon">
               <SunIcon size={14} weight="regular" />
               <span className="system-node__a0-tooltip">{t('mapNode.a0Sun')}</span>
+            </span>
+          )}
+          {isShattered && (
+            <span className="system-node__shattered-icon">
+              <DiamondsFourIcon size={14} weight="regular" />
+              <span className="system-node__shattered-tooltip">{t('mapNode.shattered')}</span>
             </span>
           )}
           {isIceBelt && (

@@ -1421,6 +1421,7 @@
     "altLastKnown": "(마지막 확인)",
     "killsTooltip": "이번 시간 {{ships}} 함선 · {{pods}} 캡슐 킬",
     "a0Sun": "A0 항성",
+    "shattered": "파괴된 성계",
     "iceBelt": "얼음 벨트 성계",
     "incursion": "인커전 성계",
     "insurgency": "반란 성계",

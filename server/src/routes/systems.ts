@@ -117,6 +117,48 @@ systemsRouter.get('/a0', async (_req, res) => {
   }
 });
 
+// Shattered systems (every planet is "Planet (Shattered)") drive the fragments
+// icon on system nodes. Flagged on solar_systems.shattered by the SDE importer,
+// so the set stays current across re-seeds. Same enrich-once-and-cache shape as
+// the A0 list above.
+interface ShatteredSystem { id: number; name: string; regionName: string }
+let shatteredEnriched: ShatteredSystem[] | null = null;
+let shatteredInflight: Promise<ShatteredSystem[]> | null = null;
+
+// Drop the cached shattered list so the next request rebuilds it from the DB.
+// Called after an SDE re-seed, which may have changed the shattered set.
+export function resetShatteredCache(): void {
+  shatteredEnriched = null;
+  shatteredInflight = null;
+}
+
+async function loadShatteredEnriched(): Promise<ShatteredSystem[]> {
+  if (shatteredEnriched) return shatteredEnriched;
+  if (shatteredInflight) return shatteredInflight;
+  shatteredInflight = (async () => {
+    const { rows } = await db.query<{ id: number; name: string; region_name: string | null }>(
+      `SELECT s.id, s.name, r.name AS region_name
+         FROM solar_systems s
+         LEFT JOIN map_regions r ON r.id = s.region_id
+        WHERE s.shattered`,
+    );
+    shatteredEnriched = rows.map(r => ({ id: r.id, name: r.name, regionName: r.region_name ?? '' }));
+    shatteredInflight = null;
+    return shatteredEnriched;
+  })();
+  return shatteredInflight;
+}
+
+// GET /api/systems/shattered — enriched list of shattered solar systems
+systemsRouter.get('/shattered', async (_req, res) => {
+  try {
+    res.json(await loadShatteredEnriched());
+  } catch (err) {
+    log.error('Shattered enrichment failed:', err);
+    res.status(500).json({ error: 'Shattered list unavailable' });
+  }
+});
+
 // Solar systems that spawn ice anomalies. Committed as a list of names
 // keyed by faction quarter so it's easy to maintain by hand; we resolve
 // the names to eve_system_ids once at first request and cache forever

@@ -1421,6 +1421,7 @@
     "altLastKnown": "(dernière connue)",
     "killsTooltip": "{{ships}} vaisseau · {{pods}} capsule détruits cette heure",
     "a0Sun": "Soleil A0",
+    "shattered": "Brisé",
     "iceBelt": "Système à ceinture de glace",
     "incursion": "Système d'incursion",
     "insurgency": "Système d'insurrection",

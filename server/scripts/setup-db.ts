@@ -106,6 +106,7 @@ async function main() {
   // name for sun_type, and importCelestialCounts needs the gates from above.
   await importStars(zip);
   await importCelestialCounts(zip);
+  await importShattered(zip);
   await importDogmaAttributes(zip);
   await importItemDogma(zip);
   await importFactions(zip);
@@ -242,6 +243,11 @@ async function createTables() {
     -- doesn't agree with it). Drives the ★ icon on system nodes. Set by
     -- importStars from mapStars.jsonl, so it refreshes on every SDE re-seed.
     ALTER TABLE solar_systems ADD COLUMN IF NOT EXISTS is_a0 BOOLEAN NOT NULL DEFAULT FALSE;
+    -- True for shattered systems — every planet is "Planet (Shattered)" (typeID
+    -- 30889): the C13 frigate holes, the Drifter wormholes, and the shattered
+    -- C1-C6 variants. Drives the fragments icon on system nodes. Set by
+    -- importShattered from mapPlanets.jsonl, so it refreshes on every SDE re-seed.
+    ALTER TABLE solar_systems ADD COLUMN IF NOT EXISTS shattered BOOLEAN NOT NULL DEFAULT FALSE;
     -- Static celestial metadata for the system-info panel (sun type + planet /
     -- moon / belt / stargate counts), filled by importSolarSystems, importStars
     -- and importCelestialCounts. Lets the panel render without a live ESI call.
@@ -697,6 +703,44 @@ async function importCelestialCounts(zip: Zip) {
            belt_count     = COALESCE(belt_count, 0),
            stargate_count = COALESCE(stargate_count, 0)`);
   console.log(`${moonCounts.size} w/ moons, ${beltCounts.size} w/ belts`);
+}
+
+// Flags shattered systems on solar_systems.shattered. A system is shattered
+// when every one of its planets is "Planet (Shattered)" (typeID 30889) — this
+// cleanly captures the C13 frigate holes, the Drifter wormholes and the
+// shattered C1-C6 variants, while excluding normal systems that merely contain
+// a single shattered planet among ordinary ones (e.g. J164104). mapPlanets is
+// only ~21k records, so a JSON.parse per line is fine. Reset-then-set so a
+// re-seed reflects the latest classification with no stale flags. Drives the
+// fragments node icon via GET /api/systems/shattered.
+const SHATTERED_PLANET_TYPE = 30889;
+async function importShattered(zip: Zip) {
+  process.stdout.write('Flagging shattered systems... ');
+  const lines = await readJsonl(zip, 'mapPlanets.jsonl');
+  const total     = new Map<number, number>();
+  const shattered = new Map<number, number>();
+  for (const line of lines) {
+    try {
+      const o   = JSON.parse(line);
+      const sys = o.solarSystemID as number | undefined;
+      if (!sys) continue;
+      total.set(sys, (total.get(sys) ?? 0) + 1);
+      if (o.typeID === SHATTERED_PLANET_TYPE) {
+        shattered.set(sys, (shattered.get(sys) ?? 0) + 1);
+      }
+    } catch { /* skip */ }
+  }
+
+  const ids: number[] = [];
+  for (const [sys, n] of total) {
+    if (n > 0 && shattered.get(sys) === n) ids.push(sys);
+  }
+
+  await db.query('UPDATE solar_systems SET shattered = FALSE WHERE shattered = TRUE');
+  if (ids.length) {
+    await db.query('UPDATE solar_systems SET shattered = TRUE WHERE id = ANY($1::int[])', [ids]);
+  }
+  console.log(`${ids.length} shattered`);
 }
 
 // Tally records by their solarSystemID. Pulls the id out with a regex to skip
