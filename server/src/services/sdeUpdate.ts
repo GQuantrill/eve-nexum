@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import { db } from '../db.js';
 import { config } from '../config.js';
 import { loadRouteGraph } from './routeGraph.js';
-import { resetA0Cache } from '../routes/systems.js';
+import { resetA0Cache, resetShatteredCache } from '../routes/systems.js';
 import { resetWormholeCache } from '../routes/wormholes.js';
 import { createLogger } from '../utils/logger.js';
 
@@ -147,6 +147,7 @@ export async function checkSde(): Promise<void> {
       log.info(`SDE updated ${before ?? 'unknown'} -> ${after}; reloading caches`);
       await loadRouteGraph();
       resetA0Cache();
+      resetShatteredCache();
       resetWormholeCache();
       result = 'updated';
     } else {
