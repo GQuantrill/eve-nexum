@@ -1493,5 +1493,12 @@
     "colShipSize": "Taille de saut de vaisseau",
     "colTotalMass": "Masse totale",
     "colLifetime": "Durée de vie"
+  },
+  "whJump": {
+    "confirmOne": "Saut vers {{system}}. Marquer {{sig}} comme y menant ?",
+    "confirmMany": "Saut vers {{system}}. Quelle signature avez-vous empruntée ?",
+    "confirm": "Confirmer",
+    "differentHole": "Autre trou",
+    "unmapped": "Trou inconnu"
   }
 }

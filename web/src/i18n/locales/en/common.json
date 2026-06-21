@@ -1480,5 +1480,12 @@
     "lessThan4h": "< 4 hrs",
     "lessThan1h": "< 1 hr",
     "broken": "Connection broken — the wormhole sig was deleted (hole collapsed)"
+  },
+  "whJump": {
+    "confirmOne": "Jumped to {{system}}. Mark {{sig}} as leading there?",
+    "confirmMany": "Jumped to {{system}}. Which signature did you jump?",
+    "confirm": "Confirm",
+    "differentHole": "Different hole",
+    "unmapped": "Unmapped hole"
   }
 }

@@ -1493,5 +1493,12 @@
     "colShipSize": "Tamaño de salto de nave",
     "colTotalMass": "Masa total",
     "colLifetime": "Vida útil"
+  },
+  "whJump": {
+    "confirmOne": "Saltaste a {{system}}. ¿Marcar {{sig}} como que lleva allí?",
+    "confirmMany": "Saltaste a {{system}}. ¿Qué firma usaste?",
+    "confirm": "Confirmar",
+    "differentHole": "Otro agujero",
+    "unmapped": "Agujero desconocido"
   }
 }

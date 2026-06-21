@@ -4,6 +4,7 @@ import { useCharacterLocation } from './useCharacterLocation';
 import { useCanEdit } from './useCanEdit';
 import { readUserSetting } from './useUserSetting';
 import { pickHandles } from '../components/map/edgeUtils';
+import { maybeConfirmWhJump } from './whJumpConfirm';
 import type { SystemClass, WormholeEffect } from '../types';
 
 interface Box { position: { x: number; y: number } }
@@ -175,6 +176,23 @@ export function applyJump(system: JumpSystem, prevMapSystemId: string | null, ca
         : { sourceHandle: 'right' as const, targetHandle: 'left' as const };
       addConnection(prevMapSystemId, mapSystemId, sourceHandle, targetHandle);
     }
+  }
+
+  // A jump resolved — real tracking and the jump simulator both funnel through
+  // here. If it's a wormhole jump, offer to pin the source system's hole to
+  // where it led. Fires regardless of whether the connection was new (so a
+  // class-only hole still gets upgraded to the specific system); holes already
+  // pinned to a system are filtered out inside whJumpConfirm. Fire-and-forget.
+  if (canAdd && prevMapSystemId && prevMapSystemId !== mapSystemId) {
+    const fromSys = map.systems.find((s) => s.id === prevMapSystemId);
+    void maybeConfirmWhJump({
+      mapId:           map.id,
+      fromMapSystemId: prevMapSystemId,
+      fromEveSystemId: fromSys?.eveSystemId ?? null,
+      toEveSystemId:   system.eveSystemId,
+      toClass:         system.systemClass,
+      toName:          system.name,
+    });
   }
 
   return mapSystemId;

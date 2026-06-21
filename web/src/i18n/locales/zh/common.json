@@ -1493,5 +1493,12 @@
     "colShipSize": "舰船跳跃尺寸",
     "colTotalMass": "总质量",
     "colLifetime": "寿命"
+  },
+  "whJump": {
+    "confirmOne": "跳到 {{system}}。将 {{sig}} 标记为通往该系统？",
+    "confirmMany": "跳到 {{system}}。你跳的是哪个信号？",
+    "confirm": "确认",
+    "differentHole": "其他虫洞",
+    "unmapped": "未知虫洞"
   }
 }

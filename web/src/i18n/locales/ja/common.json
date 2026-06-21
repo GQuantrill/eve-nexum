@@ -1493,5 +1493,12 @@
     "colShipSize": "艦船ジャンプサイズ",
     "colTotalMass": "総質量",
     "colLifetime": "寿命"
+  },
+  "whJump": {
+    "confirmOne": "{{system}} へジャンプ。{{sig}} をそこへの接続として記録しますか？",
+    "confirmMany": "{{system}} へジャンプ。どのシグネチャを通りましたか？",
+    "confirm": "確認",
+    "differentHole": "別のホール",
+    "unmapped": "未確認のホール"
   }
 }
