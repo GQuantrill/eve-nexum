@@ -1493,5 +1493,12 @@
     "colShipSize": "Tamanho de salto de nave",
     "colTotalMass": "Massa total",
     "colLifetime": "Vida útil"
+  },
+  "whJump": {
+    "confirmOne": "Saltou para {{system}}. Marcar {{sig}} como levando até lá?",
+    "confirmMany": "Saltou para {{system}}. Qual assinatura você usou?",
+    "confirm": "Confirmar",
+    "differentHole": "Outro buraco",
+    "unmapped": "Buraco desconhecido"
   }
 }

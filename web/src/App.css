@@ -2834,9 +2834,12 @@
     border-style: double;
   }
 
+  /* The system you're currently in: white border + soft white glow. White so
+     it reads as "you" without colliding with the gold home border, the yellow
+     A0 sun icon, or any class colour. */
   &[data-current='true'] {
-    border-color: #f5c518;
-    box-shadow: 0 0 0 2px rgba(245, 197, 24, 0.35), 0 0 14px rgba(245, 197, 24, 0.25);
+    border-color: #ffffff;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.55), 0 0 14px rgba(255, 255, 255, 0.4);
   }
 
   &.system-node--connect-target {
@@ -7649,6 +7652,59 @@ select.sig-toolbar-btn option {
 .toast--error   { border-left-color: #f87171; background: #1a1014; }
 .toast--info    { border-left-color: #60a5fa; background: #0f1620; }
 .toast--success { border-left-color: #4ade80; background: #0f1a14; }
+
+/* Actionable toast: message + close on one row, buttons wrapping below. Wider
+   so several hole buttons fit before wrapping. */
+.toast--actionable { max-width: 420px; }
+
+.toast__body {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.toast__msg { flex: 1; }
+
+.toast__close {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: #8a93a6;
+  font-size: calc(16px * var(--font-scale, 1));
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 2px;
+}
+
+.toast__close:hover { color: #c8d0e0; }
+
+.toast__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.toast__action {
+  background: #1c2230;
+  border: 1px solid #2e3a4f;
+  border-radius: 4px;
+  color: #c8d0e0;
+  font-size: calc(12px * var(--font-scale, 1));
+  font-weight: 600;
+  padding: 4px 10px;
+  cursor: pointer;
+}
+
+.toast__action:hover { border-color: #4a5a78; background: #232b3b; }
+
+.toast__action--primary {
+  background: #1e3a5f;
+  border-color: #3b6ea5;
+  color: #dbe7f5;
+}
+
+.toast__action--primary:hover { background: #244873; }
 
 /* ── Role badge ──────────────────────────────────────────── */
 .role-badge {

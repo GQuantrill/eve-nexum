@@ -1493,5 +1493,12 @@
     "colShipSize": "함선 점프 크기",
     "colTotalMass": "총 질량",
     "colLifetime": "수명"
+  },
+  "whJump": {
+    "confirmOne": "{{system}}(으)로 점프했습니다. {{sig}}을(를) 그곳으로 연결되는 것으로 표시할까요?",
+    "confirmMany": "{{system}}(으)로 점프했습니다. 어떤 시그니처로 점프했나요?",
+    "confirm": "확인",
+    "differentHole": "다른 웜홀",
+    "unmapped": "미확인 웜홀"
   }
 }

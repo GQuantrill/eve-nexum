@@ -1531,5 +1531,12 @@
     "colShipSize": "Размер прыжка корабля",
     "colTotalMass": "Общая масса",
     "colLifetime": "Время жизни"
+  },
+  "whJump": {
+    "confirmOne": "Прыжок в {{system}}. Отметить {{sig}} как ведущую туда?",
+    "confirmMany": "Прыжок в {{system}}. Через какую сигнатуру вы прыгнули?",
+    "confirm": "Подтвердить",
+    "differentHole": "Другая дыра",
+    "unmapped": "Неизвестная дыра"
   }
 }
