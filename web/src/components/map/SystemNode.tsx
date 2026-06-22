@@ -227,7 +227,7 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
         ...(uniformSize && uniformWidth  > 0 ? { minWidth:  uniformWidth  } : null),
         ...(uniformSize && uniformHeight > 0 ? { minHeight: uniformHeight } : null),
       } as React.CSSProperties}
-      data-selected={selected}
+      data-selected={selected || sys.selected}
       data-heat={heat ? '' : undefined}
       data-status={sys.status}
       data-intel={sys.intel ?? undefined}

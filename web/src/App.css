@@ -2722,8 +2722,11 @@
   border-color: var(--intel-color);
   border-width: 4px;
 
-  &:hover,
-  &[data-selected='true'] {
+  /* Hover keeps the intel colour (toggling borders on hover read as jumpy).
+     Selection is intentionally NOT held here so a selected node falls through
+     to the white highlight from the base rules — otherwise a selected
+     "occupied" system stays orange and is indistinguishable from the tag. */
+  &:hover {
     border-color: var(--intel-color);
   }
 }
@@ -2825,9 +2828,13 @@
     box-shadow: 0 0 12px color-mix(in srgb, var(--class-color) 30%, transparent);
   }
 
+  /* Selected node: white border + soft white glow, matching the current-system
+     treatment so neither collides with the orange "occupied" bezel. Kept a
+     touch lighter than data-current (below) so "where you are" still reads
+     slightly stronger; data-current wins when a node is both. */
   &[data-selected='true'] {
-    border-color: var(--class-color);
-    box-shadow: 0 0 16px color-mix(in srgb, var(--class-color) 40%, transparent);
+    border-color: #ffffff;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.4), 0 0 14px rgba(255, 255, 255, 0.28);
   }
 
   &[data-home='true'] {
