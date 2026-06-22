@@ -118,6 +118,16 @@ export function NotesEditor({ value, onChange, compact = false, readOnly = false
       className={`notes-editor${compact ? '' : ' notes-editor--full'}`}
       data-color-mode="dark"
       onClick={enterEdit}
+      onKeyDown={(e) => {
+        // Compact row notes (signatures / structures) behave like a plain
+        // single-line text box: Enter saves and blurs instead of inserting a
+        // newline (blur triggers the flush below). Shift+Enter still adds a line
+        // for the occasional multi-line note. The full Notes pane keeps Enter.
+        if (compact && e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          (e.target as HTMLElement).blur();
+        }
+      }}
       onBlur={(e) => {
         if (!e.currentTarget.contains(e.relatedTarget as Node)) { flush(); setFocused(false); }
       }}
