@@ -1512,6 +1512,8 @@
     "addText": "추가",
     "searchIcons": "아이콘 검색…",
     "moreIcons": "{{total}}개 중 {{shown}}개 표시 — 검색으로 좁히기",
-    "remove": "제거"
+    "remove": "제거",
+    "colour": "색상",
+    "maxReached": "사용자 라벨 최대 {{n}}개에 도달했습니다 — 추가하려면 하나를 제거하세요."
   }
 }

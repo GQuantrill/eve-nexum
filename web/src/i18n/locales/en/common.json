@@ -1492,7 +1492,9 @@
     "addText": "Add",
     "searchIcons": "Search icons…",
     "moreIcons": "Showing {{shown}} of {{total}} — search to narrow",
-    "remove": "Remove"
+    "remove": "Remove",
+    "colour": "Colour",
+    "maxReached": "Maximum of {{n}} custom labels reached — remove one to add another."
   },
   "whJump": {
     "confirmOne": "Jumped to {{system}}. Mark {{sig}} as leading there?",

@@ -1536,12 +1536,19 @@ mapsRouter.patch('/:mapId/systems/:systemId', async (req, res) => {
     vals.push([...new Set(v as string[])]);
   }
 
-  // Custom labels — up to 3 entries, each 't:<text>' (<=40 chars) or
-  // 'i:<IconName>' (a Phosphor icon component name).
+  // Custom labels — up to 3 entries, each '<kind>:<color>:<value>' where kind
+  // is t|i, color is '#RRGGBB' or empty, value is text (<=40 chars) or a
+  // Phosphor icon name. Legacy '<kind>:<value>' (no colour) still accepted.
   if ('customLabels' in updates) {
     const v = updates.customLabels;
+    const COLOR = '(#[0-9a-fA-F]{6})?';
     const valid = (s: unknown) =>
-      typeof s === 'string' && (/^t:.{1,40}$/.test(s) || /^i:[A-Za-z0-9]{1,40}$/.test(s));
+      typeof s === 'string' && (
+        new RegExp(`^t:${COLOR}:.{1,40}$`).test(s) ||
+        new RegExp(`^i:${COLOR}:[A-Za-z0-9]{1,40}$`).test(s) ||
+        /^t:.{1,40}$/.test(s) ||              // legacy text
+        /^i:[A-Za-z0-9]{1,40}$/.test(s)       // legacy icon
+      );
     if (!Array.isArray(v) || v.length > 3 || v.some((x) => !valid(x))) {
       res.status(400).json({ error: 'invalid customLabels' }); return;
     }

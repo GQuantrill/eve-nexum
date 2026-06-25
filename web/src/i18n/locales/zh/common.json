@@ -1512,6 +1512,8 @@
     "addText": "添加",
     "searchIcons": "搜索图标…",
     "moreIcons": "显示 {{total}} 个中的 {{shown}} 个 — 搜索以缩小范围",
-    "remove": "移除"
+    "remove": "移除",
+    "colour": "颜色",
+    "maxReached": "已达到 {{n}} 个自定义标签上限 — 移除一个才能再添加。"
   }
 }
