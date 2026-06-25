@@ -1307,6 +1307,14 @@
       "colorVision": {
         "title": "Colour-blind modes",
         "desc": "Deuteranopia, protanopia and tritanopia palettes that re-map every status, class and standings colour across the app."
+      },
+      "labels": {
+        "title": "System labels",
+        "desc": "Tag any system with coloured labels — toggle the built-in A/B/C and 1/2/3 set, or add up to three custom labels of your own (free text or a Phosphor icon) with a pick-your-own background colour. They render as pills above the node and sync to everyone on a corp map."
+      },
+      "apiKeys": {
+        "title": "API key management",
+        "desc": "Generate and revoke personal API keys to drive external tools against your maps. Each key acts as a chosen character and is scoped — read-only, read + live events, or read + write content — so it can only ever do what that character can."
       }
     },
     "corpFeatures": {
