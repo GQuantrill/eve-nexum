@@ -708,7 +708,11 @@
     "optimizeConnections": "Verbindungen optimieren",
     "spreadNodes": "Knoten verteilen",
     "removeOrphans": "Verwaiste Systeme entfernen ({{count}})",
-    "removeOrphansConfirm": "{{count}} verwaiste(s) System(e) entfernen? Diese haben keine gültige Verbindung (keine oder nur unterbrochene). Heimat- und gesperrte Systeme bleiben erhalten. Dies kann rückgängig gemacht werden."
+    "removeOrphansConfirm": "{{count}} verwaiste(s) System(e) entfernen? Diese haben keine gültige Verbindung (keine oder nur unterbrochene). Heimat- und gesperrte Systeme bleiben erhalten. Dies kann rückgängig gemacht werden.",
+    "labels": "Labels",
+    "customLabel": "Eigenes Label",
+    "clearLabels": "Löschen",
+    "labelNamed": "Label {{name}}"
   },
   "panel": {
     "notes": "Notizen",
@@ -1500,5 +1504,16 @@
     "confirm": "Bestätigen",
     "differentHole": "Anderes Loch",
     "unmapped": "Unbekanntes Loch"
+  },
+  "labelsDialog": {
+    "title": "Eigene Labels",
+    "max": "Bis zu {{n}} eigene Labels",
+    "textPlaceholder": "Label-Text",
+    "addText": "Hinzufügen",
+    "searchIcons": "Symbole suchen…",
+    "moreIcons": "{{shown}} von {{total}} — Suche eingrenzen",
+    "remove": "Entfernen",
+    "colour": "Farbe",
+    "maxReached": "Maximal {{n}} eigene Labels erreicht — entferne eines, um ein weiteres hinzuzufügen."
   }
 }

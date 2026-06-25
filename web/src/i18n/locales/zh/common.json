@@ -708,7 +708,11 @@
     "optimizeConnections": "优化连接",
     "spreadNodes": "散开节点",
     "removeOrphans": "移除孤立星系 ({{count}})",
-    "removeOrphansConfirm": "移除 {{count}} 个孤立星系？它们没有有效连接（没有连接，或只有断开的连接）。母星系和锁定星系将保留。此操作可撤销。"
+    "removeOrphansConfirm": "移除 {{count}} 个孤立星系？它们没有有效连接（没有连接，或只有断开的连接）。母星系和锁定星系将保留。此操作可撤销。",
+    "labels": "标签",
+    "customLabel": "自定义标签",
+    "clearLabels": "清除",
+    "labelNamed": "标签 {{name}}"
   },
   "panel": {
     "notes": "笔记",
@@ -1500,5 +1504,16 @@
     "confirm": "确认",
     "differentHole": "其他虫洞",
     "unmapped": "未知虫洞"
+  },
+  "labelsDialog": {
+    "title": "自定义标签",
+    "max": "最多 {{n}} 个自定义标签",
+    "textPlaceholder": "标签文字",
+    "addText": "添加",
+    "searchIcons": "搜索图标…",
+    "moreIcons": "显示 {{total}} 个中的 {{shown}} 个 — 搜索以缩小范围",
+    "remove": "移除",
+    "colour": "颜色",
+    "maxReached": "已达到 {{n}} 个自定义标签上限 — 移除一个才能再添加。"
   }
 }

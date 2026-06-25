@@ -708,7 +708,11 @@
     "optimizeConnections": "Otimizar conexões",
     "spreadNodes": "Espalhar nós",
     "removeOrphans": "Remover sistemas órfãos ({{count}})",
-    "removeOrphansConfirm": "Remover {{count}} sistema(s) órfão(s)? Estes não têm conexão válida (nenhuma, ou apenas quebradas). Os sistemas de origem e bloqueados são mantidos. Isto pode ser desfeito."
+    "removeOrphansConfirm": "Remover {{count}} sistema(s) órfão(s)? Estes não têm conexão válida (nenhuma, ou apenas quebradas). Os sistemas de origem e bloqueados são mantidos. Isto pode ser desfeito.",
+    "labels": "Etiquetas",
+    "customLabel": "Etiqueta personalizada",
+    "clearLabels": "Limpar",
+    "labelNamed": "Etiqueta {{name}}"
   },
   "panel": {
     "notes": "Notas",
@@ -1500,5 +1504,16 @@
     "confirm": "Confirmar",
     "differentHole": "Outro buraco",
     "unmapped": "Buraco desconhecido"
+  },
+  "labelsDialog": {
+    "title": "Etiquetas personalizadas",
+    "max": "Até {{n}} etiquetas personalizadas",
+    "textPlaceholder": "Texto da etiqueta",
+    "addText": "Adicionar",
+    "searchIcons": "Buscar ícones…",
+    "moreIcons": "{{shown}} de {{total}} — refine a busca",
+    "remove": "Remover",
+    "colour": "Cor",
+    "maxReached": "Máximo de {{n}} etiquetas personalizadas atingido — remova uma para adicionar outra."
   }
 }

@@ -77,6 +77,11 @@ export interface MapSystem {
   isHome: boolean;
   locked: boolean;
   notes: string;
+  /** Applied predefined label ids (subset of a,b,c,1,2,3) — coloured pills
+   *  above the node. */
+  labels: string[];
+  /** Up to 3 custom labels, each 't:<text>' or 'i:<IconName>' (Phosphor). */
+  customLabels: string[];
   lastActivityAt: string; // ISO timestamp, updated when system or its sigs are touched
 }
 

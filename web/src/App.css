@@ -9,6 +9,10 @@
    gradient uses a lightness-monotonic viridis ramp, safe for all three);
    tritanopia (blue-yellow) gets its own. */
 :root {
+  /* System label pill colours (A/B/C/1/2/3). Retune freely. */
+  --label-a: #2e9e57; --label-b: #2f6ec4; --label-c: #c79234;
+  --label-1: #7a4fd0; --label-2: #2aa39a; --label-3: #c4498f;
+
   --cv-sec-09: #2aff85; --cv-sec-08: #00ff66; --cv-sec-07: #00ff33;
   --cv-sec-06: #55ff00; --cv-sec-05: #99ff00; --cv-sec-04: #ffff00;
   --cv-sec-03: #ff9900; --cv-sec-01: #ff6600; --cv-sec-00: #ff3300; --cv-sec-neg: #ff0000;
@@ -2300,6 +2304,166 @@
   border-radius: 3px;
   border: 5px solid rgba(255, 255, 255, 0.15);
 }
+
+/* Coloured glyph swatch in the Labels submenu (mirrors the node pill). */
+.label-swatch {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+}
+
+/* ── System label pills (above the node) ─────────────────────────── */
+.system-node__labels {
+  position: absolute;
+  bottom: 100%;
+  left: 6px;
+  margin-bottom: 3px;
+  display: flex;
+  gap: 3px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.system-node__label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 5px 5px 5px 0;
+  font-size: calc(11px * var(--font-scale, 1));
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  white-space: nowrap;
+}
+
+.system-node__label--custom {
+  background: #1a2030;
+  color: #fff;
+  border: 1px solid #33415c;
+}
+
+/* ── Custom-label dialog ─────────────────────────────────────────── */
+.custom-label-dialog { width: min(440px, 92vw); }
+
+.custom-label-dialog__current {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.custom-label-dialog__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 6px;
+  border-radius: 5px;
+  background: #1a2030;
+  border: 1px solid #33415c;
+  font-size: calc(12px * var(--font-scale, 1));
+  color: #dbe4f3;
+}
+
+.custom-label-dialog__chip-x {
+  display: inline-flex;
+  background: none;
+  border: none;
+  color: #8a93a6;
+  cursor: pointer;
+  padding: 0;
+}
+.custom-label-dialog__chip-x:hover { color: #e25a5a; }
+/* Text colour is set inline per-chip (black/white for contrast); the X inherits
+   it so it stays legible on light backgrounds too. */
+.custom-label-dialog__chip--coloured .custom-label-dialog__chip-x { color: inherit; opacity: 0.7; }
+.custom-label-dialog__chip--coloured .custom-label-dialog__chip-x:hover { opacity: 1; }
+
+/* Per-chip recolour swatch — the native colour input shrunk to a small square. */
+.custom-label-dialog__chip-color {
+  display: inline-flex;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.35);
+}
+.custom-label-dialog__chip-color input[type='color'] {
+  width: 200%;
+  height: 200%;
+  margin: -25%;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+/* Colour row for the next-added label. */
+.custom-label-dialog__color-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0 6px;
+  font-size: calc(12px * var(--font-scale, 1));
+  color: #c8d0e0;
+}
+.custom-label-dialog__color-row input[type='color'] {
+  width: 34px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid #33415c;
+  border-radius: 4px;
+  background: none;
+  cursor: pointer;
+}
+
+.custom-label-dialog__hint {
+  font-size: calc(11px * var(--font-scale, 1));
+  color: #8a93a6;
+  margin: 8px 0 4px;
+}
+
+.custom-label-dialog__add-text { display: flex; gap: 6px; }
+
+/* At the custom-label cap the whole add area dims; the title explains why. */
+.custom-label-dialog__add-area[aria-disabled='true'] { opacity: 0.55; cursor: not-allowed; }
+
+.custom-label-dialog__icons {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(34px, 1fr));
+  gap: 4px;
+  max-height: 240px;
+  overflow-y: auto;
+  margin-top: 8px;
+  padding: 4px;
+  border: 1px solid #283248;
+  border-radius: 6px;
+}
+.custom-label-dialog__icons[aria-disabled='true'] { opacity: 0.4; pointer-events: none; }
+
+.custom-label-dialog__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 34px;
+  background: #141a26;
+  border: 1px solid #283248;
+  border-radius: 5px;
+  color: #c8d0e0;
+  cursor: pointer;
+}
+.custom-label-dialog__icon:hover { background: #1e2738; border-color: #4a5a78; color: #fff; }
 
 /* Read-only display of a generated share URL. Monospace so the UUID
    tail stays scannable; truncated with ellipsis if the origin is long. */

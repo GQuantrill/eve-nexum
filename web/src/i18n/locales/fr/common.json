@@ -708,7 +708,11 @@
     "optimizeConnections": "Optimiser les connexions",
     "spreadNodes": "Espacer les nœuds",
     "removeOrphans": "Supprimer les systèmes orphelins ({{count}})",
-    "removeOrphansConfirm": "Supprimer {{count}} système(s) orphelin(s) ? Ils n'ont aucune connexion valide (aucune, ou uniquement rompues). Les systèmes d'origine et verrouillés sont conservés. Cette action est réversible."
+    "removeOrphansConfirm": "Supprimer {{count}} système(s) orphelin(s) ? Ils n'ont aucune connexion valide (aucune, ou uniquement rompues). Les systèmes d'origine et verrouillés sont conservés. Cette action est réversible.",
+    "labels": "Labels",
+    "customLabel": "Label personnalisé",
+    "clearLabels": "Effacer",
+    "labelNamed": "Label {{name}}"
   },
   "panel": {
     "notes": "Notes",
@@ -1500,5 +1504,16 @@
     "confirm": "Confirmer",
     "differentHole": "Autre trou",
     "unmapped": "Trou inconnu"
+  },
+  "labelsDialog": {
+    "title": "Labels personnalisés",
+    "max": "Jusqu'à {{n}} labels personnalisés",
+    "textPlaceholder": "Texte du label",
+    "addText": "Ajouter",
+    "searchIcons": "Rechercher des icônes…",
+    "moreIcons": "{{shown}} sur {{total}} — affinez la recherche",
+    "remove": "Supprimer",
+    "colour": "Couleur",
+    "maxReached": "Maximum de {{n}} labels personnalisés atteint — supprimez-en un pour en ajouter."
   }
 }

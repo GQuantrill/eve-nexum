@@ -708,7 +708,11 @@
     "optimizeConnections": "연결 최적화",
     "spreadNodes": "노드 펼치기",
     "removeOrphans": "고립 성계 제거 ({{count}})",
-    "removeOrphansConfirm": "{{count}}개의 고립 성계를 제거하시겠습니까? 이들은 유효한 연결이 없습니다(없거나 끊긴 것만). 홈과 잠긴 성계는 유지됩니다. 실행 취소할 수 있습니다."
+    "removeOrphansConfirm": "{{count}}개의 고립 성계를 제거하시겠습니까? 이들은 유효한 연결이 없습니다(없거나 끊긴 것만). 홈과 잠긴 성계는 유지됩니다. 실행 취소할 수 있습니다.",
+    "labels": "라벨",
+    "customLabel": "사용자 라벨",
+    "clearLabels": "지우기",
+    "labelNamed": "라벨 {{name}}"
   },
   "panel": {
     "notes": "노트",
@@ -1500,5 +1504,16 @@
     "confirm": "확인",
     "differentHole": "다른 웜홀",
     "unmapped": "미확인 웜홀"
+  },
+  "labelsDialog": {
+    "title": "사용자 라벨",
+    "max": "사용자 라벨 최대 {{n}}개",
+    "textPlaceholder": "라벨 텍스트",
+    "addText": "추가",
+    "searchIcons": "아이콘 검색…",
+    "moreIcons": "{{total}}개 중 {{shown}}개 표시 — 검색으로 좁히기",
+    "remove": "제거",
+    "colour": "색상",
+    "maxReached": "사용자 라벨 최대 {{n}}개에 도달했습니다 — 추가하려면 하나를 제거하세요."
   }
 }

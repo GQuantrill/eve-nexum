@@ -189,6 +189,12 @@ export async function migrate() {
     -- empty. NULL means no tag.
     ALTER TABLE map_systems     ADD COLUMN IF NOT EXISTS intel TEXT;
 
+    -- Per-system labels shown as pill badges above the node. labels holds the
+    -- applied predefined ids (subset of a,b,c,1,2,3); custom_labels holds up to
+    -- 3 user entries, each prefixed 't:<text>' or 'i:<IconName>'.
+    ALTER TABLE map_systems     ADD COLUMN IF NOT EXISTS labels        TEXT[] NOT NULL DEFAULT '{}';
+    ALTER TABLE map_systems     ADD COLUMN IF NOT EXISTS custom_labels TEXT[] NOT NULL DEFAULT '{}';
+
     CREATE TABLE IF NOT EXISTS map_signatures (
       id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
       system_id   UUID        NOT NULL REFERENCES map_systems(id) ON DELETE CASCADE,

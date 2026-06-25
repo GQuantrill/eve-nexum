@@ -79,6 +79,7 @@ export async function loadFullMap(mapId: string) {
               effect, statics, region_name AS "regionName", npc_type AS "npcType",
               position_x AS x, position_y AS y,
               status, intel, is_home AS "isHome", locked, notes,
+              labels, custom_labels AS "customLabels",
               (SELECT ss.security::float8 FROM solar_systems ss WHERE ss.id = map_systems.eve_system_id) AS "security",
               last_activity_at AS "lastActivityAt"
        FROM map_systems WHERE map_id = $1`,

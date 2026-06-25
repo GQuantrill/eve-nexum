@@ -1524,6 +1524,38 @@ mapsRouter.patch('/:mapId/systems/:systemId', async (req, res) => {
     vals.push(v);
   }
 
+  // Predefined labels — applied as coloured pills above the node. A subset of
+  // the fixed id set; deduped before storing.
+  if ('labels' in updates) {
+    const v = updates.labels;
+    const ALLOWED = new Set(['a', 'b', 'c', '1', '2', '3']);
+    if (!Array.isArray(v) || v.some((x) => typeof x !== 'string' || !ALLOWED.has(x))) {
+      res.status(400).json({ error: 'invalid labels' }); return;
+    }
+    sets.push(`labels = $${vals.length + 1}`);
+    vals.push([...new Set(v as string[])]);
+  }
+
+  // Custom labels — up to 3 entries, each '<kind>:<color>:<value>' where kind
+  // is t|i, color is '#RRGGBB' or empty, value is text (<=40 chars) or a
+  // Phosphor icon name. Legacy '<kind>:<value>' (no colour) still accepted.
+  if ('customLabels' in updates) {
+    const v = updates.customLabels;
+    const COLOR = '(#[0-9a-fA-F]{6})?';
+    const valid = (s: unknown) =>
+      typeof s === 'string' && (
+        new RegExp(`^t:${COLOR}:.{1,40}$`).test(s) ||
+        new RegExp(`^i:${COLOR}:[A-Za-z0-9]{1,40}$`).test(s) ||
+        /^t:.{1,40}$/.test(s) ||              // legacy text
+        /^i:[A-Za-z0-9]{1,40}$/.test(s)       // legacy icon
+      );
+    if (!Array.isArray(v) || v.length > 3 || v.some((x) => !valid(x))) {
+      res.status(400).json({ error: 'invalid customLabels' }); return;
+    }
+    sets.push(`custom_labels = $${vals.length + 1}`);
+    vals.push(v);
+  }
+
   // handle position separately
   if (updates.position && typeof updates.position === 'object') {
     const pos = updates.position as { x?: number; y?: number };

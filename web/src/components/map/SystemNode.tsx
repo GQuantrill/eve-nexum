@@ -22,6 +22,8 @@ import { useStorms, findStorm } from '../../hooks/useStorms';
 import { useScoutConnections, findScoutConnections } from '../../hooks/useScoutConnections';
 import { useA0Systems } from '../../hooks/useA0Systems';
 import { useShatteredSystems } from '../../hooks/useShatteredSystems';
+import { PREDEFINED_LABELS, parseCustomLabel, labelTextColor } from '../../data/labels';
+import { iconComponent } from '../../utils/phosphorIcons';
 import { useIceBeltSystems, hasIceBelt } from '../../hooks/useIceBeltSystems';
 import { useCurrentHourKills } from '../../hooks/useCurrentHourKills';
 import { useNow30s } from '../../hooks/useNow30s';
@@ -242,6 +244,31 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
         selectSystem(sys.id);
       }}
     >
+      {/* Label pills, anchored just above the node's top-left (absolutely
+          positioned so they sit outside the node body). Predefined coloured
+          pills first, then custom text / icon pills. */}
+      {(sys.labels?.length || sys.customLabels?.length) ? (
+        <div className="system-node__labels">
+          {PREDEFINED_LABELS.filter((l) => sys.labels?.includes(l.id)).map((l) => (
+            <span key={l.id} className="system-node__label" style={{ background: l.color }}>{l.char}</span>
+          ))}
+          {(sys.customLabels ?? []).map((raw, i) => {
+            const parsed = parseCustomLabel(raw);
+            if (!parsed) return null;
+            const Icon = parsed.kind === 'icon' ? iconComponent(parsed.value) : null;
+            return (
+              <span
+                key={i}
+                className={`system-node__label${parsed.color ? '' : ' system-node__label--custom'}`}
+                style={parsed.color ? { background: parsed.color, color: labelTextColor(parsed.color), textShadow: 'none' } : undefined}
+              >
+                {Icon ? <Icon size={12} weight="fill" /> : parsed.value}
+              </span>
+            );
+          })}
+        </div>
+      ) : null}
+
       {/* Always present so existing edge handle references stay valid across mode toggles */}
       <Handle type="source" position={Position.Top}    id="top"    className={easyConnect ? 'system-handle system-handle--ghost' : 'system-handle'} />
       <Handle type="source" position={Position.Right}  id="right"  className={easyConnect ? 'system-handle system-handle--ghost' : 'system-handle'} />

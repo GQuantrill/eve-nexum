@@ -735,6 +735,10 @@
     "intelEmpty": "Empty",
     "intelUnnamed": "(unnamed)",
     "clearIntel": "Clear Intel",
+    "labels": "Labels",
+    "customLabel": "Custom label",
+    "clearLabels": "Clear",
+    "labelNamed": "Label {{name}}",
     "lockSystem": "Lock System",
     "unlockSystem": "Unlock System",
     "removeSystem": "Remove System",
@@ -1480,6 +1484,17 @@
     "lessThan4h": "< 4 hrs",
     "lessThan1h": "< 1 hr",
     "broken": "Connection broken — the wormhole sig was deleted (hole collapsed)"
+  },
+  "labelsDialog": {
+    "title": "Custom labels",
+    "max": "Up to {{n}} custom labels",
+    "textPlaceholder": "Label text",
+    "addText": "Add",
+    "searchIcons": "Search icons…",
+    "moreIcons": "Showing {{shown}} of {{total}} — search to narrow",
+    "remove": "Remove",
+    "colour": "Colour",
+    "maxReached": "Maximum of {{n}} custom labels reached — remove one to add another."
   },
   "whJump": {
     "confirmOne": "Jumped to {{system}}. Mark {{sig}} as leading there?",

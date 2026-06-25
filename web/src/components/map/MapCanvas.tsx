@@ -24,8 +24,10 @@ import { ConfirmModal, shouldSkipConfirm } from '../ui/ConfirmModal';
 import {
   PathIcon, MapPinSimpleIcon, HouseIcon, LockIcon, LockOpenIcon,
   XIcon, CheckIcon, PlusIcon, SelectionAllIcon, EyeIcon, CrosshairSimpleIcon,
-  LinkSimpleIcon, LinkBreakIcon, ArrowsOutIcon,
+  LinkSimpleIcon, LinkBreakIcon, ArrowsOutIcon, BookmarkSimpleIcon, TextAaIcon, TrashIcon,
 } from '@phosphor-icons/react';
+import { PREDEFINED_LABELS } from '../../data/labels';
+import { CustomLabelDialog } from '../ui/CustomLabelDialog';
 import type { MapSystem, SystemIntel } from '../../types';
 import { CLASS_COLORS } from '../../data/wormholes';
 import { cssVarToHex } from '../../utils/cssVar';
@@ -179,6 +181,8 @@ export function MapCanvas() {
   );
 
   const [pendingPosition, setPendingPosition] = useState<{ x: number; y: number } | null>(null);
+  // systemId whose custom-label dialog is open (null = closed).
+  const [labelDialogFor, setLabelDialogFor] = useState<string | null>(null);
   const [contextMenu, setContextMenu]         = useState<CtxMenu | null>(null);
   // Pending "remove orphan systems" sweep, held while the confirm modal is up.
   const [orphanConfirm, setOrphanConfirm]     = useState<{ ids: string[] } | null>(null);
@@ -1042,6 +1046,39 @@ export function MapCanvas() {
         },
       ];
 
+      // Labels: toggle predefined coloured pills (A/B/C/1/2/3), open the custom
+      // dialog, or clear all. Single-select only — each toggle persists via the
+      // same updateSystem path intel uses. Closes the menu on click (reopen to
+      // toggle more), matching the rest of the menu.
+      const labelItem = !multiSelected ? [{
+        label: t('ctxMenu.labels'),
+        icon:  <BookmarkSimpleIcon size={16} weight="regular" color="#cbd5e1" />,
+        submenu: [
+          {
+            label:  t('ctxMenu.customLabel'),
+            icon:   <TextAaIcon size={15} weight="regular" />,
+            action: () => setLabelDialogFor(contextMenu.nodeId!),
+          },
+          {
+            label:  t('ctxMenu.clearLabels'),
+            icon:   <TrashIcon size={15} weight="regular" />,
+            disabled: !(sys?.labels?.length || sys?.customLabels?.length),
+            action: () => updateSystem(contextMenu.nodeId!, { labels: [], customLabels: [] }),
+          },
+          { separator: true as const },
+          ...PREDEFINED_LABELS.map((l) => ({
+            label:   t('ctxMenu.labelNamed', { name: l.char }),
+            icon:    <span className="label-swatch" style={{ background: l.color }}>{l.char}</span>,
+            checked: (sys?.labels ?? []).includes(l.id),
+            action:  () => {
+              const cur  = sys?.labels ?? [];
+              const next = cur.includes(l.id) ? cur.filter((x) => x !== l.id) : [...cur, l.id];
+              updateSystem(contextMenu.nodeId!, { labels: next });
+            },
+          })),
+        ],
+      }] : [];
+
       return [
         {
           label: sys?.locked ? t('ctxMenu.unlockSystem') : t('ctxMenu.lockSystem'),
@@ -1065,6 +1102,7 @@ export function MapCanvas() {
         }] : []),
         ...homeItem,
         ...intelItem,
+        ...labelItem,
         ...multiItems,
         ...waypointItems,
       ];
@@ -1221,6 +1259,18 @@ export function MapCanvas() {
       {pendingPosition && (
         <AddSystemModal position={pendingPosition} onClose={() => setPendingPosition(null)} />
       )}
+
+      {labelDialogFor && (() => {
+        const sys = systems.find((s) => s.id === labelDialogFor);
+        if (!sys) return null;
+        return (
+          <CustomLabelDialog
+            customLabels={sys.customLabels ?? []}
+            onChange={(next) => updateSystem(labelDialogFor, { customLabels: next })}
+            onClose={() => setLabelDialogFor(null)}
+          />
+        );
+      })()}
 
       {orphanConfirm && (
         <ConfirmModal

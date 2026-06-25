@@ -366,6 +366,8 @@ async function createTables() {
       is_home       BOOLEAN     NOT NULL DEFAULT FALSE,
       locked        BOOLEAN     NOT NULL DEFAULT FALSE,
       notes         TEXT        NOT NULL DEFAULT '',
+      labels        TEXT[]      NOT NULL DEFAULT '{}',
+      custom_labels TEXT[]      NOT NULL DEFAULT '{}',
       last_activity_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
