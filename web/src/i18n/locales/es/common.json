@@ -1269,6 +1269,18 @@
       "lazyWhRemoval": {
         "title": "Eliminar automáticamente agujeros de gusano caducados",
         "desc": "Opcional por mapa: un barrido en el servidor elimina las firmas de agujero de gusano una vez que superan la vida útil máxima de su tipo, poniendo en cuarentena cualquier conexión que sostuvieran. Se ejecuta incluso cuando nadie tiene el mapa abierto, para que las cadenas sincronizadas y de corp se mantengan al día por sí solas."
+      },
+      "labels": {
+        "title": "Etiquetas de sistema",
+        "desc": "Etiqueta cualquier sistema con etiquetas de color — alterna el conjunto predefinido A/B/C y 1/2/3, o añade hasta tres etiquetas propias (texto libre o un icono de Phosphor) con un color de fondo a tu elección. Se muestran como píldoras sobre el nodo y se sincronizan para todos en un mapa de corporación."
+      },
+      "apiKeys": {
+        "title": "Gestión de claves API",
+        "desc": "Genera y revoca claves API personales para usar herramientas externas con tus mapas. Cada clave actúa como un personaje elegido y tiene alcance — solo lectura, lectura + eventos en vivo, o lectura + escritura de contenido — así que solo puede hacer lo que ese personaje puede."
+      },
+      "chains": {
+        "title": "Cadenas de agujeros de gusano guardadas",
+        "desc": "Guarda cualquier ruta de tu mapa como una cadena con nombre — elige un sistema de inicio y fin y la ruta se guarda con el número de saltos. Pasa el ratón sobre una cadena para atenuar todo lo demás e iluminar solo sus sistemas y conexiones, céntrate en cualquier salto y reordena tus cadenas. Los saltos rotos se marcan para volver a explorar."
       }
     },
     "corpFeatures": {

@@ -1269,6 +1269,18 @@
       "colorVision": {
         "title": "Farbenblind-Modi",
         "desc": "Deuteranopie-, Protanopie- und Tritanopie-Paletten, die jede Status-, Klassen- und Standings-Farbe in der gesamten App neu zuordnen."
+      },
+      "labels": {
+        "title": "Systemlabels",
+        "desc": "Markiere jedes System mit farbigen Labels — schalte das vordefinierte Set A/B/C und 1/2/3 um oder füge bis zu drei eigene Labels hinzu (freier Text oder ein Phosphor-Symbol) mit selbst gewählter Hintergrundfarbe. Sie erscheinen als Pillen über dem Knoten und werden für alle auf einer Corp-Karte synchronisiert."
+      },
+      "apiKeys": {
+        "title": "API-Schlüsselverwaltung",
+        "desc": "Erzeuge und widerrufe persönliche API-Schlüssel, um externe Tools mit deinen Karten zu betreiben. Jeder Schlüssel handelt als gewählter Charakter und ist begrenzt — nur lesen, lesen + Live-Events oder lesen + Inhalte schreiben — also kann er nur das, was auch dieser Charakter kann."
+      },
+      "chains": {
+        "title": "Gespeicherte Wurmloch-Ketten",
+        "desc": "Speichere jeden Pfad durch deine Karte als benannte Kette — wähle Start- und Zielsystem, und die Route wird mit Sprunganzahl gesichert. Fahre über eine Kette, um alles andere abzudunkeln und nur ihre Systeme und Verbindungen hervorzuheben, zentriere auf einen Sprung und ordne deine Ketten neu. Defekte Sprünge melden sich selbst zum erneuten Scouten."
       }
     },
     "corpFeatures": {

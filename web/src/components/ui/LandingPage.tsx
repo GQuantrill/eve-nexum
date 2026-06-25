@@ -10,6 +10,7 @@ import {
   PathIcon, StarIcon, SnowflakeIcon, LightningIcon, WarningIcon, NavigationArrowIcon, MapPinIcon, BroadcastIcon, BellRingingIcon, DiscordLogoIcon, BinocularsIcon,
   CommandIcon, HouseIcon, SkullIcon, ChartBarIcon, PulseIcon, EyeIcon, SidebarIcon, EyeglassesIcon,
   SquaresFourIcon, UserGearIcon, TableIcon, ChartDonutIcon, ClockIcon, ClipboardTextIcon, TagIcon, IdentificationCardIcon,
+  LineSegmentsIcon,
 } from '@phosphor-icons/react';
 import { apiUrl } from '../../api/client';
 import { SUPPORTED_LANGUAGES, LANGUAGE_NAMES } from '../../i18n';
@@ -28,11 +29,11 @@ type FeatureId =
   | 'interactiveMap' | 'seedRegion' | 'whIntel' | 'rollingCalc' | 'whPicker'
   | 'multiSelect' | 'pngExport' | 'sigAging' | 'brokenChain' | 'orphanCleanup' | 'lazyWhRemoval'
   | 'soloCorp' | 'multiCharacter' | 'multiMap' | 'mergeMaps' | 'crossMapSync' | 'realtime' | 'mapLocking' | 'rbac'
-  | 'systemPanel' | 'sigMgmt' | 'structImport' | 'autoStruct' | 'activityCharts'
+  | 'systemPanel' | 'sigMgmt' | 'labels' | 'structImport' | 'autoStruct' | 'activityCharts'
   | 'sovStation' | 'killboard' | 'effectDigest' | 'standings'
   | 'scout' | 'a0' | 'iceBelt' | 'storms' | 'proximity' | 'discordNotif' | 'watchlist'
-  | 'routePlanner' | 'locationTracking' | 'presence' | 'onlineStatus'
-  | 'commandPalette' | 'homeHotkey' | 'killHighlights' | 'userStats'
+  | 'chains' | 'routePlanner' | 'locationTracking' | 'presence' | 'onlineStatus'
+  | 'commandPalette' | 'homeHotkey' | 'killHighlights' | 'userStats' | 'apiKeys'
   | 'serverStatus' | 'demoMap' | 'sidebar' | 'colorVision';
 type CorpFeatureId =
   | 'multiCorp' | 'adminDash' | 'userMgmt' | 'mapMgmt' | 'usersReport'
@@ -76,6 +77,7 @@ const FEATURE_SECTIONS: FeatureSection[] = [
     items: [
       { icon: CardsIcon,      id: 'systemPanel'    },
       { icon: WaveformIcon,   id: 'sigMgmt'        },
+      { icon: TagIcon,        id: 'labels'         },
       { icon: BuildingsIcon,  id: 'structImport'   },
       { icon: SparkleIcon,    id: 'autoStruct'     },
       { icon: ChartLineIcon,  id: 'activityCharts' },
@@ -95,6 +97,7 @@ const FEATURE_SECTIONS: FeatureSection[] = [
       { icon: WarningIcon,         id: 'proximity'        },
       { icon: BinocularsIcon,      id: 'watchlist'        },
       { icon: BellRingingIcon,     id: 'discordNotif'     },
+      { icon: LineSegmentsIcon,    id: 'chains'           },
       { icon: NavigationArrowIcon, id: 'routePlanner'     },
       { icon: MapPinIcon,          id: 'locationTracking' },
       { icon: UsersIcon,           id: 'presence'         },
@@ -108,6 +111,7 @@ const FEATURE_SECTIONS: FeatureSection[] = [
       { icon: HouseIcon,    id: 'homeHotkey'     },
       { icon: SkullIcon,    id: 'killHighlights' },
       { icon: ChartBarIcon, id: 'userStats'      },
+      { icon: IdentificationCardIcon, id: 'apiKeys' },
       { icon: PulseIcon,    id: 'serverStatus'   },
       { icon: EyeIcon,        id: 'demoMap'     },
       { icon: SidebarIcon,    id: 'sidebar'     },

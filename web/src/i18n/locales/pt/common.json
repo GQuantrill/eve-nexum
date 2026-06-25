@@ -1269,6 +1269,18 @@
       "colorVision": {
         "title": "Modos para daltónicos",
         "desc": "Paletas de deuteranopia, protanopia e tritanopia que remapeiam todas as cores de estado, classe e standings em toda a aplicação."
+      },
+      "labels": {
+        "title": "Etiquetas de sistema",
+        "desc": "Marque qualquer sistema com etiquetas coloridas — alterne o conjunto predefinido A/B/C e 1/2/3, ou adicione até três etiquetas personalizadas (texto livre ou um ícone Phosphor) com uma cor de fundo à sua escolha. Aparecem como pílulas acima do nó e sincronizam para todos num mapa de corporação."
+      },
+      "apiKeys": {
+        "title": "Gestão de chaves de API",
+        "desc": "Gere e revogue chaves de API pessoais para usar ferramentas externas com os seus mapas. Cada chave age como um personagem escolhido e tem escopo — só leitura, leitura + eventos ao vivo, ou leitura + escrita de conteúdo — por isso só pode fazer o que esse personagem pode."
+      },
+      "chains": {
+        "title": "Cadeias de buracos de minhoca salvas",
+        "desc": "Grave qualquer caminho no seu mapa como uma cadeia nomeada — escolha um sistema inicial e final e a rota é salva com a contagem de saltos. Passe o rato sobre uma cadeia para escurecer o resto e iluminar apenas os seus sistemas e conexões, centre num salto e reordene as suas cadeias. Saltos quebrados sinalizam-se para re-explorar."
       }
     },
     "corpFeatures": {
