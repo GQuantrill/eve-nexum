@@ -1512,6 +1512,8 @@
     "addText": "Ajouter",
     "searchIcons": "Rechercher des icônes…",
     "moreIcons": "{{shown}} sur {{total}} — affinez la recherche",
-    "remove": "Supprimer"
+    "remove": "Supprimer",
+    "colour": "Couleur",
+    "maxReached": "Maximum de {{n}} labels personnalisés atteint — supprimez-en un pour en ajouter."
   }
 }

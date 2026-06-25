@@ -3,7 +3,8 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { XIcon } from '@phosphor-icons/react';
 import {
-  MAX_CUSTOM_LABELS, parseCustomLabel, encodeTextLabel, encodeIconLabel,
+  MAX_CUSTOM_LABELS, DEFAULT_CUSTOM_LABEL_COLOR,
+  parseCustomLabel, encodeTextLabel, encodeIconLabel, labelTextColor,
 } from '../../data/labels';
 import { ALL_ICON_NAMES, iconComponent } from '../../utils/phosphorIcons';
 
@@ -22,6 +23,9 @@ export function CustomLabelDialog({ customLabels, onChange, onClose }: Props) {
   const [labels, setLabels] = useState<string[]>(customLabels);
   const [text, setText]     = useState('');
   const [iconQuery, setIconQuery] = useState('');
+  // Colour applied to the next label added; also the starting value for the
+  // per-chip recolour inputs.
+  const [color, setColor]   = useState<string>(DEFAULT_CUSTOM_LABEL_COLOR);
 
   const full = labels.length >= MAX_CUSTOM_LABELS;
 
@@ -29,11 +33,18 @@ export function CustomLabelDialog({ customLabels, onChange, onClose }: Props) {
   const addText = () => {
     const v = text.trim();
     if (!v || full) return;
-    apply([...labels, encodeTextLabel(v.slice(0, 40))]);
+    apply([...labels, encodeTextLabel(v.slice(0, 40), color)]);
     setText('');
   };
-  const addIcon = (name: string) => { if (!full) apply([...labels, encodeIconLabel(name)]); };
+  const addIcon = (name: string) => { if (!full) apply([...labels, encodeIconLabel(name, color)]); };
   const removeAt = (i: number) => apply(labels.filter((_, j) => j !== i));
+  // Recolour an existing chip — re-encode it with the new colour, keeping kind + value.
+  const recolorAt = (i: number, c: string) => {
+    const parsed = parseCustomLabel(labels[i]);
+    if (!parsed) return;
+    const next = parsed.kind === 'text' ? encodeTextLabel(parsed.value, c) : encodeIconLabel(parsed.value, c);
+    apply(labels.map((raw, j) => (j === i ? next : raw)));
+  };
 
   const matches = useMemo(() => {
     const q = iconQuery.trim().toLowerCase();
@@ -57,9 +68,22 @@ export function CustomLabelDialog({ customLabels, onChange, onClose }: Props) {
               {labels.map((raw, i) => {
                 const parsed = parseCustomLabel(raw);
                 const Icon = parsed?.kind === 'icon' ? iconComponent(parsed.value) : null;
+                const bg = parsed?.color || undefined;
                 return (
-                  <span key={i} className="custom-label-dialog__chip">
+                  <span
+                    key={i}
+                    className={`custom-label-dialog__chip${bg ? ' custom-label-dialog__chip--coloured' : ''}`}
+                    style={bg ? { background: bg, borderColor: bg, color: labelTextColor(bg) } : undefined}
+                  >
                     {Icon ? <Icon size={13} weight="fill" /> : <span>{parsed?.value ?? raw}</span>}
+                    {/* Recolour swatch — native colour input, label as the visible swatch. */}
+                    <label className="custom-label-dialog__chip-color" title={t('labelsDialog.colour')}>
+                      <input
+                        type="color"
+                        value={parsed?.color || DEFAULT_CUSTOM_LABEL_COLOR}
+                        onChange={(e) => recolorAt(i, e.target.value)}
+                      />
+                    </label>
                     <button className="custom-label-dialog__chip-x" onClick={() => removeAt(i)} aria-label={t('labelsDialog.remove')}>
                       <XIcon size={11} weight="bold" />
                     </button>
@@ -70,6 +94,20 @@ export function CustomLabelDialog({ customLabels, onChange, onClose }: Props) {
           )}
 
           <p className="custom-label-dialog__hint">{t('labelsDialog.max', { n: MAX_CUSTOM_LABELS })}</p>
+
+          {/* Add area — wrapped so a single title explains why it's disabled at
+              the cap (a `title` on a disabled control itself won't show on hover;
+              on the enclosing element it does). */}
+          <div
+            className="custom-label-dialog__add-area"
+            aria-disabled={full}
+            title={full ? t('labelsDialog.maxReached', { n: MAX_CUSTOM_LABELS }) : undefined}
+          >
+          {/* Colour for the next label added (text or icon). */}
+          <label className="custom-label-dialog__color-row">
+            <span>{t('labelsDialog.colour')}</span>
+            <input type="color" value={color} disabled={full} onChange={(e) => setColor(e.target.value)} />
+          </label>
 
           {/* Add a text label */}
           <div className="custom-label-dialog__add-text">
@@ -119,6 +157,7 @@ export function CustomLabelDialog({ customLabels, onChange, onClose }: Props) {
               {t('labelsDialog.moreIcons', { shown: matches.shown.length, total: matches.total })}
             </p>
           )}
+          </div>
         </div>
       </div>
     </div>,

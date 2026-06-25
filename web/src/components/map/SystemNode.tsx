@@ -22,7 +22,7 @@ import { useStorms, findStorm } from '../../hooks/useStorms';
 import { useScoutConnections, findScoutConnections } from '../../hooks/useScoutConnections';
 import { useA0Systems } from '../../hooks/useA0Systems';
 import { useShatteredSystems } from '../../hooks/useShatteredSystems';
-import { PREDEFINED_LABELS, parseCustomLabel } from '../../data/labels';
+import { PREDEFINED_LABELS, parseCustomLabel, labelTextColor } from '../../data/labels';
 import { iconComponent } from '../../utils/phosphorIcons';
 import { useIceBeltSystems, hasIceBelt } from '../../hooks/useIceBeltSystems';
 import { useCurrentHourKills } from '../../hooks/useCurrentHourKills';
@@ -257,7 +257,11 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
             if (!parsed) return null;
             const Icon = parsed.kind === 'icon' ? iconComponent(parsed.value) : null;
             return (
-              <span key={i} className="system-node__label system-node__label--custom">
+              <span
+                key={i}
+                className={`system-node__label${parsed.color ? '' : ' system-node__label--custom'}`}
+                style={parsed.color ? { background: parsed.color, color: labelTextColor(parsed.color), textShadow: 'none' } : undefined}
+              >
                 {Icon ? <Icon size={12} weight="fill" /> : parsed.value}
               </span>
             );

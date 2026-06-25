@@ -2384,6 +2384,49 @@
   padding: 0;
 }
 .custom-label-dialog__chip-x:hover { color: #e25a5a; }
+/* Text colour is set inline per-chip (black/white for contrast); the X inherits
+   it so it stays legible on light backgrounds too. */
+.custom-label-dialog__chip--coloured .custom-label-dialog__chip-x { color: inherit; opacity: 0.7; }
+.custom-label-dialog__chip--coloured .custom-label-dialog__chip-x:hover { opacity: 1; }
+
+/* Per-chip recolour swatch — the native colour input shrunk to a small square. */
+.custom-label-dialog__chip-color {
+  display: inline-flex;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.35);
+}
+.custom-label-dialog__chip-color input[type='color'] {
+  width: 200%;
+  height: 200%;
+  margin: -25%;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+/* Colour row for the next-added label. */
+.custom-label-dialog__color-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0 6px;
+  font-size: calc(12px * var(--font-scale, 1));
+  color: #c8d0e0;
+}
+.custom-label-dialog__color-row input[type='color'] {
+  width: 34px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid #33415c;
+  border-radius: 4px;
+  background: none;
+  cursor: pointer;
+}
 
 .custom-label-dialog__hint {
   font-size: calc(11px * var(--font-scale, 1));
@@ -2392,6 +2435,9 @@
 }
 
 .custom-label-dialog__add-text { display: flex; gap: 6px; }
+
+/* At the custom-label cap the whole add area dims; the title explains why. */
+.custom-label-dialog__add-area[aria-disabled='true'] { opacity: 0.55; cursor: not-allowed; }
 
 .custom-label-dialog__icons {
   display: grid;

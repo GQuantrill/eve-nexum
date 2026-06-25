@@ -1512,6 +1512,8 @@
     "addText": "追加",
     "searchIcons": "アイコンを検索…",
     "moreIcons": "{{total}} 件中 {{shown}} 件を表示 — 検索で絞り込み",
-    "remove": "削除"
+    "remove": "削除",
+    "colour": "色",
+    "maxReached": "カスタムラベルは最大 {{n}} 個です — 追加するには1つ削除してください。"
   }
 }

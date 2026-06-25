@@ -24,15 +24,41 @@ export const PREDEFINED_LABEL_IDS = PREDEFINED_LABELS.map((l) => l.id);
 
 export const MAX_CUSTOM_LABELS = 3;
 
-export type CustomLabel =
-  | { kind: 'text'; value: string }
-  | { kind: 'icon'; value: string };
+// Default custom-label pill colour when the user hasn't picked one.
+export const DEFAULT_CUSTOM_LABEL_COLOR = '#3b6ea5';
 
-export function parseCustomLabel(raw: string): CustomLabel | null {
-  if (raw.startsWith('t:')) return { kind: 'text', value: raw.slice(2) };
-  if (raw.startsWith('i:')) return { kind: 'icon', value: raw.slice(2) };
-  return null;
+export interface CustomLabel {
+  kind:  'text' | 'icon';
+  value: string;
+  color: string;  // '#RRGGBB', or '' to fall back to the neutral pill style
 }
 
-export const encodeTextLabel = (text: string): string => `t:${text}`;
-export const encodeIconLabel = (iconName: string): string => `i:${iconName}`;
+// Encoding: `<kind>:<color>:<value>` where kind is t|i and color is '#RRGGBB'
+// or empty. Value (text or icon name) may itself contain colons. Legacy
+// entries written before colours existed are `<kind>:<value>` (no colour
+// segment) — still parsed, with an empty colour.
+export function parseCustomLabel(raw: string): CustomLabel | null {
+  const kind = raw.startsWith('t:') ? 'text' : raw.startsWith('i:') ? 'icon' : null;
+  if (!kind) return null;
+  const rest = raw.slice(2);
+  const m = rest.match(/^(#[0-9a-fA-F]{6})?:([\s\S]*)$/);
+  if (m) return { kind, value: m[2], color: m[1] ?? '' };
+  return { kind, value: rest, color: '' }; // legacy `<kind>:<value>`
+}
+
+export const encodeTextLabel = (text: string, color = ''): string => `t:${color}:${text}`;
+export const encodeIconLabel = (iconName: string, color = ''): string => `i:${color}:${iconName}`;
+
+// Pick black or white text for legibility on a given pill background, by
+// perceived luminance (YIQ). Light backgrounds get black text, dark get white.
+// The threshold leans slightly toward white so only clearly-light colours flip.
+export function labelTextColor(bgHex: string): string {
+  const c = bgHex.replace('#', '');
+  if (c.length < 6) return '#fff';
+  const r = parseInt(c.slice(0, 2), 16);
+  const g = parseInt(c.slice(2, 4), 16);
+  const b = parseInt(c.slice(4, 6), 16);
+  if ([r, g, b].some(Number.isNaN)) return '#fff';
+  const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+  return yiq >= 140 ? '#000' : '#fff';
+}
