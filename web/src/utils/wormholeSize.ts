@@ -6,11 +6,22 @@ import type { TFunction } from 'i18next';
 // value clusters: 5M -> S, 62M -> M, 375M/410M -> L, 1B/2B -> XL.
 export type WhSizeClass = 'xl' | 'large' | 'medium' | 'small';
 
+// Per-jump mass thresholds (kg) — the single source of truth for wormhole size.
+// Any classifier (the S/M/L/XL one below, the descriptive chart tiers) must read
+// these so they can never drift. `capital` is the freighter-vs-capital split the
+// descriptive chart draws; the 4-tier S/M/L/XL system folds it into `xl`.
+export const WH_JUMP_MASS = {
+  capital: 2_000_000_000,
+  xl:      1_000_000_000,
+  large:     300_000_000,
+  medium:     62_000_000,
+} as const;
+
 export function whSizeClass(maxJumpMass: number | null | undefined): WhSizeClass | null {
   if (!maxJumpMass || maxJumpMass <= 0) return null;
-  if (maxJumpMass >= 1_000_000_000) return 'xl';
-  if (maxJumpMass >= 300_000_000)   return 'large';
-  if (maxJumpMass >= 62_000_000)    return 'medium';
+  if (maxJumpMass >= WH_JUMP_MASS.xl)     return 'xl';
+  if (maxJumpMass >= WH_JUMP_MASS.large)  return 'large';
+  if (maxJumpMass >= WH_JUMP_MASS.medium) return 'medium';
   return 'small';
 }
 

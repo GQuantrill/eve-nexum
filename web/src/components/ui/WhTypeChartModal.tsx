@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { XIcon } from '@phosphor-icons/react';
 import { CLASS_COLORS } from '../../data/wormholes';
+import { WH_JUMP_MASS } from '../../utils/wormholeSize';
 import type { SystemClass } from '../../types';
 import {
   WH_CHART, RESPAWN_ORDER, SPAWN_ORDER, LEADS_ORDER, SHIP_ORDER, MASS_ORDER, LIFE_ORDER,
@@ -20,10 +21,10 @@ function shipSizeFromSde(
 ): ShipSize | null {
   const m = whTypes[code.toUpperCase()]?.maxJumpMass;
   if (!m) return null;
-  if (m >= 2_000_000_000) return 'up to Capital';
-  if (m >= 1_000_000_000) return 'up to Freighter';
-  if (m >= 300_000_000)   return 'up to Battleship';
-  if (m >= 62_000_000)    return 'up to Battlecruiser';
+  if (m >= WH_JUMP_MASS.capital) return 'up to Capital';
+  if (m >= WH_JUMP_MASS.xl)      return 'up to Freighter';
+  if (m >= WH_JUMP_MASS.large)   return 'up to Battleship';
+  if (m >= WH_JUMP_MASS.medium)  return 'up to Battlecruiser';
   return 'up to Destroyer';
 }
 

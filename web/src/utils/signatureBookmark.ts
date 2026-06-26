@@ -1,5 +1,6 @@
 import type { Signature } from '../types';
 import type { WormholeSpec } from '../hooks/useWormholeTypes';
+import { whSizeClass, whSizeShort } from './wormholeSize';
 
 // Tokens the bookmark-name format understands. Also drives the legend shown
 // next to the format setting.
@@ -20,14 +21,13 @@ export const BOOKMARK_TOKENS: { token: string; desc: string }[] = [
 // anyone who wants it, just not in the default.
 export const DEFAULT_BOOKMARK_FORMAT = '{sig} {dest_type} {size}';
 
-// Per-jump mass -> short size letter. Buckets are approximate and easy to
-// tweak; 0 (unknown, e.g. an un-typed K162) yields no letter.
+// Per-jump mass -> short size letter. Reuses the canonical classifier in
+// wormholeSize.ts so the bookmark {size} can never drift from the connection
+// panel (it used to have its own off-by-one `<=` thresholds — a 62M/375M/1B
+// hole is M/L/XL, not S/M/L). 0 (unknown, e.g. an un-typed K162) yields no letter.
 function sizeLetter(jumpMassKg: number): string {
-  if (!jumpMassKg) return '';
-  if (jumpMassKg <=    62_000_000) return 'S';
-  if (jumpMassKg <=   375_000_000) return 'M';
-  if (jumpMassKg <= 1_000_000_000) return 'L';
-  return 'XL';
+  const cls = whSizeClass(jumpMassKg);
+  return cls ? whSizeShort(cls) : '';
 }
 
 // Matches the longest tokens first so {sig_letters} isn't eaten by {sig}.
