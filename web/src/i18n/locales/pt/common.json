@@ -1515,7 +1515,9 @@
     "confirmMany": "Saltou para {{system}}. Qual assinatura você usou?",
     "confirm": "Confirmar",
     "differentHole": "Outro buraco",
-    "unmapped": "Buraco desconhecido"
+    "unmapped": "Buraco desconhecido",
+    "filled": "{{sig}} agora leva a {{system}}",
+    "undo": "Desfazer"
   },
   "labelsDialog": {
     "title": "Etiquetas personalizadas",

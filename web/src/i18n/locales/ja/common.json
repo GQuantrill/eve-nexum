@@ -1515,7 +1515,9 @@
     "confirmMany": "{{system}} へジャンプ。どのシグネチャを通りましたか？",
     "confirm": "確認",
     "differentHole": "別のホール",
-    "unmapped": "未確認のホール"
+    "unmapped": "未確認のホール",
+    "filled": "{{sig}} は {{system}} へ通じます",
+    "undo": "元に戻す"
   },
   "labelsDialog": {
     "title": "カスタムラベル",

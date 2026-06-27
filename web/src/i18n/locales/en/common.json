@@ -1513,6 +1513,8 @@
     "confirmMany": "Jumped to {{system}}. Which signature did you jump?",
     "confirm": "Confirm",
     "differentHole": "Different hole",
-    "unmapped": "Unmapped hole"
+    "unmapped": "Unmapped hole",
+    "filled": "{{sig}} now leads to {{system}}",
+    "undo": "Undo"
   }
 }

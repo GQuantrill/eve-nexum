@@ -1553,7 +1553,9 @@
     "confirmMany": "Прыжок в {{system}}. Через какую сигнатуру вы прыгнули?",
     "confirm": "Подтвердить",
     "differentHole": "Другая дыра",
-    "unmapped": "Неизвестная дыра"
+    "unmapped": "Неизвестная дыра",
+    "filled": "{{sig}} теперь ведёт в {{system}}",
+    "undo": "Отменить"
   },
   "labelsDialog": {
     "title": "Свои метки",

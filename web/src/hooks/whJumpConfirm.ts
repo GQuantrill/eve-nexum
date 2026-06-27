@@ -4,16 +4,10 @@ import { reevaluateConnectionsForSystem } from '../utils/whAutoDetect';
 import i18n from '../i18n';
 import type { Signature } from '../types';
 
-// After a tracked wormhole jump, offer to record which wormhole signature in
-// the source system was the one jumped — upgrading its leads-to from a class /
-// "unknown" to the SPECIFIC system we arrived in. Confirm-on-commit: nothing is
-// written until the user picks, so no premature live-sync / Discord broadcast.
+// After a tracked wormhole jump, record which wormhole signature in the source
+// system was jumped — pinning its leads-to to the SPECIFIC arrival system. A
+// single plausible hole is filled directly (with an undo); ambiguous cases ask.
 // See wh_jump_confirm_feature.md.
-
-// W-space ids start here; w-space has no stargates, so a jump touching it is a
-// wormhole jump. (k<->k wormhole jumps need server gate data — out of v1.)
-const WSPACE_MIN_ID = 31_000_000;
-const isWspace = (eveId: number | null): boolean => eveId !== null && eveId >= WSPACE_MIN_ID;
 
 // The leads-to values that are class/band/unknown rather than a pinned system
 // (see LeadsToDropdown). Anything NOT in here is a specific connected-system
@@ -54,8 +48,19 @@ export interface WhJumpContext {
 export async function maybeConfirmWhJump(ctx: WhJumpContext): Promise<void> {
   const { mapId, fromMapSystemId, fromEveSystemId, toEveSystemId, toClass, toName } = ctx;
 
-  // Only when the jump involves w-space (guaranteed-wormhole).
-  if (!isWspace(fromEveSystemId) && !isWspace(toEveSystemId)) return;
+  // Wormhole jump only. Use the stargate route: directly gate-adjacent systems
+  // are exactly 1 jump apart, so a shortest route of 1 means it was a gate, not
+  // a hole. Anything > 1 jump — or no gate path at all, which includes ALL
+  // w-space (no stargates) — means a wormhole. Race-free vs reading the
+  // connection's async gate classification.
+  if (fromEveSystemId && toEveSystemId) {
+    try {
+      const r = await api<Record<string, { jumps: number }>>(
+        `/api/route?from=${fromEveSystemId}&to=${toEveSystemId}&mode=shortest`,
+      );
+      if (r[String(toEveSystemId)]?.jumps === 1) return; // adjacent → gate jump
+    } catch { /* route unavailable — fall through and treat as a wormhole */ }
+  }
 
   let sigs: Signature[];
   try {
@@ -73,27 +78,28 @@ export async function maybeConfirmWhJump(ctx: WhJumpContext): Promise<void> {
   const label = (s: Signature): string => s.sigId || s.whType || s.name || '???';
   const dedupeKey = `whjump:${fromMapSystemId}->${toEveSystemId ?? '?'}`;
 
-  // Pin the hole to the specific arrival system (the dropdown stores the
-  // connected-system name as the leads-to value), then re-run the same
-  // connection auto-detect the sig pane uses on edit — so the map edge picks up
-  // this sig's WH type now that the hole resolves to the destination system.
-  const setLeadsTo = (s: Signature): void => {
+  // Write a hole's leads-to and re-run the same connection auto-detect the sig
+  // pane uses on edit, so the map edge picks up the WH type. `oldSig` is the
+  // pre-write state — it lets the auto-detect follow/clear the right link.
+  const writeLeadsTo = (s: Signature, value: string, oldSig: Signature): void => {
     api(`/api/maps/${mapId}/systems/${fromMapSystemId}/signatures/${s.id}`, {
       method: 'PATCH',
-      body:   JSON.stringify({ whLeadsTo: toName }),
+      body:   JSON.stringify({ whLeadsTo: value }),
     }).catch(() => { /* best-effort; the user can still set it by hand */ });
-    const updated = sigs.map((x) => (x.id === s.id ? { ...x, whLeadsTo: toName } : x));
-    reevaluateConnectionsForSystem(fromMapSystemId, updated, s);
+    const updated = sigs.map((x) => (x.id === s.id ? { ...x, whLeadsTo: value } : x));
+    reevaluateConnectionsForSystem(fromMapSystemId, updated, oldSig);
   };
 
-  // One plausible hole → one-tap confirm; several → one button per candidate.
+  // One plausible hole → fill it directly (no prompt), with an undo. Several →
+  // ask which one (no safe way to guess).
   if (candidates.length === 1) {
     const sole = candidates[0];
-    toast.show(t('whJump.confirmOne', { sig: label(sole), system: toName }), {
-      kind: 'info', sticky: true, dedupeKey,
+    const prev = sole.whLeadsTo;
+    writeLeadsTo(sole, toName, sole);
+    toast.show(t('whJump.filled', { sig: label(sole), system: toName }), {
+      kind: 'success', dedupeKey, ttlMs: 8000,
       actions: [
-        { label: t('whJump.confirm'),       primary: true, onClick: () => setLeadsTo(sole) },
-        { label: t('whJump.differentHole'),                onClick: () => { /* skip */ } },
+        { label: t('whJump.undo'), onClick: () => writeLeadsTo(sole, prev, { ...sole, whLeadsTo: toName }) },
       ],
     });
     return;
@@ -102,7 +108,7 @@ export async function maybeConfirmWhJump(ctx: WhJumpContext): Promise<void> {
   toast.show(t('whJump.confirmMany', { system: toName }), {
     kind: 'info', sticky: true, dedupeKey,
     actions: [
-      ...candidates.map((s) => ({ label: label(s), onClick: () => setLeadsTo(s) })),
+      ...candidates.map((s) => ({ label: label(s), onClick: () => writeLeadsTo(s, toName, s) })),
       { label: t('whJump.unmapped'), onClick: () => { /* skip */ } },
     ],
   });

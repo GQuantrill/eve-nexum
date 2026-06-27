@@ -1515,7 +1515,9 @@
     "confirmMany": "Saut vers {{system}}. Quelle signature avez-vous empruntée ?",
     "confirm": "Confirmer",
     "differentHole": "Autre trou",
-    "unmapped": "Trou inconnu"
+    "unmapped": "Trou inconnu",
+    "filled": "{{sig}} mène maintenant vers {{system}}",
+    "undo": "Annuler"
   },
   "labelsDialog": {
     "title": "Labels personnalisés",

@@ -1515,7 +1515,9 @@
     "confirmMany": "{{system}}(으)로 점프했습니다. 어떤 시그니처로 점프했나요?",
     "confirm": "확인",
     "differentHole": "다른 웜홀",
-    "unmapped": "미확인 웜홀"
+    "unmapped": "미확인 웜홀",
+    "filled": "{{sig}}이(가) 이제 {{system}}(으)로 연결됩니다",
+    "undo": "실행 취소"
   },
   "labelsDialog": {
     "title": "사용자 라벨",

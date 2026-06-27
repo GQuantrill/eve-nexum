@@ -157,6 +157,7 @@ export function applyJump(system: JumpSystem, prevMapSystemId: string | null, ca
     }
   }
 
+  let jumpConnId: string | null = null;
   if (canAdd && prevMapSystemId && prevMapSystemId !== mapSystemId && map.systems.some((s) => s.id === prevMapSystemId)) {
     const freshConnections = useMapStore.getState().map.connections;
     const existingConn = freshConnections.find(
@@ -167,6 +168,7 @@ export function applyJump(system: JumpSystem, prevMapSystemId: string | null, ca
     if (existingConn) {
       // Physically jumping the link is proof it's live — un-quarantine if broken.
       if (existingConn.broken) updateConnection(existingConn.id, { broken: false });
+      jumpConnId = existingConn.id;
     } else {
       const placed = useMapStore.getState().map.systems;
       const srcPos = placed.find((s) => s.id === prevMapSystemId)?.position;
@@ -174,16 +176,15 @@ export function applyJump(system: JumpSystem, prevMapSystemId: string | null, ca
       const { sourceHandle, targetHandle } = srcPos && tgtPos
         ? pickHandles(srcPos, tgtPos)
         : { sourceHandle: 'right' as const, targetHandle: 'left' as const };
-      addConnection(prevMapSystemId, mapSystemId, sourceHandle, targetHandle);
+      jumpConnId = addConnection(prevMapSystemId, mapSystemId, sourceHandle, targetHandle);
     }
   }
 
   // A jump resolved — real tracking and the jump simulator both funnel through
-  // here. If it's a wormhole jump, offer to pin the source system's hole to
-  // where it led. Fires regardless of whether the connection was new (so a
-  // class-only hole still gets upgraded to the specific system); holes already
-  // pinned to a system are filtered out inside whJumpConfirm. Fire-and-forget.
-  if (canAdd && prevMapSystemId && prevMapSystemId !== mapSystemId) {
+  // here. If it crossed a wormhole (not a stargate — whJumpConfirm checks the
+  // stargate route between the two systems), record where the source's hole
+  // leads. Holes already pinned to a system are filtered out inside whJumpConfirm.
+  if (jumpConnId && prevMapSystemId) {
     const fromSys = map.systems.find((s) => s.id === prevMapSystemId);
     void maybeConfirmWhJump({
       mapId:           map.id,

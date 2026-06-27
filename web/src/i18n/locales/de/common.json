@@ -1515,7 +1515,9 @@
     "confirmMany": "Sprung nach {{system}}. Welche Signatur warst du?",
     "confirm": "Bestätigen",
     "differentHole": "Anderes Loch",
-    "unmapped": "Unbekanntes Loch"
+    "unmapped": "Unbekanntes Loch",
+    "filled": "{{sig}} führt jetzt nach {{system}}",
+    "undo": "Rückgängig"
   },
   "labelsDialog": {
     "title": "Eigene Labels",

@@ -1515,7 +1515,9 @@
     "confirmMany": "Saltaste a {{system}}. ¿Qué firma usaste?",
     "confirm": "Confirmar",
     "differentHole": "Otro agujero",
-    "unmapped": "Agujero desconocido"
+    "unmapped": "Agujero desconocido",
+    "filled": "{{sig}} ahora lleva a {{system}}",
+    "undo": "Deshacer"
   },
   "labelsDialog": {
     "title": "Etiquetas personalizadas",
