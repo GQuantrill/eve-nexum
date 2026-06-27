@@ -155,6 +155,10 @@ export function MapCanvas() {
   const { screenToFlowPosition, setViewport, getViewport, getNode, getNodes, getZoom, fitView } = useReactFlow();
   // Invert mouse-wheel / trackpad zoom (per-user, cross-device). Off by default.
   const [invertZoom] = useUserSetting<boolean>('nexum.map.invertZoom', false);
+  // Re-centre the map on the system you JUMP into. On by default; users who find
+  // the constant re-centring jarring can turn it off in Map controls. Manually
+  // clicking a system always centres regardless of this.
+  const [centerOnJump] = useUserSetting<boolean>('nexum.map.centerOnJump', true);
   // Subscribed so the canvas-painted MiniMap (which can't read CSS vars)
   // re-resolves class colours when the colour-vision mode changes.
   const [colorVision] = useUserSetting<string>('nexum.a11y.colorVision', 'off');
@@ -432,13 +436,17 @@ export function MapCanvas() {
 
   useEffect(() => {
     if (!selectedSystemId) return;
+    // Centring on a jump is gated by the toggle; manually clicking a system
+    // always centres. The selection carries whether it came from a jump (set by
+    // location tracking); read live so this keys off the selection change.
+    if (useMapStore.getState().selectViaJump && !centerOnJump) return;
     // For newly-added nodes React Flow needs one frame to commit the node
     // before getNode can find it.
     if (!centerOnSystem(selectedSystemId)) {
       const raf = requestAnimationFrame(() => centerOnSystem(selectedSystemId));
       return () => cancelAnimationFrame(raf);
     }
-  }, [selectedSystemId, centerOnSystem]);
+  }, [selectedSystemId, centerOnJump, centerOnSystem]);
 
   // Turning compact mode OFF grows every node, which can leave them overlapping.
   // Auto-run the same spread the sidebar button triggers — but only after a

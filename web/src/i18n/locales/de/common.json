@@ -361,6 +361,7 @@
     },
     "snapToGrid": "Am Raster ausrichten",
     "settings": "Einstellungen",
+    "centerOnJump": "Bei Sprung neu zentrieren",
     "invertZoom": "Zoom umkehren (Maus/Trackpad)",
     "minimap": "Minikarte",
     "position": "Position",
