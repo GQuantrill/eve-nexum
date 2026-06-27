@@ -756,6 +756,16 @@ export function MapSidebar() {
 
         <CollapsibleSection title={t("mapSidebar.sections.mapControls")} {...sectionProps("mapControls")}>
           <SettingToggle
+            settingKey="nexum.map.centerOnJump"
+            label={t("mapSidebar.centerOnJump")}
+            defaultOn={true}
+          />
+          <SettingToggle
+            settingKey="nexum.map.centerOnSelect"
+            label={t("mapSidebar.centerOnSelect")}
+            defaultOn={true}
+          />
+          <SettingToggle
             settingKey="nexum.map.invertZoom"
             label={t("mapSidebar.invertZoom")}
             defaultOn={false}

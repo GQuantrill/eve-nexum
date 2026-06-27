@@ -399,6 +399,8 @@
     },
     "snapToGrid": "Snap to Grid",
     "settings": "Settings",
+    "centerOnJump": "Re-centre on jump",
+    "centerOnSelect": "Re-centre on select",
     "invertZoom": "Invert zoom (mouse/trackpad)",
     "minimap": "Minimap",
     "position": "Position",

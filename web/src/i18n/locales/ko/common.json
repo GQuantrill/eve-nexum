@@ -361,6 +361,8 @@
     },
     "snapToGrid": "격자에 맞추기",
     "settings": "설정",
+    "centerOnJump": "점프 시 다시 가운데 정렬",
+    "centerOnSelect": "선택 시 다시 가운데 정렬",
     "invertZoom": "확대/축소 반전 (마우스/트랙패드)",
     "minimap": "미니맵",
     "position": "위치",

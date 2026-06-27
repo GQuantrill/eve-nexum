@@ -361,6 +361,8 @@
     },
     "snapToGrid": "对齐网格",
     "settings": "设置",
+    "centerOnJump": "跳跃时重新居中",
+    "centerOnSelect": "选择时重新居中",
     "invertZoom": "反转缩放（鼠标/触控板）",
     "minimap": "小地图",
     "position": "位置",

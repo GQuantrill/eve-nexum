@@ -361,6 +361,8 @@
     },
     "snapToGrid": "グリッドに合わせる",
     "settings": "設定",
+    "centerOnJump": "ジャンプ時に再センタリング",
+    "centerOnSelect": "選択時に再センタリング",
     "invertZoom": "ズーム反転（マウス/トラックパッド）",
     "minimap": "ミニマップ",
     "position": "位置",

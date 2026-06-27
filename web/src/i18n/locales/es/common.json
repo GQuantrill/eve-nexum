@@ -361,6 +361,8 @@
     },
     "snapToGrid": "Ajustar a la cuadrícula",
     "settings": "Ajustes",
+    "centerOnJump": "Recentrar al saltar",
+    "centerOnSelect": "Recentrar al seleccionar",
     "invertZoom": "Invertir zoom (ratón/trackpad)",
     "minimap": "Minimapa",
     "position": "Posición",

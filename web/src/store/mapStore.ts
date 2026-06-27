@@ -157,6 +157,9 @@ interface MapStore {
   // Current map
   map: WormholeMap;
   selectedSystemId: string | null;
+  // True when the current selection came from a tracked jump (vs a user click).
+  // Lets the map gate "re-centre on jump" without affecting click-to-centre.
+  selectViaJump: boolean;
   selectedConnectionId: string | null;
   currentSystemId: string | null;
   snapToGrid: boolean;
@@ -271,7 +274,7 @@ interface MapStore {
   reorderRoutes: (orderedIds: string[]) => void;
 
   // Selection
-  selectSystem: (id: string | null) => void;
+  selectSystem: (id: string | null, opts?: { fromJump?: boolean }) => void;
   selectConnection: (id: string | null) => void;
 
   // Per-system revision counters bumped when a remote client changes that
@@ -470,6 +473,7 @@ export const useMapStore = create<MapStore>()((set, get) => {
     activeMapId: null,
     map: emptyMap(),
     selectedSystemId: null,
+    selectViaJump: false,
     selectedConnectionId: null,
     currentSystemId: null,
     snapToGrid: false,
@@ -1138,7 +1142,7 @@ export const useMapStore = create<MapStore>()((set, get) => {
       }
     },
 
-    selectSystem: (id) => set({ selectedSystemId: id, selectedConnectionId: null }),
+    selectSystem: (id, opts) => set({ selectedSystemId: id, selectedConnectionId: null, selectViaJump: !!opts?.fromJump }),
     selectConnection: (id) => set({ selectedConnectionId: id, selectedSystemId: null }),
     setCurrentSystem: (id) => set({ currentSystemId: id }),
 

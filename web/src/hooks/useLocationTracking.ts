@@ -273,6 +273,6 @@ export function useLocationTracking(enabled: boolean) {
 
     lastMapSystemId.current = mapSystemId;
     setCurrentSystem(mapSystemId);
-    selectSystem(mapSystemId);
+    selectSystem(mapSystemId, { fromJump: true });
   }, [enabled, location, canEdit]);
 }

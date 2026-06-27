@@ -361,6 +361,8 @@
     },
     "snapToGrid": "Aligner sur la grille",
     "settings": "Paramètres",
+    "centerOnJump": "Recentrer au saut",
+    "centerOnSelect": "Recentrer à la sélection",
     "invertZoom": "Inverser le zoom (souris/pavé tactile)",
     "minimap": "Mini-carte",
     "position": "Position",
