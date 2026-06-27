@@ -33,6 +33,14 @@ const CLASS_MAP: Record<number, string> = {
   25: 'pochven',
 };
 
+// Destination override by WH code, for holes the SDE leaves with dest_class=-1
+// (no standard destination attribute). C729 is the Pochven (Triglavian) hole —
+// it leads into Pochven, but CCP never set its destination class in dogma, so
+// without this it would be skipped as "unmapped".
+const DEST_OVERRIDE: Record<string, string> = {
+  C729: 'pochven',
+};
+
 // Curated, non-derivable fields, keyed by WH code. Also the fallback source for
 // codes that aren't in dogma at all (e.g. K162, the generic "return side").
 interface CuratedSpec {
@@ -110,7 +118,7 @@ async function loadSpecs(): Promise<Record<string, WormholeSpec>> {
     for (const row of rows) {
       const code = row.name.replace(/^Wormhole\s+/, '');
       const destNum = row.dest_class != null ? Math.round(parseFloat(row.dest_class)) : null;
-      const dest = destNum != null ? CLASS_MAP[destNum] : null;
+      const dest = (destNum != null ? CLASS_MAP[destNum] : null) ?? DEST_OVERRIDE[code] ?? null;
       if (!dest) { unmapped.push(`${code} (dest_class=${row.dest_class})`); continue; }
 
       const cur = curated[code];

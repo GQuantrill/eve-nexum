@@ -363,6 +363,8 @@ Traefik will handle TLS termination and HTTP→HTTPS redirects. The `docker-comp
 
 App-schema migrations (`users`, `maps`, `map_signatures`, etc.) layer on automatically the first time the server boots — no manual step.
 
+> **Schema ownership.** The one-shot importer (`server/scripts/setup-db.ts`) creates only the **static/SDE** schema and its indexes (`solar_systems`, `map_stargates`, `item_types`, …) — it must not depend on app columns the server migration adds later, since the importer runs *before* the server boots. **App-table indexes are owned by `server/src/migrate.ts`**, which creates them after the app columns are guaranteed to exist. (Keeping an app-table index in the importer would crash a fresh bootstrap on a missing column.)
+
 #### Updating the SDE
 
 The static data (systems, stargates, item types, dogma — everything CCP ships in the Static Data Export) is imported into Postgres at first boot and kept current from there. Here's how it stays up to date, how to force it, and how to check which build you're on.
