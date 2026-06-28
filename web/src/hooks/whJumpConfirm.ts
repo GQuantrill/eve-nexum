@@ -48,20 +48,6 @@ export interface WhJumpContext {
 export async function maybeConfirmWhJump(ctx: WhJumpContext): Promise<void> {
   const { mapId, fromMapSystemId, fromEveSystemId, toEveSystemId, toClass, toName } = ctx;
 
-  // Wormhole jump only. Use the stargate route: directly gate-adjacent systems
-  // are exactly 1 jump apart, so a shortest route of 1 means it was a gate, not
-  // a hole. Anything > 1 jump — or no gate path at all, which includes ALL
-  // w-space (no stargates) — means a wormhole. Race-free vs reading the
-  // connection's async gate classification.
-  if (fromEveSystemId && toEveSystemId) {
-    try {
-      const r = await api<Record<string, { jumps: number }>>(
-        `/api/route?from=${fromEveSystemId}&to=${toEveSystemId}&mode=shortest`,
-      );
-      if (r[String(toEveSystemId)]?.jumps === 1) return; // adjacent → gate jump
-    } catch { /* route unavailable — fall through and treat as a wormhole */ }
-  }
-
   let sigs: Signature[];
   try {
     sigs = await api<Signature[]>(`/api/maps/${mapId}/systems/${fromMapSystemId}/signatures`);
@@ -71,8 +57,24 @@ export async function maybeConfirmWhJump(ctx: WhJumpContext): Promise<void> {
 
   // Eligible = known wormhole sigs not yet pinned to a system, whose class is
   // compatible with where we arrived. Unknowns (non-wormhole) are never touched.
+  // Bail BEFORE the route check when there's nothing to fill, so ordinary gate
+  // travel never hits the (rate-limited) route endpoint.
   const candidates = sigs.filter((s) => s.sigType === 'wormhole' && isCandidate(s.whLeadsTo, toClass));
   if (candidates.length === 0) return;
+
+  // Wormhole jump only. Gate-adjacent systems are exactly 1 jump apart, so a
+  // shortest route of 1 means it was a gate, not a hole. > 1 jump — or no gate
+  // path at all, which includes ALL w-space (no stargates) — means a wormhole.
+  // Be conservative: if the route can't be checked (e.g. rate-limited), do NOT
+  // fill — a false fill on a gate jump is worse than a missed prompt.
+  if (fromEveSystemId && toEveSystemId) {
+    try {
+      const r = await api<Record<string, { jumps: number }>>(
+        `/api/route?from=${fromEveSystemId}&to=${toEveSystemId}&mode=shortest`,
+      );
+      if (r[String(toEveSystemId)]?.jumps === 1) return; // adjacent → gate jump
+    } catch { return; } // route unavailable → don't risk a false fill on a gate
+  }
 
   const t = i18n.t.bind(i18n);
   const label = (s: Signature): string => s.sigId || s.whType || s.name || '???';
