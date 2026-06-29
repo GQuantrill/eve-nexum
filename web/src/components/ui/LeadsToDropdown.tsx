@@ -95,7 +95,7 @@ export function LeadsToDropdown({ value, onChange, connectedSystems = [] }: Prop
         <div
           ref={dropdownRef}
           className="wh-picker__dropdown"
-          style={{ position: 'fixed', top: pos.top, left: pos.left }}
+          style={{ position: 'fixed', left: pos.left, top: pos.top, bottom: pos.bottom, maxHeight: pos.maxHeight }}
         >
           <input
             ref={searchRef}
