@@ -1,6 +1,7 @@
 import { api } from '../api/client';
 import { toast } from '../components/ui/Toaster';
 import { reevaluateConnectionsForSystem } from '../utils/whAutoDetect';
+import { useMapStore, awaitConnectionType } from '../store/mapStore';
 import i18n from '../i18n';
 import type { Signature } from '../types';
 
@@ -39,28 +40,14 @@ function isCandidate(whLeadsTo: string, arrivalClass: string): boolean {
 export interface WhJumpContext {
   mapId:           string;
   fromMapSystemId: string;       // source system's map-node id (where the hole sig lives)
-  fromEveSystemId: number | null;
   toEveSystemId:   number | null;
   toClass:         string;        // arrival system's class, e.g. 'C3'
   toName:          string;        // arrival system's name, e.g. 'J203753' — what we pin the hole to
+  connId:          string | null; // the connection the jump traversed
 }
 
 export async function maybeConfirmWhJump(ctx: WhJumpContext): Promise<void> {
-  const { mapId, fromMapSystemId, fromEveSystemId, toEveSystemId, toClass, toName } = ctx;
-
-  // Wormhole jump only. Use the stargate route: directly gate-adjacent systems
-  // are exactly 1 jump apart, so a shortest route of 1 means it was a gate, not
-  // a hole. Anything > 1 jump — or no gate path at all, which includes ALL
-  // w-space (no stargates) — means a wormhole. Race-free vs reading the
-  // connection's async gate classification.
-  if (fromEveSystemId && toEveSystemId) {
-    try {
-      const r = await api<Record<string, { jumps: number }>>(
-        `/api/route?from=${fromEveSystemId}&to=${toEveSystemId}&mode=shortest`,
-      );
-      if (r[String(toEveSystemId)]?.jumps === 1) return; // adjacent → gate jump
-    } catch { /* route unavailable — fall through and treat as a wormhole */ }
-  }
+  const { mapId, fromMapSystemId, toEveSystemId, toClass, toName, connId } = ctx;
 
   let sigs: Signature[];
   try {
@@ -71,8 +58,23 @@ export async function maybeConfirmWhJump(ctx: WhJumpContext): Promise<void> {
 
   // Eligible = known wormhole sigs not yet pinned to a system, whose class is
   // compatible with where we arrived. Unknowns (non-wormhole) are never touched.
+  // Bail before the gate check when there's nothing to fill.
   const candidates = sigs.filter((s) => s.sigType === 'wormhole' && isCandidate(s.whLeadsTo, toClass));
   if (candidates.length === 0) return;
+
+  // Wormhole jump only. Use the connection's server gate classification — the
+  // same map_stargates check that draws the 'G' badge, reliable now that gates
+  // are classified from the endpoints' eve ids at create time. For a fresh
+  // connection, await the create POST's result; an existing one is already
+  // classified in the store. Proceed ONLY for a confirmed 'standard' (wormhole)
+  // — a gate / jump-bridge / unknown is left alone, so no false fills on a gate.
+  if (connId) {
+    const pending = awaitConnectionType(connId);
+    const ct = pending
+      ? await pending
+      : useMapStore.getState().map.connections.find((c) => c.id === connId)?.connectionType ?? 'standard';
+    if (ct !== 'standard') return;
+  }
 
   const t = i18n.t.bind(i18n);
   const label = (s: Signature): string => s.sigId || s.whType || s.name || '???';

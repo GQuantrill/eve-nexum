@@ -182,17 +182,16 @@ export function applyJump(system: JumpSystem, prevMapSystemId: string | null, ca
 
   // A jump resolved — real tracking and the jump simulator both funnel through
   // here. If it crossed a wormhole (not a stargate — whJumpConfirm checks the
-  // stargate route between the two systems), record where the source's hole
-  // leads. Holes already pinned to a system are filtered out inside whJumpConfirm.
+  // connection's gate classification), record where the source's hole leads.
+  // Holes already pinned to a system are filtered out inside whJumpConfirm.
   if (jumpConnId && prevMapSystemId) {
-    const fromSys = map.systems.find((s) => s.id === prevMapSystemId);
     void maybeConfirmWhJump({
       mapId:           map.id,
       fromMapSystemId: prevMapSystemId,
-      fromEveSystemId: fromSys?.eveSystemId ?? null,
       toEveSystemId:   system.eveSystemId,
       toClass:         system.systemClass,
       toName:          system.name,
+      connId:          jumpConnId,
     });
   }
 
