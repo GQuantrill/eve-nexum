@@ -6027,6 +6027,15 @@ select.sig-toolbar-btn option {
   border-radius: 6px;
 }
 
+/* Shown for gate / jump-bridge connections in place of the wormhole fields. */
+.conn-gate-note {
+  margin: 0;
+  padding: 8px 10px;
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #8a93a6;
+  font-style: italic;
+}
+
 /* ---- Rolling calculator ------------------------------------------------ */
 
 /* Positioning context for the ±10% variance band overlay. */

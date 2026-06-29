@@ -646,7 +646,9 @@
     "removeConnection": "Quitar conexión",
     "brokenNotice": "Conexión rota — la firma de agujero de gusano que la sostenía fue eliminada. Se mantiene en el mapa pero en cuarentena del enrutamiento.",
     "restore": "Restaurar",
-    "restoreTitle": "Quitar la marca de rota y volver a tratarla como una conexión activa"
+    "restoreTitle": "Quitar la marca de rota y volver a tratarla como una conexión activa",
+    "gateNote": "Stargate normal — sin datos de agujero de gusano.",
+    "jumpgateNote": "Puente Ansiblex — sin datos de agujero de gusano."
   },
   "mapControls": {
     "panel": "Panel de control",

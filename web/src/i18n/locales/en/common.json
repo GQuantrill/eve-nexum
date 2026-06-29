@@ -630,6 +630,8 @@
     "restoreTitle": "Clear the broken flag and treat this as a live connection again",
     "whType": "Wormhole type",
     "whTypePlaceholder": "K162, C247…",
+    "gateNote": "In-game stargate — no wormhole data to track.",
+    "jumpgateNote": "Ansiblex jump bridge — no wormhole data to track.",
     "sigLink": "Backing signatures",
     "sigInSystem": "Sig in {{system}}",
     "sigNone": "Not linked",
