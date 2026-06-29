@@ -18,6 +18,16 @@ export interface RouteOriginOverride {
 
 // Debounce position saves — fires max once per 500 ms per system
 const moveTimers = new Map<string, ReturnType<typeof setTimeout>>();
+
+// Per-connection promises that resolve with the server's authoritative
+// gate/standard classification once the create POST returns. Lets the jump
+// confirm await the real type instead of racing the optimistic 'standard'
+// default. Resolves 'unknown' if the POST failed (offline) so callers can be
+// conservative. Self-cleans after settling.
+const connClassPromises = new Map<string, Promise<string>>();
+export function awaitConnectionType(id: string): Promise<string> | null {
+  return connClassPromises.get(id) ?? null;
+}
 // Per-node measured dimensions, kept out of reactive state so individual
 // ResizeObserver fires don't trigger re-renders across the whole map.
 // `countHeight` is false for systems with statics — those WH systems can
@@ -1007,20 +1017,30 @@ export const useMapStore = create<MapStore>()((set, get) => {
         get().pushUndo({ type: 'add_connection', connectionId: id });
         if (activeMapId) {
           const url  = `/api/maps/${activeMapId}/connections`;
-          const body = JSON.stringify({ ...conn });
-          api<{ ok: boolean; connectionType?: string }>(url, { method: 'POST', body })
+          // Pass the endpoints' eve ids so the server can gate-classify directly
+          // from map_stargates without waiting for both system rows to commit —
+          // a jump POSTs the new system and this connection near-simultaneously.
+          const systemsNow  = get().map.systems;
+          const sourceEveId = systemsNow.find((s) => s.id === conn.sourceId)?.eveSystemId ?? null;
+          const targetEveId = systemsNow.find((s) => s.id === conn.targetId)?.eveSystemId ?? null;
+          const body = JSON.stringify({ ...conn, sourceEveId, targetEveId });
+          const classifyP = api<{ ok: boolean; connectionType?: string }>(url, { method: 'POST', body })
             .then((r) => {
               // Server may auto-classify an in-game gate (stargate-adjacent
               // systems). Reflect it locally so the chain/edge updates without
               // a reload.
-              if (r?.connectionType && r.connectionType !== 'standard') {
+              const ct = r?.connectionType ?? 'standard';
+              if (ct !== 'standard') {
                 set((s) => ({
                   map: { ...s.map, connections: s.map.connections.map((c) =>
-                    c.id === id ? { ...c, connectionType: r.connectionType as MapConnection['connectionType'] } : c) },
+                    c.id === id ? { ...c, connectionType: ct as MapConnection['connectionType'] } : c) },
                 }));
               }
+              return ct;
             })
-            .catch(() => enqueue(`addConnection:${id}`, url, 'POST', body));
+            .catch(() => { enqueue(`addConnection:${id}`, url, 'POST', body); return 'unknown'; });
+          connClassPromises.set(id, classifyP);
+          void classifyP.finally(() => connClassPromises.delete(id));
         }
       }
 

@@ -646,7 +646,9 @@
     "removeConnection": "Verbindung entfernen",
     "brokenNotice": "Verbindung unterbrochen — die stützende Wurmloch-Sig wurde gelöscht. Bleibt auf der Karte, ist aber vom Routing in Quarantäne.",
     "restore": "Wiederherstellen",
-    "restoreTitle": "Die Unterbrochen-Markierung entfernen und dies wieder als aktive Verbindung behandeln"
+    "restoreTitle": "Die Unterbrochen-Markierung entfernen und dies wieder als aktive Verbindung behandeln",
+    "gateNote": "Reguläres Stargate — keine Wurmloch-Daten.",
+    "jumpgateNote": "Ansiblex-Sprungbrücke — keine Wurmloch-Daten."
   },
   "mapControls": {
     "panel": "Steuerungsfeld",

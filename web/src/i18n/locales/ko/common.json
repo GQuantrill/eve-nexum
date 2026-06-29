@@ -646,7 +646,9 @@
     "removeConnection": "연결 제거",
     "brokenNotice": "연결 끊김 — 이를 지탱하던 웜홀 시그니처가 삭제되었습니다. 맵에는 남아 있지만 라우팅에서 격리됩니다.",
     "restore": "복원",
-    "restoreTitle": "끊김 플래그를 해제하고 다시 활성 연결로 처리합니다"
+    "restoreTitle": "끊김 플래그를 해제하고 다시 활성 연결로 처리합니다",
+    "gateNote": "일반 스타게이트 — 추적할 웜홀 데이터 없음.",
+    "jumpgateNote": "Ansiblex 점프 브리지 — 추적할 웜홀 데이터 없음."
   },
   "mapControls": {
     "panel": "제어판",

@@ -1604,7 +1604,7 @@ mapsRouter.delete('/:mapId/systems/:systemId', async (req, res) => {
 
 mapsRouter.post('/:mapId/connections', async (req, res) => {
   const { mapId } = req.params;
-  const { id, sourceId, targetId, sourceHandle, targetHandle, connectionType, massStatus, timeStatus, size } = req.body;
+  const { id, sourceId, targetId, sourceHandle, targetHandle, connectionType, massStatus, timeStatus, size, sourceEveId, targetEveId } = req.body;
 
   const access = await requireMapWrite(res, mapId, req);
   if (!access) return;
@@ -1617,19 +1617,36 @@ mapsRouter.post('/:mapId/connections', async (req, res) => {
   let effectiveType: string = connectionType ?? 'standard';
   if (effectiveType === 'standard') {
     try {
-      const adj = await db.query(
-        `SELECT 1 FROM map_systems s, map_systems t
-          WHERE s.id = $1 AND t.id = $2
-            AND s.eve_system_id IS NOT NULL AND t.eve_system_id IS NOT NULL
-            AND EXISTS (
-              SELECT 1 FROM map_stargates g
-               WHERE (g.system_id = s.eve_system_id AND g.destination_system_id = t.eve_system_id)
-                  OR (g.system_id = t.eve_system_id AND g.destination_system_id = s.eve_system_id)
-            )
-          LIMIT 1`,
-        [sourceId, targetId],
-      );
-      if ((adj.rowCount ?? 0) > 0) effectiveType = 'gate';
+      let adjacent = false;
+      if (typeof sourceEveId === 'number' && typeof targetEveId === 'number') {
+        // Classify straight from the eve ids the client supplied — robust to the
+        // freshly-jumped-to system's row not being committed yet (a jump POSTs
+        // the new system and this connection near-simultaneously, and the old
+        // map_systems join could race the insert and mis-tag the gate as a hole).
+        const adj = await db.query(
+          `SELECT 1 FROM map_stargates g
+            WHERE (g.system_id = $1 AND g.destination_system_id = $2)
+               OR (g.system_id = $2 AND g.destination_system_id = $1)
+            LIMIT 1`,
+          [sourceEveId, targetEveId],
+        );
+        adjacent = (adj.rowCount ?? 0) > 0;
+      } else {
+        const adj = await db.query(
+          `SELECT 1 FROM map_systems s, map_systems t
+            WHERE s.id = $1 AND t.id = $2
+              AND s.eve_system_id IS NOT NULL AND t.eve_system_id IS NOT NULL
+              AND EXISTS (
+                SELECT 1 FROM map_stargates g
+                 WHERE (g.system_id = s.eve_system_id AND g.destination_system_id = t.eve_system_id)
+                    OR (g.system_id = t.eve_system_id AND g.destination_system_id = s.eve_system_id)
+              )
+            LIMIT 1`,
+          [sourceId, targetId],
+        );
+        adjacent = (adj.rowCount ?? 0) > 0;
+      }
+      if (adjacent) effectiveType = 'gate';
     } catch { /* stargate table absent / query failed — keep client's type */ }
   }
 

@@ -646,7 +646,9 @@
     "removeConnection": "Remover conexão",
     "brokenNotice": "Conexão quebrada — a assinatura de buraco de minhoca que a sustentava foi eliminada. Mantida no mapa mas em quarentena do encaminhamento.",
     "restore": "Restaurar",
-    "restoreTitle": "Limpar a marca de quebrada e tratar novamente como uma conexão ativa"
+    "restoreTitle": "Limpar a marca de quebrada e tratar novamente como uma conexão ativa",
+    "gateNote": "Stargate normal — sem dados de buraco de minhoca.",
+    "jumpgateNote": "Ponte Ansiblex — sem dados de buraco de minhoca."
   },
   "mapControls": {
     "panel": "Painel de controlo",

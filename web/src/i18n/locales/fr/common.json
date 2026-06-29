@@ -646,7 +646,9 @@
     "removeConnection": "Retirer la connexion",
     "brokenNotice": "Connexion rompue — la sig de trou de ver qui la soutenait a été supprimée. Conservée sur la carte mais mise en quarantaine du routage.",
     "restore": "Rétablir",
-    "restoreTitle": "Effacer le marqueur de rupture et traiter à nouveau comme une connexion active"
+    "restoreTitle": "Effacer le marqueur de rupture et traiter à nouveau comme une connexion active",
+    "gateNote": "Stargate classique — aucune donnée de trou de ver.",
+    "jumpgateNote": "Pont Ansiblex — aucune donnée de trou de ver."
   },
   "mapControls": {
     "panel": "Panneau de contrôle",
