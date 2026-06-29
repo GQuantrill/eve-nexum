@@ -1007,7 +1007,13 @@ export const useMapStore = create<MapStore>()((set, get) => {
         get().pushUndo({ type: 'add_connection', connectionId: id });
         if (activeMapId) {
           const url  = `/api/maps/${activeMapId}/connections`;
-          const body = JSON.stringify({ ...conn });
+          // Pass the endpoints' eve ids so the server can gate-classify directly
+          // from map_stargates without waiting for both system rows to commit —
+          // a jump POSTs the new system and this connection near-simultaneously.
+          const systemsNow  = get().map.systems;
+          const sourceEveId = systemsNow.find((s) => s.id === conn.sourceId)?.eveSystemId ?? null;
+          const targetEveId = systemsNow.find((s) => s.id === conn.targetId)?.eveSystemId ?? null;
+          const body = JSON.stringify({ ...conn, sourceEveId, targetEveId });
           api<{ ok: boolean; connectionType?: string }>(url, { method: 'POST', body })
             .then((r) => {
               // Server may auto-classify an in-game gate (stargate-adjacent
