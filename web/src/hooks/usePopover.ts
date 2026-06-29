@@ -2,35 +2,30 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 export interface PopoverPos {
   left:       number;
-  top?:       number;  // set when placed below the trigger
-  bottom?:    number;  // set when flipped above the trigger (anchors its bottom)
-  maxHeight:  number;  // available height so the list stays on-screen + scrollable
+  top:        number;  // always placed below the trigger
+  maxHeight:  number;  // available height below so the list stays on-screen + scrollable
 }
 
 // Shared popover plumbing for the wormhole / leads-to dropdowns. Owns the
-// open/close state, a viewport-aware position (follows page scroll, flips above
-// the trigger and caps its height so the last options stay reachable), and the
-// outside-click handler — leaves the button look and dropdown contents to the
-// caller.
+// open/close state, a viewport-aware position (always opens downward, follows
+// page scroll, and caps its height to the room below so the last options stay
+// reachable), and the outside-click handler — leaves the button look and
+// dropdown contents to the caller.
 export function usePopover() {
   const [open, setOpen] = useState(false);
   const [pos, setPos]   = useState<PopoverPos>({ left: 0, top: 0, maxHeight: 300 });
   const btnRef      = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Recompute from the trigger's current viewport rect: place below by default,
-  // flip above when there's little room below and more above, and cap the height
-  // to the available space so the dropdown never runs off-screen.
+  // Recompute from the trigger's current viewport rect. Always open downward
+  // (flipping up read as odd); cap the height to the room below so the dropdown
+  // never runs off-screen — the list scrolls within whatever height is left.
   const reposition = useCallback(() => {
     const rect = btnRef.current?.getBoundingClientRect();
     if (!rect) return;
     const margin = 8;
-    const spaceBelow = window.innerHeight - rect.bottom - margin;
-    const spaceAbove = rect.top - margin;
-    const flipUp = spaceBelow < 220 && spaceAbove > spaceBelow;
-    setPos(flipUp
-      ? { left: rect.left, bottom: window.innerHeight - rect.top + 2, maxHeight: Math.max(140, spaceAbove) }
-      : { left: rect.left, top: rect.bottom + 2,                      maxHeight: Math.max(140, spaceBelow) });
+    const spaceBelow = Math.max(0, window.innerHeight - rect.bottom - margin);
+    setPos({ left: rect.left, top: rect.bottom + 2, maxHeight: spaceBelow });
   }, []);
 
   const openAt = useCallback(() => { reposition(); setOpen(true); }, [reposition]);
