@@ -5440,6 +5440,12 @@ select.sig-toolbar-btn option {
   border-radius: 5px;
   box-shadow: 0 12px 32px rgba(0,0,0,0.8);
   z-index: 9999;
+  /* Flex column so the search stays pinned and the list fills the height the
+     hook capped to the viewport, scrolling within — so the last options are
+     always reachable instead of running off-screen. */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .wh-picker__search {
@@ -5458,7 +5464,8 @@ select.sig-toolbar-btn option {
 .wh-picker__search::placeholder { color: #7a90a8; }
 
 .wh-picker__list {
-  max-height: 300px;
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: #2e4a6a transparent;
