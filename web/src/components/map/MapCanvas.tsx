@@ -269,16 +269,19 @@ export function MapCanvas() {
     const flowX  = node.position.x + (node.measured?.width  ?? 150) / 2;
     const flowY  = node.position.y + (node.measured?.height ?? 80)  / 2;
 
-    const rfEl   = document.querySelector<HTMLElement>('.react-flow');
-    const panel  = document.querySelector<HTMLElement>('.system-panel');
-    const cW     = rfEl?.offsetWidth  ?? window.innerWidth;
-    const cH     = rfEl?.offsetHeight ?? window.innerHeight;
-    const panelH = panel?.offsetHeight ?? 0;
+    // The canvas (.react-flow, inside the flex:1 .map-canvas) already shrinks to
+    // the space ABOVE the bottom dock (.system-panel is a flex-shrink:0 sibling)
+    // and right of the left sidebar — so its own box IS the available canvas.
+    // Centre within it directly; subtracting the dock height again (as before)
+    // double-counted and pushed the node off the top when the dock was tall.
+    const rfEl = document.querySelector<HTMLElement>('.react-flow');
+    const cW   = rfEl?.offsetWidth  ?? window.innerWidth;
+    const cH   = rfEl?.offsetHeight ?? window.innerHeight;
 
     setViewport(
       {
         x:    cW / 2 - flowX * zoom,
-        y:    (cH - panelH) / 2 - flowY * zoom,
+        y:    cH / 2 - flowY * zoom,
         zoom,
       },
       { duration: 300 },
