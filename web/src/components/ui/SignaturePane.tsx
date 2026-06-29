@@ -898,11 +898,20 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                   {sig.sigType === 'wormhole' && (
                     isShareMode
                       ? <span className="sig-text">{sig.whLeadsTo || ''}</span>
-                      : <LeadsToDropdown
-                          value={sig.whLeadsTo}
-                          connectedSystems={connectedSystems}
-                          onChange={(leadsTo) => updateSig(sig.id, { whLeadsTo: leadsTo })}
-                        />
+                      : (
+                        <div className="sig-leads-cell">
+                          <LeadsToDropdown
+                            value={sig.whLeadsTo}
+                            connectedSystems={connectedSystems}
+                            onChange={(leadsTo) => updateSig(sig.id, { whLeadsTo: leadsTo })}
+                          />
+                          <button
+                            className="icon-btn"
+                            onClick={() => copyBookmark(sig)}
+                            title={t('signatures.copyBookmark')}
+                          ><CopyIcon size={12} weight="bold" /></button>
+                        </div>
+                      )
                   )}
                 </td>
                 <td>
@@ -936,13 +945,6 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                 <ElapsedCell iso={sig.updatedAt} className="sig-td--time sig-td--updated" />
                 {!isShareMode && (
                   <td className="sig-cell--actions">
-                    {sig.sigType === 'wormhole' && (
-                      <button
-                        className="icon-btn"
-                        onClick={() => copyBookmark(sig)}
-                        title={t('signatures.copyBookmark')}
-                      ><CopyIcon size={12} weight="bold" /></button>
-                    )}
                     {canEdit && (
                       <button
                         className="icon-btn icon-btn--danger"

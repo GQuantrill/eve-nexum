@@ -5369,6 +5369,14 @@ select.sig-toolbar-btn option {
   position: relative;
 }
 
+/* Leads-to cell: the destination picker plus the copy-bookmark button. */
+.sig-leads-cell {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.sig-leads-cell > :first-child { flex: 1; min-width: 0; }
+
 .sig-th--time {
   text-align: right;
 }
