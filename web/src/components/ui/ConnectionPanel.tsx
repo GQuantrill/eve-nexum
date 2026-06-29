@@ -241,6 +241,10 @@ export function ConnectionPanel() {
     update({ massUsed: 0, massStatus: 'stable' });
   };
 
+  // Wormhole-only fields (type, sig link, mass / time / size, rolling calc)
+  // don't apply to stargates or Ansiblex jump bridges — only 'standard' links.
+  const isWormhole = conn.connectionType === 'standard';
+
   return (
     <aside className="system-panel">
       <div className="system-panel__header">
@@ -265,6 +269,13 @@ export function ConnectionPanel() {
         </div>
       )}
 
+      {!isWormhole && (
+        <p className="conn-gate-note">
+          {t(conn.connectionType === 'jumpgate' ? 'connPanel.jumpgateNote' : 'connPanel.gateNote')}
+        </p>
+      )}
+
+      {isWormhole && (<>
       <label className="field">
         <span>{t('connPanel.whType')} <WHTypeInfo code={conn.type} /></span>
         <input
@@ -545,6 +556,7 @@ export function ConnectionPanel() {
           onCancel={() => setPendingPass(null)}
         />
       )}
+      </>)}
 
       <button
         className="btn btn--danger"
