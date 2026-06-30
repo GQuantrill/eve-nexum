@@ -1,7 +1,7 @@
 import { forwardRef, useEffect, useRef, useState } from 'react';
 import type { InputHTMLAttributes, KeyboardEvent } from 'react';
 import { createPortal } from 'react-dom';
-import { useEsiSearch } from '../../hooks/useEsiSearch';
+import { useEsiSearch, systemResultLabel } from '../../hooks/useEsiSearch';
 
 interface Props {
   value: string;
@@ -100,7 +100,7 @@ export const SystemSearchSelect = forwardRef<HTMLInputElement, Props>(function S
               onMouseEnter={() => setActiveIndex(i)}
             >
               <span>{r.name}</span>
-              <span className="search-results__class">{r.regionName ?? r.systemClass}</span>
+              <span className="search-results__class">{systemResultLabel(r)}</span>
             </li>
           ))}
         </ul>,
