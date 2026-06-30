@@ -543,7 +543,8 @@
     "max": "ウォッチリストの登録は最大 {{count}} 件",
     "add": "ウォッチリストに追加",
     "appeared": "ウォッチリスト：{{name}}（{{marker}}）がマップ上にあります",
-    "notifTitle": "ウォッチリスト一致"
+    "notifTitle": "ウォッチリスト一致",
+    "duplicate": "すでにウォッチリストにあります"
   },
   "chainExits": {
     "noExits": "このチェーンに Kスペース出口はありません。",

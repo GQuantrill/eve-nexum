@@ -585,7 +585,8 @@
     "max": "Maximum {{count}} watchlist entries",
     "add": "Add to watchlist",
     "appeared": "Watchlist: {{name}} ({{marker}}) is on the map",
-    "notifTitle": "Watchlist match"
+    "notifTitle": "Watchlist match",
+    "duplicate": "Already on watchlist"
   },
   "chainExits": {
     "noExits": "No K-space exits in this chain.",

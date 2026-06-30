@@ -106,6 +106,29 @@ export function WatchlistBlock() {
 
   const activeKeys = useMemo(() => new Set(items.map((it) => matchKey(it.match))), [items]);
 
+  // Entries whose match collides with an earlier one (same matchKey) — flagged
+  // so a manually-typed duplicate is caught the moment it matches. Empty
+  // placeholders are skipped (a freshly-added blank row isn't a duplicate until
+  // it's filled in), and the first occurrence stays valid; later ones are the
+  // duplicates. Characteristics can't collide (quick-add already dedupes them)
+  // but are included for completeness.
+  const dupIds = useMemo(() => {
+    const seen = new Set<string>();
+    const dups = new Set<string>();
+    for (const it of items) {
+      const m = it.match;
+      const complete =
+        (m.by === 'system' && m.query.trim() !== '') ||
+        (m.by === 'whType' && m.code.trim() !== '') ||
+        (m.by !== 'system' && m.by !== 'whType');
+      if (!complete) continue;
+      const k = matchKey(m);
+      if (seen.has(k)) dups.add(it.id);
+      else seen.add(k);
+    }
+    return dups;
+  }, [items]);
+
   const atCap = items.length >= MAX_WATCH;
 
   function addManual() {
@@ -199,6 +222,7 @@ export function WatchlistBlock() {
                 const targets = matchTargets.get(it.id) ?? [];
                 const onMap = targets.length > 0;
                 const manual = it.match.by === 'system' || it.match.by === 'whType';
+                const isDup = dupIds.has(it.id);
                 return (
                   <SortableWatchRow key={it.id} id={it.id} disabled={!draggable}>
                     {({ handleProps }) => (
@@ -284,24 +308,26 @@ export function WatchlistBlock() {
                   {it.match.by === 'system' && (
                     <input
                       type="text"
-                      className="watchlist__value"
+                      className={`watchlist__value${isDup ? ' watchlist__value--dup' : ''}`}
                       value={it.match.query}
                       maxLength={48}
                       onChange={(e) => updateItem(it.id, { match: { by: 'system', query: e.target.value } })}
                       placeholder={t('watchlist.queryPlaceholder')}
                       spellCheck={false}
+                      aria-invalid={isDup || undefined}
                       ref={(el) => { if (el && autoFocusId === it.id) { el.focus(); setAutoFocusId(null); } }}
                     />
                   )}
                   {it.match.by === 'whType' && (
                     <input
                       type="text"
-                      className="watchlist__value"
+                      className={`watchlist__value${isDup ? ' watchlist__value--dup' : ''}`}
                       value={it.match.code}
                       maxLength={8}
                       onChange={(e) => updateItem(it.id, { match: { by: 'whType', code: e.target.value.toUpperCase() } })}
                       placeholder={t('watchlist.whPlaceholder')}
                       spellCheck={false}
+                      aria-invalid={isDup || undefined}
                     />
                   )}
                   <input
@@ -313,6 +339,10 @@ export function WatchlistBlock() {
                     placeholder={t('watchlist.notePlaceholder')}
                   />
                 </div>
+
+                {isDup && (
+                  <div className="watchlist__dup-msg" role="alert">{t('watchlist.duplicate')}</div>
+                )}
                       </>
                     )}
                   </SortableWatchRow>

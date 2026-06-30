@@ -543,7 +543,8 @@
     "max": "관심 목록 항목 최대 {{count}}개",
     "add": "관심 목록에 추가",
     "appeared": "관심 목록: {{name}}({{marker}})이(가) 맵에 있습니다",
-    "notifTitle": "워치리스트 일치"
+    "notifTitle": "워치리스트 일치",
+    "duplicate": "이미 관심 목록에 있음"
   },
   "chainExits": {
     "noExits": "이 체인에 K-스페이스 출구가 없습니다.",

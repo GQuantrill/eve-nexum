@@ -543,7 +543,8 @@
     "max": "Maximal {{count}} Einträge in der Beobachtungsliste",
     "add": "Zur Beobachtungsliste hinzufügen",
     "appeared": "Beobachtungsliste: {{name}} ({{marker}}) ist auf der Karte",
-    "notifTitle": "Beobachtungslisten-Treffer"
+    "notifTitle": "Beobachtungslisten-Treffer",
+    "duplicate": "Bereits auf der Beobachtungsliste"
   },
   "chainExits": {
     "noExits": "Keine K-Space-Ausgänge in dieser Kette.",

@@ -2221,6 +2221,20 @@
   border-color: #6ea0ff;
 }
 
+/* Duplicate of an entry already on the list — the typed value collides with
+   another row. Outline the field red and explain below; the duplicate doesn't
+   add anything (alerts/highlights dedupe by target) until it's changed. */
+.watchlist__value--dup,
+.watchlist__value--dup:focus {
+  border-color: #e74c3c;
+}
+
+.watchlist__dup-msg {
+  margin-top: 3px;
+  font-size: calc(11px * var(--font-scale, 1));
+  color: #e8806f;
+}
+
 /* "Show on map" button — only present when the entry matches something on the
    current map. Green to read as "it's here, jump to it". Repeated clicks cycle
    through all matches. */
