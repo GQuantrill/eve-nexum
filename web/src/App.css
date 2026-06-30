@@ -2221,6 +2221,34 @@
   border-color: #6ea0ff;
 }
 
+/* Duplicate of an entry already on the list — the typed value collides with
+   another row. Outline the field red and explain below; the duplicate doesn't
+   add anything (alerts/highlights dedupe by target) until it's changed. */
+.watchlist__value--dup,
+.watchlist__value--dup:focus {
+  border-color: #e74c3c;
+}
+
+.watchlist__dup-msg {
+  margin-top: 3px;
+  font-size: calc(11px * var(--font-scale, 1));
+  color: #e8806f;
+}
+
+/* The system-search input and the wormhole-type picker each take the value
+   slot in a row-bottom flex row (alongside the note), so let them grow. */
+.watchlist__search,
+.watchlist__whpick {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Red outline on the picker button when the wormhole type duplicates another
+   entry — mirrors .watchlist__value--dup on the system input. */
+.watchlist__whpick--dup .wh-picker__btn {
+  border-color: #e74c3c;
+}
+
 /* "Show on map" button — only present when the entry matches something on the
    current map. Green to read as "it's here, jump to it". Repeated clicks cycle
    through all matches. */

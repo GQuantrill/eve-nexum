@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { api } from '../api/client';
+import { CLASS_LABELS } from '../data/wormholes';
+import type { SystemClass } from '../types';
 
 export interface SystemSearchResult {
   id: number;
@@ -7,6 +9,18 @@ export interface SystemSearchResult {
   security: number;
   systemClass: string;
   regionName?: string | null;
+}
+
+const K_SPACE_CLASSES = new Set(['HS', 'LS', 'NS']);
+
+/** Secondary label shown next to a system in the search dropdowns. Wormhole /
+ *  J-space systems show their class (C3, C5, Thera…) — the J-space region code
+ *  ("C-R00012") means nothing to a hunter — while k-space systems keep their
+ *  region name. */
+export function systemResultLabel(r: SystemSearchResult): string {
+  const cls = r.systemClass;
+  if (K_SPACE_CLASSES.has(cls)) return r.regionName ?? CLASS_LABELS[cls as SystemClass] ?? cls;
+  return CLASS_LABELS[cls as SystemClass] ?? cls;
 }
 
 export interface SystemDetail extends SystemSearchResult {

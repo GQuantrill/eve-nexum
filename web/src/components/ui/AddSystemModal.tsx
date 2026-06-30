@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import type { SystemClass, WormholeEffect } from '../../types';
 import { SYSTEM_CLASSES, WORMHOLE_EFFECTS, CLASS_LABELS, EFFECT_LABELS } from '../../data/wormholes';
-import { useEsiSearch, fetchSystemDetail } from '../../hooks/useEsiSearch';
+import { useEsiSearch, fetchSystemDetail, systemResultLabel } from '../../hooks/useEsiSearch';
 import { useMapStore } from '../../store/mapStore';
 
 type SystemOpts = {
@@ -278,7 +278,7 @@ export function AddSystemModal({ position, onClose, onSubmit }: Props) {
             >
               <span>{r.name}</span>
               <span className="search-results__class">
-                {alreadyOnMap ? t('addSystem.onMap') : (r.regionName ?? r.systemClass)}
+                {alreadyOnMap ? t('addSystem.onMap') : systemResultLabel(r)}
               </span>
             </li>
           );

@@ -543,7 +543,8 @@
     "max": "Maximum {{count}} entrées dans la liste de surveillance",
     "add": "Ajouter à la liste de surveillance",
     "appeared": "Liste de surveillance : {{name}} ({{marker}}) est sur la carte",
-    "notifTitle": "Correspondance de liste de surveillance"
+    "notifTitle": "Correspondance de liste de surveillance",
+    "duplicate": "Déjà dans la liste de surveillance"
   },
   "chainExits": {
     "noExits": "Aucune sortie K-space dans cette chaîne.",
