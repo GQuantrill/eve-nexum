@@ -45,6 +45,9 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
   const { t } = useTranslation();
   const sys = data as unknown as SystemNodeData;
   const color = CLASS_COLORS[sys.systemClass];
+  // Region is only worth showing for k-space; a wormhole's J-space region code
+  // ("B-R00007") carries no useful intel.
+  const isKspace = sys.systemClass === 'HS' || sys.systemClass === 'LS' || sys.systemClass === 'NS';
   const selectSystem    = useMapStore((s) => s.selectSystem);
   const compactMode     = useMapStore((s) => s.compactMode);
   const uniformSize     = useMapStore((s) => s.uniformSize);
@@ -450,7 +453,7 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
         </div>
       </div>
 
-      {!compactMode && sys.regionName && (
+      {!compactMode && isKspace && sys.regionName && (
         <div className="system-node__npc-type">
           {sys.regionName}{sys.npcType ? ` - ${sys.npcType}` : ''}
         </div>
