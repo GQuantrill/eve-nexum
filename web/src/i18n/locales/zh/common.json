@@ -543,7 +543,8 @@
     "max": "关注列表最多 {{count}} 条",
     "add": "添加到关注列表",
     "appeared": "关注列表：{{name}}（{{marker}}）已出现在地图上",
-    "notifTitle": "监视列表匹配"
+    "notifTitle": "监视列表匹配",
+    "duplicate": "已在监视列表中"
   },
   "chainExits": {
     "noExits": "此链中没有 K空间出口。",
