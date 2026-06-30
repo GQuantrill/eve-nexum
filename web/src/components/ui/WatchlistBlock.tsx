@@ -16,6 +16,8 @@ import { WATCH_MARKERS, watchMarker } from '../../data/watchMarkers';
 import { WATCH_CHARACTERISTICS } from '../../data/watchCharacteristics';
 import { matchKey, systemMatchesEntry, connectionMatchesEntry } from '../../utils/watchMatch';
 import { CLASS_LABELS, EFFECT_LABELS } from '../../data/wormholes';
+import { SystemSearchSelect } from './SystemSearchSelect';
+import { WormholeTypePicker } from './WormholeTypePicker';
 import type { WatchEntry, WatchMatch, WatchMarkerKind } from '../../types';
 
 // Watchlist rows reorder on the vertical axis only — zero the X component so
@@ -306,29 +308,23 @@ export function WatchlistBlock() {
 
                 <div className="watchlist__row-bottom">
                   {it.match.by === 'system' && (
-                    <input
-                      type="text"
-                      className={`watchlist__value${isDup ? ' watchlist__value--dup' : ''}`}
+                    <SystemSearchSelect
                       value={it.match.query}
-                      maxLength={48}
-                      onChange={(e) => updateItem(it.id, { match: { by: 'system', query: e.target.value } })}
+                      onChange={(query) => updateItem(it.id, { match: { by: 'system', query } })}
                       placeholder={t('watchlist.queryPlaceholder')}
-                      spellCheck={false}
+                      maxLength={48}
+                      className={`watchlist__value${isDup ? ' watchlist__value--dup' : ''}`}
                       aria-invalid={isDup || undefined}
                       ref={(el) => { if (el && autoFocusId === it.id) { el.focus(); setAutoFocusId(null); } }}
                     />
                   )}
                   {it.match.by === 'whType' && (
-                    <input
-                      type="text"
-                      className={`watchlist__value${isDup ? ' watchlist__value--dup' : ''}`}
-                      value={it.match.code}
-                      maxLength={8}
-                      onChange={(e) => updateItem(it.id, { match: { by: 'whType', code: e.target.value.toUpperCase() } })}
-                      placeholder={t('watchlist.whPlaceholder')}
-                      spellCheck={false}
-                      aria-invalid={isDup || undefined}
-                    />
+                    <div className={`watchlist__whpick${isDup ? ' watchlist__whpick--dup' : ''}`}>
+                      <WormholeTypePicker
+                        value={it.match.code}
+                        onChange={(code) => updateItem(it.id, { match: { by: 'whType', code } })}
+                      />
+                    </div>
                   )}
                   <input
                     type="text"

@@ -2235,6 +2235,20 @@
   color: #e8806f;
 }
 
+/* The system-search input and the wormhole-type picker each take the value
+   slot in a row-bottom flex row (alongside the note), so let them grow. */
+.watchlist__search,
+.watchlist__whpick {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Red outline on the picker button when the wormhole type duplicates another
+   entry — mirrors .watchlist__value--dup on the system input. */
+.watchlist__whpick--dup .wh-picker__btn {
+  border-color: #e74c3c;
+}
+
 /* "Show on map" button — only present when the entry matches something on the
    current map. Green to read as "it's here, jump to it". Repeated clicks cycle
    through all matches. */
