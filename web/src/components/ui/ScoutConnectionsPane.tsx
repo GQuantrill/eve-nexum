@@ -171,7 +171,11 @@ export function ScoutConnectionsPane({ scoutSystem }: Props) {
               )}
               <span className="scout-row__time">{formatRemaining(t, c.remainingHours)}</span>
             </div>
-            <div className="scout-row__region">{c.inRegionName}</div>
+            {/* A wormhole target's J-space region code carries no useful intel;
+                only show the region for k-space exits. */}
+            {isKspaceTarget && c.inRegionName && (
+              <div className="scout-row__region">{c.inRegionName}</div>
+            )}
             <div className="scout-row__meta">
               <span className="scout-row__wh">{c.whType}</span>
               <span className="scout-row__size">
