@@ -88,7 +88,7 @@ export const SystemSearchSelect = forwardRef<HTMLInputElement, Props>(function S
         <ul
           className="search-results"
           role="listbox"
-          style={{ position: 'fixed', top: pos.top, left: pos.left, width: pos.width, zIndex: 2000 }}
+          style={{ position: 'fixed', top: pos.top, left: pos.left, width: pos.width, minWidth: 240, zIndex: 2000 }}
         >
           {results.map((r, i) => (
             <li
