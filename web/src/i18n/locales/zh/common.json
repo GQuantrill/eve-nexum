@@ -503,7 +503,8 @@
     "routeIncludeThera": "包含 Thera 连接",
     "routeIncludeTurnur": "包含 Turnur 连接",
     "routeIncludeWormholes": "包含虫洞链",
-    "routeShortcutNote": "使用虫洞、Thera 或 Turnur 的路线无法设为游戏内目的地或途经点——右键点击路线中的已知空间星系以前往该处。"
+    "routeShortcutNote": "使用虫洞、Thera、Turnur 或跳跃门的路线无法设为游戏内目的地或途经点——右键点击路线中的已知空间星系以前往该处。",
+    "routeIncludeAnsiblex": "包含 Ansiblex 跳跃门"
   },
   "customIntel": {
     "title": "自定义情报",
@@ -840,7 +841,8 @@
     "riskEol": "濒死",
     "riskCritical": "质量临界",
     "riskFrig": "护卫舰洞",
-    "shortcutNoWaypoint": "此路线使用了虫洞/Thera/Turnur，无法设为自动驾驶目的地——请右键点击路线中的已知空间星系。"
+    "shortcutNoWaypoint": "此路线使用了虫洞/Thera/Turnur/跳跃门，无法设为自动驾驶目的地——请右键点击路线中的已知空间星系。",
+    "viaAnsiblex": "Ansiblex 跳跃门"
   },
   "activity": {
     "thisHour": "本小时",

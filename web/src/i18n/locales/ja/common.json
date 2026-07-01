@@ -503,7 +503,8 @@
     "routeIncludeThera": "Thera 接続を含める",
     "routeIncludeTurnur": "Turnur 接続を含める",
     "routeIncludeWormholes": "ワームホールチェーンを含める",
-    "routeShortcutNote": "ワームホール、Thera、Turnur を経由するルートはゲーム内の目的地や経由地に設定できません — ルート上のK-スペースシステムを右クリックしてそこへ向かってください。"
+    "routeShortcutNote": "ワームホール、Thera、Turnur、ジャンプゲートを経由するルートはゲーム内の目的地や経由地に設定できません — ルート上のK-スペースシステムを右クリックしてそこへ向かってください。",
+    "routeIncludeAnsiblex": "Ansiblex ジャンプゲートを含める"
   },
   "customIntel": {
     "title": "カスタムインテル",
@@ -840,7 +841,8 @@
     "riskEol": "EOL",
     "riskCritical": "限界質量",
     "riskFrig": "フリゲートホール",
-    "shortcutNoWaypoint": "このルートはワームホール/Thera/Turnur を使用するため、オートパイロットの目的地に設定できません — ルート上のK-スペースシステムを右クリックしてください。"
+    "shortcutNoWaypoint": "このルートはワームホール/Thera/Turnur/ジャンプゲートを使用するため、オートパイロットの目的地に設定できません — ルート上のK-スペースシステムを右クリックしてください。",
+    "viaAnsiblex": "Ansiblex ジャンプゲート"
   },
   "activity": {
     "thisHour": "今時間",

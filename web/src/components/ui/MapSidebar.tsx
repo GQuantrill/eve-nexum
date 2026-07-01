@@ -940,6 +940,11 @@ export function MapSidebar() {
             label={t("mapSidebar.routeIncludeWormholes")}
             defaultOn={false}
           />
+          <SettingToggle
+            settingKey="nexum.route.includeAnsiblex"
+            label={t("mapSidebar.routeIncludeAnsiblex")}
+            defaultOn={false}
+          />
           <p className="map-sidebar__hint">
             {t("mapSidebar.routeShortcutNote")}
           </p>

@@ -44,20 +44,21 @@ router.get('/', async (req, res) => {
   const includeThera     = String(req.query.includeThera)     === 'true';
   const includeTurnur    = String(req.query.includeTurnur)    === 'true';
   const includeWormholes = String(req.query.includeWormholes) === 'true';
+  const includeAnsiblex  = String(req.query.includeAnsiblex)  === 'true';
   const mapId = typeof req.query.mapId === 'string' ? req.query.mapId : undefined;
 
-  // Wormhole edges come from a specific map — require it and enforce access.
-  // Fail loudly rather than silently returning a gates-only route, which would
-  // mislead the user into thinking no wormhole route exists.
-  if (includeWormholes) {
-    if (!mapId) return res.status(400).json({ error: 'mapId required for includeWormholes' });
+  // Wormhole / Ansiblex edges come from a specific map — require it and enforce
+  // access. Fail loudly rather than silently returning a gates-only route,
+  // which would mislead the user into thinking no shortcut route exists.
+  if (includeWormholes || includeAnsiblex) {
+    if (!mapId) return res.status(400).json({ error: 'mapId required for map-based shortcuts' });
     const access = await getMapAccess(mapId, req);
     if (!access) return res.status(404).json({ error: 'Map not found' });
   }
 
   try {
-    const overlay = (includeThera || includeTurnur || includeWormholes)
-      ? await buildRouteOverlay({ thera: includeThera, turnur: includeTurnur, wormholes: includeWormholes, mapId })
+    const overlay = (includeThera || includeTurnur || includeWormholes || includeAnsiblex)
+      ? await buildRouteOverlay({ thera: includeThera, turnur: includeTurnur, wormholes: includeWormholes, ansiblex: includeAnsiblex, mapId })
       : undefined;
     const result = await shortestRoutes(from, targets, mode, overlay);
     return res.json(result);

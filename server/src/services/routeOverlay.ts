@@ -91,6 +91,27 @@ async function addWormholeEdges(o: RouteOverlay, mapId: string): Promise<boolean
   return rows.length > 0;
 }
 
+// Player Ansiblex jump bridges known on the map (connection_type 'jumpgate').
+// Both ends are k-space, so every route node stays autopilot-able per-node —
+// but EVE's autopilot won't route through a bridge on its own, so an Ansiblex
+// route is still flagged usesSpecial like a wormhole.
+async function addAnsiblexEdges(o: RouteOverlay, mapId: string): Promise<boolean> {
+  const { rows } = await db.query<{ a: number; b: number }>(
+    `SELECT s.eve_system_id AS a, t.eve_system_id AS b
+       FROM map_connections c
+       JOIN map_systems s ON s.id = c.source_id
+       JOIN map_systems t ON t.id = c.target_id
+      WHERE c.map_id = $1
+        AND c.broken = FALSE
+        AND c.connection_type = 'jumpgate'
+        AND s.eve_system_id IS NOT NULL
+        AND t.eve_system_id IS NOT NULL`,
+    [mapId],
+  );
+  for (const r of rows) addEdge(o, r.a, r.b, { kind: 'ansiblex' });
+  return rows.length > 0;
+}
+
 // Fill { name, security } for every overlay node from solar_systems, so the
 // secure-mode weight and the response path have real data for J-space / Thera.
 async function fillInfo(o: RouteOverlay): Promise<void> {
@@ -110,12 +131,13 @@ async function fillInfo(o: RouteOverlay): Promise<void> {
  * The caller MUST authorize `mapId` (getMapAccess) before enabling wormholes.
  */
 export async function buildRouteOverlay(opts: {
-  thera: boolean; turnur: boolean; wormholes: boolean; mapId?: string;
+  thera: boolean; turnur: boolean; wormholes: boolean; ansiblex: boolean; mapId?: string;
 }): Promise<RouteOverlay | undefined> {
   const o = emptyOverlay();
   let any = false;
   if (opts.thera || opts.turnur) any = (await addScoutEdges(o, opts.thera, opts.turnur)) || any;
   if (opts.wormholes && opts.mapId) any = (await addWormholeEdges(o, opts.mapId)) || any;
+  if (opts.ansiblex && opts.mapId)  any = (await addAnsiblexEdges(o, opts.mapId)) || any;
   if (!any) return undefined;
   await fillInfo(o);
   return o;

@@ -22,9 +22,10 @@ export function setWaypoint(systemId: number, systemName: string, clear: boolean
 
 // Human label for a shortcut hop, e.g. "Wormhole jump (EOL, critical)".
 function viaLabel(t: TFunction, via: EdgeMeta): string {
-  const kind = via.kind === 'thera'  ? t('route.viaThera')
-             : via.kind === 'turnur' ? t('route.viaTurnur')
-             :                         t('route.viaWormhole');
+  const kind = via.kind === 'thera'    ? t('route.viaThera')
+             : via.kind === 'turnur'   ? t('route.viaTurnur')
+             : via.kind === 'ansiblex' ? t('route.viaAnsiblex')
+             :                           t('route.viaWormhole');
   const risks = [
     via.eol      && t('route.riskEol'),
     via.critical && t('route.riskCritical'),
@@ -50,7 +51,9 @@ export function RouteSquares({ route }: { route: RouteEntry }) {
         <Fragment key={`${sys.id}-${i}`}>
           {sys.via && (
             <span
-              className={`scout-route__link${(sys.via.eol || sys.via.critical) ? ' scout-route__link--risk' : ''}`}
+              className={`scout-route__link${
+                sys.via.kind === 'ansiblex' ? ' scout-route__link--ansiblex' : ''
+              }${(sys.via.eol || sys.via.critical) ? ' scout-route__link--risk' : ''}`}
               data-tooltip={viaLabel(t, sys.via)}
               aria-label={viaLabel(t, sys.via)}
             />

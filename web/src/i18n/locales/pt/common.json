@@ -503,7 +503,8 @@
     "routeIncludeThera": "Incluir conexões de Thera",
     "routeIncludeTurnur": "Incluir conexões de Turnur",
     "routeIncludeWormholes": "Incluir cadeia de buracos de minhoca",
-    "routeShortcutNote": "Rotas que usam um buraco de minhoca, Thera ou Turnur não podem ser definidas como destino ou ponto de rota no jogo — clique com o botão direito em um sistema k-space da rota para ir até ele."
+    "routeShortcutNote": "Rotas que usam um buraco de minhoca, Thera, Turnur ou um portão de salto não podem ser definidas como destino ou ponto de rota no jogo — clique com o botão direito em um sistema k-space da rota para ir até ele.",
+    "routeIncludeAnsiblex": "Incluir portões Ansiblex"
   },
   "customIntel": {
     "title": "Intel personalizada",
@@ -840,7 +841,8 @@
     "riskEol": "EOL",
     "riskCritical": "Massa crítica",
     "riskFrig": "Buraco de fragata",
-    "shortcutNoWaypoint": "Esta rota usa um buraco de minhoca/Thera/Turnur e não pode ser definida como destino do piloto automático — clique com o botão direito em um sistema k-space da rota."
+    "shortcutNoWaypoint": "Esta rota usa um buraco de minhoca/Thera/Turnur/portão de salto e não pode ser definida como destino do piloto automático — clique com o botão direito em um sistema k-space da rota.",
+    "viaAnsiblex": "Portão de salto Ansiblex"
   },
   "activity": {
     "thisHour": "esta hora",

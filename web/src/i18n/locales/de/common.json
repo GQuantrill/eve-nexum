@@ -503,7 +503,8 @@
     "routeIncludeThera": "Thera-Verbindungen einbeziehen",
     "routeIncludeTurnur": "Turnur-Verbindungen einbeziehen",
     "routeIncludeWormholes": "Wurmlochkette einbeziehen",
-    "routeShortcutNote": "Routen über ein Wurmloch, Thera oder Turnur können nicht als spielinternes Ziel oder Wegpunkt gesetzt werden — Rechtsklick auf ein K-Space-System in der Route, um stattdessen dorthin zu navigieren."
+    "routeShortcutNote": "Routen über ein Wurmloch, Thera, Turnur oder ein Sprungtor können nicht als spielinternes Ziel oder Wegpunkt gesetzt werden — Rechtsklick auf ein K-Space-System in der Route, um stattdessen dorthin zu navigieren.",
+    "routeIncludeAnsiblex": "Ansiblex-Sprungtore einbeziehen"
   },
   "customIntel": {
     "title": "Eigene Intel",
@@ -840,7 +841,8 @@
     "riskEol": "EOL",
     "riskCritical": "Kritische Masse",
     "riskFrig": "Fregatten-Loch",
-    "shortcutNoWaypoint": "Diese Route nutzt ein Wurmloch/Thera/Turnur und kann nicht als Autopilot-Ziel gesetzt werden — Rechtsklick auf ein K-Space-System in der Route."
+    "shortcutNoWaypoint": "Diese Route nutzt ein Wurmloch/Thera/Turnur/Sprungtor und kann nicht als Autopilot-Ziel gesetzt werden — Rechtsklick auf ein K-Space-System in der Route.",
+    "viaAnsiblex": "Ansiblex-Sprungtor"
   },
   "activity": {
     "thisHour": "diese Stunde",

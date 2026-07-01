@@ -7,7 +7,7 @@ import { useUserSetting } from './useUserSetting';
 // connection) — mirrors the server EdgeMeta, used to mark the gap between two
 // route squares and flag risky holes.
 export interface EdgeMeta {
-  kind:      'wormhole' | 'thera' | 'turnur';
+  kind:      'wormhole' | 'thera' | 'turnur' | 'ansiblex';
   eol?:      boolean;
   critical?: boolean;
   frig?:     boolean;
@@ -43,9 +43,11 @@ export function useRoute(from: number | null, targets: number[]): Record<string,
   const [inclThera]     = useUserSetting<boolean>('nexum.route.includeThera', false);
   const [inclTurnur]    = useUserSetting<boolean>('nexum.route.includeTurnur', false);
   const [inclWormholes] = useUserSetting<boolean>('nexum.route.includeWormholes', false);
+  const [inclAnsiblex]  = useUserSetting<boolean>('nexum.route.includeAnsiblex', false);
 
   const targetsKey = [...targets].sort((a, b) => a - b).join(',');
-  const wantWh = inclWormholes && !!activeMapId;
+  const wantWh  = inclWormholes && !!activeMapId;
+  const wantAnsi = inclAnsiblex && !!activeMapId;
 
   useEffect(() => {
     if (!from || !targetsKey) {
@@ -56,12 +58,14 @@ export function useRoute(from: number | null, targets: number[]): Record<string,
     let url = `/api/route?from=${from}&to=${targetsKey}&mode=${routeMode}`;
     if (inclThera)  url += '&includeThera=true';
     if (inclTurnur) url += '&includeTurnur=true';
-    if (wantWh)     url += `&includeWormholes=true&mapId=${activeMapId}`;
+    if (wantWh)     url += '&includeWormholes=true';
+    if (wantAnsi)   url += '&includeAnsiblex=true';
+    if (wantWh || wantAnsi) url += `&mapId=${activeMapId}`;
     api<Record<string, RouteEntry>>(url)
       .then(r => { if (!cancelled) setData(r); })
       .catch(() => { if (!cancelled) setData({}); });
     return () => { cancelled = true; };
-  }, [from, targetsKey, routeMode, inclThera, inclTurnur, wantWh, activeMapId]);
+  }, [from, targetsKey, routeMode, inclThera, inclTurnur, wantWh, wantAnsi, activeMapId]);
 
   return data;
 }

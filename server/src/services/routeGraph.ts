@@ -7,7 +7,7 @@ const log = createLogger('routeGraph');
 // wormhole chain link or a Thera/Turnur scout connection. Carried through to
 // the client so the route UI can mark the gap and flag risky holes.
 export interface EdgeMeta {
-  kind:      'wormhole' | 'thera' | 'turnur';
+  kind:      'wormhole' | 'thera' | 'turnur' | 'ansiblex';
   eol?:      boolean;   // end-of-life hole
   critical?: boolean;   // critical mass
   frig?:     boolean;   // frigate-sized hole

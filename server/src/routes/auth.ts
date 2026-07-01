@@ -587,6 +587,7 @@ const SETTINGS_ALLOWLIST = new Set<string>([
   'nexum.route.includeThera',
   'nexum.route.includeTurnur',
   'nexum.route.includeWormholes',
+  'nexum.route.includeAnsiblex',
   'nexum.mapSidebar.stale',
   'nexum.mapSidebar.systemOptions',
   'nexum.panel.collapsed.a0',

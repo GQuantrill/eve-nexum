@@ -452,7 +452,8 @@
     "routeIncludeThera": "Include Thera connections",
     "routeIncludeTurnur": "Include Turnur connections",
     "routeIncludeWormholes": "Include wormhole chain",
-    "routeShortcutNote": "Routes using a wormhole, Thera, or Turnur can't be set as an in-game destination or waypoint — right-click a k-space system in the route to set one to it instead.",
+    "routeIncludeAnsiblex": "Include Ansiblex jump gates",
+    "routeShortcutNote": "Routes using a wormhole, Thera, Turnur, or jump gate can't be set as an in-game destination or waypoint — right-click a k-space system in the route to set one to it instead.",
     "proximityHint": "Ping when an incursion, insurgency, or hostile-sov system is within range of your current location.",
     "threshold": "Threshold",
     "proximityInSystem": "0 jumps (in system)",
@@ -875,10 +876,11 @@
     "viaWormhole": "Wormhole jump",
     "viaThera": "Via Thera",
     "viaTurnur": "Via Turnur",
+    "viaAnsiblex": "Ansiblex jump gate",
     "riskEol": "EOL",
     "riskCritical": "Critical mass",
     "riskFrig": "Frigate hole",
-    "shortcutNoWaypoint": "This route uses a wormhole/Thera/Turnur and can't be set as an autopilot destination — right-click a k-space system in the route instead."
+    "shortcutNoWaypoint": "This route uses a wormhole/Thera/Turnur/jump gate and can't be set as an autopilot destination — right-click a k-space system in the route instead."
   },
   "activity": {
     "thisHour": "this hour",

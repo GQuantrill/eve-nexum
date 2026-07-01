@@ -571,6 +571,7 @@
   border-radius: 1px;
   background: #b06ad0;
 }
+.scout-route__link--ansiblex { background: #5a9af8; }  /* jump bridge — a gate, not a hole */
 .scout-route__link--risk { background: #e15b5b; }
 
 .scout-pane__empty {
