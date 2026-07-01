@@ -1066,7 +1066,8 @@
       "threat": "Bedrohung",
       "closest": "Nächstes {{label}}-System"
     },
-    "resetLayout": "Symbolleisten-Layout zurücksetzen"
+    "resetLayout": "Symbolleisten-Layout zurücksetzen",
+    "copyThisMap": "Diese Karte kopieren"
   },
   "landing": {
     "tagline": "Wurmloch-Kettenkartierung für EVE Online",
@@ -1547,5 +1548,20 @@
     "remove": "Entfernen",
     "colour": "Farbe",
     "maxReached": "Maximal {{n}} eigene Labels erreicht — entferne eines, um ein weiteres hinzuzufügen."
+  },
+  "copyMap": {
+    "title": "Karte kopieren",
+    "sourceLabel": "Kopieren von",
+    "nameLabel": "Name der neuen Karte",
+    "namePlaceholder": "Name der neuen Karte",
+    "include": "Kopieren",
+    "copyNotes": "Notizen",
+    "copySignatures": "Signaturen",
+    "copyStructures": "Strukturen",
+    "copyAnomalies": "Anomalien",
+    "submit": "Kopie erstellen",
+    "copying": "Wird kopiert…",
+    "success": "Kopiert nach {{name}}",
+    "failed": "Kopieren fehlgeschlagen"
   }
 }

@@ -1066,7 +1066,8 @@
       "threat": "위협",
       "closest": "가장 가까운 {{label}} 성계"
     },
-    "resetLayout": "툴바 레이아웃 초기화"
+    "resetLayout": "툴바 레이아웃 초기화",
+    "copyThisMap": "이 지도 복사"
   },
   "landing": {
     "tagline": "EVE Online을 위한 웜홀 체인 지도 작성",
@@ -1547,5 +1548,20 @@
     "remove": "제거",
     "colour": "색상",
     "maxReached": "사용자 라벨 최대 {{n}}개에 도달했습니다 — 추가하려면 하나를 제거하세요."
+  },
+  "copyMap": {
+    "title": "지도 복사",
+    "sourceLabel": "복사 원본",
+    "nameLabel": "새 지도 이름",
+    "namePlaceholder": "새 지도 이름",
+    "include": "복사",
+    "copyNotes": "메모",
+    "copySignatures": "시그니처",
+    "copyStructures": "구조물",
+    "copyAnomalies": "변칙",
+    "submit": "복사본 생성",
+    "copying": "복사 중…",
+    "success": "{{name}}(으)로 복사됨",
+    "failed": "복사 실패"
   }
 }
