@@ -104,8 +104,9 @@ function Row({ item, route, isOpen, onToggle, onRemove, routeMode }: RowProps) {
           type="button"
           className="sys-btn scout-row__btn scout-row__btn--icon"
           onClick={() => setWaypoint(item.id, item.name, true)}
+          disabled={route?.usesSpecial}
           aria-label={t('waypoint.setDestination')}
-          data-tooltip={t('waypoint.setDestination')}
+          data-tooltip={route?.usesSpecial ? t('route.shortcutNoWaypoint') : t('waypoint.setDestination')}
         >
           <MapPinSimpleIcon size={14} weight="regular" color="#3ddc84" />
         </button>
@@ -113,8 +114,9 @@ function Row({ item, route, isOpen, onToggle, onRemove, routeMode }: RowProps) {
           type="button"
           className="sys-btn scout-row__btn scout-row__btn--icon"
           onClick={() => setWaypoint(item.id, item.name, false)}
+          disabled={route?.usesSpecial}
           aria-label={t('waypoint.addWaypoint')}
-          data-tooltip={t('waypoint.addWaypoint')}
+          data-tooltip={route?.usesSpecial ? t('route.shortcutNoWaypoint') : t('waypoint.addWaypoint')}
         >
           <PathIcon size={14} weight="regular" color="#5a9af8" />
         </button>

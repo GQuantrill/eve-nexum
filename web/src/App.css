@@ -557,6 +557,23 @@
   border: 1px solid rgba(0, 0, 0, 0.3);
 }
 
+/* A k-space square can be right-clicked to set an in-game destination/waypoint. */
+.scout-route__square--kspace { cursor: context-menu; }
+
+/* Shortcut hop (wormhole / Thera / Turnur) in the gap before the square it
+   leads into — a small purple diamond, red when the hole is EOL/critical. */
+.scout-route__link {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  align-self: center;
+  transform: rotate(45deg);
+  border-radius: 1px;
+  background: #b06ad0;
+}
+.scout-route__link--ansiblex { background: #5a9af8; }  /* jump bridge — a gate, not a hole */
+.scout-route__link--risk { background: #e15b5b; }
+
 .scout-pane__empty {
   padding: 12px;
   color: #6a7898;

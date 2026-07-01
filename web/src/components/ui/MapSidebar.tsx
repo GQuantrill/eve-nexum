@@ -925,6 +925,29 @@ export function MapSidebar() {
           <p className="map-sidebar__hint">
             {t("mapSidebar.routeHint")}
           </p>
+          <SettingToggle
+            settingKey="nexum.route.includeThera"
+            label={t("mapSidebar.routeIncludeThera")}
+            defaultOn={false}
+          />
+          <SettingToggle
+            settingKey="nexum.route.includeTurnur"
+            label={t("mapSidebar.routeIncludeTurnur")}
+            defaultOn={false}
+          />
+          <SettingToggle
+            settingKey="nexum.route.includeWormholes"
+            label={t("mapSidebar.routeIncludeWormholes")}
+            defaultOn={false}
+          />
+          <SettingToggle
+            settingKey="nexum.route.includeAnsiblex"
+            label={t("mapSidebar.routeIncludeAnsiblex")}
+            defaultOn={false}
+          />
+          <p className="map-sidebar__hint">
+            {t("mapSidebar.routeShortcutNote")}
+          </p>
         </CollapsibleSection>
 
         <CollapsibleSection

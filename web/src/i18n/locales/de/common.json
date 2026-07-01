@@ -499,7 +499,12 @@
     "notifColSound": "Ton",
     "notifK162": "Eingehendes K162",
     "notifProximity": "Nahe Bedrohungen",
-    "notifWatchlist": "Beobachtungslisten-Treffer"
+    "notifWatchlist": "Beobachtungslisten-Treffer",
+    "routeIncludeThera": "Thera-Verbindungen einbeziehen",
+    "routeIncludeTurnur": "Turnur-Verbindungen einbeziehen",
+    "routeIncludeWormholes": "Wurmlochkette einbeziehen",
+    "routeShortcutNote": "Routen über ein Wurmloch, Thera, Turnur oder ein Sprungtor können nicht als spielinternes Ziel oder Wegpunkt gesetzt werden — Rechtsklick auf ein K-Space-System in der Route, um stattdessen dorthin zu navigieren.",
+    "routeIncludeAnsiblex": "Ansiblex-Sprungtore einbeziehen"
   },
   "customIntel": {
     "title": "Eigene Intel",
@@ -829,7 +834,15 @@
   },
   "route": {
     "fromLastKnown": "Sprünge ab {{system}} (letzter bekannter Standort)",
-    "fromCharacter": "Sprünge von {{character}} — {{system}}"
+    "fromCharacter": "Sprünge von {{character}} — {{system}}",
+    "viaWormhole": "Wurmloch-Sprung",
+    "viaThera": "Über Thera",
+    "viaTurnur": "Über Turnur",
+    "riskEol": "EOL",
+    "riskCritical": "Kritische Masse",
+    "riskFrig": "Fregatten-Loch",
+    "shortcutNoWaypoint": "Diese Route nutzt ein Wurmloch/Thera/Turnur/Sprungtor und kann nicht als Autopilot-Ziel gesetzt werden — Rechtsklick auf ein K-Space-System in der Route.",
+    "viaAnsiblex": "Ansiblex-Sprungtor"
   },
   "activity": {
     "thisHour": "diese Stunde",

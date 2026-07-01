@@ -77,4 +77,20 @@ router.get('/', cachedJsonHandler(cache, fetchAndBuild, {
   log, logMsg: 'Scout fetch failed:', errorMsg: 'Failed to fetch scout signatures',
 }));
 
+// Programmatic accessor sharing the same TTL cache as the route above — so the
+// route planner can splice Thera/Turnur edges into the graph without a second
+// eve-scout fetch. Falls back to stale data (or []) on a fetch error.
+export async function getScoutConnections(): Promise<ScoutConnection[]> {
+  const fresh = cache.get();
+  if (fresh) return fresh;
+  try {
+    const data = await fetchAndBuild();
+    cache.set(data);
+    return data;
+  } catch (err) {
+    log.error('Scout fetch failed:', err);
+    return cache.getStale() ?? [];
+  }
+}
+
 export default router;

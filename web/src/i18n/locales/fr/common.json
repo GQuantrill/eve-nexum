@@ -499,7 +499,12 @@
     "notifColSound": "Son",
     "notifK162": "K162 entrant",
     "notifProximity": "Menaces de proximité",
-    "notifWatchlist": "Correspondance de liste de surveillance"
+    "notifWatchlist": "Correspondance de liste de surveillance",
+    "routeIncludeThera": "Inclure les connexions Thera",
+    "routeIncludeTurnur": "Inclure les connexions Turnur",
+    "routeIncludeWormholes": "Inclure la chaîne de trous de ver",
+    "routeShortcutNote": "Les itinéraires passant par un trou de ver, Thera, Turnur ou une porte de saut ne peuvent pas être définis comme destination ou point de passage en jeu — faites un clic droit sur un système k-space de l’itinéraire pour vous y rendre.",
+    "routeIncludeAnsiblex": "Inclure les portes Ansiblex"
   },
   "customIntel": {
     "title": "Intel personnalisée",
@@ -829,7 +834,15 @@
   },
   "route": {
     "fromLastKnown": "Sauts depuis {{system}} (dernière position connue)",
-    "fromCharacter": "Sauts depuis {{character}} — {{system}}"
+    "fromCharacter": "Sauts depuis {{character}} — {{system}}",
+    "viaWormhole": "Saut par trou de ver",
+    "viaThera": "Via Thera",
+    "viaTurnur": "Via Turnur",
+    "riskEol": "EOL",
+    "riskCritical": "Masse critique",
+    "riskFrig": "Trou frégate",
+    "shortcutNoWaypoint": "Cet itinéraire passe par un trou de ver/Thera/Turnur/porte de saut et ne peut pas être défini comme destination du pilote automatique — faites un clic droit sur un système k-space de l’itinéraire.",
+    "viaAnsiblex": "Porte de saut Ansiblex"
   },
   "activity": {
     "thisHour": "cette heure",
