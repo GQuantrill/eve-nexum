@@ -1066,7 +1066,8 @@
       "threat": "Menace",
       "closest": "Système {{label}} le plus proche"
     },
-    "resetLayout": "Réinitialiser la disposition de la barre d'outils"
+    "resetLayout": "Réinitialiser la disposition de la barre d'outils",
+    "copyThisMap": "Copier cette carte"
   },
   "landing": {
     "tagline": "Cartographie de chaînes de trous de ver pour EVE Online",
@@ -1547,5 +1548,20 @@
     "remove": "Supprimer",
     "colour": "Couleur",
     "maxReached": "Maximum de {{n}} labels personnalisés atteint — supprimez-en un pour en ajouter."
+  },
+  "copyMap": {
+    "title": "Copier la carte",
+    "sourceLabel": "Copie depuis",
+    "nameLabel": "Nom de la nouvelle carte",
+    "namePlaceholder": "Nom de la nouvelle carte",
+    "include": "Copier",
+    "copyNotes": "Notes",
+    "copySignatures": "Signatures",
+    "copyStructures": "Structures",
+    "copyAnomalies": "Anomalies",
+    "submit": "Créer la copie",
+    "copying": "Copie…",
+    "success": "Copié vers {{name}}",
+    "failed": "Échec de la copie"
   }
 }

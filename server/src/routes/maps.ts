@@ -19,6 +19,7 @@ import {
   createStructure, updateStructure, deleteStructure,
 } from '../services/mapWrite.js';
 import { reportPresence } from '../services/presence.js';
+import { copyMap } from '../services/mapCopy.js';
 import { notifyDiscord, webhookFor, k162Embed, connectionEmbed } from '../services/discord.js';
 
 const log = createLogger('maps');
@@ -459,6 +460,50 @@ mapsRouter.post('/', async (req, res) => {
     [req.session.userId, ownerId, name, corpId],
   );
   res.status(201).json({ id: rows[0].id });
+});
+
+// POST /api/maps/:mapId/copy — duplicate a map the caller can read into a new
+// personal map. A read-only corp map can't be copied; the copy counts against
+// the caller's personal map cap. Body: { name, include: { notes, signatures,
+// structures, anomalies } }.
+mapsRouter.post('/:mapId/copy', async (req, res) => {
+  const sourceMapId = req.params.mapId;
+  const access = await getMapAccess(sourceMapId, req);
+  if (!access) { res.status(404).json({ error: 'Map not found' }); return; }
+  if (access.accessKind === 'corp_member' && authUser(req).role === 'readonly') {
+    res.status(403).json({ error: 'Read-only corp maps cannot be copied' });
+    return;
+  }
+
+  // The copy is always a personal map — enforce the personal cap (as POST /).
+  const ownerId = await resolveOwnerId(req);
+  const { rowCount } = await db.query(
+    `SELECT 1 FROM maps WHERE owner_id = $1 AND corp_id IS NULL`, [ownerId],
+  );
+  if ((rowCount ?? 0) >= config.maxUserMaps) {
+    res.status(403).json({ error: 'Maximum maps reached' });
+    return;
+  }
+
+  const name = String(req.body.name ?? '').trim().slice(0, MAX_MAP_NAME_LEN);
+  if (!name) { res.status(400).json({ error: 'Name is required' }); return; }
+
+  const inc = (req.body.include ?? {}) as Record<string, unknown>;
+  try {
+    const newId = await copyMap({
+      sourceMapId, name, ownerId, userId: req.session.userId!,
+      include: {
+        notes:      inc.notes === true,
+        signatures: inc.signatures === true,
+        structures: inc.structures === true,
+        anomalies:  inc.anomalies === true,
+      },
+    });
+    res.status(201).json({ id: newId });
+  } catch (err) {
+    log.error('Map copy failed:', err);
+    res.status(500).json({ error: 'Map copy failed' });
+  }
 });
 
 // POST /api/maps/from-region — create a new map pre-populated with an entire

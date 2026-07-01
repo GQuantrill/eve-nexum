@@ -353,6 +353,21 @@
     "open": "open",
     "close": "close"
   },
+  "copyMap": {
+    "title": "Copy Map",
+    "sourceLabel": "Copying from",
+    "nameLabel": "New map name",
+    "namePlaceholder": "New map name",
+    "include": "Copy",
+    "copyNotes": "Notes",
+    "copySignatures": "Signatures",
+    "copyStructures": "Structures",
+    "copyAnomalies": "Anomalies",
+    "submit": "Create copy",
+    "copying": "Copying…",
+    "success": "Copied to {{name}}",
+    "failed": "Copy failed"
+  },
   "merge": {
     "title": "Merge Maps",
     "corp": "Corp",
@@ -1067,6 +1082,7 @@
     "locked": "Locked",
     "mapLimitReached": "Map limit reached",
     "newMap": "+ New Map",
+    "copyThisMap": "Copy this map",
     "deleteThisMap": "Delete this map",
     "name": "Name",
     "totalSystems": "Total Systems",

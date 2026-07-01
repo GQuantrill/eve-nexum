@@ -1066,7 +1066,8 @@
       "threat": "威胁",
       "closest": "最近的{{label}}星系"
     },
-    "resetLayout": "重置工具栏布局"
+    "resetLayout": "重置工具栏布局",
+    "copyThisMap": "复制此地图"
   },
   "landing": {
     "tagline": "EVE Online 的虫洞链路绘图",
@@ -1547,5 +1548,20 @@
     "remove": "移除",
     "colour": "颜色",
     "maxReached": "已达到 {{n}} 个自定义标签上限 — 移除一个才能再添加。"
+  },
+  "copyMap": {
+    "title": "复制地图",
+    "sourceLabel": "复制来源",
+    "nameLabel": "新地图名称",
+    "namePlaceholder": "新地图名称",
+    "include": "复制",
+    "copyNotes": "笔记",
+    "copySignatures": "信号",
+    "copyStructures": "建筑",
+    "copyAnomalies": "异常",
+    "submit": "创建副本",
+    "copying": "正在复制…",
+    "success": "已复制到 {{name}}",
+    "failed": "复制失败"
   }
 }
