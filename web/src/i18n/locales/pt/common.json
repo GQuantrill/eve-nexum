@@ -499,7 +499,11 @@
     "notifColSound": "Som",
     "notifK162": "K162 de entrada",
     "notifProximity": "Ameaças de proximidade",
-    "notifWatchlist": "Correspondência da lista de observação"
+    "notifWatchlist": "Correspondência da lista de observação",
+    "routeIncludeThera": "Incluir conexões de Thera",
+    "routeIncludeTurnur": "Incluir conexões de Turnur",
+    "routeIncludeWormholes": "Incluir cadeia de buracos de minhoca",
+    "routeShortcutNote": "Rotas que usam um buraco de minhoca, Thera ou Turnur não podem ser definidas como destino ou ponto de rota no jogo — clique com o botão direito em um sistema k-space da rota para ir até ele."
   },
   "customIntel": {
     "title": "Intel personalizada",
@@ -829,7 +833,14 @@
   },
   "route": {
     "fromLastKnown": "Saltos a partir de {{system}} (última localização conhecida)",
-    "fromCharacter": "Saltos a partir de {{character}} — {{system}}"
+    "fromCharacter": "Saltos a partir de {{character}} — {{system}}",
+    "viaWormhole": "Salto por buraco de minhoca",
+    "viaThera": "Via Thera",
+    "viaTurnur": "Via Turnur",
+    "riskEol": "EOL",
+    "riskCritical": "Massa crítica",
+    "riskFrig": "Buraco de fragata",
+    "shortcutNoWaypoint": "Esta rota usa um buraco de minhoca/Thera/Turnur e não pode ser definida como destino do piloto automático — clique com o botão direito em um sistema k-space da rota."
   },
   "activity": {
     "thisHour": "esta hora",

@@ -499,7 +499,11 @@
     "notifColSound": "소리",
     "notifK162": "수신 K162",
     "notifProximity": "근접 위협",
-    "notifWatchlist": "워치리스트 일치"
+    "notifWatchlist": "워치리스트 일치",
+    "routeIncludeThera": "Thera 연결 포함",
+    "routeIncludeTurnur": "Turnur 연결 포함",
+    "routeIncludeWormholes": "웜홀 체인 포함",
+    "routeShortcutNote": "웜홀, Thera 또는 Turnur를 사용하는 경로는 게임 내 목적지나 경유지로 설정할 수 없습니다 — 경로의 K-스페이스 시스템을 우클릭하여 그곳으로 이동하세요."
   },
   "customIntel": {
     "title": "사용자 지정 인텔",
@@ -829,7 +833,14 @@
   },
   "route": {
     "fromLastKnown": "{{system}}에서의 점프 (마지막으로 확인된 위치)",
-    "fromCharacter": "{{character}}에서의 점프 — {{system}}"
+    "fromCharacter": "{{character}}에서의 점프 — {{system}}",
+    "viaWormhole": "웜홀 점프",
+    "viaThera": "Thera 경유",
+    "viaTurnur": "Turnur 경유",
+    "riskEol": "EOL",
+    "riskCritical": "임계 질량",
+    "riskFrig": "프리깃 홀",
+    "shortcutNoWaypoint": "이 경로는 웜홀/Thera/Turnur를 사용하므로 자동 조종 목적지로 설정할 수 없습니다 — 경로의 K-스페이스 시스템을 우클릭하세요."
   },
   "activity": {
     "thisHour": "이번 시간",

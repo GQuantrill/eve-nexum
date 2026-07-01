@@ -449,6 +449,10 @@
     "routeShortest": "Shortest",
     "routeSecure": "Secure",
     "routeHint": "Shortest: fewest jumps regardless of security. Secure: prefer high-sec, detour through low/null only when no high-sec path is available.",
+    "routeIncludeThera": "Include Thera connections",
+    "routeIncludeTurnur": "Include Turnur connections",
+    "routeIncludeWormholes": "Include wormhole chain",
+    "routeShortcutNote": "Routes using a wormhole, Thera, or Turnur can't be set as an in-game destination or waypoint — right-click a k-space system in the route to set one to it instead.",
     "proximityHint": "Ping when an incursion, insurgency, or hostile-sov system is within range of your current location.",
     "threshold": "Threshold",
     "proximityInSystem": "0 jumps (in system)",
@@ -867,7 +871,14 @@
   },
   "route": {
     "fromLastKnown": "Jumps from {{system}} (last known location)",
-    "fromCharacter": "Jumps from {{character}} — {{system}}"
+    "fromCharacter": "Jumps from {{character}} — {{system}}",
+    "viaWormhole": "Wormhole jump",
+    "viaThera": "Via Thera",
+    "viaTurnur": "Via Turnur",
+    "riskEol": "EOL",
+    "riskCritical": "Critical mass",
+    "riskFrig": "Frigate hole",
+    "shortcutNoWaypoint": "This route uses a wormhole/Thera/Turnur and can't be set as an autopilot destination — right-click a k-space system in the route instead."
   },
   "activity": {
     "thisHour": "this hour",

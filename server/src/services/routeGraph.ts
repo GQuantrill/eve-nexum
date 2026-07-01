@@ -3,9 +3,39 @@ import { createLogger } from '../utils/logger.js';
 
 const log = createLogger('routeGraph');
 
+// Metadata for a non-stargate ("special") edge spliced into the graph — a
+// wormhole chain link or a Thera/Turnur scout connection. Carried through to
+// the client so the route UI can mark the gap and flag risky holes.
+export interface EdgeMeta {
+  kind:      'wormhole' | 'thera' | 'turnur';
+  eol?:      boolean;   // end-of-life hole
+  critical?: boolean;   // critical mass
+  frig?:     boolean;   // frigate-sized hole
+  whType?:   string;    // wormhole type code, when known
+}
+
+// A per-request overlay of extra edges (+ their node info + edge metadata)
+// merged on top of the static stargate graph. Never mutates the base graph.
+export interface RouteOverlay {
+  adj:      Map<number, number[]>;
+  info:     Map<number, { name: string; security: number }>;
+  edgeMeta: Map<string, EdgeMeta>;   // key = `${a}|${b}`, added both directions
+}
+
+export function edgeKey(a: number, b: number): string { return `${a}|${b}`; }
+
+export interface RoutePathNode {
+  id:       number;
+  name:     string;
+  security: number;
+  kspace:   boolean;    // true when in the base stargate graph (autopilot-able)
+  via?:     EdgeMeta;   // set when the hop INTO this node was a special edge
+}
+
 export interface RouteEntry {
-  jumps: number;
-  path:  Array<{ id: number; name: string; security: number }>;
+  jumps:       number;
+  path:        RoutePathNode[];
+  usesSpecial: boolean;  // path traverses at least one wormhole/Thera/Turnur hop
 }
 
 export type RouteMode = 'shortest' | 'secure';
@@ -15,8 +45,11 @@ export type RouteMode = 'shortest' | 'secure';
 // is essentially "only if you have to". Numbers are large enough that no
 // reasonable HS detour will ever lose to a single LS/NS shortcut.
 const SECURE_WEIGHTS = { hs: 1, ls: 100, ns: 10_000 } as const;
-function edgeCost(toSecurity: number, mode: RouteMode): number {
+function edgeCost(toSecurity: number, mode: RouteMode, isSpecial: boolean): number {
   if (mode === 'shortest') return 1;
+  // Shortcuts (wormhole / Thera / Turnur) count as null-sec in secure mode, so
+  // a "secure" route only dives through one when there's no k-space path.
+  if (isSpecial) return SECURE_WEIGHTS.ns;
   if (toSecurity >= 0.45) return SECURE_WEIGHTS.hs;
   if (toSecurity >  0.00) return SECURE_WEIGHTS.ls;
   return SECURE_WEIGHTS.ns;
@@ -88,15 +121,26 @@ export async function shortestRoutes(
   source: number,
   targets: number[],
   mode: RouteMode = 'shortest',
+  overlay?: RouteOverlay,
 ): Promise<Record<number, RouteEntry>> {
   if (!adjacency || !systemInfo) throw new Error('Route graph not loaded');
+  const baseAdj  = adjacency;
+  const baseInfo = systemInfo;
 
-  if (!adjacency.has(source)) return {};
+  const hasNode = (n: number): boolean => baseAdj.has(n) || (overlay?.info.has(n) ?? false);
+  if (!hasNode(source)) return {};
 
-  const targetSet = new Set(targets.filter(t => adjacency!.has(t)));
+  const targetSet = new Set(targets.filter(hasNode));
   if (targetSet.size === 0) return {};
 
-  const neighborsOf = (node: number): number[] => adjacency!.get(node) ?? [];
+  // Neighbours come from the static stargate graph plus any per-request overlay
+  // edges; the base graph is never copied or mutated.
+  const neighborsOf = (node: number): number[] =>
+    overlay ? [...(baseAdj.get(node) ?? []), ...(overlay.adj.get(node) ?? [])]
+            : (baseAdj.get(node) ?? []);
+  const infoOf = (id: number) => overlay?.info.get(id) ?? baseInfo.get(id);
+  const isSpecialEdge = (a: number, b: number): boolean =>
+    overlay ? overlay.edgeMeta.has(edgeKey(a, b)) : false;
 
   const dist = new Map<number, number>();
   const prev = new Map<number, number>();
@@ -139,7 +183,7 @@ export async function shortestRoutes(
       const neighbors = neighborsOf(node);
       if (neighbors.length === 0) continue;
       for (const n of neighbors) {
-        const w = edgeCost(systemInfo.get(n)?.security ?? 0, 'secure');
+        const w = edgeCost(infoOf(n)?.security ?? 0, 'secure', isSpecialEdge(node, n));
         const newCost = cost + w;
         if (newCost < (dist.get(n) ?? Infinity)) {
           dist.set(n, newCost);
@@ -152,21 +196,30 @@ export async function shortestRoutes(
 
   const result: Record<number, RouteEntry> = {};
   for (const t of found) {
-    const path: number[] = [];
+    const ids: number[] = [];
     let cur: number | undefined = t;
     while (cur !== undefined) {
-      path.push(cur);
+      ids.push(cur);
       if (cur === source) break;
       cur = prev.get(cur);
     }
-    path.reverse();
-    result[t] = {
-      jumps: path.length - 1,
-      path:  path.map(id => {
-        const info = systemInfo!.get(id);
-        return { id, name: info?.name ?? '?', security: info?.security ?? 0 };
-      }),
-    };
+    ids.reverse();
+
+    let usesSpecial = false;
+    const path: RoutePathNode[] = ids.map((id, i) => {
+      const info = infoOf(id);
+      const via = i > 0 ? overlay?.edgeMeta.get(edgeKey(ids[i - 1], id)) : undefined;
+      if (via) usesSpecial = true;
+      return {
+        id,
+        name:     info?.name ?? '?',
+        security: info?.security ?? 0,
+        kspace:   baseInfo.has(id),
+        ...(via ? { via } : {}),
+      };
+    });
+
+    result[t] = { jumps: ids.length - 1, path, usesSpecial };
   }
 
   return result;

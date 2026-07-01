@@ -499,7 +499,11 @@
     "notifColSound": "音",
     "notifK162": "着信 K162",
     "notifProximity": "近接の脅威",
-    "notifWatchlist": "ウォッチリスト一致"
+    "notifWatchlist": "ウォッチリスト一致",
+    "routeIncludeThera": "Thera 接続を含める",
+    "routeIncludeTurnur": "Turnur 接続を含める",
+    "routeIncludeWormholes": "ワームホールチェーンを含める",
+    "routeShortcutNote": "ワームホール、Thera、Turnur を経由するルートはゲーム内の目的地や経由地に設定できません — ルート上のK-スペースシステムを右クリックしてそこへ向かってください。"
   },
   "customIntel": {
     "title": "カスタムインテル",
@@ -829,7 +833,14 @@
   },
   "route": {
     "fromLastKnown": "{{system}} からのジャンプ数（最後に確認された位置）",
-    "fromCharacter": "{{character}} からのジャンプ数 — {{system}}"
+    "fromCharacter": "{{character}} からのジャンプ数 — {{system}}",
+    "viaWormhole": "ワームホールジャンプ",
+    "viaThera": "Thera 経由",
+    "viaTurnur": "Turnur 経由",
+    "riskEol": "EOL",
+    "riskCritical": "限界質量",
+    "riskFrig": "フリゲートホール",
+    "shortcutNoWaypoint": "このルートはワームホール/Thera/Turnur を使用するため、オートパイロットの目的地に設定できません — ルート上のK-スペースシステムを右クリックしてください。"
   },
   "activity": {
     "thisHour": "今時間",

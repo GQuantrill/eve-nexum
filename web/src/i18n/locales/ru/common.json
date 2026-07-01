@@ -515,7 +515,11 @@
     "notifColSound": "Звук",
     "notifK162": "Входящий K162",
     "notifProximity": "Близкие угрозы",
-    "notifWatchlist": "Совпадение списка наблюдения"
+    "notifWatchlist": "Совпадение списка наблюдения",
+    "routeIncludeThera": "Включить соединения Thera",
+    "routeIncludeTurnur": "Включить соединения Turnur",
+    "routeIncludeWormholes": "Включить цепочку червоточин",
+    "routeShortcutNote": "Маршруты через червоточину, Thera или Turnur нельзя задать как игровую точку назначения или маршрутную точку — щёлкните правой кнопкой по системе k-space в маршруте, чтобы проложить путь к ней."
   },
   "customIntel": {
     "title": "Свои метки интела",
@@ -855,7 +859,14 @@
   },
   "route": {
     "fromLastKnown": "Прыжки от {{system}} (последнее известное местоположение)",
-    "fromCharacter": "Прыжки от {{character}} — {{system}}"
+    "fromCharacter": "Прыжки от {{character}} — {{system}}",
+    "viaWormhole": "Прыжок через червоточину",
+    "viaThera": "Через Thera",
+    "viaTurnur": "Через Turnur",
+    "riskEol": "EOL",
+    "riskCritical": "Критическая масса",
+    "riskFrig": "Фрегатная червоточина",
+    "shortcutNoWaypoint": "Этот маршрут использует червоточину/Thera/Turnur и не может быть задан как точка назначения автопилота — щёлкните правой кнопкой по системе k-space в маршруте."
   },
   "activity": {
     "thisHour": "за этот час",
