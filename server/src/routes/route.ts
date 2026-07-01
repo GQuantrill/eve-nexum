@@ -2,6 +2,8 @@ import { Router } from 'express';
 import { requireAuth } from '../middleware/requireAuth.js';
 import { createLogger } from '../utils/logger.js';
 import { shortestRoutes, type RouteMode } from '../services/routeGraph.js';
+import { buildRouteOverlay } from '../services/routeOverlay.js';
+import { getMapAccess } from './maps.js';
 
 const router = Router();
 router.use(requireAuth);
@@ -38,8 +40,27 @@ router.get('/', async (req, res) => {
   const modeRaw = String(req.query.mode ?? 'shortest') as RouteMode;
   const mode: RouteMode = VALID_MODES.has(modeRaw) ? modeRaw : 'shortest';
 
+  // Optional shortcut edges spliced into the graph (opt-in per request).
+  const includeThera     = String(req.query.includeThera)     === 'true';
+  const includeTurnur    = String(req.query.includeTurnur)    === 'true';
+  const includeWormholes = String(req.query.includeWormholes) === 'true';
+  const includeAnsiblex  = String(req.query.includeAnsiblex)  === 'true';
+  const mapId = typeof req.query.mapId === 'string' ? req.query.mapId : undefined;
+
+  // Wormhole / Ansiblex edges come from a specific map — require it and enforce
+  // access. Fail loudly rather than silently returning a gates-only route,
+  // which would mislead the user into thinking no shortcut route exists.
+  if (includeWormholes || includeAnsiblex) {
+    if (!mapId) return res.status(400).json({ error: 'mapId required for map-based shortcuts' });
+    const access = await getMapAccess(mapId, req);
+    if (!access) return res.status(404).json({ error: 'Map not found' });
+  }
+
   try {
-    const result = await shortestRoutes(from, targets, mode);
+    const overlay = (includeThera || includeTurnur || includeWormholes || includeAnsiblex)
+      ? await buildRouteOverlay({ thera: includeThera, turnur: includeTurnur, wormholes: includeWormholes, ansiblex: includeAnsiblex, mapId })
+      : undefined;
+    const result = await shortestRoutes(from, targets, mode, overlay);
     return res.json(result);
   } catch (err) {
     log.error('Route compute failed:', err);

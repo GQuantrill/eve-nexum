@@ -499,7 +499,12 @@
     "notifColSound": "Sonido",
     "notifK162": "K162 entrante",
     "notifProximity": "Amenazas de proximidad",
-    "notifWatchlist": "Coincidencia de lista de seguimiento"
+    "notifWatchlist": "Coincidencia de lista de seguimiento",
+    "routeIncludeThera": "Incluir conexiones de Thera",
+    "routeIncludeTurnur": "Incluir conexiones de Turnur",
+    "routeIncludeWormholes": "Incluir cadena de agujeros de gusano",
+    "routeShortcutNote": "Las rutas que usan un agujero de gusano, Thera, Turnur o una puerta de salto no se pueden establecer como destino o punto de ruta en el juego; haz clic derecho en un sistema k-space de la ruta para ir a él.",
+    "routeIncludeAnsiblex": "Incluir puertas Ansiblex"
   },
   "customIntel": {
     "title": "Intel personalizada",
@@ -829,7 +834,15 @@
   },
   "route": {
     "fromLastKnown": "Saltos desde {{system}} (última ubicación conocida)",
-    "fromCharacter": "Saltos desde {{character}} — {{system}}"
+    "fromCharacter": "Saltos desde {{character}} — {{system}}",
+    "viaWormhole": "Salto por agujero de gusano",
+    "viaThera": "Vía Thera",
+    "viaTurnur": "Vía Turnur",
+    "riskEol": "EOL",
+    "riskCritical": "Masa crítica",
+    "riskFrig": "Agujero de fragata",
+    "shortcutNoWaypoint": "Esta ruta usa un agujero de gusano/Thera/Turnur/puerta de salto y no se puede establecer como destino del piloto automático; haz clic derecho en un sistema k-space de la ruta.",
+    "viaAnsiblex": "Puerta de salto Ansiblex"
   },
   "activity": {
     "thisHour": "esta hora",
