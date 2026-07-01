@@ -7,11 +7,13 @@ import { useAuth } from '../../context/AuthContext';
 import { useOnlineStatus } from '../../hooks/useOnlineStatus';
 import { useCharacterLocation } from '../../hooks/useCharacterLocation';
 import { useCanEdit } from '../../hooks/useCanEdit';
+import { useCanEditContent } from '../../hooks/useCanEditContent';
 import { useIsMapOwner } from '../../hooks/useIsMapOwner';
 import { useCanCreateMaps } from '../../hooks/useCanCreateMaps';
 import { UserStatsModal } from './UserStatsModal';
 import { ConfirmModal } from './ConfirmModal';
 import { CreateMapModal } from './CreateMapModal';
+import { CopyMapModal } from './CopyMapModal';
 import { ApiKeysModal } from './ApiKeysModal';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { CharacterSwitcher } from './CharacterSwitcher';
@@ -276,7 +278,12 @@ export function Toolbar() {
   const atCorpMapLimit  = corpMapCount >= maxCorpMaps;
   const { user, logout } = useAuth();
   const canEdit       = useCanEdit();
+  const canEditContent = useCanEditContent();
   const isMapOwner    = useIsMapOwner();
+  // A read-only corp map can't be copied (matches the server gate). Personal
+  // maps are always content-editable, so this is true only for corp maps where
+  // the user lacks an edit role.
+  const readonlyCorpActive = !!maps.find((m) => m.id === activeMapId)?.isCorpMap && !canEditContent;
   const canManageMaps = useCanCreateMaps();
   const canCorpCreate = !!user?.corpMode && canManageMaps;
   // No creatable option = personal slots full AND (can't make corp maps, or
@@ -298,6 +305,7 @@ export function Toolbar() {
   const [showMaps, setShowMaps]   = useState(false);
   const [showStats, setShowStats] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
+  const [showCopy, setShowCopy] = useState(false);
   const [showKeys, setShowKeys] = useState(false);
   const [showWhChart, setShowWhChart] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
@@ -456,6 +464,20 @@ export function Toolbar() {
                   {t('toolbar.newMap')}
                 </button>
               </span>
+              {!readonlyCorpActive && (
+                <span
+                  className={`map-dropdown__new-wrap${atMapLimit ? ' map-dropdown__new-wrap--disabled' : ''}`}
+                  data-disabled-reason={atMapLimit ? t('toolbar.mapLimitReached') : undefined}
+                >
+                  <button
+                    className="map-dropdown__item map-dropdown__item--action"
+                    onClick={() => { setShowMaps(false); setShowCopy(true); }}
+                    disabled={atMapLimit}
+                  >
+                    {t('toolbar.copyThisMap')}
+                  </button>
+                </span>
+              )}
               {canManageMaps && maps.length > 1 && !maps.find((m) => m.id === activeMapId)?.sharedWithMe && (
                 <button className="map-dropdown__item map-dropdown__item--danger" onClick={() => { setShowMaps(false); setDeleteConfirm(true); }}>
                   {t('toolbar.deleteThisMap')}
@@ -727,6 +749,7 @@ export function Toolbar() {
 
     {showStats && <UserStatsModal onClose={() => setShowStats(false)} />}
     {showCreate && <CreateMapModal onClose={() => setShowCreate(false)} />}
+    {showCopy && <CopyMapModal onClose={() => setShowCopy(false)} />}
     {showKeys && <ApiKeysModal onClose={() => setShowKeys(false)} />}
     {showWhChart && <WhTypeChartModal onClose={() => setShowWhChart(false)} />}
     {deleteConfirm && (

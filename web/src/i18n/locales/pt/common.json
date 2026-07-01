@@ -1066,7 +1066,8 @@
       "threat": "Ameaça",
       "closest": "Sistema {{label}} mais próximo"
     },
-    "resetLayout": "Repor disposição da barra de ferramentas"
+    "resetLayout": "Repor disposição da barra de ferramentas",
+    "copyThisMap": "Copiar este mapa"
   },
   "landing": {
     "tagline": "Cartografia de cadeias de buracos de minhoca para EVE Online",
@@ -1547,5 +1548,20 @@
     "remove": "Remover",
     "colour": "Cor",
     "maxReached": "Máximo de {{n}} etiquetas personalizadas atingido — remova uma para adicionar outra."
+  },
+  "copyMap": {
+    "title": "Copiar mapa",
+    "sourceLabel": "Copiando de",
+    "nameLabel": "Nome do novo mapa",
+    "namePlaceholder": "Nome do novo mapa",
+    "include": "Copiar",
+    "copyNotes": "Notas",
+    "copySignatures": "Assinaturas",
+    "copyStructures": "Estruturas",
+    "copyAnomalies": "Anomalias",
+    "submit": "Criar cópia",
+    "copying": "Copiando…",
+    "success": "Copiado para {{name}}",
+    "failed": "Falha ao copiar"
   }
 }

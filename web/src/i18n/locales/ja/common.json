@@ -1066,7 +1066,8 @@
       "threat": "脅威",
       "closest": "最も近い{{label}}星系"
     },
-    "resetLayout": "ツールバーのレイアウトをリセット"
+    "resetLayout": "ツールバーのレイアウトをリセット",
+    "copyThisMap": "このマップをコピー"
   },
   "landing": {
     "tagline": "EVE Online のためのワームホールチェーン・マッピング",
@@ -1547,5 +1548,20 @@
     "remove": "削除",
     "colour": "色",
     "maxReached": "カスタムラベルは最大 {{n}} 個です — 追加するには1つ削除してください。"
+  },
+  "copyMap": {
+    "title": "マップをコピー",
+    "sourceLabel": "コピー元",
+    "nameLabel": "新しいマップ名",
+    "namePlaceholder": "新しいマップ名",
+    "include": "コピー",
+    "copyNotes": "メモ",
+    "copySignatures": "シグネチャ",
+    "copyStructures": "ストラクチャ",
+    "copyAnomalies": "アノマリー",
+    "submit": "コピーを作成",
+    "copying": "コピー中…",
+    "success": "{{name}} にコピーしました",
+    "failed": "コピーに失敗しました"
   }
 }

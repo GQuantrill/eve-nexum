@@ -1066,7 +1066,8 @@
       "threat": "Amenaza",
       "closest": "Sistema {{label}} más cercano"
     },
-    "resetLayout": "Restablecer disposición de la barra de herramientas"
+    "resetLayout": "Restablecer disposición de la barra de herramientas",
+    "copyThisMap": "Copiar este mapa"
   },
   "landing": {
     "tagline": "Cartografía de cadenas de agujeros de gusano para EVE Online",
@@ -1547,5 +1548,20 @@
     "remove": "Eliminar",
     "colour": "Color",
     "maxReached": "Máximo de {{n}} etiquetas personalizadas alcanzado — elimina una para añadir otra."
+  },
+  "copyMap": {
+    "title": "Copiar mapa",
+    "sourceLabel": "Copiando desde",
+    "nameLabel": "Nombre del nuevo mapa",
+    "namePlaceholder": "Nombre del nuevo mapa",
+    "include": "Copiar",
+    "copyNotes": "Notas",
+    "copySignatures": "Firmas",
+    "copyStructures": "Estructuras",
+    "copyAnomalies": "Anomalías",
+    "submit": "Crear copia",
+    "copying": "Copiando…",
+    "success": "Copiado a {{name}}",
+    "failed": "Error al copiar"
   }
 }
