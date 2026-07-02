@@ -120,7 +120,14 @@ async function fetchEsi(killmailId: number, hash: string): Promise<EsiKillmail |
 }
 
 router.get('/:systemId(\\d+)', async (req, res) => {
-  const { systemId } = req.params;
+  // The route pattern already constrains this to digits, but parse to a bounded
+  // integer and build the upstream URL from the NUMBER (not the raw string) so
+  // no attacker-controlled text can ever reach the outbound request (SSRF).
+  const idNum = Number(req.params.systemId);
+  if (!Number.isInteger(idNum) || idNum <= 0 || idNum > 100_000_000) {
+    return res.status(400).json({ error: 'Invalid system id' });
+  }
+  const systemId = String(idNum);
 
   // Fresh cache hit — return immediately. peek() falls back to any stale entry
   // we can still serve from when the upstream is unhappy.
@@ -133,7 +140,7 @@ router.get('/:systemId(\\d+)', async (req, res) => {
   // made the client-side toggle ineffective — the server now hands back
   // everything and the killboard pane decides whether to render NPC kills
   // based on the user's preference.
-  const zkbUrl = `https://zkillboard.com/api/kills/solarSystemID/${systemId}/pastSeconds/86400/`;
+  const zkbUrl = `https://zkillboard.com/api/kills/solarSystemID/${idNum}/pastSeconds/86400/`;
   const zkbHeaders: Record<string, string> = {
     'User-Agent': ZKB_AGENT,
     Accept:       'application/json',

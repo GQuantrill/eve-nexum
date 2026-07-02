@@ -54,11 +54,16 @@ app.set('trust proxy', 1);
 app.disable('x-powered-by');
 
 // Default Helmet is safe for a JSON API: HSTS (HTTPS only), nosniff,
-// frameguard=deny, referrer-policy=no-referrer, etc. CSP is disabled
-// because we serve JSON not HTML — the frontend is delivered by nginx,
-// which is where any meaningful CSP belongs.
+// frameguard=deny, referrer-policy=no-referrer, etc. This server only ever
+// returns JSON (the SPA is served by nginx/traefik, which owns the frontend
+// CSP), so we lock the API's own CSP all the way down: default-src 'none'
+// forbids loading/executing anything should a response ever be interpreted as
+// a document. Costs nothing on JSON responses.
 app.use(helmet({
-  contentSecurityPolicy: false,
+  contentSecurityPolicy: {
+    useDefaults: false,
+    directives: { defaultSrc: ["'none'"], frameAncestors: ["'none'"] },
+  },
   crossOriginEmbedderPolicy: false,
   crossOriginResourcePolicy: { policy: 'cross-origin' },
 }));

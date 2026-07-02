@@ -7,6 +7,15 @@ const log = createLogger('origin-guard');
 // preflight; CSRF on those isn't a thing.
 const STATE_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 
+// Strip trailing slashes with a linear scan rather than `/\/+$/`, which is
+// O(n^2) on a long run of slashes (polynomial ReDoS) — and the Origin/Referer
+// headers this runs on are attacker-influenced.
+function stripTrailingSlashes(s: string): string {
+  let end = s.length;
+  while (end > 0 && s.charCodeAt(end - 1) === 47 /* '/' */) end--;
+  return s.slice(0, end);
+}
+
 /**
  * Defense-in-depth CSRF guard. Rejects state-changing requests whose
  * Origin (or Referer as a fallback) doesn't match FRONTEND_URL.
@@ -29,7 +38,7 @@ const STATE_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 export function originGuard(allowedOrigin: string) {
   // Normalise once: strip trailing slash so '.../app' and '.../app/'
   // both match without per-request string juggling.
-  const allowed = allowedOrigin.replace(/\/+$/, '');
+  const allowed = stripTrailingSlashes(allowedOrigin);
 
   return function originGuardMiddleware(req: Request, res: Response, next: NextFunction) {
     if (!STATE_METHODS.has(req.method)) {
@@ -49,7 +58,7 @@ export function originGuard(allowedOrigin: string) {
       return;
     }
 
-    const origin  = (req.headers.origin  ?? '').replace(/\/+$/, '');
+    const origin  = stripTrailingSlashes(req.headers.origin ?? '');
     const referer = req.headers.referer ?? '';
 
     // Origin is the strong signal — when present, it's authoritative.
