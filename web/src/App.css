@@ -6846,6 +6846,10 @@ select.sig-toolbar-btn option {
   background: #0d1117;
   border: 1px solid #1e2740;
   border-radius: 6px;
+  /* Lift clear of the centred canvas hint (bottom: 12px) so the bottom
+     control (center-on-me) isn't overlapped by the hint text in short /
+     narrow viewports. Overrides React Flow's default 15px panel margin. */
+  margin-bottom: 44px;
 
   button {
     background: #0d1117;
