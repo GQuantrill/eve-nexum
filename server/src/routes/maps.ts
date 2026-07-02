@@ -1569,6 +1569,17 @@ mapsRouter.patch('/:mapId/systems/:systemId', async (req, res) => {
     vals.push(v);
   }
 
+  // Single-character quick tag (one A-Z / 0-9 char), or null to clear. The
+  // strict charset stops a stale client stuffing arbitrary text into the badge.
+  if ('tag' in updates) {
+    const v = updates.tag;
+    if (v !== null && !(typeof v === 'string' && /^[A-Za-z0-9]$/.test(v))) {
+      res.status(400).json({ error: 'invalid tag' }); return;
+    }
+    sets.push(`tag = $${vals.length + 1}`);
+    vals.push(v);
+  }
+
   // Predefined labels — applied as coloured pills above the node. A subset of
   // the fixed id set; deduped before storing.
   if ('labels' in updates) {

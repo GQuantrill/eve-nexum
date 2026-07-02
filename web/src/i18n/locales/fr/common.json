@@ -722,7 +722,9 @@
     "labels": "Labels",
     "customLabel": "Label personnalisé",
     "clearLabels": "Effacer",
-    "labelNamed": "Label {{name}}"
+    "labelNamed": "Label {{name}}",
+    "tag": "Marqueur",
+    "clearTag": "Effacer le marqueur"
   },
   "panel": {
     "notes": "Notes",

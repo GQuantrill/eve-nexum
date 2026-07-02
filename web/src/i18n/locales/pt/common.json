@@ -722,7 +722,9 @@
     "labels": "Etiquetas",
     "customLabel": "Etiqueta personalizada",
     "clearLabels": "Limpar",
-    "labelNamed": "Etiqueta {{name}}"
+    "labelNamed": "Etiqueta {{name}}",
+    "tag": "Marca",
+    "clearTag": "Limpar marca"
   },
   "panel": {
     "notes": "Notas",

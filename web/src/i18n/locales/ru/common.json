@@ -740,7 +740,9 @@
     "labels": "Метки",
     "customLabel": "Своя метка",
     "clearLabels": "Очистить",
-    "labelNamed": "Метка {{name}}"
+    "labelNamed": "Метка {{name}}",
+    "tag": "Тег",
+    "clearTag": "Убрать тег"
   },
   "panel": {
     "notes": "Заметки",

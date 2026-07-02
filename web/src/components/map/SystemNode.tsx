@@ -355,6 +355,7 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
             <HouseIcon size={14} weight="regular" />
           </span>
         )}
+        {sys.tag && <span className="system-node__tag">{sys.tag}</span>}
         <span className="system-node__name">{sys.name || t('mapNode.unknown')}</span>
         {sys.security != null && Number.isFinite(Number(sys.security)) && (
           <span className="system-node__truesec" style={{ color: truesecColor(Number(sys.security)) }}>

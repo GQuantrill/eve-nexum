@@ -2398,6 +2398,69 @@
   border: 1px solid #33415c;
 }
 
+/* ── Single-character quick tag badge (inline, before the system name) ── */
+.system-node__tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  min-width: calc(16px * var(--font-scale, 1));
+  height: calc(16px * var(--font-scale, 1));
+  padding: 0 3px;
+  margin-right: 4px;
+  border-radius: 4px;
+  background: var(--tag-badge, #f5a623);
+  color: #1a1205;
+  font-size: calc(11px * var(--font-scale, 1));
+  font-weight: 800;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+/* ── Tag picker grid (context-menu flyout) ──────────────────────────── */
+.tag-picker {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 4px;
+  padding: 8px;
+}
+
+.tag-picker__cell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid #2a3446;
+  border-radius: 5px;
+  background: #10151f;
+  color: #f5c518;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.1s, border-color 0.1s;
+}
+
+.tag-picker__cell:hover:not(:disabled) {
+  background: #1c2634;
+  border-color: #f5c518;
+}
+
+.tag-picker__cell--active {
+  background: #f5a623;
+  border-color: #f5a623;
+  color: #1a1205;
+}
+
+.tag-picker__cell--clear {
+  color: #8a97ad;
+}
+
+.tag-picker__cell:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
 /* ── Custom-label dialog ─────────────────────────────────────────── */
 .custom-label-dialog { width: min(440px, 92vw); }
 

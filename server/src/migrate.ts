@@ -195,6 +195,11 @@ export async function migrate() {
     ALTER TABLE map_systems     ADD COLUMN IF NOT EXISTS labels        TEXT[] NOT NULL DEFAULT '{}';
     ALTER TABLE map_systems     ADD COLUMN IF NOT EXISTS custom_labels TEXT[] NOT NULL DEFAULT '{}';
 
+    -- Single-character quick tag (A-Z / 0-9), shown as a prominent badge before
+    -- the system name. A scalar like intel (not the labels array): one tag per
+    -- system, NULL means untagged. Used for ad-hoc "system A / B / 1 / 2" marking.
+    ALTER TABLE map_systems     ADD COLUMN IF NOT EXISTS tag           TEXT;
+
     CREATE TABLE IF NOT EXISTS map_signatures (
       id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
       system_id   UUID        NOT NULL REFERENCES map_systems(id) ON DELETE CASCADE,
