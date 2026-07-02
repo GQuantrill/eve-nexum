@@ -227,13 +227,12 @@ export const ConnectionEdge = memo(({
               style={{ transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`, zIndex: highlighted ? 1001 : undefined }}
               onClick={() => selectConnection(id)}
             >
-              {count === 3 ? (
+              {count > 0 ? (
                 <>
-                  <div className="connection-label__row connection-label__row--top">{typeNode}</div>
-                  <div className="connection-label__row">{massNode}{timeNode}</div>
+                  {typeNode && <div className="connection-label__row">{typeNode}</div>}
+                  {massNode && <div className="connection-label__row">{massNode}</div>}
+                  {timeNode && <div className="connection-label__row">{timeNode}</div>}
                 </>
-              ) : count > 0 ? (
-                <div className="connection-label__row">{typeNode}{massNode}{timeNode}</div>
               ) : null}
             </div>
           );
