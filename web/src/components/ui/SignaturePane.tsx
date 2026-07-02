@@ -110,12 +110,19 @@ const DEFAULT_WIDTHS: Record<ColKey, number> = {
   id:      72,
   type:    108,
   whtype:  170,
-  leadsto: 105,
+  leadsto: 132,
   name:    140,
   notes:   220,
   created: 80,
   updated: 80,
 };
+
+// The leads-to cell holds the destination picker AND the copy-bookmark button
+// side by side; below this the picker can't show a full J-code (J######)
+// without the copy button spilling into the next column. Enforced as a floor
+// on the column width so neither a squeezed narrow viewport nor a saved-narrow
+// layout can clip it.
+const LEADSTO_MIN_WIDTH = 132;
 
 // Grace-period choices (seconds) offered before an overwrite-paste actually
 // deletes a despawned sig. 0 = delete immediately. Compact s/m labels read
@@ -224,11 +231,14 @@ export function SignaturePane({ systemId }: { systemId: string }) {
     {},
   );
   // Merge with defaults at read time so a later-added column gracefully
-  // picks up its default width without invalidating the saved layout.
-  const colWidths = useMemo(
-    () => ({ ...DEFAULT_WIDTHS, ...savedColWidths }) as Record<ColKey, number>,
-    [savedColWidths],
-  );
+  // picks up its default width without invalidating the saved layout. The
+  // leads-to column is clamped to LEADSTO_MIN_WIDTH so a saved-narrow layout
+  // can't reintroduce the picker/copy-button overlap.
+  const colWidths = useMemo(() => {
+    const merged = { ...DEFAULT_WIDTHS, ...savedColWidths } as Record<ColKey, number>;
+    merged.leadsto = Math.max(LEADSTO_MIN_WIDTH, merged.leadsto);
+    return merged;
+  }, [savedColWidths]);
 
   const pendingUpdates = useRef<Map<string, Partial<Signature>>>(new Map());
   const debounceTimers = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
@@ -304,6 +314,17 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   }, []);
 
   const { isShareMode } = useShareMode();
+
+  // Sum of all column widths (plus the fixed checkbox / actions columns when
+  // present). Applied as the table's min-width so a narrow pane scrolls
+  // horizontally inside .sig-table-wrap instead of table-layout:fixed
+  // squeezing every column down — which is what clipped the leads-to name and
+  // spilled the copy button over the next column.
+  const tableMinWidth = useMemo(
+    () => Object.values(colWidths).reduce((a, b) => a + b, 0) + (isShareMode ? 0 : 24 + 28),
+    [colWidths, isShareMode],
+  );
+
   // Bumped when another client changes this system's sigs (live sync).
   const sigRev = useMapStore((s) => s.sigRev[systemId] ?? 0);
 
@@ -767,7 +788,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
         <div className="sig-pane__empty">{t('signatures.noMatchFilter')}</div>
       ) : (
         <div className="sig-table-wrap">
-        <table className="sig-table">
+        <table className="sig-table" style={{ minWidth: tableMinWidth }}>
           <colgroup>
             {/* In share mode the checkbox and per-row delete cells are
                 gone, so their <col> entries must drop too — otherwise
