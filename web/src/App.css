@@ -3941,10 +3941,6 @@ div.system-node__easy-handle {
   align-items: center;
 }
 
-.connection-label__row--top {
-  margin-bottom: 1px;
-}
-
 .connection-label__type {
   font-size: calc(13px * var(--font-scale, 1));
   font-weight: 700;
