@@ -12,6 +12,10 @@ export type ContextMenuItem =
       disabled?: boolean;
       checked?: boolean;
       submenu?: ContextMenuItem[];
+      /** Custom flyout content shown in place of a list submenu (e.g. a grid
+       *  picker). Receives the menu's close handler so its own controls can
+       *  dismiss the menu after acting. Ignored when `submenu` is set. */
+      flyout?: (close: () => void) => ReactNode;
     };
 
 interface Props {
@@ -103,15 +107,16 @@ export function ContextMenu({ x, y, items, onClose }: Props) {
         if ('separator' in item && item.separator) {
           return <li key={i} className="context-menu__separator" role="separator" />;
         }
-        const { label, icon, action, disabled, checked, submenu } = item;
+        const { label, icon, action, disabled, checked, submenu, flyout } = item;
+        const hasFlyout = !!submenu || !!flyout;
         return (
-          <li key={label} className="context-menu__li" onMouseEnter={() => setOpenSubmenu(submenu ? i : null)}>
+          <li key={label} className="context-menu__li" onMouseEnter={() => setOpenSubmenu(hasFlyout ? i : null)}>
             <button
               className="context-menu__item"
               disabled={disabled}
               onMouseDown={(e) => {
                 e.stopPropagation();
-                if (!disabled && action && !submenu) {
+                if (!disabled && action && !hasFlyout) {
                   action();
                   onClose();
                 }
@@ -122,10 +127,14 @@ export function ContextMenu({ x, y, items, onClose }: Props) {
               )}
               {icon && <span className="context-menu__icon">{icon}</span>}
               {label}
-              {submenu && <span className="context-menu__arrow"><CaretRightIcon size={12} weight="bold" /></span>}
+              {hasFlyout && <span className="context-menu__arrow"><CaretRightIcon size={12} weight="bold" /></span>}
             </button>
-            {submenu && openSubmenu === i && (
-              <SubMenu items={submenu} onClose={onClose} />
+            {openSubmenu === i && (
+              submenu
+                ? <SubMenu items={submenu} onClose={onClose} />
+                : flyout
+                  ? <div className="context-menu context-menu--sub context-menu--flyout">{flyout(onClose)}</div>
+                  : null
             )}
           </li>
         );

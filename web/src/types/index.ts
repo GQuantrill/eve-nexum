@@ -82,6 +82,9 @@ export interface MapSystem {
   labels: string[];
   /** Up to 3 custom labels, each 't:<text>' or 'i:<IconName>' (Phosphor). */
   customLabels: string[];
+  /** Single-character quick tag (A-Z / 0-9), shown as a badge before the name.
+   *  null/undefined = untagged. */
+  tag?: string | null;
   lastActivityAt: string; // ISO timestamp, updated when system or its sigs are touched
 }
 
