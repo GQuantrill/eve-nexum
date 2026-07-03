@@ -88,7 +88,7 @@
     "switchTo": "Switch to {{name}}",
     "focusLocation": "Centre & route from {{name}}",
     "noLocation": "No known location for {{name}}",
-    "linkFailedNotInCorp": "Couldn't add that character — they're not in the corporation.",
+    "linkFailedNotInCorp": "Couldn't add that character — they're not in a permitted corporation or alliance.",
     "linkFailed": "Couldn't add that character. Please try again.",
     "remove": "Remove",
     "removeCharacter": "Remove {{name}}",
@@ -117,6 +117,17 @@
   "admin": {
     "back": "Back to maps",
     "title": "Admin",
+    "roles": {
+      "button": "Roles?",
+      "title": "What each role can do",
+      "desc": {
+        "alliance_admin": "Full control across the entire alliance — manages alliance-scoped maps and every member's role. Includes everything an Admin can do.",
+        "admin": "Corp administration — manage your corp's users (change roles, block), lock maps, and everything Full can do.",
+        "full": "Create, delete and lock corp and alliance maps, in addition to all editing.",
+        "edit": "Edit maps — systems, connections, signatures, structures and notes — but can't create, delete or lock maps.",
+        "readonly": "View only. Can see maps but can't change anything."
+      }
+    },
     "tabs": {
       "users": "Users",
       "maps": "Maps",
@@ -317,11 +328,13 @@
     "type": "Type",
     "personal": "Personal",
     "corp": "Corp",
+    "alliance": "Alliance",
     "regionLabel": "Region (optional — blank for an empty map)",
     "regionPlaceholder": "Type to search regions…",
     "clearRegion": "Clear region",
     "regionHint": "Seeds {{count}} systems from {{region}}, positioned by their in-game coordinates with all stargate links.",
     "corpLimit": "Corp map limit reached ({{max}}).",
+    "allianceLimit": "Alliance map limit reached ({{max}}).",
     "personalLimit": "Personal map limit reached ({{max}}).",
     "createFailed": "Failed to create map",
     "created": "Created \"{{name}}\" from {{region}}",
@@ -1078,6 +1091,7 @@
     "mapType": {
       "shared": "Shared",
       "corp": "Corp",
+      "alliance": "Alliance",
       "solo": "Solo"
     },
     "lockedTooltip": "Map is locked — systems and connections are frozen. Signatures, structures, and notes can still be edited.",
@@ -1136,7 +1150,7 @@
       "joinDiscord": "Join the Nexum Discord"
     },
     "errors": {
-      "not_in_corp": "Your character is not a member of the corporation that runs this Nexum instance. Access is restricted to corp members only.",
+      "not_in_corp": "Your character isn't in a corporation or alliance permitted to access this Nexum instance. Access is restricted to authorised members only.",
       "corp_check_failed": "Could not verify your corporation membership due to an ESI error. Please try again in a moment.",
       "unknown": "An unknown error occurred. Please try again."
     },

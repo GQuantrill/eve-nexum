@@ -94,6 +94,12 @@ export async function migrate() {
     ALTER TABLE maps ADD COLUMN IF NOT EXISTS corp_id        INTEGER;
     ALTER TABLE maps ADD COLUMN IF NOT EXISTS locked         BOOLEAN     NOT NULL DEFAULT FALSE;
     ALTER TABLE maps ADD COLUMN IF NOT EXISTS last_active_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
+    -- Alliance-scoped maps (a third scope above corp: personal -> corp ->
+    -- alliance). alliance_id NOT NULL means the map is visible to the whole
+    -- alliance (or every listed alliance when ALLIANCE_MAP_SHARED). Scope is
+    -- exclusive: a corp map has corp_id, an alliance map has alliance_id.
+    -- Managed only by alliance_admin. NULL for personal + corp maps.
+    ALTER TABLE maps ADD COLUMN IF NOT EXISTS alliance_id    INTEGER;
     -- Read-only share links. Token is the only thing in the URL; the
     -- expiry column is the source of truth for "still valid" — a NULL
     -- token means sharing has been revoked outright.
@@ -499,7 +505,7 @@ export async function migrate() {
     CREATE INDEX IF NOT EXISTS idx_user_events_user      ON user_events (user_id, created_at);
     CREATE INDEX IF NOT EXISTS idx_system_activity       ON system_activity (eve_system_id, hour DESC);
     CREATE INDEX IF NOT EXISTS idx_system_activity_hour  ON system_activity (hour);
-    CREATE INDEX IF NOT EXISTS idx_maps_last_active      ON maps (last_active_at) WHERE corp_id IS NOT NULL;
+    CREATE INDEX IF NOT EXISTS idx_maps_last_active      ON maps (last_active_at) WHERE corp_id IS NOT NULL OR alliance_id IS NOT NULL;
     -- Per-creator attribution (stats dashboard + admin reports) and corp-scoped
     -- lookups (quota counts, corp map listing) hit these columns; without an
     -- index they sequential-scan the whole table.
@@ -509,6 +515,7 @@ export async function migrate() {
     CREATE INDEX IF NOT EXISTS idx_map_anomalies_creator ON map_anomalies (created_by_user_id);
     CREATE INDEX IF NOT EXISTS idx_user_events_map         ON user_events (map_id);
     CREATE INDEX IF NOT EXISTS idx_maps_corp               ON maps (corp_id);
+    CREATE INDEX IF NOT EXISTS idx_maps_alliance           ON maps (alliance_id);
 
     CREATE TABLE IF NOT EXISTS admin_audit (
       id                  BIGSERIAL   PRIMARY KEY,

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { ReactFlowProvider } from '@xyflow/react';
-import { AuthProvider, useAuth } from './context/AuthContext';
+import { AuthProvider, useAuth, isAdminRole } from './context/AuthContext';
 import { seedUserSettings, readUserSetting, useUserSetting } from './hooks/useUserSetting';
 import { MapCanvas } from './components/map/MapCanvas';
 import { SystemPanel } from './components/ui/SystemPanel';
@@ -151,7 +151,7 @@ function AppShell() {
       ? '/share'
       : !user
         ? '/landing'
-        : path.startsWith('/admin') && (user.canViewReports || (user.role === 'admin' && user.corpMode))
+        : path.startsWith('/admin') && (user.canViewReports || (isAdminRole(user.role) && (user.corpMode || user.allianceMode)))
           ? path
           : '/map';
   usePageviewTracking(analyticsPage);
@@ -216,10 +216,10 @@ function AppShell() {
   // resumes instantly with no SSO.
   if (locked) return <LockScreen user={user} onResume={unlock} onLogout={logout} />;
 
-  // Hash routes — admins reach /admin/* in corp mode (solo mode has no
-  // other users to manage, so the section is hidden). The reports
-  // character is always allowed regardless of corp mode.
-  if (path.startsWith('/admin') && (user.canViewReports || (user.role === 'admin' && user.corpMode))) {
+  // Hash routes — admins (corp or alliance) reach /admin/* in a restricted
+  // (corp/alliance) deployment; solo mode has no other users to manage, so the
+  // section is hidden. The reports character is always allowed regardless.
+  if (path.startsWith('/admin') && (user.canViewReports || (isAdminRole(user.role) && (user.corpMode || user.allianceMode)))) {
     return <AdminPage />;
   }
 

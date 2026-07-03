@@ -4,6 +4,7 @@ import { db } from '../db.js';
 import { requireAdmin } from '../middleware/requireAdmin.js';
 import { requireAdminRead } from '../middleware/requireAdminRead.js';
 import { requireReportsAccess, isReportsCharacter, corpScopeFor } from '../middleware/requireReportsAccess.js';
+import { isAdmin, isAllianceAdmin } from '../middleware/authContext.js';
 import { config } from '../config.js';
 import { createLogger } from '../utils/logger.js';
 import { invalidateSessionsForUser } from '../utils/sessionInvalidate.js';
@@ -20,7 +21,7 @@ adminReadRouter.use(requireAdminRead);
 export const reportsRouter = Router();
 reportsRouter.use(requireReportsAccess);
 
-const ROLES = ['admin', 'full', 'edit', 'readonly'] as const;
+const ROLES = ['alliance_admin', 'admin', 'full', 'edit', 'readonly'] as const;
 type Role = (typeof ROLES)[number];
 
 // Small in-memory cache for ESI corporation lookups. Tickers don't change
@@ -187,10 +188,14 @@ adminRouter.patch('/users/:id/role', async (req, res) => {
     return;
   }
 
+  const actorRole = req.session.role ?? 'readonly';
+  const newRoleReq = role as Role;
+
   // Block self-demote — an admin removing their own admin role mid-session
   // would lock themselves out unless another admin exists. Forcing them to
-  // go through another admin avoids accidental lockout.
-  if (userId === req.session.userId && role !== 'admin') {
+  // go through another admin avoids accidental lockout. (alliance_admin ->
+  // admin is not a lockout, so it's allowed.)
+  if (userId === req.session.userId && !isAdmin(newRoleReq)) {
     res.status(400).json({ error: 'You cannot demote yourself' });
     return;
   }
@@ -202,9 +207,17 @@ adminRouter.patch('/users/:id/role', async (req, res) => {
   if (!targetRows.rows.length) { res.status(404).json({ error: 'User not found' }); return; }
   const target = targetRows.rows[0];
 
-  // The configured ADMIN_CHAR_ID is auto-promoted to admin on every login,
-  // so demoting them here just creates confusing churn next login.
-  if (config.adminCharId !== null && target.character_id === config.adminCharId && role !== 'admin') {
+  // Privilege-escalation guard: only an alliance admin can grant the
+  // alliance_admin role or alter someone who already holds it. Stops a corp
+  // admin from minting an alliance admin (themselves or anyone else).
+  if ((newRoleReq === 'alliance_admin' || target.role === 'alliance_admin') && !isAllianceAdmin(actorRole)) {
+    res.status(403).json({ error: 'Only an alliance admin can manage the alliance admin role' });
+    return;
+  }
+
+  // The configured ADMIN_CHAR_ID is auto-promoted on every login, so demoting
+  // them below admin here just creates confusing churn next login.
+  if (config.adminCharId !== null && target.character_id === config.adminCharId && !isAdmin(newRoleReq)) {
     res.status(400).json({ error: 'Cannot demote the configured ADMIN_CHAR_ID' });
     return;
   }
@@ -230,12 +243,19 @@ adminRouter.post('/users/:id/block', async (req, res) => {
     return;
   }
 
-  const { rows } = await db.query<{ character_id: number; blocked: boolean }>(
-    `SELECT character_id, blocked FROM users WHERE id = $1`,
+  const { rows } = await db.query<{ character_id: number; blocked: boolean; role: string }>(
+    `SELECT character_id, blocked, role FROM users WHERE id = $1`,
     [userId],
   );
   if (!rows.length) { res.status(404).json({ error: 'User not found' }); return; }
   const target = rows[0];
+
+  // An alliance admin can only be blocked by another alliance admin — a corp
+  // admin must not be able to lock one out.
+  if (target.role === 'alliance_admin' && !isAllianceAdmin(req.session.role ?? 'readonly')) {
+    res.status(403).json({ error: 'Only an alliance admin can block an alliance admin' });
+    return;
+  }
 
   if (config.adminCharId !== null && target.character_id === config.adminCharId) {
     res.status(400).json({ error: 'Cannot block the configured ADMIN_CHAR_ID' });
@@ -574,8 +594,13 @@ reportsRouter.get('/users', async (req, res) => {
   // immediately after.
   const params: unknown[] = scope.param !== null ? [scope.param] : [];
   const corpSql = scope.sql(1);
-  // Admins additionally only see users in their corp; reports char sees all.
-  const userScope = scope.param !== null ? `u.corp_id = $1` : null;
+  // Admins additionally only see users in their scope; reports char sees all.
+  // An alliance admin scopes by alliance (matching corpScopeFor's map filter),
+  // a corp admin by corp — otherwise the alliance id would be tested against
+  // u.corp_id and match nobody.
+  const userScope = scope.param !== null
+    ? (req.session.role === 'alliance_admin' ? `u.alliance_id = $1` : `u.corp_id = $1`)
+    : null;
 
   // Row-inclusion conditions (user-scope + filter EXISTS). Joined with AND.
   const conditions: string[] = [];

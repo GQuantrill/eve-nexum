@@ -50,7 +50,7 @@
     "switchTo": "Basculer vers {{name}}",
     "focusLocation": "Centrer et router depuis {{name}}",
     "noLocation": "Aucune position connue pour {{name}}",
-    "linkFailedNotInCorp": "Impossible d'ajouter ce personnage — il n'est pas dans la corporation.",
+    "linkFailedNotInCorp": "Impossible d'ajouter ce personnage — il n'est dans aucune corporation ou alliance autorisée.",
     "linkFailed": "Impossible d'ajouter ce personnage. Veuillez réessayer.",
     "remove": "Retirer",
     "removeCharacter": "Retirer {{name}}",
@@ -247,6 +247,17 @@
       "noCorpMaps": "Aucune carte de corp pour l'instant.",
       "colMap": "Carte",
       "colExclude": "Exclure"
+    },
+    "roles": {
+      "button": "Rôles ?",
+      "title": "Ce que permet chaque rôle",
+      "desc": {
+        "alliance_admin": "Contrôle total sur toute l'alliance — gère les cartes d'alliance et le rôle de chaque membre. Inclut tout ce que peut faire un Admin.",
+        "admin": "Administration de corporation — gère les utilisateurs de votre corpo (changer les rôles, bloquer), verrouille les cartes et tout ce que peut faire Full.",
+        "full": "Créer, supprimer et verrouiller les cartes de corpo et d'alliance, en plus de toute l'édition.",
+        "edit": "Modifier les cartes — systèmes, connexions, signatures, structures et notes — mais pas créer, supprimer ni verrouiller de cartes.",
+        "readonly": "Lecture seule. Peut voir les cartes mais rien modifier."
+      }
     }
   },
   "proximityOptIn": {
@@ -279,11 +290,13 @@
     "type": "Type",
     "personal": "Personnelle",
     "corp": "Corp",
+    "alliance": "Alliance",
     "regionLabel": "Région (optionnel — vide pour une carte vierge)",
     "regionPlaceholder": "Tapez pour rechercher des régions…",
     "clearRegion": "Effacer la région",
     "regionHint": "Génère {{count}} systèmes depuis {{region}}, positionnés selon leurs coordonnées en jeu avec tous les liens de portail stellaire.",
     "corpLimit": "Limite de cartes de corp atteinte ({{max}}).",
+    "allianceLimit": "Limite de cartes d'alliance atteinte ({{max}}).",
     "personalLimit": "Limite de cartes personnelles atteinte ({{max}}).",
     "createFailed": "Échec de la création de la carte",
     "created": "« {{name}} » créée depuis {{region}}",
@@ -1025,6 +1038,7 @@
     "mapType": {
       "shared": "Partagée",
       "corp": "Corp",
+      "alliance": "Alliance",
       "solo": "Solo"
     },
     "lockedTooltip": "La carte est verrouillée — les systèmes et connexions sont gelés. Les signatures, structures et notes restent modifiables.",
@@ -1083,7 +1097,7 @@
       "joinDiscord": "Rejoindre le Discord Nexum"
     },
     "errors": {
-      "not_in_corp": "Votre personnage n'est pas membre de la corporation qui gère cette instance Nexum. L'accès est réservé aux membres de la corp.",
+      "not_in_corp": "Votre personnage n'appartient à aucune corporation ou alliance autorisée à accéder à cette instance Nexum. L'accès est réservé aux membres autorisés.",
       "corp_check_failed": "Impossible de vérifier votre appartenance à la corporation en raison d'une erreur ESI. Veuillez réessayer dans un instant.",
       "unknown": "Une erreur inconnue s'est produite. Veuillez réessayer."
     },

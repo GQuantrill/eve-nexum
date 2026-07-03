@@ -3,13 +3,13 @@ import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { timeAgo, jumps } from '../../i18n/format';
 import { useMapStore } from '../../store/mapStore';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth, formatRole, isAdminRole } from '../../context/AuthContext';
 import { useOnlineStatus } from '../../hooks/useOnlineStatus';
 import { useCharacterLocation } from '../../hooks/useCharacterLocation';
 import { useCanEdit } from '../../hooks/useCanEdit';
 import { useCanEditContent } from '../../hooks/useCanEditContent';
 import { useIsMapOwner } from '../../hooks/useIsMapOwner';
-import { useCanCreateMaps } from '../../hooks/useCanCreateMaps';
+import { useCanCreateMaps, useCanManageAllianceMaps } from '../../hooks/useCanCreateMaps';
 import { UserStatsModal } from './UserStatsModal';
 import { ConfirmModal } from './ConfirmModal';
 import { CreateMapModal } from './CreateMapModal';
@@ -214,6 +214,8 @@ export function Toolbar() {
   const maxMaps         = useMapStore((s) => s.maxMaps);
   const maxCorpMaps     = useMapStore((s) => s.maxCorpMaps);
   const corpMapCount    = useMapStore((s) => s.corpMapCount);
+  const maxAllianceMaps  = useMapStore((s) => s.maxAllianceMaps);
+  const allianceMapCount = useMapStore((s) => s.allianceMapCount);
   const activeMapId     = useMapStore((s) => s.activeMapId);
   const setMapName      = useMapStore((s) => s.setMapName);
   const switchMap       = useMapStore((s) => s.switchMap);
@@ -224,7 +226,7 @@ export function Toolbar() {
   const trackJumps      = useMapStore((s) => s.trackJumps);
   const setTrackJumps   = useMapStore((s) => s.setTrackJumps);
 
-  const atMapLimit      = maps.filter((m) => !m.isCorpMap).length >= maxMaps;
+  const atMapLimit      = maps.filter((m) => !m.isCorpMap && !m.isAllianceMap).length >= maxMaps;
   const atCorpMapLimit  = corpMapCount >= maxCorpMaps;
   const { user, logout } = useAuth();
   const canEdit       = useCanEdit();
@@ -233,12 +235,24 @@ export function Toolbar() {
   // A read-only corp map can't be copied (matches the server gate). Personal
   // maps are always content-editable, so this is true only for corp maps where
   // the user lacks an edit role.
-  const readonlyCorpActive = !!maps.find((m) => m.id === activeMapId)?.isCorpMap && !canEditContent;
+  // A read-only member can't copy a corp/alliance map (the server 403s), so hide
+  // the Copy action for those maps when the user lacks edit access.
+  const readonlyCorpActive = (() => {
+    const active = maps.find((m) => m.id === activeMapId);
+    return !!active && (active.isCorpMap || active.isAllianceMap) && !canEditContent;
+  })();
   const canManageMaps = useCanCreateMaps();
-  const canCorpCreate = !!user?.corpMode && canManageMaps;
-  // No creatable option = personal slots full AND (can't make corp maps, or
-  // corp slots full too). Gates the single "+ New Map" action.
-  const noCreateOption = atMapLimit && (!canCorpCreate || atCorpMapLimit);
+  const canManageAllianceMaps = useCanManageAllianceMaps();
+  // Corp maps exist under corp OR alliance mode (a corp inside the alliance).
+  const canCorpCreate     = (!!user?.corpMode || !!user?.allianceMode) && canManageMaps;
+  const canAllianceCreate = canManageAllianceMaps;
+  const atAllianceMapLimit = allianceMapCount >= maxAllianceMaps;
+  // No creatable option = every scope the user could make is unavailable or
+  // full: personal slots full AND corp blocked AND alliance blocked. Gates the
+  // single "+ New Map" action.
+  const noCreateOption = atMapLimit
+    && (!canCorpCreate || atCorpMapLimit)
+    && (!canAllianceCreate || atAllianceMapLimit);
   const { online, checkedAt, lastLogin } = useOnlineStatus(!!user);
   // Ship + live system come from the same poll that drives passive location
   // tracking, so no extra ESI traffic — we just surface fields already on hand.
@@ -315,7 +329,7 @@ export function Toolbar() {
       })()
     : null;
 
-  const showAdmin = !!user && (user.canViewReports || (user.role === 'admin' && user.corpMode));
+  const showAdmin = !!user && (user.canViewReports || (isAdminRole(user.role) && (user.corpMode || user.allianceMode)));
 
   // Each movable item's content, keyed by id. Items that evaluate to null are
   // simply not rendered (and not persisted in the order).
@@ -334,10 +348,14 @@ export function Toolbar() {
               if (active.sharedWithMe) {
                 return <span className="toolbar__map-type toolbar__map-type--shared">{t('toolbar.mapType.shared')}</span>;
               }
-              if (!user?.corpMode) return null;
-              return active.isCorpMap
-                ? <span className="toolbar__map-type toolbar__map-type--corp">{t('toolbar.mapType.corp')}</span>
-                : <span className="toolbar__map-type toolbar__map-type--solo">{t('toolbar.mapType.solo')}</span>;
+              if (active.isAllianceMap) {
+                return <span className="toolbar__map-type toolbar__map-type--alliance">{t('toolbar.mapType.alliance')}</span>;
+              }
+              if (active.isCorpMap) {
+                return <span className="toolbar__map-type toolbar__map-type--corp">{t('toolbar.mapType.corp')}</span>;
+              }
+              if (!user?.corpMode && !user?.allianceMode) return null;
+              return <span className="toolbar__map-type toolbar__map-type--solo">{t('toolbar.mapType.solo')}</span>;
             })()}
             {mapName || t('toolbar.noMap')}
             <span className="toolbar__caret">▾</span>
@@ -356,10 +374,10 @@ export function Toolbar() {
           {showMaps && (
             <div className="map-dropdown" onMouseLeave={() => setShowMaps(false)}>
               {[...maps].sort((a, b) => {
-                // Three-tier ordering: own personal → corp → shared-with-me.
+                // Tier ordering: own personal → corp → alliance → shared-with-me.
                 // Inside a tier, alphabetical by name.
-                const aTier = a.sharedWithMe ? 2 : a.isCorpMap ? 1 : 0;
-                const bTier = b.sharedWithMe ? 2 : b.isCorpMap ? 1 : 0;
+                const tier = (m: typeof a) => m.sharedWithMe ? 3 : m.isAllianceMap ? 2 : m.isCorpMap ? 1 : 0;
+                const aTier = tier(a), bTier = tier(b);
                 if (aTier !== bTier) return aTier - bTier;
                 return a.name.localeCompare(b.name);
               }).map((m) => (
@@ -370,9 +388,10 @@ export function Toolbar() {
                 >
                   {m.sharedWithMe
                     ? <span className="map-dropdown__badge map-dropdown__badge--shared">{t('toolbar.mapType.shared')}</span>
-                    : user?.corpMode && !m.isCorpMap
+                    : (user?.corpMode || user?.allianceMode) && !m.isCorpMap && !m.isAllianceMap
                       ? <span className="map-dropdown__badge map-dropdown__badge--solo">{t('toolbar.mapType.solo')}</span>
                       : null}
+                  {!m.sharedWithMe && m.isAllianceMap && <span className="map-dropdown__badge map-dropdown__badge--alliance">{t('toolbar.mapType.alliance')}</span>}
                   {!m.sharedWithMe && m.isCorpMap && <span className="map-dropdown__badge map-dropdown__badge--corp">{t('toolbar.mapType.corp')}</span>}
                   {m.locked    && <span className="map-dropdown__badge map-dropdown__badge--lock">🔒</span>}
                   {m.name}
@@ -579,15 +598,15 @@ export function Toolbar() {
         <div className="toolbar__char-info">
           <span className="toolbar__char-name">
             {user.characterName}
-            {/* Role only matters in corp mode — in solo deployments every
-                user is implicitly admin of their own maps, so the badge
-                just adds noise. */}
-            {user.corpMode && (
+            {/* Role only matters in a restricted (corp/alliance) deployment —
+                in solo deployments every user is implicitly admin of their own
+                maps, so the badge just adds noise. */}
+            {(user.corpMode || user.allianceMode) && (
               <span
                 className={`role-badge role-badge--${user.role}`}
-                title={t('toolbar.role', { role: user.role })}
+                title={t('toolbar.role', { role: formatRole(user.role) })}
               >
-                {user.role}
+                {formatRole(user.role)}
               </span>
             )}
           </span>

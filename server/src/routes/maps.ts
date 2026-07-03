@@ -3,7 +3,7 @@ import { esiFetch } from '../utils/esi.js';
 import type { Request, Response } from 'express';
 import { db } from '../db.js';
 import { requireAuth } from '../middleware/requireAuth.js';
-import { authUser } from '../middleware/authContext.js';
+import { authUser, isAdmin, isAllianceAdmin } from '../middleware/authContext.js';
 import { config } from '../config.js';
 import { decryptToken } from '../utils/tokenCrypto.js';
 import { createLogger } from '../utils/logger.js';
@@ -82,14 +82,17 @@ mapsRouter.use(requireAuth);
 // ── Access control helpers ────────────────────────────────────────────────────
 
 // How the current user can see this map. Determines which writes are allowed:
-//   - owner        : their personal map (or a corp map they happened to create)
-//   - corp_member  : visible via corp membership; role-gated for writes
-//   - shared       : explicit map_shares grant (character or corp) — full edit,
-//                    no role check, but lock + owner-only ops still apply
-export type AccessKind = 'owner' | 'corp_member' | 'shared';
+//   - owner          : their personal map (or a corp map they happened to create)
+//   - corp_member    : visible via corp membership; role-gated for writes
+//   - alliance_member: visible via alliance membership; role-gated for writes,
+//                      lifecycle/management is alliance_admin-only
+//   - shared         : explicit map_shares grant (character or corp) — full edit,
+//                      no role check, but lock + owner-only ops still apply
+export type AccessKind = 'owner' | 'corp_member' | 'alliance_member' | 'shared';
 export interface MapMeta {
   userId:     number;
   corpId:     number | null;
+  allianceId: number | null;
   locked:     boolean;
   accessKind: AccessKind;
 }
@@ -104,15 +107,17 @@ export async function getMapAccess(mapId: string, req: Request): Promise<MapMeta
   if (!UUID_RE.test(mapId)) return null;
   // Resolve identity from EITHER the session or an API-key context (req.apiAuth),
   // so the same access logic serves cookie clients and external API keys.
-  const auth       = authUser(req);
-  const userId     = auth.userId;
-  const userCorpId = auth.corpId;
+  const auth           = authUser(req);
+  const userId         = auth.userId;
+  const userCorpId     = auth.corpId;
+  const userAllianceId = auth.allianceId;
 
   // Pull map + caller's EVE character id in one round-trip; the latter is
   // needed to match against map_shares.target_character_id.
   const { rows } = await db.query<{
     userId:     number;
     corpId:     number | null;
+    allianceId: number | null;
     locked:     boolean;
     callerChar: number;
     mapOwner:    number | null;
@@ -120,6 +125,7 @@ export async function getMapAccess(mapId: string, req: Request): Promise<MapMeta
   }>(
     `SELECT m.user_id AS "userId",
             m.corp_id AS "corpId",
+            m.alliance_id AS "allianceId",
             m.locked,
             m.owner_id AS "mapOwner",
             u.character_id AS "callerChar",
@@ -131,27 +137,46 @@ export async function getMapAccess(mapId: string, req: Request): Promise<MapMeta
   );
   if (!rows.length) return null;
   const m = rows[0];
+  const meta = (accessKind: AccessKind): MapMeta =>
+    ({ userId: m.userId, corpId: m.corpId, allianceId: m.allianceId, locked: m.locked, accessKind });
 
   // Owner = this account. A map belongs to the account that owns it (any of
   // the account's characters), with a defensive fall back to the creating
   // character so you can never lose access to a map you made even if owner_id
   // is somehow unset.
   if (m.userId === userId || (m.mapOwner != null && m.callerOwner != null && m.mapOwner === m.callerOwner)) {
-    return { userId: m.userId, corpId: m.corpId, locked: m.locked, accessKind: 'owner' };
+    return meta('owner');
   }
 
-  const isCorpMap = config.corpMode
-    && m.corpId !== null
-    && config.corpIds.includes(m.corpId)
-    && (config.corpMapShared || m.corpId === userCorpId);
+  // Corp map access. Two ways in:
+  //   • Explicit corp deployment (CORP_ID): the map's corp must be listed;
+  //     CORP_MAP_SHARED decides whether other listed corps see it.
+  //   • Alliance deployment: any corp inside the (login-gated) alliance keeps
+  //     its own corp map, visible to same-corp members — no CORP_ID list, since
+  //     enumerating every member corp is unmanageable for a large alliance.
+  const isCorpMap = m.corpId !== null && (
+    (config.corpMode && config.corpIds.includes(m.corpId) && (config.corpMapShared || m.corpId === userCorpId))
+    || (config.allianceMode && m.corpId === userCorpId)
+  );
   if (isCorpMap) {
-    return { userId: m.userId, corpId: m.corpId, locked: m.locked, accessKind: 'corp_member' };
+    return meta('corp_member');
+  }
+
+  // Alliance map: visible to members of the owning alliance (or every listed
+  // alliance under ALLIANCE_MAP_SHARED). Mirrors the corp branch one scope up.
+  const isAllianceMap = config.allianceMode
+    && m.allianceId !== null
+    && config.allianceIds.includes(m.allianceId)
+    && (config.allianceMapShared || m.allianceId === userAllianceId);
+  if (isAllianceMap) {
+    return meta('alliance_member');
   }
 
   // Personal map shared with this character or their corp? Personal-map only —
-  // corp maps don't accept individual grants. Corp grants resolve against the
+  // a personal map has NEITHER corp_id nor alliance_id. Corp/alliance-scoped
+  // maps don't accept individual grants. Corp grants resolve against the
   // caller's *current* corp_id; switching corps moves access with them.
-  if (m.corpId === null) {
+  if (m.corpId === null && m.allianceId === null) {
     const { rowCount } = await db.query(
       `SELECT 1 FROM map_shares
          WHERE map_id = $1
@@ -161,7 +186,7 @@ export async function getMapAccess(mapId: string, req: Request): Promise<MapMeta
       [mapId, m.callerChar, userCorpId],
     );
     if (rowCount && rowCount > 0) {
-      return { userId: m.userId, corpId: m.corpId, locked: m.locked, accessKind: 'shared' };
+      return meta('shared');
     }
   }
 
@@ -209,9 +234,9 @@ export async function requireMapContentWrite(res: Response, mapId: string, req: 
 
   // Owners and explicit-share recipients always get write access. A share
   // grant is a deliberate invitation by the owner — honouring it shouldn't
-  // depend on the recipient's general role. Corp-map writes still go through
-  // the role check so readonly corp members can't silently edit.
-  if (access.accessKind === 'corp_member' && role === 'readonly') {
+  // depend on the recipient's general role. Corp- and alliance-map writes still
+  // go through the role check so readonly members can't silently edit.
+  if ((access.accessKind === 'corp_member' || access.accessKind === 'alliance_member') && role === 'readonly') {
     res.status(403).json({ error: 'Write access required' }); return null;
   }
   return access;
@@ -226,7 +251,12 @@ async function requireMapWrite(res: Response, mapId: string, req: Request): Prom
   if (authUser(req).apiScope) {
     res.status(403).json({ error: 'API keys cannot modify map topology' }); return null;
   }
-  if (access.locked && authUser(req).role !== 'admin') {
+  // Lock bypass mirrors who may toggle the lock: alliance maps need an alliance
+  // admin, corp/personal maps an ordinary admin — so a corp admin can't edit
+  // through an alliance lock they aren't allowed to set.
+  const bypassRole = authUser(req).role;
+  const canBypassLock = access.allianceId !== null ? isAllianceAdmin(bypassRole) : isAdmin(bypassRole);
+  if (access.locked && !canBypassLock) {
     res.status(403).json({ error: 'Map is locked' }); return null;
   }
   return access;
@@ -384,8 +414,9 @@ const MAX_IMPORT_CONNECTIONS = 2000;
 
 // GET /api/maps
 mapsRouter.get('/', async (req, res) => {
-  const userId     = req.session.userId!;
-  const userCorpId = req.session.userCorpId ?? null;
+  const userId         = req.session.userId!;
+  const userCorpId     = req.session.userCorpId ?? null;
+  const userAllianceId = req.session.userAllianceId ?? null;
   // Personal maps are scoped to the account (owner), so every linked alt sees
   // the same chain. -1 is an impossible owner id (so the clause matches nothing
   // rather than everything) when somehow unauthenticated for ownership.
@@ -398,29 +429,58 @@ mapsRouter.get('/', async (req, res) => {
   );
   const callerChar = meRows[0]?.characterId ?? null;
 
-  // Visibility query (personal + corp + shared) lives in the shared map-read
-  // module so the external /api/v1 list returns the identical set.
-  const rows = await listVisibleMaps({ userId, ownerId, userCorpId, callerChar });
+  // Visibility query (personal + corp + alliance + shared) lives in the shared
+  // map-read module so the external /api/v1 list returns the identical set.
+  const rows = await listVisibleMaps({ userId, ownerId, userCorpId, userAllianceId, callerChar });
 
   // Count corp maps for the user's own corp (the per-corp limit applies to
   // each corp independently — Corp A's slots are separate from Corp B's).
-  const corpMapCount = config.corpMode && userCorpId
+  const corpMapCount = (config.corpMode || config.allianceMode) && userCorpId
     ? (await db.query(`SELECT 1 FROM maps WHERE corp_id = $1`, [userCorpId])).rowCount ?? 0
     : 0;
+  const allianceMapCount = config.allianceMode && userAllianceId
+    ? (await db.query(`SELECT 1 FROM maps WHERE alliance_id = $1`, [userAllianceId])).rowCount ?? 0
+    : 0;
 
-  res.json({ maps: rows, maxMaps: config.maxUserMaps, maxCorpMaps: config.maxCorpMaps, corpMapCount });
+  res.json({
+    maps: rows,
+    maxMaps: config.maxUserMaps,
+    maxCorpMaps: config.maxCorpMaps,
+    corpMapCount,
+    maxAllianceMaps: config.maxAllianceMaps,
+    allianceMapCount,
+  });
 });
 
 // POST /api/maps
 mapsRouter.post('/', async (req, res) => {
-  const isCorpMap = config.corpMode && req.body.isCorpMap === true;
-  const role      = req.session.role ?? 'readonly';
+  // Scope is exclusive: alliance takes precedence over corp when both flags are
+  // sent. Alliance maps are alliance_admin-only; corp maps need full/admin.
+  const isAllianceMap = config.allianceMode && req.body.isAllianceMap === true;
+  const isCorpMap     = !isAllianceMap && (config.corpMode || config.allianceMode) && req.body.isCorpMap === true;
+  const role          = req.session.role ?? 'readonly';
 
   // Personal map creation is open to every role — they're scoped to the
-  // individual user, so role gating only matters for shared (corp) maps.
-  // Corp map creation still requires 'full' or 'admin'.
-  if (isCorpMap) {
-    if (role !== 'full' && role !== 'admin') {
+  // individual user, so role gating only matters for shared (corp/alliance) maps.
+  if (isAllianceMap) {
+    if (!isAllianceAdmin(role)) {
+      res.status(403).json({ error: 'Alliance map creation requires the alliance admin role' });
+      return;
+    }
+    if (!req.session.userAllianceId) {
+      res.status(403).json({ error: 'Cannot create alliance map: user has no alliance affiliation' });
+      return;
+    }
+    const { rowCount } = await db.query(
+      `SELECT 1 FROM maps WHERE alliance_id = $1`,
+      [req.session.userAllianceId],
+    );
+    if ((rowCount ?? 0) >= config.maxAllianceMaps) {
+      res.status(403).json({ error: 'Maximum alliance maps reached' });
+      return;
+    }
+  } else if (isCorpMap) {
+    if (role !== 'full' && !isAdmin(role)) {
       res.status(403).json({ error: 'Corp map creation requires full-edit or admin role' });
       return;
     }
@@ -442,7 +502,7 @@ mapsRouter.post('/', async (req, res) => {
     // can't make new ones until it deletes back under.
     const ownerId = await resolveOwnerId(req);
     const { rowCount } = await db.query(
-      `SELECT 1 FROM maps WHERE owner_id = $1 AND corp_id IS NULL`,
+      `SELECT 1 FROM maps WHERE owner_id = $1 AND corp_id IS NULL AND alliance_id IS NULL`,
       [ownerId],
     );
     if ((rowCount ?? 0) >= config.maxUserMaps) {
@@ -451,13 +511,14 @@ mapsRouter.post('/', async (req, res) => {
     }
   }
 
-  const name    = String(req.body.name ?? 'New Map').slice(0, MAX_MAP_NAME_LEN);
-  const corpId  = isCorpMap ? (req.session.userCorpId ?? null) : null;
-  const ownerId = await resolveOwnerId(req);
+  const name       = String(req.body.name ?? 'New Map').slice(0, MAX_MAP_NAME_LEN);
+  const corpId     = isCorpMap ? (req.session.userCorpId ?? null) : null;
+  const allianceId = isAllianceMap ? (req.session.userAllianceId ?? null) : null;
+  const ownerId    = await resolveOwnerId(req);
 
   const { rows } = await db.query<{ id: string }>(
-    `INSERT INTO maps (user_id, owner_id, name, corp_id) VALUES ($1, $2, $3, $4) RETURNING id`,
-    [req.session.userId, ownerId, name, corpId],
+    `INSERT INTO maps (user_id, owner_id, name, corp_id, alliance_id) VALUES ($1, $2, $3, $4, $5) RETURNING id`,
+    [req.session.userId, ownerId, name, corpId, allianceId],
   );
   res.status(201).json({ id: rows[0].id });
 });
@@ -470,15 +531,15 @@ mapsRouter.post('/:mapId/copy', async (req, res) => {
   const sourceMapId = req.params.mapId;
   const access = await getMapAccess(sourceMapId, req);
   if (!access) { res.status(404).json({ error: 'Map not found' }); return; }
-  if (access.accessKind === 'corp_member' && authUser(req).role === 'readonly') {
-    res.status(403).json({ error: 'Read-only corp maps cannot be copied' });
+  if ((access.accessKind === 'corp_member' || access.accessKind === 'alliance_member') && authUser(req).role === 'readonly') {
+    res.status(403).json({ error: 'Read-only corp/alliance maps cannot be copied' });
     return;
   }
 
   // The copy is always a personal map — enforce the personal cap (as POST /).
   const ownerId = await resolveOwnerId(req);
   const { rowCount } = await db.query(
-    `SELECT 1 FROM maps WHERE owner_id = $1 AND corp_id IS NULL`, [ownerId],
+    `SELECT 1 FROM maps WHERE owner_id = $1 AND corp_id IS NULL AND alliance_id IS NULL`, [ownerId],
   );
   if ((rowCount ?? 0) >= config.maxUserMaps) {
     res.status(403).json({ error: 'Maximum maps reached' });
@@ -512,16 +573,26 @@ mapsRouter.post('/:mapId/copy', async (req, res) => {
 // stays on POST /api/maps; this is only the seeded path. See
 // region_map_feature.md.
 mapsRouter.post('/from-region', async (req, res) => {
-  const body     = req.body as { regionId?: unknown; name?: unknown; isCorpMap?: unknown };
+  const body     = req.body as { regionId?: unknown; name?: unknown; isCorpMap?: unknown; isAllianceMap?: unknown };
   const regionId = Number(body.regionId);
   if (!Number.isInteger(regionId)) { res.status(400).json({ error: 'regionId is required' }); return; }
 
-  const isCorpMap = config.corpMode && body.isCorpMap === true;
-  const role      = req.session.role ?? 'readonly';
+  const isAllianceMap = config.allianceMode && body.isAllianceMap === true;
+  const isCorpMap     = !isAllianceMap && (config.corpMode || config.allianceMode) && body.isCorpMap === true;
+  const role          = req.session.role ?? 'readonly';
 
   // Quota + role — mirrors POST /api/maps and /import.
-  if (isCorpMap) {
-    if (role !== 'full' && role !== 'admin') {
+  if (isAllianceMap) {
+    if (!isAllianceAdmin(role)) {
+      res.status(403).json({ error: 'Alliance map creation requires the alliance admin role' }); return;
+    }
+    if (!req.session.userAllianceId) {
+      res.status(403).json({ error: 'Cannot create alliance map: user has no alliance affiliation' }); return;
+    }
+    const { rowCount } = await db.query(`SELECT 1 FROM maps WHERE alliance_id = $1`, [req.session.userAllianceId]);
+    if ((rowCount ?? 0) >= config.maxAllianceMaps) { res.status(403).json({ error: 'Maximum alliance maps reached' }); return; }
+  } else if (isCorpMap) {
+    if (role !== 'full' && !isAdmin(role)) {
       res.status(403).json({ error: 'Corp map creation requires full-edit or admin role' }); return;
     }
     if (!req.session.userCorpId) {
@@ -531,7 +602,7 @@ mapsRouter.post('/from-region', async (req, res) => {
     if ((rowCount ?? 0) >= config.maxCorpMaps) { res.status(403).json({ error: 'Maximum corp maps reached' }); return; }
   } else {
     const oid = await resolveOwnerId(req);
-    const { rowCount } = await db.query(`SELECT 1 FROM maps WHERE owner_id = $1 AND corp_id IS NULL`, [oid]);
+    const { rowCount } = await db.query(`SELECT 1 FROM maps WHERE owner_id = $1 AND corp_id IS NULL AND alliance_id IS NULL`, [oid]);
     if ((rowCount ?? 0) >= config.maxUserMaps) { res.status(403).json({ error: 'Maximum maps reached' }); return; }
   }
 
@@ -633,8 +704,10 @@ mapsRouter.post('/from-region', async (req, res) => {
 
     const ownerId = await resolveOwnerId(req);
     const mapRes = await client.query<{ id: string }>(
-      `INSERT INTO maps (user_id, owner_id, name, corp_id) VALUES ($1, $2, $3, $4) RETURNING id`,
-      [req.session.userId, ownerId, mapName, isCorpMap ? (req.session.userCorpId ?? null) : null],
+      `INSERT INTO maps (user_id, owner_id, name, corp_id, alliance_id) VALUES ($1, $2, $3, $4, $5) RETURNING id`,
+      [req.session.userId, ownerId, mapName,
+       isCorpMap ? (req.session.userCorpId ?? null) : null,
+       isAllianceMap ? (req.session.userAllianceId ?? null) : null],
     );
     const mapId = mapRes.rows[0].id;
 
@@ -706,16 +779,31 @@ mapsRouter.post('/from-region', async (req, res) => {
 
 // POST /api/maps/import
 mapsRouter.post('/import', async (req, res) => {
-  const isCorpImport = config.corpMode && (req.body as Record<string, unknown>).isCorpMap === true;
-  const role         = req.session.role ?? 'readonly';
+  const importBody     = req.body as Record<string, unknown>;
+  const isAllianceImport = config.allianceMode && importBody.isAllianceMap === true;
+  const isCorpImport     = !isAllianceImport && (config.corpMode || config.allianceMode) && importBody.isCorpMap === true;
+  const role             = req.session.role ?? 'readonly';
 
-  // Quota check against the matching tier — importing a corp map counts
-  // against MAX_CORP_MAPS (for the user's corp), importing a personal map
-  // counts against MAX_USER_MAPS. Previously this always checked the
-  // personal quota, so corp imports skipped MAX_CORP_MAPS entirely.
-  // Personal imports are open to every role; corp imports need full/admin.
-  if (isCorpImport) {
-    if (role !== 'full' && role !== 'admin') {
+  // Quota check against the matching tier — importing a corp/alliance map counts
+  // against the corresponding cap, importing a personal map counts against
+  // MAX_USER_MAPS. Personal imports are open to every role; corp imports need
+  // full/admin; alliance imports need alliance_admin.
+  if (isAllianceImport) {
+    if (!isAllianceAdmin(role)) {
+      res.status(403).json({ error: 'Alliance map import requires the alliance admin role' });
+      return;
+    }
+    if (!req.session.userAllianceId) {
+      res.status(403).json({ error: 'Cannot import alliance map: user has no alliance affiliation' });
+      return;
+    }
+    const { rowCount } = await db.query(`SELECT 1 FROM maps WHERE alliance_id = $1`, [req.session.userAllianceId]);
+    if ((rowCount ?? 0) >= config.maxAllianceMaps) {
+      res.status(403).json({ error: 'Maximum alliance maps reached' });
+      return;
+    }
+  } else if (isCorpImport) {
+    if (role !== 'full' && !isAdmin(role)) {
       res.status(403).json({ error: 'Corp map import requires full-edit or admin role' });
       return;
     }
@@ -734,7 +822,7 @@ mapsRouter.post('/import', async (req, res) => {
   } else {
     const oid = await resolveOwnerId(req);
     const { rowCount } = await db.query(
-      `SELECT 1 FROM maps WHERE owner_id = $1 AND corp_id IS NULL`,
+      `SELECT 1 FROM maps WHERE owner_id = $1 AND corp_id IS NULL AND alliance_id IS NULL`,
       [oid],
     );
     if ((rowCount ?? 0) >= config.maxUserMaps) {
@@ -769,8 +857,10 @@ mapsRouter.post('/import', async (req, res) => {
     const importName = String(name ?? 'Imported Map').slice(0, MAX_MAP_NAME_LEN);
     const ownerId = await resolveOwnerId(req);
     const mapRes = await client.query<{ id: string }>(
-      `INSERT INTO maps (user_id, owner_id, name, corp_id) VALUES ($1, $2, $3, $4) RETURNING id`,
-      [req.session.userId, ownerId, importName, isCorpImport ? (req.session.userCorpId ?? null) : null],
+      `INSERT INTO maps (user_id, owner_id, name, corp_id, alliance_id) VALUES ($1, $2, $3, $4, $5) RETURNING id`,
+      [req.session.userId, ownerId, importName,
+       isCorpImport ? (req.session.userCorpId ?? null) : null,
+       isAllianceImport ? (req.session.userAllianceId ?? null) : null],
     );
     const mapId = mapRes.rows[0].id;
 
@@ -1385,7 +1475,7 @@ mapsRouter.patch('/:mapId', async (req, res) => {
       res.status(400).json({ error: 'Only corp maps can be flagged as a merge source/destination' }); return;
     }
     const role = req.session.role ?? 'readonly';
-    if (role !== 'full' && role !== 'admin') {
+    if (role !== 'full' && !isAdmin(role)) {
       res.status(403).json({ error: 'Full-edit or admin role required' }); return;
     }
     if (allowAsMergeSource !== undefined) {
@@ -1404,12 +1494,25 @@ mapsRouter.patch('/:mapId', async (req, res) => {
     if (access.accessKind === 'shared') {
       res.status(403).json({ error: 'Only the owner can rename this map' }); return;
     }
+    // Renaming an alliance map is a management action reserved for alliance
+    // admins — checked on the map's alliance scope, not accessKind, so a former
+    // alliance admin who created it (and now resolves as 'owner') can't rename
+    // it after being demoted. Matches the delete gate.
+    if (access.allianceId !== null && !isAllianceAdmin(req.session.role ?? 'readonly')) {
+      res.status(403).json({ error: 'Only an alliance admin can rename this map' }); return;
+    }
     const trimmed = String(name).slice(0, MAX_MAP_NAME_LEN);
     if (!trimmed) { res.status(400).json({ error: 'name cannot be empty' }); return; }
     sets.push(`name = $${vals.length + 1}`); vals.push(trimmed);
   }
   if (locked !== undefined) {
-    if (req.session.role !== 'admin') { res.status(403).json({ error: 'Admin access required' }); return; }
+    // Alliance maps lock with the alliance admin role; corp/personal maps with
+    // an ordinary admin. Alliance-map management never falls to a corp admin.
+    const role = req.session.role ?? 'readonly';
+    const allianceScoped = access.allianceId !== null;
+    if (allianceScoped ? !isAllianceAdmin(role) : !isAdmin(role)) {
+      res.status(403).json({ error: allianceScoped ? 'Alliance admin access required' : 'Admin access required' }); return;
+    }
     sets.push(`locked = $${vals.length + 1}`); vals.push(locked);
   }
   // Lazy WH-removal opt-in: a plain per-map behaviour toggle any editor can set
@@ -1440,13 +1543,18 @@ mapsRouter.delete('/:mapId', async (req, res) => {
   const access = await getMapAccess(mapId, req);
   if (!access) { res.status(404).json({ error: 'Map not found' }); return; }
 
-  const isOwner  = access.userId === req.session.userId;
-  const isCorpMap = access.corpId !== null;
+  const isOwner       = access.userId === req.session.userId;
+  const isCorpMap     = access.corpId !== null;
+  const isAllianceMap = access.allianceId !== null;
+  const role          = req.session.role ?? 'readonly';
 
-  if (isCorpMap && req.session.role !== 'admin') {
+  if (isAllianceMap && !isAllianceAdmin(role)) {
+    res.status(403).json({ error: 'Only an alliance admin can delete alliance maps' }); return;
+  }
+  if (isCorpMap && !isAdmin(role)) {
     res.status(403).json({ error: 'Only admins can delete corp maps' }); return;
   }
-  if (!isOwner && req.session.role !== 'admin') {
+  if (!isOwner && !isAdmin(role)) {
     res.status(403).json({ error: 'Not authorised' }); return;
   }
 
@@ -2089,12 +2197,19 @@ async function requireShareAdmin(res: Response, mapId: string, req: Request): Pr
 
   const role = req.session.role ?? 'readonly';
   const userId = req.session.userId!;
-  const isCorpMap = config.corpMode
-    && access.corpId !== null
-    && config.corpIds.includes(access.corpId);
+  const isCorpMap = access.corpId !== null
+    && ((config.corpMode && config.corpIds.includes(access.corpId)) || config.allianceMode);
+  const isAllianceMap = config.allianceMode
+    && access.allianceId !== null
+    && config.allianceIds.includes(access.allianceId);
 
-  if (isCorpMap) {
-    if (role !== 'admin') {
+  if (isAllianceMap) {
+    if (!isAllianceAdmin(role)) {
+      res.status(403).json({ error: 'Only an alliance admin can share an alliance map' });
+      return null;
+    }
+  } else if (isCorpMap) {
+    if (!isAdmin(role)) {
       res.status(403).json({ error: 'Only an admin can share a corp map' });
       return null;
     }
@@ -2225,8 +2340,8 @@ mapsRouter.get('/:mapId/shares', async (req, res) => {
   const { mapId } = req.params;
   const access = await requireMapOwner(res, mapId, req);
   if (!access) return;
-  if (access.corpId !== null) {
-    res.status(400).json({ error: 'Corp maps cannot have per-character shares' });
+  if (access.corpId !== null || access.allianceId !== null) {
+    res.status(400).json({ error: 'Corp and alliance maps cannot have per-character shares' });
     return;
   }
 
@@ -2270,8 +2385,8 @@ mapsRouter.post('/:mapId/shares', async (req, res) => {
   const { mapId } = req.params;
   const access = await requireMapOwner(res, mapId, req);
   if (!access) return;
-  if (access.corpId !== null) {
-    res.status(400).json({ error: 'Corp maps cannot have per-character shares' });
+  if (access.corpId !== null || access.allianceId !== null) {
+    res.status(400).json({ error: 'Corp and alliance maps cannot have per-character shares' });
     return;
   }
 

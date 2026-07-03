@@ -50,7 +50,7 @@
     "switchTo": "Cambiar a {{name}}",
     "focusLocation": "Centrar y rutar desde {{name}}",
     "noLocation": "No hay ubicación conocida de {{name}}",
-    "linkFailedNotInCorp": "No se pudo añadir ese personaje: no está en la corporación.",
+    "linkFailedNotInCorp": "No se pudo añadir ese personaje: no pertenece a una corporación o alianza autorizada.",
     "linkFailed": "No se pudo añadir ese personaje. Inténtalo de nuevo.",
     "remove": "Quitar",
     "removeCharacter": "Quitar a {{name}}",
@@ -247,6 +247,17 @@
       "noCorpMaps": "Aún no hay mapas de corp.",
       "colMap": "Mapa",
       "colExclude": "Excluir"
+    },
+    "roles": {
+      "button": "¿Roles?",
+      "title": "Qué puede hacer cada rol",
+      "desc": {
+        "alliance_admin": "Control total sobre toda la alianza: gestiona los mapas de alianza y el rol de cada miembro. Incluye todo lo que puede hacer un Admin.",
+        "admin": "Administración de corporación: gestiona los usuarios de tu corp (cambiar roles, bloquear), bloquea mapas y todo lo que puede Full.",
+        "full": "Crear, eliminar y bloquear mapas de corp y alianza, además de toda la edición.",
+        "edit": "Editar mapas: sistemas, conexiones, firmas, estructuras y notas, pero no crear, eliminar ni bloquear mapas.",
+        "readonly": "Solo lectura. Puede ver los mapas pero no cambiar nada."
+      }
     }
   },
   "proximityOptIn": {
@@ -279,11 +290,13 @@
     "type": "Tipo",
     "personal": "Personal",
     "corp": "Corp",
+    "alliance": "Alianza",
     "regionLabel": "Región (opcional — vacío para un mapa en blanco)",
     "regionPlaceholder": "Escribe para buscar regiones…",
     "clearRegion": "Borrar región",
     "regionHint": "Genera {{count}} sistemas desde {{region}}, posicionados según sus coordenadas en el juego con todos los enlaces de puerta estelar.",
     "corpLimit": "Límite de mapas de corp alcanzado ({{max}}).",
+    "allianceLimit": "Límite de mapas de alianza alcanzado ({{max}}).",
     "personalLimit": "Límite de mapas personales alcanzado ({{max}}).",
     "createFailed": "No se pudo crear el mapa",
     "created": "«{{name}}» creado desde {{region}}",
@@ -1025,6 +1038,7 @@
     "mapType": {
       "shared": "Compartido",
       "corp": "Corp",
+      "alliance": "Alianza",
       "solo": "Solo"
     },
     "lockedTooltip": "El mapa está bloqueado — sistemas y conexiones congelados. Las firmas, estructuras y notas aún se pueden editar.",
@@ -1083,7 +1097,7 @@
       "joinDiscord": "Únete al Discord de Nexum"
     },
     "errors": {
-      "not_in_corp": "Tu personaje no es miembro de la corporación que gestiona esta instancia de Nexum. El acceso está restringido a miembros de la corp.",
+      "not_in_corp": "Tu personaje no pertenece a una corporación o alianza autorizada para acceder a esta instancia de Nexum. El acceso está restringido a miembros autorizados.",
       "corp_check_failed": "No se pudo verificar tu pertenencia a la corporación debido a un error de la ESI. Inténtalo de nuevo en un momento.",
       "unknown": "Ocurrió un error desconocido. Inténtalo de nuevo."
     },

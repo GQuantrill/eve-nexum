@@ -3,7 +3,8 @@ import { charPortrait } from '../../utils/eveImages';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { api } from '../../api/client';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth, isAdminRole, isAllianceAdminRole, formatRole, ROLE_ORDER } from '../../context/AuthContext';
+import type { Role as AuthRole } from '../../context/AuthContext';
 import { useHashRoute } from '../../hooks/useHashRoute';
 import { useUserSetting } from '../../hooks/useUserSetting';
 import { cssVarToHex } from '../../utils/cssVar';
@@ -15,13 +16,45 @@ import {
   PointElement, LineElement, Tooltip, Legend, Filler,
 } from 'chart.js';
 import { Doughnut, Line } from 'react-chartjs-2';
-import { CaretUpIcon, CaretDownIcon } from '@phosphor-icons/react';
+import { CaretUpIcon, CaretDownIcon, XIcon } from '@phosphor-icons/react';
+import { createPortal } from 'react-dom';
 
 // Register only the chart pieces we actually use — keeps the bundle lean.
 ChartJS.register(ArcElement, CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend, Filler);
 
-type Role = 'admin' | 'full' | 'edit' | 'readonly';
-const ROLES: Role[] = ['admin', 'full', 'edit', 'readonly'];
+type Role = 'alliance_admin' | 'admin' | 'full' | 'edit' | 'readonly';
+const ROLES: Role[] = ['alliance_admin', 'admin', 'full', 'edit', 'readonly'];
+
+// Explainer modal for the role tiers, opened from the "Roles?" button on the
+// users tab. The alliance tier is only listed when the deployment uses it.
+function RolesInfoModal({ onClose }: { onClose: () => void }) {
+  const { t } = useTranslation();
+  const { user } = useAuth();
+  const roles = ROLE_ORDER.filter((r) => r !== 'alliance_admin' || user?.allianceMode);
+  return createPortal(
+    <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="modal roles-modal" role="dialog" aria-modal="true">
+        <div className="modal__header">
+          <h2 className="modal__title">{t('admin.roles.title')}</h2>
+          <button className="icon-btn" onClick={onClose} aria-label={t('actions.close')}>
+            <XIcon size={16} weight="bold" />
+          </button>
+        </div>
+        <div className="modal__body">
+          <dl className="roles-info">
+            {roles.map((r) => (
+              <div key={r} className="roles-info__row">
+                <dt><span className={`role-badge role-badge--${r}`}>{formatRole(r)}</span></dt>
+                <dd>{t(`admin.roles.desc.${r}`)}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </div>
+    </div>,
+    document.body,
+  );
+}
 
 type Tab = 'users' | 'maps' | 'reports' | 'audit' | 'discord';
 
@@ -37,7 +70,7 @@ export function AdminPage() {
   const { t } = useTranslation();
   const [path, navigate] = useHashRoute();
   const { user } = useAuth();
-  const isAdmin = user?.role === 'admin';
+  const isAdmin = !!user && isAdminRole(user.role);
   const canSeeReports = !!user?.canViewReports;
   const tabs = useMemo(
     () => ALL_TABS.filter((t) => {
@@ -157,11 +190,14 @@ function compareUsers(a: AdminUser, b: AdminUser, sort: UserSort): number {
 function UsersTab() {
   const { t } = useTranslation();
   const { user: self } = useAuth();
-  const canEdit = self?.role === 'admin';
+  const canEdit = !!self && isAdminRole(self.role);
+  // Only an alliance admin may hand out (or modify) the alliance_admin tier.
+  const canGrantAllianceAdmin = !!self && isAllianceAdminRole(self.role);
   const [users, setUsers]     = useState<AdminUser[] | null>(null);
   const [error, setError]     = useState<string | null>(null);
   const [busyId, setBusyId]   = useState<number | null>(null);
   const [blockTarget, setBlockTarget] = useState<AdminUser | null>(null);
+  const [showRoles, setShowRoles] = useState(false);
   // Default: alphabetical by character name.
   const [sort, setSort] = useState<UserSort>({ key: 'characterName', dir: 'asc' });
 
@@ -235,7 +271,13 @@ function UsersTab() {
 
   return (
     <>
-      <h2 className="admin-page__section-title">{t('admin.users.title')}</h2>
+      <div className="admin-page__section-head">
+        <h2 className="admin-page__section-title">{t('admin.users.title')}</h2>
+        <button type="button" className="btn btn--ghost btn--sm" onClick={() => setShowRoles(true)}>
+          {t('admin.roles.button')}
+        </button>
+      </div>
+      {showRoles && <RolesInfoModal onClose={() => setShowRoles(false)} />}
       {error && <div className="admin-page__error">{error}</div>}
       {!users && !error && <div className="admin-page__loading">{t('admin.loading')}</div>}
       {users && !users.length && <div className="admin-page__empty">{t('admin.users.none')}</div>}
@@ -283,13 +325,17 @@ function UsersTab() {
                       <select
                         className="admin-modal__role-select"
                         value={u.role}
-                        disabled={isBusy || isSelf}
+                        // A non-alliance-admin can't touch an alliance admin's
+                        // role, nor grant the tier (matches the server guard).
+                        disabled={isBusy || isSelf || (u.role === 'alliance_admin' && !canGrantAllianceAdmin)}
                         onChange={(e) => changeRole(u, e.target.value as Role)}
                       >
-                        {ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
+                        {ROLES
+                          .filter((r) => r !== 'alliance_admin' || canGrantAllianceAdmin)
+                          .map((r) => <option key={r} value={r}>{formatRole(r)}</option>)}
                       </select>
                     ) : (
-                      <span className="admin-modal__mono">{u.role}</span>
+                      <span className="admin-modal__mono">{formatRole(u.role as AuthRole)}</span>
                     )}
                   </td>
                   <td>
@@ -336,6 +382,8 @@ function UsersTab() {
       {blockTarget && (
         <ConfirmModal
           message={t('admin.users.blockConfirm', { name: blockTarget.characterName })}
+          confirmLabel={t('admin.users.block')}
+          danger
           onCancel={() => setBlockTarget(null)}
           onConfirm={() => setBlocked(blockTarget, true)}
         />

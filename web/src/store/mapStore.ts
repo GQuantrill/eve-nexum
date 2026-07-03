@@ -115,8 +115,10 @@ export interface MapListItem {
   id: string;
   name: string;
   isCorpMap: boolean;
-  /** True when this map isn't owned by the caller and isn't a corp map they
-   *  belong to — i.e. it reached their list via an explicit map_shares grant. */
+  /** Alliance-scoped map (visible to the whole alliance). */
+  isAllianceMap?: boolean;
+  /** True when this map isn't owned by the caller and isn't a corp/alliance map
+   *  they belong to — i.e. it reached their list via an explicit map_shares grant. */
   sharedWithMe?: boolean;
   locked: boolean;
   /** Owning character's name — shown in the merge picker to disambiguate maps. */
@@ -162,6 +164,8 @@ interface MapStore {
   maxMaps: number;
   maxCorpMaps: number;
   corpMapCount: number;
+  maxAllianceMaps: number;
+  allianceMapCount: number;
   activeMapId: string | null;
 
   // Current map
@@ -247,8 +251,8 @@ interface MapStore {
   // Maps management
   loadMaps: () => Promise<void>;
   switchMap: (id: string) => Promise<void>;
-  createMap: (name?: string, isCorpMap?: boolean) => Promise<void>;
-  createFromRegion: (regionId: number, name: string, isCorpMap: boolean) => Promise<void>;
+  createMap: (name?: string, isCorpMap?: boolean, isAllianceMap?: boolean) => Promise<void>;
+  createFromRegion: (regionId: number, name: string, isCorpMap: boolean, isAllianceMap?: boolean) => Promise<void>;
   deleteMap: (id: string) => Promise<void>;
 
   // Map metadata
@@ -480,6 +484,8 @@ export const useMapStore = create<MapStore>()((set, get) => {
     maxMaps: 10,
     maxCorpMaps: 5,
     corpMapCount: 0,
+    maxAllianceMaps: 5,
+    allianceMapCount: 0,
     activeMapId: null,
     map: emptyMap(),
     selectedSystemId: null,
@@ -561,9 +567,9 @@ export const useMapStore = create<MapStore>()((set, get) => {
     // ── Maps management ───────────────────────────────────────────────────────
 
     loadMaps: async () => {
-      const { maps, maxMaps, maxCorpMaps, corpMapCount } = await api<{ maps: MapListItem[]; maxMaps: number; maxCorpMaps: number; corpMapCount: number }>('/api/maps');
+      const { maps, maxMaps, maxCorpMaps, corpMapCount, maxAllianceMaps, allianceMapCount } = await api<{ maps: MapListItem[]; maxMaps: number; maxCorpMaps: number; corpMapCount: number; maxAllianceMaps: number; allianceMapCount: number }>('/api/maps');
       const activeId = get().activeMapId;
-      set({ maps, maxMaps, maxCorpMaps, corpMapCount });
+      set({ maps, maxMaps, maxCorpMaps, corpMapCount, maxAllianceMaps, allianceMapCount });
 
       // Pick an initial map if none is active yet, falling back to the
       // user's last-viewed id when it's still in the list.
@@ -616,19 +622,19 @@ export const useMapStore = create<MapStore>()((set, get) => {
       }
     },
 
-    createMap: async (name = 'New Map', isCorpMap = false) => {
+    createMap: async (name = 'New Map', isCorpMap = false, isAllianceMap = false) => {
       const { id } = await api<{ id: string }>('/api/maps', {
         method: 'POST',
-        body: JSON.stringify({ name, isCorpMap }),
+        body: JSON.stringify({ name, isCorpMap, isAllianceMap }),
       });
       await get().loadMaps();
       await get().switchMap(id);
     },
 
-    createFromRegion: async (regionId, name, isCorpMap) => {
+    createFromRegion: async (regionId, name, isCorpMap, isAllianceMap = false) => {
       const { id } = await api<{ id: string }>('/api/maps/from-region', {
         method: 'POST',
-        body: JSON.stringify({ regionId, name, isCorpMap }),
+        body: JSON.stringify({ regionId, name, isCorpMap, isAllianceMap }),
       });
       await get().loadMaps();
       await get().switchMap(id);
