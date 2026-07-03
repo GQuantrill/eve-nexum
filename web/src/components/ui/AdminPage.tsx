@@ -198,6 +198,7 @@ function UsersTab() {
   const [busyId, setBusyId]   = useState<number | null>(null);
   const [blockTarget, setBlockTarget] = useState<AdminUser | null>(null);
   const [showRoles, setShowRoles] = useState(false);
+  const [query, setQuery] = useState('');
   // Default: alphabetical by character name.
   const [sort, setSort] = useState<UserSort>({ key: 'characterName', dir: 'asc' });
 
@@ -211,6 +212,17 @@ function UsersTab() {
     () => (users ? [...users].sort((a, b) => compareUsers(a, b, sort)) : null),
     [users, sort],
   );
+
+  // Case-insensitive substring filter over character name plus corp/alliance
+  // ticker + name, so an admin can jump to a member by any of those.
+  const visibleUsers = useMemo(() => {
+    const base = sortedUsers ?? [];
+    const q = query.trim().toLowerCase();
+    if (!q) return base;
+    return base.filter((u) => [
+      u.characterName, u.corpTicker, u.corpName, u.allianceTicker, u.allianceName,
+    ].some((v) => v?.toLowerCase().includes(q)));
+  }, [sortedUsers, query]);
 
   const load = useCallback(async () => {
     try {
@@ -273,6 +285,14 @@ function UsersTab() {
     <>
       <div className="admin-page__section-head">
         <h2 className="admin-page__section-title">{t('admin.users.title')}</h2>
+        <input
+          type="search"
+          className="admin-users__search"
+          placeholder={t('admin.users.searchPlaceholder')}
+          aria-label={t('admin.users.searchPlaceholder')}
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
         <button type="button" className="btn btn--ghost btn--sm" onClick={() => setShowRoles(true)}>
           {t('admin.roles.button')}
         </button>
@@ -296,7 +316,7 @@ function UsersTab() {
             </tr>
           </thead>
           <tbody>
-            {(sortedUsers ?? users).map((u) => {
+            {visibleUsers.map((u) => {
               const isSelf = self?.id === u.id;
               const isBusy = busyId === u.id;
               return (
@@ -377,6 +397,9 @@ function UsersTab() {
             })}
           </tbody>
         </table>
+      )}
+      {users && users.length > 0 && query.trim() && visibleUsers.length === 0 && (
+        <div className="admin-page__empty">{t('admin.users.noMatch', { query: query.trim() })}</div>
       )}
 
       {blockTarget && (

@@ -109,7 +109,9 @@
       "loadFailed": "ユーザーの読み込みに失敗しました",
       "roleChangeFailed": "権限の変更に失敗しました",
       "blockChangeFailed": "ブロック状態の変更に失敗しました",
-      "recheckFailed": "再確認に失敗しました"
+      "recheckFailed": "再確認に失敗しました",
+      "searchPlaceholder": "メンバーを検索…",
+      "noMatch": "「{{query}}」に一致するメンバーはいません。"
     },
     "maps": {
       "title": "マップ",

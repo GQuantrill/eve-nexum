@@ -109,7 +109,9 @@
       "loadFailed": "加载用户失败",
       "roleChangeFailed": "权限更改失败",
       "blockChangeFailed": "封禁状态更改失败",
-      "recheckFailed": "重新检查失败"
+      "recheckFailed": "重新检查失败",
+      "searchPlaceholder": "搜索成员…",
+      "noMatch": "没有与“{{query}}”匹配的成员。"
     },
     "maps": {
       "title": "地图",

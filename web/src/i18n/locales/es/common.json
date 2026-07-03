@@ -109,7 +109,9 @@
       "loadFailed": "No se pudieron cargar los usuarios",
       "roleChangeFailed": "Error al cambiar el rol",
       "blockChangeFailed": "Error al cambiar el bloqueo",
-      "recheckFailed": "Error en la reverificación"
+      "recheckFailed": "Error en la reverificación",
+      "searchPlaceholder": "Buscar miembros…",
+      "noMatch": "Ningún miembro coincide con «{{query}}»."
     },
     "maps": {
       "title": "Mapas",
