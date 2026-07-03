@@ -235,7 +235,12 @@ export function Toolbar() {
   // A read-only corp map can't be copied (matches the server gate). Personal
   // maps are always content-editable, so this is true only for corp maps where
   // the user lacks an edit role.
-  const readonlyCorpActive = !!maps.find((m) => m.id === activeMapId)?.isCorpMap && !canEditContent;
+  // A read-only member can't copy a corp/alliance map (the server 403s), so hide
+  // the Copy action for those maps when the user lacks edit access.
+  const readonlyCorpActive = (() => {
+    const active = maps.find((m) => m.id === activeMapId);
+    return !!active && (active.isCorpMap || active.isAllianceMap) && !canEditContent;
+  })();
   const canManageMaps = useCanCreateMaps();
   const canManageAllianceMaps = useCanManageAllianceMaps();
   // Corp maps exist under corp OR alliance mode (a corp inside the alliance).
