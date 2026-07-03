@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { timeAgo, jumps } from '../../i18n/format';
 import { useMapStore } from '../../store/mapStore';
-import { useAuth, formatRole } from '../../context/AuthContext';
+import { useAuth, formatRole, isAdminRole } from '../../context/AuthContext';
 import { useOnlineStatus } from '../../hooks/useOnlineStatus';
 import { useCharacterLocation } from '../../hooks/useCharacterLocation';
 import { useCanEdit } from '../../hooks/useCanEdit';
@@ -329,7 +329,7 @@ export function Toolbar() {
       })()
     : null;
 
-  const showAdmin = !!user && (user.canViewReports || (user.role === 'admin' && user.corpMode));
+  const showAdmin = !!user && (user.canViewReports || (isAdminRole(user.role) && (user.corpMode || user.allianceMode)));
 
   // Each movable item's content, keyed by id. Items that evaluate to null are
   // simply not rendered (and not persisted in the order).
