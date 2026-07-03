@@ -1407,6 +1407,7 @@
 }
 .toolbar__map-type--solo { background: rgba(74,222,128,0.12); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
 .toolbar__map-type--corp { background: rgba(100,160,255,0.15); color: #7ab0f0; border: 1px solid rgba(100,160,255,0.3); }
+.toolbar__map-type--alliance { background: rgba(245,166,35,0.15); color: #f5a623; border: 1px solid rgba(245,166,35,0.3); }
 .toolbar__map-type--shared { background: rgba(192,132,252,0.15); color: #c084fc; border: 1px solid rgba(192,132,252,0.3); }
 
 .toolbar__locked-chip {
@@ -1531,6 +1532,7 @@
 }
 .map-dropdown__badge--solo { background: rgba(74,222,128,0.12); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
 .map-dropdown__badge--corp { background: rgba(100,160,255,0.15); color: #7ab0f0; border: 1px solid rgba(100,160,255,0.3); }
+.map-dropdown__badge--alliance { background: rgba(245,166,35,0.15); color: #f5a623; border: 1px solid rgba(245,166,35,0.3); }
 .map-dropdown__badge--shared { background: rgba(192,132,252,0.15); color: #c084fc; border: 1px solid rgba(192,132,252,0.3); }
 .map-dropdown__badge--lock { background: transparent; border: none; font-size: calc(12px * var(--font-scale, 1)); }
 
@@ -5412,6 +5414,8 @@ select.sig-toolbar-btn option {
   cursor: pointer;
   transition: border-color 0.15s ease;
 }
+/* Flag-only variant (logged-in toolbar): tighter padding, no gap. */
+.lang-switcher__trigger--compact { gap: 0; padding: 4px 6px; }
 .lang-switcher__trigger:hover { border-color: #4d9de0; }
 .lang-switcher__trigger:focus-visible {
   outline: none;
@@ -8021,6 +8025,7 @@ select.sig-toolbar-btn option {
   border: 1px solid transparent;
 }
 
+.role-badge--alliance_admin { background: #3a2c12; color: #f5c26b; border-color: #6a4e1e; }
 .role-badge--admin    { background: #3a1c2a; color: #f0a8c0; border-color: #6a2e48; }
 .role-badge--full     { background: #1a2a4a; color: #7ab4f0; border-color: #2e5a9a; }
 .role-badge--edit     { background: #1a2e1a; color: #8ad08a; border-color: #2e5a2e; }
@@ -8331,6 +8336,46 @@ select.sig-toolbar-btn option {
 }
 
 .admin-page__section-bar .admin-page__section-title { margin: 0; }
+
+/* Users-tab header: section title + member search + the "Roles?" button. */
+.admin-page__section-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.admin-page__section-head .admin-page__section-title { margin: 0; }
+
+/* Member search — pushed to the right of the title, ahead of the Roles button. */
+.admin-users__search {
+  margin-left: auto;
+  width: min(260px, 40vw);
+  background: #0a0e1a;
+  border: 1px solid #1e2740;
+  border-radius: 4px;
+  color: #c8d0e0;
+  font-family: inherit;
+  font-size: calc(13px * var(--font-scale, 1));
+  padding: 5px 9px;
+}
+.admin-users__search:focus-visible {
+  outline: none;
+  border-color: #4d9de0;
+  box-shadow: 0 0 0 2px rgba(77, 157, 224, 0.25);
+}
+.admin-users__search::placeholder { color: #4a5670; }
+
+/* Roles explainer modal: a badge + description per role. */
+.roles-modal { width: min(640px, 94vw); }
+.roles-info { margin: 0; display: flex; flex-direction: column; gap: 14px; }
+.roles-info__row { display: grid; grid-template-columns: 150px 1fr; gap: 16px; align-items: start; }
+.roles-info__row dt { margin: 0; }
+.roles-info__row dd {
+  margin: 0;
+  color: #b8c2d8;
+  font-size: calc(13px * var(--font-scale, 1));
+  line-height: 1.45;
+}
 
 .admin-page__section-bar--inline {
   margin-bottom: 8px;

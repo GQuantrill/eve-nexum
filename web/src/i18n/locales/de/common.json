@@ -50,7 +50,7 @@
     "switchTo": "Zu {{name}} wechseln",
     "focusLocation": "Karte auf {{name}} zentrieren und von dort routen",
     "noLocation": "Kein bekannter Standort für {{name}}",
-    "linkFailedNotInCorp": "Charakter konnte nicht hinzugefügt werden — er ist nicht in der Corp.",
+    "linkFailedNotInCorp": "Charakter konnte nicht hinzugefügt werden — er ist in keiner berechtigten Corporation oder Allianz.",
     "linkFailed": "Charakter konnte nicht hinzugefügt werden. Bitte erneut versuchen.",
     "remove": "Entfernen",
     "removeCharacter": "{{name}} entfernen",
@@ -109,7 +109,9 @@
       "loadFailed": "Benutzer konnten nicht geladen werden",
       "roleChangeFailed": "Rollenänderung fehlgeschlagen",
       "blockChangeFailed": "Sperränderung fehlgeschlagen",
-      "recheckFailed": "Neuprüfung fehlgeschlagen"
+      "recheckFailed": "Neuprüfung fehlgeschlagen",
+      "searchPlaceholder": "Mitglieder suchen…",
+      "noMatch": "Keine Mitglieder passen zu „{{query}}“."
     },
     "maps": {
       "title": "Karten",
@@ -247,6 +249,17 @@
       "noCorpMaps": "Noch keine Corp-Karten.",
       "colMap": "Karte",
       "colExclude": "Ausschließen"
+    },
+    "roles": {
+      "button": "Rollen?",
+      "title": "Was jede Rolle darf",
+      "desc": {
+        "alliance_admin": "Volle Kontrolle über die gesamte Allianz — verwaltet allianzweite Karten und die Rolle jedes Mitglieds. Umfasst alles, was ein Admin kann.",
+        "admin": "Corp-Verwaltung — verwaltet die Nutzer der eigenen Corp (Rollen ändern, sperren), sperrt Karten und alles, was Full kann.",
+        "full": "Corp- und Allianzkarten erstellen, löschen und sperren, zusätzlich zur vollständigen Bearbeitung.",
+        "edit": "Karten bearbeiten — Systeme, Verbindungen, Signaturen, Strukturen und Notizen — aber keine Karten erstellen, löschen oder sperren.",
+        "readonly": "Nur Ansicht. Kann Karten sehen, aber nichts ändern."
+      }
     }
   },
   "proximityOptIn": {
@@ -279,11 +292,13 @@
     "type": "Typ",
     "personal": "Persönlich",
     "corp": "Corp",
+    "alliance": "Allianz",
     "regionLabel": "Region (optional — leer für eine leere Karte)",
     "regionPlaceholder": "Zum Suchen tippen…",
     "clearRegion": "Region löschen",
     "regionHint": "Erstellt {{count}} Systeme aus {{region}}, positioniert nach ihren Ingame-Koordinaten mit allen Stargate-Verbindungen.",
     "corpLimit": "Corp-Kartenlimit erreicht ({{max}}).",
+    "allianceLimit": "Allianz-Karten-Limit erreicht ({{max}}).",
     "personalLimit": "Persönliches Kartenlimit erreicht ({{max}}).",
     "createFailed": "Karte konnte nicht erstellt werden",
     "created": "\"{{name}}\" aus {{region}} erstellt",
@@ -1025,6 +1040,7 @@
     "mapType": {
       "shared": "Geteilt",
       "corp": "Corp",
+      "alliance": "Allianz",
       "solo": "Solo"
     },
     "lockedTooltip": "Karte ist gesperrt — Systeme und Verbindungen sind eingefroren. Signaturen, Strukturen und Notizen können weiterhin bearbeitet werden.",
@@ -1083,17 +1099,17 @@
       "joinDiscord": "Tritt dem Nexum-Discord bei"
     },
     "errors": {
-      "not_in_corp": "Dein Charakter ist kein Mitglied der Corporation, die diese Nexum-Instanz betreibt. Der Zugriff ist auf Corp-Mitglieder beschränkt.",
+      "not_in_corp": "Dein Charakter gehört zu keiner Corporation oder Allianz, die auf diese Nexum-Instanz zugreifen darf. Der Zugriff ist auf berechtigte Mitglieder beschränkt.",
       "corp_check_failed": "Deine Corporation-Mitgliedschaft konnte aufgrund eines ESI-Fehlers nicht überprüft werden. Bitte versuche es gleich noch einmal.",
       "unknown": "Ein unbekannter Fehler ist aufgetreten. Bitte versuche es erneut."
     },
     "sections": {
       "mapping": "Kartierung",
-      "personalCorp": "Persönliche & Corp-Karten",
+      "personalCorp": "Persönliche, Corp- & Allianzkarten",
       "sysIntel": "System-Informationen",
       "liveOps": "Live-Ops",
       "productivity": "Produktivität & UX",
-      "forCorps": "Für Corporations",
+      "forCorps": "Für Corporations & Allianzen",
       "compare": "Wie schneidet Nexum ab?",
       "languages": "In deiner Sprache verfügbar",
       "discordCta": "Fragen, Ideen oder Bugs?",
@@ -1308,6 +1324,14 @@
       "multiCorp": {
         "title": "Multi-Corp-Deployments",
         "desc": "CORP_ID akzeptiert eine kommagetrennte Liste von Corporation-IDs. Eine Nexum-Instanz kann mehrere Corps hosten; die Karten jeder Corp bleiben auf ihre eigenen Mitglieder beschränkt, sofern nicht CORP_MAP_SHARED=true gesetzt ist."
+      },
+      "allianceMaps": {
+        "title": "Allianzweite Karten",
+        "desc": "ALLIANCE_ID fügt eine dritte Kartenebene über der Corp hinzu: Allianzkarten, die jedes Allianzmitglied sehen kann. Mit ALLIANCE_MAP_SHARED=true werden sie über eine Koalition mehrerer Allianzen geteilt."
+      },
+      "allianceRoles": {
+        "title": "Allianz-Admin-Rolle",
+        "desc": "Eine eigene alliance_admin-Stufe verwaltet Allianzkarten und die Rolle jedes Mitglieds in der gesamten Allianz — eine Obermenge des Corp-Admins. Jede Corp innerhalb der Allianz kann eigene corp-private Karten führen, ohne CORP_ID-Liste."
       },
       "adminDash": {
         "title": "Admin-Dashboard",

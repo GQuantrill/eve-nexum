@@ -50,7 +50,7 @@
     "switchTo": "切换到 {{name}}",
     "focusLocation": "以 {{name}} 为中心并从其位置规划路线",
     "noLocation": "没有 {{name}} 的已知位置",
-    "linkFailedNotInCorp": "无法添加该角色——其不在该军团中。",
+    "linkFailedNotInCorp": "无法添加该角色 — 其不属于任何授权的军团或联盟。",
     "linkFailed": "无法添加该角色，请重试。",
     "remove": "移除",
     "removeCharacter": "移除 {{name}}",
@@ -109,7 +109,9 @@
       "loadFailed": "加载用户失败",
       "roleChangeFailed": "权限更改失败",
       "blockChangeFailed": "封禁状态更改失败",
-      "recheckFailed": "重新检查失败"
+      "recheckFailed": "重新检查失败",
+      "searchPlaceholder": "搜索成员…",
+      "noMatch": "没有与“{{query}}”匹配的成员。"
     },
     "maps": {
       "title": "地图",
@@ -247,6 +249,17 @@
       "noCorpMaps": "暂无军团地图。",
       "colMap": "地图",
       "colExclude": "排除"
+    },
+    "roles": {
+      "button": "角色说明？",
+      "title": "各角色权限说明",
+      "desc": {
+        "alliance_admin": "对整个联盟拥有完全控制权 — 管理联盟地图和每位成员的角色。包含管理员（Admin）的所有权限。",
+        "admin": "军团管理 — 管理本军团用户（更改角色、封禁）、锁定地图，以及 Full 的所有权限。",
+        "full": "创建、删除和锁定军团及联盟地图，以及所有编辑权限。",
+        "edit": "编辑地图 — 星系、连接、信号、建筑和备注 — 但不能创建、删除或锁定地图。",
+        "readonly": "仅查看。可以查看地图但不能更改任何内容。"
+      }
     }
   },
   "proximityOptIn": {
@@ -279,11 +292,13 @@
     "type": "类型",
     "personal": "个人",
     "corp": "军团",
+    "alliance": "联盟",
     "regionLabel": "星域（可选 — 留空则为空地图）",
     "regionPlaceholder": "输入以搜索星域…",
     "clearRegion": "清除星域",
     "regionHint": "从 {{region}} 生成 {{count}} 个星系，按其游戏内坐标定位，并绘制所有星门连接。",
     "corpLimit": "已达到军团地图上限（{{max}}）。",
+    "allianceLimit": "已达到联盟地图上限 ({{max}})。",
     "personalLimit": "已达到个人地图上限（{{max}}）。",
     "createFailed": "创建地图失败",
     "created": "已从 {{region}} 创建「{{name}}」",
@@ -1025,6 +1040,7 @@
     "mapType": {
       "shared": "共享",
       "corp": "军团",
+      "alliance": "联盟",
       "solo": "个人"
     },
     "lockedTooltip": "地图已锁定 — 星系和连接已冻结。信号、建筑和笔记仍可编辑。",
@@ -1083,17 +1099,17 @@
       "joinDiscord": "加入 Nexum Discord"
     },
     "errors": {
-      "not_in_corp": "你的角色不是运行此 Nexum 实例的公司的成员。访问仅限军团成员。",
+      "not_in_corp": "你的角色不属于任何被授权访问此 Nexum 实例的军团或联盟。访问仅限授权成员。",
       "corp_check_failed": "由于 ESI 错误，无法验证你的军团成员资格。请稍后再试。",
       "unknown": "发生未知错误。请重试。"
     },
     "sections": {
       "mapping": "绘图",
-      "personalCorp": "个人与军团地图",
+      "personalCorp": "个人、军团与联盟地图",
       "sysIntel": "星系情报",
       "liveOps": "实时行动",
       "productivity": "效率与体验",
-      "forCorps": "面向军团",
+      "forCorps": "面向军团与联盟",
       "compare": "Nexum 相比如何？",
       "languages": "支持您的语言",
       "discordCta": "有问题、想法或 bug？",
@@ -1308,6 +1324,14 @@
       "multiCorp": {
         "title": "多军团部署",
         "desc": "CORP_ID 接受以逗号分隔的军团 ID 列表。一个 Nexum 实例可托管多个军团；除非 CORP_MAP_SHARED=true，否则每个军团的地图都限定于其自己的成员。"
+      },
+      "allianceMaps": {
+        "title": "联盟范围地图",
+        "desc": "ALLIANCE_ID 在军团之上增加了第三个地图范围：联盟内所有成员均可查看的联盟地图。设置 ALLIANCE_MAP_SHARED=true 可在多个联盟的联合中共享。"
+      },
+      "allianceRoles": {
+        "title": "联盟管理员角色",
+        "desc": "专门的 alliance_admin 级别管理整个联盟的联盟地图和每位成员的角色 — 是军团管理员的超集。联盟内的任何军团仍可保留自己的军团专属地图，无需 CORP_ID 列表。"
       },
       "adminDash": {
         "title": "管理仪表盘",

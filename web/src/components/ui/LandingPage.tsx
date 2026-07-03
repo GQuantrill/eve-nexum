@@ -36,7 +36,7 @@ type FeatureId =
   | 'commandPalette' | 'homeHotkey' | 'killHighlights' | 'userStats' | 'apiKeys'
   | 'serverStatus' | 'demoMap' | 'sidebar' | 'colorVision';
 type CorpFeatureId =
-  | 'multiCorp' | 'adminDash' | 'userMgmt' | 'mapMgmt' | 'usersReport'
+  | 'multiCorp' | 'allianceMaps' | 'allianceRoles' | 'adminDash' | 'userMgmt' | 'mapMgmt' | 'usersReport'
   | 'systemsReport' | 'timeWindowed' | 'auditLog' | 'corpTicker' | 'perCharAttr';
 
 interface FeatureItem { icon: Icon; id: FeatureId }
@@ -124,6 +124,8 @@ const FEATURE_SECTIONS: FeatureSection[] = [
 // CORP_ID at the deployment level; admin-only at the UI level.
 const CORP_FEATURES: { icon: Icon; id: CorpFeatureId }[] = [
   { icon: BuildingsIcon,          id: 'multiCorp'     },
+  { icon: HandshakeIcon,          id: 'allianceMaps'  },
+  { icon: ShieldCheckIcon,        id: 'allianceRoles' },
   { icon: SquaresFourIcon,        id: 'adminDash'     },
   { icon: UserGearIcon,           id: 'userMgmt'      },
   { icon: MapTrifoldIcon,         id: 'mapMgmt'       },

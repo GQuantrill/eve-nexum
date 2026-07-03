@@ -178,6 +178,8 @@ export interface WormholeMap {
   id: string;
   name: string;
   isCorpMap?: boolean;
+  /** Alliance-scoped map (visible to the whole alliance). */
+  isAllianceMap?: boolean;
   locked?: boolean;
   /** Corp maps only: whether this map is opted in as a merge source. */
   allowAsMergeSource?: boolean;

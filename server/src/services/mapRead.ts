@@ -9,18 +9,29 @@ import { config } from '../config.js';
 const UUID_RE = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
 
 export interface VisibleMapsParams {
-  userId:     number;
-  ownerId:    number | null;
-  userCorpId: number | null;
-  callerChar: number | null;
+  userId:         number;
+  ownerId:        number | null;
+  userCorpId:     number | null;
+  userAllianceId: number | null;
+  callerChar:     number | null;
 }
 
 // The list of maps visible to an account: personal (owner) maps, corp maps in
-// the configured corp set, and personal maps explicitly shared with the
-// character or their corp. Identical query to GET /api/maps.
+// the configured corp set, alliance maps in the configured alliance set, and
+// personal maps explicitly shared with the character or their corp. Identical
+// query to GET /api/maps.
 export async function listVisibleMaps(p: VisibleMapsParams) {
+  // Corp maps the caller can see. Explicit corp deployment: the configured
+  // corps (or just the caller's, unless CORP_MAP_SHARED). Alliance deployment
+  // without a CORP_ID list: just the caller's own corp — a corp inside the
+  // alliance keeps its corp maps corp-private.
   const visibleCorpIds = config.corpMode && config.corpIds.length > 0
     ? (config.corpMapShared ? config.corpIds : (p.userCorpId ? [p.userCorpId] : []))
+    : (config.allianceMode && p.userCorpId ? [p.userCorpId] : []);
+  // Alliance visibility mirrors corp: your own alliance by default, or every
+  // listed alliance under ALLIANCE_MAP_SHARED (coalition mode).
+  const visibleAllianceIds = config.allianceMode && config.allianceIds.length > 0
+    ? (config.allianceMapShared ? config.allianceIds : (p.userAllianceId ? [p.userAllianceId] : []))
     : [];
   // -1 is an impossible owner id so the ownership clause matches nothing rather
   // than everything when ownerId is unknown.
@@ -29,9 +40,11 @@ export async function listVisibleMaps(p: VisibleMapsParams) {
     `SELECT DISTINCT
             m.id,
             m.name,
-            m.corp_id IS NOT NULL AS "isCorpMap",
+            m.corp_id IS NOT NULL     AS "isCorpMap",
+            m.alliance_id IS NOT NULL AS "isAllianceMap",
             (m.user_id <> $1 AND m.owner_id IS DISTINCT FROM $5::int
               AND (m.corp_id IS NULL OR NOT m.corp_id = ANY($2::int[]))
+              AND (m.alliance_id IS NULL OR NOT m.alliance_id = ANY($6::int[]))
             ) AS "sharedWithMe",
             m.locked,
             ou.character_name             AS "ownerName",
@@ -46,11 +59,12 @@ export async function listVisibleMaps(p: VisibleMapsParams) {
        LEFT JOIN map_shares s ON s.map_id = m.id
             AND ( s.target_character_id = $3
                OR ($4::int IS NOT NULL AND s.target_corp_id = $4) )
-      WHERE ((m.owner_id = $5::int OR m.user_id = $1) AND m.corp_id IS NULL)
+      WHERE ((m.owner_id = $5::int OR m.user_id = $1) AND m.corp_id IS NULL AND m.alliance_id IS NULL)
          OR m.corp_id = ANY($2::int[])
-         OR (s.id IS NOT NULL AND m.corp_id IS NULL)
-      ORDER BY "sharedWithMe", "isCorpMap", m.name`,
-    [p.userId, visibleCorpIds, p.callerChar, p.userCorpId, ownerId],
+         OR m.alliance_id = ANY($6::int[])
+         OR (s.id IS NOT NULL AND m.corp_id IS NULL AND m.alliance_id IS NULL)
+      ORDER BY "sharedWithMe", "isAllianceMap", "isCorpMap", m.name`,
+    [p.userId, visibleCorpIds, p.callerChar, p.userCorpId, ownerId, visibleAllianceIds],
   );
   return rows;
 }
@@ -60,7 +74,8 @@ export async function listVisibleMaps(p: VisibleMapsParams) {
 export async function loadFullMap(mapId: string) {
   const [mapRows, systems, connections, routes] = await Promise.all([
     db.query(
-      `SELECT id, name, corp_id IS NOT NULL AS "isCorpMap", locked,
+      `SELECT id, name, corp_id IS NOT NULL AS "isCorpMap",
+              alliance_id IS NOT NULL AS "isAllianceMap", locked,
               allow_as_merge_source       AS "allowAsMergeSource",
               allow_as_merge_destination  AS "allowAsMergeDestination",
               lazy_remove_wormholes       AS "lazyRemoveWormholes",

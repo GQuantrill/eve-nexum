@@ -50,7 +50,7 @@
     "switchTo": "Mudar para {{name}}",
     "focusLocation": "Centrar e traçar rota a partir de {{name}}",
     "noLocation": "Nenhuma localização conhecida de {{name}}",
-    "linkFailedNotInCorp": "Não foi possível adicionar esse personagem — não está na corporação.",
+    "linkFailedNotInCorp": "Não foi possível adicionar esse personagem — ele não está em uma corporação ou aliança autorizada.",
     "linkFailed": "Não foi possível adicionar esse personagem. Tenta novamente.",
     "remove": "Remover",
     "removeCharacter": "Remover {{name}}",
@@ -109,7 +109,9 @@
       "loadFailed": "Falha ao carregar os utilizadores",
       "roleChangeFailed": "Falha ao alterar a função",
       "blockChangeFailed": "Falha ao alterar o bloqueio",
-      "recheckFailed": "Falha na reverificação"
+      "recheckFailed": "Falha na reverificação",
+      "searchPlaceholder": "Buscar membros…",
+      "noMatch": "Nenhum membro corresponde a \"{{query}}\"."
     },
     "maps": {
       "title": "Mapas",
@@ -247,6 +249,17 @@
       "noCorpMaps": "Ainda não há mapas de corp.",
       "colMap": "Mapa",
       "colExclude": "Excluir"
+    },
+    "roles": {
+      "button": "Funções?",
+      "title": "O que cada função pode fazer",
+      "desc": {
+        "alliance_admin": "Controle total sobre toda a aliança — gerencia mapas de aliança e a função de cada membro. Inclui tudo o que um Admin pode fazer.",
+        "admin": "Administração de corporação — gerencia os usuários da sua corp (alterar funções, bloquear), bloqueia mapas e tudo o que Full pode.",
+        "full": "Criar, excluir e bloquear mapas de corp e aliança, além de toda a edição.",
+        "edit": "Editar mapas — sistemas, conexões, assinaturas, estruturas e notas — mas não criar, excluir ou bloquear mapas.",
+        "readonly": "Somente leitura. Pode ver mapas mas não alterar nada."
+      }
     }
   },
   "proximityOptIn": {
@@ -279,11 +292,13 @@
     "type": "Tipo",
     "personal": "Pessoal",
     "corp": "Corp",
+    "alliance": "Aliança",
     "regionLabel": "Região (opcional — vazio para um mapa em branco)",
     "regionPlaceholder": "Escreve para procurar regiões…",
     "clearRegion": "Limpar região",
     "regionHint": "Gera {{count}} sistemas de {{region}}, posicionados pelas suas coordenadas no jogo com todas as ligações de portão estelar.",
     "corpLimit": "Limite de mapas de corp atingido ({{max}}).",
+    "allianceLimit": "Limite de mapas de aliança atingido ({{max}}).",
     "personalLimit": "Limite de mapas pessoais atingido ({{max}}).",
     "createFailed": "Falha ao criar o mapa",
     "created": "«{{name}}» criado a partir de {{region}}",
@@ -1025,6 +1040,7 @@
     "mapType": {
       "shared": "Partilhado",
       "corp": "Corp",
+      "alliance": "Aliança",
       "solo": "Solo"
     },
     "lockedTooltip": "O mapa está bloqueado — sistemas e conexões congelados. As assinaturas, estruturas e notas ainda podem ser editadas.",
@@ -1083,17 +1099,17 @@
       "joinDiscord": "Junta-te ao Discord do Nexum"
     },
     "errors": {
-      "not_in_corp": "A tua personagem não é membro da corporação que gere esta instância do Nexum. O acesso está restrito a membros da corp.",
+      "not_in_corp": "Seu personagem não pertence a uma corporação ou aliança autorizada a acessar esta instância do Nexum. O acesso é restrito a membros autorizados.",
       "corp_check_failed": "Não foi possível verificar a tua pertença à corporação devido a um erro da ESI. Tenta novamente daqui a um momento.",
       "unknown": "Ocorreu um erro desconhecido. Tenta novamente."
     },
     "sections": {
       "mapping": "Cartografia",
-      "personalCorp": "Mapas pessoais e de corp",
+      "personalCorp": "Mapas pessoais, de corp e de aliança",
       "sysIntel": "Inteligência de sistemas",
       "liveOps": "Operações em direto",
       "productivity": "Produtividade e UX",
-      "forCorps": "Para corporações",
+      "forCorps": "Para corporações e alianças",
       "compare": "Como se compara o Nexum?",
       "languages": "Disponível no seu idioma",
       "discordCta": "Perguntas, ideias ou bugs?",
@@ -1308,6 +1324,14 @@
       "multiCorp": {
         "title": "Implementações multi-corp",
         "desc": "CORP_ID aceita uma lista de IDs de corporação separados por vírgulas. Uma instância do Nexum pode alojar várias corps; os mapas de cada corp ficam limitados aos seus próprios membros, salvo se CORP_MAP_SHARED=true."
+      },
+      "allianceMaps": {
+        "title": "Mapas de toda a aliança",
+        "desc": "ALLIANCE_ID adiciona um terceiro escopo de mapas acima da corp: mapas de aliança que todos os membros podem ver. Com ALLIANCE_MAP_SHARED=true, são compartilhados por uma coalizão de alianças."
+      },
+      "allianceRoles": {
+        "title": "Função de admin de aliança",
+        "desc": "Um nível dedicado alliance_admin gerencia os mapas de aliança e a função de cada membro em toda a aliança — um superconjunto do admin de corp. Qualquer corp dentro da aliança pode manter seus próprios mapas privados, sem lista CORP_ID."
       },
       "adminDash": {
         "title": "Painel de administração",

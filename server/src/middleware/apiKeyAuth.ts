@@ -26,7 +26,7 @@ export async function apiKeyAuth(req: Request, res: Response, next: NextFunction
     const { rows } = await db.query<{
       id: string; ownerId: number; contextUserId: number | null;
       scope: string; expiresAt: Date | null;
-      role: Role | null; corpId: number | null; characterId: number | null; characterName: string | null;
+      role: Role | null; corpId: number | null; allianceId: number | null; characterId: number | null; characterName: string | null;
     }>(
       `SELECT t.id,
               t.owner_id          AS "ownerId",
@@ -35,6 +35,7 @@ export async function apiKeyAuth(req: Request, res: Response, next: NextFunction
               t.expires_at        AS "expiresAt",
               u.role,
               u.corp_id           AS "corpId",
+              u.alliance_id       AS "allianceId",
               u.character_id      AS "characterId",
               u.character_name    AS "characterName"
          FROM api_tokens t
@@ -62,6 +63,7 @@ export async function apiKeyAuth(req: Request, res: Response, next: NextFunction
       ownerId:       row.ownerId,
       role:          row.role,
       corpId:        row.corpId,
+      allianceId:    row.allianceId,
       apiScope:      scope,
     };
 

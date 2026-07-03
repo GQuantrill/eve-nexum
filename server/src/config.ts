@@ -9,6 +9,17 @@ const CORP_IDS: number[] = (process.env.CORP_ID ?? '')
   .map((s) => parseInt(s, 10))
   .filter((n) => Number.isInteger(n) && n > 0);
 
+// ALLIANCE_ID accepts a comma-separated list of alliance IDs, mirroring
+// CORP_ID. Any member of any listed alliance is allowed to log in, and the
+// list doubles as the coalition set for alliance-map sharing. Lets a whole
+// alliance be permitted without enumerating every member corp.
+const ALLIANCE_IDS: number[] = (process.env.ALLIANCE_ID ?? '')
+  .split(',')
+  .map((s) => s.trim())
+  .filter(Boolean)
+  .map((s) => parseInt(s, 10))
+  .filter((n) => Number.isInteger(n) && n > 0);
+
 const ADMIN_CHAR_ID = process.env.ADMIN_CHAR_ID ? parseInt(process.env.ADMIN_CHAR_ID, 10) : null;
 const REPORTS_CHAR_ID = process.env.RV_REPORT_ID ? parseInt(process.env.RV_REPORT_ID, 10) : null;
 const CORP_MAP_TIME = parseInt(process.env.CORP_MAP_TIME ?? '30', 10);
@@ -18,6 +29,12 @@ const CORP_MAP_TIME = parseInt(process.env.CORP_MAP_TIME ?? '30', 10);
 // to members of the corp that created them — Corp A's chain is invisible to
 // Corp B even if they share the deployment.
 const CORP_MAP_SHARED = /^(1|true|yes)$/i.test(process.env.CORP_MAP_SHARED ?? '');
+
+// Alliance-map counterpart of CORP_MAP_SHARED. When true, every member of any
+// listed alliance sees every alliance map (coalition mode). When false
+// (default), an alliance map is visible only to members of the alliance that
+// owns it.
+const ALLIANCE_MAP_SHARED = /^(1|true|yes)$/i.test(process.env.ALLIANCE_MAP_SHARED ?? '');
 
 // DISCORD_WEBHOOK_URL — optional corp-intel notifications (inbound K162, new
 // connections). Two accepted forms:
@@ -44,8 +61,10 @@ function parseDiscordWebhooks(raw: string | undefined): { defaultUrl: string | n
 }
 const DISCORD_WEBHOOKS = parseDiscordWebhooks(process.env.DISCORD_WEBHOOK_URL);
 
-if (CORP_IDS.length > 0 && ADMIN_CHAR_ID === null) {
-  console.error('FATAL: CORP_ID is set but ADMIN_CHAR_ID is missing');
+// A restricted (non-solo) deployment — corp OR alliance gated — needs a
+// bootstrap admin so someone can always administer it.
+if ((CORP_IDS.length > 0 || ALLIANCE_IDS.length > 0) && ADMIN_CHAR_ID === null) {
+  console.error('FATAL: CORP_ID / ALLIANCE_ID is set but ADMIN_CHAR_ID is missing');
   process.exit(1);
 }
 
@@ -123,11 +142,19 @@ export const config = {
   corpMode:            CORP_IDS.length > 0,
   corpIds:             CORP_IDS,
   corpMapShared:       CORP_MAP_SHARED,
+  allianceMode:        ALLIANCE_IDS.length > 0,
+  allianceIds:         ALLIANCE_IDS,
+  allianceMapShared:   ALLIANCE_MAP_SHARED,
+  // True for any non-solo deployment (corp- or alliance-gated). Drives role
+  // enforcement, map scoping and the idle-map sweep — everything that must be
+  // OFF in a wide-open solo install but ON the moment logins are restricted.
+  restrictedMode:      CORP_IDS.length > 0 || ALLIANCE_IDS.length > 0,
   adminCharId:         ADMIN_CHAR_ID,
   reportsCharId:       REPORTS_CHAR_ID && Number.isInteger(REPORTS_CHAR_ID) && REPORTS_CHAR_ID > 0 ? REPORTS_CHAR_ID : null,
   corpMapExpireDays:   CORP_MAP_TIME,
   maxUserMaps:         parseInt(process.env.MAX_USER_MAPS ?? '5', 10),
   maxCorpMaps:         parseInt(process.env.MAX_CORP_MAPS ?? '5', 10),
+  maxAllianceMaps:     parseInt(process.env.MAX_ALLIANCE_MAPS ?? '5', 10),
   // Background last-known-location poller (multi-account). 0 / unset = disabled
   // (opt-in at the deployment level). When > 0, every linked character's
   // last_known_system is refreshed from ESI on this cadence so positions stay

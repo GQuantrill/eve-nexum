@@ -13,15 +13,19 @@ interface Props {
   onConfirm: () => void;
   onCancel: () => void;
   confirmLabel?: string;
+  /** Force danger (red) styling on the confirm button even with a custom label
+   *  — for serious non-delete actions like blocking a user. */
+  danger?: boolean;
   showDontAskAgain?: boolean;
 }
 
-export function ConfirmModal({ message, onConfirm, onCancel, confirmLabel, showDontAskAgain = true }: Props) {
+export function ConfirmModal({ message, onConfirm, onCancel, confirmLabel, danger, showDontAskAgain = true }: Props) {
   const { t } = useTranslation();
   const [dontShowAgain, setDontShowAgain] = useState(false);
 
   // No custom label → the default "delete" action, which gets danger styling.
-  const isDelete = confirmLabel === undefined;
+  // A custom label can still opt into danger styling via the `danger` prop.
+  const isDanger = confirmLabel === undefined || !!danger;
   const label = confirmLabel ?? t('actions.delete');
 
   const handleConfirm = () => {
@@ -51,7 +55,7 @@ export function ConfirmModal({ message, onConfirm, onCancel, confirmLabel, showD
           <div className="modal__actions">
             <button className="btn btn--ghost" onClick={onCancel}>{t('actions.cancel')}</button>
             <button
-              className={isDelete ? 'btn btn--danger' : 'btn btn--primary'}
+              className={isDanger ? 'btn btn--danger' : 'btn btn--primary'}
               onClick={handleConfirm}
             >
               {label}

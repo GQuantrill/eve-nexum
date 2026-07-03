@@ -50,7 +50,7 @@
     "switchTo": "{{name}}(으)로 전환",
     "focusLocation": "{{name}} 위치로 이동하고 경로 계산",
     "noLocation": "{{name}}의 알려진 위치 없음",
-    "linkFailedNotInCorp": "해당 캐릭터를 추가할 수 없습니다 — 군단에 속해 있지 않습니다.",
+    "linkFailedNotInCorp": "해당 캐릭터를 추가할 수 없습니다 — 승인된 코퍼레이션 또는 얼라이언스에 속해 있지 않습니다.",
     "linkFailed": "해당 캐릭터를 추가할 수 없습니다. 다시 시도해 주세요.",
     "remove": "제거",
     "removeCharacter": "{{name}} 제거",
@@ -109,7 +109,9 @@
       "loadFailed": "사용자를 불러오지 못했습니다",
       "roleChangeFailed": "권한 변경 실패",
       "blockChangeFailed": "차단 상태 변경 실패",
-      "recheckFailed": "다시 확인 실패"
+      "recheckFailed": "다시 확인 실패",
+      "searchPlaceholder": "멤버 검색…",
+      "noMatch": "\"{{query}}\"와 일치하는 멤버가 없습니다."
     },
     "maps": {
       "title": "지도",
@@ -247,6 +249,17 @@
       "noCorpMaps": "아직 군단 지도가 없습니다.",
       "colMap": "지도",
       "colExclude": "제외"
+    },
+    "roles": {
+      "button": "역할이란?",
+      "title": "각 역할이 할 수 있는 일",
+      "desc": {
+        "alliance_admin": "얼라이언스 전체를 완전히 관리 — 얼라이언스 맵과 모든 구성원의 역할을 관리합니다. 관리자(Admin)가 할 수 있는 모든 것을 포함합니다.",
+        "admin": "코퍼레이션 관리 — 자기 코퍼의 사용자 관리(역할 변경, 차단), 맵 잠금, 그리고 Full이 할 수 있는 모든 것.",
+        "full": "코퍼/얼라이언스 맵 생성, 삭제, 잠금과 모든 편집.",
+        "edit": "맵 편집 — 시스템, 연결, 시그니처, 구조물, 메모 — 하지만 맵을 생성, 삭제, 잠글 수는 없습니다.",
+        "readonly": "보기 전용. 맵을 볼 수 있지만 아무것도 변경할 수 없습니다."
+      }
     }
   },
   "proximityOptIn": {
@@ -279,11 +292,13 @@
     "type": "유형",
     "personal": "개인",
     "corp": "군단",
+    "alliance": "얼라이언스",
     "regionLabel": "지역 (선택 — 비워두면 빈 지도)",
     "regionPlaceholder": "지역을 검색하려면 입력하세요…",
     "clearRegion": "지역 지우기",
     "regionHint": "{{region}}에서 {{count}}개 성계를 생성하며, 게임 내 좌표에 따라 배치하고 모든 스타게이트 연결을 그립니다.",
     "corpLimit": "군단 지도 한도에 도달했습니다 ({{max}}).",
+    "allianceLimit": "얼라이언스 맵 한도에 도달했습니다 ({{max}}).",
     "personalLimit": "개인 지도 한도에 도달했습니다 ({{max}}).",
     "createFailed": "지도 생성 실패",
     "created": "{{region}}에서 “{{name}}” 생성됨",
@@ -1025,6 +1040,7 @@
     "mapType": {
       "shared": "공유",
       "corp": "군단",
+      "alliance": "얼라이언스",
       "solo": "개인"
     },
     "lockedTooltip": "지도가 잠겨 있습니다 — 성계와 연결이 동결되었습니다. 시그니처, 구조물, 노트는 여전히 편집할 수 있습니다.",
@@ -1083,17 +1099,17 @@
       "joinDiscord": "Nexum Discord 참여"
     },
     "errors": {
-      "not_in_corp": "당신의 캐릭터는 이 Nexum 인스턴스를 운영하는 군단의 구성원이 아닙니다. 접근은 군단 구성원으로 제한됩니다.",
+      "not_in_corp": "당신의 캐릭터는 이 Nexum 인스턴스에 접근이 허용된 코퍼레이션 또는 얼라이언스에 속해 있지 않습니다. 접근은 승인된 멤버로 제한됩니다.",
       "corp_check_failed": "ESI 오류로 인해 군단 구성원 여부를 확인할 수 없습니다. 잠시 후 다시 시도하세요.",
       "unknown": "알 수 없는 오류가 발생했습니다. 다시 시도하세요."
     },
     "sections": {
       "mapping": "지도 작성",
-      "personalCorp": "개인 및 군단 지도",
+      "personalCorp": "개인, 코퍼레이션 & 얼라이언스 맵",
       "sysIntel": "성계 인텔리전스",
       "liveOps": "실시간 작전",
       "productivity": "생산성 및 UX",
-      "forCorps": "군단용",
+      "forCorps": "코퍼레이션 & 얼라이언스용",
       "compare": "Nexum은 어떻게 비교되나요?",
       "languages": "당신의 언어로 제공됩니다",
       "discordCta": "질문, 아이디어 또는 버그가 있나요?",
@@ -1308,6 +1324,14 @@
       "multiCorp": {
         "title": "다중 군단 배포",
         "desc": "CORP_ID는 쉼표로 구분된 군단 ID 목록을 받습니다. 하나의 Nexum 인스턴스가 여러 군단을 호스팅할 수 있으며; CORP_MAP_SHARED=true가 아닌 한 각 군단의 지도는 자기 구성원으로 한정됩니다."
+      },
+      "allianceMaps": {
+        "title": "얼라이언스 전체 맵",
+        "desc": "ALLIANCE_ID는 코퍼레이션 위에 세 번째 맵 범위를 추가합니다. 얼라이언스의 모든 구성원이 볼 수 있는 얼라이언스 맵입니다. ALLIANCE_MAP_SHARED=true로 설정하면 여러 얼라이언스 연합에서 공유됩니다."
+      },
+      "allianceRoles": {
+        "title": "얼라이언스 관리자 역할",
+        "desc": "전용 alliance_admin 등급이 얼라이언스 전체의 얼라이언스 맵과 모든 구성원의 역할을 관리합니다 — 코퍼레이션 관리자의 상위. 얼라이언스 내 각 코퍼레이션은 CORP_ID 목록 없이도 자체 코퍼 전용 맵을 유지할 수 있습니다."
       },
       "adminDash": {
         "title": "관리 대시보드",
