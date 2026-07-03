@@ -715,80 +715,78 @@
 .toolbar {
   display: flex;
   align-items: center;
-  gap: 24px;
-  /* Sections are atomic (flex-shrink: 0), so when the row runs out of width
-     whole groups wrap to the next line rather than squishing or clipping —
-     this is what keeps the bar usable on vertical monitors / narrow laptops. */
+  gap: 10px;
+  /* Every control is an atomic flex item (flex-shrink: 0), so when the row runs
+     out of width items wrap to the next line rather than squishing, clipping, or
+     stacking — reordering can never produce an overlap. Keeps the bar usable on
+     vertical monitors / narrow laptops. */
   flex-wrap: wrap;
-  row-gap: 4px;
-  padding: 0 16px;
+  row-gap: 6px;
+  padding: 4px 16px;
   min-height: 48px;
   background: #0d1117;
   border-bottom: 1px solid #1e2740;
   flex-shrink: 0;
   /* Sits above the map sidebar (z-index 20) so tooltips dropping down from
-     toolbar buttons aren't clipped when the sidebar is open. The toolbar
-     header itself doesn't overlap the sidebar visually, so this is purely
-     about giving its absolutely-positioned descendants the right z-context. */
+     toolbar buttons aren't clipped when the sidebar is open. */
   z-index: 30;
   position: relative;
 }
 
-/* A reorderable group of toolbar controls (drag-and-drop via dnd-kit). Always
-   draggable — grab cursor by default; interactive children keep their own. */
-.toolbar__section {
+/* One movable toolbar item (drag-and-drop reorder via dnd-kit sortable). The
+   whole item is the drag handle — grab cursor by default; interactive children
+   keep their own, and the 6px pointer activation distance means a tap still
+   clicks through. Items sit in normal flex flow, never absolutely positioned,
+   so two can never occupy the same space. */
+.toolbar__item {
   display: flex;
   align-items: center;
   gap: 8px;
   flex-shrink: 0;
   cursor: grab;
-  padding: 2px 6px;
   border-radius: 6px;
-  /* Placed sections get position:absolute + left/top inline; the transform
-     (set inline) tracks the cursor 1:1 while dragging, so don't transition it. */
-  transition: background 0.12s;
   touch-action: none;
 }
-/* Hover chip + brighter grip = "this block is draggable". */
-.toolbar__section:hover { background: rgba(120, 150, 210, 0.08); }
-.toolbar__section--dragging { cursor: grabbing; opacity: 0.85; background: rgba(120, 150, 210, 0.12); }
-.toolbar__section button,
-.toolbar__section a,
-.toolbar__section .toolbar__char-system--clickable { cursor: pointer; }
-.toolbar__section input { cursor: text; }
+.toolbar__item--dragging { cursor: grabbing; }
+.toolbar__item button,
+.toolbar__item a,
+.toolbar__item .toolbar__char-system--clickable { cursor: pointer; }
+.toolbar__item input { cursor: text; }
 
-/* Six-dot drag grip: discoverable but quiet at rest, emphasised on hover/drag. */
-.toolbar__section-grip {
+/* Six-dot drag grip on every item: a persistent "this can be dragged" cue,
+   quiet at rest and emphasised on hover / while dragging. */
+.toolbar__item-grip {
   display: flex;
   align-items: center;
+  flex-shrink: 0;
   margin-right: -2px;
   color: #5a6886;
-  opacity: 0.3;
+  opacity: 0.45;
   transition: opacity 0.12s, color 0.12s;
 }
-.toolbar__section:hover .toolbar__section-grip { opacity: 0.85; color: #8a9bc4; }
-.toolbar__section--dragging .toolbar__section-grip { opacity: 1; color: #a9b8dc; }
+.toolbar__item:hover .toolbar__item-grip { opacity: 0.9; color: #8a9bc4; }
+.toolbar__item--dragging .toolbar__item-grip { opacity: 1; color: #a9b8dc; }
 
-/* Fixed account actions pinned to the far right (not part of the drag set).
-   align-self keeps them in the top row even when the bar grows for a 2nd row. */
-.toolbar__anchor-right {
+/* Groups several related controls inside a single movable item (e.g. the map
+   switcher + name field), keeping them together as one draggable unit. */
+.toolbar__group {
   display: flex;
   align-items: center;
   gap: 8px;
-  flex-shrink: 0;
-  margin-left: auto;
-  align-self: flex-start;
-  height: 48px;
 }
 
-/* Narrow screens (vertical monitors, smaller laptops): tighten the inter-section
-   gap so more fits per row before wrapping, and give the wrapped rows a little
-   vertical breathing room. The desktop 24px gap is untouched above 1600px. */
+/* The reset-layout affordance is pinned to the far right — it's a layout meta
+   action, not a movable item, and only appears once the layout is customised. */
+.toolbar__reset-layout {
+  margin-left: auto;
+  align-self: center;
+}
+
+/* Narrow screens (vertical monitors, smaller laptops): tighten the inter-item
+   gap so more fits per row before wrapping. */
 @media (max-width: 1600px) {
   .toolbar {
-    column-gap: 14px;
-    padding-top: 6px;
-    padding-bottom: 6px;
+    column-gap: 8px;
   }
 }
 
