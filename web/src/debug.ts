@@ -187,7 +187,7 @@ const nexumDebug = {
     import('./utils/debugFlags').then(({ getDebugFlag, setDebugFlag }) => {
       const next = typeof on === 'boolean' ? on : !getDebugFlag('showThreats');
       setDebugFlag('showThreats', next);
-      console.log(`[nexum] Show nearby threats: ${next ? 'ON — toolbar shows the nearest threat ignoring your alert threshold' : 'OFF — toolbar respects your alert threshold'}.`);
+      console.log(`[nexum] Show nearby threats: ${next ? 'ON — toolbar shows the nearest threat ignoring your alert threshold (a demo chip if none is detected)' : 'OFF — toolbar respects your alert threshold'}.`);
     });
   },
 
