@@ -117,6 +117,17 @@
   "admin": {
     "back": "Back to maps",
     "title": "Admin",
+    "roles": {
+      "button": "Roles?",
+      "title": "What each role can do",
+      "desc": {
+        "alliance_admin": "Full control across the entire alliance — manages alliance-scoped maps and every member's role. Includes everything an Admin can do.",
+        "admin": "Corp administration — manage your corp's users (change roles, block), lock maps, and everything Full can do.",
+        "full": "Create, delete and lock corp and alliance maps, in addition to all editing.",
+        "edit": "Edit maps — systems, connections, signatures, structures and notes — but can't create, delete or lock maps.",
+        "readonly": "View only. Can see maps but can't change anything."
+      }
+    },
     "tabs": {
       "users": "Users",
       "maps": "Maps",

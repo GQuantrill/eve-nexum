@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { timeAgo, jumps } from '../../i18n/format';
 import { useMapStore } from '../../store/mapStore';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth, formatRole } from '../../context/AuthContext';
 import { useOnlineStatus } from '../../hooks/useOnlineStatus';
 import { useCharacterLocation } from '../../hooks/useCharacterLocation';
 import { useCanEdit } from '../../hooks/useCanEdit';
@@ -604,9 +604,9 @@ export function Toolbar() {
             {(user.corpMode || user.allianceMode) && (
               <span
                 className={`role-badge role-badge--${user.role}`}
-                title={t('toolbar.role', { role: user.role })}
+                title={t('toolbar.role', { role: formatRole(user.role) })}
               >
-                {user.role}
+                {formatRole(user.role)}
               </span>
             )}
           </span>

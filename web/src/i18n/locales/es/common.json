@@ -247,6 +247,17 @@
       "noCorpMaps": "Aún no hay mapas de corp.",
       "colMap": "Mapa",
       "colExclude": "Excluir"
+    },
+    "roles": {
+      "button": "¿Roles?",
+      "title": "Qué puede hacer cada rol",
+      "desc": {
+        "alliance_admin": "Control total sobre toda la alianza: gestiona los mapas de alianza y el rol de cada miembro. Incluye todo lo que puede hacer un Admin.",
+        "admin": "Administración de corporación: gestiona los usuarios de tu corp (cambiar roles, bloquear), bloquea mapas y todo lo que puede Full.",
+        "full": "Crear, eliminar y bloquear mapas de corp y alianza, además de toda la edición.",
+        "edit": "Editar mapas: sistemas, conexiones, firmas, estructuras y notas, pero no crear, eliminar ni bloquear mapas.",
+        "readonly": "Solo lectura. Puede ver los mapas pero no cambiar nada."
+      }
     }
   },
   "proximityOptIn": {

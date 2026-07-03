@@ -247,6 +247,17 @@
       "noCorpMaps": "Aucune carte de corp pour l'instant.",
       "colMap": "Carte",
       "colExclude": "Exclure"
+    },
+    "roles": {
+      "button": "Rôles ?",
+      "title": "Ce que permet chaque rôle",
+      "desc": {
+        "alliance_admin": "Contrôle total sur toute l'alliance — gère les cartes d'alliance et le rôle de chaque membre. Inclut tout ce que peut faire un Admin.",
+        "admin": "Administration de corporation — gère les utilisateurs de votre corpo (changer les rôles, bloquer), verrouille les cartes et tout ce que peut faire Full.",
+        "full": "Créer, supprimer et verrouiller les cartes de corpo et d'alliance, en plus de toute l'édition.",
+        "edit": "Modifier les cartes — systèmes, connexions, signatures, structures et notes — mais pas créer, supprimer ni verrouiller de cartes.",
+        "readonly": "Lecture seule. Peut voir les cartes mais rien modifier."
+      }
     }
   },
   "proximityOptIn": {

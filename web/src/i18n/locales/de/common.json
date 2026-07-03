@@ -247,6 +247,17 @@
       "noCorpMaps": "Noch keine Corp-Karten.",
       "colMap": "Karte",
       "colExclude": "Ausschließen"
+    },
+    "roles": {
+      "button": "Rollen?",
+      "title": "Was jede Rolle darf",
+      "desc": {
+        "alliance_admin": "Volle Kontrolle über die gesamte Allianz — verwaltet allianzweite Karten und die Rolle jedes Mitglieds. Umfasst alles, was ein Admin kann.",
+        "admin": "Corp-Verwaltung — verwaltet die Nutzer der eigenen Corp (Rollen ändern, sperren), sperrt Karten und alles, was Full kann.",
+        "full": "Corp- und Allianzkarten erstellen, löschen und sperren, zusätzlich zur vollständigen Bearbeitung.",
+        "edit": "Karten bearbeiten — Systeme, Verbindungen, Signaturen, Strukturen und Notizen — aber keine Karten erstellen, löschen oder sperren.",
+        "readonly": "Nur Ansicht. Kann Karten sehen, aber nichts ändern."
+      }
     }
   },
   "proximityOptIn": {

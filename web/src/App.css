@@ -8335,6 +8335,27 @@ select.sig-toolbar-btn option {
 
 .admin-page__section-bar .admin-page__section-title { margin: 0; }
 
+/* Users-tab header: section title + the "Roles?" explainer button. */
+.admin-page__section-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.admin-page__section-head .admin-page__section-title { margin: 0; }
+
+/* Roles explainer modal: a badge + description per role. */
+.roles-modal { width: min(640px, 94vw); }
+.roles-info { margin: 0; display: flex; flex-direction: column; gap: 14px; }
+.roles-info__row { display: grid; grid-template-columns: 150px 1fr; gap: 16px; align-items: start; }
+.roles-info__row dt { margin: 0; }
+.roles-info__row dd {
+  margin: 0;
+  color: #b8c2d8;
+  font-size: calc(13px * var(--font-scale, 1));
+  line-height: 1.45;
+}
+
 .admin-page__section-bar--inline {
   margin-bottom: 8px;
 }

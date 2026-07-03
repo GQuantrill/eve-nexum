@@ -13,6 +13,16 @@ export function isAllianceAdminRole(role: Role): boolean {
   return role === 'alliance_admin';
 }
 
+// The canonical role order (highest tier first), for pickers and the roles
+// explainer. `readonly` is the default for a new member.
+export const ROLE_ORDER: Role[] = ['alliance_admin', 'admin', 'full', 'edit', 'readonly'];
+
+/** Human display label for a role id: 'alliance_admin' -> 'Alliance admin'. */
+export function formatRole(role: Role): string {
+  const spaced = role.replace(/_/g, ' ');
+  return spaced.charAt(0).toUpperCase() + spaced.slice(1);
+}
+
 export interface LastKnownSystem {
   id: number;
   name: string | null;
