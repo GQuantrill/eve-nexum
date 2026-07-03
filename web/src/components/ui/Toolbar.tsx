@@ -224,7 +224,7 @@ export function Toolbar() {
   const trackJumps      = useMapStore((s) => s.trackJumps);
   const setTrackJumps   = useMapStore((s) => s.setTrackJumps);
 
-  const atMapLimit      = maps.filter((m) => !m.isCorpMap).length >= maxMaps;
+  const atMapLimit      = maps.filter((m) => !m.isCorpMap && !m.isAllianceMap).length >= maxMaps;
   const atCorpMapLimit  = corpMapCount >= maxCorpMaps;
   const { user, logout } = useAuth();
   const canEdit       = useCanEdit();
@@ -334,10 +334,14 @@ export function Toolbar() {
               if (active.sharedWithMe) {
                 return <span className="toolbar__map-type toolbar__map-type--shared">{t('toolbar.mapType.shared')}</span>;
               }
-              if (!user?.corpMode) return null;
-              return active.isCorpMap
-                ? <span className="toolbar__map-type toolbar__map-type--corp">{t('toolbar.mapType.corp')}</span>
-                : <span className="toolbar__map-type toolbar__map-type--solo">{t('toolbar.mapType.solo')}</span>;
+              if (active.isAllianceMap) {
+                return <span className="toolbar__map-type toolbar__map-type--alliance">{t('toolbar.mapType.alliance')}</span>;
+              }
+              if (active.isCorpMap) {
+                return <span className="toolbar__map-type toolbar__map-type--corp">{t('toolbar.mapType.corp')}</span>;
+              }
+              if (!user?.corpMode && !user?.allianceMode) return null;
+              return <span className="toolbar__map-type toolbar__map-type--solo">{t('toolbar.mapType.solo')}</span>;
             })()}
             {mapName || t('toolbar.noMap')}
             <span className="toolbar__caret">▾</span>
@@ -356,10 +360,10 @@ export function Toolbar() {
           {showMaps && (
             <div className="map-dropdown" onMouseLeave={() => setShowMaps(false)}>
               {[...maps].sort((a, b) => {
-                // Three-tier ordering: own personal → corp → shared-with-me.
+                // Tier ordering: own personal → corp → alliance → shared-with-me.
                 // Inside a tier, alphabetical by name.
-                const aTier = a.sharedWithMe ? 2 : a.isCorpMap ? 1 : 0;
-                const bTier = b.sharedWithMe ? 2 : b.isCorpMap ? 1 : 0;
+                const tier = (m: typeof a) => m.sharedWithMe ? 3 : m.isAllianceMap ? 2 : m.isCorpMap ? 1 : 0;
+                const aTier = tier(a), bTier = tier(b);
                 if (aTier !== bTier) return aTier - bTier;
                 return a.name.localeCompare(b.name);
               }).map((m) => (
@@ -370,9 +374,10 @@ export function Toolbar() {
                 >
                   {m.sharedWithMe
                     ? <span className="map-dropdown__badge map-dropdown__badge--shared">{t('toolbar.mapType.shared')}</span>
-                    : user?.corpMode && !m.isCorpMap
+                    : (user?.corpMode || user?.allianceMode) && !m.isCorpMap && !m.isAllianceMap
                       ? <span className="map-dropdown__badge map-dropdown__badge--solo">{t('toolbar.mapType.solo')}</span>
                       : null}
+                  {!m.sharedWithMe && m.isAllianceMap && <span className="map-dropdown__badge map-dropdown__badge--alliance">{t('toolbar.mapType.alliance')}</span>}
                   {!m.sharedWithMe && m.isCorpMap && <span className="map-dropdown__badge map-dropdown__badge--corp">{t('toolbar.mapType.corp')}</span>}
                   {m.locked    && <span className="map-dropdown__badge map-dropdown__badge--lock">🔒</span>}
                   {m.name}
@@ -579,10 +584,10 @@ export function Toolbar() {
         <div className="toolbar__char-info">
           <span className="toolbar__char-name">
             {user.characterName}
-            {/* Role only matters in corp mode — in solo deployments every
-                user is implicitly admin of their own maps, so the badge
-                just adds noise. */}
-            {user.corpMode && (
+            {/* Role only matters in a restricted (corp/alliance) deployment —
+                in solo deployments every user is implicitly admin of their own
+                maps, so the badge just adds noise. */}
+            {(user.corpMode || user.allianceMode) && (
               <span
                 className={`role-badge role-badge--${user.role}`}
                 title={t('toolbar.role', { role: user.role })}

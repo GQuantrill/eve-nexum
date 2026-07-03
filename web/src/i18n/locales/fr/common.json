@@ -279,11 +279,13 @@
     "type": "Type",
     "personal": "Personnelle",
     "corp": "Corp",
+    "alliance": "Alliance",
     "regionLabel": "Région (optionnel — vide pour une carte vierge)",
     "regionPlaceholder": "Tapez pour rechercher des régions…",
     "clearRegion": "Effacer la région",
     "regionHint": "Génère {{count}} systèmes depuis {{region}}, positionnés selon leurs coordonnées en jeu avec tous les liens de portail stellaire.",
     "corpLimit": "Limite de cartes de corp atteinte ({{max}}).",
+    "allianceLimit": "Limite de cartes d'alliance atteinte ({{max}}).",
     "personalLimit": "Limite de cartes personnelles atteinte ({{max}}).",
     "createFailed": "Échec de la création de la carte",
     "created": "« {{name}} » créée depuis {{region}}",
@@ -1025,6 +1027,7 @@
     "mapType": {
       "shared": "Partagée",
       "corp": "Corp",
+      "alliance": "Alliance",
       "solo": "Solo"
     },
     "lockedTooltip": "La carte est verrouillée — les systèmes et connexions sont gelés. Les signatures, structures et notes restent modifiables.",

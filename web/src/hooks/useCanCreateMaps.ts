@@ -1,4 +1,4 @@
-import { useAuth } from '../context/AuthContext';
+import { useAuth, isAdminRole, isAllianceAdminRole } from '../context/AuthContext';
 
 // True when the current user is allowed to create / delete / lock maps. The
 // 'edit' role can mutate map contents but cannot manage map lifecycle —
@@ -8,5 +8,13 @@ import { useAuth } from '../context/AuthContext';
 export function useCanCreateMaps(): boolean {
   const user = useAuth().user;
   if (!user) return false;
-  return user.role === 'admin' || user.role === 'full';
+  return isAdminRole(user.role) || user.role === 'full';
+}
+
+// True when the user can create / manage ALLIANCE-scoped maps — the alliance
+// admin tier only, and only in an alliance-mode deployment.
+export function useCanManageAllianceMaps(): boolean {
+  const user = useAuth().user;
+  if (!user) return false;
+  return user.allianceMode && isAllianceAdminRole(user.role);
 }

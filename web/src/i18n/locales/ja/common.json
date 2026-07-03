@@ -279,11 +279,13 @@
     "type": "タイプ",
     "personal": "個人",
     "corp": "コーポ",
+    "alliance": "アライアンス",
     "regionLabel": "リージョン（任意 — 空にすると空のマップ）",
     "regionPlaceholder": "入力してリージョンを検索…",
     "clearRegion": "リージョンをクリア",
     "regionHint": "{{region}} から {{count}} 個の星系を生成し、ゲーム内座標に従って配置し、すべてのスターゲート接続を描画します。",
     "corpLimit": "コーポマップの上限に達しました（{{max}}）。",
+    "allianceLimit": "アライアンスマップの上限に達しました ({{max}})。",
     "personalLimit": "個人マップの上限に達しました（{{max}}）。",
     "createFailed": "マップの作成に失敗しました",
     "created": "{{region}} から「{{name}}」を作成しました",
@@ -1025,6 +1027,7 @@
     "mapType": {
       "shared": "共有",
       "corp": "コーポ",
+      "alliance": "アライアンス",
       "solo": "ソロ"
     },
     "lockedTooltip": "マップはロックされています — 星系と接続は凍結されています。シグネチャ、ストラクチャ、メモは引き続き編集できます。",

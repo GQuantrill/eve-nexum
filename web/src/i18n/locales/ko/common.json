@@ -279,11 +279,13 @@
     "type": "유형",
     "personal": "개인",
     "corp": "군단",
+    "alliance": "얼라이언스",
     "regionLabel": "지역 (선택 — 비워두면 빈 지도)",
     "regionPlaceholder": "지역을 검색하려면 입력하세요…",
     "clearRegion": "지역 지우기",
     "regionHint": "{{region}}에서 {{count}}개 성계를 생성하며, 게임 내 좌표에 따라 배치하고 모든 스타게이트 연결을 그립니다.",
     "corpLimit": "군단 지도 한도에 도달했습니다 ({{max}}).",
+    "allianceLimit": "얼라이언스 맵 한도에 도달했습니다 ({{max}}).",
     "personalLimit": "개인 지도 한도에 도달했습니다 ({{max}}).",
     "createFailed": "지도 생성 실패",
     "created": "{{region}}에서 “{{name}}” 생성됨",
@@ -1025,6 +1027,7 @@
     "mapType": {
       "shared": "공유",
       "corp": "군단",
+      "alliance": "얼라이언스",
       "solo": "개인"
     },
     "lockedTooltip": "지도가 잠겨 있습니다 — 성계와 연결이 동결되었습니다. 시그니처, 구조물, 노트는 여전히 편집할 수 있습니다.",

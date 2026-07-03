@@ -1,6 +1,18 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { api } from '../api/client';
 
+// Role tiers, low to high: readonly < edit < full < admin < alliance_admin.
+export type Role = 'alliance_admin' | 'admin' | 'full' | 'edit' | 'readonly';
+
+/** True for corp admin OR alliance admin — every admin capability. */
+export function isAdminRole(role: Role): boolean {
+  return role === 'admin' || role === 'alliance_admin';
+}
+/** True only for the alliance admin tier. */
+export function isAllianceAdminRole(role: Role): boolean {
+  return role === 'alliance_admin';
+}
+
 export interface LastKnownSystem {
   id: number;
   name: string | null;
@@ -13,7 +25,7 @@ export interface AccountCharacter {
   id: number;                 // users.id
   characterId: number;        // EVE character id (for the portrait)
   characterName: string;
-  role: 'admin' | 'full' | 'edit' | 'readonly';
+  role: Role;
   corpId: number | null;
   blocked: boolean;
   lastKnownSystemId: number | null;
@@ -26,8 +38,9 @@ export interface AuthUser {
   id: number;
   characterId: number;
   characterName: string;
-  role: 'admin' | 'full' | 'edit' | 'readonly';
+  role: Role;
   corpMode: boolean;
+  allianceMode: boolean;
   /** Account (human) this character belongs to; groups all linked alts. */
   ownerId: number | null;
   /** Every character linked to this account, for the switcher. */

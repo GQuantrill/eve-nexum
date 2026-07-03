@@ -317,11 +317,13 @@
     "type": "Type",
     "personal": "Personal",
     "corp": "Corp",
+    "alliance": "Alliance",
     "regionLabel": "Region (optional — blank for an empty map)",
     "regionPlaceholder": "Type to search regions…",
     "clearRegion": "Clear region",
     "regionHint": "Seeds {{count}} systems from {{region}}, positioned by their in-game coordinates with all stargate links.",
     "corpLimit": "Corp map limit reached ({{max}}).",
+    "allianceLimit": "Alliance map limit reached ({{max}}).",
     "personalLimit": "Personal map limit reached ({{max}}).",
     "createFailed": "Failed to create map",
     "created": "Created \"{{name}}\" from {{region}}",
@@ -1078,6 +1080,7 @@
     "mapType": {
       "shared": "Shared",
       "corp": "Corp",
+      "alliance": "Alliance",
       "solo": "Solo"
     },
     "lockedTooltip": "Map is locked — systems and connections are frozen. Signatures, structures, and notes can still be edited.",

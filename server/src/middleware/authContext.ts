@@ -5,7 +5,25 @@ import type { Request } from 'express';
 // off req.session directly; getMapAccess + the role gates now go through
 // authUser() so an API-key request — which has no session — resolves to the
 // same fields and every existing check works unchanged.
-export type Role = 'admin' | 'full' | 'edit' | 'readonly';
+// Role tiers, low to high: readonly < edit < full < admin < alliance_admin.
+// `alliance_admin` is a strict superset of `admin` — the difference is REACH
+// (the whole alliance vs a single corp), not editing capability. Use the
+// isAdmin/isAllianceAdmin helpers below rather than bare `=== 'admin'` so
+// alliance admins inherit every admin capability.
+export type Role = 'alliance_admin' | 'admin' | 'full' | 'edit' | 'readonly';
+
+// True for any identity with admin capability (corp admin OR alliance admin):
+// lock bypass, corp-map lifecycle, admin tooling. NOT a scope check — see
+// isAllianceAdmin for the alliance-only powers.
+export function isAdmin(role: Role): boolean {
+  return role === 'admin' || role === 'alliance_admin';
+}
+
+// True only for alliance admins: the alliance-only powers (create/manage
+// alliance maps, manage roles across the whole alliance, grant alliance_admin).
+export function isAllianceAdmin(role: Role): boolean {
+  return role === 'alliance_admin';
+}
 
 export interface AuthUser {
   userId:        number;          // users.id of the acting (bound) character
@@ -14,6 +32,7 @@ export interface AuthUser {
   ownerId:       number | null;   // account/owner the maps are scoped to
   role:          Role;
   corpId:        number | null;
+  allianceId:    number | null;   // the acting character's alliance (for alliance-scoped access)
   /** Present only for API-key requests; the key's scope. */
   apiScope?:     ApiScope;
 }
@@ -42,5 +61,6 @@ export function authUser(req: Request): AuthUser {
     ownerId:       req.session.ownerId ?? null,
     role:          req.session.role ?? 'readonly',
     corpId:        req.session.userCorpId ?? null,
+    allianceId:    req.session.userAllianceId ?? null,
   };
 }

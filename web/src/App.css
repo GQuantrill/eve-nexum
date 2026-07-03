@@ -1407,6 +1407,7 @@
 }
 .toolbar__map-type--solo { background: rgba(74,222,128,0.12); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
 .toolbar__map-type--corp { background: rgba(100,160,255,0.15); color: #7ab0f0; border: 1px solid rgba(100,160,255,0.3); }
+.toolbar__map-type--alliance { background: rgba(245,166,35,0.15); color: #f5a623; border: 1px solid rgba(245,166,35,0.3); }
 .toolbar__map-type--shared { background: rgba(192,132,252,0.15); color: #c084fc; border: 1px solid rgba(192,132,252,0.3); }
 
 .toolbar__locked-chip {
@@ -1531,6 +1532,7 @@
 }
 .map-dropdown__badge--solo { background: rgba(74,222,128,0.12); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
 .map-dropdown__badge--corp { background: rgba(100,160,255,0.15); color: #7ab0f0; border: 1px solid rgba(100,160,255,0.3); }
+.map-dropdown__badge--alliance { background: rgba(245,166,35,0.15); color: #f5a623; border: 1px solid rgba(245,166,35,0.3); }
 .map-dropdown__badge--shared { background: rgba(192,132,252,0.15); color: #c084fc; border: 1px solid rgba(192,132,252,0.3); }
 .map-dropdown__badge--lock { background: transparent; border: none; font-size: calc(12px * var(--font-scale, 1)); }
 
@@ -8021,6 +8023,7 @@ select.sig-toolbar-btn option {
   border: 1px solid transparent;
 }
 
+.role-badge--alliance_admin { background: #3a2c12; color: #f5c26b; border-color: #6a4e1e; }
 .role-badge--admin    { background: #3a1c2a; color: #f0a8c0; border-color: #6a2e48; }
 .role-badge--full     { background: #1a2a4a; color: #7ab4f0; border-color: #2e5a9a; }
 .role-badge--edit     { background: #1a2e1a; color: #8ad08a; border-color: #2e5a2e; }

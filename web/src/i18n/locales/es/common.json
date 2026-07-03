@@ -279,11 +279,13 @@
     "type": "Tipo",
     "personal": "Personal",
     "corp": "Corp",
+    "alliance": "Alianza",
     "regionLabel": "Región (opcional — vacío para un mapa en blanco)",
     "regionPlaceholder": "Escribe para buscar regiones…",
     "clearRegion": "Borrar región",
     "regionHint": "Genera {{count}} sistemas desde {{region}}, posicionados según sus coordenadas en el juego con todos los enlaces de puerta estelar.",
     "corpLimit": "Límite de mapas de corp alcanzado ({{max}}).",
+    "allianceLimit": "Límite de mapas de alianza alcanzado ({{max}}).",
     "personalLimit": "Límite de mapas personales alcanzado ({{max}}).",
     "createFailed": "No se pudo crear el mapa",
     "created": "«{{name}}» creado desde {{region}}",
@@ -1025,6 +1027,7 @@
     "mapType": {
       "shared": "Compartido",
       "corp": "Corp",
+      "alliance": "Alianza",
       "solo": "Solo"
     },
     "lockedTooltip": "El mapa está bloqueado — sistemas y conexiones congelados. Las firmas, estructuras y notas aún se pueden editar.",

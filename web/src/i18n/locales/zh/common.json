@@ -279,11 +279,13 @@
     "type": "类型",
     "personal": "个人",
     "corp": "军团",
+    "alliance": "联盟",
     "regionLabel": "星域（可选 — 留空则为空地图）",
     "regionPlaceholder": "输入以搜索星域…",
     "clearRegion": "清除星域",
     "regionHint": "从 {{region}} 生成 {{count}} 个星系，按其游戏内坐标定位，并绘制所有星门连接。",
     "corpLimit": "已达到军团地图上限（{{max}}）。",
+    "allianceLimit": "已达到联盟地图上限 ({{max}})。",
     "personalLimit": "已达到个人地图上限（{{max}}）。",
     "createFailed": "创建地图失败",
     "created": "已从 {{region}} 创建「{{name}}」",
@@ -1025,6 +1027,7 @@
     "mapType": {
       "shared": "共享",
       "corp": "军团",
+      "alliance": "联盟",
       "solo": "个人"
     },
     "lockedTooltip": "地图已锁定 — 星系和连接已冻结。信号、建筑和笔记仍可编辑。",

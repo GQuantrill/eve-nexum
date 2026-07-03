@@ -4,8 +4,10 @@ import { useTranslation } from 'react-i18next';
 import { XIcon } from '@phosphor-icons/react';
 import { api } from '../../api/client';
 import { useMapStore } from '../../store/mapStore';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth, isAdminRole, isAllianceAdminRole } from '../../context/AuthContext';
 import { toast } from './Toaster';
+
+type MapScope = 'personal' | 'corp' | 'alliance';
 
 interface Region {
   id: number;
@@ -23,21 +25,27 @@ const MAX_REGION_RESULTS = 8;
 // "+ Personal/Corp Map" buttons and the name PromptModal.
 export function CreateMapModal({ onClose }: { onClose: () => void }) {
   const { t } = useTranslation();
-  const maps         = useMapStore((s) => s.maps);
-  const maxMaps      = useMapStore((s) => s.maxMaps);
-  const maxCorpMaps  = useMapStore((s) => s.maxCorpMaps);
-  const corpMapCount = useMapStore((s) => s.corpMapCount);
+  const maps             = useMapStore((s) => s.maps);
+  const maxMaps          = useMapStore((s) => s.maxMaps);
+  const maxCorpMaps      = useMapStore((s) => s.maxCorpMaps);
+  const corpMapCount     = useMapStore((s) => s.corpMapCount);
+  const maxAllianceMaps  = useMapStore((s) => s.maxAllianceMaps);
+  const allianceMapCount = useMapStore((s) => s.allianceMapCount);
   const createMap        = useMapStore((s) => s.createMap);
   const createFromRegion = useMapStore((s) => s.createFromRegion);
   const { user } = useAuth();
 
-  const canCorp = !!user?.corpMode && (user?.role === 'full' || user?.role === 'admin');
-  const atPersonalLimit = maps.filter((m) => !m.isCorpMap).length >= maxMaps;
+  const canCorp     = !!user?.corpMode && (user?.role === 'full' || (!!user && isAdminRole(user.role)));
+  const canAlliance = !!user?.allianceMode && !!user && isAllianceAdminRole(user.role);
+  const atPersonalLimit = maps.filter((m) => !m.isCorpMap && !m.isAllianceMap).length >= maxMaps;
   const atCorpLimit     = corpMapCount >= maxCorpMaps;
+  const atAllianceLimit = allianceMapCount >= maxAllianceMaps;
 
   const [name, setName]   = useState('');
   const [nameTouched, setNameTouched] = useState(false);
-  const [isCorp, setIsCorp] = useState(false);
+  const [scope, setScope] = useState<MapScope>('personal');
+  const isCorp     = scope === 'corp';
+  const isAlliance = scope === 'alliance';
 
   const [regions, setRegions] = useState<Region[]>([]);
   const [query, setQuery]     = useState('');
@@ -72,7 +80,7 @@ export function CreateMapModal({ onClose }: { onClose: () => void }) {
     setQuery('');
   }
 
-  const limitForChoice = isCorp ? atCorpLimit : atPersonalLimit;
+  const limitForChoice = isAlliance ? atAllianceLimit : isCorp ? atCorpLimit : atPersonalLimit;
   const canSubmit = !busy && name.trim().length > 0 && !limitForChoice;
 
   async function submit() {
@@ -82,10 +90,10 @@ export function CreateMapModal({ onClose }: { onClose: () => void }) {
     try {
       const trimmed = name.trim();
       if (region) {
-        await createFromRegion(region.id, trimmed, isCorp);
+        await createFromRegion(region.id, trimmed, isCorp, isAlliance);
         toast.success(t('createMap.created', { name: trimmed, region: region.name }));
       } else {
-        await createMap(trimmed, isCorp);
+        await createMap(trimmed, isCorp, isAlliance);
       }
       onClose();
     } catch (e) {
@@ -118,12 +126,13 @@ export function CreateMapModal({ onClose }: { onClose: () => void }) {
             />
           </label>
 
-          {canCorp && (
+          {(canCorp || canAlliance) && (
             <label className="field">
               <span>{t('createMap.type')}</span>
-              <select value={isCorp ? 'corp' : 'personal'} onChange={(e) => setIsCorp(e.target.value === 'corp')}>
+              <select value={scope} onChange={(e) => setScope(e.target.value as MapScope)}>
                 <option value="personal">{t('createMap.personal')}</option>
-                <option value="corp">{t('createMap.corp')}</option>
+                {canCorp && <option value="corp">{t('createMap.corp')}</option>}
+                {canAlliance && <option value="alliance">{t('createMap.alliance')}</option>}
               </select>
             </label>
           )}
@@ -173,7 +182,11 @@ export function CreateMapModal({ onClose }: { onClose: () => void }) {
           )}
           {limitForChoice && (
             <div className="map-sidebar__hint map-sidebar__hint--error">
-              {isCorp ? t('createMap.corpLimit', { max: maxCorpMaps }) : t('createMap.personalLimit', { max: maxMaps })}
+              {isAlliance
+                ? t('createMap.allianceLimit', { max: maxAllianceMaps })
+                : isCorp
+                  ? t('createMap.corpLimit', { max: maxCorpMaps })
+                  : t('createMap.personalLimit', { max: maxMaps })}
             </div>
           )}
           {error && <div className="map-sidebar__hint map-sidebar__hint--error">{error}</div>}

@@ -3,7 +3,7 @@ import { charPortrait } from '../../utils/eveImages';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { api } from '../../api/client';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth, isAdminRole, isAllianceAdminRole } from '../../context/AuthContext';
 import { useHashRoute } from '../../hooks/useHashRoute';
 import { useUserSetting } from '../../hooks/useUserSetting';
 import { cssVarToHex } from '../../utils/cssVar';
@@ -20,8 +20,8 @@ import { CaretUpIcon, CaretDownIcon } from '@phosphor-icons/react';
 // Register only the chart pieces we actually use — keeps the bundle lean.
 ChartJS.register(ArcElement, CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend, Filler);
 
-type Role = 'admin' | 'full' | 'edit' | 'readonly';
-const ROLES: Role[] = ['admin', 'full', 'edit', 'readonly'];
+type Role = 'alliance_admin' | 'admin' | 'full' | 'edit' | 'readonly';
+const ROLES: Role[] = ['alliance_admin', 'admin', 'full', 'edit', 'readonly'];
 
 type Tab = 'users' | 'maps' | 'reports' | 'audit' | 'discord';
 
@@ -37,7 +37,7 @@ export function AdminPage() {
   const { t } = useTranslation();
   const [path, navigate] = useHashRoute();
   const { user } = useAuth();
-  const isAdmin = user?.role === 'admin';
+  const isAdmin = !!user && isAdminRole(user.role);
   const canSeeReports = !!user?.canViewReports;
   const tabs = useMemo(
     () => ALL_TABS.filter((t) => {
@@ -157,7 +157,9 @@ function compareUsers(a: AdminUser, b: AdminUser, sort: UserSort): number {
 function UsersTab() {
   const { t } = useTranslation();
   const { user: self } = useAuth();
-  const canEdit = self?.role === 'admin';
+  const canEdit = !!self && isAdminRole(self.role);
+  // Only an alliance admin may hand out (or modify) the alliance_admin tier.
+  const canGrantAllianceAdmin = !!self && isAllianceAdminRole(self.role);
   const [users, setUsers]     = useState<AdminUser[] | null>(null);
   const [error, setError]     = useState<string | null>(null);
   const [busyId, setBusyId]   = useState<number | null>(null);
@@ -283,10 +285,14 @@ function UsersTab() {
                       <select
                         className="admin-modal__role-select"
                         value={u.role}
-                        disabled={isBusy || isSelf}
+                        // A non-alliance-admin can't touch an alliance admin's
+                        // role, nor grant the tier (matches the server guard).
+                        disabled={isBusy || isSelf || (u.role === 'alliance_admin' && !canGrantAllianceAdmin)}
                         onChange={(e) => changeRole(u, e.target.value as Role)}
                       >
-                        {ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
+                        {ROLES
+                          .filter((r) => r !== 'alliance_admin' || canGrantAllianceAdmin)
+                          .map((r) => <option key={r} value={r}>{r}</option>)}
                       </select>
                     ) : (
                       <span className="admin-modal__mono">{u.role}</span>

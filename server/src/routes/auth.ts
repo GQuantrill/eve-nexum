@@ -163,7 +163,7 @@ authRouter.get('/callback', async (req, res) => {
     try {
       const esiChar = await esiFetch(`https://esi.evetech.net/v4/characters/${characterId}/`);
       if (!esiChar.ok) {
-        if (config.corpMode) {
+        if (config.restrictedMode) {
           res.redirect(failUrl('corp_check_failed'));
           return;
         }
@@ -173,13 +173,18 @@ authRouter.get('/callback', async (req, res) => {
         const charData = await esiChar.json() as { corporation_id: number; alliance_id?: number };
         userCorpId     = charData.corporation_id;
         userAllianceId = charData.alliance_id ?? null;
-        if (config.corpMode && !config.corpIds.includes(userCorpId)) {
+        // Restricted deployment: admit the character if EITHER their corp is in
+        // CORP_ID or their alliance is in ALLIANCE_ID. Lets a whole alliance be
+        // permitted without listing every member corp.
+        const corpPermitted     = config.corpIds.includes(userCorpId);
+        const alliancePermitted = userAllianceId != null && config.allianceIds.includes(userAllianceId);
+        if (config.restrictedMode && !corpPermitted && !alliancePermitted) {
           res.redirect(failUrl('not_in_corp'));
           return;
         }
       }
     } catch {
-      if (config.corpMode) {
+      if (config.restrictedMode) {
         res.redirect(failUrl('corp_check_failed'));
         return;
       }
@@ -188,14 +193,15 @@ authRouter.get('/callback', async (req, res) => {
     const expiresAt = new Date(Date.now() + tokens.expires_in * 1000);
 
     // Role policy:
-    //   - Solo mode (no CORP_ID set): no admin tooling matters because there
-    //     are no other users to manage. Default everyone to 'admin' and
-    //     force-upgrade existing rows on every login — otherwise users that
-    //     signed up while corp mode was on stay stuck at readonly.
-    //   - Corp mode: ADMIN_CHAR_ID is always pinned to admin; other new
-    //     users default to readonly so an admin has to promote them.
+    //   - Solo mode (no CORP_ID / ALLIANCE_ID set): no admin tooling matters
+    //     because there are no other users to manage. Default everyone to
+    //     'admin' and force-upgrade existing rows on every login.
+    //   - Restricted mode: ADMIN_CHAR_ID is pinned to the deployment's top tier
+    //     (alliance_admin when alliance mode is on, else admin); other new users
+    //     default to readonly so an admin has to promote them.
     const isAdminChar = characterId === config.adminCharId;
-    const defaultRole = (!config.corpMode || isAdminChar) ? 'admin' : 'readonly';
+    const bootstrapRole = config.allianceMode ? 'alliance_admin' : 'admin';
+    const defaultRole = !config.restrictedMode ? 'admin' : isAdminChar ? bootstrapRole : 'readonly';
 
     const { rows } = await db.query<{ id: number; role: string; blocked: boolean }>(
       `INSERT INTO users (character_id, character_name, access_token, refresh_token, token_expires_at, role, corp_id, alliance_id, last_login_at)
@@ -209,20 +215,20 @@ authRouter.get('/callback', async (req, res) => {
          corp_id          = COALESCE($8::int,  users.corp_id),
          alliance_id      = COALESCE($10::int, users.alliance_id),
          role             = CASE
-           -- ADMIN_CHAR_ID is always pinned to admin regardless of mode
-           WHEN $7::int IS NOT NULL AND users.character_id = $7::int THEN 'admin'
-           -- Solo mode: everyone is admin (roles are meaningless without corp scope)
+           -- ADMIN_CHAR_ID is always pinned to the deployment's top tier
+           WHEN $7::int IS NOT NULL AND users.character_id = $7::int THEN $11
+           -- Solo mode: everyone is admin (roles are meaningless without scope)
            WHEN $9::bool THEN 'admin'
            ELSE users.role
          END,
          updated_at       = NOW()
        RETURNING id, role, blocked`,
       [characterId, jwtPayload.name, encryptToken(tokens.access_token), encryptToken(tokens.refresh_token), expiresAt,
-       defaultRole, config.adminCharId, userCorpId, !config.corpMode, userAllianceId],
+       defaultRole, config.adminCharId, userCorpId, !config.restrictedMode, userAllianceId, bootstrapRole],
     );
 
     const userId = rows[0].id;
-    const role   = rows[0].role as 'admin' | 'full' | 'edit' | 'readonly';
+    const role   = rows[0].role as 'alliance_admin' | 'admin' | 'full' | 'edit' | 'readonly';
 
     // Blocked users can never sign in. ADMIN_CHAR_ID is the safety hatch:
     // it can't be blocked by the role/block flow, but if the DB row somehow
@@ -292,6 +298,7 @@ authRouter.get('/callback', async (req, res) => {
     req.session.characterName = jwtPayload.name;
     req.session.role          = role;
     req.session.userCorpId    = userCorpId;
+    req.session.userAllianceId = userAllianceId;
     req.session.ownerId       = ownerId;
     req.session.prefs         = {
       compactMode: p?.compact_mode ?? false,
@@ -429,7 +436,7 @@ authRouter.get('/me', async (req, res) => {
       uiSettings:  row?.ui_settings ?? {},
       panelOrder:  row?.panel_order  ?? ['notes', 'signatures'],
     };
-    role = (row?.role as 'admin' | 'full' | 'edit' | 'readonly') ?? 'readonly';
+    role = (row?.role as 'alliance_admin' | 'admin' | 'full' | 'edit' | 'readonly') ?? 'readonly';
     req.session.prefs = prefs;
     req.session.role  = role;
   }
@@ -484,6 +491,7 @@ authRouter.get('/me', async (req, res) => {
       characters,
       lastKnownSystem,
       corpMode:      config.corpMode,
+      allianceMode:  config.allianceMode,
       compactMode:   prefs.compactMode,
       snapToGrid:    prefs.snapToGrid,
       showMinimap:   prefs.showMinimap,

@@ -40,10 +40,11 @@ apiV1Router.use((req: Request, res: Response, next: NextFunction) => {
 apiV1Router.get('/maps', async (req, res) => {
   const me = authUser(req);
   const maps = await listVisibleMaps({
-    userId:     me.userId,
-    ownerId:    me.ownerId,
-    userCorpId: me.corpId,
-    callerChar: me.characterId,
+    userId:         me.userId,
+    ownerId:        me.ownerId,
+    userCorpId:     me.corpId,
+    userAllianceId: me.allianceId,
+    callerChar:     me.characterId,
   });
   res.json({ maps });
 });

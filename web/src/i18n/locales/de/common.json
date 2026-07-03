@@ -279,11 +279,13 @@
     "type": "Typ",
     "personal": "Persönlich",
     "corp": "Corp",
+    "alliance": "Allianz",
     "regionLabel": "Region (optional — leer für eine leere Karte)",
     "regionPlaceholder": "Zum Suchen tippen…",
     "clearRegion": "Region löschen",
     "regionHint": "Erstellt {{count}} Systeme aus {{region}}, positioniert nach ihren Ingame-Koordinaten mit allen Stargate-Verbindungen.",
     "corpLimit": "Corp-Kartenlimit erreicht ({{max}}).",
+    "allianceLimit": "Allianz-Karten-Limit erreicht ({{max}}).",
     "personalLimit": "Persönliches Kartenlimit erreicht ({{max}}).",
     "createFailed": "Karte konnte nicht erstellt werden",
     "created": "\"{{name}}\" aus {{region}} erstellt",
@@ -1025,6 +1027,7 @@
     "mapType": {
       "shared": "Geteilt",
       "corp": "Corp",
+      "alliance": "Allianz",
       "solo": "Solo"
     },
     "lockedTooltip": "Karte ist gesperrt — Systeme und Verbindungen sind eingefroren. Signaturen, Strukturen und Notizen können weiterhin bearbeitet werden.",

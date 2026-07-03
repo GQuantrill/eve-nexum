@@ -1,4 +1,4 @@
-import { useAuth } from '../context/AuthContext';
+import { useAuth, isAdminRole } from '../context/AuthContext';
 import { useMapStore } from '../store/mapStore';
 
 // Looser sibling of useCanEdit: returns true for write access *ignoring*
@@ -7,10 +7,11 @@ import { useMapStore } from '../store/mapStore';
 // changes (system add/move/delete, connection edits) still go through
 // useCanEdit and remain blocked.
 export function useCanEditContent(): boolean {
-  const user      = useAuth().user;
-  const isCorpMap = useMapStore((s) => !!s.map.isCorpMap);
+  const user          = useAuth().user;
+  const isCorpMap     = useMapStore((s) => !!s.map.isCorpMap);
+  const isAllianceMap = useMapStore((s) => !!s.map.isAllianceMap);
 
   if (!user) return false;
-  if (!isCorpMap) return true;
-  return user.role === 'admin' || user.role === 'full' || user.role === 'edit';
+  if (!isCorpMap && !isAllianceMap) return true;
+  return isAdminRole(user.role) || user.role === 'full' || user.role === 'edit';
 }
