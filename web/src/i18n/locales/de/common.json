@@ -1105,7 +1105,7 @@
     },
     "sections": {
       "mapping": "Kartierung",
-      "personalCorp": "Persönliche & Corp-Karten",
+      "personalCorp": "Persönliche, Corp- & Allianzkarten",
       "sysIntel": "System-Informationen",
       "liveOps": "Live-Ops",
       "productivity": "Produktivität & UX",

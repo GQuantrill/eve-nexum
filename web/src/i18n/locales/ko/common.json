@@ -1105,7 +1105,7 @@
     },
     "sections": {
       "mapping": "지도 작성",
-      "personalCorp": "개인 및 군단 지도",
+      "personalCorp": "개인, 코퍼레이션 & 얼라이언스 맵",
       "sysIntel": "성계 인텔리전스",
       "liveOps": "실시간 작전",
       "productivity": "생산성 및 UX",

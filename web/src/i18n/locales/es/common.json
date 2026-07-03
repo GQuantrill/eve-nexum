@@ -1105,7 +1105,7 @@
     },
     "sections": {
       "mapping": "Cartografía",
-      "personalCorp": "Mapas personales y de corp",
+      "personalCorp": "Mapas personales, de corp y de alianza",
       "sysIntel": "Inteligencia de sistemas",
       "liveOps": "Operaciones en vivo",
       "productivity": "Productividad y UX",
