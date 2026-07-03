@@ -343,6 +343,17 @@
         "sibling_groups": null,
         "typeID": 34372
     },
+    "C729": {
+        "mass_regen": 0,
+        "dest": "pochven",
+        "src": [],
+        "static": false,
+        "max_mass_per_jump": 1000000000,
+        "lifetime": 0,
+        "total_mass": 720,
+        "sibling_groups": null,
+        "typeID": 56026
+    },
     "F216": {
         "mass_regen": 0,
         "dest": "pochven",

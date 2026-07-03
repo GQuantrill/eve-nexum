@@ -152,11 +152,16 @@ async function loadSpecs(): Promise<Record<string, WormholeSpec>> {
     }
 
     log.info(`Loaded ${Object.keys(out).length} wormhole type specs (derived from SDE dogma + curated src)`);
-    if (newCodes.length) {
-      log.warn(`${newCodes.length} WH code(s) in the SDE have no curated src yet (showing with src: []): ${newCodes.join(', ')}`);
+    // Dedupe before reporting: a single WH code can have many SDE item types
+    // (e.g. C729 has 27 Pochven variants), which would otherwise repeat the code
+    // once per row in these warnings.
+    const uniqNew = [...new Set(newCodes)];
+    if (uniqNew.length) {
+      log.warn(`${uniqNew.length} WH code(s) in the SDE have no curated src yet (showing with src: []): ${uniqNew.join(', ')}`);
     }
-    if (unmapped.length) {
-      log.warn(`${unmapped.length} WH type(s) have an unmapped destination class (skipped): ${unmapped.join(', ')}`);
+    const uniqUnmapped = [...new Set(unmapped)];
+    if (uniqUnmapped.length) {
+      log.warn(`${uniqUnmapped.length} WH type(s) have an unmapped destination class (skipped): ${uniqUnmapped.join(', ')}`);
     }
 
     cache = out;
