@@ -4100,7 +4100,18 @@ div.system-node__easy-handle {
 
 .chains-new { display: flex; flex-direction: column; gap: 6px; }
 .system-combo { width: 100%; }
-.chains-new__name { width: 100%; }
+.chains-new__name {
+  width: 100%;
+  background: #111827;
+  border: 1px solid #1e2740;
+  border-radius: 5px;
+  color: #e2e8f8;
+  font-size: calc(13px * var(--font-scale, 1));
+  padding: 7px 10px;
+  outline: none;
+  box-sizing: border-box;
+}
+.chains-new__name:focus { border-color: #2e4a7a; }
 
 .chains-empty {
   font-size: calc(12px * var(--font-scale, 1));
