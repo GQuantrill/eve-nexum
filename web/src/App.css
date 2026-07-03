@@ -5414,6 +5414,8 @@ select.sig-toolbar-btn option {
   cursor: pointer;
   transition: border-color 0.15s ease;
 }
+/* Flag-only variant (logged-in toolbar): tighter padding, no gap. */
+.lang-switcher__trigger--compact { gap: 0; padding: 4px 6px; }
 .lang-switcher__trigger:hover { border-color: #4d9de0; }
 .lang-switcher__trigger:focus-visible {
   outline: none;

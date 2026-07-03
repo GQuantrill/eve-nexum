@@ -7,7 +7,9 @@ import { LangFlag } from './LangFlag';
 
 // Custom dropdown (not a native <select>) because native <option>s can't render
 // the bundled SVG flags — only plain text. Mirrors the CharacterSwitcher menu.
-export function LanguageSwitcher() {
+// `compact` shows just the flag (used in the toolbar for a logged-in user); the
+// landing page keeps the full flag + language name.
+export function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
   const { t, i18n } = useTranslation();
   const current = (i18n.resolvedLanguage ?? 'en') as SupportedLanguage;
   const [open, setOpen] = useState(false);
@@ -24,7 +26,7 @@ export function LanguageSwitcher() {
     <div className="lang-switcher" ref={wrapRef}>
       <button
         type="button"
-        className="lang-switcher__trigger"
+        className={`lang-switcher__trigger${compact ? ' lang-switcher__trigger--compact' : ''}`}
         onClick={() => setOpen((o) => !o)}
         aria-haspopup="listbox"
         aria-expanded={open}
@@ -32,8 +34,8 @@ export function LanguageSwitcher() {
         aria-label={t('language.label')}
       >
         <LangFlag lang={current} className="lang-switcher__flag" />
-        <span className="lang-switcher__current">{LANGUAGE_NAMES[current]}</span>
-        <CaretDownIcon size={12} weight="bold" />
+        {!compact && <span className="lang-switcher__current">{LANGUAGE_NAMES[current]}</span>}
+        {!compact && <CaretDownIcon size={12} weight="bold" />}
       </button>
       {open && (
         <div className="lang-switcher__menu" role="listbox" aria-label={t('language.label')}>

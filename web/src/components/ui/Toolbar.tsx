@@ -640,7 +640,7 @@ export function Toolbar() {
     // Language, API keys and sign-out travel together as one movable block.
     actions: user ? (
       <div className="toolbar__group">
-        <LanguageSwitcher />
+        <LanguageSwitcher compact />
         <button
           className="toolbar__toggle toolbar__toggle--icon"
           onClick={() => setShowKeys(true)}
