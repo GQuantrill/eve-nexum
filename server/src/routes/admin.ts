@@ -594,8 +594,13 @@ reportsRouter.get('/users', async (req, res) => {
   // immediately after.
   const params: unknown[] = scope.param !== null ? [scope.param] : [];
   const corpSql = scope.sql(1);
-  // Admins additionally only see users in their corp; reports char sees all.
-  const userScope = scope.param !== null ? `u.corp_id = $1` : null;
+  // Admins additionally only see users in their scope; reports char sees all.
+  // An alliance admin scopes by alliance (matching corpScopeFor's map filter),
+  // a corp admin by corp — otherwise the alliance id would be tested against
+  // u.corp_id and match nobody.
+  const userScope = scope.param !== null
+    ? (req.session.role === 'alliance_admin' ? `u.alliance_id = $1` : `u.corp_id = $1`)
+    : null;
 
   // Row-inclusion conditions (user-scope + filter EXISTS). Joined with AND.
   const conditions: string[] = [];

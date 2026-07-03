@@ -346,12 +346,12 @@ authRouter.post('/switch-character', async (req, res) => {
 
   const { rows } = await db.query<{
     owner_id: number | null; character_id: number; character_name: string; role: string;
-    corp_id: number | null; blocked: boolean;
+    corp_id: number | null; alliance_id: number | null; blocked: boolean;
     compact_mode: boolean; snap_to_grid: boolean; show_minimap: boolean; uniform_size: boolean;
     show_statics: boolean; easy_connect: boolean; connection_thickness: string; route_mode: string; ui_zoom: string;
     ui_settings: Record<string, unknown>; panel_order: string[];
   }>(
-    `SELECT owner_id, character_id, character_name, role, corp_id, blocked,
+    `SELECT owner_id, character_id, character_name, role, corp_id, alliance_id, blocked,
             compact_mode, snap_to_grid, show_minimap, uniform_size, show_statics, easy_connect,
             connection_thickness, route_mode, ui_zoom, ui_settings, panel_order
      FROM users WHERE id = $1`,
@@ -365,8 +365,11 @@ authRouter.post('/switch-character', async (req, res) => {
   req.session.userId        = targetId;
   req.session.characterId   = u.character_id;
   req.session.characterName = u.character_name;
-  req.session.role          = u.role as 'admin' | 'full' | 'edit' | 'readonly';
+  req.session.role          = u.role as 'alliance_admin' | 'admin' | 'full' | 'edit' | 'readonly';
   req.session.userCorpId    = u.corp_id;
+  // Critical: refresh the alliance too, else the switched-to character keeps the
+  // PREVIOUS character's alliance and gets cross-alliance map access/write/mgmt.
+  req.session.userAllianceId = u.alliance_id;
   req.session.prefs         = {
     compactMode: u.compact_mode ?? false,
     snapToGrid:  u.snap_to_grid ?? false,

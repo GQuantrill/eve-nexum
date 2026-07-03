@@ -245,7 +245,12 @@ async function requireMapWrite(res: Response, mapId: string, req: Request): Prom
   if (authUser(req).apiScope) {
     res.status(403).json({ error: 'API keys cannot modify map topology' }); return null;
   }
-  if (access.locked && !isAdmin(authUser(req).role)) {
+  // Lock bypass mirrors who may toggle the lock: alliance maps need an alliance
+  // admin, corp/personal maps an ordinary admin — so a corp admin can't edit
+  // through an alliance lock they aren't allowed to set.
+  const bypassRole = authUser(req).role;
+  const canBypassLock = access.allianceId !== null ? isAllianceAdmin(bypassRole) : isAdmin(bypassRole);
+  if (access.locked && !canBypassLock) {
     res.status(403).json({ error: 'Map is locked' }); return null;
   }
   return access;
@@ -1484,9 +1489,10 @@ mapsRouter.patch('/:mapId', async (req, res) => {
       res.status(403).json({ error: 'Only the owner can rename this map' }); return;
     }
     // Renaming an alliance map is a management action reserved for alliance
-    // admins (the creator resolves as 'owner' and is one; other alliance
-    // members resolve as 'alliance_member' and must hold the role).
-    if (access.accessKind === 'alliance_member' && !isAllianceAdmin(req.session.role ?? 'readonly')) {
+    // admins — checked on the map's alliance scope, not accessKind, so a former
+    // alliance admin who created it (and now resolves as 'owner') can't rename
+    // it after being demoted. Matches the delete gate.
+    if (access.allianceId !== null && !isAllianceAdmin(req.session.role ?? 'readonly')) {
       res.status(403).json({ error: 'Only an alliance admin can rename this map' }); return;
     }
     const trimmed = String(name).slice(0, MAX_MAP_NAME_LEN);
