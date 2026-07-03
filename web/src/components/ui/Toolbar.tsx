@@ -34,7 +34,7 @@ import {
   WarningIcon, SkullIcon, XCircleIcon, QuestionIcon,
   ShieldStarIcon, ChartBarIcon, SlidersHorizontalIcon, FootprintsIcon,
   SignOutIcon, PlanetIcon, LinkSimpleIcon, ClockCountdownIcon, MapPinIcon,
-  KeyIcon, GraphIcon, ArrowCounterClockwiseIcon,
+  KeyIcon, GraphIcon, ArrowCounterClockwiseIcon, DotsSixVerticalIcon,
 } from '@phosphor-icons/react';
 import type { Icon as PhosphorIcon } from '@phosphor-icons/react';
 import { charPortrait, typeIcon } from '../../utils/eveImages';
@@ -170,15 +170,15 @@ function CheckedAtIcon({ checkedAt }: { checkedAt: Date }) {
 // reflows and wraps instead of stacking. Conditional items (admin, proximity,
 // account actions) simply drop out of the rendered list when absent.
 const DEFAULT_TOOLBAR_ORDER = [
-  'brand', 'map', 'stats', 'proximity', 'admin', 'userstats', 'help',
-  'whchart', 'heatmap', 'mapoptions', 'trackjumps', 'server', 'account',
+  'brand', 'map', 'stats', 'proximity', 'tools', 'server', 'account',
   'actions',
 ];
 
-// One movable toolbar item. The whole item is the drag handle; the 6px pointer
-// activation distance (see the DndContext sensor) means a tap still clicks the
-// control inside — only a press-and-move starts a reorder. Sortable transforms
-// animate the other items out of the way, so nothing ever overlaps.
+// One movable toolbar item. The whole item is the drag handle (with a visible
+// six-dot grip signalling it can be dragged); the 6px pointer activation
+// distance (see the DndContext sensor) means a tap still clicks the control
+// inside — only a press-and-move starts a reorder. Sortable transforms animate
+// the other items out of the way, so nothing ever overlaps.
 function SortableItem({ id, children }: { id: string; children: ReactNode }) {
   const { setNodeRef, listeners, transform, transition, isDragging } = useSortable({ id });
   const style: CSSProperties = {
@@ -194,6 +194,9 @@ function SortableItem({ id, children }: { id: string; children: ReactNode }) {
       style={style}
       {...listeners}
     >
+      <span className="toolbar__item-grip" aria-hidden="true">
+        <DotsSixVerticalIcon size={13} weight="bold" />
+      </span>
       {children}
     </div>
   );
@@ -449,79 +452,73 @@ export function Toolbar() {
 
     proximity: proximityNode,
 
-    admin: showAdmin ? (
-      <button
-        className="toolbar__toggle toolbar__toggle--icon toolbar__toggle--prominent"
-        onClick={() => { window.location.hash = '#/admin/users'; }}
-        data-tooltip={t('toolbar.admin')}
-        aria-label={t('toolbar.admin')}
-      >
-        <ShieldStarIcon size={18} weight="regular" />
-      </button>
-    ) : null,
+    // All the explicit action buttons travel together as one movable block.
+    tools: (
+      <div className="toolbar__group">
+        {showAdmin && (
+          <button
+            className="toolbar__toggle toolbar__toggle--icon toolbar__toggle--prominent"
+            onClick={() => { window.location.hash = '#/admin/users'; }}
+            data-tooltip={t('toolbar.admin')}
+            aria-label={t('toolbar.admin')}
+          >
+            <ShieldStarIcon size={18} weight="regular" />
+          </button>
+        )}
+        <button
+          className="toolbar__toggle toolbar__toggle--icon toolbar__toggle--prominent"
+          onClick={() => setShowStats(true)}
+          data-tooltip={t('toolbar.userStats')}
+          aria-label={t('toolbar.userStats')}
+        >
+          <ChartBarIcon size={18} weight="regular" />
+        </button>
 
-    userstats: (
-      <button
-        className="toolbar__toggle toolbar__toggle--icon toolbar__toggle--prominent"
-        onClick={() => setShowStats(true)}
-        data-tooltip={t('toolbar.userStats')}
-        aria-label={t('toolbar.userStats')}
-      >
-        <ChartBarIcon size={18} weight="regular" />
-      </button>
-    ),
+        <a
+          className="toolbar__toggle toolbar__toggle--icon toolbar__toggle--prominent"
+          href="/help/"
+          target="_blank"
+          rel="noopener noreferrer"
+          data-tooltip={t('toolbar.help')}
+          aria-label={t('toolbar.help')}
+        >
+          <QuestionIcon size={18} weight="regular" />
+        </a>
 
-    help: (
-      <a
-        className="toolbar__toggle toolbar__toggle--icon toolbar__toggle--prominent"
-        href="/help/"
-        target="_blank"
-        rel="noopener noreferrer"
-        data-tooltip={t('toolbar.help')}
-        aria-label={t('toolbar.help')}
-      >
-        <QuestionIcon size={18} weight="regular" />
-      </a>
-    ),
+        <button
+          className="toolbar__toggle toolbar__toggle--icon toolbar__toggle--prominent"
+          onClick={() => setShowWhChart(true)}
+          data-tooltip={t('whChart.tooltip')}
+          aria-label={t('whChart.title')}
+        >
+          <GraphIcon size={18} weight="regular" />
+        </button>
 
-    whchart: (
-      <button
-        className="toolbar__toggle toolbar__toggle--icon toolbar__toggle--prominent"
-        onClick={() => setShowWhChart(true)}
-        data-tooltip={t('whChart.tooltip')}
-        aria-label={t('whChart.title')}
-      >
-        <GraphIcon size={18} weight="regular" />
-      </button>
-    ),
+        <HeatmapMenu />
 
-    heatmap: <HeatmapMenu />,
+        <button
+          className={`toolbar__toggle toolbar__toggle--icon toolbar__toggle--prominent${mapOptionsOpen ? ' toolbar__toggle--on' : ''}`}
+          onClick={() => setMapOptionsOpen(!mapOptionsOpen)}
+          aria-pressed={mapOptionsOpen}
+          data-tooltip={t('toolbar.mapOptions')}
+          aria-label={t('toolbar.mapOptions')}
+        >
+          <SlidersHorizontalIcon size={18} weight="regular" />
+        </button>
 
-    mapoptions: (
-      <button
-        className={`toolbar__toggle toolbar__toggle--icon toolbar__toggle--prominent${mapOptionsOpen ? ' toolbar__toggle--on' : ''}`}
-        onClick={() => setMapOptionsOpen(!mapOptionsOpen)}
-        aria-pressed={mapOptionsOpen}
-        data-tooltip={t('toolbar.mapOptions')}
-        aria-label={t('toolbar.mapOptions')}
-      >
-        <SlidersHorizontalIcon size={18} weight="regular" />
-      </button>
-    ),
-
-    trackjumps: (
-      <button
-        className={`toolbar__toggle toolbar__toggle--icon toolbar__toggle--prominent${trackJumps ? ' toolbar__toggle--on' : ''}`}
-        onClick={() => setTrackJumps(!trackJumps)}
-        aria-pressed={trackJumps}
-        aria-label={trackJumps ? t('toolbar.trackJumpsOn') : t('toolbar.trackJumpsOff')}
-        data-tooltip={trackJumps
-          ? t('toolbar.trackJumpsTooltipOn')
-          : t('toolbar.trackJumpsTooltipOff')}
-      >
-        <FootprintsIcon size={18} weight="regular" />
-        <span className={`toolbar__toggle-led${trackJumps ? ' toolbar__toggle-led--on' : ' toolbar__toggle-led--off'}`} />
-      </button>
+        <button
+          className={`toolbar__toggle toolbar__toggle--icon toolbar__toggle--prominent${trackJumps ? ' toolbar__toggle--on' : ''}`}
+          onClick={() => setTrackJumps(!trackJumps)}
+          aria-pressed={trackJumps}
+          aria-label={trackJumps ? t('toolbar.trackJumpsOn') : t('toolbar.trackJumpsOff')}
+          data-tooltip={trackJumps
+            ? t('toolbar.trackJumpsTooltipOn')
+            : t('toolbar.trackJumpsTooltipOff')}
+        >
+          <FootprintsIcon size={18} weight="regular" />
+          <span className={`toolbar__toggle-led${trackJumps ? ' toolbar__toggle-led--on' : ' toolbar__toggle-led--off'}`} />
+        </button>
+      </div>
     ),
 
     server: (

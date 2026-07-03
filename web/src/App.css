@@ -753,6 +753,20 @@
 .toolbar__item .toolbar__char-system--clickable { cursor: pointer; }
 .toolbar__item input { cursor: text; }
 
+/* Six-dot drag grip on every item: a persistent "this can be dragged" cue,
+   quiet at rest and emphasised on hover / while dragging. */
+.toolbar__item-grip {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-right: -2px;
+  color: #5a6886;
+  opacity: 0.45;
+  transition: opacity 0.12s, color 0.12s;
+}
+.toolbar__item:hover .toolbar__item-grip { opacity: 0.9; color: #8a9bc4; }
+.toolbar__item--dragging .toolbar__item-grip { opacity: 1; color: #a9b8dc; }
+
 /* Groups several related controls inside a single movable item (e.g. the map
    switcher + name field), keeping them together as one draggable unit. */
 .toolbar__group {
