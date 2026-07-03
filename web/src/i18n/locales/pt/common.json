@@ -50,7 +50,7 @@
     "switchTo": "Mudar para {{name}}",
     "focusLocation": "Centrar e traçar rota a partir de {{name}}",
     "noLocation": "Nenhuma localização conhecida de {{name}}",
-    "linkFailedNotInCorp": "Não foi possível adicionar esse personagem — não está na corporação.",
+    "linkFailedNotInCorp": "Não foi possível adicionar esse personagem — ele não está em uma corporação ou aliança autorizada.",
     "linkFailed": "Não foi possível adicionar esse personagem. Tenta novamente.",
     "remove": "Remover",
     "removeCharacter": "Remover {{name}}",
@@ -1086,7 +1086,7 @@
       "joinDiscord": "Junta-te ao Discord do Nexum"
     },
     "errors": {
-      "not_in_corp": "A tua personagem não é membro da corporação que gere esta instância do Nexum. O acesso está restrito a membros da corp.",
+      "not_in_corp": "Seu personagem não pertence a uma corporação ou aliança autorizada a acessar esta instância do Nexum. O acesso é restrito a membros autorizados.",
       "corp_check_failed": "Não foi possível verificar a tua pertença à corporação devido a um erro da ESI. Tenta novamente daqui a um momento.",
       "unknown": "Ocorreu um erro desconhecido. Tenta novamente."
     },

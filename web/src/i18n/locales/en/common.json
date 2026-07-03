@@ -88,7 +88,7 @@
     "switchTo": "Switch to {{name}}",
     "focusLocation": "Centre & route from {{name}}",
     "noLocation": "No known location for {{name}}",
-    "linkFailedNotInCorp": "Couldn't add that character — they're not in the corporation.",
+    "linkFailedNotInCorp": "Couldn't add that character — they're not in a permitted corporation or alliance.",
     "linkFailed": "Couldn't add that character. Please try again.",
     "remove": "Remove",
     "removeCharacter": "Remove {{name}}",
@@ -1139,7 +1139,7 @@
       "joinDiscord": "Join the Nexum Discord"
     },
     "errors": {
-      "not_in_corp": "Your character is not a member of the corporation that runs this Nexum instance. Access is restricted to corp members only.",
+      "not_in_corp": "Your character isn't in a corporation or alliance permitted to access this Nexum instance. Access is restricted to authorised members only.",
       "corp_check_failed": "Could not verify your corporation membership due to an ESI error. Please try again in a moment.",
       "unknown": "An unknown error occurred. Please try again."
     },

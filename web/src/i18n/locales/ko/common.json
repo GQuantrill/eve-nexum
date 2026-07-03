@@ -50,7 +50,7 @@
     "switchTo": "{{name}}(으)로 전환",
     "focusLocation": "{{name}} 위치로 이동하고 경로 계산",
     "noLocation": "{{name}}의 알려진 위치 없음",
-    "linkFailedNotInCorp": "해당 캐릭터를 추가할 수 없습니다 — 군단에 속해 있지 않습니다.",
+    "linkFailedNotInCorp": "해당 캐릭터를 추가할 수 없습니다 — 승인된 코퍼레이션 또는 얼라이언스에 속해 있지 않습니다.",
     "linkFailed": "해당 캐릭터를 추가할 수 없습니다. 다시 시도해 주세요.",
     "remove": "제거",
     "removeCharacter": "{{name}} 제거",
@@ -1086,7 +1086,7 @@
       "joinDiscord": "Nexum Discord 참여"
     },
     "errors": {
-      "not_in_corp": "당신의 캐릭터는 이 Nexum 인스턴스를 운영하는 군단의 구성원이 아닙니다. 접근은 군단 구성원으로 제한됩니다.",
+      "not_in_corp": "당신의 캐릭터는 이 Nexum 인스턴스에 접근이 허용된 코퍼레이션 또는 얼라이언스에 속해 있지 않습니다. 접근은 승인된 멤버로 제한됩니다.",
       "corp_check_failed": "ESI 오류로 인해 군단 구성원 여부를 확인할 수 없습니다. 잠시 후 다시 시도하세요.",
       "unknown": "알 수 없는 오류가 발생했습니다. 다시 시도하세요."
     },

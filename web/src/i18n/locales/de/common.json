@@ -50,7 +50,7 @@
     "switchTo": "Zu {{name}} wechseln",
     "focusLocation": "Karte auf {{name}} zentrieren und von dort routen",
     "noLocation": "Kein bekannter Standort für {{name}}",
-    "linkFailedNotInCorp": "Charakter konnte nicht hinzugefügt werden — er ist nicht in der Corp.",
+    "linkFailedNotInCorp": "Charakter konnte nicht hinzugefügt werden — er ist in keiner berechtigten Corporation oder Allianz.",
     "linkFailed": "Charakter konnte nicht hinzugefügt werden. Bitte erneut versuchen.",
     "remove": "Entfernen",
     "removeCharacter": "{{name}} entfernen",
@@ -1086,7 +1086,7 @@
       "joinDiscord": "Tritt dem Nexum-Discord bei"
     },
     "errors": {
-      "not_in_corp": "Dein Charakter ist kein Mitglied der Corporation, die diese Nexum-Instanz betreibt. Der Zugriff ist auf Corp-Mitglieder beschränkt.",
+      "not_in_corp": "Dein Charakter gehört zu keiner Corporation oder Allianz, die auf diese Nexum-Instanz zugreifen darf. Der Zugriff ist auf berechtigte Mitglieder beschränkt.",
       "corp_check_failed": "Deine Corporation-Mitgliedschaft konnte aufgrund eines ESI-Fehlers nicht überprüft werden. Bitte versuche es gleich noch einmal.",
       "unknown": "Ein unbekannter Fehler ist aufgetreten. Bitte versuche es erneut."
     },

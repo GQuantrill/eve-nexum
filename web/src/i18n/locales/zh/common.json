@@ -50,7 +50,7 @@
     "switchTo": "切换到 {{name}}",
     "focusLocation": "以 {{name}} 为中心并从其位置规划路线",
     "noLocation": "没有 {{name}} 的已知位置",
-    "linkFailedNotInCorp": "无法添加该角色——其不在该军团中。",
+    "linkFailedNotInCorp": "无法添加该角色 — 其不属于任何授权的军团或联盟。",
     "linkFailed": "无法添加该角色，请重试。",
     "remove": "移除",
     "removeCharacter": "移除 {{name}}",
@@ -1086,7 +1086,7 @@
       "joinDiscord": "加入 Nexum Discord"
     },
     "errors": {
-      "not_in_corp": "你的角色不是运行此 Nexum 实例的公司的成员。访问仅限军团成员。",
+      "not_in_corp": "你的角色不属于任何被授权访问此 Nexum 实例的军团或联盟。访问仅限授权成员。",
       "corp_check_failed": "由于 ESI 错误，无法验证你的军团成员资格。请稍后再试。",
       "unknown": "发生未知错误。请重试。"
     },
