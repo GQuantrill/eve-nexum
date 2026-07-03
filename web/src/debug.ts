@@ -179,6 +179,18 @@ const nexumDebug = {
     else console.log('[nexum] No jump simulation running.');
   },
 
+  // Toggle showing the nearest detected threat (incursion / insurgency /
+  // hostile-sov) in the toolbar regardless of the proximity alert threshold —
+  // for verifying the proximity chip without an actual in-zone threat. Pass a
+  // boolean to force on/off, or call with no argument to flip it.
+  showThreats(on?: boolean) {
+    import('./utils/debugFlags').then(({ getDebugFlag, setDebugFlag }) => {
+      const next = typeof on === 'boolean' ? on : !getDebugFlag('showThreats');
+      setDebugFlag('showThreats', next);
+      console.log(`[nexum] Show nearby threats: ${next ? 'ON — toolbar shows the nearest threat ignoring your alert threshold' : 'OFF — toolbar respects your alert threshold'}.`);
+    });
+  },
+
   clear() {
     log.length = 0;
     console.log('[nexum] Debug log cleared.');
@@ -195,6 +207,7 @@ const nexumDebug = {
     console.log("nexumDebug.simulateJumps(['Jita','Perimeter','Jita'], 2000) — replay a route, one hop / interval");
     console.log("nexumDebug.simulateJumps([...], 1000, { dryRun: true }) — replay without firing server writes (logged-out safe)");
     console.log('nexumDebug.stopJumps() — cancel a running jump simulation');
+    console.log('nexumDebug.showThreats(on?)  — toggle showing the nearest threat in the toolbar, ignoring the alert threshold');
     console.log('nexumDebug.clear()     — clear the log buffer');
     console.groupEnd();
   },

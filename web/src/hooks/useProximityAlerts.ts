@@ -7,6 +7,7 @@ import { useStandings } from './useStandings';
 import { ensureSovLoaded, getSovEntries } from './useSovData';
 import { useUserSetting, readUserSetting, writeUserSetting } from './useUserSetting';
 import { NOTIFY, notifyOn } from '../utils/notificationPrefs';
+import { useDebugFlag } from '../utils/debugFlags';
 
 export type ThreatKind = 'incursion' | 'insurgency' | 'hostile-sov';
 
@@ -87,6 +88,11 @@ export function useProximityAlerts(): {
   const insurgency = useInsurgency();
   const standings  = useStandings();
   const [threshold] = useProximityThreshold();
+  // nexumDebug.showThreats() flips this to surface the nearest threat in the
+  // toolbar regardless of the alert threshold. Only affects what's DISPLAYED —
+  // the notification/beep below still uses the real threshold so debug mode
+  // doesn't spam alerts for far-off threats.
+  const debugShowThreats = useDebugFlag('showThreats');
 
   // Cluster-wide sov data loads asynchronously the first time anyone
   // consumes it. We need to know when it's ready so we can fold the
@@ -165,5 +171,8 @@ export function useProximityAlerts(): {
     }
   }, [nearest, threshold, nameMap]);
 
-  return { nearest, threshold };
+  // Callers gate display on `nearest.jumps <= threshold`; boosting the returned
+  // threshold under the debug flag makes any detected threat show, while the
+  // real `threshold` above still governs notifications.
+  return { nearest, threshold: debugShowThreats ? Number.MAX_SAFE_INTEGER : threshold };
 }
