@@ -1109,7 +1109,7 @@
       "sysIntel": "System-Informationen",
       "liveOps": "Live-Ops",
       "productivity": "Produktivität & UX",
-      "forCorps": "Für Corporations",
+      "forCorps": "Für Corporations & Allianzen",
       "compare": "Wie schneidet Nexum ab?",
       "languages": "In deiner Sprache verfügbar",
       "discordCta": "Fragen, Ideen oder Bugs?",
@@ -1324,6 +1324,14 @@
       "multiCorp": {
         "title": "Multi-Corp-Deployments",
         "desc": "CORP_ID akzeptiert eine kommagetrennte Liste von Corporation-IDs. Eine Nexum-Instanz kann mehrere Corps hosten; die Karten jeder Corp bleiben auf ihre eigenen Mitglieder beschränkt, sofern nicht CORP_MAP_SHARED=true gesetzt ist."
+      },
+      "allianceMaps": {
+        "title": "Allianzweite Karten",
+        "desc": "ALLIANCE_ID fügt eine dritte Kartenebene über der Corp hinzu: Allianzkarten, die jedes Allianzmitglied sehen kann. Mit ALLIANCE_MAP_SHARED=true werden sie über eine Koalition mehrerer Allianzen geteilt."
+      },
+      "allianceRoles": {
+        "title": "Allianz-Admin-Rolle",
+        "desc": "Eine eigene alliance_admin-Stufe verwaltet Allianzkarten und die Rolle jedes Mitglieds in der gesamten Allianz — eine Obermenge des Corp-Admins. Jede Corp innerhalb der Allianz kann eigene corp-private Karten führen, ohne CORP_ID-Liste."
       },
       "adminDash": {
         "title": "Admin-Dashboard",

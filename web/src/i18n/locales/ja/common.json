@@ -1109,7 +1109,7 @@
       "sysIntel": "星系インテリジェンス",
       "liveOps": "ライブ作戦",
       "productivity": "生産性＆UX",
-      "forCorps": "コーポ向け",
+      "forCorps": "コーポレーション＆アライアンス向け",
       "compare": "Nexum はどう比較される？",
       "languages": "あなたの言語で使えます",
       "discordCta": "質問、アイデア、バグは？",
@@ -1324,6 +1324,14 @@
       "multiCorp": {
         "title": "マルチコーポ展開",
         "desc": "CORP_ID はカンマ区切りのコーポレーション ID リストを受け付けます。1 つの Nexum インスタンスで複数のコーポをホストでき、CORP_MAP_SHARED=true でない限り、各コーポのマップは自分のメンバーに限定されます。"
+      },
+      "allianceMaps": {
+        "title": "アライアンス全体のマップ",
+        "desc": "ALLIANCE_ID はコーポの上に3つ目のマップスコープを追加します。アライアンスの全メンバーが見られるアライアンスマップです。ALLIANCE_MAP_SHARED=true にすると、複数アライアンスの連合で共有できます。"
+      },
+      "allianceRoles": {
+        "title": "アライアンス管理者ロール",
+        "desc": "専用の alliance_admin 階層が、アライアンス全体のアライアンスマップと全メンバーのロールを管理します（コーポ管理者の上位）。アライアンス内の各コーポは、CORP_ID リストなしで独自のコーポ専用マップを保持できます。"
       },
       "adminDash": {
         "title": "管理ダッシュボード",

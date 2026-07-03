@@ -1109,7 +1109,7 @@
       "sysIntel": "星系情报",
       "liveOps": "实时行动",
       "productivity": "效率与体验",
-      "forCorps": "面向军团",
+      "forCorps": "面向军团与联盟",
       "compare": "Nexum 相比如何？",
       "languages": "支持您的语言",
       "discordCta": "有问题、想法或 bug？",
@@ -1324,6 +1324,14 @@
       "multiCorp": {
         "title": "多军团部署",
         "desc": "CORP_ID 接受以逗号分隔的军团 ID 列表。一个 Nexum 实例可托管多个军团；除非 CORP_MAP_SHARED=true，否则每个军团的地图都限定于其自己的成员。"
+      },
+      "allianceMaps": {
+        "title": "联盟范围地图",
+        "desc": "ALLIANCE_ID 在军团之上增加了第三个地图范围：联盟内所有成员均可查看的联盟地图。设置 ALLIANCE_MAP_SHARED=true 可在多个联盟的联合中共享。"
+      },
+      "allianceRoles": {
+        "title": "联盟管理员角色",
+        "desc": "专门的 alliance_admin 级别管理整个联盟的联盟地图和每位成员的角色 — 是军团管理员的超集。联盟内的任何军团仍可保留自己的军团专属地图，无需 CORP_ID 列表。"
       },
       "adminDash": {
         "title": "管理仪表盘",
