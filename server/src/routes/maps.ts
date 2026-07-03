@@ -148,10 +148,16 @@ export async function getMapAccess(mapId: string, req: Request): Promise<MapMeta
     return meta('owner');
   }
 
-  const isCorpMap = config.corpMode
-    && m.corpId !== null
-    && config.corpIds.includes(m.corpId)
-    && (config.corpMapShared || m.corpId === userCorpId);
+  // Corp map access. Two ways in:
+  //   • Explicit corp deployment (CORP_ID): the map's corp must be listed;
+  //     CORP_MAP_SHARED decides whether other listed corps see it.
+  //   • Alliance deployment: any corp inside the (login-gated) alliance keeps
+  //     its own corp map, visible to same-corp members — no CORP_ID list, since
+  //     enumerating every member corp is unmanageable for a large alliance.
+  const isCorpMap = m.corpId !== null && (
+    (config.corpMode && config.corpIds.includes(m.corpId) && (config.corpMapShared || m.corpId === userCorpId))
+    || (config.allianceMode && m.corpId === userCorpId)
+  );
   if (isCorpMap) {
     return meta('corp_member');
   }
@@ -429,7 +435,7 @@ mapsRouter.get('/', async (req, res) => {
 
   // Count corp maps for the user's own corp (the per-corp limit applies to
   // each corp independently — Corp A's slots are separate from Corp B's).
-  const corpMapCount = config.corpMode && userCorpId
+  const corpMapCount = (config.corpMode || config.allianceMode) && userCorpId
     ? (await db.query(`SELECT 1 FROM maps WHERE corp_id = $1`, [userCorpId])).rowCount ?? 0
     : 0;
   const allianceMapCount = config.allianceMode && userAllianceId
@@ -451,7 +457,7 @@ mapsRouter.post('/', async (req, res) => {
   // Scope is exclusive: alliance takes precedence over corp when both flags are
   // sent. Alliance maps are alliance_admin-only; corp maps need full/admin.
   const isAllianceMap = config.allianceMode && req.body.isAllianceMap === true;
-  const isCorpMap     = !isAllianceMap && config.corpMode && req.body.isCorpMap === true;
+  const isCorpMap     = !isAllianceMap && (config.corpMode || config.allianceMode) && req.body.isCorpMap === true;
   const role          = req.session.role ?? 'readonly';
 
   // Personal map creation is open to every role — they're scoped to the
@@ -572,7 +578,7 @@ mapsRouter.post('/from-region', async (req, res) => {
   if (!Number.isInteger(regionId)) { res.status(400).json({ error: 'regionId is required' }); return; }
 
   const isAllianceMap = config.allianceMode && body.isAllianceMap === true;
-  const isCorpMap     = !isAllianceMap && config.corpMode && body.isCorpMap === true;
+  const isCorpMap     = !isAllianceMap && (config.corpMode || config.allianceMode) && body.isCorpMap === true;
   const role          = req.session.role ?? 'readonly';
 
   // Quota + role — mirrors POST /api/maps and /import.
@@ -775,7 +781,7 @@ mapsRouter.post('/from-region', async (req, res) => {
 mapsRouter.post('/import', async (req, res) => {
   const importBody     = req.body as Record<string, unknown>;
   const isAllianceImport = config.allianceMode && importBody.isAllianceMap === true;
-  const isCorpImport     = !isAllianceImport && config.corpMode && importBody.isCorpMap === true;
+  const isCorpImport     = !isAllianceImport && (config.corpMode || config.allianceMode) && importBody.isCorpMap === true;
   const role             = req.session.role ?? 'readonly';
 
   // Quota check against the matching tier — importing a corp/alliance map counts
@@ -2191,9 +2197,8 @@ async function requireShareAdmin(res: Response, mapId: string, req: Request): Pr
 
   const role = req.session.role ?? 'readonly';
   const userId = req.session.userId!;
-  const isCorpMap = config.corpMode
-    && access.corpId !== null
-    && config.corpIds.includes(access.corpId);
+  const isCorpMap = access.corpId !== null
+    && ((config.corpMode && config.corpIds.includes(access.corpId)) || config.allianceMode);
   const isAllianceMap = config.allianceMode
     && access.allianceId !== null
     && config.allianceIds.includes(access.allianceId);

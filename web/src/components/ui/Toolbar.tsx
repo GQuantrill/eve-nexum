@@ -9,7 +9,7 @@ import { useCharacterLocation } from '../../hooks/useCharacterLocation';
 import { useCanEdit } from '../../hooks/useCanEdit';
 import { useCanEditContent } from '../../hooks/useCanEditContent';
 import { useIsMapOwner } from '../../hooks/useIsMapOwner';
-import { useCanCreateMaps } from '../../hooks/useCanCreateMaps';
+import { useCanCreateMaps, useCanManageAllianceMaps } from '../../hooks/useCanCreateMaps';
 import { UserStatsModal } from './UserStatsModal';
 import { ConfirmModal } from './ConfirmModal';
 import { CreateMapModal } from './CreateMapModal';
@@ -214,6 +214,8 @@ export function Toolbar() {
   const maxMaps         = useMapStore((s) => s.maxMaps);
   const maxCorpMaps     = useMapStore((s) => s.maxCorpMaps);
   const corpMapCount    = useMapStore((s) => s.corpMapCount);
+  const maxAllianceMaps  = useMapStore((s) => s.maxAllianceMaps);
+  const allianceMapCount = useMapStore((s) => s.allianceMapCount);
   const activeMapId     = useMapStore((s) => s.activeMapId);
   const setMapName      = useMapStore((s) => s.setMapName);
   const switchMap       = useMapStore((s) => s.switchMap);
@@ -235,10 +237,17 @@ export function Toolbar() {
   // the user lacks an edit role.
   const readonlyCorpActive = !!maps.find((m) => m.id === activeMapId)?.isCorpMap && !canEditContent;
   const canManageMaps = useCanCreateMaps();
-  const canCorpCreate = !!user?.corpMode && canManageMaps;
-  // No creatable option = personal slots full AND (can't make corp maps, or
-  // corp slots full too). Gates the single "+ New Map" action.
-  const noCreateOption = atMapLimit && (!canCorpCreate || atCorpMapLimit);
+  const canManageAllianceMaps = useCanManageAllianceMaps();
+  // Corp maps exist under corp OR alliance mode (a corp inside the alliance).
+  const canCorpCreate     = (!!user?.corpMode || !!user?.allianceMode) && canManageMaps;
+  const canAllianceCreate = canManageAllianceMaps;
+  const atAllianceMapLimit = allianceMapCount >= maxAllianceMaps;
+  // No creatable option = every scope the user could make is unavailable or
+  // full: personal slots full AND corp blocked AND alliance blocked. Gates the
+  // single "+ New Map" action.
+  const noCreateOption = atMapLimit
+    && (!canCorpCreate || atCorpMapLimit)
+    && (!canAllianceCreate || atAllianceMapLimit);
   const { online, checkedAt, lastLogin } = useOnlineStatus(!!user);
   // Ship + live system come from the same poll that drives passive location
   // tracking, so no extra ESI traffic — we just surface fields already on hand.

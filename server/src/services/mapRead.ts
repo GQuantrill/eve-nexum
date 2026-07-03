@@ -21,9 +21,13 @@ export interface VisibleMapsParams {
 // personal maps explicitly shared with the character or their corp. Identical
 // query to GET /api/maps.
 export async function listVisibleMaps(p: VisibleMapsParams) {
+  // Corp maps the caller can see. Explicit corp deployment: the configured
+  // corps (or just the caller's, unless CORP_MAP_SHARED). Alliance deployment
+  // without a CORP_ID list: just the caller's own corp — a corp inside the
+  // alliance keeps its corp maps corp-private.
   const visibleCorpIds = config.corpMode && config.corpIds.length > 0
     ? (config.corpMapShared ? config.corpIds : (p.userCorpId ? [p.userCorpId] : []))
-    : [];
+    : (config.allianceMode && p.userCorpId ? [p.userCorpId] : []);
   // Alliance visibility mirrors corp: your own alliance by default, or every
   // listed alliance under ALLIANCE_MAP_SHARED (coalition mode).
   const visibleAllianceIds = config.allianceMode && config.allianceIds.length > 0

@@ -35,7 +35,9 @@ export function CreateMapModal({ onClose }: { onClose: () => void }) {
   const createFromRegion = useMapStore((s) => s.createFromRegion);
   const { user } = useAuth();
 
-  const canCorp     = !!user?.corpMode && (user?.role === 'full' || (!!user && isAdminRole(user.role)));
+  // Corp maps exist whenever the deployment is corp- OR alliance-gated: in an
+  // alliance a corp keeps corp-private maps without needing a CORP_ID list.
+  const canCorp     = (!!user?.corpMode || !!user?.allianceMode) && (user?.role === 'full' || (!!user && isAdminRole(user.role)));
   const canAlliance = !!user?.allianceMode && !!user && isAllianceAdminRole(user.role);
   const atPersonalLimit = maps.filter((m) => !m.isCorpMap && !m.isAllianceMap).length >= maxMaps;
   const atCorpLimit     = corpMapCount >= maxCorpMaps;
