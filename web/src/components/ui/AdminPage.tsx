@@ -342,6 +342,8 @@ function UsersTab() {
       {blockTarget && (
         <ConfirmModal
           message={t('admin.users.blockConfirm', { name: blockTarget.characterName })}
+          confirmLabel={t('admin.users.block')}
+          danger
           onCancel={() => setBlockTarget(null)}
           onConfirm={() => setBlocked(blockTarget, true)}
         />
