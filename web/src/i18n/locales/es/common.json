@@ -1105,11 +1105,11 @@
     },
     "sections": {
       "mapping": "Cartografía",
-      "personalCorp": "Mapas personales y de corp",
+      "personalCorp": "Mapas personales, de corp y de alianza",
       "sysIntel": "Inteligencia de sistemas",
       "liveOps": "Operaciones en vivo",
       "productivity": "Productividad y UX",
-      "forCorps": "Para corporaciones",
+      "forCorps": "Para corporaciones y alianzas",
       "compare": "¿Cómo se compara Nexum?",
       "languages": "Disponible en tu idioma",
       "discordCta": "¿Preguntas, ideas o bugs?",
@@ -1324,6 +1324,14 @@
       "multiCorp": {
         "title": "Despliegues multi-corp",
         "desc": "CORP_ID acepta una lista de IDs de corporación separados por comas. Una instancia de Nexum puede alojar varias corps; los mapas de cada corp se limitan a sus propios miembros salvo que CORP_MAP_SHARED=true."
+      },
+      "allianceMaps": {
+        "title": "Mapas de toda la alianza",
+        "desc": "ALLIANCE_ID añade un tercer ámbito de mapas por encima de la corp: mapas de alianza que todos los miembros pueden ver. Con ALLIANCE_MAP_SHARED=true se comparten entre una coalición de alianzas."
+      },
+      "allianceRoles": {
+        "title": "Rol de admin de alianza",
+        "desc": "Un nivel dedicado alliance_admin gestiona los mapas de alianza y el rol de cada miembro en toda la alianza, un superconjunto del admin de corp. Cualquier corp dentro de la alianza puede mantener sus propios mapas privados, sin lista CORP_ID."
       },
       "adminDash": {
         "title": "Panel de administración",

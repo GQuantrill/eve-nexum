@@ -1158,11 +1158,11 @@
     },
     "sections": {
       "mapping": "Mapping",
-      "personalCorp": "Personal & corp maps",
+      "personalCorp": "Personal, Corp & Alliance maps",
       "sysIntel": "System intelligence",
       "liveOps": "Live ops",
       "productivity": "Productivity & UX",
-      "forCorps": "For Corporations",
+      "forCorps": "For Corporations & Alliances",
       "compare": "How does Nexum compare?",
       "languages": "Available in your language",
       "discordCta": "Got questions, ideas, or bugs?",
@@ -1377,6 +1377,14 @@
       "multiCorp": {
         "title": "Multi-corp deployments",
         "desc": "CORP_ID accepts a comma-separated list of corporation IDs. One Nexum instance can host several corps; each corp's maps stay scoped to its own members unless CORP_MAP_SHARED=true."
+      },
+      "allianceMaps": {
+        "title": "Alliance-wide maps",
+        "desc": "ALLIANCE_ID adds a third map scope above corp: alliance maps every member of the alliance can see. Set ALLIANCE_MAP_SHARED=true to share them across a coalition of alliances."
+      },
+      "allianceRoles": {
+        "title": "Alliance admin role",
+        "desc": "A dedicated alliance_admin tier manages alliance maps and every member's role across the whole alliance — a superset of the corp admin. Any corp inside the alliance can still keep its own corp-private maps, no CORP_ID list needed."
       },
       "adminDash": {
         "title": "Admin dashboard",

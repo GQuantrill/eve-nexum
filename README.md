@@ -13,11 +13,11 @@
 - [Quick start](#quick-start)
 - [Features](#features)
   - [Mapping](#mapping)
-  - [Personal & corp maps](#personal--corp-maps)
+  - [Personal, Corp & Alliance maps](#personal-corp--alliance-maps)
   - [System intelligence](#system-intelligence)
   - [Live ops](#live-ops)
   - [Productivity & UX](#productivity--ux)
-  - [For corporations](#for-corporations)
+  - [For corporations & alliances](#for-corporations--alliances)
 - [Wormhole bookmarks](#wormhole-bookmarks)
 - [External API](#external-api)
 - [Installation](#installation)
@@ -28,9 +28,10 @@
   - [Refreshing wormhole types](#refreshing-wormhole-types)
   - [Upgrading an existing deployment](#upgrading-an-existing-deployment)
   - [Backup & restore](#backup--restore)
-- [Corp mode](#corp-mode)
+- [Corp & alliance mode](#corp--alliance-mode)
   - [Allowing multiple corporations](#allowing-multiple-corporations)
-  - [How corp map visibility works](#how-corp-map-visibility-works)
+  - [Alliance mode](#alliance-mode)
+  - [How corp & alliance map visibility works](#how-corp--alliance-map-visibility-works)
   - [Roles](#roles)
   - [Map locking](#map-locking)
   - [Merging maps](#merging-maps)
@@ -74,7 +75,7 @@ SESSION_SECRET=…
 TOKEN_ENCRYPTION_KEY=…
 ```
 
-Leave `CORP_ID` unset for now — that opens login to any EVE character. To restrict to one or more corps later, see [Corp mode](#corp-mode).
+Leave `CORP_ID` unset for now — that opens login to any EVE character. To restrict to one or more corps or alliances later, see [Corp & alliance mode](#corp--alliance-mode).
 
 Build and start the stack. On first run an `importer` service downloads the EVE Static Data Export and populates Postgres (a one-off, a few minutes) before the server boots; later runs detect the data is already there and skip straight through:
 
@@ -87,7 +88,7 @@ Open <http://localhost> and click **Log in with EVE Online**. That's it.
 
 **Next steps**
 
-- Restrict logins to your corp, set up roles, locking, merges, or Discord notifications → [Corp mode](#corp-mode).
+- Restrict logins to your corp or alliance, set up roles, locking, merges, or Discord notifications → [Corp & alliance mode](#corp--alliance-mode).
 - Production deployment (TLS via Traefik, a public URL, periodic SDE refreshes, upgrades) → [Installation](#installation).
 - Something not coming up → [Troubleshooting](#troubleshooting).
 
@@ -110,9 +111,9 @@ Open <http://localhost> and click **Log in with EVE Online**. That's it.
 - **Orphan cleanup** — a right-click canvas action sweeps away orphaned systems (no live connection, or only broken ones) in one go, while always protecting your home system and any locked systems. Shows a live count and confirms before removing; every removal is undoable.
 - **Auto-remove aged wormholes** — opt-in per map (Connections section of the sidebar). A server-side sweep periodically removes wormhole signatures older than their type's maximum lifetime and quarantines any connection they backed. Because it runs server-side on a fixed cadence (`LAZY_WH_SWEEP_MINUTES`, default 15), it keeps synced and corp chains current even when nobody has the map open. K162s are aged against the 48h maximum WH lifetime; codes with no known lifetime are left alone.
 
-### Personal & corp maps
+### Personal, Corp & Alliance maps
 
-- **Solo / Corp split** — every user has personal maps that are always private; in corp mode each corp also gets shared corp maps. Cross-corp visibility is opt-in via `CORP_MAP_SHARED` (see [Corp mode](#corp-mode)).
+- **Personal / Corp / Alliance scopes** — every user has personal maps that are always private. In corp mode each corp also gets shared corp maps (cross-corp visibility is opt-in via `CORP_MAP_SHARED`). In alliance mode there's a third scope above corp: **alliance maps** every member of the alliance can see, managed by the `alliance_admin` role, with cross-alliance sharing opt-in via `ALLIANCE_MAP_SHARED`. A corp inside an alliance still keeps its own corp-private maps without listing every member corp in `CORP_ID`. See [Corp & alliance mode](#corp--alliance-mode).
 - **Multi-character accounts** — link several characters (alts) to a single account and switch the active character from the in-app switcher with no re-login, since each character's token is already stored. Linking merges that character's maps onto the account; the per-account map cap is enforced only at creation, so nothing is lost on link. You can also follow an alt's live (or last-known) location and route from it while flying your main, and unlink a character at any time — an unlinked character keeps its own data and becomes a standalone account again on its next login. The currently-active character can't be removed (switch away first).
 - **Share a personal map with another character or corp** — owners can grant edit access to a specific EVE character or an entire corp from the map sidebar. Recipients can edit signatures, structures, notes, and topology like a corp member but can't rename, delete, or re-share the map. Grants target raw EVE IDs, so they take effect on the recipient's very first Nexum login — no pre-registration required. The map appears in their switcher under a distinct "Shared" badge. Personal maps only; corp maps are already shared via membership.
 - **Multi-map support** — each character (or corp) can maintain multiple independent maps up to configured limits (`MAX_USER_MAPS` / `MAX_CORP_MAPS`).
@@ -163,12 +164,14 @@ Open <http://localhost> and click **Log in with EVE Online**. That's it.
 - **European date format** — DD-MM-YYYY everywhere a date is displayed (chart axes, relative-time fallbacks for events older than a month). ISO timestamps are still used in CSV exports for spreadsheet sortability.
 - **Multi-lingual** — the entire UI is translated into nine languages: English, Deutsch, Français, Español, Português, 简体中文, 한국어, 日本語, and Русский. The language is auto-detected from the browser (regional locales like `es-MX` or `en-GB` map to the base language) and can be changed any time from the in-app language switcher; the choice persists per browser. The public landing and comparison pages are localised too.
 
-### For corporations
+### For corporations & alliances
 
-These features only matter once `CORP_ID` is set — see [Corp mode](#corp-mode) for the full configuration.
+These features only matter once `CORP_ID` or `ALLIANCE_ID` is set — see [Corp & alliance mode](#corp--alliance-mode) for the full configuration.
 
 - **Multi-corp deployments** — `CORP_ID` accepts a comma-separated list of corporation IDs. One Nexum instance can host several corps; each corp's maps stay scoped to its own members unless `CORP_MAP_SHARED=true`.
-- **Admin dashboard** — a dedicated `#/admin` page with five tabs: Users, Maps, Reports, Discord, Audit log. Admins reach it from the toolbar's Admin button.
+- **Alliance-wide maps** — `ALLIANCE_ID` adds a third map scope above corp: **alliance maps** every member of the alliance can see. Login is admitted if a character's corp is in `CORP_ID` **or** their alliance is in `ALLIANCE_ID`, so a whole alliance is permitted without listing every member corp. Set `ALLIANCE_MAP_SHARED=true` to share alliance maps across a coalition of listed alliances. A corp inside the alliance still keeps its own corp-private maps (derived from the members' corp at login).
+- **Alliance admin role** — a dedicated `alliance_admin` tier sits above `admin`: it manages alliance maps and every member's role across the whole alliance (a superset of the corp admin), while corp admins stay scoped to their own corp. Only an alliance admin can create/delete/lock alliance maps or grant the `alliance_admin` role. The bootstrap `ADMIN_CHAR_ID` is pinned to `alliance_admin` when `ALLIANCE_ID` is set.
+- **Admin dashboard** — a dedicated `#/admin` page with five tabs: Users, Maps, Reports, Discord, Audit log. Admins reach it from the toolbar's Admin button. The Users tab has a member search and a **Roles?** explainer.
 - **User management** — change roles, block / unblock, and force an ESI corp-membership re-check on demand. Self-block / self-demote and changes to `ADMIN_CHAR_ID` are guarded against. Anyone who has left every listed corp is auto-blocked on the next login or recheck.
 - **Map management** — admins see every corp map (solo maps are excluded by design) with owner avatar, corp ticker, system / connection counts, lock state, and last-active time. Force-lock, force-unlock, and force-delete are one-click each.
 - **Users report** — per-character last-login, systems added / deleted, structures added, signatures broken down by type, and last-corp-activity timestamps. Every column sortable, filterable by activity (logins / signatures / structures) and time window (24h / week / month / year / all), exportable as CSV.
@@ -304,12 +307,15 @@ Edit `.env` and fill in the required values:
 | `EVE_CALLBACK_URL` | Yes | Must match the callback registered in your EVE app — e.g. `https://yourdomain.com/auth/callback` |
 | `FRONTEND_URL` | Yes | Public URL of the app — e.g. `https://yourdomain.com` |
 | `DOMAIN` | Traefik only | Bare hostname for the Traefik router rule — e.g. `nexum.yourdomain.com` |
-| `CORP_ID` | Optional | Restricts logins to specific EVE corporations. **Comma-separated list** of corporation IDs — anyone whose corp is not in the list is rejected at the OAuth callback. Leave empty/unset to allow any EVE character to log in. Example single corp: `98000001`. Example multi-corp: `98000001,98000002`. |
-| `ADMIN_CHAR_ID` | When `CORP_ID` is set | EVE character ID of the bootstrap admin. Forced to the `admin` role on first login and cannot be demoted or blocked by other admins. **Not a corp-membership exemption** — this character still has to be in one of the corps listed in `CORP_ID` to log in. See [What happens when a user leaves the corp](#what-happens-when-a-user-leaves-the-corp). |
+| `CORP_ID` | Optional | Restricts logins to specific EVE corporations. **Comma-separated list** of corporation IDs — anyone whose corp is not in the list is rejected at the OAuth callback (unless their alliance is in `ALLIANCE_ID`). Leave empty/unset to allow any EVE character to log in. Example single corp: `98000001`. Example multi-corp: `98000001,98000002`. |
+| `ALLIANCE_ID` | Optional | Restricts logins to specific EVE alliances, and adds the **alliance map** scope. **Comma-separated list** of alliance IDs. A character is admitted if their corp is in `CORP_ID` **or** their alliance is in `ALLIANCE_ID`, so a whole alliance can be permitted without listing every member corp. The list also forms the coalition for `ALLIANCE_MAP_SHARED`. Example: `99000001` or `99000001,99000002`. |
+| `ADMIN_CHAR_ID` | When `CORP_ID` or `ALLIANCE_ID` is set | EVE character ID of the bootstrap admin. Forced to the top role on first login (`alliance_admin` when `ALLIANCE_ID` is set, otherwise `admin`) and cannot be demoted or blocked by other admins. **Not a membership exemption** — this character still has to be in a listed corp or alliance to log in. See [What happens when a user leaves the corp](#what-happens-when-a-user-leaves-the-corp). |
 | `CORP_MAP_SHARED` | Optional | `1` / `true` to share every corp map across every listed corp. Default (`false`) scopes corp maps to the corp that created them — Corp A's chain stays invisible to Corp B even when they share a deployment. Only enable when all listed corps explicitly trust each other. |
-| `CORP_MAP_TIME` | Optional | Days an idle corp map can sit untouched before it's auto-archived. Default `30`. |
+| `ALLIANCE_MAP_SHARED` | Optional | Alliance counterpart of `CORP_MAP_SHARED`. `1` / `true` makes every alliance map visible to every listed alliance (coalition mode). Default (`false`) scopes each alliance map to its owning alliance. |
+| `CORP_MAP_TIME` | Optional | Days an idle corp or alliance map can sit untouched before it's auto-deleted. Default `30`. |
 | `MAX_USER_MAPS` | Optional | Max number of personal maps per user. Default `5`. |
 | `MAX_CORP_MAPS` | Optional | Max number of corp maps per corp. Default `5`. |
+| `MAX_ALLIANCE_MAPS` | Optional | Max number of alliance maps per alliance. Default `5`. |
 | `LAZY_WH_SWEEP_MINUTES` | Optional | Cadence (minutes) of the lazy wormhole-removal sweep, which removes aged-out WH sigs and quarantines the connections they backed on maps that have opted in. Default `15`. Set to `0` to disable the sweep entirely. |
 | `DISCORD_WEBHOOK_URL` | Optional | Discord webhook(s) for corp-intel notifications (inbound K162, new connections). One URL fires for **every** corp map; for multi-corp deployments use `corpId=URL` pairs (comma-separated) to route each corp to its own channel — e.g. `98000001=https://discord.com/api/webhooks/…,98000002=https://discord.com/api/webhooks/…`. Personal maps never notify. Leave unset to disable. Which regions/maps actually notify is then filtered per corp in the admin **Discord** tab. See [Discord notifications](#discord-notifications). |
 
@@ -501,13 +507,13 @@ The frontend is available at `http://localhost:5174`. The Vite dev server proxie
 
 ---
 
-## Corp mode
+## Corp & alliance mode
 
-When `CORP_ID` is set, Nexum operates in **corp mode** — only members of the listed corporations can log in. All four user roles described below apply only in corp mode; open deployments (no `CORP_ID`) treat every authenticated character as a normal user with full access to their own maps.
+When `CORP_ID` and/or `ALLIANCE_ID` is set, Nexum operates in **restricted mode** — only members of the listed corporations or alliances can log in. The user roles described below apply only in restricted mode; open deployments (neither set) treat every authenticated character as a normal user with full access to their own maps.
 
 ### Allowing multiple corporations
 
-`CORP_ID` accepts a comma-separated list of corporation IDs. Every character logging in is checked against this list via ESI; anyone whose corp is not included is bounced to the landing page with `?error=not_in_corp`.
+`CORP_ID` accepts a comma-separated list of corporation IDs. Every character logging in is checked against this list via ESI; anyone whose corp is not included (and whose alliance isn't in `ALLIANCE_ID`) is bounced to the landing page with `?error=not_in_corp`.
 
 ```dotenv
 # Single corp
@@ -517,34 +523,57 @@ CORP_ID=98000001
 CORP_ID=98000001,98000002,98000003
 ```
 
-### How corp map visibility works
+### Alliance mode
+
+Set `ALLIANCE_ID` to permit whole alliances without enumerating every member corp. A character is admitted if their corp is in `CORP_ID` **or** their alliance is in `ALLIANCE_ID`, so the two lists are additive — you can run alliance-only, corp-only, or a mix.
+
+```dotenv
+# Permit an entire alliance (no need to list its corps)
+ALLIANCE_ID=99000001
+
+# A coalition of alliances
+ALLIANCE_ID=99000001,99000002
+```
+
+Alliance mode adds a **third map scope above corp**: `personal → corp → alliance`.
+
+- **Alliance maps** are visible to every member of the owning alliance and are created / deleted / locked / renamed only by the `alliance_admin` role. Set `ALLIANCE_MAP_SHARED=true` to make every alliance map visible across all listed alliances (coalition mode); the default keeps each alliance's maps to its own members.
+- **Corp maps inside an alliance** still work without a `CORP_ID` list — a corp map is derived from the creator's corp at login and stays visible to same-corp members only. This lets each corp keep private chains while the alliance shares its own maps above them.
+- **`alliance_admin`** is a superset of `admin`: it administers users and maps across the entire alliance, whereas a corp `admin` stays scoped to its own corp. Only an alliance admin can grant the `alliance_admin` role or block another alliance admin. `ADMIN_CHAR_ID` is pinned to `alliance_admin` while `ALLIANCE_ID` is set.
+
+### How corp & alliance map visibility works
 
 By default (`CORP_MAP_SHARED=false`), **corp maps are scoped to the corp that created them**. If Corp A creates a corp map, only members of Corp A can see it — Corp B's members never know it exists, even though they share the deployment. This is the safer default for alliance-shared instances where each corp wants to keep its chain intel private.
 
 Set `CORP_MAP_SHARED=true` to make every corp map visible to every listed corp. Only do this when all listed corps explicitly trust each other.
 
-Personal maps are **always private to their owning user**, regardless of corp or `CORP_MAP_SHARED`. Leaving a corp does not transfer ownership.
+**Alliance maps** follow the same pattern one scope up: by default an alliance map is visible only to its owning alliance; `ALLIANCE_MAP_SHARED=true` shares every alliance map across all listed alliances (coalition mode).
+
+Personal maps are **always private to their owning user**, regardless of corp, alliance, or the `*_MAP_SHARED` flags. Leaving a corp or alliance does not transfer ownership.
 
 ### Roles
 
 Roles are stored per-user in the database. New users default to `readonly`; an admin must promote them.
 
-Rules differ for personal (solo) maps vs corp maps. Personal maps are scoped to a single user; corp maps are shared infrastructure and gated more tightly.
+Rules differ for personal (solo) maps, corp maps, and alliance maps. Personal maps are scoped to a single user; corp and alliance maps are shared infrastructure and gated more tightly.
 
 **Personal maps** — every user can create their own personal maps (up to `MAX_USER_MAPS`) and edit everything inside them, regardless of role. A `readonly` user is "readonly" only with respect to other people's maps; their own personal map is theirs.
 
 **Shared-in personal maps** — when another user has shared their personal map with you (or with your corp), you can edit signatures, structures, notes, and topology regardless of your global role — the grant is an explicit invitation by the owner. You cannot rename the map, delete it, generate a public share link, or change who else has access; those stay with the owner. Lock state still applies: if the owner is also an admin and locks the map, your topology edits are frozen the same as a locked corp map.
 
-**Corp maps:**
+**Corp & alliance maps:**
 
-| Role       | View | Edit signatures / structures / notes | Edit systems / connections / rename | Create / delete corp map | Lock map | Manage users |
-|---|---|---|---|---|---|---|
-| `readonly` | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ |
-| `edit`     | ✓ | ✓ | ✓ | ✗ | ✗ | ✗ |
-| `full`     | ✓ | ✓ | ✓ | ✓ | ✗ | ✗ |
-| `admin`    | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Role             | View | Edit signatures / structures / notes | Edit systems / connections / rename | Create / delete / lock **corp** map | Manage corp users | Create / delete / lock **alliance** map | Manage alliance users |
+|---|---|---|---|---|---|---|---|
+| `readonly`       | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
+| `edit`           | ✓ | ✓ | ✓ | ✗ | ✗ | ✗ | ✗ |
+| `full`           | ✓ | ✓ | ✓ | ✓ | ✗ | ✗ | ✗ |
+| `admin`          | ✓ | ✓ | ✓ | ✓ | ✓ (own corp) | ✗ | ✗ |
+| `alliance_admin` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ (whole alliance) |
 
-The character whose ID matches `ADMIN_CHAR_ID` is always given `admin` on login and **cannot be demoted or blocked** by other admins. Leave it set even after you've promoted other admins — it's the recovery path against an admin demoting themselves or being blocked by mistake.
+Editing rights on an alliance map follow the same tiers as a corp map (a `readonly` alliance member can view but not edit; `edit`/`full`/`admin` can edit). Only `alliance_admin` can create, delete, lock, or rename an alliance map, or grant the `alliance_admin` role. `alliance_admin` is a strict superset of `admin` — the difference is reach (the whole alliance vs a single corp), not editing capability.
+
+The character whose ID matches `ADMIN_CHAR_ID` is always given the top role on login (`alliance_admin` when `ALLIANCE_ID` is set, otherwise `admin`) and **cannot be demoted or blocked** by other admins. Leave it set even after you've promoted other admins — it's the recovery path against an admin demoting themselves or being blocked by mistake.
 
 ### Map locking
 

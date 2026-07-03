@@ -1105,11 +1105,11 @@
     },
     "sections": {
       "mapping": "지도 작성",
-      "personalCorp": "개인 및 군단 지도",
+      "personalCorp": "개인, 코퍼레이션 & 얼라이언스 맵",
       "sysIntel": "성계 인텔리전스",
       "liveOps": "실시간 작전",
       "productivity": "생산성 및 UX",
-      "forCorps": "군단용",
+      "forCorps": "코퍼레이션 & 얼라이언스용",
       "compare": "Nexum은 어떻게 비교되나요?",
       "languages": "당신의 언어로 제공됩니다",
       "discordCta": "질문, 아이디어 또는 버그가 있나요?",
@@ -1324,6 +1324,14 @@
       "multiCorp": {
         "title": "다중 군단 배포",
         "desc": "CORP_ID는 쉼표로 구분된 군단 ID 목록을 받습니다. 하나의 Nexum 인스턴스가 여러 군단을 호스팅할 수 있으며; CORP_MAP_SHARED=true가 아닌 한 각 군단의 지도는 자기 구성원으로 한정됩니다."
+      },
+      "allianceMaps": {
+        "title": "얼라이언스 전체 맵",
+        "desc": "ALLIANCE_ID는 코퍼레이션 위에 세 번째 맵 범위를 추가합니다. 얼라이언스의 모든 구성원이 볼 수 있는 얼라이언스 맵입니다. ALLIANCE_MAP_SHARED=true로 설정하면 여러 얼라이언스 연합에서 공유됩니다."
+      },
+      "allianceRoles": {
+        "title": "얼라이언스 관리자 역할",
+        "desc": "전용 alliance_admin 등급이 얼라이언스 전체의 얼라이언스 맵과 모든 구성원의 역할을 관리합니다 — 코퍼레이션 관리자의 상위. 얼라이언스 내 각 코퍼레이션은 CORP_ID 목록 없이도 자체 코퍼 전용 맵을 유지할 수 있습니다."
       },
       "adminDash": {
         "title": "관리 대시보드",
