@@ -170,7 +170,7 @@ function CheckedAtIcon({ checkedAt }: { checkedAt: Date }) {
 // reflows and wraps instead of stacking. Conditional items (admin, proximity,
 // account actions) simply drop out of the rendered list when absent.
 const DEFAULT_TOOLBAR_ORDER = [
-  'brand', 'map', 'stats', 'proximity', 'tools', 'server', 'account',
+  'map', 'stats', 'proximity', 'tools', 'server', 'account',
   'actions',
 ];
 
@@ -320,12 +320,6 @@ export function Toolbar() {
   // Each movable item's content, keyed by id. Items that evaluate to null are
   // simply not rendered (and not persisted in the order).
   const items: Record<string, ReactNode> = {
-    brand: (
-      <div className="toolbar__brand">
-        <span className="toolbar__logo">◈</span>
-      </div>
-    ),
-
     map: (
       <div className="toolbar__group">
         <div className="toolbar__map-switcher" ref={mapSwitcherRef}>
@@ -661,6 +655,11 @@ export function Toolbar() {
   return (
     <>
     <header className="toolbar toolbar--free">
+      {/* Fixed brand anchor — always top-left, never draggable. */}
+      <div className="toolbar__brand">
+        <span className="toolbar__logo">◈</span>
+      </div>
+
       <DndContext sensors={dragSensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
         <SortableContext items={renderOrder} strategy={rectSortingStrategy}>
           {renderOrder.map((id) => (
