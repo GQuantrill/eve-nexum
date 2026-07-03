@@ -722,7 +722,9 @@
     "labels": "Labels",
     "customLabel": "Eigenes Label",
     "clearLabels": "Löschen",
-    "labelNamed": "Label {{name}}"
+    "labelNamed": "Label {{name}}",
+    "tag": "Tag",
+    "clearTag": "Tag entfernen"
   },
   "panel": {
     "notes": "Notizen",

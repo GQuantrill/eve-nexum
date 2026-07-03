@@ -764,6 +764,8 @@
     "customLabel": "Custom label",
     "clearLabels": "Clear",
     "labelNamed": "Label {{name}}",
+    "tag": "Tag",
+    "clearTag": "Clear tag",
     "lockSystem": "Lock System",
     "unlockSystem": "Unlock System",
     "removeSystem": "Remove System",

@@ -722,7 +722,9 @@
     "labels": "ラベル",
     "customLabel": "カスタムラベル",
     "clearLabels": "クリア",
-    "labelNamed": "ラベル {{name}}"
+    "labelNamed": "ラベル {{name}}",
+    "tag": "タグ",
+    "clearTag": "タグを消去"
   },
   "panel": {
     "notes": "メモ",

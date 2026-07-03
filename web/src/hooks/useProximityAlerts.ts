@@ -7,6 +7,7 @@ import { useStandings } from './useStandings';
 import { ensureSovLoaded, getSovEntries } from './useSovData';
 import { useUserSetting, readUserSetting, writeUserSetting } from './useUserSetting';
 import { NOTIFY, notifyOn } from '../utils/notificationPrefs';
+import { useDebugFlag } from '../utils/debugFlags';
 
 export type ThreatKind = 'incursion' | 'insurgency' | 'hostile-sov';
 
@@ -18,6 +19,12 @@ export interface NearestThreat {
 
 const THRESHOLD_KEY = 'nexum.proximityThreshold';
 const DEFAULT_THRESHOLD = 2;
+
+// Stand-in threat shown when nexumDebug.showThreats() is on but nothing real is
+// detected (e.g. testing in the browser with no live character location, so no
+// route origin exists to measure real threats from). Purely for eyeballing the
+// proximity chip; never used outside debug mode.
+const DEMO_THREAT: NearestThreat = { kind: 'incursion', jumps: 2, systemId: -1 };
 
 function clamp(n: number): number {
   return Math.max(0, Math.min(5, Math.floor(n)));
@@ -87,6 +94,11 @@ export function useProximityAlerts(): {
   const insurgency = useInsurgency();
   const standings  = useStandings();
   const [threshold] = useProximityThreshold();
+  // nexumDebug.showThreats() flips this to surface the nearest threat in the
+  // toolbar regardless of the alert threshold. Only affects what's DISPLAYED —
+  // the notification/beep below still uses the real threshold so debug mode
+  // doesn't spam alerts for far-off threats.
+  const debugShowThreats = useDebugFlag('showThreats');
 
   // Cluster-wide sov data loads asynchronously the first time anyone
   // consumes it. We need to know when it's ready so we can fold the
@@ -165,5 +177,12 @@ export function useProximityAlerts(): {
     }
   }, [nearest, threshold, nameMap]);
 
+  // Debug: surface a threat regardless of the alert threshold. Show the real
+  // nearest one if there is any (with real jumps), otherwise a demo stand-in so
+  // the chip is always visible for eyeballing. Only the RETURNED values change —
+  // the notification/beep above still keys off the real `nearest` + threshold.
+  if (debugShowThreats) {
+    return { nearest: nearest ?? DEMO_THREAT, threshold: Number.MAX_SAFE_INTEGER };
+  }
   return { nearest, threshold };
 }

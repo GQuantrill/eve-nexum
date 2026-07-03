@@ -722,7 +722,9 @@
     "labels": "라벨",
     "customLabel": "사용자 라벨",
     "clearLabels": "지우기",
-    "labelNamed": "라벨 {{name}}"
+    "labelNamed": "라벨 {{name}}",
+    "tag": "태그",
+    "clearTag": "태그 지우기"
   },
   "panel": {
     "notes": "노트",

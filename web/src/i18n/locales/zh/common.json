@@ -722,7 +722,9 @@
     "labels": "标签",
     "customLabel": "自定义标签",
     "clearLabels": "清除",
-    "labelNamed": "标签 {{name}}"
+    "labelNamed": "标签 {{name}}",
+    "tag": "标记",
+    "clearTag": "清除标记"
   },
   "panel": {
     "notes": "笔记",
