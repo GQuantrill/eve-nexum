@@ -140,6 +140,8 @@
     "users": {
       "title": "Users",
       "none": "No users yet.",
+      "searchPlaceholder": "Search members…",
+      "noMatch": "No members match \"{{query}}\".",
       "colCharacter": "Character",
       "colCorp": "Corp",
       "colAlliance": "Alliance",

@@ -109,7 +109,9 @@
       "loadFailed": "Benutzer konnten nicht geladen werden",
       "roleChangeFailed": "Rollenänderung fehlgeschlagen",
       "blockChangeFailed": "Sperränderung fehlgeschlagen",
-      "recheckFailed": "Neuprüfung fehlgeschlagen"
+      "recheckFailed": "Neuprüfung fehlgeschlagen",
+      "searchPlaceholder": "Mitglieder suchen…",
+      "noMatch": "Keine Mitglieder passen zu „{{query}}“."
     },
     "maps": {
       "title": "Karten",

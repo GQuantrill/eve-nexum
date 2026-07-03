@@ -109,7 +109,9 @@
       "loadFailed": "Échec du chargement des utilisateurs",
       "roleChangeFailed": "Échec du changement de rôle",
       "blockChangeFailed": "Échec du changement de blocage",
-      "recheckFailed": "Échec de la revérification"
+      "recheckFailed": "Échec de la revérification",
+      "searchPlaceholder": "Rechercher des membres…",
+      "noMatch": "Aucun membre ne correspond à « {{query}} »."
     },
     "maps": {
       "title": "Cartes",

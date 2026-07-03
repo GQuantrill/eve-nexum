@@ -109,7 +109,9 @@
       "loadFailed": "사용자를 불러오지 못했습니다",
       "roleChangeFailed": "권한 변경 실패",
       "blockChangeFailed": "차단 상태 변경 실패",
-      "recheckFailed": "다시 확인 실패"
+      "recheckFailed": "다시 확인 실패",
+      "searchPlaceholder": "멤버 검색…",
+      "noMatch": "\"{{query}}\"와 일치하는 멤버가 없습니다."
     },
     "maps": {
       "title": "지도",

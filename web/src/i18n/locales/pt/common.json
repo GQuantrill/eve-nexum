@@ -109,7 +109,9 @@
       "loadFailed": "Falha ao carregar os utilizadores",
       "roleChangeFailed": "Falha ao alterar a função",
       "blockChangeFailed": "Falha ao alterar o bloqueio",
-      "recheckFailed": "Falha na reverificação"
+      "recheckFailed": "Falha na reverificação",
+      "searchPlaceholder": "Buscar membros…",
+      "noMatch": "Nenhum membro corresponde a \"{{query}}\"."
     },
     "maps": {
       "title": "Mapas",
