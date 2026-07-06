@@ -210,6 +210,11 @@ export function useLocationTracking(enabled: boolean) {
   const lastEveSystemId = useRef<number | null>(null);
   const lastMapSystemId = useRef<string | null>(null);
   const lastActiveMapId = useRef<string | null>(null);
+  // The eve system we last auto-selected. Guards the "follow the character"
+  // selection so it fires only on a GENUINE move — not when ESI's online flag
+  // flickers (which resets lastEveSystemId and would otherwise re-select the
+  // same system, yanking the user off whatever they'd manually clicked).
+  const lastSelectedEveId = useRef<number | null>(null);
 
   useEffect(() => {
     if (!enabled) return;
@@ -224,6 +229,7 @@ export function useLocationTracking(enabled: boolean) {
       lastActiveMapId.current = map.id;
       lastEveSystemId.current = null;
       lastMapSystemId.current = null;
+      lastSelectedEveId.current = null;
     }
 
     const system = location.system;
@@ -272,6 +278,13 @@ export function useLocationTracking(enabled: boolean) {
 
     lastMapSystemId.current = mapSystemId;
     setCurrentSystem(mapSystemId);
-    selectSystem(mapSystemId, { fromJump: true });
+    // Follow the character onto the new system only when it's genuinely a
+    // different system than the one we last auto-selected. An ESI online-status
+    // flicker resets lastEveSystemId (above), which would otherwise re-run this
+    // for the SAME system and steal a selection the user made by hand.
+    if (system.eveSystemId !== lastSelectedEveId.current) {
+      lastSelectedEveId.current = system.eveSystemId;
+      selectSystem(mapSystemId, { fromJump: true });
+    }
   }, [enabled, location, canEdit]);
 }
