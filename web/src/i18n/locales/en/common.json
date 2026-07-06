@@ -881,7 +881,7 @@
     "home": "Home",
     "noJumps": "— jumps",
     "removeFromList": "Remove from list",
-    "signIn": "Sign in and dock in K-space to see jumps to hubs.",
+    "signIn": "Sign in and dock in K-space to see jumps to hubs, or enable the route shortcut options to route from a wormhole or Thera.",
     "searchPlaceholder": "Search system name…",
     "onList": "on list",
     "noMatch": "No systems match \"{{query}}\""

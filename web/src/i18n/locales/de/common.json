@@ -828,7 +828,7 @@
     "home": "Heimat",
     "noJumps": "— Sprünge",
     "removeFromList": "Aus Liste entfernen",
-    "signIn": "Melde dich an und docke in K-Space, um Sprünge zu Hubs zu sehen.",
+    "signIn": "Melde dich an und docke in K-Space, um Sprünge zu Hubs zu sehen, oder aktiviere die Routen-Shortcut-Optionen, um von einem Wurmloch oder Thera aus zu routen.",
     "searchPlaceholder": "Systemname suchen…",
     "onList": "auf Liste",
     "noMatch": "Keine Systeme passen zu \"{{query}}\""
