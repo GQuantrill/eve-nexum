@@ -995,6 +995,7 @@
     "colNotes": "Заметки",
     "colAge": "Возраст",
     "colUpdated": "Обновлено",
+    "columns": "Столбцы",
     "namePlaceholder": "Название сайта"
   },
   "anomalies": {
@@ -1031,6 +1032,7 @@
     "colNotes": "Заметки",
     "colAge": "Возраст",
     "colUpdated": "Обновлено",
+    "columns": "Столбцы",
     "namePlaceholder": "Название аномалии"
   },
   "stats": {

@@ -963,6 +963,7 @@
     "colNotes": "Notas",
     "colAge": "Idade",
     "colUpdated": "Atualizado",
+    "columns": "Colunas",
     "namePlaceholder": "Nome do site"
   },
   "anomalies": {
@@ -995,6 +996,7 @@
     "colNotes": "Notas",
     "colAge": "Idade",
     "colUpdated": "Atualizado",
+    "columns": "Colunas",
     "namePlaceholder": "Nome da anomalia"
   },
   "stats": {

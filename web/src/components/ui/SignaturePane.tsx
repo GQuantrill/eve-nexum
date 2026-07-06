@@ -5,11 +5,12 @@ import { useMapStore } from '../../store/mapStore';
 import { useCanEditContent } from '../../hooks/useCanEditContent';
 import { useShareMode } from '../../context/ShareModeContext';
 import { useUserSetting } from '../../hooks/useUserSetting';
+import { useClickOutside } from '../../hooks/useClickOutside';
 import type { Signature, SigType } from '../../types';
 import { ConfirmModal, shouldSkipConfirm } from './ConfirmModal';
 import { NotesEditor } from './NotesEditor';
 import { WormholeTypePicker } from './WormholeTypePicker';
-import { XIcon, CopyIcon } from '@phosphor-icons/react';
+import { XIcon, CopyIcon, ColumnsIcon } from '@phosphor-icons/react';
 import { LeadsToDropdown } from './LeadsToDropdown';
 import { toast } from './Toaster';
 import { reevaluateConnectionsForSystem } from '../../utils/whAutoDetect';
@@ -123,6 +124,18 @@ const DEFAULT_WIDTHS: Record<ColKey, number> = {
 // on the column width so neither a squeezed narrow viewport nor a saved-narrow
 // layout can clip it.
 const LEADSTO_MIN_WIDTH = 132;
+
+// Columns the user can hide to slim the pane down (handy for an undocked, narrow
+// window). ID / Type / WH Type / Leads To always stay — they're the core scan
+// data. Label keys reuse the existing header translations. Hidden columns are
+// stored as a list under one ui_settings key; empty (the default) = all shown,
+// so a later-added hideable column defaults visible without migration.
+const HIDEABLE_COLS = [
+  { key: 'name',    labelKey: 'signatures.colName' },
+  { key: 'notes',   labelKey: 'signatures.colNotes' },
+  { key: 'created', labelKey: 'signatures.colAge' },
+  { key: 'updated', labelKey: 'signatures.colUpdated' },
+] as const satisfies ReadonlyArray<{ key: ColKey; labelKey: string }>;
 
 // Grace-period choices (seconds) offered before an overwrite-paste actually
 // deletes a despawned sig. 0 = delete immediately. Compact s/m labels read
@@ -240,6 +253,16 @@ export function SignaturePane({ systemId }: { systemId: string }) {
     return merged;
   }, [savedColWidths]);
 
+  // Hidden columns, persisted per user (shared across every Signature pane).
+  const [hiddenColsArr, setHiddenColsArr] = useUserSetting<ColKey[]>('nexum.sigPane.hiddenCols', []);
+  const hiddenCols = useMemo(() => new Set(hiddenColsArr), [hiddenColsArr]);
+  const isColVisible = useCallback((c: ColKey) => !hiddenCols.has(c), [hiddenCols]);
+  const toggleCol = (c: ColKey) =>
+    setHiddenColsArr((prev) => (prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c]));
+  const [colMenuOpen, setColMenuOpen] = useState(false);
+  const colMenuRef = useRef<HTMLDivElement>(null);
+  useClickOutside(colMenuOpen, colMenuRef, () => setColMenuOpen(false));
+
   const pendingUpdates = useRef<Map<string, Partial<Signature>>>(new Map());
   const debounceTimers = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
   const sigsRef        = useRef<Signature[]>([]);
@@ -321,8 +344,9 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   // squeezing every column down — which is what clipped the leads-to name and
   // spilled the copy button over the next column.
   const tableMinWidth = useMemo(
-    () => Object.values(colWidths).reduce((a, b) => a + b, 0) + (isShareMode ? 0 : 24 + 28),
-    [colWidths, isShareMode],
+    () => (Object.entries(colWidths) as Array<[ColKey, number]>)
+      .reduce((a, [k, w]) => a + (isColVisible(k) ? w : 0), 0) + (isShareMode ? 0 : 24 + 28),
+    [colWidths, isShareMode, isColVisible],
   );
 
   // Bumped when another client changes this system's sigs (live sync).
@@ -777,6 +801,33 @@ export function SignaturePane({ systemId }: { systemId: string }) {
               {t('signatures.filterClear')}
             </button>
           )}
+          <div className="sig-col-menu" ref={colMenuRef}>
+            <button
+              type="button"
+              className={`icon-btn sig-col-menu__btn${hiddenCols.size > 0 ? ' sig-col-menu__btn--active' : ''}`}
+              onClick={() => setColMenuOpen((o) => !o)}
+              aria-expanded={colMenuOpen}
+              aria-label={t('signatures.columns')}
+              data-tooltip={t('signatures.columns')}
+            >
+              <ColumnsIcon size={14} weight="regular" />
+            </button>
+            {colMenuOpen && (
+              <div className="sig-col-menu__pop" role="menu">
+                <div className="sig-col-menu__title">{t('signatures.columns')}</div>
+                {HIDEABLE_COLS.map(({ key, labelKey }) => (
+                  <label key={key} className="sig-col-menu__item">
+                    <input
+                      type="checkbox"
+                      checked={isColVisible(key)}
+                      onChange={() => toggleCol(key)}
+                    />
+                    <span>{t(labelKey)}</span>
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       )}
 
@@ -799,10 +850,10 @@ export function SignaturePane({ systemId }: { systemId: string }) {
             <col style={{ width: colWidths.type }} />
             <col style={{ width: colWidths.whtype }} className="sig-col--whtype" />
             <col style={{ width: colWidths.leadsto }} />
-            <col style={{ width: colWidths.name }} />
-            <col style={{ width: colWidths.notes }} />
-            <col style={{ width: colWidths.created }} />
-            <col style={{ width: colWidths.updated }} />
+            {isColVisible('name')    && <col style={{ width: colWidths.name }} />}
+            {isColVisible('notes')   && <col style={{ width: colWidths.notes }} />}
+            {isColVisible('created') && <col style={{ width: colWidths.created }} />}
+            {isColVisible('updated') && <col style={{ width: colWidths.updated }} />}
             {!isShareMode && <col className="sig-col--actions" />}
           </colgroup>
           <thead>
@@ -834,22 +885,30 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                 {t('signatures.colLeadsTo')}{sortInd('whLeadsTo')}
                 <div className="sig-th__resize" onMouseDown={(e) => startResize('leadsto', e)} />
               </th>
-              <th className="sig-th sig-th--sortable" onClick={() => handleSort('name')}>
-                {t('signatures.colName')}{sortInd('name')}
-                <div className="sig-th__resize" onMouseDown={(e) => startResize('name', e)} />
-              </th>
-              <th className="sig-th">
-                {t('signatures.colNotes')}
-                <div className="sig-th__resize" onMouseDown={(e) => startResize('notes', e)} />
-              </th>
-              <th className="sig-th sig-th--sortable sig-th--time" onClick={() => handleSort('createdAt')}>
-                {t('signatures.colAge')}{sortInd('createdAt')}
-                <div className="sig-th__resize" onMouseDown={(e) => startResize('created', e)} />
-              </th>
-              <th className="sig-th sig-th--sortable sig-th--time" onClick={() => handleSort('updatedAt')}>
-                {t('signatures.colUpdated')}{sortInd('updatedAt')}
-                <div className="sig-th__resize" onMouseDown={(e) => startResize('updated', e)} />
-              </th>
+              {isColVisible('name') && (
+                <th className="sig-th sig-th--sortable" onClick={() => handleSort('name')}>
+                  {t('signatures.colName')}{sortInd('name')}
+                  <div className="sig-th__resize" onMouseDown={(e) => startResize('name', e)} />
+                </th>
+              )}
+              {isColVisible('notes') && (
+                <th className="sig-th">
+                  {t('signatures.colNotes')}
+                  <div className="sig-th__resize" onMouseDown={(e) => startResize('notes', e)} />
+                </th>
+              )}
+              {isColVisible('created') && (
+                <th className="sig-th sig-th--sortable sig-th--time" onClick={() => handleSort('createdAt')}>
+                  {t('signatures.colAge')}{sortInd('createdAt')}
+                  <div className="sig-th__resize" onMouseDown={(e) => startResize('created', e)} />
+                </th>
+              )}
+              {isColVisible('updated') && (
+                <th className="sig-th sig-th--sortable sig-th--time" onClick={() => handleSort('updatedAt')}>
+                  {t('signatures.colUpdated')}{sortInd('updatedAt')}
+                  <div className="sig-th__resize" onMouseDown={(e) => startResize('updated', e)} />
+                </th>
+              )}
               {!isShareMode && <th className="sig-cell--actions" />}
             </tr>
           </thead>
@@ -935,35 +994,43 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                       )
                   )}
                 </td>
-                <td>
-                  {isShareMode ? (
-                    <span className="sig-text">{sig.name}</span>
-                  ) : (
-                    <input
-                      className="sig-input"
-                      value={sig.name}
-                      onChange={(e) => updateSig(sig.id, { name: e.target.value })}
-                      placeholder={t('signatures.namePlaceholder')}
+                {isColVisible('name') && (
+                  <td>
+                    {isShareMode ? (
+                      <span className="sig-text">{sig.name}</span>
+                    ) : (
+                      <input
+                        className="sig-input"
+                        value={sig.name}
+                        onChange={(e) => updateSig(sig.id, { name: e.target.value })}
+                        placeholder={t('signatures.namePlaceholder')}
+                      />
+                    )}
+                  </td>
+                )}
+                {isColVisible('notes') && (
+                  <td className="sig-notes-cell">
+                    <NotesEditor
+                      value={sig.notes}
+                      onChange={(v) => updateSig(sig.id, { notes: v })}
+                      compact
+                      readOnly={!canEdit || isShareMode}
                     />
-                  )}
-                </td>
-                <td className="sig-notes-cell">
-                  <NotesEditor
-                    value={sig.notes}
-                    onChange={(v) => updateSig(sig.id, { notes: v })}
-                    compact
-                    readOnly={!canEdit || isShareMode}
+                  </td>
+                )}
+                {isColVisible('created') && (
+                  <ElapsedCell
+                    iso={sig.createdAt}
+                    className={`sig-td--time${
+                      isSigStale(sig.sigType, sig.whType, sig.createdAt, tickNow)
+                        ? ' sig-td--age-stale'
+                        : ''
+                    }`}
                   />
-                </td>
-                <ElapsedCell
-                  iso={sig.createdAt}
-                  className={`sig-td--time${
-                    isSigStale(sig.sigType, sig.whType, sig.createdAt, tickNow)
-                      ? ' sig-td--age-stale'
-                      : ''
-                  }`}
-                />
-                <ElapsedCell iso={sig.updatedAt} className="sig-td--time sig-td--updated" />
+                )}
+                {isColVisible('updated') && (
+                  <ElapsedCell iso={sig.updatedAt} className="sig-td--time sig-td--updated" />
+                )}
                 {!isShareMode && (
                   <td className="sig-cell--actions">
                     {canEdit && (

@@ -963,6 +963,7 @@
     "colNotes": "笔记",
     "colAge": "存在时长",
     "colUpdated": "更新时间",
+    "columns": "列",
     "namePlaceholder": "站点名称"
   },
   "anomalies": {
@@ -995,6 +996,7 @@
     "colNotes": "笔记",
     "colAge": "存在时长",
     "colUpdated": "更新时间",
+    "columns": "列",
     "namePlaceholder": "异常空间名称"
   },
   "stats": {
