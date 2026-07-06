@@ -904,6 +904,8 @@
     "showNpcKills": "NPC 킬 표시",
     "loading": "킬 불러오는 중…",
     "noKills": "지난 24시간 내 킬 없음.",
+    "lastKillAgo": "지난 24시간 동안 킬 없음 — 마지막 {{time}}.",
+    "noKillsOnRecord": "기록된 킬이 없습니다.",
     "noKillsNpc": "지난 24시간 내 킬 없음 — NPC 전용 {{count}}개 숨김.",
     "showThem": "표시",
     "loadMore": "더 불러오기 ({{count}}개 남음)"
