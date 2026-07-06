@@ -801,7 +801,9 @@
     "structures": "Structures",
     "npcStations": "NPC Stations",
     "killboard": "zKillboard",
-    "activity": "Activity"
+    "activity": "Activity",
+    "undock": "Undock to a floating window",
+    "redock": "Dock back"
   },
   "systemPanel": {
     "unknownSystem": "Unknown System",
@@ -957,6 +959,8 @@
     "showNpcKills": "Show NPC kills",
     "loading": "Loading kills…",
     "noKills": "No kills in the last 24h.",
+    "lastKillAgo": "No kills in the last 24h — last was {{time}}.",
+    "noKillsOnRecord": "No kills on record.",
     "noKillsNpc": "No kills in the last 24h — {{count}} NPC-only hidden.",
     "showThem": "Show them",
     "loadMore": "Load more ({{count}} remaining)"

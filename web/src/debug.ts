@@ -191,6 +191,30 @@ const nexumDebug = {
     });
   },
 
+  // Trace what clears the selected system. Subscribes to the map store and
+  // logs every selectedSystemId transition; when it goes to null it prints a
+  // stack trace of whatever caused it (the setter runs synchronously inside the
+  // action, so the action frame is in the stack). Run it, reproduce the
+  // "bottom panel vanishes" bug, and the CLEARED line names the culprit. Call
+  // again to stop.
+  _selUnsub: null as null | (() => void),
+  traceSelection() {
+    if (this._selUnsub) { this._selUnsub(); this._selUnsub = null; console.log('[nexum] Selection trace OFF.'); return; }
+    import('./store/mapStore').then(({ useMapStore }) => {
+      this._selUnsub = useMapStore.subscribe((state, prev) => {
+        if (state.selectedSystemId === prev.selectedSystemId) return;
+        const from = prev.selectedSystemId, to = state.selectedSystemId;
+        if (from && !to) {
+          console.warn(`[nexum] selectedSystemId CLEARED (${from} → null) — what did it:`);
+          console.warn(new Error('selection cleared').stack);
+        } else {
+          console.info(`[nexum] selectedSystemId: ${from ?? 'null'} → ${to ?? 'null'}`);
+        }
+      });
+      console.log('[nexum] Selection trace ON — reproduce the bug (click out, wait for the bottom panel to vanish). The CLEARED line + stack shows the cause. Run nexumDebug.traceSelection() again to stop.');
+    });
+  },
+
   clear() {
     log.length = 0;
     console.log('[nexum] Debug log cleared.');
@@ -204,6 +228,7 @@ const nexumDebug = {
     console.log('nexumDebug.mapState()  — current map store snapshot');
     console.log('nexumDebug.queue()     — show pending write queue');
     console.log('nexumDebug.flush()     — manually flush the write queue');
+    console.log('nexumDebug.traceSelection() — log a stack trace whenever the selected system is cleared');
     console.log("nexumDebug.simulateJumps(['Jita','Perimeter','Jita'], 2000) — replay a route, one hop / interval");
     console.log("nexumDebug.simulateJumps([...], 1000, { dryRun: true }) — replay without firing server writes (logged-out safe)");
     console.log('nexumDebug.stopJumps() — cancel a running jump simulation');

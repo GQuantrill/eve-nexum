@@ -748,7 +748,9 @@
     "structures": "Estruturas",
     "npcStations": "Estações PNJ",
     "killboard": "zKillboard",
-    "activity": "Atividade"
+    "activity": "Atividade",
+    "undock": "Desacoplar para uma janela flutuante",
+    "redock": "Reacoplar"
   },
   "systemPanel": {
     "unknownSystem": "Sistema desconhecido",
@@ -904,6 +906,8 @@
     "showNpcKills": "Mostrar kills de PNJ",
     "loading": "A carregar kills…",
     "noKills": "Sem kills nas últimas 24h.",
+    "lastKillAgo": "Sem kills nas últimas 24h — o último {{time}}.",
+    "noKillsOnRecord": "Nenhum kill registrado.",
     "noKillsNpc": "Sem kills nas últimas 24h — {{count}} só de PNJ ocultos.",
     "showThem": "Mostrá-los",
     "loadMore": "Carregar mais ({{count}} restantes)"

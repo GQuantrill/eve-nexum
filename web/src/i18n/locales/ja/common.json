@@ -748,7 +748,9 @@
     "structures": "ストラクチャ",
     "npcStations": "NPC ステーション",
     "killboard": "zKillboard",
-    "activity": "アクティビティ"
+    "activity": "アクティビティ",
+    "undock": "フローティングウィンドウに切り離す",
+    "redock": "元に戻す"
   },
   "systemPanel": {
     "unknownSystem": "不明な星系",
@@ -904,6 +906,8 @@
     "showNpcKills": "NPC キルを表示",
     "loading": "キルを読み込み中…",
     "noKills": "過去24時間にキルはありません。",
+    "lastKillAgo": "過去24時間のキルなし — 最後は{{time}}。",
+    "noKillsOnRecord": "記録されているキルはありません。",
     "noKillsNpc": "過去24時間にキルはありません — NPC のみ {{count}} 件を非表示。",
     "showThem": "表示する",
     "loadMore": "さらに読み込む（残り {{count}}）"

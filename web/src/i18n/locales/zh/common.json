@@ -748,7 +748,9 @@
     "structures": "建筑",
     "npcStations": "NPC 空间站",
     "killboard": "zKillboard",
-    "activity": "活动"
+    "activity": "活动",
+    "undock": "分离为浮动窗口",
+    "redock": "重新停靠"
   },
   "systemPanel": {
     "unknownSystem": "未知星系",
@@ -904,6 +906,8 @@
     "showNpcKills": "显示 NPC 击杀",
     "loading": "正在加载击杀…",
     "noKills": "过去 24 小时内无击杀。",
+    "lastKillAgo": "过去24小时无击杀 — 最近一次{{time}}。",
+    "noKillsOnRecord": "无击杀记录。",
     "noKillsNpc": "过去 24 小时内无击杀 — {{count}} 个纯 NPC 已隐藏。",
     "showThem": "显示它们",
     "loadMore": "加载更多（剩余 {{count}}）"

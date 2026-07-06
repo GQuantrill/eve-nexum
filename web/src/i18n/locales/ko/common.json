@@ -748,7 +748,9 @@
     "structures": "구조물",
     "npcStations": "NPC 정거장",
     "killboard": "zKillboard",
-    "activity": "활동"
+    "activity": "활동",
+    "undock": "플로팅 창으로 분리",
+    "redock": "다시 도킹"
   },
   "systemPanel": {
     "unknownSystem": "알 수 없는 성계",
@@ -904,6 +906,8 @@
     "showNpcKills": "NPC 킬 표시",
     "loading": "킬 불러오는 중…",
     "noKills": "지난 24시간 내 킬 없음.",
+    "lastKillAgo": "지난 24시간 동안 킬 없음 — 마지막 {{time}}.",
+    "noKillsOnRecord": "기록된 킬이 없습니다.",
     "noKillsNpc": "지난 24시간 내 킬 없음 — NPC 전용 {{count}}개 숨김.",
     "showThem": "표시",
     "loadMore": "더 불러오기 ({{count}}개 남음)"

@@ -766,7 +766,9 @@
     "structures": "Структуры",
     "npcStations": "Станции NPC",
     "killboard": "zKillboard",
-    "activity": "Активность"
+    "activity": "Активность",
+    "undock": "Открепить в плавающее окно",
+    "redock": "Пристыковать обратно"
   },
   "systemPanel": {
     "unknownSystem": "Неизвестная система",
@@ -932,6 +934,8 @@
     "showNpcKills": "Показывать киллы NPC",
     "loading": "Загрузка киллов…",
     "noKills": "Нет киллов за последние 24 ч.",
+    "lastKillAgo": "Нет киллов за последние 24ч — последний {{time}}.",
+    "noKillsOnRecord": "Нет киллов в истории.",
     "noKillsNpc": "Нет киллов за последние 24 ч — {{count}} только по NPC скрыто.",
     "showThem": "Показать их",
     "loadMore": "Загрузить ещё (осталось {{count}})"
