@@ -336,7 +336,7 @@ export type RemoteEvent =
   | { type: 'route.update';      id: string; updates: Partial<SavedRoute> }
   | { type: 'route.remove';      id: string }
   | { type: 'route.reorder';     orderedIds: string[] }
-  | { type: 'map.meta';          name?: string; locked?: boolean }
+  | { type: 'map.meta';          name?: string; locked?: boolean; bookmarkFormat?: string | null }
   | { type: 'map.resync' }
   | { type: 'sig.changed';       systemId: string }
   | { type: 'structure.changed'; systemId: string }
@@ -1263,17 +1263,14 @@ export const useMapStore = create<MapStore>()((set, get) => {
           break;
         }
         case 'map.meta': {
+          const patch = {
+            ...(event.name   !== undefined ? { name:   event.name }   : {}),
+            ...(event.locked !== undefined ? { locked: event.locked } : {}),
+            ...(event.bookmarkFormat !== undefined ? { bookmarkFormat: event.bookmarkFormat } : {}),
+          };
           set((s) => ({
-            map: {
-              ...s.map,
-              ...(event.name   !== undefined ? { name:   event.name }   : {}),
-              ...(event.locked !== undefined ? { locked: event.locked } : {}),
-            },
-            maps: s.maps.map((m) => m.id === s.activeMapId
-              ? { ...m,
-                  ...(event.name   !== undefined ? { name:   event.name }   : {}),
-                  ...(event.locked !== undefined ? { locked: event.locked } : {}) }
-              : m),
+            map: { ...s.map, ...patch },
+            maps: s.maps.map((m) => (m.id === s.activeMapId ? { ...m, ...patch } : m)),
           }));
           break;
         }

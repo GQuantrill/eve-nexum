@@ -294,9 +294,14 @@ export function SignaturePane({ systemId }: { systemId: string }) {
     'nexum.sigPane.overwriteDelay',
     OVERWRITE_DELAY_DEFAULT,
   );
-  // Token format for the per-row "copy bookmark name" button. Edited in the
-  // sidebar's Map Options; read here to build the pasted name.
-  const [bookmarkFormat] = useUserSetting<string>('nexum.sig.bookmarkFormat', DEFAULT_BOOKMARK_FORMAT);
+  // Token format for the per-row "copy bookmark name" button. The map can set a
+  // shared format so everyone on it copies holes identically; when it hasn't,
+  // each user falls back to their own global format (edited in Map Options).
+  const [userBookmarkFormat] = useUserSetting<string>('nexum.sig.bookmarkFormat', DEFAULT_BOOKMARK_FORMAT);
+  const mapBookmarkFormat = useMapStore((s) => s.map.bookmarkFormat);
+  const bookmarkFormat = mapBookmarkFormat && mapBookmarkFormat.trim()
+    ? mapBookmarkFormat
+    : userBookmarkFormat;
   // Full wormhole catalog — needed so size/mass tokens resolve for every WH
   // type (the static map only covers k-space statics).
   const whTypes = useWormholeTypes();
