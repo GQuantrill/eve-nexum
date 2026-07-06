@@ -748,7 +748,9 @@
     "structures": "Strukturen",
     "npcStations": "NPC-Stationen",
     "killboard": "zKillboard",
-    "activity": "Aktivität"
+    "activity": "Aktivität",
+    "undock": "In ein schwebendes Fenster ablösen",
+    "redock": "Wieder andocken"
   },
   "systemPanel": {
     "unknownSystem": "Unbekanntes System",

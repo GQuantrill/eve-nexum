@@ -766,7 +766,9 @@
     "structures": "Структуры",
     "npcStations": "Станции NPC",
     "killboard": "zKillboard",
-    "activity": "Активность"
+    "activity": "Активность",
+    "undock": "Открепить в плавающее окно",
+    "redock": "Пристыковать обратно"
   },
   "systemPanel": {
     "unknownSystem": "Неизвестная система",

@@ -11,6 +11,8 @@ import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-ki
 import { useMapStore } from '../../store/mapStore';
 import { CLASS_COLORS, CLASS_LABELS, EFFECT_LABELS, EFFECT_MODIFIERS, WORMHOLE_DESTINATIONS } from '../../data/wormholes';
 import { DraggableCard } from './DraggableCard';
+import { FloatingPanel, type PanelGeometry } from './FloatingPanel';
+import { useUserSetting } from '../../hooks/useUserSetting';
 import { SignaturePane } from './SignaturePane';
 import { AnomalyPane } from './AnomalyPane';
 import { StructuresPane } from './StructuresPane';
@@ -195,6 +197,11 @@ export function SystemPanel() {
   const shareIncludesStructures = useMapStore((s) => s.map.shareIncludeStructures === true);
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
 
+  // Undocked (floating) panels: id -> {x,y,w,h}, persisted per user. `topFloat`
+  // is the last-focused floating window, lifted above the others.
+  const [floatingPanels, setFloatingPanels] = useUserSetting<Record<string, PanelGeometry>>('nexum.floatingPanels', {});
+  const [topFloat, setTopFloat] = useState<string | null>(null);
+
   const [height, setHeight] = useState(() => {
     const v = localStorage.getItem(HEIGHT_KEY);
     return v ? clamp(parseInt(v, 10)) : DEFAULT_H;
@@ -308,7 +315,42 @@ export function SystemPanel() {
     activity:    <ActivityPane eveSystemId={sys.eveSystemId} />,
   };
 
+  // Whether each pane still renders in share mode (guests only see the
+  // categories the owner opted into at link time).
+  const shareVisible = (id: string): boolean => {
+    if (!isShareMode) return true;
+    if (id === 'notes')      return shareIncludesNotes;
+    if (id === 'structures') return shareIncludesStructures;
+    if (id === 'signatures') return shareIncludesSigs;
+    // Anomalies aren't embedded in the share payload yet — always empty for a
+    // guest, so hide the pane for now.
+    if (id === 'anomalies')  return false;
+    return true;
+  };
+
+  // Panes popped out into floating windows: id -> geometry. A floating pane is
+  // removed from the docked stack and shown as its own window; redocking clears
+  // it. Order in the dock still comes from panelOrder, so a redocked pane
+  // returns to its place.
+  const undock = (id: string) => setFloatingPanels((prev) => {
+    if (prev[id]) return prev;
+    const n = Object.keys(prev).length;
+    return { ...prev, [id]: { x: 140 + n * 28, y: 120 + n * 28, w: 460, h: 320 } };
+  });
+  const redock = (id: string) => setFloatingPanels((prev) => {
+    const next = { ...prev };
+    delete next[id];
+    return next;
+  });
+  const commitGeo = (id: string, g: PanelGeometry) => setFloatingPanels((prev) => ({ ...prev, [id]: g }));
+
+  // Docked (stacked) panes = order minus anything floating, minus share-hidden.
+  const dockedIds = panelOrder.filter((id) => !floatingPanels[id]).filter(shareVisible);
+  // Floating panes that are still valid ids and share-visible.
+  const floatingIds = Object.keys(floatingPanels).filter((id) => cards[id] && shareVisible(id));
+
   return (
+    <>
     <aside className="system-panel" style={{ height }}>
       <div className="system-panel__resize-handle" onMouseDown={onResizeMouseDown} />
 
@@ -666,32 +708,33 @@ export function SystemPanel() {
       )}
 
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-        <SortableContext items={panelOrder} strategy={verticalListSortingStrategy}>
+        <SortableContext items={dockedIds} strategy={verticalListSortingStrategy}>
           <div className="panel-stack">
-            {panelOrder
-              // In share mode each panel category is gated on the
-              // matching include-flag the owner picked at link time.
-              // Anything off → hide the tab entirely so a guest never
-              // sees an empty pane.
-              .filter((id) => {
-                if (!isShareMode) return true;
-                if (id === 'notes')      return shareIncludesNotes;
-                if (id === 'structures') return shareIncludesStructures;
-                if (id === 'signatures') return shareIncludesSigs;
-                // Anomalies aren't embedded in the share payload yet, so the
-                // pane would always be empty for a guest — hide it for now.
-                if (id === 'anomalies')  return false;
-                return true;
-              })
-              .map((id) => (
-                <DraggableCard key={id} id={id} title={panelTitle[id] ?? id}>
-                  {cards[id]}
-                </DraggableCard>
-              ))}
+            {dockedIds.map((id) => (
+              <DraggableCard key={id} id={id} title={panelTitle[id] ?? id} onUndock={() => undock(id)}>
+                {cards[id]}
+              </DraggableCard>
+            ))}
           </div>
         </SortableContext>
       </DndContext>
     </aside>
+
+    {/* Undocked panes — portaled floating windows that follow the selection. */}
+    {floatingIds.map((id) => (
+      <FloatingPanel
+        key={id}
+        title={panelTitle[id] ?? id}
+        geometry={floatingPanels[id]}
+        onCommit={(g) => commitGeo(id, g)}
+        onRedock={() => redock(id)}
+        onFocus={() => setTopFloat(id)}
+        zIndex={id === topFloat ? 46 : 41}
+      >
+        {cards[id]}
+      </FloatingPanel>
+    ))}
+    </>
   );
 }
 

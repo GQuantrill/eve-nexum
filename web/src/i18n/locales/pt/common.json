@@ -748,7 +748,9 @@
     "structures": "Estruturas",
     "npcStations": "Estações PNJ",
     "killboard": "zKillboard",
-    "activity": "Atividade"
+    "activity": "Atividade",
+    "undock": "Desacoplar para uma janela flutuante",
+    "redock": "Reacoplar"
   },
   "systemPanel": {
     "unknownSystem": "Sistema desconhecido",
