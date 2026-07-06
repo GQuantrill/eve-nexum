@@ -138,6 +138,12 @@ export async function migrate() {
     -- DEFAULT FALSE — purely opt-in, nothing auto-deletes until enabled.
     ALTER TABLE maps ADD COLUMN IF NOT EXISTS lazy_remove_wormholes BOOLEAN NOT NULL DEFAULT FALSE;
 
+    -- Per-map bookmark-name format override. NULL (the default) means "no map
+    -- policy" and each user falls back to their own nexum.sig.bookmarkFormat.
+    -- When set, every user copying a bookmark on this map gets the same format,
+    -- so shared bookmarks stay consistent across the group.
+    ALTER TABLE maps ADD COLUMN IF NOT EXISTS bookmark_format TEXT;
+
     -- Per-corp Discord notification settings (region filter). No row => the
     -- defaults below => notify for every region. The regions column holds
     -- region NAMES, matched directly against map_systems.region_name.
