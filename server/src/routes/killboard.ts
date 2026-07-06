@@ -70,6 +70,13 @@ export interface KillEntry {
 // background sweep that used to live inline here.
 const cache = new TtlCache<string, KillEntry[]>(CACHE_TTL_MS, 15 * 60 * 1000);
 
+// Separate, long-lived cache for the "last kill" lookup (the /:id/last route).
+// A quiet system's most-recent kill barely changes, so a 30-minute TTL keeps
+// the extra zKill/ESI calls to a trickle even for systems in constant view.
+// Value is the ISO killmail time, or null = no kills on record for the system.
+const LAST_KILL_TTL_MS = 30 * 60 * 1000;
+const lastKillCache = new TtlCache<string, string | null>(LAST_KILL_TTL_MS, 60 * 60 * 1000);
+
 // Cap parallel ESI killmail fetches and share in-flight promises across
 // concurrent callers so two clients hitting the same system don't double the
 // load on ESI.
@@ -231,6 +238,69 @@ router.get('/:systemId(\\d+)', async (req, res) => {
     log.warn(`Failed to reach zKillboard for system ${systemId}:`, (err as Error).message);
     if (stale) return res.json(stale.value);
     return res.json([]);
+  }
+});
+
+// GET /:systemId/last — the timestamp of the most recent kill in the system,
+// of ANY age (unlike the 24h list above). Returns { killmailTime: string|null }
+// where null means zKillboard has no kills on record for the system. Only the
+// client's empty-24h state needs this, so it's fetched lazily and cached for a
+// long time here to keep zKill happy.
+router.get('/:systemId(\\d+)/last', async (req, res) => {
+  const idNum = Number(req.params.systemId);
+  if (!Number.isInteger(idNum) || idNum <= 0 || idNum > 100_000_000) {
+    return res.status(400).json({ error: 'Invalid system id' });
+  }
+  const systemId = String(idNum);
+
+  const fresh = lastKillCache.get(systemId);
+  if (fresh) return res.json({ killmailTime: fresh.value });
+  const stale = lastKillCache.peek(systemId);
+
+  // No pastSeconds → zKillboard returns the system's most recent kills, newest
+  // first. We only need the first entry's time.
+  const zkbUrl = `https://zkillboard.com/api/kills/solarSystemID/${idNum}/`;
+  const zkbHeaders: Record<string, string> = {
+    'User-Agent': ZKB_AGENT,
+    Accept:       'application/json',
+  };
+  const cachedEtag = typeof stale?.meta?.etag === 'string' ? stale.meta.etag : undefined;
+  if (cachedEtag) zkbHeaders['If-None-Match'] = cachedEtag;
+
+  try {
+    const zkbRes = await fetch(zkbUrl, { headers: zkbHeaders, signal: withTimeout(FETCH_TIMEOUT_MS) });
+
+    if (zkbRes.status === 304 && stale) {
+      lastKillCache.set(systemId, stale.value, stale.meta);
+      return res.json({ killmailTime: stale.value });
+    }
+    if (!zkbRes.ok) {
+      if (stale) return res.json({ killmailTime: stale.value });
+      log.warn(`zKillboard (last) returned ${zkbRes.status} for system ${systemId}`);
+      return res.json({ killmailTime: null });
+    }
+
+    const body = (await zkbRes.json()) as ZkbEntry[];
+    const etag = zkbRes.headers.get('etag') ?? undefined;
+
+    if (!Array.isArray(body) || body.length === 0) {
+      // Genuinely nothing on record — cache the null so we don't re-ask soon.
+      lastKillCache.set(systemId, null, etag ? { etag } : undefined);
+      return res.json({ killmailTime: null });
+    }
+
+    const newest = body[0];
+    const esi = await fetchEsi(newest.killmail_id, newest.zkb.hash);
+    const time = esi?.killmail_time ?? null;
+    // Only cache a resolved time; if ESI failed, fall back to stale and don't
+    // poison the cache with a transient null.
+    if (time !== null) lastKillCache.set(systemId, time, etag ? { etag } : undefined);
+    else if (stale) return res.json({ killmailTime: stale.value });
+    return res.json({ killmailTime: time });
+  } catch (err) {
+    log.warn(`Failed to reach zKillboard (last) for system ${systemId}:`, (err as Error).message);
+    if (stale) return res.json({ killmailTime: stale.value });
+    return res.json({ killmailTime: null });
   }
 });
 

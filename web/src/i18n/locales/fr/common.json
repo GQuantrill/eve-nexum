@@ -904,6 +904,8 @@
     "showNpcKills": "Afficher les kills PNJ",
     "loading": "Chargement des kills…",
     "noKills": "Aucun kill ces dernières 24 h.",
+    "lastKillAgo": "Aucun kill ces dernières 24h — le dernier {{time}}.",
+    "noKillsOnRecord": "Aucun kill enregistré.",
     "noKillsNpc": "Aucun kill ces dernières 24 h — {{count}} PNJ uniquement masqués.",
     "showThem": "Les afficher",
     "loadMore": "Charger plus ({{count}} restants)"

@@ -118,3 +118,40 @@ export function useKillboard(eveSystemId: number | null, options: UseKillboardOp
 
   return { kills, loading, error, lastUpdated, npcCount, refresh };
 }
+
+interface LastKillCacheEntry { time: string | null; at: number }
+const lastKillClientCache = new Map<number, LastKillCacheEntry>();
+const LAST_KILL_CACHE_TTL_MS = 30 * 60 * 1000;
+
+// The system's most recent kill of ANY age (server /last endpoint), for when
+// the 24h list is empty. Only fetched when `enabled` — the killboard pane turns
+// it on solely for quiet systems, so active systems never pay for it. Returns:
+//   undefined = not loaded yet / disabled
+//   null      = no kills on record for the system
+//   string    = ISO time of the last kill
+export function useLastKill(eveSystemId: number | null, enabled: boolean) {
+  const [lastKillTime, setLastKillTime] = useState<string | null | undefined>(undefined);
+
+  useEffect(() => {
+    if (!eveSystemId || !enabled) { setLastKillTime(undefined); return; }
+
+    const cached = lastKillClientCache.get(eveSystemId);
+    if (cached && Date.now() - cached.at < LAST_KILL_CACHE_TTL_MS) {
+      setLastKillTime(cached.time);
+      return;
+    }
+
+    let cancelled = false;
+    api<{ killmailTime: string | null }>(`/api/killboard/${eveSystemId}/last`)
+      .then((d) => {
+        if (cancelled) return;
+        lastKillClientCache.set(eveSystemId, { time: d.killmailTime, at: Date.now() });
+        setLastKillTime(d.killmailTime);
+      })
+      .catch(() => { if (!cancelled) setLastKillTime(undefined); });
+
+    return () => { cancelled = true; };
+  }, [eveSystemId, enabled]);
+
+  return lastKillTime;
+}

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
-import { useKillboard } from '../../hooks/useKillboard';
+import { useKillboard, useLastKill } from '../../hooks/useKillboard';
 import { useStandings } from '../../hooks/useStandings';
 import { useUserSetting } from '../../hooks/useUserSetting';
 import { abbreviateValue } from '../../i18n/format';
@@ -234,6 +234,12 @@ export function KillboardPane({ eveSystemId }: Props) {
   const standings = useStandings();
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
+  // Nothing in the last 24h (and not merely NPC-filtered) → look up the last
+  // kill of any age so the pane can say "last kill was X ago" instead of a bare
+  // "no kills". Gated so active systems never trigger the extra lookup.
+  const trulyEmpty     = !loading && !error && kills.length === 0 && !(npcCount > 0 && !includeNpc);
+  const lastKillTime   = useLastKill(eveSystemId, trulyEmpty);
+
   // Reset the lazy window whenever the system or filter changes — otherwise
   // a system with 8 visible kills carries over its expanded count to the
   // next system the user clicks on, which is jarring.
@@ -288,6 +294,10 @@ export function KillboardPane({ eveSystemId }: Props) {
               {t('killboard.noKillsNpc', { count: npcCount })}{' '}
               <button type="button" className="zkb-pane__inline-toggle" onClick={() => { setIncludeNpc(true); refresh(true); }}>{t('killboard.showThem')}</button>
             </>
+          ) : lastKillTime === null ? (
+            t('killboard.noKillsOnRecord')
+          ) : lastKillTime ? (
+            t('killboard.lastKillAgo', { time: timeAgo(t, lastKillTime) })
           ) : (
             t('killboard.noKills')
           )}
