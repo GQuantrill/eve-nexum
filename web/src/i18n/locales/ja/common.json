@@ -748,7 +748,9 @@
     "structures": "ストラクチャ",
     "npcStations": "NPC ステーション",
     "killboard": "zKillboard",
-    "activity": "アクティビティ"
+    "activity": "アクティビティ",
+    "undock": "フローティングウィンドウに切り離す",
+    "redock": "元に戻す"
   },
   "systemPanel": {
     "unknownSystem": "不明な星系",

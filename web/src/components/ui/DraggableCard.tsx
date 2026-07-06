@@ -2,17 +2,21 @@ import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { ArrowSquareOutIcon } from '@phosphor-icons/react';
 import { useUserSetting } from '../../hooks/useUserSetting';
 
 interface Props {
   id: string;
   title: string;
   children: ReactNode;
+  /** When provided, an "undock" button pops this card out into a floating
+   *  window. Only the bottom dock passes it; the sidebar cards omit it. */
+  onUndock?: () => void;
 }
 
 function storageKey(id: string) { return `nexum.panel.collapsed.${id}`; }
 
-export function DraggableCard({ id, title, children }: Props) {
+export function DraggableCard({ id, title, children, onUndock }: Props) {
   const { t } = useTranslation();
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
 
@@ -40,6 +44,17 @@ export function DraggableCard({ id, title, children }: Props) {
           <span className={`info-card__chevron${collapsed ? ' info-card__chevron--collapsed' : ''}`}>▾</span>
         </button>
         <span className="info-card__title">{title}</span>
+        {onUndock && (
+          <button
+            type="button"
+            className="info-card__undock-btn"
+            onClick={(e) => { e.stopPropagation(); onUndock(); }}
+            title={t('panel.undock')}
+            aria-label={t('panel.undock')}
+          >
+            <ArrowSquareOutIcon size={13} weight="regular" />
+          </button>
+        )}
         <button
           type="button"
           className="info-card__drag-handle"

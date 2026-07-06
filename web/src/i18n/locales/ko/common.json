@@ -748,7 +748,9 @@
     "structures": "구조물",
     "npcStations": "NPC 정거장",
     "killboard": "zKillboard",
-    "activity": "활동"
+    "activity": "활동",
+    "undock": "플로팅 창으로 분리",
+    "redock": "다시 도킹"
   },
   "systemPanel": {
     "unknownSystem": "알 수 없는 성계",

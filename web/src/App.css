@@ -4890,6 +4890,90 @@ div.system-node__easy-handle {
   padding: 8px 10px;
 }
 
+/* Undock button in a dock card header — subtle, brightens on hover. */
+.info-card__undock-btn {
+  display: inline-flex;
+  align-items: center;
+  background: none;
+  border: none;
+  color: #6a80a0;
+  cursor: pointer;
+  padding: 0 2px;
+  line-height: 1;
+}
+.info-card__undock-btn:hover { color: #8ab8f0; }
+
+/* ── Floating (undocked) panel window ─────────────────────────────── */
+.floating-panel {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  background: #0d1117;
+  border: 1px solid #2e4a7a;
+  border-radius: 8px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+  min-width: 260px;
+  min-height: 140px;
+}
+.floating-panel__bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: #111827;
+  border-bottom: 1px solid #1e2740;
+  cursor: move;
+  touch-action: none;
+  user-select: none;
+  flex-shrink: 0;
+}
+.floating-panel__title {
+  flex: 1;
+  font-size: calc(15px * var(--font-scale, 1));
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #c0ccde;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.floating-panel__redock {
+  display: inline-flex;
+  align-items: center;
+  background: none;
+  border: none;
+  color: #6a80a0;
+  cursor: pointer;
+  padding: 0 2px;
+}
+.floating-panel__redock:hover { color: #8ab8f0; }
+.floating-panel__body {
+  flex: 1;
+  overflow: auto;
+  padding: 8px 10px;
+}
+.floating-panel__resize {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 16px;
+  height: 16px;
+  cursor: nwse-resize;
+  touch-action: none;
+}
+.floating-panel__resize::after {
+  content: '';
+  position: absolute;
+  right: 3px;
+  bottom: 3px;
+  width: 7px;
+  height: 7px;
+  border-right: 2px solid #3a4a62;
+  border-bottom: 2px solid #3a4a62;
+}
+
 .notes-editor {
   .w-md-editor {
     background: transparent;
