@@ -828,7 +828,7 @@
     "home": "ホーム",
     "noJumps": "— ジャンプ",
     "removeFromList": "リストから削除",
-    "signIn": "ログインして Kスペースにドックすると、ハブまでのジャンプ数が表示されます。",
+    "signIn": "ログインして Kスペースにドックすると、ハブまでのジャンプ数が表示されます。ワームホールや Thera から経路を計算するには、ルートのショートカットオプションを有効にしてください。",
     "searchPlaceholder": "星系名を検索…",
     "onList": "リスト内",
     "noMatch": "「{{query}}」に一致する星系はありません"
@@ -963,6 +963,7 @@
     "colNotes": "メモ",
     "colAge": "経過",
     "colUpdated": "更新",
+    "columns": "列",
     "namePlaceholder": "サイト名"
   },
   "anomalies": {
@@ -995,6 +996,7 @@
     "colNotes": "メモ",
     "colAge": "経過",
     "colUpdated": "更新",
+    "columns": "列",
     "namePlaceholder": "アノマリー名"
   },
   "stats": {

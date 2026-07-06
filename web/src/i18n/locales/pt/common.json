@@ -828,7 +828,7 @@
     "home": "Origem",
     "noJumps": "— saltos",
     "removeFromList": "Remover da lista",
-    "signIn": "Inicia sessão e atraca em K-space para ver os saltos até aos hubs.",
+    "signIn": "Inicia sessão e atraca em K-space para ver os saltos até aos hubs, ou ativa as opções de atalho de rota para traçar rotas a partir de um wormhole ou de Thera.",
     "searchPlaceholder": "Procurar nome de sistema…",
     "onList": "na lista",
     "noMatch": "Nenhum sistema corresponde a «{{query}}»"
@@ -963,6 +963,7 @@
     "colNotes": "Notas",
     "colAge": "Idade",
     "colUpdated": "Atualizado",
+    "columns": "Colunas",
     "namePlaceholder": "Nome do site"
   },
   "anomalies": {
@@ -995,6 +996,7 @@
     "colNotes": "Notas",
     "colAge": "Idade",
     "colUpdated": "Atualizado",
+    "columns": "Colunas",
     "namePlaceholder": "Nome da anomalia"
   },
   "stats": {

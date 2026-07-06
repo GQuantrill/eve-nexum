@@ -5167,6 +5167,43 @@ div.system-node__easy-handle {
 }
 .sig-filter-clear:hover { color: #9ec0e8; }
 
+/* Column picker — icon button in the filter row that opens a checkbox popover
+   to hide/show optional columns (slims the pane when undocked). Pushed to the
+   right edge of the wrapping filter row. */
+.sig-col-menu { position: relative; margin-left: auto; }
+.sig-col-menu__btn--active { color: #5a9af8; }
+.sig-col-menu__pop {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 1000;
+  min-width: 140px;
+  background: #0d1117;
+  border: 1px solid #1e2740;
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+  padding: 6px;
+}
+.sig-col-menu__title {
+  font-size: calc(11px * var(--font-scale, 1));
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #6a8ab0;
+  padding: 2px 6px 6px;
+}
+.sig-col-menu__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px;
+  border-radius: 4px;
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #c8d0e0;
+  cursor: pointer;
+}
+.sig-col-menu__item:hover { background: rgba(90, 154, 248, 0.12); }
+.sig-col-menu__item input { cursor: pointer; }
+
 .sig-pane__empty {
   font-size: calc(16px * var(--font-scale, 1));
   color: #6a7a98;

@@ -828,7 +828,7 @@
     "home": "母星系",
     "noJumps": "— 跳",
     "removeFromList": "从列表中移除",
-    "signIn": "登录并在 K空间停靠以查看到各枢纽的跳数。",
+    "signIn": "登录并在 K空间停靠以查看到各枢纽的跳数，或启用路线快捷方式选项以从虫洞或 Thera 计算路线。",
     "searchPlaceholder": "搜索星系名称…",
     "onList": "在列表中",
     "noMatch": "没有星系匹配「{{query}}」"
@@ -963,6 +963,7 @@
     "colNotes": "笔记",
     "colAge": "存在时长",
     "colUpdated": "更新时间",
+    "columns": "列",
     "namePlaceholder": "站点名称"
   },
   "anomalies": {
@@ -995,6 +996,7 @@
     "colNotes": "笔记",
     "colAge": "存在时长",
     "colUpdated": "更新时间",
+    "columns": "列",
     "namePlaceholder": "异常空间名称"
   },
   "stats": {

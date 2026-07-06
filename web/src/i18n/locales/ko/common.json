@@ -828,7 +828,7 @@
     "home": "홈",
     "noJumps": "— 점프",
     "removeFromList": "목록에서 제거",
-    "signIn": "로그인하고 K-스페이스에 도킹하면 허브까지의 점프 수를 볼 수 있습니다.",
+    "signIn": "로그인하고 K-스페이스에 도킹하면 허브까지의 점프 수를 볼 수 있습니다. 웜홀이나 Thera에서 경로를 계산하려면 경로 지름길 옵션을 활성화하세요.",
     "searchPlaceholder": "성계 이름 검색…",
     "onList": "목록에 있음",
     "noMatch": "“{{query}}”와 일치하는 성계가 없습니다"
@@ -963,6 +963,7 @@
     "colNotes": "노트",
     "colAge": "경과",
     "colUpdated": "업데이트",
+    "columns": "열",
     "namePlaceholder": "사이트 이름"
   },
   "anomalies": {
@@ -995,6 +996,7 @@
     "colNotes": "노트",
     "colAge": "경과",
     "colUpdated": "업데이트",
+    "columns": "열",
     "namePlaceholder": "어노말리 이름"
   },
   "stats": {
