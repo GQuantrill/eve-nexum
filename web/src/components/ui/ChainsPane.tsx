@@ -239,7 +239,9 @@ function SortableChainItem({ route, open, steps, canEdit, draggable, onToggle, s
             type="button"
             className="icon-btn chain-item__del"
             title={t('chains.remove')}
-            onClick={() => removeRoute(route.id)}
+            // Clear the hover highlight first — deleting unmounts this row, so
+            // its onMouseLeave never fires and the map would stay dimmed.
+            onClick={() => { setRouteHighlight(null); removeRoute(route.id); }}
           >
             <TrashIcon size={13} weight="regular" />
           </button>
