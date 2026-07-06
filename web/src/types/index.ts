@@ -188,6 +188,10 @@ export interface WormholeMap {
   /** Opt-in: a server-side sweep removes wormhole sigs older than their type's
    *  max lifetime and quarantines (marks broken) any connection they backed. */
   lazyRemoveWormholes?: boolean;
+  /** Per-map bookmark-name format override. When set (non-empty), every user on
+   *  this map copies bookmarks in this format; when null/absent, each user falls
+   *  back to their own nexum.sig.bookmarkFormat global setting. */
+  bookmarkFormat?: string | null;
   /** Present when the map has an active or expired share link. The token
    *  itself is in shareToken; shareExpiresAt is the cutoff. The owner UI
    *  treats an expired token as "no link" — regenerate to share again.

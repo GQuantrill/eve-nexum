@@ -409,6 +409,7 @@ async function verifySystemInMap(res: Response, systemId: string, mapId: string)
 // ── Maps ──────────────────────────────────────────────────────────────────────
 
 const MAX_MAP_NAME_LEN  = 200;
+const MAX_BOOKMARK_FMT_LEN = 200;
 const MAX_IMPORT_SYSTEMS     = 500;
 const MAX_IMPORT_CONNECTIONS = 2000;
 
@@ -1457,9 +1458,9 @@ mapsRouter.post('/:mapId/presence', async (req, res) => {
 // toggle merge-source eligibility (corp maps, full/admin only)
 mapsRouter.patch('/:mapId', async (req, res) => {
   const { mapId } = req.params;
-  const { name, locked, allowAsMergeSource, allowAsMergeDestination, lazyRemoveWormholes } = req.body as {
+  const { name, locked, allowAsMergeSource, allowAsMergeDestination, lazyRemoveWormholes, bookmarkFormat } = req.body as {
     name?: string; locked?: boolean; allowAsMergeSource?: boolean; allowAsMergeDestination?: boolean;
-    lazyRemoveWormholes?: boolean;
+    lazyRemoveWormholes?: boolean; bookmarkFormat?: string | null;
   };
 
   const access = await requireMapWrite(res, mapId, req);
@@ -1521,17 +1522,30 @@ mapsRouter.patch('/:mapId', async (req, res) => {
     sets.push(`lazy_remove_wormholes = $${vals.length + 1}`); vals.push(lazyRemoveWormholes === true);
   }
 
+  // Per-map bookmark-name format: another plain per-map behaviour setting any
+  // editor can set. An empty/whitespace/null value clears the override so users
+  // fall back to their own global format. Stored trimmed and length-capped.
+  let normalizedBookmarkFmt: string | null | undefined;
+  if (bookmarkFormat !== undefined) {
+    const trimmed = typeof bookmarkFormat === 'string' ? bookmarkFormat.trim().slice(0, MAX_BOOKMARK_FMT_LEN) : '';
+    normalizedBookmarkFmt = trimmed === '' ? null : trimmed;
+    sets.push(`bookmark_format = $${vals.length + 1}`); vals.push(normalizedBookmarkFmt);
+  }
+
   if (sets.length === 1) { res.status(400).json({ error: 'Nothing to update' }); return; }
 
   await db.query(`UPDATE maps SET ${sets.join(', ')} WHERE id = $${vals.length + 1}`, [...vals, mapId]);
-  // Live-sync rename / lock to other viewers (the only map-level fields the
-  // canvas shows). Merge-source flags are sidebar-only, so not pushed.
-  if (name !== undefined || locked !== undefined) {
+  // Live-sync rename / lock / bookmark-format to other viewers. Rename + lock
+  // show on the canvas; the bookmark format must propagate live so everyone
+  // copying a hole gets the same name without a reload. Merge-source flags are
+  // sidebar-only, so not pushed.
+  if (name !== undefined || locked !== undefined || normalizedBookmarkFmt !== undefined) {
     publishToMap(mapId, {
       type: 'map.meta',
       actor: req.get('x-client-id') ?? null,
       ...(name !== undefined ? { name: String(name).slice(0, MAX_MAP_NAME_LEN) } : {}),
       ...(locked !== undefined ? { locked } : {}),
+      ...(normalizedBookmarkFmt !== undefined ? { bookmarkFormat: normalizedBookmarkFmt } : {}),
     });
   }
   res.json({ ok: true });
