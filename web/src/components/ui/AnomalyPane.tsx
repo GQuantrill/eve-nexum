@@ -5,10 +5,11 @@ import { useMapStore } from '../../store/mapStore';
 import { useCanEditContent } from '../../hooks/useCanEditContent';
 import { useShareMode } from '../../context/ShareModeContext';
 import { useUserSetting } from '../../hooks/useUserSetting';
+import { useClickOutside } from '../../hooks/useClickOutside';
 import type { Anomaly, AnomType } from '../../types';
 import { ConfirmModal, shouldSkipConfirm } from './ConfirmModal';
 import { NotesEditor } from './NotesEditor';
-import { XIcon } from '@phosphor-icons/react';
+import { XIcon, ColumnsIcon } from '@phosphor-icons/react';
 import { toast } from './Toaster';
 import { duration, DASH } from '../../i18n/format';
 
@@ -67,6 +68,17 @@ const DEFAULT_WIDTHS: Record<ColKey, number> = {
   created: 80,
   updated: 80,
 };
+
+// Columns the user can hide to slim the pane down (handy for an undocked, narrow
+// window). ID / Type / Name always stay. Label keys reuse the existing header
+// translations. Hidden columns are stored as a list under one ui_settings key;
+// empty (the default) = all shown, so a later-added hideable column defaults
+// visible without migration.
+const HIDEABLE_COLS = [
+  { key: 'notes',   labelKey: 'anomalies.colNotes' },
+  { key: 'created', labelKey: 'anomalies.colAge' },
+  { key: 'updated', labelKey: 'anomalies.colUpdated' },
+] as const satisfies ReadonlyArray<{ key: ColKey; labelKey: string }>;
 
 // Grace-period choices (seconds) offered before an overwrite-paste actually
 // deletes an anomaly absent from the new scan. Mirrors the signature pane.
@@ -151,6 +163,16 @@ export function AnomalyPane({ systemId }: { systemId: string }) {
     () => ({ ...DEFAULT_WIDTHS, ...savedColWidths }) as Record<ColKey, number>,
     [savedColWidths],
   );
+
+  // Hidden columns, persisted per user (shared across every Anomalies pane).
+  const [hiddenColsArr, setHiddenColsArr] = useUserSetting<ColKey[]>('nexum.anomPane.hiddenCols', []);
+  const hiddenCols = useMemo(() => new Set(hiddenColsArr), [hiddenColsArr]);
+  const isColVisible = useCallback((c: ColKey) => !hiddenCols.has(c), [hiddenCols]);
+  const toggleCol = (c: ColKey) =>
+    setHiddenColsArr((prev) => (prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c]));
+  const [colMenuOpen, setColMenuOpen] = useState(false);
+  const colMenuRef = useRef<HTMLDivElement>(null);
+  useClickOutside(colMenuOpen, colMenuRef, () => setColMenuOpen(false));
 
   const pendingUpdates = useRef<Map<string, Partial<Anomaly>>>(new Map());
   const debounceTimers = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
@@ -512,6 +534,33 @@ export function AnomalyPane({ systemId }: { systemId: string }) {
               {t('anomalies.filterClear')}
             </button>
           )}
+          <div className="sig-col-menu" ref={colMenuRef}>
+            <button
+              type="button"
+              className={`icon-btn sig-col-menu__btn${hiddenCols.size > 0 ? ' sig-col-menu__btn--active' : ''}`}
+              onClick={() => setColMenuOpen((o) => !o)}
+              aria-expanded={colMenuOpen}
+              aria-label={t('anomalies.columns')}
+              data-tooltip={t('anomalies.columns')}
+            >
+              <ColumnsIcon size={14} weight="regular" />
+            </button>
+            {colMenuOpen && (
+              <div className="sig-col-menu__pop" role="menu">
+                <div className="sig-col-menu__title">{t('anomalies.columns')}</div>
+                {HIDEABLE_COLS.map(({ key, labelKey }) => (
+                  <label key={key} className="sig-col-menu__item">
+                    <input
+                      type="checkbox"
+                      checked={isColVisible(key)}
+                      onChange={() => toggleCol(key)}
+                    />
+                    <span>{t(labelKey)}</span>
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       )}
 
@@ -527,9 +576,9 @@ export function AnomalyPane({ systemId }: { systemId: string }) {
             <col style={{ width: colWidths.id }} />
             <col style={{ width: colWidths.type }} />
             <col style={{ width: colWidths.name }} />
-            <col style={{ width: colWidths.notes }} />
-            <col style={{ width: colWidths.created }} />
-            <col style={{ width: colWidths.updated }} />
+            {isColVisible('notes')   && <col style={{ width: colWidths.notes }} />}
+            {isColVisible('created') && <col style={{ width: colWidths.created }} />}
+            {isColVisible('updated') && <col style={{ width: colWidths.updated }} />}
             <col className="sig-col--actions" />
           </colgroup>
           <thead>
@@ -555,18 +604,24 @@ export function AnomalyPane({ systemId }: { systemId: string }) {
                 {t('anomalies.colName')}{sortInd('name')}
                 <div className="sig-th__resize" onMouseDown={(e) => startResize('name', e)} />
               </th>
-              <th className="sig-th">
-                {t('anomalies.colNotes')}
-                <div className="sig-th__resize" onMouseDown={(e) => startResize('notes', e)} />
-              </th>
-              <th className="sig-th sig-th--sortable sig-th--time" onClick={() => handleSort('createdAt')}>
-                {t('anomalies.colAge')}{sortInd('createdAt')}
-                <div className="sig-th__resize" onMouseDown={(e) => startResize('created', e)} />
-              </th>
-              <th className="sig-th sig-th--sortable sig-th--time" onClick={() => handleSort('updatedAt')}>
-                {t('anomalies.colUpdated')}{sortInd('updatedAt')}
-                <div className="sig-th__resize" onMouseDown={(e) => startResize('updated', e)} />
-              </th>
+              {isColVisible('notes') && (
+                <th className="sig-th">
+                  {t('anomalies.colNotes')}
+                  <div className="sig-th__resize" onMouseDown={(e) => startResize('notes', e)} />
+                </th>
+              )}
+              {isColVisible('created') && (
+                <th className="sig-th sig-th--sortable sig-th--time" onClick={() => handleSort('createdAt')}>
+                  {t('anomalies.colAge')}{sortInd('createdAt')}
+                  <div className="sig-th__resize" onMouseDown={(e) => startResize('created', e)} />
+                </th>
+              )}
+              {isColVisible('updated') && (
+                <th className="sig-th sig-th--sortable sig-th--time" onClick={() => handleSort('updatedAt')}>
+                  {t('anomalies.colUpdated')}{sortInd('updatedAt')}
+                  <div className="sig-th__resize" onMouseDown={(e) => startResize('updated', e)} />
+                </th>
+              )}
               <th className="sig-cell--actions" />
             </tr>
           </thead>
@@ -614,16 +669,18 @@ export function AnomalyPane({ systemId }: { systemId: string }) {
                     placeholder={t('anomalies.namePlaceholder')}
                   />
                 </td>
-                <td className="sig-notes-cell">
-                  <NotesEditor
-                    value={anom.notes}
-                    onChange={(v) => updateAnom(anom.id, { notes: v })}
-                    compact
-                    readOnly={!canEdit}
-                  />
-                </td>
-                <ElapsedCell iso={anom.createdAt} className="sig-td--time" />
-                <ElapsedCell iso={anom.updatedAt} className="sig-td--time sig-td--updated" />
+                {isColVisible('notes') && (
+                  <td className="sig-notes-cell">
+                    <NotesEditor
+                      value={anom.notes}
+                      onChange={(v) => updateAnom(anom.id, { notes: v })}
+                      compact
+                      readOnly={!canEdit}
+                    />
+                  </td>
+                )}
+                {isColVisible('created') && <ElapsedCell iso={anom.createdAt} className="sig-td--time" />}
+                {isColVisible('updated') && <ElapsedCell iso={anom.updatedAt} className="sig-td--time sig-td--updated" />}
                 <td className="sig-cell--actions">
                   {canEdit && (
                     <button
