@@ -828,7 +828,7 @@
     "home": "Origen",
     "noJumps": "— saltos",
     "removeFromList": "Quitar de la lista",
-    "signIn": "Inicia sesión y atraca en K-space para ver los saltos a los hubs.",
+    "signIn": "Inicia sesión y atraca en K-space para ver los saltos a los hubs, o activa las opciones de atajos de ruta para calcular rutas desde un agujero de gusano o Thera.",
     "searchPlaceholder": "Buscar nombre de sistema…",
     "onList": "en la lista",
     "noMatch": "Ningún sistema coincide con «{{query}}»"
