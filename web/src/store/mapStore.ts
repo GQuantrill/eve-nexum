@@ -602,13 +602,27 @@ export const useMapStore = create<MapStore>()((set, get) => {
       for (const t of moveTimers.values()) clearTimeout(t);
       moveTimers.clear();
 
+      // Re-selecting the CURRENT map is a resync (SSE reconnect after the tab
+      // was backgrounded, or the merge resync event), not a real switch. Keep
+      // the user's selection + current system across it so alt-tabbing to EVE
+      // and back doesn't drop the system they had open for pasting sigs.
+      const isResync = id === get().activeMapId;
+      const prev = isResync
+        ? { sel: get().selectedSystemId, conn: get().selectedConnectionId, current: get().currentSystemId }
+        : { sel: null, conn: null, current: null };
+
       try {
         const map = await api<WormholeMap>(`/api/maps/${id}`);
         // Older payloads / share responses may omit routes — normalise so the
         // chains slice can always read an array.
         if (!Array.isArray(map.routes)) map.routes = [];
         localStorage.setItem('nexum.lastMapId', id);
-        set({ map, activeMapId: id, selectedSystemId: null, selectedConnectionId: null, currentSystemId: null, undoStack: [], sigTypesBySystem: {}, contentBySystem: {}, contentFilter: { sigTypes: [], anomTypes: [], nameQuery: '' } });
+        // Drop any preserved ref that no longer exists in the refetched map
+        // (e.g. the selected system was deleted while we were disconnected).
+        const keepSel     = prev.sel     && map.systems.some((s) => s.id === prev.sel)      ? prev.sel     : null;
+        const keepConn    = prev.conn    && map.connections.some((c) => c.id === prev.conn) ? prev.conn    : null;
+        const keepCurrent = prev.current && map.systems.some((s) => s.id === prev.current)  ? prev.current : null;
+        set({ map, activeMapId: id, selectedSystemId: keepSel, selectedConnectionId: keepConn, currentSystemId: keepCurrent, undoStack: [], sigTypesBySystem: {}, contentBySystem: {}, contentFilter: { sigTypes: [], anomTypes: [], nameQuery: '' } });
       } catch (err) {
         // 403/404 — the grant was revoked, or the map was deleted. Reload
         // the list (which will trigger the revocation-detection path above
