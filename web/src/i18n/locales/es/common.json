@@ -963,6 +963,7 @@
     "colNotes": "Notas",
     "colAge": "Antigüedad",
     "colUpdated": "Actualizado",
+    "columns": "Columnas",
     "namePlaceholder": "Nombre del sitio"
   },
   "anomalies": {
