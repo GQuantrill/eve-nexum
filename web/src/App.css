@@ -800,9 +800,10 @@
 }
 
 .toolbar__logo {
-  font-size: calc(20px * var(--font-scale, 1));
-  color: #4d9de0;
-  line-height: 1;
+  width: calc(26px * var(--font-scale, 1));
+  height: calc(26px * var(--font-scale, 1));
+  object-fit: contain;
+  display: block;
 }
 
 .toolbar__option {
@@ -7064,9 +7065,9 @@ select.sig-toolbar-btn option {
 }
 
 .landing__logo {
-  font-size: calc(56px * var(--font-scale, 1));
-  color: #4d9de0;
-  line-height: 1;
+  width: calc(76px * var(--font-scale, 1));
+  height: calc(76px * var(--font-scale, 1));
+  object-fit: contain;
   filter: drop-shadow(0 0 24px rgba(77, 157, 224, 0.4));
 }
 
@@ -7720,8 +7721,9 @@ select.sig-toolbar-btn option {
 }
 
 .loading-screen__logo {
-  font-size: calc(40px * var(--font-scale, 1));
-  color: #2a4a7a;
+  width: calc(56px * var(--font-scale, 1));
+  height: calc(56px * var(--font-scale, 1));
+  object-fit: contain;
   animation: pulse 1.5s ease-in-out infinite;
 }
 

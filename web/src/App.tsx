@@ -204,7 +204,7 @@ function AppShell() {
   if (loading) {
     return (
       <div className="loading-screen">
-        <span className="loading-screen__logo">◈</span>
+        <img className="loading-screen__logo" src="/screen.png" alt="Nexum" />
       </div>
     );
   }

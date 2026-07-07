@@ -676,7 +676,7 @@ export function Toolbar() {
     <header className="toolbar toolbar--free">
       {/* Fixed brand anchor — always top-left, never draggable. */}
       <div className="toolbar__brand">
-        <span className="toolbar__logo">◈</span>
+        <img className="toolbar__logo" src="/screen.png" alt="Nexum" />
       </div>
 
       <DndContext sensors={dragSensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
