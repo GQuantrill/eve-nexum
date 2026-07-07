@@ -1415,10 +1415,11 @@ function csvEscape(value: string): string {
 
 // ── Discord tab ───────────────────────────────────────────────────────────────
 interface DiscordSettings {
-  corpId:     number | null;
-  allRegions: boolean;
-  regions:    string[];
-  maps:       { id: string; name: string; excluded: boolean }[];
+  scope:        'corp' | 'alliance' | null;
+  allRegions:   boolean;
+  regions:      string[];
+  notifyChains: boolean;
+  maps:         { id: string; name: string; excluded: boolean }[];
 }
 interface RegionOption { id: number; name: string }
 
@@ -1457,9 +1458,12 @@ function DiscordTab() {
   useEffect(() => { load(); }, [load]);
 
   async function saveRegions() {
+    if (!data) return;
     setSaving(true); setSaved(false);
     try {
-      await api('/api/admin/discord', { method: 'PUT', body: JSON.stringify({ allRegions, regions }) });
+      // Include notifyChains so the PUT (which defaults absent flags to true)
+      // can't silently re-enable chain broadcasts the admin turned off.
+      await api('/api/admin/discord', { method: 'PUT', body: JSON.stringify({ allRegions, regions, notifyChains: data.notifyChains }) });
       setData((d) => (d ? { ...d, allRegions, regions } : d));
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
@@ -1467,6 +1471,20 @@ function DiscordTab() {
       setError(e instanceof Error ? e.message : t('admin.discord.saveFailed'));
     } finally {
       setSaving(false);
+    }
+  }
+
+  // Broadcast toggles persist immediately, using the last-saved region filter so
+  // an unsaved region draft isn't dragged along.
+  async function toggleChains(next: boolean) {
+    if (!data) return;
+    const prev = data.notifyChains;
+    setData((d) => (d ? { ...d, notifyChains: next } : d));
+    try {
+      await api('/api/admin/discord', { method: 'PUT', body: JSON.stringify({ allRegions: data.allRegions, regions: data.regions, notifyChains: next }) });
+    } catch (e) {
+      setData((d) => (d ? { ...d, notifyChains: prev } : d));
+      setError(e instanceof Error ? e.message : t('admin.discord.saveFailed'));
     }
   }
 
@@ -1490,7 +1508,7 @@ function DiscordTab() {
 
   if (!data && error) return (<><h2 className="admin-page__section-title">{t('admin.discord.title')}</h2><div className="admin-page__error">{error}</div></>);
   if (!data)          return (<><h2 className="admin-page__section-title">{t('admin.discord.title')}</h2><div className="admin-page__loading">{t('admin.loading')}</div></>);
-  if (data.corpId == null) {
+  if (data.scope == null) {
     return (<><h2 className="admin-page__section-title">{t('admin.discord.title')}</h2>
       <div className="admin-page__empty">{t('admin.discord.noCorp')}</div></>);
   }
@@ -1549,6 +1567,15 @@ function DiscordTab() {
           </button>
           {saved && <span className="discord-admin__saved">{t('admin.discord.saved')}</span>}
         </div>
+      </section>
+
+      <section className="discord-admin__section">
+        <h3 className="discord-admin__heading">{t('admin.discord.events')}</h3>
+        <label className="discord-admin__radio">
+          <input type="checkbox" checked={data.notifyChains} onChange={(e) => toggleChains(e.target.checked)} />
+          {t('admin.discord.broadcastChains')}
+        </label>
+        <p className="discord-admin__hint">{t('admin.discord.broadcastChainsHint')}</p>
       </section>
 
       <section className="discord-admin__section">

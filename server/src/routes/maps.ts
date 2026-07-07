@@ -20,7 +20,7 @@ import {
 } from '../services/mapWrite.js';
 import { reportPresence } from '../services/presence.js';
 import { copyMap } from '../services/mapCopy.js';
-import { notifyDiscord, webhookFor, k162Embed, connectionEmbed } from '../services/discord.js';
+import { notifyDiscord, webhookFor, k162Embed, connectionEmbed, chainEmbed, type DiscordScope } from '../services/discord.js';
 
 const log = createLogger('maps');
 const discordLog = createLogger('discord');
@@ -285,24 +285,25 @@ function regionAllowed(allRegions: boolean, allow: string[], names: (string | nu
 // wait longer than this, and a second detection for an already-pending sig is
 // ignored so the original deadline stands.
 const K162_DEFER_MS = 10_000;
-interface PendingK162 { timer: ReturnType<typeof setTimeout>; corpId: number | null; actor: string | null; }
+interface PendingK162 { timer: ReturnType<typeof setTimeout>; scope: DiscordScope; actor: string | null; }
 const pendingK162 = new Map<string, PendingK162>();
 
 export function dispatchK162(meta: MapMeta, sigId: string, systemId: string, actor: string | null): void {
-  if (!webhookFor(meta.corpId)) {
-    discordLog.info(`K162 detected (system ${systemId}) but not sending — no webhook for corpId=${meta.corpId ?? 'null (personal map; webhooks are corp-maps only)'}`);
+  if (!webhookFor(meta)) {
+    discordLog.info(`K162 detected (system ${systemId}) but not sending — no webhook for corpId=${meta.corpId ?? 'null'}/allianceId=${meta.allianceId ?? 'null'} (personal maps never notify)`);
     return;
   }
   if (pendingK162.has(sigId)) {
     discordLog.info(`K162 (sig ${sigId}) already pending — keeping the existing ${K162_DEFER_MS / 1000}s window`);
     return;
   }
-  discordLog.info(`K162 on corp map (corpId=${meta.corpId}, sig ${sigId}) — deferring ${K162_DEFER_MS / 1000}s to catch a leads-to`);
+  const scope: DiscordScope = { corpId: meta.corpId, allianceId: meta.allianceId };
+  discordLog.info(`K162 on org map (corpId=${meta.corpId ?? 'null'}/allianceId=${meta.allianceId ?? 'null'}, sig ${sigId}) — deferring ${K162_DEFER_MS / 1000}s to catch a leads-to`);
   const timer = setTimeout(() => {
     pendingK162.delete(sigId);
-    void fireK162(meta.corpId, sigId, actor);
+    void fireK162(scope, sigId, actor);
   }, K162_DEFER_MS);
-  pendingK162.set(sigId, { timer, corpId: meta.corpId, actor });
+  pendingK162.set(sigId, { timer, scope, actor });
 }
 
 // Send a pending K162 immediately — e.g. once its leads-to has been filled in —
@@ -314,12 +315,24 @@ export function flushK162(sigId: string): void {
   clearTimeout(p.timer);
   pendingK162.delete(sigId);
   discordLog.info(`K162 (sig ${sigId}) leads-to set — sending now instead of waiting`);
-  void fireK162(p.corpId, sigId, p.actor);
+  void fireK162(p.scope, sigId, p.actor);
 }
+
+// The region-filter columns resolved for a map's org (corp OR alliance), read by
+// LEFT JOINing both settings tables on the map's own corp_id / alliance_id — a
+// map matches exactly one, so COALESCE picks that row (or the permissive
+// defaults when the org has never saved settings).
+const DISCORD_SETTINGS_JOIN = `
+  LEFT JOIN corp_discord_settings     cds ON cds.corp_id     = m.corp_id
+  LEFT JOIN alliance_discord_settings ads ON ads.alliance_id = m.alliance_id`;
+const DISCORD_SETTINGS_COLS = `
+  COALESCE(cds.all_regions,   ads.all_regions,   TRUE)          AS "allRegions",
+  COALESCE(cds.regions,       ads.regions,       '{}'::text[])  AS "regions",
+  COALESCE(cds.notify_chains, ads.notify_chains, TRUE)          AS "notifyChains"`;
 
 // Re-read the signature now (after the defer window) and send if it's still a
 // K162, including the leads-to if one was set in the meantime.
-async function fireK162(corpId: number | null, sigId: string, actor: string | null): Promise<void> {
+async function fireK162(scope: DiscordScope, sigId: string, actor: string | null): Promise<void> {
   try {
     const { rows } = await db.query<{
       whType: string | null; leadsTo: string | null; system: string; systemClass: string;
@@ -328,14 +341,13 @@ async function fireK162(corpId: number | null, sigId: string, actor: string | nu
       `SELECT sg.wh_type AS "whType", sg.wh_leads_to AS "leadsTo",
               s.name AS "system", s.system_class AS "systemClass", s.region_name AS "region",
               m.name AS "mapName", m.discord_notify AS "mapEnabled",
-              COALESCE(cds.all_regions, TRUE)        AS "allRegions",
-              COALESCE(cds.regions, '{}'::text[])    AS "regions"
+              ${DISCORD_SETTINGS_COLS}
          FROM map_signatures sg
          JOIN map_systems s ON s.id = sg.system_id
          JOIN maps m ON m.id = s.map_id
-         LEFT JOIN corp_discord_settings cds ON cds.corp_id = $2
+         ${DISCORD_SETTINGS_JOIN}
         WHERE sg.id = $1`,
-      [sigId, corpId],
+      [sigId],
     );
     const r = rows[0];
     if (!r) { discordLog.info(`K162 (sig ${sigId}) removed before send — skipping`); return; }
@@ -348,10 +360,10 @@ async function fireK162(corpId: number | null, sigId: string, actor: string | nu
       return;
     }
     if (!regionAllowed(r.allRegions, r.regions, [r.region])) {
-      discordLog.info(`K162 (sig ${sigId}) suppressed — region "${r.region ?? 'unknown'}" not in the corp filter`);
+      discordLog.info(`K162 (sig ${sigId}) suppressed — region "${r.region ?? 'unknown'}" not in the org filter`);
       return;
     }
-    notifyDiscord(corpId, k162Embed({ system: r.system, systemClass: r.systemClass, leadsTo: r.leadsTo, mapName: r.mapName, actor }));
+    notifyDiscord(scope, k162Embed({ system: r.system, systemClass: r.systemClass, leadsTo: r.leadsTo, mapName: r.mapName, actor }));
   } catch (e) {
     discordLog.warn(`K162 deferred dispatch failed: ${(e as Error).message}`);
   }
@@ -361,25 +373,24 @@ function dispatchNewConnection(
   meta: MapMeta, mapId: string, sourceId: string, targetId: string,
   whType: string | null, size: string | null, actor: string | null,
 ): void {
-  if (!webhookFor(meta.corpId)) {
-    discordLog.info(`new connection but not sending — no webhook for corpId=${meta.corpId ?? 'null (personal map; webhooks are corp-maps only)'}`);
+  if (!webhookFor(meta)) {
+    discordLog.info(`new connection but not sending — no webhook for corpId=${meta.corpId ?? 'null'}/allianceId=${meta.allianceId ?? 'null'} (personal maps never notify)`);
     return;
   }
-  discordLog.info(`new connection on corp map (corpId=${meta.corpId}) — building notification`);
+  discordLog.info(`new connection on org map (corpId=${meta.corpId ?? 'null'}/allianceId=${meta.allianceId ?? 'null'}) — building notification`);
   db.query<{
     a: string; b: string; regionA: string | null; regionB: string | null;
     mapName: string; mapEnabled: boolean; allRegions: boolean; regions: string[];
   }>(
     `SELECT a.name AS a, b.name AS b, a.region_name AS "regionA", b.region_name AS "regionB",
             m.name AS "mapName", m.discord_notify AS "mapEnabled",
-            COALESCE(cds.all_regions, TRUE)     AS "allRegions",
-            COALESCE(cds.regions, '{}'::text[]) AS "regions"
+            ${DISCORD_SETTINGS_COLS}
        FROM maps m
        JOIN map_systems a ON a.id = $2
        JOIN map_systems b ON b.id = $3
-       LEFT JOIN corp_discord_settings cds ON cds.corp_id = $4
+       ${DISCORD_SETTINGS_JOIN}
       WHERE m.id = $1`,
-    [mapId, sourceId, targetId, meta.corpId],
+    [mapId, sourceId, targetId],
   ).then(({ rows }) => {
     const r = rows[0];
     if (!r) { discordLog.warn(`connection dispatch: endpoints not found`); return; }
@@ -388,11 +399,74 @@ function dispatchNewConnection(
       return;
     }
     if (!regionAllowed(r.allRegions, r.regions, [r.regionA, r.regionB])) {
-      discordLog.info(`new connection suppressed — neither region (${r.regionA ?? '?'} / ${r.regionB ?? '?'}) in the corp filter`);
+      discordLog.info(`new connection suppressed — neither region (${r.regionA ?? '?'} / ${r.regionB ?? '?'}) in the org filter`);
       return;
     }
-    notifyDiscord(meta.corpId, connectionEmbed({ a: r.a, b: r.b, whType, size, mapName: r.mapName, actor }));
+    notifyDiscord(meta, connectionEmbed({ a: r.a, b: r.b, whType, size, mapName: r.mapName, actor }));
   }).catch((e) => discordLog.warn(`connection dispatch query failed: ${(e as Error).message}`));
+}
+
+// Smallest wormhole size across a chain's hops = the largest ship that can make
+// the whole trip. Only 'standard' (wormhole) links constrain it; gates/bridges
+// are unlimited, so a gates-only chain reports "Any". `size` is the connection's
+// stored jump-size class, same value the new-connection notification reports.
+const SIZE_RANK: Record<string, number> = { small: 0, medium: 1, large: 2, xl: 3 };
+const SIZE_LABEL: Record<string, string> = { small: 'Small', medium: 'Medium', large: 'Large', xl: 'XL' };
+function chainMaxSize(sizes: string[]): string {
+  let tightest: string | null = null;
+  for (const s of sizes) {
+    if (!(s in SIZE_RANK)) continue;
+    if (tightest === null || SIZE_RANK[s] < SIZE_RANK[tightest]) tightest = s;
+  }
+  return tightest ? (SIZE_LABEL[tightest] ?? tightest) : 'Any (gates)';
+}
+
+// Broadcast a saved wormhole chain. Same gates as the other notifications (org
+// webhook + per-map opt-out + region filter) plus the notify_chains toggle. The
+// region check uses the chain's endpoint systems.
+function dispatchChainSaved(
+  meta: MapMeta, mapId: string, route: { name: string; systemIds: string[]; connectionIds: string[] }, actor: string | null,
+): void {
+  if (!webhookFor(meta)) return;
+  const startId = route.systemIds[0];
+  const endId   = route.systemIds[route.systemIds.length - 1];
+  db.query<{
+    startName: string; endName: string; startRegion: string | null; endRegion: string | null;
+    mapName: string; mapEnabled: boolean; allRegions: boolean; regions: string[]; notifyChains: boolean;
+    sizes: string[];
+  }>(
+    `SELECT sn.name AS "startName", en.name AS "endName",
+            sn.region_name AS "startRegion", en.region_name AS "endRegion",
+            m.name AS "mapName", m.discord_notify AS "mapEnabled",
+            ${DISCORD_SETTINGS_COLS},
+            COALESCE((SELECT array_agg(c.size)
+                        FROM map_connections c
+                       WHERE c.id = ANY($4::uuid[]) AND c.connection_type = 'standard'), '{}'::text[]) AS sizes
+       FROM maps m
+       JOIN map_systems sn ON sn.id = $2
+       JOIN map_systems en ON en.id = $3
+       ${DISCORD_SETTINGS_JOIN}
+      WHERE m.id = $1`,
+    [mapId, startId, endId, route.connectionIds],
+  ).then(({ rows }) => {
+    const r = rows[0];
+    if (!r) { discordLog.warn(`chain dispatch: endpoints not found`); return; }
+    if (!r.mapEnabled) { discordLog.info(`chain "${route.name}" suppressed — map "${r.mapName}" is excluded from Discord`); return; }
+    if (!r.notifyChains) { discordLog.info(`chain "${route.name}" suppressed — chain broadcasts off for this org`); return; }
+    if (!regionAllowed(r.allRegions, r.regions, [r.startRegion, r.endRegion])) {
+      discordLog.info(`chain "${route.name}" suppressed — neither endpoint region in the org filter`);
+      return;
+    }
+    notifyDiscord(meta, chainEmbed({
+      name:    route.name,
+      start:   r.startName,
+      end:     r.endName,
+      maxSize: chainMaxSize(r.sizes),
+      hops:    route.connectionIds.length,
+      mapName: r.mapName,
+      actor,
+    }));
+  }).catch((e) => discordLog.warn(`chain dispatch query failed: ${(e as Error).message}`));
 }
 
 // Confirms a system UUID actually belongs to the supplied map; prevents
@@ -1947,16 +2021,24 @@ mapsRouter.post('/:mapId/routes', async (req, res) => {
   }
   const me = authUser(req);
   // New chains append to the bottom of the list (next sort_order for the map).
-  await db.query(
+  const ins = await db.query(
     `INSERT INTO map_routes (id, map_id, name, system_ids, connection_ids, created_by_user_id, sort_order)
      SELECT $1,$2,$3,$4,$5,$6, COALESCE(MAX(sort_order) + 1, 0) FROM map_routes WHERE map_id = $2
      ON CONFLICT (id) DO NOTHING`,
     [id, mapId, name, systemIds, connectionIds ?? [], me.userId],
   );
   await touchMap(mapId);
+  // Only a genuinely new row broadcasts — a retried POST hits ON CONFLICT DO
+  // NOTHING (rowCount 0), so we don't double-post the same chain to Discord.
+  const inserted = (ins.rowCount ?? 0) > 0;
   db.query(`${routeSelect} WHERE id = $1 AND map_id = $2`, [id, mapId])
     .then(({ rows }) => {
-      if (rows[0]) publishToMap(mapId, { type: 'route.add', actor: req.get('x-client-id') ?? null, route: rows[0] });
+      const route = rows[0] as { name: string; systemIds: string[]; connectionIds: string[] } | undefined;
+      if (!route) return;
+      publishToMap(mapId, { type: 'route.add', actor: req.get('x-client-id') ?? null, route });
+      // Notify Discord that a chain was saved (corp/alliance maps only; gated by
+      // the org's settings). Best-effort — never blocks or fails the save.
+      if (inserted) dispatchChainSaved(access, mapId, route, req.session.characterName ?? null);
     }).catch(console.error);
   res.status(201).json({ ok: true });
 });
