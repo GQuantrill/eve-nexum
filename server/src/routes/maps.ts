@@ -482,9 +482,9 @@ function dispatchNewConnection(
       discordLog.info(`new connection ${r.a} <-> ${r.b} suppressed — hole type "${ev.whType || '?'}" not in the org's type filter`);
       return;
     }
-    // Turnur is a special hub the SDE classes as low-sec; treat it as high-sec
-    // for the destination-class filter (operator preference).
-    const destClass = r.b === 'Turnur' ? 'HS' : r.classB;
+    // Turnur is a distinct destination option (like Thera), even though the SDE
+    // classes it low-sec — so a Turnur hole matches the 'Turnur' filter.
+    const destClass = r.b === 'Turnur' ? 'Turnur' : r.classB;
     if (!whListAllows(r.whClasses, destClass)) {
       discordLog.info(`new connection ${r.a} <-> ${r.b} suppressed — dest class "${destClass}" not in the org's class filter`);
       return;

@@ -1430,7 +1430,7 @@ interface RegionOption { id: number; name: string }
 // Fixed vocab for the wormhole filters (mirrors the server). Empty = all.
 // Class chips show the raw EVE class code (no translation needed); size chips
 // reuse the existing connection-panel size labels.
-const WH_CLASS_OPTS = ['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C13', 'HS', 'LS', 'NS', 'Thera', 'Pochven', 'Drifter'];
+const WH_CLASS_OPTS = ['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C13', 'HS', 'LS', 'NS', 'Thera', 'Pochven', 'Drifter', 'Turnur'];
 const WH_SIZE_OPTS = [
   { key: 'small',  labelKey: 'connPanel.sizeSmall'  },
   { key: 'medium', labelKey: 'connPanel.sizeMedium' },
@@ -1657,7 +1657,7 @@ function DiscordTab() {
 
         <div className="discord-admin__actions">
           <button className="btn btn--primary" disabled={!dirty || saving} onClick={saveFilters}>
-            {saving ? t('admin.discord.saving') : t('admin.discord.saveRegions')}
+            {saving ? t('admin.discord.saving') : t('actions.save')}
           </button>
           {saved && <span className="discord-admin__saved">{t('admin.discord.saved')}</span>}
         </div>

@@ -500,7 +500,7 @@ function resolveDiscordScope(req: Request): DiscordScope | null {
 // Vocab for the wormhole notification filters. Classes/sizes are validated
 // against these; type codes are validated by shape (letter + 3 digits, incl.
 // K162) since the catalog is dynamic.
-const WH_CLASSES = new Set(['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C13', 'HS', 'LS', 'NS', 'Thera', 'Pochven', 'Drifter']);
+const WH_CLASSES = new Set(['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C13', 'HS', 'LS', 'NS', 'Thera', 'Pochven', 'Drifter', 'Turnur']);
 const WH_SIZES   = new Set(['small', 'medium', 'large', 'xl']);
 const WH_TYPE_RE = /^[A-Z][0-9]{3}$/;
 

@@ -8656,8 +8656,18 @@ select.sig-toolbar-btn option {
 .discord-admin__chip button:hover { color: #fff; }
 .discord-admin__search {
   width: 100%;
+  max-width: 320px;
   box-sizing: border-box;
+  background: #0a0e1a;
+  border: 1px solid #1e2740;
+  border-radius: 4px;
+  color: #c8d4f0;
+  font-family: inherit;
+  font-size: calc(13px * var(--font-scale, 1));
+  padding: 5px 8px;
+  outline: none;
 }
+.discord-admin__search:focus { border-color: #6ea0ff; }
 .discord-admin__results {
   list-style: none;
   margin: 2px 0 0;
