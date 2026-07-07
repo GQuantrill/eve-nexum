@@ -530,6 +530,7 @@
     "fleetHeatmap": "Fleet heatmap",
     "showAccountChars": "Show my characters",
     "staleHint": "Visually dim systems that haven't been updated for the chosen interval, so old chain residue is easy to spot at a glance.",
+    "staleNever": "Never",
     "exportJson": "↓ Export as JSON",
     "importJson": "↑ Import from JSON",
     "exportPng": "⎙ Export as PNG",

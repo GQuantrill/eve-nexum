@@ -465,6 +465,7 @@
     "fleetHeatmap": "Mapa de calor da frota",
     "showAccountChars": "Mostrar os meus personagens",
     "staleHint": "Esmaece visualmente os sistemas que não foram atualizados no intervalo escolhido, para detetar de relance os restos de cadeias antigas.",
+    "staleNever": "Nunca",
     "exportJson": "↓ Exportar como JSON",
     "importJson": "↑ Importar de JSON",
     "exportPng": "⎙ Exportar como PNG",

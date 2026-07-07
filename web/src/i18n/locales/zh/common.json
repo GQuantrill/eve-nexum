@@ -465,6 +465,7 @@
     "fleetHeatmap": "舰队热力图",
     "showAccountChars": "显示我的角色",
     "staleHint": "将在选定间隔内未更新的星系视觉上淡化，以便一眼看出旧链残留。",
+    "staleNever": "从不",
     "exportJson": "↓ 导出为 JSON",
     "importJson": "↑ 从 JSON 导入",
     "exportPng": "⎙ 导出为 PNG",

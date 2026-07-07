@@ -465,6 +465,7 @@
     "fleetHeatmap": "플릿 히트맵",
     "showAccountChars": "내 캐릭터 표시",
     "staleHint": "선택한 간격 동안 업데이트되지 않은 성계를 시각적으로 흐리게 하여, 오래된 체인 잔재를 한눈에 알아볼 수 있게 합니다.",
+    "staleNever": "안 함",
     "exportJson": "↓ JSON으로 내보내기",
     "importJson": "↑ JSON에서 가져오기",
     "exportPng": "⎙ PNG로 내보내기",

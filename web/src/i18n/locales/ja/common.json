@@ -465,6 +465,7 @@
     "fleetHeatmap": "フリートヒートマップ",
     "showAccountChars": "自分のキャラクターを表示",
     "staleHint": "選択した間隔の間更新されていない星系を視覚的に暗くし、古いチェーンの残りを一目で見つけられるようにします。",
+    "staleNever": "しない",
     "exportJson": "↓ JSON としてエクスポート",
     "importJson": "↑ JSON からインポート",
     "exportPng": "⎙ PNG としてエクスポート",

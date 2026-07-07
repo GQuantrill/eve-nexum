@@ -1165,6 +1165,7 @@ export function MapSidebar() {
                 <option value={48}>{t("units.hours", { count: 48 })}</option>
                 <option value={168}>{t("units.weeks", { count: 1 })}</option>
                 <option value={720}>{t("units.months", { count: 1 })}</option>
+                <option value={0}>{t("mapSidebar.staleNever")}</option>
               </select>
             </div>
           </CollapsibleSection>
