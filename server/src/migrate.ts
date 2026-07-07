@@ -170,6 +170,16 @@ export async function migrate() {
       updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
 
+    -- Wormhole filters for the new-connection notification: type code, dest
+    -- class and hole size. Empty array = "all" (the default), otherwise the
+    -- notification fires only when the hole matches. Applied to both scopes.
+    ALTER TABLE corp_discord_settings     ADD COLUMN IF NOT EXISTS wh_types   TEXT[] NOT NULL DEFAULT '{}';
+    ALTER TABLE corp_discord_settings     ADD COLUMN IF NOT EXISTS wh_classes TEXT[] NOT NULL DEFAULT '{}';
+    ALTER TABLE corp_discord_settings     ADD COLUMN IF NOT EXISTS wh_sizes   TEXT[] NOT NULL DEFAULT '{}';
+    ALTER TABLE alliance_discord_settings ADD COLUMN IF NOT EXISTS wh_types   TEXT[] NOT NULL DEFAULT '{}';
+    ALTER TABLE alliance_discord_settings ADD COLUMN IF NOT EXISTS wh_classes TEXT[] NOT NULL DEFAULT '{}';
+    ALTER TABLE alliance_discord_settings ADD COLUMN IF NOT EXISTS wh_sizes   TEXT[] NOT NULL DEFAULT '{}';
+
     CREATE TABLE IF NOT EXISTS map_systems (
       id            UUID        PRIMARY KEY,
       map_id        UUID        NOT NULL REFERENCES maps(id) ON DELETE CASCADE,
