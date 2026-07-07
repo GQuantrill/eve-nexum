@@ -429,7 +429,7 @@ The only thing the SDE can't provide is `src` ("where can this WH appear") — c
 docker compose run --rm \
   -v "$PWD/server:/app" -w /app -e NODE_ENV=development \
   --entrypoint sh server -c "yarn install --frozen-lockfile && yarn extract-wormholes"
-docker compose build server && docker compose up -d
+docker compose build && docker compose up -d
 ```
 
 See [Static data files](#static-data-files) for what `extract-wormholes` does and the fields involved.
