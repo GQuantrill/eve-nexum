@@ -29,6 +29,7 @@ import scoutRouter        from './routes/scout.js';
 import routeRouter        from './routes/route.js';
 import wormholesRouter    from './routes/wormholes.js';
 import { loadRouteGraph } from './services/routeGraph.js';
+import { seedDiscordWebhooksFromEnv } from './services/discordSeed.js';
 import { startSdeAutoUpdate } from './services/sdeUpdate.js';
 import { startLocationPoller } from './services/locationPoll.js';
 import { startWhSweeper } from './services/whSweep.js';
@@ -169,6 +170,7 @@ async function expireMaps() {
 
 migrate()
   .then(async () => {
+    await seedDiscordWebhooksFromEnv();
     await expireMaps();
     setInterval(expireMaps, 60 * 60 * 1000); // re-check hourly
     await initActivity();

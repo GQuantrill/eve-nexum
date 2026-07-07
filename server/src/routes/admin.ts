@@ -6,6 +6,7 @@ import { requireAdminRead } from '../middleware/requireAdminRead.js';
 import { requireReportsAccess, isReportsCharacter, corpScopeFor } from '../middleware/requireReportsAccess.js';
 import { isAdmin, isAllianceAdmin } from '../middleware/authContext.js';
 import { config } from '../config.js';
+import { isDiscordWebhookUrl } from '../services/discord.js';
 import { createLogger } from '../utils/logger.js';
 import { invalidateSessionsForUser } from '../utils/sessionInvalidate.js';
 import { audit } from '../services/audit.js';
@@ -507,16 +508,18 @@ const WH_TYPE_RE = /^[A-Z][0-9]{3}$/;
 interface WhSettingsRow {
   allRegions: boolean; regions: string[]; notifyChains: boolean;
   whTypes: string[]; whClasses: string[]; whSizes: string[];
+  connectionsWebhook: string | null; chainsWebhook: string | null;
 }
 const WH_SETTINGS_COLS = `all_regions AS "allRegions", regions, notify_chains AS "notifyChains",
-                          wh_types AS "whTypes", wh_classes AS "whClasses", wh_sizes AS "whSizes"`;
+                          wh_types AS "whTypes", wh_classes AS "whClasses", wh_sizes AS "whSizes",
+                          connections_webhook AS "connectionsWebhook", chains_webhook AS "chainsWebhook"`;
 
 // GET /api/admin/discord — current settings + this org's maps with their
 // excluded state (excluded = NOT discord_notify).
 adminRouter.get('/discord', async (req, res) => {
   const scope = resolveDiscordScope(req);
   if (!scope) {
-    res.json({ scope: null, allRegions: true, regions: [], notifyChains: true, whTypes: [], whClasses: [], whSizes: [], maps: [] });
+    res.json({ scope: null, allRegions: true, regions: [], notifyChains: true, whTypes: [], whClasses: [], whSizes: [], connectionsWebhook: '', chainsWebhook: '', maps: [] });
     return;
   }
   // Literal SQL per branch (no interpolated identifiers) so the settings table /
@@ -539,6 +542,8 @@ adminRouter.get('/discord', async (req, res) => {
     whTypes:      row?.whTypes ?? [],
     whClasses:    row?.whClasses ?? [],
     whSizes:      row?.whSizes ?? [],
+    connectionsWebhook: row?.connectionsWebhook ?? '',
+    chainsWebhook:      row?.chainsWebhook ?? '',
     maps:         maps.rows,
   });
 });
@@ -551,9 +556,28 @@ adminRouter.put('/discord', async (req, res) => {
   const body = req.body as {
     allRegions?: unknown; regions?: unknown; notifyChains?: unknown;
     whTypes?: unknown; whClasses?: unknown; whSizes?: unknown;
+    connectionsWebhook?: unknown; chainsWebhook?: unknown;
   };
   const allRegions   = body.allRegions !== false;   // default true
   const notifyChains = body.notifyChains !== false; // default true
+
+  // Webhook URLs. A field that's PRESENT sets the value: empty string clears
+  // (NULL), a non-empty value MUST be a real Discord webhook (SSRF guard) or the
+  // whole request is rejected. A field that's ABSENT leaves the stored value
+  // unchanged (so a partial PUT — e.g. a future API client that doesn't know
+  // about webhooks — can't wipe them). `provided` distinguishes the two.
+  const resolveWebhook = (v: unknown): { provided: boolean; value: string | null; bad: boolean } => {
+    if (typeof v !== 'string') return { provided: false, value: null, bad: false };
+    const s = v.trim();
+    if (s === '') return { provided: true, value: null, bad: false };
+    return isDiscordWebhookUrl(s) ? { provided: true, value: s, bad: false } : { provided: true, value: null, bad: true };
+  };
+  const conn  = resolveWebhook(body.connectionsWebhook);
+  const chain = resolveWebhook(body.chainsWebhook);
+  if (conn.bad || chain.bad) {
+    res.status(400).json({ error: 'Webhook must be a Discord webhook URL (https://discord.com/api/webhooks/…)' });
+    return;
+  }
   let regions = Array.isArray(body.regions)
     ? body.regions.filter((r): r is string => typeof r === 'string')
     : [];
@@ -574,25 +598,34 @@ adminRouter.put('/discord', async (req, res) => {
   const whClasses = [...new Set(asStrings(body.whClasses).map((s) => s.trim()).filter((s) => WH_CLASSES.has(s)))];
   const whSizes   = [...new Set(asStrings(body.whSizes).map((s) => s.trim().toLowerCase()).filter((s) => WH_SIZES.has(s)))];
 
+  // On an existing row, only overwrite a webhook column when the field was
+  // provided (CASE on the `provided` flag); otherwise keep the stored value.
+  const params = [scope.id, allRegions, regions, notifyChains, whTypes, whClasses, whSizes, conn.value, chain.value, conn.provided, chain.provided];
   if (scope.kind === 'alliance') {
     await db.query(
-      `INSERT INTO alliance_discord_settings (alliance_id, all_regions, regions, notify_chains, wh_types, wh_classes, wh_sizes, updated_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
+      `INSERT INTO alliance_discord_settings (alliance_id, all_regions, regions, notify_chains, wh_types, wh_classes, wh_sizes, connections_webhook, chains_webhook, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())
        ON CONFLICT (alliance_id) DO UPDATE
          SET all_regions = EXCLUDED.all_regions, regions = EXCLUDED.regions,
              notify_chains = EXCLUDED.notify_chains, wh_types = EXCLUDED.wh_types,
-             wh_classes = EXCLUDED.wh_classes, wh_sizes = EXCLUDED.wh_sizes, updated_at = NOW()`,
-      [scope.id, allRegions, regions, notifyChains, whTypes, whClasses, whSizes],
+             wh_classes = EXCLUDED.wh_classes, wh_sizes = EXCLUDED.wh_sizes,
+             connections_webhook = CASE WHEN $10 THEN EXCLUDED.connections_webhook ELSE alliance_discord_settings.connections_webhook END,
+             chains_webhook      = CASE WHEN $11 THEN EXCLUDED.chains_webhook      ELSE alliance_discord_settings.chains_webhook END,
+             updated_at = NOW()`,
+      params,
     );
   } else {
     await db.query(
-      `INSERT INTO corp_discord_settings (corp_id, all_regions, regions, notify_chains, wh_types, wh_classes, wh_sizes, updated_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
+      `INSERT INTO corp_discord_settings (corp_id, all_regions, regions, notify_chains, wh_types, wh_classes, wh_sizes, connections_webhook, chains_webhook, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())
        ON CONFLICT (corp_id) DO UPDATE
          SET all_regions = EXCLUDED.all_regions, regions = EXCLUDED.regions,
              notify_chains = EXCLUDED.notify_chains, wh_types = EXCLUDED.wh_types,
-             wh_classes = EXCLUDED.wh_classes, wh_sizes = EXCLUDED.wh_sizes, updated_at = NOW()`,
-      [scope.id, allRegions, regions, notifyChains, whTypes, whClasses, whSizes],
+             wh_classes = EXCLUDED.wh_classes, wh_sizes = EXCLUDED.wh_sizes,
+             connections_webhook = CASE WHEN $10 THEN EXCLUDED.connections_webhook ELSE corp_discord_settings.connections_webhook END,
+             chains_webhook      = CASE WHEN $11 THEN EXCLUDED.chains_webhook      ELSE corp_discord_settings.chains_webhook END,
+             updated_at = NOW()`,
+      params,
     );
   }
   res.json({ ok: true, allRegions, regions, notifyChains, whTypes, whClasses, whSizes });

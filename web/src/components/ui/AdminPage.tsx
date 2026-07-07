@@ -1423,6 +1423,8 @@ interface DiscordSettings {
   whTypes:      string[];
   whClasses:    string[];
   whSizes:      string[];
+  connectionsWebhook: string;
+  chainsWebhook:      string;
   maps:         { id: string; name: string; excluded: boolean }[];
 }
 interface RegionOption { id: number; name: string }
@@ -1456,6 +1458,9 @@ function DiscordTab() {
   const [whClasses, setWhClasses] = useState<string[]>([]);
   const [whSizes, setWhSizes]     = useState<string[]>([]);
   const [whQuery, setWhQuery]     = useState('');
+  // Editable copies of the per-event webhook URLs (empty = off).
+  const [connWebhook, setConnWebhook]   = useState('');
+  const [chainWebhook, setChainWebhook] = useState('');
 
   const load = useCallback(async () => {
     try {
@@ -1469,6 +1474,8 @@ function DiscordTab() {
       setWhTypes(s.whTypes ?? []);
       setWhClasses(s.whClasses ?? []);
       setWhSizes(s.whSizes ?? []);
+      setConnWebhook(s.connectionsWebhook ?? '');
+      setChainWebhook(s.chainsWebhook ?? '');
       setRegionOpts(r.regions);
       setError(null);
     } catch (e) {
@@ -1487,8 +1494,8 @@ function DiscordTab() {
     try {
       // Send every field the PUT can wipe (it defaults absent flags/lists), so a
       // save never silently resets the chain toggle or another filter dimension.
-      await api('/api/admin/discord', { method: 'PUT', body: JSON.stringify({ allRegions, regions, notifyChains: data.notifyChains, whTypes, whClasses, whSizes }) });
-      setData((d) => (d ? { ...d, allRegions, regions, whTypes, whClasses, whSizes } : d));
+      await api('/api/admin/discord', { method: 'PUT', body: JSON.stringify({ allRegions, regions, notifyChains: data.notifyChains, whTypes, whClasses, whSizes, connectionsWebhook: connWebhook.trim(), chainsWebhook: chainWebhook.trim() }) });
+      setData((d) => (d ? { ...d, allRegions, regions, whTypes, whClasses, whSizes, connectionsWebhook: connWebhook.trim(), chainsWebhook: chainWebhook.trim() } : d));
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     } catch (e) {
@@ -1505,7 +1512,7 @@ function DiscordTab() {
     const prev = data.notifyChains;
     setData((d) => (d ? { ...d, notifyChains: next } : d));
     try {
-      await api('/api/admin/discord', { method: 'PUT', body: JSON.stringify({ allRegions: data.allRegions, regions: data.regions, notifyChains: next, whTypes: data.whTypes, whClasses: data.whClasses, whSizes: data.whSizes }) });
+      await api('/api/admin/discord', { method: 'PUT', body: JSON.stringify({ allRegions: data.allRegions, regions: data.regions, notifyChains: next, whTypes: data.whTypes, whClasses: data.whClasses, whSizes: data.whSizes, connectionsWebhook: data.connectionsWebhook, chainsWebhook: data.chainsWebhook }) });
     } catch (e) {
       setData((d) => (d ? { ...d, notifyChains: prev } : d));
       setError(e instanceof Error ? e.message : t('admin.discord.saveFailed'));
@@ -1550,13 +1557,40 @@ function DiscordTab() {
     || sortJoin(regions)   !== sortJoin(data.regions)
     || sortJoin(whTypes)   !== sortJoin(data.whTypes)
     || sortJoin(whClasses) !== sortJoin(data.whClasses)
-    || sortJoin(whSizes)   !== sortJoin(data.whSizes);
+    || sortJoin(whSizes)   !== sortJoin(data.whSizes)
+    || connWebhook.trim()  !== data.connectionsWebhook
+    || chainWebhook.trim() !== data.chainsWebhook;
 
   return (
     <>
       <h2 className="admin-page__section-title">{t('admin.discord.titleNotifications')}</h2>
       {error && <div className="admin-page__error">{error}</div>}
       <p className="discord-admin__hint">{t('admin.discord.hint')}</p>
+
+      <section className="discord-admin__section">
+        <h3 className="discord-admin__heading">{t('admin.discord.webhooks')}</h3>
+        <p className="discord-admin__hint">{t('admin.discord.webhooksHint')}</p>
+        <label className="discord-admin__sublabel" htmlFor="conn-webhook">{t('admin.discord.connectionsWebhook')}</label>
+        <input
+          id="conn-webhook"
+          type="url"
+          className="discord-admin__search discord-admin__search--wide"
+          placeholder="https://discord.com/api/webhooks/…"
+          value={connWebhook}
+          spellCheck={false}
+          onChange={(e) => setConnWebhook(e.target.value)}
+        />
+        <label className="discord-admin__sublabel" htmlFor="chain-webhook">{t('admin.discord.chainsWebhook')}</label>
+        <input
+          id="chain-webhook"
+          type="url"
+          className="discord-admin__search discord-admin__search--wide"
+          placeholder="https://discord.com/api/webhooks/…"
+          value={chainWebhook}
+          spellCheck={false}
+          onChange={(e) => setChainWebhook(e.target.value)}
+        />
+      </section>
 
       <section className="discord-admin__section">
         <h3 className="discord-admin__heading">{t('admin.discord.regions')}</h3>
