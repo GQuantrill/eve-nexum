@@ -465,6 +465,7 @@
     "fleetHeatmap": "Carte de chaleur de flotte",
     "showAccountChars": "Afficher mes personnages",
     "staleHint": "Atténue visuellement les systèmes non mis à jour depuis l'intervalle choisi, pour repérer d'un coup d'œil les résidus de chaîne.",
+    "staleNever": "Jamais",
     "exportJson": "↓ Exporter en JSON",
     "importJson": "↑ Importer depuis JSON",
     "exportPng": "⎙ Exporter en PNG",

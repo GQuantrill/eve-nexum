@@ -156,7 +156,8 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
   }, [heatmap.metric, heatmap.max, heatmap.intensity, heatmap.colorVision, sys.eveSystemId, allKills, fleet, user?.characterId]);
   const now             = useNow30s();
   const [staleHours]    = useStaleThreshold();
-  const isStale         = !!sys.lastActivityAt &&
+  // staleHours === 0 is the "Never fade" sentinel: no system is ever stale.
+  const isStale         = staleHours > 0 && !!sys.lastActivityAt &&
                           (now - new Date(sys.lastActivityAt).getTime()) > staleHours * 3_600_000;
   const connection      = useConnection();
   const [customIntel]   = useCustomIntel();
