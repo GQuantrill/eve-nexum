@@ -369,6 +369,51 @@ async function fireK162(scope: DiscordScope, sigId: string, actor: string | null
   }
 }
 
+// The leads-to "band" a wormhole signature uses for an arrival class — mirrors
+// whJumpConfirm.bandFor on the client so the server's wormhole-evidence check
+// stays in step with what the client would treat as a plausible hole.
+function whBand(cls: string): string {
+  if (cls === 'C1' || cls === 'C2' || cls === 'C3') return 'C1-C3';
+  if (cls === 'C4' || cls === 'C5') return 'C4-C5';
+  return cls; // C6 / C13 / Thera / Pochven / Drifter / HS / LS / NS
+}
+
+// The wh_leads_to values a hole in `fromClass`-space could carry and still be a
+// plausible candidate for a jump that ARRIVED in a `toClass`/`toName` system:
+// unscanned ('' / 'unknown'), pinned to that exact system, or class/band-matched.
+// (A hole pinned to a different system name is excluded — it's already solved.)
+function candidateLeadsTo(toName: string, toClass: string): string[] {
+  return ['', 'unknown', toName, whBand(toClass), toClass];
+}
+
+// Whether a jump between two systems looks like a real WORMHOLE jump rather than
+// a gate / Ansiblex / bridge: at least one endpoint must hold a scanned wormhole
+// signature that plausibly accounts for the hop. In-game gates are already typed
+// 'gate' and never reach here; this catches jump-bridge hops between k-space
+// systems that the stargate check can't (they aren't stargate-adjacent), which
+// otherwise looked like fresh wormholes. Best-effort: on a query error we assume
+// it IS a wormhole (fail-open) rather than silently dropping a real one.
+async function looksLikeWormholeJump(
+  sourceId: string, targetId: string,
+  aName: string, aClass: string, bName: string, bClass: string,
+): Promise<boolean> {
+  try {
+    const { rowCount } = await db.query(
+      `SELECT 1
+         FROM map_signatures sg
+        WHERE sg.sig_type = 'wormhole'
+          AND ( (sg.system_id = $1 AND sg.wh_leads_to = ANY($3::text[]))
+             OR (sg.system_id = $2 AND sg.wh_leads_to = ANY($4::text[])) )
+        LIMIT 1`,
+      [sourceId, targetId, candidateLeadsTo(bName, bClass), candidateLeadsTo(aName, aClass)],
+    );
+    return (rowCount ?? 0) > 0;
+  } catch (e) {
+    discordLog.warn(`wormhole-evidence check failed (assuming wormhole): ${(e as Error).message}`);
+    return true;
+  }
+}
+
 function dispatchNewConnection(
   meta: MapMeta, mapId: string, sourceId: string, targetId: string,
   whType: string | null, size: string | null, actor: string | null,
@@ -379,10 +424,11 @@ function dispatchNewConnection(
   }
   discordLog.info(`new connection on org map (corpId=${meta.corpId ?? 'null'}/allianceId=${meta.allianceId ?? 'null'}) — building notification`);
   db.query<{
-    a: string; b: string; regionA: string | null; regionB: string | null;
+    a: string; b: string; classA: string; classB: string; regionA: string | null; regionB: string | null;
     mapName: string; mapEnabled: boolean; allRegions: boolean; regions: string[];
   }>(
-    `SELECT a.name AS a, b.name AS b, a.region_name AS "regionA", b.region_name AS "regionB",
+    `SELECT a.name AS a, b.name AS b, a.system_class AS "classA", b.system_class AS "classB",
+            a.region_name AS "regionA", b.region_name AS "regionB",
             m.name AS "mapName", m.discord_notify AS "mapEnabled",
             ${DISCORD_SETTINGS_COLS}
        FROM maps m
@@ -391,7 +437,7 @@ function dispatchNewConnection(
        ${DISCORD_SETTINGS_JOIN}
       WHERE m.id = $1`,
     [mapId, sourceId, targetId],
-  ).then(({ rows }) => {
+  ).then(async ({ rows }) => {
     const r = rows[0];
     if (!r) { discordLog.warn(`connection dispatch: endpoints not found`); return; }
     if (!r.mapEnabled) {
@@ -400,6 +446,12 @@ function dispatchNewConnection(
     }
     if (!regionAllowed(r.allRegions, r.regions, [r.regionA, r.regionB])) {
       discordLog.info(`new connection suppressed — neither region (${r.regionA ?? '?'} / ${r.regionB ?? '?'}) in the org filter`);
+      return;
+    }
+    // Suppress gate / Ansiblex / bridge hops: only broadcast when a scanned
+    // wormhole signature plausibly backs the jump (see looksLikeWormholeJump).
+    if (!(await looksLikeWormholeJump(sourceId, targetId, r.a, r.classA, r.b, r.classB))) {
+      discordLog.info(`new connection ${r.a} <-> ${r.b} suppressed — no wormhole signature backs it (likely a gate/jump-bridge)`);
       return;
     }
     notifyDiscord(meta, connectionEmbed({ a: r.a, b: r.b, whType, size, mapName: r.mapName, actor }));
