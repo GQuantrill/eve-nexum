@@ -429,7 +429,7 @@ The only thing the SDE can't provide is `src` ("where can this WH appear") — c
 docker compose run --rm \
   -v "$PWD/server:/app" -w /app -e NODE_ENV=development \
   --entrypoint sh server -c "yarn install --frozen-lockfile && yarn extract-wormholes"
-docker compose build && docker compose up -d
+docker compose build server && docker compose up -d
 ```
 
 See [Static data files](#static-data-files) for what `extract-wormholes` does and the fields involved.
@@ -440,7 +440,7 @@ Pulling a new Nexum release into a running instance:
 
 - **App-schema changes apply automatically.** New columns and tables (e.g. the map-merge `allow_as_merge_source` / `allow_as_merge_destination` flags, the solar-system coordinate columns) are added by the migration that runs on every server boot — just rebuild and restart:
   ```bash
-  docker compose build server && docker compose up -d
+  docker compose build && docker compose up -d
   ```
 
 #### Backup & restore
