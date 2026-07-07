@@ -1,6 +1,7 @@
-// Best-effort Discord webhook notifications for corp chain intel. Fire-and-
-// forget: never blocks a request and never throws into a caller. Corp-scoped
-// and configured purely via env (see config.ts). See discord_webhooks_feature.md.
+// Best-effort Discord webhook notifications for corp/alliance chain intel.
+// Fire-and-forget: never blocks a request and never throws into a caller.
+// Scoped to a map's corp OR alliance and configured purely via env (see
+// config.ts). See discord_webhooks_feature.md.
 import { config } from '../config.js';
 import { createLogger } from '../utils/logger.js';
 
@@ -9,18 +10,25 @@ const log = createLogger('discord');
 // Log the configuration once at startup so a misconfigured DISCORD_WEBHOOK_URL
 // is obvious in the logs. URLs are secrets, so we log presence, not values.
 {
-  const corps = Object.keys(config.discord.byCorp);
-  const enabled = !!config.discord.defaultUrl || corps.length > 0;
+  const corps      = Object.keys(config.discord.byCorp);
+  const alliances  = Object.keys(config.discord.byAlliance);
+  const enabled = !!config.discord.defaultUrl || corps.length > 0 || alliances.length > 0;
   log.info(enabled
-    ? `enabled — default webhook: ${config.discord.defaultUrl ? 'set' : 'none'}; per-corp overrides: [${corps.join(', ') || 'none'}]`
+    ? `enabled — default webhook: ${config.discord.defaultUrl ? 'set' : 'none'}; per-corp overrides: [${corps.join(', ') || 'none'}]; per-alliance overrides: [${alliances.join(', ') || 'none'}]`
     : 'disabled — DISCORD_WEBHOOK_URL is not set (no notifications will be sent)');
 }
 
-// Resolve the webhook for a map's corp: per-corp override, else the default,
-// else null (feature off, or a personal map with corpId === null).
-export function webhookFor(corpId: number | null): string | null {
-  if (corpId == null) return null;
-  return config.discord.byCorp[corpId] ?? config.discord.defaultUrl ?? null;
+// The org a map belongs to for Discord routing: a corp OR an alliance (a map is
+// never both). Personal maps have both null and never notify.
+export interface DiscordScope { corpId: number | null; allianceId: number | null; }
+
+// Resolve the webhook for a map's org: the corp/alliance-specific override
+// first, then the shared default, else null (feature off, or a personal map).
+export function webhookFor(scope: DiscordScope): string | null {
+  if (scope.corpId != null && config.discord.byCorp[scope.corpId]) return config.discord.byCorp[scope.corpId];
+  if (scope.allianceId != null && config.discord.byAlliance[scope.allianceId]) return config.discord.byAlliance[scope.allianceId];
+  if (scope.corpId != null || scope.allianceId != null) return config.discord.defaultUrl ?? null;
+  return null;
 }
 
 export interface DiscordEmbed {
@@ -39,11 +47,11 @@ const MAX_QUEUE  = 100;   // drop overflow rather than grow unbounded
 const SPACING_MS = 1000;  // gentle pacing — well under Discord's ~30/min limit
 let draining = false;
 
-// Enqueue a notification. No-op when no webhook is configured for the corp.
-export function notifyDiscord(corpId: number | null, embed: DiscordEmbed): void {
-  const url = webhookFor(corpId);
+// Enqueue a notification. No-op when no webhook is configured for the scope.
+export function notifyDiscord(scope: DiscordScope, embed: DiscordEmbed): void {
+  const url = webhookFor(scope);
   if (!url) {
-    log.info(`skip "${embed.title}" — no webhook resolved for corpId=${corpId ?? 'null (personal map)'}`);
+    log.info(`skip "${embed.title}" — no webhook resolved for corpId=${scope.corpId ?? 'null'} / allianceId=${scope.allianceId ?? 'null'}`);
     return;
   }
   if (queue.length >= MAX_QUEUE) {
@@ -51,7 +59,7 @@ export function notifyDiscord(corpId: number | null, embed: DiscordEmbed): void 
     return;
   }
   queue.push({ url, embed });
-  log.info(`queued "${embed.title}" for corpId=${corpId} (queue depth: ${queue.length})`);
+  log.info(`queued "${embed.title}" for corpId=${scope.corpId ?? 'null'} / allianceId=${scope.allianceId ?? 'null'} (queue depth: ${queue.length})`);
   void drain();
 }
 
@@ -101,6 +109,26 @@ const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve,
 // ── Embed builders ──────────────────────────────────────────────────────────
 const AMBER = 0xf0a030;
 const BLUE  = 0x5b9bff;
+const GREEN = 0x3ddc84;
+
+// Saved wormhole chain: name + start/end + how tight and how far.
+export function chainEmbed(p: {
+  name: string; start: string; end: string; maxSize: string; hops: number; mapName: string; actor: string | null;
+}): DiscordEmbed {
+  return {
+    title:       '🧭 Chain saved',
+    description: `**${p.name || `${p.start} → ${p.end}`}** on **${p.mapName}**`,
+    color:       GREEN,
+    fields: [
+      { name: 'From',      value: p.start,          inline: true },
+      { name: 'To',        value: p.end,            inline: true },
+      { name: 'Max ship',  value: p.maxSize,        inline: true },
+      { name: 'Hops',      value: String(p.hops),   inline: true },
+    ],
+    footer:    p.actor ? { text: `saved by ${p.actor}` } : undefined,
+    timestamp: new Date().toISOString(),
+  };
+}
 
 export function k162Embed(p: {
   system: string; systemClass: string; leadsTo?: string | null; mapName: string; actor: string | null;

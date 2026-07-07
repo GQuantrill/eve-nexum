@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, type Request } from 'express';
 import { esiFetch } from '../utils/esi.js';
 import { db } from '../db.js';
 import { requireAdmin } from '../middleware/requireAdmin.js';
@@ -478,44 +478,66 @@ adminRouter.delete('/maps/:id', async (req, res) => {
 });
 
 // ── Discord notification settings ─────────────────────────────────────────────
-// Per-corp region filter + per-map exclusions for the Discord webhook
-// notifications. Scoped to the admin's own corp (req.session.userCorpId). See
-// discord_filters_feature.md.
+// Region filter + per-event-type toggles + per-map exclusions for the Discord
+// webhook notifications. Scoped to the admin's own org — corp OR alliance. An
+// alliance deployment's admin (alliance_admin) manages the alliance's settings;
+// otherwise the admin's corp. See discord_filters_feature.md.
 
-// GET /api/admin/discord — current settings + this corp's maps with their
+type DiscordScope = { kind: 'corp' | 'alliance'; id: number };
+
+// Which org's Discord settings this admin manages. Alliance takes precedence in
+// an alliance-mode deployment when the caller is an alliance admin; otherwise
+// the caller's corp. null when the caller has no org (personal deployment).
+function resolveDiscordScope(req: Request): DiscordScope | null {
+  const role       = req.session.role ?? 'readonly';
+  const allianceId = req.session.userAllianceId ?? null;
+  const corpId     = req.session.userCorpId ?? null;
+  if (config.allianceMode && allianceId != null && isAllianceAdmin(role)) return { kind: 'alliance', id: allianceId };
+  if (corpId != null) return { kind: 'corp', id: corpId };
+  return null;
+}
+
+// GET /api/admin/discord — current settings + this org's maps with their
 // excluded state (excluded = NOT discord_notify).
 adminRouter.get('/discord', async (req, res) => {
-  const corpId = req.session.userCorpId ?? null;
-  if (corpId == null) {
-    res.json({ corpId: null, allRegions: true, regions: [], maps: [] });
+  const scope = resolveDiscordScope(req);
+  if (!scope) {
+    res.json({ scope: null, allRegions: true, regions: [], notifyChains: true, maps: [] });
     return;
   }
-  const [settings, maps] = await Promise.all([
-    db.query<{ allRegions: boolean; regions: string[] }>(
-      `SELECT all_regions AS "allRegions", regions FROM corp_discord_settings WHERE corp_id = $1`,
-      [corpId],
-    ),
-    db.query<{ id: string; name: string; excluded: boolean }>(
-      `SELECT id, name, NOT discord_notify AS excluded FROM maps WHERE corp_id = $1 ORDER BY name`,
-      [corpId],
-    ),
-  ]);
+  // Literal SQL per branch (no interpolated identifiers) so the settings table /
+  // scope column are never string-built from a variable.
+  const settingsP = scope.kind === 'alliance'
+    ? db.query<{ allRegions: boolean; regions: string[]; notifyChains: boolean }>(
+        `SELECT all_regions AS "allRegions", regions, notify_chains AS "notifyChains"
+           FROM alliance_discord_settings WHERE alliance_id = $1`, [scope.id])
+    : db.query<{ allRegions: boolean; regions: string[]; notifyChains: boolean }>(
+        `SELECT all_regions AS "allRegions", regions, notify_chains AS "notifyChains"
+           FROM corp_discord_settings WHERE corp_id = $1`, [scope.id]);
+  const mapsP = scope.kind === 'alliance'
+    ? db.query<{ id: string; name: string; excluded: boolean }>(
+        `SELECT id, name, NOT discord_notify AS excluded FROM maps WHERE alliance_id = $1 ORDER BY name`, [scope.id])
+    : db.query<{ id: string; name: string; excluded: boolean }>(
+        `SELECT id, name, NOT discord_notify AS excluded FROM maps WHERE corp_id = $1 ORDER BY name`, [scope.id]);
+  const [settings, maps] = await Promise.all([settingsP, mapsP]);
   const row = settings.rows[0];
   res.json({
-    corpId,
-    allRegions: row?.allRegions ?? true,
-    regions:    row?.regions ?? [],
-    maps:       maps.rows,
+    scope:        scope.kind,
+    allRegions:   row?.allRegions ?? true,
+    regions:      row?.regions ?? [],
+    notifyChains: row?.notifyChains ?? true,
+    maps:         maps.rows,
   });
 });
 
-// PUT /api/admin/discord — set the region filter for the admin's corp.
+// PUT /api/admin/discord — set the region filter + event toggles for the org.
 adminRouter.put('/discord', async (req, res) => {
-  const corpId = req.session.userCorpId ?? null;
-  if (corpId == null) { res.status(400).json({ error: 'No corp context' }); return; }
+  const scope = resolveDiscordScope(req);
+  if (!scope) { res.status(400).json({ error: 'No org context' }); return; }
 
-  const body = req.body as { allRegions?: unknown; regions?: unknown };
-  const allRegions = body.allRegions !== false; // default true
+  const body = req.body as { allRegions?: unknown; regions?: unknown; notifyChains?: unknown };
+  const allRegions   = body.allRegions !== false;   // default true
+  const notifyChains = body.notifyChains !== false; // default true
   let regions = Array.isArray(body.regions)
     ? body.regions.filter((r): r is string => typeof r === 'string')
     : [];
@@ -529,30 +551,45 @@ adminRouter.put('/discord', async (req, res) => {
     regions = [...new Set(regions.filter((r) => valid.has(r)))];
   }
 
-  await db.query(
-    `INSERT INTO corp_discord_settings (corp_id, all_regions, regions, updated_at)
-     VALUES ($1, $2, $3, NOW())
-     ON CONFLICT (corp_id) DO UPDATE
-       SET all_regions = EXCLUDED.all_regions, regions = EXCLUDED.regions, updated_at = NOW()`,
-    [corpId, allRegions, regions],
-  );
-  res.json({ ok: true, allRegions, regions });
+  if (scope.kind === 'alliance') {
+    await db.query(
+      `INSERT INTO alliance_discord_settings (alliance_id, all_regions, regions, notify_chains, updated_at)
+       VALUES ($1, $2, $3, $4, NOW())
+       ON CONFLICT (alliance_id) DO UPDATE
+         SET all_regions = EXCLUDED.all_regions, regions = EXCLUDED.regions,
+             notify_chains = EXCLUDED.notify_chains, updated_at = NOW()`,
+      [scope.id, allRegions, regions, notifyChains],
+    );
+  } else {
+    await db.query(
+      `INSERT INTO corp_discord_settings (corp_id, all_regions, regions, notify_chains, updated_at)
+       VALUES ($1, $2, $3, $4, NOW())
+       ON CONFLICT (corp_id) DO UPDATE
+         SET all_regions = EXCLUDED.all_regions, regions = EXCLUDED.regions,
+             notify_chains = EXCLUDED.notify_chains, updated_at = NOW()`,
+      [scope.id, allRegions, regions, notifyChains],
+    );
+  }
+  res.json({ ok: true, allRegions, regions, notifyChains });
 });
 
-// PATCH /api/admin/maps/:id/discord — exclude / re-include one of the corp's
+// PATCH /api/admin/maps/:id/discord — exclude / re-include one of the org's
 // maps from Discord notifications. Maps notify by default, so this manages the
-// exceptions. Scoped to the admin's corp.
+// exceptions. Scoped to the admin's org so an admin can't toggle another org's map.
 adminRouter.patch('/maps/:id/discord', async (req, res) => {
-  const mapId  = req.params.id;
-  const corpId = req.session.userCorpId ?? null;
-  if (!mapId)            { res.status(400).json({ error: 'invalid map id' }); return; }
-  if (corpId == null)    { res.status(400).json({ error: 'No corp context' }); return; }
+  const mapId = req.params.id;
+  const scope = resolveDiscordScope(req);
+  if (!mapId) { res.status(400).json({ error: 'invalid map id' }); return; }
+  if (!scope) { res.status(400).json({ error: 'No org context' }); return; }
   const excluded = (req.body as { excluded?: unknown }).excluded === true;
 
-  const { rowCount } = await db.query(
-    `UPDATE maps SET discord_notify = $1, updated_at = NOW() WHERE id = $2 AND corp_id = $3`,
-    [!excluded, mapId, corpId],
-  );
+  const { rowCount } = scope.kind === 'alliance'
+    ? await db.query(
+        `UPDATE maps SET discord_notify = $1, updated_at = NOW() WHERE id = $2 AND alliance_id = $3`,
+        [!excluded, mapId, scope.id])
+    : await db.query(
+        `UPDATE maps SET discord_notify = $1, updated_at = NOW() WHERE id = $2 AND corp_id = $3`,
+        [!excluded, mapId, scope.id]);
   if (!rowCount) { res.status(404).json({ error: 'Map not found' }); return; }
   res.json({ ok: true, excluded });
 });

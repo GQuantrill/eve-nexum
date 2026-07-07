@@ -154,6 +154,22 @@ export async function migrate() {
       updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
 
+    -- Per-event-type broadcast opt-outs, added alongside the region filter.
+    -- DEFAULT TRUE keeps existing behaviour (chain saves broadcast) until an
+    -- admin turns them off.
+    ALTER TABLE corp_discord_settings ADD COLUMN IF NOT EXISTS notify_chains BOOLEAN NOT NULL DEFAULT TRUE;
+
+    -- Alliance mirror of corp_discord_settings, so alliance maps get the same
+    -- region filter + per-event-type toggles. A map is corp- OR alliance-scoped,
+    -- never both, so its dispatch reads exactly one of these tables.
+    CREATE TABLE IF NOT EXISTS alliance_discord_settings (
+      alliance_id   INTEGER     PRIMARY KEY,
+      all_regions   BOOLEAN     NOT NULL DEFAULT TRUE,
+      regions       TEXT[]      NOT NULL DEFAULT '{}',
+      notify_chains BOOLEAN     NOT NULL DEFAULT TRUE,
+      updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
     CREATE TABLE IF NOT EXISTS map_systems (
       id            UUID        PRIMARY KEY,
       map_id        UUID        NOT NULL REFERENCES maps(id) ON DELETE CASCADE,

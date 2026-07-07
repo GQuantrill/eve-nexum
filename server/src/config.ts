@@ -36,15 +36,18 @@ const CORP_MAP_SHARED = /^(1|true|yes)$/i.test(process.env.CORP_MAP_SHARED ?? ''
 // owns it.
 const ALLIANCE_MAP_SHARED = /^(1|true|yes)$/i.test(process.env.ALLIANCE_MAP_SHARED ?? '');
 
-// DISCORD_WEBHOOK_URL — optional corp-intel notifications (inbound K162, new
-// connections). Two accepted forms:
-//   • a single webhook URL                → used for every corp map
-//   • "corpId=URL,corpId=URL" pairs        → per-corp routing (multi-corp deploys)
+// DISCORD_WEBHOOK_URL — optional corp/alliance intel notifications (inbound
+// K162, new connections, saved chains). Accepted forms (comma-separated):
+//   • a single webhook URL                → used for every corp AND alliance map
+//   • "corpId=URL"                         → per-corp routing (multi-corp deploys)
+//   • "a<allianceId>=URL"                  → per-alliance routing (leading 'a')
 // '=' splits the id from the URL because URLs contain ':'; entries are
 // comma-separated (Discord webhook URLs contain no commas). A bare http(s)
-// entry sets the default. Unset → the feature is simply off.
-function parseDiscordWebhooks(raw: string | undefined): { defaultUrl: string | null; byCorp: Record<number, string> } {
+// entry sets the default. Unset → the feature is simply off. A corp/alliance
+// map resolves its own override first, then falls back to the default.
+function parseDiscordWebhooks(raw: string | undefined): { defaultUrl: string | null; byCorp: Record<number, string>; byAlliance: Record<number, string> } {
   const byCorp: Record<number, string> = {};
+  const byAlliance: Record<number, string> = {};
   let defaultUrl: string | null = null;
   for (const entry of (raw ?? '').split(',').map((s) => s.trim()).filter(Boolean)) {
     if (/^https?:\/\//i.test(entry)) {
@@ -53,11 +56,17 @@ function parseDiscordWebhooks(raw: string | undefined): { defaultUrl: string | n
     }
     const eq = entry.indexOf('=');
     if (eq <= 0) continue;
-    const id = parseInt(entry.slice(0, eq).trim(), 10);
+    const key = entry.slice(0, eq).trim();
     const url = entry.slice(eq + 1).trim();
-    if (Number.isInteger(id) && id > 0 && /^https?:\/\//i.test(url)) byCorp[id] = url;
+    if (!/^https?:\/\//i.test(url)) continue;
+    // A leading 'a' marks an alliance id (a99000001=...); otherwise it's a corp id.
+    const isAlliance = /^a\d+$/i.test(key);
+    const id = parseInt(isAlliance ? key.slice(1) : key, 10);
+    if (!Number.isInteger(id) || id <= 0) continue;
+    if (isAlliance) byAlliance[id] = url;
+    else            byCorp[id]     = url;
   }
-  return { defaultUrl, byCorp };
+  return { defaultUrl, byCorp, byAlliance };
 }
 const DISCORD_WEBHOOKS = parseDiscordWebhooks(process.env.DISCORD_WEBHOOK_URL);
 
