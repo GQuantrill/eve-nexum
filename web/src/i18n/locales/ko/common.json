@@ -1110,6 +1110,8 @@
       "closest": "가장 가까운 {{label}} 성계"
     },
     "resetLayout": "툴바 레이아웃 초기화",
+    "updateAvailable": "업데이트 사용 가능",
+    "updateAvailableVersion": "업데이트 사용 가능: v{{version}}",
     "copyThisMap": "이 지도 복사"
   },
   "landing": {

@@ -1110,6 +1110,8 @@
       "closest": "最近的{{label}}星系"
     },
     "resetLayout": "重置工具栏布局",
+    "updateAvailable": "有可用更新",
+    "updateAvailableVersion": "有可用更新：v{{version}}",
     "copyThisMap": "复制此地图"
   },
   "landing": {

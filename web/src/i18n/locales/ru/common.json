@@ -1146,6 +1146,8 @@
       "closest": "Ближайшая система: {{label}}"
     },
     "resetLayout": "Сбросить раскладку панели инструментов",
+    "updateAvailable": "Доступно обновление",
+    "updateAvailableVersion": "Доступно обновление: v{{version}}",
     "copyThisMap": "Копировать эту карту"
   },
   "landing": {

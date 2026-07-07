@@ -1110,6 +1110,8 @@
       "closest": "Nächstes {{label}}-System"
     },
     "resetLayout": "Symbolleisten-Layout zurücksetzen",
+    "updateAvailable": "Update verfügbar",
+    "updateAvailableVersion": "Update verfügbar: v{{version}}",
     "copyThisMap": "Diese Karte kopieren"
   },
   "landing": {

@@ -790,6 +790,29 @@
   }
 }
 
+/* Update-available badge: blinking red exclamation, pushed to the far right of
+   the toolbar. Admins + alliance admins only (component self-gates). */
+.toolbar__update {
+  margin-left: auto;
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  background: none;
+  border: none;
+  padding: 0 6px;
+  cursor: pointer;
+  color: #e05a5a;
+  animation: nexum-update-blink 1s steps(1, end) infinite;
+}
+.toolbar__update:hover { color: #ff7a7a; animation: none; }
+@keyframes nexum-update-blink {
+  0%, 49%  { opacity: 1; }
+  50%, 100% { opacity: 0.2; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .toolbar__update { animation: none; }
+}
+
 .toolbar__brand {
   display: flex;
   align-items: center;

@@ -7,6 +7,7 @@ import { requireReportsAccess, isReportsCharacter, corpScopeFor } from '../middl
 import { isAdmin, isAllianceAdmin } from '../middleware/authContext.js';
 import { config } from '../config.js';
 import { isDiscordWebhookUrl } from '../services/discord.js';
+import { getVersionStatus } from '../services/versionCheck.js';
 import { createLogger } from '../utils/logger.js';
 import { invalidateSessionsForUser } from '../utils/sessionInvalidate.js';
 import { audit } from '../services/audit.js';
@@ -15,6 +16,13 @@ const log = createLogger('admin');
 
 export const adminRouter = Router();
 adminRouter.use(requireAdmin);
+
+// GET /api/admin/version — running version vs the latest upstream GitHub release.
+// Admin + alliance-admin only (requireAdmin). Result is cached server-side, so
+// admin clients can poll it cheaply without hitting GitHub's rate limit.
+adminRouter.get('/version', async (_req, res) => {
+  res.json(await getVersionStatus());
+});
 
 export const adminReadRouter = Router();
 adminReadRouter.use(requireAdminRead);
