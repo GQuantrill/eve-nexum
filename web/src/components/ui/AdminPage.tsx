@@ -7,6 +7,7 @@ import { useAuth, isAdminRole, isAllianceAdminRole, formatRole, ROLE_ORDER } fro
 import type { Role as AuthRole } from '../../context/AuthContext';
 import { useHashRoute } from '../../hooks/useHashRoute';
 import { useUserSetting } from '../../hooks/useUserSetting';
+import { useWormholeTypes } from '../../hooks/useWormholeTypes';
 import { cssVarToHex } from '../../utils/cssVar';
 import { timeAgo, europeanDate, DASH } from '../../i18n/format';
 import { ConfirmModal } from './ConfirmModal';
@@ -1419,12 +1420,29 @@ interface DiscordSettings {
   allRegions:   boolean;
   regions:      string[];
   notifyChains: boolean;
+  whTypes:      string[];
+  whClasses:    string[];
+  whSizes:      string[];
+  connectionsWebhook: string;
+  chainsWebhook:      string;
   maps:         { id: string; name: string; excluded: boolean }[];
 }
 interface RegionOption { id: number; name: string }
 
+// Fixed vocab for the wormhole filters (mirrors the server). Empty = all.
+// Class chips show the raw EVE class code (no translation needed); size chips
+// reuse the existing connection-panel size labels.
+const WH_CLASS_OPTS = ['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C13', 'HS', 'LS', 'NS', 'Thera', 'Pochven', 'Drifter', 'Turnur'];
+const WH_SIZE_OPTS = [
+  { key: 'small',  labelKey: 'connPanel.sizeSmall'  },
+  { key: 'medium', labelKey: 'connPanel.sizeMedium' },
+  { key: 'large',  labelKey: 'connPanel.sizeLarge'  },
+  { key: 'xl',     labelKey: 'connPanel.sizeXl'     },
+] as const;
+
 function DiscordTab() {
   const { t } = useTranslation();
+  const whCatalog = useWormholeTypes();
   const [data, setData]           = useState<DiscordSettings | null>(null);
   const [regionOpts, setRegionOpts] = useState<RegionOption[]>([]);
   const [error, setError]         = useState<string | null>(null);
@@ -1435,6 +1453,14 @@ function DiscordTab() {
   const [allRegions, setAllRegions] = useState(true);
   const [regions, setRegions]       = useState<string[]>([]);
   const [query, setQuery]           = useState('');
+  // Editable copies of the wormhole filters (empty list = all).
+  const [whTypes, setWhTypes]     = useState<string[]>([]);
+  const [whClasses, setWhClasses] = useState<string[]>([]);
+  const [whSizes, setWhSizes]     = useState<string[]>([]);
+  const [whQuery, setWhQuery]     = useState('');
+  // Editable copies of the per-event webhook URLs (empty = off).
+  const [connWebhook, setConnWebhook]   = useState('');
+  const [chainWebhook, setChainWebhook] = useState('');
 
   const load = useCallback(async () => {
     try {
@@ -1445,6 +1471,11 @@ function DiscordTab() {
       setData(s);
       setAllRegions(s.allRegions);
       setRegions(s.regions);
+      setWhTypes(s.whTypes ?? []);
+      setWhClasses(s.whClasses ?? []);
+      setWhSizes(s.whSizes ?? []);
+      setConnWebhook(s.connectionsWebhook ?? '');
+      setChainWebhook(s.chainsWebhook ?? '');
       setRegionOpts(r.regions);
       setError(null);
     } catch (e) {
@@ -1457,14 +1488,14 @@ function DiscordTab() {
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { load(); }, [load]);
 
-  async function saveRegions() {
+  async function saveFilters() {
     if (!data) return;
     setSaving(true); setSaved(false);
     try {
-      // Include notifyChains so the PUT (which defaults absent flags to true)
-      // can't silently re-enable chain broadcasts the admin turned off.
-      await api('/api/admin/discord', { method: 'PUT', body: JSON.stringify({ allRegions, regions, notifyChains: data.notifyChains }) });
-      setData((d) => (d ? { ...d, allRegions, regions } : d));
+      // Send every field the PUT can wipe (it defaults absent flags/lists), so a
+      // save never silently resets the chain toggle or another filter dimension.
+      await api('/api/admin/discord', { method: 'PUT', body: JSON.stringify({ allRegions, regions, notifyChains: data.notifyChains, whTypes, whClasses, whSizes, connectionsWebhook: connWebhook.trim(), chainsWebhook: chainWebhook.trim() }) });
+      setData((d) => (d ? { ...d, allRegions, regions, whTypes, whClasses, whSizes, connectionsWebhook: connWebhook.trim(), chainsWebhook: chainWebhook.trim() } : d));
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     } catch (e) {
@@ -1474,19 +1505,22 @@ function DiscordTab() {
     }
   }
 
-  // Broadcast toggles persist immediately, using the last-saved region filter so
-  // an unsaved region draft isn't dragged along.
+  // Broadcast toggles persist immediately, using the last-saved filters so an
+  // unsaved draft isn't dragged along and no other filter is wiped.
   async function toggleChains(next: boolean) {
     if (!data) return;
     const prev = data.notifyChains;
     setData((d) => (d ? { ...d, notifyChains: next } : d));
     try {
-      await api('/api/admin/discord', { method: 'PUT', body: JSON.stringify({ allRegions: data.allRegions, regions: data.regions, notifyChains: next }) });
+      await api('/api/admin/discord', { method: 'PUT', body: JSON.stringify({ allRegions: data.allRegions, regions: data.regions, notifyChains: next, whTypes: data.whTypes, whClasses: data.whClasses, whSizes: data.whSizes, connectionsWebhook: data.connectionsWebhook, chainsWebhook: data.chainsWebhook }) });
     } catch (e) {
       setData((d) => (d ? { ...d, notifyChains: prev } : d));
       setError(e instanceof Error ? e.message : t('admin.discord.saveFailed'));
     }
   }
+
+  const toggleIn = (list: string[], set: (v: string[]) => void, val: string) =>
+    set(list.includes(val) ? list.filter((x) => x !== val) : [...list, val]);
 
   async function toggleMap(id: string, excluded: boolean) {
     setData((d) => (d ? { ...d, maps: d.maps.map((m) => (m.id === id ? { ...m, excluded } : m)) } : d));
@@ -1506,6 +1540,11 @@ function DiscordTab() {
     ? regionOpts.filter((o) => o.name.toLowerCase().includes(q) && !regions.includes(o.name)).slice(0, 8)
     : [];
 
+  const wq = whQuery.trim().toUpperCase();
+  const whMatches = wq
+    ? Object.keys(whCatalog).filter((c) => c.includes(wq) && !whTypes.includes(c)).sort().slice(0, 8)
+    : [];
+
   if (!data && error) return (<><h2 className="admin-page__section-title">{t('admin.discord.title')}</h2><div className="admin-page__error">{error}</div></>);
   if (!data)          return (<><h2 className="admin-page__section-title">{t('admin.discord.title')}</h2><div className="admin-page__loading">{t('admin.loading')}</div></>);
   if (data.scope == null) {
@@ -1513,13 +1552,45 @@ function DiscordTab() {
       <div className="admin-page__empty">{t('admin.discord.noCorp')}</div></>);
   }
 
-  const dirty = allRegions !== data.allRegions || regions.slice().sort().join('|') !== data.regions.slice().sort().join('|');
+  const sortJoin = (a: string[]) => a.slice().sort().join('|');
+  const dirty = allRegions !== data.allRegions
+    || sortJoin(regions)   !== sortJoin(data.regions)
+    || sortJoin(whTypes)   !== sortJoin(data.whTypes)
+    || sortJoin(whClasses) !== sortJoin(data.whClasses)
+    || sortJoin(whSizes)   !== sortJoin(data.whSizes)
+    || connWebhook.trim()  !== data.connectionsWebhook
+    || chainWebhook.trim() !== data.chainsWebhook;
 
   return (
     <>
       <h2 className="admin-page__section-title">{t('admin.discord.titleNotifications')}</h2>
       {error && <div className="admin-page__error">{error}</div>}
       <p className="discord-admin__hint">{t('admin.discord.hint')}</p>
+
+      <section className="discord-admin__section">
+        <h3 className="discord-admin__heading">{t('admin.discord.webhooks')}</h3>
+        <p className="discord-admin__hint">{t('admin.discord.webhooksHint')}</p>
+        <label className="discord-admin__sublabel" htmlFor="conn-webhook">{t('admin.discord.connectionsWebhook')}</label>
+        <input
+          id="conn-webhook"
+          type="url"
+          className="discord-admin__search discord-admin__search--wide"
+          placeholder="https://discord.com/api/webhooks/…"
+          value={connWebhook}
+          spellCheck={false}
+          onChange={(e) => setConnWebhook(e.target.value)}
+        />
+        <label className="discord-admin__sublabel" htmlFor="chain-webhook">{t('admin.discord.chainsWebhook')}</label>
+        <input
+          id="chain-webhook"
+          type="url"
+          className="discord-admin__search discord-admin__search--wide"
+          placeholder="https://discord.com/api/webhooks/…"
+          value={chainWebhook}
+          spellCheck={false}
+          onChange={(e) => setChainWebhook(e.target.value)}
+        />
+      </section>
 
       <section className="discord-admin__section">
         <h3 className="discord-admin__heading">{t('admin.discord.regions')}</h3>
@@ -1561,9 +1632,66 @@ function DiscordTab() {
           </div>
         )}
 
+        {/* ── Wormhole filters (type code / dest class / size) — empty = all ── */}
+        <h4 className="discord-admin__subheading">{t('admin.discord.whFilters')}</h4>
+        <p className="discord-admin__hint">{t('admin.discord.whFiltersHint')}</p>
+
+        <label className="discord-admin__sublabel">{t('admin.discord.whTypeLabel')}</label>
+        <div className="discord-admin__chips">
+          {whTypes.length === 0
+            ? <span className="admin-page__empty">{t('admin.discord.whAll')}</span>
+            : whTypes.map((c) => (
+                <span key={c} className="discord-admin__chip">{c}
+                  <button type="button" onClick={() => setWhTypes(whTypes.filter((x) => x !== c))} aria-label={t('admin.discord.removeType', { name: c })}>×</button>
+                </span>
+              ))}
+        </div>
+        <input
+          type="text"
+          className="discord-admin__search"
+          placeholder={t('admin.discord.whTypePlaceholder')}
+          value={whQuery}
+          onChange={(e) => setWhQuery(e.target.value.toUpperCase())}
+        />
+        {whMatches.length > 0 && (
+          <ul className="discord-admin__results">
+            {whMatches.map((c) => (
+              <li key={c}>
+                <button type="button" onClick={() => { setWhTypes([...whTypes, c]); setWhQuery(''); }}>
+                  {c}<span className="discord-admin__result-meta"> → {whCatalog[c]?.dest ?? '?'}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <label className="discord-admin__sublabel">{t('admin.discord.whClassLabel')}</label>
+        <div className="discord-admin__togglechips">
+          {WH_CLASS_OPTS.map((c) => (
+            <button
+              key={c}
+              type="button"
+              className={`discord-admin__togglechip${whClasses.includes(c) ? ' discord-admin__togglechip--on' : ''}`}
+              onClick={() => toggleIn(whClasses, setWhClasses, c)}
+            >{c}</button>
+          ))}
+        </div>
+
+        <label className="discord-admin__sublabel">{t('admin.discord.whSizeLabel')}</label>
+        <div className="discord-admin__togglechips">
+          {WH_SIZE_OPTS.map((o) => (
+            <button
+              key={o.key}
+              type="button"
+              className={`discord-admin__togglechip${whSizes.includes(o.key) ? ' discord-admin__togglechip--on' : ''}`}
+              onClick={() => toggleIn(whSizes, setWhSizes, o.key)}
+            >{t(o.labelKey)}</button>
+          ))}
+        </div>
+
         <div className="discord-admin__actions">
-          <button className="btn btn--primary" disabled={!dirty || saving} onClick={saveRegions}>
-            {saving ? t('admin.discord.saving') : t('admin.discord.saveRegions')}
+          <button className="btn btn--primary" disabled={!dirty || saving} onClick={saveFilters}>
+            {saving ? t('admin.discord.saving') : t('actions.save')}
           </button>
           {saved && <span className="discord-admin__saved">{t('admin.discord.saved')}</span>}
         </div>

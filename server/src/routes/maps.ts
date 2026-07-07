@@ -20,7 +20,7 @@ import {
 } from '../services/mapWrite.js';
 import { reportPresence } from '../services/presence.js';
 import { copyMap } from '../services/mapCopy.js';
-import { notifyDiscord, webhookFor, k162Embed, connectionEmbed, chainEmbed, type DiscordScope } from '../services/discord.js';
+import { notifyDiscord, k162Embed, connectionEmbed, chainEmbed } from '../services/discord.js';
 
 const log = createLogger('maps');
 const discordLog = createLogger('discord');
@@ -285,25 +285,28 @@ function regionAllowed(allRegions: boolean, allow: string[], names: (string | nu
 // wait longer than this, and a second detection for an already-pending sig is
 // ignored so the original deadline stands.
 const K162_DEFER_MS = 10_000;
-interface PendingK162 { timer: ReturnType<typeof setTimeout>; scope: DiscordScope; actor: string | null; }
+interface PendingK162 { timer: ReturnType<typeof setTimeout>; actor: string | null; }
 const pendingK162 = new Map<string, PendingK162>();
 
+// True when a map has an owning org that could have webhooks (corp or alliance).
+// Personal maps never notify, so we skip them without a DB round-trip.
+function hasOrg(meta: MapMeta): boolean { return meta.corpId != null || meta.allianceId != null; }
+
 export function dispatchK162(meta: MapMeta, sigId: string, systemId: string, actor: string | null): void {
-  if (!webhookFor(meta)) {
-    discordLog.info(`K162 detected (system ${systemId}) but not sending — no webhook for corpId=${meta.corpId ?? 'null'}/allianceId=${meta.allianceId ?? 'null'} (personal maps never notify)`);
+  if (!hasOrg(meta)) {
+    discordLog.info(`K162 detected (system ${systemId}) but not sending — personal map (no corp/alliance)`);
     return;
   }
   if (pendingK162.has(sigId)) {
     discordLog.info(`K162 (sig ${sigId}) already pending — keeping the existing ${K162_DEFER_MS / 1000}s window`);
     return;
   }
-  const scope: DiscordScope = { corpId: meta.corpId, allianceId: meta.allianceId };
   discordLog.info(`K162 on org map (corpId=${meta.corpId ?? 'null'}/allianceId=${meta.allianceId ?? 'null'}, sig ${sigId}) — deferring ${K162_DEFER_MS / 1000}s to catch a leads-to`);
   const timer = setTimeout(() => {
     pendingK162.delete(sigId);
-    void fireK162(scope, sigId, actor);
+    void fireK162(sigId, actor);
   }, K162_DEFER_MS);
-  pendingK162.set(sigId, { timer, scope, actor });
+  pendingK162.set(sigId, { timer, actor });
 }
 
 // Send a pending K162 immediately — e.g. once its leads-to has been filled in —
@@ -315,28 +318,31 @@ export function flushK162(sigId: string): void {
   clearTimeout(p.timer);
   pendingK162.delete(sigId);
   discordLog.info(`K162 (sig ${sigId}) leads-to set — sending now instead of waiting`);
-  void fireK162(p.scope, sigId, p.actor);
+  void fireK162(sigId, p.actor);
 }
 
-// The region-filter columns resolved for a map's org (corp OR alliance), read by
-// LEFT JOINing both settings tables on the map's own corp_id / alliance_id — a
-// map matches exactly one, so COALESCE picks that row (or the permissive
-// defaults when the org has never saved settings).
+// The Discord settings resolved for a map's org (corp OR alliance), read by LEFT
+// JOINing both settings tables on the map's own corp_id / alliance_id — a map
+// matches exactly one, so COALESCE picks that row (or the permissive defaults
+// when the org has never saved settings). Includes the per-event webhook URLs.
 const DISCORD_SETTINGS_JOIN = `
   LEFT JOIN corp_discord_settings     cds ON cds.corp_id     = m.corp_id
   LEFT JOIN alliance_discord_settings ads ON ads.alliance_id = m.alliance_id`;
 const DISCORD_SETTINGS_COLS = `
   COALESCE(cds.all_regions,   ads.all_regions,   TRUE)          AS "allRegions",
   COALESCE(cds.regions,       ads.regions,       '{}'::text[])  AS "regions",
-  COALESCE(cds.notify_chains, ads.notify_chains, TRUE)          AS "notifyChains"`;
+  COALESCE(cds.notify_chains, ads.notify_chains, TRUE)          AS "notifyChains",
+  COALESCE(cds.connections_webhook, ads.connections_webhook)    AS "connectionsWebhook",
+  COALESCE(cds.chains_webhook,      ads.chains_webhook)         AS "chainsWebhook"`;
 
 // Re-read the signature now (after the defer window) and send if it's still a
 // K162, including the leads-to if one was set in the meantime.
-async function fireK162(scope: DiscordScope, sigId: string, actor: string | null): Promise<void> {
+async function fireK162(sigId: string, actor: string | null): Promise<void> {
   try {
     const { rows } = await db.query<{
       whType: string | null; leadsTo: string | null; system: string; systemClass: string;
       region: string | null; mapName: string; mapEnabled: boolean; allRegions: boolean; regions: string[];
+      connectionsWebhook: string | null;
     }>(
       `SELECT sg.wh_type AS "whType", sg.wh_leads_to AS "leadsTo",
               s.name AS "system", s.system_class AS "systemClass", s.region_name AS "region",
@@ -351,6 +357,7 @@ async function fireK162(scope: DiscordScope, sigId: string, actor: string | null
     );
     const r = rows[0];
     if (!r) { discordLog.info(`K162 (sig ${sigId}) removed before send — skipping`); return; }
+    if (!r.connectionsWebhook) { discordLog.info(`K162 (sig ${sigId}) suppressed — no connections webhook configured`); return; }
     if ((r.whType ?? '').toUpperCase() !== 'K162') {
       discordLog.info(`K162 (sig ${sigId}) changed to "${r.whType ?? ''}" before send — skipping`);
       return;
@@ -363,37 +370,103 @@ async function fireK162(scope: DiscordScope, sigId: string, actor: string | null
       discordLog.info(`K162 (sig ${sigId}) suppressed — region "${r.region ?? 'unknown'}" not in the org filter`);
       return;
     }
-    notifyDiscord(scope, k162Embed({ system: r.system, systemClass: r.systemClass, leadsTo: r.leadsTo, mapName: r.mapName, actor }));
+    notifyDiscord(r.connectionsWebhook, k162Embed({ system: r.system, systemClass: r.systemClass, leadsTo: r.leadsTo, mapName: r.mapName, actor }));
   } catch (e) {
     discordLog.warn(`K162 deferred dispatch failed: ${(e as Error).message}`);
   }
+}
+
+// The leads-to "band" a wormhole signature uses for an arrival class — mirrors
+// whJumpConfirm.bandFor on the client so the server's wormhole-evidence check
+// stays in step with what the client would treat as a plausible hole.
+function whBand(cls: string): string {
+  if (cls === 'C1' || cls === 'C2' || cls === 'C3') return 'C1-C3';
+  if (cls === 'C4' || cls === 'C5') return 'C4-C5';
+  return cls; // C6 / C13 / Thera / Pochven / Drifter / HS / LS / NS
+}
+
+// The wh_leads_to values a hole in `fromClass`-space could carry and still be a
+// plausible candidate for a jump that ARRIVED in a `toClass`/`toName` system:
+// unscanned ('' / 'unknown'), pinned to that exact system, or class/band-matched.
+// (A hole pinned to a different system name is excluded — it's already solved.)
+function candidateLeadsTo(toName: string, toClass: string): string[] {
+  return ['', 'unknown', toName, whBand(toClass), toClass];
+}
+
+// Whether a jump between two systems looks like a real WORMHOLE jump rather than
+// a gate / Ansiblex / bridge: at least one endpoint must hold a scanned wormhole
+// signature that plausibly accounts for the hop. In-game gates are already typed
+// 'gate' and never reach here; this catches jump-bridge hops between k-space
+// systems that the stargate check can't (they aren't stargate-adjacent), which
+// otherwise looked like fresh wormholes.
+//
+// Returns { backed, whType }: backed=false → suppress (no wormhole evidence);
+// whType is the backing hole's type code for the embed + type filter, preferring
+// the source-side sig's real code (e.g. 'C247') over a bare 'K162' twin, '' when
+// unknown. Best-effort: on a query error we assume it IS a wormhole (fail-open,
+// unknown type) rather than silently dropping a real one.
+async function wormholeEvidence(
+  sourceId: string, targetId: string,
+  aName: string, aClass: string, bName: string, bClass: string,
+): Promise<{ backed: boolean; whType: string }> {
+  try {
+    const { rows } = await db.query<{ whType: string | null }>(
+      `SELECT sg.wh_type AS "whType"
+         FROM map_signatures sg
+        WHERE sg.sig_type = 'wormhole'
+          AND ( (sg.system_id = $1 AND sg.wh_leads_to = ANY($3::text[]))
+             OR (sg.system_id = $2 AND sg.wh_leads_to = ANY($4::text[])) )
+        ORDER BY CASE WHEN COALESCE(sg.wh_type, '') NOT IN ('', 'K162') THEN 0 ELSE 1 END
+        LIMIT 1`,
+      [sourceId, targetId, candidateLeadsTo(bName, bClass), candidateLeadsTo(aName, aClass)],
+    );
+    if (rows.length === 0) return { backed: false, whType: '' };
+    return { backed: true, whType: (rows[0].whType ?? '').toUpperCase() };
+  } catch (e) {
+    discordLog.warn(`wormhole-evidence check failed (assuming wormhole): ${(e as Error).message}`);
+    return { backed: true, whType: '' };
+  }
+}
+
+// Wormhole notification filters (type code / dest class / size). An empty list
+// means "all" (the default). Type is fail-open on an unknown/empty code so a
+// hole whose type isn't scanned yet is never silently dropped by a type filter;
+// class and size are always known, so they match strictly.
+function whListAllows(list: string[], value: string): boolean {
+  return list.length === 0 || list.includes(value);
+}
+function whTypeAllows(list: string[], code: string): boolean {
+  return list.length === 0 || code === '' || list.includes(code);
 }
 
 function dispatchNewConnection(
   meta: MapMeta, mapId: string, sourceId: string, targetId: string,
   whType: string | null, size: string | null, actor: string | null,
 ): void {
-  if (!webhookFor(meta)) {
-    discordLog.info(`new connection but not sending — no webhook for corpId=${meta.corpId ?? 'null'}/allianceId=${meta.allianceId ?? 'null'} (personal maps never notify)`);
-    return;
-  }
+  if (!hasOrg(meta)) return; // personal map — never notifies
   discordLog.info(`new connection on org map (corpId=${meta.corpId ?? 'null'}/allianceId=${meta.allianceId ?? 'null'}) — building notification`);
   db.query<{
-    a: string; b: string; regionA: string | null; regionB: string | null;
+    a: string; b: string; classA: string; classB: string; regionA: string | null; regionB: string | null;
     mapName: string; mapEnabled: boolean; allRegions: boolean; regions: string[];
+    whTypes: string[]; whClasses: string[]; whSizes: string[]; connectionsWebhook: string | null;
   }>(
-    `SELECT a.name AS a, b.name AS b, a.region_name AS "regionA", b.region_name AS "regionB",
+    `SELECT a.name AS a, b.name AS b, a.system_class AS "classA", b.system_class AS "classB",
+            a.region_name AS "regionA", b.region_name AS "regionB",
             m.name AS "mapName", m.discord_notify AS "mapEnabled",
-            ${DISCORD_SETTINGS_COLS}
+            ${DISCORD_SETTINGS_COLS},
+            COALESCE(cds.wh_types,   ads.wh_types,   '{}'::text[]) AS "whTypes",
+            COALESCE(cds.wh_classes, ads.wh_classes, '{}'::text[]) AS "whClasses",
+            COALESCE(cds.wh_sizes,   ads.wh_sizes,   '{}'::text[]) AS "whSizes"
        FROM maps m
        JOIN map_systems a ON a.id = $2
        JOIN map_systems b ON b.id = $3
        ${DISCORD_SETTINGS_JOIN}
       WHERE m.id = $1`,
     [mapId, sourceId, targetId],
-  ).then(({ rows }) => {
+  ).then(async ({ rows }) => {
     const r = rows[0];
     if (!r) { discordLog.warn(`connection dispatch: endpoints not found`); return; }
+    if (!r.connectionsWebhook) { discordLog.info(`new connection suppressed — no connections webhook configured`); return; }
     if (!r.mapEnabled) {
       discordLog.info(`new connection suppressed — map "${r.mapName}" is excluded from Discord`);
       return;
@@ -402,7 +475,30 @@ function dispatchNewConnection(
       discordLog.info(`new connection suppressed — neither region (${r.regionA ?? '?'} / ${r.regionB ?? '?'}) in the org filter`);
       return;
     }
-    notifyDiscord(meta, connectionEmbed({ a: r.a, b: r.b, whType, size, mapName: r.mapName, actor }));
+    // Suppress gate / Ansiblex / bridge hops: only broadcast when a scanned
+    // wormhole signature plausibly backs the jump (see wormholeEvidence).
+    const ev = await wormholeEvidence(sourceId, targetId, r.a, r.classA, r.b, r.classB);
+    if (!ev.backed) {
+      discordLog.info(`new connection ${r.a} <-> ${r.b} suppressed — no wormhole signature backs it (likely a gate/jump-bridge)`);
+      return;
+    }
+    // Wormhole filters (dest class = the "to" end; size from the connection row).
+    if (!whTypeAllows(r.whTypes, ev.whType)) {
+      discordLog.info(`new connection ${r.a} <-> ${r.b} suppressed — hole type "${ev.whType || '?'}" not in the org's type filter`);
+      return;
+    }
+    // Turnur is a distinct destination option (like Thera), even though the SDE
+    // classes it low-sec — so a Turnur hole matches the 'Turnur' filter.
+    const destClass = r.b === 'Turnur' ? 'Turnur' : r.classB;
+    if (!whListAllows(r.whClasses, destClass)) {
+      discordLog.info(`new connection ${r.a} <-> ${r.b} suppressed — dest class "${destClass}" not in the org's class filter`);
+      return;
+    }
+    if (!whListAllows(r.whSizes, (size ?? 'large'))) {
+      discordLog.info(`new connection ${r.a} <-> ${r.b} suppressed — size "${size ?? 'large'}" not in the org's size filter`);
+      return;
+    }
+    notifyDiscord(r.connectionsWebhook, connectionEmbed({ a: r.a, b: r.b, whType: ev.whType || whType, size, mapName: r.mapName, actor }));
   }).catch((e) => discordLog.warn(`connection dispatch query failed: ${(e as Error).message}`));
 }
 
@@ -427,13 +523,13 @@ function chainMaxSize(sizes: string[]): string {
 function dispatchChainSaved(
   meta: MapMeta, mapId: string, route: { name: string; systemIds: string[]; connectionIds: string[] }, actor: string | null,
 ): void {
-  if (!webhookFor(meta)) return;
+  if (!hasOrg(meta)) return; // personal map — never notifies
   const startId = route.systemIds[0];
   const endId   = route.systemIds[route.systemIds.length - 1];
   db.query<{
     startName: string; endName: string; startRegion: string | null; endRegion: string | null;
     mapName: string; mapEnabled: boolean; allRegions: boolean; regions: string[]; notifyChains: boolean;
-    sizes: string[];
+    sizes: string[]; chainsWebhook: string | null;
   }>(
     `SELECT sn.name AS "startName", en.name AS "endName",
             sn.region_name AS "startRegion", en.region_name AS "endRegion",
@@ -451,13 +547,14 @@ function dispatchChainSaved(
   ).then(({ rows }) => {
     const r = rows[0];
     if (!r) { discordLog.warn(`chain dispatch: endpoints not found`); return; }
+    if (!r.chainsWebhook) { discordLog.info(`chain "${route.name}" suppressed — no chains webhook configured`); return; }
     if (!r.mapEnabled) { discordLog.info(`chain "${route.name}" suppressed — map "${r.mapName}" is excluded from Discord`); return; }
     if (!r.notifyChains) { discordLog.info(`chain "${route.name}" suppressed — chain broadcasts off for this org`); return; }
     if (!regionAllowed(r.allRegions, r.regions, [r.startRegion, r.endRegion])) {
       discordLog.info(`chain "${route.name}" suppressed — neither endpoint region in the org filter`);
       return;
     }
-    notifyDiscord(meta, chainEmbed({
+    notifyDiscord(r.chainsWebhook, chainEmbed({
       name:    route.name,
       start:   r.startName,
       end:     r.endName,

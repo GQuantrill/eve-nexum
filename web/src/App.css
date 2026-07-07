@@ -8573,6 +8573,46 @@ select.sig-toolbar-btn option {
   color: #c8d8f0;
   margin: 0 0 10px;
 }
+/* Wormhole filter sub-blocks inside the region section. */
+.discord-admin__subheading {
+  font-size: calc(14px * var(--font-scale, 1));
+  color: #c8d8f0;
+  margin: 18px 0 4px;
+  border-top: 1px solid #1a2436;
+  padding-top: 14px;
+}
+.discord-admin__sublabel {
+  display: block;
+  font-size: calc(12px * var(--font-scale, 1));
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #6a8ab0;
+  margin: 12px 0 5px;
+}
+.discord-admin__togglechips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-width: 520px;
+}
+.discord-admin__togglechip {
+  background: transparent;
+  border: 1px solid #2e3a52;
+  border-radius: 999px;
+  color: #8a9ab5;
+  font-family: inherit;
+  font-size: calc(13px * var(--font-scale, 1));
+  padding: 3px 12px;
+  cursor: pointer;
+  transition: border-color 0.12s, color 0.12s, background 0.12s;
+}
+.discord-admin__togglechip:hover { border-color: #4d9de0; color: #c8d0e0; }
+.discord-admin__togglechip--on {
+  border-color: #5a9af8;
+  background: rgba(90, 154, 248, 0.18);
+  color: #e8f0ff;
+}
+.discord-admin__result-meta { color: #6a8ab0; }
 .discord-admin__radio {
   display: flex;
   align-items: center;
@@ -8616,8 +8656,20 @@ select.sig-toolbar-btn option {
 .discord-admin__chip button:hover { color: #fff; }
 .discord-admin__search {
   width: 100%;
+  max-width: 320px;
   box-sizing: border-box;
+  background: #0a0e1a;
+  border: 1px solid #1e2740;
+  border-radius: 4px;
+  color: #c8d4f0;
+  font-family: inherit;
+  font-size: calc(13px * var(--font-scale, 1));
+  padding: 5px 8px;
+  outline: none;
 }
+.discord-admin__search:focus { border-color: #6ea0ff; }
+/* Webhook URL fields are longer than the type search — give them more room. */
+.discord-admin__search--wide { max-width: 560px; margin-bottom: 6px; }
 .discord-admin__results {
   list-style: none;
   margin: 2px 0 0;
