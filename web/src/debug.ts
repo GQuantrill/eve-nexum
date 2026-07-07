@@ -191,6 +191,18 @@ const nexumDebug = {
     });
   },
 
+  // Force the "update available" toolbar badge on/off regardless of the real
+  // version check, so you can eyeball the blinking indicator without cutting a
+  // newer release. Admin-gated in normal use; this bypasses the version check
+  // only (still runs in your own session, resets on reload).
+  updateBadge(on?: boolean) {
+    import('./utils/debugFlags').then(({ getDebugFlag, setDebugFlag }) => {
+      const next = typeof on === 'boolean' ? on : !getDebugFlag('forceUpdateBadge');
+      setDebugFlag('forceUpdateBadge', next);
+      console.log(`[nexum] Force update badge: ${next ? 'ON — the update indicator is shown regardless of the real version check' : 'OFF — back to the real update check'}.`);
+    });
+  },
+
   // Trace what clears the selected system. Subscribes to the map store and
   // logs every selectedSystemId transition; when it goes to null it prints a
   // stack trace of whatever caused it (the setter runs synchronously inside the
@@ -233,6 +245,7 @@ const nexumDebug = {
     console.log("nexumDebug.simulateJumps([...], 1000, { dryRun: true }) — replay without firing server writes (logged-out safe)");
     console.log('nexumDebug.stopJumps() — cancel a running jump simulation');
     console.log('nexumDebug.showThreats(on?)  — toggle showing the nearest threat in the toolbar, ignoring the alert threshold');
+    console.log('nexumDebug.updateBadge(on?)  — force the "update available" toolbar badge on/off for testing');
     console.log('nexumDebug.clear()     — clear the log buffer');
     console.groupEnd();
   },
