@@ -180,6 +180,15 @@ export async function migrate() {
     ALTER TABLE alliance_discord_settings ADD COLUMN IF NOT EXISTS wh_classes TEXT[] NOT NULL DEFAULT '{}';
     ALTER TABLE alliance_discord_settings ADD COLUMN IF NOT EXISTS wh_sizes   TEXT[] NOT NULL DEFAULT '{}';
 
+    -- Per-org, per-event-type webhook URLs (replaces the single DISCORD_WEBHOOK_URL
+    -- env). NULL = that event type is off for the org. Connections = inbound K162
+    -- + new-connection alerts; chains = saved-chain broadcasts. Seeded once from
+    -- the old env value on boot (see seedDiscordWebhooksFromEnv), then env-free.
+    ALTER TABLE corp_discord_settings     ADD COLUMN IF NOT EXISTS connections_webhook TEXT;
+    ALTER TABLE corp_discord_settings     ADD COLUMN IF NOT EXISTS chains_webhook      TEXT;
+    ALTER TABLE alliance_discord_settings ADD COLUMN IF NOT EXISTS connections_webhook TEXT;
+    ALTER TABLE alliance_discord_settings ADD COLUMN IF NOT EXISTS chains_webhook      TEXT;
+
     CREATE TABLE IF NOT EXISTS map_systems (
       id            UUID        PRIMARY KEY,
       map_id        UUID        NOT NULL REFERENCES maps(id) ON DELETE CASCADE,

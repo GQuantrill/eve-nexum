@@ -8668,6 +8668,8 @@ select.sig-toolbar-btn option {
   outline: none;
 }
 .discord-admin__search:focus { border-color: #6ea0ff; }
+/* Webhook URL fields are longer than the type search — give them more room. */
+.discord-admin__search--wide { max-width: 560px; margin-bottom: 6px; }
 .discord-admin__results {
   list-style: none;
   margin: 2px 0 0;
