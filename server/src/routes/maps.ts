@@ -391,27 +391,45 @@ function candidateLeadsTo(toName: string, toClass: string): string[] {
 // signature that plausibly accounts for the hop. In-game gates are already typed
 // 'gate' and never reach here; this catches jump-bridge hops between k-space
 // systems that the stargate check can't (they aren't stargate-adjacent), which
-// otherwise looked like fresh wormholes. Best-effort: on a query error we assume
-// it IS a wormhole (fail-open) rather than silently dropping a real one.
-async function looksLikeWormholeJump(
+// otherwise looked like fresh wormholes.
+//
+// Returns { backed, whType }: backed=false → suppress (no wormhole evidence);
+// whType is the backing hole's type code for the embed + type filter, preferring
+// the source-side sig's real code (e.g. 'C247') over a bare 'K162' twin, '' when
+// unknown. Best-effort: on a query error we assume it IS a wormhole (fail-open,
+// unknown type) rather than silently dropping a real one.
+async function wormholeEvidence(
   sourceId: string, targetId: string,
   aName: string, aClass: string, bName: string, bClass: string,
-): Promise<boolean> {
+): Promise<{ backed: boolean; whType: string }> {
   try {
-    const { rowCount } = await db.query(
-      `SELECT 1
+    const { rows } = await db.query<{ whType: string | null }>(
+      `SELECT sg.wh_type AS "whType"
          FROM map_signatures sg
         WHERE sg.sig_type = 'wormhole'
           AND ( (sg.system_id = $1 AND sg.wh_leads_to = ANY($3::text[]))
              OR (sg.system_id = $2 AND sg.wh_leads_to = ANY($4::text[])) )
+        ORDER BY CASE WHEN COALESCE(sg.wh_type, '') NOT IN ('', 'K162') THEN 0 ELSE 1 END
         LIMIT 1`,
       [sourceId, targetId, candidateLeadsTo(bName, bClass), candidateLeadsTo(aName, aClass)],
     );
-    return (rowCount ?? 0) > 0;
+    if (rows.length === 0) return { backed: false, whType: '' };
+    return { backed: true, whType: (rows[0].whType ?? '').toUpperCase() };
   } catch (e) {
     discordLog.warn(`wormhole-evidence check failed (assuming wormhole): ${(e as Error).message}`);
-    return true;
+    return { backed: true, whType: '' };
   }
+}
+
+// Wormhole notification filters (type code / dest class / size). An empty list
+// means "all" (the default). Type is fail-open on an unknown/empty code so a
+// hole whose type isn't scanned yet is never silently dropped by a type filter;
+// class and size are always known, so they match strictly.
+function whListAllows(list: string[], value: string): boolean {
+  return list.length === 0 || list.includes(value);
+}
+function whTypeAllows(list: string[], code: string): boolean {
+  return list.length === 0 || code === '' || list.includes(code);
 }
 
 function dispatchNewConnection(
@@ -426,11 +444,15 @@ function dispatchNewConnection(
   db.query<{
     a: string; b: string; classA: string; classB: string; regionA: string | null; regionB: string | null;
     mapName: string; mapEnabled: boolean; allRegions: boolean; regions: string[];
+    whTypes: string[]; whClasses: string[]; whSizes: string[];
   }>(
     `SELECT a.name AS a, b.name AS b, a.system_class AS "classA", b.system_class AS "classB",
             a.region_name AS "regionA", b.region_name AS "regionB",
             m.name AS "mapName", m.discord_notify AS "mapEnabled",
-            ${DISCORD_SETTINGS_COLS}
+            ${DISCORD_SETTINGS_COLS},
+            COALESCE(cds.wh_types,   ads.wh_types,   '{}'::text[]) AS "whTypes",
+            COALESCE(cds.wh_classes, ads.wh_classes, '{}'::text[]) AS "whClasses",
+            COALESCE(cds.wh_sizes,   ads.wh_sizes,   '{}'::text[]) AS "whSizes"
        FROM maps m
        JOIN map_systems a ON a.id = $2
        JOIN map_systems b ON b.id = $3
@@ -449,12 +471,29 @@ function dispatchNewConnection(
       return;
     }
     // Suppress gate / Ansiblex / bridge hops: only broadcast when a scanned
-    // wormhole signature plausibly backs the jump (see looksLikeWormholeJump).
-    if (!(await looksLikeWormholeJump(sourceId, targetId, r.a, r.classA, r.b, r.classB))) {
+    // wormhole signature plausibly backs the jump (see wormholeEvidence).
+    const ev = await wormholeEvidence(sourceId, targetId, r.a, r.classA, r.b, r.classB);
+    if (!ev.backed) {
       discordLog.info(`new connection ${r.a} <-> ${r.b} suppressed — no wormhole signature backs it (likely a gate/jump-bridge)`);
       return;
     }
-    notifyDiscord(meta, connectionEmbed({ a: r.a, b: r.b, whType, size, mapName: r.mapName, actor }));
+    // Wormhole filters (dest class = the "to" end; size from the connection row).
+    if (!whTypeAllows(r.whTypes, ev.whType)) {
+      discordLog.info(`new connection ${r.a} <-> ${r.b} suppressed — hole type "${ev.whType || '?'}" not in the org's type filter`);
+      return;
+    }
+    // Turnur is a special hub the SDE classes as low-sec; treat it as high-sec
+    // for the destination-class filter (operator preference).
+    const destClass = r.b === 'Turnur' ? 'HS' : r.classB;
+    if (!whListAllows(r.whClasses, destClass)) {
+      discordLog.info(`new connection ${r.a} <-> ${r.b} suppressed — dest class "${destClass}" not in the org's class filter`);
+      return;
+    }
+    if (!whListAllows(r.whSizes, (size ?? 'large'))) {
+      discordLog.info(`new connection ${r.a} <-> ${r.b} suppressed — size "${size ?? 'large'}" not in the org's size filter`);
+      return;
+    }
+    notifyDiscord(meta, connectionEmbed({ a: r.a, b: r.b, whType: ev.whType || whType, size, mapName: r.mapName, actor }));
   }).catch((e) => discordLog.warn(`connection dispatch query failed: ${(e as Error).message}`));
 }
 

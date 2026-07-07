@@ -8573,6 +8573,46 @@ select.sig-toolbar-btn option {
   color: #c8d8f0;
   margin: 0 0 10px;
 }
+/* Wormhole filter sub-blocks inside the region section. */
+.discord-admin__subheading {
+  font-size: calc(14px * var(--font-scale, 1));
+  color: #c8d8f0;
+  margin: 18px 0 4px;
+  border-top: 1px solid #1a2436;
+  padding-top: 14px;
+}
+.discord-admin__sublabel {
+  display: block;
+  font-size: calc(12px * var(--font-scale, 1));
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #6a8ab0;
+  margin: 12px 0 5px;
+}
+.discord-admin__togglechips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-width: 520px;
+}
+.discord-admin__togglechip {
+  background: transparent;
+  border: 1px solid #2e3a52;
+  border-radius: 999px;
+  color: #8a9ab5;
+  font-family: inherit;
+  font-size: calc(13px * var(--font-scale, 1));
+  padding: 3px 12px;
+  cursor: pointer;
+  transition: border-color 0.12s, color 0.12s, background 0.12s;
+}
+.discord-admin__togglechip:hover { border-color: #4d9de0; color: #c8d0e0; }
+.discord-admin__togglechip--on {
+  border-color: #5a9af8;
+  background: rgba(90, 154, 248, 0.18);
+  color: #e8f0ff;
+}
+.discord-admin__result-meta { color: #6a8ab0; }
 .discord-admin__radio {
   display: flex;
   align-items: center;
