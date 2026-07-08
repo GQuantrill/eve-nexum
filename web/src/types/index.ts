@@ -55,6 +55,9 @@ export interface WatchEntry {
   match:  WatchMatch;
   note:   string;
   marker: WatchMarkerKind;
+  // Optional named list this entry belongs to. Absent = ungrouped (shown at the
+  // top, always visible); a value files it under a collapsible group section.
+  group?: string;
 }
 
 export interface MapSystem {

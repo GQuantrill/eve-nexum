@@ -51,14 +51,23 @@ const infoCache     = new Map<string, EntityInfo>();
 const infoInflight  = new Map<string, Promise<EntityInfo | null>>();
 const factionsMap   = new Map<number, FactionEntry>();
 let   sovLoad: Promise<void> | null      = null;
+let   sovLoadedAt   = 0;
 let   factionsLoad: Promise<void> | null = null;
 
+// Sov changes at most ~hourly (campaigns resolve on the hour), so re-fetch the
+// cluster-wide map at most this often. Shared module-level cache: one refresh
+// serves every system node. ~29 KB gzipped, browser → ESI directly (no backend).
+const SOV_TTL_MS = 30 * 60 * 1000;
+
 async function ensureSovMap() {
-  if (sovLoad) return sovLoad;
+  const now = Date.now();
+  // Reuse an in-flight load OR a still-fresh one; refetch once stale.
+  if (sovLoad && now - sovLoadedAt < SOV_TTL_MS) return sovLoad;
+  sovLoadedAt = now; // start the TTL window now — also dedups concurrent callers
   sovLoad = fetch(`${ESI}/sovereignty/map/`)
     .then((r) => r.json())
     .then((entries: SovEntry[]) => { for (const e of entries) sovMap.set(e.system_id, e); })
-    .catch(() => {});
+    .catch(() => { sovLoad = null; sovLoadedAt = 0; }); // failed → keep old data, retry next call
   return sovLoad;
 }
 
@@ -97,10 +106,12 @@ export function useSovData(eveSystemId: number | null): SovResult | null {
   const [sov, setSov] = useState<SovResult | null>(null);
 
   useEffect(() => {
+    // Clear when there's no system to look up (a deliberate reset, not a sync).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (!eveSystemId) { setSov(null); return; }
     let cancelled = false;
 
-    Promise.all([ensureSovMap(), ensureFactions()]).then(async () => {
+    const run = () => Promise.all([ensureSovMap(), ensureFactions()]).then(async () => {
       const entry = sovMap.get(eveSystemId);
       if (!entry || cancelled) return;
       const [allianceInfo, corpInfo] = await Promise.all([
@@ -146,7 +157,12 @@ export function useSovData(eveSystemId: number | null): SovResult | null {
       });
     });
 
-    return () => { cancelled = true; };
+    run();
+    // Re-read on the same cadence as the sov cache TTL so a mounted node picks
+    // up sov flips without a reload. ensureSovMap dedups the actual fetch, so N
+    // nodes still trigger at most one network call per window.
+    const id = setInterval(run, SOV_TTL_MS);
+    return () => { cancelled = true; clearInterval(id); };
   }, [eveSystemId]);
 
   return sov;
