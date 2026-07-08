@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { v4 as uuid } from 'uuid';
-import { TrashIcon, PlusIcon, CrosshairIcon } from '@phosphor-icons/react';
+import { TrashIcon, PlusIcon, CrosshairIcon, ListPlusIcon, CaretDownIcon } from '@phosphor-icons/react';
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import type { DragEndEvent, Modifier } from '@dnd-kit/core';
 import {
@@ -18,6 +18,7 @@ import { matchKey, systemMatchesEntry, connectionMatchesEntry } from '../../util
 import { CLASS_LABELS, EFFECT_LABELS } from '../../data/wormholes';
 import { SystemSearchSelect } from './SystemSearchSelect';
 import { WormholeTypePicker } from './WormholeTypePicker';
+import { PromptModal } from './PromptModal';
 import type { WatchEntry, WatchMatch, WatchMarkerKind } from '../../types';
 
 // Watchlist rows reorder on the vertical axis only — zero the X component so
@@ -65,7 +66,16 @@ export function WatchlistBlock() {
   const { t } = useTranslation();
   const [items, setItems] = useWatchlist();
   const [soundOn, setSoundOn] = useUserSetting<boolean>('nexum.watchlist.sound', true);
+  const [collapsedGroups, setCollapsedGroups] = useUserSetting<string[]>('nexum.watchlist.collapsedGroups', []);
   const [autoFocusId, setAutoFocusId] = useState<string | null>(null);
+
+  // Bulk-import form state (paste J-codes / system names, one per line or comma-
+  // separated, into a named group).
+  const [importOpen, setImportOpen]     = useState(false);
+  const [importName, setImportName]     = useState('');
+  const [importMarker, setImportMarker] = useState<WatchMarkerKind>('watch');
+  const [importText, setImportText]     = useState('');
+  const [newGroupOpen, setNewGroupOpen] = useState(false);
 
   const systems     = useMapStore((s) => s.map.systems);
   const connections = useMapStore((s) => s.map.connections);
@@ -132,12 +142,60 @@ export function WatchlistBlock() {
   }, [items]);
 
   const atCap = items.length >= MAX_WATCH;
+  const room  = Math.max(0, MAX_WATCH - items.length);
+
+  // Ungrouped entries (shown at the top, always visible) + named groups (in
+  // first-seen order) that fold away. Collapse state persists per user.
+  const ungrouped = useMemo(() => items.filter((it) => !it.group), [items]);
+  const groups = useMemo(() => {
+    const m = new Map<string, WatchEntry[]>();
+    for (const it of items) {
+      if (!it.group) continue;
+      const arr = m.get(it.group);
+      if (arr) arr.push(it); else m.set(it.group, [it]);
+    }
+    return m;
+  }, [items]);
+  const collapsed = useMemo(() => new Set(collapsedGroups), [collapsedGroups]);
 
   function addManual() {
     if (atCap) return;
     const next: WatchEntry = { id: uuid(), match: { by: 'system', query: '' }, note: '', marker: 'target' };
     setItems([...items, next]);
     setAutoFocusId(next.id);
+  }
+
+  function toggleGroupCollapsed(name: string) {
+    setCollapsedGroups((prev) => (prev.includes(name) ? prev.filter((g) => g !== name) : [...prev, name]));
+  }
+
+  function addToGroup(name: string) {
+    if (atCap) return;
+    const next: WatchEntry = { id: uuid(), match: { by: 'system', query: '' }, note: '', marker: 'target', group: name };
+    setItems([...items, next]);
+    setCollapsedGroups((prev) => prev.filter((g) => g !== name)); // expand so the new row is visible
+    setAutoFocusId(next.id);
+  }
+
+  function deleteGroup(name: string) {
+    setItems(items.filter((it) => it.group !== name));
+    setCollapsedGroups((prev) => prev.filter((g) => g !== name));
+  }
+
+  function runImport() {
+    const name = importName.trim();
+    if (!name || atCap) return;
+    // Split on newlines AND commas; trim, drop blanks, dedupe within the paste.
+    const tokens = [...new Set(importText.split(/[\n,]+/).map((s) => s.trim()).filter(Boolean))];
+    const take = tokens.slice(0, room);
+    if (take.length === 0) return;
+    const added: WatchEntry[] = take.map((query) => ({
+      id: uuid(), match: { by: 'system', query }, note: '', marker: importMarker, group: name,
+    }));
+    setItems([...items, ...added]);
+    setImportText('');
+    setImportName('');
+    setImportOpen(false);
   }
 
   function toggleCharacteristic(match: WatchMatch, marker: WatchMarkerKind) {
@@ -163,17 +221,136 @@ export function WatchlistBlock() {
   }
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
-  const itemIds = useMemo(() => items.map((it) => it.id), [items]);
-  const draggable = items.length > 1;
+  // Drag-reorder applies to the ungrouped (active) entries only; grouped lists
+  // are set-and-forget, so their rows aren't draggable.
+  const ungroupedIds = useMemo(() => ungrouped.map((it) => it.id), [ungrouped]);
+  const draggable = ungrouped.length > 1;
 
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
-    const from = itemIds.indexOf(String(active.id));
-    const to   = itemIds.indexOf(String(over.id));
+    const from = ungroupedIds.indexOf(String(active.id));
+    const to   = ungroupedIds.indexOf(String(over.id));
     if (from === -1 || to === -1) return;
-    setItems(arrayMove(items, from, to));
+    const reordered = arrayMove(ungrouped, from, to);
+    setItems([...reordered, ...items.filter((it) => it.group)]);
   }
+
+  // Row content, shared between draggable ungrouped rows and static grouped rows.
+  const renderRow = (it: WatchEntry, handleProps: Record<string, unknown> | null, showDrag: boolean) => {
+    const def = watchMarker(it.marker);
+    const targets = matchTargets.get(it.id) ?? [];
+    const onMap = targets.length > 0;
+    const manual = it.match.by === 'system' || it.match.by === 'whType';
+    const isDup = dupIds.has(it.id);
+    return (
+      <>
+        <div className="watchlist__row-top">
+          {showDrag && handleProps && (
+            <button type="button" className="watchlist__drag-handle" {...handleProps} title={t('closest.dragToReorder')}>⠿</button>
+          )}
+          <span className="watchlist__marker-icon" style={{ color: def.color }} title={t(`watchMarker.${it.marker}`)}>
+            <def.Icon size={16} weight="fill" />
+          </span>
+          <select
+            className="watchlist__marker"
+            value={it.marker}
+            onChange={(e) => updateItem(it.id, { marker: e.target.value as WatchMarkerKind })}
+            title={t(`watchMarker.${it.marker}`)}
+            aria-label={t('watchlist.markerAria')}
+          >
+            {WATCH_MARKERS.map((m) => (
+              <option key={m.kind} value={m.kind}>{t(`watchMarker.${m.kind}`)}</option>
+            ))}
+          </select>
+          {manual ? (
+            <select
+              className="watchlist__by"
+              value={it.match.by}
+              onChange={(e) => setBy(it.id, e.target.value as 'system' | 'whType')}
+              aria-label={t('watchlist.matchByAria')}
+            >
+              <option value="system">{t('watchlist.matchSystem')}</option>
+              <option value="whType">{t('watchlist.matchWhType')}</option>
+            </select>
+          ) : (
+            <span className="watchlist__char-label">{matchLabel(it.match)}</span>
+          )}
+          {onMap && (
+            <button
+              type="button"
+              className={`watchlist__locate${expandedId === it.id ? ' watchlist__locate--open' : ''}`}
+              onClick={() => locate(it.id)}
+              title={targets.length > 1 ? `${t('watchlist.locate')} (${targets.length})` : t('watchlist.locate')}
+              aria-label={t('watchlist.locate')}
+              aria-expanded={targets.length > 1 ? expandedId === it.id : undefined}
+            >
+              <CrosshairIcon size={14} weight="bold" />
+              {targets.length > 1 && <span className="watchlist__locate-count">{targets.length}</span>}
+            </button>
+          )}
+          <button
+            type="button"
+            className="watchlist__remove"
+            onClick={() => removeItem(it.id)}
+            title={t('watchlist.remove')}
+          >
+            <TrashIcon size={14} weight="regular" />
+          </button>
+        </div>
+
+        {expandedId === it.id && targets.length > 1 && (
+          <div className="watchlist__matches">
+            {targets.map((tgt) => (
+              <button
+                key={tgt.nodeId}
+                type="button"
+                className="watchlist__match"
+                onClick={() => requestCenterOnNode(tgt.nodeId)}
+              >
+                <CrosshairIcon size={11} weight="bold" />
+                {tgt.label}
+              </button>
+            ))}
+          </div>
+        )}
+
+        <div className="watchlist__row-bottom">
+          {it.match.by === 'system' && (
+            <SystemSearchSelect
+              value={it.match.query}
+              onChange={(query) => updateItem(it.id, { match: { by: 'system', query } })}
+              placeholder={t('watchlist.queryPlaceholder')}
+              maxLength={48}
+              className={`watchlist__value${isDup ? ' watchlist__value--dup' : ''}`}
+              aria-invalid={isDup || undefined}
+              ref={(el) => { if (el && autoFocusId === it.id) { el.focus(); setAutoFocusId(null); } }}
+            />
+          )}
+          {it.match.by === 'whType' && (
+            <div className={`watchlist__whpick${isDup ? ' watchlist__whpick--dup' : ''}`}>
+              <WormholeTypePicker
+                value={it.match.code}
+                onChange={(code) => updateItem(it.id, { match: { by: 'whType', code } })}
+              />
+            </div>
+          )}
+          <input
+            type="text"
+            className="watchlist__note"
+            value={it.note}
+            maxLength={120}
+            onChange={(e) => updateItem(it.id, { note: e.target.value })}
+            placeholder={t('watchlist.notePlaceholder')}
+          />
+        </div>
+
+        {isDup && (
+          <div className="watchlist__dup-msg" role="alert">{t('watchlist.duplicate')}</div>
+        )}
+      </>
+    );
+  };
 
   return (
     <div className="watchlist">
@@ -210,154 +387,165 @@ export function WatchlistBlock() {
         </div>
       </div>
 
-      {items.length > 0 && (
+      {/* Ungrouped (active) entries — draggable. */}
+      {ungrouped.length > 0 && (
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
           modifiers={[restrictToVerticalAxis]}
           onDragEnd={handleDragEnd}
         >
-          <SortableContext items={itemIds} strategy={verticalListSortingStrategy}>
+          <SortableContext items={ungroupedIds} strategy={verticalListSortingStrategy}>
             <div className="watchlist__list">
-              {items.map((it) => {
-                const def = watchMarker(it.marker);
-                const targets = matchTargets.get(it.id) ?? [];
-                const onMap = targets.length > 0;
-                const manual = it.match.by === 'system' || it.match.by === 'whType';
-                const isDup = dupIds.has(it.id);
-                return (
-                  <SortableWatchRow key={it.id} id={it.id} disabled={!draggable}>
-                    {({ handleProps }) => (
-                      <>
-                <div className="watchlist__row-top">
-                  {draggable && (
-                    <button
-                      type="button"
-                      className="watchlist__drag-handle"
-                      {...handleProps}
-                      title={t('closest.dragToReorder')}
-                    >
-                      ⠿
-                    </button>
-                  )}
-                  <span className="watchlist__marker-icon" style={{ color: def.color }} title={t(`watchMarker.${it.marker}`)}>
-                    <def.Icon size={16} weight="fill" />
-                  </span>
-                  <select
-                    className="watchlist__marker"
-                    value={it.marker}
-                    onChange={(e) => updateItem(it.id, { marker: e.target.value as WatchMarkerKind })}
-                    title={t(`watchMarker.${it.marker}`)}
-                    aria-label={t('watchlist.markerAria')}
-                  >
-                    {WATCH_MARKERS.map((m) => (
-                      <option key={m.kind} value={m.kind}>{t(`watchMarker.${m.kind}`)}</option>
-                    ))}
-                  </select>
-                  {manual ? (
-                    <select
-                      className="watchlist__by"
-                      value={it.match.by}
-                      onChange={(e) => setBy(it.id, e.target.value as 'system' | 'whType')}
-                      aria-label={t('watchlist.matchByAria')}
-                    >
-                      <option value="system">{t('watchlist.matchSystem')}</option>
-                      <option value="whType">{t('watchlist.matchWhType')}</option>
-                    </select>
-                  ) : (
-                    <span className="watchlist__char-label">{matchLabel(it.match)}</span>
-                  )}
-                  {onMap && (
-                    <button
-                      type="button"
-                      className={`watchlist__locate${expandedId === it.id ? ' watchlist__locate--open' : ''}`}
-                      onClick={() => locate(it.id)}
-                      title={targets.length > 1 ? `${t('watchlist.locate')} (${targets.length})` : t('watchlist.locate')}
-                      aria-label={t('watchlist.locate')}
-                      aria-expanded={targets.length > 1 ? expandedId === it.id : undefined}
-                    >
-                      <CrosshairIcon size={14} weight="bold" />
-                      {targets.length > 1 && <span className="watchlist__locate-count">{targets.length}</span>}
-                    </button>
-                  )}
-                  <button
-                    type="button"
-                    className="watchlist__remove"
-                    onClick={() => removeItem(it.id)}
-                    title={t('watchlist.remove')}
-                  >
-                    <TrashIcon size={14} weight="regular" />
-                  </button>
-                </div>
-
-                {expandedId === it.id && targets.length > 1 && (
-                  <div className="watchlist__matches">
-                    {targets.map((tgt) => (
-                      <button
-                        key={tgt.nodeId}
-                        type="button"
-                        className="watchlist__match"
-                        onClick={() => requestCenterOnNode(tgt.nodeId)}
-                      >
-                        <CrosshairIcon size={11} weight="bold" />
-                        {tgt.label}
-                      </button>
-                    ))}
-                  </div>
-                )}
-
-                <div className="watchlist__row-bottom">
-                  {it.match.by === 'system' && (
-                    <SystemSearchSelect
-                      value={it.match.query}
-                      onChange={(query) => updateItem(it.id, { match: { by: 'system', query } })}
-                      placeholder={t('watchlist.queryPlaceholder')}
-                      maxLength={48}
-                      className={`watchlist__value${isDup ? ' watchlist__value--dup' : ''}`}
-                      aria-invalid={isDup || undefined}
-                      ref={(el) => { if (el && autoFocusId === it.id) { el.focus(); setAutoFocusId(null); } }}
-                    />
-                  )}
-                  {it.match.by === 'whType' && (
-                    <div className={`watchlist__whpick${isDup ? ' watchlist__whpick--dup' : ''}`}>
-                      <WormholeTypePicker
-                        value={it.match.code}
-                        onChange={(code) => updateItem(it.id, { match: { by: 'whType', code } })}
-                      />
-                    </div>
-                  )}
-                  <input
-                    type="text"
-                    className="watchlist__note"
-                    value={it.note}
-                    maxLength={120}
-                    onChange={(e) => updateItem(it.id, { note: e.target.value })}
-                    placeholder={t('watchlist.notePlaceholder')}
-                  />
-                </div>
-
-                {isDup && (
-                  <div className="watchlist__dup-msg" role="alert">{t('watchlist.duplicate')}</div>
-                )}
-                      </>
-                    )}
-                  </SortableWatchRow>
-                );
-              })}
+              {ungrouped.map((it) => (
+                <SortableWatchRow key={it.id} id={it.id} disabled={!draggable}>
+                  {({ handleProps }) => renderRow(it, handleProps, draggable)}
+                </SortableWatchRow>
+              ))}
             </div>
           </SortableContext>
         </DndContext>
       )}
 
-      <button
-        type="button"
-        className="map-sidebar__action"
-        onClick={addManual}
-        disabled={atCap}
-        title={atCap ? t('watchlist.max', { count: MAX_WATCH }) : undefined}
-      >
-        <PlusIcon size={14} weight="bold" /> {t('watchlist.add')}
-      </button>
+      {/* Named lists — collapsible, set-and-forget. */}
+      {[...groups.entries()].map(([name, entries]) => {
+        const isCollapsed = collapsed.has(name);
+        // How many entries in this group currently match a system on the map —
+        // surfaced on the header so a collapsed group still shows at a glance
+        // that some of its watched holes are present.
+        const onMap = entries.reduce((n, it) => n + ((matchTargets.get(it.id)?.length ?? 0) > 0 ? 1 : 0), 0);
+        return (
+          <div className={`watchlist__group${onMap > 0 ? ' watchlist__group--onmap' : ''}`} key={name}>
+            <div className="watchlist__group-head">
+              <button
+                type="button"
+                className="watchlist__group-toggle"
+                onClick={() => toggleGroupCollapsed(name)}
+                aria-expanded={!isCollapsed}
+              >
+                <CaretDownIcon size={12} weight="bold" className={`watchlist__group-caret${isCollapsed ? ' watchlist__group-caret--collapsed' : ''}`} />
+                <span className="watchlist__group-name">{name}</span>
+                <span className="watchlist__group-count">{entries.length}</span>
+                {onMap > 0 && (
+                  <span className="watchlist__group-onmap" title={t('watchlist.groupOnMap', { count: onMap })}>
+                    <CrosshairIcon size={12} weight="bold" />
+                    {onMap}
+                  </span>
+                )}
+              </button>
+              <button
+                type="button"
+                className="watchlist__group-btn"
+                onClick={() => addToGroup(name)}
+                disabled={atCap}
+                title={atCap ? t('watchlist.max', { count: MAX_WATCH }) : t('watchlist.addToGroup')}
+              >
+                <PlusIcon size={12} weight="bold" />
+              </button>
+              <button
+                type="button"
+                className="watchlist__group-btn watchlist__group-btn--del"
+                onClick={() => deleteGroup(name)}
+                title={t('watchlist.deleteGroup')}
+              >
+                <TrashIcon size={12} weight="regular" />
+              </button>
+            </div>
+            {!isCollapsed && (
+              <div className="watchlist__list">
+                {entries.map((it) => (
+                  <div className="watchlist__row" key={it.id}>{renderRow(it, null, false)}</div>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })}
+
+      <div className="watchlist__actions">
+        <button
+          type="button"
+          className="map-sidebar__action"
+          onClick={addManual}
+          disabled={atCap}
+          title={atCap ? t('watchlist.max', { count: MAX_WATCH }) : undefined}
+        >
+          <PlusIcon size={14} weight="bold" /> {t('watchlist.add')}
+        </button>
+        <button
+          type="button"
+          className="map-sidebar__action"
+          onClick={() => setNewGroupOpen(true)}
+          disabled={atCap}
+          title={atCap ? t('watchlist.max', { count: MAX_WATCH }) : undefined}
+        >
+          <PlusIcon size={14} weight="bold" /> {t('watchlist.newGroup')}
+        </button>
+        <button
+          type="button"
+          className="map-sidebar__action"
+          onClick={() => setImportOpen((o) => !o)}
+          disabled={atCap && !importOpen}
+        >
+          <ListPlusIcon size={14} weight="bold" /> {t('watchlist.importGroup')}
+        </button>
+      </div>
+
+      {newGroupOpen && (
+        <PromptModal
+          title={t('watchlist.newGroup')}
+          placeholder={t('watchlist.groupNamePlaceholder')}
+          onConfirm={(name) => { addToGroup(name); setNewGroupOpen(false); }}
+          onCancel={() => setNewGroupOpen(false)}
+        />
+      )}
+
+      {/* Bulk import: name a group, pick a marker, paste J-codes / system names
+          (one per line or comma-separated). */}
+      {importOpen && (
+        <div className="watchlist__import">
+          <div className="watchlist__import-head">
+            <input
+              type="text"
+              className="watchlist__import-name"
+              value={importName}
+              maxLength={40}
+              onChange={(e) => setImportName(e.target.value)}
+              placeholder={t('watchlist.groupNamePlaceholder')}
+            />
+            <select
+              className="watchlist__import-marker"
+              value={importMarker}
+              onChange={(e) => setImportMarker(e.target.value as WatchMarkerKind)}
+              aria-label={t('watchlist.markerAria')}
+            >
+              {WATCH_MARKERS.map((m) => (
+                <option key={m.kind} value={m.kind}>{t(`watchMarker.${m.kind}`)}</option>
+              ))}
+            </select>
+          </div>
+          <textarea
+            className="watchlist__import-text"
+            value={importText}
+            onChange={(e) => setImportText(e.target.value)}
+            placeholder={t('watchlist.importPlaceholder')}
+            rows={5}
+            spellCheck={false}
+          />
+          <div className="watchlist__import-actions">
+            <span className="watchlist__import-room">{t('watchlist.roomLeft', { count: room })}</span>
+            <button type="button" className="sys-btn" onClick={() => setImportOpen(false)}>{t('actions.cancel')}</button>
+            <button
+              type="button"
+              className="sys-btn sys-btn--ok"
+              onClick={runImport}
+              disabled={!importName.trim() || !importText.trim() || room === 0}
+            >
+              {t('watchlist.import')}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
