@@ -405,6 +405,13 @@
     },
     "snapToGrid": "Привязка к сетке",
     "settings": "Настройки",
+    "poweredBy": "Автор:",
+    "version": "Версия",
+    "showPatchNotes": "Показать список изменений",
+    "patchNotesTitle": "Список изменений",
+    "patchNotesFailed": "Не удалось загрузить список изменений.",
+    "patchNotesEmpty": "Пока нет списка изменений.",
+    "patchNotesNoNotes": "Нет заметок для этой версии.",
     "centerOnJump": "Центрировать при прыжке",
     "centerOnSelect": "Центрировать при выборе",
     "invertZoom": "Инвертировать масштаб (мышь/трекпад)",
@@ -1146,6 +1153,8 @@
       "closest": "Ближайшая система: {{label}}"
     },
     "resetLayout": "Сбросить раскладку панели инструментов",
+    "updateAvailable": "Доступно обновление",
+    "updateAvailableVersion": "Доступно обновление: v{{version}}",
     "copyThisMap": "Копировать эту карту"
   },
   "landing": {

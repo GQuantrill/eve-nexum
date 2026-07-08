@@ -790,6 +790,29 @@
   }
 }
 
+/* Update-available badge: blinking red exclamation, pushed to the far right of
+   the toolbar. Admins + alliance admins only (component self-gates). */
+.toolbar__update {
+  margin-left: auto;
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  background: none;
+  border: none;
+  padding: 0 6px;
+  cursor: pointer;
+  color: #e05a5a;
+  animation: nexum-update-blink 1s steps(1, end) infinite;
+}
+.toolbar__update:hover { color: #ff7a7a; animation: none; }
+@keyframes nexum-update-blink {
+  0%, 49%  { opacity: 1; }
+  50%, 100% { opacity: 0.2; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .toolbar__update { animation: none; }
+}
+
 .toolbar__brand {
   display: flex;
   align-items: center;
@@ -800,9 +823,10 @@
 }
 
 .toolbar__logo {
-  font-size: calc(20px * var(--font-scale, 1));
-  color: #4d9de0;
-  line-height: 1;
+  width: calc(26px * var(--font-scale, 1));
+  height: calc(26px * var(--font-scale, 1));
+  object-fit: contain;
+  display: block;
 }
 
 .toolbar__option {
@@ -2676,6 +2700,93 @@
 }
 
 /* "Settings" button at the top of the sidebar — opens the preferences modal. */
+/* Branding block at the top of the map menu: logo + name, "Powered by", version
+   and the patch-notes button. */
+.map-sidebar__brand {
+  padding: 2px 2px 12px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid #1a2436;
+}
+.map-sidebar__brand-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.map-sidebar__brand-logo {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+.map-sidebar__brand-name {
+  font-size: calc(16px * var(--font-scale, 1));
+  font-weight: 700;
+  color: #e8f0ff;
+  letter-spacing: 0.02em;
+}
+.map-sidebar__brand-by {
+  font-size: calc(12px * var(--font-scale, 1));
+  color: #6a8ab0;
+}
+.map-sidebar__brand-by a { color: #5a9af8; text-decoration: none; }
+.map-sidebar__brand-by a:hover { text-decoration: underline; }
+.map-sidebar__brand-version {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
+  font-size: calc(12px * var(--font-scale, 1));
+  color: #8aa0c8;
+}
+.map-sidebar__patchnotes-btn {
+  flex-shrink: 0;
+  background: transparent;
+  border: 1px solid #2e3a52;
+  border-radius: 4px;
+  color: #9ec0e8;
+  font-family: inherit;
+  font-size: calc(12px * var(--font-scale, 1));
+  padding: 3px 8px;
+  cursor: pointer;
+}
+.map-sidebar__patchnotes-btn:hover { border-color: #5a9af8; color: #e8f0ff; }
+
+/* Patch-notes modal (reuses the generic .modal / .modal-overlay shell). Flex
+   column so the header stays put and only the body scrolls. */
+.modal.patchnotes {
+  max-width: 720px;
+  width: 90vw;
+  max-height: 82vh;
+  display: flex;
+  flex-direction: column;
+}
+.modal.patchnotes .modal__header { flex-shrink: 0; }
+.patchnotes__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 8px 18px 14px;
+}
+.patchnotes__release { padding: 12px 0; border-bottom: 1px solid #1a2436; }
+.patchnotes__release:last-child { border-bottom: none; }
+.patchnotes__release-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 6px; }
+.patchnotes__version {
+  font-size: calc(17px * var(--font-scale, 1));
+  font-weight: 700;
+  color: #5b9bff;
+  text-decoration: none;
+}
+.patchnotes__version:hover { text-decoration: underline; }
+.patchnotes__date { font-size: calc(12px * var(--font-scale, 1)); color: #6a8ab0; }
+.patchnotes__empty { padding: 28px; text-align: center; color: #8aa0c8; }
+.patchnotes__md.wmde-markdown,
+.patchnotes__md {
+  background: transparent;
+  color: #c8d4f0;
+  font-size: calc(13px * var(--font-scale, 1));
+}
+
 .map-sidebar__settings-btn {
   display: flex;
   align-items: center;
@@ -7064,9 +7175,9 @@ select.sig-toolbar-btn option {
 }
 
 .landing__logo {
-  font-size: calc(56px * var(--font-scale, 1));
-  color: #4d9de0;
-  line-height: 1;
+  width: calc(76px * var(--font-scale, 1));
+  height: calc(76px * var(--font-scale, 1));
+  object-fit: contain;
   filter: drop-shadow(0 0 24px rgba(77, 157, 224, 0.4));
 }
 
@@ -7720,8 +7831,9 @@ select.sig-toolbar-btn option {
 }
 
 .loading-screen__logo {
-  font-size: calc(40px * var(--font-scale, 1));
-  color: #2a4a7a;
+  width: calc(56px * var(--font-scale, 1));
+  height: calc(56px * var(--font-scale, 1));
+  object-fit: contain;
   animation: pulse 1.5s ease-in-out infinite;
 }
 

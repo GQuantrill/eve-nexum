@@ -312,7 +312,7 @@ export function LandingPage() {
         <div style={{ position: 'absolute', top: 16, right: 16, zIndex: 3 }}>
           <LanguageSwitcher />
         </div>
-        <div className="landing__logo">◈</div>
+        <img className="landing__logo" src="/screen.png" alt="Nexum" />
         <h1 className="landing__title">Nexum</h1>
         <p className="landing__tagline">{t('landing.tagline')}</p>
       </header>

@@ -391,6 +391,13 @@
     },
     "snapToGrid": "グリッドに合わせる",
     "settings": "設定",
+    "poweredBy": "提供",
+    "version": "バージョン",
+    "showPatchNotes": "パッチノートを表示",
+    "patchNotesTitle": "パッチノート",
+    "patchNotesFailed": "パッチノートを読み込めませんでした。",
+    "patchNotesEmpty": "まだパッチノートがありません。",
+    "patchNotesNoNotes": "このバージョンのノートはありません。",
     "centerOnJump": "ジャンプ時に再センタリング",
     "centerOnSelect": "選択時に再センタリング",
     "invertZoom": "ズーム反転（マウス/トラックパッド）",
@@ -1110,6 +1117,8 @@
       "closest": "最も近い{{label}}星系"
     },
     "resetLayout": "ツールバーのレイアウトをリセット",
+    "updateAvailable": "アップデートが利用可能",
+    "updateAvailableVersion": "アップデートが利用可能: v{{version}}",
     "copyThisMap": "このマップをコピー"
   },
   "landing": {

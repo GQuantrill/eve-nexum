@@ -391,6 +391,13 @@
     },
     "snapToGrid": "Ajustar a la cuadrícula",
     "settings": "Ajustes",
+    "poweredBy": "Desarrollado por",
+    "version": "Versión",
+    "showPatchNotes": "Ver notas de la versión",
+    "patchNotesTitle": "Notas de la versión",
+    "patchNotesFailed": "No se pudieron cargar las notas.",
+    "patchNotesEmpty": "Aún no hay notas de versión.",
+    "patchNotesNoNotes": "Sin notas para esta versión.",
     "centerOnJump": "Recentrar al saltar",
     "centerOnSelect": "Recentrar al seleccionar",
     "invertZoom": "Invertir zoom (ratón/trackpad)",
@@ -1110,6 +1117,8 @@
       "closest": "Sistema {{label}} más cercano"
     },
     "resetLayout": "Restablecer disposición de la barra de herramientas",
+    "updateAvailable": "Actualización disponible",
+    "updateAvailableVersion": "Actualización disponible: v{{version}}",
     "copyThisMap": "Copiar este mapa"
   },
   "landing": {

@@ -391,6 +391,13 @@
     },
     "snapToGrid": "Am Raster ausrichten",
     "settings": "Einstellungen",
+    "poweredBy": "Bereitgestellt von",
+    "version": "Version",
+    "showPatchNotes": "Patchnotes anzeigen",
+    "patchNotesTitle": "Patchnotes",
+    "patchNotesFailed": "Patchnotes konnten nicht geladen werden.",
+    "patchNotesEmpty": "Noch keine Patchnotes.",
+    "patchNotesNoNotes": "Keine Notizen für diese Version.",
     "centerOnJump": "Bei Sprung neu zentrieren",
     "centerOnSelect": "Bei Auswahl neu zentrieren",
     "invertZoom": "Zoom umkehren (Maus/Trackpad)",
@@ -1110,6 +1117,8 @@
       "closest": "Nächstes {{label}}-System"
     },
     "resetLayout": "Symbolleisten-Layout zurücksetzen",
+    "updateAvailable": "Update verfügbar",
+    "updateAvailableVersion": "Update verfügbar: v{{version}}",
     "copyThisMap": "Diese Karte kopieren"
   },
   "landing": {

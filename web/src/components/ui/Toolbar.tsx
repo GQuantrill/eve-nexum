@@ -37,6 +37,7 @@ import {
   KeyIcon, GraphIcon, ArrowCounterClockwiseIcon, DotsSixVerticalIcon,
 } from '@phosphor-icons/react';
 import type { Icon as PhosphorIcon } from '@phosphor-icons/react';
+import { UpdateIndicator } from './UpdateIndicator';
 import { charPortrait, typeIcon } from '../../utils/eveImages';
 
 interface EveStatus {
@@ -676,7 +677,7 @@ export function Toolbar() {
     <header className="toolbar toolbar--free">
       {/* Fixed brand anchor — always top-left, never draggable. */}
       <div className="toolbar__brand">
-        <span className="toolbar__logo">◈</span>
+        <img className="toolbar__logo" src="/screen.png" alt="Nexum" />
       </div>
 
       <DndContext sensors={dragSensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
@@ -686,6 +687,8 @@ export function Toolbar() {
           ))}
         </SortableContext>
       </DndContext>
+
+      <UpdateIndicator />
 
       {user && !atDefaultLayout && (
         <button
