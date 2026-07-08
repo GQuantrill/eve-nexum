@@ -2234,8 +2234,8 @@
 .watchlist__group .watchlist__list { padding: 8px 6px; margin-top: 0; }
 
 /* ── Bulk import form ─────────────────────────────────────────────── */
-.watchlist__actions { display: flex; gap: 6px; margin-top: 4px; }
-.watchlist__actions .map-sidebar__action { flex: 1; }
+.watchlist__actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.watchlist__actions .map-sidebar__action { flex: 1 1 auto; min-width: 90px; justify-content: center; }
 .watchlist__import {
   margin-top: 8px;
   padding: 8px;

@@ -18,6 +18,7 @@ import { matchKey, systemMatchesEntry, connectionMatchesEntry } from '../../util
 import { CLASS_LABELS, EFFECT_LABELS } from '../../data/wormholes';
 import { SystemSearchSelect } from './SystemSearchSelect';
 import { WormholeTypePicker } from './WormholeTypePicker';
+import { PromptModal } from './PromptModal';
 import type { WatchEntry, WatchMatch, WatchMarkerKind } from '../../types';
 
 // Watchlist rows reorder on the vertical axis only — zero the X component so
@@ -69,11 +70,12 @@ export function WatchlistBlock() {
   const [autoFocusId, setAutoFocusId] = useState<string | null>(null);
 
   // Bulk-import form state (paste J-codes / system names, one per line or comma-
-  // separated, into a named list).
+  // separated, into a named group).
   const [importOpen, setImportOpen]     = useState(false);
   const [importName, setImportName]     = useState('');
   const [importMarker, setImportMarker] = useState<WatchMarkerKind>('watch');
   const [importText, setImportText]     = useState('');
+  const [newGroupOpen, setNewGroupOpen] = useState(false);
 
   const systems     = useMapStore((s) => s.map.systems);
   const connections = useMapStore((s) => s.map.connections);
@@ -426,7 +428,7 @@ export function WatchlistBlock() {
                 className="watchlist__group-btn"
                 onClick={() => addToGroup(name)}
                 disabled={atCap}
-                title={atCap ? t('watchlist.max', { count: MAX_WATCH }) : t('watchlist.addToList')}
+                title={atCap ? t('watchlist.max', { count: MAX_WATCH }) : t('watchlist.addToGroup')}
               >
                 <PlusIcon size={12} weight="bold" />
               </button>
@@ -434,7 +436,7 @@ export function WatchlistBlock() {
                 type="button"
                 className="watchlist__group-btn watchlist__group-btn--del"
                 onClick={() => deleteGroup(name)}
-                title={t('watchlist.deleteList')}
+                title={t('watchlist.deleteGroup')}
               >
                 <TrashIcon size={12} weight="regular" />
               </button>
@@ -463,14 +465,32 @@ export function WatchlistBlock() {
         <button
           type="button"
           className="map-sidebar__action"
+          onClick={() => setNewGroupOpen(true)}
+          disabled={atCap}
+          title={atCap ? t('watchlist.max', { count: MAX_WATCH }) : undefined}
+        >
+          <PlusIcon size={14} weight="bold" /> {t('watchlist.newGroup')}
+        </button>
+        <button
+          type="button"
+          className="map-sidebar__action"
           onClick={() => setImportOpen((o) => !o)}
           disabled={atCap && !importOpen}
         >
-          <ListPlusIcon size={14} weight="bold" /> {t('watchlist.importList')}
+          <ListPlusIcon size={14} weight="bold" /> {t('watchlist.importGroup')}
         </button>
       </div>
 
-      {/* Bulk import: name a list, pick a marker, paste J-codes / system names
+      {newGroupOpen && (
+        <PromptModal
+          title={t('watchlist.newGroup')}
+          placeholder={t('watchlist.groupNamePlaceholder')}
+          onConfirm={(name) => { addToGroup(name); setNewGroupOpen(false); }}
+          onCancel={() => setNewGroupOpen(false)}
+        />
+      )}
+
+      {/* Bulk import: name a group, pick a marker, paste J-codes / system names
           (one per line or comma-separated). */}
       {importOpen && (
         <div className="watchlist__import">
@@ -481,7 +501,7 @@ export function WatchlistBlock() {
               value={importName}
               maxLength={40}
               onChange={(e) => setImportName(e.target.value)}
-              placeholder={t('watchlist.listNamePlaceholder')}
+              placeholder={t('watchlist.groupNamePlaceholder')}
             />
             <select
               className="watchlist__import-marker"
