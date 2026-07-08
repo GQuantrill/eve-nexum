@@ -575,6 +575,13 @@
   "watchlist": {
     "hint": "Löcher, nach denen du jagst. Füge einen Systemnamen oder J-Code hinzu; sobald es auf der Karte erscheint, wird sein Knoten hervorgehoben (und gibt einmal einen Ton aus, falls aktiviert).",
     "chimeToggle": "Ton abspielen, wenn ein beobachtetes System erscheint",
+    "importList": "Liste importieren",
+    "addToList": "Zur Liste hinzufügen",
+    "deleteList": "Liste löschen",
+    "listNamePlaceholder": "Listenname",
+    "importPlaceholder": "J-Codes oder Systemnamen einfügen — einer pro Zeile oder kommagetrennt",
+    "roomLeft": "{{count}} Plätze frei",
+    "import": "Importieren",
     "markerAria": "Markierung",
     "matchByAria": "Abgleichen nach",
     "matchSystem": "System",

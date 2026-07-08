@@ -4,9 +4,9 @@ import type { WatchEntry, WatchMatch, WatchMarkerKind } from '../types';
 
 const SETTING_KEY = 'nexum.watchlist';
 
-/** Cap on watchlist entries. A hand-maintained hunting list; past this the
- *  user wants notes/intel tags, not a watchlist. */
-export const MAX_WATCH = 50;
+/** Cap on watchlist entries. Higher now that entries can be filed into
+ *  collapsible named lists (groups) rather than one flat hand-typed list. */
+export const MAX_WATCH = 75;
 
 const VALID_MARKERS: WatchMarkerKind[] = ['target', 'honeypot', 'avoid', 'friendly', 'watch'];
 
@@ -35,7 +35,8 @@ function coerce(v: unknown): WatchEntry | null {
   if (isValidMatch(o.match)) match = o.match as WatchMatch;
   else if (typeof o.query === 'string') match = { by: 'system', query: o.query }; // legacy
   if (!match) return null;
-  return { id: o.id, match, note: o.note, marker: o.marker as WatchMarkerKind };
+  const group = typeof o.group === 'string' && o.group.trim() !== '' ? o.group : undefined;
+  return { id: o.id, match, note: o.note, marker: o.marker as WatchMarkerKind, ...(group ? { group } : {}) };
 }
 
 export function useWatchlist(): [WatchEntry[], (next: WatchEntry[] | ((prev: WatchEntry[]) => WatchEntry[])) => void] {

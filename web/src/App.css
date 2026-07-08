@@ -2177,6 +2177,120 @@
   margin-top: 2px;
 }
 
+/* ── Named lists (groups) ─────────────────────────────────────────── */
+.watchlist__group {
+  margin-top: 10px;
+  border: 1px solid #1a2436;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.watchlist__group-head {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #0d1526;
+  padding: 4px 6px;
+}
+.watchlist__group-toggle {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  color: #c8d4f0;
+  cursor: pointer;
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 600;
+  text-align: left;
+  min-width: 0;
+}
+.watchlist__group-caret { transition: transform 0.15s ease; flex-shrink: 0; }
+.watchlist__group-caret--collapsed { transform: rotate(-90deg); }
+.watchlist__group-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.watchlist__group-count {
+  flex-shrink: 0;
+  color: #6a8ab0;
+  font-weight: 400;
+  font-size: calc(12px * var(--font-scale, 1));
+}
+.watchlist__group-btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  background: none;
+  border: none;
+  color: #6a80a0;
+  cursor: pointer;
+  padding: 2px 4px;
+}
+.watchlist__group-btn:hover:not(:disabled) { color: #a0ccf8; }
+.watchlist__group-btn:disabled { opacity: 0.4; cursor: default; }
+.watchlist__group-btn--del:hover:not(:disabled) { color: #e05a5a; }
+.watchlist__group .watchlist__list { padding: 8px 6px; margin-top: 0; }
+
+/* ── Bulk import form ─────────────────────────────────────────────── */
+.watchlist__actions { display: flex; gap: 6px; margin-top: 4px; }
+.watchlist__actions .map-sidebar__action { flex: 1; }
+.watchlist__import {
+  margin-top: 8px;
+  padding: 8px;
+  border: 1px solid #1e2740;
+  border-radius: 6px;
+  background: #0a0e1a;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.watchlist__import-head { display: flex; gap: 6px; }
+.watchlist__import-name {
+  flex: 1;
+  min-width: 0;
+  background: #0d1117;
+  border: 1px solid #1e2740;
+  border-radius: 4px;
+  color: #c8d4f0;
+  font-family: inherit;
+  font-size: calc(13px * var(--font-scale, 1));
+  padding: 5px 8px;
+  outline: none;
+}
+.watchlist__import-name:focus { border-color: #6ea0ff; }
+.watchlist__import-marker {
+  flex-shrink: 0;
+  background: #0d1117;
+  border: 1px solid #1e2740;
+  border-radius: 4px;
+  color: #c8d4f0;
+  font-family: inherit;
+  font-size: calc(12px * var(--font-scale, 1));
+  padding: 4px 6px;
+}
+.watchlist__import-text {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  background: #0d1117;
+  border: 1px solid #1e2740;
+  border-radius: 4px;
+  color: #c8d4f0;
+  font-family: inherit;
+  font-size: calc(13px * var(--font-scale, 1));
+  padding: 6px 8px;
+  outline: none;
+}
+.watchlist__import-text:focus { border-color: #6ea0ff; }
+.watchlist__import-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.watchlist__import-room { flex: 1; color: #6a8ab0; font-size: calc(12px * var(--font-scale, 1)); }
+
 /* Each entry is a small card: a top line (marker | what | delete) and a
    bottom line (value + note). The left-docked panel is wide enough for this
    to read comfortably without clipping. */

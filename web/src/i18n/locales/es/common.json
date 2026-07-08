@@ -575,6 +575,13 @@
   "watchlist": {
     "hint": "Agujeros que estás buscando. Añade un nombre de sistema o un J-code; cuando aparezca en el mapa, su nodo se resalta (y suena una vez, si está activado).",
     "chimeToggle": "Sonar cuando aparezca un sistema vigilado",
+    "importList": "Importar lista",
+    "addToList": "Añadir a la lista",
+    "deleteList": "Eliminar lista",
+    "listNamePlaceholder": "Nombre de la lista",
+    "importPlaceholder": "Pega J-codes o nombres de sistema — uno por línea o separados por comas",
+    "roomLeft": "{{count}} espacios libres",
+    "import": "Importar",
     "markerAria": "Marcador",
     "matchByAria": "Coincidir por",
     "matchSystem": "Sistema",

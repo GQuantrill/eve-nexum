@@ -575,6 +575,13 @@
   "watchlist": {
     "hint": "你正在搜寻的虫洞。添加星系名称或 J-code；当它出现在地图上时，其节点会被高亮显示（如已启用，会响一次提示音）。",
     "chimeToggle": "关注的星系出现时播放提示音",
+    "importList": "导入列表",
+    "addToList": "添加到列表",
+    "deleteList": "删除列表",
+    "listNamePlaceholder": "列表名称",
+    "importPlaceholder": "粘贴 J 代码或星系名称 — 每行一个或用逗号分隔",
+    "roomLeft": "剩余 {{count}} 个",
+    "import": "导入",
     "markerAria": "标记",
     "matchByAria": "匹配方式",
     "matchSystem": "星系",

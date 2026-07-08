@@ -575,6 +575,13 @@
   "watchlist": {
     "hint": "Buracos que estás a caçar. Adiciona um nome de sistema ou um J-code; quando aparecer no mapa, o seu nó é destacado (e toca uma vez, se ativado).",
     "chimeToggle": "Tocar quando um sistema observado aparecer",
+    "importList": "Importar lista",
+    "addToList": "Adicionar à lista",
+    "deleteList": "Eliminar lista",
+    "listNamePlaceholder": "Nome da lista",
+    "importPlaceholder": "Cola J-codes ou nomes de sistemas — um por linha ou separados por vírgulas",
+    "roomLeft": "{{count}} espaços livres",
+    "import": "Importar",
     "markerAria": "Marcador",
     "matchByAria": "Corresponder por",
     "matchSystem": "Sistema",
