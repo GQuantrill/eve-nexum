@@ -12,8 +12,8 @@ const log = createLogger('versionCheck');
 // release, not when their own fork tags something.
 const REPO = 'GQuantrill/eve-nexum';
 const LATEST_URL = `https://api.github.com/repos/${REPO}/releases/latest`;
-const OK_TTL_MS   = 6 * 60 * 60 * 1000; // cache a good result 6h
-const FAIL_TTL_MS = 15 * 60 * 1000;     // retry a failure after 15m
+const OK_TTL_MS   = 60 * 60 * 1000; // cache a good result 1h — so a new release surfaces within ~1.5h
+const FAIL_TTL_MS = 15 * 60 * 1000; // retry a failure after 15m
 
 // Running version, read from package.json at the process cwd (/app in Docker,
 // server/ in dev — both have package.json at the root). Mirrors telemetry.

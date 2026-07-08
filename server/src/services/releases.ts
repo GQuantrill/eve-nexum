@@ -8,7 +8,7 @@ const log = createLogger('releases');
 
 const REPO       = 'GQuantrill/eve-nexum';
 const LIST_URL   = `https://api.github.com/repos/${REPO}/releases?per_page=10`;
-const OK_TTL_MS   = 6 * 60 * 60 * 1000;
+const OK_TTL_MS   = 60 * 60 * 1000; // 1h — in sync with the version check
 const FAIL_TTL_MS = 15 * 60 * 1000;
 const MAX_BODY    = 20_000; // release notes are small; cap defensively
 
