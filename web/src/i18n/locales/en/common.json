@@ -1145,6 +1145,8 @@
     "trackJumpsTooltipOff": "Not tracking jumps — only existing systems get the you-are-here indicator",
     "signOut": "Sign out",
     "resetLayout": "Reset toolbar layout",
+    "updateAvailable": "Update available",
+    "updateAvailableVersion": "Update available: v{{version}}",
     "role": "Role: {{role}}",
     "checkedAgo": "checked {{time}}",
     "lastKnownSystem": "Last known system",

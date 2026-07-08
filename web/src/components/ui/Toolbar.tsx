@@ -37,6 +37,7 @@ import {
   KeyIcon, GraphIcon, ArrowCounterClockwiseIcon, DotsSixVerticalIcon,
 } from '@phosphor-icons/react';
 import type { Icon as PhosphorIcon } from '@phosphor-icons/react';
+import { UpdateIndicator } from './UpdateIndicator';
 import { charPortrait, typeIcon } from '../../utils/eveImages';
 
 interface EveStatus {
@@ -686,6 +687,8 @@ export function Toolbar() {
           ))}
         </SortableContext>
       </DndContext>
+
+      <UpdateIndicator />
 
       {user && !atDefaultLayout && (
         <button

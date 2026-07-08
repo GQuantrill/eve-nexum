@@ -1110,6 +1110,8 @@
       "closest": "Sistema {{label}} mais próximo"
     },
     "resetLayout": "Repor disposição da barra de ferramentas",
+    "updateAvailable": "Atualização disponível",
+    "updateAvailableVersion": "Atualização disponível: v{{version}}",
     "copyThisMap": "Copiar este mapa"
   },
   "landing": {

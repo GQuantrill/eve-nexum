@@ -10,10 +10,14 @@ export interface DebugFlags {
   // proximity alert threshold — for eyeballing the proximity chip without an
   // in-zone incursion/insurgency.
   showThreats: boolean;
+  // Force the "update available" toolbar badge on regardless of the real version
+  // check — for eyeballing the indicator without cutting a newer release.
+  forceUpdateBadge: boolean;
 }
 
 const flags: DebugFlags = {
   showThreats: false,
+  forceUpdateBadge: false,
 };
 
 const listeners = new Set<() => void>();

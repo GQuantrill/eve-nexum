@@ -1110,6 +1110,8 @@
       "closest": "最も近い{{label}}星系"
     },
     "resetLayout": "ツールバーのレイアウトをリセット",
+    "updateAvailable": "アップデートが利用可能",
+    "updateAvailableVersion": "アップデートが利用可能: v{{version}}",
     "copyThisMap": "このマップをコピー"
   },
   "landing": {
