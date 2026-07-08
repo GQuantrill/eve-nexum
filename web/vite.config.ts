@@ -1,5 +1,10 @@
 import { defineConfig, loadEnv, type PluginOption } from 'vite'
 import react from '@vitejs/plugin-react'
+import { readFileSync } from 'node:fs'
+
+// Baked into the bundle at build time so the UI can show the deployed version
+// without an API round-trip. Kept in sync with the server (both bumped together).
+const APP_VERSION = (JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8')) as { version?: string }).version ?? '0.0.0'
 
 // Inject the Google Tag Manager snippet at build time, but ONLY when a
 // container ID is provided via VITE_GTM_ID. With no ID (the default, and what
@@ -40,6 +45,7 @@ export default defineConfig(({ mode }) => {
   const gtmId = (env.VITE_GTM_ID ?? process.env.VITE_GTM_ID ?? '').trim()
 
   return {
+    define: { __APP_VERSION__: JSON.stringify(APP_VERSION) },
     plugins: [react(), gtmPlugin(gtmId)],
     server: {
       port: 5174,

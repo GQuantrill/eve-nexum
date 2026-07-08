@@ -29,6 +29,7 @@ import { ChainExitsSection } from "./ChainExitsSection";
 import { MapSharesSection } from "./MapSharesSection";
 import { MergeMapModal } from "./MergeMapModal";
 import { CustomIntelBlock } from "./CustomIntelBlock";
+import { PatchNotesModal } from "./PatchNotesModal";
 import { ContentFilterBlock } from "./ContentFilterBlock";
 import { useIsMapOwner } from "../../hooks/useIsMapOwner";
 import type { WormholeMap } from "../../types";
@@ -653,6 +654,7 @@ export function MapSidebar() {
   // the sidebar; the sidebar keeps only the live mapping tools.
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settingsTab, setSettingsTab] = useState<"display" | "signatures" | "shortcuts">("display");
+  const [patchNotesOpen, setPatchNotesOpen] = useState(false);
   const notifPermission = useNotificationPermission();
   const { user } = useAuth();
   const isCorpMap = useMapStore((s) => !!s.map.isCorpMap);
@@ -803,6 +805,25 @@ export function MapSidebar() {
       </button>
 
       <div className="map-sidebar__content">
+        <div className="map-sidebar__brand">
+          <div className="map-sidebar__brand-top">
+            <img src="/screen.png" alt="" className="map-sidebar__brand-logo" />
+            <div className="map-sidebar__brand-text">
+              <div className="map-sidebar__brand-name">Eve Nexum</div>
+              <div className="map-sidebar__brand-by">
+                {t("mapSidebar.poweredBy")}{" "}
+                <a href="https://evewho.com/character/1841929906" target="_blank" rel="noopener noreferrer">Addelee</a>
+              </div>
+            </div>
+          </div>
+          <div className="map-sidebar__brand-version">
+            <span>{t("mapSidebar.version")}: {__APP_VERSION__}</span>
+            <button type="button" className="map-sidebar__patchnotes-btn" onClick={() => setPatchNotesOpen(true)}>
+              {t("mapSidebar.showPatchNotes")}
+            </button>
+          </div>
+        </div>
+
         <button
           type="button"
           className="map-sidebar__settings-btn"
@@ -1236,6 +1257,8 @@ export function MapSidebar() {
           e.target.value = "";
         }}
       />
+
+      {patchNotesOpen && <PatchNotesModal onClose={() => setPatchNotesOpen(false)} />}
 
       {settingsOpen && createPortal(
         <div className="settings-modal__overlay" onClick={() => setSettingsOpen(false)}>
