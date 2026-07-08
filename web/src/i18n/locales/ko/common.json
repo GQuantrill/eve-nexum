@@ -577,6 +577,7 @@
     "chimeToggle": "감시 중인 성계가 나타나면 알림음 재생",
     "importGroup": "그룹 가져오기",
     "newGroup": "새 그룹",
+    "groupOnMap": "지도에 {{count}}개",
     "addToGroup": "그룹에 추가",
     "deleteGroup": "그룹 삭제",
     "groupNamePlaceholder": "그룹 이름",

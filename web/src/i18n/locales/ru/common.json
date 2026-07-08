@@ -593,6 +593,7 @@
     "chimeToggle": "Сигнал при появлении отслеживаемой системы",
     "importGroup": "Импортировать группу",
     "newGroup": "Новая группа",
+    "groupOnMap": "На карте: {{count}}",
     "addToGroup": "Добавить в группу",
     "deleteGroup": "Удалить группу",
     "groupNamePlaceholder": "Название группы",

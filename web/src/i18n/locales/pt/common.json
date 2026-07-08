@@ -577,6 +577,7 @@
     "chimeToggle": "Tocar quando um sistema observado aparecer",
     "importGroup": "Importar grupo",
     "newGroup": "Novo grupo",
+    "groupOnMap": "{{count}} no mapa",
     "addToGroup": "Adicionar ao grupo",
     "deleteGroup": "Eliminar grupo",
     "groupNamePlaceholder": "Nome do grupo",

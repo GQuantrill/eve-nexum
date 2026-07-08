@@ -634,6 +634,7 @@
     "chimeToggle": "Chime when a watched system appears",
     "importGroup": "Import group",
     "newGroup": "New group",
+    "groupOnMap": "{{count}} on the map",
     "addToGroup": "Add to group",
     "deleteGroup": "Delete group",
     "groupNamePlaceholder": "Group name",

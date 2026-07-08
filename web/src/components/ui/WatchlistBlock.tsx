@@ -410,8 +410,12 @@ export function WatchlistBlock() {
       {/* Named lists — collapsible, set-and-forget. */}
       {[...groups.entries()].map(([name, entries]) => {
         const isCollapsed = collapsed.has(name);
+        // How many entries in this group currently match a system on the map —
+        // surfaced on the header so a collapsed group still shows at a glance
+        // that some of its watched holes are present.
+        const onMap = entries.reduce((n, it) => n + ((matchTargets.get(it.id)?.length ?? 0) > 0 ? 1 : 0), 0);
         return (
-          <div className="watchlist__group" key={name}>
+          <div className={`watchlist__group${onMap > 0 ? ' watchlist__group--onmap' : ''}`} key={name}>
             <div className="watchlist__group-head">
               <button
                 type="button"
@@ -422,6 +426,12 @@ export function WatchlistBlock() {
                 <CaretDownIcon size={12} weight="bold" className={`watchlist__group-caret${isCollapsed ? ' watchlist__group-caret--collapsed' : ''}`} />
                 <span className="watchlist__group-name">{name}</span>
                 <span className="watchlist__group-count">{entries.length}</span>
+                {onMap > 0 && (
+                  <span className="watchlist__group-onmap" title={t('watchlist.groupOnMap', { count: onMap })}>
+                    <CrosshairIcon size={12} weight="bold" />
+                    {onMap}
+                  </span>
+                )}
               </button>
               <button
                 type="button"

@@ -577,6 +577,7 @@
     "chimeToggle": "关注的星系出现时播放提示音",
     "importGroup": "导入分组",
     "newGroup": "新建分组",
+    "groupOnMap": "地图上有 {{count}} 个",
     "addToGroup": "添加到分组",
     "deleteGroup": "删除分组",
     "groupNamePlaceholder": "分组名称",

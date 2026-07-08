@@ -577,6 +577,7 @@
     "chimeToggle": "Ton abspielen, wenn ein beobachtetes System erscheint",
     "importGroup": "Gruppe importieren",
     "newGroup": "Neue Gruppe",
+    "groupOnMap": "{{count}} auf der Karte",
     "addToGroup": "Zur Gruppe hinzufügen",
     "deleteGroup": "Gruppe löschen",
     "groupNamePlaceholder": "Gruppenname",

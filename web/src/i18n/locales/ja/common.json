@@ -577,6 +577,7 @@
     "chimeToggle": "監視中の星系が現れたらチャイムを鳴らす",
     "importGroup": "グループをインポート",
     "newGroup": "新しいグループ",
+    "groupOnMap": "マップ上に{{count}}件",
     "addToGroup": "グループに追加",
     "deleteGroup": "グループを削除",
     "groupNamePlaceholder": "グループ名",

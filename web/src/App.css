@@ -2218,6 +2218,19 @@
   font-weight: 400;
   font-size: calc(12px * var(--font-scale, 1));
 }
+/* Aggregate "N of this group's entries are on the current map" — green like the
+   per-row locate badge, so a collapsed group still shows a match at a glance. */
+.watchlist__group-onmap {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: #4ade80;
+  font-weight: 600;
+  font-size: calc(12px * var(--font-scale, 1));
+}
+.watchlist__group--onmap { border-color: #2c6e49; }
+.watchlist__group--onmap .watchlist__group-head { background: rgba(74, 222, 128, 0.07); }
 .watchlist__group-btn {
   flex-shrink: 0;
   display: inline-flex;
