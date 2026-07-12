@@ -314,6 +314,38 @@ export async function migrate() {
     ALTER TABLE map_connections ADD COLUMN IF NOT EXISTS source_signature_id UUID REFERENCES map_signatures(id) ON DELETE SET NULL;
     ALTER TABLE map_connections ADD COLUMN IF NOT EXISTS target_signature_id UUID REFERENCES map_signatures(id) ON DELETE SET NULL;
 
+    -- Discord dedupe: a connection is broadcast at most once, the first time it
+    -- becomes a confirmed wormhole link (standard + a backing sig). Set true on
+    -- send so a later edit (mass/time/type change, or filling in the sig after a
+    -- manual connect) can re-check without re-broadcasting. On first add, mark
+    -- every EXISTING connection as already-handled so the current chain isn't
+    -- re-announced when its holes are next edited after deploy — guarded so the
+    -- backfill runs exactly once, not on every boot.
+    -- discord_notified: broadcast at least once. discord_notified_known: the
+    -- broadcast carried a KNOWN wormhole type (not a bare K162) — lets a hole
+    -- first announced as an unknown K162 re-broadcast once when its real type is
+    -- scanned. Each column is guarded and backfilled INDEPENDENTLY (TRUE for
+    -- pre-existing connections, so the current chain isn't re-announced) — the
+    -- second must not be gated on the first, since an earlier deploy may already
+    -- have added discord_notified alone.
+    DO $$
+    BEGIN
+      IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_name = 'map_connections' AND column_name = 'discord_notified'
+      ) THEN
+        ALTER TABLE map_connections ADD COLUMN discord_notified BOOLEAN NOT NULL DEFAULT FALSE;
+        UPDATE map_connections SET discord_notified = TRUE;
+      END IF;
+      IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_name = 'map_connections' AND column_name = 'discord_notified_known'
+      ) THEN
+        ALTER TABLE map_connections ADD COLUMN discord_notified_known BOOLEAN NOT NULL DEFAULT FALSE;
+        UPDATE map_connections SET discord_notified_known = TRUE;
+      END IF;
+    END $$;
+
     -- Saved chains: a named, user-recorded path through the map's own
     -- connections (A..B). Stored as the explicit step sequence — ordered
     -- system ids + the connection traversed between each pair — so hops can be

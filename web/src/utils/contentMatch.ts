@@ -7,11 +7,18 @@ export const FILTER_ANOM_TYPES = ['combat', 'ore', 'homefront'] as const;
 
 /** Is any filter criterion set? When false the whole map shows normally. */
 export function contentFilterActive(f: ContentFilter): boolean {
-  return f.sigTypes.length > 0 || f.anomTypes.length > 0 || f.nameQuery.trim() !== '';
+  return f.sigTypes.length > 0 || f.anomTypes.length > 0 || f.nameQuery.trim() !== '' || f.undivedWh;
 }
 
-/** Does a system's scanned content satisfy the filter (OR across criteria)? */
-export function systemMatchesContent(c: SystemContent | undefined, f: ContentFilter): boolean {
+/**
+ * Does a system's scanned content satisfy the filter (OR across criteria)?
+ * `hasUndivedWh` is the system's undived-wormhole flag (from undivedWhBySystem),
+ * kept separate because it's derived from connections, not the sig/anom index.
+ */
+export function systemMatchesContent(
+  c: SystemContent | undefined, f: ContentFilter, hasUndivedWh = false,
+): boolean {
+  if (f.undivedWh && hasUndivedWh) return true;
   if (!c) return false;
   if (f.sigTypes.some((t) => c.sigTypes.includes(t))) return true;
   if (f.anomTypes.some((t) => c.anomTypes.includes(t))) return true;

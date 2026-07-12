@@ -561,7 +561,8 @@
     "routeIncludeTurnur": "Включить соединения Turnur",
     "routeIncludeWormholes": "Включить цепочку червоточин",
     "routeShortcutNote": "Маршруты через червоточину, Thera, Turnur или прыжковые врата нельзя задать как игровую точку назначения или маршрутную точку — щёлкните правой кнопкой по системе k-space в маршруте, чтобы проложить путь к ней.",
-    "routeIncludeAnsiblex": "Включить прыжковые врата Ansiblex"
+    "routeIncludeAnsiblex": "Включить прыжковые врата Ansiblex",
+    "showUndivedWhs": "Показывать непройденные ЧД"
   },
   "customIntel": {
     "title": "Свои метки интела",
@@ -579,7 +580,9 @@
     "namePlaceholder": "Название сайта содержит…",
     "matchCount_one": "{{count}} система подходит",
     "matchCount_other": "{{count}} систем подходит",
-    "clear": "Сбросить фильтр"
+    "clear": "Сбросить фильтр",
+    "holes": "Червоточины",
+    "undivedWh": "Непройденная дыра"
   },
   "watchMarker": {
     "target": "Цель",
@@ -1577,7 +1580,9 @@
     "scoutConnections_few": "{{name}}: соединения",
     "scoutConnections_many": "{{name}}: соединений",
     "scoutConnections_other": "{{name}}: соединений",
-    "scoutConnectionsMulti": "Соединения: {{names}}"
+    "scoutConnectionsMulti": "Соединения: {{names}}",
+    "undivedWhTitle": "Просканированные, но не пройденные червоточины",
+    "undivedUnknown": "неизвестно"
   },
   "mapEdge": {
     "lessThan24h": "< 24 ч",

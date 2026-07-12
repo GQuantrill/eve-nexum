@@ -728,6 +728,7 @@ export function MapSidebar() {
   const setUniformSize = useMapStore((s) => s.setUniformSize);
   const showStatics = useMapStore((s) => s.showStatics);
   const setShowStatics = useMapStore((s) => s.setShowStatics);
+  const [showUndivedWh, setShowUndivedWh] = useUserSetting<boolean>('nexum.map.showUndivedWh', true);
   const easyConnect = useMapStore((s) => s.easyConnect);
   const setEasyConnect = useMapStore((s) => s.setEasyConnect);
   const mapOptionsOpen = useMapStore((s) => s.mapOptionsOpen);
@@ -891,6 +892,17 @@ export function MapSidebar() {
               aria-pressed={showStatics}
             >
               {showStatics ? t("actions.on") : t("actions.off")}
+            </button>
+          </div>
+
+          <div className="map-sidebar__row">
+            <label className="map-sidebar__label">{t("mapSidebar.showUndivedWhs")}</label>
+            <button
+              className={`toolbar__toggle${showUndivedWh ? " toolbar__toggle--on" : ""}`}
+              onClick={() => setShowUndivedWh(!showUndivedWh)}
+              aria-pressed={showUndivedWh}
+            >
+              {showUndivedWh ? t("actions.on") : t("actions.off")}
             </button>
           </div>
 

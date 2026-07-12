@@ -13,11 +13,16 @@ export function ContentFilterBlock() {
   const clearContentFilter = useMapStore((s) => s.clearContentFilter);
   const systems = useMapStore((s) => s.map.systems);
   const contentBySystem = useMapStore((s) => s.contentBySystem);
+  const undivedWhBySystem = useMapStore((s) => s.undivedWhBySystem);
 
   const active = contentFilterActive(filter);
   const matchCount = useMemo(
-    () => (active ? systems.filter((sys) => systemMatchesContent(contentBySystem[sys.id], filter)).length : 0),
-    [active, systems, contentBySystem, filter],
+    () => (active
+      ? systems.filter((sys) => systemMatchesContent(
+          contentBySystem[sys.id], filter, (undivedWhBySystem[sys.id]?.length ?? 0) > 0,
+        )).length
+      : 0),
+    [active, systems, contentBySystem, undivedWhBySystem, filter],
   );
 
   function toggle(kind: 'sigTypes' | 'anomTypes', value: string) {
@@ -57,6 +62,18 @@ export function ContentFilterBlock() {
             {t(`anomType.${at}`)}
           </button>
         ))}
+      </div>
+
+      <div className="map-sidebar__label">{t('contentFilter.holes')}</div>
+      <div className="content-filter__chips">
+        <button
+          type="button"
+          className={`sig-filter-chip${filter.undivedWh ? ' sig-filter-chip--active' : ''}`}
+          aria-pressed={filter.undivedWh}
+          onClick={() => setContentFilter({ undivedWh: !filter.undivedWh })}
+        >
+          {t('contentFilter.undivedWh')}
+        </button>
       </div>
 
       <input

@@ -545,7 +545,8 @@
     "routeIncludeTurnur": "Incluir conexões de Turnur",
     "routeIncludeWormholes": "Incluir cadeia de buracos de minhoca",
     "routeShortcutNote": "Rotas que usam um buraco de minhoca, Thera, Turnur ou um portão de salto não podem ser definidas como destino ou ponto de rota no jogo — clique com o botão direito em um sistema k-space da rota para ir até ele.",
-    "routeIncludeAnsiblex": "Incluir portões Ansiblex"
+    "routeIncludeAnsiblex": "Incluir portões Ansiblex",
+    "showUndivedWhs": "Mostrar WHs não mergulhados"
   },
   "customIntel": {
     "title": "Intel personalizada",
@@ -563,7 +564,9 @@
     "namePlaceholder": "O nome do site contém…",
     "matchCount_one": "{{count}} sistema corresponde",
     "matchCount_other": "{{count}} sistemas correspondem",
-    "clear": "Limpar filtro"
+    "clear": "Limpar filtro",
+    "holes": "Buracos de minhoca",
+    "undivedWh": "Buraco não mergulhado"
   },
   "watchMarker": {
     "target": "Alvo",
@@ -1539,7 +1542,9 @@
     "suppressed": "Suprimido",
     "scoutConnections_one": "Conexão de {{name}}",
     "scoutConnections_other": "Conexões de {{name}}",
-    "scoutConnectionsMulti": "Conexões de {{names}}"
+    "scoutConnectionsMulti": "Conexões de {{names}}",
+    "undivedWhTitle": "Buracos de minhoca escaneados mas não mergulhados",
+    "undivedUnknown": "desconhecido"
   },
   "mapEdge": {
     "lessThan24h": "< 24h",

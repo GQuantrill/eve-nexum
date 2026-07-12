@@ -5,6 +5,7 @@ import { api } from '../api/client';
 import { enqueue } from './pendingQueue';
 import { toast } from '../components/ui/Toaster';
 import type { WormholeMap, MapSystem, MapConnection, SavedRoute, SystemClass, WormholeEffect } from '../types';
+import type { WhSig, UndivedHole } from '../utils/undivedWormholes';
 import { pickHandles } from '../components/map/edgeUtils';
 
 // Another of the account's characters chosen as the route/centre origin.
@@ -156,6 +157,7 @@ export interface ContentFilter {
   sigTypes:  string[];
   anomTypes: string[];
   nameQuery: string;
+  undivedWh: boolean; // spotlight systems with a scanned-but-not-dived wormhole
 }
 
 interface MapStore {
@@ -305,6 +307,20 @@ interface MapStore {
   sigTypesBySystem: Record<string, string[]>;
   setSigTypesBulk: (next: Record<string, string[]>) => void;
   setSystemSigTypes: (systemId: string, types: string[]) => void;
+
+  // Map-wide index of scanned wormhole SIGNATURES per system ({id, sigId,
+  // whType, leadsTo}) — richer than sigTypesBySystem, so undived holes can be
+  // derived. Loaded in bulk on map switch, kept fresh by the open sig pane +
+  // remote sig.changed events.
+  whSigsBySystem: Record<string, WhSig[]>;
+  setWhSigsBulk: (next: Record<string, WhSig[]>) => void;
+  setSystemWhSigs: (systemId: string, sigs: WhSig[]) => void;
+
+  // Derived index: undived (scanned-but-not-dived) wormholes per system. Rebuilt
+  // from whSigsBySystem + connections by useUndivedWormholeIndex. Powers the
+  // under-node pills and the content filter's "undived wormhole" state.
+  undivedWhBySystem: Record<string, UndivedHole[]>;
+  setUndivedWhBulk: (next: Record<string, UndivedHole[]>) => void;
 
   // Map-wide content index per system for the content filter: the set of
   // signature types and anomaly types present, plus all site names (lowercased
@@ -525,9 +541,16 @@ export const useMapStore = create<MapStore>()((set, get) => {
     })),
     contentBySystem: {},
     setContentBulk: (next) => set({ contentBySystem: next }),
-    contentFilter: { sigTypes: [], anomTypes: [], nameQuery: '' },
+    whSigsBySystem: {},
+    setWhSigsBulk: (next) => set({ whSigsBySystem: next }),
+    setSystemWhSigs: (systemId, sigs) => set((s) => ({
+      whSigsBySystem: { ...s.whSigsBySystem, [systemId]: sigs },
+    })),
+    undivedWhBySystem: {},
+    setUndivedWhBulk: (next) => set({ undivedWhBySystem: next }),
+    contentFilter: { sigTypes: [], anomTypes: [], nameQuery: '', undivedWh: false },
     setContentFilter: (next) => set((s) => ({ contentFilter: { ...s.contentFilter, ...next } })),
-    clearContentFilter: () => set({ contentFilter: { sigTypes: [], anomTypes: [], nameQuery: '' } }),
+    clearContentFilter: () => set({ contentFilter: { sigTypes: [], anomTypes: [], nameQuery: '', undivedWh: false } }),
     panelOrder: ['activity', 'killboard', 'notes', 'signatures', 'anomalies', 'structures', 'npcStations'],
     undoStack: [],
 
@@ -622,7 +645,7 @@ export const useMapStore = create<MapStore>()((set, get) => {
         const keepSel     = prev.sel     && map.systems.some((s) => s.id === prev.sel)      ? prev.sel     : null;
         const keepConn    = prev.conn    && map.connections.some((c) => c.id === prev.conn) ? prev.conn    : null;
         const keepCurrent = prev.current && map.systems.some((s) => s.id === prev.current)  ? prev.current : null;
-        set({ map, activeMapId: id, selectedSystemId: keepSel, selectedConnectionId: keepConn, currentSystemId: keepCurrent, undoStack: [], sigTypesBySystem: {}, contentBySystem: {}, contentFilter: { sigTypes: [], anomTypes: [], nameQuery: '' } });
+        set({ map, activeMapId: id, selectedSystemId: keepSel, selectedConnectionId: keepConn, currentSystemId: keepCurrent, undoStack: [], sigTypesBySystem: {}, contentBySystem: {}, whSigsBySystem: {}, undivedWhBySystem: {}, contentFilter: { sigTypes: [], anomTypes: [], nameQuery: '', undivedWh: false } });
       } catch (err) {
         // 403/404 — the grant was revoked, or the map was deleted. Reload
         // the list (which will trigger the revocation-detection path above

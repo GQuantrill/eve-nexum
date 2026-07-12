@@ -545,7 +545,8 @@
     "routeIncludeTurnur": "Incluir conexiones de Turnur",
     "routeIncludeWormholes": "Incluir cadena de agujeros de gusano",
     "routeShortcutNote": "Las rutas que usan un agujero de gusano, Thera, Turnur o una puerta de salto no se pueden establecer como destino o punto de ruta en el juego; haz clic derecho en un sistema k-space de la ruta para ir a él.",
-    "routeIncludeAnsiblex": "Incluir puertas Ansiblex"
+    "routeIncludeAnsiblex": "Incluir puertas Ansiblex",
+    "showUndivedWhs": "Mostrar WHs sin explorar"
   },
   "customIntel": {
     "title": "Intel personalizada",
@@ -563,7 +564,9 @@
     "namePlaceholder": "El nombre del sitio contiene…",
     "matchCount_one": "{{count}} sistema coincide",
     "matchCount_other": "{{count}} sistemas coinciden",
-    "clear": "Limpiar filtro"
+    "clear": "Limpiar filtro",
+    "holes": "Agujeros de gusano",
+    "undivedWh": "Agujero sin explorar"
   },
   "watchMarker": {
     "target": "Objetivo",
@@ -1539,7 +1542,9 @@
     "suppressed": "Suprimido",
     "scoutConnections_one": "Conexión de {{name}}",
     "scoutConnections_other": "Conexiones de {{name}}",
-    "scoutConnectionsMulti": "Conexiones de {{names}}"
+    "scoutConnectionsMulti": "Conexiones de {{names}}",
+    "undivedWhTitle": "Agujeros de gusano escaneados pero no explorados",
+    "undivedUnknown": "desconocido"
   },
   "mapEdge": {
     "lessThan24h": "< 24h",
