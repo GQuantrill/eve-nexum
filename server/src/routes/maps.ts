@@ -21,6 +21,7 @@ import {
 import { reportPresence } from '../services/presence.js';
 import { copyMap } from '../services/mapCopy.js';
 import { notifyDiscord, k162Embed, connectionEmbed, chainEmbed } from '../services/discord.js';
+import { whSizeForCode } from './wormholes.js';
 
 const log = createLogger('maps');
 const discordLog = createLogger('discord');
@@ -494,11 +495,15 @@ function dispatchNewConnection(
       discordLog.info(`new connection ${r.a} <-> ${r.b} suppressed — dest class "${destClass}" not in the org's class filter`);
       return;
     }
-    if (!whListAllows(r.whSizes, (size ?? 'large'))) {
-      discordLog.info(`new connection ${r.a} <-> ${r.b} suppressed — size "${size ?? 'large'}" not in the org's size filter`);
+    // Size: the freshly-scanned hole is at its nominal size, so derive it from
+    // the backing wormhole type (Q003 -> small). Only fall back to the stored
+    // connection size, then 'large', when the type is unknown (e.g. bare K162).
+    const effSize = (await whSizeForCode(ev.whType || whType)) ?? size ?? 'large';
+    if (!whListAllows(r.whSizes, effSize)) {
+      discordLog.info(`new connection ${r.a} <-> ${r.b} suppressed — size "${effSize}" not in the org's size filter`);
       return;
     }
-    notifyDiscord(r.connectionsWebhook, connectionEmbed({ a: r.a, b: r.b, whType: ev.whType || whType, size, mapName: r.mapName, actor }));
+    notifyDiscord(r.connectionsWebhook, connectionEmbed({ a: r.a, b: r.b, whType: ev.whType || whType, size: effSize, mapName: r.mapName, actor }));
   }).catch((e) => discordLog.warn(`connection dispatch query failed: ${(e as Error).message}`));
 }
 
@@ -2040,7 +2045,7 @@ mapsRouter.post('/:mapId/connections', async (req, res) => {
   // Only notify on a genuinely new wormhole connection — not a duplicate-id
   // retry, and not an in-game gate or Ansiblex link.
   if (inserted > 0 && effectiveType === 'standard') {
-    dispatchNewConnection(access, mapId, sourceId, targetId, null, size ?? 'large', req.session.characterName ?? null);
+    dispatchNewConnection(access, mapId, sourceId, targetId, null, size ?? null, req.session.characterName ?? null);
   }
   // Return the resolved type so the originating client can reflect an
   // auto-classified gate without waiting for a reload.
