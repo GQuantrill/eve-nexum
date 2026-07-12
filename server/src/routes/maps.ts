@@ -460,70 +460,85 @@ function whTypeAllows(list: string[], code: string): boolean {
   return list.length === 0 || code === '' || list.includes(code);
 }
 
-function dispatchNewConnection(
-  meta: MapMeta, mapId: string, sourceId: string, targetId: string,
-  whType: string | null, size: string | null, actor: string | null,
-): void {
+// Broadcast a wormhole connection — at most once per connection. Keyed on the
+// connection id (not just its endpoints) so it can be re-checked whenever the
+// connection changes: created by a jump (sig already present), created manually
+// then backed by a sig later, or its type filled in by auto-detect. The
+// `discord_notified` flag is set only on a real send, so a connection that is
+// suppressed now (no backing sig yet) can still fire once the sig arrives, and
+// one already sent never re-broadcasts.
+function maybeBroadcastConnection(meta: MapMeta, mapId: string, connId: string, actor: string | null): void {
   if (!hasOrg(meta)) return; // personal map — never notifies
-  discordLog.info(`new connection on org map (corpId=${meta.corpId ?? 'null'}/allianceId=${meta.allianceId ?? 'null'}) — building notification`);
   db.query<{
+    sourceId: string; targetId: string; connType: string; notified: boolean; size: string | null; whType: string | null;
     a: string; b: string; classA: string; classB: string; regionA: string | null; regionB: string | null;
     mapName: string; mapEnabled: boolean; allRegions: boolean; regions: string[];
     whTypes: string[]; whClasses: string[]; whSizes: string[]; connectionsWebhook: string | null;
   }>(
-    `SELECT a.name AS a, b.name AS b, a.system_class AS "classA", b.system_class AS "classB",
+    `SELECT c.source_id AS "sourceId", c.target_id AS "targetId", c.connection_type AS "connType",
+            c.discord_notified AS "notified", c.size, c.wh_type AS "whType",
+            a.name AS a, b.name AS b, a.system_class AS "classA", b.system_class AS "classB",
             a.region_name AS "regionA", b.region_name AS "regionB",
             m.name AS "mapName", m.discord_notify AS "mapEnabled",
             ${DISCORD_SETTINGS_COLS},
             COALESCE(cds.wh_types,   ads.wh_types,   '{}'::text[]) AS "whTypes",
             COALESCE(cds.wh_classes, ads.wh_classes, '{}'::text[]) AS "whClasses",
             COALESCE(cds.wh_sizes,   ads.wh_sizes,   '{}'::text[]) AS "whSizes"
-       FROM maps m
-       JOIN map_systems a ON a.id = $2
-       JOIN map_systems b ON b.id = $3
+       FROM map_connections c
+       JOIN maps m ON m.id = c.map_id
+       JOIN map_systems a ON a.id = c.source_id
+       JOIN map_systems b ON b.id = c.target_id
        ${DISCORD_SETTINGS_JOIN}
-      WHERE m.id = $1`,
-    [mapId, sourceId, targetId],
+      WHERE c.id = $1 AND c.map_id = $2`,
+    [connId, mapId],
   ).then(async ({ rows }) => {
     const r = rows[0];
-    if (!r) { discordLog.warn(`connection dispatch: endpoints not found`); return; }
-    if (!r.connectionsWebhook) { discordLog.info(`new connection suppressed — no connections webhook configured`); return; }
+    if (!r) { discordLog.warn(`connection dispatch: connection ${connId} not found`); return; }
+    if (r.notified) return; // already broadcast — never repeat
+    if (r.connType !== 'standard') return; // gate / Ansiblex / jump-bridge
+    if (!r.connectionsWebhook) { discordLog.info(`connection ${r.a} <-> ${r.b} suppressed — no connections webhook configured`); return; }
     if (!r.mapEnabled) {
-      discordLog.info(`new connection suppressed — map "${r.mapName}" is excluded from Discord`);
+      discordLog.info(`connection ${r.a} <-> ${r.b} suppressed — map "${r.mapName}" is excluded from Discord`);
       return;
     }
     if (!regionAllowed(r.allRegions, r.regions, [r.regionA, r.regionB])) {
-      discordLog.info(`new connection suppressed — neither region (${r.regionA ?? '?'} / ${r.regionB ?? '?'}) in the org filter`);
+      discordLog.info(`connection ${r.a} <-> ${r.b} suppressed — neither region (${r.regionA ?? '?'} / ${r.regionB ?? '?'}) in the org filter`);
       return;
     }
     // Suppress gate / Ansiblex / bridge hops: only broadcast when a scanned
-    // wormhole signature plausibly backs the jump (see wormholeEvidence).
-    const ev = await wormholeEvidence(sourceId, targetId, r.a, r.classA, r.b, r.classB);
+    // wormhole signature plausibly backs the jump (see wormholeEvidence). Left
+    // unsent (flag not set) so it can fire once the sig is added.
+    const ev = await wormholeEvidence(r.sourceId, r.targetId, r.a, r.classA, r.b, r.classB);
     if (!ev.backed) {
-      discordLog.info(`new connection ${r.a} <-> ${r.b} suppressed — no wormhole signature backs it (likely a gate/jump-bridge)`);
+      discordLog.info(`connection ${r.a} <-> ${r.b} not broadcast yet — no wormhole signature backs it (gate/bridge, or sig not scanned)`);
       return;
     }
-    // Wormhole filters (dest class = the "to" end; size from the connection row).
+    // Wormhole filters (dest class = the "to" end; size from the type).
     if (!whTypeAllows(r.whTypes, ev.whType)) {
-      discordLog.info(`new connection ${r.a} <-> ${r.b} suppressed — hole type "${ev.whType || '?'}" not in the org's type filter`);
+      discordLog.info(`connection ${r.a} <-> ${r.b} suppressed — hole type "${ev.whType || '?'}" not in the org's type filter`);
       return;
     }
     // Turnur is a distinct destination option (like Thera), even though the SDE
     // classes it low-sec — so a Turnur hole matches the 'Turnur' filter.
     const destClass = r.b === 'Turnur' ? 'Turnur' : r.classB;
     if (!whListAllows(r.whClasses, destClass)) {
-      discordLog.info(`new connection ${r.a} <-> ${r.b} suppressed — dest class "${destClass}" not in the org's class filter`);
+      discordLog.info(`connection ${r.a} <-> ${r.b} suppressed — dest class "${destClass}" not in the org's class filter`);
       return;
     }
-    // Size: the freshly-scanned hole is at its nominal size, so derive it from
-    // the backing wormhole type (Q003 -> small). Only fall back to the stored
-    // connection size, then 'large', when the type is unknown (e.g. bare K162).
-    const effSize = (await whSizeForCode(ev.whType || whType)) ?? size ?? 'large';
+    // Size: derive from the backing wormhole type (Q003 -> small); fall back to
+    // the stored connection size, then 'large', when the type is unknown.
+    const effSize = (await whSizeForCode(ev.whType || r.whType)) ?? r.size ?? 'large';
     if (!whListAllows(r.whSizes, effSize)) {
-      discordLog.info(`new connection ${r.a} <-> ${r.b} suppressed — size "${effSize}" not in the org's size filter`);
+      discordLog.info(`connection ${r.a} <-> ${r.b} suppressed — size "${effSize}" not in the org's size filter`);
       return;
     }
-    notifyDiscord(r.connectionsWebhook, connectionEmbed({ a: r.a, b: r.b, whType: ev.whType || whType, size: effSize, mapName: r.mapName, actor }));
+    // Claim the send atomically: only the query that flips the flag from false
+    // actually posts, so concurrent triggers (create + a near-simultaneous type
+    // PATCH) can't double-broadcast.
+    const claim = await db.query(
+      `UPDATE map_connections SET discord_notified = TRUE WHERE id = $1 AND discord_notified = FALSE`, [connId]);
+    if (claim.rowCount === 0) return; // someone else already claimed it
+    notifyDiscord(r.connectionsWebhook, connectionEmbed({ a: r.a, b: r.b, whType: ev.whType || r.whType, size: effSize, mapName: r.mapName, actor }));
   }).catch((e) => discordLog.warn(`connection dispatch query failed: ${(e as Error).message}`));
 }
 
@@ -2062,10 +2077,12 @@ mapsRouter.post('/:mapId/connections', async (req, res) => {
   ).then(({ rows }) => {
     if (rows[0]) publishToMap(mapId, { type: 'connection.add', actor: req.get('x-client-id') ?? null, connection: rows[0] });
   }).catch(console.error);
-  // Only notify on a genuinely new wormhole connection — not a duplicate-id
-  // retry, and not an in-game gate or Ansiblex link.
+  // Broadcast a genuinely new wormhole connection — not a duplicate-id retry,
+  // and not an in-game gate/Ansiblex. If no sig backs it yet (manual connect
+  // before scanning), this is a no-op that leaves discord_notified false, so
+  // the later type PATCH from sig auto-detect fires it instead.
   if (inserted > 0 && effectiveType === 'standard') {
-    dispatchNewConnection(access, mapId, sourceId, targetId, null, size ?? null, req.session.characterName ?? null);
+    maybeBroadcastConnection(access, mapId, id, req.session.characterName ?? null);
   }
   // Return the resolved type so the originating client can reflect an
   // auto-classified gate without waiting for a reload.
@@ -2117,6 +2134,12 @@ mapsRouter.patch('/:mapId/connections/:connectionId', async (req, res) => {
   );
   await touchMap(mapId);
   publishToMap(mapId, { type: 'connection.update', actor: req.get('x-client-id') ?? null, id: connectionId, updates });
+  // A wormhole type was just filled in — e.g. sig auto-detect labelling a
+  // manually-drawn connection once its hole is scanned. Re-check the broadcast;
+  // it's deduped, so a connection already announced won't fire again.
+  if (typeof updates.type === 'string' && updates.type.trim() !== '') {
+    maybeBroadcastConnection(access, mapId, connectionId, req.session.characterName ?? null);
+  }
   res.json({ ok: true });
 });
 
