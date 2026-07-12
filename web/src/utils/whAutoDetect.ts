@@ -1,5 +1,5 @@
 import { useMapStore } from '../store/mapStore';
-import type { Signature } from '../types';
+import type { Signature, MapConnection } from '../types';
 
 /**
  * After a signature was edited or deleted, re-evaluate every connection that
@@ -48,12 +48,13 @@ export function reevaluateConnectionsForSystem(
     const oc = otherSys.systemClass.toUpperCase();
     const on = (otherSys.name ?? '').toUpperCase();
 
-    const backingCodes: string[] = [];
-    for (const s of allSigs) {
-      if (!s.whType || !s.whLeadsTo) continue;
-      const target = s.whLeadsTo.toUpperCase();
-      if (target === oc || target === on) backingCodes.push(s.whType.toUpperCase());
-    }
+    // Sigs on this system that back the link: a scanned wormhole whose leads-to
+    // points at the other endpoint, by exact system name (pinned) or by class.
+    const backing = allSigs.filter(
+      (s) => s.whType && s.whLeadsTo &&
+        (s.whLeadsTo.toUpperCase() === oc || s.whLeadsTo.toUpperCase() === on),
+    );
+    const backingCodes = backing.map((s) => (s.whType ?? '').toUpperCase());
     const best = backingCodes.find(t => t !== 'K162') ?? backingCodes[0];
 
     // True when this connection's current type was auto-filled from the sig
@@ -66,29 +67,48 @@ export function reevaluateConnectionsForSystem(
       conn.type && conn.type.toUpperCase() === oldType
     );
 
+    const patch: Partial<Omit<MapConnection, 'id'>> = {};
+
     if (best) {
       if (conn.broken) {
         // A sig backs this link again (e.g. it reappeared in a re-scan) —
         // un-quarantine it and restore the type.
-        updateConnection(conn.id, { broken: false, type: best });
+        patch.broken = false; patch.type = best;
       } else if (conn.type === null || (conn.type.toUpperCase() === 'K162' && best !== 'K162')) {
         // Empty, or a K162 placeholder being upgraded to a real code.
-        updateConnection(conn.id, { type: best });
+        patch.type = best;
       } else if (oldBackedThis && conn.type.toUpperCase() !== best.toUpperCase()) {
         // The sig that auto-filled this connection had its WH type changed —
         // follow it so editing a sig's type updates the map label too.
-        updateConnection(conn.id, { type: best });
+        patch.type = best;
       }
-      // else: '' (user cleared) or a manual real code — leave it.
-      continue;
+      // else: '' (user cleared) or a manual real code — leave the type.
+
+      // Record which sig backs this end so "Backing signatures" fills in
+      // automatically instead of only ever being set by hand. Only when the
+      // backing sig is UNAMBIGUOUS — a single hole pinned to the exact connected
+      // system, or the sole backing hole on this end — and never overriding a
+      // manual link. (A K162 twin pinned to the same system alongside the real
+      // code is fine: the real code wins as the single non-K162 pinned hole.)
+      const endField = conn.sourceId === systemId ? 'sourceSignatureId' : 'targetSignatureId';
+      if (!conn[endField]) {
+        const pinned = backing.filter((s) => (s.whLeadsTo ?? '').toUpperCase() === on);
+        const pinnedReal = pinned.filter((s) => (s.whType ?? '').toUpperCase() !== 'K162');
+        const linkSig =
+          pinnedReal.length === 1 ? pinnedReal[0] :
+          pinned.length === 1     ? pinned[0]     :
+          pinned.length === 0 && backing.length === 1 ? backing[0] :
+          undefined; // several plausible holes — ambiguous, leave it to the user
+        if (linkSig) patch[endField] = linkSig.id;
+      }
+    } else if (oldBackedThis && !conn.broken) {
+      // No sig backs the connection any more. If this sig used to back it:
+      //  - on a delete (breakOnOrphan), quarantine it — the hole collapsed, so
+      //    sever the chain visually but keep it traceable;
+      //  - on an edit, just clear the orphaned auto-filled type as before.
+      if (breakOnOrphan) patch.broken = true; else patch.type = null;
     }
 
-    // No sig backs the connection any more. If this sig used to back it:
-    //  - on a delete (breakOnOrphan), quarantine it — the hole collapsed, so
-    //    sever the chain visually but keep it traceable;
-    //  - on an edit, just clear the orphaned auto-filled type as before.
-    if (oldBackedThis && !conn.broken) {
-      updateConnection(conn.id, breakOnOrphan ? { broken: true } : { type: null });
-    }
+    if (Object.keys(patch).length) updateConnection(conn.id, patch);
   }
 }
