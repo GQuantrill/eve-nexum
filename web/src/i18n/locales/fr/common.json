@@ -545,7 +545,8 @@
     "routeIncludeTurnur": "Inclure les connexions Turnur",
     "routeIncludeWormholes": "Inclure la chaîne de trous de ver",
     "routeShortcutNote": "Les itinéraires passant par un trou de ver, Thera, Turnur ou une porte de saut ne peuvent pas être définis comme destination ou point de passage en jeu — faites un clic droit sur un système k-space de l’itinéraire pour vous y rendre.",
-    "routeIncludeAnsiblex": "Inclure les portes Ansiblex"
+    "routeIncludeAnsiblex": "Inclure les portes Ansiblex",
+    "showUndivedWhs": "Afficher les TdV non explorés"
   },
   "customIntel": {
     "title": "Intel personnalisée",
@@ -563,7 +564,9 @@
     "namePlaceholder": "Le nom du site contient…",
     "matchCount_one": "{{count}} système correspond",
     "matchCount_other": "{{count}} systèmes correspondent",
-    "clear": "Effacer le filtre"
+    "clear": "Effacer le filtre",
+    "holes": "Trous de ver",
+    "undivedWh": "Trou non exploré"
   },
   "watchMarker": {
     "target": "Cible",
@@ -1539,7 +1542,9 @@
     "suppressed": "Supprimé",
     "scoutConnections_one": "Connexion {{name}}",
     "scoutConnections_other": "Connexions {{name}}",
-    "scoutConnectionsMulti": "Connexions {{names}}"
+    "scoutConnectionsMulti": "Connexions {{names}}",
+    "undivedWhTitle": "Trous de ver scannés mais non explorés",
+    "undivedUnknown": "inconnu"
   },
   "mapEdge": {
     "lessThan24h": "< 24h",

@@ -13,6 +13,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useAccountLocations } from '../../hooks/useAccountLocations';
 import { useWatchlistAlerts } from '../../hooks/useWatchlistAlerts';
 import { useMapSignatureIndex } from '../../hooks/useMapSignatureIndex';
+import { useUndivedWormholeIndex } from '../../hooks/useUndivedWormholeIndex';
 import { useCanEdit } from '../../hooks/useCanEdit';
 import { useMinimapPosition } from '../../hooks/useMinimapPosition';
 import { useShareMode } from '../../context/ShareModeContext';
@@ -110,6 +111,7 @@ function systemToNode(sys: MapSystem, selectedId: string | null, easyConnect = f
 export function MapCanvas() {
   const { t } = useTranslation();
   useMapSignatureIndex();
+  useUndivedWormholeIndex();
   useWatchlistAlerts();
   const systems              = useMapStore((s) => s.map.systems);
   const connections          = useMapStore((s) => s.map.connections);

@@ -545,7 +545,8 @@
     "routeIncludeTurnur": "包含 Turnur 连接",
     "routeIncludeWormholes": "包含虫洞链",
     "routeShortcutNote": "使用虫洞、Thera、Turnur 或跳跃门的路线无法设为游戏内目的地或途经点——右键点击路线中的已知空间星系以前往该处。",
-    "routeIncludeAnsiblex": "包含 Ansiblex 跳跃门"
+    "routeIncludeAnsiblex": "包含 Ansiblex 跳跃门",
+    "showUndivedWhs": "显示未跳跃虫洞"
   },
   "customIntel": {
     "title": "自定义情报",
@@ -563,7 +564,9 @@
     "namePlaceholder": "地点名称包含…",
     "matchCount_one": "{{count}} 个星系匹配",
     "matchCount_other": "{{count}} 个星系匹配",
-    "clear": "清除筛选"
+    "clear": "清除筛选",
+    "holes": "虫洞",
+    "undivedWh": "未跳跃虫洞"
   },
   "watchMarker": {
     "target": "目标",
@@ -1539,7 +1542,9 @@
     "suppressed": "已镇压",
     "scoutConnections_one": "{{name}} 连接",
     "scoutConnections_other": "{{name}} 连接",
-    "scoutConnectionsMulti": "{{names}} 连接"
+    "scoutConnectionsMulti": "{{names}} 连接",
+    "undivedWhTitle": "已扫描但未跳跃的虫洞",
+    "undivedUnknown": "未知"
   },
   "mapEdge": {
     "lessThan24h": "< 24h",
