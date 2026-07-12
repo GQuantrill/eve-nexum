@@ -2067,7 +2067,18 @@ mapsRouter.patch('/:mapId/connections/:connectionId', async (req, res) => {
     sourceSignatureId: 'source_signature_id', targetSignatureId: 'target_signature_id',
   };
 
-  const updates = req.body as Record<string, unknown>;
+  const updates: Record<string, unknown> = { ...(req.body as Record<string, unknown>) };
+
+  // The stored size should follow the hole type. When the wormhole type is set
+  // without an explicit size — wormhole auto-detect and external API writes both
+  // send `type` alone — derive the nominal size class from the type so a Q003 is
+  // stored as 'small' instead of the 'large' insert-time default. An explicit
+  // client size (e.g. a manual override) is always respected.
+  if ('type' in updates && !('size' in updates)) {
+    const derived = await whSizeForCode(updates.type as string | null);
+    if (derived) updates.size = derived;
+  }
+
   const sets: string[] = [];
   const vals: unknown[] = [];
 
