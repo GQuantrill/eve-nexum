@@ -487,13 +487,13 @@ function whTypeAllows(list: string[], code: string): boolean {
 function maybeBroadcastConnection(meta: MapMeta, mapId: string, connId: string, actor: string | null): void {
   if (!hasOrg(meta)) return; // personal map — never notifies
   db.query<{
-    sourceId: string; targetId: string; connType: string; notified: boolean; size: string | null; whType: string | null;
+    sourceId: string; targetId: string; connType: string; notified: boolean; notifiedKnown: boolean; size: string | null; whType: string | null;
     a: string; b: string; classA: string; classB: string; regionA: string | null; regionB: string | null;
     mapName: string; mapEnabled: boolean; allRegions: boolean; regions: string[];
     whTypes: string[]; whClasses: string[]; whSizes: string[]; connectionsWebhook: string | null;
   }>(
     `SELECT c.source_id AS "sourceId", c.target_id AS "targetId", c.connection_type AS "connType",
-            c.discord_notified AS "notified", c.size, c.wh_type AS "whType",
+            c.discord_notified AS "notified", c.discord_notified_known AS "notifiedKnown", c.size, c.wh_type AS "whType",
             a.name AS a, b.name AS b, a.system_class AS "classA", b.system_class AS "classB",
             a.region_name AS "regionA", b.region_name AS "regionB",
             m.name AS "mapName", m.discord_notify AS "mapEnabled",
@@ -511,7 +511,10 @@ function maybeBroadcastConnection(meta: MapMeta, mapId: string, connId: string, 
   ).then(async ({ rows }) => {
     const r = rows[0];
     if (!r) { discordLog.warn(`connection dispatch: connection ${connId} not found`); return; }
-    if (r.notified) return; // already broadcast — never repeat
+    // Broadcast at most twice: once when the hole is first confirmed (even as an
+    // unknown K162), then once more when its real type becomes known. Once we've
+    // announced a known type, never again.
+    if (r.notified && r.notifiedKnown) return;
     if (r.connType !== 'standard') return; // gate / Ansiblex / jump-bridge
     if (!r.connectionsWebhook) { discordLog.info(`connection ${r.a} <-> ${r.b} suppressed — no connections webhook configured`); return; }
     if (!r.mapEnabled) {
@@ -530,6 +533,13 @@ function maybeBroadcastConnection(meta: MapMeta, mapId: string, connId: string, 
       discordLog.info(`connection ${r.a} <-> ${r.b} not broadcast yet — no wormhole signature backs it (gate/bridge, or sig not scanned)`);
       return;
     }
+    // The resolved hole type and whether we actually know it. A bare K162 (or no
+    // code) is "unknown" — its size can't be derived and it may upgrade later.
+    const code = (ev.whType || r.whType || '').toUpperCase();
+    const known = code !== '' && code !== 'K162';
+    // Already announced this hole and its type is still unknown — wait for a real
+    // code before pinging again.
+    if (r.notified && !known) return;
     // Wormhole filters (dest class = the "to" end; size from the type).
     if (!whTypeAllows(r.whTypes, ev.whType)) {
       discordLog.info(`connection ${r.a} <-> ${r.b} suppressed — hole type "${ev.whType || '?'}" not in the org's type filter`);
@@ -542,19 +552,24 @@ function maybeBroadcastConnection(meta: MapMeta, mapId: string, connId: string, 
       discordLog.info(`connection ${r.a} <-> ${r.b} suppressed — dest class "${destClass}" not in the org's class filter`);
       return;
     }
-    // Size: derive from the backing wormhole type (Q003 -> small); fall back to
-    // the stored connection size, then 'large', when the type is unknown.
-    const effSize = (await whSizeForCode(ev.whType || r.whType)) ?? r.size ?? 'large';
-    if (!whListAllows(r.whSizes, effSize)) {
+    // Size is derivable only once the type is known (Q003 -> small). A K162 has
+    // no known size — show none rather than a misleading default, and fail the
+    // size filter open so an unknown hole isn't hidden by it.
+    const effSize = known ? ((await whSizeForCode(code)) ?? r.size ?? 'large') : null;
+    if (effSize && !whListAllows(r.whSizes, effSize)) {
       discordLog.info(`connection ${r.a} <-> ${r.b} suppressed — size "${effSize}" not in the org's size filter`);
       return;
     }
-    // Claim the send atomically: only the query that flips the flag from false
-    // actually posts, so concurrent triggers (create + a near-simultaneous type
-    // PATCH) can't double-broadcast.
+    // Claim the send atomically: the first broadcast (discord_notified false→true)
+    // or the one-time upgrade when the type becomes known (discord_notified_known
+    // false→true). Only the row update that actually transitions posts, so
+    // concurrent triggers can't double-broadcast the same step.
     const claim = await db.query(
-      `UPDATE map_connections SET discord_notified = TRUE WHERE id = $1 AND discord_notified = FALSE`, [connId]);
-    if (claim.rowCount === 0) return; // someone else already claimed it
+      `UPDATE map_connections
+          SET discord_notified = TRUE, discord_notified_known = discord_notified_known OR $2
+        WHERE id = $1 AND (discord_notified = FALSE OR (discord_notified_known = FALSE AND $2))`,
+      [connId, known]);
+    if (claim.rowCount === 0) return; // someone else already claimed this step
     notifyDiscord(r.connectionsWebhook, connectionEmbed({ a: r.a, b: r.b, whType: ev.whType || r.whType, size: effSize, mapName: r.mapName, actor }));
   }).catch((e) => discordLog.warn(`connection dispatch query failed: ${(e as Error).message}`));
 }

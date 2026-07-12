@@ -327,8 +327,14 @@ export async function migrate() {
         SELECT 1 FROM information_schema.columns
         WHERE table_name = 'map_connections' AND column_name = 'discord_notified'
       ) THEN
-        ALTER TABLE map_connections ADD COLUMN discord_notified BOOLEAN NOT NULL DEFAULT FALSE;
-        UPDATE map_connections SET discord_notified = TRUE;
+        -- discord_notified: broadcast at least once. discord_notified_known: the
+        -- broadcast carried a KNOWN wormhole type (not a bare K162) — lets a hole
+        -- first announced as an unknown K162 re-broadcast once when its real type
+        -- is scanned. Both TRUE for pre-existing connections so the current chain
+        -- isn't re-announced after deploy.
+        ALTER TABLE map_connections ADD COLUMN discord_notified       BOOLEAN NOT NULL DEFAULT FALSE;
+        ALTER TABLE map_connections ADD COLUMN discord_notified_known BOOLEAN NOT NULL DEFAULT FALSE;
+        UPDATE map_connections SET discord_notified = TRUE, discord_notified_known = TRUE;
       END IF;
     END $$;
 
