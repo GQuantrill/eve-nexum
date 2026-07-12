@@ -56,6 +56,14 @@ export async function maybeConfirmWhJump(ctx: WhJumpContext): Promise<void> {
     return;
   }
 
+  // Already accounted for: a wormhole sig here is pinned to exactly where we
+  // arrived, so this hole is solved and its connection's backing sig is (or will
+  // be) linked by the sig auto-detect. Don't fill a second hole or prompt — this
+  // is the "asked which sig on the way back even though one already leads home"
+  // case.
+  const arrived = toName.toUpperCase();
+  if (sigs.some((s) => s.sigType === 'wormhole' && (s.whLeadsTo || '').toUpperCase() === arrived)) return;
+
   // Eligible = known wormhole sigs not yet pinned to a system, whose class is
   // compatible with where we arrived. Unknowns (non-wormhole) are never touched.
   // Bail before the gate check when there's nothing to fill.
