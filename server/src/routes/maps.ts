@@ -336,6 +336,22 @@ const DISCORD_SETTINGS_COLS = `
   COALESCE(cds.connections_webhook, ads.connections_webhook)    AS "connectionsWebhook",
   COALESCE(cds.chains_webhook,      ads.chains_webhook)         AS "chainsWebhook"`;
 
+// leads-to tokens that are a class/band/unknown rather than a pinned system —
+// mirrors the client's CLASS_OR_UNKNOWN set. A leads-to NOT in here is a
+// specific connected system, i.e. the hole is resolved to a real destination.
+const LEADS_TO_NON_SYSTEM = new Set([
+  '', 'UNKNOWN',
+  'C1-C3', 'C4-C5', 'C6', 'C13', 'THERA', 'POCHVEN', 'DRIFTER',
+  'HS', 'LS', 'NS',
+  'C1', 'C2', 'C3', 'C4', 'C5',
+]);
+// True once a hole's leads-to names a specific destination system (not empty,
+// "unknown", or a class/band). Discord notifications fire only then — an
+// unknown/class-only hole is surfaced on the map instead, not broadcast.
+function leadsToIsSystem(leadsTo: string | null): boolean {
+  return !LEADS_TO_NON_SYSTEM.has((leadsTo ?? '').trim().toUpperCase());
+}
+
 // Re-read the signature now (after the defer window) and send if it's still a
 // K162, including the leads-to if one was set in the meantime.
 async function fireK162(sigId: string, actor: string | null): Promise<void> {
@@ -369,6 +385,10 @@ async function fireK162(sigId: string, actor: string | null): Promise<void> {
     }
     if (!regionAllowed(r.allRegions, r.regions, [r.region])) {
       discordLog.info(`K162 (sig ${sigId}) suppressed — region "${r.region ?? 'unknown'}" not in the org filter`);
+      return;
+    }
+    if (!leadsToIsSystem(r.leadsTo)) {
+      discordLog.info(`K162 (sig ${sigId}) suppressed — leads-to "${r.leadsTo ?? 'unknown'}" is not a specific destination system`);
       return;
     }
     notifyDiscord(r.connectionsWebhook, k162Embed({ system: r.system, systemClass: r.systemClass, leadsTo: r.leadsTo, mapName: r.mapName, actor }));
