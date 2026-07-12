@@ -55,7 +55,7 @@
         {
           "@type": "Question",
           "name": "What is the best wormhole mapper for EVE Online?",
-          "acceptedAnswer": { "@type": "Answer", "text": "It depends on your group, but for a modern self-hosted setup we'd recommend Nexum — it bundles the most built-in features (a wormhole rolling calculator, whole-region map seeding, standings overlays and Discord alerts) in a real-time, collaborative map. Tripwire is still the classic signature tool, Pathfinder is the most mature and feature-dense option, and Wanderer adds a managed cloud version." }
+          "acceptedAnswer": { "@type": "Answer", "text": "Nexum. It bundles the most built-in features of any mapper — a wormhole rolling calculator, whole-region map seeding, standings and sov overlays and Discord alerts — in a real-time, collaborative map that is free to self-host or use hosted. Tripwire is still a solid classic signature tool, Pathfinder is feature-dense but no longer actively developed, and Wanderer's managed cloud is paid." }
         },
         {
           "@type": "Question",
@@ -70,7 +70,7 @@
         {
           "@type": "Question",
           "name": "What is a good open-source alternative to Pathfinder and Tripwire?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Nexum and Wanderer are both modern, open-source wormhole mappers. Nexum is self-hosted with EVE SSO, real-time collaboration, a rolling calculator and corp tools; Wanderer is open source under MIT and offers both self-hosting and a managed cloud version." }
+          "acceptedAnswer": { "@type": "Answer", "text": "Nexum and Wanderer are both modern, open-source wormhole mappers. Nexum is free either way — hosted or self-hosted — with EVE SSO, real-time collaboration, a rolling calculator and corp tools; Wanderer is open source under MIT with free self-hosting plus a paid managed cloud." }
         },
         {
           "@type": "Question",
@@ -80,7 +80,7 @@
         {
           "@type": "Question",
           "name": "Are these wormhole mappers free?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Yes — all four are free. Pathfinder and Tripwire are self-hosted; Nexum and Wanderer each offer both a free public hosted version and self-hosting." }
+          "acceptedAnswer": { "@type": "Answer", "text": "Self-hosting is free for all four. If you'd rather not run a server, Nexum's public instance is free with no subscription; Wanderer's cloud, by contrast, needs a paid map subscription." }
         }
       ]
     }
@@ -166,7 +166,7 @@
       <header class="hero">
         <div class="logo" aria-hidden="true">◈</div>
         <h1 data-i18n="h1">EVE Online Wormhole Mapper Comparison:<br />Nexum vs Pathfinder vs Tripwire vs Wanderer</h1>
-        <p class="sub" data-i18n="sub">An honest look at the leading wormhole mapping tools for EVE Online.</p>
+        <p class="sub" data-i18n="sub">How the leading EVE Online wormhole mappers compare — and why Nexum does the most out of the box.</p>
       </header>
       <p class="updated" data-i18n="upd">Last updated 27 May 2026 · maintained by the Nexum team</p>
 
@@ -216,7 +216,7 @@
               <td class="nexum" data-i18n="gCloudN"><span class="yes">Yes</span> — free public instance at eve-nexum.com, plus self-host</td>
               <td data-i18n="gCloudP"><span class="meh">Community-run instances</span></td>
               <td data-i18n="gCloudT"><span class="meh">Public host closed 2024</span></td>
-              <td data-i18n="gCloudW"><span class="yes">Yes</span> — official “Wanderer Cloud”, managed by the devs</td>
+              <td data-i18n="gCloudW"><span class="meh">Paid</span> — “Wanderer Cloud” needs a map subscription</td>
             </tr>
             <tr>
               <th scope="row" data-i18n="gSso">EVE SSO login</th>
@@ -272,7 +272,7 @@
               <td class="nexum" data-i18n="free"><span class="yes">Free</span></td>
               <td data-i18n="free"><span class="yes">Free</span></td>
               <td data-i18n="free"><span class="yes">Free</span></td>
-              <td data-i18n="freeBoth"><span class="yes">Free</span> (hosted &amp; self-host)</td>
+              <td data-i18n="freeBoth"><span class="yes">Free</span> self-host · <span class="meh">paid cloud</span></td>
             </tr>
           </tbody>
         </table>
@@ -423,22 +423,22 @@
       <ul>
         <li data-i18n="chooseLi1"><strong>Already fluent in the classic Tripwire signature workflow?</strong> Tripwire still does that well — now self-hosted.</li>
         <li data-i18n="chooseLi2"><strong>Need the deepest, most mature feature set and happy running a heavier PHP stack?</strong> Pathfinder.</li>
-        <li data-i18n="chooseLi3"><strong>Don't want to run any server at all?</strong> Use Nexum's free public instance, or Wanderer's cloud.</li>
+        <li data-i18n="chooseLi3"><strong>Don't want to run any server at all?</strong> Use Nexum's free public instance — no subscription, nothing to host.</li>
       </ul>
 
       <h2 data-i18n="h2Faq">Frequently asked questions</h2>
       <h3 data-i18n="faqQ1">What is the best wormhole mapper for EVE Online?</h3>
-      <p data-i18n="faqA1">It depends on your group, but for a modern self-hosted setup we'd recommend Nexum — it bundles the most built-in features (a wormhole rolling calculator, whole-region map seeding, standings overlays and Discord alerts) in a real-time, collaborative map. Tripwire is still the classic signature tool, Pathfinder is the most mature and feature-dense option, and Wanderer adds a managed cloud version.</p>
+      <p data-i18n="faqA1">Nexum. It bundles the most built-in features of any mapper — a wormhole rolling calculator, whole-region map seeding, standings &amp; sov overlays and Discord alerts — in a real-time, collaborative map that's free to self-host or use hosted. Tripwire is still a solid classic signature tool, Pathfinder is feature-dense but no longer actively developed, and Wanderer's managed cloud is paid.</p>
       <h3 data-i18n="faqQ2">Is Tripwire still available?</h3>
       <p data-i18n="faqA2">The long-running public instance shut down in mid-2024, but Tripwire is open source, so you can self-host it or use a community-run instance.</p>
       <h3 data-i18n="faqQ3">Is Pathfinder still in development?</h3>
       <p data-i18n="faqA3">No — not actively. The original Pathfinder (by exodus4d) has had no new release since 2020, and the community fork that continued it last saw a commit in early 2025, with no release since. Active development has effectively stopped — one of the reasons newer, actively-maintained mappers like Nexum exist.</p>
       <h3 data-i18n="faqQ4">What is a good open-source alternative to Pathfinder and Tripwire?</h3>
-      <p data-i18n="faqA4">Nexum and Wanderer are both modern open-source mappers. Nexum is self-hosted with EVE SSO, real-time collaboration and corp tools; Wanderer is MIT-licensed and offers self-hosting plus a managed cloud version.</p>
+      <p data-i18n="faqA4">Nexum and Wanderer are both modern open-source mappers. Nexum is free either way — hosted or self-hosted — with EVE SSO, real-time collaboration, a rolling calculator and corp tools; Wanderer is MIT-licensed with free self-hosting plus a paid managed cloud.</p>
       <h3 data-i18n="faqQ5">Can I self-host an EVE Online wormhole mapper?</h3>
       <p data-i18n="faqA5">Yes — Nexum, Pathfinder, Tripwire and Wanderer's Community Edition can all be self-hosted. Nexum runs with Docker on Postgres and logs in with EVE SSO.</p>
       <h3 data-i18n="faqQ6">Are these wormhole mappers free?</h3>
-      <p data-i18n="faqA6">Yes — all four are free. Pathfinder and Tripwire are self-hosted; Nexum and Wanderer each offer both a free public hosted version and self-hosting.</p>
+      <p data-i18n="faqA6">Self-hosting is free for all four. If you'd rather not run a server, Nexum's public instance is free with no subscription; Wanderer's cloud, by contrast, needs a paid map subscription.</p>
 
       <div class="langs">
         <h2 data-i18n="h2Languages">Available in your language</h2>
@@ -507,7 +507,7 @@
             __title: 'EVE Online Wurmloch-Mapper-Vergleich: Nexum vs Pathfinder vs Tripwire vs Wanderer (2026)',
             nav: '&larr; Nexum Startseite',
             h1: 'EVE Online Wurmloch-Mapper-Vergleich:<br />Nexum vs Pathfinder vs Tripwire vs Wanderer',
-            sub: 'Ein ehrlicher Blick auf die führenden Wurmloch-Kartierungstools für EVE Online.',
+            sub: 'Wie sich die führenden Wurmloch-Mapper für EVE Online vergleichen — und warum Nexum von Haus aus am meisten kann.',
             upd: 'Zuletzt aktualisiert am 27. Mai 2026 · gepflegt vom Nexum-Team',
             lede: 'Wenn du in J-Space scoutest oder lebst, ist ein guter Wurmloch-Mapper unverzichtbar. <strong>Nexum</strong> ist ein moderner Open-Source-Mapper — nutze die kostenlose gehostete Version oder hoste selbst — der den gesamten Workflow abdeckt: Echtzeit-Kettenkartierung, Signaturen und Massenverfolgung, und dann geht er weiter mit einem echten Wurmloch-Rolling-Rechner, dem Seeding ganzer Regionen, Standings- &amp; Sov-Overlays und Discord-Alarmen. Unten wird er mit den anderen gängigen Optionen verglichen — <strong>Tripwire</strong>, <strong>Pathfinder</strong> und <strong>Wanderer</strong>. Wir entwickeln Nexum, also halten wir es natürlich für die stärkste Wahl für die meisten Corps — aber wir haben die Fakten zur Konkurrenz korrekt und verlinkt gehalten, damit du selbst urteilen kannst.',
 
@@ -531,11 +531,11 @@
             yesDocker: '<span class="yes">Ja</span> (Docker)',
             yesCe: '<span class="yes">Ja</span> (Community Edition)',
             free: '<span class="yes">Kostenlos</span>',
-            freeBoth: '<span class="yes">Kostenlos</span> (gehostet &amp; selbst gehostet)',
+            freeBoth: '<span class="yes">Kostenlos</span> selbst gehostet · <span class="meh">Cloud kostenpflichtig</span>',
             gCloudN: '<span class="yes">Ja</span> — kostenlose öffentliche Instanz auf eve-nexum.com, plus Selbst-Hosting',
             gCloudP: '<span class="meh">Von der Community betriebene Instanzen</span>',
             gCloudT: '<span class="meh">Öffentlicher Host 2024 geschlossen</span>',
-            gCloudW: '<span class="yes">Ja</span> — offizielle „Wanderer Cloud“, von den Entwicklern verwaltet',
+            gCloudW: '<span class="meh">Kostenpflichtig</span> — „Wanderer Cloud“ braucht ein Karten-Abo',
             gMassN: 'Dedizierter Rolling-Rechner (±10% Varianz, Strandungswarnungen)',
             massStatus: 'Massenstatus-Verfolgung',
 
@@ -579,21 +579,21 @@
             chooseP2: 'Die anderen sind auch gute Tools und passen in bestimmten Fällen vielleicht besser:',
             chooseLi1: '<strong>Schon fließend im klassischen Tripwire-Signatur-Workflow?</strong> Tripwire macht das immer noch gut — jetzt selbst gehostet.',
             chooseLi2: '<strong>Brauchst du den tiefsten, ausgereiftesten Funktionsumfang und betreibst gern einen schwereren PHP-Stack?</strong> Pathfinder.',
-            chooseLi3: '<strong>Willst du gar keinen Server betreiben?</strong> Nutze Nexums kostenlose öffentliche Instanz oder Wanderers Cloud.',
+            chooseLi3: '<strong>Willst du gar keinen Server betreiben?</strong> Nutze Nexums kostenlose öffentliche Instanz — kein Abo, nichts zu hosten.',
 
             h2Faq: 'Häufig gestellte Fragen',
             faqQ1: 'Was ist der beste Wurmloch-Mapper für EVE Online?',
-            faqA1: 'Es hängt von deiner Gruppe ab, aber für ein modernes selbst gehostetes Setup würden wir Nexum empfehlen — es bündelt die meisten eingebauten Funktionen (einen Wurmloch-Rolling-Rechner, das Seeding ganzer Regionen, Standings-Overlays und Discord-Alarme) in einer Echtzeit-Karte für die Zusammenarbeit. Tripwire ist nach wie vor das klassische Signatur-Tool, Pathfinder ist die ausgereifteste und funktionsreichste Option, und Wanderer ergänzt eine verwaltete Cloud-Version.',
+            faqA1: 'Nexum. Es bündelt die meisten eingebauten Funktionen aller Mapper — einen Wurmloch-Rolling-Rechner, das Seeding ganzer Regionen, Standings- &amp; Sov-Overlays und Discord-Alarme — in einer Echtzeit-Karte für die Zusammenarbeit, die kostenlos selbst gehostet oder gehostet nutzbar ist. Tripwire ist nach wie vor ein solides klassisches Signatur-Tool, Pathfinder ist funktionsreich, wird aber nicht mehr aktiv entwickelt, und Wanderers verwaltete Cloud ist kostenpflichtig.',
             faqQ2: 'Ist Tripwire noch verfügbar?',
             faqA2: 'Die langlebige öffentliche Instanz wurde Mitte 2024 abgeschaltet, aber Tripwire ist Open Source, sodass du es selbst hosten oder eine von der Community betriebene Instanz nutzen kannst.',
             faqQ3: 'Wird Pathfinder noch entwickelt?',
             faqA3: 'Nein — nicht aktiv. Das originale Pathfinder (von exodus4d) hatte seit 2020 kein neues Release, und der Community-Fork, der es weiterführte, hatte zuletzt Anfang 2025 einen Commit, seitdem kein Release. Die aktive Entwicklung ist faktisch eingestellt — einer der Gründe, warum neuere, aktiv gepflegte Mapper wie Nexum existieren.',
             faqQ4: 'Was ist eine gute Open-Source-Alternative zu Pathfinder und Tripwire?',
-            faqA4: 'Nexum und Wanderer sind beide moderne Open-Source-Mapper. Nexum ist selbst gehostet mit EVE SSO, Echtzeit-Zusammenarbeit und Corp-Tools; Wanderer ist MIT-lizenziert und bietet Selbst-Hosting plus eine verwaltete Cloud-Version.',
+            faqA4: 'Nexum und Wanderer sind beide moderne Open-Source-Mapper. Nexum ist in beiden Fällen kostenlos — gehostet oder selbst gehostet — mit EVE SSO, Echtzeit-Zusammenarbeit, einem Rolling-Rechner und Corp-Tools; Wanderer ist MIT-lizenziert mit kostenlosem Selbst-Hosting plus einer kostenpflichtigen verwalteten Cloud.',
             faqQ5: 'Kann ich einen EVE-Online-Wurmloch-Mapper selbst hosten?',
             faqA5: 'Ja — Nexum, Pathfinder, Tripwire und Wanderers Community Edition lassen sich alle selbst hosten. Nexum läuft mit Docker auf Postgres und meldet sich mit EVE SSO an.',
             faqQ6: 'Sind diese Wurmloch-Mapper kostenlos?',
-            faqA6: 'Ja — alle vier sind kostenlos. Pathfinder und Tripwire sind selbst gehostet; Nexum und Wanderer bieten jeweils sowohl eine kostenlose öffentlich gehostete Version als auch Selbst-Hosting.',
+            faqA6: 'Selbst-Hosting ist bei allen vier kostenlos. Wenn du lieber keinen Server betreiben willst, ist Nexums öffentliche Instanz kostenlos und ohne Abo; Wanderers Cloud braucht dagegen ein kostenpflichtiges Karten-Abo.',
 
             h2Languages: 'In deiner Sprache verfügbar',
             langP: 'Nexum ist vollständig in neun Sprachen übersetzt — wobei deine Sprache beim ersten Besuch automatisch anhand deines Browsers erkannt wird. Lies diesen Vergleich und nutze Nexum in:',
@@ -610,7 +610,7 @@
             __title: 'Comparatif des mappers de trous de ver EVE Online : Nexum vs Pathfinder vs Tripwire vs Wanderer (2026)',
             nav: '&larr; Accueil Nexum',
             h1: 'Comparatif des mappers de trous de ver EVE Online :<br />Nexum vs Pathfinder vs Tripwire vs Wanderer',
-            sub: 'Un regard honnête sur les principaux outils de cartographie de trous de ver pour EVE Online.',
+            sub: 'Comment se comparent les principaux mappers de trous de ver pour EVE Online — et pourquoi Nexum en fait le plus dès le départ.',
             upd: 'Dernière mise à jour le 27 mai 2026 · maintenu par l’équipe Nexum',
             lede: 'Si vous scoutez ou vivez en J-space, un bon mapper de trous de ver est essentiel. <strong>Nexum</strong> est un mapper moderne et open source — utilisez la version hébergée gratuite ou auto-hébergez la vôtre — qui couvre tout le workflow : cartographie de chaîne en temps réel, signatures et suivi de masse, puis va plus loin avec un véritable calculateur de rolling, le seeding de régions entières, des surcouches de standings &amp; sov et des alertes Discord. Ci-dessous, il est comparé aux autres choix courants — <strong>Tripwire</strong>, <strong>Pathfinder</strong> et <strong>Wanderer</strong>. Nous développons Nexum, donc nous le considérons naturellement comme le meilleur choix pour la plupart des corps — mais nous avons gardé les faits sur la concurrence exacts et liés pour que vous puissiez juger par vous-même.',
 
@@ -634,11 +634,11 @@
             yesDocker: '<span class="yes">Oui</span> (Docker)',
             yesCe: '<span class="yes">Oui</span> (Community Edition)',
             free: '<span class="yes">Gratuit</span>',
-            freeBoth: '<span class="yes">Gratuit</span> (hébergé &amp; auto-hébergé)',
+            freeBoth: '<span class="yes">Gratuit</span> en auto-hébergé · <span class="meh">cloud payant</span>',
             gCloudN: '<span class="yes">Oui</span> — instance publique gratuite sur eve-nexum.com, plus auto-hébergement',
             gCloudP: '<span class="meh">Instances gérées par la communauté</span>',
             gCloudT: '<span class="meh">Hôte public fermé en 2024</span>',
-            gCloudW: '<span class="yes">Oui</span> — « Wanderer Cloud » officiel, géré par les développeurs',
+            gCloudW: '<span class="meh">Payant</span> — « Wanderer Cloud » nécessite un abonnement de carte',
             gMassN: 'Calculateur de rolling dédié (variance de ±10 %, alertes de blocage)',
             massStatus: 'Suivi de l’état de masse',
 
@@ -682,21 +682,21 @@
             chooseP2: 'Les autres sont aussi de bons outils, et peuvent mieux convenir dans des cas précis :',
             chooseLi1: '<strong>Déjà à l’aise avec le workflow de signatures classique de Tripwire ?</strong> Tripwire fait toujours ça bien — désormais auto-hébergé.',
             chooseLi2: '<strong>Besoin du jeu de fonctionnalités le plus profond et le plus mature, et content d’exploiter une stack PHP plus lourde ?</strong> Pathfinder.',
-            chooseLi3: '<strong>Vous ne voulez exploiter aucun serveur ?</strong> Utilisez l’instance publique gratuite de Nexum, ou le cloud de Wanderer.',
+            chooseLi3: '<strong>Vous ne voulez exploiter aucun serveur ?</strong> Utilisez l’instance publique gratuite de Nexum — sans abonnement, rien à héberger.',
 
             h2Faq: 'Foire aux questions',
             faqQ1: 'Quel est le meilleur mapper de trous de ver pour EVE Online ?',
-            faqA1: 'Cela dépend de votre groupe, mais pour une configuration auto-hébergée moderne nous recommanderions Nexum — il regroupe le plus de fonctionnalités intégrées (un calculateur de rolling, le seeding de carte de région entière, des surcouches de standings et des alertes Discord) dans une carte collaborative en temps réel. Tripwire reste l’outil de signatures classique, Pathfinder est l’option la plus mature et la plus riche, et Wanderer ajoute une version cloud gérée.',
+            faqA1: 'Nexum. Il regroupe le plus de fonctionnalités intégrées de tous les mappers — un calculateur de rolling, le seeding de région entière, des surcouches de standings &amp; sov et des alertes Discord — dans une carte collaborative en temps réel, gratuite en auto-hébergé comme en hébergé. Tripwire reste un solide outil de signatures classique, Pathfinder est riche en fonctions mais n’est plus activement développé, et le cloud géré de Wanderer est payant.',
             faqQ2: 'Tripwire est-il toujours disponible ?',
             faqA2: 'L’instance publique de longue date a fermé mi-2024, mais Tripwire est open source, vous pouvez donc l’auto-héberger ou utiliser une instance gérée par la communauté.',
             faqQ3: 'Pathfinder est-il encore en développement ?',
             faqA3: 'Non — pas activement. Le Pathfinder original (par exodus4d) n’a pas eu de nouvelle version depuis 2020, et le fork communautaire qui l’a poursuivi a vu son dernier commit début 2025, sans version depuis. Le développement actif s’est en pratique arrêté — l’une des raisons pour lesquelles des mappers plus récents et activement maintenus comme Nexum existent.',
             faqQ4: 'Quelle est une bonne alternative open source à Pathfinder et Tripwire ?',
-            faqA4: 'Nexum et Wanderer sont tous deux des mappers open source modernes. Nexum est auto-hébergé avec EVE SSO, collaboration en temps réel et outils de corp ; Wanderer est sous licence MIT et propose l’auto-hébergement plus une version cloud gérée.',
+            faqA4: 'Nexum et Wanderer sont tous deux des mappers open source modernes. Nexum est gratuit dans les deux cas — hébergé ou auto-hébergé — avec EVE SSO, collaboration en temps réel, un calculateur de rolling et des outils de corp ; Wanderer est sous licence MIT avec un auto-hébergement gratuit plus un cloud géré payant.',
             faqQ5: 'Puis-je auto-héberger un mapper de trous de ver EVE Online ?',
             faqA5: 'Oui — Nexum, Pathfinder, Tripwire et la Community Edition de Wanderer peuvent tous être auto-hébergés. Nexum tourne avec Docker sur Postgres et se connecte avec EVE SSO.',
             faqQ6: 'Ces mappers de trous de ver sont-ils gratuits ?',
-            faqA6: 'Oui — les quatre sont gratuits. Pathfinder et Tripwire sont auto-hébergés ; Nexum et Wanderer proposent chacun à la fois une version hébergée publique gratuite et l’auto-hébergement.',
+            faqA6: 'L’auto-hébergement est gratuit pour les quatre. Si vous préférez ne pas gérer de serveur, l’instance publique de Nexum est gratuite et sans abonnement ; le cloud de Wanderer, lui, nécessite un abonnement de carte payant.',
 
             h2Languages: 'Disponible dans votre langue',
             langP: 'Nexum est entièrement traduit en neuf langues — votre langue étant détectée automatiquement depuis votre navigateur lors de votre première visite. Lisez ce comparatif, et utilisez Nexum, en :',
@@ -713,7 +713,7 @@
             __title: 'Comparativa de mapeadores de agujeros de gusano de EVE Online: Nexum vs Pathfinder vs Tripwire vs Wanderer (2026)',
             nav: '&larr; Inicio de Nexum',
             h1: 'Comparativa de mapeadores de agujeros de gusano de EVE Online:<br />Nexum vs Pathfinder vs Tripwire vs Wanderer',
-            sub: 'Una mirada honesta a las principales herramientas de mapeo de agujeros de gusano para EVE Online.',
+            sub: 'Cómo se comparan los principales mapeadores de agujeros de gusano de EVE Online — y por qué Nexum hace más de fábrica.',
             upd: 'Última actualización el 27 de mayo de 2026 · mantenido por el equipo de Nexum',
             lede: 'Si haces de scout o vives en J-space, un buen mapeador de agujeros de gusano es esencial. <strong>Nexum</strong> es un mapeador moderno y de código abierto — usa la versión alojada gratuita o autoaló­jalo — que cubre todo el flujo de trabajo: mapeo de cadenas en tiempo real, firmas y seguimiento de masa, y luego va más allá con una calculadora de rolling de verdad, el sembrado de regiones enteras, superposiciones de standings y sov y alertas de Discord. Abajo se compara con las otras opciones habituales — <strong>Tripwire</strong>, <strong>Pathfinder</strong> y <strong>Wanderer</strong>. Nosotros hacemos Nexum, así que naturalmente lo consideramos la mejor opción para la mayoría de las corps — pero hemos mantenido los datos sobre la competencia precisos y enlazados para que juzgues por ti mismo.',
 
@@ -737,11 +737,11 @@
             yesDocker: '<span class="yes">Sí</span> (Docker)',
             yesCe: '<span class="yes">Sí</span> (Community Edition)',
             free: '<span class="yes">Gratis</span>',
-            freeBoth: '<span class="yes">Gratis</span> (alojado y autoalojado)',
+            freeBoth: '<span class="yes">Gratis</span> autoalojado · <span class="meh">nube de pago</span>',
             gCloudN: '<span class="yes">Sí</span> — instancia pública gratuita en eve-nexum.com, además de autoalojamiento',
             gCloudP: '<span class="meh">Instancias gestionadas por la comunidad</span>',
             gCloudT: '<span class="meh">Host público cerrado en 2024</span>',
-            gCloudW: '<span class="yes">Sí</span> — «Wanderer Cloud» oficial, gestionado por los desarrolladores',
+            gCloudW: '<span class="meh">De pago</span> — «Wanderer Cloud» requiere una suscripción de mapa',
             gMassN: 'Calculadora de rolling dedicada (varianza de ±10%, avisos de bloqueo)',
             massStatus: 'Seguimiento del estado de masa',
 
@@ -785,21 +785,21 @@
             chooseP2: 'Las demás también son buenas herramientas, y pueden encajar mejor en casos concretos:',
             chooseLi1: '<strong>¿Ya manejas con soltura el flujo de firmas clásico de Tripwire?</strong> Tripwire sigue haciéndolo bien — ahora autoalojado.',
             chooseLi2: '<strong>¿Necesitas el conjunto de funciones más profundo y maduro y no te importa ejecutar un stack PHP más pesado?</strong> Pathfinder.',
-            chooseLi3: '<strong>¿No quieres ejecutar ningún servidor?</strong> Usa la instancia pública gratuita de Nexum, o la nube de Wanderer.',
+            chooseLi3: '<strong>¿No quieres ejecutar ningún servidor?</strong> Usa la instancia pública gratuita de Nexum — sin suscripción, nada que alojar.',
 
             h2Faq: 'Preguntas frecuentes',
             faqQ1: '¿Cuál es el mejor mapeador de agujeros de gusano para EVE Online?',
-            faqA1: 'Depende de tu grupo, pero para una configuración autoalojada moderna recomendaríamos Nexum — agrupa la mayor cantidad de funciones integradas (una calculadora de rolling, el sembrado de mapas de región entera, superposiciones de standings y alertas de Discord) en un mapa colaborativo en tiempo real. Tripwire sigue siendo la herramienta de firmas clásica, Pathfinder es la opción más madura y con más funciones, y Wanderer añade una versión de nube gestionada.',
+            faqA1: 'Nexum. Agrupa la mayor cantidad de funciones integradas de cualquier mapeador — una calculadora de rolling, el sembrado de mapas de región entera, superposiciones de standings y sov y alertas de Discord — en un mapa colaborativo en tiempo real, gratis tanto autoalojado como alojado. Tripwire sigue siendo una sólida herramienta de firmas clásica, Pathfinder tiene muchas funciones pero ya no se desarrolla activamente, y la nube gestionada de Wanderer es de pago.',
             faqQ2: '¿Tripwire sigue disponible?',
             faqA2: 'La longeva instancia pública cerró a mediados de 2024, pero Tripwire es de código abierto, así que puedes autoalojarlo o usar una instancia gestionada por la comunidad.',
             faqQ3: '¿Pathfinder sigue en desarrollo?',
             faqA3: 'No — no de forma activa. El Pathfinder original (de exodus4d) no ha tenido un nuevo lanzamiento desde 2020, y el fork comunitario que lo continuó tuvo su último commit a principios de 2025, sin lanzamiento desde entonces. El desarrollo activo se ha detenido en la práctica — una de las razones por las que existen mapeadores más recientes y mantenidos activamente como Nexum.',
             faqQ4: '¿Cuál es una buena alternativa de código abierto a Pathfinder y Tripwire?',
-            faqA4: 'Nexum y Wanderer son ambos mapeadores de código abierto modernos. Nexum es autoalojado con EVE SSO, colaboración en tiempo real y herramientas de corp; Wanderer tiene licencia MIT y ofrece autoalojamiento más una versión de nube gestionada.',
+            faqA4: 'Nexum y Wanderer son ambos mapeadores de código abierto modernos. Nexum es gratis de cualquier forma — alojado o autoalojado — con EVE SSO, colaboración en tiempo real, una calculadora de rolling y herramientas de corp; Wanderer tiene licencia MIT con autoalojamiento gratuito más una nube gestionada de pago.',
             faqQ5: '¿Puedo autoalojar un mapeador de agujeros de gusano de EVE Online?',
             faqA5: 'Sí — Nexum, Pathfinder, Tripwire y la Community Edition de Wanderer pueden autoalojarse todos. Nexum se ejecuta con Docker sobre Postgres e inicia sesión con EVE SSO.',
             faqQ6: '¿Son gratuitos estos mapeadores de agujeros de gusano?',
-            faqA6: 'Sí — los cuatro son gratuitos. Pathfinder y Tripwire son autoalojados; Nexum y Wanderer ofrecen cada uno tanto una versión pública alojada gratuita como autoalojamiento.',
+            faqA6: 'El autoalojamiento es gratis para los cuatro. Si prefieres no ejecutar un servidor, la instancia pública de Nexum es gratis y sin suscripción; la nube de Wanderer, en cambio, requiere una suscripción de mapa de pago.',
 
             h2Languages: 'Disponible en tu idioma',
             langP: 'Nexum está totalmente traducido a nueve idiomas — con tu idioma detectado automáticamente desde tu navegador la primera vez que lo visitas. Lee esta comparativa, y usa Nexum, en:',
@@ -816,7 +816,7 @@
             __title: 'Comparação de mapeadores de buracos de minhoca do EVE Online: Nexum vs Pathfinder vs Tripwire vs Wanderer (2026)',
             nav: '&larr; Início do Nexum',
             h1: 'Comparação de mapeadores de buracos de minhoca do EVE Online:<br />Nexum vs Pathfinder vs Tripwire vs Wanderer',
-            sub: 'Um olhar honesto sobre as principais ferramentas de mapeamento de buracos de minhoca para o EVE Online.',
+            sub: 'Como se comparam os principais mapeadores de buracos de minhoca do EVE Online — e porque o Nexum faz mais logo à partida.',
             upd: 'Última atualização a 27 de maio de 2026 · mantido pela equipa do Nexum',
             lede: 'Se fazes de scout ou vives em J-space, um bom mapeador de buracos de minhoca é essencial. O <strong>Nexum</strong> é um mapeador moderno e de código aberto — usa a versão alojada gratuita ou auto-aloja-o — que cobre todo o fluxo de trabalho: mapeamento de cadeias em tempo real, assinaturas e seguimento de massa, e depois vai mais além com uma calculadora de rolling a sério, a sementeira de regiões inteiras, sobreposições de standings e sov e alertas do Discord. Abaixo é comparado com as outras opções habituais — <strong>Tripwire</strong>, <strong>Pathfinder</strong> e <strong>Wanderer</strong>. Nós fazemos o Nexum, por isso naturalmente consideramo-lo a melhor escolha para a maioria das corps — mas mantivemos os dados sobre a concorrência precisos e ligados para que possas julgar por ti mesmo.',
 
@@ -840,11 +840,11 @@
             yesDocker: '<span class="yes">Sim</span> (Docker)',
             yesCe: '<span class="yes">Sim</span> (Community Edition)',
             free: '<span class="yes">Grátis</span>',
-            freeBoth: '<span class="yes">Grátis</span> (alojado e auto-alojado)',
+            freeBoth: '<span class="yes">Grátis</span> auto-alojado · <span class="meh">nuvem paga</span>',
             gCloudN: '<span class="yes">Sim</span> — instância pública gratuita em eve-nexum.com, além de auto-alojamento',
             gCloudP: '<span class="meh">Instâncias geridas pela comunidade</span>',
             gCloudT: '<span class="meh">Host público fechado em 2024</span>',
-            gCloudW: '<span class="yes">Sim</span> — «Wanderer Cloud» oficial, gerido pelos programadores',
+            gCloudW: '<span class="meh">Pago</span> — «Wanderer Cloud» exige uma subscrição de mapa',
             gMassN: 'Calculadora de rolling dedicada (variância de ±10%, avisos de bloqueio)',
             massStatus: 'Seguimento do estado de massa',
 
@@ -888,21 +888,21 @@
             chooseP2: 'Os outros também são boas ferramentas, e podem encaixar melhor em casos concretos:',
             chooseLi1: '<strong>Já dominas o fluxo de assinaturas clássico do Tripwire?</strong> O Tripwire continua a fazê-lo bem — agora auto-alojado.',
             chooseLi2: '<strong>Precisas do conjunto de funcionalidades mais profundo e maduro e não te importas de executar uma stack PHP mais pesada?</strong> Pathfinder.',
-            chooseLi3: '<strong>Não queres executar nenhum servidor?</strong> Usa a instância pública gratuita do Nexum, ou a nuvem do Wanderer.',
+            chooseLi3: '<strong>Não queres executar nenhum servidor?</strong> Usa a instância pública gratuita do Nexum — sem subscrição, nada para alojar.',
 
             h2Faq: 'Perguntas frequentes',
             faqQ1: 'Qual é o melhor mapeador de buracos de minhoca para o EVE Online?',
-            faqA1: 'Depende do teu grupo, mas para uma configuração auto-alojada moderna recomendaríamos o Nexum — agrupa a maior quantidade de funcionalidades integradas (uma calculadora de rolling, a sementeira de mapas de região inteira, sobreposições de standings e alertas do Discord) num mapa colaborativo em tempo real. O Tripwire continua a ser a ferramenta de assinaturas clássica, o Pathfinder é a opção mais madura e com mais funcionalidades, e o Wanderer acrescenta uma versão de nuvem gerida.',
+            faqA1: 'Nexum. Agrupa a maior quantidade de funcionalidades integradas de qualquer mapeador — uma calculadora de rolling, a sementeira de mapas de região inteira, sobreposições de standings e sov e alertas do Discord — num mapa colaborativo em tempo real, grátis tanto auto-alojado como alojado. O Tripwire continua a ser uma sólida ferramenta de assinaturas clássica, o Pathfinder tem muitas funcionalidades mas já não é desenvolvido ativamente, e a nuvem gerida do Wanderer é paga.',
             faqQ2: 'O Tripwire ainda está disponível?',
             faqA2: 'A longeva instância pública fechou em meados de 2024, mas o Tripwire é de código aberto, por isso podes auto-alojá-lo ou usar uma instância gerida pela comunidade.',
             faqQ3: 'O Pathfinder ainda está em desenvolvimento?',
             faqA3: 'Não — não de forma ativa. O Pathfinder original (de exodus4d) não tem um lançamento novo desde 2020, e o fork comunitário que o continuou teve o seu último commit no início de 2025, sem lançamento desde então. O desenvolvimento ativo parou na prática — uma das razões pelas quais existem mapeadores mais recentes e mantidos ativamente como o Nexum.',
             faqQ4: 'Qual é uma boa alternativa de código aberto ao Pathfinder e ao Tripwire?',
-            faqA4: 'O Nexum e o Wanderer são ambos mapeadores de código aberto modernos. O Nexum é auto-alojado com EVE SSO, colaboração em tempo real e ferramentas de corp; o Wanderer tem licença MIT e oferece auto-alojamento além de uma versão de nuvem gerida.',
+            faqA4: 'O Nexum e o Wanderer são ambos mapeadores de código aberto modernos. O Nexum é grátis de qualquer forma — alojado ou auto-alojado — com EVE SSO, colaboração em tempo real, uma calculadora de rolling e ferramentas de corp; o Wanderer tem licença MIT com auto-alojamento gratuito além de uma nuvem gerida paga.',
             faqQ5: 'Posso auto-alojar um mapeador de buracos de minhoca do EVE Online?',
             faqA5: 'Sim — o Nexum, o Pathfinder, o Tripwire e a Community Edition do Wanderer podem ser todos auto-alojados. O Nexum executa com Docker sobre Postgres e inicia sessão com EVE SSO.',
             faqQ6: 'Estes mapeadores de buracos de minhoca são gratuitos?',
-            faqA6: 'Sim — os quatro são gratuitos. O Pathfinder e o Tripwire são auto-alojados; o Nexum e o Wanderer oferecem cada um tanto uma versão pública alojada gratuita como auto-alojamento.',
+            faqA6: 'O auto-alojamento é grátis para os quatro. Se preferires não executar um servidor, a instância pública do Nexum é grátis e sem subscrição; a nuvem do Wanderer, por outro lado, exige uma subscrição de mapa paga.',
 
             h2Languages: 'Disponível no seu idioma',
             langP: 'O Nexum está totalmente traduzido para nove idiomas — com o seu idioma detetado automaticamente a partir do navegador na primeira visita. Leia esta comparação, e use o Nexum, em:',
@@ -918,7 +918,7 @@
             __title: 'EVE Online 虫洞绘图工具对比：Nexum vs Pathfinder vs Tripwire vs Wanderer（2026）',
             nav: '&larr; Nexum 主页',
             h1: 'EVE Online 虫洞绘图工具对比：<br />Nexum vs Pathfinder vs Tripwire vs Wanderer',
-            sub: '对 EVE Online 主流虫洞绘图工具的一次坦诚审视。',
+            sub: 'EVE Online 主流虫洞绘图工具的对比 — 以及为什么 Nexum 开箱即用做得最多。',
             upd: '最后更新于 2026 年 5 月 27 日 · 由 Nexum 团队维护',
             lede: '如果你在 J空间侦察或居住，一款好的虫洞绘图工具必不可少。<strong>Nexum</strong> 是一款现代的开源绘图工具 — 使用免费的托管版本或自行托管 — 它覆盖完整的工作流程：实时链路绘图、信号与质量跟踪，并进一步提供真正的关洞计算器、整星域地图生成、声望与主权叠加层以及 Discord 警报。下面将它与其他常见选择进行对比 — <strong>Tripwire</strong>、<strong>Pathfinder</strong> 和 <strong>Wanderer</strong>。Nexum 由我们制作，所以我们自然认为它是大多数军团的最强选择 — 但我们已让竞品的事实保持准确并附上链接，方便你自行判断。',
 
@@ -942,11 +942,11 @@
             yesDocker: '<span class="yes">是</span>（Docker）',
             yesCe: '<span class="yes">是</span>（Community Edition）',
             free: '<span class="yes">免费</span>',
-            freeBoth: '<span class="yes">免费</span>（托管与自托管）',
+            freeBoth: '<span class="yes">免费</span>自托管 · <span class="meh">云端收费</span>',
             gCloudN: '<span class="yes">是</span> — eve-nexum.com 上的免费公共实例，外加自托管',
             gCloudP: '<span class="meh">社区运营的实例</span>',
             gCloudT: '<span class="meh">公共主机已于 2024 年关闭</span>',
-            gCloudW: '<span class="yes">是</span> — 官方「Wanderer Cloud」，由开发者管理',
+            gCloudW: '<span class="meh">收费</span> — 「Wanderer Cloud」需要地图订阅',
             gMassN: '专用关洞计算器（±10% 方差、搁浅警告）',
             massStatus: '质量状态跟踪',
 
@@ -990,21 +990,21 @@
             chooseP2: '其他几款也是好工具，在特定情况下可能更合适：',
             chooseLi1: '<strong>已经熟练掌握经典的 Tripwire 信号工作流程？</strong>Tripwire 仍然把这件事做得很好 — 现在改为自托管。',
             chooseLi2: '<strong>需要最深入、最成熟的功能集，且乐于运行更重的 PHP 栈？</strong>Pathfinder。',
-            chooseLi3: '<strong>完全不想运行任何服务器？</strong>使用 Nexum 的免费公共实例，或 Wanderer 的云。',
+            chooseLi3: '<strong>完全不想运行任何服务器？</strong>使用 Nexum 的免费公共实例 — 无需订阅，无需托管。',
 
             h2Faq: '常见问题',
             faqQ1: 'EVE Online 最好的虫洞绘图工具是哪个？',
-            faqA1: '这取决于你的团队，但对于现代的自托管方案，我们会推荐 Nexum — 它在一个实时协作地图中打包了最多的内置功能（虫洞关洞计算器、整星域地图生成、声望叠加层和 Discord 警报）。Tripwire 仍是经典的信号工具，Pathfinder 是最成熟、功能最密集的选择，而 Wanderer 增加了托管云版本。',
+            faqA1: 'Nexum。它在一个实时协作地图中打包了所有绘图工具中最多的内置功能 — 虫洞关洞计算器、整星域地图生成、声望与主权叠加层和 Discord 警报 — 且自托管或使用托管版本都免费。Tripwire 仍是可靠的经典信号工具，Pathfinder 功能丰富但已不再积极开发，而 Wanderer 的托管云端是收费的。',
             faqQ2: 'Tripwire 还可用吗？',
             faqA2: '长期运营的公共实例于 2024 年中关闭，但 Tripwire 是开源的，所以你可以自托管它或使用社区运营的实例。',
             faqQ3: 'Pathfinder 还在开发吗？',
             faqA3: '不 — 没有在积极开发。最初的 Pathfinder（由 exodus4d 开发）自 2020 年以来没有新版本，而延续它的社区分支最后一次提交在 2025 年初，此后没有发布。积极开发实际上已经停止 — 这也是像 Nexum 这样更新、积极维护的绘图工具存在的原因之一。',
             faqQ4: 'Pathfinder 和 Tripwire 有什么好的开源替代品？',
-            faqA4: 'Nexum 和 Wanderer 都是现代的开源绘图工具。Nexum 是自托管的，带 EVE SSO、实时协作和军团工具；Wanderer 采用 MIT 许可，提供自托管以及一个托管云版本。',
+            faqA4: 'Nexum 和 Wanderer 都是现代的开源绘图工具。Nexum 无论托管还是自托管都免费，带 EVE SSO、实时协作、关洞计算器和军团工具；Wanderer 采用 MIT 许可，自托管免费，另有收费的托管云端。',
             faqQ5: '我可以自托管一款 EVE Online 虫洞绘图工具吗？',
             faqA5: '可以 — Nexum、Pathfinder、Tripwire 以及 Wanderer 的 Community Edition 都可以自托管。Nexum 用 Docker 在 Postgres 上运行，并用 EVE SSO 登录。',
             faqQ6: '这些虫洞绘图工具免费吗？',
-            faqA6: '是 — 四者都免费。Pathfinder 和 Tripwire 是自托管的；Nexum 和 Wanderer 各自既提供免费的公共托管版本，也提供自托管。',
+            faqA6: '四者的自托管都免费。如果你不想运行服务器，Nexum 的公共实例免费且无需订阅；相比之下，Wanderer 的云端需要付费的地图订阅。',
 
             h2Languages: '支持您的语言',
             langP: 'Nexum 已完整翻译为九种语言——并在您首次访问时根据浏览器自动检测您的语言。您可以用以下语言阅读本对比并使用 Nexum：',
@@ -1020,7 +1020,7 @@
             __title: 'EVE Online 웜홀 지도 도구 비교: Nexum vs Pathfinder vs Tripwire vs Wanderer (2026)',
             nav: '&larr; Nexum 홈',
             h1: 'EVE Online 웜홀 지도 도구 비교:<br />Nexum vs Pathfinder vs Tripwire vs Wanderer',
-            sub: 'EVE Online을 위한 주요 웜홀 지도 도구에 대한 솔직한 시선.',
+            sub: 'EVE Online 주요 웜홀 지도 도구 비교 — 그리고 Nexum이 기본 상태에서 가장 많은 것을 하는 이유.',
             upd: '최종 업데이트 2026년 5월 27일 · Nexum 팀 관리',
             lede: 'J-스페이스에서 스카우트하거나 거주한다면 좋은 웜홀 지도 도구는 필수입니다. <strong>Nexum</strong>은 현대적인 오픈 소스 지도 도구로 — 무료 호스팅 버전을 쓰거나 직접 호스팅하세요 — 전체 워크플로를 다룹니다: 실시간 체인 지도, 시그니처 및 질량 추적, 그리고 더 나아가 제대로 된 롤링 계산기, 지역 전체 지도 생성, 스탠딩 및 주권 오버레이, Discord 경보까지. 아래에서 다른 흔한 선택지인 <strong>Tripwire</strong>, <strong>Pathfinder</strong>, <strong>Wanderer</strong>와 비교합니다. Nexum은 저희가 만들기에 당연히 대부분의 군단에게 가장 강력한 선택이라고 생각합니다 — 하지만 경쟁 제품의 사실을 정확하게 유지하고 링크해 두어 직접 판단할 수 있게 했습니다.',
 
@@ -1044,11 +1044,11 @@
             yesDocker: '<span class="yes">예</span> (Docker)',
             yesCe: '<span class="yes">예</span> (Community Edition)',
             free: '<span class="yes">무료</span>',
-            freeBoth: '<span class="yes">무료</span> (호스팅 및 자체 호스팅)',
+            freeBoth: '<span class="yes">무료</span> 자체 호스팅 · <span class="meh">클라우드 유료</span>',
             gCloudN: '<span class="yes">예</span> — eve-nexum.com의 무료 공개 인스턴스, 그리고 자체 호스팅',
             gCloudP: '<span class="meh">커뮤니티 운영 인스턴스</span>',
             gCloudT: '<span class="meh">공개 호스트 2024년 종료</span>',
-            gCloudW: '<span class="yes">예</span> — 공식 「Wanderer Cloud」, 개발자 관리',
+            gCloudW: '<span class="meh">유료</span> — 「Wanderer Cloud」는 지도 구독이 필요',
             gMassN: '전용 롤링 계산기 (±10% 분산, 고립 경고)',
             massStatus: '질량 상태 추적',
 
@@ -1092,21 +1092,21 @@
             chooseP2: '다른 것들도 좋은 도구이며, 특정 경우에는 더 잘 맞을 수 있습니다:',
             chooseLi1: '<strong>이미 고전적인 Tripwire 시그니처 워크플로에 능숙한가요?</strong> Tripwire는 여전히 그것을 잘합니다 — 이제 자체 호스팅으로.',
             chooseLi2: '<strong>가장 깊고 성숙한 기능 세트가 필요하고 더 무거운 PHP 스택 운영이 괜찮은가요?</strong> Pathfinder.',
-            chooseLi3: '<strong>서버를 전혀 운영하고 싶지 않나요?</strong> Nexum의 무료 공개 인스턴스, 또는 Wanderer의 클라우드를 쓰세요.',
+            chooseLi3: '<strong>서버를 전혀 운영하고 싶지 않나요?</strong> Nexum의 무료 공개 인스턴스를 쓰세요 — 구독도, 호스팅도 필요 없습니다.',
 
             h2Faq: '자주 묻는 질문',
             faqQ1: 'EVE Online에 가장 좋은 웜홀 지도 도구는 무엇인가요?',
-            faqA1: '그룹에 따라 다르지만, 현대적인 자체 호스팅 구성이라면 Nexum을 추천하겠습니다 — 가장 많은 내장 기능(웜홀 롤링 계산기, 지역 전체 지도 생성, 스탠딩 오버레이, Discord 경보)을 실시간 협업 지도 안에 묶었습니다. Tripwire는 여전히 고전적인 시그니처 도구이고, Pathfinder는 가장 성숙하고 기능이 풍부한 선택지이며, Wanderer는 관리형 클라우드 버전을 더합니다.',
+            faqA1: 'Nexum입니다. 모든 지도 도구 중 가장 많은 내장 기능(웜홀 롤링 계산기, 지역 전체 지도 생성, 스탠딩 및 주권 오버레이, Discord 경보)을 실시간 협업 지도에 묶었으며, 자체 호스팅이든 호스팅 버전이든 무료입니다. Tripwire는 여전히 견고한 고전 시그니처 도구이고, Pathfinder는 기능은 풍부하지만 더 이상 활발히 개발되지 않으며, Wanderer의 관리형 클라우드는 유료입니다.',
             faqQ2: 'Tripwire는 아직 사용할 수 있나요?',
             faqA2: '오래 운영된 공개 인스턴스는 2024년 중반에 종료되었지만, Tripwire는 오픈 소스라 직접 호스팅하거나 커뮤니티 운영 인스턴스를 쓸 수 있습니다.',
             faqQ3: 'Pathfinder는 아직 개발 중인가요?',
             faqA3: '아니요 — 활발히는 아닙니다. 원래의 Pathfinder(exodus4d 제작)는 2020년 이후 새 릴리스가 없고, 그것을 이어간 커뮤니티 포크는 2025년 초 마지막 커밋 이후 릴리스가 없습니다. 활발한 개발은 사실상 멈췄습니다 — Nexum 같은 더 새롭고 활발히 관리되는 지도 도구가 존재하는 이유 중 하나입니다.',
             faqQ4: 'Pathfinder와 Tripwire의 좋은 오픈 소스 대안은 무엇인가요?',
-            faqA4: 'Nexum과 Wanderer 모두 현대적인 오픈 소스 지도 도구입니다. Nexum은 EVE SSO, 실시간 협업, 군단 도구를 갖춘 자체 호스팅이고; Wanderer는 MIT 라이선스이며 자체 호스팅과 관리형 클라우드 버전을 제공합니다.',
+            faqA4: 'Nexum과 Wanderer 모두 현대적인 오픈 소스 지도 도구입니다. Nexum은 호스팅이든 자체 호스팅이든 무료이며 EVE SSO, 실시간 협업, 롤링 계산기, 군단 도구를 갖췄고; Wanderer는 MIT 라이선스로 자체 호스팅은 무료이지만 관리형 클라우드는 유료입니다.',
             faqQ5: 'EVE Online 웜홀 지도 도구를 직접 호스팅할 수 있나요?',
             faqA5: '네 — Nexum, Pathfinder, Tripwire, 그리고 Wanderer의 Community Edition 모두 자체 호스팅할 수 있습니다. Nexum은 Postgres 위에서 Docker로 실행되고 EVE SSO로 로그인합니다.',
             faqQ6: '이 웜홀 지도 도구들은 무료인가요?',
-            faqA6: '네 — 넷 모두 무료입니다. Pathfinder와 Tripwire는 자체 호스팅이고; Nexum과 Wanderer는 각각 무료 공개 호스팅 버전과 자체 호스팅 둘 다를 제공합니다.',
+            faqA6: '자체 호스팅은 넷 모두 무료입니다. 서버를 운영하고 싶지 않다면 Nexum의 공개 인스턴스는 무료이며 구독이 필요 없습니다; 반면 Wanderer의 클라우드는 유료 지도 구독이 필요합니다.',
 
             h2Languages: '당신의 언어로 제공됩니다',
             langP: 'Nexum은 아홉 개 언어로 완전히 번역되어 있으며, 처음 방문할 때 브라우저에서 사용자의 언어를 자동으로 감지합니다. 다음 언어로 이 비교를 읽고 Nexum을 사용하세요:',
@@ -1122,7 +1122,7 @@
             __title: 'EVE Online ワームホールマッパー比較: Nexum vs Pathfinder vs Tripwire vs Wanderer（2026）',
             nav: '&larr; Nexum ホーム',
             h1: 'EVE Online ワームホールマッパー比較:<br />Nexum vs Pathfinder vs Tripwire vs Wanderer',
-            sub: 'EVE Online の主要なワームホールマッピングツールを率直に見つめます。',
+            sub: 'EVE Online の主要なワームホールマッパーの比較 — そして Nexum が最初から最も多くをこなす理由。',
             upd: '最終更新 2026年5月27日 · Nexum チームが管理',
             lede: 'J-スペースでスカウトしたり住んだりするなら、良いワームホールマッパーは必須です。<strong>Nexum</strong> はモダンなオープンソースのマッパーで — 無料のホスティング版を使うか自分でホストできます — フルワークフローをカバーします: リアルタイムのチェーンマッピング、シグネチャと質量の追跡、さらに本格的なロール計算機、リージョン全体のマップ生成、スタンディングと主権のオーバーレイ、Discord アラートまで。以下では、他のよくある選択肢 — <strong>Tripwire</strong>、<strong>Pathfinder</strong>、<strong>Wanderer</strong> — と比較します。Nexum は私たちが作っているので、当然ほとんどのコーポにとって最強の選択だと考えていますが、競合の事実は正確かつリンク付きで保ち、ご自身で判断できるようにしています。',
 
@@ -1146,11 +1146,11 @@
             yesDocker: '<span class="yes">はい</span>（Docker）',
             yesCe: '<span class="yes">はい</span>（Community Edition）',
             free: '<span class="yes">無料</span>',
-            freeBoth: '<span class="yes">無料</span>（ホスティングおよびセルフホスト）',
+            freeBoth: '<span class="yes">無料</span>のセルフホスト · <span class="meh">クラウドは有料</span>',
             gCloudN: '<span class="yes">はい</span> — eve-nexum.com の無料パブリックインスタンス、さらにセルフホスト',
             gCloudP: '<span class="meh">コミュニティ運営のインスタンス</span>',
             gCloudT: '<span class="meh">パブリックホストは 2024 年に閉鎖</span>',
-            gCloudW: '<span class="yes">はい</span> — 公式「Wanderer Cloud」、開発者が管理',
+            gCloudW: '<span class="meh">有料</span> — 「Wanderer Cloud」はマップのサブスクが必要',
             gMassN: '専用ロール計算機（±10% 分散、座礁警告）',
             massStatus: '質量ステータス追跡',
 
@@ -1194,21 +1194,21 @@
             chooseP2: '他のものも良いツールで、特定のケースではよりフィットするかもしれません:',
             chooseLi1: '<strong>すでに古典的な Tripwire のシグネチャワークフローに精通していますか？</strong>Tripwire は今もそれをうまくやります — 今やセルフホストで。',
             chooseLi2: '<strong>最も深く成熟した機能セットが必要で、より重い PHP スタックの運用が平気ですか？</strong>Pathfinder。',
-            chooseLi3: '<strong>サーバーを一切運用したくないですか？</strong>Nexum の無料パブリックインスタンス、または Wanderer のクラウドを使ってください。',
+            chooseLi3: '<strong>サーバーを一切運用したくないですか？</strong>Nexum の無料パブリックインスタンスを使ってください — サブスク不要、ホスティング不要。',
 
             h2Faq: 'よくある質問',
             faqQ1: 'EVE Online に最適なワームホールマッパーは？',
-            faqA1: 'グループ次第ですが、モダンなセルフホスト構成なら Nexum をお勧めします — 最も多くの組み込み機能（ワームホールロール計算機、リージョン全体のマップ生成、スタンディングオーバーレイ、Discord アラート）をリアルタイムの共同マップにまとめています。Tripwire は今も古典的なシグネチャツールで、Pathfinder は最も成熟し機能が豊富な選択肢、Wanderer はマネージドクラウド版を加えます。',
+            faqA1: 'Nexum です。あらゆるマッパーの中で最も多くの組み込み機能（ワームホールロール計算機、リージョン全体のマップ生成、スタンディングと主権のオーバーレイ、Discord アラート）をリアルタイムの共同マップにまとめており、セルフホストでもホスティング版でも無料です。Tripwire は今も堅実な古典的シグネチャツール、Pathfinder は機能豊富ですがもはや活発に開発されておらず、Wanderer のマネージドクラウドは有料です。',
             faqQ2: 'Tripwire はまだ使えますか？',
             faqA2: '長く運営されたパブリックインスタンスは 2024 年半ばに閉鎖されましたが、Tripwire はオープンソースなので、自分でホストするかコミュニティ運営のインスタンスを使えます。',
             faqQ3: 'Pathfinder はまだ開発されていますか？',
             faqA3: 'いいえ — 活発にはされていません。オリジナルの Pathfinder（exodus4d 作）は 2020 年以降新リリースがなく、それを引き継いだコミュニティフォークも 2025 年初頭の最後のコミット以降リリースがありません。活発な開発は事実上止まりました — Nexum のようなより新しく活発に保守されるマッパーが存在する理由の 1 つです。',
             faqQ4: 'Pathfinder と Tripwire の良いオープンソース代替は？',
-            faqA4: 'Nexum と Wanderer はどちらもモダンなオープンソースマッパーです。Nexum は EVE SSO、リアルタイム共同作業、コーポツールを備えたセルフホストで、Wanderer は MIT ライセンスでセルフホストに加えマネージドクラウド版を提供します。',
+            faqA4: 'Nexum と Wanderer はどちらもモダンなオープンソースマッパーです。Nexum はホスティングでもセルフホストでも無料で、EVE SSO、リアルタイム共同作業、ロール計算機、コーポツールを備えています。Wanderer は MIT ライセンスでセルフホストは無料ですが、マネージドクラウドは有料です。',
             faqQ5: 'EVE Online のワームホールマッパーをセルフホストできますか？',
             faqA5: 'はい — Nexum、Pathfinder、Tripwire、そして Wanderer の Community Edition はすべてセルフホストできます。Nexum は Postgres 上で Docker で動作し、EVE SSO でログインします。',
             faqQ6: 'これらのワームホールマッパーは無料ですか？',
-            faqA6: 'はい — 4 つとも無料です。Pathfinder と Tripwire はセルフホスト、Nexum と Wanderer はそれぞれ無料のパブリックホスティング版とセルフホストの両方を提供します。',
+            faqA6: 'セルフホストは 4 つとも無料です。サーバーを運用したくない場合、Nexum のパブリックインスタンスは無料でサブスク不要です。一方、Wanderer のクラウドは有料のマップサブスクが必要です。',
 
             h2Languages: 'あなたの言語で使えます',
             langP: 'Nexum は9つの言語に完全に翻訳されており、初回アクセス時にブラウザからあなたの言語を自動検出します。次の言語でこの比較を読み、Nexum を使えます：',
@@ -1224,7 +1224,7 @@
             __title: 'Сравнение мапперов червоточин EVE Online: Nexum vs Pathfinder vs Tripwire vs Wanderer (2026)',
             nav: '&larr; Главная Nexum',
             h1: 'Сравнение мапперов червоточин EVE Online:<br />Nexum vs Pathfinder vs Tripwire vs Wanderer',
-            sub: 'Честный взгляд на ведущие инструменты картирования червоточин для EVE Online.',
+            sub: 'Как сравниваются ведущие мапперы червоточин для EVE Online — и почему Nexum из коробки делает больше всего.',
             upd: 'Последнее обновление 27 мая 2026 · ведётся командой Nexum',
             lede: 'Если вы скаутите или живёте в J-спейсе, хороший маппер червоточин необходим. <strong>Nexum</strong> — современный маппер с открытым исходным кодом — используйте бесплатную хостинг-версию или поднимите свою — покрывающий полный рабочий процесс: картирование цепочек в реальном времени, отслеживание сигнатур и массы, плюс полноценный калькулятор роллинга, генерация карт по целым регионам, оверлеи стендингов и суверенитета и оповещения в Discord. Ниже мы сравниваем его с другими частыми вариантами — <strong>Tripwire</strong>, <strong>Pathfinder</strong> и <strong>Wanderer</strong>. Nexum делаем мы, так что, естественно, считаем его сильнейшим выбором для большинства корпораций, но факты о конкурентах держим точными и со ссылками, чтобы вы могли судить сами.',
 
@@ -1248,11 +1248,11 @@
             yesDocker: '<span class="yes">Да</span> (Docker)',
             yesCe: '<span class="yes">Да</span> (Community Edition)',
             free: '<span class="yes">Бесплатно</span>',
-            freeBoth: '<span class="yes">Бесплатно</span> (хостинг и самостоятельный)',
+            freeBoth: '<span class="yes">Бесплатно</span> при самостоятельном хостинге · <span class="meh">облако платное</span>',
             gCloudN: '<span class="yes">Да</span> — бесплатный публичный экземпляр на eve-nexum.com, плюс самостоятельный хостинг',
             gCloudP: '<span class="meh">Экземпляры от сообщества</span>',
             gCloudT: '<span class="meh">Публичный хост закрыт в 2024</span>',
-            gCloudW: '<span class="yes">Да</span> — официальный «Wanderer Cloud», ведётся разработчиком',
+            gCloudW: '<span class="meh">Платно</span> — «Wanderer Cloud» требует подписку на карту',
             gMassN: 'Выделенный калькулятор роллинга (разброс ±10%, предупреждения о застревании)',
             massStatus: 'Отслеживание состояния массы',
 
@@ -1296,21 +1296,21 @@
             chooseP2: 'Остальные тоже хорошие инструменты и в определённых случаях могут подойти лучше:',
             chooseLi1: '<strong>Уже свободно владеете классическим сигнатурным процессом Tripwire?</strong> Tripwire по-прежнему делает это хорошо — теперь на самостоятельном хостинге.',
             chooseLi2: '<strong>Нужен самый глубокий и зрелый набор функций и не против эксплуатировать более тяжёлый стек PHP?</strong> Pathfinder.',
-            chooseLi3: '<strong>Вообще не хотите эксплуатировать сервер?</strong> Используйте бесплатный публичный экземпляр Nexum или облако Wanderer.',
+            chooseLi3: '<strong>Вообще не хотите эксплуатировать сервер?</strong> Используйте бесплатный публичный экземпляр Nexum — без подписки и без хостинга.',
 
             h2Faq: 'Частые вопросы',
             faqQ1: 'Какой маппер червоточин лучший для EVE Online?',
-            faqA1: 'Зависит от вашей группы, но для современной самостоятельно хостируемой конфигурации мы рекомендуем Nexum — он объединяет больше всего встроенных функций (калькулятор роллинга червоточин, генерация карт по целым регионам, оверлеи стендингов, оповещения Discord) в совместной карте в реальном времени. Tripwire по-прежнему классический сигнатурный инструмент, Pathfinder — самый зрелый и функционально насыщенный вариант, а Wanderer добавляет управляемую облачную версию.',
+            faqA1: 'Nexum. Он объединяет больше всего встроенных функций среди всех мапперов — калькулятор роллинга червоточин, генерацию карт по целым регионам, оверлеи стендингов и суверенитета и оповещения Discord — в совместной карте в реальном времени, бесплатной как при самостоятельном хостинге, так и в размещённой версии. Tripwire по-прежнему надёжный классический сигнатурный инструмент, Pathfinder функционально насыщен, но больше активно не развивается, а управляемое облако Wanderer платное.',
             faqQ2: 'Можно ли ещё пользоваться Tripwire?',
             faqA2: 'Долго работавший публичный экземпляр закрылся в середине 2024 года, но Tripwire с открытым кодом, поэтому вы можете хостить его сами или пользоваться экземпляром сообщества.',
             faqQ3: 'Разрабатывается ли ещё Pathfinder?',
             faqA3: 'Нет — не активно. У оригинального Pathfinder (от exodus4d) нет новых релизов с 2020 года, а у форка сообщества, который его подхватил, нет релизов с последнего коммита в начале 2025 года. Активная разработка фактически остановилась — одна из причин, почему существуют более новые, активно поддерживаемые мапперы вроде Nexum.',
             faqQ4: 'Какая хорошая открытая альтернатива Pathfinder и Tripwire?',
-            faqA4: 'Nexum и Wanderer — оба современные открытые мапперы. Nexum — самостоятельно хостируемый, с EVE SSO, совместной работой в реальном времени и корп-инструментами, а Wanderer лицензирован под MIT и предлагает как самостоятельный хостинг, так и управляемую облачную версию.',
+            faqA4: 'Nexum и Wanderer — оба современные открытые мапперы. Nexum бесплатен в любом случае — размещённый или самостоятельный — с EVE SSO, совместной работой в реальном времени, калькулятором роллинга и корп-инструментами; Wanderer лицензирован под MIT с бесплатным самостоятельным хостингом плюс платным управляемым облаком.',
             faqQ5: 'Можно ли хостить маппер червоточин EVE Online самостоятельно?',
             faqA5: 'Да — Nexum, Pathfinder, Tripwire и Community Edition от Wanderer все можно хостить самостоятельно. Nexum работает в Docker поверх Postgres и вход через EVE SSO.',
             faqQ6: 'Бесплатны ли эти мапперы червоточин?',
-            faqA6: 'Да — все четыре бесплатны. Pathfinder и Tripwire — самостоятельный хостинг, а Nexum и Wanderer предлагают и бесплатную публичную хостинг-версию, и самостоятельный хостинг.',
+            faqA6: 'Самостоятельный хостинг бесплатен для всех четырёх. Если вы предпочитаете не держать сервер, публичный экземпляр Nexum бесплатен и без подписки; облако Wanderer, напротив, требует платную подписку на карту.',
 
             h2Languages: 'Доступен на вашем языке',
             langP: 'Nexum полностью переведён на девять языков — ваш язык определяется автоматически по браузеру при первом визите. Читайте это сравнение и пользуйтесь Nexum на:',
