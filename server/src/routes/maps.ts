@@ -359,12 +359,25 @@ async function fireK162(sigId: string, actor: string | null): Promise<void> {
     const { rows } = await db.query<{
       whType: string | null; leadsTo: string | null; system: string; systemClass: string;
       region: string | null; mapName: string; mapEnabled: boolean; allRegions: boolean; regions: string[];
-      connectionsWebhook: string | null;
+      connectionsWebhook: string | null; connectedToDest: boolean;
     }>(
+      // `connectedToDest`: a wormhole connection already links this K162's system
+      // to the system its leads-to names — i.e. the far side of a hole we've
+      // already mapped (and broadcast) from the other end. When true we skip the
+      // K162 ping so the same hole isn't announced twice.
       `SELECT sg.wh_type AS "whType", sg.wh_leads_to AS "leadsTo",
               s.name AS "system", s.system_class AS "systemClass", s.region_name AS "region",
               m.name AS "mapName", m.discord_notify AS "mapEnabled",
-              ${DISCORD_SETTINGS_COLS}
+              ${DISCORD_SETTINGS_COLS},
+              EXISTS (
+                SELECT 1 FROM map_connections c
+                  JOIN map_systems os
+                    ON os.id = (CASE WHEN c.source_id = s.id THEN c.target_id ELSE c.source_id END)
+                 WHERE c.map_id = m.id
+                   AND c.connection_type = 'standard'
+                   AND (c.source_id = s.id OR c.target_id = s.id)
+                   AND UPPER(os.name) = UPPER(sg.wh_leads_to)
+              ) AS "connectedToDest"
          FROM map_signatures sg
          JOIN map_systems s ON s.id = sg.system_id
          JOIN maps m ON m.id = s.map_id
@@ -389,6 +402,10 @@ async function fireK162(sigId: string, actor: string | null): Promise<void> {
     }
     if (!leadsToIsSystem(r.leadsTo)) {
       discordLog.info(`K162 (sig ${sigId}) suppressed — leads-to "${r.leadsTo ?? 'unknown'}" is not a specific destination system`);
+      return;
+    }
+    if (r.connectedToDest) {
+      discordLog.info(`K162 (sig ${sigId}) suppressed — "${r.system}" is already connected to "${r.leadsTo}"; that hole was broadcast from the other end`);
       return;
     }
     notifyDiscord(r.connectionsWebhook, k162Embed({ system: r.system, systemClass: r.systemClass, leadsTo: r.leadsTo, mapName: r.mapName, actor }));
