@@ -171,6 +171,34 @@ async function loadSpecs(): Promise<Record<string, WormholeSpec>> {
   return inflight;
 }
 
+// Per-jump mass thresholds (kg) — MUST mirror web/src/utils/wormholeSize.ts's
+// WH_JUMP_MASS so the server and client classify a hole's size identically.
+const WH_JUMP_MASS = { xl: 1_000_000_000, large: 300_000_000, medium: 62_000_000 } as const;
+
+export type WhSizeClass = 'xl' | 'large' | 'medium' | 'small';
+
+function sizeClassForMass(maxJumpMass: number | null | undefined): WhSizeClass | null {
+  if (!maxJumpMass || maxJumpMass <= 0) return null;
+  if (maxJumpMass >= WH_JUMP_MASS.xl)     return 'xl';
+  if (maxJumpMass >= WH_JUMP_MASS.large)  return 'large';
+  if (maxJumpMass >= WH_JUMP_MASS.medium) return 'medium';
+  return 'small';
+}
+
+// The nominal size class for a wormhole code (e.g. 'Q003' -> 'small'), derived
+// from the SDE per-jump mass cap. null when the code is unknown/unscanned
+// (e.g. a bare K162) so callers can fall back. Best-effort: a spec-load failure
+// yields null rather than throwing into the caller.
+export async function whSizeForCode(code: string | null | undefined): Promise<WhSizeClass | null> {
+  if (!code) return null;
+  try {
+    const specs = await loadSpecs();
+    return sizeClassForMass(specs[code.toUpperCase()]?.maxJumpMass);
+  } catch {
+    return null;
+  }
+}
+
 router.get('/types', async (_req, res) => {
   try {
     res.json(await loadSpecs());
