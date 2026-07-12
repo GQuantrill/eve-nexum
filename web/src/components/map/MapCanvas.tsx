@@ -200,6 +200,18 @@ export function MapCanvas() {
   const [customIntel] = useCustomIntel();
   const wrapperRef = useRef<HTMLDivElement>(null);
 
+  // The canvas how-to hint is onboarding: show it only on a visitor's first
+  // ever visit, then remember (per-device) that they've seen it and hide it.
+  const [showCanvasHint] = useState(() => {
+    try { return localStorage.getItem('nexum.seenMapHint') !== '1'; }
+    catch { return true; } // private mode / storage blocked: just show it
+  });
+  useEffect(() => {
+    if (showCanvasHint) {
+      try { localStorage.setItem('nexum.seenMapHint', '1'); } catch { /* quota / private mode */ }
+    }
+  }, [showCanvasHint]);
+
   // Inverted-zoom handler. When on, React Flow's own wheel AND pinch zoom are
   // off (zoomOnScroll / zoomOnPinch = !invertZoom) and we handle both here with
   // the direction flipped, anchored at the cursor, matching d3-zoom's scaling so
@@ -1304,7 +1316,7 @@ export function MapCanvas() {
         )}
       </ReactFlow>
 
-      <div className="map-canvas__hint">{t('ctxMenu.canvasHint')}</div>
+      {showCanvasHint && <div className="map-canvas__hint">{t('ctxMenu.canvasHint')}</div>}
 
       {contextMenu && (
         <ContextMenu
