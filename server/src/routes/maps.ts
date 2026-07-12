@@ -2274,7 +2274,8 @@ mapsRouter.get('/:mapId/signatures', async (req, res) => {
   const access = await getMapAccess(mapId, req);
   if (!access) { res.status(404).json({ error: 'Map not found' }); return; }
   const { rows } = await db.query(
-    `SELECT s.system_id AS "systemId", s.sig_type AS "sigType", s.name, s.wh_type AS "whType"
+    `SELECT s.id, s.sig_id AS "sigId", s.system_id AS "systemId", s.sig_type AS "sigType",
+            s.name, s.wh_type AS "whType", s.wh_leads_to AS "whLeadsTo"
      FROM map_signatures s
      JOIN map_systems ms ON ms.id = s.system_id
      WHERE ms.map_id = $1`,

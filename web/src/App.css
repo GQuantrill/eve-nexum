@@ -3704,6 +3704,31 @@
   &::before { content: '→'; color: #6a80a0; margin-right: 1px; }
 }
 
+/* Scanned-but-not-dived wormholes: a row of small capsules just under the node,
+   coloured by destination class (neutral when the type/destination is unknown).
+   Absolutely positioned so they never affect node sizing or the handles. */
+.system-node__holes {
+  position: absolute;
+  top: 100%;
+  left: 4px;
+  margin-top: 3px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  z-index: 1;
+}
+
+.system-node__hole {
+  width: calc(14px * var(--font-scale, 1));
+  height: calc(6px * var(--font-scale, 1));
+  border-radius: 3px;
+  background: #6a7898; /* neutral: unknown destination */
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+.system-node__hole:hover { transform: scaleY(1.5); }
+
 .system-node__sov-logo-wrap {
   position: relative;
   display: flex;

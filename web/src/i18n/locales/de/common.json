@@ -545,7 +545,8 @@
     "routeIncludeTurnur": "Turnur-Verbindungen einbeziehen",
     "routeIncludeWormholes": "Wurmlochkette einbeziehen",
     "routeShortcutNote": "Routen über ein Wurmloch, Thera, Turnur oder ein Sprungtor können nicht als spielinternes Ziel oder Wegpunkt gesetzt werden — Rechtsklick auf ein K-Space-System in der Route, um stattdessen dorthin zu navigieren.",
-    "routeIncludeAnsiblex": "Ansiblex-Sprungtore einbeziehen"
+    "routeIncludeAnsiblex": "Ansiblex-Sprungtore einbeziehen",
+    "showUndivedWhs": "Ungetauchte WHs zeigen"
   },
   "customIntel": {
     "title": "Eigene Intel",
@@ -563,7 +564,9 @@
     "namePlaceholder": "Site-Name enthält…",
     "matchCount_one": "{{count}} System passt",
     "matchCount_other": "{{count}} Systeme passen",
-    "clear": "Filter löschen"
+    "clear": "Filter löschen",
+    "holes": "Wurmlöcher",
+    "undivedWh": "Ungetauchtes Loch"
   },
   "watchMarker": {
     "target": "Ziel",
@@ -1539,7 +1542,9 @@
     "suppressed": "Unterdrückt",
     "scoutConnections_one": "{{name}}-Verbindung",
     "scoutConnections_other": "{{name}}-Verbindungen",
-    "scoutConnectionsMulti": "{{names}}-Verbindungen"
+    "scoutConnectionsMulti": "{{names}}-Verbindungen",
+    "undivedWhTitle": "Gescannte, aber nicht getauchte Wurmlöcher",
+    "undivedUnknown": "unbekannt"
   },
   "mapEdge": {
     "lessThan24h": "< 24 Std",

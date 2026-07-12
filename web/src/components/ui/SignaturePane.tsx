@@ -197,6 +197,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   const map             = useMapStore((s) => s.map);
   const currentSystemId = useMapStore((s) => s.currentSystemId);
   const setSystemSigTypes = useMapStore((s) => s.setSystemSigTypes);
+  const setSystemWhSigs = useMapStore((s) => s.setSystemWhSigs);
   const canEdit         = useCanEditContent();
 
   const systemStatics = useMemo(
@@ -274,6 +275,15 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   useEffect(() => {
     setSystemSigTypes(systemId, sigs.filter((s) => s.whType).map((s) => s.whType.toUpperCase()));
   }, [sigs, systemId, setSystemSigTypes]);
+
+  // Same, for the richer wormhole-sig index that drives undived-hole pills and
+  // the "undived wormhole" content filter — so scanning/pinning a hole here
+  // updates its pill immediately, not on the next reload.
+  useEffect(() => {
+    setSystemWhSigs(systemId, sigs
+      .filter((s) => s.sigType === 'wormhole')
+      .map((s) => ({ id: s.id, sigId: s.sigId ?? '', whType: s.whType ?? '', leadsTo: s.whLeadsTo ?? '' })));
+  }, [sigs, systemId, setSystemWhSigs]);
 
   // Overwrite-on-paste mode. When on (or when Shift is held during a paste),
   // a paste also deletes signatures whose ID is absent from the pasted scan —

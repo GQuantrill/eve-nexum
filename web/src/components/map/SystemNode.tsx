@@ -176,8 +176,12 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
   // matching ones stay lit.
   const contentFilter   = useMapStore((s) => s.contentFilter);
   const sysContent      = useMapStore((s) => s.contentBySystem[sys.id]);
+  // Scanned-but-not-dived wormholes here — rendered as pills under the node and
+  // matched by the content filter's "undived wormhole" state.
+  const undivedHoles    = useMapStore((s) => s.undivedWhBySystem[sys.id]);
+  const [showUndivedWh] = useUserSetting<boolean>('nexum.map.showUndivedWh', true);
   const filterOn        = contentFilterActive(contentFilter);
-  const contentMatch    = filterOn && systemMatchesContent(sysContent, contentFilter);
+  const contentMatch    = filterOn && systemMatchesContent(sysContent, contentFilter, (undivedHoles?.length ?? 0) > 0);
   const filteredOut     = filterOn && !contentMatch;
 
   // Tooltip label: dedupe by scout system name (Thera / Turnur). Multiple
@@ -482,6 +486,20 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
               </WHTypeInfo>
             );
           })}
+        </div>
+      )}
+
+      {showUndivedWh && undivedHoles && undivedHoles.length > 0 && (
+        <div className="system-node__holes" title={t('mapNode.undivedWhTitle')}>
+          {undivedHoles.map((h) => (
+            <span
+              key={h.id}
+              className="system-node__hole"
+              style={h.dest ? { background: CLASS_COLORS[h.dest] } : undefined}
+              title={`${h.sigId || '?'} · ${h.code || t('mapNode.undivedUnknown')}${h.dest ? ` → ${h.dest}` : ''}`}
+              onClick={(e) => { e.stopPropagation(); selectSystem(sys.id); }}
+            />
+          ))}
         </div>
       )}
 

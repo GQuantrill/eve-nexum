@@ -545,7 +545,8 @@
     "routeIncludeTurnur": "Turnur 接続を含める",
     "routeIncludeWormholes": "ワームホールチェーンを含める",
     "routeShortcutNote": "ワームホール、Thera、Turnur、ジャンプゲートを経由するルートはゲーム内の目的地や経由地に設定できません — ルート上のK-スペースシステムを右クリックしてそこへ向かってください。",
-    "routeIncludeAnsiblex": "Ansiblex ジャンプゲートを含める"
+    "routeIncludeAnsiblex": "Ansiblex ジャンプゲートを含める",
+    "showUndivedWhs": "未ダイブWHを表示"
   },
   "customIntel": {
     "title": "カスタムインテル",
@@ -563,7 +564,9 @@
     "namePlaceholder": "サイト名を含む…",
     "matchCount_one": "{{count}} 件のシステムが一致",
     "matchCount_other": "{{count}} 件のシステムが一致",
-    "clear": "フィルターをクリア"
+    "clear": "フィルターをクリア",
+    "holes": "ワームホール",
+    "undivedWh": "未ダイブホール"
   },
   "watchMarker": {
     "target": "ターゲット",
@@ -1539,7 +1542,9 @@
     "suppressed": "鎮圧",
     "scoutConnections_one": "{{name}} 接続",
     "scoutConnections_other": "{{name}} 接続",
-    "scoutConnectionsMulti": "{{names}} 接続"
+    "scoutConnectionsMulti": "{{names}} 接続",
+    "undivedWhTitle": "スキャン済みだが未ダイブのワームホール",
+    "undivedUnknown": "不明"
   },
   "mapEdge": {
     "lessThan24h": "< 24h",
