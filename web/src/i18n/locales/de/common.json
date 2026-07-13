@@ -602,7 +602,8 @@
     "add": "Zur Beobachtungsliste hinzufügen",
     "appeared": "Beobachtungsliste: {{name}} ({{marker}}) ist auf der Karte",
     "notifTitle": "Beobachtungslisten-Treffer",
-    "duplicate": "Bereits auf der Beobachtungsliste"
+    "duplicate": "Bereits auf der Beobachtungsliste",
+    "dropToUngroup": "Hierher ziehen, um aus der Gruppe zu entfernen"
   },
   "chainExits": {
     "noExits": "Keine K-Space-Ausgänge in dieser Kette.",

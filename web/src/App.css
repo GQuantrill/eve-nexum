@@ -2177,6 +2177,33 @@
   margin-top: 2px;
 }
 
+/* Drag-and-drop: a container (ungrouped list or a group) tints while a row
+   hovers over it, so the drop target is obvious. */
+.watchlist__drop-over {
+  outline: 1px dashed var(--accent, #5b9bff);
+  outline-offset: 2px;
+  background: color-mix(in srgb, var(--accent, #5b9bff) 8%, transparent);
+  border-radius: 6px;
+}
+
+/* Empty-ungrouped affordance, shown only while dragging so a grouped row can be
+   dropped back out. */
+.watchlist__drop-hint {
+  padding: 10px;
+  text-align: center;
+  font-size: calc(12px * var(--font-scale, 1));
+  color: var(--muted, #8a98b8);
+  border: 1px dashed #2a3650;
+  border-radius: 6px;
+}
+
+/* The row preview that follows the cursor during a drag. */
+.watchlist__row--overlay {
+  cursor: grabbing;
+  opacity: 0.95;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
 /* ── Named lists (groups) ─────────────────────────────────────────── */
 .watchlist__group {
   margin-top: 10px;

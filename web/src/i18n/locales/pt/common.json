@@ -602,7 +602,8 @@
     "add": "Adicionar à lista de observação",
     "appeared": "Lista de observação: {{name}} ({{marker}}) está no mapa",
     "notifTitle": "Correspondência da lista de observação",
-    "duplicate": "Já está na lista de observação"
+    "duplicate": "Já está na lista de observação",
+    "dropToUngroup": "Larga aqui para remover do grupo"
   },
   "chainExits": {
     "noExits": "Não há saídas de K-space nesta cadeia.",
