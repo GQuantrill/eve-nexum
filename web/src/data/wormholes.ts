@@ -115,42 +115,58 @@ export const EFFECT_ICONS: Record<WormholeEffect, { symbol: string; color: strin
   wolf_rayet:           { symbol: '⚔', color: 'var(--cv-effect-wolfrayet)' },
 };
 
+// System-effect modifiers, per the in-game "Effects" panel. `good` = beneficial
+// (shown ▲ green) vs detrimental (▼ red). Verified against the live client;
+// magnitudes scale by class but the set and direction are fixed per effect.
 export const EFFECT_MODIFIERS: Record<WormholeEffect, Array<{ label: string; good: boolean }>> = {
   none: [],
+  // Pulsar: shield buffed, armor punished; larger sig, faster cap, stronger neuts.
   pulsar: [
     { label: 'Shield HP',      good: true  },
     { label: 'Cap Recharge',   good: true  },
-    { label: 'Armor HP',       good: false },
-    { label: 'Cap Size',       good: false },
+    { label: 'Neut/NOS Drain', good: true  },
+    { label: 'Armor Resist',   good: false },
+    { label: 'Sig Radius',     good: false },
   ],
+  // Black Hole: speed, range and missiles up; agility and webs down.
   black_hole: [
-    { label: 'Ship Speed',         good: true  },
-    { label: 'Missile Speed',      good: true  },
-    { label: 'Stasis Web Str',     good: false },
-    { label: 'Target Painter Str', good: false },
-    { label: 'Explosion Radius',   good: false },
+    { label: 'Ship Speed',      good: true  },
+    { label: 'Missile Speed',   good: true  },
+    { label: 'Explosion Vel',   good: true  },
+    { label: 'Targeting Range', good: true  },
+    { label: 'Ship Agility',    good: false },
+    { label: 'Stasis Web Str',  good: false },
   ],
+  // Cataclysmic Variable: remote reps and cap buffed; local reps, cap recharge
+  // and remote cap transfer punished.
   cataclysmic_variable: [
-    { label: 'Local Rep',    good: true  },
-    { label: 'Cap Recharge', good: true  },
-    { label: 'Remote Rep',   good: false },
-    { label: 'Cap Size',     good: false },
+    { label: 'Remote Rep',   good: true  },
+    { label: 'Cap Capacity', good: true  },
+    { label: 'Local Rep',    good: false },
+    { label: 'Cap Recharge', good: false },
+    { label: 'Remote Cap',   good: false },
   ],
+  // Magnetar: huge raw damage, but application (tracking, range, missiles) suffers.
   magnetar: [
-    { label: 'Drone Damage',      good: true  },
-    { label: 'Targeting Range',   good: false },
-    { label: 'Drone Range',       good: false },
-    { label: 'Explosion Radius',  good: false },
+    { label: 'Weapon Damage',    good: true  },
+    { label: 'Tracking',         good: false },
+    { label: 'Targeting Range',  good: false },
+    { label: 'Explosion Radius', good: false },
+    { label: 'Target Painter',   good: false },
   ],
+  // Red Giant: overheat, smartbomb and bomb buffs; modules take more heat damage.
   red_giant: [
-    { label: 'Overheat Bonus',  good: true  },
+    { label: 'Overheat',        good: true  },
+    { label: 'Smartbomb Dmg',   good: true  },
     { label: 'Smartbomb Range', good: true  },
+    { label: 'Bomb Damage',     good: true  },
     { label: 'Heat Damage',     good: false },
   ],
+  // Wolf-Rayet: armor and small weapons buffed, smaller sig; shield resists punished.
   wolf_rayet: [
-    { label: 'Small Weapons',    good: true  },
-    { label: 'Armor HP',         good: true  },
-    { label: 'Sig Radius',       good: true  },
-    { label: 'Shield HP',        good: false },
+    { label: 'Small Weapons', good: true  },
+    { label: 'Armor HP',      good: true  },
+    { label: 'Sig Radius',    good: true  },
+    { label: 'Shield Resist', good: false },
   ],
 };
