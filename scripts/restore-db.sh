@@ -40,11 +40,28 @@ if [ ! -f .env ]; then
 fi
 
 # Read PG_USER / PG_DB from the deployed .env so this stays in sync with the
-# running stack (same as backup-db.sh).
-set -a
-# shellcheck disable=SC1091
-. ./.env
-set +a
+# running stack (same as backup-db.sh). We do NOT `source` the file — .env is a
+# dotenv file, not a shell script, so `source` breaks on any line that isn't a
+# clean shell assignment. Read only the keys we need; last assignment wins,
+# surrounding quotes and a trailing CR trimmed.
+read_env() {
+  local val
+  val="$(grep -E "^[[:space:]]*${1}=" .env | tail -n1)" || return 0
+  val="${val#*=}"
+  val="${val%$'\r'}"
+  val="${val#"${val%%[![:space:]]*}"}"   # ltrim
+  val="${val%"${val##*[![:space:]]}"}"   # rtrim
+  case "$val" in
+    \"*\") val="${val#\"}"; val="${val%\"}" ;;
+    \'*\') val="${val#\'}"; val="${val%\'}" ;;
+  esac
+  printf '%s' "$val"
+}
+
+PG_USER="$(read_env PG_USER)"
+PG_DB="$(read_env PG_DB)"
+PROJ="$(read_env COMPOSE_PROJECT_NAME)"
+[ -n "$PROJ" ] && export COMPOSE_PROJECT_NAME="$PROJ"
 
 : "${PG_USER:?PG_USER not set in .env}"
 : "${PG_DB:?PG_DB not set in .env}"
