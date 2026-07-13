@@ -41,11 +41,32 @@ if [ ! -f .env ]; then
 fi
 
 # Read PG_USER / PG_DB straight from the deployed .env so this script stays in
-# sync with whatever the running stack is using.
-set -a
-# shellcheck disable=SC1091
-. ./.env
-set +a
+# sync with whatever the running stack is using. We do NOT `source` the file:
+# .env is a dotenv file (parsed by the app via the `dotenv` library), not a
+# shell script, so `source` chokes on any line that isn't a clean shell
+# assignment (e.g. an uncommented `SDE_CHECK_UTC=11:30  # comment`). Read only
+# the keys we need instead — last assignment wins; surrounding quotes and a
+# trailing CR are trimmed.
+read_env() {
+  local val
+  val="$(grep -E "^[[:space:]]*${1}=" .env | tail -n1)" || return 0
+  val="${val#*=}"
+  val="${val%$'\r'}"
+  val="${val#"${val%%[![:space:]]*}"}"   # ltrim
+  val="${val%"${val##*[![:space:]]}"}"   # rtrim
+  case "$val" in
+    \"*\") val="${val#\"}"; val="${val%\"}" ;;
+    \'*\') val="${val#\'}"; val="${val%\'}" ;;
+  esac
+  printf '%s' "$val"
+}
+
+PG_USER="$(read_env PG_USER)"
+PG_DB="$(read_env PG_DB)"
+# Honour a custom compose project name if the deploy sets one, so
+# `docker compose exec` targets the right postgres container.
+PROJ="$(read_env COMPOSE_PROJECT_NAME)"
+[ -n "$PROJ" ] && export COMPOSE_PROJECT_NAME="$PROJ"
 
 : "${PG_USER:?PG_USER not set in .env}"
 : "${PG_DB:?PG_DB not set in .env}"
