@@ -1544,7 +1544,7 @@
     "scoutConnections_one": "{{name}} 连接",
     "scoutConnections_other": "{{name}} 连接",
     "scoutConnectionsMulti": "{{names}} 连接",
-    "undivedWhTitle": "已扫描但未跳跃的虫洞",
+    "undivedWhTitle": "未探索的虫洞",
     "undivedUnknown": "未知"
   },
   "mapEdge": {

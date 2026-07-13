@@ -1544,7 +1544,7 @@
     "scoutConnections_one": "{{name}} 연결",
     "scoutConnections_other": "{{name}} 연결",
     "scoutConnectionsMulti": "{{names}} 연결",
-    "undivedWhTitle": "스캔했지만 아직 다이브하지 않은 웜홀",
+    "undivedWhTitle": "미탐사 웜홀",
     "undivedUnknown": "알 수 없음"
   },
   "mapEdge": {

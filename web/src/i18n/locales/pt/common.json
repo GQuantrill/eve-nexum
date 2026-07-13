@@ -1544,7 +1544,7 @@
     "scoutConnections_one": "Conexão de {{name}}",
     "scoutConnections_other": "Conexões de {{name}}",
     "scoutConnectionsMulti": "Conexões de {{names}}",
-    "undivedWhTitle": "Buracos de minhoca escaneados mas não mergulhados",
+    "undivedWhTitle": "Buraco de minhoca inexplorado",
     "undivedUnknown": "desconhecido"
   },
   "mapEdge": {

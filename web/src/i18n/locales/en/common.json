@@ -1590,7 +1590,7 @@
     "stormLastReport": "Last report: {{value}}",
     "stormReportedBy": "By: {{value}}",
     "statics": "Statics",
-    "undivedWhTitle": "Scanned but not dived wormholes",
+    "undivedWhTitle": "Unexplored Wormhole",
     "undivedUnknown": "unknown",
     "staging": "Staging",
     "incursionBadge": "Incursion",

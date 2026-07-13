@@ -1544,7 +1544,7 @@
     "scoutConnections_one": "{{name}}-Verbindung",
     "scoutConnections_other": "{{name}}-Verbindungen",
     "scoutConnectionsMulti": "{{names}}-Verbindungen",
-    "undivedWhTitle": "Gescannte, aber nicht getauchte Wurmlöcher",
+    "undivedWhTitle": "Unerforschtes Wurmloch",
     "undivedUnknown": "unbekannt"
   },
   "mapEdge": {

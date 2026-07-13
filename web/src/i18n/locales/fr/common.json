@@ -1544,7 +1544,7 @@
     "scoutConnections_one": "Connexion {{name}}",
     "scoutConnections_other": "Connexions {{name}}",
     "scoutConnectionsMulti": "Connexions {{names}}",
-    "undivedWhTitle": "Trous de ver scannés mais non explorés",
+    "undivedWhTitle": "Trou de ver inexploré",
     "undivedUnknown": "inconnu"
   },
   "mapEdge": {
