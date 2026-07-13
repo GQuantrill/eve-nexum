@@ -62,7 +62,12 @@ export function PatchNotesModal({ onClose }: { onClose: () => void }) {
           {releases?.map((r) => (
             <section key={r.version || r.name} className="patchnotes__release">
               <div className="patchnotes__release-head">
-                <a href={r.url} target="_blank" rel="noopener noreferrer" className="patchnotes__version">
+                <a
+                  href={r.url && /^https:\/\//i.test(r.url) ? r.url : undefined}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="patchnotes__version"
+                >
                   v{r.version || r.name}
                 </a>
                 {r.publishedAt && <span className="patchnotes__date">{fmtDate(r.publishedAt)}</span>}

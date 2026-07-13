@@ -15,14 +15,15 @@ import { LeadsToDropdown } from './LeadsToDropdown';
 import { toast } from './Toaster';
 import { reevaluateConnectionsForSystem } from '../../utils/whAutoDetect';
 import { alertInboundK162 } from '../../utils/k162Alert';
-import { WORMHOLE_TYPES } from '../../data/wormholes';
 import { formatBookmarkName, DEFAULT_BOOKMARK_FORMAT } from '../../utils/signatureBookmark';
 import { useWormholeTypes } from '../../hooks/useWormholeTypes';
 import { duration, DASH } from '../../i18n/format';
 
 // Aging bands for wormhole signatures, anchored to the WH type's known
-// lifetime. K162 and unknown codes return '' (no tint) since we don't
-// know the real lifetime from this side. Other sig types are skipped.
+// lifetime from the SDE catalog (useWormholeTypes) — the single source, so
+// every code with a lifetime tints, not just a hardcoded handful. K162 and
+// unknown codes return '' (no lifetime known from this side); other sig types
+// are skipped.
 //
 //   < 50% of lifetime → fresh, no tint
 //   50–90%            → mid (yellow row)
@@ -33,12 +34,13 @@ function whAgeRowClass(
   whType: string,
   createdAt: string | undefined,
   now: number,
+  whTypes: ReturnType<typeof useWormholeTypes>,
 ): string {
   if (sigType !== 'wormhole' || !whType || !createdAt) return '';
-  const wh = WORMHOLE_TYPES[whType.toUpperCase()];
-  if (!wh || wh.lifetimeH <= 0) return '';
+  const wh = whTypes[whType.toUpperCase()];
+  if (!wh || wh.lifetimeHours <= 0) return '';
   const ageH = (now - new Date(createdAt).getTime()) / 3_600_000;
-  const pct  = ageH / wh.lifetimeH;
+  const pct  = ageH / wh.lifetimeHours;
   if (pct < 0.5)  return '';
   if (pct < 0.9)  return 'sig-row--wh-mid';
   if (pct < 1.0)  return 'sig-row--wh-eol';
@@ -931,7 +933,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
             {sortedSigs.map((sig) => (
               <tr
                 key={sig.id}
-                className={`${selected.has(sig.id) ? 'sig-row--selected' : ''} ${sig.sigType === 'unknown' ? 'sig-row--unknown' : ''} ${whAgeRowClass(sig.sigType, sig.whType, sig.createdAt, tickNow)} ${removing.has(sig.id) ? 'sig-row--removing' : ''}`}
+                className={`${selected.has(sig.id) ? 'sig-row--selected' : ''} ${sig.sigType === 'unknown' ? 'sig-row--unknown' : ''} ${whAgeRowClass(sig.sigType, sig.whType, sig.createdAt, tickNow, whTypes)} ${removing.has(sig.id) ? 'sig-row--removing' : ''}`}
                 style={removing.has(sig.id) && overwriteDelay > 0 ? { animationDuration: `${overwriteDelay}s` } : undefined}
               >
                 {!isShareMode && (
