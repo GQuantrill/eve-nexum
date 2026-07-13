@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
@@ -186,6 +186,7 @@ export function SystemPanel() {
     activity:    t('panel.activity'),
   };
   const systems          = useMapStore((s) => s.map.systems);
+  const connections      = useMapStore((s) => s.map.connections);
   const selectedSystemId = useMapStore((s) => s.selectedSystemId);
   const panelOrder       = useMapStore((s) => s.panelOrder);
   const updateSystem     = useMapStore((s) => s.updateSystem);
@@ -233,6 +234,33 @@ export function SystemPanel() {
   const incursions   = useIncursions();
   const insurgencies = useInsurgency();
   const [customIntel] = useCustomIntel();
+
+  // The selected system's chain: every system reachable from it by following
+  // (non-broken) connections. The "In chain" digest is scoped to this so it
+  // shows only systems actually linked to the selected one — not every effect
+  // system that merely sits on the same map.
+  const chainIds = useMemo(() => {
+    const seen = new Set<string>();
+    if (!selectedSystemId) return seen;
+    const adj = new Map<string, string[]>();
+    const link = (a: string, b: string) => {
+      const arr = adj.get(a);
+      if (arr) arr.push(b); else adj.set(a, [b]);
+    };
+    for (const c of connections) {
+      if (c.broken) continue; // a collapsed hole no longer links its ends
+      link(c.sourceId, c.targetId);
+      link(c.targetId, c.sourceId);
+    }
+    const queue = [selectedSystemId];
+    seen.add(selectedSystemId);
+    while (queue.length) {
+      const id = queue.pop()!;
+      for (const n of adj.get(id) ?? []) if (!seen.has(n)) { seen.add(n); queue.push(n); }
+    }
+    return seen;
+  }, [connections, selectedSystemId]);
+
   if (!sys) return null;
   const incursion  = findIncursion(incursions, sys.eveSystemId);
   const insurgency = findInsurgency(insurgencies, sys.eveSystemId);
@@ -424,7 +452,7 @@ export function SystemPanel() {
           </div>
 
           {(() => {
-            const chainEffects = systems.filter((s) => s.effect !== 'none');
+            const chainEffects = systems.filter((s) => s.effect !== 'none' && chainIds.has(s.id));
             if (chainEffects.length === 0) return null;
             return (
               <div className="sys-info__chain-fx">
