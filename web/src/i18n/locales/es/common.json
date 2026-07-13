@@ -566,7 +566,7 @@
     "matchCount_other": "{{count}} sistemas coinciden",
     "clear": "Limpiar filtro",
     "holes": "Agujeros de gusano",
-    "undivedWh": "Agujero sin explorar"
+    "undivedWh": "Inexplorado"
   },
   "watchMarker": {
     "target": "Objetivo",
@@ -1544,7 +1544,7 @@
     "scoutConnections_one": "Conexión de {{name}}",
     "scoutConnections_other": "Conexiones de {{name}}",
     "scoutConnectionsMulti": "Conexiones de {{names}}",
-    "undivedWhTitle": "Agujeros de gusano escaneados pero no explorados",
+    "undivedWhTitle": "Agujero de gusano inexplorado",
     "undivedUnknown": "desconocido"
   },
   "mapEdge": {
