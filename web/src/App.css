@@ -3652,6 +3652,10 @@
   border-radius: 6px;
   padding: 6px 10px;
   white-space: nowrap;
+  /* Size the box to its widest row. Without this the tooltip's shrink-to-fit
+     width is constrained by its tiny icon container, so longer labels
+     (e.g. "Targeting Range") get clipped. */
+  width: max-content;
   z-index: 9999;
   flex-direction: column;
   gap: 3px;
