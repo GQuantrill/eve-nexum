@@ -602,7 +602,8 @@
     "add": "添加到关注列表",
     "appeared": "关注列表：{{name}}（{{marker}}）已出现在地图上",
     "notifTitle": "监视列表匹配",
-    "duplicate": "已在监视列表中"
+    "duplicate": "已在监视列表中",
+    "dropToUngroup": "拖放到此处以移出分组"
   },
   "chainExits": {
     "noExits": "此链中没有 K空间出口。",

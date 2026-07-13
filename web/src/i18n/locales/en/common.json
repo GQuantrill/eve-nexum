@@ -640,6 +640,7 @@
     "groupOnMap": "{{count}} on the map",
     "addToGroup": "Add to group",
     "deleteGroup": "Delete group",
+    "dropToUngroup": "Drop here to remove from group",
     "groupNamePlaceholder": "Group name",
     "importPlaceholder": "Paste J-codes or system names — one per line or comma-separated",
     "roomLeft": "{{count}} slots left",
