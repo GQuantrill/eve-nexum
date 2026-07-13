@@ -130,12 +130,12 @@ export const EFFECT_MODIFIERS: Record<WormholeEffect, Array<{ label: string; goo
   ],
   // Black Hole: speed, range and missiles up; agility and webs down.
   black_hole: [
-    { label: 'Ship Speed',      good: true  },
-    { label: 'Missile Speed',   good: true  },
-    { label: 'Explosion Vel',   good: true  },
-    { label: 'Targeting Range', good: true  },
-    { label: 'Ship Agility',    good: false },
-    { label: 'Stasis Web Str',  good: false },
+    { label: 'Ship Velocity',      good: true  },
+    { label: 'Missile Velocity',   good: true  },
+    { label: 'Explosion Velocity', good: true  },
+    { label: 'Targeting Range',    good: true  },
+    { label: 'Ship Agility',       good: false },
+    { label: 'Stasis Web Str',     good: false },
   ],
   // Cataclysmic Variable: remote reps, shield transfer and cap buffed; local
   // reps, cap recharge and remote cap transfer punished.
