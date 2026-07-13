@@ -7,7 +7,7 @@ import {
 } from '@phosphor-icons/react';
 import type { NodeProps } from '@xyflow/react';
 import type { MapSystem } from '../../types';
-import { CLASS_COLORS, CLASS_LABELS, EFFECT_ICONS, EFFECT_LABELS, EFFECT_MODIFIERS, WORMHOLE_DESTINATIONS } from '../../data/wormholes';
+import { CLASS_COLORS, CLASS_LABELS, EFFECT_ICONS, EFFECT_LABELS, EFFECT_MODIFIERS } from '../../data/wormholes';
 import { useMapStore } from '../../store/mapStore';
 import { usePresenceStore } from '../../store/presenceStore';
 import { useAccountLocations } from '../../hooks/useAccountLocations';
@@ -16,6 +16,8 @@ import { useStandings } from '../../hooks/useStandings';
 import { useFleet } from '../../hooks/useFleet';
 import { useAuth } from '../../context/AuthContext';
 import { useUserSetting } from '../../hooks/useUserSetting';
+import { useWormholeTypes } from '../../hooks/useWormholeTypes';
+import { holeDisplay, whDestClass } from '../../utils/whDest';
 import { useIncursions, findIncursion } from '../../hooks/useIncursions';
 import { useInsurgency, findInsurgency } from '../../hooks/useInsurgency';
 import { useStorms, findStorm } from '../../hooks/useStorms';
@@ -180,6 +182,10 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
   // matched by the content filter's "undived wormhole" state.
   const undivedHoles    = useMapStore((s) => s.undivedWhBySystem[sys.id]);
   const [showUndivedWh] = useUserSetting<boolean>('nexum.map.showUndivedWh', true);
+  // SDE-derived wormhole catalog (the single source of truth for destinations),
+  // used to colour statics and undived-hole pills consistently with the rest of
+  // the app rather than the drift-prone hardcoded map.
+  const whTypes         = useWormholeTypes();
   const filterOn        = contentFilterActive(contentFilter);
   const contentMatch    = filterOn && systemMatchesContent(sysContent, contentFilter, (undivedHoles?.length ?? 0) > 0);
   const filteredOut     = filterOn && !contentMatch;
@@ -469,7 +475,7 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
         <div className="system-node__statics">
           <div className="title">{t('mapNode.statics')}</div>
           {sys.statics.map((s) => {
-            const dest = WORMHOLE_DESTINATIONS[s];
+            const dest = whDestClass(s, whTypes);
             return (
               <WHTypeInfo key={s} code={s}>
               <span className="system-node__static-tag">
@@ -490,16 +496,21 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
       )}
 
       {showUndivedWh && undivedHoles && undivedHoles.length > 0 && (
-        <div className="system-node__holes" title={t('mapNode.undivedWhTitle')}>
-          {undivedHoles.map((h) => (
-            <span
-              key={h.id}
-              className="system-node__hole"
-              style={h.dest ? { background: CLASS_COLORS[h.dest] } : undefined}
-              title={`${h.sigId || '?'} · ${h.code || t('mapNode.undivedUnknown')}${h.dest ? ` → ${h.dest}` : ''}`}
-              onClick={(e) => { e.stopPropagation(); selectSystem(sys.id); }}
-            />
-          ))}
+        <div className="system-node__holes">
+          {undivedHoles.map((h) => {
+            // Destination + colour from the single SDE-backed source (type first,
+            // else the leads-to band) so pills match the signature pane.
+            const disp = holeDisplay(h.code, h.leadsTo, whTypes);
+            return (
+              <span
+                key={h.id}
+                className="system-node__hole"
+                style={disp ? { background: disp.color } : undefined}
+                title={`${t('mapNode.undivedWhTitle')} — ${h.sigId || '?'} · ${h.code || t('mapNode.undivedUnknown')}${disp ? ` → ${disp.label}` : ''}`}
+                onClick={(e) => { e.stopPropagation(); selectSystem(sys.id); }}
+              />
+            );
+          })}
         </div>
       )}
 

@@ -582,7 +582,7 @@
     "matchCount_other": "{{count}} систем подходит",
     "clear": "Сбросить фильтр",
     "holes": "Червоточины",
-    "undivedWh": "Непройденная дыра"
+    "undivedWh": "Неисследованные"
   },
   "watchMarker": {
     "target": "Цель",
@@ -1582,7 +1582,7 @@
     "scoutConnections_many": "{{name}}: соединений",
     "scoutConnections_other": "{{name}}: соединений",
     "scoutConnectionsMulti": "Соединения: {{names}}",
-    "undivedWhTitle": "Просканированные, но не пройденные червоточины",
+    "undivedWhTitle": "Неисследованная червоточина",
     "undivedUnknown": "неизвестно"
   },
   "mapEdge": {

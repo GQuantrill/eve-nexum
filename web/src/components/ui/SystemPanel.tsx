@@ -9,7 +9,9 @@ import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from 
 import type { DragEndEvent } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 import { useMapStore } from '../../store/mapStore';
-import { CLASS_COLORS, CLASS_LABELS, EFFECT_LABELS, EFFECT_MODIFIERS, WORMHOLE_DESTINATIONS } from '../../data/wormholes';
+import { CLASS_COLORS, CLASS_LABELS, EFFECT_LABELS, EFFECT_MODIFIERS } from '../../data/wormholes';
+import { useWormholeTypes } from '../../hooks/useWormholeTypes';
+import { whDestClass } from '../../utils/whDest';
 import { DraggableCard } from './DraggableCard';
 import { FloatingPanel, type PanelGeometry } from './FloatingPanel';
 import { useUserSetting } from '../../hooks/useUserSetting';
@@ -173,6 +175,7 @@ function clamp(v: number) {
 
 export function SystemPanel() {
   const { t } = useTranslation();
+  const whTypes = useWormholeTypes();
   const panelTitle: Record<string, string> = {
     notes:       t('panel.notes'),
     signatures:  t('panel.signatures'),
@@ -532,7 +535,7 @@ export function SystemPanel() {
               <div className="sys-info__section-label">{t('systemPanel.statics')}</div>
               <div className="sys-info__row">
                 {sys.statics.map((s) => {
-                  const dest = WORMHOLE_DESTINATIONS[s];
+                  const dest = whDestClass(s, whTypes);
                   return (
                     <WHTypeInfo key={s} code={s}>
                       <span className="sys-info__static">

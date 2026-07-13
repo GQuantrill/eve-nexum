@@ -566,7 +566,7 @@
     "matchCount_other": "{{count}} 件のシステムが一致",
     "clear": "フィルターをクリア",
     "holes": "ワームホール",
-    "undivedWh": "未ダイブホール"
+    "undivedWh": "未探索"
   },
   "watchMarker": {
     "target": "ターゲット",
@@ -1544,7 +1544,7 @@
     "scoutConnections_one": "{{name}} 接続",
     "scoutConnections_other": "{{name}} 接続",
     "scoutConnectionsMulti": "{{names}} 接続",
-    "undivedWhTitle": "スキャン済みだが未ダイブのワームホール",
+    "undivedWhTitle": "未探索のワームホール",
     "undivedUnknown": "不明"
   },
   "mapEdge": {

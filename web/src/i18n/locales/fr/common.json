@@ -566,7 +566,7 @@
     "matchCount_other": "{{count}} systèmes correspondent",
     "clear": "Effacer le filtre",
     "holes": "Trous de ver",
-    "undivedWh": "Trou non exploré"
+    "undivedWh": "Inexploré"
   },
   "watchMarker": {
     "target": "Cible",
@@ -1544,7 +1544,7 @@
     "scoutConnections_one": "Connexion {{name}}",
     "scoutConnections_other": "Connexions {{name}}",
     "scoutConnectionsMulti": "Connexions {{names}}",
-    "undivedWhTitle": "Trous de ver scannés mais non explorés",
+    "undivedWhTitle": "Trou de ver inexploré",
     "undivedUnknown": "inconnu"
   },
   "mapEdge": {
