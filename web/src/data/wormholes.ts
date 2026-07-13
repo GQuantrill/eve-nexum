@@ -137,21 +137,25 @@ export const EFFECT_MODIFIERS: Record<WormholeEffect, Array<{ label: string; goo
     { label: 'Ship Agility',    good: false },
     { label: 'Stasis Web Str',  good: false },
   ],
-  // Cataclysmic Variable: remote reps and cap buffed; local reps, cap recharge
-  // and remote cap transfer punished.
+  // Cataclysmic Variable: remote reps, shield transfer and cap buffed; local
+  // reps, cap recharge and remote cap transfer punished.
   cataclysmic_variable: [
-    { label: 'Remote Rep',   good: true  },
-    { label: 'Cap Capacity', good: true  },
-    { label: 'Local Rep',    good: false },
-    { label: 'Cap Recharge', good: false },
-    { label: 'Remote Cap',   good: false },
+    { label: 'Remote Armor Rep',   good: true  },
+    { label: 'Shield Transfer',    good: true  },
+    { label: 'Cap Capacity',       good: true  },
+    { label: 'Local Armor Rep',    good: false },
+    { label: 'Local Shield Boost', good: false },
+    { label: 'Cap Recharge',       good: false },
+    { label: 'Remote Cap',         good: false },
   ],
-  // Magnetar: huge raw damage, but application (tracking, range, missiles) suffers.
+  // Magnetar: huge raw damage and explosion radius up; tracking, range and
+  // target painting down.
   magnetar: [
     { label: 'Weapon Damage',    good: true  },
-    { label: 'Tracking',         good: false },
+    { label: 'Explosion Radius', good: true  },
+    { label: 'Drone Tracking',   good: false },
+    { label: 'Tracking Speed',   good: false },
     { label: 'Targeting Range',  good: false },
-    { label: 'Explosion Radius', good: false },
     { label: 'Target Painter',   good: false },
   ],
   // Red Giant: overheat, smartbomb and bomb buffs; modules take more heat damage.
