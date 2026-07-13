@@ -131,22 +131,20 @@ export const EFFECT_MODIFIERS: Record<WormholeEffect, Array<{ label: string; goo
   // Black Hole: speed, range and missiles up; agility and webs down.
   black_hole: [
     { label: 'Ship Velocity',      good: true  },
-    { label: 'Missile Velocity',   good: true  },
-    { label: 'Explosion Velocity', good: true  },
     { label: 'Targeting Range',    good: true  },
+    { label: 'Missile Velocity',   good: true  },
+    { label: 'Missle & Vorton Explosion Velocity', good: true  },
     { label: 'Ship Agility',       good: false },
-    { label: 'Stasis Web Str',     good: false },
+    { label: 'Stasis Web Strength',     good: false },
   ],
   // Cataclysmic Variable: remote reps, shield transfer and cap buffed; local
   // reps, cap recharge and remote cap transfer punished.
   cataclysmic_variable: [
-    { label: 'Remote Armor Rep',   good: true  },
-    { label: 'Shield Transfer',    good: true  },
+    { label: 'Remote Armor Rep & Shield Boost',   good: true  },
     { label: 'Cap Capacity',       good: true  },
-    { label: 'Local Armor Rep',    good: false },
-    { label: 'Local Shield Boost', good: false },
-    { label: 'Cap Recharge',       good: false },
-    { label: 'Remote Cap',         good: false },
+    { label: 'Cap Recharge Rate',       good: false },
+    { label: 'Remote Cap Transfer',         good: false },
+    { label: 'Local Armor Rep & Shield Boost',    good: false },
   ],
   // Magnetar: huge raw damage and explosion radius up; tracking, range and
   // target painting down.
@@ -161,16 +159,15 @@ export const EFFECT_MODIFIERS: Record<WormholeEffect, Array<{ label: string; goo
   // Red Giant: overheat, smartbomb and bomb buffs; modules take more heat damage.
   red_giant: [
     { label: 'Overheat',        good: true  },
-    { label: 'Smartbomb Dmg',   good: true  },
-    { label: 'Smartbomb Range', good: true  },
+    { label: 'Smartbomb Damage & Range',   good: true  },
     { label: 'Bomb Damage',     good: true  },
     { label: 'Heat Damage',     good: false },
   ],
   // Wolf-Rayet: armor and small weapons buffed, smaller sig; shield resists punished.
   wolf_rayet: [
-    { label: 'Small Weapons', good: true  },
+    { label: 'Small Weapon Damage', good: true  },
     { label: 'Armor HP',      good: true  },
-    { label: 'Sig Radius',    good: true  },
-    { label: 'Shield Resist', good: false },
+    { label: 'Sig Radius Reduction',    good: true  },
+    { label: 'Shield Resists', good: false },
   ],
 };
