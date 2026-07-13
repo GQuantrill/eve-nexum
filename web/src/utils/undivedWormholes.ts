@@ -1,6 +1,4 @@
-import type { SystemClass } from '../types';
 import type { MapConnection } from '../types';
-import { WORMHOLE_DESTINATIONS } from '../data/wormholes';
 
 // A "scanned but not dived" wormhole: you know a hole is here (and maybe its
 // type/destination class) but you haven't jumped it, so no connection on the
@@ -15,13 +13,15 @@ export interface WhSig {
   leadsTo:  string;   // pinned system name, a class/band token, or "" / "unknown"
 }
 
-// A resolved undived hole, ready to render: its scan id, code, and the
-// destination class we can colour it by (null when unknown).
+// An undived hole, ready to render. Its destination/colour is resolved at
+// render time from the wormhole type (via the shared SDE-backed whDest helper)
+// or the leads-to band — NOT precomputed here — so there's a single source of
+// truth for wormhole destinations.
 export interface UndivedHole {
-  id:    string;
-  sigId: string;
-  code:  string;
-  dest:  SystemClass | null;
+  id:      string;
+  sigId:   string;
+  code:    string;
+  leadsTo: string;
 }
 
 // leads-to values that are a class/band/unknown rather than a pinned system —
@@ -40,20 +40,6 @@ function isUnresolvedLeadsTo(leadsTo: string): boolean {
   return CLASS_OR_UNKNOWN.has((leadsTo || '').trim().toUpperCase());
 }
 
-// The destination class to colour a hole by: from the wormhole type first
-// (e.g. U210 -> LS), else the leads-to when it's itself an exact class token,
-// else null (unknown -> neutral).
-function destForHole(code: string, leadsTo: string): SystemClass | null {
-  const byType = WORMHOLE_DESTINATIONS[(code || '').toUpperCase()];
-  if (byType) return byType;
-  const lt = (leadsTo || '').trim().toUpperCase();
-  const asClass = ({
-    C1: 'C1', C2: 'C2', C3: 'C3', C4: 'C4', C5: 'C5', C6: 'C6', C13: 'C13',
-    HS: 'HS', LS: 'LS', NS: 'NS', THERA: 'Thera', POCHVEN: 'Pochven', DRIFTER: 'Drifter',
-  } as Record<string, SystemClass>)[lt];
-  return asClass ?? null;
-}
-
 // The undived holes for one system: wormhole sigs whose leads-to is still
 // unresolved AND which don't already back a connection (a dived hole gets a
 // connection, and — via the backing-sig auto-link — its sig linked to it).
@@ -67,7 +53,7 @@ export function undivedForSystem(sigs: WhSig[], connections: MapConnection[]): U
   for (const s of sigs) {
     if (!isUnresolvedLeadsTo(s.leadsTo)) continue; // pinned to a system — solved
     if (backing.has(s.id)) continue;               // already backs a connection
-    out.push({ id: s.id, sigId: s.sigId, code: s.whType, dest: destForHole(s.whType, s.leadsTo) });
+    out.push({ id: s.id, sigId: s.sigId, code: s.whType, leadsTo: s.leadsTo });
   }
   return out;
 }

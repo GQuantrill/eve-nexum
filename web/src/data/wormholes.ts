@@ -45,13 +45,13 @@ export const WORMHOLE_DESTINATIONS: Record<string, SystemClass> = {
   // → C4
   E175: 'C4', X877: 'C4', Y683: 'C4', Z457: 'C4',
   // → C5
-  H296: 'C5', H900: 'C5', N062: 'C5', V911: 'C5',
+  H296: 'C5', H900: 'C5', N062: 'C5', N432: 'C5', V911: 'C5',
   // → C6
   R474: 'C6', U574: 'C6', V753: 'C6', W237: 'C6',
   // → Hi-Sec
   B274: 'HS', D845: 'HS', N110: 'HS', Q063: 'HS',
   // → Low-Sec
-  A239: 'LS', J244: 'LS', N432: 'LS', U210: 'LS', V898: 'LS',
+  A239: 'LS', J244: 'LS', U210: 'LS', V898: 'LS',
   // → Null-Sec
   E545: 'NS', E587: 'NS', K346: 'NS', S047: 'NS', Z060: 'NS',
   // → Thera
@@ -91,7 +91,7 @@ export const WORMHOLE_TYPES: Record<string, { leadsTo: SystemClass; maxMassKg: n
   D382:  { leadsTo: 'C5', maxMassKg: 3_000_000_000, jumpMassKg: 1_000_000_000, lifetimeH: 16 },
   W237:  { leadsTo: 'C6', maxMassKg: 3_000_000_000, jumpMassKg: 1_000_000_000, lifetimeH: 24 },
   S047:  { leadsTo: 'NS', maxMassKg: 2_000_000_000, jumpMassKg: 300_000_000, lifetimeH: 16 },
-  N432:  { leadsTo: 'LS', maxMassKg: 2_000_000_000, jumpMassKg: 300_000_000, lifetimeH: 16 },
+  N432:  { leadsTo: 'C5', maxMassKg: 2_000_000_000, jumpMassKg: 300_000_000, lifetimeH: 16 },
 };
 
 export const SYSTEM_CLASSES: SystemClass[] = [

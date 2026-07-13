@@ -1,8 +1,9 @@
 import { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowRightIcon, CaretDownIcon, CaretUpIcon } from '@phosphor-icons/react';
-import { CLASS_COLORS, CLASS_LABELS, WORMHOLE_DESTINATIONS } from '../../data/wormholes';
+import { CLASS_COLORS, CLASS_LABELS } from '../../data/wormholes';
 import { useWormholeTypes } from '../../hooks/useWormholeTypes';
+import { whDestClass, DEST_TO_CLASS } from '../../utils/whDest';
 import { usePopover } from '../../hooks/usePopover';
 import type { SystemClass } from '../../types';
 
@@ -11,14 +12,6 @@ interface Props {
   onChange: (whType: string, leadsTo: string) => void;
   statics?: string[];
 }
-
-// Map server's lowercase `dest` values to the SystemClass union used by
-// CLASS_COLORS / CLASS_LABELS.
-const DEST_TO_CLASS: Record<string, SystemClass> = {
-  c1: 'C1', c2: 'C2', c3: 'C3', c4: 'C4', c5: 'C5', c6: 'C6', c13: 'C13',
-  hs: 'HS', ls: 'LS', ns: 'NS',
-  thera: 'Thera', pochven: 'Pochven', drifter: 'Drifter',
-};
 
 // Display order for the picker's groups. Anything from the server whose
 // `dest` isn't covered here still gets shown — appended at the bottom under
@@ -40,14 +33,8 @@ const GROUP_ORDER: { key: string; label: string; dest: SystemClass }[] = [
   { key: 'drifter', label: 'Drifter',  dest: 'Drifter' },
 ];
 
-function destFor(code: string, types: ReturnType<typeof useWormholeTypes>): SystemClass | null {
-  const fromServer = types[code]?.dest;
-  if (fromServer) return DEST_TO_CLASS[fromServer.toLowerCase()] ?? null;
-  return WORMHOLE_DESTINATIONS[code] ?? null;
-}
-
 function DestBadge({ code, types }: { code: string; types: ReturnType<typeof useWormholeTypes> }) {
-  const dest = destFor(code, types);
+  const dest = whDestClass(code, types);
   if (!dest) return null;
   return (
     <>
@@ -73,7 +60,7 @@ export function WormholeTypePicker({ value, onChange, statics = [] }: Props) {
   };
 
   const select = (code: string) => {
-    const dest = code === 'K162' ? null : destFor(code, types);
+    const dest = code === 'K162' ? null : whDestClass(code, types);
     onChange(code, dest ?? '');
     setOpen(false);
   };
