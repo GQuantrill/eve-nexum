@@ -566,7 +566,7 @@
     "matchCount_other": "{{count}}개 시스템 일치",
     "clear": "필터 지우기",
     "holes": "웜홀",
-    "undivedWh": "미탐사 홀"
+    "undivedWh": "미탐사"
   },
   "watchMarker": {
     "target": "표적",

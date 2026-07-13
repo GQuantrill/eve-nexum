@@ -566,7 +566,7 @@
     "matchCount_other": "{{count}} sistemas correspondem",
     "clear": "Limpar filtro",
     "holes": "Buracos de minhoca",
-    "undivedWh": "Buraco não mergulhado"
+    "undivedWh": "Inexplorado"
   },
   "watchMarker": {
     "target": "Alvo",

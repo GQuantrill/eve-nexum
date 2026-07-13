@@ -582,7 +582,7 @@
     "matchCount_other": "{{count}} систем подходит",
     "clear": "Сбросить фильтр",
     "holes": "Червоточины",
-    "undivedWh": "Непройденная дыра"
+    "undivedWh": "Неисследованные"
   },
   "watchMarker": {
     "target": "Цель",

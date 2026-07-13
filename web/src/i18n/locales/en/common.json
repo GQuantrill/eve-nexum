@@ -606,7 +606,7 @@
     "sigs": "Signatures",
     "anoms": "Anomalies",
     "holes": "Wormholes",
-    "undivedWh": "Undived hole",
+    "undivedWh": "Unexplored",
     "namePlaceholder": "Site name contains…",
     "matchCount_one": "{{count}} system matches",
     "matchCount_other": "{{count}} systems match",

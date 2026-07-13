@@ -566,7 +566,7 @@
     "matchCount_other": "{{count}} 件のシステムが一致",
     "clear": "フィルターをクリア",
     "holes": "ワームホール",
-    "undivedWh": "未ダイブホール"
+    "undivedWh": "未探索"
   },
   "watchMarker": {
     "target": "ターゲット",

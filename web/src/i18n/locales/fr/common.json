@@ -566,7 +566,7 @@
     "matchCount_other": "{{count}} systèmes correspondent",
     "clear": "Effacer le filtre",
     "holes": "Trous de ver",
-    "undivedWh": "Trou non exploré"
+    "undivedWh": "Inexploré"
   },
   "watchMarker": {
     "target": "Cible",

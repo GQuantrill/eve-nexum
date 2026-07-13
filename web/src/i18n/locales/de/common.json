@@ -566,7 +566,7 @@
     "matchCount_other": "{{count}} Systeme passen",
     "clear": "Filter löschen",
     "holes": "Wurmlöcher",
-    "undivedWh": "Ungetauchtes Loch"
+    "undivedWh": "Unerforscht"
   },
   "watchMarker": {
     "target": "Ziel",

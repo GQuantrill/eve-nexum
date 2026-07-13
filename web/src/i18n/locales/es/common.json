@@ -566,7 +566,7 @@
     "matchCount_other": "{{count}} sistemas coinciden",
     "clear": "Limpiar filtro",
     "holes": "Agujeros de gusano",
-    "undivedWh": "Agujero sin explorar"
+    "undivedWh": "Inexplorado"
   },
   "watchMarker": {
     "target": "Objetivo",
