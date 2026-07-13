@@ -2349,6 +2349,11 @@
   display: flex;
   align-items: center;
   gap: 6px;
+  /* Wrap onto extra rows on a narrow (docked) panel instead of shrinking the
+     controls to nothing. Kicks in only when they no longer fit side by side —
+     wide layouts are unchanged. Paired with the min-widths below, since a
+     min-width of 0 would let items shrink forever and never wrap. */
+  flex-wrap: wrap;
 }
 
 .watchlist__drag-handle {
@@ -2383,11 +2388,11 @@
 }
 
 .watchlist__marker { width: 82px; }
-.watchlist__by { flex: 1; min-width: 0; }
+.watchlist__by { flex: 1; min-width: 80px; }
 
 .watchlist__char-label {
   flex: 1;
-  min-width: 0;
+  min-width: 80px;
   font-size: calc(12px * var(--font-scale, 1));
   color: #c8d4f0;
   white-space: nowrap;
@@ -2399,7 +2404,7 @@
 .watchlist__note {
   flex: 1;
   width: 100%;
-  min-width: 0;
+  min-width: 96px;
   background: #0a0e1a;
   border: 1px solid #1e2740;
   border-radius: 4px;
@@ -2435,7 +2440,7 @@
 .watchlist__search,
 .watchlist__whpick {
   flex: 1;
-  min-width: 0;
+  min-width: 96px;
 }
 
 /* Red outline on the picker button when the wormhole type duplicates another
@@ -3647,6 +3652,10 @@
   border-radius: 6px;
   padding: 6px 10px;
   white-space: nowrap;
+  /* Size the box to its widest row. Without this the tooltip's shrink-to-fit
+     width is constrained by its tiny icon container, so longer labels
+     (e.g. "Targeting Range") get clipped. */
+  width: max-content;
   z-index: 9999;
   flex-direction: column;
   gap: 3px;
