@@ -6,4 +6,3 @@ export const charPortrait = (id: number, size = 64) => `${BASE}/characters/${id}
 export const corpLogo     = (id: number, size = 64) => `${BASE}/corporations/${id}/logo?size=${size}`;
 export const allianceLogo = (id: number, size = 64) => `${BASE}/alliances/${id}/logo?size=${size}`;
 export const typeIcon     = (id: number, size = 64) => `${BASE}/types/${id}/icon?size=${size}`;
-export const typeRender   = (id: number, size = 64) => `${BASE}/types/${id}/render?size=${size}`;

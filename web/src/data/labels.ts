@@ -20,8 +20,6 @@ export const PREDEFINED_LABELS: LabelDef[] = [
   { id: '3', char: '3', color: 'var(--label-3)' },
 ];
 
-export const PREDEFINED_LABEL_IDS = PREDEFINED_LABELS.map((l) => l.id);
-
 export const MAX_CUSTOM_LABELS = 3;
 
 // Default custom-label pill colour when the user hasn't picked one.

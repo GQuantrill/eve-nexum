@@ -27,13 +27,19 @@ console.warn = (...args: unknown[]) => {
   _warn(...args);
 };
 
+// Redact the bearer-style share token so it never lands in the captured log
+// buffer (which nexumDebug.dump() prints to the console).
+function redactUrl(url: string): string {
+  return url.replace(/([?&]shareToken=)[^&]*/gi, '$1[redacted]');
+}
+
 // Intercept fetch to log API failures
 const _fetch = window.fetch.bind(window);
 window.fetch = async (input, init) => {
   const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : (input as Request).url;
   const res = await _fetch(input, init);
   if (!res.ok && url.includes('/api/')) {
-    entry('api', `${res.status} ${res.statusText} — ${url}`);
+    entry('api', `${res.status} ${res.statusText} — ${redactUrl(url)}`);
   }
   return res;
 };
