@@ -22,8 +22,8 @@ import { useIncursions, findIncursion } from '../../hooks/useIncursions';
 import { useInsurgency, findInsurgency } from '../../hooks/useInsurgency';
 import { useStorms, findStorm } from '../../hooks/useStorms';
 import { useScoutConnections, findScoutConnections } from '../../hooks/useScoutConnections';
-import { useA0Systems } from '../../hooks/useA0Systems';
-import { useShatteredSystems } from '../../hooks/useShatteredSystems';
+import { useA0SystemIds } from '../../hooks/useA0Systems';
+import { useShatteredSystemIds } from '../../hooks/useShatteredSystems';
 import { PREDEFINED_LABELS, parseCustomLabel, labelTextColor } from '../../data/labels';
 import { iconComponent } from '../../utils/phosphorIcons';
 import { useIceBeltSystems, hasIceBelt } from '../../hooks/useIceBeltSystems';
@@ -129,11 +129,10 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
   const storm           = useMemo(() => findStorm(storms, sys.eveSystemId), [storms, sys.eveSystemId]);
   const scoutAll        = useScoutConnections();
   const scoutMatches    = useMemo(() => findScoutConnections(scoutAll, sys.eveSystemId), [scoutAll, sys.eveSystemId]);
-  const a0Systems       = useA0Systems();
-  const a0Ids           = useMemo(() => new Set(a0Systems.map(s => s.id)), [a0Systems]);
+  // Shared id-Sets (built once, not per node) for O(1) membership.
+  const a0Ids           = useA0SystemIds();
   const isA0            = sys.eveSystemId !== null && a0Ids.has(sys.eveSystemId);
-  const shatteredSystems = useShatteredSystems();
-  const shatteredIds    = useMemo(() => new Set(shatteredSystems.map(s => s.id)), [shatteredSystems]);
+  const shatteredIds    = useShatteredSystemIds();
   const isShattered     = sys.eveSystemId !== null && shatteredIds.has(sys.eveSystemId);
   const iceBeltSystems  = useIceBeltSystems();
   const isIceBelt       = useMemo(() => hasIceBelt(iceBeltSystems, sys.eveSystemId), [iceBeltSystems, sys.eveSystemId]);
@@ -169,7 +168,12 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
   // entry (by name, class, effect, or a static wormhole type / frig hole).
   const [watchEntries]  = useWatchlist();
   const watchSigTypes   = useMapStore((s) => s.sigTypesBySystem[sys.id]);
-  const watch           = matchSystem(watchEntries, sys, watchSigTypes);
+  // Memoized: matchSystem scans up to MAX_WATCH (~75) entries; without this it
+  // re-ran on every re-render (e.g. every 10s location poll), for every node.
+  const watch           = useMemo(
+    () => matchSystem(watchEntries, sys, watchSigTypes),
+    [watchEntries, sys, watchSigTypes],
+  );
   const watchDef        = watch ? watchMarker(watch.marker) : null;
   const watchTip        = watch ? (watch.note.trim() || t(`watchMarker.${watch.marker}`)) : undefined;
 
@@ -187,7 +191,10 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
   // the app rather than the drift-prone hardcoded map.
   const whTypes         = useWormholeTypes();
   const filterOn        = contentFilterActive(contentFilter);
-  const contentMatch    = filterOn && systemMatchesContent(sysContent, contentFilter, (undivedHoles?.length ?? 0) > 0);
+  const contentMatch    = useMemo(
+    () => filterOn && systemMatchesContent(sysContent, contentFilter, (undivedHoles?.length ?? 0) > 0),
+    [filterOn, sysContent, contentFilter, undivedHoles],
+  );
   const filteredOut     = filterOn && !contentMatch;
 
   // Tooltip label: dedupe by scout system name (Thera / Turnur). Multiple
