@@ -769,6 +769,23 @@ export async function migrate() {
       created_at         TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
     CREATE INDEX IF NOT EXISTS idx_api_tokens_owner ON api_tokens (owner_id);
+
+    -- Login allow-list. Who may sign in to a restricted deployment, beyond the
+    -- .env CORP_ID/ALLIANCE_ID core. Each row admits a corp, an alliance, or a
+    -- single character by raw EVE id. Seeded from .env on boot (source='env',
+    -- immutable from the admin API); everything else is managed live from the
+    -- admin area. See access-control-design.md.
+    CREATE TABLE IF NOT EXISTS access_grants (
+      id            UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+      kind          TEXT        NOT NULL CHECK (kind IN ('corp','alliance','character')),
+      eve_id        BIGINT      NOT NULL,
+      source        TEXT        NOT NULL DEFAULT 'admin' CHECK (source IN ('env','admin','share','standing')),
+      note          TEXT,
+      added_by_user INTEGER     REFERENCES users(id) ON DELETE SET NULL,
+      created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      UNIQUE (kind, eve_id)
+    );
+    CREATE INDEX IF NOT EXISTS idx_access_grants_lookup ON access_grants (kind, eve_id);
   `);
 
   await encryptLegacyTokens();
