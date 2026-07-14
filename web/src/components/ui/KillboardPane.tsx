@@ -4,7 +4,7 @@ import type { TFunction } from 'i18next';
 import { useKillboard, useLastKill } from '../../hooks/useKillboard';
 import { useStandings } from '../../hooks/useStandings';
 import { useUserSetting } from '../../hooks/useUserSetting';
-import { abbreviateValue } from '../../i18n/format';
+import { abbreviateValue, splitHoursMinutes } from '../../i18n/format';
 import type { ZkbKill } from '../../hooks/useKillboard';
 
 const NPC_TOGGLE_KEY = 'nexum.killboardIncludeNpc';
@@ -20,10 +20,11 @@ const ZKB     = 'https://zkillboard.com';
 // force) rather than a small gang. Tune to taste.
 const GANK_THRESHOLD = 10;
 
+// Killboard uses a finer-grained "time ago" than the shared timeAgo (h+m
+// combined, e.g. "3h 24m ago"), so it stays its own function — but the h/m
+// split now comes from the shared helper.
 function timeAgo(t: TFunction, iso: string): string {
-  const diffMs = Date.now() - new Date(iso).getTime();
-  const h = Math.floor(diffMs / 3_600_000);
-  const m = Math.floor((diffMs % 3_600_000) / 60_000);
+  const { hours: h, minutes: m } = splitHoursMinutes(Date.now() - new Date(iso).getTime());
   if (h >= 24) return t('time.daysAgo', { value: Math.floor(h / 24) });
   if (h > 0)   return t('killboard.hoursMinutesAgo', { hours: h, minutes: m });
   return m <= 0 ? t('time.justNow') : t('time.minutesAgo', { value: m });

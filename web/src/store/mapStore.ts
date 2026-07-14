@@ -99,6 +99,27 @@ function recomputeUniformMax(): { w: number; h: number } {
   // the height would lock at 0 and the inline minHeight would never apply.
   return { w: snapUpToGrid(w), h: snapUpToGrid(anyHeightEligible ? h : hAll) };
 }
+
+// Coalesce the uniform-max recompute. On map load all N nodes report their size
+// in the same frame; recomputing (an O(N) scan) + writing the store per report
+// was O(N^2) and re-rendered every node up to N times as the max ratcheted.
+// Instead each report just schedules one recompute per frame that reads the
+// final nodeSizes and writes the store at most once.
+let uniformRaf: ReturnType<typeof requestAnimationFrame> | null = null;
+function scheduleUniformRecompute(): void {
+  if (uniformRaf !== null) return;
+  const run = () => {
+    uniformRaf = null;
+    const { w, h } = recomputeUniformMax();
+    const st = useMapStore.getState();
+    if (st.uniformWidth !== w || st.uniformHeight !== h) {
+      useMapStore.setState({ uniformWidth: w, uniformHeight: h });
+    }
+  };
+  // requestAnimationFrame is absent under SSR/tests — fall back to running now.
+  if (typeof requestAnimationFrame === 'undefined') { run(); return; }
+  uniformRaf = requestAnimationFrame(run);
+}
 // Debounce map name saves — keyed by mapId so two tabs renaming two different
 // maps don't clobber each other through a shared timer slot.
 const nameTimers = new Map<string, ReturnType<typeof setTimeout>>();
@@ -798,11 +819,7 @@ export const useMapStore = create<MapStore>()((set, get) => {
           && Math.abs(prev.h - height) < 1
           && prev.countHeight === countHeight) return;
       nodeSizes.set(id, { w: width, h: height, countHeight });
-      const { w, h } = recomputeUniformMax();
-      const cur = get();
-      if (cur.uniformWidth !== w || cur.uniformHeight !== h) {
-        set({ uniformWidth: w, uniformHeight: h });
-      }
+      scheduleUniformRecompute();
 
       // Consume a pending placement fix now we know this node's real size.
       // Only ever moves the node FARTHER from the source (restores the gap when
@@ -837,11 +854,7 @@ export const useMapStore = create<MapStore>()((set, get) => {
       // before the real measure consumes it. The fix is cleared in
       // reportNodeSize (on apply) or removeSystem (on real removal).
       if (!nodeSizes.delete(id)) return;
-      const { w, h } = recomputeUniformMax();
-      const cur = get();
-      if (cur.uniformWidth !== w || cur.uniformHeight !== h) {
-        set({ uniformWidth: w, uniformHeight: h });
-      }
+      scheduleUniformRecompute();
     },
 
     // Drop every cached natural size and reset the broadcast uniform

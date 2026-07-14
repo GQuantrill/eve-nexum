@@ -46,8 +46,11 @@ export function isUnresolvedLeadsTo(value: string | null | undefined): boolean {
 }
 
 // J-space "band" leads-to values (an unscanned hole reports a band, not an exact
-// class) with display label + colour — mirrors the LeadsToDropdown options.
-const LEADS_TO_BANDS: Record<string, { label: string; color: string }> = {
+// class) with display label + colour. Single source — the LeadsToDropdown picker
+// builds its band options from this map, and holeDisplay resolves stored band
+// values through it. Insertion order is the picker's display order. Each band is
+// coloured by its worst class so the threat reads green -> orange -> red.
+export const LEADS_TO_BANDS: Record<string, { label: string; color: string }> = {
   'C1-C3': { label: 'C1 - C3', color: CLASS_COLORS.C3 },
   'C4-C5': { label: 'C4 - C5', color: CLASS_COLORS.C5 },
 };
