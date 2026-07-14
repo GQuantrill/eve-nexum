@@ -11,6 +11,7 @@ import { useNow30s } from '../../hooks/useNow30s';
 import { useWatchlist } from '../../hooks/useWatchlist';
 import { matchConnection } from '../../utils/watchMatch';
 import { watchMarker } from '../../data/watchMarkers';
+import { hoursMins } from '../../i18n/format';
 
 // CSS custom properties (resolved via the edge path's inline `style`) so the
 // colour-vision palettes (--cv-conn-* in App.css) re-map connection colours.
@@ -48,9 +49,7 @@ function computeEolState(eolAt: string | null | undefined, now: number) {
   const elapsed   = now - new Date(eolAt).getTime();
   const remaining = EOL_LIFE_MS - elapsed;
   if (remaining <= 0) return { color: TIME_COLORS.expired, label: '!', cls: 'connection-label__crit', expired: true };
-  const hours = Math.floor(remaining / 3_600_000);
-  const mins  = Math.floor((remaining % 3_600_000) / 60_000);
-  const label = hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
+  const label = hoursMins(remaining);
   if (remaining < EOL_LESS_1H_MS) {
     return { color: TIME_COLORS.lessThan1h, label, cls: 'connection-label__eol', expired: false };
   }

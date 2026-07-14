@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { ArrowRightIcon, CaretDownIcon, CaretUpIcon } from '@phosphor-icons/react';
 import type { MapSystem, SystemClass } from '../../types';
 import { CLASS_COLORS, CLASS_LABELS } from '../../data/wormholes';
+import { LEADS_TO_BANDS } from '../../utils/whDest';
 import { usePopover } from '../../hooks/usePopover';
 
 interface Props {
@@ -21,10 +22,9 @@ interface DestOption { value: string; label: string; color: string; }
 // worst class so the threat reads green → orange → red. C13 / Thera / Pochven /
 // Drifter stay individual (their descriptions are distinct), as does K-space.
 const J_SPACE: DestOption[] = [
-  // Stored values stay 'C1-C3' / 'C4-C5' (unchanged for existing data + matching);
-  // only the display labels get spaced hyphens.
-  { value: 'C1-C3', label: 'C1 - C3', color: CLASS_COLORS.C3 },
-  { value: 'C4-C5', label: 'C4 - C5', color: CLASS_COLORS.C5 },
+  // Bands (C1-C3 / C4-C5) come from the single source in whDest.ts; stored
+  // values stay 'C1-C3' / 'C4-C5' (unchanged for existing data + matching).
+  ...Object.entries(LEADS_TO_BANDS).map(([value, b]) => ({ value, label: b.label, color: b.color })),
   { value: 'C6',    label: 'C6',    color: CLASS_COLORS.C6 },
   { value: 'C13',     label: CLASS_LABELS.C13,     color: CLASS_COLORS.C13 },
   { value: 'Thera',   label: CLASS_LABELS.Thera,   color: CLASS_COLORS.Thera },
