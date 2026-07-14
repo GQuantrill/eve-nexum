@@ -64,36 +64,6 @@ export const WORMHOLE_DESTINATIONS: Record<string, SystemClass> = {
   E004: 'C1', L005: 'C2', Z006: 'C3', M001: 'C4', C008: 'C5', G008: 'C6', Q003: 'NS',
 };
 
-// Grouped WH types for the picker UI (ordered for display)
-export const WH_GROUPS: { key: string; label: string; types: string[] }[] = [
-  { key: 'k162',    label: 'K162',     types: ['K162'] },
-  { key: 'frigate', label: 'Frigate',  types: ['E004', 'L005', 'Z006', 'M001', 'C008', 'G008', 'Q003', 'A009'] },
-  { key: 'highsec', label: 'Hi-Sec',   types: ['B274', 'D845', 'N110', 'Q063'] },
-  { key: 'lowsec',  label: 'Low-Sec',  types: ['A239', 'J244', 'N432', 'U210', 'V898'] },
-  { key: 'nullsec', label: 'Null-Sec', types: ['E545', 'E587', 'K346', 'S047', 'Z060'] },
-  { key: 'c1',      label: 'Class 1',  types: ['E004', 'P060', 'Q317', 'Y790', 'Z647', 'Z971'] },
-  { key: 'c2',      label: 'Class 2',  types: ['D364', 'D382', 'G024', 'L005', 'N766'] },
-  { key: 'c3',      label: 'Class 3',  types: ['C247', 'L477', 'M267', 'O477', 'Z006'] },
-  { key: 'c4',      label: 'Class 4',  types: ['E175', 'M001', 'X877', 'Y683', 'Z457'] },
-  { key: 'c5',      label: 'Class 5',  types: ['C008', 'H296', 'H900', 'N062', 'V911'] },
-  { key: 'c6',      label: 'Class 6',  types: ['G008', 'R474', 'U574', 'V753', 'W237'] },
-  { key: 'thera',   label: 'Thera',    types: ['F135', 'F353', 'L031', 'M164', 'T458'] },
-  { key: 'drifter', label: 'Drifter',  types: ['B735', 'C414', 'R259', 'S877', 'V928'] },
-];
-
-export const WORMHOLE_TYPES: Record<string, { leadsTo: SystemClass; maxMassKg: number; jumpMassKg: number; lifetimeH: number }> = {
-  K162:  { leadsTo: 'C1', maxMassKg: 0,          jumpMassKg: 0,         lifetimeH: 24 },
-  Z060:  { leadsTo: 'HS', maxMassKg: 500_000_000,  jumpMassKg: 20_000_000, lifetimeH: 16 },
-  B274:  { leadsTo: 'HS', maxMassKg: 2_000_000_000, jumpMassKg: 300_000_000, lifetimeH: 24 },
-  N110:  { leadsTo: 'C1', maxMassKg: 500_000_000,  jumpMassKg: 20_000_000, lifetimeH: 16 },
-  C247:  { leadsTo: 'C3', maxMassKg: 1_800_000_000, jumpMassKg: 300_000_000, lifetimeH: 16 },
-  X877:  { leadsTo: 'C4', maxMassKg: 2_000_000_000, jumpMassKg: 300_000_000, lifetimeH: 16 },
-  D382:  { leadsTo: 'C5', maxMassKg: 3_000_000_000, jumpMassKg: 1_000_000_000, lifetimeH: 16 },
-  W237:  { leadsTo: 'C6', maxMassKg: 3_000_000_000, jumpMassKg: 1_000_000_000, lifetimeH: 24 },
-  S047:  { leadsTo: 'NS', maxMassKg: 2_000_000_000, jumpMassKg: 300_000_000, lifetimeH: 16 },
-  N432:  { leadsTo: 'C5', maxMassKg: 2_000_000_000, jumpMassKg: 300_000_000, lifetimeH: 16 },
-};
-
 export const SYSTEM_CLASSES: SystemClass[] = [
   'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C13',
   'HS', 'LS', 'NS', 'Thera', 'Pochven', 'Drifter',

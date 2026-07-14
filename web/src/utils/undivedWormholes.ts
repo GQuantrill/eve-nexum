@@ -1,4 +1,5 @@
 import type { MapConnection } from '../types';
+import { isUnresolvedLeadsTo } from './whDest';
 
 // A "scanned but not dived" wormhole: you know a hole is here (and maybe its
 // type/destination class) but you haven't jumped it, so no connection on the
@@ -22,22 +23,6 @@ export interface UndivedHole {
   sigId:   string;
   code:    string;
   leadsTo: string;
-}
-
-// leads-to values that are a class/band/unknown rather than a pinned system —
-// mirrors whJumpConfirm's set. A leads-to NOT in here is a specific connected
-// system, i.e. the hole is already solved. (Legacy exact C-classes included.)
-const CLASS_OR_UNKNOWN = new Set([
-  '', 'UNKNOWN',
-  'C1-C3', 'C4-C5', 'C6', 'C13', 'THERA', 'POCHVEN', 'DRIFTER',
-  'HS', 'LS', 'NS',
-  'C1', 'C2', 'C3', 'C4', 'C5',
-]);
-
-// A hole is unresolved while its leads-to is still a class/band/unknown (not
-// pinned to a specific system).
-function isUnresolvedLeadsTo(leadsTo: string): boolean {
-  return CLASS_OR_UNKNOWN.has((leadsTo || '').trim().toUpperCase());
 }
 
 // The undived holes for one system: wormhole sigs whose leads-to is still

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { api } from '../../api/client';
-import { useMapStore } from '../../store/mapStore';
+import { useMapStore, awaitSystemCreate } from '../../store/mapStore';
 import { useCanEditContent } from '../../hooks/useCanEditContent';
 import { useShareMode } from '../../context/ShareModeContext';
 import { useUserSetting } from '../../hooks/useUserSetting';
@@ -15,14 +15,15 @@ import { LeadsToDropdown } from './LeadsToDropdown';
 import { toast } from './Toaster';
 import { reevaluateConnectionsForSystem } from '../../utils/whAutoDetect';
 import { alertInboundK162 } from '../../utils/k162Alert';
-import { WORMHOLE_TYPES } from '../../data/wormholes';
 import { formatBookmarkName, DEFAULT_BOOKMARK_FORMAT } from '../../utils/signatureBookmark';
 import { useWormholeTypes } from '../../hooks/useWormholeTypes';
 import { duration, DASH } from '../../i18n/format';
 
 // Aging bands for wormhole signatures, anchored to the WH type's known
-// lifetime. K162 and unknown codes return '' (no tint) since we don't
-// know the real lifetime from this side. Other sig types are skipped.
+// lifetime from the SDE catalog (useWormholeTypes) — the single source, so
+// every code with a lifetime tints, not just a hardcoded handful. K162 and
+// unknown codes return '' (no lifetime known from this side); other sig types
+// are skipped.
 //
 //   < 50% of lifetime → fresh, no tint
 //   50–90%            → mid (yellow row)
@@ -33,12 +34,13 @@ function whAgeRowClass(
   whType: string,
   createdAt: string | undefined,
   now: number,
+  whTypes: ReturnType<typeof useWormholeTypes>,
 ): string {
   if (sigType !== 'wormhole' || !whType || !createdAt) return '';
-  const wh = WORMHOLE_TYPES[whType.toUpperCase()];
-  if (!wh || wh.lifetimeH <= 0) return '';
+  const wh = whTypes[whType.toUpperCase()];
+  if (!wh || wh.lifetimeHours <= 0) return '';
   const ageH = (now - new Date(createdAt).getTime()) / 3_600_000;
-  const pct  = ageH / wh.lifetimeH;
+  const pct  = ageH / wh.lifetimeHours;
   if (pct < 0.5)  return '';
   if (pct < 0.9)  return 'sig-row--wh-mid';
   if (pct < 1.0)  return 'sig-row--wh-eol';
@@ -388,9 +390,19 @@ export function SignaturePane({ systemId }: { systemId: string }) {
       return;
     }
 
-    api<Signature[]>(`/api/maps/${activeMapId}/systems/${systemId}/signatures`)
-      .then(setSigs)
-      .catch(() => toast.error(t('signatures.loadFailed')));
+    // A system just created by a jump may not have committed server-side yet;
+    // wait for its create POST before fetching, or the GET 404s ("Failed to
+    // load signatures"). Existing systems resolve to null and fetch at once.
+    let cancelled = false;
+    const fetchSigs = () => {
+      if (cancelled) return;
+      api<Signature[]>(`/api/maps/${activeMapId}/systems/${systemId}/signatures`)
+        .then((data) => { if (!cancelled) setSigs(data); })
+        .catch(() => { if (!cancelled) toast.error(t('signatures.loadFailed')); });
+    };
+    const pending = awaitSystemCreate(systemId);
+    if (pending) void pending.then(fetchSigs); else fetchSigs();
+    return () => { cancelled = true; };
   }, [activeMapId, systemId, isShareMode]);
 
   // Live sync: when a remote client changes this system's sigs, re-fetch in
@@ -931,7 +943,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
             {sortedSigs.map((sig) => (
               <tr
                 key={sig.id}
-                className={`${selected.has(sig.id) ? 'sig-row--selected' : ''} ${sig.sigType === 'unknown' ? 'sig-row--unknown' : ''} ${whAgeRowClass(sig.sigType, sig.whType, sig.createdAt, tickNow)} ${removing.has(sig.id) ? 'sig-row--removing' : ''}`}
+                className={`${selected.has(sig.id) ? 'sig-row--selected' : ''} ${sig.sigType === 'unknown' ? 'sig-row--unknown' : ''} ${whAgeRowClass(sig.sigType, sig.whType, sig.createdAt, tickNow, whTypes)} ${removing.has(sig.id) ? 'sig-row--removing' : ''}`}
                 style={removing.has(sig.id) && overwriteDelay > 0 ? { animationDuration: `${overwriteDelay}s` } : undefined}
               >
                 {!isShareMode && (

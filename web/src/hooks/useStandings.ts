@@ -133,5 +133,3 @@ export function useStandings() {
   }), [tick, getStanding]);
 }
 
-// Convenience for code that only needs the loader (no per-target lookups).
-export function preloadStandings() { void load(); }

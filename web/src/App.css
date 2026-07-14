@@ -5620,7 +5620,7 @@ div.system-node__easy-handle {
   background: #0a1525 !important;
 }
 
-/* Wormhole-sig aging. Tints anchored to WORMHOLE_TYPES.lifetimeH:
+/* Wormhole-sig aging. Tints anchored to the SDE catalog lifetimeHours:
    --wh-mid  50–90% of lifetime (yellow)
    --wh-eol  90–100%            (orange)
    --wh-past >100%              (red — likely closed)

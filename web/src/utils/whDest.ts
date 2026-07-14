@@ -27,6 +27,24 @@ export function whDestClass(code: string | null | undefined, types: WhTypeDest):
   return WORMHOLE_DESTINATIONS[c] ?? null;
 }
 
+// leads-to tokens that are a class/band/unknown rather than a pinned system. A
+// value NOT in here is a specific connected-system name — i.e. the hole is
+// already solved. Case-insensitive so every consumer agrees (this set was
+// previously duplicated in undivedWormholes + whJumpConfirm and had drifted in
+// case-handling). Legacy exact C-classes included.
+const UNRESOLVED_LEADS_TO = new Set([
+  '', 'UNKNOWN',
+  'C1-C3', 'C4-C5', 'C6', 'C13', 'THERA', 'POCHVEN', 'DRIFTER',
+  'HS', 'LS', 'NS',
+  'C1', 'C2', 'C3', 'C4', 'C5',
+]);
+
+/** True while a hole's leads-to is still a class/band/unknown (not pinned to a
+ *  specific system). The single source for "is this hole unresolved". */
+export function isUnresolvedLeadsTo(value: string | null | undefined): boolean {
+  return UNRESOLVED_LEADS_TO.has((value ?? '').trim().toUpperCase());
+}
+
 // J-space "band" leads-to values (an unscanned hole reports a band, not an exact
 // class) with display label + colour — mirrors the LeadsToDropdown options.
 const LEADS_TO_BANDS: Record<string, { label: string; color: string }> = {
@@ -36,7 +54,7 @@ const LEADS_TO_BANDS: Record<string, { label: string; color: string }> = {
 
 /** Label + colour for a leads-to value (band or exact class); null when empty,
  *  unknown, or a free-form connected-system name. */
-export function leadsToDisplay(value: string | null | undefined): { label: string; color: string } | null {
+function leadsToDisplay(value: string | null | undefined): { label: string; color: string } | null {
   const v = (value ?? '').trim();
   if (!v || v.toLowerCase() === 'unknown') return null;
   const band = LEADS_TO_BANDS[v.toUpperCase()];

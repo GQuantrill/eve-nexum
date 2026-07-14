@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { api } from '../../api/client';
-import { useMapStore } from '../../store/mapStore';
+import { useMapStore, awaitSystemCreate } from '../../store/mapStore';
 import { useCanEditContent } from '../../hooks/useCanEditContent';
 import { useShareMode } from '../../context/ShareModeContext';
 import { useUserSetting } from '../../hooks/useUserSetting';
@@ -231,9 +231,18 @@ export function AnomalyPane({ systemId }: { systemId: string }) {
     // panel is hidden in share mode (see SystemPanel), so just bail.
     if (isShareMode) return;
 
-    api<Anomaly[]>(`/api/maps/${activeMapId}/systems/${systemId}/anomalies`)
-      .then(setAnoms)
-      .catch(() => toast.error(t('anomalies.loadFailed')));
+    // Wait for a just-jumped-to system's create POST to commit before fetching,
+    // or the GET 404s ("Failed to load anomalies"). Existing systems fetch now.
+    let cancelled = false;
+    const fetchAnoms = () => {
+      if (cancelled) return;
+      api<Anomaly[]>(`/api/maps/${activeMapId}/systems/${systemId}/anomalies`)
+        .then((data) => { if (!cancelled) setAnoms(data); })
+        .catch(() => { if (!cancelled) toast.error(t('anomalies.loadFailed')); });
+    };
+    const pending = awaitSystemCreate(systemId);
+    if (pending) void pending.then(fetchAnoms); else fetchAnoms();
+    return () => { cancelled = true; };
   }, [activeMapId, systemId, isShareMode]);
 
   // Live sync: re-fetch in place when a remote client changes this system's
