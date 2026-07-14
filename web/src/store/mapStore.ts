@@ -29,6 +29,19 @@ const connClassPromises = new Map<string, Promise<string>>();
 export function awaitConnectionType(id: string): Promise<string> | null {
   return connClassPromises.get(id) ?? null;
 }
+
+// Per-system promises that settle once the create POST for a newly-added system
+// has returned. A jump adds the arrival system and its connection (and opens the
+// system panel) in the same tick — all fire-and-forget POSTs/GETs that would
+// otherwise race the system INSERT: the connection FK-violates (server 409) and
+// the panes 404. Dependents await this so nothing hits the server before the
+// system row exists. Resolves (never rejects) so awaiters can't hang; absent
+// once settled, so lookups for an already-created system return null and proceed
+// immediately.
+const systemCreatePromises = new Map<string, Promise<void>>();
+export function awaitSystemCreate(id: string): Promise<void> | null {
+  return systemCreatePromises.get(id) ?? null;
+}
 // Per-node measured dimensions, kept out of reactive state so individual
 // ResizeObserver fires don't trigger re-renders across the whole map.
 // `countHeight` is false for systems with statics — those WH systems can
@@ -914,7 +927,7 @@ export const useMapStore = create<MapStore>()((set, get) => {
         if (activeMapId) {
           const url  = `/api/maps/${activeMapId}/systems`;
           const body = JSON.stringify({ ...added });
-          api<{ system?: { security?: number | null; eveSystemId?: number | null } }>(url, { method: 'POST', body })
+          const createP = api<{ system?: { security?: number | null; eveSystemId?: number | null } }>(url, { method: 'POST', body })
             .then((resp) => {
               // Backfill server-derived fields (SDE security, resolved eve id)
               // onto the optimistic node — addSystem can't know these, and the
@@ -937,6 +950,11 @@ export const useMapStore = create<MapStore>()((set, get) => {
               }));
             })
             .catch(() => enqueue(`addSystem:${added.name}`, url, 'POST', body));
+          // Publish the settle signal so the jump's connection POST and the
+          // system panel's sig/structure/anomaly GETs wait for the row to exist
+          // instead of racing it. Never rejects; self-cleans after settling.
+          systemCreatePromises.set(id, createP);
+          void createP.finally(() => systemCreatePromises.delete(id));
         }
       }
 
@@ -1080,7 +1098,18 @@ export const useMapStore = create<MapStore>()((set, get) => {
           const sourceEveId = systemsNow.find((s) => s.id === conn.sourceId)?.eveSystemId ?? null;
           const targetEveId = systemsNow.find((s) => s.id === conn.targetId)?.eveSystemId ?? null;
           const body = JSON.stringify({ ...conn, sourceEveId, targetEveId });
-          const classifyP = api<{ ok: boolean; connectionType?: string }>(url, { method: 'POST', body })
+          // On a jump the endpoint system(s) are being created this same tick;
+          // wait for their create POST to land before POSTing the connection, or
+          // its FK to map_systems violates (server 409) and the classification
+          // resolves 'unknown' — which makes the jump-confirm skip auto-filling
+          // the hole's leads-to. Endpoints that already exist resolve to null and
+          // don't wait.
+          const endpointsReady = Promise.all([
+            awaitSystemCreate(conn.sourceId),
+            awaitSystemCreate(conn.targetId),
+          ]);
+          const classifyP = endpointsReady
+            .then(() => api<{ ok: boolean; connectionType?: string }>(url, { method: 'POST', body }))
             .then((r) => {
               // Server may auto-classify an in-game gate (stargate-adjacent
               // systems). Reflect it locally so the chain/edge updates without

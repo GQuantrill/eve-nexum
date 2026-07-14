@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { api } from '../../api/client';
-import { useMapStore } from '../../store/mapStore';
+import { useMapStore, awaitSystemCreate } from '../../store/mapStore';
 import { useCanEditContent } from '../../hooks/useCanEditContent';
 import { useShareMode } from '../../context/ShareModeContext';
 import { useUserSetting } from '../../hooks/useUserSetting';
@@ -394,9 +394,19 @@ export function SignaturePane({ systemId }: { systemId: string }) {
       return;
     }
 
-    api<Signature[]>(`/api/maps/${activeMapId}/systems/${systemId}/signatures`)
-      .then(setSigs)
-      .catch(() => toast.error(t('signatures.loadFailed')));
+    // A system just created by a jump may not have committed server-side yet;
+    // wait for its create POST before fetching, or the GET 404s ("Failed to
+    // load signatures"). Existing systems resolve to null and fetch at once.
+    let cancelled = false;
+    const fetchSigs = () => {
+      if (cancelled) return;
+      api<Signature[]>(`/api/maps/${activeMapId}/systems/${systemId}/signatures`)
+        .then((data) => { if (!cancelled) setSigs(data); })
+        .catch(() => { if (!cancelled) toast.error(t('signatures.loadFailed')); });
+    };
+    const pending = awaitSystemCreate(systemId);
+    if (pending) void pending.then(fetchSigs); else fetchSigs();
+    return () => { cancelled = true; };
   }, [activeMapId, systemId, isShareMode]);
 
   // Live sync: when a remote client changes this system's sigs, re-fetch in
