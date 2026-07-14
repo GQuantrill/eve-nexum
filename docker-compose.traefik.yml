@@ -3,6 +3,11 @@
 #
 # Required .env additions:
 #   DOMAIN=nexum.yourdomain.com
+#
+# Running a SECOND instance (e.g. a QA env) on the SAME host/Traefik: give it a
+# distinct compose project name AND a distinct STACK so its Traefik router,
+# service and middleware names don't collide with the first. See QA-SETUP.md.
+#   STACK=eve-nexum-qa  (defaults to eve-nexum when unset — prod is unchanged)
 
 services:
   postgres:
@@ -24,19 +29,22 @@ services:
       - internal
       - traefik-public
     labels:
+      # Router / service / middleware names are prefixed by ${STACK} (default
+      # eve-nexum) so a second instance (STACK=eve-nexum-qa) can share this
+      # Traefik without name collisions.
       - "traefik.enable=true"
       - "traefik.docker.network=traefik-public"
       # HTTPS router
-      - "traefik.http.routers.eve-nexum.rule=Host(`${DOMAIN}`)"
-      - "traefik.http.routers.eve-nexum.entrypoints=websecure"
-      - "traefik.http.routers.eve-nexum.tls=true"
-      - "traefik.http.routers.eve-nexum.tls.certresolver=letsencrypt"
-      - "traefik.http.services.eve-nexum.loadbalancer.server.port=80"
+      - "traefik.http.routers.${STACK:-eve-nexum}.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.${STACK:-eve-nexum}.entrypoints=websecure"
+      - "traefik.http.routers.${STACK:-eve-nexum}.tls=true"
+      - "traefik.http.routers.${STACK:-eve-nexum}.tls.certresolver=letsencrypt"
+      - "traefik.http.services.${STACK:-eve-nexum}.loadbalancer.server.port=80"
       # HTTP → HTTPS redirect
-      - "traefik.http.routers.eve-nexum-http.rule=Host(`${DOMAIN}`)"
-      - "traefik.http.routers.eve-nexum-http.entrypoints=web"
-      - "traefik.http.routers.eve-nexum-http.middlewares=redirect-to-https"
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.routers.${STACK:-eve-nexum}-http.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.${STACK:-eve-nexum}-http.entrypoints=web"
+      - "traefik.http.routers.${STACK:-eve-nexum}-http.middlewares=${STACK:-eve-nexum}-redirect-to-https"
+      - "traefik.http.middlewares.${STACK:-eve-nexum}-redirect-to-https.redirectscheme.scheme=https"
 
 networks:
   internal:

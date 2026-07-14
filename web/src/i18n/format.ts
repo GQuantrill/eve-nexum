@@ -45,14 +45,34 @@ export function duration(t: TFunction, totalSeconds: number): string {
   return t('duration.daysHoursMinutes', { days: d, hours: pad2(h % 24), minutes: pad2(m % 60) });
 }
 
+/**
+ * Split a positive millisecond span into whole hours + leftover minutes. The
+ * `h = floor(ms / 3.6e6), m = floor(rem / 6e4)` idiom was copy-pasted into
+ * expiresIn, the connection-edge EOL label and the killboard "time ago"; this
+ * is the single source. Negative spans clamp to zero.
+ */
+export function splitHoursMinutes(ms: number): { hours: number; minutes: number } {
+  const clamped = ms > 0 ? ms : 0;
+  return {
+    hours:   Math.floor(clamped / 3_600_000),
+    minutes: Math.floor((clamped % 3_600_000) / 60_000),
+  };
+}
+
+/** Compact "2h 14m" / "14m" from a millisecond span. Units are the universal
+ *  h/m abbreviations (as shown on the connection-edge label), so not translated. */
+export function hoursMins(ms: number): string {
+  const { hours, minutes } = splitHoursMinutes(ms);
+  return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+}
+
 /** "expires in 2h 14m" / "expires in 14m" / "expired" from a millisecond remainder. */
 export function expiresIn(t: TFunction, ms: number): string {
   if (ms <= 0) return t('share.expired');
-  const h = Math.floor(ms / 3_600_000);
-  const m = Math.floor((ms % 3_600_000) / 60_000);
-  return h > 0
-    ? t('share.expiresInHM', { hours: h, minutes: m })
-    : t('share.expiresInM', { minutes: m });
+  const { hours, minutes } = splitHoursMinutes(ms);
+  return hours > 0
+    ? t('share.expiresInHM', { hours, minutes })
+    : t('share.expiresInM', { minutes });
 }
 
 /** Wormhole mass: "1.44 B kg" / "500 M kg" / "123,456 kg" / em dash for <= 0. */

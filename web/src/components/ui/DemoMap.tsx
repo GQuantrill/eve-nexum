@@ -12,8 +12,8 @@ import type { SystemClass, WormholeEffect } from '../../types';
 import {
   CLASS_COLORS, CLASS_LABELS,
   EFFECT_ICONS, EFFECT_LABELS, EFFECT_MODIFIERS,
-  WORMHOLE_DESTINATIONS,
 } from '../../data/wormholes';
+import { whDestClass } from '../../utils/whDest';
 import { ContextMenu, type ContextMenuItem } from './ContextMenu';
 import { AddSystemModal } from './AddSystemModal';
 import { pickHandles } from '../map/edgeUtils';
@@ -154,7 +154,7 @@ function DemoSystemNode({ data, selected }: NodeProps) {
         <div className="system-node__statics">
           <div className="title">{t('systemPanel.statics')}</div>
           {sys.statics.map(s => {
-            const dest = WORMHOLE_DESTINATIONS[s];
+            const dest = whDestClass(s, {});
             return (
               <span key={s} className="system-node__static-tag">
                 {s}
@@ -210,7 +210,7 @@ function DemoInfoPanel({ sys, onRemove }: { sys: DemoSys; onRemove: () => void }
         <div className="demo-info__statics">
           <div className="demo-info__label">{t('systemPanel.statics')}</div>
           {sys.statics.map(s => {
-            const dest = WORMHOLE_DESTINATIONS[s];
+            const dest = whDestClass(s, {});
             return (
               <div key={s} className="demo-info__static-row">
                 <span className="demo-info__static-code">{s}</span>

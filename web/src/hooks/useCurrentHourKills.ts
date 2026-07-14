@@ -22,13 +22,31 @@ function notify(d: Map<number, SystemKills>) {
   subscribers.forEach(fn => fn(d));
 }
 
+// True when two polls hold identical kill counts, so we keep the previous Map
+// reference and skip the all-node re-render (kills change at most every ~hour,
+// but the poll runs every 5 min — most polls are no-ops).
+function sameKills(a: Map<number, SystemKills>, b: Map<number, SystemKills>): boolean {
+  if (a.size !== b.size) return false;
+  for (const [k, va] of a) {
+    const vb = b.get(k);
+    if (!vb
+        || vb.shipKills !== va.shipKills
+        || vb.podKills  !== va.podKills
+        || vb.npcKills  !== va.npcKills
+        || vb.jumps     !== va.jumps) return false;
+  }
+  return true;
+}
+
 function load() {
   if (inflight) return inflight;
   inflight = api<SystemKills[]>('/api/activity/current-kills')
     .then(rows => {
-      cache = new Map(rows.map(r => [r.systemId, r]));
-      cacheAt = Date.now();
       inflight = null;
+      const next = new Map(rows.map(r => [r.systemId, r]));
+      cacheAt = Date.now();
+      if (sameKills(cache, next)) return cache;
+      cache = next;
       notify(cache);
       return cache;
     })
