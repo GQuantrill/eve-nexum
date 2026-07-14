@@ -30,10 +30,38 @@ function notify(d: ScoutConnection[]) {
   subscribers.forEach(fn => fn(d));
 }
 
+// True when two polls hold the same scout connections, so we keep the previous
+// reference and skip the all-node re-render. remainingHours is included so the
+// ScoutConnectionsPane countdown stays live — meaning this fires mainly in the
+// common no-connections case (empty === empty), which is exactly the fan-out
+// worth eliminating for the majority of maps.
+function sameScout(a: ScoutConnection[], b: ScoutConnection[]): boolean {
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) {
+    const x = a[i], y = b[i];
+    if (x.id             !== y.id
+        || x.remainingHours !== y.remainingHours
+        || x.expiresAt      !== y.expiresAt
+        || x.inSystemId     !== y.inSystemId
+        || x.outSystemName  !== y.outSystemName) return false;
+  }
+  return true;
+}
+
 function load() {
   if (inflight) return inflight;
   inflight = api<ScoutConnection[]>('/api/scout')
-    .then(d => { moduleCache = { data: d, fetchedAt: Date.now() }; inflight = null; notify(d); return d; })
+    .then(d => {
+      inflight = null;
+      const prev = moduleCache?.data;
+      if (prev && sameScout(prev, d)) {
+        moduleCache = { data: prev, fetchedAt: Date.now() };
+        return prev;
+      }
+      moduleCache = { data: d, fetchedAt: Date.now() };
+      notify(d);
+      return d;
+    })
     .catch(() => { inflight = null; return moduleCache?.data ?? []; });
   return inflight;
 }

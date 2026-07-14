@@ -49,10 +49,27 @@ function notify(d: FleetState) {
   subscribers.forEach((fn) => fn(d));
 }
 
+// True when two polls describe the same fleet in the same places, so we can
+// keep the previous reference and skip the all-node re-render. Members arrive
+// in a stable server-driven order, so a positional compare is enough (a
+// reordering only costs one redundant notify — never a stale render).
+function sameFleet(a: FleetState, b: FleetState): boolean {
+  if (a.inFleet !== b.inFleet || a.members.length !== b.members.length) return false;
+  for (let i = 0; i < a.members.length; i++) {
+    const ma = a.members[i], mb = b.members[i];
+    if (ma.characterId     !== mb.characterId
+        || ma.solarSystemId   !== mb.solarSystemId
+        || ma.characterName   !== mb.characterName
+        || ma.solarSystemName !== mb.solarSystemName) return false;
+  }
+  return true;
+}
+
 function load() {
   if (inflight) return inflight;
   inflight = api<RawResponse>('/api/character/fleet')
     .then((r) => {
+      inflight = null;
       const members: FleetMember[] = r.members.map((m) => ({
         characterId:     m.character_id,
         characterName:   m.character_name ?? null,
@@ -60,8 +77,12 @@ function load() {
         solarSystemName: m.solar_system_name ?? null,
       }));
       const data: FleetState = { inFleet: r.inFleet, members, bySystem: indexBySystem(members) };
+      const prev = moduleCache?.data;
+      if (prev && sameFleet(prev, data)) {
+        moduleCache = { data: prev, fetchedAt: Date.now() };
+        return prev;
+      }
       moduleCache = { data, fetchedAt: Date.now() };
-      inflight = null;
       notify(data);
       return data;
     })
