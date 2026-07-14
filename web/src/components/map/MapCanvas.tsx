@@ -266,6 +266,16 @@ export function MapCanvas() {
   // only ever ran once before being overwritten.
   const [nodes, setNodes] = useNodesState<Node>([]);
 
+  // Per-id cache of the last-built node plus the inputs it was built from. The
+  // store keeps the SAME `sys` reference for systems that didn't change, so on
+  // any single-system edit we can reuse the exact node object for every other
+  // system — keeping its `data` reference stable so SystemNode's memo holds and
+  // only the one changed node re-renders (instead of all N).
+  const nodeCache = useRef<Map<string, {
+    sys: MapSystem; selected: boolean; easyConnect: boolean;
+    canEdit: boolean; dimmed: boolean; routeHighlighted: boolean; node: Node;
+  }>>(new Map());
+
   const onNodesChange = useCallback(
     (changes: NodeChange[]) => {
       changes.forEach((c) => {
@@ -452,10 +462,31 @@ export function MapCanvas() {
 
   useEffect(() => {
     const hl = routeHighlight ? new Set(routeHighlight.systemIds) : null;
-    setNodes(systems.map((s) => {
-      const inRoute = !!hl && hl.has(s.id);
-      return systemToNode(s, selectedSystemId, easyConnect, canEdit, !!hl && !inRoute, inRoute);
-    }));
+    const prevCache = nodeCache.current;
+    const nextCache = new Map<string, {
+      sys: MapSystem; selected: boolean; easyConnect: boolean;
+      canEdit: boolean; dimmed: boolean; routeHighlighted: boolean; node: Node;
+    }>();
+    const nextNodes = systems.map((s) => {
+      const inRoute  = !!hl && hl.has(s.id);
+      const dimmed   = !!hl && !inRoute;
+      const selected = s.id === selectedSystemId;
+      // Reuse the previous node object outright when nothing this node renders
+      // from has changed — same `sys` ref (unchanged system) and same derived
+      // flags. Reference-identical node -> React Flow skips it entirely.
+      const prev = prevCache.get(s.id);
+      if (prev && prev.sys === s && prev.selected === selected
+          && prev.easyConnect === easyConnect && prev.canEdit === canEdit
+          && prev.dimmed === dimmed && prev.routeHighlighted === inRoute) {
+        nextCache.set(s.id, prev);
+        return prev.node;
+      }
+      const node = systemToNode(s, selectedSystemId, easyConnect, canEdit, dimmed, inRoute);
+      nextCache.set(s.id, { sys: s, selected, easyConnect, canEdit, dimmed, routeHighlighted: inRoute, node });
+      return node;
+    });
+    nodeCache.current = nextCache;
+    setNodes(nextNodes);
   }, [systems, selectedSystemId, easyConnect, setNodes, canEdit, routeHighlight]);
 
   useEffect(() => {
@@ -614,9 +645,30 @@ export function MapCanvas() {
   const onNodeMouseEnter = useCallback((_: React.MouseEvent, node: Node) => setHoveredNodeId(node.id), []);
   const onNodeMouseLeave = useCallback(() => setHoveredNodeId(null), []);
 
-  // Edges driven directly from store — no local duplicate state, except for
-  // the live drag-handle overrides above.
-  const edges = useMemo(
+  // Precomputed at drag-start so each drag frame doesn't re-scan every
+  // connection and rebuild a position Map of every system: connections touching
+  // a moved node never change during a drag, and neither do the non-moved
+  // systems' positions.
+  const dragConns   = useRef<typeof connections>([]);
+  const dragBasePos = useRef<Map<string, { x: number; y: number }>>(new Map());
+  const onNodeDragStart = useCallback(
+    (_: React.MouseEvent, _node: Node, movedNodes: Node[]) => {
+      if (!canEdit) return;
+      const movedIds = new Set(movedNodes.map((n) => n.id));
+      dragConns.current = connections.filter(
+        (c) => movedIds.has(c.sourceId) || movedIds.has(c.targetId),
+      );
+      dragBasePos.current = new Map(systems.map((s) => [s.id, s.position]));
+    },
+    [canEdit, connections, systems],
+  );
+
+  // Base edges — everything EXCEPT the mouse-hover highlight. Kept off the
+  // hover state so moving the mouse across nodes doesn't rebuild all E edge
+  // objects (which would re-render every ConnectionEdge). `highlighted` here
+  // reflects only the route-chain highlight; the transient hover highlight is
+  // layered on below, touching just the edges under the cursor.
+  const baseEdges = useMemo(
     () => {
       // Group connections by unordered system pair so multiples between the
       // same two systems can be fanned apart (parallelIndex / parallelCount)
@@ -634,12 +686,7 @@ export function MapCanvas() {
         const ov = dragHandles.get(c.id);
         const key = c.sourceId < c.targetId ? `${c.sourceId}|${c.targetId}` : `${c.targetId}|${c.sourceId}`;
         const group = pairGroups.get(key)!;
-        // Hover-only: a *selected* system would keep its links lit permanently
-        // (e.g. your located system on a 2-node map), which reads as a stuck
-        // hover effect — so highlight only follows the mouse.
         const inRoute = !!routeConns && routeConns.has(c.id);
-        const highlighted =
-          inRoute || (hoveredNodeId != null && (c.sourceId === hoveredNodeId || c.targetId === hoveredNodeId));
         const dimmed = !!routeConns && !inRoute;
         return {
           id: c.id,
@@ -649,17 +696,32 @@ export function MapCanvas() {
           targetHandle: ov?.targetHandle ?? c.targetHandle ?? undefined,
           type: 'connection',
           // Lift highlighted edges above the rest so the traced link sits on top.
-          zIndex: highlighted ? 10 : 0,
+          zIndex: inRoute ? 10 : 0,
           data: {
-            ...c, edgeStyle, connectionThickness, highlighted, dimmed,
+            ...c, edgeStyle, connectionThickness, highlighted: inRoute, dimmed,
             parallelIndex: group.indexOf(c.id), parallelCount: group.length,
           } as unknown as Record<string, unknown>,
           selected: c.id === selectedConnectionId,
         };
       });
     },
-    [connections, selectedConnectionId, edgeStyle, connectionThickness, dragHandles, hoveredNodeId, routeHighlight],
+    [connections, selectedConnectionId, edgeStyle, connectionThickness, dragHandles, routeHighlight],
   );
+
+  // Layer the hover highlight on top of the base edges. Only edges touching the
+  // hovered node are rebuilt; every other edge keeps its exact object reference
+  // so ConnectionEdge's memo holds. Hover-only: a *selected* system would keep
+  // its links lit permanently (reads as a stuck hover), so highlight follows
+  // the mouse. When nothing is hovered this returns baseEdges unchanged.
+  const edges = useMemo(() => {
+    if (hoveredNodeId == null) return baseEdges;
+    return baseEdges.map((e) => {
+      if (e.source !== hoveredNodeId && e.target !== hoveredNodeId) return e;
+      const data = e.data as { highlighted?: boolean };
+      if (data.highlighted) return e; // already lit by the route chain
+      return { ...e, zIndex: 10, data: { ...e.data, highlighted: true } };
+    });
+  }, [baseEdges, hoveredNodeId]);
 
   const onEdgesChange = useCallback(
     (changes: EdgeChange[]) => {
@@ -696,17 +758,16 @@ export function MapCanvas() {
   const onNodeDrag = useCallback(
     (_: React.MouseEvent, _node: Node, movedNodes: Node[]) => {
       if (!canEdit) return;
-      const movedIds = new Set(movedNodes.map((n) => n.id));
-      // Live positions: store positions overridden by the in-flight drag.
-      const posMap = new Map(systems.map((s) => [s.id, s.position]));
-      movedNodes.forEach((n) => posMap.set(n.id, n.position));
+      // Only the moved nodes' live positions override the drag-start snapshot;
+      // every other endpoint is read straight from dragBasePos.
+      const moved = new Map(movedNodes.map((n) => [n.id, n.position]));
+      const posOf = (id: string) => moved.get(id) ?? dragBasePos.current.get(id);
 
       setDragHandles((prev) => {
         let next = prev;
-        for (const conn of connections) {
-          if (!movedIds.has(conn.sourceId) && !movedIds.has(conn.targetId)) continue;
-          const src = posMap.get(conn.sourceId);
-          const tgt = posMap.get(conn.targetId);
+        for (const conn of dragConns.current) {
+          const src = posOf(conn.sourceId);
+          const tgt = posOf(conn.targetId);
           if (!src || !tgt) continue;
           const { sourceHandle, targetHandle } = pickHandles(src, tgt);
           const cur = next.get(conn.id);
@@ -720,7 +781,7 @@ export function MapCanvas() {
         return next;
       });
     },
-    [canEdit, systems, connections],
+    [canEdit],
   );
 
   const onNodeDragStop = useCallback(
@@ -728,16 +789,14 @@ export function MapCanvas() {
       if (!canEdit) return;
       movedNodes.forEach((n) => moveSystem(n.id, n.position));
 
-      const movedIds = new Set(movedNodes.map((n) => n.id));
-      // Build position map from store, then override with the just-dragged positions
-      // (store hasn't updated yet when this fires)
-      const posMap = new Map(systems.map((s) => [s.id, s.position]));
-      movedNodes.forEach((n) => posMap.set(n.id, n.position));
+      // Reuse the drag-start snapshot (store hasn't committed the move yet),
+      // overriding only the just-dragged positions.
+      const moved = new Map(movedNodes.map((n) => [n.id, n.position]));
+      const posOf = (id: string) => moved.get(id) ?? dragBasePos.current.get(id);
 
-      for (const conn of connections) {
-        if (!movedIds.has(conn.sourceId) && !movedIds.has(conn.targetId)) continue;
-        const src = posMap.get(conn.sourceId);
-        const tgt = posMap.get(conn.targetId);
+      for (const conn of dragConns.current) {
+        const src = posOf(conn.sourceId);
+        const tgt = posOf(conn.targetId);
         if (!src || !tgt) continue;
         const { sourceHandle, targetHandle } = pickHandles(src, tgt);
         if (conn.sourceHandle !== sourceHandle || conn.targetHandle !== targetHandle) {
@@ -748,7 +807,7 @@ export function MapCanvas() {
       // drop the overrides (no flicker — the store write above is synchronous).
       setDragHandles((prev) => (prev.size ? new Map() : prev));
     },
-    [moveSystem, systems, connections, updateConnection, canEdit],
+    [moveSystem, updateConnection, canEdit],
   );
 
   const nodeCtxFired = useRef(false);
@@ -1238,6 +1297,7 @@ export function MapCanvas() {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
+        onNodeDragStart={onNodeDragStart}
         onNodeDrag={onNodeDrag}
         onNodeDragStop={onNodeDragStop}
         onNodeMouseEnter={onNodeMouseEnter}
