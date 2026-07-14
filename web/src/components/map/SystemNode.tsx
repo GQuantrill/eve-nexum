@@ -91,16 +91,19 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
   }, [showAccountChars, accountLocations.bySystem, sys.eveSystemId]);
 
   // Other people viewing this map who are currently in this system (presence).
-  // Excludes self — the green you-are-here dot covers that.
-  const presenceViewers = usePresenceStore((s) => s.viewers);
+  // Excludes self — the green you-are-here dot covers that. Subscribe to just
+  // this system's slice of the presence index (stable ref unless a viewer
+  // enters/leaves THIS system), so a viewer moving elsewhere doesn't re-render
+  // this node.
+  const presenceSlice = usePresenceStore(
+    (s) => (sys.eveSystemId == null ? undefined : s.bySystem.get(sys.eveSystemId)),
+  );
   const presenceHere    = useMemo(() => {
-    if (sys.eveSystemId == null) return undefined;
+    if (!presenceSlice || presenceSlice.length === 0) return undefined;
     const myId = user?.characterId;
-    const here = Object.values(presenceViewers).filter(
-      (v) => v.eveSystemId === sys.eveSystemId && v.characterId !== myId,
-    );
+    const here = presenceSlice.filter((v) => v.characterId !== myId);
     return here.length ? here : undefined;
-  }, [presenceViewers, sys.eveSystemId, user?.characterId]);
+  }, [presenceSlice, user?.characterId]);
 
   // Halo around any sov-holder system based on the user's contact bands.
   // Threshold is just "negative or positive" rather than the strict ≤-5

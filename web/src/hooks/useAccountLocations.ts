@@ -50,15 +50,37 @@ function indexBySystem(list: AccountCharLocation[]): Map<number, AccountCharLoca
 
 function notify(d: AccountLocations) { subscribers.forEach((fn) => fn(d)); }
 
+// True when two polls describe the same characters in the same places, so we
+// can keep the previous reference and skip the all-node re-render. Keyed by
+// charId; compares only the fields a node actually renders.
+function sameLocations(a: AccountLocations, b: AccountLocations): boolean {
+  if (a.byChar.size !== b.byChar.size) return false;
+  for (const [k, va] of a.byChar) {
+    const vb = b.byChar.get(k);
+    if (!vb
+        || vb.eveSystemId   !== va.eveSystemId
+        || vb.online        !== va.online
+        || vb.systemName    !== va.systemName
+        || vb.systemClass   !== va.systemClass
+        || vb.characterName !== va.characterName) return false;
+  }
+  return true;
+}
+
 function load() {
   if (inflight) return inflight;
   inflight = api<RawResponse>('/api/character/account-locations')
     .then((r) => {
+      inflight = null;
       const byChar = new Map<number, AccountCharLocation>();
       for (const c of r.characters) byChar.set(c.charId, c);
       const data: AccountLocations = { bySystem: indexBySystem(r.characters), byChar };
+      const prev = moduleCache?.data;
+      if (prev && sameLocations(prev, data)) {
+        moduleCache = { data: prev, fetchedAt: Date.now() };
+        return prev;
+      }
       moduleCache = { data, fetchedAt: Date.now() };
-      inflight = null;
       notify(data);
       return data;
     })
