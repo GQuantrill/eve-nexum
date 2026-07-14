@@ -196,27 +196,31 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   const sigTypeLabel = (type: SigType) =>
     type === 'unknown' ? t('sigType.unknown') : SIG_TYPE_LABELS[type];
   const activeMapId     = useMapStore((s) => s.activeMapId);
-  const map             = useMapStore((s) => s.map);
+  // Narrow slices instead of the whole `map`: the pane only reads systems +
+  // connections, so it no longer re-renders on unrelated map mutations (rename,
+  // saved routes, updatedAt bumps, share-flag changes, ...).
+  const mapSystems      = useMapStore((s) => s.map.systems);
+  const mapConnections  = useMapStore((s) => s.map.connections);
   const currentSystemId = useMapStore((s) => s.currentSystemId);
   const setSystemSigTypes = useMapStore((s) => s.setSystemSigTypes);
   const setSystemWhSigs = useMapStore((s) => s.setSystemWhSigs);
   const canEdit         = useCanEditContent();
 
   const systemStatics = useMemo(
-    () => map.systems.find((sys) => sys.id === systemId)?.statics ?? [],
-    [map.systems, systemId],
+    () => mapSystems.find((sys) => sys.id === systemId)?.statics ?? [],
+    [mapSystems, systemId],
   );
 
   const connectedSystems = useMemo(() => {
-    const conns = map.connections.filter(
+    const conns = mapConnections.filter(
       (c) => c.sourceId === systemId || c.targetId === systemId,
     );
     return conns.flatMap((c) => {
       const otherId = c.sourceId === systemId ? c.targetId : c.sourceId;
-      const sys = map.systems.find((m) => m.id === otherId);
+      const sys = mapSystems.find((m) => m.id === otherId);
       return sys ? [{ id: sys.id, name: sys.name, systemClass: sys.systemClass }] : [];
     });
-  }, [map.connections, map.systems, systemId]);
+  }, [mapConnections, mapSystems, systemId]);
 
   const [sigs, setSigs]               = useState<Signature[]>([]);
   const [selected, setSelected]       = useState<Set<string>>(new Set());
@@ -418,7 +422,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
       updates.whType?.toUpperCase() === 'K162' &&
       existing?.whType?.toUpperCase() !== 'K162'
     ) {
-      const sysName = map.systems.find((s) => s.id === systemId)?.name ?? 'unknown system';
+      const sysName = mapSystems.find((s) => s.id === systemId)?.name ?? 'unknown system';
       alertInboundK162(sysName);
     }
 
@@ -460,13 +464,13 @@ export function SignaturePane({ systemId }: { systemId: string }) {
       const leads = sig.whLeadsTo?.toUpperCase();
       if (!leads) continue;
       let source: string | null = null;
-      for (const conn of map.connections) {
+      for (const conn of mapConnections) {
         if (conn.connectionType !== 'standard') continue;
         const otherId =
           conn.sourceId === systemId ? conn.targetId :
           conn.targetId === systemId ? conn.sourceId : null;
         if (!otherId) continue;
-        const other = map.systems.find((s) => s.id === otherId);
+        const other = mapSystems.find((s) => s.id === otherId);
         if (!other) continue;
         const oc = other.systemClass.toUpperCase();
         const on = (other.name ?? '').toUpperCase();
@@ -477,7 +481,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
       if (source) updateSig(sig.id, { notes: source });
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sigs, map.connections, map.systems, systemId, canEdit, isShareMode]);
+  }, [sigs, mapConnections, mapSystems, systemId, canEdit, isShareMode]);
 
   // Quarantine orphaned wormhole links. A live wormhole always shows as a sig
   // on BOTH ends, so if this system has been scanned (has sigs) yet carries no
@@ -621,8 +625,8 @@ export function SignaturePane({ systemId }: { systemId: string }) {
 
       // Warn if the character is in a different system than the one being edited
       if (currentSystemId && currentSystemId !== systemId) {
-        const currentName  = map.systems.find((s) => s.id === currentSystemId)?.name  ?? 'unknown';
-        const selectedName = map.systems.find((s) => s.id === systemId)?.name ?? 'unknown';
+        const currentName  = mapSystems.find((s) => s.id === currentSystemId)?.name  ?? 'unknown';
+        const selectedName = mapSystems.find((s) => s.id === systemId)?.name ?? 'unknown';
         setPendingAction({
           message: t('signatures.pasteDifferentSystem', { current: currentName, selected: selectedName }),
           fn: () => processPaste(parsed, overwrite, delaySec),
@@ -637,7 +641,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
 
     window.addEventListener('paste', handlePaste);
     return () => window.removeEventListener('paste', handlePaste);
-  }, [activeMapId, systemId, currentSystemId, map.systems, processPaste, overwriteOnPaste, overwriteDelay, t]);
+  }, [activeMapId, systemId, currentSystemId, mapSystems, processPaste, overwriteOnPaste, overwriteDelay, t]);
 
   const addSig = async () => {
     if (!activeMapId) return;
