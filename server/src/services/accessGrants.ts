@@ -77,3 +77,13 @@ export function grantKindAllowedForInstall(kind: GrantKind): boolean {
   if (kind === 'alliance') return config.allianceMode;
   return true;
 }
+
+// The positive-standing prerequisite (design 4.0) applies to GROUP targets
+// (corp / alliance) only. An individual character is a deliberate, named 1:1
+// grant — the operator is explicitly picking a specific person, not admitting a
+// whole org — so it isn't gated on standing (you rarely set per-character
+// standings in-game anyway). Used by both the map-share flow and the admin
+// allow-list add so they stay consistent.
+export function requiresPositiveStanding(kind: GrantKind): boolean {
+  return kind !== 'character';
+}

@@ -14,7 +14,7 @@ import { audit } from '../services/audit.js';
 import { resolveEntityNames } from '../services/entityNames.js';
 import {
   isLoginPermitted, standingPermitsTarget, grantKindAllowedForInstall,
-  type GrantKind,
+  requiresPositiveStanding, type GrantKind,
 } from '../services/accessGrants.js';
 
 const log = createLogger('admin');
@@ -429,9 +429,10 @@ adminRouter.post('/access-grants', async (req, res) => {
   if (!grantKindAllowedForInstall(kind)) {
     res.status(400).json({ error: 'alliance_not_supported', message: 'Alliance grants are only available on an alliance installation.' }); return;
   }
-  // Positive-standing prerequisite (design 4.0): only entities the deployment
-  // holds at positive standing may be granted. Fail-closed.
-  if (!(await standingPermitsTarget(kind, eveId))) {
+  // Positive-standing prerequisite (design 4.0): corp/alliance targets must be
+  // held at positive standing; individual characters are exempt (deliberate 1:1
+  // grant). Fail-closed for the group kinds.
+  if (requiresPositiveStanding(kind) && !(await standingPermitsTarget(kind, eveId))) {
     res.status(403).json({ error: 'standing_not_positive', message: 'The deployment does not hold this entity at positive standing (contacts must be synced and standing must be > 0).' }); return;
   }
 

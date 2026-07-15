@@ -5,7 +5,7 @@ import { db } from '../db.js';
 import { requireAuth } from '../middleware/requireAuth.js';
 import { authUser, isAdmin, isAllianceAdmin } from '../middleware/authContext.js';
 import { config } from '../config.js';
-import { standingPermitsTarget, grantKindAllowedForInstall } from '../services/accessGrants.js';
+import { standingPermitsTarget, grantKindAllowedForInstall, requiresPositiveStanding } from '../services/accessGrants.js';
 import { decryptToken } from '../utils/tokenCrypto.js';
 import { createLogger } from '../utils/logger.js';
 import { resolveOwnerId } from '../utils/owner.js';
@@ -2709,9 +2709,10 @@ mapsRouter.post('/:mapId/shares', async (req, res) => {
   }
 
   // Positive-standing prerequisite (design 4.0): a restricted deployment may
-  // only share with an entity it holds at positive standing. A solo/unrestricted
-  // install has no standings to check, so the gate is skipped there.
-  if (config.restrictedMode && !(await standingPermitsTarget(kind, idNum))) {
+  // only share with a CORP/ALLIANCE it holds at positive standing. Individual
+  // characters are exempt (a deliberate 1:1 grant). Solo/unrestricted installs
+  // have no standings to check, so the gate is skipped there too.
+  if (config.restrictedMode && requiresPositiveStanding(kind) && !(await standingPermitsTarget(kind, idNum))) {
     res.status(403).json({
       error: 'standing_not_positive',
       message: 'Your deployment does not hold this entity at positive standing (contacts must be synced and standing must be > 0).',
