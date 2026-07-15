@@ -678,7 +678,14 @@
     "accessRevoked": "アクセスを取り消しました",
     "accessRevokedFor": "{{name}} のアクセスを取り消しました",
     "addFailed": "共有の追加に失敗しました",
-    "revokeFailed": "共有の取り消しに失敗しました"
+    "revokeFailed": "共有の取り消しに失敗しました",
+    "alliance": "アライアンス",
+    "placeholderAlliance": "正確なアライアンス名",
+    "badgeAlliance": "アライ",
+    "alsoGrantLogin": "ログインも許可する",
+    "sharedWithLogin": "{{name}} と共有しました — ログインもできるようになりました",
+    "errStanding": "拒否されました: デプロイはこの対象にポジティブスタンディングを持っていません（コンタクトが同期され、スタンディングが0より大きい必要があります）。",
+    "errAllianceUnsupported": "アライアンス共有はアライアンスインストールでのみ利用できます。"
   },
   "panes": {
     "noEveSystem": "EVE 星系が関連付けられていません",

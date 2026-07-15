@@ -678,7 +678,14 @@
     "accessRevoked": "Accès révoqué",
     "accessRevokedFor": "Accès révoqué pour {{name}}",
     "addFailed": "Échec de l'ajout du partage",
-    "revokeFailed": "Échec de la révocation du partage"
+    "revokeFailed": "Échec de la révocation du partage",
+    "alliance": "Alliance",
+    "placeholderAlliance": "Nom exact de l'alliance",
+    "badgeAlliance": "Alli",
+    "alsoGrantLogin": "Les autoriser aussi à se connecter",
+    "sharedWithLogin": "Partagé avec {{name}} — ils peuvent désormais se connecter",
+    "errStanding": "Refusé : votre installation n'a pas de standing positif envers cette entité (les contacts doivent être synchronisés et le standing supérieur à 0).",
+    "errAllianceUnsupported": "Le partage d'alliance n'est disponible que sur une installation d'alliance."
   },
   "panes": {
     "noEveSystem": "Aucun système EVE lié",

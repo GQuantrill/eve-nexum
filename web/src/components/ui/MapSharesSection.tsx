@@ -1,20 +1,26 @@
 import { useEffect, useRef, useState } from 'react';
-import { charPortrait, corpLogo } from '../../utils/eveImages';
+import { charPortrait, corpLogo, allianceLogo } from '../../utils/eveImages';
 import { useTranslation } from 'react-i18next';
-import { api } from '../../api/client';
+import { api, ApiError } from '../../api/client';
 import { useMapStore } from '../../store/mapStore';
+import { useAuth } from '../../context/AuthContext';
 import { toast } from './Toaster';
 import { XIcon } from '@phosphor-icons/react';
 
 interface ShareRow {
   id:        string;
-  kind:      'character' | 'corp';
+  kind:      'character' | 'corp' | 'alliance';
   targetId:  number;
   name:      string | null;
   createdAt: string;
 }
 
-type PickerKind = 'character' | 'corp';
+type PickerKind = 'character' | 'corp' | 'alliance';
+const SEARCH_ENDPOINT: Record<PickerKind, string> = {
+  character: '/api/search/characters',
+  corp:      '/api/search/corporations',
+  alliance:  '/api/search/alliances',
+};
 
 interface ResolvedMatch {
   id:   number;
@@ -31,11 +37,18 @@ export function MapSharesSection() {
   const [error, setError]     = useState<string | null>(null);
 
   // Picker state
+  const { user } = useAuth();
+  const allowAlliance = !!user?.allianceMode;
+  const KINDS: PickerKind[] = allowAlliance ? ['character', 'corp', 'alliance'] : ['character', 'corp'];
   const [kind, setKind]   = useState<PickerKind>('character');
   const [query, setQuery] = useState('');
   const [match, setMatch] = useState<ResolvedMatch | null>(null);
   const [searching, setSearching] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  // On a restricted deployment, sharing to a corp/alliance can also admit their
+  // members to log in (they'd otherwise be shared-but-locked-out). Default on.
+  const [grantLogin, setGrantLogin] = useState(true);
+  const canGrantLogin = !!user?.corpMode || !!user?.allianceMode;
 
   // Re-load shares whenever the active map changes.
   useEffect(() => {
@@ -59,8 +72,7 @@ export function MapSharesSection() {
 
     setSearching(true);
     searchTimer.current = setTimeout(() => {
-      const endpoint = kind === 'character' ? '/api/search/characters' : '/api/search/corporations';
-      api<{ match: ResolvedMatch | null }>(`${endpoint}?q=${encodeURIComponent(q)}`)
+      api<{ match: ResolvedMatch | null }>(`${SEARCH_ENDPOINT[kind]}?q=${encodeURIComponent(q)}`)
         .then((r) => setMatch(r.match))
         .catch(() => setMatch(null))
         .finally(() => setSearching(false));
@@ -73,20 +85,28 @@ export function MapSharesSection() {
 
   async function addShare() {
     if (!mapId || !match) return;
+    const alsoGrantLogin = canGrantLogin && grantLogin;
     setSubmitting(true);
     setError(null);
     try {
-      const row = await api<ShareRow>(`/api/maps/${mapId}/shares`, {
+      const row = await api<ShareRow & { loginGranted?: boolean }>(`/api/maps/${mapId}/shares`, {
         method: 'POST',
-        body:   JSON.stringify({ kind, targetId: match.id }),
+        body:   JSON.stringify({ kind, targetId: match.id, alsoGrantLogin }),
       });
       setShares((prev) => [...prev, row]);
       setQuery('');
       setMatch(null);
-      toast.success(t('mapShares.sharedWith', { name: row.name ?? match.name }));
+      toast.success(row.loginGranted
+        ? t('mapShares.sharedWithLogin', { name: row.name ?? match.name })
+        : t('mapShares.sharedWith', { name: row.name ?? match.name }));
     } catch (e) {
-      const msg = e instanceof Error ? e.message : t('mapShares.addFailed');
-      setError(msg);
+      const code = e instanceof ApiError ? e.code : undefined;
+      const serverMsg = e instanceof ApiError ? e.serverMessage : undefined;
+      setError(
+        code === 'standing_not_positive'  ? t('mapShares.errStanding') :
+        code === 'alliance_not_supported' ? t('mapShares.errAllianceUnsupported') :
+        (serverMsg ?? (e instanceof Error ? e.message : t('mapShares.addFailed'))),
+      );
     } finally {
       setSubmitting(false);
     }
@@ -116,21 +136,23 @@ export function MapSharesSection() {
 
       <div className="map-shares__picker">
         <div className="map-sidebar__btn-group">
-          {(['character', 'corp'] as const).map((k) => (
+          {KINDS.map((k) => (
             <button
               key={k}
               type="button"
               className={`map-sidebar__btn-group-item${kind === k ? ' map-sidebar__btn-group-item--active' : ''}`}
               onClick={() => { setKind(k); setMatch(null); }}
             >
-              {k === 'character' ? t('mapShares.character') : t('mapShares.corp')}
+              {t(`mapShares.${k}`)}
             </button>
           ))}
         </div>
 
         <input
           className="map-shares__input"
-          placeholder={kind === 'character' ? t('mapShares.placeholderChar') : t('mapShares.placeholderCorp')}
+          placeholder={kind === 'character' ? t('mapShares.placeholderChar')
+            : kind === 'corp' ? t('mapShares.placeholderCorp')
+            : t('mapShares.placeholderAlliance')}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           maxLength={50}
@@ -146,6 +168,13 @@ export function MapSharesSection() {
                 ? <span className="map-shares__match--ok">{t('mapShares.found', { name: match.name })}</span>
                 : <span className="map-shares__match--miss">{t('mapShares.noMatch')}</span>}
         </div>
+
+        {canGrantLogin && (
+          <label className="map-shares__grant-login">
+            <input type="checkbox" checked={grantLogin} onChange={(e) => setGrantLogin(e.target.checked)} />
+            {t('mapShares.alsoGrantLogin')}
+          </label>
+        )}
 
         <button
           type="button"
@@ -166,14 +195,16 @@ export function MapSharesSection() {
                 <div key={s.id} className="map-shares__row">
                   <img
                     className="map-shares__avatar"
-                    src={s.kind === 'character'
-                      ? charPortrait(s.targetId, 32)
-                      : corpLogo(s.targetId, 32)}
+                    src={s.kind === 'character' ? charPortrait(s.targetId, 32)
+                      : s.kind === 'corp' ? corpLogo(s.targetId, 32)
+                      : allianceLogo(s.targetId, 32)}
                     alt=""
                     loading="lazy"
                   />
                   <span className={`map-shares__kind map-shares__kind--${s.kind}`}>
-                    {s.kind === 'character' ? t('mapShares.badgeChar') : t('mapShares.badgeCorp')}
+                    {s.kind === 'character' ? t('mapShares.badgeChar')
+                      : s.kind === 'corp' ? t('mapShares.badgeCorp')
+                      : t('mapShares.badgeAlliance')}
                   </span>
                   <span className="map-shares__name" title={String(s.targetId)}>
                     {s.name ?? t('mapShares.unknownTarget', { kind: s.kind, id: s.targetId })}

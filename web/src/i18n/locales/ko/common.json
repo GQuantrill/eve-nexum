@@ -678,7 +678,14 @@
     "accessRevoked": "접근이 취소됨",
     "accessRevokedFor": "{{name}} 님의 접근이 취소됨",
     "addFailed": "공유 추가 실패",
-    "revokeFailed": "공유 취소 실패"
+    "revokeFailed": "공유 취소 실패",
+    "alliance": "얼라이언스",
+    "placeholderAlliance": "정확한 얼라이언스 이름",
+    "badgeAlliance": "얼라",
+    "alsoGrantLogin": "로그인도 허용",
+    "sharedWithLogin": "{{name}}와(과) 공유함 — 이제 로그인도 할 수 있습니다",
+    "errStanding": "거부됨: 배포가 이 대상에 대해 긍정적 스탠딩이 없습니다(연락처가 동기화되고 스탠딩이 0보다 커야 합니다).",
+    "errAllianceUnsupported": "얼라이언스 공유는 얼라이언스 설치에서만 사용할 수 있습니다."
   },
   "panes": {
     "noEveSystem": "연결된 EVE 성계 없음",
