@@ -125,7 +125,8 @@
       "syncNoRole": "Sincronizado, mas o seu personagem não conseguiu ler a lista de contactos de corp/aliança. Precisa do cargo Contact Manager (corp) ou de executor de aliança no jogo, mais o scope de contactos — o acesso por standing requer um personagem que os tenha.",
       "syncFailed": "Falha ao sincronizar standings.",
       "readonlyNote": "Qualquer corp, aliança ou personagem adicionado aqui começa como só de leitura. Têm de iniciar sessão pelo menos uma vez antes de lhes poder atribuir um cargo (no separador Utilizadores).",
-      "syncDelay": "Nota: o EVE pode demorar até ~10 minutos a publicar as alterações de contactos no ESI, por isso um standing que acabou de definir no jogo pode ainda não aparecer numa sincronização."
+      "syncDelay": "Nota: o EVE pode demorar até ~10 minutos a publicar as alterações de contactos no ESI, por isso um standing que acabou de definir no jogo pode ainda não aparecer numa sincronização.",
+      "eveWho": "Ver no eveWho"
     },
     "loading": "A carregar…",
     "exportCsv": "Exportar como CSV",

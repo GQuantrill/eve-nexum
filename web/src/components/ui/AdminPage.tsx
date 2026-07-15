@@ -17,7 +17,7 @@ import {
   PointElement, LineElement, Tooltip, Legend, Filler,
 } from 'chart.js';
 import { Doughnut, Line } from 'react-chartjs-2';
-import { CaretUpIcon, CaretDownIcon, XIcon } from '@phosphor-icons/react';
+import { CaretUpIcon, CaretDownIcon, XIcon, ArrowSquareOutIcon } from '@phosphor-icons/react';
 import { createPortal } from 'react-dom';
 
 // Register only the chart pieces we actually use — keeps the bundle lean.
@@ -152,6 +152,29 @@ function grantErrorMessage(e: unknown, t: TFunction, fallback: string): string {
 }
 
 type GrantPickKind = 'corp' | 'alliance' | 'character';
+
+// eveWho profile URL for a corp / alliance / character grant target.
+function eveWhoUrl(kind: 'corp' | 'alliance' | 'character', id: number): string {
+  const seg = kind === 'corp' ? 'corporation' : kind === 'alliance' ? 'alliance' : 'character';
+  return `https://evewho.com/${seg}/${id}`;
+}
+
+// Small external-link icon to an entity's eveWho profile.
+function EveWhoLink({ kind, id, t }: { kind: 'corp' | 'alliance' | 'character'; id: number; t: TFunction }) {
+  return (
+    <a
+      className="admin-access__evewho"
+      href={eveWhoUrl(kind, id)}
+      target="_blank"
+      rel="noreferrer"
+      title={t('admin.access.eveWho')}
+      aria-label={t('admin.access.eveWho')}
+    >
+      <ArrowSquareOutIcon size={13} weight="bold" />
+    </a>
+  );
+}
+
 const SEARCH_ENDPOINT: Record<GrantPickKind, string> = {
   character: '/api/search/characters',
   corp:      '/api/search/corporations',
@@ -283,6 +306,7 @@ function AccessTab() {
             : searching ? t('admin.access.searching')
             : match ? t('admin.access.found', { name: match.name })
             : t('admin.access.noMatch')}
+          {match && <EveWhoLink kind={kind} id={match.id} t={t} />}
         </span>
         <button type="button" className="btn btn--ghost btn--sm" disabled={!match || submitting} onClick={addGrant}>
           {submitting ? t('admin.access.adding') : t('admin.access.add')}
@@ -308,7 +332,10 @@ function AccessTab() {
               {grants.map((g) => (
                 <tr key={g.id}>
                   <td>{t(`admin.access.kind_${g.kind}`)}</td>
-                  <td title={String(g.eveId)}>{g.label}</td>
+                  <td title={String(g.eveId)}>
+                    {g.label}
+                    <EveWhoLink kind={g.kind} id={g.eveId} t={t} />
+                  </td>
                   <td>{g.source === 'env' ? t('admin.access.sourceEnv') : g.source}</td>
                   <td>{g.addedByName ?? (g.source === 'env' ? t('admin.access.sourceEnv') : DASH)}</td>
                   <td>

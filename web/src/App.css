@@ -9059,6 +9059,14 @@ select.sig-toolbar-btn option {
   color: #8090a8;
 }
 .admin-access__match--ok { color: #4ade80; }
+.admin-access__evewho {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 6px;
+  color: #6a8ab0;
+  vertical-align: middle;
+}
+.admin-access__evewho:hover { color: #6ea0ff; }
 .discord-admin__actions {
   display: flex;
   align-items: center;
