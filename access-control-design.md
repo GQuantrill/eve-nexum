@@ -300,6 +300,16 @@ it so operators are not misled:
 
 ## 7. Test plan (authz cannot rely on tsc/CodeQL)
 
+Harness: vitest is now set up server-side (`server` `yarn test`, wired into CI).
+First suite `src/services/accessGrants.test.ts` (13 tests, mocked config+db) covers
+the decision logic: install-type gating (grantKindAllowedForInstall), the
+positive-standing table/contact_kind selection + alliance-install-only +
+fail-closed (standingPermitsTarget), and admit/deny + param passthrough
+(isLoginPermitted). NEXT layer (not yet done): DB-integration tests that run the
+real SQL against a throwaway test database, plus admin endpoint tests (env-immutable
+refusal, revocation session-kill).
+
+
 - Seed: CORP_ID/ALLIANCE_ID reproduce as `source='env'` grants; re-running boot
   is idempotent; env row not deletable via API (expect 4xx).
 - Gate: char in an admin-added corp logs in; char in no listed/standing corp is

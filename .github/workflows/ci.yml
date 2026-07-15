@@ -30,7 +30,7 @@ jobs:
       - run: yarn build
 
   server:
-    name: server (typecheck)
+    name: server (typecheck + test)
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -44,3 +44,4 @@ jobs:
           cache-dependency-path: server/yarn.lock
       - run: yarn install --frozen-lockfile
       - run: npx tsc --noEmit
+      - run: yarn test
