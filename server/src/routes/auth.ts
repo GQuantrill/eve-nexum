@@ -6,7 +6,7 @@ import { encryptToken } from '../utils/tokenCrypto.js';
 import { createLogger } from '../utils/logger.js';
 import { esiFetch } from '../utils/esi.js';
 import { refreshStandingsForUser } from '../services/standings.js';
-import { isLoginPermitted } from '../services/accessGrants.js';
+import { isLoginPermitted, standingsPermitLogin } from '../services/accessGrants.js';
 import { seedDemoMap } from '../services/demoMap.js';
 
 const log = createLogger('auth');
@@ -180,9 +180,11 @@ authRouter.get('/callback', async (req, res) => {
         // and extended live from the admin area, so a friendly corp can be
         // admitted without editing .env. See access-control-design.md.
         if (config.restrictedMode) {
-          const permitted = await isLoginPermitted({
-            characterId: characterId, corpId: userCorpId, allianceId: userAllianceId,
-          });
+          const ids = { characterId, corpId: userCorpId, allianceId: userAllianceId };
+          // Admitted by an explicit allow-list grant, OR (Phase 3) by the
+          // standings auto-admit when it's enabled and the pilot is stood at or
+          // above the configured friendly threshold.
+          const permitted = await isLoginPermitted(ids) || await standingsPermitLogin(ids);
           if (!permitted) {
             res.redirect(failUrl('not_in_corp'));
             return;

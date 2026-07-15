@@ -4,6 +4,7 @@
 // positive-standing prerequisite from access-control-design.md section 4.0.
 import { db } from '../db.js';
 import { config } from '../config.js';
+import { getStandingsLoginSettings } from './appSettings.js';
 
 export type GrantKind = 'corp' | 'alliance' | 'character';
 
@@ -76,6 +77,52 @@ export async function standingPermitsTarget(kind: GrantKind, eveId: number): Pro
 export function grantKindAllowedForInstall(kind: GrantKind): boolean {
   if (kind === 'alliance') return config.allianceMode;
   return true;
+}
+
+// Standings auto-admit ("friends") — Phase 3. Admin-toggleable, OFF by default.
+// When on, a pilot may log in if the DEPLOYMENT holds them at standing >= the
+// admin-chosen threshold (5 or 10), even without an explicit access_grants row.
+// Install-type decides the source (per design):
+//   - Alliance install: the deployment ALLIANCE's contacts only; match the
+//     pilot's alliance, then corp, then character. Corp standings are ignored.
+//   - Corp install: the deployment CORP's contacts only; match the pilot's corp,
+//     then character. Alliance standings are ignored entirely.
+// POSITIVE-ONLY: signed `standing >= threshold` (threshold is 5 or 10), never
+// magnitude/abs. Fail-closed: disabled, or no matching contact, returns false.
+export async function standingsPermitLogin(p: {
+  characterId: number;
+  corpId:      number | null;
+  allianceId:  number | null;
+}): Promise<boolean> {
+  const { enabled, threshold } = await getStandingsLoginSettings();
+  if (!enabled) return false;
+
+  if (config.allianceMode) {
+    const { rows } = await db.query<{ ok: boolean }>(
+      `SELECT EXISTS (
+         SELECT 1 FROM alliance_standings
+          WHERE alliance_id = ANY($1::bigint[])
+            AND standing >= $2
+            AND ( (contact_kind = 'alliance'    AND contact_id = $3)
+               OR (contact_kind = 'corporation' AND contact_id = $4)
+               OR (contact_kind = 'character'   AND contact_id = $5) )
+       ) AS ok`,
+      [config.allianceIds, threshold, p.allianceId, p.corpId, p.characterId],
+    );
+    return rows[0]?.ok ?? false;
+  }
+
+  const { rows } = await db.query<{ ok: boolean }>(
+    `SELECT EXISTS (
+       SELECT 1 FROM corp_standings
+        WHERE corp_id = ANY($1::bigint[])
+          AND standing >= $2
+          AND ( (contact_kind = 'corporation' AND contact_id = $3)
+             OR (contact_kind = 'character'   AND contact_id = $4) )
+     ) AS ok`,
+    [config.corpIds, threshold, p.corpId, p.characterId],
+  );
+  return rows[0]?.ok ?? false;
 }
 
 // The positive-standing prerequisite (design 4.0) applies to GROUP targets

@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 // Mock config + db so we can drive the install-type / positive-standing decision
 // logic without a database. hoisted so the mock factories (which run before the
 // module import below) can close over them.
-const { mockConfig, queryMock } = vi.hoisted(() => ({
+const { mockConfig, queryMock, mockSettings } = vi.hoisted(() => ({
   mockConfig: {
     corpMode: true,
     allianceMode: false,
@@ -11,14 +11,18 @@ const { mockConfig, queryMock } = vi.hoisted(() => ({
     allianceIds: [1354830081] as number[],
   },
   queryMock: vi.fn(),
+  mockSettings: { enabled: false, threshold: 10 as 5 | 10 },
 }));
 
 vi.mock('../config.js', () => ({ config: mockConfig }));
 vi.mock('../db.js', () => ({ db: { query: queryMock } }));
+vi.mock('./appSettings.js', () => ({
+  getStandingsLoginSettings: async () => ({ enabled: mockSettings.enabled, threshold: mockSettings.threshold }),
+}));
 
 // vi.mock calls above are hoisted by vitest, so this static import already sees
 // the mocked config/db.
-import { isLoginPermitted, standingPermitsTarget, grantKindAllowedForInstall, requiresPositiveStanding } from './accessGrants.js';
+import { isLoginPermitted, standingPermitsTarget, grantKindAllowedForInstall, requiresPositiveStanding, standingsPermitLogin } from './accessGrants.js';
 
 const rows = (ok: boolean) => ({ rows: [{ ok }] });
 
@@ -28,6 +32,8 @@ beforeEach(() => {
   mockConfig.allianceMode = false;
   mockConfig.corpIds = [98120330];
   mockConfig.allianceIds = [1354830081];
+  mockSettings.enabled = false;
+  mockSettings.threshold = 10;
 });
 
 describe('grantKindAllowedForInstall', () => {
@@ -107,6 +113,52 @@ describe('standingPermitsTarget', () => {
   it('fail-closed: an empty result set denies', async () => {
     queryMock.mockResolvedValue({ rows: [] });
     expect(await standingPermitsTarget('corp', 999)).toBe(false);
+  });
+});
+
+describe('standingsPermitLogin', () => {
+  const pilot = { characterId: 1841929906, corpId: 98370861, allianceId: 99000001 };
+
+  it('returns false (without querying) when the toggle is off', async () => {
+    mockSettings.enabled = false;
+    expect(await standingsPermitLogin(pilot)).toBe(false);
+    expect(queryMock).not.toHaveBeenCalled();
+  });
+
+  it('alliance install: reads alliance_standings with the threshold + all three contact kinds', async () => {
+    mockConfig.allianceMode = true;
+    mockSettings.enabled = true;
+    mockSettings.threshold = 10;
+    queryMock.mockResolvedValue({ rows: [{ ok: true }] });
+    expect(await standingsPermitLogin(pilot)).toBe(true);
+    const [sql, params] = queryMock.mock.calls[0] as [string, unknown[]];
+    expect(sql).toContain('alliance_standings');
+    expect(sql).not.toContain('corp_standings');
+    expect(params[0]).toEqual(mockConfig.allianceIds);
+    expect(params[1]).toBe(10);                 // threshold
+    expect(params[2]).toBe(pilot.allianceId);   // alliance match
+    expect(params[3]).toBe(pilot.corpId);       // corp match
+    expect(params[4]).toBe(pilot.characterId);  // character match
+  });
+
+  it('corp install: reads corp_standings only (alliance ignored), corp+char match', async () => {
+    mockSettings.enabled = true;
+    mockSettings.threshold = 5;
+    queryMock.mockResolvedValue({ rows: [{ ok: false }] });
+    expect(await standingsPermitLogin(pilot)).toBe(false);
+    const [sql, params] = queryMock.mock.calls[0] as [string, unknown[]];
+    expect(sql).toContain('corp_standings');
+    expect(sql).not.toContain('alliance_standings');
+    expect(params[0]).toEqual(mockConfig.corpIds);
+    expect(params[1]).toBe(5);
+    expect(params[2]).toBe(pilot.corpId);
+    expect(params[3]).toBe(pilot.characterId);
+  });
+
+  it('fail-closed: an empty result set denies', async () => {
+    mockSettings.enabled = true;
+    queryMock.mockResolvedValue({ rows: [] });
+    expect(await standingsPermitLogin(pilot)).toBe(false);
   });
 });
 

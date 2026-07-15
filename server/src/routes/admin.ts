@@ -16,6 +16,10 @@ import {
   isLoginPermitted, standingPermitsTarget, grantKindAllowedForInstall,
   requiresPositiveStanding, type GrantKind,
 } from '../services/accessGrants.js';
+import {
+  getStandingsLoginSettings, setSetting,
+  STANDINGS_LOGIN_ENABLED, STANDINGS_LOGIN_THRESHOLD,
+} from '../services/appSettings.js';
 
 const log = createLogger('admin');
 
@@ -477,6 +481,30 @@ adminRouter.delete('/access-grants/:id', async (req, res) => {
     if (!stillOk) killed += await invalidateSessionsForUser(u.id);
   }
   res.json({ ok: true, sessionsKilled: killed });
+});
+
+// ── Standings auto-admit ("friends") settings — Phase 3 ──────────────────────
+
+// GET /api/admin/access-settings — current standings auto-admit toggle + level.
+adminRouter.get('/access-settings', async (_req, res) => {
+  const s = await getStandingsLoginSettings();
+  res.json({ standingsLoginEnabled: s.enabled, standingsLoginThreshold: s.threshold });
+});
+
+// PATCH /api/admin/access-settings — update the standings auto-admit settings.
+adminRouter.patch('/access-settings', async (req, res) => {
+  const { enabled, threshold } = req.body as { enabled?: unknown; threshold?: unknown };
+  if (enabled !== undefined) {
+    if (typeof enabled !== 'boolean') { res.status(400).json({ error: 'enabled must be a boolean' }); return; }
+    await setSetting(STANDINGS_LOGIN_ENABLED, enabled ? 'true' : 'false', req.session.userId ?? null);
+  }
+  if (threshold !== undefined) {
+    if (threshold !== 5 && threshold !== 10) { res.status(400).json({ error: 'threshold must be 5 or 10' }); return; }
+    await setSetting(STANDINGS_LOGIN_THRESHOLD, String(threshold), req.session.userId ?? null);
+  }
+  await audit(req, null, null, 'access_settings_update', null, JSON.stringify({ enabled, threshold }));
+  const s = await getStandingsLoginSettings();
+  res.json({ standingsLoginEnabled: s.enabled, standingsLoginThreshold: s.threshold });
 });
 
 // GET /api/admin/maps — every corp map in the system with owner + stats.
