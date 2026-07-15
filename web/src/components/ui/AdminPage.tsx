@@ -247,47 +247,43 @@ function AccessTab() {
 
   return (
     <div className="admin-access">
-      <div className="admin-page__section-title">{t('admin.access.title')}</div>
-      <p className="admin-page__section-head">{t('admin.access.intro')}</p>
+      <h2 className="admin-page__section-title">{t('admin.access.title')}</h2>
+      <p className="admin-access__intro">{t('admin.access.intro')}</p>
+      <div className="admin-access__note">{t('admin.access.readonlyNote')}</div>
 
-      <div className="admin-access__sync">
-        <button type="button" className="admin-modal__action" disabled={syncing} onClick={syncStandings}>
+      <div className="admin-access__toolbar">
+        <button type="button" className="btn btn--ghost btn--sm" disabled={syncing} onClick={syncStandings}>
           {syncing ? t('admin.access.syncing') : t('admin.access.syncStandings')}
         </button>
-        <span className="admin-access__sync-hint">{t('admin.access.syncHint')}</span>
-        {syncResult && (
-          <div className={syncResult.ok ? 'admin-page__section-head' : 'admin-page__error'}>{syncResult.text}</div>
-        )}
+        <span className="admin-access__hint">{t('admin.access.syncHint')}</span>
       </div>
+      {syncResult && (
+        <div className={syncResult.ok ? 'admin-access__result' : 'admin-page__error'}>{syncResult.text}</div>
+      )}
 
       <div className="admin-access__add">
-        <div className="admin-page__filter-group">
-          {KINDS.map((k) => (
-            <button
-              key={k}
-              type="button"
-              className={`admin-page__tab${kind === k ? ' admin-page__tab--active' : ''}`}
-              onClick={() => { setKind(k); setMatch(null); setQuery(''); }}
-            >
-              {t(`admin.access.kind_${k}`)}
-            </button>
-          ))}
-        </div>
+        <select
+          className="admin-access__kind"
+          value={kind}
+          onChange={(e) => { setKind(e.target.value as GrantPickKind); setMatch(null); setQuery(''); }}
+        >
+          {KINDS.map((k) => <option key={k} value={k}>{t(`admin.access.kind_${k}`)}</option>)}
+        </select>
         <input
-          className="admin-modal__role-select"
+          className="admin-access__input"
           placeholder={t(`admin.access.placeholder_${kind}`)}
           value={query}
           maxLength={50}
           spellCheck={false}
           onChange={(e) => setQuery(e.target.value)}
         />
-        <span className="admin-access__match">
+        <span className={`admin-access__match${match ? ' admin-access__match--ok' : ''}`}>
           {query.trim().length < 3 ? t('admin.access.typeAtLeast3')
             : searching ? t('admin.access.searching')
             : match ? t('admin.access.found', { name: match.name })
             : t('admin.access.noMatch')}
         </span>
-        <button type="button" className="admin-modal__action" disabled={!match || submitting} onClick={addGrant}>
+        <button type="button" className="btn btn--ghost btn--sm" disabled={!match || submitting} onClick={addGrant}>
           {submitting ? t('admin.access.adding') : t('admin.access.add')}
         </button>
       </div>
@@ -317,7 +313,7 @@ function AccessTab() {
                   <td>
                     {g.immutable
                       ? <span className="admin-modal__pill" title={t('admin.access.envLockedHint')}>{t('admin.access.envLocked')}</span>
-                      : <button type="button" className="admin-modal__action admin-modal__danger" onClick={() => removeGrant(g)}>
+                      : <button type="button" className="btn btn--ghost btn--sm admin-modal__danger" onClick={() => removeGrant(g)}>
                           {t('admin.access.remove')}
                         </button>}
                   </td>

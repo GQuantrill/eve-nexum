@@ -8992,6 +8992,72 @@ select.sig-toolbar-btn option {
   font-size: calc(13px * var(--font-scale, 1));
 }
 .discord-admin__results li button:hover { background: rgba(91, 155, 255, 0.12); }
+
+/* ── Admin: login access (allow-list) tab ──────────────────────────────── */
+.admin-access__intro {
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #8090a8;
+  max-width: 720px;
+  line-height: 1.5;
+  margin: 6px 0 12px;
+}
+.admin-access__note {
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #a8b6cc;
+  max-width: 720px;
+  line-height: 1.5;
+  margin: 0 0 20px;
+  padding: 9px 12px;
+  background: #0d1524;
+  border: 1px solid #1e2740;
+  border-left: 3px solid #2e5a9a;
+  border-radius: 5px;
+}
+.admin-access__toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+.admin-access__hint {
+  font-size: calc(12px * var(--font-scale, 1));
+  color: #8090a8;
+}
+.admin-access__result {
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #7aa2c8;
+  margin: 2px 0 4px;
+}
+.admin-access__add {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 16px 0 4px;
+  padding-top: 16px;
+  border-top: 1px solid #1a2535;
+}
+.admin-access__kind,
+.admin-access__input {
+  box-sizing: border-box;
+  background: #0a0e1a;
+  border: 1px solid #1e2740;
+  border-radius: 4px;
+  color: #c8d4f0;
+  font-family: inherit;
+  font-size: calc(13px * var(--font-scale, 1));
+  padding: 5px 8px;
+  outline: none;
+}
+.admin-access__input { width: 240px; }
+.admin-access__kind:focus,
+.admin-access__input:focus { border-color: #6ea0ff; }
+.admin-access__match {
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #8090a8;
+}
+.admin-access__match--ok { color: #4ade80; }
 .discord-admin__actions {
   display: flex;
   align-items: center;

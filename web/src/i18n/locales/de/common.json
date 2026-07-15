@@ -123,7 +123,8 @@
       "syncHint": "Die neuesten Corp-/Allianz-Kontakte von ESI abrufen, damit die Positiv-Standing-Prüfungen aktuelle Daten verwenden.",
       "syncOk": "Standings synchronisiert — {{count}} Kontakte.",
       "syncNoRole": "Synchronisiert, aber Ihr Charakter konnte die Corp-/Allianz-Kontaktliste nicht lesen. Er benötigt die Ingame-Rolle Contact Manager (Corp) bzw. die Allianz-Executor-Rolle sowie den Kontakte-Scope — Standing-basierter Zugang erfordert einen Charakter, der sie hat.",
-      "syncFailed": "Standings-Synchronisierung fehlgeschlagen."
+      "syncFailed": "Standings-Synchronisierung fehlgeschlagen.",
+      "readonlyNote": "Jede hier hinzugefügte Corp, Allianz oder Charakter beginnt schreibgeschützt (read-only). Sie müssen sich mindestens einmal anmelden, bevor Sie ihnen eine Rolle zuweisen können (im Tab Benutzer)."
     },
     "loading": "Lädt…",
     "exportCsv": "Als CSV exportieren",

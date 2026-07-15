@@ -172,7 +172,8 @@
       "syncHint": "Pull the latest corp/alliance contacts from ESI so positive-standing checks use current data.",
       "syncOk": "Standings synced — {{count}} contacts.",
       "syncNoRole": "Synced, but your character couldn't read the corp/alliance contact list. It needs the in-game Contact Manager (corp) or alliance-executor role plus the contacts scope — standing-based access needs a character that has them.",
-      "syncFailed": "Standings sync failed."
+      "syncFailed": "Standings sync failed.",
+      "readonlyNote": "Any corp, alliance or character added here starts read-only. They must log in at least once before you can grant them a role (from the Users tab)."
     },
     "loading": "Loading…",
     "exportCsv": "Export as CSV",
