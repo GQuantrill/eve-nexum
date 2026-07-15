@@ -31,6 +31,7 @@ import wormholesRouter    from './routes/wormholes.js';
 import releasesRouter     from './routes/releases.js';
 import { loadRouteGraph } from './services/routeGraph.js';
 import { seedDiscordWebhooksFromEnv } from './services/discordSeed.js';
+import { seedAccessGrantsFromEnv } from './services/accessGrantsSeed.js';
 import { startSdeAutoUpdate } from './services/sdeUpdate.js';
 import { startLocationPoller } from './services/locationPoll.js';
 import { startWhSweeper } from './services/whSweep.js';
@@ -173,6 +174,7 @@ async function expireMaps() {
 migrate()
   .then(async () => {
     await seedDiscordWebhooksFromEnv();
+    await seedAccessGrantsFromEnv();
     await expireMaps();
     setInterval(expireMaps, 60 * 60 * 1000); // re-check hourly
     await initActivity();

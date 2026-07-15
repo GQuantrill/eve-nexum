@@ -1,0 +1,79 @@
+// Login allow-list (access_grants) helpers. The single login gate in
+// routes/auth.ts calls isLoginPermitted(); the admin grant endpoints and (later)
+// the standings auto-admit call standingPermitsTarget() to enforce the
+// positive-standing prerequisite from access-control-design.md section 4.0.
+import { db } from '../db.js';
+import { config } from '../config.js';
+
+export type GrantKind = 'corp' | 'alliance' | 'character';
+
+// The login gate: is this character admitted by any allow-list grant — their
+// own character id, their corp, or (only when they have one) their alliance?
+export async function isLoginPermitted(p: {
+  characterId: number;
+  corpId:      number | null;
+  allianceId:  number | null;
+}): Promise<boolean> {
+  const { rows } = await db.query<{ ok: boolean }>(
+    `SELECT EXISTS (
+       SELECT 1 FROM access_grants
+        WHERE (kind = 'character' AND eve_id = $1)
+           OR ($2::bigint IS NOT NULL AND kind = 'corp'     AND eve_id = $2)
+           OR ($3::bigint IS NOT NULL AND kind = 'alliance' AND eve_id = $3)
+     ) AS ok`,
+    [p.characterId, p.corpId, p.allianceId],
+  );
+  return rows[0]?.ok ?? false;
+}
+
+// Positive-standing prerequisite (design 4.0). Does the DEPLOYMENT hold `eveId`
+// (of `kind`) at positive standing (> 0)? Install-type decides the source:
+//   - Alliance install: the deployment ALLIANCE's contacts only (alliance takes
+//     priority; corp standings are not consulted).
+//   - Corp install: the deployment CORP's contacts only; alliance standings are
+//     ignored entirely, so an alliance target can never qualify (alliance targets
+//     are alliance-install-only by design).
+// Signed comparison `standing > 0` — never magnitude/abs. Fail-closed: no
+// matching contact row (or contacts never synced) returns false.
+export async function standingPermitsTarget(kind: GrantKind, eveId: number): Promise<boolean> {
+  if (config.allianceMode) {
+    const contactKind =
+      kind === 'alliance' ? 'alliance' :
+      kind === 'corp'     ? 'corporation' :
+                            'character';
+    const { rows } = await db.query<{ ok: boolean }>(
+      `SELECT EXISTS (
+         SELECT 1 FROM alliance_standings
+          WHERE alliance_id = ANY($1::bigint[])
+            AND contact_kind = $2 AND contact_id = $3 AND standing > 0
+       ) AS ok`,
+      [config.allianceIds, contactKind, eveId],
+    );
+    return rows[0]?.ok ?? false;
+  }
+
+  // Corp install: alliance-kind targets are not offered (return false); corp and
+  // character targets check the deployment corp's contacts.
+  const contactKind =
+    kind === 'corp'      ? 'corporation' :
+    kind === 'character' ? 'character' :
+                           null;
+  if (contactKind === null) return false;
+  const { rows } = await db.query<{ ok: boolean }>(
+    `SELECT EXISTS (
+       SELECT 1 FROM corp_standings
+        WHERE corp_id = ANY($1::bigint[])
+          AND contact_kind = $2 AND contact_id = $3 AND standing > 0
+     ) AS ok`,
+    [config.corpIds, contactKind, eveId],
+  );
+  return rows[0]?.ok ?? false;
+}
+
+// Alliance targets only make sense in an alliance installation (a corp install
+// works purely at corp/character granularity and ignores alliance standings).
+// Shared by the admin grant endpoint and the map-share flow.
+export function grantKindAllowedForInstall(kind: GrantKind): boolean {
+  if (kind === 'alliance') return config.allianceMode;
+  return true;
+}

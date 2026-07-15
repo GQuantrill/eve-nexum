@@ -25,6 +25,28 @@ export function setWritesSuppressed(suppressed: boolean): void {
 
 const WRITE_METHODS = new Set(['POST', 'PATCH', 'PUT', 'DELETE']);
 
+// Thrown on a non-2xx response. `.message` stays the terse "API <path> → <status>"
+// form for backward compatibility (existing callers show it), while `.status`,
+// `.code` (the server's `error` field) and `.serverMessage` (its `message` field)
+// let callers surface a specific, human-readable reason instead of a generic one.
+export class ApiError extends Error {
+  readonly status: number;
+  readonly code?: string;
+  readonly serverMessage?: string;
+  readonly body?: unknown;
+  constructor(path: string, status: number, body: unknown) {
+    super(`API ${path} → ${status}`);
+    this.name = 'ApiError';
+    this.status = status;
+    this.body = body;
+    if (body && typeof body === 'object') {
+      const b = body as { error?: unknown; message?: unknown };
+      if (typeof b.error === 'string')   this.code = b.error;
+      if (typeof b.message === 'string') this.serverMessage = b.message;
+    }
+  }
+}
+
 export async function api<T = unknown>(path: string, options?: RequestInit): Promise<T> {
   const method = (options?.method ?? 'GET').toUpperCase();
 
@@ -52,7 +74,13 @@ export async function api<T = unknown>(path: string, options?: RequestInit): Pro
     // its own headers (previously `...options` could replace them wholesale).
     headers: { 'Content-Type': 'application/json', 'X-Client-Id': CLIENT_ID, ...optHeaders },
   });
-  if (!res.ok) throw new Error(`API ${path} → ${res.status}`);
+  if (!res.ok) {
+    // Read the error body (JSON { error, message }) so callers can show the
+    // real reason. Tolerant of non-JSON / empty error bodies.
+    let body: unknown;
+    try { body = await res.json(); } catch { /* no or non-JSON body */ }
+    throw new ApiError(path, res.status, body);
+  }
   // A 204 (or otherwise empty) response has no body to parse — calling
   // res.json() on it throws "Unexpected end of JSON input". Treat no-content
   // responses as a successful undefined so callers that don't read the body

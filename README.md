@@ -180,6 +180,17 @@ These features only matter once `CORP_ID` or `ALLIANCE_ID` is set — see [Corp 
 - **Corp ticker resolution** — corp IDs in the Users and Maps reports are resolved to in-game tickers via ESI (`/v5/corporations/{id}/`), with a 1-hour in-memory cache to keep the report loads cheap.
 - **Per-character attribution** — sigs, structures, and system add / delete actions are recorded with the user who made them, so reports can answer "who has been scanning what" with no manual logging.
 
+### Admitting friends without editing `.env`
+
+Historically the only way to let someone log in was to add their corp/alliance to `CORP_ID` / `ALLIANCE_ID` and restart. Now those env lists **seed a database login allow-list** on boot, and admins manage the rest live:
+
+- **The `.env` core is immutable.** Every `CORP_ID` / `ALLIANCE_ID` entry becomes an allow-list row marked as env-sourced. Those rows can't be changed or removed from the admin area — only by editing `.env` — so a mistaken (or compromised) admin can never lock out or open up the deployment's core. Editing `.env` and rebooting reconciles the core exactly.
+- **Add friendly corps, alliances, or individual characters** to the allow-list from the admin area without touching `.env` or restarting. Their members can then log in; what they can actually *see* is still governed separately (a newly-admitted guest defaults to read-only and sees only maps explicitly shared with them).
+- **Positive standing is required.** You can only admit an entity your deployment holds at **positive** standing in-game. On an alliance installation this reads the alliance's contacts; on a corp installation it reads the corp's contacts (alliance standings are ignored). Neutral (0) and negative (−5 / −10) are refused. Alliance-level grants are only offered on an alliance installation.
+- **Revoking takes effect immediately** — removing a grant logs out anyone it was the sole reason for admitting, rather than waiting for their session to expire. The bootstrap `ADMIN_CHAR_ID` is never locked out.
+
+Every allow-list change is written to the [Audit log](#corp--alliance-mode).
+
 ---
 
 ## Wormhole bookmarks
@@ -307,8 +318,8 @@ Edit `.env` and fill in the required values:
 | `EVE_CALLBACK_URL` | Yes | Must match the callback registered in your EVE app — e.g. `https://yourdomain.com/auth/callback` |
 | `FRONTEND_URL` | Yes | Public URL of the app — e.g. `https://yourdomain.com` |
 | `DOMAIN` | Traefik only | Bare hostname for the Traefik router rule — e.g. `nexum.yourdomain.com` |
-| `CORP_ID` | Optional | Restricts logins to specific EVE corporations. **Comma-separated list** of corporation IDs — anyone whose corp is not in the list is rejected at the OAuth callback (unless their alliance is in `ALLIANCE_ID`). Leave empty/unset to allow any EVE character to log in. Example single corp: `98000001`. Example multi-corp: `98000001,98000002`. |
-| `ALLIANCE_ID` | Optional | Restricts logins to specific EVE alliances, and adds the **alliance map** scope. **Comma-separated list** of alliance IDs. A character is admitted if their corp is in `CORP_ID` **or** their alliance is in `ALLIANCE_ID`, so a whole alliance can be permitted without listing every member corp. The list also forms the coalition for `ALLIANCE_MAP_SHARED`. Example: `99000001` or `99000001,99000002`. |
+| `CORP_ID` | Optional | Restricts logins to specific EVE corporations. **Comma-separated list** of corporation IDs — anyone whose corp is not admitted is rejected at the OAuth callback (unless their alliance is in `ALLIANCE_ID`). Leave empty/unset to allow any EVE character to log in. Example single corp: `98000001`. Example multi-corp: `98000001,98000002`. **On boot this list _seeds_ the login allow-list** (see [Admitting friends without editing `.env`](#admitting-friends-without-editing-env)): the env-seeded entries are the immutable "core" — additional corps, alliances, or individual characters are admitted live from the admin area without editing `.env` or restarting. Removing a corp from `CORP_ID` removes its core entry on the next boot. |
+| `ALLIANCE_ID` | Optional | Restricts logins to specific EVE alliances, and adds the **alliance map** scope. **Comma-separated list** of alliance IDs. A character is admitted if their corp is in `CORP_ID` **or** their alliance is in `ALLIANCE_ID`, so a whole alliance can be permitted without listing every member corp. Like `CORP_ID`, this seeds the immutable core of the login allow-list. The list also forms the coalition for `ALLIANCE_MAP_SHARED`. Example: `99000001` or `99000001,99000002`. |
 | `ADMIN_CHAR_ID` | When `CORP_ID` or `ALLIANCE_ID` is set | EVE character ID of the bootstrap admin. Forced to the top role on first login (`alliance_admin` when `ALLIANCE_ID` is set, otherwise `admin`) and cannot be demoted or blocked by other admins. **Not a membership exemption** — this character still has to be in a listed corp or alliance to log in. See [What happens when a user leaves the corp](#what-happens-when-a-user-leaves-the-corp). |
 | `CORP_MAP_SHARED` | Optional | `1` / `true` to share every corp map across every listed corp. Default (`false`) scopes corp maps to the corp that created them — Corp A's chain stays invisible to Corp B even when they share a deployment. Only enable when all listed corps explicitly trust each other. |
 | `ALLIANCE_MAP_SHARED` | Optional | Alliance counterpart of `CORP_MAP_SHARED`. `1` / `true` makes every alliance map visible to every listed alliance (coalition mode). Default (`false`) scopes each alliance map to its owning alliance. |
