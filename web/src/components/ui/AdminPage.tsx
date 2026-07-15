@@ -202,6 +202,21 @@ function AccessTab() {
   const [syncing, setSyncing]       = useState(false);
   const [syncResult, setSyncResult] = useState<{ ok: boolean; text: string } | null>(null);
 
+  // Standings auto-admit ("friends") settings — off by default.
+  const [stdEnabled, setStdEnabled]     = useState(false);
+  const [stdThreshold, setStdThreshold] = useState<5 | 10>(10);
+
+  const saveStandingsSettings = async (patch: { enabled?: boolean; threshold?: 5 | 10 }) => {
+    if (patch.enabled !== undefined) setStdEnabled(patch.enabled);
+    if (patch.threshold !== undefined) setStdThreshold(patch.threshold);
+    try {
+      await api('/api/admin/access-settings', { method: 'PATCH', body: JSON.stringify(patch) });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : t('admin.access.settingsSaveFailed'));
+      void load(); // reconcile with the server's real state
+    }
+  };
+
   // Force-refresh the deployment's standings from ESI using the admin's own
   // token (one call does character + corp + alliance). The positive-standing
   // gate reads whichever bucket matches the install type, so we report on that.
@@ -223,7 +238,13 @@ function AccessTab() {
   const load = useCallback(async () => {
     setLoading(true); setError(null);
     try {
-      setGrants(await api<AccessGrant[]>('/api/admin/access-grants'));
+      const [g, s] = await Promise.all([
+        api<AccessGrant[]>('/api/admin/access-grants'),
+        api<{ standingsLoginEnabled: boolean; standingsLoginThreshold: number }>('/api/admin/access-settings'),
+      ]);
+      setGrants(g);
+      setStdEnabled(s.standingsLoginEnabled);
+      setStdThreshold(s.standingsLoginThreshold === 5 ? 5 : 10);
     } catch (e) {
       setError(e instanceof Error ? e.message : t('admin.access.loadFailed'));
     } finally { setLoading(false); }
@@ -273,6 +294,27 @@ function AccessTab() {
       <h2 className="admin-page__section-title">{t('admin.access.title')}</h2>
       <p className="admin-access__intro">{t('admin.access.intro')}</p>
       <div className="admin-access__note">{t('admin.access.readonlyNote')}</div>
+
+      <div className="admin-access__standings">
+        <label className="admin-access__toggle">
+          <input type="checkbox" checked={stdEnabled} onChange={(e) => saveStandingsSettings({ enabled: e.target.checked })} />
+          <span>{t('admin.access.standingsEnable')}</span>
+        </label>
+        <p className="admin-access__hint">{t('admin.access.standingsHint')}</p>
+        {stdEnabled && (
+          <div className="admin-access__threshold">
+            <span className="admin-access__threshold-label">{t('admin.access.standingsMinLevel')}</span>
+            <label>
+              <input type="radio" name="std-threshold" checked={stdThreshold === 10} onChange={() => saveStandingsSettings({ threshold: 10 })} />
+              {t('admin.access.threshold10')}
+            </label>
+            <label>
+              <input type="radio" name="std-threshold" checked={stdThreshold === 5} onChange={() => saveStandingsSettings({ threshold: 5 })} />
+              {t('admin.access.threshold5')}
+            </label>
+          </div>
+        )}
+      </div>
 
       <div className="admin-access__toolbar">
         <button type="button" className="btn btn--ghost btn--sm" disabled={syncing} onClick={syncStandings}>

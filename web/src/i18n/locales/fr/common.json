@@ -126,7 +126,13 @@
       "syncFailed": "Échec de la synchronisation des standings.",
       "readonlyNote": "Toute corpo, alliance ou personnage ajouté ici commence en lecture seule. Ils doivent se connecter au moins une fois avant que vous puissiez leur attribuer un rôle (dans l'onglet Utilisateurs).",
       "syncDelay": "Remarque : EVE peut mettre jusqu'à ~10 minutes pour publier les changements de contacts sur l'ESI ; un standing que vous venez de définir en jeu peut donc ne pas encore apparaître lors d'une synchronisation.",
-      "eveWho": "Voir sur eveWho"
+      "eveWho": "Voir sur eveWho",
+      "standingsEnable": "Admettre les amis automatiquement selon le standing",
+      "standingsHint": "Lorsque activé, toute personne que l'installation tient au standing choisi ou mieux peut se connecter automatiquement, sans avoir à l'ajouter ici. Désactivé par défaut ; nécessite des contacts corpo/alliance synchronisés (bouton ci-dessous).",
+      "standingsMinLevel": "Standing minimum :",
+      "threshold10": "+10 uniquement (Excellent)",
+      "threshold5": "+5 et plus (Bon ou mieux)",
+      "settingsSaveFailed": "Échec de l'enregistrement du réglage"
     },
     "loading": "Chargement…",
     "exportCsv": "Exporter en CSV",

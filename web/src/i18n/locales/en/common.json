@@ -175,7 +175,13 @@
       "syncFailed": "Standings sync failed.",
       "readonlyNote": "Any corp, alliance or character added here starts read-only. They must log in at least once before you can grant them a role (from the Users tab).",
       "syncDelay": "Heads up: EVE can take up to ~10 minutes to publish contact changes to ESI, so a standing you just set in-game may not show up in a sync yet.",
-      "eveWho": "View on eveWho"
+      "eveWho": "View on eveWho",
+      "standingsEnable": "Auto-admit friends by standing",
+      "standingsHint": "When on, anyone the deployment holds at the chosen standing or better can log in automatically — no need to add them here. Off by default; requires your corp/alliance contacts to be synced (button below).",
+      "standingsMinLevel": "Minimum standing:",
+      "threshold10": "+10 only (Excellent)",
+      "threshold5": "+5 and above (Good or better)",
+      "settingsSaveFailed": "Failed to save setting"
     },
     "loading": "Loading…",
     "exportCsv": "Export as CSV",

@@ -126,7 +126,13 @@
       "syncFailed": "Falha ao sincronizar standings.",
       "readonlyNote": "Qualquer corp, aliança ou personagem adicionado aqui começa como só de leitura. Têm de iniciar sessão pelo menos uma vez antes de lhes poder atribuir um cargo (no separador Utilizadores).",
       "syncDelay": "Nota: o EVE pode demorar até ~10 minutos a publicar as alterações de contactos no ESI, por isso um standing que acabou de definir no jogo pode ainda não aparecer numa sincronização.",
-      "eveWho": "Ver no eveWho"
+      "eveWho": "Ver no eveWho",
+      "standingsEnable": "Admitir amigos automaticamente por standing",
+      "standingsHint": "Quando ativo, qualquer pessoa que a instalação tenha no standing escolhido ou melhor pode iniciar sessão automaticamente — sem ter de a adicionar aqui. Desativado por predefinição; requer contactos de corp/aliança sincronizados (botão abaixo).",
+      "standingsMinLevel": "Standing mínimo:",
+      "threshold10": "Apenas +10 (Excelente)",
+      "threshold5": "+5 e acima (Bom ou melhor)",
+      "settingsSaveFailed": "Falha ao guardar a definição"
     },
     "loading": "A carregar…",
     "exportCsv": "Exportar como CSV",
