@@ -801,6 +801,16 @@ export async function migrate() {
       UNIQUE (kind, eve_id)
     );
     CREATE INDEX IF NOT EXISTS idx_access_grants_lookup ON access_grants (kind, eve_id);
+
+    -- Deployment-level key/value settings (distinct from per-user ui_settings).
+    -- Phase 3 uses standings_login_enabled ('true'|'false') and
+    -- standings_login_threshold ('5'|'10') for the standings auto-admit toggle.
+    CREATE TABLE IF NOT EXISTS app_settings (
+      key             TEXT        PRIMARY KEY,
+      value           TEXT        NOT NULL,
+      updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_by_user INTEGER     REFERENCES users(id) ON DELETE SET NULL
+    );
   `);
 
   await encryptLegacyTokens();
