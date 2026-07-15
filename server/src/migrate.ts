@@ -692,6 +692,21 @@ export async function migrate() {
     CREATE INDEX IF NOT EXISTS idx_map_shares_char ON map_shares (target_character_id) WHERE target_character_id IS NOT NULL;
     CREATE INDEX IF NOT EXISTS idx_map_shares_corp ON map_shares (target_corp_id)      WHERE target_corp_id      IS NOT NULL;
 
+    -- Phase 2: alliance share targets (alliance installs only). Add the column,
+    -- swap the 2-way XOR CHECK for an "exactly one of three" rule, and add the
+    -- matching partial indexes. The original inline CHECK is unnamed (Postgres
+    -- calls it map_shares_check); drop it by that name, then add a named one.
+    ALTER TABLE map_shares ADD COLUMN IF NOT EXISTS target_alliance_id INTEGER;
+    ALTER TABLE map_shares DROP CONSTRAINT IF EXISTS map_shares_check;
+    ALTER TABLE map_shares DROP CONSTRAINT IF EXISTS map_shares_target_xor;
+    ALTER TABLE map_shares ADD CONSTRAINT map_shares_target_xor CHECK (
+      (target_character_id IS NOT NULL)::int
+      + (target_corp_id     IS NOT NULL)::int
+      + (target_alliance_id IS NOT NULL)::int = 1
+    );
+    CREATE UNIQUE INDEX IF NOT EXISTS uq_map_shares_alliance ON map_shares (map_id, target_alliance_id) WHERE target_alliance_id IS NOT NULL;
+    CREATE INDEX IF NOT EXISTS idx_map_shares_alliance ON map_shares (target_alliance_id) WHERE target_alliance_id IS NOT NULL;
+
     -- Last known solar system per user, updated from the ESI location poll as
     -- the pilot jumps. Lets the profile remember where they were last seen.
     -- INTEGER to match solar_systems.id (SDE-seeded); nullable until the first

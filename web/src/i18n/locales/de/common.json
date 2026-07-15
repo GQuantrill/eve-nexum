@@ -678,7 +678,14 @@
     "accessRevoked": "Zugriff widerrufen",
     "accessRevokedFor": "Zugriff widerrufen für {{name}}",
     "addFailed": "Freigabe konnte nicht hinzugefügt werden",
-    "revokeFailed": "Freigabe konnte nicht widerrufen werden"
+    "revokeFailed": "Freigabe konnte nicht widerrufen werden",
+    "alliance": "Allianz",
+    "placeholderAlliance": "Genauer Allianzname",
+    "badgeAlliance": "Alli",
+    "alsoGrantLogin": "Auch Anmeldung erlauben",
+    "sharedWithLogin": "Mit {{name}} geteilt — sie können sich jetzt auch anmelden",
+    "errStanding": "Abgelehnt: Ihre Installation hat zu dieser Entität kein positives Standing (Kontakte müssen synchronisiert sein und das Standing über 0 liegen).",
+    "errAllianceUnsupported": "Allianz-Freigabe ist nur bei einer Allianz-Installation verfügbar."
   },
   "panes": {
     "noEveSystem": "Kein EVE-System verknüpft",

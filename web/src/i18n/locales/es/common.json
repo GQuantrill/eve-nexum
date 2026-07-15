@@ -678,7 +678,14 @@
     "accessRevoked": "Acceso revocado",
     "accessRevokedFor": "Acceso revocado para {{name}}",
     "addFailed": "No se pudo añadir el recurso compartido",
-    "revokeFailed": "No se pudo revocar el recurso compartido"
+    "revokeFailed": "No se pudo revocar el recurso compartido",
+    "alliance": "Alianza",
+    "placeholderAlliance": "Nombre exacto de la alianza",
+    "badgeAlliance": "Ali",
+    "alsoGrantLogin": "Permitirles también iniciar sesión",
+    "sharedWithLogin": "Compartido con {{name}}: ahora también pueden iniciar sesión",
+    "errStanding": "Rechazado: tu instalación no tiene standing positivo con esta entidad (los contactos deben estar sincronizados y el standing por encima de 0).",
+    "errAllianceUnsupported": "El uso compartido de alianza solo está disponible en una instalación de alianza."
   },
   "panes": {
     "noEveSystem": "Ningún sistema de EVE vinculado",

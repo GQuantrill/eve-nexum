@@ -678,7 +678,14 @@
     "accessRevoked": "已撤销访问",
     "accessRevokedFor": "已撤销 {{name}} 的访问",
     "addFailed": "添加共享失败",
-    "revokeFailed": "撤销共享失败"
+    "revokeFailed": "撤销共享失败",
+    "alliance": "联盟",
+    "placeholderAlliance": "精确的联盟名称",
+    "badgeAlliance": "联盟",
+    "alsoGrantLogin": "同时允许登录",
+    "sharedWithLogin": "已与 {{name}} 共享 — 他们现在也可以登录了",
+    "errStanding": "已拒绝：你的部署对该实体没有正声望（联系人必须已同步且声望大于 0）。",
+    "errAllianceUnsupported": "联盟共享仅在联盟安装中可用。"
   },
   "panes": {
     "noEveSystem": "未关联 EVE 星系",

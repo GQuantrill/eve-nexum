@@ -5,6 +5,7 @@ import { db } from '../db.js';
 import { requireAuth } from '../middleware/requireAuth.js';
 import { authUser, isAdmin, isAllianceAdmin } from '../middleware/authContext.js';
 import { config } from '../config.js';
+import { standingPermitsTarget, grantKindAllowedForInstall, requiresPositiveStanding } from '../services/accessGrants.js';
 import { decryptToken } from '../utils/tokenCrypto.js';
 import { createLogger } from '../utils/logger.js';
 import { resolveOwnerId } from '../utils/owner.js';
@@ -182,9 +183,10 @@ export async function getMapAccess(mapId: string, req: Request): Promise<MapMeta
       `SELECT 1 FROM map_shares
          WHERE map_id = $1
            AND ( target_character_id = $2
-              OR ($3::int IS NOT NULL AND target_corp_id = $3) )
+              OR ($3::int IS NOT NULL AND target_corp_id = $3)
+              OR ($4::int IS NOT NULL AND target_alliance_id = $4) )
          LIMIT 1`,
-      [mapId, m.callerChar, userCorpId],
+      [mapId, m.callerChar, userCorpId, userAllianceId],
     );
     if (rowCount && rowCount > 0) {
       return meta('shared');
@@ -2634,11 +2636,13 @@ mapsRouter.get('/:mapId/shares', async (req, res) => {
     id: string;
     targetCharacterId: number | null;
     targetCorpId:      number | null;
+    targetAllianceId:  number | null;
     createdAt:         string;
   }>(
     `SELECT id,
             target_character_id AS "targetCharacterId",
             target_corp_id      AS "targetCorpId",
+            target_alliance_id  AS "targetAllianceId",
             created_at          AS "createdAt"
        FROM map_shares
       WHERE map_id = $1
@@ -2647,18 +2651,16 @@ mapsRouter.get('/:mapId/shares', async (req, res) => {
   );
 
   // Resolve all referenced EVE ids in a single batched call.
-  const ids = rows.flatMap((r) => [r.targetCharacterId, r.targetCorpId])
+  const ids = rows.flatMap((r) => [r.targetCharacterId, r.targetCorpId, r.targetAllianceId])
     .filter((x): x is number => x != null);
   const names = await resolveEntityNames(ids);
 
   res.json({
-    shares: rows.map((r) => ({
-      id:                  r.id,
-      kind:                r.targetCharacterId != null ? 'character' : 'corp',
-      targetId:            (r.targetCharacterId ?? r.targetCorpId)!,
-      name:                names.get((r.targetCharacterId ?? r.targetCorpId)!)?.name ?? null,
-      createdAt:           r.createdAt,
-    })),
+    shares: rows.map((r) => {
+      const kind = r.targetCharacterId != null ? 'character' : r.targetCorpId != null ? 'corp' : 'alliance';
+      const targetId = (r.targetCharacterId ?? r.targetCorpId ?? r.targetAllianceId)!;
+      return { id: r.id, kind, targetId, name: names.get(targetId)?.name ?? null, createdAt: r.createdAt };
+    }),
   });
 });
 
@@ -2675,14 +2677,19 @@ mapsRouter.post('/:mapId/shares', async (req, res) => {
     return;
   }
 
-  const { kind, targetId } = req.body as { kind?: unknown; targetId?: unknown };
-  if (kind !== 'character' && kind !== 'corp') {
-    res.status(400).json({ error: 'kind must be "character" or "corp"' });
+  const { kind, targetId, alsoGrantLogin } = req.body as { kind?: unknown; targetId?: unknown; alsoGrantLogin?: unknown };
+  if (kind !== 'character' && kind !== 'corp' && kind !== 'alliance') {
+    res.status(400).json({ error: 'kind must be "character", "corp", or "alliance"' });
     return;
   }
   const idNum = Number(targetId);
   if (!Number.isInteger(idNum) || idNum <= 0 || idNum > 2_147_483_647) {
     res.status(400).json({ error: 'targetId must be a positive integer' });
+    return;
+  }
+  // Alliance targets only exist on an alliance installation.
+  if (!grantKindAllowedForInstall(kind)) {
+    res.status(400).json({ error: 'alliance_not_supported', message: 'Alliance sharing is only available on an alliance installation.' });
     return;
   }
 
@@ -2701,6 +2708,18 @@ mapsRouter.post('/:mapId/shares', async (req, res) => {
     }
   }
 
+  // Positive-standing prerequisite (design 4.0): a restricted deployment may
+  // only share with a CORP/ALLIANCE it holds at positive standing. Individual
+  // characters are exempt (a deliberate 1:1 grant). Solo/unrestricted installs
+  // have no standings to check, so the gate is skipped there too.
+  if (config.restrictedMode && requiresPositiveStanding(kind) && !(await standingPermitsTarget(kind, idNum))) {
+    res.status(403).json({
+      error: 'standing_not_positive',
+      message: 'Your deployment does not hold this entity at positive standing (contacts must be synced and standing must be > 0).',
+    });
+    return;
+  }
+
   // Enforce a hard ceiling so a runaway client can't pile thousands of
   // grants onto one map.
   const { rowCount: existing } = await db.query(
@@ -2712,17 +2731,31 @@ mapsRouter.post('/:mapId/shares', async (req, res) => {
     return;
   }
 
+  // Target column by kind — a fixed whitelist keyed by the validated `kind`,
+  // so this is not user-controlled SQL.
+  const targetCol = { character: 'target_character_id', corp: 'target_corp_id', alliance: 'target_alliance_id' }[kind];
+
   try {
     const { rows } = await db.query<{ id: string; createdAt: string }>(
-      kind === 'character'
-        ? `INSERT INTO map_shares (map_id, target_character_id, granted_by_user_id)
-                VALUES ($1, $2, $3)
-             RETURNING id, created_at AS "createdAt"`
-        : `INSERT INTO map_shares (map_id, target_corp_id, granted_by_user_id)
-                VALUES ($1, $2, $3)
-             RETURNING id, created_at AS "createdAt"`,
+      `INSERT INTO map_shares (map_id, ${targetCol}, granted_by_user_id)
+            VALUES ($1, $2, $3)
+         RETURNING id, created_at AS "createdAt"`,
       [mapId, idNum, req.session.userId],
     );
+
+    // Optionally admit the target to log in too (design Phase 2). The
+    // positive-standing gate above already validated it. Insert an access_grants
+    // row (source='share'); idempotent, and it never overrides an env/admin row.
+    let loginGranted = false;
+    if (alsoGrantLogin === true && config.restrictedMode) {
+      const ins = await db.query(
+        `INSERT INTO access_grants (kind, eve_id, source, note, added_by_user)
+              VALUES ($1, $2, 'share', 'Added via map share', $3)
+         ON CONFLICT (kind, eve_id) DO NOTHING`,
+        [kind, idNum, req.session.userId],
+      );
+      loginGranted = (ins.rowCount ?? 0) > 0;
+    }
 
     // Best-effort name resolve so the client can render immediately.
     const names = await resolveEntityNames([idNum]);
@@ -2732,6 +2765,7 @@ mapsRouter.post('/:mapId/shares', async (req, res) => {
       targetId:  idNum,
       name:      names.get(idNum)?.name ?? null,
       createdAt: rows[0].createdAt,
+      loginGranted,
     });
   } catch (err) {
     // 23505 = unique violation (already shared with this target)

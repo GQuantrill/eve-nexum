@@ -92,19 +92,24 @@ standing - never magnitude/abs (the killboard tint logic uses abs and must not b
 reused here). Fail-closed: if the target has no standing entry, or the contact
 list has never synced, treat it as "not positive" and refuse the grant.
 
-Exemption: the deployment's OWN corp/alliance (the `.env`-seeded core) is exempt -
-it is the deployment's own identity, not a grant to a third party.
+Exemptions (do NOT require positive standing):
+- The deployment's OWN corp/alliance (the `.env`-seeded core) - it is the
+  deployment's own identity, not a grant to a third party.
+- **Individual CHARACTER targets [RESOLVED 2026-07-15].** The gate applies to
+  GROUP targets (corp / alliance) only. A single character is a deliberate,
+  named 1:1 grant - the operator is explicitly picking a specific person, not
+  admitting a whole org - and you rarely set per-character standings in-game, so
+  requiring one would just break the "share my map with my friend Bob" case.
+  Enforced via `requiresPositiveStanding(kind) = kind !== 'character'`, applied
+  identically in the map-share flow and the admin allow-list add.
 
 Open sub-decisions to resolve in review (do not assume):
-- Does a manual grant require only `> 0`, or the same `+5`/`+10` minimum the
+- Does a manual GROUP grant require only `> 0`, or the same `+5`/`+10` minimum the
   auto-admit uses? Draft assumes manual = any positive (`> 0`); auto-admit = the
   admin-chosen `+5`/`+10`.
-- For a character-target grant, which standing decides it - the character's own,
-  their corp's, their alliance's, or best matching? Draft assumes best matching
-  contact (character, then corp, then alliance in alliance installs).
-- Should a blocked (non-positive) target be hidden in the share/allow search, or
-  shown greyed-out with a "standing too low" reason? (UX; recommend greyed-out +
-  reason so the operator understands why.)
+- Should a blocked (non-positive) group target be hidden in the share/allow
+  search, or shown greyed-out with a "standing too low" reason? (UX; recommend
+  greyed-out + reason so the operator understands why.)
 
 ### Phase 1 - DB allow-list, seeded from `.env` (the core change)
 
@@ -160,11 +165,9 @@ positive standing (the `.env` core is exempt). Server-side check, not just UI.
   of character/corp/alliance is non-null". Update `share.ts` visibility to match
   an alliance target, and the create endpoint (`maps.ts` `POST /shares`).
 - Positive-standing gate on the share itself (per 4.0): the create endpoint MUST
-  reject a share to any target the deployment does not hold at positive standing,
-  and the picker must not offer such targets (or shows them disabled with the
-  reason). This applies even though the operator is choosing the target by hand -
-  a manual mistake (or a stolen session) must not be able to hand a map to a
-  hostile/neutral corp.
+  reject a share to a CORP/ALLIANCE target the deployment does not hold at
+  positive standing - a manual mistake (or a stolen session) must not hand a map
+  to a hostile/neutral org. Individual CHARACTER shares are exempt (see 4.0).
 - When sharing a map to a corp/alliance that is **not** already in
   `access_grants`, the client prompts: "They cannot log in yet - also allow their
   members to sign in?" If accepted, insert an `access_grants` row with
@@ -261,14 +264,14 @@ Notes / caveats specific to standings:
 7. **Fail-closed everywhere.** ESI hiccup during the corp/alliance lookup already
    rejects in restricted mode (`auth.ts:166-190`); keep that. A standings query
    error must deny, not admit.
-8. **Positive standing is required to grant ANY access (see 4.0).** No manual map
-   share, no manual login allow-list add, and no standings auto-admit may target
-   an entity the deployment does not hold at positive standing (`> 0`). Neutral
-   (0) and negative never qualify. Signed comparison only, never magnitude/abs
-   (the killboard tint logic uses abs - do not reuse it here). Enforced
-   server-side on every grant endpoint, not just in the UI. The `.env` core is the
-   only exemption (it is the deployment's own identity). Fail-closed when no
-   standing entry exists.
+8. **Positive standing is required to grant access to a GROUP (see 4.0).** No
+   manual map share, no manual login allow-list add, and no standings auto-admit
+   may target a CORP or ALLIANCE the deployment does not hold at positive standing
+   (`> 0`). Neutral (0) and negative never qualify. Signed comparison only, never
+   magnitude/abs (the killboard tint logic uses abs - do not reuse it here).
+   Enforced server-side on every grant endpoint, not just in the UI. Exempt: the
+   `.env` core (deployment's own identity) and individual CHARACTER targets
+   (deliberate 1:1 grant). Fail-closed when no standing entry exists.
 
 --------------------------------------------------------------------------------
 

@@ -678,7 +678,14 @@
     "accessRevoked": "Acesso revogado",
     "accessRevokedFor": "Acesso revogado para {{name}}",
     "addFailed": "Falha ao adicionar a partilha",
-    "revokeFailed": "Falha ao revogar a partilha"
+    "revokeFailed": "Falha ao revogar a partilha",
+    "alliance": "Aliança",
+    "placeholderAlliance": "Nome exato da aliança",
+    "badgeAlliance": "Ali",
+    "alsoGrantLogin": "Permitir também que iniciem sessão",
+    "sharedWithLogin": "Partilhado com {{name}} — agora também podem iniciar sessão",
+    "errStanding": "Recusado: a sua instalação não tem standing positivo com esta entidade (os contactos têm de estar sincronizados e o standing acima de 0).",
+    "errAllianceUnsupported": "A partilha de aliança só está disponível numa instalação de aliança."
   },
   "panes": {
     "noEveSystem": "Nenhum sistema de EVE associado",

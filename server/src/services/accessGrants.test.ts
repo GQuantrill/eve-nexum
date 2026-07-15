@@ -18,7 +18,7 @@ vi.mock('../db.js', () => ({ db: { query: queryMock } }));
 
 // vi.mock calls above are hoisted by vitest, so this static import already sees
 // the mocked config/db.
-import { isLoginPermitted, standingPermitsTarget, grantKindAllowedForInstall } from './accessGrants.js';
+import { isLoginPermitted, standingPermitsTarget, grantKindAllowedForInstall, requiresPositiveStanding } from './accessGrants.js';
 
 const rows = (ok: boolean) => ({ rows: [{ ok }] });
 
@@ -41,6 +41,16 @@ describe('grantKindAllowedForInstall', () => {
     mockConfig.allianceMode = true;
     expect(grantKindAllowedForInstall('alliance')).toBe(true);
     expect(grantKindAllowedForInstall('corp')).toBe(true);
+  });
+});
+
+describe('requiresPositiveStanding', () => {
+  it('gates corp + alliance (group targets)', () => {
+    expect(requiresPositiveStanding('corp')).toBe(true);
+    expect(requiresPositiveStanding('alliance')).toBe(true);
+  });
+  it('exempts individual characters (deliberate 1:1 grant)', () => {
+    expect(requiresPositiveStanding('character')).toBe(false);
   });
 });
 

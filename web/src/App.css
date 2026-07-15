@@ -1830,6 +1830,15 @@
 .map-shares__match--hint { color: #6a7898; }
 .map-shares__match--ok   { color: #4ade80; }
 .map-shares__match--miss { color: #f0a030; }
+.map-shares__grant-login {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: calc(12px * var(--font-scale, 1));
+  color: #a8b6cc;
+  cursor: pointer;
+  margin: 2px 0;
+}
 
 .map-shares__list {
   display: flex;
