@@ -124,7 +124,8 @@
       "syncOk": "Standings synchronisés — {{count}} contacts.",
       "syncNoRole": "Synchronisé, mais votre personnage n'a pas pu lire la liste de contacts corpo/alliance. Il lui faut le rôle Contact Manager (corpo) ou exécuteur d'alliance en jeu, plus le scope contacts — l'accès par standing nécessite un personnage qui les possède.",
       "syncFailed": "Échec de la synchronisation des standings.",
-      "readonlyNote": "Toute corpo, alliance ou personnage ajouté ici commence en lecture seule. Ils doivent se connecter au moins une fois avant que vous puissiez leur attribuer un rôle (dans l'onglet Utilisateurs)."
+      "readonlyNote": "Toute corpo, alliance ou personnage ajouté ici commence en lecture seule. Ils doivent se connecter au moins une fois avant que vous puissiez leur attribuer un rôle (dans l'onglet Utilisateurs).",
+      "syncDelay": "Remarque : EVE peut mettre jusqu'à ~10 minutes pour publier les changements de contacts sur l'ESI ; un standing que vous venez de définir en jeu peut donc ne pas encore apparaître lors d'une synchronisation."
     },
     "loading": "Chargement…",
     "exportCsv": "Exporter en CSV",

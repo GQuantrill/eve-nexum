@@ -257,6 +257,7 @@ function AccessTab() {
         </button>
         <span className="admin-access__hint">{t('admin.access.syncHint')}</span>
       </div>
+      <div className="admin-access__hint admin-access__hint--delay">{t('admin.access.syncDelay')}</div>
       {syncResult && (
         <div className={syncResult.ok ? 'admin-access__result' : 'admin-page__error'}>{syncResult.text}</div>
       )}
@@ -307,7 +308,7 @@ function AccessTab() {
               {grants.map((g) => (
                 <tr key={g.id}>
                   <td>{t(`admin.access.kind_${g.kind}`)}</td>
-                  <td>{g.label}</td>
+                  <td title={String(g.eveId)}>{g.label}</td>
                   <td>{g.source === 'env' ? t('admin.access.sourceEnv') : g.source}</td>
                   <td>{g.addedByName ?? (g.source === 'env' ? t('admin.access.sourceEnv') : DASH)}</td>
                   <td>

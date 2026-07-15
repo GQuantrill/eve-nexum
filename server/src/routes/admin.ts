@@ -381,7 +381,7 @@ adminRouter.post('/users/:id/recheck-corp', async (req, res) => {
 // GET /api/admin/access-grants — list all grants with resolved names.
 adminRouter.get('/access-grants', async (_req, res) => {
   const { rows } = await db.query<{
-    id: string; kind: GrantKind; eve_id: number; source: string;
+    id: string; kind: GrantKind; eve_id: string; source: string;
     note: string | null; created_at: string; added_by_name: string | null;
   }>(
     `SELECT g.id, g.kind, g.eve_id, g.source, g.note, g.created_at,
@@ -390,18 +390,23 @@ adminRouter.get('/access-grants', async (_req, res) => {
        LEFT JOIN users u ON u.id = g.added_by_user
       ORDER BY g.kind, g.created_at`,
   );
+  // eve_id is BIGINT — node-pg hands it back as a string, which the ESI/name
+  // resolvers (they filter on Number.isInteger) and the Map lookups reject.
+  // Normalise to a number once. EVE ids fit safely in a JS number.
+  const eid = (r: { eve_id: string }) => Number(r.eve_id);
   const [corps, alliances, names] = await Promise.all([
-    resolveCorps(rows.filter((r) => r.kind === 'corp').map((r) => r.eve_id)),
-    resolveAlliances(rows.filter((r) => r.kind === 'alliance').map((r) => r.eve_id)),
-    resolveEntityNames(rows.filter((r) => r.kind === 'character').map((r) => r.eve_id)),
+    resolveCorps(rows.filter((r) => r.kind === 'corp').map(eid)),
+    resolveAlliances(rows.filter((r) => r.kind === 'alliance').map(eid)),
+    resolveEntityNames(rows.filter((r) => r.kind === 'character').map(eid)),
   ]);
-  const label = (r: { kind: GrantKind; eve_id: number }): string => {
-    if (r.kind === 'corp')     { const c = corps.get(r.eve_id);     return c ? `${c.name} [${c.ticker}]` : String(r.eve_id); }
-    if (r.kind === 'alliance') { const a = alliances.get(r.eve_id); return a ? `${a.name} [${a.ticker}]` : String(r.eve_id); }
-    return names.get(r.eve_id)?.name ?? String(r.eve_id);
+  const label = (r: { kind: GrantKind; eve_id: string }): string => {
+    const id = eid(r);
+    if (r.kind === 'corp')     { const c = corps.get(id);     return c ? `${c.name} [${c.ticker}]` : String(id); }
+    if (r.kind === 'alliance') { const a = alliances.get(id); return a ? `${a.name} [${a.ticker}]` : String(id); }
+    return names.get(id)?.name ?? String(id);
   };
   res.json(rows.map((r) => ({
-    id: r.id, kind: r.kind, eveId: r.eve_id, source: r.source, note: r.note,
+    id: r.id, kind: r.kind, eveId: eid(r), source: r.source, note: r.note,
     addedByName: r.added_by_name, createdAt: r.created_at,
     label: label(r), immutable: r.source === 'env',
   })));

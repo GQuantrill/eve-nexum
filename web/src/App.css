@@ -9024,6 +9024,7 @@ select.sig-toolbar-btn option {
   font-size: calc(12px * var(--font-scale, 1));
   color: #8090a8;
 }
+.admin-access__hint--delay { display: block; margin: 3px 0 0; max-width: 720px; line-height: 1.5; }
 .admin-access__result {
   font-size: calc(13px * var(--font-scale, 1));
   color: #7aa2c8;
