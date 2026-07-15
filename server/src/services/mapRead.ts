@@ -58,13 +58,14 @@ export async function listVisibleMaps(p: VisibleMapsParams) {
        JOIN users ou ON ou.id = m.user_id
        LEFT JOIN map_shares s ON s.map_id = m.id
             AND ( s.target_character_id = $3
-               OR ($4::int IS NOT NULL AND s.target_corp_id = $4) )
+               OR ($4::int IS NOT NULL AND s.target_corp_id = $4)
+               OR ($7::int IS NOT NULL AND s.target_alliance_id = $7) )
       WHERE ((m.owner_id = $5::int OR m.user_id = $1) AND m.corp_id IS NULL AND m.alliance_id IS NULL)
          OR m.corp_id = ANY($2::int[])
          OR m.alliance_id = ANY($6::int[])
          OR (s.id IS NOT NULL AND m.corp_id IS NULL AND m.alliance_id IS NULL)
       ORDER BY "sharedWithMe", "isAllianceMap", "isCorpMap", m.name`,
-    [p.userId, visibleCorpIds, p.callerChar, p.userCorpId, ownerId, visibleAllianceIds],
+    [p.userId, visibleCorpIds, p.callerChar, p.userCorpId, ownerId, visibleAllianceIds, p.userAllianceId],
   );
   return rows;
 }
