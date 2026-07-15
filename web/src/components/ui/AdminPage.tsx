@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { charPortrait } from '../../utils/eveImages';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
@@ -57,10 +57,11 @@ function RolesInfoModal({ onClose }: { onClose: () => void }) {
   );
 }
 
-type Tab = 'users' | 'maps' | 'reports' | 'audit' | 'discord';
+type Tab = 'users' | 'access' | 'maps' | 'reports' | 'audit' | 'discord';
 
 const ALL_TABS: { key: Tab; path: string }[] = [
   { key: 'users',   path: '/admin/users'   },
+  { key: 'access',  path: '/admin/access'  },
   { key: 'maps',    path: '/admin/maps'    },
   { key: 'reports', path: '/admin/reports' },
   { key: 'discord', path: '/admin/discord' },
@@ -103,6 +104,7 @@ export function AdminPage() {
 
       <main className="admin-page__content">
         {tab === 'users'   && (isAdmin || canSeeReports) && <UsersTab />}
+        {tab === 'access'  && isAdmin       && <AccessTab />}
         {tab === 'maps'    && isAdmin       && <MapsTab />}
         {tab === 'reports' && (isAdmin || canSeeReports) && <ReportsTab />}
         {tab === 'discord' && isAdmin       && <DiscordTab />}
@@ -114,11 +116,180 @@ export function AdminPage() {
 
 function pathToTab(path: string, isAdmin: boolean, canSeeReports: boolean): Tab {
   const fallback: Tab = isAdmin || canSeeReports ? 'users' : 'reports';
+  if (path.startsWith('/admin/access'))  return isAdmin       ? 'access'  : fallback;
   if (path.startsWith('/admin/maps'))    return isAdmin       ? 'maps'    : fallback;
   if (path.startsWith('/admin/reports')) return (isAdmin || canSeeReports) ? 'reports' : fallback;
   if (path.startsWith('/admin/discord')) return isAdmin       ? 'discord' : fallback;
   if (path.startsWith('/admin/audit'))   return isAdmin       ? 'audit'   : fallback;
   return fallback;
+}
+
+// ── Access allow-list tab ─────────────────────────────────────────────────────
+
+interface AccessGrant {
+  id:          string;
+  kind:        'corp' | 'alliance' | 'character';
+  eveId:       number;
+  source:      string;
+  note:        string | null;
+  addedByName: string | null;
+  createdAt:   string;
+  label:       string;
+  immutable:   boolean;
+}
+
+type GrantPickKind = 'corp' | 'alliance' | 'character';
+const SEARCH_ENDPOINT: Record<GrantPickKind, string> = {
+  character: '/api/search/characters',
+  corp:      '/api/search/corporations',
+  alliance:  '/api/search/alliances',
+};
+
+function AccessTab() {
+  const { t } = useTranslation();
+  const { user } = useAuth();
+  const allowAlliance = !!user?.allianceMode;
+  const KINDS: GrantPickKind[] = allowAlliance ? ['corp', 'alliance', 'character'] : ['corp', 'character'];
+
+  const [grants, setGrants]   = useState<AccessGrant[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError]     = useState<string | null>(null);
+
+  const [kind, setKind]           = useState<GrantPickKind>('corp');
+  const [query, setQuery]         = useState('');
+  const [match, setMatch]         = useState<{ id: number; name: string } | null>(null);
+  const [searching, setSearching] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [addError, setAddError]   = useState<string | null>(null);
+  const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const load = useCallback(async () => {
+    setLoading(true); setError(null);
+    try {
+      setGrants(await api<AccessGrant[]>('/api/admin/access-grants'));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : t('admin.access.loadFailed'));
+    } finally { setLoading(false); }
+  }, [t]);
+  useEffect(() => { load(); }, [load]);
+
+  // Debounced exact-name lookup for the currently-selected kind.
+  useEffect(() => {
+    setMatch(null); setAddError(null);
+    const q = query.trim();
+    if (q.length < 3) { setSearching(false); return; }
+    if (searchTimer.current) clearTimeout(searchTimer.current);
+    setSearching(true);
+    searchTimer.current = setTimeout(() => {
+      api<{ match: { id: number; name: string } | null }>(`${SEARCH_ENDPOINT[kind]}?q=${encodeURIComponent(q)}`)
+        .then((r) => setMatch(r.match))
+        .catch(() => setMatch(null))
+        .finally(() => setSearching(false));
+    }, 350);
+    return () => { if (searchTimer.current) clearTimeout(searchTimer.current); };
+  }, [query, kind]);
+
+  const addGrant = async () => {
+    if (!match) return;
+    setSubmitting(true); setAddError(null);
+    try {
+      await api('/api/admin/access-grants', { method: 'POST', body: JSON.stringify({ kind, eveId: match.id }) });
+      setQuery(''); setMatch(null);
+      await load();
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : '';
+      const key =
+        /standing_not_positive/.test(msg)  ? 'admin.access.errStanding' :
+        /already_granted/.test(msg)        ? 'admin.access.errDuplicate' :
+        /alliance_not_supported/.test(msg) ? 'admin.access.errAllianceUnsupported' :
+        'admin.access.addFailed';
+      setAddError(t(key));
+    } finally { setSubmitting(false); }
+  };
+
+  const removeGrant = async (g: AccessGrant) => {
+    if (g.immutable) return;
+    try {
+      await api(`/api/admin/access-grants/${g.id}`, { method: 'DELETE' });
+      await load();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : t('admin.access.removeFailed'));
+    }
+  };
+
+  return (
+    <div className="admin-access">
+      <div className="admin-page__section-title">{t('admin.access.title')}</div>
+      <p className="admin-page__section-head">{t('admin.access.intro')}</p>
+
+      <div className="admin-access__add">
+        <div className="admin-page__filter-group">
+          {KINDS.map((k) => (
+            <button
+              key={k}
+              type="button"
+              className={`admin-page__tab${kind === k ? ' admin-page__tab--active' : ''}`}
+              onClick={() => { setKind(k); setMatch(null); setQuery(''); }}
+            >
+              {t(`admin.access.kind_${k}`)}
+            </button>
+          ))}
+        </div>
+        <input
+          className="admin-modal__role-select"
+          placeholder={t(`admin.access.placeholder_${kind}`)}
+          value={query}
+          maxLength={50}
+          spellCheck={false}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+        <span className="admin-access__match">
+          {query.trim().length < 3 ? t('admin.access.typeAtLeast3')
+            : searching ? t('admin.access.searching')
+            : match ? t('admin.access.found', { name: match.name })
+            : t('admin.access.noMatch')}
+        </span>
+        <button type="button" className="admin-modal__action" disabled={!match || submitting} onClick={addGrant}>
+          {submitting ? t('admin.access.adding') : t('admin.access.add')}
+        </button>
+      </div>
+      {addError && <div className="admin-page__error">{addError}</div>}
+
+      {loading ? <div className="admin-page__loading">{t('admin.access.loading')}</div>
+        : error ? <div className="admin-page__error">{error}</div>
+        : grants.length === 0 ? <div className="admin-page__empty">{t('admin.access.none')}</div>
+        : (
+          <table className="admin-modal__table">
+            <thead>
+              <tr>
+                <th>{t('admin.access.colKind')}</th>
+                <th>{t('admin.access.colEntity')}</th>
+                <th>{t('admin.access.colSource')}</th>
+                <th>{t('admin.access.colAddedBy')}</th>
+                <th />
+              </tr>
+            </thead>
+            <tbody>
+              {grants.map((g) => (
+                <tr key={g.id}>
+                  <td>{t(`admin.access.kind_${g.kind}`)}</td>
+                  <td>{g.label}</td>
+                  <td>{g.source === 'env' ? t('admin.access.sourceEnv') : g.source}</td>
+                  <td>{g.addedByName ?? (g.source === 'env' ? t('admin.access.sourceEnv') : DASH)}</td>
+                  <td>
+                    {g.immutable
+                      ? <span className="admin-modal__pill" title={t('admin.access.envLockedHint')}>{t('admin.access.envLocked')}</span>
+                      : <button type="button" className="admin-modal__action admin-modal__danger" onClick={() => removeGrant(g)}>
+                          {t('admin.access.remove')}
+                        </button>}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+    </div>
+  );
 }
 
 // ── Users tab ───────────────────────────────────────────────────────────────
