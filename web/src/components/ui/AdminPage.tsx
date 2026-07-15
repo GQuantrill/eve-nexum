@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { charPortrait } from '../../utils/eveImages';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
-import { api } from '../../api/client';
+import { api, ApiError } from '../../api/client';
 import { useAuth, isAdminRole, isAllianceAdminRole, formatRole, ROLE_ORDER } from '../../context/AuthContext';
 import type { Role as AuthRole } from '../../context/AuthContext';
 import { useHashRoute } from '../../hooks/useHashRoute';
@@ -138,6 +138,19 @@ interface AccessGrant {
   immutable:   boolean;
 }
 
+// Turn an access-grant API failure into the clearest message we can show: a
+// translated string for known server codes, otherwise the server's own
+// `message` (so the operator sees WHY, not just "failed"), and only then a
+// generic fallback.
+function grantErrorMessage(e: unknown, t: TFunction, fallback: string): string {
+  const code = e instanceof ApiError ? e.code : undefined;
+  if (code === 'standing_not_positive')  return t('admin.access.errStanding');
+  if (code === 'already_granted')        return t('admin.access.errDuplicate');
+  if (code === 'alliance_not_supported') return t('admin.access.errAllianceUnsupported');
+  const serverMsg = e instanceof ApiError ? e.serverMessage : undefined;
+  return serverMsg && serverMsg.trim() ? serverMsg : fallback;
+}
+
 type GrantPickKind = 'corp' | 'alliance' | 'character';
 const SEARCH_ENDPOINT: Record<GrantPickKind, string> = {
   character: '/api/search/characters',
@@ -197,13 +210,7 @@ function AccessTab() {
       setQuery(''); setMatch(null);
       await load();
     } catch (e) {
-      const msg = e instanceof Error ? e.message : '';
-      const key =
-        /standing_not_positive/.test(msg)  ? 'admin.access.errStanding' :
-        /already_granted/.test(msg)        ? 'admin.access.errDuplicate' :
-        /alliance_not_supported/.test(msg) ? 'admin.access.errAllianceUnsupported' :
-        'admin.access.addFailed';
-      setAddError(t(key));
+      setAddError(grantErrorMessage(e, t, t('admin.access.addFailed')));
     } finally { setSubmitting(false); }
   };
 
@@ -213,7 +220,7 @@ function AccessTab() {
       await api(`/api/admin/access-grants/${g.id}`, { method: 'DELETE' });
       await load();
     } catch (e) {
-      setError(e instanceof Error ? e.message : t('admin.access.removeFailed'));
+      setError(grantErrorMessage(e, t, t('admin.access.removeFailed')));
     }
   };
 
