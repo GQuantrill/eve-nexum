@@ -117,7 +117,13 @@
       "colAddedBy": "Hinzugefügt von",
       "sourceEnv": ".env",
       "envLocked": "Gesperrt (.env)",
-      "envLockedHint": "Aus .env übernommen — dort ändern."
+      "envLockedHint": "Aus .env übernommen — dort ändern.",
+      "syncStandings": "Standings synchronisieren",
+      "syncing": "Wird synchronisiert…",
+      "syncHint": "Die neuesten Corp-/Allianz-Kontakte von ESI abrufen, damit die Positiv-Standing-Prüfungen aktuelle Daten verwenden.",
+      "syncOk": "Standings synchronisiert — {{count}} Kontakte.",
+      "syncNoRole": "Synchronisiert, aber Ihr Charakter konnte die Corp-/Allianz-Kontaktliste nicht lesen. Er benötigt die Ingame-Rolle Contact Manager (Corp) bzw. die Allianz-Executor-Rolle sowie den Kontakte-Scope — Standing-basierter Zugang erfordert einen Charakter, der sie hat.",
+      "syncFailed": "Standings-Synchronisierung fehlgeschlagen."
     },
     "loading": "Lädt…",
     "exportCsv": "Als CSV exportieren",

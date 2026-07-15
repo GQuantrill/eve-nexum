@@ -176,6 +176,27 @@ function AccessTab() {
   const [addError, setAddError]   = useState<string | null>(null);
   const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const [syncing, setSyncing]       = useState(false);
+  const [syncResult, setSyncResult] = useState<{ ok: boolean; text: string } | null>(null);
+
+  // Force-refresh the deployment's standings from ESI using the admin's own
+  // token (one call does character + corp + alliance). The positive-standing
+  // gate reads whichever bucket matches the install type, so we report on that.
+  const syncStandings = async () => {
+    setSyncing(true); setSyncResult(null);
+    try {
+      const r = await api<{ counts: Record<string, number>; succeeded: Record<string, boolean> }>(
+        '/api/standings/refresh', { method: 'POST' },
+      );
+      const bucket = allowAlliance ? 'alliance' : 'corp';
+      setSyncResult(r.succeeded[bucket]
+        ? { ok: true,  text: t('admin.access.syncOk', { count: r.counts[bucket] ?? 0 }) }
+        : { ok: false, text: t('admin.access.syncNoRole') });
+    } catch (e) {
+      setSyncResult({ ok: false, text: grantErrorMessage(e, t, t('admin.access.syncFailed')) });
+    } finally { setSyncing(false); }
+  };
+
   const load = useCallback(async () => {
     setLoading(true); setError(null);
     try {
@@ -228,6 +249,16 @@ function AccessTab() {
     <div className="admin-access">
       <div className="admin-page__section-title">{t('admin.access.title')}</div>
       <p className="admin-page__section-head">{t('admin.access.intro')}</p>
+
+      <div className="admin-access__sync">
+        <button type="button" className="admin-modal__action" disabled={syncing} onClick={syncStandings}>
+          {syncing ? t('admin.access.syncing') : t('admin.access.syncStandings')}
+        </button>
+        <span className="admin-access__sync-hint">{t('admin.access.syncHint')}</span>
+        {syncResult && (
+          <div className={syncResult.ok ? 'admin-page__section-head' : 'admin-page__error'}>{syncResult.text}</div>
+        )}
+      </div>
 
       <div className="admin-access__add">
         <div className="admin-page__filter-group">

@@ -166,7 +166,13 @@
       "colAddedBy": "Added by",
       "sourceEnv": ".env",
       "envLocked": "Locked (.env)",
-      "envLockedHint": "Seeded from .env — change it there."
+      "envLockedHint": "Seeded from .env — change it there.",
+      "syncStandings": "Sync standings",
+      "syncing": "Syncing…",
+      "syncHint": "Pull the latest corp/alliance contacts from ESI so positive-standing checks use current data.",
+      "syncOk": "Standings synced — {{count}} contacts.",
+      "syncNoRole": "Synced, but your character couldn't read the corp/alliance contact list. It needs the in-game Contact Manager (corp) or alliance-executor role plus the contacts scope — standing-based access needs a character that has them.",
+      "syncFailed": "Standings sync failed."
     },
     "loading": "Loading…",
     "exportCsv": "Export as CSV",

@@ -117,7 +117,13 @@
       "colAddedBy": "Añadido por",
       "sourceEnv": ".env",
       "envLocked": "Bloqueado (.env)",
-      "envLockedHint": "Sembrado desde .env — cámbialo allí."
+      "envLockedHint": "Sembrado desde .env — cámbialo allí.",
+      "syncStandings": "Sincronizar standings",
+      "syncing": "Sincronizando…",
+      "syncHint": "Obtén los contactos de corp/alianza más recientes de ESI para que las comprobaciones de standing positivo usen datos actuales.",
+      "syncOk": "Standings sincronizados — {{count}} contactos.",
+      "syncNoRole": "Sincronizado, pero tu personaje no pudo leer la lista de contactos de corp/alianza. Necesita el rol de Contact Manager (corp) o de ejecutor de alianza en el juego más el scope de contactos — el acceso por standing requiere un personaje que los tenga.",
+      "syncFailed": "Error al sincronizar standings."
     },
     "loading": "Cargando…",
     "exportCsv": "Exportar como CSV",

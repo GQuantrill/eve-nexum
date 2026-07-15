@@ -117,7 +117,13 @@
       "colAddedBy": "添加者",
       "sourceEnv": ".env",
       "envLocked": "已锁定 (.env)",
-      "envLockedHint": "从 .env 载入 — 请在那里更改。"
+      "envLockedHint": "从 .env 载入 — 请在那里更改。",
+      "syncStandings": "同步声望",
+      "syncing": "同步中…",
+      "syncHint": "从 ESI 获取最新的军团/联盟联系人，使正声望检查使用最新数据。",
+      "syncOk": "声望已同步 — {{count}} 个联系人。",
+      "syncNoRole": "已同步，但你的角色无法读取军团/联盟联系人列表。它需要游戏内的 Contact Manager（军团）或联盟执行者角色以及 contacts 权限范围 — 基于声望的访问需要拥有这些权限的角色。",
+      "syncFailed": "声望同步失败。"
     },
     "loading": "加载中…",
     "exportCsv": "导出为 CSV",
