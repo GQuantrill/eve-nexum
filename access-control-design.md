@@ -231,12 +231,22 @@ Notes / caveats specific to standings:
    session) locking out the core or opening the instance.
 2. **`ADMIN_CHAR_ID` stays `.env`-only** - the bootstrap/safety hatch is never
    DB-controlled.
-3. **Login != visibility.** A newly-admitted guest defaults to `readonly` and
-   sees nothing until a map is explicitly shared to them. Before shipping,
-   re-verify `share.ts` scoping: an admitted guest-corp must NOT gain
-   `corp_member` access to the CORE corp's maps. This is the single most
-   important review item - test it explicitly (guest corp X logs in, sees only
-   maps shared to X, not the core corp's corp-maps unless CORP_MAP_SHARED).
+3. **Login != visibility. [VERIFIED 2026-07-15 by code trace]** A newly-admitted
+   guest defaults to `readonly` and sees nothing until a map is explicitly
+   shared to them. Verified at both layers for a guest in a different
+   corp/alliance:
+   - Per-map `getMapAccess` (maps.ts:158-192): `corp_member` requires
+     `m.corp_id === userCorpId`; `alliance_member` requires
+     `m.alliance_id === userAllianceId`; `shared` only applies to personal maps
+     (corp_id AND alliance_id NULL). A guest matches none of the core's maps ->
+     returns null. Only `CORP_MAP_SHARED` / `ALLIANCE_MAP_SHARED` (explicit
+     operator coalition opt-in) widen this.
+   - List `listVisibleMaps` (services/mapRead.ts): `visibleCorpIds = [userCorpId]`
+     and `visibleAllianceIds = [userAllianceId]` in alliance mode, so the core's
+     maps never enter a guest's list either.
+   So an admitted guest sees only its own personal/corp/alliance maps and maps
+   explicitly shared to it - never the core's. (Still worth a live smoke test
+   once a second real account is available; the SQL trace is the interim proof.)
 4. **Revocation invalidates access.** Removing a grant should stop future logins
    AND drop existing sessions for affected users. Options: (a) mark affected
    `users` rows and check on each request, or (b) a session-version bump. At
