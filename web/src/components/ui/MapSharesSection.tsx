@@ -5,7 +5,7 @@ import { api, ApiError } from '../../api/client';
 import { useMapStore } from '../../store/mapStore';
 import { useAuth } from '../../context/AuthContext';
 import { toast } from './Toaster';
-import { XIcon } from '@phosphor-icons/react';
+import { XIcon, PlusIcon } from '@phosphor-icons/react';
 
 interface ShareRow {
   id:        string;
@@ -27,7 +27,19 @@ interface ResolvedMatch {
   name: string;
 }
 
+// A target queued for sharing. `error` is set (after a failed submit) so it
+// stays visible with the reason instead of silently vanishing.
+interface StagedTarget {
+  kind:  PickerKind;
+  id:    number;
+  name:  string;
+  error?: string;
+}
+
 const DEBOUNCE_MS = 350;
+
+const logoFor = (kind: PickerKind, id: number) =>
+  kind === 'character' ? charPortrait(id, 32) : kind === 'corp' ? corpLogo(id, 32) : allianceLogo(id, 32);
 
 export function MapSharesSection() {
   const { t } = useTranslation();
@@ -47,13 +59,16 @@ export function MapSharesSection() {
   const [match, setMatch] = useState<ResolvedMatch | null>(null);
   const [searching, setSearching] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  // Targets queued to share with in one go ("share to many").
+  const [staged, setStaged] = useState<StagedTarget[]>([]);
   // On a restricted deployment, sharing to a corp/alliance can also admit their
   // members to log in (they'd otherwise be shared-but-locked-out). Default on.
   const [grantLogin, setGrantLogin] = useState(true);
   const canGrantLogin = !!user?.corpMode || !!user?.allianceMode;
 
-  // Re-load shares whenever the active map changes.
+  // Re-load shares whenever the active map changes; clear any staging.
   useEffect(() => {
+    setStaged([]);
     if (!mapId) { setShares([]); return; }
     setLoading(true);
     setError(null);
@@ -85,32 +100,66 @@ export function MapSharesSection() {
     };
   }, [query, kind]);
 
-  async function addShare() {
-    if (!mapId || !match) return;
+  // Queue the current match for the batch. Skips a target already staged or
+  // already shared, then clears the input for the next search.
+  function stageMatch() {
+    if (!match) return;
+    const dupeStaged = staged.some((s) => s.kind === kind && s.id === match.id);
+    const dupeShared = shares.some((s) => s.kind === kind && s.targetId === match.id);
+    if (dupeStaged || dupeShared) {
+      setError(t('mapShares.alreadyStaged', { name: match.name }));
+    } else {
+      setStaged((prev) => [...prev, { kind, id: match.id, name: match.name }]);
+      setError(null);
+    }
+    setQuery('');
+    setMatch(null);
+  }
+
+  function removeStaged(k: PickerKind, id: number) {
+    setStaged((prev) => prev.filter((s) => !(s.kind === k && s.id === id)));
+  }
+
+  // Share the map with every staged target, one validated request each (reuses
+  // the standing gate, self-share guard, dedup and per-map ceiling server-side).
+  // Successful targets move into the shares list; failures stay staged, tagged
+  // with the reason.
+  async function shareAll() {
+    if (!mapId || staged.length === 0) return;
     const alsoGrantLogin = canGrantLogin && grantLogin;
     setSubmitting(true);
     setError(null);
-    try {
-      const row = await api<ShareRow & { loginGranted?: boolean }>(`/api/maps/${mapId}/shares`, {
-        method: 'POST',
-        body:   JSON.stringify({ kind, targetId: match.id, alsoGrantLogin }),
-      });
-      setShares((prev) => [...prev, row]);
-      setQuery('');
-      setMatch(null);
-      toast.success(row.loginGranted
-        ? t('mapShares.sharedWithLogin', { name: row.name ?? match.name })
-        : t('mapShares.sharedWith', { name: row.name ?? match.name }));
-    } catch (e) {
-      const code = e instanceof ApiError ? e.code : undefined;
-      const serverMsg = e instanceof ApiError ? e.serverMessage : undefined;
-      setError(
-        code === 'standing_not_positive'  ? t('mapShares.errStanding') :
-        code === 'alliance_not_supported' ? t('mapShares.errAllianceUnsupported') :
-        (serverMsg ?? (e instanceof Error ? e.message : t('mapShares.addFailed'))),
-      );
-    } finally {
-      setSubmitting(false);
+
+    const succeeded: ShareRow[] = [];
+    const failed: StagedTarget[] = [];
+    for (const tgt of staged) {
+      try {
+        const row = await api<ShareRow & { loginGranted?: boolean }>(`/api/maps/${mapId}/shares`, {
+          method: 'POST',
+          body:   JSON.stringify({ kind: tgt.kind, targetId: tgt.id, alsoGrantLogin }),
+        });
+        succeeded.push(row);
+      } catch (e) {
+        const code      = e instanceof ApiError ? e.code : undefined;
+        const serverMsg = e instanceof ApiError ? e.serverMessage : undefined;
+        const reason =
+          code === 'standing_not_positive'  ? t('mapShares.errStanding') :
+          code === 'alliance_not_supported' ? t('mapShares.errAllianceUnsupported') :
+          (serverMsg ?? (e instanceof Error ? e.message : t('mapShares.addFailed')));
+        failed.push({ ...tgt, error: reason });
+      }
+    }
+
+    setShares((prev) => [...prev, ...succeeded]);
+    setStaged(failed);          // keep only the ones that failed, with their reason
+    setSubmitting(false);
+
+    if (succeeded.length > 0 && failed.length === 0) {
+      toast.success(t('mapShares.batchShared', { count: succeeded.length }));
+    } else if (succeeded.length > 0) {
+      toast.info(t('mapShares.batchPartial', { shared: succeeded.length, skipped: failed.length }));
+    } else {
+      toast.error(t('mapShares.batchNone', { count: failed.length }));
     }
   }
 
@@ -127,8 +176,6 @@ export function MapSharesSection() {
       setError(e instanceof Error ? e.message : t('mapShares.revokeFailed'));
     }
   }
-
-  const canAdd = !!match && !submitting;
 
   return (
     <>
@@ -150,16 +197,28 @@ export function MapSharesSection() {
           ))}
         </div>
 
-        <input
-          className="map-shares__input"
-          placeholder={kind === 'character' ? t('mapShares.placeholderChar')
-            : kind === 'corp' ? t('mapShares.placeholderCorp')
-            : t('mapShares.placeholderAlliance')}
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          maxLength={50}
-          spellCheck={false}
-        />
+        <div className="map-shares__search-row">
+          <input
+            className="map-shares__input"
+            placeholder={kind === 'character' ? t('mapShares.placeholderChar')
+              : kind === 'corp' ? t('mapShares.placeholderCorp')
+              : t('mapShares.placeholderAlliance')}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter' && match) stageMatch(); }}
+            maxLength={50}
+            spellCheck={false}
+          />
+          <button
+            type="button"
+            className="map-shares__add-btn"
+            onClick={stageMatch}
+            disabled={!match || submitting}
+            title={t('mapShares.addToList')}
+          >
+            <PlusIcon size={13} weight="bold" />
+          </button>
+        </div>
 
         <div className="map-shares__match">
           {query.trim().length < 3
@@ -171,6 +230,30 @@ export function MapSharesSection() {
                 : <span className="map-shares__match--miss">{t('mapShares.noMatch')}</span>}
         </div>
 
+        {staged.length > 0 && (
+          <div className="map-shares__staged">
+            <div className="map-shares__staged-head">{t('mapShares.staged', { count: staged.length })}</div>
+            {staged.map((s) => (
+              <div
+                key={`${s.kind}:${s.id}`}
+                className={`map-shares__chip${s.error ? ' map-shares__chip--error' : ''}`}
+                title={s.error ?? String(s.id)}
+              >
+                <img className="map-shares__chip-avatar" src={logoFor(s.kind, s.id)} alt="" loading="lazy" />
+                <span className="map-shares__chip-name">{s.name}</span>
+                <button
+                  type="button"
+                  className="map-shares__chip-remove"
+                  onClick={() => removeStaged(s.kind, s.id)}
+                  title={t('mapShares.removeStaged')}
+                >
+                  <XIcon size={11} weight="bold" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
         {canGrantLogin && (
           <label className="map-shares__grant-login">
             <input type="checkbox" checked={grantLogin} onChange={(e) => setGrantLogin(e.target.checked)} />
@@ -181,10 +264,10 @@ export function MapSharesSection() {
         <button
           type="button"
           className="map-sidebar__action"
-          onClick={addShare}
-          disabled={!canAdd}
+          onClick={shareAll}
+          disabled={staged.length === 0 || submitting}
         >
-          {submitting ? t('mapShares.adding') : t('mapShares.share')}
+          {submitting ? t('mapShares.sharingMany') : t('mapShares.shareCount', { count: staged.length })}
         </button>
       </div>
 
@@ -197,9 +280,7 @@ export function MapSharesSection() {
                 <div key={s.id} className="map-shares__row">
                   <img
                     className="map-shares__avatar"
-                    src={s.kind === 'character' ? charPortrait(s.targetId, 32)
-                      : s.kind === 'corp' ? corpLogo(s.targetId, 32)
-                      : allianceLogo(s.targetId, 32)}
+                    src={logoFor(s.kind, s.targetId)}
                     alt=""
                     loading="lazy"
                   />

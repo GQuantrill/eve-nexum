@@ -707,7 +707,16 @@
     "alsoGrantLogin": "Les autoriser aussi à se connecter",
     "sharedWithLogin": "Partagé avec {{name}} — ils peuvent désormais se connecter",
     "errStanding": "Refusé : votre installation n'a pas de standing positif envers cette entité (les contacts doivent être synchronisés et le standing supérieur à 0).",
-    "errAllianceUnsupported": "Le partage d'alliance n'est disponible que sur une installation d'alliance."
+    "errAllianceUnsupported": "Le partage d'alliance n'est disponible que sur une installation d'alliance.",
+    "addToList": "Ajouter à la liste",
+    "staged": "À partager ({{count}})",
+    "removeStaged": "Retirer",
+    "alreadyStaged": "{{name}} est déjà dans la liste",
+    "sharingMany": "Partage…",
+    "shareCount": "Partager avec {{count}}",
+    "batchShared": "Carte partagée avec {{count}}.",
+    "batchPartial": "Partagé avec {{shared}} ; {{skipped}} ignoré(s).",
+    "batchNone": "Impossible de partager — {{count}} ignoré(s)."
   },
   "panes": {
     "noEveSystem": "Aucun système EVE lié",

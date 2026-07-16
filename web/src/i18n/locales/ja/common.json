@@ -707,7 +707,16 @@
     "alsoGrantLogin": "ログインも許可する",
     "sharedWithLogin": "{{name}} と共有しました — ログインもできるようになりました",
     "errStanding": "拒否されました: デプロイはこの対象にポジティブスタンディングを持っていません（コンタクトが同期され、スタンディングが0より大きい必要があります）。",
-    "errAllianceUnsupported": "アライアンス共有はアライアンスインストールでのみ利用できます。"
+    "errAllianceUnsupported": "アライアンス共有はアライアンスインストールでのみ利用できます。",
+    "addToList": "リストに追加",
+    "staged": "共有予定 ({{count}})",
+    "removeStaged": "削除",
+    "alreadyStaged": "{{name}} はすでにリストにあります",
+    "sharingMany": "共有中…",
+    "shareCount": "{{count}} 件と共有",
+    "batchShared": "マップを {{count}} 件と共有しました。",
+    "batchPartial": "{{shared}} 件と共有、{{skipped}} 件スキップ。",
+    "batchNone": "共有できませんでした — {{count}} 件スキップ。"
   },
   "panes": {
     "noEveSystem": "EVE 星系が関連付けられていません",
