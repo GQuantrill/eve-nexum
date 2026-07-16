@@ -50,9 +50,14 @@ async function sendPing(instanceId: string): Promise<void> {
       body:    JSON.stringify({ version: appVersion(), instanceId }),
       signal:  AbortSignal.timeout(10_000),
     });
-    if (!res.ok) log.warn(`ping rejected (status ${res.status})`);
+    // Log the OUTCOME, not just failures — otherwise "enabled" in the log looks
+    // like success even when the POST never lands (e.g. a host that can't reach
+    // its own public URL). The collector replies 204 on a successful upsert.
+    if (res.ok) log.info(`ping accepted by collector (status ${res.status})`);
+    else        log.warn(`ping rejected (status ${res.status})`);
   } catch (err) {
-    // Offline / collector down / DNS — all non-fatal and expected.
+    // Offline / collector down / DNS / can't reach own public URL — all
+    // non-fatal and expected; but log it so an empty table is explainable.
     log.warn('ping failed:', err instanceof Error ? err.message : String(err));
   }
 }
