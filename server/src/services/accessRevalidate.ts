@@ -44,9 +44,13 @@ export async function revalidateActiveSessions(): Promise<RevalidateResult> {
   let usersEvicted = 0;
   let sessionsKilled = 0;
   for (const u of rows) {
+    // character_id is BIGINT — node-pg hands it back as a STRING, so normalise
+    // before any numeric comparison. (A `===` against the numeric adminCharId
+    // would otherwise never match, and the bootstrap admin would be evicted.)
+    const characterId = Number(u.characterId);
     // Never evict the configured bootstrap admin — the safety hatch.
-    if (config.adminCharId !== null && u.characterId === config.adminCharId) continue;
-    const ids = { characterId: u.characterId, corpId: u.corpId, allianceId: u.allianceId };
+    if (config.adminCharId !== null && characterId === config.adminCharId) continue;
+    const ids = { characterId, corpId: u.corpId, allianceId: u.allianceId };
     const stillOk = !u.blocked && (await isLoginPermitted(ids) || await standingsPermitLogin(ids));
     if (!stillOk) {
       const n = await invalidateSessionsForUser(u.id);
