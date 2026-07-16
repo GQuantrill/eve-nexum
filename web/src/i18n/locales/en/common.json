@@ -718,6 +718,7 @@
     "matchSystem": "System",
     "matchWhType": "Wormhole type",
     "matchSystemType": "System type",
+    "matchLeadsTo": "Leads to",
     "quickAdd": "Quick add",
     "whPlaceholder": "WH type, e.g. C247",
     "queryPlaceholder": "System name / J-code",

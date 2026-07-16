@@ -656,6 +656,7 @@
     "matchSystem": "System",
     "matchWhType": "Wurmlochtyp",
     "matchSystemType": "Systemtyp",
+    "matchLeadsTo": "Führt zu",
     "quickAdd": "Schnell hinzufügen",
     "whPlaceholder": "WH-Typ, z. B. C247",
     "queryPlaceholder": "Systemname / J-Code",

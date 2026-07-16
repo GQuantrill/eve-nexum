@@ -656,6 +656,7 @@
     "matchSystem": "시스템",
     "matchWhType": "웜홀 유형",
     "matchSystemType": "시스템 유형",
+    "matchLeadsTo": "연결 대상",
     "quickAdd": "빠른 추가",
     "whPlaceholder": "웜홀 유형, 예: C247",
     "queryPlaceholder": "성계 이름 / J-code",

@@ -656,6 +656,7 @@
     "matchSystem": "Sistema",
     "matchWhType": "Tipo de agujero",
     "matchSystemType": "Tipo de sistema",
+    "matchLeadsTo": "Lleva a",
     "quickAdd": "Añadir rápido",
     "whPlaceholder": "Tipo de AG, p. ej. C247",
     "queryPlaceholder": "Nombre de sistema / J-code",

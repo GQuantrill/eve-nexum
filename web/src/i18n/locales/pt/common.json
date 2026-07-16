@@ -656,6 +656,7 @@
     "matchSystem": "Sistema",
     "matchWhType": "Tipo de buraco",
     "matchSystemType": "Tipo de sistema",
+    "matchLeadsTo": "Leva a",
     "quickAdd": "Adição rápida",
     "whPlaceholder": "Tipo de BV, ex. C247",
     "queryPlaceholder": "Nome de sistema / J-code",

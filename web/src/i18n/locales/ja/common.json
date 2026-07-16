@@ -656,6 +656,7 @@
     "matchSystem": "システム",
     "matchWhType": "ワームホールタイプ",
     "matchSystemType": "システムタイプ",
+    "matchLeadsTo": "接続先",
     "quickAdd": "クイック追加",
     "whPlaceholder": "WHタイプ（例: C247）",
     "queryPlaceholder": "星系名 / J-code",

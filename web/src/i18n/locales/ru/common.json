@@ -672,6 +672,7 @@
     "matchSystem": "Система",
     "matchWhType": "Тип червоточины",
     "matchSystemType": "Тип системы",
+    "matchLeadsTo": "Ведёт в",
     "quickAdd": "Быстрое добавление",
     "whPlaceholder": "Тип ЧД, напр. C247",
     "queryPlaceholder": "Название системы / J-code",
