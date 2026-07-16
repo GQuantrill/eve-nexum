@@ -84,8 +84,13 @@ standingsRouter.get('/me', async (req, res) => {
 // ESI calls succeeded (200), came back forbidden (403 — missing scope or
 // role), or failed otherwise. Useful both as a debug tool and as a
 // "refresh my standings now" button.
+//
+// Body { scope: 'org' } refreshes ONLY corp + alliance (skips personal) — used
+// by the access-page sync, which must never touch personal contacts. The
+// default ('all') refreshes personal too, for the system-info map tint.
 standingsRouter.post('/refresh', async (req, res) => {
   const userId = req.session.userId!;
+  const orgOnly = (req.body as { scope?: string } | undefined)?.scope === 'org';
 
   const { rows } = await db.query<{
     character_id: number;
@@ -99,13 +104,19 @@ standingsRouter.post('/refresh', async (req, res) => {
   if (!rows.length) { res.status(404).json({ error: 'User not found' }); return; }
   const { character_id, corp_id, alliance_id, access_token } = rows[0];
 
-  // Clear the throttle row(s) so refreshStandingsForUser doesn't skip.
+  // Clear the throttle row(s) so refreshStandingsForUser doesn't skip. An
+  // org-only sync leaves the personal throttle alone (it isn't refreshed).
+  if (!orgOnly) {
+    await db.query(
+      `DELETE FROM standings_refresh WHERE owner_kind = 'character' AND owner_id = $1`,
+      [character_id],
+    );
+  }
   await db.query(
     `DELETE FROM standings_refresh
-     WHERE (owner_kind = 'character' AND owner_id = $1)
-        OR (owner_kind = 'corp'      AND owner_id = $2)
-        OR (owner_kind = 'alliance'  AND owner_id = $3)`,
-    [character_id, corp_id ?? 0, alliance_id ?? 0],
+     WHERE (owner_kind = 'corp'     AND owner_id = $1)
+        OR (owner_kind = 'alliance' AND owner_id = $2)`,
+    [corp_id ?? 0, alliance_id ?? 0],
   );
 
   let token: string;
@@ -123,6 +134,7 @@ standingsRouter.post('/refresh', async (req, res) => {
       corpId:      corp_id,
       allianceId:  alliance_id,
       accessToken: token,
+      scope:       orgOnly ? 'org' : 'all',
     });
   } catch (err) {
     log.error('manual refresh failed:', err);
