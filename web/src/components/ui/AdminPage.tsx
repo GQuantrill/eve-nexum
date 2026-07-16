@@ -232,7 +232,11 @@ function AccessTab() {
       const r = await api<{ counts: Record<string, number>; succeeded: Record<string, boolean> }>(
         '/api/standings/refresh', { method: 'POST' },
       );
-      const bucket = allowAlliance ? 'alliance' : 'corp';
+      // Report on the bucket the gate actually reads: alliance_standings on an
+      // alliance install, else the corp's OWN contacts (which include any
+      // alliance standings). NOT allowAlliance — a corp install offers alliance
+      // targets but still gates via the corp's contacts.
+      const bucket = user?.allianceMode ? 'alliance' : 'corp';
       setSyncResult(r.succeeded[bucket]
         ? { ok: true,  text: t('admin.access.syncOk', { count: r.counts[bucket] ?? 0 }) }
         : { ok: false, text: t('admin.access.syncNoRole') });
