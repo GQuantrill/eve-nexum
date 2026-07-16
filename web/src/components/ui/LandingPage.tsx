@@ -10,6 +10,7 @@ import {
   PathIcon, StarIcon, SnowflakeIcon, LightningIcon, WarningIcon, NavigationArrowIcon, MapPinIcon, BroadcastIcon, BellRingingIcon, DiscordLogoIcon, BinocularsIcon,
   CommandIcon, HouseIcon, SkullIcon, ChartBarIcon, PulseIcon, EyeIcon, SidebarIcon, EyeglassesIcon,
   SquaresFourIcon, UserGearIcon, TableIcon, ChartDonutIcon, ClockIcon, ClipboardTextIcon, TagIcon, IdentificationCardIcon,
+  KeyIcon,
   LineSegmentsIcon,
 } from '@phosphor-icons/react';
 import { apiUrl } from '../../api/client';
@@ -36,7 +37,7 @@ type FeatureId =
   | 'commandPalette' | 'homeHotkey' | 'killHighlights' | 'userStats' | 'apiKeys'
   | 'serverStatus' | 'demoMap' | 'sidebar' | 'colorVision';
 type CorpFeatureId =
-  | 'multiCorp' | 'allianceMaps' | 'allianceRoles' | 'adminDash' | 'userMgmt' | 'mapMgmt' | 'usersReport'
+  | 'multiCorp' | 'allianceMaps' | 'allianceRoles' | 'accessControl' | 'adminDash' | 'userMgmt' | 'mapMgmt' | 'usersReport'
   | 'systemsReport' | 'timeWindowed' | 'auditLog' | 'corpTicker' | 'perCharAttr';
 
 interface FeatureItem { icon: Icon; id: FeatureId }
@@ -126,6 +127,7 @@ const CORP_FEATURES: { icon: Icon; id: CorpFeatureId }[] = [
   { icon: BuildingsIcon,          id: 'multiCorp'     },
   { icon: HandshakeIcon,          id: 'allianceMaps'  },
   { icon: ShieldCheckIcon,        id: 'allianceRoles' },
+  { icon: KeyIcon,                id: 'accessControl' },
   { icon: SquaresFourIcon,        id: 'adminDash'     },
   { icon: UserGearIcon,           id: 'userMgmt'      },
   { icon: MapTrifoldIcon,         id: 'mapMgmt'       },

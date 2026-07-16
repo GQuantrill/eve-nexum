@@ -1,5 +1,7 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { api } from '../api/client';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { api, setUnauthorizedHandler } from '../api/client';
+import { toast } from '../components/ui/Toaster';
+import i18n from '../i18n';
 
 // Role tiers, low to high: readonly < edit < full < admin < alliance_admin.
 export type Role = 'alliance_admin' | 'admin' | 'full' | 'edit' | 'readonly';
@@ -101,6 +103,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const lock = useCallback(() => setLocked(true), []);
   const unlock = useCallback(() => setLocked(false), []);
 
+  // Kick back to login when a request 401s (session revoked / expired). Guarded
+  // so it only fires when we currently believe we're logged in — an
+  // unauthenticated /auth/me probe (userRef null) is ignored — and only once
+  // per session, since a dropped session 401s many in-flight requests at once.
+  const userRef  = useRef<AuthUser | null>(null);
+  const kickedRef = useRef(false);
+  useEffect(() => {
+    setUnauthorizedHandler(() => {
+      if (!userRef.current || kickedRef.current) return;
+      kickedRef.current = true;
+      setLocked(false);
+      setUser(null);
+      toast.info(i18n.t('session.ended'));
+    });
+    return () => setUnauthorizedHandler(null);
+  }, []);
+
   useEffect(() => {
     api<{ user: AuthUser | null }>('/auth/me')
       .then((d) => {
@@ -130,6 +149,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(d.user);
     } catch { /* keep the current user on a transient failure */ }
   }, []);
+
+  // Mirror `user` into the ref the 401 handler reads, and re-arm the one-shot
+  // kick guard whenever a session (re-)establishes.
+  useEffect(() => {
+    userRef.current = user;
+    if (user) kickedRef.current = false;
+  }, [user]);
 
   // Memoize so consumers don't re-render every time AuthProvider re-renders
   // for an unrelated reason. logout / refresh are stable via useCallback.

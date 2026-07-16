@@ -11,6 +11,16 @@ import { getVersionStatus } from '../services/versionCheck.js';
 import { createLogger } from '../utils/logger.js';
 import { invalidateSessionsForUser } from '../utils/sessionInvalidate.js';
 import { audit } from '../services/audit.js';
+import { resolveEntityNames } from '../services/entityNames.js';
+import {
+  standingPermitsTarget, grantKindAllowedForInstall,
+  requiresPositiveStanding, type GrantKind,
+} from '../services/accessGrants.js';
+import {
+  getStandingsLoginSettings, setSetting,
+  STANDINGS_LOGIN_ENABLED, STANDINGS_LOGIN_THRESHOLD,
+} from '../services/appSettings.js';
+import { revalidateActiveSessions } from '../services/accessRevalidate.js';
 
 const log = createLogger('admin');
 
@@ -366,6 +376,171 @@ adminRouter.post('/users/:id/recheck-corp', async (req, res) => {
     inAllowedCorp,
     blocked:       shouldBlock || target.blocked,
   });
+});
+
+// ── Login allow-list (access_grants) ─────────────────────────────────────────
+// Who may sign in beyond the .env core. .env rows (source='env') are immutable
+// here. Every non-env grant must clear the positive-standing prerequisite
+// (design 4.0). See access-control-design.md.
+
+// GET /api/admin/access-grants — list all grants with resolved names.
+adminRouter.get('/access-grants', async (_req, res) => {
+  const { rows } = await db.query<{
+    id: string; kind: GrantKind; eve_id: string; source: string;
+    note: string | null; created_at: string; added_by_name: string | null;
+  }>(
+    `SELECT g.id, g.kind, g.eve_id, g.source, g.note, g.created_at,
+            u.character_name AS added_by_name
+       FROM access_grants g
+       LEFT JOIN users u ON u.id = g.added_by_user
+      ORDER BY g.kind, g.created_at`,
+  );
+  // eve_id is BIGINT — node-pg hands it back as a string, which the ESI/name
+  // resolvers (they filter on Number.isInteger) and the Map lookups reject.
+  // Normalise to a number once. EVE ids fit safely in a JS number.
+  const eid = (r: { eve_id: string }) => Number(r.eve_id);
+  const [corps, alliances, names] = await Promise.all([
+    resolveCorps(rows.filter((r) => r.kind === 'corp').map(eid)),
+    resolveAlliances(rows.filter((r) => r.kind === 'alliance').map(eid)),
+    resolveEntityNames(rows.filter((r) => r.kind === 'character').map(eid)),
+  ]);
+  const label = (r: { kind: GrantKind; eve_id: string }): string => {
+    const id = eid(r);
+    if (r.kind === 'corp')     { const c = corps.get(id);     return c ? `${c.name} [${c.ticker}]` : String(id); }
+    if (r.kind === 'alliance') { const a = alliances.get(id); return a ? `${a.name} [${a.ticker}]` : String(id); }
+    return names.get(id)?.name ?? String(id);
+  };
+  res.json(rows.map((r) => ({
+    id: r.id, kind: r.kind, eveId: eid(r), source: r.source, note: r.note,
+    addedByName: r.added_by_name, createdAt: r.created_at,
+    label: label(r), immutable: r.source === 'env',
+  })));
+});
+
+// GET /api/admin/standings-view — the deployment's OWN contact list (the corp's
+// contacts in a corp install, the alliance's in an alliance install), limited to
+// corporation + alliance contacts and resolved to name + ticker + standing. Feeds
+// the access-page standings viewer. Read-only; access control itself only ever
+// reads these same corp/alliance buckets. See access-control-design.md.
+adminRouter.get('/standings-view', async (_req, res) => {
+  interface Contact { contactKind: 'corporation' | 'alliance'; id: number; name: string; ticker: string | null; standing: number }
+
+  async function loadContacts(table: 'corp_standings' | 'alliance_standings', ownerCol: 'corp_id' | 'alliance_id', ownerIds: number[]): Promise<Contact[]> {
+    if (ownerIds.length === 0) return [];
+    // MAX(standing): with multiple deployment owner ids the gate admits on the
+    // best standing toward a contact, so surface that same effective value.
+    const { rows } = await db.query<{ contact_kind: 'corporation' | 'alliance'; contact_id: string; standing: number }>(
+      `SELECT contact_kind, contact_id, MAX(standing)::real AS standing
+         FROM ${table}
+        WHERE ${ownerCol} = ANY($1::bigint[])
+          AND contact_kind IN ('corporation', 'alliance')
+        GROUP BY contact_kind, contact_id`,
+      [ownerIds],
+    );
+    const corpIds = rows.filter((r) => r.contact_kind === 'corporation').map((r) => Number(r.contact_id));
+    const allyIds = rows.filter((r) => r.contact_kind === 'alliance').map((r) => Number(r.contact_id));
+    const [corps, alliances] = await Promise.all([resolveCorps(corpIds), resolveAlliances(allyIds)]);
+    return rows.map((r) => {
+      const id   = Number(r.contact_id);
+      const info = r.contact_kind === 'corporation' ? corps.get(id) : alliances.get(id);
+      return { contactKind: r.contact_kind, id, name: info?.name ?? String(id), ticker: info?.ticker ?? null, standing: r.standing };
+    });
+  }
+
+  const [corp, alliance] = await Promise.all([
+    config.corpMode     ? loadContacts('corp_standings',     'corp_id',     config.corpIds)     : Promise.resolve(null),
+    config.allianceMode ? loadContacts('alliance_standings', 'alliance_id', config.allianceIds) : Promise.resolve(null),
+  ]);
+  res.json({ corp, alliance });
+});
+
+// POST /api/admin/access-grants — add a corp/alliance/character to the allow-list.
+adminRouter.post('/access-grants', async (req, res) => {
+  const kind = req.body?.kind as GrantKind;
+  const eveId = parseInt(String(req.body?.eveId), 10);
+  const note = typeof req.body?.note === 'string' ? req.body.note.trim().slice(0, 200) || null : null;
+
+  if (kind !== 'corp' && kind !== 'alliance' && kind !== 'character') {
+    res.status(400).json({ error: 'kind must be corp, alliance, or character' }); return;
+  }
+  if (!Number.isInteger(eveId) || eveId <= 0) {
+    res.status(400).json({ error: 'invalid eveId' }); return;
+  }
+  // Alliance grants are alliance-install-only (a corp install ignores alliance
+  // standings, so an alliance target could never clear the positive gate).
+  if (!grantKindAllowedForInstall(kind)) {
+    res.status(400).json({ error: 'alliance_not_supported', message: 'Alliance grants are only available on an alliance installation.' }); return;
+  }
+  // Positive-standing prerequisite (design 4.0): corp/alliance targets must be
+  // held at positive standing; individual characters are exempt (deliberate 1:1
+  // grant). Fail-closed for the group kinds.
+  if (requiresPositiveStanding(kind) && !(await standingPermitsTarget(kind, eveId))) {
+    res.status(403).json({ error: 'standing_not_positive', message: 'The deployment does not hold this entity at positive standing (contacts must be synced and standing must be > 0).' }); return;
+  }
+
+  const { rows } = await db.query<{ id: string }>(
+    `INSERT INTO access_grants (kind, eve_id, source, note, added_by_user)
+     VALUES ($1, $2, 'admin', $3, $4)
+     ON CONFLICT (kind, eve_id) DO NOTHING
+     RETURNING id`,
+    [kind, eveId, note, req.session.userId ?? null],
+  );
+  if (!rows.length) { res.status(409).json({ error: 'already_granted' }); return; }
+  await audit(req, null, kind === 'character' ? eveId : null, 'access_grant_add', null, `${kind}:${eveId}`);
+  res.status(201).json({ ok: true, id: rows[0].id });
+});
+
+// DELETE /api/admin/access-grants/:id — revoke a grant. env rows are immutable.
+// Kills the sessions of anyone this grant was the sole reason for admitting.
+adminRouter.delete('/access-grants/:id', async (req, res) => {
+  const { rows } = await db.query<{ kind: GrantKind; eve_id: number; source: string }>(
+    `SELECT kind, eve_id, source FROM access_grants WHERE id = $1`, [req.params.id],
+  );
+  if (!rows.length) { res.status(404).json({ error: 'not found' }); return; }
+  const g = rows[0];
+  if (g.source === 'env') {
+    res.status(400).json({ error: 'env_immutable', message: 'This grant is seeded from .env and can only be removed by editing .env.' }); return;
+  }
+
+  await db.query(`DELETE FROM access_grants WHERE id = $1`, [req.params.id]);
+  await audit(req, null, g.kind === 'character' ? g.eve_id : null, 'access_grant_remove', `${g.kind}:${g.eve_id}`, null);
+
+  // Immediately log out anyone the gate no longer permits. Reuse the shared
+  // re-validation so the check matches the login gate exactly: it evaluates
+  // isLoginPermitted OR standingsPermitLogin, so a user still admitted via the
+  // standings auto-admit isn't spuriously logged out just because this explicit
+  // grant was removed. Never evicts ADMIN_CHAR_ID.
+  const { sessionsKilled } = await revalidateActiveSessions();
+  res.json({ ok: true, sessionsKilled });
+});
+
+// ── Standings auto-admit ("friends") settings — Phase 3 ──────────────────────
+
+// GET /api/admin/access-settings — current standings auto-admit toggle + level.
+adminRouter.get('/access-settings', async (_req, res) => {
+  const s = await getStandingsLoginSettings();
+  res.json({ standingsLoginEnabled: s.enabled, standingsLoginThreshold: s.threshold });
+});
+
+// PATCH /api/admin/access-settings — update the standings auto-admit settings.
+adminRouter.patch('/access-settings', async (req, res) => {
+  const { enabled, threshold } = req.body as { enabled?: unknown; threshold?: unknown };
+  if (enabled !== undefined) {
+    if (typeof enabled !== 'boolean') { res.status(400).json({ error: 'enabled must be a boolean' }); return; }
+    await setSetting(STANDINGS_LOGIN_ENABLED, enabled ? 'true' : 'false', req.session.userId ?? null);
+  }
+  if (threshold !== undefined) {
+    if (threshold !== 5 && threshold !== 10) { res.status(400).json({ error: 'threshold must be 5 or 10' }); return; }
+    await setSetting(STANDINGS_LOGIN_THRESHOLD, String(threshold), req.session.userId ?? null);
+  }
+  await audit(req, null, null, 'access_settings_update', null, JSON.stringify({ enabled, threshold }));
+  // A settings change can NARROW who's admitted (disabling, or raising the
+  // threshold), so immediately evict any live session the new gate no longer
+  // permits — otherwise a de-authorised user lingers to the cookie TTL.
+  // Widening changes evict nobody, so it's safe to always run.
+  const { sessionsKilled } = await revalidateActiveSessions();
+  const s = await getStandingsLoginSettings();
+  res.json({ standingsLoginEnabled: s.enabled, standingsLoginThreshold: s.threshold, sessionsKilled });
 });
 
 // GET /api/admin/maps — every corp map in the system with owner + stats.

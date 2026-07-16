@@ -31,9 +31,11 @@ import wormholesRouter    from './routes/wormholes.js';
 import releasesRouter     from './routes/releases.js';
 import { loadRouteGraph } from './services/routeGraph.js';
 import { seedDiscordWebhooksFromEnv } from './services/discordSeed.js';
+import { seedAccessGrantsFromEnv } from './services/accessGrantsSeed.js';
 import { startSdeAutoUpdate } from './services/sdeUpdate.js';
 import { startLocationPoller } from './services/locationPoll.js';
 import { startWhSweeper } from './services/whSweep.js';
+import { startAccessRevalidation } from './services/accessRevalidate.js';
 import { startTelemetry } from './services/telemetry.js';
 import { telemetryRouter } from './routes/telemetry.js';
 import { adminRouter, adminReadRouter, reportsRouter } from './routes/admin.js';
@@ -99,7 +101,9 @@ app.use(session({
 // session middleware (so logout etc. still see the session) but before
 // any route is reached. SameSite=lax is the primary protection; this
 // catches the residual cases.
-app.use(originGuard(process.env.FRONTEND_URL ?? 'http://localhost:5174'));
+// The telemetry collector receives anonymous server-to-server pings (no browser
+// Origin, no credentials), so it must be exempt from the CSRF origin check.
+app.use(originGuard(process.env.FRONTEND_URL ?? 'http://localhost:5174', { exemptPaths: ['/api/telemetry'] }));
 
 // Tight limiter ONLY on the SSO brute-force surface (login spam, state
 // guessing). The rest of /auth — /me, /preferences, /settings,
@@ -173,6 +177,7 @@ async function expireMaps() {
 migrate()
   .then(async () => {
     await seedDiscordWebhooksFromEnv();
+    await seedAccessGrantsFromEnv();
     await expireMaps();
     setInterval(expireMaps, 60 * 60 * 1000); // re-check hourly
     await initActivity();
@@ -181,6 +186,7 @@ migrate()
     startSdeAutoUpdate();
     startLocationPoller();
     startWhSweeper();
+    startAccessRevalidation();
     void startTelemetry();
   })
   .catch((err) => { console.error('Migration failed:', err); process.exit(1); });

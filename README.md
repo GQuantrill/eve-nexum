@@ -115,7 +115,7 @@ Open <http://localhost> and click **Log in with EVE Online**. That's it.
 
 - **Personal / Corp / Alliance scopes** — every user has personal maps that are always private. In corp mode each corp also gets shared corp maps (cross-corp visibility is opt-in via `CORP_MAP_SHARED`). In alliance mode there's a third scope above corp: **alliance maps** every member of the alliance can see, managed by the `alliance_admin` role, with cross-alliance sharing opt-in via `ALLIANCE_MAP_SHARED`. A corp inside an alliance still keeps its own corp-private maps without listing every member corp in `CORP_ID`. See [Corp & alliance mode](#corp--alliance-mode).
 - **Multi-character accounts** — link several characters (alts) to a single account and switch the active character from the in-app switcher with no re-login, since each character's token is already stored. Linking merges that character's maps onto the account; the per-account map cap is enforced only at creation, so nothing is lost on link. You can also follow an alt's live (or last-known) location and route from it while flying your main, and unlink a character at any time — an unlinked character keeps its own data and becomes a standalone account again on its next login. The currently-active character can't be removed (switch away first).
-- **Share a personal map with another character or corp** — owners can grant edit access to a specific EVE character or an entire corp from the map sidebar. Recipients can edit signatures, structures, notes, and topology like a corp member but can't rename, delete, or re-share the map. Grants target raw EVE IDs, so they take effect on the recipient's very first Nexum login — no pre-registration required. The map appears in their switcher under a distinct "Shared" badge. Personal maps only; corp maps are already shared via membership.
+- **Share a personal map with a character, corp, or alliance** — owners can grant edit access to a specific EVE character, an entire corp, or an entire alliance from the map sidebar. Recipients can edit signatures, structures, notes, and topology like a corp member but can't rename, delete, or re-share the map. Grants target raw EVE IDs, so they take effect on the recipient's very first Nexum login — no pre-registration required. The map appears in their switcher under a distinct "Shared" badge. Personal maps only; corp maps are already shared via membership. On a restricted deployment you can only share with an entity your corp/alliance holds at **positive standing** (see [Admitting friends without editing `.env`](#admitting-friends-without-editing-env)), and a **"Also let them log in"** option can admit the recipient to the login allow-list in the same step — otherwise a shared-but-unlisted corp's members still couldn't sign in to see it.
 - **Multi-map support** — each character (or corp) can maintain multiple independent maps up to configured limits (`MAX_USER_MAPS` / `MAX_CORP_MAPS`).
 - **Real-time collaboration** — edits propagate live to everyone viewing the same map. Adding/moving/removing systems, drawing or retyping connections, renaming or locking the map, signature and structure changes, and merges all appear for other viewers within moments — no refresh. Delivered over a per-map Server-Sent Events stream (access-checked, so you only ever receive events for maps you can see), with your own changes echo-suppressed and an automatic resync on reconnect. Purely additive: if the stream drops, editing still works exactly as before.
 - **Merge maps** — fold one map's contents into another. The destination is the source of truth: existing systems are kept and only missing systems and connections are added, while signatures, structures, and notes are merged in (each toggleable in the merge dialog). New systems are aligned into the destination's existing layout near the systems they connect to, rather than dumped off to one side. Corp maps must be explicitly opted in — separately as a merge **source** and/or **destination** — and any merge touching a corp map is recorded in the audit log. See [Merging maps](#merging-maps) for the roles involved.
@@ -171,6 +171,7 @@ These features only matter once `CORP_ID` or `ALLIANCE_ID` is set — see [Corp 
 - **Multi-corp deployments** — `CORP_ID` accepts a comma-separated list of corporation IDs. One Nexum instance can host several corps; each corp's maps stay scoped to its own members unless `CORP_MAP_SHARED=true`.
 - **Alliance-wide maps** — `ALLIANCE_ID` adds a third map scope above corp: **alliance maps** every member of the alliance can see. Login is admitted if a character's corp is in `CORP_ID` **or** their alliance is in `ALLIANCE_ID`, so a whole alliance is permitted without listing every member corp. Set `ALLIANCE_MAP_SHARED=true` to share alliance maps across a coalition of listed alliances. A corp inside the alliance still keeps its own corp-private maps (derived from the members' corp at login).
 - **Alliance admin role** — a dedicated `alliance_admin` tier sits above `admin`: it manages alliance maps and every member's role across the whole alliance (a superset of the corp admin), while corp admins stay scoped to their own corp. Only an alliance admin can create/delete/lock alliance maps or grant the `alliance_admin` role. The bootstrap `ADMIN_CHAR_ID` is pinned to `alliance_admin` when `ALLIANCE_ID` is set.
+- **User access control** — decide who can sign in beyond the immutable `.env` core: a database login allow-list managed in the admin area, optional auto-admit of friendly corps/alliances by in-game standing, and a standings viewer — all with live session re-validation. See [Admitting friends without editing `.env`](#admitting-friends-without-editing-env).
 - **Admin dashboard** — a dedicated `#/admin` page with five tabs: Users, Maps, Reports, Discord, Audit log. Admins reach it from the toolbar's Admin button. The Users tab has a member search and a **Roles?** explainer.
 - **User management** — change roles, block / unblock, and force an ESI corp-membership re-check on demand. Self-block / self-demote and changes to `ADMIN_CHAR_ID` are guarded against. Anyone who has left every listed corp is auto-blocked on the next login or recheck.
 - **Map management** — admins see every corp map (solo maps are excluded by design) with owner avatar, corp ticker, system / connection counts, lock state, and last-active time. Force-lock, force-unlock, and force-delete are one-click each.
@@ -179,6 +180,19 @@ These features only matter once `CORP_ID` or `ALLIANCE_ID` is set — see [Corp 
 - **Audit log** — every admin action (role change, block, force-lock, force-unlock, force-delete, ESI corp change, auto-block on departure, corp-map merge as source/destination) is recorded with actor, target, old → new value, and timestamp. Exportable as CSV.
 - **Corp ticker resolution** — corp IDs in the Users and Maps reports are resolved to in-game tickers via ESI (`/v5/corporations/{id}/`), with a 1-hour in-memory cache to keep the report loads cheap.
 - **Per-character attribution** — sigs, structures, and system add / delete actions are recorded with the user who made them, so reports can answer "who has been scanning what" with no manual logging.
+
+### Admitting friends without editing `.env`
+
+Historically the only way to let someone log in was to add their corp/alliance to `CORP_ID` / `ALLIANCE_ID` and restart. Now those env lists **seed a database login allow-list** on boot, and admins manage the rest live:
+
+- **The `.env` core is immutable.** Every `CORP_ID` / `ALLIANCE_ID` entry becomes an allow-list row marked as env-sourced. Those rows can't be changed or removed from the admin area — only by editing `.env` — so a mistaken (or compromised) admin can never lock out or open up the deployment's core. Editing `.env` and rebooting reconciles the core exactly.
+- **Add friendly corps, alliances, or individual characters** to the allow-list from the admin area without touching `.env` or restarting. Their members can then log in; what they can actually *see* is still governed separately (a newly-admitted guest defaults to read-only and sees only maps explicitly shared with them).
+- **Positive standing is required** (for corp/alliance targets; individual characters are exempt). You can only admit a corp or alliance your deployment holds at **positive** standing in-game. An alliance installation reads the alliance's contacts; a corp installation reads the corp's own contacts — and because a corp's contact list can hold an alliance standing, **a corp installation can admit a whole friendly alliance too**, gated on the corp's own standing toward it. Neutral (0) and negative (−5 / −10) are refused.
+- **Auto-admit friends by standing (optional, off by default)** — instead of adding corps one by one, you can flip a switch so that anyone your corp/alliance holds at a chosen in-game standing (**+10 only**, or **+5 and above**) may log in automatically. An alliance installation reads the alliance's contacts; a corp installation reads the corp's own contacts and matches the pilot's corp, character, or alliance (so a corp can auto-admit a whole friendly alliance). Only positive standings qualify (neutral and negative never do), and it needs your contacts synced first (a director-role character has to sync them via the **Sync standings** button, which pulls only the corp/alliance contact lists). Turning it off reverts to the explicit allow-list.
+- **Standings viewer** — a popout on the access page lists your deployment's corp/alliance contacts grouped by standing band (**+10 / +5 / 0 / −5 / −10**) with name, ticker, and standing, so you can see at a glance who the standings auto-admit would let in.
+- **Access is re-checked on live sessions, not just at login.** The login gate runs once at sign-in, so Nexum continuously re-validates who's already signed in: removing a grant, tightening the standings settings, or syncing standings **immediately** logs out anyone the gate no longer permits (instead of waiting out their 7-day session). A periodic sweep also refreshes each logged-in pilot's corp/alliance from ESI, so someone who **leaves an admitted corp is evicted without having to log in again** (an ESI outage is fail-safe — it never mass-evicts). When a session is revoked, the browser drops back to the login screen on its next request. The bootstrap `ADMIN_CHAR_ID` is never locked out.
+
+Every allow-list change is written to the [Audit log](#corp--alliance-mode).
 
 ---
 
@@ -307,8 +321,8 @@ Edit `.env` and fill in the required values:
 | `EVE_CALLBACK_URL` | Yes | Must match the callback registered in your EVE app — e.g. `https://yourdomain.com/auth/callback` |
 | `FRONTEND_URL` | Yes | Public URL of the app — e.g. `https://yourdomain.com` |
 | `DOMAIN` | Traefik only | Bare hostname for the Traefik router rule — e.g. `nexum.yourdomain.com` |
-| `CORP_ID` | Optional | Restricts logins to specific EVE corporations. **Comma-separated list** of corporation IDs — anyone whose corp is not in the list is rejected at the OAuth callback (unless their alliance is in `ALLIANCE_ID`). Leave empty/unset to allow any EVE character to log in. Example single corp: `98000001`. Example multi-corp: `98000001,98000002`. |
-| `ALLIANCE_ID` | Optional | Restricts logins to specific EVE alliances, and adds the **alliance map** scope. **Comma-separated list** of alliance IDs. A character is admitted if their corp is in `CORP_ID` **or** their alliance is in `ALLIANCE_ID`, so a whole alliance can be permitted without listing every member corp. The list also forms the coalition for `ALLIANCE_MAP_SHARED`. Example: `99000001` or `99000001,99000002`. |
+| `CORP_ID` | Optional | Restricts logins to specific EVE corporations. **Comma-separated list** of corporation IDs — anyone whose corp is not admitted is rejected at the OAuth callback (unless their alliance is in `ALLIANCE_ID`). Leave empty/unset to allow any EVE character to log in. Example single corp: `98000001`. Example multi-corp: `98000001,98000002`. **On boot this list _seeds_ the login allow-list** (see [Admitting friends without editing `.env`](#admitting-friends-without-editing-env)): the env-seeded entries are the immutable "core" — additional corps, alliances, or individual characters are admitted live from the admin area without editing `.env` or restarting. Removing a corp from `CORP_ID` removes its core entry on the next boot. |
+| `ALLIANCE_ID` | Optional | Restricts logins to specific EVE alliances, and adds the **alliance map** scope. **Comma-separated list** of alliance IDs. A character is admitted if their corp is in `CORP_ID` **or** their alliance is in `ALLIANCE_ID`, so a whole alliance can be permitted without listing every member corp. Like `CORP_ID`, this seeds the immutable core of the login allow-list. The list also forms the coalition for `ALLIANCE_MAP_SHARED`. Example: `99000001` or `99000001,99000002`. |
 | `ADMIN_CHAR_ID` | When `CORP_ID` or `ALLIANCE_ID` is set | EVE character ID of the bootstrap admin. Forced to the top role on first login (`alliance_admin` when `ALLIANCE_ID` is set, otherwise `admin`) and cannot be demoted or blocked by other admins. **Not a membership exemption** — this character still has to be in a listed corp or alliance to log in. See [What happens when a user leaves the corp](#what-happens-when-a-user-leaves-the-corp). |
 | `CORP_MAP_SHARED` | Optional | `1` / `true` to share every corp map across every listed corp. Default (`false`) scopes corp maps to the corp that created them — Corp A's chain stays invisible to Corp B even when they share a deployment. Only enable when all listed corps explicitly trust each other. |
 | `ALLIANCE_MAP_SHARED` | Optional | Alliance counterpart of `CORP_MAP_SHARED`. `1` / `true` makes every alliance map visible to every listed alliance (coalition mode). Default (`false`) scopes each alliance map to its owning alliance. |
@@ -317,6 +331,7 @@ Edit `.env` and fill in the required values:
 | `MAX_CORP_MAPS` | Optional | Max number of corp maps per corp. Default `5`. |
 | `MAX_ALLIANCE_MAPS` | Optional | Max number of alliance maps per alliance. Default `5`. |
 | `LAZY_WH_SWEEP_MINUTES` | Optional | Cadence (minutes) of the lazy wormhole-removal sweep, which removes aged-out WH sigs and quarantines the connections they backed on maps that have opted in. Default `15`. Set to `0` to disable the sweep entirely. |
+| `ACCESS_REVALIDATE_MINUTES` | Optional | Cadence (minutes) of the login-access re-validation sweep, which logs out any live session the access gate no longer permits — e.g. a pilot who dropped below the auto-admit standing or left an admitted corp. Restricted deployments only. Default `60`. Set to `0` to disable the periodic sweep (an admin settings change still evicts immediately). |
 | `DISCORD_WEBHOOK_URL` | Optional | Discord webhook(s) for corp-intel notifications (inbound K162, new connections). One URL fires for **every** corp map; for multi-corp deployments use `corpId=URL` pairs (comma-separated) to route each corp to its own channel — e.g. `98000001=https://discord.com/api/webhooks/…,98000002=https://discord.com/api/webhooks/…`. Personal maps never notify. Leave unset to disable. Which regions/maps actually notify is then filtered per corp in the admin **Discord** tab. See [Discord notifications](#discord-notifications). |
 
 #### EVE developer app scopes
@@ -604,7 +619,7 @@ Every merge that involves a corp map on either side writes an audit entry (`corp
 
 ### What happens when a user leaves the corp
 
-The corp membership check runs **at login**. Existing sessions keep working until the user logs out and back in — at which point ESI is queried again and a corp departure causes the login to fail. Admins can also manually block a user (see below), which prevents login entirely regardless of corp membership.
+The corp membership check runs **at login**, and a periodic background sweep re-checks each live session's corp/alliance against ESI (cadence `ACCESS_REVALIDATE_MINUTES`, default 60 min). So a pilot who leaves an admitted corp is logged out within that window **without having to log out first** — and, of course, their next login attempt is also rejected. An ESI outage is fail-safe: the sweep falls back to the stored affiliation and never mass-evicts. Admins can also manually block a user (see below), which prevents login entirely regardless of corp membership.
 
 #### …including `ADMIN_CHAR_ID`
 
@@ -702,20 +717,24 @@ Only ever use a container ID you own. The ID is inlined at build time, so a rebu
 
 ### Deployment telemetry (version ping) — opt-in
 
-So the project can gauge how many people self-host and which versions are live, the server can send a tiny **opt-in** ping. It is **off unless you set `NEXUM_TELEMETRY=1`**, and when enabled it sends, once a day:
+So the project can gauge how many people self-host, which versions are live, and roughly how much they're used, the server can send a tiny **opt-in** ping. It is **off by default**, and when enabled it sends, once a day:
 
 - the app **version** (e.g. `0.1.0`)
 - a **random per-instance id** (generated once, stored locally), so repeat pings count as one install
+- two **aggregate counts**: the number of **maps** and the number of **users** on the install
 
-That's the entire payload. It contains **no** user data, character names, corp IDs, map data, or settings, and the receiver **does not store your IP**. To enable it:
+That's the entire payload. The counts are plain totals — it contains **no** character names, corp IDs, map contents, per-user detail, or settings, and the receiver **does not store your IP**. There are two ways to opt in:
 
 ```bash
+# 1. the flag — sends to the project's default collector
 NEXUM_TELEMETRY=1                                  # in .env
-# optional: send to your own collector instead of the project's
-# NEXUM_TELEMETRY_URL=https://your-host/api/telemetry
+
+# 2. …or just set a collector URL. Populating this is itself treated as opt-in,
+#    so you don't also need the flag. Point it at the project's or your own.
+NEXUM_TELEMETRY_URL=https://eve-nexum.com/api/telemetry
 ```
 
-Unset `NEXUM_TELEMETRY` (the default) and the server never makes the call. The receiving endpoint (`POST /api/telemetry`) exists on every deployment but stays empty unless instances are pointed at it.
+Leave **both** unset (the default) and the server never makes the call. The receiving endpoint (`POST /api/telemetry`) exists on every deployment but stays empty unless instances are pointed at it.
 
 ---
 

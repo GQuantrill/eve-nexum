@@ -120,4 +120,26 @@ searchRouter.get('/corporations', async (req, res) => {
   res.json({ match });
 });
 
+// GET /api/search/alliances?q=<exact name>
+// Same shape as /corporations. Used by the admin access allow-list picker to
+// resolve an alliance name to its id (alliance grants are alliance-install-only).
+searchRouter.get('/alliances', async (req, res) => {
+  const q = cleanQuery(req.query.q);
+  if (!q) { res.json({ match: null }); return; }
+  const key = `alliance:${q.toLowerCase()}`;
+
+  const cached = lookupCache.get(key);
+  if (cached !== null) {
+    res.json({ match: cached.value });
+    return;
+  }
+
+  const body = await lookupExactName(q);
+  const match = body?.alliances?.[0]
+    ? { id: body.alliances[0].id, name: body.alliances[0].name }
+    : null;
+  lookupCache.set(key, match);
+  res.json({ match });
+});
+
 export default searchRouter;
