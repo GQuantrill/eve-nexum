@@ -101,7 +101,9 @@ app.use(session({
 // session middleware (so logout etc. still see the session) but before
 // any route is reached. SameSite=lax is the primary protection; this
 // catches the residual cases.
-app.use(originGuard(process.env.FRONTEND_URL ?? 'http://localhost:5174'));
+// The telemetry collector receives anonymous server-to-server pings (no browser
+// Origin, no credentials), so it must be exempt from the CSRF origin check.
+app.use(originGuard(process.env.FRONTEND_URL ?? 'http://localhost:5174', { exemptPaths: ['/api/telemetry'] }));
 
 // Tight limiter ONLY on the SSO brute-force surface (login spam, state
 // guessing). The rest of /auth — /me, /preferences, /settings,
