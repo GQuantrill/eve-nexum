@@ -171,11 +171,12 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
   // entry (by name, class, effect, or a static wormhole type / frig hole).
   const [watchEntries]  = useWatchlist();
   const watchSigTypes   = useMapStore((s) => s.sigTypesBySystem[sys.id]);
+  const watchWhSigs     = useMapStore((s) => s.whSigsBySystem[sys.id]);
   // Memoized: matchSystem scans up to MAX_WATCH (~75) entries; without this it
   // re-ran on every re-render (e.g. every 10s location poll), for every node.
   const watch           = useMemo(
-    () => matchSystem(watchEntries, sys, watchSigTypes),
-    [watchEntries, sys, watchSigTypes],
+    () => matchSystem(watchEntries, sys, watchSigTypes, watchWhSigs),
+    [watchEntries, sys, watchSigTypes, watchWhSigs],
   );
   const watchDef        = watch ? watchMarker(watch.marker) : null;
   const watchTip        = watch ? (watch.note.trim() || t(`watchMarker.${watch.marker}`)) : undefined;

@@ -54,6 +54,7 @@ export function useWatchlistAlerts() {
   const connections = useMapStore((s) => s.map.connections);
   const activeMapId = useMapStore((s) => s.activeMapId);
   const sigTypesBySystem = useMapStore((s) => s.sigTypesBySystem);
+  const whSigsBySystem = useMapStore((s) => s.whSigsBySystem);
   const [entries]   = useWatchlist();
   const [soundOn]   = useUserSetting<boolean>(NOTIFY.watchlistSound, true);
   const [desktopOn] = useUserSetting<boolean>(NOTIFY.watchlistDesktop, false);
@@ -71,7 +72,7 @@ export function useWatchlistAlerts() {
     // Present matches, keyed by target id, with the label/marker to announce.
     const present = new Map<string, { name: string; marker: string }>();
     for (const sys of systems) {
-      const e = matchSystem(entries, sys, sigTypesBySystem[sys.id]);
+      const e = matchSystem(entries, sys, sigTypesBySystem[sys.id], whSigsBySystem[sys.id]);
       if (e) present.set(`sys:${sys.id}`, { name: sys.name || '?', marker: t(`watchMarker.${e.marker}`) });
     }
     for (const conn of connections) {
@@ -115,5 +116,5 @@ export function useWatchlistAlerts() {
     for (const key of Array.from(st.alerted)) {
       if (!present.has(key)) st.alerted.delete(key);
     }
-  }, [systems, connections, activeMapId, sigTypesBySystem, entries, soundOn, desktopOn, t]);
+  }, [systems, connections, activeMapId, sigTypesBySystem, whSigsBySystem, entries, soundOn, desktopOn, t]);
 }

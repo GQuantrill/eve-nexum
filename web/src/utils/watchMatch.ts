@@ -1,13 +1,36 @@
-import type { WatchEntry, WatchMatch, MapSystem, MapConnection } from '../types';
+import type { WatchEntry, WatchMatch, MapSystem, MapConnection, SystemClass } from '../types';
 import { WORMHOLE_DESTINATIONS } from '../data/wormholes';
+import { DEST_TO_CLASS } from './whDest';
 
 // Frigate-only wormhole type codes (the "frigate" group in wormholes.ts). A
 // system whose static is one of these — or a connection of one of these types,
 // or any connection the user has sized "small" — is a frig hole.
 export const FRIG_WH_TYPES = new Set(['E004', 'L005', 'Z006', 'M001', 'C008', 'G008', 'Q003', 'A009']);
 
+// A scanned sig's "leads to" can be a band (unresolved to an exact class) rather
+// than a single class. Expand a band to the classes it covers so a "leads to"
+// watch still fires (a C1-C3 band could be your watched C2).
+const BAND_CLASSES: Record<string, SystemClass[]> = {
+  'C1-C3': ['C1', 'C2', 'C3'],
+  'C4-C5': ['C4', 'C5'],
+};
+
+// The one wormhole-sig field the "leads to" watch reads: its type code and its
+// recorded leads-to. Structural so any {whType, leadsTo} (the store's WhSig) fits.
+export interface LeadsToSig { whType?: string; leadsTo?: string }
+
 function norm(s: string): string {
   return s.trim().toLowerCase();
+}
+
+// Classes a scanned sig's leads-to TOKEN represents (an exact class like "HS"
+// or a band like "C1-C3"); empty for a pinned system name / unknown / "".
+function leadsToTokenClasses(token: string | undefined): SystemClass[] {
+  const up = (token ?? '').trim().toUpperCase();
+  if (!up) return [];
+  if (BAND_CLASSES[up]) return BAND_CLASSES[up];
+  const cls = DEST_TO_CLASS[up.toLowerCase()];
+  return cls ? [cls] : [];
 }
 
 /** Stable key for a match — used to dedupe entries and to light up the
@@ -26,7 +49,7 @@ export function matchKey(m: WatchMatch): string {
 /** Does a system satisfy an entry? whType / frigHole match the system's statics
  *  AND its scanned wormhole-sig types (passed in from the map-wide index), so a
  *  freshly-scanned sig counts even before it's resolved into a connection. */
-export function systemMatchesEntry(e: WatchEntry, sys: MapSystem, sigTypes?: string[]): boolean {
+export function systemMatchesEntry(e: WatchEntry, sys: MapSystem, sigTypes?: string[], whSigs?: LeadsToSig[]): boolean {
   const m = e.match;
   switch (m.by) {
     case 'system':   return m.query.trim() !== '' && norm(sys.name) === norm(m.query);
@@ -38,10 +61,14 @@ export function systemMatchesEntry(e: WatchEntry, sys: MapSystem, sigTypes?: str
     }
     case 'class':    return sys.systemClass === m.cls;
     case 'leadsTo': {
-      // A wormhole (static or scanned sig) whose DESTINATION is the watched
-      // class — e.g. "leads to C2" fires on a system holding a C2 static.
-      const leads = (code: string) => WORMHOLE_DESTINATIONS[code.trim().toUpperCase()] === m.cls;
-      return sys.statics.some(leads) || (sigTypes?.some(leads) ?? false);
+      // A wormhole whose DESTINATION is the watched class. Statics + scanned sigs
+      // with a fixed-destination code (e.g. "leads to C2" fires on a C2 static),
+      // AND scanned sigs with no fixed destination (K162) whose recorded leads-to
+      // resolves to the class — so a K162 we've solved to Hi-Sec still counts.
+      const codeLeads = (code: string) => WORMHOLE_DESTINATIONS[code.trim().toUpperCase()] === m.cls;
+      if (sys.statics.some(codeLeads)) return true;
+      return (whSigs ?? []).some((s) =>
+        codeLeads(s.whType ?? '') || leadsToTokenClasses(s.leadsTo).includes(m.cls));
     }
     case 'effect':   return sys.effect === m.effect;
     case 'frigHole': return sys.statics.some((s) => FRIG_WH_TYPES.has(s.toUpperCase()))
@@ -62,8 +89,8 @@ export function connectionMatchesEntry(e: WatchEntry, conn: MapConnection): bool
 }
 
 /** First entry (list order) that matches this system, or null. */
-export function matchSystem(entries: WatchEntry[], sys: MapSystem, sigTypes?: string[]): WatchEntry | null {
-  for (const e of entries) if (systemMatchesEntry(e, sys, sigTypes)) return e;
+export function matchSystem(entries: WatchEntry[], sys: MapSystem, sigTypes?: string[], whSigs?: LeadsToSig[]): WatchEntry | null {
+  for (const e of entries) if (systemMatchesEntry(e, sys, sigTypes, whSigs)) return e;
   return null;
 }
 
