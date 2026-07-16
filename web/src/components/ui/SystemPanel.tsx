@@ -781,10 +781,9 @@ function StandingsRefreshButton({ standings }: { standings: ReturnType<typeof us
   async function onClick() {
     const r = await standings.refresh();
     if (!r) { setStatus('err'); }
-    else if (r.succeeded?.character || r.succeeded?.corp || r.succeeded?.alliance) {
+    else if (r.succeeded?.corp || r.succeeded?.alliance) {
       toast.success(
         t('systemPanel.standingsRefreshed', {
-          personal: r.counts?.character ?? 0,
           corp: r.counts?.corp ?? 0,
           alliance: r.counts?.alliance ?? 0,
         })
@@ -811,10 +810,10 @@ function StandingsRefreshButton({ standings }: { standings: ReturnType<typeof us
   );
 }
 
-// Inline standings strip next to a sov holder row. Renders up to three
-// compact pills — Personal / Corp / Alliance — only for buckets that
-// actually have a contact for this entity. Colour-coded against in-game
-// blue (≥5) / red (≤-5) thresholds with a softer tier inside that range.
+// Inline standings strip next to a sov holder row. Renders up to two
+// compact pills — Corp / Alliance — only for buckets that actually have a
+// contact for this entity. Colour-coded against in-game blue (≥5) / red
+// (≤-5) thresholds with a softer tier inside that range.
 function StandingsBadges({
   standings,
   kind,
@@ -847,7 +846,6 @@ function StandingsBadges({
   // Buckets the user isn't a member of (no corp / no alliance) just show
   // "—" with the "none" colour tier.
   const entries: Array<{ label: string; value: number | null; hasBucket: boolean }> = [
-    { label: 'P', value: lookup.character, hasBucket: true },
     { label: 'C', value: lookup.corp,      hasBucket: !!standings.self?.corpId     },
     { label: 'A', value: lookup.alliance,  hasBucket: !!standings.self?.allianceId },
   ];
@@ -880,7 +878,6 @@ function StandingsBadges({
 
 function labelFor(t: TFunction, short: string): string {
   switch (short) {
-    case 'P': return t('systemPanel.personal');
     case 'C': return t('systemPanel.corp');
     case 'A': return t('systemPanel.alliance');
     default:  return short;

@@ -920,7 +920,7 @@
     "faction": "Фракция",
     "personal": "Личные",
     "refreshStandings": "Обновить стендинги из ESI сейчас (минуя 6-часовой TTL)",
-    "standingsRefreshed": "Стендинги обновлены — {{personal}} личных · {{corp}} корп · {{alliance}} альянсовых контактов",
+    "standingsRefreshed": "Стендинги обновлены — {{corp}} корп · {{alliance}} альянсовых контактов",
     "noContactsRefreshed": "Не удалось обновить ни один контакт. Возможно, у токена нет области read_contacts — выйдите и войдите снова.",
     "standingsNotLoaded": "Стендинги ещё не загружены. Если это не исчезнет, выйдите и войдите снова, чтобы выдать области read_contacts.",
     "standingNotInBucket": "{{label}}: вы не в одной из них",

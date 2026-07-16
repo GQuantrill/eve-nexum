@@ -58,8 +58,8 @@ async function markRefreshed(ownerKind: string, ownerId: number) {
 }
 
 async function replaceStandings(
-  table: 'character_standings' | 'corp_standings' | 'alliance_standings',
-  ownerCol: 'character_id' | 'corp_id' | 'alliance_id',
+  table: 'corp_standings' | 'alliance_standings',
+  ownerCol: 'corp_id' | 'alliance_id',
   ownerId: number,
   contacts: EsiContact[],
   actorUserId: number | null,
@@ -73,21 +73,12 @@ async function replaceStandings(
       const kinds   = contacts.map((c) => c.contact_type);
       const ids     = contacts.map((c) => c.contact_id);
       const values  = contacts.map((c) => c.standing);
-      if (table === 'character_standings') {
-        await client.query(
-          `INSERT INTO ${table} (${ownerCol}, contact_kind, contact_id, standing)
-           SELECT $1, k, i, v
-           FROM UNNEST($2::text[], $3::int[], $4::real[]) AS t(k, i, v)`,
-          [ownerId, kinds, ids, values],
-        );
-      } else {
-        await client.query(
-          `INSERT INTO ${table} (${ownerCol}, contact_kind, contact_id, standing, updated_by_user_id)
-           SELECT $1, k, i, v, $5
-           FROM UNNEST($2::text[], $3::int[], $4::real[]) AS t(k, i, v)`,
-          [ownerId, kinds, ids, values, actorUserId],
-        );
-      }
+      await client.query(
+        `INSERT INTO ${table} (${ownerCol}, contact_kind, contact_id, standing, updated_by_user_id)
+         SELECT $1, k, i, v, $5
+         FROM UNNEST($2::text[], $3::int[], $4::real[]) AS t(k, i, v)`,
+        [ownerId, kinds, ids, values, actorUserId],
+      );
     }
     await client.query('COMMIT');
   } catch (err) {
@@ -98,10 +89,12 @@ async function replaceStandings(
   }
 }
 
-// Fire-and-forget standings refresh on login. Pulls personal, corp, and
-// alliance contacts in parallel; gracefully no-ops the corp/alliance reads
-// when the character lacks the Contact Manager role. Never throws — every
-// failure is logged so a transient ESI hiccup doesn't break login.
+// Fire-and-forget standings refresh on login. Pulls CORP and ALLIANCE contacts
+// in parallel; gracefully no-ops each read when the character lacks the Contact
+// Manager / executor role. Personal (character) contacts are deliberately NOT
+// fetched — this is a corp/alliance tool and we don't request the personal
+// read_contacts scope. Never throws — every failure is logged so a transient
+// ESI hiccup doesn't break login.
 export async function refreshStandingsForUser(params: {
   userId:      number;
   characterId: number;
@@ -112,23 +105,6 @@ export async function refreshStandingsForUser(params: {
   const { userId, characterId, corpId, allianceId, accessToken } = params;
 
   const tasks: Promise<void>[] = [];
-
-  // Personal — always available with the read_contacts scope.
-  if (await shouldRefresh('character', characterId)) {
-    tasks.push((async () => {
-      const r = await fetchAllContacts(
-        `https://esi.evetech.net/v2/characters/${characterId}/contacts/`,
-        accessToken,
-      );
-      if (Array.isArray(r)) {
-        log.info(`character ${characterId}: fetched ${r.length} personal contacts`);
-        await replaceStandings('character_standings', 'character_id', characterId, r, userId);
-        await markRefreshed('character', characterId);
-      } else {
-        log.info(`character ${characterId}: personal contacts fetch returned ${r.status} (${r.error}) — likely missing esi-characters.read_contacts.v1 scope`);
-      }
-    })().catch((err) => log.error('character standings fetch errored:', err)));
-  }
 
   // Corp — requires the Contact Manager role; 403 is the common case.
   if (corpId !== null && await shouldRefresh('corp', corpId)) {

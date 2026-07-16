@@ -12,14 +12,14 @@ standingsRouter.use(requireAuth);
 
 type ContactKind = 'character' | 'corporation' | 'alliance' | 'faction';
 
-// GET /api/standings/me — returns the three standings buckets visible to
-// the logged-in character: their personal contacts, their corp's contacts
-// (if a corp Contact Manager has ever logged in), and their alliance's
-// contacts (likewise). Maps are keyed `"<kind>:<id>"` for fast lookup on
-// the client.
+// GET /api/standings/me — returns the standings buckets visible to the
+// logged-in character: their corp's contacts (if a corp Contact Manager has
+// ever logged in) and their alliance's contacts (likewise). Personal contacts
+// are deliberately not read — this is a corp/alliance tool. Maps are keyed
+// `"<kind>:<id>"` for fast lookup on the client.
 //
 // The frontend's useStandings hook compresses these into a single
-// "effective standing" per target — most negative across the three.
+// "effective standing" per target — most negative across the buckets.
 standingsRouter.get('/me', async (req, res) => {
   const userId = req.session.userId!;
 
@@ -30,12 +30,7 @@ standingsRouter.get('/me', async (req, res) => {
   if (!userRows.length) { res.status(404).json({ error: 'User not found' }); return; }
   const { character_id, corp_id, alliance_id } = userRows[0];
 
-  const [charRows, corpRows, allianceRows, refreshRows] = await Promise.all([
-    db.query<{ contact_kind: ContactKind; contact_id: number; standing: number }>(
-      `SELECT contact_kind, contact_id, standing
-       FROM character_standings WHERE character_id = $1`,
-      [character_id],
-    ),
+  const [corpRows, allianceRows, refreshRows] = await Promise.all([
     corp_id !== null
       ? db.query<{ contact_kind: ContactKind; contact_id: number; standing: number }>(
           `SELECT contact_kind, contact_id, standing
@@ -52,10 +47,9 @@ standingsRouter.get('/me', async (req, res) => {
       : Promise.resolve({ rows: [] as Array<{ contact_kind: ContactKind; contact_id: number; standing: number }> }),
     db.query<{ owner_kind: string; last_fetched_at: string }>(
       `SELECT owner_kind, last_fetched_at FROM standings_refresh
-       WHERE (owner_kind = 'character' AND owner_id = $1)
-          OR (owner_kind = 'corp'      AND owner_id = $2)
-          OR (owner_kind = 'alliance'  AND owner_id = $3)`,
-      [character_id, corp_id ?? 0, alliance_id ?? 0],
+       WHERE (owner_kind = 'corp'     AND owner_id = $1)
+          OR (owner_kind = 'alliance' AND owner_id = $2)`,
+      [corp_id ?? 0, alliance_id ?? 0],
     ),
   ]);
 
@@ -72,7 +66,6 @@ standingsRouter.get('/me', async (req, res) => {
     characterId: character_id,
     corpId:      corp_id,
     allianceId:  alliance_id,
-    character:   toMap(charRows.rows),
     corp:        toMap(corpRows.rows),
     alliance:    toMap(allianceRows.rows),
     refreshedAt,
@@ -102,10 +95,9 @@ standingsRouter.post('/refresh', async (req, res) => {
   // Clear the throttle row(s) so refreshStandingsForUser doesn't skip.
   await db.query(
     `DELETE FROM standings_refresh
-     WHERE (owner_kind = 'character' AND owner_id = $1)
-        OR (owner_kind = 'corp'      AND owner_id = $2)
-        OR (owner_kind = 'alliance'  AND owner_id = $3)`,
-    [character_id, corp_id ?? 0, alliance_id ?? 0],
+     WHERE (owner_kind = 'corp'     AND owner_id = $1)
+        OR (owner_kind = 'alliance' AND owner_id = $2)`,
+    [corp_id ?? 0, alliance_id ?? 0],
   );
 
   let token: string;
@@ -131,8 +123,7 @@ standingsRouter.post('/refresh', async (req, res) => {
   }
 
   // Read back what was actually stored so the client can see the result.
-  const [charCnt, corpCnt, allianceCnt, refreshRows] = await Promise.all([
-    db.query<{ count: number }>(`SELECT COUNT(*)::int AS count FROM character_standings WHERE character_id = $1`, [character_id]),
+  const [corpCnt, allianceCnt, refreshRows] = await Promise.all([
     corp_id !== null
       ? db.query<{ count: number }>(`SELECT COUNT(*)::int AS count FROM corp_standings WHERE corp_id = $1`, [corp_id])
       : Promise.resolve({ rows: [{ count: 0 }] }),
@@ -141,10 +132,9 @@ standingsRouter.post('/refresh', async (req, res) => {
       : Promise.resolve({ rows: [{ count: 0 }] }),
     db.query<{ owner_kind: string; last_fetched_at: string }>(
       `SELECT owner_kind, last_fetched_at FROM standings_refresh
-       WHERE (owner_kind = 'character' AND owner_id = $1)
-          OR (owner_kind = 'corp'      AND owner_id = $2)
-          OR (owner_kind = 'alliance'  AND owner_id = $3)`,
-      [character_id, corp_id ?? 0, alliance_id ?? 0],
+       WHERE (owner_kind = 'corp'     AND owner_id = $1)
+          OR (owner_kind = 'alliance' AND owner_id = $2)`,
+      [corp_id ?? 0, alliance_id ?? 0],
     ),
   ]);
 
@@ -154,7 +144,6 @@ standingsRouter.post('/refresh', async (req, res) => {
   res.json({
     ok: true,
     counts: {
-      character: charCnt.rows[0]?.count ?? 0,
       corp:      corpCnt.rows[0]?.count ?? 0,
       alliance:  allianceCnt.rows[0]?.count ?? 0,
     },
@@ -163,9 +152,8 @@ standingsRouter.post('/refresh', async (req, res) => {
     // ESI call returned 403 (missing scope or role). Helps the client tell
     // "you have no contacts" from "your token doesn't carry the scope".
     succeeded: {
-      character: 'character' in refreshedAt,
-      corp:      'corp'      in refreshedAt,
-      alliance:  'alliance'  in refreshedAt,
+      corp:      'corp'     in refreshedAt,
+      alliance:  'alliance' in refreshedAt,
     },
   });
 });

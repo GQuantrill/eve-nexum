@@ -947,7 +947,7 @@
     "faction": "Faction",
     "personal": "Personal",
     "refreshStandings": "Refresh standings from ESI now (bypasses the 6h TTL)",
-    "standingsRefreshed": "Standings refreshed — {{personal}} personal · {{corp}} corp · {{alliance}} alliance contacts",
+    "standingsRefreshed": "Standings refreshed — {{corp}} corp · {{alliance}} alliance contacts",
     "noContactsRefreshed": "No contacts could be refreshed. Token may be missing the read_contacts scope — log out and back in.",
     "standingsNotLoaded": "Standings not loaded yet. If this stays here, log out and back in to grant the read_contacts scopes.",
     "standingNotInBucket": "{{label}}: you are not in one",

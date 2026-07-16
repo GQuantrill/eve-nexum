@@ -894,7 +894,7 @@
     "faction": "Faction",
     "personal": "Personnel",
     "refreshStandings": "Actualiser les standings depuis l'ESI maintenant (contourne le TTL de 6 h)",
-    "standingsRefreshed": "Standings actualisés — {{personal}} perso · {{corp}} corp · {{alliance}} contacts d'alliance",
+    "standingsRefreshed": "Standings actualisés — {{corp}} corp · {{alliance}} contacts d'alliance",
     "noContactsRefreshed": "Aucun contact n'a pu être actualisé. Le token n'a peut-être pas le scope read_contacts — déconnectez-vous et reconnectez-vous.",
     "standingsNotLoaded": "Standings pas encore chargés. Si cela persiste, déconnectez-vous et reconnectez-vous pour accorder les scopes read_contacts.",
     "standingNotInBucket": "{{label}} : vous n'êtes dans aucun",

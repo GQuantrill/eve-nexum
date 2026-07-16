@@ -894,7 +894,7 @@
     "faction": "팩션",
     "personal": "개인",
     "refreshStandings": "지금 ESI에서 스탠딩 새로 고침 (6시간 TTL 무시)",
-    "standingsRefreshed": "스탠딩 새로 고침됨 — 개인 {{personal}} · 군단 {{corp}} · 연합 연락처 {{alliance}}",
+    "standingsRefreshed": "스탠딩 새로 고침됨 — 군단 {{corp}} · 연합 연락처 {{alliance}}",
     "noContactsRefreshed": "연락처를 새로 고칠 수 없습니다. 토큰에 read_contacts 스코프가 없을 수 있습니다 — 로그아웃 후 다시 로그인하세요.",
     "standingsNotLoaded": "스탠딩이 아직 로드되지 않았습니다. 계속 이 상태라면, 로그아웃 후 다시 로그인하여 read_contacts 스코프를 부여하세요.",
     "standingNotInBucket": "{{label}}: 어느 쪽에도 속하지 않음",

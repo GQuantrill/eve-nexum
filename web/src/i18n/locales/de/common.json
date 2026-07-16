@@ -894,7 +894,7 @@
     "faction": "Fraktion",
     "personal": "Persönlich",
     "refreshStandings": "Standings jetzt von ESI aktualisieren (umgeht die 6h-TTL)",
-    "standingsRefreshed": "Standings aktualisiert — {{personal}} persönlich · {{corp}} Corp · {{alliance}} Allianz-Kontakte",
+    "standingsRefreshed": "Standings aktualisiert — {{corp}} Corp · {{alliance}} Allianz-Kontakte",
     "noContactsRefreshed": "Es konnten keine Kontakte aktualisiert werden. Dem Token fehlt möglicherweise der read_contacts-Scope — melde dich ab und wieder an.",
     "standingsNotLoaded": "Standings noch nicht geladen. Wenn dies bestehen bleibt, melde dich ab und wieder an, um die read_contacts-Scopes zu gewähren.",
     "standingNotInBucket": "{{label}}: du bist in keiner",

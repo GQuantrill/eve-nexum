@@ -894,7 +894,7 @@
     "faction": "ファクション",
     "personal": "個人",
     "refreshStandings": "今すぐ ESI からスタンディングを更新（6時間 TTL を回避）",
-    "standingsRefreshed": "スタンディングを更新しました — 個人 {{personal}} · コーポ {{corp}} · アライアンス連絡先 {{alliance}}",
+    "standingsRefreshed": "スタンディングを更新しました — コーポ {{corp}} · アライアンス連絡先 {{alliance}}",
     "noContactsRefreshed": "連絡先を更新できませんでした。トークンに read_contacts スコープがない可能性があります — ログアウトして再ログインしてください。",
     "standingsNotLoaded": "スタンディングがまだ読み込まれていません。これが続く場合は、ログアウトして再ログインし read_contacts スコープを付与してください。",
     "standingNotInBucket": "{{label}}: どれにも属していません",

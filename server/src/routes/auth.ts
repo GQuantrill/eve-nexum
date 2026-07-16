@@ -30,11 +30,13 @@ const SSO_SCOPES = [
   'esi-ui.write_waypoint.v1',
   'esi-characters.read_corporation_roles.v1',
   'esi-location.read_online.v1',
-  // Read player standings (contacts) so the UI can colour-tag structures /
-  // killboard / sov by your standing toward each entity. Corp / alliance reads
-  // only succeed for characters with the Contact Manager role; reads gracefully
-  // no-op otherwise.
-  'esi-characters.read_contacts.v1',
+  // Read CORP / ALLIANCE standings (contacts) so the UI can colour-tag
+  // structures / killboard / sov by the org's standing toward each entity, and
+  // so standings-based access can be gated on the deployment's own contacts. We
+  // deliberately do NOT request esi-characters.read_contacts.v1 — this is a
+  // corp/alliance tool; a single pilot's personal contacts must never drive
+  // org-wide standings. Corp / alliance reads only succeed for characters with
+  // the Contact Manager role; reads gracefully no-op otherwise.
   'esi-corporations.read_contacts.v1',
   'esi-alliances.read_contacts.v1',
   // Fleet member tracking — show fleet-mate locations on the map as purple

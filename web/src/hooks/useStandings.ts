@@ -5,10 +5,9 @@ import { useShareMode } from '../context/ShareModeContext';
 export type ContactKind = 'character' | 'corporation' | 'alliance' | 'faction';
 
 export interface StandingsLookup {
-  character: number | null;
   corp:      number | null;
   alliance:  number | null;
-  effective: number;   // most negative non-null across the three, 0 if none
+  effective: number;   // most negative non-null across the buckets, 0 if none
   isHostile:  boolean; // effective < -5 — red "terrible" band (-10 territory)
   isFriendly: boolean; // effective >  5 — dark-blue "excellent" band (+10 territory)
   isNeutral:  boolean; // not hostile and not friendly
@@ -18,7 +17,6 @@ interface StandingsResponse {
   characterId: number;
   corpId:      number | null;
   allianceId:  number | null;
-  character:   Record<string, number>;
   corp:        Record<string, number>;
   alliance:    Record<string, number>;
 }
@@ -55,8 +53,8 @@ async function load() {
 // refresh result so callers can show "X new contacts" or similar.
 async function refreshFromEsi(): Promise<{
   ok: boolean;
-  counts?:    { character: number; corp: number; alliance: number };
-  succeeded?: { character: boolean; corp: boolean; alliance: boolean };
+  counts?:    { corp: number; alliance: number };
+  succeeded?: { corp: boolean; alliance: boolean };
 } | null> {
   if (refreshing) return null;
   refreshing = true;
@@ -64,8 +62,8 @@ async function refreshFromEsi(): Promise<{
   try {
     const result = await api<{
       ok: boolean;
-      counts:    { character: number; corp: number; alliance: number };
-      succeeded: { character: boolean; corp: boolean; alliance: boolean };
+      counts:    { corp: number; alliance: number };
+      succeeded: { corp: boolean; alliance: boolean };
     }>('/api/standings/refresh', { method: 'POST' });
     // Force a re-pull of the GET endpoint so the cache reflects the
     // freshly-written DB rows.
@@ -82,7 +80,7 @@ async function refreshFromEsi(): Promise<{
 }
 
 const EMPTY: StandingsLookup = {
-  character: null, corp: null, alliance: null,
+  corp: null, alliance: null,
   effective: 0, isHostile: false, isFriendly: false, isNeutral: true,
 };
 
@@ -109,14 +107,13 @@ export function useStandings() {
   const getStanding = useCallback((kind: ContactKind, id: number): StandingsLookup => {
     if (!cache) return EMPTY;
     const key = `${kind}:${id}`;
-    const character = cache.character[key] ?? null;
     const corp      = cache.corp[key]      ?? null;
     const alliance  = cache.alliance[key]  ?? null;
 
-    const values = [character, corp, alliance].filter((v): v is number => v !== null);
+    const values = [corp, alliance].filter((v): v is number => v !== null);
     const effective = values.length ? Math.min(...values) : 0;
     return {
-      character, corp, alliance, effective,
+      corp, alliance, effective,
       isHostile:  effective < -5,
       isFriendly: effective >  5,
       isNeutral:  effective >= -5 && effective <= 5,

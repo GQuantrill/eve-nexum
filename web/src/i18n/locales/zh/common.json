@@ -894,7 +894,7 @@
     "faction": "势力",
     "personal": "个人",
     "refreshStandings": "立即从 ESI 刷新声望（绕过 6 小时 TTL）",
-    "standingsRefreshed": "声望已刷新 — {{personal}} 个人 · {{corp}} 军团 · {{alliance}} 联盟联系人",
+    "standingsRefreshed": "声望已刷新 — {{corp}} 军团 · {{alliance}} 联盟联系人",
     "noContactsRefreshed": "无法刷新任何联系人。令牌可能缺少 read_contacts 权限 — 请登出后重新登录。",
     "standingsNotLoaded": "声望尚未加载。如果一直如此，请登出后重新登录以授予 read_contacts 权限。",
     "standingNotInBucket": "{{label}}：你不属于任何一类",
