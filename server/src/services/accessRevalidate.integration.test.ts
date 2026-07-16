@@ -8,6 +8,13 @@ vi.mock('../config.js', async (importActual) => {
   return { config: new Proxy({}, { get: (_t, k: string) => (k in state.over ? state.over[k] : base[k]) }) };
 });
 
+// Mock ESI so the affiliation refresh is deterministic. `esi.rows` is the
+// /characters/affiliation/ payload; `esi.ok=false` simulates an ESI outage.
+const esi = vi.hoisted(() => ({ ok: true, status: 200, rows: [] as Array<{ character_id: number; corporation_id: number; alliance_id?: number }> }));
+vi.mock('../utils/esi.js', () => ({
+  esiFetch: vi.fn(async () => ({ ok: esi.ok, status: esi.status, json: async () => esi.rows } as unknown as Response)),
+}));
+
 import { ensureIntegrationDb, truncateAll, seedUser, seedSession, liveSessionCount } from '../test/integrationDb.js';
 import { db } from '../db.js';
 import { setSetting } from './appSettings.js';
@@ -22,6 +29,7 @@ describe.skipIf(!dbReady)('revalidateActiveSessions (integration — real SQL)',
   beforeEach(async () => {
     await truncateAll();
     state.over = { corpMode: true, allianceMode: false, corpIds: [1000], allianceIds: [2000], restrictedMode: true, adminCharId: 777 };
+    esi.ok = true; esi.status = 200; esi.rows = [];
   });
 
   it('keeps a still-permitted user, evicts one no longer permitted', async () => {
@@ -82,6 +90,63 @@ describe.skipIf(!dbReady)('revalidateActiveSessions (integration — real SQL)',
     expect(res.sessionsKilled).toBe(0);
     // The expired row is left untouched (the scan never reached this user).
     expect(await liveSessionCount(u)).toBe(1);
+  });
+
+  describe('affiliation refresh (refreshAffiliation: true)', () => {
+    it('evicts a pilot who left an admitted corp (fresh corp, not stored)', async () => {
+      await grantCorp(500);
+      const u = await seedUser({ characterId: 1, corpId: 500 }); // stored corp is admitted...
+      await seedSession(u);
+      esi.rows = [{ character_id: 1, corporation_id: 999 }]; // ...but ESI says they left to 999
+
+      const res = await revalidateActiveSessions({ refreshAffiliation: true });
+
+      expect(res.sessionsKilled).toBe(1);
+      expect(await liveSessionCount(u)).toBe(0);
+      // The stale corp_id is updated + a corp_change is audited.
+      const { rows } = await db.query<{ corp_id: number }>(`SELECT corp_id FROM users WHERE id = $1`, [u]);
+      expect(rows[0].corp_id).toBe(999);
+      const audit = await db.query(`SELECT 1 FROM admin_audit WHERE action='corp_change' AND target_user_id=$1`, [u]);
+      expect(audit.rows).toHaveLength(1);
+    });
+
+    it('keeps a pilot who moved INTO an admitted corp (stored corp was not admitted)', async () => {
+      await grantCorp(500);
+      const u = await seedUser({ characterId: 2, corpId: 999 }); // stored corp not admitted...
+      await seedSession(u);
+      esi.rows = [{ character_id: 2, corporation_id: 500 }]; // ...but now in the admitted corp
+
+      const res = await revalidateActiveSessions({ refreshAffiliation: true });
+
+      expect(res.sessionsKilled).toBe(0);
+      expect(await liveSessionCount(u)).toBe(1);
+      const { rows } = await db.query<{ corp_id: number }>(`SELECT corp_id FROM users WHERE id = $1`, [u]);
+      expect(rows[0].corp_id).toBe(500);
+    });
+
+    it('falls back to stored ids on an ESI outage (no mass eviction)', async () => {
+      await grantCorp(500);
+      const u = await seedUser({ characterId: 3, corpId: 500 }); // permitted by stored
+      await seedSession(u);
+      esi.ok = false; esi.status = 503; // ESI down
+
+      const res = await revalidateActiveSessions({ refreshAffiliation: true });
+
+      expect(res.sessionsKilled).toBe(0);
+      expect(await liveSessionCount(u)).toBe(1);
+    });
+
+    it('updates a changed alliance_id even when the corp is unchanged', async () => {
+      await grantCorp(500);
+      const u = await seedUser({ characterId: 4, corpId: 500, allianceId: null });
+      await seedSession(u);
+      esi.rows = [{ character_id: 4, corporation_id: 500, alliance_id: 3000 }];
+
+      await revalidateActiveSessions({ refreshAffiliation: true });
+
+      const { rows } = await db.query<{ alliance_id: number }>(`SELECT alliance_id FROM users WHERE id = $1`, [u]);
+      expect(rows[0].alliance_id).toBe(3000);
+    });
   });
 
   it('keeps a user admitted purely by the standings auto-admit', async () => {

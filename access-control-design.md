@@ -370,4 +370,10 @@ Fixed by Number()-coercing before the compare.
   (owner/account model), or strictly per-character? Recommend per-character.
 - Do we want a deployment-wide "share also grants login" default (auto) vs the
   per-share prompt? Recommend prompt, remember-per-session.
-- Re-validation cadence for stale corp membership.
+- ~~Re-validation cadence for stale corp membership.~~ RESOLVED (2026-07-16): the
+  periodic sweep (`revalidateActiveSessions({ refreshAffiliation: true })`, cadence
+  `ACCESS_REVALIDATE_MINUTES`) batch-refreshes each live user's corp/alliance from
+  ESI (`POST /characters/affiliation/`) before the gate check, so a pilot who left
+  an admitted corp is evicted without needing to re-login. Fail-safe: any ESI error
+  falls back to the stored ids (an outage never mass-evicts). Admin-triggered sweeps
+  leave `refreshAffiliation` off to stay fast.
