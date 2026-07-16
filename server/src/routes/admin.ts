@@ -13,7 +13,7 @@ import { invalidateSessionsForUser } from '../utils/sessionInvalidate.js';
 import { audit } from '../services/audit.js';
 import { resolveEntityNames } from '../services/entityNames.js';
 import {
-  isLoginPermitted, standingPermitsTarget, grantKindAllowedForInstall,
+  standingPermitsTarget, grantKindAllowedForInstall,
   requiresPositiveStanding, type GrantKind,
 } from '../services/accessGrants.js';
 import {
@@ -468,20 +468,13 @@ adminRouter.delete('/access-grants/:id', async (req, res) => {
   await db.query(`DELETE FROM access_grants WHERE id = $1`, [req.params.id]);
   await audit(req, null, g.kind === 'character' ? g.eve_id : null, 'access_grant_remove', `${g.kind}:${g.eve_id}`, null);
 
-  // Immediately log out anyone who was ONLY admitted by this grant. Find users
-  // matching the removed target, then re-check each against the remaining list.
-  const col = g.kind === 'character' ? 'character_id' : g.kind === 'corp' ? 'corp_id' : 'alliance_id';
-  const { rows: affected } = await db.query<{ id: number; character_id: number; corp_id: number | null; alliance_id: number | null }>(
-    `SELECT id, character_id, corp_id, alliance_id FROM users WHERE ${col} = $1`, [g.eve_id],
-  );
-  let killed = 0;
-  for (const u of affected) {
-    // Never lock out the configured bootstrap admin.
-    if (config.adminCharId !== null && u.character_id === config.adminCharId) continue;
-    const stillOk = await isLoginPermitted({ characterId: u.character_id, corpId: u.corp_id, allianceId: u.alliance_id });
-    if (!stillOk) killed += await invalidateSessionsForUser(u.id);
-  }
-  res.json({ ok: true, sessionsKilled: killed });
+  // Immediately log out anyone the gate no longer permits. Reuse the shared
+  // re-validation so the check matches the login gate exactly: it evaluates
+  // isLoginPermitted OR standingsPermitLogin, so a user still admitted via the
+  // standings auto-admit isn't spuriously logged out just because this explicit
+  // grant was removed. Never evicts ADMIN_CHAR_ID.
+  const { sessionsKilled } = await revalidateActiveSessions();
+  res.json({ ok: true, sessionsKilled });
 });
 
 // ── Standings auto-admit ("friends") settings — Phase 3 ──────────────────────

@@ -250,11 +250,13 @@ Notes / caveats specific to standings:
    So an admitted guest sees only its own personal/corp/alliance maps and maps
    explicitly shared to it - never the core's. (Still worth a live smoke test
    once a second real account is available; the SQL trace is the interim proof.)
-4. **Revocation invalidates access. [DONE]** Removing an explicit grant already
-   session-kills those it solely admitted (Phase 1). For the standings path
-   (which persists no grant), a narrowing admin change (disable / raise threshold)
-   now runs `revalidateActiveSessions()` immediately, evicting any live session
-   the current gate no longer permits. `ADMIN_CHAR_ID` is never evicted.
+4. **Revocation invalidates access. [DONE]** Every narrowing admin action now
+   runs the SAME `revalidateActiveSessions()` immediately: removing an access_grant
+   (corp/alliance/character) AND disabling / raising the standings threshold. It
+   evicts any live session the current gate no longer permits, evaluating
+   `isLoginPermitted OR standingsPermitLogin` (so removing an explicit grant does
+   not spuriously log out a user still admitted by the standings auto-admit).
+   `ADMIN_CHAR_ID` is never evicted.
 5. **Periodic re-validation. [DONE]** `startAccessRevalidation()` sweeps live
    sessions on a timer (`ACCESS_REVALIDATE_MINUTES`, default 60, restricted
    deployments only), re-evaluating each against the current gate + block flag.
