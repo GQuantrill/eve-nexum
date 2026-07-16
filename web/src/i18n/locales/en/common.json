@@ -60,6 +60,7 @@
   },
   "session": {
     "idleLogout": "Signed out due to inactivity.",
+    "ended": "Your session ended — please log in again.",
     "lockedTitle": "Paused",
     "lockedHint": "You were idle, so mapping was paused. Your login is still active.",
     "resumeAs": "Continue as {{name}}",

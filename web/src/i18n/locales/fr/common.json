@@ -22,6 +22,7 @@
   },
   "session": {
     "idleLogout": "Déconnecté pour inactivité.",
+    "ended": "Votre session a pris fin — veuillez vous reconnecter.",
     "lockedTitle": "En pause",
     "lockedHint": "Vous étiez inactif, la carte a donc été mise en pause. Votre connexion est toujours active.",
     "resumeAs": "Continuer en tant que {{name}}",

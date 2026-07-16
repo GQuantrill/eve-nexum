@@ -22,6 +22,7 @@
   },
   "session": {
     "idleLogout": "Sessão terminada por inatividade.",
+    "ended": "A sua sessão terminou — inicie sessão novamente.",
     "lockedTitle": "Em pausa",
     "lockedHint": "Você ficou inativo, então o mapa foi pausado. Seu login continua ativo.",
     "resumeAs": "Continuar como {{name}}",

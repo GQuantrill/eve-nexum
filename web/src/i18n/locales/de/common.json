@@ -22,6 +22,7 @@
   },
   "session": {
     "idleLogout": "Wegen Inaktivität abgemeldet.",
+    "ended": "Ihre Sitzung wurde beendet — bitte melden Sie sich erneut an.",
     "lockedTitle": "Pausiert",
     "lockedHint": "Du warst inaktiv, daher wurde die Karte pausiert. Deine Anmeldung ist noch aktiv.",
     "resumeAs": "Weiter als {{name}}",
