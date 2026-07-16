@@ -37,9 +37,15 @@ beforeEach(() => {
 });
 
 describe('grantKindAllowedForInstall', () => {
-  it('corp install: corp + character allowed, alliance NOT (alliance-install-only)', () => {
+  it('corp install: corp, character AND alliance all allowed', () => {
     expect(grantKindAllowedForInstall('corp')).toBe(true);
     expect(grantKindAllowedForInstall('character')).toBe(true);
+    expect(grantKindAllowedForInstall('alliance')).toBe(true); // corp can admit an alliance
+  });
+
+  it('solo (unrestricted) install: alliance kind not offered', () => {
+    mockConfig.corpMode = false;
+    mockConfig.allianceMode = false;
     expect(grantKindAllowedForInstall('alliance')).toBe(false);
   });
 
@@ -99,10 +105,15 @@ describe('standingPermitsTarget', () => {
     expect(params[1]).toBe('corporation');
   });
 
-  it('corp install: an alliance target is refused WITHOUT querying (alliance-install-only)', async () => {
+  it('corp install: an alliance target checks corp_standings on the alliance contact', async () => {
+    queryMock.mockResolvedValue(rows(true));
     const ok = await standingPermitsTarget('alliance', 1354830081);
-    expect(ok).toBe(false);
-    expect(queryMock).not.toHaveBeenCalled();
+    expect(ok).toBe(true);
+    const [sql, params] = queryMock.mock.calls[0] as [string, unknown[]];
+    expect(sql).toContain('corp_standings');
+    expect(sql).not.toContain('alliance_standings');
+    expect(params[1]).toBe('alliance');   // corp's contact toward the alliance
+    expect(params[2]).toBe(1354830081);
   });
 
   it('fail-closed: a non-positive / missing standing denies', async () => {
@@ -141,7 +152,7 @@ describe('standingsPermitLogin', () => {
     expect(params[4]).toBe(pilot.characterId);  // character match
   });
 
-  it('corp install: reads corp_standings only (alliance ignored), corp+char match', async () => {
+  it('corp install: reads corp_standings, matching corp, character AND alliance', async () => {
     mockSettings.enabled = true;
     mockSettings.threshold = 5;
     queryMock.mockResolvedValue({ rows: [{ ok: false }] });
@@ -153,6 +164,7 @@ describe('standingsPermitLogin', () => {
     expect(params[1]).toBe(5);
     expect(params[2]).toBe(pilot.corpId);
     expect(params[3]).toBe(pilot.characterId);
+    expect(params[4]).toBe(pilot.allianceId); // corp can admit the pilot's alliance
   });
 
   it('fail-closed: an empty result set denies', async () => {

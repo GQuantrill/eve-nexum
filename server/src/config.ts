@@ -135,6 +135,15 @@ export const config = {
   // last_known_system is refreshed from ESI on this cadence so positions stay
   // current without anyone being logged into Nexum.
   locationPollMinutes: Math.max(0, parseInt(process.env.LOCATION_POLL_MINUTES ?? '0', 10) || 0),
+  // Cadence (minutes) of the login-access re-validation sweep, which evicts live
+  // sessions the current gate no longer permits (standings toggled off/tightened,
+  // a standing drifting below threshold, or leaving an admitted corp). Restricted
+  // deployments only. Default 60; set to 0 to disable the periodic sweep (an
+  // admin settings change still sweeps immediately).
+  accessRevalidateMinutes: (() => {
+    const n = parseInt(process.env.ACCESS_REVALIDATE_MINUTES ?? '60', 10);
+    return Number.isFinite(n) && n >= 0 ? n : 60;
+  })(),
   // Cadence (minutes) of the lazy wormhole-removal sweep, which deletes aged-out
   // WH sigs (and quarantines the connections they backed) on maps that have
   // opted in. Default 15; set to 0 to disable the sweep globally.

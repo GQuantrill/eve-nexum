@@ -38,7 +38,9 @@ export function MapSharesSection() {
 
   // Picker state
   const { user } = useAuth();
-  const allowAlliance = !!user?.allianceMode;
+  // Alliance targets are offered in any restricted deployment (a corp install can
+  // share to / admit an alliance, gated on the corp's own standing toward it).
+  const allowAlliance = !!user?.corpMode || !!user?.allianceMode;
   const KINDS: PickerKind[] = allowAlliance ? ['character', 'corp', 'alliance'] : ['character', 'corp'];
   const [kind, setKind]   = useState<PickerKind>('character');
   const [query, setQuery] = useState('');

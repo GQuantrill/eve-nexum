@@ -28,12 +28,12 @@ export async function isLoginPermitted(p: {
 }
 
 // Positive-standing prerequisite (design 4.0). Does the DEPLOYMENT hold `eveId`
-// (of `kind`) at positive standing (> 0)? Install-type decides the source:
-//   - Alliance install: the deployment ALLIANCE's contacts only (alliance takes
-//     priority; corp standings are not consulted).
-//   - Corp install: the deployment CORP's contacts only; alliance standings are
-//     ignored entirely, so an alliance target can never qualify (alliance targets
-//     are alliance-install-only by design).
+// (of `kind`) at positive standing (> 0)? Install-type decides WHOSE contacts:
+//   - Alliance install: the deployment ALLIANCE's contacts (contact_kind matches
+//     the target: alliance / corporation / character).
+//   - Corp install: the deployment CORP's own contacts. A corp can hold a
+//     standing toward an alliance, so an alliance target is checked against the
+//     corp's alliance contact (not refused).
 // Signed comparison `standing > 0` — never magnitude/abs. Fail-closed: no
 // matching contact row (or contacts never synced) returns false.
 export async function standingPermitsTarget(kind: GrantKind, eveId: number): Promise<boolean> {
@@ -53,13 +53,13 @@ export async function standingPermitsTarget(kind: GrantKind, eveId: number): Pro
     return rows[0]?.ok ?? false;
   }
 
-  // Corp install: alliance-kind targets are not offered (return false); corp and
-  // character targets check the deployment corp's contacts.
+  // Corp install: the deployment corp's own contacts. A corp can hold a standing
+  // toward an alliance, so an alliance target is checked against the corp's
+  // alliance contact (gated on the corp's own standing) rather than refused.
   const contactKind =
     kind === 'corp'      ? 'corporation' :
-    kind === 'character' ? 'character' :
-                           null;
-  if (contactKind === null) return false;
+    kind === 'alliance'  ? 'alliance' :
+                           'character';
   const { rows } = await db.query<{ ok: boolean }>(
     `SELECT EXISTS (
        SELECT 1 FROM corp_standings
@@ -71,11 +71,13 @@ export async function standingPermitsTarget(kind: GrantKind, eveId: number): Pro
   return rows[0]?.ok ?? false;
 }
 
-// Alliance targets only make sense in an alliance installation (a corp install
-// works purely at corp/character granularity and ignores alliance standings).
-// Shared by the admin grant endpoint and the map-share flow.
+// Alliance targets are allowed in ANY restricted deployment. Even a corp install
+// can admit an alliance — gated on the corp's OWN standing toward that alliance
+// (a corp's contact list can hold alliance standings). Solo installs gate
+// nothing, so this is only consulted in restricted mode. Shared by the admin
+// grant endpoint and the map-share flow.
 export function grantKindAllowedForInstall(kind: GrantKind): boolean {
-  if (kind === 'alliance') return config.allianceMode;
+  if (kind === 'alliance') return config.corpMode || config.allianceMode;
   return true;
 }
 
@@ -85,8 +87,8 @@ export function grantKindAllowedForInstall(kind: GrantKind): boolean {
 // Install-type decides the source (per design):
 //   - Alliance install: the deployment ALLIANCE's contacts only; match the
 //     pilot's alliance, then corp, then character. Corp standings are ignored.
-//   - Corp install: the deployment CORP's contacts only; match the pilot's corp,
-//     then character. Alliance standings are ignored entirely.
+//   - Corp install: the deployment CORP's own contacts; match the pilot's corp,
+//     character, OR alliance (a corp can hold an alliance standing).
 // POSITIVE-ONLY: signed `standing >= threshold` (threshold is 5 or 10), never
 // magnitude/abs. Fail-closed: disabled, or no matching contact, returns false.
 export async function standingsPermitLogin(p: {
@@ -112,15 +114,19 @@ export async function standingsPermitLogin(p: {
     return rows[0]?.ok ?? false;
   }
 
+  // Corp install: the deployment corp's own contacts. Match the pilot's corp,
+  // character, OR alliance — a corp's contact list can hold an alliance standing,
+  // so a corp deployment can admit a whole friendly alliance.
   const { rows } = await db.query<{ ok: boolean }>(
     `SELECT EXISTS (
        SELECT 1 FROM corp_standings
         WHERE corp_id = ANY($1::bigint[])
           AND standing >= $2
           AND ( (contact_kind = 'corporation' AND contact_id = $3)
-             OR (contact_kind = 'character'   AND contact_id = $4) )
+             OR (contact_kind = 'character'   AND contact_id = $4)
+             OR ($5::int IS NOT NULL AND contact_kind = 'alliance' AND contact_id = $5) )
      ) AS ok`,
-    [config.corpIds, threshold, p.corpId, p.characterId],
+    [config.corpIds, threshold, p.corpId, p.characterId, p.allianceId],
   );
   return rows[0]?.ok ?? false;
 }

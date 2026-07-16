@@ -9076,6 +9076,35 @@ select.sig-toolbar-btn option {
   vertical-align: middle;
 }
 .admin-access__evewho:hover { color: #6ea0ff; }
+.admin-access__standings {
+  margin: 0 0 18px;
+  padding: 12px 14px;
+  background: #0d1524;
+  border: 1px solid #1e2740;
+  border-radius: 6px;
+  max-width: 720px;
+}
+.admin-access__toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: calc(14px * var(--font-scale, 1));
+  color: #c8d4f0;
+}
+.admin-access__threshold {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #1a2535;
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #c0ccde;
+}
+.admin-access__threshold label { display: flex; align-items: center; gap: 5px; cursor: pointer; }
+.admin-access__threshold-label { color: #8090a8; }
 .discord-admin__actions {
   display: flex;
   align-items: center;
