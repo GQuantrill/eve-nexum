@@ -329,6 +329,7 @@ Edit `.env` and fill in the required values:
 | `MAX_CORP_MAPS` | Optional | Max number of corp maps per corp. Default `5`. |
 | `MAX_ALLIANCE_MAPS` | Optional | Max number of alliance maps per alliance. Default `5`. |
 | `LAZY_WH_SWEEP_MINUTES` | Optional | Cadence (minutes) of the lazy wormhole-removal sweep, which removes aged-out WH sigs and quarantines the connections they backed on maps that have opted in. Default `15`. Set to `0` to disable the sweep entirely. |
+| `ACCESS_REVALIDATE_MINUTES` | Optional | Cadence (minutes) of the login-access re-validation sweep, which logs out any live session the access gate no longer permits — e.g. a pilot who dropped below the auto-admit standing or left an admitted corp. Restricted deployments only. Default `60`. Set to `0` to disable the periodic sweep (an admin settings change still evicts immediately). |
 | `DISCORD_WEBHOOK_URL` | Optional | Discord webhook(s) for corp-intel notifications (inbound K162, new connections). One URL fires for **every** corp map; for multi-corp deployments use `corpId=URL` pairs (comma-separated) to route each corp to its own channel — e.g. `98000001=https://discord.com/api/webhooks/…,98000002=https://discord.com/api/webhooks/…`. Personal maps never notify. Leave unset to disable. Which regions/maps actually notify is then filtered per corp in the admin **Discord** tab. See [Discord notifications](#discord-notifications). |
 
 #### EVE developer app scopes

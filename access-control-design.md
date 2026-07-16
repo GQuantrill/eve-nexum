@@ -250,15 +250,16 @@ Notes / caveats specific to standings:
    So an admitted guest sees only its own personal/corp/alliance maps and maps
    explicitly shared to it - never the core's. (Still worth a live smoke test
    once a second real account is available; the SQL trace is the interim proof.)
-4. **Revocation invalidates access.** Removing a grant should stop future logins
-   AND drop existing sessions for affected users. Options: (a) mark affected
-   `users` rows and check on each request, or (b) a session-version bump. At
-   minimum, a revoked user is blocked at the next request, not only at next
-   login. Decide and test.
-5. **Periodic re-validation.** Corp/alliance membership is captured at login and
-   stored on `users.corp_id/alliance_id`. People change corps in EVE. Extend the
-   existing `recheck-corp` path to also re-evaluate against `access_grants` /
-   standings, and/or re-check on a schedule.
+4. **Revocation invalidates access. [DONE]** Removing an explicit grant already
+   session-kills those it solely admitted (Phase 1). For the standings path
+   (which persists no grant), a narrowing admin change (disable / raise threshold)
+   now runs `revalidateActiveSessions()` immediately, evicting any live session
+   the current gate no longer permits. `ADMIN_CHAR_ID` is never evicted.
+5. **Periodic re-validation. [DONE]** `startAccessRevalidation()` sweeps live
+   sessions on a timer (`ACCESS_REVALIDATE_MINUTES`, default 60, restricted
+   deployments only), re-evaluating each against the current gate + block flag.
+   Catches standing drift (dropping below threshold) and leaving an admitted corp
+   without an admin action. Shares the same eviction as #4.
 6. **Audit.** Every grant add/remove goes to `admin_audit` (table exists), with
    actor + target + source.
 7. **Fail-closed everywhere.** ESI hiccup during the corp/alliance lookup already

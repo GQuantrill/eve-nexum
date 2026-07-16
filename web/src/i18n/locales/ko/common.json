@@ -132,7 +132,8 @@
       "standingsMinLevel": "최소 스탠딩:",
       "threshold10": "+10만 (탁월)",
       "threshold5": "+5 이상 (양호 이상)",
-      "settingsSaveFailed": "설정을 저장하지 못했습니다"
+      "settingsSaveFailed": "설정을 저장하지 못했습니다",
+      "standingsSessionsEnded": "활성 세션 {{count}}개를 종료했습니다 — 더 이상 허용되지 않습니다."
     },
     "loading": "불러오는 중…",
     "exportCsv": "CSV로 내보내기",

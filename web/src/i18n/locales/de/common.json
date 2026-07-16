@@ -132,7 +132,8 @@
       "standingsMinLevel": "Mindest-Standing:",
       "threshold10": "Nur +10 (Hervorragend)",
       "threshold5": "+5 und höher (Gut oder besser)",
-      "settingsSaveFailed": "Einstellung konnte nicht gespeichert werden"
+      "settingsSaveFailed": "Einstellung konnte nicht gespeichert werden",
+      "standingsSessionsEnded": "{{count}} aktive Sitzung(en) beendet — nicht mehr zugelassen."
     },
     "loading": "Lädt…",
     "exportCsv": "Als CSV exportieren",

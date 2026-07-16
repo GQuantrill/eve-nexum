@@ -132,7 +132,8 @@
       "standingsMinLevel": "最低声望：",
       "threshold10": "仅 +10（优秀）",
       "threshold5": "+5 及以上（良好或更高）",
-      "settingsSaveFailed": "保存设置失败"
+      "settingsSaveFailed": "保存设置失败",
+      "standingsSessionsEnded": "已结束 {{count}} 个活动会话 — 不再被允许。"
     },
     "loading": "加载中…",
     "exportCsv": "导出为 CSV",

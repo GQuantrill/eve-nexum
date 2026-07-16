@@ -181,7 +181,8 @@
       "standingsMinLevel": "Minimum standing:",
       "threshold10": "+10 only (Excellent)",
       "threshold5": "+5 and above (Good or better)",
-      "settingsSaveFailed": "Failed to save setting"
+      "settingsSaveFailed": "Failed to save setting",
+      "standingsSessionsEnded": "{{count}} active session(s) ended — no longer permitted."
     },
     "loading": "Loading…",
     "exportCsv": "Export as CSV",

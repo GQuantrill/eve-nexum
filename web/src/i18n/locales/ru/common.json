@@ -132,7 +132,8 @@
       "standingsMinLevel": "Минимальный стендинг:",
       "threshold10": "Только +10 (Отлично)",
       "threshold5": "+5 и выше (Хорошо или лучше)",
-      "settingsSaveFailed": "Не удалось сохранить настройку"
+      "settingsSaveFailed": "Не удалось сохранить настройку",
+      "standingsSessionsEnded": "Завершено активных сессий: {{count}} — доступ больше не разрешён."
     },
     "loading": "Загрузка…",
     "exportCsv": "Экспорт в CSV",

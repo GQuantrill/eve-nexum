@@ -35,6 +35,7 @@ import { seedAccessGrantsFromEnv } from './services/accessGrantsSeed.js';
 import { startSdeAutoUpdate } from './services/sdeUpdate.js';
 import { startLocationPoller } from './services/locationPoll.js';
 import { startWhSweeper } from './services/whSweep.js';
+import { startAccessRevalidation } from './services/accessRevalidate.js';
 import { startTelemetry } from './services/telemetry.js';
 import { telemetryRouter } from './routes/telemetry.js';
 import { adminRouter, adminReadRouter, reportsRouter } from './routes/admin.js';
@@ -183,6 +184,7 @@ migrate()
     startSdeAutoUpdate();
     startLocationPoller();
     startWhSweeper();
+    startAccessRevalidation();
     void startTelemetry();
   })
   .catch((err) => { console.error('Migration failed:', err); process.exit(1); });

@@ -20,6 +20,7 @@ import {
   getStandingsLoginSettings, setSetting,
   STANDINGS_LOGIN_ENABLED, STANDINGS_LOGIN_THRESHOLD,
 } from '../services/appSettings.js';
+import { revalidateActiveSessions } from '../services/accessRevalidate.js';
 
 const log = createLogger('admin');
 
@@ -503,8 +504,13 @@ adminRouter.patch('/access-settings', async (req, res) => {
     await setSetting(STANDINGS_LOGIN_THRESHOLD, String(threshold), req.session.userId ?? null);
   }
   await audit(req, null, null, 'access_settings_update', null, JSON.stringify({ enabled, threshold }));
+  // A settings change can NARROW who's admitted (disabling, or raising the
+  // threshold), so immediately evict any live session the new gate no longer
+  // permits — otherwise a de-authorised user lingers to the cookie TTL.
+  // Widening changes evict nobody, so it's safe to always run.
+  const { sessionsKilled } = await revalidateActiveSessions();
   const s = await getStandingsLoginSettings();
-  res.json({ standingsLoginEnabled: s.enabled, standingsLoginThreshold: s.threshold });
+  res.json({ standingsLoginEnabled: s.enabled, standingsLoginThreshold: s.threshold, sessionsKilled });
 });
 
 // GET /api/admin/maps — every corp map in the system with owner + stats.

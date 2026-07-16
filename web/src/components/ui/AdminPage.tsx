@@ -3,6 +3,7 @@ import { charPortrait } from '../../utils/eveImages';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { api, ApiError } from '../../api/client';
+import { toast } from './Toaster';
 import { useAuth, isAdminRole, isAllianceAdminRole, formatRole, ROLE_ORDER } from '../../context/AuthContext';
 import type { Role as AuthRole } from '../../context/AuthContext';
 import { useHashRoute } from '../../hooks/useHashRoute';
@@ -210,7 +211,10 @@ function AccessTab() {
     if (patch.enabled !== undefined) setStdEnabled(patch.enabled);
     if (patch.threshold !== undefined) setStdThreshold(patch.threshold);
     try {
-      await api('/api/admin/access-settings', { method: 'PATCH', body: JSON.stringify(patch) });
+      const r = await api<{ sessionsKilled?: number }>('/api/admin/access-settings', { method: 'PATCH', body: JSON.stringify(patch) });
+      if (r.sessionsKilled && r.sessionsKilled > 0) {
+        toast.info(t('admin.access.standingsSessionsEnded', { count: r.sessionsKilled }));
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : t('admin.access.settingsSaveFailed'));
       void load(); // reconcile with the server's real state

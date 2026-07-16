@@ -132,7 +132,8 @@
       "standingsMinLevel": "最小スタンディング:",
       "threshold10": "+10 のみ（優秀）",
       "threshold5": "+5 以上（良好以上）",
-      "settingsSaveFailed": "設定の保存に失敗しました"
+      "settingsSaveFailed": "設定の保存に失敗しました",
+      "standingsSessionsEnded": "アクティブなセッション {{count}} 件を終了しました（許可されなくなりました）。"
     },
     "loading": "読み込み中…",
     "exportCsv": "CSV としてエクスポート",
