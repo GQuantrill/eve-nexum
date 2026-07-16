@@ -32,9 +32,32 @@ jobs:
   server:
     name: server (typecheck + test)
     runs-on: ubuntu-latest
+    # Throwaway Postgres for the DB-integration suites (*.integration.test.ts).
+    # The DB name ends in _test, which the test harness requires before it will
+    # run (a guard against ever pointing TRUNCATE-heavy tests at a real DB).
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: nexum
+          POSTGRES_PASSWORD: nexum
+          POSTGRES_DB: eve_nexum_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U nexum -d eve_nexum_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     defaults:
       run:
         working-directory: server
+    env:
+      PG_HOST: localhost
+      PG_PORT: 5432
+      PG_DB: eve_nexum_test
+      PG_USER: nexum
+      PG_PASSWORD: nexum
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

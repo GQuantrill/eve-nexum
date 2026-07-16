@@ -309,14 +309,33 @@ it so operators are not misled:
 
 ## 7. Test plan (authz cannot rely on tsc/CodeQL)
 
-Harness: vitest is now set up server-side (`server` `yarn test`, wired into CI).
-First suite `src/services/accessGrants.test.ts` (13 tests, mocked config+db) covers
-the decision logic: install-type gating (grantKindAllowedForInstall), the
-positive-standing table/contact_kind selection (incl. corp-install alliance targets) +
-fail-closed (standingPermitsTarget), and admit/deny + param passthrough
-(isLoginPermitted). NEXT layer (not yet done): DB-integration tests that run the
-real SQL against a throwaway test database, plus admin endpoint tests (env-immutable
-refusal, revocation session-kill).
+Harness: vitest is set up server-side (`server` `yarn test`, wired into CI).
+
+Layer 1 — mocked unit tests (`*.test.ts`, mocked config+db): the decision logic —
+install-type gating (grantKindAllowedForInstall), positive-standing table/
+contact_kind selection incl. corp-install alliance targets + fail-closed
+(standingPermitsTarget), admit/deny + param passthrough (isLoginPermitted).
+
+Layer 2 — DB-integration tests (`*.integration.test.ts`, mocked config + REAL sql
+vs a throwaway `eve_nexum_test` database; DONE 2026-07-16). Harness in
+`src/test/integrationDb.ts` runs the real migrate() then seeds/truncates; suites
+skip (describe.skipIf) when no test DB is reachable and run in CI via a Postgres
+service. Coverage:
+  - accessGrants: isLoginPermitted (corp/alliance/character grant match, null-corp
+    no-match), standingPermitsTarget (corp + alliance install, positive-only,
+    corp-install alliance contact, fail-closed), standingsPermitLogin (toggle off,
+    thresholds 5/10, corp-admits-alliance, negative denied).
+  - revalidateActiveSessions: still-permitted kept / no-longer-permitted evicted,
+    all-sessions-of-a-user killed, bootstrap-admin exemption, blocked-user eviction,
+    solo no-op, expired sessions ignored, standings-auto-admit kept.
+  - admin endpoints (supertest + fake session): unauth 401, non-admin 403, positive
+    standing 201, standing-not-positive 403 (nothing written), character exempt,
+    env-immutable delete 400, revocation session-kill.
+
+This layer immediately caught a real bug: revalidateActiveSessions compared the
+BIGINT character_id (a STRING from node-pg) with the numeric adminCharId via ===,
+so the bootstrap-admin exemption never matched and the admin could be evicted.
+Fixed by Number()-coercing before the compare.
 
 
 - Seed: CORP_ID/ALLIANCE_ID reproduce as `source='env'` grants; re-running boot
@@ -351,4 +370,10 @@ refusal, revocation session-kill).
   (owner/account model), or strictly per-character? Recommend per-character.
 - Do we want a deployment-wide "share also grants login" default (auto) vs the
   per-share prompt? Recommend prompt, remember-per-session.
-- Re-validation cadence for stale corp membership.
+- ~~Re-validation cadence for stale corp membership.~~ RESOLVED (2026-07-16): the
+  periodic sweep (`revalidateActiveSessions({ refreshAffiliation: true })`, cadence
+  `ACCESS_REVALIDATE_MINUTES`) batch-refreshes each live user's corp/alliance from
+  ESI (`POST /characters/affiliation/`) before the gate check, so a pilot who left
+  an admitted corp is evicted without needing to re-login. Fail-safe: any ESI error
+  falls back to the stored ids (an outage never mass-evicts). Admin-triggered sweeps
+  leave `refreshAffiliation` off to stay fast.
