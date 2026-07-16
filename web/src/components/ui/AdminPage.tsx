@@ -332,21 +332,25 @@ function AccessTab() {
         )}
       </div>
 
-      <div className="admin-access__toolbar">
-        <button type="button" className="btn btn--ghost btn--sm" disabled={syncing} onClick={syncStandings}>
-          {syncing ? t('admin.access.syncing') : t('admin.access.syncStandings')}
-        </button>
-        <button type="button" className="btn btn--ghost btn--sm" onClick={() => setShowStandings(true)}>
-          {t('admin.access.viewStandings')}
-        </button>
-        <span className="admin-access__hint">{t('admin.access.syncHint')}</span>
+      <div className="admin-access__sync">
+        <div className="admin-access__toolbar">
+          <button type="button" className="btn btn--ghost btn--sm" disabled={syncing} onClick={syncStandings}>
+            {syncing ? t('admin.access.syncing') : t('admin.access.syncStandings')}
+          </button>
+          <button type="button" className="btn btn--ghost btn--sm" onClick={() => setShowStandings(true)}>
+            {t('admin.access.viewStandings')}
+          </button>
+          {syncResult && (
+            <span className={`admin-access__sync-status${syncResult.ok ? '' : ' admin-access__sync-status--err'}`}>
+              {syncResult.text}
+            </span>
+          )}
+        </div>
+        <p className="admin-access__hint">{t('admin.access.syncHint')}</p>
+        <p className="admin-access__hint">{t('admin.access.syncDelay')}</p>
       </div>
 
       {showStandings && <StandingsViewerModal onClose={() => setShowStandings(false)} />}
-      <div className="admin-access__hint admin-access__hint--delay">{t('admin.access.syncDelay')}</div>
-      {syncResult && (
-        <div className={syncResult.ok ? 'admin-access__result' : 'admin-page__error'}>{syncResult.text}</div>
-      )}
 
       <div className="admin-access__add">
         <select

@@ -9022,16 +9022,32 @@ select.sig-toolbar-btn option {
   border-left: 3px solid #2e5a9a;
   border-radius: 5px;
 }
+/* Sync / view standings action group: a clean button row, its inline result,
+   and the muted helper lines beneath — all grouped so they read as one unit. */
+.admin-access__sync { margin-bottom: 6px; }
 .admin-access__toolbar {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   flex-wrap: wrap;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
+.admin-access__sync-status {
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #6fbf8f;
+  margin-left: 4px;
+}
+.admin-access__sync-status--err { color: #e06a6a; }
 .admin-access__hint {
   font-size: calc(12px * var(--font-scale, 1));
   color: #8090a8;
+}
+/* Helper lines beneath the buttons sit tight together as a block. */
+.admin-access__sync .admin-access__hint {
+  display: block;
+  margin: 2px 0 0;
+  max-width: 720px;
+  line-height: 1.5;
 }
 .admin-access__hint--delay { display: block; margin: 3px 0 0; max-width: 720px; line-height: 1.5; }
 .admin-access__result {
