@@ -12,6 +12,7 @@ import { useWormholeTypes } from '../../hooks/useWormholeTypes';
 import { cssVarToHex } from '../../utils/cssVar';
 import { timeAgo, europeanDate, DASH } from '../../i18n/format';
 import { ConfirmModal } from './ConfirmModal';
+import { StandingsViewerModal } from './StandingsViewerModal';
 import {
   Chart as ChartJS,
   ArcElement, CategoryScale, LinearScale,
@@ -204,6 +205,7 @@ function AccessTab() {
 
   const [syncing, setSyncing]       = useState(false);
   const [syncResult, setSyncResult] = useState<{ ok: boolean; text: string } | null>(null);
+  const [showStandings, setShowStandings] = useState(false);
 
   // Standings auto-admit ("friends") settings — off by default.
   const [stdEnabled, setStdEnabled]     = useState(false);
@@ -334,8 +336,13 @@ function AccessTab() {
         <button type="button" className="btn btn--ghost btn--sm" disabled={syncing} onClick={syncStandings}>
           {syncing ? t('admin.access.syncing') : t('admin.access.syncStandings')}
         </button>
+        <button type="button" className="btn btn--ghost btn--sm" onClick={() => setShowStandings(true)}>
+          {t('admin.access.viewStandings')}
+        </button>
         <span className="admin-access__hint">{t('admin.access.syncHint')}</span>
       </div>
+
+      {showStandings && <StandingsViewerModal onClose={() => setShowStandings(false)} />}
       <div className="admin-access__hint admin-access__hint--delay">{t('admin.access.syncDelay')}</div>
       {syncResult && (
         <div className={syncResult.ok ? 'admin-access__result' : 'admin-page__error'}>{syncResult.text}</div>

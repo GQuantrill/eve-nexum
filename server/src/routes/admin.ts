@@ -417,6 +417,43 @@ adminRouter.get('/access-grants', async (_req, res) => {
   })));
 });
 
+// GET /api/admin/standings-view — the deployment's OWN contact list (the corp's
+// contacts in a corp install, the alliance's in an alliance install), limited to
+// corporation + alliance contacts and resolved to name + ticker + standing. Feeds
+// the access-page standings viewer. Read-only; access control itself only ever
+// reads these same corp/alliance buckets. See access-control-design.md.
+adminRouter.get('/standings-view', async (_req, res) => {
+  interface Contact { contactKind: 'corporation' | 'alliance'; id: number; name: string; ticker: string | null; standing: number }
+
+  async function loadContacts(table: 'corp_standings' | 'alliance_standings', ownerCol: 'corp_id' | 'alliance_id', ownerIds: number[]): Promise<Contact[]> {
+    if (ownerIds.length === 0) return [];
+    // MAX(standing): with multiple deployment owner ids the gate admits on the
+    // best standing toward a contact, so surface that same effective value.
+    const { rows } = await db.query<{ contact_kind: 'corporation' | 'alliance'; contact_id: string; standing: number }>(
+      `SELECT contact_kind, contact_id, MAX(standing)::real AS standing
+         FROM ${table}
+        WHERE ${ownerCol} = ANY($1::bigint[])
+          AND contact_kind IN ('corporation', 'alliance')
+        GROUP BY contact_kind, contact_id`,
+      [ownerIds],
+    );
+    const corpIds = rows.filter((r) => r.contact_kind === 'corporation').map((r) => Number(r.contact_id));
+    const allyIds = rows.filter((r) => r.contact_kind === 'alliance').map((r) => Number(r.contact_id));
+    const [corps, alliances] = await Promise.all([resolveCorps(corpIds), resolveAlliances(allyIds)]);
+    return rows.map((r) => {
+      const id   = Number(r.contact_id);
+      const info = r.contact_kind === 'corporation' ? corps.get(id) : alliances.get(id);
+      return { contactKind: r.contact_kind, id, name: info?.name ?? String(id), ticker: info?.ticker ?? null, standing: r.standing };
+    });
+  }
+
+  const [corp, alliance] = await Promise.all([
+    config.corpMode     ? loadContacts('corp_standings',     'corp_id',     config.corpIds)     : Promise.resolve(null),
+    config.allianceMode ? loadContacts('alliance_standings', 'alliance_id', config.allianceIds) : Promise.resolve(null),
+  ]);
+  res.json({ corp, alliance });
+});
+
 // POST /api/admin/access-grants — add a corp/alliance/character to the allow-list.
 adminRouter.post('/access-grants', async (req, res) => {
   const kind = req.body?.kind as GrantKind;
