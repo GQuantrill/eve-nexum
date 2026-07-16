@@ -42,12 +42,29 @@ async function getInstanceId(): Promise<string> {
   return settled.rows[0]?.value ?? randomUUID();
 }
 
+// Aggregate scale counts for the ping: how many maps and users this install has.
+// Counts only — no ids, names, or any identifying detail. Failure is non-fatal;
+// we just omit the count (null) rather than skip the whole ping.
+async function collectCounts(): Promise<{ mapCount: number | null; userCount: number | null }> {
+  try {
+    const [maps, users] = await Promise.all([
+      db.query<{ n: string }>(`SELECT COUNT(*)::int AS n FROM maps`),
+      db.query<{ n: string }>(`SELECT COUNT(*)::int AS n FROM users`),
+    ]);
+    return { mapCount: Number(maps.rows[0]?.n ?? 0), userCount: Number(users.rows[0]?.n ?? 0) };
+  } catch (err) {
+    log.warn('count collection failed:', err instanceof Error ? err.message : String(err));
+    return { mapCount: null, userCount: null };
+  }
+}
+
 async function sendPing(instanceId: string): Promise<void> {
   try {
+    const { mapCount, userCount } = await collectCounts();
     const res = await fetch(config.telemetry.url, {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ version: appVersion(), instanceId }),
+      body:    JSON.stringify({ version: appVersion(), instanceId, mapCount, userCount }),
       signal:  AbortSignal.timeout(10_000),
     });
     // Log the OUTCOME, not just failures — otherwise "enabled" in the log looks
@@ -63,9 +80,10 @@ async function sendPing(instanceId: string): Promise<void> {
 }
 
 /**
- * Opt-in anonymous deployment ping (NEXUM_TELEMETRY). Sends only the app
- * version + a random per-instance id, now and once a day after. No-op unless
- * the operator opted in. Wrapped so a failure here never affects boot.
+ * Opt-in anonymous deployment ping (NEXUM_TELEMETRY). Sends the app version, a
+ * random per-instance id, and two aggregate counts (# maps, # users) — now and
+ * once a day after. No identifying data. No-op unless the operator opted in.
+ * Wrapped so a failure here never affects boot.
  */
 export async function startTelemetry(): Promise<void> {
   if (!config.telemetry.enabled) return;
