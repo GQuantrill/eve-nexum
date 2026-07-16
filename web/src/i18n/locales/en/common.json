@@ -764,7 +764,16 @@
     "alsoGrantLogin": "Also let them log in",
     "sharedWithLogin": "Shared with {{name}} — they can now log in too",
     "errStanding": "Refused: your deployment doesn't hold this entity at positive standing (contacts must be synced and standing above 0).",
-    "errAllianceUnsupported": "Alliance sharing is only available on an alliance installation."
+    "errAllianceUnsupported": "Alliance sharing is only available on an alliance installation.",
+    "addToList": "Add to list",
+    "staged": "To share ({{count}})",
+    "removeStaged": "Remove",
+    "alreadyStaged": "{{name}} is already in the list",
+    "sharingMany": "Sharing…",
+    "shareCount": "Share with {{count}}",
+    "batchShared": "Shared the map with {{count}}.",
+    "batchPartial": "Shared with {{shared}}; {{skipped}} skipped.",
+    "batchNone": "Couldn't share — {{count}} skipped."
   },
   "panes": {
     "noEveSystem": "No EVE system linked",

@@ -707,7 +707,16 @@
     "alsoGrantLogin": "Permitir também que iniciem sessão",
     "sharedWithLogin": "Partilhado com {{name}} — agora também podem iniciar sessão",
     "errStanding": "Recusado: a sua instalação não tem standing positivo com esta entidade (os contactos têm de estar sincronizados e o standing acima de 0).",
-    "errAllianceUnsupported": "A partilha de aliança só está disponível numa instalação de aliança."
+    "errAllianceUnsupported": "A partilha de aliança só está disponível numa instalação de aliança.",
+    "addToList": "Adicionar à lista",
+    "staged": "Para partilhar ({{count}})",
+    "removeStaged": "Remover",
+    "alreadyStaged": "{{name}} já está na lista",
+    "sharingMany": "A partilhar…",
+    "shareCount": "Partilhar com {{count}}",
+    "batchShared": "Mapa partilhado com {{count}}.",
+    "batchPartial": "Partilhado com {{shared}}; {{skipped}} ignorado(s).",
+    "batchNone": "Não foi possível partilhar — {{count}} ignorado(s)."
   },
   "panes": {
     "noEveSystem": "Nenhum sistema de EVE associado",

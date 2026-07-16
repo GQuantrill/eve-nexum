@@ -707,7 +707,16 @@
     "alsoGrantLogin": "로그인도 허용",
     "sharedWithLogin": "{{name}}와(과) 공유함 — 이제 로그인도 할 수 있습니다",
     "errStanding": "거부됨: 배포가 이 대상에 대해 긍정적 스탠딩이 없습니다(연락처가 동기화되고 스탠딩이 0보다 커야 합니다).",
-    "errAllianceUnsupported": "얼라이언스 공유는 얼라이언스 설치에서만 사용할 수 있습니다."
+    "errAllianceUnsupported": "얼라이언스 공유는 얼라이언스 설치에서만 사용할 수 있습니다.",
+    "addToList": "목록에 추가",
+    "staged": "공유 예정 ({{count}})",
+    "removeStaged": "제거",
+    "alreadyStaged": "{{name}} 은(는) 이미 목록에 있습니다",
+    "sharingMany": "공유 중…",
+    "shareCount": "{{count}}명과 공유",
+    "batchShared": "맵을 {{count}}명과 공유했습니다.",
+    "batchPartial": "{{shared}}명과 공유, {{skipped}}명 건너뜀.",
+    "batchNone": "공유하지 못했습니다 — {{count}}명 건너뜀."
   },
   "panes": {
     "noEveSystem": "연결된 EVE 성계 없음",

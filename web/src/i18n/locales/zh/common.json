@@ -707,7 +707,16 @@
     "alsoGrantLogin": "同时允许登录",
     "sharedWithLogin": "已与 {{name}} 共享 — 他们现在也可以登录了",
     "errStanding": "已拒绝：你的部署对该实体没有正声望（联系人必须已同步且声望大于 0）。",
-    "errAllianceUnsupported": "联盟共享仅在联盟安装中可用。"
+    "errAllianceUnsupported": "联盟共享仅在联盟安装中可用。",
+    "addToList": "添加到列表",
+    "staged": "待共享 ({{count}})",
+    "removeStaged": "移除",
+    "alreadyStaged": "{{name}} 已在列表中",
+    "sharingMany": "正在共享…",
+    "shareCount": "与 {{count}} 个共享",
+    "batchShared": "已将地图共享给 {{count}} 个。",
+    "batchPartial": "已共享 {{shared}} 个；跳过 {{skipped}} 个。",
+    "batchNone": "无法共享 — 跳过 {{count}} 个。"
   },
   "panes": {
     "noEveSystem": "未关联 EVE 星系",

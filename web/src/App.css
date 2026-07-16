@@ -1830,6 +1830,38 @@
 .map-shares__match--hint { color: #6a7898; }
 .map-shares__match--ok   { color: #4ade80; }
 .map-shares__match--miss { color: #f0a030; }
+
+/* Search input + "add to list" button on one row (share-to-many staging). */
+.map-shares__search-row { display: flex; gap: 6px; align-items: stretch; }
+.map-shares__search-row .map-shares__input { flex: 1 1 auto; width: auto; }
+.map-shares__add-btn {
+  flex: 0 0 auto;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 30px;
+  background: #16233c; border: 1px solid #2e5a9a; border-radius: 4px;
+  color: #7ab4f0; cursor: pointer;
+}
+.map-shares__add-btn:hover:not(:disabled) { background: #1a3a6a; }
+.map-shares__add-btn:disabled { opacity: 0.4; cursor: default; border-color: #1e2740; color: #4a5670; }
+
+/* Staged targets queued for the batch share. */
+.map-shares__staged { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.map-shares__staged-head { width: 100%; font-size: calc(11px * var(--font-scale, 1)); color: #8090a8; }
+.map-shares__chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 2px 4px 2px 3px;
+  background: #0f1626; border: 1px solid #263352; border-radius: 12px;
+  font-size: calc(11px * var(--font-scale, 1)); color: #c8d4f0;
+  max-width: 100%;
+}
+.map-shares__chip--error { border-color: #7a3030; background: #1a1012; }
+.map-shares__chip-avatar { width: 16px; height: 16px; border-radius: 50%; flex-shrink: 0; object-fit: cover; }
+.map-shares__chip-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 140px; }
+.map-shares__chip-remove {
+  display: inline-flex; align-items: center; justify-content: center;
+  background: none; border: none; color: #7a8aa8; cursor: pointer; padding: 0;
+}
+.map-shares__chip-remove:hover { color: #e06a6a; }
 .map-shares__grant-login {
   display: flex;
   align-items: center;
