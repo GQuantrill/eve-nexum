@@ -655,6 +655,8 @@
     "matchByAria": "匹配方式",
     "matchSystem": "星系",
     "matchWhType": "虫洞类型",
+    "matchSystemType": "系统类型",
+    "matchLeadsTo": "通往",
     "quickAdd": "快速添加",
     "whPlaceholder": "虫洞类型，例如 C247",
     "queryPlaceholder": "星系名称 / J-code",

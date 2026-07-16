@@ -350,6 +350,12 @@ interface MapStore {
   setWhSigsBulk: (next: Record<string, WhSig[]>) => void;
   setSystemWhSigs: (systemId: string, sigs: WhSig[]) => void;
 
+  // Derived index: the destination classes each system's wormholes lead to —
+  // from its statics, scanned wormhole sigs, and live connections. Rebuilt by
+  // useLeadsToIndex; powers the watchlist "leads to" match.
+  leadsToClassesBySystem: Record<string, SystemClass[]>;
+  setLeadsToClasses: (next: Record<string, SystemClass[]>) => void;
+
   // Derived index: undived (scanned-but-not-dived) wormholes per system. Rebuilt
   // from whSigsBySystem + connections by useUndivedWormholeIndex. Powers the
   // under-node pills and the content filter's "undived wormhole" state.
@@ -580,6 +586,8 @@ export const useMapStore = create<MapStore>()((set, get) => {
     setSystemWhSigs: (systemId, sigs) => set((s) => ({
       whSigsBySystem: { ...s.whSigsBySystem, [systemId]: sigs },
     })),
+    leadsToClassesBySystem: {},
+    setLeadsToClasses: (next) => set({ leadsToClassesBySystem: next }),
     undivedWhBySystem: {},
     setUndivedWhBulk: (next) => set({ undivedWhBySystem: next }),
     contentFilter: { sigTypes: [], anomTypes: [], nameQuery: '', undivedWh: false },

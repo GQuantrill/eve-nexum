@@ -17,6 +17,7 @@ function isValidMatch(m: unknown): m is WatchMatch {
     case 'system':   return typeof (m as { query?: unknown }).query === 'string';
     case 'whType':   return typeof (m as { code?: unknown }).code === 'string';
     case 'class':    return typeof (m as { cls?: unknown }).cls === 'string';
+    case 'leadsTo':  return typeof (m as { cls?: unknown }).cls === 'string';
     case 'effect':   return typeof (m as { effect?: unknown }).effect === 'string';
     case 'frigHole': return true;
     default:         return false;

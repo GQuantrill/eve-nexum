@@ -1,4 +1,4 @@
-import type { WatchEntry, WatchMatch, MapSystem, MapConnection } from '../types';
+import type { WatchEntry, WatchMatch, MapSystem, MapConnection, SystemClass } from '../types';
 
 // Frigate-only wormhole type codes (the "frigate" group in wormholes.ts). A
 // system whose static is one of these — or a connection of one of these types,
@@ -16,6 +16,7 @@ export function matchKey(m: WatchMatch): string {
     case 'system':   return `system:${norm(m.query)}`;
     case 'whType':   return `whType:${m.code.trim().toUpperCase()}`;
     case 'class':    return `class:${m.cls}`;
+    case 'leadsTo':  return `leadsTo:${m.cls}`;
     case 'effect':   return `effect:${m.effect}`;
     case 'frigHole': return 'frigHole';
   }
@@ -23,8 +24,11 @@ export function matchKey(m: WatchMatch): string {
 
 /** Does a system satisfy an entry? whType / frigHole match the system's statics
  *  AND its scanned wormhole-sig types (passed in from the map-wide index), so a
- *  freshly-scanned sig counts even before it's resolved into a connection. */
-export function systemMatchesEntry(e: WatchEntry, sys: MapSystem, sigTypes?: string[]): boolean {
+ *  freshly-scanned sig counts even before it's resolved into a connection. The
+ *  leadsTo match reads `destClasses` — the pre-resolved set of classes this
+ *  system's wormholes (statics, scanned sigs and live connections) lead to,
+ *  built once per map change by useLeadsToIndex. */
+export function systemMatchesEntry(e: WatchEntry, sys: MapSystem, sigTypes?: string[], destClasses?: SystemClass[]): boolean {
   const m = e.match;
   switch (m.by) {
     case 'system':   return m.query.trim() !== '' && norm(sys.name) === norm(m.query);
@@ -35,14 +39,16 @@ export function systemMatchesEntry(e: WatchEntry, sys: MapSystem, sigTypes?: str
         || (sigTypes?.some((s) => s.toUpperCase() === code) ?? false);
     }
     case 'class':    return sys.systemClass === m.cls;
+    case 'leadsTo':  return (destClasses ?? []).includes(m.cls);
     case 'effect':   return sys.effect === m.effect;
     case 'frigHole': return sys.statics.some((s) => FRIG_WH_TYPES.has(s.toUpperCase()))
         || (sigTypes?.some((s) => FRIG_WH_TYPES.has(s.toUpperCase())) ?? false);
   }
 }
 
-/** Does a connection satisfy an entry? Only the wormhole-flavoured matches
- *  apply to an edge; system/class/effect are node concepts. */
+/** Does a connection satisfy an entry? Only the wormhole-flavoured matches apply
+ *  to an edge; system/class/effect/leadsTo are node concepts (leadsTo is resolved
+ *  per system by useLeadsToIndex, which already accounts for connections). */
 export function connectionMatchesEntry(e: WatchEntry, conn: MapConnection): boolean {
   const m = e.match;
   switch (m.by) {
@@ -53,8 +59,8 @@ export function connectionMatchesEntry(e: WatchEntry, conn: MapConnection): bool
 }
 
 /** First entry (list order) that matches this system, or null. */
-export function matchSystem(entries: WatchEntry[], sys: MapSystem, sigTypes?: string[]): WatchEntry | null {
-  for (const e of entries) if (systemMatchesEntry(e, sys, sigTypes)) return e;
+export function matchSystem(entries: WatchEntry[], sys: MapSystem, sigTypes?: string[], destClasses?: SystemClass[]): WatchEntry | null {
+  for (const e of entries) if (systemMatchesEntry(e, sys, sigTypes, destClasses)) return e;
   return null;
 }
 

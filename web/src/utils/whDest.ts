@@ -45,6 +45,23 @@ export function isUnresolvedLeadsTo(value: string | null | undefined): boolean {
   return UNRESOLVED_LEADS_TO.has((value ?? '').trim().toUpperCase());
 }
 
+// A leads-to band expands to the exact classes it covers, so a hole recorded as
+// "C1-C3" counts toward a watch on any of C1/C2/C3.
+const BAND_TO_CLASSES: Record<string, SystemClass[]> = {
+  'C1-C3': ['C1', 'C2', 'C3'],
+  'C4-C5': ['C4', 'C5'],
+};
+
+/** The concrete classes a leads-to TOKEN represents — an exact class ("HS", "C2")
+ *  or a band ("C1-C3"); [] for a pinned system name / unknown / "". */
+export function leadsToClasses(token: string | null | undefined): SystemClass[] {
+  const up = (token ?? '').trim().toUpperCase();
+  if (!up) return [];
+  if (BAND_TO_CLASSES[up]) return BAND_TO_CLASSES[up];
+  const cls = DEST_TO_CLASS[up.toLowerCase()];
+  return cls ? [cls] : [];
+}
+
 // J-space "band" leads-to values (an unscanned hole reports a band, not an exact
 // class) with display label + colour. Single source — the LeadsToDropdown picker
 // builds its band options from this map, and holeDisplay resolves stored band
