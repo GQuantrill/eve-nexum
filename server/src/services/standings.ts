@@ -102,19 +102,28 @@ async function replaceStandings(
 // alliance contacts in parallel; gracefully no-ops the corp/alliance reads
 // when the character lacks the Contact Manager role. Never throws — every
 // failure is logged so a transient ESI hiccup doesn't break login.
+//
+// scope: 'all' (default) refreshes all three buckets — used on login and by the
+// system-info "refresh standings" button that powers the map tint. scope: 'org'
+// refreshes ONLY corp + alliance and never touches personal contacts — used by
+// the access-page sync, since access control only ever reads corp/alliance
+// standings (so it must not request the personal endpoint at all).
 export async function refreshStandingsForUser(params: {
   userId:      number;
   characterId: number;
   corpId:      number | null;
   allianceId:  number | null;
   accessToken: string;
+  scope?:      'all' | 'org';
 }): Promise<void> {
   const { userId, characterId, corpId, allianceId, accessToken } = params;
+  const scope = params.scope ?? 'all';
 
   const tasks: Promise<void>[] = [];
 
-  // Personal — always available with the read_contacts scope.
-  if (await shouldRefresh('character', characterId)) {
+  // Personal — for the map tint only (never access control). Skipped for
+  // org-scoped syncs.
+  if (scope !== 'org' && await shouldRefresh('character', characterId)) {
     tasks.push((async () => {
       const r = await fetchAllContacts(
         `https://esi.evetech.net/v2/characters/${characterId}/contacts/`,

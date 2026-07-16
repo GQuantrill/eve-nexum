@@ -229,8 +229,12 @@ function AccessTab() {
   const syncStandings = async () => {
     setSyncing(true); setSyncResult(null);
     try {
+      // scope:'org' — access control only ever uses corp/alliance standings, so
+      // the access-page sync pulls ONLY the corp + alliance contact lists. It
+      // deliberately does not touch personal contacts (that's the map's tint,
+      // refreshed from the system-info panel instead).
       const r = await api<{ counts: Record<string, number>; succeeded: Record<string, boolean> }>(
-        '/api/standings/refresh', { method: 'POST' },
+        '/api/standings/refresh', { method: 'POST', body: JSON.stringify({ scope: 'org' }) },
       );
       // Report on the bucket the gate actually reads: alliance_standings on an
       // alliance install, else the corp's OWN contacts (which include any
