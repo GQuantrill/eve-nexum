@@ -8,7 +8,7 @@ import {
 } from "../../hooks/useNotificationPermission";
 import { expiresIn } from "../../i18n/format";
 import { useMapStore } from "../../store/mapStore";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth, isAdminRole, type Role } from "../../context/AuthContext";
 import { api } from "../../api/client";
 import { toast } from "./Toaster";
 import { useProximityThreshold } from "../../hooks/useProximityAlerts";
@@ -162,12 +162,12 @@ type SectionId =
 // they're a recipient — not the owner — and must not see the share-link
 // controls.
 function canShareThisMap(
-  user: { role?: string } | null | undefined,
+  user: { role?: Role } | null | undefined,
   isCorpMap: boolean,
   isMapOwner: boolean,
 ): boolean {
   if (!user) return false;
-  if (isCorpMap) return user.role === "admin";
+  if (isCorpMap) return isAdminRole(user.role ?? 'readonly');
   return isMapOwner;
 }
 
@@ -557,7 +557,7 @@ function MergeSection() {
   const { user } = useAuth();
   const role = user?.role ?? "readonly";
   const isCorpMap = !!map.isCorpMap;
-  const canToggleSource = isCorpMap && (role === "full" || role === "admin");
+  const canToggleSource = isCorpMap && (role === "full" || isAdminRole(role));
 
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);

@@ -31,28 +31,34 @@ async function insertBatch(
 }
 
 /**
- * Duplicate `sourceMapId` into a brand-new personal map owned by `ownerId` /
- * created by `userId`. Systems + connections (with per-system intel/labels/
- * status/home) are always copied; `include` gates system notes, signatures,
- * structures and anomalies. Everything runs in one transaction; the new map id
- * is returned. Copied signatures are flagged `from_merge` so they don't count
- * as fresh scanning activity.
+ * Duplicate `sourceMapId` into a brand-new map owned by `ownerId` / created by
+ * `userId`. The copy's scope is set by `corpId` / `allianceId` (both null → a
+ * personal map); the caller (the copy route) is responsible for the role,
+ * affiliation and quota checks that scope requires. Systems + connections (with
+ * per-system intel/labels/status/home) are always copied; `include` gates system
+ * notes, signatures, structures and anomalies. Everything runs in one
+ * transaction; the new map id is returned. Copied signatures are flagged
+ * `from_merge` so they don't count as fresh scanning activity.
  */
 export async function copyMap(params: {
   sourceMapId: string;
   name: string;
   ownerId: number | null;
   userId: number;
+  corpId?: number | null;
+  allianceId?: number | null;
   include: CopyInclude;
 }): Promise<string> {
   const { sourceMapId, name, ownerId, userId, include } = params;
+  const corpId     = params.corpId ?? null;
+  const allianceId = params.allianceId ?? null;
   const client = await db.connect();
   try {
     await client.query('BEGIN');
 
     const { rows: mapRows } = await client.query<{ id: string }>(
-      `INSERT INTO maps (user_id, owner_id, name, corp_id) VALUES ($1, $2, $3, NULL) RETURNING id`,
-      [userId, ownerId, name],
+      `INSERT INTO maps (user_id, owner_id, name, corp_id, alliance_id) VALUES ($1, $2, $3, $4, $5) RETURNING id`,
+      [userId, ownerId, name, corpId, allianceId],
     );
     const newMapId = mapRows[0].id;
 

@@ -450,16 +450,22 @@ export async function migrate() {
     ALTER TABLE IF EXISTS solar_systems ADD COLUMN IF NOT EXISTS stargate_count INTEGER;
 
     -- Opt-in anonymous deployment pings (NEXUM_TELEMETRY). One row per install,
-    -- keyed by a random per-instance id; stores only the app version and seen
-    -- timestamps — deliberately NO IP and no user/map data. On most installs
-    -- this stays empty; only the project's central collector receives pings.
+    -- keyed by a random per-instance id; stores the app version, seen timestamps
+    -- and two AGGREGATE counts (# maps, # users) for vague scale analytics —
+    -- deliberately NO IP and no identifying user/map data. On most installs this
+    -- stays empty; only the project's central collector receives pings.
     CREATE TABLE IF NOT EXISTS telemetry_pings (
       instance_id TEXT        PRIMARY KEY,
       version     TEXT,
+      map_count   INTEGER,
+      user_count  INTEGER,
       first_seen  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       last_seen   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       ping_count  INTEGER     NOT NULL DEFAULT 1
     );
+    -- Backfill the aggregate-count columns onto an already-collecting instance.
+    ALTER TABLE telemetry_pings ADD COLUMN IF NOT EXISTS map_count  INTEGER;
+    ALTER TABLE telemetry_pings ADD COLUMN IF NOT EXISTS user_count INTEGER;
 
     CREATE TABLE IF NOT EXISTS user_events (
       id          BIGSERIAL   PRIMARY KEY,
@@ -692,6 +698,21 @@ export async function migrate() {
     CREATE INDEX IF NOT EXISTS idx_map_shares_char ON map_shares (target_character_id) WHERE target_character_id IS NOT NULL;
     CREATE INDEX IF NOT EXISTS idx_map_shares_corp ON map_shares (target_corp_id)      WHERE target_corp_id      IS NOT NULL;
 
+    -- Phase 2: alliance share targets (alliance installs only). Add the column,
+    -- swap the 2-way XOR CHECK for an "exactly one of three" rule, and add the
+    -- matching partial indexes. The original inline CHECK is unnamed (Postgres
+    -- calls it map_shares_check); drop it by that name, then add a named one.
+    ALTER TABLE map_shares ADD COLUMN IF NOT EXISTS target_alliance_id INTEGER;
+    ALTER TABLE map_shares DROP CONSTRAINT IF EXISTS map_shares_check;
+    ALTER TABLE map_shares DROP CONSTRAINT IF EXISTS map_shares_target_xor;
+    ALTER TABLE map_shares ADD CONSTRAINT map_shares_target_xor CHECK (
+      (target_character_id IS NOT NULL)::int
+      + (target_corp_id     IS NOT NULL)::int
+      + (target_alliance_id IS NOT NULL)::int = 1
+    );
+    CREATE UNIQUE INDEX IF NOT EXISTS uq_map_shares_alliance ON map_shares (map_id, target_alliance_id) WHERE target_alliance_id IS NOT NULL;
+    CREATE INDEX IF NOT EXISTS idx_map_shares_alliance ON map_shares (target_alliance_id) WHERE target_alliance_id IS NOT NULL;
+
     -- Last known solar system per user, updated from the ESI location poll as
     -- the pilot jumps. Lets the profile remember where they were last seen.
     -- INTEGER to match solar_systems.id (SDE-seeded); nullable until the first
@@ -769,6 +790,33 @@ export async function migrate() {
       created_at         TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
     CREATE INDEX IF NOT EXISTS idx_api_tokens_owner ON api_tokens (owner_id);
+
+    -- Login allow-list. Who may sign in to a restricted deployment, beyond the
+    -- .env CORP_ID/ALLIANCE_ID core. Each row admits a corp, an alliance, or a
+    -- single character by raw EVE id. Seeded from .env on boot (source='env',
+    -- immutable from the admin API); everything else is managed live from the
+    -- admin area. See access-control-design.md.
+    CREATE TABLE IF NOT EXISTS access_grants (
+      id            UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+      kind          TEXT        NOT NULL CHECK (kind IN ('corp','alliance','character')),
+      eve_id        BIGINT      NOT NULL,
+      source        TEXT        NOT NULL DEFAULT 'admin' CHECK (source IN ('env','admin','share','standing')),
+      note          TEXT,
+      added_by_user INTEGER     REFERENCES users(id) ON DELETE SET NULL,
+      created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      UNIQUE (kind, eve_id)
+    );
+    CREATE INDEX IF NOT EXISTS idx_access_grants_lookup ON access_grants (kind, eve_id);
+
+    -- Deployment-level key/value settings (distinct from per-user ui_settings).
+    -- Phase 3 uses standings_login_enabled ('true'|'false') and
+    -- standings_login_threshold ('5'|'10') for the standings auto-admit toggle.
+    CREATE TABLE IF NOT EXISTS app_settings (
+      key             TEXT        PRIMARY KEY,
+      value           TEXT        NOT NULL,
+      updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_by_user INTEGER     REFERENCES users(id) ON DELETE SET NULL
+    );
   `);
 
   await encryptLegacyTokens();

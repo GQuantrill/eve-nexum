@@ -107,10 +107,17 @@ const tokenEncryptionKey = isHex64Key
   : createHash('sha256').update(TOKEN_ENC_RAW).digest('hex');
 
 // Opt-in anonymous deployment ping. OFF by default — a self-hosted instance
-// phones home to nobody unless the operator sets NEXUM_TELEMETRY=1. When on,
-// the server sends only { version, instanceId } once a day so the project can
-// count active installs. NEXUM_TELEMETRY_URL overrides the collector endpoint.
-const TELEMETRY_ENABLED = /^(1|true|yes|on)$/i.test(process.env.NEXUM_TELEMETRY ?? '');
+// phones home to nobody unless the operator opts in. When on, the server sends
+// only { version, instanceId } once a day so the project can count active
+// installs. Two ways to opt in:
+//   - NEXUM_TELEMETRY=1 (uses the default eve-nexum.com collector), or
+//   - simply setting NEXUM_TELEMETRY_URL to a non-empty value — populating a
+//     collector endpoint is itself treated as consent (comment it out / leave it
+//     unset to stay opted out).
+// Key off the RAW env var here, not the resolved URL below: the resolved URL
+// always falls back to the default, so testing it would opt everyone in.
+const TELEMETRY_URL_SET = (process.env.NEXUM_TELEMETRY_URL ?? '').trim().length > 0;
+const TELEMETRY_ENABLED = /^(1|true|yes|on)$/i.test(process.env.NEXUM_TELEMETRY ?? '') || TELEMETRY_URL_SET;
 const TELEMETRY_URL = process.env.NEXUM_TELEMETRY_URL?.trim() || 'https://eve-nexum.com/api/telemetry';
 
 export const config = {
@@ -135,6 +142,15 @@ export const config = {
   // last_known_system is refreshed from ESI on this cadence so positions stay
   // current without anyone being logged into Nexum.
   locationPollMinutes: Math.max(0, parseInt(process.env.LOCATION_POLL_MINUTES ?? '0', 10) || 0),
+  // Cadence (minutes) of the login-access re-validation sweep, which evicts live
+  // sessions the current gate no longer permits (standings toggled off/tightened,
+  // a standing drifting below threshold, or leaving an admitted corp). Restricted
+  // deployments only. Default 60; set to 0 to disable the periodic sweep (an
+  // admin settings change still sweeps immediately).
+  accessRevalidateMinutes: (() => {
+    const n = parseInt(process.env.ACCESS_REVALIDATE_MINUTES ?? '60', 10);
+    return Number.isFinite(n) && n >= 0 ? n : 60;
+  })(),
   // Cadence (minutes) of the lazy wormhole-removal sweep, which deletes aged-out
   // WH sigs (and quarantines the connections they backed) on maps that have
   // opted in. Default 15; set to 0 to disable the sweep globally.

@@ -5,7 +5,7 @@ import type { TFunction } from 'i18next';
 import { XIcon } from '@phosphor-icons/react';
 import { api } from '../../api/client';
 import { useMapStore, type MapListItem } from '../../store/mapStore';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth, isAdminRole } from '../../context/AuthContext';
 import { toast } from './Toaster';
 
 interface MergeResult {
@@ -14,7 +14,7 @@ interface MergeResult {
 }
 
 // Roles that can write to a corp map (and therefore use one as a destination).
-const CORP_WRITE_ROLES = new Set(['edit', 'full', 'admin']);
+const CORP_WRITE_ROLES = new Set(['edit', 'full', 'admin', 'alliance_admin']);
 
 function mapLabel(t: TFunction, m: MapListItem): string {
   const kind = m.isCorpMap ? t('merge.corp') : t('merge.solo');
@@ -30,7 +30,7 @@ export function MergeMapModal({ onClose }: { onClose: () => void }) {
   const requestFitView = useMapStore((s) => s.requestFitView);
   const { user }    = useAuth();
   const role    = user?.role ?? 'readonly';
-  const isAdmin = role === 'admin';
+  const isAdmin = isAdminRole(role);
 
   // Source: any solo map the user can see (owned or shared), or a corp map
   // explicitly flagged as a merge source. Destination: maps the user can write

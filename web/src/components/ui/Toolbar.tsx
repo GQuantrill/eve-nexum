@@ -242,6 +242,9 @@ export function Toolbar() {
     const active = maps.find((m) => m.id === activeMapId);
     return !!active && (active.isCorpMap || active.isAllianceMap) && !canEditContent;
   })();
+  // A map merely shared with you (map_shares grant, not your own / your org's) can't
+  // be copied — only its owner may fork it. Hide the Copy action for those.
+  const activeIsShared = !!maps.find((m) => m.id === activeMapId)?.sharedWithMe;
   const canManageMaps = useCanCreateMaps();
   const canManageAllianceMaps = useCanManageAllianceMaps();
   // Corp maps exist under corp OR alliance mode (a corp inside the alliance).
@@ -411,7 +414,7 @@ export function Toolbar() {
                   {t('toolbar.newMap')}
                 </button>
               </span>
-              {!readonlyCorpActive && (
+              {!readonlyCorpActive && !activeIsShared && (
                 <span
                   className={`map-dropdown__new-wrap${atMapLimit ? ' map-dropdown__new-wrap--disabled' : ''}`}
                   data-disabled-reason={atMapLimit ? t('toolbar.mapLimitReached') : undefined}

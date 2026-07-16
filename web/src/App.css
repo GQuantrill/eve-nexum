@@ -1831,6 +1831,47 @@
 .map-shares__match--ok   { color: #4ade80; }
 .map-shares__match--miss { color: #f0a030; }
 
+/* Search input + "add to list" button on one row (share-to-many staging). */
+.map-shares__search-row { display: flex; gap: 6px; align-items: stretch; }
+.map-shares__search-row .map-shares__input { flex: 1 1 auto; width: auto; }
+.map-shares__add-btn {
+  flex: 0 0 auto;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 30px;
+  background: #16233c; border: 1px solid #2e5a9a; border-radius: 4px;
+  color: #7ab4f0; cursor: pointer;
+}
+.map-shares__add-btn:hover:not(:disabled) { background: #1a3a6a; }
+.map-shares__add-btn:disabled { opacity: 0.4; cursor: default; border-color: #1e2740; color: #4a5670; }
+
+/* Staged targets queued for the batch share. */
+.map-shares__staged { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.map-shares__staged-head { width: 100%; font-size: calc(11px * var(--font-scale, 1)); color: #8090a8; }
+.map-shares__chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 2px 4px 2px 3px;
+  background: #0f1626; border: 1px solid #263352; border-radius: 12px;
+  font-size: calc(11px * var(--font-scale, 1)); color: #c8d4f0;
+  max-width: 100%;
+}
+.map-shares__chip--error { border-color: #7a3030; background: #1a1012; }
+.map-shares__chip-avatar { width: 16px; height: 16px; border-radius: 50%; flex-shrink: 0; object-fit: cover; }
+.map-shares__chip-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 140px; }
+.map-shares__chip-remove {
+  display: inline-flex; align-items: center; justify-content: center;
+  background: none; border: none; color: #7a8aa8; cursor: pointer; padding: 0;
+}
+.map-shares__chip-remove:hover { color: #e06a6a; }
+.map-shares__grant-login {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: calc(12px * var(--font-scale, 1));
+  color: #a8b6cc;
+  cursor: pointer;
+  margin: 2px 0;
+}
+
 .map-shares__list {
   display: flex;
   flex-direction: column;
@@ -3141,6 +3182,23 @@
   flex-direction: column;
   gap: 4px;
 }
+
+/* Copy Map "new map type" picker — buttons side by side, equal width. */
+.copymap__type-group { display: flex; gap: 6px; }
+.copymap__type-btn {
+  flex: 1;
+  padding: 6px 10px;
+  background: #141c2e;
+  border: 1px solid #1e2740;
+  border-radius: 5px;
+  color: #c0ccde;
+  font-size: calc(13px * var(--font-scale, 1));
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.copymap__type-btn:hover { background: #1a2440; color: #c8d0e0; }
+.copymap__type-btn--active { background: #1a3060; border-color: #3a6abf; color: #c8d8ff; }
 
 .map-sidebar__btn-group-item {
   width: 100%;
@@ -8992,6 +9050,126 @@ select.sig-toolbar-btn option {
   font-size: calc(13px * var(--font-scale, 1));
 }
 .discord-admin__results li button:hover { background: rgba(91, 155, 255, 0.12); }
+
+/* ── Admin: login access (allow-list) tab ──────────────────────────────── */
+.admin-access__intro {
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #8090a8;
+  max-width: 720px;
+  line-height: 1.5;
+  margin: 6px 0 12px;
+}
+.admin-access__note {
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #a8b6cc;
+  max-width: 720px;
+  line-height: 1.5;
+  margin: 0 0 20px;
+  padding: 9px 12px;
+  background: #0d1524;
+  border: 1px solid #1e2740;
+  border-left: 3px solid #2e5a9a;
+  border-radius: 5px;
+}
+/* Sync / view standings action group: a clean button row, its inline result,
+   and the muted helper lines beneath — all grouped so they read as one unit. */
+.admin-access__sync { margin-bottom: 6px; }
+.admin-access__toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.admin-access__sync-status {
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #6fbf8f;
+  margin-left: 4px;
+}
+.admin-access__sync-status--err { color: #e06a6a; }
+.admin-access__hint {
+  font-size: calc(12px * var(--font-scale, 1));
+  color: #8090a8;
+}
+/* Helper lines beneath the buttons sit tight together as a block. */
+.admin-access__sync .admin-access__hint {
+  display: block;
+  margin: 2px 0 0;
+  max-width: 720px;
+  line-height: 1.5;
+}
+.admin-access__hint--delay { display: block; margin: 3px 0 0; max-width: 720px; line-height: 1.5; }
+.admin-access__result {
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #7aa2c8;
+  margin: 2px 0 4px;
+}
+.admin-access__add {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 16px 0 4px;
+  padding-top: 16px;
+  border-top: 1px solid #1a2535;
+}
+.admin-access__kind,
+.admin-access__input {
+  box-sizing: border-box;
+  background: #0a0e1a;
+  border: 1px solid #1e2740;
+  border-radius: 4px;
+  color: #c8d4f0;
+  font-family: inherit;
+  font-size: calc(13px * var(--font-scale, 1));
+  padding: 5px 8px;
+  outline: none;
+}
+.admin-access__input { width: 240px; }
+.admin-access__kind:focus,
+.admin-access__input:focus { border-color: #6ea0ff; }
+.admin-access__match {
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #8090a8;
+}
+.admin-access__match--ok { color: #4ade80; }
+.admin-access__evewho {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 6px;
+  color: #6a8ab0;
+  vertical-align: middle;
+}
+.admin-access__evewho:hover { color: #6ea0ff; }
+.admin-access__standings {
+  margin: 0 0 18px;
+  padding: 12px 14px;
+  background: #0d1524;
+  border: 1px solid #1e2740;
+  border-radius: 6px;
+  max-width: 720px;
+}
+.admin-access__toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: calc(14px * var(--font-scale, 1));
+  color: #c8d4f0;
+}
+.admin-access__threshold {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #1a2535;
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #c0ccde;
+}
+.admin-access__threshold label { display: flex; align-items: center; gap: 5px; cursor: pointer; }
+.admin-access__threshold-label { color: #8090a8; }
 .discord-admin__actions {
   display: flex;
   align-items: center;
@@ -9338,3 +9516,76 @@ select.sig-toolbar-btn option {
   color: #c8d4f0;
   font-size: calc(11px * var(--font-scale, 1));
 }
+
+/* ── Access-page Standings Viewer modal ─────────────────────────────── */
+.standings-viewer { width: 580px; max-width: 92vw; display: flex; flex-direction: column; }
+.standings-viewer .modal__header h3 {
+  font-size: calc(14px * var(--font-scale, 1));
+  font-weight: 600; color: #e2e8f8; margin: 0;
+}
+
+/* Corp / Alliance source switch (only shown when a deployment has both). */
+.standings-viewer__sources {
+  display: flex; gap: 4px; padding: 10px 16px 0;
+}
+.standings-viewer__source {
+  background: transparent; border: 1px solid #1e2740; border-radius: 5px;
+  color: #5a6a8a; cursor: pointer; font-family: inherit;
+  font-size: calc(12px * var(--font-scale, 1)); padding: 3px 12px;
+}
+.standings-viewer__source:hover { background: #1a2240; color: #c8d0e0; }
+.standings-viewer__source--active { background: #1a3a6a; border-color: #2e5a9a; color: #7ab4f0; }
+
+/* The five standing-band tabs. */
+.standings-viewer__tabs {
+  display: flex; gap: 4px; padding: 12px 16px; border-bottom: 1px solid #1e2740;
+}
+.standings-viewer__tab {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px;
+  background: transparent; border: 1px solid #1e2740; border-radius: 5px;
+  cursor: pointer; font-family: inherit; padding: 5px 0; color: #5a6a8a;
+}
+.standings-viewer__tab:hover { background: #131c30; }
+.standings-viewer__tab-label { font-size: calc(13px * var(--font-scale, 1)); font-weight: 600; }
+.standings-viewer__tab-count { font-size: calc(10px * var(--font-scale, 1)); opacity: 0.7; }
+.standings-viewer__tab--active { background: #131c30; border-color: #2e5a9a; }
+
+/* Band accent colours — reuse the app's colour-vision standing vars. */
+.standings-viewer__band--excellent { color: var(--cv-stand-friendly); }
+.standings-viewer__band--good      { color: var(--cv-stand-good); }
+.standings-viewer__band--neutral   { color: #8a97b0; }
+.standings-viewer__band--bad       { color: var(--cv-stand-bad); }
+.standings-viewer__band--terrible  { color: var(--cv-stand-hostile); }
+.standings-viewer__tab--active.standings-viewer__band--excellent { border-color: color-mix(in srgb, var(--cv-stand-friendly) 55%, transparent); }
+.standings-viewer__tab--active.standings-viewer__band--good      { border-color: color-mix(in srgb, var(--cv-stand-good) 55%, transparent); }
+.standings-viewer__tab--active.standings-viewer__band--bad       { border-color: color-mix(in srgb, var(--cv-stand-bad) 55%, transparent); }
+.standings-viewer__tab--active.standings-viewer__band--terrible  { border-color: color-mix(in srgb, var(--cv-stand-hostile) 55%, transparent); }
+
+.standings-viewer__body {
+  padding: 0; max-height: 60vh; overflow-y: auto; gap: 0;
+}
+.standings-viewer__msg {
+  font-size: calc(13px * var(--font-scale, 1)); color: #5a6a8a;
+  text-align: center; padding: 28px 16px;
+}
+.standings-viewer__msg--error { color: #e06a6a; }
+
+.standings-viewer__table {
+  width: 100%; border-collapse: collapse;
+  font-size: calc(13px * var(--font-scale, 1));
+}
+.standings-viewer__table thead th {
+  position: sticky; top: 0; background: #0d1117; z-index: 1;
+  text-align: left; color: #5a6a8a; font-weight: 600;
+  padding: 8px 16px; border-bottom: 1px solid #1e2740;
+  font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; letter-spacing: 0.04em;
+}
+.standings-viewer__table tbody td {
+  padding: 6px 16px; border-bottom: 1px solid #151d30; color: #c8d0e0;
+}
+.standings-viewer__table tbody tr:hover td { background: #131c30; }
+.standings-viewer__col-name { display: flex; align-items: center; gap: 8px; }
+.standings-viewer__logo { width: 24px; height: 24px; border-radius: 3px; flex-shrink: 0; }
+.standings-viewer__name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.standings-viewer__col-ticker { color: #8a97b0; white-space: nowrap; }
+.standings-viewer__col-standing { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }

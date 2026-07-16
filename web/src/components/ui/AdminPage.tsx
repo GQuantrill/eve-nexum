@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { charPortrait } from '../../utils/eveImages';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
-import { api } from '../../api/client';
+import { api, ApiError } from '../../api/client';
+import { toast } from './Toaster';
 import { useAuth, isAdminRole, isAllianceAdminRole, formatRole, ROLE_ORDER } from '../../context/AuthContext';
 import type { Role as AuthRole } from '../../context/AuthContext';
 import { useHashRoute } from '../../hooks/useHashRoute';
@@ -11,13 +12,14 @@ import { useWormholeTypes } from '../../hooks/useWormholeTypes';
 import { cssVarToHex } from '../../utils/cssVar';
 import { timeAgo, europeanDate, DASH } from '../../i18n/format';
 import { ConfirmModal } from './ConfirmModal';
+import { StandingsViewerModal } from './StandingsViewerModal';
 import {
   Chart as ChartJS,
   ArcElement, CategoryScale, LinearScale,
   PointElement, LineElement, Tooltip, Legend, Filler,
 } from 'chart.js';
 import { Doughnut, Line } from 'react-chartjs-2';
-import { CaretUpIcon, CaretDownIcon, XIcon } from '@phosphor-icons/react';
+import { CaretUpIcon, CaretDownIcon, XIcon, ArrowSquareOutIcon } from '@phosphor-icons/react';
 import { createPortal } from 'react-dom';
 
 // Register only the chart pieces we actually use — keeps the bundle lean.
@@ -57,10 +59,11 @@ function RolesInfoModal({ onClose }: { onClose: () => void }) {
   );
 }
 
-type Tab = 'users' | 'maps' | 'reports' | 'audit' | 'discord';
+type Tab = 'users' | 'access' | 'maps' | 'reports' | 'audit' | 'discord';
 
 const ALL_TABS: { key: Tab; path: string }[] = [
   { key: 'users',   path: '/admin/users'   },
+  { key: 'access',  path: '/admin/access'  },
   { key: 'maps',    path: '/admin/maps'    },
   { key: 'reports', path: '/admin/reports' },
   { key: 'discord', path: '/admin/discord' },
@@ -103,6 +106,7 @@ export function AdminPage() {
 
       <main className="admin-page__content">
         {tab === 'users'   && (isAdmin || canSeeReports) && <UsersTab />}
+        {tab === 'access'  && isAdmin       && <AccessTab />}
         {tab === 'maps'    && isAdmin       && <MapsTab />}
         {tab === 'reports' && (isAdmin || canSeeReports) && <ReportsTab />}
         {tab === 'discord' && isAdmin       && <DiscordTab />}
@@ -114,11 +118,312 @@ export function AdminPage() {
 
 function pathToTab(path: string, isAdmin: boolean, canSeeReports: boolean): Tab {
   const fallback: Tab = isAdmin || canSeeReports ? 'users' : 'reports';
+  if (path.startsWith('/admin/access'))  return isAdmin       ? 'access'  : fallback;
   if (path.startsWith('/admin/maps'))    return isAdmin       ? 'maps'    : fallback;
   if (path.startsWith('/admin/reports')) return (isAdmin || canSeeReports) ? 'reports' : fallback;
   if (path.startsWith('/admin/discord')) return isAdmin       ? 'discord' : fallback;
   if (path.startsWith('/admin/audit'))   return isAdmin       ? 'audit'   : fallback;
   return fallback;
+}
+
+// ── Access allow-list tab ─────────────────────────────────────────────────────
+
+interface AccessGrant {
+  id:          string;
+  kind:        'corp' | 'alliance' | 'character';
+  eveId:       number;
+  source:      string;
+  note:        string | null;
+  addedByName: string | null;
+  createdAt:   string;
+  label:       string;
+  immutable:   boolean;
+}
+
+// Turn an access-grant API failure into the clearest message we can show: a
+// translated string for known server codes, otherwise the server's own
+// `message` (so the operator sees WHY, not just "failed"), and only then a
+// generic fallback.
+function grantErrorMessage(e: unknown, t: TFunction, fallback: string): string {
+  const code = e instanceof ApiError ? e.code : undefined;
+  if (code === 'standing_not_positive')  return t('admin.access.errStanding');
+  if (code === 'already_granted')        return t('admin.access.errDuplicate');
+  if (code === 'alliance_not_supported') return t('admin.access.errAllianceUnsupported');
+  const serverMsg = e instanceof ApiError ? e.serverMessage : undefined;
+  return serverMsg && serverMsg.trim() ? serverMsg : fallback;
+}
+
+type GrantPickKind = 'corp' | 'alliance' | 'character';
+
+// eveWho profile URL for a corp / alliance / character grant target.
+function eveWhoUrl(kind: 'corp' | 'alliance' | 'character', id: number): string {
+  const seg = kind === 'corp' ? 'corporation' : kind === 'alliance' ? 'alliance' : 'character';
+  return `https://evewho.com/${seg}/${id}`;
+}
+
+// Small external-link icon to an entity's eveWho profile.
+function EveWhoLink({ kind, id, t }: { kind: 'corp' | 'alliance' | 'character'; id: number; t: TFunction }) {
+  return (
+    <a
+      className="admin-access__evewho"
+      href={eveWhoUrl(kind, id)}
+      target="_blank"
+      rel="noreferrer"
+      title={t('admin.access.eveWho')}
+      aria-label={t('admin.access.eveWho')}
+    >
+      <ArrowSquareOutIcon size={13} weight="bold" />
+    </a>
+  );
+}
+
+const SEARCH_ENDPOINT: Record<GrantPickKind, string> = {
+  character: '/api/search/characters',
+  corp:      '/api/search/corporations',
+  alliance:  '/api/search/alliances',
+};
+
+function AccessTab() {
+  const { t } = useTranslation();
+  const { user } = useAuth();
+  // Alliance targets are offered in any restricted deployment now (a corp install
+  // can admit an alliance, gated on the corp's own standing toward it).
+  const allowAlliance = !!user?.corpMode || !!user?.allianceMode;
+  const KINDS: GrantPickKind[] = allowAlliance ? ['corp', 'alliance', 'character'] : ['corp', 'character'];
+
+  const [grants, setGrants]   = useState<AccessGrant[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError]     = useState<string | null>(null);
+
+  const [kind, setKind]           = useState<GrantPickKind>('corp');
+  const [query, setQuery]         = useState('');
+  const [match, setMatch]         = useState<{ id: number; name: string } | null>(null);
+  const [searching, setSearching] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [addError, setAddError]   = useState<string | null>(null);
+  const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const [syncing, setSyncing]       = useState(false);
+  const [syncResult, setSyncResult] = useState<{ ok: boolean; text: string } | null>(null);
+  const [showStandings, setShowStandings] = useState(false);
+
+  // Standings auto-admit ("friends") settings — off by default.
+  const [stdEnabled, setStdEnabled]     = useState(false);
+  const [stdThreshold, setStdThreshold] = useState<5 | 10>(10);
+
+  const saveStandingsSettings = async (patch: { enabled?: boolean; threshold?: 5 | 10 }) => {
+    if (patch.enabled !== undefined) setStdEnabled(patch.enabled);
+    if (patch.threshold !== undefined) setStdThreshold(patch.threshold);
+    try {
+      const r = await api<{ sessionsKilled?: number }>('/api/admin/access-settings', { method: 'PATCH', body: JSON.stringify(patch) });
+      if (r.sessionsKilled && r.sessionsKilled > 0) {
+        toast.info(t('admin.access.standingsSessionsEnded', { count: r.sessionsKilled }));
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : t('admin.access.settingsSaveFailed'));
+      void load(); // reconcile with the server's real state
+    }
+  };
+
+  // Force-refresh the deployment's standings from ESI using the admin's own
+  // token (one call does character + corp + alliance). The positive-standing
+  // gate reads whichever bucket matches the install type, so we report on that.
+  const syncStandings = async () => {
+    setSyncing(true); setSyncResult(null);
+    try {
+      // scope:'org' — access control only ever uses corp/alliance standings, so
+      // the access-page sync pulls ONLY the corp + alliance contact lists. It
+      // deliberately does not touch personal contacts (that's the map's tint,
+      // refreshed from the system-info panel instead).
+      const r = await api<{ counts: Record<string, number>; succeeded: Record<string, boolean>; sessionsKilled?: number }>(
+        '/api/standings/refresh', { method: 'POST', body: JSON.stringify({ scope: 'org' }) },
+      );
+      // Report on the bucket the gate actually reads: alliance_standings on an
+      // alliance install, else the corp's OWN contacts (which include any
+      // alliance standings). NOT allowAlliance — a corp install offers alliance
+      // targets but still gates via the corp's contacts.
+      const bucket = user?.allianceMode ? 'alliance' : 'corp';
+      setSyncResult(r.succeeded[bucket]
+        ? { ok: true,  text: t('admin.access.syncOk', { count: r.counts[bucket] ?? 0 }) }
+        : { ok: false, text: t('admin.access.syncNoRole') });
+      // The sync re-checks live sessions against the freshly-pulled standings and
+      // evicts anyone no longer permitted — surface that, same as the settings flow.
+      if (r.sessionsKilled && r.sessionsKilled > 0) {
+        toast.info(t('admin.access.standingsSessionsEnded', { count: r.sessionsKilled }));
+      }
+    } catch (e) {
+      setSyncResult({ ok: false, text: grantErrorMessage(e, t, t('admin.access.syncFailed')) });
+    } finally { setSyncing(false); }
+  };
+
+  const load = useCallback(async () => {
+    setLoading(true); setError(null);
+    try {
+      const [g, s] = await Promise.all([
+        api<AccessGrant[]>('/api/admin/access-grants'),
+        api<{ standingsLoginEnabled: boolean; standingsLoginThreshold: number }>('/api/admin/access-settings'),
+      ]);
+      setGrants(g);
+      setStdEnabled(s.standingsLoginEnabled);
+      setStdThreshold(s.standingsLoginThreshold === 5 ? 5 : 10);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : t('admin.access.loadFailed'));
+    } finally { setLoading(false); }
+  }, [t]);
+  useEffect(() => { load(); }, [load]);
+
+  // Debounced exact-name lookup for the currently-selected kind.
+  useEffect(() => {
+    setMatch(null); setAddError(null);
+    const q = query.trim();
+    if (q.length < 3) { setSearching(false); return; }
+    if (searchTimer.current) clearTimeout(searchTimer.current);
+    setSearching(true);
+    searchTimer.current = setTimeout(() => {
+      api<{ match: { id: number; name: string } | null }>(`${SEARCH_ENDPOINT[kind]}?q=${encodeURIComponent(q)}`)
+        .then((r) => setMatch(r.match))
+        .catch(() => setMatch(null))
+        .finally(() => setSearching(false));
+    }, 350);
+    return () => { if (searchTimer.current) clearTimeout(searchTimer.current); };
+  }, [query, kind]);
+
+  const addGrant = async () => {
+    if (!match) return;
+    setSubmitting(true); setAddError(null);
+    try {
+      await api('/api/admin/access-grants', { method: 'POST', body: JSON.stringify({ kind, eveId: match.id }) });
+      setQuery(''); setMatch(null);
+      await load();
+    } catch (e) {
+      setAddError(grantErrorMessage(e, t, t('admin.access.addFailed')));
+    } finally { setSubmitting(false); }
+  };
+
+  const removeGrant = async (g: AccessGrant) => {
+    if (g.immutable) return;
+    try {
+      await api(`/api/admin/access-grants/${g.id}`, { method: 'DELETE' });
+      await load();
+    } catch (e) {
+      setError(grantErrorMessage(e, t, t('admin.access.removeFailed')));
+    }
+  };
+
+  return (
+    <div className="admin-access">
+      <h2 className="admin-page__section-title">{t('admin.access.title')}</h2>
+      <p className="admin-access__intro">{t('admin.access.intro')}</p>
+      <div className="admin-access__note">{t('admin.access.readonlyNote')}</div>
+
+      <div className="admin-access__standings">
+        <label className="admin-access__toggle">
+          <input type="checkbox" checked={stdEnabled} onChange={(e) => saveStandingsSettings({ enabled: e.target.checked })} />
+          <span>{t('admin.access.standingsEnable')}</span>
+        </label>
+        <p className="admin-access__hint">{t('admin.access.standingsHint')}</p>
+        {stdEnabled && (
+          <div className="admin-access__threshold">
+            <span className="admin-access__threshold-label">{t('admin.access.standingsMinLevel')}</span>
+            <label>
+              <input type="radio" name="std-threshold" checked={stdThreshold === 10} onChange={() => saveStandingsSettings({ threshold: 10 })} />
+              {t('admin.access.threshold10')}
+            </label>
+            <label>
+              <input type="radio" name="std-threshold" checked={stdThreshold === 5} onChange={() => saveStandingsSettings({ threshold: 5 })} />
+              {t('admin.access.threshold5')}
+            </label>
+          </div>
+        )}
+      </div>
+
+      <div className="admin-access__sync">
+        <div className="admin-access__toolbar">
+          <button type="button" className="btn btn--ghost btn--sm" disabled={syncing} onClick={syncStandings}>
+            {syncing ? t('admin.access.syncing') : t('admin.access.syncStandings')}
+          </button>
+          <button type="button" className="btn btn--ghost btn--sm" onClick={() => setShowStandings(true)}>
+            {t('admin.access.viewStandings')}
+          </button>
+          {syncResult && (
+            <span className={`admin-access__sync-status${syncResult.ok ? '' : ' admin-access__sync-status--err'}`}>
+              {syncResult.text}
+            </span>
+          )}
+        </div>
+        <p className="admin-access__hint">{t('admin.access.syncHint')}</p>
+        <p className="admin-access__hint">{t('admin.access.syncDelay')}</p>
+      </div>
+
+      {showStandings && <StandingsViewerModal onClose={() => setShowStandings(false)} />}
+
+      <div className="admin-access__add">
+        <select
+          className="admin-access__kind"
+          value={kind}
+          onChange={(e) => { setKind(e.target.value as GrantPickKind); setMatch(null); setQuery(''); }}
+        >
+          {KINDS.map((k) => <option key={k} value={k}>{t(`admin.access.kind_${k}`)}</option>)}
+        </select>
+        <input
+          className="admin-access__input"
+          placeholder={t(`admin.access.placeholder_${kind}`)}
+          value={query}
+          maxLength={50}
+          spellCheck={false}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+        <span className={`admin-access__match${match ? ' admin-access__match--ok' : ''}`}>
+          {query.trim().length < 3 ? t('admin.access.typeAtLeast3')
+            : searching ? t('admin.access.searching')
+            : match ? t('admin.access.found', { name: match.name })
+            : t('admin.access.noMatch')}
+          {match && <EveWhoLink kind={kind} id={match.id} t={t} />}
+        </span>
+        <button type="button" className="btn btn--ghost btn--sm" disabled={!match || submitting} onClick={addGrant}>
+          {submitting ? t('admin.access.adding') : t('admin.access.add')}
+        </button>
+      </div>
+      {addError && <div className="admin-page__error">{addError}</div>}
+
+      {loading ? <div className="admin-page__loading">{t('admin.access.loading')}</div>
+        : error ? <div className="admin-page__error">{error}</div>
+        : grants.length === 0 ? <div className="admin-page__empty">{t('admin.access.none')}</div>
+        : (
+          <table className="admin-modal__table">
+            <thead>
+              <tr>
+                <th>{t('admin.access.colKind')}</th>
+                <th>{t('admin.access.colEntity')}</th>
+                <th>{t('admin.access.colSource')}</th>
+                <th>{t('admin.access.colAddedBy')}</th>
+                <th />
+              </tr>
+            </thead>
+            <tbody>
+              {grants.map((g) => (
+                <tr key={g.id}>
+                  <td>{t(`admin.access.kind_${g.kind}`)}</td>
+                  <td title={String(g.eveId)}>
+                    {g.label}
+                    <EveWhoLink kind={g.kind} id={g.eveId} t={t} />
+                  </td>
+                  <td>{g.source === 'env' ? t('admin.access.sourceEnv') : g.source}</td>
+                  <td>{g.addedByName ?? (g.source === 'env' ? t('admin.access.sourceEnv') : DASH)}</td>
+                  <td>
+                    {g.immutable
+                      ? <span className="admin-modal__pill" title={t('admin.access.envLockedHint')}>{t('admin.access.envLocked')}</span>
+                      : <button type="button" className="btn btn--ghost btn--sm admin-modal__danger" onClick={() => removeGrant(g)}>
+                          {t('admin.access.remove')}
+                        </button>}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+    </div>
+  );
 }
 
 // ── Users tab ───────────────────────────────────────────────────────────────
