@@ -107,10 +107,17 @@ const tokenEncryptionKey = isHex64Key
   : createHash('sha256').update(TOKEN_ENC_RAW).digest('hex');
 
 // Opt-in anonymous deployment ping. OFF by default — a self-hosted instance
-// phones home to nobody unless the operator sets NEXUM_TELEMETRY=1. When on,
-// the server sends only { version, instanceId } once a day so the project can
-// count active installs. NEXUM_TELEMETRY_URL overrides the collector endpoint.
-const TELEMETRY_ENABLED = /^(1|true|yes|on)$/i.test(process.env.NEXUM_TELEMETRY ?? '');
+// phones home to nobody unless the operator opts in. When on, the server sends
+// only { version, instanceId } once a day so the project can count active
+// installs. Two ways to opt in:
+//   - NEXUM_TELEMETRY=1 (uses the default eve-nexum.com collector), or
+//   - simply setting NEXUM_TELEMETRY_URL to a non-empty value — populating a
+//     collector endpoint is itself treated as consent (comment it out / leave it
+//     unset to stay opted out).
+// Key off the RAW env var here, not the resolved URL below: the resolved URL
+// always falls back to the default, so testing it would opt everyone in.
+const TELEMETRY_URL_SET = (process.env.NEXUM_TELEMETRY_URL ?? '').trim().length > 0;
+const TELEMETRY_ENABLED = /^(1|true|yes|on)$/i.test(process.env.NEXUM_TELEMETRY ?? '') || TELEMETRY_URL_SET;
 const TELEMETRY_URL = process.env.NEXUM_TELEMETRY_URL?.trim() || 'https://eve-nexum.com/api/telemetry';
 
 export const config = {

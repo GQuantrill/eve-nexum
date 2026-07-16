@@ -67,7 +67,7 @@ export async function startTelemetry(): Promise<void> {
   try {
     log.info(
       `anonymous telemetry enabled — sending { version, instanceId } to ${config.telemetry.url} ` +
-      `once a day (disable by unsetting NEXUM_TELEMETRY)`,
+      `once a day (disable by unsetting NEXUM_TELEMETRY and NEXUM_TELEMETRY_URL)`,
     );
     const instanceId = await getInstanceId();
     await sendPing(instanceId);
