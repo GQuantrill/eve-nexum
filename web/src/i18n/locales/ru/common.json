@@ -671,6 +671,7 @@
     "matchByAria": "Сопоставить по",
     "matchSystem": "Система",
     "matchWhType": "Тип червоточины",
+    "matchSystemType": "Тип системы",
     "quickAdd": "Быстрое добавление",
     "whPlaceholder": "Тип ЧД, напр. C247",
     "queryPlaceholder": "Название системы / J-code",

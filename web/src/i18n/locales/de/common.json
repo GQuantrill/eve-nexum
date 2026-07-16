@@ -655,6 +655,7 @@
     "matchByAria": "Abgleichen nach",
     "matchSystem": "System",
     "matchWhType": "Wurmlochtyp",
+    "matchSystemType": "Systemtyp",
     "quickAdd": "Schnell hinzufügen",
     "whPlaceholder": "WH-Typ, z. B. C247",
     "queryPlaceholder": "Systemname / J-Code",

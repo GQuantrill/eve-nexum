@@ -2462,6 +2462,9 @@
   border-color: #6ea0ff;
 }
 
+/* The "System type" mode reuses the value-input styling as a class dropdown. */
+.watchlist__class-select { cursor: pointer; }
+
 /* Duplicate of an entry already on the list — the typed value collides with
    another row. Outline the field red and explain below; the duplicate doesn't
    add anything (alerts/highlights dedupe by target) until it's changed. */

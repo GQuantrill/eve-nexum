@@ -655,6 +655,7 @@
     "matchByAria": "Critère",
     "matchSystem": "Système",
     "matchWhType": "Type de trou",
+    "matchSystemType": "Type de système",
     "quickAdd": "Ajout rapide",
     "whPlaceholder": "Type de TL, ex. C247",
     "queryPlaceholder": "Nom de système / J-code",

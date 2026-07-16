@@ -717,6 +717,7 @@
     "matchByAria": "Match by",
     "matchSystem": "System",
     "matchWhType": "Wormhole type",
+    "matchSystemType": "System type",
     "quickAdd": "Quick add",
     "whPlaceholder": "WH type, e.g. C247",
     "queryPlaceholder": "System name / J-code",
