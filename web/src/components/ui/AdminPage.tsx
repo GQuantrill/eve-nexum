@@ -185,7 +185,9 @@ const SEARCH_ENDPOINT: Record<GrantPickKind, string> = {
 function AccessTab() {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const allowAlliance = !!user?.allianceMode;
+  // Alliance targets are offered in any restricted deployment now (a corp install
+  // can admit an alliance, gated on the corp's own standing toward it).
+  const allowAlliance = !!user?.corpMode || !!user?.allianceMode;
   const KINDS: GrantPickKind[] = allowAlliance ? ['corp', 'alliance', 'character'] : ['corp', 'character'];
 
   const [grants, setGrants]   = useState<AccessGrant[]>([]);

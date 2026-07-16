@@ -209,9 +209,12 @@ Evaluation depends on installation type (per your rule):
   character_id. Alliance standings take priority; corp-level standings are not
   consulted.
 - **Corp installation** (`config.corpMode` and not alliance): use the deployment
-  corp's contacts only. Permit if, for any deployment corp id C,
+  corp's OWN contacts. Permit if, for any deployment corp id C,
   `corp_standings(owner=C, contact matches the pilot) >= threshold`, matching the
-  pilot's corp_id then character_id. Alliance standings are ignored entirely.
+  pilot's corp_id, character_id, OR alliance_id. [REVISED 2026-07-16] A corp's
+  contact list can hold an alliance standing, so a corp install can admit a whole
+  friendly alliance too — gated on the CORP's own standing toward that alliance.
+  (It reads the deployment corp's contacts, not any "alliance's contacts".)
 
 Notes / caveats specific to standings:
 - Positive only (repeat of the hard rule above, because it is easy to get wrong):
@@ -309,7 +312,7 @@ it so operators are not misled:
 Harness: vitest is now set up server-side (`server` `yarn test`, wired into CI).
 First suite `src/services/accessGrants.test.ts` (13 tests, mocked config+db) covers
 the decision logic: install-type gating (grantKindAllowedForInstall), the
-positive-standing table/contact_kind selection + alliance-install-only +
+positive-standing table/contact_kind selection (incl. corp-install alliance targets) +
 fail-closed (standingPermitsTarget), and admit/deny + param passthrough
 (isLoginPermitted). NEXT layer (not yet done): DB-integration tests that run the
 real SQL against a throwaway test database, plus admin endpoint tests (env-immutable
