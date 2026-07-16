@@ -235,7 +235,7 @@ function AccessTab() {
       // the access-page sync pulls ONLY the corp + alliance contact lists. It
       // deliberately does not touch personal contacts (that's the map's tint,
       // refreshed from the system-info panel instead).
-      const r = await api<{ counts: Record<string, number>; succeeded: Record<string, boolean> }>(
+      const r = await api<{ counts: Record<string, number>; succeeded: Record<string, boolean>; sessionsKilled?: number }>(
         '/api/standings/refresh', { method: 'POST', body: JSON.stringify({ scope: 'org' }) },
       );
       // Report on the bucket the gate actually reads: alliance_standings on an
@@ -246,6 +246,11 @@ function AccessTab() {
       setSyncResult(r.succeeded[bucket]
         ? { ok: true,  text: t('admin.access.syncOk', { count: r.counts[bucket] ?? 0 }) }
         : { ok: false, text: t('admin.access.syncNoRole') });
+      // The sync re-checks live sessions against the freshly-pulled standings and
+      // evicts anyone no longer permitted — surface that, same as the settings flow.
+      if (r.sessionsKilled && r.sessionsKilled > 0) {
+        toast.info(t('admin.access.standingsSessionsEnded', { count: r.sessionsKilled }));
+      }
     } catch (e) {
       setSyncResult({ ok: false, text: grantErrorMessage(e, t, t('admin.access.syncFailed')) });
     } finally { setSyncing(false); }

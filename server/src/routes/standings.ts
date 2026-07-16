@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { db } from '../db.js';
 import { requireAuth } from '../middleware/requireAuth.js';
 import { refreshStandingsForUser } from '../services/standings.js';
+import { revalidateActiveSessions } from '../services/accessRevalidate.js';
 import { decryptToken } from '../utils/tokenCrypto.js';
 import { createLogger } from '../utils/logger.js';
 
@@ -163,6 +164,16 @@ standingsRouter.post('/refresh', async (req, res) => {
   const refreshedAt: Record<string, string> = {};
   for (const r of refreshRows.rows) refreshedAt[r.owner_kind] = r.last_fetched_at;
 
+  // Access-page (org) sync: the freshly-pulled corp/alliance standings can mean a
+  // currently-logged-in user is no longer permitted (e.g. an auto-admitted corp's
+  // standing dropped below the threshold). Re-check live sessions and evict the
+  // no-longer-permitted now, instead of waiting for the periodic sweep. No-op in
+  // solo mode; never evicts the bootstrap admin. Skipped for the map-tint refresh
+  // (scope 'all'), which any user can trigger and which isn't an access action.
+  const revalidation = orgOnly
+    ? await revalidateActiveSessions()
+    : { usersEvicted: 0, sessionsKilled: 0 };
+
   res.json({
     ok: true,
     counts: {
@@ -179,5 +190,6 @@ standingsRouter.post('/refresh', async (req, res) => {
       corp:      'corp'      in refreshedAt,
       alliance:  'alliance'  in refreshedAt,
     },
+    sessionsKilled: revalidation.sessionsKilled,
   });
 });
