@@ -1717,6 +1717,10 @@
     "submit": "创建副本",
     "copying": "正在复制…",
     "success": "已复制到 {{name}}",
-    "failed": "复制失败"
+    "failed": "复制失败",
+    "typeLabel": "新地图类型",
+    "typePersonal": "个人",
+    "typeCorp": "军团",
+    "typeAlliance": "联盟"
   }
 }

@@ -1717,6 +1717,10 @@
     "submit": "コピーを作成",
     "copying": "コピー中…",
     "success": "{{name}} にコピーしました",
-    "failed": "コピーに失敗しました"
+    "failed": "コピーに失敗しました",
+    "typeLabel": "新しいマップの種類",
+    "typePersonal": "個人",
+    "typeCorp": "コーポ",
+    "typeAlliance": "アライアンス"
   }
 }

@@ -1717,6 +1717,10 @@
     "submit": "Kopie erstellen",
     "copying": "Wird kopiert…",
     "success": "Kopiert nach {{name}}",
-    "failed": "Kopieren fehlgeschlagen"
+    "failed": "Kopieren fehlgeschlagen",
+    "typeLabel": "Neuer Kartentyp",
+    "typePersonal": "Persönlich",
+    "typeCorp": "Corp",
+    "typeAlliance": "Allianz"
   }
 }

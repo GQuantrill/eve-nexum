@@ -1717,6 +1717,10 @@
     "submit": "복사본 생성",
     "copying": "복사 중…",
     "success": "{{name}}(으)로 복사됨",
-    "failed": "복사 실패"
+    "failed": "복사 실패",
+    "typeLabel": "새 맵 유형",
+    "typePersonal": "개인",
+    "typeCorp": "군단",
+    "typeAlliance": "연합"
   }
 }

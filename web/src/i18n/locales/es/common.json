@@ -1717,6 +1717,10 @@
     "submit": "Crear copia",
     "copying": "Copiando…",
     "success": "Copiado a {{name}}",
-    "failed": "Error al copiar"
+    "failed": "Error al copiar",
+    "typeLabel": "Tipo del nuevo mapa",
+    "typePersonal": "Personal",
+    "typeCorp": "Corp",
+    "typeAlliance": "Alianza"
   }
 }

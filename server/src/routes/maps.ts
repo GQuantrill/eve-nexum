@@ -770,35 +770,68 @@ mapsRouter.post('/', async (req, res) => {
 });
 
 // POST /api/maps/:mapId/copy — duplicate a map the caller can read into a new
-// personal map. A read-only corp map can't be copied; the copy counts against
-// the caller's personal map cap. Body: { name, include: { notes, signatures,
-// structures, anomalies } }.
+// map. A read-only corp/alliance map can't be copied. The copy's SCOPE is chosen
+// by the caller (isCorpMap / isAllianceMap) independent of the source's scope —
+// e.g. copy an alliance map into a new corp map — subject to the same role,
+// affiliation and quota rules as POST /. Body: { name, isCorpMap?, isAllianceMap?,
+// include: { notes, signatures, structures, anomalies } }.
 mapsRouter.post('/:mapId/copy', async (req, res) => {
   const sourceMapId = req.params.mapId;
   const access = await getMapAccess(sourceMapId, req);
   if (!access) { res.status(404).json({ error: 'Map not found' }); return; }
+  // A map that reached the caller via a map_shares grant (someone else's map,
+  // shared with them) can only be copied by its owner — a recipient can't fork it.
+  if (access.accessKind === 'shared') {
+    res.status(403).json({ error: 'A map shared with you can only be copied by its owner' });
+    return;
+  }
   if ((access.accessKind === 'corp_member' || access.accessKind === 'alliance_member') && authUser(req).role === 'readonly') {
     res.status(403).json({ error: 'Read-only corp/alliance maps cannot be copied' });
     return;
   }
 
-  // The copy is always a personal map — enforce the personal cap (as POST /).
-  const ownerId = await resolveOwnerId(req);
-  const { rowCount } = await db.query(
-    `SELECT 1 FROM maps WHERE owner_id = $1 AND corp_id IS NULL AND alliance_id IS NULL`, [ownerId],
-  );
-  if ((rowCount ?? 0) >= config.maxUserMaps) {
-    res.status(403).json({ error: 'Maximum maps reached' });
-    return;
+  // Target scope — exclusive, alliance wins over corp, same rules as POST /.
+  const role          = req.session.role ?? 'readonly';
+  const isAllianceMap = config.allianceMode && req.body.isAllianceMap === true;
+  const isCorpMap     = !isAllianceMap && (config.corpMode || config.allianceMode) && req.body.isCorpMap === true;
+
+  if (isAllianceMap) {
+    if (!isAllianceAdmin(role)) {
+      res.status(403).json({ error: 'Alliance map creation requires the alliance admin role' }); return;
+    }
+    if (!req.session.userAllianceId) {
+      res.status(403).json({ error: 'Cannot create alliance map: user has no alliance affiliation' }); return;
+    }
+    const { rowCount } = await db.query(`SELECT 1 FROM maps WHERE alliance_id = $1`, [req.session.userAllianceId]);
+    if ((rowCount ?? 0) >= config.maxAllianceMaps) { res.status(403).json({ error: 'Maximum alliance maps reached' }); return; }
+  } else if (isCorpMap) {
+    if (role !== 'full' && !isAdmin(role)) {
+      res.status(403).json({ error: 'Corp map creation requires full-edit or admin role' }); return;
+    }
+    if (!req.session.userCorpId) {
+      res.status(403).json({ error: 'Cannot create corp map: user has no corp affiliation' }); return;
+    }
+    const { rowCount } = await db.query(`SELECT 1 FROM maps WHERE corp_id = $1`, [req.session.userCorpId]);
+    if ((rowCount ?? 0) >= config.maxCorpMaps) { res.status(403).json({ error: 'Maximum corp maps reached' }); return; }
+  } else {
+    const oid = await resolveOwnerId(req);
+    const { rowCount } = await db.query(
+      `SELECT 1 FROM maps WHERE owner_id = $1 AND corp_id IS NULL AND alliance_id IS NULL`, [oid],
+    );
+    if ((rowCount ?? 0) >= config.maxUserMaps) { res.status(403).json({ error: 'Maximum maps reached' }); return; }
   }
 
   const name = String(req.body.name ?? '').trim().slice(0, MAX_MAP_NAME_LEN);
   if (!name) { res.status(400).json({ error: 'Name is required' }); return; }
 
+  const ownerId    = await resolveOwnerId(req);
+  const corpId     = isCorpMap     ? (req.session.userCorpId ?? null)     : null;
+  const allianceId = isAllianceMap ? (req.session.userAllianceId ?? null) : null;
+
   const inc = (req.body.include ?? {}) as Record<string, unknown>;
   try {
     const newId = await copyMap({
-      sourceMapId, name, ownerId, userId: req.session.userId!,
+      sourceMapId, name, ownerId, userId: req.session.userId!, corpId, allianceId,
       include: {
         notes:      inc.notes === true,
         signatures: inc.signatures === true,

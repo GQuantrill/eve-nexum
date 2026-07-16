@@ -460,7 +460,11 @@
     "submit": "Create copy",
     "copying": "Copying…",
     "success": "Copied to {{name}}",
-    "failed": "Copy failed"
+    "failed": "Copy failed",
+    "typeLabel": "New map type",
+    "typePersonal": "Personal",
+    "typeCorp": "Corp",
+    "typeAlliance": "Alliance"
   },
   "merge": {
     "title": "Merge Maps",

@@ -1717,6 +1717,10 @@
     "submit": "Créer la copie",
     "copying": "Copie…",
     "success": "Copié vers {{name}}",
-    "failed": "Échec de la copie"
+    "failed": "Échec de la copie",
+    "typeLabel": "Type de la nouvelle carte",
+    "typePersonal": "Personnelle",
+    "typeCorp": "Corpo",
+    "typeAlliance": "Alliance"
   }
 }
