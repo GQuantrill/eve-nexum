@@ -820,6 +820,7 @@
     "jumpgate": "점프 게이트",
     "whLifetime": "웜홀 수명",
     "lifeFresh": "신선",
+    "lifeFreshMax": "신선 ({{hours}}시간)",
     "life1d": "1일 미만 남음",
     "life4h": "4시간 미만 남음",
     "life1h": "1시간 미만 남음",

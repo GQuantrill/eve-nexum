@@ -820,6 +820,7 @@
     "jumpgate": "跳桥",
     "whLifetime": "虫洞寿命",
     "lifeFresh": "新鲜",
+    "lifeFreshMax": "新鲜 ({{hours}} 小时)",
     "life1d": "剩余不到 1 天",
     "life4h": "剩余不到 4 小时",
     "life1h": "剩余不到 1 小时",

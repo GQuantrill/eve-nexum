@@ -820,6 +820,7 @@
     "jumpgate": "ジャンプゲート",
     "whLifetime": "ワームホール寿命",
     "lifeFresh": "新鮮",
+    "lifeFreshMax": "新鮮 ({{hours}}時間)",
     "life1d": "残り1日未満",
     "life4h": "残り4時間未満",
     "life1h": "残り1時間未満",
