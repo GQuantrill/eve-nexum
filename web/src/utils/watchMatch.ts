@@ -49,7 +49,13 @@ export function matchKey(m: WatchMatch): string {
 /** Does a system satisfy an entry? whType / frigHole match the system's statics
  *  AND its scanned wormhole-sig types (passed in from the map-wide index), so a
  *  freshly-scanned sig counts even before it's resolved into a connection. */
-export function systemMatchesEntry(e: WatchEntry, sys: MapSystem, sigTypes?: string[], whSigs?: LeadsToSig[]): boolean {
+export function systemMatchesEntry(
+  e: WatchEntry,
+  sys: MapSystem,
+  sigTypes?: string[],
+  whSigs?: LeadsToSig[],
+  nameToClass?: Map<string, SystemClass>,
+): boolean {
   const m = e.match;
   switch (m.by) {
     case 'system':   return m.query.trim() !== '' && norm(sys.name) === norm(m.query);
@@ -61,14 +67,20 @@ export function systemMatchesEntry(e: WatchEntry, sys: MapSystem, sigTypes?: str
     }
     case 'class':    return sys.systemClass === m.cls;
     case 'leadsTo': {
-      // A wormhole whose DESTINATION is the watched class. Statics + scanned sigs
-      // with a fixed-destination code (e.g. "leads to C2" fires on a C2 static),
-      // AND scanned sigs with no fixed destination (K162) whose recorded leads-to
-      // resolves to the class — so a K162 we've solved to Hi-Sec still counts.
+      // A wormhole whose DESTINATION is the watched class. Resolve each hole three
+      // ways so anything we know the destination of counts:
+      //   1. a fixed-destination code (statics + scanned sigs, e.g. a C2 static),
+      //   2. a scanned sig's recorded leads-to TOKEN (K162 marked "Hi-Sec"/"C1-C3"),
+      //   3. a scanned sig pinned to a specific SYSTEM (K162 solved to "Arnon") —
+      //      resolved to that system's class via the name->class map.
       const codeLeads = (code: string) => WORMHOLE_DESTINATIONS[code.trim().toUpperCase()] === m.cls;
       if (sys.statics.some(codeLeads)) return true;
-      return (whSigs ?? []).some((s) =>
-        codeLeads(s.whType ?? '') || leadsToTokenClasses(s.leadsTo).includes(m.cls));
+      return (whSigs ?? []).some((s) => {
+        if (codeLeads(s.whType ?? '')) return true;
+        if (leadsToTokenClasses(s.leadsTo).includes(m.cls)) return true;
+        const pinned = (s.leadsTo ?? '').trim();
+        return pinned !== '' && nameToClass?.get(pinned.toUpperCase()) === m.cls;
+      });
     }
     case 'effect':   return sys.effect === m.effect;
     case 'frigHole': return sys.statics.some((s) => FRIG_WH_TYPES.has(s.toUpperCase()))
@@ -89,8 +101,14 @@ export function connectionMatchesEntry(e: WatchEntry, conn: MapConnection): bool
 }
 
 /** First entry (list order) that matches this system, or null. */
-export function matchSystem(entries: WatchEntry[], sys: MapSystem, sigTypes?: string[], whSigs?: LeadsToSig[]): WatchEntry | null {
-  for (const e of entries) if (systemMatchesEntry(e, sys, sigTypes, whSigs)) return e;
+export function matchSystem(
+  entries: WatchEntry[],
+  sys: MapSystem,
+  sigTypes?: string[],
+  whSigs?: LeadsToSig[],
+  nameToClass?: Map<string, SystemClass>,
+): WatchEntry | null {
+  for (const e of entries) if (systemMatchesEntry(e, sys, sigTypes, whSigs, nameToClass)) return e;
   return null;
 }
 
