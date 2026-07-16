@@ -37,6 +37,7 @@ import { matchSystem } from '../../utils/watchMatch';
 import { contentFilterActive, systemMatchesContent } from '../../utils/contentMatch';
 import { watchMarker } from '../../data/watchMarkers';
 import { useHeatmap } from '../../context/HeatmapContext';
+import { useShareMode } from '../../context/ShareModeContext';
 import { heatValue, heatColor } from '../../utils/heatmap';
 import { WHTypeInfo } from '../ui/WHTypeInfo';
 import { truesecColor } from '../../utils/truesec';
@@ -167,6 +168,10 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
   const [customIntel]   = useCustomIntel();
   const intelColor      = resolveIntelColor(sys.intel, customIntel);
   const intelLabel      = resolveIntelLabel(sys.intel, customIntel, t);
+  // The home marker is the map OWNER's — meaningless (and a touch personal) to a
+  // share-link viewer, so hide the home icon + double border in share mode.
+  const { isShareMode } = useShareMode();
+  const showHome        = sys.isHome && !isShareMode;
   // Personal watchlist: highlight + corner icon when this system matches an
   // entry (by name, class, effect, or a static wormhole type / frig hole).
   const [watchEntries]  = useWatchlist();
@@ -258,7 +263,7 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
       data-heat={heat ? '' : undefined}
       data-status={sys.status}
       data-intel={sys.intel ?? undefined}
-      data-home={sys.isHome}
+      data-home={showHome}
       data-current={isCurrent}
       onClick={(e) => {
         // Skip our single-select on shift-click so ReactFlow's built-in
@@ -372,7 +377,7 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
             </span>
           </span>
         )}
-        {sys.isHome && (
+        {showHome && (
           <span className="system-node__home-icon" aria-label={t('mapNode.homeSystem')}>
             <HouseIcon size={14} weight="regular" />
           </span>
