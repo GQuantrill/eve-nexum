@@ -4,20 +4,39 @@ import { useTranslation } from 'react-i18next';
 import { XIcon } from '@phosphor-icons/react';
 import { api } from '../../api/client';
 import { useMapStore } from '../../store/mapStore';
+import { useAuth, isAdminRole, isAllianceAdminRole } from '../../context/AuthContext';
 import { toast } from './Toaster';
 
-// Duplicate the active map into a new personal map. Source is fixed (the active
-// map, shown read-only); the four toggles gate system notes / signatures /
-// structures / anomalies — topology + intel/labels always copy.
+type MapType = 'personal' | 'corp' | 'alliance';
+const TYPE_LABEL = { personal: 'copyMap.typePersonal', corp: 'copyMap.typeCorp', alliance: 'copyMap.typeAlliance' } as const;
+
+// Duplicate the active map. Source is fixed (the active map, shown read-only); the
+// four toggles gate system notes / signatures / structures / anomalies — topology
+// + intel/labels always copy. When the source is a corp/alliance map, the copy's
+// scope can be re-chosen (e.g. copy an alliance map into a new corp map), limited
+// to the types the caller may create; the server re-checks role/affiliation/quota.
 export function CopyMapModal({ onClose }: { onClose: () => void }) {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const activeMapId    = useMapStore((s) => s.activeMapId);
   const sourceName     = useMapStore((s) => s.map.name);
+  const maps           = useMapStore((s) => s.maps);
   const switchMap      = useMapStore((s) => s.switchMap);
   const loadMaps       = useMapStore((s) => s.loadMaps);
   const requestFitView = useMapStore((s) => s.requestFitView);
 
+  const source        = maps.find((m) => m.id === activeMapId);
+  const sourceIsShared = !!source?.isCorpMap || !!source?.isAllianceMap;
+  const role          = user?.role ?? 'readonly';
+  const canCorp       = (!!user?.corpMode || !!user?.allianceMode) && (role === 'full' || isAdminRole(role));
+  const canAlliance   = !!user?.allianceMode && isAllianceAdminRole(role);
+  const typeOptions: MapType[] = ['personal', ...(canCorp ? ['corp' as const] : []), ...(canAlliance ? ['alliance' as const] : [])];
+  // Default to the source's own scope when the caller may create it, else personal.
+  const defaultType: MapType = source?.isAllianceMap && canAlliance ? 'alliance'
+    : source?.isCorpMap && canCorp ? 'corp' : 'personal';
+
   const [name, setName]             = useState(`${sourceName} Copy`);
+  const [mapType, setMapType]       = useState<MapType>(defaultType);
   const [notes, setNotes]           = useState(true);
   const [signatures, setSignatures] = useState(true);
   const [structures, setStructures] = useState(true);
@@ -27,6 +46,9 @@ export function CopyMapModal({ onClose }: { onClose: () => void }) {
 
   const trimmed = name.trim();
   const canCopy = !!activeMapId && !!trimmed && !busy;
+  // Only offer the scope picker for corp/alliance sources (personal copies stay
+  // personal) and only when there's actually more than one option to pick.
+  const showTypePicker = sourceIsShared && typeOptions.length > 1;
 
   async function doCopy() {
     if (!canCopy || !activeMapId) return;
@@ -35,7 +57,12 @@ export function CopyMapModal({ onClose }: { onClose: () => void }) {
     try {
       const r = await api<{ id: string }>(`/api/maps/${activeMapId}/copy`, {
         method: 'POST',
-        body: JSON.stringify({ name: trimmed, include: { notes, signatures, structures, anomalies } }),
+        body: JSON.stringify({
+          name: trimmed,
+          isCorpMap:     showTypePicker && mapType === 'corp',
+          isAllianceMap: showTypePicker && mapType === 'alliance',
+          include: { notes, signatures, structures, anomalies },
+        }),
       });
       toast.success(t('copyMap.success', { name: trimmed }));
       await loadMaps();
@@ -76,6 +103,24 @@ export function CopyMapModal({ onClose }: { onClose: () => void }) {
               autoFocus
             />
           </label>
+
+          {showTypePicker && (
+            <div className="field">
+              <span>{t('copyMap.typeLabel')}</span>
+              <div className="map-sidebar__btn-group">
+                {typeOptions.map((o) => (
+                  <button
+                    key={o}
+                    type="button"
+                    className={`map-sidebar__btn-group-item${mapType === o ? ' map-sidebar__btn-group-item--active' : ''}`}
+                    onClick={() => setMapType(o)}
+                  >
+                    {t(TYPE_LABEL[o])}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="field">
             <span>{t('copyMap.include')}</span>
