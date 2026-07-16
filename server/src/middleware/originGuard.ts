@@ -35,13 +35,25 @@ function stripTrailingSlashes(s: string): string {
  * EVE SSO redirects in via top-level navigation, which the OAuth state
  * param verifies separately.
  */
-export function originGuard(allowedOrigin: string) {
+export function originGuard(allowedOrigin: string, opts: { exemptPaths?: string[] } = {}) {
   // Normalise once: strip trailing slash so '.../app' and '.../app/'
   // both match without per-request string juggling.
   const allowed = stripTrailingSlashes(allowedOrigin);
+  const exemptPaths = opts.exemptPaths ?? [];
 
   return function originGuardMiddleware(req: Request, res: Response, next: NextFunction) {
     if (!STATE_METHODS.has(req.method)) {
+      next();
+      return;
+    }
+
+    // Public server-to-server endpoints (e.g. anonymous telemetry pings from
+    // self-hosted installs) legitimately arrive with NO browser Origin/Referer.
+    // They also carry no ambient credential (no session cookie is meaningful to
+    // them) and change no victim-affecting state, so CSRF doesn't apply — the
+    // guard would otherwise reject every one of them at the no-Origin branch
+    // below. Such routes validate + rate-limit their own input downstream.
+    if (exemptPaths.some((p) => req.path === p || req.path.startsWith(`${p}/`))) {
       next();
       return;
     }

@@ -715,20 +715,23 @@ Only ever use a container ID you own. The ID is inlined at build time, so a rebu
 
 ### Deployment telemetry (version ping) — opt-in
 
-So the project can gauge how many people self-host and which versions are live, the server can send a tiny **opt-in** ping. It is **off unless you set `NEXUM_TELEMETRY=1`**, and when enabled it sends, once a day:
+So the project can gauge how many people self-host and which versions are live, the server can send a tiny **opt-in** ping. It is **off by default**, and when enabled it sends, once a day:
 
 - the app **version** (e.g. `0.1.0`)
 - a **random per-instance id** (generated once, stored locally), so repeat pings count as one install
 
-That's the entire payload. It contains **no** user data, character names, corp IDs, map data, or settings, and the receiver **does not store your IP**. To enable it:
+That's the entire payload. It contains **no** user data, character names, corp IDs, map data, or settings, and the receiver **does not store your IP**. There are two ways to opt in:
 
 ```bash
+# 1. the flag — sends to the project's default collector
 NEXUM_TELEMETRY=1                                  # in .env
-# optional: send to your own collector instead of the project's
-# NEXUM_TELEMETRY_URL=https://your-host/api/telemetry
+
+# 2. …or just set a collector URL. Populating this is itself treated as opt-in,
+#    so you don't also need the flag. Point it at the project's or your own.
+NEXUM_TELEMETRY_URL=https://eve-nexum.com/api/telemetry
 ```
 
-Unset `NEXUM_TELEMETRY` (the default) and the server never makes the call. The receiving endpoint (`POST /api/telemetry`) exists on every deployment but stays empty unless instances are pointed at it.
+Leave **both** unset (the default) and the server never makes the call. The receiving endpoint (`POST /api/telemetry`) exists on every deployment but stays empty unless instances are pointed at it.
 
 ---
 
