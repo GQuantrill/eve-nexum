@@ -12,9 +12,11 @@ const TYPE_LABEL = { personal: 'copyMap.typePersonal', corp: 'copyMap.typeCorp',
 
 // Duplicate the active map. Source is fixed (the active map, shown read-only); the
 // four toggles gate system notes / signatures / structures / anomalies — topology
-// + intel/labels always copy. When the source is a corp/alliance map, the copy's
-// scope can be re-chosen (e.g. copy an alliance map into a new corp map), limited
-// to the types the caller may create; the server re-checks role/affiliation/quota.
+// + intel/labels always copy. The copy's scope can be chosen (Personal / Corp /
+// Alliance) — e.g. turn a personal map into a corp map, or an alliance map into a
+// corp one — limited to the scopes the caller may create; the server re-checks
+// role/affiliation/quota. (Maps merely shared with the caller can't be copied at
+// all — the Copy action is hidden for them and the server 403s.)
 export function CopyMapModal({ onClose }: { onClose: () => void }) {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -26,7 +28,6 @@ export function CopyMapModal({ onClose }: { onClose: () => void }) {
   const requestFitView = useMapStore((s) => s.requestFitView);
 
   const source        = maps.find((m) => m.id === activeMapId);
-  const sourceIsShared = !!source?.isCorpMap || !!source?.isAllianceMap;
   const role          = user?.role ?? 'readonly';
   const canCorp       = (!!user?.corpMode || !!user?.allianceMode) && (role === 'full' || isAdminRole(role));
   const canAlliance   = !!user?.allianceMode && isAllianceAdminRole(role);
@@ -46,9 +47,9 @@ export function CopyMapModal({ onClose }: { onClose: () => void }) {
 
   const trimmed = name.trim();
   const canCopy = !!activeMapId && !!trimmed && !busy;
-  // Only offer the scope picker for corp/alliance sources (personal copies stay
-  // personal) and only when there's actually more than one option to pick.
-  const showTypePicker = sourceIsShared && typeOptions.length > 1;
+  // Offer the scope picker whenever there's more than one scope the caller may
+  // create — so a personal ("solo") map can be copied into a corp/alliance map too.
+  const showTypePicker = typeOptions.length > 1;
 
   async function doCopy() {
     if (!canCopy || !activeMapId) return;

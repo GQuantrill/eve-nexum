@@ -779,6 +779,12 @@ mapsRouter.post('/:mapId/copy', async (req, res) => {
   const sourceMapId = req.params.mapId;
   const access = await getMapAccess(sourceMapId, req);
   if (!access) { res.status(404).json({ error: 'Map not found' }); return; }
+  // A map that reached the caller via a map_shares grant (someone else's map,
+  // shared with them) can only be copied by its owner — a recipient can't fork it.
+  if (access.accessKind === 'shared') {
+    res.status(403).json({ error: 'A map shared with you can only be copied by its owner' });
+    return;
+  }
   if ((access.accessKind === 'corp_member' || access.accessKind === 'alliance_member') && authUser(req).role === 'readonly') {
     res.status(403).json({ error: 'Read-only corp/alliance maps cannot be copied' });
     return;
