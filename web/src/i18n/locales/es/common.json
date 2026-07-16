@@ -820,6 +820,7 @@
     "jumpgate": "Jump gate",
     "whLifetime": "Vida útil del agujero de gusano",
     "lifeFresh": "Reciente",
+    "lifeFreshMax": "Reciente ({{hours}} horas)",
     "life1d": "Menos de 1 día restante",
     "life4h": "Menos de 4 horas restantes",
     "life1h": "Menos de 1 hora restante",

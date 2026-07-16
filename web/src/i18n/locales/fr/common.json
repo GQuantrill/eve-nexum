@@ -820,6 +820,7 @@
     "jumpgate": "Jump gate",
     "whLifetime": "Durée de vie du trou de ver",
     "lifeFresh": "Récent",
+    "lifeFreshMax": "Récent ({{hours}} heures)",
     "life1d": "Moins d'1 jour restant",
     "life4h": "Moins de 4 heures restantes",
     "life1h": "Moins d'1 heure restante",

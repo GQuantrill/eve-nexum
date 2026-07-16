@@ -15,6 +15,7 @@ import { useWatchlistAlerts } from '../../hooks/useWatchlistAlerts';
 import { useMapSignatureIndex } from '../../hooks/useMapSignatureIndex';
 import { useUndivedWormholeIndex } from '../../hooks/useUndivedWormholeIndex';
 import { useLeadsToIndex } from '../../hooks/useLeadsToIndex';
+import { useWormholeTypes } from '../../hooks/useWormholeTypes';
 import { useCanEdit } from '../../hooks/useCanEdit';
 import { useMinimapPosition } from '../../hooks/useMinimapPosition';
 import { useShareMode } from '../../context/ShareModeContext';
@@ -111,6 +112,7 @@ function systemToNode(sys: MapSystem, selectedId: string | null, easyConnect = f
 
 export function MapCanvas() {
   const { t } = useTranslation();
+  const whTypes = useWormholeTypes();
   useMapSignatureIndex();
   useUndivedWormholeIndex();
   useLeadsToIndex();
@@ -962,9 +964,18 @@ export function MapCanvas() {
               'fresh';
             const eolFromOffset = (hrsBack: number) =>
               new Date(Date.now() - hrsBack * 3_600_000).toISOString();
+            // "Fresh" carries the wormhole type's max lifetime when we know it. A
+            // bare K162 (reverse side, forward type unidentified) has no inherent
+            // lifetime, so it — and any untyped connection — shows no timespan.
+            const whCode = (conn?.type ?? '').trim().toUpperCase();
+            const lifeHrs = whCode && whCode !== 'K162' ? whTypes[whCode]?.lifetimeHours : undefined;
+            // Every row carries a `checked` boolean so they share the same layout
+            // (the check column). The state is categorical — the three EOL rows
+            // are quick "set how deep into EOL" actions; the eol stage reads on
+            // the first, matching the coarse indicator the edge label refines.
             return [
               {
-                label: t('ctxMenu.lifeFresh'),
+                label: lifeHrs ? t('ctxMenu.lifeFreshMax', { hours: lifeHrs }) : t('ctxMenu.lifeFresh'),
                 checked: stage === 'fresh',
                 action: () => updateConnection(eid, { timeStatus: 'fresh', eolAt: null }),
               },
@@ -980,10 +991,12 @@ export function MapCanvas() {
               },
               {
                 label: t('ctxMenu.life1h'),
+                checked: false,
                 action: () => updateConnection(eid, { timeStatus: 'eol', eolAt: eolFromOffset(3) }),
               },
               {
                 label: t('ctxMenu.lifeExpired'),
+                checked: false,
                 action: () => updateConnection(eid, { timeStatus: 'eol', eolAt: eolFromOffset(4) }),
               },
             ];

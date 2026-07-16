@@ -879,6 +879,7 @@
     "jumpgate": "Jumpgate",
     "whLifetime": "Wormhole Lifetime",
     "lifeFresh": "Fresh",
+    "lifeFreshMax": "Fresh ({{hours}} hours)",
     "life1d": "Less than 1 day remaining",
     "life4h": "Less than 4 hours remaining",
     "life1h": "Less than 1 hour remaining",
