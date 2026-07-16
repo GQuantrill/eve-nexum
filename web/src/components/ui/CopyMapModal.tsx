@@ -108,12 +108,12 @@ export function CopyMapModal({ onClose }: { onClose: () => void }) {
           {showTypePicker && (
             <div className="field">
               <span>{t('copyMap.typeLabel')}</span>
-              <div className="map-sidebar__btn-group">
+              <div className="copymap__type-group">
                 {typeOptions.map((o) => (
                   <button
                     key={o}
                     type="button"
-                    className={`map-sidebar__btn-group-item${mapType === o ? ' map-sidebar__btn-group-item--active' : ''}`}
+                    className={`copymap__type-btn${mapType === o ? ' copymap__type-btn--active' : ''}`}
                     onClick={() => setMapType(o)}
                   >
                     {t(TYPE_LABEL[o])}

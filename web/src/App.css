@@ -3183,6 +3183,23 @@
   gap: 4px;
 }
 
+/* Copy Map "new map type" picker — buttons side by side, equal width. */
+.copymap__type-group { display: flex; gap: 6px; }
+.copymap__type-btn {
+  flex: 1;
+  padding: 6px 10px;
+  background: #141c2e;
+  border: 1px solid #1e2740;
+  border-radius: 5px;
+  color: #c0ccde;
+  font-size: calc(13px * var(--font-scale, 1));
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.copymap__type-btn:hover { background: #1a2440; color: #c8d0e0; }
+.copymap__type-btn--active { background: #1a3060; border-color: #3a6abf; color: #c8d8ff; }
+
 .map-sidebar__btn-group-item {
   width: 100%;
   padding: 6px 10px;
