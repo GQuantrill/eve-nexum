@@ -47,6 +47,7 @@ export type WatchMatch =
   | { by: 'system';   query: string }
   | { by: 'whType';   code: string }
   | { by: 'class';    cls: SystemClass }
+  | { by: 'leadsTo';  cls: SystemClass }
   | { by: 'effect';   effect: WormholeEffect }
   | { by: 'frigHole' };
 
