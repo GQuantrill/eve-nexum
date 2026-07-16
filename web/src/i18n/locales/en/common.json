@@ -1552,6 +1552,10 @@
       "perCharAttr": {
         "title": "Per-character attribution",
         "desc": "Sigs, structures, and system add / delete actions are recorded with the user who made them, so reports can answer \"who has been scanning what\" with no manual logging."
+      },
+      "accessControl": {
+        "title": "User access control",
+        "desc": "Decide who can sign in beyond your .env core: a DB allow-list (seeded from CORP_ID/ALLIANCE_ID) managed in the admin area, optional auto-admit of friendly corps/alliances by in-game standing (+5/+10), and a standings viewer that groups your contacts by band. Sessions are re-checked live, so revoking access — or a pilot leaving an admitted corp — logs them out."
       }
     },
     "forCorpsBody": "Run Nexum as a shared deployment for your corp or alliance. Members get visible-to-the-corp chain maps and private personal maps in one tool, with role-based permissions, admin tooling, and per-character activity reporting.",
