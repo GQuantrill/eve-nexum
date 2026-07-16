@@ -140,7 +140,7 @@
       "syncNoRole": "Sincronizado, pero tu personaje no pudo leer la lista de contactos de corp/alianza. Necesita el rol de Contact Manager (corp) o de ejecutor de alianza en el juego más el scope de contactos — el acceso por standing requiere un personaje que los tenga.",
       "syncFailed": "Error al sincronizar standings.",
       "readonlyNote": "Cualquier corp, alianza o personaje añadido aquí empieza como solo lectura. Deben iniciar sesión al menos una vez antes de que puedas asignarles un rol (en la pestaña Usuarios).",
-      "syncDelay": "Aviso: EVE puede tardar hasta ~10 minutos en publicar los cambios de contactos en ESI, así que un standing que acabas de establecer en el juego puede que aún no aparezca en una sincronización.",
+      "syncDelay": "Aviso: EVE puede tardar hasta ~15 minutos en publicar los cambios de contactos en ESI, así que un standing que acabas de establecer en el juego puede que aún no aparezca en una sincronización.",
       "eveWho": "Ver en eveWho",
       "standingsEnable": "Admitir amigos automáticamente por standing",
       "standingsHint": "Cuando está activo, cualquiera a quien la instalación tenga en el standing elegido o superior puede iniciar sesión automáticamente, sin necesidad de añadirlo aquí. Desactivado por defecto; requiere que los contactos de corp/alianza estén sincronizados (botón abajo).",
