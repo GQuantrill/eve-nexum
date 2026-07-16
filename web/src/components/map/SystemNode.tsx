@@ -33,7 +33,6 @@ import { useStaleThreshold } from '../../hooks/useStaleThreshold';
 import { useCustomIntel } from '../../hooks/useCustomIntel';
 import { resolveIntelColor, resolveIntelLabel } from '../../utils/intelColors';
 import { useWatchlist } from '../../hooks/useWatchlist';
-import { useSystemClassByName } from '../../hooks/useSystemClassByName';
 import { matchSystem } from '../../utils/watchMatch';
 import { contentFilterActive, systemMatchesContent } from '../../utils/contentMatch';
 import { watchMarker } from '../../data/watchMarkers';
@@ -172,13 +171,12 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
   // entry (by name, class, effect, or a static wormhole type / frig hole).
   const [watchEntries]  = useWatchlist();
   const watchSigTypes   = useMapStore((s) => s.sigTypesBySystem[sys.id]);
-  const watchWhSigs     = useMapStore((s) => s.whSigsBySystem[sys.id]);
-  const classByName     = useSystemClassByName();
+  const watchLeadsTo    = useMapStore((s) => s.leadsToClassesBySystem[sys.id]);
   // Memoized: matchSystem scans up to MAX_WATCH (~75) entries; without this it
   // re-ran on every re-render (e.g. every 10s location poll), for every node.
   const watch           = useMemo(
-    () => matchSystem(watchEntries, sys, watchSigTypes, watchWhSigs, classByName),
-    [watchEntries, sys, watchSigTypes, watchWhSigs, classByName],
+    () => matchSystem(watchEntries, sys, watchSigTypes, watchLeadsTo),
+    [watchEntries, sys, watchSigTypes, watchLeadsTo],
   );
   const watchDef        = watch ? watchMarker(watch.marker) : null;
   const watchTip        = watch ? (watch.note.trim() || t(`watchMarker.${watch.marker}`)) : undefined;

@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { useMapStore } from '../store/mapStore';
 import { useUserSetting } from './useUserSetting';
 import { useWatchlist } from './useWatchlist';
-import { useSystemClassByName } from './useSystemClassByName';
 import { matchSystem, matchConnection } from '../utils/watchMatch';
 import { toast } from '../components/ui/Toaster';
 import { NOTIFY, fireDesktopNotification } from '../utils/notificationPrefs';
@@ -55,8 +54,7 @@ export function useWatchlistAlerts() {
   const connections = useMapStore((s) => s.map.connections);
   const activeMapId = useMapStore((s) => s.activeMapId);
   const sigTypesBySystem = useMapStore((s) => s.sigTypesBySystem);
-  const whSigsBySystem = useMapStore((s) => s.whSigsBySystem);
-  const classByName = useSystemClassByName();
+  const leadsToClassesBySystem = useMapStore((s) => s.leadsToClassesBySystem);
   const [entries]   = useWatchlist();
   const [soundOn]   = useUserSetting<boolean>(NOTIFY.watchlistSound, true);
   const [desktopOn] = useUserSetting<boolean>(NOTIFY.watchlistDesktop, false);
@@ -74,7 +72,7 @@ export function useWatchlistAlerts() {
     // Present matches, keyed by target id, with the label/marker to announce.
     const present = new Map<string, { name: string; marker: string }>();
     for (const sys of systems) {
-      const e = matchSystem(entries, sys, sigTypesBySystem[sys.id], whSigsBySystem[sys.id], classByName);
+      const e = matchSystem(entries, sys, sigTypesBySystem[sys.id], leadsToClassesBySystem[sys.id]);
       if (e) present.set(`sys:${sys.id}`, { name: sys.name || '?', marker: t(`watchMarker.${e.marker}`) });
     }
     for (const conn of connections) {
@@ -118,5 +116,5 @@ export function useWatchlistAlerts() {
     for (const key of Array.from(st.alerted)) {
       if (!present.has(key)) st.alerted.delete(key);
     }
-  }, [systems, connections, activeMapId, sigTypesBySystem, whSigsBySystem, classByName, entries, soundOn, desktopOn, t]);
+  }, [systems, connections, activeMapId, sigTypesBySystem, leadsToClassesBySystem, entries, soundOn, desktopOn, t]);
 }

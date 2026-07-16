@@ -14,6 +14,7 @@ import { useAccountLocations } from '../../hooks/useAccountLocations';
 import { useWatchlistAlerts } from '../../hooks/useWatchlistAlerts';
 import { useMapSignatureIndex } from '../../hooks/useMapSignatureIndex';
 import { useUndivedWormholeIndex } from '../../hooks/useUndivedWormholeIndex';
+import { useLeadsToIndex } from '../../hooks/useLeadsToIndex';
 import { useCanEdit } from '../../hooks/useCanEdit';
 import { useMinimapPosition } from '../../hooks/useMinimapPosition';
 import { useShareMode } from '../../context/ShareModeContext';
@@ -112,6 +113,7 @@ export function MapCanvas() {
   const { t } = useTranslation();
   useMapSignatureIndex();
   useUndivedWormholeIndex();
+  useLeadsToIndex();
   useWatchlistAlerts();
   const systems              = useMapStore((s) => s.map.systems);
   const connections          = useMapStore((s) => s.map.connections);
