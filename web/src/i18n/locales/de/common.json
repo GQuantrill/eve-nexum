@@ -1495,6 +1495,10 @@
       "perCharAttr": {
         "title": "Zuordnung pro Charakter",
         "desc": "Sigs, Strukturen sowie System-Hinzufügen- / -Löschen-Aktionen werden mit dem Benutzer erfasst, der sie ausgeführt hat, sodass Berichte ohne manuelle Protokollierung beantworten können, \"wer was gescannt hat\"."
+      },
+      "accessControl": {
+        "title": "Benutzer-Zugriffskontrolle",
+        "desc": "Bestimme, wer sich über deinen .env-Kern hinaus anmelden darf: eine DB-Zulassungsliste (aus CORP_ID/ALLIANCE_ID vorbefüllt) im Admin-Bereich, optionale automatische Aufnahme befreundeter Corps/Allianzen nach Standing (+5/+10) und eine Standing-Ansicht nach Stufe. Sitzungen werden live geprüft — Zugriff entziehen oder eine Corp verlassen meldet die Nutzer ab."
       }
     },
     "forCorpsBody": "Betreibe Nexum als gemeinsames Deployment für deine Corp oder Allianz. Mitglieder erhalten für die Corp sichtbare Kettenkarten und private persönliche Karten in einem Tool, mit rollenbasierten Berechtigungen, Admin-Tools und Aktivitätsberichten pro Charakter.",

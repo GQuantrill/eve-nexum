@@ -1495,6 +1495,10 @@
       "perCharAttr": {
         "title": "Atribución por personaje",
         "desc": "Las firmas, estructuras y las acciones de añadir / eliminar sistemas se registran con el usuario que las realizó, para que los informes puedan responder a «quién ha estado escaneando qué» sin registro manual."
+      },
+      "accessControl": {
+        "title": "Control de acceso de usuarios",
+        "desc": "Decide quién puede iniciar sesión más allá de tu núcleo .env: una lista de permitidos en BD (sembrada desde CORP_ID/ALLIANCE_ID) gestionada en el panel, admisión automática opcional de corps/alianzas amigas por standing (+5/+10) y un visor de standings agrupados por nivel. Las sesiones se revalidan en vivo: revocar acceso —o un piloto que deja una corp admitida— lo desconecta."
       }
     },
     "forCorpsBody": "Ejecuta Nexum como un despliegue compartido para tu corp o alianza. Los miembros obtienen mapas de cadena visibles para la corp y mapas personales privados en una sola herramienta, con permisos basados en roles, herramientas de administración e informes de actividad por personaje.",

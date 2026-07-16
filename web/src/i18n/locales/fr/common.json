@@ -1495,6 +1495,10 @@
       "perCharAttr": {
         "title": "Attribution par personnage",
         "desc": "Les sigs, structures et actions d'ajout / suppression de système sont enregistrées avec l'utilisateur qui les a effectuées, pour que les rapports puissent répondre à « qui a scanné quoi » sans journalisation manuelle."
+      },
+      "accessControl": {
+        "title": "Contrôle d'accès des utilisateurs",
+        "desc": "Décidez qui peut se connecter au-delà de votre noyau .env : une liste d'autorisation en base (initialisée depuis CORP_ID/ALLIANCE_ID) gérée dans l'admin, l'admission automatique optionnelle des corpos/alliances amies selon le standing (+5/+10), et un visualiseur de standings groupés par palier. Les sessions sont revérifiées en direct — révoquer un accès, ou un pilote quittant une corpo admise, le déconnecte."
       }
     },
     "forCorpsBody": "Faites tourner Nexum en déploiement partagé pour votre corp ou alliance. Les membres obtiennent des cartes de chaîne visibles par la corp et des cartes personnelles privées dans un seul outil, avec des permissions basées sur les rôles, des outils d'administration et des rapports d'activité par personnage.",
