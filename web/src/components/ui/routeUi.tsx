@@ -6,6 +6,7 @@ import { toast } from './Toaster';
 import i18n from '../../i18n';
 import { truesecColor } from '../../utils/truesec';
 import { ContextMenu } from './ContextMenu';
+import { useSystemAlias } from '../../hooks/useSystemAlias';
 import type { RouteEntry, RoutePathNode, EdgeMeta } from '../../hooks/useRoute';
 
 /** Fire ESI waypoint endpoint; surface success/failure via toast. */
@@ -43,6 +44,7 @@ function viaLabel(t: TFunction, via: EdgeMeta): string {
  */
 export function RouteSquares({ route }: { route: RouteEntry }) {
   const { t } = useTranslation();
+  const aliasName = useSystemAlias();
   const [menu, setMenu] = useState<{ x: number; y: number; node: RoutePathNode } | null>(null);
 
   return (
@@ -61,8 +63,8 @@ export function RouteSquares({ route }: { route: RouteEntry }) {
           <span
             className={`scout-route__square${sys.kspace ? ' scout-route__square--kspace' : ''}`}
             style={{ background: truesecColor(sys.security) }}
-            data-tooltip={`${sys.name} ${sys.security.toFixed(1)}`}
-            aria-label={`${sys.name} ${sys.security.toFixed(1)}`}
+            data-tooltip={`${aliasName(sys.name)} ${sys.security.toFixed(1)}`}
+            aria-label={`${aliasName(sys.name)} ${sys.security.toFixed(1)}`}
             onContextMenu={sys.kspace
               ? (e) => { e.preventDefault(); setMenu({ x: e.clientX, y: e.clientY, node: sys }); }
               : undefined}

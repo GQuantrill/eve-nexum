@@ -1,4 +1,5 @@
 import type { WormholeMap, MapSystem, SavedRoute, Signature } from '../types';
+import { systemDisplayName } from './systemName';
 
 // A computed path through the map's own connections: the ordered system ids and
 // the connection traversed between each consecutive pair (length = systems - 1).
@@ -130,8 +131,8 @@ export function buildChainSteps(
     steps.push({
       index: i + 1,
       fromId, toId,
-      fromName: sysById.get(fromId)?.name ?? '?',
-      toName:   sysById.get(toId)?.name ?? '?',
+      fromName: (() => { const s = sysById.get(fromId); return s ? systemDisplayName(s) : '?'; })(),
+      toName:   (() => { const s = sysById.get(toId);   return s ? systemDisplayName(s) : '?'; })(),
       kind, whType, sigId, broken,
     });
   }

@@ -7,6 +7,7 @@ import { whSizeForType, whSizeShort } from '../../utils/wormholeSize';
 import { useRouteOrigin } from '../../hooks/useRouteOrigin';
 import { useRoute } from '../../hooks/useRoute';
 import { setWaypoint, RouteSquares } from './routeUi';
+import { useSystemAlias } from '../../hooks/useSystemAlias';
 import { truesecColor } from '../../utils/truesec';
 import { useMapStore } from '../../store/mapStore';
 import { MapPinSimpleIcon, PathIcon } from '@phosphor-icons/react';
@@ -63,6 +64,7 @@ function formatRemaining(t: TFunction, hours: number): string {
 
 export function ScoutConnectionsPane({ scoutSystem }: Props) {
   const { t }    = useTranslation();
+  const aliasName = useSystemAlias();
   const all      = useScoutConnections();
   const origin   = useRouteOrigin();
   const routeMode = useMapStore((s) => s.routeMode);
@@ -131,9 +133,9 @@ export function ScoutConnectionsPane({ scoutSystem }: Props) {
   return (
     <div className="scout-pane">
       {origin.characterName && origin.name ? (
-        <div className="scout-pane__note scout-pane__note--lastknown">{t('route.fromCharacter', { character: origin.characterName, system: origin.name })}</div>
+        <div className="scout-pane__note scout-pane__note--lastknown">{t('route.fromCharacter', { character: origin.characterName, system: aliasName(origin.name) })}</div>
       ) : origin.fromLastKnown && origin.name ? (
-        <div className="scout-pane__note scout-pane__note--lastknown">{t('route.fromLastKnown', { system: origin.name })}</div>
+        <div className="scout-pane__note scout-pane__note--lastknown">{t('route.fromLastKnown', { system: aliasName(origin.name) })}</div>
       ) : null}
       <div className="scout-pane__sort">
         <label className="scout-pane__sort-label" htmlFor={`scout-sort-${scoutSystem}`}>
@@ -160,7 +162,7 @@ export function ScoutConnectionsPane({ scoutSystem }: Props) {
         return (
           <div key={c.id} className="scout-row">
             <div className="scout-row__sys">
-              <span className="scout-row__name">{c.inSystemName}</span>
+              <span className="scout-row__name">{aliasName(c.inSystemName)}</span>
               {c.inSystemClass && (
                 <span
                   className="scout-row__class"

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useMapStore } from '../../store/mapStore';
+import { systemDisplayName } from '../../utils/systemName';
 
 interface Result {
   mapId:        string;
@@ -64,12 +65,13 @@ export function CommandPaletteModal() {
     // each map's name itself; selecting a non-active map switches to it.
     const out: Result[] = [];
     for (const s of currentMap.systems) {
-      if (s.name.toLowerCase().includes(q)) {
+      // Match on the real name AND the alias, so a system is findable by either.
+      if (s.name.toLowerCase().includes(q) || (s.alias?.trim().toLowerCase().includes(q) ?? false)) {
         out.push({
           mapId:        currentMap.id,
           mapName:      currentMap.name,
           systemId:     s.id,
-          systemName:   s.name,
+          systemName:   systemDisplayName(s),
           systemClass:  s.systemClass,
           regionName:   s.regionName,
           isCurrentMap: true,

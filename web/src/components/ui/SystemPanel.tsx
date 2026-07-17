@@ -25,6 +25,7 @@ import { ActivityPane } from './ActivityPane';
 import { useStandings, type ContactKind } from '../../hooks/useStandings';
 import { toast } from './Toaster';
 import { truesecColor } from '../../utils/truesec';
+import { systemDisplayName } from '../../utils/systemName';
 import { useIncursions, findIncursion } from '../../hooks/useIncursions';
 import { useInsurgency, findInsurgency } from '../../hooks/useInsurgency';
 import { useCanEditContent } from '../../hooks/useCanEditContent';
@@ -398,7 +399,11 @@ export function SystemPanel() {
       <>
       <div className="system-panel__left" style={{ width: infoWidth }}>
         <div className="system-panel__header">
-          <h2 className="system-panel__title">{sys.name || t('systemPanel.unknownSystem')}</h2>
+          <h2 className="system-panel__title">
+            {sys.alias?.trim()
+              ? <>{sys.alias.trim()} <span className="system-panel__real-name">({sys.name})</span></>
+              : (sys.name || t('systemPanel.unknownSystem'))}
+          </h2>
           <div className="system-panel__actions">
             {sys.eveSystemId && !isShareMode && (
               <>
@@ -460,7 +465,7 @@ export function SystemPanel() {
                 {chainEffects.map((s) => (
                   <ChainEffectChip
                     key={s.id}
-                    name={s.name}
+                    name={systemDisplayName(s)}
                     effect={s.effect}
                     isCurrent={s.id === sys.id}
                     onClick={() => selectSystem(s.id)}
