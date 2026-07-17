@@ -51,6 +51,7 @@ export async function listVisibleMaps(p: VisibleMapsParams) {
             m.allow_as_merge_source       AS "allowAsMergeSource",
             m.allow_as_merge_destination  AS "allowAsMergeDestination",
             m.lazy_remove_wormholes       AS "lazyRemoveWormholes",
+            m.collapse_grace_hours        AS "collapseGraceHours",
             m.last_active_at AS "lastActiveAt",
             m.created_at     AS "createdAt",
             m.updated_at     AS "updatedAt"
@@ -80,6 +81,7 @@ export async function loadFullMap(mapId: string) {
               allow_as_merge_source       AS "allowAsMergeSource",
               allow_as_merge_destination  AS "allowAsMergeDestination",
               lazy_remove_wormholes       AS "lazyRemoveWormholes",
+              collapse_grace_hours        AS "collapseGraceHours",
               bookmark_format             AS "bookmarkFormat",
               share_token              AS "shareToken",
               share_expires_at         AS "shareExpiresAt",
@@ -108,7 +110,7 @@ export async function loadFullMap(mapId: string) {
               connection_type AS "connectionType", mass_status AS "massStatus",
               time_status AS "timeStatus", size, wh_type AS "type",
               COALESCE(mass_used, 0)::float8 AS "massUsed",
-              eol_at AS "eolAt", broken,
+              eol_at AS "eolAt", lifetime_expires_at AS "lifetimeExpiresAt", broken,
               source_signature_id AS "sourceSignatureId",
               target_signature_id AS "targetSignatureId",
               created_at AS "createdAt"
