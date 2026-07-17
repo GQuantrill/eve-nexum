@@ -108,7 +108,7 @@ export async function loadFullMap(mapId: string) {
               connection_type AS "connectionType", mass_status AS "massStatus",
               time_status AS "timeStatus", size, wh_type AS "type",
               COALESCE(mass_used, 0)::float8 AS "massUsed",
-              eol_at AS "eolAt", broken,
+              eol_at AS "eolAt", lifetime_expires_at AS "lifetimeExpiresAt", broken,
               source_signature_id AS "sourceSignatureId",
               target_signature_id AS "targetSignatureId",
               created_at AS "createdAt"

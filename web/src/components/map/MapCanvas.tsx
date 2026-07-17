@@ -956,52 +956,62 @@ export function MapCanvas() {
         {
           label: t('ctxMenu.whLifetime'),
           submenu: (() => {
-            // The submenu's checked indicator reflects what the user last
-            // selected (categorical), not the live derived stage. Live stage
-            // lives on the edge label; this is just "what option did I click?".
-            const hasEol = !!conn?.eolAt;
+            // The checked indicator is the coarse "what stage am I in?" hint from
+            // the stored category (the sweep keeps it current within the hour);
+            // the live countdown lives on the edge label. Picking a row sets a
+            // manual expiry (lifetimeExpiresAt) that then ages from that point.
+            const hasEol = !!conn?.eolAt || !!conn?.lifetimeExpiresAt;
             const stage: 'fresh' | 'lessThan24h' | 'eol' =
               timeStatus === 'lessThan24h' ? 'lessThan24h' :
-              hasEol || timeStatus === 'eol' ? 'eol' :
+              (hasEol || timeStatus === 'eol' || timeStatus === 'lessThan4h'
+                || timeStatus === 'lessThan1h' || timeStatus === 'expired') ? 'eol' :
               'fresh';
-            const eolFromOffset = (hrsBack: number) =>
-              new Date(Date.now() - hrsBack * 3_600_000).toISOString();
+            // Date.now() only inside the action closures — calling it while
+            // building the items trips the react-compiler "impure in render" rule.
+            const expiresIn = (hrs: number) =>
+              new Date(Date.now() + hrs * 3_600_000).toISOString();
             // "Fresh" carries the wormhole type's max lifetime when we know it. A
             // bare K162 (reverse side, forward type unidentified) has no inherent
             // lifetime, so it — and any untyped connection — shows no timespan.
             const whCode = (conn?.type ?? '').trim().toUpperCase();
             const lifeHrs = whCode && whCode !== 'K162' ? whTypes[whCode]?.lifetimeHours : undefined;
-            // Every row carries a `checked` boolean so they share the same layout
-            // (the check column). The state is categorical — the three EOL rows
-            // are quick "set how deep into EOL" actions; the eol stage reads on
-            // the first, matching the coarse indicator the edge label refines.
-            return [
-              {
-                label: lifeHrs ? t('ctxMenu.lifeFreshMax', { hours: lifeHrs }) : t('ctxMenu.lifeFresh'),
-                checked: stage === 'fresh',
-                action: () => updateConnection(eid, { timeStatus: 'fresh', eolAt: null }),
-              },
+            // Fresh = more than a day of life left, only reachable by a >24h hole.
+            // Hide it for a known 24h/16h hole (it opens straight into "< 1 day");
+            // keep it when the life is unknown (K162/untyped) since we can't rule
+            // it out. Setting it clears any legacy eol_at so the override wins.
+            const showFresh = !lifeHrs || lifeHrs > 24;
+            const rows: { label: string; checked: boolean; action: () => void }[] = [];
+            if (showFresh) rows.push({
+              label: lifeHrs ? t('ctxMenu.lifeFreshMax', { hours: lifeHrs }) : t('ctxMenu.lifeFresh'),
+              checked: stage === 'fresh',
+              action: () => updateConnection(eid, {
+                timeStatus: 'fresh', eolAt: null,
+                lifetimeExpiresAt: lifeHrs ? expiresIn(lifeHrs) : null,
+              }),
+            });
+            rows.push(
               {
                 label: t('ctxMenu.life1d'),
                 checked: stage === 'lessThan24h',
-                action: () => updateConnection(eid, { timeStatus: 'lessThan24h', eolAt: null }),
+                action: () => updateConnection(eid, { timeStatus: 'lessThan24h', eolAt: null, lifetimeExpiresAt: expiresIn(24) }),
               },
               {
                 label: t('ctxMenu.life4h'),
                 checked: stage === 'eol',
-                action: () => updateConnection(eid, { timeStatus: 'eol', eolAt: eolFromOffset(0) }),
+                action: () => updateConnection(eid, { timeStatus: 'lessThan4h', eolAt: null, lifetimeExpiresAt: expiresIn(4) }),
               },
               {
                 label: t('ctxMenu.life1h'),
                 checked: false,
-                action: () => updateConnection(eid, { timeStatus: 'eol', eolAt: eolFromOffset(3) }),
+                action: () => updateConnection(eid, { timeStatus: 'lessThan1h', eolAt: null, lifetimeExpiresAt: expiresIn(1) }),
               },
               {
                 label: t('ctxMenu.lifeExpired'),
                 checked: false,
-                action: () => updateConnection(eid, { timeStatus: 'eol', eolAt: eolFromOffset(4) }),
+                action: () => updateConnection(eid, { timeStatus: 'expired', eolAt: null, lifetimeExpiresAt: expiresIn(0) }),
               },
-            ];
+            );
+            return rows;
           })(),
         },
         {

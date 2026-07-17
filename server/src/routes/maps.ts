@@ -2147,7 +2147,7 @@ mapsRouter.post('/:mapId/connections', async (req, res) => {
     `SELECT id, source_id AS "sourceId", target_id AS "targetId", source_handle AS "sourceHandle",
             target_handle AS "targetHandle", connection_type AS "connectionType", mass_status AS "massStatus",
             time_status AS "timeStatus", size, wh_type AS "type", COALESCE(mass_used, 0)::float8 AS "massUsed",
-            eol_at AS "eolAt", broken,
+            eol_at AS "eolAt", lifetime_expires_at AS "lifetimeExpiresAt", broken,
             source_signature_id AS "sourceSignatureId", target_signature_id AS "targetSignatureId",
             created_at AS "createdAt"
        FROM map_connections WHERE id = $1 AND map_id = $2`,
@@ -2178,11 +2178,29 @@ mapsRouter.patch('/:mapId/connections/:connectionId', async (req, res) => {
     timeStatus: 'time_status', size: 'size',
     sourceHandle: 'source_handle', targetHandle: 'target_handle',
     type: 'wh_type', massUsed: 'mass_used',
-    eolAt: 'eol_at', broken: 'broken',
+    eolAt: 'eol_at', lifetimeExpiresAt: 'lifetime_expires_at', broken: 'broken',
     sourceSignatureId: 'source_signature_id', targetSignatureId: 'target_signature_id',
   };
 
   const updates: Record<string, unknown> = { ...(req.body as Record<string, unknown>) };
+
+  // Validate the two time-bucket fields. The whitelist below trusts values
+  // verbatim, so reject anything malformed here (a bad ISO string would 22007
+  // the UPDATE and 500 the request; an unknown time_status would corrupt the
+  // edge state read by every client).
+  if ('timeStatus' in updates) {
+    const v = updates.timeStatus;
+    const VALID = ['fresh', 'eol', 'lessThan24h', 'lessThan4h', 'lessThan1h', 'expired'];
+    if (v !== null && (typeof v !== 'string' || !VALID.includes(v))) {
+      res.status(400).json({ error: 'invalid timeStatus' }); return;
+    }
+  }
+  if ('lifetimeExpiresAt' in updates) {
+    const v = updates.lifetimeExpiresAt;
+    if (v !== null && (typeof v !== 'string' || Number.isNaN(Date.parse(v)))) {
+      res.status(400).json({ error: 'invalid lifetimeExpiresAt' }); return;
+    }
+  }
 
   // The stored size should follow the hole type. When the wormhole type is set
   // without an explicit size — wormhole auto-detect and external API writes both

@@ -42,3 +42,53 @@ export function whLifetimeHours(code: string | null | undefined): number | null 
   if (c === 'K162') return MAX_WH_LIFETIME_HOURS;
   return WH_LIFETIME_HOURS[c] ?? null;
 }
+
+// ── Connection time-bucket model (mirrors web/src/utils/whLifetime.ts) ─────────
+// A connection's remaining life maps to one of these buckets. Kept in lockstep
+// with the client so the hourly sweep and the live edge label always agree.
+
+export type TimeBucket = 'fresh' | 'lessThan24h' | 'lessThan4h' | 'lessThan1h' | 'expired';
+
+const HOUR_MS = 3_600_000;
+// Length of the final "EOL" window a legacy eol_at mark represents (a marked
+// hole has ~4h of life left), so an old eol_at still ages correctly here.
+const EOL_LIFE_MS = 4 * HOUR_MS;
+
+/**
+ * The bucket a connection is in given the milliseconds of life it has left.
+ * Boundaries are inclusive of the shorter bucket, so a hole flips exactly at the
+ * threshold: a fresh 24h static opens at "< 1 day" (never "fresh"), and a 16h
+ * hole drops to "< 4h" once 12h have elapsed. "fresh" (> 24h left) is therefore
+ * only reachable by a hole whose max life exceeds 24h.
+ */
+export function lifeBucket(remainingMs: number): TimeBucket {
+  if (remainingMs <= 0)             return 'expired';
+  if (remainingMs <= HOUR_MS)       return 'lessThan1h';
+  if (remainingMs <= EOL_LIFE_MS)   return 'lessThan4h';
+  if (remainingMs <= 24 * HOUR_MS)  return 'lessThan24h';
+  return 'fresh';
+}
+
+/**
+ * Estimated collapse time (ms since epoch) for a connection, or null when its
+ * lifetime is unknown (untyped, or a bare K162 with no manual override — we
+ * can't know the reverse side's real life, so it never auto-ages). Priority:
+ *   1. manual override (lifetime_expires_at) — a user set it, so it always wins;
+ *   2. legacy EOL mark (eol_at) — treated as a 4h window from when it was set;
+ *   3. auto: created_at + the wh type's charted max life.
+ */
+export function effectiveExpiryMs(row: {
+  lifetimeExpiresAt: Date | string | null;
+  eolAt:             Date | string | null;
+  whType:            string | null;
+  createdAt:         Date | string;
+}): number | null {
+  if (row.lifetimeExpiresAt) return new Date(row.lifetimeExpiresAt).getTime();
+  if (row.eolAt)             return new Date(row.eolAt).getTime() + EOL_LIFE_MS;
+  const code = (row.whType ?? '').trim().toUpperCase();
+  if (code && code !== 'K162') {
+    const h = whLifetimeHours(code);
+    if (h != null) return new Date(row.createdAt).getTime() + h * HOUR_MS;
+  }
+  return null;
+}
