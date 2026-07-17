@@ -12,6 +12,7 @@ import { useEsiSearch } from '../../hooks/useEsiSearch';
 import { useMapStore } from '../../store/mapStore';
 import { useUserSetting } from '../../hooks/useUserSetting';
 import { setWaypoint, RouteSquares } from './routeUi';
+import { useSystemAlias } from '../../hooks/useSystemAlias';
 import { useRouteOrigin } from '../../hooks/useRouteOrigin';
 import { jumps as jumpsLabel } from '../../i18n/format';
 
@@ -70,6 +71,7 @@ interface RowProps {
 
 function Row({ item, route, isOpen, onToggle, onRemove, routeMode }: RowProps) {
   const { t } = useTranslation();
+  const aliasName = useSystemAlias();
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: String(item.id) });
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -88,7 +90,7 @@ function Row({ item, route, isOpen, onToggle, onRemove, routeMode }: RowProps) {
         >
           ⠿
         </button>
-        <span className="scout-row__name">{item.name}</span>
+        <span className="scout-row__name">{aliasName(item.name)}</span>
         {item.isHome && (
           <span className="scout-row__home" aria-label={t('closest.home')} data-tooltip={t('closest.home')}>
             <HouseIcon size={14} weight="regular" color="#f0c040" />
@@ -153,6 +155,7 @@ function Row({ item, route, isOpen, onToggle, onRemove, routeMode }: RowProps) {
 
 export function ClosestSystemsPane() {
   const { t } = useTranslation();
+  const aliasName = useSystemAlias();
   const origin    = useRouteOrigin();
   const routeMode = useMapStore((s) => s.routeMode);
   const homeSystem = useMapStore(useShallow((s) => {
@@ -312,9 +315,9 @@ export function ClosestSystemsPane() {
   return (
     <div className="scout-pane">
       {origin.characterName && origin.name ? (
-        <div className="scout-pane__note scout-pane__note--lastknown">{t('route.fromCharacter', { character: origin.characterName, system: origin.name })}</div>
+        <div className="scout-pane__note scout-pane__note--lastknown">{t('route.fromCharacter', { character: origin.characterName, system: aliasName(origin.name) })}</div>
       ) : origin.fromLastKnown && origin.name ? (
-        <div className="scout-pane__note scout-pane__note--lastknown">{t('route.fromLastKnown', { system: origin.name })}</div>
+        <div className="scout-pane__note scout-pane__note--lastknown">{t('route.fromLastKnown', { system: aliasName(origin.name) })}</div>
       ) : null}
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
         <SortableContext items={items.map((i) => String(i.id))} strategy={verticalListSortingStrategy}>
@@ -387,7 +390,7 @@ export function ClosestSystemsPane() {
                 onMouseEnter={() => !already && setActiveIndex(i)}
                 onMouseDown={(e) => { e.preventDefault(); if (!already) addSystem(r.id, r.name); }}
               >
-                <span className="scout-pane__add-result-name">{r.name}</span>
+                <span className="scout-pane__add-result-name">{aliasName(r.name)}</span>
                 <span className="scout-pane__add-result-region">
                   {already ? t('closest.onList') : (r.regionName ?? r.systemClass)}
                 </span>

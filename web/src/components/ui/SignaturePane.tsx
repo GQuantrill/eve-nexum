@@ -4,6 +4,7 @@ import { api } from '../../api/client';
 import { useMapStore, awaitSystemCreate } from '../../store/mapStore';
 import { useCanEditContent } from '../../hooks/useCanEditContent';
 import { useShareMode } from '../../context/ShareModeContext';
+import { systemDisplayName } from '../../utils/systemName';
 import { useUserSetting } from '../../hooks/useUserSetting';
 import { useClickOutside } from '../../hooks/useClickOutside';
 import type { Signature, SigType } from '../../types';
@@ -432,8 +433,8 @@ export function SignaturePane({ systemId }: { systemId: string }) {
       updates.whType?.toUpperCase() === 'K162' &&
       existing?.whType?.toUpperCase() !== 'K162'
     ) {
-      const sysName = mapSystems.find((s) => s.id === systemId)?.name ?? 'unknown system';
-      alertInboundK162(sysName);
+      const sysForAlert = mapSystems.find((s) => s.id === systemId);
+      alertInboundK162(sysForAlert ? systemDisplayName(sysForAlert) : 'unknown system');
     }
 
     // Re-evaluate connections whenever whType or whLeadsTo changes — either
@@ -635,8 +636,10 @@ export function SignaturePane({ systemId }: { systemId: string }) {
 
       // Warn if the character is in a different system than the one being edited
       if (currentSystemId && currentSystemId !== systemId) {
-        const currentName  = mapSystems.find((s) => s.id === currentSystemId)?.name  ?? 'unknown';
-        const selectedName = mapSystems.find((s) => s.id === systemId)?.name ?? 'unknown';
+        const cur = mapSystems.find((s) => s.id === currentSystemId);
+        const sel = mapSystems.find((s) => s.id === systemId);
+        const currentName  = cur ? systemDisplayName(cur) : 'unknown';
+        const selectedName = sel ? systemDisplayName(sel) : 'unknown';
         setPendingAction({
           message: t('signatures.pasteDifferentSystem', { current: currentName, selected: selectedName }),
           fn: () => processPaste(parsed, overwrite, delaySec),

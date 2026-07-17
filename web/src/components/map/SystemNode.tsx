@@ -39,6 +39,7 @@ import { watchMarker } from '../../data/watchMarkers';
 import { useHeatmap } from '../../context/HeatmapContext';
 import { useShareMode } from '../../context/ShareModeContext';
 import { systemDisplayName } from '../../utils/systemName';
+import { useSystemAlias } from '../../hooks/useSystemAlias';
 import { heatValue, heatColor } from '../../utils/heatmap';
 import { WHTypeInfo } from '../ui/WHTypeInfo';
 import { truesecColor } from '../../utils/truesec';
@@ -209,13 +210,14 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
 
   // Tooltip label: dedupe by scout system name (Thera / Turnur). Multiple
   // connections from the same scout are summarised, mixed scouts are listed.
+  const aliasName = useSystemAlias();
   const scoutLabel = useMemo(() => {
     if (scoutMatches.length === 0) return '';
-    const names = Array.from(new Set(scoutMatches.map(c => c.outSystemName)));
+    const names = Array.from(new Set(scoutMatches.map(c => aliasName(c.outSystemName))));
     return names.length === 1
       ? t('mapNode.scoutConnections', { name: names[0], count: scoutMatches.length })
       : t('mapNode.scoutConnectionsMulti', { names: names.join(' & ') });
-  }, [scoutMatches, t]);
+  }, [scoutMatches, t, aliasName]);
   const isTarget        = connection.inProgress && connection.fromNode?.id !== sys.id;
 
   // Measure the node so the map store can compute the largest natural

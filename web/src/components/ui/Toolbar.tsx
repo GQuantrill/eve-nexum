@@ -6,6 +6,7 @@ import { useMapStore } from '../../store/mapStore';
 import { useAuth, formatRole, isAdminRole } from '../../context/AuthContext';
 import { useOnlineStatus } from '../../hooks/useOnlineStatus';
 import { useCharacterLocation } from '../../hooks/useCharacterLocation';
+import { useSystemAlias } from '../../hooks/useSystemAlias';
 import { useCanEdit } from '../../hooks/useCanEdit';
 import { useCanEditContent } from '../../hooks/useCanEditContent';
 import { useIsMapOwner } from '../../hooks/useIsMapOwner';
@@ -261,6 +262,7 @@ export function Toolbar() {
   // Ship + live system come from the same poll that drives passive location
   // tracking, so no extra ESI traffic — we just surface fields already on hand.
   const { ship, system: liveSystem, online: locOnline } = useCharacterLocation();
+  const aliasName = useSystemAlias();
   // What to show next to the avatar: the live system when the pilot is online
   // in EVE, otherwise the last known system from their profile.
   const shownSystem = (locOnline && liveSystem?.name) ? liveSystem.name : (user?.lastKnownSystem?.name ?? null);
@@ -269,6 +271,9 @@ export function Toolbar() {
   // Clicking the system centres the map on it — but only when it's actually on
   // the current map.
   const shownSystemOnMap = shownSystemEveId != null && mapSystems.some((s) => s.eveSystemId === shownSystemEveId);
+  // Display-only: show the per-map alias when this system has one (real name
+  // still drives centring via shownSystemEveId).
+  const shownSystemDisplay = aliasName(shownSystem);
   const eveStatus = useEveServerStatus();
   const [showMaps, setShowMaps]   = useState(false);
   const [showStats, setShowStats] = useState(false);
@@ -619,11 +624,11 @@ export function Toolbar() {
               <button
                 type="button"
                 className="toolbar__char-system toolbar__char-system--clickable"
-                data-tooltip={t('toolbar.centerOnSystem', { system: shownSystem })}
+                data-tooltip={t('toolbar.centerOnSystem', { system: shownSystemDisplay })}
                 onClick={() => { if (shownSystemEveId != null) requestCenterOnEveSystem(shownSystemEveId); }}
               >
                 <MapPinIcon size={11} weight="fill" />
-                {shownSystem}
+                {shownSystemDisplay}
               </button>
             ) : (
               <span
@@ -631,7 +636,7 @@ export function Toolbar() {
                 data-tooltip={shownSystemIsLast ? t('toolbar.lastKnownSystem') : t('toolbar.currentSystem')}
               >
                 <MapPinIcon size={11} weight="fill" />
-                {shownSystem}
+                {shownSystemDisplay}
               </span>
             ))}
             {checkedAt && <CheckedAtIcon checkedAt={checkedAt} />}
