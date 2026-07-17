@@ -70,7 +70,9 @@ export function LeadsToDropdown({ value, onChange, connectedSystems = [] }: Prop
   const band = value ? J_SPACE.find((o) => o.value === value) : undefined;
   const isClass = value ? value in CLASS_LABELS : false;
   const displayColor = band ? band.color : isClass ? CLASS_COLORS[value as SystemClass] : '#c0d0e8';
-  const displayLabel = band ? band.label : isClass ? CLASS_LABELS[value as SystemClass] : value;
+  // Free-form connected-system value: show its per-map alias when set (display
+  // only — the stored `value` stays the real system name).
+  const displayLabel = band ? band.label : isClass ? CLASS_LABELS[value as SystemClass] : aliasName(value);
 
   return (
     <div className="wh-picker">
