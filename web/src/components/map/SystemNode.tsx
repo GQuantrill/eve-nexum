@@ -38,6 +38,7 @@ import { contentFilterActive, systemMatchesContent } from '../../utils/contentMa
 import { watchMarker } from '../../data/watchMarkers';
 import { useHeatmap } from '../../context/HeatmapContext';
 import { useShareMode } from '../../context/ShareModeContext';
+import { systemDisplayName } from '../../utils/systemName';
 import { heatValue, heatColor } from '../../utils/heatmap';
 import { WHTypeInfo } from '../ui/WHTypeInfo';
 import { truesecColor } from '../../utils/truesec';
@@ -383,7 +384,7 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
           </span>
         )}
         {sys.tag && <span className="system-node__tag">{sys.tag}</span>}
-        <span className="system-node__name">{sys.name || t('mapNode.unknown')}</span>
+        <span className="system-node__name">{systemDisplayName(sys) || t('mapNode.unknown')}</span>
         {sys.security != null && Number.isFinite(Number(sys.security)) && (
           <span className="system-node__truesec" style={{ color: truesecColor(Number(sys.security)) }}>
             {Number(sys.security).toFixed(1)}

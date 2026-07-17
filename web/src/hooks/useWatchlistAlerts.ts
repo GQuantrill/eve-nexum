@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useMapStore } from '../store/mapStore';
 import { useUserSetting } from './useUserSetting';
 import { useWatchlist } from './useWatchlist';
+import { systemDisplayName } from '../utils/systemName';
 import { matchSystem, matchConnection } from '../utils/watchMatch';
 import { toast } from '../components/ui/Toaster';
 import { NOTIFY, fireDesktopNotification } from '../utils/notificationPrefs';
@@ -73,7 +74,7 @@ export function useWatchlistAlerts() {
     const present = new Map<string, { name: string; marker: string }>();
     for (const sys of systems) {
       const e = matchSystem(entries, sys, sigTypesBySystem[sys.id], leadsToClassesBySystem[sys.id]);
-      if (e) present.set(`sys:${sys.id}`, { name: sys.name || '?', marker: t(`watchMarker.${e.marker}`) });
+      if (e) present.set(`sys:${sys.id}`, { name: systemDisplayName(sys) || '?', marker: t(`watchMarker.${e.marker}`) });
     }
     for (const conn of connections) {
       const e = matchConnection(entries, conn);

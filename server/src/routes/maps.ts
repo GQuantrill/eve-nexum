@@ -1909,7 +1909,7 @@ mapsRouter.post('/:mapId/systems', async (req, res) => {
     const { rows } = await db.query(
       `SELECT id, eve_system_id AS "eveSystemId", name, system_class AS "systemClass", effect, statics,
               region_name AS "regionName", npc_type AS "npcType", position_x AS x, position_y AS y,
-              status, intel, is_home AS "isHome", locked, notes,
+              status, intel, is_home AS "isHome", locked, notes, alias,
               (SELECT ss.security::float8 FROM solar_systems ss WHERE ss.id = map_systems.eve_system_id) AS "security",
               last_activity_at AS "lastActivityAt"
          FROM map_systems WHERE id = $1 AND map_id = $2`,
@@ -1978,6 +1978,17 @@ mapsRouter.patch('/:mapId/systems/:systemId', async (req, res) => {
     }
     sets.push(`tag = $${vals.length + 1}`);
     vals.push(v);
+  }
+
+  // Display-only alias — a label shown in place of the real system name. A string
+  // (trimmed, ≤32 chars) or null to clear; empty/whitespace also clears. Purely
+  // cosmetic — the real `name` still drives all matching/topology.
+  if ('alias' in updates) {
+    const v = updates.alias;
+    if (v !== null && typeof v !== 'string') { res.status(400).json({ error: 'invalid alias' }); return; }
+    const clean = typeof v === 'string' ? v.trim().slice(0, 32) : '';
+    sets.push(`alias = $${vals.length + 1}`);
+    vals.push(clean || null);
   }
 
   // Predefined labels — applied as coloured pills above the node. A subset of

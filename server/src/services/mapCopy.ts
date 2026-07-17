@@ -67,11 +67,11 @@ export async function copyMap(params: {
       id: string; eveSystemId: number | null; name: string; systemClass: string; effect: string;
       statics: string[]; regionName: string | null; npcType: string | null; x: number; y: number;
       status: string; isHome: boolean; locked: boolean; notes: string; intel: string | null;
-      labels: string[]; customLabels: string[]; tag: string | null;
+      labels: string[]; customLabels: string[]; tag: string | null; alias: string | null;
     }>(
       `SELECT id, eve_system_id AS "eveSystemId", name, system_class AS "systemClass", effect, statics,
               region_name AS "regionName", npc_type AS "npcType", position_x AS x, position_y AS y,
-              status, is_home AS "isHome", locked, notes, intel, labels, custom_labels AS "customLabels", tag
+              status, is_home AS "isHome", locked, notes, intel, labels, custom_labels AS "customLabels", tag, alias
          FROM map_systems WHERE map_id = $1`,
       [sourceMapId],
     );
@@ -81,11 +81,11 @@ export async function copyMap(params: {
     await insertBatch(client, 'map_systems',
       ['id', 'map_id', 'eve_system_id', 'name', 'system_class', 'effect', 'statics', 'region_name',
        'npc_type', 'position_x', 'position_y', 'status', 'is_home', 'locked', 'notes', 'intel',
-       'labels', 'custom_labels', 'tag'],
+       'labels', 'custom_labels', 'tag', 'alias'],
       sysRes.rows.map((s) => [
         sysIdMap.get(s.id), newMapId, s.eveSystemId, s.name, s.systemClass, s.effect, s.statics,
         s.regionName, s.npcType, s.x, s.y, s.status, s.isHome, s.locked,
-        include.notes ? s.notes : '', s.intel, s.labels, s.customLabels, s.tag,
+        include.notes ? s.notes : '', s.intel, s.labels, s.customLabels, s.tag, s.alias,
       ]),
     );
 
