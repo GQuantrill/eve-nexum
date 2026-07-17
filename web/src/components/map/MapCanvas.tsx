@@ -36,6 +36,7 @@ import { PREDEFINED_LABELS } from '../../data/labels';
 // flyout. A single one of these (or none) marks a system via map_systems.tag.
 const TAG_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('');
 import { CustomLabelDialog } from '../ui/CustomLabelDialog';
+import { PromptModal } from '../ui/PromptModal';
 import type { MapSystem, SystemIntel } from '../../types';
 import { CLASS_COLORS } from '../../data/wormholes';
 import { cssVarToHex } from '../../utils/cssVar';
@@ -200,6 +201,7 @@ export function MapCanvas() {
   const [pendingPosition, setPendingPosition] = useState<{ x: number; y: number } | null>(null);
   // systemId whose custom-label dialog is open (null = closed).
   const [labelDialogFor, setLabelDialogFor] = useState<string | null>(null);
+  const [aliasDialogFor, setAliasDialogFor] = useState<string | null>(null);
   const [contextMenu, setContextMenu]         = useState<CtxMenu | null>(null);
   // Pending "remove orphan systems" sweep, held while the confirm modal is up.
   const [orphanConfirm, setOrphanConfirm]     = useState<{ ids: string[] } | null>(null);
@@ -1086,6 +1088,22 @@ export function MapCanvas() {
             },
       ] : [];
 
+      // Display-only alias — rename the node on this map. Toggles to "Clear alias"
+      // (restoring the real name) once one is set. The real name is untouched.
+      const aliasItem = !multiSelected ? [
+        sys?.alias
+          ? {
+              label: t('ctxMenu.clearAlias'),
+              icon:  <TextAaIcon size={16} weight="regular" />,
+              action: () => updateSystem(contextMenu.nodeId!, { alias: null }),
+            }
+          : {
+              label: t('ctxMenu.setAlias'),
+              icon:  <TextAaIcon size={16} weight="regular" />,
+              action: () => setAliasDialogFor(contextMenu.nodeId!),
+            },
+      ] : [];
+
       // Manual intel tag. Built-in options + the user's custom intels, each
       // rendered with a colored swatch via an inline span. Submenu shows a
       // check mark next to the currently-applied tag so the user can
@@ -1247,6 +1265,7 @@ export function MapCanvas() {
           },
         }] : []),
         ...homeItem,
+        ...aliasItem,
         ...tagItem,
         ...intelItem,
         ...labelItem,
@@ -1416,6 +1435,22 @@ export function MapCanvas() {
             customLabels={sys.customLabels ?? []}
             onChange={(next) => updateSystem(labelDialogFor, { customLabels: next })}
             onClose={() => setLabelDialogFor(null)}
+          />
+        );
+      })()}
+
+      {aliasDialogFor && (() => {
+        const sys = systems.find((s) => s.id === aliasDialogFor);
+        if (!sys) return null;
+        return (
+          <PromptModal
+            title={t('ctxMenu.aliasTitle')}
+            message={t('ctxMenu.aliasMessage', { name: sys.name })}
+            defaultValue={sys.alias ?? ''}
+            placeholder={sys.name}
+            confirmLabel={t('ctxMenu.aliasConfirm')}
+            onConfirm={(value) => { updateSystem(aliasDialogFor, { alias: value }); setAliasDialogFor(null); }}
+            onCancel={() => setAliasDialogFor(null)}
           />
         );
       })()}

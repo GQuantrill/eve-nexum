@@ -65,6 +65,9 @@ export interface MapSystem {
   id: string;
   eveSystemId: number | null;
   name: string;
+  /** Display-only per-map rename. When set, shown in place of `name` in the UI;
+   *  `name` still drives all logic (connections, leads-to, matching, ESI). */
+  alias?: string | null;
   /** True-security status from the SDE (solar_systems.security). Served with
    *  the map so nodes don't each hit ESI. Null for legacy rows with no eve id. */
   security?: number | null;

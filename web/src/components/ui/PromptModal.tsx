@@ -20,8 +20,13 @@ export function PromptModal({ title, message, defaultValue = '', placeholder, co
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    inputRef.current?.focus();
-    inputRef.current?.select();
+    // Defer a frame so the focus wins any race with a closing context menu (or
+    // other element) restoring focus after this modal mounts.
+    const id = requestAnimationFrame(() => {
+      inputRef.current?.focus();
+      inputRef.current?.select();
+    });
+    return () => cancelAnimationFrame(id);
   }, []);
 
   const submit = () => {
