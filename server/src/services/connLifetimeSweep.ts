@@ -19,6 +19,7 @@ interface Row {
   sourceSignatureId: string | null;
   targetSignatureId: string | null;
   lazyRemove:        boolean;
+  graceHours:        number;
 }
 
 export type LifetimeAction =
@@ -96,7 +97,7 @@ async function sweepConnLifetimes(): Promise<void> {
               c.eol_at AS "eolAt", c.lifetime_expires_at AS "lifetimeExpiresAt", c.created_at AS "createdAt",
               c.source_id AS "sourceId", c.target_id AS "targetId",
               c.source_signature_id AS "sourceSignatureId", c.target_signature_id AS "targetSignatureId",
-              m.lazy_remove_wormholes AS "lazyRemove"
+              m.lazy_remove_wormholes AS "lazyRemove", m.collapse_grace_hours AS "graceHours"
          FROM map_connections c
          JOIN maps m ON m.id = c.map_id
         WHERE c.connection_type = 'standard'
@@ -112,7 +113,6 @@ async function sweepConnLifetimes(): Promise<void> {
   }
 
   const now = Date.now();
-  const graceMs = config.connCollapseGraceHours * 3_600_000;
   // Re-bucket updates grouped by their new bucket (one UPDATE per bucket value);
   // collapses grouped by map (one transaction per map).
   const changedByBucket = new Map<TimeBucket, string[]>();
@@ -120,7 +120,8 @@ async function sweepConnLifetimes(): Promise<void> {
   const collapseByMap = new Map<string, Row[]>();
 
   for (const r of rows) {
-    const action = connLifetimeAction(r, now, graceMs);
+    // Grace is per-map (map settings). Each connection carries its map's value.
+    const action = connLifetimeAction(r, now, r.graceHours * 3_600_000);
     if (action.kind === 'collapse') {
       const list = collapseByMap.get(r.mapId);
       if (list) list.push(r); else collapseByMap.set(r.mapId, [r]);
