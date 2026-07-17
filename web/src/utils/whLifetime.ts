@@ -11,6 +11,10 @@ export type TimeBucket = 'fresh' | 'lessThan24h' | 'lessThan4h' | 'lessThan1h' |
 const HOUR_MS = 3_600_000;
 // A legacy eol_at mark means "~4h of life left from when it was marked".
 export const EOL_LIFE_MS = 4 * HOUR_MS;
+// A bare K162's forward type is unknown, so it decays against the longest life
+// any wormhole can have (48h) — conservative, so it never expires early. Mirrors
+// MAX_WH_LIFETIME_HOURS in server/src/data/whLifetimes.ts.
+const K162_MAX_LIFE_HOURS = 48;
 
 /**
  * The bucket a connection is in given the milliseconds of life it has left.
@@ -28,10 +32,10 @@ export function lifeBucket(remainingMs: number): TimeBucket {
 
 /**
  * Estimated collapse time (ms since epoch) for a connection, or null when its
- * lifetime is unknown (untyped, or a bare K162 with no manual override). Priority:
+ * lifetime is unknown (untyped / unrecognised code). Priority:
  *   1. manual override (lifetimeExpiresAt) — a user set it, so it always wins;
  *   2. legacy EOL mark (eolAt) — a 4h window from when it was set;
- *   3. auto: createdAt + the wh type's charted max life.
+ *   3. auto: createdAt + the wh type's charted max life (K162 → the 48h ceiling).
  */
 export function effectiveExpiryMs(
   conn: Pick<MapConnection, 'lifetimeExpiresAt' | 'eolAt' | 'type' | 'createdAt'>,
@@ -39,25 +43,23 @@ export function effectiveExpiryMs(
 ): number | null {
   if (conn.lifetimeExpiresAt) return new Date(conn.lifetimeExpiresAt).getTime();
   if (conn.eolAt)             return new Date(conn.eolAt).getTime() + EOL_LIFE_MS;
-  const code = (conn.type ?? '').trim().toUpperCase();
-  if (code && code !== 'K162') {
-    const h = whTypes[code]?.lifetimeHours;
-    if (h) return new Date(conn.createdAt).getTime() + h * HOUR_MS;
-  }
+  const h = knownMaxLifeHours(conn, whTypes);
+  if (h) return new Date(conn.createdAt).getTime() + h * HOUR_MS;
   return null;
 }
 
 /**
- * The wormhole type's charted max lifetime in hours, or null for an untyped or
- * bare-K162 connection (life unknown). Drives the right-click / panel menus:
- * "Fresh" (life > 24h remaining) is only reachable by a >24h hole, so the menu
- * hides it when this is a known value <= 24.
+ * The wormhole type's charted max lifetime in hours, or null for an untyped /
+ * unrecognised connection. A bare K162 resolves to the 48h ceiling. Drives the
+ * right-click / panel menus: "Fresh" (life > 24h remaining) is only reachable by
+ * a >24h hole, so the menu hides it when this is a known value <= 24.
  */
 export function knownMaxLifeHours(
   conn: Pick<MapConnection, 'type'>,
   whTypes: Record<string, WormholeSpec>,
 ): number | null {
   const code = (conn.type ?? '').trim().toUpperCase();
-  if (!code || code === 'K162') return null;
+  if (!code) return null;
+  if (code === 'K162') return K162_MAX_LIFE_HOURS;
   return whTypes[code]?.lifetimeHours || null;
 }

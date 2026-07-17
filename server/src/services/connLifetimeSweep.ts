@@ -24,8 +24,8 @@ interface Row {
  * hole simply shows the expired state; sig-based removal stays with whSweep).
  *
  * The prefilter keeps the candidate set to holes with a determinable lifetime:
- * a manual/legacy timestamp, or a known non-K162 type. Untyped and bare-K162
- * connections have no computable expiry and are left untouched.
+ * a manual/legacy timestamp, or any typed hole (K162 decays against the 48h
+ * ceiling). Untyped connections have no computable expiry and are skipped in JS.
  */
 async function sweepConnLifetimes(): Promise<void> {
   let rows: Row[];
@@ -38,7 +38,7 @@ async function sweepConnLifetimes(): Promise<void> {
           AND broken = FALSE
           AND (lifetime_expires_at IS NOT NULL
             OR eol_at IS NOT NULL
-            OR (wh_type IS NOT NULL AND wh_type <> '' AND UPPER(wh_type) <> 'K162'))`,
+            OR (wh_type IS NOT NULL AND wh_type <> ''))`,
     );
     rows = res.rows;
   } catch (err) {

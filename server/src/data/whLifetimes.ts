@@ -71,11 +71,12 @@ export function lifeBucket(remainingMs: number): TimeBucket {
 
 /**
  * Estimated collapse time (ms since epoch) for a connection, or null when its
- * lifetime is unknown (untyped, or a bare K162 with no manual override — we
- * can't know the reverse side's real life, so it never auto-ages). Priority:
+ * lifetime is unknown (untyped / unrecognised code). Priority:
  *   1. manual override (lifetime_expires_at) — a user set it, so it always wins;
  *   2. legacy EOL mark (eol_at) — treated as a 4h window from when it was set;
- *   3. auto: created_at + the wh type's charted max life.
+ *   3. auto: created_at + the wh type's charted max life. A bare K162 (reverse
+ *      side, forward type unknown) has no inherent life, so it decays against the
+ *      48h max-possible ceiling — conservative, so it never expires early.
  */
 export function effectiveExpiryMs(row: {
   lifetimeExpiresAt: Date | string | null;
@@ -85,10 +86,7 @@ export function effectiveExpiryMs(row: {
 }): number | null {
   if (row.lifetimeExpiresAt) return new Date(row.lifetimeExpiresAt).getTime();
   if (row.eolAt)             return new Date(row.eolAt).getTime() + EOL_LIFE_MS;
-  const code = (row.whType ?? '').trim().toUpperCase();
-  if (code && code !== 'K162') {
-    const h = whLifetimeHours(code);
-    if (h != null) return new Date(row.createdAt).getTime() + h * HOUR_MS;
-  }
+  const h = whLifetimeHours(row.whType);   // K162 → 48h ceiling; unknown → null
+  if (h != null) return new Date(row.createdAt).getTime() + h * HOUR_MS;
   return null;
 }

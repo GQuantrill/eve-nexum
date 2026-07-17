@@ -16,6 +16,7 @@ import { useMapSignatureIndex } from '../../hooks/useMapSignatureIndex';
 import { useUndivedWormholeIndex } from '../../hooks/useUndivedWormholeIndex';
 import { useLeadsToIndex } from '../../hooks/useLeadsToIndex';
 import { useWormholeTypes } from '../../hooks/useWormholeTypes';
+import { knownMaxLifeHours } from '../../utils/whLifetime';
 import { useCanEdit } from '../../hooks/useCanEdit';
 import { useMinimapPosition } from '../../hooks/useMinimapPosition';
 import { useShareMode } from '../../context/ShareModeContext';
@@ -970,11 +971,10 @@ export function MapCanvas() {
             // building the items trips the react-compiler "impure in render" rule.
             const expiresIn = (hrs: number) =>
               new Date(Date.now() + hrs * 3_600_000).toISOString();
-            // "Fresh" carries the wormhole type's max lifetime when we know it. A
-            // bare K162 (reverse side, forward type unidentified) has no inherent
-            // lifetime, so it — and any untyped connection — shows no timespan.
-            const whCode = (conn?.type ?? '').trim().toUpperCase();
-            const lifeHrs = whCode && whCode !== 'K162' ? whTypes[whCode]?.lifetimeHours : undefined;
+            // "Fresh" carries the hole's max lifetime when we know it: the type's
+            // charted life, or the 48h ceiling for a bare K162 (reverse side,
+            // forward type unidentified). Only an untyped connection has none.
+            const lifeHrs = knownMaxLifeHours({ type: conn?.type ?? null }, whTypes) ?? undefined;
             // Fresh = more than a day of life left, only reachable by a >24h hole.
             // Hide it for a known 24h/16h hole (it opens straight into "< 1 day");
             // keep it when the life is unknown (K162/untyped) since we can't rule

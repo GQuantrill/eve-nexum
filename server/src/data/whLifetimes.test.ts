@@ -49,10 +49,17 @@ describe('effectiveExpiryMs', () => {
     expect(lifeBucket(exp - createdMs)).toBe('fresh');
   });
 
-  it('untyped or bare K162 has no computable expiry', () => {
+  it('untyped / unrecognised has no computable expiry', () => {
     expect(effectiveExpiryMs({ lifetimeExpiresAt: null, eolAt: null, whType: null, createdAt: created })).toBeNull();
     expect(effectiveExpiryMs({ lifetimeExpiresAt: null, eolAt: null, whType: '', createdAt: created })).toBeNull();
-    expect(effectiveExpiryMs({ lifetimeExpiresAt: null, eolAt: null, whType: 'K162', createdAt: created })).toBeNull();
+    expect(effectiveExpiryMs({ lifetimeExpiresAt: null, eolAt: null, whType: 'ZZZ9', createdAt: created })).toBeNull();
+  });
+
+  it('a bare K162 decays against the 48h ceiling and opens fresh', () => {
+    expect(whLifetimeHours('K162')).toBe(48);
+    const exp = effectiveExpiryMs({ lifetimeExpiresAt: null, eolAt: null, whType: 'K162', createdAt: created })!;
+    expect(exp).toBe(createdMs + 48 * H);
+    expect(lifeBucket(exp - createdMs)).toBe('fresh');
   });
 
   it('manual override wins over the auto estimate', () => {
