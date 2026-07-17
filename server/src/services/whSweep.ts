@@ -12,12 +12,13 @@ const log = createLogger('whSweep');
 const MIN_LIFETIME_HOURS = 4.5;
 
 interface CandidateRow {
-  id:        string;
-  systemId:  string;
-  mapId:     string;
-  whType:    string;
-  whLeadsTo: string;
-  createdAt: Date;
+  id:         string;
+  systemId:   string;
+  mapId:      string;
+  whType:     string;
+  whLeadsTo:  string;
+  createdAt:  Date;
+  graceHours: number;
 }
 
 interface SysRow  { id: string; name: string; systemClass: string }
@@ -155,7 +156,8 @@ async function sweepAll(): Promise<void> {
   try {
     const res = await db.query<CandidateRow>(
       `SELECT s.id, s.system_id AS "systemId", sys.map_id AS "mapId",
-              s.wh_type AS "whType", s.wh_leads_to AS "whLeadsTo", s.created_at AS "createdAt"
+              s.wh_type AS "whType", s.wh_leads_to AS "whLeadsTo", s.created_at AS "createdAt",
+              m.collapse_grace_hours AS "graceHours"
          FROM map_signatures s
          JOIN map_systems sys ON sys.id = s.system_id
          JOIN maps m ON m.id = sys.map_id
@@ -171,16 +173,15 @@ async function sweepAll(): Promise<void> {
   }
 
   const now = Date.now();
-  // Same grace buffer the connection-lifetime collapse uses, so a hole's sig and
-  // its connection are removed together (~max life + grace) rather than the sig
-  // vanishing a couple of hours before the edge severs.
-  const graceH = config.connCollapseGraceHours;
   const byMap = new Map<string, CandidateRow[]>();
   for (const r of rows) {
     const maxH = whLifetimeHours(r.whType);
     if (maxH === null) continue; // unknown code → never auto-remove
     const ageH = (now - new Date(r.createdAt).getTime()) / 3_600_000;
-    if (ageH <= maxH + graceH) continue;
+    // Same per-map grace buffer the connection-lifetime collapse uses, so a
+    // hole's sig and its connection are removed together (~max life + grace)
+    // rather than the sig vanishing a couple of hours before the edge severs.
+    if (ageH <= maxH + r.graceHours) continue;
     const list = byMap.get(r.mapId);
     if (list) list.push(r); else byMap.set(r.mapId, [r]);
   }

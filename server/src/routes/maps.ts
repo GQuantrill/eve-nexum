@@ -1737,9 +1737,9 @@ mapsRouter.post('/:mapId/presence', async (req, res) => {
 // toggle merge-source eligibility (corp maps, full/admin only)
 mapsRouter.patch('/:mapId', async (req, res) => {
   const { mapId } = req.params;
-  const { name, locked, allowAsMergeSource, allowAsMergeDestination, lazyRemoveWormholes, bookmarkFormat } = req.body as {
+  const { name, locked, allowAsMergeSource, allowAsMergeDestination, lazyRemoveWormholes, collapseGraceHours, bookmarkFormat } = req.body as {
     name?: string; locked?: boolean; allowAsMergeSource?: boolean; allowAsMergeDestination?: boolean;
-    lazyRemoveWormholes?: boolean; bookmarkFormat?: string | null;
+    lazyRemoveWormholes?: boolean; collapseGraceHours?: number; bookmarkFormat?: string | null;
   };
 
   const access = await requireMapWrite(res, mapId, req);
@@ -1799,6 +1799,16 @@ mapsRouter.patch('/:mapId', async (req, res) => {
   // (no corp/admin gate). The sweep itself runs server-side on this cadence.
   if (lazyRemoveWormholes !== undefined) {
     sets.push(`lazy_remove_wormholes = $${vals.length + 1}`); vals.push(lazyRemoveWormholes === true);
+  }
+  // Per-map collapse grace (hours) — how long an expired hole waits before the
+  // sweep severs it and drops its sigs. Another plain per-map behaviour setting;
+  // clamp to a sane 0–24h so a bad value can't wedge the sweep.
+  if (collapseGraceHours !== undefined) {
+    const n = Number(collapseGraceHours);
+    if (!Number.isFinite(n) || n < 0 || n > 24) {
+      res.status(400).json({ error: 'collapseGraceHours must be a number between 0 and 24' }); return;
+    }
+    sets.push(`collapse_grace_hours = $${vals.length + 1}`); vals.push(n);
   }
 
   // Per-map bookmark-name format: another plain per-map behaviour setting any

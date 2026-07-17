@@ -137,6 +137,11 @@ export async function migrate() {
     -- max lifetime and quarantines (marks broken) any connection they backed.
     -- DEFAULT FALSE — purely opt-in, nothing auto-deletes until enabled.
     ALTER TABLE maps ADD COLUMN IF NOT EXISTS lazy_remove_wormholes BOOLEAN NOT NULL DEFAULT FALSE;
+    -- Per-map grace period (hours) a connection stays past its expiry before the
+    -- lifetime sweep collapses it (severs + drops its backing sigs) on lazy-removal
+    -- maps. 0.5 = 30 min. Editable from the map settings; also applied to the sig
+    -- sweep so a hole's sig and connection disappear together.
+    ALTER TABLE maps ADD COLUMN IF NOT EXISTS collapse_grace_hours DOUBLE PRECISION NOT NULL DEFAULT 0.5;
 
     -- Per-map bookmark-name format override. NULL (the default) means "no map
     -- policy" and each user falls back to their own nexum.sig.bookmarkFormat.
