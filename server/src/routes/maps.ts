@@ -23,6 +23,7 @@ import { reportPresence } from '../services/presence.js';
 import { copyMap } from '../services/mapCopy.js';
 import { notifyDiscord, k162Embed, connectionEmbed, chainEmbed } from '../services/discord.js';
 import { whSizeForCode } from './wormholes.js';
+import { effectiveExpiryMs, lifeBucket } from '../data/whLifetimes.js';
 
 const log = createLogger('maps');
 const discordLog = createLogger('discord');
@@ -2210,6 +2211,31 @@ mapsRouter.patch('/:mapId/connections/:connectionId', async (req, res) => {
   if ('type' in updates && !('size' in updates)) {
     const derived = await whSizeForCode(updates.type as string | null);
     if (derived) updates.size = derived;
+  }
+
+  // When the wormhole type is (re)identified, stamp the current time bucket so
+  // the stored status is right immediately — otherwise it stays stale until the
+  // next hourly connLifetimeSweep and the right-click menu / scout list disagree
+  // with the live edge label. Skip if the client already sent an explicit
+  // timeStatus (a manual pick owns it).
+  if ('type' in updates && !('timeStatus' in updates)) {
+    try {
+      const cur = await db.query<{ createdAt: Date; eolAt: Date | null; lifetimeExpiresAt: Date | null }>(
+        `SELECT created_at AS "createdAt", eol_at AS "eolAt", lifetime_expires_at AS "lifetimeExpiresAt"
+           FROM map_connections WHERE id = $1 AND map_id = $2`,
+        [connectionId, mapId],
+      );
+      const row = cur.rows[0];
+      if (row) {
+        const expiry = effectiveExpiryMs({
+          lifetimeExpiresAt: row.lifetimeExpiresAt,
+          eolAt:             row.eolAt,
+          whType:            updates.type as string | null,
+          createdAt:         row.createdAt,
+        });
+        if (expiry != null) updates.timeStatus = lifeBucket(expiry - Date.now());
+      }
+    } catch { /* leave time_status as-is on any lookup failure */ }
   }
 
   const sets: string[] = [];

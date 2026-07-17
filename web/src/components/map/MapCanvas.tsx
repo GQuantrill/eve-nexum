@@ -16,7 +16,7 @@ import { useMapSignatureIndex } from '../../hooks/useMapSignatureIndex';
 import { useUndivedWormholeIndex } from '../../hooks/useUndivedWormholeIndex';
 import { useLeadsToIndex } from '../../hooks/useLeadsToIndex';
 import { useWormholeTypes } from '../../hooks/useWormholeTypes';
-import { knownMaxLifeHours } from '../../utils/whLifetime';
+import { knownMaxLifeHours, effectiveExpiryMs, lifeBucket, type TimeBucket } from '../../utils/whLifetime';
 import { useCanEdit } from '../../hooks/useCanEdit';
 import { useMinimapPosition } from '../../hooks/useMinimapPosition';
 import { useShareMode } from '../../context/ShareModeContext';
@@ -99,6 +99,9 @@ interface CtxMenu {
   nodeId?: string;
   edgeId?: string;
   selectedNodeIds?: string[]; // snapshot taken at right-click time before RF resets selection
+  openedAt?: number;          // Date.now() when opened, so the lifetime submenu can
+                              // show the same live bucket as the edge without calling
+                              // Date.now() during render (react-compiler purity rule)
 }
 
 function systemToNode(sys: MapSystem, selectedId: string | null, easyConnect = false, canEdit = true, dimmed = false, routeHighlighted = false): Node {
@@ -870,7 +873,7 @@ export function MapCanvas() {
       if (isShareMode) return;
       e.preventDefault();
       e.stopPropagation();
-      setContextMenu({ screenX: e.clientX, screenY: e.clientY, flowX: 0, flowY: 0, edgeId: edge.id });
+      setContextMenu({ screenX: e.clientX, screenY: e.clientY, flowX: 0, flowY: 0, edgeId: edge.id, openedAt: Date.now() });
     },
     [isShareMode],
   );
@@ -957,16 +960,20 @@ export function MapCanvas() {
         {
           label: t('ctxMenu.whLifetime'),
           submenu: (() => {
-            // The checked indicator is the coarse "what stage am I in?" hint from
-            // the stored category (the sweep keeps it current within the hour);
-            // the live countdown lives on the edge label. Picking a row sets a
-            // manual expiry (lifetimeExpiresAt) that then ages from that point.
-            const hasEol = !!conn?.eolAt || !!conn?.lifetimeExpiresAt;
-            const stage: 'fresh' | 'lessThan24h' | 'eol' =
-              timeStatus === 'lessThan24h' ? 'lessThan24h' :
-              (hasEol || timeStatus === 'eol' || timeStatus === 'lessThan4h'
-                || timeStatus === 'lessThan1h' || timeStatus === 'expired') ? 'eol' :
-              'fresh';
+            // The checked row is the SAME live bucket the edge label shows, so the
+            // menu never drifts from the label. Derived from the hole's effective
+            // expiry as of when the menu opened (openedAt) — calling Date.now()
+            // while building the items trips the react-compiler purity rule. When
+            // the lifetime is unknown (untyped) fall back to the stored category.
+            const openedAt = contextMenu.openedAt ?? 0;
+            const expiryMs = conn ? effectiveExpiryMs(conn, whTypes) : null;
+            const current: TimeBucket =
+              expiryMs != null && openedAt ? lifeBucket(expiryMs - openedAt)
+              : timeStatus === 'lessThan24h' ? 'lessThan24h'
+              : (timeStatus === 'lessThan4h' || timeStatus === 'eol') ? 'lessThan4h'
+              : timeStatus === 'lessThan1h' ? 'lessThan1h'
+              : timeStatus === 'expired' ? 'expired'
+              : 'fresh';
             // Date.now() only inside the action closures — calling it while
             // building the items trips the react-compiler "impure in render" rule.
             const expiresIn = (hrs: number) =>
@@ -983,7 +990,7 @@ export function MapCanvas() {
             const rows: { label: string; checked: boolean; action: () => void }[] = [];
             if (showFresh) rows.push({
               label: lifeHrs ? t('ctxMenu.lifeFreshMax', { hours: lifeHrs }) : t('ctxMenu.lifeFresh'),
-              checked: stage === 'fresh',
+              checked: current === 'fresh',
               action: () => updateConnection(eid, {
                 timeStatus: 'fresh', eolAt: null,
                 lifetimeExpiresAt: lifeHrs ? expiresIn(lifeHrs) : null,
@@ -992,22 +999,22 @@ export function MapCanvas() {
             rows.push(
               {
                 label: t('ctxMenu.life1d'),
-                checked: stage === 'lessThan24h',
+                checked: current === 'lessThan24h',
                 action: () => updateConnection(eid, { timeStatus: 'lessThan24h', eolAt: null, lifetimeExpiresAt: expiresIn(24) }),
               },
               {
                 label: t('ctxMenu.life4h'),
-                checked: stage === 'eol',
+                checked: current === 'lessThan4h',
                 action: () => updateConnection(eid, { timeStatus: 'lessThan4h', eolAt: null, lifetimeExpiresAt: expiresIn(4) }),
               },
               {
                 label: t('ctxMenu.life1h'),
-                checked: false,
+                checked: current === 'lessThan1h',
                 action: () => updateConnection(eid, { timeStatus: 'lessThan1h', eolAt: null, lifetimeExpiresAt: expiresIn(1) }),
               },
               {
                 label: t('ctxMenu.lifeExpired'),
-                checked: false,
+                checked: current === 'expired',
                 action: () => updateConnection(eid, { timeStatus: 'expired', eolAt: null, lifetimeExpiresAt: expiresIn(0) }),
               },
             );
