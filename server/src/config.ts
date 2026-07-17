@@ -165,6 +165,14 @@ export const config = {
     const n = parseInt(process.env.CONN_LIFETIME_SWEEP_MINUTES ?? '60', 10);
     return Number.isFinite(n) && n >= 0 ? n : 60;
   })(),
+  // Grace period (hours) a connection stays past its expiry before the lifetime
+  // sweep collapses it — severs it (broken) and deletes its backing wormhole
+  // sigs — on maps opted into lazy wormhole removal. A buffer so a hole that
+  // lingers slightly past the estimate isn't cut early. Default 0.5 (30 min).
+  connCollapseGraceHours: (() => {
+    const n = parseFloat(process.env.CONN_COLLAPSE_GRACE_HOURS ?? '0.5');
+    return Number.isFinite(n) && n >= 0 ? n : 0.5;
+  })(),
   sdeAutoUpdate:       SDE_AUTO_UPDATE,
   sdeCheckUtc:         SDE_CHECK_UTC,
   telemetry:           { enabled: TELEMETRY_ENABLED, url: TELEMETRY_URL },
