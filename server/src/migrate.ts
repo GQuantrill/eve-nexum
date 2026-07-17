@@ -228,6 +228,13 @@ export async function migrate() {
     -- connection is kept on the map but quarantined (rendered severed, excluded
     -- from routing) so the chain is still traceable. See broken_chain_feature.
     ALTER TABLE map_connections ADD COLUMN IF NOT EXISTS broken    BOOLEAN NOT NULL DEFAULT FALSE;
+    -- Manual wormhole-lifetime override: when set, this is the estimated moment
+    -- the hole collapses and it drives the connection's time bucket (fresh / <1d
+    -- / <4h / <1h / expired). NULL = auto: the lifetime is derived on the fly
+    -- from created_at + the wh_type's charted max life (see services/connLifetimeSweep.ts
+    -- and the client's whLifetime util). Only user edits write this column, so a
+    -- non-null value always wins over the auto estimate.
+    ALTER TABLE map_connections ADD COLUMN IF NOT EXISTS lifetime_expires_at TIMESTAMPTZ;
     ALTER TABLE map_systems     ADD COLUMN IF NOT EXISTS last_activity_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
 
     -- Manual intel tag a user can apply to a system via right-click. Distinct

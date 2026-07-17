@@ -118,13 +118,13 @@ export async function copyMap(params: {
     const connRes = await client.query<{
       sourceId: string; targetId: string; sourceHandle: string | null; targetHandle: string | null;
       connectionType: string; massStatus: string | null; timeStatus: string | null; size: string;
-      whType: string | null; massUsed: string; eolAt: Date | null; broken: boolean;
+      whType: string | null; massUsed: string; eolAt: Date | null; lifetimeExpiresAt: Date | null; broken: boolean;
       sourceSignatureId: string | null; targetSignatureId: string | null;
     }>(
       `SELECT source_id AS "sourceId", target_id AS "targetId", source_handle AS "sourceHandle",
               target_handle AS "targetHandle", connection_type AS "connectionType",
               mass_status AS "massStatus", time_status AS "timeStatus", size, wh_type AS "whType",
-              mass_used AS "massUsed", eol_at AS "eolAt", broken,
+              mass_used AS "massUsed", eol_at AS "eolAt", lifetime_expires_at AS "lifetimeExpiresAt", broken,
               source_signature_id AS "sourceSignatureId", target_signature_id AS "targetSignatureId"
          FROM map_connections WHERE map_id = $1`,
       [sourceMapId],
@@ -132,7 +132,7 @@ export async function copyMap(params: {
     const remapSig = (id: string | null) => (id ? sigIdMap.get(id) ?? null : null);
     await insertBatch(client, 'map_connections',
       ['id', 'map_id', 'source_id', 'target_id', 'source_handle', 'target_handle', 'connection_type',
-       'mass_status', 'time_status', 'size', 'wh_type', 'mass_used', 'eol_at', 'broken',
+       'mass_status', 'time_status', 'size', 'wh_type', 'mass_used', 'eol_at', 'lifetime_expires_at', 'broken',
        'source_signature_id', 'target_signature_id'],
       connRes.rows.flatMap((c): unknown[][] => {
         const src = sysIdMap.get(c.sourceId);
@@ -140,7 +140,7 @@ export async function copyMap(params: {
         if (!src || !tgt) return [];
         return [[
           crypto.randomUUID(), newMapId, src, tgt, c.sourceHandle, c.targetHandle, c.connectionType,
-          c.massStatus, c.timeStatus, c.size, c.whType, c.massUsed, c.eolAt, c.broken,
+          c.massStatus, c.timeStatus, c.size, c.whType, c.massUsed, c.eolAt, c.lifetimeExpiresAt, c.broken,
           remapSig(c.sourceSignatureId), remapSig(c.targetSignatureId),
         ]];
       }),

@@ -167,6 +167,11 @@ export interface MapConnection {
   size: ConnectionSize;
   massUsed: number; // kg — total mass jumped through this connection
   eolAt: string | null; // ISO timestamp when EOL was marked (null = fresh)
+  /** Manual wormhole-lifetime override: the estimated ISO timestamp the hole
+   *  collapses, driving its time bucket. Null = auto (derived from createdAt +
+   *  the wh type's charted max life). Only user edits set this; a non-null value
+   *  wins over the auto estimate. See utils/whLifetime.ts. */
+  lifetimeExpiresAt?: string | null;
   /** Optional links to the backing wormhole signature at each end: the sig you
    *  warp to in the source system, and the (usually K162) sig in the target.
    *  Powers the per-hop "warp to ABC-123" directions in saved chains. Null when

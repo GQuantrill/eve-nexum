@@ -9,6 +9,7 @@ import { systemDisplayName } from '../../utils/systemName';
 import { useCharacterLocation } from '../../hooks/useCharacterLocation';
 import { WHTypeInfo } from './WHTypeInfo';
 import { whSizeForType } from '../../utils/wormholeSize';
+import { effectiveExpiryMs, lifeBucket, knownMaxLifeHours } from '../../utils/whLifetime';
 import { ConfirmModal } from './ConfirmModal';
 import { XIcon } from '@phosphor-icons/react';
 import { api } from '../../api/client';
@@ -335,30 +336,29 @@ export function ConnectionPanel() {
         <span>{t('connPanel.timeStatus')}</span>
         <select
           value={(() => {
-            // Derive the live stage from eolAt + timeStatus so the dropdown
-            // tracks the same countdown the edge label shows.
-            if (conn.timeStatus === 'lessThan24h' && !conn.eolAt) return 'lessThan24h';
-            if (conn.eolAt) {
-              const elapsedH = (now - new Date(conn.eolAt).getTime()) / 3_600_000;
-              if (elapsedH >= 4) return 'expired';
-              if (elapsedH >= 3) return 'lessThan1h';
-              return 'lessThan4h';
-            }
-            return 'fresh';
+            // Derive the live stage from the hole's effective expiry so the
+            // dropdown tracks the same countdown the edge label shows.
+            const expiry = effectiveExpiryMs(conn, whTypes);
+            if (expiry != null) return lifeBucket(expiry - now);
+            return conn.timeStatus === 'lessThan24h' ? 'lessThan24h' : 'fresh';
           })()}
           onChange={(e) => {
             const v = e.target.value as TimeStatus;
-            const offset = (h: number) => new Date(Date.now() - h * 3_600_000).toISOString();
+            // A picked stage becomes a manual expiry that then ages from now.
+            const expiresIn = (h: number) => new Date(Date.now() + h * 3_600_000).toISOString();
+            const maxLife = knownMaxLifeHours(conn, whTypes);
             switch (v) {
-              case 'fresh':       update({ timeStatus: 'fresh',       eolAt: null });            break;
-              case 'lessThan24h': update({ timeStatus: 'lessThan24h', eolAt: null });            break;
-              case 'lessThan4h':  update({ timeStatus: 'eol',         eolAt: offset(0) });        break;
-              case 'lessThan1h':  update({ timeStatus: 'eol',         eolAt: offset(3) });        break;
-              case 'expired':     update({ timeStatus: 'eol',         eolAt: offset(4) });        break;
+              case 'fresh':       update({ timeStatus: 'fresh',       eolAt: null, lifetimeExpiresAt: maxLife ? expiresIn(maxLife) : null }); break;
+              case 'lessThan24h': update({ timeStatus: 'lessThan24h', eolAt: null, lifetimeExpiresAt: expiresIn(24) }); break;
+              case 'lessThan4h':  update({ timeStatus: 'lessThan4h',  eolAt: null, lifetimeExpiresAt: expiresIn(4) });  break;
+              case 'lessThan1h':  update({ timeStatus: 'lessThan1h',  eolAt: null, lifetimeExpiresAt: expiresIn(1) });  break;
+              case 'expired':     update({ timeStatus: 'expired',     eolAt: null, lifetimeExpiresAt: expiresIn(0) });  break;
             }
           }}
         >
-          <option value="fresh">{t('connPanel.fresh')}</option>
+          {(knownMaxLifeHours(conn, whTypes) ?? 48) > 24 && (
+            <option value="fresh">{t('connPanel.fresh')}</option>
+          )}
           <option value="lessThan24h">{t('connPanel.lessThan1d')}</option>
           <option value="lessThan4h">{t('connPanel.lessThan4h')}</option>
           <option value="lessThan1h">{t('connPanel.lessThan1h')}</option>
