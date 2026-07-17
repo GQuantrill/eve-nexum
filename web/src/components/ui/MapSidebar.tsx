@@ -501,25 +501,23 @@ function LazyWhSweepToggle() {
         />
       </label>
       <div className="map-sidebar__hint">{t("mapSidebar.lazyRemoveWhHint")}</div>
-      {enabled && (
-        <>
-          <div className="map-sidebar__row">
-            <label className="map-sidebar__label" htmlFor="collapse-grace">{t("mapSidebar.collapseGrace")}</label>
-            <select
-              id="collapse-grace"
-              className="map-sidebar__select"
-              value={String(grace)}
-              disabled={saving}
-              onChange={(e) => persist({ collapseGraceHours: parseFloat(e.target.value) }, { collapseGraceHours: grace })}
-            >
-              {COLLAPSE_GRACE_OPTIONS.map((o) => (
-                <option key={o.h} value={String(o.h)}>{o.label(t)}</option>
-              ))}
-            </select>
-          </div>
-          <div className="map-sidebar__hint">{t("mapSidebar.collapseGraceHint")}</div>
-        </>
-      )}
+      {/* Always shown for discoverability; only editable once auto-removal is on,
+          since the grace period has no effect otherwise. */}
+      <div className="map-sidebar__row">
+        <label className="map-sidebar__label" htmlFor="collapse-grace">{t("mapSidebar.collapseGrace")}</label>
+        <select
+          id="collapse-grace"
+          className="map-sidebar__select"
+          value={String(grace)}
+          disabled={!enabled || saving}
+          onChange={(e) => persist({ collapseGraceHours: parseFloat(e.target.value) }, { collapseGraceHours: grace })}
+        >
+          {COLLAPSE_GRACE_OPTIONS.map((o) => (
+            <option key={o.h} value={String(o.h)}>{o.label(t)}</option>
+          ))}
+        </select>
+      </div>
+      <div className="map-sidebar__hint">{t("mapSidebar.collapseGraceHint")}</div>
     </>
   );
 }
