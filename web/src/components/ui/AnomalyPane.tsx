@@ -4,6 +4,7 @@ import { api } from '../../api/client';
 import { useMapStore, awaitSystemCreate } from '../../store/mapStore';
 import { useCanEditContent } from '../../hooks/useCanEditContent';
 import { useShareMode } from '../../context/ShareModeContext';
+import { systemDisplayName } from '../../utils/systemName';
 import { useUserSetting } from '../../hooks/useUserSetting';
 import { useClickOutside } from '../../hooks/useClickOutside';
 import type { Anomaly, AnomType } from '../../types';
@@ -368,8 +369,10 @@ export function AnomalyPane({ systemId }: { systemId: string }) {
       const delaySec = overwriteDelay;
 
       if (currentSystemId && currentSystemId !== systemId) {
-        const currentName  = map.systems.find((s) => s.id === currentSystemId)?.name  ?? 'unknown';
-        const selectedName = map.systems.find((s) => s.id === systemId)?.name ?? 'unknown';
+        const cur = map.systems.find((s) => s.id === currentSystemId);
+        const sel = map.systems.find((s) => s.id === systemId);
+        const currentName  = cur ? systemDisplayName(cur) : 'unknown';
+        const selectedName = sel ? systemDisplayName(sel) : 'unknown';
         setPendingAction({
           message: t('anomalies.pasteDifferentSystem', { current: currentName, selected: selectedName }),
           fn: () => processPaste(parsed, overwrite, delaySec),

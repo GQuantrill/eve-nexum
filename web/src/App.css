@@ -4679,6 +4679,13 @@ div.system-node__easy-handle {
   min-width: 130px;
 }
 
+/* The real system name shown after an alias in the panel header, e.g. HOME (J155002). */
+.system-panel__real-name {
+  font-weight: 400;
+  color: #7a8aa8;
+  font-size: calc(13px * var(--font-scale, 1));
+}
+
 .system-panel__actions {
   display: flex;
   align-items: center;

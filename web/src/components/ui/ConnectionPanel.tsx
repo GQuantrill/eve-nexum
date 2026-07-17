@@ -5,6 +5,7 @@ import { useMapStore } from '../../store/mapStore';
 import { useWormholeTypes } from '../../hooks/useWormholeTypes';
 import { useNow30s } from '../../hooks/useNow30s';
 import { useCanEdit } from '../../hooks/useCanEdit';
+import { systemDisplayName } from '../../utils/systemName';
 import { useCharacterLocation } from '../../hooks/useCharacterLocation';
 import { WHTypeInfo } from './WHTypeInfo';
 import { whSizeForType } from '../../utils/wormholeSize';
@@ -249,7 +250,7 @@ export function ConnectionPanel() {
     <aside className="system-panel">
       <div className="system-panel__header">
         <h2 className="system-panel__title">
-          {src?.name ?? '?'} → {tgt?.name ?? '?'}
+          {src ? systemDisplayName(src) : '?'} → {tgt ? systemDisplayName(tgt) : '?'}
         </h2>
         <button className="icon-btn" onClick={() => selectConnection(null)} title={t('actions.close')}><XIcon size={14} weight="bold" /></button>
       </div>
@@ -290,7 +291,7 @@ export function ConnectionPanel() {
         <div className="conn-siglink">
           <div className="conn-siglink__label">{t('connPanel.sigLink')}</div>
           <label className="field">
-            <span>{t('connPanel.sigInSystem', { system: src?.name ?? '?' })}</span>
+            <span>{t('connPanel.sigInSystem', { system: src ? systemDisplayName(src) : '?' })}</span>
             <select
               value={conn.sourceSignatureId ?? ''}
               disabled={!canEdit}
@@ -303,7 +304,7 @@ export function ConnectionPanel() {
             </select>
           </label>
           <label className="field">
-            <span>{t('connPanel.sigInSystem', { system: tgt?.name ?? '?' })}</span>
+            <span>{t('connPanel.sigInSystem', { system: tgt ? systemDisplayName(tgt) : '?' })}</span>
             <select
               value={conn.targetSignatureId ?? ''}
               disabled={!canEdit}

@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMapStore } from '../../store/mapStore';
 import { useRoute } from '../../hooks/useRoute';
+import { systemDisplayName } from '../../utils/systemName';
 import type { SystemClass } from '../../types';
 
 // Jita IV-Moon 4 system id. Hardcoded elsewhere in the app — see
@@ -47,7 +48,7 @@ export function ChainExitsSection() {
       .map((s) => ({
         id:    s.id,
         eveId: s.eveSystemId as number,
-        name:  s.name,
+        name:  systemDisplayName(s),
         klass: s.systemClass as ExitClass,
       }));
   }, [systems]);

@@ -247,6 +247,11 @@ export async function migrate() {
     -- system, NULL means untagged. Used for ad-hoc "system A / B / 1 / 2" marking.
     ALTER TABLE map_systems     ADD COLUMN IF NOT EXISTS tag           TEXT;
 
+    -- Display-only per-system alias: a user-set label shown in place of the real
+    -- system name on this map. NULL = show the real name. The real name still
+    -- drives all logic (connections, leads-to, matching, ESI); this is cosmetic.
+    ALTER TABLE map_systems     ADD COLUMN IF NOT EXISTS alias         TEXT;
+
     CREATE TABLE IF NOT EXISTS map_signatures (
       id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
       system_id   UUID        NOT NULL REFERENCES map_systems(id) ON DELETE CASCADE,
