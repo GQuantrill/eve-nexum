@@ -5,6 +5,7 @@ import type { MapSystem, SystemClass } from '../../types';
 import { CLASS_COLORS, CLASS_LABELS } from '../../data/wormholes';
 import { LEADS_TO_BANDS } from '../../utils/whDest';
 import { usePopover } from '../../hooks/usePopover';
+import { useSystemAlias } from '../../hooks/useSystemAlias';
 
 interface Props {
   value: string;
@@ -35,6 +36,7 @@ const K_SPACE: SystemClass[] = ['HS', 'LS', 'NS'];
 
 export function LeadsToDropdown({ value, onChange, connectedSystems = [] }: Props) {
   const { t } = useTranslation();
+  const aliasName = useSystemAlias();
   const { open, setOpen, pos, btnRef, dropdownRef, openAt } = usePopover();
   const [search, setSearch] = useState('');
   const searchRef = useRef<HTMLInputElement>(null);
@@ -128,7 +130,7 @@ export function LeadsToDropdown({ value, onChange, connectedSystems = [] }: Prop
                     onMouseDown={() => select(sys.name || sys.id)}
                   >
                     <span className="wh-picker__code" style={{ color: '#c0d0e8', minWidth: 'auto', marginRight: 4 }}>
-                      {sys.name || t('mapNode.unknown')}
+                      {aliasName(sys.name) || t('mapNode.unknown')}
                     </span>
                     <span className="wh-picker__arrow"><ArrowRightIcon size={11} weight="bold" /></span>
                     <span className="wh-picker__dest" style={{ color: CLASS_COLORS[sys.systemClass] }}>
