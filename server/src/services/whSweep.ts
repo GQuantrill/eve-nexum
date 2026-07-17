@@ -171,12 +171,16 @@ async function sweepAll(): Promise<void> {
   }
 
   const now = Date.now();
+  // Same grace buffer the connection-lifetime collapse uses, so a hole's sig and
+  // its connection are removed together (~max life + grace) rather than the sig
+  // vanishing a couple of hours before the edge severs.
+  const graceH = config.connCollapseGraceHours;
   const byMap = new Map<string, CandidateRow[]>();
   for (const r of rows) {
     const maxH = whLifetimeHours(r.whType);
     if (maxH === null) continue; // unknown code → never auto-remove
     const ageH = (now - new Date(r.createdAt).getTime()) / 3_600_000;
-    if (ageH <= maxH) continue;
+    if (ageH <= maxH + graceH) continue;
     const list = byMap.get(r.mapId);
     if (list) list.push(r); else byMap.set(r.mapId, [r]);
   }
