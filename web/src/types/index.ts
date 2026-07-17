@@ -167,6 +167,11 @@ export interface MapConnection {
   size: ConnectionSize;
   massUsed: number; // kg — total mass jumped through this connection
   eolAt: string | null; // ISO timestamp when EOL was marked (null = fresh)
+  /** Manual wormhole-lifetime override: the estimated ISO timestamp the hole
+   *  collapses, driving its time bucket. Null = auto (derived from createdAt +
+   *  the wh type's charted max life). Only user edits set this; a non-null value
+   *  wins over the auto estimate. See utils/whLifetime.ts. */
+  lifetimeExpiresAt?: string | null;
   /** Optional links to the backing wormhole signature at each end: the sig you
    *  warp to in the source system, and the (usually K162) sig in the target.
    *  Powers the per-hop "warp to ABC-123" directions in saved chains. Null when
@@ -195,6 +200,9 @@ export interface WormholeMap {
   /** Opt-in: a server-side sweep removes wormhole sigs older than their type's
    *  max lifetime and quarantines (marks broken) any connection they backed. */
   lazyRemoveWormholes?: boolean;
+  /** Lazy-removal maps only: hours an expired connection lingers before the
+   *  lifetime sweep severs it and drops its backing sigs. Default 0.5 (30 min). */
+  collapseGraceHours?: number;
   /** Per-map bookmark-name format override. When set (non-empty), every user on
    *  this map copies bookmarks in this format; when null/absent, each user falls
    *  back to their own nexum.sig.bookmarkFormat global setting. */

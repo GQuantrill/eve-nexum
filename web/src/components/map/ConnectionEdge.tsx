@@ -9,9 +9,12 @@ import type { MapConnection } from '../../types';
 import { useMapStore } from '../../store/mapStore';
 import { useNow30s } from '../../hooks/useNow30s';
 import { useWatchlist } from '../../hooks/useWatchlist';
+import { useWormholeTypes } from '../../hooks/useWormholeTypes';
 import { matchConnection } from '../../utils/watchMatch';
 import { watchMarker } from '../../data/watchMarkers';
+import { effectiveExpiryMs, lifeBucket, type TimeBucket } from '../../utils/whLifetime';
 import { hoursMins } from '../../i18n/format';
+import type { TFunction } from 'i18next';
 
 // CSS custom properties (resolved via the edge path's inline `style`) so the
 // colour-vision palettes (--cv-conn-* in App.css) re-map connection colours.
@@ -23,9 +26,6 @@ const HIGHLIGHT_COLOR = 'var(--cv-conn-highlight)';
 // Perpendicular spacing between multiple connections that share the same pair
 // of systems, so they fan apart instead of stacking on one line.
 const PARALLEL_SEP = 18;
-
-const EOL_LIFE_MS    = 4 * 60 * 60 * 1000;
-const EOL_LESS_1H_MS = 60 * 60 * 1000;
 
 const TIME_COLORS: Record<string, string> = {
   lessThan4h: 'var(--cv-conn-4h)',
@@ -40,20 +40,20 @@ const MASS_LABELS: Record<string, { text: string; cls: string }> = {
 };
 
 /**
- * Given the EOL timestamp, return the live display state. Counts down from
- * 4h at the time EOL was marked; flips to "< 1 hr" when 3h have elapsed;
- * marks expired after 4h.
+ * Colour + label for a live time bucket. The two sub-4h buckets show a live
+ * countdown (updated by useNow30s); "< 1 day" is a static band label; a fresh
+ * hole (> 24h left) carries no time label. Returns null text ⇒ no label drawn.
  */
-function computeEolState(eolAt: string | null | undefined, now: number) {
-  if (!eolAt) return null;
-  const elapsed   = now - new Date(eolAt).getTime();
-  const remaining = EOL_LIFE_MS - elapsed;
-  if (remaining <= 0) return { color: TIME_COLORS.expired, label: '!', cls: 'connection-label__crit', expired: true };
-  const label = hoursMins(remaining);
-  if (remaining < EOL_LESS_1H_MS) {
-    return { color: TIME_COLORS.lessThan1h, label, cls: 'connection-label__eol', expired: false };
+function bucketDisplay(
+  bucket: TimeBucket, remainingMs: number, t: TFunction,
+): { color: string; text: string | null; cls: string } {
+  switch (bucket) {
+    case 'expired':     return { color: TIME_COLORS.expired,    text: '!',                     cls: 'connection-label__crit' };
+    case 'lessThan1h':  return { color: TIME_COLORS.lessThan1h, text: hoursMins(remainingMs),  cls: 'connection-label__eol' };
+    case 'lessThan4h':  return { color: TIME_COLORS.lessThan4h, text: hoursMins(remainingMs),  cls: 'connection-label__eol' };
+    case 'lessThan24h': return { color: STANDARD_COLOR,         text: t('mapEdge.lessThan24h'), cls: 'connection-label__eol' };
+    default:            return { color: STANDARD_COLOR,         text: null,                    cls: '' };
   }
-  return   { color: TIME_COLORS.lessThan4h, label, cls: 'connection-label__eol', expired: false };
 }
 
 export const ConnectionEdge = memo(({
@@ -70,6 +70,7 @@ export const ConnectionEdge = memo(({
     parallelCount?: number;
   };
   const selectConnection = useMapStore((s) => s.selectConnection);
+  const whTypes = useWormholeTypes();
   const now = useNow30s();
 
   // Lit because the hovered/selected system is one of its endpoints — these get
@@ -126,13 +127,17 @@ export const ConnectionEdge = memo(({
   // still traceable but clearly no longer an active link.
   const broken = !!conn?.broken;
 
-  // Live EOL state takes priority over the legacy categorical timeStatus.
-  const eolState   = !noLifetime ? computeEolState(conn?.eolAt, now) : null;
+  // Live lifetime: derive the current bucket from the hole's effective expiry
+  // (manual override, legacy EOL mark, or createdAt + the wh type's max life),
+  // re-evaluated every 30s via `now` so a hole visibly ages on its own. Null =
+  // lifetime unknown (untyped / bare K162) → fall back to the stored category.
+  const expiryMs   = !noLifetime && conn ? effectiveExpiryMs(conn, whTypes) : null;
+  const lifeState  = expiryMs != null ? bucketDisplay(lifeBucket(expiryMs - now), expiryMs - now, t) : null;
   const timeStatus = conn?.timeStatus ?? null;
 
   const color = isJumpgate ? JUMPGATE_COLOR
     : isGate ? GATE_COLOR
-    : (eolState?.color ?? TIME_COLORS[timeStatus ?? ''] ?? STANDARD_COLOR);
+    : (lifeState?.color ?? TIME_COLORS[timeStatus ?? ''] ?? STANDARD_COLOR);
   // Final stroke: broken keeps severed-red; otherwise a highlighted link (its
   // system is hovered/selected) takes the highlight hue, else its own state colour.
   const strokeColor = broken
@@ -151,10 +156,11 @@ export const ConnectionEdge = memo(({
   const strokeWidth = emphasized ? baseWidth + 2 : baseWidth;
   const massLabel   = !noLifetime && conn?.massStatus ? (MASS_LABELS[conn.massStatus] ?? null) : null;
 
-  // Prefer the live countdown label; fall back to the static category label
-  // if a connection has a legacy timeStatus value but no eolAt.
+  // Prefer the live bucket label; fall back to the stored category label only
+  // for a connection whose lifetime is unknown but which carries a legacy
+  // timeStatus value (e.g. a hand-set band on an untyped hole).
   const timeLabel = (() => {
-    if (eolState) return { text: eolState.label, cls: eolState.cls };
+    if (lifeState) return lifeState.text ? { text: lifeState.text, cls: lifeState.cls } : null;
     switch (timeStatus) {
       case 'lessThan24h': return { text: t('mapEdge.lessThan24h'), cls: 'connection-label__eol' };
       case 'lessThan4h':  return { text: t('mapEdge.lessThan4h'),  cls: 'connection-label__eol' };

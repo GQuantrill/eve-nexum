@@ -23,6 +23,7 @@ import { reportPresence } from '../services/presence.js';
 import { copyMap } from '../services/mapCopy.js';
 import { notifyDiscord, k162Embed, connectionEmbed, chainEmbed } from '../services/discord.js';
 import { whSizeForCode } from './wormholes.js';
+import { effectiveExpiryMs, lifeBucket } from '../data/whLifetimes.js';
 
 const log = createLogger('maps');
 const discordLog = createLogger('discord');
@@ -1736,9 +1737,9 @@ mapsRouter.post('/:mapId/presence', async (req, res) => {
 // toggle merge-source eligibility (corp maps, full/admin only)
 mapsRouter.patch('/:mapId', async (req, res) => {
   const { mapId } = req.params;
-  const { name, locked, allowAsMergeSource, allowAsMergeDestination, lazyRemoveWormholes, bookmarkFormat } = req.body as {
+  const { name, locked, allowAsMergeSource, allowAsMergeDestination, lazyRemoveWormholes, collapseGraceHours, bookmarkFormat } = req.body as {
     name?: string; locked?: boolean; allowAsMergeSource?: boolean; allowAsMergeDestination?: boolean;
-    lazyRemoveWormholes?: boolean; bookmarkFormat?: string | null;
+    lazyRemoveWormholes?: boolean; collapseGraceHours?: number; bookmarkFormat?: string | null;
   };
 
   const access = await requireMapWrite(res, mapId, req);
@@ -1798,6 +1799,16 @@ mapsRouter.patch('/:mapId', async (req, res) => {
   // (no corp/admin gate). The sweep itself runs server-side on this cadence.
   if (lazyRemoveWormholes !== undefined) {
     sets.push(`lazy_remove_wormholes = $${vals.length + 1}`); vals.push(lazyRemoveWormholes === true);
+  }
+  // Per-map collapse grace (hours) — how long an expired hole waits before the
+  // sweep severs it and drops its sigs. Another plain per-map behaviour setting;
+  // clamp to a sane 0–24h so a bad value can't wedge the sweep.
+  if (collapseGraceHours !== undefined) {
+    const n = Number(collapseGraceHours);
+    if (!Number.isFinite(n) || n < 0 || n > 24) {
+      res.status(400).json({ error: 'collapseGraceHours must be a number between 0 and 24' }); return;
+    }
+    sets.push(`collapse_grace_hours = $${vals.length + 1}`); vals.push(n);
   }
 
   // Per-map bookmark-name format: another plain per-map behaviour setting any
@@ -2147,7 +2158,7 @@ mapsRouter.post('/:mapId/connections', async (req, res) => {
     `SELECT id, source_id AS "sourceId", target_id AS "targetId", source_handle AS "sourceHandle",
             target_handle AS "targetHandle", connection_type AS "connectionType", mass_status AS "massStatus",
             time_status AS "timeStatus", size, wh_type AS "type", COALESCE(mass_used, 0)::float8 AS "massUsed",
-            eol_at AS "eolAt", broken,
+            eol_at AS "eolAt", lifetime_expires_at AS "lifetimeExpiresAt", broken,
             source_signature_id AS "sourceSignatureId", target_signature_id AS "targetSignatureId",
             created_at AS "createdAt"
        FROM map_connections WHERE id = $1 AND map_id = $2`,
@@ -2178,11 +2189,29 @@ mapsRouter.patch('/:mapId/connections/:connectionId', async (req, res) => {
     timeStatus: 'time_status', size: 'size',
     sourceHandle: 'source_handle', targetHandle: 'target_handle',
     type: 'wh_type', massUsed: 'mass_used',
-    eolAt: 'eol_at', broken: 'broken',
+    eolAt: 'eol_at', lifetimeExpiresAt: 'lifetime_expires_at', broken: 'broken',
     sourceSignatureId: 'source_signature_id', targetSignatureId: 'target_signature_id',
   };
 
   const updates: Record<string, unknown> = { ...(req.body as Record<string, unknown>) };
+
+  // Validate the two time-bucket fields. The whitelist below trusts values
+  // verbatim, so reject anything malformed here (a bad ISO string would 22007
+  // the UPDATE and 500 the request; an unknown time_status would corrupt the
+  // edge state read by every client).
+  if ('timeStatus' in updates) {
+    const v = updates.timeStatus;
+    const VALID = ['fresh', 'eol', 'lessThan24h', 'lessThan4h', 'lessThan1h', 'expired'];
+    if (v !== null && (typeof v !== 'string' || !VALID.includes(v))) {
+      res.status(400).json({ error: 'invalid timeStatus' }); return;
+    }
+  }
+  if ('lifetimeExpiresAt' in updates) {
+    const v = updates.lifetimeExpiresAt;
+    if (v !== null && (typeof v !== 'string' || Number.isNaN(Date.parse(v)))) {
+      res.status(400).json({ error: 'invalid lifetimeExpiresAt' }); return;
+    }
+  }
 
   // The stored size should follow the hole type. When the wormhole type is set
   // without an explicit size — wormhole auto-detect and external API writes both
@@ -2192,6 +2221,31 @@ mapsRouter.patch('/:mapId/connections/:connectionId', async (req, res) => {
   if ('type' in updates && !('size' in updates)) {
     const derived = await whSizeForCode(updates.type as string | null);
     if (derived) updates.size = derived;
+  }
+
+  // When the wormhole type is (re)identified, stamp the current time bucket so
+  // the stored status is right immediately — otherwise it stays stale until the
+  // next hourly connLifetimeSweep and the right-click menu / scout list disagree
+  // with the live edge label. Skip if the client already sent an explicit
+  // timeStatus (a manual pick owns it).
+  if ('type' in updates && !('timeStatus' in updates)) {
+    try {
+      const cur = await db.query<{ createdAt: Date; eolAt: Date | null; lifetimeExpiresAt: Date | null }>(
+        `SELECT created_at AS "createdAt", eol_at AS "eolAt", lifetime_expires_at AS "lifetimeExpiresAt"
+           FROM map_connections WHERE id = $1 AND map_id = $2`,
+        [connectionId, mapId],
+      );
+      const row = cur.rows[0];
+      if (row) {
+        const expiry = effectiveExpiryMs({
+          lifetimeExpiresAt: row.lifetimeExpiresAt,
+          eolAt:             row.eolAt,
+          whType:            updates.type as string | null,
+          createdAt:         row.createdAt,
+        });
+        if (expiry != null) updates.timeStatus = lifeBucket(expiry - Date.now());
+      }
+    } catch { /* leave time_status as-is on any lookup failure */ }
   }
 
   const sets: string[] = [];

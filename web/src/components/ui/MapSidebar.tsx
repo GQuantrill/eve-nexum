@@ -447,29 +447,41 @@ function ShareSection() {
 // lets that corp map be used as a merge source by the corp.
 // Per-map opt-in for the server-side lazy WH-removal sweep. Mirrors the merge
 // flags' optimistic-PATCH-with-revert pattern. Any editor can toggle it.
+// Grace-period presets (hours) offered for how long an expired hole lingers
+// before it's collapsed. 0.5 (30 min) is the default.
+const COLLAPSE_GRACE_OPTIONS: Array<{ h: number; label: (t: TFunction) => string }> = [
+  { h: 0,    label: (t) => t("mapSidebar.collapseGraceImmediate") },
+  { h: 0.25, label: (t) => t("units.minutes", { count: 15 }) },
+  { h: 0.5,  label: (t) => t("units.minutes", { count: 30 }) },
+  { h: 1,    label: (t) => t("units.hours", { count: 1 }) },
+  { h: 2,    label: (t) => t("units.hours", { count: 2 }) },
+  { h: 4,    label: (t) => t("units.hours", { count: 4 }) },
+];
+
 function LazyWhSweepToggle() {
   const { t } = useTranslation();
   const map = useMapStore((s) => s.map);
   const enabled = !!map.lazyRemoveWormholes;
+  const grace = map.collapseGraceHours ?? 0.5;
   const [saving, setSaving] = useState(false);
 
-  function setInStore(value: boolean) {
+  function setInStore(patch: { lazyRemoveWormholes?: boolean; collapseGraceHours?: number }) {
     useMapStore.setState((s) => ({
-      map: { ...s.map, lazyRemoveWormholes: value },
-      maps: s.maps.map((m) => (m.id === map.id ? { ...m, lazyRemoveWormholes: value } : m)),
+      map: { ...s.map, ...patch },
+      maps: s.maps.map((m) => (m.id === map.id ? { ...m, ...patch } : m)),
     }));
   }
 
-  async function toggle(next: boolean) {
+  async function persist(
+    patch: { lazyRemoveWormholes?: boolean; collapseGraceHours?: number },
+    revert: { lazyRemoveWormholes?: boolean; collapseGraceHours?: number },
+  ) {
     setSaving(true);
-    setInStore(next);
+    setInStore(patch);
     try {
-      await api(`/api/maps/${map.id}`, {
-        method: "PATCH",
-        body: JSON.stringify({ lazyRemoveWormholes: next }),
-      });
+      await api(`/api/maps/${map.id}`, { method: "PATCH", body: JSON.stringify(patch) });
     } catch (e) {
-      setInStore(!next);
+      setInStore(revert);
       toast.error(e instanceof Error ? e.message : t("mapSidebar.updateSettingFailed"));
     } finally {
       setSaving(false);
@@ -485,10 +497,27 @@ function LazyWhSweepToggle() {
           className="map-sidebar__toggle-input"
           checked={enabled}
           disabled={saving}
-          onChange={(e) => toggle(e.target.checked)}
+          onChange={(e) => persist({ lazyRemoveWormholes: e.target.checked }, { lazyRemoveWormholes: enabled })}
         />
       </label>
       <div className="map-sidebar__hint">{t("mapSidebar.lazyRemoveWhHint")}</div>
+      {/* Always shown for discoverability; only editable once auto-removal is on,
+          since the grace period has no effect otherwise. */}
+      <div className="map-sidebar__row">
+        <label className="map-sidebar__label" htmlFor="collapse-grace">{t("mapSidebar.collapseGrace")}</label>
+        <select
+          id="collapse-grace"
+          className="map-sidebar__select"
+          value={String(grace)}
+          disabled={!enabled || saving}
+          onChange={(e) => persist({ collapseGraceHours: parseFloat(e.target.value) }, { collapseGraceHours: grace })}
+        >
+          {COLLAPSE_GRACE_OPTIONS.map((o) => (
+            <option key={o.h} value={String(o.h)}>{o.label(t)}</option>
+          ))}
+        </select>
+      </div>
+      <div className="map-sidebar__hint">{t("mapSidebar.collapseGraceHint")}</div>
     </>
   );
 }

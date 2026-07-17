@@ -158,6 +158,13 @@ export const config = {
     const n = parseInt(process.env.LAZY_WH_SWEEP_MINUTES ?? '15', 10);
     return Number.isFinite(n) && n >= 0 ? n : 15;
   })(),
+  // Cadence (minutes) of the connection-lifetime sweep, which re-buckets each
+  // wormhole connection's time status (fresh / <1d / <4h / <1h / expired) from
+  // its age so holes visibly decay on their own. Default 60; 0 disables it.
+  connLifetimeSweepMinutes: (() => {
+    const n = parseInt(process.env.CONN_LIFETIME_SWEEP_MINUTES ?? '60', 10);
+    return Number.isFinite(n) && n >= 0 ? n : 60;
+  })(),
   sdeAutoUpdate:       SDE_AUTO_UPDATE,
   sdeCheckUtc:         SDE_CHECK_UTC,
   telemetry:           { enabled: TELEMETRY_ENABLED, url: TELEMETRY_URL },
