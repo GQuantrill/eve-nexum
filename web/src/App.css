@@ -2385,7 +2385,6 @@
   background: rgba(255,255,255,0.02);
 }
 
-.watchlist__row-top,
 .watchlist__row-bottom {
   display: flex;
   align-items: center;
@@ -2394,6 +2393,23 @@
      controls to nothing. Kicks in only when they no longer fit side by side —
      wide layouts are unchanged. Paired with the min-widths below, since a
      min-width of 0 would let items shrink forever and never wrap. */
+  flex-wrap: wrap;
+}
+
+/* Top row: the delete button is pinned to the right and never wraps; the
+   marker / match-type controls wrap within the inner group beside it instead
+   of pushing the delete onto a line of its own. */
+.watchlist__row-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+.watchlist__row-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
   flex-wrap: wrap;
 }
 
