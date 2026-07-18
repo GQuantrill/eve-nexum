@@ -2397,6 +2397,72 @@
   flex-wrap: wrap;
 }
 
+/* Full-width delete along the bottom of an entry — avoids competing for space
+   with the marker / match-type / locate controls on a narrow panel. */
+.watchlist__delete-full {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: 100%;
+  margin-top: 6px;
+  background: transparent;
+  border: 1px solid #3a2030;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: calc(11px * var(--font-scale, 1));
+  color: #d88a8a;
+  cursor: pointer;
+}
+.watchlist__delete-full:hover {
+  background: rgba(224,90,90,0.10);
+  color: #e05a5a;
+}
+
+/* Compound-criteria block: the AND/OR selector, each criterion row, and the
+   add button. Left-aligned and full-width so the rows line up with the primary
+   match controls above. */
+.watchlist__criteria {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+}
+.watchlist__criterion {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.watchlist__combine {
+  align-self: flex-start;
+  background: #0a0e1a;
+  border: 1px solid #1e2740;
+  border-radius: 4px;
+  padding: 3px 6px;
+  font-size: calc(11px * var(--font-scale, 1));
+  color: #9fb0d0;
+  cursor: pointer;
+  outline: none;
+}
+.watchlist__add-criteria {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: 1px dashed #2a3550;
+  border-radius: 4px;
+  padding: 3px 8px;
+  font-size: calc(11px * var(--font-scale, 1));
+  color: #7a8aa8;
+  cursor: pointer;
+}
+.watchlist__add-criteria:hover {
+  color: #9fb0d0;
+  border-color: #3a4870;
+}
+
 .watchlist__drag-handle {
   flex: none;
   background: none; border: none;
