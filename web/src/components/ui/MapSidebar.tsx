@@ -142,6 +142,7 @@ type SectionId =
   | "systemOptions"
   | "contentFilter"
   | "connections"
+  | "tracking"
   | "route"
   | "chainExits"
   | "proximityAlerts"
@@ -1023,6 +1024,15 @@ export function MapSidebar() {
               <LazyWhSweepToggle />
             </>
           )}
+        </CollapsibleSection>
+
+        <CollapsibleSection title={t("mapSidebar.sections.tracking")} {...sectionProps("tracking")}>
+          <SettingToggle
+            settingKey="nexum.tracking.skipKspace"
+            label={t("mapSidebar.skipKspace")}
+            defaultOn={false}
+          />
+          <div className="map-sidebar__hint">{t("mapSidebar.skipKspaceHint")}</div>
         </CollapsibleSection>
 
         <CollapsibleSection title={t("mapSidebar.sections.route")} {...sectionProps("route")}>
