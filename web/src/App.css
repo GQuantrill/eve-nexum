@@ -2385,6 +2385,7 @@
   background: rgba(255,255,255,0.02);
 }
 
+.watchlist__row-top,
 .watchlist__row-bottom {
   display: flex;
   align-items: center;
@@ -2396,21 +2397,26 @@
   flex-wrap: wrap;
 }
 
-/* Top row: the delete button is pinned to the right and never wraps; the
-   marker / match-type controls wrap within the inner group beside it instead
-   of pushing the delete onto a line of its own. */
-.watchlist__row-top {
-  display: flex;
-  align-items: flex-start;
-  gap: 6px;
-}
-.watchlist__row-main {
-  flex: 1;
-  min-width: 0;
+/* Full-width delete along the bottom of an entry — avoids competing for space
+   with the marker / match-type / locate controls on a narrow panel. */
+.watchlist__delete-full {
   display: flex;
   align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
+  justify-content: center;
+  gap: 5px;
+  width: 100%;
+  margin-top: 6px;
+  background: transparent;
+  border: 1px solid #3a2030;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: calc(11px * var(--font-scale, 1));
+  color: #d88a8a;
+  cursor: pointer;
+}
+.watchlist__delete-full:hover {
+  background: rgba(224,90,90,0.10);
+  color: #e05a5a;
 }
 
 /* Compound-criteria block: the AND/OR selector, each criterion row, and the
