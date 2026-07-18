@@ -2420,13 +2420,13 @@
 }
 
 /* Compound-criteria block: the AND/OR selector, each criterion row, and the
-   add button. Indented under the primary controls to read as a refinement. */
+   add button. Left-aligned and full-width so the rows line up with the primary
+   match controls above. */
 .watchlist__criteria {
   display: flex;
   flex-direction: column;
   gap: 6px;
   margin-top: 6px;
-  padding-left: 26px;
 }
 .watchlist__criterion {
   display: flex;
