@@ -1,3 +1,5 @@
+import type { JumpSystem } from './hooks/useLocationTracking';
+
 interface LogEntry {
   ts: string;
   level: 'error' | 'warn' | 'api';
@@ -122,13 +124,15 @@ const nexumDebug = {
       return;
     }
     const { dryRun = false } = opts;
-    const [{ applyJump }, store, esi, client] = await Promise.all([
+    const [{ applyTrackedJump }, store, esi, client, userSettings] = await Promise.all([
       import('./hooks/useLocationTracking'),
       import('./store/mapStore'),
       import('./hooks/useEsiSearch'),
       import('./api/client'),
+      import('./hooks/useUserSetting'),
     ]);
     const { useMapStore } = store;
+    const { readUserSetting } = userSettings;
 
     const resolve = async (name: string) => {
       const results = await (await fetch(
@@ -145,9 +149,18 @@ const nexumDebug = {
     };
 
     if (this._jumpTimer) { clearInterval(this._jumpTimer); this._jumpTimer = null; }
-    let prev = useMapStore.getState().currentSystemId;
+    // Drive the exact filter live tracking uses: keep a separate "previous
+    // physical system" (for the K-space skip logic) and connection anchor.
+    let prevAnchor = useMapStore.getState().currentSystemId;
+    const startNode = useMapStore.getState().map.systems.find((s) => s.id === prevAnchor);
+    let prevPhysical: JumpSystem | null = startNode && startNode.eveSystemId != null ? {
+      eveSystemId: startNode.eveSystemId, name: startNode.name, systemClass: startNode.systemClass,
+      effect: startNode.effect, statics: startNode.statics,
+      regionName: startNode.regionName, npcType: startNode.npcType,
+    } : null;
+    const skipKspace = readUserSetting<boolean>('nexum.tracking.skipKspace', false);
     let i = 0;
-    console.log(`[nexum] Simulating ${names.length} jumps, one every ${intervalMs}ms${dryRun ? ' (dry run — no server writes)' : ''}. nexumDebug.stopJumps() to cancel.`);
+    console.log(`[nexum] Simulating ${names.length} jumps, one every ${intervalMs}ms${dryRun ? ' (dry run — no server writes)' : ''}${skipKspace ? ' (skip K-space on)' : ''}. nexumDebug.stopJumps() to cancel.`);
 
     const step = async () => {
       if (i >= names.length) { this.stopJumps(); console.log('[nexum] Jump simulation complete.'); return; }
@@ -157,14 +170,16 @@ const nexumDebug = {
       // applyJump's writes are dispatched synchronously (the suppression check
       // runs before fetch), so toggling around this call captures them all.
       if (dryRun) client.setWritesSuppressed(true);
-      let id: string | null;
+      let result: { mapSystemId: string | null; anchor: string | null | 'keep' };
       try {
-        id = applyJump(sys, prev, true);
+        result = applyTrackedJump(sys, prevPhysical, prevAnchor, { skipKspace, canAdd: true });
       } finally {
         if (dryRun) client.setWritesSuppressed(false);
       }
+      prevPhysical = sys;
+      if (result.anchor !== 'keep') prevAnchor = result.anchor;
+      const id = result.mapSystemId;
       if (id) {
-        prev = id;
         useMapStore.getState().setCurrentSystem(id);
         // Selecting a system opens its detail panel, whose panes immediately
         // GET /systems/:id/{signatures,structures,anomalies}. In a dry run the
@@ -174,6 +189,8 @@ const nexumDebug = {
         if (!dryRun) useMapStore.getState().selectSystem(id);
         const pos = useMapStore.getState().map.systems.find((s) => s.id === id)?.position;
         console.log(`[nexum] jump ${i}/${names.length} → ${sys.name}  @ (${pos?.x}, ${pos?.y})`);
+      } else {
+        console.log(`[nexum] jump ${i}/${names.length} → ${sys.name}  (skipped — K-space)`);
       }
     };
     await step();
