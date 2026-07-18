@@ -22,14 +22,23 @@ export function matchKey(m: WatchMatch): string {
   }
 }
 
-/** Does a system satisfy an entry? whType / frigHole match the system's statics
- *  AND its scanned wormhole-sig types (passed in from the map-wide index), so a
- *  freshly-scanned sig counts even before it's resolved into a connection. The
- *  leadsTo match reads `destClasses` — the pre-resolved set of classes this
- *  system's wormholes (statics, scanned sigs and live connections) lead to,
+// The full condition list for an entry: its primary match plus any extra
+// criteria. Combined per entry.criteriaMode ('or' = any, else 'and' = all).
+function conditions(e: WatchEntry): WatchMatch[] {
+  return e.criteria && e.criteria.length ? [e.match, ...e.criteria] : [e.match];
+}
+function combine(e: WatchEntry, test: (m: WatchMatch) => boolean): boolean {
+  const conds = conditions(e);
+  return e.criteriaMode === 'or' ? conds.some(test) : conds.every(test);
+}
+
+/** Does ONE condition hold for a system? whType / frigHole match the system's
+ *  statics AND its scanned wormhole-sig types (passed in from the map-wide
+ *  index), so a freshly-scanned sig counts even before it's resolved into a
+ *  connection. leadsTo reads `destClasses` — the pre-resolved set of classes
+ *  this system's wormholes (statics, scanned sigs and live connections) lead to,
  *  built once per map change by useLeadsToIndex. */
-export function systemMatchesEntry(e: WatchEntry, sys: MapSystem, sigTypes?: string[], destClasses?: SystemClass[]): boolean {
-  const m = e.match;
+function systemMatchesOne(m: WatchMatch, sys: MapSystem, sigTypes?: string[], destClasses?: SystemClass[]): boolean {
   switch (m.by) {
     case 'system':   return m.query.trim() !== '' && norm(sys.name) === norm(m.query);
     case 'whType': {
@@ -46,16 +55,28 @@ export function systemMatchesEntry(e: WatchEntry, sys: MapSystem, sigTypes?: str
   }
 }
 
-/** Does a connection satisfy an entry? Only the wormhole-flavoured matches apply
- *  to an edge; system/class/effect/leadsTo are node concepts (leadsTo is resolved
- *  per system by useLeadsToIndex, which already accounts for connections). */
-export function connectionMatchesEntry(e: WatchEntry, conn: MapConnection): boolean {
-  const m = e.match;
+/** Does a system satisfy an entry — its primary match combined with any criteria
+ *  by the entry's AND/OR mode? */
+export function systemMatchesEntry(e: WatchEntry, sys: MapSystem, sigTypes?: string[], destClasses?: SystemClass[]): boolean {
+  return combine(e, (m) => systemMatchesOne(m, sys, sigTypes, destClasses));
+}
+
+/** Does ONE condition hold for a connection? Only the wormhole-flavoured matches
+ *  apply to an edge; system/class/effect/leadsTo are node concepts, so they're
+ *  false here — which makes a compound entry with a node-only criterion light up
+ *  connections only in OR mode (never in AND, since a node condition can't hold
+ *  on a bare edge). */
+function connMatchesOne(m: WatchMatch, conn: MapConnection): boolean {
   switch (m.by) {
     case 'whType':   return m.code.trim() !== '' && !!conn.type && conn.type.toUpperCase() === m.code.trim().toUpperCase();
     case 'frigHole': return conn.size === 'small' || (!!conn.type && FRIG_WH_TYPES.has(conn.type.toUpperCase()));
     default:         return false;
   }
+}
+
+/** Does a connection satisfy an entry (primary + criteria, combined by mode)? */
+export function connectionMatchesEntry(e: WatchEntry, conn: MapConnection): boolean {
+  return combine(e, (m) => connMatchesOne(m, conn));
 }
 
 /** First entry (list order) that matches this system, or null. */
