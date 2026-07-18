@@ -22,14 +22,16 @@ export function matchKey(m: WatchMatch): string {
   }
 }
 
-// The full condition list for an entry: its primary match plus any extra
-// criteria. Combined per entry.criteriaMode ('or' = any, else 'and' = all).
-function conditions(e: WatchEntry): WatchMatch[] {
-  return e.criteria && e.criteria.length ? [e.match, ...e.criteria] : [e.match];
-}
+// Evaluate an entry: the PRIMARY match is always required (the base filter);
+// any extra criteria then refine it, combined per entry.criteriaMode ('or' =
+// at least one criterion, else 'and' = all criteria). So "C3, leads-to C2 OR
+// contains K162" means a C3 that also leads to C2 or contains a K162 — the C3
+// is never optional.
 function combine(e: WatchEntry, test: (m: WatchMatch) => boolean): boolean {
-  const conds = conditions(e);
-  return e.criteriaMode === 'or' ? conds.some(test) : conds.every(test);
+  if (!test(e.match)) return false;
+  const c = e.criteria;
+  if (!c || !c.length) return true;
+  return e.criteriaMode === 'or' ? c.some(test) : c.every(test);
 }
 
 /** Does ONE condition hold for a system? whType / frigHole match the system's
