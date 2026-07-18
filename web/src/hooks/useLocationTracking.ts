@@ -205,6 +205,53 @@ export function applyJump(system: JumpSystem, prevMapSystemId: string | null, ca
 }
 
 /**
+ * One jump through the "don't track K-space" filter, funnelling to `applyJump`.
+ * Shared by the live tracker AND `nexumDebug.simulateJumps`, so the simulator
+ * reproduces exactly what real flying records.
+ *
+ * With `skipKspace` off it's a plain `applyJump`. With it on, only the K-space
+ * systems bordering a J-space jump are recorded: the first entered from J-space,
+ * and the last before jumping back into J-space (added retroactively here).
+ * Intermediate K-space is dropped. Returns the resulting map-system id (or null
+ * when nothing was recorded) plus how the caller should advance its connection
+ * anchor: a node id, null (clear), or 'keep' (a skipped system must not become
+ * the anchor). `prev` is the previous PHYSICAL system, mapped or not.
+ */
+export function applyTrackedJump(
+  curr: JumpSystem,
+  prev: JumpSystem | null,
+  prevMapSystemId: string | null,
+  opts: { skipKspace: boolean; canAdd: boolean },
+): { mapSystemId: string | null; anchor: string | null | 'keep' } {
+  const skip = opts.skipKspace && opts.canAdd;
+  const systems = () => useMapStore.getState().map.systems;
+
+  if (skip && isKspaceSkip(curr.systemClass)) {
+    // Arriving in K-space: keep it only when jumping in FROM J-space (the first
+    // K-space of this excursion). Intermediate K-space, or a login already
+    // parked in K-space, is skipped.
+    const fromJspace = prev !== null && !isKspaceSkip(prev.systemClass);
+    if (fromJspace) {
+      const mapSystemId = applyJump(curr, prevMapSystemId, true);
+      return { mapSystemId, anchor: mapSystemId };
+    }
+    return { mapSystemId: systems().find((s) => s.eveSystemId === curr.eveSystemId)?.id ?? null, anchor: 'keep' };
+  }
+
+  if (skip && prev !== null && isKspaceSkip(prev.systemClass)) {
+    // Arriving in J-space (or Pochven) from K-space: record the K-space system
+    // we jumped from — retroactively if it was skipped — and link it to here.
+    const prevOnMap = systems().find((s) => s.eveSystemId === prev.eveSystemId)?.id ?? null;
+    const source = prevOnMap ?? applyJump(prev, null, true); // add the last K-space isolated
+    const mapSystemId = applyJump(curr, source, true);       // then connect it through
+    return { mapSystemId, anchor: mapSystemId };
+  }
+
+  const mapSystemId = applyJump(curr, prevMapSystemId, opts.canAdd);
+  return { mapSystemId, anchor: mapSystemId };
+}
+
+/**
  * Map-side reaction to character location changes. The actual polling lives
  * in `useCharacterLocation` (10s, module-level, shared with the sidebar);
  * this hook just runs map-mutation side-effects whenever the location data
@@ -281,44 +328,10 @@ export function useLocationTracking(enabled: boolean) {
     // no-topology user is viewing; track-jumps off opts out of auto-add too.
     const trackJumps = useMapStore.getState().trackJumps;
     const canAdd = trackJumps && !map.locked && canEdit;
-    // Opt-in: only record the K-space systems that border a J-space jump — the
-    // first one entered from J-space and the last one before jumping back into
-    // J-space — skipping everything gated through in between. HS/LS/NS only;
-    // Pochven is always tracked.
-    const skipKspace = canAdd && readUserSetting<boolean>('nexum.tracking.skipKspace', false);
+    const skipKspace = readUserSetting<boolean>('nexum.tracking.skipKspace', false);
 
-    let mapSystemId: string | null;
-    // How to advance the connection anchor: a node id, null (clear), or 'keep'
-    // (a skipped K-space system must not become the anchor).
-    let anchorUpdate: string | null | 'keep';
-
-    if (skipKspace && isKspaceSkip(curr.systemClass)) {
-      // Arriving in K-space: keep it only when jumping in FROM J-space (the first
-      // K-space of this excursion). Intermediate K-space, or a login already
-      // parked in K-space, is skipped.
-      const fromJspace = prev !== null && !isKspaceSkip(prev.systemClass);
-      if (fromJspace) {
-        mapSystemId = applyJump(curr, prevMapSystemId, true);
-        anchorUpdate = mapSystemId;
-      } else {
-        mapSystemId = map.systems.find((s) => s.eveSystemId === curr.eveSystemId)?.id ?? null;
-        anchorUpdate = 'keep';
-      }
-    } else if (skipKspace && prev !== null && isKspaceSkip(prev.systemClass)) {
-      // Arriving in J-space (or Pochven) from K-space: record the K-space system
-      // we jumped from — retroactively if it was skipped — and link it to here.
-      const prevOnMap = map.systems.find((s) => s.eveSystemId === prev.eveSystemId)?.id ?? null;
-      const source = prevOnMap ?? applyJump(prev, null, true); // add the last K-space isolated
-      mapSystemId = applyJump(curr, source, true);             // then connect it through
-      anchorUpdate = mapSystemId;
-    } else {
-      // Normal tracking (K-space skipping off, or a step that needs no special
-      // handling).
-      mapSystemId = applyJump(curr, prevMapSystemId, canAdd);
-      anchorUpdate = mapSystemId;
-    }
-
-    if (anchorUpdate !== 'keep') lastMapSystemId.current = anchorUpdate;
+    const { mapSystemId, anchor } = applyTrackedJump(curr, prev, prevMapSystemId, { skipKspace, canAdd });
+    if (anchor !== 'keep') lastMapSystemId.current = anchor;
 
     if (mapSystemId === null) {
       // On an untracked system (skipped K-space, or can't-add and not on map).
