@@ -54,6 +54,13 @@ export type WatchMatch =
 export interface WatchEntry {
   id:     string;
   match:  WatchMatch;
+  /** Extra conditions combined with `match` per `criteriaMode`. The full set
+   *  [match, ...criteria] is ANDed (all) or ORed (any) when testing a system /
+   *  connection. Absent/empty = a plain single-condition entry. The editor
+   *  limits criteria to whType ("contains") and leadsTo ("leads to"). */
+  criteria?: WatchMatch[];
+  /** How [match, ...criteria] combine. Default 'and'. */
+  criteriaMode?: 'and' | 'or';
   note:   string;
   marker: WatchMarkerKind;
   // Optional named list this entry belongs to. Absent = ungrouped (shown at the

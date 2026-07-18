@@ -11,6 +11,10 @@ interface Props {
   value: string;
   onChange: (whType: string, leadsTo: string) => void;
   statics?: string[];
+  /** Show only the type code on the button (no "→ dest" badge). For tight
+   *  columns like the watchlist where the destination badge would clip. The
+   *  dropdown still shows the destination. */
+  codeOnly?: boolean;
 }
 
 // Display order for the picker's groups. Anything from the server whose
@@ -46,7 +50,7 @@ function DestBadge({ code, types }: { code: string; types: ReturnType<typeof use
   );
 }
 
-export function WormholeTypePicker({ value, onChange, statics = [] }: Props) {
+export function WormholeTypePicker({ value, onChange, statics = [], codeOnly = false }: Props) {
   const { t } = useTranslation();
   const types = useWormholeTypes();
   const { open, setOpen, pos, btnRef, dropdownRef, openAt } = usePopover();
@@ -128,7 +132,7 @@ export function WormholeTypePicker({ value, onChange, statics = [] }: Props) {
         {value ? (
           <span className="wh-picker__btn-inner">
             <span className="wh-picker__code">{value}</span>
-            <DestBadge code={value} types={types} />
+            {!codeOnly && <DestBadge code={value} types={types} />}
           </span>
         ) : (
           <span className="wh-picker__placeholder">{t('mapNode.unknown')}</span>
