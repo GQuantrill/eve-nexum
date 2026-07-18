@@ -98,6 +98,12 @@ export interface JumpSystem {
   npcType:     string | null;
 }
 
+// K-space classes suppressed by the opt-in "don't track K-space" setting.
+// Pochven is deliberately NOT here — it's wormhole-relevant, so it's always
+// tracked like J-space.
+const KSPACE_SKIP = new Set(['HS', 'LS', 'NS']);
+const isKspaceSkip = (cls: string) => KSPACE_SKIP.has(cls);
+
 /**
  * Apply one "the player is now in `system`, arriving from `prevMapSystemId`"
  * jump to the active map: reuse the system if it's already placed, otherwise
@@ -210,6 +216,11 @@ export function useLocationTracking(enabled: boolean) {
   const lastEveSystemId = useRef<number | null>(null);
   const lastMapSystemId = useRef<string | null>(null);
   const lastActiveMapId = useRef<string | null>(null);
+  // The pilot's previous PHYSICAL system (whether or not it was recorded on the
+  // map). Needed for the "don't track K-space" option, which has to look at the
+  // departure system's class — and retroactively add the last K-space system
+  // when the pilot jumps from it into J-space.
+  const prevPhysical = useRef<JumpSystem | null>(null);
   // The eve system we last auto-selected. Guards the "follow the character"
   // selection so it fires only on a GENUINE move — not when ESI's online flag
   // flickers (which resets lastEveSystemId and would otherwise re-select the
@@ -230,12 +241,14 @@ export function useLocationTracking(enabled: boolean) {
       lastEveSystemId.current = null;
       lastMapSystemId.current = null;
       lastSelectedEveId.current = null;
+      prevPhysical.current = null;
     }
 
     const system = location.system;
     if (!location.online || !system) {
       lastEveSystemId.current = null;
       lastMapSystemId.current = null;
+      prevPhysical.current = null;
       setCurrentSystem(null);
       return;
     }
@@ -252,31 +265,67 @@ export function useLocationTracking(enabled: boolean) {
     }
     lastEveSystemId.current = system.eveSystemId;
 
+    const curr: JumpSystem = {
+      eveSystemId: system.eveSystemId,
+      name:        system.name,
+      systemClass: system.systemClass,
+      effect:      system.effect,
+      statics:     system.statics,
+      regionName:  system.regionName ?? null,
+      npcType:     system.npcType ?? null,
+    };
+    const prev = prevPhysical.current;
+    prevPhysical.current = curr; // remember the physical location for the next jump
+
     // A locked map never grows from passive tracking, nor does one a readonly /
     // no-topology user is viewing; track-jumps off opts out of auto-add too.
     const trackJumps = useMapStore.getState().trackJumps;
     const canAdd = trackJumps && !map.locked && canEdit;
-    const mapSystemId = applyJump(
-      {
-        eveSystemId: system.eveSystemId,
-        name:        system.name,
-        systemClass: system.systemClass,
-        effect:      system.effect,
-        statics:     system.statics,
-        regionName:  system.regionName ?? null,
-        npcType:     system.npcType ?? null,
-      },
-      prevMapSystemId,
-      canAdd,
-    );
+    // Opt-in: only record the K-space systems that border a J-space jump — the
+    // first one entered from J-space and the last one before jumping back into
+    // J-space — skipping everything gated through in between. HS/LS/NS only;
+    // Pochven is always tracked.
+    const skipKspace = canAdd && readUserSetting<boolean>('nexum.tracking.skipKspace', false);
+
+    let mapSystemId: string | null;
+    // How to advance the connection anchor: a node id, null (clear), or 'keep'
+    // (a skipped K-space system must not become the anchor).
+    let anchorUpdate: string | null | 'keep';
+
+    if (skipKspace && isKspaceSkip(curr.systemClass)) {
+      // Arriving in K-space: keep it only when jumping in FROM J-space (the first
+      // K-space of this excursion). Intermediate K-space, or a login already
+      // parked in K-space, is skipped.
+      const fromJspace = prev !== null && !isKspaceSkip(prev.systemClass);
+      if (fromJspace) {
+        mapSystemId = applyJump(curr, prevMapSystemId, true);
+        anchorUpdate = mapSystemId;
+      } else {
+        mapSystemId = map.systems.find((s) => s.eveSystemId === curr.eveSystemId)?.id ?? null;
+        anchorUpdate = 'keep';
+      }
+    } else if (skipKspace && prev !== null && isKspaceSkip(prev.systemClass)) {
+      // Arriving in J-space (or Pochven) from K-space: record the K-space system
+      // we jumped from — retroactively if it was skipped — and link it to here.
+      const prevOnMap = map.systems.find((s) => s.eveSystemId === prev.eveSystemId)?.id ?? null;
+      const source = prevOnMap ?? applyJump(prev, null, true); // add the last K-space isolated
+      mapSystemId = applyJump(curr, source, true);             // then connect it through
+      anchorUpdate = mapSystemId;
+    } else {
+      // Normal tracking (K-space skipping off, or a step that needs no special
+      // handling).
+      mapSystemId = applyJump(curr, prevMapSystemId, canAdd);
+      anchorUpdate = mapSystemId;
+    }
+
+    if (anchorUpdate !== 'keep') lastMapSystemId.current = anchorUpdate;
+
     if (mapSystemId === null) {
-      // Not on the map and not allowed to add — record nothing, just clear.
-      lastMapSystemId.current = null;
+      // On an untracked system (skipped K-space, or can't-add and not on map).
       setCurrentSystem(null);
       return;
     }
 
-    lastMapSystemId.current = mapSystemId;
     setCurrentSystem(mapSystemId);
     // Follow the character onto the new system only when it's genuinely a
     // different system than the one we last auto-selected. An ESI online-status
