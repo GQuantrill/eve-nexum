@@ -93,14 +93,14 @@ async function sweepMap(mapId: string, expired: CandidateRow[]): Promise<void> {
   try {
     await client.query('BEGIN');
 
-    const [sysRes, connRes] = await Promise.all([
-      client.query<SysRow>(
-        `SELECT id, name, system_class AS "systemClass" FROM map_systems WHERE map_id = $1`, [mapId]),
-      client.query<ConnRow>(
-        `SELECT id, source_id AS "sourceId", target_id AS "targetId", wh_type AS "type",
-                connection_type AS "connectionType", broken
-           FROM map_connections WHERE map_id = $1`, [mapId]),
-    ]);
+    // Sequential, not Promise.all — concurrent queries on one pooled tx client
+    // are serialised by node-pg anyway and the parallel form is deprecated (pg@9).
+    const sysRes = await client.query<SysRow>(
+      `SELECT id, name, system_class AS "systemClass" FROM map_systems WHERE map_id = $1`, [mapId]);
+    const connRes = await client.query<ConnRow>(
+      `SELECT id, source_id AS "sourceId", target_id AS "targetId", wh_type AS "type",
+              connection_type AS "connectionType", broken
+         FROM map_connections WHERE map_id = $1`, [mapId]);
 
     await client.query(`DELETE FROM map_signatures WHERE id = ANY($1::uuid[])`, [expiredIds]);
 

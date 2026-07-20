@@ -1328,29 +1328,31 @@ mapsRouter.post('/:mapId/merge', async (req, res) => {
     await client.query('BEGIN');
 
     // ── Load both sides ─────────────────────────────────────────────────
-    const [destSysRes, destConnRes, srcSysRes, srcConnRes] = await Promise.all([
-      client.query<{ id: string; eveSystemId: number | null; name: string; notes: string; x: number; y: number }>(
-        `SELECT id, eve_system_id AS "eveSystemId", name, notes, position_x AS x, position_y AS y
-           FROM map_systems WHERE map_id = $1`, [destId]),
-      client.query<{ sourceId: string; targetId: string }>(
-        `SELECT source_id AS "sourceId", target_id AS "targetId" FROM map_connections WHERE map_id = $1`, [destId]),
-      client.query<{
-        id: string; eveSystemId: number | null; name: string; systemClass: string; effect: string;
-        statics: string[]; regionName: string | null; npcType: string | null; x: number; y: number;
-        status: string; notes: string;
-      }>(
-        `SELECT id, eve_system_id AS "eveSystemId", name, system_class AS "systemClass", effect, statics,
-                region_name AS "regionName", npc_type AS "npcType", position_x AS x, position_y AS y, status, notes
-           FROM map_systems WHERE map_id = $1`, [sourceId]),
-      client.query<{
-        sourceId: string; targetId: string; sourceHandle: string | null; targetHandle: string | null;
-        connectionType: string; massStatus: string | null; timeStatus: string | null; size: string; whType: string | null;
-      }>(
-        `SELECT source_id AS "sourceId", target_id AS "targetId", source_handle AS "sourceHandle",
-                target_handle AS "targetHandle", connection_type AS "connectionType",
-                mass_status AS "massStatus", time_status AS "timeStatus", size, wh_type AS "whType"
-           FROM map_connections WHERE map_id = $1`, [sourceId]),
-    ]);
+    // Sequential awaits, not Promise.all: these all run on the ONE pooled
+    // transaction client, which node-pg already serialises — and the concurrent
+    // form ("client.query while the client is executing a query") is deprecated
+    // and removed in pg@9. Same in-transaction snapshot either way.
+    const destSysRes = await client.query<{ id: string; eveSystemId: number | null; name: string; notes: string; x: number; y: number }>(
+      `SELECT id, eve_system_id AS "eveSystemId", name, notes, position_x AS x, position_y AS y
+         FROM map_systems WHERE map_id = $1`, [destId]);
+    const destConnRes = await client.query<{ sourceId: string; targetId: string }>(
+      `SELECT source_id AS "sourceId", target_id AS "targetId" FROM map_connections WHERE map_id = $1`, [destId]);
+    const srcSysRes = await client.query<{
+      id: string; eveSystemId: number | null; name: string; systemClass: string; effect: string;
+      statics: string[]; regionName: string | null; npcType: string | null; x: number; y: number;
+      status: string; notes: string;
+    }>(
+      `SELECT id, eve_system_id AS "eveSystemId", name, system_class AS "systemClass", effect, statics,
+              region_name AS "regionName", npc_type AS "npcType", position_x AS x, position_y AS y, status, notes
+         FROM map_systems WHERE map_id = $1`, [sourceId]);
+    const srcConnRes = await client.query<{
+      sourceId: string; targetId: string; sourceHandle: string | null; targetHandle: string | null;
+      connectionType: string; massStatus: string | null; timeStatus: string | null; size: string; whType: string | null;
+    }>(
+      `SELECT source_id AS "sourceId", target_id AS "targetId", source_handle AS "sourceHandle",
+              target_handle AS "targetHandle", connection_type AS "connectionType",
+              mass_status AS "massStatus", time_status AS "timeStatus", size, wh_type AS "whType"
+         FROM map_connections WHERE map_id = $1`, [sourceId]);
 
     if (srcSysRes.rows.length > MAX_IMPORT_SYSTEMS) {
       await client.query('ROLLBACK');
@@ -1526,15 +1528,13 @@ mapsRouter.post('/:mapId/merge', async (req, res) => {
     // ── Signatures: upsert by sig_id within the destination system ───────
     let addedSignatures = 0, updatedSignatures = 0;
     if (include.signatures && srcSysIds.length > 0) {
-      const [srcSigs, destSigs] = await Promise.all([
-        client.query<{ systemId: string; sigId: string; sigType: string; name: string; notes: string; whType: string; whLeadsTo: string }>(
-          `SELECT system_id AS "systemId", sig_id AS "sigId", sig_type AS "sigType", name, notes,
-                  wh_type AS "whType", wh_leads_to AS "whLeadsTo"
-             FROM map_signatures WHERE system_id = ANY($1::uuid[])`, [srcSysIds]),
-        client.query<{ id: string; systemId: string; sigId: string }>(
-          `SELECT id, system_id AS "systemId", sig_id AS "sigId"
-             FROM map_signatures WHERE system_id = ANY($1::uuid[])`, [destSysIds]),
-      ]);
+      const srcSigs = await client.query<{ systemId: string; sigId: string; sigType: string; name: string; notes: string; whType: string; whLeadsTo: string }>(
+        `SELECT system_id AS "systemId", sig_id AS "sigId", sig_type AS "sigType", name, notes,
+                wh_type AS "whType", wh_leads_to AS "whLeadsTo"
+           FROM map_signatures WHERE system_id = ANY($1::uuid[])`, [srcSysIds]);
+      const destSigs = await client.query<{ id: string; systemId: string; sigId: string }>(
+        `SELECT id, system_id AS "systemId", sig_id AS "sigId"
+           FROM map_signatures WHERE system_id = ANY($1::uuid[])`, [destSysIds]);
       const destSigMap = new Map<string, string>(); // `${destSysId}|${sigIdLower}` → dest sig id
       for (const ds of destSigs.rows) {
         const k = ds.sigId.trim().toLowerCase();
@@ -1587,15 +1587,13 @@ mapsRouter.post('/:mapId/merge', async (req, res) => {
     // ── Structures: upsert by eve_id, falling back to name, per system ───
     let addedStructures = 0, updatedStructures = 0;
     if (include.structures && srcSysIds.length > 0) {
-      const [srcStructs, destStructs] = await Promise.all([
-        client.query<{ systemId: string; name: string; structureType: string; ownerCorp: string; eveId: string | null; notes: string; ownerCorpId: number | null }>(
-          `SELECT system_id AS "systemId", name, structure_type AS "structureType", owner_corp AS "ownerCorp",
-                  eve_id AS "eveId", notes, owner_corp_id AS "ownerCorpId"
-             FROM map_structures WHERE system_id = ANY($1::uuid[])`, [srcSysIds]),
-        client.query<{ id: string; systemId: string; name: string; eveId: string | null }>(
-          `SELECT id, system_id AS "systemId", name, eve_id AS "eveId"
-             FROM map_structures WHERE system_id = ANY($1::uuid[])`, [destSysIds]),
-      ]);
+      const srcStructs = await client.query<{ systemId: string; name: string; structureType: string; ownerCorp: string; eveId: string | null; notes: string; ownerCorpId: number | null }>(
+        `SELECT system_id AS "systemId", name, structure_type AS "structureType", owner_corp AS "ownerCorp",
+                eve_id AS "eveId", notes, owner_corp_id AS "ownerCorpId"
+           FROM map_structures WHERE system_id = ANY($1::uuid[])`, [srcSysIds]);
+      const destStructs = await client.query<{ id: string; systemId: string; name: string; eveId: string | null }>(
+        `SELECT id, system_id AS "systemId", name, eve_id AS "eveId"
+           FROM map_structures WHERE system_id = ANY($1::uuid[])`, [destSysIds]);
       const byEve  = new Map<string, string>(); // `${destSysId}|${eveId}`     → id
       const byName = new Map<string, string>(); // `${destSysId}|${nameLower}` → id
       for (const d of destStructs.rows) {
