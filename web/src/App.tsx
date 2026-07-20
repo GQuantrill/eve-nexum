@@ -24,7 +24,6 @@ import { useHashRoute } from './hooks/useHashRoute';
 import { usePageviewTracking } from './hooks/usePageviewTracking';
 import { useIdleLock } from './hooks/useIdleLock';
 import { LockScreen } from './components/ui/LockScreen';
-import './App.css';
 
 // Which signed-in user we've already hydrated prefs/settings for. MapApp
 // unmounts when you navigate away (e.g. to /admin) and re-mounts on return;

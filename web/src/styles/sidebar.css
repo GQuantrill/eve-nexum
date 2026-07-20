@@ -1,6 +1,7 @@
-/* Design tokens (colour, colour-vision palettes) live in styles/tokens.css,
-   imported globally in main.tsx. This file holds component styles, which are
-   being migrated out into co-located CSS Modules — see design-system.md. */
+/* Map sidebar family: toolbar, character switcher, map sidebar, watchlist,
+   named lists, bulk import, settings, content filter, WH type picker.
+   Relocated verbatim out of App.css (Phase 2 bucket-2); kept GLOBAL,
+   imported once in main.tsx. See design-system.md. */
 
 /* ── Toolbar ─────────────────────────────────────────────── */
 .toolbar {

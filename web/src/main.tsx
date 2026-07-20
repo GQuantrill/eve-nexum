@@ -7,6 +7,7 @@ import './index.css'
 // Shared global styles, relocated verbatim out of App.css (Phase 2 bucket-2).
 import './styles/buttons.css' // shared icon-button primitives
 import './styles/layout.css' // app shell / workspace sidebar / map-canvas frame
+import './styles/sidebar.css' // toolbar, map sidebar, watchlist, content filter, WH picker
 import './styles/overlays.css' // shared overlay UI (menus/dropdowns/popovers)
 import './styles/tooltip.css' // global [data-tooltip] + react-flow overrides
 import './styles/panes.css' // shared panel/pane styles
