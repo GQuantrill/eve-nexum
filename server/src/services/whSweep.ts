@@ -151,9 +151,17 @@ async function sweepMap(mapId: string, expired: CandidateRow[]): Promise<void> {
 }
 
 /** One sweep pass over every opted-in map. */
-async function sweepAll(): Promise<void> {
+export async function sweepAll(): Promise<void> {
   let rows: CandidateRow[];
   try {
+    // When the connection-lifetime sweep is running, it is the single authority
+    // for any connection carrying a MANUAL lifetime override (lifetime_expires_at)
+    // — it honours the override, this sig-age sweep can't see it. Defer those sigs
+    // to it, so a hole whose life was manually EXTENDED past its type max isn't
+    // collapsed early here (the two sweeps otherwise disagree). Shorter overrides
+    // are collapsed by connLifetimeSweep first anyway. When it's disabled, this
+    // sweep handles everything as before.
+    const deferOverrides = config.connLifetimeSweepMinutes > 0;
     const res = await db.query<CandidateRow>(
       `SELECT s.id, s.system_id AS "systemId", sys.map_id AS "mapId",
               s.wh_type AS "whType", s.wh_leads_to AS "whLeadsTo", s.created_at AS "createdAt",
@@ -163,8 +171,12 @@ async function sweepAll(): Promise<void> {
          JOIN maps m ON m.id = sys.map_id
         WHERE m.lazy_remove_wormholes = TRUE
           AND s.sig_type = 'wormhole'
-          AND s.created_at < NOW() - ($1 || ' hours')::interval`,
-      [String(MIN_LIFETIME_HOURS)],
+          AND s.created_at < NOW() - ($1 || ' hours')::interval
+          AND (NOT $2::boolean OR NOT EXISTS (
+                SELECT 1 FROM map_connections c
+                 WHERE (c.source_signature_id = s.id OR c.target_signature_id = s.id)
+                   AND c.lifetime_expires_at IS NOT NULL))`,
+      [String(MIN_LIFETIME_HOURS), deferOverrides],
     );
     rows = res.rows;
   } catch (err) {
