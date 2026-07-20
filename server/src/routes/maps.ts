@@ -1541,16 +1541,16 @@ mapsRouter.post('/:mapId/merge', async (req, res) => {
         if (k) destSigMap.set(`${ds.systemId}|${k}`, ds.id);
       }
       const sigPh: string[] = []; const sigVals: unknown[] = [];
+      // Collisions are collected and flushed as one set-based UPDATE (below)
+      // instead of a query per row inside the transaction.
+      const sigUp: { id: string; sigType: string; name: string; notes: string; whType: string; whLeadsTo: string }[] = [];
       for (const sg of srcSigs.rows) {
         const destSysId = idMap.get(sg.systemId);
         if (!destSysId) continue;
         const k = sg.sigId.trim().toLowerCase();
         const existing = k ? destSigMap.get(`${destSysId}|${k}`) : undefined;
         if (existing) {
-          await client.query(
-            `UPDATE map_signatures SET sig_type=$1, name=$2, notes=$3, wh_type=$4, wh_leads_to=$5, updated_at=NOW() WHERE id=$6`,
-            [sg.sigType, sg.name, sg.notes, sg.whType, sg.whLeadsTo, existing],
-          );
+          sigUp.push({ id: existing, sigType: sg.sigType, name: sg.name, notes: sg.notes, whType: sg.whType, whLeadsTo: sg.whLeadsTo });
           updatedSignatures++;
         } else {
           const base = sigVals.length;
@@ -1561,6 +1561,20 @@ mapsRouter.post('/:mapId/merge', async (req, res) => {
           sigVals.push(destSysId, sg.sigId, sg.sigType, sg.name, sg.notes, sg.whType, sg.whLeadsTo, req.session.userId, true);
           addedSignatures++;
         }
+      }
+      if (sigUp.length > 0) {
+        // One UPDATE for every collision — unnest of per-column arrays (6 params
+        // total, no param-cap / no per-row round-trips).
+        await client.query(
+          `UPDATE map_signatures AS m
+              SET sig_type = v.sig_type, name = v.name, notes = v.notes,
+                  wh_type = v.wh_type, wh_leads_to = v.wh_leads_to, updated_at = NOW()
+             FROM unnest($1::uuid[], $2::text[], $3::text[], $4::text[], $5::text[], $6::text[])
+                  AS v(id, sig_type, name, notes, wh_type, wh_leads_to)
+            WHERE m.id = v.id`,
+          [sigUp.map(u => u.id), sigUp.map(u => u.sigType), sigUp.map(u => u.name),
+           sigUp.map(u => u.notes), sigUp.map(u => u.whType), sigUp.map(u => u.whLeadsTo)],
+        );
       }
       if (sigPh.length > 0) {
         await client.query(
@@ -1590,6 +1604,7 @@ mapsRouter.post('/:mapId/merge', async (req, res) => {
         if (nk) byName.set(`${d.systemId}|${nk}`, d.id);
       }
       const stPh: string[] = []; const stVals: unknown[] = [];
+      const stUp: { id: string; name: string; structureType: string; ownerCorp: string; ownerCorpId: number | null; eveId: string | null; notes: string }[] = [];
       for (const st of srcStructs.rows) {
         const destSysId = idMap.get(st.systemId);
         if (!destSysId) continue;
@@ -1599,10 +1614,7 @@ mapsRouter.post('/:mapId/merge', async (req, res) => {
           if (nk) existing = byName.get(`${destSysId}|${nk}`);
         }
         if (existing) {
-          await client.query(
-            `UPDATE map_structures SET name=$1, structure_type=$2, owner_corp=$3, owner_corp_id=$4, eve_id=$5, notes=$6, updated_at=NOW() WHERE id=$7`,
-            [st.name, st.structureType, st.ownerCorp, st.ownerCorpId, st.eveId, st.notes, existing],
-          );
+          stUp.push({ id: existing, name: st.name, structureType: st.structureType, ownerCorp: st.ownerCorp, ownerCorpId: st.ownerCorpId, eveId: st.eveId, notes: st.notes });
           updatedStructures++;
         } else {
           const base = stVals.length;
@@ -1610,6 +1622,18 @@ mapsRouter.post('/:mapId/merge', async (req, res) => {
           stVals.push(destSysId, st.name, st.structureType, st.ownerCorp, st.eveId, st.notes, req.session.userId, st.ownerCorpId);
           addedStructures++;
         }
+      }
+      if (stUp.length > 0) {
+        await client.query(
+          `UPDATE map_structures AS m
+              SET name = v.name, structure_type = v.structure_type, owner_corp = v.owner_corp,
+                  owner_corp_id = v.owner_corp_id, eve_id = v.eve_id, notes = v.notes, updated_at = NOW()
+             FROM unnest($1::uuid[], $2::text[], $3::text[], $4::text[], $5::int[], $6::bigint[], $7::text[])
+                  AS v(id, name, structure_type, owner_corp, owner_corp_id, eve_id, notes)
+            WHERE m.id = v.id`,
+          [stUp.map(u => u.id), stUp.map(u => u.name), stUp.map(u => u.structureType), stUp.map(u => u.ownerCorp),
+           stUp.map(u => u.ownerCorpId), stUp.map(u => u.eveId), stUp.map(u => u.notes)],
+        );
       }
       if (stPh.length > 0) {
         await client.query(
@@ -1619,9 +1643,14 @@ mapsRouter.post('/:mapId/merge', async (req, res) => {
       }
     }
 
-    // ── Apply queued system-note merges ──────────────────────────────────
-    for (const nm of noteMerges) {
-      await client.query(`UPDATE map_systems SET notes = $1 WHERE id = $2`, [nm.notes, nm.destSysId]);
+    // ── Apply queued system-note merges (one set-based UPDATE) ────────────
+    if (noteMerges.length > 0) {
+      await client.query(
+        `UPDATE map_systems AS m SET notes = v.notes
+           FROM unnest($1::uuid[], $2::text[]) AS v(id, notes)
+          WHERE m.id = v.id`,
+        [noteMerges.map((nm) => nm.destSysId), noteMerges.map((nm) => nm.notes)],
+      );
     }
 
     // ── Audit: one row per corp map involved (inside the transaction) ────
