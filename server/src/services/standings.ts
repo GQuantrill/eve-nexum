@@ -11,6 +11,33 @@ const log = createLogger('standings');
 // here just makes the server work harder for no fresher data.
 const REFRESH_TTL_MS = 6 * 60 * 60 * 1000;
 
+// ── Corp/alliance contact-bucket read cache ──────────────────────────────────
+// The corp/alliance buckets are shared across every member and change only on a
+// Contact-Manager sync, but /api/standings/me is hit per map load/poll by every
+// member — a big corp's thousands of contacts would otherwise be re-queried and
+// re-materialised for each member on each poll. Cache them briefly, keyed by
+// kind:id, invalidated on write (below) so a fresh sync is seen at once; the TTL
+// bounds staleness for any write path that forgets to invalidate.
+export type OrgContactRow = { contact_kind: string; contact_id: number; standing: number };
+const CONTACT_TTL_MS = 60_000;
+const orgContactCache = new Map<string, { rows: OrgContactRow[]; at: number }>();
+
+export async function loadOrgContacts(kind: 'corp' | 'alliance', id: number): Promise<OrgContactRow[]> {
+  const key = `${kind}:${id}`;
+  const hit = orgContactCache.get(key);
+  if (hit && Date.now() - hit.at < CONTACT_TTL_MS) return hit.rows;
+  const sql = kind === 'corp'
+    ? `SELECT contact_kind, contact_id, standing FROM corp_standings WHERE corp_id = $1`
+    : `SELECT contact_kind, contact_id, standing FROM alliance_standings WHERE alliance_id = $1`;
+  const { rows } = await db.query<OrgContactRow>(sql, [id]);
+  orgContactCache.set(key, { rows, at: Date.now() });
+  return rows;
+}
+
+function invalidateOrgContacts(kind: 'corp' | 'alliance', id: number): void {
+  orgContactCache.delete(`${kind}:${id}`);
+}
+
 type ContactKind = 'character' | 'corporation' | 'alliance' | 'faction';
 
 interface EsiContact {
@@ -149,6 +176,7 @@ export async function refreshStandingsForUser(params: {
       if (Array.isArray(r)) {
         log.info(`corp ${corpId}: fetched ${r.length} corp contacts (via character ${characterId})`);
         await replaceStandings('corp_standings', 'corp_id', corpId, r, userId);
+        invalidateOrgContacts('corp', corpId);
         await markRefreshed('corp', corpId);
       } else {
         log.info(`corp ${corpId}: contacts fetch returned ${r.status} (${r.error}) — character ${characterId} likely lacks Contact Manager role or the read_contacts scope`);
@@ -167,6 +195,7 @@ export async function refreshStandingsForUser(params: {
       if (Array.isArray(r)) {
         log.info(`alliance ${allianceId}: fetched ${r.length} alliance contacts (via character ${characterId})`);
         await replaceStandings('alliance_standings', 'alliance_id', allianceId, r, userId);
+        invalidateOrgContacts('alliance', allianceId);
         await markRefreshed('alliance', allianceId);
       } else {
         log.info(`alliance ${allianceId}: contacts fetch returned ${r.status} (${r.error}) — character ${characterId} likely lacks alliance-executor role or the read_contacts scope`);
