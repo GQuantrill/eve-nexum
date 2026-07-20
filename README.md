@@ -354,38 +354,9 @@ When registering your application at [developers.eveonline.com](https://develope
 | `esi-alliances.read_contacts.v1` | Read the **alliance's** shared contact list. Requires the character to be in the alliance executor corp with the right role; almost always denied for normal members, and that's fine — the call no-ops without breaking login. |
 | `esi-fleets.read_fleet.v1` | Read the character's current fleet composition (members + their solar systems) so fleet-mates show up as purple dots on the map with a hover tooltip listing names. Member-list reads require the character to be the **fleet boss**; wing/squad commanders see "in a fleet, no member visibility" and the UI degrades silently. |
 
-**2. Build and start the stack**
-
-The server depends on the EVE Static Data Export (SDE) tables (`map_stargates`, `solar_systems`, `item_types`, …) at boot — without them, route-graph initialisation throws and the container crash-loops. A dedicated `importer` service handles this: it runs once after Postgres is healthy, downloads the SDE (~hundreds of MB from CCP, a few minutes; logs progress per table), populates the static tables, then exits. The server waits for it to finish (`service_completed_successfully`) before booting, so a single command brings everything up in the right order.
-
-```bash
-docker compose build
-docker compose up -d
-```
-
-The app will be available on port `${WEB_PORT:-80}` (defaults to `80`).
-
-The import is self-skipping: on every later `up` or restart the importer sees the static tables are already populated and exits in a second without re-downloading. So the two commands above are also your update flow — or just run one of the [one-command deploy scripts](#one-command-deploy-scripts) below. To force a re-import (e.g. after a CCP SDE drop), see [Updating the SDE](#updating-the-sde) below.
-
-The importer also stores each system's universe coordinates and CCP's 2D star-map projection (`position` / `position2D`), which power the [Seed a map from a region](#features) feature.
-
-**3. Reverse proxy (optional)**
-
-To front the stack with Traefik for TLS and a public URL, add `DOMAIN=nexum.yourdomain.com` to your `.env`, then:
-```bash
-docker compose -f docker-compose.yml -f docker-compose.traefik.yml up -d
-```
-Traefik will handle TLS termination and HTTP→HTTPS redirects. The `docker-compose.traefik.yml` overlay assumes a Traefik network named `traefik-public` and a cert resolver named `letsencrypt`.
-
-> **Tip — avoid retyping the overlay.** Every `docker compose ...` command below uses the standard form. If you run with the Traefik overlay, either prefix each command with `-f docker-compose.yml -f docker-compose.traefik.yml`, or set it once per shell session:
-> ```bash
-> export COMPOSE_FILE=docker-compose.yml:docker-compose.traefik.yml
-> ```
-> After that, plain `docker compose ...` automatically loads both files. Add the export to `~/.bashrc` / `~/.zshrc` if it's the only deployment on that host.
-
 #### One-command deploy scripts
 
-Not comfortable with Docker commands? The repo ships small scripts that run the whole **pull → build → restart** cycle for you, so updating to a new release is a single command from the repo root — no need to remember the `docker compose` lines above.
+Not comfortable with Docker commands? The repo ships small scripts that run the whole **pull → build → restart** cycle for you, so both first setup and later updates are a single command from the repo root — no need to remember the `docker compose` lines below.
 
 **Use the scripts for _your_ operating system — Linux/macOS _or_ Windows, not both.** They do the same thing; the `.sh` and `.ps1` versions are just for different shells.
 
@@ -403,11 +374,40 @@ Not comfortable with Docker commands? The repo ships small scripts that run the 
 | `.\build-traefik.ps1` | **The live / public site** (fronted by Traefik) | `git pull`, then build + `up -d` with **both** compose files |
 | `.\build.ps1` | **Local / dev** (no Traefik) | `git pull`, then a plain build + `up -d` |
 
-Each script **stops if a step fails**, so a broken pull or build never restarts the site with a bad image.
+Each script **stops if a step fails**, so a broken pull or build never restarts the site with a bad image. On the **first** run it also downloads EVE's static data (a few minutes) — that's the importer described under **Build and start the stack** below; nothing is stuck.
 
-> **On your public server, always use `build-traefik`.** A plain build without the Traefik overlay 404s the live site. The plain `build` scripts are for local/dev only.
+> **On your public server, always use `build-traefik`.** A plain build without the Traefik overlay 404s the live site. The plain `build` scripts are for local/dev only. (Traefik setup is covered under **Reverse proxy** below.)
 >
 > First run on Windows may need `Set-ExecutionPolicy -Scope Process RemoteSigned`; on Linux/macOS the `.sh` files are already executable (`chmod +x` is preset).
+
+**2. Build and start the stack**
+
+The server depends on the EVE Static Data Export (SDE) tables (`map_stargates`, `solar_systems`, `item_types`, …) at boot — without them, route-graph initialisation throws and the container crash-loops. A dedicated `importer` service handles this: it runs once after Postgres is healthy, downloads the SDE (~hundreds of MB from CCP, a few minutes; logs progress per table), populates the static tables, then exits. The server waits for it to finish (`service_completed_successfully`) before booting, so a single command brings everything up in the right order.
+
+```bash
+docker compose build
+docker compose up -d
+```
+
+The app will be available on port `${WEB_PORT:-80}` (defaults to `80`).
+
+The import is self-skipping: on every later `up` or restart the importer sees the static tables are already populated and exits in a second without re-downloading. So the two commands above are also your update flow — or just run one of the [one-command deploy scripts](#one-command-deploy-scripts) above. To force a re-import (e.g. after a CCP SDE drop), see [Updating the SDE](#updating-the-sde) below.
+
+The importer also stores each system's universe coordinates and CCP's 2D star-map projection (`position` / `position2D`), which power the [Seed a map from a region](#features) feature.
+
+**3. Reverse proxy (optional)**
+
+To front the stack with Traefik for TLS and a public URL, add `DOMAIN=nexum.yourdomain.com` to your `.env`, then:
+```bash
+docker compose -f docker-compose.yml -f docker-compose.traefik.yml up -d
+```
+Traefik will handle TLS termination and HTTP→HTTPS redirects. The `docker-compose.traefik.yml` overlay assumes a Traefik network named `traefik-public` and a cert resolver named `letsencrypt`.
+
+> **Tip — avoid retyping the overlay.** Every `docker compose ...` command below uses the standard form. If you run with the Traefik overlay, either prefix each command with `-f docker-compose.yml -f docker-compose.traefik.yml`, or set it once per shell session:
+> ```bash
+> export COMPOSE_FILE=docker-compose.yml:docker-compose.traefik.yml
+> ```
+> After that, plain `docker compose ...` automatically loads both files. Add the export to `~/.bashrc` / `~/.zshrc` if it's the only deployment on that host.
 
 App-schema migrations (`users`, `maps`, `map_signatures`, etc.) layer on automatically the first time the server boots — no manual step.
 
