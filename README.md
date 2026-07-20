@@ -387,12 +387,23 @@ Traefik will handle TLS termination and HTTP→HTTPS redirects. The `docker-comp
 
 Not comfortable with Docker commands? The repo ships small scripts that run the whole **pull → build → restart** cycle for you, so updating to a new release is a single command from the repo root — no need to remember the `docker compose` lines above.
 
+**Use the scripts for _your_ operating system — Linux/macOS _or_ Windows, not both.** They do the same thing; the `.sh` and `.ps1` versions are just for different shells.
+
+**Linux / macOS** — run the `.sh` scripts:
+
 | Run this | Use it for | What it does |
 |---|---|---|
-| `./build-traefik.sh`  ·  `.\build-traefik.ps1` | **The live / public site** (fronted by Traefik) | `git pull`, then build + `up -d` with **both** compose files |
-| `./build.sh`  ·  `.\build.ps1` | **Local / dev** (no Traefik) | `git pull`, then a plain build + `up -d` |
+| `./build-traefik.sh` | **The live / public site** (fronted by Traefik) | `git pull`, then build + `up -d` with **both** compose files |
+| `./build.sh` | **Local / dev** (no Traefik) | `git pull`, then a plain build + `up -d` |
 
-`.sh` is for Linux/macOS, `.ps1` is for Windows PowerShell. Each script **stops if a step fails**, so a broken pull or build never restarts the site with a bad image.
+**Windows** — run the `.ps1` scripts in PowerShell:
+
+| Run this | Use it for | What it does |
+|---|---|---|
+| `.\build-traefik.ps1` | **The live / public site** (fronted by Traefik) | `git pull`, then build + `up -d` with **both** compose files |
+| `.\build.ps1` | **Local / dev** (no Traefik) | `git pull`, then a plain build + `up -d` |
+
+Each script **stops if a step fails**, so a broken pull or build never restarts the site with a bad image.
 
 > **On your public server, always use `build-traefik`.** A plain build without the Traefik overlay 404s the live site. The plain `build` scripts are for local/dev only.
 >
