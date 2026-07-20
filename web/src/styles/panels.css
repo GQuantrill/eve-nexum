@@ -138,7 +138,7 @@
 /* The real system name shown after an alias in the panel header, e.g. HOME (J155002). */
 .system-panel__real-name {
   font-weight: 400;
-  color: var(--text-quiet);
+  color: var(--text-muted);
   font-size: calc(13px * var(--font-scale, 1));
 }
 

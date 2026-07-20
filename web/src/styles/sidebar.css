@@ -170,7 +170,7 @@
   &.toolbar__toggle--prominent {
     background: #2a3a5a;
     border-color: #3a5a8a;
-    color: var(--text-primary-alt);
+    color: var(--text-primary);
 
     &:hover { background: var(--surface-muted); color: #ffffff; }
   }
@@ -324,7 +324,7 @@
 }
 .toolbar__char-system svg { color: var(--accent); flex-shrink: 0; }
 .toolbar__char-system--clickable { cursor: pointer; }
-.toolbar__char-system--clickable:hover { color: var(--text-primary-alt); }
+.toolbar__char-system--clickable:hover { color: var(--text-primary); }
 .toolbar__char-system--clickable:hover svg { color: #7ab0ff; }
 .toolbar__checked-icon {
   display: inline-flex;
@@ -481,7 +481,7 @@
     left: 50%;
     transform: translateX(-50%);
     background: var(--surface-panel);
-    color: var(--text-primary-alt);
+    color: var(--text-primary);
     font-size: calc(13px * var(--font-scale, 1));
     white-space: nowrap;
     padding: 3px 7px;
@@ -851,7 +851,7 @@
 .map-shares__chip-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 140px; }
 .map-shares__chip-remove {
   display: inline-flex; align-items: center; justify-content: center;
-  background: none; border: none; color: var(--text-quiet); cursor: pointer; padding: 0;
+  background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 0;
 }
 .map-shares__chip-remove:hover { color: #e06a6a; }
 .map-shares__grant-login {
@@ -1228,7 +1228,7 @@
   border-radius: 4px;
   padding: 3px 8px;
   font-size: calc(11px * var(--font-scale, 1));
-  color: var(--text-quiet);
+  color: var(--text-muted);
   cursor: pointer;
 }
 .watchlist__add-criteria:hover {
@@ -1529,7 +1529,7 @@
 }
 
 .map-sidebar__toggle-input {
-  accent-color: var(--accent-friendly);
+  accent-color: var(--accent);
   cursor: pointer;
   margin: 0;
 }
@@ -2058,7 +2058,7 @@
   outline: none;
 
   &:hover { border-color: #2a3a52; }
-  &:focus { border-color: #3a6aaa; color: var(--text-primary-alt); }
+  &:focus { border-color: #3a6aaa; color: var(--text-primary); }
 
   &--type { font-size: calc(13px * var(--font-scale, 1)); }
 

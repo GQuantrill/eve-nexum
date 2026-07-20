@@ -9,67 +9,63 @@
    ============================================================ */
 
 /* ── UI chrome ──────────────────────────────────────────────
-   Semantic tokens for the app frame: surfaces, borders, text.
-   Values are the current palette 1:1 (extracted from hardcoded
-   hex, no visual change). Near-duplicate values are kept distinct
-   on purpose — consolidating them shifts pixels, so it's a
-   deliberate design decision, not part of this refactor.
-   NOTE: accent/state colours (blue accents, danger red, success
-   green, warning amber) are intentionally NOT tokenised here yet
-   — several share a hex with a --cv-* map colour below, so they
-   need context-aware treatment during the component split rather
-   than a blind value swap. */
+   Semantic tokens for the app frame: surfaces, borders, a text
+   scale, accents and state colours. These theme the UI chrome and
+   are independent of the --cv-* map palette below (some share a hex
+   — e.g. --danger #e05a5a == --cv-intel-hostile — but map elements
+   use the --cv-* var so they re-theme with colour vision while
+   chrome themes on its own). Near-duplicate one-off colours have
+   been consolidated into this scale (imperceptible snaps); the
+   surface base/sunken/well ladder is a deliberate depth scale, kept
+   distinct. Component CSS should reference these vars, not raw hex. */
 :root {
   /* Surfaces — app base (darkest) → raised/hover (lightest). */
-  --surface-base:    #0a0e1a;
-  --surface-sunken:  #0b0e16;
-  --surface-well:    #0d1117;
-  --surface-panel:   #111827;
-  --surface-raised:  #141c2e;
+  --surface-base: #0a0e1a;
+  --surface-sunken: #0b0e16;
+  --surface-well: #0d1117;
+  --surface-panel: #111827;
+  --surface-raised: #141c2e;
   --surface-overlay: #1a2240;
-  --surface-hover:   #1a2535;
+  --surface-hover: #1a2535;
 
   /* Borders — subtle default → accent. */
-  --border:               #1e2740;
-  --border-strong:        #2e3f60;
-  --border-accent:        #2e4a7a;
+  --border: #1e2740;
+  --border-strong: #2e3f60;
+  --border-accent: #2e4a7a;
   --border-accent-strong: #2e5a9a;
 
   /* Text — bright → faint. */
-  --text-bright:      #e2e8f8;
-  --text-primary:     #c8d4f0;
-  --text-primary-alt: #c8d8f0;
-  --text-default:     #c8d0e0;
-  --text-secondary:   #c0ccde;
-  --text-subtle:      #8a9ab8;
-  --text-muted:       #7a90a8;
-  --text-quiet:       #7a8aa8;
-  --text-dim:         #6a80a0;
-  --text-faint:       #6a7898;
-  --text-faintest:    #5a6a8a;
+  --text-bright: #e2e8f8;
+  --text-primary: #c8d4f0;
+  --text-default: #c8d0e0;
+  --text-secondary: #c0ccde;
+  --text-subtle: #8a9ab8;
+  --text-muted: #7a90a8;
+  --text-dim: #6a80a0;
+  --text-faint: #6a7898;
+  --text-faintest: #5a6a8a;
 
   /* Accents (interactive blue) + state colours. These CHROME uses share a hex
      with a --cv-* map colour (e.g. --danger #e05a5a == --cv-intel-hostile);
      that's fine — map elements use the --cv-* var and re-theme with colour
      vision, while these tokens theme the UI chrome independently. */
-  --accent:         #5a9af8;
-  --accent-bright:  #6ea0ff;
-  --accent-alt:     #4d9de0;
-  --accent-light:   #7ab4f0;
-  --accent-friendly:#5b9bff;
-  --accent-pale:    #8fc8ff;
-  --accent-violet:  #c084fc;
-  --danger:         #e05a5a;
-  --danger-soft:    #f87171;
-  --danger-strong:  #e74c3c;
-  --success:        #3ddc84;
+  --accent: #5a9af8;
+  --accent-bright: #6ea0ff;
+  --accent-alt: #4d9de0;
+  --accent-light: #7ab4f0;
+  --accent-pale: #8fc8ff;
+  --accent-violet: #c084fc;
+  --danger: #e05a5a;
+  --danger-soft: #f87171;
+  --danger-strong: #e74c3c;
+  --success: #3ddc84;
   --success-bright: #4ade80;
-  --success-alt:    #4caf50;
-  --warning:        #f0a030;
-  --warning-alt:    #f5a623;
-  --warning-gold:   #f0c040;
-  --warning-amber:  #f5b96a;
-  --surface-muted:  #3a4a6a;
+  --success-alt: #4caf50;
+  --warning: #f0a030;
+  --warning-alt: #f5a623;
+  --warning-gold: #f0c040;
+  --warning-amber: #f5b96a;
+  --surface-muted: #3a4a6a;
 }
 
 /* ── Colour-vision (colour-blindness) palettes ──────────────
@@ -84,96 +80,238 @@
    tritanopia (blue-yellow) gets its own. */
 :root {
   /* System label pill colours (A/B/C/1/2/3). Retune freely. */
-  --label-a: #2e9e57; --label-b: #2f6ec4; --label-c: #c79234;
-  --label-1: #7a4fd0; --label-2: #2aa39a; --label-3: #c4498f;
+  --label-a: #2e9e57;
+  --label-b: #2f6ec4;
+  --label-c: #c79234;
+  --label-1: #7a4fd0;
+  --label-2: #2aa39a;
+  --label-3: #c4498f;
 
-  --cv-sec-09: #2aff85; --cv-sec-08: #00ff66; --cv-sec-07: #00ff33;
-  --cv-sec-06: #55ff00; --cv-sec-05: #99ff00; --cv-sec-04: #ffff00;
-  --cv-sec-03: #ff9900; --cv-sec-01: #ff6600; --cv-sec-00: #ff3300; --cv-sec-neg: #ff0000;
+  --cv-sec-09: #2aff85;
+  --cv-sec-08: #00ff66;
+  --cv-sec-07: #00ff33;
+  --cv-sec-06: #55ff00;
+  --cv-sec-05: #99ff00;
+  --cv-sec-04: #ffff00;
+  --cv-sec-03: #ff9900;
+  --cv-sec-01: #ff6600;
+  --cv-sec-00: #ff3300;
+  --cv-sec-neg: #ff0000;
 
-  --cv-class-c1: #3a6bc4; --cv-class-c2: #2e85c4; --cv-class-c3: #2a9b7a;
-  --cv-class-c4: #2a7a5a; --cv-class-c5: #c45a2a; --cv-class-c6: #c42a2a;
-  --cv-class-c13: #8a3ac4; --cv-class-hs: #4caf50; --cv-class-ls: #c4a42a;
-  --cv-class-ns: #7b3fc4; --cv-class-thera: #c42a8a; --cv-class-pochven: #8a2ac4;
+  --cv-class-c1: #3a6bc4;
+  --cv-class-c2: #2e85c4;
+  --cv-class-c3: #2a9b7a;
+  --cv-class-c4: #2a7a5a;
+  --cv-class-c5: #c45a2a;
+  --cv-class-c6: #c42a2a;
+  --cv-class-c13: #8a3ac4;
+  --cv-class-hs: #4caf50;
+  --cv-class-ls: #c4a42a;
+  --cv-class-ns: #7b3fc4;
+  --cv-class-thera: #c42a8a;
+  --cv-class-pochven: #8a2ac4;
   --cv-class-drifter: #555577;
 
-  --cv-intel-friendly: #5b9bff; --cv-intel-hostile: #e05a5a;
-  --cv-intel-occupied: #f0a030; --cv-intel-empty: #8c98ac;
+  --cv-intel-friendly: #5b9bff;
+  --cv-intel-hostile: #e05a5a;
+  --cv-intel-occupied: #f0a030;
+  --cv-intel-empty: #8c98ac;
 
-  --cv-stand-friendly: #5b9bff; --cv-stand-good: #8fc8ff;
-  --cv-stand-bad: #f5a623; --cv-stand-hostile: #e74c3c;
+  --cv-stand-friendly: #5b9bff;
+  --cv-stand-good: #8fc8ff;
+  --cv-stand-bad: #f5a623;
+  --cv-stand-hostile: #e74c3c;
 
-  --cv-conn-4h: #f0c040; --cv-conn-1h: #ff9800; --cv-conn-expired: #f44336;
-  --cv-conn-standard: #8a9ab8; --cv-conn-jumpgate: #4db8c4; --cv-conn-gate: #5fb878; --cv-conn-highlight: #67e8f9;
+  --cv-conn-4h: #f0c040;
+  --cv-conn-1h: #ff9800;
+  --cv-conn-expired: #f44336;
+  --cv-conn-standard: #8a9ab8;
+  --cv-conn-jumpgate: #4db8c4;
+  --cv-conn-gate: #5fb878;
+  --cv-conn-highlight: #67e8f9;
 
-  --cv-status-unknown: #3a4a6a; --cv-status-visited: #3a8a5a; --cv-status-cleared: #2a6aaa;
-  --cv-online-on: #3ddc84; --cv-online-off: #e05a5a;
+  --cv-status-unknown: #3a4a6a;
+  --cv-status-visited: #3a8a5a;
+  --cv-status-cleared: #2a6aaa;
+  --cv-online-on: #3ddc84;
+  --cv-online-off: #e05a5a;
 
-  --cv-storm-electric: #5a9af8; --cv-storm-gamma: #8ad08a; --cv-storm-exotic: #c084fc; --cv-storm-plasma: #f5793a; --cv-storm-unknown: #c0ccde;
-  --cv-effect-pulsar: #4db8ff; --cv-effect-blackhole: #8888aa; --cv-effect-cataclysmic: #aa55ff; --cv-effect-magnetar: #ff9900; --cv-effect-redgiant: #ff5522; --cv-effect-wolfrayet: #44dd88;
-  --cv-watch-target: #6ea0ff; --cv-watch-honeypot: #e0a64e; --cv-watch-avoid: #e0556e; --cv-watch-friendly: #4ade80; --cv-watch-watch: #67e8f9;
-  --cv-sig-data: #7ab4f0; --cv-sig-relic: #f0a8c0; --cv-sig-wormhole: #c084fc; --cv-sig-gas: #8ad08a; --cv-sig-ore: #f5b96a; --cv-sig-combat: #f87171; --cv-sig-unknown: #7a8aa8;
+  --cv-storm-electric: #5a9af8;
+  --cv-storm-gamma: #8ad08a;
+  --cv-storm-exotic: #c084fc;
+  --cv-storm-plasma: #f5793a;
+  --cv-storm-unknown: #c0ccde;
+  --cv-effect-pulsar: #4db8ff;
+  --cv-effect-blackhole: #8888aa;
+  --cv-effect-cataclysmic: #aa55ff;
+  --cv-effect-magnetar: #ff9900;
+  --cv-effect-redgiant: #ff5522;
+  --cv-effect-wolfrayet: #44dd88;
+  --cv-watch-target: #6ea0ff;
+  --cv-watch-honeypot: #e0a64e;
+  --cv-watch-avoid: #e0556e;
+  --cv-watch-friendly: #4ade80;
+  --cv-watch-watch: #67e8f9;
+  --cv-sig-data: #7ab4f0;
+  --cv-sig-relic: #f0a8c0;
+  --cv-sig-wormhole: #c084fc;
+  --cv-sig-gas: #8ad08a;
+  --cv-sig-ore: #f5b96a;
+  --cv-sig-combat: #f87171;
+  --cv-sig-unknown: #7a8aa8;
 }
 
 /* Red-green safe (deuteranopia + protanopia) — Okabe-Ito categorical hues;
    viridis security ramp (bright = high-sec, dark = null). */
 :root[data-color-vision="deuteranopia"],
 :root[data-color-vision="protanopia"] {
-  --cv-sec-09: #fde725; --cv-sec-08: #b5de2b; --cv-sec-07: #6ece58;
-  --cv-sec-06: #35b779; --cv-sec-05: #1f9e89; --cv-sec-04: #26828e;
-  --cv-sec-03: #31688e; --cv-sec-01: #3e4a89; --cv-sec-00: #482878; --cv-sec-neg: #440154;
+  --cv-sec-09: #fde725;
+  --cv-sec-08: #b5de2b;
+  --cv-sec-07: #6ece58;
+  --cv-sec-06: #35b779;
+  --cv-sec-05: #1f9e89;
+  --cv-sec-04: #26828e;
+  --cv-sec-03: #31688e;
+  --cv-sec-01: #3e4a89;
+  --cv-sec-00: #482878;
+  --cv-sec-neg: #440154;
 
-  --cv-class-c1: #56b4e9; --cv-class-c2: #0072b2; --cv-class-c3: #80cdc1;
-  --cv-class-c4: #117733; --cv-class-c5: #e69f00; --cv-class-c6: #d55e00;
-  --cv-class-c13: #cc79a7; --cv-class-hs: #009e73; --cv-class-ls: #f0e442;
-  --cv-class-ns: #8a5fb5; --cv-class-thera: #aa4499; --cv-class-pochven: #882255;
+  --cv-class-c1: #56b4e9;
+  --cv-class-c2: #0072b2;
+  --cv-class-c3: #80cdc1;
+  --cv-class-c4: #117733;
+  --cv-class-c5: #e69f00;
+  --cv-class-c6: #d55e00;
+  --cv-class-c13: #cc79a7;
+  --cv-class-hs: #009e73;
+  --cv-class-ls: #f0e442;
+  --cv-class-ns: #8a5fb5;
+  --cv-class-thera: #aa4499;
+  --cv-class-pochven: #882255;
   --cv-class-drifter: #888888;
 
-  --cv-intel-friendly: #0072b2; --cv-intel-hostile: #d55e00;
-  --cv-intel-occupied: #e69f00; --cv-intel-empty: #999999;
+  --cv-intel-friendly: #0072b2;
+  --cv-intel-hostile: #d55e00;
+  --cv-intel-occupied: #e69f00;
+  --cv-intel-empty: #999999;
 
-  --cv-stand-friendly: #0072b2; --cv-stand-good: #56b4e9;
-  --cv-stand-bad: #e69f00; --cv-stand-hostile: #d55e00;
+  --cv-stand-friendly: #0072b2;
+  --cv-stand-good: #56b4e9;
+  --cv-stand-bad: #e69f00;
+  --cv-stand-hostile: #d55e00;
 
-  --cv-conn-4h: #f0e442; --cv-conn-1h: #e69f00; --cv-conn-expired: #d55e00;
-  --cv-conn-standard: #8a9ab8; --cv-conn-jumpgate: #56b4e9; --cv-conn-gate: #009e73; --cv-conn-highlight: #56b4e9;
+  --cv-conn-4h: #f0e442;
+  --cv-conn-1h: #e69f00;
+  --cv-conn-expired: #d55e00;
+  --cv-conn-standard: #8a9ab8;
+  --cv-conn-jumpgate: #56b4e9;
+  --cv-conn-gate: #009e73;
+  --cv-conn-highlight: #56b4e9;
 
-  --cv-status-unknown: #777788; --cv-status-visited: #e69f00; --cv-status-cleared: #0072b2;
-  --cv-online-on: #009e73; --cv-online-off: #d55e00;
+  --cv-status-unknown: #777788;
+  --cv-status-visited: #e69f00;
+  --cv-status-cleared: #0072b2;
+  --cv-online-on: #009e73;
+  --cv-online-off: #d55e00;
 
-  --cv-storm-electric: #56b4e9; --cv-storm-gamma: #009e73; --cv-storm-exotic: #cc79a7; --cv-storm-plasma: #e69f00; --cv-storm-unknown: #aaaaaa;
-  --cv-effect-pulsar: #56b4e9; --cv-effect-blackhole: #888888; --cv-effect-cataclysmic: #cc79a7; --cv-effect-magnetar: #e69f00; --cv-effect-redgiant: #d55e00; --cv-effect-wolfrayet: #009e73;
-  --cv-watch-target: #0072b2; --cv-watch-honeypot: #e69f00; --cv-watch-avoid: #d55e00; --cv-watch-friendly: #009e73; --cv-watch-watch: #56b4e9;
-  --cv-sig-data: #0072b2; --cv-sig-relic: #cc79a7; --cv-sig-wormhole: #f0e442; --cv-sig-gas: #009e73; --cv-sig-ore: #e69f00; --cv-sig-combat: #d55e00; --cv-sig-unknown: #999999;
+  --cv-storm-electric: #56b4e9;
+  --cv-storm-gamma: #009e73;
+  --cv-storm-exotic: #cc79a7;
+  --cv-storm-plasma: #e69f00;
+  --cv-storm-unknown: #aaaaaa;
+  --cv-effect-pulsar: #56b4e9;
+  --cv-effect-blackhole: #888888;
+  --cv-effect-cataclysmic: #cc79a7;
+  --cv-effect-magnetar: #e69f00;
+  --cv-effect-redgiant: #d55e00;
+  --cv-effect-wolfrayet: #009e73;
+  --cv-watch-target: #0072b2;
+  --cv-watch-honeypot: #e69f00;
+  --cv-watch-avoid: #d55e00;
+  --cv-watch-friendly: #009e73;
+  --cv-watch-watch: #56b4e9;
+  --cv-sig-data: #0072b2;
+  --cv-sig-relic: #cc79a7;
+  --cv-sig-wormhole: #f0e442;
+  --cv-sig-gas: #009e73;
+  --cv-sig-ore: #e69f00;
+  --cv-sig-combat: #d55e00;
+  --cv-sig-unknown: #999999;
 }
 
 /* Tritanopia (blue-yellow) — lean on red/green/teal/magenta + lightness;
    reuse the viridis security ramp (lightness-monotonic, safe here too). */
 :root[data-color-vision="tritanopia"] {
-  --cv-sec-09: #fde725; --cv-sec-08: #b5de2b; --cv-sec-07: #6ece58;
-  --cv-sec-06: #35b779; --cv-sec-05: #1f9e89; --cv-sec-04: #26828e;
-  --cv-sec-03: #31688e; --cv-sec-01: #3e4a89; --cv-sec-00: #482878; --cv-sec-neg: #440154;
+  --cv-sec-09: #fde725;
+  --cv-sec-08: #b5de2b;
+  --cv-sec-07: #6ece58;
+  --cv-sec-06: #35b779;
+  --cv-sec-05: #1f9e89;
+  --cv-sec-04: #26828e;
+  --cv-sec-03: #31688e;
+  --cv-sec-01: #3e4a89;
+  --cv-sec-00: #482878;
+  --cv-sec-neg: #440154;
 
-  --cv-class-c1: #44aa99; --cv-class-c2: #117733; --cv-class-c3: #88ccaa;
-  --cv-class-c4: #225522; --cv-class-c5: #ee7733; --cv-class-c6: #cc3311;
-  --cv-class-c13: #cc6699; --cv-class-hs: #5cb85c; --cv-class-ls: #ee9944;
-  --cv-class-ns: #99440f; --cv-class-thera: #aa4477; --cv-class-pochven: #882255;
+  --cv-class-c1: #44aa99;
+  --cv-class-c2: #117733;
+  --cv-class-c3: #88ccaa;
+  --cv-class-c4: #225522;
+  --cv-class-c5: #ee7733;
+  --cv-class-c6: #cc3311;
+  --cv-class-c13: #cc6699;
+  --cv-class-hs: #5cb85c;
+  --cv-class-ls: #ee9944;
+  --cv-class-ns: #99440f;
+  --cv-class-thera: #aa4477;
+  --cv-class-pochven: #882255;
   --cv-class-drifter: #888888;
 
-  --cv-intel-friendly: #44aa99; --cv-intel-hostile: #cc3311;
-  --cv-intel-occupied: #ee7733; --cv-intel-empty: #999999;
+  --cv-intel-friendly: #44aa99;
+  --cv-intel-hostile: #cc3311;
+  --cv-intel-occupied: #ee7733;
+  --cv-intel-empty: #999999;
 
-  --cv-stand-friendly: #44aa99; --cv-stand-good: #88ccaa;
-  --cv-stand-bad: #ee7733; --cv-stand-hostile: #cc3311;
+  --cv-stand-friendly: #44aa99;
+  --cv-stand-good: #88ccaa;
+  --cv-stand-bad: #ee7733;
+  --cv-stand-hostile: #cc3311;
 
-  --cv-conn-4h: #88ccaa; --cv-conn-1h: #ee7733; --cv-conn-expired: #cc3311;
-  --cv-conn-standard: #8a9ab8; --cv-conn-jumpgate: #44aa99; --cv-conn-gate: #117733; --cv-conn-highlight: #ee99cc;
+  --cv-conn-4h: #88ccaa;
+  --cv-conn-1h: #ee7733;
+  --cv-conn-expired: #cc3311;
+  --cv-conn-standard: #8a9ab8;
+  --cv-conn-jumpgate: #44aa99;
+  --cv-conn-gate: #117733;
+  --cv-conn-highlight: #ee99cc;
 
-  --cv-status-unknown: #888888; --cv-status-visited: #117733; --cv-status-cleared: #aa4477;
-  --cv-online-on: #117733; --cv-online-off: #cc3311;
+  --cv-status-unknown: #888888;
+  --cv-status-visited: #117733;
+  --cv-status-cleared: #aa4477;
+  --cv-online-on: #117733;
+  --cv-online-off: #cc3311;
 
-  --cv-storm-electric: #44aa99; --cv-storm-gamma: #117733; --cv-storm-exotic: #cc6699; --cv-storm-plasma: #cc3311; --cv-storm-unknown: #aaaaaa;
-  --cv-effect-pulsar: #44aa99; --cv-effect-blackhole: #888888; --cv-effect-cataclysmic: #cc6699; --cv-effect-magnetar: #ee7733; --cv-effect-redgiant: #cc3311; --cv-effect-wolfrayet: #117733;
-  --cv-watch-target: #44aa99; --cv-watch-honeypot: #ee9944; --cv-watch-avoid: #cc3311; --cv-watch-friendly: #117733; --cv-watch-watch: #88ccaa;
-  --cv-sig-data: #44aa99; --cv-sig-relic: #cc6699; --cv-sig-wormhole: #aa4477; --cv-sig-gas: #117733; --cv-sig-ore: #ee9944; --cv-sig-combat: #cc3311; --cv-sig-unknown: #999999;
+  --cv-storm-electric: #44aa99;
+  --cv-storm-gamma: #117733;
+  --cv-storm-exotic: #cc6699;
+  --cv-storm-plasma: #cc3311;
+  --cv-storm-unknown: #aaaaaa;
+  --cv-effect-pulsar: #44aa99;
+  --cv-effect-blackhole: #888888;
+  --cv-effect-cataclysmic: #cc6699;
+  --cv-effect-magnetar: #ee7733;
+  --cv-effect-redgiant: #cc3311;
+  --cv-effect-wolfrayet: #117733;
+  --cv-watch-target: #44aa99;
+  --cv-watch-honeypot: #ee9944;
+  --cv-watch-avoid: #cc3311;
+  --cv-watch-friendly: #117733;
+  --cv-watch-watch: #88ccaa;
+  --cv-sig-data: #44aa99;
+  --cv-sig-relic: #cc6699;
+  --cv-sig-wormhole: #aa4477;
+  --cv-sig-gas: #117733;
+  --cv-sig-ore: #ee9944;
+  --cv-sig-combat: #cc3311;
+  --cv-sig-unknown: #999999;
 }

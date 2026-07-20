@@ -103,7 +103,7 @@
 
 .share-error__hint {
   font-size: calc(13px * var(--font-scale, 1));
-  color: var(--text-quiet);
+  color: var(--text-muted);
   margin-top: 16px;
 }
 
@@ -203,7 +203,7 @@
 
   &:hover {
     background: var(--surface-raised);
-    color: var(--text-primary-alt);
+    color: var(--text-primary);
   }
 }
 

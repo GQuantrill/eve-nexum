@@ -115,7 +115,7 @@
 
 .kvKey {
   font-size: calc(13px * var(--font-scale, 1));
-  color: var(--text-quiet);
+  color: var(--text-muted);
   white-space: nowrap;
 }
 
@@ -193,7 +193,7 @@
 
 .effect {
   font-style: italic;
-  color: var(--text-quiet);
+  color: var(--text-muted);
   font-size: calc(13px * var(--font-scale, 1));
 }
 

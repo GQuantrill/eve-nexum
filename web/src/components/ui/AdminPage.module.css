@@ -65,7 +65,7 @@
 .mTable th {
   font-size: calc(11px * var(--font-scale, 1));
   font-weight: 600;
-  color: var(--text-quiet);
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   padding: 8px 10px;
@@ -191,7 +191,7 @@
 
 .mWhen {
   font-size: calc(12px * var(--font-scale, 1));
-  color: var(--text-quiet);
+  color: var(--text-muted);
   white-space: nowrap;
 }
 
@@ -236,7 +236,7 @@
 .pgBack {
   background: transparent;
   border: none;
-  color: var(--text-quiet);
+  color: var(--text-muted);
   font-family: inherit;
   font-size: calc(12px * var(--font-scale, 1));
   text-align: left;
@@ -264,7 +264,7 @@
   background: transparent;
   border: 1px solid transparent;
   border-radius: 5px;
-  color: var(--text-quiet);
+  color: var(--text-muted);
   font-family: inherit;
   font-size: calc(13px * var(--font-scale, 1));
   padding: 7px 10px;
@@ -364,7 +364,7 @@
 
 .pgFilterLabel {
   font-size: calc(11px * var(--font-scale, 1));
-  color: var(--text-quiet);
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
@@ -405,13 +405,13 @@
 }
 .dcHeading {
   font-size: calc(15px * var(--font-scale, 1));
-  color: var(--text-primary-alt);
+  color: var(--text-primary);
   margin: 0 0 10px;
 }
 /* Wormhole filter sub-blocks inside the region section. */
 .dcSubheading {
   font-size: calc(14px * var(--font-scale, 1));
-  color: var(--text-primary-alt);
+  color: var(--text-primary);
   margin: 18px 0 4px;
   border-top: 1px solid var(--surface-hover);
   padding-top: 14px;
@@ -678,7 +678,7 @@
   background: transparent;
   border: 1px solid var(--border);
   border-radius: 5px;
-  color: var(--text-quiet);
+  color: var(--text-muted);
   font-family: inherit;
   font-size: calc(13px * var(--font-scale, 1));
   padding: 4px 14px;
@@ -711,7 +711,7 @@
 }
 
 .pgSigChipLabel {
-  color: var(--text-quiet);
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }

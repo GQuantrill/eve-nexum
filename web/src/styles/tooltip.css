@@ -13,7 +13,7 @@
     left: 50%;
     transform: translateX(-50%);
     background: var(--surface-panel);
-    color: var(--text-primary-alt);
+    color: var(--text-primary);
     font-size: calc(12px * var(--font-scale, 1));
     white-space: nowrap;
     padding: 3px 8px;

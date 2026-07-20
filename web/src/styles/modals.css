@@ -71,14 +71,14 @@
 
 .stats-modal__card-label {
   font-size: calc(13px * var(--font-scale, 1));
-  color: var(--text-quiet);
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
 
 .stats-modal__section-title {
   font-size: calc(13px * var(--font-scale, 1));
-  color: var(--text-quiet);
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   margin: 4px 0 0;
@@ -99,7 +99,7 @@
 .stats-modal__th {
   font-size: calc(13px * var(--font-scale, 1));
   font-weight: 600;
-  color: var(--text-quiet);
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   padding: 7px 10px;
@@ -139,7 +139,7 @@
 
 .stats-modal__row-pct {
   font-size: calc(13px * var(--font-scale, 1));
-  color: var(--text-quiet);
+  color: var(--text-muted);
   width: 36px;
   text-align: right;
 }

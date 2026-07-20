@@ -508,7 +508,7 @@
 .landing__section-title {
   font-size: calc(22px * var(--font-scale, 1));
   font-weight: 600;
-  color: var(--text-primary-alt);
+  color: var(--text-primary);
   margin-bottom: 16px;
 }
 
@@ -540,7 +540,7 @@
 .landing__compare-link {
   display: inline-block;
   padding: 12px 26px;
-  background: var(--accent-friendly);
+  background: var(--accent);
   color: #04060c;
   font-weight: 700;
   font-size: calc(15px * var(--font-scale, 1));
@@ -580,7 +580,7 @@
   background: rgba(91, 155, 255, 0.08);
   border: 1px solid rgba(91, 155, 255, 0.28);
   border-radius: 999px;
-  color: var(--text-primary-alt);
+  color: var(--text-primary);
   font-size: calc(14px * var(--font-scale, 1));
   font-weight: 600;
   white-space: nowrap;
@@ -616,7 +616,7 @@
 .landing__faq-q {
   font-size: calc(15px * var(--font-scale, 1));
   font-weight: 600;
-  color: var(--text-primary-alt);
+  color: var(--text-primary);
   margin: 0 0 6px;
 }
 

@@ -74,7 +74,7 @@
   border-radius: 4px;
   padding: 3px 7px;
   font-size: calc(11px * var(--font-scale, 1));
-  color: var(--text-primary-alt);
+  color: var(--text-primary);
   white-space: nowrap;
   pointer-events: none;
   z-index: 5;
@@ -90,7 +90,7 @@
 }
 
 .tooltipWhen {
-  color: var(--text-quiet);
+  color: var(--text-muted);
   font-size: calc(10px * var(--font-scale, 1));
 }
 

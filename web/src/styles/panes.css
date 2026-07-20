@@ -268,7 +268,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--text-quiet);
+  color: var(--text-muted);
 }
 
 /* EVE in-game standings palette: dark blue at +10 (excellent), light blue
@@ -302,7 +302,7 @@
 .admin-page__report-heading {
   font-size: calc(12px * var(--font-scale, 1));
   font-weight: 600;
-  color: var(--text-quiet);
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   margin: 24px 0 10px;
@@ -350,7 +350,7 @@
 
 .admin-page__stat-card-label {
   font-size: calc(11px * var(--font-scale, 1));
-  color: var(--text-quiet);
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
@@ -379,7 +379,7 @@
 .admin-page__chart-title {
   font-size: calc(12px * var(--font-scale, 1));
   font-weight: 600;
-  color: var(--text-quiet);
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }

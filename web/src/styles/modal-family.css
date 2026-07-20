@@ -188,7 +188,7 @@
 
 .map-sidebar__share-meta {
   font-size: calc(11px * var(--font-scale, 1));
-  color: var(--text-quiet);
+  color: var(--text-muted);
   padding: 2px 0;
 }
 
@@ -348,7 +348,7 @@
 .patchnotes__version {
   font-size: calc(17px * var(--font-scale, 1));
   font-weight: 700;
-  color: var(--accent-friendly);
+  color: var(--accent);
   text-decoration: none;
 }
 .patchnotes__version:hover { text-decoration: underline; }
