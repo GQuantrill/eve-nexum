@@ -88,11 +88,11 @@
   cursor: pointer;
   transition: color 0.15s, border-color 0.15s, transform 0.4s ease;
 }
-.refreshBtn:hover     { color: #c0d0e0; border-color: #3a4a6a; }
+.refreshBtn:hover     { color: #c0d0e0; border-color: var(--surface-muted); }
 .refreshBtn:disabled  { cursor: wait; opacity: 0.7; }
 .refreshBtnBusy     { animation: sys-info-refresh-spin 0.8s linear infinite; }
 .refreshBtnOk       { color: var(--success-bright); border-color: rgba(74,222,128,0.35); }
-.refreshBtnErr      { color: #e74c3c; border-color: rgba(231,76,60,0.4); }
+.refreshBtnErr      { color: var(--danger-strong); border-color: rgba(231,76,60,0.4); }
 
 @keyframes sys-info-refresh-spin {
   from { transform: rotate(0deg); }
@@ -233,7 +233,7 @@
 }
 
 .effectModGood {
-  color: #4caf50;
+  color: var(--success-alt);
   background: rgba(76, 175, 80, 0.1);
   border: 1px solid rgba(76, 175, 80, 0.25);
 }

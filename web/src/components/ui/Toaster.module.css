@@ -28,7 +28,7 @@
   color: var(--text-default);
 }
 
-.error   { border-left-color: #f87171; background: #1a1014; }
+.error   { border-left-color: var(--danger-soft); background: #1a1014; }
 .info    { border-left-color: #60a5fa; background: #0f1620; }
 .success { border-left-color: var(--success-bright); background: #0f1a14; }
 

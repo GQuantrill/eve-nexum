@@ -178,7 +178,7 @@
 
 .demo-info__mod--good {
   font-size: calc(12px * var(--font-scale, 1));
-  color: #4caf50;
+  color: var(--success-alt);
 }
 
 .demo-info__mod--bad {
@@ -540,7 +540,7 @@
 .landing__compare-link {
   display: inline-block;
   padding: 12px 26px;
-  background: #5b9bff;
+  background: var(--accent-friendly);
   color: #04060c;
   font-weight: 700;
   font-size: calc(15px * var(--font-scale, 1));

@@ -464,7 +464,7 @@
   position: relative;
   transition: background 0.15s, border-color 0.15s;
 
-  &:hover { background: #1a2440; border-color: #3a4a6a; }
+  &:hover { background: #1a2440; border-color: var(--surface-muted); }
 }
 
 .sys-info__chain-fx__chip--current {

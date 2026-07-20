@@ -348,7 +348,7 @@
 .patchnotes__version {
   font-size: calc(17px * var(--font-scale, 1));
   font-weight: 700;
-  color: #5b9bff;
+  color: var(--accent-friendly);
   text-decoration: none;
 }
 .patchnotes__version:hover { text-decoration: underline; }

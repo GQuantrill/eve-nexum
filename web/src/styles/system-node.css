@@ -244,7 +244,7 @@
 }
 
 .system-node__home-icon {
-  color: #f0c040;
+  color: var(--warning-gold);
   margin-right: 4px;
   display: inline-flex;
   align-items: center;
@@ -292,7 +292,7 @@
   height: 18px;
   padding: 0 5px;
   border-radius: 999px;
-  border: 1.5px solid #c084fc;
+  border: 1.5px solid var(--accent-violet);
   background: rgba(192, 132, 252, 0.15);
   box-shadow: 0 0 5px rgba(192, 132, 252, 0.5);
   color: #e7d6ff;
@@ -353,7 +353,7 @@
   height: 18px;
   padding: 0 5px;
   border-radius: 999px;
-  border: 1.5px solid #f5b96a;
+  border: 1.5px solid var(--warning-amber);
   background: rgba(245, 185, 106, 0.15);
   box-shadow: 0 0 5px rgba(245, 185, 106, 0.5);
   color: #f5e3c8;
@@ -488,7 +488,7 @@
 
 .system-node__effect-tooltip__bad {
   font-size: calc(13px * var(--font-scale, 1));
-  color: #f87171;
+  color: var(--danger-soft);
 }
 
 .system-node__name {

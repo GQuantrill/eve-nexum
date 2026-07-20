@@ -167,7 +167,7 @@
 }
 
 .mPillOk      { background: #0f1a14; color: var(--success-bright); border-color: #1e3a28; }
-.mPillBlocked { background: #1a1014; color: #f87171; border-color: #3a1e22; }
+.mPillBlocked { background: #1a1014; color: var(--danger-soft); border-color: #3a1e22; }
 
 .mNum {
   font-variant-numeric: tabular-nums;
@@ -202,7 +202,7 @@
   white-space: nowrap;
 }
 
-.mDanger { color: #f87171; }
+.mDanger { color: var(--danger-soft); }
 
 .mAction {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;

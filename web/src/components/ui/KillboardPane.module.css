@@ -48,7 +48,7 @@
 }
 
 .npcToggle input {
-  accent-color: #5b9bff;
+  accent-color: var(--accent-friendly);
   cursor: pointer;
   margin: 0;
 }
@@ -63,13 +63,13 @@
 .inlineToggle {
   background: none;
   border: none;
-  color: #5b9bff;
+  color: var(--accent-friendly);
   cursor: pointer;
   padding: 0;
   font: inherit;
   text-decoration: underline;
 
-  &:hover { color: #8fc8ff; }
+  &:hover { color: var(--accent-pale); }
 }
 
 .list { display: flex; flex-direction: column; }
@@ -94,14 +94,14 @@
    Colours mirror the EVE in-game flag palette already used in the sov
    pills (red for hostile, blue for friendly). */
 .killBad {
-  border-left: 3px solid #e74c3c;
+  border-left: 3px solid var(--danger-strong);
   padding-left: 6px;
   background: linear-gradient(to right, rgba(231,76,60,0.18), rgba(231,76,60,0) 35%);
 }
 .killBad:hover  { background: linear-gradient(to right, rgba(231,76,60,0.28), rgba(231,76,60,0.04) 50%); }
 
 .killGood {
-  border-left: 3px solid #5b9bff;
+  border-left: 3px solid var(--accent-friendly);
   padding-left: 6px;
   background: linear-gradient(to right, rgba(91,155,255,0.18), rgba(91,155,255,0) 35%);
 }

@@ -25,7 +25,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  color: #f0c040;
+  color: var(--warning-gold);
   font-size: calc(12px * var(--font-scale, 1));
   font-weight: 600;
 }

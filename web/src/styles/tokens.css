@@ -56,10 +56,20 @@
   --accent-bright:  #6ea0ff;
   --accent-alt:     #4d9de0;
   --accent-light:   #7ab4f0;
+  --accent-friendly:#5b9bff;
+  --accent-pale:    #8fc8ff;
+  --accent-violet:  #c084fc;
   --danger:         #e05a5a;
+  --danger-soft:    #f87171;
+  --danger-strong:  #e74c3c;
   --success:        #3ddc84;
   --success-bright: #4ade80;
+  --success-alt:    #4caf50;
   --warning:        #f0a030;
+  --warning-alt:    #f5a623;
+  --warning-gold:   #f0c040;
+  --warning-amber:  #f5b96a;
+  --surface-muted:  #3a4a6a;
 }
 
 /* ── Colour-vision (colour-blindness) palettes ──────────────

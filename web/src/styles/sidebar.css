@@ -444,7 +444,7 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #3a4a6a;
+  background: var(--surface-muted);
   flex-shrink: 0;
 
   &.toolbar__online-dot--on  { background: var(--success); box-shadow: 0 0 4px var(--success); }
@@ -469,7 +469,7 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #3a4a6a;
+  background: var(--surface-muted);
   flex-shrink: 0;
   cursor: default;
   position: relative;
@@ -901,7 +901,7 @@
 
 .map-shares__kind--character {
   background: rgba(192,132,252,0.15);
-  color: #c084fc;
+  color: var(--accent-violet);
   border: 1px solid rgba(192,132,252,0.3);
 }
 
@@ -1309,7 +1309,7 @@
    add anything (alerts/highlights dedupe by target) until it's changed. */
 .watchlist__value--dup,
 .watchlist__value--dup:focus {
-  border-color: #e74c3c;
+  border-color: var(--danger-strong);
 }
 
 .watchlist__dup-msg {
@@ -1329,7 +1329,7 @@
 /* Red outline on the picker button when the wormhole type duplicates another
    entry — mirrors .watchlist__value--dup on the system input. */
 .watchlist__whpick--dup .wh-picker__btn {
-  border-color: #e74c3c;
+  border-color: var(--danger-strong);
 }
 
 /* "Show on map" button — only present when the entry matches something on the
@@ -1529,7 +1529,7 @@
 }
 
 .map-sidebar__toggle-input {
-  accent-color: #5b9bff;
+  accent-color: var(--accent-friendly);
   cursor: pointer;
   margin: 0;
 }
@@ -1992,7 +1992,7 @@
   padding: 1px 6px;
   border-radius: 3px;
 }
-.known-structures__badge--corp-esi       { background: rgba(91,155,255,0.15);  color: #8fc8ff; border: 1px solid rgba(91,155,255,0.4); }
+.known-structures__badge--corp-esi       { background: rgba(91,155,255,0.15);  color: var(--accent-pale); border: 1px solid rgba(91,155,255,0.4); }
 .known-structures__badge--public-dataset { background: rgba(122,138,168,0.15); color: var(--text-default); border: 1px solid rgba(122,138,168,0.4); }
 
 /* Read-only twin of .sig-input, used in share mode where the row cells

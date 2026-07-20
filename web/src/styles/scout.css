@@ -78,7 +78,7 @@
 }
 
 .scout-row__class--home {
-  color: #f0c040;
+  color: var(--warning-gold);
 }
 
 /* Home indicator on a Closest Systems row — inline-flex so the SVG
