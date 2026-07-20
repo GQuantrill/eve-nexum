@@ -14,6 +14,7 @@ import './styles/scout.css' // scout/route connection rows
 import './styles/forms.css' // shared form controls
 import './styles/modals.css' // user stats modal
 import './styles/screens.css' // full-screen states + role badge
+import './styles/system-node.css' // map node card + label pills + tag badge
 import App from './App.tsx'
 
 createRoot(document.getElementById('root')!).render(

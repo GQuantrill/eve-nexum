@@ -1,0 +1,1148 @@
+/* System node (map node card) + its label pills and inline tag badge.
+   Relocated verbatim out of App.css (Phase 2). These .system-node* /
+   .sys-label* classes are used across the map components, so kept
+   GLOBAL; imported once in main.tsx. See design-system.md. */
+
+/* ── System node ─────────────────────────────────────────── */
+.system-node--stale {
+  opacity: 0.45;
+  filter: saturate(0.5);
+}
+
+.system-node--stale:hover {
+  opacity: 0.85;
+  filter: none;
+}
+
+/* Content filter (map-wide spotlight): systems whose scanned content doesn't
+   match the active filter fade right back; matches stay lit with a soft accent
+   ring so they pop against the dimmed map. Hovering a faded node restores it. */
+.system-node--filtered-out {
+  opacity: 0.45;
+  filter: saturate(0.5);
+  transition: opacity 0.18s ease, filter 0.18s ease;
+}
+
+.system-node--filtered-out:hover {
+  opacity: 0.85;
+  filter: none;
+}
+
+/* Dimmed while a saved chain is hovered (everything not on its route). */
+.system-node--dimmed {
+  opacity: 0.12;
+  filter: saturate(0.4);
+  transition: opacity 0.15s ease, filter 0.15s ease;
+}
+
+/* A system that IS on the hovered chain's route — lift it with a glow ring. */
+.system-node--route {
+  box-shadow: 0 0 0 2px var(--cv-conn-highlight),
+              0 0 14px 2px color-mix(in srgb, var(--cv-conn-highlight) 55%, transparent);
+  transition: box-shadow 0.15s ease;
+}
+
+.system-node--content-match {
+  box-shadow: 0 0 0 2px var(--accent, #5b9bff), 0 0 12px 1px rgba(91,155,255,0.45);
+}
+
+/* Hostile / friendly sov halos. Box-shadow only — doesn't displace the
+   layout the way a thicker border would. The map-canvas zoom keeps these
+   readable even at small node sizes. */
+.system-node--sov-hostile { box-shadow: 0 0 0 2px var(--cv-stand-hostile), 0 0 10px color-mix(in srgb, var(--cv-stand-hostile) 55%, transparent); }
+.system-node--sov-blue    { box-shadow: 0 0 0 2px var(--cv-stand-friendly), 0 0 10px color-mix(in srgb, var(--cv-stand-friendly) 45%, transparent); }
+
+/* Manual intel tag — replaces the default class-color border with a
+   thicker, fully-saturated intel colour so the tag reads at a glance
+   even when the node is unhovered. The class is still legible via the
+   class-badge inside the header, so swapping the border doesn't lose
+   information. The colour comes from --intel-color, which SystemNode
+   sets inline based on the resolved tag (built-in palette or the user's
+   CustomIntel entry).
+   Hover/selected stay on the intel colour rather than reverting to the
+   class colour — toggling between two borders on hover was visually
+   jumpy and made the intel state read as "less important" than hover.
+   The class-color box-shadow on hover/selected still fires, so the
+   feedback is preserved. */
+.system-node[data-intel] {
+  border-color: var(--intel-color);
+  border-width: 4px;
+
+  /* Hover keeps the intel colour (toggling borders on hover read as jumpy).
+     Selection is intentionally NOT held here so a selected node falls through
+     to the white highlight from the base rules — otherwise a selected
+     "occupied" system stays orange and is indistinguishable from the tag. */
+  &:hover {
+    border-color: var(--intel-color);
+  }
+}
+
+/* Folded-corner triangle in the top-right when intel is set — a second,
+   shape-based cue alongside the coloured border. A real element (rendered by
+   SystemNode) rather than a ::after so it can carry a tooltip with the intel
+   label on hover; pointer-events enabled for exactly that. Uses the same
+   --intel-color SystemNode sets inline. */
+.system-node__intel-corner {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-top: 16px solid var(--intel-color);
+  border-left: 16px solid transparent;
+  border-top-right-radius: 6px;
+  pointer-events: auto;
+}
+
+/* Watchlist: a coloured ring around any node whose system is on the user's
+   watchlist, plus a glyph badge in the top-left corner. --watch-color is set
+   inline by SystemNode from the marker definition. */
+.system-node--watched {
+  box-shadow: 0 0 0 2px var(--watch-color, #6ea0ff), 0 0 10px 1px var(--watch-color, #6ea0ff);
+}
+
+.system-node__watch-corner {
+  position: absolute;
+  top: -9px;
+  left: -9px;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  border-radius: 50%;
+  background: var(--surface-base);
+  color: var(--watch-color, #6ea0ff);
+  border: 1px solid var(--watch-color, #6ea0ff);
+  box-shadow: 0 0 6px var(--watch-color, #6ea0ff);
+  pointer-events: auto;
+  z-index: 3;
+}
+
+/* Heatmap halo behind any node with a value for the active metric. Intensity
+   (--heat, 0..1) and colour (--heat-color) are set inline by SystemNode; the
+   metric (fleet / kills / pods / npc / jumps) just changes the colour. Drawn
+   on ::before behind the node so it doesn't fight the node's own border
+   box-shadows (hover / selected / current / sov). Two layers — a tight bright
+   inner ring + a soft wide outer halo — so even the lowest value reads. */
+.system-node[data-heat]::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  z-index: -1;
+  pointer-events: none;
+  /* Opacity + size scale almost entirely with --heat so cold systems barely
+     glow and hot ones pop — that's what gives the map contrast. */
+  box-shadow:
+    0 0 calc(6px  + var(--heat, 0) * 20px)
+        calc(1px  + var(--heat, 0) * 7px)
+        color-mix(in srgb, var(--heat-color, #f97316) calc(12% + var(--heat, 0) * 78%), transparent),
+    0 0 calc(16px + var(--heat, 0) * 46px)
+        calc(4px  + var(--heat, 0) * 15px)
+        color-mix(in srgb, var(--heat-color, #f97316) calc(var(--heat, 0) * 55%), transparent);
+}
+
+.system-node {
+  min-width: 160px;  /* 8 snap-grid squares — keep node size a grid multiple */
+  min-height: 80px;  /* 4 snap-grid squares tall */
+  background: var(--surface-panel);
+  border: 1.5px solid color-mix(in srgb, var(--class-color) 40%, var(--border));
+  border-radius: 8px;
+  padding: 8px 12px 10px;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s, opacity 0.2s, filter 0.2s;
+  position: relative;
+
+  /* Compact mode hides the region / statics / incursion / insurgency rows but
+     the 4-square min-height floor (added for map-generation spacing) kept the
+     node a fixed 80px tall, leaving empty space below the content. Opt compact
+     nodes out of the floor so they hug their reduced content again — the
+     behaviour before the floor existed. Also drop the width floor by 2 grid
+     squares (160px → 120px, i.e. 8 → 6 squares) so compact nodes are narrower
+     too; still a snap-grid multiple, and content wider than that still grows
+     the node. Uniform sizing still wins via its inline min-width/height when
+     both modes are on. */
+  &.system-node--compact {
+    min-height: 0;
+    min-width: 120px;
+  }
+
+  &:hover {
+    border-color: var(--class-color);
+    box-shadow: 0 0 12px color-mix(in srgb, var(--class-color) 30%, transparent);
+  }
+
+  /* Selected node: white border + soft white glow, matching the current-system
+     treatment so neither collides with the orange "occupied" bezel. Kept a
+     touch lighter than data-current (below) so "where you are" still reads
+     slightly stronger; data-current wins when a node is both. */
+  &[data-selected='true'] {
+    border-color: #ffffff;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.4), 0 0 14px rgba(255, 255, 255, 0.28);
+  }
+
+  &[data-home='true'] {
+    border-style: double;
+  }
+
+  /* The system you're currently in: white border + soft white glow. White so
+     it reads as "you" without colliding with the gold home border, the yellow
+     A0 sun icon, or any class colour. */
+  &[data-current='true'] {
+    border-color: #ffffff;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.55), 0 0 14px rgba(255, 255, 255, 0.4);
+  }
+
+  &.system-node--connect-target {
+    border-color: #38bdf8;
+    border-style: dashed;
+    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.4), 0 0 18px rgba(56, 189, 248, 0.3);
+  }
+}
+
+/* Uniform-size mode — every node is padded up to the natural width /
+   height of the largest visible node. The min-width / min-height values
+   are applied inline from SystemNode after a ResizeObserver measures
+   each node and the store recomputes the max. No fixed dimensions in
+   CSS: that lets a node with genuinely-larger content extend the
+   uniform target instead of getting clipped. */
+
+.system-node__header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.system-node__meta-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.system-node__class-badge {
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--class-color);
+  text-transform: uppercase;
+}
+
+.system-node__truesec {
+  font-size: calc(13px * var(--font-scale, 1));
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-weight: 600;
+}
+
+.system-node__icons {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.system-node__home-icon {
+  color: #f0c040;
+  margin-right: 4px;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* SVGs default to `vertical-align: baseline`, leaving a sub-pixel gap at
+   the bottom of their inline box. In a flex row that translates to the
+   icon visually sitting slightly above the text. Forcing block layout on
+   every SVG inside the header / meta rows removes the gap so icons line
+   up exactly with the truesec digits / system name. */
+.system-node__header svg,
+.system-node__meta-row svg {
+  display: block;
+}
+
+.system-node__current-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #3ddc84;
+  box-shadow: 0 0 5px #3ddc84;
+  margin-right: 4px;
+  flex-shrink: 0;
+}
+
+/* Fleet-presence dot — purple variant of the you-are-here green dot.
+   Wrapper carries the hover state for the names tooltip; pointer cursor
+   hints that hovering does something. */
+.system-node__fleet-dot-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  margin-right: 4px;
+}
+
+/* Count badge: how many fleet members are in this system, inside a purple
+   ring. Circular for a single digit, expands to a pill for larger counts
+   (fleets run big). */
+.system-node__fleet-count {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  border: 1.5px solid #c084fc;
+  background: rgba(192, 132, 252, 0.15);
+  box-shadow: 0 0 5px rgba(192, 132, 252, 0.5);
+  color: #e7d6ff;
+  font-size: calc(11px * var(--font-scale, 1));
+  font-weight: 600;
+  line-height: 18px;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+  cursor: help;
+}
+
+.system-node__fleet-tooltip {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  background: var(--surface-panel);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  padding: 5px 8px;
+  white-space: nowrap;
+  z-index: 9999;
+  flex-direction: column;
+  gap: 2px;
+  pointer-events: none;
+  font-size: calc(13px * var(--font-scale, 1));
+  color: var(--text-primary);
+}
+
+.system-node__fleet-dot-wrap:hover .system-node__fleet-tooltip {
+  display: flex;
+}
+
+.react-flow__node:has(.system-node__fleet-dot-wrap:hover) {
+  z-index: 9999 !important;
+}
+
+.system-node__fleet-tooltip-row {
+  display: block;
+}
+
+/* Account characters (your own alts) in this system. Gold — distinct from the
+   purple fleet dot and blue presence dot. Offline alts (shown at their last
+   known system) get a "(last known)" qualifier. */
+.system-node__alt-dot-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  margin-right: 4px;
+}
+/* Count badge: how many of your alts are in this system, inside a gold ring. */
+.system-node__alt-count {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  border: 1.5px solid #f5b96a;
+  background: rgba(245, 185, 106, 0.15);
+  box-shadow: 0 0 5px rgba(245, 185, 106, 0.5);
+  color: #f5e3c8;
+  font-size: calc(11px * var(--font-scale, 1));
+  font-weight: 600;
+  line-height: 18px;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+  cursor: help;
+}
+.system-node__alt-tooltip {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  background: var(--surface-panel);
+  border: 1px solid #5a4a2e;
+  border-radius: 6px;
+  padding: 5px 8px;
+  white-space: nowrap;
+  z-index: 9999;
+  flex-direction: column;
+  gap: 2px;
+  pointer-events: none;
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #f0e2c8;
+}
+.system-node__alt-dot-wrap:hover .system-node__alt-tooltip { display: flex; }
+.react-flow__node:has(.system-node__alt-dot-wrap:hover) { z-index: 9999 !important; }
+.system-node__alt-tooltip-row { display: block; }
+.system-node__alt-offline { margin-left: 6px; color: #8a7a5a; font-size: 0.85em; }
+
+/* Presence: other pilots viewing this map who are in this system. Blue, to
+   distinguish from the purple fleet dot; hover reveals their names. */
+.system-node__presence-dot-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  margin-right: 4px;
+}
+
+.system-node__presence-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4d9de0;
+  box-shadow: 0 0 5px #4d9de0;
+  flex-shrink: 0;
+  cursor: help;
+}
+
+.system-node__presence-tooltip {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  background: var(--surface-panel);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  padding: 5px 8px;
+  white-space: nowrap;
+  z-index: 9999;
+  flex-direction: column;
+  gap: 2px;
+  pointer-events: none;
+  font-size: calc(13px * var(--font-scale, 1));
+  color: var(--text-primary);
+}
+
+.system-node__presence-dot-wrap:hover .system-node__presence-tooltip {
+  display: flex;
+}
+
+.react-flow__node:has(.system-node__presence-dot-wrap:hover) {
+  z-index: 9999 !important;
+}
+
+.system-node__presence-tooltip-row {
+  display: block;
+}
+
+.system-node__lock-icon {
+  font-size: calc(13px * var(--font-scale, 1));
+  opacity: 0.7;
+}
+
+.system-node__effect-icon {
+  font-size: calc(16px * var(--font-scale, 1));
+  position: relative;
+}
+
+.system-node__effect-tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface-panel);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  padding: 6px 10px;
+  white-space: nowrap;
+  /* Size the box to its widest row. Without this the tooltip's shrink-to-fit
+     width is constrained by its tiny icon container, so longer labels
+     (e.g. "Targeting Range") get clipped. */
+  width: max-content;
+  z-index: 9999;
+  flex-direction: column;
+  gap: 3px;
+  pointer-events: none;
+}
+
+.system-node__effect-icon:hover .system-node__effect-tooltip {
+  display: flex;
+}
+
+.react-flow__node:has(.system-node__effect-icon:hover) {
+  z-index: 9999 !important;
+}
+
+.system-node__effect-tooltip__title {
+  font-size: calc(16px * var(--font-scale, 1));
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.system-node__effect-tooltip__good {
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #4ade80;
+}
+
+.system-node__effect-tooltip__bad {
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #f87171;
+}
+
+.system-node__name {
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 600;
+  color: var(--text-bright);
+  line-height: 1.2;
+}
+
+.system-node__effect {
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #c0ccde;
+  margin-top: 2px;
+}
+
+.system-node__npc-type {
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #c47a2a;
+  margin-top: 2px;
+  font-style: italic;
+}
+
+.system-node__statics {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 6px;
+}
+
+.system-node__statics .title {
+  font-size: calc(13px * var(--font-scale, 1));
+}
+
+.system-node__static-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--text-default);
+  background: var(--border);
+  border-radius: 3px;
+  padding: 1px 5px;
+}
+
+.system-node__static-dest {
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 700;
+  opacity: 0.9;
+
+  &::before { content: '→'; color: var(--text-dim); margin-right: 1px; }
+}
+
+/* Scanned-but-not-dived wormholes: a row of small capsules just under the node,
+   coloured by destination class (neutral when the type/destination is unknown).
+   Absolutely positioned so they never affect node sizing or the handles. */
+.system-node__holes {
+  position: absolute;
+  top: 100%;
+  left: 4px;
+  margin-top: 3px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  z-index: 1;
+}
+
+.system-node__hole {
+  width: calc(14px * var(--font-scale, 1));
+  height: calc(6px * var(--font-scale, 1));
+  border-radius: 3px;
+  background: var(--text-faint); /* neutral: unknown destination */
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+.system-node__hole:hover { transform: scaleY(1.5); }
+
+.system-node__sov-logo-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+}
+
+.system-node__sov-logo {
+  display: block;
+  width: 22px;
+  height: 22px;
+  border-radius: 3px;
+  object-fit: cover;
+  opacity: 0.85;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.system-node__sov-tooltip {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  background: var(--surface-panel);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  padding: 5px 8px;
+  white-space: nowrap;
+  z-index: 9999;
+  flex-direction: column;
+  gap: 2px;
+  pointer-events: none;
+  font-size: calc(16px * var(--font-scale, 1));
+  color: var(--text-primary);
+}
+
+.system-node__sov-logo-wrap:hover .system-node__sov-tooltip {
+  display: flex;
+}
+
+.react-flow__node:has(.system-node__sov-logo-wrap:hover) {
+  z-index: 9999 !important;
+}
+
+.system-node__sov-tooltip__ticker {
+  color: #5a9af8;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: calc(13px * var(--font-scale, 1));
+}
+
+@keyframes skull-flash {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.15; }
+}
+
+.system-node__insurgency-icon {
+  color: #f0a030;
+  font-size: calc(13px * var(--font-scale, 1));
+  cursor: default;
+  filter: drop-shadow(0 0 3px #f0a03088);
+  position: relative;
+  animation: skull-flash 1.4s ease-in-out infinite;
+}
+
+.system-node__insurgency-tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface-panel);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  padding: 4px 10px;
+  white-space: nowrap;
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #f0c060;
+  font-weight: 600;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.system-node__insurgency-icon:hover .system-node__insurgency-tooltip {
+  display: block;
+}
+
+.react-flow__node:has(.system-node__insurgency-icon:hover) {
+  z-index: 9999 !important;
+}
+
+.system-node__insurgency-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(240, 160, 48, 0.12);
+  border: 1px solid rgba(240, 160, 48, 0.35);
+  border-radius: 4px;
+  padding: 2px 6px;
+  margin: 2px 6px 4px;
+}
+
+.system-node__insurgency-logo {
+  width: 16px;
+  height: 16px;
+  border-radius: 2px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.system-node__insurgency-label {
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #f0a030;
+  font-weight: 600;
+  white-space: nowrap;
+  position: relative;
+}
+
+.system-node__insurgency-badge-tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface-panel);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  padding: 4px 10px;
+  white-space: nowrap;
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #f0c060;
+  font-weight: 500;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.system-node__insurgency-label:hover .system-node__insurgency-badge-tooltip {
+  display: block;
+}
+
+.react-flow__node:has(.system-node__insurgency-label:hover) {
+  z-index: 9999 !important;
+}
+
+.system-node__incursion-icon {
+  color: #e05a5a;
+  font-size: calc(13px * var(--font-scale, 1));
+  cursor: default;
+  filter: drop-shadow(0 0 3px #e05a5a88);
+  position: relative;
+  animation: skull-flash 1.4s ease-in-out infinite;
+}
+
+.system-node__incursion-tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface-panel);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  padding: 4px 10px;
+  white-space: nowrap;
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #e05a5a;
+  font-weight: 600;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.system-node__incursion-icon:hover .system-node__incursion-tooltip {
+  display: block;
+}
+
+.react-flow__node:has(.system-node__incursion-icon:hover) {
+  z-index: 9999 !important;
+}
+
+.system-node__storm-icon {
+  font-size: calc(13px * var(--font-scale, 1));
+  cursor: default;
+  position: relative;
+  line-height: 1;
+}
+
+.system-node__storm-icon--electric { color: var(--cv-storm-electric); filter: drop-shadow(0 0 3px color-mix(in srgb, var(--cv-storm-electric) 53%, transparent)); }
+.system-node__storm-icon--gamma    { color: var(--cv-storm-gamma);    filter: drop-shadow(0 0 3px color-mix(in srgb, var(--cv-storm-gamma) 53%, transparent)); }
+.system-node__storm-icon--exotic   { color: var(--cv-storm-exotic);   filter: drop-shadow(0 0 3px color-mix(in srgb, var(--cv-storm-exotic) 53%, transparent)); }
+.system-node__storm-icon--plasma   { color: var(--cv-storm-plasma);   filter: drop-shadow(0 0 3px color-mix(in srgb, var(--cv-storm-plasma) 53%, transparent)); }
+.system-node__storm-icon--unknown  { color: var(--cv-storm-unknown); }
+
+.system-node__storm-tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface-panel);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  padding: 5px 10px;
+  white-space: nowrap;
+  font-size: calc(13px * var(--font-scale, 1));
+  color: var(--text-primary);
+  font-weight: 500;
+  pointer-events: none;
+  z-index: 9999;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.system-node__storm-tooltip__title {
+  color: var(--text-bright);
+  font-weight: 600;
+}
+
+.system-node__storm-icon:hover .system-node__storm-tooltip {
+  display: flex;
+}
+
+.react-flow__node:has(.system-node__storm-icon:hover) {
+  z-index: 9999 !important;
+}
+
+.system-node__scout-icon {
+  color: #7ab4f0;
+  font-size: calc(13px * var(--font-scale, 1));
+  cursor: default;
+  filter: drop-shadow(0 0 3px #7ab4f088);
+  position: relative;
+}
+
+.system-node__scout-tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface-panel);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  padding: 4px 10px;
+  white-space: nowrap;
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #7ab4f0;
+  font-weight: 600;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.system-node__scout-icon:hover .system-node__scout-tooltip {
+  display: block;
+}
+
+.react-flow__node:has(.system-node__scout-icon:hover) {
+  z-index: 9999 !important;
+}
+
+.system-node__a0-icon {
+  color: #b8d4ff;
+  font-size: calc(13px * var(--font-scale, 1));
+  cursor: default;
+  filter: drop-shadow(0 0 3px #b8d4ffaa);
+  position: relative;
+}
+
+.system-node__a0-tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface-panel);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  padding: 4px 10px;
+  white-space: nowrap;
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #b8d4ff;
+  font-weight: 600;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.system-node__a0-icon:hover .system-node__a0-tooltip {
+  display: block;
+}
+
+.react-flow__node:has(.system-node__a0-icon:hover) {
+  z-index: 9999 !important;
+}
+
+.system-node__shattered-icon {
+  color: #d9a8ff;
+  font-size: calc(13px * var(--font-scale, 1));
+  cursor: default;
+  filter: drop-shadow(0 0 3px #d9a8ffaa);
+  position: relative;
+}
+
+.system-node__shattered-tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface-panel);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  padding: 4px 10px;
+  white-space: nowrap;
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #d9a8ff;
+  font-weight: 600;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.system-node__shattered-icon:hover .system-node__shattered-tooltip {
+  display: block;
+}
+
+.react-flow__node:has(.system-node__shattered-icon:hover) {
+  z-index: 9999 !important;
+}
+
+.system-node__ice-icon {
+  color: #9ed7f5;
+  font-size: calc(13px * var(--font-scale, 1));
+  cursor: default;
+  filter: drop-shadow(0 0 3px #9ed7f5aa);
+  position: relative;
+  line-height: 1;
+}
+
+.system-node__ice-tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface-panel);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  padding: 4px 10px;
+  white-space: nowrap;
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #9ed7f5;
+  font-weight: 600;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.system-node__ice-icon:hover .system-node__ice-tooltip {
+  display: block;
+}
+
+.react-flow__node:has(.system-node__ice-icon:hover) {
+  z-index: 9999 !important;
+}
+
+.system-node__kill-icon {
+  color: #ff6060;
+  font-size: calc(13px * var(--font-scale, 1));
+  cursor: default;
+  filter: drop-shadow(0 0 3px #ff606088);
+  position: relative;
+}
+
+.system-node__kill-tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface-panel);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  padding: 4px 10px;
+  white-space: nowrap;
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #ff6060;
+  font-weight: 600;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.system-node__kill-icon:hover .system-node__kill-tooltip {
+  display: block;
+}
+
+.react-flow__node:has(.system-node__kill-icon:hover) {
+  z-index: 9999 !important;
+}
+
+.system-node__incursion-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(224, 90, 90, 0.12);
+  border: 1px solid rgba(224, 90, 90, 0.35);
+  border-radius: 4px;
+  padding: 2px 6px;
+  margin: 2px 6px 4px;
+}
+
+.system-node__incursion-logo {
+  width: 16px;
+  height: 16px;
+  border-radius: 2px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.system-node__incursion-label {
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #e05a5a;
+  font-weight: 600;
+  white-space: nowrap;
+  position: relative;
+}
+
+.system-node__incursion-badge-tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface-panel);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  padding: 4px 10px;
+  white-space: nowrap;
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #e0a0a0;
+  font-weight: 500;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.system-node__incursion-label:hover .system-node__incursion-badge-tooltip {
+  display: block;
+}
+
+.react-flow__node:has(.system-node__incursion-label:hover) {
+  z-index: 9999 !important;
+}
+
+/* Full-node invisible handle for easy connect mode */
+div.system-node__easy-handle {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 0;
+  transform: none;
+  border: none;
+  opacity: 0;
+  z-index: 1;
+}
+
+/* Drag grip shown at top of node in easy connect mode */
+.system-node__drag-handle {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  width: 24px;
+  height: 10px;
+  z-index: 2;
+  cursor: grab;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 1px;
+    transition: background 0.15s;
+  }
+
+  &::before { top: 0; }
+  &::after  { top: 6px; }
+
+  &:hover {
+    &::before,
+    &::after { background: rgba(255, 255, 255, 0.6); }
+  }
+
+  &:active { cursor: grabbing; }
+}
+
+.system-node__status-dot {
+  position: absolute;
+  bottom: 8px;
+  right: 10px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+
+  &[data-status='unknown']  { background: var(--cv-status-unknown); }
+  &[data-status='visited']  { background: var(--cv-status-visited); }
+  &[data-status='cleared']  { background: var(--cv-status-cleared); }
+}
+
+.system-handle {
+  width: 8px !important;
+  height: 8px !important;
+  background: #2a3a5a !important;
+  border-color: #4d6a9a !important;
+
+  &:hover { background: #4d9de0 !important; }
+
+  &.system-handle--ghost {
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+}
+
+
+/* ── System label pills (above the node) ─────────────────────────── */
+.system-node__labels {
+  position: absolute;
+  bottom: 100%;
+  left: 6px;
+  margin-bottom: 3px;
+  display: flex;
+  gap: 3px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.system-node__label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 5px 5px 5px 0;
+  font-size: calc(11px * var(--font-scale, 1));
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  white-space: nowrap;
+}
+
+.system-node__label--custom {
+  background: #1a2030;
+  color: #fff;
+  border: 1px solid #33415c;
+}
+
+
+/* ── Single-character quick tag badge (inline, before the system name) ── */
+.system-node__tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  min-width: calc(16px * var(--font-scale, 1));
+  height: calc(16px * var(--font-scale, 1));
+  padding: 0 3px;
+  margin-right: 4px;
+  border-radius: 4px;
+  background: var(--tag-badge, #f5a623);
+  color: #1a1205;
+  font-size: calc(11px * var(--font-scale, 1));
+  font-weight: 800;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
