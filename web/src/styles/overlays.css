@@ -1,0 +1,321 @@
+/* Overlay UI shared across the app (menus, dropdowns, popovers).
+   Relocated verbatim out of App.css (Phase 2 bucket-2 of the CSS
+   refactor). Kept GLOBAL on purpose (these classes are used by many
+   components); imported once in main.tsx. See design-system.md. */
+
+/* ── Map switcher dropdown ───────────────────────────────── */
+.toolbar__map-switcher {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.toolbar__map-name-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  color: var(--text-bright);
+  cursor: pointer;
+  font-size: calc(14px * var(--font-scale, 1));
+  font-weight: 600;
+  padding: 4px 10px;
+  white-space: nowrap;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &:hover { background: var(--surface-overlay); }
+}
+
+.toolbar__caret { font-size: calc(13px * var(--font-scale, 1)); color: var(--text-faintest); flex-shrink: 0; }
+
+.toolbar__map-type {
+  font-size: calc(11px * var(--font-scale, 1));
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 3px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+.toolbar__map-type--solo { background: rgba(74,222,128,0.12); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
+.toolbar__map-type--corp { background: rgba(100,160,255,0.15); color: #7ab0f0; border: 1px solid rgba(100,160,255,0.3); }
+.toolbar__map-type--alliance { background: rgba(245,166,35,0.15); color: #f5a623; border: 1px solid rgba(245,166,35,0.3); }
+.toolbar__map-type--shared { background: rgba(192,132,252,0.15); color: #c084fc; border: 1px solid rgba(192,132,252,0.3); }
+
+.toolbar__locked-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: calc(11px * var(--font-scale, 1));
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #f5b96a;
+  background: rgba(245,185,106,0.10);
+  border: 1px solid rgba(245,185,106,0.35);
+
+  /* Override the generic [data-tooltip] placement — the chip sits near the
+     top-left of the viewport, so the default centered-below tooltip clips
+     off the left edge. Anchor it to the right of the chip instead and let
+     it wrap. */
+  &::after {
+    top: 50%;
+    left: calc(100% + 8px);
+    transform: translateY(-50%);
+    white-space: normal;
+    width: max-content;
+    max-width: 320px;
+    text-transform: none;
+    letter-spacing: 0;
+    line-height: 1.4;
+  }
+}
+
+.toolbar__locked-icon { font-size: calc(12px * var(--font-scale, 1)); }
+
+.map-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  background: var(--surface-well);
+  border: 1px solid var(--border-accent);
+  border-radius: 7px;
+  min-width: 180px;
+  padding: 4px 0;
+  z-index: 2000;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.map-dropdown__item {
+  display: block;
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--text-default);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: calc(13px * var(--font-scale, 1));
+  padding: 7px 14px;
+  text-align: left;
+
+  &:hover { background: #1a2a4a; color: var(--text-bright); }
+
+  &--active { color: #4d9de0; font-weight: 600; }
+  &--action  { color: #4d9de0; font-weight: 600; }
+  &--danger  { color: #e05a5a; }
+}
+
+.map-dropdown__new-wrap {
+  display: block;
+  position: relative;
+}
+
+.map-dropdown__new-wrap--disabled {
+  cursor: not-allowed;
+}
+
+.map-dropdown__new-wrap--disabled .map-dropdown__item {
+  color: var(--text-dim) !important;
+  pointer-events: none;
+}
+
+.map-dropdown__new-wrap--disabled .map-dropdown__item:hover {
+  background: transparent !important;
+  color: var(--text-dim) !important;
+}
+
+.map-dropdown__new-wrap--disabled::after {
+  content: attr(data-disabled-reason);
+  position: absolute;
+  left: calc(100% + 8px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--surface-well);
+  border: 1px solid var(--border-accent);
+  border-radius: 5px;
+  color: #c0ccde;
+  font-size: calc(16px * var(--font-scale, 1));
+  padding: 4px 10px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.1s;
+}
+
+.map-dropdown__new-wrap--disabled:hover::after { opacity: 1; }
+
+.map-dropdown__divider {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 0;
+}
+
+.map-dropdown__badge {
+  display: inline-block;
+  font-size: calc(11px * var(--font-scale, 1));
+  padding: 1px 5px;
+  border-radius: 3px;
+  margin-right: 6px;
+  font-weight: 600;
+  vertical-align: middle;
+}
+.map-dropdown__badge--solo { background: rgba(74,222,128,0.12); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
+.map-dropdown__badge--corp { background: rgba(100,160,255,0.15); color: #7ab0f0; border: 1px solid rgba(100,160,255,0.3); }
+.map-dropdown__badge--alliance { background: rgba(245,166,35,0.15); color: #f5a623; border: 1px solid rgba(245,166,35,0.3); }
+.map-dropdown__badge--shared { background: rgba(192,132,252,0.15); color: #c084fc; border: 1px solid rgba(192,132,252,0.3); }
+.map-dropdown__badge--lock { background: transparent; border: none; font-size: calc(12px * var(--font-scale, 1)); }
+
+.toolbar__actions { display: flex; gap: 8px; }
+
+
+/* ── Tag picker grid (context-menu flyout) ──────────────────────────── */
+.tag-picker {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 4px;
+  padding: 8px;
+}
+
+.tag-picker__cell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid #2a3446;
+  border-radius: 5px;
+  background: #10151f;
+  color: #f5c518;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.1s, border-color 0.1s;
+}
+
+.tag-picker__cell:hover:not(:disabled) {
+  background: #1c2634;
+  border-color: #f5c518;
+}
+
+.tag-picker__cell--active {
+  background: #f5a623;
+  border-color: #f5a623;
+  color: #1a1205;
+}
+
+.tag-picker__cell--clear {
+  color: #8a97ad;
+}
+
+.tag-picker__cell:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+
+/* ── Context menu ────────────────────────────────────────── */
+.context-menu {
+  position: fixed;
+  z-index: 2000;
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+  background: var(--surface-well);
+  border: 1px solid var(--border-accent);
+  user-select: none;
+  border-radius: 7px;
+  min-width: 160px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  pointer-events: all;
+}
+
+.context-menu__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--text-default);
+  font-size: calc(13px * var(--font-scale, 1));
+  font-family: inherit;
+  padding: 7px 14px;
+  text-align: left;
+  cursor: pointer;
+
+  .context-menu--ready &:hover:not(:disabled) { background: #1a2a4a; color: var(--text-bright); }
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
+}
+
+.context-menu__separator {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 0;
+}
+
+.context-menu__check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  color: #4d9de0;
+  flex-shrink: 0;
+}
+
+.context-menu__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  color: #4d9de0;
+  flex-shrink: 0;
+}
+
+.context-menu__icon svg,
+.context-menu__check svg {
+  display: block;
+}
+
+.context-menu__arrow {
+  margin-left: auto;
+  padding-left: 8px;
+  font-size: calc(13px * var(--font-scale, 1));
+  color: var(--text-faintest);
+}
+
+.context-menu__li {
+  position: relative;
+}
+
+.context-menu--sub {
+  position: absolute;
+  top: -4px;
+  left: 100%;
+  z-index: 2001;
+}
+
+.connection-label__jumpgate {
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 700;
+  color: #4db8c4;
+  background: #0d1f22;
+  border: 1px solid #2a6a70;
+  border-radius: 3px;
+  padding: 1px 4px;
+}
+
+/* In-game stargate label ("G") — palette-aware via --cv-conn-gate. */
+.connection-label__gate {
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 700;
+  color: var(--cv-conn-gate);
+  background: color-mix(in srgb, var(--cv-conn-gate) 16%, var(--surface-sunken));
+  border: 1px solid color-mix(in srgb, var(--cv-conn-gate) 45%, var(--surface-sunken));
+  border-radius: 3px;
+  padding: 1px 4px;
+}
+
