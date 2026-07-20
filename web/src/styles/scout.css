@@ -266,7 +266,7 @@
   background: #b06ad0;
 }
 .scout-route__link--ansiblex { background: var(--accent); }  /* jump bridge — a gate, not a hole */
-.scout-route__link--risk { background: #e15b5b; }
+.scout-route__link--risk { background: var(--danger); }
 
 .scout-pane__empty {
   padding: 12px;
@@ -291,14 +291,14 @@
   background: transparent;
   border: 1px solid var(--border);
   border-radius: 4px;
-  color: #8a9ab5;
+  color: var(--text-subtle);
   font-family: inherit;
   font-size: calc(12px * var(--font-scale, 1));
   padding: 2px 8px;
   cursor: pointer;
 }
 .fleet-pane__sort-btn:hover { border-color: var(--accent-alt); color: var(--text-default); }
-.fleet-pane__sort-btn--on { background: #1c2940; border-color: var(--accent-alt); color: #e8f0ff; }
+.fleet-pane__sort-btn--on { background: var(--border); border-color: var(--accent-alt); color: #e8f0ff; }
 .fleet-pane__dir {
   display: inline-flex;
   align-items: center;
@@ -309,7 +309,7 @@
   background: transparent;
   border: 1px solid var(--border);
   border-radius: 4px;
-  color: #8a9ab5;
+  color: var(--text-subtle);
   cursor: pointer;
 }
 .fleet-pane__dir:hover { border-color: var(--accent-alt); color: var(--text-default); }
@@ -323,7 +323,7 @@
   font-size: calc(12px * var(--font-scale, 1));
   padding: 4px 8px;
 }
-.fleet-pane__search::placeholder { color: #5a6a85; }
+.fleet-pane__search::placeholder { color: var(--text-faintest); }
 .fleet-pane__search:focus-visible {
   outline: none;
   border-color: var(--accent-alt);
@@ -362,7 +362,7 @@
   padding: 3px 4px;
   border-radius: 4px;
 }
-.fleet-pane__row:hover { background: #162032; }
+.fleet-pane__row:hover { background: var(--surface-raised); }
 .fleet-pane__avatar { width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0; }
 .fleet-pane__name {
   flex: 1;
@@ -375,7 +375,7 @@
 }
 .fleet-pane__loc {
   max-width: 42%;
-  color: #8aa0bd;
+  color: var(--text-subtle);
   font-size: calc(12px * var(--font-scale, 1));
   white-space: nowrap;
   overflow: hidden;

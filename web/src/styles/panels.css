@@ -77,7 +77,7 @@
   align-self: stretch;
   width: 18px;
   margin-top: 12px;
-  background: #0d1421;
+  background: var(--surface-panel);
   border: 1px solid var(--border);
   border-radius: 4px;
   color: var(--text-dim);
@@ -85,7 +85,7 @@
   font-size: 14px;
   line-height: 1;
 
-  &:hover { background: #16213a; color: #a0ccf8; }
+  &:hover { background: var(--surface-overlay); color: #a0ccf8; }
 }
 
 .system-panel__left {
@@ -333,7 +333,7 @@
   gap: 4px;
   flex: 1;
   font-size: calc(12px * var(--font-scale, 1));
-  color: #8a98b8;
+  color: var(--text-subtle);
 }
 .roller__mass input {
   width: 100%;
@@ -346,7 +346,7 @@
   align-items: center;
   gap: 6px;
   font-size: calc(13px * var(--font-scale, 1));
-  color: #8a98b8;
+  color: var(--text-subtle);
 }
 .roll-side strong { color: #cdd6e6; }
 .roll-side__dot {
@@ -464,7 +464,7 @@
   position: relative;
   transition: background 0.15s, border-color 0.15s;
 
-  &:hover { background: #1a2440; border-color: var(--surface-muted); }
+  &:hover { background: var(--surface-overlay); border-color: var(--surface-muted); }
 }
 
 .sys-info__chain-fx__chip--current {

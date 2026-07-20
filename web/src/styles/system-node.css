@@ -1121,9 +1121,9 @@ div.system-node__easy-handle {
 }
 
 .system-node__label--custom {
-  background: #1a2030;
+  background: var(--surface-raised);
   color: #fff;
-  border: 1px solid #33415c;
+  border: 1px solid var(--border-strong);
 }
 
 

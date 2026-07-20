@@ -12,7 +12,7 @@
     top: calc(100% + 6px);
     left: 50%;
     transform: translateX(-50%);
-    background: #101828;
+    background: var(--surface-panel);
     color: var(--text-primary-alt);
     font-size: calc(12px * var(--font-scale, 1));
     white-space: nowrap;

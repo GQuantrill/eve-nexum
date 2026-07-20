@@ -116,7 +116,7 @@
 
 .stats-modal__row:last-child { border-bottom: none; }
 
-.stats-modal__row:nth-child(even) { background: #080c14; }
+.stats-modal__row:nth-child(even) { background: var(--surface-sunken); }
 
 .stats-modal__row td {
   padding: 7px 10px;
@@ -201,7 +201,7 @@
   align-items: center;
   gap: 8px;
   font-size: calc(13px * var(--font-scale, 1));
-  color: #6a7a98;
+  color: var(--text-faint);
   cursor: pointer;
   user-select: none;
 }

@@ -57,7 +57,7 @@
 
 .sectionCaret {
   font-size: 9px;
-  color: #5a6a85;
+  color: var(--text-faintest);
   width: 9px;
   text-align: center;
 }
@@ -69,7 +69,7 @@
   align-self: flex-start;
   align-items: center;
   gap: 4px;
-  background: #0d1421;
+  background: var(--surface-panel);
   border: 1px solid var(--surface-hover);
   border-radius: 4px;
   padding: 3px 8px;
@@ -88,7 +88,7 @@
   cursor: pointer;
   transition: color 0.15s, border-color 0.15s, transform 0.4s ease;
 }
-.refreshBtn:hover     { color: #c0d0e0; border-color: var(--surface-muted); }
+.refreshBtn:hover     { color: var(--text-secondary); border-color: var(--surface-muted); }
 .refreshBtn:disabled  { cursor: wait; opacity: 0.7; }
 .refreshBtnBusy     { animation: sys-info-refresh-spin 0.8s linear infinite; }
 .refreshBtnOk       { color: var(--success-bright); border-color: rgba(74,222,128,0.35); }
@@ -158,7 +158,7 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  background: #0d1421;
+  background: var(--surface-panel);
   border: 1px solid var(--surface-hover);
   border-radius: 4px;
   padding: 3px 8px;
@@ -172,11 +172,11 @@
 }
 
 .celestialIconSun {
-  color: #f5c542;
+  color: var(--warning-gold);
 }
 
 .celestialLabel {
-  color: #8090a8;
+  color: var(--text-muted);
   font-size: calc(13px * var(--font-scale, 1));
 }
 
@@ -193,7 +193,7 @@
 
 .effect {
   font-style: italic;
-  color: #7a8aaa;
+  color: var(--text-quiet);
   font-size: calc(13px * var(--font-scale, 1));
 }
 
@@ -248,7 +248,7 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  background: #0d1421;
+  background: var(--surface-panel);
   border: 1px solid var(--border-accent);
   border-radius: 4px;
   padding: 2px 8px;
@@ -276,7 +276,7 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  background: #0d1421;
+  background: var(--surface-panel);
   border: 1px solid var(--surface-hover);
   border-radius: 6px;
   padding: 6px 8px;
@@ -330,7 +330,7 @@
   align-items: center;
   gap: 10px;
   flex: 1;
-  background: #0d1421;
+  background: var(--surface-panel);
   border: 1px solid var(--surface-hover);
   border-radius: 6px;
   padding: 8px 10px;

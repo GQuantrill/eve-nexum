@@ -83,7 +83,7 @@
 }
 
 .prefix {
-  color: #6b7a99;
+  color: var(--text-faint);
   font-family: monospace;
   font-size: calc(11px * var(--font-scale, 1));
   flex-shrink: 0;
@@ -110,7 +110,7 @@
 
 .scopeRead {
   background: rgba(100,160,255,0.12);
-  color: #7ab0f0;
+  color: var(--accent-light);
   border: 1px solid rgba(100,160,255,0.3);
 }
 
@@ -131,7 +131,7 @@
   flex-direction: column;
   gap: 1px;
   text-align: right;
-  color: #6b7a99;
+  color: var(--text-faint);
   font-size: calc(10px * var(--font-scale, 1));
   flex-shrink: 0;
 }

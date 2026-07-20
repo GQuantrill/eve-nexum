@@ -176,7 +176,7 @@
 .chain-step__warp { display: inline-flex; align-items: center; gap: 4px; }
 .chain-step__wh {
   padding: 0 5px; border-radius: 4px;
-  background: #161d2e; color: var(--text-secondary);
+  background: var(--surface-raised); color: var(--text-secondary);
   font-family: monospace; font-size: calc(10px * var(--font-scale, 1));
 }
 .chain-step__broken { display: inline-flex; align-items: center; gap: 4px; color: var(--cv-conn-expired); }
@@ -249,7 +249,7 @@
   border-radius: 3px;
   font-size: calc(11px * var(--font-scale, 1));
   font-variant-numeric: tabular-nums;
-  background: #14182a;
+  background: var(--surface-panel);
   border: 1px solid var(--border);
   color: var(--text-default);
   line-height: 1.4;
@@ -328,7 +328,7 @@
   padding: 14px 12px;
 }
 
-.admin-page__stat-card--accent { border-color: var(--border-accent-strong); background: #0a1426; }
+.admin-page__stat-card--accent { border-color: var(--border-accent-strong); background: var(--surface-panel); }
 
 .admin-page__stat-card-value {
   font-size: calc(22px * var(--font-scale, 1));

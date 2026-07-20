@@ -15,7 +15,7 @@
   align-items: center;
   justify-content: space-between;
   font-size: calc(16px * var(--font-scale, 1));
-  color: #6a7a98;
+  color: var(--text-faint);
   padding: 2px 4px 6px;
 }
 
@@ -32,7 +32,7 @@
   padding: 6px 14px;
   transition: background 120ms ease, color 120ms ease;
 
-  &:hover { background: #1e2a44; color: var(--text-bright); }
+  &:hover { background: var(--border); color: var(--text-bright); }
 }
 
 .npcToggle {
@@ -42,7 +42,7 @@
   font-size: calc(11px * var(--font-scale, 1));
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #6a7a98;
+  color: var(--text-faint);
   cursor: pointer;
   user-select: none;
 }
@@ -172,7 +172,7 @@
 .count[data-tip]:hover::after { opacity: 1; }
 
 .nameSuffix {
-  color: #8a98b8;
+  color: var(--text-subtle);
   font-weight: 600;
 }
 
@@ -326,5 +326,5 @@
 
 .time {
   font-size: calc(13px * var(--font-scale, 1));
-  color: #6a7a98;
+  color: var(--text-faint);
 }

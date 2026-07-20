@@ -5,7 +5,7 @@
    when an element carries both classes (unchanged behaviour). */
 
 .icon-btn--danger {
-  color: #e25a5a;
+  color: var(--danger);
   &:hover { color: #ff6b6b; }
 }
 

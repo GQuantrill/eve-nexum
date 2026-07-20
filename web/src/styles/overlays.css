@@ -40,7 +40,7 @@
   vertical-align: middle;
 }
 .toolbar__map-type--solo { background: rgba(74,222,128,0.12); color: var(--success-bright); border: 1px solid rgba(74,222,128,0.3); }
-.toolbar__map-type--corp { background: rgba(100,160,255,0.15); color: #7ab0f0; border: 1px solid rgba(100,160,255,0.3); }
+.toolbar__map-type--corp { background: rgba(100,160,255,0.15); color: var(--accent-light); border: 1px solid rgba(100,160,255,0.3); }
 .toolbar__map-type--alliance { background: rgba(245,166,35,0.15); color: var(--warning-alt); border: 1px solid rgba(245,166,35,0.3); }
 .toolbar__map-type--shared { background: rgba(192,132,252,0.15); color: var(--accent-violet); border: 1px solid rgba(192,132,252,0.3); }
 
@@ -165,7 +165,7 @@
   vertical-align: middle;
 }
 .map-dropdown__badge--solo { background: rgba(74,222,128,0.12); color: var(--success-bright); border: 1px solid rgba(74,222,128,0.3); }
-.map-dropdown__badge--corp { background: rgba(100,160,255,0.15); color: #7ab0f0; border: 1px solid rgba(100,160,255,0.3); }
+.map-dropdown__badge--corp { background: rgba(100,160,255,0.15); color: var(--accent-light); border: 1px solid rgba(100,160,255,0.3); }
 .map-dropdown__badge--alliance { background: rgba(245,166,35,0.15); color: var(--warning-alt); border: 1px solid rgba(245,166,35,0.3); }
 .map-dropdown__badge--shared { background: rgba(192,132,252,0.15); color: var(--accent-violet); border: 1px solid rgba(192,132,252,0.3); }
 .map-dropdown__badge--lock { background: transparent; border: none; font-size: calc(12px * var(--font-scale, 1)); }
@@ -198,7 +198,7 @@
 }
 
 .tag-picker__cell:hover:not(:disabled) {
-  background: #1c2634;
+  background: var(--surface-hover);
   border-color: #f5c518;
 }
 

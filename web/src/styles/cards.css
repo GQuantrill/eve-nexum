@@ -14,7 +14,7 @@
 }
 
 .info-card {
-  background: #080e1a;
+  background: var(--surface-base);
   border: 1px solid var(--border);
   border-radius: 6px;
   overflow: hidden;
@@ -80,7 +80,7 @@
   padding: 0 2px;
   user-select: none;
 
-  &:hover { color: #6a7a98; }
+  &:hover { color: var(--text-faint); }
   &:active { cursor: grabbing; }
 }
 
@@ -169,8 +169,8 @@
   bottom: 3px;
   width: 7px;
   height: 7px;
-  border-right: 2px solid #3a4a62;
-  border-bottom: 2px solid #3a4a62;
+  border-right: 2px solid var(--surface-muted);
+  border-bottom: 2px solid var(--surface-muted);
 }
 
 .notes-editor {
@@ -187,7 +187,7 @@
     border-bottom: 1px solid var(--border);
 
     li button {
-      color: #6a7a98;
+      color: var(--text-faint);
       &:hover { color: var(--text-default); background: var(--surface-overlay); }
     }
 

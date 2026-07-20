@@ -103,7 +103,7 @@
 }
 
 .mTable tbody tr:last-child { border-bottom: none; }
-.mTable tbody tr:nth-child(even) { background: #080c14; }
+.mTable tbody tr:nth-child(even) { background: var(--surface-sunken); }
 
 .mTable td {
   padding: 8px 10px;
@@ -393,7 +393,7 @@
 /* ---- Admin Discord tab ---- */
 .dcHint {
   font-size: calc(13px * var(--font-scale, 1));
-  color: #8090a8;
+  color: var(--text-muted);
   max-width: 640px;
   line-height: 1.5;
   margin: 6px 0 18px;
@@ -413,7 +413,7 @@
   font-size: calc(14px * var(--font-scale, 1));
   color: var(--text-primary-alt);
   margin: 18px 0 4px;
-  border-top: 1px solid #1a2436;
+  border-top: 1px solid var(--surface-hover);
   padding-top: 14px;
 }
 .dcSublabel {
@@ -434,7 +434,7 @@
   background: transparent;
   border: 1px solid #2e3a52;
   border-radius: 999px;
-  color: #8a9ab5;
+  color: var(--text-subtle);
   font-family: inherit;
   font-size: calc(13px * var(--font-scale, 1));
   padding: 3px 12px;
@@ -453,7 +453,7 @@
   align-items: center;
   gap: 8px;
   font-size: calc(14px * var(--font-scale, 1));
-  color: #c8d2e6;
+  color: var(--text-default);
   margin: 6px 0;
   cursor: pointer;
 }
@@ -509,7 +509,7 @@
   list-style: none;
   margin: 2px 0 0;
   padding: 4px;
-  background: #0e1626;
+  background: var(--surface-panel);
   border: 1px solid var(--border);
   border-radius: 6px;
   max-width: 520px;
@@ -520,7 +520,7 @@
   text-align: left;
   background: none;
   border: none;
-  color: #c8d2e6;
+  color: var(--text-default);
   padding: 6px 8px;
   border-radius: 4px;
   cursor: pointer;
@@ -531,7 +531,7 @@
 /* ── Admin: login access (allow-list) tab ──────────────────────────────── */
 .acIntro {
   font-size: calc(13px * var(--font-scale, 1));
-  color: #8090a8;
+  color: var(--text-muted);
   max-width: 720px;
   line-height: 1.5;
   margin: 6px 0 12px;
@@ -543,7 +543,7 @@
   line-height: 1.5;
   margin: 0 0 20px;
   padding: 9px 12px;
-  background: #0d1524;
+  background: var(--surface-panel);
   border: 1px solid var(--border);
   border-left: 3px solid var(--border-accent-strong);
   border-radius: 5px;
@@ -566,7 +566,7 @@
 .acSyncStatusErr { color: #e06a6a; }
 .acHint {
   font-size: calc(12px * var(--font-scale, 1));
-  color: #8090a8;
+  color: var(--text-muted);
 }
 /* Helper lines beneath the buttons sit tight together as a block. */
 .acSync .acHint {
@@ -607,7 +607,7 @@
 .acInput:focus { border-color: var(--accent-bright); }
 .acMatch {
   font-size: calc(13px * var(--font-scale, 1));
-  color: #8090a8;
+  color: var(--text-muted);
 }
 .acMatchOk { color: var(--success-bright); }
 .acEvewho {
@@ -621,7 +621,7 @@
 .acStandings {
   margin: 0 0 18px;
   padding: 12px 14px;
-  background: #0d1524;
+  background: var(--surface-panel);
   border: 1px solid var(--border);
   border-radius: 6px;
   max-width: 720px;
@@ -646,7 +646,7 @@
   color: var(--text-secondary);
 }
 .acThreshold label { display: flex; align-items: center; gap: 5px; cursor: pointer; }
-.acThresholdLabel { color: #8090a8; }
+.acThresholdLabel { color: var(--text-muted); }
 .dcActions {
   display: flex;
   align-items: center;

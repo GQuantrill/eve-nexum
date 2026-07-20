@@ -75,8 +75,8 @@
   gap: 5px;
   padding: 3px 6px;
   border-radius: 5px;
-  background: #1a2030;
-  border: 1px solid #33415c;
+  background: var(--surface-raised);
+  border: 1px solid var(--border-strong);
   font-size: calc(12px * var(--font-scale, 1));
   color: #dbe4f3;
 }
@@ -89,7 +89,7 @@
   cursor: pointer;
   padding: 0;
 }
-.custom-label-dialog__chip-x:hover { color: #e25a5a; }
+.custom-label-dialog__chip-x:hover { color: var(--danger); }
 /* Text colour is set inline per-chip (black/white for contrast); the X inherits
    it so it stays legible on light backgrounds too. */
 .custom-label-dialog__chip--coloured .custom-label-dialog__chip-x { color: inherit; opacity: 0.7; }
@@ -128,7 +128,7 @@
   width: 34px;
   height: 24px;
   padding: 0;
-  border: 1px solid #33415c;
+  border: 1px solid var(--border-strong);
   border-radius: 4px;
   background: none;
   cursor: pointer;
@@ -163,13 +163,13 @@
   align-items: center;
   justify-content: center;
   height: 34px;
-  background: #141a26;
+  background: var(--surface-panel);
   border: 1px solid #283248;
   border-radius: 5px;
   color: var(--text-default);
   cursor: pointer;
 }
-.custom-label-dialog__icon:hover { background: #1e2738; border-color: #4a5a78; color: #fff; }
+.custom-label-dialog__icon:hover { background: var(--surface-hover); border-color: #4a5a78; color: #fff; }
 
 /* Read-only display of a generated share URL. Monospace so the UUID
    tail stays scannable; truncated with ellipsis if the origin is long. */
@@ -177,7 +177,7 @@
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
   font-size: calc(11px * var(--font-scale, 1));
   color: var(--text-primary);
-  background: #08101a;
+  background: var(--surface-base);
   border: 1px solid var(--border);
   border-radius: 4px;
   padding: 6px 8px;
@@ -217,7 +217,7 @@
   margin: 2px 0 0;
   font-size: calc(11px * var(--font-scale, 1));
   line-height: 1.4;
-  color: #8a98b0;
+  color: var(--text-subtle);
 }
 
 .map-sidebar__status {
@@ -279,7 +279,7 @@
 .map-sidebar__brand {
   padding: 2px 2px 12px;
   margin-bottom: 8px;
-  border-bottom: 1px solid #1a2436;
+  border-bottom: 1px solid var(--surface-hover);
 }
 .map-sidebar__brand-top {
   display: flex;
@@ -342,7 +342,7 @@
   overflow-y: auto;
   padding: 8px 18px 14px;
 }
-.patchnotes__release { padding: 12px 0; border-bottom: 1px solid #1a2436; }
+.patchnotes__release { padding: 12px 0; border-bottom: 1px solid var(--surface-hover); }
 .patchnotes__release:last-child { border-bottom: none; }
 .patchnotes__release-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 6px; }
 .patchnotes__version {
@@ -368,7 +368,7 @@
   width: 100%;
   padding: 8px 10px;
   margin-bottom: 4px;
-  background: #11192b;
+  background: var(--surface-panel);
   border: 1px solid var(--border);
   border-radius: 6px;
   color: var(--text-secondary);
@@ -376,7 +376,7 @@
   font-size: calc(13px * var(--font-scale, 1));
   font-weight: 600;
 
-  &:hover { background: #16213a; border-color: var(--border-accent); color: #a0ccf8; }
+  &:hover { background: var(--surface-overlay); border-color: var(--border-accent); color: #a0ccf8; }
 }
 
 
@@ -429,17 +429,17 @@
   font-size: calc(11px * var(--font-scale, 1));
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #6b7a99;
+  color: var(--text-faint);
   padding-bottom: 4px;
   border-bottom: 1px solid var(--border);
   margin-bottom: 4px;
   /* Solid chip, distinctly darker than the modal, so connectors tuck behind. */
-  background: #070a10;
+  background: var(--surface-sunken);
 }
 
 .whchart__cell {
   font-size: calc(12px * var(--font-scale, 1));
-  color: #5a6886;
+  color: var(--text-faintest);
   padding: 2px 4px;
   white-space: nowrap;
   overflow: hidden;
@@ -447,7 +447,7 @@
   transition: color 0.1s;
   /* Solid chip (darker than the modal) so transiting lines are occluded by the
      cell box rather than drawn over the glyphs — lines only show in the gaps. */
-  background: #070a10;
+  background: var(--surface-sunken);
 }
 
 /* Highlighted target rows for the active code. */
@@ -466,13 +466,13 @@
 .whchart__code {
   font-family: monospace;
   font-size: calc(12px * var(--font-scale, 1));
-  color: #8a96b4;
+  color: var(--text-subtle);
   padding: 1px 4px;
   border-radius: 3px;
   cursor: pointer;
   break-inside: avoid;
   /* Solid chip (darker than the modal) so connectors tuck behind the codes. */
-  background: #070a10;
+  background: var(--surface-sunken);
 }
 
 .whchart__code:hover { background: var(--surface-raised); color: var(--text-primary); }
@@ -524,15 +524,15 @@
   background: transparent; border: 1px solid var(--border); border-radius: 5px;
   cursor: pointer; font-family: inherit; padding: 5px 0; color: var(--text-faintest);
 }
-.standings-viewer__tab:hover { background: #131c30; }
+.standings-viewer__tab:hover { background: var(--surface-raised); }
 .standings-viewer__tab-label { font-size: calc(13px * var(--font-scale, 1)); font-weight: 600; }
 .standings-viewer__tab-count { font-size: calc(10px * var(--font-scale, 1)); opacity: 0.7; }
-.standings-viewer__tab--active { background: #131c30; border-color: var(--border-accent-strong); }
+.standings-viewer__tab--active { background: var(--surface-raised); border-color: var(--border-accent-strong); }
 
 /* Band accent colours — reuse the app's colour-vision standing vars. */
 .standings-viewer__band--excellent { color: var(--cv-stand-friendly); }
 .standings-viewer__band--good      { color: var(--cv-stand-good); }
-.standings-viewer__band--neutral   { color: #8a97b0; }
+.standings-viewer__band--neutral   { color: var(--text-subtle); }
 .standings-viewer__band--bad       { color: var(--cv-stand-bad); }
 .standings-viewer__band--terrible  { color: var(--cv-stand-hostile); }
 .standings-viewer__tab--active.standings-viewer__band--excellent { border-color: color-mix(in srgb, var(--cv-stand-friendly) 55%, transparent); }
@@ -560,11 +560,11 @@
   font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; letter-spacing: 0.04em;
 }
 .standings-viewer__table tbody td {
-  padding: 6px 16px; border-bottom: 1px solid #151d30; color: var(--text-default);
+  padding: 6px 16px; border-bottom: 1px solid var(--surface-raised); color: var(--text-default);
 }
-.standings-viewer__table tbody tr:hover td { background: #131c30; }
+.standings-viewer__table tbody tr:hover td { background: var(--surface-raised); }
 .standings-viewer__col-name { display: flex; align-items: center; gap: 8px; }
 .standings-viewer__logo { width: 24px; height: 24px; border-radius: 3px; flex-shrink: 0; }
 .standings-viewer__name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.standings-viewer__col-ticker { color: #8a97b0; white-space: nowrap; }
+.standings-viewer__col-ticker { color: var(--text-subtle); white-space: nowrap; }
 .standings-viewer__col-standing { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }

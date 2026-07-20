@@ -69,7 +69,7 @@
 .tooltip {
   position: absolute;
   transform: translate(-50%, -100%) translateY(-6px);
-  background: #101828;
+  background: var(--surface-panel);
   border: 1px solid #1e2e48;
   border-radius: 4px;
   padding: 3px 7px;
