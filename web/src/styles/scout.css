@@ -1,0 +1,407 @@
+/* Scout / route connection rows (A0, Closest Systems, Fleet, Scout panes).
+   Relocated verbatim out of App.css (Phase 2 bucket-2). Kept GLOBAL;
+   imported once in main.tsx. See design-system.md. */
+
+/* ── Scout connection rows ───────────────────────────────── */
+.scout-pane {
+  display: flex;
+  flex-direction: column;
+}
+
+.scout-pane__sort {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--surface-raised);
+}
+.scout-pane__sort-label {
+  font-size: calc(12px * var(--font-scale, 1));
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.scout-pane__sort-select {
+  flex: 1;
+  background: var(--surface-base);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-default);
+  font-family: inherit;
+  font-size: calc(13px * var(--font-scale, 1));
+  padding: 3px 6px;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+.scout-pane__sort-select:hover { border-color: #4d9de0; }
+.scout-pane__sort-select:focus-visible {
+  outline: none;
+  border-color: #4d9de0;
+  box-shadow: 0 0 0 2px rgba(77, 157, 224, 0.25);
+}
+.scout-pane__sort-select option {
+  background: var(--surface-well);
+  color: var(--text-default);
+}
+
+.scout-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px;
+  border-bottom: 1px solid var(--surface-raised);
+  font-size: calc(13px * var(--font-scale, 1));
+}
+
+.scout-row:last-child { border-bottom: none; }
+
+.scout-row__sys {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.scout-row__name {
+  color: var(--text-default);
+  font-weight: 500;
+  font-family: monospace;
+}
+
+.scout-row__class {
+  color: var(--text-faint);
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 600;
+}
+
+.scout-row__class--a0 {
+  color: #b8d4ff;
+}
+
+.scout-row__class--home {
+  color: #f0c040;
+}
+
+/* Home indicator on a Closest Systems row — inline-flex so the SVG
+   sits centred next to the system name without a baseline gap. */
+.scout-row__home {
+  display: inline-flex;
+  align-items: center;
+
+  svg { display: block; }
+}
+
+/* "Add System" affordance at the bottom of the Closest Systems pane. */
+.scout-pane__add {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+
+  svg { display: block; }
+}
+
+.scout-pane__add-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.scout-pane__add-input {
+  flex: 1;
+  background: var(--surface-well);
+  border: 1px solid var(--border-accent);
+  border-radius: 4px;
+  color: var(--text-default);
+  font-size: calc(13px * var(--font-scale, 1));
+  padding: 4px 8px;
+
+  &:focus { border-color: #5a9af8; outline: none; }
+}
+
+.scout-pane__add-results {
+  /* Portaled to <body>; inline style sets `position: fixed` + top/left/width */
+  z-index: 2000;
+  background: var(--surface-well);
+  border: 1px solid var(--border-accent);
+  border-radius: 4px;
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+  max-height: 240px;
+  overflow-y: auto;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.45);
+}
+
+.scout-pane__add-result {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 10px;
+  cursor: pointer;
+  font-size: calc(13px * var(--font-scale, 1));
+}
+
+.scout-pane__add-result--active {
+  background: #1a2a4a;
+}
+
+.scout-pane__add-result--disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.scout-pane__add-result-name   { color: var(--text-bright); }
+.scout-pane__add-result-region { color: #8a9ab8; font-size: calc(12px * var(--font-scale, 1)); }
+
+.scout-pane__add-empty {
+  /* Portaled — see .scout-pane__add-results */
+  z-index: 2000;
+  background: var(--surface-well);
+  border: 1px solid var(--border-accent);
+  border-radius: 4px;
+  color: #8a9ab8;
+  font-size: calc(12px * var(--font-scale, 1));
+  padding: 6px 10px;
+}
+
+/* Drag-handle for reorderable scout rows (Closest Systems). Sits before
+   the system name; cursor flips to grab so the affordance is obvious. */
+.scout-row__drag {
+  background: transparent;
+  border: none;
+  color: var(--text-faintest);
+  cursor: grab;
+  padding: 0 4px 0 0;
+  font-size: calc(14px * var(--font-scale, 1));
+  line-height: 1;
+
+  &:hover { color: var(--text-default); }
+  &:active { cursor: grabbing; }
+}
+
+.scout-row__time {
+  margin-left: auto;
+  color: #8a9ab8;
+  font-size: calc(13px * var(--font-scale, 1));
+}
+
+.scout-row__region {
+  color: var(--text-faint);
+  font-size: calc(13px * var(--font-scale, 1));
+}
+
+.scout-row__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #8a9ab8;
+  font-size: calc(13px * var(--font-scale, 1));
+  margin-top: 1px;
+}
+
+.scout-row__wh {
+  font-family: monospace;
+  color: #7ab4f0;
+}
+
+.scout-row__size {
+  color: #c0a878;
+}
+
+.scout-row__sig {
+  font-family: monospace;
+  margin-left: auto;
+  color: var(--text-faint);
+}
+
+.scout-row__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.scout-row__jumps {
+  color: #7ab4f0;
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 600;
+  margin-right: auto;
+}
+
+.scout-row__btn {
+  font-size: calc(13px * var(--font-scale, 1));
+}
+
+.scout-route {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin-top: 4px;
+}
+
+.scout-route__square {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 1px;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+/* A k-space square can be right-clicked to set an in-game destination/waypoint. */
+.scout-route__square--kspace { cursor: context-menu; }
+
+/* Shortcut hop (wormhole / Thera / Turnur) in the gap before the square it
+   leads into — a small purple diamond, red when the hole is EOL/critical. */
+.scout-route__link {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  align-self: center;
+  transform: rotate(45deg);
+  border-radius: 1px;
+  background: #b06ad0;
+}
+.scout-route__link--ansiblex { background: #5a9af8; }  /* jump bridge — a gate, not a hole */
+.scout-route__link--risk { background: #e15b5b; }
+
+.scout-pane__empty {
+  padding: 12px;
+  color: var(--text-faint);
+  font-size: calc(13px * var(--font-scale, 1));
+  text-align: center;
+}
+
+/* Fleet roster panel. The list scrolls (fleets run up to 255 pilots) so the
+   sidebar never balloons; the toolbar stays pinned above it. */
+.fleet-pane { display: flex; flex-direction: column; }
+.fleet-pane__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--surface-raised);
+}
+.fleet-pane__sortby { display: inline-flex; gap: 4px; }
+.fleet-pane__sort-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: #8a9ab5;
+  font-family: inherit;
+  font-size: calc(12px * var(--font-scale, 1));
+  padding: 2px 8px;
+  cursor: pointer;
+}
+.fleet-pane__sort-btn:hover { border-color: #4d9de0; color: var(--text-default); }
+.fleet-pane__sort-btn--on { background: #1c2940; border-color: #4d9de0; color: #e8f0ff; }
+.fleet-pane__dir {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 22px;
+  flex-shrink: 0;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: #8a9ab5;
+  cursor: pointer;
+}
+.fleet-pane__dir:hover { border-color: #4d9de0; color: var(--text-default); }
+.fleet-pane__search {
+  margin: 6px 8px 0;
+  background: var(--surface-base);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-default);
+  font-family: inherit;
+  font-size: calc(12px * var(--font-scale, 1));
+  padding: 4px 8px;
+}
+.fleet-pane__search::placeholder { color: #5a6a85; }
+.fleet-pane__search:focus-visible {
+  outline: none;
+  border-color: #4d9de0;
+  box-shadow: 0 0 0 2px rgba(77, 157, 224, 0.25);
+}
+.fleet-pane__list {
+  list-style: none;
+  margin: 0;
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  max-height: 340px;
+  overflow-y: auto;
+  /* Firefox: thin themed bar (matches the app's #2e4a6a accent). */
+  scrollbar-width: thin;
+  scrollbar-color: #2e4a6a transparent;
+}
+/* WebKit (Chrome/Safari/Edge): styling the bar makes macOS show a classic,
+   always-present scrollbar when the list overflows instead of the auto-hiding
+   overlay — and keeps it in keeping with the panel theme. No bar shows when the
+   content fits, since overflow stays auto. */
+.fleet-pane__list::-webkit-scrollbar { width: 10px; }
+.fleet-pane__list::-webkit-scrollbar-track { background: transparent; }
+.fleet-pane__list::-webkit-scrollbar-thumb {
+  background: #2e4a6a;
+  border-radius: 5px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+.fleet-pane__list::-webkit-scrollbar-thumb:hover { background: #3d5f86; }
+.fleet-pane__row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 4px;
+  border-radius: 4px;
+}
+.fleet-pane__row:hover { background: #162032; }
+.fleet-pane__avatar { width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0; }
+.fleet-pane__name {
+  flex: 1;
+  min-width: 0;
+  color: var(--text-default);
+  font-size: calc(13px * var(--font-scale, 1));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.fleet-pane__loc {
+  max-width: 42%;
+  color: #8aa0bd;
+  font-size: calc(12px * var(--font-scale, 1));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.fleet-pane__jumps {
+  flex-shrink: 0;
+  color: #9fb3cd;
+  font-size: calc(12px * var(--font-scale, 1));
+  text-align: right;
+  min-width: 48px;
+}
+
+.scout-pane__note {
+  padding: 6px 8px;
+  font-size: calc(13px * var(--font-scale, 1));
+  color: var(--text-faint);
+  font-style: italic;
+  border-bottom: 1px solid var(--surface-raised);
+}
+/* Shown when jump counts are computed from the pilot's last known system
+   (offline) rather than their live location — flag it so stale jumps are
+   obvious. */
+.scout-pane__note--lastknown {
+  color: #c8a45a;
+  font-style: normal;
+  background: rgba(200, 164, 90, 0.08);
+}
+

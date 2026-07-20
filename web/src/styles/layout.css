@@ -1,0 +1,228 @@
+/* App layout shell, workspace sidebar, map-canvas frame.
+   Relocated verbatim out of App.css (Phase 2 bucket-2). Kept GLOBAL;
+   imported once in main.tsx. See design-system.md. */
+
+/* ── Layout ─────────────────────────────────────────────── */
+.layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #08090f;
+  color: var(--text-default);
+  font-family: 'Inter', system-ui, sans-serif;
+  user-select: none;
+}
+
+/* Shared-view header strip — replaces the regular Toolbar when a guest
+   loads a read-only map link. Slim, just enough to identify the map and
+   credit the owner. */
+.share-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px;
+  height: 36px;
+  background: var(--surface-well);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #8693ad;
+}
+
+.share-header__title {
+  font-weight: 600;
+  color: var(--text-bright);
+}
+
+.share-header__meta strong {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.share-header__sep {
+  color: var(--border-strong);
+}
+
+/* Right-aligned recruit button. margin-left:auto pulls it to the edge so
+   the meta cluster on the left stays naturally packed. */
+.share-header__cta {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  background: #1d3a6b;
+  border: 1px solid var(--border-accent);
+  border-radius: 4px;
+  color: var(--text-bright);
+  text-decoration: none;
+  font-size: calc(12px * var(--font-scale, 1));
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  transition: background 120ms ease, border-color 120ms ease;
+}
+
+.share-header__cta:hover {
+  background: var(--border-accent);
+  border-color: #5a9af8;
+}
+
+/* Branded error card shown when a share link is expired or not found. */
+.share-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: #08090f;
+  color: var(--text-default);
+  font-family: 'Inter', system-ui, sans-serif;
+  padding: 16px;
+}
+
+.share-error__card {
+  max-width: 460px;
+  background: var(--surface-well);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 28px 32px;
+  text-align: center;
+}
+
+.share-error__title {
+  font-size: calc(18px * var(--font-scale, 1));
+  font-weight: 600;
+  color: var(--text-bright);
+  margin-bottom: 16px;
+}
+
+.share-error__body {
+  font-size: calc(14px * var(--font-scale, 1));
+  color: #c0ccde;
+  line-height: 1.5;
+  margin: 8px 0;
+}
+
+.share-error__hint {
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #7a8aa8;
+  margin-top: 16px;
+}
+
+.layout__body {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  overflow: hidden;
+}
+
+.layout__main {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  position: relative; /* anchor for .map-sidebar */
+}
+
+
+/* ── Workspace sidebar ───────────────────────────────────── */
+.sidebar {
+  width: 18vw;
+  min-width: 180px;
+  max-width: 300px;
+  background: var(--surface-well);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.sidebar__resize-handle {
+  position: absolute;
+  top: 0;
+  width: 6px;
+  height: 100%;
+  cursor: col-resize;
+  z-index: 10;
+  touch-action: none;
+}
+
+.sidebar__resize-handle--left  { right: -3px; }
+.sidebar__resize-handle--right { left: -3px; }
+
+.sidebar__resize-handle:hover,
+.sidebar__resize-handle:active {
+  background: rgba(122, 180, 240, 0.25);
+}
+
+.sidebar--left {
+  order: -1;
+  border-right: 1px solid var(--border);
+}
+
+.sidebar--right {
+  order: 1;
+  border-left: 1px solid var(--border);
+}
+
+.sidebar--collapsed {
+  width: 28px;
+  min-width: 28px;
+  max-width: 28px;
+  position: relative;
+}
+
+.sidebar__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  height: 40px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.sidebar__content {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.sidebar__expand-tab {
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  border: none;
+  color: var(--text-faint);
+  font-size: calc(14px * var(--font-scale, 1));
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 25;
+  padding: 0;
+  transition: background 0.15s, color 0.15s;
+
+  &:hover {
+    background: var(--surface-raised);
+    color: var(--text-primary-alt);
+  }
+}
+
+
+/* ── Map canvas ──────────────────────────────────────────── */
+.map-canvas {
+  flex: 1;
+  position: relative;
+  background: #08090f;
+}
+
+.map-canvas__hint {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: calc(16px * var(--font-scale, 1));
+  color: var(--text-default);
+  pointer-events: none;
+  white-space: nowrap;
+}
+

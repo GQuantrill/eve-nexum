@@ -1,0 +1,23 @@
+/* Shared icon-button primitives. Consolidated verbatim out of App.css
+   (base was mis-placed in the Search field section; --danger was
+   stranded elsewhere). Order preserved from pristine App.css:
+   .icon-btn--danger BEFORE the base, so the base's color still wins
+   when an element carries both classes (unchanged behaviour). */
+
+.icon-btn--danger {
+  color: #e25a5a;
+  &:hover { color: #ff6b6b; }
+}
+
+.icon-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-faintest);
+  cursor: pointer;
+  font-size: calc(14px * var(--font-scale, 1));
+  padding: 2px 6px;
+  border-radius: 4px;
+  flex-shrink: 0;
+
+  &:hover { color: var(--text-default); background: var(--surface-overlay); }
+}

@@ -1,0 +1,120 @@
+/* Shared form controls (search field).
+   Relocated verbatim out of App.css (Phase 2 bucket-2). Kept GLOBAL;
+   imported once in main.tsx. See design-system.md. */
+
+/* ── Search field ────────────────────────────────────────── */
+.search-field {
+  position: relative;
+}
+
+.search-field__wrap {
+  position: relative;
+}
+
+.search-field__input {
+  width: 100%;
+  background: var(--surface-panel);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  color: var(--text-bright);
+  font-size: calc(13px * var(--font-scale, 1));
+  padding: 7px 30px 7px 10px;
+  outline: none;
+  box-sizing: border-box;
+
+  &:focus { border-color: var(--border-accent); }
+
+  &--selected {
+    border-color: #2e5a3a;
+    background: #0f1f18;
+    color: #6adba0;
+    cursor: default;
+  }
+}
+
+.search-field__clear {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: #4a6a5a;
+  cursor: pointer;
+  font-size: calc(13px * var(--font-scale, 1));
+  padding: 2px 4px;
+  line-height: 1;
+  border-radius: 3px;
+
+  &:hover { color: var(--text-default); background: #1a2a20; }
+}
+
+.search-field__spinner {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--border-accent);
+  border-top-color: #4d9de0;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+.search-field__empty {
+  margin: 6px 0 0;
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #4a5a7a;
+  padding: 0 2px;
+}
+
+.search-field__duplicate {
+  margin: 6px 0 0;
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #c47a2a;
+  padding: 0 2px;
+}
+
+@keyframes spin { to { transform: translateY(-50%) rotate(360deg); } }
+
+.search-results {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: var(--surface-panel);
+  border: 1px solid var(--border-accent);
+  border-radius: 5px;
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+  z-index: 10;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.search-results__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 12px;
+  font-size: calc(13px * var(--font-scale, 1));
+  color: var(--text-default);
+  cursor: pointer;
+
+  &:hover:not(&--disabled),
+  &--active { background: #1a2a4a; color: var(--text-bright); }
+
+  &--disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.search-results__class {
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 700;
+  color: var(--text-faintest);
+  letter-spacing: 0.05em;
+}
