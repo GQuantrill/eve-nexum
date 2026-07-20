@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { db } from '../db.js';
 import { requireAuth } from '../middleware/requireAuth.js';
-import { refreshStandingsForUser } from '../services/standings.js';
+import { refreshStandingsForUser, loadOrgContacts } from '../services/standings.js';
 import { revalidateActiveSessions } from '../services/accessRevalidate.js';
 import { decryptToken } from '../utils/tokenCrypto.js';
 import { createLogger } from '../utils/logger.js';
@@ -31,26 +31,16 @@ standingsRouter.get('/me', async (req, res) => {
   if (!userRows.length) { res.status(404).json({ error: 'User not found' }); return; }
   const { character_id, corp_id, alliance_id } = userRows[0];
 
-  const [charRows, corpRows, allianceRows, refreshRows] = await Promise.all([
+  const [charRows, corpContacts, allianceContacts, refreshRows] = await Promise.all([
     db.query<{ contact_kind: ContactKind; contact_id: number; standing: number }>(
       `SELECT contact_kind, contact_id, standing
        FROM character_standings WHERE character_id = $1`,
       [character_id],
     ),
-    corp_id !== null
-      ? db.query<{ contact_kind: ContactKind; contact_id: number; standing: number }>(
-          `SELECT contact_kind, contact_id, standing
-           FROM corp_standings WHERE corp_id = $1`,
-          [corp_id],
-        )
-      : Promise.resolve({ rows: [] as Array<{ contact_kind: ContactKind; contact_id: number; standing: number }> }),
-    alliance_id !== null
-      ? db.query<{ contact_kind: ContactKind; contact_id: number; standing: number }>(
-          `SELECT contact_kind, contact_id, standing
-           FROM alliance_standings WHERE alliance_id = $1`,
-          [alliance_id],
-        )
-      : Promise.resolve({ rows: [] as Array<{ contact_kind: ContactKind; contact_id: number; standing: number }> }),
+    // Corp/alliance buckets go through the shared read cache — these lists are
+    // shared across members and re-fetched by everyone on every poll.
+    corp_id !== null ? loadOrgContacts('corp', corp_id) : Promise.resolve([]),
+    alliance_id !== null ? loadOrgContacts('alliance', alliance_id) : Promise.resolve([]),
     db.query<{ owner_kind: string; last_fetched_at: string }>(
       `SELECT owner_kind, last_fetched_at FROM standings_refresh
        WHERE (owner_kind = 'character' AND owner_id = $1)
@@ -60,7 +50,7 @@ standingsRouter.get('/me', async (req, res) => {
     ),
   ]);
 
-  function toMap(rows: Array<{ contact_kind: ContactKind; contact_id: number; standing: number }>): Record<string, number> {
+  function toMap(rows: Array<{ contact_kind: string; contact_id: number; standing: number }>): Record<string, number> {
     const out: Record<string, number> = {};
     for (const r of rows) out[`${r.contact_kind}:${r.contact_id}`] = r.standing;
     return out;
@@ -74,8 +64,8 @@ standingsRouter.get('/me', async (req, res) => {
     corpId:      corp_id,
     allianceId:  alliance_id,
     character:   toMap(charRows.rows),
-    corp:        toMap(corpRows.rows),
-    alliance:    toMap(allianceRows.rows),
+    corp:        toMap(corpContacts),
+    alliance:    toMap(allianceContacts),
     refreshedAt,
   });
 });

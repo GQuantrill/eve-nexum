@@ -2,7 +2,7 @@
 // per-user ui_settings blob — these are instance-wide and admin-managed.
 import { db } from '../db.js';
 
-export async function getSetting(key: string): Promise<string | null> {
+async function getSetting(key: string): Promise<string | null> {
   const { rows } = await db.query<{ value: string }>(
     `SELECT value FROM app_settings WHERE key = $1`,
     [key],

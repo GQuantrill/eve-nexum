@@ -1,24 +1,37 @@
 import { createHash, randomBytes } from 'node:crypto';
 
+// Comma-separated list of positive integer IDs from an env value (CORP_ID,
+// ALLIANCE_ID). Blanks and non-positive/non-integer entries are dropped.
+function parseIdList(raw: string | undefined): number[] {
+  return (raw ?? '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .map((s) => parseInt(s, 10))
+    .filter((n) => Number.isInteger(n) && n > 0);
+}
+
+// Boolean env flag — 1 / true / yes (case-insensitive), else false.
+function parseBool(raw: string | undefined): boolean {
+  return /^(1|true|yes)$/i.test(raw ?? '');
+}
+
+// Bounded integer env with a default and minimum; falls back to `def` when
+// unset/NaN/out of range.
+function intEnv(raw: string | undefined, def: number, min = 0): number {
+  const n = parseInt(raw ?? '', 10);
+  return Number.isFinite(n) && n >= min ? n : def;
+}
+
 // CORP_ID accepts a comma-separated list of corporation IDs. Any member of
 // any listed corp is allowed to log in.
-const CORP_IDS: number[] = (process.env.CORP_ID ?? '')
-  .split(',')
-  .map((s) => s.trim())
-  .filter(Boolean)
-  .map((s) => parseInt(s, 10))
-  .filter((n) => Number.isInteger(n) && n > 0);
+const CORP_IDS: number[] = parseIdList(process.env.CORP_ID);
 
 // ALLIANCE_ID accepts a comma-separated list of alliance IDs, mirroring
 // CORP_ID. Any member of any listed alliance is allowed to log in, and the
 // list doubles as the coalition set for alliance-map sharing. Lets a whole
 // alliance be permitted without enumerating every member corp.
-const ALLIANCE_IDS: number[] = (process.env.ALLIANCE_ID ?? '')
-  .split(',')
-  .map((s) => s.trim())
-  .filter(Boolean)
-  .map((s) => parseInt(s, 10))
-  .filter((n) => Number.isInteger(n) && n > 0);
+const ALLIANCE_IDS: number[] = parseIdList(process.env.ALLIANCE_ID);
 
 const ADMIN_CHAR_ID = process.env.ADMIN_CHAR_ID ? parseInt(process.env.ADMIN_CHAR_ID, 10) : null;
 const REPORTS_CHAR_ID = process.env.RV_REPORT_ID ? parseInt(process.env.RV_REPORT_ID, 10) : null;
@@ -28,13 +41,13 @@ const CORP_MAP_TIME = parseInt(process.env.CORP_MAP_TIME ?? '30', 10);
 // of which corp created it. When false (default), corp maps are visible only
 // to members of the corp that created them — Corp A's chain is invisible to
 // Corp B even if they share the deployment.
-const CORP_MAP_SHARED = /^(1|true|yes)$/i.test(process.env.CORP_MAP_SHARED ?? '');
+const CORP_MAP_SHARED = parseBool(process.env.CORP_MAP_SHARED);
 
 // Alliance-map counterpart of CORP_MAP_SHARED. When true, every member of any
 // listed alliance sees every alliance map (coalition mode). When false
 // (default), an alliance map is visible only to members of the alliance that
 // owns it.
-const ALLIANCE_MAP_SHARED = /^(1|true|yes)$/i.test(process.env.ALLIANCE_MAP_SHARED ?? '');
+const ALLIANCE_MAP_SHARED = parseBool(process.env.ALLIANCE_MAP_SHARED);
 
 // A restricted (non-solo) deployment — corp OR alliance gated — needs a
 // bootstrap admin so someone can always administer it.
@@ -147,24 +160,15 @@ export const config = {
   // a standing drifting below threshold, or leaving an admitted corp). Restricted
   // deployments only. Default 60; set to 0 to disable the periodic sweep (an
   // admin settings change still sweeps immediately).
-  accessRevalidateMinutes: (() => {
-    const n = parseInt(process.env.ACCESS_REVALIDATE_MINUTES ?? '60', 10);
-    return Number.isFinite(n) && n >= 0 ? n : 60;
-  })(),
+  accessRevalidateMinutes: intEnv(process.env.ACCESS_REVALIDATE_MINUTES, 60),
   // Cadence (minutes) of the lazy wormhole-removal sweep, which deletes aged-out
   // WH sigs (and quarantines the connections they backed) on maps that have
   // opted in. Default 15; set to 0 to disable the sweep globally.
-  lazyWhSweepMinutes:  (() => {
-    const n = parseInt(process.env.LAZY_WH_SWEEP_MINUTES ?? '15', 10);
-    return Number.isFinite(n) && n >= 0 ? n : 15;
-  })(),
+  lazyWhSweepMinutes:  intEnv(process.env.LAZY_WH_SWEEP_MINUTES, 15),
   // Cadence (minutes) of the connection-lifetime sweep, which re-buckets each
   // wormhole connection's time status (fresh / <1d / <4h / <1h / expired) from
   // its age so holes visibly decay on their own. Default 60; 0 disables it.
-  connLifetimeSweepMinutes: (() => {
-    const n = parseInt(process.env.CONN_LIFETIME_SWEEP_MINUTES ?? '60', 10);
-    return Number.isFinite(n) && n >= 0 ? n : 60;
-  })(),
+  connLifetimeSweepMinutes: intEnv(process.env.CONN_LIFETIME_SWEEP_MINUTES, 60),
   sdeAutoUpdate:       SDE_AUTO_UPDATE,
   sdeCheckUtc:         SDE_CHECK_UTC,
   telemetry:           { enabled: TELEMETRY_ENABLED, url: TELEMETRY_URL },

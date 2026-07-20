@@ -47,5 +47,6 @@ changes.md
 # Local-only Compose overrides (e.g. publishing Postgres to the host for yarn-dev)
 docker-compose.override.yml
 
-# Local frontend audit working notes (not committed)
+# Local audit working notes (not committed)
 frontend-audit.md
+backend-audit.md

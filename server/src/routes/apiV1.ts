@@ -54,7 +54,7 @@ apiV1Router.get('/maps', async (req, res) => {
 // reason to leak.
 apiV1Router.get('/maps/:mapId', async (req, res) => {
   const { mapId } = req.params;
-  if (!(await getMapAccess(mapId, req))) { res.status(404).json({ error: 'Map not found' }); return; }
+  if (!(await requireMapRead(res, mapId, req))) return;
   const full = await loadFullMap(mapId);
   if (!full) { res.status(404).json({ error: 'Map not found' }); return; }
   const {
@@ -66,11 +66,19 @@ apiV1Router.get('/maps/:mapId', async (req, res) => {
   res.json(safe);
 });
 
+// Confirm the caller can read this map, else 404 (response sent). Returns false
+// when denied — mirrors the maps.ts requireMapWrite guard shape.
+async function requireMapRead(res: Response, mapId: string, req: Request): Promise<boolean> {
+  if (await getMapAccess(mapId, req)) return true;
+  res.status(404).json({ error: 'Map not found' });
+  return false;
+}
+
 // Per-system intel. Each guards access on the map, then confirms the system
 // belongs to it (cross-map IDOR + malformed-uuid guard) before loading.
 async function systemScope(req: Request, res: Response): Promise<boolean> {
   const { mapId, systemId } = req.params;
-  if (!(await getMapAccess(mapId, req))) { res.status(404).json({ error: 'Map not found' }); return false; }
+  if (!(await requireMapRead(res, mapId, req))) return false;
   if (!(await isSystemInMap(systemId, mapId))) { res.status(404).json({ error: 'System not found' }); return false; }
   return true;
 }
@@ -102,7 +110,7 @@ apiV1Router.get('/maps/:mapId/events', async (req, res) => {
     return;
   }
   const { mapId } = req.params;
-  if (!(await getMapAccess(mapId, req))) { res.status(404).json({ error: 'Map not found' }); return; }
+  if (!(await requireMapRead(res, mapId, req))) return;
   streamMapEvents(req, res, mapId);
 });
 

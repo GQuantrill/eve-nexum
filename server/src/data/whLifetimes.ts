@@ -25,7 +25,7 @@ const WH_LIFETIME_HOURS: Record<string, number> = {
 // The longest lifetime any wormhole can have. K162 (the reverse side of a hole)
 // carries no type-specific lifetime of its own — we can't know the originating
 // hole's type — so it's aged against this conservative maximum.
-export const MAX_WH_LIFETIME_HOURS = 48;
+const MAX_WH_LIFETIME_HOURS = 48;
 
 /**
  * Maximum lifetime in hours for a wormhole sig of the given type code, or

@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { db } from '../db.js';
 import { onMapEvent } from '../services/mapEvents.js';
+import { CONNECTION_COLS } from '../services/mapRead.js';
 import { createLogger } from '../utils/logger.js';
 
 const log = createLogger('share');
@@ -176,15 +177,7 @@ shareRouter.get('/:token', async (req, res) => {
         [mapId],
       ),
       db.query(
-        `SELECT id, source_id AS "sourceId", target_id AS "targetId",
-                source_handle AS "sourceHandle", target_handle AS "targetHandle",
-                connection_type AS "connectionType", mass_status AS "massStatus",
-                time_status AS "timeStatus", size, wh_type AS "type",
-                COALESCE(mass_used, 0)::float8 AS "massUsed",
-                eol_at AS "eolAt", lifetime_expires_at AS "lifetimeExpiresAt", broken,
-                source_signature_id AS "sourceSignatureId", target_signature_id AS "targetSignatureId",
-                created_at AS "createdAt"
-         FROM map_connections ${connectionWhere}`,
+        `SELECT ${CONNECTION_COLS} FROM map_connections ${connectionWhere}`,
         [mapId],
       ),
       includeSigs
