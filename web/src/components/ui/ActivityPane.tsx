@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { api } from '../../api/client';
 import { useUserSetting } from '../../hooks/useUserSetting';
+import styles from './ActivityPane.module.css';
 
 interface HoverState { index: number; xPct: number; yPct: number; value: number }
 
@@ -66,11 +67,11 @@ function MiniLineChart({ title, values, color, signed = false }: {
   const polyline = values.map((v, i) => `${xOfIdx(i).toFixed(1)},${yOf(v).toFixed(1)}`).join(' ');
 
   return (
-    <div className="activity-chart">
-      <div className="activity-chart__title">{title}</div>
-      <div className="activity-chart__plot">
+    <div className={styles.chart}>
+      <div className={styles.title}>{title}</div>
+      <div className={styles.plot}>
       <svg
-        className="activity-chart__svg"
+        className={styles.svg}
         viewBox={`0 0 ${VB_W} ${VB_H}`}
         preserveAspectRatio="none"
         onMouseLeave={() => setHover(null)}
@@ -156,14 +157,14 @@ function MiniLineChart({ title, values, color, signed = false }: {
       </svg>
       {hover && (
         <div
-          className="activity-chart__tooltip"
+          className={styles.tooltip}
           style={{
             left: `${hover.xPct}%`,
             top:  `${hover.yPct}%`,
           }}
         >
-          <span className="activity-chart__tooltip-value">{hover.value.toLocaleString()}</span>
-          <span className="activity-chart__tooltip-when">{hoursAgoLabel(t, SLOTS - 1 - slotOfIdx(hover.index))}</span>
+          <span className={styles.tooltipValue}>{hover.value.toLocaleString()}</span>
+          <span className={styles.tooltipWhen}>{hoursAgoLabel(t, SLOTS - 1 - slotOfIdx(hover.index))}</span>
         </div>
       )}
       </div>
@@ -200,7 +201,7 @@ function ActivityChartsView({ data }: { data: HourlyPoint[] }) {
   }
 
   return (
-    <div className="activity-pane">
+    <div className={styles.pane}>
       {showJumps && (
         <MiniLineChart
           title={t('mapSidebar.activityJumps')}

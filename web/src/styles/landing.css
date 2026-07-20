@@ -1,0 +1,644 @@
+/* Public landing page + interactive demo. Relocated verbatim out of App.css (Phase 2 bucket-2);
+   kept GLOBAL, imported once in main.tsx. See design-system.md. */
+
+/* ── Landing page ────────────────────────────────────────── */
+.landing {
+  position: relative;
+  min-height: 100vh;
+  background: var(--surface-sunken);
+  color: var(--text-default);
+  font-family: 'Inter', system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+.landing__canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.landing__header-fade {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(rgba(6, 8, 15, 0.55), rgba(6, 8, 15, 0.55)),
+    radial-gradient(ellipse 80% 60% at 50% 50%, transparent 20%, rgba(6, 8, 15, 0.5) 70%, rgba(6, 8, 15, 0.95) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.landing__content {
+  position: relative;
+  z-index: 1;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 48px 32px 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 64px;
+}
+
+.landing__header {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  text-align: center;
+  min-height: 320px;
+  padding: 60px 32px;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(77, 157, 224, 0.12);
+}
+
+.landing__header > *:not(.landing__canvas):not(.landing__header-fade) {
+  position: relative;
+  z-index: 2;
+}
+
+.landing__logo {
+  width: calc(76px * var(--font-scale, 1));
+  height: calc(76px * var(--font-scale, 1));
+  object-fit: contain;
+  filter: drop-shadow(0 0 24px rgba(77, 157, 224, 0.4));
+}
+
+.landing__title {
+  font-size: calc(52px * var(--font-scale, 1));
+  font-weight: 800;
+  color: var(--text-bright);
+  margin: 0;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.landing__tagline {
+  font-size: calc(18px * var(--font-scale, 1));
+  color: var(--text-subtle);
+  margin: 0;
+  letter-spacing: 0.04em;
+}
+
+.landing__features {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  width: 100%;
+}
+
+.landing__demo {
+  position: relative;
+  width: 100%;
+  margin: 16px 0;
+}
+
+.landing__demo-img {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid var(--surface-hover);
+  display: block;
+}
+
+.landing__demo-note {
+  font-size: calc(12px * var(--font-scale, 1));
+  color: var(--text-subtle);
+  text-align: center;
+  margin: 0 0 8px;
+  letter-spacing: 0.01em;
+}
+
+
+/* ── Interactive demo map ─────────────────────────────────── */
+.demo-wrap {
+  display: flex;
+  gap: 0;
+  width: 100%;
+  height: 480px;
+  border: 1px solid var(--surface-hover);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--surface-base);
+}
+
+.demo-info {
+  width: 0;
+  flex-shrink: 0;
+  overflow: hidden;
+  transition: width 0.2s ease;
+  border-right: 0 solid var(--surface-hover);
+  background: var(--surface-base);
+  display: flex;
+  flex-direction: column;
+}
+
+.demo-info--visible {
+  width: 220px;
+  border-right-width: 1px;
+}
+
+.demo-info__content {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.demo-info__name {
+  font-size: calc(15px * var(--font-scale, 1));
+  font-weight: 600;
+  color: var(--text-bright);
+  word-break: break-all;
+}
+
+.demo-info__class {
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 500;
+}
+
+.demo-info__effect {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: calc(13px * var(--font-scale, 1));
+}
+
+.demo-info__effect-mods {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 2px;
+}
+
+.demo-info__mod--good {
+  font-size: calc(12px * var(--font-scale, 1));
+  color: var(--success-alt);
+}
+
+.demo-info__mod--bad {
+  font-size: calc(12px * var(--font-scale, 1));
+  color: var(--danger);
+}
+
+.demo-info__label {
+  font-size: calc(11px * var(--font-scale, 1));
+  font-weight: 600;
+  color: var(--text-faintest);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 4px;
+}
+
+.demo-info__statics {
+  display: flex;
+  flex-direction: column;
+}
+
+.demo-info__static-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: calc(12px * var(--font-scale, 1));
+  padding: 2px 0;
+}
+
+.demo-info__static-code {
+  font-family: monospace;
+  color: var(--text-secondary);
+}
+
+.demo-info__section {
+  display: flex;
+  flex-direction: column;
+  font-size: calc(13px * var(--font-scale, 1));
+}
+
+.demo-info__remove {
+  margin-top: 8px;
+}
+
+.demo-info__more {
+  margin-top: auto;
+  background: var(--surface-panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+}
+
+.demo-info__more-icon {
+  font-size: calc(14px * var(--font-scale, 1));
+  color: #4a7ab8;
+}
+
+.demo-info__more p {
+  font-size: calc(11px * var(--font-scale, 1));
+  color: #4a6080;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.demo-map-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 170px;
+}
+
+.demo-map-actions__count {
+  font-size: calc(11px * var(--font-scale, 1));
+  color: var(--surface-muted);
+  text-align: center;
+  padding-top: 2px;
+}
+
+.demo-map-actions__count--limit {
+  color: #c07040;
+}
+
+.demo-info__hint-limit {
+  font-size: calc(11px * var(--font-scale, 1));
+  color: var(--text-subtle);
+  margin-top: 4px;
+}
+
+.demo-info__hint {
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: var(--text-subtle);
+  font-size: calc(12px * var(--font-scale, 1));
+  line-height: 1.5;
+  height: 100%;
+  justify-content: center;
+}
+
+.demo-info__hint-icon {
+  font-size: calc(24px * var(--font-scale, 1));
+  color: var(--border-accent);
+  margin-bottom: 4px;
+}
+
+.demo-info__hint p {
+  margin: 0;
+}
+
+.demo-canvas-wrap {
+  flex: 1;
+  position: relative;
+  min-width: 0;
+}
+
+.landing__screenshot-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.landing__screenshot-single {
+  margin-top: 12px;
+  display: flex;
+  justify-content: center;
+}
+
+.landing__screenshot-single .landing__screenshot {
+  max-width: 100%;
+}
+
+.landing__screenshot {
+  width: 100%;
+  border-radius: 6px;
+  border: 1px solid var(--surface-hover);
+  display: block;
+}
+
+.landing__screenshot--sm {
+  width: auto;
+  max-width: 200px;
+  margin: 0 auto;
+}
+
+.landing__screenshot-figure {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.landing__screenshot-caption {
+  font-size: calc(13px * var(--font-scale, 1));
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.landing__screenshot-subtitle {
+  font-size: calc(13px * var(--font-scale, 1));
+  color: var(--text-secondary);
+  margin: 0 0 12px;
+  text-align: center;
+}
+
+.landing__feature {
+  background: rgba(13, 20, 35, 0.8);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: border-color 0.2s;
+}
+.landing__feature:hover { border-color: var(--border-accent); }
+
+.landing__feature-icon {
+  font-size: calc(28px * var(--font-scale, 1));
+  color: var(--accent-alt);
+  line-height: 1;
+}
+
+.landing__feature-title {
+  font-size: calc(16px * var(--font-scale, 1));
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+
+.landing__feature-desc {
+  font-size: calc(14px * var(--font-scale, 1));
+  color: var(--text-subtle);
+  margin: 0;
+  line-height: 1.6;
+}
+
+.landing__cta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.landing__login-wrap {
+  display: block;
+  opacity: 0.92;
+  transition: opacity 0.15s, transform 0.15s;
+}
+.landing__login-wrap:hover { opacity: 1; transform: translateY(-1px); }
+
+.landing__eve-btn { display: block; }
+
+.landing__error {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: rgba(224, 90, 90, 0.1);
+  border: 1px solid rgba(224, 90, 90, 0.35);
+  border-radius: 6px;
+  padding: 12px 16px;
+  color: #e08080;
+  font-size: calc(14px * var(--font-scale, 1));
+  max-width: 420px;
+  text-align: left;
+  line-height: 1.5;
+}
+.landing__error-icon { flex-shrink: 0; font-size: calc(16px * var(--font-scale, 1)); }
+
+.landing__note {
+  font-size: calc(13px * var(--font-scale, 1));
+  color: var(--text-dim);
+  margin: 0;
+  text-align: center;
+}
+
+.landing__returning {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 28px 14px 16px;
+  background: rgba(13, 20, 40, 0.9);
+  border: 1px solid var(--border-strong);
+  border-radius: 50px;
+  text-decoration: none;
+  transition: border-color 0.2s, background 0.2s, transform 0.15s;
+}
+.landing__returning:hover {
+  border-color: var(--accent-alt);
+  background: rgba(20, 35, 65, 0.95);
+  transform: translateY(-2px);
+}
+
+.landing__returning-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 2px solid var(--border-accent);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.landing__returning-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+}
+
+.landing__returning-label {
+  font-size: calc(13px * var(--font-scale, 1));
+  color: var(--text-subtle);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.landing__returning-name {
+  font-size: calc(18px * var(--font-scale, 1));
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.landing__switch-link {
+  font-size: calc(13px * var(--font-scale, 1));
+  color: var(--text-dim);
+  text-decoration: none;
+  border-bottom: 1px solid #3a5878;
+  padding-bottom: 1px;
+  transition: color 0.15s, border-color 0.15s;
+}
+.landing__switch-link:hover { color: var(--accent-alt); border-color: var(--accent-alt); }
+
+/* "Join the Discord" button under the EVE SSO login - Discord blurple. */
+.landing__discord-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+  padding: 10px 18px;
+  background: #5865f2;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: calc(14px * var(--font-scale, 1));
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background 0.15s, transform 0.15s;
+}
+.landing__discord-btn:hover {
+  background: #4752c4;
+  transform: translateY(-1px);
+}
+
+.landing__section {
+  width: 100%;
+  padding: 48px 0;
+  border-top: 1px solid var(--surface-hover);
+}
+
+.landing__section-title {
+  font-size: calc(22px * var(--font-scale, 1));
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+
+.landing__section-body {
+  font-size: calc(15px * var(--font-scale, 1));
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+.landing__about-me {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.landing__about-me .landing__section-body {
+  flex: 1;
+  margin: 0;
+}
+
+/* Prominent "compare" call-to-action shown under the feature set. */
+.landing__compare {
+  text-align: center;
+}
+.landing__compare .landing__section-body {
+  max-width: 620px;
+  margin: 0 auto 20px;
+}
+.landing__compare-link {
+  display: inline-block;
+  padding: 12px 26px;
+  background: var(--accent);
+  color: var(--surface-sunken);
+  font-weight: 700;
+  font-size: calc(15px * var(--font-scale, 1));
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background 0.15s, transform 0.15s;
+}
+.landing__compare-link:hover {
+  background: var(--accent-light);
+  transform: translateY(-1px);
+}
+
+
+/* ── Multi-lingual section ───────────────────────────────── */
+.landing__languages {
+  text-align: center;
+}
+.landing__languages .landing__section-body {
+  max-width: 620px;
+  margin: 0 auto 20px;
+}
+.landing__lang-list {
+  list-style: none;
+  margin: 0 auto;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  max-width: 680px;
+}
+.landing__lang-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  background: rgba(91, 155, 255, 0.08);
+  border: 1px solid rgba(91, 155, 255, 0.28);
+  border-radius: 999px;
+  color: var(--text-primary);
+  font-size: calc(14px * var(--font-scale, 1));
+  font-weight: 600;
+  white-space: nowrap;
+}
+.landing__lang-flag {
+  width: 20px;
+  height: 13px;
+  flex-shrink: 0;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3);
+}
+
+.landing__portrait {
+  width: 240px;
+  height: 240px;
+  border-radius: 10%;
+  border: 2px solid var(--border);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.landing__faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.landing__faq-item {
+  border-left: 2px solid var(--border);
+  padding-left: 16px;
+}
+
+.landing__faq-q {
+  font-size: calc(15px * var(--font-scale, 1));
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 6px;
+}
+
+.landing__faq-a {
+  font-size: calc(14px * var(--font-scale, 1));
+  color: var(--text-muted);
+  line-height: 1.7;
+  margin: 0;
+}
+
+.landing__faq-link {
+  color: var(--accent-alt);
+  text-decoration: none;
+}
+
+.landing__faq-link:hover {
+  text-decoration: underline;
+}
+
+.landing__footer {
+  font-size: calc(13px * var(--font-scale, 1));
+  color: var(--text-muted);
+  text-align: center;
+}
+

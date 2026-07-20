@@ -1,0 +1,146 @@
+/* Global instant tooltip ([data-tooltip]) + react-flow overrides.
+   Relocated verbatim out of App.css (Phase 2 bucket-2). Kept GLOBAL;
+   imported once in main.tsx. See design-system.md. */
+
+/* ── Generic instant tooltip ─────────────────────────────── */
+[data-tooltip] {
+  position: relative;
+
+  &::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--surface-panel);
+    color: var(--text-primary);
+    font-size: calc(12px * var(--font-scale, 1));
+    white-space: nowrap;
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.1s;
+    z-index: 9999;
+  }
+  /* Hover reveal is handled by the JS-positioned TooltipLayer (see
+     TooltipLayer.tsx), which clamps the chip inside the viewport so it can't
+     spill off-screen the way this centred pseudo-element does. The ::after
+     above is kept (invisible) so the legacy markup/variant classes are inert
+     rather than removed wholesale. */
+}
+
+/* Portal-rendered floating tooltip (see Tooltip.tsx). Anchored via
+   fixed positioning at the parent's bounding rect so it escapes every
+   ancestor overflow:hidden / scroll container in the System Panel. */
+.floating-tooltip {
+  position: fixed;
+  z-index: 99999;
+  background: var(--surface-sunken);
+  border: 1px solid #4a6ea8;
+  border-radius: 4px;
+  color: #f0f4ff;
+  font-size: calc(12px * var(--font-scale, 1));
+  font-weight: 500;
+  padding: 4px 9px;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+/* Variant used by the global TooltipLayer. Allows long labels to wrap within
+   a bounded width so that, combined with the layer's viewport clamping, the
+   chip always fits on-screen. Short labels still render on a single line. */
+.floating-tooltip--auto {
+  max-width: min(360px, calc(100vw - 12px));
+  white-space: normal;
+  text-align: center;
+  line-height: 1.35;
+}
+
+/* Right-side variant. Elements at the bottom of the System Panel (links,
+   sov refresh) would otherwise drop their tooltip *below* themselves and
+   off the bottom of the viewport — render it to the right instead. The
+   beefier background+border lifts the chip off whatever content sits
+   beneath it (the panel chrome is similar in colour to the default plate). */
+[data-tooltip].tooltip-right::after {
+  top: 50%;
+  left: 100%;
+  /* margin-left rather than left:calc(100%+8px) — when the parent is a
+     narrow icon the calc() form leaves the ::after's containing-block
+     width effectively negative, and some browsers honour that as a wrap
+     even with white-space:nowrap, so the background ends up tiny while
+     the text overflows. width:max-content + margin-left dodges that. */
+  margin-left: 8px;
+  transform: translateY(-50%);
+  width: max-content;
+  background: var(--surface-sunken);
+  border: 1px solid #4a6ea8;
+  color: #f0f4ff;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+/* Above-the-element variant. Use when the element sits close to the
+   right edge of a container (where tooltip-right would be clipped) but
+   has free space above it. Same plate styling as tooltip-right so the
+   visual language stays consistent across variants. */
+[data-tooltip].tooltip-above::after {
+  top: auto;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  background: var(--surface-sunken);
+  border: 1px solid #4a6ea8;
+  color: #f0f4ff;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+.toolbar__server-label {
+  font-size: calc(13px * var(--font-scale, 1));
+  color: var(--text-muted);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.toolbar__player-count {
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #6a8ab0;
+  font-variant-numeric: tabular-nums;
+}
+
+.btn--sm { padding: 3px 10px; font-size: calc(16px * var(--font-scale, 1)); }
+
+
+/* ── React Flow overrides ────────────────────────────────── */
+.react-flow__controls {
+  background: var(--surface-well);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  /* Lift clear of the centred canvas hint (bottom: 12px) so the bottom
+     control (center-on-me) isn't overlapped by the hint text in short /
+     narrow viewports. Overrides React Flow's default 15px panel margin. */
+  margin-bottom: 44px;
+
+  button {
+    background: var(--surface-well);
+    border-color: var(--border);
+    color: var(--text-secondary);
+
+    &:hover { background: var(--surface-overlay); color: var(--text-bright); }
+    svg { fill: currentColor; }
+  }
+}
+
+.react-flow__minimap {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.react-flow__edge-path { cursor: pointer; }
+

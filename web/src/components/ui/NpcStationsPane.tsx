@@ -7,6 +7,7 @@ import { PathIcon, MapPinSimpleIcon } from '@phosphor-icons/react';
 import { setDestination, addWaypoint } from '../../api/waypoint';
 import { loadSystem } from '../../hooks/useEsiSystem';
 import { useShareMode } from '../../context/ShareModeContext';
+import styles from './NpcStationsPane.module.css';
 
 const ESI = 'https://esi.evetech.net/latest';
 
@@ -111,22 +112,22 @@ export function NpcStationsPane({ eveSystemId }: { eveSystemId: number | null })
 
   return (
     <>
-      <ul className="npc-station-list">
+      <ul className={styles.stationList}>
         {stations.map((s) => (
           <li
             key={s.id}
-            className="npc-station-item"
+            className={styles.stationItem}
             onContextMenu={isShareMode ? undefined : (e) => onContextMenu(e, s)}
           >
-            <span className="npc-station-name">{s.name}</span>
-            <span className="npc-station-actions">
+            <span className={styles.stationName}>{s.name}</span>
+            <span className={styles.stationActions}>
               {s.services.length > 0 && (
-                <span className="npc-station-services">
+                <span className={styles.stationServices}>
                   {s.services.map((svc) => {
                     const def = SERVICE_ICONS[svc];
                     if (!def) return null;
                     return (
-                      <span key={svc} className="npc-svc-icon" data-tooltip={t(`npcStations.services.${def.key}`)}>
+                      <span key={svc} className={styles.svcIcon} data-tooltip={t(`npcStations.services.${def.key}`)}>
                         {def.icon}
                       </span>
                     );
@@ -134,7 +135,7 @@ export function NpcStationsPane({ eveSystemId }: { eveSystemId: number | null })
                 </span>
               )}
               {!isShareMode && (
-                <span className="npc-station-btns">
+                <span className={styles.stationBtns}>
                   <button
                     type="button"
                     className="sys-btn"

@@ -8,6 +8,13 @@ import { europeanDate, timeAgo } from '../../i18n/format';
 import { useNow30s } from '../../hooks/useNow30s';
 import { toast } from './Toaster';
 import { ConfirmModal } from './ConfirmModal';
+import styles from './ApiKeysModal.module.css';
+
+const SCOPE_CLASS: Record<'read' | 'events' | 'write', string> = {
+  read:   styles.scopeRead,
+  events: styles.scopeEvents,
+  write:  styles.scopeWrite,
+};
 
 // One row as returned by GET /api/keys — never includes the secret, only the
 // stored prefix + metadata.
@@ -120,13 +127,13 @@ export function ApiKeysModal({ onClose }: { onClose: () => void }) {
 
           {/* Show-once secret. Stays until the user closes it. */}
           {newKey && (
-            <div className="api-keys__reveal">
-              <div className="api-keys__reveal-warn">
+            <div className={styles.reveal}>
+              <div className={styles.revealWarn}>
                 <WarningIcon size={14} weight="fill" />
                 {t('apiKeys.copyNow')}
               </div>
-              <code className="api-keys__secret">{newKey.key}</code>
-              <div className="api-keys__reveal-actions">
+              <code className={styles.secret}>{newKey.key}</code>
+              <div className={styles.revealActions}>
                 <button type="button" className="btn btn--primary" onClick={() => copyKey(newKey.key)}>
                   <CopyIcon size={14} weight="regular" /> {t('actions.copy')}
                 </button>
@@ -138,7 +145,7 @@ export function ApiKeysModal({ onClose }: { onClose: () => void }) {
           )}
 
           {/* Create form */}
-          <div className="api-keys__create">
+          <div className={styles.create}>
             <label className="field">
               <span>{t('apiKeys.name')}</span>
               <input
@@ -183,7 +190,7 @@ export function ApiKeysModal({ onClose }: { onClose: () => void }) {
           {error && <div className="map-sidebar__hint map-sidebar__hint--error">{error}</div>}
 
           {/* Existing keys */}
-          <div className="api-keys__list">
+          <div className={styles.list}>
             {loading
               ? <div className="map-sidebar__hint">{t('apiKeys.loading')}</div>
               : keys.length === 0
@@ -192,22 +199,22 @@ export function ApiKeysModal({ onClose }: { onClose: () => void }) {
                     const expired = !!k.expiresAt && new Date(k.expiresAt).getTime() <= now;
                     const inert = k.contextUserId == null;
                     return (
-                      <div key={k.id} className="api-keys__row">
-                        <div className="api-keys__main">
-                          <span className="api-keys__name">{k.name}</span>
-                          <code className="api-keys__prefix">{k.tokenPrefix}…</code>
-                          <span className={`api-keys__scope api-keys__scope--${k.scope}`}>
+                      <div key={k.id} className={styles.row}>
+                        <div className={styles.main}>
+                          <span className={styles.name}>{k.name}</span>
+                          <code className={styles.prefix}>{k.tokenPrefix}…</code>
+                          <span className={[styles.scope, SCOPE_CLASS[k.scope]].filter(Boolean).join(' ')}>
                             {k.scope === 'write' ? t('apiKeys.scopeWriteBadge')
                               : k.scope === 'events' ? t('apiKeys.scopeEventsBadge')
                               : t('apiKeys.scopeReadBadge')}
                           </span>
                           {(expired || inert) && (
-                            <span className="api-keys__flag">
+                            <span className={styles.flag}>
                               {expired ? t('apiKeys.flagExpired') : t('apiKeys.flagInert')}
                             </span>
                           )}
                         </div>
-                        <div className="api-keys__meta">
+                        <div className={styles.meta}>
                           <span>{t('apiKeys.boundTo', { name: k.contextCharacterName ?? '—' })}</span>
                           <span>{k.lastUsedAt
                             ? t('apiKeys.lastUsed', { ago: timeAgo(t, new Date(k.lastUsedAt)) })
@@ -218,7 +225,7 @@ export function ApiKeysModal({ onClose }: { onClose: () => void }) {
                         </div>
                         <button
                           type="button"
-                          className="map-shares__revoke api-keys__revoke"
+                          className={`map-shares__revoke ${styles.revoke}`}
                           onClick={() => setRevokeId(k.id)}
                           title={t('apiKeys.revoke')}
                         >

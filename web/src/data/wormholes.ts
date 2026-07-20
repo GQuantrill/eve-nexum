@@ -1,7 +1,7 @@
 import type { SystemClass, WormholeEffect } from '../types';
 
 // CSS custom properties so the colour-vision palettes (--cv-class-* in
-// App.css) can re-map system-class colours per colour-blindness mode.
+// styles/tokens.css) can re-map system-class colours per colour-blindness mode.
 export const CLASS_COLORS: Record<SystemClass, string> = {
   C1: 'var(--cv-class-c1)',
   C2: 'var(--cv-class-c2)',
@@ -73,7 +73,7 @@ export const WORMHOLE_EFFECTS: WormholeEffect[] = [
   'none', 'pulsar', 'black_hole', 'cataclysmic_variable', 'magnetar', 'red_giant', 'wolf_rayet',
 ];
 
-// Colours are CSS custom properties (--cv-effect-* in App.css) so they re-map
+// Colours are CSS custom properties (--cv-effect-* in styles/tokens.css) so they re-map
 // per colour-vision mode; used in DOM inline styles, so var() resolves.
 export const EFFECT_ICONS: Record<WormholeEffect, { symbol: string; color: string }> = {
   none:                 { symbol: '',  color: '' },

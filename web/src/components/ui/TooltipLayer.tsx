@@ -15,7 +15,7 @@ import { createPortal } from 'react-dom';
  * chip positioned from the trigger's bounding rect and then CLAMPED inside the
  * viewport, so a tooltip can never leave the display area regardless of where
  * its trigger sits. The matching CSS hover-reveal is disabled so the two
- * mechanisms don't double up (see App.css `[data-tooltip]`).
+ * mechanisms don't double up (see styles/tooltip.css `[data-tooltip]`).
  *
  * Placement honours the same opt-in hints the CSS variants used:
  *   - `.tooltip-right`  -> to the right of the trigger

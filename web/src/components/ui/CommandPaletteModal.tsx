@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useMapStore } from '../../store/mapStore';
 import { systemDisplayName } from '../../utils/systemName';
+import styles from './CommandPaletteModal.module.css';
 
 interface Result {
   mapId:        string;
@@ -122,10 +123,10 @@ export function CommandPaletteModal() {
   if (!open) return null;
   return createPortal(
     <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) setOpen(false); }}>
-      <div className="modal command-palette" role="dialog" aria-modal="true">
+      <div className={`modal ${styles.palette}`} role="dialog" aria-modal="true">
         <input
           ref={inputRef}
-          className="command-palette__input"
+          className={styles.input}
           type="text"
           placeholder={t('commandPalette.placeholder')}
           value={query}
@@ -133,31 +134,31 @@ export function CommandPaletteModal() {
           onKeyDown={onKeyInside}
           aria-label={t('commandPalette.search')}
         />
-        <div className="command-palette__list" role="listbox">
+        <div className={styles.list} role="listbox">
           {results.length === 0 && query && (
-            <div className="command-palette__empty">{t('commandPalette.noMatches')}</div>
+            <div className={styles.empty}>{t('commandPalette.noMatches')}</div>
           )}
           {results.map((r, i) => (
             <div
               key={`${r.mapId}-${r.systemId || 'map'}`}
-              className={`command-palette__item${i === active ? ' command-palette__item--active' : ''}`}
+              className={[styles.item, i === active && styles.itemActive].filter(Boolean).join(' ')}
               role="option"
               aria-selected={i === active}
               onMouseEnter={() => setActive(i)}
               onMouseDown={(e) => { e.preventDefault(); commit(r); }}
             >
-              <span className="command-palette__name">{r.systemName}</span>
+              <span className={styles.name}>{r.systemName}</span>
               {r.systemClass && (
-                <span className="command-palette__class">{r.systemClass}</span>
+                <span className={styles.cls}>{r.systemClass}</span>
               )}
-              <span className="command-palette__meta">
+              <span className={styles.meta}>
                 {r.regionName ? `${r.regionName} · ` : ''}
                 {r.isCurrentMap ? r.mapName : t('commandPalette.switchMap')}
               </span>
             </div>
           ))}
         </div>
-        <div className="command-palette__hint">
+        <div className={styles.hint}>
           <kbd>↑↓</kbd> {t('commandPalette.navigate')} <kbd>↵</kbd> {t('commandPalette.open')} <kbd>Esc</kbd> {t('commandPalette.close')}
         </div>
       </div>

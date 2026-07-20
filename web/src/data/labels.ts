@@ -7,7 +7,7 @@
 export interface LabelDef {
   id:    string;  // stored value in MapSystem.labels
   char:  string;  // pill glyph
-  color: string;  // CSS var (defined in App.css)
+  color: string;  // CSS var (defined in styles/tokens.css)
 }
 
 // Fixed order — pills render in this order, filtered by what the system has.
