@@ -4,6 +4,7 @@ import { v4 as uuid } from 'uuid';
 import { TrashIcon, PlusIcon } from '@phosphor-icons/react';
 import { useCustomIntel, MAX_CUSTOM_INTEL } from '../../hooks/useCustomIntel';
 import type { CustomIntel } from '../../types';
+import styles from './CustomIntelBlock.module.css';
 
 const DEFAULT_COLOR = '#6ea0ff';
 
@@ -33,20 +34,20 @@ export function CustomIntelBlock() {
   const atCap = items.length >= MAX_CUSTOM_INTEL;
 
   return (
-    <div className="custom-intel">
+    <div className={styles.customIntel}>
       <div className="map-sidebar__label">{t('customIntel.title')}</div>
       <div className="map-sidebar__hint">
         {t('customIntel.hint')}
       </div>
 
       {items.length > 0 && (
-        <div className="custom-intel__list">
+        <div className={styles.list}>
           {items.map((it) => (
-            <div key={it.id} className="custom-intel__row">
+            <div key={it.id} className={styles.row}>
               {/* The native colour input renders the small coloured swatch
                   + opens the OS picker on click. Wrapping in a label keeps
                   the click target generous without any extra CSS. */}
-              <label className="custom-intel__swatch" style={{ background: it.color }}>
+              <label className={styles.swatch} style={{ background: it.color }}>
                 <input
                   type="color"
                   value={it.color}
@@ -55,7 +56,7 @@ export function CustomIntelBlock() {
               </label>
               <input
                 type="text"
-                className="custom-intel__label-input"
+                className={styles.labelInput}
                 value={it.label}
                 maxLength={32}
                 onChange={(e) => updateItem(it.id, { label: e.target.value })}
@@ -73,7 +74,7 @@ export function CustomIntelBlock() {
               />
               <button
                 type="button"
-                className="custom-intel__remove"
+                className={styles.remove}
                 onClick={() => removeItem(it.id)}
                 title={t('customIntel.remove')}
               >

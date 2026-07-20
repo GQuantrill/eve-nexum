@@ -1,0 +1,64 @@
+/* ── Wormhole type info popover ──────────────────────────── */
+.root {
+  display: inline-flex;
+  position: relative;
+  margin-left: 4px;
+}
+
+.btn {
+  background: transparent;
+  border: none;
+  color: var(--text-faint);
+  cursor: pointer;
+  font-size: calc(14px * var(--font-scale, 1));
+  padding: 0;
+  line-height: 1;
+  transition: color 0.15s;
+
+  &:hover { color: #7ab4f0; }
+}
+
+.popover {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 180px;
+  background: var(--surface-well);
+  border: 1px solid var(--border-accent);
+  border-radius: 6px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 9999;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+}
+
+/* When the WH-type popover is open inside a node, lift the whole node
+   above its siblings so the popover doesn't get painted under the
+   neighbouring system that happens to sit in front of it in DOM order.
+   Same pattern the sov-logo / effect-icon tooltips use. */
+:global(.react-flow__node):has(.popover) {
+  z-index: 9999 !important;
+}
+
+.header {
+  font-family: monospace;
+  font-weight: 700;
+  font-size: calc(13px * var(--font-scale, 1));
+  color: var(--text-default);
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2px;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  font-size: calc(13px * var(--font-scale, 1));
+  gap: 12px;
+}
+
+.label { color: var(--text-faint); }
+.value { color: #c0ccde; font-weight: 500; }

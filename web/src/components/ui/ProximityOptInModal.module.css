@@ -1,0 +1,12 @@
+/* ── Proximity opt-in modal body ─────────────────────────── */
+.body p {
+  font-size: calc(14px * var(--font-scale, 1));
+  color: #c0ccde;
+  line-height: 1.45;
+  margin: 0 0 10px;
+}
+
+.sub {
+  font-size: calc(13px * var(--font-scale, 1)) !important;
+  color: #8a9ab8 !important;
+}
