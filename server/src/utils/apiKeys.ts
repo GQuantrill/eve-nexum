@@ -1,4 +1,4 @@
-import { randomBytes, createHash, timingSafeEqual } from 'node:crypto';
+import { randomBytes, createHash } from 'node:crypto';
 
 // External API keys. Unlike the EVE OAuth tokens (encrypted at rest so they can
 // be decrypted and replayed to ESI — see tokenCrypto.ts), an API key is only
@@ -29,12 +29,3 @@ export function generateApiKey(): GeneratedKey {
   return { raw, hash: hashApiKey(raw), prefix: raw.slice(0, PREFIX_LEN) };
 }
 
-// Constant-time compare of two sha-256 hex digests. Lookup is by the unique
-// token_hash column; this is defence-in-depth against timing oracles on the
-// off chance a non-indexed compare path is ever added.
-export function hashesEqual(a: string, b: string): boolean {
-  const ba = Buffer.from(a, 'utf8');
-  const bb = Buffer.from(b, 'utf8');
-  if (ba.length !== bb.length) return false;
-  return timingSafeEqual(ba, bb);
-}
