@@ -596,6 +596,14 @@ export async function migrate() {
       ON map_systems (map_id, eve_system_id)
       WHERE eve_system_id IS NOT NULL;
     CREATE INDEX IF NOT EXISTS idx_map_connections_map   ON map_connections (map_id);
+    -- FK referencing columns on map_connections. Postgres does NOT auto-index a
+    -- referencing side, so without these every map_signatures DELETE (the wh /
+    -- lifetime sweeps run these on a timer) and every map_systems DELETE / map
+    -- cascade seq-scans the whole map_connections table to find referencing rows.
+    CREATE INDEX IF NOT EXISTS idx_map_connections_source     ON map_connections (source_id);
+    CREATE INDEX IF NOT EXISTS idx_map_connections_target     ON map_connections (target_id);
+    CREATE INDEX IF NOT EXISTS idx_map_connections_source_sig ON map_connections (source_signature_id);
+    CREATE INDEX IF NOT EXISTS idx_map_connections_target_sig ON map_connections (target_signature_id);
     CREATE INDEX IF NOT EXISTS idx_map_signatures_system ON map_signatures (system_id);
     CREATE INDEX IF NOT EXISTS idx_map_structures_system ON map_structures (system_id);
     CREATE INDEX IF NOT EXISTS idx_user_events_user      ON user_events (user_id, created_at);

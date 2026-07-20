@@ -13,7 +13,7 @@ import { resolveEntityNames } from '../services/entityNames.js';
 import { audit } from '../services/audit.js';
 import { publishToMap } from '../services/mapEvents.js';
 import { streamMapEvents } from '../services/mapStream.js';
-import { listVisibleMaps, loadFullMap, loadSystemSignatures, loadSystemAnomalies, loadSystemStructures } from '../services/mapRead.js';
+import { listVisibleMaps, loadFullMap, loadSystemSignatures, loadSystemAnomalies, loadSystemStructures, CONNECTION_COLS } from '../services/mapRead.js';
 import {
   createSignature, updateSignature, deleteSignature,
   createAnomaly, updateAnomaly, deleteAnomaly,
@@ -1920,7 +1920,8 @@ mapsRouter.post('/:mapId/systems', async (req, res) => {
     const { rows } = await db.query(
       `SELECT id, eve_system_id AS "eveSystemId", name, system_class AS "systemClass", effect, statics,
               region_name AS "regionName", npc_type AS "npcType", position_x AS x, position_y AS y,
-              status, intel, is_home AS "isHome", locked, notes, alias,
+              status, intel, is_home AS "isHome", locked, notes,
+              labels, custom_labels AS "customLabels", tag, alias,
               (SELECT ss.security::float8 FROM solar_systems ss WHERE ss.id = map_systems.eve_system_id) AS "security",
               last_activity_at AS "lastActivityAt"
          FROM map_systems WHERE id = $1 AND map_id = $2`,
@@ -2155,13 +2156,7 @@ mapsRouter.post('/:mapId/connections', async (req, res) => {
   await touchMap(mapId);
   // Re-read the canonical row so remote clients get the full MapConnection shape.
   db.query(
-    `SELECT id, source_id AS "sourceId", target_id AS "targetId", source_handle AS "sourceHandle",
-            target_handle AS "targetHandle", connection_type AS "connectionType", mass_status AS "massStatus",
-            time_status AS "timeStatus", size, wh_type AS "type", COALESCE(mass_used, 0)::float8 AS "massUsed",
-            eol_at AS "eolAt", lifetime_expires_at AS "lifetimeExpiresAt", broken,
-            source_signature_id AS "sourceSignatureId", target_signature_id AS "targetSignatureId",
-            created_at AS "createdAt"
-       FROM map_connections WHERE id = $1 AND map_id = $2`,
+    `SELECT ${CONNECTION_COLS} FROM map_connections WHERE id = $1 AND map_id = $2`,
     [id, mapId],
   ).then(({ rows }) => {
     if (rows[0]) publishToMap(mapId, { type: 'connection.add', actor: req.get('x-client-id') ?? null, connection: rows[0] });
@@ -2814,6 +2809,21 @@ mapsRouter.post('/:mapId/shares', async (req, res) => {
     res.status(403).json({
       error: 'standing_not_positive',
       message: 'Your deployment does not hold this entity at positive standing (contacts must be synced and standing must be > 0).',
+    });
+    return;
+  }
+
+  // Granting login access widens the deployment's login allow-list. corp/alliance
+  // targets are validated by the positive-standing gate above; an individual
+  // CHARACTER grant has no such gate (requiresPositiveStanding is false for
+  // characters), so restrict it to admins — matching the admin-only allow-list
+  // endpoint. Without this, any member (even readonly) could self-admit an
+  // arbitrary character into a restricted deployment via a map share.
+  if (alsoGrantLogin === true && config.restrictedMode && kind === 'character'
+      && !isAdmin(req.session.role ?? 'readonly')) {
+    res.status(403).json({
+      error: 'forbidden',
+      message: 'Only an admin can grant login access to an individual character.',
     });
     return;
   }

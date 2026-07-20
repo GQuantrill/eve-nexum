@@ -8,6 +8,23 @@ import { config } from '../config.js';
 
 const UUID_RE = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
 
+// The full MapConnection column projection, single-sourced so every shape that
+// reaches a client — the full map load, the share view, and the connection.add
+// broadcast re-read — stays identical (they used to be three hand-copied lists
+// that could drift, notably the "type" vs "whType" alias). A fixed constant,
+// never interpolated with user input.
+export const CONNECTION_COLS = `
+  id, source_id AS "sourceId", target_id AS "targetId",
+  source_handle AS "sourceHandle", target_handle AS "targetHandle",
+  connection_type AS "connectionType", mass_status AS "massStatus",
+  time_status AS "timeStatus", size, wh_type AS "type",
+  COALESCE(mass_used, 0)::float8 AS "massUsed",
+  eol_at AS "eolAt", lifetime_expires_at AS "lifetimeExpiresAt", broken,
+  source_signature_id AS "sourceSignatureId",
+  target_signature_id AS "targetSignatureId",
+  created_at AS "createdAt"
+`;
+
 export interface VisibleMapsParams {
   userId:         number;
   ownerId:        number | null;
@@ -105,16 +122,7 @@ export async function loadFullMap(mapId: string) {
       [mapId],
     ),
     db.query(
-      `SELECT id, source_id AS "sourceId", target_id AS "targetId",
-              source_handle AS "sourceHandle", target_handle AS "targetHandle",
-              connection_type AS "connectionType", mass_status AS "massStatus",
-              time_status AS "timeStatus", size, wh_type AS "type",
-              COALESCE(mass_used, 0)::float8 AS "massUsed",
-              eol_at AS "eolAt", lifetime_expires_at AS "lifetimeExpiresAt", broken,
-              source_signature_id AS "sourceSignatureId",
-              target_signature_id AS "targetSignatureId",
-              created_at AS "createdAt"
-       FROM map_connections WHERE map_id = $1`,
+      `SELECT ${CONNECTION_COLS} FROM map_connections WHERE map_id = $1`,
       [mapId],
     ),
     db.query(
