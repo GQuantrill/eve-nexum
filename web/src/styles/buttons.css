@@ -1,13 +1,5 @@
-/* Shared icon-button primitives. Consolidated verbatim out of App.css
-   (base was mis-placed in the Search field section; --danger was
-   stranded elsewhere). Order preserved from pristine App.css:
-   .icon-btn--danger BEFORE the base, so the base's color still wins
-   when an element carries both classes (unchanged behaviour). */
-
-.icon-btn--danger {
-  color: var(--danger);
-  &:hover { color: var(--danger-soft); }
-}
+/* Shared icon-button primitives. Consolidated out of App.css (base was
+   mis-placed in the Search field section; --danger was stranded elsewhere). */
 
 .icon-btn {
   background: transparent;
@@ -20,6 +12,15 @@
   flex-shrink: 0;
 
   &:hover { color: var(--text-default); background: var(--surface-overlay); }
+}
+
+/* Danger variant (delete buttons). Compound selector — the two classes are
+   always applied together (`icon-btn icon-btn--danger`), so this beats the
+   base's colour by specificity regardless of source order. Previously the
+   base was declared later at equal specificity and masked the red. */
+.icon-btn.icon-btn--danger {
+  color: var(--danger);
+  &:hover { color: var(--danger-soft); }
 }
 
 /* --- appended from App.css (Phase 2 bucket-2) --- */
