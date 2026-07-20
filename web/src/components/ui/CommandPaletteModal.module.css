@@ -35,7 +35,7 @@
   color: var(--text-default);
 }
 
-.itemActive { background: #1a2a4a; }
+.itemActive { background: var(--border); }
 
 .name { font-family: monospace; flex-shrink: 0; }
 
@@ -44,7 +44,7 @@
   font-weight: 600;
   color: var(--text-faint);
   background: var(--surface-raised);
-  border: 1px solid #2a3a5a;
+  border: 1px solid var(--border-strong);
   padding: 0 6px;
   border-radius: 3px;
 }

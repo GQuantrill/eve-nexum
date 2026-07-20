@@ -6,7 +6,7 @@
 
 .icon-btn--danger {
   color: var(--danger);
-  &:hover { color: #ff6b6b; }
+  &:hover { color: var(--danger-soft); }
 }
 
 .icon-btn {
@@ -53,7 +53,7 @@
 
   &--danger {
     background: #2a1010;
-    color: #f44336;
+    color: var(--danger-strong);
     border: 1px solid #5a2020;
     margin-top: auto;
 

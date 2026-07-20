@@ -132,7 +132,7 @@
 .mSelfTag {
   font-size: calc(10px * var(--font-scale, 1));
   color: var(--accent-light);
-  background: #1a2a4a;
+  background: var(--border);
   border: 1px solid var(--border-accent-strong);
   border-radius: 3px;
   padding: 1px 5px;
@@ -166,19 +166,19 @@
   border: 1px solid transparent;
 }
 
-.mPillOk      { background: #0f1a14; color: var(--success-bright); border-color: #1e3a28; }
-.mPillBlocked { background: #1a1014; color: var(--danger-soft); border-color: #3a1e22; }
+.mPillOk      { background: var(--surface-well); color: var(--success-bright); border-color: #1e3a28; }
+.mPillBlocked { background: var(--surface-well); color: var(--danger-soft); border-color: #3a1e22; }
 
 .mNum {
   font-variant-numeric: tabular-nums;
   text-align: right;
-  color: #8a96aa;
+  color: var(--text-subtle);
 }
 
 .mMono {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: calc(12px * var(--font-scale, 1));
-  color: #8a96aa;
+  color: var(--text-subtle);
 }
 
 .mTicker {
@@ -218,7 +218,7 @@
 .adminPage {
   display: flex;
   height: 100vh;
-  background: #050810;
+  background: var(--surface-sunken);
   color: var(--text-default);
 }
 
@@ -339,7 +339,7 @@
 .rolesInfoRow dt { margin: 0; }
 .rolesInfoRow dd {
   margin: 0;
-  color: #b8c2d8;
+  color: var(--text-secondary);
   font-size: calc(13px * var(--font-scale, 1));
   line-height: 1.45;
 }
@@ -378,7 +378,7 @@
 .mTable .mNumCenter {
   text-align: center;
   font-variant-numeric: tabular-nums;
-  color: #8a96aa;
+  color: var(--text-subtle);
 }
 
 .pgSortThCenter { text-align: center; }
@@ -432,7 +432,7 @@
 }
 .dcTogglechip {
   background: transparent;
-  border: 1px solid #2e3a52;
+  border: 1px solid var(--border-strong);
   border-radius: 999px;
   color: var(--text-subtle);
   font-family: inherit;
@@ -445,7 +445,7 @@
 .dcTogglechipOn {
   border-color: var(--accent);
   background: rgba(90, 154, 248, 0.18);
-  color: #e8f0ff;
+  color: var(--text-bright);
 }
 .dcResultMeta { color: #6a8ab0; }
 .dcRadio {
@@ -662,7 +662,7 @@
   font-size: calc(13px * var(--font-scale, 1));
   color: var(--danger);
   padding: 12px 14px;
-  background: #1a1014;
+  background: var(--surface-well);
   border: 1px solid #3a1e22;
   border-radius: 6px;
   margin-bottom: 12px;

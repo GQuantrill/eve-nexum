@@ -18,7 +18,7 @@
     white-space: nowrap;
     padding: 3px 8px;
     border-radius: 4px;
-    border: 1px solid #1e2e48;
+    border: 1px solid var(--border);
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.1s;
@@ -37,7 +37,7 @@
 .floating-tooltip {
   position: fixed;
   z-index: 99999;
-  background: #050810;
+  background: var(--surface-sunken);
   border: 1px solid #4a6ea8;
   border-radius: 4px;
   color: #f0f4ff;
@@ -75,7 +75,7 @@
   margin-left: 8px;
   transform: translateY(-50%);
   width: max-content;
-  background: #050810;
+  background: var(--surface-sunken);
   border: 1px solid #4a6ea8;
   color: #f0f4ff;
   font-weight: 500;
@@ -92,7 +92,7 @@
   left: 50%;
   transform: translateX(-50%);
   width: max-content;
-  background: #050810;
+  background: var(--surface-sunken);
   border: 1px solid #4a6ea8;
   color: #f0f4ff;
   font-weight: 500;

@@ -99,7 +99,7 @@
   padding: 0 2px;
   line-height: 1;
 }
-.info-card__undock-btn:hover { color: #8ab8f0; }
+.info-card__undock-btn:hover { color: var(--accent-light); }
 
 
 /* ── Floating (undocked) panel window ─────────────────────────────── */
@@ -147,7 +147,7 @@
   cursor: pointer;
   padding: 0 2px;
 }
-.floating-panel__redock:hover { color: #8ab8f0; }
+.floating-panel__redock:hover { color: var(--accent-light); }
 .floating-panel__body {
   flex: 1;
   overflow: auto;

@@ -7,7 +7,7 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background: #08090f;
+  background: var(--surface-sunken);
   color: var(--text-default);
   font-family: 'Inter', system-ui, sans-serif;
   user-select: none;
@@ -26,7 +26,7 @@
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
   font-size: calc(13px * var(--font-scale, 1));
-  color: #8693ad;
+  color: var(--text-muted);
 }
 
 .share-header__title {
@@ -72,7 +72,7 @@
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background: #08090f;
+  background: var(--surface-sunken);
   color: var(--text-default);
   font-family: 'Inter', system-ui, sans-serif;
   padding: 16px;
@@ -212,7 +212,7 @@
 .map-canvas {
   flex: 1;
   position: relative;
-  background: #08090f;
+  background: var(--surface-sunken);
 }
 
 .map-canvas__hint {

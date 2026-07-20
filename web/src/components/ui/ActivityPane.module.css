@@ -70,7 +70,7 @@
   position: absolute;
   transform: translate(-50%, -100%) translateY(-6px);
   background: var(--surface-panel);
-  border: 1px solid #1e2e48;
+  border: 1px solid var(--border);
   border-radius: 4px;
   padding: 3px 7px;
   font-size: calc(11px * var(--font-scale, 1));

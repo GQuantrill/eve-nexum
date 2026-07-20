@@ -14,7 +14,7 @@
 
 .stationItem {
   font-size: calc(13px * var(--font-scale, 1));
-  color: #d8e0f0;
+  color: var(--text-bright);
   padding: 4px 6px;
   border-radius: 4px;
   background: var(--surface-well);
@@ -87,7 +87,7 @@
      background (var(--surface-well)) so the label reads cleanly against either the
      station row or the panel chrome. Drop shadow adds a bit more visual
      separation from busy content underneath. */
-  background: #050810;
+  background: var(--surface-sunken);
   border: 1px solid #4a6ea8;
   border-radius: 4px;
   color: #f0f4ff;

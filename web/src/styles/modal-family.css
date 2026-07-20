@@ -78,14 +78,14 @@
   background: var(--surface-raised);
   border: 1px solid var(--border-strong);
   font-size: calc(12px * var(--font-scale, 1));
-  color: #dbe4f3;
+  color: var(--text-bright);
 }
 
 .custom-label-dialog__chip-x {
   display: inline-flex;
   background: none;
   border: none;
-  color: #8a93a6;
+  color: var(--text-muted);
   cursor: pointer;
   padding: 0;
 }
@@ -136,7 +136,7 @@
 
 .custom-label-dialog__hint {
   font-size: calc(11px * var(--font-scale, 1));
-  color: #8a93a6;
+  color: var(--text-muted);
   margin: 8px 0 4px;
 }
 
@@ -153,7 +153,7 @@
   overflow-y: auto;
   margin-top: 8px;
   padding: 4px;
-  border: 1px solid #283248;
+  border: 1px solid var(--border);
   border-radius: 6px;
 }
 .custom-label-dialog__icons[aria-disabled='true'] { opacity: 0.4; pointer-events: none; }
@@ -164,7 +164,7 @@
   justify-content: center;
   height: 34px;
   background: var(--surface-panel);
-  border: 1px solid #283248;
+  border: 1px solid var(--border);
   border-radius: 5px;
   color: var(--text-default);
   cursor: pointer;
@@ -295,7 +295,7 @@
 .map-sidebar__brand-name {
   font-size: calc(16px * var(--font-scale, 1));
   font-weight: 700;
-  color: #e8f0ff;
+  color: var(--text-bright);
   letter-spacing: 0.02em;
 }
 .map-sidebar__brand-by {
@@ -311,12 +311,12 @@
   gap: 8px;
   margin-top: 10px;
   font-size: calc(12px * var(--font-scale, 1));
-  color: #8aa0c8;
+  color: var(--text-subtle);
 }
 .map-sidebar__patchnotes-btn {
   flex-shrink: 0;
   background: transparent;
-  border: 1px solid #2e3a52;
+  border: 1px solid var(--border-strong);
   border-radius: 4px;
   color: #9ec0e8;
   font-family: inherit;
@@ -324,7 +324,7 @@
   padding: 3px 8px;
   cursor: pointer;
 }
-.map-sidebar__patchnotes-btn:hover { border-color: var(--accent); color: #e8f0ff; }
+.map-sidebar__patchnotes-btn:hover { border-color: var(--accent); color: var(--text-bright); }
 
 /* Patch-notes modal (reuses the generic .modal / .modal-overlay shell). Flex
    column so the header stays put and only the body scrolls. */
@@ -353,7 +353,7 @@
 }
 .patchnotes__version:hover { text-decoration: underline; }
 .patchnotes__date { font-size: calc(12px * var(--font-scale, 1)); color: #6a8ab0; }
-.patchnotes__empty { padding: 28px; text-align: center; color: #8aa0c8; }
+.patchnotes__empty { padding: 28px; text-align: center; color: var(--text-subtle); }
 .patchnotes__md.wmde-markdown,
 .patchnotes__md {
   background: transparent;

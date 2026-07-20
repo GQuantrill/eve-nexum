@@ -644,7 +644,7 @@
   padding: 4px 10px;
   white-space: nowrap;
   font-size: calc(13px * var(--font-scale, 1));
-  color: #f0c060;
+  color: var(--warning-amber);
   font-weight: 600;
   pointer-events: none;
   z-index: 9999;
@@ -697,7 +697,7 @@
   padding: 4px 10px;
   white-space: nowrap;
   font-size: calc(13px * var(--font-scale, 1));
-  color: #f0c060;
+  color: var(--warning-amber);
   font-weight: 500;
   pointer-events: none;
   z-index: 9999;
@@ -1079,7 +1079,7 @@ div.system-node__easy-handle {
 .system-handle {
   width: 8px !important;
   height: 8px !important;
-  background: #2a3a5a !important;
+  background: var(--border-strong) !important;
   border-color: #4d6a9a !important;
 
   &:hover { background: var(--accent-alt) !important; }

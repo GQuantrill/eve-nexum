@@ -38,7 +38,7 @@
 .secret {
   display: block;
   padding: 6px 8px;
-  background: #08090f;
+  background: var(--surface-sunken);
   border: 1px solid var(--border);
   border-radius: 4px;
   color: var(--text-primary);

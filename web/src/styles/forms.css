@@ -26,7 +26,7 @@
 
   &--selected {
     border-color: #2e5a3a;
-    background: #0f1f18;
+    background: var(--surface-well);
     color: #6adba0;
     cursor: default;
   }
@@ -104,7 +104,7 @@
   cursor: pointer;
 
   &:hover:not(&--disabled),
-  &--active { background: #1a2a4a; color: var(--text-bright); }
+  &--active { background: var(--border); color: var(--text-bright); }
 
   &--disabled {
     opacity: 0.4;

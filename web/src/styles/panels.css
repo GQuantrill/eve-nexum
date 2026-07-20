@@ -160,7 +160,7 @@
   padding: 3px 8px;
   white-space: nowrap;
 
-  &:hover { background: #1a2a4a; color: #a0ccf8; }
+  &:hover { background: var(--border); color: #a0ccf8; }
   &:active { background: #1a3a6a; }
 }
 
@@ -278,7 +278,7 @@
   margin: 0;
   padding: 8px 10px;
   font-size: calc(13px * var(--font-scale, 1));
-  color: #8a93a6;
+  color: var(--text-muted);
   font-style: italic;
 }
 
@@ -348,7 +348,7 @@
   font-size: calc(13px * var(--font-scale, 1));
   color: var(--text-subtle);
 }
-.roll-side strong { color: #cdd6e6; }
+.roll-side strong { color: var(--text-default); }
 .roll-side__dot {
   width: 9px;
   height: 9px;
@@ -457,7 +457,7 @@
   padding: 2px 8px;
   border-radius: 12px;
   background: var(--surface-raised);
-  border: 1px solid #2a3a5a;
+  border: 1px solid var(--border-strong);
   color: var(--text-secondary);
   font-size: calc(13px * var(--font-scale, 1));
   cursor: pointer;
@@ -469,7 +469,7 @@
 
 .sys-info__chain-fx__chip--current {
   border-color: #4a7ab8;
-  background: #1a2a4a;
+  background: var(--border);
 }
 
 .sys-info__chain-fx__sys {

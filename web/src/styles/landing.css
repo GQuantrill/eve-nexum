@@ -5,7 +5,7 @@
 .landing {
   position: relative;
   min-height: 100vh;
-  background: #06080f;
+  background: var(--surface-sunken);
   color: var(--text-default);
   font-family: 'Inter', system-ui, sans-serif;
   overflow-x: hidden;
@@ -71,7 +71,7 @@
 .landing__title {
   font-size: calc(52px * var(--font-scale, 1));
   font-weight: 800;
-  color: #e8f0ff;
+  color: var(--text-bright);
   margin: 0;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -79,7 +79,7 @@
 
 .landing__tagline {
   font-size: calc(18px * var(--font-scale, 1));
-  color: #7a9ab8;
+  color: var(--text-subtle);
   margin: 0;
   letter-spacing: 0.04em;
 }
@@ -183,7 +183,7 @@
 
 .demo-info__mod--bad {
   font-size: calc(12px * var(--font-scale, 1));
-  color: #e05050;
+  color: var(--danger);
 }
 
 .demo-info__label {
@@ -210,7 +210,7 @@
 
 .demo-info__static-code {
   font-family: monospace;
-  color: #c0d0e8;
+  color: var(--text-secondary);
 }
 
 .demo-info__section {
@@ -257,7 +257,7 @@
 
 .demo-map-actions__count {
   font-size: calc(11px * var(--font-scale, 1));
-  color: #3a5070;
+  color: var(--surface-muted);
   text-align: center;
   padding-top: 2px;
 }
@@ -372,7 +372,7 @@
 .landing__feature-title {
   font-size: calc(16px * var(--font-scale, 1));
   font-weight: 700;
-  color: #d0ddf0;
+  color: var(--text-primary);
   margin: 0;
   letter-spacing: 0.02em;
 }
@@ -458,7 +458,7 @@
 
 .landing__returning-label {
   font-size: calc(13px * var(--font-scale, 1));
-  color: #7a9ab8;
+  color: var(--text-subtle);
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
@@ -466,12 +466,12 @@
 .landing__returning-name {
   font-size: calc(18px * var(--font-scale, 1));
   font-weight: 700;
-  color: #d0e0f8;
+  color: var(--text-primary);
 }
 
 .landing__switch-link {
   font-size: calc(13px * var(--font-scale, 1));
-  color: #5a80a8;
+  color: var(--text-dim);
   text-decoration: none;
   border-bottom: 1px solid #3a5878;
   padding-bottom: 1px;
@@ -541,7 +541,7 @@
   display: inline-block;
   padding: 12px 26px;
   background: var(--accent);
-  color: #04060c;
+  color: var(--surface-sunken);
   font-weight: 700;
   font-size: calc(15px * var(--font-scale, 1));
   border-radius: 8px;
@@ -549,7 +549,7 @@
   transition: background 0.15s, transform 0.15s;
 }
 .landing__compare-link:hover {
-  background: #7ab0ff;
+  background: var(--accent-light);
   transform: translateY(-1px);
 }
 

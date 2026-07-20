@@ -145,7 +145,7 @@
 }
 
 .scout-pane__add-result--active {
-  background: #1a2a4a;
+  background: var(--border);
 }
 
 .scout-pane__add-result--disabled {
@@ -298,7 +298,7 @@
   cursor: pointer;
 }
 .fleet-pane__sort-btn:hover { border-color: var(--accent-alt); color: var(--text-default); }
-.fleet-pane__sort-btn--on { background: var(--border); border-color: var(--accent-alt); color: #e8f0ff; }
+.fleet-pane__sort-btn--on { background: var(--border); border-color: var(--accent-alt); color: var(--text-bright); }
 .fleet-pane__dir {
   display: inline-flex;
   align-items: center;
@@ -338,9 +338,9 @@
   gap: 1px;
   max-height: 340px;
   overflow-y: auto;
-  /* Firefox: thin themed bar (matches the app's #2e4a6a accent). */
+  /* Firefox: thin themed bar (matches the app's var(--surface-muted) accent). */
   scrollbar-width: thin;
-  scrollbar-color: #2e4a6a transparent;
+  scrollbar-color: var(--surface-muted) transparent;
 }
 /* WebKit (Chrome/Safari/Edge): styling the bar makes macOS show a classic,
    always-present scrollbar when the list overflows instead of the auto-hiding
@@ -349,7 +349,7 @@
 .fleet-pane__list::-webkit-scrollbar { width: 10px; }
 .fleet-pane__list::-webkit-scrollbar-track { background: transparent; }
 .fleet-pane__list::-webkit-scrollbar-thumb {
-  background: #2e4a6a;
+  background: var(--surface-muted);
   border-radius: 5px;
   border: 2px solid transparent;
   background-clip: padding-box;
