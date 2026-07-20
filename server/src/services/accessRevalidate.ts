@@ -11,7 +11,7 @@
 import { db } from '../db.js';
 import { config } from '../config.js';
 import { isLoginPermitted, standingsPermitLogin } from './accessGrants.js';
-import { invalidateSessionsForUser } from '../utils/sessionInvalidate.js';
+import { invalidateSessionsForUser, refreshSessionAffiliation } from '../utils/sessionInvalidate.js';
 import { audit } from './audit.js';
 import { esiFetch } from '../utils/esi.js';
 import { createLogger } from '../utils/logger.js';
@@ -114,6 +114,11 @@ export async function revalidateActiveSessions(opts: { refreshAffiliation?: bool
         await db.query(`UPDATE users SET corp_id = $1, alliance_id = $2, updated_at = NOW() WHERE id = $3`, [aff.corpId, aff.allianceId, u.id]);
         await audit({ session: {} }, u.id, characterId, 'corp_change',
           u.corpId !== null ? String(u.corpId) : null, aff.corpId !== null ? String(aff.corpId) : null);
+        // Refresh the live session's corp/alliance scope in place (don't evict —
+        // the design keeps sessions across corp moves). Without this, a pilot who
+        // changed corp keeps their old corp's map read/write scope until re-login.
+        // If they're no longer permitted at all, the eviction below still fires.
+        await refreshSessionAffiliation(u.id, aff.corpId, aff.allianceId);
       }
       corpId = aff.corpId;
       allianceId = aff.allianceId;
