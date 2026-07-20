@@ -21,6 +21,7 @@ import {
 import { Doughnut, Line } from 'react-chartjs-2';
 import { CaretUpIcon, CaretDownIcon, XIcon, ArrowSquareOutIcon } from '@phosphor-icons/react';
 import { createPortal } from 'react-dom';
+import styles from './AdminPage.module.css';
 
 // Register only the chart pieces we actually use — keeps the bundle lean.
 ChartJS.register(ArcElement, CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend, Filler);
@@ -36,7 +37,7 @@ function RolesInfoModal({ onClose }: { onClose: () => void }) {
   const roles = ROLE_ORDER.filter((r) => r !== 'alliance_admin' || user?.allianceMode);
   return createPortal(
     <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="modal roles-modal" role="dialog" aria-modal="true">
+      <div className={`modal ${styles.rolesModal}`} role="dialog" aria-modal="true">
         <div className="modal__header">
           <h2 className="modal__title">{t('admin.roles.title')}</h2>
           <button className="icon-btn" onClick={onClose} aria-label={t('actions.close')}>
@@ -44,9 +45,9 @@ function RolesInfoModal({ onClose }: { onClose: () => void }) {
           </button>
         </div>
         <div className="modal__body">
-          <dl className="roles-info">
+          <dl className={styles.rolesInfo}>
             {roles.map((r) => (
-              <div key={r} className="roles-info__row">
+              <div key={r} className={styles.rolesInfoRow}>
                 <dt><span className={`role-badge role-badge--${r}`}>{formatRole(r)}</span></dt>
                 <dd>{t(`admin.roles.desc.${r}`)}</dd>
               </div>
@@ -87,15 +88,15 @@ export function AdminPage() {
   const tab = pathToTab(path, isAdmin, canSeeReports);
 
   return (
-    <div className="admin-page">
-      <aside className="admin-page__nav">
-        <button className="admin-page__back" onClick={() => navigate('/')}>← {t('admin.back')}</button>
-        <h1 className="admin-page__title">{t('admin.title')}</h1>
-        <nav className="admin-page__tabs">
+    <div className={styles.adminPage}>
+      <aside className={styles.pgNav}>
+        <button className={styles.pgBack} onClick={() => navigate('/')}>← {t('admin.back')}</button>
+        <h1 className={styles.pgTitle}>{t('admin.title')}</h1>
+        <nav className={styles.pgTabs}>
           {tabs.map((tb) => (
             <button
               key={tb.key}
-              className={`admin-page__tab${tab === tb.key ? ' admin-page__tab--active' : ''}`}
+              className={[styles.pgTab, tab === tb.key && styles.pgTabActive].filter(Boolean).join(' ')}
               onClick={() => navigate(tb.path)}
             >
               {t(`admin.tabs.${tb.key}`)}
@@ -104,7 +105,7 @@ export function AdminPage() {
         </nav>
       </aside>
 
-      <main className="admin-page__content">
+      <main className={styles.pgContent}>
         {tab === 'users'   && (isAdmin || canSeeReports) && <UsersTab />}
         {tab === 'access'  && isAdmin       && <AccessTab />}
         {tab === 'maps'    && isAdmin       && <MapsTab />}
@@ -165,7 +166,7 @@ function eveWhoUrl(kind: 'corp' | 'alliance' | 'character', id: number): string 
 function EveWhoLink({ kind, id, t }: { kind: 'corp' | 'alliance' | 'character'; id: number; t: TFunction }) {
   return (
     <a
-      className="admin-access__evewho"
+      className={styles.acEvewho}
       href={eveWhoUrl(kind, id)}
       target="_blank"
       rel="noreferrer"
@@ -312,19 +313,19 @@ function AccessTab() {
 
   return (
     <div className="admin-access">
-      <h2 className="admin-page__section-title">{t('admin.access.title')}</h2>
-      <p className="admin-access__intro">{t('admin.access.intro')}</p>
-      <div className="admin-access__note">{t('admin.access.readonlyNote')}</div>
+      <h2 className={styles.pgSectionTitle}>{t('admin.access.title')}</h2>
+      <p className={styles.acIntro}>{t('admin.access.intro')}</p>
+      <div className={styles.acNote}>{t('admin.access.readonlyNote')}</div>
 
-      <div className="admin-access__standings">
-        <label className="admin-access__toggle">
+      <div className={styles.acStandings}>
+        <label className={styles.acToggle}>
           <input type="checkbox" checked={stdEnabled} onChange={(e) => saveStandingsSettings({ enabled: e.target.checked })} />
           <span>{t('admin.access.standingsEnable')}</span>
         </label>
-        <p className="admin-access__hint">{t('admin.access.standingsHint')}</p>
+        <p className={styles.acHint}>{t('admin.access.standingsHint')}</p>
         {stdEnabled && (
-          <div className="admin-access__threshold">
-            <span className="admin-access__threshold-label">{t('admin.access.standingsMinLevel')}</span>
+          <div className={styles.acThreshold}>
+            <span className={styles.acThresholdLabel}>{t('admin.access.standingsMinLevel')}</span>
             <label>
               <input type="radio" name="std-threshold" checked={stdThreshold === 10} onChange={() => saveStandingsSettings({ threshold: 10 })} />
               {t('admin.access.threshold10')}
@@ -337,8 +338,8 @@ function AccessTab() {
         )}
       </div>
 
-      <div className="admin-access__sync">
-        <div className="admin-access__toolbar">
+      <div className={styles.acSync}>
+        <div className={styles.acToolbar}>
           <button type="button" className="btn btn--ghost btn--sm" disabled={syncing} onClick={syncStandings}>
             {syncing ? t('admin.access.syncing') : t('admin.access.syncStandings')}
           </button>
@@ -346,34 +347,34 @@ function AccessTab() {
             {t('admin.access.viewStandings')}
           </button>
           {syncResult && (
-            <span className={`admin-access__sync-status${syncResult.ok ? '' : ' admin-access__sync-status--err'}`}>
+            <span className={[styles.acSyncStatus, !syncResult.ok && styles.acSyncStatusErr].filter(Boolean).join(' ')}>
               {syncResult.text}
             </span>
           )}
         </div>
-        <p className="admin-access__hint">{t('admin.access.syncHint')}</p>
-        <p className="admin-access__hint">{t('admin.access.syncDelay')}</p>
+        <p className={styles.acHint}>{t('admin.access.syncHint')}</p>
+        <p className={styles.acHint}>{t('admin.access.syncDelay')}</p>
       </div>
 
       {showStandings && <StandingsViewerModal onClose={() => setShowStandings(false)} />}
 
-      <div className="admin-access__add">
+      <div className={styles.acAdd}>
         <select
-          className="admin-access__kind"
+          className={styles.acKind}
           value={kind}
           onChange={(e) => { setKind(e.target.value as GrantPickKind); setMatch(null); setQuery(''); }}
         >
           {KINDS.map((k) => <option key={k} value={k}>{t(`admin.access.kind_${k}`)}</option>)}
         </select>
         <input
-          className="admin-access__input"
+          className={styles.acInput}
           placeholder={t(`admin.access.placeholder_${kind}`)}
           value={query}
           maxLength={50}
           spellCheck={false}
           onChange={(e) => setQuery(e.target.value)}
         />
-        <span className={`admin-access__match${match ? ' admin-access__match--ok' : ''}`}>
+        <span className={[styles.acMatch, match && styles.acMatchOk].filter(Boolean).join(' ')}>
           {query.trim().length < 3 ? t('admin.access.typeAtLeast3')
             : searching ? t('admin.access.searching')
             : match ? t('admin.access.found', { name: match.name })
@@ -384,13 +385,13 @@ function AccessTab() {
           {submitting ? t('admin.access.adding') : t('admin.access.add')}
         </button>
       </div>
-      {addError && <div className="admin-page__error">{addError}</div>}
+      {addError && <div className={styles.pgError}>{addError}</div>}
 
-      {loading ? <div className="admin-page__loading">{t('admin.access.loading')}</div>
-        : error ? <div className="admin-page__error">{error}</div>
-        : grants.length === 0 ? <div className="admin-page__empty">{t('admin.access.none')}</div>
+      {loading ? <div className={styles.pgLoading}>{t('admin.access.loading')}</div>
+        : error ? <div className={styles.pgError}>{error}</div>
+        : grants.length === 0 ? <div className={styles.pgEmpty}>{t('admin.access.none')}</div>
         : (
-          <table className="admin-modal__table">
+          <table className={styles.mTable}>
             <thead>
               <tr>
                 <th>{t('admin.access.colKind')}</th>
@@ -412,8 +413,8 @@ function AccessTab() {
                   <td>{g.addedByName ?? (g.source === 'env' ? t('admin.access.sourceEnv') : DASH)}</td>
                   <td>
                     {g.immutable
-                      ? <span className="admin-modal__pill" title={t('admin.access.envLockedHint')}>{t('admin.access.envLocked')}</span>
-                      : <button type="button" className="btn btn--ghost btn--sm admin-modal__danger" onClick={() => removeGrant(g)}>
+                      ? <span className={styles.mPill} title={t('admin.access.envLockedHint')}>{t('admin.access.envLocked')}</span>
+                      : <button type="button" className={`btn btn--ghost btn--sm ${styles.mDanger}`} onClick={() => removeGrant(g)}>
                           {t('admin.access.remove')}
                         </button>}
                   </td>
@@ -464,12 +465,12 @@ function SortableTh({ col, label, sort, onToggle }: {
   const arrow  = active ? (sort.dir === 'asc' ? '↑' : '↓') : '↕';
   return (
     <th
-      className={`admin-modal__th-sort${active ? ' admin-modal__th-sort--active' : ''}`}
+      className={[styles.mThSort, active && styles.mThSortActive].filter(Boolean).join(' ')}
       onClick={() => onToggle(col)}
       role="button"
       aria-sort={active ? (sort.dir === 'asc' ? 'ascending' : 'descending') : 'none'}
     >
-      {label} <span className="admin-modal__th-sort-arrow">{arrow}</span>
+      {label} <span className={styles.mThSortArrow}>{arrow}</span>
     </th>
   );
 }
@@ -589,11 +590,11 @@ function UsersTab() {
 
   return (
     <>
-      <div className="admin-page__section-head">
-        <h2 className="admin-page__section-title">{t('admin.users.title')}</h2>
+      <div className={styles.pgSectionHead}>
+        <h2 className={styles.pgSectionTitle}>{t('admin.users.title')}</h2>
         <input
           type="search"
-          className="admin-users__search"
+          className={styles.usersSearch}
           placeholder={t('admin.users.searchPlaceholder')}
           aria-label={t('admin.users.searchPlaceholder')}
           value={query}
@@ -604,11 +605,11 @@ function UsersTab() {
         </button>
       </div>
       {showRoles && <RolesInfoModal onClose={() => setShowRoles(false)} />}
-      {error && <div className="admin-page__error">{error}</div>}
-      {!users && !error && <div className="admin-page__loading">{t('admin.loading')}</div>}
-      {users && !users.length && <div className="admin-page__empty">{t('admin.users.none')}</div>}
+      {error && <div className={styles.pgError}>{error}</div>}
+      {!users && !error && <div className={styles.pgLoading}>{t('admin.loading')}</div>}
+      {users && !users.length && <div className={styles.pgEmpty}>{t('admin.users.none')}</div>}
       {users && users.length > 0 && (
-        <table className="admin-modal__table">
+        <table className={styles.mTable}>
           <thead>
             <tr>
               <SortableTh col="characterName"  label={t('admin.users.colCharacter')} sort={sort} onToggle={toggleSort} />
@@ -626,30 +627,30 @@ function UsersTab() {
               const isSelf = self?.id === u.id;
               const isBusy = busyId === u.id;
               return (
-                <tr key={u.id} className={u.blocked ? 'admin-modal__tr--blocked' : ''}>
-                  <td className="admin-modal__name-cell">
+                <tr key={u.id} className={u.blocked ? styles.mTrBlocked : ''}>
+                  <td className={styles.mNameCell}>
                     <img
-                      className="admin-modal__avatar"
+                      className={styles.mAvatar}
                       src={charPortrait(u.characterId, 32)}
                       alt=""
                     />
                     <span>{u.characterName}</span>
-                    {isSelf && <span className="admin-modal__self-tag">{t('admin.users.you')}</span>}
+                    {isSelf && <span className={styles.mSelfTag}>{t('admin.users.you')}</span>}
                   </td>
                   <td title={u.corpName ?? undefined}>
                     {u.corpTicker
-                      ? <span className="admin-modal__ticker">[{u.corpTicker}]</span>
-                      : <span className="admin-modal__mono">{u.corpId ?? '—'}</span>}
+                      ? <span className={styles.mTicker}>[{u.corpTicker}]</span>
+                      : <span className={styles.mMono}>{u.corpId ?? '—'}</span>}
                   </td>
                   <td title={u.allianceName ?? undefined}>
                     {u.allianceTicker
-                      ? <span className="admin-modal__ticker">[{u.allianceTicker}]</span>
-                      : <span className="admin-modal__mono">—</span>}
+                      ? <span className={styles.mTicker}>[{u.allianceTicker}]</span>
+                      : <span className={styles.mMono}>—</span>}
                   </td>
                   <td>
                     {canEdit ? (
                       <select
-                        className="admin-modal__role-select"
+                        className={styles.mRoleSelect}
                         value={u.role}
                         // A non-alliance-admin can't touch an alliance admin's
                         // role, nor grant the tier (matches the server guard).
@@ -661,27 +662,27 @@ function UsersTab() {
                           .map((r) => <option key={r} value={r}>{formatRole(r)}</option>)}
                       </select>
                     ) : (
-                      <span className="admin-modal__mono">{formatRole(u.role as AuthRole)}</span>
+                      <span className={styles.mMono}>{formatRole(u.role as AuthRole)}</span>
                     )}
                   </td>
                   <td>
                     {u.blocked
-                      ? <span className="admin-modal__pill admin-modal__pill--blocked">{t('admin.users.blocked')}</span>
-                      : <span className="admin-modal__pill admin-modal__pill--ok">{t('admin.users.active')}</span>}
+                      ? <span className={`${styles.mPill} ${styles.mPillBlocked}`}>{t('admin.users.blocked')}</span>
+                      : <span className={`${styles.mPill} ${styles.mPillOk}`}>{t('admin.users.active')}</span>}
                   </td>
-                  <td className="admin-modal__when">{formatRelative(t, u.lastLogin)}</td>
+                  <td className={styles.mWhen}>{formatRelative(t, u.lastLogin)}</td>
                   <td title={u.lastKnownSystemAt ? formatRelative(t, u.lastKnownSystemAt) : undefined}>
                     {u.lastKnownSystemName ?? '—'}
                   </td>
                   {canEdit && (
-                    <td className="admin-modal__actions">
+                    <td className={styles.mActions}>
                       {u.blocked ? (
                         <button className="btn btn--ghost btn--sm" disabled={isBusy} onClick={() => setBlocked(u, false)}>
                           {t('admin.users.unblock')}
                         </button>
                       ) : (
                         <button
-                          className="btn btn--ghost btn--sm admin-modal__danger"
+                          className={`btn btn--ghost btn--sm ${styles.mDanger}`}
                           disabled={isBusy || isSelf}
                           onClick={() => setBlockTarget(u)}
                         >
@@ -705,7 +706,7 @@ function UsersTab() {
         </table>
       )}
       {users && users.length > 0 && query.trim() && visibleUsers.length === 0 && (
-        <div className="admin-page__empty">{t('admin.users.noMatch', { query: query.trim() })}</div>
+        <div className={styles.pgEmpty}>{t('admin.users.noMatch', { query: query.trim() })}</div>
       )}
 
       {blockTarget && (
@@ -789,12 +790,12 @@ function MapsTab() {
 
   return (
     <>
-      <h2 className="admin-page__section-title">{t('admin.maps.title')}</h2>
-      {error && <div className="admin-page__error">{error}</div>}
-      {!maps && !error && <div className="admin-page__loading">{t('admin.loading')}</div>}
-      {maps && !maps.length && <div className="admin-page__empty">{t('admin.maps.none')}</div>}
+      <h2 className={styles.pgSectionTitle}>{t('admin.maps.title')}</h2>
+      {error && <div className={styles.pgError}>{error}</div>}
+      {!maps && !error && <div className={styles.pgLoading}>{t('admin.loading')}</div>}
+      {maps && !maps.length && <div className={styles.pgEmpty}>{t('admin.maps.none')}</div>}
       {maps && maps.length > 0 && (
-        <table className="admin-modal__table">
+        <table className={styles.mTable}>
           <thead>
             <tr>
               <th>{t('admin.maps.colName')}</th>
@@ -813,9 +814,9 @@ function MapsTab() {
               return (
                 <tr key={m.id}>
                   <td>{m.name}</td>
-                  <td className="admin-modal__name-cell">
+                  <td className={styles.mNameCell}>
                     <img
-                      className="admin-modal__avatar"
+                      className={styles.mAvatar}
                       src={charPortrait(m.ownerCharacterId, 32)}
                       alt=""
                     />
@@ -823,18 +824,18 @@ function MapsTab() {
                   </td>
                   <td title={m.corpName ?? undefined}>
                     {m.corpTicker
-                      ? <span className="admin-modal__ticker">[{m.corpTicker}]</span>
-                      : <span className="admin-modal__mono">{m.corpId}</span>}
+                      ? <span className={styles.mTicker}>[{m.corpTicker}]</span>
+                      : <span className={styles.mMono}>{m.corpId}</span>}
                   </td>
-                  <td className="admin-modal__num">{m.systemCount}</td>
-                  <td className="admin-modal__num">{m.connectionCount}</td>
+                  <td className={styles.mNum}>{m.systemCount}</td>
+                  <td className={styles.mNum}>{m.connectionCount}</td>
                   <td>
                     {m.locked
-                      ? <span className="admin-modal__pill admin-modal__pill--blocked">{t('admin.maps.locked')}</span>
-                      : <span className="admin-modal__pill admin-modal__pill--ok">{t('admin.maps.open')}</span>}
+                      ? <span className={`${styles.mPill} ${styles.mPillBlocked}`}>{t('admin.maps.locked')}</span>
+                      : <span className={`${styles.mPill} ${styles.mPillOk}`}>{t('admin.maps.open')}</span>}
                   </td>
-                  <td className="admin-modal__when">{formatRelative(t, m.lastActiveAt)}</td>
-                  <td className="admin-modal__actions">
+                  <td className={styles.mWhen}>{formatRelative(t, m.lastActiveAt)}</td>
+                  <td className={styles.mActions}>
                     {m.locked ? (
                       <button
                         className="btn btn--ghost btn--sm"
@@ -855,7 +856,7 @@ function MapsTab() {
                       </button>
                     )}
                     <button
-                      className="btn btn--ghost btn--sm admin-modal__danger"
+                      className={`btn btn--ghost btn--sm ${styles.mDanger}`}
                       disabled={isBusy}
                       onClick={() => setDeleteTarget(m)}
                     >
@@ -941,12 +942,12 @@ function ReportsTab() {
 
   return (
     <>
-      <h2 className="admin-page__section-title">{t('admin.reports.title')}</h2>
-      <div className="admin-page__subtabs">
+      <h2 className={styles.pgSectionTitle}>{t('admin.reports.title')}</h2>
+      <div className={styles.pgSubtabs}>
         {visibleReports.map((r) => (
           <button
             key={r.key}
-            className={`admin-page__subtab${kind === r.key ? ' admin-page__subtab--active' : ''}`}
+            className={[styles.pgSubtab, kind === r.key && styles.pgSubtabActive].filter(Boolean).join(' ')}
             onClick={() => navigate(`/admin/reports/${r.key}`)}
           >
             {t(REPORT_TAB_KEY[r.key])}
@@ -1137,21 +1138,21 @@ function UsersReport() {
   }
 
   const controls = (
-    <div className="admin-page__filter-bar">
-      <div className="admin-page__filter-group">
-        <label className="admin-page__filter-label">{t('admin.reports.filter')}</label>
+    <div className={styles.pgFilterBar}>
+      <div className={styles.pgFilterGroup}>
+        <label className={styles.pgFilterLabel}>{t('admin.reports.filter')}</label>
         <select
-          className="admin-modal__role-select"
+          className={styles.mRoleSelect}
           value={filter}
           onChange={(e) => setFilter(e.target.value as UserFilterKey)}
         >
           {USER_FILTER_OPTIONS.map((o) => <option key={o.value} value={o.value}>{t(`admin.reports.userFilters.${o.value}`)}</option>)}
         </select>
       </div>
-      <div className="admin-page__filter-group">
-        <label className="admin-page__filter-label">{t('admin.reports.window')}</label>
+      <div className={styles.pgFilterGroup}>
+        <label className={styles.pgFilterLabel}>{t('admin.reports.window')}</label>
         <select
-          className="admin-modal__role-select"
+          className={styles.mRoleSelect}
           value={window}
           onChange={(e) => setWindow(e.target.value as WindowKey)}
           disabled={filter === 'all'}
@@ -1160,7 +1161,7 @@ function UsersReport() {
           {WINDOW_OPTIONS.map((o) => <option key={o.value} value={o.value}>{t(`admin.reports.windowOptions.${o.value}`)}</option>)}
         </select>
       </div>
-      <div className="admin-page__filter-spacer" />
+      <div className={styles.pgFilterSpacer} />
       {sortedRows && sortedRows.length > 0 && (
         <button className="btn btn--ghost btn--sm" onClick={downloadCsv}>
           ↓ {t('admin.exportCsv')}
@@ -1169,9 +1170,9 @@ function UsersReport() {
     </div>
   );
 
-  if (error) return <>{controls}<div className="admin-page__error">{error}</div></>;
-  if (!sortedRows) return <>{controls}<div className="admin-page__loading">{t('admin.loading')}</div></>;
-  if (!sortedRows.length) return <>{controls}<div className="admin-page__empty">{t('admin.reports.users.empty')}</div></>;
+  if (error) return <>{controls}<div className={styles.pgError}>{error}</div></>;
+  if (!sortedRows) return <>{controls}<div className={styles.pgLoading}>{t('admin.loading')}</div></>;
+  if (!sortedRows.length) return <>{controls}<div className={styles.pgEmpty}>{t('admin.reports.users.empty')}</div></>;
 
   return (
     <>
@@ -1181,7 +1182,7 @@ function UsersReport() {
       <StatCard label={t('admin.reports.users.uniqueCorps')}     value={summary.corps} />
       <StatCard label={t('admin.reports.users.uniqueAlliances')} value={summary.alliances} />
     </div>
-    <table className="admin-modal__table admin-page__sortable">
+    <table className={`${styles.mTable} admin-page__sortable`}>
       <thead>
         <tr>
           <SortHeader label={t('admin.reports.users.colCharacter')}         colKey="name"           sort={sort} onSort={handleSort} />
@@ -1211,9 +1212,9 @@ function UsersReport() {
           const total = Object.values(u.sigTypeCounts).reduce((a, b) => a + b, 0);
           return (
             <tr key={u.id}>
-              <td className="admin-modal__name-cell">
+              <td className={styles.mNameCell}>
                 <img
-                  className="admin-modal__avatar"
+                  className={styles.mAvatar}
                   src={charPortrait(u.characterId, 32)}
                   alt=""
                 />
@@ -1221,28 +1222,28 @@ function UsersReport() {
               </td>
               <td title={u.corpName ?? undefined}>
                 {u.corpTicker
-                  ? <span className="admin-modal__ticker">[{u.corpTicker}]</span>
-                  : <span className="admin-modal__mono">{u.corpId ?? '—'}</span>}
+                  ? <span className={styles.mTicker}>[{u.corpTicker}]</span>
+                  : <span className={styles.mMono}>{u.corpId ?? '—'}</span>}
               </td>
               <td title={u.allianceName ?? undefined}>
                 {u.allianceTicker
-                  ? <span className="admin-modal__ticker">[{u.allianceTicker}]</span>
+                  ? <span className={styles.mTicker}>[{u.allianceTicker}]</span>
                   : u.allianceId !== null
-                    ? <span className="admin-modal__mono">{u.allianceId}</span>
+                    ? <span className={styles.mMono}>{u.allianceId}</span>
                     : '—'}
               </td>
-              <td className="admin-modal__when">{u.lastLogin ? formatRelative(t, u.lastLogin) : '—'}</td>
+              <td className={styles.mWhen}>{u.lastLogin ? formatRelative(t, u.lastLogin) : '—'}</td>
               <td>{u.lastKnownSystemName ?? '—'}</td>
-              <td className="admin-modal__num">{u.systemsAdded   > 0 ? u.systemsAdded   : '—'}</td>
-              <td className="admin-modal__num">{u.systemsDeleted > 0 ? u.systemsDeleted : '—'}</td>
-              <td className="admin-modal__when">{u.lastActive ? formatRelative(t, u.lastActive) : '—'}</td>
-              <td className="admin-modal__when">{u.lastCorpSigAt ? formatRelative(t, u.lastCorpSigAt) : '—'}</td>
-              <td className="admin-modal__num">{total > 0 ? total : '—'}</td>
+              <td className={styles.mNum}>{u.systemsAdded   > 0 ? u.systemsAdded   : '—'}</td>
+              <td className={styles.mNum}>{u.systemsDeleted > 0 ? u.systemsDeleted : '—'}</td>
+              <td className={styles.mWhen}>{u.lastActive ? formatRelative(t, u.lastActive) : '—'}</td>
+              <td className={styles.mWhen}>{u.lastCorpSigAt ? formatRelative(t, u.lastCorpSigAt) : '—'}</td>
+              <td className={styles.mNum}>{total > 0 ? total : '—'}</td>
               {SIG_TYPE_ORDER.map((st) => {
                 const n = u.sigTypeCounts[st.key] ?? 0;
                 return (
-                  <td key={st.key} className="admin-modal__num--center">
-                    {n > 0 ? n : <span className="admin-modal__mono">—</span>}
+                  <td key={st.key} className={styles.mNumCenter}>
+                    {n > 0 ? n : <span className={styles.mMono}>—</span>}
                   </td>
                 );
               })}
@@ -1272,10 +1273,11 @@ function SortHeader<K extends string>({
   align?: 'center';
 }) {
   const active = sort.key === colKey;
-  const cls =
-    'admin-page__sort-th' +
-    (active ? ' admin-page__sort-th--active' : '') +
-    (align === 'center' ? ' admin-page__sort-th--center' : '');
+  const cls = [
+    'admin-page__sort-th',
+    active && 'admin-page__sort-th--active',
+    align === 'center' && styles.pgSortThCenter,
+  ].filter(Boolean).join(' ');
   return (
     <th className={cls} onClick={() => onSort(colKey)}>
       <span>{label}</span>
@@ -1356,11 +1358,11 @@ function SystemsReport() {
   }
 
   const controls = (
-    <div className="admin-page__filter-bar">
-      <div className="admin-page__filter-group">
-        <label className="admin-page__filter-label">{t('admin.reports.window')}</label>
+    <div className={styles.pgFilterBar}>
+      <div className={styles.pgFilterGroup}>
+        <label className={styles.pgFilterLabel}>{t('admin.reports.window')}</label>
         <select
-          className="admin-modal__role-select"
+          className={styles.mRoleSelect}
           value={window}
           onChange={(e) => setWindow(e.target.value as WindowKey)}
         >
@@ -1370,9 +1372,9 @@ function SystemsReport() {
     </div>
   );
 
-  if (error) return <>{controls}<div className="admin-page__error">{error}</div></>;
-  if (!data || !sortedWh) return <>{controls}<div className="admin-page__loading">{t('admin.loading')}</div></>;
-  if (data.total === 0) return <>{controls}<div className="admin-page__empty">{t('admin.reports.systems.empty')}</div></>;
+  if (error) return <>{controls}<div className={styles.pgError}>{error}</div></>;
+  if (!data || !sortedWh) return <>{controls}<div className={styles.pgLoading}>{t('admin.loading')}</div></>;
+  if (data.total === 0) return <>{controls}<div className={styles.pgEmpty}>{t('admin.reports.systems.empty')}</div></>;
 
   // Exclude unidentified ("unknown") signatures from the sig-type breakdown —
   // they're not a real type, so they're left out of the stat cards, the donut,
@@ -1475,9 +1477,9 @@ function SystemsReport() {
 
       <h3 className="admin-page__report-heading">{t('admin.reports.systems.whHeading')}</h3>
       {sortedWh.length === 0 ? (
-        <div className="admin-page__empty">{t('admin.reports.systems.whEmpty')}</div>
+        <div className={styles.pgEmpty}>{t('admin.reports.systems.whEmpty')}</div>
       ) : (
-        <table className="admin-modal__table admin-page__sortable admin-page__wh-table">
+        <table className={`${styles.mTable} admin-page__sortable admin-page__wh-table`}>
           <thead>
             <tr>
               <SortHeader label={t('admin.reports.systems.colType')}  colKey="whType" sort={whSort} onSort={handleWhSort} />
@@ -1487,8 +1489,8 @@ function SystemsReport() {
           <tbody>
             {sortedWh.map((row) => (
               <tr key={row.whType}>
-                <td className="admin-modal__mono">{row.whType}</td>
-                <td className="admin-modal__num">{row.count}</td>
+                <td className={styles.mMono}>{row.whType}</td>
+                <td className={styles.mNum}>{row.count}</td>
               </tr>
             ))}
           </tbody>
@@ -1564,16 +1566,16 @@ function GhostSitesReport() {
       : { key, dir: key === 'observations' || key === 'lastSeen' ? 'desc' : 'asc' });
   }
 
-  if (error)   return <div className="admin-page__error">{error}</div>;
-  if (!sorted) return <div className="admin-page__loading">{t('admin.loading')}</div>;
+  if (error)   return <div className={styles.pgError}>{error}</div>;
+  if (!sorted) return <div className={styles.pgLoading}>{t('admin.loading')}</div>;
 
   return (
     <>
       <h3 className="admin-page__report-heading">{t('admin.reports.ghost.heading')}</h3>
       {sorted.length === 0 ? (
-        <div className="admin-page__empty">{t('admin.reports.ghost.empty')}</div>
+        <div className={styles.pgEmpty}>{t('admin.reports.ghost.empty')}</div>
       ) : (
-        <table className="admin-modal__table admin-page__sortable">
+        <table className={`${styles.mTable} admin-page__sortable`}>
           <thead>
             <tr>
               <SortHeader label={t('admin.reports.ghost.colRegion')}        colKey="region"        sort={sort} onSort={onSort} />
@@ -1592,12 +1594,12 @@ function GhostSitesReport() {
               <tr key={r.eveSystemId}>
                 <td>{r.regionName        ?? '—'}</td>
                 <td>{r.constellationName ?? '—'}</td>
-                <td className="admin-modal__mono">{r.systemName}</td>
+                <td className={styles.mMono}>{r.systemName}</td>
                 <td>{r.systemClass}</td>
                 <td>{r.sunType     ?? '—'}</td>
-                <td className="admin-modal__num">{r.planetCount ?? '—'}</td>
-                <td className="admin-modal__num">{r.moonCount   ?? '—'}</td>
-                <td className="admin-modal__num">{r.observations}</td>
+                <td className={styles.mNum}>{r.planetCount ?? '—'}</td>
+                <td className={styles.mNum}>{r.moonCount   ?? '—'}</td>
+                <td className={styles.mNum}>{r.observations}</td>
                 <td>{new Date(r.lastSeenAt).toLocaleString()}</td>
               </tr>
             ))}
@@ -1658,19 +1660,19 @@ function AuditTab() {
 
   return (
     <>
-      <div className="admin-page__section-bar">
-        <h2 className="admin-page__section-title">{t('admin.audit.title')}</h2>
+      <div className={styles.pgSectionBar}>
+        <h2 className={styles.pgSectionTitle}>{t('admin.audit.title')}</h2>
         {entries && entries.length > 0 && (
           <button className="btn btn--ghost btn--sm" onClick={downloadCsv}>
             ↓ {t('admin.exportCsv')}
           </button>
         )}
       </div>
-      {error && <div className="admin-page__error">{error}</div>}
-      {!entries && !error && <div className="admin-page__loading">{t('admin.loading')}</div>}
-      {entries && !entries.length && <div className="admin-page__empty">{t('admin.audit.none')}</div>}
+      {error && <div className={styles.pgError}>{error}</div>}
+      {!entries && !error && <div className={styles.pgLoading}>{t('admin.loading')}</div>}
+      {entries && !entries.length && <div className={styles.pgEmpty}>{t('admin.audit.none')}</div>}
       {entries && entries.length > 0 && (
-        <table className="admin-modal__table">
+        <table className={styles.mTable}>
           <thead>
             <tr>
               <th>{t('admin.audit.colWhen')}</th>
@@ -1683,11 +1685,11 @@ function AuditTab() {
           <tbody>
             {entries.map((e) => (
               <tr key={e.id}>
-                <td className="admin-modal__when">{formatRelative(t, e.createdAt)}</td>
+                <td className={styles.mWhen}>{formatRelative(t, e.createdAt)}</td>
                 <td>{e.actorCharacterName ?? '—'}</td>
-                <td><span className="admin-modal__action">{e.action}</span></td>
+                <td><span className={styles.mAction}>{e.action}</span></td>
                 <td>{e.targetCharacterName ?? '—'}</td>
-                <td className="admin-modal__mono">
+                <td className={styles.mMono}>
                   {e.oldValue ?? '∅'} → {e.newValue ?? '∅'}
                 </td>
               </tr>
@@ -1850,11 +1852,11 @@ function DiscordTab() {
     ? Object.keys(whCatalog).filter((c) => c.includes(wq) && !whTypes.includes(c)).sort().slice(0, 8)
     : [];
 
-  if (!data && error) return (<><h2 className="admin-page__section-title">{t('admin.discord.title')}</h2><div className="admin-page__error">{error}</div></>);
-  if (!data)          return (<><h2 className="admin-page__section-title">{t('admin.discord.title')}</h2><div className="admin-page__loading">{t('admin.loading')}</div></>);
+  if (!data && error) return (<><h2 className={styles.pgSectionTitle}>{t('admin.discord.title')}</h2><div className={styles.pgError}>{error}</div></>);
+  if (!data)          return (<><h2 className={styles.pgSectionTitle}>{t('admin.discord.title')}</h2><div className={styles.pgLoading}>{t('admin.loading')}</div></>);
   if (data.scope == null) {
-    return (<><h2 className="admin-page__section-title">{t('admin.discord.title')}</h2>
-      <div className="admin-page__empty">{t('admin.discord.noCorp')}</div></>);
+    return (<><h2 className={styles.pgSectionTitle}>{t('admin.discord.title')}</h2>
+      <div className={styles.pgEmpty}>{t('admin.discord.noCorp')}</div></>);
   }
 
   const sortJoin = (a: string[]) => a.slice().sort().join('|');
@@ -1868,28 +1870,28 @@ function DiscordTab() {
 
   return (
     <>
-      <h2 className="admin-page__section-title">{t('admin.discord.titleNotifications')}</h2>
-      {error && <div className="admin-page__error">{error}</div>}
-      <p className="discord-admin__hint">{t('admin.discord.hint')}</p>
+      <h2 className={styles.pgSectionTitle}>{t('admin.discord.titleNotifications')}</h2>
+      {error && <div className={styles.pgError}>{error}</div>}
+      <p className={styles.dcHint}>{t('admin.discord.hint')}</p>
 
-      <section className="discord-admin__section">
-        <h3 className="discord-admin__heading">{t('admin.discord.webhooks')}</h3>
-        <p className="discord-admin__hint">{t('admin.discord.webhooksHint')}</p>
-        <label className="discord-admin__sublabel" htmlFor="conn-webhook">{t('admin.discord.connectionsWebhook')}</label>
+      <section className={styles.dcSection}>
+        <h3 className={styles.dcHeading}>{t('admin.discord.webhooks')}</h3>
+        <p className={styles.dcHint}>{t('admin.discord.webhooksHint')}</p>
+        <label className={styles.dcSublabel} htmlFor="conn-webhook">{t('admin.discord.connectionsWebhook')}</label>
         <input
           id="conn-webhook"
           type="url"
-          className="discord-admin__search discord-admin__search--wide"
+          className={`${styles.dcSearch} ${styles.dcSearchWide}`}
           placeholder="https://discord.com/api/webhooks/…"
           value={connWebhook}
           spellCheck={false}
           onChange={(e) => setConnWebhook(e.target.value)}
         />
-        <label className="discord-admin__sublabel" htmlFor="chain-webhook">{t('admin.discord.chainsWebhook')}</label>
+        <label className={styles.dcSublabel} htmlFor="chain-webhook">{t('admin.discord.chainsWebhook')}</label>
         <input
           id="chain-webhook"
           type="url"
-          className="discord-admin__search discord-admin__search--wide"
+          className={`${styles.dcSearch} ${styles.dcSearchWide}`}
           placeholder="https://discord.com/api/webhooks/…"
           value={chainWebhook}
           spellCheck={false}
@@ -1897,24 +1899,24 @@ function DiscordTab() {
         />
       </section>
 
-      <section className="discord-admin__section">
-        <h3 className="discord-admin__heading">{t('admin.discord.regions')}</h3>
-        <label className="discord-admin__radio">
+      <section className={styles.dcSection}>
+        <h3 className={styles.dcHeading}>{t('admin.discord.regions')}</h3>
+        <label className={styles.dcRadio}>
           <input type="radio" name="discord-regions" checked={allRegions} onChange={() => setAllRegions(true)} />
           {t('admin.discord.notifyAll')}
         </label>
-        <label className="discord-admin__radio">
+        <label className={styles.dcRadio}>
           <input type="radio" name="discord-regions" checked={!allRegions} onChange={() => setAllRegions(false)} />
           {t('admin.discord.notifySelected')}
         </label>
 
         {!allRegions && (
-          <div className="discord-admin__regions">
-            <div className="discord-admin__chips">
+          <div className={styles.dcRegions}>
+            <div className={styles.dcChips}>
               {regions.length === 0
-                ? <span className="admin-page__empty">{t('admin.discord.noRegionsSelected')}</span>
+                ? <span className={styles.pgEmpty}>{t('admin.discord.noRegionsSelected')}</span>
                 : regions.map((r) => (
-                    <span key={r} className="discord-admin__chip">
+                    <span key={r} className={styles.dcChip}>
                       {r}
                       <button type="button" onClick={() => removeRegion(r)} aria-label={t('admin.discord.removeRegion', { name: r })}>×</button>
                     </span>
@@ -1922,13 +1924,13 @@ function DiscordTab() {
             </div>
             <input
               type="text"
-              className="discord-admin__search"
+              className={styles.dcSearch}
               placeholder={t('admin.discord.searchPlaceholder')}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
             {matches.length > 0 && (
-              <ul className="discord-admin__results">
+              <ul className={styles.dcResults}>
                 {matches.map((o) => (
                   <li key={o.id}><button type="button" onClick={() => addRegion(o.name)}>{o.name}</button></li>
                 ))}
@@ -1938,86 +1940,86 @@ function DiscordTab() {
         )}
 
         {/* ── Wormhole filters (type code / dest class / size) — empty = all ── */}
-        <h4 className="discord-admin__subheading">{t('admin.discord.whFilters')}</h4>
-        <p className="discord-admin__hint">{t('admin.discord.whFiltersHint')}</p>
+        <h4 className={styles.dcSubheading}>{t('admin.discord.whFilters')}</h4>
+        <p className={styles.dcHint}>{t('admin.discord.whFiltersHint')}</p>
 
-        <label className="discord-admin__sublabel">{t('admin.discord.whTypeLabel')}</label>
-        <div className="discord-admin__chips">
+        <label className={styles.dcSublabel}>{t('admin.discord.whTypeLabel')}</label>
+        <div className={styles.dcChips}>
           {whTypes.length === 0
-            ? <span className="admin-page__empty">{t('admin.discord.whAll')}</span>
+            ? <span className={styles.pgEmpty}>{t('admin.discord.whAll')}</span>
             : whTypes.map((c) => (
-                <span key={c} className="discord-admin__chip">{c}
+                <span key={c} className={styles.dcChip}>{c}
                   <button type="button" onClick={() => setWhTypes(whTypes.filter((x) => x !== c))} aria-label={t('admin.discord.removeType', { name: c })}>×</button>
                 </span>
               ))}
         </div>
         <input
           type="text"
-          className="discord-admin__search"
+          className={styles.dcSearch}
           placeholder={t('admin.discord.whTypePlaceholder')}
           value={whQuery}
           onChange={(e) => setWhQuery(e.target.value.toUpperCase())}
         />
         {whMatches.length > 0 && (
-          <ul className="discord-admin__results">
+          <ul className={styles.dcResults}>
             {whMatches.map((c) => (
               <li key={c}>
                 <button type="button" onClick={() => { setWhTypes([...whTypes, c]); setWhQuery(''); }}>
-                  {c}<span className="discord-admin__result-meta"> → {whCatalog[c]?.dest ?? '?'}</span>
+                  {c}<span className={styles.dcResultMeta}> → {whCatalog[c]?.dest ?? '?'}</span>
                 </button>
               </li>
             ))}
           </ul>
         )}
 
-        <label className="discord-admin__sublabel">{t('admin.discord.whClassLabel')}</label>
-        <div className="discord-admin__togglechips">
+        <label className={styles.dcSublabel}>{t('admin.discord.whClassLabel')}</label>
+        <div className={styles.dcTogglechips}>
           {WH_CLASS_OPTS.map((c) => (
             <button
               key={c}
               type="button"
-              className={`discord-admin__togglechip${whClasses.includes(c) ? ' discord-admin__togglechip--on' : ''}`}
+              className={[styles.dcTogglechip, whClasses.includes(c) && styles.dcTogglechipOn].filter(Boolean).join(' ')}
               onClick={() => toggleIn(whClasses, setWhClasses, c)}
             >{c}</button>
           ))}
         </div>
 
-        <label className="discord-admin__sublabel">{t('admin.discord.whSizeLabel')}</label>
-        <div className="discord-admin__togglechips">
+        <label className={styles.dcSublabel}>{t('admin.discord.whSizeLabel')}</label>
+        <div className={styles.dcTogglechips}>
           {WH_SIZE_OPTS.map((o) => (
             <button
               key={o.key}
               type="button"
-              className={`discord-admin__togglechip${whSizes.includes(o.key) ? ' discord-admin__togglechip--on' : ''}`}
+              className={[styles.dcTogglechip, whSizes.includes(o.key) && styles.dcTogglechipOn].filter(Boolean).join(' ')}
               onClick={() => toggleIn(whSizes, setWhSizes, o.key)}
             >{t(o.labelKey)}</button>
           ))}
         </div>
 
-        <div className="discord-admin__actions">
+        <div className={styles.dcActions}>
           <button className="btn btn--primary" disabled={!dirty || saving} onClick={saveFilters}>
             {saving ? t('admin.discord.saving') : t('actions.save')}
           </button>
-          {saved && <span className="discord-admin__saved">{t('admin.discord.saved')}</span>}
+          {saved && <span className={styles.dcSaved}>{t('admin.discord.saved')}</span>}
         </div>
       </section>
 
-      <section className="discord-admin__section">
-        <h3 className="discord-admin__heading">{t('admin.discord.events')}</h3>
-        <label className="discord-admin__radio">
+      <section className={styles.dcSection}>
+        <h3 className={styles.dcHeading}>{t('admin.discord.events')}</h3>
+        <label className={styles.dcRadio}>
           <input type="checkbox" checked={data.notifyChains} onChange={(e) => toggleChains(e.target.checked)} />
           {t('admin.discord.broadcastChains')}
         </label>
-        <p className="discord-admin__hint">{t('admin.discord.broadcastChainsHint')}</p>
+        <p className={styles.dcHint}>{t('admin.discord.broadcastChainsHint')}</p>
       </section>
 
-      <section className="discord-admin__section">
-        <h3 className="discord-admin__heading">{t('admin.discord.excludedMaps')}</h3>
-        <p className="discord-admin__hint">{t('admin.discord.excludedHint')}</p>
+      <section className={styles.dcSection}>
+        <h3 className={styles.dcHeading}>{t('admin.discord.excludedMaps')}</h3>
+        <p className={styles.dcHint}>{t('admin.discord.excludedHint')}</p>
         {data.maps.length === 0
-          ? <div className="admin-page__empty">{t('admin.discord.noCorpMaps')}</div>
+          ? <div className={styles.pgEmpty}>{t('admin.discord.noCorpMaps')}</div>
           : (
-            <table className="admin-modal__table">
+            <table className={styles.mTable}>
               <thead><tr><th>{t('admin.discord.colMap')}</th><th>{t('admin.discord.colExclude')}</th></tr></thead>
               <tbody>
                 {data.maps.map((m) => (
