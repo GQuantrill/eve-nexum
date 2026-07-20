@@ -1,0 +1,391 @@
+/* Shared panel / pane styles (connection labels, saved chains, signature
+   pane, inline sov standings). Relocated verbatim out of App.css
+   (Phase 2 bucket-2). Kept GLOBAL; imported once in main.tsx. */
+
+/* ── Connection edge label ───────────────────────────────── */
+.connection-label {
+  position: absolute;
+  pointer-events: all;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  cursor: pointer;
+}
+
+.connection-label__row {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+}
+
+.connection-label__type {
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 700;
+  color: var(--text-default);
+  background: var(--surface-panel);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 1px 4px;
+}
+
+.connection-label__eol {
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 700;
+  color: var(--cv-conn-4h);
+  background: color-mix(in srgb, var(--cv-conn-4h) 16%, var(--surface-sunken));
+  border: 1px solid color-mix(in srgb, var(--cv-conn-4h) 38%, var(--surface-sunken));
+  border-radius: 3px;
+  padding: 1px 4px;
+}
+
+.connection-label__crit {
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 900;
+  color: var(--cv-conn-expired);
+  background: color-mix(in srgb, var(--cv-conn-expired) 16%, var(--surface-sunken));
+  border: 1px solid color-mix(in srgb, var(--cv-conn-expired) 38%, var(--surface-sunken));
+  border-radius: 3px;
+  padding: 1px 5px;
+}
+
+.connection-label__mass {
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 700;
+  color: #c0ccde;
+  background: var(--surface-panel);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 1px 4px;
+
+  &.connection-label__mass--warn {
+    color: var(--cv-conn-1h);
+    background: color-mix(in srgb, var(--cv-conn-1h) 14%, var(--surface-sunken));
+    border-color: color-mix(in srgb, var(--cv-conn-1h) 40%, var(--surface-sunken));
+  }
+
+  &.connection-label__mass--crit {
+    color: var(--cv-conn-expired);
+    background: color-mix(in srgb, var(--cv-conn-expired) 16%, var(--surface-sunken));
+    border-color: color-mix(in srgb, var(--cv-conn-expired) 38%, var(--surface-sunken));
+  }
+}
+
+/* Severed-connection marker: a ✂ badge dropped at the midpoint of a broken
+   (quarantined) connection. The dashed red edge plus this badge make a
+   collapsed chain obvious without removing it from the map. */
+.connection-break {
+  position: absolute;
+  pointer-events: all;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(20px * var(--font-scale, 1));
+  height: calc(20px * var(--font-scale, 1));
+  font-size: calc(13px * var(--font-scale, 1));
+  line-height: 1;
+  color: var(--cv-conn-expired);
+  background: color-mix(in srgb, var(--cv-conn-expired) 18%, var(--surface-sunken));
+  border: 1px solid color-mix(in srgb, var(--cv-conn-expired) 55%, var(--surface-sunken));
+  border-radius: 50%;
+}
+
+/* Broken-connection banner in the connection side panel. */
+.conn-broken-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 10px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  color: var(--cv-conn-expired);
+  background: color-mix(in srgb, var(--cv-conn-expired) 12%, var(--surface-sunken));
+  border: 1px solid color-mix(in srgb, var(--cv-conn-expired) 40%, var(--surface-sunken));
+}
+
+.conn-broken-banner__text {
+  flex: 1;
+  font-size: calc(12px * var(--font-scale, 1));
+  line-height: 1.35;
+}
+
+
+/* ── Saved chains (sidebar) ──────────────────────────────── */
+.chains-pane { display: flex; flex-direction: column; gap: 10px; }
+
+.chains-new { display: flex; flex-direction: column; gap: 6px; }
+.system-combo { width: 100%; }
+.chains-new__name {
+  width: 100%;
+  background: var(--surface-panel);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  color: var(--text-bright);
+  font-size: calc(13px * var(--font-scale, 1));
+  padding: 7px 10px;
+  outline: none;
+  box-sizing: border-box;
+}
+.chains-new__name:focus { border-color: var(--border-accent); }
+
+.chains-empty {
+  font-size: calc(12px * var(--font-scale, 1));
+  color: #8a9ab8;
+  line-height: 1.4;
+}
+
+.chains-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+
+.chain-item { border: 1px solid var(--surface-overlay); border-radius: 6px; background: var(--surface-sunken); }
+.chain-item__head { display: flex; align-items: center; }
+.chain-item__drag-handle {
+  flex: none;
+  background: none; border: none;
+  color: var(--text-dim); cursor: grab; user-select: none;
+  padding: 0 2px 0 6px;
+  font-size: calc(13px * var(--font-scale, 1)); line-height: 1;
+}
+.chain-item__drag-handle:hover { color: #8a9ab8; }
+.chain-item__drag-handle:active { cursor: grabbing; }
+.chain-item__toggle {
+  flex: 1; min-width: 0;
+  display: flex; align-items: center; gap: 6px;
+  background: none; border: none; cursor: pointer; text-align: left;
+  padding: 7px 8px; color: #c0ccde;
+  font-size: calc(13px * var(--font-scale, 1));
+}
+.chain-item__name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chain-item__hops { flex: none; color: #8a9ab8; font-size: calc(11px * var(--font-scale, 1)); }
+.chain-item__del { flex: none; margin-right: 4px; color: #8a9ab8; }
+.chain-item__del:hover { color: var(--cv-conn-expired); }
+
+.chain-steps { list-style: none; margin: 0; padding: 2px 8px 8px; display: flex; flex-direction: column; gap: 5px; }
+.chain-step { display: flex; flex-direction: column; gap: 2px; padding-left: 6px; border-left: 2px solid var(--border); }
+.chain-step--broken { border-left-color: var(--cv-conn-expired); }
+.chain-step__systems {
+  display: flex; align-items: center; gap: 5px;
+  background: none; border: none; cursor: pointer; padding: 0; text-align: left;
+  color: #c0ccde; font-size: calc(12px * var(--font-scale, 1));
+}
+.chain-step__systems:hover { color: #fff; }
+.chain-step__via {
+  display: flex; align-items: center; gap: 5px;
+  font-size: calc(11px * var(--font-scale, 1)); color: #8a9ab8;
+}
+.chain-step__warp { display: inline-flex; align-items: center; gap: 4px; }
+.chain-step__wh {
+  padding: 0 5px; border-radius: 4px;
+  background: #161d2e; color: #c0ccde;
+  font-family: monospace; font-size: calc(10px * var(--font-scale, 1));
+}
+.chain-step__broken { display: inline-flex; align-items: center; gap: 4px; color: var(--cv-conn-expired); }
+/* Type / Size line under a wormhole hop's "warp to" line. */
+.chain-step__meta {
+  display: flex; flex-wrap: wrap; gap: 4px 12px;
+  padding-left: 16px;
+  font-size: calc(10px * var(--font-scale, 1)); color: #8a9ab8;
+}
+
+/* Per-end "backing signature" link controls in the connection panel. */
+.conn-siglink {
+  margin: 4px 0 2px;
+  padding-top: 8px;
+  border-top: 1px solid var(--surface-overlay);
+}
+
+.conn-siglink__label {
+  font-size: calc(12px * var(--font-scale, 1));
+  font-weight: 600;
+  color: #8a9ab8;
+  margin-bottom: 6px;
+}
+
+
+/* ── Signature pane ──────────────────────────────────────── */
+.sig-pane {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sig-pane__hint {
+  font-size: calc(13px * var(--font-scale, 1));
+  color: var(--text-default);
+  margin: 0 0 6px;
+  font-style: italic;
+  margin: 10px;
+}
+
+.sig-pane__toolbar {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Multi-select signature-type filter. Left-aligned chips above the table;
+   click to show only the selected types (none selected = show all). */
+.sig-pane__filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 0 6px;
+}
+
+/* ── Inline sov standings badges ─────────────────────────── */
+.sys-info__sov-standings {
+  display: flex;
+  gap: 4px;
+  /* No margin-left:auto — the grown text column pushes the badges right on a
+     shared line, and when they wrap to their own line they sit left-aligned. */
+}
+
+.sys-info__sov-standing {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: calc(11px * var(--font-scale, 1));
+  font-variant-numeric: tabular-nums;
+  background: #14182a;
+  border: 1px solid var(--border);
+  color: var(--text-default);
+  line-height: 1.4;
+  /* Lock to a consistent width so the dash-only pills and number-bearing
+     pills line up neatly side-by-side. Sized to fit '-10.0' worst case. */
+  min-width: 52px;
+}
+
+.sys-info__sov-standing-value {
+  min-width: 28px;
+  text-align: right;
+}
+
+.sys-info__sov-standing-label {
+  font-size: calc(9px * var(--font-scale, 1));
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #7a8aa8;
+}
+
+/* EVE in-game standings palette: dark blue at +10 (excellent), light blue
+   at +5 (good), orange at -5 (bad), red at -10 (terrible). Neutral falls
+   through to the base pill colours. */
+.sys-info__sov-standing--friendly { color: var(--cv-stand-friendly); background: color-mix(in srgb, var(--cv-stand-friendly) 12%, transparent); border-color: color-mix(in srgb, var(--cv-stand-friendly) 35%, transparent); }  /* +10 */
+.sys-info__sov-standing--good     { color: var(--cv-stand-good);     background: color-mix(in srgb, var(--cv-stand-good) 10%, transparent);     border-color: color-mix(in srgb, var(--cv-stand-good) 30%, transparent); }      /* +5  */
+.sys-info__sov-standing--bad      { color: var(--cv-stand-bad);      background: color-mix(in srgb, var(--cv-stand-bad) 10%, transparent);      border-color: color-mix(in srgb, var(--cv-stand-bad) 35%, transparent); }       /* -5  */
+.sys-info__sov-standing--hostile  { color: var(--cv-stand-hostile);  background: color-mix(in srgb, var(--cv-stand-hostile) 12%, transparent);  border-color: color-mix(in srgb, var(--cv-stand-hostile) 40%, transparent); }   /* -10 */
+.sys-info__sov-standing--none     { color: #4a5670; }
+.sys-info__sov-standing--none .sys-info__sov-standing-label { color: #3a4254; }
+
+.admin-page__sort-th {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.admin-page__sort-th:hover { color: var(--text-default); }
+
+.admin-page__sort-th--active { color: #7ab4f0; }
+
+.admin-page__sort-arrow {
+  display: inline-block;
+  width: 10px;
+  margin-left: 5px;
+  font-size: calc(9px * var(--font-scale, 1));
+  color: #7ab4f0;
+}
+
+.admin-page__report-heading {
+  font-size: calc(12px * var(--font-scale, 1));
+  font-weight: 600;
+  color: #7a8aa8;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 24px 0 10px;
+}
+
+.admin-page__report-heading:first-child { margin-top: 0; }
+
+.admin-page__stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.admin-page__stat-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: #08090f;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 12px;
+}
+
+.admin-page__stat-card--accent { border-color: var(--border-accent-strong); background: #0a1426; }
+
+.admin-page__stat-card-value {
+  font-size: calc(22px * var(--font-scale, 1));
+  font-weight: 700;
+  color: var(--text-bright);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-page__stat-card--accent .admin-page__stat-card-value { color: #7ab4f0; }
+
+.admin-page__stat-card-pct {
+  font-size: calc(12px * var(--font-scale, 1));
+  font-weight: 600;
+  color: #9aa8c0;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-page__stat-card-label {
+  font-size: calc(11px * var(--font-scale, 1));
+  color: #7a8aa8;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.admin-page__wh-table {
+  max-width: 360px;
+}
+
+.admin-page__chart-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.admin-page__chart-card {
+  background: #08090f;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.admin-page__chart-title {
+  font-size: calc(12px * var(--font-scale, 1));
+  font-weight: 600;
+  color: #7a8aa8;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.admin-page__chart-canvas {
+  position: relative;
+  height: 240px;
+}
+
