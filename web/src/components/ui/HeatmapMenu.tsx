@@ -36,7 +36,14 @@ export function HeatmapMenu() {
         <FireIcon size={18} weight="regular" />
       </button>
       {open && (
-        <div className="heatmap-menu__pop" role="menu">
+        // Own the pointer inside the popover so dragging the intensity slider
+        // (or the select / reset) isn't read as a reorder by the surrounding
+        // dnd-kit sortable toolbar item.
+        <div
+          className="heatmap-menu__pop"
+          role="menu"
+          onPointerDown={(e) => e.stopPropagation()}
+        >
           <label className="heatmap-menu__label" htmlFor="heatmap-metric-tb">{t('mapSidebar.heatmap')}</label>
           <select
             id="heatmap-metric-tb"
