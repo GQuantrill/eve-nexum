@@ -17,7 +17,7 @@ import { hoursMins } from '../../i18n/format';
 import type { TFunction } from 'i18next';
 
 // CSS custom properties (resolved via the edge path's inline `style`) so the
-// colour-vision palettes (--cv-conn-* in App.css) re-map connection colours.
+// colour-vision palettes (--cv-conn-* in styles/tokens.css) re-map connection colours.
 const STANDARD_COLOR = 'var(--cv-conn-standard)';
 const JUMPGATE_COLOR  = 'var(--cv-conn-jumpgate)';
 const GATE_COLOR      = 'var(--cv-conn-gate)';

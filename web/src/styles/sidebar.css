@@ -1,0 +1,2347 @@
+/* Map sidebar family: toolbar, character switcher, map sidebar, watchlist,
+   named lists, bulk import, settings, content filter, WH type picker.
+   Relocated verbatim out of App.css (Phase 2 bucket-2); kept GLOBAL,
+   imported once in main.tsx. See design-system.md. */
+
+/* ── Toolbar ─────────────────────────────────────────────── */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  /* Every control is an atomic flex item (flex-shrink: 0), so when the row runs
+     out of width items wrap to the next line rather than squishing, clipping, or
+     stacking — reordering can never produce an overlap. Keeps the bar usable on
+     vertical monitors / narrow laptops. */
+  flex-wrap: wrap;
+  row-gap: 6px;
+  padding: 4px 16px;
+  min-height: 48px;
+  background: var(--surface-well);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  /* Sits above the map sidebar (z-index 20) so tooltips dropping down from
+     toolbar buttons aren't clipped when the sidebar is open. */
+  z-index: 30;
+  position: relative;
+}
+
+/* One movable toolbar item (drag-and-drop reorder via dnd-kit sortable). The
+   whole item is the drag handle — grab cursor by default; interactive children
+   keep their own, and the 6px pointer activation distance means a tap still
+   clicks through. Items sit in normal flex flow, never absolutely positioned,
+   so two can never occupy the same space. */
+.toolbar__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  cursor: grab;
+  border-radius: 6px;
+  touch-action: none;
+}
+.toolbar__item--dragging { cursor: grabbing; }
+.toolbar__item button,
+.toolbar__item a,
+.toolbar__item .toolbar__char-system--clickable { cursor: pointer; }
+.toolbar__item input { cursor: text; }
+
+/* Six-dot drag grip on every item: a persistent "this can be dragged" cue,
+   quiet at rest and emphasised on hover / while dragging. */
+.toolbar__item-grip {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-right: -2px;
+  color: var(--text-faintest);
+  opacity: 0.45;
+  transition: opacity 0.12s, color 0.12s;
+}
+.toolbar__item:hover .toolbar__item-grip { opacity: 0.9; color: var(--text-subtle); }
+.toolbar__item--dragging .toolbar__item-grip { opacity: 1; color: #a9b8dc; }
+
+/* Groups several related controls inside a single movable item (e.g. the map
+   switcher + name field), keeping them together as one draggable unit. */
+.toolbar__group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* The reset-layout affordance is pinned to the far right — it's a layout meta
+   action, not a movable item, and only appears once the layout is customised. */
+.toolbar__reset-layout {
+  margin-left: auto;
+  align-self: center;
+}
+
+/* Narrow screens (vertical monitors, smaller laptops): tighten the inter-item
+   gap so more fits per row before wrapping. */
+@media (max-width: 1600px) {
+  .toolbar {
+    column-gap: 8px;
+  }
+}
+
+/* Update-available badge: blinking red exclamation, pushed to the far right of
+   the toolbar. Admins + alliance admins only (component self-gates). */
+.toolbar__update {
+  margin-left: auto;
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  background: none;
+  border: none;
+  padding: 0 6px;
+  cursor: pointer;
+  color: var(--danger);
+  animation: nexum-update-blink 1s steps(1, end) infinite;
+}
+.toolbar__update:hover { color: var(--danger-soft); animation: none; }
+@keyframes nexum-update-blink {
+  0%, 49%  { opacity: 1; }
+  50%, 100% { opacity: 0.2; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .toolbar__update { animation: none; }
+}
+
+.toolbar__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  /* Stays in the top row even when the bar grows for a dragged 2nd-row section. */
+  align-self: flex-start;
+  height: 48px;
+}
+
+.toolbar__logo {
+  width: calc(26px * var(--font-scale, 1));
+  height: calc(26px * var(--font-scale, 1));
+  object-fit: contain;
+  display: block;
+}
+
+.toolbar__option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.toolbar__option-label {
+  font-size: calc(16px * var(--font-scale, 1));
+  color: var(--text-faintest);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.toolbar__toggle {
+  background: var(--surface-panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-faintest);
+  cursor: pointer;
+  font-size: calc(16px * var(--font-scale, 1));
+  font-weight: 600;
+  padding: 3px 10px;
+
+  &:hover { background: var(--surface-overlay); color: var(--text-default); }
+
+  &.toolbar__toggle--on {
+    background: #1a3a6a;
+    border-color: var(--border-accent-strong);
+    color: var(--accent-light);
+  }
+
+  /* Square icon-only variant — sized to fit the 18px Phosphor SVGs. The
+   * inline-flex centring keeps the icon optically middle of the button
+   * regardless of font line-height. */
+  &.toolbar__toggle--icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+    line-height: 1;
+  }
+
+  &.toolbar__toggle--icon svg { display: block; }
+
+  /* Brighter variant — for buttons we want to read more prominently
+   * against the dark toolbar (e.g. Sign out). */
+  &.toolbar__toggle--prominent {
+    background: var(--border-strong);
+    border-color: #3a5a8a;
+    color: var(--text-primary);
+
+    &:hover { background: var(--surface-muted); color: #ffffff; }
+  }
+}
+
+.toolbar__map-name {
+  background: transparent;
+  border: none;
+  color: var(--text-bright);
+  font-size: calc(15px * var(--font-scale, 1));
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  outline: none;
+  padding: 2px 4px;
+  border-radius: 4px;
+  min-width: 120px;
+
+  &:hover { background: var(--surface-overlay); }
+  &:focus { background: var(--surface-overlay); outline: 1px solid var(--border-accent); }
+}
+
+.toolbar__stats {
+  display: flex;
+  gap: 16px;
+  font-size: calc(13px * var(--font-scale, 1));
+  color: var(--text-bright);
+
+  span { display: flex; align-items: center; gap: 4px; }
+}
+
+.toolbar__stat {
+  cursor: default;
+  color: var(--text-secondary);
+
+  svg { display: block; color: var(--accent-light); }
+}
+
+.toolbar__stat-count {
+  font-variant-numeric: tabular-nums;
+}
+
+.toolbar__spacer { flex: 1; }
+
+.toolbar__proximity {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+  font-size: calc(13px * var(--font-scale, 1));
+  color: var(--text-secondary);
+  background: var(--surface-well);
+  white-space: nowrap;
+  position: relative;
+  color: red;
+  border-color: red;
+}
+
+.toolbar__proximity--alert {
+  border-color: var(--danger);
+  color: #ffb0b0;
+  background: rgba(224, 90, 90, 0.12);
+  animation: proximity-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes proximity-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(224, 90, 90, 0); }
+  50%      { box-shadow: 0 0 0 4px rgba(224, 90, 90, 0.25); }
+}
+
+.toolbar__proximity-icon {
+  font-size: calc(14px * var(--font-scale, 1));
+}
+
+.toolbar__proximity-text {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.toolbar__user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.toolbar__avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid var(--border-accent);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+/* Current-ship icon — wrapped in a <span> so the generic [data-tooltip]
+   ::after pseudo-element can render (it can't on <img> directly). */
+.toolbar__ship-wrap {
+  display: inline-flex;
+  flex-shrink: 0;
+  line-height: 0;
+}
+
+.toolbar__ship {
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+  border: 1px solid var(--border-accent);
+  background: var(--surface-well);
+  object-fit: cover;
+}
+
+.toolbar__char-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.toolbar__char-name {
+  font-size: calc(13px * var(--font-scale, 1));
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.toolbar__checked-at {
+  font-size: calc(13px * var(--font-scale, 1));
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+/* Second line under the character name: last-known/current system + a small
+   "last checked" clock icon (replaces the old text label). */
+.toolbar__char-sub {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.toolbar__char-system {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: calc(12px * var(--font-scale, 1));
+  color: var(--text-muted);
+  white-space: nowrap;
+  /* Button reset so the clickable variant matches the plain span. */
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+}
+.toolbar__char-system svg { color: var(--accent); flex-shrink: 0; }
+.toolbar__char-system--clickable { cursor: pointer; }
+.toolbar__char-system--clickable:hover { color: var(--text-primary); }
+.toolbar__char-system--clickable:hover svg { color: var(--accent-light); }
+.toolbar__checked-icon {
+  display: inline-flex;
+  align-items: center;
+  color: var(--text-faintest);
+  cursor: default;
+}
+
+/* ── Character (account) switcher ─────────────────────────── */
+.character-switcher { position: relative; display: inline-flex; }
+.character-switcher__trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-subtle);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.character-switcher__trigger:hover { border-color: var(--accent-alt); color: var(--text-default); }
+.character-switcher__menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 1000;
+  min-width: 200px;
+  background: var(--surface-well);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.character-switcher__row { display: flex; align-items: center; border-radius: 4px; }
+.character-switcher__row:hover { background: var(--surface-raised); }
+.character-switcher__row--active .character-switcher__name { color: var(--text-bright); }
+.character-switcher__switch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  padding: 5px 8px;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: calc(13px * var(--font-scale, 1));
+  cursor: pointer;
+  text-align: left;
+}
+.character-switcher__switch:disabled { cursor: default; }
+.character-switcher__avatar { width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0; }
+.character-switcher__identity { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.character-switcher__name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.character-switcher__blocked { margin-left: 6px; color: var(--danger); font-size: 0.85em; }
+.character-switcher__location { font-size: 0.82em; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.character-switcher__focus {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  margin-right: 4px;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.character-switcher__focus:hover:not(:disabled) { color: var(--accent); background: var(--border); }
+.character-switcher__focus:disabled { opacity: 0.4; cursor: default; }
+.character-switcher__focus--on { color: var(--accent); }
+.character-switcher__remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  margin-right: 4px;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.character-switcher__remove:hover:not(:disabled) { color: var(--danger-soft); background: #2a1820; }
+.character-switcher__remove:disabled { opacity: 0.4; cursor: default; }
+/* Occupies the remove button's slot on the active row so the track pins
+   stay aligned in the rightmost column across every row. */
+.character-switcher__remove-spacer { width: 26px; margin-right: 4px; flex-shrink: 0; }
+.character-switcher__add {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  margin-top: 2px;
+  border-top: 1px solid var(--surface-hover);
+  color: var(--accent);
+  font-size: calc(13px * var(--font-scale, 1));
+  text-decoration: none;
+  border-radius: 4px;
+}
+.character-switcher__add:hover { background: var(--surface-raised); color: var(--accent-light); }
+
+
+.toolbar__online-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--surface-muted);
+  flex-shrink: 0;
+
+  &.toolbar__online-dot--on  { background: var(--success); box-shadow: 0 0 4px var(--success); }
+  &.toolbar__online-dot--off { background: var(--danger); }
+}
+
+.toolbar__server-status {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0 12px;
+  border-right: 1px solid var(--surface-hover);
+}
+
+.toolbar__server-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.toolbar__status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--surface-muted);
+  flex-shrink: 0;
+  cursor: default;
+  position: relative;
+
+  &::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--surface-panel);
+    color: var(--text-primary);
+    font-size: calc(13px * var(--font-scale, 1));
+    white-space: nowrap;
+    padding: 3px 7px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.1s;
+  }
+  /* Reveal handled by the global TooltipLayer (viewport-clamped). */
+
+  &.toolbar__status-dot--on  { background: var(--cv-online-on);  box-shadow: 0 0 4px color-mix(in srgb, var(--cv-online-on) 40%, transparent); }
+  &.toolbar__status-dot--off { background: var(--cv-online-off); box-shadow: 0 0 4px color-mix(in srgb, var(--cv-online-off) 40%, transparent); }
+}
+
+/* Status LED for toolbar toggle buttons whose on/off state isn't obvious
+   from the active styling alone (e.g. Track Jumps). On icon-only
+   buttons it overlays the bottom-right corner so the button stays
+   square; on text buttons it would sit inline (legacy positioning). */
+.toolbar__toggle-led {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.toolbar__toggle--icon {
+  position: relative;
+}
+.toolbar__toggle--icon > .toolbar__toggle-led {
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+}
+
+.toolbar__toggle-led--on  { background: var(--success); box-shadow: 0 0 4px #3ddc8466; }
+.toolbar__toggle-led--off { background: var(--danger); box-shadow: 0 0 4px #e05a5a66; }
+
+/* Heatmap toolbar control — icon button + horizontal popover (type + intensity). */
+.heatmap-menu { position: relative; display: inline-flex; }
+.heatmap-menu__pop {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  background: var(--surface-well);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+  padding: 8px 10px;
+}
+/* Labels kept for screen readers (htmlFor association) but visually hidden —
+   the select value and the slider/percentage already convey what they control. */
+.heatmap-menu__label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.heatmap-menu__select {
+  background: var(--surface-base);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-default);
+  font-family: inherit;
+  font-size: calc(12px * var(--font-scale, 1));
+  padding: 3px 6px;
+  cursor: pointer;
+}
+.heatmap-menu__slider { width: 110px; }
+.heatmap-menu__value {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-default);
+  font-size: calc(11px * var(--font-scale, 1));
+  padding: 2px 6px;
+  min-width: 46px;
+  cursor: pointer;
+}
+
+/* ── Map sidebar ─────────────────────────────────────────── */
+.map-sidebar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 250px;
+  transform: translateX(100%);
+  transition: transform 0.2s ease;
+  background: var(--surface-well);
+  border-left: 1px solid var(--border);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+}
+
+.map-sidebar--open {
+  transform: translateX(0);
+}
+
+.map-sidebar__tab {
+  position: absolute;
+  left: -28px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 56px;
+  background: var(--surface-well);
+  border: 1px solid var(--border);
+  border-right: none;
+  border-radius: 6px 0 0 6px;
+  color: var(--text-secondary);
+  font-size: calc(18px * var(--font-scale, 1));
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s, background 0.15s;
+
+  &:hover {
+    background: var(--surface-raised);
+    color: var(--text-default);
+  }
+}
+
+.map-sidebar__content {
+  display: flex;
+  flex-direction: column;
+  padding: 16px 12px;
+  gap: 8px;
+  overflow-y: auto;
+}
+
+.map-sidebar__section-title {
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-faintest);
+  text-align: start;
+
+}
+
+.map-sidebar__section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 4px 0;
+  margin: 0;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.map-sidebar__section-header:hover .map-sidebar__section-title { color: var(--text-default); }
+
+.map-sidebar__caret {
+  color: var(--text-faintest);
+  font-size: calc(12px * var(--font-scale, 1));
+  transition: transform 0.15s ease;
+  transform: rotate(-90deg);
+}
+
+.map-sidebar__caret--open { transform: rotate(0deg); }
+
+.map-sidebar__section-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 6px;
+}
+
+.map-sidebar__section--collapsed {
+  gap: 0;
+}
+
+.map-sidebar__select {
+  background: var(--surface-panel);
+  border: 1px solid var(--border);
+  color: var(--text-default);
+  font-size: calc(13px * var(--font-scale, 1));
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+
+  &:focus { border-color: var(--border-accent); outline: none; }
+}
+
+.map-sidebar__zoom {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.map-sidebar__zoom-slider {
+  flex: 1;
+  min-width: 80px;
+  accent-color: var(--accent);
+}
+
+.map-sidebar__zoom-value {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-secondary);
+  font-size: calc(12px * var(--font-scale, 1));
+  font-variant-numeric: tabular-nums;
+  padding: 2px 6px;
+  cursor: pointer;
+  min-width: 48px;
+  text-align: center;
+
+  &:hover { border-color: var(--accent); color: var(--text-bright); }
+}
+
+.map-sidebar__hint {
+  font-size: calc(12px * var(--font-scale, 1));
+  color: var(--text-subtle);
+  line-height: 1.4;
+  padding: 4px 0 0;
+}
+
+.map-sidebar__hint--error {
+  color: #ff8a80;
+}
+
+.chain-exits__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 2px 0;
+}
+
+.chain-exits__chip {
+  font-size: calc(11px * var(--font-scale, 1));
+  padding: 2px 8px;
+  border: 1px solid;
+  border-radius: 999px;
+  background: rgba(8, 9, 15, 0.4);
+}
+
+.chain-exits__chip strong {
+  font-weight: 700;
+  margin-right: 3px;
+}
+
+.chain-exits__nearest {
+  font-size: calc(12px * var(--font-scale, 1));
+  color: var(--text-primary);
+  padding: 4px 8px;
+  background: rgba(110, 160, 255, 0.06);
+  border-left: 2px solid var(--accent-bright);
+  border-radius: 0 3px 3px 0;
+}
+
+.chain-exits__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 180px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.chain-exits__row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  font-size: calc(12px * var(--font-scale, 1));
+  border-bottom: 1px solid var(--surface-panel);
+}
+
+.chain-exits__row:last-child {
+  border-bottom: none;
+}
+
+.chain-exits__dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.chain-exits__name {
+  flex: 1;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chain-exits__jumps {
+  color: var(--text-subtle);
+  font-variant-numeric: tabular-nums;
+}
+
+.map-shares__picker {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.map-shares__input {
+  width: 100%;
+  background: var(--surface-base);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 5px 8px;
+  font-size: calc(13px * var(--font-scale, 1));
+  color: var(--text-primary);
+  outline: none;
+}
+
+.map-shares__input:focus {
+  border-color: var(--accent-bright);
+}
+
+.map-shares__match {
+  min-height: calc(16px * var(--font-scale, 1));
+  font-size: calc(11px * var(--font-scale, 1));
+}
+
+.map-shares__match--hint { color: var(--text-faint); }
+.map-shares__match--ok   { color: var(--success-bright); }
+.map-shares__match--miss { color: var(--warning); }
+
+/* Search input + "add to list" button on one row (share-to-many staging). */
+.map-shares__search-row { display: flex; gap: 6px; align-items: stretch; }
+.map-shares__search-row .map-shares__input { flex: 1 1 auto; width: auto; }
+.map-shares__add-btn {
+  flex: 0 0 auto;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 30px;
+  background: var(--surface-overlay); border: 1px solid var(--border-accent-strong); border-radius: 4px;
+  color: var(--accent-light); cursor: pointer;
+}
+.map-shares__add-btn:hover:not(:disabled) { background: #1a3a6a; }
+.map-shares__add-btn:disabled { opacity: 0.4; cursor: default; border-color: var(--border); color: #4a5670; }
+
+/* Staged targets queued for the batch share. */
+.map-shares__staged { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.map-shares__staged-head { width: 100%; font-size: calc(11px * var(--font-scale, 1)); color: var(--text-muted); }
+.map-shares__chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 2px 4px 2px 3px;
+  background: var(--surface-panel); border: 1px solid #263352; border-radius: 12px;
+  font-size: calc(11px * var(--font-scale, 1)); color: var(--text-primary);
+  max-width: 100%;
+}
+.map-shares__chip--error { border-color: #7a3030; background: var(--surface-well); }
+.map-shares__chip-avatar { width: 16px; height: 16px; border-radius: 50%; flex-shrink: 0; object-fit: cover; }
+.map-shares__chip-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 140px; }
+.map-shares__chip-remove {
+  display: inline-flex; align-items: center; justify-content: center;
+  background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 0;
+}
+.map-shares__chip-remove:hover { color: #e06a6a; }
+.map-shares__grant-login {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: calc(12px * var(--font-scale, 1));
+  color: #a8b6cc;
+  cursor: pointer;
+  margin: 2px 0;
+}
+
+.map-shares__list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 4px;
+}
+
+.map-shares__row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 6px;
+  background: var(--surface-base);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: calc(12px * var(--font-scale, 1));
+}
+
+.map-shares__avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 3px;
+  background: var(--surface-sunken);
+  flex-shrink: 0;
+  object-fit: cover;
+}
+
+.map-shares__kind {
+  font-size: calc(10px * var(--font-scale, 1));
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.map-shares__kind--character {
+  background: rgba(192,132,252,0.15);
+  color: var(--accent-violet);
+  border: 1px solid rgba(192,132,252,0.3);
+}
+
+.map-shares__kind--corp {
+  background: rgba(100,160,255,0.15);
+  color: var(--accent-light);
+  border: 1px solid rgba(100,160,255,0.3);
+}
+
+.map-shares__name {
+  flex: 1;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.map-shares__revoke {
+  background: transparent;
+  border: 1px solid #3a2030;
+  color: #d88a8a;
+  border-radius: 3px;
+  padding: 2px 4px;
+  cursor: pointer;
+  line-height: 0;
+  flex-shrink: 0;
+}
+
+.map-shares__revoke:hover {
+  background: rgba(224,90,90,0.1);
+  color: var(--danger);
+}
+
+/* ── Watchlist sidebar panel ─────────────────────────────────────────────── */
+.watchlist {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.watchlist__sound {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: calc(12px * var(--font-scale, 1));
+  color: #aeb9d6;
+  cursor: pointer;
+}
+
+/* Quick-add characteristic palette: tick a chip to drop a matching row in. */
+.watchlist__quickadd {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.watchlist__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.watchlist__chip {
+  background: var(--surface-base);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 2px 9px;
+  font-size: calc(11px * var(--font-scale, 1));
+  color: #9aa6c4;
+  cursor: pointer;
+  transition: color 0.12s, border-color 0.12s, background 0.12s;
+}
+
+.watchlist__chip:hover { color: var(--text-primary); }
+
+.watchlist__chip--active {
+  color: #cfe0ff;
+  border-color: var(--border-accent-strong);
+  background: rgba(110,160,255,0.14);
+}
+
+.watchlist__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 2px;
+}
+
+/* Drag-and-drop: a container (ungrouped list or a group) tints while a row
+   hovers over it, so the drop target is obvious. */
+.watchlist__drop-over {
+  outline: 1px dashed var(--accent, #5b9bff);
+  outline-offset: 2px;
+  background: color-mix(in srgb, var(--accent, #5b9bff) 8%, transparent);
+  border-radius: 6px;
+}
+
+/* Empty-ungrouped affordance, shown only while dragging so a grouped row can be
+   dropped back out. */
+.watchlist__drop-hint {
+  padding: 10px;
+  text-align: center;
+  font-size: calc(12px * var(--font-scale, 1));
+  color: var(--muted, #8a98b8);
+  border: 1px dashed #2a3650;
+  border-radius: 6px;
+}
+
+/* The row preview that follows the cursor during a drag. */
+.watchlist__row--overlay {
+  cursor: grabbing;
+  opacity: 0.95;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+/* ── Named lists (groups) ─────────────────────────────────────────── */
+.watchlist__group {
+  margin-top: 10px;
+  border: 1px solid var(--surface-hover);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.watchlist__group-head {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--surface-panel);
+  padding: 4px 6px;
+}
+.watchlist__group-toggle {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 600;
+  text-align: left;
+  min-width: 0;
+}
+.watchlist__group-caret { transition: transform 0.15s ease; flex-shrink: 0; }
+.watchlist__group-caret--collapsed { transform: rotate(-90deg); }
+.watchlist__group-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.watchlist__group-count {
+  flex-shrink: 0;
+  color: #6a8ab0;
+  font-weight: 400;
+  font-size: calc(12px * var(--font-scale, 1));
+}
+/* Aggregate "N of this group's entries are on the current map" — green like the
+   per-row locate badge, so a collapsed group still shows a match at a glance. */
+.watchlist__group-onmap {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--success-bright);
+  font-weight: 600;
+  font-size: calc(12px * var(--font-scale, 1));
+}
+.watchlist__group--onmap { border-color: #2c6e49; }
+.watchlist__group--onmap .watchlist__group-head { background: rgba(74, 222, 128, 0.07); }
+.watchlist__group-btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 2px 4px;
+}
+.watchlist__group-btn:hover:not(:disabled) { color: #a0ccf8; }
+.watchlist__group-btn:disabled { opacity: 0.4; cursor: default; }
+.watchlist__group-btn--del:hover:not(:disabled) { color: var(--danger); }
+.watchlist__group .watchlist__list { padding: 8px 6px; margin-top: 0; }
+
+/* ── Bulk import form ─────────────────────────────────────────────── */
+.watchlist__actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.watchlist__actions .map-sidebar__action { flex: 1 1 auto; min-width: 90px; justify-content: center; }
+.watchlist__import {
+  margin-top: 8px;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface-base);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.watchlist__import-head { display: flex; gap: 6px; }
+.watchlist__import-name {
+  flex: 1;
+  min-width: 0;
+  background: var(--surface-well);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: calc(13px * var(--font-scale, 1));
+  padding: 5px 8px;
+  outline: none;
+}
+.watchlist__import-name:focus { border-color: var(--accent-bright); }
+.watchlist__import-marker {
+  flex-shrink: 0;
+  background: var(--surface-well);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: calc(12px * var(--font-scale, 1));
+  padding: 4px 6px;
+}
+.watchlist__import-text {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  background: var(--surface-well);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: calc(13px * var(--font-scale, 1));
+  padding: 6px 8px;
+  outline: none;
+}
+.watchlist__import-text:focus { border-color: var(--accent-bright); }
+.watchlist__import-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.watchlist__import-room { flex: 1; color: #6a8ab0; font-size: calc(12px * var(--font-scale, 1)); }
+
+/* Each entry is a small card: a top line (marker | what | delete) and a
+   bottom line (value + note). The left-docked panel is wide enough for this
+   to read comfortably without clipping. */
+.watchlist__row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid var(--surface-overlay);
+  border-radius: 6px;
+  background: rgba(255,255,255,0.02);
+}
+
+.watchlist__row-top,
+.watchlist__row-bottom {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  /* Wrap onto extra rows on a narrow (docked) panel instead of shrinking the
+     controls to nothing. Kicks in only when they no longer fit side by side —
+     wide layouts are unchanged. Paired with the min-widths below, since a
+     min-width of 0 would let items shrink forever and never wrap. */
+  flex-wrap: wrap;
+}
+
+/* Full-width delete along the bottom of an entry — avoids competing for space
+   with the marker / match-type / locate controls on a narrow panel. */
+.watchlist__delete-full {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: 100%;
+  margin-top: 6px;
+  background: transparent;
+  border: 1px solid #3a2030;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: calc(11px * var(--font-scale, 1));
+  color: #d88a8a;
+  cursor: pointer;
+}
+.watchlist__delete-full:hover {
+  background: rgba(224,90,90,0.10);
+  color: var(--danger);
+}
+
+/* Compound-criteria block: the AND/OR selector, each criterion row, and the
+   add button. Left-aligned and full-width so the rows line up with the primary
+   match controls above. */
+.watchlist__criteria {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+}
+.watchlist__criterion {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.watchlist__combine {
+  align-self: flex-start;
+  background: var(--surface-base);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 3px 6px;
+  font-size: calc(11px * var(--font-scale, 1));
+  color: #9fb0d0;
+  cursor: pointer;
+  outline: none;
+}
+.watchlist__add-criteria {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: 1px dashed #2a3550;
+  border-radius: 4px;
+  padding: 3px 8px;
+  font-size: calc(11px * var(--font-scale, 1));
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.watchlist__add-criteria:hover {
+  color: #9fb0d0;
+  border-color: var(--surface-muted);
+}
+
+.watchlist__drag-handle {
+  flex: none;
+  background: none; border: none;
+  color: var(--text-dim); cursor: grab; user-select: none;
+  padding: 0 2px;
+  font-size: calc(13px * var(--font-scale, 1)); line-height: 1;
+}
+.watchlist__drag-handle:hover { color: var(--text-subtle); }
+.watchlist__drag-handle:active { cursor: grabbing; }
+
+.watchlist__marker-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+}
+
+.watchlist__marker,
+.watchlist__by {
+  flex-shrink: 0;
+  background: var(--surface-base);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 4px 2px;
+  font-size: calc(12px * var(--font-scale, 1));
+  color: var(--text-primary);
+  outline: none;
+  cursor: pointer;
+}
+
+.watchlist__marker { width: 82px; }
+.watchlist__by { flex: 1; min-width: 80px; }
+
+.watchlist__char-label {
+  flex: 1;
+  min-width: 80px;
+  font-size: calc(12px * var(--font-scale, 1));
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.watchlist__value,
+.watchlist__note {
+  flex: 1;
+  width: 100%;
+  min-width: 96px;
+  background: var(--surface-base);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 4px 6px;
+  font-size: calc(12px * var(--font-scale, 1));
+  color: var(--text-primary);
+  outline: none;
+}
+
+.watchlist__note { color: #9aa6c4; }
+
+.watchlist__value:focus,
+.watchlist__note:focus {
+  border-color: var(--accent-bright);
+}
+
+/* The "System type" mode reuses the value-input styling as a class dropdown. */
+.watchlist__class-select { cursor: pointer; }
+
+/* Duplicate of an entry already on the list — the typed value collides with
+   another row. Outline the field red and explain below; the duplicate doesn't
+   add anything (alerts/highlights dedupe by target) until it's changed. */
+.watchlist__value--dup,
+.watchlist__value--dup:focus {
+  border-color: var(--danger-strong);
+}
+
+.watchlist__dup-msg {
+  margin-top: 3px;
+  font-size: calc(11px * var(--font-scale, 1));
+  color: #e8806f;
+}
+
+/* The system-search input and the wormhole-type picker each take the value
+   slot in a row-bottom flex row (alongside the note), so let them grow. */
+.watchlist__search,
+.watchlist__whpick {
+  flex: 1;
+  min-width: 96px;
+}
+
+/* Red outline on the picker button when the wormhole type duplicates another
+   entry — mirrors .watchlist__value--dup on the system input. */
+.watchlist__whpick--dup .wh-picker__btn {
+  border-color: var(--danger-strong);
+}
+
+/* "Show on map" button — only present when the entry matches something on the
+   current map. Green to read as "it's here, jump to it". Repeated clicks cycle
+   through all matches. */
+.watchlist__locate {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  background: rgba(74,222,128,0.10);
+  border: 1px solid #2c6e49;
+  color: var(--success-bright);
+  border-radius: 4px;
+  padding: 3px 5px;
+  cursor: pointer;
+  line-height: 0;
+}
+
+.watchlist__locate:hover,
+.watchlist__locate--open {
+  background: rgba(74,222,128,0.20);
+  color: #6ef0a0;
+}
+
+.watchlist__locate-count {
+  font-size: calc(10px * var(--font-scale, 1));
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* Expanded list of matches for an entry with more than one on the map. */
+.watchlist__matches {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 0 2px 26px;
+}
+
+.watchlist__match {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  text-align: start;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  padding: 3px 6px;
+  font-size: calc(12px * var(--font-scale, 1));
+  color: #aeb9d6;
+  cursor: pointer;
+}
+
+.watchlist__match:hover {
+  background: rgba(110,160,255,0.12);
+  color: #cfe0ff;
+}
+
+.watchlist__remove {
+  background: transparent;
+  border: 1px solid #3a2030;
+  color: #d88a8a;
+  border-radius: 4px;
+  padding: 3px 5px;
+  cursor: pointer;
+  line-height: 0;
+  flex-shrink: 0;
+}
+
+.watchlist__remove:hover {
+  background: rgba(224,90,90,0.10);
+  color: var(--danger);
+}
+
+/* Right-click submenu swatch — tiny rounded square that sits where the
+   icon normally goes for built-in intel options. */
+.intel-swatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  border: 5px solid rgba(255, 255, 255, 0.15);
+}
+
+/* Coloured glyph swatch in the Labels submenu (mirrors the node pill). */
+.label-swatch {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+}
+
+/* ── Settings modal ──────────────────────────────────────────── */
+.settings-modal__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(4, 8, 16, 0.6);
+}
+
+.settings-modal {
+  width: min(520px, 92vw);
+  max-height: 82vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-well);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+
+.settings-modal__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--surface-hover);
+}
+
+.settings-modal__title {
+  margin: 0;
+  font-size: calc(16px * var(--font-scale, 1));
+  font-weight: 600;
+  color: var(--text-bright);
+}
+
+.settings-modal__tabs {
+  display: flex;
+  gap: 4px;
+  padding: 8px 12px 0;
+  border-bottom: 1px solid var(--surface-hover);
+}
+
+.settings-modal__tab {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 8px 12px;
+  color: var(--text-subtle);
+  cursor: pointer;
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 600;
+
+  &:hover { color: var(--text-secondary); }
+}
+
+.settings-modal__tab--active {
+  color: #a0ccf8;
+  border-bottom-color: var(--accent);
+}
+
+.settings-modal__body {
+  padding: 14px 16px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Help text + token legend under the wormhole-bookmark format field. */
+.map-sidebar__help {
+  margin: 8px 0 6px;
+  font-size: calc(12px * var(--font-scale, 1));
+  line-height: 1.45;
+  color: var(--text-subtle);
+}
+
+.map-sidebar__tokens {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: calc(12px * var(--font-scale, 1));
+  color: var(--text-subtle);
+}
+
+.map-sidebar__tokens code {
+  color: var(--accent-pale);
+  background: var(--surface-panel);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 0 4px;
+  font-size: calc(11px * var(--font-scale, 1));
+}
+
+.map-sidebar__toggle-input {
+  accent-color: var(--accent);
+  cursor: pointer;
+  margin: 0;
+}
+
+/* Notifications section — per-event desktop / sound checkbox grid. */
+.notif-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 6px;
+}
+
+.notif-grid__head,
+.notif-grid__row {
+  display: grid;
+  grid-template-columns: 1fr 58px 58px;
+  align-items: center;
+}
+
+.notif-grid__head {
+  padding-bottom: 3px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2px;
+}
+
+.notif-grid__head span:nth-child(n + 2) {
+  justify-self: center;
+  color: var(--text-faint);
+  font-size: calc(11px * var(--font-scale, 1));
+}
+
+.notif-grid__row {
+  padding: 3px 0;
+}
+
+.notif-grid__row .map-sidebar__toggle-input {
+  justify-self: center;
+}
+
+.notif-grid__label {
+  color: var(--text-primary);
+  font-size: calc(13px * var(--font-scale, 1));
+}
+
+.map-sidebar__divider {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 0;
+}
+
+.map-sidebar__action {
+  width: 100%;
+  padding: 8px 10px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  color: var(--text-secondary);
+  font-size: calc(13px * var(--font-scale, 1));
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  &:hover {
+    background: var(--surface-overlay);
+    color: var(--text-default);
+  }
+}
+
+.map-sidebar__btn-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Copy Map "new map type" picker — buttons side by side, equal width. */
+.copymap__type-group { display: flex; gap: 6px; }
+.copymap__type-btn {
+  flex: 1;
+  padding: 6px 10px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  color: var(--text-secondary);
+  font-size: calc(13px * var(--font-scale, 1));
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.copymap__type-btn:hover { background: var(--surface-overlay); color: var(--text-default); }
+.copymap__type-btn--active { background: #1a3060; border-color: #3a6abf; color: var(--text-primary); }
+
+.map-sidebar__btn-group-item {
+  width: 100%;
+  padding: 6px 10px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  color: var(--text-secondary);
+  font-size: calc(13px * var(--font-scale, 1));
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+
+  &:hover {
+    background: var(--surface-overlay);
+    color: var(--text-default);
+  }
+}
+
+.map-sidebar__btn-group-item--active {
+  background: #1a3060;
+  border-color: #3a6abf;
+  color: var(--text-primary);
+}
+
+.map-sidebar__import-wrap {
+  position: relative;
+}
+
+.map-sidebar__import-wrap--disabled {
+  cursor: not-allowed;
+
+  .map-sidebar__action {
+    color: var(--text-dim);
+    pointer-events: none;
+  }
+
+  &::after {
+    content: 'Maximum maps reached';
+    position: absolute;
+    right: calc(100% + 8px);
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--surface-well);
+    border: 1px solid var(--border-accent);
+    border-radius: 5px;
+    color: var(--text-secondary);
+    font-size: calc(16px * var(--font-scale, 1));
+    padding: 4px 10px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.1s;
+  }
+
+  &:hover::after { opacity: 1; }
+}
+
+/* ── Content filter sidebar panel ────────────────────────────────────────── */
+.content-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.content-filter__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 2px;
+}
+
+.content-filter__name {
+  width: 100%;
+  background: var(--surface-base);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 5px 8px;
+  margin-top: 4px;
+  font-size: calc(12px * var(--font-scale, 1));
+  color: var(--text-primary);
+  outline: none;
+}
+
+.content-filter__name:focus { border-color: var(--accent-bright); }
+
+.content-filter__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.content-filter__count {
+  font-size: calc(12px * var(--font-scale, 1));
+  color: var(--text-subtle);
+}
+
+.content-filter__clear {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  border: 1px solid #3a2030;
+  color: #d88a8a;
+  border-radius: 4px;
+  padding: 3px 8px;
+  font-size: calc(12px * var(--font-scale, 1));
+  cursor: pointer;
+}
+
+.content-filter__clear:hover { background: rgba(224,90,90,0.10); color: var(--danger); }
+
+.sig-filter-chip {
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  color: var(--text-subtle);
+  font-family: inherit;
+  font-size: calc(13px * var(--font-scale, 1));
+  padding: 2px 11px;
+  cursor: pointer;
+  transition: border-color 0.12s, color 0.12s, background 0.12s;
+}
+.sig-filter-chip:hover { border-color: var(--accent-alt); color: var(--text-default); }
+.sig-filter-chip--active {
+  border-color: var(--accent);
+  background: rgba(90, 154, 248, 0.18);
+  color: var(--text-bright);
+}
+.sig-filter-clear {
+  background: transparent;
+  border: none;
+  color: #6a8ab0;
+  font-family: inherit;
+  font-size: calc(12px * var(--font-scale, 1));
+  padding: 2px 6px;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.sig-filter-clear:hover { color: #9ec0e8; }
+
+/* Column picker — icon button in the filter row that opens a checkbox popover
+   to hide/show optional columns (slims the pane when undocked). Pushed to the
+   right edge of the wrapping filter row. */
+.sig-col-menu { position: relative; margin-left: auto; }
+.sig-col-menu__btn--active { color: var(--accent); }
+.sig-col-menu__pop {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 1000;
+  min-width: 140px;
+  background: var(--surface-well);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+  padding: 6px;
+}
+.sig-col-menu__title {
+  font-size: calc(11px * var(--font-scale, 1));
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #6a8ab0;
+  padding: 2px 6px 6px;
+}
+.sig-col-menu__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px;
+  border-radius: 4px;
+  font-size: calc(13px * var(--font-scale, 1));
+  color: var(--text-default);
+  cursor: pointer;
+}
+.sig-col-menu__item:hover { background: rgba(90, 154, 248, 0.12); }
+.sig-col-menu__item input { cursor: pointer; }
+
+.sig-pane__empty {
+  font-size: calc(16px * var(--font-scale, 1));
+  color: var(--text-faint);
+  font-style: italic;
+  padding: 4px 0;
+}
+
+/* Share-mode variant: there's no toolbar or hint above this message, so
+   center it in the empty pane instead of letting it hug the top-left. */
+.sig-pane__empty--shared {
+  text-align: center;
+  padding: 24px 0;
+}
+
+.sig-table {
+  border-collapse: collapse;
+  font-size: calc(14px * var(--font-scale, 1));
+  width: 100%;
+  table-layout: fixed;
+
+  th {
+    color: var(--text-muted);
+    font-size: calc(13px * var(--font-scale, 1));
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    text-align: left;
+    padding: 5px 6px;
+    border-bottom: 1px solid var(--surface-hover);
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 2px 4px;
+    border-bottom: 1px solid var(--surface-panel);
+    vertical-align: middle;
+    height: 34px;
+  }
+
+  tbody tr {
+    background: var(--surface-sunken);
+    &:nth-child(even) { background: var(--surface-base); }
+    &:hover td { background: var(--surface-panel); }
+  }
+}
+
+.sig-col--check   { width: 24px; }
+.sig-col--whtype  { overflow: visible; }
+.sig-col--actions { width: 28px; }
+
+/* When the resizable columns sum wider than the pane, let the table scroll
+   horizontally inside its card instead of being clipped by the card's
+   overflow:hidden. */
+.sig-table-wrap {
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+/* Pin the per-row delete (and its header) to the right edge so it's always
+   reachable no matter how narrow the pane is or how the columns are sized.
+   The cell needs an opaque background per row state, otherwise scrolled
+   columns would show through the pinned column. Scoped under .sig-table so
+   these win over the semi-transparent .sig-row--* td tints. */
+.sig-table th.sig-cell--actions,
+.sig-table td.sig-cell--actions {
+  position: sticky;
+  right: 0;
+  z-index: 1;
+  box-shadow: -6px 0 8px -6px rgba(0, 0, 0, 0.55);
+}
+.sig-table th.sig-cell--actions             { background: var(--surface-base); }          /* card backdrop */
+.sig-table tbody td.sig-cell--actions        { background: var(--surface-sunken); }          /* odd rows */
+.sig-table tbody tr:nth-child(even) td.sig-cell--actions { background: var(--surface-base); }
+.sig-table tbody tr:hover td.sig-cell--actions           { background: var(--surface-panel); }
+.sig-table tbody tr.sig-row--selected td.sig-cell--actions { background: var(--surface-panel); }
+
+.sig-th {
+  position: relative;
+  overflow: hidden;
+}
+
+.sig-th--sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.sig-th--sortable:hover {
+  color: var(--text-subtle);
+}
+
+.sig-th__resize {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 5px;
+  cursor: col-resize;
+  background: transparent;
+  z-index: 1;
+}
+
+.sig-th__resize:hover,
+.sig-th__resize:active {
+  background: rgba(77, 157, 224, 0.4);
+}
+
+.sig-checkbox {
+  accent-color: #3a7ad8;
+  cursor: pointer;
+  width: 12px;
+  height: 12px;
+}
+
+.sig-row--selected td {
+  background: var(--surface-panel) !important;
+}
+
+/* Wormhole-sig aging. Tints anchored to the SDE catalog lifetimeHours:
+   --wh-mid  50–90% of lifetime (yellow)
+   --wh-eol  90–100%            (orange)
+   --wh-past >100%              (red — likely closed)
+   Selected rows still win because their rule uses !important. */
+.sig-row--wh-mid  td { background: rgba(245,166,35,0.05); }
+.sig-row--wh-eol  td { background: rgba(245,140,35,0.12); }
+.sig-row--wh-past td { background: rgba(231,76,60,0.14); }
+
+/* Untyped signatures get a subtle red tint so a paste-and-forget pile is
+   obvious at a glance. Aging tints take precedence (they're added after
+   this rule in the className join, so they cascade and win when both
+   apply on a wormhole row that's also flagged unknown — unusual but
+   possible). Selected rows still override via !important. */
+.sig-row--unknown td { background: rgba(231,76,60,0.06); }
+
+/* Overwrite-paste pending removal: the row stays visible with a struck-through
+   red treatment and slowly fades over the configured grace period, so the user
+   can see exactly which sigs are about to be deleted (and clear any in-game
+   bookmarks) before they go. animation-duration is set inline to match the
+   delay. */
+.sig-row--removing {
+  animation: sig-row-removing-fade linear forwards;
+}
+.sig-row--removing td {
+  text-decoration: line-through;
+  color: #e88a8a;
+  background: rgba(231,76,60,0.16);
+}
+/* The pinned actions cell needs an opaque red so scrolled columns don't show
+   through it (it can't use the semi-transparent tint above). */
+.sig-table tbody tr.sig-row--removing td.sig-cell--actions { background: var(--surface-well); }
+@keyframes sig-row-removing-fade {
+  from { opacity: 1; }
+  to   { opacity: 0.4; }
+}
+
+/* Structures pane row tints, mirroring the EVE standings palette used
+   by the sov pills and killboard rows. owner_corp_id is resolved via
+   ESI on insert (and only when an eve_id was supplied), so rows without
+   a resolved owner stay neutral. */
+.structure-row--hostile  td { background: rgba(231,76,60,0.14); }
+.structure-row--bad      td { background: rgba(245,166,35,0.08); }
+.structure-row--good     td { background: rgba(143,200,255,0.08); }
+.structure-row--friendly td { background: rgba(91,155,255,0.12); }
+
+/* Auto-discovered structures section below the user-managed table.
+   Treats the rows as inert intel — no edit controls. */
+.known-structures            { margin-top: 16px; padding-top: 10px; border-top: 1px dashed var(--border); }
+.known-structures__heading {
+  font-size: calc(11px * var(--font-scale, 1));
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.known-structures__hint     { font-size: calc(11px * var(--font-scale, 1)); text-transform: none; letter-spacing: 0; color: #4a5670; }
+.known-structures__table    { width: 100%; }
+.known-structures__source   { width: 60px; }
+.known-structures__badge {
+  display: inline-block;
+  font-size: calc(10px * var(--font-scale, 1));
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 1px 6px;
+  border-radius: 3px;
+}
+.known-structures__badge--corp-esi       { background: rgba(91,155,255,0.15);  color: var(--accent-pale); border: 1px solid rgba(91,155,255,0.4); }
+.known-structures__badge--public-dataset { background: rgba(122,138,168,0.15); color: var(--text-default); border: 1px solid rgba(122,138,168,0.4); }
+
+/* Read-only twin of .sig-input, used in share mode where the row cells
+   become plain text instead of inputs/selects. Same typography so column
+   widths stay stable when switching modes. nowrap prevents short
+   monospaced sig IDs (e.g. "DSC-380") from breaking onto two lines
+   when the column happens to be narrower than the saved colWidths. */
+.sig-text {
+  color: var(--text-default);
+  font-size: calc(14px * var(--font-scale, 1));
+  font-family: inherit;
+  display: inline-block;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sig-text--id {
+  font-family: 'Courier New', monospace;
+  /* Wide enough for the standard "ABC-123" sig-ID format. The column's
+     saved width is set in editable mode where the <input> reserves its
+     own min-width; the plain text variant needs the floor explicitly. */
+  min-width: 64px;
+}
+
+.sig-text--type {
+  text-transform: capitalize;
+}
+
+.sig-input {
+  background: transparent;
+  border: none;
+  color: var(--text-default);
+  font-size: calc(14px * var(--font-scale, 1));
+  font-family: inherit;
+  width: 100%;
+  outline: none;
+  padding: 0;
+
+  &::placeholder { color: var(--border-strong); }
+  &:focus { color: var(--text-bright); }
+
+  &--id {
+    font-family: 'Courier New', monospace;
+    font-size: calc(13px * var(--font-scale, 1));
+    color: #7a9ac8;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+  }
+}
+
+.sig-select {
+  background: var(--surface-panel);
+  border: 1px solid transparent;
+  border-radius: 3px;
+  color: #a0b0c8;
+  font-size: calc(13px * var(--font-scale, 1));
+  font-family: inherit;
+  padding: 2px 2px;
+  width: 100%;
+  cursor: pointer;
+  outline: none;
+
+  &:hover { border-color: var(--border-strong); }
+  &:focus { border-color: #3a6aaa; color: var(--text-primary); }
+
+  &--type { font-size: calc(13px * var(--font-scale, 1)); }
+
+  &--type-unknown  { color: #c89a30; font-style: italic; }
+  &--type-wormhole { color: var(--accent); }
+  &--type-data     { color: #58b8e8; }
+  &--type-relic    { color: #c87840; }
+  &--type-combat   { color: var(--danger); }
+  &--type-gas      { color: #60c060; }
+  &--type-ore      { color: #b08040; }
+
+  &--leadsto { color: #78a0c0; font-size: calc(13px * var(--font-scale, 1)); }
+}
+
+.sig-toolbar-btn {
+  background: transparent;
+  border: 1px solid var(--border-accent);
+  border-radius: 4px;
+  color: var(--text-secondary);
+  font-size: calc(14px * var(--font-scale, 1));
+  padding: 3px 10px;
+  cursor: pointer;
+  font-family: inherit;
+
+  &:hover { border-color: var(--accent); color: var(--text-default); }
+
+  &--danger {
+    border-color: #5a2a2a;
+    color: var(--danger);
+    &:hover { border-color: var(--danger); color: var(--danger-soft); }
+  }
+}
+
+/* Overwrite-on-paste toggle: a labelled checkbox styled to sit inline with
+   the sig toolbar buttons. The native checkbox (accent-coloured) gives an
+   unambiguous on/off tick; the active outline reinforces it. */
+.sig-overwrite-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--border-accent);
+  border-radius: 4px;
+  padding: 2px 10px;
+  color: var(--text-secondary);
+  font-size: calc(14px * var(--font-scale, 1));
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.sig-overwrite-toggle:hover { border-color: var(--accent); }
+.sig-overwrite-toggle--active {
+  border-color: var(--accent);
+  background: rgba(90, 154, 248, 0.16);
+  color: var(--text-bright);
+}
+.sig-overwrite-toggle .map-sidebar__toggle-input { cursor: pointer; }
+
+/* Native <select> uses the page background for the dropdown panel and OS
+   defaults for option rows — both render as light on a dark theme. Force
+   the dark palette explicitly. */
+select.sig-toolbar-btn {
+  background: var(--surface-well);
+  color: var(--text-secondary);
+}
+select.sig-toolbar-btn option {
+  background: var(--surface-well);
+  color: var(--text-secondary);
+}
+
+/* Language picker (toolbar + landing hero). Matches the site's dark
+   selects; native option rows forced dark so the dropdown panel isn't
+   light on a dark page. */
+.lang-switcher { position: relative; display: inline-flex; }
+.lang-switcher__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface-base);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-default);
+  font-family: inherit;
+  font-size: calc(13px * var(--font-scale, 1));
+  padding: 4px 8px;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+/* Flag-only variant (logged-in toolbar): tighter padding, no gap. */
+.lang-switcher__trigger--compact { gap: 0; padding: 4px 6px; }
+.lang-switcher__trigger:hover { border-color: var(--accent-alt); }
+.lang-switcher__trigger:focus-visible {
+  outline: none;
+  border-color: var(--accent-alt);
+  box-shadow: 0 0 0 2px rgba(77, 157, 224, 0.25);
+}
+.lang-switcher__flag {
+  width: 18px;
+  height: 12px;
+  flex-shrink: 0;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
+}
+.lang-switcher__menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 1000;
+  min-width: 170px;
+  max-height: 60vh;
+  overflow-y: auto;
+  background: var(--surface-well);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.lang-switcher__option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 8px;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: calc(13px * var(--font-scale, 1));
+  text-align: left;
+  cursor: pointer;
+}
+.lang-switcher__option:hover { background: var(--surface-raised); }
+.lang-switcher__option-name { flex: 1; white-space: nowrap; }
+.lang-switcher__option--active { color: var(--text-bright); }
+
+.sig-notes-cell {
+  vertical-align: top;
+  padding: 2px 4px;
+}
+
+.sig-td--wh {
+  overflow: visible;
+  position: relative;
+}
+
+/* Leads-to cell: the destination picker plus the copy-bookmark button. */
+.sig-leads-cell {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.sig-leads-cell > :first-child { flex: 1; min-width: 0; }
+
+.sig-th--time {
+  text-align: right;
+}
+
+.sig-td--time {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-size: calc(13px * var(--font-scale, 1));
+  color: var(--text-muted);
+  white-space: nowrap;
+  padding-right: 8px;
+}
+
+.sig-td--updated {
+  color: var(--warning);
+}
+
+.sig-td--age-stale {
+  color: var(--danger);
+}
+
+/* ── WH Type Picker ──────────────────────────────────────── */
+.wh-picker { position: relative; width: 100%; font-size: calc(13px * var(--font-scale, 1)); }
+
+.wh-picker__btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: var(--surface-panel);
+  border: 1px solid grey;
+  border-radius: 3px;
+  color: var(--accent-light);
+  font-family: 'Courier New', monospace;
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 600;
+  padding: 2px 5px;
+  cursor: pointer;
+  gap: 4px;
+  white-space: nowrap;
+  
+}
+.wh-picker__btn:hover       { border-color: #3a6aaa; }
+.wh-picker__btn--open       { border-color: #3a6aaa; }
+.wh-picker__btn--empty      { color: var(--border-strong); font-family: inherit; font-weight: normal; }
+
+.wh-picker__btn-inner {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  overflow: hidden;
+  
+}
+
+.wh-picker__chevron { color: var(--surface-muted); font-size: calc(14px * var(--font-scale, 1)); flex-shrink: 0; }
+
+.wh-picker__dropdown {
+  min-width: 240px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border-accent);
+  border-radius: 5px;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.8);
+  z-index: 9999;
+  /* Flex column so the search stays pinned and the list fills the height the
+     hook capped to the viewport, scrolling within — so the last options are
+     always reachable instead of running off-screen. */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.wh-picker__search {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--surface-panel);
+  border: none;
+  border-bottom: 1px solid var(--border-strong);
+  color: var(--text-bright);
+  font-family: inherit;
+  font-size: calc(15px * var(--font-scale, 1));
+  outline: none;
+  padding: 8px 12px;
+}
+.wh-picker__search::placeholder { color: var(--text-muted); }
+
+.wh-picker__list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-muted) transparent;
+}
+
+.wh-picker__group-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 12px 3px;
+  color: #grey;
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border-top: 1px solid var(--border);
+  margin-top: 2px;
+  font-size: calc(14px * var(--font-scale, 1));
+}
+
+.wh-picker__group-count { color: var(--text-secondary); font-weight: 400; text-transform: none; letter-spacing: 0; font-size: calc(14px * var(--font-scale, 1)); }
+
+.wh-picker__option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  color: var(--text-secondary);
+  font-size: calc(14px * var(--font-scale, 1));
+}
+.wh-picker__option:hover   { background: var(--border); }
+.wh-picker__option--active { background: #1e3555; }
+
+.wh-picker__code { font-family: 'Courier New', monospace; font-weight: 700; font-size: calc(14px * var(--font-scale, 1)); color: var(--accent-light); min-width: 44px; }
+.wh-picker__arrow { color: var(--text-faintest); font-size: calc(13px * var(--font-scale, 1)); }
+.wh-picker__dest  { font-size: calc(14px * var(--font-scale, 1)); font-weight: 600; }
+.wh-picker__placeholder { color: var(--text-bright); font-size: calc(14px * var(--font-scale, 1)); }
+.wh-picker__inbound { color: var(--text-faintest); font-size: calc(13px * var(--font-scale, 1)); font-style: italic; margin-left: 4px; }
+

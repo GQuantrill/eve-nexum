@@ -18,7 +18,7 @@ const HEAT_STOPS: [number, number, number][] = [
 // Colour-blind-safe ramp (viridis): perceptually uniform + monotonic in
 // lightness, so it stays distinguishable under all three CVD types. The
 // heatmap colour is computed in JS (not a static var()), so it can't piggyback
-// on the App.css palette overrides — `cvd` switches the ramp here instead.
+// on the styles/tokens.css palette overrides — `cvd` switches the ramp here instead.
 const HEAT_STOPS_CVD: [number, number, number][] = [
   [68,  1,  84],   // #440154 dark purple (low)
   [33, 145, 140],  // #21918c teal (mid)

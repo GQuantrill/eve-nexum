@@ -1,0 +1,215 @@
+/* User Stats modal.
+   Relocated verbatim out of App.css (Phase 2 bucket-2). Kept GLOBAL;
+   imported once in main.tsx. See design-system.md. */
+
+/* ── User Stats Modal ────────────────────────────────────── */
+.stats-modal {
+  width: 560px;
+}
+
+.stats-modal__periods {
+  display: flex;
+  gap: 4px;
+  padding: 0 16px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.stats-modal__period-btn {
+  flex: 1;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  color: var(--text-faintest);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: calc(13px * var(--font-scale, 1));
+  padding: 4px 0;
+  white-space: nowrap;
+}
+
+.stats-modal__period-btn:hover { background: var(--surface-overlay); color: var(--text-default); }
+
+.stats-modal__period-btn--active {
+  background: #1a3a6a;
+  border-color: var(--border-accent-strong);
+  color: var(--accent-light);
+}
+
+.stats-modal__loading,
+.stats-modal__error {
+  font-size: calc(13px * var(--font-scale, 1));
+  color: var(--text-faintest);
+  text-align: center;
+  padding: 24px 0;
+}
+
+.stats-modal__error { color: var(--danger); }
+
+.stats-modal__summary {
+  display: flex;
+  gap: 12px;
+}
+
+.stats-modal__card {
+  flex: 1;
+  background: var(--surface-sunken);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.stats-modal__card-value {
+  font-size: calc(28px * var(--font-scale, 1));
+  font-weight: 700;
+  color: var(--text-bright);
+  line-height: 1;
+}
+
+.stats-modal__card-label {
+  font-size: calc(13px * var(--font-scale, 1));
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.stats-modal__section-title {
+  font-size: calc(13px * var(--font-scale, 1));
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 4px 0 0;
+}
+
+.stats-modal__table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.stats-modal__head-row {
+  background: var(--surface-base);
+}
+
+.stats-modal__th {
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 7px 10px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.stats-modal__th--count,
+.stats-modal__th--pct { text-align: right; }
+
+.stats-modal__row {
+  border-bottom: 1px solid var(--surface-panel);
+}
+
+.stats-modal__row:last-child { border-bottom: none; }
+
+.stats-modal__row:nth-child(even) { background: var(--surface-sunken); }
+
+.stats-modal__row td {
+  padding: 7px 10px;
+  vertical-align: middle;
+}
+
+.stats-modal__row-label {
+  font-size: calc(13px * var(--font-scale, 1));
+  color: var(--text-secondary);
+  width: 90px;
+}
+
+.stats-modal__row-value {
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 600;
+  color: var(--text-default);
+  width: 48px;
+  text-align: right;
+}
+
+.stats-modal__row-pct {
+  font-size: calc(13px * var(--font-scale, 1));
+  color: var(--text-muted);
+  width: 36px;
+  text-align: right;
+}
+
+.stats-modal__row-bar {
+  width: 100%;
+  padding-left: 8px !important;
+}
+
+.stats-modal__bar-track {
+  background: var(--surface-panel);
+  border-radius: 3px;
+  height: 6px;
+  width: 100%;
+}
+
+.stats-modal__bar {
+  height: 6px;
+  background: var(--border-accent-strong);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+  min-width: 0;
+}
+
+.stats-modal__spark {
+  position: relative;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px;
+  background: var(--surface-sunken);
+}
+
+.stats-modal__spark-svg {
+  display: block;
+  width: 100%;
+  height: 80px;
+}
+
+.stats-modal__spark-tooltip {
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  font-size: calc(11px * var(--font-scale, 1));
+  color: var(--text-default);
+  background: rgba(8, 9, 15, 0.85);
+  padding: 2px 6px;
+  border-radius: 3px;
+  pointer-events: none;
+}
+
+.confirm-modal__message {
+  font-size: calc(13px * var(--font-scale, 1));
+  color: var(--text-default);
+  margin: 0;
+}
+
+.confirm-modal__skip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: calc(13px * var(--font-scale, 1));
+  color: var(--text-faint);
+  cursor: pointer;
+  user-select: none;
+}
+
+.field__label {
+  display: block;
+  font-size: calc(13px * var(--font-scale, 1));
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+

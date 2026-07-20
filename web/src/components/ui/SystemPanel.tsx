@@ -34,6 +34,7 @@ import { useCustomIntel } from '../../hooks/useCustomIntel';
 import { resolveIntelColor, resolveIntelLabel } from '../../utils/intelColors';
 import { WHTypeInfo } from './WHTypeInfo';
 import { Tooltip } from './Tooltip';
+import styles from './SystemPanel.module.css';
 
 /**
  * One chip in the "In chain:" digest. Owns its own hover state and renders
@@ -131,15 +132,15 @@ function InfoSection({
 }) {
   const [collapsed, toggle] = useSectionCollapse(id);
   return (
-    <div className="sys-info__section">
-      <div className="sys-info__section-label">
+    <div className={styles.section}>
+      <div className={styles.sectionLabel}>
         <button
           type="button"
-          className="sys-info__section-toggle"
+          className={styles.sectionToggle}
           onClick={toggle}
           aria-expanded={!collapsed}
         >
-          <span className="sys-info__section-caret">{collapsed ? '▸' : '▾'}</span>
+          <span className={styles.sectionCaret}>{collapsed ? '▸' : '▾'}</span>
           {title}
         </button>
         {headerExtra}
@@ -431,26 +432,26 @@ export function SystemPanel() {
           <button type="button" className="icon-btn system-panel__collapse" onClick={toggleInfoCollapsed} title={t('systemPanel.collapseInfo')}>‹</button>
         </div>
 
-        <div className="sys-info">
-          <div className="sys-info__headline">
-            <span className="sys-info__badge" style={{ color: CLASS_COLORS[sys.systemClass] }}>
+        <div className={styles.info}>
+          <div className={styles.headline}>
+            <span className={styles.badge} style={{ color: CLASS_COLORS[sys.systemClass] }}>
               {CLASS_LABELS[sys.systemClass]}
             </span>
             {esiSys?.securityStatus != null && (
-              <span className="sys-info__truesec" style={{ color: truesecColor(esiSys.securityStatus) }}>
+              <span className={styles.truesec} style={{ color: truesecColor(esiSys.securityStatus) }}>
                 {esiSys.securityStatus.toFixed(1)}
               </span>
             )}
             {sys.effect !== 'none' && (
-              <span className="sys-info__effect">{EFFECT_LABELS[sys.effect]}</span>
+              <span className={styles.effect}>{EFFECT_LABELS[sys.effect]}</span>
             )}
             {/* Current intel tag — only rendered when the user has actually
                 set one. Pulls colour + label from the same resolver used by
                 the node border + right-click menu so all three stay in
                 sync if the user edits a custom intel definition. */}
             {sys.intel && intelLabel && (
-              <span className="sys-info__intel" style={{ borderColor: intelColor ?? '#445' }}>
-                <span className="sys-info__intel-swatch" style={{ background: intelColor ?? '#445' }} />
+              <span className={styles.intel} style={{ borderColor: intelColor ?? '#445' }}>
+                <span className={styles.intelSwatch} style={{ background: intelColor ?? '#445' }} />
                 {intelLabel}
               </span>
             )}
@@ -476,29 +477,34 @@ export function SystemPanel() {
           })()}
 
           {incursion && (
-            <div className="sys-info__section sys-info__incursion">
-              <div className="sys-info__section-label">{t('systemPanel.incursion')}</div>
-              <div className="sys-info__incursion-card">
+            <div className={`${styles.section} sys-info__incursion`}>
+              <div className={styles.sectionLabel}>{t('systemPanel.incursion')}</div>
+              <div className={styles.incursionCard}>
                 {incursion.factionLogoUrl && (
-                  <img className="sys-info__incursion-logo" src={incursion.factionLogoUrl} alt={incursion.factionName} />
+                  <img className={styles.incursionLogo} src={incursion.factionLogoUrl} alt={incursion.factionName} />
                 )}
-                <div className="sys-info__incursion-detail">
-                  <span className="sys-info__incursion-faction">{incursion.factionName}</span>
-                  <div className="sys-info__incursion-meta">
-                    <span className={`sys-info__incursion-state sys-info__incursion-state--${incursion.state}`}>
+                <div className={styles.incursionDetail}>
+                  <span className={styles.incursionFaction}>{incursion.factionName}</span>
+                  <div className={styles.incursionMeta}>
+                    <span className={`${styles.incursionState} ${
+                      incursion.state === 'established' ? styles.incursionStateEstablished
+                        : incursion.state === 'mobilizing' ? styles.incursionStateMobilizing
+                        : incursion.state === 'withdrawing' ? styles.incursionStateWithdrawing
+                        : ''
+                    }`}>
                       {incursion.state === 'established' ? t('systemPanel.incursionState.established')
                         : incursion.state === 'mobilizing' ? t('systemPanel.incursionState.mobilizing')
                         : incursion.state === 'withdrawing' ? t('systemPanel.incursionState.withdrawing')
                         : incursion.state.charAt(0).toUpperCase() + incursion.state.slice(1)}
                     </span>
-                    {incursion.isStaging && <span className="sys-info__incursion-staging">{t('systemPanel.staging')}</span>}
-                    {incursion.hasBoss && <span className="sys-info__incursion-boss">{t('systemPanel.bossPresent')}</span>}
+                    {incursion.isStaging && <span className={styles.incursionStaging}>{t('systemPanel.staging')}</span>}
+                    {incursion.hasBoss && <span className={styles.incursionBoss}>{t('systemPanel.bossPresent')}</span>}
                   </div>
-                  <div className="sys-info__incursion-influence">
-                    <div className="sys-info__incursion-bar-track">
-                      <div className="sys-info__incursion-bar" style={{ width: `${Math.round(incursion.influence * 100)}%` }} />
+                  <div className={styles.incursionInfluence}>
+                    <div className={styles.incursionBarTrack}>
+                      <div className={styles.incursionBar} style={{ width: `${Math.round(incursion.influence * 100)}%` }} />
                     </div>
-                    <span className="sys-info__incursion-pct">{t('systemPanel.influence', { pct: Math.round(incursion.influence * 100) })}</span>
+                    <span className={styles.incursionPct}>{t('systemPanel.influence', { pct: Math.round(incursion.influence * 100) })}</span>
                   </div>
                 </div>
               </div>
@@ -506,9 +512,9 @@ export function SystemPanel() {
           )}
 
           {insurgency && (
-            <div className="sys-info__section">
-              <div className="sys-info__section-label">{t('systemPanel.insurgency', { faction: insurgency.factionName })}</div>
-              <div className="sys-info__insurgency-rings">
+            <div className={styles.section}>
+              <div className={styles.sectionLabel}>{t('systemPanel.insurgency', { faction: insurgency.factionName })}</div>
+              <div className={styles.insurgencyRings}>
                 {[
                   { label: t('systemPanel.corruption'),  pct: insurgency.corruptionPct,  stage: insurgency.corruptionState,  color: '#4ade80', icon: '☣' },
                   { label: t('systemPanel.suppression'), pct: insurgency.suppressionPct, stage: insurgency.suppressionState, color: '#c8d0e0', icon: '⊕' },
@@ -517,8 +523,8 @@ export function SystemPanel() {
                   const circ = 2 * Math.PI * R;
                   const fill = (pct / 100) * circ;
                   return (
-                    <div key={label} className="sys-info__insurgency-ring-cell">
-                      <svg className="sys-info__insurgency-svg" viewBox="0 0 54 54">
+                    <div key={label} className={styles.insurgencyRingCell}>
+                      <svg className={styles.insurgencySvg} viewBox="0 0 54 54">
                         <circle cx="27" cy="27" r={R} fill="#0d1421" stroke="#1a2535" strokeWidth="4" />
                         <circle
                           cx="27" cy="27" r={R}
@@ -538,10 +544,10 @@ export function SystemPanel() {
                           </text>
                         )}
                       </svg>
-                      <div className="sys-info__insurgency-ring-info">
-                        <span className="sys-info__insurgency-ring-label">{label}</span>
-                        <span className="sys-info__insurgency-ring-stage" style={{ color }}>{t('systemPanel.stage', { stage })}</span>
-                        <span className="sys-info__insurgency-ring-pct">{Math.round(pct)}%</span>
+                      <div className={styles.insurgencyRingInfo}>
+                        <span className={styles.insurgencyRingLabel}>{label}</span>
+                        <span className={styles.insurgencyRingStage} style={{ color }}>{t('systemPanel.stage', { stage })}</span>
+                        <span className={styles.insurgencyRingPct}>{Math.round(pct)}%</span>
                       </div>
                     </div>
                   );
@@ -551,11 +557,11 @@ export function SystemPanel() {
           )}
 
           {sys.effect !== 'none' && EFFECT_MODIFIERS[sys.effect].length > 0 && (
-            <div className="sys-info__section">
-              <div className="sys-info__section-label">{t('systemPanel.systemEffects')}</div>
-              <div className="sys-info__effect-mods">
+            <div className={styles.section}>
+              <div className={styles.sectionLabel}>{t('systemPanel.systemEffects')}</div>
+              <div className={styles.effectMods}>
                 {EFFECT_MODIFIERS[sys.effect].map(({ label, good }) => (
-                  <span key={label} className={`sys-info__effect-mod${good ? ' sys-info__effect-mod--good' : ' sys-info__effect-mod--bad'}`}>
+                  <span key={label} className={`${styles.effectMod} ${good ? styles.effectModGood : styles.effectModBad}`}>
                     {good ? '▲' : '▼'} {label}
                   </span>
                 ))}
@@ -564,17 +570,17 @@ export function SystemPanel() {
           )}
 
           {sys.statics.length > 0 && (
-            <div className="sys-info__section">
-              <div className="sys-info__section-label">{t('systemPanel.statics')}</div>
-              <div className="sys-info__row">
+            <div className={styles.section}>
+              <div className={styles.sectionLabel}>{t('systemPanel.statics')}</div>
+              <div className={styles.row}>
                 {sys.statics.map((s) => {
                   const dest = whDestClass(s, whTypes);
                   return (
                     <WHTypeInfo key={s} code={s}>
-                      <span className="sys-info__static">
+                      <span className={styles.staticChip}>
                         {s}
                         {dest && (
-                          <span className="sys-info__static-dest" style={{ color: CLASS_COLORS[dest] }}>
+                          <span className={styles.staticDest} style={{ color: CLASS_COLORS[dest] }}>
                             {dest}
                           </span>
                         )}
@@ -588,10 +594,10 @@ export function SystemPanel() {
 
           {(sys.regionName || sys.npcType || esiSys?.constellationName) && (
             <InfoSection id="location" title={t('systemPanel.location')}>
-              <div className="sys-info__kv-grid">
-                {sys.regionName    && <><span className="sys-info__kv-key">{t('systemPanel.region')}</span><span className="sys-info__kv-val">{sys.regionName}</span></>}
-                {esiSys?.constellationName && <><span className="sys-info__kv-key">{t('systemPanel.constellation')}</span><span className="sys-info__kv-val">{esiSys.constellationName}</span></>}
-                {sys.npcType       && <><span className="sys-info__kv-key">{t('systemPanel.npc')}</span><span className="sys-info__kv-val">{sys.npcType}</span></>}
+              <div className={styles.kvGrid}>
+                {sys.regionName    && <><span className={styles.kvKey}>{t('systemPanel.region')}</span><span className={styles.kvVal}>{sys.regionName}</span></>}
+                {esiSys?.constellationName && <><span className={styles.kvKey}>{t('systemPanel.constellation')}</span><span className={styles.kvVal}>{esiSys.constellationName}</span></>}
+                {sys.npcType       && <><span className={styles.kvKey}>{t('systemPanel.npc')}</span><span className={styles.kvVal}>{sys.npcType}</span></>}
               </div>
             </InfoSection>
           )}
@@ -599,38 +605,38 @@ export function SystemPanel() {
           {esiSys && (esiSys.sunType || esiSys.planetCount > 0 || esiSys.moonCount > 0 || esiSys.beltCount > 0 || esiSys.stargateCount > 0) && (
             <InfoSection id="celestials" title={t('systemPanel.celestials')}>
               {esiSys.sunType && (
-                <div className="sys-info__sun" title={t('systemPanel.sunType')}>
-                  <span className="sys-info__celestial-icon sys-info__celestial-icon--sun">☀</span>
+                <div className={styles.sun} title={t('systemPanel.sunType')}>
+                  <span className={`${styles.celestialIcon} ${styles.celestialIconSun}`}>☀</span>
                   <span>{esiSys.sunType}</span>
                 </div>
               )}
-              <div className="sys-info__celestials">
+              <div className={styles.celestials}>
                 {esiSys.planetCount > 0 && (
-                  <div className="sys-info__celestial">
-                    <span className="sys-info__celestial-icon">◎</span>
+                  <div className={styles.celestial}>
+                    <span className={styles.celestialIcon}>◎</span>
                     <span>{esiSys.planetCount}</span>
-                    <span className="sys-info__celestial-label">{t('systemPanel.planets', { count: esiSys.planetCount })}</span>
+                    <span className={styles.celestialLabel}>{t('systemPanel.planets', { count: esiSys.planetCount })}</span>
                   </div>
                 )}
                 {esiSys.moonCount > 0 && (
-                  <div className="sys-info__celestial">
-                    <span className="sys-info__celestial-icon">○</span>
+                  <div className={styles.celestial}>
+                    <span className={styles.celestialIcon}>○</span>
                     <span>{esiSys.moonCount}</span>
-                    <span className="sys-info__celestial-label">{t('systemPanel.moons', { count: esiSys.moonCount })}</span>
+                    <span className={styles.celestialLabel}>{t('systemPanel.moons', { count: esiSys.moonCount })}</span>
                   </div>
                 )}
                 {esiSys.beltCount > 0 && (
-                  <div className="sys-info__celestial">
-                    <span className="sys-info__celestial-icon">⁂</span>
+                  <div className={styles.celestial}>
+                    <span className={styles.celestialIcon}>⁂</span>
                     <span>{esiSys.beltCount}</span>
-                    <span className="sys-info__celestial-label">{t('systemPanel.belts', { count: esiSys.beltCount })}</span>
+                    <span className={styles.celestialLabel}>{t('systemPanel.belts', { count: esiSys.beltCount })}</span>
                   </div>
                 )}
                 {esiSys.stargateCount > 0 && (
-                  <div className="sys-info__celestial">
-                    <span className="sys-info__celestial-icon">⬡</span>
+                  <div className={styles.celestial}>
+                    <span className={styles.celestialIcon}>⬡</span>
                     <span>{esiSys.stargateCount}</span>
-                    <span className="sys-info__celestial-label">{t('systemPanel.gates', { count: esiSys.stargateCount })}</span>
+                    <span className={styles.celestialLabel}>{t('systemPanel.gates', { count: esiSys.stargateCount })}</span>
                   </div>
                 )}
               </div>
@@ -643,14 +649,14 @@ export function SystemPanel() {
               title={t('systemPanel.sovereignty')}
               headerExtra={<StandingsRefreshButton standings={standings} />}
             >
-            <div className="sys-info__sov-block">
+            <div className={styles.sovBlock}>
               {sov.alliance && sov.allianceId !== undefined && (
-                <div className="sys-info__row sys-info__sov">
-                  <img className="sys-info__sov-logo" src={sov.alliance.logoUrl} alt={sov.alliance.name} />
-                  <div className="sys-info__sov-text">
-                    <span className="sys-info__sov-label">{t('systemPanel.alliance')}</span>
-                    <span className="sys-info__sov-name">{sov.alliance.name}</span>
-                    <span className="sys-info__sov-ticker">[{sov.alliance.ticker}]</span>
+                <div className={`${styles.row} ${styles.sov}`}>
+                  <img className={styles.sovLogo} src={sov.alliance.logoUrl} alt={sov.alliance.name} />
+                  <div className={styles.sovText}>
+                    <span className={styles.sovLabel}>{t('systemPanel.alliance')}</span>
+                    <span className={styles.sovName}>{sov.alliance.name}</span>
+                    <span className={styles.sovTicker}>[{sov.alliance.ticker}]</span>
                   </div>
                   <StandingsBadges
                     standings={standings}
@@ -660,12 +666,12 @@ export function SystemPanel() {
                 </div>
               )}
               {sov.corp && sov.corporationId !== undefined && (
-                <div className="sys-info__row sys-info__sov">
-                  <img className="sys-info__sov-logo" src={sov.corp.logoUrl} alt={sov.corp.name} />
-                  <div className="sys-info__sov-text">
-                    <span className="sys-info__sov-label">{t('systemPanel.corp')}</span>
-                    <span className="sys-info__sov-name">{sov.corp.name}</span>
-                    <span className="sys-info__sov-ticker">[{sov.corp.ticker}]</span>
+                <div className={`${styles.row} ${styles.sov}`}>
+                  <img className={styles.sovLogo} src={sov.corp.logoUrl} alt={sov.corp.name} />
+                  <div className={styles.sovText}>
+                    <span className={styles.sovLabel}>{t('systemPanel.corp')}</span>
+                    <span className={styles.sovName}>{sov.corp.name}</span>
+                    <span className={styles.sovTicker}>[{sov.corp.ticker}]</span>
                   </div>
                   <StandingsBadges
                     standings={standings}
@@ -675,11 +681,11 @@ export function SystemPanel() {
                 </div>
               )}
               {sov.faction && (
-                <div className="sys-info__row sys-info__sov">
-                  <img className="sys-info__sov-logo" src={sov.faction.logoUrl} alt={sov.faction.name} />
-                  <div className="sys-info__sov-text">
-                    <span className="sys-info__sov-label">{t('systemPanel.faction')}</span>
-                    <span className="sys-info__sov-name">{sov.faction.name}</span>
+                <div className={`${styles.row} ${styles.sov}`}>
+                  <img className={styles.sovLogo} src={sov.faction.logoUrl} alt={sov.faction.name} />
+                  <div className={styles.sovText}>
+                    <span className={styles.sovLabel}>{t('systemPanel.faction')}</span>
+                    <span className={styles.sovName}>{sov.faction.name}</span>
                   </div>
                 </div>
               )}
@@ -689,7 +695,7 @@ export function SystemPanel() {
 
           {(sys.name || sys.eveSystemId) && (
             <InfoSection id="links" title={t('systemPanel.links')}>
-              <div className="sys-info__links">
+              <div className={styles.links}>
                 {/* Dotlan only needs the name. K-space goes to the NPC-delta
                     map (uses Region + System); j-space and unlinked systems
                     fall back to the plain /system/<name> URL. */}
@@ -699,9 +705,9 @@ export function SystemPanel() {
                       href={`https://evemaps.dotlan.net/map/${encodeURIComponent(sys.regionName.replace(/ /g, '_'))}/${encodeURIComponent(sys.name.replace(/ /g, '_'))}#npc_delta`}
                       target="_blank"
                       rel="noreferrer"
-                      className="sys-info__ext-link"
+                      className={styles.extLink}
                     >
-                      <img src="/vendor/dotlan.ico" alt="Dotlan" className="sys-info__ext-icon" loading="lazy" />
+                      <img src="/vendor/dotlan.ico" alt="Dotlan" className={styles.extIcon} loading="lazy" />
                     </a>
                   </Tooltip>
                 )}
@@ -711,9 +717,9 @@ export function SystemPanel() {
                       href={`https://evemaps.dotlan.net/system/${encodeURIComponent(sys.name.replace(/ /g, '_'))}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="sys-info__ext-link"
+                      className={styles.extLink}
                     >
-                      <img src="/vendor/dotlan.ico" alt="Dotlan" className="sys-info__ext-icon" loading="lazy" />
+                      <img src="/vendor/dotlan.ico" alt="Dotlan" className={styles.extIcon} loading="lazy" />
                     </a>
                   </Tooltip>
                 )}
@@ -723,9 +729,9 @@ export function SystemPanel() {
                       href={`https://zkillboard.com/system/${sys.eveSystemId}/`}
                       target="_blank"
                       rel="noreferrer"
-                      className="sys-info__ext-link"
+                      className={styles.extLink}
                     >
-                      <img src="/vendor/zkillboard-wreck.png" alt="zKillboard" className="sys-info__ext-icon" loading="lazy" />
+                      <img src="/vendor/zkillboard-wreck.png" alt="zKillboard" className={styles.extIcon} loading="lazy" />
                     </a>
                   </Tooltip>
                 )}
@@ -806,7 +812,7 @@ function StandingsRefreshButton({ standings }: { standings: ReturnType<typeof us
     <Tooltip label={t('systemPanel.refreshStandings')} placement="above">
       <button
         type="button"
-        className={`sys-info__refresh-btn${standings.refreshing ? ' sys-info__refresh-btn--busy' : ''}${status === 'ok' ? ' sys-info__refresh-btn--ok' : ''}${status === 'err' ? ' sys-info__refresh-btn--err' : ''}`}
+        className={[styles.refreshBtn, standings.refreshing && styles.refreshBtnBusy, status === 'ok' && styles.refreshBtnOk, status === 'err' && styles.refreshBtnErr].filter(Boolean).join(' ')}
         onClick={onClick}
         disabled={standings.refreshing || busy}
       >

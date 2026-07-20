@@ -13,7 +13,7 @@ export interface WatchMarkerDef {
 }
 
 // Order is the picker order, most-hunted first. Colours are CSS custom
-// properties (--cv-watch-* in App.css) so they re-map per colour-vision mode;
+// properties (--cv-watch-* in styles/tokens.css) so they re-map per colour-vision mode;
 // consumed in DOM styles / filter strings, so var() resolves.
 export const WATCH_MARKERS: WatchMarkerDef[] = [
   { kind: 'target',   Icon: TargetIcon,    color: 'var(--cv-watch-target)' },   // looking for / target
