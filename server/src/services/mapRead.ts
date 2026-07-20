@@ -8,6 +8,23 @@ import { config } from '../config.js';
 
 const UUID_RE = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
 
+// The full MapConnection column projection, single-sourced so every shape that
+// reaches a client — the full map load, the share view, and the connection.add
+// broadcast re-read — stays identical (they used to be three hand-copied lists
+// that could drift, notably the "type" vs "whType" alias). A fixed constant,
+// never interpolated with user input.
+export const CONNECTION_COLS = `
+  id, source_id AS "sourceId", target_id AS "targetId",
+  source_handle AS "sourceHandle", target_handle AS "targetHandle",
+  connection_type AS "connectionType", mass_status AS "massStatus",
+  time_status AS "timeStatus", size, wh_type AS "type",
+  COALESCE(mass_used, 0)::float8 AS "massUsed",
+  eol_at AS "eolAt", lifetime_expires_at AS "lifetimeExpiresAt", broken,
+  source_signature_id AS "sourceSignatureId",
+  target_signature_id AS "targetSignatureId",
+  created_at AS "createdAt"
+`;
+
 export interface VisibleMapsParams {
   userId:         number;
   ownerId:        number | null;
@@ -94,27 +111,20 @@ export async function loadFullMap(mapId: string) {
       [mapId],
     ),
     db.query(
-      `SELECT id, eve_system_id AS "eveSystemId", name, system_class AS "systemClass",
-              effect, statics, region_name AS "regionName", npc_type AS "npcType",
-              position_x AS x, position_y AS y,
-              status, intel, is_home AS "isHome", locked, notes,
-              labels, custom_labels AS "customLabels", tag, alias,
-              (SELECT ss.security::float8 FROM solar_systems ss WHERE ss.id = map_systems.eve_system_id) AS "security",
-              last_activity_at AS "lastActivityAt"
-       FROM map_systems WHERE map_id = $1`,
+      `SELECT ms.id, ms.eve_system_id AS "eveSystemId", ms.name, ms.system_class AS "systemClass",
+              ms.effect, ms.statics, ms.region_name AS "regionName", ms.npc_type AS "npcType",
+              ms.position_x AS x, ms.position_y AS y,
+              ms.status, ms.intel, ms.is_home AS "isHome", ms.locked, ms.notes,
+              ms.labels, ms.custom_labels AS "customLabels", ms.tag, ms.alias,
+              ss.security::float8 AS "security",
+              ms.last_activity_at AS "lastActivityAt"
+       FROM map_systems ms
+       LEFT JOIN solar_systems ss ON ss.id = ms.eve_system_id
+       WHERE ms.map_id = $1`,
       [mapId],
     ),
     db.query(
-      `SELECT id, source_id AS "sourceId", target_id AS "targetId",
-              source_handle AS "sourceHandle", target_handle AS "targetHandle",
-              connection_type AS "connectionType", mass_status AS "massStatus",
-              time_status AS "timeStatus", size, wh_type AS "type",
-              COALESCE(mass_used, 0)::float8 AS "massUsed",
-              eol_at AS "eolAt", lifetime_expires_at AS "lifetimeExpiresAt", broken,
-              source_signature_id AS "sourceSignatureId",
-              target_signature_id AS "targetSignatureId",
-              created_at AS "createdAt"
-       FROM map_connections WHERE map_id = $1`,
+      `SELECT ${CONNECTION_COLS} FROM map_connections WHERE map_id = $1`,
       [mapId],
     ),
     db.query(

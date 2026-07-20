@@ -122,6 +122,10 @@ describe.skipIf(!dbReady)('revalidateActiveSessions (integration — real SQL)',
       expect(await liveSessionCount(u)).toBe(1);
       const { rows } = await db.query<{ corp_id: number }>(`SELECT corp_id FROM users WHERE id = $1`, [u]);
       expect(rows[0].corp_id).toBe(500);
+      // The live session's scope is refreshed in place (not evicted) to the new corp.
+      const sess = await db.query<{ corp: string | null }>(
+        `SELECT sess->>'userCorpId' AS corp FROM sessions WHERE (sess->>'userId')::int = $1`, [u]);
+      expect(sess.rows[0].corp).toBe('500');
     });
 
     it('falls back to stored ids on an ESI outage (no mass eviction)', async () => {

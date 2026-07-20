@@ -246,6 +246,10 @@ adminRouter.patch('/users/:id/role', async (req, res) => {
   const newRole = role as Role;
   await db.query(`UPDATE users SET role = $1, updated_at = NOW() WHERE id = $2`, [newRole, userId]);
   await audit(req, userId, target.character_id, 'role_change', target.role, newRole);
+  // A live session carries a login-time role snapshot; drop the user's sessions so
+  // the change takes effect immediately (a demotion otherwise keeps its old map
+  // write access until re-login / the 7-day cookie TTL). Matches the block handler.
+  await invalidateSessionsForUser(userId);
 
   res.json({ ok: true });
 });
