@@ -24,6 +24,7 @@
   - [Docker (recommended)](#option-1--docker-recommended)
   - [Local development](#option-2--local-development)
   - [EVE developer app scopes](#eve-developer-app-scopes)
+  - [One-command deploy scripts](#one-command-deploy-scripts)
   - [Updating the SDE](#updating-the-sde)
   - [Refreshing wormhole types](#refreshing-wormhole-types)
   - [Upgrading an existing deployment](#upgrading-an-existing-deployment)
@@ -353,6 +354,32 @@ When registering your application at [developers.eveonline.com](https://develope
 | `esi-alliances.read_contacts.v1` | Read the **alliance's** shared contact list. Requires the character to be in the alliance executor corp with the right role; almost always denied for normal members, and that's fine — the call no-ops without breaking login. |
 | `esi-fleets.read_fleet.v1` | Read the character's current fleet composition (members + their solar systems) so fleet-mates show up as purple dots on the map with a hover tooltip listing names. Member-list reads require the character to be the **fleet boss**; wing/squad commanders see "in a fleet, no member visibility" and the UI degrades silently. |
 
+#### One-command deploy scripts
+
+Not comfortable with Docker commands? The repo ships small scripts that run the whole **pull → build → restart** cycle for you, so both first setup and later updates are a single command from the repo root — no need to remember the `docker compose` lines below.
+
+**Use the scripts for _your_ operating system — Linux/macOS _or_ Windows, not both.** They do the same thing; the `.sh` and `.ps1` versions are just for different shells.
+
+**Linux / macOS** — run the `.sh` scripts:
+
+| Run this | Use it for | What it does |
+|---|---|---|
+| `./build-traefik.sh` | **The live / public site** (fronted by Traefik) | `git pull`, then build + `up -d` with **both** compose files |
+| `./build.sh` | **Local / dev** (no Traefik) | `git pull`, then a plain build + `up -d` |
+
+**Windows** — run the `.ps1` scripts in PowerShell:
+
+| Run this | Use it for | What it does |
+|---|---|---|
+| `.\build-traefik.ps1` | **The live / public site** (fronted by Traefik) | `git pull`, then build + `up -d` with **both** compose files |
+| `.\build.ps1` | **Local / dev** (no Traefik) | `git pull`, then a plain build + `up -d` |
+
+Each script **stops if a step fails**, so a broken pull or build never restarts the site with a bad image. On the **first** run it also downloads EVE's static data (a few minutes) — that's the importer described under **Build and start the stack** below; nothing is stuck.
+
+> **On your public server, always use `build-traefik`.** A plain build without the Traefik overlay 404s the live site. The plain `build` scripts are for local/dev only. (Traefik setup is covered under **Reverse proxy** below.)
+>
+> First run on Windows may need `Set-ExecutionPolicy -Scope Process RemoteSigned`; on Linux/macOS the `.sh` files are already executable (`chmod +x` is preset).
+
 **2. Build and start the stack**
 
 The server depends on the EVE Static Data Export (SDE) tables (`map_stargates`, `solar_systems`, `item_types`, …) at boot — without them, route-graph initialisation throws and the container crash-loops. A dedicated `importer` service handles this: it runs once after Postgres is healthy, downloads the SDE (~hundreds of MB from CCP, a few minutes; logs progress per table), populates the static tables, then exits. The server waits for it to finish (`service_completed_successfully`) before booting, so a single command brings everything up in the right order.
@@ -364,7 +391,7 @@ docker compose up -d
 
 The app will be available on port `${WEB_PORT:-80}` (defaults to `80`).
 
-The import is self-skipping: on every later `up` or restart the importer sees the static tables are already populated and exits in a second without re-downloading. So the two commands above are also your update flow. To force a re-import (e.g. after a CCP SDE drop), see [Updating the SDE](#updating-the-sde) below.
+The import is self-skipping: on every later `up` or restart the importer sees the static tables are already populated and exits in a second without re-downloading. So the two commands above are also your update flow — or just run one of the [one-command deploy scripts](#one-command-deploy-scripts) above. To force a re-import (e.g. after a CCP SDE drop), see [Updating the SDE](#updating-the-sde) below.
 
 The importer also stores each system's universe coordinates and CCP's 2D star-map projection (`position` / `position2D`), which power the [Seed a map from a region](#features) feature.
 
