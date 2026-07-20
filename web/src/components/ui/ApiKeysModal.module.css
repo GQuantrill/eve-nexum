@@ -1,0 +1,141 @@
+/* ── API keys modal ───────────────────────────────────────── */
+.create {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  background: var(--surface-base);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  margin: 8px 0;
+}
+
+.reveal {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  background: rgba(240,192,64,0.06);
+  border: 1px solid rgba(240,192,64,0.35);
+  border-radius: 6px;
+  margin: 8px 0;
+}
+
+.revealWarn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #f0c040;
+  font-size: calc(12px * var(--font-scale, 1));
+  font-weight: 600;
+}
+
+.revealActions {
+  display: flex;
+  gap: 8px;
+}
+
+.secret {
+  display: block;
+  padding: 6px 8px;
+  background: #08090f;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-family: monospace;
+  font-size: calc(12px * var(--font-scale, 1));
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background: var(--surface-base);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.main {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
+}
+
+.name {
+  color: var(--text-primary);
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.prefix {
+  color: #6b7a99;
+  font-family: monospace;
+  font-size: calc(11px * var(--font-scale, 1));
+  flex-shrink: 0;
+}
+
+.flag {
+  font-size: calc(10px * var(--font-scale, 1));
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-weight: 600;
+  background: rgba(224,90,90,0.12);
+  color: #e05a5a;
+  border: 1px solid rgba(224,90,90,0.3);
+  flex-shrink: 0;
+}
+
+.scope {
+  font-size: calc(10px * var(--font-scale, 1));
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.scopeRead {
+  background: rgba(100,160,255,0.12);
+  color: #7ab0f0;
+  border: 1px solid rgba(100,160,255,0.3);
+}
+
+.scopeEvents {
+  background: rgba(120,200,140,0.12);
+  color: #6fc98a;
+  border: 1px solid rgba(120,200,140,0.3);
+}
+
+.scopeWrite {
+  background: rgba(240,160,80,0.12);
+  color: #e0a050;
+  border: 1px solid rgba(240,160,80,0.3);
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  text-align: right;
+  color: #6b7a99;
+  font-size: calc(10px * var(--font-scale, 1));
+  flex-shrink: 0;
+}
+
+.revoke {
+  flex-shrink: 0;
+}
