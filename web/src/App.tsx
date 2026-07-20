@@ -42,7 +42,7 @@ function MapApp() {
   const uiZoom              = useMapStore((s) => s.uiZoom);
   const resetUniformSizes   = useMapStore((s) => s.resetUniformSizes);
 
-  // Apply the user's UI scale as a CSS custom property. App.css `font-size`
+  // Apply the user's UI scale as a CSS custom property. The global stylesheets' `font-size`
   // declarations multiply through `calc(Npx * var(--font-scale, 1))`, so
   // only text scales — layout boxes stay the same size and React Flow /
   // modal positioning math keeps working. Previously this used CSS
@@ -60,7 +60,7 @@ function MapApp() {
   }, [uiZoom, resetUniformSizes]);
 
   // Colour-vision mode → data attribute on <html>; the --cv-* palette
-  // overrides in App.css key off it. 'off' (or unset) leaves the defaults.
+  // overrides in those sheets key off it. 'off' (or unset) leaves the defaults.
   const [colorVision] = useUserSetting<string>('nexum.a11y.colorVision', 'off');
   useEffect(() => {
     if (colorVision && colorVision !== 'off') {

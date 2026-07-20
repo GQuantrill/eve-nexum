@@ -1300,7 +1300,7 @@ interface SystemsReportData {
 }
 
 // Stable palette for the sig-type donut so colours don't shuffle on refresh.
-// CSS custom properties (--cv-sig-* in App.css) for colour-vision support.
+// CSS custom properties (--cv-sig-* in styles/tokens.css) for colour-vision support.
 // Resolved to hex via cssVarToHex where consumed, since the donut paints to a
 // <canvas> (chart.js) which can't read var().
 const SIG_TYPE_COLORS: Record<string, string> = {

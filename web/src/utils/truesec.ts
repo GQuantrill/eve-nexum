@@ -1,5 +1,5 @@
 // Returns a CSS custom property so the colour-vision palettes (the --cv-sec-*
-// vars in App.css) can re-map the security gradient per mode.
+// vars in styles/tokens.css) can re-map the security gradient per mode.
 export function truesecColor(sec: number): string {
   if (sec >= 0.9) return 'var(--cv-sec-09)';
   if (sec >= 0.8) return 'var(--cv-sec-08)';
