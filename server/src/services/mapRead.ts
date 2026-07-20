@@ -111,14 +111,16 @@ export async function loadFullMap(mapId: string) {
       [mapId],
     ),
     db.query(
-      `SELECT id, eve_system_id AS "eveSystemId", name, system_class AS "systemClass",
-              effect, statics, region_name AS "regionName", npc_type AS "npcType",
-              position_x AS x, position_y AS y,
-              status, intel, is_home AS "isHome", locked, notes,
-              labels, custom_labels AS "customLabels", tag, alias,
-              (SELECT ss.security::float8 FROM solar_systems ss WHERE ss.id = map_systems.eve_system_id) AS "security",
-              last_activity_at AS "lastActivityAt"
-       FROM map_systems WHERE map_id = $1`,
+      `SELECT ms.id, ms.eve_system_id AS "eveSystemId", ms.name, ms.system_class AS "systemClass",
+              ms.effect, ms.statics, ms.region_name AS "regionName", ms.npc_type AS "npcType",
+              ms.position_x AS x, ms.position_y AS y,
+              ms.status, ms.intel, ms.is_home AS "isHome", ms.locked, ms.notes,
+              ms.labels, ms.custom_labels AS "customLabels", ms.tag, ms.alias,
+              ss.security::float8 AS "security",
+              ms.last_activity_at AS "lastActivityAt"
+       FROM map_systems ms
+       LEFT JOIN solar_systems ss ON ss.id = ms.eve_system_id
+       WHERE ms.map_id = $1`,
       [mapId],
     ),
     db.query(
