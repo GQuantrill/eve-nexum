@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import styles from './Toaster.module.css';
 
 // Tiny event-driven toaster. Module-level emitter so any call site can do
 // `toast.error('...')` without threading context through props. The Toaster
@@ -87,7 +88,7 @@ export function Toaster() {
   if (toasts.length === 0) return null;
 
   return (
-    <div className="toaster">
+    <div className={styles.toaster}>
       {toasts.map((t) => {
         const hasActions = !!t.actions?.length;
         // Plain toasts keep click-to-dismiss. Actionable/sticky toasts must not
@@ -97,17 +98,17 @@ export function Toaster() {
         return (
           <div
             key={t.id}
-            className={`toast toast--${t.kind}${hasActions ? ' toast--actionable' : ''}`}
+            className={[styles.toast, styles[t.kind], hasActions && styles.actionable].filter(Boolean).join(' ')}
             role={t.kind === 'error' ? 'alert' : 'status'}
             onClick={dismissOnBodyClick ? () => dismiss(t.id) : undefined}
             style={dismissOnBodyClick ? undefined : { cursor: 'default' }}
           >
-            <div className="toast__body">
-              <span className="toast__msg">{t.msg}</span>
+            <div className={styles.body}>
+              <span className={styles.msg}>{t.msg}</span>
               {(hasActions || t.sticky) && (
                 <button
                   type="button"
-                  className="toast__close"
+                  className={styles.close}
                   aria-label="Dismiss"
                   onClick={() => dismiss(t.id)}
                 >
@@ -116,12 +117,12 @@ export function Toaster() {
               )}
             </div>
             {hasActions && (
-              <div className="toast__actions">
+              <div className={styles.actions}>
                 {t.actions!.map((a, i) => (
                   <button
                     key={i}
                     type="button"
-                    className={`toast__action${a.primary ? ' toast__action--primary' : ''}`}
+                    className={[styles.action, a.primary && styles.primary].filter(Boolean).join(' ')}
                     onClick={() => { a.onClick(); dismiss(t.id); }}
                   >
                     {a.label}

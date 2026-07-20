@@ -1,0 +1,86 @@
+/* Toaster — event-driven toast stack. Migrated out of App.css (Phase 2 of the
+   CSS refactor, see design-system.md). Scoped via CSS Modules, so class names
+   are local; reference design tokens, not raw hex. Toast state-accent colours
+   (error/info/success) are kept as their original literals for now — unifying
+   them into --danger/--info/--success tokens is a deliberate palette pass. */
+
+.toaster {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.toast {
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: calc(13px * var(--font-scale, 1));
+  max-width: 360px;
+  pointer-events: auto;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  border-left: 3px solid;
+  background: #14181f;
+  color: var(--text-default);
+}
+
+.error   { border-left-color: #f87171; background: #1a1014; }
+.info    { border-left-color: #60a5fa; background: #0f1620; }
+.success { border-left-color: #4ade80; background: #0f1a14; }
+
+/* Actionable toast: message + close on one row, buttons wrapping below. Wider
+   so several hole buttons fit before wrapping. */
+.actionable { max-width: 420px; }
+
+.body {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.msg { flex: 1; }
+
+.close {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: #8a93a6;
+  font-size: calc(16px * var(--font-scale, 1));
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 2px;
+}
+
+.close:hover { color: var(--text-default); }
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.action {
+  background: #1c2230;
+  border: 1px solid #2e3a4f;
+  border-radius: 4px;
+  color: var(--text-default);
+  font-size: calc(12px * var(--font-scale, 1));
+  font-weight: 600;
+  padding: 4px 10px;
+  cursor: pointer;
+}
+
+.action:hover { border-color: #4a5a78; background: #232b3b; }
+
+.primary {
+  background: #1e3a5f;
+  border-color: #3b6ea5;
+  color: #dbe7f5;
+}
+
+.primary:hover { background: #244873; }
