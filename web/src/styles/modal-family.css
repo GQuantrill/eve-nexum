@@ -1,0 +1,570 @@
+/* Modal shell + modal-based dialogs. Relocated verbatim out of App.css (Phase 2 bucket-2);
+   kept GLOBAL, imported once in main.tsx. See design-system.md. */
+
+/* ── Modal ───────────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(2px);
+}
+
+.modal {
+  background: var(--surface-well);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  width: 360px;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+
+.modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal__title {
+  font-size: calc(14px * var(--font-scale, 1));
+  font-weight: 600;
+  color: var(--text-bright);
+  margin: 0;
+}
+
+.modal__body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+}
+
+.modal__row {
+  display: flex;
+  gap: 10px;
+
+  .field { flex: 1; }
+}
+
+.modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+
+/* ── Custom-label dialog ─────────────────────────────────────────── */
+.custom-label-dialog { width: min(440px, 92vw); }
+
+.custom-label-dialog__current {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.custom-label-dialog__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 6px;
+  border-radius: 5px;
+  background: #1a2030;
+  border: 1px solid #33415c;
+  font-size: calc(12px * var(--font-scale, 1));
+  color: #dbe4f3;
+}
+
+.custom-label-dialog__chip-x {
+  display: inline-flex;
+  background: none;
+  border: none;
+  color: #8a93a6;
+  cursor: pointer;
+  padding: 0;
+}
+.custom-label-dialog__chip-x:hover { color: #e25a5a; }
+/* Text colour is set inline per-chip (black/white for contrast); the X inherits
+   it so it stays legible on light backgrounds too. */
+.custom-label-dialog__chip--coloured .custom-label-dialog__chip-x { color: inherit; opacity: 0.7; }
+.custom-label-dialog__chip--coloured .custom-label-dialog__chip-x:hover { opacity: 1; }
+
+/* Per-chip recolour swatch — the native colour input shrunk to a small square. */
+.custom-label-dialog__chip-color {
+  display: inline-flex;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.35);
+}
+.custom-label-dialog__chip-color input[type='color'] {
+  width: 200%;
+  height: 200%;
+  margin: -25%;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+/* Colour row for the next-added label. */
+.custom-label-dialog__color-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0 6px;
+  font-size: calc(12px * var(--font-scale, 1));
+  color: var(--text-default);
+}
+.custom-label-dialog__color-row input[type='color'] {
+  width: 34px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid #33415c;
+  border-radius: 4px;
+  background: none;
+  cursor: pointer;
+}
+
+.custom-label-dialog__hint {
+  font-size: calc(11px * var(--font-scale, 1));
+  color: #8a93a6;
+  margin: 8px 0 4px;
+}
+
+.custom-label-dialog__add-text { display: flex; gap: 6px; }
+
+/* At the custom-label cap the whole add area dims; the title explains why. */
+.custom-label-dialog__add-area[aria-disabled='true'] { opacity: 0.55; cursor: not-allowed; }
+
+.custom-label-dialog__icons {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(34px, 1fr));
+  gap: 4px;
+  max-height: 240px;
+  overflow-y: auto;
+  margin-top: 8px;
+  padding: 4px;
+  border: 1px solid #283248;
+  border-radius: 6px;
+}
+.custom-label-dialog__icons[aria-disabled='true'] { opacity: 0.4; pointer-events: none; }
+
+.custom-label-dialog__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 34px;
+  background: #141a26;
+  border: 1px solid #283248;
+  border-radius: 5px;
+  color: var(--text-default);
+  cursor: pointer;
+}
+.custom-label-dialog__icon:hover { background: #1e2738; border-color: #4a5a78; color: #fff; }
+
+/* Read-only display of a generated share URL. Monospace so the UUID
+   tail stays scannable; truncated with ellipsis if the origin is long. */
+.map-sidebar__share-url {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: calc(11px * var(--font-scale, 1));
+  color: var(--text-primary);
+  background: #08101a;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 6px 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.map-sidebar__share-meta {
+  font-size: calc(11px * var(--font-scale, 1));
+  color: #7a8aa8;
+  padding: 2px 0;
+}
+
+.map-sidebar__shortcut {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #c0ccde;
+  padding: 2px 0;
+
+  kbd {
+    font-family: inherit;
+    font-size: calc(11px * var(--font-scale, 1));
+    background: var(--surface-raised);
+    border: 1px solid var(--border-strong);
+    border-radius: 3px;
+    padding: 1px 6px;
+    color: #c0ccde;
+    flex-shrink: 0;
+  }
+}
+
+/* Caveat under a shortcut (e.g. browsers that intercept Ctrl+Shift+V). */
+.map-sidebar__shortcut-note {
+  margin: 2px 0 0;
+  font-size: calc(11px * var(--font-scale, 1));
+  line-height: 1.4;
+  color: #8a98b0;
+}
+
+.map-sidebar__status {
+  font-size: calc(13px * var(--font-scale, 1));
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid;
+
+  &--ok  { color: #3ddc84; border-color: #3ddc84; }
+  &--err { color: #e05a5a; border-color: #e05a5a; }
+}
+
+.map-sidebar__title {
+  font-size: calc(16px * var(--font-scale, 1));
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-faintest);
+  margin-bottom: 4px;
+}
+
+.map-sidebar__section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.map-sidebar__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.map-sidebar__label {
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #c0ccde;
+}
+
+/* Stacked field: label on its own line above a full-width control. */
+.map-sidebar__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.map-sidebar__select--full {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.map-sidebar__toggle-row {
+  cursor: pointer;
+}
+
+/* "Settings" button at the top of the sidebar — opens the preferences modal. */
+/* Branding block at the top of the map menu: logo + name, "Powered by", version
+   and the patch-notes button. */
+.map-sidebar__brand {
+  padding: 2px 2px 12px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid #1a2436;
+}
+.map-sidebar__brand-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.map-sidebar__brand-logo {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+.map-sidebar__brand-name {
+  font-size: calc(16px * var(--font-scale, 1));
+  font-weight: 700;
+  color: #e8f0ff;
+  letter-spacing: 0.02em;
+}
+.map-sidebar__brand-by {
+  font-size: calc(12px * var(--font-scale, 1));
+  color: #6a8ab0;
+}
+.map-sidebar__brand-by a { color: #5a9af8; text-decoration: none; }
+.map-sidebar__brand-by a:hover { text-decoration: underline; }
+.map-sidebar__brand-version {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
+  font-size: calc(12px * var(--font-scale, 1));
+  color: #8aa0c8;
+}
+.map-sidebar__patchnotes-btn {
+  flex-shrink: 0;
+  background: transparent;
+  border: 1px solid #2e3a52;
+  border-radius: 4px;
+  color: #9ec0e8;
+  font-family: inherit;
+  font-size: calc(12px * var(--font-scale, 1));
+  padding: 3px 8px;
+  cursor: pointer;
+}
+.map-sidebar__patchnotes-btn:hover { border-color: #5a9af8; color: #e8f0ff; }
+
+/* Patch-notes modal (reuses the generic .modal / .modal-overlay shell). Flex
+   column so the header stays put and only the body scrolls. */
+.modal.patchnotes {
+  max-width: 720px;
+  width: 90vw;
+  max-height: 82vh;
+  display: flex;
+  flex-direction: column;
+}
+.modal.patchnotes .modal__header { flex-shrink: 0; }
+.patchnotes__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 8px 18px 14px;
+}
+.patchnotes__release { padding: 12px 0; border-bottom: 1px solid #1a2436; }
+.patchnotes__release:last-child { border-bottom: none; }
+.patchnotes__release-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 6px; }
+.patchnotes__version {
+  font-size: calc(17px * var(--font-scale, 1));
+  font-weight: 700;
+  color: #5b9bff;
+  text-decoration: none;
+}
+.patchnotes__version:hover { text-decoration: underline; }
+.patchnotes__date { font-size: calc(12px * var(--font-scale, 1)); color: #6a8ab0; }
+.patchnotes__empty { padding: 28px; text-align: center; color: #8aa0c8; }
+.patchnotes__md.wmde-markdown,
+.patchnotes__md {
+  background: transparent;
+  color: var(--text-primary);
+  font-size: calc(13px * var(--font-scale, 1));
+}
+
+.map-sidebar__settings-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  margin-bottom: 4px;
+  background: #11192b;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: #c0ccde;
+  cursor: pointer;
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 600;
+
+  &:hover { background: #16213a; border-color: var(--border-accent); color: #a0ccf8; }
+}
+
+
+/* ── Wormhole type chart (whtype.info-style reference) ─────── */
+.modal.whchart {
+  width: 94vw;
+  max-width: 1180px;
+}
+
+.whchart__body {
+  position: relative;
+  display: flex;
+  /* .modal__body defaults to column — force row so the attribute columns sit
+     side-by-side instead of stacking under the (full-width) code list. */
+  flex-direction: row;
+  gap: 10px;
+  height: auto;
+  max-height: 80vh;
+  overflow: hidden;
+  /* Own stacking context so the SVG (z-index 0) reliably sits behind the
+     columns (z-index 1) — i.e. connector lines render under the labels. */
+  isolation: isolate;
+}
+
+/* SVG line overlay sits BEHIND the column text (z-index 0); columns are lifted
+   to z-index 1 so the connectors read as running under the labels. */
+.whchart__lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.whchart__col {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.whchart__col--codes { flex: 0 0 200px; }
+.whchart__col--narrow { flex: 0 0 110px; }
+
+.whchart__col-head {
+  font-size: calc(11px * var(--font-scale, 1));
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #6b7a99;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
+  /* Solid chip, distinctly darker than the modal, so connectors tuck behind. */
+  background: #070a10;
+}
+
+.whchart__cell {
+  font-size: calc(12px * var(--font-scale, 1));
+  color: #5a6886;
+  padding: 2px 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.1s;
+  /* Solid chip (darker than the modal) so transiting lines are occluded by the
+     cell box rather than drawn over the glyphs — lines only show in the gaps. */
+  background: #070a10;
+}
+
+/* Highlighted target rows for the active code. */
+.whchart__cell--on {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* Codes flow top-to-bottom down each column (alphabetical within a column),
+   balanced across 4 columns so all ~101 fit without a scroll. */
+.whchart__codes {
+  column-count: 4;
+  column-gap: 6px;
+}
+
+.whchart__code {
+  font-family: monospace;
+  font-size: calc(12px * var(--font-scale, 1));
+  color: #8a96b4;
+  padding: 1px 4px;
+  border-radius: 3px;
+  cursor: pointer;
+  break-inside: avoid;
+  /* Solid chip (darker than the modal) so connectors tuck behind the codes. */
+  background: #070a10;
+}
+
+.whchart__code:hover { background: var(--surface-raised); color: var(--text-primary); }
+
+.whchart__code--active {
+  background: rgba(91,155,255,0.16);
+  color: #fff;
+  font-weight: 700;
+}
+
+.whchart__search {
+  display: block;
+  width: 100%;
+  margin-top: 4px;
+  padding: 2px 5px;
+  background: var(--surface-base);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-size: calc(11px * var(--font-scale, 1));
+}
+
+
+/* ── Access-page Standings Viewer modal ─────────────────────────────── */
+.standings-viewer { width: 580px; max-width: 92vw; display: flex; flex-direction: column; }
+.standings-viewer .modal__header h3 {
+  font-size: calc(14px * var(--font-scale, 1));
+  font-weight: 600; color: var(--text-bright); margin: 0;
+}
+
+/* Corp / Alliance source switch (only shown when a deployment has both). */
+.standings-viewer__sources {
+  display: flex; gap: 4px; padding: 10px 16px 0;
+}
+.standings-viewer__source {
+  background: transparent; border: 1px solid var(--border); border-radius: 5px;
+  color: var(--text-faintest); cursor: pointer; font-family: inherit;
+  font-size: calc(12px * var(--font-scale, 1)); padding: 3px 12px;
+}
+.standings-viewer__source:hover { background: var(--surface-overlay); color: var(--text-default); }
+.standings-viewer__source--active { background: #1a3a6a; border-color: var(--border-accent-strong); color: #7ab4f0; }
+
+/* The five standing-band tabs. */
+.standings-viewer__tabs {
+  display: flex; gap: 4px; padding: 12px 16px; border-bottom: 1px solid var(--border);
+}
+.standings-viewer__tab {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px;
+  background: transparent; border: 1px solid var(--border); border-radius: 5px;
+  cursor: pointer; font-family: inherit; padding: 5px 0; color: var(--text-faintest);
+}
+.standings-viewer__tab:hover { background: #131c30; }
+.standings-viewer__tab-label { font-size: calc(13px * var(--font-scale, 1)); font-weight: 600; }
+.standings-viewer__tab-count { font-size: calc(10px * var(--font-scale, 1)); opacity: 0.7; }
+.standings-viewer__tab--active { background: #131c30; border-color: var(--border-accent-strong); }
+
+/* Band accent colours — reuse the app's colour-vision standing vars. */
+.standings-viewer__band--excellent { color: var(--cv-stand-friendly); }
+.standings-viewer__band--good      { color: var(--cv-stand-good); }
+.standings-viewer__band--neutral   { color: #8a97b0; }
+.standings-viewer__band--bad       { color: var(--cv-stand-bad); }
+.standings-viewer__band--terrible  { color: var(--cv-stand-hostile); }
+.standings-viewer__tab--active.standings-viewer__band--excellent { border-color: color-mix(in srgb, var(--cv-stand-friendly) 55%, transparent); }
+.standings-viewer__tab--active.standings-viewer__band--good      { border-color: color-mix(in srgb, var(--cv-stand-good) 55%, transparent); }
+.standings-viewer__tab--active.standings-viewer__band--bad       { border-color: color-mix(in srgb, var(--cv-stand-bad) 55%, transparent); }
+.standings-viewer__tab--active.standings-viewer__band--terrible  { border-color: color-mix(in srgb, var(--cv-stand-hostile) 55%, transparent); }
+
+.standings-viewer__body {
+  padding: 0; max-height: 60vh; overflow-y: auto; gap: 0;
+}
+.standings-viewer__msg {
+  font-size: calc(13px * var(--font-scale, 1)); color: var(--text-faintest);
+  text-align: center; padding: 28px 16px;
+}
+.standings-viewer__msg--error { color: #e06a6a; }
+
+.standings-viewer__table {
+  width: 100%; border-collapse: collapse;
+  font-size: calc(13px * var(--font-scale, 1));
+}
+.standings-viewer__table thead th {
+  position: sticky; top: 0; background: var(--surface-well); z-index: 1;
+  text-align: left; color: var(--text-faintest); font-weight: 600;
+  padding: 8px 16px; border-bottom: 1px solid var(--border);
+  font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; letter-spacing: 0.04em;
+}
+.standings-viewer__table tbody td {
+  padding: 6px 16px; border-bottom: 1px solid #151d30; color: var(--text-default);
+}
+.standings-viewer__table tbody tr:hover td { background: #131c30; }
+.standings-viewer__col-name { display: flex; align-items: center; gap: 8px; }
+.standings-viewer__logo { width: 24px; height: 24px; border-radius: 3px; flex-shrink: 0; }
+.standings-viewer__name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.standings-viewer__col-ticker { color: #8a97b0; white-space: nowrap; }
+.standings-viewer__col-standing { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }

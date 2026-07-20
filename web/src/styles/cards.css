@@ -1,0 +1,253 @@
+/* Draggable info cards + floating panel window. Relocated verbatim out of App.css (Phase 2 bucket-2);
+   kept GLOBAL, imported once in main.tsx. See design-system.md. */
+
+/* ── Draggable info cards ─────────────────────────────────── */
+.panel-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 260px;
+  overflow-y: auto;
+  padding-top: 12px;
+  min-height: 0;
+}
+
+.info-card {
+  background: #080e1a;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.info-card--collapsed .info-card__header {
+  border-bottom: none;
+}
+
+.info-card__header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-well);
+  cursor: pointer;
+}
+
+.info-card__title {
+  font-size: calc(16px * var(--font-scale, 1));
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #c0ccde;
+  flex: 1;
+}
+
+.info-card__collapse-btn {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+
+  &:hover { color: #c0ccde; }
+}
+
+.info-card__chevron {
+  display: inline-block;
+  font-size: calc(14px * var(--font-scale, 1));
+  transition: transform 0.15s ease;
+  transform: rotate(0deg);
+}
+
+.info-card__chevron--collapsed {
+  transform: rotate(-90deg);
+}
+
+.info-card__drag-handle {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: grab;
+  font-size: calc(14px * var(--font-scale, 1));
+  line-height: 1;
+  padding: 0 2px;
+  user-select: none;
+
+  &:hover { color: #6a7a98; }
+  &:active { cursor: grabbing; }
+}
+
+.info-card__body {
+  padding: 8px 10px;
+}
+
+/* Undock button in a dock card header — subtle, brightens on hover. */
+.info-card__undock-btn {
+  display: inline-flex;
+  align-items: center;
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 0 2px;
+  line-height: 1;
+}
+.info-card__undock-btn:hover { color: #8ab8f0; }
+
+
+/* ── Floating (undocked) panel window ─────────────────────────────── */
+.floating-panel {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-well);
+  border: 1px solid var(--border-accent);
+  border-radius: 8px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+  min-width: 260px;
+  min-height: 140px;
+}
+.floating-panel__bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: var(--surface-panel);
+  border-bottom: 1px solid var(--border);
+  cursor: move;
+  touch-action: none;
+  user-select: none;
+  flex-shrink: 0;
+}
+.floating-panel__title {
+  flex: 1;
+  font-size: calc(15px * var(--font-scale, 1));
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #c0ccde;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.floating-panel__redock {
+  display: inline-flex;
+  align-items: center;
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 0 2px;
+}
+.floating-panel__redock:hover { color: #8ab8f0; }
+.floating-panel__body {
+  flex: 1;
+  overflow: auto;
+  padding: 8px 10px;
+}
+.floating-panel__resize {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 16px;
+  height: 16px;
+  cursor: nwse-resize;
+  touch-action: none;
+}
+.floating-panel__resize::after {
+  content: '';
+  position: absolute;
+  right: 3px;
+  bottom: 3px;
+  width: 7px;
+  height: 7px;
+  border-right: 2px solid #3a4a62;
+  border-bottom: 2px solid #3a4a62;
+}
+
+.notes-editor {
+  .w-md-editor {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    color: var(--text-default);
+    font-size: calc(13px * var(--font-scale, 1));
+  }
+
+  .w-md-editor-toolbar {
+    background: var(--surface-well);
+    border-bottom: 1px solid var(--border);
+
+    li button {
+      color: #6a7a98;
+      &:hover { color: var(--text-default); background: var(--surface-overlay); }
+    }
+
+    li.active button { color: var(--text-default); }
+  }
+
+  .w-md-editor-content {
+    background: transparent;
+  }
+
+  .w-md-editor-input textarea {
+    color: var(--text-default);
+    font-size: calc(13px * var(--font-scale, 1));
+    caret-color: var(--text-default);
+  }
+
+  .wmde-markdown {
+    background: transparent;
+    color: var(--text-default);
+    font-size: calc(13px * var(--font-scale, 1));
+
+    h1, h2, h3 { color: var(--text-bright); border-color: var(--border); }
+    a { color: #5a9af8; }
+    code { background: var(--surface-panel); color: #a8c0e8; }
+    pre { background: var(--surface-panel); }
+    blockquote { border-color: var(--border-accent); color: #c0ccde; }
+  }
+
+  .w-md-editor-bar { display: none; }
+}
+
+/* Show MDEditor's drag handle only on the full Notes pane, so users can pull
+   it taller. Compact row notes (signatures / structures) stay handle-free.
+   Same specificity as the hide rule above; wins by source order. */
+.notes-editor--full .w-md-editor-bar {
+  display: block;
+}
+
+.notes-editor--empty {
+  cursor: text;
+  padding: 3px 6px;
+}
+
+.notes-editor--preview {
+  cursor: text;
+  padding: 3px 6px;
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #c0ccde;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.notes-editor__placeholder {
+  font-size: calc(13px * var(--font-scale, 1));
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+.info-card:has(.notes-editor) .info-card__body {
+  padding: 0;
+}
+

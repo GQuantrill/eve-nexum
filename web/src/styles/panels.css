@@ -1,0 +1,502 @@
+/* Side panel, mass tracker, chain-effect summary. Relocated verbatim out of App.css (Phase 2 bucket-2);
+   kept GLOBAL, imported once in main.tsx. See design-system.md. */
+
+/* ── Side panel ──────────────────────────────────────────── */
+.system-panel {
+  background: var(--surface-well);
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 12px;
+  /* Extra left padding clears the watchlist panel's left-edge tab (a persistent
+     ~38px handle, vertically centred) so it never overlaps the system name /
+     panel content when the panel is tall. */
+  padding: 0 16px 12px 48px;
+  overflow: hidden;
+  flex-shrink: 0;
+  position: relative;
+
+  > .btn { align-self: flex-end; }
+}
+
+.system-panel__resize-handle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  cursor: ns-resize;
+  z-index: 10;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 2px;
+    border-radius: 1px;
+    background: var(--border-accent);
+    transition: background 0.15s;
+  }
+
+  &:hover::after { background: #5a9af8; }
+}
+
+/* Vertical divider between the system-info column and the panel-stack; drag to
+   resize the column. Mirrors the horizontal (height) handle above. */
+.system-panel__col-resize {
+  flex-shrink: 0;
+  width: 6px;
+  align-self: stretch;
+  cursor: ew-resize;
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 2px;
+    transform: translateY(-50%);
+    width: 2px;
+    height: 40px;
+    border-radius: 1px;
+    background: var(--border-accent);
+    transition: background 0.15s;
+  }
+
+  &:hover::after { background: #5a9af8; }
+}
+
+/* Slim rail shown when the system-info column is fully collapsed; click to
+   bring it back. The panel-stack fills the rest of the width meanwhile. */
+.system-panel__expand {
+  flex-shrink: 0;
+  align-self: stretch;
+  width: 18px;
+  margin-top: 12px;
+  background: #0d1421;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+
+  &:hover { background: #16213a; color: #a0ccf8; }
+}
+
+.system-panel__left {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+  min-width: 160px;
+  padding-top: 12px;
+  padding-right: 12px;
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+}
+
+.system-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  /* When the panel is narrowed, the action buttons wrap to a second line
+     rather than crushing the system name — the title keeps its own line. */
+  flex-wrap: wrap;
+  /* Anchor + reserved gutter for the collapse caret, which is pinned to the
+     top-right corner (out of the flex flow) rather than riding with the
+     Set Destination / Waypoint buttons. */
+  position: relative;
+  padding-right: 24px;
+}
+
+.system-panel__collapse {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.system-panel__title {
+  font-size: calc(16px * var(--font-scale, 1));
+  font-weight: 600;
+  color: var(--text-bright);
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1 1 auto;
+  /* Keep the name readable; once it + the buttons no longer fit, the buttons
+     wrap below instead of the name shrinking to an ellipsis. */
+  min-width: 130px;
+}
+
+/* The real system name shown after an alias in the panel header, e.g. HOME (J155002). */
+.system-panel__real-name {
+  font-weight: 400;
+  color: #7a8aa8;
+  font-size: calc(13px * var(--font-scale, 1));
+}
+
+.system-panel__actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.sys-btn {
+  background: var(--surface-panel);
+  border: 1px solid var(--border-accent);
+  border-radius: 4px;
+  color: #7ab4f0;
+  cursor: pointer;
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 500;
+  padding: 3px 8px;
+  white-space: nowrap;
+
+  &:hover { background: #1a2a4a; color: #a0ccf8; }
+  &:active { background: #1a3a6a; }
+}
+
+.sys-btn--ok {
+  border-color: #3ddc84;
+  color: #3ddc84;
+}
+
+.sys-btn--err {
+  border-color: #e05a5a;
+  color: #e05a5a;
+}
+
+
+/* ── Mass tracker ────────────────────────────────────────── */
+.mass-tracker {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface-well);
+}
+
+.mass-tracker__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.mass-tracker__label {
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 600;
+  color: #c0ccde;
+}
+
+.mass-tracker__values {
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #8a9ab8;
+  font-family: monospace;
+}
+
+.mass-tracker__bar {
+  height: 8px;
+  background: var(--surface-raised);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.mass-tracker__fill {
+  height: 100%;
+  transition: width 0.2s ease, background 0.2s ease;
+}
+
+.mass-tracker__fill--stable       { background: #3ddc84; }
+.mass-tracker__fill--destabilized { background: #f0a030; }
+.mass-tracker__fill--critical     { background: #e05a5a; }
+
+.mass-tracker__remaining {
+  font-size: calc(13px * var(--font-scale, 1));
+  color: var(--text-faint);
+}
+
+.mass-tracker__budget {
+  font-size: calc(12px * var(--font-scale, 1));
+  color: #6ea0ff;
+  padding: 4px 8px;
+  background: rgba(110, 160, 255, 0.06);
+  border-left: 2px solid #6ea0ff;
+  border-radius: 0 3px 3px 0;
+  margin-top: 2px;
+}
+
+.mass-tracker__budget--empty {
+  color: #f0a030;
+  background: rgba(240, 160, 48, 0.06);
+  border-left-color: #f0a030;
+}
+
+.mass-tracker__budget--blocked {
+  color: #e05a5a;
+  background: rgba(224, 90, 90, 0.06);
+  border-left-color: #e05a5a;
+}
+
+.mass-tracker__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.mass-tracker__btn {
+  font-size: calc(13px * var(--font-scale, 1));
+}
+
+.mass-tracker__reset {
+  margin-left: auto;
+  border-color: #4a3030;
+  color: #d8a8a8;
+}
+
+.mass-tracker__hint {
+  padding: 8px 10px;
+  font-size: calc(13px * var(--font-scale, 1));
+  color: var(--text-faint);
+  font-style: italic;
+  border: 1px dashed var(--border);
+  border-radius: 6px;
+}
+
+/* Shown for gate / jump-bridge connections in place of the wormhole fields. */
+.conn-gate-note {
+  margin: 0;
+  padding: 8px 10px;
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #8a93a6;
+  font-style: italic;
+}
+
+/* ---- Rolling calculator ------------------------------------------------ */
+
+/* Positioning context for the ±10% variance band overlay. */
+.mass-tracker__bar { position: relative; }
+
+/* The uncertain-collapse zone: the hole may pop anywhere once the fill enters
+   this band (between worst- and best-case total mass). */
+.roll-band {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(224, 90, 90, 0.32) 0 4px,
+    rgba(224, 90, 90, 0.12) 4px 8px
+  );
+}
+
+.roll-pill {
+  font-size: calc(11px * var(--font-scale, 1));
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.roll-pill--open      { color: #3ddc84; background: rgba(61, 220, 132, 0.12); }
+.roll-pill--maybe     { color: #f0a030; background: rgba(240, 160, 48, 0.14); }
+.roll-pill--collapsed { color: #e05a5a; background: rgba(224, 90, 90, 0.16); }
+
+.roller {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.roller__row {
+  display: flex;
+  gap: 6px;
+}
+.roller__row select { flex: 1; }
+.roller__masses {
+  display: flex;
+  gap: 8px;
+}
+.roller__mass {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  font-size: calc(12px * var(--font-scale, 1));
+  color: #8a98b8;
+}
+.roller__mass input {
+  width: 100%;
+  min-width: 0;
+}
+.roller__unit { color: var(--text-faint); }
+
+.roll-side {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #8a98b8;
+}
+.roll-side strong { color: #cdd6e6; }
+.roll-side__dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.roll-side__dot--home { background: #3ddc84; box-shadow: 0 0 6px rgba(61, 220, 132, 0.6); }
+.roll-side__dot--far  { background: #f0a030; box-shadow: 0 0 6px rgba(240, 160, 48, 0.6); }
+
+.roll-pass {
+  display: flex;
+  gap: 6px;
+}
+.roll-pass__btn {
+  flex: 1;
+  font-size: calc(13px * var(--font-scale, 1));
+  border-left-width: 3px;
+}
+.roll-pass__btn--safe     { border-left-color: #3ddc84; }
+.roll-pass__btn--risky    { border-left-color: #f0a030; }
+.roll-pass__btn--collapse { border-left-color: #e05a5a; }
+
+.roll-guidance {
+  font-size: calc(12px * var(--font-scale, 1));
+  padding: 5px 8px;
+  border-radius: 4px;
+  border-left: 2px solid;
+  line-height: 1.35;
+}
+.roll-guidance--ok     { color: #8fd6a8; background: rgba(61, 220, 132, 0.06); border-left-color: #3ddc84; }
+.roll-guidance--warn   { color: #f0c080; background: rgba(240, 160, 48, 0.07); border-left-color: #f0a030; }
+.roll-guidance--danger { color: #f0a0a0; background: rgba(224, 90, 90, 0.08); border-left-color: #e05a5a; }
+
+.roll-actions {
+  display: flex;
+  gap: 6px;
+}
+.roll-actions .sys-btn { flex: 1; }
+
+.roll-other {
+  font-size: calc(12px * var(--font-scale, 1));
+  color: var(--text-faint);
+}
+.roll-other summary {
+  cursor: pointer;
+  padding: 2px 0;
+  user-select: none;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #c0ccde;
+
+  &--checkbox {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-default);
+  }
+
+  input[type='text'],
+  input[type='number'],
+  select,
+  textarea {
+    background: var(--surface-panel);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    color: var(--text-bright);
+    font-size: calc(13px * var(--font-scale, 1));
+    padding: 6px 8px;
+    outline: none;
+    font-family: inherit;
+    resize: vertical;
+
+    &:focus { border-color: var(--border-accent); }
+  }
+
+  select option { background: var(--surface-panel); }
+}
+
+
+/* ── Chain effect summary ────────────────────────────────── */
+.sys-info__chain-fx {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: calc(13px * var(--font-scale, 1));
+}
+
+.sys-info__chain-fx__label {
+  color: var(--text-faint);
+  font-size: calc(13px * var(--font-scale, 1));
+  margin-right: 2px;
+}
+
+.sys-info__chain-fx__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: var(--surface-raised);
+  border: 1px solid #2a3a5a;
+  color: #c0ccde;
+  font-size: calc(13px * var(--font-scale, 1));
+  cursor: pointer;
+  position: relative;
+  transition: background 0.15s, border-color 0.15s;
+
+  &:hover { background: #1a2440; border-color: #3a4a6a; }
+}
+
+.sys-info__chain-fx__chip--current {
+  border-color: #4a7ab8;
+  background: #1a2a4a;
+}
+
+.sys-info__chain-fx__sys {
+  color: var(--text-faint);
+  font-family: monospace;
+  font-size: calc(12px * var(--font-scale, 1));
+}
+
+/* Portal-rendered tooltip for chain-effect chips — escapes the system panel's
+   overflow:hidden by living in document.body with position:fixed. */
+.sys-info__chain-fx__tip {
+  position: fixed;
+  transform: translateX(-50%);
+  z-index: 9999;
+  background: var(--surface-panel);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: calc(12px * var(--font-scale, 1));
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  pointer-events: none;
+  max-width: 280px;
+  white-space: normal;
+}
+
+.sys-info__chain-fx__tip-good { color: #3ddc84; }
+.sys-info__chain-fx__tip-bad  { color: #e05a5a; }
+

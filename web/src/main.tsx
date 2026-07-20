@@ -15,6 +15,10 @@ import './styles/forms.css' // shared form controls
 import './styles/modals.css' // user stats modal
 import './styles/screens.css' // full-screen states + role badge
 import './styles/system-node.css' // map node card + label pills + tag badge
+import './styles/modal-family.css' // modal shell + modal-based dialogs (uses .field from forms.css)
+import './styles/cards.css' // draggable info cards + floating panel
+import './styles/panels.css' // side panel, mass tracker, chain-effect summary (uses .btn from buttons.css)
+import './styles/landing.css' // public landing page + interactive demo
 import App from './App.tsx'
 
 createRoot(document.getElementById('root')!).render(

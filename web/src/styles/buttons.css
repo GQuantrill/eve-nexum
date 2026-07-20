@@ -21,3 +21,44 @@
 
   &:hover { color: var(--text-default); background: var(--surface-overlay); }
 }
+
+/* --- appended from App.css (Phase 2 bucket-2) --- */
+
+/* ── Buttons ─────────────────────────────────────────────── */
+.btn {
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 600;
+  padding: 7px 14px;
+  transition: background 0.15s;
+
+  &--ghost {
+    background: transparent;
+    color: #c0ccde;
+    border: 1px solid var(--border);
+
+    &:hover { background: var(--surface-overlay); color: var(--text-default); }
+  }
+
+  &--primary {
+    background: #1a3a6a;
+    color: #7ab4f0;
+    border: 1px solid var(--border-accent-strong);
+
+    &:hover:not(:disabled) { background: #1e4a8a; }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+  }
+
+  &--danger {
+    background: #2a1010;
+    color: #f44336;
+    border: 1px solid #5a2020;
+    margin-top: auto;
+
+    &:hover { background: #3a1515; }
+  }
+}
+
+
