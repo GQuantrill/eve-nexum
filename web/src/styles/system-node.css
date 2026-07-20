@@ -264,8 +264,8 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #3ddc84;
-  box-shadow: 0 0 5px #3ddc84;
+  background: var(--success);
+  box-shadow: 0 0 5px var(--success);
   margin-right: 4px;
   flex-shrink: 0;
 }
@@ -399,8 +399,8 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #4d9de0;
-  box-shadow: 0 0 5px #4d9de0;
+  background: var(--accent-alt);
+  box-shadow: 0 0 5px var(--accent-alt);
   flex-shrink: 0;
   cursor: help;
 }
@@ -483,7 +483,7 @@
 
 .system-node__effect-tooltip__good {
   font-size: calc(13px * var(--font-scale, 1));
-  color: #4ade80;
+  color: var(--success-bright);
 }
 
 .system-node__effect-tooltip__bad {
@@ -500,7 +500,7 @@
 
 .system-node__effect {
   font-size: calc(13px * var(--font-scale, 1));
-  color: #c0ccde;
+  color: var(--text-secondary);
   margin-top: 2px;
 }
 
@@ -613,7 +613,7 @@
 }
 
 .system-node__sov-tooltip__ticker {
-  color: #5a9af8;
+  color: var(--accent);
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
   font-size: calc(13px * var(--font-scale, 1));
 }
@@ -624,7 +624,7 @@
 }
 
 .system-node__insurgency-icon {
-  color: #f0a030;
+  color: var(--warning);
   font-size: calc(13px * var(--font-scale, 1));
   cursor: default;
   filter: drop-shadow(0 0 3px #f0a03088);
@@ -679,7 +679,7 @@
 
 .system-node__insurgency-label {
   font-size: calc(13px * var(--font-scale, 1));
-  color: #f0a030;
+  color: var(--warning);
   font-weight: 600;
   white-space: nowrap;
   position: relative;
@@ -712,7 +712,7 @@
 }
 
 .system-node__incursion-icon {
-  color: #e05a5a;
+  color: var(--danger);
   font-size: calc(13px * var(--font-scale, 1));
   cursor: default;
   filter: drop-shadow(0 0 3px #e05a5a88);
@@ -732,7 +732,7 @@
   padding: 4px 10px;
   white-space: nowrap;
   font-size: calc(13px * var(--font-scale, 1));
-  color: #e05a5a;
+  color: var(--danger);
   font-weight: 600;
   pointer-events: none;
   z-index: 9999;
@@ -793,7 +793,7 @@
 }
 
 .system-node__scout-icon {
-  color: #7ab4f0;
+  color: var(--accent-light);
   font-size: calc(13px * var(--font-scale, 1));
   cursor: default;
   filter: drop-shadow(0 0 3px #7ab4f088);
@@ -812,7 +812,7 @@
   padding: 4px 10px;
   white-space: nowrap;
   font-size: calc(13px * var(--font-scale, 1));
-  color: #7ab4f0;
+  color: var(--accent-light);
   font-weight: 600;
   pointer-events: none;
   z-index: 9999;
@@ -984,7 +984,7 @@
 
 .system-node__incursion-label {
   font-size: calc(13px * var(--font-scale, 1));
-  color: #e05a5a;
+  color: var(--danger);
   font-weight: 600;
   white-space: nowrap;
   position: relative;
@@ -1082,7 +1082,7 @@ div.system-node__easy-handle {
   background: #2a3a5a !important;
   border-color: #4d6a9a !important;
 
-  &:hover { background: #4d9de0 !important; }
+  &:hover { background: var(--accent-alt) !important; }
 
   &.system-handle--ghost {
     opacity: 0 !important;

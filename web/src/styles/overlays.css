@@ -39,7 +39,7 @@
   margin-right: 6px;
   vertical-align: middle;
 }
-.toolbar__map-type--solo { background: rgba(74,222,128,0.12); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
+.toolbar__map-type--solo { background: rgba(74,222,128,0.12); color: var(--success-bright); border: 1px solid rgba(74,222,128,0.3); }
 .toolbar__map-type--corp { background: rgba(100,160,255,0.15); color: #7ab0f0; border: 1px solid rgba(100,160,255,0.3); }
 .toolbar__map-type--alliance { background: rgba(245,166,35,0.15); color: #f5a623; border: 1px solid rgba(245,166,35,0.3); }
 .toolbar__map-type--shared { background: rgba(192,132,252,0.15); color: #c084fc; border: 1px solid rgba(192,132,252,0.3); }
@@ -105,9 +105,9 @@
 
   &:hover { background: #1a2a4a; color: var(--text-bright); }
 
-  &--active { color: #4d9de0; font-weight: 600; }
-  &--action  { color: #4d9de0; font-weight: 600; }
-  &--danger  { color: #e05a5a; }
+  &--active { color: var(--accent-alt); font-weight: 600; }
+  &--action  { color: var(--accent-alt); font-weight: 600; }
+  &--danger  { color: var(--danger); }
 }
 
 .map-dropdown__new-wrap {
@@ -138,7 +138,7 @@
   background: var(--surface-well);
   border: 1px solid var(--border-accent);
   border-radius: 5px;
-  color: #c0ccde;
+  color: var(--text-secondary);
   font-size: calc(16px * var(--font-scale, 1));
   padding: 4px 10px;
   white-space: nowrap;
@@ -164,7 +164,7 @@
   font-weight: 600;
   vertical-align: middle;
 }
-.map-dropdown__badge--solo { background: rgba(74,222,128,0.12); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
+.map-dropdown__badge--solo { background: rgba(74,222,128,0.12); color: var(--success-bright); border: 1px solid rgba(74,222,128,0.3); }
 .map-dropdown__badge--corp { background: rgba(100,160,255,0.15); color: #7ab0f0; border: 1px solid rgba(100,160,255,0.3); }
 .map-dropdown__badge--alliance { background: rgba(245,166,35,0.15); color: #f5a623; border: 1px solid rgba(245,166,35,0.3); }
 .map-dropdown__badge--shared { background: rgba(192,132,252,0.15); color: #c084fc; border: 1px solid rgba(192,132,252,0.3); }
@@ -263,7 +263,7 @@
   align-items: center;
   justify-content: center;
   width: 16px;
-  color: #4d9de0;
+  color: var(--accent-alt);
   flex-shrink: 0;
 }
 
@@ -271,7 +271,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: flex-start;
-  color: #4d9de0;
+  color: var(--accent-alt);
   flex-shrink: 0;
 }
 

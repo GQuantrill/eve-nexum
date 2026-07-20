@@ -35,17 +35,31 @@
   --border-accent:        #2e4a7a;
   --border-accent-strong: #2e5a9a;
 
-  /* Text — bright → faint. (Greys that double as a --cv-* map
-     colour — #c0ccde, #8a9ab8, #7a8aa8 — are deliberately left
-     out; they're handled per-context in the split.) */
+  /* Text — bright → faint. */
   --text-bright:      #e2e8f8;
   --text-primary:     #c8d4f0;
   --text-primary-alt: #c8d8f0;
   --text-default:     #c8d0e0;
+  --text-secondary:   #c0ccde;
+  --text-subtle:      #8a9ab8;
   --text-muted:       #7a90a8;
+  --text-quiet:       #7a8aa8;
   --text-dim:         #6a80a0;
   --text-faint:       #6a7898;
   --text-faintest:    #5a6a8a;
+
+  /* Accents (interactive blue) + state colours. These CHROME uses share a hex
+     with a --cv-* map colour (e.g. --danger #e05a5a == --cv-intel-hostile);
+     that's fine — map elements use the --cv-* var and re-theme with colour
+     vision, while these tokens theme the UI chrome independently. */
+  --accent:         #5a9af8;
+  --accent-bright:  #6ea0ff;
+  --accent-alt:     #4d9de0;
+  --accent-light:   #7ab4f0;
+  --danger:         #e05a5a;
+  --success:        #3ddc84;
+  --success-bright: #4ade80;
+  --warning:        #f0a030;
 }
 
 /* ── Colour-vision (colour-blindness) palettes ──────────────

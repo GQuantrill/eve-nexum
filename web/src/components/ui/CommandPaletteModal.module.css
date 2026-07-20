@@ -77,6 +77,6 @@
     padding: 1px 5px;
     font-family: inherit;
     font-size: calc(11px * var(--font-scale, 1));
-    color: #c0ccde;
+    color: var(--text-secondary);
   }
 }

@@ -90,7 +90,7 @@
 }
 
 .tooltipWhen {
-  color: #7a8aa8;
+  color: var(--text-quiet);
   font-size: calc(10px * var(--font-scale, 1));
 }
 

@@ -129,7 +129,7 @@
   button {
     background: var(--surface-well);
     border-color: var(--border);
-    color: #c0ccde;
+    color: var(--text-secondary);
 
     &:hover { background: var(--surface-overlay); color: var(--text-bright); }
     svg { fill: currentColor; }

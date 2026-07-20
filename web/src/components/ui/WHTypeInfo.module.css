@@ -15,7 +15,7 @@
   line-height: 1;
   transition: color 0.15s;
 
-  &:hover { color: #7ab4f0; }
+  &:hover { color: var(--accent-light); }
 }
 
 .popover {
@@ -61,4 +61,4 @@
 }
 
 .label { color: var(--text-faint); }
-.value { color: #c0ccde; font-weight: 500; }
+.value { color: var(--text-secondary); font-weight: 500; }

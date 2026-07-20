@@ -27,7 +27,7 @@
 .mTabActive {
   background: #1a3a6a;
   border-color: var(--border-accent-strong);
-  color: #7ab4f0;
+  color: var(--accent-light);
 }
 
 .mBody {
@@ -45,7 +45,7 @@
 
 .mError {
   font-size: calc(13px * var(--font-scale, 1));
-  color: #e05a5a;
+  color: var(--danger);
   text-align: center;
   padding: 24px 0;
 }
@@ -65,7 +65,7 @@
 .mTable th {
   font-size: calc(11px * var(--font-scale, 1));
   font-weight: 600;
-  color: #7a8aa8;
+  color: var(--text-quiet);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   padding: 8px 10px;
@@ -80,11 +80,11 @@
 }
 
 .mThSort:hover {
-  color: #c0ccde;
+  color: var(--text-secondary);
 }
 
 .mThSortActive {
-  color: #c0ccde;
+  color: var(--text-secondary);
 }
 
 .mThSortArrow {
@@ -108,7 +108,7 @@
 .mTable td {
   padding: 8px 10px;
   font-size: calc(13px * var(--font-scale, 1));
-  color: #c0ccde;
+  color: var(--text-secondary);
   vertical-align: middle;
 }
 
@@ -131,7 +131,7 @@
 
 .mSelfTag {
   font-size: calc(10px * var(--font-scale, 1));
-  color: #7ab4f0;
+  color: var(--accent-light);
   background: #1a2a4a;
   border: 1px solid var(--border-accent-strong);
   border-radius: 3px;
@@ -166,7 +166,7 @@
   border: 1px solid transparent;
 }
 
-.mPillOk      { background: #0f1a14; color: #4ade80; border-color: #1e3a28; }
+.mPillOk      { background: #0f1a14; color: var(--success-bright); border-color: #1e3a28; }
 .mPillBlocked { background: #1a1014; color: #f87171; border-color: #3a1e22; }
 
 .mNum {
@@ -191,7 +191,7 @@
 
 .mWhen {
   font-size: calc(12px * var(--font-scale, 1));
-  color: #7a8aa8;
+  color: var(--text-quiet);
   white-space: nowrap;
 }
 
@@ -236,7 +236,7 @@
 .pgBack {
   background: transparent;
   border: none;
-  color: #7a8aa8;
+  color: var(--text-quiet);
   font-family: inherit;
   font-size: calc(12px * var(--font-scale, 1));
   text-align: left;
@@ -264,7 +264,7 @@
   background: transparent;
   border: 1px solid transparent;
   border-radius: 5px;
-  color: #7a8aa8;
+  color: var(--text-quiet);
   font-family: inherit;
   font-size: calc(13px * var(--font-scale, 1));
   padding: 7px 10px;
@@ -277,7 +277,7 @@
 .pgTabActive {
   background: #1a3a6a;
   border-color: var(--border-accent-strong);
-  color: #7ab4f0;
+  color: var(--accent-light);
 }
 
 .pgContent {
@@ -327,7 +327,7 @@
 }
 .usersSearch:focus-visible {
   outline: none;
-  border-color: #4d9de0;
+  border-color: var(--accent-alt);
   box-shadow: 0 0 0 2px rgba(77, 157, 224, 0.25);
 }
 .usersSearch::placeholder { color: #4a5670; }
@@ -364,7 +364,7 @@
 
 .pgFilterLabel {
   font-size: calc(11px * var(--font-scale, 1));
-  color: #7a8aa8;
+  color: var(--text-quiet);
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
@@ -441,9 +441,9 @@
   cursor: pointer;
   transition: border-color 0.12s, color 0.12s, background 0.12s;
 }
-.dcTogglechip:hover { border-color: #4d9de0; color: var(--text-default); }
+.dcTogglechip:hover { border-color: var(--accent-alt); color: var(--text-default); }
 .dcTogglechipOn {
-  border-color: #5a9af8;
+  border-color: var(--accent);
   background: rgba(90, 154, 248, 0.18);
   color: #e8f0ff;
 }
@@ -502,7 +502,7 @@
   padding: 5px 8px;
   outline: none;
 }
-.dcSearch:focus { border-color: #6ea0ff; }
+.dcSearch:focus { border-color: var(--accent-bright); }
 /* Webhook URL fields are longer than the type search — give them more room. */
 .dcSearchWide { max-width: 560px; margin-bottom: 6px; }
 .dcResults {
@@ -604,12 +604,12 @@
 }
 .acInput { width: 240px; }
 .acKind:focus,
-.acInput:focus { border-color: #6ea0ff; }
+.acInput:focus { border-color: var(--accent-bright); }
 .acMatch {
   font-size: calc(13px * var(--font-scale, 1));
   color: #8090a8;
 }
-.acMatchOk { color: #4ade80; }
+.acMatchOk { color: var(--success-bright); }
 .acEvewho {
   display: inline-flex;
   align-items: center;
@@ -617,7 +617,7 @@
   color: #6a8ab0;
   vertical-align: middle;
 }
-.acEvewho:hover { color: #6ea0ff; }
+.acEvewho:hover { color: var(--accent-bright); }
 .acStandings {
   margin: 0 0 18px;
   padding: 12px 14px;
@@ -643,7 +643,7 @@
   padding-top: 10px;
   border-top: 1px solid var(--surface-hover);
   font-size: calc(13px * var(--font-scale, 1));
-  color: #c0ccde;
+  color: var(--text-secondary);
 }
 .acThreshold label { display: flex; align-items: center; gap: 5px; cursor: pointer; }
 .acThresholdLabel { color: #8090a8; }
@@ -654,13 +654,13 @@
   margin-top: 14px;
 }
 .dcSaved {
-  color: #3ddc84;
+  color: var(--success);
   font-size: calc(13px * var(--font-scale, 1));
 }
 
 .pgError {
   font-size: calc(13px * var(--font-scale, 1));
-  color: #e05a5a;
+  color: var(--danger);
   padding: 12px 14px;
   background: #1a1014;
   border: 1px solid #3a1e22;
@@ -678,7 +678,7 @@
   background: transparent;
   border: 1px solid var(--border);
   border-radius: 5px;
-  color: #7a8aa8;
+  color: var(--text-quiet);
   font-family: inherit;
   font-size: calc(13px * var(--font-scale, 1));
   padding: 4px 14px;
@@ -690,7 +690,7 @@
 .pgSubtabActive {
   background: #1a3a6a;
   border-color: var(--border-accent-strong);
-  color: #7ab4f0;
+  color: var(--accent-light);
 }
 
 .pgSigChips {
@@ -711,7 +711,7 @@
 }
 
 .pgSigChipLabel {
-  color: #7a8aa8;
+  color: var(--text-quiet);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }

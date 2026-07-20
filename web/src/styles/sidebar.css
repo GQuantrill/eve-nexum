@@ -93,7 +93,7 @@
   border: none;
   padding: 0 6px;
   cursor: pointer;
-  color: #e05a5a;
+  color: var(--danger);
   animation: nexum-update-blink 1s steps(1, end) infinite;
 }
 .toolbar__update:hover { color: #ff7a7a; animation: none; }
@@ -149,7 +149,7 @@
   &.toolbar__toggle--on {
     background: #1a3a6a;
     border-color: var(--border-accent-strong);
-    color: #7ab4f0;
+    color: var(--accent-light);
   }
 
   /* Square icon-only variant — sized to fit the 18px Phosphor SVGs. The
@@ -203,9 +203,9 @@
 
 .toolbar__stat {
   cursor: default;
-  color: #c0ccde;
+  color: var(--text-secondary);
 
-  svg { display: block; color: #7ab4f0; }
+  svg { display: block; color: var(--accent-light); }
 }
 
 .toolbar__stat-count {
@@ -222,7 +222,7 @@
   border: 1px solid #2a3a5a;
   border-radius: 4px;
   font-size: calc(13px * var(--font-scale, 1));
-  color: #c0ccde;
+  color: var(--text-secondary);
   background: var(--surface-well);
   white-space: nowrap;
   position: relative;
@@ -231,7 +231,7 @@
 }
 
 .toolbar__proximity--alert {
-  border-color: #e05a5a;
+  border-color: var(--danger);
   color: #ffb0b0;
   background: rgba(224, 90, 90, 0.12);
   animation: proximity-pulse 1.6s ease-in-out infinite;
@@ -292,7 +292,7 @@
 
 .toolbar__char-name {
   font-size: calc(13px * var(--font-scale, 1));
-  color: #c0ccde;
+  color: var(--text-secondary);
   white-space: nowrap;
 }
 
@@ -322,7 +322,7 @@
   padding: 0;
   font-family: inherit;
 }
-.toolbar__char-system svg { color: #5a9af8; flex-shrink: 0; }
+.toolbar__char-system svg { color: var(--accent); flex-shrink: 0; }
 .toolbar__char-system--clickable { cursor: pointer; }
 .toolbar__char-system--clickable:hover { color: var(--text-primary-alt); }
 .toolbar__char-system--clickable:hover svg { color: #7ab0ff; }
@@ -348,7 +348,7 @@
   cursor: pointer;
   transition: border-color 0.15s, color 0.15s;
 }
-.character-switcher__trigger:hover { border-color: #4d9de0; color: var(--text-default); }
+.character-switcher__trigger:hover { border-color: var(--accent-alt); color: var(--text-default); }
 .character-switcher__menu {
   position: absolute;
   top: calc(100% + 6px);
@@ -377,7 +377,7 @@
   background: transparent;
   border: none;
   border-radius: 4px;
-  color: #c0ccde;
+  color: var(--text-secondary);
   font-family: inherit;
   font-size: calc(13px * var(--font-scale, 1));
   cursor: pointer;
@@ -403,9 +403,9 @@
   color: var(--text-muted);
   cursor: pointer;
 }
-.character-switcher__focus:hover:not(:disabled) { color: #5a9af8; background: #1c2940; }
+.character-switcher__focus:hover:not(:disabled) { color: var(--accent); background: #1c2940; }
 .character-switcher__focus:disabled { opacity: 0.4; cursor: default; }
-.character-switcher__focus--on { color: #5a9af8; }
+.character-switcher__focus--on { color: var(--accent); }
 .character-switcher__remove {
   display: inline-flex;
   align-items: center;
@@ -432,7 +432,7 @@
   padding: 6px 8px;
   margin-top: 2px;
   border-top: 1px solid var(--surface-hover);
-  color: #5a9af8;
+  color: var(--accent);
   font-size: calc(13px * var(--font-scale, 1));
   text-decoration: none;
   border-radius: 4px;
@@ -447,8 +447,8 @@
   background: #3a4a6a;
   flex-shrink: 0;
 
-  &.toolbar__online-dot--on  { background: #3ddc84; box-shadow: 0 0 4px #3ddc84; }
-  &.toolbar__online-dot--off { background: #e05a5a; }
+  &.toolbar__online-dot--on  { background: var(--success); box-shadow: 0 0 4px var(--success); }
+  &.toolbar__online-dot--off { background: var(--danger); }
 }
 
 .toolbar__server-status {
@@ -517,8 +517,8 @@
   bottom: 2px;
 }
 
-.toolbar__toggle-led--on  { background: #3ddc84; box-shadow: 0 0 4px #3ddc8466; }
-.toolbar__toggle-led--off { background: #e05a5a; box-shadow: 0 0 4px #e05a5a66; }
+.toolbar__toggle-led--on  { background: var(--success); box-shadow: 0 0 4px #3ddc8466; }
+.toolbar__toggle-led--off { background: var(--danger); box-shadow: 0 0 4px #e05a5a66; }
 
 /* Heatmap toolbar control — icon button + horizontal popover (type + intensity). */
 .heatmap-menu { position: relative; display: inline-flex; }
@@ -603,7 +603,7 @@
   border: 1px solid var(--border);
   border-right: none;
   border-radius: 6px 0 0 6px;
-  color: #c0ccde;
+  color: var(--text-secondary);
   font-size: calc(18px * var(--font-scale, 1));
   cursor: pointer;
   display: flex;
@@ -691,14 +691,14 @@
 .map-sidebar__zoom-slider {
   flex: 1;
   min-width: 80px;
-  accent-color: #5a9af8;
+  accent-color: var(--accent);
 }
 
 .map-sidebar__zoom-value {
   background: transparent;
   border: 1px solid var(--border);
   border-radius: 4px;
-  color: #c0ccde;
+  color: var(--text-secondary);
   font-size: calc(12px * var(--font-scale, 1));
   font-variant-numeric: tabular-nums;
   padding: 2px 6px;
@@ -706,12 +706,12 @@
   min-width: 48px;
   text-align: center;
 
-  &:hover { border-color: #5a9af8; color: var(--text-bright); }
+  &:hover { border-color: var(--accent); color: var(--text-bright); }
 }
 
 .map-sidebar__hint {
   font-size: calc(12px * var(--font-scale, 1));
-  color: #8a9ab8;
+  color: var(--text-subtle);
   line-height: 1.4;
   padding: 4px 0 0;
 }
@@ -745,7 +745,7 @@
   color: var(--text-primary);
   padding: 4px 8px;
   background: rgba(110, 160, 255, 0.06);
-  border-left: 2px solid #6ea0ff;
+  border-left: 2px solid var(--accent-bright);
   border-radius: 0 3px 3px 0;
 }
 
@@ -789,7 +789,7 @@
 }
 
 .chain-exits__jumps {
-  color: #8a9ab8;
+  color: var(--text-subtle);
   font-variant-numeric: tabular-nums;
 }
 
@@ -811,7 +811,7 @@
 }
 
 .map-shares__input:focus {
-  border-color: #6ea0ff;
+  border-color: var(--accent-bright);
 }
 
 .map-shares__match {
@@ -820,8 +820,8 @@
 }
 
 .map-shares__match--hint { color: var(--text-faint); }
-.map-shares__match--ok   { color: #4ade80; }
-.map-shares__match--miss { color: #f0a030; }
+.map-shares__match--ok   { color: var(--success-bright); }
+.map-shares__match--miss { color: var(--warning); }
 
 /* Search input + "add to list" button on one row (share-to-many staging). */
 .map-shares__search-row { display: flex; gap: 6px; align-items: stretch; }
@@ -831,7 +831,7 @@
   display: inline-flex; align-items: center; justify-content: center;
   width: 30px;
   background: #16233c; border: 1px solid var(--border-accent-strong); border-radius: 4px;
-  color: #7ab4f0; cursor: pointer;
+  color: var(--accent-light); cursor: pointer;
 }
 .map-shares__add-btn:hover:not(:disabled) { background: #1a3a6a; }
 .map-shares__add-btn:disabled { opacity: 0.4; cursor: default; border-color: var(--border); color: #4a5670; }
@@ -851,7 +851,7 @@
 .map-shares__chip-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 140px; }
 .map-shares__chip-remove {
   display: inline-flex; align-items: center; justify-content: center;
-  background: none; border: none; color: #7a8aa8; cursor: pointer; padding: 0;
+  background: none; border: none; color: var(--text-quiet); cursor: pointer; padding: 0;
 }
 .map-shares__chip-remove:hover { color: #e06a6a; }
 .map-shares__grant-login {
@@ -932,7 +932,7 @@
 
 .map-shares__revoke:hover {
   background: rgba(224,90,90,0.1);
-  color: #e05a5a;
+  color: var(--danger);
 }
 
 /* ── Watchlist sidebar panel ─────────────────────────────────────────────── */
@@ -1066,7 +1066,7 @@
   display: inline-flex;
   align-items: center;
   gap: 3px;
-  color: #4ade80;
+  color: var(--success-bright);
   font-weight: 600;
   font-size: calc(12px * var(--font-scale, 1));
 }
@@ -1084,7 +1084,7 @@
 }
 .watchlist__group-btn:hover:not(:disabled) { color: #a0ccf8; }
 .watchlist__group-btn:disabled { opacity: 0.4; cursor: default; }
-.watchlist__group-btn--del:hover:not(:disabled) { color: #e05a5a; }
+.watchlist__group-btn--del:hover:not(:disabled) { color: var(--danger); }
 .watchlist__group .watchlist__list { padding: 8px 6px; margin-top: 0; }
 
 /* ── Bulk import form ─────────────────────────────────────────────── */
@@ -1113,7 +1113,7 @@
   padding: 5px 8px;
   outline: none;
 }
-.watchlist__import-name:focus { border-color: #6ea0ff; }
+.watchlist__import-name:focus { border-color: var(--accent-bright); }
 .watchlist__import-marker {
   flex-shrink: 0;
   background: var(--surface-well);
@@ -1137,7 +1137,7 @@
   padding: 6px 8px;
   outline: none;
 }
-.watchlist__import-text:focus { border-color: #6ea0ff; }
+.watchlist__import-text:focus { border-color: var(--accent-bright); }
 .watchlist__import-actions {
   display: flex;
   align-items: center;
@@ -1189,7 +1189,7 @@
 }
 .watchlist__delete-full:hover {
   background: rgba(224,90,90,0.10);
-  color: #e05a5a;
+  color: var(--danger);
 }
 
 /* Compound-criteria block: the AND/OR selector, each criterion row, and the
@@ -1228,7 +1228,7 @@
   border-radius: 4px;
   padding: 3px 8px;
   font-size: calc(11px * var(--font-scale, 1));
-  color: #7a8aa8;
+  color: var(--text-quiet);
   cursor: pointer;
 }
 .watchlist__add-criteria:hover {
@@ -1243,7 +1243,7 @@
   padding: 0 2px;
   font-size: calc(13px * var(--font-scale, 1)); line-height: 1;
 }
-.watchlist__drag-handle:hover { color: #8a9ab8; }
+.watchlist__drag-handle:hover { color: var(--text-subtle); }
 .watchlist__drag-handle:active { cursor: grabbing; }
 
 .watchlist__marker-icon {
@@ -1298,7 +1298,7 @@
 
 .watchlist__value:focus,
 .watchlist__note:focus {
-  border-color: #6ea0ff;
+  border-color: var(--accent-bright);
 }
 
 /* The "System type" mode reuses the value-input styling as a class dropdown. */
@@ -1343,7 +1343,7 @@
   gap: 3px;
   background: rgba(74,222,128,0.10);
   border: 1px solid #2c6e49;
-  color: #4ade80;
+  color: var(--success-bright);
   border-radius: 4px;
   padding: 3px 5px;
   cursor: pointer;
@@ -1403,7 +1403,7 @@
 
 .watchlist__remove:hover {
   background: rgba(224,90,90,0.10);
-  color: #e05a5a;
+  color: var(--danger);
 }
 
 /* Right-click submenu swatch — tiny rounded square that sits where the
@@ -1484,12 +1484,12 @@
   font-size: calc(13px * var(--font-scale, 1));
   font-weight: 600;
 
-  &:hover { color: #c0ccde; }
+  &:hover { color: var(--text-secondary); }
 }
 
 .settings-modal__tab--active {
   color: #a0ccf8;
-  border-bottom-color: #5a9af8;
+  border-bottom-color: var(--accent);
 }
 
 .settings-modal__body {
@@ -1586,7 +1586,7 @@
   background: var(--surface-raised);
   border: 1px solid var(--border);
   border-radius: 5px;
-  color: #c0ccde;
+  color: var(--text-secondary);
   font-size: calc(13px * var(--font-scale, 1));
   text-align: left;
   cursor: pointer;
@@ -1615,7 +1615,7 @@
   background: var(--surface-raised);
   border: 1px solid var(--border);
   border-radius: 5px;
-  color: #c0ccde;
+  color: var(--text-secondary);
   font-size: calc(13px * var(--font-scale, 1));
   text-align: center;
   cursor: pointer;
@@ -1630,7 +1630,7 @@
   background: var(--surface-raised);
   border: 1px solid var(--border);
   border-radius: 5px;
-  color: #c0ccde;
+  color: var(--text-secondary);
   font-size: calc(13px * var(--font-scale, 1));
   text-align: left;
   cursor: pointer;
@@ -1669,7 +1669,7 @@
     background: var(--surface-well);
     border: 1px solid var(--border-accent);
     border-radius: 5px;
-    color: #c0ccde;
+    color: var(--text-secondary);
     font-size: calc(16px * var(--font-scale, 1));
     padding: 4px 10px;
     white-space: nowrap;
@@ -1708,7 +1708,7 @@
   outline: none;
 }
 
-.content-filter__name:focus { border-color: #6ea0ff; }
+.content-filter__name:focus { border-color: var(--accent-bright); }
 
 .content-filter__footer {
   display: flex;
@@ -1736,7 +1736,7 @@
   cursor: pointer;
 }
 
-.content-filter__clear:hover { background: rgba(224,90,90,0.10); color: #e05a5a; }
+.content-filter__clear:hover { background: rgba(224,90,90,0.10); color: var(--danger); }
 
 .sig-filter-chip {
   background: transparent;
@@ -1749,9 +1749,9 @@
   cursor: pointer;
   transition: border-color 0.12s, color 0.12s, background 0.12s;
 }
-.sig-filter-chip:hover { border-color: #4d9de0; color: var(--text-default); }
+.sig-filter-chip:hover { border-color: var(--accent-alt); color: var(--text-default); }
 .sig-filter-chip--active {
-  border-color: #5a9af8;
+  border-color: var(--accent);
   background: rgba(90, 154, 248, 0.18);
   color: #e8f0ff;
 }
@@ -1771,7 +1771,7 @@
    to hide/show optional columns (slims the pane when undocked). Pushed to the
    right edge of the wrapping filter row. */
 .sig-col-menu { position: relative; margin-left: auto; }
-.sig-col-menu__btn--active { color: #5a9af8; }
+.sig-col-menu__btn--active { color: var(--accent); }
 .sig-col-menu__pop {
   position: absolute;
   top: calc(100% + 6px);
@@ -2063,7 +2063,7 @@
   &--type { font-size: calc(13px * var(--font-scale, 1)); }
 
   &--type-unknown  { color: #c89a30; font-style: italic; }
-  &--type-wormhole { color: #5a9af8; }
+  &--type-wormhole { color: var(--accent); }
   &--type-data     { color: #58b8e8; }
   &--type-relic    { color: #c87840; }
   &--type-combat   { color: #e05050; }
@@ -2077,13 +2077,13 @@
   background: transparent;
   border: 1px solid var(--border-accent);
   border-radius: 4px;
-  color: #c0ccde;
+  color: var(--text-secondary);
   font-size: calc(14px * var(--font-scale, 1));
   padding: 3px 10px;
   cursor: pointer;
   font-family: inherit;
 
-  &:hover { border-color: #5a9af8; color: var(--text-default); }
+  &:hover { border-color: var(--accent); color: var(--text-default); }
 
   &--danger {
     border-color: #5a2a2a;
@@ -2102,15 +2102,15 @@
   border: 1px solid var(--border-accent);
   border-radius: 4px;
   padding: 2px 10px;
-  color: #c0ccde;
+  color: var(--text-secondary);
   font-size: calc(14px * var(--font-scale, 1));
   cursor: pointer;
   -webkit-user-select: none;
   user-select: none;
 }
-.sig-overwrite-toggle:hover { border-color: #5a9af8; }
+.sig-overwrite-toggle:hover { border-color: var(--accent); }
 .sig-overwrite-toggle--active {
-  border-color: #5a9af8;
+  border-color: var(--accent);
   background: rgba(90, 154, 248, 0.16);
   color: #e8f0ff;
 }
@@ -2121,11 +2121,11 @@
    the dark palette explicitly. */
 select.sig-toolbar-btn {
   background: var(--surface-well);
-  color: #c0ccde;
+  color: var(--text-secondary);
 }
 select.sig-toolbar-btn option {
   background: var(--surface-well);
-  color: #c0ccde;
+  color: var(--text-secondary);
 }
 
 /* Language picker (toolbar + landing hero). Matches the site's dark
@@ -2148,10 +2148,10 @@ select.sig-toolbar-btn option {
 }
 /* Flag-only variant (logged-in toolbar): tighter padding, no gap. */
 .lang-switcher__trigger--compact { gap: 0; padding: 4px 6px; }
-.lang-switcher__trigger:hover { border-color: #4d9de0; }
+.lang-switcher__trigger:hover { border-color: var(--accent-alt); }
 .lang-switcher__trigger:focus-visible {
   outline: none;
-  border-color: #4d9de0;
+  border-color: var(--accent-alt);
   box-shadow: 0 0 0 2px rgba(77, 157, 224, 0.25);
 }
 .lang-switcher__flag {
@@ -2187,7 +2187,7 @@ select.sig-toolbar-btn option {
   background: transparent;
   border: none;
   border-radius: 4px;
-  color: #c0ccde;
+  color: var(--text-secondary);
   font-family: inherit;
   font-size: calc(13px * var(--font-scale, 1));
   text-align: left;
@@ -2229,11 +2229,11 @@ select.sig-toolbar-btn option {
 }
 
 .sig-td--updated {
-  color: #f0a030;
+  color: var(--warning);
 }
 
 .sig-td--age-stale {
-  color: #e05a5a;
+  color: var(--danger);
 }
 
 /* ── WH Type Picker ──────────────────────────────────────── */

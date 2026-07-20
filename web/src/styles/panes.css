@@ -52,7 +52,7 @@
 .connection-label__mass {
   font-size: calc(13px * var(--font-scale, 1));
   font-weight: 700;
-  color: #c0ccde;
+  color: var(--text-secondary);
   background: var(--surface-panel);
   border: 1px solid var(--border);
   border-radius: 3px;
@@ -131,7 +131,7 @@
 
 .chains-empty {
   font-size: calc(12px * var(--font-scale, 1));
-  color: #8a9ab8;
+  color: var(--text-subtle);
   line-height: 1.4;
 }
 
@@ -146,18 +146,18 @@
   padding: 0 2px 0 6px;
   font-size: calc(13px * var(--font-scale, 1)); line-height: 1;
 }
-.chain-item__drag-handle:hover { color: #8a9ab8; }
+.chain-item__drag-handle:hover { color: var(--text-subtle); }
 .chain-item__drag-handle:active { cursor: grabbing; }
 .chain-item__toggle {
   flex: 1; min-width: 0;
   display: flex; align-items: center; gap: 6px;
   background: none; border: none; cursor: pointer; text-align: left;
-  padding: 7px 8px; color: #c0ccde;
+  padding: 7px 8px; color: var(--text-secondary);
   font-size: calc(13px * var(--font-scale, 1));
 }
 .chain-item__name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.chain-item__hops { flex: none; color: #8a9ab8; font-size: calc(11px * var(--font-scale, 1)); }
-.chain-item__del { flex: none; margin-right: 4px; color: #8a9ab8; }
+.chain-item__hops { flex: none; color: var(--text-subtle); font-size: calc(11px * var(--font-scale, 1)); }
+.chain-item__del { flex: none; margin-right: 4px; color: var(--text-subtle); }
 .chain-item__del:hover { color: var(--cv-conn-expired); }
 
 .chain-steps { list-style: none; margin: 0; padding: 2px 8px 8px; display: flex; flex-direction: column; gap: 5px; }
@@ -166,17 +166,17 @@
 .chain-step__systems {
   display: flex; align-items: center; gap: 5px;
   background: none; border: none; cursor: pointer; padding: 0; text-align: left;
-  color: #c0ccde; font-size: calc(12px * var(--font-scale, 1));
+  color: var(--text-secondary); font-size: calc(12px * var(--font-scale, 1));
 }
 .chain-step__systems:hover { color: #fff; }
 .chain-step__via {
   display: flex; align-items: center; gap: 5px;
-  font-size: calc(11px * var(--font-scale, 1)); color: #8a9ab8;
+  font-size: calc(11px * var(--font-scale, 1)); color: var(--text-subtle);
 }
 .chain-step__warp { display: inline-flex; align-items: center; gap: 4px; }
 .chain-step__wh {
   padding: 0 5px; border-radius: 4px;
-  background: #161d2e; color: #c0ccde;
+  background: #161d2e; color: var(--text-secondary);
   font-family: monospace; font-size: calc(10px * var(--font-scale, 1));
 }
 .chain-step__broken { display: inline-flex; align-items: center; gap: 4px; color: var(--cv-conn-expired); }
@@ -184,7 +184,7 @@
 .chain-step__meta {
   display: flex; flex-wrap: wrap; gap: 4px 12px;
   padding-left: 16px;
-  font-size: calc(10px * var(--font-scale, 1)); color: #8a9ab8;
+  font-size: calc(10px * var(--font-scale, 1)); color: var(--text-subtle);
 }
 
 /* Per-end "backing signature" link controls in the connection panel. */
@@ -197,7 +197,7 @@
 .conn-siglink__label {
   font-size: calc(12px * var(--font-scale, 1));
   font-weight: 600;
-  color: #8a9ab8;
+  color: var(--text-subtle);
   margin-bottom: 6px;
 }
 
@@ -268,7 +268,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #7a8aa8;
+  color: var(--text-quiet);
 }
 
 /* EVE in-game standings palette: dark blue at +10 (excellent), light blue
@@ -289,20 +289,20 @@
 
 .admin-page__sort-th:hover { color: var(--text-default); }
 
-.admin-page__sort-th--active { color: #7ab4f0; }
+.admin-page__sort-th--active { color: var(--accent-light); }
 
 .admin-page__sort-arrow {
   display: inline-block;
   width: 10px;
   margin-left: 5px;
   font-size: calc(9px * var(--font-scale, 1));
-  color: #7ab4f0;
+  color: var(--accent-light);
 }
 
 .admin-page__report-heading {
   font-size: calc(12px * var(--font-scale, 1));
   font-weight: 600;
-  color: #7a8aa8;
+  color: var(--text-quiet);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   margin: 24px 0 10px;
@@ -338,7 +338,7 @@
   font-variant-numeric: tabular-nums;
 }
 
-.admin-page__stat-card--accent .admin-page__stat-card-value { color: #7ab4f0; }
+.admin-page__stat-card--accent .admin-page__stat-card-value { color: var(--accent-light); }
 
 .admin-page__stat-card-pct {
   font-size: calc(12px * var(--font-scale, 1));
@@ -350,7 +350,7 @@
 
 .admin-page__stat-card-label {
   font-size: calc(11px * var(--font-scale, 1));
-  color: #7a8aa8;
+  color: var(--text-quiet);
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
@@ -379,7 +379,7 @@
 .admin-page__chart-title {
   font-size: calc(12px * var(--font-scale, 1));
   font-weight: 600;
-  color: #7a8aa8;
+  color: var(--text-quiet);
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }

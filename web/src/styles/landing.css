@@ -346,7 +346,7 @@
 
 .landing__screenshot-subtitle {
   font-size: calc(13px * var(--font-scale, 1));
-  color: #c0ccde;
+  color: var(--text-secondary);
   margin: 0 0 12px;
   text-align: center;
 }
@@ -365,7 +365,7 @@
 
 .landing__feature-icon {
   font-size: calc(28px * var(--font-scale, 1));
-  color: #4d9de0;
+  color: var(--accent-alt);
   line-height: 1;
 }
 
@@ -435,7 +435,7 @@
   transition: border-color 0.2s, background 0.2s, transform 0.15s;
 }
 .landing__returning:hover {
-  border-color: #4d9de0;
+  border-color: var(--accent-alt);
   background: rgba(20, 35, 65, 0.95);
   transform: translateY(-2px);
 }
@@ -477,7 +477,7 @@
   padding-bottom: 1px;
   transition: color 0.15s, border-color 0.15s;
 }
-.landing__switch-link:hover { color: #4d9de0; border-color: #4d9de0; }
+.landing__switch-link:hover { color: var(--accent-alt); border-color: var(--accent-alt); }
 
 /* "Join the Discord" button under the EVE SSO login - Discord blurple. */
 .landing__discord-btn {
@@ -628,7 +628,7 @@
 }
 
 .landing__faq-link {
-  color: #4d9de0;
+  color: var(--accent-alt);
   text-decoration: none;
 }
 

@@ -1,7 +1,7 @@
 /* ── zKillboard pane ─────────────────────────────────────── */
 .state {
   font-size: calc(13px * var(--font-scale, 1));
-  color: #c0ccde;
+  color: var(--text-secondary);
   padding: 8px 4px;
   margin: 0;
 }
@@ -25,7 +25,7 @@
   background: var(--surface-raised);
   border: 1px solid var(--border);
   border-radius: 4px;
-  color: #c0ccde;
+  color: var(--text-secondary);
   cursor: pointer;
   font-size: calc(12px * var(--font-scale, 1));
   letter-spacing: 0.04em;
@@ -53,7 +53,7 @@
   margin: 0;
 }
 
-.npcToggle:hover { color: #c0ccde; }
+.npcToggle:hover { color: var(--text-secondary); }
 
 .npcHidden {
   font-size: calc(11px * var(--font-scale, 1));
@@ -206,7 +206,7 @@
 
 .name {
   font-size: calc(13px * var(--font-scale, 1));
-  color: #c0ccde;
+  color: var(--text-secondary);
   text-decoration: none;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -273,7 +273,7 @@
   position: relative;
   transition: opacity 0.12s;
 
-  &:hover { opacity: 1; outline: 1px solid #5a9af8; }
+  &:hover { opacity: 1; outline: 1px solid var(--accent); }
 
   &[data-tip]::after {
     content: attr(data-tip);
@@ -320,7 +320,7 @@
 .value {
   font-size: calc(14px * var(--font-scale, 1));
   font-weight: 600;
-  color: #4ade80;
+  color: var(--success-bright);
   letter-spacing: 0.02em;
 }
 

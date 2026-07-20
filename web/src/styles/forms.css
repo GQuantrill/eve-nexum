@@ -57,7 +57,7 @@
   width: 12px;
   height: 12px;
   border: 2px solid var(--border-accent);
-  border-top-color: #4d9de0;
+  border-top-color: var(--accent-alt);
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
 }

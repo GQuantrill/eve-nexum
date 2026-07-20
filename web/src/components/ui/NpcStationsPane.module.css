@@ -68,7 +68,7 @@
    icons in the same row — without this the tooltip plate gets painted
    under the neighbouring icons. */
 .svcIcon:hover {
-  color: #7ab4f0;
+  color: var(--accent-light);
   z-index: 9999;
 }
 

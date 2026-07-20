@@ -33,10 +33,10 @@
   cursor: pointer;
   transition: border-color 0.15s ease;
 }
-.scout-pane__sort-select:hover { border-color: #4d9de0; }
+.scout-pane__sort-select:hover { border-color: var(--accent-alt); }
 .scout-pane__sort-select:focus-visible {
   outline: none;
-  border-color: #4d9de0;
+  border-color: var(--accent-alt);
   box-shadow: 0 0 0 2px rgba(77, 157, 224, 0.25);
 }
 .scout-pane__sort-select option {
@@ -117,7 +117,7 @@
   font-size: calc(13px * var(--font-scale, 1));
   padding: 4px 8px;
 
-  &:focus { border-color: #5a9af8; outline: none; }
+  &:focus { border-color: var(--accent); outline: none; }
 }
 
 .scout-pane__add-results {
@@ -154,7 +154,7 @@
 }
 
 .scout-pane__add-result-name   { color: var(--text-bright); }
-.scout-pane__add-result-region { color: #8a9ab8; font-size: calc(12px * var(--font-scale, 1)); }
+.scout-pane__add-result-region { color: var(--text-subtle); font-size: calc(12px * var(--font-scale, 1)); }
 
 .scout-pane__add-empty {
   /* Portaled — see .scout-pane__add-results */
@@ -162,7 +162,7 @@
   background: var(--surface-well);
   border: 1px solid var(--border-accent);
   border-radius: 4px;
-  color: #8a9ab8;
+  color: var(--text-subtle);
   font-size: calc(12px * var(--font-scale, 1));
   padding: 6px 10px;
 }
@@ -184,7 +184,7 @@
 
 .scout-row__time {
   margin-left: auto;
-  color: #8a9ab8;
+  color: var(--text-subtle);
   font-size: calc(13px * var(--font-scale, 1));
 }
 
@@ -197,14 +197,14 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #8a9ab8;
+  color: var(--text-subtle);
   font-size: calc(13px * var(--font-scale, 1));
   margin-top: 1px;
 }
 
 .scout-row__wh {
   font-family: monospace;
-  color: #7ab4f0;
+  color: var(--accent-light);
 }
 
 .scout-row__size {
@@ -226,7 +226,7 @@
 }
 
 .scout-row__jumps {
-  color: #7ab4f0;
+  color: var(--accent-light);
   font-size: calc(13px * var(--font-scale, 1));
   font-weight: 600;
   margin-right: auto;
@@ -265,7 +265,7 @@
   border-radius: 1px;
   background: #b06ad0;
 }
-.scout-route__link--ansiblex { background: #5a9af8; }  /* jump bridge — a gate, not a hole */
+.scout-route__link--ansiblex { background: var(--accent); }  /* jump bridge — a gate, not a hole */
 .scout-route__link--risk { background: #e15b5b; }
 
 .scout-pane__empty {
@@ -297,8 +297,8 @@
   padding: 2px 8px;
   cursor: pointer;
 }
-.fleet-pane__sort-btn:hover { border-color: #4d9de0; color: var(--text-default); }
-.fleet-pane__sort-btn--on { background: #1c2940; border-color: #4d9de0; color: #e8f0ff; }
+.fleet-pane__sort-btn:hover { border-color: var(--accent-alt); color: var(--text-default); }
+.fleet-pane__sort-btn--on { background: #1c2940; border-color: var(--accent-alt); color: #e8f0ff; }
 .fleet-pane__dir {
   display: inline-flex;
   align-items: center;
@@ -312,7 +312,7 @@
   color: #8a9ab5;
   cursor: pointer;
 }
-.fleet-pane__dir:hover { border-color: #4d9de0; color: var(--text-default); }
+.fleet-pane__dir:hover { border-color: var(--accent-alt); color: var(--text-default); }
 .fleet-pane__search {
   margin: 6px 8px 0;
   background: var(--surface-base);
@@ -326,7 +326,7 @@
 .fleet-pane__search::placeholder { color: #5a6a85; }
 .fleet-pane__search:focus-visible {
   outline: none;
-  border-color: #4d9de0;
+  border-color: var(--accent-alt);
   box-shadow: 0 0 0 2px rgba(77, 157, 224, 0.25);
 }
 .fleet-pane__list {

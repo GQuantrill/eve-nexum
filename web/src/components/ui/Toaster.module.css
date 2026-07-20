@@ -30,7 +30,7 @@
 
 .error   { border-left-color: #f87171; background: #1a1014; }
 .info    { border-left-color: #60a5fa; background: #0f1620; }
-.success { border-left-color: #4ade80; background: #0f1a14; }
+.success { border-left-color: var(--success-bright); background: #0f1a14; }
 
 /* Actionable toast: message + close on one row, buttons wrapping below. Wider
    so several hole buttons fit before wrapping. */

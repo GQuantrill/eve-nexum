@@ -91,7 +91,7 @@
 .refreshBtn:hover     { color: #c0d0e0; border-color: #3a4a6a; }
 .refreshBtn:disabled  { cursor: wait; opacity: 0.7; }
 .refreshBtnBusy     { animation: sys-info-refresh-spin 0.8s linear infinite; }
-.refreshBtnOk       { color: #4ade80; border-color: rgba(74,222,128,0.35); }
+.refreshBtnOk       { color: var(--success-bright); border-color: rgba(74,222,128,0.35); }
 .refreshBtnErr      { color: #e74c3c; border-color: rgba(231,76,60,0.4); }
 
 @keyframes sys-info-refresh-spin {
@@ -115,13 +115,13 @@
 
 .kvKey {
   font-size: calc(13px * var(--font-scale, 1));
-  color: #7a8aa8;
+  color: var(--text-quiet);
   white-space: nowrap;
 }
 
 .kvVal {
   font-size: calc(13px * var(--font-scale, 1));
-  color: #c0ccde;
+  color: var(--text-secondary);
 }
 
 .links {
@@ -239,7 +239,7 @@
 }
 
 .effectModBad {
-  color: #e05a5a;
+  color: var(--danger);
   background: rgba(224, 90, 90, 0.1);
   border: 1px solid rgba(224, 90, 90, 0.25);
 }
@@ -408,8 +408,8 @@
   border-radius: 3px;
   font-weight: 500;
 
-  &.incursionStateEstablished { background: rgba(224,90,90,0.2); color: #e05a5a; }
-  &.incursionStateMobilizing  { background: rgba(240,160,48,0.2); color: #f0a030; }
+  &.incursionStateEstablished { background: rgba(224,90,90,0.2); color: var(--danger); }
+  &.incursionStateMobilizing  { background: rgba(240,160,48,0.2); color: var(--warning); }
   &.incursionStateWithdrawing { background: rgba(100,180,100,0.2); color: #64b464; }
 }
 
@@ -419,7 +419,7 @@
   padding: 1px 6px;
   border-radius: 3px;
   background: rgba(77,157,224,0.15);
-  color: #4d9de0;
+  color: var(--accent-alt);
 }
 
 .incursionInfluence {
@@ -439,7 +439,7 @@
 
 .incursionBar {
   height: 100%;
-  background: #e05a5a;
+  background: var(--danger);
   border-radius: 2px;
   transition: width 0.3s ease;
 }

@@ -188,7 +188,7 @@
 
 .map-sidebar__share-meta {
   font-size: calc(11px * var(--font-scale, 1));
-  color: #7a8aa8;
+  color: var(--text-quiet);
   padding: 2px 0;
 }
 
@@ -197,7 +197,7 @@
   align-items: center;
   gap: 8px;
   font-size: calc(13px * var(--font-scale, 1));
-  color: #c0ccde;
+  color: var(--text-secondary);
   padding: 2px 0;
 
   kbd {
@@ -207,7 +207,7 @@
     border: 1px solid var(--border-strong);
     border-radius: 3px;
     padding: 1px 6px;
-    color: #c0ccde;
+    color: var(--text-secondary);
     flex-shrink: 0;
   }
 }
@@ -226,8 +226,8 @@
   border-radius: 4px;
   border: 1px solid;
 
-  &--ok  { color: #3ddc84; border-color: #3ddc84; }
-  &--err { color: #e05a5a; border-color: #e05a5a; }
+  &--ok  { color: var(--success); border-color: var(--success); }
+  &--err { color: var(--danger); border-color: var(--danger); }
 }
 
 .map-sidebar__title {
@@ -254,7 +254,7 @@
 
 .map-sidebar__label {
   font-size: calc(13px * var(--font-scale, 1));
-  color: #c0ccde;
+  color: var(--text-secondary);
 }
 
 /* Stacked field: label on its own line above a full-width control. */
@@ -302,7 +302,7 @@
   font-size: calc(12px * var(--font-scale, 1));
   color: #6a8ab0;
 }
-.map-sidebar__brand-by a { color: #5a9af8; text-decoration: none; }
+.map-sidebar__brand-by a { color: var(--accent); text-decoration: none; }
 .map-sidebar__brand-by a:hover { text-decoration: underline; }
 .map-sidebar__brand-version {
   display: flex;
@@ -324,7 +324,7 @@
   padding: 3px 8px;
   cursor: pointer;
 }
-.map-sidebar__patchnotes-btn:hover { border-color: #5a9af8; color: #e8f0ff; }
+.map-sidebar__patchnotes-btn:hover { border-color: var(--accent); color: #e8f0ff; }
 
 /* Patch-notes modal (reuses the generic .modal / .modal-overlay shell). Flex
    column so the header stays put and only the body scrolls. */
@@ -371,7 +371,7 @@
   background: #11192b;
   border: 1px solid var(--border);
   border-radius: 6px;
-  color: #c0ccde;
+  color: var(--text-secondary);
   cursor: pointer;
   font-size: calc(13px * var(--font-scale, 1));
   font-weight: 600;
@@ -513,7 +513,7 @@
   font-size: calc(12px * var(--font-scale, 1)); padding: 3px 12px;
 }
 .standings-viewer__source:hover { background: var(--surface-overlay); color: var(--text-default); }
-.standings-viewer__source--active { background: #1a3a6a; border-color: var(--border-accent-strong); color: #7ab4f0; }
+.standings-viewer__source--active { background: #1a3a6a; border-color: var(--border-accent-strong); color: var(--accent-light); }
 
 /* The five standing-band tabs. */
 .standings-viewer__tabs {

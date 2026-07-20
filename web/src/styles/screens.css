@@ -67,7 +67,7 @@
   font-size: calc(14px * var(--font-scale, 1));
   font-weight: 600;
 
-  &:hover { background: #234b86; border-color: #5a9af8; }
+  &:hover { background: #234b86; border-color: var(--accent); }
 }
 
 .lock-screen__logout {
@@ -109,7 +109,7 @@
 
 .role-badge--alliance_admin { background: #3a2c12; color: #f5c26b; border-color: #6a4e1e; }
 .role-badge--admin    { background: #3a1c2a; color: #f0a8c0; border-color: #6a2e48; }
-.role-badge--full     { background: #1a2a4a; color: #7ab4f0; border-color: var(--border-accent-strong); }
+.role-badge--full     { background: #1a2a4a; color: var(--accent-light); border-color: var(--border-accent-strong); }
 .role-badge--edit     { background: #1a2e1a; color: #8ad08a; border-color: #2e5a2e; }
 .role-badge--readonly { background: #232830; color: #8a96aa; border-color: #3a4254; }
 

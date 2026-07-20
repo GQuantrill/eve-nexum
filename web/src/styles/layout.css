@@ -63,7 +63,7 @@
 
 .share-header__cta:hover {
   background: var(--border-accent);
-  border-color: #5a9af8;
+  border-color: var(--accent);
 }
 
 /* Branded error card shown when a share link is expired or not found. */
@@ -96,14 +96,14 @@
 
 .share-error__body {
   font-size: calc(14px * var(--font-scale, 1));
-  color: #c0ccde;
+  color: var(--text-secondary);
   line-height: 1.5;
   margin: 8px 0;
 }
 
 .share-error__hint {
   font-size: calc(13px * var(--font-scale, 1));
-  color: #7a8aa8;
+  color: var(--text-quiet);
   margin-top: 16px;
 }
 

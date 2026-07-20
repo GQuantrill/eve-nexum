@@ -95,7 +95,7 @@
   border-radius: 3px;
   font-weight: 600;
   background: rgba(224,90,90,0.12);
-  color: #e05a5a;
+  color: var(--danger);
   border: 1px solid rgba(224,90,90,0.3);
   flex-shrink: 0;
 }

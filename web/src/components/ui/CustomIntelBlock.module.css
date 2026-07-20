@@ -56,7 +56,7 @@
 }
 
 .labelInput:focus {
-  border-color: #6ea0ff;
+  border-color: var(--accent-bright);
 }
 
 .remove {
@@ -72,5 +72,5 @@
 
 .remove:hover {
   background: rgba(224,90,90,0.10);
-  color: #e05a5a;
+  color: var(--danger);
 }

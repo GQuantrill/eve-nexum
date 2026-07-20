@@ -36,7 +36,7 @@
 
   &--ghost {
     background: transparent;
-    color: #c0ccde;
+    color: var(--text-secondary);
     border: 1px solid var(--border);
 
     &:hover { background: var(--surface-overlay); color: var(--text-default); }
@@ -44,7 +44,7 @@
 
   &--primary {
     background: #1a3a6a;
-    color: #7ab4f0;
+    color: var(--accent-light);
     border: 1px solid var(--border-accent-strong);
 
     &:hover:not(:disabled) { background: #1e4a8a; }

@@ -32,7 +32,7 @@
 .stats-modal__period-btn--active {
   background: #1a3a6a;
   border-color: var(--border-accent-strong);
-  color: #7ab4f0;
+  color: var(--accent-light);
 }
 
 .stats-modal__loading,
@@ -43,7 +43,7 @@
   padding: 24px 0;
 }
 
-.stats-modal__error { color: #e05a5a; }
+.stats-modal__error { color: var(--danger); }
 
 .stats-modal__summary {
   display: flex;
@@ -71,14 +71,14 @@
 
 .stats-modal__card-label {
   font-size: calc(13px * var(--font-scale, 1));
-  color: #7a8aa8;
+  color: var(--text-quiet);
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
 
 .stats-modal__section-title {
   font-size: calc(13px * var(--font-scale, 1));
-  color: #7a8aa8;
+  color: var(--text-quiet);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   margin: 4px 0 0;
@@ -99,7 +99,7 @@
 .stats-modal__th {
   font-size: calc(13px * var(--font-scale, 1));
   font-weight: 600;
-  color: #7a8aa8;
+  color: var(--text-quiet);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   padding: 7px 10px;
@@ -125,7 +125,7 @@
 
 .stats-modal__row-label {
   font-size: calc(13px * var(--font-scale, 1));
-  color: #c0ccde;
+  color: var(--text-secondary);
   width: 90px;
 }
 
@@ -139,7 +139,7 @@
 
 .stats-modal__row-pct {
   font-size: calc(13px * var(--font-scale, 1));
-  color: #7a8aa8;
+  color: var(--text-quiet);
   width: 36px;
   text-align: right;
 }
@@ -209,7 +209,7 @@
 .field__label {
   display: block;
   font-size: calc(13px * var(--font-scale, 1));
-  color: #c0ccde;
+  color: var(--text-secondary);
   margin-bottom: 4px;
 }
 
