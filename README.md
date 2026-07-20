@@ -24,6 +24,7 @@
   - [Docker (recommended)](#option-1--docker-recommended)
   - [Local development](#option-2--local-development)
   - [EVE developer app scopes](#eve-developer-app-scopes)
+  - [One-command deploy scripts](#one-command-deploy-scripts)
   - [Updating the SDE](#updating-the-sde)
   - [Refreshing wormhole types](#refreshing-wormhole-types)
   - [Upgrading an existing deployment](#upgrading-an-existing-deployment)
@@ -364,7 +365,7 @@ docker compose up -d
 
 The app will be available on port `${WEB_PORT:-80}` (defaults to `80`).
 
-The import is self-skipping: on every later `up` or restart the importer sees the static tables are already populated and exits in a second without re-downloading. So the two commands above are also your update flow. To force a re-import (e.g. after a CCP SDE drop), see [Updating the SDE](#updating-the-sde) below.
+The import is self-skipping: on every later `up` or restart the importer sees the static tables are already populated and exits in a second without re-downloading. So the two commands above are also your update flow — or just run one of the [one-command deploy scripts](#one-command-deploy-scripts) below. To force a re-import (e.g. after a CCP SDE drop), see [Updating the SDE](#updating-the-sde) below.
 
 The importer also stores each system's universe coordinates and CCP's 2D star-map projection (`position` / `position2D`), which power the [Seed a map from a region](#features) feature.
 
@@ -381,6 +382,21 @@ Traefik will handle TLS termination and HTTP→HTTPS redirects. The `docker-comp
 > export COMPOSE_FILE=docker-compose.yml:docker-compose.traefik.yml
 > ```
 > After that, plain `docker compose ...` automatically loads both files. Add the export to `~/.bashrc` / `~/.zshrc` if it's the only deployment on that host.
+
+#### One-command deploy scripts
+
+Not comfortable with Docker commands? The repo ships small scripts that run the whole **pull → build → restart** cycle for you, so updating to a new release is a single command from the repo root — no need to remember the `docker compose` lines above.
+
+| Run this | Use it for | What it does |
+|---|---|---|
+| `./build-traefik.sh`  ·  `.\build-traefik.ps1` | **The live / public site** (fronted by Traefik) | `git pull`, then build + `up -d` with **both** compose files |
+| `./build.sh`  ·  `.\build.ps1` | **Local / dev** (no Traefik) | `git pull`, then a plain build + `up -d` |
+
+`.sh` is for Linux/macOS, `.ps1` is for Windows PowerShell. Each script **stops if a step fails**, so a broken pull or build never restarts the site with a bad image.
+
+> **On your public server, always use `build-traefik`.** A plain build without the Traefik overlay 404s the live site. The plain `build` scripts are for local/dev only.
+>
+> First run on Windows may need `Set-ExecutionPolicy -Scope Process RemoteSigned`; on Linux/macOS the `.sh` files are already executable (`chmod +x` is preset).
 
 App-schema migrations (`users`, `maps`, `map_signatures`, etc.) layer on automatically the first time the server boots — no manual step.
 
