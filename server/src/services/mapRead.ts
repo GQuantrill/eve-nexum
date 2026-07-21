@@ -35,8 +35,8 @@ export interface VisibleMapsParams {
 
 // The list of maps visible to an account: personal (owner) maps, corp maps in
 // the configured corp set, alliance maps in the configured alliance set, and
-// personal maps explicitly shared with the character or their corp. Identical
-// query to GET /api/maps.
+// any map (personal, corp, OR alliance) explicitly shared with the character,
+// their corp, or their alliance. Identical query to GET /api/maps.
 export async function listVisibleMaps(p: VisibleMapsParams) {
   // Corp maps the caller can see. Explicit corp deployment: the configured
   // corps (or just the caller's, unless CORP_MAP_SHARED). Alliance deployment
@@ -81,7 +81,7 @@ export async function listVisibleMaps(p: VisibleMapsParams) {
       WHERE ((m.owner_id = $5::int OR m.user_id = $1) AND m.corp_id IS NULL AND m.alliance_id IS NULL)
          OR m.corp_id = ANY($2::int[])
          OR m.alliance_id = ANY($6::int[])
-         OR (s.id IS NOT NULL AND m.corp_id IS NULL AND m.alliance_id IS NULL)
+         OR s.id IS NOT NULL   -- any map (incl. corp/alliance) shared with me/my corp/my alliance
       ORDER BY "sharedWithMe", "isAllianceMap", "isCorpMap", m.name`,
     [p.userId, visibleCorpIds, p.callerChar, p.userCorpId, ownerId, visibleAllianceIds, p.userAllianceId],
   );

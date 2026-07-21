@@ -98,6 +98,9 @@ export interface MapMeta {
   allianceId: number | null;
   locked:     boolean;
   accessKind: AccessKind;
+  // Only meaningful when accessKind === 'shared': did the grant confer edit
+  // rights (true) or view-only (false)? Undefined for owner/corp/alliance access.
+  shareCanWrite?: boolean;
 }
 
 // UUID-shape guard. The maps router takes :mapId straight from the URL,
@@ -175,23 +178,26 @@ export async function getMapAccess(mapId: string, req: Request): Promise<MapMeta
     return meta('alliance_member');
   }
 
-  // Personal map shared with this character or their corp? Personal-map only —
-  // a personal map has NEITHER corp_id nor alliance_id. Corp/alliance-scoped
-  // maps don't accept individual grants. Corp grants resolve against the
-  // caller's *current* corp_id; switching corps moves access with them.
-  if (m.corpId === null && m.allianceId === null) {
-    const { rowCount } = await db.query(
-      `SELECT 1 FROM map_shares
-         WHERE map_id = $1
-           AND ( target_character_id = $2
-              OR ($3::int IS NOT NULL AND target_corp_id = $3)
-              OR ($4::int IS NOT NULL AND target_alliance_id = $4) )
-         LIMIT 1`,
-      [mapId, m.callerChar, userCorpId, userAllianceId],
-    );
-    if (rowCount && rowCount > 0) {
-      return meta('shared');
-    }
+  // Shared with this character / their corp / their alliance via an explicit
+  // grant. Applies to ANY map scope: owner and corp/alliance members already
+  // matched above, so this branch only ever admits a NON-member whom the owner
+  // (or a corp/alliance admin) deliberately invited. The grant's can_write
+  // decides view-only vs edit; if several grants match the same caller, the
+  // most permissive wins. Corp/alliance grants resolve against the caller's
+  // *current* ids, so switching corp/alliance moves access with them.
+  const share = await db.query<{ canWrite: boolean }>(
+    `SELECT can_write AS "canWrite" FROM map_shares
+       WHERE map_id = $1
+         AND ( target_character_id = $2
+            OR ($3::int IS NOT NULL AND target_corp_id = $3)
+            OR ($4::int IS NOT NULL AND target_alliance_id = $4) )
+       ORDER BY can_write DESC
+       LIMIT 1`,
+    [mapId, m.callerChar, userCorpId, userAllianceId],
+  );
+  if (share.rowCount && share.rowCount > 0) {
+    return { userId: m.userId, corpId: m.corpId, allianceId: m.allianceId,
+             locked: m.locked, accessKind: 'shared', shareCanWrite: share.rows[0].canWrite };
   }
 
   return null;
@@ -242,6 +248,12 @@ export async function requireMapContentWrite(res: Response, mapId: string, req: 
   // go through the role check so readonly members can't silently edit.
   if ((access.accessKind === 'corp_member' || access.accessKind === 'alliance_member') && role === 'readonly') {
     res.status(403).json({ error: 'Write access required' }); return null;
+  }
+  // A view-only share grant (can_write = false) may read the map but never
+  // mutate it — regardless of the recipient's own role. (An edit grant, or any
+  // owner/member access, falls through.)
+  if (access.accessKind === 'shared' && access.shareCanWrite === false) {
+    res.status(403).json({ error: 'This map was shared with you view-only' }); return null;
   }
   return access;
 }
@@ -2740,29 +2752,28 @@ mapsRouter.delete('/:mapId/share', async (req, res) => {
 
 const MAX_SHARES_PER_MAP = 50;
 
-// GET /api/maps/:mapId/shares — owner-only list of current grants.
-// Returns the EVE id, target kind, when it was granted, and a resolved
+// GET /api/maps/:mapId/shares — list current grants. Personal maps: owner only;
+// corp/alliance maps: an admin / alliance-admin of the owning org (requireShareAdmin).
+// Returns the EVE id, target kind, edit flag, when it was granted, and a resolved
 // human-readable name so the picker UI doesn't have to fan out to ESI.
 mapsRouter.get('/:mapId/shares', async (req, res) => {
   const { mapId } = req.params;
-  const access = await requireMapOwner(res, mapId, req);
+  const access = await requireShareAdmin(res, mapId, req);
   if (!access) return;
-  if (access.corpId !== null || access.allianceId !== null) {
-    res.status(400).json({ error: 'Corp and alliance maps cannot have per-character shares' });
-    return;
-  }
 
   const { rows } = await db.query<{
     id: string;
     targetCharacterId: number | null;
     targetCorpId:      number | null;
     targetAllianceId:  number | null;
+    canWrite:          boolean;
     createdAt:         string;
   }>(
     `SELECT id,
             target_character_id AS "targetCharacterId",
             target_corp_id      AS "targetCorpId",
             target_alliance_id  AS "targetAllianceId",
+            can_write           AS "canWrite",
             created_at          AS "createdAt"
        FROM map_shares
       WHERE map_id = $1
@@ -2779,25 +2790,25 @@ mapsRouter.get('/:mapId/shares', async (req, res) => {
     shares: rows.map((r) => {
       const kind = r.targetCharacterId != null ? 'character' : r.targetCorpId != null ? 'corp' : 'alliance';
       const targetId = (r.targetCharacterId ?? r.targetCorpId ?? r.targetAllianceId)!;
-      return { id: r.id, kind, targetId, name: names.get(targetId)?.name ?? null, createdAt: r.createdAt };
+      return { id: r.id, kind, targetId, name: names.get(targetId)?.name ?? null, canWrite: r.canWrite, createdAt: r.createdAt };
     }),
   });
 });
 
-// POST /api/maps/:mapId/shares — owner-only grant create.
-// Body: { kind: 'character' | 'corp', targetId: number }
+// POST /api/maps/:mapId/shares — grant create. Personal maps: owner only;
+// corp/alliance maps: an admin / alliance-admin of the owning org.
+// Body: { kind: 'character' | 'corp' | 'alliance', targetId: number, canWrite?: boolean, alsoGrantLogin?: boolean }
 // Returns the resolved name + canonical row so the client can show it
 // immediately without re-fetching the whole list.
 mapsRouter.post('/:mapId/shares', async (req, res) => {
   const { mapId } = req.params;
-  const access = await requireMapOwner(res, mapId, req);
+  const access = await requireShareAdmin(res, mapId, req);
   if (!access) return;
-  if (access.corpId !== null || access.allianceId !== null) {
-    res.status(400).json({ error: 'Corp and alliance maps cannot have per-character shares' });
-    return;
-  }
 
-  const { kind, targetId, alsoGrantLogin } = req.body as { kind?: unknown; targetId?: unknown; alsoGrantLogin?: unknown };
+  const { kind, targetId, alsoGrantLogin, canWrite } = req.body as { kind?: unknown; targetId?: unknown; alsoGrantLogin?: unknown; canWrite?: unknown };
+  // Default to edit (true) when unspecified, matching the historical share
+  // behaviour for personal maps; the UI sends an explicit boolean.
+  const grantCanWrite = canWrite === undefined ? true : canWrite === true;
   if (kind !== 'character' && kind !== 'corp' && kind !== 'alliance') {
     res.status(400).json({ error: 'kind must be "character", "corp", or "alliance"' });
     return;
@@ -2872,10 +2883,10 @@ mapsRouter.post('/:mapId/shares', async (req, res) => {
 
   try {
     const { rows } = await db.query<{ id: string; createdAt: string }>(
-      `INSERT INTO map_shares (map_id, ${targetCol}, granted_by_user_id)
-            VALUES ($1, $2, $3)
+      `INSERT INTO map_shares (map_id, ${targetCol}, granted_by_user_id, can_write)
+            VALUES ($1, $2, $3, $4)
          RETURNING id, created_at AS "createdAt"`,
-      [mapId, idNum, req.session.userId],
+      [mapId, idNum, req.session.userId, grantCanWrite],
     );
 
     // Optionally admit the target to log in too (design Phase 2). The
@@ -2899,6 +2910,7 @@ mapsRouter.post('/:mapId/shares', async (req, res) => {
       kind,
       targetId:  idNum,
       name:      names.get(idNum)?.name ?? null,
+      canWrite:  grantCanWrite,
       createdAt: rows[0].createdAt,
       loginGranted,
     });
@@ -2912,11 +2924,12 @@ mapsRouter.post('/:mapId/shares', async (req, res) => {
   }
 });
 
-// DELETE /api/maps/:mapId/shares/:shareId — owner-only revoke.
+// DELETE /api/maps/:mapId/shares/:shareId — revoke. Personal maps: owner only;
+// corp/alliance maps: an admin / alliance-admin of the owning org.
 mapsRouter.delete('/:mapId/shares/:shareId', async (req, res) => {
   const { mapId, shareId } = req.params;
   if (!UUID_RE.test(shareId)) { res.status(404).json({ error: 'Share not found' }); return; }
-  const access = await requireMapOwner(res, mapId, req);
+  const access = await requireShareAdmin(res, mapId, req);
   if (!access) return;
 
   const { rowCount } = await db.query(
