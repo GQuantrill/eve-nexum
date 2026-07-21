@@ -738,6 +738,12 @@ export async function migrate() {
     CREATE UNIQUE INDEX IF NOT EXISTS uq_map_shares_alliance ON map_shares (map_id, target_alliance_id) WHERE target_alliance_id IS NOT NULL;
     CREATE INDEX IF NOT EXISTS idx_map_shares_alliance ON map_shares (target_alliance_id) WHERE target_alliance_id IS NOT NULL;
 
+    -- Phase 3: per-grant permission, so an owner can share a map (incl. corp/
+    -- alliance maps) view-only OR editable. TRUE = recipient can edit — the
+    -- original share behaviour, so the default keeps every existing grant as
+    -- edit; FALSE = read-only.
+    ALTER TABLE map_shares ADD COLUMN IF NOT EXISTS can_write BOOLEAN NOT NULL DEFAULT TRUE;
+
     -- Last known solar system per user, updated from the ESI location poll as
     -- the pilot jumps. Lets the profile remember where they were last seen.
     -- INTEGER to match solar_systems.id (SDE-seeded); nullable until the first

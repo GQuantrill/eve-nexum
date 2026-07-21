@@ -8,7 +8,7 @@ import {
 } from "../../hooks/useNotificationPermission";
 import { expiresIn } from "../../i18n/format";
 import { useMapStore } from "../../store/mapStore";
-import { useAuth, isAdminRole, type Role } from "../../context/AuthContext";
+import { useAuth, isAdminRole, isAllianceAdminRole, type Role } from "../../context/AuthContext";
 import { api } from "../../api/client";
 import { toast } from "./Toaster";
 import { useProximityThreshold } from "../../hooks/useProximityAlerts";
@@ -157,18 +157,22 @@ type SectionId =
   | "shortcuts"
   | null;
 
-// Share permissions mirror the server's requireShareAdmin: corp maps are
-// admin-only, personal maps are owner-only. A personal map can now reach
-// the user via a map_shares grant (sharedWithMe = true), in which case
-// they're a recipient — not the owner — and must not see the share-link
-// controls.
+// Share permissions mirror the server's requireShareAdmin: alliance maps are
+// alliance-admin-only, corp maps admin-only, personal maps owner-only. A
+// personal map can now reach the user via a map_shares grant (sharedWithMe =
+// true), in which case they're a recipient — not the owner — and must not see
+// the share controls. Governs BOTH the public share-link and the per-entity
+// share-grant sections, exactly as requireShareAdmin gates both server-side.
 function canShareThisMap(
   user: { role?: Role } | null | undefined,
   isCorpMap: boolean,
+  isAllianceMap: boolean,
   isMapOwner: boolean,
 ): boolean {
   if (!user) return false;
-  if (isCorpMap) return isAdminRole(user.role ?? 'readonly');
+  const role = user.role ?? 'readonly';
+  if (isAllianceMap) return isAllianceAdminRole(role);
+  if (isCorpMap) return isAdminRole(role);
   return isMapOwner;
 }
 
@@ -688,11 +692,13 @@ export function MapSidebar() {
   const notifPermission = useNotificationPermission();
   const { user } = useAuth();
   const isCorpMap = useMapStore((s) => !!s.map.isCorpMap);
+  const isAllianceMap = useMapStore((s) => !!s.map.isAllianceMap);
   const isMapOwner = useIsMapOwner();
-  // Per-character / per-corp share grants are personal-map only and
-  // owner-only. Hide the section anywhere else so it doesn't suggest
-  // an action that would fail at the server.
-  const canManageShareGrants = isMapOwner && !isCorpMap;
+  // Per-entity share grants work on any map scope now; who may manage them
+  // mirrors the server's requireShareAdmin (owner for personal, corp/alliance
+  // admin for org maps). Hide the section for anyone else so it never suggests
+  // an action the server would reject.
+  const canManageShareGrants = canShareThisMap(user, isCorpMap, isAllianceMap, isMapOwner);
   // The map-management buttons (optimize / spread / JSON / PNG / stale fade)
   // are hidden only when a readonly user is looking at a corp map. On their
   // own personal map a readonly user still owns the layout and can use the
@@ -1277,7 +1283,7 @@ export function MapSidebar() {
           <MergeSection />
         </CollapsibleSection>
 
-        {canShareThisMap(user, isCorpMap, isMapOwner) && (
+        {canShareThisMap(user, isCorpMap, isAllianceMap, isMapOwner) && (
           <CollapsibleSection
             title={t("mapSidebar.sections.liveSharing")}
             {...sectionProps("share")}

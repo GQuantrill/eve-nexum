@@ -695,7 +695,10 @@
     "via": "via"
   },
   "mapShares": {
-    "hint": "Accordez à un autre personnage — ou à tous les membres d'une corp — un accès en modification à cette carte personnelle. Les destinataires peuvent modifier le contenu et la topologie mais ne peuvent pas la renommer, la supprimer ou la repartager.",
+    "hint": "Accordez à un autre personnage, une corp ou une alliance l'accès à cette carte — lecture seule ou modification. Les destinataires ne peuvent pas la renommer, la supprimer ou la repartager.",
+    "accessLabel": "Accès",
+    "accessView": "Lecture",
+    "accessEdit": "Modifier",
     "character": "Personnage",
     "corp": "Corp",
     "placeholderChar": "Nom exact du personnage",
