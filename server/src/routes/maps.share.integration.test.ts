@@ -98,6 +98,28 @@ describe.skipIf(!dbReady)('sharing corp/alliance maps (integration — real SQL)
     expect(rw.statusCode).toBe(200);
   });
 
+  it('an EDIT share still respects the recipient’s role — a readonly recipient cannot write', async () => {
+    // Share to corp 2000 with edit; a readonly-role member of 2000 still can't
+    // write (normal roles apply past the share), while a full-role member can.
+    const mapId = await seedCorpMap(owner.id, 1000);
+    await seedShare(mapId, 'target_corp_id', 2000, true, owner.id); // EDIT share to corp 2000
+    const roMember = await mkUser({ characterId: 910, corpId: 2000, role: 'readonly' });
+
+    // Read access is granted...
+    const acc = await getMapAccess(mapId, reqFor(roMember));
+    expect(acc?.accessKind).toBe('shared');
+    expect(acc?.shareCanWrite).toBe(true);
+    // ...but the readonly role blocks writing.
+    const ro = fakeRes();
+    expect(await requireMapContentWrite(ro as unknown as express.Response, mapId, reqFor(roMember))).toBeNull();
+    expect(ro.statusCode).toBe(403);
+
+    // The full-role outsider (also corp 2000) writes fine under the same share.
+    const rw = fakeRes();
+    expect(await requireMapContentWrite(rw as unknown as express.Response, mapId, reqFor(outsider))).not.toBeNull();
+    expect(rw.statusCode).toBe(200);
+  });
+
   it('a corp member keeps corp_member access (a view-only share must not downgrade it)', async () => {
     const mapId = await seedCorpMap(owner.id, 1000);
     await seedShare(mapId, 'target_corp_id', 1000, false, owner.id); // view-only share to own corp

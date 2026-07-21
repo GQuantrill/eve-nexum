@@ -242,16 +242,18 @@ export async function requireMapContentWrite(res: Response, mapId: string, req: 
 
   const role = acting.role;
 
-  // Owners and explicit-share recipients always get write access. A share
-  // grant is a deliberate invitation by the owner — honouring it shouldn't
-  // depend on the recipient's general role. Corp- and alliance-map writes still
-  // go through the role check so readonly members can't silently edit.
-  if ((access.accessKind === 'corp_member' || access.accessKind === 'alliance_member') && role === 'readonly') {
+  // The map's OWNER always writes it. Every other way in — corp member,
+  // alliance member, OR an explicit share grant — remains bound by the caller's
+  // own deployment role: a 'readonly' identity can view but never write, even to
+  // a map shared with edit. A share only opens the DOOR to a map; normal roles
+  // still govern what you can do once inside (solo installs make everyone
+  // 'admin', so this only constrains restricted corp/alliance deployments).
+  if (access.accessKind !== 'owner' && role === 'readonly') {
     res.status(403).json({ error: 'Write access required' }); return null;
   }
-  // A view-only share grant (can_write = false) may read the map but never
-  // mutate it — regardless of the recipient's own role. (An edit grant, or any
-  // owner/member access, falls through.)
+  // A view-only share grant (can_write = false) is a further, role-independent
+  // ceiling: even an edit/full/admin recipient can only READ a map shared with
+  // them view-only.
   if (access.accessKind === 'shared' && access.shareCanWrite === false) {
     res.status(403).json({ error: 'This map was shared with you view-only' }); return null;
   }
@@ -1701,7 +1703,10 @@ mapsRouter.get('/:mapId', async (req, res) => {
   // Full map (meta + systems + connections). Loader is shared with /api/v1.
   const full = await loadFullMap(mapId);
   if (!full) { res.status(404).json({ error: 'Map not found' }); return; }
-  res.json(full);
+  // Surface the caller's access so the client can hide edit UI it would 403 on.
+  // Authoritative check still happens per-write server-side; this is UX only.
+  // shareCanWrite is only meaningful for accessKind 'shared'.
+  res.json({ ...full, accessKind: access.accessKind, shareCanWrite: access.shareCanWrite ?? null });
 });
 
 // GET /api/maps/:mapId/events — SSE stream of live edits for this map. Scoped
