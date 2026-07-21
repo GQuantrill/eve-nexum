@@ -10,7 +10,7 @@
 // same helpers as the login gate and the same session-kill as an admin block.
 import { db } from '../db.js';
 import { config } from '../config.js';
-import { isLoginPermitted, standingsPermitLogin } from './accessGrants.js';
+import { isLoginPermitted, standingsPermitLogin, pruneStandingDerivedGrants } from './accessGrants.js';
 import { invalidateSessionsForUser, refreshSessionAffiliation } from '../utils/sessionInvalidate.js';
 import { audit } from './audit.js';
 import { esiFetch } from '../utils/esi.js';
@@ -18,7 +18,7 @@ import { createLogger } from '../utils/logger.js';
 
 const log = createLogger('accessRevalidate');
 
-export interface RevalidateResult { usersEvicted: number; sessionsKilled: number }
+export interface RevalidateResult { usersEvicted: number; sessionsKilled: number; grantsPruned: number }
 
 interface Affiliation { corpId: number | null; allianceId: number | null }
 
@@ -68,7 +68,13 @@ async function fetchAffiliations(charIds: number[]): Promise<Map<number, Affilia
 export async function revalidateActiveSessions(opts: { refreshAffiliation?: boolean } = {}): Promise<RevalidateResult> {
   // Solo (unrestricted) deployments have no gate — everyone is allowed, so
   // there is nothing to revoke.
-  if (!config.restrictedMode) return { usersEvicted: 0, sessionsKilled: 0 };
+  if (!config.restrictedMode) return { usersEvicted: 0, sessionsKilled: 0, grantsPruned: 0 };
+
+  // First, drop any share/standing-derived login grants whose justifying
+  // standing no longer holds — so the eviction check below sees the reduced
+  // allow-list and boots anyone left with neither a (real) grant nor a standing.
+  const grantsPruned = await pruneStandingDerivedGrants();
+  if (grantsPruned > 0) log.info(`Pruned ${grantsPruned} standing-derived login grant(s) no longer at positive standing.`);
 
   // Distinct users with a LIVE session (connect-pg-simple stores userId in the
   // session JSON; `expire` is the row's TTL). Sessions without a userId (e.g. a
@@ -134,7 +140,7 @@ export async function revalidateActiveSessions(opts: { refreshAffiliation?: bool
   if (sessionsKilled > 0) {
     log.info(`Revalidation evicted ${usersEvicted} user(s), ${sessionsKilled} session(s) no longer permitted.`);
   }
-  return { usersEvicted, sessionsKilled };
+  return { usersEvicted, sessionsKilled, grantsPruned };
 }
 
 // Periodic re-validation timer. Runs in restricted deployments only, on the

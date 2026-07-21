@@ -140,3 +140,62 @@ export async function standingsPermitLogin(p: {
 export function requiresPositiveStanding(kind: GrantKind): boolean {
   return kind !== 'character';
 }
+
+// Remove login grants that only ever existed BECAUSE the deployment held a
+// corp/alliance at positive standing — i.e. source 'share' (created by a map
+// share's "also grant login") or 'standing' — once that standing no longer
+// holds. This is what stops a guest corp, admitted via standings, from
+// grandfathering itself into PERMANENT access by having a member share a map:
+// the grant is now conditional on the standing that justified it.
+//
+// Deliberately NEVER touches:
+//   • source 'env' / 'admin' — operator/admin decisions, an intentional static
+//     allow-list; they outlive standings on purpose.
+//   • kind 'character' — a named 1:1 grant, never standing-gated (mirrors
+//     requiresPositiveStanding), so it has no standing to lose.
+//
+// FAIL-SAFE: prune only when this deployment's contacts have actually been
+// synced (the relevant standings table has ≥1 row for the configured org). An
+// empty/never-synced table must not be read as "everyone lost standing" and
+// wipe every share grant. Mirrors the ESI-outage fail-safe in the sweep.
+// Returns the number of grants pruned.
+export async function pruneStandingDerivedGrants(): Promise<number> {
+  if (!config.restrictedMode) return 0;
+
+  if (config.allianceMode) {
+    const { rowCount } = await db.query(
+      `DELETE FROM access_grants ag
+        WHERE ag.source IN ('share','standing')
+          AND ag.kind   IN ('corp','alliance')
+          AND EXISTS (SELECT 1 FROM alliance_standings WHERE alliance_id = ANY($1::bigint[]))
+          AND NOT EXISTS (
+            SELECT 1 FROM alliance_standings s
+             WHERE s.alliance_id  = ANY($1::bigint[])
+               AND s.contact_kind = CASE ag.kind WHEN 'corp' THEN 'corporation' ELSE 'alliance' END
+               AND s.contact_id   = ag.eve_id
+               AND s.standing     > 0
+          )`,
+      [config.allianceIds],
+    );
+    return rowCount ?? 0;
+  }
+
+  // Corp install: the deployment corp's own contacts. A corp can hold a standing
+  // toward an alliance, so an alliance grant is checked against the corp's
+  // alliance contact — matching standingPermitsTarget's corp branch exactly.
+  const { rowCount } = await db.query(
+    `DELETE FROM access_grants ag
+      WHERE ag.source IN ('share','standing')
+        AND ag.kind   IN ('corp','alliance')
+        AND EXISTS (SELECT 1 FROM corp_standings WHERE corp_id = ANY($1::bigint[]))
+        AND NOT EXISTS (
+          SELECT 1 FROM corp_standings s
+           WHERE s.corp_id      = ANY($1::bigint[])
+             AND s.contact_kind = CASE ag.kind WHEN 'corp' THEN 'corporation' ELSE 'alliance' END
+             AND s.contact_id   = ag.eve_id
+             AND s.standing     > 0
+        )`,
+    [config.corpIds],
+  );
+  return rowCount ?? 0;
+}

@@ -8,6 +8,7 @@ const H = vi.hoisted(() => ({
   queryMock: vi.fn(async () => ({ rows: [] as Row[] })),
   isLoginPermitted: vi.fn(async (_p: unknown) => false),
   standingsPermitLogin: vi.fn(async (_p: unknown) => false),
+  pruneStandingDerivedGrants: vi.fn(async () => 0),
   invalidate: vi.fn(async (_id: number) => 1),
 }));
 
@@ -16,6 +17,7 @@ vi.mock('../db.js', () => ({ db: { query: H.queryMock } }));
 vi.mock('./accessGrants.js', () => ({
   isLoginPermitted: H.isLoginPermitted,
   standingsPermitLogin: H.standingsPermitLogin,
+  pruneStandingDerivedGrants: H.pruneStandingDerivedGrants,
 }));
 vi.mock('../utils/sessionInvalidate.js', () => ({ invalidateSessionsForUser: H.invalidate }));
 
@@ -28,6 +30,7 @@ beforeEach(() => {
   H.queryMock.mockReset().mockImplementation(async () => ({ rows: H.rows }));
   H.isLoginPermitted.mockReset().mockResolvedValue(false);
   H.standingsPermitLogin.mockReset().mockResolvedValue(false);
+  H.pruneStandingDerivedGrants.mockReset().mockResolvedValue(0);
   H.invalidate.mockReset().mockResolvedValue(1);
 });
 
@@ -38,7 +41,7 @@ describe('revalidateActiveSessions', () => {
   it('no-op in a solo (unrestricted) deployment', async () => {
     H.config.restrictedMode = false;
     const r = await revalidateActiveSessions();
-    expect(r).toEqual({ usersEvicted: 0, sessionsKilled: 0 });
+    expect(r).toEqual({ usersEvicted: 0, sessionsKilled: 0, grantsPruned: 0 });
     expect(H.queryMock).not.toHaveBeenCalled();
     expect(H.invalidate).not.toHaveBeenCalled();
   });
@@ -49,7 +52,7 @@ describe('revalidateActiveSessions', () => {
     const r = await revalidateActiveSessions();
     expect(H.invalidate).toHaveBeenCalledTimes(1);
     expect(H.invalidate).toHaveBeenCalledWith(2);
-    expect(r).toEqual({ usersEvicted: 1, sessionsKilled: 1 });
+    expect(r).toEqual({ usersEvicted: 1, sessionsKilled: 1, grantsPruned: 0 });
   });
 
   it('admits via the standings path too (not just explicit grants)', async () => {

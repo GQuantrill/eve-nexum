@@ -162,7 +162,7 @@ standingsRouter.post('/refresh', async (req, res) => {
   // (scope 'all'), which any user can trigger and which isn't an access action.
   const revalidation = orgOnly
     ? await revalidateActiveSessions()
-    : { usersEvicted: 0, sessionsKilled: 0 };
+    : { usersEvicted: 0, sessionsKilled: 0, grantsPruned: 0 };
 
   res.json({
     ok: true,

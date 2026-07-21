@@ -199,6 +199,14 @@ export interface WormholeMap {
   isCorpMap?: boolean;
   /** Alliance-scoped map (visible to the whole alliance). */
   isAllianceMap?: boolean;
+  /** How the caller reached this map (server-authoritative, from GET /maps/:id):
+   *  'owner' | 'corp_member' | 'alliance_member' | 'shared'. Drives whether the
+   *  edit UI is shown — the server still enforces every write. */
+  accessKind?: 'owner' | 'corp_member' | 'alliance_member' | 'shared';
+  /** For accessKind 'shared' only: did the grant confer edit (true) or view-only
+   *  (false)? null/absent otherwise. A view-only share caps editing regardless
+   *  of the caller's role. */
+  shareCanWrite?: boolean | null;
   locked?: boolean;
   /** Corp maps only: whether this map is opted in as a merge source. */
   allowAsMergeSource?: boolean;
