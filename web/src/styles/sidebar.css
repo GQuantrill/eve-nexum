@@ -935,6 +935,40 @@
   color: var(--danger);
 }
 
+/* Access-level (view / edit) toggle above the Share button. */
+.map-shares__access {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 2px 0;
+}
+
+.map-shares__access-label {
+  font-size: calc(12px * var(--font-scale, 1));
+  color: #a8b6cc;
+}
+
+/* Per-row badge showing whether a grant is view-only or editable. */
+.map-shares__access-badge {
+  font-size: calc(10px * var(--font-scale, 1));
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.map-shares__access-badge--view {
+  background: rgba(138,154,184,0.15);
+  color: var(--text-subtle);
+  border: 1px solid rgba(138,154,184,0.3);
+}
+
+.map-shares__access-badge--edit {
+  background: rgba(61,220,132,0.15);
+  color: var(--success);
+  border: 1px solid rgba(61,220,132,0.3);
+}
+
 /* ── Watchlist sidebar panel ─────────────────────────────────────────────── */
 .watchlist {
   display: flex;

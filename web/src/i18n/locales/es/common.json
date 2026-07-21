@@ -695,7 +695,10 @@
     "via": "vía"
   },
   "mapShares": {
-    "hint": "Concede a otro personaje — o a todos los miembros de una corp — acceso de edición a este mapa personal. Los destinatarios pueden editar el contenido y la topología pero no pueden renombrarlo, eliminarlo ni volver a compartirlo.",
+    "hint": "Concede a otro personaje, corp o alianza acceso a este mapa — solo lectura o edición. Los destinatarios no pueden renombrarlo, eliminarlo ni volver a compartirlo.",
+    "accessLabel": "Acceso",
+    "accessView": "Ver",
+    "accessEdit": "Editar",
     "character": "Personaje",
     "corp": "Corp",
     "placeholderChar": "Nombre exacto del personaje",

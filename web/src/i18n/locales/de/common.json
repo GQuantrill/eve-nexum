@@ -695,7 +695,10 @@
     "via": "über"
   },
   "mapShares": {
-    "hint": "Gewähre einem anderen Charakter — oder jedem Mitglied einer Corp — Bearbeitungszugriff auf diese persönliche Karte. Empfänger können Inhalt und Topologie bearbeiten, aber nicht umbenennen, löschen oder weiter teilen.",
+    "hint": "Gewähre einem anderen Charakter, einer Corp oder Allianz Zugriff auf diese Karte — nur ansehen oder bearbeiten. Empfänger können sie nicht umbenennen, löschen oder weiter teilen.",
+    "accessLabel": "Zugriff",
+    "accessView": "Ansehen",
+    "accessEdit": "Bearbeiten",
     "character": "Charakter",
     "corp": "Corp",
     "placeholderChar": "Exakter Charaktername",
