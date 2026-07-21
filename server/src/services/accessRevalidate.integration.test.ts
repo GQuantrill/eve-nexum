@@ -79,7 +79,7 @@ describe.skipIf(!dbReady)('revalidateActiveSessions (integration — real SQL)',
     const u = await seedUser({ characterId: 4, corpId: 999 });
     await seedSession(u);
     const res = await revalidateActiveSessions();
-    expect(res).toEqual({ usersEvicted: 0, sessionsKilled: 0 });
+    expect(res).toEqual({ usersEvicted: 0, sessionsKilled: 0, grantsPruned: 0 });
     expect(await liveSessionCount(u)).toBe(1);
   });
 
@@ -162,5 +162,82 @@ describe.skipIf(!dbReady)('revalidateActiveSessions (integration — real SQL)',
     const res = await revalidateActiveSessions();
     expect(res.sessionsKilled).toBe(0);
     expect(await liveSessionCount(u)).toBe(1);
+  });
+
+  // Standing-derived login grants (source 'share' from a map-share's also-grant-
+  // login) must not outlive the standing that justified them — the guest-corp
+  // grandfathering leak.
+  describe('pruning standing-derived grants', () => {
+    // A synced-but-neutral contact row so the deployment counts as "contacts
+    // synced" (fail-safe guard) without holding corp 500 at positive standing.
+    const seedSyncedContacts = () =>
+      db.query(`INSERT INTO corp_standings (corp_id, contact_kind, contact_id, standing, updated_at) VALUES (1000, 'corporation', 999, 5, NOW())`);
+    const shareGrant = (kind: 'corp' | 'alliance' | 'character', eveId: number) =>
+      db.query(`INSERT INTO access_grants (id, kind, eve_id, source, created_at) VALUES (gen_random_uuid(), $1, $2, 'share', NOW())`, [kind, eveId]);
+    const grantExists = async (kind: string, eveId: number): Promise<boolean> =>
+      (await db.query(`SELECT 1 FROM access_grants WHERE kind = $1 AND eve_id = $2`, [kind, eveId])).rows.length > 0;
+
+    it('prunes a share grant whose standing is gone, then evicts the user it admitted', async () => {
+      await seedSyncedContacts();                 // contacts synced, but 500 not held
+      await shareGrant('corp', 500);              // guest corp admitted only by this
+      const u = await seedUser({ characterId: 20, corpId: 500 });
+      await seedSession(u);
+
+      const res = await revalidateActiveSessions();
+
+      expect(res.grantsPruned).toBe(1);
+      expect(await grantExists('corp', 500)).toBe(false);
+      expect(res.sessionsKilled).toBe(1);
+      expect(await liveSessionCount(u)).toBe(0);
+    });
+
+    it('keeps a share grant while the standing still holds', async () => {
+      await seedSyncedContacts();
+      await db.query(`INSERT INTO corp_standings (corp_id, contact_kind, contact_id, standing, updated_at) VALUES (1000, 'corporation', 500, 8, NOW())`);
+      await shareGrant('corp', 500);
+      const u = await seedUser({ characterId: 21, corpId: 500 });
+      await seedSession(u);
+
+      const res = await revalidateActiveSessions();
+
+      expect(res.grantsPruned).toBe(0);
+      expect(await grantExists('corp', 500)).toBe(true);
+      expect(await liveSessionCount(u)).toBe(1);
+    });
+
+    it('never prunes an admin grant, even with no standing', async () => {
+      await seedSyncedContacts();                 // synced, 500 not held
+      await grantCorp(500);                        // source='admin'
+      const u = await seedUser({ characterId: 22, corpId: 500 });
+      await seedSession(u);
+
+      const res = await revalidateActiveSessions();
+
+      expect(res.grantsPruned).toBe(0);
+      expect(await grantExists('corp', 500)).toBe(true);
+      expect(await liveSessionCount(u)).toBe(1);
+    });
+
+    it('fail-safe: prunes nothing when contacts have never been synced', async () => {
+      // No corp_standings rows at all → the table isn't a trustworthy "who lost
+      // standing" signal, so share grants are left intact.
+      await shareGrant('corp', 500);
+      const u = await seedUser({ characterId: 23, corpId: 500 });
+      await seedSession(u);
+
+      const res = await revalidateActiveSessions();
+
+      expect(res.grantsPruned).toBe(0);
+      expect(await grantExists('corp', 500)).toBe(true);
+      expect(await liveSessionCount(u)).toBe(1);
+    });
+
+    it('never prunes a character share grant (deliberate 1:1, not standing-gated)', async () => {
+      await seedSyncedContacts();
+      await shareGrant('character', 424242);       // no standing for this char
+      const res = await revalidateActiveSessions();
+      expect(res.grantsPruned).toBe(0);
+      expect(await grantExists('character', 424242)).toBe(true);
+    });
   });
 });

@@ -12,6 +12,7 @@ interface ShareRow {
   kind:      'character' | 'corp' | 'alliance';
   targetId:  number;
   name:      string | null;
+  canWrite:  boolean;
   createdAt: string;
 }
 
@@ -61,6 +62,10 @@ export function MapSharesSection() {
   const [submitting, setSubmitting] = useState(false);
   // Targets queued to share with in one go ("share to many").
   const [staged, setStaged] = useState<StagedTarget[]>([]);
+  // Access level applied to every target in this batch: edit (can_write=true)
+  // or view-only. Defaults to view-only — the safer default for sharing an org
+  // map outward.
+  const [canWrite, setCanWrite] = useState(false);
   // On a restricted deployment, sharing to a corp/alliance can also admit their
   // members to log in (they'd otherwise be shared-but-locked-out). Default on.
   const [grantLogin, setGrantLogin] = useState(true);
@@ -136,7 +141,7 @@ export function MapSharesSection() {
       try {
         const row = await api<ShareRow & { loginGranted?: boolean }>(`/api/maps/${mapId}/shares`, {
           method: 'POST',
-          body:   JSON.stringify({ kind: tgt.kind, targetId: tgt.id, alsoGrantLogin }),
+          body:   JSON.stringify({ kind: tgt.kind, targetId: tgt.id, canWrite, alsoGrantLogin }),
         });
         succeeded.push(row);
       } catch (e) {
@@ -254,6 +259,26 @@ export function MapSharesSection() {
           </div>
         )}
 
+        <div className="map-shares__access">
+          <span className="map-shares__access-label">{t('mapShares.accessLabel')}</span>
+          <div className="map-sidebar__btn-group">
+            <button
+              type="button"
+              className={`map-sidebar__btn-group-item${!canWrite ? ' map-sidebar__btn-group-item--active' : ''}`}
+              onClick={() => setCanWrite(false)}
+            >
+              {t('mapShares.accessView')}
+            </button>
+            <button
+              type="button"
+              className={`map-sidebar__btn-group-item${canWrite ? ' map-sidebar__btn-group-item--active' : ''}`}
+              onClick={() => setCanWrite(true)}
+            >
+              {t('mapShares.accessEdit')}
+            </button>
+          </div>
+        </div>
+
         {canGrantLogin && (
           <label className="map-shares__grant-login">
             <input type="checkbox" checked={grantLogin} onChange={(e) => setGrantLogin(e.target.checked)} />
@@ -291,6 +316,9 @@ export function MapSharesSection() {
                   </span>
                   <span className="map-shares__name" title={String(s.targetId)}>
                     {s.name ?? t('mapShares.unknownTarget', { kind: s.kind, id: s.targetId })}
+                  </span>
+                  <span className={`map-shares__access-badge map-shares__access-badge--${s.canWrite ? 'edit' : 'view'}`}>
+                    {s.canWrite ? t('mapShares.accessEdit') : t('mapShares.accessView')}
                   </span>
                   <button
                     type="button"

@@ -564,9 +564,18 @@
     "showUndivedWhs": "Show Undived WHs",
     "easyConnect": "Easy Connect",
     "connectionStyle": "Connection Style",
-    "edgeStyle": { "bezier": "Standard", "straight": "Straight", "smoothstep": "Step" },
+    "edgeStyle": {
+      "bezier": "Standard",
+      "straight": "Straight",
+      "smoothstep": "Step"
+    },
     "connectionThickness": "Connection Thickness",
-    "thickness": { "thin": "Thin", "standard": "Standard", "thick": "Thick", "extra": "Extra Thick" },
+    "thickness": {
+      "thin": "Thin",
+      "standard": "Standard",
+      "thick": "Thick",
+      "extra": "Extra Thick"
+    },
     "optimizeConnections": "⟳ Optimize Connections",
     "spreadNodes": "⊞ Spread Nodes",
     "spreadNodesTooltip": "Adjust system nodes to stop overlapping",
@@ -756,7 +765,10 @@
     "via": "via"
   },
   "mapShares": {
-    "hint": "Grant another character — or every member of a corp — edit access to this personal map. Recipients can edit content and topology but can't rename, delete, or re-share it.",
+    "hint": "Grant another character, corp, or alliance access to this map — view-only or edit. Recipients can't rename, delete, or re-share it.",
+    "accessLabel": "Access",
+    "accessView": "View",
+    "accessEdit": "Edit",
     "character": "Character",
     "corp": "Corp",
     "placeholderChar": "Exact character name",
@@ -828,7 +840,11 @@
     "sizeSmall": "Small (Frigate)",
     "rollingCalculator": "Rolling calculator",
     "custom": "Custom",
-    "collapse": { "open": "Open", "maybe": "May have collapsed", "collapsed": "Collapsed" },
+    "collapse": {
+      "open": "Open",
+      "maybe": "May have collapsed",
+      "collapsed": "Collapsed"
+    },
     "remaining": "{{worst}}–{{best}} left · {{used}} used · max jump {{max}}",
     "useMyShip": "Use my ship",
     "useMyShipTitle": "Cold = {{ship}} ({{mass}}), hot = +prop",
