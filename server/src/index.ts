@@ -32,6 +32,7 @@ import releasesRouter     from './routes/releases.js';
 import { loadRouteGraph } from './services/routeGraph.js';
 import { seedDiscordWebhooksFromEnv } from './services/discordSeed.js';
 import { seedAccessGrantsFromEnv } from './services/accessGrantsSeed.js';
+import { expireIdleOrgMaps, expireOrphanPersonalMaps } from './services/mapCleanup.js';
 import { startSdeAutoUpdate } from './services/sdeUpdate.js';
 import { startLocationPoller } from './services/locationPoll.js';
 import { startWhSweeper } from './services/whSweep.js';
@@ -163,24 +164,19 @@ app.use((err: Error & { status?: number; type?: string }, req: express.Request, 
   res.status(err.status ?? 500).json({ error: 'internal' });
 });
 
-async function expireMaps() {
-  if (!config.restrictedMode) return;
-  const cutoff = new Date(Date.now() - config.corpMapExpireDays * 24 * 60 * 60 * 1000);
-  // Corp + alliance maps only — a member's idle personal maps must never be
-  // auto-deleted by this sweep (matches the partial idx_maps_last_active index).
-  const { rowCount } = await db.query(
-    `DELETE FROM maps WHERE last_active_at < $1 AND (corp_id IS NOT NULL OR alliance_id IS NOT NULL)`,
-    [cutoff],
-  );
-  if (rowCount) console.log(`Expired ${rowCount} inactive corp/alliance map(s)`);
+// Map-lifecycle cleanup: idle corp/alliance maps + personal maps whose owner can
+// no longer log in. Both no-op in solo mode. See services/mapCleanup.ts.
+async function cleanupMaps() {
+  await expireIdleOrgMaps().catch((err) => rootLog.warn('expireIdleOrgMaps failed:', err));
+  await expireOrphanPersonalMaps().catch((err) => rootLog.warn('expireOrphanPersonalMaps failed:', err));
 }
 
 migrate()
   .then(async () => {
     await seedDiscordWebhooksFromEnv();
     await seedAccessGrantsFromEnv();
-    await expireMaps();
-    setInterval(expireMaps, 60 * 60 * 1000); // re-check hourly
+    await cleanupMaps();
+    setInterval(cleanupMaps, 60 * 60 * 1000); // re-check hourly
     await initActivity();
     await loadRouteGraph();
     app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
