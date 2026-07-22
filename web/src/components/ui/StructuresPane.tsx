@@ -7,6 +7,7 @@ import { useShareMode } from '../../context/ShareModeContext';
 import type { Structure, StructureType } from '../../types';
 import { NotesEditor } from './NotesEditor';
 import { ConfirmModal, shouldSkipConfirm } from './ConfirmModal';
+import { Select } from './Select';
 import { ContextMenu } from './ContextMenu';
 import { XIcon, PathIcon, MapPinSimpleIcon } from '@phosphor-icons/react';
 import { setDestination, addWaypoint } from '../../api/waypoint';
@@ -282,15 +283,15 @@ export function StructuresPane({ systemId }: { systemId: string }) {
                     {isShareMode ? (
                       <span className="sig-text">{typeLabel(s.structureType)}</span>
                     ) : (
-                      <select
-                        className="sig-select"
+                      <Select
+                        className="sig-type-select"
                         value={s.structureType}
-                        onChange={(e) => updateStructure(s.id, { structureType: e.target.value as StructureType })}
-                      >
-                        {(Object.keys(STRUCTURE_TYPE_LABELS) as StructureType[]).map((st) => (
-                          <option key={st} value={st}>{typeLabel(st)}</option>
-                        ))}
-                      </select>
+                        onChange={(v) => updateStructure(s.id, { structureType: v as StructureType })}
+                        options={(Object.keys(STRUCTURE_TYPE_LABELS) as StructureType[]).map((st) => ({
+                          value: st,
+                          label: typeLabel(st),
+                        }))}
+                      />
                     )}
                   </td>
                   <td>

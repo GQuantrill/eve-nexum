@@ -11,6 +11,7 @@ import type { Signature, SigType } from '../../types';
 import { ConfirmModal, shouldSkipConfirm } from './ConfirmModal';
 import { NotesEditor } from './NotesEditor';
 import { WormholeTypePicker } from './WormholeTypePicker';
+import { Select } from './Select';
 import { XIcon, CopyIcon, ColumnsIcon } from '@phosphor-icons/react';
 import { LeadsToDropdown } from './LeadsToDropdown';
 import { toast } from './Toaster';
@@ -152,7 +153,7 @@ function formatDelay(sec: number): string {
 // Order the type-filter chips most-useful-first. Covers every SigType.
 const SIG_TYPE_FILTER_ORDER: SigType[] = ['wormhole', 'data', 'relic', 'gas', 'ore', 'combat', 'unknown'];
 
-// Signature-type <select> options, alphabetical by label. Used for both the
+// Signature-type Select options, alphabetical by label. Used for both the
 // per-row type picker and the bulk "set type" dropdown.
 const SIG_TYPE_OPTIONS: SigType[] = ['combat', 'data', 'gas', 'ore', 'relic', 'unknown', 'wormhole'];
 
@@ -774,36 +775,30 @@ export function SignaturePane({ systemId }: { systemId: string }) {
             />
             <span>{t('signatures.overwriteToggle')}</span>
           </label>
-          <select
-            className="sig-toolbar-btn"
-            value={overwriteDelay}
-            onChange={(e) => setOverwriteDelay(Number(e.target.value))}
-            aria-label={t('signatures.removeDelayLabel')}
-            data-tooltip={t('signatures.removeDelayTooltip')}
-          >
-            {OVERWRITE_DELAY_OPTIONS.map((s) => (
-              <option key={s} value={s}>
-                {s === 0 ? t('signatures.removeDelayInstant') : formatDelay(s)}
-              </option>
-            ))}
-          </select>
+          <Select
+            value={String(overwriteDelay)}
+            onChange={(v) => setOverwriteDelay(Number(v))}
+            ariaLabel={t('signatures.removeDelayLabel')}
+            title={t('signatures.removeDelayTooltip')}
+            options={OVERWRITE_DELAY_OPTIONS.map((s) => ({
+              value: String(s),
+              label: s === 0 ? t('signatures.removeDelayInstant') : formatDelay(s),
+            }))}
+          />
           {selected.size > 0 && (
             <>
-              <select
-                className="sig-toolbar-btn"
+              <Select
                 value=""
-                onChange={(e) => {
-                  if (!e.target.value) return;
-                  setSelectedType(e.target.value as SigType);
-                  e.target.value = '';
-                }}
-                aria-label={t('signatures.setTypeAria')}
-              >
-                <option value="">{t('signatures.setType', { count: selected.size })}</option>
-                {SIG_TYPE_OPTIONS.map((type) => (
-                  <option key={type} value={type}>{t(`sigType.${type}`)}</option>
-                ))}
-              </select>
+                onChange={(v) => { if (v) setSelectedType(v as SigType); }}
+                ariaLabel={t('signatures.setTypeAria')}
+                placeholder={t('signatures.setType', { count: selected.size })}
+                showCheck={false}
+                options={SIG_TYPE_OPTIONS.map((type) => ({
+                  value: type,
+                  text:  t(`sigType.${type}`),
+                  label: <span className={`sig-select--type-${type}`}>{t(`sigType.${type}`)}</span>,
+                }))}
+              />
               <button className="sig-toolbar-btn sig-toolbar-btn--danger" onClick={deleteSelected}>
                 {t('signatures.deleteSelected', { count: selected.size })}
               </button>
@@ -983,15 +978,18 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                       {sigTypeLabel(sig.sigType)}
                     </span>
                   ) : (
-                    <select
-                      className={`sig-select sig-select--type sig-select--type-${sig.sigType}`}
+                    <Select
+                      className="sig-type-select"
                       value={sig.sigType}
-                      onChange={(e) => updateSig(sig.id, { sigType: e.target.value as SigType })}
-                    >
-                      {SIG_TYPE_OPTIONS.map((st) => (
-                        <option key={st} value={st}>{sigTypeLabel(st)}</option>
-                      ))}
-                    </select>
+                      onChange={(v) => updateSig(sig.id, { sigType: v as SigType })}
+                      options={SIG_TYPE_OPTIONS.map((st) => ({
+                        value: st,
+                        text:  sigTypeLabel(st),
+                        // Reuse the existing per-type colour classes so the value
+                        // stays tinted by type in the trigger and the list.
+                        label: <span className={`sig-select--type-${st}`}>{sigTypeLabel(st)}</span>,
+                      }))}
+                    />
                   )}
                 </td>
                 <td className="sig-td--wh">
