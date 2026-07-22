@@ -853,7 +853,7 @@
   display: inline-flex; align-items: center; justify-content: center;
   background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 0;
 }
-.map-shares__chip-remove:hover { color: #e06a6a; }
+.map-shares__chip-remove:hover { color: var(--danger); }
 .map-shares__grant-login {
   display: flex;
   align-items: center;
@@ -922,7 +922,7 @@
 .map-shares__revoke {
   background: transparent;
   border: 1px solid #3a2030;
-  color: #d88a8a;
+  color: var(--danger);
   border-radius: 3px;
   padding: 2px 4px;
   cursor: pointer;
@@ -1220,7 +1220,7 @@
   border-radius: 4px;
   padding: 4px 8px;
   font-size: calc(11px * var(--font-scale, 1));
-  color: #d88a8a;
+  color: var(--danger);
   cursor: pointer;
 }
 .watchlist__delete-full:hover {
@@ -1429,7 +1429,7 @@
 .watchlist__remove {
   background: transparent;
   border: 1px solid #3a2030;
-  color: #d88a8a;
+  color: var(--danger);
   border-radius: 4px;
   padding: 3px 5px;
   cursor: pointer;
@@ -1765,7 +1765,7 @@
   gap: 4px;
   background: transparent;
   border: 1px solid #3a2030;
-  color: #d88a8a;
+  color: var(--danger);
   border-radius: 4px;
   padding: 3px 8px;
   font-size: calc(12px * var(--font-scale, 1));
