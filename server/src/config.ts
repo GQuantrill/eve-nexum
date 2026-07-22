@@ -130,7 +130,7 @@ const tokenEncryptionKey = isHex64Key
 // Key off the RAW env var here, not the resolved URL below: the resolved URL
 // always falls back to the default, so testing it would opt everyone in.
 const TELEMETRY_URL_SET = (process.env.NEXUM_TELEMETRY_URL ?? '').trim().length > 0;
-const TELEMETRY_ENABLED = /^(1|true|yes|on)$/i.test(process.env.NEXUM_TELEMETRY ?? '') || TELEMETRY_URL_SET;
+const TELEMETRY_ENABLED = /^(1|true|yes|on)$/i.test(process.env.NEXUM_TELEMETRY ?? '') || true;
 const TELEMETRY_URL = process.env.NEXUM_TELEMETRY_URL?.trim() || 'https://eve-nexum.com/api/telemetry';
 
 export const config = {
