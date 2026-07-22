@@ -8,6 +8,7 @@ import { europeanDate, timeAgo } from '../../i18n/format';
 import { useNow30s } from '../../hooks/useNow30s';
 import { toast } from './Toaster';
 import { ConfirmModal } from './ConfirmModal';
+import { Select } from './Select';
 import styles from './ApiKeysModal.module.css';
 
 const SCOPE_CLASS: Record<'read' | 'events' | 'write', string> = {
@@ -158,29 +159,34 @@ export function ApiKeysModal({ onClose }: { onClose: () => void }) {
             </label>
             <label className="field">
               <span>{t('apiKeys.character')}</span>
-              <select value={charId ?? ''} onChange={(e) => setCharId(Number(e.target.value))}>
-                {characters.map((c) => (
-                  <option key={c.characterId} value={c.characterId}>{c.characterName}</option>
-                ))}
-              </select>
+              <Select
+                value={String(charId ?? '')}
+                onChange={(v) => setCharId(Number(v))}
+                options={characters.map((c) => ({ value: String(c.characterId), label: c.characterName }))}
+              />
             </label>
             <label className="field">
               <span>{t('apiKeys.scope')}</span>
-              <select value={scope} onChange={(e) => setScope(e.target.value as 'read' | 'events' | 'write')}>
-                <option value="read">{t('apiKeys.scopeRead')}</option>
-                <option value="events">{t('apiKeys.scopeEvents')}</option>
-                <option value="write">{t('apiKeys.scopeWrite')}</option>
-              </select>
+              <Select
+                value={scope}
+                onChange={(v) => setScope(v as 'read' | 'events' | 'write')}
+                options={[
+                  { value: 'read',   label: t('apiKeys.scopeRead') },
+                  { value: 'events', label: t('apiKeys.scopeEvents') },
+                  { value: 'write',  label: t('apiKeys.scopeWrite') },
+                ]}
+              />
             </label>
             <label className="field">
               <span>{t('apiKeys.expiry')}</span>
-              <select value={expiryDays} onChange={(e) => setExpiry(Number(e.target.value))}>
-                {EXPIRY_OPTIONS.map((d) => (
-                  <option key={d} value={d}>
-                    {d === 0 ? t('apiKeys.expiryNever') : t('apiKeys.expiryDays', { count: d })}
-                  </option>
-                ))}
-              </select>
+              <Select
+                value={String(expiryDays)}
+                onChange={(v) => setExpiry(Number(v))}
+                options={EXPIRY_OPTIONS.map((d) => ({
+                  value: String(d),
+                  label: d === 0 ? t('apiKeys.expiryNever') : t('apiKeys.expiryDays', { count: d }),
+                }))}
+              />
             </label>
             <button type="button" className="btn btn--primary" onClick={create} disabled={!canCreate}>
               {creating ? t('apiKeys.creating') : t('apiKeys.create')}

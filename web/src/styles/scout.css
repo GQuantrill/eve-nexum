@@ -21,28 +21,8 @@
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
-.scout-pane__sort-select {
-  flex: 1;
-  background: var(--surface-base);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  color: var(--text-default);
-  font-family: inherit;
-  font-size: calc(13px * var(--font-scale, 1));
-  padding: 3px 6px;
-  cursor: pointer;
-  transition: border-color 0.15s ease;
-}
-.scout-pane__sort-select:hover { border-color: var(--accent-alt); }
-.scout-pane__sort-select:focus-visible {
-  outline: none;
-  border-color: var(--accent-alt);
-  box-shadow: 0 0 0 2px rgba(77, 157, 224, 0.25);
-}
-.scout-pane__sort-select option {
-  background: var(--surface-well);
-  color: var(--text-default);
-}
+/* Layout-only now — the themed <Select> owns the control styling. */
+.scout-pane__sort-select { flex: 1; }
 
 .scout-row {
   display: flex;

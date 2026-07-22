@@ -1,0 +1,97 @@
+/* Reusable themed <Select> — a styled replacement for native <select> that
+   opens a dark, on-theme dropdown (matching the wormhole/leads-to pickers)
+   instead of the OS-default list. Positioning + outside-click come from
+   usePopover; this file is just the look. */
+
+/* Auto-width by default (like a native <select>, which fits its content). Call
+   sites that want full-width / flex sizing pass a className. As a flex item it
+   stretches normally (flex overrides inline-block). */
+.select {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  vertical-align: middle;
+}
+
+/* Trigger button — looks like a standard form control. */
+.trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--surface-base);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: calc(13px * var(--font-scale, 1));
+  line-height: 1.3;
+  padding: 4px 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  text-align: left;
+  outline: none;
+}
+.trigger:hover:not(:disabled)  { border-color: var(--border-accent); }
+.triggerOpen,
+.trigger:focus-visible         { border-color: var(--accent); }
+.trigger:disabled              { opacity: 0.5; cursor: not-allowed; }
+.triggerInvalid,
+.triggerInvalid:hover          { border-color: var(--danger); }
+
+.value {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.placeholder { color: var(--text-muted); }
+
+.chevron {
+  flex-shrink: 0;
+  display: inline-flex;
+  color: var(--text-subtle);
+}
+
+/* Dropdown panel (rendered position:fixed by the component). */
+.dropdown {
+  background: var(--surface-raised);
+  border: 1px solid var(--border-accent);
+  border-radius: 5px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.list {
+  min-height: 0;
+  overflow-y: auto;
+  padding: 2px 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-muted) transparent;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  color: var(--text-secondary);
+  font-size: calc(13px * var(--font-scale, 1));
+}
+/* Hover OR keyboard-active highlight. */
+.option:hover:not(.optionDisabled),
+.optionActive:not(.optionDisabled) { background: var(--border); }
+/* The currently-selected value. */
+.optionSelected { color: var(--text-bright); background: #1e3555; }
+.optionSelected.optionActive { background: #24406a; }
+.optionDisabled { opacity: 0.4; cursor: not-allowed; }
+
+/* A small tick space so selected rows read clearly even without colour. */
+.check { flex-shrink: 0; width: 12px; display: inline-flex; color: var(--accent-light); }
