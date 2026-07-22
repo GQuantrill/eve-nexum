@@ -943,6 +943,11 @@
   margin: 2px 0;
 }
 
+/* View / Edit is a horizontal segmented toggle — override the base button group
+   (which is a full-width vertical list) so the two options sit side by side. */
+.map-shares__access .map-sidebar__btn-group { flex-direction: row; }
+.map-shares__access .map-sidebar__btn-group-item { width: auto; }
+
 .map-shares__access-label {
   font-size: calc(12px * var(--font-scale, 1));
   color: #a8b6cc;
