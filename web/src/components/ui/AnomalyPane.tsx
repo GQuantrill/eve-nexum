@@ -10,6 +10,7 @@ import { useClickOutside } from '../../hooks/useClickOutside';
 import type { Anomaly, AnomType } from '../../types';
 import { ConfirmModal, shouldSkipConfirm } from './ConfirmModal';
 import { NotesEditor } from './NotesEditor';
+import { Select } from './Select';
 import { XIcon, ColumnsIcon } from '@phosphor-icons/react';
 import { toast } from './Toaster';
 import { duration, DASH } from '../../i18n/format';
@@ -502,19 +503,16 @@ export function AnomalyPane({ systemId }: { systemId: string }) {
             />
             <span>{t('anomalies.overwriteToggle')}</span>
           </label>
-          <select
-            className="sig-toolbar-btn"
-            value={overwriteDelay}
-            onChange={(e) => setOverwriteDelay(Number(e.target.value))}
-            aria-label={t('anomalies.removeDelayLabel')}
-            data-tooltip={t('anomalies.removeDelayTooltip')}
-          >
-            {OVERWRITE_DELAY_OPTIONS.map((s) => (
-              <option key={s} value={s}>
-                {s === 0 ? t('anomalies.removeDelayInstant') : formatDelay(s)}
-              </option>
-            ))}
-          </select>
+          <Select
+            value={String(overwriteDelay)}
+            onChange={(v) => setOverwriteDelay(Number(v))}
+            ariaLabel={t('anomalies.removeDelayLabel')}
+            title={t('anomalies.removeDelayTooltip')}
+            options={OVERWRITE_DELAY_OPTIONS.map((s) => ({
+              value: String(s),
+              label: s === 0 ? t('anomalies.removeDelayInstant') : formatDelay(s),
+            }))}
+          />
           {selected.size > 0 && (
             <button className="sig-toolbar-btn sig-toolbar-btn--danger" onClick={deleteSelected}>
               {t('anomalies.deleteSelected', { count: selected.size })}
@@ -663,15 +661,16 @@ export function AnomalyPane({ systemId }: { systemId: string }) {
                   />
                 </td>
                 <td>
-                  <select
-                    className={`sig-select sig-select--type sig-select--type-${anom.anomType}`}
+                  <Select
+                    className="sig-type-select"
                     value={anom.anomType}
-                    onChange={(e) => updateAnom(anom.id, { anomType: e.target.value as AnomType })}
-                  >
-                    {ANOM_TYPE_OPTIONS.map((at) => (
-                      <option key={at} value={at}>{anomTypeLabel(at)}</option>
-                    ))}
-                  </select>
+                    onChange={(v) => updateAnom(anom.id, { anomType: v as AnomType })}
+                    options={ANOM_TYPE_OPTIONS.map((at) => ({
+                      value: at,
+                      text:  anomTypeLabel(at),
+                      label: <span className={`sig-select--type-${at}`}>{anomTypeLabel(at)}</span>,
+                    }))}
+                  />
                 </td>
                 <td>
                   <input
