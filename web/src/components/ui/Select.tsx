@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { ReactNode, KeyboardEvent } from 'react';
+import { createPortal } from 'react-dom';
 import { CaretDownIcon, CaretUpIcon, CheckIcon } from '@phosphor-icons/react';
 import { usePopover } from '../../hooks/usePopover';
 import styles from './Select.module.css';
@@ -143,7 +144,7 @@ export function Select<V extends string = string>({
         </span>
       </button>
 
-      {open && (
+      {open && createPortal(
         <div
           ref={dropdownRef}
           className={styles.dropdown}
@@ -179,7 +180,8 @@ export function Select<V extends string = string>({
               );
             })}
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </div>
   );
