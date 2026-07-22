@@ -29,6 +29,11 @@ import {
 // (same one-liner the Sidebar uses for its panel reorder).
 const restrictToVerticalAxis: Modifier = ({ transform }) => ({ ...transform, x: 0 });
 
+// The default "start → end" chain label. Single-sourced so the same string is
+// generated at creation and recognised later (to flip it when the chain is
+// viewed reversed and no custom name was set).
+const autoChainName = (fromName: string, toName: string) => `${fromName} → ${toName}`;
+
 // Recorded chains: pick a start + end system, the tool finds the shortest path
 // through the map's own connections and saves it; expanding a chain shows the
 // per-hop directions (warp to which sig / jump which gate), with any hop whose
@@ -117,7 +122,7 @@ export function ChainsPane() {
     const path = buildChainPath(map, fromId, toId);
     if (!path) { toast.error(t('chains.noPath')); return; }
     const label = name.trim() ||
-      `${nameById.get(fromId) ?? '?'} ${'→'} ${nameById.get(toId) ?? '?'}`;
+      autoChainName(nameById.get(fromId) ?? '?', nameById.get(toId) ?? '?');
     addRoute(label, path.systemIds, path.connectionIds);
     setName('');
     setFromId('');
@@ -180,6 +185,15 @@ export function ChainsPane() {
                 const steps = open ? buildChainSteps(view, map, sigsBySystem) : [];
                 // The chain's displayed exit = last system of the shown direction.
                 const destSysId = view.systemIds[view.systemIds.length - 1];
+                // If the row still carries its default "start → end" label (no
+                // custom name), flip the label to match the displayed direction
+                // when reversed. A user-set name is shown unchanged.
+                const endName = (r: SavedRoute, i: number) => nameById.get(r.systemIds[i]) ?? '?';
+                const lastIdx = route.systemIds.length - 1;
+                const isAutoName = route.name === autoChainName(endName(route, 0), endName(route, lastIdx));
+                const displayName = isAutoName
+                  ? autoChainName(endName(view, 0), endName(view, lastIdx))
+                  : route.name;
                 return (
                   <SortableChainItem
                     key={route.id}
@@ -192,6 +206,7 @@ export function ChainsPane() {
                     onToggle={() => setExpandedId(open ? null : route.id)}
                     onReverse={() => toggleReversed(route.id)}
                     sizeLabel={sizeLabel}
+                    displayName={displayName}
                     destEveId={eveIdById.get(destSysId) ?? null}
                     destName={nameById.get(destSysId) ?? '?'}
                   />
@@ -215,13 +230,14 @@ interface SortableChainItemProps {
   onToggle: () => void;
   onReverse: () => void;
   sizeLabel: (whType: string | null) => string | null;
+  displayName: string;
   destEveId: number | null;
   destName: string;
 }
 
 // One chain row: drag handle + collapsible header + per-hop steps. Pulls its
 // own store actions so the parent only threads view state through props.
-function SortableChainItem({ route, open, steps, canEdit, reversed, draggable, onToggle, onReverse, sizeLabel, destEveId, destName }: SortableChainItemProps) {
+function SortableChainItem({ route, open, steps, canEdit, reversed, draggable, onToggle, onReverse, sizeLabel, displayName, destEveId, destName }: SortableChainItemProps) {
   const { t } = useTranslation();
   const removeRoute         = useMapStore((s) => s.removeRoute);
   const setRouteHighlight   = useMapStore((s) => s.setRouteHighlight);
@@ -263,7 +279,7 @@ function SortableChainItem({ route, open, steps, canEdit, reversed, draggable, o
           onClick={onToggle}
         >
           {open ? <CaretDownIcon size={12} weight="bold" /> : <CaretRightIcon size={12} weight="bold" />}
-          <span className="chain-item__name">{route.name || t('chains.unnamed')}</span>
+          <span className="chain-item__name">{displayName || t('chains.unnamed')}</span>
           <span className="chain-item__hops">{t('chains.hops', { count: hops })}</span>
         </button>
         {/* Reverse the DISPLAYED direction (client-only; the saved route is
