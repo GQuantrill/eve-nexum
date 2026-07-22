@@ -11,20 +11,28 @@ import { useCanEdit } from '../../hooks/useCanEdit';
 import { useWormholeTypes } from '../../hooks/useWormholeTypes';
 import { api } from '../../api/client';
 import { toast } from './Toaster';
-import { buildChainPath, buildChainSteps } from '../../utils/chains';
+import { buildChainPath, buildChainSteps, reverseRoute } from '../../utils/chains';
 import type { ChainStep } from '../../utils/chains';
 import { whSizeForType, whSizeLabel } from '../../utils/wormholeSize';
 import { SystemCombobox } from './SystemCombobox';
+import { useRoute } from '../../hooks/useRoute';
+import { useClosestSystemsList } from '../../hooks/useClosestSystems';
+import { jumps as jumpsLabel } from '../../i18n/format';
 import type { Signature, SavedRoute } from '../../types';
 import {
   CaretRightIcon, CaretDownIcon, TrashIcon, ArrowRightIcon,
-  ArrowBendUpRightIcon, WarningIcon,
+  ArrowBendUpRightIcon, WarningIcon, ArrowsLeftRightIcon,
 } from '@phosphor-icons/react';
 
 // A chain row is dragged only up/down within the list; zero the X component so
 // both the drag transform and collision detection lock to the vertical axis
 // (same one-liner the Sidebar uses for its panel reorder).
 const restrictToVerticalAxis: Modifier = ({ transform }) => ({ ...transform, x: 0 });
+
+// The default "start → end" chain label. Single-sourced so the same string is
+// generated at creation and recognised later (to flip it when the chain is
+// viewed reversed and no custom name was set).
+const autoChainName = (fromName: string, toName: string) => `${fromName} → ${toName}`;
 
 // Recorded chains: pick a start + end system, the tool finds the shortest path
 // through the map's own connections and saves it; expanding a chain shows the
@@ -54,6 +62,14 @@ export function ChainsPane() {
   const [toId, setToId]     = useState('');
   const [name, setName]     = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  // Chains the user is viewing reversed (client-only, never persisted): the
+  // saved route stays as-is in the DB; this just flips the displayed direction.
+  const [reversedIds, setReversedIds] = useState<Set<string>>(new Set());
+  const toggleReversed = (id: string) => setReversedIds((prev) => {
+    const next = new Set(prev);
+    if (next.has(id)) next.delete(id); else next.add(id);
+    return next;
+  });
   // systemId -> its signatures, for the expanded chain's from-systems, so steps
   // can name the sig to warp to (explicit link or auto-matched by "leads to").
   const [sigsBySystem, setSigsBySystem] = useState<Map<string, Signature[]>>(new Map());
@@ -66,14 +82,21 @@ export function ChainsPane() {
     () => new Map(map.systems.map((s) => [s.id, s.name])),
     [map.systems],
   );
+  // Map-system id -> EVE system id, to route from a chain's exit to the closest
+  // systems (which are keyed by EVE id).
+  const eveIdById = useMemo(
+    () => new Map(map.systems.map((s) => [s.id, s.eveSystemId])),
+    [map.systems],
+  );
 
-  // Load the endpoint signatures for the expanded chain so its steps can name
-  // the sig to warp to. Only the "from" system of each hop matters.
+  // Load the signatures for the expanded chain so its steps can name the sig to
+  // warp to. We load EVERY system on the route (not just the forward from-
+  // systems) so the reversed view has the near-side sigs for the return hops too.
   useEffect(() => {
     if (!expandedId || !map.id) return;
     const route = map.routes.find((r) => r.id === expandedId);
     if (!route) return;
-    const fromSystems = Array.from(new Set(route.systemIds.slice(0, -1)));
+    const fromSystems = Array.from(new Set(route.systemIds));
     let cancelled = false;
     Promise.all(
       fromSystems.map((sysId) =>
@@ -99,7 +122,7 @@ export function ChainsPane() {
     const path = buildChainPath(map, fromId, toId);
     if (!path) { toast.error(t('chains.noPath')); return; }
     const label = name.trim() ||
-      `${nameById.get(fromId) ?? '?'} ${'→'} ${nameById.get(toId) ?? '?'}`;
+      autoChainName(nameById.get(fromId) ?? '?', nameById.get(toId) ?? '?');
     addRoute(label, path.systemIds, path.connectionIds);
     setName('');
     setFromId('');
@@ -154,18 +177,38 @@ export function ChainsPane() {
           <SortableContext items={routeIds} strategy={verticalListSortingStrategy}>
             <ul className="chains-list">
               {map.routes.map((route) => {
-                const open  = expandedId === route.id;
-                const steps = open ? buildChainSteps(route, map, sigsBySystem) : [];
+                const open     = expandedId === route.id;
+                const reversed = reversedIds.has(route.id);
+                // The route as displayed: flipped when the user reversed it, so
+                // steps, hop highlights and the sig lookup all use one direction.
+                const view  = reversed ? reverseRoute(route) : route;
+                const steps = open ? buildChainSteps(view, map, sigsBySystem) : [];
+                // The chain's displayed exit = last system of the shown direction.
+                const destSysId = view.systemIds[view.systemIds.length - 1];
+                // If the row still carries its default "start → end" label (no
+                // custom name), flip the label to match the displayed direction
+                // when reversed. A user-set name is shown unchanged.
+                const endName = (r: SavedRoute, i: number) => nameById.get(r.systemIds[i]) ?? '?';
+                const lastIdx = route.systemIds.length - 1;
+                const isAutoName = route.name === autoChainName(endName(route, 0), endName(route, lastIdx));
+                const displayName = isAutoName
+                  ? autoChainName(endName(view, 0), endName(view, lastIdx))
+                  : route.name;
                 return (
                   <SortableChainItem
                     key={route.id}
-                    route={route}
+                    route={view}
                     open={open}
                     steps={steps}
                     canEdit={canEdit}
+                    reversed={reversed}
                     draggable={canEdit && map.routes.length > 1}
                     onToggle={() => setExpandedId(open ? null : route.id)}
+                    onReverse={() => toggleReversed(route.id)}
                     sizeLabel={sizeLabel}
+                    displayName={displayName}
+                    destEveId={eveIdById.get(destSysId) ?? null}
+                    destName={nameById.get(destSysId) ?? '?'}
                   />
                 );
               })}
@@ -182,14 +225,19 @@ interface SortableChainItemProps {
   open: boolean;
   steps: ChainStep[];
   canEdit: boolean;
+  reversed: boolean;
   draggable: boolean;
   onToggle: () => void;
+  onReverse: () => void;
   sizeLabel: (whType: string | null) => string | null;
+  displayName: string;
+  destEveId: number | null;
+  destName: string;
 }
 
 // One chain row: drag handle + collapsible header + per-hop steps. Pulls its
 // own store actions so the parent only threads view state through props.
-function SortableChainItem({ route, open, steps, canEdit, draggable, onToggle, sizeLabel }: SortableChainItemProps) {
+function SortableChainItem({ route, open, steps, canEdit, reversed, draggable, onToggle, onReverse, sizeLabel, displayName, destEveId, destName }: SortableChainItemProps) {
   const { t } = useTranslation();
   const removeRoute         = useMapStore((s) => s.removeRoute);
   const setRouteHighlight   = useMapStore((s) => s.setRouteHighlight);
@@ -231,8 +279,20 @@ function SortableChainItem({ route, open, steps, canEdit, draggable, onToggle, s
           onClick={onToggle}
         >
           {open ? <CaretDownIcon size={12} weight="bold" /> : <CaretRightIcon size={12} weight="bold" />}
-          <span className="chain-item__name">{route.name || t('chains.unnamed')}</span>
+          <span className="chain-item__name">{displayName || t('chains.unnamed')}</span>
           <span className="chain-item__hops">{t('chains.hops', { count: hops })}</span>
+        </button>
+        {/* Reverse the DISPLAYED direction (client-only; the saved route is
+            untouched) — so the return trip's sigs are read straight off one
+            saved chain. Shown to everyone; reversing is a view action. */}
+        <button
+          type="button"
+          className={`icon-btn chain-item__reverse${reversed ? ' chain-item__reverse--on' : ''}`}
+          title={t('chains.reverse')}
+          aria-pressed={reversed}
+          onClick={onReverse}
+        >
+          <ArrowsLeftRightIcon size={13} weight="regular" />
         </button>
         {canEdit && (
           <button
@@ -312,6 +372,67 @@ function SortableChainItem({ route, open, steps, canEdit, draggable, onToggle, s
           ))}
         </ol>
       )}
+
+      {open && <ChainExitDistances destEveId={destEveId} destName={destName} />}
     </li>
+  );
+}
+
+// From a saved chain's displayed exit, how far each of the user's "closest
+// systems" is by k-space route. Only mounted while the chain is expanded, so a
+// single route lookup fires for the chain you're actually looking at. Reverses
+// with the chain (the parent passes the displayed-direction exit).
+function ChainExitDistances({ destEveId, destName }: { destEveId: number | null; destName: string }) {
+  const { t }   = useTranslation();
+  // Collapsed by default; the route lookup is deferred until it's opened, so a
+  // closed section costs no /api/route call.
+  const [open, setOpen] = useState(false);
+  const closest = useClosestSystemsList();
+  // Don't route to the exit itself if it happens to be in the list.
+  const targets = useMemo(
+    () => closest.filter((c) => c.id !== destEveId).map((c) => c.id),
+    [closest, destEveId],
+  );
+  const routes  = useRoute(open ? destEveId : null, targets);
+
+  const rows = useMemo(() => {
+    return closest
+      .filter((c) => c.id !== destEveId)
+      .map((c) => ({ id: c.id, name: c.name, jumps: routes[String(c.id)]?.jumps ?? null }))
+      // Reachable first (fewest jumps), then the unreachable, then by name.
+      .sort((a, b) => {
+        if (a.jumps === null && b.jumps === null) return a.name.localeCompare(b.name);
+        if (a.jumps === null) return 1;
+        if (b.jumps === null) return -1;
+        return a.jumps - b.jumps || a.name.localeCompare(b.name);
+      });
+  }, [closest, routes, destEveId]);
+
+  if (rows.length === 0) return null;
+
+  return (
+    <div className="chain-exits">
+      <button
+        type="button"
+        className="chain-exits__toggle"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+      >
+        {open ? <CaretDownIcon size={11} weight="bold" /> : <CaretRightIcon size={11} weight="bold" />}
+        <span className="chain-exits__head">{t('chains.fromExit', { system: destName })}</span>
+      </button>
+      {open && (
+        <ul className="chain-exits__list">
+          {rows.map((r) => (
+            <li key={r.id} className="chain-exits__row">
+              <span className="chain-exits__name">{r.name}</span>
+              <span className="chain-exits__jumps">
+                {r.jumps !== null ? jumpsLabel(t, r.jumps) : t('chains.noRoute')}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }
