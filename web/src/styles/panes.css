@@ -157,8 +157,9 @@
 }
 .chain-item__name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .chain-item__hops { flex: none; color: var(--text-subtle); font-size: calc(11px * var(--font-scale, 1)); }
-.chain-item__del { flex: none; margin-right: 4px; color: var(--text-subtle); }
-.chain-item__del:hover { color: var(--cv-conn-expired); }
+/* Always-red delete trash, matching the closest-systems + watchlist removes. */
+.chain-item__del { flex: none; margin-right: 4px; color: var(--danger); }
+.chain-item__del:hover { color: var(--danger); }
 
 /* Reverse-direction toggle. Muted like the other row icons; lights up in the
    accent colour while the chain is being viewed reversed. */
