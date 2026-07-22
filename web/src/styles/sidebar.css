@@ -2107,6 +2107,11 @@
   &--leadsto { color: #78a0c0; font-size: calc(13px * var(--font-scale, 1)); }
 }
 
+/* Full-width themed <Select> in the sig/anomaly/structure type cells (the old
+   native .sig-select was width:100%). Type tinting now comes from the option
+   labels reusing .sig-select--type-*, so this is layout only. */
+.sig-type-select { width: 100%; }
+
 .sig-toolbar-btn {
   background: transparent;
   border: 1px solid var(--border-accent);
