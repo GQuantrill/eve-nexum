@@ -1118,6 +1118,8 @@
 }
 .watchlist__group-btn:hover:not(:disabled) { color: #a0ccf8; }
 .watchlist__group-btn:disabled { opacity: 0.4; cursor: default; }
+/* The group-delete trash is always red (matches the closest-systems remove). */
+.watchlist__group-btn--del { color: var(--danger); }
 .watchlist__group-btn--del:hover:not(:disabled) { color: var(--danger); }
 .watchlist__group .watchlist__list { padding: 8px 6px; margin-top: 0; }
 
