@@ -9,6 +9,7 @@
     "unnamed": "Untitled chain",
     "hops": "{{count}} hops",
     "remove": "Delete chain",
+    "reverse": "Reverse route",
     "centerOn": "Centre on {{system}}",
     "brokenHop": "Hop broken — re-scout",
     "viaGate": "Warp to gate",

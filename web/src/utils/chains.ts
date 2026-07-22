@@ -54,6 +54,19 @@ export function buildChainPath(map: WormholeMap, fromId: string, toId: string): 
   return { systemIds, connectionIds };
 }
 
+// Flip a saved chain's direction for display only (never persisted): what was
+// the destination becomes the source and vice-versa. Reversing BOTH the system
+// and connection lists keeps hop i aligned (from=systemIds[i], conn=connIds[i]),
+// so buildChainSteps then recomputes each hop's near-side signature for the
+// return direction automatically. Pure — returns a new route, same id/name.
+export function reverseRoute(route: SavedRoute): SavedRoute {
+  return {
+    ...route,
+    systemIds:     [...route.systemIds].reverse(),
+    connectionIds: [...route.connectionIds].reverse(),
+  };
+}
+
 // gate = in-game stargate (warp to gate), wormhole = warp to its sig,
 // jumpgate = player Ansiblex bridge (take the jump bridge).
 export type ChainStepKind = 'gate' | 'wormhole' | 'jumpgate';

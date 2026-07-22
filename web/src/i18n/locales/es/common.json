@@ -9,6 +9,7 @@
     "unnamed": "Cadena sin título",
     "hops": "{{count}} saltos",
     "remove": "Eliminar cadena",
+    "reverse": "Invertir ruta",
     "centerOn": "Centrar en {{system}}",
     "brokenHop": "Salto roto — vuelve a explorar",
     "viaGate": "Warp a la puerta estelar",

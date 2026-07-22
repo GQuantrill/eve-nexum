@@ -9,6 +9,7 @@
     "unnamed": "未命名链路",
     "hops": "{{count}} 跳",
     "remove": "删除链路",
+    "reverse": "反转路线",
     "centerOn": "居中显示 {{system}}",
     "brokenHop": "该跳已断开 — 需重新探测",
     "viaGate": "跃迁至星门",

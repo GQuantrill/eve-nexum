@@ -9,6 +9,7 @@
     "unnamed": "Unbenannte Kette",
     "hops": "{{count}} Sprünge",
     "remove": "Kette löschen",
+    "reverse": "Route umkehren",
     "centerOn": "Auf {{system}} zentrieren",
     "brokenHop": "Sprung unterbrochen – neu scouten",
     "viaGate": "Zum Stargate warpen",

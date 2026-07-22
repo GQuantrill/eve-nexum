@@ -11,14 +11,14 @@ import { useCanEdit } from '../../hooks/useCanEdit';
 import { useWormholeTypes } from '../../hooks/useWormholeTypes';
 import { api } from '../../api/client';
 import { toast } from './Toaster';
-import { buildChainPath, buildChainSteps } from '../../utils/chains';
+import { buildChainPath, buildChainSteps, reverseRoute } from '../../utils/chains';
 import type { ChainStep } from '../../utils/chains';
 import { whSizeForType, whSizeLabel } from '../../utils/wormholeSize';
 import { SystemCombobox } from './SystemCombobox';
 import type { Signature, SavedRoute } from '../../types';
 import {
   CaretRightIcon, CaretDownIcon, TrashIcon, ArrowRightIcon,
-  ArrowBendUpRightIcon, WarningIcon,
+  ArrowBendUpRightIcon, WarningIcon, ArrowsLeftRightIcon,
 } from '@phosphor-icons/react';
 
 // A chain row is dragged only up/down within the list; zero the X component so
@@ -54,6 +54,14 @@ export function ChainsPane() {
   const [toId, setToId]     = useState('');
   const [name, setName]     = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  // Chains the user is viewing reversed (client-only, never persisted): the
+  // saved route stays as-is in the DB; this just flips the displayed direction.
+  const [reversedIds, setReversedIds] = useState<Set<string>>(new Set());
+  const toggleReversed = (id: string) => setReversedIds((prev) => {
+    const next = new Set(prev);
+    if (next.has(id)) next.delete(id); else next.add(id);
+    return next;
+  });
   // systemId -> its signatures, for the expanded chain's from-systems, so steps
   // can name the sig to warp to (explicit link or auto-matched by "leads to").
   const [sigsBySystem, setSigsBySystem] = useState<Map<string, Signature[]>>(new Map());
@@ -67,13 +75,14 @@ export function ChainsPane() {
     [map.systems],
   );
 
-  // Load the endpoint signatures for the expanded chain so its steps can name
-  // the sig to warp to. Only the "from" system of each hop matters.
+  // Load the signatures for the expanded chain so its steps can name the sig to
+  // warp to. We load EVERY system on the route (not just the forward from-
+  // systems) so the reversed view has the near-side sigs for the return hops too.
   useEffect(() => {
     if (!expandedId || !map.id) return;
     const route = map.routes.find((r) => r.id === expandedId);
     if (!route) return;
-    const fromSystems = Array.from(new Set(route.systemIds.slice(0, -1)));
+    const fromSystems = Array.from(new Set(route.systemIds));
     let cancelled = false;
     Promise.all(
       fromSystems.map((sysId) =>
@@ -154,17 +163,23 @@ export function ChainsPane() {
           <SortableContext items={routeIds} strategy={verticalListSortingStrategy}>
             <ul className="chains-list">
               {map.routes.map((route) => {
-                const open  = expandedId === route.id;
-                const steps = open ? buildChainSteps(route, map, sigsBySystem) : [];
+                const open     = expandedId === route.id;
+                const reversed = reversedIds.has(route.id);
+                // The route as displayed: flipped when the user reversed it, so
+                // steps, hop highlights and the sig lookup all use one direction.
+                const view  = reversed ? reverseRoute(route) : route;
+                const steps = open ? buildChainSteps(view, map, sigsBySystem) : [];
                 return (
                   <SortableChainItem
                     key={route.id}
-                    route={route}
+                    route={view}
                     open={open}
                     steps={steps}
                     canEdit={canEdit}
+                    reversed={reversed}
                     draggable={canEdit && map.routes.length > 1}
                     onToggle={() => setExpandedId(open ? null : route.id)}
+                    onReverse={() => toggleReversed(route.id)}
                     sizeLabel={sizeLabel}
                   />
                 );
@@ -182,14 +197,16 @@ interface SortableChainItemProps {
   open: boolean;
   steps: ChainStep[];
   canEdit: boolean;
+  reversed: boolean;
   draggable: boolean;
   onToggle: () => void;
+  onReverse: () => void;
   sizeLabel: (whType: string | null) => string | null;
 }
 
 // One chain row: drag handle + collapsible header + per-hop steps. Pulls its
 // own store actions so the parent only threads view state through props.
-function SortableChainItem({ route, open, steps, canEdit, draggable, onToggle, sizeLabel }: SortableChainItemProps) {
+function SortableChainItem({ route, open, steps, canEdit, reversed, draggable, onToggle, onReverse, sizeLabel }: SortableChainItemProps) {
   const { t } = useTranslation();
   const removeRoute         = useMapStore((s) => s.removeRoute);
   const setRouteHighlight   = useMapStore((s) => s.setRouteHighlight);
@@ -233,6 +250,18 @@ function SortableChainItem({ route, open, steps, canEdit, draggable, onToggle, s
           {open ? <CaretDownIcon size={12} weight="bold" /> : <CaretRightIcon size={12} weight="bold" />}
           <span className="chain-item__name">{route.name || t('chains.unnamed')}</span>
           <span className="chain-item__hops">{t('chains.hops', { count: hops })}</span>
+        </button>
+        {/* Reverse the DISPLAYED direction (client-only; the saved route is
+            untouched) — so the return trip's sigs are read straight off one
+            saved chain. Shown to everyone; reversing is a view action. */}
+        <button
+          type="button"
+          className={`icon-btn chain-item__reverse${reversed ? ' chain-item__reverse--on' : ''}`}
+          title={t('chains.reverse')}
+          aria-pressed={reversed}
+          onClick={onReverse}
+        >
+          <ArrowsLeftRightIcon size={13} weight="regular" />
         </button>
         {canEdit && (
           <button

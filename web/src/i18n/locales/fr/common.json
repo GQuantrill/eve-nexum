@@ -9,6 +9,7 @@
     "unnamed": "Chaîne sans nom",
     "hops": "{{count}} sauts",
     "remove": "Supprimer la chaîne",
+    "reverse": "Inverser le trajet",
     "centerOn": "Centrer sur {{system}}",
     "brokenHop": "Saut rompu — à re-scanner",
     "viaGate": "Warp vers la stargate",

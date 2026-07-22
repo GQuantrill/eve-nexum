@@ -160,6 +160,13 @@
 .chain-item__del { flex: none; margin-right: 4px; color: var(--text-subtle); }
 .chain-item__del:hover { color: var(--cv-conn-expired); }
 
+/* Reverse-direction toggle. Muted like the other row icons; lights up in the
+   accent colour while the chain is being viewed reversed. */
+.chain-item__reverse { flex: none; color: var(--text-subtle); }
+.chain-item__reverse:hover { color: var(--text-default); }
+.chain-item__reverse--on,
+.chain-item__reverse--on:hover { color: var(--accent); }
+
 .chain-steps { list-style: none; margin: 0; padding: 2px 8px 8px; display: flex; flex-direction: column; gap: 5px; }
 .chain-step { display: flex; flex-direction: column; gap: 2px; padding-left: 6px; border-left: 2px solid var(--border); }
 .chain-step--broken { border-left-color: var(--cv-conn-expired); }
