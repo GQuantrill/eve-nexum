@@ -1315,6 +1315,10 @@
    tight 4px 2px, tuned for the fixed-width markers.) */
 .watchlist__by { flex: 1; min-width: 80px; padding: 4px 2px 4px 8px; }
 
+/* Layout-only wrapper for the themed <Select> that replaced the native match-by
+   <select> — the Select owns its own styling, so this just sets the flex sizing. */
+.watchlist__by-select { flex: 1; min-width: 80px; }
+
 .watchlist__char-label {
   flex: 1;
   min-width: 80px;
