@@ -38,13 +38,11 @@ export function ClassPicker({ value, onChange, classes }: Props) {
         ref={btnRef}
         type="button"
         className={`wh-picker__btn${open ? ' wh-picker__btn--open' : ''}`}
+        style={{ fontFamily: 'inherit', fontWeight: 600 }}
         onClick={openAt}
       >
         <span className="wh-picker__btn-inner">
-          {/* Reuse .wh-picker__code (monospace, min-width) so the class value
-              lines up exactly like the wormhole-type picker's code; keep the
-              per-class colour inline. */}
-          <span className="wh-picker__code" style={{ color: CLASS_COLORS[value] }}>
+          <span style={{ color: CLASS_COLORS[value], fontSize: 'calc(13px * var(--font-scale, 1))' }}>
             {CLASS_LABELS[value] ?? value}
           </span>
         </span>
