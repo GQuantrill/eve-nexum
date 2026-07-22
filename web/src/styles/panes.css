@@ -210,7 +210,7 @@
 .chain-step__systems:hover { color: #fff; }
 .chain-step__via {
   display: flex; align-items: center; gap: 5px;
-  font-size: calc(11px * var(--font-scale, 1)); color: var(--text-subtle);
+  font-size: calc(12px * var(--font-scale, 1)); color: var(--text-subtle);
 }
 .chain-step__warp { display: inline-flex; align-items: center; gap: 4px; }
 .chain-step__wh {
@@ -223,7 +223,7 @@
 .chain-step__meta {
   display: flex; flex-wrap: wrap; gap: 4px 12px;
   padding-left: 16px;
-  font-size: calc(10px * var(--font-scale, 1)); color: var(--text-subtle);
+  font-size: calc(12px * var(--font-scale, 1)); color: var(--text-subtle);
 }
 
 /* Per-end "backing signature" link controls in the connection panel. */
