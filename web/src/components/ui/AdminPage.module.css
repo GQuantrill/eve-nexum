@@ -140,21 +140,6 @@
   letter-spacing: 0.06em;
 }
 
-.mRoleSelect {
-  background: var(--surface-base);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  color: var(--text-default);
-  font-family: inherit;
-  font-size: calc(12px * var(--font-scale, 1));
-  padding: 3px 6px;
-}
-
-.mRoleSelect:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
 .mPill {
   display: inline-block;
   font-size: calc(11px * var(--font-scale, 1));

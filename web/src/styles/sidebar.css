@@ -853,7 +853,7 @@
   display: inline-flex; align-items: center; justify-content: center;
   background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 0;
 }
-.map-shares__chip-remove:hover { color: #e06a6a; }
+.map-shares__chip-remove:hover { color: var(--danger); }
 .map-shares__grant-login {
   display: flex;
   align-items: center;
@@ -922,7 +922,7 @@
 .map-shares__revoke {
   background: transparent;
   border: 1px solid #3a2030;
-  color: #d88a8a;
+  color: var(--danger);
   border-radius: 3px;
   padding: 2px 4px;
   cursor: pointer;
@@ -1118,6 +1118,8 @@
 }
 .watchlist__group-btn:hover:not(:disabled) { color: #a0ccf8; }
 .watchlist__group-btn:disabled { opacity: 0.4; cursor: default; }
+/* The group-delete trash is always red (matches the closest-systems remove). */
+.watchlist__group-btn--del { color: var(--danger); }
 .watchlist__group-btn--del:hover:not(:disabled) { color: var(--danger); }
 .watchlist__group .watchlist__list { padding: 8px 6px; margin-top: 0; }
 
@@ -1148,15 +1150,9 @@
   outline: none;
 }
 .watchlist__import-name:focus { border-color: var(--accent-bright); }
+/* Layout-only — the themed <Select> owns the control styling. */
 .watchlist__import-marker {
   flex-shrink: 0;
-  background: var(--surface-well);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  color: var(--text-primary);
-  font-family: inherit;
-  font-size: calc(12px * var(--font-scale, 1));
-  padding: 4px 6px;
 }
 .watchlist__import-text {
   width: 100%;
@@ -1218,7 +1214,7 @@
   border-radius: 4px;
   padding: 4px 8px;
   font-size: calc(11px * var(--font-scale, 1));
-  color: #d88a8a;
+  color: var(--danger);
   cursor: pointer;
 }
 .watchlist__delete-full:hover {
@@ -1241,16 +1237,9 @@
   gap: 6px;
   flex-wrap: wrap;
 }
+/* Layout-only — the themed <Select> owns the control styling. */
 .watchlist__combine {
   align-self: flex-start;
-  background: var(--surface-base);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 3px 6px;
-  font-size: calc(11px * var(--font-scale, 1));
-  color: #9fb0d0;
-  cursor: pointer;
-  outline: none;
 }
 .watchlist__add-criteria {
   align-self: flex-start;
@@ -1260,8 +1249,9 @@
   background: none;
   border: 1px dashed #2a3550;
   border-radius: 4px;
-  padding: 3px 8px;
-  font-size: calc(11px * var(--font-scale, 1));
+  /* Same height/type size as the criteria dropdowns above it. */
+  padding: 4px 8px;
+  font-size: calc(12px * var(--font-scale, 1));
   color: var(--text-muted);
   cursor: pointer;
 }
@@ -1288,21 +1278,26 @@
   width: 20px;
 }
 
+/* Layout-only — the themed <Select> owns the control styling. */
 .watchlist__marker,
 .watchlist__by {
   flex-shrink: 0;
-  background: var(--surface-base);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 4px 2px;
-  font-size: calc(12px * var(--font-scale, 1));
-  color: var(--text-primary);
-  outline: none;
-  cursor: pointer;
 }
 
-.watchlist__marker { width: 82px; }
+/* Roomier now that the marker icon lives inside the Select (trigger + options)
+   rather than as a separate element beside it. */
+.watchlist__marker { min-width: 96px; }
+/* Icon + label inside a marker option / the trigger. */
+.watchlist__marker-opt { display: inline-flex; align-items: center; gap: 6px; }
+/* Contains / Leads to selects: roomier text on the left, tight on the right so
+   the native <select> arrow sits near the edge — matching .watchlist__combine so
+   all the criteria dropdowns look uniform. (The shared marker rule keeps its
+   tight 4px 2px, tuned for the fixed-width markers.) */
 .watchlist__by { flex: 1; min-width: 80px; }
+
+/* Layout-only wrapper for the themed <Select> that replaced the native match-by
+   <select> — the Select owns its own styling, so this just sets the flex sizing. */
+.watchlist__by-select { flex: 1; min-width: 80px; }
 
 .watchlist__char-label {
   flex: 1;
@@ -1335,8 +1330,8 @@
   border-color: var(--accent-bright);
 }
 
-/* The "System type" mode reuses the value-input styling as a class dropdown. */
-.watchlist__class-select { cursor: pointer; }
+/* "System type" mode: the themed <Select>; just the flex sizing here. */
+.watchlist__class-select { flex: 1; min-width: 96px; }
 
 /* Duplicate of an entry already on the list — the typed value collides with
    another row. Outline the field red and explain below; the duplicate doesn't
@@ -1427,7 +1422,7 @@
 .watchlist__remove {
   background: transparent;
   border: 1px solid #3a2030;
-  color: #d88a8a;
+  color: var(--danger);
   border-radius: 4px;
   padding: 3px 5px;
   cursor: pointer;
@@ -1763,7 +1758,7 @@
   gap: 4px;
   background: transparent;
   border: 1px solid #3a2030;
-  color: #d88a8a;
+  color: var(--danger);
   border-radius: 4px;
   padding: 3px 8px;
   font-size: calc(12px * var(--font-scale, 1));
@@ -2373,7 +2368,7 @@ select.sig-toolbar-btn option {
 .wh-picker__option:hover   { background: var(--border); }
 .wh-picker__option--active { background: #1e3555; }
 
-.wh-picker__code { font-family: 'Courier New', monospace; font-weight: 700; font-size: calc(14px * var(--font-scale, 1)); color: var(--accent-light); min-width: 44px; }
+.wh-picker__code { font-family: 'Courier New', monospace; font-weight: 700; font-size: calc(14px * var(--font-scale, 1)); color: var(--accent-light); min-width: 37px; }
 .wh-picker__arrow { color: var(--text-faintest); font-size: calc(13px * var(--font-scale, 1)); }
 .wh-picker__dest  { font-size: calc(14px * var(--font-scale, 1)); font-weight: 600; }
 .wh-picker__placeholder { color: var(--text-bright); font-size: calc(14px * var(--font-scale, 1)); }

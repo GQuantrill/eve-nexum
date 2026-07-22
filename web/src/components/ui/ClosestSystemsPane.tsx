@@ -5,7 +5,7 @@ import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from 
 import type { DragEndEvent } from '@dnd-kit/core';
 import { SortableContext, useSortable, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { MapPinSimpleIcon, PathIcon, XIcon, PlusIcon, HouseIcon } from '@phosphor-icons/react';
+import { MapPinSimpleIcon, PathIcon, XIcon, PlusIcon, HouseIcon, TrashIcon } from '@phosphor-icons/react';
 import { useShallow } from 'zustand/react/shallow';
 import { useRoute, type RouteEntry } from '../../hooks/useRoute';
 import { useEsiSearch } from '../../hooks/useEsiSearch';
@@ -143,7 +143,7 @@ function Row({ item, route, isOpen, onToggle, onRemove, routeMode }: RowProps) {
             aria-label={t('closest.removeFromList')}
             data-tooltip={t('closest.removeFromList')}
           >
-            <XIcon size={14} weight="regular" color="#e25a5a" />
+            <TrashIcon size={14} weight="regular" color="#e05a5a" />
           </button>
         )}
       </div>

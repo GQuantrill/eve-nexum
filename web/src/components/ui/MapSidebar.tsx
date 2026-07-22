@@ -11,6 +11,7 @@ import { useMapStore } from "../../store/mapStore";
 import { useAuth, isAdminRole, isAllianceAdminRole, type Role } from "../../context/AuthContext";
 import { api } from "../../api/client";
 import { toast } from "./Toaster";
+import { Select } from "./Select";
 import { useProximityThreshold } from "../../hooks/useProximityAlerts";
 import { useStaleThreshold } from "../../hooks/useStaleThreshold";
 import {
@@ -355,18 +356,15 @@ function ShareSection() {
           <label className="map-sidebar__label" htmlFor="share-expiry">
             {t("mapSidebar.linkExpiresAfter")}
           </label>
-          <select
+          <Select
             id="share-expiry"
-            className="map-sidebar__select"
-            value={expiryHours}
-            onChange={(e) => setExpiryHours(parseInt(e.target.value, 10))}
-          >
-            {SHARE_EXPIRY_OPTIONS.map((o) => (
-              <option key={o.hours} value={o.hours}>
-                {o.label(t)}
-              </option>
-            ))}
-          </select>
+            value={String(expiryHours)}
+            onChange={(v) => setExpiryHours(parseInt(v, 10))}
+            options={SHARE_EXPIRY_OPTIONS.map((o) => ({
+              value: String(o.hours),
+              label: o.label(t),
+            }))}
+          />
         </div>
       )}
 
@@ -510,17 +508,16 @@ function LazyWhSweepToggle() {
           since the grace period has no effect otherwise. */}
       <div className="map-sidebar__row">
         <label className="map-sidebar__label" htmlFor="collapse-grace">{t("mapSidebar.collapseGrace")}</label>
-        <select
+        <Select
           id="collapse-grace"
-          className="map-sidebar__select"
           value={String(grace)}
           disabled={!enabled || saving}
-          onChange={(e) => persist({ collapseGraceHours: parseFloat(e.target.value) }, { collapseGraceHours: grace })}
-        >
-          {COLLAPSE_GRACE_OPTIONS.map((o) => (
-            <option key={o.h} value={String(o.h)}>{o.label(t)}</option>
-          ))}
-        </select>
+          onChange={(v) => persist({ collapseGraceHours: parseFloat(v) }, { collapseGraceHours: grace })}
+          options={COLLAPSE_GRACE_OPTIONS.map((o) => ({
+            value: String(o.h),
+            label: o.label(t),
+          }))}
+        />
       </div>
       <div className="map-sidebar__hint">{t("mapSidebar.collapseGraceHint")}</div>
     </>
@@ -993,21 +990,21 @@ export function MapSidebar() {
             >
               {t("mapSidebar.connectionThickness")}
             </label>
-            <select
+            <Select
               id="connection-thickness"
-              className="map-sidebar__select"
               value={connectionThickness}
-              onChange={(e) =>
+              onChange={(v) =>
                 setConnectionThickness(
-                  e.target.value as "thin" | "standard" | "thick" | "extra",
+                  v as "thin" | "standard" | "thick" | "extra",
                 )
               }
-            >
-              <option value="thin">{t("mapSidebar.thickness.thin")}</option>
-              <option value="standard">{t("mapSidebar.thickness.standard")}</option>
-              <option value="thick">{t("mapSidebar.thickness.thick")}</option>
-              <option value="extra">{t("mapSidebar.thickness.extra")}</option>
-            </select>
+              options={[
+                { value: "thin", label: t("mapSidebar.thickness.thin") },
+                { value: "standard", label: t("mapSidebar.thickness.standard") },
+                { value: "thick", label: t("mapSidebar.thickness.thick") },
+                { value: "extra", label: t("mapSidebar.thickness.extra") },
+              ]}
+            />
           </div>
 
           {!hideTopologyTools && (
@@ -1046,17 +1043,15 @@ export function MapSidebar() {
             <label className="map-sidebar__label" htmlFor="route-mode">
               {t("mapSidebar.routePreference")}
             </label>
-            <select
+            <Select
               id="route-mode"
-              className="map-sidebar__select"
               value={routeMode}
-              onChange={(e) =>
-                setRouteMode(e.target.value as "shortest" | "secure")
-              }
-            >
-              <option value="shortest">{t("mapSidebar.routeShortest")}</option>
-              <option value="secure">{t("mapSidebar.routeSecure")}</option>
-            </select>
+              onChange={(v) => setRouteMode(v as "shortest" | "secure")}
+              options={[
+                { value: "shortest", label: t("mapSidebar.routeShortest") },
+                { value: "secure", label: t("mapSidebar.routeSecure") },
+              ]}
+            />
           </div>
           <p className="map-sidebar__hint">
             {t("mapSidebar.routeHint")}
@@ -1104,19 +1099,19 @@ export function MapSidebar() {
             <label className="map-sidebar__label" htmlFor="proximity-threshold">
               {t("mapSidebar.threshold")}
             </label>
-            <select
+            <Select
               id="proximity-threshold"
-              className="map-sidebar__select"
-              value={threshold}
-              onChange={(e) => setThreshold(parseInt(e.target.value, 10))}
-            >
-              <option value={0}>{t("mapSidebar.proximityInSystem")}</option>
-              <option value={1}>{t("mapSidebar.proximityLe", { count: 1 })}</option>
-              <option value={2}>{t("mapSidebar.proximityLe", { count: 2 })}</option>
-              <option value={3}>{t("mapSidebar.proximityLe", { count: 3 })}</option>
-              <option value={4}>{t("mapSidebar.proximityLe", { count: 4 })}</option>
-              <option value={5}>{t("mapSidebar.proximityLe", { count: 5 })}</option>
-            </select>
+              value={String(threshold)}
+              onChange={(v) => setThreshold(parseInt(v, 10))}
+              options={[
+                { value: "0", label: t("mapSidebar.proximityInSystem") },
+                { value: "1", label: t("mapSidebar.proximityLe", { count: 1 }) },
+                { value: "2", label: t("mapSidebar.proximityLe", { count: 2 }) },
+                { value: "3", label: t("mapSidebar.proximityLe", { count: 3 }) },
+                { value: "4", label: t("mapSidebar.proximityLe", { count: 4 }) },
+                { value: "5", label: t("mapSidebar.proximityLe", { count: 5 }) },
+              ]}
+            />
           </div>
           <div className="map-sidebar__hint">
             {t("mapSidebar.proximityNotifyHint")}
@@ -1230,21 +1225,21 @@ export function MapSidebar() {
               <label className="map-sidebar__label" htmlFor="stale-threshold">
                 {t("mapSidebar.threshold")}
               </label>
-              <select
+              <Select
                 id="stale-threshold"
-                className="map-sidebar__select"
-                value={staleHours}
-                onChange={(e) => setStaleHours(parseInt(e.target.value, 10))}
-              >
-                <option value={1}>{t("units.hours", { count: 1 })}</option>
-                <option value={4}>{t("units.hours", { count: 4 })}</option>
-                <option value={12}>{t("units.hours", { count: 12 })}</option>
-                <option value={24}>{t("units.hours", { count: 24 })}</option>
-                <option value={48}>{t("units.hours", { count: 48 })}</option>
-                <option value={168}>{t("units.weeks", { count: 1 })}</option>
-                <option value={720}>{t("units.months", { count: 1 })}</option>
-                <option value={0}>{t("mapSidebar.staleNever")}</option>
-              </select>
+                value={String(staleHours)}
+                onChange={(v) => setStaleHours(parseInt(v, 10))}
+                options={[
+                  { value: "1", label: t("units.hours", { count: 1 }) },
+                  { value: "4", label: t("units.hours", { count: 4 }) },
+                  { value: "12", label: t("units.hours", { count: 12 }) },
+                  { value: "24", label: t("units.hours", { count: 24 }) },
+                  { value: "48", label: t("units.hours", { count: 48 }) },
+                  { value: "168", label: t("units.weeks", { count: 1 }) },
+                  { value: "720", label: t("units.months", { count: 1 }) },
+                  { value: "0", label: t("mapSidebar.staleNever") },
+                ]}
+              />
             </div>
           </CollapsibleSection>
         )}
@@ -1355,12 +1350,12 @@ export function MapSidebar() {
                   {showMinimap && (
                     <div className="map-sidebar__row">
                       <label className="map-sidebar__label" htmlFor="minimap-position">{t("mapSidebar.position")}</label>
-                      <select id="minimap-position" className="map-sidebar__select" value={minimapPosition} onChange={(e) => setMinimapPosition(e.target.value as MinimapPosition)}>
-                        <option value="bottom-right">{t("mapSidebar.minimapPos.bottomRight")}</option>
-                        <option value="bottom-left">{t("mapSidebar.minimapPos.bottomLeft")}</option>
-                        <option value="top-right">{t("mapSidebar.minimapPos.topRight")}</option>
-                        <option value="top-left">{t("mapSidebar.minimapPos.topLeft")}</option>
-                      </select>
+                      <Select id="minimap-position" value={minimapPosition} onChange={(v) => setMinimapPosition(v as MinimapPosition)} options={[
+                        { value: "bottom-right", label: t("mapSidebar.minimapPos.bottomRight") },
+                        { value: "bottom-left", label: t("mapSidebar.minimapPos.bottomLeft") },
+                        { value: "top-right", label: t("mapSidebar.minimapPos.topRight") },
+                        { value: "top-left", label: t("mapSidebar.minimapPos.topLeft") },
+                      ]} />
                     </div>
                   )}
                   <div className="map-sidebar__row">
@@ -1374,21 +1369,21 @@ export function MapSidebar() {
                   </div>
                   <div className="map-sidebar__row">
                     <label className="map-sidebar__label" htmlFor="placement-dir">{t("mapSidebar.placement")}</label>
-                    <select id="placement-dir" className="map-sidebar__select" value={normalizePlacement(placement)} onChange={(e) => setPlacement(e.target.value)}>
-                      <option value="east">{t("mapSidebar.placementOptions.east")}</option>
-                      <option value="south">{t("mapSidebar.placementOptions.south")}</option>
-                      <option value="west">{t("mapSidebar.placementOptions.west")}</option>
-                      <option value="north">{t("mapSidebar.placementOptions.north")}</option>
-                    </select>
+                    <Select id="placement-dir" value={normalizePlacement(placement)} onChange={(v) => setPlacement(v)} options={[
+                      { value: "east", label: t("mapSidebar.placementOptions.east") },
+                      { value: "south", label: t("mapSidebar.placementOptions.south") },
+                      { value: "west", label: t("mapSidebar.placementOptions.west") },
+                      { value: "north", label: t("mapSidebar.placementOptions.north") },
+                    ]} />
                   </div>
                   <div className="map-sidebar__row">
                     <label className="map-sidebar__label" htmlFor="color-vision">{t("mapSidebar.colorVision")}</label>
-                    <select id="color-vision" className="map-sidebar__select" value={colorVision} onChange={(e) => setColorVision(e.target.value)}>
-                      <option value="off">{t("mapSidebar.colorVisionOptions.off")}</option>
-                      <option value="deuteranopia">{t("mapSidebar.colorVisionOptions.deuteranopia")}</option>
-                      <option value="protanopia">{t("mapSidebar.colorVisionOptions.protanopia")}</option>
-                      <option value="tritanopia">{t("mapSidebar.colorVisionOptions.tritanopia")}</option>
-                    </select>
+                    <Select id="color-vision" value={colorVision} onChange={(v) => setColorVision(v)} options={[
+                      { value: "off", label: t("mapSidebar.colorVisionOptions.off") },
+                      { value: "deuteranopia", label: t("mapSidebar.colorVisionOptions.deuteranopia") },
+                      { value: "protanopia", label: t("mapSidebar.colorVisionOptions.protanopia") },
+                      { value: "tritanopia", label: t("mapSidebar.colorVisionOptions.tritanopia") },
+                    ]} />
                   </div>
                 </>
               )}

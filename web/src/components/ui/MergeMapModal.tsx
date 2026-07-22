@@ -7,6 +7,7 @@ import { api } from '../../api/client';
 import { useMapStore, type MapListItem } from '../../store/mapStore';
 import { useAuth, isAdminRole } from '../../context/AuthContext';
 import { toast } from './Toaster';
+import { Select } from './Select';
 
 interface MergeResult {
   added:   { systems: number; connections: number; signatures: number; structures: number };
@@ -100,22 +101,22 @@ export function MergeMapModal({ onClose }: { onClose: () => void }) {
         <div className="modal__body">
           <label className="field">
             <span>{t('merge.sourceMap')}</span>
-            <select value={sourceId} onChange={(e) => setSourceId(e.target.value)}>
-              <option value="">{t('merge.selectSource')}</option>
-              {sourceOptions.map((m) => (
-                <option key={m.id} value={m.id}>{mapLabel(t, m)}</option>
-              ))}
-            </select>
+            <Select
+              value={sourceId}
+              onChange={(v) => setSourceId(v)}
+              placeholder={t('merge.selectSource')}
+              options={sourceOptions.map((m) => ({ value: m.id, label: mapLabel(t, m) }))}
+            />
           </label>
 
           <label className="field">
             <span>{t('merge.destMap')}</span>
-            <select value={destId} onChange={(e) => setDestId(e.target.value)}>
-              <option value="">{t('merge.selectDest')}</option>
-              {destOptions.map((m) => (
-                <option key={m.id} value={m.id}>{mapLabel(t, m)}</option>
-              ))}
-            </select>
+            <Select
+              value={destId}
+              onChange={(v) => setDestId(v)}
+              placeholder={t('merge.selectDest')}
+              options={destOptions.map((m) => ({ value: m.id, label: mapLabel(t, m) }))}
+            />
           </label>
 
           {sameMap && (
