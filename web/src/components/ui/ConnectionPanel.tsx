@@ -8,6 +8,7 @@ import { useCanEdit } from '../../hooks/useCanEdit';
 import { systemDisplayName } from '../../utils/systemName';
 import { useCharacterLocation } from '../../hooks/useCharacterLocation';
 import { WHTypeInfo } from './WHTypeInfo';
+import { Select } from './Select';
 import { whSizeForType } from '../../utils/wormholeSize';
 import { effectiveExpiryMs, lifeBucket, knownMaxLifeHours } from '../../utils/whLifetime';
 import { ConfirmModal } from './ConfirmModal';
@@ -293,48 +294,47 @@ export function ConnectionPanel() {
           <div className="conn-siglink__label">{t('connPanel.sigLink')}</div>
           <label className="field">
             <span>{t('connPanel.sigInSystem', { system: src ? systemDisplayName(src) : '?' })}</span>
-            <select
+            <Select
               value={conn.sourceSignatureId ?? ''}
               disabled={!canEdit}
-              onChange={(e) => update({ sourceSignatureId: e.target.value || null })}
-            >
-              <option value="">{t('connPanel.sigNone')}</option>
-              {linkSigs(endpointSigs.src).map((s) => (
-                <option key={s.id} value={s.id}>{sigLabel(s)}</option>
-              ))}
-            </select>
+              onChange={(v) => update({ sourceSignatureId: v || null })}
+              options={[
+                { value: '', label: t('connPanel.sigNone') },
+                ...linkSigs(endpointSigs.src).map((s) => ({ value: s.id, label: sigLabel(s) })),
+              ]}
+            />
           </label>
           <label className="field">
             <span>{t('connPanel.sigInSystem', { system: tgt ? systemDisplayName(tgt) : '?' })}</span>
-            <select
+            <Select
               value={conn.targetSignatureId ?? ''}
               disabled={!canEdit}
-              onChange={(e) => update({ targetSignatureId: e.target.value || null })}
-            >
-              <option value="">{t('connPanel.sigNone')}</option>
-              {linkSigs(endpointSigs.tgt).map((s) => (
-                <option key={s.id} value={s.id}>{sigLabel(s)}</option>
-              ))}
-            </select>
+              onChange={(v) => update({ targetSignatureId: v || null })}
+              options={[
+                { value: '', label: t('connPanel.sigNone') },
+                ...linkSigs(endpointSigs.tgt).map((s) => ({ value: s.id, label: sigLabel(s) })),
+              ]}
+            />
           </label>
         </div>
       )}
 
       <label className="field">
         <span>{t('connPanel.massStatus')}</span>
-        <select
+        <Select
           value={conn.massStatus ?? ''}
-          onChange={(e) => update({ massStatus: e.target.value as MassStatus })}
-        >
-          <option value="stable">{t('connPanel.stable')}</option>
-          <option value="destabilized">{t('connPanel.destabilized')}</option>
-          <option value="critical">{t('connPanel.critical')}</option>
-        </select>
+          onChange={(v) => update({ massStatus: v as MassStatus })}
+          options={[
+            { value: 'stable', label: t('connPanel.stable') },
+            { value: 'destabilized', label: t('connPanel.destabilized') },
+            { value: 'critical', label: t('connPanel.critical') },
+          ]}
+        />
       </label>
 
       <label className="field">
         <span>{t('connPanel.timeStatus')}</span>
-        <select
+        <Select
           value={(() => {
             // Derive the live stage from the hole's effective expiry so the
             // dropdown tracks the same countdown the edge label shows.
@@ -342,8 +342,8 @@ export function ConnectionPanel() {
             if (expiry != null) return lifeBucket(expiry - now);
             return conn.timeStatus === 'lessThan24h' ? 'lessThan24h' : 'fresh';
           })()}
-          onChange={(e) => {
-            const v = e.target.value as TimeStatus;
+          onChange={(val) => {
+            const v = val as TimeStatus;
             // A picked stage becomes a manual expiry that then ages from now.
             const expiresIn = (h: number) => new Date(Date.now() + h * 3_600_000).toISOString();
             const maxLife = knownMaxLifeHours(conn, whTypes);
@@ -355,28 +355,30 @@ export function ConnectionPanel() {
               case 'expired':     update({ timeStatus: 'expired',     eolAt: null, lifetimeExpiresAt: expiresIn(0) });  break;
             }
           }}
-        >
-          {(knownMaxLifeHours(conn, whTypes) ?? 48) > 24 && (
-            <option value="fresh">{t('connPanel.fresh')}</option>
-          )}
-          <option value="lessThan24h">{t('connPanel.lessThan1d')}</option>
-          <option value="lessThan4h">{t('connPanel.lessThan4h')}</option>
-          <option value="lessThan1h">{t('connPanel.lessThan1h')}</option>
-          <option value="expired">{t('connPanel.expired')}</option>
-        </select>
+          options={[
+            ...((knownMaxLifeHours(conn, whTypes) ?? 48) > 24
+              ? [{ value: 'fresh', label: t('connPanel.fresh') }]
+              : []),
+            { value: 'lessThan24h', label: t('connPanel.lessThan1d') },
+            { value: 'lessThan4h', label: t('connPanel.lessThan4h') },
+            { value: 'lessThan1h', label: t('connPanel.lessThan1h') },
+            { value: 'expired', label: t('connPanel.expired') },
+          ]}
+        />
       </label>
 
       <label className="field">
         <span>{t('connPanel.size')}</span>
-        <select
+        <Select
           value={conn.size}
-          onChange={(e) => update({ size: e.target.value as ConnectionSize })}
-        >
-          <option value="xl">{t('connPanel.sizeXl')}</option>
-          <option value="large">{t('connPanel.sizeLarge')}</option>
-          <option value="medium">{t('connPanel.sizeMedium')}</option>
-          <option value="small">{t('connPanel.sizeSmall')}</option>
-        </select>
+          onChange={(v) => update({ size: v as ConnectionSize })}
+          options={[
+            { value: 'xl', label: t('connPanel.sizeXl') },
+            { value: 'large', label: t('connPanel.sizeLarge') },
+            { value: 'medium', label: t('connPanel.sizeMedium') },
+            { value: 'small', label: t('connPanel.sizeSmall') },
+          ]}
+        />
       </label>
 
       {whSpec ? (() => {
@@ -445,16 +447,17 @@ export function ConnectionPanel() {
           {/* Roller ship config (per-pilot, persisted) */}
           <div className="roller">
             <div className="roller__row">
-              <select
+              <Select
                 value={presetName}
-                onChange={(e) => {
-                  const p = ROLLER_PRESETS.find(x => x.name === e.target.value);
+                onChange={(v) => {
+                  const p = ROLLER_PRESETS.find(x => x.name === v);
                   if (p) setRoller({ ...p });
                 }}
-              >
-                {ROLLER_PRESETS.map(p => <option key={p.name} value={p.name}>{p.name}</option>)}
-                <option value="Custom">{t('connPanel.custom')}</option>
-              </select>
+                options={[
+                  ...ROLLER_PRESETS.map(p => ({ value: p.name, label: p.name })),
+                  { value: 'Custom', label: t('connPanel.custom') },
+                ]}
+              />
               <button
                 type="button"
                 className="sys-btn"

@@ -3,9 +3,14 @@
    instead of the OS-default list. Positioning + outside-click come from
    usePopover; this file is just the look. */
 
+/* Auto-width by default (like a native <select>, which fits its content). Call
+   sites that want full-width / flex sizing pass a className. As a flex item it
+   stretches normally (flex overrides inline-block). */
 .select {
   position: relative;
-  width: 100%;
+  display: inline-block;
+  max-width: 100%;
+  vertical-align: middle;
 }
 
 /* Trigger button — looks like a standard form control. */
@@ -33,6 +38,8 @@
 .triggerOpen,
 .trigger:focus-visible         { border-color: var(--accent); }
 .trigger:disabled              { opacity: 0.5; cursor: not-allowed; }
+.triggerInvalid,
+.triggerInvalid:hover          { border-color: var(--danger); }
 
 .value {
   flex: 1;

@@ -6,6 +6,7 @@ import { api } from '../../api/client';
 import { useMapStore } from '../../store/mapStore';
 import { useAuth, isAdminRole, isAllianceAdminRole } from '../../context/AuthContext';
 import { toast } from './Toaster';
+import { Select } from './Select';
 
 type MapScope = 'personal' | 'corp' | 'alliance';
 
@@ -131,11 +132,15 @@ export function CreateMapModal({ onClose }: { onClose: () => void }) {
           {(canCorp || canAlliance) && (
             <label className="field">
               <span>{t('createMap.type')}</span>
-              <select value={scope} onChange={(e) => setScope(e.target.value as MapScope)}>
-                <option value="personal">{t('createMap.personal')}</option>
-                {canCorp && <option value="corp">{t('createMap.corp')}</option>}
-                {canAlliance && <option value="alliance">{t('createMap.alliance')}</option>}
-              </select>
+              <Select
+                value={scope}
+                onChange={(v) => setScope(v as MapScope)}
+                options={[
+                  { value: 'personal', label: t('createMap.personal') },
+                  ...(canCorp     ? [{ value: 'corp',     label: t('createMap.corp') }]     : []),
+                  ...(canAlliance ? [{ value: 'alliance', label: t('createMap.alliance') }] : []),
+                ]}
+              />
             </label>
           )}
 

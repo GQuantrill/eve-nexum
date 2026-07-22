@@ -20,10 +20,15 @@ interface SelectProps<V extends string = string> {
   placeholder?: string;
   /** Accessible name for the control (there's no visible <label> in most uses). */
   ariaLabel?:   string;
+  /** Native hover tooltip on the trigger — for selects that had an explanatory
+   *  title / data-tooltip. */
+  title?:       string;
   /** Extra class on the wrapper — for width / flex context at the call site. */
   className?:   string;
   disabled?:    boolean;
   id?:          string;
+  /** Flag the control as invalid (red border on the trigger) — e.g. a duplicate. */
+  invalid?:     boolean;
   /** Show a leading tick on the selected row. Default true. */
   showCheck?:   boolean;
 }
@@ -38,7 +43,7 @@ const optText = <V extends string>(o: SelectOption<V>): string =>
  * than the OS-default list. No <optgroup> support (nothing in the app needs it).
  */
 export function Select<V extends string = string>({
-  value, onChange, options, placeholder, ariaLabel, className, disabled, id, showCheck = true,
+  value, onChange, options, placeholder, ariaLabel, title, className, disabled, id, invalid, showCheck = true,
 }: SelectProps<V>) {
   const { open, setOpen, pos, btnRef, dropdownRef, openAt } = usePopover();
   const listRef = useRef<HTMLDivElement>(null);
@@ -121,10 +126,11 @@ export function Select<V extends string = string>({
         ref={btnRef}
         id={id}
         type="button"
-        className={`${styles.trigger}${open ? ` ${styles.triggerOpen}` : ''}`}
+        className={`${styles.trigger}${open ? ` ${styles.triggerOpen}` : ''}${invalid ? ` ${styles.triggerInvalid}` : ''}`}
         onClick={() => (open ? close(false) : openList())}
         onKeyDown={onKeyDown}
         disabled={disabled}
+        title={title}
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label={ariaLabel}
