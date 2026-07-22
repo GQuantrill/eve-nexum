@@ -368,13 +368,16 @@ function SortableChainItem({ route, open, steps, canEdit, reversed, draggable, o
 // with the chain (the parent passes the displayed-direction exit).
 function ChainExitDistances({ destEveId, destName }: { destEveId: number | null; destName: string }) {
   const { t }   = useTranslation();
+  // Collapsed by default; the route lookup is deferred until it's opened, so a
+  // closed section costs no /api/route call.
+  const [open, setOpen] = useState(false);
   const closest = useClosestSystemsList();
   // Don't route to the exit itself if it happens to be in the list.
   const targets = useMemo(
     () => closest.filter((c) => c.id !== destEveId).map((c) => c.id),
     [closest, destEveId],
   );
-  const routes  = useRoute(destEveId, targets);
+  const routes  = useRoute(open ? destEveId : null, targets);
 
   const rows = useMemo(() => {
     return closest
@@ -393,17 +396,27 @@ function ChainExitDistances({ destEveId, destName }: { destEveId: number | null;
 
   return (
     <div className="chain-exits">
-      <div className="chain-exits__head">{t('chains.fromExit', { system: destName })}</div>
-      <ul className="chain-exits__list">
-        {rows.map((r) => (
-          <li key={r.id} className="chain-exits__row">
-            <span className="chain-exits__name">{r.name}</span>
-            <span className="chain-exits__jumps">
-              {r.jumps !== null ? jumpsLabel(t, r.jumps) : t('chains.noRoute')}
-            </span>
-          </li>
-        ))}
-      </ul>
+      <button
+        type="button"
+        className="chain-exits__toggle"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+      >
+        {open ? <CaretDownIcon size={11} weight="bold" /> : <CaretRightIcon size={11} weight="bold" />}
+        <span className="chain-exits__head">{t('chains.fromExit', { system: destName })}</span>
+      </button>
+      {open && (
+        <ul className="chain-exits__list">
+          {rows.map((r) => (
+            <li key={r.id} className="chain-exits__row">
+              <span className="chain-exits__name">{r.name}</span>
+              <span className="chain-exits__jumps">
+                {r.jumps !== null ? jumpsLabel(t, r.jumps) : t('chains.noRoute')}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

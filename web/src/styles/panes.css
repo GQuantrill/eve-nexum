@@ -168,16 +168,26 @@
 .chain-item__reverse--on:hover { color: var(--accent); }
 
 /* "From this exit" — closest-systems distances measured from the chain's shown
-   destination. Sits below the per-hop steps in an expanded chain. */
+   destination. Collapsible; sits below the per-hop steps in an expanded chain. */
 .chain-exits { padding: 4px 8px 8px; border-top: 1px solid var(--border); }
-.chain-exits__head {
+.chain-exits__toggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
   color: var(--text-subtle);
+}
+.chain-exits__toggle:hover { color: var(--text-default); }
+.chain-exits__head {
   font-size: calc(10px * var(--font-scale, 1));
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  margin-bottom: 3px;
 }
-.chain-exits__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.chain-exits__list { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
 .chain-exits__row {
   display: flex;
   align-items: baseline;
