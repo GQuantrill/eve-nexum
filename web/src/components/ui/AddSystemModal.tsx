@@ -5,6 +5,7 @@ import type { SystemClass, WormholeEffect } from '../../types';
 import { SYSTEM_CLASSES, WORMHOLE_EFFECTS, CLASS_LABELS, EFFECT_LABELS } from '../../data/wormholes';
 import { useEsiSearch, fetchSystemDetail, systemResultLabel } from '../../hooks/useEsiSearch';
 import { useMapStore } from '../../store/mapStore';
+import { Select } from './Select';
 
 type SystemOpts = {
   eveSystemId?: number | null;
@@ -205,28 +206,22 @@ export function AddSystemModal({ position, onClose, onSubmit }: Props) {
           <div className="modal__row">
             <label className="field">
               <span>{t('addSystem.class')}</span>
-              <select
+              <Select
                 value={systemClass}
-                onChange={(e) => setSystemClass(e.target.value as SystemClass)}
+                onChange={(v) => setSystemClass(v as SystemClass)}
                 disabled={loadingDetail}
-              >
-                {SYSTEM_CLASSES.map((c) => (
-                  <option key={c} value={c}>{CLASS_LABELS[c]}</option>
-                ))}
-              </select>
+                options={SYSTEM_CLASSES.map((c) => ({ value: c, label: CLASS_LABELS[c] }))}
+              />
             </label>
 
             <label className="field">
               <span>{t('addSystem.effect')}</span>
-              <select
+              <Select
                 value={effect}
-                onChange={(e) => setEffect(e.target.value as WormholeEffect)}
+                onChange={(v) => setEffect(v as WormholeEffect)}
                 disabled={loadingDetail}
-              >
-                {WORMHOLE_EFFECTS.map((ef) => (
-                  <option key={ef} value={ef}>{EFFECT_LABELS[ef] || t('addSystem.effectNone')}</option>
-                ))}
-              </select>
+                options={WORMHOLE_EFFECTS.map((ef) => ({ value: ef, label: EFFECT_LABELS[ef] || t('addSystem.effectNone') }))}
+              />
             </label>
           </div>
           )}

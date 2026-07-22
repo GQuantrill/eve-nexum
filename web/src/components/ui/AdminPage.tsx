@@ -13,6 +13,7 @@ import { cssVarToHex } from '../../utils/cssVar';
 import { timeAgo, europeanDate, DASH } from '../../i18n/format';
 import { ConfirmModal } from './ConfirmModal';
 import { StandingsViewerModal } from './StandingsViewerModal';
+import { Select } from './Select';
 import {
   Chart as ChartJS,
   ArcElement, CategoryScale, LinearScale,
@@ -359,13 +360,11 @@ function AccessTab() {
       {showStandings && <StandingsViewerModal onClose={() => setShowStandings(false)} />}
 
       <div className={styles.acAdd}>
-        <select
-          className={styles.acKind}
+        <Select
           value={kind}
-          onChange={(e) => { setKind(e.target.value as GrantPickKind); setMatch(null); setQuery(''); }}
-        >
-          {KINDS.map((k) => <option key={k} value={k}>{t(`admin.access.kind_${k}`)}</option>)}
-        </select>
+          onChange={(v) => { setKind(v as GrantPickKind); setMatch(null); setQuery(''); }}
+          options={KINDS.map((k) => ({ value: k, label: t(`admin.access.kind_${k}`) }))}
+        />
         <input
           className={styles.acInput}
           placeholder={t(`admin.access.placeholder_${kind}`)}
@@ -649,18 +648,16 @@ function UsersTab() {
                   </td>
                   <td>
                     {canEdit ? (
-                      <select
-                        className={styles.mRoleSelect}
+                      <Select
                         value={u.role}
                         // A non-alliance-admin can't touch an alliance admin's
                         // role, nor grant the tier (matches the server guard).
                         disabled={isBusy || isSelf || (u.role === 'alliance_admin' && !canGrantAllianceAdmin)}
-                        onChange={(e) => changeRole(u, e.target.value as Role)}
-                      >
-                        {ROLES
+                        onChange={(v) => changeRole(u, v as Role)}
+                        options={ROLES
                           .filter((r) => r !== 'alliance_admin' || canGrantAllianceAdmin)
-                          .map((r) => <option key={r} value={r}>{formatRole(r)}</option>)}
-                      </select>
+                          .map((r) => ({ value: r, label: formatRole(r) }))}
+                      />
                     ) : (
                       <span className={styles.mMono}>{formatRole(u.role as AuthRole)}</span>
                     )}
@@ -1141,25 +1138,20 @@ function UsersReport() {
     <div className={styles.pgFilterBar}>
       <div className={styles.pgFilterGroup}>
         <label className={styles.pgFilterLabel}>{t('admin.reports.filter')}</label>
-        <select
-          className={styles.mRoleSelect}
+        <Select
           value={filter}
-          onChange={(e) => setFilter(e.target.value as UserFilterKey)}
-        >
-          {USER_FILTER_OPTIONS.map((o) => <option key={o.value} value={o.value}>{t(`admin.reports.userFilters.${o.value}`)}</option>)}
-        </select>
+          onChange={(v) => setFilter(v as UserFilterKey)}
+          options={USER_FILTER_OPTIONS.map((o) => ({ value: o.value, label: t(`admin.reports.userFilters.${o.value}`) }))}
+        />
       </div>
       <div className={styles.pgFilterGroup}>
         <label className={styles.pgFilterLabel}>{t('admin.reports.window')}</label>
-        <select
-          className={styles.mRoleSelect}
+        <Select
           value={window}
-          onChange={(e) => setWindow(e.target.value as WindowKey)}
+          onChange={(v) => setWindow(v as WindowKey)}
           disabled={filter === 'all'}
-          title={filter === 'all' ? t('admin.reports.windowHint') : ''}
-        >
-          {WINDOW_OPTIONS.map((o) => <option key={o.value} value={o.value}>{t(`admin.reports.windowOptions.${o.value}`)}</option>)}
-        </select>
+          options={WINDOW_OPTIONS.map((o) => ({ value: o.value, label: t(`admin.reports.windowOptions.${o.value}`) }))}
+        />
       </div>
       <div className={styles.pgFilterSpacer} />
       {sortedRows && sortedRows.length > 0 && (
@@ -1361,13 +1353,11 @@ function SystemsReport() {
     <div className={styles.pgFilterBar}>
       <div className={styles.pgFilterGroup}>
         <label className={styles.pgFilterLabel}>{t('admin.reports.window')}</label>
-        <select
-          className={styles.mRoleSelect}
+        <Select
           value={window}
-          onChange={(e) => setWindow(e.target.value as WindowKey)}
-        >
-          {WINDOW_OPTIONS.map((o) => <option key={o.value} value={o.value}>{t(`admin.reports.windowOptions.${o.value}`)}</option>)}
-        </select>
+          onChange={(v) => setWindow(v as WindowKey)}
+          options={WINDOW_OPTIONS.map((o) => ({ value: o.value, label: t(`admin.reports.windowOptions.${o.value}`) }))}
+        />
       </div>
     </div>
   );

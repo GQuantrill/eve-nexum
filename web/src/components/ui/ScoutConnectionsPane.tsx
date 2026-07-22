@@ -11,6 +11,7 @@ import { useSystemAlias } from '../../hooks/useSystemAlias';
 import { truesecColor } from '../../utils/truesec';
 import { useMapStore } from '../../store/mapStore';
 import { MapPinSimpleIcon, PathIcon } from '@phosphor-icons/react';
+import { Select } from './Select';
 
 interface Props {
   scoutSystem: 'Thera' | 'Turnur';
@@ -141,17 +142,16 @@ export function ScoutConnectionsPane({ scoutSystem }: Props) {
         <label className="scout-pane__sort-label" htmlFor={`scout-sort-${scoutSystem}`}>
           {t('scout.sortLabel')}
         </label>
-        <select
+        <Select
           id={`scout-sort-${scoutSystem}`}
           className="scout-pane__sort-select"
           value={sortBy}
-          onChange={(e) => changeSort(e.target.value as ScoutSort)}
-        >
-          <option value="age">{t('scout.sortAge')}</option>
-          <option value="closest">
-            {t(routeMode === 'secure' ? 'scout.sortSecure' : 'scout.sortShortest')}
-          </option>
-        </select>
+          onChange={(v) => changeSort(v as ScoutSort)}
+          options={[
+            { value: 'age', label: t('scout.sortAge') },
+            { value: 'closest', label: t(routeMode === 'secure' ? 'scout.sortSecure' : 'scout.sortShortest') },
+          ]}
+        />
       </div>
       {sorted.map(c => {
         const route   = canRoute ? routes[String(c.inSystemId)] : undefined;

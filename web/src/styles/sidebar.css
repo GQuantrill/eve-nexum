@@ -1150,15 +1150,9 @@
   outline: none;
 }
 .watchlist__import-name:focus { border-color: var(--accent-bright); }
+/* Layout-only — the themed <Select> owns the control styling. */
 .watchlist__import-marker {
   flex-shrink: 0;
-  background: var(--surface-well);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  color: var(--text-primary);
-  font-family: inherit;
-  font-size: calc(12px * var(--font-scale, 1));
-  padding: 4px 6px;
 }
 .watchlist__import-text {
   width: 100%;
@@ -1243,20 +1237,9 @@
   gap: 6px;
   flex-wrap: wrap;
 }
+/* Layout-only — the themed <Select> owns the control styling. */
 .watchlist__combine {
   align-self: flex-start;
-  background: var(--surface-base);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  /* Match the criteria dropdowns (.watchlist__by) so "Match all" is the same
-     size as the Contains / Leads to selects below it. Asymmetric padding: room
-     for the text on the left, tight on the right so the native <select> arrow
-     stays near the edge. */
-  padding: 4px 2px 4px 8px;
-  font-size: calc(12px * var(--font-scale, 1));
-  color: var(--text-primary);
-  cursor: pointer;
-  outline: none;
 }
 .watchlist__add-criteria {
   align-self: flex-start;
@@ -1295,25 +1278,26 @@
   width: 20px;
 }
 
+/* Layout-only — the themed <Select> owns the control styling. */
 .watchlist__marker,
 .watchlist__by {
   flex-shrink: 0;
-  background: var(--surface-base);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 4px 2px;
-  font-size: calc(12px * var(--font-scale, 1));
-  color: var(--text-primary);
-  outline: none;
-  cursor: pointer;
 }
 
-.watchlist__marker { width: 82px; }
+/* Roomier now that the marker icon lives inside the Select (trigger + options)
+   rather than as a separate element beside it. */
+.watchlist__marker { min-width: 96px; }
+/* Icon + label inside a marker option / the trigger. */
+.watchlist__marker-opt { display: inline-flex; align-items: center; gap: 6px; }
 /* Contains / Leads to selects: roomier text on the left, tight on the right so
    the native <select> arrow sits near the edge — matching .watchlist__combine so
    all the criteria dropdowns look uniform. (The shared marker rule keeps its
    tight 4px 2px, tuned for the fixed-width markers.) */
-.watchlist__by { flex: 1; min-width: 80px; padding: 4px 2px 4px 8px; }
+.watchlist__by { flex: 1; min-width: 80px; }
+
+/* Layout-only wrapper for the themed <Select> that replaced the native match-by
+   <select> — the Select owns its own styling, so this just sets the flex sizing. */
+.watchlist__by-select { flex: 1; min-width: 80px; }
 
 .watchlist__char-label {
   flex: 1;
@@ -1346,8 +1330,8 @@
   border-color: var(--accent-bright);
 }
 
-/* The "System type" mode reuses the value-input styling as a class dropdown. */
-.watchlist__class-select { cursor: pointer; }
+/* "System type" mode: the themed <Select>; just the flex sizing here. */
+.watchlist__class-select { flex: 1; min-width: 96px; }
 
 /* Duplicate of an entry already on the list — the typed value collides with
    another row. Outline the field red and explain below; the duplicate doesn't

@@ -4,6 +4,7 @@ import { FireIcon } from '@phosphor-icons/react';
 import { useUserSetting } from '../../hooks/useUserSetting';
 import { useClickOutside } from '../../hooks/useClickOutside';
 import { HEAT_METRICS, type HeatMetric } from '../../utils/heatmap';
+import { Select } from './Select';
 
 /**
  * Toolbar heatmap control: an icon button that opens a small horizontal popover
@@ -45,16 +46,12 @@ export function HeatmapMenu() {
           onPointerDown={(e) => e.stopPropagation()}
         >
           <label className="heatmap-menu__label" htmlFor="heatmap-metric-tb">{t('mapSidebar.heatmap')}</label>
-          <select
+          <Select
             id="heatmap-metric-tb"
-            className="heatmap-menu__select"
             value={metric}
-            onChange={(e) => setMetric(e.target.value as HeatMetric)}
-          >
-            {HEAT_METRICS.map((m) => (
-              <option key={m} value={m}>{t(`mapSidebar.heatmapOptions.${m}`)}</option>
-            ))}
-          </select>
+            onChange={(v) => setMetric(v as HeatMetric)}
+            options={HEAT_METRICS.map((m) => ({ value: m, label: t(`mapSidebar.heatmapOptions.${m}`) }))}
+          />
           {active && (
             <>
               <label className="heatmap-menu__label" htmlFor="heatmap-intensity-tb">{t('mapSidebar.heatIntensity')}</label>
