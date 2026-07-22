@@ -10,6 +10,8 @@
     "hops": "{{count}} hops",
     "remove": "Delete chain",
     "reverse": "Reverse route",
+    "fromExit": "From {{system}}",
+    "noRoute": "no route",
     "centerOn": "Centre on {{system}}",
     "brokenHop": "Hop broken — re-scout",
     "viaGate": "Warp to gate",

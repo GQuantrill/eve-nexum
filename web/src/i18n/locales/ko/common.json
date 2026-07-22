@@ -10,6 +10,8 @@
     "hops": "{{count}}점프",
     "remove": "체인 삭제",
     "reverse": "경로 반전",
+    "fromExit": "{{system}}에서",
+    "noRoute": "경로 없음",
     "centerOn": "{{system}}(으)로 중심 이동",
     "brokenHop": "끊긴 점프 — 재정찰 필요",
     "viaGate": "스타게이트로 워프",

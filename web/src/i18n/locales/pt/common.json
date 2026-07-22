@@ -10,6 +10,8 @@
     "hops": "{{count}} saltos",
     "remove": "Excluir cadeia",
     "reverse": "Inverter rota",
+    "fromExit": "De {{system}}",
+    "noRoute": "sem rota",
     "centerOn": "Centralizar em {{system}}",
     "brokenHop": "Salto quebrado — explore novamente",
     "viaGate": "Warp para o portão estelar",

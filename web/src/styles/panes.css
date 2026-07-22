@@ -167,6 +167,27 @@
 .chain-item__reverse--on,
 .chain-item__reverse--on:hover { color: var(--accent); }
 
+/* "From this exit" — closest-systems distances measured from the chain's shown
+   destination. Sits below the per-hop steps in an expanded chain. */
+.chain-exits { padding: 4px 8px 8px; border-top: 1px solid var(--border); }
+.chain-exits__head {
+  color: var(--text-subtle);
+  font-size: calc(10px * var(--font-scale, 1));
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 3px;
+}
+.chain-exits__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.chain-exits__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: calc(12px * var(--font-scale, 1));
+}
+.chain-exits__name  { color: var(--text-default); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chain-exits__jumps { flex: none; color: var(--text-subtle); font-variant-numeric: tabular-nums; }
+
 .chain-steps { list-style: none; margin: 0; padding: 2px 8px 8px; display: flex; flex-direction: column; gap: 5px; }
 .chain-step { display: flex; flex-direction: column; gap: 2px; padding-left: 6px; border-left: 2px solid var(--border); }
 .chain-step--broken { border-left-color: var(--cv-conn-expired); }

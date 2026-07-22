@@ -15,6 +15,9 @@ import { buildChainPath, buildChainSteps, reverseRoute } from '../../utils/chain
 import type { ChainStep } from '../../utils/chains';
 import { whSizeForType, whSizeLabel } from '../../utils/wormholeSize';
 import { SystemCombobox } from './SystemCombobox';
+import { useRoute } from '../../hooks/useRoute';
+import { useClosestSystemsList } from '../../hooks/useClosestSystems';
+import { jumps as jumpsLabel } from '../../i18n/format';
 import type { Signature, SavedRoute } from '../../types';
 import {
   CaretRightIcon, CaretDownIcon, TrashIcon, ArrowRightIcon,
@@ -72,6 +75,12 @@ export function ChainsPane() {
   );
   const nameById = useMemo(
     () => new Map(map.systems.map((s) => [s.id, s.name])),
+    [map.systems],
+  );
+  // Map-system id -> EVE system id, to route from a chain's exit to the closest
+  // systems (which are keyed by EVE id).
+  const eveIdById = useMemo(
+    () => new Map(map.systems.map((s) => [s.id, s.eveSystemId])),
     [map.systems],
   );
 
@@ -169,6 +178,8 @@ export function ChainsPane() {
                 // steps, hop highlights and the sig lookup all use one direction.
                 const view  = reversed ? reverseRoute(route) : route;
                 const steps = open ? buildChainSteps(view, map, sigsBySystem) : [];
+                // The chain's displayed exit = last system of the shown direction.
+                const destSysId = view.systemIds[view.systemIds.length - 1];
                 return (
                   <SortableChainItem
                     key={route.id}
@@ -181,6 +192,8 @@ export function ChainsPane() {
                     onToggle={() => setExpandedId(open ? null : route.id)}
                     onReverse={() => toggleReversed(route.id)}
                     sizeLabel={sizeLabel}
+                    destEveId={eveIdById.get(destSysId) ?? null}
+                    destName={nameById.get(destSysId) ?? '?'}
                   />
                 );
               })}
@@ -202,11 +215,13 @@ interface SortableChainItemProps {
   onToggle: () => void;
   onReverse: () => void;
   sizeLabel: (whType: string | null) => string | null;
+  destEveId: number | null;
+  destName: string;
 }
 
 // One chain row: drag handle + collapsible header + per-hop steps. Pulls its
 // own store actions so the parent only threads view state through props.
-function SortableChainItem({ route, open, steps, canEdit, reversed, draggable, onToggle, onReverse, sizeLabel }: SortableChainItemProps) {
+function SortableChainItem({ route, open, steps, canEdit, reversed, draggable, onToggle, onReverse, sizeLabel, destEveId, destName }: SortableChainItemProps) {
   const { t } = useTranslation();
   const removeRoute         = useMapStore((s) => s.removeRoute);
   const setRouteHighlight   = useMapStore((s) => s.setRouteHighlight);
@@ -341,6 +356,54 @@ function SortableChainItem({ route, open, steps, canEdit, reversed, draggable, o
           ))}
         </ol>
       )}
+
+      {open && <ChainExitDistances destEveId={destEveId} destName={destName} />}
     </li>
+  );
+}
+
+// From a saved chain's displayed exit, how far each of the user's "closest
+// systems" is by k-space route. Only mounted while the chain is expanded, so a
+// single route lookup fires for the chain you're actually looking at. Reverses
+// with the chain (the parent passes the displayed-direction exit).
+function ChainExitDistances({ destEveId, destName }: { destEveId: number | null; destName: string }) {
+  const { t }   = useTranslation();
+  const closest = useClosestSystemsList();
+  // Don't route to the exit itself if it happens to be in the list.
+  const targets = useMemo(
+    () => closest.filter((c) => c.id !== destEveId).map((c) => c.id),
+    [closest, destEveId],
+  );
+  const routes  = useRoute(destEveId, targets);
+
+  const rows = useMemo(() => {
+    return closest
+      .filter((c) => c.id !== destEveId)
+      .map((c) => ({ id: c.id, name: c.name, jumps: routes[String(c.id)]?.jumps ?? null }))
+      // Reachable first (fewest jumps), then the unreachable, then by name.
+      .sort((a, b) => {
+        if (a.jumps === null && b.jumps === null) return a.name.localeCompare(b.name);
+        if (a.jumps === null) return 1;
+        if (b.jumps === null) return -1;
+        return a.jumps - b.jumps || a.name.localeCompare(b.name);
+      });
+  }, [closest, routes, destEveId]);
+
+  if (rows.length === 0) return null;
+
+  return (
+    <div className="chain-exits">
+      <div className="chain-exits__head">{t('chains.fromExit', { system: destName })}</div>
+      <ul className="chain-exits__list">
+        {rows.map((r) => (
+          <li key={r.id} className="chain-exits__row">
+            <span className="chain-exits__name">{r.name}</span>
+            <span className="chain-exits__jumps">
+              {r.jumps !== null ? jumpsLabel(t, r.jumps) : t('chains.noRoute')}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

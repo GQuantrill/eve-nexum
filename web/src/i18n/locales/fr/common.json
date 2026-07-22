@@ -10,6 +10,8 @@
     "hops": "{{count}} sauts",
     "remove": "Supprimer la chaîne",
     "reverse": "Inverser le trajet",
+    "fromExit": "Depuis {{system}}",
+    "noRoute": "aucun trajet",
     "centerOn": "Centrer sur {{system}}",
     "brokenHop": "Saut rompu — à re-scanner",
     "viaGate": "Warp vers la stargate",

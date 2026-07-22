@@ -10,6 +10,8 @@
     "hops": "{{count}} Sprünge",
     "remove": "Kette löschen",
     "reverse": "Route umkehren",
+    "fromExit": "Von {{system}}",
+    "noRoute": "keine Route",
     "centerOn": "Auf {{system}} zentrieren",
     "brokenHop": "Sprung unterbrochen – neu scouten",
     "viaGate": "Zum Stargate warpen",
