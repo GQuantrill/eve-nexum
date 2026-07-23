@@ -1189,6 +1189,7 @@
     "loading": "Загрузка…",
     "jumps": "Прыжки",
     "signatures": "Сигнатуры",
+    "activity": "Активность",
     "dailyActivity": "Дневная активность — последние 30 дней",
     "byType": "Сигнатуры по типу",
     "type": "Тип",
@@ -1207,6 +1208,9 @@
     "minutesAgo": "{{value}} мин назад",
     "hoursAgo": "{{value}} ч назад",
     "daysAgo": "{{value}} дн назад",
+    "now": "сейчас",
+    "monthsAgo": "{{value}} мес. назад",
+    "thisMonth": "этот месяц",
     "today": "сегодня"
   },
   "duration": {
