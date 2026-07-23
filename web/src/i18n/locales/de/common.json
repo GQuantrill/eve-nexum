@@ -1007,7 +1007,7 @@
     "riskEol": "EOL",
     "riskCritical": "Kritische Masse",
     "riskFrig": "Fregatten-Loch",
-    "shortcutNoWaypoint": "Diese Route nutzt ein Wurmloch/Thera/Turnur/Sprungtor und kann nicht als Autopilot-Ziel gesetzt werden — Rechtsklick auf ein K-Space-System in der Route.",
+    "jspaceNoWaypoint": "Wurmloch-Systeme können nicht als Autopilot-Ziel gesetzt werden.",
     "viaAnsiblex": "Ansiblex-Sprungtor"
   },
   "activity": {

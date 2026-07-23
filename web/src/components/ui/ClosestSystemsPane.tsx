@@ -11,7 +11,7 @@ import { useEsiSearch } from '../../hooks/useEsiSearch';
 import { useMapStore } from '../../store/mapStore';
 import { useAllMapHomes } from '../../hooks/useMapHomes';
 import { useUserSetting } from '../../hooks/useUserSetting';
-import { setWaypoint, RouteSquares } from './routeUi';
+import { setWaypoint, RouteSquares, canSetAutopilot } from './routeUi';
 import { useSystemAlias } from '../../hooks/useSystemAlias';
 import { useRouteOrigin } from '../../hooks/useRouteOrigin';
 import { jumps as jumpsLabel } from '../../i18n/format';
@@ -78,6 +78,9 @@ function Row({ item, route, isOpen, onToggle, onRemove, routeMode }: RowProps) {
     transition,
     opacity: isDragging ? 0.4 : 1,
   };
+  // A k-space destination stays autopilot-settable even when the shortest route
+  // shortcuts through a hole or Ansiblex bridge — EVE routes there via gates.
+  const canAutopilot = canSetAutopilot(route);
   return (
     <div ref={setNodeRef} className="scout-row" style={style}>
       <div className="scout-row__sys">
@@ -106,9 +109,9 @@ function Row({ item, route, isOpen, onToggle, onRemove, routeMode }: RowProps) {
           type="button"
           className="sys-btn scout-row__btn scout-row__btn--icon"
           onClick={() => setWaypoint(item.id, item.name, true)}
-          disabled={route?.usesSpecial}
+          disabled={!canAutopilot}
           aria-label={t('waypoint.setDestination')}
-          data-tooltip={route?.usesSpecial ? t('route.shortcutNoWaypoint') : t('waypoint.setDestination')}
+          data-tooltip={canAutopilot ? t('waypoint.setDestination') : t('route.jspaceNoWaypoint')}
         >
           <MapPinSimpleIcon size={14} weight="regular" color="#3ddc84" />
         </button>
@@ -116,9 +119,9 @@ function Row({ item, route, isOpen, onToggle, onRemove, routeMode }: RowProps) {
           type="button"
           className="sys-btn scout-row__btn scout-row__btn--icon"
           onClick={() => setWaypoint(item.id, item.name, false)}
-          disabled={route?.usesSpecial}
+          disabled={!canAutopilot}
           aria-label={t('waypoint.addWaypoint')}
-          data-tooltip={route?.usesSpecial ? t('route.shortcutNoWaypoint') : t('waypoint.addWaypoint')}
+          data-tooltip={canAutopilot ? t('waypoint.addWaypoint') : t('route.jspaceNoWaypoint')}
         >
           <PathIcon size={14} weight="regular" color="#5a9af8" />
         </button>

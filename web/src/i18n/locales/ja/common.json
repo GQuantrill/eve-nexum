@@ -1007,7 +1007,7 @@
     "riskEol": "EOL",
     "riskCritical": "限界質量",
     "riskFrig": "フリゲートホール",
-    "shortcutNoWaypoint": "このルートはワームホール/Thera/Turnur/ジャンプゲートを使用するため、オートパイロットの目的地に設定できません — ルート上のK-スペースシステムを右クリックしてください。",
+    "jspaceNoWaypoint": "ワームホールシステムはオートパイロットの目的地に設定できません。",
     "viaAnsiblex": "Ansiblex ジャンプゲート"
   },
   "activity": {
