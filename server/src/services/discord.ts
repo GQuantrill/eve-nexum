@@ -167,7 +167,7 @@ export function connectionEmbed(p: {
 export function kspaceExitEmbed(p: {
   exitName: string; exitRegion: string | null; exitSecurity: number;
   connectedName: string; connectedClass: string;
-  pathNames: string[]; whJumps: number;
+  pathNames: string[]; whJumps: number; gateJumps: number;
   hubName: string | null; hubJumps: number | null; total: number;
   mapName: string; actor: string | null;
 }): DiscordEmbed {
@@ -189,7 +189,9 @@ export function kspaceExitEmbed(p: {
     fields.push({ name: 'Nearest trade hub', value: `${p.hubName} — ${p.hubJumps} stargate jumps from exit`, inline: true });
   }
   if (p.hubJumps != null) {
-    fields.push({ name: 'Total effective distance', value: `${p.whJumps} WH + ${p.hubJumps} stargate = ${p.total} jumps` });
+    // Stargate portion = in-chain gate/Ansiblex hops + the exit→hub gate route.
+    const stargate = p.gateJumps + p.hubJumps;
+    fields.push({ name: 'Total effective distance', value: `${p.whJumps} WH + ${stargate} stargate = ${p.total} jumps` });
   }
   return {
     title,
