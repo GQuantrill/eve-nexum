@@ -1078,7 +1078,7 @@
     "riskEol": "EOL",
     "riskCritical": "Critical mass",
     "riskFrig": "Frigate hole",
-    "shortcutNoWaypoint": "This route uses a wormhole/Thera/Turnur/jump gate and can't be set as an autopilot destination — right-click a k-space system in the route instead."
+    "jspaceNoWaypoint": "Wormhole systems can't be set as an autopilot destination."
   },
   "activity": {
     "thisHour": "this hour",

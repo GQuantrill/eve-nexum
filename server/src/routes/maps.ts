@@ -674,7 +674,11 @@ const MAX_IMPORT_SYSTEMS     = 500;
 const MAX_IMPORT_CONNECTIONS = 2000;
 
 // GET /api/maps
-mapsRouter.get('/', async (req, res) => {
+// Resolve the session identity and return the full set of maps the caller can
+// see (personal + corp + alliance + shared). Single source for GET /, GET
+// /homes, and the closest-systems union route so the three can never drift on
+// which maps "belong" to a user.
+export async function gatherVisibleMaps(req: Request) {
   const userId         = req.session.userId!;
   const userCorpId     = req.session.userCorpId ?? null;
   const userAllianceId = req.session.userAllianceId ?? null;
@@ -689,10 +693,23 @@ mapsRouter.get('/', async (req, res) => {
     [userId],
   );
   const callerChar = meRows[0]?.characterId ?? null;
+  // Visibility query lives in the shared map-read module so the external
+  // /api/v1 list returns the identical set.
+  return listVisibleMaps({ userId, ownerId, userCorpId, userAllianceId, callerChar });
+}
 
-  // Visibility query (personal + corp + alliance + shared) lives in the shared
-  // map-read module so the external /api/v1 list returns the identical set.
-  const rows = await listVisibleMaps({ userId, ownerId, userCorpId, userAllianceId, callerChar });
+// Just the ids of the caller's visible maps — used to scope map-based route
+// overlays (wormhole/Ansiblex chains) to every map the user can see, not one
+// active tab. Already access-filtered, so callers need no further getMapAccess.
+export async function visibleMapIds(req: Request): Promise<string[]> {
+  const rows = await gatherVisibleMaps(req);
+  return rows.map((m: { id: string }) => m.id);
+}
+
+mapsRouter.get('/', async (req, res) => {
+  const userCorpId     = req.session.userCorpId ?? null;
+  const userAllianceId = req.session.userAllianceId ?? null;
+  const rows = await gatherVisibleMaps(req);
 
   // Count corp maps for the user's own corp (the per-corp limit applies to
   // each corp independently — Corp A's slots are separate from Corp B's).
@@ -711,6 +728,28 @@ mapsRouter.get('/', async (req, res) => {
     maxAllianceMaps: config.maxAllianceMaps,
     allianceMapCount,
   });
+});
+
+// Home systems flagged across every map the caller can see. Powers the
+// Closest Systems pane's auto-home rows, which are per-user (they must not
+// change when the active map tab does). Deduped by eve system id — the same
+// home flagged on two maps surfaces once. Registered before GET /:mapId so the
+// literal path wins the match.
+mapsRouter.get('/homes', async (req, res) => {
+  const mapIds = await visibleMapIds(req);
+  if (mapIds.length === 0) return res.json({ homes: [] });
+  const { rows } = await db.query<{ eveSystemId: number; name: string }>(
+    `SELECT DISTINCT ON (ms.eve_system_id)
+            ms.eve_system_id AS "eveSystemId", ms.name
+       FROM map_systems ms
+       JOIN maps m ON m.id = ms.map_id
+      WHERE ms.map_id = ANY($1::uuid[])
+        AND ms.is_home = TRUE
+        AND ms.eve_system_id IS NOT NULL
+      ORDER BY ms.eve_system_id, m.name`,
+    [mapIds],
+  );
+  res.json({ homes: rows });
 });
 
 // POST /api/maps

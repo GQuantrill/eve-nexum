@@ -1007,7 +1007,7 @@
     "riskEol": "濒死",
     "riskCritical": "质量临界",
     "riskFrig": "护卫舰洞",
-    "shortcutNoWaypoint": "此路线使用了虫洞/Thera/Turnur/跳跃门，无法设为自动驾驶目的地——请右键点击路线中的已知空间星系。",
+    "jspaceNoWaypoint": "虫洞星系无法设为自动驾驶目的地。",
     "viaAnsiblex": "Ansiblex 跳跃门"
   },
   "activity": {

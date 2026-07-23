@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
-import { useShallow } from 'zustand/react/shallow';
-import { useMapStore } from '../store/mapStore';
 import { useUserSetting } from './useUserSetting';
+import { useAllMapHomes } from './useMapHomes';
 
 // Shared model for the "closest systems" list — the curated set of destinations
 // (trade hubs + custom) the ClosestSystemsPane routes to, plus the auto-injected
@@ -35,29 +34,31 @@ export function sanitiseClosestList(raw: unknown): StoredEntry[] {
 
 export interface ClosestEntry { id: number; name: string; isHome: boolean }
 
-// The list as shown in the ClosestSystemsPane: the saved entries, with the
-// current home system prepended when it isn't already listed and hasn't been
-// hidden. Read-only — mutation stays in the pane.
+// The list as shown in the ClosestSystemsPane: the saved entries, with the home
+// systems from every map the user can see prepended when they aren't already
+// listed and haven't been hidden. Read-only — mutation stays in the pane.
 export function useClosestSystemsList(): ClosestEntry[] {
   const [listRaw] = useUserSetting<StoredEntry[]>(CLOSEST_LIST_KEY, CLOSEST_HUB_DEFAULTS);
   const [hiddenHomeArr] = useUserSetting<number[]>(CLOSEST_HIDDEN_HOME_KEY, []);
-  const homeSystem = useMapStore(useShallow((s) => {
-    const found = s.map.systems.find((sys) => sys.isHome && sys.eveSystemId != null);
-    return found ? { id: found.eveSystemId as number, name: found.name } : null;
-  }));
+  const homes = useAllMapHomes();
 
   return useMemo(() => {
     const list = sanitiseClosestList(listRaw);
     const hiddenHome = new Set(hiddenHomeArr);
-    const result: ClosestEntry[] = [];
+    const homeIds = new Set(homes.map((h) => h.eveSystemId));
+    const listItems: ClosestEntry[] = [];
     const seen = new Set<number>();
     for (const entry of list) {
-      result.push({ id: entry.id, name: entry.name, isHome: homeSystem?.id === entry.id });
+      listItems.push({ id: entry.id, name: entry.name, isHome: homeIds.has(entry.id) });
       seen.add(entry.id);
     }
-    if (homeSystem && !seen.has(homeSystem.id) && !hiddenHome.has(homeSystem.id)) {
-      result.unshift({ id: homeSystem.id, name: homeSystem.name, isHome: true });
+    // Prepend each flagged home not already in the list and not hidden.
+    const autoHomes: ClosestEntry[] = [];
+    for (const h of homes) {
+      if (seen.has(h.eveSystemId) || hiddenHome.has(h.eveSystemId)) continue;
+      autoHomes.push({ id: h.eveSystemId, name: h.name, isHome: true });
+      seen.add(h.eveSystemId);
     }
-    return result;
-  }, [listRaw, hiddenHomeArr, homeSystem]);
+    return [...autoHomes, ...listItems];
+  }, [listRaw, hiddenHomeArr, homes]);
 }
