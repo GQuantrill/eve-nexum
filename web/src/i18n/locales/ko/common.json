@@ -325,6 +325,8 @@
       "whClassLabel": "목적지 등급",
       "whSizeLabel": "크기",
       "whAll": "전체",
+      "exitsMinSecLabel": "최소 출구 보안도",
+      "exitsMinSecHint": "새로 발견된 K-스페이스 출구의 보안도가 이 값 이상일 때만 상세 출구 정보(홈으로부터의 경로, 가장 가까운 거래 허브)를 전송합니다. -1.0 ~ 1.0; 0.45 = 하이섹.",
       "removeType": "{{name}} 제거",
       "excludedMaps": "제외된 지도",
       "excludedHint": "모든 지도가 기본적으로 알림을 보냅니다. 지도를 체크하면 Discord에서 제외됩니다.",

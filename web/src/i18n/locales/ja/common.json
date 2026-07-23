@@ -325,6 +325,8 @@
       "whClassLabel": "接続先クラス",
       "whSizeLabel": "サイズ",
       "whAll": "すべて",
+      "exitsMinSecLabel": "出口の最低セキュリティ",
+      "exitsMinSecHint": "新たに判明した K スペース出口のセキュリティがこの値以上のときのみ、詳細な出口情報（拠点からの経路、最寄りの交易ハブ）を送信します。-1.0 ～ 1.0、0.45 = ハイセク。",
       "removeType": "{{name}} を削除",
       "excludedMaps": "除外したマップ",
       "excludedHint": "すべてのマップがデフォルトで通知します。マップにチェックを入れると Discord から除外されます。",

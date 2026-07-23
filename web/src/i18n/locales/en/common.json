@@ -374,6 +374,8 @@
       "whClassLabel": "Destination class",
       "whSizeLabel": "Size",
       "whAll": "All",
+      "exitsMinSecLabel": "Minimum exit security",
+      "exitsMinSecHint": "Only send the rich exit intel (path from home, nearest trade hub) when a newly revealed k-space exit has at least this security. -1.0 to 1.0; 0.45 = high-sec.",
       "removeType": "Remove {{name}}",
       "excludedMaps": "Excluded maps",
       "excludedHint": "All maps notify by default. Tick a map to exclude it from Discord.",
