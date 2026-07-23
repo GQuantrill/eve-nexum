@@ -6,10 +6,10 @@ import type { DragEndEvent } from '@dnd-kit/core';
 import { SortableContext, useSortable, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { MapPinSimpleIcon, PathIcon, XIcon, PlusIcon, HouseIcon, TrashIcon } from '@phosphor-icons/react';
-import { useShallow } from 'zustand/react/shallow';
 import { useRoute, type RouteEntry } from '../../hooks/useRoute';
 import { useEsiSearch } from '../../hooks/useEsiSearch';
 import { useMapStore } from '../../store/mapStore';
+import { useAllMapHomes } from '../../hooks/useMapHomes';
 import { useUserSetting } from '../../hooks/useUserSetting';
 import { setWaypoint, RouteSquares } from './routeUi';
 import { useSystemAlias } from '../../hooks/useSystemAlias';
@@ -158,10 +158,10 @@ export function ClosestSystemsPane() {
   const aliasName = useSystemAlias();
   const origin    = useRouteOrigin();
   const routeMode = useMapStore((s) => s.routeMode);
-  const homeSystem = useMapStore(useShallow((s) => {
-    const found = s.map.systems.find((sys) => sys.isHome && sys.eveSystemId != null);
-    return found ? { id: found.eveSystemId as number, name: found.name } : null;
-  }));
+  // Home rows span every map the user can see, not just the active tab — this
+  // pane is a per-user tool. Deduped by eve id.
+  const homes   = useAllMapHomes();
+  const homeIds = useMemo(() => new Set(homes.map((h) => h.eveSystemId)), [homes]);
 
   const [listRaw, setList]      = useUserSetting<StoredEntry[]>(LIST_KEY, HUB_DEFAULTS);
   const list = useMemo(() => sanitiseList(listRaw), [listRaw]);
@@ -201,26 +201,30 @@ export function ClosestSystemsPane() {
 
   const canRoute = origin.systemId !== null;
 
-  // Items = home (auto, if present and not in list and not hidden) ++
-  // user list. Every row is removable. Removing the auto-home row hides
-  // it via the hiddenHome set; if the user later picks a different
-  // home, that new ID isn't in the set so it auto-appears.
+  // Items = auto-home rows (each flagged home not in the list and not hidden) ++
+  // user list. Every row is removable. Removing an auto-home row hides it via
+  // the hiddenHome set; if the user later picks a different home, that new ID
+  // isn't in the set so it auto-appears.
   const items = useMemo<RowItem[]>(() => {
-    const result: RowItem[] = [];
+    const listItems: RowItem[] = [];
     const seen = new Set<number>();
     for (const entry of list) {
-      const isHome = homeSystem?.id === entry.id;
-      result.push({ id: entry.id, name: entry.name, isHome, inList: true });
+      listItems.push({ id: entry.id, name: entry.name, isHome: homeIds.has(entry.id), inList: true });
       seen.add(entry.id);
     }
-    if (homeSystem && !seen.has(homeSystem.id) && !hiddenHome.has(homeSystem.id)) {
-      result.unshift({ id: homeSystem.id, name: homeSystem.name, isHome: true, inList: false });
+    const autoHomes: RowItem[] = [];
+    for (const h of homes) {
+      if (seen.has(h.eveSystemId) || hiddenHome.has(h.eveSystemId)) continue;
+      autoHomes.push({ id: h.eveSystemId, name: h.name, isHome: true, inList: false });
+      seen.add(h.eveSystemId);
     }
-    return result;
-  }, [list, homeSystem, hiddenHome]);
+    return [...autoHomes, ...listItems];
+  }, [list, homes, homeIds, hiddenHome]);
 
   const targetIds = useMemo(() => items.map((i) => i.id), [items]);
-  const routes    = useRoute(origin.systemId, targetIds);
+  // 'all' scope: union the wormhole chains of every map the user can see, so the
+  // chain they're actually in routes regardless of which map tab is active.
+  const routes    = useRoute(origin.systemId, targetIds, 'all');
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
 
@@ -249,11 +253,10 @@ export function ClosestSystemsPane() {
 
   function removeRow(id: number) {
     setList((prev) => prev.filter((e) => e.id !== id));
-    // If we just removed the current home (whether it was in the list
-    // or was the auto-row), hide it so it doesn't re-appear on the
-    // next render. Tracking by ID means a future home change still
-    // surfaces normally.
-    if (homeSystem?.id === id) {
+    // If we just removed one of the flagged homes (whether it was in the
+    // list or was an auto-row), hide it so it doesn't re-appear on the next
+    // render. Tracking by ID means a future home change still surfaces normally.
+    if (homeIds.has(id)) {
       setHiddenHomeArr((prev) => Array.from(new Set([...prev, id])));
     }
   }
