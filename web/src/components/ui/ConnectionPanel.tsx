@@ -214,7 +214,13 @@ export function ConnectionPanel() {
   const addMass = (kg: number) => {
     if (!whSpec) return;
     const next = Math.max(0, massUsed + kg);
-    const nextStatus = deriveStatus((whSpec.totalMass - next) / whSpec.totalMass);
+    // Derive the status from the WORST-case remaining — the same basis as the
+    // calculator's fill bar and pass warnings — so a pass that pushes the hole
+    // into the critical band flags Critical, not just Destabilized. Deriving
+    // from nominal here lagged: the bar went red while the dropdown stayed
+    // destabilized.
+    const r = massRange(whSpec.totalMass, next);
+    const nextStatus = deriveStatus(r.worstRemaining / (r.worstTotal || 1));
     update({ massUsed: next, massStatus: nextStatus });
   };
 
