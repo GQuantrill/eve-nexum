@@ -157,7 +157,7 @@ export function UserStatsModal({ onClose }: Props) {
 
         <div className="modal__header">
           <h2 className="modal__title">{t('stats.title')}</h2>
-          <button className="modal__close" onClick={onClose}><XIcon size={14} weight="bold" /></button>
+          <button className="icon-btn" onClick={onClose} aria-label={t('actions.close')}><XIcon size={16} weight="bold" /></button>
         </div>
 
         <div className="stats-modal__periods">
