@@ -44,6 +44,20 @@ function deriveStatus(remainingFraction: number): MassStatus {
   return 'stable';
 }
 
+// Inverse of deriveStatus: the most-remaining edge of each status band. Used
+// when the pilot picks a mass status by hand (they eyeballed the hole in-game,
+// or someone else rolled it) so the rolling calculator reflects that state
+// instead of only counting passes it saw. Each maps to the boundary — the
+// optimistic edge — of its band: destabilized = 50% left, critical = 10% left.
+const STATUS_REMAINING_FRACTION: Record<MassStatus, number> = {
+  stable:       1.0,
+  destabilized: 0.50,
+  critical:     0.10,
+};
+function massUsedForStatus(status: MassStatus, totalMass: number): number {
+  return Math.round(totalMass * (1 - STATUS_REMAINING_FRACTION[status]));
+}
+
 // Match a sig's `whLeadsTo` against the other endpoint. The dropdown can
 // store either a class abbrev ("C2") or a system name ("J123456"), so we
 // accept either.
@@ -200,7 +214,13 @@ export function ConnectionPanel() {
   const addMass = (kg: number) => {
     if (!whSpec) return;
     const next = Math.max(0, massUsed + kg);
-    const nextStatus = deriveStatus((whSpec.totalMass - next) / whSpec.totalMass);
+    // Derive the status from the WORST-case remaining — the same basis as the
+    // calculator's fill bar and pass warnings — so a pass that pushes the hole
+    // into the critical band flags Critical, not just Destabilized. Deriving
+    // from nominal here lagged: the bar went red while the dropdown stayed
+    // destabilized.
+    const r = massRange(whSpec.totalMass, next);
+    const nextStatus = deriveStatus(r.worstRemaining / (r.worstTotal || 1));
     update({ massUsed: next, massStatus: nextStatus });
   };
 
@@ -242,6 +262,19 @@ export function ConnectionPanel() {
     setSide('home');
     saveSession(conn.id, { side: 'home', stack: [] });
     update({ massUsed: 0, massStatus: 'stable' });
+  };
+
+  // Picking a mass status by hand also seeds massUsed to that band's boundary,
+  // so the rolling calculator's remaining estimate reflects the chosen state
+  // (setting Critical drops "left" to ~10%, not the full bar). The previous
+  // per-pass undo history no longer matches, so clear it (keep the roll side).
+  const changeMassStatus = (status: MassStatus) => {
+    if (whSpec) update({ massStatus: status, massUsed: massUsedForStatus(status, whSpec.totalMass) });
+    else        update({ massStatus: status });
+    if (conn && stack.length) {
+      setStack([]);
+      saveSession(conn.id, { side, stack: [] });
+    }
   };
 
   // Wormhole-only fields (type, sig link, mass / time / size, rolling calc)
@@ -323,7 +356,7 @@ export function ConnectionPanel() {
         <span>{t('connPanel.massStatus')}</span>
         <Select
           value={conn.massStatus ?? ''}
-          onChange={(v) => update({ massStatus: v as MassStatus })}
+          onChange={(v) => changeMassStatus(v as MassStatus)}
           options={[
             { value: 'stable', label: t('connPanel.stable') },
             { value: 'destabilized', label: t('connPanel.destabilized') },
