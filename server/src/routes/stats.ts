@@ -23,7 +23,84 @@ function emptyPeriod(): PeriodStats {
 type PeriodKey = 'forever' | 'year' | 'month' | 'week' | 'day';
 const PERIODS: PeriodKey[] = ['forever', 'year', 'month', 'week', 'day'];
 
-const DAILY_DAYS = 30;
+// Granularity of the activity chart per period. The chart follows the selected
+// period: last-24h is hourly, a week/month are daily, a year and all-time are
+// monthly. Every bucket reads the same append-only user_events log, so any
+// granularity is just a date_trunc away — no extra tables.
+type BucketUnit = 'hour' | 'day' | 'month';
+interface SeriesSpec { unit: BucketUnit; since: Date; count: number }
+
+// Longest all-time monthly series we'll render — bounds the array for an
+// account with years of history (the app itself is far younger, so in practice
+// "forever" is a handful of months).
+const MAX_FOREVER_MONTHS = 120;
+
+function truncUTC(d: Date, unit: BucketUnit): Date {
+  const x = new Date(d);
+  x.setUTCMilliseconds(0); x.setUTCSeconds(0); x.setUTCMinutes(0);
+  if (unit === 'day' || unit === 'month') x.setUTCHours(0);
+  if (unit === 'month') x.setUTCDate(1);
+  return x;
+}
+function addUnit(d: Date, unit: BucketUnit, i: number): Date {
+  const x = new Date(d);
+  if (unit === 'hour')     x.setUTCHours(x.getUTCHours() + i);
+  else if (unit === 'day') x.setUTCDate(x.getUTCDate() + i);
+  else                     x.setUTCMonth(x.getUTCMonth() + i);
+  return x;
+}
+// Canonical bucket key matching the SQL to_char below, in UTC. For day/month
+// buckets the truncated hour is 00, so one format string covers all three.
+function bucketKey(d: Date): string {
+  const p = (n: number) => String(n).padStart(2, '0');
+  return `${d.getUTCFullYear()}-${p(d.getUTCMonth() + 1)}-${p(d.getUTCDate())} ${p(d.getUTCHours())}`;
+}
+function monthsBetween(a: Date, b: Date): number {
+  return (b.getUTCFullYear() - a.getUTCFullYear()) * 12 + (b.getUTCMonth() - a.getUTCMonth());
+}
+
+// The window + granularity for each period, ending at the current bucket.
+function seriesSpecs(now: Date, firstEvent: Date): Record<PeriodKey, SeriesSpec> {
+  const hour  = truncUTC(now, 'hour');
+  const day   = truncUTC(now, 'day');
+  const month = truncUTC(now, 'month');
+  const foreverCount = Math.min(MAX_FOREVER_MONTHS, monthsBetween(truncUTC(firstEvent, 'month'), month) + 1);
+  return {
+    day:     { unit: 'hour',  since: addUnit(hour,  'hour',  -23), count: 24 },
+    week:    { unit: 'day',   since: addUnit(day,   'day',    -6), count: 7  },
+    month:   { unit: 'day',   since: addUnit(day,   'day',   -29), count: 30 },
+    year:    { unit: 'month', since: addUnit(month, 'month', -11), count: 12 },
+    // Clamp the start forward if history exceeds the cap, so it still ends at
+    // the current month.
+    forever: { unit: 'month', since: addUnit(month, 'month', -(Math.max(1, foreverCount) - 1)), count: Math.max(1, foreverCount) },
+  };
+}
+
+// Dense per-bucket signature counts for one period, oldest first, current
+// bucket last. Missing buckets fill 0.
+async function bucketSeries(userId: number, spec: SeriesSpec): Promise<number[]> {
+  const { rows } = await db.query<{ bucket: string; count: string }>(
+    `SELECT to_char(date_trunc($2, created_at AT TIME ZONE 'UTC'), 'YYYY-MM-DD HH24') AS bucket,
+            COUNT(*)::text AS count
+       FROM user_events
+      WHERE user_id = $1 AND event_type = 'signature' AND created_at >= $3
+      GROUP BY bucket`,
+    [userId, spec.unit, spec.since],
+  );
+  const byBucket = new Map<string, number>();
+  for (const r of rows) byBucket.set(r.bucket, parseInt(r.count, 10));
+  const out: number[] = [];
+  for (let i = 0; i < spec.count; i++) out.push(byBucket.get(bucketKey(addUnit(spec.since, spec.unit, i))) ?? 0);
+  return out;
+}
+
+interface Series { unit: BucketUnit; values: number[] }
+function emptySeries(): Record<PeriodKey, Series> {
+  const specs = seriesSpecs(new Date(), new Date());
+  const out = {} as Record<PeriodKey, Series>;
+  for (const p of PERIODS) out[p] = { unit: specs[p].unit, values: Array(specs[p].count).fill(0) };
+  return out;
+}
 
 router.get('/', async (req, res) => {
   const userId = req.session.userId;
@@ -35,7 +112,7 @@ router.get('/', async (req, res) => {
       forever: emptyPeriod(), year: emptyPeriod(), month: emptyPeriod(),
       week: emptyPeriod(), day: emptyPeriod(),
     };
-    return res.json({ ...empty, daily: Array(DAILY_DAYS).fill(0) });
+    return res.json({ ...empty, series: emptySeries() });
   }
 
   const now   = new Date();
@@ -45,23 +122,16 @@ router.get('/', async (req, res) => {
   const year  = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
   const bucketParams = [userId, year, month, week, day];
 
-  // Daily series window — go back DAILY_DAYS-1 days at UTC midnight so today
-  // sits in the right-most slot regardless of the current hour.
-  const dailySince = new Date(now);
-  dailySince.setUTCHours(0, 0, 0, 0);
-  dailySince.setUTCDate(dailySince.getUTCDate() - (DAILY_DAYS - 1));
-
-  // Three parallel queries. Both jumps and sigs read the append-only
-  // user_events log (event_type 'jump' / 'signature'), so the figures are a
-  // record of ACTIVITY — how much you scanned/jumped in the window — and are
-  // immune to later deletions or overwrite-paste removals. (Earlier the sig
-  // counts came from the live map_signatures table, which undercounted: a
-  // heavy scan yesterday that was since re-scanned/cleared vanished, so "this
-  // week" could read the same as "last 24h".) The sig_type recorded is the
-  // type at scan time; rows logged before the sig_type column carry NULL and
-  // bucket as 'unknown'.
-  //   daily — per-day scan count for the last DAILY_DAYS days (sparkline)
-  const [jumpRes, sigRes, dailyRes] = await Promise.all([
+  // Both jumps and sigs read the append-only user_events log (event_type
+  // 'jump' / 'signature'), so the figures are a record of ACTIVITY — how much
+  // you scanned/jumped in the window — and are immune to later deletions or
+  // overwrite-paste removals. (Earlier the sig counts came from the live
+  // map_signatures table, which undercounted: a heavy scan yesterday that was
+  // since re-scanned/cleared vanished, so "this week" could read the same as
+  // "last 24h".) The sig_type recorded is the type at scan time; rows logged
+  // before the sig_type column carry NULL and bucket as 'unknown'.
+  //   min — first signature event, so "all time" knows how many months to span.
+  const [jumpRes, sigRes, minRes] = await Promise.all([
     db.query<{ forever: string; year: string; month: string; week: string; day: string }>(
       `SELECT
          COUNT(*)::text                                  AS forever,
@@ -86,14 +156,11 @@ router.get('/', async (req, res) => {
        GROUP BY sig_type`,
       bucketParams,
     ),
-    db.query<{ bucket: string; count: string }>(
-      `SELECT date_trunc('day', created_at AT TIME ZONE 'UTC')::date::text AS bucket,
-              COUNT(*)::text                                                AS count
+    db.query<{ min: string | null }>(
+      `SELECT MIN(created_at)::text AS min
          FROM user_events
-        WHERE user_id = $1 AND event_type = 'signature'
-          AND created_at >= $2
-        GROUP BY bucket`,
-      [userId, dailySince],
+        WHERE user_id = $1 AND event_type = 'signature'`,
+      [userId],
     ),
   ]);
 
@@ -126,18 +193,15 @@ router.get('/', async (req, res) => {
     }
   }
 
-  // Build a dense DAILY_DAYS-long array, oldest first, today last.
-  const byBucket = new Map<string, number>();
-  for (const row of dailyRes.rows) byBucket.set(row.bucket, parseInt(row.count, 10));
-  const daily: number[] = [];
-  for (let i = 0; i < DAILY_DAYS; i++) {
-    const d = new Date(dailySince);
-    d.setUTCDate(d.getUTCDate() + i);
-    const key = d.toISOString().slice(0, 10);
-    daily.push(byBucket.get(key) ?? 0);
-  }
+  // One activity series per period, at the period's own granularity, so the
+  // chart follows the selected range instead of always showing 30 days.
+  const firstEvent = minRes.rows[0]?.min ? new Date(minRes.rows[0].min) : now;
+  const specs = seriesSpecs(now, firstEvent);
+  const seriesValues = await Promise.all(PERIODS.map((p) => bucketSeries(userId, specs[p])));
+  const series = {} as Record<PeriodKey, Series>;
+  PERIODS.forEach((p, i) => { series[p] = { unit: specs[p].unit, values: seriesValues[i] }; });
 
-  res.json({ ...result, daily });
+  res.json({ ...result, series });
 });
 
 export default router;

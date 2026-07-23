@@ -1151,6 +1151,7 @@
     "loading": "불러오는 중…",
     "jumps": "점프",
     "signatures": "시그니처",
+    "activity": "활동",
     "dailyActivity": "일별 활동 — 지난 30일",
     "byType": "유형별 시그니처",
     "type": "유형",
@@ -1169,6 +1170,9 @@
     "minutesAgo": "{{value}}분 전",
     "hoursAgo": "{{value}}시간 전",
     "daysAgo": "{{value}}일 전",
+    "now": "지금",
+    "monthsAgo": "{{value}}개월 전",
+    "thisMonth": "이번 달",
     "today": "오늘"
   },
   "duration": {
