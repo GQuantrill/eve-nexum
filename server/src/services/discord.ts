@@ -167,7 +167,7 @@ export function connectionEmbed(p: {
 export function kspaceExitEmbed(p: {
   exitName: string; exitRegion: string | null; exitSecurity: number;
   connectedName: string; connectedClass: string;
-  pathNames: string[]; whJumps: number; gateJumps: number;
+  pathNames: string[]; whJumps: number; gateJumps: number; maxShipSize: string;
   hubName: string | null; hubJumps: number | null; total: number;
   mapName: string; actor: string | null;
 }): DiscordEmbed {
@@ -190,15 +190,19 @@ export function kspaceExitEmbed(p: {
     { name: 'Exit system',   value: `${p.exitName} (${p.exitRegion ?? '?'}) — Security ${p.exitSecurity.toFixed(1)}`, inline: true },
     { name: 'Connected to',  value: `${p.connectedName} (${p.connectedClass})`, inline: true },
     { name: 'Path from home', value: p.pathNames.join(' → ') },
-    { name: 'Jumps from home', value: jumpsFromHome, inline: true },
+    { name: 'Jumps from home',   value: jumpsFromHome, inline: true },
+    { name: 'Maximum ship size', value: p.maxShipSize, inline: true },
   ];
-  if (p.hubName != null) {
-    fields.push({ name: 'Nearest trade hub', value: `${p.hubName} — ${p.hubJumps} stargate jump${p.hubJumps === 1 ? '' : 's'} from exit`, inline: true });
-  }
-  if (p.hubJumps != null) {
+  if (p.hubName != null && p.hubJumps != null) {
     // Stargate portion = in-chain gate/Ansiblex hops + the exit→hub gate route.
     const stargate = p.gateJumps + p.hubJumps;
-    fields.push({ name: 'Total effective distance', value: `${p.whJumps} WH + ${stargate} stargate = ${p.total} jumps` });
+    // An empty full-width field forces a row break so the hub + total render as
+    // their own inline pair instead of packing onto the jumps/size row.
+    fields.push(
+      { name: '\u200b', value: '\u200b' },
+      { name: 'Nearest trade hub',        value: `${p.hubName} — ${p.hubJumps} stargate jump${p.hubJumps === 1 ? '' : 's'} from exit`, inline: true },
+      { name: 'Total effective distance', value: `${p.whJumps} WH + ${stargate} stargate = ${p.total} jumps`, inline: true },
+    );
   }
   return {
     title,

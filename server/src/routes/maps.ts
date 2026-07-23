@@ -510,11 +510,12 @@ const TRADE_HUBS: { id: number; name: string }[] = [
 const KSPACE_EXIT_CLASSES = new Set(['HS', 'LS', 'NS']);
 
 interface ExitIntel {
-  pathNames: string[];                              // home … exit, inclusive
-  whJumps:   number;                                // wormhole ('standard') hops in that path
-  gateJumps: number;                                // in-chain gate / Ansiblex hops (non-wormhole)
-  hub:       { name: string; jumps: number } | null; // nearest trade hub by stargate
-  total:     number;                                // whJumps + gateJumps + hub jumps
+  pathNames:   string[];                              // home … exit, inclusive
+  whJumps:     number;                                // wormhole ('standard') hops in that path
+  gateJumps:   number;                                // in-chain gate / Ansiblex hops (non-wormhole)
+  maxShipSize: string;                                // tightest wormhole on the route (largest ship that fits)
+  hub:         { name: string; jumps: number } | null; // nearest trade hub by stargate
+  total:       number;                                // whJumps + gateJumps + hub jumps
 }
 
 // Routing intel for a k-space exit newly revealed on a map: the shortest
@@ -526,8 +527,8 @@ async function computeExitIntel(mapId: string, exitNodeId: string): Promise<Exit
   const [sysRes, connRes] = await Promise.all([
     db.query<{ id: string; name: string; eve_system_id: number | null; is_home: boolean }>(
       `SELECT id, name, eve_system_id, is_home FROM map_systems WHERE map_id = $1`, [mapId]),
-    db.query<{ source_id: string; target_id: string; connection_type: string }>(
-      `SELECT source_id, target_id, connection_type FROM map_connections WHERE map_id = $1 AND broken = FALSE`, [mapId]),
+    db.query<{ source_id: string; target_id: string; connection_type: string; size: string | null }>(
+      `SELECT source_id, target_id, connection_type, size FROM map_connections WHERE map_id = $1 AND broken = FALSE`, [mapId]),
   ]);
 
   const nodes = new Map<string, { name: string; eve: number | null }>();
@@ -541,14 +542,16 @@ async function computeExitIntel(mapId: string, exitNodeId: string): Promise<Exit
   // Undirected adjacency over the map's un-broken connections, plus each edge's
   // type so chain hops can be split into wormhole vs gate below.
   const adj = new Map<string, string[]>();
-  const edgeType = new Map<string, string>(); // "a|b" (both directions) -> connection_type
-  const link = (a: string, b: string, type: string) => {
+  const edgeType = new Map<string, string>();         // "a|b" (both directions) -> connection_type
+  const edgeSize = new Map<string, string | null>();  // "a|b" -> jump-size class (wormholes only matter)
+  const link = (a: string, b: string, type: string, size: string | null) => {
     const l = adj.get(a); if (l) l.push(b); else adj.set(a, [b]);
     edgeType.set(`${a}|${b}`, type);
+    edgeSize.set(`${a}|${b}`, size);
   };
   for (const c of connRes.rows) {
-    link(c.source_id, c.target_id, c.connection_type);
-    link(c.target_id, c.source_id, c.connection_type);
+    link(c.source_id, c.target_id, c.connection_type, c.size);
+    link(c.target_id, c.source_id, c.connection_type, c.size);
   }
 
   // BFS home → exit, tracking predecessors to rebuild the shortest path.
@@ -578,12 +581,21 @@ async function computeExitIntel(mapId: string, exitNodeId: string): Promise<Exit
   const pathNames = idPath.map((id) => nodes.get(id)?.name ?? '?');
   // Split the chain hops: a 'standard' link is a wormhole jump; a 'gate'
   // (stargate) or 'jumpgate' (Ansiblex) link is a gate jump — so a chain that
-  // crosses k-space by gate isn't miscounted as wormholes.
+  // crosses k-space by gate isn't miscounted as wormholes. Collect the wormhole
+  // hops' sizes so the tightest (largest ship that fits the whole trip) shows.
   let whJumps = 0, gateJumps = 0;
+  const whSizes: string[] = [];
   for (let i = 1; i < idPath.length; i++) {
-    if (edgeType.get(`${idPath[i - 1]}|${idPath[i]}`) === 'standard') whJumps++;
-    else gateJumps++;
+    const key = `${idPath[i - 1]}|${idPath[i]}`;
+    if (edgeType.get(key) === 'standard') {
+      whJumps++;
+      const sz = edgeSize.get(key);
+      if (sz) whSizes.push(sz);
+    } else {
+      gateJumps++;
+    }
   }
+  const maxShipSize = chainMaxSize(whSizes);
 
   // Nearest trade hub by stargate jumps from the exit's eve system.
   let hub: { name: string; jumps: number } | null = null;
@@ -595,7 +607,7 @@ async function computeExitIntel(mapId: string, exitNodeId: string): Promise<Exit
       if (entry && (hub === null || entry.jumps < hub.jumps)) hub = { name: h.name, jumps: entry.jumps };
     }
   }
-  return { pathNames, whJumps, gateJumps, hub, total: whJumps + gateJumps + (hub?.jumps ?? 0) };
+  return { pathNames, whJumps, gateJumps, maxShipSize, hub, total: whJumps + gateJumps + (hub?.jumps ?? 0) };
 }
 
 interface KspaceExitPick {
@@ -743,6 +755,7 @@ function maybeBroadcastConnection(meta: MapMeta, mapId: string, connId: string, 
             exitName: exit.name, exitRegion: exit.region, exitSecurity: exit.security,
             connectedName: exit.connectedName, connectedClass: exit.connectedClass,
             pathNames: intel.pathNames, whJumps: intel.whJumps, gateJumps: intel.gateJumps,
+            maxShipSize: intel.maxShipSize,
             hubName: intel.hub?.name ?? null, hubJumps: intel.hub?.jumps ?? null,
             total: intel.total, mapName: r.mapName, actor,
           }));
