@@ -1007,7 +1007,7 @@
     "riskEol": "EOL",
     "riskCritical": "임계 질량",
     "riskFrig": "프리깃 홀",
-    "shortcutNoWaypoint": "이 경로는 웜홀/Thera/Turnur/점프 게이트를 사용하므로 자동 조종 목적지로 설정할 수 없습니다 — 경로의 K-스페이스 시스템을 우클릭하세요.",
+    "jspaceNoWaypoint": "웜홀 시스템은 자동 조종 목적지로 설정할 수 없습니다.",
     "viaAnsiblex": "Ansiblex 점프 게이트"
   },
   "activity": {

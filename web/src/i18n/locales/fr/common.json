@@ -1007,7 +1007,7 @@
     "riskEol": "EOL",
     "riskCritical": "Masse critique",
     "riskFrig": "Trou frégate",
-    "shortcutNoWaypoint": "Cet itinéraire passe par un trou de ver/Thera/Turnur/porte de saut et ne peut pas être défini comme destination du pilote automatique — faites un clic droit sur un système k-space de l’itinéraire.",
+    "jspaceNoWaypoint": "Les systèmes de trou de ver ne peuvent pas être définis comme destination du pilote automatique.",
     "viaAnsiblex": "Porte de saut Ansiblex"
   },
   "activity": {

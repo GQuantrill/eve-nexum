@@ -25,7 +25,8 @@ export interface RoutePathNode {
 export interface RouteEntry {
   jumps:       number;
   path:        RoutePathNode[];
-  usesSpecial: boolean;  // path traverses a wormhole/Thera/Turnur hop → not autopilot-able
+  usesSpecial: boolean;  // path traverses a wormhole/Thera/Turnur/Ansiblex hop (informational — the
+                         // displayed route won't match EVE autopilot; a k-space destination is still settable)
 }
 
 /**

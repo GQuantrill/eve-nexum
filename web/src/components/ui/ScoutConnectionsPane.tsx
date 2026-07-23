@@ -6,7 +6,7 @@ import { useWormholeTypes } from '../../hooks/useWormholeTypes';
 import { whSizeForType, whSizeShort } from '../../utils/wormholeSize';
 import { useRouteOrigin } from '../../hooks/useRouteOrigin';
 import { useRoute } from '../../hooks/useRoute';
-import { setWaypoint, RouteSquares } from './routeUi';
+import { setWaypoint, RouteSquares, canSetAutopilot } from './routeUi';
 import { useSystemAlias } from '../../hooks/useSystemAlias';
 import { truesecColor } from '../../utils/truesec';
 import { useMapStore } from '../../store/mapStore';
@@ -159,6 +159,9 @@ export function ScoutConnectionsPane({ scoutSystem }: Props) {
         // The K-space exit is the destination users can autopilot to.
         // Wormhole-class targets can't be set as a waypoint.
         const isKspaceTarget = !isWormholeClass(c.inSystemClass);
+        // A k-space exit stays settable even when the shortest route shortcuts
+        // through a hole/Ansiblex — EVE routes there via gates regardless.
+        const canAutopilot = canSetAutopilot(route);
         return (
           <div key={c.id} className="scout-row">
             <div className="scout-row__sys">
@@ -199,9 +202,9 @@ export function ScoutConnectionsPane({ scoutSystem }: Props) {
                     type="button"
                     className="sys-btn scout-row__btn scout-row__btn--icon"
                     onClick={() => setWaypoint(c.inSystemId, c.inSystemName, true)}
-                    disabled={route?.usesSpecial}
+                    disabled={!canAutopilot}
                     aria-label={t('waypoint.setDestination')}
-                    data-tooltip={route?.usesSpecial ? t('route.shortcutNoWaypoint') : t('waypoint.setDestination')}
+                    data-tooltip={canAutopilot ? t('waypoint.setDestination') : t('route.jspaceNoWaypoint')}
                   >
                     <MapPinSimpleIcon size={14} weight="regular" color="#3ddc84" />
                   </button>
@@ -209,9 +212,9 @@ export function ScoutConnectionsPane({ scoutSystem }: Props) {
                     type="button"
                     className="sys-btn scout-row__btn scout-row__btn--icon"
                     onClick={() => setWaypoint(c.inSystemId, c.inSystemName, false)}
-                    disabled={route?.usesSpecial}
+                    disabled={!canAutopilot}
                     aria-label={t('waypoint.addWaypoint')}
-                    data-tooltip={route?.usesSpecial ? t('route.shortcutNoWaypoint') : t('waypoint.addWaypoint')}
+                    data-tooltip={canAutopilot ? t('waypoint.addWaypoint') : t('route.jspaceNoWaypoint')}
                   >
                     <PathIcon size={14} weight="regular" color="#5a9af8" />
                   </button>
