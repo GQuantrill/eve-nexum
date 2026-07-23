@@ -19,9 +19,19 @@ export interface PeriodStats {
   signatures: SigBreakdown;
 }
 
+/** Chart bucket granularity for a period's activity series. */
+export type BucketUnit = 'hour' | 'day' | 'month';
+
+export interface ActivitySeries {
+  /** Bucket size: hourly (24h), daily (week/month), monthly (year/all-time). */
+  unit:   BucketUnit;
+  /** Sig counts per bucket, oldest first, current bucket last. */
+  values: number[];
+}
+
 export type StatsResponse = Record<StatPeriod, PeriodStats> & {
-  /** Sig counts per day for the last 30 days, oldest first, today last. */
-  daily: number[];
+  /** One activity series per period, at that period's own granularity. */
+  series: Record<StatPeriod, ActivitySeries>;
 };
 
 export function useStats(open: boolean) {

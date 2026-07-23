@@ -1151,6 +1151,7 @@
     "loading": "加载中…",
     "jumps": "跳跃",
     "signatures": "信号",
+    "activity": "活动",
     "dailyActivity": "每日活动 — 最近 30 天",
     "byType": "按类型分类的信号",
     "type": "类型",
@@ -1169,6 +1170,9 @@
     "minutesAgo": "{{value}} 分钟前",
     "hoursAgo": "{{value}} 小时前",
     "daysAgo": "{{value}} 天前",
+    "now": "现在",
+    "monthsAgo": "{{value}}个月前",
+    "thisMonth": "本月",
     "today": "今天"
   },
   "duration": {

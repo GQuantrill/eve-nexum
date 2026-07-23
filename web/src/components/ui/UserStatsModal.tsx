@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { XIcon } from '@phosphor-icons/react';
-import { useStats, type StatPeriod, type SigBreakdown } from '../../hooks/useStats';
+import { useStats, type StatPeriod, type SigBreakdown, type BucketUnit } from '../../hooks/useStats';
 
 const SPARK_VB_W = 600;
 const SPARK_VB_H = 80;
 const SPARK_PAD  = { top: 6, right: 6, bottom: 18, left: 28 };
 const SPARK_COLOR = '#6ea0ff';
 
-function SigSparkline({ values }: { values: number[] }) {
+function SigSparkline({ values, unit }: { values: number[]; unit: BucketUnit }) {
   const { t } = useTranslation();
   const n      = values.length;
   const iw     = SPARK_VB_W - SPARK_PAD.left - SPARK_PAD.right;
@@ -26,10 +26,18 @@ function SigSparkline({ values }: { values: number[] }) {
 
   // Y ticks: 0, mid, max
   const yTicks = [...new Set([0, Math.round(maxVal / 2), maxVal])];
-  // X ticks: 30d ago (left) and today (right)
+  // Relative label for a bucket, given how many buckets back from the current
+  // one it sits (0 = current). Wording follows the series granularity.
+  const relLabel = (back: number): string => {
+    if (unit === 'hour')  return back === 0 ? t('time.now')       : t('time.hoursAgo',  { value: back });
+    if (unit === 'month') return back === 0 ? t('time.thisMonth') : t('time.monthsAgo', { value: back });
+    return                       back === 0 ? t('time.today')     : t('time.daysAgo',   { value: back });
+  };
+
+  // X ticks: oldest bucket (left) and current bucket (right).
   const xLabels: { x: number; label: string }[] = n > 0 ? [
-    { x: xOf(0),     label: t('time.daysAgo', { value: n - 1 }) },
-    { x: xOf(n - 1), label: t('time.today') },
+    { x: xOf(0),     label: relLabel(n - 1) },
+    { x: xOf(n - 1), label: relLabel(0) },
   ] : [];
 
   return (
@@ -94,7 +102,7 @@ function SigSparkline({ values }: { values: number[] }) {
       </svg>
       {hover && (
         <div className="stats-modal__spark-tooltip">
-          <strong>{hover.value.toLocaleString()}</strong> sigs · {n - 1 - hover.index === 0 ? t('time.today') : t('time.daysAgo', { value: n - 1 - hover.index })}
+          <strong>{hover.value.toLocaleString()}</strong> sigs · {relLabel(n - 1 - hover.index)}
         </div>
       )}
     </div>
@@ -149,7 +157,7 @@ export function UserStatsModal({ onClose }: Props) {
 
         <div className="modal__header">
           <h2 className="modal__title">{t('stats.title')}</h2>
-          <button className="modal__close" onClick={onClose}><XIcon size={14} weight="bold" /></button>
+          <button className="icon-btn" onClick={onClose} aria-label={t('actions.close')}><XIcon size={16} weight="bold" /></button>
         </div>
 
         <div className="stats-modal__periods">
@@ -181,10 +189,10 @@ export function UserStatsModal({ onClose }: Props) {
                 </div>
               </div>
 
-              {stats?.daily && stats.daily.some((v) => v > 0) && (
+              {stats?.series[period] && stats.series[period].values.some((v) => v > 0) && (
                 <>
-                  <h3 className="stats-modal__section-title">{t('stats.dailyActivity')}</h3>
-                  <SigSparkline values={stats.daily} />
+                  <h3 className="stats-modal__section-title">{t('stats.activity')} — {periodLabels[period]}</h3>
+                  <SigSparkline values={stats.series[period].values} unit={stats.series[period].unit} />
                 </>
               )}
 

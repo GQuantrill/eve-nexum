@@ -1151,6 +1151,7 @@
     "loading": "読み込み中…",
     "jumps": "ジャンプ",
     "signatures": "シグネチャ",
+    "activity": "アクティビティ",
     "dailyActivity": "日別アクティビティ — 過去30日",
     "byType": "タイプ別シグネチャ",
     "type": "タイプ",
@@ -1169,6 +1170,9 @@
     "minutesAgo": "{{value}}分前",
     "hoursAgo": "{{value}}時間前",
     "daysAgo": "{{value}}日前",
+    "now": "現在",
+    "monthsAgo": "{{value}}か月前",
+    "thisMonth": "今月",
     "today": "今日"
   },
   "duration": {

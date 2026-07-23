@@ -4,7 +4,7 @@
 
 /* ── User Stats Modal ────────────────────────────────────── */
 .stats-modal {
-  width: 560px;
+  width: min(720px, 94vw);
 }
 
 .stats-modal__periods {

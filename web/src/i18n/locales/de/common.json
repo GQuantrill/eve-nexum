@@ -1151,6 +1151,7 @@
     "loading": "Lädt…",
     "jumps": "Sprünge",
     "signatures": "Signaturen",
+    "activity": "Aktivität",
     "dailyActivity": "Tägliche Aktivität — letzte 30 Tage",
     "byType": "Signaturen nach Typ",
     "type": "Typ",
@@ -1169,6 +1170,9 @@
     "minutesAgo": "vor {{value}}m",
     "hoursAgo": "vor {{value}}h",
     "daysAgo": "vor {{value}}t",
+    "now": "jetzt",
+    "monthsAgo": "vor {{value}} Mon.",
+    "thisMonth": "dieser Monat",
     "today": "heute"
   },
   "duration": {
