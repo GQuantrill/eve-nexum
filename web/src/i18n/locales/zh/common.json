@@ -325,6 +325,8 @@
       "whClassLabel": "目标等级",
       "whSizeLabel": "大小",
       "whAll": "全部",
+      "exitsMinSecLabel": "最低出口安全等级",
+      "exitsMinSecHint": "仅当新发现的 K 空间出口的安全等级达到此值时，才发送详细的出口情报（从母星的路径、最近的贸易枢纽）。-1.0 到 1.0；0.45 = 高安。",
       "removeType": "移除 {{name}}",
       "excludedMaps": "排除的地图",
       "excludedHint": "所有地图默认都会通知。勾选某个地图可将其从 Discord 中排除。",

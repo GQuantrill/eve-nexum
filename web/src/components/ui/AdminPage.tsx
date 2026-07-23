@@ -1722,6 +1722,7 @@ interface DiscordSettings {
   whSizes:      string[];
   connectionsWebhook: string;
   chainsWebhook:      string;
+  exitsMinSecurity:   number;
   maps:         { id: string; name: string; excluded: boolean }[];
 }
 interface RegionOption { id: number; name: string }
@@ -1758,6 +1759,8 @@ function DiscordTab() {
   // Editable copies of the per-event webhook URLs (empty = off).
   const [connWebhook, setConnWebhook]   = useState('');
   const [chainWebhook, setChainWebhook] = useState('');
+  // Minimum k-space exit security for the rich exit embed (default 0.45 = HS).
+  const [exitMinSec, setExitMinSec]     = useState(0.45);
 
   const load = useCallback(async () => {
     try {
@@ -1773,6 +1776,7 @@ function DiscordTab() {
       setWhSizes(s.whSizes ?? []);
       setConnWebhook(s.connectionsWebhook ?? '');
       setChainWebhook(s.chainsWebhook ?? '');
+      setExitMinSec(s.exitsMinSecurity ?? 0.45);
       setRegionOpts(r.regions);
       setError(null);
     } catch (e) {
@@ -1791,8 +1795,8 @@ function DiscordTab() {
     try {
       // Send every field the PUT can wipe (it defaults absent flags/lists), so a
       // save never silently resets the chain toggle or another filter dimension.
-      await api('/api/admin/discord', { method: 'PUT', body: JSON.stringify({ allRegions, regions, notifyChains: data.notifyChains, whTypes, whClasses, whSizes, connectionsWebhook: connWebhook.trim(), chainsWebhook: chainWebhook.trim() }) });
-      setData((d) => (d ? { ...d, allRegions, regions, whTypes, whClasses, whSizes, connectionsWebhook: connWebhook.trim(), chainsWebhook: chainWebhook.trim() } : d));
+      await api('/api/admin/discord', { method: 'PUT', body: JSON.stringify({ allRegions, regions, notifyChains: data.notifyChains, whTypes, whClasses, whSizes, connectionsWebhook: connWebhook.trim(), chainsWebhook: chainWebhook.trim(), exitsMinSecurity: exitMinSec }) });
+      setData((d) => (d ? { ...d, allRegions, regions, whTypes, whClasses, whSizes, connectionsWebhook: connWebhook.trim(), chainsWebhook: chainWebhook.trim(), exitsMinSecurity: exitMinSec } : d));
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     } catch (e) {
@@ -1809,7 +1813,7 @@ function DiscordTab() {
     const prev = data.notifyChains;
     setData((d) => (d ? { ...d, notifyChains: next } : d));
     try {
-      await api('/api/admin/discord', { method: 'PUT', body: JSON.stringify({ allRegions: data.allRegions, regions: data.regions, notifyChains: next, whTypes: data.whTypes, whClasses: data.whClasses, whSizes: data.whSizes, connectionsWebhook: data.connectionsWebhook, chainsWebhook: data.chainsWebhook }) });
+      await api('/api/admin/discord', { method: 'PUT', body: JSON.stringify({ allRegions: data.allRegions, regions: data.regions, notifyChains: next, whTypes: data.whTypes, whClasses: data.whClasses, whSizes: data.whSizes, connectionsWebhook: data.connectionsWebhook, chainsWebhook: data.chainsWebhook, exitsMinSecurity: data.exitsMinSecurity }) });
     } catch (e) {
       setData((d) => (d ? { ...d, notifyChains: prev } : d));
       setError(e instanceof Error ? e.message : t('admin.discord.saveFailed'));
@@ -1856,7 +1860,8 @@ function DiscordTab() {
     || sortJoin(whClasses) !== sortJoin(data.whClasses)
     || sortJoin(whSizes)   !== sortJoin(data.whSizes)
     || connWebhook.trim()  !== data.connectionsWebhook
-    || chainWebhook.trim() !== data.chainsWebhook;
+    || chainWebhook.trim() !== data.chainsWebhook
+    || exitMinSec          !== data.exitsMinSecurity;
 
   return (
     <>
@@ -1985,6 +1990,20 @@ function DiscordTab() {
             >{t(o.labelKey)}</button>
           ))}
         </div>
+
+        {/* Minimum security a revealed k-space exit needs for the rich exit embed. */}
+        <label className={styles.dcSublabel} htmlFor="exit-min-sec">{t('admin.discord.exitsMinSecLabel')}</label>
+        <p className={styles.dcHint}>{t('admin.discord.exitsMinSecHint')}</p>
+        <input
+          id="exit-min-sec"
+          type="number"
+          className={styles.dcSearch}
+          min={-1}
+          max={1}
+          step={0.1}
+          value={exitMinSec}
+          onChange={(e) => setExitMinSec(Number(e.target.value))}
+        />
 
         <div className={styles.dcActions}>
           <button className="btn btn--primary" disabled={!dirty || saving} onClick={saveFilters}>

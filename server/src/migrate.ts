@@ -194,6 +194,12 @@ export async function migrate() {
     ALTER TABLE alliance_discord_settings ADD COLUMN IF NOT EXISTS connections_webhook TEXT;
     ALTER TABLE alliance_discord_settings ADD COLUMN IF NOT EXISTS chains_webhook      TEXT;
 
+    -- Minimum solar-system security a revealed k-space exit must have for the
+    -- new-connection notification to upgrade to the rich routing-intel embed.
+    -- Default 0.45 (high-sec). Applied to both scopes.
+    ALTER TABLE corp_discord_settings     ADD COLUMN IF NOT EXISTS exits_min_security REAL NOT NULL DEFAULT 0.45;
+    ALTER TABLE alliance_discord_settings ADD COLUMN IF NOT EXISTS exits_min_security REAL NOT NULL DEFAULT 0.45;
+
     CREATE TABLE IF NOT EXISTS map_systems (
       id            UUID        PRIMARY KEY,
       map_id        UUID        NOT NULL REFERENCES maps(id) ON DELETE CASCADE,

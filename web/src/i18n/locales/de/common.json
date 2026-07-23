@@ -325,6 +325,8 @@
       "whClassLabel": "Zielklasse",
       "whSizeLabel": "Größe",
       "whAll": "Alle",
+      "exitsMinSecLabel": "Mindestsicherheit für Ausgänge",
+      "exitsMinSecHint": "Zeige die ausführlichen Ausgangsinfos (Weg von zu Hause, nächster Handelsknoten) nur, wenn ein neu entdeckter K-Space-Ausgang mindestens diese Sicherheit hat. -1,0 bis 1,0; 0,45 = Highsec.",
       "removeType": "{{name}} entfernen",
       "excludedMaps": "Ausgeschlossene Karten",
       "excludedHint": "Alle Karten benachrichtigen standardmäßig. Hake eine Karte an, um sie von Discord auszuschließen.",
