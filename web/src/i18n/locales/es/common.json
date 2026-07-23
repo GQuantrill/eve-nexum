@@ -1151,6 +1151,7 @@
     "loading": "Cargando…",
     "jumps": "Saltos",
     "signatures": "Firmas",
+    "activity": "Actividad",
     "dailyActivity": "Actividad diaria — últimos 30 días",
     "byType": "Firmas por tipo",
     "type": "Tipo",
@@ -1169,6 +1170,9 @@
     "minutesAgo": "hace {{value}}m",
     "hoursAgo": "hace {{value}}h",
     "daysAgo": "hace {{value}}d",
+    "now": "ahora",
+    "monthsAgo": "hace {{value}} meses",
+    "thisMonth": "este mes",
     "today": "hoy"
   },
   "duration": {
