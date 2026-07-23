@@ -1,5 +1,9 @@
 *, *::before, *::after { box-sizing: border-box; }
 
+/* Tell the browser we're a dark app so native UI — scrollbars, form controls,
+   the resize handle — renders dark instead of the light OS default. */
+:root { color-scheme: dark; }
+
 body {
   margin: 0;
   background: #08090f;
@@ -7,6 +11,26 @@ body {
   font-family: 'Inter', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
+
+/* Branded dark scrollbars everywhere, so no element falls back to the light
+   native OS scrollbar. Firefox uses the two-property form; WebKit/Blink use the
+   pseudo-elements. Per-element rules (e.g. .fleet-pane__list) are more specific
+   and still win where a component wants its own treatment. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-muted) transparent;
+}
+
+::-webkit-scrollbar { width: 12px; height: 12px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--surface-muted);
+  border-radius: 7px;
+  border: 3px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--border-strong); }
+::-webkit-scrollbar-corner { background: transparent; }
 
 #root {
   width: 100%;

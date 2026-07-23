@@ -55,11 +55,15 @@ async function addScoutEdges(o: RouteOverlay, thera: boolean, turnur: boolean): 
   return added;
 }
 
-// Wormhole chain links from a map. Only real wormholes (connection_type
-// 'standard'; gates already live in the base graph), never broken/collapsed
-// holes, and only where both ends have a resolved eve_system_id — an unmapped
-// intermediate system with a null id necessarily severs that chain path.
-async function addWormholeEdges(o: RouteOverlay, mapId: string): Promise<boolean> {
+// Wormhole chain links from one or more maps. Only real wormholes
+// (connection_type 'standard'; gates already live in the base graph), never
+// broken/collapsed holes, and only where both ends have a resolved
+// eve_system_id — an unmapped intermediate system with a null id necessarily
+// severs that chain path. Passing several map ids unions their chains (the
+// closest-systems pane routes across every map the user can see, so the chain
+// they're actually sitting in is used regardless of the active tab).
+async function addWormholeEdges(o: RouteOverlay, mapIds: string[]): Promise<boolean> {
+  if (mapIds.length === 0) return false;
   const { rows } = await db.query<{
     a: number; b: number; whType: string | null;
     critical: boolean; eol: boolean; frig: boolean;
@@ -72,12 +76,12 @@ async function addWormholeEdges(o: RouteOverlay, mapId: string): Promise<boolean
        FROM map_connections c
        JOIN map_systems s ON s.id = c.source_id
        JOIN map_systems t ON t.id = c.target_id
-      WHERE c.map_id = $1
+      WHERE c.map_id = ANY($1::uuid[])
         AND c.broken = FALSE
         AND c.connection_type = 'standard'
         AND s.eve_system_id IS NOT NULL
         AND t.eve_system_id IS NOT NULL`,
-    [mapId],
+    [mapIds],
   );
   for (const r of rows) {
     addEdge(o, r.a, r.b, {
@@ -95,18 +99,19 @@ async function addWormholeEdges(o: RouteOverlay, mapId: string): Promise<boolean
 // Both ends are k-space, so every route node stays autopilot-able per-node —
 // but EVE's autopilot won't route through a bridge on its own, so an Ansiblex
 // route is still flagged usesSpecial like a wormhole.
-async function addAnsiblexEdges(o: RouteOverlay, mapId: string): Promise<boolean> {
+async function addAnsiblexEdges(o: RouteOverlay, mapIds: string[]): Promise<boolean> {
+  if (mapIds.length === 0) return false;
   const { rows } = await db.query<{ a: number; b: number }>(
     `SELECT s.eve_system_id AS a, t.eve_system_id AS b
        FROM map_connections c
        JOIN map_systems s ON s.id = c.source_id
        JOIN map_systems t ON t.id = c.target_id
-      WHERE c.map_id = $1
+      WHERE c.map_id = ANY($1::uuid[])
         AND c.broken = FALSE
         AND c.connection_type = 'jumpgate'
         AND s.eve_system_id IS NOT NULL
         AND t.eve_system_id IS NOT NULL`,
-    [mapId],
+    [mapIds],
   );
   for (const r of rows) addEdge(o, r.a, r.b, { kind: 'ansiblex' });
   return rows.length > 0;
@@ -128,16 +133,18 @@ async function fillInfo(o: RouteOverlay): Promise<void> {
  * Build the per-request routing overlay from the enabled shortcut sources.
  * Returns `undefined` when nothing was enabled or no edges were produced, so
  * the caller passes `undefined` to shortestRoutes and routing is unchanged.
- * The caller MUST authorize `mapId` (getMapAccess) before enabling wormholes.
+ * The caller MUST authorize every id in `mapIds` (getMapAccess, or derive them
+ * from listVisibleMaps which is already access-scoped) before enabling wormholes.
  */
 export async function buildRouteOverlay(opts: {
-  thera: boolean; turnur: boolean; wormholes: boolean; ansiblex: boolean; mapId?: string;
+  thera: boolean; turnur: boolean; wormholes: boolean; ansiblex: boolean; mapIds?: string[];
 }): Promise<RouteOverlay | undefined> {
   const o = emptyOverlay();
+  const mapIds = opts.mapIds ?? [];
   let any = false;
   if (opts.thera || opts.turnur) any = (await addScoutEdges(o, opts.thera, opts.turnur)) || any;
-  if (opts.wormholes && opts.mapId) any = (await addWormholeEdges(o, opts.mapId)) || any;
-  if (opts.ansiblex && opts.mapId)  any = (await addAnsiblexEdges(o, opts.mapId)) || any;
+  if (opts.wormholes && mapIds.length) any = (await addWormholeEdges(o, mapIds)) || any;
+  if (opts.ansiblex && mapIds.length)  any = (await addAnsiblexEdges(o, mapIds)) || any;
   if (!any) return undefined;
   await fillInfo(o);
   return o;

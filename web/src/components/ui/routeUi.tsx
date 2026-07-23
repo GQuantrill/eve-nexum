@@ -9,6 +9,25 @@ import { ContextMenu } from './ContextMenu';
 import { useSystemAlias } from '../../hooks/useSystemAlias';
 import type { RouteEntry, RoutePathNode, EdgeMeta } from '../../hooks/useRoute';
 
+/**
+ * Whether the route's destination can be pushed to the in-game autopilot.
+ *
+ * A k-space destination always can — EVE routes there via stargates even when
+ * the shortest *displayed* route shortcuts through a wormhole, a Thera/Turnur
+ * hole, or an Ansiblex bridge. The autopilot only needs the target itself to be
+ * gate-reachable; it computes its own gate path and ignores the shortcut. So
+ * the button is gated on the DESTINATION being k-space, never on whether the
+ * path happened to use a shortcut. Only a J-space (wormhole) destination, which
+ * has no gates, genuinely can't be an autopilot waypoint.
+ *
+ * Defaults to true when there's no computed route — the target is still a real
+ * system the user can autopilot toward.
+ */
+export function canSetAutopilot(route?: RouteEntry): boolean {
+  const dest = route?.path[route.path.length - 1];
+  return dest ? dest.kspace : true;
+}
+
 /** Fire ESI waypoint endpoint; surface success/failure via toast. */
 export function setWaypoint(systemId: number, systemName: string, clear: boolean) {
   api('/api/character/waypoint', {

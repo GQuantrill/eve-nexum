@@ -1007,7 +1007,7 @@
     "riskEol": "EOL",
     "riskCritical": "Massa crítica",
     "riskFrig": "Buraco de fragata",
-    "shortcutNoWaypoint": "Esta rota usa um buraco de minhoca/Thera/Turnur/portão de salto e não pode ser definida como destino do piloto automático — clique com o botão direito em um sistema k-space da rota.",
+    "jspaceNoWaypoint": "Sistemas de buraco de minhoca não podem ser definidos como destino do piloto automático.",
     "viaAnsiblex": "Portão de salto Ansiblex"
   },
   "activity": {
