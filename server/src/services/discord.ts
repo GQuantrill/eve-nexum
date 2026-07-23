@@ -108,6 +108,7 @@ const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve,
 const AMBER = 0xf0a030;
 const BLUE  = 0x5b9bff;
 const GREEN = 0x3ddc84;
+const RED   = 0xe05a5a;
 
 // Saved wormhole chain: name + start/end + how tight and how far.
 export function chainEmbed(p: {
@@ -156,5 +157,46 @@ export function connectionEmbed(p: {
     fields:      fields.length ? fields : undefined,
     footer:      p.actor ? { text: `added by ${p.actor}` } : undefined,
     timestamp:   new Date().toISOString(),
+  };
+}
+
+// Richer form of the new-connection notification for a freshly revealed k-space
+// exit reachable from the map's home: the security band, the chain path out to
+// it, and how far the nearest trade hub is by stargate. Same connections
+// webhook as connectionEmbed — just a routing-intel layout when the intel exists.
+export function kspaceExitEmbed(p: {
+  exitName: string; exitRegion: string | null; exitSecurity: number;
+  connectedName: string; connectedClass: string;
+  pathNames: string[]; whJumps: number;
+  hubName: string | null; hubJumps: number | null; total: number;
+  mapName: string; actor: string | null;
+}): DiscordEmbed {
+  // Security-band aware title + colour: highsec reads safe (green), lowsec
+  // caution (amber), nullsec danger (red).
+  const title = p.exitSecurity >= 0.45 ? '🚨 Highsec Exit Found'
+              : p.exitSecurity >  0.0  ? '🚨 Lowsec Exit Found'
+              :                          '🚨 Nullsec Exit Found';
+  const color = p.exitSecurity >= 0.45 ? GREEN
+              : p.exitSecurity >  0.0  ? AMBER
+              :                          RED;
+  const fields: NonNullable<DiscordEmbed['fields']> = [
+    { name: 'Exit system',  value: `${p.exitName} (${p.exitRegion ?? '?'}) — Security ${p.exitSecurity.toFixed(1)}`, inline: true },
+    { name: 'Connected to', value: `${p.connectedName} (${p.connectedClass})`, inline: true },
+    { name: 'Path from home',           value: p.pathNames.join(' → ') },
+    { name: 'Wormhole jumps from home', value: String(p.whJumps), inline: true },
+  ];
+  if (p.hubName != null) {
+    fields.push({ name: 'Nearest trade hub', value: `${p.hubName} — ${p.hubJumps} stargate jumps from exit`, inline: true });
+  }
+  if (p.hubJumps != null) {
+    fields.push({ name: 'Total effective distance', value: `${p.whJumps} WH + ${p.hubJumps} stargate = ${p.total} jumps` });
+  }
+  return {
+    title,
+    description: `**${p.exitName}** exit found on **${p.mapName}**`,
+    color,
+    fields,
+    footer:    p.actor ? { text: `mapped by ${p.actor}` } : undefined,
+    timestamp: new Date().toISOString(),
   };
 }

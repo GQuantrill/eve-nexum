@@ -325,6 +325,8 @@
       "whClassLabel": "Classe de destino",
       "whSizeLabel": "Tamanho",
       "whAll": "Todos",
+      "exitsMinSecLabel": "Segurança mínima da saída",
+      "exitsMinSecHint": "Envia as informações detalhadas de saída (rota de casa, hub comercial mais próximo) apenas quando uma nova saída para o k-space tem pelo menos esta segurança. -1,0 a 1,0; 0,45 = alta segurança.",
       "removeType": "Remover {{name}}",
       "excludedMaps": "Mapas excluídos",
       "excludedHint": "Todos os mapas notificam por defeito. Marca um mapa para o excluir do Discord.",

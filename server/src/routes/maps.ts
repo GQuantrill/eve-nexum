@@ -21,7 +21,8 @@ import {
 } from '../services/mapWrite.js';
 import { reportPresence } from '../services/presence.js';
 import { copyMap } from '../services/mapCopy.js';
-import { notifyDiscord, k162Embed, connectionEmbed, chainEmbed } from '../services/discord.js';
+import { notifyDiscord, k162Embed, connectionEmbed, chainEmbed, kspaceExitEmbed } from '../services/discord.js';
+import { shortestRoutes } from '../services/routeGraph.js';
 import { whSizeForCode } from './wormholes.js';
 import { effectiveExpiryMs, lifeBucket } from '../data/whLifetimes.js';
 
@@ -351,7 +352,8 @@ const DISCORD_SETTINGS_COLS = `
   COALESCE(cds.regions,       ads.regions,       '{}'::text[])  AS "regions",
   COALESCE(cds.notify_chains, ads.notify_chains, TRUE)          AS "notifyChains",
   COALESCE(cds.connections_webhook, ads.connections_webhook)    AS "connectionsWebhook",
-  COALESCE(cds.chains_webhook,      ads.chains_webhook)         AS "chainsWebhook"`;
+  COALESCE(cds.chains_webhook,      ads.chains_webhook)         AS "chainsWebhook",
+  COALESCE(cds.exits_min_security,  ads.exits_min_security, 0.45) AS "exitsMinSecurity"`;
 
 // leads-to tokens that are a class/band/unknown rather than a pinned system —
 // mirrors the client's CLASS_OR_UNKNOWN set. A leads-to NOT in here is a
@@ -494,6 +496,123 @@ function whTypeAllows(list: string[], code: string): boolean {
   return list.length === 0 || code === '' || list.includes(code);
 }
 
+// Trade hubs (eve solar-system ids) used to size up a freshly revealed k-space
+// exit: the nearest one by stargate jumps is reported in the rich exit embed.
+const TRADE_HUBS: { id: number; name: string }[] = [
+  { id: 30000142, name: 'Jita' },
+  { id: 30002187, name: 'Amarr' },
+  { id: 30002510, name: 'Rens' },
+  { id: 30002659, name: 'Dodixie' },
+  { id: 30002053, name: 'Hek' },
+];
+
+// K-space system classes — the "exits" a wormhole chain can drop you into.
+const KSPACE_EXIT_CLASSES = new Set(['HS', 'LS', 'NS']);
+
+interface ExitIntel {
+  pathNames: string[];                              // home … exit, inclusive
+  whJumps:   number;                                // edges in that path
+  hub:       { name: string; jumps: number } | null; // nearest trade hub by stargate
+  total:     number;                                // whJumps + hub jumps
+}
+
+// Routing intel for a k-space exit newly revealed on a map: the shortest
+// wormhole-chain path from the map's home to the exit (BFS over the map's live
+// connections), plus the nearest trade hub by stargate jumps from the exit.
+// Returns null when the map has no home or the exit isn't reachable from it —
+// callers then fall back to the plain connection embed.
+async function computeExitIntel(mapId: string, exitNodeId: string): Promise<ExitIntel | null> {
+  const [sysRes, connRes] = await Promise.all([
+    db.query<{ id: string; name: string; eve_system_id: number | null; is_home: boolean }>(
+      `SELECT id, name, eve_system_id, is_home FROM map_systems WHERE map_id = $1`, [mapId]),
+    db.query<{ source_id: string; target_id: string }>(
+      `SELECT source_id, target_id FROM map_connections WHERE map_id = $1 AND broken = FALSE`, [mapId]),
+  ]);
+
+  const nodes = new Map<string, { name: string; eve: number | null }>();
+  let homeId: string | null = null;
+  for (const s of sysRes.rows) {
+    nodes.set(s.id, { name: s.name, eve: s.eve_system_id });
+    if (s.is_home && homeId === null) homeId = s.id; // first home wins
+  }
+  if (homeId === null || !nodes.has(exitNodeId)) return null;
+
+  // Undirected adjacency over the map's un-broken connections.
+  const adj = new Map<string, string[]>();
+  const link = (a: string, b: string) => { const l = adj.get(a); if (l) l.push(b); else adj.set(a, [b]); };
+  for (const c of connRes.rows) { link(c.source_id, c.target_id); link(c.target_id, c.source_id); }
+
+  // BFS home → exit, tracking predecessors to rebuild the shortest path.
+  const prev = new Map<string, string>();
+  const seen = new Set<string>([homeId]);
+  const queue: string[] = [homeId];
+  let head = 0;
+  let found = homeId === exitNodeId;
+  while (head < queue.length && !found) {
+    const cur = queue[head++];
+    for (const n of adj.get(cur) ?? []) {
+      if (seen.has(n)) continue;
+      seen.add(n);
+      prev.set(n, cur);
+      if (n === exitNodeId) { found = true; break; }
+      queue.push(n);
+    }
+  }
+  if (!found) return null;
+
+  const idPath: string[] = [];
+  for (let cur: string | undefined = exitNodeId; cur !== undefined; cur = prev.get(cur)) {
+    idPath.push(cur);
+    if (cur === homeId) break;
+  }
+  idPath.reverse();
+  const pathNames = idPath.map((id) => nodes.get(id)?.name ?? '?');
+  const whJumps = pathNames.length - 1;
+
+  // Nearest trade hub by stargate jumps from the exit's eve system.
+  let hub: { name: string; jumps: number } | null = null;
+  const exitEve = nodes.get(exitNodeId)?.eve ?? null;
+  if (exitEve != null) {
+    const routes = await shortestRoutes(exitEve, TRADE_HUBS.map((h) => h.id), 'shortest');
+    for (const h of TRADE_HUBS) {
+      const entry = routes[h.id];
+      if (entry && (hub === null || entry.jumps < hub.jumps)) hub = { name: h.name, jumps: entry.jumps };
+    }
+  }
+  return { pathNames, whJumps, hub, total: whJumps + (hub?.jumps ?? 0) };
+}
+
+interface KspaceExitPick {
+  nodeId: string; name: string; region: string | null; security: number;
+  connectedName: string; connectedClass: string;
+}
+
+// Choose which endpoint of a connection to treat as the k-space EXIT for the
+// rich routing embed, or null when neither qualifies. An endpoint qualifies when
+// it's HS/LS/NS with a known security at/above the org's minimum. When both
+// sides qualify (e.g. HS↔HS) the home endpoint is never the exit; failing that
+// the higher-security side wins. The other endpoint is the connected-to wormhole.
+function pickKspaceExit(r: {
+  sourceId: string; targetId: string; a: string; b: string; classA: string; classB: string;
+  regionA: string | null; regionB: string | null; secA: number | null; secB: number | null;
+  homeA: boolean; homeB: boolean; exitsMinSecurity: number;
+}): KspaceExitPick | null {
+  const qualifies = (cls: string, sec: number | null): boolean =>
+    KSPACE_EXIT_CLASSES.has(cls) && sec != null && sec >= r.exitsMinSecurity;
+  const aOk = qualifies(r.classA, r.secA);
+  const bOk = qualifies(r.classB, r.secB);
+  if (!aOk && !bOk) return null;
+
+  const sideA: KspaceExitPick = { nodeId: r.sourceId, name: r.a, region: r.regionA, security: r.secA as number, connectedName: r.b, connectedClass: r.classB };
+  const sideB: KspaceExitPick = { nodeId: r.targetId, name: r.b, region: r.regionB, security: r.secB as number, connectedName: r.a, connectedClass: r.classA };
+  if (aOk && !bOk) return sideA;
+  if (bOk && !aOk) return sideB;
+  // Both qualify: prefer the non-home side, else the higher-security one.
+  if (r.homeA && !r.homeB) return sideB;
+  if (r.homeB && !r.homeA) return sideA;
+  return (r.secB as number) > (r.secA as number) ? sideB : sideA;
+}
+
 // Broadcast a wormhole connection — at most once per connection. Keyed on the
 // connection id (not just its endpoints) so it can be re-checked whenever the
 // connection changes: created by a jump (sig already present), created manually
@@ -506,13 +625,17 @@ function maybeBroadcastConnection(meta: MapMeta, mapId: string, connId: string, 
   db.query<{
     sourceId: string; targetId: string; connType: string; notified: boolean; notifiedKnown: boolean; size: string | null; whType: string | null;
     a: string; b: string; classA: string; classB: string; regionA: string | null; regionB: string | null;
+    eveA: number | null; eveB: number | null; secA: number | null; secB: number | null; homeA: boolean; homeB: boolean;
     mapName: string; mapEnabled: boolean; allRegions: boolean; regions: string[];
-    whTypes: string[]; whClasses: string[]; whSizes: string[]; connectionsWebhook: string | null;
+    whTypes: string[]; whClasses: string[]; whSizes: string[]; connectionsWebhook: string | null; exitsMinSecurity: number;
   }>(
     `SELECT c.source_id AS "sourceId", c.target_id AS "targetId", c.connection_type AS "connType",
             c.discord_notified AS "notified", c.discord_notified_known AS "notifiedKnown", c.size, c.wh_type AS "whType",
             a.name AS a, b.name AS b, a.system_class AS "classA", b.system_class AS "classB",
             a.region_name AS "regionA", b.region_name AS "regionB",
+            a.eve_system_id AS "eveA", b.eve_system_id AS "eveB",
+            ssa.security::float8 AS "secA", ssb.security::float8 AS "secB",
+            a.is_home AS "homeA", b.is_home AS "homeB",
             m.name AS "mapName", m.discord_notify AS "mapEnabled",
             ${DISCORD_SETTINGS_COLS},
             COALESCE(cds.wh_types,   ads.wh_types,   '{}'::text[]) AS "whTypes",
@@ -522,6 +645,8 @@ function maybeBroadcastConnection(meta: MapMeta, mapId: string, connId: string, 
        JOIN maps m ON m.id = c.map_id
        JOIN map_systems a ON a.id = c.source_id
        JOIN map_systems b ON b.id = c.target_id
+       LEFT JOIN solar_systems ssa ON ssa.id = a.eve_system_id
+       LEFT JOIN solar_systems ssb ON ssb.id = b.eve_system_id
        ${DISCORD_SETTINGS_JOIN}
       WHERE c.id = $1 AND c.map_id = $2`,
     [connId, mapId],
@@ -587,6 +712,30 @@ function maybeBroadcastConnection(meta: MapMeta, mapId: string, connId: string, 
         WHERE id = $1 AND (discord_notified = FALSE OR (discord_notified_known = FALSE AND $2))`,
       [connId, known]);
     if (claim.rowCount === 0) return; // someone else already claimed this step
+    // Choose the embed: a newly revealed k-space exit (HS/LS/NS endpoint whose
+    // security is known and at/above the org minimum) that's reachable from the
+    // map's home gets the rich routing embed; anything else keeps the plain
+    // connection notification. Computing the intel is best-effort — any failure
+    // (or an unreachable / home-less exit) falls back to the plain embed so the
+    // send still happens.
+    try {
+      const exit = pickKspaceExit(r);
+      if (exit) {
+        const intel = await computeExitIntel(mapId, exit.nodeId);
+        if (intel) {
+          notifyDiscord(r.connectionsWebhook, kspaceExitEmbed({
+            exitName: exit.name, exitRegion: exit.region, exitSecurity: exit.security,
+            connectedName: exit.connectedName, connectedClass: exit.connectedClass,
+            pathNames: intel.pathNames, whJumps: intel.whJumps,
+            hubName: intel.hub?.name ?? null, hubJumps: intel.hub?.jumps ?? null,
+            total: intel.total, mapName: r.mapName, actor,
+          }));
+          return;
+        }
+      }
+    } catch (e) {
+      discordLog.warn(`k-space exit intel failed for ${r.a} <-> ${r.b} (falling back to plain embed): ${(e as Error).message}`);
+    }
     notifyDiscord(r.connectionsWebhook, connectionEmbed({ a: r.a, b: r.b, whType: ev.whType || r.whType, size: effSize, mapName: r.mapName, actor }));
   }).catch((e) => discordLog.warn(`connection dispatch query failed: ${(e as Error).message}`));
 }
