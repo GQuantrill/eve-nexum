@@ -1007,7 +1007,7 @@
     "riskEol": "EOL",
     "riskCritical": "Masa crítica",
     "riskFrig": "Agujero de fragata",
-    "shortcutNoWaypoint": "Esta ruta usa un agujero de gusano/Thera/Turnur/puerta de salto y no se puede establecer como destino del piloto automático; haz clic derecho en un sistema k-space de la ruta.",
+    "jspaceNoWaypoint": "Los sistemas de agujero de gusano no se pueden establecer como destino del piloto automático.",
     "viaAnsiblex": "Puerta de salto Ansiblex"
   },
   "activity": {

@@ -5,7 +5,7 @@ import { jumps } from '../../i18n/format';
 import { useA0Systems } from '../../hooks/useA0Systems';
 import { useRouteOrigin } from '../../hooks/useRouteOrigin';
 import { useRoute } from '../../hooks/useRoute';
-import { setWaypoint, RouteSquares } from './routeUi';
+import { setWaypoint, RouteSquares, canSetAutopilot } from './routeUi';
 import { useSystemAlias } from '../../hooks/useSystemAlias';
 import { useMapStore } from '../../store/mapStore';
 
@@ -68,6 +68,7 @@ export function A0Pane() {
       {closest.map(s => {
         const route   = routes[String(s.id)];
         const isOpen  = expanded.has(s.id);
+        const canAutopilot = canSetAutopilot(route);
         return (
           <div key={s.id} className="scout-row">
             <div className="scout-row__sys">
@@ -82,9 +83,9 @@ export function A0Pane() {
                 type="button"
                 className="sys-btn scout-row__btn scout-row__btn--icon"
                 onClick={() => setWaypoint(s.id, s.name, true)}
-                disabled={route?.usesSpecial}
+                disabled={!canAutopilot}
                 aria-label={t('waypoint.setDestination')}
-                data-tooltip={route?.usesSpecial ? t('route.shortcutNoWaypoint') : t('waypoint.setDestination')}
+                data-tooltip={canAutopilot ? t('waypoint.setDestination') : t('route.jspaceNoWaypoint')}
               >
                 <MapPinSimpleIcon size={14} weight="regular" color="#3ddc84" />
               </button>
@@ -92,9 +93,9 @@ export function A0Pane() {
                 type="button"
                 className="sys-btn scout-row__btn scout-row__btn--icon"
                 onClick={() => setWaypoint(s.id, s.name, false)}
-                disabled={route?.usesSpecial}
+                disabled={!canAutopilot}
                 aria-label={t('waypoint.addWaypoint')}
-                data-tooltip={route?.usesSpecial ? t('route.shortcutNoWaypoint') : t('waypoint.addWaypoint')}
+                data-tooltip={canAutopilot ? t('waypoint.addWaypoint') : t('route.jspaceNoWaypoint')}
               >
                 <PathIcon size={14} weight="regular" color="#5a9af8" />
               </button>
