@@ -179,14 +179,21 @@ export function kspaceExitEmbed(p: {
   const color = p.exitSecurity >= 0.45 ? GREEN
               : p.exitSecurity >  0.0  ? AMBER
               :                          RED;
+  // "Jumps from home" = the chain hops out to the exit, with the gate/WH split
+  // inline, e.g. "5 (2 gates + 3 WH)".
+  const chainTotal = p.whJumps + p.gateJumps;
+  const breakdown: string[] = [];
+  if (p.gateJumps > 0) breakdown.push(`${p.gateJumps} gate${p.gateJumps === 1 ? '' : 's'}`);
+  if (p.whJumps  > 0) breakdown.push(`${p.whJumps} WH`);
+  const jumpsFromHome = breakdown.length ? `${chainTotal} (${breakdown.join(' + ')})` : String(chainTotal);
   const fields: NonNullable<DiscordEmbed['fields']> = [
-    { name: 'Exit system',  value: `${p.exitName} (${p.exitRegion ?? '?'}) — Security ${p.exitSecurity.toFixed(1)}`, inline: true },
-    { name: 'Connected to', value: `${p.connectedName} (${p.connectedClass})`, inline: true },
-    { name: 'Path from home',           value: p.pathNames.join(' → ') },
-    { name: 'Wormhole jumps from home', value: String(p.whJumps), inline: true },
+    { name: 'Exit system',   value: `${p.exitName} (${p.exitRegion ?? '?'}) — Security ${p.exitSecurity.toFixed(1)}`, inline: true },
+    { name: 'Connected to',  value: `${p.connectedName} (${p.connectedClass})`, inline: true },
+    { name: 'Path from home', value: p.pathNames.join(' → ') },
+    { name: 'Jumps from home', value: jumpsFromHome, inline: true },
   ];
   if (p.hubName != null) {
-    fields.push({ name: 'Nearest trade hub', value: `${p.hubName} — ${p.hubJumps} stargate jumps from exit`, inline: true });
+    fields.push({ name: 'Nearest trade hub', value: `${p.hubName} — ${p.hubJumps} stargate jump${p.hubJumps === 1 ? '' : 's'} from exit`, inline: true });
   }
   if (p.hubJumps != null) {
     // Stargate portion = in-chain gate/Ansiblex hops + the exit→hub gate route.
