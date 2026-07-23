@@ -108,6 +108,7 @@ const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve,
 const AMBER = 0xf0a030;
 const BLUE  = 0x5b9bff;
 const GREEN = 0x3ddc84;
+const RED   = 0xe05a5a;
 
 // Saved wormhole chain: name + start/end + how tight and how far.
 export function chainEmbed(p: {
@@ -156,5 +157,59 @@ export function connectionEmbed(p: {
     fields:      fields.length ? fields : undefined,
     footer:      p.actor ? { text: `added by ${p.actor}` } : undefined,
     timestamp:   new Date().toISOString(),
+  };
+}
+
+// Richer form of the new-connection notification for a freshly revealed k-space
+// exit reachable from the map's home: the security band, the chain path out to
+// it, and how far the nearest trade hub is by stargate. Same connections
+// webhook as connectionEmbed — just a routing-intel layout when the intel exists.
+export function kspaceExitEmbed(p: {
+  exitName: string; exitRegion: string | null; exitSecurity: number;
+  connectedName: string; connectedClass: string;
+  pathNames: string[]; whJumps: number; gateJumps: number; maxShipSize: string;
+  hubName: string | null; hubJumps: number | null; total: number;
+  mapName: string; actor: string | null;
+}): DiscordEmbed {
+  // Security-band aware title + colour: highsec reads safe (green), lowsec
+  // caution (amber), nullsec danger (red).
+  const title = p.exitSecurity >= 0.45 ? '🚨 Highsec Exit Found'
+              : p.exitSecurity >  0.0  ? '🚨 Lowsec Exit Found'
+              :                          '🚨 Nullsec Exit Found';
+  const color = p.exitSecurity >= 0.45 ? GREEN
+              : p.exitSecurity >  0.0  ? AMBER
+              :                          RED;
+  // "Jumps from home" = the chain hops out to the exit, with the gate/WH split
+  // inline, e.g. "5 (2 gates + 3 WH)".
+  const chainTotal = p.whJumps + p.gateJumps;
+  const breakdown: string[] = [];
+  if (p.gateJumps > 0) breakdown.push(`${p.gateJumps} gate${p.gateJumps === 1 ? '' : 's'}`);
+  if (p.whJumps  > 0) breakdown.push(`${p.whJumps} WH`);
+  const jumpsFromHome = breakdown.length ? `${chainTotal} (${breakdown.join(' + ')})` : String(chainTotal);
+  const fields: NonNullable<DiscordEmbed['fields']> = [
+    { name: 'Exit system',   value: `${p.exitName} (${p.exitRegion ?? '?'}) — Security ${p.exitSecurity.toFixed(1)}`, inline: true },
+    { name: 'Connected to',  value: `${p.connectedName} (${p.connectedClass})`, inline: true },
+    { name: 'Path from home', value: p.pathNames.join(' → ') },
+    { name: 'Jumps from home',   value: jumpsFromHome, inline: true },
+    { name: 'Maximum ship size', value: p.maxShipSize, inline: true },
+  ];
+  if (p.hubName != null && p.hubJumps != null) {
+    // Stargate portion = in-chain gate/Ansiblex hops + the exit→hub gate route.
+    const stargate = p.gateJumps + p.hubJumps;
+    // An empty full-width field forces a row break so the hub + total render as
+    // their own inline pair instead of packing onto the jumps/size row.
+    fields.push(
+      { name: '\u200b', value: '\u200b' },
+      { name: 'Nearest trade hub',        value: `${p.hubName} — ${p.hubJumps} stargate jump${p.hubJumps === 1 ? '' : 's'} from exit`, inline: true },
+      { name: 'Total effective distance', value: `${p.whJumps} WH + ${stargate} stargate = ${p.total} jumps`, inline: true },
+    );
+  }
+  return {
+    title,
+    description: `**${p.exitName}** exit found on **${p.mapName}**`,
+    color,
+    fields,
+    footer:    p.actor ? { text: `mapped by ${p.actor}` } : undefined,
+    timestamp: new Date().toISOString(),
   };
 }

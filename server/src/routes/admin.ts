@@ -696,17 +696,19 @@ interface WhSettingsRow {
   allRegions: boolean; regions: string[]; notifyChains: boolean;
   whTypes: string[]; whClasses: string[]; whSizes: string[];
   connectionsWebhook: string | null; chainsWebhook: string | null;
+  exitsMinSecurity: number;
 }
 const WH_SETTINGS_COLS = `all_regions AS "allRegions", regions, notify_chains AS "notifyChains",
                           wh_types AS "whTypes", wh_classes AS "whClasses", wh_sizes AS "whSizes",
-                          connections_webhook AS "connectionsWebhook", chains_webhook AS "chainsWebhook"`;
+                          connections_webhook AS "connectionsWebhook", chains_webhook AS "chainsWebhook",
+                          exits_min_security AS "exitsMinSecurity"`;
 
 // GET /api/admin/discord — current settings + this org's maps with their
 // excluded state (excluded = NOT discord_notify).
 adminRouter.get('/discord', async (req, res) => {
   const scope = resolveDiscordScope(req);
   if (!scope) {
-    res.json({ scope: null, allRegions: true, regions: [], notifyChains: true, whTypes: [], whClasses: [], whSizes: [], connectionsWebhook: '', chainsWebhook: '', maps: [] });
+    res.json({ scope: null, allRegions: true, regions: [], notifyChains: true, whTypes: [], whClasses: [], whSizes: [], connectionsWebhook: '', chainsWebhook: '', exitsMinSecurity: 0.45, maps: [] });
     return;
   }
   // Literal SQL per branch (no interpolated identifiers) so the settings table /
@@ -731,6 +733,7 @@ adminRouter.get('/discord', async (req, res) => {
     whSizes:      row?.whSizes ?? [],
     connectionsWebhook: row?.connectionsWebhook ?? '',
     chainsWebhook:      row?.chainsWebhook ?? '',
+    exitsMinSecurity:   row?.exitsMinSecurity ?? 0.45,
     maps:         maps.rows,
   });
 });
@@ -743,10 +746,17 @@ adminRouter.put('/discord', async (req, res) => {
   const body = req.body as {
     allRegions?: unknown; regions?: unknown; notifyChains?: unknown;
     whTypes?: unknown; whClasses?: unknown; whSizes?: unknown;
-    connectionsWebhook?: unknown; chainsWebhook?: unknown;
+    connectionsWebhook?: unknown; chainsWebhook?: unknown; exitsMinSecurity?: unknown;
   };
   const allRegions   = body.allRegions !== false;   // default true
   const notifyChains = body.notifyChains !== false; // default true
+
+  // Minimum k-space exit security for the rich exit embed. A finite number
+  // clamped to EVE's [-1.0, 1.0] range; default 0.45 (high-sec) when absent or
+  // invalid. Not a secret — always written (no webhook-style masking).
+  const exitsMinSecurity = typeof body.exitsMinSecurity === 'number' && Number.isFinite(body.exitsMinSecurity)
+    ? Math.min(1.0, Math.max(-1.0, body.exitsMinSecurity))
+    : 0.45;
 
   // Webhook URLs. A field that's PRESENT sets the value: empty string clears
   // (NULL), a non-empty value MUST be a real Discord webhook (SSRF guard) or the
@@ -787,35 +797,37 @@ adminRouter.put('/discord', async (req, res) => {
 
   // On an existing row, only overwrite a webhook column when the field was
   // provided (CASE on the `provided` flag); otherwise keep the stored value.
-  const params = [scope.id, allRegions, regions, notifyChains, whTypes, whClasses, whSizes, conn.value, chain.value, conn.provided, chain.provided];
+  const params = [scope.id, allRegions, regions, notifyChains, whTypes, whClasses, whSizes, conn.value, chain.value, conn.provided, chain.provided, exitsMinSecurity];
   if (scope.kind === 'alliance') {
     await db.query(
-      `INSERT INTO alliance_discord_settings (alliance_id, all_regions, regions, notify_chains, wh_types, wh_classes, wh_sizes, connections_webhook, chains_webhook, updated_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())
+      `INSERT INTO alliance_discord_settings (alliance_id, all_regions, regions, notify_chains, wh_types, wh_classes, wh_sizes, connections_webhook, chains_webhook, exits_min_security, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $12, NOW())
        ON CONFLICT (alliance_id) DO UPDATE
          SET all_regions = EXCLUDED.all_regions, regions = EXCLUDED.regions,
              notify_chains = EXCLUDED.notify_chains, wh_types = EXCLUDED.wh_types,
              wh_classes = EXCLUDED.wh_classes, wh_sizes = EXCLUDED.wh_sizes,
              connections_webhook = CASE WHEN $10 THEN EXCLUDED.connections_webhook ELSE alliance_discord_settings.connections_webhook END,
              chains_webhook      = CASE WHEN $11 THEN EXCLUDED.chains_webhook      ELSE alliance_discord_settings.chains_webhook END,
+             exits_min_security = EXCLUDED.exits_min_security,
              updated_at = NOW()`,
       params,
     );
   } else {
     await db.query(
-      `INSERT INTO corp_discord_settings (corp_id, all_regions, regions, notify_chains, wh_types, wh_classes, wh_sizes, connections_webhook, chains_webhook, updated_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())
+      `INSERT INTO corp_discord_settings (corp_id, all_regions, regions, notify_chains, wh_types, wh_classes, wh_sizes, connections_webhook, chains_webhook, exits_min_security, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $12, NOW())
        ON CONFLICT (corp_id) DO UPDATE
          SET all_regions = EXCLUDED.all_regions, regions = EXCLUDED.regions,
              notify_chains = EXCLUDED.notify_chains, wh_types = EXCLUDED.wh_types,
              wh_classes = EXCLUDED.wh_classes, wh_sizes = EXCLUDED.wh_sizes,
              connections_webhook = CASE WHEN $10 THEN EXCLUDED.connections_webhook ELSE corp_discord_settings.connections_webhook END,
              chains_webhook      = CASE WHEN $11 THEN EXCLUDED.chains_webhook      ELSE corp_discord_settings.chains_webhook END,
+             exits_min_security = EXCLUDED.exits_min_security,
              updated_at = NOW()`,
       params,
     );
   }
-  res.json({ ok: true, allRegions, regions, notifyChains, whTypes, whClasses, whSizes });
+  res.json({ ok: true, allRegions, regions, notifyChains, whTypes, whClasses, whSizes, exitsMinSecurity });
 });
 
 // PATCH /api/admin/maps/:id/discord — exclude / re-include one of the org's

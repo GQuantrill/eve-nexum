@@ -325,6 +325,8 @@
       "whClassLabel": "Classe de destination",
       "whSizeLabel": "Taille",
       "whAll": "Tous",
+      "exitsMinSecLabel": "Sécurité minimale des sorties",
+      "exitsMinSecHint": "N'envoie les informations détaillées de sortie (trajet depuis la base, hub commercial le plus proche) que lorsqu'une nouvelle sortie K-space a au moins cette sécurité. -1,0 à 1,0 ; 0,45 = high-sec.",
       "removeType": "Retirer {{name}}",
       "excludedMaps": "Cartes exclues",
       "excludedHint": "Toutes les cartes notifient par défaut. Cochez une carte pour l'exclure de Discord.",
