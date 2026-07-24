@@ -822,6 +822,7 @@
     "flagAdd": "Add flag",
     "flagNotePlaceholder": "e.g. DO NOT ROLL - fleet inbound",
     "flagRemove": "Remove flag",
+    "flagBlink": "Blink",
     "restore": "Restore",
     "restoreTitle": "Clear the broken flag and treat this as a live connection again",
     "whType": "Wormhole type",

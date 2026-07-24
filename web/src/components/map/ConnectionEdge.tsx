@@ -228,7 +228,7 @@ export const ConnectionEdge = memo(({
           const flagNode = FlagIcon
             ? (
               <span
-                className="connection-label__flag"
+                className={`connection-label__flag${conn?.flagBlink ? ' connection-label__flag--blink' : ''}`}
                 data-tooltip={conn?.flagNote || undefined}
                 onClick={(e) => { e.stopPropagation(); selectConnection(id); }}
               >

@@ -813,6 +813,7 @@
     "flagAdd": "フラグを追加",
     "flagNotePlaceholder": "例: ロール禁止 - 艦隊接近中",
     "flagRemove": "フラグを削除",
+    "flagBlink": "点滅",
     "restore": "復元",
     "restoreTitle": "切断フラグを解除し、再び有効な接続として扱います",
     "gateNote": "通常のスターゲート — ワームホールデータはありません。",

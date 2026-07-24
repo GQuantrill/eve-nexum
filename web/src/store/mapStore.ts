@@ -1088,7 +1088,7 @@ export const useMapStore = create<MapStore>()((set, get) => {
                 massStatus: null, timeStatus: null, size: 'large',
                 massUsed: 0, eolAt: null,
                 sourceSignatureId: null, targetSignatureId: null, broken: false,
-                flagIcon: null, flagNote: null,
+                flagIcon: null, flagNote: null, flagBlink: false,
                 createdAt: new Date().toISOString() },
             ],
           },

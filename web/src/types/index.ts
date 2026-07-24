@@ -196,6 +196,7 @@ export interface MapConnection {
    *  icon replaces the old (single flag). Both null = no flag. */
   flagIcon: string | null;
   flagNote: string | null;
+  flagBlink: boolean;
   createdAt: string;
 }
 

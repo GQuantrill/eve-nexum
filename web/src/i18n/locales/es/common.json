@@ -813,6 +813,7 @@
     "flagAdd": "Añadir marca",
     "flagNotePlaceholder": "p. ej. NO ROLEAR – flota en camino",
     "flagRemove": "Quitar marca",
+    "flagBlink": "Parpadear",
     "restore": "Restaurar",
     "restoreTitle": "Quitar la marca de rota y volver a tratarla como una conexión activa",
     "gateNote": "Stargate normal — sin datos de agujero de gusano.",

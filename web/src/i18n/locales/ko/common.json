@@ -813,6 +813,7 @@
     "flagAdd": "플래그 추가",
     "flagNotePlaceholder": "예: 굴리지 마세요 - 함대 진입 중",
     "flagRemove": "플래그 제거",
+    "flagBlink": "깜박임",
     "restore": "복원",
     "restoreTitle": "끊김 플래그를 해제하고 다시 활성 연결로 처리합니다",
     "gateNote": "일반 스타게이트 — 추적할 웜홀 데이터 없음.",

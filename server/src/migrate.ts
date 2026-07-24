@@ -252,6 +252,8 @@ export async function migrate() {
     -- surfaces on hover. Both NULL = no flag.
     ALTER TABLE map_connections ADD COLUMN IF NOT EXISTS flag_icon TEXT;
     ALTER TABLE map_connections ADD COLUMN IF NOT EXISTS flag_note TEXT;
+    -- Opt-in: make the flag icon blink on the edge to grab attention.
+    ALTER TABLE map_connections ADD COLUMN IF NOT EXISTS flag_blink BOOLEAN NOT NULL DEFAULT FALSE;
     ALTER TABLE map_systems     ADD COLUMN IF NOT EXISTS last_activity_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
 
     -- Manual intel tag a user can apply to a system via right-click. Distinct

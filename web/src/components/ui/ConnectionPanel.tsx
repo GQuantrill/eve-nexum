@@ -469,6 +469,17 @@ export function ConnectionPanel() {
             placeholder={t('connPanel.flagNotePlaceholder')}
           />
         )}
+        {conn.flagIcon && (
+          <label className="conn-flag__blink">
+            <input
+              type="checkbox"
+              checked={conn.flagBlink}
+              disabled={!canEdit}
+              onChange={(e) => update({ flagBlink: e.target.checked })}
+            />
+            <span>{t('connPanel.flagBlink')}</span>
+          </label>
+        )}
       </label>
       </div>
 
