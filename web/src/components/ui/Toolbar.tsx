@@ -6,7 +6,6 @@ import { useMapStore } from '../../store/mapStore';
 import { useAuth, formatRole, isAdminRole } from '../../context/AuthContext';
 import { useOnlineStatus } from '../../hooks/useOnlineStatus';
 import { useCharacterLocation } from '../../hooks/useCharacterLocation';
-import { useFollowedCharacterId, setFollowedCharacterId } from '../../hooks/useFollowedCharacter';
 import { useSystemAlias } from '../../hooks/useSystemAlias';
 import { useCanEdit } from '../../hooks/useCanEdit';
 import { useCanEditContent } from '../../hooks/useCanEditContent';
@@ -20,7 +19,6 @@ import { ApiKeysModal } from './ApiKeysModal';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { CharacterSwitcher } from './CharacterSwitcher';
 import { HeatmapMenu } from './HeatmapMenu';
-import { Select } from './Select';
 import { WhTypeChartModal } from './WhTypeChartModal';
 import { useProximityAlerts } from '../../hooks/useProximityAlerts';
 import { useClickOutside } from '../../hooks/useClickOutside';
@@ -229,9 +227,6 @@ export function Toolbar() {
   const setMapOptionsOpen = useMapStore((s) => s.setMapOptionsOpen);
   const trackJumps      = useMapStore((s) => s.trackJumps);
   const setTrackJumps   = useMapStore((s) => s.setTrackJumps);
-  // Per-tab followed character for auto-add jump tracking (null = follow the
-  // session-active character). Only surfaced when the account has more than one.
-  const followedId      = useFollowedCharacterId();
 
   const atMapLimit      = maps.filter((m) => !m.isCorpMap && !m.isAllianceMap).length >= maxMaps;
   const atCorpMapLimit  = corpMapCount >= maxCorpMaps;
@@ -545,19 +540,6 @@ export function Toolbar() {
           <FootprintsIcon size={18} weight="regular" />
           <span className={`toolbar__toggle-led${trackJumps ? ' toolbar__toggle-led--on' : ' toolbar__toggle-led--off'}`} />
         </button>
-
-        {(user?.characters?.length ?? 0) > 1 && (() => {
-          const activeId = user!.id;
-          return (
-            <Select
-              value={String(followedId ?? activeId)}
-              onChange={(v) => { const picked = Number(v); setFollowedCharacterId(picked === activeId ? null : picked); }}
-              options={user!.characters.map((c) => ({ value: String(c.id), label: c.characterName }))}
-              ariaLabel={t('toolbar.following')}
-              title={t('toolbar.followingTooltip')}
-            />
-          );
-        })()}
       </div>
     ),
 
