@@ -83,15 +83,19 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
   }, [showFleetMembers, fleet.bySystem, sys.eveSystemId, user?.characterId]);
 
   // The account's other characters (alts) located in this system — live when
-  // online, else their last known position. The active character has its own
-  // you-are-here dot, so it's excluded server-side.
+  // online, else their last known position. The character THIS TAB acts as has
+  // its own you-are-here dot, so exclude it from the alt list. The session-active
+  // character is already excluded server-side; this also drops a PINNED acting
+  // character (which the server doesn't know about), so it never shows as both a
+  // you-are-here dot and an alt dot.
   const accountLocations     = useAccountLocations();
   const [showAccountChars]   = useUserSetting<boolean>('nexum.account.showOnMap', true);
+  const actingUserId = useMapStore((s) => s.routeOrigin?.charId ?? null) ?? user?.id ?? null;
   const accountHere = useMemo(() => {
     if (!showAccountChars || sys.eveSystemId == null) return undefined;
-    const here = accountLocations.bySystem.get(sys.eveSystemId);
+    const here = accountLocations.bySystem.get(sys.eveSystemId)?.filter((c) => c.charId !== actingUserId);
     return here && here.length ? here : undefined;
-  }, [showAccountChars, accountLocations.bySystem, sys.eveSystemId]);
+  }, [showAccountChars, accountLocations.bySystem, sys.eveSystemId, actingUserId]);
 
   // Other people viewing this map who are currently in this system (presence).
   // Excludes self — the green you-are-here dot covers that. Subscribe to just
