@@ -52,7 +52,7 @@
     "blocked": "blockiert",
     "characterAdded": "{{name}} hinzugefügt",
     "switchTo": "Zu {{name}} wechseln",
-    "focusLocation": "Karte auf {{name}} zentrieren und von dort routen",
+    "focusLocation": "{{name}} auf diesem Tab verfolgen, zentrieren und von dort routen",
     "noLocation": "Kein bekannter Standort für {{name}}",
     "linkFailedNotInCorp": "Charakter konnte nicht hinzugefügt werden — er ist in keiner berechtigten Corporation oder Allianz.",
     "linkFailed": "Charakter konnte nicht hinzugefügt werden. Bitte erneut versuchen.",
@@ -809,6 +809,12 @@
     "rollIt": "Durchrollen",
     "removeConnection": "Verbindung entfernen",
     "brokenNotice": "Verbindung unterbrochen — die stützende Wurmloch-Sig wurde gelöscht. Bleibt auf der Karte, ist aber vom Routing in Quarantäne.",
+    "flagLabel": "Markierung",
+    "flagAdd": "Markierung hinzufügen",
+    "flagNotePlaceholder": "z. B. NICHT ROLLEN – Flotte im Anflug",
+    "flagRemove": "Markierung entfernen",
+    "flagBlink": "Blinken",
+    "flagColor": "Farbe",
     "restore": "Wiederherstellen",
     "restoreTitle": "Die Unterbrochen-Markierung entfernen und dies wieder als aktive Verbindung behandeln",
     "gateNote": "Reguläres Stargate — keine Wurmloch-Daten.",
@@ -1730,6 +1736,11 @@
     "unmapped": "Unbekanntes Loch",
     "filled": "{{sig}} führt jetzt nach {{system}}",
     "undo": "Rückgängig"
+  },
+  "iconPicker": {
+    "title": "Symbol auswählen",
+    "search": "Symbole suchen…",
+    "more": "Suche verfeinern, um mehr zu sehen"
   },
   "labelsDialog": {
     "title": "Eigene Labels",

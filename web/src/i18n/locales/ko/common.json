@@ -52,7 +52,7 @@
     "blocked": "차단됨",
     "characterAdded": "{{name}} 추가됨",
     "switchTo": "{{name}}(으)로 전환",
-    "focusLocation": "{{name}} 위치로 이동하고 경로 계산",
+    "focusLocation": "이 탭에서 {{name}} 추적, 위치로 이동 및 경로 계산",
     "noLocation": "{{name}}의 알려진 위치 없음",
     "linkFailedNotInCorp": "해당 캐릭터를 추가할 수 없습니다 — 승인된 코퍼레이션 또는 얼라이언스에 속해 있지 않습니다.",
     "linkFailed": "해당 캐릭터를 추가할 수 없습니다. 다시 시도해 주세요.",
@@ -809,6 +809,12 @@
     "rollIt": "통과 실행",
     "removeConnection": "연결 제거",
     "brokenNotice": "연결 끊김 — 이를 지탱하던 웜홀 시그니처가 삭제되었습니다. 맵에는 남아 있지만 라우팅에서 격리됩니다.",
+    "flagLabel": "플래그",
+    "flagAdd": "플래그 추가",
+    "flagNotePlaceholder": "예: 굴리지 마세요 - 함대 진입 중",
+    "flagRemove": "플래그 제거",
+    "flagBlink": "깜박임",
+    "flagColor": "색상",
     "restore": "복원",
     "restoreTitle": "끊김 플래그를 해제하고 다시 활성 연결로 처리합니다",
     "gateNote": "일반 스타게이트 — 추적할 웜홀 데이터 없음.",
@@ -1730,6 +1736,11 @@
     "unmapped": "미확인 웜홀",
     "filled": "{{sig}}이(가) 이제 {{system}}(으)로 연결됩니다",
     "undo": "실행 취소"
+  },
+  "iconPicker": {
+    "title": "아이콘 선택",
+    "search": "아이콘 검색…",
+    "more": "더 보려면 검색을 좁히세요"
   },
   "labelsDialog": {
     "title": "사용자 라벨",

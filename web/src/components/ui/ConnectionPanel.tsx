@@ -12,7 +12,9 @@ import { Select } from './Select';
 import { whSizeForType } from '../../utils/wormholeSize';
 import { effectiveExpiryMs, lifeBucket, knownMaxLifeHours } from '../../utils/whLifetime';
 import { ConfirmModal } from './ConfirmModal';
-import { XIcon } from '@phosphor-icons/react';
+import { IconPickerDialog } from './IconPickerDialog';
+import { XIcon, TagIcon } from '@phosphor-icons/react';
+import { iconComponent } from '../../utils/phosphorIcons';
 import { api } from '../../api/client';
 import type { MassStatus, TimeStatus, ConnectionSize, Signature, SystemClass } from '../../types';
 import {
@@ -116,6 +118,8 @@ export function ConnectionPanel() {
   const [stack,  setStack]  = useState<number[]>([]);
   const [pendingPass, setPendingPass] = useState<{ kg: number; strand: boolean } | null>(null);
   const [sessionConnId, setSessionConnId] = useState<string | undefined>(undefined);
+  // Open state for the connection-flag icon picker.
+  const [flagPickerOpen, setFlagPickerOpen] = useState(false);
   // Signatures on the two endpoint systems — feeds both the WH-type auto-detect
   // and the per-end "backing signature" link dropdowns below.
   const [endpointSigs, setEndpointSigs] = useState<{ src: Signature[]; tgt: Signature[] }>({ src: [], tgt: [] });
@@ -312,6 +316,8 @@ export function ConnectionPanel() {
       )}
 
       {isWormhole && (<>
+      {/* Column 1 — wormhole type + backing signatures */}
+      <div className="conn-col conn-col--wh">
       <label className="field">
         <span>{t('connPanel.whType')} <WHTypeInfo code={conn.type} /></span>
         <input
@@ -351,7 +357,10 @@ export function ConnectionPanel() {
           </label>
         </div>
       )}
+      </div>
 
+      {/* Column 2 — mass / time / size */}
+      <div className="conn-col conn-col--status">
       <label className="field">
         <span>{t('connPanel.massStatus')}</span>
         <Select
@@ -413,7 +422,88 @@ export function ConnectionPanel() {
           ]}
         />
       </label>
+      </div>
 
+      {/* Column 3 — flag */}
+      <div className="conn-col conn-col--flag">
+      {/* Corp/alliance-shared flag: a single icon + note surfaced on the edge
+          (e.g. "DO NOT ROLL — fleet inbound"). Setting a new icon replaces the
+          old one. Synced to every viewer via the connection update path. */}
+      <label className="field conn-flag">
+        <span>{t('connPanel.flagLabel')}</span>
+        <div className="conn-flag__row">
+          {(() => {
+            const FlagIcon = conn.flagIcon ? iconComponent(conn.flagIcon) : null;
+            return (
+              <button
+                type="button"
+                className="sys-btn conn-flag__pick"
+                disabled={!canEdit}
+                onClick={() => setFlagPickerOpen(true)}
+                title={t('connPanel.flagAdd')}
+              >
+                {FlagIcon ? <FlagIcon size={16} weight="fill" /> : <TagIcon size={16} />}
+                {!FlagIcon && <span>{t('connPanel.flagAdd')}</span>}
+              </button>
+            );
+          })()}
+          {conn.flagIcon && (
+            <input
+              type="color"
+              className="conn-flag__color"
+              value={conn.flagColor ?? '#f0a030'}
+              disabled={!canEdit}
+              onChange={(e) => update({ flagColor: e.target.value })}
+              title={t('connPanel.flagColor')}
+              aria-label={t('connPanel.flagColor')}
+            />
+          )}
+          {conn.flagIcon && (
+            <button
+              type="button"
+              className="icon-btn conn-flag__remove"
+              disabled={!canEdit}
+              onClick={() => update({ flagIcon: null, flagNote: null, flagColor: null, flagBlink: false })}
+              data-tooltip={t('connPanel.flagRemove')}
+            >
+              <XIcon size={14} weight="bold" />
+            </button>
+          )}
+        </div>
+        {conn.flagIcon && (
+          <input
+            type="text"
+            value={conn.flagNote ?? ''}
+            maxLength={200}
+            disabled={!canEdit}
+            onChange={(e) => update({ flagNote: e.target.value || null })}
+            placeholder={t('connPanel.flagNotePlaceholder')}
+          />
+        )}
+        {conn.flagIcon && (
+          <label className="conn-flag__blink">
+            <input
+              type="checkbox"
+              checked={conn.flagBlink}
+              disabled={!canEdit}
+              onChange={(e) => update({ flagBlink: e.target.checked })}
+            />
+            <span>{t('connPanel.flagBlink')}</span>
+          </label>
+        )}
+      </label>
+      </div>
+
+      {flagPickerOpen && (
+        <IconPickerDialog
+          current={conn.flagIcon}
+          onPick={(name) => update({ flagIcon: name })}
+          onClose={() => setFlagPickerOpen(false)}
+        />
+      )}
+
+      {/* Column 4 — rolling calculator */}
+      <div className="conn-col conn-col--roller">
       {whSpec ? (() => {
         const range    = massRange(whSpec.totalMass, massUsed);
         const cState   = collapseState(whSpec.totalMass, massUsed);
@@ -583,6 +673,7 @@ export function ConnectionPanel() {
       ) : (
         <div className="mass-tracker__hint">{t('connPanel.enterWhType')}</div>
       )}
+      </div>
 
       {pendingPass && (
         <ConfirmModal

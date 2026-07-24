@@ -52,7 +52,7 @@
     "blocked": "bloqueado",
     "characterAdded": "{{name}} adicionado",
     "switchTo": "Mudar para {{name}}",
-    "focusLocation": "Centrar e traçar rota a partir de {{name}}",
+    "focusLocation": "Seguir, centrar e traçar rota a partir de {{name}} nesta aba",
     "noLocation": "Nenhuma localização conhecida de {{name}}",
     "linkFailedNotInCorp": "Não foi possível adicionar esse personagem — ele não está em uma corporação ou aliança autorizada.",
     "linkFailed": "Não foi possível adicionar esse personagem. Tenta novamente.",
@@ -809,6 +809,12 @@
     "rollIt": "Fazer a passagem",
     "removeConnection": "Remover conexão",
     "brokenNotice": "Conexão quebrada — a assinatura de buraco de minhoca que a sustentava foi eliminada. Mantida no mapa mas em quarentena do encaminhamento.",
+    "flagLabel": "Marcador",
+    "flagAdd": "Adicionar marcador",
+    "flagNotePlaceholder": "ex. NÃO ROLAR – frota a caminho",
+    "flagRemove": "Remover marcador",
+    "flagBlink": "Piscar",
+    "flagColor": "Cor",
     "restore": "Restaurar",
     "restoreTitle": "Limpar a marca de quebrada e tratar novamente como uma conexão ativa",
     "gateNote": "Stargate normal — sem dados de buraco de minhoca.",
@@ -1730,6 +1736,11 @@
     "unmapped": "Buraco desconhecido",
     "filled": "{{sig}} agora leva a {{system}}",
     "undo": "Desfazer"
+  },
+  "iconPicker": {
+    "title": "Escolher um ícone",
+    "search": "Pesquisar ícones…",
+    "more": "Refine a pesquisa para ver mais"
   },
   "labelsDialog": {
     "title": "Etiquetas personalizadas",

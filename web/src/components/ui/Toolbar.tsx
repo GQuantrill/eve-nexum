@@ -259,15 +259,25 @@ export function Toolbar() {
     && (!canCorpCreate || atCorpMapLimit)
     && (!canAllianceCreate || atAllianceMapLimit);
   const { online, checkedAt, lastLogin } = useOnlineStatus(!!user);
+  // The character THIS TAB acts as: the per-tab pinned character (a routeOrigin
+  // override) when set, else the session-active character. The avatar, name and
+  // you-are-here follow it; the role badge stays on the session identity below.
+  // The character THIS TAB acts as: the per-tab pinned character, else the tab's
+  // own (session-active) character — resolved to an explicit users.id so the
+  // name/avatar always match the location (which is now resolved by the same id).
+  const actingCharId = useMapStore((s) => s.routeOrigin?.charId ?? null) ?? user?.id ?? null;
+  const actingChar = actingCharId != null ? (user?.characters?.find((c) => c.id === actingCharId) ?? null) : null;
   // Ship + live system come from the same poll that drives passive location
   // tracking, so no extra ESI traffic — we just surface fields already on hand.
+  // After the acting-character rework this poll already reports the acting char.
   const { ship, system: liveSystem, online: locOnline } = useCharacterLocation();
   const aliasName = useSystemAlias();
   // What to show next to the avatar: the live system when the pilot is online
-  // in EVE, otherwise the last known system from their profile.
-  const shownSystem = (locOnline && liveSystem?.name) ? liveSystem.name : (user?.lastKnownSystem?.name ?? null);
+  // in EVE, otherwise the last known system from the acting character's profile
+  // (falling back to the session user when no pin is set).
+  const shownSystem = (locOnline && liveSystem?.name) ? liveSystem.name : (actingChar ? actingChar.lastKnownSystemName : (user?.lastKnownSystem?.name ?? null));
   const shownSystemIsLast = !(locOnline && liveSystem?.name);
-  const shownSystemEveId = (locOnline && liveSystem?.eveSystemId) ? liveSystem.eveSystemId : (user?.lastKnownSystem?.id ?? null);
+  const shownSystemEveId = (locOnline && liveSystem?.eveSystemId) ? liveSystem.eveSystemId : (actingChar ? actingChar.lastKnownSystemId : (user?.lastKnownSystem?.id ?? null));
   // Clicking the system centres the map on it — but only when it's actually on
   // the current map.
   const shownSystemOnMap = shownSystemEveId != null && mapSystems.some((s) => s.eveSystemId === shownSystemEveId);
@@ -587,8 +597,8 @@ export function Toolbar() {
         />
         <img
           className="toolbar__avatar"
-          src={charPortrait(user.characterId, 64)}
-          alt={user.characterName}
+          src={charPortrait(actingChar?.characterId ?? user!.characterId, 64)}
+          alt={actingChar?.characterName ?? user!.characterName}
         />
         {ship && (
           <span
@@ -606,7 +616,7 @@ export function Toolbar() {
         )}
         <div className="toolbar__char-info">
           <span className="toolbar__char-name">
-            {user.characterName}
+            {actingChar?.characterName ?? user!.characterName}
             {/* Role only matters in a restricted (corp/alliance) deployment —
                 in solo deployments every user is implicitly admin of their own
                 maps, so the badge just adds noise. */}

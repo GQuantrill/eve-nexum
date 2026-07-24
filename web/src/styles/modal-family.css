@@ -170,6 +170,8 @@
   cursor: pointer;
 }
 .custom-label-dialog__icon:hover { background: var(--surface-hover); border-color: #4a5a78; color: #fff; }
+/* The currently-selected icon (single-pick IconPickerDialog) stays highlighted. */
+.custom-label-dialog__icon--active { border-color: var(--cv-conn-4h); color: var(--cv-conn-4h); }
 
 /* Read-only display of a generated share URL. Monospace so the UUID
    tail stays scannable; truncated with ellipsis if the origin is long. */

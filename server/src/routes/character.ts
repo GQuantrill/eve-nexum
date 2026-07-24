@@ -132,6 +132,19 @@ characterRouter.get('/location', async (req, res) => {
 characterRouter.get('/:targetUserId/location', async (req, res) => {
   const targetUserId = Number(req.params.targetUserId);
   if (!Number.isInteger(targetUserId)) { res.status(400).json({ error: 'Invalid user id' }); return; }
+  // Your own session character is always authorised — identical to
+  // /api/character/location. The per-tab acting-character model resolves every
+  // tab's location by explicit id (including the default = your own char), so
+  // this path must work without depending on owner_id being populated.
+  if (targetUserId === req.session.userId) {
+    try {
+      res.json(await getLocationPayload(targetUserId));
+    } catch (err) {
+      log.error('Location check failed:', err);
+      res.status(500).json({ error: 'Failed to get location' });
+    }
+    return;
+  }
   const ownerId = await resolveOwnerId(req);
   if (ownerId == null) { res.status(401).json({ error: 'Not authenticated' }); return; }
   const { rows } = await db.query<{ owner_id: number | null }>(

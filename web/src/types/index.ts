@@ -190,6 +190,14 @@ export interface MapConnection {
    *  connection is kept on the map but quarantined — rendered severed and
    *  excluded from routing — so the chain is still traceable. */
   broken: boolean;
+  /** Optional corp/alliance-shared flag: a single Phosphor icon export name
+   *  (e.g. 'WarningIcon') shown as a badge on the edge, plus a free-text note
+   *  revealed on hover — for intel like "DO NOT ROLL — fleet inbound". A new
+   *  icon replaces the old (single flag). Both null = no flag. */
+  flagIcon: string | null;
+  flagNote: string | null;
+  flagBlink: boolean;
+  flagColor: string | null;
   createdAt: string;
 }
 

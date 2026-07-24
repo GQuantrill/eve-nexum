@@ -246,6 +246,16 @@ export async function migrate() {
     -- and the client's whLifetime util). Only user edits write this column, so a
     -- non-null value always wins over the auto estimate.
     ALTER TABLE map_connections ADD COLUMN IF NOT EXISTS lifetime_expires_at TIMESTAMPTZ;
+    -- Optional corp/alliance-shared "flag" on a connection: a single Phosphor
+    -- icon export name (e.g. WarningIcon) + a free-text note, to mark intel like
+    -- "DO NOT ROLL -- fleet inbound". Shown as a badge on the edge; the note
+    -- surfaces on hover. Both NULL = no flag.
+    ALTER TABLE map_connections ADD COLUMN IF NOT EXISTS flag_icon TEXT;
+    ALTER TABLE map_connections ADD COLUMN IF NOT EXISTS flag_note TEXT;
+    -- Opt-in: make the flag icon blink on the edge to grab attention.
+    ALTER TABLE map_connections ADD COLUMN IF NOT EXISTS flag_blink BOOLEAN NOT NULL DEFAULT FALSE;
+    -- Optional flag colour (hex, e.g. #f0a030). NULL = the default amber.
+    ALTER TABLE map_connections ADD COLUMN IF NOT EXISTS flag_color TEXT;
     ALTER TABLE map_systems     ADD COLUMN IF NOT EXISTS last_activity_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
 
     -- Manual intel tag a user can apply to a system via right-click. Distinct

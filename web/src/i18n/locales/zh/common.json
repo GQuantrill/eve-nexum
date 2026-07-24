@@ -52,7 +52,7 @@
     "blocked": "已封禁",
     "characterAdded": "已添加 {{name}}",
     "switchTo": "切换到 {{name}}",
-    "focusLocation": "以 {{name}} 为中心并从其位置规划路线",
+    "focusLocation": "在此标签页跟踪 {{name}}，并以其位置为中心规划路线",
     "noLocation": "没有 {{name}} 的已知位置",
     "linkFailedNotInCorp": "无法添加该角色 — 其不属于任何授权的军团或联盟。",
     "linkFailed": "无法添加该角色，请重试。",
@@ -809,6 +809,12 @@
     "rollIt": "执行通过",
     "removeConnection": "移除连接",
     "brokenNotice": "连接已断开——支撑它的虫洞信号已被删除。保留在地图上，但已从路由中隔离。",
+    "flagLabel": "标记",
+    "flagAdd": "添加标记",
+    "flagNotePlaceholder": "例如：请勿滚洞 - 舰队即将抵达",
+    "flagRemove": "移除标记",
+    "flagBlink": "闪烁",
+    "flagColor": "颜色",
     "restore": "恢复",
     "restoreTitle": "清除断开标记，重新将其视为活动连接",
     "gateNote": "普通星门 — 无虫洞数据可追踪。",
@@ -1730,6 +1736,11 @@
     "unmapped": "未知虫洞",
     "filled": "{{sig}} 现在通往 {{system}}",
     "undo": "撤销"
+  },
+  "iconPicker": {
+    "title": "选择图标",
+    "search": "搜索图标…",
+    "more": "细化搜索以查看更多"
   },
   "labelsDialog": {
     "title": "自定义标签",

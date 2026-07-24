@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useMapStore, getPlacementCell, registerPlacementFix } from '../store/mapStore';
 import { useCharacterLocation } from './useCharacterLocation';
 import { useCanEdit } from './useCanEdit';
+import { useAuth } from '../context/AuthContext';
 import { readUserSetting } from './useUserSetting';
 import { pickHandles } from '../components/map/edgeUtils';
 import { maybeConfirmWhJump } from './whJumpConfirm';
@@ -259,10 +260,19 @@ export function applyTrackedJump(
  */
 export function useLocationTracking(enabled: boolean) {
   const location = useCharacterLocation();
+  const { user } = useAuth();
+  // The effective acting character (pin, else this tab's own character). Any
+  // change to it must reset the jump refs below, so the new character's system
+  // isn't linked back to the previous character's as a bogus connection.
+  const followedId = useMapStore((s) => s.routeOrigin?.charId ?? null) ?? user?.id ?? null;
   const canEdit  = useCanEdit();
   const lastEveSystemId = useRef<number | null>(null);
   const lastMapSystemId = useRef<string | null>(null);
   const lastActiveMapId = useRef<string | null>(null);
+  // The character we were following on the last pass. Switching the followed
+  // character must reset the jump refs (see below) so the new character's
+  // current system isn't drawn as a jump FROM the previous character's system.
+  const lastFollowedId = useRef<number | null>(null);
   // The pilot's previous PHYSICAL system (whether or not it was recorded on the
   // map). Needed for the "don't track K-space" option, which has to look at the
   // departure system's class — and retroactively add the last K-space system
@@ -282,9 +292,12 @@ export function useLocationTracking(enabled: boolean) {
     // next location update rather than racing addSystem against an empty store.
     if (!map.id) return;
 
-    // Reset refs when the active map changes
-    if (map.id !== lastActiveMapId.current) {
+    // Reset refs when the active map changes OR the followed character changes.
+    // A new followed character's current system must not be linked back to the
+    // previous character's last system (a bogus cross-character connection).
+    if (map.id !== lastActiveMapId.current || followedId !== lastFollowedId.current) {
       lastActiveMapId.current = map.id;
+      lastFollowedId.current = followedId;
       lastEveSystemId.current = null;
       lastMapSystemId.current = null;
       lastSelectedEveId.current = null;
@@ -324,6 +337,22 @@ export function useLocationTracking(enabled: boolean) {
     const prev = prevPhysical.current;
     prevPhysical.current = curr; // remember the physical location for the next jump
 
+    // When this tab follows a PINNED character (a routeOrigin override, not the
+    // session-active one), keep that override's location live as they fly — so
+    // route calcs and centring track their current system, not the pin-time
+    // snapshot. Only the location fields change; charId / name are preserved.
+    if (followedId != null) {
+      const ro = useMapStore.getState().routeOrigin;
+      if (ro && ro.charId === followedId) {
+        useMapStore.getState().setRouteOrigin({
+          ...ro,
+          eveSystemId: system.eveSystemId,
+          systemName:  system.name,
+          systemClass: system.systemClass,
+        });
+      }
+    }
+
     // A locked map never grows from passive tracking, nor does one a readonly /
     // no-topology user is viewing; track-jumps off opts out of auto-add too.
     const trackJumps = useMapStore.getState().trackJumps;
@@ -348,5 +377,5 @@ export function useLocationTracking(enabled: boolean) {
       lastSelectedEveId.current = system.eveSystemId;
       selectSystem(mapSystemId, { fromJump: true });
     }
-  }, [enabled, location, canEdit]);
+  }, [enabled, location, canEdit, followedId]);
 }
