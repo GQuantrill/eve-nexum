@@ -1223,6 +1223,8 @@
     "trackJumpsOff": "跟踪跳跃：关",
     "trackJumpsTooltipOn": "正在跟踪跳跃 — 随着你移动会添加新星系",
     "trackJumpsTooltipOff": "未跟踪跳跃 — 只有已有星系会获得「你在此处」标记",
+    "following": "跟随",
+    "followingTooltip": "在此标签页中自动添加此角色的跳跃",
     "signOut": "登出",
     "role": "权限：{{role}}",
     "checkedAgo": "检查于 {{time}}",
