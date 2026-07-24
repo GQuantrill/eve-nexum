@@ -316,6 +316,8 @@ export function ConnectionPanel() {
       )}
 
       {isWormhole && (<>
+      {/* Column 1 — wormhole type + backing signatures */}
+      <div className="conn-col conn-col--wh">
       <label className="field">
         <span>{t('connPanel.whType')} <WHTypeInfo code={conn.type} /></span>
         <input
@@ -355,7 +357,10 @@ export function ConnectionPanel() {
           </label>
         </div>
       )}
+      </div>
 
+      {/* Column 2 — mass / time / size */}
+      <div className="conn-col conn-col--status">
       <label className="field">
         <span>{t('connPanel.massStatus')}</span>
         <Select
@@ -417,7 +422,10 @@ export function ConnectionPanel() {
           ]}
         />
       </label>
+      </div>
 
+      {/* Column 3 — flag */}
+      <div className="conn-col conn-col--flag">
       {/* Corp/alliance-shared flag: a single icon + note surfaced on the edge
           (e.g. "DO NOT ROLL — fleet inbound"). Setting a new icon replaces the
           old one. Synced to every viewer via the connection update path. */}
@@ -462,6 +470,7 @@ export function ConnectionPanel() {
           />
         )}
       </label>
+      </div>
 
       {flagPickerOpen && (
         <IconPickerDialog
@@ -471,6 +480,8 @@ export function ConnectionPanel() {
         />
       )}
 
+      {/* Column 4 — rolling calculator */}
+      <div className="conn-col conn-col--roller">
       {whSpec ? (() => {
         const range    = massRange(whSpec.totalMass, massUsed);
         const cState   = collapseState(whSpec.totalMass, massUsed);
@@ -640,6 +651,7 @@ export function ConnectionPanel() {
       ) : (
         <div className="mass-tracker__hint">{t('connPanel.enterWhType')}</div>
       )}
+      </div>
 
       {pendingPass && (
         <ConfirmModal

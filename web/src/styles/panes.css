@@ -241,6 +241,19 @@
   font-size: calc(12px * var(--font-scale, 1)); color: var(--text-subtle);
 }
 
+/* Connection panel is a horizontal bottom bar; group its wormhole fields into
+   a few vertical columns (WH type + sigs / mass-time-size / flag / roller) so
+   they stack instead of overflowing the width into one clipped row. */
+.conn-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-self: flex-start;
+  min-width: 0;
+}
+.conn-col--flag   { min-width: 150px; }
+.conn-col--roller { min-width: 300px; }
+
 /* Per-end "backing signature" link controls in the connection panel. */
 .conn-siglink {
   margin: 4px 0 2px;
