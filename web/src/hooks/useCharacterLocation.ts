@@ -2,6 +2,14 @@ import { useEffect, useState } from 'react';
 import { api } from '../api/client';
 import { flushQueue } from '../store/pendingQueue';
 import { useShareMode } from '../context/ShareModeContext';
+import { useMapStore } from '../store/mapStore';
+
+// The character THIS TAB acts as: the per-tab pinned character (a routeOrigin
+// override) when one is set, otherwise null to follow the session-active
+// character via the shared active-location endpoint.
+function actingCharId(): number | null {
+  try { return useMapStore.getState().routeOrigin?.charId ?? null; } catch { return null; }
+}
 
 export interface CharacterLocationSystem {
   eveSystemId: number;
@@ -36,8 +44,11 @@ interface RawLocationResponse {
 const POLL_MS = 10_000;
 const EMPTY: CharacterLocation = { online: false, system: null, ship: null };
 
-let moduleCache: { data: CharacterLocation; fetchedAt: number } | null = null;
+let moduleCache: { charId: number | null; data: CharacterLocation; fetchedAt: number } | null = null;
 let inflight: Promise<CharacterLocation> | null = null;
+// The acting char id the current in-flight request is for — so an in-flight
+// fetch is only reused when it's for the SAME character, not a stale one.
+let inflightCharId: number | null = null;
 const subscribers = new Set<(d: CharacterLocation) => void>();
 let pollTimer: ReturnType<typeof setInterval> | null = null;
 
@@ -46,12 +57,19 @@ function notify(d: CharacterLocation) {
 }
 
 function load() {
-  if (inflight) return inflight;
-  inflight = api<RawLocationResponse>('/api/character/location')
+  const charId = actingCharId();
+  // Reuse an in-flight request only when it's for the character we still want.
+  if (inflight && inflightCharId === charId) return inflight;
+  const url = charId == null ? '/api/character/location' : '/api/character/' + charId + '/location';
+  inflightCharId = charId;
+  inflight = api<RawLocationResponse>(url)
     .then(r => {
       const data: CharacterLocation = { online: r.online, system: r.system, ship: r.ship ?? null };
-      moduleCache = { data, fetchedAt: Date.now() };
       inflight = null;
+      // The acting character may have changed while this was in flight — if so,
+      // discard the result rather than caching/broadcasting a stale char.
+      if (actingCharId() !== charId) return data;
+      moduleCache = { charId, data, fetchedAt: Date.now() };
       // Successful round-trip — give the offline-write queue a chance to drain.
       flushQueue();
       notify(data);
@@ -66,6 +84,7 @@ function load() {
 
 export function useCharacterLocation(): CharacterLocation {
   const { isShareMode } = useShareMode();
+  const actingId = useMapStore((s) => s.routeOrigin?.charId ?? null);
   const [data, setData] = useState<CharacterLocation>(moduleCache?.data ?? EMPTY);
 
   useEffect(() => {
@@ -74,8 +93,12 @@ export function useCharacterLocation(): CharacterLocation {
 
     subscribers.add(setData);
     const now = Date.now();
-    if (!moduleCache || now - moduleCache.fetchedAt >= POLL_MS) load();
-    else setData(moduleCache.data);
+    // Serve the cache synchronously only when it's for the acting character and
+    // still fresh; otherwise fetch. Read the live acting id (not the render-time
+    // `actingId`) so this effect needn't re-run on every character switch — the
+    // dedicated effect below handles switches.
+    if (moduleCache && moduleCache.charId === actingCharId() && now - moduleCache.fetchedAt < POLL_MS) setData(moduleCache.data);
+    else load();
     if (!pollTimer) pollTimer = setInterval(load, POLL_MS);
     return () => {
       subscribers.delete(setData);
@@ -85,6 +108,15 @@ export function useCharacterLocation(): CharacterLocation {
       }
     };
   }, [isShareMode]);
+
+  // Switching the pinned (acting) character must re-fetch right away rather than
+  // waiting for the next poll tick. Invalidate a stale-char cache first so no
+  // consumer briefly reads the previous character's location.
+  useEffect(() => {
+    if (isShareMode) return;
+    if (moduleCache && moduleCache.charId !== actingId) moduleCache = null;
+    load();
+  }, [actingId, isShareMode]);
 
   return isShareMode ? EMPTY : data;
 }
