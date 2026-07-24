@@ -52,7 +52,7 @@
     "blocked": "bloqué",
     "characterAdded": "{{name}} ajouté",
     "switchTo": "Basculer vers {{name}}",
-    "focusLocation": "Centrer et router depuis {{name}}",
+    "focusLocation": "Suivre, centrer et router depuis {{name}} sur cet onglet",
     "noLocation": "Aucune position connue pour {{name}}",
     "linkFailedNotInCorp": "Impossible d'ajouter ce personnage — il n'est dans aucune corporation ou alliance autorisée.",
     "linkFailed": "Impossible d'ajouter ce personnage. Veuillez réessayer.",
@@ -809,6 +809,12 @@
     "rollIt": "Effectuer le passage",
     "removeConnection": "Retirer la connexion",
     "brokenNotice": "Connexion rompue — la sig de trou de ver qui la soutenait a été supprimée. Conservée sur la carte mais mise en quarantaine du routage.",
+    "flagLabel": "Marqueur",
+    "flagAdd": "Ajouter un marqueur",
+    "flagNotePlaceholder": "ex. NE PAS ROULER – flotte en approche",
+    "flagRemove": "Supprimer le marqueur",
+    "flagBlink": "Clignoter",
+    "flagColor": "Couleur",
     "restore": "Rétablir",
     "restoreTitle": "Effacer le marqueur de rupture et traiter à nouveau comme une connexion active",
     "gateNote": "Stargate classique — aucune donnée de trou de ver.",
@@ -1730,6 +1736,11 @@
     "unmapped": "Trou inconnu",
     "filled": "{{sig}} mène maintenant vers {{system}}",
     "undo": "Annuler"
+  },
+  "iconPicker": {
+    "title": "Choisir une icône",
+    "search": "Rechercher des icônes…",
+    "more": "Affinez votre recherche pour en voir plus"
   },
   "labelsDialog": {
     "title": "Labels personnalisés",

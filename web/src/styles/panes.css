@@ -29,6 +29,45 @@
   padding: 1px 4px;
 }
 
+/* Corp/alliance-shared flag badge — sits beside the type badge, amber-tinted
+   to draw the eye. The note (if set) surfaces via the global [data-tooltip]. */
+.connection-label__flag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--flag-color, var(--cv-conn-4h));
+  background: color-mix(in srgb, var(--flag-color, var(--cv-conn-4h)) 16%, var(--surface-panel));
+  border: 1px solid color-mix(in srgb, var(--flag-color, var(--cv-conn-4h)) 40%, var(--surface-panel));
+  border-radius: 3px;
+  padding: 1px 4px;
+  margin-left: 3px;
+  cursor: pointer;
+}
+
+/* Opt-in attention blink for an important flag ("DO NOT ROLL"): pulse the
+   background, border and a glowing ring so it's hard to miss on the map. */
+.connection-label__flag--blink {
+  animation: conn-flag-blink 1.1s ease-in-out infinite;
+}
+@keyframes conn-flag-blink {
+  0%, 100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--flag-color, var(--cv-conn-4h)) 0%, transparent);
+    background: color-mix(in srgb, var(--flag-color, var(--cv-conn-4h)) 16%, var(--surface-panel));
+  }
+  50% {
+    box-shadow: 0 0 8px 2px color-mix(in srgb, var(--flag-color, var(--cv-conn-4h)) 65%, transparent);
+    background: color-mix(in srgb, var(--flag-color, var(--cv-conn-4h)) 42%, var(--surface-panel));
+  }
+}
+/* Respect reduced-motion: drop the pulse but keep a strong static highlight. */
+@media (prefers-reduced-motion: reduce) {
+  .connection-label__flag--blink {
+    animation: none;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--flag-color, var(--cv-conn-4h)) 45%, transparent);
+    background: color-mix(in srgb, var(--flag-color, var(--cv-conn-4h)) 34%, var(--surface-panel));
+  }
+}
+
 .connection-label__eol {
   font-size: calc(13px * var(--font-scale, 1));
   font-weight: 700;
@@ -226,6 +265,19 @@
   font-size: calc(12px * var(--font-scale, 1)); color: var(--text-subtle);
 }
 
+/* Connection panel is a horizontal bottom bar; group its wormhole fields into
+   a few vertical columns (WH type + sigs / mass-time-size / flag / roller) so
+   they stack instead of overflowing the width into one clipped row. */
+.conn-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-self: flex-start;
+  min-width: 0;
+}
+.conn-col--flag   { min-width: 150px; }
+.conn-col--roller { min-width: 300px; }
+
 /* Per-end "backing signature" link controls in the connection panel. */
 .conn-siglink {
   margin: 4px 0 2px;
@@ -239,6 +291,44 @@
   color: var(--text-subtle);
   margin-bottom: 6px;
 }
+
+/* ── Connection flag (corp/alliance-shared icon + note) ──── */
+.conn-flag__row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.conn-flag__pick {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.conn-flag__remove { color: var(--text-subtle); }
+.conn-flag__remove:hover { color: var(--danger); }
+
+.conn-flag__color {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: none;
+  cursor: pointer;
+}
+.conn-flag__color:disabled { cursor: default; opacity: 0.5; }
+
+.conn-flag__blink {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  font-size: calc(12px * var(--font-scale, 1));
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.conn-flag__blink input { cursor: pointer; }
 
 
 /* ── Signature pane ──────────────────────────────────────── */
