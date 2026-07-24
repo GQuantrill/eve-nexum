@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useMapStore, getPlacementCell, registerPlacementFix } from '../store/mapStore';
 import { useCharacterLocation } from './useCharacterLocation';
 import { useCanEdit } from './useCanEdit';
+import { useAuth } from '../context/AuthContext';
 import { readUserSetting } from './useUserSetting';
 import { pickHandles } from '../components/map/edgeUtils';
 import { maybeConfirmWhJump } from './whJumpConfirm';
@@ -259,7 +260,11 @@ export function applyTrackedJump(
  */
 export function useLocationTracking(enabled: boolean) {
   const location = useCharacterLocation();
-  const followedId = useMapStore((s) => s.routeOrigin?.charId ?? null);
+  const { user } = useAuth();
+  // The effective acting character (pin, else this tab's own character). Any
+  // change to it must reset the jump refs below, so the new character's system
+  // isn't linked back to the previous character's as a bogus connection.
+  const followedId = useMapStore((s) => s.routeOrigin?.charId ?? null) ?? user?.id ?? null;
   const canEdit  = useCanEdit();
   const lastEveSystemId = useRef<number | null>(null);
   const lastMapSystemId = useRef<string | null>(null);

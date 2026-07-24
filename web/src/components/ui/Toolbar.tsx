@@ -262,7 +262,10 @@ export function Toolbar() {
   // The character THIS TAB acts as: the per-tab pinned character (a routeOrigin
   // override) when set, else the session-active character. The avatar, name and
   // you-are-here follow it; the role badge stays on the session identity below.
-  const actingCharId = useMapStore((s) => s.routeOrigin?.charId ?? null);
+  // The character THIS TAB acts as: the per-tab pinned character, else the tab's
+  // own (session-active) character — resolved to an explicit users.id so the
+  // name/avatar always match the location (which is now resolved by the same id).
+  const actingCharId = useMapStore((s) => s.routeOrigin?.charId ?? null) ?? user?.id ?? null;
   const actingChar = actingCharId != null ? (user?.characters?.find((c) => c.id === actingCharId) ?? null) : null;
   // Ship + live system come from the same poll that drives passive location
   // tracking, so no extra ESI traffic — we just surface fields already on hand.
