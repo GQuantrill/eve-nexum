@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, type CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   getBezierPath, getStraightPath, getSmoothStepPath,
@@ -229,6 +229,11 @@ export const ConnectionEdge = memo(({
             ? (
               <span
                 className={`connection-label__flag${conn?.flagBlink ? ' connection-label__flag--blink' : ''}`}
+                // Custom flag colour drives the icon, badge and blink via the
+                // --flag-color CSS var (falls back to the default amber). Only a
+                // validated #rrggbb reaches here (server-checked), so it's safe
+                // to feed into the inline custom property.
+                style={conn?.flagColor ? ({ '--flag-color': conn.flagColor } as CSSProperties) : undefined}
                 data-tooltip={conn?.flagNote || undefined}
                 onClick={(e) => { e.stopPropagation(); selectConnection(id); }}
               >

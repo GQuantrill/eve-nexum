@@ -814,6 +814,7 @@
     "flagNotePlaceholder": "ex. NE PAS ROULER – flotte en approche",
     "flagRemove": "Supprimer le marqueur",
     "flagBlink": "Clignoter",
+    "flagColor": "Couleur",
     "restore": "Rétablir",
     "restoreTitle": "Effacer le marqueur de rupture et traiter à nouveau comme une connexion active",
     "gateNote": "Stargate classique — aucune donnée de trou de ver.",

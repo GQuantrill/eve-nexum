@@ -2446,7 +2446,7 @@ mapsRouter.patch('/:mapId/connections/:connectionId', async (req, res) => {
     sourceHandle: 'source_handle', targetHandle: 'target_handle',
     type: 'wh_type', massUsed: 'mass_used',
     eolAt: 'eol_at', lifetimeExpiresAt: 'lifetime_expires_at', broken: 'broken',
-    flagIcon: 'flag_icon', flagNote: 'flag_note', flagBlink: 'flag_blink',
+    flagIcon: 'flag_icon', flagNote: 'flag_note', flagBlink: 'flag_blink', flagColor: 'flag_color',
     sourceSignatureId: 'source_signature_id', targetSignatureId: 'target_signature_id',
   };
 
@@ -2486,6 +2486,14 @@ mapsRouter.patch('/:mapId/connections/:connectionId', async (req, res) => {
   }
   if ('flagBlink' in updates && typeof updates.flagBlink !== 'boolean') {
     res.status(400).json({ error: 'invalid flagBlink' }); return;
+  }
+  // Flag colour goes into an inline CSS custom property on the edge, so require
+  // a plain #rrggbb hex (rejecting anything that could smuggle other CSS).
+  if ('flagColor' in updates) {
+    const v = updates.flagColor;
+    if (v !== null && (typeof v !== 'string' || !/^#[0-9a-fA-F]{6}$/.test(v))) {
+      res.status(400).json({ error: 'invalid flagColor' }); return;
+    }
   }
 
   // The stored size should follow the hole type. When the wormhole type is set

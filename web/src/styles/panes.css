@@ -35,9 +35,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--cv-conn-4h);
-  background: color-mix(in srgb, var(--cv-conn-4h) 16%, var(--surface-panel));
-  border: 1px solid color-mix(in srgb, var(--cv-conn-4h) 40%, var(--surface-panel));
+  color: var(--flag-color, var(--cv-conn-4h));
+  background: color-mix(in srgb, var(--flag-color, var(--cv-conn-4h)) 16%, var(--surface-panel));
+  border: 1px solid color-mix(in srgb, var(--flag-color, var(--cv-conn-4h)) 40%, var(--surface-panel));
   border-radius: 3px;
   padding: 1px 4px;
   margin-left: 3px;
@@ -51,20 +51,20 @@
 }
 @keyframes conn-flag-blink {
   0%, 100% {
-    box-shadow: 0 0 0 0 color-mix(in srgb, var(--cv-conn-4h) 0%, transparent);
-    background: color-mix(in srgb, var(--cv-conn-4h) 16%, var(--surface-panel));
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--flag-color, var(--cv-conn-4h)) 0%, transparent);
+    background: color-mix(in srgb, var(--flag-color, var(--cv-conn-4h)) 16%, var(--surface-panel));
   }
   50% {
-    box-shadow: 0 0 8px 2px color-mix(in srgb, var(--cv-conn-4h) 65%, transparent);
-    background: color-mix(in srgb, var(--cv-conn-4h) 42%, var(--surface-panel));
+    box-shadow: 0 0 8px 2px color-mix(in srgb, var(--flag-color, var(--cv-conn-4h)) 65%, transparent);
+    background: color-mix(in srgb, var(--flag-color, var(--cv-conn-4h)) 42%, var(--surface-panel));
   }
 }
 /* Respect reduced-motion: drop the pulse but keep a strong static highlight. */
 @media (prefers-reduced-motion: reduce) {
   .connection-label__flag--blink {
     animation: none;
-    box-shadow: 0 0 0 2px color-mix(in srgb, var(--cv-conn-4h) 45%, transparent);
-    background: color-mix(in srgb, var(--cv-conn-4h) 34%, var(--surface-panel));
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--flag-color, var(--cv-conn-4h)) 45%, transparent);
+    background: color-mix(in srgb, var(--flag-color, var(--cv-conn-4h)) 34%, var(--surface-panel));
   }
 }
 
@@ -307,6 +307,17 @@
 
 .conn-flag__remove { color: var(--text-subtle); }
 .conn-flag__remove:hover { color: var(--danger); }
+
+.conn-flag__color {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: none;
+  cursor: pointer;
+}
+.conn-flag__color:disabled { cursor: default; opacity: 0.5; }
 
 .conn-flag__blink {
   display: flex;

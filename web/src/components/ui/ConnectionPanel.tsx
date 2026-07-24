@@ -448,11 +448,22 @@ export function ConnectionPanel() {
             );
           })()}
           {conn.flagIcon && (
+            <input
+              type="color"
+              className="conn-flag__color"
+              value={conn.flagColor ?? '#f0a030'}
+              disabled={!canEdit}
+              onChange={(e) => update({ flagColor: e.target.value })}
+              title={t('connPanel.flagColor')}
+              aria-label={t('connPanel.flagColor')}
+            />
+          )}
+          {conn.flagIcon && (
             <button
               type="button"
               className="icon-btn conn-flag__remove"
               disabled={!canEdit}
-              onClick={() => update({ flagIcon: null, flagNote: null })}
+              onClick={() => update({ flagIcon: null, flagNote: null, flagColor: null, flagBlink: false })}
               data-tooltip={t('connPanel.flagRemove')}
             >
               <XIcon size={14} weight="bold" />

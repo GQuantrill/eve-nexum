@@ -197,6 +197,7 @@ export interface MapConnection {
   flagIcon: string | null;
   flagNote: string | null;
   flagBlink: boolean;
+  flagColor: string | null;
   createdAt: string;
 }
 
