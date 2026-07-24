@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, type CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   getBezierPath, getStraightPath, getSmoothStepPath,
@@ -13,6 +13,7 @@ import { useWormholeTypes } from '../../hooks/useWormholeTypes';
 import { matchConnection } from '../../utils/watchMatch';
 import { watchMarker } from '../../data/watchMarkers';
 import { effectiveExpiryMs, lifeBucket, type TimeBucket } from '../../utils/whLifetime';
+import { iconComponent } from '../../utils/phosphorIcons';
 import { hoursMins } from '../../i18n/format';
 import type { TFunction } from 'i18next';
 
@@ -221,7 +222,26 @@ export const ConnectionEdge = memo(({
           const timeNode = !noLifetime && timeLabel
             ? <span className={timeLabel.cls}>{timeLabel.text}</span>
             : null;
-          const count = (typeNode ? 1 : 0) + (massNode ? 1 : 0) + (timeNode ? 1 : 0);
+          // Corp/alliance-shared flag: an icon badge beside the type, its note
+          // (if any) revealed by the global [data-tooltip] layer on hover.
+          const FlagIcon = conn?.flagIcon ? iconComponent(conn.flagIcon) : null;
+          const flagNode = FlagIcon
+            ? (
+              <span
+                className={`connection-label__flag${conn?.flagBlink ? ' connection-label__flag--blink' : ''}`}
+                // Custom flag colour drives the icon, badge and blink via the
+                // --flag-color CSS var (falls back to the default amber). Only a
+                // validated #rrggbb reaches here (server-checked), so it's safe
+                // to feed into the inline custom property.
+                style={conn?.flagColor ? ({ '--flag-color': conn.flagColor } as CSSProperties) : undefined}
+                data-tooltip={conn?.flagNote || undefined}
+                onClick={(e) => { e.stopPropagation(); selectConnection(id); }}
+              >
+                <FlagIcon size={14} weight="fill" />
+              </span>
+            )
+            : null;
+          const count = (typeNode ? 1 : 0) + (massNode ? 1 : 0) + (timeNode ? 1 : 0) + (flagNode ? 1 : 0);
 
           return (
             <div
@@ -234,7 +254,7 @@ export const ConnectionEdge = memo(({
             >
               {count > 0 ? (
                 <>
-                  {typeNode && <div className="connection-label__row">{typeNode}</div>}
+                  {(typeNode || flagNode) && <div className="connection-label__row">{typeNode}{flagNode}</div>}
                   {massNode && <div className="connection-label__row">{massNode}</div>}
                   {timeNode && <div className="connection-label__row">{timeNode}</div>}
                 </>
