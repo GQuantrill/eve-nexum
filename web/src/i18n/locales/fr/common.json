@@ -1223,6 +1223,8 @@
     "trackJumpsOff": "Suivi des sauts : désactivé",
     "trackJumpsTooltipOn": "Suivi des sauts — de nouveaux systèmes sont ajoutés au fil de vos déplacements",
     "trackJumpsTooltipOff": "Pas de suivi des sauts — seuls les systèmes existants reçoivent l'indicateur de position",
+    "following": "Suivi",
+    "followingTooltip": "Ajouter automatiquement les sauts de ce personnage dans cet onglet",
     "signOut": "Se déconnecter",
     "role": "Rôle : {{role}}",
     "checkedAgo": "vérifié {{time}}",

@@ -1223,6 +1223,8 @@
     "trackJumpsOff": "점프 추적: 꺼짐",
     "trackJumpsTooltipOn": "점프 추적 중 — 이동함에 따라 새 성계가 추가됩니다",
     "trackJumpsTooltipOff": "점프 추적 안 함 — 기존 성계만 “현재 위치” 표시를 받습니다",
+    "following": "추적 대상",
+    "followingTooltip": "이 탭에서 이 캐릭터의 점프를 자동으로 추가합니다",
     "signOut": "로그아웃",
     "role": "권한: {{role}}",
     "checkedAgo": "{{time}} 확인됨",

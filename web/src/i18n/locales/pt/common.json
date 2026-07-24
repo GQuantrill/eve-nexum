@@ -1223,6 +1223,8 @@
     "trackJumpsOff": "Seguir saltos: desligado",
     "trackJumpsTooltipOn": "A seguir saltos — novos sistemas são adicionados à medida que te moves",
     "trackJumpsTooltipOff": "Sem seguir saltos — apenas os sistemas existentes recebem o indicador de posição",
+    "following": "Seguindo",
+    "followingTooltip": "Adicionar automaticamente os saltos deste personagem nesta aba",
     "signOut": "Terminar sessão",
     "role": "Função: {{role}}",
     "checkedAgo": "verificado {{time}}",

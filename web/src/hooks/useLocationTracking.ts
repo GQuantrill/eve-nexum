@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useMapStore, getPlacementCell, registerPlacementFix } from '../store/mapStore';
-import { useCharacterLocation } from './useCharacterLocation';
+import { useFollowedCharacterLocation, useFollowedCharacterId } from './useFollowedCharacter';
 import { useCanEdit } from './useCanEdit';
 import { readUserSetting } from './useUserSetting';
 import { pickHandles } from '../components/map/edgeUtils';
@@ -258,11 +258,16 @@ export function applyTrackedJump(
  * advances and a map is active.
  */
 export function useLocationTracking(enabled: boolean) {
-  const location = useCharacterLocation();
+  const location = useFollowedCharacterLocation();
+  const followedId = useFollowedCharacterId();
   const canEdit  = useCanEdit();
   const lastEveSystemId = useRef<number | null>(null);
   const lastMapSystemId = useRef<string | null>(null);
   const lastActiveMapId = useRef<string | null>(null);
+  // The character we were following on the last pass. Switching the followed
+  // character must reset the jump refs (see below) so the new character's
+  // current system isn't drawn as a jump FROM the previous character's system.
+  const lastFollowedId = useRef<number | null>(null);
   // The pilot's previous PHYSICAL system (whether or not it was recorded on the
   // map). Needed for the "don't track K-space" option, which has to look at the
   // departure system's class — and retroactively add the last K-space system
@@ -282,9 +287,12 @@ export function useLocationTracking(enabled: boolean) {
     // next location update rather than racing addSystem against an empty store.
     if (!map.id) return;
 
-    // Reset refs when the active map changes
-    if (map.id !== lastActiveMapId.current) {
+    // Reset refs when the active map changes OR the followed character changes.
+    // A new followed character's current system must not be linked back to the
+    // previous character's last system (a bogus cross-character connection).
+    if (map.id !== lastActiveMapId.current || followedId !== lastFollowedId.current) {
       lastActiveMapId.current = map.id;
+      lastFollowedId.current = followedId;
       lastEveSystemId.current = null;
       lastMapSystemId.current = null;
       lastSelectedEveId.current = null;
@@ -348,5 +356,5 @@ export function useLocationTracking(enabled: boolean) {
       lastSelectedEveId.current = system.eveSystemId;
       selectSystem(mapSystemId, { fromJump: true });
     }
-  }, [enabled, location, canEdit]);
+  }, [enabled, location, canEdit, followedId]);
 }

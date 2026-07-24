@@ -1223,6 +1223,8 @@
     "trackJumpsOff": "Sprünge verfolgen: aus",
     "trackJumpsTooltipOn": "Sprünge werden verfolgt — neue Systeme werden hinzugefügt, während du dich bewegst",
     "trackJumpsTooltipOff": "Sprünge werden nicht verfolgt — nur vorhandene Systeme erhalten die Standortanzeige",
+    "following": "Verfolgt",
+    "followingTooltip": "Sprünge dieses Charakters in diesem Tab automatisch hinzufügen",
     "signOut": "Abmelden",
     "role": "Rolle: {{role}}",
     "checkedAgo": "geprüft {{time}}",
