@@ -809,6 +809,10 @@
     "rollIt": "Effectuer le passage",
     "removeConnection": "Retirer la connexion",
     "brokenNotice": "Connexion rompue — la sig de trou de ver qui la soutenait a été supprimée. Conservée sur la carte mais mise en quarantaine du routage.",
+    "flagLabel": "Marqueur",
+    "flagAdd": "Ajouter un marqueur",
+    "flagNotePlaceholder": "ex. NE PAS ROULER – flotte en approche",
+    "flagRemove": "Supprimer le marqueur",
     "restore": "Rétablir",
     "restoreTitle": "Effacer le marqueur de rupture et traiter à nouveau comme une connexion active",
     "gateNote": "Stargate classique — aucune donnée de trou de ver.",
@@ -1730,6 +1734,11 @@
     "unmapped": "Trou inconnu",
     "filled": "{{sig}} mène maintenant vers {{system}}",
     "undo": "Annuler"
+  },
+  "iconPicker": {
+    "title": "Choisir une icône",
+    "search": "Rechercher des icônes…",
+    "more": "Affinez votre recherche pour en voir plus"
   },
   "labelsDialog": {
     "title": "Labels personnalisés",

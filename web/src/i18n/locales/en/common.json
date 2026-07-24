@@ -818,6 +818,10 @@
   },
   "connPanel": {
     "brokenNotice": "Connection broken — the backing wormhole sig was deleted. Kept on the map but quarantined from routing.",
+    "flagLabel": "Flag",
+    "flagAdd": "Add flag",
+    "flagNotePlaceholder": "e.g. DO NOT ROLL - fleet inbound",
+    "flagRemove": "Remove flag",
     "restore": "Restore",
     "restoreTitle": "Clear the broken flag and treat this as a live connection again",
     "whType": "Wormhole type",
@@ -1740,6 +1744,11 @@
     "lessThan4h": "< 4 hrs",
     "lessThan1h": "< 1 hr",
     "broken": "Connection broken — the wormhole sig was deleted (hole collapsed)"
+  },
+  "iconPicker": {
+    "title": "Choose an icon",
+    "search": "Search icons...",
+    "more": "Refine your search to see more"
   },
   "labelsDialog": {
     "title": "Custom labels",

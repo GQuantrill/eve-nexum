@@ -29,6 +29,21 @@
   padding: 1px 4px;
 }
 
+/* Corp/alliance-shared flag badge — sits beside the type badge, amber-tinted
+   to draw the eye. The note (if set) surfaces via the global [data-tooltip]. */
+.connection-label__flag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cv-conn-4h);
+  background: color-mix(in srgb, var(--cv-conn-4h) 16%, var(--surface-panel));
+  border: 1px solid color-mix(in srgb, var(--cv-conn-4h) 40%, var(--surface-panel));
+  border-radius: 3px;
+  padding: 1px 4px;
+  margin-left: 3px;
+  cursor: pointer;
+}
+
 .connection-label__eol {
   font-size: calc(13px * var(--font-scale, 1));
   font-weight: 700;
@@ -239,6 +254,22 @@
   color: var(--text-subtle);
   margin-bottom: 6px;
 }
+
+/* ── Connection flag (corp/alliance-shared icon + note) ──── */
+.conn-flag__row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.conn-flag__pick {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.conn-flag__remove { color: var(--text-subtle); }
+.conn-flag__remove:hover { color: var(--danger); }
 
 
 /* ── Signature pane ──────────────────────────────────────── */

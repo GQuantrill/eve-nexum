@@ -809,6 +809,10 @@
     "rollIt": "通過を実行",
     "removeConnection": "接続を削除",
     "brokenNotice": "接続が切断されました — 支えていたワームホールシグが削除されました。マップ上には残りますが、ルーティングからは隔離されています。",
+    "flagLabel": "フラグ",
+    "flagAdd": "フラグを追加",
+    "flagNotePlaceholder": "例: ロール禁止 - 艦隊接近中",
+    "flagRemove": "フラグを削除",
     "restore": "復元",
     "restoreTitle": "切断フラグを解除し、再び有効な接続として扱います",
     "gateNote": "通常のスターゲート — ワームホールデータはありません。",
@@ -1730,6 +1734,11 @@
     "unmapped": "未確認のホール",
     "filled": "{{sig}} は {{system}} へ通じます",
     "undo": "元に戻す"
+  },
+  "iconPicker": {
+    "title": "アイコンを選択",
+    "search": "アイコンを検索…",
+    "more": "検索を絞り込むともっと表示されます"
   },
   "labelsDialog": {
     "title": "カスタムラベル",

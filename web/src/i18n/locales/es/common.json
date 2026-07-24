@@ -809,6 +809,10 @@
     "rollIt": "Realizar la pasada",
     "removeConnection": "Quitar conexión",
     "brokenNotice": "Conexión rota — la firma de agujero de gusano que la sostenía fue eliminada. Se mantiene en el mapa pero en cuarentena del enrutamiento.",
+    "flagLabel": "Marca",
+    "flagAdd": "Añadir marca",
+    "flagNotePlaceholder": "p. ej. NO ROLEAR – flota en camino",
+    "flagRemove": "Quitar marca",
     "restore": "Restaurar",
     "restoreTitle": "Quitar la marca de rota y volver a tratarla como una conexión activa",
     "gateNote": "Stargate normal — sin datos de agujero de gusano.",
@@ -1730,6 +1734,11 @@
     "unmapped": "Agujero desconocido",
     "filled": "{{sig}} ahora lleva a {{system}}",
     "undo": "Deshacer"
+  },
+  "iconPicker": {
+    "title": "Elegir un icono",
+    "search": "Buscar iconos…",
+    "more": "Afina tu búsqueda para ver más"
   },
   "labelsDialog": {
     "title": "Etiquetas personalizadas",
