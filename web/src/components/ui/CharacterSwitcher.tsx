@@ -51,11 +51,22 @@ export function CharacterSwitcher() {
     }
   }
 
-  // Point centring + jump calcs at this character's location (live if online,
-  // else its last known system). The active character clears the override and
-  // reverts to live routing.
+  // Pin THIS TAB to act as this character: centring, the you-are-here toolbar,
+  // auto-add tracking and route origin all follow it (live location if online,
+  // else its last known system). Clicking the character that's already acting
+  // clears the pin and reverts to the session-active character. Pinning the
+  // active character explicitly is allowed too — it stops the tab drifting when
+  // the session-active character later changes.
   async function focusOn(c: typeof characters[number]) {
     if (busy) return;
+    // Already the acting character (an explicit pin on it, or the default when
+    // no pin and it's active) — toggle the pin off and revert to live routing.
+    const alreadyActing = routeOrigin ? routeOrigin.charId === c.id : c.active;
+    if (alreadyActing) {
+      setRouteOrigin(null);
+      setOpen(false);
+      return;
+    }
     setBusy(true);
     try {
       const loc = await api<CharLocationResponse>(`/api/character/${c.id}/location`).catch(() => null);
@@ -71,9 +82,7 @@ export function CharacterSwitcher() {
         toast.error(t('account.noLocation', { name: c.characterName }));
         return;
       }
-      setRouteOrigin(c.active
-        ? null
-        : { charId: c.id, characterName: c.characterName, eveSystemId, systemName, systemClass });
+      setRouteOrigin({ charId: c.id, characterName: c.characterName, eveSystemId, systemName, systemClass });
       requestCenter(eveSystemId);
     } finally {
       setBusy(false);

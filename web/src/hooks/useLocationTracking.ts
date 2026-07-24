@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useMapStore, getPlacementCell, registerPlacementFix } from '../store/mapStore';
-import { useFollowedCharacterLocation, useFollowedCharacterId } from './useFollowedCharacter';
+import { useCharacterLocation } from './useCharacterLocation';
 import { useCanEdit } from './useCanEdit';
 import { readUserSetting } from './useUserSetting';
 import { pickHandles } from '../components/map/edgeUtils';
@@ -258,8 +258,8 @@ export function applyTrackedJump(
  * advances and a map is active.
  */
 export function useLocationTracking(enabled: boolean) {
-  const location = useFollowedCharacterLocation();
-  const followedId = useFollowedCharacterId();
+  const location = useCharacterLocation();
+  const followedId = useMapStore((s) => s.routeOrigin?.charId ?? null);
   const canEdit  = useCanEdit();
   const lastEveSystemId = useRef<number | null>(null);
   const lastMapSystemId = useRef<string | null>(null);
