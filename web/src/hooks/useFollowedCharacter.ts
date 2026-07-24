@@ -1,50 +1,22 @@
-import { useEffect, useState, useSyncExternalStore } from 'react';
+import { useEffect, useState } from 'react';
 import { api } from '../api/client';
 import { useShareMode } from '../context/ShareModeContext';
 import { useAuth } from '../context/AuthContext';
+import { useMapStore } from '../store/mapStore';
 import { useCharacterLocation, type CharacterLocation } from './useCharacterLocation';
 
-// Per-TAB choice of which of the account's characters to auto-add jumps from.
-// Stored in sessionStorage (survives reload, stays per-tab). `null` means "follow
-// the session-active character" — the default and backward-compatible behaviour.
-const FOLLOWED_KEY = 'nexum.followedChar';
+// Which of the account's characters THIS TAB follows for auto-add jump tracking.
+// It's the character pinned via the character switcher's focus button — stored
+// in the per-tab `routeOrigin` store field (a client-only override, so each tab
+// is independent) — or null to follow the session-active character (default).
+// Pinning is how a multiboxer makes two tabs track two characters onto two maps
+// at once, with no separate character selector.
 const POLL_MS = 10_000;
 const EMPTY: CharacterLocation = { online: false, system: null, ship: null };
 
-// Module-level listener set so useSyncExternalStore consumers re-read the snapshot
-// whenever setFollowedCharacterId writes.
-const listeners = new Set<() => void>();
-
-function subscribe(fn: () => void): () => void {
-  listeners.add(fn);
-  return () => { listeners.delete(fn); };
-}
-
-function getSnapshot(): number | null {
-  try {
-    const raw = sessionStorage.getItem(FOLLOWED_KEY);
-    if (raw == null) return null;
-    const n = Number(raw);
-    return Number.isInteger(n) ? n : null;
-  } catch { return null; }
-}
-
-function getServerSnapshot(): number | null {
-  return null;
-}
-
-/** The per-tab followed user id, or null to follow the session-active character. */
+/** The per-tab followed user id (the pinned character), or null for the active character. */
 export function useFollowedCharacterId(): number | null {
-  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-}
-
-/** Set (or clear, with null) the per-tab followed character, then notify readers. */
-export function setFollowedCharacterId(id: number | null): void {
-  try {
-    if (id == null) sessionStorage.removeItem(FOLLOWED_KEY);
-    else sessionStorage.setItem(FOLLOWED_KEY, String(id));
-  } catch { /* private mode / quota — ignore */ }
-  listeners.forEach(fn => fn());
+  return useMapStore((s) => s.routeOrigin?.charId ?? null);
 }
 
 interface RawLocationResponse {
@@ -93,7 +65,7 @@ export function useOtherCharacterLocation(userId: number | null): CharacterLocat
 
 /**
  * The location that auto-add jump tracking should follow on THIS tab: the
- * per-tab followed character when one is chosen, otherwise the session-active
+ * per-tab pinned character when one is set, otherwise the session-active
  * character. Both sub-hooks are always called (hooks rules); only a genuinely
  * different character adds a second poll — following the active character reuses
  * the existing shared active poll.

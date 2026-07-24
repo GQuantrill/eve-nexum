@@ -332,6 +332,22 @@ export function useLocationTracking(enabled: boolean) {
     const prev = prevPhysical.current;
     prevPhysical.current = curr; // remember the physical location for the next jump
 
+    // When this tab follows a PINNED character (a routeOrigin override, not the
+    // session-active one), keep that override's location live as they fly — so
+    // route calcs and centring track their current system, not the pin-time
+    // snapshot. Only the location fields change; charId / name are preserved.
+    if (followedId != null) {
+      const ro = useMapStore.getState().routeOrigin;
+      if (ro && ro.charId === followedId) {
+        useMapStore.getState().setRouteOrigin({
+          ...ro,
+          eveSystemId: system.eveSystemId,
+          systemName:  system.name,
+          systemClass: system.systemClass,
+        });
+      }
+    }
+
     // A locked map never grows from passive tracking, nor does one a readonly /
     // no-topology user is viewing; track-jumps off opts out of auto-add too.
     const trackJumps = useMapStore.getState().trackJumps;
