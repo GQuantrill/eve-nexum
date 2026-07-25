@@ -993,10 +993,13 @@ mapsRouter.post('/', async (req, res) => {
   const corpId     = isCorpMap ? (req.session.userCorpId ?? null) : null;
   const allianceId = isAllianceMap ? (req.session.userAllianceId ?? null) : null;
   const ownerId    = await resolveOwnerId(req);
+  // Map-level "Don't track K-space" only applies to corp/alliance maps; force
+  // false on personal maps (they keep the per-user nexum.tracking.skipKspace).
+  const skipKspace = req.body.skipKspace === true && (isCorpMap || isAllianceMap);
 
   const { rows } = await db.query<{ id: string }>(
-    `INSERT INTO maps (user_id, owner_id, name, corp_id, alliance_id) VALUES ($1, $2, $3, $4, $5) RETURNING id`,
-    [req.session.userId, ownerId, name, corpId, allianceId],
+    `INSERT INTO maps (user_id, owner_id, name, corp_id, alliance_id, skip_kspace) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
+    [req.session.userId, ownerId, name, corpId, allianceId, skipKspace],
   );
   res.status(201).json({ id: rows[0].id });
 });
@@ -1084,7 +1087,7 @@ mapsRouter.post('/:mapId/copy', async (req, res) => {
 // stays on POST /api/maps; this is only the seeded path. See
 // region_map_feature.md.
 mapsRouter.post('/from-region', async (req, res) => {
-  const body     = req.body as { regionId?: unknown; name?: unknown; isCorpMap?: unknown; isAllianceMap?: unknown };
+  const body     = req.body as { regionId?: unknown; name?: unknown; isCorpMap?: unknown; isAllianceMap?: unknown; skipKspace?: unknown };
   const regionId = Number(body.regionId);
   if (!Number.isInteger(regionId)) { res.status(400).json({ error: 'regionId is required' }); return; }
 
@@ -1214,11 +1217,14 @@ mapsRouter.post('/from-region', async (req, res) => {
     await client.query('BEGIN');
 
     const ownerId = await resolveOwnerId(req);
+    // K-space tracking policy only applies to corp/alliance maps; false otherwise.
+    const skipKspace = body.skipKspace === true && (isCorpMap || isAllianceMap);
     const mapRes = await client.query<{ id: string }>(
-      `INSERT INTO maps (user_id, owner_id, name, corp_id, alliance_id) VALUES ($1, $2, $3, $4, $5) RETURNING id`,
+      `INSERT INTO maps (user_id, owner_id, name, corp_id, alliance_id, skip_kspace) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
       [req.session.userId, ownerId, mapName,
        isCorpMap ? (req.session.userCorpId ?? null) : null,
-       isAllianceMap ? (req.session.userAllianceId ?? null) : null],
+       isAllianceMap ? (req.session.userAllianceId ?? null) : null,
+       skipKspace],
     );
     const mapId = mapRes.rows[0].id;
 
@@ -1342,10 +1348,11 @@ mapsRouter.post('/import', async (req, res) => {
     }
   }
 
-  const { name, systems = [], connections = [] } = req.body as {
+  const { name, systems = [], connections = [], skipKspace } = req.body as {
     name?: string;
     systems?: Array<Record<string, unknown>>;
     connections?: Array<Record<string, unknown>>;
+    skipKspace?: boolean;
   };
 
   if (!Array.isArray(systems) || !Array.isArray(connections)) {
@@ -1367,11 +1374,14 @@ mapsRouter.post('/import', async (req, res) => {
 
     const importName = String(name ?? 'Imported Map').slice(0, MAX_MAP_NAME_LEN);
     const ownerId = await resolveOwnerId(req);
+    // K-space tracking policy only applies to corp/alliance maps; false otherwise.
+    const importSkipKspace = skipKspace === true && (isCorpImport || isAllianceImport);
     const mapRes = await client.query<{ id: string }>(
-      `INSERT INTO maps (user_id, owner_id, name, corp_id, alliance_id) VALUES ($1, $2, $3, $4, $5) RETURNING id`,
+      `INSERT INTO maps (user_id, owner_id, name, corp_id, alliance_id, skip_kspace) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
       [req.session.userId, ownerId, importName,
        isCorpImport ? (req.session.userCorpId ?? null) : null,
-       isAllianceImport ? (req.session.userAllianceId ?? null) : null],
+       isAllianceImport ? (req.session.userAllianceId ?? null) : null,
+       importSkipKspace],
     );
     const mapId = mapRes.rows[0].id;
 
@@ -1998,9 +2008,9 @@ mapsRouter.post('/:mapId/presence', async (req, res) => {
 // toggle merge-source eligibility (corp maps, full/admin only)
 mapsRouter.patch('/:mapId', async (req, res) => {
   const { mapId } = req.params;
-  const { name, locked, allowAsMergeSource, allowAsMergeDestination, lazyRemoveWormholes, collapseGraceHours, bookmarkFormat } = req.body as {
+  const { name, locked, allowAsMergeSource, allowAsMergeDestination, lazyRemoveWormholes, collapseGraceHours, bookmarkFormat, skipKspace } = req.body as {
     name?: string; locked?: boolean; allowAsMergeSource?: boolean; allowAsMergeDestination?: boolean;
-    lazyRemoveWormholes?: boolean; collapseGraceHours?: number; bookmarkFormat?: string | null;
+    lazyRemoveWormholes?: boolean; collapseGraceHours?: number; bookmarkFormat?: string | null; skipKspace?: boolean;
   };
 
   const access = await requireMapWrite(res, mapId, req);
@@ -2055,6 +2065,21 @@ mapsRouter.patch('/:mapId', async (req, res) => {
       res.status(403).json({ error: allianceScoped ? 'Alliance admin access required' : 'Admin access required' }); return;
     }
     sets.push(`locked = $${vals.length + 1}`); vals.push(locked);
+  }
+  // Map-level "Don't track K-space" policy — corp/alliance maps only, and gated
+  // to owner/admins exactly like the lock: alliance maps need the alliance admin
+  // role, corp maps an ordinary admin. Overrides each member's personal
+  // nexum.tracking.skipKspace while they are on this map.
+  if (skipKspace !== undefined) {
+    if (access.corpId === null && access.allianceId === null) {
+      res.status(400).json({ error: 'Only corp/alliance maps have a K-space tracking policy' }); return;
+    }
+    const role = req.session.role ?? 'readonly';
+    const allianceScoped = access.allianceId !== null;
+    if (allianceScoped ? !isAllianceAdmin(role) : !isAdmin(role)) {
+      res.status(403).json({ error: allianceScoped ? 'Alliance admin access required' : 'Admin access required' }); return;
+    }
+    sets.push(`skip_kspace = $${vals.length + 1}`); vals.push(skipKspace === true);
   }
   // Lazy WH-removal opt-in: a plain per-map behaviour toggle any editor can set
   // (no corp/admin gate). The sweep itself runs server-side on this cadence.

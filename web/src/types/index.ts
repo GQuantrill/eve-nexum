@@ -223,6 +223,10 @@ export interface WormholeMap {
   /** Opt-in: a server-side sweep removes wormhole sigs older than their type's
    *  max lifetime and quarantines (marks broken) any connection they backed. */
   lazyRemoveWormholes?: boolean;
+  /** Corp/alliance maps only: map-level "Don't track K-space" policy. When true,
+   *  no one on this map records K-space jumps, overriding each member's personal
+   *  nexum.tracking.skipKspace. Only owner/admins can change it. */
+  skipKspace?: boolean;
   /** Lazy-removal maps only: hours an expired connection lingers before the
    *  lifetime sweep severs it and drops its backing sigs. Default 0.5 (30 min). */
   collapseGraceHours?: number;
