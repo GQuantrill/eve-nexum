@@ -20,7 +20,7 @@ const GRID = 20;
 // Auto-placed systems always sit a consistent 3 grid squares clear of the
 // system they're placed next to — rather than a node-width-dependent gap that
 // drifted as the uniform-size max grew.
-const PLACEMENT_GAP = 3 * GRID;
+export const PLACEMENT_GAP = 3 * GRID;
 const ceilToGrid  = (n: number) => Math.ceil(n / GRID) * GRID;
 const roundToGrid = (n: number) => Math.round(n / GRID) * GRID;
 
@@ -58,7 +58,7 @@ const FALLBACK_BY_DIR: Record<PlacementDirection, [number, number]> = {
 // the source when horizontal, below it when vertical), then the rest of the
 // ring, then outward on wider rings. Each candidate is collision-checked
 // against every node, so it also dodges unrelated systems sitting in a slot.
-function findFreePosition(
+export function findFreePosition(
   source: { x: number; y: number },
   systems: Box[],
   w: number,

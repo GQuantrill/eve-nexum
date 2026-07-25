@@ -50,6 +50,8 @@ import { PromptModal } from '../ui/PromptModal';
 import type { MapSystem, SystemIntel, SystemClass } from '../../types';
 import { api } from '../../api/client';
 import { truesecColor } from '../../utils/truesec';
+import { readUserSetting } from '../../hooks/useUserSetting';
+import { findFreePosition, normalizePlacement, PLACEMENT_GAP } from '../../hooks/useLocationTracking';
 import { CLASS_COLORS } from '../../data/wormholes';
 import { cssVarToHex } from '../../utils/cssVar';
 import { pickHandles } from './edgeUtils';
@@ -1290,19 +1292,16 @@ export function MapCanvas() {
       // (map_stargates); ones already on the map show checked + disabled. Picking
       // a missing one drops it in beside the source with a stargate connection.
       const isKspace = !multiSelected && !!sys?.eveSystemId && KSPACE_CLASSES.has(sys.systemClass);
-      const addAdjacent = (adj: AdjacentSystem, notPresent: AdjacentSystem[]) => {
+      const addAdjacent = (adj: AdjacentSystem) => {
         const src = systems.find((s) => s.id === contextMenu.nodeId);
         if (!src) return;
+        // Reuse the exact placement live tracking uses: the next free slot around
+        // the source, starting in the user's preferred direction and rotating
+        // clockwise, collision-checked against every node. Reading the current
+        // `systems` each call means successive adds don't overlap each other.
         const cell = getPlacementCell();
-        const w = cell.w || 220;
-        const h = cell.h || 120;
-        // Fan new nodes out to the source's right, vertically centred on it.
-        const slot = notPresent.findIndex((r) => r.eveSystemId === adj.eveSystemId);
-        const n = notPresent.length;
-        const pos = {
-          x: src.position.x + w + 60,
-          y: src.position.y + (slot - (n - 1) / 2) * (h + 24),
-        };
+        const direction = normalizePlacement(readUserSetting<string>('nexum.map.placement', 'east'));
+        const pos = findFreePosition(src.position, systems, cell.w || 220, cell.h || 120, PLACEMENT_GAP, direction, snapToGrid);
         const newId = addSystem(adj.name, adj.systemClass as SystemClass, pos, {
           eveSystemId: adj.eveSystemId,
           regionName:  adj.regionName,
@@ -1317,7 +1316,6 @@ export function MapCanvas() {
         if (state === 'error') return [{ label: t('ctxMenu.addAdjacentError'), disabled: true }];
         if (state.length === 0) return [{ label: t('ctxMenu.addAdjacentNone'), disabled: true }];
         const present = new Set(systems.map((s) => s.eveSystemId).filter((x): x is number => x != null));
-        const notPresent = state.filter((r) => !present.has(r.eveSystemId));
         return state.map((adj) => {
           const already = present.has(adj.eveSystemId);
           return {
@@ -1325,7 +1323,7 @@ export function MapCanvas() {
             icon:    <span className="intel-swatch" style={{ background: truesecColor(adj.security ?? 0) }} aria-hidden="true" />,
             checked: already,
             disabled: already,
-            action:  already ? undefined : () => addAdjacent(adj, notPresent),
+            action:  already ? undefined : () => addAdjacent(adj),
           };
         });
       };
