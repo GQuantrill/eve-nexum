@@ -49,6 +49,9 @@ export function CreateMapModal({ onClose }: { onClose: () => void }) {
   const [scope, setScope] = useState<MapScope>('personal');
   const isCorp     = scope === 'corp';
   const isAlliance = scope === 'alliance';
+  // Corp/alliance-only map-level "Don't track K-space" policy; ignored (and
+  // forced false server-side) for personal maps.
+  const [skipKspace, setSkipKspace] = useState(false);
 
   const [regions, setRegions] = useState<Region[]>([]);
   const [query, setQuery]     = useState('');
@@ -92,11 +95,12 @@ export function CreateMapModal({ onClose }: { onClose: () => void }) {
     setError(null);
     try {
       const trimmed = name.trim();
+      const skip = (isCorp || isAlliance) && skipKspace;
       if (region) {
-        await createFromRegion(region.id, trimmed, isCorp, isAlliance);
+        await createFromRegion(region.id, trimmed, isCorp, isAlliance, skip);
         toast.success(t('createMap.created', { name: trimmed, region: region.name }));
       } else {
-        await createMap(trimmed, isCorp, isAlliance);
+        await createMap(trimmed, isCorp, isAlliance, skip);
       }
       onClose();
     } catch (e) {
@@ -142,6 +146,17 @@ export function CreateMapModal({ onClose }: { onClose: () => void }) {
                 ]}
               />
             </label>
+          )}
+
+          {(isCorp || isAlliance) && (
+            <div className="field">
+              <label className="map-sidebar__row map-sidebar__toggle-row">
+                <span className="map-sidebar__label">{t('createMap.skipKspace')}</span>
+                <input type="checkbox" className="map-sidebar__toggle-input"
+                  checked={skipKspace} onChange={(e) => setSkipKspace(e.target.checked)} />
+              </label>
+              <div className="map-sidebar__hint">{t('createMap.skipKspaceHint')}</div>
+            </div>
           )}
 
           <div className="field">

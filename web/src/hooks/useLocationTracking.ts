@@ -357,7 +357,11 @@ export function useLocationTracking(enabled: boolean) {
     // no-topology user is viewing; track-jumps off opts out of auto-add too.
     const trackJumps = useMapStore.getState().trackJumps;
     const canAdd = trackJumps && !map.locked && canEdit;
-    const skipKspace = readUserSetting<boolean>('nexum.tracking.skipKspace', false);
+    // On a corp/alliance map the map-level policy overrides everyone's personal
+    // setting; personal maps keep using the per-user setting.
+    const skipKspace = (map.isCorpMap || map.isAllianceMap)
+      ? !!map.skipKspace
+      : readUserSetting<boolean>('nexum.tracking.skipKspace', false);
 
     const { mapSystemId, anchor } = applyTrackedJump(curr, prev, prevMapSystemId, { skipKspace, canAdd });
     if (anchor !== 'keep') lastMapSystemId.current = anchor;

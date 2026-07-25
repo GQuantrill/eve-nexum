@@ -99,6 +99,7 @@ export async function loadFullMap(mapId: string) {
               allow_as_merge_source       AS "allowAsMergeSource",
               allow_as_merge_destination  AS "allowAsMergeDestination",
               lazy_remove_wormholes       AS "lazyRemoveWormholes",
+              skip_kspace                 AS "skipKspace",
               collapse_grace_hours        AS "collapseGraceHours",
               bookmark_format             AS "bookmarkFormat",
               share_token              AS "shareToken",
