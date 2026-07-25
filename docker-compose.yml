@@ -22,11 +22,56 @@ services:
     build:
       context: ./server
       dockerfile: Dockerfile
-    env_file: .env
-    environment:
-      PG_HOST: postgres
-      PG_PORT: 5432
-      NODE_ENV: production
+    # The .env file is OPTIONAL. Secrets/config are read from the environment of
+    # whatever runs `docker compose` (e.g. `infisical run -- docker compose up
+    # -d`); when that environment doesn't provide a var, it falls back to a
+    # local .env if one is present. Either source works and neither is required,
+    # so a secrets manager (Infisical) can inject everything without a plain-text
+    # .env on disk.
+    env_file: &optional_env
+      - path: .env
+        required: false
+    environment: &container_env
+      # Fixed for the compose network -- always override any inherited value.
+      # The server reaches Postgres by service name regardless of any host-side
+      # PG_PORT remap, so these three are pinned rather than passed through.
+      - PG_HOST=postgres
+      - PG_PORT=5432
+      - NODE_ENV=production
+      # Passed through from the shell / Infisical when set, else from the
+      # optional .env above. ADD NEW SERVER ENV VARS HERE so they reach the
+      # container under both setups. (Vars unset in every source are omitted.)
+      - PG_DB
+      - PG_USER
+      - PG_PASSWORD
+      - PG_POOL_MAX
+      - PORT
+      - SESSION_SECRET
+      - TOKEN_ENCRYPTION_KEY
+      - EVE_CLIENT_ID
+      - EVE_CLIENT_SECRET
+      - EVE_CALLBACK_URL
+      - FRONTEND_URL
+      - CORP_ID
+      - CORP_MAP_SHARED
+      - CORP_MAP_TIME
+      - ALLIANCE_ID
+      - ALLIANCE_MAP_SHARED
+      - ADMIN_CHAR_ID
+      - RV_REPORT_ID
+      - MAX_USER_MAPS
+      - MAX_CORP_MAPS
+      - MAX_ALLIANCE_MAPS
+      - ACCESS_REVALIDATE_MINUTES
+      - CONN_LIFETIME_SWEEP_MINUTES
+      - LAZY_WH_SWEEP_MINUTES
+      - LOCATION_POLL_MINUTES
+      - SDE_AUTO_UPDATE
+      - SDE_CHECK_UTC
+      - FORCE_SDE_IMPORT
+      - DISCORD_WEBHOOK_URL
+      - NEXUM_TELEMETRY
+      - NEXUM_TELEMETRY_URL
     command: ["node", "dist/scripts/setup-db.js"]
     volumes:
       # Persist the downloaded SDE zip so re-imports don't re-fetch it.
@@ -40,14 +85,10 @@ services:
       context: ./server
       dockerfile: Dockerfile
     restart: unless-stopped
-    env_file: .env
-    environment:
-      # Inside the Docker network the server reaches Postgres at
-      # postgres:5432 regardless of any host-side port remapping the
-      # user did via PG_PORT in .env.
-      PG_HOST: postgres
-      PG_PORT: 5432
-      NODE_ENV: production
+    # Same secret/config sourcing as the importer above (see its comment):
+    # optional .env, everything else passed through from the shell / Infisical.
+    env_file: *optional_env
+    environment: *container_env
     ports:
       # Server listens on whatever PORT says. Host port matches so
       # EVE_CALLBACK_URL=http://localhost:${PORT}/auth/callback works.
