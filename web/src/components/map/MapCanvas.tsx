@@ -8,7 +8,7 @@ import {
 import type { Connection, Node, Edge, EdgeChange, NodeChange } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
-import { useMapStore } from '../../store/mapStore';
+import { useMapStore, getPlacementCell } from '../../store/mapStore';
 import { useAuth } from '../../context/AuthContext';
 import { useAccountLocations } from '../../hooks/useAccountLocations';
 import { useWatchlistAlerts } from '../../hooks/useWatchlistAlerts';
@@ -24,6 +24,7 @@ import { SystemNode } from './SystemNode';
 import { ConnectionEdge } from './ConnectionEdge';
 import { AddSystemModal } from '../ui/AddSystemModal';
 import { ContextMenu } from '../ui/ContextMenu';
+import type { ContextMenuItem } from '../ui/ContextMenu';
 import { ConfirmModal, shouldSkipConfirm } from '../ui/ConfirmModal';
 import {
   PathIcon, MapPinSimpleIcon, HouseIcon, LockIcon, LockOpenIcon,
@@ -36,9 +37,19 @@ import { PREDEFINED_LABELS } from '../../data/labels';
 // Quick-tag character set: all letters then all digits, laid out in the grid
 // flyout. A single one of these (or none) marks a system via map_systems.tag.
 const TAG_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('');
+
+// K-space class values (from solar_systems.class). Only these systems have
+// stargates, so the "Add adjacent" menu item is offered for them alone.
+const KSPACE_CLASSES = new Set<string>(['HS', 'LS', 'NS']);
+type AdjacentSystem = {
+  eveSystemId: number; name: string; security: number | null;
+  systemClass: string; regionName: string | null;
+};
 import { CustomLabelDialog } from '../ui/CustomLabelDialog';
 import { PromptModal } from '../ui/PromptModal';
-import type { MapSystem, SystemIntel } from '../../types';
+import type { MapSystem, SystemIntel, SystemClass } from '../../types';
+import { api } from '../../api/client';
+import { truesecColor } from '../../utils/truesec';
 import { CLASS_COLORS } from '../../data/wormholes';
 import { cssVarToHex } from '../../utils/cssVar';
 import { pickHandles } from './edgeUtils';
@@ -142,6 +153,7 @@ export function MapCanvas() {
   const edgeStyle            = useMapStore((s) => s.edgeStyle);
   const connectionThickness  = useMapStore((s) => s.connectionThickness);
   const addConnection        = useMapStore((s) => s.addConnection);
+  const addSystem            = useMapStore((s) => s.addSystem);
   const moveSystem           = useMapStore((s) => s.moveSystem);
   const lockSystem           = useMapStore((s) => s.lockSystem);
   const updateSystem         = useMapStore((s) => s.updateSystem);
@@ -209,6 +221,9 @@ export function MapCanvas() {
   const [contextMenu, setContextMenu]         = useState<CtxMenu | null>(null);
   // Pending "remove orphan systems" sweep, held while the confirm modal is up.
   const [orphanConfirm, setOrphanConfirm]     = useState<{ ids: string[] } | null>(null);
+  // Gate-adjacent systems per k-space eveSystemId, fetched lazily when a node's
+  // context menu opens. 'loading'/'error' are transient states for the submenu.
+  const [adjacent, setAdjacent] = useState<Record<number, AdjacentSystem[] | 'loading' | 'error'>>({});
   const [customIntel] = useCustomIntel();
   const wrapperRef = useRef<HTMLDivElement>(null);
 
@@ -836,8 +851,19 @@ export function MapCanvas() {
       setTimeout(() => { nodeCtxFired.current = false; }, 0);
       const selectedNodeIds = nodes.filter((n) => n.selected).map((n) => n.id);
       setContextMenu({ screenX: e.clientX, screenY: e.clientY, flowX: 0, flowY: 0, nodeId: node.id, selectedNodeIds });
+
+      // Prefetch k-space stargate neighbours for the "Add adjacent" submenu
+      // (edit-only, once per system for the session).
+      const sys = systems.find((s) => s.id === node.id);
+      const eveId = sys?.eveSystemId ?? null;
+      if (canEdit && eveId != null && KSPACE_CLASSES.has(sys!.systemClass) && adjacent[eveId] === undefined) {
+        setAdjacent((m) => ({ ...m, [eveId]: 'loading' }));
+        api<AdjacentSystem[]>(`/api/systems/${eveId}/adjacent`)
+          .then((rows) => setAdjacent((m) => ({ ...m, [eveId]: rows })))
+          .catch(() => setAdjacent((m) => ({ ...m, [eveId]: 'error' })));
+      }
     },
-    [nodes, isShareMode],
+    [nodes, isShareMode, systems, canEdit, adjacent],
   );
 
   const onPaneContextMenu = useCallback(
@@ -1260,6 +1286,55 @@ export function MapCanvas() {
         ],
       }] : [];
 
+      // "Add adjacent" — k-space only. Lists the source system's gate neighbours
+      // (map_stargates); ones already on the map show checked + disabled. Picking
+      // a missing one drops it in beside the source with a stargate connection.
+      const isKspace = !multiSelected && !!sys?.eveSystemId && KSPACE_CLASSES.has(sys.systemClass);
+      const addAdjacent = (adj: AdjacentSystem, notPresent: AdjacentSystem[]) => {
+        const src = systems.find((s) => s.id === contextMenu.nodeId);
+        if (!src) return;
+        const cell = getPlacementCell();
+        const w = cell.w || 220;
+        const h = cell.h || 120;
+        // Fan new nodes out to the source's right, vertically centred on it.
+        const slot = notPresent.findIndex((r) => r.eveSystemId === adj.eveSystemId);
+        const n = notPresent.length;
+        const pos = {
+          x: src.position.x + w + 60,
+          y: src.position.y + (slot - (n - 1) / 2) * (h + 24),
+        };
+        const newId = addSystem(adj.name, adj.systemClass as SystemClass, pos, {
+          eveSystemId: adj.eveSystemId,
+          regionName:  adj.regionName,
+        });
+        const { sourceHandle, targetHandle } = pickHandles(src.position, pos);
+        const connId = addConnection(contextMenu.nodeId!, newId, sourceHandle, targetHandle);
+        updateConnection(connId, { connectionType: 'gate' });
+      };
+      const adjacentSubmenu = (): ContextMenuItem[] => {
+        const state = sys?.eveSystemId != null ? adjacent[sys.eveSystemId] : undefined;
+        if (state === undefined || state === 'loading') return [{ label: t('ctxMenu.addAdjacentLoading'), disabled: true }];
+        if (state === 'error') return [{ label: t('ctxMenu.addAdjacentError'), disabled: true }];
+        if (state.length === 0) return [{ label: t('ctxMenu.addAdjacentNone'), disabled: true }];
+        const present = new Set(systems.map((s) => s.eveSystemId).filter((x): x is number => x != null));
+        const notPresent = state.filter((r) => !present.has(r.eveSystemId));
+        return state.map((adj) => {
+          const already = present.has(adj.eveSystemId);
+          return {
+            label:   adj.name,
+            icon:    <span className="intel-swatch" style={{ background: truesecColor(adj.security ?? 0) }} aria-hidden="true" />,
+            checked: already,
+            disabled: already,
+            action:  already ? undefined : () => addAdjacent(adj, notPresent),
+          };
+        });
+      };
+      const adjacentItem: ContextMenuItem[] = isKspace ? [{
+        label: t('ctxMenu.addAdjacent'),
+        icon:  <PlusIcon size={16} weight="regular" color="#5a9af8" />,
+        submenu: adjacentSubmenu(),
+      }] : [];
+
       return [
         {
           label: sys?.locked ? t('ctxMenu.unlockSystem') : t('ctxMenu.lockSystem'),
@@ -1286,6 +1361,7 @@ export function MapCanvas() {
         ...tagItem,
         ...intelItem,
         ...labelItem,
+        ...adjacentItem,
         ...multiItems,
         ...waypointItems,
       ];
