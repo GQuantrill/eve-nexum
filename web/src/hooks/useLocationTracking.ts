@@ -67,8 +67,15 @@ export function findFreePosition(
   direction: PlacementDirection,
   snap: boolean,
 ): { x: number; y: number } {
+  // When snap-to-grid is on and the source isn't grid-aligned, `place()` rounds
+  // each candidate up to GRID/2 toward its neighbours. The up/left cardinal
+  // slots sit at an exact box boundary, so that rounding tips them into a false
+  // collision and the ring silently skips those directions — nothing ever lands
+  // above/left of the source. Relax the collision margin by that rounding
+  // tolerance so every slot stays reachable; the step spacing is unchanged.
+  const collideGap = snap ? Math.max(0, gap - GRID / 2) : gap;
   const collides = (x: number, y: number) =>
-    systems.some((s) => boxesOverlap(x, y, s.position.x, s.position.y, w, h, gap));
+    systems.some((s) => boxesOverlap(x, y, s.position.x, s.position.y, w, h, collideGap));
 
   // Grid-aligned step: a whole node footprint rounded up to the grid plus the
   // fixed gap, so spacing is consistent instead of drifting with node width.
