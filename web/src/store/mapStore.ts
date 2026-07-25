@@ -287,8 +287,8 @@ interface MapStore {
   // Maps management
   loadMaps: () => Promise<void>;
   switchMap: (id: string) => Promise<void>;
-  createMap: (name?: string, isCorpMap?: boolean, isAllianceMap?: boolean) => Promise<void>;
-  createFromRegion: (regionId: number, name: string, isCorpMap: boolean, isAllianceMap?: boolean) => Promise<void>;
+  createMap: (name?: string, isCorpMap?: boolean, isAllianceMap?: boolean, skipKspace?: boolean) => Promise<void>;
+  createFromRegion: (regionId: number, name: string, isCorpMap: boolean, isAllianceMap?: boolean, skipKspace?: boolean) => Promise<void>;
   deleteMap: (id: string) => Promise<void>;
 
   // Map metadata
@@ -701,19 +701,19 @@ export const useMapStore = create<MapStore>()((set, get) => {
       }
     },
 
-    createMap: async (name = 'New Map', isCorpMap = false, isAllianceMap = false) => {
+    createMap: async (name = 'New Map', isCorpMap = false, isAllianceMap = false, skipKspace = false) => {
       const { id } = await api<{ id: string }>('/api/maps', {
         method: 'POST',
-        body: JSON.stringify({ name, isCorpMap, isAllianceMap }),
+        body: JSON.stringify({ name, isCorpMap, isAllianceMap, skipKspace }),
       });
       await get().loadMaps();
       await get().switchMap(id);
     },
 
-    createFromRegion: async (regionId, name, isCorpMap, isAllianceMap = false) => {
+    createFromRegion: async (regionId, name, isCorpMap, isAllianceMap = false, skipKspace = false) => {
       const { id } = await api<{ id: string }>('/api/maps/from-region', {
         method: 'POST',
-        body: JSON.stringify({ regionId, name, isCorpMap, isAllianceMap }),
+        body: JSON.stringify({ regionId, name, isCorpMap, isAllianceMap, skipKspace }),
       });
       await get().loadMaps();
       await get().switchMap(id);

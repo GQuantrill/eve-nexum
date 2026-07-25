@@ -56,9 +56,17 @@ export async function copyMap(params: {
   try {
     await client.query('BEGIN');
 
+    // Carry the source's "Don't track K-space" policy over, but it only applies
+    // to corp/alliance maps — force false when copying into a personal map.
+    const { rows: srcRows } = await client.query<{ skipKspace: boolean }>(
+      `SELECT skip_kspace AS "skipKspace" FROM maps WHERE id = $1`,
+      [sourceMapId],
+    );
+    const skipKspace = (corpId !== null || allianceId !== null) && srcRows[0]?.skipKspace === true;
+
     const { rows: mapRows } = await client.query<{ id: string }>(
-      `INSERT INTO maps (user_id, owner_id, name, corp_id, alliance_id) VALUES ($1, $2, $3, $4, $5) RETURNING id`,
-      [userId, ownerId, name, corpId, allianceId],
+      `INSERT INTO maps (user_id, owner_id, name, corp_id, alliance_id, skip_kspace) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
+      [userId, ownerId, name, corpId, allianceId, skipKspace],
     );
     const newMapId = mapRows[0].id;
 
