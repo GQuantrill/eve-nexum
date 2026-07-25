@@ -24,7 +24,9 @@ main() {
   docker compose build
 
   echo "==> [3/3] docker compose up -d"
-  docker compose up -d
+  # up -d reconciles (only changed services are recreated); --remove-orphans
+  # also drops containers for services deleted from the compose files.
+  docker compose up -d --remove-orphans
 
   echo "==> done. Container status:"
   docker compose ps
