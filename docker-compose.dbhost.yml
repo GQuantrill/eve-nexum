@@ -1,0 +1,19 @@
+# Optional overlay: publish Postgres to the HOST so tools on the machine
+# (backups, a psql client, a secrets-manager health check) can reach it.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.dbhost.yml up -d
+#
+# Bound to loopback (127.0.0.1) by DEFAULT, so the port is reachable only from
+# the host itself -- it is NOT exposed to the LAN or the internet. Change the
+# interface with PG_HOST_BIND, e.g. PG_HOST_BIND=0.0.0.0 to expose it on all
+# interfaces (you almost certainly should NOT -- Postgres is passworded but
+# there's no reason to put it on a public interface).
+#
+# build-traefik.sh includes this overlay automatically whenever PG_HOST_BIND is
+# set in the environment, so under Infisical you just add PG_HOST_BIND=127.0.0.1
+# to your secrets and no local compose edit is needed. Combine with the Traefik
+# overlay by passing all three files (base + traefik + dbhost).
+services:
+  postgres:
+    ports:
+      - "${PG_HOST_BIND:-127.0.0.1}:5432:5432"
