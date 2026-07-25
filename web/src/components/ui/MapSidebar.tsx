@@ -524,6 +524,59 @@ function LazyWhSweepToggle() {
   );
 }
 
+// Corp/alliance map-level "Don't track K-space" policy. When on, no one on this
+// map records K-space jumps, overriding each member's personal
+// nexum.tracking.skipKspace while they're on the map. Only owner/admins may
+// change it (alliance maps need the alliance admin role, corp maps an admin) —
+// everyone else sees the current state read-only. Same optimistic
+// PATCH-with-revert pattern as the lazy-sweep toggle.
+function CorpKspaceToggle() {
+  const { t } = useTranslation();
+  const map = useMapStore((s) => s.map);
+  const { user } = useAuth();
+  const enabled = !!map.skipKspace;
+  const [saving, setSaving] = useState(false);
+
+  const role = user?.role ?? "readonly";
+  const canEdit = map.isAllianceMap ? isAllianceAdminRole(role) : isAdminRole(role);
+
+  function setInStore(skip: boolean) {
+    useMapStore.setState((s) => ({
+      map: { ...s.map, skipKspace: skip },
+      maps: s.maps.map((m) => (m.id === map.id ? { ...m, skipKspace: skip } : m)),
+    }));
+  }
+
+  async function persist(next: boolean) {
+    setSaving(true);
+    setInStore(next);
+    try {
+      await api(`/api/maps/${map.id}`, { method: "PATCH", body: JSON.stringify({ skipKspace: next }) });
+    } catch (e) {
+      setInStore(!next);
+      toast.error(e instanceof Error ? e.message : t("mapSidebar.updateSettingFailed"));
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <>
+      <label className="map-sidebar__row map-sidebar__toggle-row">
+        <span className="map-sidebar__label">{t("mapSidebar.corpSkipKspace")}</span>
+        <input
+          type="checkbox"
+          className="map-sidebar__toggle-input"
+          checked={enabled}
+          disabled={saving || !canEdit}
+          onChange={(e) => persist(e.target.checked)}
+        />
+      </label>
+      <div className="map-sidebar__hint">{t("mapSidebar.corpSkipKspaceHint")}</div>
+    </>
+  );
+}
+
 // Per-map bookmark-name format. When set it overrides every user's own global
 // format for holes on this map, so a group's bookmarks stay consistent. Blank
 // clears the override (fall back to each user's global). Any editor can set it;
@@ -1030,12 +1083,20 @@ export function MapSidebar() {
         </CollapsibleSection>
 
         <CollapsibleSection title={t("mapSidebar.sections.tracking")} {...sectionProps("tracking")}>
-          <SettingToggle
-            settingKey="nexum.tracking.skipKspace"
-            label={t("mapSidebar.skipKspace")}
-            defaultOn={false}
-          />
-          <div className="map-sidebar__hint">{t("mapSidebar.skipKspaceHint")}</div>
+          {isCorpMap || isAllianceMap ? (
+            // Corp/alliance maps use a map-level policy that overrides everyone's
+            // personal K-space setting while they're on this map.
+            <CorpKspaceToggle />
+          ) : (
+            <>
+              <SettingToggle
+                settingKey="nexum.tracking.skipKspace"
+                label={t("mapSidebar.skipKspace")}
+                defaultOn={false}
+              />
+              <div className="map-sidebar__hint">{t("mapSidebar.skipKspaceHint")}</div>
+            </>
+          )}
         </CollapsibleSection>
 
         <CollapsibleSection title={t("mapSidebar.sections.route")} {...sectionProps("route")}>
