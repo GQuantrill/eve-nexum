@@ -236,6 +236,43 @@ systemsRouter.get('/search', async (req, res) => {
   }
 });
 
+// GET /api/systems/:id/adjacent — k-space stargate neighbours of a system,
+// powering the "Add adjacent" map context-menu. Pure static-SDE read against
+// map_stargates (parameterized). Only k-space systems have stargates, so a
+// wormhole system simply returns an empty array.
+systemsRouter.get('/:id(\\d+)/adjacent', async (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  try {
+    const { rows } = await db.query<{
+      eveSystemId: number; name: string; security: string | null;
+      systemClass: string | null; regionName: string | null;
+    }>(
+      `SELECT s.id       AS "eveSystemId",
+              s.name     AS "name",
+              s.security AS "security",
+              s.class    AS "systemClass",
+              r.name     AS "regionName"
+         FROM map_stargates g
+         JOIN solar_systems s      ON s.id = g.destination_system_id
+         LEFT JOIN map_regions r   ON r.id = s.region_id
+        WHERE g.system_id = $1
+        GROUP BY s.id, s.name, s.security, s.class, r.name
+        ORDER BY s.name`,
+      [id],
+    );
+    return res.json(rows.map((row) => ({
+      eveSystemId: row.eveSystemId,
+      name:        row.name,
+      security:    row.security != null ? Number(row.security) : null,
+      systemClass: row.systemClass ?? null,
+      regionName:  row.regionName ?? null,
+    })));
+  } catch (err) {
+    log.error('Adjacent-systems query failed:', err);
+    return res.status(500).json({ error: 'Database query failed' });
+  }
+});
+
 // GET /api/systems/:id/celestials — static celestial metadata for the panel
 // (security, constellation, sun type, planet/moon/belt/gate counts). DB-first;
 // live-ESI fallback (cached) only for systems not yet filled by a re-seed.

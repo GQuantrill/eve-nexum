@@ -20,7 +20,7 @@ const GRID = 20;
 // Auto-placed systems always sit a consistent 3 grid squares clear of the
 // system they're placed next to — rather than a node-width-dependent gap that
 // drifted as the uniform-size max grew.
-const PLACEMENT_GAP = 3 * GRID;
+export const PLACEMENT_GAP = 3 * GRID;
 const ceilToGrid  = (n: number) => Math.ceil(n / GRID) * GRID;
 const roundToGrid = (n: number) => Math.round(n / GRID) * GRID;
 
@@ -58,7 +58,7 @@ const FALLBACK_BY_DIR: Record<PlacementDirection, [number, number]> = {
 // the source when horizontal, below it when vertical), then the rest of the
 // ring, then outward on wider rings. Each candidate is collision-checked
 // against every node, so it also dodges unrelated systems sitting in a slot.
-function findFreePosition(
+export function findFreePosition(
   source: { x: number; y: number },
   systems: Box[],
   w: number,
@@ -67,8 +67,15 @@ function findFreePosition(
   direction: PlacementDirection,
   snap: boolean,
 ): { x: number; y: number } {
+  // When snap-to-grid is on and the source isn't grid-aligned, `place()` rounds
+  // each candidate up to GRID/2 toward its neighbours. The up/left cardinal
+  // slots sit at an exact box boundary, so that rounding tips them into a false
+  // collision and the ring silently skips those directions — nothing ever lands
+  // above/left of the source. Relax the collision margin by that rounding
+  // tolerance so every slot stays reachable; the step spacing is unchanged.
+  const collideGap = snap ? Math.max(0, gap - GRID / 2) : gap;
   const collides = (x: number, y: number) =>
-    systems.some((s) => boxesOverlap(x, y, s.position.x, s.position.y, w, h, gap));
+    systems.some((s) => boxesOverlap(x, y, s.position.x, s.position.y, w, h, collideGap));
 
   // Grid-aligned step: a whole node footprint rounded up to the grid plus the
   // fixed gap, so spacing is consistent instead of drifting with node width.
