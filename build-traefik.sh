@@ -21,6 +21,15 @@ main() {
 
   local compose=(-f docker-compose.yml -f docker-compose.traefik.yml)
 
+  # Opt-in: set PG_HOST_BIND to publish Postgres on the host (loopback by
+  # default -- see docker-compose.dbhost.yml). Unset => Postgres stays internal
+  # to the compose network. Under Infisical, put PG_HOST_BIND in your secrets
+  # and run this via `infisical run -- ./build-traefik.sh`.
+  if [[ -n "${PG_HOST_BIND:-}" ]]; then
+    compose+=(-f docker-compose.dbhost.yml)
+    echo "==> PG_HOST_BIND=${PG_HOST_BIND} set: publishing Postgres on the host"
+  fi
+
   echo "==> [1/3] git pull"
   git pull
 

@@ -409,6 +409,14 @@ Traefik will handle TLS termination and HTTP→HTTPS redirects. The `docker-comp
 > ```
 > After that, plain `docker compose ...` automatically loads both files. Add the export to `~/.bashrc` / `~/.zshrc` if it's the only deployment on that host.
 
+**4. Reaching Postgres from the host (optional)**
+
+By default Postgres is internal to the compose network — nothing on the host can connect to it. To expose it for backups, a `psql` client, or a monitoring probe, set `PG_HOST_BIND` and add the `docker-compose.dbhost.yml` overlay:
+```bash
+PG_HOST_BIND=127.0.0.1 docker compose -f docker-compose.yml -f docker-compose.dbhost.yml up -d
+```
+It binds **loopback only** (`127.0.0.1:5432`) by default, so the port is reachable from the host machine but not from the network. `build-traefik.sh` adds this overlay automatically whenever `PG_HOST_BIND` is set, so under a secrets manager you just put `PG_HOST_BIND=127.0.0.1` in your secrets — no local compose edit. Set `PG_HOST_BIND=0.0.0.0` only if you deliberately want it on all interfaces (rarely a good idea).
+
 App-schema migrations (`users`, `maps`, `map_signatures`, etc.) layer on automatically the first time the server boots — no manual step.
 
 > **Schema ownership.** The one-shot importer (`server/scripts/setup-db.ts`) creates only the **static/SDE** schema and its indexes (`solar_systems`, `map_stargates`, `item_types`, …) — it must not depend on app columns the server migration adds later, since the importer runs *before* the server boots. **App-table indexes are owned by `server/src/migrate.ts`**, which creates them after the app columns are guaranteed to exist. (Keeping an app-table index in the importer would crash a fresh bootstrap on a missing column.)
