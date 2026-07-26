@@ -25,7 +25,8 @@ import { NOTIFY } from "../../utils/notificationPrefs";
 import { useResettableState } from "../../hooks/useResettableState";
 import { DEFAULT_BOOKMARK_FORMAT, BOOKMARK_TOKENS } from "../../utils/signatureBookmark";
 import { toPng } from "html-to-image";
-import { CaretLeftIcon, CaretRightIcon, GearIcon } from "@phosphor-icons/react";
+import { CaretLeftIcon, CaretRightIcon, GearIcon, DiscordLogoIcon } from "@phosphor-icons/react";
+import { DISCORD_INVITE_URL } from "../../data/links";
 import { ChainExitsSection } from "./ChainExitsSection";
 import { MapSharesSection } from "./MapSharesSection";
 import { MergeMapModal } from "./MergeMapModal";
@@ -910,6 +911,16 @@ export function MapSidebar() {
             </button>
           </div>
         </div>
+
+        <a
+          className="map-sidebar__settings-btn map-sidebar__discord-btn"
+          href={DISCORD_INVITE_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <DiscordLogoIcon size={14} weight="fill" color="#5865F2" />
+          {t("actions.joinDiscord")}
+        </a>
 
         <button
           type="button"

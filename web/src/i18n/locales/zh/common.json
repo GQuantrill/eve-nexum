@@ -64,6 +64,7 @@
     "locationUnknown": "位置未知"
   },
   "actions": {
+    "joinDiscord": "加入 Discord",
     "save": "保存",
     "cancel": "取消",
     "delete": "删除",
@@ -1208,6 +1209,7 @@
     "kg": "{{value}} kg"
   },
   "toolbar": {
+    "discord": "Discord",
     "switchMap": "切换地图",
     "noMap": "无地图",
     "mapType": {

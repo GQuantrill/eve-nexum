@@ -64,6 +64,7 @@
     "locationUnknown": "現在地不明"
   },
   "actions": {
+    "joinDiscord": "Discordに参加",
     "save": "保存",
     "cancel": "キャンセル",
     "delete": "削除",
@@ -1208,6 +1209,7 @@
     "kg": "{{value}} kg"
   },
   "toolbar": {
+    "discord": "Discord",
     "switchMap": "マップ切り替え",
     "noMap": "マップなし",
     "mapType": {
