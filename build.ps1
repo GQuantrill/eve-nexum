@@ -26,7 +26,9 @@ function Invoke-Step {
 
 Invoke-Step '[1/3] git pull'             { git pull }
 Invoke-Step '[2/3] docker compose build' { docker compose build }
-Invoke-Step '[3/3] docker compose up -d' { docker compose up -d }
+# up -d reconciles (only changed services are recreated); --remove-orphans also
+# drops containers for services deleted from the compose files.
+Invoke-Step '[3/3] docker compose up -d' { docker compose up -d --remove-orphans }
 
 Write-Host '==> done. Container status:' -ForegroundColor Green
 docker compose ps

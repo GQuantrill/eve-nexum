@@ -36,7 +36,16 @@ function Invoke-Step {
 
 Invoke-Step '[1/3] git pull'             { git pull }
 Invoke-Step '[2/3] docker compose build' { docker compose @compose build }
-Invoke-Step '[3/3] docker compose up -d' { docker compose @compose up -d }
+# up -d reconciles (only changed services are recreated); --remove-orphans also
+# drops containers for services deleted from the compose files. Scoped to this
+# compose project, so a separate stack (e.g. QA) is untouched.
+Invoke-Step '[3/4] docker compose up -d' { docker compose @compose up -d --remove-orphans }
+
+# Reclaim disk from images this build superseded. Dangling-only (no -a), so it
+# never touches an in-use image. Called directly (not via Invoke-Step) so a
+# non-zero exit is non-fatal and can't fail an otherwise-good deploy.
+Write-Host '==> [4/4] prune dangling images' -ForegroundColor Cyan
+docker image prune -f
 
 Write-Host '==> done. Container status:' -ForegroundColor Green
 docker compose @compose ps

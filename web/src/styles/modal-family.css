@@ -381,6 +381,13 @@
   &:hover { background: var(--surface-overlay); border-color: var(--border-accent); color: #a0ccf8; }
 }
 
+.map-sidebar__discord-btn { text-decoration: none; }
+.map-sidebar__discord-btn:hover {
+  background: rgba(88, 101, 242, 0.14);
+  border-color: #5865f2;
+  color: #c7ceff;
+}
+
 
 /* ── Wormhole type chart (whtype.info-style reference) ─────── */
 .modal.whchart {

@@ -36,8 +36,20 @@ main() {
   echo "==> [2/3] docker compose build"
   docker compose "${compose[@]}" build
 
-  echo "==> [3/3] docker compose up -d"
-  docker compose "${compose[@]}" up -d
+  echo "==> [3/4] docker compose up -d"
+  # up -d already reconciles: it recomputes each service's config hash and
+  # recreates only the ones whose config or image changed, leaving the rest
+  # running. --remove-orphans also drops containers for services deleted from
+  # the compose files (config-hash reconciliation doesn't cover those, so they'd
+  # otherwise linger unrouted). Scoped to this compose project, so a separate
+  # stack (e.g. QA with its own project name) is untouched.
+  docker compose "${compose[@]}" up -d --remove-orphans
+
+  # Reclaim disk from images this build superseded. Dangling-only (no -a), so it
+  # never touches an image a container is using; non-fatal so a prune hiccup
+  # can't fail an otherwise-good deploy.
+  echo "==> [4/4] prune dangling images"
+  docker image prune -f || true
 
   echo "==> done. Container status:"
   docker compose "${compose[@]}" ps

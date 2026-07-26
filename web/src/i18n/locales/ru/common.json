@@ -64,6 +64,7 @@
     "locationUnknown": "Местоположение неизвестно"
   },
   "actions": {
+    "joinDiscord": "Присоединиться к Discord",
     "save": "Сохранить",
     "cancel": "Отмена",
     "delete": "Удалить",
@@ -1246,6 +1247,7 @@
     "kg": "{{value}} кг"
   },
   "toolbar": {
+    "discord": "Discord",
     "switchMap": "Сменить карту",
     "noMap": "Нет карты",
     "mapType": {
