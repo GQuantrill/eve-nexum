@@ -14,6 +14,7 @@ import {
   LineSegmentsIcon,
 } from '@phosphor-icons/react';
 import { apiUrl } from '../../api/client';
+import { DISCORD_INVITE_URL } from '../../data/links';
 import { SUPPORTED_LANGUAGES, LANGUAGE_NAMES } from '../../i18n';
 import { DemoMap } from './DemoMap';
 import { LanguageSwitcher } from './LanguageSwitcher';
@@ -371,7 +372,7 @@ export function LandingPage() {
             </>
           )}
           <a
-            href="https://discord.gg/KG8SMXrhZ4"
+            href={DISCORD_INVITE_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="landing__discord-btn"
@@ -453,7 +454,7 @@ export function LandingPage() {
             {t('landing.discordCtaBody')}
           </p>
           <a
-            href="https://discord.gg/KG8SMXrhZ4"
+            href={DISCORD_INVITE_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="landing__discord-btn"

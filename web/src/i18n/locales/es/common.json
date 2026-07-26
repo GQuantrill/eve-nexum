@@ -64,6 +64,7 @@
     "locationUnknown": "Ubicación desconocida"
   },
   "actions": {
+    "joinDiscord": "Unirse a Discord",
     "save": "Guardar",
     "cancel": "Cancelar",
     "delete": "Eliminar",
@@ -1208,6 +1209,7 @@
     "kg": "{{value}} kg"
   },
   "toolbar": {
+    "discord": "Discord",
     "switchMap": "Cambiar de mapa",
     "noMap": "Sin mapa",
     "mapType": {
