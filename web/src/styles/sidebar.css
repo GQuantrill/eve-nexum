@@ -176,6 +176,16 @@
   }
 }
 
+/* Discord CTA in the top bar: icon + label, Discord blurple accent. Uses the
+   base .toolbar__toggle (text-capable) + --prominent, not the icon-only variant. */
+.toolbar__discord {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+}
+.toolbar__discord svg { display: block; }
+
 .toolbar__map-name {
   background: transparent;
   border: none;
