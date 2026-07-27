@@ -4,6 +4,7 @@ import { createLogger } from '../utils/logger.js';
 import { activeMapIds, publishToMap } from './mapEvents.js';
 import { resolveEntityNames } from './entityNames.js';
 import { notifyDiscord, killEmbed } from './discord.js';
+import { recordKill, type BufferedKill } from './killBuffer.js';
 
 // A single decorated kill, shared by the live SSE `kill.recent` event and the
 // REST backfill (routes/maps.ts). Every display name is resolved by US from a
@@ -53,6 +54,27 @@ export async function resolveShipTypeName(id: number): Promise<string> {
   return name;
 }
 
+// Decorate a buffered kill into the full KillRow the client renders: who/what/
+// where resolved by US from the numeric ids (resolveEntityNames + SDE) — no
+// zKill-supplied string is ever forwarded. Used by both the live SSE path and
+// the REST backfill (which reads the in-memory buffer).
+export async function buildKillRow(k: BufferedKill): Promise<KillRow> {
+  const [meta, shipTypeName, names] = await Promise.all([
+    resolveSystemMeta(k.eveSystemId),
+    resolveShipTypeName(k.shipTypeId),
+    resolveEntityNames([k.victimCharacterId, k.victimCorporationId]),
+  ]);
+  return {
+    killmailId: k.killmailId, atMs: k.atMs, eveSystemId: k.eveSystemId,
+    systemName: meta.systemName, regionName: meta.regionName,
+    shipTypeId: k.shipTypeId, shipTypeName, totalValue: k.totalValue,
+    victimCharacterId: k.victimCharacterId,
+    victimName: k.victimCharacterId ? names.get(k.victimCharacterId)?.name ?? null : null,
+    victimCorporationId: k.victimCorporationId,
+    victimCorpName: k.victimCorporationId ? names.get(k.victimCorporationId)?.name ?? null : null,
+  };
+}
+
 // Single-process consumer of zKillboard's live killmail feed. Filters to
 // high-value kills in systems that are currently on a live map and pushes a
 // `kill.recent` event over the SSE stream so the client can flash the system
@@ -72,7 +94,7 @@ const r2z2KillUrl = (seq: number) => `https://r2z2.zkillboard.com/ephemeral/${se
 const USER_AGENT = `Eve-Nexum/1.0 (${config.killFeed.contact})`; // non-blank UA required (Cloudflare)
 const FETCH_TIMEOUT_MS = 15_000;
 const MAX_BACKOFF_MS = 30_000;
-const IDLE_SLEEP_MS = 6_000;  // mandatory >=6s wait after a 404 (caught up) — a shorter wait is 403'd
+const IDLE_SLEEP_MS = 10_000; // wait after a 404 (caught up). R2Z2 mandates >=6s (shorter is 403'd); 10s is comfortably safe and kills already lag by minutes.
 const REQ_SPACING_MS = 120;   // ~8 req/s while catching up; comfortably under the 15 req/s cap
 const SEEN_CAP = 2000;
 
@@ -125,7 +147,8 @@ async function getJson(url: string): Promise<{ status: number; body: unknown }> 
   return { status: 200, body: await res.json() };
 }
 
-// Process one ephemeral killmail: filter, match to live maps, decorate, publish.
+// Process one ephemeral killmail: buffer it, then (if a map is watching its
+// system) decorate + publish + Discord.
 async function processKill(body: EphemeralKill): Promise<void> {
   const km = body.esi ?? {};
   const killmailId    = Number(body.killmail_id ?? km.killmail_id);
@@ -138,7 +161,25 @@ async function processKill(body: EphemeralKill): Promise<void> {
   if (!(totalValue >= config.killFeed.minValueIsk)) return;
   stats.overMin++;
 
-  // Only touch the DB when at least one map is actually being watched.
+  // Numeric ids only from the (untrusted) killmail. character_id is absent for
+  // structure/NPC-only losses -> null. `Number(x) || null` maps 0/NaN to null;
+  // a real id is a large positive number so it survives.
+  const shipTypeId          = Number(km.victim?.ship_type_id) || 0;
+  const victimCharacterId   = Number(km.victim?.character_id) || null;
+  const victimCorporationId = Number(km.victim?.corporation_id) || null;
+  const parsed = km.killmail_time ? Date.parse(km.killmail_time) : NaN;
+  const atMs = Number.isFinite(parsed) ? parsed : Date.now();
+
+  // Record into the rolling buffer UNCONDITIONALLY (even with no map open) so the
+  // kill-log backfill can be served from memory — no zKillboard REST scraping.
+  const buffered: BufferedKill = {
+    killmailId, atMs, eveSystemId: solarSystemId,
+    shipTypeId, totalValue, victimCharacterId, victimCorporationId,
+  };
+  recordKill(buffered);
+
+  // Live path: only decorate + forward when a map is actually being watched AND
+  // the kill is in one of its systems.
   const live = activeMapIds();
   if (!live.length) return;
 
@@ -150,37 +191,13 @@ async function processKill(body: EphemeralKill): Promise<void> {
   );
   if (!rows.length) return;
 
-  // Numeric ids only from the (untrusted) killmail. character_id is absent for
-  // structure/NPC-only losses -> null. `Number(x) || null` maps 0/NaN to null;
-  // a real id is a large positive number so it survives.
-  const shipTypeId          = Number(km.victim?.ship_type_id) || 0;
-  const victimCharacterId   = Number(km.victim?.character_id) || null;
-  const victimCorporationId = Number(km.victim?.corporation_id) || null;
-  const parsed = km.killmail_time ? Date.parse(km.killmail_time) : NaN;
-  const atMs = Number.isFinite(parsed) ? parsed : Date.now();
-
-  // Resolve who/what/where from the ids on OUR side (ESI cache + SDE) — the
-  // killmail carries no names, so nothing untrusted is echoed to clients.
-  const [meta, shipTypeName, names] = await Promise.all([
-    resolveSystemMeta(solarSystemId),
-    resolveShipTypeName(shipTypeId),
-    resolveEntityNames([victimCharacterId, victimCorporationId]),
-  ]);
-  const killRow: KillRow = {
-    killmailId, atMs, eveSystemId: solarSystemId,
-    systemName: meta.systemName, regionName: meta.regionName,
-    shipTypeId, shipTypeName, totalValue,
-    victimCharacterId,
-    victimName: victimCharacterId ? names.get(victimCharacterId)?.name ?? null : null,
-    victimCorporationId,
-    victimCorpName: victimCorporationId ? names.get(victimCorporationId)?.name ?? null : null,
-  };
+  const killRow = await buildKillRow(buffered);
 
   for (const { mapId } of rows) {
     publishToMap(mapId, { type: 'kill.recent', actor: null, ...killRow });
   }
   stats.forwarded++;
-  log.info(`forwarded kill in ${meta.systemName} (${Math.round(totalValue / 1e6)}M ISK) -> ${rows.length} map(s)`);
+  log.info(`forwarded kill in ${killRow.systemName} (${Math.round(totalValue / 1e6)}M ISK) -> ${rows.length} map(s)`);
 
   // Corp/alliance Discord kill alert for the matched maps (opt-in per org).
   await dispatchDiscord(rows.map((r) => r.mapId), killRow);
@@ -243,8 +260,8 @@ async function loop(): Promise<void> {
       }
       const { status, body } = await getJson(r2z2KillUrl(seq));
       if (status === 404) {
-        // Caught up — no killmail at this sequence yet. Honour the mandatory
-        // >=6s wait, then retry the SAME sequence.
+        // Caught up — no killmail at this sequence yet. Wait (>= the 6s R2Z2
+        // minimum), then retry the SAME sequence.
         await sleep(IDLE_SLEEP_MS);
         backoff = 1_000;
         continue;
