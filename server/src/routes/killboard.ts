@@ -10,7 +10,7 @@ router.use(optionalAuth);
 const log = createLogger('killboard');
 
 const ZKB_AGENT    = 'Eve-Nexum/1.0 (https://github.com/GQuantrill/eve-nexum; gq@area404.org)';
-const CACHE_TTL_MS = 5 * 60 * 1000;
+const CACHE_TTL_MS = 90 * 1000; // fresher REST half now that the live feed covers the newest kills
 const FETCH_TIMEOUT_MS = 8_000;
 
 interface ZkbEntry {

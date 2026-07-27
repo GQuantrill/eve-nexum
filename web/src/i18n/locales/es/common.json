@@ -1058,6 +1058,7 @@
   "killboard": {
     "hoursMinutesAgo": "hace {{hours}}h {{minutes}}m",
     "viewKillmail": "Ver killmail en zKillboard",
+    "live": "En directo",
     "soloKill": "Kill en solitario",
     "gank": "Gank — {{count}} atacantes",
     "attackers": "{{count}} atacantes",

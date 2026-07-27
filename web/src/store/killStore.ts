@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { create } from 'zustand';
 
 // Live kill flags + a chronological kill log — ephemeral, fed by the SSE stream
@@ -31,6 +32,15 @@ export interface KillRow {
   victimName:          string | null;
   victimCorporationId: number | null;
   victimCorpName:      string | null;
+  npc:                 boolean;
+  finalBlow: {
+    characterId:   number | null;
+    name:          string | null;
+    corporationId: number | null;
+    corpName:      string | null;
+    shipTypeId:    number;
+    shipName:      string;
+  } | null;
 }
 
 // A per-system flag carries the kill plus when WE received it. The node badge
@@ -105,4 +115,16 @@ export function useSystemKill(eveSystemId: number | null | undefined): KillFlag 
 // The chronological kill log for the panel.
 export function useKillLog(): KillRow[] {
   return useKillStore((s) => s.log);
+}
+
+// Live kills for one system (newest-first) — merged into that system's killboard
+// panel so recent notable kills appear without waiting on zKill's REST. Subscribes
+// to the stable `log` and memoises the filter (a filter inside the selector would
+// return a fresh array every store change and re-render needlessly).
+export function useSystemKillLog(eveSystemId: number | null | undefined): KillRow[] {
+  const log = useKillStore((s) => s.log);
+  return useMemo(
+    () => (eveSystemId == null ? [] : log.filter((k) => k.eveSystemId === eveSystemId)),
+    [log, eveSystemId],
+  );
 }

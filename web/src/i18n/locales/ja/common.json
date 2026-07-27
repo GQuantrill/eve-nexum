@@ -1058,6 +1058,7 @@
   "killboard": {
     "hoursMinutesAgo": "{{hours}}時間{{minutes}}分前",
     "viewKillmail": "zKillboard でキルメールを表示",
+    "live": "ライブ",
     "soloKill": "ソロキル",
     "gank": "ガンク — 攻撃者 {{count}} 名",
     "attackers": "攻撃者 {{count}} 名",

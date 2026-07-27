@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useMapStore, type RemoteEvent } from '../store/mapStore';
 import { usePresenceStore, type PresenceViewer } from '../store/presenceStore';
-import { useKillStore } from '../store/killStore';
+import { useKillStore, type KillRow } from '../store/killStore';
 import { apiUrl } from '../api/client';
 import { CLIENT_ID } from '../api/clientId';
 
@@ -64,6 +64,8 @@ export function useMapEventStream(): void {
               victimName:          (data.victimName as string | null) ?? null,
               victimCorporationId: (data.victimCorporationId as number | null) ?? null,
               victimCorpName:      (data.victimCorpName as string | null) ?? null,
+              npc:                 !!data.npc,
+              finalBlow:           (data.finalBlow as KillRow['finalBlow']) ?? null,
             });
             return;
         }

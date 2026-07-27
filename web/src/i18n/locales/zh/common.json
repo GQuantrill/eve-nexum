@@ -1058,6 +1058,7 @@
   "killboard": {
     "hoursMinutesAgo": "{{hours}} 小时 {{minutes}} 分钟前",
     "viewKillmail": "在 zKillboard 上查看击杀报告",
+    "live": "实时",
     "soloKill": "单人击杀",
     "gank": "围杀 — {{count}} 名攻击者",
     "attackers": "{{count}} 名攻击者",

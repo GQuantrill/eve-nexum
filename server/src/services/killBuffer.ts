@@ -4,13 +4,17 @@ import { config } from '../config.js';
 // the kill-log backfill can be served WITHOUT any zKillboard REST calls. Numeric
 // ids only (untrusted-safe); display names are resolved on read via buildKillRow.
 export interface BufferedKill {
-  killmailId:          number;
-  atMs:                number;
-  eveSystemId:         number;
-  shipTypeId:          number;
-  totalValue:          number;
-  victimCharacterId:   number | null;
-  victimCorporationId: number | null;
+  killmailId:            number;
+  atMs:                  number;
+  eveSystemId:           number;
+  shipTypeId:            number;
+  totalValue:            number;
+  victimCharacterId:     number | null;
+  victimCorporationId:   number | null;
+  finalBlowCharacterId:  number | null;
+  finalBlowCorporationId: number | null;
+  finalBlowShipTypeId:   number;
+  npc:                   boolean;
 }
 
 // Rolling in-memory buffer of recent kills, fed by the live consumer. Append
