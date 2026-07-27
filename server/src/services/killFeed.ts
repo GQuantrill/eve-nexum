@@ -267,7 +267,10 @@ export function startKillFeed(): void {
   running = true;
   log.info(`live kill feed enabled (R2Z2 ephemeral, min ${config.killFeed.minValueIsk.toLocaleString()} ISK)`);
   const hb = setInterval(() => {
-    log.info(`heartbeat: ${stats.seen} seen, ${stats.overMin} >= min ISK, ${stats.forwarded} forwarded to live maps`);
+    // `watched` = maps with a live SSE client right now. If this is 0, no kill
+    // can ever forward regardless of the feed — the browser's event stream isn't
+    // registering (nothing to match against).
+    log.info(`heartbeat: ${stats.seen} seen, ${stats.overMin} >= min ISK, ${stats.forwarded} forwarded; ${activeMapIds().length} map(s) watched now`);
   }, HEARTBEAT_MS);
   hb.unref?.();
   void loop();
