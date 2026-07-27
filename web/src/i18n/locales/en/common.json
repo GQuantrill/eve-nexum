@@ -382,7 +382,9 @@
       "excludedHint": "All maps notify by default. Tick a map to exclude it from Discord.",
       "noCorpMaps": "No corp maps yet.",
       "colMap": "Map",
-      "colExclude": "Exclude"
+      "colExclude": "Exclude",
+      "killWebhook": "Kill webhook",
+      "killMinIsk": "Minimum ISK"
     }
   },
   "proximityOptIn": {
@@ -1782,5 +1784,16 @@
     "unmapped": "Unmapped hole",
     "filled": "{{sig}} now leads to {{system}}",
     "undo": "Undo"
+  },
+  "killLog": {
+    "title": "Kill Log",
+    "tooltip": "Recent kills on this map",
+    "empty": "No recent kills",
+    "loading": "Loading kills...",
+    "error": "Couldn't load kills",
+    "viewOnZkb": "View on zKillboard",
+    "unknown": "Unknown",
+    "unknownShip": "Unknown ship",
+    "ago": "{{d}} ago"
   }
 }

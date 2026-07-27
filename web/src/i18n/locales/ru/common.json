@@ -333,7 +333,9 @@
       "excludedHint": "По умолчанию уведомляют все карты. Отметьте карту, чтобы исключить её из Discord.",
       "noCorpMaps": "Корп-карт пока нет.",
       "colMap": "Карта",
-      "colExclude": "Исключить"
+      "colExclude": "Исключить",
+      "killWebhook": "Вебхук киллов",
+      "killMinIsk": "Минимум ISK"
     },
     "roles": {
       "button": "Роли?",
@@ -1822,5 +1824,16 @@
     "typePersonal": "Личная",
     "typeCorp": "Корп",
     "typeAlliance": "Альянс"
+  },
+  "killLog": {
+    "title": "Журнал киллов",
+    "tooltip": "Недавние киллы на этой карте",
+    "empty": "Нет недавних киллов",
+    "loading": "Загрузка киллов...",
+    "error": "Не удалось загрузить киллы",
+    "viewOnZkb": "Смотреть на zKillboard",
+    "unknown": "Неизвестно",
+    "unknownShip": "Неизвестный корабль",
+    "ago": "{{d}} назад"
   }
 }

@@ -333,7 +333,9 @@
       "excludedHint": "모든 지도가 기본적으로 알림을 보냅니다. 지도를 체크하면 Discord에서 제외됩니다.",
       "noCorpMaps": "아직 군단 지도가 없습니다.",
       "colMap": "지도",
-      "colExclude": "제외"
+      "colExclude": "제외",
+      "killWebhook": "킬 웹훅",
+      "killMinIsk": "최소 ISK"
     },
     "roles": {
       "button": "역할이란?",
@@ -1782,5 +1784,16 @@
     "typePersonal": "개인",
     "typeCorp": "군단",
     "typeAlliance": "연합"
+  },
+  "killLog": {
+    "title": "킬 로그",
+    "tooltip": "이 맵의 최근 킬",
+    "empty": "최근 킬 없음",
+    "loading": "킬 불러오는 중...",
+    "error": "킬을 불러올 수 없습니다",
+    "viewOnZkb": "zKillboard에서 보기",
+    "unknown": "알 수 없음",
+    "unknownShip": "알 수 없는 함선",
+    "ago": "{{d}} 전"
   }
 }

@@ -1723,6 +1723,8 @@ interface DiscordSettings {
   connectionsWebhook: string;
   chainsWebhook:      string;
   exitsMinSecurity:   number;
+  killWebhook:        string;
+  killMinIsk:         number;
   maps:         { id: string; name: string; excluded: boolean }[];
 }
 interface RegionOption { id: number; name: string }
@@ -1761,6 +1763,10 @@ function DiscordTab() {
   const [chainWebhook, setChainWebhook] = useState('');
   // Minimum k-space exit security for the rich exit embed (default 0.45 = HS).
   const [exitMinSec, setExitMinSec]     = useState(0.45);
+  // Kill-alert webhook (empty = off) + its per-org minimum ISK (0 = every kill
+  // the feed surfaces). Requires the server KILL_FEED consumer to be enabled.
+  const [killWebhook, setKillWebhook]   = useState('');
+  const [killMinIsk, setKillMinIsk]     = useState(0);
 
   const load = useCallback(async () => {
     try {
@@ -1777,6 +1783,8 @@ function DiscordTab() {
       setConnWebhook(s.connectionsWebhook ?? '');
       setChainWebhook(s.chainsWebhook ?? '');
       setExitMinSec(s.exitsMinSecurity ?? 0.45);
+      setKillWebhook(s.killWebhook ?? '');
+      setKillMinIsk(s.killMinIsk ?? 0);
       setRegionOpts(r.regions);
       setError(null);
     } catch (e) {
@@ -1795,8 +1803,8 @@ function DiscordTab() {
     try {
       // Send every field the PUT can wipe (it defaults absent flags/lists), so a
       // save never silently resets the chain toggle or another filter dimension.
-      await api('/api/admin/discord', { method: 'PUT', body: JSON.stringify({ allRegions, regions, notifyChains: data.notifyChains, whTypes, whClasses, whSizes, connectionsWebhook: connWebhook.trim(), chainsWebhook: chainWebhook.trim(), exitsMinSecurity: exitMinSec }) });
-      setData((d) => (d ? { ...d, allRegions, regions, whTypes, whClasses, whSizes, connectionsWebhook: connWebhook.trim(), chainsWebhook: chainWebhook.trim(), exitsMinSecurity: exitMinSec } : d));
+      await api('/api/admin/discord', { method: 'PUT', body: JSON.stringify({ allRegions, regions, notifyChains: data.notifyChains, whTypes, whClasses, whSizes, connectionsWebhook: connWebhook.trim(), chainsWebhook: chainWebhook.trim(), exitsMinSecurity: exitMinSec, killWebhook: killWebhook.trim(), killMinIsk }) });
+      setData((d) => (d ? { ...d, allRegions, regions, whTypes, whClasses, whSizes, connectionsWebhook: connWebhook.trim(), chainsWebhook: chainWebhook.trim(), exitsMinSecurity: exitMinSec, killWebhook: killWebhook.trim(), killMinIsk } : d));
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     } catch (e) {
@@ -1813,7 +1821,7 @@ function DiscordTab() {
     const prev = data.notifyChains;
     setData((d) => (d ? { ...d, notifyChains: next } : d));
     try {
-      await api('/api/admin/discord', { method: 'PUT', body: JSON.stringify({ allRegions: data.allRegions, regions: data.regions, notifyChains: next, whTypes: data.whTypes, whClasses: data.whClasses, whSizes: data.whSizes, connectionsWebhook: data.connectionsWebhook, chainsWebhook: data.chainsWebhook, exitsMinSecurity: data.exitsMinSecurity }) });
+      await api('/api/admin/discord', { method: 'PUT', body: JSON.stringify({ allRegions: data.allRegions, regions: data.regions, notifyChains: next, whTypes: data.whTypes, whClasses: data.whClasses, whSizes: data.whSizes, connectionsWebhook: data.connectionsWebhook, chainsWebhook: data.chainsWebhook, exitsMinSecurity: data.exitsMinSecurity, killWebhook: data.killWebhook, killMinIsk: data.killMinIsk }) });
     } catch (e) {
       setData((d) => (d ? { ...d, notifyChains: prev } : d));
       setError(e instanceof Error ? e.message : t('admin.discord.saveFailed'));
@@ -1861,7 +1869,9 @@ function DiscordTab() {
     || sortJoin(whSizes)   !== sortJoin(data.whSizes)
     || connWebhook.trim()  !== data.connectionsWebhook
     || chainWebhook.trim() !== data.chainsWebhook
-    || exitMinSec          !== data.exitsMinSecurity;
+    || exitMinSec          !== data.exitsMinSecurity
+    || killWebhook.trim()  !== data.killWebhook
+    || killMinIsk          !== data.killMinIsk;
 
   return (
     <>
@@ -1891,6 +1901,26 @@ function DiscordTab() {
           value={chainWebhook}
           spellCheck={false}
           onChange={(e) => setChainWebhook(e.target.value)}
+        />
+        <label className={styles.dcSublabel} htmlFor="kill-webhook">{t('admin.discord.killWebhook')}</label>
+        <input
+          id="kill-webhook"
+          type="url"
+          className={`${styles.dcSearch} ${styles.dcSearchWide}`}
+          placeholder="https://discord.com/api/webhooks/…"
+          value={killWebhook}
+          spellCheck={false}
+          onChange={(e) => setKillWebhook(e.target.value)}
+        />
+        <label className={styles.dcSublabel} htmlFor="kill-min-isk">{t('admin.discord.killMinIsk')}</label>
+        <input
+          id="kill-min-isk"
+          type="number"
+          min={0}
+          step={1000000}
+          className={styles.dcSearch}
+          value={killMinIsk}
+          onChange={(e) => setKillMinIsk(Math.max(0, Math.floor(Number(e.target.value) || 0)))}
         />
       </section>
 

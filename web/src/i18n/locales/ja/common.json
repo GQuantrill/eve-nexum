@@ -333,7 +333,9 @@
       "excludedHint": "すべてのマップがデフォルトで通知します。マップにチェックを入れると Discord から除外されます。",
       "noCorpMaps": "まだコーポマップがありません。",
       "colMap": "マップ",
-      "colExclude": "除外"
+      "colExclude": "除外",
+      "killWebhook": "キル Webhook",
+      "killMinIsk": "最低 ISK"
     },
     "roles": {
       "button": "ロールとは？",
@@ -1782,5 +1784,16 @@
     "typePersonal": "個人",
     "typeCorp": "コーポ",
     "typeAlliance": "アライアンス"
+  },
+  "killLog": {
+    "title": "キルログ",
+    "tooltip": "このマップの最近のキル",
+    "empty": "最近のキルはありません",
+    "loading": "キルを読み込み中...",
+    "error": "キルを読み込めませんでした",
+    "viewOnZkb": "zKillboardで見る",
+    "unknown": "不明",
+    "unknownShip": "不明な艦船",
+    "ago": "{{d}}前"
   }
 }

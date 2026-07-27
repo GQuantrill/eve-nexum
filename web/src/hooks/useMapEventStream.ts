@@ -49,13 +49,21 @@ export function useMapEventStream(): void {
             presence.remove(data.characterId as number);
             return;
           case 'kill.recent':
-            // Ephemeral, non-map state — route to the kill store, not mapStore.
+            // Ephemeral, non-map state — route the whole decorated KillRow to the
+            // kill store (flags the node + feeds the log), not mapStore.
             useKillStore.getState().recordKill({
-              eveSystemId: data.eveSystemId as number,
-              killmailId:  data.killmailId as number,
-              shipTypeId:  data.shipTypeId as number,
-              totalValue:  data.totalValue as number,
-              atMs:        data.atMs as number,
+              killmailId:          data.killmailId as number,
+              atMs:                data.atMs as number,
+              eveSystemId:         data.eveSystemId as number,
+              systemName:          data.systemName as string,
+              regionName:          (data.regionName as string | null) ?? null,
+              shipTypeId:          data.shipTypeId as number,
+              shipTypeName:        data.shipTypeName as string,
+              totalValue:          data.totalValue as number,
+              victimCharacterId:   (data.victimCharacterId as number | null) ?? null,
+              victimName:          (data.victimName as string | null) ?? null,
+              victimCorporationId: (data.victimCorporationId as number | null) ?? null,
+              victimCorpName:      (data.victimCorpName as string | null) ?? null,
             });
             return;
         }

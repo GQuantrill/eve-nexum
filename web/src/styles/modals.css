@@ -213,3 +213,98 @@
   margin-bottom: 4px;
 }
 
+
+/* ── Kill Log panel ──────────────────────────────────────── */
+.killlog-modal {
+  width: min(680px, 94vw);
+}
+
+.killlog__body {
+  max-height: min(70vh, 640px);
+  overflow-y: auto;
+  padding: 0;
+}
+
+.killlog__status {
+  padding: 24px 16px;
+  text-align: center;
+  font-size: calc(13px * var(--font-scale, 1));
+  color: var(--text-faintest);
+}
+.killlog__status--error { color: var(--danger); }
+
+.killlog__list {
+  display: flex;
+  flex-direction: column;
+}
+
+.killlog__row {
+  display: grid;
+  grid-template-columns: auto 1.4fr 1fr 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--border);
+  text-decoration: none;
+  color: var(--text-default);
+}
+.killlog__row:hover { background: var(--surface-overlay); }
+
+.killlog__thumbs {
+  position: relative;
+  width: 44px;
+  height: 32px;
+  flex: none;
+}
+.killlog__portrait {
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  object-fit: cover;
+}
+.killlog__ship {
+  position: absolute;
+  right: 0;
+  bottom: -2px;
+  width: 22px;
+  height: 22px;
+  border-radius: 3px;
+  background: var(--surface-sunken);
+  outline: 1px solid var(--border);
+  object-fit: cover;
+}
+
+.killlog__who,
+.killlog__what,
+.killlog__where {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.killlog__victim,
+.killlog__ship-name,
+.killlog__system {
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.killlog__corp,
+.killlog__region {
+  font-size: calc(11px * var(--font-scale, 1));
+  color: var(--text-faintest);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.killlog__value {
+  font-size: calc(11px * var(--font-scale, 1));
+  color: #ff8080;
+}
+.killlog__ago {
+  font-size: calc(11px * var(--font-scale, 1));
+  color: var(--text-faintest);
+  white-space: nowrap;
+  text-align: right;
+}

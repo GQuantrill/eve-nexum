@@ -173,18 +173,20 @@ export const config = {
   sdeCheckUtc:         SDE_CHECK_UTC,
   telemetry:           { enabled: TELEMETRY_ENABLED, url: TELEMETRY_URL },
   // Live kill flagging. OFF by default (KILL_FEED=1 to opt in) — when enabled a
-  // single server-side consumer long-polls zKillboard's RedisQ feed and flags
+  // single server-side consumer reads zKillboard's R2Z2 ephemeral feed and flags
   // recent high-value kills on systems currently shown on live maps, pushed over
   // the SSE stream. `contact` builds the zKill User-Agent (fair-use requires a
-  // reachable contact). `queueId` is this deployment's RedisQ queue name (keep
-  // it stable + unique so kills aren't split across restarts). `minValueIsk`
-  // filters out low-value noise; `recentSeconds` is how long a flag lives.
+  // reachable contact; a blank UA is Cloudflare-blocked). `minValueIsk` filters
+  // out low-value noise; `recentSeconds` is how long a flag lives.
   killFeed: {
     enabled:       parseBool(process.env.KILL_FEED),
     contact:       process.env.KILL_FEED_CONTACT?.trim() || 'gq@area404.org',
-    queueId:       process.env.KILL_FEED_QUEUE_ID?.trim() || 'eve-nexum',
     minValueIsk:   intEnv(process.env.KILL_FEED_MIN_ISK, 50_000_000),
     recentSeconds: intEnv(process.env.KILL_FEED_RECENT_SECONDS, 900),
+    // Kill-log backfill: how many of a map's systems to query zKill for on
+    // panel-open. Capped so a huge chain can't fan out into a burst of zKill
+    // REST calls (fair-use). Extra systems are skipped (logged), not queried.
+    backfillMaxSystems: intEnv(process.env.KILL_FEED_BACKFILL_MAX_SYSTEMS, 30),
   },
   // Required in non-dev (guarded above). The dev fallback is randomised per
   // boot rather than a known literal, so a dev instance accidentally exposed

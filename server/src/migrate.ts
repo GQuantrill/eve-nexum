@@ -205,6 +205,14 @@ export async function migrate() {
     ALTER TABLE corp_discord_settings     ADD COLUMN IF NOT EXISTS exits_min_security REAL NOT NULL DEFAULT 0.45;
     ALTER TABLE alliance_discord_settings ADD COLUMN IF NOT EXISTS exits_min_security REAL NOT NULL DEFAULT 0.45;
 
+    -- Kill alerts (zKill live feed): per-org webhook + a minimum ISK value the
+    -- kill must clear to notify. NULL webhook = kill alerts off for the org;
+    -- kill_min_isk default 0 = notify for every kill the feed already surfaces.
+    ALTER TABLE corp_discord_settings     ADD COLUMN IF NOT EXISTS kill_webhook TEXT;
+    ALTER TABLE alliance_discord_settings ADD COLUMN IF NOT EXISTS kill_webhook TEXT;
+    ALTER TABLE corp_discord_settings     ADD COLUMN IF NOT EXISTS kill_min_isk BIGINT NOT NULL DEFAULT 0;
+    ALTER TABLE alliance_discord_settings ADD COLUMN IF NOT EXISTS kill_min_isk BIGINT NOT NULL DEFAULT 0;
+
     CREATE TABLE IF NOT EXISTS map_systems (
       id            UUID        PRIMARY KEY,
       map_id        UUID        NOT NULL REFERENCES maps(id) ON DELETE CASCADE,

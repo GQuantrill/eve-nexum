@@ -333,7 +333,9 @@
       "excludedHint": "Todos los mapas notifican por defecto. Marca un mapa para excluirlo de Discord.",
       "noCorpMaps": "Aún no hay mapas de corp.",
       "colMap": "Mapa",
-      "colExclude": "Excluir"
+      "colExclude": "Excluir",
+      "killWebhook": "Webhook de bajas",
+      "killMinIsk": "ISK mínimo"
     },
     "roles": {
       "button": "¿Roles?",
@@ -1782,5 +1784,16 @@
     "typePersonal": "Personal",
     "typeCorp": "Corp",
     "typeAlliance": "Alianza"
+  },
+  "killLog": {
+    "title": "Registro de bajas",
+    "tooltip": "Bajas recientes en este mapa",
+    "empty": "Sin bajas recientes",
+    "loading": "Cargando bajas...",
+    "error": "No se pudieron cargar las bajas",
+    "viewOnZkb": "Ver en zKillboard",
+    "unknown": "Desconocido",
+    "unknownShip": "Nave desconocida",
+    "ago": "hace {{d}}"
   }
 }

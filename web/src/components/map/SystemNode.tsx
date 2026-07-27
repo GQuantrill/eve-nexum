@@ -11,6 +11,7 @@ import { CLASS_COLORS, CLASS_LABELS, EFFECT_ICONS, EFFECT_LABELS, EFFECT_MODIFIE
 import { useMapStore } from '../../store/mapStore';
 import { usePresenceStore } from '../../store/presenceStore';
 import { useSystemKill, RECENT_KILL_MS } from '../../store/killStore';
+import { iskCompact } from '../../utils/isk';
 import { useAccountLocations } from '../../hooks/useAccountLocations';
 import { useSovData } from '../../hooks/useSovData';
 import { useStandings } from '../../hooks/useStandings';
@@ -46,14 +47,6 @@ import { WHTypeInfo } from '../ui/WHTypeInfo';
 import { truesecColor } from '../../utils/truesec';
 
 type SystemNodeData = MapSystem & { selected: boolean; dimmed?: boolean; routeHighlighted?: boolean };
-
-// Compact ISK for the recent-kill tooltip: 1.2B / 340M / 90K.
-function iskCompact(v: number): string {
-  if (v >= 1_000_000_000) return `${(v / 1_000_000_000).toFixed(1)}B`;
-  if (v >= 1_000_000)     return `${(v / 1_000_000).toFixed(0)}M`;
-  if (v >= 1_000)         return `${(v / 1_000).toFixed(0)}K`;
-  return String(Math.round(v));
-}
 
 export const SystemNode = memo(({ data, selected }: NodeProps) => {
   const { t } = useTranslation();

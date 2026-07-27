@@ -333,7 +333,9 @@
       "excludedHint": "Alle Karten benachrichtigen standardmäßig. Hake eine Karte an, um sie von Discord auszuschließen.",
       "noCorpMaps": "Noch keine Corp-Karten.",
       "colMap": "Karte",
-      "colExclude": "Ausschließen"
+      "colExclude": "Ausschließen",
+      "killWebhook": "Kill-Webhook",
+      "killMinIsk": "Mindest-ISK"
     },
     "roles": {
       "button": "Rollen?",
@@ -1782,5 +1784,16 @@
     "typePersonal": "Persönlich",
     "typeCorp": "Corp",
     "typeAlliance": "Allianz"
+  },
+  "killLog": {
+    "title": "Kill-Log",
+    "tooltip": "Aktuelle Kills auf dieser Karte",
+    "empty": "Keine aktuellen Kills",
+    "loading": "Kills werden geladen...",
+    "error": "Kills konnten nicht geladen werden",
+    "viewOnZkb": "Auf zKillboard ansehen",
+    "unknown": "Unbekannt",
+    "unknownShip": "Unbekanntes Schiff",
+    "ago": "vor {{d}}"
   }
 }
