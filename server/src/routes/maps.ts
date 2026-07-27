@@ -1973,9 +1973,15 @@ mapsRouter.get('/:mapId/kills/backfill', esiLimiter, async (req, res) => {
   if (!systemIds.length) { res.json([]); return; }
 
   // Per-system fetch is cached + ESI-concurrency-capped inside fetchSystemKills.
+  // Pass the ISK floor + a per-system cap so it filters BEFORE ESI hydration —
+  // essential in busy regions (The Forge) where hydrating every kill would trip
+  // rate limits and return stale/incomplete data. 40 newest kept per system; the
+  // merged result is sliced to 200 below anyway.
   const perSystemFetch = async (sysId: number): Promise<KillRow[]> => {
-    const kills = (await fetchSystemKills(sysId, config.killFeed.backfillSeconds))
-      .filter((k) => k.zkb.totalValue >= config.killFeed.minValueIsk);
+    const kills = await fetchSystemKills(sysId, config.killFeed.backfillSeconds, {
+      minValueIsk: config.killFeed.minValueIsk,
+      maxKills: 40,
+    });
     if (!kills.length) return [];
     const meta = await resolveSystemMeta(sysId);
     return Promise.all(kills.map(async (k): Promise<KillRow> => ({

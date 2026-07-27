@@ -131,10 +131,18 @@ async function fetchEsi(killmailId: number, hash: string): Promise<EsiKillmail |
 // killboard route (24h) and the kill-log backfill (1h). SSRF-safe: the URL is
 // built from the bounded NUMBER, never raw text. Cache is keyed by
 // system:pastSeconds so the two windows don't clobber each other.
-export async function fetchSystemKills(systemId: number, pastSeconds: number): Promise<KillEntry[]> {
+export async function fetchSystemKills(
+  systemId: number,
+  pastSeconds: number,
+  opts: { minValueIsk?: number; maxKills?: number } = {},
+): Promise<KillEntry[]> {
   if (!Number.isInteger(systemId) || systemId <= 0 || systemId > 100_000_000) return [];
   const secs = Number.isInteger(pastSeconds) && pastSeconds > 0 && pastSeconds <= 604_800 ? pastSeconds : 86_400;
-  const key = `${systemId}:${secs}`;
+  const minValueIsk = Math.max(0, opts.minValueIsk ?? 0);
+  const maxKills = opts.maxKills && opts.maxKills > 0 ? opts.maxKills : 0; // 0 = no cap
+  // Cache per (system, window, value-floor, cap) — the filtered result differs,
+  // so the killboard pane (no floor/cap) and the kill-log backfill don't collide.
+  const key = `${systemId}:${secs}:${minValueIsk}:${maxKills}`;
 
   const fresh = cache.get(key);
   if (fresh) return fresh.value;
@@ -168,11 +176,24 @@ export async function fetchSystemKills(systemId: number, pastSeconds: number): P
 
     const etag = zkbRes.headers.get('etag') ?? undefined;
 
+    // Filter by value and cap to the newest N BEFORE hydrating. The zKill list
+    // already carries zkb.totalValue, and killmail_id is monotonic with time, so
+    // we only pay an ESI call for kills we actually keep. Without this a busy
+    // region (e.g. The Forge) hydrates thousands of cheap kills per open, trips
+    // ESI/zKill rate limits, and falls back to stale data — dropping the newest
+    // kills, differently each run. Defaults (floor 0, no cap) = pane unchanged.
+    let wanted = minValueIsk > 0
+      ? zkbBody.filter((k) => (k.zkb?.totalValue ?? 0) >= minValueIsk)
+      : zkbBody;
+    if (maxKills > 0 && wanted.length > maxKills) {
+      wanted = [...wanted].sort((a, b) => b.killmail_id - a.killmail_id).slice(0, maxKills);
+    }
+
     // Hydrate full killmails from ESI in parallel (capped at ESI_MAX_CONCURRENT
     // so a busy system queues rather than thundering CCP).
-    const esiResults = await Promise.all(zkbBody.map((k) => fetchEsi(k.killmail_id, k.zkb.hash)));
+    const esiResults = await Promise.all(wanted.map((k) => fetchEsi(k.killmail_id, k.zkb.hash)));
 
-    const kills = zkbBody
+    const kills = wanted
       .map((zkb, i) => {
         const esi = esiResults[i];
         if (!esi) return null;
