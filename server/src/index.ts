@@ -37,6 +37,7 @@ import { startSdeAutoUpdate } from './services/sdeUpdate.js';
 import { startLocationPoller } from './services/locationPoll.js';
 import { startWhSweeper } from './services/whSweep.js';
 import { startConnLifetimeSweeper } from './services/connLifetimeSweep.js';
+import { startKillFeed } from './services/killFeed.js';
 import { startAccessRevalidation } from './services/accessRevalidate.js';
 import { startTelemetry } from './services/telemetry.js';
 import { telemetryRouter } from './routes/telemetry.js';
@@ -185,6 +186,7 @@ migrate()
     startWhSweeper();
     startConnLifetimeSweeper();
     startAccessRevalidation();
+    startKillFeed();
     void startTelemetry();
   })
   .catch((err) => { console.error('Migration failed:', err); process.exit(1); });

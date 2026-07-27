@@ -333,7 +333,9 @@
       "excludedHint": "所有地图默认都会通知。勾选某个地图可将其从 Discord 中排除。",
       "noCorpMaps": "暂无军团地图。",
       "colMap": "地图",
-      "colExclude": "排除"
+      "colExclude": "排除",
+      "killWebhook": "击杀 Webhook",
+      "killMinIsk": "最低 ISK"
     },
     "roles": {
       "button": "角色说明？",
@@ -1662,6 +1664,7 @@
     "characterFallback": "角色 {{id}}",
     "altLastKnown": "（最后已知）",
     "killsTooltip": "本小时 {{ships}} 舰船 · {{pods}} 太空舱击杀",
+    "recentKill": "{{ago}} 分钟前击杀 ({{value}} ISK)",
     "a0Sun": "A0 恒星",
     "shattered": "破碎星系",
     "iceBelt": "冰带星系",
@@ -1781,5 +1784,16 @@
     "typePersonal": "个人",
     "typeCorp": "军团",
     "typeAlliance": "联盟"
+  },
+  "killLog": {
+    "title": "击杀记录",
+    "tooltip": "此地图上的最近击杀",
+    "empty": "暂无最近击杀",
+    "loading": "正在加载击杀...",
+    "error": "无法加载击杀",
+    "viewOnZkb": "在 zKillboard 上查看",
+    "unknown": "未知",
+    "unknownShip": "未知舰船",
+    "ago": "{{d}}前"
   }
 }

@@ -333,7 +333,9 @@
       "excludedHint": "Toutes les cartes notifient par défaut. Cochez une carte pour l'exclure de Discord.",
       "noCorpMaps": "Aucune carte de corp pour l'instant.",
       "colMap": "Carte",
-      "colExclude": "Exclure"
+      "colExclude": "Exclure",
+      "killWebhook": "Webhook des kills",
+      "killMinIsk": "ISK minimum"
     },
     "roles": {
       "button": "Rôles ?",
@@ -1662,6 +1664,7 @@
     "characterFallback": "Personnage {{id}}",
     "altLastKnown": "(dernière connue)",
     "killsTooltip": "{{ships}} vaisseau · {{pods}} capsule détruits cette heure",
+    "recentKill": "Kill il y a {{ago}} min ({{value}} ISK)",
     "a0Sun": "Soleil A0",
     "shattered": "Brisé",
     "iceBelt": "Système à ceinture de glace",
@@ -1781,5 +1784,16 @@
     "typePersonal": "Personnelle",
     "typeCorp": "Corpo",
     "typeAlliance": "Alliance"
+  },
+  "killLog": {
+    "title": "Journal des kills",
+    "tooltip": "Kills récents sur cette carte",
+    "empty": "Aucun kill récent",
+    "loading": "Chargement des kills...",
+    "error": "Impossible de charger les kills",
+    "viewOnZkb": "Voir sur zKillboard",
+    "unknown": "Inconnu",
+    "unknownShip": "Vaisseau inconnu",
+    "ago": "il y a {{d}}"
   }
 }

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useMapStore, type RemoteEvent } from '../store/mapStore';
 import { usePresenceStore, type PresenceViewer } from '../store/presenceStore';
+import { useKillStore } from '../store/killStore';
 import { apiUrl } from '../api/client';
 import { CLIENT_ID } from '../api/clientId';
 
@@ -17,6 +18,7 @@ export function useMapEventStream(): void {
     if (!activeMapId) return;
     openedOnce.current = false;
     usePresenceStore.getState().reset(); // clear last map's roster; snapshot repopulates
+    useKillStore.getState().reset();     // clear last map's kill flags
 
     const es = new EventSource(apiUrl(`/api/maps/${activeMapId}/events`), { withCredentials: true });
 
@@ -45,6 +47,24 @@ export function useMapEventStream(): void {
             return;
           case 'presence.leave':
             presence.remove(data.characterId as number);
+            return;
+          case 'kill.recent':
+            // Ephemeral, non-map state — route the whole decorated KillRow to the
+            // kill store (flags the node + feeds the log), not mapStore.
+            useKillStore.getState().recordKill({
+              killmailId:          data.killmailId as number,
+              atMs:                data.atMs as number,
+              eveSystemId:         data.eveSystemId as number,
+              systemName:          data.systemName as string,
+              regionName:          (data.regionName as string | null) ?? null,
+              shipTypeId:          data.shipTypeId as number,
+              shipTypeName:        data.shipTypeName as string,
+              totalValue:          data.totalValue as number,
+              victimCharacterId:   (data.victimCharacterId as number | null) ?? null,
+              victimName:          (data.victimName as string | null) ?? null,
+              victimCorporationId: (data.victimCorporationId as number | null) ?? null,
+              victimCorpName:      (data.victimCorpName as string | null) ?? null,
+            });
             return;
         }
 

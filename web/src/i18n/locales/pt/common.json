@@ -333,7 +333,9 @@
       "excludedHint": "Todos os mapas notificam por defeito. Marca um mapa para o excluir do Discord.",
       "noCorpMaps": "Ainda não há mapas de corp.",
       "colMap": "Mapa",
-      "colExclude": "Excluir"
+      "colExclude": "Excluir",
+      "killWebhook": "Webhook de abates",
+      "killMinIsk": "ISK mínimo"
     },
     "roles": {
       "button": "Funções?",
@@ -1662,6 +1664,7 @@
     "characterFallback": "Personagem {{id}}",
     "altLastKnown": "(última conhecida)",
     "killsTooltip": "{{ships}} nave · {{pods}} cápsula destruídas esta hora",
+    "recentKill": "Abate há {{ago}} min ({{value}} ISK)",
     "a0Sun": "Sol A0",
     "shattered": "Estilhaçado",
     "iceBelt": "Sistema com cinturão de gelo",
@@ -1781,5 +1784,16 @@
     "typePersonal": "Pessoal",
     "typeCorp": "Corp",
     "typeAlliance": "Aliança"
+  },
+  "killLog": {
+    "title": "Registo de abates",
+    "tooltip": "Abates recentes neste mapa",
+    "empty": "Sem abates recentes",
+    "loading": "A carregar abates...",
+    "error": "Não foi possível carregar os abates",
+    "viewOnZkb": "Ver no zKillboard",
+    "unknown": "Desconhecido",
+    "unknownShip": "Nave desconhecida",
+    "ago": "há {{d}}"
   }
 }
