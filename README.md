@@ -27,6 +27,7 @@
   - [One-command deploy scripts](#one-command-deploy-scripts)
   - [Updating the SDE](#updating-the-sde)
   - [Refreshing wormhole types](#refreshing-wormhole-types)
+  - [Live kill feed](#live-kill-feed-opt-in)
   - [Upgrading an existing deployment](#upgrading-an-existing-deployment)
   - [Backup & restore](#backup--restore)
 - [Corp & alliance mode](#corp--alliance-mode)
@@ -483,6 +484,23 @@ docker compose build server && docker compose up -d
 ```
 
 See [Static data files](#static-data-files) for what `extract-wormholes` does and the fields involved.
+
+#### Live kill feed (opt-in)
+
+Flags recent high-value kills on your mapped systems and feeds a **Kill Log** panel (top-bar skull icon). A single server-side consumer reads zKillboard's live **R2Z2 ephemeral** feed; for a kill at or above a value threshold in a system on a *currently-viewed* map, it pulses that system's node and prepends a row to the log. Opening the log also backfills recent history for that map's systems. Corp/alliance maps can additionally push kills to a Discord webhook (**Admin → Discord**).
+
+**Off by default.** Enable and tune via `.env`:
+
+| Variable | Default | Effect |
+|---|---|---|
+| `KILL_FEED` | `0` (off) | Set to `1` to run the live consumer. While off, the feature is inert (the Kill Log's on-open backfill still works, but nothing flashes live). |
+| `KILL_FEED_CONTACT` | — | A reachable contact (email or URL) — it builds the zKillboard `User-Agent`. Required by zKill fair-use; a blank UA is Cloudflare-blocked. |
+| `KILL_FEED_MIN_ISK` | `50000000` | Only kills at or above this ISK value are flagged and logged. |
+| `KILL_FEED_RECENT_SECONDS` | `900` (15 min) | How long a node stays flagged after a kill lands there. |
+| `KILL_FEED_BACKFILL_SECONDS` | `10800` (3 h) | How far back the Kill Log's on-open backfill looks. |
+| `KILL_FEED_BACKFILL_MAX_SYSTEMS` | `30` | **Soft cap** on how many of a map's systems the backfill queries when you open the log. **There is no hard maximum** — raise it for larger chains; a map with more systems than the cap simply has the extras skipped (logged). It exists only as a zKillboard fair-use bound: each system is one zKill REST call, so a huge chain would fan out a lot of requests. Even above the cap, requests go out **at most 5 at a time** and per-system results are **cached (5 min)**, so a higher value just means a slower *first* open and more total zKill load — never a burst. |
+
+Fair-use: the consumer is a single long-poller that stays under zKill's 15 req/s limit and honours the mandatory 6 s idle wait, and it only does work for maps that have a live viewer (a kill flashes only while someone is watching that map). On boot it logs `[killFeed] live kill feed enabled …` (or `disabled …`), plus a periodic heartbeat and a line per forwarded kill — handy for confirming it's running (`… | grep killFeed`).
 
 #### Upgrading an existing deployment
 
