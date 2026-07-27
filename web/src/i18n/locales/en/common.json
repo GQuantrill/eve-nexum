@@ -1732,6 +1732,7 @@
     "characterFallback": "Character {{id}}",
     "altLastKnown": "(last known)",
     "killsTooltip": "{{ships}} ship · {{pods}} pod kills this hour",
+    "recentKill": "Kill {{ago}}m ago ({{value}} ISK)",
     "a0Sun": "A0 sun",
     "shattered": "Shattered",
     "iceBelt": "Ice belt system",

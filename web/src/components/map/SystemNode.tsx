@@ -10,6 +10,7 @@ import type { MapSystem } from '../../types';
 import { CLASS_COLORS, CLASS_LABELS, EFFECT_ICONS, EFFECT_LABELS, EFFECT_MODIFIERS } from '../../data/wormholes';
 import { useMapStore } from '../../store/mapStore';
 import { usePresenceStore } from '../../store/presenceStore';
+import { useSystemKill, RECENT_KILL_MS } from '../../store/killStore';
 import { useAccountLocations } from '../../hooks/useAccountLocations';
 import { useSovData } from '../../hooks/useSovData';
 import { useStandings } from '../../hooks/useStandings';
@@ -45,6 +46,14 @@ import { WHTypeInfo } from '../ui/WHTypeInfo';
 import { truesecColor } from '../../utils/truesec';
 
 type SystemNodeData = MapSystem & { selected: boolean; dimmed?: boolean; routeHighlighted?: boolean };
+
+// Compact ISK for the recent-kill tooltip: 1.2B / 340M / 90K.
+function iskCompact(v: number): string {
+  if (v >= 1_000_000_000) return `${(v / 1_000_000_000).toFixed(1)}B`;
+  if (v >= 1_000_000)     return `${(v / 1_000_000).toFixed(0)}M`;
+  if (v >= 1_000)         return `${(v / 1_000).toFixed(0)}K`;
+  return String(Math.round(v));
+}
 
 export const SystemNode = memo(({ data, selected }: NodeProps) => {
   const { t } = useTranslation();
@@ -149,6 +158,8 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
   const allKills        = useCurrentHourKills();
   const myKills         = sys.eveSystemId !== null ? allKills.get(sys.eveSystemId) : undefined;
   const hotKills        = !!myKills && myKills.shipKills + myKills.podKills > 0;
+  // Live "a kill just happened here" flag from the zKill feed (ephemeral, SSE).
+  const recentKill      = useSystemKill(sys.eveSystemId);
 
   // Active heatmap glow for this node — value for the selected metric,
   // normalised against the per-map max (from HeatmapContext). null = no glow
@@ -166,6 +177,9 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
     return { glow: Math.min(1, raw * heatmap.intensity), color: heatColor(raw, heatmap.colorVision !== 'off') };
   }, [heatmap.metric, heatmap.max, heatmap.intensity, heatmap.colorVision, sys.eveSystemId, allKills, fleet, user?.characterId]);
   const now             = useNow30s();
+  // The flag fades once the kill ages past the display window; the 30s ticker
+  // re-evaluates this so it drops on its own without another SSE frame.
+  const killFresh       = !!recentKill && now - recentKill.atMs < RECENT_KILL_MS;
   const [staleHours]    = useStaleThreshold();
   // staleHours === 0 is the "Never fade" sentinel: no system is ever stale.
   const isStale         = staleHours > 0 && !!sys.lastActivityAt &&
@@ -410,6 +424,17 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
       <div className="system-node__meta-row">
         <span className="system-node__class-badge">{CLASS_LABELS[sys.systemClass]}</span>
         <div className="system-node__icons">
+          {killFresh && recentKill && (
+            <span className="system-node__recentkill-icon">
+              <SkullIcon size={14} weight="fill" />
+              <span className="system-node__recentkill-tooltip">
+                {t('mapNode.recentKill', {
+                  value: iskCompact(recentKill.totalValue),
+                  ago: Math.max(0, Math.round((now - recentKill.atMs) / 60_000)),
+                })}
+              </span>
+            </span>
+          )}
           {hotKills && myKills && (
             <span className="system-node__kill-icon">
               <SwordIcon size={14} weight="regular" />

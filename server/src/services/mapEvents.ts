@@ -33,6 +33,14 @@ export function subscribeMap(mapId: string, res: Response): () => void {
   };
 }
 
+// Map ids that currently have at least one live SSE subscriber. A key exists in
+// `subscribers` only while its Set is non-empty (see the cleanup in the
+// unsubscribe fn above), so the keys ARE the set of actively-viewed maps. Lets
+// background producers (e.g. the kill feed) skip work for maps nobody is watching.
+export function activeMapIds(): string[] {
+  return [...subscribers.keys()];
+}
+
 // Register a transform callback for a map's events. Returns an unsubscribe fn.
 // The callback gets the event object (not an SSE frame), so the caller decides
 // what, if anything, to forward.

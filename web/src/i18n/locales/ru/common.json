@@ -1700,6 +1700,7 @@
     "characterFallback": "Персонаж {{id}}",
     "altLastKnown": "(последнее изв.)",
     "killsTooltip": "{{ships}} кораблей · {{pods}} капсул убито за этот час",
+    "recentKill": "Килл {{ago}} мин назад ({{value}} ISK)",
     "a0Sun": "Звезда A0",
     "shattered": "Разрушенная",
     "iceBelt": "Система с ледяным поясом",

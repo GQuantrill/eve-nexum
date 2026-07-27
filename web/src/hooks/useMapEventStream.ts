@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useMapStore, type RemoteEvent } from '../store/mapStore';
 import { usePresenceStore, type PresenceViewer } from '../store/presenceStore';
+import { useKillStore } from '../store/killStore';
 import { apiUrl } from '../api/client';
 import { CLIENT_ID } from '../api/clientId';
 
@@ -17,6 +18,7 @@ export function useMapEventStream(): void {
     if (!activeMapId) return;
     openedOnce.current = false;
     usePresenceStore.getState().reset(); // clear last map's roster; snapshot repopulates
+    useKillStore.getState().reset();     // clear last map's kill flags
 
     const es = new EventSource(apiUrl(`/api/maps/${activeMapId}/events`), { withCredentials: true });
 
@@ -45,6 +47,16 @@ export function useMapEventStream(): void {
             return;
           case 'presence.leave':
             presence.remove(data.characterId as number);
+            return;
+          case 'kill.recent':
+            // Ephemeral, non-map state — route to the kill store, not mapStore.
+            useKillStore.getState().recordKill({
+              eveSystemId: data.eveSystemId as number,
+              killmailId:  data.killmailId as number,
+              shipTypeId:  data.shipTypeId as number,
+              totalValue:  data.totalValue as number,
+              atMs:        data.atMs as number,
+            });
             return;
         }
 
