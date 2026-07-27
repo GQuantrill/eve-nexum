@@ -302,7 +302,7 @@
       "saveFailed": "保存失败",
       "updateFailed": "更新失败",
       "noCorp": "无军团上下文 — Discord 通知仅适用于军团地图。",
-      "hint": "控制该军团的地图向 Discord 发送哪些虫洞通知。Webhook 本身在服务器端设置（DISCORD_WEBHOOK_URL）。默认情况下每个地图和星域都会通知 — 这些设置只会做减法。",
+      "hint": "控制该军团的地图向 Discord 发送的内容。Webhook 网址在此选项卡中设置 — 留空即可禁用该提醒。默认情况下每个地图和星域都会通知；这些筛选器只会做减法。",
       "regions": "星域",
       "notifyAll": "通知所有星域",
       "notifySelected": "仅选定星域",

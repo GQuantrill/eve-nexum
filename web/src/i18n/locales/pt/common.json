@@ -302,7 +302,7 @@
       "saveFailed": "Falha ao guardar",
       "updateFailed": "Falha ao atualizar",
       "noCorp": "Sem contexto de corp — as notificações do Discord só se aplicam a mapas de corp.",
-      "hint": "Controla que notificações de buraco de minhoca os mapas desta corp enviam para o Discord. O webhook é configurado no servidor (DISCORD_WEBHOOK_URL). Por defeito cada mapa e região notifica — estas definições apenas restringem.",
+      "hint": "Controla o que os mapas desta corp enviam para o Discord. Os URLs de webhook são definidos neste separador — deixa um em branco para desativar esse alerta. Por defeito cada mapa e região notifica; estes filtros apenas restringem.",
       "regions": "Regiões",
       "notifyAll": "Notificar para todas as regiões",
       "notifySelected": "Apenas regiões selecionadas",

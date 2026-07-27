@@ -686,37 +686,34 @@ If you want a permanent break-glass, run a second `ADMIN_CHAR_ID`-eligible chara
 
 ### Discord notifications
 
-Set `DISCORD_WEBHOOK_URL` to push chain intel into a Discord channel so alerts reach people who aren't watching Nexum. It fires **server-side**, so it doesn't depend on anyone having the map open.
+Corp and alliance maps can push chain intel into a Discord channel so alerts reach people who aren't watching Nexum. It fires **server-side**, so it doesn't depend on anyone having the map open.
+
+**Set up in the app, not `.env`.** Webhooks are configured **per corp/alliance in the admin panel** (**Admin → Discord**) — paste a Discord webhook URL and it takes effect immediately, no restart. The URL is stored server-side, never sent to the browser, and masked in logs. There's a separate webhook per event type, so you can route each to its own channel (leave one blank to disable that type).
+
+> Create the webhook in Discord (**Channel → Edit → Integrations → Webhooks → New Webhook**), copy the URL, and paste it into the matching field in **Admin → Discord**.
 
 **What fires:**
 
+- **New connection** — a connection is drawn between two systems. When it reveals a **k-space exit** at or above a configurable minimum security, it upgrades to a routing embed (exit system/region/security, ship-size limit, jumps from home, nearest hub).
 - **Inbound K162** — a signature's wormhole type is set to K162 (something just connected into the chain).
-- **New wormhole connection** — a connection is drawn between two systems.
+- **Kills** — high-value kills in the map's systems, if the [live kill feed](#live-kill-feed-opt-in) is enabled. Each org sets its own minimum ISK.
 
 **Scope and behaviour:**
 
-- **Corp maps only.** Personal maps never notify — their scanning stays private.
+- **Corp and alliance maps only.** Personal maps never notify — their scanning stays private.
 - **Bulk operations are excluded.** Seeding a region or merging maps creates many connections at once and deliberately does *not* post to Discord; only interactive edits do.
-- **Best-effort.** A webhook failure (Discord down, timeout, rate-limit) is logged and dropped — it never affects the edit that triggered it. Delivery is paced and honours Discord's rate limits.
+- **Best-effort.** A webhook failure (Discord down, timeout, rate-limit) is logged and dropped — it never affects the edit that triggered it. Delivery is paced, honours Discord's rate limits, and only ever posts to Discord-owned webhook hosts.
 
-**Configuration** — create a webhook in your Discord channel (Channel → Edit → Integrations → Webhooks) and set the URL:
-
-```bash
-# One channel for every corp map:
-DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/123/abc
-
-# Multi-corp: route each corp to its own channel (corpId=URL, comma-separated):
-DISCORD_WEBHOOK_URL=98000001=https://discord.com/api/webhooks/1/a,98000002=https://discord.com/api/webhooks/2/b
-```
-
-The webhook URL is a secret: it lives only in the server env, is never sent to the browser, and is masked in logs. Changing it takes effect on the next server restart. Leave it unset to disable notifications entirely.
-
-**Filtering (admin).** By default every corp map and region notifies. The **Discord** tab in the admin panel lets an admin narrow this per corp, without touching the webhook:
+**Filtering (admin).** The **Discord** tab lets an admin narrow what each org notifies without touching the webhook:
 
 - **Regions** — notify for all regions (default), or only a chosen allowlist. The wormhole's system region is checked at send time; for a new connection, either endpoint's region qualifies.
+- **Wormhole type / class / size** — restrict which holes trigger the chain notifications.
 - **Excluded maps** — every map notifies by default; tick maps to exclude them.
+- **K-space exit minimum security** and **kill minimum ISK** — thresholds for the exit-routing embed and the kill alerts.
 
 These settings only ever *subtract* from the default, and new maps are always included automatically, so nothing silently goes dark.
+
+> **Legacy `DISCORD_WEBHOOK_URL`.** Superseded by the per-org settings above. If it's still set, on boot the server does a one-time seed of that URL into any org rows that don't yet have a connections webhook (fills blanks only, never overwrites) — so an old single-webhook deployment keeps working and migrates in place. Once you've confirmed your webhooks in **Admin → Discord**, remove `DISCORD_WEBHOOK_URL` from `.env`.
 
 ### Admin operations
 
