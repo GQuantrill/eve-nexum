@@ -108,7 +108,7 @@ export function KillLogPanel({ onClose }: Props) {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal killlog-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal__header">
-          <h2 className="modal__title"><SkullIcon size={18} weight="fill" /> {t('killLog.title')}</h2>
+          <h2 className="modal__title killlog__title"><SkullIcon size={18} weight="fill" />{t('killLog.title')}</h2>
           <button className="icon-btn" onClick={onClose} aria-label={t('actions.close')}><XIcon size={16} weight="bold" /></button>
         </div>
         <div className="modal__body killlog__body">

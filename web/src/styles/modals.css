@@ -222,6 +222,14 @@
   width: min(760px, 94vw);
 }
 
+/* Vertically centre the skull icon with the title text (the base .modal__title
+   is block, so the inline SVG baseline-aligns and rides high). */
+.killlog__title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .killlog__body {
   max-height: min(70vh, 640px);
   overflow-y: auto;
