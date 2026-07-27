@@ -172,7 +172,7 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
   const now             = useNow30s();
   // The flag fades once the kill ages past the display window; the 30s ticker
   // re-evaluates this so it drops on its own without another SSE frame.
-  const killFresh       = !!recentKill && now - recentKill.atMs < RECENT_KILL_MS;
+  const killFresh       = !!recentKill && now - recentKill.flaggedAtMs < RECENT_KILL_MS;
   const [staleHours]    = useStaleThreshold();
   // staleHours === 0 is the "Never fade" sentinel: no system is ever stale.
   const isStale         = staleHours > 0 && !!sys.lastActivityAt &&

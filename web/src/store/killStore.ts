@@ -13,7 +13,7 @@ export const RECENT_KILL_MS = 15 * 60 * 1000;
 
 // Newest-first log cap — plenty for the panel, bounded so a busy feed can't grow
 // the array without limit.
-const LOG_CAP = 200;
+const LOG_CAP = 300;
 
 // A single decorated kill — the exact shape the server sends on the `kill.recent`
 // SSE event and returns from GET /api/maps/:id/kills/backfill. Every display name
@@ -33,9 +33,16 @@ export interface KillRow {
   victimCorpName:      string | null;
 }
 
+// A per-system flag carries the kill plus when WE received it. The node badge
+// freshness is gated on `flaggedAtMs` (receipt), NOT the killmail's `atMs`:
+// zKill/ESI often deliver a killmail 15+ min after the kill, so gating on the
+// kill time would leave a live kill already "stale" on arrival and it would
+// never flash. Receipt time makes every live kill flash for the full window.
+export type KillFlag = KillRow & { flaggedAtMs: number };
+
 interface KillState {
   // Latest kill per eveSystemId — drives the pulsing node badge.
-  bySystem: Map<number, KillRow>;
+  bySystem: Map<number, KillFlag>;
   // Chronological feed (newest first, deduped by killmailId) — drives the panel.
   log: KillRow[];
   // A single live kill: flag its system AND prepend to the log.
@@ -54,14 +61,17 @@ export const useKillStore = create<KillState>((set) => ({
   bySystem: new Map(),
   log: [],
   recordKill: (row) => set((s) => {
+    const now = Date.now();
     const next = new Map(s.bySystem);
-    // Opportunistically drop flags that have already aged out so the map can't
-    // grow unbounded on a busy feed.
-    const cutoff = Date.now() - RECENT_KILL_MS;
-    for (const [sysId, k] of next) if (k.atMs < cutoff) next.delete(sysId);
-    // Keep only the most recent kill for a system.
+    // Opportunistically drop flags that have aged out (by receipt time) so the
+    // map can't grow unbounded on a busy feed.
+    const cutoff = now - RECENT_KILL_MS;
+    for (const [sysId, k] of next) if (k.flaggedAtMs < cutoff) next.delete(sysId);
+    // Keep the most recent kill for a system; stamp receipt time so the badge
+    // flashes for the full window regardless of the killmail's (possibly stale)
+    // timestamp.
     const existing = next.get(row.eveSystemId);
-    if (!existing || row.atMs >= existing.atMs) next.set(row.eveSystemId, row);
+    if (!existing || row.atMs >= existing.atMs) next.set(row.eveSystemId, { ...row, flaggedAtMs: now });
     return { bySystem: next, log: prependDeduped(s.log, row) };
   }),
   seedBackfill: (rows) => set((s) => {
@@ -77,7 +87,7 @@ export const useKillStore = create<KillState>((set) => ({
 
 // Per-system selector — mirrors the presence-store slice so a node only
 // re-renders when its own system's flag changes.
-export function useSystemKill(eveSystemId: number | null | undefined): KillRow | undefined {
+export function useSystemKill(eveSystemId: number | null | undefined): KillFlag | undefined {
   return useKillStore((s) => (eveSystemId == null ? undefined : s.bySystem.get(eveSystemId)));
 }
 
