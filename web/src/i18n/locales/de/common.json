@@ -1792,6 +1792,7 @@
     "loading": "Kills werden geladen...",
     "error": "Kills konnten nicht geladen werden",
     "viewOnZkb": "Auf zKillboard ansehen",
+    "showOnMap": "Auf Karte zeigen",
     "unknown": "Unbekannt",
     "unknownShip": "Unbekanntes Schiff",
     "ago": "vor {{d}}"

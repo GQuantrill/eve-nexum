@@ -1792,6 +1792,7 @@
     "loading": "Cargando bajas...",
     "error": "No se pudieron cargar las bajas",
     "viewOnZkb": "Ver en zKillboard",
+    "showOnMap": "Mostrar en el mapa",
     "unknown": "Desconocido",
     "unknownShip": "Nave desconocida",
     "ago": "hace {{d}}"

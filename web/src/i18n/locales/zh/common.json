@@ -1792,6 +1792,7 @@
     "loading": "正在加载击杀...",
     "error": "无法加载击杀",
     "viewOnZkb": "在 zKillboard 上查看",
+    "showOnMap": "在地图上显示",
     "unknown": "未知",
     "unknownShip": "未知舰船",
     "ago": "{{d}}前"
