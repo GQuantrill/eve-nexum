@@ -209,6 +209,11 @@ async function dispatchDiscord(mapIds: string[], kill: KillRow): Promise<void> {
       sent.add(r.killWebhook);
       notifyDiscord(r.killWebhook, killEmbed(kill));
     }
+    // Diagnostic: explains why a forwarded kill did/didn't post to Discord.
+    // 0 matched-with-webhook => the map is personal, or the URL isn't in that
+    // org's *Kill* field. webhooks but 0 dispatched => below the org kill_min_isk.
+    const withHook = rows.filter((r) => r.killWebhook).length;
+    log.info(`kill Discord: ${rows.length} matched map(s), ${withHook} with a kill webhook, dispatched to ${sent.size}`);
   } catch (err) {
     log.warn('kill Discord dispatch failed:', err instanceof Error ? err.message : err);
   }
