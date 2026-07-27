@@ -975,6 +975,10 @@
   font-size: calc(13px * var(--font-scale, 1));
   cursor: default;
   position: relative;
+}
+/* Pulse the skull glyph only — putting the opacity animation on the wrapper
+   would cascade to its subtree and blink the hover tooltip too. */
+.system-node__recentkill-icon svg {
   animation: recentkill-pulse 1.4s ease-in-out infinite;
 }
 .system-node__recentkill-tooltip {
