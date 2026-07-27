@@ -132,9 +132,11 @@ async function processKill(body: EphemeralKill): Promise<void> {
   const solarSystemId = Number(km.solar_system_id);
   if (!Number.isFinite(killmailId) || !Number.isFinite(solarSystemId)) return;
   if (!markSeen(killmailId)) return;
+  stats.seen++;
 
   const totalValue = Number(body.zkb?.totalValue ?? 0);
   if (!(totalValue >= config.killFeed.minValueIsk)) return;
+  stats.overMin++;
 
   // Only touch the DB when at least one map is actually being watched.
   const live = activeMapIds();
@@ -177,6 +179,8 @@ async function processKill(body: EphemeralKill): Promise<void> {
   for (const { mapId } of rows) {
     publishToMap(mapId, { type: 'kill.recent', actor: null, ...killRow });
   }
+  stats.forwarded++;
+  log.info(`forwarded kill in ${meta.systemName} (${Math.round(totalValue / 1e6)}M ISK) -> ${rows.length} map(s)`);
 
   // Corp/alliance Discord kill alert for the matched maps (opt-in per org).
   await dispatchDiscord(rows.map((r) => r.mapId), killRow);
@@ -211,6 +215,14 @@ async function dispatchDiscord(mapIds: string[], kill: KillRow): Promise<void> {
 }
 
 let running = false;
+
+// Rolling counters for the heartbeat log, so "is the feed actually working?" is
+// observable: `seen` = killmails pulled from the firehose, `overMin` = those at
+// or above the ISK floor, `forwarded` = those in a currently-viewed map's
+// systems (the ones that flash a node). seen climbing with forwarded stuck at 0
+// just means no big kill has happened in a mapped system yet — not a fault.
+const stats = { seen: 0, overMin: 0, forwarded: 0 };
+const HEARTBEAT_MS = 120_000;
 
 async function loop(): Promise<void> {
   let backoff = 1_000;
@@ -254,5 +266,9 @@ export function startKillFeed(): void {
   if (running) return;
   running = true;
   log.info(`live kill feed enabled (R2Z2 ephemeral, min ${config.killFeed.minValueIsk.toLocaleString()} ISK)`);
+  const hb = setInterval(() => {
+    log.info(`heartbeat: ${stats.seen} seen, ${stats.overMin} >= min ISK, ${stats.forwarded} forwarded to live maps`);
+  }, HEARTBEAT_MS);
+  hb.unref?.();
   void loop();
 }
