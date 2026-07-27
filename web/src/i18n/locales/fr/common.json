@@ -302,7 +302,7 @@
       "saveFailed": "Échec de l'enregistrement",
       "updateFailed": "Échec de la mise à jour",
       "noCorp": "Aucun contexte de corp — les notifications Discord ne s'appliquent qu'aux cartes de corp.",
-      "hint": "Détermine quelles notifications de trou de ver les cartes de cette corp envoient à Discord. Le webhook lui-même est défini côté serveur (DISCORD_WEBHOOK_URL). Par défaut, chaque carte et région notifie — ces paramètres ne font que restreindre.",
+      "hint": "Détermine ce que les cartes de cette corp envoient à Discord. Les URL de webhook se définissent dans cet onglet — laissez-en une vide pour désactiver l'alerte correspondante. Par défaut, chaque carte et région notifie ; ces filtres ne font que restreindre.",
       "regions": "Régions",
       "notifyAll": "Notifier pour toutes les régions",
       "notifySelected": "Seulement les régions sélectionnées",

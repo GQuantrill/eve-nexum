@@ -302,7 +302,7 @@
       "saveFailed": "Speichern fehlgeschlagen",
       "updateFailed": "Aktualisierung fehlgeschlagen",
       "noCorp": "Kein Corp-Kontext — Discord-Benachrichtigungen gelten nur für Corp-Karten.",
-      "hint": "Legt fest, welche Wurmloch-Benachrichtigungen die Karten dieser Corp an Discord senden. Der Webhook selbst wird serverseitig gesetzt (DISCORD_WEBHOOK_URL). Standardmäßig benachrichtigt jede Karte und Region — diese Einstellungen schränken nur ein.",
+      "hint": "Legt fest, was die Karten dieser Corp an Discord senden. Die Webhook-URLs werden in diesem Tab gesetzt — lass eine leer, um die jeweilige Benachrichtigung zu deaktivieren. Standardmäßig benachrichtigt jede Karte und Region; diese Filter schränken nur ein.",
       "regions": "Regionen",
       "notifyAll": "Für alle Regionen benachrichtigen",
       "notifySelected": "Nur ausgewählte Regionen",

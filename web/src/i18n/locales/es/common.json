@@ -302,7 +302,7 @@
       "saveFailed": "Error al guardar",
       "updateFailed": "Error al actualizar",
       "noCorp": "Sin contexto de corp — las notificaciones de Discord solo aplican a mapas de corp.",
-      "hint": "Controla qué notificaciones de agujero de gusano envían a Discord los mapas de esta corp. El webhook se configura en el servidor (DISCORD_WEBHOOK_URL). Por defecto cada mapa y región notifica — estos ajustes solo restan.",
+      "hint": "Controla qué envían a Discord los mapas de esta corp. Las URL de webhook se configuran en esta pestaña — deja una en blanco para desactivar esa alerta. Por defecto cada mapa y región notifica; estos filtros solo restan.",
       "regions": "Regiones",
       "notifyAll": "Notificar para todas las regiones",
       "notifySelected": "Solo regiones seleccionadas",
