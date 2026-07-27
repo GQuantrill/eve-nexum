@@ -1974,7 +1974,7 @@ mapsRouter.get('/:mapId/kills/backfill', esiLimiter, async (req, res) => {
 
   // Per-system fetch is cached + ESI-concurrency-capped inside fetchSystemKills.
   const perSystemFetch = async (sysId: number): Promise<KillRow[]> => {
-    const kills = (await fetchSystemKills(sysId, 3600))
+    const kills = (await fetchSystemKills(sysId, config.killFeed.backfillSeconds))
       .filter((k) => k.zkb.totalValue >= config.killFeed.minValueIsk);
     if (!kills.length) return [];
     const meta = await resolveSystemMeta(sysId);
@@ -2015,7 +2015,7 @@ mapsRouter.get('/:mapId/kills/backfill', esiLimiter, async (req, res) => {
     }
   }
   merged.sort((a, b) => b.atMs - a.atMs);
-  res.json(merged.slice(0, 50));
+  res.json(merged.slice(0, 200));
 });
 
 // POST /api/maps/:mapId/presence — a viewer reports its current location.

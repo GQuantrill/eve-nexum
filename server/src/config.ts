@@ -187,6 +187,9 @@ export const config = {
     // panel-open. Capped so a huge chain can't fan out into a burst of zKill
     // REST calls (fair-use). Extra systems are skipped (logged), not queried.
     backfillMaxSystems: intEnv(process.env.KILL_FEED_BACKFILL_MAX_SYSTEMS, 30),
+    // How far back the kill-log backfill looks (seconds). Longer = more history
+    // in the log, but more per-system kills to hydrate via ESI on panel-open.
+    backfillSeconds: intEnv(process.env.KILL_FEED_BACKFILL_SECONDS, 10_800), // 3h
   },
   // Required in non-dev (guarded above). The dev fallback is randomised per
   // boot rather than a known literal, so a dev instance accidentally exposed
