@@ -1792,6 +1792,7 @@
     "loading": "Loading kills...",
     "error": "Couldn't load kills",
     "viewOnZkb": "View on zKillboard",
+    "showOnMap": "Show on map",
     "unknown": "Unknown",
     "unknownShip": "Unknown ship",
     "ago": "{{d}} ago"

@@ -88,7 +88,7 @@ interface EsiKillmail {
 }
 interface EphemeralKill {
   killmail_id?: number;
-  killmail?:    EsiKillmail;       // the raw ESI killmail (nested)
+  esi?:         EsiKillmail;       // the raw ESI killmail (R2Z2 nests it under `esi`)
   zkb?:         { totalValue?: number };
 }
 
@@ -127,7 +127,7 @@ async function getJson(url: string): Promise<{ status: number; body: unknown }> 
 
 // Process one ephemeral killmail: filter, match to live maps, decorate, publish.
 async function processKill(body: EphemeralKill): Promise<void> {
-  const km = body.killmail ?? {};
+  const km = body.esi ?? {};
   const killmailId    = Number(body.killmail_id ?? km.killmail_id);
   const solarSystemId = Number(km.solar_system_id);
   if (!Number.isFinite(killmailId) || !Number.isFinite(solarSystemId)) return;

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { XIcon, SkullIcon } from '@phosphor-icons/react';
+import { XIcon, SkullIcon, ArrowSquareOutIcon } from '@phosphor-icons/react';
 import { api } from '../../api/client';
 import { useMapStore } from '../../store/mapStore';
 import { useKillStore, useKillLog, type KillRow } from '../../store/killStore';
@@ -26,7 +26,7 @@ function durToken(atMs: number, now: number): string | null {
   return `${Math.floor(h / 24)}d`;
 }
 
-function KillRowItem({ k, now }: { k: KillRow; now: number }) {
+function KillRowItem({ k, now, onShow }: { k: KillRow; now: number; onShow: (eveSystemId: number) => void }) {
   const { t } = useTranslation();
   const portrait = k.victimCharacterId
     ? charPortrait(k.victimCharacterId, 64)
@@ -34,12 +34,16 @@ function KillRowItem({ k, now }: { k: KillRow; now: number }) {
   const d = durToken(k.atMs, now);
   const ago = d ? t('killLog.ago', { d }) : t('time.now');
   return (
-    <a
+    // The row centres the map on the kill's system (and closes the panel); the
+    // zKillboard permalink is a separate trailing icon so it doesn't hijack the
+    // primary click.
+    <div
       className="killlog__row"
-      href={zkbLink(k.killmailId)}
-      target="_blank"
-      rel="noopener noreferrer"
-      title={t('killLog.viewOnZkb')}
+      role="button"
+      tabIndex={0}
+      title={t('killLog.showOnMap')}
+      onClick={() => onShow(k.eveSystemId)}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onShow(k.eveSystemId); } }}
     >
       <div className="killlog__thumbs">
         {portrait && <img className="killlog__portrait" src={portrait} alt="" loading="lazy" />}
@@ -58,7 +62,17 @@ function KillRowItem({ k, now }: { k: KillRow; now: number }) {
         <span className="killlog__region">{k.regionName ?? ''}</span>
       </div>
       <span className="killlog__ago">{ago}</span>
-    </a>
+      <a
+        className="killlog__zkb"
+        href={zkbLink(k.killmailId)}
+        target="_blank"
+        rel="noopener noreferrer"
+        title={t('killLog.viewOnZkb')}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <ArrowSquareOutIcon size={15} weight="regular" />
+      </a>
+    </div>
   );
 }
 
@@ -82,6 +96,12 @@ export function KillLogPanel({ onClose }: Props) {
     return () => { cancelled = true; };
   }, [activeMapId, t]);
 
+  // Centre the map on the kill's system, then close so it isn't behind the modal.
+  const onShow = (eveSystemId: number) => {
+    useMapStore.getState().requestCenterOnEveSystem(eveSystemId);
+    onClose();
+  };
+
   const showLoading = loading && !!activeMapId;
 
   return (
@@ -97,7 +117,7 @@ export function KillLogPanel({ onClose }: Props) {
           {!showLoading && !error && log.length === 0 && <div className="killlog__status">{t('killLog.empty')}</div>}
           {log.length > 0 && (
             <div className="killlog__list">
-              {log.map((k) => <KillRowItem key={k.killmailId} k={k} now={now} />)}
+              {log.map((k) => <KillRowItem key={k.killmailId} k={k} now={now} onShow={onShow} />)}
             </div>
           )}
         </div>

@@ -1792,6 +1792,7 @@
     "loading": "A carregar abates...",
     "error": "Não foi possível carregar os abates",
     "viewOnZkb": "Ver no zKillboard",
+    "showOnMap": "Mostrar no mapa",
     "unknown": "Desconhecido",
     "unknownShip": "Nave desconhecida",
     "ago": "há {{d}}"

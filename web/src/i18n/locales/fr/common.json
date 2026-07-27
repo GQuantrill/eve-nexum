@@ -1792,6 +1792,7 @@
     "loading": "Chargement des kills...",
     "error": "Impossible de charger les kills",
     "viewOnZkb": "Voir sur zKillboard",
+    "showOnMap": "Afficher sur la carte",
     "unknown": "Inconnu",
     "unknownShip": "Vaisseau inconnu",
     "ago": "il y a {{d}}"
