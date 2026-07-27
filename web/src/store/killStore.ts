@@ -76,11 +76,22 @@ export const useKillStore = create<KillState>((set) => ({
   }),
   seedBackfill: (rows) => set((s) => {
     // Merge backfilled history into the log (deduped), newest first, capped.
-    // Does NOT touch bySystem — old kills shouldn't re-pulse nodes.
     const byId = new Map<number, KillRow>();
     for (const r of [...s.log, ...rows]) byId.set(r.killmailId, r);
     const log = [...byId.values()].sort((a, b) => b.atMs - a.atMs).slice(0, LOG_CAP);
-    return { log };
+    // Flag any backfilled kill that's STILL within the recency window so its
+    // node pulses the moment the map loads (a kill 6 min ago should already be
+    // flashing). Anchor to the kill's own time (atMs) — not "now" — so it flashes
+    // only for the remainder and expires correctly, and never override a fresher
+    // existing (e.g. live) flag.
+    const cutoff = Date.now() - RECENT_KILL_MS;
+    const bySystem = new Map(s.bySystem);
+    for (const r of rows) {
+      if (r.atMs < cutoff) continue;
+      const existing = bySystem.get(r.eveSystemId);
+      if (!existing || r.atMs > existing.flaggedAtMs) bySystem.set(r.eveSystemId, { ...r, flaggedAtMs: r.atMs });
+    }
+    return { log, bySystem };
   }),
   reset: () => set({ bySystem: new Map(), log: [] }),
 }));
