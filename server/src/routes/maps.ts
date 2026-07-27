@@ -25,9 +25,8 @@ import { notifyDiscord, k162Embed, connectionEmbed, chainEmbed, kspaceExitEmbed 
 import { shortestRoutes } from '../services/routeGraph.js';
 import { whSizeForCode } from './wormholes.js';
 import { effectiveExpiryMs, lifeBucket } from '../data/whLifetimes.js';
-import { esiLimiter } from '../middleware/rateLimits.js';
-import { fetchSystemKills } from './killboard.js';
-import { resolveSystemMeta, resolveShipTypeName, type KillRow } from '../services/killFeed.js';
+import { buildKillRow } from '../services/killFeed.js';
+import { recentKillsForSystems } from '../services/killBuffer.js';
 
 const log = createLogger('maps');
 const discordLog = createLogger('discord');
@@ -1950,11 +1949,13 @@ mapsRouter.get('/:mapId/events', async (req, res) => {
   streamMapEvents(req, res, mapId);
 });
 
-// GET /api/maps/:mapId/kills/backfill — recent (last hour) high-value kills in
-// the map's systems, to seed the kill-log panel on open. Access-checked and
-// rate-limited (esiLimiter) since it fans out to zKill; the system count is
-// capped so a huge chain can't burst the feed. Returns KillRow[] newest-first.
-mapsRouter.get('/:mapId/kills/backfill', esiLimiter, async (req, res) => {
+// GET /api/maps/:mapId/kills/backfill — recent high-value kills in the map's
+// systems, to seed the kill-log panel on open. Served from the in-memory buffer
+// the live feed fills (services/killBuffer) — no zKillboard REST calls, so it's
+// instant and scales to any map size. Access-checked. Returns KillRow[]
+// newest-first. (The buffer only holds kills since the server booted, so right
+// after a restart the log fills in as the feed runs.)
+mapsRouter.get('/:mapId/kills/backfill', async (req, res) => {
   const { mapId } = req.params;
   const access = await getMapAccess(mapId, req);
   if (!access) { res.status(404).json({ error: 'Map not found' }); return; }
@@ -1964,64 +1965,12 @@ mapsRouter.get('/:mapId/kills/backfill', esiLimiter, async (req, res) => {
        FROM map_systems WHERE map_id = $1 AND eve_system_id IS NOT NULL`,
     [mapId],
   );
-  let systemIds = rows.map((r) => r.eveSystemId);
-  const cap = config.killFeed.backfillMaxSystems;
-  if (systemIds.length > cap) {
-    log.warn(`kill backfill: map ${mapId} has ${systemIds.length} systems, capping to ${cap}`);
-    systemIds = systemIds.slice(0, cap);
-  }
-  if (!systemIds.length) { res.json([]); return; }
+  const systemIds = new Set(rows.map((r) => r.eveSystemId));
+  if (!systemIds.size) { res.json([]); return; }
 
-  // Per-system fetch is cached + ESI-concurrency-capped inside fetchSystemKills.
-  // Pass the ISK floor + a per-system cap so it filters BEFORE ESI hydration —
-  // essential in busy regions (The Forge) where hydrating every kill would trip
-  // rate limits and return stale/incomplete data. 20 newest kept per system to
-  // keep ESI calls low; the merged result is sliced to 200 below anyway.
-  const perSystemFetch = async (sysId: number): Promise<KillRow[]> => {
-    const kills = await fetchSystemKills(sysId, config.killFeed.backfillSeconds, {
-      minValueIsk: config.killFeed.minValueIsk,
-      maxKills: 20,
-    });
-    if (!kills.length) return [];
-    const meta = await resolveSystemMeta(sysId);
-    return Promise.all(kills.map(async (k): Promise<KillRow> => ({
-      killmailId:  k.killmail_id,
-      atMs:        Date.parse(k.killmail_time) || Date.now(),
-      eveSystemId: sysId,
-      systemName:  meta.systemName,
-      regionName:  meta.regionName,
-      shipTypeId:  k.victim.ship_type_id,
-      shipTypeName: await resolveShipTypeName(k.victim.ship_type_id),
-      totalValue:  k.zkb.totalValue,
-      victimCharacterId:   k.victim.character_id ?? null,
-      victimName:          k.victim.character_name ?? null,
-      victimCorporationId: k.victim.corporation_id ?? null,
-      victimCorpName:      k.victim.corporation_name ?? null,
-    })));
-  };
-  // Bound the per-system zKill REST fan-out: fetchSystemKills caps the ESI
-  // hydration internally, but the outer list calls would otherwise all fire at
-  // once (up to backfillMaxSystems), bursting zKill on a cold cache. Process in
-  // small chunks so at most BACKFILL_CONCURRENCY systems hit zKill together.
-  const BACKFILL_CONCURRENCY = 5;
-  const perSystem: KillRow[][] = [];
-  for (let i = 0; i < systemIds.length; i += BACKFILL_CONCURRENCY) {
-    const chunk = systemIds.slice(i, i + BACKFILL_CONCURRENCY);
-    perSystem.push(...await Promise.all(chunk.map(perSystemFetch)));
-  }
-
-  // Merge, dedupe by killmail id, newest first, cap the response.
-  const seen = new Set<number>();
-  const merged: KillRow[] = [];
-  for (const list of perSystem) {
-    for (const row of list) {
-      if (seen.has(row.killmailId)) continue;
-      seen.add(row.killmailId);
-      merged.push(row);
-    }
-  }
-  merged.sort((a, b) => b.atMs - a.atMs);
-  res.json(merged.slice(0, 200));
+  const buffered = recentKillsForSystems(systemIds, 200);
+  const kills = await Promise.all(buffered.map(buildKillRow));
+  res.json(kills);
 });
 
 // POST /api/maps/:mapId/presence — a viewer reports its current location.

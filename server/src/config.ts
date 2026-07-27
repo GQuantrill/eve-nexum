@@ -183,12 +183,8 @@ export const config = {
     contact:       process.env.KILL_FEED_CONTACT?.trim() || 'gq@area404.org',
     minValueIsk:   intEnv(process.env.KILL_FEED_MIN_ISK, 50_000_000),
     recentSeconds: intEnv(process.env.KILL_FEED_RECENT_SECONDS, 900),
-    // Kill-log backfill: how many of a map's systems to query zKill for on
-    // panel-open. Capped so a huge chain can't fan out into a burst of zKill
-    // REST calls (fair-use). Extra systems are skipped (logged), not queried.
-    backfillMaxSystems: intEnv(process.env.KILL_FEED_BACKFILL_MAX_SYSTEMS, 30),
-    // How far back the kill-log backfill looks (seconds). Longer = more history
-    // in the log, but more per-system kills to hydrate via ESI on panel-open.
+    // How far back the kill-log backfill looks (seconds) — i.e. how long the
+    // in-memory kill buffer retains kills. Longer = more history in the log.
     backfillSeconds: intEnv(process.env.KILL_FEED_BACKFILL_SECONDS, 10_800), // 3h
   },
   // Required in non-dev (guarded above). The dev fallback is randomised per
