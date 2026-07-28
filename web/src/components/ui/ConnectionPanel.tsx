@@ -119,6 +119,11 @@ export function ConnectionPanel() {
   const [stack,  setStack]  = useState<number[]>([]);
   const [pendingPass, setPendingPass] = useState<{ kg: number; strand: boolean } | null>(null);
   const [sessionConnId, setSessionConnId] = useState<string | undefined>(undefined);
+  // "Custom" ship explicitly chosen from the preset dropdown. Needed because the
+  // preset name is otherwise derived purely from the cold/hot masses — so picking
+  // "Custom" while the masses still match a preset would snap straight back. This
+  // flag makes the choice stick so the pilot can then type their own masses.
+  const [rollerCustom, setRollerCustom] = useState(false);
   // Open state for the connection-flag icon picker.
   const [flagPickerOpen, setFlagPickerOpen] = useState(false);
   // Signatures on the two endpoint systems — feeds both the WH-type auto-detect
@@ -212,6 +217,7 @@ export function ConnectionPanel() {
     setSide(s.side);
     setStack(s.stack);
     setPendingPass(null);
+    setRollerCustom(false);
   }
 
   if (!conn) return null;
@@ -559,7 +565,7 @@ export function ConnectionPanel() {
 
         const myShip = location.ship;
         const canUseMyShip = !!(myShip && myShip.mass != null && myShip.mass > 0);
-        const presetName = ROLLER_PRESETS.find(p => p.coldKg === roller.coldKg && p.hotKg === roller.hotKg)?.name ?? 'Custom';
+        const presetName = rollerCustom ? 'Custom' : (ROLLER_PRESETS.find(p => p.coldKg === roller.coldKg && p.hotKg === roller.hotKg)?.name ?? 'Custom');
         const setMass = (key: 'coldKg' | 'hotKg', m: number) =>
           setRoller(r => ({ ...r, name: 'Custom', [key]: Math.max(0, Math.round(m * 1_000_000)) }));
 
@@ -589,8 +595,9 @@ export function ConnectionPanel() {
               <Select
                 value={presetName}
                 onChange={(v) => {
+                  if (v === 'Custom') { setRollerCustom(true); return; }
                   const p = ROLLER_PRESETS.find(x => x.name === v);
-                  if (p) setRoller({ ...p });
+                  if (p) { setRollerCustom(false); setRoller({ ...p }); }
                 }}
                 options={[
                   ...ROLLER_PRESETS.map(p => ({ value: p.name, label: p.name })),
