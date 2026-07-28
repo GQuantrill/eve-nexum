@@ -160,6 +160,33 @@ export function connectionEmbed(p: {
   };
 }
 
+// Compact ISK for the kill embed: 1.2B / 340M / 90K.
+function iskCompact(v: number): string {
+  if (v >= 1_000_000_000) return `${(v / 1_000_000_000).toFixed(1)}B`;
+  if (v >= 1_000_000)     return `${Math.round(v / 1_000_000)}M`;
+  if (v >= 1_000)         return `${Math.round(v / 1_000)}K`;
+  return String(Math.round(v));
+}
+
+// A kill in a mapped system (zKill live feed). Names are resolved server-side
+// from ids; the killmail link lets readers drill into zKillboard.
+export function killEmbed(p: {
+  killmailId: number; systemName: string; regionName: string | null;
+  shipTypeName: string; totalValue: number;
+  victimName: string | null; victimCorpName: string | null; atMs: number;
+}): DiscordEmbed {
+  return {
+    title:       `💀 Kill in ${p.systemName}`,
+    description: `**${p.victimName ?? 'Unknown'}** [${p.victimCorpName ?? '?'}] lost a **${p.shipTypeName || 'ship'}**\n[View on zKillboard](https://zkillboard.com/kill/${p.killmailId}/)`,
+    color:       RED,
+    fields: [
+      { name: 'Value',  value: `${iskCompact(p.totalValue)} ISK`, inline: true },
+      { name: 'System', value: p.regionName ? `${p.systemName} (${p.regionName})` : p.systemName, inline: true },
+    ],
+    timestamp: new Date(p.atMs).toISOString(),
+  };
+}
+
 // Richer form of the new-connection notification for a freshly revealed k-space
 // exit reachable from the map's home: the security band, the chain path out to
 // it, and how far the nearest trade hub is by stargate. Same connections

@@ -25,6 +25,8 @@ import { notifyDiscord, k162Embed, connectionEmbed, chainEmbed, kspaceExitEmbed 
 import { shortestRoutes } from '../services/routeGraph.js';
 import { whSizeForCode } from './wormholes.js';
 import { effectiveExpiryMs, lifeBucket } from '../data/whLifetimes.js';
+import { buildKillRow } from '../services/killFeed.js';
+import { recentKillsForSystems } from '../services/killBuffer.js';
 
 const log = createLogger('maps');
 const discordLog = createLogger('discord');
@@ -1945,6 +1947,30 @@ mapsRouter.get('/:mapId/events', async (req, res) => {
   if (!access) { res.status(404).json({ error: 'Map not found' }); return; }
   // Shared with the API-key stream at /api/v1/maps/:id/events.
   streamMapEvents(req, res, mapId);
+});
+
+// GET /api/maps/:mapId/kills/backfill — recent high-value kills in the map's
+// systems, to seed the kill-log panel on open. Served from the in-memory buffer
+// the live feed fills (services/killBuffer) — no zKillboard REST calls, so it's
+// instant and scales to any map size. Access-checked. Returns KillRow[]
+// newest-first. (The buffer only holds kills since the server booted, so right
+// after a restart the log fills in as the feed runs.)
+mapsRouter.get('/:mapId/kills/backfill', async (req, res) => {
+  const { mapId } = req.params;
+  const access = await getMapAccess(mapId, req);
+  if (!access) { res.status(404).json({ error: 'Map not found' }); return; }
+
+  const { rows } = await db.query<{ eveSystemId: number }>(
+    `SELECT DISTINCT eve_system_id AS "eveSystemId"
+       FROM map_systems WHERE map_id = $1 AND eve_system_id IS NOT NULL`,
+    [mapId],
+  );
+  const systemIds = new Set(rows.map((r) => r.eveSystemId));
+  if (!systemIds.size) { res.json([]); return; }
+
+  const buffered = recentKillsForSystems(systemIds, 200);
+  const kills = await Promise.all(buffered.map(buildKillRow));
+  res.json(kills);
 });
 
 // POST /api/maps/:mapId/presence — a viewer reports its current location.

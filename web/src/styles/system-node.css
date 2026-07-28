@@ -963,6 +963,48 @@
   z-index: 9999 !important;
 }
 
+/* Live "a kill just happened here" flag (zKill feed). Distinct from the hourly
+   kill-icon above: a pulsing red skull that draws the eye for ~15 min then the
+   node stops rendering it. */
+@keyframes recentkill-pulse {
+  0%, 100% { opacity: 1;    filter: drop-shadow(0 0 2px #ff3b3b88); }
+  50%      { opacity: 0.45; filter: drop-shadow(0 0 6px #ff3b3bcc); }
+}
+.system-node__recentkill-icon {
+  color: #ff3b3b;
+  font-size: calc(13px * var(--font-scale, 1));
+  cursor: default;
+  position: relative;
+}
+/* Pulse the skull glyph only — putting the opacity animation on the wrapper
+   would cascade to its subtree and blink the hover tooltip too. */
+.system-node__recentkill-icon svg {
+  animation: recentkill-pulse 1.4s ease-in-out infinite;
+}
+.system-node__recentkill-tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface-panel);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  padding: 4px 10px;
+  white-space: nowrap;
+  font-size: calc(13px * var(--font-scale, 1));
+  color: #ff6060;
+  font-weight: 600;
+  pointer-events: none;
+  z-index: 9999;
+}
+.system-node__recentkill-icon:hover .system-node__recentkill-tooltip {
+  display: block;
+}
+.react-flow__node:has(.system-node__recentkill-icon:hover) {
+  z-index: 9999 !important;
+}
+
 .system-node__incursion-badge {
   display: flex;
   align-items: center;

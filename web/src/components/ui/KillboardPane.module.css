@@ -84,6 +84,30 @@
   transition: background 0.1s;
 }
 
+/* A kill sourced live from the R2Z2 feed (not yet in / ahead of zKill's REST):
+   a subtle left accent plus a pulsing dot so it's obvious it's real-time. */
+.killLive {
+  position: relative;
+  box-shadow: inset 2px 0 0 #ff3b3b;
+}
+.liveDot {
+  position: absolute;
+  left: 3px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ff3b3b;
+  box-shadow: 0 0 4px #ff3b3b;
+  animation: killboard-live-pulse 1.4s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes killboard-live-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.3; }
+}
+
 .kill:hover { background: rgba(255,255,255,0.03); }
 
 .killPod { background: rgba(100,40,180,0.08); }

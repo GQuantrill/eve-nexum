@@ -302,7 +302,7 @@
       "saveFailed": "저장 실패",
       "updateFailed": "업데이트 실패",
       "noCorp": "군단 컨텍스트 없음 — Discord 알림은 군단 지도에만 적용됩니다.",
-      "hint": "이 군단의 지도가 Discord로 어떤 웜홀 알림을 보낼지 제어합니다. 웹훅 자체는 서버 측에서 설정됩니다(DISCORD_WEBHOOK_URL). 기본적으로 모든 지도와 지역이 알림을 보냅니다 — 이 설정은 그것을 빼기만 합니다.",
+      "hint": "이 군단의 지도가 Discord로 보내는 내용을 제어합니다. 웹훅 URL은 이 탭에서 설정합니다 — 비워 두면 해당 알림이 비활성화됩니다. 기본적으로 모든 지도와 지역이 알림을 보냅니다. 이 필터는 빼기만 합니다.",
       "regions": "지역",
       "notifyAll": "모든 지역에 알림",
       "notifySelected": "선택한 지역만",
@@ -333,7 +333,9 @@
       "excludedHint": "모든 지도가 기본적으로 알림을 보냅니다. 지도를 체크하면 Discord에서 제외됩니다.",
       "noCorpMaps": "아직 군단 지도가 없습니다.",
       "colMap": "지도",
-      "colExclude": "제외"
+      "colExclude": "제외",
+      "killWebhook": "킬 웹훅",
+      "killMinIsk": "최소 ISK"
     },
     "roles": {
       "button": "역할이란?",
@@ -1056,6 +1058,7 @@
   "killboard": {
     "hoursMinutesAgo": "{{hours}}시간 {{minutes}}분 전",
     "viewKillmail": "zKillboard에서 킬메일 보기",
+    "live": "실시간",
     "soloKill": "솔로 킬",
     "gank": "갱크 — 공격자 {{count}}명",
     "attackers": "공격자 {{count}}명",
@@ -1662,6 +1665,7 @@
     "characterFallback": "캐릭터 {{id}}",
     "altLastKnown": "(마지막 확인)",
     "killsTooltip": "이번 시간 {{ships}} 함선 · {{pods}} 캡슐 킬",
+    "recentKill": "{{ago}}분 전 격추 ({{value}} ISK)",
     "a0Sun": "A0 항성",
     "shattered": "파괴된 성계",
     "iceBelt": "얼음 벨트 성계",
@@ -1781,5 +1785,17 @@
     "typePersonal": "개인",
     "typeCorp": "군단",
     "typeAlliance": "연합"
+  },
+  "killLog": {
+    "title": "킬 로그",
+    "tooltip": "이 맵의 최근 킬",
+    "empty": "최근 킬 없음",
+    "loading": "킬 불러오는 중...",
+    "error": "킬을 불러올 수 없습니다",
+    "viewOnZkb": "zKillboard에서 보기",
+    "showOnMap": "지도에 표시",
+    "unknown": "알 수 없음",
+    "unknownShip": "알 수 없는 함선",
+    "ago": "{{d}} 전"
   }
 }
