@@ -395,6 +395,10 @@
   max-width: 1180px;
 }
 
+.modal.bookmark-fmt-modal {
+  width: min(560px, 94vw);
+}
+
 .whchart__body {
   position: relative;
   display: flex;
