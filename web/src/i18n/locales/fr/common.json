@@ -811,7 +811,10 @@
     "jumpLog": {
       "title": "Journal de sauts",
       "empty": "Aucun saut enregistré pour l'instant.",
-      "total": "{{count}} sauts · ~{{mass}} masse de base",
+      "total": "{{count}} sauts · ~{{mass}}",
+      "massMode": "Mode de masse",
+      "coldTitle": "Masse de base (sans propulseur)",
+      "hotTitle": "Masse de base + propulseur ({{prop}} par vaisseau)",
       "clear": "Vider",
       "clearTitle": "Vider le journal de sauts de cette connexion",
       "unknownShip": "Vaisseau inconnu"

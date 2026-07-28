@@ -282,8 +282,24 @@
 /* Jump log: a passive, shared list of known ships that jumped this hole. Read
    only — it never drives the mass bar. Scrolls internally so a busy hole doesn't
    grow the bottom bar. */
-.jumplog__clear {
+/* Cold/Hot mass mode toggle — segmented, mirrors the roller's cold/hot idea.
+   Display-only: it recomputes the shown masses, never the connection. */
+.jumplog__mode {
   margin-left: auto;
+  display: inline-flex;
+  border: 1px solid var(--surface-overlay);
+  border-radius: 5px;
+  overflow: hidden;
+}
+.jumplog__mode-btn {
+  background: none; border: none; cursor: pointer;
+  color: var(--text-subtle);
+  font-size: calc(11px * var(--font-scale, 1));
+  padding: 1px 8px;
+}
+.jumplog__mode-btn--on { background: var(--surface-overlay); color: var(--text-default); font-weight: 600; }
+.jumplog__clear {
+  margin-left: 8px;
   background: none; border: none; cursor: pointer;
   color: var(--text-subtle);
   font-size: calc(11px * var(--font-scale, 1));

@@ -124,6 +124,10 @@ export function ConnectionPanel() {
   // Signatures on the two endpoint systems — feeds both the WH-type auto-detect
   // and the per-end "backing signature" link dropdowns below.
   const [endpointSigs, setEndpointSigs] = useState<{ src: Signature[]; tgt: Signature[] }>({ src: [], tgt: [] });
+  // Jump-log mass mode: cold = base SDE mass, hot = base + prop-mod mass (each
+  // ship's prop active), so pilots can estimate the heavier end of what went
+  // through. Display-only — never persisted, never touches the connection.
+  const [jumpHot, setJumpHot] = useState(false);
 
   // No-op the mutation calls when the user lacks topology permission. The
   // panel still renders so readonly users can inspect the connection.
@@ -698,6 +702,26 @@ export function ConnectionPanel() {
       <div className="conn-col conn-col--jumplog">
         <div className="mass-tracker__header">
           <span className="mass-tracker__label">{t('connPanel.jumpLog.title')}</span>
+          {jumps.length > 0 && (
+            <div className="jumplog__mode" role="group" aria-label={t('connPanel.jumpLog.massMode')}>
+              <button
+                type="button"
+                className={`jumplog__mode-btn${!jumpHot ? ' jumplog__mode-btn--on' : ''}`}
+                onClick={() => setJumpHot(false)}
+                title={t('connPanel.jumpLog.coldTitle')}
+              >
+                {t('connPanel.cold')}
+              </button>
+              <button
+                type="button"
+                className={`jumplog__mode-btn${jumpHot ? ' jumplog__mode-btn--on' : ''}`}
+                onClick={() => setJumpHot(true)}
+                title={t('connPanel.jumpLog.hotTitle', { prop: fmtMass(PROP_MASS) })}
+              >
+                {t('connPanel.hot')}
+              </button>
+            </div>
+          )}
           {canEdit && jumps.length > 0 && (
             <button
               type="button"
@@ -724,7 +748,10 @@ export function ConnectionPanel() {
             const to   = j.toSystemName   ?? (j.direction === 'forward' ? tgtName : srcName);
             return `${from} → ${to}`;
           };
-          const totalMass = jumps.reduce((sum, j) => sum + (j.shipMass ?? 0), 0);
+          // Hot mode adds one prop-mod's mass per ship (can't add prop to a ship
+          // whose base mass we never resolved — leave those null).
+          const shownMass = (m: number | null) => m == null ? null : (jumpHot ? m + PROP_MASS : m);
+          const totalMass = jumps.reduce((sum, j) => sum + (shownMass(j.shipMass) ?? 0), 0);
           return (
             <>
               <div className="jumplog__total">
@@ -742,7 +769,7 @@ export function ConnectionPanel() {
                         {j.shipTypeName ?? t('connPanel.jumpLog.unknownShip')}
                         {j.shipGroup ? <span className="jumplog__class"> · {j.shipGroup}</span> : null}
                       </span>
-                      <span className="jumplog__mass">{j.shipMass != null ? fmtMass(j.shipMass) : '—'}</span>
+                      <span className="jumplog__mass">{shownMass(j.shipMass) != null ? fmtMass(shownMass(j.shipMass)!) : '—'}</span>
                     </div>
                     <div className="jumplog__route">{routeOf(j)}</div>
                   </li>

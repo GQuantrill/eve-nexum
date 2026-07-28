@@ -811,7 +811,10 @@
     "jumpLog": {
       "title": "ジャンプログ",
       "empty": "まだジャンプは記録されていません。",
-      "total": "{{count}} 回のジャンプ · 約 {{mass}} 基本質量",
+      "total": "{{count}} 回のジャンプ · 約 {{mass}}",
+      "massMode": "質量モード",
+      "coldTitle": "基本質量（プロップなし）",
+      "hotTitle": "基本質量 + プロップ（艦船ごとに {{prop}}）",
       "clear": "クリア",
       "clearTitle": "この接続のジャンプログをクリア",
       "unknownShip": "不明な艦船"

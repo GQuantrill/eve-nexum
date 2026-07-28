@@ -811,7 +811,10 @@
     "jumpLog": {
       "title": "Sprungprotokoll",
       "empty": "Noch keine Sprünge aufgezeichnet.",
-      "total": "{{count}} Sprünge · ~{{mass}} Basismasse",
+      "total": "{{count}} Sprünge · ~{{mass}}",
+      "massMode": "Massenmodus",
+      "coldTitle": "Basismasse (ohne Prop-Mod)",
+      "hotTitle": "Basismasse + Prop-Mod ({{prop}} pro Schiff)",
       "clear": "Leeren",
       "clearTitle": "Sprungprotokoll dieser Verbindung leeren",
       "unknownShip": "Unbekanntes Schiff"

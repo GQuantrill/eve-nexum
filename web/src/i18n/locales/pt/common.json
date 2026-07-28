@@ -811,7 +811,10 @@
     "jumpLog": {
       "title": "Registo de saltos",
       "empty": "Ainda não há saltos registados.",
-      "total": "{{count}} saltos · ~{{mass}} massa base",
+      "total": "{{count}} saltos · ~{{mass}}",
+      "massMode": "Modo de massa",
+      "coldTitle": "Massa base (sem propulsor)",
+      "hotTitle": "Massa base + propulsor ({{prop}} por nave)",
       "clear": "Limpar",
       "clearTitle": "Limpar o registo de saltos desta ligação",
       "unknownShip": "Nave desconhecida"

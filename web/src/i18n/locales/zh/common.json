@@ -811,7 +811,10 @@
     "jumpLog": {
       "title": "跳跃日志",
       "empty": "尚未记录跳跃。",
-      "total": "{{count}} 次跳跃 · 约 {{mass}} 基础质量",
+      "total": "{{count}} 次跳跃 · 约 {{mass}}",
+      "massMode": "质量模式",
+      "coldTitle": "基础质量（无推进器）",
+      "hotTitle": "基础质量 + 推进器（每艘 {{prop}}）",
       "clear": "清空",
       "clearTitle": "清空此连接的跳跃日志",
       "unknownShip": "未知舰船"
