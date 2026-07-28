@@ -1735,6 +1735,7 @@
     "characterFallback": "Character {{id}}",
     "altLastKnown": "(last known)",
     "killsTooltip": "{{ships}} ship · {{pods}} pod kills this hour",
+    "killsTooltipHint": "CCP hourly count · killmail may not be on zKillboard yet",
     "recentKill": "Kill {{ago}}m ago ({{value}} ISK)",
     "a0Sun": "A0 sun",
     "shattered": "Shattered",

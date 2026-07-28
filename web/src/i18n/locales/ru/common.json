@@ -1703,6 +1703,7 @@
     "characterFallback": "Персонаж {{id}}",
     "altLastKnown": "(последнее изв.)",
     "killsTooltip": "{{ships}} кораблей · {{pods}} капсул убито за этот час",
+    "killsTooltipHint": "Почасовой подсчёт CCP · killmail может ещё не быть на zKillboard",
     "recentKill": "Килл {{ago}} мин назад ({{value}} ISK)",
     "a0Sun": "Звезда A0",
     "shattered": "Разрушенная",
