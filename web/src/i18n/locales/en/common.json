@@ -1297,6 +1297,7 @@
     "newMap": "+ New Map",
     "copyThisMap": "Copy this map",
     "deleteThisMap": "Delete this map",
+    "leaveThisMap": "Leave shared map",
     "name": "Name",
     "totalSystems": "Total Systems",
     "totalConnections": "Total Connections",
@@ -1323,6 +1324,7 @@
     "currentSystem": "Current system",
     "centerOnSystem": "Centre the map on {{system}}",
     "deleteMapConfirm": "Delete \"{{name}}\"? This cannot be undone.",
+    "leaveMapConfirm": "Remove \"{{name}}\" from your list? The owner can share it again later.",
     "online": {
       "offline": "Offline",
       "statusUnknown": "Status unknown",

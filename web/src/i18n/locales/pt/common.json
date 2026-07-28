@@ -1226,6 +1226,7 @@
     "mapLimitReached": "Limite de mapas atingido",
     "newMap": "+ Novo mapa",
     "deleteThisMap": "Eliminar este mapa",
+    "leaveThisMap": "Sair do mapa partilhado",
     "name": "Nome do mapa",
     "totalSystems": "Total de sistemas",
     "totalConnections": "Total de conexões",
@@ -1249,6 +1250,7 @@
     "currentSystem": "Sistema atual",
     "centerOnSystem": "Centrar o mapa em {{system}}",
     "deleteMapConfirm": "Eliminar «{{name}}»? Esta ação não pode ser desfeita.",
+    "leaveMapConfirm": "Remover «{{name}}» da tua lista? O proprietário pode partilhá-lo novamente mais tarde.",
     "online": {
       "offline": "Offline",
       "statusUnknown": "Estado desconhecido",

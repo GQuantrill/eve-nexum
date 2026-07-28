@@ -1226,6 +1226,7 @@
     "mapLimitReached": "Limite de cartes atteinte",
     "newMap": "+ Nouvelle carte",
     "deleteThisMap": "Supprimer cette carte",
+    "leaveThisMap": "Quitter la carte partagée",
     "name": "Nom de la carte",
     "totalSystems": "Total systèmes",
     "totalConnections": "Total connexions",
@@ -1249,6 +1250,7 @@
     "currentSystem": "Système actuel",
     "centerOnSystem": "Centrer la carte sur {{system}}",
     "deleteMapConfirm": "Supprimer « {{name}} » ? Cette action est irréversible.",
+    "leaveMapConfirm": "Retirer « {{name}} » de votre liste ? Le propriétaire pourra la repartager plus tard.",
     "online": {
       "offline": "Hors ligne",
       "statusUnknown": "Statut inconnu",

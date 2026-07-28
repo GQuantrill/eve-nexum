@@ -226,12 +226,17 @@ export function Toolbar() {
   const switchMap       = useMapStore((s) => s.switchMap);
   const requestFitView  = useMapStore((s) => s.requestFitView);
   const deleteMap       = useMapStore((s) => s.deleteMap);
+  const leaveShare      = useMapStore((s) => s.leaveShare);
   const mapOptionsOpen  = useMapStore((s) => s.mapOptionsOpen);
   const setMapOptionsOpen = useMapStore((s) => s.setMapOptionsOpen);
   const trackJumps      = useMapStore((s) => s.trackJumps);
   const setTrackJumps   = useMapStore((s) => s.setTrackJumps);
 
-  const atMapLimit      = maps.filter((m) => !m.isCorpMap && !m.isAllianceMap).length >= maxMaps;
+  // Personal-map cap counts only maps the caller OWNS. A map merely shared with
+  // them (sharedWithMe) has a different owner and doesn't count server-side, so
+  // exclude it here too — otherwise received shares wrongly eat into the cap and
+  // disable "+ New Map" / "Copy".
+  const atMapLimit      = maps.filter((m) => !m.isCorpMap && !m.isAllianceMap && !m.sharedWithMe).length >= maxMaps;
   const atCorpMapLimit  = corpMapCount >= maxCorpMaps;
   const { user, logout } = useAuth();
   const canEdit       = useCanEdit();
@@ -249,6 +254,9 @@ export function Toolbar() {
   // A map merely shared with you (map_shares grant, not your own / your org's) can't
   // be copied — only its owner may fork it. Hide the Copy action for those.
   const activeIsShared = !!maps.find((m) => m.id === activeMapId)?.sharedWithMe;
+  // A map shared with this character specifically (not via corp/alliance) can be
+  // dropped from their own list — gates the "Leave shared map" action below.
+  const activeCanLeave = !!maps.find((m) => m.id === activeMapId)?.canLeaveShare;
   const canManageMaps = useCanCreateMaps();
   const canManageAllianceMaps = useCanManageAllianceMaps();
   // Corp maps exist under corp OR alliance mode (a corp inside the alliance).
@@ -296,6 +304,7 @@ export function Toolbar() {
   const [showWhChart, setShowWhChart] = useState(false);
   const [showKillLog, setShowKillLog] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [leaveConfirm, setLeaveConfirm] = useState(false);
   const mapSwitcherRef = useRef<HTMLDivElement>(null);
   useClickOutside(showMaps, mapSwitcherRef, () => setShowMaps(false));
 
@@ -326,6 +335,11 @@ export function Toolbar() {
   async function handleDeleteMap() {
     if (!activeMapId) return;
     await deleteMap(activeMapId);
+  }
+
+  async function handleLeaveShare() {
+    if (!activeMapId) return;
+    await leaveShare(activeMapId);
   }
 
   // Nearest-threat chip: null unless an in-zone threat exists (the user's
@@ -450,6 +464,11 @@ export function Toolbar() {
               {canManageMaps && maps.length > 1 && !maps.find((m) => m.id === activeMapId)?.sharedWithMe && (
                 <button className="map-dropdown__item map-dropdown__item--danger" onClick={() => { setShowMaps(false); setDeleteConfirm(true); }}>
                   {t('toolbar.deleteThisMap')}
+                </button>
+              )}
+              {activeCanLeave && (
+                <button className="map-dropdown__item map-dropdown__item--danger" onClick={() => { setShowMaps(false); setLeaveConfirm(true); }}>
+                  {t('toolbar.leaveThisMap')}
                 </button>
               )}
             </div>
@@ -758,6 +777,16 @@ export function Toolbar() {
         onConfirm={async () => {
           setDeleteConfirm(false);
           await handleDeleteMap();
+        }}
+      />
+    )}
+    {leaveConfirm && (
+      <ConfirmModal
+        message={t('toolbar.leaveMapConfirm', { name: mapName })}
+        onCancel={() => setLeaveConfirm(false)}
+        onConfirm={async () => {
+          setLeaveConfirm(false);
+          await handleLeaveShare();
         }}
       />
     )}

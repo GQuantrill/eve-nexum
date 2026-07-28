@@ -1226,6 +1226,7 @@
     "mapLimitReached": "マップ上限に到達",
     "newMap": "+ 新規マップ",
     "deleteThisMap": "このマップを削除",
+    "leaveThisMap": "共有マップから退出",
     "name": "マップ名",
     "totalSystems": "総星系数",
     "totalConnections": "総接続数",
@@ -1249,6 +1250,7 @@
     "currentSystem": "現在のシステム",
     "centerOnSystem": "マップを {{system}} に移動",
     "deleteMapConfirm": "「{{name}}」を削除しますか？この操作は取り消せません。",
+    "leaveMapConfirm": "「{{name}}」をリストから削除しますか？オーナーは後で再共有できます。",
     "online": {
       "offline": "オフライン",
       "statusUnknown": "ステータス不明",

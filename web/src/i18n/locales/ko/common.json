@@ -1226,6 +1226,7 @@
     "mapLimitReached": "지도 한도 도달",
     "newMap": "+ 새 지도",
     "deleteThisMap": "이 지도 삭제",
+    "leaveThisMap": "공유된 지도 나가기",
     "name": "지도 이름",
     "totalSystems": "전체 성계",
     "totalConnections": "전체 연결",
@@ -1249,6 +1250,7 @@
     "currentSystem": "현재 성계",
     "centerOnSystem": "지도를 {{system}}(으)로 이동",
     "deleteMapConfirm": "“{{name}}”을(를) 삭제할까요? 이 작업은 취소할 수 없습니다.",
+    "leaveMapConfirm": "목록에서 “{{name}}”을(를) 제거할까요? 소유자가 나중에 다시 공유할 수 있습니다.",
     "online": {
       "offline": "오프라인",
       "statusUnknown": "상태 알 수 없음",

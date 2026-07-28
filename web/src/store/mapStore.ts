@@ -155,6 +155,9 @@ export interface MapListItem {
   /** True when this map isn't owned by the caller and isn't a corp/alliance map
    *  they belong to — i.e. it reached their list via an explicit map_shares grant. */
   sharedWithMe?: boolean;
+  /** True when the caller has a CHARACTER-scoped share grant they can self-remove
+   *  ("leave the share"). False for corp/alliance grants (org-owned — admin only). */
+  canLeaveShare?: boolean;
   locked: boolean;
   /** Owning character's name — shown in the merge picker to disambiguate maps. */
   ownerName?: string | null;
@@ -290,6 +293,7 @@ interface MapStore {
   createMap: (name?: string, isCorpMap?: boolean, isAllianceMap?: boolean, skipKspace?: boolean) => Promise<void>;
   createFromRegion: (regionId: number, name: string, isCorpMap: boolean, isAllianceMap?: boolean, skipKspace?: boolean) => Promise<void>;
   deleteMap: (id: string) => Promise<void>;
+  leaveShare: (id: string) => Promise<void>;
 
   // Map metadata
   setMapName: (name: string) => void;
@@ -732,6 +736,23 @@ export const useMapStore = create<MapStore>()((set, get) => {
 
     deleteMap: async (id) => {
       await api(`/api/maps/${id}`, { method: 'DELETE' });
+      const remaining = get().maps.filter((m) => m.id !== id);
+      set({ maps: remaining });
+      if (get().activeMapId === id) {
+        if (remaining.length > 0) {
+          await get().switchMap(remaining[0].id);
+        } else {
+          set({ map: emptyMap(), activeMapId: null });
+        }
+      }
+    },
+
+    // Recipient-side "leave shared map": drops the map from the caller's own list
+    // by deleting their personal share grant. The map itself is untouched for its
+    // owner and everyone else. Local cleanup mirrors deleteMap (remove from the
+    // list, switch away if it was active).
+    leaveShare: async (id) => {
+      await api(`/api/maps/${id}/shares/mine`, { method: 'DELETE' });
       const remaining = get().maps.filter((m) => m.id !== id);
       set({ maps: remaining });
       if (get().activeMapId === id) {
