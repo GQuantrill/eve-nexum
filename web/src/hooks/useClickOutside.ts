@@ -22,7 +22,13 @@ export function useClickOutside<T extends HTMLElement>(
   useEffect(() => {
     if (!enabled) return;
     const onDown = (e: PointerEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) cb.current();
+      if (!ref.current || ref.current.contains(e.target as Node)) return;
+      // A themed <Select>'s dropdown is portalled to <body>, so it's outside
+      // `ref` — but a click on one of its options is NOT an "outside" click for
+      // the popover that hosts the Select. Ignore it, or the host would close
+      // (unmounting the Select) before the option's mousedown applies.
+      if ((e.target as Element | null)?.closest?.('[data-select-dropdown]')) return;
+      cb.current();
     };
     document.addEventListener('pointerdown', onDown, true);
     return () => document.removeEventListener('pointerdown', onDown, true);

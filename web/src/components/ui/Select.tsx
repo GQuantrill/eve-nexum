@@ -149,6 +149,11 @@ export function Select<V extends string = string>({
           ref={dropdownRef}
           className={styles.dropdown}
           role="listbox"
+          // Portalled to <body>, so it's outside any parent popover's ref. Mark
+          // it so useClickOutside doesn't read a click on an option as "outside"
+          // and close the parent (unmounting this dropdown before the option's
+          // mousedown selects). See useClickOutside.
+          data-select-dropdown=""
           aria-label={ariaLabel}
           style={{ position: 'fixed', left: pos.left, top: pos.top, maxHeight: pos.maxHeight, minWidth: minW }}
         >
