@@ -14,7 +14,7 @@ import { audit } from '../services/audit.js';
 import { publishToMap } from '../services/mapEvents.js';
 import { streamMapEvents } from '../services/mapStream.js';
 import { listVisibleMaps, loadFullMap, loadSystemSignatures, loadSystemAnomalies, loadSystemStructures, CONNECTION_COLS } from '../services/mapRead.js';
-import { listConnectionJumps, recordConnectionJump, clearConnectionJumps } from '../services/connectionJumps.js';
+import { listConnectionJumps, recordConnectionJump, setConnectionJumpHot, clearConnectionJumps } from '../services/connectionJumps.js';
 import {
   createSignature, updateSignature, deleteSignature,
   createAnomaly, updateAnomaly, deleteAnomaly,
@@ -2710,6 +2710,23 @@ mapsRouter.post('/:mapId/connections/:connectionId/jumps', async (req, res) => {
   });
   publishToMap(mapId, { type: 'jump.logged', actor: req.get('x-client-id') ?? null, connectionId, jump });
   res.status(201).json(jump);
+});
+
+// PATCH one logged crossing — currently just the hot/cold flag, set by a viewer
+// who knows whether that pilot's prop was active. Content-level write.
+mapsRouter.patch('/:mapId/connections/:connectionId/jumps/:jumpId', async (req, res) => {
+  const { mapId, connectionId, jumpId } = req.params;
+  if (!UUID_RE.test(jumpId)) { res.status(404).json({ error: 'Jump not found' }); return; }
+  const access = await requireMapContentWrite(res, mapId, req);
+  if (!access) return;
+  if (!(await verifyConnectionInMap(res, connectionId, mapId))) return;
+
+  const hot = (req.body as { hot?: unknown }).hot;
+  if (typeof hot !== 'boolean') { res.status(400).json({ error: 'hot must be a boolean' }); return; }
+  const jump = await setConnectionJumpHot(jumpId, connectionId, mapId, hot);
+  if (!jump) { res.status(404).json({ error: 'Jump not found' }); return; }
+  publishToMap(mapId, { type: 'jump.updated', actor: req.get('x-client-id') ?? null, connectionId, jump });
+  res.json(jump);
 });
 
 mapsRouter.delete('/:mapId/connections/:connectionId/jumps', async (req, res) => {

@@ -76,6 +76,9 @@ export function useMapEventStream(): void {
             // crossing (no optimistic add on the poster). Never touches mass.
             useJumpLogStore.getState().recordJump(data.jump as JumpRow);
             return;
+          case 'jump.updated':
+            useJumpLogStore.getState().updateJump(data.jump as JumpRow);
+            return;
           case 'jump.cleared':
             useJumpLogStore.getState().clearConnection(data.connectionId as string);
             return;

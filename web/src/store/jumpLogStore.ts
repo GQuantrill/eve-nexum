@@ -25,12 +25,14 @@ export interface JumpRow {
   shipTypeName:   string | null;
   shipGroup:      string | null;   // ship class, e.g. "Battleship"
   shipMass:       number | null;   // base SDE mass, kg
+  hot:            boolean;         // pilot had prop active (marked by a viewer)
   jumpedAt:       number;          // epoch ms
 }
 
 interface JumpLogState {
   byConnection: Map<string, JumpRow[]>;   // newest-first per connection
   recordJump: (row: JumpRow) => void;     // one live jump (SSE)
+  updateJump: (row: JumpRow) => void;     // a jump changed (e.g. hot flag; SSE / optimistic)
   seed: (connectionId: string, rows: JumpRow[]) => void;  // REST fetch on open
   clearConnection: (connectionId: string) => void;        // log wiped (SSE / local)
   reset: () => void;                       // map switch
@@ -46,6 +48,13 @@ export const useJumpLogStore = create<JumpLogState>((set) => ({
   recordJump: (row) => set((s) => {
     const next = new Map(s.byConnection);
     next.set(row.connectionId, prependDeduped(next.get(row.connectionId) ?? [], row));
+    return { byConnection: next };
+  }),
+  updateJump: (row) => set((s) => {
+    const list = s.byConnection.get(row.connectionId);
+    if (!list) return s;
+    const next = new Map(s.byConnection);
+    next.set(row.connectionId, list.map((j) => (j.id === row.id ? row : j)));
     return { byConnection: next };
   }),
   seed: (connectionId, rows) => set((s) => {

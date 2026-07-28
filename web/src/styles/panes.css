@@ -282,28 +282,33 @@
 /* Jump log: a passive, shared list of known ships that jumped this hole. Read
    only — it never drives the mass bar. Scrolls internally so a busy hole doesn't
    grow the bottom bar. */
-/* Cold/Hot mass mode toggle — segmented, mirrors the roller's cold/hot idea.
-   Display-only: it recomputes the shown masses, never the connection. */
-.jumplog__mode {
-  margin-left: auto;
-  display: inline-flex;
-  border: 1px solid var(--surface-overlay);
-  border-radius: 5px;
-  overflow: hidden;
-}
-.jumplog__mode-btn {
-  background: none; border: none; cursor: pointer;
-  color: var(--text-subtle);
-  font-size: calc(11px * var(--font-scale, 1));
-  padding: 1px 8px;
-}
-.jumplog__mode-btn--on { background: var(--surface-overlay); color: var(--text-default); font-weight: 600; }
 .jumplog__clear {
-  margin-left: 8px;
+  margin-left: auto;
   background: none; border: none; cursor: pointer;
   color: var(--text-subtle);
   font-size: calc(11px * var(--font-scale, 1));
   padding: 0 2px;
+}
+/* Per-jump Cold/Hot marker: a viewer flips it once they know whether that pilot's
+   prop was active, and that jump's mass counts base (cold) or base + prop (hot).
+   Button when you can edit, static badge otherwise. */
+.jumplog__hot-btn, .jumplog__hot-badge {
+  font-size: calc(10px * var(--font-scale, 1));
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 0 6px;
+  border-radius: 4px;
+  border: 1px solid var(--surface-overlay);
+  color: var(--text-subtle);
+  white-space: nowrap;
+}
+.jumplog__hot-btn { cursor: pointer; background: none; }
+.jumplog__hot-btn:hover { border-color: var(--text-subtle); }
+.jumplog__hot-btn--hot, .jumplog__hot-badge--hot {
+  color: var(--cv-conn-expired);
+  border-color: color-mix(in srgb, var(--cv-conn-expired) 55%, transparent);
+  background: color-mix(in srgb, var(--cv-conn-expired) 12%, transparent);
 }
 .jumplog__clear:hover { color: var(--cv-conn-expired); text-decoration: underline; }
 .jumplog__total {
@@ -329,7 +334,7 @@
 .jumplog__ship  { font-size: calc(12px * var(--font-scale, 1)); color: var(--text-default); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .jumplog__class { color: var(--text-subtle); }
 .jumplog__mass  { font-size: calc(12px * var(--font-scale, 1)); color: var(--text-subtle); font-variant-numeric: tabular-nums; white-space: nowrap; }
-.jumplog__route { margin-top: 3px; font-size: calc(11px * var(--font-scale, 1)); color: var(--text-subtle); }
+.jumplog__route { font-size: calc(11px * var(--font-scale, 1)); color: var(--text-subtle); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 /* Per-end "backing signature" link controls in the connection panel. */
 .conn-siglink {

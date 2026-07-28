@@ -339,15 +339,17 @@ export async function migrate() {
       ship_type_name TEXT,
       ship_group     TEXT,                       -- ship class, e.g. "Battleship"
       ship_mass      BIGINT,                     -- base SDE mass, kg
+      hot            BOOLEAN     NOT NULL DEFAULT FALSE,  -- pilot had prop active (known by a viewer)
       jumped_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
-    -- from/to system columns were added after the table's first cut — CREATE TABLE
-    -- IF NOT EXISTS won't add them to a DB that already has the table, so ALTER
-    -- them in idempotently (no-op on a fresh DB where CREATE already made them).
+    -- Columns added after the table's first cut — CREATE TABLE IF NOT EXISTS won't
+    -- add them to a DB that already has the table, so ALTER them in idempotently
+    -- (no-op on a fresh DB where CREATE already made them).
     ALTER TABLE map_connection_jumps ADD COLUMN IF NOT EXISTS from_eve_system_id INTEGER;
     ALTER TABLE map_connection_jumps ADD COLUMN IF NOT EXISTS to_eve_system_id   INTEGER;
     ALTER TABLE map_connection_jumps ADD COLUMN IF NOT EXISTS from_system_name   TEXT;
     ALTER TABLE map_connection_jumps ADD COLUMN IF NOT EXISTS to_system_name     TEXT;
+    ALTER TABLE map_connection_jumps ADD COLUMN IF NOT EXISTS hot BOOLEAN NOT NULL DEFAULT FALSE;
 
     -- Cosmic anomalies (no scanning required — already 100% on the probe
     -- scanner). Separate from map_signatures: anomalies have no wormhole

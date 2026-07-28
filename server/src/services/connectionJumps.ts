@@ -21,6 +21,7 @@ export interface JumpRow {
   shipTypeName:   string | null;
   shipGroup:      string | null;   // ship class, e.g. "Battleship"
   shipMass:       number | null;   // base SDE mass, kg
+  hot:            boolean;         // pilot had prop active (marked by a viewer)
   jumpedAt:       number;          // epoch ms
 }
 
@@ -38,6 +39,7 @@ const SELECT_COLS = `
   ship_type_name AS "shipTypeName",
   ship_group     AS "shipGroup",
   ship_mass::float8 AS "shipMass",
+  hot,
   (EXTRACT(EPOCH FROM jumped_at) * 1000)::float8 AS "jumpedAt"
 `;
 
@@ -119,6 +121,21 @@ export async function recordConnectionJump(input: RecordJumpInput): Promise<Jump
     ],
   );
   return rows[0];
+}
+
+// Mark one logged crossing hot/cold (a viewer knows the pilot's prop was on/off).
+// Scoped to the map so a stray jump id can't be flipped cross-map. Returns the
+// updated row for broadcast, or null if the id isn't on this connection/map.
+export async function setConnectionJumpHot(
+  jumpId: string, connectionId: string, mapId: string, hot: boolean,
+): Promise<JumpRow | null> {
+  const { rows } = await db.query<JumpRow>(
+    `UPDATE map_connection_jumps SET hot = $1
+      WHERE id = $2 AND connection_id = $3 AND map_id = $4
+      RETURNING ${SELECT_COLS}`,
+    [hot, jumpId, connectionId, mapId],
+  );
+  return rows[0] ?? null;
 }
 
 // Wipe a connection's jump log (e.g. a fleet clears it after collapsing a hole).
