@@ -812,7 +812,6 @@
       "title": "점프 기록",
       "empty": "아직 기록된 점프가 없습니다.",
       "total": "{{count}}회 점프 · 약 {{mass}}",
-      "massMode": "질량 모드",
       "coldTitle": "기본 질량 (프롭 모드 없음)",
       "hotTitle": "기본 질량 + 프롭 모드 (함선당 {{prop}})",
       "clear": "지우기",

@@ -1,7 +1,7 @@
 {
   "name": "nexum-web",
   "private": true,
-  "version": "3.18.0",
+  "version": "3.18.1",
   "license": "AGPL-3.0-or-later",
   "type": "module",
   "author": {
@@ -51,6 +51,8 @@
     "vite": "^8.0.10"
   },
   "resolutions": {
-    "@babel/core": "^7.29.6"
+    "@babel/core": "^7.29.6",
+    "brace-expansion": "^5.0.7",
+    "postcss": "^8.5.18"
   }
 }
