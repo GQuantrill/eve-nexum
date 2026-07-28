@@ -211,62 +211,89 @@ async function processKill(body: EphemeralKill): Promise<void> {
   };
   recordKill(buffered);
 
-  // Live path: only decorate + forward when a map is actually being watched AND
-  // the kill is in one of its systems.
+  // Two independent outputs:
+  //  - SSE flash + log: only for maps a client is CURRENTLY watching (no point
+  //    pushing to a disconnected browser).
+  //  - Discord: fires SERVER-SIDE regardless of viewers — the whole point of the
+  //    webhook is to reach people who don't have the map open.
   const live = activeMapIds();
-  if (!live.length) return;
+  const anyHooks = await anyKillWebhooks();
+  if (!live.length && !anyHooks) return; // nothing to do this kill
 
-  const { rows } = await db.query<{ mapId: string }>(
-    `SELECT DISTINCT map_id AS "mapId"
-       FROM map_systems
-      WHERE eve_system_id = $1 AND map_id = ANY($2::uuid[])`,
-    [solarSystemId, live],
-  );
-  if (!rows.length) return;
+  // Watched maps containing this system (SSE targets).
+  const liveMaps: string[] = live.length
+    ? (await db.query<{ mapId: string }>(
+        `SELECT DISTINCT map_id AS "mapId"
+           FROM map_systems WHERE eve_system_id = $1 AND map_id = ANY($2::uuid[])`,
+        [solarSystemId, live],
+      )).rows.map((r) => r.mapId)
+    : [];
+
+  // Corp/alliance maps containing this system that have a kill webhook — viewers
+  // irrelevant. Deduped to distinct (webhook, min-ISK) pairs.
+  const hooks = anyHooks
+    ? (await db.query<{ killWebhook: string; killMinIsk: string }>(
+        `SELECT DISTINCT COALESCE(cds.kill_webhook, ads.kill_webhook)    AS "killWebhook",
+                COALESCE(cds.kill_min_isk, ads.kill_min_isk, 0) AS "killMinIsk"
+           FROM map_systems ms
+           JOIN maps m ON m.id = ms.map_id
+           LEFT JOIN corp_discord_settings     cds ON cds.corp_id     = m.corp_id
+           LEFT JOIN alliance_discord_settings ads ON ads.alliance_id = m.alliance_id
+          WHERE ms.eve_system_id = $1
+            AND COALESCE(cds.kill_webhook, ads.kill_webhook) IS NOT NULL`,
+        [solarSystemId],
+      )).rows
+    : [];
+
+  if (!liveMaps.length && !hooks.length) return;
 
   const killRow = await buildKillRow(buffered);
 
-  for (const { mapId } of rows) {
+  for (const mapId of liveMaps) {
     publishToMap(mapId, { type: 'kill.recent', actor: null, ...killRow });
   }
-  stats.forwarded++;
-  log.info(`forwarded kill in ${killRow.systemName} (${Math.round(totalValue / 1e6)}M ISK) -> ${rows.length} map(s)`);
+  if (liveMaps.length) {
+    stats.forwarded++;
+    log.info(`forwarded kill in ${killRow.systemName} (${Math.round(totalValue / 1e6)}M ISK) -> ${liveMaps.length} map(s)`);
+  }
 
-  // Corp/alliance Discord kill alert for the matched maps (opt-in per org).
-  await dispatchDiscord(rows.map((r) => r.mapId), killRow);
+  dispatchDiscord(hooks, killRow);
 }
 
 // Send a Discord kill alert to the webhook of each matched corp/alliance map
 // that has one configured and whose per-org min-ISK the kill clears. Dedupes by
 // URL so two maps sharing a webhook get a single message. Best-effort — a webhook
 // lookup failure is logged and swallowed, never breaking the poll loop.
-async function dispatchDiscord(mapIds: string[], kill: KillRow): Promise<void> {
-  if (!mapIds.length) return;
-  try {
-    const { rows } = await db.query<{ killWebhook: string | null; killMinIsk: string }>(
-      `SELECT COALESCE(cds.kill_webhook, ads.kill_webhook)      AS "killWebhook",
-              COALESCE(cds.kill_min_isk, ads.kill_min_isk, 0)   AS "killMinIsk"
-         FROM maps m
-         LEFT JOIN corp_discord_settings     cds ON cds.corp_id     = m.corp_id
-         LEFT JOIN alliance_discord_settings ads ON ads.alliance_id = m.alliance_id
-        WHERE m.id = ANY($1::uuid[])`,
-      [mapIds],
-    );
-    const sent = new Set<string>();
-    for (const r of rows) {
-      if (!r.killWebhook || sent.has(r.killWebhook)) continue;
-      if (kill.totalValue < Number(r.killMinIsk)) continue;
-      sent.add(r.killWebhook);
-      notifyDiscord(r.killWebhook, killEmbed(kill));
-    }
-    // Diagnostic: explains why a forwarded kill did/didn't post to Discord.
-    // 0 matched-with-webhook => the map is personal, or the URL isn't in that
-    // org's *Kill* field. webhooks but 0 dispatched => below the org kill_min_isk.
-    const withHook = rows.filter((r) => r.killWebhook).length;
-    log.info(`kill Discord: ${rows.length} matched map(s), ${withHook} with a kill webhook, dispatched to ${sent.size}`);
-  } catch (err) {
-    log.warn('kill Discord dispatch failed:', err instanceof Error ? err.message : err);
+function dispatchDiscord(hooks: { killWebhook: string; killMinIsk: string }[], kill: KillRow): void {
+  const sent = new Set<string>();
+  for (const h of hooks) {
+    if (sent.has(h.killWebhook)) continue;
+    if (kill.totalValue < Number(h.killMinIsk)) continue;
+    sent.add(h.killWebhook);
+    notifyDiscord(h.killWebhook, killEmbed(kill)); // SSRF-guarded + queued inside
   }
+  if (sent.size) log.info(`kill Discord: dispatched to ${sent.size} webhook(s) for ${kill.systemName}`);
+}
+
+// Cheap cached "does any org have a kill webhook?" — so a deployment that doesn't
+// use Discord kill alerts pays nothing per kill (no map lookup at all). Refreshed
+// at most once a minute; a newly-added webhook takes effect within ~60s.
+let hooksCheckedAt = 0;
+let hooksPresent = false;
+async function anyKillWebhooks(): Promise<boolean> {
+  const now = Date.now();
+  if (now - hooksCheckedAt < 60_000) return hooksPresent;
+  try {
+    const { rows } = await db.query<{ present: boolean }>(
+      `SELECT (EXISTS(SELECT 1 FROM corp_discord_settings     WHERE kill_webhook IS NOT NULL)
+            OR EXISTS(SELECT 1 FROM alliance_discord_settings WHERE kill_webhook IS NOT NULL)) AS present`,
+    );
+    hooksPresent = !!rows[0]?.present;
+    hooksCheckedAt = now;
+  } catch (err) {
+    log.warn('kill Discord webhook check failed:', err instanceof Error ? err.message : err);
+  }
+  return hooksPresent;
 }
 
 let running = false;
