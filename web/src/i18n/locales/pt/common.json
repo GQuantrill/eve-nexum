@@ -808,6 +808,14 @@
     "undoPass": "Anular passagem",
     "reset": "Reiniciar",
     "otherShips": "Outras naves que passaram",
+    "jumpLog": {
+      "title": "Registo de saltos",
+      "empty": "Ainda não há saltos registados.",
+      "total": "{{count}} saltos · ~{{mass}} massa base",
+      "clear": "Limpar",
+      "clearTitle": "Limpar o registo de saltos desta ligação",
+      "unknownShip": "Nave desconhecida"
+    },
     "noMassData": "Sem dados de massa para o tipo «{{type}}».",
     "enterWhType": "Introduz um tipo de buraco de minhoca acima para ativar o seguimento de massa.",
     "collapseConfirm": "Esta passagem (+{{mass}}) provavelmente colapsará o buraco.",

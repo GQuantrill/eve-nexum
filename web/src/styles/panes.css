@@ -277,6 +277,43 @@
 }
 .conn-col--flag   { min-width: 150px; }
 .conn-col--roller { min-width: 300px; }
+.conn-col--jumplog { min-width: 260px; max-width: 320px; }
+
+/* Jump log: a passive, shared list of known ships that jumped this hole. Read
+   only — it never drives the mass bar. Scrolls internally so a busy hole doesn't
+   grow the bottom bar. */
+.jumplog__clear {
+  margin-left: auto;
+  background: none; border: none; cursor: pointer;
+  color: var(--text-subtle);
+  font-size: calc(11px * var(--font-scale, 1));
+  padding: 0 2px;
+}
+.jumplog__clear:hover { color: var(--cv-conn-expired); text-decoration: underline; }
+.jumplog__total {
+  font-size: calc(12px * var(--font-scale, 1));
+  color: var(--text-subtle);
+  font-variant-numeric: tabular-nums;
+}
+.jumplog__list {
+  list-style: none; margin: 0; padding: 0;
+  display: flex; flex-direction: column; gap: 6px;
+  max-height: 168px; overflow-y: auto;
+}
+.jumplog__row {
+  padding: 5px 7px;
+  border: 1px solid var(--surface-overlay);
+  border-radius: 5px;
+  background: var(--surface-base);
+}
+.jumplog__line { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.jumplog__line--sub { margin-top: 2px; }
+.jumplog__pilot { font-size: calc(12px * var(--font-scale, 1)); font-weight: 600; color: var(--text-default); }
+.jumplog__time  { font-size: calc(11px * var(--font-scale, 1)); color: var(--text-subtle); white-space: nowrap; }
+.jumplog__ship  { font-size: calc(12px * var(--font-scale, 1)); color: var(--text-default); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.jumplog__class { color: var(--text-subtle); }
+.jumplog__mass  { font-size: calc(12px * var(--font-scale, 1)); color: var(--text-subtle); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.jumplog__route { margin-top: 3px; font-size: calc(11px * var(--font-scale, 1)); color: var(--text-subtle); }
 
 /* Per-end "backing signature" link controls in the connection panel. */
 .conn-siglink {

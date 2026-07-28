@@ -7,6 +7,7 @@ import { readUserSetting } from './useUserSetting';
 import { pickHandles } from '../components/map/edgeUtils';
 import { maybeConfirmWhJump } from './whJumpConfirm';
 import { prefetchStargateNeighbors, isDefiniteWormholeHop } from '../utils/stargateAdjacency';
+import { recordConnectionJump } from '../utils/recordConnectionJump';
 import type { SystemClass, WormholeEffect } from '../types';
 
 interface Box { position: { x: number; y: number } }
@@ -124,7 +125,12 @@ const isKspaceSkip = (cls: string) => KSPACE_SKIP.has(cls);
  * Shared by the live tracker below and `nexumDebug.simulateJumps`, so the
  * console debug tool drives the exact same placement code as a real jump.
  */
-export function applyJump(system: JumpSystem, prevMapSystemId: string | null, canAdd: boolean): string | null {
+/** Fired when a jump traversed a mapped connection — carries the connection and
+ *  its endpoints so a caller can log the crossing (jump log). Never affects
+ *  placement or mass. */
+export type OnConnectionJump = (info: { connId: string; fromMapSystemId: string; toMapSystemId: string }) => void;
+
+export function applyJump(system: JumpSystem, prevMapSystemId: string | null, canAdd: boolean, onJump?: OnConnectionJump): string | null {
   const { map, addSystem, addConnection, updateConnection, snapToGrid } = useMapStore.getState();
 
   let mapSystemId: string;
@@ -208,6 +214,9 @@ export function applyJump(system: JumpSystem, prevMapSystemId: string | null, ca
       toName:          system.name,
       connId:          jumpConnId,
     });
+    // Log this crossing for the jump log (wormhole connections only — the callback
+    // itself gates on the connection's gate classification). Intel only.
+    onJump?.({ connId: jumpConnId, fromMapSystemId: prevMapSystemId, toMapSystemId: mapSystemId });
   }
 
   return mapSystemId;
@@ -231,6 +240,7 @@ export function applyTrackedJump(
   prev: JumpSystem | null,
   prevMapSystemId: string | null,
   opts: { skipKspace: boolean; canAdd: boolean },
+  onJump?: OnConnectionJump,
 ): { mapSystemId: string | null; anchor: string | null | 'keep' } {
   const skip = opts.skipKspace && opts.canAdd;
   const systems = () => useMapStore.getState().map.systems;
@@ -248,7 +258,7 @@ export function applyTrackedJump(
     const viaWormhole = prev !== null && isKspaceSkip(prev.systemClass)
       && isDefiniteWormholeHop(prev.eveSystemId, curr.eveSystemId);
     if (fromJspace || viaWormhole) {
-      const mapSystemId = applyJump(curr, prevMapSystemId, true);
+      const mapSystemId = applyJump(curr, prevMapSystemId, true, onJump);
       return { mapSystemId, anchor: mapSystemId };
     }
     return { mapSystemId: systems().find((s) => s.eveSystemId === curr.eveSystemId)?.id ?? null, anchor: 'keep' };
@@ -259,11 +269,11 @@ export function applyTrackedJump(
     // we jumped from — retroactively if it was skipped — and link it to here.
     const prevOnMap = systems().find((s) => s.eveSystemId === prev.eveSystemId)?.id ?? null;
     const source = prevOnMap ?? applyJump(prev, null, true); // add the last K-space isolated
-    const mapSystemId = applyJump(curr, source, true);       // then connect it through
+    const mapSystemId = applyJump(curr, source, true, onJump); // then connect it through
     return { mapSystemId, anchor: mapSystemId };
   }
 
-  const mapSystemId = applyJump(curr, prevMapSystemId, opts.canAdd);
+  const mapSystemId = applyJump(curr, prevMapSystemId, opts.canAdd, onJump);
   return { mapSystemId, anchor: mapSystemId };
 }
 
@@ -378,7 +388,18 @@ export function useLocationTracking(enabled: boolean) {
       ? !!map.skipKspace
       : readUserSetting<boolean>('nexum.tracking.skipKspace', false);
 
-    const { mapSystemId, anchor } = applyTrackedJump(curr, prev, prevMapSystemId, { skipKspace, canAdd });
+    // Log this pilot's own wormhole crossings to the connection jump log (shared
+    // intel). Only when we know their ship; attributed to the acting character
+    // (a pinned alt or this tab's own char), verified server-side. Fires only for
+    // a real mapped connection, and never mutates mass.
+    const shipTypeId = location.ship?.typeId ?? null;
+    const onJump: OnConnectionJump | undefined = (canAdd && shipTypeId != null)
+      ? ({ connId, fromMapSystemId, toMapSystemId }) => recordConnectionJump({
+          mapId: map.id, connId, fromMapSystemId, toMapSystemId, shipTypeId, actingCharId: followedId,
+        })
+      : undefined;
+
+    const { mapSystemId, anchor } = applyTrackedJump(curr, prev, prevMapSystemId, { skipKspace, canAdd }, onJump);
     if (anchor !== 'keep') lastMapSystemId.current = anchor;
 
     if (mapSystemId === null) {

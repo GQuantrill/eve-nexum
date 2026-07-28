@@ -808,6 +808,14 @@
     "undoPass": "撤销通过",
     "reset": "重置",
     "otherShips": "其他已通过的舰船",
+    "jumpLog": {
+      "title": "跳跃日志",
+      "empty": "尚未记录跳跃。",
+      "total": "{{count}} 次跳跃 · 约 {{mass}} 基础质量",
+      "clear": "清空",
+      "clearTitle": "清空此连接的跳跃日志",
+      "unknownShip": "未知舰船"
+    },
     "noMassData": "没有类型「{{type}}」的质量数据。",
     "enterWhType": "在上方输入虫洞类型以启用质量跟踪。",
     "collapseConfirm": "这次通过（+{{mass}}）很可能坍塌该洞。",

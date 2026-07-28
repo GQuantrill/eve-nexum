@@ -808,6 +808,14 @@
     "undoPass": "통과 실행 취소",
     "reset": "재설정",
     "otherShips": "통과한 다른 함선",
+    "jumpLog": {
+      "title": "점프 기록",
+      "empty": "아직 기록된 점프가 없습니다.",
+      "total": "{{count}}회 점프 · 약 {{mass}} 기본 질량",
+      "clear": "지우기",
+      "clearTitle": "이 연결의 점프 기록 지우기",
+      "unknownShip": "알 수 없는 함선"
+    },
     "noMassData": "유형 “{{type}}”에 대한 질량 데이터가 없습니다.",
     "enterWhType": "질량 추적을 활성화하려면 위에 웜홀 유형을 입력하세요.",
     "collapseConfirm": "이 통과 (+{{mass}})로 홀이 붕괴될 가능성이 높습니다.",

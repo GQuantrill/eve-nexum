@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { mass } from '../../i18n/format';
+import { mass, timeAgo } from '../../i18n/format';
 import { useMapStore } from '../../store/mapStore';
+import { useConnectionJumps, useJumpLogStore, type JumpRow } from '../../store/jumpLogStore';
 import { useWormholeTypes } from '../../hooks/useWormholeTypes';
 import { useNow30s } from '../../hooks/useNow30s';
 import { useCanEdit } from '../../hooks/useCanEdit';
@@ -150,6 +151,21 @@ export function ConnectionPanel() {
     return () => { cancelled = true; };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conn?.id, src?.id, tgt?.id, map.id, conn?.connectionType]);
+
+  // Jump log for the selected wormhole connection. Fetched once per connection
+  // (SSE keeps it live after that via jumpLogStore). Read from the store so live
+  // `jump.logged` events update the panel without a refetch.
+  const jumps = useConnectionJumps(conn?.id ?? null);
+  useEffect(() => {
+    if (!conn || !map.id || conn.connectionType !== 'standard') return;
+    const cid = conn.id;
+    let cancelled = false;
+    api<JumpRow[]>(`/api/maps/${map.id}/connections/${cid}/jumps`)
+      .then((rows) => { if (!cancelled) useJumpLogStore.getState().seed(cid, rows); })
+      .catch(() => { /* best-effort */ });
+    return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conn?.id, conn?.connectionType, map.id]);
 
   // Auto-detect the WH type from the fetched endpoint signatures. Only fills if
   // conn.type is strictly `null` (never touched) so manual entries — including
@@ -673,6 +689,68 @@ export function ConnectionPanel() {
       ) : (
         <div className="mass-tracker__hint">{t('connPanel.enterWhType')}</div>
       )}
+      </div>
+
+      {/* Column 5 — jump log. Passive shared intel: which known ships have jumped
+          through this hole (either way), so pilots can eyeball the mass that's
+          gone through. It NEVER mutates the connection's mass — separate from the
+          rolling calculator on purpose. */}
+      <div className="conn-col conn-col--jumplog">
+        <div className="mass-tracker__header">
+          <span className="mass-tracker__label">{t('connPanel.jumpLog.title')}</span>
+          {canEdit && jumps.length > 0 && (
+            <button
+              type="button"
+              className="jumplog__clear"
+              title={t('connPanel.jumpLog.clearTitle')}
+              onClick={() => {
+                useJumpLogStore.getState().clearConnection(conn.id);
+                void api(`/api/maps/${map.id}/connections/${conn.id}/jumps`, { method: 'DELETE' }).catch(() => {});
+              }}
+            >
+              {t('connPanel.jumpLog.clear')}
+            </button>
+          )}
+        </div>
+        {jumps.length === 0 ? (
+          <div className="mass-tracker__hint">{t('connPanel.jumpLog.empty')}</div>
+        ) : (() => {
+          const srcName = src ? systemDisplayName(src) : '?';
+          const tgtName = tgt ? systemDisplayName(tgt) : '?';
+          // Prefer each row's own stored from/to (self-describing); fall back to
+          // the live connection endpoints via the direction flag for older rows.
+          const routeOf = (j: JumpRow) => {
+            const from = j.fromSystemName ?? (j.direction === 'forward' ? srcName : tgtName);
+            const to   = j.toSystemName   ?? (j.direction === 'forward' ? tgtName : srcName);
+            return `${from} → ${to}`;
+          };
+          const totalMass = jumps.reduce((sum, j) => sum + (j.shipMass ?? 0), 0);
+          return (
+            <>
+              <div className="jumplog__total">
+                {t('connPanel.jumpLog.total', { count: jumps.length, mass: fmtMass(totalMass) })}
+              </div>
+              <ul className="jumplog__list">
+                {jumps.map((j) => (
+                  <li key={j.id} className="jumplog__row">
+                    <div className="jumplog__line">
+                      <span className="jumplog__pilot">{j.characterName ?? '—'}</span>
+                      <span className="jumplog__time">{timeAgo(t, j.jumpedAt)}</span>
+                    </div>
+                    <div className="jumplog__line jumplog__line--sub">
+                      <span className="jumplog__ship">
+                        {j.shipTypeName ?? t('connPanel.jumpLog.unknownShip')}
+                        {j.shipGroup ? <span className="jumplog__class"> · {j.shipGroup}</span> : null}
+                      </span>
+                      <span className="jumplog__mass">{j.shipMass != null ? fmtMass(j.shipMass) : '—'}</span>
+                    </div>
+                    <div className="jumplog__route">{routeOf(j)}</div>
+                  </li>
+                ))}
+              </ul>
+            </>
+          );
+        })()}
       </div>
 
       {pendingPass && (
