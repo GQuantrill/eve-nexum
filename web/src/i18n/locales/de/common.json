@@ -302,7 +302,7 @@
       "saveFailed": "Speichern fehlgeschlagen",
       "updateFailed": "Aktualisierung fehlgeschlagen",
       "noCorp": "Kein Corp-Kontext — Discord-Benachrichtigungen gelten nur für Corp-Karten.",
-      "hint": "Legt fest, welche Wurmloch-Benachrichtigungen die Karten dieser Corp an Discord senden. Der Webhook selbst wird serverseitig gesetzt (DISCORD_WEBHOOK_URL). Standardmäßig benachrichtigt jede Karte und Region — diese Einstellungen schränken nur ein.",
+      "hint": "Legt fest, was die Karten dieser Corp an Discord senden. Die Webhook-URLs werden in diesem Tab gesetzt — lass eine leer, um die jeweilige Benachrichtigung zu deaktivieren. Standardmäßig benachrichtigt jede Karte und Region; diese Filter schränken nur ein.",
       "regions": "Regionen",
       "notifyAll": "Für alle Regionen benachrichtigen",
       "notifySelected": "Nur ausgewählte Regionen",
@@ -333,7 +333,9 @@
       "excludedHint": "Alle Karten benachrichtigen standardmäßig. Hake eine Karte an, um sie von Discord auszuschließen.",
       "noCorpMaps": "Noch keine Corp-Karten.",
       "colMap": "Karte",
-      "colExclude": "Ausschließen"
+      "colExclude": "Ausschließen",
+      "killWebhook": "Kill-Webhook",
+      "killMinIsk": "Mindest-ISK"
     },
     "roles": {
       "button": "Rollen?",
@@ -1056,6 +1058,7 @@
   "killboard": {
     "hoursMinutesAgo": "vor {{hours}}h {{minutes}}m",
     "viewKillmail": "Killmail auf zKillboard ansehen",
+    "live": "Live",
     "soloKill": "Solo-Kill",
     "gank": "Gank — {{count}} Angreifer",
     "attackers": "{{count}} Angreifer",
@@ -1662,6 +1665,7 @@
     "characterFallback": "Charakter {{id}}",
     "altLastKnown": "(zuletzt bekannt)",
     "killsTooltip": "{{ships}} Schiff · {{pods}} Pod-Kills diese Stunde",
+    "recentKill": "Kill vor {{ago}} Min. ({{value}} ISK)",
     "a0Sun": "A0-Sonne",
     "shattered": "Zerschmettert",
     "iceBelt": "Eisgürtel-System",
@@ -1781,5 +1785,17 @@
     "typePersonal": "Persönlich",
     "typeCorp": "Corp",
     "typeAlliance": "Allianz"
+  },
+  "killLog": {
+    "title": "Kill-Log",
+    "tooltip": "Aktuelle Kills auf dieser Karte",
+    "empty": "Keine aktuellen Kills",
+    "loading": "Kills werden geladen...",
+    "error": "Kills konnten nicht geladen werden",
+    "viewOnZkb": "Auf zKillboard ansehen",
+    "showOnMap": "Auf Karte zeigen",
+    "unknown": "Unbekannt",
+    "unknownShip": "Unbekanntes Schiff",
+    "ago": "vor {{d}}"
   }
 }

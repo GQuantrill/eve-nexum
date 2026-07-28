@@ -351,7 +351,7 @@
       "saveFailed": "Save failed",
       "updateFailed": "Update failed",
       "noCorp": "No corp context — Discord notifications apply to corp maps only.",
-      "hint": "Controls which wormhole notifications this corp's maps post to Discord. The webhook itself is set server-side (DISCORD_WEBHOOK_URL). By default every map and region notifies — these settings only subtract.",
+      "hint": "Controls what this corp's maps post to Discord. Webhook URLs are set in this tab — leave one blank to disable that alert. By default every map and region notifies; these filters only subtract.",
       "regions": "Regions",
       "notifyAll": "Notify for all regions",
       "notifySelected": "Only selected regions",
@@ -382,7 +382,9 @@
       "excludedHint": "All maps notify by default. Tick a map to exclude it from Discord.",
       "noCorpMaps": "No corp maps yet.",
       "colMap": "Map",
-      "colExclude": "Exclude"
+      "colExclude": "Exclude",
+      "killWebhook": "Kill webhook",
+      "killMinIsk": "Minimum ISK"
     }
   },
   "proximityOptIn": {
@@ -1126,6 +1128,7 @@
   "killboard": {
     "hoursMinutesAgo": "{{hours}}h {{minutes}}m ago",
     "viewKillmail": "View killmail on zKillboard",
+    "live": "Live",
     "soloKill": "Solo kill",
     "gank": "Gank — {{count}} attackers",
     "attackers": "{{count}} attackers",
@@ -1732,6 +1735,7 @@
     "characterFallback": "Character {{id}}",
     "altLastKnown": "(last known)",
     "killsTooltip": "{{ships}} ship · {{pods}} pod kills this hour",
+    "recentKill": "Kill {{ago}}m ago ({{value}} ISK)",
     "a0Sun": "A0 sun",
     "shattered": "Shattered",
     "iceBelt": "Ice belt system",
@@ -1781,5 +1785,17 @@
     "unmapped": "Unmapped hole",
     "filled": "{{sig}} now leads to {{system}}",
     "undo": "Undo"
+  },
+  "killLog": {
+    "title": "Kill Log",
+    "tooltip": "Recent kills on this map",
+    "empty": "No recent kills",
+    "loading": "Loading kills...",
+    "error": "Couldn't load kills",
+    "viewOnZkb": "View on zKillboard",
+    "showOnMap": "Show on map",
+    "unknown": "Unknown",
+    "unknownShip": "Unknown ship",
+    "ago": "{{d}} ago"
   }
 }

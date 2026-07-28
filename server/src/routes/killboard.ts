@@ -10,7 +10,7 @@ router.use(optionalAuth);
 const log = createLogger('killboard');
 
 const ZKB_AGENT    = 'Eve-Nexum/1.0 (https://github.com/GQuantrill/eve-nexum; gq@area404.org)';
-const CACHE_TTL_MS = 5 * 60 * 1000;
+const CACHE_TTL_MS = 90 * 1000; // fresher REST half now that the live feed covers the newest kills
 const FETCH_TIMEOUT_MS = 8_000;
 
 interface ZkbEntry {
@@ -126,69 +126,74 @@ async function fetchEsi(killmailId: number, hash: string): Promise<EsiKillmail |
   return promise;
 }
 
-router.get('/:systemId(\\d+)', async (req, res) => {
-  // The route pattern already constrains this to digits, but parse to a bounded
-  // integer and build the upstream URL from the NUMBER (not the raw string) so
-  // no attacker-controlled text can ever reach the outbound request (SSRF).
-  const idNum = Number(req.params.systemId);
-  if (!Number.isInteger(idNum) || idNum <= 0 || idNum > 100_000_000) {
-    return res.status(400).json({ error: 'Invalid system id' });
-  }
-  const systemId = String(idNum);
+// Fetch (and cache) every kill in a system over the past `pastSeconds`, hydrated
+// from ESI and decorated with resolved char/corp/alliance names. Shared by the
+// killboard route (24h) and the kill-log backfill (1h). SSRF-safe: the URL is
+// built from the bounded NUMBER, never raw text. Cache is keyed by
+// system:pastSeconds so the two windows don't clobber each other.
+export async function fetchSystemKills(
+  systemId: number,
+  pastSeconds: number,
+  opts: { minValueIsk?: number; maxKills?: number } = {},
+): Promise<KillEntry[]> {
+  if (!Number.isInteger(systemId) || systemId <= 0 || systemId > 100_000_000) return [];
+  const secs = Number.isInteger(pastSeconds) && pastSeconds > 0 && pastSeconds <= 604_800 ? pastSeconds : 86_400;
+  const minValueIsk = Math.max(0, opts.minValueIsk ?? 0);
+  const maxKills = opts.maxKills && opts.maxKills > 0 ? opts.maxKills : 0; // 0 = no cap
+  // Cache per (system, window, value-floor, cap) — the filtered result differs,
+  // so the killboard pane (no floor/cap) and the kill-log backfill don't collide.
+  const key = `${systemId}:${secs}:${minValueIsk}:${maxKills}`;
 
-  // Fresh cache hit — return immediately. peek() falls back to any stale entry
-  // we can still serve from when the upstream is unhappy.
-  const fresh = cache.get(systemId);
-  if (fresh) return res.json(fresh.value);
-  const stale = cache.peek(systemId);
+  const fresh = cache.get(key);
+  if (fresh) return fresh.value;
+  const stale = cache.peek(key);
 
-  // zKillboard: every kill in the past 24h, NPC flag intact on each row.
-  // We used to pass `npc/0/` to exclude NPCs at the API level, but that
-  // made the client-side toggle ineffective — the server now hands back
-  // everything and the killboard pane decides whether to render NPC kills
-  // based on the user's preference.
-  const zkbUrl = `https://zkillboard.com/api/kills/solarSystemID/${idNum}/pastSeconds/86400/`;
-  const zkbHeaders: Record<string, string> = {
-    'User-Agent': ZKB_AGENT,
-    Accept:       'application/json',
-  };
+  const zkbUrl = `https://zkillboard.com/api/kills/solarSystemID/${systemId}/pastSeconds/${secs}/`;
+  const zkbHeaders: Record<string, string> = { 'User-Agent': ZKB_AGENT, Accept: 'application/json' };
   const cachedEtag = typeof stale?.meta?.etag === 'string' ? stale.meta.etag : undefined;
   if (cachedEtag) zkbHeaders['If-None-Match'] = cachedEtag;
 
   try {
     const zkbRes = await fetch(zkbUrl, { headers: zkbHeaders, signal: withTimeout(FETCH_TIMEOUT_MS) });
 
-    // zKillboard says nothing changed — refresh the TTL on the existing entry
-    // and return it.
+    // Nothing changed — refresh the TTL on the existing entry and return it.
     if (zkbRes.status === 304 && stale) {
-      cache.set(systemId, stale.value, stale.meta);
-      return res.json(stale.value);
+      cache.set(key, stale.value, stale.meta);
+      return stale.value;
     }
-
     if (!zkbRes.ok) {
-      if (stale) return res.json(stale.value);
+      if (stale) return stale.value;
       log.warn(`zKillboard returned ${zkbRes.status} for system ${systemId}`);
-      return res.json([]);
+      return [];
     }
 
     const zkbBody = (await zkbRes.json()) as ZkbEntry[];
-
     if (!Array.isArray(zkbBody)) {
-      if (stale) return res.json(stale.value);
+      if (stale) return stale.value;
       log.warn(`Unexpected response from zKillboard for system ${systemId}`);
-      return res.json([]);
+      return [];
     }
 
     const etag = zkbRes.headers.get('etag') ?? undefined;
 
-    // Fetch full killmail details from ESI in parallel. ESI concurrency is
-    // capped at ESI_MAX_CONCURRENT so a busy system (Jita, active null)
-    // queues rather than thundering CCP.
-    const esiResults = await Promise.all(
-      zkbBody.map((k) => fetchEsi(k.killmail_id, k.zkb.hash)),
-    );
+    // Filter by value and cap to the newest N BEFORE hydrating. The zKill list
+    // already carries zkb.totalValue, and killmail_id is monotonic with time, so
+    // we only pay an ESI call for kills we actually keep. Without this a busy
+    // region (e.g. The Forge) hydrates thousands of cheap kills per open, trips
+    // ESI/zKill rate limits, and falls back to stale data — dropping the newest
+    // kills, differently each run. Defaults (floor 0, no cap) = pane unchanged.
+    let wanted = minValueIsk > 0
+      ? zkbBody.filter((k) => (k.zkb?.totalValue ?? 0) >= minValueIsk)
+      : zkbBody;
+    if (maxKills > 0 && wanted.length > maxKills) {
+      wanted = [...wanted].sort((a, b) => b.killmail_id - a.killmail_id).slice(0, maxKills);
+    }
 
-    const kills = zkbBody
+    // Hydrate full killmails from ESI in parallel (capped at ESI_MAX_CONCURRENT
+    // so a busy system queues rather than thundering CCP).
+    const esiResults = await Promise.all(wanted.map((k) => fetchEsi(k.killmail_id, k.zkb.hash)));
+
+    const kills = wanted
       .map((zkb, i) => {
         const esi = esiResults[i];
         if (!esi) return null;
@@ -210,9 +215,7 @@ router.get('/:systemId(\\d+)', async (req, res) => {
       })
       .filter((k): k is KillEntry => k !== null);
 
-    // Resolve every char/corp/alliance ID in one batch and decorate the
-    // entries in-place with human names. Cache hits stay zero-cost; misses
-    // pay one bounded ESI call per unique missing entity, ever.
+    // Resolve every char/corp/alliance ID in one batch and decorate in place.
     const nameIds: number[] = [];
     for (const k of kills) {
       nameIds.push(k.victim.character_id!, k.victim.corporation_id!, k.victim.alliance_id!);
@@ -232,13 +235,23 @@ router.get('/:systemId(\\d+)', async (req, res) => {
       }
     }
 
-    cache.set(systemId, kills, etag ? { etag } : undefined);
-    return res.json(kills);
+    cache.set(key, kills, etag ? { etag } : undefined);
+    return kills;
   } catch (err) {
     log.warn(`Failed to reach zKillboard for system ${systemId}:`, (err as Error).message);
-    if (stale) return res.json(stale.value);
-    return res.json([]);
+    if (stale) return stale.value;
+    return [];
   }
+}
+
+router.get('/:systemId(\\d+)', async (req, res) => {
+  // The route pattern already constrains this to digits, but parse to a bounded
+  // integer so no attacker-controlled text can ever reach the outbound request.
+  const idNum = Number(req.params.systemId);
+  if (!Number.isInteger(idNum) || idNum <= 0 || idNum > 100_000_000) {
+    return res.status(400).json({ error: 'Invalid system id' });
+  }
+  return res.json(await fetchSystemKills(idNum, 86_400));
 });
 
 // GET /:systemId/last — the timestamp of the most recent kill in the system,

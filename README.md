@@ -27,6 +27,7 @@
   - [One-command deploy scripts](#one-command-deploy-scripts)
   - [Updating the SDE](#updating-the-sde)
   - [Refreshing wormhole types](#refreshing-wormhole-types)
+  - [Live kill feed](#live-kill-feed-opt-in)
   - [Upgrading an existing deployment](#upgrading-an-existing-deployment)
   - [Backup & restore](#backup--restore)
 - [Corp & alliance mode](#corp--alliance-mode)
@@ -484,6 +485,22 @@ docker compose build server && docker compose up -d
 
 See [Static data files](#static-data-files) for what `extract-wormholes` does and the fields involved.
 
+#### Live kill feed (opt-in)
+
+Flags recent high-value kills on your mapped systems and feeds a **Kill Log** panel (top-bar skull icon). A single server-side consumer reads zKillboard's live **R2Z2 ephemeral** feed; for a kill at or above a value threshold in a system on a *currently-viewed* map, it pulses that system's node and prepends a row to the log. It also keeps a rolling in-memory buffer of recent high-value kills, and opening the log **backfills from that buffer** (filtered to the map's systems) — no extra zKillboard requests, so it scales to any map size. Corp/alliance maps can additionally push kills to a Discord webhook (**Admin → Discord**).
+
+**Off by default.** Enable and tune via `.env`:
+
+| Variable | Default | Effect |
+|---|---|---|
+| `KILL_FEED` | `0` (off) | Set to `1` to run the consumer. While off the whole feature is inert — nothing flashes and the Kill Log stays empty (the buffer is only filled by the running consumer). |
+| `KILL_FEED_CONTACT` | — | A reachable contact (email or URL) — it builds the zKillboard `User-Agent`. Required by zKill fair-use; a blank UA is Cloudflare-blocked. |
+| `KILL_FEED_MIN_ISK` | `50000000` | Only kills at or above this ISK value are flagged, logged, and buffered. |
+| `KILL_FEED_RECENT_SECONDS` | `900` (15 min) | How long a node stays flagged after a kill lands there. |
+| `KILL_FEED_BACKFILL_SECONDS` | `10800` (3 h) | How long the in-memory buffer retains kills — i.e. how far back the Kill Log shows on open. |
+
+Fair-use: the consumer is a single poller that stays under zKill's 15 req/s limit and waits ~10 s between checks when the feed is caught up. The Kill Log **backfill is served entirely from the in-memory buffer** — no per-system zKillboard requests — but it therefore only contains kills seen **since the server started**, filling in over the first few hours of uptime. On boot the consumer logs `[killFeed] live kill feed enabled …` (or `disabled …`), plus a periodic heartbeat and a line per forwarded kill (`… | grep killFeed`).
+
 #### Upgrading an existing deployment
 
 Pulling a new Nexum release into a running instance:
@@ -668,37 +685,34 @@ If you want a permanent break-glass, run a second `ADMIN_CHAR_ID`-eligible chara
 
 ### Discord notifications
 
-Set `DISCORD_WEBHOOK_URL` to push chain intel into a Discord channel so alerts reach people who aren't watching Nexum. It fires **server-side**, so it doesn't depend on anyone having the map open.
+Corp and alliance maps can push chain intel into a Discord channel so alerts reach people who aren't watching Nexum. It fires **server-side**, so it doesn't depend on anyone having the map open.
+
+**Set up in the app, not `.env`.** Webhooks are configured **per corp/alliance in the admin panel** (**Admin → Discord**) — paste a Discord webhook URL and it takes effect immediately, no restart. The URL is stored server-side, never sent to the browser, and masked in logs. There's a separate webhook per event type, so you can route each to its own channel (leave one blank to disable that type).
+
+> Create the webhook in Discord (**Channel → Edit → Integrations → Webhooks → New Webhook**), copy the URL, and paste it into the matching field in **Admin → Discord**.
 
 **What fires:**
 
+- **New connection** — a connection is drawn between two systems. When it reveals a **k-space exit** at or above a configurable minimum security, it upgrades to a routing embed (exit system/region/security, ship-size limit, jumps from home, nearest hub).
 - **Inbound K162** — a signature's wormhole type is set to K162 (something just connected into the chain).
-- **New wormhole connection** — a connection is drawn between two systems.
+- **Kills** — high-value kills in the map's systems, if the [live kill feed](#live-kill-feed-opt-in) is enabled. Each org sets its own minimum ISK.
 
 **Scope and behaviour:**
 
-- **Corp maps only.** Personal maps never notify — their scanning stays private.
+- **Corp and alliance maps only.** Personal maps never notify — their scanning stays private.
 - **Bulk operations are excluded.** Seeding a region or merging maps creates many connections at once and deliberately does *not* post to Discord; only interactive edits do.
-- **Best-effort.** A webhook failure (Discord down, timeout, rate-limit) is logged and dropped — it never affects the edit that triggered it. Delivery is paced and honours Discord's rate limits.
+- **Best-effort.** A webhook failure (Discord down, timeout, rate-limit) is logged and dropped — it never affects the edit that triggered it. Delivery is paced, honours Discord's rate limits, and only ever posts to Discord-owned webhook hosts.
 
-**Configuration** — create a webhook in your Discord channel (Channel → Edit → Integrations → Webhooks) and set the URL:
-
-```bash
-# One channel for every corp map:
-DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/123/abc
-
-# Multi-corp: route each corp to its own channel (corpId=URL, comma-separated):
-DISCORD_WEBHOOK_URL=98000001=https://discord.com/api/webhooks/1/a,98000002=https://discord.com/api/webhooks/2/b
-```
-
-The webhook URL is a secret: it lives only in the server env, is never sent to the browser, and is masked in logs. Changing it takes effect on the next server restart. Leave it unset to disable notifications entirely.
-
-**Filtering (admin).** By default every corp map and region notifies. The **Discord** tab in the admin panel lets an admin narrow this per corp, without touching the webhook:
+**Filtering (admin).** The **Discord** tab lets an admin narrow what each org notifies without touching the webhook:
 
 - **Regions** — notify for all regions (default), or only a chosen allowlist. The wormhole's system region is checked at send time; for a new connection, either endpoint's region qualifies.
+- **Wormhole type / class / size** — restrict which holes trigger the chain notifications.
 - **Excluded maps** — every map notifies by default; tick maps to exclude them.
+- **K-space exit minimum security** and **kill minimum ISK** — thresholds for the exit-routing embed and the kill alerts.
 
 These settings only ever *subtract* from the default, and new maps are always included automatically, so nothing silently goes dark.
+
+> **Legacy `DISCORD_WEBHOOK_URL`.** Superseded by the per-org settings above. If it's still set, on boot the server does a one-time seed of that URL into any org rows that don't yet have a connections webhook (fills blanks only, never overwrites) — so an old single-webhook deployment keeps working and migrates in place. Once you've confirmed your webhooks in **Admin → Discord**, remove `DISCORD_WEBHOOK_URL` from `.env`.
 
 ### Admin operations
 

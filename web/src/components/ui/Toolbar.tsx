@@ -20,6 +20,7 @@ import { LanguageSwitcher } from './LanguageSwitcher';
 import { CharacterSwitcher } from './CharacterSwitcher';
 import { HeatmapMenu } from './HeatmapMenu';
 import { WhTypeChartModal } from './WhTypeChartModal';
+import { KillLogPanel } from './KillLogPanel';
 import { useProximityAlerts } from '../../hooks/useProximityAlerts';
 import { useClickOutside } from '../../hooks/useClickOutside';
 import { useUserSetting } from '../../hooks/useUserSetting';
@@ -293,6 +294,7 @@ export function Toolbar() {
   const [showCopy, setShowCopy] = useState(false);
   const [showKeys, setShowKeys] = useState(false);
   const [showWhChart, setShowWhChart] = useState(false);
+  const [showKillLog, setShowKillLog] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const mapSwitcherRef = useRef<HTMLDivElement>(null);
   useClickOutside(showMaps, mapSwitcherRef, () => setShowMaps(false));
@@ -540,6 +542,15 @@ export function Toolbar() {
           <GraphIcon size={18} weight="regular" />
         </button>
 
+        <button
+          className="toolbar__toggle toolbar__toggle--icon toolbar__toggle--prominent"
+          onClick={() => setShowKillLog(true)}
+          data-tooltip={t('killLog.tooltip')}
+          aria-label={t('killLog.title')}
+        >
+          <SkullIcon size={18} weight="regular" />
+        </button>
+
         <HeatmapMenu />
 
         <button
@@ -739,6 +750,7 @@ export function Toolbar() {
     {showCopy && <CopyMapModal onClose={() => setShowCopy(false)} />}
     {showKeys && <ApiKeysModal onClose={() => setShowKeys(false)} />}
     {showWhChart && <WhTypeChartModal onClose={() => setShowWhChart(false)} />}
+    {showKillLog && <KillLogPanel onClose={() => setShowKillLog(false)} />}
     {deleteConfirm && (
       <ConfirmModal
         message={t('toolbar.deleteMapConfirm', { name: mapName })}

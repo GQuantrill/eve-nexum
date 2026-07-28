@@ -302,7 +302,7 @@
       "saveFailed": "Error al guardar",
       "updateFailed": "Error al actualizar",
       "noCorp": "Sin contexto de corp — las notificaciones de Discord solo aplican a mapas de corp.",
-      "hint": "Controla qué notificaciones de agujero de gusano envían a Discord los mapas de esta corp. El webhook se configura en el servidor (DISCORD_WEBHOOK_URL). Por defecto cada mapa y región notifica — estos ajustes solo restan.",
+      "hint": "Controla qué envían a Discord los mapas de esta corp. Las URL de webhook se configuran en esta pestaña — deja una en blanco para desactivar esa alerta. Por defecto cada mapa y región notifica; estos filtros solo restan.",
       "regions": "Regiones",
       "notifyAll": "Notificar para todas las regiones",
       "notifySelected": "Solo regiones seleccionadas",
@@ -333,7 +333,9 @@
       "excludedHint": "Todos los mapas notifican por defecto. Marca un mapa para excluirlo de Discord.",
       "noCorpMaps": "Aún no hay mapas de corp.",
       "colMap": "Mapa",
-      "colExclude": "Excluir"
+      "colExclude": "Excluir",
+      "killWebhook": "Webhook de bajas",
+      "killMinIsk": "ISK mínimo"
     },
     "roles": {
       "button": "¿Roles?",
@@ -1056,6 +1058,7 @@
   "killboard": {
     "hoursMinutesAgo": "hace {{hours}}h {{minutes}}m",
     "viewKillmail": "Ver killmail en zKillboard",
+    "live": "En directo",
     "soloKill": "Kill en solitario",
     "gank": "Gank — {{count}} atacantes",
     "attackers": "{{count}} atacantes",
@@ -1662,6 +1665,7 @@
     "characterFallback": "Personaje {{id}}",
     "altLastKnown": "(última conocida)",
     "killsTooltip": "{{ships}} nave · {{pods}} cápsula destruidas esta hora",
+    "recentKill": "Muerte hace {{ago}} min ({{value}} ISK)",
     "a0Sun": "Sol A0",
     "shattered": "Destrozado",
     "iceBelt": "Sistema con cinturón de hielo",
@@ -1781,5 +1785,17 @@
     "typePersonal": "Personal",
     "typeCorp": "Corp",
     "typeAlliance": "Alianza"
+  },
+  "killLog": {
+    "title": "Registro de bajas",
+    "tooltip": "Bajas recientes en este mapa",
+    "empty": "Sin bajas recientes",
+    "loading": "Cargando bajas...",
+    "error": "No se pudieron cargar las bajas",
+    "viewOnZkb": "Ver en zKillboard",
+    "showOnMap": "Mostrar en el mapa",
+    "unknown": "Desconocido",
+    "unknownShip": "Nave desconocida",
+    "ago": "hace {{d}}"
   }
 }
