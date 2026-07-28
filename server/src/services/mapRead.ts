@@ -64,6 +64,13 @@ export async function listVisibleMaps(p: VisibleMapsParams) {
               AND (m.corp_id IS NULL OR NOT m.corp_id = ANY($2::int[]))
               AND (m.alliance_id IS NULL OR NOT m.alliance_id = ANY($6::int[]))
             ) AS "sharedWithMe",
+            -- True iff the caller has an explicit CHARACTER-scoped grant (not a
+            -- corp/alliance one, which belongs to the whole org). Only these can
+            -- be self-removed via DELETE /:mapId/shares/mine.
+            EXISTS (
+              SELECT 1 FROM map_shares ms
+               WHERE ms.map_id = m.id AND ms.target_character_id = $3
+            ) AS "canLeaveShare",
             m.locked,
             ou.character_name             AS "ownerName",
             m.allow_as_merge_source       AS "allowAsMergeSource",
