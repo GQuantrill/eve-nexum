@@ -893,7 +893,6 @@
       "title": "Jump log",
       "empty": "No jumps recorded yet.",
       "total": "{{count}} jumps · ~{{mass}}",
-      "massMode": "Mass mode",
       "coldTitle": "Base mass (no prop mod)",
       "hotTitle": "Base mass + prop mod ({{prop}} per ship)",
       "clear": "Clear",
