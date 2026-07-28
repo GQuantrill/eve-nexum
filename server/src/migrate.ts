@@ -318,6 +318,39 @@ export async function migrate() {
       updated_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
 
+    -- Jump log: a passive, shared record of which known ships have physically
+    -- jumped THROUGH a wormhole connection (either direction), so pilots can
+    -- eyeball the mass that's gone through. Pure intel — it NEVER mutates the
+    -- connection's mass_used (that's the rolling calculator's separate job).
+    -- Each row is one crossing, recorded by the jumping pilot's own client.
+    -- ship_* are resolved server-side from the SDE by type id (not client-trusted).
+    CREATE TABLE IF NOT EXISTS map_connection_jumps (
+      id             UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+      connection_id  UUID        NOT NULL REFERENCES map_connections(id) ON DELETE CASCADE,
+      map_id         UUID        NOT NULL,      -- for map-scoped reads / SSE routing
+      direction      TEXT        NOT NULL DEFAULT 'forward',  -- source→target vs target→source
+      from_eve_system_id INTEGER,               -- system jumped FROM (self-describing order)
+      to_eve_system_id   INTEGER,               -- system jumped TO
+      from_system_name   TEXT,                  -- resolved server-side from solar_systems
+      to_system_name     TEXT,
+      character_id   BIGINT,                    -- EVE character id of the pilot
+      character_name TEXT,
+      ship_type_id   INTEGER,
+      ship_type_name TEXT,
+      ship_group     TEXT,                       -- ship class, e.g. "Battleship"
+      ship_mass      BIGINT,                     -- base SDE mass, kg
+      hot            BOOLEAN     NOT NULL DEFAULT FALSE,  -- pilot had prop active (known by a viewer)
+      jumped_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+    -- Columns added after the table's first cut — CREATE TABLE IF NOT EXISTS won't
+    -- add them to a DB that already has the table, so ALTER them in idempotently
+    -- (no-op on a fresh DB where CREATE already made them).
+    ALTER TABLE map_connection_jumps ADD COLUMN IF NOT EXISTS from_eve_system_id INTEGER;
+    ALTER TABLE map_connection_jumps ADD COLUMN IF NOT EXISTS to_eve_system_id   INTEGER;
+    ALTER TABLE map_connection_jumps ADD COLUMN IF NOT EXISTS from_system_name   TEXT;
+    ALTER TABLE map_connection_jumps ADD COLUMN IF NOT EXISTS to_system_name     TEXT;
+    ALTER TABLE map_connection_jumps ADD COLUMN IF NOT EXISTS hot BOOLEAN NOT NULL DEFAULT FALSE;
+
     -- Cosmic anomalies (no scanning required — already 100% on the probe
     -- scanner). Separate from map_signatures: anomalies have no wormhole
     -- type / leads-to, never back a connection, and aren't part of scan
@@ -634,6 +667,9 @@ export async function migrate() {
     CREATE INDEX IF NOT EXISTS idx_map_connections_source_sig ON map_connections (source_signature_id);
     CREATE INDEX IF NOT EXISTS idx_map_connections_target_sig ON map_connections (target_signature_id);
     CREATE INDEX IF NOT EXISTS idx_map_signatures_system ON map_signatures (system_id);
+    -- FK referencing column — Postgres doesn't auto-index it, and a connection
+    -- delete cascades to these, so index it to avoid a seq-scan per connection drop.
+    CREATE INDEX IF NOT EXISTS idx_conn_jumps_conn ON map_connection_jumps (connection_id, jumped_at DESC);
     CREATE INDEX IF NOT EXISTS idx_map_structures_system ON map_structures (system_id);
     CREATE INDEX IF NOT EXISTS idx_user_events_user      ON user_events (user_id, created_at);
     CREATE INDEX IF NOT EXISTS idx_system_activity       ON system_activity (eve_system_id, hour DESC);

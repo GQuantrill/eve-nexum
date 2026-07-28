@@ -14,6 +14,7 @@ import { audit } from '../services/audit.js';
 import { publishToMap } from '../services/mapEvents.js';
 import { streamMapEvents } from '../services/mapStream.js';
 import { listVisibleMaps, loadFullMap, loadSystemSignatures, loadSystemAnomalies, loadSystemStructures, CONNECTION_COLS } from '../services/mapRead.js';
+import { listConnectionJumps, recordConnectionJump, setConnectionJumpHot, clearConnectionJumps } from '../services/connectionJumps.js';
 import {
   createSignature, updateSignature, deleteSignature,
   createAnomaly, updateAnomaly, deleteAnomaly,
@@ -843,6 +844,18 @@ async function verifySystemInMap(res: Response, systemId: string, mapId: string)
     [systemId, mapId],
   );
   if (!rowCount) { res.status(404).json({ error: 'System not found' }); return false; }
+  return true;
+}
+
+// Confirms a connection belongs to the map (cross-map IDOR guard + malformed-uuid
+// crash guard), mirroring verifySystemInMap.
+async function verifyConnectionInMap(res: Response, connectionId: string, mapId: string): Promise<boolean> {
+  if (!UUID_RE.test(connectionId)) { res.status(404).json({ error: 'Connection not found' }); return false; }
+  const { rowCount } = await db.query(
+    `SELECT 1 FROM map_connections WHERE id = $1 AND map_id = $2`,
+    [connectionId, mapId],
+  );
+  if (!rowCount) { res.status(404).json({ error: 'Connection not found' }); return false; }
   return true;
 }
 
@@ -2632,6 +2645,100 @@ mapsRouter.delete('/:mapId/connections/:connectionId', async (req, res) => {
   res.json({ ok: true });
 });
 
+// ── Connection jump log ─────────────────────────────────────────────────────────
+// A passive, shared record of known ships that have physically jumped through a
+// connection — intel for eyeballing the mass that's gone through. It NEVER
+// mutates the connection's mass_used (that's the rolling calculator). Read is any
+// map viewer; write is content-level (mirrors signatures) so a readonly / view-only
+// share can't post. Ship name/class/base mass are resolved server-side from the
+// SDE; the pilot identity is derived from the session (or one of the caller's own
+// characters), never trusted from the body.
+
+// Resolve the acting pilot's EVE character id + name. `actingCharId` (a users.id
+// the client is following, e.g. a pinned alt) is honoured ONLY when it belongs to
+// the caller's own account, so a jump can never be attributed to someone else's
+// pilot; otherwise it falls back to the session character.
+async function resolveActingPilot(
+  sessionUserId: number, actingCharId: unknown,
+): Promise<{ characterId: number | null; characterName: string | null }> {
+  const raw = Number(actingCharId);
+  if (Number.isInteger(raw) && raw > 0 && raw !== sessionUserId) {
+    const { rows } = await db.query<{ characterId: number | null; characterName: string | null }>(
+      `SELECT character_id AS "characterId", character_name AS "characterName"
+         FROM users u
+        WHERE u.id = $1
+          AND ( u.id = $2 OR u.owner_id = (SELECT owner_id FROM users WHERE id = $2) )`,
+      [raw, sessionUserId],
+    );
+    if (rows.length) return rows[0];
+  }
+  const { rows } = await db.query<{ characterId: number | null; characterName: string | null }>(
+    `SELECT character_id AS "characterId", character_name AS "characterName" FROM users WHERE id = $1`,
+    [sessionUserId],
+  );
+  return rows[0] ?? { characterId: null, characterName: null };
+}
+
+mapsRouter.get('/:mapId/connections/:connectionId/jumps', async (req, res) => {
+  const { mapId, connectionId } = req.params;
+  const access = await getMapAccess(mapId, req);
+  if (!access) { res.status(404).json({ error: 'Map not found' }); return; }
+  if (!(await verifyConnectionInMap(res, connectionId, mapId))) return;
+  res.json(await listConnectionJumps(connectionId));
+});
+
+mapsRouter.post('/:mapId/connections/:connectionId/jumps', async (req, res) => {
+  const { mapId, connectionId } = req.params;
+  const access = await requireMapContentWrite(res, mapId, req);
+  if (!access) return;
+  if (!(await verifyConnectionInMap(res, connectionId, mapId))) return;
+
+  const body = req.body as {
+    shipTypeId?: unknown; direction?: unknown; actingCharId?: unknown;
+    fromEveSystemId?: unknown; toEveSystemId?: unknown;
+  };
+  const posInt = (v: unknown): number | null =>
+    Number.isInteger(Number(v)) && Number(v) > 0 ? Number(v) : null;
+  const shipTypeId = posInt(body.shipTypeId);
+  const direction: 'forward' | 'reverse' = body.direction === 'reverse' ? 'reverse' : 'forward';
+  const pilot = await resolveActingPilot(req.session.userId!, body.actingCharId);
+
+  const jump = await recordConnectionJump({
+    mapId, connectionId, direction,
+    fromEveSystemId: posInt(body.fromEveSystemId), toEveSystemId: posInt(body.toEveSystemId),
+    characterId: pilot.characterId, characterName: pilot.characterName, shipTypeId,
+  });
+  publishToMap(mapId, { type: 'jump.logged', actor: req.get('x-client-id') ?? null, connectionId, jump });
+  res.status(201).json(jump);
+});
+
+// PATCH one logged crossing — currently just the hot/cold flag, set by a viewer
+// who knows whether that pilot's prop was active. Content-level write.
+mapsRouter.patch('/:mapId/connections/:connectionId/jumps/:jumpId', async (req, res) => {
+  const { mapId, connectionId, jumpId } = req.params;
+  if (!UUID_RE.test(jumpId)) { res.status(404).json({ error: 'Jump not found' }); return; }
+  const access = await requireMapContentWrite(res, mapId, req);
+  if (!access) return;
+  if (!(await verifyConnectionInMap(res, connectionId, mapId))) return;
+
+  const hot = (req.body as { hot?: unknown }).hot;
+  if (typeof hot !== 'boolean') { res.status(400).json({ error: 'hot must be a boolean' }); return; }
+  const jump = await setConnectionJumpHot(jumpId, connectionId, mapId, hot);
+  if (!jump) { res.status(404).json({ error: 'Jump not found' }); return; }
+  publishToMap(mapId, { type: 'jump.updated', actor: req.get('x-client-id') ?? null, connectionId, jump });
+  res.json(jump);
+});
+
+mapsRouter.delete('/:mapId/connections/:connectionId/jumps', async (req, res) => {
+  const { mapId, connectionId } = req.params;
+  const access = await requireMapContentWrite(res, mapId, req);
+  if (!access) return;
+  if (!(await verifyConnectionInMap(res, connectionId, mapId))) return;
+  await clearConnectionJumps(connectionId, mapId);
+  publishToMap(mapId, { type: 'jump.cleared', actor: req.get('x-client-id') ?? null, connectionId });
+  res.json({ ok: true });
+});
+
 // ── Saved chains (routes) ──────────────────────────────────────────────────────
 // A chain is a named, recorded path A..B through the map's own connections.
 // Content-level permission (like signatures): it annotates the map, it doesn't
@@ -3235,6 +3342,38 @@ mapsRouter.post('/:mapId/shares', async (req, res) => {
     }
     throw err;
   }
+});
+
+// DELETE /api/maps/:mapId/shares/mine — a share RECIPIENT drops the map from
+// their OWN list (leave the share) without deleting it for anyone else. This is
+// the recipient counterpart to the owner-only revoke below: it deletes ONLY a
+// map_shares row whose target_character_id is the caller's own EVE character, so
+// it can never touch another character's grant or a corp/alliance-scoped grant
+// (which belongs to the whole org — only an admin can revoke those via :shareId).
+// The self-scoped WHERE makes this safe without a broader access check: with no
+// matching personal grant it simply deletes nothing and 404s. Must be registered
+// BEFORE the ':shareId' route so 'mine' isn't captured as a share UUID.
+mapsRouter.delete('/:mapId/shares/mine', async (req, res) => {
+  const { mapId } = req.params;
+  if (!UUID_RE.test(mapId)) { res.status(404).json({ error: 'Map not found' }); return; }
+
+  // Session-authed only — this is a personal-list action; external API keys
+  // don't have a "my list" to leave. authUser resolves the session user id.
+  const userId = req.session.userId;
+  if (!userId) { res.status(401).json({ error: 'Not authenticated' }); return; }
+  const { rows } = await db.query<{ callerChar: number | null }>(
+    `SELECT character_id AS "callerChar" FROM users WHERE id = $1`,
+    [userId],
+  );
+  const callerChar = rows[0]?.callerChar ?? null;
+  if (callerChar === null) { res.status(400).json({ error: 'No character on account' }); return; }
+
+  const { rowCount } = await db.query(
+    `DELETE FROM map_shares WHERE map_id = $1 AND target_character_id = $2`,
+    [mapId, callerChar],
+  );
+  if (!rowCount) { res.status(404).json({ error: 'No personal share to leave' }); return; }
+  res.json({ ok: true });
 });
 
 // DELETE /api/maps/:mapId/shares/:shareId — revoke. Personal maps: owner only;

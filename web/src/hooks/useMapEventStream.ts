@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useMapStore, type RemoteEvent } from '../store/mapStore';
 import { usePresenceStore, type PresenceViewer } from '../store/presenceStore';
 import { useKillStore, type KillRow } from '../store/killStore';
+import { useJumpLogStore, type JumpRow } from '../store/jumpLogStore';
 import { apiUrl } from '../api/client';
 import { CLIENT_ID } from '../api/clientId';
 
@@ -19,6 +20,7 @@ export function useMapEventStream(): void {
     openedOnce.current = false;
     usePresenceStore.getState().reset(); // clear last map's roster; snapshot repopulates
     useKillStore.getState().reset();     // clear last map's kill flags
+    useJumpLogStore.getState().reset();  // clear last map's connection jump logs
 
     const es = new EventSource(apiUrl(`/api/maps/${activeMapId}/events`), { withCredentials: true });
 
@@ -67,6 +69,18 @@ export function useMapEventStream(): void {
               npc:                 !!data.npc,
               finalBlow:           (data.finalBlow as KillRow['finalBlow']) ?? null,
             });
+            return;
+          case 'jump.logged':
+            // Ephemeral connection intel — append to the jump-log store. Handled
+            // before the echo check so the pilot who logged it also sees their own
+            // crossing (no optimistic add on the poster). Never touches mass.
+            useJumpLogStore.getState().recordJump(data.jump as JumpRow);
+            return;
+          case 'jump.updated':
+            useJumpLogStore.getState().updateJump(data.jump as JumpRow);
+            return;
+          case 'jump.cleared':
+            useJumpLogStore.getState().clearConnection(data.connectionId as string);
             return;
         }
 

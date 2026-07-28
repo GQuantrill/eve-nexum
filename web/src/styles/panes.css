@@ -277,6 +277,68 @@
 }
 .conn-col--flag   { min-width: 150px; }
 .conn-col--roller { min-width: 300px; }
+/* The neighbouring rolling-calculator column wraps its content in a bordered
+   .mass-tracker card (1px border + 8px pad), so its title sits ~9px below the
+   column top. This column has no card, so pad the top the same amount to line
+   the "Jump log" header up with "Rolling calculator" and the other columns. */
+.conn-col--jumplog { min-width: 260px; max-width: 320px; padding-top: 9px; }
+
+/* Jump log: a passive, shared list of known ships that jumped this hole. Read
+   only — it never drives the mass bar. Scrolls internally so a busy hole doesn't
+   grow the bottom bar. */
+.jumplog__clear {
+  margin-left: auto;
+  background: none; border: none; cursor: pointer;
+  color: var(--text-subtle);
+  font-size: calc(11px * var(--font-scale, 1));
+  padding: 0 2px;
+}
+/* Per-jump Cold/Hot marker: a viewer flips it once they know whether that pilot's
+   prop was active, and that jump's mass counts base (cold) or base + prop (hot).
+   Button when you can edit, static badge otherwise. */
+.jumplog__hot-btn, .jumplog__hot-badge {
+  font-size: calc(10px * var(--font-scale, 1));
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 0 6px;
+  border-radius: 4px;
+  border: 1px solid var(--surface-overlay);
+  color: var(--text-subtle);
+  white-space: nowrap;
+}
+.jumplog__hot-btn { cursor: pointer; background: none; }
+.jumplog__hot-btn:hover { border-color: var(--text-subtle); }
+.jumplog__hot-btn--hot, .jumplog__hot-badge--hot {
+  color: var(--cv-conn-expired);
+  border-color: color-mix(in srgb, var(--cv-conn-expired) 55%, transparent);
+  background: color-mix(in srgb, var(--cv-conn-expired) 12%, transparent);
+}
+.jumplog__clear:hover { color: var(--cv-conn-expired); text-decoration: underline; }
+.jumplog__total {
+  font-size: calc(12px * var(--font-scale, 1));
+  color: var(--text-subtle);
+  font-variant-numeric: tabular-nums;
+}
+.jumplog__list {
+  list-style: none; margin: 0; padding: 0;
+  display: flex; flex-direction: column; gap: 6px;
+  max-height: 168px; overflow-y: auto;
+}
+.jumplog__row {
+  padding: 5px 7px;
+  border: 1px solid var(--surface-overlay);
+  border-radius: 5px;
+  background: var(--surface-base);
+}
+.jumplog__line { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.jumplog__line--sub { margin-top: 2px; }
+.jumplog__pilot { font-size: calc(12px * var(--font-scale, 1)); font-weight: 600; color: var(--text-default); }
+.jumplog__time  { font-size: calc(11px * var(--font-scale, 1)); color: var(--text-subtle); white-space: nowrap; }
+.jumplog__ship  { font-size: calc(12px * var(--font-scale, 1)); color: var(--text-default); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.jumplog__class { color: var(--text-subtle); }
+.jumplog__mass  { font-size: calc(12px * var(--font-scale, 1)); color: var(--text-subtle); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.jumplog__route { font-size: calc(11px * var(--font-scale, 1)); color: var(--text-subtle); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 /* Per-end "backing signature" link controls in the connection panel. */
 .conn-siglink {
