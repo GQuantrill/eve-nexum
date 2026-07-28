@@ -713,6 +713,18 @@
   &:focus { border-color: var(--border-accent); outline: none; }
 }
 
+/* Trigger that opens the map bookmark-format modal. Looks like the field but
+   shows the current format (or the placeholder) left-aligned and truncated. */
+.map-sidebar__bookmark-trigger {
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  &:hover { border-color: var(--border-accent); }
+}
+.map-sidebar__bookmark-trigger--empty { color: var(--text-faintest); }
+
 .map-sidebar__zoom {
   display: flex;
   align-items: center;

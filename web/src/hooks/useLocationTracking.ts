@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { readUserSetting } from './useUserSetting';
 import { pickHandles } from '../components/map/edgeUtils';
 import { maybeConfirmWhJump } from './whJumpConfirm';
+import { prefetchStargateNeighbors, isDefiniteWormholeHop } from '../utils/stargateAdjacency';
 import type { SystemClass, WormholeEffect } from '../types';
 
 interface Box { position: { x: number; y: number } }
@@ -235,11 +236,18 @@ export function applyTrackedJump(
   const systems = () => useMapStore.getState().map.systems;
 
   if (skip && isKspaceSkip(curr.systemClass)) {
-    // Arriving in K-space: keep it only when jumping in FROM J-space (the first
-    // K-space of this excursion). Intermediate K-space, or a login already
-    // parked in K-space, is skipped.
+    // Warm this system's stargate neighbours so the NEXT hop out of it can be
+    // classified (gate vs wormhole) synchronously.
+    prefetchStargateNeighbors(curr.eveSystemId);
+    // Arriving in K-space: keep it when jumping in FROM J-space (the first
+    // K-space of this excursion), OR when the hop from a previous K-space system
+    // was NOT via a stargate — non-adjacent K-space systems mean a wormhole /
+    // Ansiblex was used, and that connection is exactly what the map is for.
+    // Only a plain gate hop through intermediate K-space is dropped.
     const fromJspace = prev !== null && !isKspaceSkip(prev.systemClass);
-    if (fromJspace) {
+    const viaWormhole = prev !== null && isKspaceSkip(prev.systemClass)
+      && isDefiniteWormholeHop(prev.eveSystemId, curr.eveSystemId);
+    if (fromJspace || viaWormhole) {
       const mapSystemId = applyJump(curr, prevMapSystemId, true);
       return { mapSystemId, anchor: mapSystemId };
     }

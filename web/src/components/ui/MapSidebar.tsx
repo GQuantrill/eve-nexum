@@ -19,7 +19,6 @@ import {
   type MinimapPosition,
 } from "../../hooks/useMinimapPosition";
 import { useUserSetting } from "../../hooks/useUserSetting";
-import { useCanEditContent } from "../../hooks/useCanEditContent";
 import { normalizePlacement } from "../../hooks/useLocationTracking";
 import { NOTIFY } from "../../utils/notificationPrefs";
 import { useResettableState } from "../../hooks/useResettableState";
@@ -580,13 +579,48 @@ function CorpKspaceToggle() {
 
 // Per-map bookmark-name format. When set it overrides every user's own global
 // format for holes on this map, so a group's bookmarks stay consistent. Blank
-// clears the override (fall back to each user's global). Any editor can set it;
-// commits on blur with the same optimistic-PATCH-with-revert pattern as the
-// lazy-sweep toggle. Live-synced to other viewers via map.meta.
+// clears the override (fall back to each user's global). Owner/admin-only (see
+// the gate below); live-synced to other viewers via map.meta.
+//
+// In the sidebar this is just a trigger — the actual editor + token reference
+// opens in its own modal (below), since the sidebar is too tight for both.
 function MapBookmarkFormat() {
   const { t } = useTranslation();
   const map = useMapStore((s) => s.map);
-  const canEdit = useCanEditContent();
+  // Shared per-map policy — owner/admin only (alliance admin for alliance maps,
+  // admin for corp maps, owner for personal), mirroring the server gate.
+  const { user } = useAuth();
+  const isMapOwner = useIsMapOwner();
+  const role = user?.role ?? "readonly";
+  const canEdit = map.isAllianceMap ? isAllianceAdminRole(role) : map.isCorpMap ? isAdminRole(role) : isMapOwner;
+  const [open, setOpen] = useState(false);
+
+  if (!canEdit) return null; // only owner/admins manage the shared policy
+
+  const current = map.bookmarkFormat?.trim();
+  return (
+    <div className="map-sidebar__field">
+      <label className="map-sidebar__label">{t("mapSidebar.mapBookmark")}</label>
+      <button
+        type="button"
+        className="map-sidebar__select map-sidebar__select--full map-sidebar__bookmark-trigger"
+        onClick={() => setOpen(true)}
+      >
+        <span className={current ? undefined : "map-sidebar__bookmark-trigger--empty"}>
+          {current || t("mapSidebar.mapBookmarkPlaceholder")}
+        </span>
+      </button>
+      {open && <MapBookmarkFormatModal onClose={() => setOpen(false)} />}
+    </div>
+  );
+}
+
+// The format editor + token reference, in its own modal so the sidebar stays
+// compact. Same optimistic-PATCH-with-revert as before; commits on blur and on
+// close (idempotent — a no-op when unchanged).
+function MapBookmarkFormatModal({ onClose }: { onClose: () => void }) {
+  const { t } = useTranslation();
+  const map = useMapStore((s) => s.map);
   const [value, setValue] = useResettableState(map.bookmarkFormat ?? "");
   const [saving, setSaving] = useState(false);
 
@@ -615,23 +649,42 @@ function MapBookmarkFormat() {
     }
   }
 
-  return (
-    <div className="map-sidebar__field">
-      <label className="map-sidebar__label" htmlFor="map-bookmark-fmt">{t("mapSidebar.mapBookmark")}</label>
-      <input
-        id="map-bookmark-fmt"
-        className="map-sidebar__select map-sidebar__select--full"
-        type="text"
-        spellCheck={false}
-        value={value}
-        disabled={saving || !canEdit}
-        placeholder={t("mapSidebar.mapBookmarkPlaceholder")}
-        onChange={(e) => setValue(e.target.value)}
-        onBlur={commit}
-        onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }}
-      />
-      <p className="map-sidebar__help">{t("mapSidebar.mapBookmarkHelp")}</p>
-    </div>
+  // Save (optimistically) then close; commit is a no-op when nothing changed.
+  function close() { void commit(); onClose(); }
+
+  // Portal to <body> so the fixed overlay isn't trapped by the sidebar's
+  // transform/stacking context (which would pin it inside the sidebar).
+  return createPortal(
+    <div className="modal-overlay" onClick={close}>
+      <div className="modal bookmark-fmt-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="modal__header">
+          <h2 className="modal__title">{t("mapSidebar.mapBookmark")}</h2>
+          <button type="button" className="icon-btn" onClick={close} aria-label={t("actions.close")}>✕</button>
+        </div>
+        <div className="modal__body">
+          <input
+            className="map-sidebar__select map-sidebar__select--full"
+            type="text"
+            spellCheck={false}
+            autoFocus
+            value={value}
+            disabled={saving}
+            placeholder={t("mapSidebar.mapBookmarkPlaceholder")}
+            onChange={(e) => setValue(e.target.value)}
+            onBlur={commit}
+            onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }}
+          />
+          <p className="map-sidebar__help">{t("mapSidebar.mapBookmarkHelp")}</p>
+          <p className="map-sidebar__help">{t("mapSidebar.bookmarkHelp")}</p>
+          <ul className="map-sidebar__tokens">
+            {BOOKMARK_TOKENS.map((b) => (
+              <li key={b.token}><code>{b.token}</code> - {b.desc}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>,
+    document.body,
   );
 }
 
@@ -1091,6 +1144,9 @@ export function MapSidebar() {
               <LazyWhSweepToggle />
             </>
           )}
+          {/* Shared bookmark-name format for this map — owner/admin only; the
+              component renders null for everyone else. */}
+          <MapBookmarkFormat />
         </CollapsibleSection>
 
         <CollapsibleSection title={t("mapSidebar.sections.tracking")} {...sectionProps("tracking")}>
@@ -1462,7 +1518,6 @@ export function MapSidebar() {
 
               {settingsTab === "signatures" && (
                 <>
-                  <MapBookmarkFormat />
                   <div className="map-sidebar__field">
                     <label className="map-sidebar__label" htmlFor="sig-bookmark-fmt">{t("mapSidebar.sigBookmark")}</label>
                     <input id="sig-bookmark-fmt" className="map-sidebar__select map-sidebar__select--full" type="text" spellCheck={false} value={sigBookmarkFmt} onChange={(e) => setSigBookmarkFmt(e.target.value)} placeholder={DEFAULT_BOOKMARK_FORMAT} />
