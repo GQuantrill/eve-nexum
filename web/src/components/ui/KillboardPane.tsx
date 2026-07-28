@@ -1,12 +1,39 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { useKillboard, useLastKill } from '../../hooks/useKillboard';
 import { useStandings } from '../../hooks/useStandings';
 import { useUserSetting } from '../../hooks/useUserSetting';
+import { useNow30s } from '../../hooks/useNow30s';
+import { useSystemKillLog, RECENT_KILL_MS, type KillRow as FeedKill } from '../../store/killStore';
 import { abbreviateValue, splitHoursMinutes } from '../../i18n/format';
 import type { ZkbKill } from '../../hooks/useKillboard';
 import styles from './KillboardPane.module.css';
+
+// Adapt a live kill-feed row into the zKill shape the panel renders. We only
+// have the final-blow attacker from the feed, so `attackers` holds just that.
+function killRowToZkb(r: FeedKill): ZkbKill {
+  return {
+    killmail_id:   r.killmailId,
+    killmail_time: new Date(r.atMs).toISOString(),
+    victim: {
+      character_id:     r.victimCharacterId ?? undefined,
+      character_name:   r.victimName ?? undefined,
+      corporation_id:   r.victimCorporationId ?? undefined,
+      corporation_name: r.victimCorpName ?? undefined,
+      ship_type_id:     r.shipTypeId,
+    },
+    attackers: r.finalBlow ? [{
+      final_blow:       true,
+      character_id:     r.finalBlow.characterId ?? undefined,
+      character_name:   r.finalBlow.name ?? undefined,
+      corporation_id:   r.finalBlow.corporationId ?? undefined,
+      corporation_name: r.finalBlow.corpName ?? undefined,
+      ship_type_id:     r.finalBlow.shipTypeId || undefined,
+    }] : [],
+    zkb: { hash: '', totalValue: r.totalValue, solo: false, npc: r.npc },
+  };
+}
 
 const NPC_TOGGLE_KEY = 'nexum.killboardIncludeNpc';
 
@@ -130,7 +157,7 @@ function killRowTint(victim: number, killer: number): string {
   return '';
 }
 
-function KillRow({ kill, standings }: { kill: ZkbKill; standings: ReturnType<typeof useStandings> }) {
+function KillRow({ kill, standings, pulse }: { kill: ZkbKill; standings: ReturnType<typeof useStandings>; pulse?: boolean }) {
   const { t } = useTranslation();
   const isPod      = kill.victim.ship_type_id === 670;
   const v          = kill.victim;
@@ -141,7 +168,8 @@ function KillRow({ kill, standings }: { kill: ZkbKill; standings: ReturnType<typ
   const tint           = killRowTint(victimStanding, killerStanding);
 
   return (
-    <div className={[styles.kill, isPod && styles.killPod, tint].filter(Boolean).join(' ')}>
+    <div className={[styles.kill, isPod && styles.killPod, pulse && styles.killLive, tint].filter(Boolean).join(' ')}>
+      {pulse && <span className={styles.liveDot} data-tip={t('killboard.live')} aria-label={t('killboard.live')} />}
       {/* Victim side: victim ship → victim affiliations */}
       <span className={styles.shipWrap}>
         <a
@@ -236,6 +264,21 @@ export function KillboardPane({ eveSystemId }: Props) {
   const standings = useStandings();
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
+  // Merge the live kill feed for this system with the zKill REST list so recent
+  // notable kills show immediately, without waiting on zKill's cached REST API.
+  const liveRows = useSystemKillLog(eveSystemId);
+  const now      = useNow30s();
+  const liveIds  = useMemo(() => new Set(liveRows.map((r) => r.killmailId)), [liveRows]);
+  const mergedKills = useMemo(() => {
+    const byId = new Map<number, ZkbKill>();
+    for (const k of kills) byId.set(k.killmail_id, k); // REST first — fuller attacker list wins on overlap
+    for (const r of liveRows) {
+      if (!includeNpc && r.npc) continue;              // respect the NPC toggle for live rows too
+      if (!byId.has(r.killmailId)) byId.set(r.killmailId, killRowToZkb(r));
+    }
+    return [...byId.values()].sort((a, b) => Date.parse(b.killmail_time) - Date.parse(a.killmail_time));
+  }, [kills, liveRows, includeNpc]);
+
   // Nothing in the last 24h (and not merely NPC-filtered) → look up the last
   // kill of any age so the pane can say "last kill was X ago" instead of a bare
   // "no kills". Gated so active systems never trigger the extra lookup.
@@ -251,8 +294,8 @@ export function KillboardPane({ eveSystemId }: Props) {
     return <p className={styles.state}>{t('panes.noEveSystem')}</p>;
   }
 
-  const visibleKills = kills.slice(0, visibleCount);
-  const hasMore      = visibleCount < kills.length;
+  const visibleKills = mergedKills.slice(0, visibleCount);
+  const hasMore      = visibleCount < mergedKills.length;
 
   // Render the meta row (with the NPC toggle) regardless of whether there
   // are kills to show — otherwise the user has no way to flip the toggle
@@ -261,7 +304,7 @@ export function KillboardPane({ eveSystemId }: Props) {
     <div className={styles.pane}>
       <div className={styles.paneMeta}>
         <span>
-          {t('units.kills', { count: kills.length })}
+          {t('units.kills', { count: mergedKills.length })}
           {!includeNpc && npcCount > 0 && (
             <span className={styles.npcHidden} data-tooltip={t('killboard.npcHiddenTooltip')}>
               {' '}· {t('killboard.npcHidden', { count: npcCount })}
@@ -285,11 +328,11 @@ export function KillboardPane({ eveSystemId }: Props) {
         </label>
       </div>
 
-      {loading && kills.length === 0 ? (
+      {loading && mergedKills.length === 0 ? (
         <p className={styles.state}>{t('killboard.loading')}</p>
-      ) : error ? (
+      ) : error && mergedKills.length === 0 ? (
         <p className={`${styles.state} ${styles.stateError}`}>{error}</p>
-      ) : kills.length === 0 ? (
+      ) : mergedKills.length === 0 ? (
         <p className={styles.state}>
           {!includeNpc && npcCount > 0 ? (
             <>
@@ -306,14 +349,21 @@ export function KillboardPane({ eveSystemId }: Props) {
         </p>
       ) : (
         <div className={styles.list}>
-          {visibleKills.map((k) => <KillRow key={k.killmail_id} kill={k} standings={standings} />)}
+          {visibleKills.map((k) => (
+            <KillRow
+              key={k.killmail_id}
+              kill={k}
+              standings={standings}
+              pulse={liveIds.has(k.killmail_id) && now - Date.parse(k.killmail_time) < RECENT_KILL_MS}
+            />
+          ))}
           {hasMore && (
             <button
               type="button"
               className={styles.loadMore}
               onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
             >
-              {t('killboard.loadMore', { count: kills.length - visibleCount })}
+              {t('killboard.loadMore', { count: mergedKills.length - visibleCount })}
             </button>
           )}
         </div>

@@ -1058,6 +1058,7 @@
   "killboard": {
     "hoursMinutesAgo": "{{hours}}시간 {{minutes}}분 전",
     "viewKillmail": "zKillboard에서 킬메일 보기",
+    "live": "실시간",
     "soloKill": "솔로 킬",
     "gank": "갱크 — 공격자 {{count}}명",
     "attackers": "공격자 {{count}}명",

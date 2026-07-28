@@ -1088,6 +1088,7 @@
   "killboard": {
     "hoursMinutesAgo": "{{hours}}ч {{minutes}}м назад",
     "viewKillmail": "Посмотреть киллмейл на zKillboard",
+    "live": "В реальном времени",
     "soloKill": "Соло-килл",
     "gank": "Ганк — {{count}} атакующих",
     "attackers": "{{count}} атакующих",

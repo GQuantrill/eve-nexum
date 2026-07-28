@@ -23,6 +23,15 @@ export interface KillRow {
   victimName:          string | null;
   victimCorporationId: number | null;
   victimCorpName:      string | null;
+  npc:                 boolean;
+  finalBlow: {
+    characterId:   number | null;
+    name:          string | null;
+    corporationId: number | null;
+    corpName:      string | null;
+    shipTypeId:    number;
+    shipName:      string;
+  } | null;
 }
 
 // Static SDE lookups, cached in-process (system/region and ship-type names never
@@ -59,11 +68,16 @@ export async function resolveShipTypeName(id: number): Promise<string> {
 // zKill-supplied string is ever forwarded. Used by both the live SSE path and
 // the REST backfill (which reads the in-memory buffer).
 export async function buildKillRow(k: BufferedKill): Promise<KillRow> {
-  const [meta, shipTypeName, names] = await Promise.all([
+  const [meta, shipTypeName, fbShipName, names] = await Promise.all([
     resolveSystemMeta(k.eveSystemId),
     resolveShipTypeName(k.shipTypeId),
-    resolveEntityNames([k.victimCharacterId, k.victimCorporationId]),
+    resolveShipTypeName(k.finalBlowShipTypeId),
+    resolveEntityNames([
+      k.victimCharacterId, k.victimCorporationId,
+      k.finalBlowCharacterId, k.finalBlowCorporationId,
+    ]),
   ]);
+  const hasFinalBlow = k.finalBlowCharacterId != null || k.finalBlowCorporationId != null || k.finalBlowShipTypeId > 0;
   return {
     killmailId: k.killmailId, atMs: k.atMs, eveSystemId: k.eveSystemId,
     systemName: meta.systemName, regionName: meta.regionName,
@@ -72,6 +86,15 @@ export async function buildKillRow(k: BufferedKill): Promise<KillRow> {
     victimName: k.victimCharacterId ? names.get(k.victimCharacterId)?.name ?? null : null,
     victimCorporationId: k.victimCorporationId,
     victimCorpName: k.victimCorporationId ? names.get(k.victimCorporationId)?.name ?? null : null,
+    npc: k.npc,
+    finalBlow: hasFinalBlow ? {
+      characterId:   k.finalBlowCharacterId,
+      name:          k.finalBlowCharacterId ? names.get(k.finalBlowCharacterId)?.name ?? null : null,
+      corporationId: k.finalBlowCorporationId,
+      corpName:      k.finalBlowCorporationId ? names.get(k.finalBlowCorporationId)?.name ?? null : null,
+      shipTypeId:    k.finalBlowShipTypeId,
+      shipName:      fbShipName,
+    } : null,
   };
 }
 
@@ -107,11 +130,12 @@ interface EsiKillmail {
   killmail_time?:   string;
   solar_system_id?: number;
   victim?:          { ship_type_id?: number; character_id?: number; corporation_id?: number };
+  attackers?:       Array<{ character_id?: number; corporation_id?: number; ship_type_id?: number; final_blow?: boolean }>;
 }
 interface EphemeralKill {
   killmail_id?: number;
   esi?:         EsiKillmail;       // the raw ESI killmail (R2Z2 nests it under `esi`)
-  zkb?:         { totalValue?: number };
+  zkb?:         { totalValue?: number; npc?: boolean };
 }
 
 // Bounded FIFO of recently-seen killmail ids — drops repeats across reconnects
@@ -170,11 +194,20 @@ async function processKill(body: EphemeralKill): Promise<void> {
   const parsed = km.killmail_time ? Date.parse(km.killmail_time) : NaN;
   const atMs = Number.isFinite(parsed) ? parsed : Date.now();
 
+  // Final-blow attacker (numeric ids only) so the killboard panel can render the
+  // live kill as a full row; and zKill's npc flag so the panel's NPC toggle works.
+  const fb = km.attackers?.find((a) => a?.final_blow);
+  const finalBlowCharacterId   = Number(fb?.character_id) || null;
+  const finalBlowCorporationId = Number(fb?.corporation_id) || null;
+  const finalBlowShipTypeId    = Number(fb?.ship_type_id) || 0;
+  const npc = !!body.zkb?.npc;
+
   // Record into the rolling buffer UNCONDITIONALLY (even with no map open) so the
   // kill-log backfill can be served from memory — no zKillboard REST scraping.
   const buffered: BufferedKill = {
     killmailId, atMs, eveSystemId: solarSystemId,
     shipTypeId, totalValue, victimCharacterId, victimCorporationId,
+    finalBlowCharacterId, finalBlowCorporationId, finalBlowShipTypeId, npc,
   };
   recordKill(buffered);
 
