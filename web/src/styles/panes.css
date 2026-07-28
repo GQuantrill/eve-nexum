@@ -277,7 +277,11 @@
 }
 .conn-col--flag   { min-width: 150px; }
 .conn-col--roller { min-width: 300px; }
-.conn-col--jumplog { min-width: 260px; max-width: 320px; }
+/* The neighbouring rolling-calculator column wraps its content in a bordered
+   .mass-tracker card (1px border + 8px pad), so its title sits ~9px below the
+   column top. This column has no card, so pad the top the same amount to line
+   the "Jump log" header up with "Rolling calculator" and the other columns. */
+.conn-col--jumplog { min-width: 260px; max-width: 320px; padding-top: 9px; }
 
 /* Jump log: a passive, shared list of known ships that jumped this hole. Read
    only — it never drives the mass bar. Scrolls internally so a busy hole doesn't
