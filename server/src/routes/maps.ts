@@ -2123,11 +2123,24 @@ mapsRouter.patch('/:mapId', async (req, res) => {
     sets.push(`collapse_grace_hours = $${vals.length + 1}`); vals.push(n);
   }
 
-  // Per-map bookmark-name format: another plain per-map behaviour setting any
-  // editor can set. An empty/whitespace/null value clears the override so users
-  // fall back to their own global format. Stored trimmed and length-capped.
+  // Per-map bookmark-name format: a shared policy that overrides every member's
+  // personal format, so it's owner/admin-gated exactly like the K-space policy /
+  // rename — shared recipients never; corp maps need an admin; alliance maps an
+  // alliance admin; a personal map's owner is fine. An empty/whitespace/null
+  // value clears the override so users fall back to their own global format.
+  // Stored trimmed and length-capped.
   let normalizedBookmarkFmt: string | null | undefined;
   if (bookmarkFormat !== undefined) {
+    const role = req.session.role ?? 'readonly';
+    if (access.accessKind === 'shared') {
+      res.status(403).json({ error: 'Only the map owner can change the shared bookmark format' }); return;
+    }
+    if (access.corpId !== null || access.allianceId !== null) {
+      const allianceScoped = access.allianceId !== null;
+      if (allianceScoped ? !isAllianceAdmin(role) : !isAdmin(role)) {
+        res.status(403).json({ error: allianceScoped ? 'Alliance admin access required' : 'Admin access required' }); return;
+      }
+    }
     const trimmed = typeof bookmarkFormat === 'string' ? bookmarkFormat.trim().slice(0, MAX_BOOKMARK_FMT_LEN) : '';
     normalizedBookmarkFmt = trimmed === '' ? null : trimmed;
     sets.push(`bookmark_format = $${vals.length + 1}`); vals.push(normalizedBookmarkFmt);

@@ -19,7 +19,6 @@ import {
   type MinimapPosition,
 } from "../../hooks/useMinimapPosition";
 import { useUserSetting } from "../../hooks/useUserSetting";
-import { useCanEditContent } from "../../hooks/useCanEditContent";
 import { normalizePlacement } from "../../hooks/useLocationTracking";
 import { NOTIFY } from "../../utils/notificationPrefs";
 import { useResettableState } from "../../hooks/useResettableState";
@@ -586,7 +585,12 @@ function CorpKspaceToggle() {
 function MapBookmarkFormat() {
   const { t } = useTranslation();
   const map = useMapStore((s) => s.map);
-  const canEdit = useCanEditContent();
+  // Shared per-map policy — owner/admin only (alliance admin for alliance maps,
+  // admin for corp maps, owner for personal), mirroring the server gate.
+  const { user } = useAuth();
+  const isMapOwner = useIsMapOwner();
+  const role = user?.role ?? "readonly";
+  const canEdit = map.isAllianceMap ? isAllianceAdminRole(role) : map.isCorpMap ? isAdminRole(role) : isMapOwner;
   const [value, setValue] = useResettableState(map.bookmarkFormat ?? "");
   const [saving, setSaving] = useState(false);
 
@@ -614,6 +618,8 @@ function MapBookmarkFormat() {
       setSaving(false);
     }
   }
+
+  if (!canEdit) return null; // only owner/admins manage the shared policy
 
   return (
     <div className="map-sidebar__field">
@@ -1091,6 +1097,9 @@ export function MapSidebar() {
               <LazyWhSweepToggle />
             </>
           )}
+          {/* Shared bookmark-name format for this map — owner/admin only; the
+              component renders null for everyone else. */}
+          <MapBookmarkFormat />
         </CollapsibleSection>
 
         <CollapsibleSection title={t("mapSidebar.sections.tracking")} {...sectionProps("tracking")}>
@@ -1462,7 +1471,6 @@ export function MapSidebar() {
 
               {settingsTab === "signatures" && (
                 <>
-                  <MapBookmarkFormat />
                   <div className="map-sidebar__field">
                     <label className="map-sidebar__label" htmlFor="sig-bookmark-fmt">{t("mapSidebar.sigBookmark")}</label>
                     <input id="sig-bookmark-fmt" className="map-sidebar__select map-sidebar__select--full" type="text" spellCheck={false} value={sigBookmarkFmt} onChange={(e) => setSigBookmarkFmt(e.target.value)} placeholder={DEFAULT_BOOKMARK_FORMAT} />
