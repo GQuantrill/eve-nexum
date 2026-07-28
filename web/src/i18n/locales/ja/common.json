@@ -808,6 +808,17 @@
     "undoPass": "通過を元に戻す",
     "reset": "リセット",
     "otherShips": "通過した他の艦船",
+    "jumpLog": {
+      "title": "ジャンプログ",
+      "empty": "まだジャンプは記録されていません。",
+      "total": "{{count}} 回のジャンプ · 約 {{mass}}",
+      "massMode": "質量モード",
+      "coldTitle": "基本質量（プロップなし）",
+      "hotTitle": "基本質量 + プロップ（艦船ごとに {{prop}}）",
+      "clear": "クリア",
+      "clearTitle": "この接続のジャンプログをクリア",
+      "unknownShip": "不明な艦船"
+    },
     "noMassData": "タイプ「{{type}}」の質量データがありません。",
     "enterWhType": "質量トラッキングを有効にするには、上にワームホールタイプを入力してください。",
     "collapseConfirm": "この通過（+{{mass}}）でホールが崩壊する可能性が高いです。",

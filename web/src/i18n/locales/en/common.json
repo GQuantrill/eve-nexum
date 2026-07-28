@@ -889,6 +889,17 @@
     "undoPass": "Undo pass",
     "reset": "Reset",
     "otherShips": "Other ships passed",
+    "jumpLog": {
+      "title": "Jump log",
+      "empty": "No jumps recorded yet.",
+      "total": "{{count}} jumps · ~{{mass}}",
+      "massMode": "Mass mode",
+      "coldTitle": "Base mass (no prop mod)",
+      "hotTitle": "Base mass + prop mod ({{prop}} per ship)",
+      "clear": "Clear",
+      "clearTitle": "Clear this connection's jump log",
+      "unknownShip": "Unknown ship"
+    },
     "noMassData": "No mass data for type \"{{type}}\".",
     "enterWhType": "Enter a wormhole type above to enable mass tracking.",
     "collapseConfirm": "This pass (+{{mass}}) will likely collapse the hole.",

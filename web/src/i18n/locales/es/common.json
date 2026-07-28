@@ -808,6 +808,17 @@
     "undoPass": "Deshacer pasada",
     "reset": "Reiniciar",
     "otherShips": "Otras naves que pasaron",
+    "jumpLog": {
+      "title": "Registro de saltos",
+      "empty": "Aún no se han registrado saltos.",
+      "total": "{{count}} saltos · ~{{mass}}",
+      "massMode": "Modo de masa",
+      "coldTitle": "Masa base (sin propulsor)",
+      "hotTitle": "Masa base + propulsor ({{prop}} por nave)",
+      "clear": "Vaciar",
+      "clearTitle": "Vaciar el registro de saltos de esta conexión",
+      "unknownShip": "Nave desconocida"
+    },
     "noMassData": "No hay datos de masa para el tipo «{{type}}».",
     "enterWhType": "Introduce un tipo de agujero de gusano arriba para activar el seguimiento de masa.",
     "collapseConfirm": "Esta pasada (+{{mass}}) probablemente colapse el agujero.",

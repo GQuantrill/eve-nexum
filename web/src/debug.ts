@@ -118,18 +118,23 @@ const nexumDebug = {
   // queuing) any server writes — useful when logged out or without a saved map.
   _jumpTimer: null as ReturnType<typeof setInterval> | null,
 
-  async simulateJumps(names: string[], intervalMs = 2000, opts: { dryRun?: boolean } = {}) {
+  async simulateJumps(names: string[], intervalMs = 2000, opts: { dryRun?: boolean; shipTypeId?: number } = {}) {
     if (!Array.isArray(names) || names.some((n) => typeof n !== 'string')) {
-      console.error('[nexum] simulateJumps(names[], intervalMs?, { dryRun? }) — names must be an array of system names.');
+      console.error('[nexum] simulateJumps(names[], intervalMs?, { dryRun?, shipTypeId? }) — names must be an array of system names.');
       return;
     }
-    const { dryRun = false } = opts;
-    const [{ applyTrackedJump }, store, esi, client, userSettings] = await Promise.all([
+    const { dryRun = false, shipTypeId } = opts;
+    // Ship the fake pilot "flies" so a wormhole crossing lands in the jump log
+    // (the live tracker uses the real ship; the sim has none). Defaults to a
+    // Megathron (base ~105M kg) so the mass is realistic; override via shipTypeId.
+    const simShipTypeId = shipTypeId ?? 641;
+    const [{ applyTrackedJump }, store, esi, client, userSettings, { recordConnectionJump }] = await Promise.all([
       import('./hooks/useLocationTracking'),
       import('./store/mapStore'),
       import('./hooks/useEsiSearch'),
       import('./api/client'),
       import('./hooks/useUserSetting'),
+      import('./utils/recordConnectionJump'),
     ]);
     const { useMapStore } = store;
     const { readUserSetting } = userSettings;
@@ -170,9 +175,16 @@ const nexumDebug = {
       // applyJump's writes are dispatched synchronously (the suppression check
       // runs before fetch), so toggling around this call captures them all.
       if (dryRun) client.setWritesSuppressed(true);
+      // Record each wormhole crossing to the jump log, exactly like the live
+      // tracker's onJump — but not in a dry run (its POST is async, so it would
+      // escape the synchronous write-suppression window). Attribute to the
+      // session character (actingCharId null → server resolves from the session).
+      const mapId = useMapStore.getState().map.id;
+      const onJump = dryRun ? undefined : ({ connId, fromMapSystemId, toMapSystemId }: { connId: string; fromMapSystemId: string; toMapSystemId: string }) =>
+        recordConnectionJump({ mapId, connId, fromMapSystemId, toMapSystemId, shipTypeId: simShipTypeId, actingCharId: null });
       let result: { mapSystemId: string | null; anchor: string | null | 'keep' };
       try {
-        result = applyTrackedJump(sys, prevPhysical, prevAnchor, { skipKspace, canAdd: true });
+        result = applyTrackedJump(sys, prevPhysical, prevAnchor, { skipKspace, canAdd: true }, onJump);
       } finally {
         if (dryRun) client.setWritesSuppressed(false);
       }
@@ -266,6 +278,7 @@ const nexumDebug = {
     console.log('nexumDebug.traceSelection() — log a stack trace whenever the selected system is cleared');
     console.log("nexumDebug.simulateJumps(['Jita','Perimeter','Jita'], 2000) — replay a route, one hop / interval");
     console.log("nexumDebug.simulateJumps([...], 1000, { dryRun: true }) — replay without firing server writes (logged-out safe)");
+    console.log("nexumDebug.simulateJumps([...], 2000, { shipTypeId: 641 }) — set the ship the fake pilot flies (for the jump log)");
     console.log('nexumDebug.stopJumps() — cancel a running jump simulation');
     console.log('nexumDebug.showThreats(on?)  — toggle showing the nearest threat in the toolbar, ignoring the alert threshold');
     console.log('nexumDebug.updateBadge(on?)  — force the "update available" toolbar badge on/off for testing');

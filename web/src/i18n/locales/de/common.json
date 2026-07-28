@@ -808,6 +808,17 @@
     "undoPass": "Durchflug rückgängig",
     "reset": "Zurücksetzen",
     "otherShips": "Andere Schiffe durchgeflogen",
+    "jumpLog": {
+      "title": "Sprungprotokoll",
+      "empty": "Noch keine Sprünge aufgezeichnet.",
+      "total": "{{count}} Sprünge · ~{{mass}}",
+      "massMode": "Massenmodus",
+      "coldTitle": "Basismasse (ohne Prop-Mod)",
+      "hotTitle": "Basismasse + Prop-Mod ({{prop}} pro Schiff)",
+      "clear": "Leeren",
+      "clearTitle": "Sprungprotokoll dieser Verbindung leeren",
+      "unknownShip": "Unbekanntes Schiff"
+    },
     "noMassData": "Keine Massendaten für Typ \"{{type}}\".",
     "enterWhType": "Gib oben einen Wurmlochtyp ein, um die Massenverfolgung zu aktivieren.",
     "collapseConfirm": "Dieser Durchflug (+{{mass}}) wird das Loch wahrscheinlich kollabieren lassen.",
