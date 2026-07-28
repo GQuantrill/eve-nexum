@@ -812,7 +812,6 @@
       "title": "Journal de sauts",
       "empty": "Aucun saut enregistré pour l'instant.",
       "total": "{{count}} sauts · ~{{mass}}",
-      "massMode": "Mode de masse",
       "coldTitle": "Masse de base (sans propulseur)",
       "hotTitle": "Masse de base + propulseur ({{prop}} par vaisseau)",
       "clear": "Vider",
