@@ -1226,6 +1226,7 @@
     "mapLimitReached": "Kartenlimit erreicht",
     "newMap": "+ Neue Karte",
     "deleteThisMap": "Diese Karte löschen",
+    "leaveThisMap": "Geteilte Karte verlassen",
     "name": "Kartenname",
     "totalSystems": "Systeme gesamt",
     "totalConnections": "Verbindungen gesamt",
@@ -1249,6 +1250,7 @@
     "currentSystem": "Aktuelles System",
     "centerOnSystem": "Karte auf {{system}} zentrieren",
     "deleteMapConfirm": "\"{{name}}\" löschen? Dies kann nicht rückgängig gemacht werden.",
+    "leaveMapConfirm": "\"{{name}}\" aus deiner Liste entfernen? Der Eigentümer kann sie später erneut teilen.",
     "online": {
       "offline": "Offline",
       "statusUnknown": "Status unbekannt",

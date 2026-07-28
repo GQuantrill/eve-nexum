@@ -1226,6 +1226,7 @@
     "mapLimitReached": "已达到地图上限",
     "newMap": "+ 新建地图",
     "deleteThisMap": "删除此地图",
+    "leaveThisMap": "退出共享地图",
     "name": "地图名称",
     "totalSystems": "星系总数",
     "totalConnections": "连接总数",
@@ -1249,6 +1250,7 @@
     "currentSystem": "当前星系",
     "centerOnSystem": "将地图居中到 {{system}}",
     "deleteMapConfirm": "删除「{{name}}」？此操作无法撤销。",
+    "leaveMapConfirm": "从你的列表中移除「{{name}}」？所有者之后可以再次共享。",
     "online": {
       "offline": "离线",
       "statusUnknown": "状态未知",

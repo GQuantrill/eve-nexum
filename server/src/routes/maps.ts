@@ -3237,6 +3237,38 @@ mapsRouter.post('/:mapId/shares', async (req, res) => {
   }
 });
 
+// DELETE /api/maps/:mapId/shares/mine — a share RECIPIENT drops the map from
+// their OWN list (leave the share) without deleting it for anyone else. This is
+// the recipient counterpart to the owner-only revoke below: it deletes ONLY a
+// map_shares row whose target_character_id is the caller's own EVE character, so
+// it can never touch another character's grant or a corp/alliance-scoped grant
+// (which belongs to the whole org — only an admin can revoke those via :shareId).
+// The self-scoped WHERE makes this safe without a broader access check: with no
+// matching personal grant it simply deletes nothing and 404s. Must be registered
+// BEFORE the ':shareId' route so 'mine' isn't captured as a share UUID.
+mapsRouter.delete('/:mapId/shares/mine', async (req, res) => {
+  const { mapId } = req.params;
+  if (!UUID_RE.test(mapId)) { res.status(404).json({ error: 'Map not found' }); return; }
+
+  // Session-authed only — this is a personal-list action; external API keys
+  // don't have a "my list" to leave. authUser resolves the session user id.
+  const userId = req.session.userId;
+  if (!userId) { res.status(401).json({ error: 'Not authenticated' }); return; }
+  const { rows } = await db.query<{ callerChar: number | null }>(
+    `SELECT character_id AS "callerChar" FROM users WHERE id = $1`,
+    [userId],
+  );
+  const callerChar = rows[0]?.callerChar ?? null;
+  if (callerChar === null) { res.status(400).json({ error: 'No character on account' }); return; }
+
+  const { rowCount } = await db.query(
+    `DELETE FROM map_shares WHERE map_id = $1 AND target_character_id = $2`,
+    [mapId, callerChar],
+  );
+  if (!rowCount) { res.status(404).json({ error: 'No personal share to leave' }); return; }
+  res.json({ ok: true });
+});
+
 // DELETE /api/maps/:mapId/shares/:shareId — revoke. Personal maps: owner only;
 // corp/alliance maps: an admin / alliance-admin of the owning org.
 mapsRouter.delete('/:mapId/shares/:shareId', async (req, res) => {

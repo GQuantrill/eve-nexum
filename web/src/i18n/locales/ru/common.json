@@ -1264,6 +1264,7 @@
     "mapLimitReached": "Достигнут лимит карт",
     "newMap": "+ Новая карта",
     "deleteThisMap": "Удалить эту карту",
+    "leaveThisMap": "Покинуть общую карту",
     "name": "Название",
     "totalSystems": "Всего систем",
     "totalConnections": "Всего соединений",
@@ -1287,6 +1288,7 @@
     "currentSystem": "Текущая система",
     "centerOnSystem": "Центрировать карту на {{system}}",
     "deleteMapConfirm": "Удалить «{{name}}»? Это нельзя отменить.",
+    "leaveMapConfirm": "Убрать «{{name}}» из вашего списка? Владелец сможет поделиться ею снова позже.",
     "online": {
       "offline": "Офлайн",
       "statusUnknown": "Статус неизвестен",
