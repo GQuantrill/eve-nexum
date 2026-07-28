@@ -1665,6 +1665,7 @@
     "characterFallback": "Personagem {{id}}",
     "altLastKnown": "(última conhecida)",
     "killsTooltip": "{{ships}} nave · {{pods}} cápsula destruídas esta hora",
+    "killsTooltipHint": "Contagem horária da CCP · pode ainda não estar no zKillboard",
     "recentKill": "Abate há {{ago}} min ({{value}} ISK)",
     "a0Sun": "Sol A0",
     "shattered": "Estilhaçado",

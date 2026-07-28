@@ -432,7 +432,12 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
             <span className="system-node__kill-icon">
               <SwordIcon size={14} weight="regular" />
               <span className="system-node__kill-tooltip">
-                {t('mapNode.killsTooltip', { ships: myKills.shipKills, pods: myKills.podKills })}
+                <span className="system-node__kill-tooltip-main">
+                  {t('mapNode.killsTooltip', { ships: myKills.shipKills, pods: myKills.podKills })}
+                </span>
+                <span className="system-node__kill-tooltip-hint">
+                  {t('mapNode.killsTooltipHint')}
+                </span>
               </span>
             </span>
           )}

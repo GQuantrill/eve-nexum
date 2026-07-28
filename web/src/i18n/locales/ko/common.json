@@ -1665,6 +1665,7 @@
     "characterFallback": "캐릭터 {{id}}",
     "altLastKnown": "(마지막 확인)",
     "killsTooltip": "이번 시간 {{ships}} 함선 · {{pods}} 캡슐 킬",
+    "killsTooltipHint": "CCP 시간별 집계 · 킬메일이 아직 zKillboard에 없을 수 있음",
     "recentKill": "{{ago}}분 전 격추 ({{value}} ISK)",
     "a0Sun": "A0 항성",
     "shattered": "파괴된 성계",

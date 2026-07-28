@@ -1665,6 +1665,7 @@
     "characterFallback": "角色 {{id}}",
     "altLastKnown": "（最后已知）",
     "killsTooltip": "本小时 {{ships}} 舰船 · {{pods}} 太空舱击杀",
+    "killsTooltipHint": "CCP 每小时统计 · 击杀报告可能尚未出现在 zKillboard",
     "recentKill": "{{ago}} 分钟前击杀 ({{value}} ISK)",
     "a0Sun": "A0 恒星",
     "shattered": "破碎星系",

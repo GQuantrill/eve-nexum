@@ -947,12 +947,29 @@
   border: 1px solid var(--border-strong);
   border-radius: 6px;
   padding: 4px 10px;
-  white-space: nowrap;
   font-size: calc(13px * var(--font-scale, 1));
   color: #ff6060;
   font-weight: 600;
   pointer-events: none;
   z-index: 9999;
+  text-align: center;
+}
+
+.system-node__kill-tooltip-main {
+  white-space: nowrap;
+}
+
+/* Muted second line clarifying the count is CCP's ESI hourly aggregate, which
+   can differ from the zKillboard panel (a killmail zKill hasn't ingested yet,
+   or never will). Allowed to wrap so the longer translations stay readable. */
+.system-node__kill-tooltip-hint {
+  display: block;
+  margin-top: 2px;
+  max-width: 210px;
+  white-space: normal;
+  font-size: calc(11px * var(--font-scale, 1));
+  font-weight: 500;
+  color: var(--text-subtle);
 }
 
 .system-node__kill-icon:hover .system-node__kill-tooltip {

@@ -1665,6 +1665,7 @@
     "characterFallback": "キャラクター {{id}}",
     "altLastKnown": "（最後の確認）",
     "killsTooltip": "今時間 {{ships}} 艦船 · {{pods}} ポッドキル",
+    "killsTooltipHint": "CCP の時間別集計 · killmail はまだ zKillboard にない場合があります",
     "recentKill": "{{ago}}分前のキル ({{value}} ISK)",
     "a0Sun": "A0 恒星",
     "shattered": "破壊された星系",
