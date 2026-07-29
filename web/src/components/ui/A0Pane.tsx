@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MapPinSimpleIcon, PathIcon } from '@phosphor-icons/react';
+import { MapPinSimpleIcon, PathIcon } from '../../icons';
 import { jumps } from '../../i18n/format';
 import { useA0Systems } from '../../hooks/useA0Systems';
 import { useRouteOrigin } from '../../hooks/useRouteOrigin';

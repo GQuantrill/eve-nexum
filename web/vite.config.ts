@@ -47,6 +47,25 @@ export default defineConfig(({ mode }) => {
   return {
     define: { __APP_VERSION__: JSON.stringify(APP_VERSION) },
     plugins: [react(), gtmPlugin(gtmId)],
+    build: {
+      rollupOptions: {
+        output: {
+          // Split big / slow-changing deps into their own cacheable chunks so the
+          // entry stays lean and these aren't re-downloaded on every app deploy
+          // (the app ships often; the icon set and translations rarely change).
+          // NOTE: the current rolldown-vite groups node_modules at the package
+          // level, so we can't further split the Phosphor set into an on-demand
+          // chunk here — it loads with the app but is cached separately. A curated
+          // icon set would be needed to make the picker's full set truly lazy.
+          manualChunks(id) {
+            if (id.includes('@phosphor-icons')) return 'phosphor';
+            if (id.includes('@xyflow') || id.includes('@dnd-kit')) return 'xyflow';
+            if (id.includes('chart.js')) return 'chartjs';
+            if (id.includes('/src/i18n/locales/')) return 'locales';
+          },
+        },
+      },
+    },
     server: {
       port: 5174,
       proxy: {

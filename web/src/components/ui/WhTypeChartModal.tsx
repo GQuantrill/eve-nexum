@@ -1,7 +1,7 @@
 import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { XIcon } from '@phosphor-icons/react';
+import { XIcon } from '../../icons';
 import { CLASS_COLORS } from '../../data/wormholes';
 import { WH_JUMP_MASS } from '../../utils/wormholeSize';
 import type { SystemClass } from '../../types';

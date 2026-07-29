@@ -22,7 +22,7 @@ import type { Signature, SavedRoute } from '../../types';
 import {
   CaretRightIcon, CaretDownIcon, TrashIcon, ArrowRightIcon,
   ArrowBendUpRightIcon, WarningIcon, ArrowsLeftRightIcon,
-} from '@phosphor-icons/react';
+} from '../../icons';
 
 // A chain row is dragged only up/down within the list; zero the X component so
 // both the drag transform and collision detection lock to the vertical axis

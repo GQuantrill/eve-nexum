@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { v4 as uuid } from 'uuid';
-import { TrashIcon, PlusIcon } from '@phosphor-icons/react';
+import { TrashIcon, PlusIcon } from '../../icons';
 import { useCustomIntel, MAX_CUSTOM_INTEL } from '../../hooks/useCustomIntel';
 import type { CustomIntel } from '../../types';
 import styles from './CustomIntelBlock.module.css';

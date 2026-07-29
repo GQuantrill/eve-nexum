@@ -12,7 +12,7 @@ import { ConfirmModal, shouldSkipConfirm } from './ConfirmModal';
 import { NotesEditor } from './NotesEditor';
 import { WormholeTypePicker } from './WormholeTypePicker';
 import { Select } from './Select';
-import { XIcon, CopyIcon, ColumnsIcon } from '@phosphor-icons/react';
+import { XIcon, CopyIcon, ColumnsIcon } from '../../icons';
 import { LeadsToDropdown } from './LeadsToDropdown';
 import { toast } from './Toaster';
 import { reevaluateConnectionsForSystem } from '../../utils/whAutoDetect';

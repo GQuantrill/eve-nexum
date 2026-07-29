@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FireIcon } from '@phosphor-icons/react';
+import { FireIcon } from '../../icons';
 import { useUserSetting } from '../../hooks/useUserSetting';
 import { useClickOutside } from '../../hooks/useClickOutside';
 import { HEAT_METRICS, type HeatMetric } from '../../utils/heatmap';

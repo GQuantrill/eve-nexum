@@ -5,7 +5,7 @@ import { api, ApiError } from '../../api/client';
 import { useMapStore } from '../../store/mapStore';
 import { useAuth } from '../../context/AuthContext';
 import { toast } from './Toaster';
-import { XIcon, PlusIcon } from '@phosphor-icons/react';
+import { XIcon, PlusIcon } from '../../icons';
 
 interface ShareRow {
   id:        string;

@@ -31,7 +31,7 @@ import {
   XIcon, CheckIcon, PlusIcon, SelectionAllIcon, EyeIcon, CrosshairSimpleIcon,
   LinkSimpleIcon, LinkBreakIcon, ArrowsOutIcon, BookmarkSimpleIcon, TextAaIcon, TrashIcon,
   HashIcon, ProhibitIcon,
-} from '@phosphor-icons/react';
+} from '../../icons';
 import { PREDEFINED_LABELS } from '../../data/labels';
 
 // Quick-tag character set: all letters then all digits, laid out in the grid

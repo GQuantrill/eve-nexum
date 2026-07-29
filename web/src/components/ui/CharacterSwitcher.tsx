@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import { useClickOutside } from '../../hooks/useClickOutside';
 import { charPortrait } from '../../utils/eveImages';
 import { useTranslation } from 'react-i18next';
-import { CaretDownIcon, PlusIcon, CheckIcon, MapPinIcon, TrashIcon } from '@phosphor-icons/react';
+import { CaretDownIcon, PlusIcon, CheckIcon, MapPinIcon, TrashIcon } from '../../icons';
 import { useAuth } from '../../context/AuthContext';
 import { useMapStore } from '../../store/mapStore';
 import { api, apiUrl } from '../../api/client';
