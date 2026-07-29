@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { ReactNode, KeyboardEvent } from 'react';
 import { createPortal } from 'react-dom';
-import { CaretDownIcon, CaretUpIcon, CheckIcon } from '@phosphor-icons/react';
+import { CaretDownIcon, CaretUpIcon, CheckIcon } from '../../icons';
 import { usePopover } from '../../hooks/usePopover';
 import styles from './Select.module.css';
 

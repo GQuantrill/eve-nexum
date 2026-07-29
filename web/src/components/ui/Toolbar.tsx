@@ -38,8 +38,8 @@ import {
   SignOutIcon, PlanetIcon, LinkSimpleIcon, ClockCountdownIcon, MapPinIcon,
   KeyIcon, GraphIcon, ArrowCounterClockwiseIcon, DotsSixVerticalIcon,
   DiscordLogoIcon,
-} from '@phosphor-icons/react';
-import type { Icon as PhosphorIcon } from '@phosphor-icons/react';
+} from '../../icons';
+import type { Icon as PhosphorIcon } from '../../icons';
 import { UpdateIndicator } from './UpdateIndicator';
 import { charPortrait, typeIcon } from '../../utils/eveImages';
 import { DISCORD_INVITE_URL } from '../../data/links';

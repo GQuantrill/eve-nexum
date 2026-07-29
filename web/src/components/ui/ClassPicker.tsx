@@ -1,4 +1,4 @@
-import { CaretDownIcon, CaretUpIcon } from '@phosphor-icons/react';
+import { CaretDownIcon, CaretUpIcon } from '../../icons';
 import { CLASS_COLORS, CLASS_LABELS } from '../../data/wormholes';
 import { usePopover } from '../../hooks/usePopover';
 import type { SystemClass } from '../../types';

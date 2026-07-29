@@ -1767,6 +1767,7 @@
   "iconPicker": {
     "title": "Escolher um ícone",
     "search": "Pesquisar ícones…",
+    "loading": "A carregar ícones…",
     "more": "Refine a pesquisa para ver mais"
   },
   "labelsDialog": {

@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>How to Map a Wormhole Chain in EVE Online — Beginner's Guide</title>
+    <meta name="description" content="Learn how to map a wormhole chain in EVE Online: scanning signatures, bookmarking connections, reading K162s, tracking mass, and using a real-time wormhole mapper so your whole corp sees the same chain." />
+    <meta name="keywords" content="how to map wormholes eve, wormhole chain mapping, eve wormhole scanning, wormhole mapper, scanning signatures eve, wormhole bookmarks, mapping a chain, J-space navigation, eve online wormhole tracking" />
+    <meta name="author" content="Area 404" />
+    <meta name="theme-color" content="#06080f" />
+    <link rel="canonical" href="https://eve-nexum.com/guides/mapping/" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <meta name="robots" content="index, follow" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://eve-nexum.com/guides/mapping/" />
+    <meta property="og:title" content="How to Map a Wormhole Chain in EVE Online" />
+    <meta property="og:description" content="Scanning signatures, bookmarking connections, reading K162s, tracking mass, and using a real-time wormhole mapper." />
+    <meta property="og:image" content="https://eve-nexum.com/hero.png" />
+    <meta property="og:site_name" content="Nexum" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="How to Map a Wormhole Chain in EVE Online" />
+    <meta name="twitter:description" content="Scanning, bookmarking, K162s, mass tracking, and using a real-time wormhole mapper." />
+    <meta name="twitter:image" content="https://eve-nexum.com/hero.png" />
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "How to Map a Wormhole Chain in EVE Online",
+      "about": "Scanning and mapping wormhole chains in EVE Online",
+      "author": { "@type": "Organization", "name": "Area 404" },
+      "publisher": { "@type": "Organization", "name": "Nexum", "url": "https://eve-nexum.com/" },
+      "mainEntityOfPage": "https://eve-nexum.com/guides/mapping/",
+      "inLanguage": "en"
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "HowTo",
+      "name": "How to map a wormhole chain in EVE Online",
+      "step": [
+        { "@type": "HowToStep", "name": "Scan your home system", "text": "Use probes to resolve every cosmic signature, then filter for the wormhole signatures - those are your connections out." },
+        { "@type": "HowToStep", "name": "Identify each wormhole", "text": "Warp to and enter each hole; the far side's named signature tells you the type, mass and lifetime. The near side may show only a K162." },
+        { "@type": "HowToStep", "name": "Record it on a map", "text": "Add each system and connection to a mapper as you scan, pasting your in-game signature list so wormholes auto-tag and age." },
+        { "@type": "HowToStep", "name": "Follow the chain outward", "text": "Repeat in each connected system to build the full chain from your home to k-space exits and neighbouring holes." },
+        { "@type": "HowToStep", "name": "Share it live with your corp", "text": "Use a real-time mapper so every pilot sees the same chain, mass status and threats without re-scanning." }
+      ]
+    }
+    </script>
+
+    <style>
+      :root { --bg:#06080f; --panel:#111827; --panel2:#141c2e; --border:#1e2740; --text:#c8d2e6; --head:#eaf0fb; --muted:#8a98b8; --muted2:#6a7898; --accent:#5b9bff; --green:#3ddc84; --amber:#f0a030; --red:#e05a5a; }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; background: var(--bg); }
+      body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--text); line-height: 1.6; }
+      .wrap { max-width: 820px; margin: 0 auto; padding: 32px 20px 64px; }
+      a { color: var(--accent); }
+      .topnav { font-size: 14px; }
+      .topnav a { color: var(--muted); text-decoration: none; }
+      header.hero { margin: 24px 0 8px; }
+      .logo { font-size: 30px; color: var(--accent); line-height: 1; }
+      h1 { color: var(--head); font-size: 30px; line-height: 1.25; margin: 12px 0 6px; }
+      .sub { color: var(--muted); margin: 0; }
+      .updated { color: var(--muted2); font-size: 13px; margin: 6px 0 28px; }
+      h2 { color: var(--head); font-size: 23px; margin: 40px 0 10px; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+      h3 { color: var(--head); font-size: 18px; margin: 22px 0 4px; }
+      p { margin: 10px 0; }
+      .lede { font-size: 17px; color: var(--text); }
+      ul, ol { padding-left: 20px; } li { margin: 5px 0; }
+      .card { background: var(--panel); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 8px; padding: 4px 16px 14px; margin: 16px 0; }
+      .cta { background: var(--panel2); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; margin: 36px 0 0; text-align: center; }
+      .cta a.btn { display: inline-block; margin-top: 8px; padding: 9px 18px; background: var(--accent); color: #04060c; border-radius: 8px; text-decoration: none; font-weight: 700; }
+      .related { margin: 30px 0 0; padding: 16px 20px; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; }
+      .related h2 { border: 0; margin: 0 0 8px; font-size: 16px; }
+      footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--border); color: var(--muted2); font-size: 13px; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <nav class="topnav"><a href="/">&larr; Nexum home</a></nav>
+
+      <header class="hero">
+        <div class="logo" aria-hidden="true">&#9672;</div>
+        <h1>How to Map a Wormhole Chain in EVE Online</h1>
+        <p class="sub">Scan it, read it, record it, and share it live with your corp.</p>
+      </header>
+      <p class="updated">A Nexum wormhole guide</p>
+
+      <p class="lede">A wormhole "chain" is the tree of systems you can reach from your home through wormholes - your statics, the wandering holes into them, and the k-space exits at the far ends. Because those holes shift and die constantly, the chain is never the same twice, so wormhole corps keep a live <strong>map</strong> of it. This guide walks through building one from scratch and keeping it current.</p>
+
+      <h2>Step 1: Scan your home</h2>
+      <p>Open the probe scanner and resolve every cosmic signature in your system to 100%. Filter for the <strong>wormhole</strong> signatures - those are your ways out (and other people's ways in). Data/relic/gas sites matter for ISK, but for mapping it is the wormholes you care about.</p>
+
+      <h2>Step 2: Identify each wormhole</h2>
+      <p>Warp to a wormhole and look at it. If it shows a named type (like "N062" or "C247"), that side tells you the destination class, total mass and lifetime. If it shows a <strong>K162</strong>, it is the exit side of a hole someone opened from elsewhere - jump through and read the named signature on the far side to learn what it really is. Note the mass stage ("not significantly disrupted", "reduced", "on the verge of collapse") and the lifetime ("not yet begun to decay" vs "reaching the end of its natural lifetime").</p>
+
+      <div class="card">
+        <h3>Paste, do not retype</h3>
+        <p>In game you can copy your whole probe-scanner signature list. A good mapper lets you paste it straight in, matches it against what is already on the map, and auto-tags wormholes - so you are not hand-typing six-character sig IDs under time pressure.</p>
+      </div>
+
+      <h2>Step 3: Record it on a map</h2>
+      <p>As you identify each hole, add the system and the connection to your map. A dedicated wormhole mapper beats in-game bookmarks because it shows the whole tree at a glance, remembers wormhole types and mass, ages holes automatically as they decay, and does not clutter your bookmark folder. Mark your home, tag connections (frigate hole, EOL, critical mass), and note anything you found - occupied POCOs, a tower, recent kills.</p>
+
+      <h2>Step 4: Follow the chain outward</h2>
+      <p>Jump into each connected system and repeat: scan, identify, record. Keep going until you have mapped out to the k-space exits (highsec/lowsec/nullsec) and any dead-end holes. The result is a full picture of everywhere you can go and everywhere something can come from - which is the difference between roaming safely and warping blind.</p>
+
+      <h2>Step 5: Share it live with your corp</h2>
+      <p>The single biggest upgrade to wormhole life is a <strong>real-time collaborative</strong> map. Instead of one person scanning and everyone else asking "what's the chain?", every pilot sees the same map update instantly as it is scanned. Threats, mass status, and who is where are visible to the whole fleet at once. That is what turns mapping from a chore into a shared situational picture.</p>
+
+      <div class="card">
+        <h3>Keep it current, automatically</h3>
+        <p>Holes decay and collapse whether or not anyone updates the map. A good mapper ages wormholes toward end-of-life on its own, flags stale connections, and (with opt-in tracking) even follows your pilots as they jump - so the chain reflects reality without constant babysitting.</p>
+      </div>
+
+      <div class="cta">
+        <p><strong>Map your chain in real time - free.</strong> Nexum syncs every edit live to everyone viewing the map.</p>
+        <a class="btn" href="/">Open Nexum</a>
+      </div>
+
+      <div class="related">
+        <h2>Related guides</h2>
+        <ul>
+          <li><a href="/guides/rolling/">How to roll a wormhole (mass guide + calculator)</a></li>
+          <li><a href="/guides/classes/">EVE wormhole classes and statics explained</a></li>
+          <li><a href="/compare/">Nexum vs Pathfinder vs Tripwire vs Wanderer</a></li>
+        </ul>
+      </div>
+
+      <footer>
+        <p>EVE Online and the EVE logo are the registered trademarks of CCP hf. All rights reserved worldwide. Nexum is a third-party tool and is not affiliated with or endorsed by CCP hf. See the full <a href="/license/">license &amp; EVE IP notice</a>.</p>
+      </footer>
+    </div>
+  </body>
+</html>

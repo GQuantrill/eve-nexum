@@ -11,7 +11,7 @@ import type { Anomaly, AnomType } from '../../types';
 import { ConfirmModal, shouldSkipConfirm } from './ConfirmModal';
 import { NotesEditor } from './NotesEditor';
 import { Select } from './Select';
-import { XIcon, ColumnsIcon } from '@phosphor-icons/react';
+import { XIcon, ColumnsIcon } from '../../icons';
 import { toast } from './Toaster';
 import { duration, DASH } from '../../i18n/format';
 
