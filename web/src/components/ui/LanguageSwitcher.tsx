@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CaretDownIcon, CheckIcon } from '@phosphor-icons/react';
+import { CaretDownIcon, CheckIcon } from '../../icons';
 import { SUPPORTED_LANGUAGES, LANGUAGE_NAMES, type SupportedLanguage } from '../../i18n';
 import { useClickOutside } from '../../hooks/useClickOutside';
 import { LangFlag } from './LangFlag';

@@ -10,7 +10,7 @@ import { setWaypoint, RouteSquares, canSetAutopilot } from './routeUi';
 import { useSystemAlias } from '../../hooks/useSystemAlias';
 import { truesecColor } from '../../utils/truesec';
 import { useMapStore } from '../../store/mapStore';
-import { MapPinSimpleIcon, PathIcon } from '@phosphor-icons/react';
+import { MapPinSimpleIcon, PathIcon } from '../../icons';
 import { Select } from './Select';
 
 interface Props {

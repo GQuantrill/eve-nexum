@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>EVE Online Wormhole Classes &amp; Statics Explained (C1-C6, Thera, Shattered)</title>
+    <meta name="description" content="A clear guide to EVE Online wormhole classes C1 to C6, class 13 frigate holes, Thera and shattered systems, wormhole system effects (Pulsar, Magnetar, and more), and how statics and wandering connections work." />
+    <meta name="keywords" content="eve wormhole classes, wormhole statics, wormhole class effects, C1 C2 C3 C4 C5 C6, wormhole system effects, pulsar magnetar, wormhole static destination, K162, J-space, eve online wormholes explained" />
+    <meta name="author" content="Area 404" />
+    <meta name="theme-color" content="#06080f" />
+    <link rel="canonical" href="https://eve-nexum.com/guides/classes/" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <meta name="robots" content="index, follow" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://eve-nexum.com/guides/classes/" />
+    <meta property="og:title" content="EVE Online Wormhole Classes &amp; Statics Explained" />
+    <meta property="og:description" content="Wormhole classes C1-C6, C13, Thera, shattered systems, system effects, and how statics and wandering connections work." />
+    <meta property="og:image" content="https://eve-nexum.com/hero.png" />
+    <meta property="og:site_name" content="Nexum" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="EVE Online Wormhole Classes &amp; Statics Explained" />
+    <meta name="twitter:description" content="C1-C6, C13, Thera, shattered systems, effects, statics and wandering connections." />
+    <meta name="twitter:image" content="https://eve-nexum.com/hero.png" />
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "EVE Online Wormhole Classes & Statics Explained",
+      "about": "Wormhole space classes, effects and static connections in EVE Online",
+      "author": { "@type": "Organization", "name": "Area 404" },
+      "publisher": { "@type": "Organization", "name": "Nexum", "url": "https://eve-nexum.com/" },
+      "mainEntityOfPage": "https://eve-nexum.com/guides/classes/",
+      "inLanguage": "en"
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        { "@type": "Question", "name": "What are wormhole classes in EVE Online?", "acceptedAnswer": { "@type": "Answer", "text": "Wormhole (J-space) systems are graded C1 through C6 by difficulty, plus special classes: C13 frigate-only holes, shattered systems, and Thera. Higher classes have tougher Sleeper NPCs, bigger rewards, and heavier wormhole mass allowances." } },
+        { "@type": "Question", "name": "What is a static wormhole?", "acceptedAnswer": { "@type": "Answer", "text": "A static is a wormhole connection a system always regenerates to a fixed destination class. When one static dies, another of the same type spawns, so a C3 with a highsec static always has a route to highsec somewhere. Wandering connections, by contrast, are random and temporary." } },
+        { "@type": "Question", "name": "What is a K162?", "acceptedAnswer": { "@type": "Answer", "text": "A K162 is the exit side of a wormhole - the signature that appears when someone opens a connection from the other end. It carries no type information of its own, so you learn the real hole type (and its mass) from the named signature on the opposite side." } }
+      ]
+    }
+    </script>
+
+    <style>
+      :root { --bg:#06080f; --panel:#111827; --panel2:#141c2e; --border:#1e2740; --text:#c8d2e6; --head:#eaf0fb; --muted:#8a98b8; --muted2:#6a7898; --accent:#5b9bff; --green:#3ddc84; --amber:#f0a030; --red:#e05a5a; }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; background: var(--bg); }
+      body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--text); line-height: 1.6; }
+      .wrap { max-width: 820px; margin: 0 auto; padding: 32px 20px 64px; }
+      a { color: var(--accent); }
+      .topnav { font-size: 14px; }
+      .topnav a { color: var(--muted); text-decoration: none; }
+      header.hero { margin: 24px 0 8px; }
+      .logo { font-size: 30px; color: var(--accent); line-height: 1; }
+      h1 { color: var(--head); font-size: 30px; line-height: 1.25; margin: 12px 0 6px; }
+      .sub { color: var(--muted); margin: 0; }
+      .updated { color: var(--muted2); font-size: 13px; margin: 6px 0 28px; }
+      h2 { color: var(--head); font-size: 23px; margin: 40px 0 10px; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+      h3 { color: var(--head); font-size: 18px; margin: 22px 0 4px; }
+      p { margin: 10px 0; }
+      .lede { font-size: 17px; color: var(--text); }
+      ul, ol { padding-left: 20px; } li { margin: 5px 0; }
+      .table-scroll { overflow-x: auto; margin: 18px 0; border: 1px solid var(--border); border-radius: 10px; }
+      table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 14px; }
+      th, td { padding: 9px 12px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: top; }
+      thead th { background: var(--panel2); color: var(--head); }
+      tbody th { color: var(--muted); font-weight: 600; }
+      .card { background: var(--panel); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 8px; padding: 4px 16px 14px; margin: 16px 0; }
+      .cta { background: var(--panel2); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; margin: 36px 0 0; text-align: center; }
+      .cta a.btn { display: inline-block; margin-top: 8px; padding: 9px 18px; background: var(--accent); color: #04060c; border-radius: 8px; text-decoration: none; font-weight: 700; }
+      .related { margin: 30px 0 0; padding: 16px 20px; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; }
+      .related h2 { border: 0; margin: 0 0 8px; font-size: 16px; }
+      footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--border); color: var(--muted2); font-size: 13px; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <nav class="topnav"><a href="/">&larr; Nexum home</a></nav>
+
+      <header class="hero">
+        <div class="logo" aria-hidden="true">&#9672;</div>
+        <h1>EVE Online Wormhole Classes &amp; Statics Explained</h1>
+        <p class="sub">C1-C6, frigate holes, Thera and shattered systems, effects, and how statics work.</p>
+      </header>
+      <p class="updated">A Nexum wormhole guide</p>
+
+      <p class="lede">Wormhole space - "J-space" - is the ~2,600 unknown systems that only connect through wormholes, never gates. Each system has a <strong>class</strong> that sets its difficulty and rewards, sometimes a <strong>system effect</strong> that buffs or nerfs your ships, and a <strong>static</strong> that decides where it reliably connects. Understanding these three things is most of what you need to live in, or roam through, wormholes.</p>
+
+      <h2>The wormhole classes (C1-C6)</h2>
+      <p>The main classes scale in Sleeper NPC difficulty, loot, and - importantly for movement - wormhole mass allowances.</p>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>Class</th><th>Feel</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><th>C1</th><td>Starter</td><td>Low ship-mass holes; cruiser-friendly. Often has a highsec static.</td></tr>
+            <tr><th>C2</th><td>Casual</td><td>Two statics is common; a frequent choice for small corps.</td></tr>
+            <tr><th>C3</th><td>Solid ISK</td><td>Popular home class; strong ratting for the risk, usually a k-space static.</td></tr>
+            <tr><th>C4</th><td>Defensive</td><td>Dual wormhole statics and no direct k-space static - hard to find, hard to invade.</td></tr>
+            <tr><th>C5</th><td>Capital</td><td>High mass holes; capital ratting and escalations. Serious PvP.</td></tr>
+            <tr><th>C6</th><td>Endgame</td><td>Maximum mass and reward; large-scale capital brawls.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Special classes</h3>
+      <ul>
+        <li><strong>C13</strong> - frigate-sized "shattered" holes; only frigates, destroyers and a few small hulls fit through the tiny mass limits.</li>
+        <li><strong>Shattered systems</strong> - no planets you can anchor on, often multiple statics and a static effect; used for daytripping and hunting.</li>
+        <li><strong>Thera</strong> - a unique, large shattered system with many static exits all over New Eden. It is a hub for explorers and roamers and is heavily patrolled.</li>
+      </ul>
+
+      <h2>System effects</h2>
+      <p>Many wormhole systems have a persistent <strong>effect</strong> that changes your ship stats - and the strength scales with class (a C6 effect is far stronger than a C1). The main ones:</p>
+      <ul>
+        <li><strong>Pulsar</strong> - boosts shields, reduces armour resists, cuts capacitor recharge.</li>
+        <li><strong>Magnetar</strong> - boosts damage and drone stats but hurts tracking, missile explosion and targeting.</li>
+        <li><strong>Black Hole</strong> - boosts speed, range and missile velocity; hurts tracking and inertia.</li>
+        <li><strong>Red Giant</strong> - boosts overheat, smartbombs, bombs and precision.</li>
+        <li><strong>Cataclysmic Variable</strong> - boosts remote reps and capacitor capacity; reduces recharge and local rep.</li>
+        <li><strong>Wolf-Rayet</strong> - big boost to armour resists and small weapon damage; reduces shield HP - a small-ship brawler's effect.</li>
+      </ul>
+      <p>Always check a system's effect before you commit a fight in it - a Magnetar can double a brawler's damage, and a Pulsar can flip a fit's tank on its head.</p>
+
+      <h2>Statics vs wandering connections</h2>
+      <p>A <strong>static</strong> is a connection a system <em>always</em> regenerates to a fixed destination class. When a system's static dies (collapsed or expired), a new one of the same type spawns somewhere else. So a C3 with a highsec static will always have a route to highsec - the specific highsec system changes, the guarantee does not. Statics are why corps pick a home class: a reliable highsec static makes logistics easy; a C5 static makes for constant capital content.</p>
+      <p><strong>Wandering</strong> connections are the random, temporary holes that open into your system from elsewhere. They are unpredictable and are the usual way roamers and invaders arrive - which is why you scan your home every day.</p>
+
+      <div class="card">
+        <h3>K162 - the exit side</h3>
+        <p>Every wormhole has two ends. The side that was opened <em>from the other system</em> shows up as a <strong>K162</strong> and carries no mass/type info of its own. To know the real hole type, mass and lifetime, you read the named signature (e.g. "N062", "C247") on the opposite side. A mapper resolves this for you automatically from your scan results.</p>
+      </div>
+
+      <div class="cta">
+        <p><strong>Map every class as you scan it.</strong> Nexum labels wormhole types, statics, effects and mass automatically - free.</p>
+        <a class="btn" href="/">Open Nexum</a>
+      </div>
+
+      <div class="related">
+        <h2>Related guides</h2>
+        <ul>
+          <li><a href="/guides/rolling/">How to roll a wormhole (mass guide + calculator)</a></li>
+          <li><a href="/guides/mapping/">How to map a wormhole chain</a></li>
+          <li><a href="/compare/">Nexum vs Pathfinder vs Tripwire vs Wanderer</a></li>
+        </ul>
+      </div>
+
+      <footer>
+        <p>EVE Online and the EVE logo are the registered trademarks of CCP hf. All rights reserved worldwide. Nexum is a third-party tool and is not affiliated with or endorsed by CCP hf. See the full <a href="/license/">license &amp; EVE IP notice</a>.</p>
+      </footer>
+    </div>
+  </body>
+</html>

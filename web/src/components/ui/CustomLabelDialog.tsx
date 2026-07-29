@@ -1,12 +1,12 @@
 import { useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { XIcon } from '@phosphor-icons/react';
+import { XIcon } from '../../icons';
 import {
   MAX_CUSTOM_LABELS, DEFAULT_CUSTOM_LABEL_COLOR,
   parseCustomLabel, encodeTextLabel, encodeIconLabel, labelTextColor,
 } from '../../data/labels';
-import { ALL_ICON_NAMES, iconComponent } from '../../utils/phosphorIcons';
+import { usePhosphorIcons } from '../../utils/phosphorIcons';
 
 interface Props {
   customLabels: string[];                 // raw 't:'/'i:' entries
@@ -28,6 +28,8 @@ export function CustomLabelDialog({ customLabels, onChange, onClose }: Props) {
   const [color, setColor]   = useState<string>(DEFAULT_CUSTOM_LABEL_COLOR);
 
   const full = labels.length >= MAX_CUSTOM_LABELS;
+  // Phosphor is lazy-loaded on first open; `names` fills in once ready.
+  const { ready, names, resolve } = usePhosphorIcons();
 
   const apply = (next: string[]) => { setLabels(next); onChange(next); };
   const addText = () => {
@@ -48,9 +50,9 @@ export function CustomLabelDialog({ customLabels, onChange, onClose }: Props) {
 
   const matches = useMemo(() => {
     const q = iconQuery.trim().toLowerCase();
-    const list = q ? ALL_ICON_NAMES.filter((n) => n.toLowerCase().includes(q)) : ALL_ICON_NAMES;
+    const list = q ? names.filter((n) => n.toLowerCase().includes(q)) : names;
     return { shown: list.slice(0, ICON_RENDER_CAP), total: list.length };
-  }, [iconQuery]);
+  }, [iconQuery, names]);
 
   return createPortal(
     <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
@@ -67,7 +69,7 @@ export function CustomLabelDialog({ customLabels, onChange, onClose }: Props) {
             <div className="custom-label-dialog__current">
               {labels.map((raw, i) => {
                 const parsed = parseCustomLabel(raw);
-                const Icon = parsed?.kind === 'icon' ? iconComponent(parsed.value) : null;
+                const Icon = parsed?.kind === 'icon' ? resolve(parsed.value) : null;
                 const bg = parsed?.color || undefined;
                 return (
                   <span
@@ -135,9 +137,10 @@ export function CustomLabelDialog({ customLabels, onChange, onClose }: Props) {
             onChange={(e) => setIconQuery(e.target.value)}
             style={{ width: '100%', marginTop: 10 }}
           />
+          {!ready && <p className="custom-label-dialog__hint">{t('iconPicker.loading')}</p>}
           <div className="custom-label-dialog__icons" aria-disabled={full}>
             {matches.shown.map((name) => {
-              const Icon = iconComponent(name);
+              const Icon = resolve(name);
               if (!Icon) return null;
               return (
                 <button

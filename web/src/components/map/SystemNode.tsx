@@ -4,7 +4,7 @@ import { Handle, Position, useConnection } from '@xyflow/react';
 import {
   HouseIcon, LockIcon, WarningIcon, SkullIcon, LightningIcon,
   SunIcon, SnowflakeIcon, SwordIcon, SparkleIcon, DiamondsFourIcon,
-} from '@phosphor-icons/react';
+} from '../../icons';
 import type { NodeProps } from '@xyflow/react';
 import type { MapSystem } from '../../types';
 import { CLASS_COLORS, CLASS_LABELS, EFFECT_ICONS, EFFECT_LABELS, EFFECT_MODIFIERS } from '../../data/wormholes';
@@ -27,7 +27,7 @@ import { useScoutConnections, findScoutConnections } from '../../hooks/useScoutC
 import { useA0SystemIds } from '../../hooks/useA0Systems';
 import { useShatteredSystemIds } from '../../hooks/useShatteredSystems';
 import { PREDEFINED_LABELS, parseCustomLabel, labelTextColor } from '../../data/labels';
-import { iconComponent } from '../../utils/phosphorIcons';
+import { DynamicIcon } from '../DynamicIcon';
 import { useIceBeltSystems, hasIceBelt } from '../../hooks/useIceBeltSystems';
 import { useCurrentHourKills } from '../../hooks/useCurrentHourKills';
 import { useNow30s } from '../../hooks/useNow30s';
@@ -299,14 +299,15 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
           {(sys.customLabels ?? []).map((raw, i) => {
             const parsed = parseCustomLabel(raw);
             if (!parsed) return null;
-            const Icon = parsed.kind === 'icon' ? iconComponent(parsed.value) : null;
             return (
               <span
                 key={i}
                 className={`system-node__label${parsed.color ? '' : ' system-node__label--custom'}`}
                 style={parsed.color ? { background: parsed.color, color: labelTextColor(parsed.color), textShadow: 'none' } : undefined}
               >
-                {Icon ? <Icon size={12} weight="fill" /> : parsed.value}
+                {parsed.kind === 'icon'
+                  ? <DynamicIcon name={parsed.value} size={12} weight="fill" />
+                  : parsed.value}
               </span>
             );
           })}
