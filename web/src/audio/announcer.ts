@@ -67,6 +67,16 @@ export const useAnnouncer = create<AnnouncerState>((set, get) => ({
     if (loadPromise) return loadPromise;
     set({ status: 'loading', progress: 0, error: null });
     loadPromise = (async () => {
+      // Configure the ONNX runtime (transformers.js backend) BEFORE loading:
+      // force single-threaded wasm so it doesn't need SharedArrayBuffer /
+      // cross-origin isolation (we deliberately don't set COOP/COEP — those
+      // would break cross-origin images/GTM). The ORT runtime .mjs/.wasm load
+      // from jsdelivr, which the demo CSP allows in script-src + connect-src.
+      try {
+        const { env } = await import('@huggingface/transformers');
+        (env.backends.onnx.wasm as { numThreads?: number }).numThreads = 1;
+      } catch { /* best-effort — proceed with defaults */ }
+
       const { KokoroTTS: Kokoro } = await import('kokoro-js');
       const webgpu = typeof navigator !== 'undefined' && 'gpu' in navigator;
       tts = await Kokoro.from_pretrained(MODEL_ID, {
