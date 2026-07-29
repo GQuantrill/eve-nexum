@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { WarningIcon } from '@phosphor-icons/react';
+import { WarningIcon } from '../../icons';
 import { useUpdateCheck } from '../../hooks/useUpdateCheck';
 import { useDebugFlag } from '../../utils/debugFlags';
 

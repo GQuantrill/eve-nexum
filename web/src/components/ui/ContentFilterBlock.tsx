@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { XIcon } from '@phosphor-icons/react';
+import { XIcon } from '../../icons';
 import { useMapStore } from '../../store/mapStore';
 import { FILTER_SIG_TYPES, FILTER_ANOM_TYPES, contentFilterActive, systemMatchesContent } from '../../utils/contentMatch';
 

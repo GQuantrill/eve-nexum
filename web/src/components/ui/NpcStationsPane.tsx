@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
 import type { NpcStation } from '../../types';
 import { ContextMenu } from './ContextMenu';
-import { PathIcon, MapPinSimpleIcon } from '@phosphor-icons/react';
+import { PathIcon, MapPinSimpleIcon } from '../../icons';
 import { setDestination, addWaypoint } from '../../api/waypoint';
 import { loadSystem } from '../../hooks/useEsiSystem';
 import { useShareMode } from '../../context/ShareModeContext';

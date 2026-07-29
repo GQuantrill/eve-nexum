@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowRightIcon, CaretDownIcon, CaretUpIcon } from '@phosphor-icons/react';
+import { ArrowRightIcon, CaretDownIcon, CaretUpIcon } from '../../icons';
 import type { MapSystem, SystemClass } from '../../types';
 import { CLASS_COLORS, CLASS_LABELS } from '../../data/wormholes';
 import { LEADS_TO_BANDS } from '../../utils/whDest';

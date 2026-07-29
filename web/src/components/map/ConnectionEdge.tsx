@@ -13,7 +13,7 @@ import { useWormholeTypes } from '../../hooks/useWormholeTypes';
 import { matchConnection } from '../../utils/watchMatch';
 import { watchMarker } from '../../data/watchMarkers';
 import { effectiveExpiryMs, lifeBucket, type TimeBucket } from '../../utils/whLifetime';
-import { iconComponent } from '../../utils/phosphorIcons';
+import { DynamicIcon } from '../DynamicIcon';
 import { hoursMins } from '../../i18n/format';
 import type { TFunction } from 'i18next';
 
@@ -224,8 +224,8 @@ export const ConnectionEdge = memo(({
             : null;
           // Corp/alliance-shared flag: an icon badge beside the type, its note
           // (if any) revealed by the global [data-tooltip] layer on hover.
-          const FlagIcon = conn?.flagIcon ? iconComponent(conn.flagIcon) : null;
-          const flagNode = FlagIcon
+          const flagIcon = conn?.flagIcon || null;
+          const flagNode = flagIcon
             ? (
               <span
                 className={`connection-label__flag${conn?.flagBlink ? ' connection-label__flag--blink' : ''}`}
@@ -237,7 +237,7 @@ export const ConnectionEdge = memo(({
                 data-tooltip={conn?.flagNote || undefined}
                 onClick={(e) => { e.stopPropagation(); selectConnection(id); }}
               >
-                <FlagIcon size={14} weight="fill" />
+                <DynamicIcon name={flagIcon} size={14} weight="fill" />
               </span>
             )
             : null;

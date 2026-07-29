@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { XIcon } from '@phosphor-icons/react';
+import { XIcon } from '../../icons';
 import { useStats, type StatPeriod, type SigBreakdown, type BucketUnit } from '../../hooks/useStats';
 
 const SPARK_VB_W = 600;

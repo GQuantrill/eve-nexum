@@ -1767,6 +1767,7 @@
   "iconPicker": {
     "title": "아이콘 선택",
     "search": "아이콘 검색…",
+    "loading": "아이콘 불러오는 중…",
     "more": "더 보려면 검색을 좁히세요"
   },
   "labelsDialog": {

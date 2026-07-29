@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { charPortrait } from '../../utils/eveImages';
 import { Trans, useTranslation } from 'react-i18next';
-import type { Icon } from '@phosphor-icons/react';
+import type { Icon } from '../../icons';
 import {
   GraphIcon, MapTrifoldIcon, GaugeIcon, MagnifyingGlassIcon, SelectionIcon, ImageIcon, HourglassIcon,
   LinkBreakIcon, BroomIcon, TimerIcon,
@@ -12,7 +12,7 @@ import {
   SquaresFourIcon, UserGearIcon, TableIcon, ChartDonutIcon, ClockIcon, ClipboardTextIcon, TagIcon, IdentificationCardIcon,
   KeyIcon,
   LineSegmentsIcon,
-} from '@phosphor-icons/react';
+} from '../../icons';
 import { apiUrl } from '../../api/client';
 import { DISCORD_INVITE_URL } from '../../data/links';
 import { SUPPORTED_LANGUAGES, LANGUAGE_NAMES } from '../../i18n';

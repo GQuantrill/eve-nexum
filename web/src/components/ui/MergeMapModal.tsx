@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Trans, useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
-import { XIcon } from '@phosphor-icons/react';
+import { XIcon } from '../../icons';
 import { api } from '../../api/client';
 import { useMapStore, type MapListItem } from '../../store/mapStore';
 import { useAuth, isAdminRole } from '../../context/AuthContext';

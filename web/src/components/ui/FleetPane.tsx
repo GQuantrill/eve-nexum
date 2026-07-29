@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { charPortrait } from '../../utils/eveImages';
 import { useTranslation } from 'react-i18next';
-import { ArrowUpIcon, ArrowDownIcon } from '@phosphor-icons/react';
+import { ArrowUpIcon, ArrowDownIcon } from '../../icons';
 import { useFleet } from '../../hooks/useFleet';
 import { useRoute } from '../../hooks/useRoute';
 import { useRouteOrigin } from '../../hooks/useRouteOrigin';

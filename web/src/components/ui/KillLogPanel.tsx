@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { XIcon, SkullIcon, ArrowSquareOutIcon } from '@phosphor-icons/react';
+import { XIcon, SkullIcon, ArrowSquareOutIcon } from '../../icons';
 import { api } from '../../api/client';
 import { useMapStore } from '../../store/mapStore';
 import { useKillStore, useKillLog, type KillRow } from '../../store/killStore';

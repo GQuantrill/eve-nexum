@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { XIcon, CopyIcon, WarningIcon } from '@phosphor-icons/react';
+import { XIcon, CopyIcon, WarningIcon } from '../../icons';
 import { api } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { europeanDate, timeAgo } from '../../i18n/format';

@@ -1,4 +1,4 @@
-import { type Icon, TargetIcon, MagnetIcon, SkullIcon, HandshakeIcon, EyeIcon } from '@phosphor-icons/react';
+import { type Icon, TargetIcon, MagnetIcon, SkullIcon, HandshakeIcon, EyeIcon } from '../icons';
 import type { WatchMarkerKind } from '../types';
 
 // The single source of truth for watchlist markers. Deliberately separate from
