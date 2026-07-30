@@ -602,6 +602,10 @@
     "invalidJson": "無効な JSON ファイルです。",
     "notNexumMap": "このファイルは Eve-Nexum のマップエクスポートではないようです。",
     "importFailed": "インポートに失敗しました: {{error}}",
+    "importWanderer": "↑ Wanderer からインポート",
+    "importWandererTitle": "Wanderer マッパーからエクスポートしたマップをインポート（新しい個人マップを作成）",
+    "notWandererMap": "ファイルが Wanderer のエクスポートではないようです。",
+    "wandererImported": "Wanderer からインポート：{{systems}} システム、{{connections}} 接続（{{skipped}} 件スキップ）。",
     "colorVision": "色覚",
     "colorVisionOptions": {
       "off": "デフォルトの色",

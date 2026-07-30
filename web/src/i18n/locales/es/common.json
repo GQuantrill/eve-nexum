@@ -602,6 +602,10 @@
     "invalidJson": "Archivo JSON no válido.",
     "notNexumMap": "El archivo no parece una exportación de mapa de Eve-Nexum.",
     "importFailed": "Error al importar: {{error}}",
+    "importWanderer": "↑ Importar desde Wanderer",
+    "importWandererTitle": "Importar un mapa exportado del mapeador Wanderer (crea un nuevo mapa personal)",
+    "notWandererMap": "El archivo no parece una exportación de Wanderer.",
+    "wandererImported": "Importado desde Wanderer: {{systems}} sistemas, {{connections}} conexiones ({{skipped}} omitidos).",
     "colorVision": "Visión del color",
     "colorVisionOptions": {
       "off": "Colores predeterminados",
