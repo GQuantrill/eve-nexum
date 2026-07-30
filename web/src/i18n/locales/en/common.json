@@ -521,7 +521,8 @@
       "mergeMaps": "Merge Maps",
       "liveSharing": "Live Map Broadcast",
       "shareMap": "Share Map",
-      "shortcuts": "Shortcuts"
+      "shortcuts": "Shortcuts",
+      "announcer": "Announcer"
     },
     "snapToGrid": "Snap to Grid",
     "settings": "Settings",
@@ -691,7 +692,24 @@
     "importWanderer": "↑ Import from Wanderer",
     "importWandererTitle": "Import a map exported from the Wanderer mapper (creates a new personal map)",
     "notWandererMap": "File does not look like a Wanderer export.",
-    "wandererImported": "Imported from Wanderer: {{systems}} systems, {{connections}} connections ({{skipped}} skipped)."
+    "wandererImported": "Imported from Wanderer: {{systems}} systems, {{connections}} connections ({{skipped}} skipped).",
+    "announcer": {
+      "hint": "Spoken alerts using an on-device voice. English only.",
+      "enable": "Enable announcer",
+      "voice": "Voice",
+      "downloading": "Downloading voice… {{progress}}%",
+      "speaking": "Speaking…",
+      "preview": "Preview voice",
+      "ready": "Ready",
+      "loadFailed": "Voice model failed to load: {{error}}",
+      "announce": "Announce:",
+      "evConnect": "Character connect / disconnect",
+      "evIncursions": "Incursions in range",
+      "evLawless": "Lawless systems in range",
+      "evKills": "Recent kills in range",
+      "evNewChain": "New chain added by others",
+      "threshold": "\"In range\" uses the Proximity Alerts threshold."
+    }
   },
   "customIntel": {
     "title": "Custom Intel",

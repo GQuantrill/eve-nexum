@@ -1364,7 +1364,7 @@ export function MapSidebar() {
           </div>
         </CollapsibleSection>
 
-        <CollapsibleSection title="Announcer" {...sectionProps("announcer")}>
+        <CollapsibleSection title={t("mapSidebar.sections.announcer")} {...sectionProps("announcer")}>
           <AnnouncerSection />
         </CollapsibleSection>
 

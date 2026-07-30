@@ -464,7 +464,8 @@
       "liveSharing": "Transmisión de mapa en vivo",
       "shareMap": "Compartir mapa",
       "shortcuts": "Atajos",
-      "notifications": "Notificaciones"
+      "notifications": "Notificaciones",
+      "announcer": "Anuncios de voz"
     },
     "snapToGrid": "Ajustar a la cuadrícula",
     "settings": "Ajustes",
@@ -634,7 +635,24 @@
     "routeIncludeWormholes": "Incluir cadena de agujeros de gusano",
     "routeShortcutNote": "Las rutas que usan un agujero de gusano, Thera, Turnur o una puerta de salto no se pueden establecer como destino o punto de ruta en el juego; haz clic derecho en un sistema k-space de la ruta para ir a él.",
     "routeIncludeAnsiblex": "Incluir puertas Ansiblex",
-    "showUndivedWhs": "Mostrar WHs sin explorar"
+    "showUndivedWhs": "Mostrar WHs sin explorar",
+    "announcer": {
+      "hint": "Alertas habladas con una voz en el dispositivo. Solo en inglés.",
+      "enable": "Activar anuncios de voz",
+      "voice": "Voz",
+      "downloading": "Cargando voz… {{progress}} %",
+      "speaking": "Hablando…",
+      "preview": "Probar voz",
+      "ready": "Listo",
+      "loadFailed": "No se pudo cargar el modelo de voz: {{error}}",
+      "announce": "Anunciar:",
+      "evConnect": "Conexión / desconexión de personaje",
+      "evIncursions": "Incursiones dentro del alcance",
+      "evLawless": "Sistemas sin ley dentro del alcance",
+      "evKills": "Naves destruidas recientes dentro del alcance",
+      "evNewChain": "Nueva cadena añadida por otros",
+      "threshold": "«Dentro del alcance» usa el umbral de las alertas de proximidad."
+    }
   },
   "customIntel": {
     "title": "Intel personalizada",

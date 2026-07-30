@@ -464,7 +464,8 @@
       "liveSharing": "Live-Karten-Übertragung",
       "shareMap": "Karte teilen",
       "shortcuts": "Tastenkürzel",
-      "notifications": "Benachrichtigungen"
+      "notifications": "Benachrichtigungen",
+      "announcer": "Sprachansage"
     },
     "snapToGrid": "Am Raster ausrichten",
     "settings": "Einstellungen",
@@ -634,7 +635,24 @@
     "routeIncludeWormholes": "Wurmlochkette einbeziehen",
     "routeShortcutNote": "Routen über ein Wurmloch, Thera, Turnur oder ein Sprungtor können nicht als spielinternes Ziel oder Wegpunkt gesetzt werden — Rechtsklick auf ein K-Space-System in der Route, um stattdessen dorthin zu navigieren.",
     "routeIncludeAnsiblex": "Ansiblex-Sprungtore einbeziehen",
-    "showUndivedWhs": "Ungetauchte WHs zeigen"
+    "showUndivedWhs": "Ungetauchte WHs zeigen",
+    "announcer": {
+      "hint": "Gesprochene Warnungen mit einer Stimme auf dem Gerät. Nur Englisch.",
+      "enable": "Sprachansage aktivieren",
+      "voice": "Stimme",
+      "downloading": "Stimme wird geladen… {{progress}} %",
+      "speaking": "Spricht…",
+      "preview": "Stimme testen",
+      "ready": "Bereit",
+      "loadFailed": "Sprachmodell konnte nicht geladen werden: {{error}}",
+      "announce": "Ansagen:",
+      "evConnect": "Charakter-An-/Abmeldung",
+      "evIncursions": "Inkursionen in Reichweite",
+      "evLawless": "Gesetzlose Systeme in Reichweite",
+      "evKills": "Aktuelle Abschüsse in Reichweite",
+      "evNewChain": "Neue Kette von anderen hinzugefügt",
+      "threshold": "„In Reichweite“ nutzt den Schwellenwert der Näherungswarnungen."
+    }
   },
   "customIntel": {
     "title": "Eigene Intel",

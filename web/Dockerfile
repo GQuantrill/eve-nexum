@@ -9,7 +9,16 @@ COPY . .
 # it as a build arg. Must be set before `yarn build` since Vite inlines it.
 ARG VITE_GTM_ID=
 ENV VITE_GTM_ID=$VITE_GTM_ID
-RUN yarn build
+
+# Voice announcer: self-host the Kokoro model + ORT wasm same-origin so the CSP
+# stays connect-src 'self' (no Hugging Face / jsdelivr at runtime). ANNOUNCER_DTYPE
+# picks the weight precision baked in (q8 ~86 MB default; fp16 ~163 MB; fp32 ~326 MB).
+# Both the flag and dtype are inlined by Vite, so they must be set before the build;
+# fetch-model then downloads the matching assets into the just-built dist/.
+ARG ANNOUNCER_DTYPE=q8
+ENV VITE_ANNOUNCER_SELF_HOSTED=true
+ENV VITE_ANNOUNCER_DTYPE=$ANNOUNCER_DTYPE
+RUN yarn build && node scripts/fetch-model.mjs
 
 FROM nginx:alpine
 COPY --from=builder /app/dist /usr/share/nginx/html

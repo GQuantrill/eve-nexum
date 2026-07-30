@@ -464,7 +464,8 @@
       "liveSharing": "Diffusion de carte en direct",
       "shareMap": "Partager la carte",
       "shortcuts": "Raccourcis",
-      "notifications": "Notifications"
+      "notifications": "Notifications",
+      "announcer": "Annonces vocales"
     },
     "snapToGrid": "Aligner sur la grille",
     "settings": "Paramètres",
@@ -634,7 +635,24 @@
     "routeIncludeWormholes": "Inclure la chaîne de trous de ver",
     "routeShortcutNote": "Les itinéraires passant par un trou de ver, Thera, Turnur ou une porte de saut ne peuvent pas être définis comme destination ou point de passage en jeu — faites un clic droit sur un système k-space de l’itinéraire pour vous y rendre.",
     "routeIncludeAnsiblex": "Inclure les portes Ansiblex",
-    "showUndivedWhs": "Afficher les TdV non explorés"
+    "showUndivedWhs": "Afficher les TdV non explorés",
+    "announcer": {
+      "hint": "Alertes vocales avec une voix sur l’appareil. Anglais uniquement.",
+      "enable": "Activer les annonces vocales",
+      "voice": "Voix",
+      "downloading": "Chargement de la voix… {{progress}} %",
+      "speaking": "Lecture…",
+      "preview": "Tester la voix",
+      "ready": "Prêt",
+      "loadFailed": "Échec du chargement du modèle vocal : {{error}}",
+      "announce": "Annoncer :",
+      "evConnect": "Connexion / déconnexion d’un personnage",
+      "evIncursions": "Incursions à portée",
+      "evLawless": "Systèmes sans loi à portée",
+      "evKills": "Vaisseaux détruits récents à portée",
+      "evNewChain": "Nouvelle chaîne ajoutée par d’autres",
+      "threshold": "« À portée » utilise le seuil des alertes de proximité."
+    }
   },
   "customIntel": {
     "title": "Intel personnalisée",

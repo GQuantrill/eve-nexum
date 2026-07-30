@@ -464,7 +464,8 @@
       "liveSharing": "Transmissão de mapa em direto",
       "shareMap": "Partilhar mapa",
       "shortcuts": "Atalhos",
-      "notifications": "Notificações"
+      "notifications": "Notificações",
+      "announcer": "Anúncios de voz"
     },
     "snapToGrid": "Ajustar à grade",
     "settings": "Configurações",
@@ -634,7 +635,24 @@
     "routeIncludeWormholes": "Incluir cadeia de buracos de minhoca",
     "routeShortcutNote": "Rotas que usam um buraco de minhoca, Thera, Turnur ou um portão de salto não podem ser definidas como destino ou ponto de rota no jogo — clique com o botão direito em um sistema k-space da rota para ir até ele.",
     "routeIncludeAnsiblex": "Incluir portões Ansiblex",
-    "showUndivedWhs": "Mostrar WHs não mergulhados"
+    "showUndivedWhs": "Mostrar WHs não mergulhados",
+    "announcer": {
+      "hint": "Alertas falados com uma voz no dispositivo. Apenas em inglês.",
+      "enable": "Ativar anúncios de voz",
+      "voice": "Voz",
+      "downloading": "A carregar voz… {{progress}} %",
+      "speaking": "A reproduzir…",
+      "preview": "Testar voz",
+      "ready": "Pronto",
+      "loadFailed": "Falha ao carregar o modelo de voz: {{error}}",
+      "announce": "Anunciar:",
+      "evConnect": "Personagem ligado / desligado",
+      "evIncursions": "Incursões no alcance",
+      "evLawless": "Sistemas sem lei no alcance",
+      "evKills": "Naves destruídas recentes no alcance",
+      "evNewChain": "Nova cadeia adicionada por outros",
+      "threshold": "«No alcance» usa o limiar dos alertas de proximidade."
+    }
   },
   "customIntel": {
     "title": "Intel personalizada",

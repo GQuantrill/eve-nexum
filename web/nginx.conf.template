@@ -26,18 +26,18 @@ server {
     # noscript fallback frames googletagmanager.com. This deliberately
     # loosens the formerly-strict script-src — the price of running GTM.
     #
-    # !!! AUDIO-DEMO ONLY (audio branch) -- do NOT merge to release/main. !!!
-    # The in-browser Kokoro voice announcer (kokoro-js + transformers.js/ONNX)
-    # needs three relaxations vs the production CSP:
-    #   - script-src 'wasm-unsafe-eval'  -> instantiate the ONNX WebAssembly
-    #   - worker-src 'self' blob:        -> transformers spawns a blob-URL worker
-    #   - connect-src + Hugging Face hosts / jsdelivr / blob: -> download the
-    #     ~80-300 MB model at runtime and fetch the ORT wasm
-    # For PRODUCTION this must instead SELF-HOST the model + wasm same-origin
-    # (connect-src stays 'self', no third-party hosts); only the wasm-eval +
-    # worker directives are then unavoidable. Revert this block before any
-    # release->main merge.
-    add_header Content-Security-Policy "default-src 'self'; img-src 'self' data: https://images.evetech.net https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://cdn.jsdelivr.net; worker-src 'self' blob:; media-src 'self' blob:; connect-src 'self' blob: https://esi.evetech.net https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://huggingface.co https://*.huggingface.co https://*.hf.co https://*.xethub.hf.co https://cdn.jsdelivr.net; font-src 'self' data:; frame-src https://www.googletagmanager.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'" always;
+    # In-browser Kokoro voice announcer (kokoro-js + transformers.js/ONNX): the
+    # model + ORT wasm are SELF-HOSTED same-origin (served from /models/ and /ort/,
+    # baked into the image at build time — see web/Dockerfile + scripts/fetch-model),
+    # so connect-src stays 'self' with NO third-party hosts. The only additions vs a
+    # plain SPA are the two directives that in-browser WebAssembly inference can't
+    # avoid:
+    #   - script-src 'wasm-unsafe-eval'  -> compile/instantiate the ONNX WebAssembly
+    #   - worker-src 'self' blob:        -> the ORT runtime may spawn a same-origin
+    #                                       blob-URL worker
+    # Audio plays via the Web Audio API from raw samples (no blob media element), so
+    # no media-src relaxation is needed.
+    add_header Content-Security-Policy "default-src 'self'; img-src 'self' data: https://images.evetech.net https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com; worker-src 'self' blob:; connect-src 'self' https://esi.evetech.net https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com; font-src 'self' data:; frame-src https://www.googletagmanager.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'" always;
 
     # Clickjacking + MIME-sniff defenses. frame-ancestors above is the
     # modern equivalent of X-Frame-Options, but legacy browsers still
@@ -89,6 +89,23 @@ server {
     # above are still inherited here.
     location ^~ /vendor/ {
         expires 30d;
+        access_log off;
+    }
+
+    # Self-hosted voice-announcer assets (baked into the image). The Kokoro model
+    # (config + onnx + voice bins, tens of MB) is versioned by the model-id path
+    # and effectively immutable, so cache it hard. `expires` (not add_header) keeps
+    # the server-level security headers inherited. Real files → try_files serves
+    # them directly; these blocks just attach caching.
+    location ^~ /models/ {
+        expires 365d;
+        access_log off;
+    }
+    # ORT WebAssembly runtime. Its filename isn't content-hashed and its ABI is
+    # tied to the bundled transformers.js version, so cache it only modestly to
+    # bound staleness if a deploy bumps that dependency.
+    location ^~ /ort/ {
+        expires 7d;
         access_log off;
     }
 

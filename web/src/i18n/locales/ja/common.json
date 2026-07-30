@@ -464,7 +464,8 @@
       "liveSharing": "ライブマップ配信",
       "shareMap": "マップを共有",
       "shortcuts": "ショートカット",
-      "notifications": "通知"
+      "notifications": "通知",
+      "announcer": "音声アナウンス"
     },
     "snapToGrid": "グリッドに合わせる",
     "settings": "設定",
@@ -634,7 +635,24 @@
     "routeIncludeWormholes": "ワームホールチェーンを含める",
     "routeShortcutNote": "ワームホール、Thera、Turnur、ジャンプゲートを経由するルートはゲーム内の目的地や経由地に設定できません — ルート上のK-スペースシステムを右クリックしてそこへ向かってください。",
     "routeIncludeAnsiblex": "Ansiblex ジャンプゲートを含める",
-    "showUndivedWhs": "未ダイブWHを表示"
+    "showUndivedWhs": "未ダイブWHを表示",
+    "announcer": {
+      "hint": "デバイス内の音声で読み上げる通知です。英語のみ対応。",
+      "enable": "音声アナウンスを有効化",
+      "voice": "音声",
+      "downloading": "音声をダウンロード中… {{progress}}%",
+      "speaking": "再生中…",
+      "preview": "音声を試聴",
+      "ready": "準備完了",
+      "loadFailed": "音声モデルの読み込みに失敗しました: {{error}}",
+      "announce": "アナウンス対象:",
+      "evConnect": "キャラクターの接続 / 切断",
+      "evIncursions": "範囲内のインカージョン",
+      "evLawless": "範囲内の無法星系",
+      "evKills": "範囲内の最近のキル",
+      "evNewChain": "他ユーザーが追加した新しいチェーン",
+      "threshold": "「範囲内」は近接アラートのしきい値を使用します。"
+    }
   },
   "customIntel": {
     "title": "カスタムインテル",
