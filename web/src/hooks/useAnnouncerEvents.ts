@@ -3,6 +3,7 @@ import { useAnnouncer, primeAudioOnGesture } from '../audio/announcer';
 import { useUserSetting } from './useUserSetting';
 import { useCharacterLocation } from './useCharacterLocation';
 import { useAccountLocations } from './useAccountLocations';
+import { useAuth } from '../context/AuthContext';
 import { useIncursions } from './useIncursions';
 import { useProximityThreshold } from './useProximityAlerts';
 import { useRoute } from './useRoute';
@@ -50,6 +51,7 @@ export function useAnnouncerEvents(): void {
 
   const location   = useCharacterLocation();
   const alts       = useAccountLocations();
+  const { user }   = useAuth();
   const incursions = useIncursions();
   const killLog    = useKillLog();
   const chainAdds  = useRemoteActivity((s) => s.chainAdds);
@@ -157,7 +159,22 @@ export function useAnnouncerEvents(): void {
     }
   }, [killLog, killRoutes, threshold, enabled, evKills, say]);
 
-  // ---- Alt connect / disconnect across all your characters ------------------
+  // ---- Active (main) character connect / disconnect -------------------------
+  // useAccountLocations covers only the OTHER characters (alts); the character
+  // this tab is tracking lives in useCharacterLocation, so watch its online flag
+  // here — otherwise logging in on your main is never announced.
+  const activeName = user?.characterName ?? null;
+  const prevActiveOnline = useRef<boolean | null>(null);
+  useEffect(() => {
+    const online = location.online;
+    const was = prevActiveOnline.current;
+    prevActiveOnline.current = online;
+    if (was === null || was === online) return;   // seed on first run / no change
+    if (!enabled || !evConnect || !activeName) return;
+    say(online ? `${activeName} connected.` : `${activeName} disconnected.`);
+  }, [location.online, activeName, enabled, evConnect, say]);
+
+  // ---- Alt connect / disconnect across all your other characters ------------
   const prevOnline = useRef<Map<number, boolean> | null>(null);
   useEffect(() => {
     const cur = new Map<number, boolean>();
