@@ -175,6 +175,7 @@ export const useAnnouncer = create<AnnouncerState>((set, get) => ({
         wasm.numThreads = 1;
         if (SELF_HOSTED) {
           wasm.wasmPaths = LOCAL_WASM_PATH;
+          env.allowLocalModels = true;        // browser default is false — must opt in
           env.allowRemoteModels = false;      // never touch the HF hub
           env.localModelPath = LOCAL_MODEL_PATH;
           env.useBrowserCache = true;
