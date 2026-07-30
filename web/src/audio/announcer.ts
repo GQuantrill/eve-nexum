@@ -1,21 +1,13 @@
 import { create } from 'zustand';
-import type { KokoroTTS } from 'kokoro-js';
 
-// PROTOTYPE in-browser voice announcer using Kokoro-82M (kokoro-js + ONNX).
-// Runs entirely client-side: the model is lazy-loaded from the Hugging Face hub
-// the first time the user enables voice (behind a user gesture, so autoplay is
-// satisfied), then generation + playback happen locally — no server, no per-use
-// cost, works offline once cached.
-//
-// KNOWN ROUGH EDGES (fine for evaluating quality/latency, to fix before shipping):
-//  - Generation runs on the MAIN THREAD, so a long phrase briefly janks the UI.
-//    The real version should run Kokoro in a Web Worker.
-//  - First load downloads the model (tens–hundreds of MB depending on dtype).
-//  - WebGPU path is fastest (Chrome/Edge); falls back to WASM (CPU) elsewhere.
+// In-browser voice announcer (Kokoro-82M via kokoro-js + ONNX). The model and all
+// generation run in a Web Worker (ttsWorker.ts) so multi-second WASM/CPU inference
+// never freezes the UI; this module owns only the store, the worker plumbing, and
+// audio PLAYBACK (Web Audio must live on the main thread). Self-hosting + the voice
+// cache-prime are handled inside the worker. Model loads lazily on the first
+// load()/speak(); playback is unlocked by the first user gesture.
 
 type Status = 'idle' | 'loading' | 'ready' | 'error';
-
-interface ProgressInfo { status?: string; progress?: number; file?: string }
 
 interface AnnouncerState {
   status:   Status;
@@ -56,62 +48,68 @@ export const VOICES: Array<{ id: string; label: string }> = [
   { id: 'bf_isabella', label: 'Isabella (UK, female)' },
 ];
 
-const MODEL_ID = 'onnx-community/Kokoro-82M-v1.0-ONNX';
+// ── Web Worker plumbing ───────────────────────────────────────────────────────
+// The worker is created lazily (first load/speak) so its heavy deps (kokoro-js +
+// transformers) aren't downloaded until the announcer is actually used.
+let worker: Worker | null = null;
+let loadPromise: Promise<void> | null = null;
+let loadResolve: (() => void) | null = null;
+let loadReject:  ((e: unknown) => void) | null = null;
+let genSeq = 0;
+const pendingGen = new Map<number, () => void>();   // generate id -> resolve (after playback/error)
+let queue: Promise<void> = Promise.resolve();       // serialises speak() generations
 
-// PRODUCTION (self-hosted) vs DEV. The Docker build sets VITE_ANNOUNCER_SELF_HOSTED
-// and serves the model + ORT wasm same-origin, so the CSP can stay connect-src
-// 'self' with no third-party hosts. In dev (vite server, no nginx CSP) the flag is
-// unset and everything loads from the Hugging Face hub / jsdelivr as normal.
-const SELF_HOSTED = import.meta.env.VITE_ANNOUNCER_SELF_HOSTED === 'true';
-// Weight precision. Build arg (VITE_ANNOUNCER_DTYPE); the Dockerfile downloads the
-// matching onnx and passes the same value here so runtime and asset agree. q8 is
-// kokoro's recommended WASM pairing (~86 MB vs 326 MB fp32); flip via the build arg.
-const DTYPE = (import.meta.env.VITE_ANNOUNCER_DTYPE as string) || (SELF_HOSTED ? 'q8' : 'fp32');
-// Where the self-hosted assets live (served by nginx from the built dist/).
-const LOCAL_MODEL_PATH = '/models/';           // transformers: {path}{model_id}/...
-const LOCAL_WASM_PATH  = '/ort/';              // ORT .wasm / .mjs
-const LOCAL_VOICES_BASE = `${LOCAL_MODEL_PATH}${MODEL_ID}/voices`;
-
-// kokoro-js fetches voice style vectors from a HARD-CODED Hugging Face URL and does
-// NOT honour transformers' local-model config — BUT it first checks a CacheStorage
-// bucket ("kokoro-voices") keyed by that URL, and returns the hit without any
-// network. So in self-hosted mode we PRIME that cache with same-origin bytes: kokoro
-// then never reaches HF and connect-src can stay 'self'. Coupled to kokoro-js's cache
-// name + URL scheme, so the dep is pinned (see package.json). No-op in dev.
-const KOKORO_VOICE_CACHE = 'kokoro-voices';
-const hfVoiceUrl = (id: string) =>
-  `https://huggingface.co/${MODEL_ID}/resolve/main/voices/${id}.bin`;
-const primedVoices = new Set<string>();
-async function primeVoice(id: string): Promise<void> {
-  if (!SELF_HOSTED || primedVoices.has(id)) return;
-  try {
-    const cache = await caches.open(KOKORO_VOICE_CACHE);
-    const key = hfVoiceUrl(id);
-    if (!(await cache.match(key))) {
-      const res = await fetch(`${LOCAL_VOICES_BASE}/${id}.bin`);   // same-origin
-      if (!res.ok) return;                                          // leave unprimed → retried next call
-      await cache.put(key, new Response(await res.arrayBuffer()));
+function getWorker(): Worker {
+  if (worker) return worker;
+  const w = new Worker(new URL('./ttsWorker.ts', import.meta.url), { type: 'module' });
+  w.onmessage = async (e: MessageEvent) => {
+    const m = e.data as { type: string; id?: number; progress?: number; backend?: string;
+                          error?: string; samples?: Float32Array; rate?: number };
+    switch (m.type) {
+      case 'progress':
+        useAnnouncer.setState({ progress: m.progress ?? 0 });
+        break;
+      case 'ready':
+        useAnnouncer.setState({ status: 'ready', progress: 100, backend: m.backend ?? '' });
+        loadResolve?.(); loadResolve = loadReject = null;
+        break;
+      case 'loadError':
+        useAnnouncer.setState({ status: 'error', error: m.error ?? 'load failed' });
+        loadReject?.(m.error); loadResolve = loadReject = null; loadPromise = null;
+        break;
+      case 'audio': {
+        const done = pendingGen.get(m.id as number);
+        pendingGen.delete(m.id as number);
+        if (done) {                                   // undefined => cancelled by stop(); drop it
+          try { await playSamples(m.samples as Float32Array, m.rate as number); } catch { /* ignore */ }
+          useAnnouncer.setState({ speaking: false });
+          done();
+        }
+        break;
+      }
+      case 'genError': {
+        const done = pendingGen.get(m.id as number);
+        pendingGen.delete(m.id as number);
+        useAnnouncer.setState({ speaking: false });
+        done?.();
+        break;
+      }
     }
-    primedVoices.add(id);
-  } catch { /* CacheStorage unavailable — kokoro will try its own path */ }
+  };
+  w.onerror = () => {
+    useAnnouncer.setState({ status: 'error', error: 'Voice worker failed to start' });
+    loadReject?.('worker error'); loadResolve = loadReject = null; loadPromise = null;
+  };
+  worker = w;
+  return w;
 }
 
-// Kokoro types `voice` as a union of its known ids; ours is a plain string from
-// the store, so narrow to that union at the call site (every VOICES id is valid).
-type VoiceId = NonNullable<Parameters<KokoroTTS['generate']>[1]>['voice'];
-
-// The model + generation queue live outside the store (non-serialisable, and we
-// never want React to try to diff them).
-let tts: KokoroTTS | null = null;
-let loadPromise: Promise<void> | null = null;
-let queue: Promise<void> = Promise.resolve();
-
-// Playback via the Web Audio API from Kokoro's RAW Float32 samples — NOT a WAV
-// blob through an <audio> element. The blob path re-encodes to 16-bit PCM (which
-// clips/crackles on peaks) and lets the element resample; feeding the raw
-// Float32 into an AudioBuffer at the model's own 24 kHz plays it verbatim and the
-// browser does a clean high-quality resample to the device rate. One shared
-// AudioContext, unlocked by the first user gesture (Enable/Speak).
+// ── Playback (main thread) ────────────────────────────────────────────────────
+// Web Audio API from Kokoro's RAW Float32 samples — NOT a WAV blob through an
+// <audio> element. The blob path re-encodes to 16-bit PCM (which clips/crackles on
+// peaks) and lets the element resample; feeding the raw Float32 into an AudioBuffer
+// at the model's own 24 kHz plays it verbatim and the browser does a clean resample
+// to the device rate. One shared AudioContext, unlocked by the first user gesture.
 let audioCtx: AudioContext | null = null;
 let currentSource: AudioBufferSourceNode | null = null;
 
@@ -158,52 +156,12 @@ export const useAnnouncer = create<AnnouncerState>((set, get) => ({
 
   setVoice: (v) => set({ voice: v }),
 
-  load: async () => {
-    if (get().status === 'ready') return;
+  load: () => {
+    if (get().status === 'ready') return Promise.resolve();
     if (loadPromise) return loadPromise;
     set({ status: 'loading', progress: 0, error: null });
-    loadPromise = (async () => {
-      // Configure the ONNX runtime (transformers.js backend) BEFORE loading.
-      // Single-threaded wasm so it needs no SharedArrayBuffer / cross-origin
-      // isolation (we deliberately don't set COOP/COEP — those break cross-origin
-      // images/GTM). In self-hosted mode, point the runtime at same-origin assets
-      // so nothing loads from a third party: the ORT .wasm from /ort/, and the
-      // model (config + onnx) from /models/ with remote hub fetches disabled.
-      try {
-        const { env } = await import('@huggingface/transformers');
-        const wasm = env.backends.onnx.wasm as { numThreads?: number; wasmPaths?: string };
-        wasm.numThreads = 1;
-        if (SELF_HOSTED) {
-          wasm.wasmPaths = LOCAL_WASM_PATH;
-          env.allowLocalModels = true;        // browser default is false — must opt in
-          env.allowRemoteModels = false;      // never touch the HF hub
-          env.localModelPath = LOCAL_MODEL_PATH;
-          env.useBrowserCache = true;
-        }
-      } catch { /* best-effort — proceed with defaults */ }
-
-      const { KokoroTTS: Kokoro } = await import('kokoro-js');
-      // WASM (CPU) backend — NOT WebGPU. WebGPU produced muffled/crackling audio
-      // on Chromium (AMD Dawn/D3D11 fp16 vocoder artifact); WASM/CPU sidesteps it
-      // at any dtype. dtype comes from the build arg (q8 default in prod). Single-
-      // threaded (numThreads=1 above) so it needs no cross-origin isolation.
-      const device = 'wasm';
-      const dtype  = DTYPE;
-      tts = await Kokoro.from_pretrained(MODEL_ID, {
-        device,
-        dtype: dtype as NonNullable<Parameters<typeof Kokoro.from_pretrained>[1]>['dtype'],
-        progress_callback: (p: ProgressInfo) => {
-          if (typeof p.progress === 'number') set({ progress: Math.round(p.progress) });
-        },
-      });
-      // Prime the default voice so the first announcement plays without a stall.
-      await primeVoice(get().voice);
-      set({ status: 'ready', progress: 100, backend: `${device}/${dtype}${SELF_HOSTED ? '/self-hosted' : ''}` });
-    })().catch((e: unknown) => {
-      set({ status: 'error', error: e instanceof Error ? e.message : String(e) });
-      loadPromise = null;
-      throw e;
-    });
+    loadPromise = new Promise<void>((resolve, reject) => { loadResolve = resolve; loadReject = reject; });
+    getWorker().postMessage({ type: 'load' });
     return loadPromise;
   },
 
@@ -212,26 +170,23 @@ export const useAnnouncer = create<AnnouncerState>((set, get) => ({
     if (!clean) return;
     if (get().status !== 'ready') { try { await get().load(); } catch { return; } }
     const voice = get().voice;
-    // Serialise generations so announcements don't overlap or race the model.
-    queue = queue.then(async () => {
-      if (!tts) return;
+    // Serialise generations so announcements don't overlap. The worker does the
+    // work; we resolve when its audio comes back and finishes playing.
+    queue = queue.then(() => new Promise<void>((resolve) => {
+      const id = ++genSeq;
+      pendingGen.set(id, resolve);
       set({ speaking: true });
-      try {
-        await primeVoice(voice);   // ensure the voice is same-origin-cached first
-        const audio = await tts.generate(clean, { voice: voice as VoiceId });
-        // RawAudio: .audio is the Float32 waveform, .sampling_rate is 24000.
-        await playSamples(audio.audio as Float32Array, audio.sampling_rate);
-      } catch {
-        /* prototype: swallow generation/playback failures */
-      } finally {
-        set({ speaking: false });
-      }
-    });
+      getWorker().postMessage({ type: 'generate', id, text: clean, voice });
+    }));
     return queue;
   },
 
   stop: () => {
     if (currentSource) { try { currentSource.stop(); } catch { /* already stopped */ } currentSource = null; }
+    // Resolve any queued generations so the chain doesn't wedge; their late audio
+    // (worker can't cancel mid-inference) is dropped by the 'audio' handler.
+    for (const done of pendingGen.values()) done();
+    pendingGen.clear();
     queue = Promise.resolve();
     set({ speaking: false });
   },
