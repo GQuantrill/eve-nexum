@@ -105,6 +105,17 @@ server {
     # tied to the bundled transformers.js version, so cache it only modestly to
     # bound staleness if a deploy bumps that dependency.
     location ^~ /ort/ {
+        # nginx's default mime.types has NO .mjs mapping, so the ORT loader module
+        # (ort-wasm-*.jsep.mjs) is served as application/octet-stream and the
+        # browser refuses to run it as an ES module ("Failed to fetch dynamically
+        # imported module"). Declare the JS + wasm types here. NOTE: a types block
+        # replaces the inherited map for this location — fine, /ort only holds
+        # these two file types.
+        types {
+            text/javascript  mjs;
+            application/wasm wasm;
+        }
+        default_type application/octet-stream;
         expires 7d;
         access_log off;
     }
