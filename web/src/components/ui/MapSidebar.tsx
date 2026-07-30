@@ -929,6 +929,12 @@ export function MapSidebar() {
       });
       await useMapStore.getState().loadMaps();
       await useMapStore.getState().switchMap(id);
+      // Tidy connection handles to the imported layout + fit it in view, deferred
+      // so the canvas has mounted the new nodes first (matches the region seed).
+      setTimeout(() => {
+        useMapStore.getState().optimizeConnections();
+        useMapStore.getState().requestFitView();
+      }, 500);
     } catch (err) {
       toast.error(
         t("mapSidebar.importFailed", { error: err instanceof Error ? err.message : String(err) }),
@@ -963,6 +969,14 @@ export function MapSidebar() {
       );
       await useMapStore.getState().loadMaps();
       await useMapStore.getState().switchMap(id);
+      // Re-route connection handles to the imported layout + fit it in view,
+      // deferred so the canvas has mounted the new nodes first (matches the
+      // region seed). Wanderer connections arrive without handles, so this
+      // tidies every edge onto the nearest sides.
+      setTimeout(() => {
+        useMapStore.getState().optimizeConnections();
+        useMapStore.getState().requestFitView();
+      }, 500);
       toast.success(
         t("mapSidebar.wandererImported", {
           systems: imported.systems, connections: imported.connections, skipped: imported.skipped,
