@@ -1415,10 +1415,6 @@ export function MapSidebar() {
         {!hideTopologyTools && (
           <CollapsibleSection title={t("mapSidebar.sections.importExport")} {...sectionProps("export")}>
             <div className="map-sidebar__section">
-              <button className="map-sidebar__action" onClick={handleExport}>
-                {t("mapSidebar.exportJson")}
-              </button>
-
               <div
                 className={`map-sidebar__import-wrap${atMapLimit ? " map-sidebar__import-wrap--disabled" : ""}`}
               >
@@ -1442,6 +1438,10 @@ export function MapSidebar() {
                   {t("mapSidebar.importWanderer")}
                 </button>
               </div>
+
+              <button className="map-sidebar__action" onClick={handleExport}>
+                {t("mapSidebar.exportJson")}
+              </button>
               <button
                 type="button"
                 className="map-sidebar__action"
