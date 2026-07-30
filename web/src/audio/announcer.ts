@@ -58,6 +58,44 @@ export const VOICES: Array<{ id: string; label: string }> = [
 
 const MODEL_ID = 'onnx-community/Kokoro-82M-v1.0-ONNX';
 
+// PRODUCTION (self-hosted) vs DEV. The Docker build sets VITE_ANNOUNCER_SELF_HOSTED
+// and serves the model + ORT wasm same-origin, so the CSP can stay connect-src
+// 'self' with no third-party hosts. In dev (vite server, no nginx CSP) the flag is
+// unset and everything loads from the Hugging Face hub / jsdelivr as normal.
+const SELF_HOSTED = import.meta.env.VITE_ANNOUNCER_SELF_HOSTED === 'true';
+// Weight precision. Build arg (VITE_ANNOUNCER_DTYPE); the Dockerfile downloads the
+// matching onnx and passes the same value here so runtime and asset agree. q8 is
+// kokoro's recommended WASM pairing (~86 MB vs 326 MB fp32); flip via the build arg.
+const DTYPE = (import.meta.env.VITE_ANNOUNCER_DTYPE as string) || (SELF_HOSTED ? 'q8' : 'fp32');
+// Where the self-hosted assets live (served by nginx from the built dist/).
+const LOCAL_MODEL_PATH = '/models/';           // transformers: {path}{model_id}/...
+const LOCAL_WASM_PATH  = '/ort/';              // ORT .wasm / .mjs
+const LOCAL_VOICES_BASE = `${LOCAL_MODEL_PATH}${MODEL_ID}/voices`;
+
+// kokoro-js fetches voice style vectors from a HARD-CODED Hugging Face URL and does
+// NOT honour transformers' local-model config — BUT it first checks a CacheStorage
+// bucket ("kokoro-voices") keyed by that URL, and returns the hit without any
+// network. So in self-hosted mode we PRIME that cache with same-origin bytes: kokoro
+// then never reaches HF and connect-src can stay 'self'. Coupled to kokoro-js's cache
+// name + URL scheme, so the dep is pinned (see package.json). No-op in dev.
+const KOKORO_VOICE_CACHE = 'kokoro-voices';
+const hfVoiceUrl = (id: string) =>
+  `https://huggingface.co/${MODEL_ID}/resolve/main/voices/${id}.bin`;
+const primedVoices = new Set<string>();
+async function primeVoice(id: string): Promise<void> {
+  if (!SELF_HOSTED || primedVoices.has(id)) return;
+  try {
+    const cache = await caches.open(KOKORO_VOICE_CACHE);
+    const key = hfVoiceUrl(id);
+    if (!(await cache.match(key))) {
+      const res = await fetch(`${LOCAL_VOICES_BASE}/${id}.bin`);   // same-origin
+      if (!res.ok) return;                                          // leave unprimed → retried next call
+      await cache.put(key, new Response(await res.arrayBuffer()));
+    }
+    primedVoices.add(id);
+  } catch { /* CacheStorage unavailable — kokoro will try its own path */ }
+}
+
 // Kokoro types `voice` as a union of its known ids; ours is a plain string from
 // the store, so narrow to that union at the call site (every VOICES id is valid).
 type VoiceId = NonNullable<Parameters<KokoroTTS['generate']>[1]>['voice'];
@@ -125,32 +163,41 @@ export const useAnnouncer = create<AnnouncerState>((set, get) => ({
     if (loadPromise) return loadPromise;
     set({ status: 'loading', progress: 0, error: null });
     loadPromise = (async () => {
-      // Configure the ONNX runtime (transformers.js backend) BEFORE loading:
-      // force single-threaded wasm so it doesn't need SharedArrayBuffer /
-      // cross-origin isolation (we deliberately don't set COOP/COEP — those
-      // would break cross-origin images/GTM). The ORT runtime .mjs/.wasm load
-      // from jsdelivr, which the demo CSP allows in script-src + connect-src.
+      // Configure the ONNX runtime (transformers.js backend) BEFORE loading.
+      // Single-threaded wasm so it needs no SharedArrayBuffer / cross-origin
+      // isolation (we deliberately don't set COOP/COEP — those break cross-origin
+      // images/GTM). In self-hosted mode, point the runtime at same-origin assets
+      // so nothing loads from a third party: the ORT .wasm from /ort/, and the
+      // model (config + onnx) from /models/ with remote hub fetches disabled.
       try {
         const { env } = await import('@huggingface/transformers');
-        (env.backends.onnx.wasm as { numThreads?: number }).numThreads = 1;
+        const wasm = env.backends.onnx.wasm as { numThreads?: number; wasmPaths?: string };
+        wasm.numThreads = 1;
+        if (SELF_HOSTED) {
+          wasm.wasmPaths = LOCAL_WASM_PATH;
+          env.allowRemoteModels = false;      // never touch the HF hub
+          env.localModelPath = LOCAL_MODEL_PATH;
+          env.useBrowserCache = true;
+        }
       } catch { /* best-effort — proceed with defaults */ }
 
       const { KokoroTTS: Kokoro } = await import('kokoro-js');
-      // Force the WASM (CPU) backend at fp32 — the reference-quality path.
-      // Kokoro's WebGPU backend produced muffled/crackling audio on Chromium in
-      // testing (a known transformers.js/ONNX-WebGPU artifact), and the raw-sample
-      // playback fix ruled out the player. CPU fp32 is slower but clean. Single-
+      // WASM (CPU) backend — NOT WebGPU. WebGPU produced muffled/crackling audio
+      // on Chromium (AMD Dawn/D3D11 fp16 vocoder artifact); WASM/CPU sidesteps it
+      // at any dtype. dtype comes from the build arg (q8 default in prod). Single-
       // threaded (numThreads=1 above) so it needs no cross-origin isolation.
       const device = 'wasm';
-      const dtype  = 'fp32';
+      const dtype  = DTYPE;
       tts = await Kokoro.from_pretrained(MODEL_ID, {
         device,
-        dtype,
+        dtype: dtype as NonNullable<Parameters<typeof Kokoro.from_pretrained>[1]>['dtype'],
         progress_callback: (p: ProgressInfo) => {
           if (typeof p.progress === 'number') set({ progress: Math.round(p.progress) });
         },
       });
-      set({ status: 'ready', progress: 100, backend: `${device}/${dtype}` });
+      // Prime the default voice so the first announcement plays without a stall.
+      await primeVoice(get().voice);
+      set({ status: 'ready', progress: 100, backend: `${device}/${dtype}${SELF_HOSTED ? '/self-hosted' : ''}` });
     })().catch((e: unknown) => {
       set({ status: 'error', error: e instanceof Error ? e.message : String(e) });
       loadPromise = null;
@@ -169,6 +216,7 @@ export const useAnnouncer = create<AnnouncerState>((set, get) => ({
       if (!tts) return;
       set({ speaking: true });
       try {
+        await primeVoice(voice);   // ensure the voice is same-origin-cached first
         const audio = await tts.generate(clean, { voice: voice as VoiceId });
         // RawAudio: .audio is the Float32 waveform, .sampling_rate is 24000.
         await playSamples(audio.audio as Float32Array, audio.sampling_rate);

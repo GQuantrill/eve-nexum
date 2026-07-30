@@ -54,6 +54,7 @@
   "resolutions": {
     "@babel/core": "^7.29.6",
     "brace-expansion": "^5.0.7",
-    "postcss": "^8.5.18"
+    "postcss": "^8.5.18",
+    "kokoro-js": "1.2.1"
   }
 }
