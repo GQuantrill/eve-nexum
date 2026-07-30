@@ -887,7 +887,11 @@ export function MapSidebar() {
   const connectionCount = useMapStore((s) => s.map.connections.length);
   const systemCount = useMapStore((s) => s.map.systems.length);
 
-  const atMapLimit = maps.length >= maxMaps;
+  // Import creates a PERSONAL map, so the cap is the personal-map limit — count
+  // only maps the user owns (not corp/alliance maps or ones merely shared with
+  // them). Matches the server's quota (owner_id, corp/alliance NULL). Counting
+  // every visible map wrongly disabled Import for corp/alliance members/admins.
+  const atMapLimit = maps.filter((m) => !m.isCorpMap && !m.isAllianceMap && !m.sharedWithMe).length >= maxMaps;
 
 
   function handleExport() {
