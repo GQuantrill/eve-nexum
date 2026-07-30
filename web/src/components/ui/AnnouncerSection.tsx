@@ -39,9 +39,7 @@ export function AnnouncerSection() {
   return (
     <>
       <div className="map-sidebar__hint">
-        Spoken alerts in your browser using an on-device voice (Kokoro). The voice
-        model (~80&nbsp;MB) downloads the first time something is announced, then
-        runs locally — no server, works offline once cached. English only.
+        Spoken alerts using an on-device voice. English only.
       </div>
 
       <label className="map-sidebar__row map-sidebar__toggle-row">

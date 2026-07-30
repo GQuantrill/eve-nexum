@@ -32,28 +32,28 @@ interface AnnouncerState {
 
 // Curated Kokoro v1.0 voices, quality-gated to grade C and above (kokoro-js
 // exposes 28 English voices; the D/F ones have little training data and sound
-// noticeably rougher, so they're left out). Ordered best-first within each
-// accent/gender group; the trailing letter is Kokoro's own quality grade.
+// noticeably rougher, so they're left out). Grouped by country, then male /
+// female, and within each group ordered best-first by Kokoro's quality grade.
 export const VOICES: Array<{ id: string; label: string }> = [
-  // US female
-  { id: 'af_heart',    label: 'Heart (US, female) - A' },
-  { id: 'af_bella',    label: 'Bella (US, female) - A-' },
-  { id: 'af_nicole',   label: 'Nicole (US, female) - B-' },
-  { id: 'af_sarah',    label: 'Sarah (US, female) - C+' },
-  { id: 'af_aoede',    label: 'Aoede (US, female) - C+' },
-  { id: 'af_kore',     label: 'Kore (US, female) - C+' },
-  { id: 'af_alloy',    label: 'Alloy (US, female) - C' },
-  { id: 'af_nova',     label: 'Nova (US, female) - C' },
   // US male
-  { id: 'am_michael',  label: 'Michael (US, male) - C+' },
-  { id: 'am_fenrir',   label: 'Fenrir (US, male) - C+' },
-  { id: 'am_puck',     label: 'Puck (US, male) - C+' },
-  // UK female
-  { id: 'bf_emma',     label: 'Emma (UK, female) - B-' },
-  { id: 'bf_isabella', label: 'Isabella (UK, female) - C' },
+  { id: 'am_michael',  label: 'Michael (US, male)' },
+  { id: 'am_fenrir',   label: 'Fenrir (US, male)' },
+  { id: 'am_puck',     label: 'Puck (US, male)' },
+  // US female
+  { id: 'af_heart',    label: 'Heart (US, female)' },
+  { id: 'af_bella',    label: 'Bella (US, female)' },
+  { id: 'af_nicole',   label: 'Nicole (US, female)' },
+  { id: 'af_sarah',    label: 'Sarah (US, female)' },
+  { id: 'af_aoede',    label: 'Aoede (US, female)' },
+  { id: 'af_kore',     label: 'Kore (US, female)' },
+  { id: 'af_alloy',    label: 'Alloy (US, female)' },
+  { id: 'af_nova',     label: 'Nova (US, female)' },
   // UK male
-  { id: 'bm_george',   label: 'George (UK, male) - C' },
-  { id: 'bm_fable',    label: 'Fable (UK, male) - C' },
+  { id: 'bm_george',   label: 'George (UK, male)' },
+  { id: 'bm_fable',    label: 'Fable (UK, male)' },
+  // UK female
+  { id: 'bf_emma',     label: 'Emma (UK, female)' },
+  { id: 'bf_isabella', label: 'Isabella (UK, female)' },
 ];
 
 const MODEL_ID = 'onnx-community/Kokoro-82M-v1.0-ONNX';
