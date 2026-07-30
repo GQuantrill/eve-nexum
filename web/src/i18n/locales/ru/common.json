@@ -620,6 +620,10 @@
     "invalidJson": "Некорректный файл JSON.",
     "notNexumMap": "Файл не похож на экспорт карты Eve-Nexum.",
     "importFailed": "Не удалось импортировать: {{error}}",
+    "importWanderer": "↑ Импорт из Wanderer",
+    "importWandererTitle": "Импортировать карту, экспортированную из маппера Wanderer (создаёт новую личную карту)",
+    "notWandererMap": "Файл не похож на экспорт из Wanderer.",
+    "wandererImported": "Импортировано из Wanderer: {{systems}} систем, {{connections}} соединений ({{skipped}} пропущено).",
     "colorVision": "Цветовое зрение",
     "colorVisionOptions": {
       "off": "Цвета по умолчанию",

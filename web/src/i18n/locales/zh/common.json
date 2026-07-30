@@ -602,6 +602,10 @@
     "invalidJson": "无效的 JSON 文件。",
     "notNexumMap": "该文件看起来不像 Eve-Nexum 地图导出文件。",
     "importFailed": "导入失败：{{error}}",
+    "importWanderer": "↑ 从 Wanderer 导入",
+    "importWandererTitle": "导入从 Wanderer 地图工具导出的地图（创建新的个人地图）",
+    "notWandererMap": "该文件看起来不是 Wanderer 的导出文件。",
+    "wandererImported": "已从 Wanderer 导入：{{systems}} 个星系，{{connections}} 条连接（跳过 {{skipped}} 个）。",
     "colorVision": "色觉",
     "colorVisionOptions": {
       "off": "默认颜色",
