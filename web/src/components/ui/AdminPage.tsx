@@ -20,7 +20,7 @@ import {
   PointElement, LineElement, Tooltip, Legend, Filler,
 } from 'chart.js';
 import { Doughnut, Line } from 'react-chartjs-2';
-import { CaretUpIcon, CaretDownIcon, XIcon, ArrowSquareOutIcon } from '@phosphor-icons/react';
+import { CaretUpIcon, CaretDownIcon, XIcon, ArrowSquareOutIcon } from '../../icons';
 import { createPortal } from 'react-dom';
 import styles from './AdminPage.module.css';
 

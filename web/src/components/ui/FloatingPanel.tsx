@@ -1,7 +1,7 @@
 import { useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowSquareInIcon } from '@phosphor-icons/react';
+import { ArrowSquareInIcon } from '../../icons';
 
 export interface PanelGeometry { x: number; y: number; w: number; h: number; }
 

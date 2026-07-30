@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
-import { CaretRightIcon, CheckIcon } from '@phosphor-icons/react';
+import { CaretRightIcon, CheckIcon } from '../../icons';
 
 export type ContextMenuItem =
   | { separator: true }

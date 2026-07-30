@@ -602,6 +602,10 @@
     "invalidJson": "Ungültige JSON-Datei.",
     "notNexumMap": "Die Datei sieht nicht wie ein Eve-Nexum-Kartenexport aus.",
     "importFailed": "Import fehlgeschlagen: {{error}}",
+    "importWanderer": "↑ Aus Wanderer importieren",
+    "importWandererTitle": "Eine aus dem Wanderer-Mapper exportierte Karte importieren (erstellt eine neue persönliche Karte)",
+    "notWandererMap": "Die Datei sieht nicht wie ein Wanderer-Export aus.",
+    "wandererImported": "Aus Wanderer importiert: {{systems}} Systeme, {{connections}} Verbindungen ({{skipped}} übersprungen).",
     "colorVision": "Farbsehen",
     "colorVisionOptions": {
       "off": "Standardfarben",
@@ -1767,6 +1771,7 @@
   "iconPicker": {
     "title": "Symbol auswählen",
     "search": "Symbole suchen…",
+    "loading": "Symbole werden geladen…",
     "more": "Suche verfeinern, um mehr zu sehen"
   },
   "labelsDialog": {

@@ -9,7 +9,7 @@ import { NotesEditor } from './NotesEditor';
 import { ConfirmModal, shouldSkipConfirm } from './ConfirmModal';
 import { Select } from './Select';
 import { ContextMenu } from './ContextMenu';
-import { XIcon, PathIcon, MapPinSimpleIcon } from '@phosphor-icons/react';
+import { XIcon, PathIcon, MapPinSimpleIcon } from '../../icons';
 import { setDestination, addWaypoint } from '../../api/waypoint';
 import { toast } from './Toaster';
 import { useCanEditContent } from '../../hooks/useCanEditContent';

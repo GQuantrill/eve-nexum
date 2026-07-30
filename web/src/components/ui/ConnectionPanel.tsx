@@ -14,8 +14,8 @@ import { whSizeForType } from '../../utils/wormholeSize';
 import { effectiveExpiryMs, lifeBucket, knownMaxLifeHours } from '../../utils/whLifetime';
 import { ConfirmModal } from './ConfirmModal';
 import { IconPickerDialog } from './IconPickerDialog';
-import { XIcon, TagIcon } from '@phosphor-icons/react';
-import { iconComponent } from '../../utils/phosphorIcons';
+import { XIcon, TagIcon } from '../../icons';
+import { DynamicIcon } from '../DynamicIcon';
 import { api } from '../../api/client';
 import type { MassStatus, TimeStatus, ConnectionSize, Signature, SystemClass } from '../../types';
 import {
@@ -455,7 +455,6 @@ export function ConnectionPanel() {
         <span>{t('connPanel.flagLabel')}</span>
         <div className="conn-flag__row">
           {(() => {
-            const FlagIcon = conn.flagIcon ? iconComponent(conn.flagIcon) : null;
             return (
               <button
                 type="button"
@@ -464,8 +463,8 @@ export function ConnectionPanel() {
                 onClick={() => setFlagPickerOpen(true)}
                 title={t('connPanel.flagAdd')}
               >
-                {FlagIcon ? <FlagIcon size={16} weight="fill" /> : <TagIcon size={16} />}
-                {!FlagIcon && <span>{t('connPanel.flagAdd')}</span>}
+                {conn.flagIcon ? <DynamicIcon name={conn.flagIcon} size={16} weight="fill" /> : <TagIcon size={16} />}
+                {!conn.flagIcon && <span>{t('connPanel.flagAdd')}</span>}
               </button>
             );
           })()}

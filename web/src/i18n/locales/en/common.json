@@ -687,7 +687,11 @@
     "exportFailed": "Export failed: {{error}}",
     "invalidJson": "Invalid JSON file.",
     "notNexumMap": "File does not look like a Eve-Nexum map export.",
-    "importFailed": "Import failed: {{error}}"
+    "importFailed": "Import failed: {{error}}",
+    "importWanderer": "↑ Import from Wanderer",
+    "importWandererTitle": "Import a map exported from the Wanderer mapper (creates a new personal map)",
+    "notWandererMap": "File does not look like a Wanderer export.",
+    "wandererImported": "Imported from Wanderer: {{systems}} systems, {{connections}} connections ({{skipped}} skipped)."
   },
   "customIntel": {
     "title": "Custom Intel",
@@ -1777,6 +1781,7 @@
   "iconPicker": {
     "title": "Choose an icon",
     "search": "Search icons...",
+    "loading": "Loading icons...",
     "more": "Refine your search to see more"
   },
   "labelsDialog": {

@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>How to Roll a Wormhole in EVE Online — Mass Guide + Rolling Calculator</title>
+    <meta name="description" content="A practical guide to rolling wormholes in EVE Online: how wormhole mass works, hot vs cold pass mass, the plus/minus 10% variance, how to avoid stranding, which ships to use, and how a rolling calculator keeps your chain safe." />
+    <meta name="keywords" content="how to roll a wormhole, eve wormhole rolling, wormhole mass, wormhole rolling guide, wormhole mass calculator, eve online wormhole mass, rolling battleship, wormhole stranding, J-space" />
+    <meta name="author" content="Area 404" />
+    <meta name="theme-color" content="#06080f" />
+    <link rel="canonical" href="https://eve-nexum.com/guides/rolling/" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <meta name="robots" content="index, follow" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://eve-nexum.com/guides/rolling/" />
+    <meta property="og:title" content="How to Roll a Wormhole in EVE Online — Mass Guide + Calculator" />
+    <meta property="og:description" content="How wormhole mass works, hot vs cold passes, the plus/minus 10% variance, avoiding stranding, and using a rolling calculator." />
+    <meta property="og:image" content="https://eve-nexum.com/hero.png" />
+    <meta property="og:site_name" content="Nexum" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="How to Roll a Wormhole in EVE Online" />
+    <meta name="twitter:description" content="Wormhole mass, hot vs cold passes, the plus/minus 10% variance, stranding, and a rolling calculator." />
+    <meta name="twitter:image" content="https://eve-nexum.com/hero.png" />
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "How to Roll a Wormhole in EVE Online — Mass Guide + Rolling Calculator",
+      "about": "Wormhole mass mechanics and rolling technique in EVE Online",
+      "author": { "@type": "Organization", "name": "Area 404" },
+      "publisher": { "@type": "Organization", "name": "Nexum", "url": "https://eve-nexum.com/" },
+      "mainEntityOfPage": "https://eve-nexum.com/guides/rolling/",
+      "inLanguage": "en"
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        { "@type": "Question", "name": "What is wormhole rolling?", "acceptedAnswer": { "@type": "Answer", "text": "Rolling is deliberately pushing enough ship mass through a wormhole to collapse it, so you can spawn a fresh connection to a new random system, cut off a threat, or control who can reach your home." } },
+        { "@type": "Question", "name": "How does wormhole mass work?", "acceptedAnswer": { "@type": "Answer", "text": "Every wormhole has a total mass allowance and a per-jump maximum. Each ship subtracts its mass as it passes. When the remaining mass runs out the hole collapses. Both numbers vary by plus or minus 10 percent, so the exact collapse point is a range, not a fixed value." } },
+        { "@type": "Question", "name": "What is hot and cold pass mass?", "acceptedAnswer": { "@type": "Answer", "text": "A cold pass uses the ship's base mass with the prop mod off. A hot pass has an active microwarpdrive or afterburner, which adds roughly 50,000,000 kg. Rolling crews mix hot and cold passes to land the total inside the collapse window without over-shooting on the wrong side." } }
+      ]
+    }
+    </script>
+
+    <style>
+      :root { --bg:#06080f; --panel:#111827; --panel2:#141c2e; --border:#1e2740; --text:#c8d2e6; --head:#eaf0fb; --muted:#8a98b8; --muted2:#6a7898; --accent:#5b9bff; --green:#3ddc84; --amber:#f0a030; --red:#e05a5a; }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; background: var(--bg); }
+      body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--text); line-height: 1.6; }
+      .wrap { max-width: 820px; margin: 0 auto; padding: 32px 20px 64px; }
+      a { color: var(--accent); }
+      .topnav { font-size: 14px; }
+      .topnav a { color: var(--muted); text-decoration: none; }
+      header.hero { margin: 24px 0 8px; }
+      .logo { font-size: 30px; color: var(--accent); line-height: 1; }
+      h1 { color: var(--head); font-size: 30px; line-height: 1.25; margin: 12px 0 6px; }
+      .sub { color: var(--muted); margin: 0; }
+      .updated { color: var(--muted2); font-size: 13px; margin: 6px 0 28px; }
+      h2 { color: var(--head); font-size: 23px; margin: 40px 0 10px; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+      h3 { color: var(--head); font-size: 18px; margin: 22px 0 4px; }
+      p { margin: 10px 0; }
+      .lede { font-size: 17px; color: var(--text); }
+      ul, ol { padding-left: 20px; } li { margin: 5px 0; }
+      .card { background: var(--panel); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 8px; padding: 4px 16px 14px; margin: 16px 0; }
+      .card.warn { border-left-color: var(--amber); }
+      .cta { background: var(--panel2); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; margin: 36px 0 0; text-align: center; }
+      .cta a.btn { display: inline-block; margin-top: 8px; padding: 9px 18px; background: var(--accent); color: #04060c; border-radius: 8px; text-decoration: none; font-weight: 700; }
+      .related { margin: 30px 0 0; padding: 16px 20px; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; }
+      .related h2 { border: 0; margin: 0 0 8px; font-size: 16px; }
+      footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--border); color: var(--muted2); font-size: 13px; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <nav class="topnav"><a href="/">&larr; Nexum home</a></nav>
+
+      <header class="hero">
+        <div class="logo" aria-hidden="true">&#9672;</div>
+        <h1>How to Roll a Wormhole in EVE Online</h1>
+        <p class="sub">Understand wormhole mass, roll safely, and never strand your fleet on the wrong side.</p>
+      </header>
+      <p class="updated">A Nexum wormhole guide</p>
+
+      <p class="lede">"Rolling" a wormhole means deliberately collapsing it by pushing ship mass through until it dies, then letting a fresh connection spawn. Corps roll holes to reach a new random system, to close a chain a hostile is coming down, or to control exactly who can reach their home. Get the mass maths wrong and you either fail to close the hole or, worse, strand pilots on the far side. This guide covers the mechanics and the safe method.</p>
+
+      <h2>How wormhole mass works</h2>
+      <p>Every wormhole has two mass numbers that matter for rolling:</p>
+      <ul>
+        <li><strong>Total mass</strong> - the combined ship mass the hole can pass before it collapses (for example ~2,000,000,000 kg on many C1-C3 statics, up to ~3,300,000,000 kg on big cap holes).</li>
+        <li><strong>Per-jump (maximum jump) mass</strong> - the heaviest single ship that can use it. Too heavy and the ship simply cannot jump.</li>
+      </ul>
+      <p>Each ship that jumps subtracts its own mass from the remaining total. When the remaining mass hits zero, the hole collapses on that jump. The catch: <strong>both numbers vary by plus or minus 10%</strong> and you cannot see the exact figure in game. So the real collapse point is a <em>window</em>, not a precise value - which is exactly why rolling has risk and why a calculator helps.</p>
+
+      <div class="card">
+        <h3>Reading the stages in game</h3>
+        <p>The wormhole's on-screen description tells you roughly how much mass is left: "not yet had its stability significantly disrupted" (over ~50% remaining), "had its stability reduced" (under ~50%, "destabilised"), and "on the verge of collapse" (under ~10%, "critical"). Those bands are what a rolling tracker turns into pass counts.</p>
+      </div>
+
+      <h2>Hot vs cold pass mass</h2>
+      <p>Ship mass changes depending on whether your propulsion module is running:</p>
+      <ul>
+        <li><strong>Cold pass</strong> - prop mod off. The ship jumps at its base hull mass.</li>
+        <li><strong>Hot pass</strong> - microwarpdrive or afterburner active. An active prop mod adds roughly <strong>50,000,000 kg</strong> for that jump.</li>
+      </ul>
+      <p>Rolling crews alternate hot and cold passes to land the running total inside the collapse window instead of overshooting. A common tool is a Higgs Anchor rig, which multiplies hull mass so a single battleship carries a large, predictable chunk of the total - fewer jumps, tighter control.</p>
+
+      <h2>The safe rolling method</h2>
+      <ol>
+        <li><strong>Know the hole.</strong> Identify the wormhole type so you know its total and per-jump mass (a mapper shows this from the code, e.g. a K162 is the far side of a named type).</li>
+        <li><strong>Pick your roller.</strong> Battleships (often with a Higgs rig and a prop mod) are the standard. Two pilots, or one pilot bouncing back and forth, is typical.</li>
+        <li><strong>Always end on the home side.</strong> Plan your pass count so the <em>last</em> pass that collapses the hole leaves your roller at home - never stranded in the unknown far system.</li>
+        <li><strong>Pass, check the description, repeat.</strong> After each jump, re-read the mass stage. As you approach "critical", switch to your lightest safe pass so you do not overshoot into a strand.</li>
+        <li><strong>When it is critical, roll it closed from the home side.</strong> The final pass should be one you can afford to make one-way if it does not collapse - and that lands you home if it does.</li>
+      </ol>
+
+      <div class="card warn">
+        <h3>Stranding: the failure you are avoiding</h3>
+        <p>If the hole collapses while your roller is on the <em>far</em> side, that pilot is stuck in a random unknown system with no way back except scanning a new exit. That is a stranding. The whole point of counting passes and ending home-side is to make stranding impossible - which is exactly what a rolling calculator enforces for you.</p>
+      </div>
+
+      <h2>Let a rolling calculator do the maths</h2>
+      <p><a href="/">Nexum</a> has a built-in <strong>rolling calculator</strong> on every wormhole connection. Set your roller's cold and hot mass (or hit "use my ship"), tell it which side you are on, and it tracks the cumulative mass, shows the plus/minus 10% variance band, tells you how many safe passes remain, and warns you before a pass would strand you on the far side. It also keeps a shared jump log of who passed the hole, so a whole fleet can roll off one synced count instead of everyone guessing. Because it is real-time and collaborative, two pilots rolling from opposite ends see the same numbers.</p>
+
+      <div class="cta">
+        <p><strong>Roll with confidence.</strong> Nexum's rolling calculator is free - map your chain and track every pass.</p>
+        <a class="btn" href="/">Open Nexum</a>
+      </div>
+
+      <div class="related">
+        <h2>Related guides</h2>
+        <ul>
+          <li><a href="/guides/classes/">EVE wormhole classes and statics explained</a></li>
+          <li><a href="/guides/mapping/">How to map a wormhole chain</a></li>
+          <li><a href="/compare/">Nexum vs Pathfinder vs Tripwire vs Wanderer</a></li>
+        </ul>
+      </div>
+
+      <footer>
+        <p>EVE Online and the EVE logo are the registered trademarks of CCP hf. All rights reserved worldwide. Nexum is a third-party tool and is not affiliated with or endorsed by CCP hf. See the full <a href="/license/">license &amp; EVE IP notice</a>.</p>
+      </footer>
+    </div>
+  </body>
+</html>

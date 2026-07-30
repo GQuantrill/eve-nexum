@@ -11,7 +11,7 @@ import { ClosestSystemsPane } from './ClosestSystemsPane';
 import { FleetPane } from './FleetPane';
 import { WatchlistBlock } from './WatchlistBlock';
 import { ChainsPane } from './ChainsPane';
-import { CaretLeftIcon, CaretRightIcon, ArrowLineLeftIcon, ArrowLineRightIcon } from '@phosphor-icons/react';
+import { CaretLeftIcon, CaretRightIcon, ArrowLineLeftIcon, ArrowLineRightIcon } from '../../icons';
 import { useUserSetting } from '../../hooks/useUserSetting';
 
 const SIDE_KEY      = 'nexum.sidebar.side';

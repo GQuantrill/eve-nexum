@@ -602,6 +602,10 @@
     "invalidJson": "無効な JSON ファイルです。",
     "notNexumMap": "このファイルは Eve-Nexum のマップエクスポートではないようです。",
     "importFailed": "インポートに失敗しました: {{error}}",
+    "importWanderer": "↑ Wanderer からインポート",
+    "importWandererTitle": "Wanderer マッパーからエクスポートしたマップをインポート（新しい個人マップを作成）",
+    "notWandererMap": "ファイルが Wanderer のエクスポートではないようです。",
+    "wandererImported": "Wanderer からインポート：{{systems}} システム、{{connections}} 接続（{{skipped}} 件スキップ）。",
     "colorVision": "色覚",
     "colorVisionOptions": {
       "off": "デフォルトの色",
@@ -1767,6 +1771,7 @@
   "iconPicker": {
     "title": "アイコンを選択",
     "search": "アイコンを検索…",
+    "loading": "アイコンを読み込み中…",
     "more": "検索を絞り込むともっと表示されます"
   },
   "labelsDialog": {

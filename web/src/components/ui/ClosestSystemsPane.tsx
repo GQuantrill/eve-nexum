@@ -5,7 +5,7 @@ import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from 
 import type { DragEndEvent } from '@dnd-kit/core';
 import { SortableContext, useSortable, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { MapPinSimpleIcon, PathIcon, XIcon, PlusIcon, HouseIcon, TrashIcon } from '@phosphor-icons/react';
+import { MapPinSimpleIcon, PathIcon, XIcon, PlusIcon, HouseIcon, TrashIcon } from '../../icons';
 import { useRoute, type RouteEntry } from '../../hooks/useRoute';
 import { useEsiSearch } from '../../hooks/useEsiSearch';
 import { useMapStore } from '../../store/mapStore';

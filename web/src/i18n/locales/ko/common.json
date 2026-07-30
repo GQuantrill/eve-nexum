@@ -602,6 +602,10 @@
     "invalidJson": "잘못된 JSON 파일입니다.",
     "notNexumMap": "이 파일은 Eve-Nexum 지도 내보내기 파일이 아닌 것 같습니다.",
     "importFailed": "가져오기 실패: {{error}}",
+    "importWanderer": "↑ Wanderer에서 가져오기",
+    "importWandererTitle": "Wanderer 매퍼에서 내보낸 지도 가져오기 (새 개인 지도 생성)",
+    "notWandererMap": "파일이 Wanderer 내보내기 형식이 아닌 것 같습니다.",
+    "wandererImported": "Wanderer에서 가져옴: 성계 {{systems}}개, 연결 {{connections}}개 ({{skipped}}개 건너뜀).",
     "colorVision": "색각",
     "colorVisionOptions": {
       "off": "기본 색상",
@@ -1767,6 +1771,7 @@
   "iconPicker": {
     "title": "아이콘 선택",
     "search": "아이콘 검색…",
+    "loading": "아이콘 불러오는 중…",
     "more": "더 보려면 검색을 좁히세요"
   },
   "labelsDialog": {
