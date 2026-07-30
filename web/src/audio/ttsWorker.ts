@@ -60,6 +60,14 @@ function load(): Promise<void> {
         if (typeof pr === 'number') post({ type: 'progress', progress: Math.round(pr) });
       },
     });
+    // Warm up: ONNX Runtime's FIRST inference compiles/optimises kernels and is
+    // much slower than steady state. Run one throwaway generation now — behind the
+    // loading UI — so the user's first real announcement pays only steady-state
+    // cost, not the cold-start penalty. Non-fatal if it fails.
+    try {
+      await primeVoice('af_nicole');
+      await tts.generate('warming up', { voice: 'af_nicole' as VoiceId });
+    } catch { /* warm-up is best-effort */ }
   })().catch((e: unknown) => { loadPromise = null; throw e; });
   return loadPromise;
 }
