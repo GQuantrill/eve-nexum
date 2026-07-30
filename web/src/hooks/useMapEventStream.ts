@@ -87,9 +87,10 @@ export function useMapEventStream(): void {
         }
 
         if (data.actor === CLIENT_ID) return; // our own echo — already applied
-        // Another viewer added a connection — count it for the voice announcer's
-        // "new chain" event (only remote adds reach here, never our own edits).
-        if (data.type === 'connection.add') useRemoteActivity.getState().noteConnectionAdd();
+        // Another viewer saved a wormhole chain — count it for the voice
+        // announcer's "new chain" event (only remote adds reach here, never our
+        // own saves, and NOT plain map connections — only saved chains).
+        if (data.type === 'route.add') useRemoteActivity.getState().noteChainAdd();
         useMapStore.getState().applyRemote(data as unknown as RemoteEvent);
       } catch { /* ignore malformed frame */ }
     };

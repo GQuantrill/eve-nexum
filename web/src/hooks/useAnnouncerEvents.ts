@@ -52,7 +52,7 @@ export function useAnnouncerEvents(): void {
   const alts       = useAccountLocations();
   const incursions = useIncursions();
   const killLog    = useKillLog();
-  const chainAdds  = useRemoteActivity((s) => s.connectionAdds);
+  const chainAdds  = useRemoteActivity((s) => s.chainAdds);
 
   const currentSys = location.system?.eveSystemId ?? null;
   const inHighsec  = location.system?.systemClass === 'HS';
@@ -175,8 +175,9 @@ export function useAnnouncerEvents(): void {
   }, [alts, enabled, evConnect, say]);
 
   // ---- New wormhole chain added by someone else (debounced) -----------------
-  // chainAdds only counts REMOTE connection.add events (see remoteActivityStore).
-  // Coalesce a burst of adds into one announcement.
+  // chainAdds only counts REMOTE route.add events — a saved wormhole chain in
+  // the Chains panel, NOT a plain map connection (see remoteActivityStore).
+  // Coalesce a burst of saves into one announcement.
   const prevChainAdds = useRef<number | null>(null);
   const chainTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
@@ -187,7 +188,7 @@ export function useAnnouncerEvents(): void {
     if (chainTimer.current) clearTimeout(chainTimer.current);
     chainTimer.current = setTimeout(() => {
       chainTimer.current = null;
-      say('New connections added to the map.');
+      say('New chain added to the map.');
     }, 5000);
   }, [chainAdds, enabled, evChain, say]);
   useEffect(() => () => { if (chainTimer.current) clearTimeout(chainTimer.current); }, []);
