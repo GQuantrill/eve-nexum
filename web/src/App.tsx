@@ -19,6 +19,7 @@ import { SharedMapView } from './components/ui/SharedMapView';
 import { useMapStore } from './store/mapStore';
 import { useLocationTracking } from './hooks/useLocationTracking';
 import { useMapEventStream } from './hooks/useMapEventStream';
+import { useAnnouncerEvents } from './hooks/useAnnouncerEvents';
 import { useMapPresence } from './hooks/useMapPresence';
 import { useHashRoute } from './hooks/useHashRoute';
 import { usePageviewTracking } from './hooks/usePageviewTracking';
@@ -110,6 +111,7 @@ function MapApp() {
 
   useLocationTracking(!!mapId);
   useMapEventStream();
+  useAnnouncerEvents();
   useMapPresence();
 
   return (

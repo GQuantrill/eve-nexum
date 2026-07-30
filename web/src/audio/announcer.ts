@@ -67,6 +67,18 @@ function getAudioContext(): AudioContext {
   return audioCtx;
 }
 
+// Browsers start an AudioContext suspended until a user gesture. With the
+// announcer on by default, prime it on the first interaction so an event that
+// fires before the user has clicked anything can still play once they do.
+let gestureHooked = false;
+export function primeAudioOnGesture(): void {
+  if (gestureHooked || typeof window === 'undefined') return;
+  gestureHooked = true;
+  const resume = () => { getAudioContext().resume().catch(() => { /* ignore */ }); };
+  window.addEventListener('pointerdown', resume, { once: true });
+  window.addEventListener('keydown', resume, { once: true });
+}
+
 async function playSamples(samples: Float32Array, sampleRate: number): Promise<void> {
   const ctx = getAudioContext();
   if (ctx.state === 'suspended') { try { await ctx.resume(); } catch { /* ignore */ } }
@@ -87,7 +99,7 @@ export const useAnnouncer = create<AnnouncerState>((set, get) => ({
   status: 'idle',
   progress: 0,
   error: null,
-  voice: 'af_heart',
+  voice: 'af_nicole',
   speaking: false,
   backend: '',
 

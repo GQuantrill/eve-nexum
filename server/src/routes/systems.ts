@@ -273,6 +273,39 @@ systemsRouter.get('/:id(\\d+)/adjacent', async (req, res) => {
   }
 });
 
+// GET /api/systems/:id/nearby-lawless?jumps=N — lowsec/nullsec systems within N
+// gate-jumps of :id, for the voice announcer's "lawless in range" event. BFS over
+// map_stargates (a recursive CTE), joined to solar_systems; security < 0.45 is
+// below highsec (matches deriveClass). N clamped 0..5 (proximity ceiling). Only
+// k-space has stargates, so a wormhole origin returns [].
+systemsRouter.get('/:id(\\d+)/nearby-lawless', async (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  const jumps = Math.max(0, Math.min(5, parseInt(String(req.query.jumps ?? '2'), 10) || 0));
+  try {
+    const { rows } = await db.query<{ id: number; name: string; security: string; jumps: number }>(
+      `WITH RECURSIVE bfs(system_id, depth) AS (
+         SELECT $1::int, 0
+         UNION
+         SELECT g.destination_system_id, b.depth + 1
+           FROM bfs b JOIN map_stargates g ON g.system_id = b.system_id
+          WHERE b.depth < $2
+       )
+       SELECT s.id, s.name, s.security::text AS security, MIN(b.depth)::int AS jumps
+         FROM bfs b JOIN solar_systems s ON s.id = b.system_id
+        WHERE b.system_id <> $1 AND s.security < 0.45
+        GROUP BY s.id, s.name, s.security
+        ORDER BY jumps, s.name`,
+      [id, jumps],
+    );
+    return res.json(rows.map((r) => ({
+      eveSystemId: r.id, name: r.name, security: Number(r.security), jumps: r.jumps,
+    })));
+  } catch (err) {
+    log.error('nearby-lawless query failed:', err);
+    return res.status(500).json({ error: 'Database query failed' });
+  }
+});
+
 // GET /api/systems/:id/celestials — static celestial metadata for the panel
 // (security, constellation, sun type, planet/moon/belt/gate counts). DB-first;
 // live-ESI fallback (cached) only for systems not yet filled by a re-seed.

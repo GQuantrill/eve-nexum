@@ -21,7 +21,6 @@ import { CharacterSwitcher } from './CharacterSwitcher';
 import { HeatmapMenu } from './HeatmapMenu';
 import { WhTypeChartModal } from './WhTypeChartModal';
 import { KillLogPanel } from './KillLogPanel';
-import { AudioLabModal } from './AudioLabModal';
 import { useProximityAlerts } from '../../hooks/useProximityAlerts';
 import { useClickOutside } from '../../hooks/useClickOutside';
 import { useUserSetting } from '../../hooks/useUserSetting';
@@ -38,7 +37,7 @@ import {
   ShieldStarIcon, ChartBarIcon, SlidersHorizontalIcon, FootprintsIcon,
   SignOutIcon, PlanetIcon, LinkSimpleIcon, ClockCountdownIcon, MapPinIcon,
   KeyIcon, GraphIcon, ArrowCounterClockwiseIcon, DotsSixVerticalIcon,
-  DiscordLogoIcon, MegaphoneIcon,
+  DiscordLogoIcon,
 } from '@phosphor-icons/react';
 import type { Icon as PhosphorIcon } from '@phosphor-icons/react';
 import { UpdateIndicator } from './UpdateIndicator';
@@ -304,7 +303,6 @@ export function Toolbar() {
   const [showKeys, setShowKeys] = useState(false);
   const [showWhChart, setShowWhChart] = useState(false);
   const [showKillLog, setShowKillLog] = useState(false);
-  const [showAudioLab, setShowAudioLab] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [leaveConfirm, setLeaveConfirm] = useState(false);
   const mapSwitcherRef = useRef<HTMLDivElement>(null);
@@ -572,15 +570,6 @@ export function Toolbar() {
           <SkullIcon size={18} weight="regular" />
         </button>
 
-        <button
-          className="toolbar__toggle toolbar__toggle--icon toolbar__toggle--prominent"
-          onClick={() => setShowAudioLab(true)}
-          data-tooltip="Voice announcer (beta)"
-          aria-label="Voice announcer"
-        >
-          <MegaphoneIcon size={18} weight="regular" />
-        </button>
-
         <HeatmapMenu />
 
         <button
@@ -781,7 +770,6 @@ export function Toolbar() {
     {showKeys && <ApiKeysModal onClose={() => setShowKeys(false)} />}
     {showWhChart && <WhTypeChartModal onClose={() => setShowWhChart(false)} />}
     {showKillLog && <KillLogPanel onClose={() => setShowKillLog(false)} />}
-    {showAudioLab && <AudioLabModal onClose={() => setShowAudioLab(false)} />}
     {deleteConfirm && (
       <ConfirmModal
         message={t('toolbar.deleteMapConfirm', { name: mapName })}
