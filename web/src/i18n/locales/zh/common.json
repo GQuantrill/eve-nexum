@@ -651,7 +651,9 @@
       "evLawless": "范围内的无法治系统",
       "evKills": "范围内的最近击杀",
       "evNewChain": "他人新增的虫洞链",
-      "threshold": "“范围内”使用接近警报的阈值。"
+      "threshold": "“范围内”使用接近警报的阈值。",
+      "experimental": "实验性功能",
+      "delayNote": "语音可能会延迟最多 5 秒。首次运行会更久。"
     }
   },
   "customIntel": {

@@ -42,6 +42,22 @@ export function AnnouncerSection() {
 
   return (
     <>
+      <div
+        style={{
+          display: "inline-block",
+          fontSize: 11,
+          textTransform: "uppercase",
+          letterSpacing: "0.06em",
+          fontWeight: 700,
+          color: "#e0a13c",
+          border: "1px solid #e0a13c55",
+          borderRadius: 4,
+          padding: "1px 6px",
+          marginBottom: 6,
+        }}
+      >
+        {t("mapSidebar.announcer.experimental")}
+      </div>
       <div className="map-sidebar__hint">{t("mapSidebar.announcer.hint")}</div>
 
       <label className="map-sidebar__row map-sidebar__toggle-row">
@@ -89,6 +105,8 @@ export function AnnouncerSection() {
               {t("mapSidebar.announcer.loadFailed", { error })}
             </div>
           )}
+
+          <div className="map-sidebar__hint">{t("mapSidebar.announcer.delayNote")}</div>
 
           <div className="map-sidebar__hint" style={{ marginTop: 4 }}>
             {t("mapSidebar.announcer.announce")}

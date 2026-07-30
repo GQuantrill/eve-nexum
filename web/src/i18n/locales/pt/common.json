@@ -651,7 +651,9 @@
       "evLawless": "Sistemas sem lei no alcance",
       "evKills": "Naves destruídas recentes no alcance",
       "evNewChain": "Nova cadeia adicionada por outros",
-      "threshold": "«No alcance» usa o limiar dos alertas de proximidade."
+      "threshold": "«No alcance» usa o limiar dos alertas de proximidade.",
+      "experimental": "Funcionalidade experimental",
+      "delayNote": "A voz pode demorar até 5 segundos. A primeira execução demora mais."
     }
   },
   "customIntel": {

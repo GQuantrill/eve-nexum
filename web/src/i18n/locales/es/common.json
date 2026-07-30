@@ -651,7 +651,9 @@
       "evLawless": "Sistemas sin ley dentro del alcance",
       "evKills": "Naves destruidas recientes dentro del alcance",
       "evNewChain": "Nueva cadena añadida por otros",
-      "threshold": "«Dentro del alcance» usa el umbral de las alertas de proximidad."
+      "threshold": "«Dentro del alcance» usa el umbral de las alertas de proximidad.",
+      "experimental": "Función experimental",
+      "delayNote": "La voz puede tardar hasta 5 segundos. La primera vez tarda más."
     }
   },
   "customIntel": {
