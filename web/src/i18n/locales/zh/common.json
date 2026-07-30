@@ -464,7 +464,8 @@
       "liveSharing": "实时地图广播",
       "shareMap": "共享地图",
       "shortcuts": "快捷键",
-      "notifications": "通知"
+      "notifications": "通知",
+      "announcer": "语音播报"
     },
     "snapToGrid": "对齐网格",
     "settings": "设置",
@@ -634,7 +635,24 @@
     "routeIncludeWormholes": "包含虫洞链",
     "routeShortcutNote": "使用虫洞、Thera、Turnur 或跳跃门的路线无法设为游戏内目的地或途经点——右键点击路线中的已知空间星系以前往该处。",
     "routeIncludeAnsiblex": "包含 Ansiblex 跳跃门",
-    "showUndivedWhs": "显示未跳跃虫洞"
+    "showUndivedWhs": "显示未跳跃虫洞",
+    "announcer": {
+      "hint": "使用设备本地语音的语音提示。仅限英语。",
+      "enable": "启用语音播报",
+      "voice": "语音",
+      "downloading": "正在下载语音… {{progress}}%",
+      "speaking": "播报中…",
+      "preview": "试听语音",
+      "ready": "就绪",
+      "loadFailed": "语音模型加载失败：{{error}}",
+      "announce": "播报：",
+      "evConnect": "角色上线 / 下线",
+      "evIncursions": "范围内的入侵",
+      "evLawless": "范围内的无法治系统",
+      "evKills": "范围内的最近击杀",
+      "evNewChain": "他人新增的虫洞链",
+      "threshold": "“范围内”使用接近警报的阈值。"
+    }
   },
   "customIntel": {
     "title": "自定义情报",

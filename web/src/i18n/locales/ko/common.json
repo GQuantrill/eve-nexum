@@ -464,7 +464,8 @@
       "liveSharing": "실시간 지도 송출",
       "shareMap": "지도 공유",
       "shortcuts": "단축키",
-      "notifications": "알림"
+      "notifications": "알림",
+      "announcer": "음성 안내"
     },
     "snapToGrid": "격자에 맞추기",
     "settings": "설정",
@@ -634,7 +635,24 @@
     "routeIncludeWormholes": "웜홀 체인 포함",
     "routeShortcutNote": "웜홀, Thera, Turnur 또는 점프 게이트를 사용하는 경로는 게임 내 목적지나 경유지로 설정할 수 없습니다 — 경로의 K-스페이스 시스템을 우클릭하여 그곳으로 이동하세요.",
     "routeIncludeAnsiblex": "Ansiblex 점프 게이트 포함",
-    "showUndivedWhs": "미탐사 웜홀 표시"
+    "showUndivedWhs": "미탐사 웜홀 표시",
+    "announcer": {
+      "hint": "기기 내 음성으로 읽어주는 알림입니다. 영어만 지원합니다.",
+      "enable": "음성 안내 사용",
+      "voice": "음성",
+      "downloading": "음성 다운로드 중… {{progress}}%",
+      "speaking": "재생 중…",
+      "preview": "음성 미리듣기",
+      "ready": "준비됨",
+      "loadFailed": "음성 모델을 불러오지 못했습니다: {{error}}",
+      "announce": "안내 항목:",
+      "evConnect": "캐릭터 접속 / 접속 종료",
+      "evIncursions": "범위 내 인커전",
+      "evLawless": "범위 내 무법 성계",
+      "evKills": "범위 내 최근 킬",
+      "evNewChain": "다른 사용자가 추가한 새 체인",
+      "threshold": "‘범위 내’는 근접 경보 임계값을 사용합니다."
+    }
   },
   "customIntel": {
     "title": "사용자 지정 인텔",
