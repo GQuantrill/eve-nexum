@@ -27,6 +27,7 @@ import { toPng } from "html-to-image";
 import { CaretLeftIcon, CaretRightIcon, GearIcon, DiscordLogoIcon } from "@phosphor-icons/react";
 import { DISCORD_INVITE_URL } from "../../data/links";
 import { ChainExitsSection } from "./ChainExitsSection";
+import { AnnouncerSection } from "./AnnouncerSection";
 import { MapSharesSection } from "./MapSharesSection";
 import { MergeMapModal } from "./MergeMapModal";
 import { CustomIntelBlock } from "./CustomIntelBlock";
@@ -148,6 +149,7 @@ type SectionId =
   | "chainExits"
   | "proximityAlerts"
   | "notifications"
+  | "announcer"
   | "activity"
   | "fleet"
   | "share"
@@ -1360,6 +1362,10 @@ export function MapSidebar() {
               desktopDefault={false}
             />
           </div>
+        </CollapsibleSection>
+
+        <CollapsibleSection title="Announcer" {...sectionProps("announcer")}>
+          <AnnouncerSection />
         </CollapsibleSection>
 
         <CollapsibleSection title={t("mapSidebar.sections.activity")} {...sectionProps("activity")}>

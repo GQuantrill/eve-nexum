@@ -3,6 +3,7 @@ import { useMapStore, type RemoteEvent } from '../store/mapStore';
 import { usePresenceStore, type PresenceViewer } from '../store/presenceStore';
 import { useKillStore, type KillRow } from '../store/killStore';
 import { useJumpLogStore, type JumpRow } from '../store/jumpLogStore';
+import { useRemoteActivity } from '../store/remoteActivityStore';
 import { apiUrl } from '../api/client';
 import { CLIENT_ID } from '../api/clientId';
 
@@ -21,6 +22,7 @@ export function useMapEventStream(): void {
     usePresenceStore.getState().reset(); // clear last map's roster; snapshot repopulates
     useKillStore.getState().reset();     // clear last map's kill flags
     useJumpLogStore.getState().reset();  // clear last map's connection jump logs
+    useRemoteActivity.getState().reset(); // clear last map's remote-edit counters
 
     const es = new EventSource(apiUrl(`/api/maps/${activeMapId}/events`), { withCredentials: true });
 
@@ -85,6 +87,10 @@ export function useMapEventStream(): void {
         }
 
         if (data.actor === CLIENT_ID) return; // our own echo — already applied
+        // Another viewer saved a wormhole chain — count it for the voice
+        // announcer's "new chain" event (only remote adds reach here, never our
+        // own saves, and NOT plain map connections — only saved chains).
+        if (data.type === 'route.add') useRemoteActivity.getState().noteChainAdd();
         useMapStore.getState().applyRemote(data as unknown as RemoteEvent);
       } catch { /* ignore malformed frame */ }
     };

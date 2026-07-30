@@ -47,6 +47,11 @@ export default defineConfig(({ mode }) => {
   return {
     define: { __APP_VERSION__: JSON.stringify(APP_VERSION) },
     plugins: [react(), gtmPlugin(gtmId)],
+    // kokoro-js pulls @huggingface/transformers (ONNX runtime + wasm + import.meta.url
+    // + node-only fallbacks). Skip esbuild pre-bundling so Vite resolves its browser
+    // build and dynamic wasm/model loading correctly; it's dynamically imported, so
+    // this only affects the async voice-announcer chunk.
+    optimizeDeps: { exclude: ['@huggingface/transformers', 'kokoro-js'] },
     build: {
       rollupOptions: {
         output: {
