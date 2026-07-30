@@ -51,7 +51,35 @@ type VoiceId = NonNullable<Parameters<KokoroTTS['generate']>[1]>['voice'];
 let tts: KokoroTTS | null = null;
 let loadPromise: Promise<void> | null = null;
 let queue: Promise<void> = Promise.resolve();
-let current: HTMLAudioElement | null = null;
+
+// Playback via the Web Audio API from Kokoro's RAW Float32 samples — NOT a WAV
+// blob through an <audio> element. The blob path re-encodes to 16-bit PCM (which
+// clips/crackles on peaks) and lets the element resample; feeding the raw
+// Float32 into an AudioBuffer at the model's own 24 kHz plays it verbatim and the
+// browser does a clean high-quality resample to the device rate. One shared
+// AudioContext, unlocked by the first user gesture (Enable/Speak).
+let audioCtx: AudioContext | null = null;
+let currentSource: AudioBufferSourceNode | null = null;
+
+function getAudioContext(): AudioContext {
+  if (!audioCtx) audioCtx = new AudioContext();
+  return audioCtx;
+}
+
+async function playSamples(samples: Float32Array, sampleRate: number): Promise<void> {
+  const ctx = getAudioContext();
+  if (ctx.state === 'suspended') { try { await ctx.resume(); } catch { /* ignore */ } }
+  const buffer = ctx.createBuffer(1, samples.length, sampleRate);
+  buffer.getChannelData(0).set(samples);
+  const source = ctx.createBufferSource();
+  source.buffer = buffer;
+  source.connect(ctx.destination);
+  currentSource = source;
+  await new Promise<void>((resolve) => {
+    source.onended = () => { if (currentSource === source) currentSource = null; resolve(); };
+    try { source.start(); } catch { resolve(); }
+  });
+}
 
 export const useAnnouncer = create<AnnouncerState>((set, get) => ({
   status: 'idle',
@@ -107,15 +135,8 @@ export const useAnnouncer = create<AnnouncerState>((set, get) => ({
       set({ speaking: true });
       try {
         const audio = await tts.generate(clean, { voice: voice as VoiceId });
-        const url = URL.createObjectURL(audio.toBlob());
-        await new Promise<void>((resolve) => {
-          const el = new Audio(url);
-          current = el;
-          const done = () => { URL.revokeObjectURL(url); if (current === el) current = null; resolve(); };
-          el.onended = done;
-          el.onerror = done;
-          void el.play().catch(done);
-        });
+        // RawAudio: .audio is the Float32 waveform, .sampling_rate is 24000.
+        await playSamples(audio.audio as Float32Array, audio.sampling_rate);
       } catch {
         /* prototype: swallow generation/playback failures */
       } finally {
@@ -126,7 +147,7 @@ export const useAnnouncer = create<AnnouncerState>((set, get) => ({
   },
 
   stop: () => {
-    if (current) { current.pause(); current = null; }
+    if (currentSource) { try { currentSource.stop(); } catch { /* already stopped */ } currentSource = null; }
     queue = Promise.resolve();
     set({ speaking: false });
   },
