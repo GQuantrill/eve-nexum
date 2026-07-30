@@ -146,6 +146,25 @@ async function playSamples(samples: Float32Array, sampleRate: number): Promise<v
   });
 }
 
+// Rewrite EVE shorthand + coined jargon into words the TTS pronounces correctly:
+// it reads security codes like "LS" letter-by-letter, and mangles run-together
+// terms like "lowsec". Applied to ALL announcer text (see speak). Security codes
+// are matched as standalone UPPERCASE tokens so real system names (e.g. a system
+// literally named with those letters) aren't rewritten; the spelled-out jargon is
+// case-insensitive. Extend this list as new announcement wording needs it.
+const SPEECH_MAP: Array<[RegExp, string]> = [
+  [/\bLS\b/g, 'low security'],
+  [/\bNS\b/g, 'null security'],
+  [/\bHS\b/g, 'high security'],
+  [/\blow[\s-]?sec\b/gi, 'low security'],
+  [/\bnull[\s-]?sec\b/gi, 'null security'],
+  [/\bhigh[\s-]?sec\b/gi, 'high security'],
+  [/\bWH\b/g, 'wormhole'],
+];
+export function normalizeForSpeech(text: string): string {
+  return SPEECH_MAP.reduce((s, [re, rep]) => s.replace(re, rep), text);
+}
+
 export const useAnnouncer = create<AnnouncerState>((set, get) => ({
   status: 'idle',
   progress: 0,
@@ -166,7 +185,8 @@ export const useAnnouncer = create<AnnouncerState>((set, get) => ({
   },
 
   speak: async (text) => {
-    const clean = text.trim().replace(/\s+/g, ' ').slice(0, 300);   // cap length
+    // Normalise jargon → speakable words BEFORE generation, then cap length.
+    const clean = normalizeForSpeech(text.trim().replace(/\s+/g, ' ')).slice(0, 300);
     if (!clean) return;
     if (get().status !== 'ready') { try { await get().load(); } catch { return; } }
     const voice = get().voice;
