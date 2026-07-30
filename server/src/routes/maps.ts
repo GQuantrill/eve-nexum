@@ -1508,6 +1508,158 @@ mapsRouter.post('/import', async (req, res) => {
   }
 });
 
+// ── Wanderer import ─────────────────────────────────────────────────────────
+// Import a map exported from Wanderer (the other EVE wormhole mapper). Its export
+// gives only EVE system ids + a coarse layout + numeric mass/time/size codes. We
+// enrich each system's name/class/effect/statics/region from our SDE, classify
+// each connection as gate vs wormhole from map_stargates (Wanderer doesn't export
+// that), de-overlap the layout for our larger nodes, and create a personal map.
+// Not recoverable from the export: wormhole types (N062/K162) and signatures.
+const W_MASS: Record<number, string> = { 0: 'stable', 1: 'destabilized', 2: 'critical' };
+const W_TIME: Record<number, string> = { 0: 'fresh', 1: 'eol' };
+const W_SIZE: Record<number, string> = { 0: 'small', 1: 'medium', 2: 'large', 3: 'xl' };
+
+interface WSystem { id?: unknown; position?: { x?: unknown; y?: unknown }; locked?: unknown; tag?: unknown; description?: unknown }
+interface WConn   { source?: unknown; target?: unknown; mass_status?: unknown; time_status?: unknown; ship_size_type?: unknown }
+
+// Push overlapping node boxes apart (our nodes are far bigger than Wanderer's),
+// preserving relative layout. Same idea as the region seeder.
+function deOverlapCoords(coords: Array<{ x: number; y: number }>): void {
+  const MIN_X = 240, MIN_Y = 160;
+  for (let pass = 0; pass < 20; pass++) {
+    let moved = false;
+    for (let i = 0; i < coords.length; i++) for (let j = i + 1; j < coords.length; j++) {
+      const dx = coords[j].x - coords[i].x, dy = coords[j].y - coords[i].y;
+      const ox = MIN_X - Math.abs(dx), oy = MIN_Y - Math.abs(dy);
+      if (ox <= 0 || oy <= 0) continue;
+      if (ox <= oy) { const s = (dx < 0 ? -1 : 1) * (ox / 2); coords[i].x -= s; coords[j].x += s; }
+      else          { const s = (dy < 0 ? -1 : 1) * (oy / 2); coords[i].y -= s; coords[j].y += s; }
+      moved = true;
+    }
+    if (!moved) break;
+  }
+}
+
+mapsRouter.post('/import/wanderer', async (req, res) => {
+  const body = req.body as { name?: unknown; systems?: unknown; connections?: unknown };
+  const systems     = Array.isArray(body.systems) ? (body.systems as WSystem[]) : null;
+  const connections = Array.isArray(body.connections) ? (body.connections as WConn[]) : [];
+  if (!systems)                                   { res.status(400).json({ error: 'systems must be an array' }); return; }
+  if (systems.length > MAX_IMPORT_SYSTEMS)        { res.status(413).json({ error: `Too many systems (max ${MAX_IMPORT_SYSTEMS})` }); return; }
+  if (connections.length > MAX_IMPORT_CONNECTIONS) { res.status(413).json({ error: `Too many connections (max ${MAX_IMPORT_CONNECTIONS})` }); return; }
+
+  // v1 imports to a PERSONAL map — enforce that scope's quota.
+  const oid = await resolveOwnerId(req);
+  const quota = await db.query(`SELECT 1 FROM maps WHERE owner_id = $1 AND corp_id IS NULL AND alliance_id IS NULL`, [oid]);
+  if ((quota.rowCount ?? 0) >= config.maxUserMaps) { res.status(403).json({ error: 'Maximum maps reached' }); return; }
+
+  const eveIds = [...new Set(systems.map((s) => Number(s.id)).filter((n) => Number.isInteger(n) && n > 0))];
+  if (eveIds.length === 0) { res.status(400).json({ error: 'No valid EVE system ids in the file' }); return; }
+
+  // Enrich from the SDE; unknown ids (Abyssal, bad data) are skipped.
+  const { rows: sde } = await db.query<{ id: number; name: string; systemClass: string | null; effect: string | null; statics: string[]; regionName: string | null }>(
+    `SELECT s.id, s.name, s.class AS "systemClass", s.effect, s.statics, r.name AS "regionName"
+       FROM solar_systems s LEFT JOIN map_regions r ON r.id = s.region_id
+      WHERE s.id = ANY($1::int[])`,
+    [eveIds],
+  );
+  const sdeById = new Map(sde.map((r) => [r.id, r]));
+
+  // In-game stargate pairs among the imported systems → 'gate'; the rest 'standard'.
+  const { rows: gates } = await db.query<{ a: number; b: number }>(
+    `SELECT system_id AS a, destination_system_id AS b FROM map_stargates
+      WHERE system_id = ANY($1::int[]) AND destination_system_id = ANY($1::int[])`,
+    [eveIds],
+  );
+  const pairKey = (a: number, b: number) => (a < b ? `${a}|${b}` : `${b}|${a}`);
+  const gatePairs = new Set(gates.map((g) => pairKey(g.a, g.b)));
+
+  // Keep only systems we could enrich; carry their Wanderer layout + fields.
+  const kept = systems
+    .map((s) => ({ s, eve: Number(s.id) }))
+    .filter(({ eve }) => Number.isInteger(eve) && sdeById.has(eve));
+  if (kept.length === 0) { res.status(400).json({ error: 'None of the systems were recognised (not in the EVE SDE)' }); return; }
+  const coords = kept.map(({ s }) => ({ x: Number(s.position?.x) || 0, y: Number(s.position?.y) || 0 }));
+  deOverlapCoords(coords);
+
+  const client = await db.connect();
+  try {
+    await client.query('BEGIN');
+    const name = String(typeof body.name === 'string' && body.name.trim() ? body.name : 'Imported from Wanderer').slice(0, MAX_MAP_NAME_LEN);
+    const mapRes = await client.query<{ id: string }>(
+      `INSERT INTO maps (user_id, owner_id, name) VALUES ($1, $2, $3) RETURNING id`,
+      [req.session.userId, oid, name],
+    );
+    const mapId = mapRes.rows[0].id;
+
+    // Systems.
+    const idByEve = new Map<number, string>();
+    const SYSCOLS = 16;
+    const sysPh: string[] = []; const sysVals: unknown[] = [];
+    kept.forEach(({ s, eve }, i) => {
+      const info = sdeById.get(eve)!;
+      const newId = crypto.randomUUID();
+      idByEve.set(eve, newId);
+      const base = sysVals.length;
+      sysPh.push(`(${Array.from({ length: SYSCOLS }, (_, k) => `$${base + k + 1}`).join(',')})`);
+      sysVals.push(
+        newId, mapId, eve, info.name, info.systemClass ?? 'unknown',
+        info.effect ?? 'none', info.statics ?? [], info.regionName ?? null, null,
+        coords[i].x, coords[i].y, 'unknown', false, s.locked === true,
+        typeof s.description === 'string' ? s.description.slice(0, 2000) : '',
+        typeof s.tag === 'string' ? s.tag.slice(0, 50) : null,
+      );
+    });
+    if (sysPh.length > 0) {
+      await client.query(
+        `INSERT INTO map_systems
+           (id, map_id, eve_system_id, name, system_class, effect, statics, region_name, npc_type,
+            position_x, position_y, status, is_home, locked, notes, tag)
+         VALUES ${sysPh.join(',')}`,
+        sysVals,
+      );
+    }
+
+    // Connections — only where both endpoints survived; dedup undirected pair.
+    const seen = new Set<string>();
+    const CONNCOLS = 8;
+    const connPh: string[] = []; const connVals: unknown[] = [];
+    for (const c of connections) {
+      const a = Number(c.source), b = Number(c.target);
+      const src = idByEve.get(a), tgt = idByEve.get(b);
+      if (!src || !tgt || src === tgt) continue;
+      const key = src < tgt ? `${src}|${tgt}` : `${tgt}|${src}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      const type = gatePairs.has(pairKey(a, b)) ? 'gate' : 'standard';
+      const base = connVals.length;
+      connPh.push(`(${Array.from({ length: CONNCOLS }, (_, k) => `$${base + k + 1}`).join(',')})`);
+      connVals.push(
+        crypto.randomUUID(), mapId, src, tgt, type,
+        W_MASS[Number(c.mass_status)] ?? 'stable',
+        W_TIME[Number(c.time_status)] ?? 'fresh',
+        W_SIZE[Number(c.ship_size_type)] ?? 'large',
+      );
+    }
+    if (connPh.length > 0) {
+      await client.query(
+        `INSERT INTO map_connections
+           (id, map_id, source_id, target_id, connection_type, mass_status, time_status, size)
+         VALUES ${connPh.join(',')}`,
+        connVals,
+      );
+    }
+
+    await client.query('COMMIT');
+    res.status(201).json({ id: mapId, imported: { systems: sysPh.length, connections: connPh.length, skipped: systems.length - kept.length } });
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    client.release();
+  }
+});
+
 // Merge a source system note into a destination note. Destination is truth:
 // fill it if empty, otherwise append the source note under a divider so
 // nothing is lost. Returns the new note string, or null when no change is
