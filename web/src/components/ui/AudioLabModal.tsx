@@ -10,7 +10,7 @@ import { Select } from './Select';
 // arbitrary text, and optionally announce live kills. English-only on purpose —
 // i18n gets added if this graduates from a prototype.
 export function AudioLabModal({ onClose }: { onClose: () => void }) {
-  const { status, progress, error, voice, speaking, setVoice, load, speak, stop } = useAnnouncer();
+  const { status, progress, error, voice, speaking, backend, setVoice, load, speak, stop } = useAnnouncer();
   const [text, setText] = useState('Hostile entering Jita. Two more in Perimeter.');
   const [announceKills, setAnnounceKills] = useState(false);
 
@@ -55,6 +55,7 @@ export function AudioLabModal({ onClose }: { onClose: () => void }) {
 
           {ready && (
             <>
+              <p style={{ color: 'var(--text-subtle)', fontSize: 12, margin: 0 }}>Backend: {backend || 'unknown'}</p>
               <label style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: 13 }}>
                 <span>Voice</span>
                 <Select value={voice} onChange={setVoice}

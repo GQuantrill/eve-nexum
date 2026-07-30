@@ -23,6 +23,7 @@ interface AnnouncerState {
   error:    string | null;
   voice:    string;
   speaking: boolean;
+  backend:  string;        // which ONNX backend/dtype actually ran (diagnostic)
   setVoice: (v: string) => void;
   load:     () => Promise<void>;
   speak:    (text: string) => Promise<void>;
@@ -69,7 +70,8 @@ function getAudioContext(): AudioContext {
 async function playSamples(samples: Float32Array, sampleRate: number): Promise<void> {
   const ctx = getAudioContext();
   if (ctx.state === 'suspended') { try { await ctx.resume(); } catch { /* ignore */ } }
-  const buffer = ctx.createBuffer(1, samples.length, sampleRate);
+  const rate = sampleRate > 0 ? sampleRate : 24000;   // Kokoro outputs 24 kHz
+  const buffer = ctx.createBuffer(1, samples.length, rate);
   buffer.getChannelData(0).set(samples);
   const source = ctx.createBufferSource();
   source.buffer = buffer;
@@ -87,6 +89,7 @@ export const useAnnouncer = create<AnnouncerState>((set, get) => ({
   error: null,
   voice: 'af_heart',
   speaking: false,
+  backend: '',
 
   setVoice: (v) => set({ voice: v }),
 
@@ -106,16 +109,21 @@ export const useAnnouncer = create<AnnouncerState>((set, get) => ({
       } catch { /* best-effort — proceed with defaults */ }
 
       const { KokoroTTS: Kokoro } = await import('kokoro-js');
-      const webgpu = typeof navigator !== 'undefined' && 'gpu' in navigator;
+      // Force the WASM (CPU) backend at fp32 — the reference-quality path.
+      // Kokoro's WebGPU backend produced muffled/crackling audio on Chromium in
+      // testing (a known transformers.js/ONNX-WebGPU artifact), and the raw-sample
+      // playback fix ruled out the player. CPU fp32 is slower but clean. Single-
+      // threaded (numThreads=1 above) so it needs no cross-origin isolation.
+      const device = 'wasm';
+      const dtype  = 'fp32';
       tts = await Kokoro.from_pretrained(MODEL_ID, {
-        device: webgpu ? 'webgpu' : 'wasm',
-        // fp32 on WebGPU for best quality; q8 keeps the WASM/CPU path small+quick.
-        dtype: webgpu ? 'fp32' : 'q8',
+        device,
+        dtype,
         progress_callback: (p: ProgressInfo) => {
           if (typeof p.progress === 'number') set({ progress: Math.round(p.progress) });
         },
       });
-      set({ status: 'ready', progress: 100 });
+      set({ status: 'ready', progress: 100, backend: `${device}/${dtype}` });
     })().catch((e: unknown) => {
       set({ status: 'error', error: e instanceof Error ? e.message : String(e) });
       loadPromise = null;
