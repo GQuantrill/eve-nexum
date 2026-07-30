@@ -708,7 +708,9 @@
       "evLawless": "Lawless systems in range",
       "evKills": "Recent kills in range",
       "evNewChain": "New chain added by others",
-      "threshold": "\"In range\" uses the Proximity Alerts threshold."
+      "threshold": "\"In range\" uses the Proximity Alerts threshold.",
+      "experimental": "Experimental Feature",
+      "delayNote": "Voice may be delayed by up to 5 seconds. The first run takes longer."
     }
   },
   "customIntel": {

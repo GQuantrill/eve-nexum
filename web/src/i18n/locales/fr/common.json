@@ -651,7 +651,9 @@
       "evLawless": "Systèmes sans loi à portée",
       "evKills": "Vaisseaux détruits récents à portée",
       "evNewChain": "Nouvelle chaîne ajoutée par d’autres",
-      "threshold": "« À portée » utilise le seuil des alertes de proximité."
+      "threshold": "« À portée » utilise le seuil des alertes de proximité.",
+      "experimental": "Fonctionnalité expérimentale",
+      "delayNote": "La voix peut être retardée jusqu’à 5 secondes. La première exécution est plus longue."
     }
   },
   "customIntel": {

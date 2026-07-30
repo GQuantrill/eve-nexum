@@ -651,7 +651,9 @@
       "evLawless": "Gesetzlose Systeme in Reichweite",
       "evKills": "Aktuelle Abschüsse in Reichweite",
       "evNewChain": "Neue Kette von anderen hinzugefügt",
-      "threshold": "„In Reichweite“ nutzt den Schwellenwert der Näherungswarnungen."
+      "threshold": "„In Reichweite“ nutzt den Schwellenwert der Näherungswarnungen.",
+      "experimental": "Experimentelle Funktion",
+      "delayNote": "Die Stimme kann sich um bis zu 5 Sekunden verzögern. Der erste Durchlauf dauert länger."
     }
   },
   "customIntel": {
