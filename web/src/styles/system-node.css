@@ -559,9 +559,9 @@
 }
 
 .system-node__hole {
-  width: calc(14px * var(--font-scale, 1));
-  height: calc(6px * var(--font-scale, 1));
-  border-radius: 3px;
+  width: calc(18px * var(--font-scale, 1));
+  height: calc(8px * var(--font-scale, 1));
+  border-radius: 4px;
   background: var(--text-faint); /* neutral: unknown destination */
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4);
   cursor: pointer;
