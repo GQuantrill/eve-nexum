@@ -33,6 +33,7 @@ async function primeVoice(id: string): Promise<void> {
 
 let tts: KokoroTTS | null = null;
 let loadPromise: Promise<void> | null = null;
+let threads = 1;   // WASM inference threads actually used (diagnostic)
 
 type VoiceId = NonNullable<Parameters<KokoroTTS['generate']>[1]>['voice'];
 type DtypeOpt = NonNullable<Parameters<typeof KokoroTTS.from_pretrained>[1]>['dtype'];
@@ -44,7 +45,13 @@ function load(): Promise<void> {
   if (loadPromise) return loadPromise;
   loadPromise = (async () => {
     const wasm = env.backends.onnx.wasm as { numThreads?: number; wasmPaths?: string };
-    wasm.numThreads = 1;
+    // Multi-thread the WASM backend when the page is cross-origin isolated (COOP +
+    // COEP set by nginx) so SharedArrayBuffer is available — threads cut generation
+    // time roughly with core count. Falls back to a single thread otherwise, so the
+    // code is correct whether or not the isolation headers are deployed.
+    const coi = (globalThis as { crossOriginIsolated?: boolean }).crossOriginIsolated === true;
+    threads = coi ? Math.min(navigator.hardwareConcurrency || 4, 8) : 1;
+    wasm.numThreads = threads;
     if (SELF_HOSTED) {
       wasm.wasmPaths = LOCAL_WASM_PATH;
       env.allowLocalModels = true;
@@ -60,6 +67,14 @@ function load(): Promise<void> {
         if (typeof pr === 'number') post({ type: 'progress', progress: Math.round(pr) });
       },
     });
+    // Warm up: ONNX Runtime's FIRST inference compiles/optimises kernels and is
+    // much slower than steady state. Run one throwaway generation now — behind the
+    // loading UI — so the user's first real announcement pays only steady-state
+    // cost, not the cold-start penalty. Non-fatal if it fails.
+    try {
+      await primeVoice('af_nicole');
+      await tts.generate('warming up', { voice: 'af_nicole' as VoiceId });
+    } catch { /* warm-up is best-effort */ }
   })().catch((e: unknown) => { loadPromise = null; throw e; });
   return loadPromise;
 }
@@ -67,7 +82,7 @@ function load(): Promise<void> {
 self.onmessage = async (e: MessageEvent) => {
   const msg = e.data as { type: string; id?: number; text?: string; voice?: string };
   if (msg.type === 'load') {
-    try { await load(); post({ type: 'ready', backend: `wasm/${DTYPE}${SELF_HOSTED ? '/self-hosted' : ''}` }); }
+    try { await load(); post({ type: 'ready', backend: `wasm/${DTYPE}${SELF_HOSTED ? '/self-hosted' : ''}/${threads}t` }); }
     catch (err) { post({ type: 'loadError', error: err instanceof Error ? err.message : String(err) }); }
     return;
   }

@@ -53,6 +53,19 @@ server {
     # proxy, the header is a no-op.
     add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
 
+    # Cross-origin isolation — enables SharedArrayBuffer so the voice announcer's
+    # WASM inference can run MULTI-THREADED (single-threaded generation took ~13s
+    # per phrase). COEP is 'credentialless' (NOT require-corp) specifically so
+    # cross-origin no-cors resources — EVE character/corp portraits from
+    # images.evetech.net, which send no CORP header — still load, just without
+    # credentials (they're public). Login is a full-page redirect, so COOP
+    # same-origin doesn't affect SSO. WATCH ON QA before promoting: portraits,
+    # GTM/GA (cross-origin scripts + the noscript iframe), and the SSO round-trip.
+    # If any break and can't be resolved, drop these two headers — the worker
+    # falls back to single-threaded automatically (checks crossOriginIsolated).
+    add_header Cross-Origin-Opener-Policy   "same-origin"    always;
+    add_header Cross-Origin-Embedder-Policy "credentialless" always;
+
     # Live map-edit SSE stream. Must disable proxy buffering or nginx holds the
     # event frames until the response ends (which never happens on a long-lived
     # stream). Matched before the generic /api block below.
