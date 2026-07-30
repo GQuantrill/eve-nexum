@@ -776,6 +776,7 @@ function MergeSection() {
 export function MapSidebar() {
   const { t } = useTranslation();
   const importInputRef = useRef<HTMLInputElement>(null);
+  const wandererInputRef = useRef<HTMLInputElement>(null);
   const [threshold, setThreshold] = useProximityThreshold();
   const [staleHours, setStaleHours] = useStaleThreshold();
   // Single source of truth for which section is expanded. Defaults to
@@ -924,6 +925,45 @@ export function MapSidebar() {
       });
       await useMapStore.getState().loadMaps();
       await useMapStore.getState().switchMap(id);
+    } catch (err) {
+      toast.error(
+        t("mapSidebar.importFailed", { error: err instanceof Error ? err.message : String(err) }),
+      );
+    }
+  }
+
+  // Import a map exported from Wanderer. Its shape differs from a Nexum export
+  // (systems carry only an EVE id + layout; connections use source/target + numeric
+  // codes), so it goes to a dedicated endpoint that enriches from the SDE and
+  // classifies gate vs wormhole. Creates a new personal map.
+  async function handleImportWanderer(file: File) {
+    let parsed: { systems?: unknown; connections?: unknown };
+    try {
+      parsed = JSON.parse(await file.text()) as { systems?: unknown; connections?: unknown };
+    } catch {
+      toast.error(t("mapSidebar.invalidJson"));
+      return;
+    }
+    if (!Array.isArray(parsed.systems)) {
+      toast.error(t("mapSidebar.notWandererMap"));
+      return;
+    }
+    const name = file.name.replace(/\.json$/i, "") || "Imported from Wanderer";
+    try {
+      const { id, imported } = await api<{ id: string; imported: { systems: number; connections: number; skipped: number } }>(
+        "/api/maps/import/wanderer",
+        {
+          method: "POST",
+          body: JSON.stringify({ name, systems: parsed.systems, connections: parsed.connections ?? [] }),
+        },
+      );
+      await useMapStore.getState().loadMaps();
+      await useMapStore.getState().switchMap(id);
+      toast.success(
+        t("mapSidebar.wandererImported", {
+          systems: imported.systems, connections: imported.connections, skipped: imported.skipped,
+        }),
+      );
     } catch (err) {
       toast.error(
         t("mapSidebar.importFailed", { error: err instanceof Error ? err.message : String(err) }),
@@ -1390,6 +1430,18 @@ export function MapSidebar() {
                   {t("mapSidebar.importJson")}
                 </button>
               </div>
+              <div
+                className={`map-sidebar__import-wrap${atMapLimit ? " map-sidebar__import-wrap--disabled" : ""}`}
+              >
+                <button
+                  className="map-sidebar__action"
+                  onClick={() => wandererInputRef.current?.click()}
+                  disabled={atMapLimit}
+                  title={t("mapSidebar.importWandererTitle")}
+                >
+                  {t("mapSidebar.importWanderer")}
+                </button>
+              </div>
               <button
                 type="button"
                 className="map-sidebar__action"
@@ -1434,6 +1486,18 @@ export function MapSidebar() {
         onChange={(e) => {
           const file = e.target.files?.[0];
           if (file) handleImport(file);
+          e.target.value = "";
+        }}
+      />
+
+      <input
+        ref={wandererInputRef}
+        type="file"
+        accept=".json,application/json"
+        style={{ display: "none" }}
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) handleImportWanderer(file);
           e.target.value = "";
         }}
       />
