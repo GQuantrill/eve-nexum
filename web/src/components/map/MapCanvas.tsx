@@ -1475,7 +1475,10 @@ export function MapCanvas() {
             position={minimapPosition}
             nodeColor={(n) => {
               const sys = systems.find((s) => s.id === n.id);
-              return sys ? cssVarToHex(CLASS_COLORS[sys.systemClass]) : '#333';
+              // CLASS_COLORS can miss (corrupt/unknown systemClass) → undefined;
+              // fall back rather than feed undefined into the colour resolver.
+              const color = sys ? CLASS_COLORS[sys.systemClass] : undefined;
+              return color ? cssVarToHex(color) : '#333';
             }}
             maskColor="rgba(13,17,23,0.85)"
             onClick={(_e, position) => {
