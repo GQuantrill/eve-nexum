@@ -13,6 +13,24 @@ export interface JumpTarget {
   ly:          number;
 }
 
+// Light-year distance between two systems, cached per unordered pair (distance is
+// symmetric + static). `enabled` gates the fetch so non-cyno edges never call out.
+const distanceCache = new Map<string, number | null>();
+export function useJumpDistance(from: number | null, to: number | null, enabled: boolean): number | null {
+  const key = from != null && to != null ? [from, to].sort((x, y) => x - y).join('-') : null;
+  const [ly, setLy] = useState<number | null>(key && distanceCache.has(key) ? distanceCache.get(key)! : null);
+  useEffect(() => {
+    if (!enabled || key == null || from == null || to == null) return;
+    if (distanceCache.has(key)) { setLy(distanceCache.get(key)!); return; }
+    let cancelled = false;
+    api<{ ly: number | null }>(`/api/systems/${from}/distance?to=${to}`)
+      .then((d) => { distanceCache.set(key, d.ly); if (!cancelled) setLy(d.ly); })
+      .catch(() => { /* leave null */ });
+    return () => { cancelled = true; };
+  }, [enabled, key, from, to]);
+  return ly;
+}
+
 /** Jump Drive Calibration skill level (0-5). Per-user, syncs across devices. */
 export function useJdcLevel(): [number, (n: number) => void] {
   const [jdc, setJdc] = useUserSetting<number>('nexum.jump.jdc', 5);

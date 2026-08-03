@@ -11,6 +11,8 @@ import { useNow30s } from '../../hooks/useNow30s';
 import { useWatchlist } from '../../hooks/useWatchlist';
 import { useWormholeTypes } from '../../hooks/useWormholeTypes';
 import { matchConnection } from '../../utils/watchMatch';
+import { useJumpDistance, useJdcLevel } from '../../hooks/useJumpRange';
+import { classesInRange } from '../../data/jumpDrives';
 import { watchMarker } from '../../data/watchMarkers';
 import { effectiveExpiryMs, lifeBucket, type TimeBucket } from '../../utils/whLifetime';
 import { DynamicIcon } from '../DynamicIcon';
@@ -86,6 +88,15 @@ export const ConnectionEdge = memo(({
   const [watchEntries] = useWatchlist();
   const watch = conn ? matchConnection(watchEntries, conn) : null;
   const watchColor = watch ? watchMarker(watch.marker).color : null;
+
+  // Cyno-jump auto-annotation: for a cyno-tagged edge, resolve its endpoints' EVE
+  // ids (null otherwise, so non-cyno edges never re-run the find or fetch), get
+  // the star-to-star light-year distance, and classify by the user's JDC.
+  const cynoEdge = conn?.connectionType === 'cyno';
+  const srcEve = useMapStore((s) => (cynoEdge ? (s.map.systems.find((x) => x.id === conn.sourceId)?.eveSystemId ?? null) : null));
+  const tgtEve = useMapStore((s) => (cynoEdge ? (s.map.systems.find((x) => x.id === conn.targetId)?.eveSystemId ?? null) : null));
+  const cynoLy = useJumpDistance(srcEve, tgtEve, cynoEdge);
+  const [jdc] = useJdcLevel();
 
   let [edgePath, labelX, labelY] = (() => {
     const args = { sourceX, sourceY, sourcePosition, targetX, targetY, targetPosition };
@@ -209,7 +220,13 @@ export const ConnectionEdge = memo(({
         )}
         {!broken && (() => {
           const typeNode = isCyno
-            ? <span className="connection-label__cyno">CJ</span>
+            ? <span className="connection-label__cyno" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                CJ{cynoLy != null ? ` ${cynoLy.toFixed(1)}ly` : ''}
+                {cynoLy != null && classesInRange(cynoLy, jdc).map((c) => (
+                  <span key={c.key} title={c.label}
+                    style={{ width: 6, height: 6, borderRadius: '50%', background: c.color, display: 'inline-block' }} />
+                ))}
+              </span>
             : isJumpgate
             ? <span className="connection-label__jumpgate">JG</span>
             : isGate

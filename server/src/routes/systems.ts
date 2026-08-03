@@ -360,6 +360,26 @@ systemsRouter.get('/:id(\\d+)/jump-range', async (req, res) => {
   }
 });
 
+// GET /api/systems/:id/distance?to=N — light-years between two systems (star-to-
+// star), for annotating a tagged cyno-jump connection. Null if either lacks coords.
+systemsRouter.get('/:id(\\d+)/distance', async (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  const to = parseInt(String(req.query.to ?? ''), 10);
+  if (!to || to === id) return res.json({ ly: null });
+  try {
+    const { rows } = await db.query<{ ly: string | null }>(
+      `SELECT (sqrt(power(a.pos_x - b.pos_x, 2) + power(a.pos_y - b.pos_y, 2) + power(a.pos_z - b.pos_z, 2)) / $3)::text AS ly
+         FROM solar_systems a, solar_systems b
+        WHERE a.id = $1 AND b.id = $2 AND a.pos_x IS NOT NULL AND b.pos_x IS NOT NULL`,
+      [id, to, METRES_PER_LY],
+    );
+    return res.json({ ly: rows[0]?.ly != null ? Number(rows[0].ly) : null });
+  } catch (err) {
+    log.error('distance query failed:', err);
+    return res.status(500).json({ error: 'Database query failed' });
+  }
+});
+
 // GET /api/systems/:id/celestials — static celestial metadata for the panel
 // (security, constellation, sun type, planet/moon/belt/gate counts). DB-first;
 // live-ESI fallback (cached) only for systems not yet filled by a re-seed.
