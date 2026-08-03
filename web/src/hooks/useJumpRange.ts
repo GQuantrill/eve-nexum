@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { api } from '../api/client';
 import { useUserSetting } from './useUserSetting';
 import { useJumpRangeStore, type InRangeInfo } from '../store/jumpRangeStore';
+import { useMapStore } from '../store/mapStore';
 import { classesInRange, maxRangeLy } from '../data/jumpDrives';
 
 export interface JumpTarget {
@@ -64,9 +65,14 @@ export function useJumpRange(): { targets: JumpTarget[]; loading: boolean; jdc: 
     return () => { cancelled = true; };
   }, [stagingId, maxLy, setInRange]);
 
-  // Annotate + push the reachable set to the store (recomputed when jdc changes,
-  // without re-fetching — the fetch radius already covers the widest class).
-  const targets = useMemo(() => rows.filter((r) => r.ly <= maxLy), [rows, maxLy]);
+  // Scope to systems ON THE CURRENT MAP — the endpoint returns every LS/NS system
+  // in range (all of New Eden), but the overlay only highlights placed systems, so
+  // the panel must match. (Full off-map reachability is a future jump planner.)
+  const mapSystems = useMapStore((s) => s.map.systems);
+  const targets = useMemo(() => {
+    const onMap = new Set(mapSystems.map((s) => s.eveSystemId).filter((id): id is number => id != null));
+    return rows.filter((r) => r.ly <= maxLy && onMap.has(r.eveSystemId));
+  }, [rows, maxLy, mapSystems]);
   useEffect(() => {
     const m = new Map<number, InRangeInfo>();
     for (const t of targets) {
