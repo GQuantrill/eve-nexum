@@ -285,8 +285,8 @@ authRouter.get('/callback', async (req, res) => {
     }
 
     // First login: seed a starter "Demo Map" so the canvas isn't blank.
-    // No-op when the user already has a map.
-    await seedDemoMap(userId);
+    // No-op when the user already has a map. Skipped when INCLUDE_DEMO_MAP is off.
+    if (config.includeDemoMap) await seedDemoMap(userId);
 
     // Snapshot prefs into the session so /auth/me can answer without a DB call.
     const prefRows = await db.query<{ compact_mode: boolean; snap_to_grid: boolean; show_minimap: boolean; uniform_size: boolean; show_statics: boolean; easy_connect: boolean; connection_thickness: string; route_mode: string; ui_zoom: string; ui_settings: Record<string, unknown>; panel_order: string[] }>(

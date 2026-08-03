@@ -61,6 +61,11 @@ if ((CORP_IDS.length > 0 || ALLIANCE_IDS.length > 0) && ADMIN_CHAR_ID === null) 
 // SDE_CHECK_UTC (HH:MM, default 11:30) is when to check: EVE downtime is 11:00
 // UTC and CCP publishes the export shortly after, so we look a little later.
 const SDE_AUTO_UPDATE = !/^(0|false|no|off)$/i.test(process.env.SDE_AUTO_UPDATE ?? '');
+
+// Seed a starter "Demo Map" on a user's first login. On by default (preserves
+// existing behaviour); set INCLUDE_DEMO_MAP=0/false/no/off to give new users a
+// blank canvas instead.
+const INCLUDE_DEMO_MAP = !/^(0|false|no|off)$/i.test(process.env.INCLUDE_DEMO_MAP ?? '');
 const SDE_CHECK_UTC   = /^\d{1,2}:\d{2}$/.test(process.env.SDE_CHECK_UTC ?? '')
   ? process.env.SDE_CHECK_UTC!
   : '11:30';
@@ -171,6 +176,7 @@ export const config = {
   connLifetimeSweepMinutes: intEnv(process.env.CONN_LIFETIME_SWEEP_MINUTES, 60),
   sdeAutoUpdate:       SDE_AUTO_UPDATE,
   sdeCheckUtc:         SDE_CHECK_UTC,
+  includeDemoMap:      INCLUDE_DEMO_MAP,
   telemetry:           { enabled: TELEMETRY_ENABLED, url: TELEMETRY_URL },
   // Live kill flagging. OFF by default (KILL_FEED=1 to opt in) — when enabled a
   // single server-side consumer reads zKillboard's R2Z2 ephemeral feed and flags
