@@ -1278,7 +1278,7 @@ export function MapSidebar() {
           <ChainExitsSection />
         </CollapsibleSection>
 
-        <CollapsibleSection title="Jump Range" {...sectionProps("jumpRange")}>
+        <CollapsibleSection title={t("mapSidebar.sections.jumpRange")} {...sectionProps("jumpRange")}>
           <JumpRangePane />
         </CollapsibleSection>
 

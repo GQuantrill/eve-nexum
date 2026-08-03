@@ -24,7 +24,7 @@ import type { TFunction } from 'i18next';
 const STANDARD_COLOR = 'var(--cv-conn-standard)';
 const JUMPGATE_COLOR  = 'var(--cv-conn-jumpgate)';
 const GATE_COLOR      = 'var(--cv-conn-gate)';
-const CYNO_COLOR      = '#b57bff';   // cyno-jump route (purple)
+const CYNO_COLOR      = 'var(--cv-conn-cyno)';   // cyno-jump route (purple, palette-aware)
 const HIGHLIGHT_COLOR = 'var(--cv-conn-highlight)';
 
 // Perpendicular spacing between multiple connections that share the same pair

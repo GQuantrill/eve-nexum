@@ -1,14 +1,17 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useJumpRangeStore } from '../../store/jumpRangeStore';
 import { useJumpRange, useJdcLevel } from '../../hooks/useJumpRange';
 import { JUMP_CLASSES, jumpRange } from '../../data/jumpDrives';
 import { useEsiSearch, systemResultLabel } from '../../hooks/useEsiSearch';
 
-// PROTOTYPE Jump Range overlay panel. Pick a staging system (right-click a system
-// -> "Jump range from here"), set your JDC skill, and see every low/null system
-// within jump range — filterable by ship class — plus the reachable systems get
-// highlighted on the map (via jumpRangeStore -> SystemNode).
+// Jump Range overlay panel. Pick a staging system (search above, or right-click a
+// system -> "Jump range from here"), set your JDC skill, and see every low/null
+// system within jump range — filterable by ship class — plus the reachable systems
+// highlight on the map (via jumpRangeStore -> SystemNode). Ship-class names, the
+// JDC skill name and "ly" stay English (EVE terms).
 export function JumpRangePane() {
+  const { t } = useTranslation();
   const [jdc, setJdc] = useJdcLevel();
   const stagingName = useJumpRangeStore((s) => s.stagingName);
   const stagingId   = useJumpRangeStore((s) => s.stagingId);
@@ -18,23 +21,20 @@ export function JumpRangePane() {
   const setFilter = useJumpRangeStore((s) => s.setFilterClass);
 
   const filterRange = filter ? jumpRange(JUMP_CLASSES.find((c) => c.key === filter)!.base, jdc) : Infinity;
-  const shown = targets.filter((t) => t.ly <= filterRange);
+  const shown = targets.filter((t2) => t2.ly <= filterRange);
 
   return (
     <>
       <StagingPicker onPick={(id, name) => setStaging(id, name)} />
 
       {stagingId == null && (
-        <div className="map-sidebar__hint">
-          Search a staging system above, or right-click a system on the map and choose
-          <strong> “Jump range from here”</strong>.
-        </div>
+        <div className="map-sidebar__hint">{t('mapSidebar.jumpRange.pickHint')}</div>
       )}
 
       {stagingId != null && (<>
       <div className="map-sidebar__row" style={{ justifyContent: 'space-between' }}>
-        <span className="map-sidebar__label">Staging: <strong>{stagingName ?? stagingId}</strong></span>
-        <button type="button" className="toolbar__toggle" onClick={() => setStaging(null)}>Clear</button>
+        <span className="map-sidebar__label">{t('mapSidebar.jumpRange.staging')}: <strong>{stagingName ?? stagingId}</strong></span>
+        <button type="button" className="toolbar__toggle" onClick={() => setStaging(null)}>{t('mapSidebar.jumpRange.clear')}</button>
       </div>
 
       <label className="map-sidebar__row" style={{ gap: 8 }}>
@@ -46,7 +46,7 @@ export function JumpRangePane() {
 
       {/* Class filter chips — each shows its effective range at this JDC */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, margin: '6px 0' }}>
-        <Chip active={filter === null} onClick={() => setFilter(null)} color="#8aa" label={`All (${targets.length})`} />
+        <Chip active={filter === null} onClick={() => setFilter(null)} color="#8aa" label={`${t('mapSidebar.jumpRange.all')} (${targets.length})`} />
         {JUMP_CLASSES.map((c) => (
           <Chip
             key={c.key}
@@ -58,32 +58,40 @@ export function JumpRangePane() {
         ))}
       </div>
 
-      {loading && <div className="map-sidebar__hint">Calculating…</div>}
+      {/* Colour legend: dot colour -> ship class (near = orange … far = blue). */}
+      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8, margin: '2px 0 6px', fontSize: 10, color: 'var(--text-faint)' }}>
+        <span>{t('mapSidebar.jumpRange.legend')}</span>
+        {JUMP_CLASSES.map((c) => (
+          <span key={c.key} style={{ display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+            <span style={{ width: 7, height: 7, borderRadius: '50%', background: c.color, display: 'inline-block' }} />
+            {c.label.split(' ')[0]}
+          </span>
+        ))}
+      </div>
+
+      {loading && <div className="map-sidebar__hint">{t('mapSidebar.jumpRange.calculating')}</div>}
       {!loading && !hasCoords && (
         <div className="map-sidebar__hint" style={{ color: 'var(--cv-conn-expired)' }}>
-          This deployment doesn't have 3D system coordinates loaded, which jump-range
-          needs. Run the SDE coordinate backfill on the server
-          (<code>npx tsx scripts/backfill-coords.ts</code>) or re-run <code>setup-db</code>,
-          then reload.
+          {t('mapSidebar.jumpRange.noCoords')}
         </div>
       )}
       {!loading && hasCoords && (
         <div style={{ maxHeight: 320, overflowY: 'auto' }}>
-          <div className="map-sidebar__hint">{shown.length} systems in range</div>
-          {shown.map((t) => {
-            const reach = JUMP_CLASSES.filter((c) => t.ly <= jumpRange(c.base, jdc));
+          <div className="map-sidebar__hint">{t('mapSidebar.jumpRange.inRange', { count: shown.length })}</div>
+          {shown.map((t2) => {
+            const reach = JUMP_CLASSES.filter((c) => t2.ly <= jumpRange(c.base, jdc));
             return (
-              <div key={t.eveSystemId} className="map-sidebar__row" style={{ justifyContent: 'space-between', gap: 8 }}>
+              <div key={t2.eveSystemId} className="map-sidebar__row" style={{ justifyContent: 'space-between', gap: 8 }}>
                 <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {t.name}{' '}
-                  <span style={{ color: 'var(--text-faint)', fontSize: 11 }}>{t.systemClass}</span>
+                  {t2.name}{' '}
+                  <span style={{ color: 'var(--text-faint)', fontSize: 11 }}>{t2.systemClass}</span>
                 </span>
                 <span style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
                   {reach.map((c) => (
                     <span key={c.key} title={c.label}
                       style={{ width: 8, height: 8, borderRadius: '50%', background: c.color, display: 'inline-block' }} />
                   ))}
-                  <span style={{ fontVariantNumeric: 'tabular-nums', minWidth: 44, textAlign: 'right' }}>{t.ly.toFixed(2)} ly</span>
+                  <span style={{ fontVariantNumeric: 'tabular-nums', minWidth: 44, textAlign: 'right' }}>{t2.ly.toFixed(2)} ly</span>
                 </span>
               </div>
             );
@@ -97,6 +105,7 @@ export function JumpRangePane() {
 
 // Search any low/null EVE system by name (on-map or not) to use as the staging point.
 function StagingPicker({ onPick }: { onPick: (id: number, name: string) => void }) {
+  const { t } = useTranslation();
   const [query, setQuery] = useState('');
   const { results, loading } = useEsiSearch(query);
   const kspace = results.filter((r) => r.systemClass === 'LS' || r.systemClass === 'NS');
@@ -108,7 +117,7 @@ function StagingPicker({ onPick }: { onPick: (id: number, name: string) => void 
         style={{ width: '100%' }}
         type="text"
         value={query}
-        placeholder="Staging system (low/null)…"
+        placeholder={t('mapSidebar.jumpRange.stagingPlaceholder')}
         onChange={(e) => setQuery(e.target.value)}
       />
       {show && (
@@ -116,7 +125,7 @@ function StagingPicker({ onPick }: { onPick: (id: number, name: string) => void 
           position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 20, maxHeight: 220,
           overflowY: 'auto', background: 'var(--bg-elevated, #161b22)', border: '1px solid #30363d', borderRadius: 6,
         }}>
-          {loading && <div className="map-sidebar__hint" style={{ padding: '6px 8px' }}>Searching…</div>}
+          {loading && <div className="map-sidebar__hint" style={{ padding: '6px 8px' }}>{t('mapSidebar.jumpRange.searching')}</div>}
           {kspace.map((r) => (
             <button
               key={r.id}

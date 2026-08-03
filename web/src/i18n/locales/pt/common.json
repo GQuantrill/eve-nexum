@@ -465,7 +465,8 @@
       "shareMap": "Partilhar mapa",
       "shortcuts": "Atalhos",
       "notifications": "Notificações",
-      "announcer": "Anúncios de voz"
+      "announcer": "Anúncios de voz",
+      "jumpRange": "Alcance de salto"
     },
     "snapToGrid": "Ajustar à grade",
     "settings": "Configurações",
@@ -654,6 +655,18 @@
       "threshold": "«No alcance» usa o limiar dos alertas de proximidade.",
       "experimental": "Funcionalidade experimental",
       "delayNote": "A voz pode demorar até 5 segundos. A primeira execução demora mais."
+    },
+    "jumpRange": {
+      "stagingPlaceholder": "Sistema de staging (low/null)…",
+      "searching": "A procurar…",
+      "pickHint": "Procure um sistema de staging acima, ou clique com o botão direito num sistema e escolha «Alcance de salto a partir daqui».",
+      "staging": "Staging",
+      "clear": "Limpar",
+      "calculating": "A calcular…",
+      "noCoords": "Esta instalação não tem carregadas as coordenadas 3D de sistema necessárias para o alcance de salto. Execute o backfill de coordenadas no servidor (ou execute setup-db novamente) e recarregue.",
+      "inRange": "{{count}} sistemas ao alcance",
+      "all": "Todos",
+      "legend": "Alcançável por:"
     }
   },
   "customIntel": {
@@ -939,7 +952,9 @@
     "clearLabels": "Limpar",
     "labelNamed": "Etiqueta {{name}}",
     "tag": "Marca",
-    "clearTag": "Limpar marca"
+    "clearTag": "Limpar marca",
+    "jumpRangeFrom": "Alcance de salto a partir daqui",
+    "jumpCyno": "Salto cyno"
   },
   "panel": {
     "notes": "Notas",

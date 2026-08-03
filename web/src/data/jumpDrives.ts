@@ -10,11 +10,14 @@ export interface JumpClass {
   color: string;
 }
 
+// Colours are the Wong colour-blind-safe quartet (sky-blue / reddish-purple /
+// bluish-green / orange) so the range tiers stay distinguishable across vision
+// types without needing per-palette CSS vars.
 export const JUMP_CLASSES: JumpClass[] = [
-  { key: 'jf',      label: 'Jump Freighter / Rorqual', base: 5.0, color: '#4ea1ff' },
-  { key: 'blops',   label: 'Black Ops',                base: 4.0, color: '#b57bff' },
-  { key: 'carrier', label: 'Carrier / Dread / FAX',    base: 3.5, color: '#4ecb8d' },
-  { key: 'super',   label: 'Super / Titan',            base: 3.0, color: '#ff9d4e' },
+  { key: 'jf',      label: 'Jump Freighter / Rorqual', base: 5.0, color: '#56b4e9' },
+  { key: 'blops',   label: 'Black Ops',                base: 4.0, color: '#cc79a7' },
+  { key: 'carrier', label: 'Carrier / Dread / FAX',    base: 3.5, color: '#009e73' },
+  { key: 'super',   label: 'Super / Titan',            base: 3.0, color: '#e69f00' },
 ];
 
 /** Effective max jump range (ly) for a base range at a given JDC skill level. */

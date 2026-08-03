@@ -465,7 +465,8 @@
       "shareMap": "Partager la carte",
       "shortcuts": "Raccourcis",
       "notifications": "Notifications",
-      "announcer": "Annonces vocales"
+      "announcer": "Annonces vocales",
+      "jumpRange": "Portée de saut"
     },
     "snapToGrid": "Aligner sur la grille",
     "settings": "Paramètres",
@@ -654,6 +655,18 @@
       "threshold": "« À portée » utilise le seuil des alertes de proximité.",
       "experimental": "Fonctionnalité expérimentale",
       "delayNote": "La voix peut être retardée jusqu’à 5 secondes. La première exécution est plus longue."
+    },
+    "jumpRange": {
+      "stagingPlaceholder": "Système de staging (low/null)…",
+      "searching": "Recherche…",
+      "pickHint": "Recherchez un système de staging ci-dessus, ou faites un clic droit sur un système et choisissez « Portée de saut d’ici ».",
+      "staging": "Staging",
+      "clear": "Effacer",
+      "calculating": "Calcul…",
+      "noCoords": "Ce déploiement n’a pas les coordonnées système 3D nécessaires à la portée de saut. Lancez le backfill des coordonnées sur le serveur (ou relancez setup-db), puis rechargez.",
+      "inRange": "{{count}} systèmes à portée",
+      "all": "Tous",
+      "legend": "Atteignable par :"
     }
   },
   "customIntel": {
@@ -939,7 +952,9 @@
     "clearLabels": "Effacer",
     "labelNamed": "Label {{name}}",
     "tag": "Marqueur",
-    "clearTag": "Effacer le marqueur"
+    "clearTag": "Effacer le marqueur",
+    "jumpRangeFrom": "Portée de saut d’ici",
+    "jumpCyno": "Saut cyno"
   },
   "panel": {
     "notes": "Notes",

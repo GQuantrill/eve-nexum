@@ -465,7 +465,8 @@
       "shareMap": "Karte teilen",
       "shortcuts": "Tastenkürzel",
       "notifications": "Benachrichtigungen",
-      "announcer": "Sprachansage"
+      "announcer": "Sprachansage",
+      "jumpRange": "Sprungreichweite"
     },
     "snapToGrid": "Am Raster ausrichten",
     "settings": "Einstellungen",
@@ -654,6 +655,18 @@
       "threshold": "„In Reichweite“ nutzt den Schwellenwert der Näherungswarnungen.",
       "experimental": "Experimentelle Funktion",
       "delayNote": "Die Stimme kann sich um bis zu 5 Sekunden verzögern. Der erste Durchlauf dauert länger."
+    },
+    "jumpRange": {
+      "stagingPlaceholder": "Staging-System (Low/Null)…",
+      "searching": "Suche…",
+      "pickHint": "Suche oben ein Staging-System oder klicke mit der rechten Maustaste auf ein System und wähle „Sprungreichweite von hier“.",
+      "staging": "Staging",
+      "clear": "Löschen",
+      "calculating": "Berechne…",
+      "noCoords": "Dieser Installation fehlen die für die Sprungreichweite nötigen 3D-Systemkoordinaten. Führe den Koordinaten-Backfill auf dem Server aus (oder setup-db erneut) und lade dann neu.",
+      "inRange": "{{count}} Systeme in Reichweite",
+      "all": "Alle",
+      "legend": "Erreichbar mit:"
     }
   },
   "customIntel": {
@@ -939,7 +952,9 @@
     "clearLabels": "Löschen",
     "labelNamed": "Label {{name}}",
     "tag": "Tag",
-    "clearTag": "Tag entfernen"
+    "clearTag": "Tag entfernen",
+    "jumpRangeFrom": "Sprungreichweite von hier",
+    "jumpCyno": "Cyno-Sprung"
   },
   "panel": {
     "notes": "Notizen",

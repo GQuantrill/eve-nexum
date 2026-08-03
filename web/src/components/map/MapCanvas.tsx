@@ -941,7 +941,7 @@ export function MapCanvas() {
             action: () => { addWaypoint(sys.eveSystemId!, sys.name).catch(() => {}); },
           },
           {
-            label: 'Jump range from here',
+            label: t('ctxMenu.jumpRangeFrom'),
             icon: <MapPinSimpleIcon size={16} weight="regular" color="#b57bff" />,
             action: () => useJumpRangeStore.getState().setStaging(sys.eveSystemId!, sys.name),
           },
@@ -990,7 +990,7 @@ export function MapCanvas() {
               action: () => updateConnection(eid, { connectionType: 'jumpgate' }),
             },
             {
-              label: 'Cyno Jump',
+              label: t('ctxMenu.jumpCyno'),
               checked: connType === 'cyno',
               action: () => updateConnection(eid, { connectionType: 'cyno' }),
             },
@@ -1102,7 +1102,7 @@ export function MapCanvas() {
           action: () => { addWaypoint(sys.eveSystemId!, sys.name).catch(() => {}); },
         },
         {
-          label: 'Jump range from here',
+          label: t('ctxMenu.jumpRangeFrom'),
           icon: <MapPinSimpleIcon size={16} weight="regular" color="#b57bff" />,
           action: () => useJumpRangeStore.getState().setStaging(sys.eveSystemId!, sys.name),
         },

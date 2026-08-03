@@ -128,6 +128,7 @@
   --cv-conn-standard: #8a9ab8;
   --cv-conn-jumpgate: #4db8c4;
   --cv-conn-gate: #5fb878;
+  --cv-conn-cyno: #b57bff;
   --cv-conn-highlight: #67e8f9;
 
   --cv-status-unknown: #3a4a6a;
@@ -206,6 +207,7 @@
   --cv-conn-standard: #8a9ab8;
   --cv-conn-jumpgate: #56b4e9;
   --cv-conn-gate: #009e73;
+  --cv-conn-cyno: #cc79a7;
   --cv-conn-highlight: #56b4e9;
 
   --cv-status-unknown: #777788;
@@ -283,6 +285,7 @@
   --cv-conn-standard: #8a9ab8;
   --cv-conn-jumpgate: #44aa99;
   --cv-conn-gate: #117733;
+  --cv-conn-cyno: #aa4499;
   --cv-conn-highlight: #ee99cc;
 
   --cv-status-unknown: #888888;

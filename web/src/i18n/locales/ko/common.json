@@ -465,7 +465,8 @@
       "shareMap": "지도 공유",
       "shortcuts": "단축키",
       "notifications": "알림",
-      "announcer": "음성 안내"
+      "announcer": "음성 안내",
+      "jumpRange": "점프 범위"
     },
     "snapToGrid": "격자에 맞추기",
     "settings": "설정",
@@ -654,6 +655,18 @@
       "threshold": "‘범위 내’는 근접 경보 임계값을 사용합니다.",
       "experimental": "실험적 기능",
       "delayNote": "음성이 최대 5초 지연될 수 있습니다. 첫 실행은 더 오래 걸립니다."
+    },
+    "jumpRange": {
+      "stagingPlaceholder": "스테이징 성계 (로우/널)…",
+      "searching": "검색 중…",
+      "pickHint": "위에서 스테이징 성계를 검색하거나, 지도의 성계를 우클릭하고 ‘여기서부터 점프 범위’를 선택하세요.",
+      "staging": "스테이징",
+      "clear": "지우기",
+      "calculating": "계산 중…",
+      "noCoords": "이 배포에는 점프 범위에 필요한 3D 성계 좌표가 로드되어 있지 않습니다. 서버에서 좌표 백필을 실행하거나 setup-db를 다시 실행한 후 새로고침하세요.",
+      "inRange": "범위 내 {{count}}개 성계",
+      "all": "전체",
+      "legend": "도달 가능:"
     }
   },
   "customIntel": {
@@ -939,7 +952,9 @@
     "clearLabels": "지우기",
     "labelNamed": "라벨 {{name}}",
     "tag": "태그",
-    "clearTag": "태그 지우기"
+    "clearTag": "태그 지우기",
+    "jumpRangeFrom": "여기서부터 점프 범위",
+    "jumpCyno": "사이노 점프"
   },
   "panel": {
     "notes": "노트",

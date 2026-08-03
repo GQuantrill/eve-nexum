@@ -522,7 +522,8 @@
       "liveSharing": "Live Map Broadcast",
       "shareMap": "Share Map",
       "shortcuts": "Shortcuts",
-      "announcer": "Announcer"
+      "announcer": "Announcer",
+      "jumpRange": "Jump Range"
     },
     "snapToGrid": "Snap to Grid",
     "settings": "Settings",
@@ -711,6 +712,18 @@
       "threshold": "\"In range\" uses the Proximity Alerts threshold.",
       "experimental": "Experimental Feature",
       "delayNote": "Voice may be delayed by up to 5 seconds. The first run takes longer."
+    },
+    "jumpRange": {
+      "stagingPlaceholder": "Staging system (low/null)…",
+      "searching": "Searching…",
+      "pickHint": "Search a staging system above, or right-click a system on the map and choose “Jump range from here”.",
+      "staging": "Staging",
+      "clear": "Clear",
+      "calculating": "Calculating…",
+      "noCoords": "This deployment doesn't have 3D system coordinates loaded, which jump range needs. Run the coordinate backfill on the server (or re-run setup-db), then reload.",
+      "inRange": "{{count}} systems in range",
+      "all": "All",
+      "legend": "Reachable by:"
     }
   },
   "customIntel": {
@@ -1009,7 +1022,9 @@
     "noHomeSet": "No home system set. Right-click a system → \"Set as home\".",
     "failSetDest": "Failed to set destination",
     "failAddWaypoint": "Failed to add waypoint",
-    "canvasHint": "Right-click canvas to add system · Drag between handles to connect · Shift+click or drag to multi-select · Right click system to interact"
+    "canvasHint": "Right-click canvas to add system · Drag between handles to connect · Shift+click or drag to multi-select · Right click system to interact",
+    "jumpRangeFrom": "Jump range from here",
+    "jumpCyno": "Cyno Jump"
   },
   "panel": {
     "notes": "Notes",

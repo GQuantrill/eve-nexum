@@ -465,7 +465,8 @@
       "shareMap": "共享地图",
       "shortcuts": "快捷键",
       "notifications": "通知",
-      "announcer": "语音播报"
+      "announcer": "语音播报",
+      "jumpRange": "跳跃范围"
     },
     "snapToGrid": "对齐网格",
     "settings": "设置",
@@ -654,6 +655,18 @@
       "threshold": "“范围内”使用接近警报的阈值。",
       "experimental": "实验性功能",
       "delayNote": "语音可能会延迟最多 5 秒。首次运行会更久。"
+    },
+    "jumpRange": {
+      "stagingPlaceholder": "集结星系（低安/零安）…",
+      "searching": "搜索中…",
+      "pickHint": "在上方搜索一个集结星系，或右键点击地图上的星系并选择“从此处的跳跃范围”。",
+      "staging": "集结点",
+      "clear": "清除",
+      "calculating": "计算中…",
+      "noCoords": "此部署未加载跳跃范围所需的 3D 星系坐标。请在服务器上运行坐标回填（或重新运行 setup-db），然后重新加载。",
+      "inRange": "范围内 {{count}} 个星系",
+      "all": "全部",
+      "legend": "可到达："
     }
   },
   "customIntel": {
@@ -939,7 +952,9 @@
     "clearLabels": "清除",
     "labelNamed": "标签 {{name}}",
     "tag": "标记",
-    "clearTag": "清除标记"
+    "clearTag": "清除标记",
+    "jumpRangeFrom": "从此处的跳跃范围",
+    "jumpCyno": "Cyno 跳跃"
   },
   "panel": {
     "notes": "笔记",
