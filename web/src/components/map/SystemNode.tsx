@@ -12,6 +12,7 @@ import { useMapStore } from '../../store/mapStore';
 import { usePresenceStore } from '../../store/presenceStore';
 import { useSystemKill, RECENT_KILL_MS } from '../../store/killStore';
 import { useJumpRangeStore } from '../../store/jumpRangeStore';
+import { JUMP_CLASSES } from '../../data/jumpDrives';
 import { iskCompact } from '../../utils/isk';
 import { useAccountLocations } from '../../hooks/useAccountLocations';
 import { useSovData } from '../../hooks/useSovData';
@@ -262,9 +263,28 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
     return () => { obs.disconnect(); forgetNodeSize(sys.id); };
   }, [sys.id, countHeight, reportNodeSize, forgetNodeSize]);
 
-  // Jump-range overlay: ring this node if it's the staging system or within range.
+  // Jump-range overlay. When active: the staging system gets a gold ring, systems
+  // reachable under the active class filter glow in the tightest-class colour, and
+  // everything else dims so the reachable set stands out.
+  const jrActive  = useJumpRangeStore((s) => s.stagingId != null);
   const jrInfo    = useJumpRangeStore((s) => (sys.eveSystemId != null ? s.inRange.get(sys.eveSystemId) : undefined));
   const jrStaging = useJumpRangeStore((s) => s.stagingId != null && s.stagingId === sys.eveSystemId);
+  const jrFilter  = useJumpRangeStore((s) => s.filterClass);
+  let jrGlow: string | null = null;
+  let jrDim = false;
+  if (jrActive) {
+    if (jrStaging) jrGlow = '#ffd54a';
+    else if (jrInfo && (!jrFilter || jrInfo.classKeys.includes(jrFilter))) {
+      jrGlow = jrFilter ? (JUMP_CLASSES.find((c) => c.key === jrFilter)?.color ?? jrInfo.color) : jrInfo.color;
+    } else {
+      jrDim = true;   // overlay on but this node isn't reachable (or not under the filter)
+    }
+  }
+  const jrStyle: React.CSSProperties =
+    jrStaging ? { boxShadow: `0 0 0 3px ${jrGlow}, 0 0 22px 6px ${jrGlow}`, zIndex: 5 }
+    : jrGlow  ? { boxShadow: `0 0 0 2px ${jrGlow}, 0 0 15px 4px ${jrGlow}bb`, zIndex: 4 }
+    : jrDim   ? { opacity: 0.25 }
+    : {};
 
   return (
     <div
@@ -277,11 +297,7 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
         ...(heat ? { '--heat': heat.glow, '--heat-color': heat.color } : null),
         ...(uniformSize && uniformWidth  > 0 ? { minWidth:  uniformWidth  } : null),
         ...(uniformSize && uniformHeight > 0 ? { minHeight: uniformHeight } : null),
-        ...(jrStaging
-          ? { outline: '3px solid #ffd54a', outlineOffset: 3 }
-          : jrInfo
-          ? { outline: `2px solid ${jrInfo.color}`, outlineOffset: 3 }
-          : null),
+        ...jrStyle,
       } as React.CSSProperties}
       data-selected={selected || sys.selected}
       data-heat={heat ? '' : undefined}

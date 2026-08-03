@@ -15,14 +15,18 @@ interface JumpRangeState {
   stagingId:   number | null;               // EVE system id of the staging system
   stagingName: string | null;
   inRange:     Map<number, InRangeInfo>;     // eveSystemId -> reach info
+  filterClass: string | null;               // active ship-class filter (null = all)
   setStaging:  (id: number | null, name?: string | null) => void;
   setInRange:  (m: Map<number, InRangeInfo>) => void;
+  setFilterClass: (key: string | null) => void;
 }
 
 export const useJumpRangeStore = create<JumpRangeState>((set) => ({
   stagingId:   null,
   stagingName: null,
   inRange:     new Map(),
-  setStaging:  (id, name = null) => set({ stagingId: id, stagingName: name, inRange: new Map() }),
+  filterClass: null,
+  setStaging:  (id, name = null) => set({ stagingId: id, stagingName: name, inRange: new Map(), filterClass: null }),
   setInRange:  (m) => set({ inRange: m }),
+  setFilterClass: (key) => set({ filterClass: key }),
 }));

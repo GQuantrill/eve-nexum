@@ -54,7 +54,10 @@ export function useJumpRange(): { targets: JumpTarget[]; loading: boolean; jdc: 
     for (const t of targets) {
       const classes = classesInRange(t.ly, jdc);
       if (classes.length === 0) continue;
-      m.set(t.eveSystemId, { ly: t.ly, color: classes[0].color, classKeys: classes.map((c) => c.key) });
+      // Colour by the TIGHTEST class that still reaches (last in the widest-first
+      // list) — a distance gradient (close = super/orange … far = JF/blue) rather
+      // than every reachable system sharing the widest class's colour.
+      m.set(t.eveSystemId, { ly: t.ly, color: classes[classes.length - 1].color, classKeys: classes.map((c) => c.key) });
     }
     setInRange(m);
   }, [targets, jdc, setInRange]);

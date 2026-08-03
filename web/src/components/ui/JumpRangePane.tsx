@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useJumpRangeStore } from '../../store/jumpRangeStore';
 import { useJumpRange, useJdcLevel } from '../../hooks/useJumpRange';
 import { JUMP_CLASSES, jumpRange } from '../../data/jumpDrives';
@@ -13,7 +12,8 @@ export function JumpRangePane() {
   const stagingId   = useJumpRangeStore((s) => s.stagingId);
   const setStaging  = useJumpRangeStore((s) => s.setStaging);
   const { targets, loading, hasCoords } = useJumpRange();
-  const [filter, setFilter] = useState<string | null>(null); // class key, null = all
+  const filter    = useJumpRangeStore((s) => s.filterClass);   // class key, null = all
+  const setFilter = useJumpRangeStore((s) => s.setFilterClass);
 
   const filterRange = filter ? jumpRange(JUMP_CLASSES.find((c) => c.key === filter)!.base, jdc) : Infinity;
   const shown = targets.filter((t) => t.ly <= filterRange);
