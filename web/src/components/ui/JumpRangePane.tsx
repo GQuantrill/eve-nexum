@@ -76,7 +76,7 @@ export function JumpRangePane() {
               <div key={t.eveSystemId} className="map-sidebar__row" style={{ justifyContent: 'space-between', gap: 8 }}>
                 <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {t.name}{' '}
-                  <span style={{ color: 'var(--text-faint)', fontSize: 11 }}>{t.systemClass} · {t.regionName ?? '?'}</span>
+                  <span style={{ color: 'var(--text-faint)', fontSize: 11 }}>{t.systemClass}</span>
                 </span>
                 <span style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
                   {reach.map((c) => (
