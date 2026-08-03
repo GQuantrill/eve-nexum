@@ -317,6 +317,15 @@ systemsRouter.get('/:id(\\d+)/jump-range', async (req, res) => {
   const id = parseInt(req.params.id, 10);
   const maxLy = Math.max(0.1, Math.min(20, parseFloat(String(req.query.maxLy ?? '10')) || 10));
   try {
+    // 3D coords come from the SDE (setup-db) or scripts/backfill-coords.ts. On a
+    // deployment seeded before that, they're NULL — report it distinctly instead
+    // of returning a misleading empty result, so the UI can prompt a backfill.
+    const origin = await db.query<{ pos_x: number | null }>(
+      'SELECT pos_x FROM solar_systems WHERE id = $1', [id],
+    );
+    if (!origin.rows[0] || origin.rows[0].pos_x == null) {
+      return res.json({ hasCoords: false, systems: [] });
+    }
     const { rows } = await db.query<{
       id: number; name: string; system_class: string; security: string; region_name: string | null; ly: string;
     }>(
@@ -334,14 +343,17 @@ systemsRouter.get('/:id(\\d+)/jump-range', async (req, res) => {
         ORDER BY ly`,
       [id, maxLy, METRES_PER_LY],
     );
-    return res.json(rows.map((r) => ({
-      eveSystemId: r.id,
-      name: r.name,
-      systemClass: r.system_class,
-      security: Number(r.security),
-      regionName: r.region_name ?? null,
-      ly: Number(r.ly),
-    })));
+    return res.json({
+      hasCoords: true,
+      systems: rows.map((r) => ({
+        eveSystemId: r.id,
+        name: r.name,
+        systemClass: r.system_class,
+        security: Number(r.security),
+        regionName: r.region_name ?? null,
+        ly: Number(r.ly),
+      })),
+    });
   } catch (err) {
     log.error('jump-range query failed:', err);
     return res.status(500).json({ error: 'Database query failed' });

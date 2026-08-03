@@ -12,7 +12,7 @@ export function JumpRangePane() {
   const stagingName = useJumpRangeStore((s) => s.stagingName);
   const stagingId   = useJumpRangeStore((s) => s.stagingId);
   const setStaging  = useJumpRangeStore((s) => s.setStaging);
-  const { targets, loading } = useJumpRange();
+  const { targets, loading, hasCoords } = useJumpRange();
   const [filter, setFilter] = useState<string | null>(null); // class key, null = all
 
   const filterRange = filter ? jumpRange(JUMP_CLASSES.find((c) => c.key === filter)!.base, jdc) : Infinity;
@@ -56,7 +56,15 @@ export function JumpRangePane() {
       </div>
 
       {loading && <div className="map-sidebar__hint">Calculating…</div>}
-      {!loading && (
+      {!loading && !hasCoords && (
+        <div className="map-sidebar__hint" style={{ color: 'var(--cv-conn-expired)' }}>
+          This deployment doesn't have 3D system coordinates loaded, which jump-range
+          needs. Run the SDE coordinate backfill on the server
+          (<code>npx tsx scripts/backfill-coords.ts</code>) or re-run <code>setup-db</code>,
+          then reload.
+        </div>
+      )}
+      {!loading && hasCoords && (
         <div style={{ maxHeight: 320, overflowY: 'auto' }}>
           <div className="map-sidebar__hint">{shown.length} systems in range</div>
           {shown.map((t) => {

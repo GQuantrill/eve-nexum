@@ -26,21 +26,22 @@ export function useJdcLevel(): [number, (n: number) => void] {
  * pushes the reachable set into the store so map nodes can highlight. Returns the
  * ordered target list for the panel. No staging → empty + store cleared.
  */
-export function useJumpRange(): { targets: JumpTarget[]; loading: boolean; jdc: number } {
+export function useJumpRange(): { targets: JumpTarget[]; loading: boolean; jdc: number; hasCoords: boolean } {
   const [jdc] = useJdcLevel();
   const stagingId = useJumpRangeStore((s) => s.stagingId);
   const setInRange = useJumpRangeStore((s) => s.setInRange);
   const [rows, setRows] = useState<JumpTarget[]>([]);
   const [loading, setLoading] = useState(false);
+  const [hasCoords, setHasCoords] = useState(true);
   const maxLy = maxRangeLy(jdc);
 
   useEffect(() => {
-    if (stagingId == null) { setRows([]); setInRange(new Map()); return; }
+    if (stagingId == null) { setRows([]); setHasCoords(true); setInRange(new Map()); return; }
     let cancelled = false;
     setLoading(true);
-    api<JumpTarget[]>(`/api/systems/${stagingId}/jump-range?maxLy=${maxLy.toFixed(2)}`)
-      .then((data) => { if (!cancelled) setRows(data); })
-      .catch(() => { if (!cancelled) setRows([]); })
+    api<{ hasCoords: boolean; systems: JumpTarget[] }>(`/api/systems/${stagingId}/jump-range?maxLy=${maxLy.toFixed(2)}`)
+      .then((data) => { if (!cancelled) { setRows(data.systems); setHasCoords(data.hasCoords); } })
+      .catch(() => { if (!cancelled) { setRows([]); setHasCoords(true); } })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
   }, [stagingId, maxLy, setInRange]);
@@ -58,5 +59,5 @@ export function useJumpRange(): { targets: JumpTarget[]; loading: boolean; jdc: 
     setInRange(m);
   }, [targets, jdc, setInRange]);
 
-  return { targets, loading, jdc };
+  return { targets, loading, jdc, hasCoords };
 }
