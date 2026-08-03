@@ -11,6 +11,7 @@ import { CLASS_COLORS, CLASS_LABELS, EFFECT_ICONS, EFFECT_LABELS, EFFECT_MODIFIE
 import { useMapStore } from '../../store/mapStore';
 import { usePresenceStore } from '../../store/presenceStore';
 import { useSystemKill, RECENT_KILL_MS } from '../../store/killStore';
+import { useJumpRangeStore } from '../../store/jumpRangeStore';
 import { iskCompact } from '../../utils/isk';
 import { useAccountLocations } from '../../hooks/useAccountLocations';
 import { useSovData } from '../../hooks/useSovData';
@@ -261,6 +262,10 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
     return () => { obs.disconnect(); forgetNodeSize(sys.id); };
   }, [sys.id, countHeight, reportNodeSize, forgetNodeSize]);
 
+  // Jump-range overlay: ring this node if it's the staging system or within range.
+  const jrInfo    = useJumpRangeStore((s) => (sys.eveSystemId != null ? s.inRange.get(sys.eveSystemId) : undefined));
+  const jrStaging = useJumpRangeStore((s) => s.stagingId != null && s.stagingId === sys.eveSystemId);
+
   return (
     <div
       ref={nodeRef}
@@ -272,6 +277,11 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
         ...(heat ? { '--heat': heat.glow, '--heat-color': heat.color } : null),
         ...(uniformSize && uniformWidth  > 0 ? { minWidth:  uniformWidth  } : null),
         ...(uniformSize && uniformHeight > 0 ? { minHeight: uniformHeight } : null),
+        ...(jrStaging
+          ? { outline: '3px solid #ffd54a', outlineOffset: 3 }
+          : jrInfo
+          ? { outline: `2px solid ${jrInfo.color}`, outlineOffset: 3 }
+          : null),
       } as React.CSSProperties}
       data-selected={selected || sys.selected}
       data-heat={heat ? '' : undefined}

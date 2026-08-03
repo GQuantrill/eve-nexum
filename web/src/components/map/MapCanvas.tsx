@@ -54,6 +54,7 @@ import { readUserSetting } from '../../hooks/useUserSetting';
 import { findFreePosition, normalizePlacement, PLACEMENT_GAP } from '../../hooks/useLocationTracking';
 import { CLASS_COLORS } from '../../data/wormholes';
 import { cssVarToHex } from '../../utils/cssVar';
+import { useJumpRangeStore } from '../../store/jumpRangeStore';
 import { pickHandles } from './edgeUtils';
 import { setDestination, addWaypoint } from '../../api/waypoint';
 import { toast } from '../ui/Toaster';
@@ -939,6 +940,11 @@ export function MapCanvas() {
             icon: <PathIcon size={16} weight="regular" color="#5a9af8" />,
             action: () => { addWaypoint(sys.eveSystemId!, sys.name).catch(() => {}); },
           },
+          {
+            label: 'Jump range from here',
+            icon: <MapPinSimpleIcon size={16} weight="regular" color="#b57bff" />,
+            action: () => useJumpRangeStore.getState().setStaging(sys.eveSystemId!, sys.name),
+          },
         ];
       }
       // Pane menu — only "Select All" survives.
@@ -1089,6 +1095,11 @@ export function MapCanvas() {
           label: t('waypoint.addWaypoint'),
           icon: <PathIcon size={16} weight="regular" color="#5a9af8" />,
           action: () => { addWaypoint(sys.eveSystemId!, sys.name).catch(() => {}); },
+        },
+        {
+          label: 'Jump range from here',
+          icon: <MapPinSimpleIcon size={16} weight="regular" color="#b57bff" />,
+          action: () => useJumpRangeStore.getState().setStaging(sys.eveSystemId!, sys.name),
         },
       ] : [];
 

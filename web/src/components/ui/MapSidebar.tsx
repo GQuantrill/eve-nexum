@@ -27,6 +27,7 @@ import { toPng } from "html-to-image";
 import { CaretLeftIcon, CaretRightIcon, GearIcon, DiscordLogoIcon } from "@phosphor-icons/react";
 import { DISCORD_INVITE_URL } from "../../data/links";
 import { ChainExitsSection } from "./ChainExitsSection";
+import { JumpRangePane } from "./JumpRangePane";
 import { AnnouncerSection } from "./AnnouncerSection";
 import { MapSharesSection } from "./MapSharesSection";
 import { MergeMapModal } from "./MergeMapModal";
@@ -147,6 +148,7 @@ type SectionId =
   | "tracking"
   | "route"
   | "chainExits"
+  | "jumpRange"
   | "proximityAlerts"
   | "notifications"
   | "announcer"
@@ -1274,6 +1276,10 @@ export function MapSidebar() {
           {...sectionProps("chainExits")}
         >
           <ChainExitsSection />
+        </CollapsibleSection>
+
+        <CollapsibleSection title="Jump Range" {...sectionProps("jumpRange")}>
+          <JumpRangePane />
         </CollapsibleSection>
 
         <CollapsibleSection

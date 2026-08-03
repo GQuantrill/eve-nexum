@@ -306,6 +306,48 @@ systemsRouter.get('/:id(\\d+)/nearby-lawless', async (req, res) => {
   }
 });
 
+// GET /api/systems/:id/jump-range?maxLy=N — every LS/NS k-space system within N
+// light-years of :id (star-to-star, the metric jump drives use), for the jump-
+// range overlay. Distance = 3D Euclidean over the SDE universe coords (metres)
+// / metres-per-ly. Only lowsec + nullsec (jump drives don't work to highsec, and
+// J-space/wormhole systems can't be jumped to). N clamped 0.1..20 (largest cap
+// range at max skills is ~10 ly, so 20 is generous headroom). Ordered nearest-first.
+const METRES_PER_LY = 9.4607e15;
+systemsRouter.get('/:id(\\d+)/jump-range', async (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  const maxLy = Math.max(0.1, Math.min(20, parseFloat(String(req.query.maxLy ?? '10')) || 10));
+  try {
+    const { rows } = await db.query<{
+      id: number; name: string; system_class: string; security: string; region_name: string | null; ly: string;
+    }>(
+      `WITH o AS (SELECT pos_x, pos_y, pos_z FROM solar_systems WHERE id = $1)
+       SELECT s.id, s.name, s.system_class, s.security::text AS security,
+              r.name AS region_name,
+              (sqrt(power(s.pos_x - o.pos_x, 2) + power(s.pos_y - o.pos_y, 2) + power(s.pos_z - o.pos_z, 2)) / $3)::text AS ly
+         FROM solar_systems s
+         CROSS JOIN o
+         LEFT JOIN map_regions r ON r.id = s.region_id
+        WHERE s.id <> $1
+          AND s.system_class IN ('LS','NS')
+          AND s.pos_x IS NOT NULL AND o.pos_x IS NOT NULL
+          AND sqrt(power(s.pos_x - o.pos_x, 2) + power(s.pos_y - o.pos_y, 2) + power(s.pos_z - o.pos_z, 2)) / $3 <= $2
+        ORDER BY ly`,
+      [id, maxLy, METRES_PER_LY],
+    );
+    return res.json(rows.map((r) => ({
+      eveSystemId: r.id,
+      name: r.name,
+      systemClass: r.system_class,
+      security: Number(r.security),
+      regionName: r.region_name ?? null,
+      ly: Number(r.ly),
+    })));
+  } catch (err) {
+    log.error('jump-range query failed:', err);
+    return res.status(500).json({ error: 'Database query failed' });
+  }
+});
+
 // GET /api/systems/:id/celestials — static celestial metadata for the panel
 // (security, constellation, sun type, planet/moon/belt/gate counts). DB-first;
 // live-ESI fallback (cached) only for systems not yet filled by a re-seed.
