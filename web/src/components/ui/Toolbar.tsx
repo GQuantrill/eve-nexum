@@ -21,6 +21,7 @@ import { CharacterSwitcher } from './CharacterSwitcher';
 import { HeatmapMenu } from './HeatmapMenu';
 import { WhTypeChartModal } from './WhTypeChartModal';
 import { KillLogPanel } from './KillLogPanel';
+import { JumpPlannerModal } from './JumpPlannerModal';
 import { useProximityAlerts } from '../../hooks/useProximityAlerts';
 import { useClickOutside } from '../../hooks/useClickOutside';
 import { useUserSetting } from '../../hooks/useUserSetting';
@@ -33,7 +34,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import {
-  WarningIcon, SkullIcon, XCircleIcon, QuestionIcon,
+  WarningIcon, SkullIcon, NavigationArrowIcon, XCircleIcon, QuestionIcon,
   ShieldStarIcon, ChartBarIcon, SlidersHorizontalIcon, FootprintsIcon,
   SignOutIcon, PlanetIcon, LinkSimpleIcon, ClockCountdownIcon, MapPinIcon,
   KeyIcon, GraphIcon, ArrowCounterClockwiseIcon, DotsSixVerticalIcon,
@@ -303,6 +304,7 @@ export function Toolbar() {
   const [showKeys, setShowKeys] = useState(false);
   const [showWhChart, setShowWhChart] = useState(false);
   const [showKillLog, setShowKillLog] = useState(false);
+  const [showJumpPlanner, setShowJumpPlanner] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [leaveConfirm, setLeaveConfirm] = useState(false);
   const mapSwitcherRef = useRef<HTMLDivElement>(null);
@@ -570,6 +572,15 @@ export function Toolbar() {
           <SkullIcon size={18} weight="regular" />
         </button>
 
+        <button
+          className="toolbar__toggle toolbar__toggle--icon toolbar__toggle--prominent"
+          onClick={() => setShowJumpPlanner(true)}
+          data-tooltip="Jump Planner"
+          aria-label="Jump Planner"
+        >
+          <NavigationArrowIcon size={18} weight="regular" />
+        </button>
+
         <HeatmapMenu />
 
         <button
@@ -770,6 +781,7 @@ export function Toolbar() {
     {showKeys && <ApiKeysModal onClose={() => setShowKeys(false)} />}
     {showWhChart && <WhTypeChartModal onClose={() => setShowWhChart(false)} />}
     {showKillLog && <KillLogPanel onClose={() => setShowKillLog(false)} />}
+    {showJumpPlanner && <JumpPlannerModal onClose={() => setShowJumpPlanner(false)} />}
     {deleteConfirm && (
       <ConfirmModal
         message={t('toolbar.deleteMapConfirm', { name: mapName })}
