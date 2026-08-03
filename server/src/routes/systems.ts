@@ -330,14 +330,14 @@ systemsRouter.get('/:id(\\d+)/jump-range', async (req, res) => {
       id: number; name: string; system_class: string; security: string; region_name: string | null; ly: string;
     }>(
       `WITH o AS (SELECT pos_x, pos_y, pos_z FROM solar_systems WHERE id = $1)
-       SELECT s.id, s.name, s.system_class, s.security::text AS security,
+       SELECT s.id, s.name, s.class AS system_class, s.security::text AS security,
               r.name AS region_name,
               (sqrt(power(s.pos_x - o.pos_x, 2) + power(s.pos_y - o.pos_y, 2) + power(s.pos_z - o.pos_z, 2)) / $3)::text AS ly
          FROM solar_systems s
          CROSS JOIN o
          LEFT JOIN map_regions r ON r.id = s.region_id
         WHERE s.id <> $1
-          AND s.system_class IN ('LS','NS')
+          AND s.class IN ('LS','NS')
           AND s.pos_x IS NOT NULL AND o.pos_x IS NOT NULL
           AND sqrt(power(s.pos_x - o.pos_x, 2) + power(s.pos_y - o.pos_y, 2) + power(s.pos_z - o.pos_z, 2)) / $3 <= $2
         ORDER BY ly`,
