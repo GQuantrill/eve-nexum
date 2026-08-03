@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import { db } from '../db.js';
 import { createLogger } from '../utils/logger.js';
 import { esiFetch } from '../utils/esi.js';
+import { planJumpRoute, jumpGraphSize } from '../services/jumpGraph.js';
 
 export const systemsRouter = Router();
 const log = createLogger('systems');
@@ -377,6 +378,30 @@ systemsRouter.get('/:id(\\d+)/distance', async (req, res) => {
   } catch (err) {
     log.error('distance query failed:', err);
     return res.status(500).json({ error: 'Database query failed' });
+  }
+});
+
+// GET /api/systems/jump-route?from=&to=&rangeLy=&objective=hops|fuel — plot a
+// multi-hop capital/black-ops jump route between two LS/NS systems, where every
+// hop is within rangeLy (the ship's max range). objective 'hops' = fewest jumps,
+// 'fuel' = least total light-years. { hasCoords:false } when coords aren't loaded;
+// route null = no path within range. Ship-agnostic — the client turns ship class
+// + JDC into rangeLy and estimates fuel from the returned hop distances.
+systemsRouter.get('/jump-route', async (req, res) => {
+  const from = parseInt(String(req.query.from ?? ''), 10);
+  const to   = parseInt(String(req.query.to ?? ''), 10);
+  const rangeLy = Math.max(0.1, Math.min(20, parseFloat(String(req.query.rangeLy ?? '')) || 0));
+  const objective = req.query.objective === 'fuel' ? 'fuel' : 'hops';
+  if (!from || !to || !rangeLy) {
+    return res.status(400).json({ error: 'from, to and rangeLy are required' });
+  }
+  try {
+    if ((await jumpGraphSize()) === 0) return res.json({ hasCoords: false, route: null });
+    const route = await planJumpRoute(from, to, rangeLy, objective);
+    return res.json({ hasCoords: true, route });
+  } catch (err) {
+    log.error('jump-route failed:', err);
+    return res.status(500).json({ error: 'Routing failed' });
   }
 });
 
