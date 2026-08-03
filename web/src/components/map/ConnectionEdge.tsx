@@ -22,6 +22,7 @@ import type { TFunction } from 'i18next';
 const STANDARD_COLOR = 'var(--cv-conn-standard)';
 const JUMPGATE_COLOR  = 'var(--cv-conn-jumpgate)';
 const GATE_COLOR      = 'var(--cv-conn-gate)';
+const CYNO_COLOR      = '#b57bff';   // cyno-jump route (purple)
 const HIGHLIGHT_COLOR = 'var(--cv-conn-highlight)';
 
 // Perpendicular spacing between multiple connections that share the same pair
@@ -120,9 +121,10 @@ export const ConnectionEdge = memo(({
 
   const isJumpgate = conn?.connectionType === 'jumpgate'; // player Ansiblex bridge
   const isGate     = conn?.connectionType === 'gate';     // in-game stargate
-  // Stargates and Ansiblex bridges are permanent in-game infrastructure — no
-  // wormhole lifetime or mass to track.
-  const noLifetime = isJumpgate || isGate;
+  const isCyno     = conn?.connectionType === 'cyno';     // tagged cyno-jump route
+  // Stargates, Ansiblex bridges and cyno routes are infrastructure/intel, not
+  // wormholes — no lifetime or mass to track.
+  const noLifetime = isJumpgate || isGate || isCyno;
   // Quarantined: the backing wormhole sig was deleted (hole collapsed). Kept on
   // the map but rendered severed (dashed/red + a ✂ marker) so the chain is
   // still traceable but clearly no longer an active link.
@@ -136,7 +138,8 @@ export const ConnectionEdge = memo(({
   const lifeState  = expiryMs != null ? bucketDisplay(lifeBucket(expiryMs - now), expiryMs - now, t) : null;
   const timeStatus = conn?.timeStatus ?? null;
 
-  const color = isJumpgate ? JUMPGATE_COLOR
+  const color = isCyno ? CYNO_COLOR
+    : isJumpgate ? JUMPGATE_COLOR
     : isGate ? GATE_COLOR
     : (lifeState?.color ?? TIME_COLORS[timeStatus ?? ''] ?? STANDARD_COLOR);
   // Final stroke: broken keeps severed-red; otherwise a highlighted link (its
@@ -182,7 +185,7 @@ export const ConnectionEdge = memo(({
           // stays readable even while highlighted.
           stroke: strokeColor,
           strokeWidth: watchColor ? strokeWidth + 1 : strokeWidth,
-          strokeDasharray: broken ? '5 7' : isJumpgate ? '10 5' : undefined,
+          strokeDasharray: broken ? '5 7' : isCyno ? '2 6' : isJumpgate ? '10 5' : undefined,
           filter: [
             emphasized ? `drop-shadow(0 0 6px ${strokeColor})` : null,
             watchColor ? `drop-shadow(0 0 5px ${watchColor}) drop-shadow(0 0 2px ${watchColor})` : null,
@@ -205,7 +208,9 @@ export const ConnectionEdge = memo(({
           </div>
         )}
         {!broken && (() => {
-          const typeNode = isJumpgate
+          const typeNode = isCyno
+            ? <span className="connection-label__cyno">CJ</span>
+            : isJumpgate
             ? <span className="connection-label__jumpgate">JG</span>
             : isGate
               ? <span className="connection-label__gate">G</span>

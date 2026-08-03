@@ -989,6 +989,11 @@ export function MapCanvas() {
               checked: connType === 'jumpgate',
               action: () => updateConnection(eid, { connectionType: 'jumpgate' }),
             },
+            {
+              label: 'Cyno Jump',
+              checked: connType === 'cyno',
+              action: () => updateConnection(eid, { connectionType: 'cyno' }),
+            },
           ],
         },
         {
