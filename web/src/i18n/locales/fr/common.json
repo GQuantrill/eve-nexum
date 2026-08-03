@@ -1549,6 +1549,10 @@
       "chains": {
         "title": "Chaînes de trous de ver enregistrées",
         "desc": "Enregistrez n'importe quel chemin sur votre carte comme une chaîne nommée — choisissez un système de départ et d'arrivée, et la route est sauvegardée avec le nombre de sauts. Survolez une chaîne pour assombrir le reste et n'éclairer que ses systèmes et connexions, centrez sur un saut, et réordonnez vos chaînes. Les sauts rompus se signalent pour un re-scout."
+      },
+      "jumpRange": {
+        "title": "Portée du disque de saut",
+        "desc": "Choisissez un système de staging et mettez en évidence chaque système low/null à portée de saut, coloré par classe de vaisseau (Black Ops, Carrier, Super, JF) selon votre Jump Drive Calibration. Étiquetez les routes de saut cyno sur les connexions, annotées automatiquement avec la distance en années-lumière et les classes capables de sauter."
       }
     },
     "corpFeatures": {

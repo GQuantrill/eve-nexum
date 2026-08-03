@@ -1549,6 +1549,10 @@
       "chains": {
         "title": "Cadenas de agujeros de gusano guardadas",
         "desc": "Guarda cualquier ruta de tu mapa como una cadena con nombre — elige un sistema de inicio y fin y la ruta se guarda con el número de saltos. Pasa el ratón sobre una cadena para atenuar todo lo demás e iluminar solo sus sistemas y conexiones, céntrate en cualquier salto y reordena tus cadenas. Los saltos rotos se marcan para volver a explorar."
+      },
+      "jumpRange": {
+        "title": "Alcance del motor de salto",
+        "desc": "Elige un sistema de staging y resalta cada sistema low/null dentro del alcance de salto, coloreado por clase de nave (Black Ops, Carrier, Super, JF) según tu Jump Drive Calibration. Etiqueta rutas de salto cyno en las conexiones, anotadas automáticamente con la distancia en años luz y qué clases pueden saltar."
       }
     },
     "corpFeatures": {

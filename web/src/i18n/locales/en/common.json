@@ -1619,6 +1619,10 @@
       "chains": {
         "title": "Saved wormhole chains",
         "desc": "Record any path through your map as a named chain — pick a start and end system and the route is saved with its hop count. Hover a chain to dim everything off it and light up just its systems and connections, centre on any hop, and reorder your saved chains. Broken hops flag themselves for a re-scout."
+      },
+      "jumpRange": {
+        "title": "Jump-drive range",
+        "desc": "Pick a staging system and highlight every low/null system within jump range of it, colour-banded by ship class (Black Ops, Carrier, Super, JF) at your Jump Drive Calibration. Tag cyno-jump routes on connections, auto-annotated with the light-year distance and which classes can make the jump."
       }
     },
     "corpFeatures": {

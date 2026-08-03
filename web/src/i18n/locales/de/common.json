@@ -1549,6 +1549,10 @@
       "chains": {
         "title": "Gespeicherte Wurmloch-Ketten",
         "desc": "Speichere jeden Pfad durch deine Karte als benannte Kette — wähle Start- und Zielsystem, und die Route wird mit Sprunganzahl gesichert. Fahre über eine Kette, um alles andere abzudunkeln und nur ihre Systeme und Verbindungen hervorzuheben, zentriere auf einen Sprung und ordne deine Ketten neu. Defekte Sprünge melden sich selbst zum erneuten Scouten."
+      },
+      "jumpRange": {
+        "title": "Sprungantriebs-Reichweite",
+        "desc": "Wähle ein Staging-System und markiere jedes Low-/Null-System in Sprungreichweite, nach Schiffsklasse (Black Ops, Carrier, Super, JF) bei deiner Jump Drive Calibration farblich gestaffelt. Markiere Cyno-Sprungrouten an Verbindungen — automatisch mit Lichtjahr-Distanz und den passenden Klassen beschriftet."
       }
     },
     "corpFeatures": {

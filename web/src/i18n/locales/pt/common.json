@@ -1549,6 +1549,10 @@
       "chains": {
         "title": "Cadeias de buracos de minhoca salvas",
         "desc": "Grave qualquer caminho no seu mapa como uma cadeia nomeada — escolha um sistema inicial e final e a rota é salva com a contagem de saltos. Passe o rato sobre uma cadeia para escurecer o resto e iluminar apenas os seus sistemas e conexões, centre num salto e reordene as suas cadeias. Saltos quebrados sinalizam-se para re-explorar."
+      },
+      "jumpRange": {
+        "title": "Alcance do motor de salto",
+        "desc": "Escolha um sistema de staging e destaque cada sistema low/null dentro do alcance de salto, colorido por classe de nave (Black Ops, Carrier, Super, JF) conforme a sua Jump Drive Calibration. Marque rotas de salto cyno nas ligações, anotadas automaticamente com a distância em anos-luz e que classes conseguem saltar."
       }
     },
     "corpFeatures": {
