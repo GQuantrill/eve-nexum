@@ -465,7 +465,8 @@
       "shareMap": "지도 공유",
       "shortcuts": "단축키",
       "notifications": "알림",
-      "announcer": "음성 안내"
+      "announcer": "음성 안내",
+      "jumpRange": "점프 범위"
     },
     "snapToGrid": "격자에 맞추기",
     "settings": "설정",
@@ -654,6 +655,18 @@
       "threshold": "‘범위 내’는 근접 경보 임계값을 사용합니다.",
       "experimental": "실험적 기능",
       "delayNote": "음성이 최대 5초 지연될 수 있습니다. 첫 실행은 더 오래 걸립니다."
+    },
+    "jumpRange": {
+      "stagingPlaceholder": "스테이징 성계 (로우/널)…",
+      "searching": "검색 중…",
+      "pickHint": "위에서 스테이징 성계를 검색하거나, 지도의 성계를 우클릭하고 ‘여기서부터 점프 범위’를 선택하세요.",
+      "staging": "스테이징",
+      "clear": "지우기",
+      "calculating": "계산 중…",
+      "noCoords": "이 배포에는 점프 범위에 필요한 3D 성계 좌표가 로드되어 있지 않습니다. 서버에서 좌표 백필을 실행하거나 setup-db를 다시 실행한 후 새로고침하세요.",
+      "inRange": "범위 내 {{count}}개 성계",
+      "all": "전체",
+      "legend": "도달 가능:"
     }
   },
   "customIntel": {
@@ -939,7 +952,9 @@
     "clearLabels": "지우기",
     "labelNamed": "라벨 {{name}}",
     "tag": "태그",
-    "clearTag": "태그 지우기"
+    "clearTag": "태그 지우기",
+    "jumpRangeFrom": "여기서부터 점프 범위",
+    "jumpCyno": "사이노 점프"
   },
   "panel": {
     "notes": "노트",
@@ -1534,6 +1549,10 @@
       "chains": {
         "title": "저장된 웜홀 체인",
         "desc": "맵의 어떤 경로든 이름이 있는 체인으로 기록하세요 — 시작과 끝 성계를 고르면 점프 수와 함께 경로가 저장됩니다. 체인 위에 마우스를 올리면 나머지가 흐려지고 해당 체인의 성계와 연결만 밝아지며, 임의의 점프로 가운데 정렬하고 체인 순서를 바꿀 수 있습니다. 끊긴 점프는 다시 정찰하도록 스스로 표시됩니다."
+      },
+      "jumpRange": {
+        "title": "점프 드라이브 범위",
+        "desc": "스테이징 성계를 선택하면 점프 범위 내의 모든 로우섹/널섹 성계가 표시되며, Jump Drive Calibration에 따라 함선 클래스(Black Ops, Carrier, Super, JF)별로 색상이 구분됩니다. 연결에 사이노 점프 경로를 태그하면 광년 거리와 점프 가능한 클래스가 자동으로 표시됩니다."
       }
     },
     "corpFeatures": {

@@ -465,7 +465,8 @@
       "shareMap": "共享地图",
       "shortcuts": "快捷键",
       "notifications": "通知",
-      "announcer": "语音播报"
+      "announcer": "语音播报",
+      "jumpRange": "跳跃范围"
     },
     "snapToGrid": "对齐网格",
     "settings": "设置",
@@ -654,6 +655,18 @@
       "threshold": "“范围内”使用接近警报的阈值。",
       "experimental": "实验性功能",
       "delayNote": "语音可能会延迟最多 5 秒。首次运行会更久。"
+    },
+    "jumpRange": {
+      "stagingPlaceholder": "集结星系（低安/零安）…",
+      "searching": "搜索中…",
+      "pickHint": "在上方搜索一个集结星系，或右键点击地图上的星系并选择“从此处的跳跃范围”。",
+      "staging": "集结点",
+      "clear": "清除",
+      "calculating": "计算中…",
+      "noCoords": "此部署未加载跳跃范围所需的 3D 星系坐标。请在服务器上运行坐标回填（或重新运行 setup-db），然后重新加载。",
+      "inRange": "范围内 {{count}} 个星系",
+      "all": "全部",
+      "legend": "可到达："
     }
   },
   "customIntel": {
@@ -939,7 +952,9 @@
     "clearLabels": "清除",
     "labelNamed": "标签 {{name}}",
     "tag": "标记",
-    "clearTag": "清除标记"
+    "clearTag": "清除标记",
+    "jumpRangeFrom": "从此处的跳跃范围",
+    "jumpCyno": "Cyno 跳跃"
   },
   "panel": {
     "notes": "笔记",
@@ -1534,6 +1549,10 @@
       "chains": {
         "title": "已保存的虫洞链",
         "desc": "将地图上的任意路径保存为命名链 — 选择起点和终点系统，路线会连同跳数一起保存。悬停某条链可使其余部分变暗，只点亮它的系统和连接，可居中到任意一跳，并重新排序你的链。断裂的跳点会自行标记以便重新探测。"
+      },
+      "jumpRange": {
+        "title": "跳跃引擎范围",
+        "desc": "选择一个集结星系，高亮其跳跃范围内的所有低安/零安星系，并根据你的 Jump Drive Calibration 按舰船类别（Black Ops、Carrier、Super、JF）着色分级。在连接上标记 cyno 跳跃路线，自动标注光年距离及可执行跳跃的舰船类别。"
       }
     },
     "corpFeatures": {

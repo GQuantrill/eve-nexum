@@ -159,7 +159,7 @@ export interface NpcStation {
 // (warp to gate, jump); 'jumpgate' = player Ansiblex jump bridge. 'standard'
 // is kept (rather than renamed to 'wormhole') to avoid migrating every stored
 // row + call site — it remains the wormhole sentinel.
-export type ConnectionType = 'standard' | 'gate' | 'jumpgate';
+export type ConnectionType = 'standard' | 'gate' | 'jumpgate' | 'cyno';
 
 export interface MapConnection {
   id: string;

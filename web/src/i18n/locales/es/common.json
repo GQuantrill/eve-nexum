@@ -465,7 +465,8 @@
       "shareMap": "Compartir mapa",
       "shortcuts": "Atajos",
       "notifications": "Notificaciones",
-      "announcer": "Anuncios de voz"
+      "announcer": "Anuncios de voz",
+      "jumpRange": "Alcance de salto"
     },
     "snapToGrid": "Ajustar a la cuadrícula",
     "settings": "Ajustes",
@@ -654,6 +655,18 @@
       "threshold": "«Dentro del alcance» usa el umbral de las alertas de proximidad.",
       "experimental": "Función experimental",
       "delayNote": "La voz puede tardar hasta 5 segundos. La primera vez tarda más."
+    },
+    "jumpRange": {
+      "stagingPlaceholder": "Sistema de staging (low/null)…",
+      "searching": "Buscando…",
+      "pickHint": "Busca un sistema de staging arriba, o haz clic derecho en un sistema y elige «Alcance de salto desde aquí».",
+      "staging": "Staging",
+      "clear": "Borrar",
+      "calculating": "Calculando…",
+      "noCoords": "Esta instalación no tiene cargadas las coordenadas 3D de sistema que necesita el alcance de salto. Ejecuta el backfill de coordenadas en el servidor (o vuelve a ejecutar setup-db) y recarga.",
+      "inRange": "{{count}} sistemas al alcance",
+      "all": "Todos",
+      "legend": "Alcanzable por:"
     }
   },
   "customIntel": {
@@ -939,7 +952,9 @@
     "clearLabels": "Borrar",
     "labelNamed": "Etiqueta {{name}}",
     "tag": "Marca",
-    "clearTag": "Quitar marca"
+    "clearTag": "Quitar marca",
+    "jumpRangeFrom": "Alcance de salto desde aquí",
+    "jumpCyno": "Salto cyno"
   },
   "panel": {
     "notes": "Notas",
@@ -1534,6 +1549,10 @@
       "chains": {
         "title": "Cadenas de agujeros de gusano guardadas",
         "desc": "Guarda cualquier ruta de tu mapa como una cadena con nombre — elige un sistema de inicio y fin y la ruta se guarda con el número de saltos. Pasa el ratón sobre una cadena para atenuar todo lo demás e iluminar solo sus sistemas y conexiones, céntrate en cualquier salto y reordena tus cadenas. Los saltos rotos se marcan para volver a explorar."
+      },
+      "jumpRange": {
+        "title": "Alcance del motor de salto",
+        "desc": "Elige un sistema de staging y resalta cada sistema low/null dentro del alcance de salto, coloreado por clase de nave (Black Ops, Carrier, Super, JF) según tu Jump Drive Calibration. Etiqueta rutas de salto cyno en las conexiones, anotadas automáticamente con la distancia en años luz y qué clases pueden saltar."
       }
     },
     "corpFeatures": {

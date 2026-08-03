@@ -306,6 +306,80 @@ systemsRouter.get('/:id(\\d+)/nearby-lawless', async (req, res) => {
   }
 });
 
+// GET /api/systems/:id/jump-range?maxLy=N — every LS/NS k-space system within N
+// light-years of :id (star-to-star, the metric jump drives use), for the jump-
+// range overlay. Distance = 3D Euclidean over the SDE universe coords (metres)
+// / metres-per-ly. Only lowsec + nullsec (jump drives don't work to highsec, and
+// J-space/wormhole systems can't be jumped to). N clamped 0.1..20 (largest cap
+// range at max skills is ~10 ly, so 20 is generous headroom). Ordered nearest-first.
+const METRES_PER_LY = 9.4607e15;
+systemsRouter.get('/:id(\\d+)/jump-range', async (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  const maxLy = Math.max(0.1, Math.min(20, parseFloat(String(req.query.maxLy ?? '10')) || 10));
+  try {
+    // 3D coords come from the SDE (setup-db) or scripts/backfill-coords.ts. On a
+    // deployment seeded before that, they're NULL — report it distinctly instead
+    // of returning a misleading empty result, so the UI can prompt a backfill.
+    const origin = await db.query<{ pos_x: number | null }>(
+      'SELECT pos_x FROM solar_systems WHERE id = $1', [id],
+    );
+    if (!origin.rows[0] || origin.rows[0].pos_x == null) {
+      return res.json({ hasCoords: false, systems: [] });
+    }
+    const { rows } = await db.query<{
+      id: number; name: string; system_class: string; security: string; region_name: string | null; ly: string;
+    }>(
+      `WITH o AS (SELECT pos_x, pos_y, pos_z FROM solar_systems WHERE id = $1)
+       SELECT s.id, s.name, s.class AS system_class, s.security::text AS security,
+              r.name AS region_name,
+              (sqrt(power(s.pos_x - o.pos_x, 2) + power(s.pos_y - o.pos_y, 2) + power(s.pos_z - o.pos_z, 2)) / $3)::text AS ly
+         FROM solar_systems s
+         CROSS JOIN o
+         LEFT JOIN map_regions r ON r.id = s.region_id
+        WHERE s.id <> $1
+          AND s.class IN ('LS','NS')
+          AND s.pos_x IS NOT NULL AND o.pos_x IS NOT NULL
+          AND sqrt(power(s.pos_x - o.pos_x, 2) + power(s.pos_y - o.pos_y, 2) + power(s.pos_z - o.pos_z, 2)) / $3 <= $2
+        ORDER BY ly`,
+      [id, maxLy, METRES_PER_LY],
+    );
+    return res.json({
+      hasCoords: true,
+      systems: rows.map((r) => ({
+        eveSystemId: r.id,
+        name: r.name,
+        systemClass: r.system_class,
+        security: Number(r.security),
+        regionName: r.region_name ?? null,
+        ly: Number(r.ly),
+      })),
+    });
+  } catch (err) {
+    log.error('jump-range query failed:', err);
+    return res.status(500).json({ error: 'Database query failed' });
+  }
+});
+
+// GET /api/systems/:id/distance?to=N — light-years between two systems (star-to-
+// star), for annotating a tagged cyno-jump connection. Null if either lacks coords.
+systemsRouter.get('/:id(\\d+)/distance', async (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  const to = parseInt(String(req.query.to ?? ''), 10);
+  if (!to || to === id) return res.json({ ly: null });
+  try {
+    const { rows } = await db.query<{ ly: string | null }>(
+      `SELECT (sqrt(power(a.pos_x - b.pos_x, 2) + power(a.pos_y - b.pos_y, 2) + power(a.pos_z - b.pos_z, 2)) / $3)::text AS ly
+         FROM solar_systems a, solar_systems b
+        WHERE a.id = $1 AND b.id = $2 AND a.pos_x IS NOT NULL AND b.pos_x IS NOT NULL`,
+      [id, to, METRES_PER_LY],
+    );
+    return res.json({ ly: rows[0]?.ly != null ? Number(rows[0].ly) : null });
+  } catch (err) {
+    log.error('distance query failed:', err);
+    return res.status(500).json({ error: 'Database query failed' });
+  }
+});
+
 // GET /api/systems/:id/celestials — static celestial metadata for the panel
 // (security, constellation, sun type, planet/moon/belt/gate counts). DB-first;
 // live-ESI fallback (cached) only for systems not yet filled by a re-seed.

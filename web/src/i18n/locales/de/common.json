@@ -465,7 +465,8 @@
       "shareMap": "Karte teilen",
       "shortcuts": "Tastenkürzel",
       "notifications": "Benachrichtigungen",
-      "announcer": "Sprachansage"
+      "announcer": "Sprachansage",
+      "jumpRange": "Sprungreichweite"
     },
     "snapToGrid": "Am Raster ausrichten",
     "settings": "Einstellungen",
@@ -654,6 +655,18 @@
       "threshold": "„In Reichweite“ nutzt den Schwellenwert der Näherungswarnungen.",
       "experimental": "Experimentelle Funktion",
       "delayNote": "Die Stimme kann sich um bis zu 5 Sekunden verzögern. Der erste Durchlauf dauert länger."
+    },
+    "jumpRange": {
+      "stagingPlaceholder": "Staging-System (Low/Null)…",
+      "searching": "Suche…",
+      "pickHint": "Suche oben ein Staging-System oder klicke mit der rechten Maustaste auf ein System und wähle „Sprungreichweite von hier“.",
+      "staging": "Staging",
+      "clear": "Löschen",
+      "calculating": "Berechne…",
+      "noCoords": "Dieser Installation fehlen die für die Sprungreichweite nötigen 3D-Systemkoordinaten. Führe den Koordinaten-Backfill auf dem Server aus (oder setup-db erneut) und lade dann neu.",
+      "inRange": "{{count}} Systeme in Reichweite",
+      "all": "Alle",
+      "legend": "Erreichbar mit:"
     }
   },
   "customIntel": {
@@ -939,7 +952,9 @@
     "clearLabels": "Löschen",
     "labelNamed": "Label {{name}}",
     "tag": "Tag",
-    "clearTag": "Tag entfernen"
+    "clearTag": "Tag entfernen",
+    "jumpRangeFrom": "Sprungreichweite von hier",
+    "jumpCyno": "Cyno-Sprung"
   },
   "panel": {
     "notes": "Notizen",
@@ -1534,6 +1549,10 @@
       "chains": {
         "title": "Gespeicherte Wurmloch-Ketten",
         "desc": "Speichere jeden Pfad durch deine Karte als benannte Kette — wähle Start- und Zielsystem, und die Route wird mit Sprunganzahl gesichert. Fahre über eine Kette, um alles andere abzudunkeln und nur ihre Systeme und Verbindungen hervorzuheben, zentriere auf einen Sprung und ordne deine Ketten neu. Defekte Sprünge melden sich selbst zum erneuten Scouten."
+      },
+      "jumpRange": {
+        "title": "Sprungantriebs-Reichweite",
+        "desc": "Wähle ein Staging-System und markiere jedes Low-/Null-System in Sprungreichweite, nach Schiffsklasse (Black Ops, Carrier, Super, JF) bei deiner Jump Drive Calibration farblich gestaffelt. Markiere Cyno-Sprungrouten an Verbindungen — automatisch mit Lichtjahr-Distanz und den passenden Klassen beschriftet."
       }
     },
     "corpFeatures": {

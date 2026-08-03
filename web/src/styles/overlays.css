@@ -319,3 +319,14 @@
   padding: 1px 4px;
 }
 
+/* Cyno-jump label ("CJ") — palette-aware via --cv-conn-cyno. */
+.connection-label__cyno {
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 700;
+  color: var(--cv-conn-cyno);
+  background: color-mix(in srgb, var(--cv-conn-cyno) 16%, var(--surface-sunken));
+  border: 1px solid color-mix(in srgb, var(--cv-conn-cyno) 45%, var(--surface-sunken));
+  border-radius: 3px;
+  padding: 1px 4px;
+}
+

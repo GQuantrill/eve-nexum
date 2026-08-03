@@ -522,7 +522,8 @@
       "liveSharing": "Live Map Broadcast",
       "shareMap": "Share Map",
       "shortcuts": "Shortcuts",
-      "announcer": "Announcer"
+      "announcer": "Announcer",
+      "jumpRange": "Jump Range"
     },
     "snapToGrid": "Snap to Grid",
     "settings": "Settings",
@@ -711,6 +712,18 @@
       "threshold": "\"In range\" uses the Proximity Alerts threshold.",
       "experimental": "Experimental Feature",
       "delayNote": "Voice may be delayed by up to 5 seconds. The first run takes longer."
+    },
+    "jumpRange": {
+      "stagingPlaceholder": "Staging system (low/null)…",
+      "searching": "Searching…",
+      "pickHint": "Search a staging system above, or right-click a system on the map and choose “Jump range from here”.",
+      "staging": "Staging",
+      "clear": "Clear",
+      "calculating": "Calculating…",
+      "noCoords": "This deployment doesn't have 3D system coordinates loaded, which jump range needs. Run the coordinate backfill on the server (or re-run setup-db), then reload.",
+      "inRange": "{{count}} systems in range",
+      "all": "All",
+      "legend": "Reachable by:"
     }
   },
   "customIntel": {
@@ -1009,7 +1022,9 @@
     "noHomeSet": "No home system set. Right-click a system → \"Set as home\".",
     "failSetDest": "Failed to set destination",
     "failAddWaypoint": "Failed to add waypoint",
-    "canvasHint": "Right-click canvas to add system · Drag between handles to connect · Shift+click or drag to multi-select · Right click system to interact"
+    "canvasHint": "Right-click canvas to add system · Drag between handles to connect · Shift+click or drag to multi-select · Right click system to interact",
+    "jumpRangeFrom": "Jump range from here",
+    "jumpCyno": "Cyno Jump"
   },
   "panel": {
     "notes": "Notes",
@@ -1604,6 +1619,10 @@
       "chains": {
         "title": "Saved wormhole chains",
         "desc": "Record any path through your map as a named chain — pick a start and end system and the route is saved with its hop count. Hover a chain to dim everything off it and light up just its systems and connections, centre on any hop, and reorder your saved chains. Broken hops flag themselves for a re-scout."
+      },
+      "jumpRange": {
+        "title": "Jump-drive range",
+        "desc": "Pick a staging system and highlight every low/null system within jump range of it, colour-banded by ship class (Black Ops, Carrier, Super, JF) at your Jump Drive Calibration. Tag cyno-jump routes on connections, auto-annotated with the light-year distance and which classes can make the jump."
       }
     },
     "corpFeatures": {
