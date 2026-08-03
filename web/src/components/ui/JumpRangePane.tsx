@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { useJumpRangeStore } from '../../store/jumpRangeStore';
 import { useJumpRange, useJdcLevel } from '../../hooks/useJumpRange';
 import { JUMP_CLASSES, jumpRange } from '../../data/jumpDrives';
+import { useEsiSearch, systemResultLabel } from '../../hooks/useEsiSearch';
 
 // PROTOTYPE Jump Range overlay panel. Pick a staging system (right-click a system
 // -> "Jump range from here"), set your JDC skill, and see every low/null system
@@ -18,17 +20,18 @@ export function JumpRangePane() {
   const filterRange = filter ? jumpRange(JUMP_CLASSES.find((c) => c.key === filter)!.base, jdc) : Infinity;
   const shown = targets.filter((t) => t.ly <= filterRange);
 
-  if (stagingId == null) {
-    return (
-      <div className="map-sidebar__hint">
-        Right-click a system on the map and choose <strong>“Jump range from here”</strong> to
-        see every low/null system within jump range of it.
-      </div>
-    );
-  }
-
   return (
     <>
+      <StagingPicker onPick={(id, name) => setStaging(id, name)} />
+
+      {stagingId == null && (
+        <div className="map-sidebar__hint">
+          Search a staging system above, or right-click a system on the map and choose
+          <strong> “Jump range from here”</strong>.
+        </div>
+      )}
+
+      {stagingId != null && (<>
       <div className="map-sidebar__row" style={{ justifyContent: 'space-between' }}>
         <span className="map-sidebar__label">Staging: <strong>{stagingName ?? stagingId}</strong></span>
         <button type="button" className="toolbar__toggle" onClick={() => setStaging(null)}>Clear</button>
@@ -87,7 +90,47 @@ export function JumpRangePane() {
           })}
         </div>
       )}
+      </>)}
     </>
+  );
+}
+
+// Search any low/null EVE system by name (on-map or not) to use as the staging point.
+function StagingPicker({ onPick }: { onPick: (id: number, name: string) => void }) {
+  const [query, setQuery] = useState('');
+  const { results, loading } = useEsiSearch(query);
+  const kspace = results.filter((r) => r.systemClass === 'LS' || r.systemClass === 'NS');
+  const show = query.trim().length >= 2 && (kspace.length > 0 || loading);
+  return (
+    <div style={{ position: 'relative', marginBottom: 4 }}>
+      <input
+        className="chains-new__name"
+        style={{ width: '100%' }}
+        type="text"
+        value={query}
+        placeholder="Staging system (low/null)…"
+        onChange={(e) => setQuery(e.target.value)}
+      />
+      {show && (
+        <div style={{
+          position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 20, maxHeight: 220,
+          overflowY: 'auto', background: 'var(--bg-elevated, #161b22)', border: '1px solid #30363d', borderRadius: 6,
+        }}>
+          {loading && <div className="map-sidebar__hint" style={{ padding: '6px 8px' }}>Searching…</div>}
+          {kspace.map((r) => (
+            <button
+              key={r.id}
+              type="button"
+              onClick={() => { onPick(r.id, r.name); setQuery(''); }}
+              style={{
+                display: 'block', width: '100%', textAlign: 'left', padding: '5px 8px',
+                background: 'transparent', border: 'none', color: 'inherit', cursor: 'pointer', fontSize: 13,
+              }}
+            >{systemResultLabel(r)}</button>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 
