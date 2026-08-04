@@ -11,26 +11,29 @@ export interface JumpClass {
   fuelPerLy: number;  // base isotopes/ly at JFC 0 (estimateFuel applies the JFC cut)
 }
 
-// Colours are the Wong colour-blind-safe quartet (sky-blue / reddish-purple /
-// bluish-green / orange) so the range tiers stay distinguishable across vision
-// types without needing per-palette CSS vars.
+// Colours are from the Wong colour-blind-safe palette (sky-blue / yellow /
+// reddish-purple / bluish-green / orange) so the range tiers stay distinguishable
+// across vision types without needing per-palette CSS vars.
 export const JUMP_CLASSES: JumpClass[] = [
-  // blops measured in-game (Panther: 2592 iso / 7.407 ly = 350/ly, JFC 0). The
-  // rest are still estimates — replace with in-game readings when available.
-  { key: 'jf',      label: 'Jump Freighter / Rorqual', base: 5.0, color: '#56b4e9', fuelPerLy: 1000 },
-  { key: 'blops',   label: 'Black Ops',                base: 4.0, color: '#cc79a7', fuelPerLy: 350 },
-  { key: 'carrier', label: 'Carrier / Dread / FAX',    base: 3.5, color: '#009e73', fuelPerLy: 1000 },
-  { key: 'super',   label: 'Super / Titan',            base: 3.0, color: '#e69f00', fuelPerLy: 2500 },
+  // fuelPerLy measured in-game at JFC 0 (single ~7.4 ly jumps): JF 4700,
+  // Rorqual 4000, Blops 700, Carrier/Dread/FAX 3000, Super/Titan 3000. JF and
+  // Rorqual share max range (10 ly) but differ in fuel, and only the JF gets the
+  // Jump Freighters skill cut, so they are separate classes.
+  { key: 'jf',      label: 'Jump Freighter',           base: 5.0, color: '#56b4e9', fuelPerLy: 4700 },
+  { key: 'rorqual', label: 'Rorqual',                  base: 5.0, color: '#f0e442', fuelPerLy: 4000 },
+  { key: 'blops',   label: 'Black Ops',                base: 4.0, color: '#cc79a7', fuelPerLy: 700 },
+  { key: 'carrier', label: 'Carrier / Dread / FAX',    base: 3.5, color: '#009e73', fuelPerLy: 3000 },
+  { key: 'super',   label: 'Super / Titan',            base: 3.0, color: '#e69f00', fuelPerLy: 3000 },
 ];
 
 /** Effective max jump range (ly) for a base range at a given JDC skill level. */
 export const jumpRange = (base: number, jdc: number): number => base * (1 + 0.2 * jdc);
 
 /**
- * APPROXIMATE isotopes for a route of `totalLy` light-years. Jump Fuel
- * Conservation cuts consumption 10%/level; the Jump Freighters skill cuts it a
- * further 10%/level for jump freighters only. Rough — for planning, not the exact
- * fitting-tool number.
+ * Isotopes for a route of `totalLy` light-years, from the measured JFC-0 base
+ * per class. Jump Fuel Conservation cuts consumption 10%/level; the Jump
+ * Freighters skill cuts it a further 10%/level for jump freighters only. Close
+ * to in-game, but per-class (individual hulls vary slightly) and fuel-type-blind.
  */
 export function estimateFuel(totalLy: number, classKey: string, jfc: number, jumpFreighters: number): number {
   const c = JUMP_CLASSES.find((x) => x.key === classKey);
