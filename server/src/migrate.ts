@@ -927,6 +927,21 @@ export async function migrate() {
       created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
     CREATE INDEX IF NOT EXISTS idx_jump_plans_owner ON jump_plans (owner_id);
+
+    -- Corp structures pulled from ESI (esi-corporations.read_structures.v1),
+    -- scoped by corporation. Populated by a role-holding member's refresh; any
+    -- corp member can read them (e.g. as jump-planner endpoints). The full set
+    -- for a corp is replaced on each sync, so stale structures drop out.
+    CREATE TABLE IF NOT EXISTS structures (
+      structure_id    BIGINT      PRIMARY KEY,
+      corporation_id  INTEGER     NOT NULL,
+      name            TEXT        NOT NULL DEFAULT '',
+      solar_system_id INTEGER,
+      type_id         INTEGER,
+      type_name       TEXT        NOT NULL DEFAULT '',
+      updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+    CREATE INDEX IF NOT EXISTS idx_structures_corp ON structures (corporation_id);
   `);
 
   await encryptLegacyTokens();

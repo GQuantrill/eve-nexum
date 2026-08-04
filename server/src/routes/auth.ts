@@ -25,6 +25,7 @@ const SSO_SCOPES = [
   'esi-location.read_location.v1',
   'esi-location.read_ship_type.v1',
   'esi-universe.read_structures.v1',
+  'esi-corporations.read_structures.v1',
   'esi-corporations.read_corporation_membership.v1',
   'esi-ui.open_window.v1',
   'esi-ui.write_waypoint.v1',
