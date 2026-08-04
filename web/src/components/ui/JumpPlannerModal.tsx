@@ -72,17 +72,26 @@ export function JumpPlannerModal({ onClose }: { onClose: () => void }) {
           <button className="icon-btn" onClick={onClose} title="Close"><XIcon size={14} weight="bold" /></button>
         </div>
         <div className="modal__body" style={{ display: 'flex', flexDirection: 'column', gap: 12, overflowY: 'auto' }}>
-          {plans.length > 0 && (
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center' }}>
-              <span style={{ fontSize: 12, color: 'var(--text-subtle)' }}>Saved:</span>
-              {plans.map((p) => (
-                <span key={p.id} style={{ display: 'inline-flex', alignItems: 'center', gap: 2, border: '1px solid #30363d', borderRadius: 12, padding: '1px 3px 1px 9px', fontSize: 12 }}>
-                  <button type="button" onClick={() => loadPlan(p)} style={{ background: 'transparent', border: 'none', color: 'inherit', cursor: 'pointer', fontSize: 12 }}>{p.name}</button>
-                  <button type="button" onClick={() => deletePlan(p.id)} className="icon-btn" title="Delete"><XIcon size={11} /></button>
-                </span>
-              ))}
-            </div>
-          )}
+          <div>
+            <div style={{ fontSize: 12, color: 'var(--text-subtle)', marginBottom: 4 }}>Saved plans (click to load)</div>
+            {plans.length === 0 ? (
+              <div className="map-sidebar__hint" style={{ margin: 0 }}>None yet — plan a route, type a name in the box below, and hit Save.</div>
+            ) : (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                {plans.map((p) => (
+                  <span key={p.id} style={{ display: 'inline-flex', alignItems: 'stretch', border: '1px solid #30363d', borderRadius: 6, overflow: 'hidden' }}>
+                    <button type="button" onClick={() => loadPlan(p)} title="Load this plan"
+                      style={{ background: 'var(--surface-panel, #1c2333)', border: 'none', color: 'inherit', cursor: 'pointer', fontSize: 12, padding: '5px 9px' }}>
+                      <strong>{p.name}</strong>{'  '}
+                      <span style={{ color: 'var(--text-faint)' }}>{p.fromName ?? p.fromEveId} → {p.toName ?? p.toEveId}</span>
+                    </button>
+                    <button type="button" onClick={() => deletePlan(p.id)} className="icon-btn" title="Delete plan"
+                      style={{ padding: '0 7px', borderLeft: '1px solid #30363d' }}><XIcon size={11} /></button>
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             <Field label="From (low/null)" value={from} onPick={setFrom} />
             <Field label="To (low/null)"   value={to}   onPick={setTo} />
