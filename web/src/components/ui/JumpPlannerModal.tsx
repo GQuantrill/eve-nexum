@@ -165,7 +165,9 @@ function RouteMap({ hops }: { hops: RouteHop[] }) {
   const scale = Math.min((W - 2 * PAD) / spanX, (H - 2 * PAD) / spanY);
   const ox = (W - spanX * scale) / 2, oy = (H - spanY * scale) / 2;
   const sx = (x: number) => ox + (x - minX) * scale;
-  const sy = (y: number) => oy + (y - minY) * scale;   // pos2d y is screen-down already
+  // Flip Y: CCP's 2D projection grows northward, SVG grows downward — without
+  // this the map renders upside-down (a northern destination appears south).
+  const sy = (y: number) => oy + (maxY - y) * scale;
   const pts = hops.map((h) => ({ x: sx(h.x), y: sy(h.y), h }));
   return (
     <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 300, background: '#0d1117', borderRadius: 6 }}>
