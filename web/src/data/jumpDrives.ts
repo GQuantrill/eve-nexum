@@ -8,15 +8,17 @@ export interface JumpClass {
   label:    string;
   base:     number;   // max range (ly) at JDC 0
   color:    string;
-  fuelPerLy: number;  // APPROXIMATE isotopes consumed per light-year (verify vs EVE)
+  fuelPerLy: number;  // base isotopes/ly at JFC 0 (estimateFuel applies the JFC cut)
 }
 
 // Colours are the Wong colour-blind-safe quartet (sky-blue / reddish-purple /
 // bluish-green / orange) so the range tiers stay distinguishable across vision
 // types without needing per-palette CSS vars.
 export const JUMP_CLASSES: JumpClass[] = [
+  // blops measured in-game (Panther: 2592 iso / 7.407 ly = 350/ly, JFC 0). The
+  // rest are still estimates — replace with in-game readings when available.
   { key: 'jf',      label: 'Jump Freighter / Rorqual', base: 5.0, color: '#56b4e9', fuelPerLy: 1000 },
-  { key: 'blops',   label: 'Black Ops',                base: 4.0, color: '#cc79a7', fuelPerLy: 450 },
+  { key: 'blops',   label: 'Black Ops',                base: 4.0, color: '#cc79a7', fuelPerLy: 350 },
   { key: 'carrier', label: 'Carrier / Dread / FAX',    base: 3.5, color: '#009e73', fuelPerLy: 1000 },
   { key: 'super',   label: 'Super / Titan',            base: 3.0, color: '#e69f00', fuelPerLy: 2500 },
 ];
