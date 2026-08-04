@@ -927,6 +927,10 @@ export async function migrate() {
       created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
     CREATE INDEX IF NOT EXISTS idx_jump_plans_owner ON jump_plans (owner_id);
+    -- Persist the routing controls with a saved plan (added after the table).
+    ALTER TABLE jump_plans ADD COLUMN IF NOT EXISTS avoid_system_ids    INTEGER[] NOT NULL DEFAULT '{}';
+    ALTER TABLE jump_plans ADD COLUMN IF NOT EXISTS waypoint_system_ids INTEGER[] NOT NULL DEFAULT '{}';
+    ALTER TABLE jump_plans ADD COLUMN IF NOT EXISTS prefer_level        TEXT      NOT NULL DEFAULT 'off';
 
     -- Corp structures pulled from ESI (esi-corporations.read_structures.v1),
     -- scoped by corporation. Populated by a role-holding member's refresh; any

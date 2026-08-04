@@ -16,7 +16,7 @@ import { dockState } from '../../data/dockingRules';
 // EVE skill names, ship-class labels and "ly" stay English; the rest is i18n'd.
 interface RouteHop { eveSystemId: number; name: string; systemClass: string; lyFromPrev: number; x: number; y: number }
 interface RouteResp { hasCoords: boolean; route: { hops: RouteHop[]; jumps: number; totalLy: number } | null }
-interface SavedPlan { id: string; name: string; fromEveId: number; toEveId: number; fromName: string | null; toName: string | null; shipClass: string; objective: 'hops' | 'fuel' }
+interface SavedPlan { id: string; name: string; fromEveId: number; toEveId: number; fromName: string | null; toName: string | null; shipClass: string; objective: 'hops' | 'fuel'; avoid: { id: number; name: string }[]; waypoints: { id: number; name: string }[]; preferLevel: string }
 interface CorpStructure { key: string; name: string; typeName: string; solarSystemId: number | null; systemName: string | null; systemClass: string | null; source: 'corp' | 'map' }
 type Picked = { id: number; name: string; structureType?: string | null } | null;
 
@@ -58,13 +58,18 @@ export function JumpPlannerModal({ onClose }: { onClose: () => void }) {
   };
   const savePlan = async () => {
     if (!from || !to || !saveName.trim()) return;
-    await api('/api/jump-plans', { method: 'POST', body: JSON.stringify({ name: saveName.trim(), fromEveId: from.id, toEveId: to.id, shipClass, objective }) }).catch(() => {});
+    await api('/api/jump-plans', { method: 'POST', body: JSON.stringify({
+      name: saveName.trim(), fromEveId: from.id, toEveId: to.id, shipClass, objective,
+      avoid: avoid.map((a) => a.id), waypoints: waypoints.map((w) => w.id), preferLevel,
+    }) }).catch(() => {});
     setSaveName(''); refreshPlans();
   };
   const loadPlan = (p: SavedPlan) => {
     setFrom({ id: p.fromEveId, name: p.fromName ?? String(p.fromEveId) });
     setTo({ id: p.toEveId, name: p.toName ?? String(p.toEveId) });
-    setShipClass(p.shipClass); setObjective(p.objective); setResult(null); setError(null);
+    setShipClass(p.shipClass); setObjective(p.objective);
+    setAvoid(p.avoid ?? []); setWaypoints(p.waypoints ?? []); setPreferLevel(p.preferLevel ?? 'off');
+    setResult(null); setError(null);
   };
   const deletePlan = async (id: string) => { await api(`/api/jump-plans/${id}`, { method: 'DELETE' }).catch(() => {}); refreshPlans(); };
   const moveWaypoint = (i: number, dir: -1 | 1) => setWaypoints((w) => {
