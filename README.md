@@ -352,6 +352,7 @@ When registering your application at [developers.eveonline.com](https://develope
 | `esi-ui.open_window.v1` | Open windows in the EVE client |
 | `esi-ui.write_waypoint.v1` | Set destinations and add waypoints |
 | `esi-universe.read_structures.v1` | Read player-owned structure info |
+| `esi-corporations.read_structures.v1` | List the **corporation's** Upwell structures for use as jump-planner endpoints. Only succeeds for a character with the in-game **Station Manager** or **Director** role; the sync no-ops for anyone else. Any corp member can then read the structures a role-holder pulled. |
 | `esi-corporations.read_corporation_membership.v1` | Read corporation member list |
 | `esi-characters.read_corporation_roles.v1` | Read character's corporation roles |
 | `esi-characters.read_contacts.v1` | Read the character's personal contact list (standings) — used to colour-tag hostile / friendly entities in the Standings card, Killboard, Sov holder, and map node halos. |
