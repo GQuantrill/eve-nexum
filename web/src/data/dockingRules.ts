@@ -1,46 +1,55 @@
-// Upwell structure docking rules for the jump planner. A ship can dock when its
-// category (subcap / capital / supercapital) is within the structure's maximum.
-// Black Ops are battleships, so they dock anywhere a subcap can. Regular capitals
-// need a Large+ structure; supers/titans dock ONLY at an XL citadel (Keepstar) —
-// not XL engineering (Sotiyo).
+// Upwell structure docking rules for the jump planner, from the in-game docking
+// matrix. Three states per (ship, structure): DOCK (can dock), TETHER (can get
+// under the shield but not dock), UNDOCK (can leave but not dock/tether). Only
+// DOCK lets a ship use the structure as a real endpoint; TETHER is a softer
+// "you can arrive safe but not dock" and UNDOCK is a hard no.
 //
-// VERIFY THESE against EVE before relying on them (same footing as the fuel
-// numbers) — the structure -> max-category table is the bit most likely to drift.
-export type DockCategory = 'subcap' | 'capital' | 'supercapital';
-const ORDER: Record<DockCategory, number> = { subcap: 0, capital: 1, supercapital: 2 };
+// It is NOT purely size-based — Azbel (L engineering), Tatara (L refinery) and
+// Fortizar (L citadel) differ for the same ship — so it's a full matrix.
+export type DockState = 'dock' | 'tether' | 'undock';
 
-// JUMP_CLASSES key -> the category that has to dock.
-const SHIP_CATEGORY: Record<string, DockCategory> = {
-  blops: 'subcap',        // Black Ops is a battleship, not a capital
-  jf: 'capital',
-  rorqual: 'capital',
-  carrier: 'capital',     // Carrier / Dread / FAX
-  super: 'supercapital',  // Super / Titan
+// Structure columns in the matrix. Medium groups Astrahus/Raitaru/Athanor.
+type StructCol = 'medium' | 'azbel' | 'tatara' | 'fortizar' | 'sotiyo' | 'keepstar';
+// Ship rows. Black Ops is a battleship, so it docks everywhere like a freighter.
+type ShipRow = 'freighter' | 'rorqual' | 'capital' | 'super';
+
+// SDE structure type name -> matrix column.
+const STRUCTURE_COLUMN: Record<string, StructCol> = {
+  Astrahus: 'medium', Raitaru: 'medium', Athanor: 'medium',
+  Azbel: 'azbel',
+  Tatara: 'tatara',
+  Fortizar: 'fortizar',
+  "'Moreau' Fortizar": 'fortizar', "'Draccous' Fortizar": 'fortizar',
+  "'Horizon' Fortizar": 'fortizar', "'Prometheus' Fortizar": 'fortizar',
+  Sotiyo: 'sotiyo',
+  Keepstar: 'keepstar',
 };
 
-// Structure type name (from the SDE) -> the highest category it can dock.
-const STRUCTURE_MAX: Record<string, DockCategory> = {
-  // Medium — subcaps (and Black Ops) only
-  Astrahus: 'subcap', Raitaru: 'subcap', Athanor: 'subcap',
-  // Large — capitals
-  Fortizar: 'capital', Azbel: 'capital', Tatara: 'capital',
-  "'Moreau' Fortizar": 'capital', "'Draccous' Fortizar": 'capital',
-  "'Horizon' Fortizar": 'capital', "'Prometheus' Fortizar": 'capital',
-  // XL citadel — supers / titans
-  Keepstar: 'supercapital',
-  // XL engineering — capitals, but NOT supers / titans
-  Sotiyo: 'capital',
+// JUMP_CLASSES key -> matrix row.
+const SHIP_ROW: Record<string, ShipRow> = {
+  blops: 'freighter',    // Black Ops battleship — docks anywhere a subcap can
+  jf: 'freighter',       // Freighters / Jump Freighters
+  rorqual: 'rorqual',
+  carrier: 'capital',    // Dreadnoughts / Carriers / FAX / Lancers
+  super: 'super',        // Supercarriers / Titans
+};
+
+const MATRIX: Record<ShipRow, Record<StructCol, DockState>> = {
+  freighter: { medium: 'dock',   azbel: 'dock',   tatara: 'dock',   fortizar: 'dock',   sotiyo: 'dock',   keepstar: 'dock' },
+  rorqual:   { medium: 'tether', azbel: 'undock', tatara: 'dock',   fortizar: 'dock',   sotiyo: 'dock',   keepstar: 'dock' },
+  capital:   { medium: 'tether', azbel: 'undock', tatara: 'tether', fortizar: 'dock',   sotiyo: 'dock',   keepstar: 'dock' },
+  super:     { medium: 'tether', azbel: 'tether', tatara: 'tether', fortizar: 'tether', sotiyo: 'undock', keepstar: 'dock' },
 };
 
 /**
- * Can `shipClass` dock at a structure of `structureType`? Returns null when the
- * type is unknown (e.g. a map-tagged structure with no resolved type) — the
- * caller should stay silent rather than warn on a guess.
+ * Docking state for `shipClass` at a structure of `structureType`, or null when
+ * the type is unknown (e.g. a map-tagged structure with no resolved type) — the
+ * caller should stay silent rather than guess.
  */
-export function canDock(shipClass: string, structureType: string | null | undefined): boolean | null {
+export function dockState(shipClass: string, structureType: string | null | undefined): DockState | null {
   if (!structureType) return null;
-  const max = STRUCTURE_MAX[structureType];
-  if (max == null) return null;
-  const need = SHIP_CATEGORY[shipClass] ?? 'capital';
-  return ORDER[need] <= ORDER[max];
+  const col = STRUCTURE_COLUMN[structureType];
+  if (!col) return null;
+  const row = SHIP_ROW[shipClass] ?? 'capital';
+  return MATRIX[row][col];
 }

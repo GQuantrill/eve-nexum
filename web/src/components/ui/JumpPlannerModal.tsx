@@ -8,7 +8,7 @@ import { useEsiSearch, systemResultLabel } from '../../hooks/useEsiSearch';
 import { useJdcLevel } from '../../hooks/useJumpRange';
 import { useUserSetting } from '../../hooks/useUserSetting';
 import { JUMP_CLASSES, jumpRange, estimateFuel } from '../../data/jumpDrives';
-import { canDock } from '../../data/dockingRules';
+import { dockState } from '../../data/dockingRules';
 
 // Jump Planner. Pick source/dest, a ship class + skills (JDC / Jump Fuel
 // Conservation / Jump Freighters) and an objective (fewest jumps or least fuel),
@@ -70,10 +70,17 @@ export function JumpPlannerModal({ onClose }: { onClose: () => void }) {
   const isJf = shipClass === 'jf';
 
   // Docking check for structure endpoints (informational — never blocks routing).
-  // null means unknown structure type, so we stay silent rather than warn.
+  // undock = hard "can't dock", tether = softer "can arrive safe but not dock";
+  // unknown structure type stays silent.
   const dockWarn = ([from, to] as Picked[])
-    .filter((p): p is NonNullable<Picked> => !!p?.structureType && canDock(shipClass, p.structureType) === false)
-    .map((p) => `${cls.label} can't dock at ${p.name} (${p.structureType}).`);
+    .map((p) => {
+      if (!p?.structureType) return null;
+      const st = dockState(shipClass, p.structureType);
+      if (st === 'undock') return { bad: true,  msg: `${cls.label} can't dock at ${p.name} (${p.structureType}).` };
+      if (st === 'tether') return { bad: false, msg: `${cls.label} can only tether at ${p.name} (${p.structureType}), not dock.` };
+      return null;
+    })
+    .filter((w): w is { bad: boolean; msg: string } => w !== null);
 
   const plan = async () => {
     if (!from || !to) return;
@@ -160,7 +167,7 @@ export function JumpPlannerModal({ onClose }: { onClose: () => void }) {
 
           {error && <div style={{ color: 'var(--cv-conn-expired)', fontSize: 13 }}>{error}</div>}
           {dockWarn.map((w) => (
-            <div key={w} style={{ color: 'var(--cv-conn-eol, #e69f00)', fontSize: 13 }}>⚠ {w}</div>
+            <div key={w.msg} style={{ color: w.bad ? 'var(--cv-conn-expired)' : 'var(--cv-conn-eol, #e69f00)', fontSize: 13 }}>⚠ {w.msg}</div>
           ))}
 
           {result?.route && (
