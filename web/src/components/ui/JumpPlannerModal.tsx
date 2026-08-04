@@ -248,8 +248,8 @@ function RouteMap({ hops }: { hops: RouteHop[] }) {
     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>{dot(color)} {label}</span>
   );
   return (
-    <div>
-      <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 300, background: '#0d1117', borderRadius: 6 }}>
+    <div style={{ position: 'relative' }}>
+      <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 300, background: '#0d1117', borderRadius: 6, display: 'block' }}>
         <polyline points={pts.map((p) => `${p.x},${p.y}`).join(' ')} fill="none" stroke="#56b4e9" strokeWidth={2} opacity={0.85} />
         {pts.map((p, i) => {
           const first = i === 0, last = i === pts.length - 1;
@@ -264,7 +264,7 @@ function RouteMap({ hops }: { hops: RouteHop[] }) {
           );
         })}
       </svg>
-      <div style={{ display: 'flex', gap: 16, marginTop: 6, fontSize: 12, color: 'var(--text-subtle)', alignItems: 'center' }}>
+      <div style={{ position: 'absolute', top: 8, right: 10, display: 'flex', flexDirection: 'column', gap: 4, fontSize: 12, color: 'var(--text-subtle)', background: 'rgba(13,17,23,0.7)', padding: '5px 8px', borderRadius: 5 }}>
         {legendItem('#3ddc84', t('jumpPlanner.legendOrigin'))}
         {pts.length > 2 && legendItem('#161b22', t('jumpPlanner.legendHop'))}
         {legendItem('#e69f00', t('jumpPlanner.legendDest'))}
