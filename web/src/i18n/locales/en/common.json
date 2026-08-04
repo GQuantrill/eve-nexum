@@ -1854,5 +1854,30 @@
     "unknown": "Unknown",
     "unknownShip": "Unknown ship",
     "ago": "{{d}} ago"
+  },
+  "jumpPlanner": {
+    "title": "Jump Planner",
+    "close": "Close",
+    "savedHdr": "Saved plans (click to load)",
+    "savedEmpty": "None yet — plan a route, type a name in the box below, and hit Save.",
+    "from": "From (low/null)",
+    "to": "To (low/null)",
+    "ship": "Ship",
+    "range": "Range",
+    "fewestJumps": "Fewest jumps",
+    "leastFuel": "Least fuel",
+    "planRoute": "Plan route",
+    "planning": "Planning…",
+    "nameToSave": "Name to save…",
+    "save": "Save",
+    "errNoCoords": "This deployment doesn't have 3D coordinates loaded (run the coordinate backfill).",
+    "errNoRoute": "No route within range — try a longer-range ship or higher JDC.",
+    "errFailed": "Routing failed.",
+    "searching": "Searching…",
+    "searchSystem": "Search a system…",
+    "result": "{{jumps}} jumps · {{ly}} ly · ~{{fuel}} isotopes (estimate)",
+    "loadPlan": "Load this plan",
+    "deletePlan": "Delete plan",
+    "change": "Change"
   }
 }

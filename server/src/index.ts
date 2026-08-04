@@ -14,6 +14,7 @@ import { db } from './db.js';
 import { config } from './config.js';
 import { migrate } from './migrate.js';
 import { systemsRouter } from './routes/systems.js';
+import { jumpPlansRouter } from './routes/jumpPlans.js';
 import { sdeRouter } from './routes/sde.js';
 import { regionsRouter } from './routes/regions.js';
 import { authRouter } from './routes/auth.js';
@@ -121,6 +122,7 @@ app.use('/api/sde', publicLimiter, sdeRouter);
 app.use('/api/telemetry', publicLimiter, telemetryRouter);
 app.use('/api/regions', appLimiter, regionsRouter);
 app.use('/api/maps', appLimiter, mapsRouter);
+app.use('/api/jump-plans', appLimiter, jumpPlansRouter);
 // Public read-only share endpoint — no auth, validates the share_token
 // itself. Rate-limited under publicLimiter alongside other unauthed routes.
 app.use('/api/share', publicLimiter, shareRouter);

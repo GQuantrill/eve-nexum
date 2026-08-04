@@ -1854,5 +1854,30 @@
     "unknown": "Unbekannt",
     "unknownShip": "Unbekanntes Schiff",
     "ago": "vor {{d}}"
+  },
+  "jumpPlanner": {
+    "title": "Sprungplaner",
+    "close": "Schließen",
+    "savedHdr": "Gespeicherte Pläne (zum Laden klicken)",
+    "savedEmpty": "Noch keine — plane eine Route, gib unten einen Namen ein und klicke Speichern.",
+    "from": "Von (Low/Null)",
+    "to": "Nach (Low/Null)",
+    "ship": "Schiff",
+    "range": "Reichweite",
+    "fewestJumps": "Wenigste Sprünge",
+    "leastFuel": "Wenigster Treibstoff",
+    "planRoute": "Route planen",
+    "planning": "Plane…",
+    "nameToSave": "Name zum Speichern…",
+    "save": "Speichern",
+    "errNoCoords": "Dieser Installation fehlen geladene 3D-Koordinaten (führe den Koordinaten-Backfill aus).",
+    "errNoRoute": "Keine Route in Reichweite — versuche ein Schiff mit größerer Reichweite oder höhere JDC.",
+    "errFailed": "Routenberechnung fehlgeschlagen.",
+    "searching": "Suche…",
+    "searchSystem": "System suchen…",
+    "result": "{{jumps}} Sprünge · {{ly}} ly · ~{{fuel}} Isotope (Schätzung)",
+    "loadPlan": "Diesen Plan laden",
+    "deletePlan": "Plan löschen",
+    "change": "Ändern"
   }
 }

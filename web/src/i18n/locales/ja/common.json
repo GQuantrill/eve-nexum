@@ -1854,5 +1854,30 @@
     "unknown": "不明",
     "unknownShip": "不明な艦船",
     "ago": "{{d}}前"
+  },
+  "jumpPlanner": {
+    "title": "ジャンプ・プランナー",
+    "close": "閉じる",
+    "savedHdr": "保存済みプラン（クリックで読み込み）",
+    "savedEmpty": "まだありません — ルートを計画し、下に名前を入力して保存を押してください。",
+    "from": "出発（ロー/ヌル）",
+    "to": "到着（ロー/ヌル）",
+    "ship": "艦船",
+    "range": "範囲",
+    "fewestJumps": "最少ジャンプ",
+    "leastFuel": "最少燃料",
+    "planRoute": "ルートを計画",
+    "planning": "計画中…",
+    "nameToSave": "保存名…",
+    "save": "保存",
+    "errNoCoords": "このデプロイには3D座標が読み込まれていません（座標のバックフィルを実行してください）。",
+    "errNoRoute": "範囲内にルートがありません — 航続距離の長い艦船か、より高いJDCをお試しください。",
+    "errFailed": "ルート計算に失敗しました。",
+    "searching": "検索中…",
+    "searchSystem": "星系を検索…",
+    "result": "{{jumps}} ジャンプ · {{ly}} ly · ~{{fuel}} アイソトープ（推定）",
+    "loadPlan": "このプランを読み込む",
+    "deletePlan": "プランを削除",
+    "change": "変更"
   }
 }

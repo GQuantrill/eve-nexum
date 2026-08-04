@@ -1854,5 +1854,30 @@
     "unknown": "未知",
     "unknownShip": "未知舰船",
     "ago": "{{d}}前"
+  },
+  "jumpPlanner": {
+    "title": "跳跃规划器",
+    "close": "关闭",
+    "savedHdr": "已保存的规划（点击加载）",
+    "savedEmpty": "暂无 — 规划一条路线，在下方输入名称并点击保存。",
+    "from": "起点（低安/零安）",
+    "to": "终点（低安/零安）",
+    "ship": "舰船",
+    "range": "范围",
+    "fewestJumps": "最少跳数",
+    "leastFuel": "最少燃料",
+    "planRoute": "规划路线",
+    "planning": "规划中…",
+    "nameToSave": "保存名称…",
+    "save": "保存",
+    "errNoCoords": "此部署未加载 3D 坐标（请运行坐标回填）。",
+    "errNoRoute": "范围内无路线 — 请尝试更远航程的舰船或更高的 JDC。",
+    "errFailed": "路线计算失败。",
+    "searching": "搜索中…",
+    "searchSystem": "搜索星系…",
+    "result": "{{jumps}} 跳 · {{ly}} ly · ~{{fuel}} 同位素（估算）",
+    "loadPlan": "加载此规划",
+    "deletePlan": "删除规划",
+    "change": "更改"
   }
 }
