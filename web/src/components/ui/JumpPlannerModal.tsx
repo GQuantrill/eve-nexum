@@ -16,6 +16,7 @@ import { JUMP_CLASSES, jumpRange, estimateFuel } from '../../data/jumpDrives';
 interface RouteHop { eveSystemId: number; name: string; systemClass: string; lyFromPrev: number; x: number; y: number }
 interface RouteResp { hasCoords: boolean; route: { hops: RouteHop[]; jumps: number; totalLy: number } | null }
 interface SavedPlan { id: string; name: string; fromEveId: number; toEveId: number; fromName: string | null; toName: string | null; shipClass: string; objective: 'hops' | 'fuel' }
+interface CorpStructure { structureId: number; name: string; typeName: string; solarSystemId: number | null; systemName: string | null; systemClass: string | null }
 type Picked = { id: number; name: string } | null;
 
 export function JumpPlannerModal({ onClose }: { onClose: () => void }) {
@@ -32,9 +33,25 @@ export function JumpPlannerModal({ onClose }: { onClose: () => void }) {
   const [error, setError]     = useState<string | null>(null);
   const [plans, setPlans]     = useState<SavedPlan[]>([]);
   const [saveName, setSaveName] = useState('');
+  const [structures, setStructures] = useState<CorpStructure[]>([]);
+  const [structSync, setStructSync] = useState<string | null>(null);
 
   const refreshPlans = () => { api<SavedPlan[]>('/api/jump-plans').then(setPlans).catch(() => {}); };
-  useEffect(() => { refreshPlans(); }, []);
+  const loadStructures = () => { api<CorpStructure[]>('/api/structures').then(setStructures).catch(() => {}); };
+  useEffect(() => { refreshPlans(); loadStructures(); }, []);
+  // Pull the corp's structures from ESI (role- + scope-gated server-side); the
+  // status covers re-auth / role / no-corp outcomes, not just success.
+  const syncStructures = async () => {
+    setStructSync('Syncing…');
+    try {
+      const r = await api<{ status: string; count?: number }>('/api/structures/refresh', { method: 'POST' });
+      if (r.status === 'ok') { setStructSync(`Synced ${r.count ?? 0}`); loadStructures(); }
+      else if (r.status === 'needs_reauth') setStructSync('Log out and back in to grant structure access');
+      else if (r.status === 'no_role') setStructSync('Needs the Station Manager or Director role');
+      else if (r.status === 'no_corp') setStructSync('No corporation on record');
+      else setStructSync('Sync failed');
+    } catch { setStructSync('Sync failed'); }
+  };
   const savePlan = async () => {
     if (!from || !to || !saveName.trim()) return;
     await api('/api/jump-plans', { method: 'POST', body: JSON.stringify({ name: saveName.trim(), fromEveId: from.id, toEveId: to.id, shipClass, objective }) }).catch(() => {});
@@ -96,8 +113,13 @@ export function JumpPlannerModal({ onClose }: { onClose: () => void }) {
             )}
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-            <Field label={t('jumpPlanner.from')} value={from} onPick={setFrom} />
-            <Field label={t('jumpPlanner.to')}   value={to}   onPick={setTo} />
+            <Field label={t('jumpPlanner.from')} value={from} onPick={setFrom} structures={structures} />
+            <Field label={t('jumpPlanner.to')}   value={to}   onPick={setTo}   structures={structures} />
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 12, color: 'var(--text-subtle)' }}>
+            <span>Structures: <strong>{structures.length}</strong></span>
+            <button type="button" className="btn btn--ghost" onClick={syncStructures}>Sync from ESI</button>
+            {structSync && <span style={{ color: 'var(--text-faint)' }}>{structSync}</span>}
           </div>
 
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, alignItems: 'flex-end' }}>
@@ -205,13 +227,19 @@ function Skill({ value, onChange, readOnly, ariaLabel }: { value: number; onChan
   );
 }
 
-// LS/NS system search field (label + input + dropdown), controlled by a picked value.
-function Field({ label, value, onPick }: { label: string; value: Picked; onPick: (v: Picked) => void }) {
+// LS/NS system search field (label + input + dropdown), controlled by a picked
+// value. Matching corp structures (in jumpable LS/NS systems) are offered above
+// the system results; picking one resolves to its containing system.
+function Field({ label, value, onPick, structures }: { label: string; value: Picked; onPick: (v: Picked) => void; structures: CorpStructure[] }) {
   const { t } = useTranslation();
   const [query, setQuery] = useState('');
   const { results, loading } = useEsiSearch(query);
   const kspace = results.filter((r) => r.systemClass === 'LS' || r.systemClass === 'NS');
-  const show = query.trim().length >= 2 && (kspace.length > 0 || loading);
+  const q = query.trim().toLowerCase();
+  const structMatches = q.length >= 2
+    ? structures.filter((s) => s.solarSystemId != null && (s.systemClass === 'LS' || s.systemClass === 'NS') && s.name.toLowerCase().includes(q)).slice(0, 6)
+    : [];
+  const show = query.trim().length >= 2 && (structMatches.length > 0 || kspace.length > 0 || loading);
   return (
     <div style={{ position: 'relative' }}>
       <div style={{ fontSize: 12, color: 'var(--text-subtle)', marginBottom: 3 }}>{label}</div>
@@ -228,6 +256,13 @@ function Field({ label, value, onPick }: { label: string; value: Picked; onPick:
         // Same two-column layout as the map's Add System search: name left,
         // region (systemResultLabel) right — reuses the shared search-results CSS.
         <ul className="search-results">
+          {structMatches.map((s) => (
+            <li key={`st-${s.structureId}`} className="search-results__item" role="option"
+              onMouseDown={(e) => { e.preventDefault(); onPick({ id: s.solarSystemId!, name: s.name }); setQuery(''); }}>
+              <span>{s.name}</span>
+              <span className="search-results__class">{s.typeName || 'Structure'} · {s.systemName}</span>
+            </li>
+          ))}
           {loading && <li className="search-results__item" style={{ cursor: 'default', opacity: 0.6 }}>{t('jumpPlanner.searching')}</li>}
           {kspace.map((r) => (
             <li key={r.id} className="search-results__item" role="option"
