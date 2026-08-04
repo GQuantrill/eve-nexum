@@ -8,6 +8,7 @@ import { useEsiSearch, systemResultLabel } from '../../hooks/useEsiSearch';
 import { useJdcLevel } from '../../hooks/useJumpRange';
 import { useUserSetting } from '../../hooks/useUserSetting';
 import { JUMP_CLASSES, jumpRange, estimateFuel } from '../../data/jumpDrives';
+import { canDock } from '../../data/dockingRules';
 
 // Jump Planner. Pick source/dest, a ship class + skills (JDC / Jump Fuel
 // Conservation / Jump Freighters) and an objective (fewest jumps or least fuel),
@@ -17,7 +18,7 @@ interface RouteHop { eveSystemId: number; name: string; systemClass: string; lyF
 interface RouteResp { hasCoords: boolean; route: { hops: RouteHop[]; jumps: number; totalLy: number } | null }
 interface SavedPlan { id: string; name: string; fromEveId: number; toEveId: number; fromName: string | null; toName: string | null; shipClass: string; objective: 'hops' | 'fuel' }
 interface CorpStructure { key: string; name: string; typeName: string; solarSystemId: number | null; systemName: string | null; systemClass: string | null; source: 'corp' | 'map' }
-type Picked = { id: number; name: string } | null;
+type Picked = { id: number; name: string; structureType?: string | null } | null;
 
 export function JumpPlannerModal({ onClose }: { onClose: () => void }) {
   const { t } = useTranslation();
@@ -67,6 +68,12 @@ export function JumpPlannerModal({ onClose }: { onClose: () => void }) {
   const cls = JUMP_CLASSES.find((c) => c.key === shipClass) ?? JUMP_CLASSES[0];
   const rangeLy = jumpRange(cls.base, jdc);
   const isJf = shipClass === 'jf';
+
+  // Docking check for structure endpoints (informational — never blocks routing).
+  // null means unknown structure type, so we stay silent rather than warn.
+  const dockWarn = ([from, to] as Picked[])
+    .filter((p): p is NonNullable<Picked> => !!p?.structureType && canDock(shipClass, p.structureType) === false)
+    .map((p) => `${cls.label} can't dock at ${p.name} (${p.structureType}).`);
 
   const plan = async () => {
     if (!from || !to) return;
@@ -152,6 +159,9 @@ export function JumpPlannerModal({ onClose }: { onClose: () => void }) {
           </div>
 
           {error && <div style={{ color: 'var(--cv-conn-expired)', fontSize: 13 }}>{error}</div>}
+          {dockWarn.map((w) => (
+            <div key={w} style={{ color: 'var(--cv-conn-eol, #e69f00)', fontSize: 13 }}>⚠ {w}</div>
+          ))}
 
           {result?.route && (
             <div style={{ borderTop: '1px solid #30363d', paddingTop: 10 }}>
@@ -258,7 +268,7 @@ function Field({ label, value, onPick, structures }: { label: string; value: Pic
         <ul className="search-results">
           {structMatches.map((s) => (
             <li key={`st-${s.key}`} className="search-results__item" role="option"
-              onMouseDown={(e) => { e.preventDefault(); onPick({ id: s.solarSystemId!, name: s.name }); setQuery(''); }}>
+              onMouseDown={(e) => { e.preventDefault(); onPick({ id: s.solarSystemId!, name: s.name, structureType: s.typeName || null }); setQuery(''); }}>
               <span>{s.name}</span>
               <span className="search-results__class">{s.typeName || 'Structure'} · {s.systemName}</span>
             </li>
