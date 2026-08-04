@@ -9,7 +9,12 @@
 export type DockState = 'dock' | 'tether' | 'undock';
 
 // Structure columns in the matrix. Medium groups Astrahus/Raitaru/Athanor.
-type StructCol = 'medium' | 'azbel' | 'tatara' | 'fortizar' | 'sotiyo' | 'keepstar';
+// 'station' = NPC station: normal capitals (Dread/Carrier/FAX/Rorqual) dock,
+// supers/titans can't. Note: NPC stations aren't a jump-planner endpoint source
+// yet (our structures come from corp ESI + map tags, both Upwell-only), so this
+// column is dormant until stations become pickable — the rule is here so it's
+// right when they do.
+type StructCol = 'medium' | 'azbel' | 'tatara' | 'fortizar' | 'station' | 'sotiyo' | 'keepstar';
 // Ship rows. Black Ops is a battleship, so it docks everywhere like a freighter.
 type ShipRow = 'freighter' | 'rorqual' | 'capital' | 'super';
 
@@ -35,10 +40,10 @@ const SHIP_ROW: Record<string, ShipRow> = {
 };
 
 const MATRIX: Record<ShipRow, Record<StructCol, DockState>> = {
-  freighter: { medium: 'dock',   azbel: 'dock',   tatara: 'dock',   fortizar: 'dock',   sotiyo: 'dock',   keepstar: 'dock' },
-  rorqual:   { medium: 'tether', azbel: 'undock', tatara: 'dock',   fortizar: 'dock',   sotiyo: 'dock',   keepstar: 'dock' },
-  capital:   { medium: 'tether', azbel: 'undock', tatara: 'tether', fortizar: 'dock',   sotiyo: 'dock',   keepstar: 'dock' },
-  super:     { medium: 'tether', azbel: 'tether', tatara: 'tether', fortizar: 'tether', sotiyo: 'undock', keepstar: 'dock' },
+  freighter: { medium: 'dock',   azbel: 'dock',   tatara: 'dock',   fortizar: 'dock',   station: 'dock',   sotiyo: 'dock',   keepstar: 'dock' },
+  rorqual:   { medium: 'tether', azbel: 'undock', tatara: 'dock',   fortizar: 'dock',   station: 'dock',   sotiyo: 'dock',   keepstar: 'dock' },
+  capital:   { medium: 'tether', azbel: 'undock', tatara: 'tether', fortizar: 'dock',   station: 'dock',   sotiyo: 'dock',   keepstar: 'dock' },
+  super:     { medium: 'tether', azbel: 'tether', tatara: 'tether', fortizar: 'tether', station: 'undock', sotiyo: 'undock', keepstar: 'dock' },
 };
 
 /**
