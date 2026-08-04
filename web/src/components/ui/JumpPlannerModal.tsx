@@ -20,7 +20,7 @@ export function JumpPlannerModal({ onClose }: { onClose: () => void }) {
   const [from, setFrom] = useState<Picked>(null);
   const [to, setTo]     = useState<Picked>(null);
   const [shipClass, setShipClass] = useUserSetting<string>('nexum.jump.planShip', 'blops');
-  const [jdc]      = useJdcLevel();
+  const [jdc, setJdc] = useJdcLevel();
   const [jfc, setJfc]         = useUserSetting<number>('nexum.jump.jfc', 5);
   const [jfSkill, setJfSkill] = useUserSetting<number>('nexum.jump.jf', 5);
   const [objective, setObjective] = useState<'hops' | 'fuel'>('hops');
@@ -103,7 +103,7 @@ export function JumpPlannerModal({ onClose }: { onClose: () => void }) {
                 {JUMP_CLASSES.map((c) => <option key={c.key} value={c.key}>{c.label}</option>)}
               </select>
             </Labelled>
-            <Labelled label="JDC (range)"><Skill value={jdc} readOnly /></Labelled>
+            <Labelled label="JDC (range)"><Skill value={jdc} onChange={setJdc} /></Labelled>
             <Labelled label="Jump Fuel Conservation"><Skill value={jfc} onChange={setJfc} /></Labelled>
             {isJf && <Labelled label="Jump Freighters"><Skill value={jfSkill} onChange={setJfSkill} /></Labelled>}
             <span style={{ color: 'var(--text-subtle)', fontSize: 12 }}>Range: <strong>{rangeLy.toFixed(1)} ly</strong></span>
