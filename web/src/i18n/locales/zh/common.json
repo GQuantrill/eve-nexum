@@ -1898,6 +1898,9 @@
     "avoid": "避开",
     "avoidAdd": "添加要避开的星系…",
     "avoidNone": "无需避开",
-    "preferStations": "优先经过有空间站的星系"
+    "preferStations": "优先经过有空间站的星系",
+    "legendOrigin": "起点",
+    "legendDest": "终点",
+    "legendHop": "中转"
   }
 }

@@ -1898,6 +1898,9 @@
     "avoid": "Vermeiden",
     "avoidAdd": "System zum Vermeiden…",
     "avoidNone": "Nichts zu vermeiden",
-    "preferStations": "Stationssysteme bevorzugen"
+    "preferStations": "Stationssysteme bevorzugen",
+    "legendOrigin": "Start",
+    "legendDest": "Ziel",
+    "legendHop": "Zwischenstopp"
   }
 }

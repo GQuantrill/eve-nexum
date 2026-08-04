@@ -228,6 +228,7 @@ export function JumpPlannerModal({ onClose }: { onClose: () => void }) {
 // Plots the route on CCP's 2D star-map projection — aspect-preserving, centred,
 // with a line through the hops and start/end marked. Labels are best-effort.
 function RouteMap({ hops }: { hops: RouteHop[] }) {
+  const { t } = useTranslation();
   if (hops.length < 2) return null;
   const W = 820, H = 300, PAD = 34;
   const xs = hops.map((h) => h.x), ys = hops.map((h) => h.y);
@@ -240,22 +241,35 @@ function RouteMap({ hops }: { hops: RouteHop[] }) {
   // this the map renders upside-down (a northern destination appears south).
   const sy = (y: number) => oy + (maxY - y) * scale;
   const pts = hops.map((h) => ({ x: sx(h.x), y: sy(h.y), h }));
+  const dot = (color: string) => (
+    <span style={{ display: 'inline-block', width: 11, height: 11, borderRadius: '50%', background: color, border: '2px solid #56b4e9', boxSizing: 'border-box' }} />
+  );
+  const legendItem = (color: string, label: string) => (
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>{dot(color)} {label}</span>
+  );
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 300, background: '#0d1117', borderRadius: 6 }}>
-      <polyline points={pts.map((p) => `${p.x},${p.y}`).join(' ')} fill="none" stroke="#56b4e9" strokeWidth={2} opacity={0.85} />
-      {pts.map((p, i) => {
-        const first = i === 0, last = i === pts.length - 1;
-        return (
-          <g key={p.h.eveSystemId}>
-            <circle cx={p.x} cy={p.y} r={first || last ? 6 : 4}
-              fill={first ? '#3ddc84' : last ? '#e69f00' : '#161b22'} stroke="#56b4e9" strokeWidth={2} />
-            {(first || last || pts.length <= 12) && (
-              <text x={p.x} y={p.y - 9} fill="#c9d1d9" fontSize={11} textAnchor="middle">{p.h.name}</text>
-            )}
-          </g>
-        );
-      })}
-    </svg>
+    <div>
+      <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 300, background: '#0d1117', borderRadius: 6 }}>
+        <polyline points={pts.map((p) => `${p.x},${p.y}`).join(' ')} fill="none" stroke="#56b4e9" strokeWidth={2} opacity={0.85} />
+        {pts.map((p, i) => {
+          const first = i === 0, last = i === pts.length - 1;
+          return (
+            <g key={p.h.eveSystemId}>
+              <circle cx={p.x} cy={p.y} r={first || last ? 6 : 4}
+                fill={first ? '#3ddc84' : last ? '#e69f00' : '#161b22'} stroke="#56b4e9" strokeWidth={2} />
+              {(first || last || pts.length <= 12) && (
+                <text x={p.x} y={p.y - 9} fill="#c9d1d9" fontSize={11} textAnchor="middle">{p.h.name}</text>
+              )}
+            </g>
+          );
+        })}
+      </svg>
+      <div style={{ display: 'flex', gap: 16, marginTop: 6, fontSize: 12, color: 'var(--text-subtle)', alignItems: 'center' }}>
+        {legendItem('#3ddc84', t('jumpPlanner.legendOrigin'))}
+        {pts.length > 2 && legendItem('#161b22', t('jumpPlanner.legendHop'))}
+        {legendItem('#e69f00', t('jumpPlanner.legendDest'))}
+      </div>
+    </div>
   );
 }
 

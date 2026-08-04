@@ -1898,6 +1898,9 @@
     "avoid": "Avoid",
     "avoidAdd": "Add a system to avoid…",
     "avoidNone": "Nothing to avoid",
-    "preferStations": "Prefer station systems"
+    "preferStations": "Prefer station systems",
+    "legendOrigin": "Origin",
+    "legendDest": "Destination",
+    "legendHop": "Waypoint"
   }
 }

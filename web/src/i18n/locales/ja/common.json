@@ -1898,6 +1898,9 @@
     "avoid": "回避",
     "avoidAdd": "回避する星系を追加…",
     "avoidNone": "回避対象なし",
-    "preferStations": "ステーションのある星系を優先"
+    "preferStations": "ステーションのある星系を優先",
+    "legendOrigin": "出発",
+    "legendDest": "目的地",
+    "legendHop": "経由"
   }
 }

@@ -1898,6 +1898,9 @@
     "avoid": "Evitar",
     "avoidAdd": "Sistema a evitar…",
     "avoidNone": "Nada que evitar",
-    "preferStations": "Preferir sistemas con estación"
+    "preferStations": "Preferir sistemas con estación",
+    "legendOrigin": "Origen",
+    "legendDest": "Destino",
+    "legendHop": "Escala"
   }
 }

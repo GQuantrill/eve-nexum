@@ -1898,6 +1898,9 @@
     "avoid": "회피",
     "avoidAdd": "회피할 성계 추가…",
     "avoidNone": "회피할 대상 없음",
-    "preferStations": "스테이션 성계 우선"
+    "preferStations": "스테이션 성계 우선",
+    "legendOrigin": "출발",
+    "legendDest": "도착",
+    "legendHop": "경유"
   }
 }
