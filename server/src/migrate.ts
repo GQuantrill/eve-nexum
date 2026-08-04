@@ -913,6 +913,20 @@ export async function migrate() {
       updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       updated_by_user INTEGER     REFERENCES users(id) ON DELETE SET NULL
     );
+
+    -- Saved jump-planner routes (account-scoped). Stores the inputs only; the
+    -- route is recomputed on load against the account's current skills.
+    CREATE TABLE IF NOT EXISTS jump_plans (
+      id          UUID        PRIMARY KEY,
+      owner_id    INTEGER     NOT NULL,
+      name        TEXT        NOT NULL,
+      from_eve_id INTEGER     NOT NULL,
+      to_eve_id   INTEGER     NOT NULL,
+      ship_class  TEXT        NOT NULL,
+      objective   TEXT        NOT NULL DEFAULT 'hops',
+      created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+    CREATE INDEX IF NOT EXISTS idx_jump_plans_owner ON jump_plans (owner_id);
   `);
 
   await encryptLegacyTokens();

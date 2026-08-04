@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { XIcon } from '../../icons';
 import { api } from '../../api/client';
@@ -13,6 +13,7 @@ import { JUMP_CLASSES, jumpRange, estimateFuel } from '../../data/jumpDrives';
 // totals. English-only for now; i18n + the route map + save come next.
 interface RouteHop { eveSystemId: number; name: string; systemClass: string; lyFromPrev: number; x: number; y: number }
 interface RouteResp { hasCoords: boolean; route: { hops: RouteHop[]; jumps: number; totalLy: number } | null }
+interface SavedPlan { id: string; name: string; fromEveId: number; toEveId: number; fromName: string | null; toName: string | null; shipClass: string; objective: 'hops' | 'fuel' }
 type Picked = { id: number; name: string } | null;
 
 export function JumpPlannerModal({ onClose }: { onClose: () => void }) {
@@ -26,6 +27,22 @@ export function JumpPlannerModal({ onClose }: { onClose: () => void }) {
   const [result, setResult]   = useState<RouteResp | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState<string | null>(null);
+  const [plans, setPlans]     = useState<SavedPlan[]>([]);
+  const [saveName, setSaveName] = useState('');
+
+  const refreshPlans = () => { api<SavedPlan[]>('/api/jump-plans').then(setPlans).catch(() => {}); };
+  useEffect(() => { refreshPlans(); }, []);
+  const savePlan = async () => {
+    if (!from || !to || !saveName.trim()) return;
+    await api('/api/jump-plans', { method: 'POST', body: JSON.stringify({ name: saveName.trim(), fromEveId: from.id, toEveId: to.id, shipClass, objective }) }).catch(() => {});
+    setSaveName(''); refreshPlans();
+  };
+  const loadPlan = (p: SavedPlan) => {
+    setFrom({ id: p.fromEveId, name: p.fromName ?? String(p.fromEveId) });
+    setTo({ id: p.toEveId, name: p.toName ?? String(p.toEveId) });
+    setShipClass(p.shipClass); setObjective(p.objective); setResult(null); setError(null);
+  };
+  const deletePlan = async (id: string) => { await api(`/api/jump-plans/${id}`, { method: 'DELETE' }).catch(() => {}); refreshPlans(); };
 
   const cls = JUMP_CLASSES.find((c) => c.key === shipClass) ?? JUMP_CLASSES[0];
   const rangeLy = jumpRange(cls.base, jdc);
@@ -55,6 +72,17 @@ export function JumpPlannerModal({ onClose }: { onClose: () => void }) {
           <button className="icon-btn" onClick={onClose} title="Close"><XIcon size={14} weight="bold" /></button>
         </div>
         <div className="modal__body" style={{ display: 'flex', flexDirection: 'column', gap: 12, overflowY: 'auto' }}>
+          {plans.length > 0 && (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center' }}>
+              <span style={{ fontSize: 12, color: 'var(--text-subtle)' }}>Saved:</span>
+              {plans.map((p) => (
+                <span key={p.id} style={{ display: 'inline-flex', alignItems: 'center', gap: 2, border: '1px solid #30363d', borderRadius: 12, padding: '1px 3px 1px 9px', fontSize: 12 }}>
+                  <button type="button" onClick={() => loadPlan(p)} style={{ background: 'transparent', border: 'none', color: 'inherit', cursor: 'pointer', fontSize: 12 }}>{p.name}</button>
+                  <button type="button" onClick={() => deletePlan(p.id)} className="icon-btn" title="Delete"><XIcon size={11} /></button>
+                </span>
+              ))}
+            </div>
+          )}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             <Field label="From (low/null)" value={from} onPick={setFrom} />
             <Field label="To (low/null)"   value={to}   onPick={setTo} />
@@ -84,6 +112,10 @@ export function JumpPlannerModal({ onClose }: { onClose: () => void }) {
             <button type="button" className="btn btn--primary" disabled={!from || !to || loading} onClick={plan}>
               {loading ? 'Planning…' : 'Plan route'}
             </button>
+            <span style={{ flex: 1 }} />
+            <input className="chains-new__name" style={{ width: 150 }} placeholder="Name to save…"
+              value={saveName} onChange={(e) => setSaveName(e.target.value)} />
+            <button type="button" className="btn btn--ghost" disabled={!from || !to || !saveName.trim()} onClick={savePlan}>Save</button>
           </div>
 
           {error && <div style={{ color: 'var(--cv-conn-expired)', fontSize: 13 }}>{error}</div>}
