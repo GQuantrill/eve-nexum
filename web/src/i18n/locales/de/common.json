@@ -1901,6 +1901,9 @@
     "preferStations": "Stationssysteme bevorzugen",
     "legendOrigin": "Start",
     "legendDest": "Ziel",
-    "legendHop": "Zwischenstopp"
+    "legendHop": "Zwischenstopp",
+    "preferOff": "Aus",
+    "preferPrefer": "Bevorzugen",
+    "preferStrong": "Stark"
   }
 }

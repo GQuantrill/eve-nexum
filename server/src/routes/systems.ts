@@ -399,7 +399,9 @@ systemsRouter.get('/jump-route', async (req, res) => {
     new Set(String(v ?? '').split(',').map((s) => parseInt(s, 10)).filter(Boolean).slice(0, cap));
   const avoid = idList(req.query.avoid, 200);
   const extraSafe = idList(req.query.safe, 400);
-  const preferSafe = req.query.preferStations === 'true' || req.query.preferStations === '1';
+  const pref = String(req.query.preferStations ?? '');
+  const preferSafe = pref === 'strong' ? 'strong' as const
+    : (pref === 'prefer' || pref === '1' || pref === 'true') ? 'prefer' as const : undefined;
   if (!from || !to || !rangeLy) {
     return res.status(400).json({ error: 'from, to and rangeLy are required' });
   }

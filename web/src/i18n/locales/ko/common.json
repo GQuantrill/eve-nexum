@@ -1901,6 +1901,9 @@
     "preferStations": "스테이션 성계 우선",
     "legendOrigin": "출발",
     "legendDest": "도착",
-    "legendHop": "경유"
+    "legendHop": "경유",
+    "preferOff": "끄기",
+    "preferPrefer": "우선",
+    "preferStrong": "강함"
   }
 }

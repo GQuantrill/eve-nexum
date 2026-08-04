@@ -1901,6 +1901,9 @@
     "preferStations": "优先经过有空间站的星系",
     "legendOrigin": "起点",
     "legendDest": "终点",
-    "legendHop": "中转"
+    "legendHop": "中转",
+    "preferOff": "关闭",
+    "preferPrefer": "优先",
+    "preferStrong": "强"
   }
 }

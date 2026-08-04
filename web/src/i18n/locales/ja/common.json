@@ -1901,6 +1901,9 @@
     "preferStations": "ステーションのある星系を優先",
     "legendOrigin": "出発",
     "legendDest": "目的地",
-    "legendHop": "経由"
+    "legendHop": "経由",
+    "preferOff": "オフ",
+    "preferPrefer": "優先",
+    "preferStrong": "強"
   }
 }

@@ -1901,6 +1901,9 @@
     "preferStations": "Prefer station systems",
     "legendOrigin": "Origin",
     "legendDest": "Destination",
-    "legendHop": "Waypoint"
+    "legendHop": "Waypoint",
+    "preferOff": "Off",
+    "preferPrefer": "Prefer",
+    "preferStrong": "Strong"
   }
 }

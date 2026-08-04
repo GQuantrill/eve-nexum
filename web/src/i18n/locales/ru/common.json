@@ -1941,6 +1941,9 @@
     "preferStations": "Предпочитать системы со станцией",
     "legendOrigin": "Начало",
     "legendDest": "Назначение",
-    "legendHop": "Промежуточная"
+    "legendHop": "Промежуточная",
+    "preferOff": "Выкл",
+    "preferPrefer": "Предпочитать",
+    "preferStrong": "Сильно"
   }
 }

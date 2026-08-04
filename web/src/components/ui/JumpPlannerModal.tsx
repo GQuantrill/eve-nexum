@@ -37,7 +37,7 @@ export function JumpPlannerModal({ onClose }: { onClose: () => void }) {
   const [structures, setStructures] = useState<CorpStructure[]>([]);
   const [structSync, setStructSync] = useState<string | null>(null);
   const [avoid, setAvoid] = useState<{ id: number; name: string }[]>([]);
-  const [preferStations, setPreferStations] = useUserSetting<boolean>('nexum.jump.preferStations', false);
+  const [preferLevel, setPreferLevel] = useUserSetting<string>('nexum.jump.preferLevel', 'off');
 
   const refreshPlans = () => { api<SavedPlan[]>('/api/jump-plans').then(setPlans).catch(() => {}); };
   const loadStructures = () => { api<CorpStructure[]>('/api/structures').then(setStructures).catch(() => {}); };
@@ -93,8 +93,8 @@ export function JumpPlannerModal({ onClose }: { onClose: () => void }) {
         from: String(from.id), to: String(to.id), rangeLy: rangeLy.toFixed(2), objective,
       });
       if (avoid.length) params.set('avoid', avoid.map((a) => a.id).join(','));
-      if (preferStations) {
-        params.set('preferStations', '1');
+      if (preferLevel !== 'off') {
+        params.set('preferStations', preferLevel);
         // Pass the caller's structure systems so they count as "safe" too.
         const safe = [...new Set(structures.map((s) => s.solarSystemId).filter((v): v is number => v != null))];
         if (safe.length) params.set('safe', safe.join(','));
@@ -173,10 +173,14 @@ export function JumpPlannerModal({ onClose }: { onClose: () => void }) {
                 </div>
               )}
             </div>
-            <label style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, marginTop: 20 }}>
-              <input type="checkbox" checked={preferStations} onChange={(e) => setPreferStations(e.target.checked)} />
-              {t('jumpPlanner.preferStations')}
-            </label>
+            <Labelled label={t('jumpPlanner.preferStations')}>
+              <Select value={preferLevel} onChange={setPreferLevel} ariaLabel={t('jumpPlanner.preferStations')}
+                options={[
+                  { value: 'off', label: t('jumpPlanner.preferOff') },
+                  { value: 'prefer', label: t('jumpPlanner.preferPrefer') },
+                  { value: 'strong', label: t('jumpPlanner.preferStrong') },
+                ]} />
+            </Labelled>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>

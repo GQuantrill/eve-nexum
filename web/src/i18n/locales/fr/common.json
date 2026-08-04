@@ -1901,6 +1901,9 @@
     "preferStations": "Préférer les systèmes avec station",
     "legendOrigin": "Origine",
     "legendDest": "Destination",
-    "legendHop": "Étape"
+    "legendHop": "Étape",
+    "preferOff": "Désactivé",
+    "preferPrefer": "Préférer",
+    "preferStrong": "Fort"
   }
 }

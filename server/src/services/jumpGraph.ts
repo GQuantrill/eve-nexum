@@ -77,17 +77,21 @@ class MinHeap {
   }
 }
 
-// Virtual cost added to a hop that lands in an "unsafe" (no station/structure)
-// intermediate system when preferSafe is on. Soft bias — the router still routes
-// through empty systems when it must; tune if the preference feels too weak/strong.
-const UNSAFE_PENALTY_HOPS = 2;   // ~two extra jumps' worth
-const UNSAFE_PENALTY_LY   = 1.5; // ~1.5 ly of virtual distance
+// Prefer-station-systems bias: virtual cost added to a hop that lands in an
+// "unsafe" (no station/structure) intermediate system. Two UI-selectable tiers;
+// soft — the router still routes through empties when it must. 'hops'/'ly' are
+// the penalty in each objective's units. Tune these if a tier feels off.
+const PREFER_PENALTY = {
+  prefer: { hops: 2, ly: 1.5 },   // gentle nudge
+  strong: { hops: 5, ly: 4 },     // hug station systems hard
+} as const;
+export type PreferLevel = keyof typeof PREFER_PENALTY;
 
 export interface PlanOpts {
   /** Systems the route must never pass through (endpoints are exempt). */
   avoid?: Set<number>;
-  /** Bias the route through systems with a station/structure (avoid empties). */
-  preferSafe?: boolean;
+  /** Bias strength toward station/structure systems; undefined = no bias. */
+  preferSafe?: PreferLevel;
   /** Extra "safe" systems beyond NPC stations — e.g. the caller's structures. */
   extraSafe?: Set<number>;
 }
@@ -113,7 +117,8 @@ export async function planJumpRoute(
   const avoid = opts.avoid ?? new Set<number>();
   const extraSafe = opts.extraSafe;
   const isSafe = (s: JumpSystem) => s.safe || (extraSafe?.has(s.id) ?? false);
-  const penalty = objective === 'fuel' ? UNSAFE_PENALTY_LY : UNSAFE_PENALTY_HOPS;
+  const pen = opts.preferSafe ? PREFER_PENALTY[opts.preferSafe] : null;
+  const penalty = pen ? (objective === 'fuel' ? pen.ly : pen.hops) : 0;
 
   const all = systems!;
   const g = new Map<number, number>();       // best cost from source
@@ -138,7 +143,7 @@ export async function planJumpRoute(
       const ly = lyBetween(cs, n);
       if (ly > rangeLy) continue;
       // Penalise landing in an empty system (not the destination) when asked.
-      const extra = (opts.preferSafe && n.id !== toId && !isSafe(n)) ? penalty : 0;
+      const extra = (pen && n.id !== toId && !isSafe(n)) ? penalty : 0;
       const ng = gc + (objective === 'fuel' ? ly : 1) + extra;
       if (ng < (g.get(n.id) ?? Infinity)) {
         g.set(n.id, ng);
