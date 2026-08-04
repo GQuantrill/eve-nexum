@@ -11,7 +11,7 @@ import { JUMP_CLASSES, jumpRange, estimateFuel } from '../../data/jumpDrives';
 // ship class + skills (JDC / Jump Fuel Conservation / Jump Freighters), and an
 // objective (fewest jumps or least fuel), and plot a multi-hop jump route with
 // totals. English-only for now; i18n + the route map + save come next.
-interface RouteHop { eveSystemId: number; name: string; systemClass: string; lyFromPrev: number }
+interface RouteHop { eveSystemId: number; name: string; systemClass: string; lyFromPrev: number; x: number; y: number }
 interface RouteResp { hasCoords: boolean; route: { hops: RouteHop[]; jumps: number; totalLy: number } | null }
 type Picked = { id: number; name: string } | null;
 
@@ -94,7 +94,8 @@ export function JumpPlannerModal({ onClose }: { onClose: () => void }) {
                 <strong>{result.route.jumps}</strong> jumps · <strong>{result.route.totalLy.toFixed(1)}</strong> ly ·
                 {' '}~<strong>{fuel.toLocaleString()}</strong> isotopes <span style={{ color: 'var(--text-faint)' }}>(estimate)</span>
               </div>
-              <ol style={{ margin: 0, paddingLeft: 20, display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <RouteMap hops={result.route.hops} />
+              <ol style={{ margin: '10px 0 0', paddingLeft: 20, display: 'flex', flexDirection: 'column', gap: 2 }}>
                 {result.route.hops.map((h, i) => (
                   <li key={h.eveSystemId} style={{ fontSize: 13 }}>
                     {h.name} <span style={{ color: 'var(--text-faint)' }}>{h.systemClass}</span>
@@ -108,6 +109,38 @@ export function JumpPlannerModal({ onClose }: { onClose: () => void }) {
       </div>
     </div>,
     document.body,
+  );
+}
+
+// Plots the route on CCP's 2D star-map projection — aspect-preserving, centred,
+// with a line through the hops and start/end marked. Labels are best-effort.
+function RouteMap({ hops }: { hops: RouteHop[] }) {
+  if (hops.length < 2) return null;
+  const W = 820, H = 300, PAD = 34;
+  const xs = hops.map((h) => h.x), ys = hops.map((h) => h.y);
+  const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
+  const spanX = maxX - minX || 1, spanY = maxY - minY || 1;
+  const scale = Math.min((W - 2 * PAD) / spanX, (H - 2 * PAD) / spanY);
+  const ox = (W - spanX * scale) / 2, oy = (H - spanY * scale) / 2;
+  const sx = (x: number) => ox + (x - minX) * scale;
+  const sy = (y: number) => oy + (y - minY) * scale;   // pos2d y is screen-down already
+  const pts = hops.map((h) => ({ x: sx(h.x), y: sy(h.y), h }));
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 300, background: '#0d1117', borderRadius: 6 }}>
+      <polyline points={pts.map((p) => `${p.x},${p.y}`).join(' ')} fill="none" stroke="#56b4e9" strokeWidth={2} opacity={0.85} />
+      {pts.map((p, i) => {
+        const first = i === 0, last = i === pts.length - 1;
+        return (
+          <g key={p.h.eveSystemId}>
+            <circle cx={p.x} cy={p.y} r={first || last ? 6 : 4}
+              fill={first ? '#3ddc84' : last ? '#e69f00' : '#161b22'} stroke="#56b4e9" strokeWidth={2} />
+            {(first || last || pts.length <= 12) && (
+              <text x={p.x} y={p.y - 9} fill="#c9d1d9" fontSize={11} textAnchor="middle">{p.h.name}</text>
+            )}
+          </g>
+        );
+      })}
+    </svg>
   );
 }
 

@@ -10,7 +10,7 @@ import { createLogger } from '../utils/logger.js';
 const log = createLogger('jumpGraph');
 const METRES_PER_LY = 9.4607e15;
 
-interface JumpSystem { id: number; name: string; cls: string; x: number; y: number; z: number }
+interface JumpSystem { id: number; name: string; cls: string; x: number; y: number; z: number; x2: number; y2: number }
 
 let systems: JumpSystem[] | null = null;
 let byId: Map<number, JumpSystem> | null = null;
@@ -20,12 +20,17 @@ async function ensureLoaded(): Promise<void> {
   if (systems) return;
   if (loading) { await loading; return; }
   loading = (async () => {
-    const { rows } = await db.query<{ id: number; name: string; class: string; pos_x: number; pos_y: number; pos_z: number }>(
-      `SELECT id, name, class, pos_x, pos_y, pos_z
+    const { rows } = await db.query<{ id: number; name: string; class: string; pos_x: number; pos_y: number; pos_z: number; pos2d_x: number | null; pos2d_y: number | null }>(
+      `SELECT id, name, class, pos_x, pos_y, pos_z, pos2d_x, pos2d_y
          FROM solar_systems
         WHERE class IN ('LS','NS') AND pos_x IS NOT NULL`,
     );
-    systems = rows.map((r) => ({ id: r.id, name: r.name, cls: r.class, x: r.pos_x, y: r.pos_y, z: r.pos_z }));
+    // pos2d is CCP's flat star-map projection (for the route map); fall back to the
+    // galactic X/Z plane if a row is missing it so layout never breaks.
+    systems = rows.map((r) => ({
+      id: r.id, name: r.name, cls: r.class, x: r.pos_x, y: r.pos_y, z: r.pos_z,
+      x2: r.pos2d_x ?? r.pos_x, y2: r.pos2d_y ?? r.pos_z,
+    }));
     byId = new Map(systems.map((s) => [s.id, s]));
     log.info(`loaded ${systems.length} LS/NS systems for jump routing`);
   })();
@@ -41,7 +46,7 @@ export async function jumpGraphSize(): Promise<number> {
 const lyBetween = (a: JumpSystem, b: JumpSystem): number =>
   Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2 + (a.z - b.z) ** 2) / METRES_PER_LY;
 
-export interface JumpRouteHop { eveSystemId: number; name: string; systemClass: string; lyFromPrev: number }
+export interface JumpRouteHop { eveSystemId: number; name: string; systemClass: string; lyFromPrev: number; x: number; y: number }
 export interface JumpRouteResult { hops: JumpRouteHop[]; jumps: number; totalLy: number }
 
 // Minimal binary min-heap keyed by priority (f-score).
@@ -78,7 +83,7 @@ export async function planJumpRoute(
   const src = byId!.get(fromId);
   const dst = byId!.get(toId);
   if (!src || !dst) return null;
-  if (fromId === toId) return { hops: [{ eveSystemId: fromId, name: src.name, systemClass: src.cls, lyFromPrev: 0 }], jumps: 0, totalLy: 0 };
+  if (fromId === toId) return { hops: [{ eveSystemId: fromId, name: src.name, systemClass: src.cls, lyFromPrev: 0, x: src.x2, y: src.y2 }], jumps: 0, totalLy: 0 };
 
   const all = systems!;
   const g = new Map<number, number>();       // best cost from source
@@ -120,7 +125,7 @@ export async function planJumpRoute(
     const s = byId!.get(path[i])!;
     const ly = i === 0 ? 0 : lyBetween(byId!.get(path[i - 1])!, s);
     totalLy += ly;
-    hops.push({ eveSystemId: s.id, name: s.name, systemClass: s.cls, lyFromPrev: ly });
+    hops.push({ eveSystemId: s.id, name: s.name, systemClass: s.cls, lyFromPrev: ly, x: s.x2, y: s.y2 });
   }
   return { hops, jumps: path.length - 1, totalLy };
 }
