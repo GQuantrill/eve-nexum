@@ -6,6 +6,7 @@ import { encryptToken } from '../utils/tokenCrypto.js';
 import { createLogger } from '../utils/logger.js';
 import { esiFetch } from '../utils/esi.js';
 import { refreshStandingsForUser } from '../services/standings.js';
+import { syncCorpStructures } from '../services/structureSync.js';
 import { isLoginPermitted, standingsPermitLogin } from '../services/accessGrants.js';
 import { seedDemoMap } from '../services/demoMap.js';
 
@@ -255,6 +256,12 @@ authRouter.get('/callback', async (req, res) => {
       accessToken: tokens.access_token,
     }).catch((err) => log.error('standings refresh kickoff failed:', err));
 
+    // Fire-and-forget corp-structures sync (TTL-gated, role- and scope-gated
+    // inside the service). A Station Manager / Director login auto-populates the
+    // corp's jump-planner structures; everyone else no-ops and just reads them.
+    const kickStructures = () => syncCorpStructures(userId)
+      .catch((err) => log.error('structure sync kickoff failed:', err));
+
     // ── Add-character link ────────────────────────────────────────────────
     // Authenticated "add character" flow: attach this character to the
     // initiating account and return WITHOUT touching the active session — no
@@ -268,6 +275,7 @@ authRouter.get('/callback', async (req, res) => {
       req.session.ownerId = addCharacterOwnerId;
       await new Promise<void>((resolve, reject) => { req.session.save((err) => err ? reject(err) : resolve()); });
       kickStandings();
+      kickStructures();
       res.redirect(`${FRONTEND_URL}?added=${encodeURIComponent(jwtPayload.name)}`);
       return;
     }
@@ -328,6 +336,7 @@ authRouter.get('/callback', async (req, res) => {
     });
 
     kickStandings();
+    kickStructures();
     // ?login=success lets the frontend fire a one-time analytics "login" event
     // (it's only present on the post-callback redirect, not on normal loads).
     res.redirect(`${FRONTEND_URL}?login=success`);

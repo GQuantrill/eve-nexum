@@ -11,9 +11,29 @@ import { createLogger } from '../utils/logger.js';
 const log = createLogger('structureSync');
 const ESI = 'https://esi.evetech.net/latest';
 const STRUCTURE_ROLES = ['Station_Manager', 'Director'];
+// Auto-sync is TTL-gated so a login doesn't re-pull every time (mirrors the
+// standings refresh window). The manual "Sync from ESI" button passes force.
+const SYNC_TTL_MS = 6 * 60 * 60 * 1000;
+
+// Reuse the generic standings_refresh timestamp table (owner_kind/owner_id KV)
+// so we don't need a dedicated one. Only marked on a successful sync, so a
+// no_role attempt never suppresses a later role-holder's populate.
+async function structuresFresh(corpId: number): Promise<boolean> {
+  const { rows } = await db.query<{ last_fetched_at: string }>(
+    `SELECT last_fetched_at FROM standings_refresh WHERE owner_kind = 'corp_structures' AND owner_id = $1`, [corpId],
+  );
+  return rows.length > 0 && Date.now() - new Date(rows[0].last_fetched_at).getTime() < SYNC_TTL_MS;
+}
+async function markStructuresSynced(corpId: number): Promise<void> {
+  await db.query(
+    `INSERT INTO standings_refresh (owner_kind, owner_id, last_fetched_at) VALUES ('corp_structures', $1, NOW())
+     ON CONFLICT (owner_kind, owner_id) DO UPDATE SET last_fetched_at = NOW()`, [corpId],
+  );
+}
 
 export type StructureSyncResult =
   | { status: 'ok'; count: number }
+  | { status: 'skipped' }       // synced recently (TTL) — auto-sync only
   | { status: 'no_corp' }       // user has no corp on record
   | { status: 'no_role' }       // not a Station Manager / Director
   | { status: 'needs_reauth' }  // read_structures scope not granted (or token dead)
@@ -21,13 +41,16 @@ export type StructureSyncResult =
 
 interface CorpStructure { structure_id: number; system_id: number; type_id: number }
 
-export async function syncCorpStructures(userId: number): Promise<StructureSyncResult> {
+export async function syncCorpStructures(userId: number, opts: { force?: boolean } = {}): Promise<StructureSyncResult> {
   const { rows } = await db.query<{ character_id: number | null; corp_id: number | null }>(
     `SELECT character_id, corp_id FROM users WHERE id = $1`, [userId],
   );
   const u = rows[0];
   if (!u?.corp_id || !u.character_id) return { status: 'no_corp' };
   const corpId = u.corp_id;
+
+  // Cheap DB gate before any ESI call: skip if a recent sync covers this corp.
+  if (!opts.force && await structuresFresh(corpId)) return { status: 'skipped' };
 
   let token: string;
   try { token = await getValidToken(userId); }
@@ -106,6 +129,7 @@ export async function syncCorpStructures(userId: number): Promise<StructureSyncR
     client.release();
   }
 
+  await markStructuresSynced(corpId);
   log.info(`synced ${named.length} structures for corp ${corpId}`);
   return { status: 'ok', count: named.length };
 }

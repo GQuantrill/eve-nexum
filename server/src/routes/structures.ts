@@ -38,7 +38,7 @@ structuresRouter.get('/', async (req, res) => {
 structuresRouter.post('/refresh', async (req, res) => {
   const userId = req.session.userId!;
   try {
-    const result = await syncCorpStructures(userId);
+    const result = await syncCorpStructures(userId, { force: true });
     return res.status(result.status === 'error' ? 502 : 200).json(result);
   } catch (err) { log.error('refresh failed', err); return res.status(500).json({ error: 'Refresh failed' }); }
 });
