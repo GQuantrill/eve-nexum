@@ -36,6 +36,8 @@ export function JumpPlannerModal({ onClose }: { onClose: () => void }) {
   const [saveName, setSaveName] = useState('');
   const [structures, setStructures] = useState<CorpStructure[]>([]);
   const [structSync, setStructSync] = useState<string | null>(null);
+  const [avoid, setAvoid] = useState<{ id: number; name: string }[]>([]);
+  const [preferStations, setPreferStations] = useUserSetting<boolean>('nexum.jump.preferStations', false);
 
   const refreshPlans = () => { api<SavedPlan[]>('/api/jump-plans').then(setPlans).catch(() => {}); };
   const loadStructures = () => { api<CorpStructure[]>('/api/structures').then(setStructures).catch(() => {}); };
@@ -87,9 +89,17 @@ export function JumpPlannerModal({ onClose }: { onClose: () => void }) {
     if (!from || !to) return;
     setLoading(true); setError(null); setResult(null);
     try {
-      const r = await api<RouteResp>(
-        `/api/systems/jump-route?from=${from.id}&to=${to.id}&rangeLy=${rangeLy.toFixed(2)}&objective=${objective}`,
-      );
+      const params = new URLSearchParams({
+        from: String(from.id), to: String(to.id), rangeLy: rangeLy.toFixed(2), objective,
+      });
+      if (avoid.length) params.set('avoid', avoid.map((a) => a.id).join(','));
+      if (preferStations) {
+        params.set('preferStations', '1');
+        // Pass the caller's structure systems so they count as "safe" too.
+        const safe = [...new Set(structures.map((s) => s.solarSystemId).filter((v): v is number => v != null))];
+        if (safe.length) params.set('safe', safe.join(','));
+      }
+      const r = await api<RouteResp>(`/api/systems/jump-route?${params.toString()}`);
       setResult(r);
       if (!r.hasCoords) setError(t('jumpPlanner.errNoCoords'));
       else if (!r.route) setError(t('jumpPlanner.errNoRoute'));
@@ -146,6 +156,27 @@ export function JumpPlannerModal({ onClose }: { onClose: () => void }) {
             <Labelled label="Jump Fuel Conservation"><Skill value={jfc} onChange={setJfc} ariaLabel="Jump Fuel Conservation" /></Labelled>
             {isJf && <Labelled label="Jump Freighters"><Skill value={jfSkill} onChange={setJfSkill} ariaLabel="Jump Freighters" /></Labelled>}
             <span style={{ color: 'var(--text-subtle)', fontSize: 12 }}>{t('jumpPlanner.range')}: <strong>{rangeLy.toFixed(1)} ly</strong></span>
+          </div>
+
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, alignItems: 'flex-start' }}>
+            <div style={{ flex: '1 1 260px', minWidth: 220 }}>
+              <div style={{ fontSize: 12, color: 'var(--text-subtle)', marginBottom: 4 }}>{t('jumpPlanner.avoid')}</div>
+              <AvoidPicker onAdd={(s) => setAvoid((a) => (a.some((x) => x.id === s.id) ? a : [...a, s]))} />
+              {avoid.length > 0 && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 6 }}>
+                  {avoid.map((a) => (
+                    <span key={a.id} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, border: '1px solid #30363d', borderRadius: 12, padding: '2px 4px 2px 9px', fontSize: 12 }}>
+                      {a.name}
+                      <button type="button" className="icon-btn" onClick={() => setAvoid((v) => v.filter((x) => x.id !== a.id))}><XIcon size={11} /></button>
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+            <label style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, marginTop: 20 }}>
+              <input type="checkbox" checked={preferStations} onChange={(e) => setPreferStations(e.target.checked)} />
+              {t('jumpPlanner.preferStations')}
+            </label>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -234,6 +265,34 @@ function Labelled({ label, children }: { label: string; children: React.ReactNod
       <span style={{ color: 'var(--text-subtle)' }}>{label}</span>
       {children}
     </label>
+  );
+}
+
+// LS/NS system search that adds picks to a list (the avoidance list) rather than
+// holding a single value. Reuses the shared search-results dropdown.
+function AvoidPicker({ onAdd }: { onAdd: (s: { id: number; name: string }) => void }) {
+  const { t } = useTranslation();
+  const [query, setQuery] = useState('');
+  const { results, loading } = useEsiSearch(query);
+  const kspace = results.filter((r) => r.systemClass === 'LS' || r.systemClass === 'NS');
+  const show = query.trim().length >= 2 && (kspace.length > 0 || loading);
+  return (
+    <div style={{ position: 'relative' }}>
+      <input className="chains-new__name" style={{ width: '100%' }} type="text" value={query}
+        placeholder={t('jumpPlanner.avoidAdd')} onChange={(e) => setQuery(e.target.value)} />
+      {show && (
+        <ul className="search-results">
+          {loading && <li className="search-results__item" style={{ cursor: 'default', opacity: 0.6 }}>{t('jumpPlanner.searching')}</li>}
+          {kspace.map((r) => (
+            <li key={r.id} className="search-results__item" role="option"
+              onMouseDown={(e) => { e.preventDefault(); onAdd({ id: r.id, name: r.name }); setQuery(''); }}>
+              <span>{r.name}</span>
+              <span className="search-results__class">{systemResultLabel(r)}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }
 

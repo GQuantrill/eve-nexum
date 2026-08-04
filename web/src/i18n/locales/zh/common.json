@@ -1894,6 +1894,10 @@
     "dockCant": "{{ship}} 无法在 {{name}}（{{type}}）停靠。",
     "dockTether": "{{ship}} 只能在 {{name}}（{{type}}）系留，无法停靠。",
     "structureFallback": "建筑",
-    "npcStation": "NPC 空间站"
+    "npcStation": "NPC 空间站",
+    "avoid": "避开",
+    "avoidAdd": "添加要避开的星系…",
+    "avoidNone": "无需避开",
+    "preferStations": "优先经过有空间站的星系"
   }
 }

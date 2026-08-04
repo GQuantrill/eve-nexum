@@ -1894,6 +1894,10 @@
     "dockCant": "{{ship}}은(는) {{name}}({{type}})에 도킹할 수 없습니다.",
     "dockTether": "{{ship}}은(는) {{name}}({{type}})에서 테더만 가능하고 도킹은 불가합니다.",
     "structureFallback": "구조물",
-    "npcStation": "NPC 스테이션"
+    "npcStation": "NPC 스테이션",
+    "avoid": "회피",
+    "avoidAdd": "회피할 성계 추가…",
+    "avoidNone": "회피할 대상 없음",
+    "preferStations": "스테이션 성계 우선"
   }
 }

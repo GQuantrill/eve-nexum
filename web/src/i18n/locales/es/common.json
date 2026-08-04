@@ -1894,6 +1894,10 @@
     "dockCant": "{{ship}} no puede atracar en {{name}} ({{type}}).",
     "dockTether": "{{ship}} solo puede hacer tether en {{name}} ({{type}}), no atracar.",
     "structureFallback": "Estructura",
-    "npcStation": "Estación PNJ"
+    "npcStation": "Estación PNJ",
+    "avoid": "Evitar",
+    "avoidAdd": "Sistema a evitar…",
+    "avoidNone": "Nada que evitar",
+    "preferStations": "Preferir sistemas con estación"
   }
 }

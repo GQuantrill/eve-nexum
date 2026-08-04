@@ -10,7 +10,7 @@ import { createLogger } from '../utils/logger.js';
 const log = createLogger('jumpGraph');
 const METRES_PER_LY = 9.4607e15;
 
-interface JumpSystem { id: number; name: string; cls: string; x: number; y: number; z: number; x2: number; y2: number }
+interface JumpSystem { id: number; name: string; cls: string; x: number; y: number; z: number; x2: number; y2: number; safe: boolean }
 
 let systems: JumpSystem[] | null = null;
 let byId: Map<number, JumpSystem> | null = null;
@@ -25,14 +25,22 @@ async function ensureLoaded(): Promise<void> {
          FROM solar_systems
         WHERE class IN ('LS','NS') AND pos_x IS NOT NULL`,
     );
+    // "Safe" = has an NPC station (a place to dock/tether). Used by the
+    // prefer-station-systems option so routes avoid landing in empty systems.
+    // npc_stations may be empty until backfilled — then nothing is safe and the
+    // option simply has no effect.
+    const stationRows = await db.query<{ solar_system_id: number }>(
+      `SELECT DISTINCT solar_system_id FROM npc_stations WHERE solar_system_id IS NOT NULL`,
+    ).catch(() => ({ rows: [] as { solar_system_id: number }[] }));
+    const stationSet = new Set(stationRows.rows.map((r) => r.solar_system_id));
     // pos2d is CCP's flat star-map projection (for the route map); fall back to the
     // galactic X/Z plane if a row is missing it so layout never breaks.
     systems = rows.map((r) => ({
       id: r.id, name: r.name, cls: r.class, x: r.pos_x, y: r.pos_y, z: r.pos_z,
-      x2: r.pos2d_x ?? r.pos_x, y2: r.pos2d_y ?? r.pos_z,
+      x2: r.pos2d_x ?? r.pos_x, y2: r.pos2d_y ?? r.pos_z, safe: stationSet.has(r.id),
     }));
     byId = new Map(systems.map((s) => [s.id, s]));
-    log.info(`loaded ${systems.length} LS/NS systems for jump routing`);
+    log.info(`loaded ${systems.length} LS/NS systems for jump routing (${stationSet.size} with stations)`);
   })();
   await loading;
 }
@@ -69,21 +77,43 @@ class MinHeap {
   }
 }
 
+// Virtual cost added to a hop that lands in an "unsafe" (no station/structure)
+// intermediate system when preferSafe is on. Soft bias — the router still routes
+// through empty systems when it must; tune if the preference feels too weak/strong.
+const UNSAFE_PENALTY_HOPS = 2;   // ~two extra jumps' worth
+const UNSAFE_PENALTY_LY   = 1.5; // ~1.5 ly of virtual distance
+
+export interface PlanOpts {
+  /** Systems the route must never pass through (endpoints are exempt). */
+  avoid?: Set<number>;
+  /** Bias the route through systems with a station/structure (avoid empties). */
+  preferSafe?: boolean;
+  /** Extra "safe" systems beyond NPC stations — e.g. the caller's structures. */
+  extraSafe?: Set<number>;
+}
+
 /**
  * Shortest jump route from `fromId` to `toId` where every hop is <= `rangeLy`.
  * objective 'hops' minimises jump count; 'fuel' minimises total light-years
- * (fuel is proportional to ly for a given ship). Returns null if either endpoint
- * isn't a coord'd LS/NS system, or no route exists within range. A* with a
- * straight-line-to-goal heuristic (admissible for both objectives).
+ * (fuel is proportional to ly for a given ship). `opts.avoid` routes around
+ * given systems; `opts.preferSafe` biases toward station/structure systems.
+ * Returns null if either endpoint isn't a coord'd LS/NS system, or no route
+ * exists within range. A* with a straight-line-to-goal heuristic (admissible:
+ * the penalty only ever adds cost, so the heuristic never overestimates).
  */
 export async function planJumpRoute(
-  fromId: number, toId: number, rangeLy: number, objective: 'hops' | 'fuel',
+  fromId: number, toId: number, rangeLy: number, objective: 'hops' | 'fuel', opts: PlanOpts = {},
 ): Promise<JumpRouteResult | null> {
   await ensureLoaded();
   const src = byId!.get(fromId);
   const dst = byId!.get(toId);
   if (!src || !dst) return null;
   if (fromId === toId) return { hops: [{ eveSystemId: fromId, name: src.name, systemClass: src.cls, lyFromPrev: 0, x: src.x2, y: src.y2 }], jumps: 0, totalLy: 0 };
+
+  const avoid = opts.avoid ?? new Set<number>();
+  const extraSafe = opts.extraSafe;
+  const isSafe = (s: JumpSystem) => s.safe || (extraSafe?.has(s.id) ?? false);
+  const penalty = objective === 'fuel' ? UNSAFE_PENALTY_LY : UNSAFE_PENALTY_HOPS;
 
   const all = systems!;
   const g = new Map<number, number>();       // best cost from source
@@ -104,9 +134,12 @@ export async function planJumpRoute(
     const gc = g.get(cur)!;
     for (const n of all) {
       if (n.id === cur || done.has(n.id)) continue;
+      if (avoid.has(n.id) && n.id !== toId) continue;   // route around avoided systems
       const ly = lyBetween(cs, n);
       if (ly > rangeLy) continue;
-      const ng = gc + (objective === 'fuel' ? ly : 1);
+      // Penalise landing in an empty system (not the destination) when asked.
+      const extra = (opts.preferSafe && n.id !== toId && !isSafe(n)) ? penalty : 0;
+      const ng = gc + (objective === 'fuel' ? ly : 1) + extra;
       if (ng < (g.get(n.id) ?? Infinity)) {
         g.set(n.id, ng);
         prev.set(n.id, cur);

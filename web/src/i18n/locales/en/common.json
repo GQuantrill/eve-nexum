@@ -1894,6 +1894,10 @@
     "dockCant": "{{ship}} can't dock at {{name}} ({{type}}).",
     "dockTether": "{{ship}} can only tether at {{name}} ({{type}}), not dock.",
     "structureFallback": "Structure",
-    "npcStation": "NPC station"
+    "npcStation": "NPC station",
+    "avoid": "Avoid",
+    "avoidAdd": "Add a system to avoid…",
+    "avoidNone": "Nothing to avoid",
+    "preferStations": "Prefer station systems"
   }
 }

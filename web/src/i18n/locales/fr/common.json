@@ -1894,6 +1894,10 @@
     "dockCant": "{{ship}} ne peut pas s'amarrer à {{name}} ({{type}}).",
     "dockTether": "{{ship}} peut seulement rester en tether à {{name}} ({{type}}), pas s'amarrer.",
     "structureFallback": "Structure",
-    "npcStation": "Station PNJ"
+    "npcStation": "Station PNJ",
+    "avoid": "Éviter",
+    "avoidAdd": "Système à éviter…",
+    "avoidNone": "Rien à éviter",
+    "preferStations": "Préférer les systèmes avec station"
   }
 }

@@ -1894,6 +1894,10 @@
     "dockCant": "{{ship}} は {{name}}（{{type}}）にドッキングできません。",
     "dockTether": "{{ship}} は {{name}}（{{type}}）でテザーのみ可能で、ドッキングはできません。",
     "structureFallback": "ストラクチャ",
-    "npcStation": "NPCステーション"
+    "npcStation": "NPCステーション",
+    "avoid": "回避",
+    "avoidAdd": "回避する星系を追加…",
+    "avoidNone": "回避対象なし",
+    "preferStations": "ステーションのある星系を優先"
   }
 }

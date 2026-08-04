@@ -1894,6 +1894,10 @@
     "dockCant": "{{ship}} kann nicht an {{name}} ({{type}}) andocken.",
     "dockTether": "{{ship}} kann an {{name}} ({{type}}) nur tethern, nicht andocken.",
     "structureFallback": "Struktur",
-    "npcStation": "NPC-Station"
+    "npcStation": "NPC-Station",
+    "avoid": "Vermeiden",
+    "avoidAdd": "System zum Vermeiden…",
+    "avoidNone": "Nichts zu vermeiden",
+    "preferStations": "Stationssysteme bevorzugen"
   }
 }

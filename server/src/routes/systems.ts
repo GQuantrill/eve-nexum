@@ -392,12 +392,20 @@ systemsRouter.get('/jump-route', async (req, res) => {
   const to   = parseInt(String(req.query.to ?? ''), 10);
   const rangeLy = Math.max(0.1, Math.min(20, parseFloat(String(req.query.rangeLy ?? '')) || 0));
   const objective = req.query.objective === 'fuel' ? 'fuel' : 'hops';
+  // Optional routing controls: `avoid` = systems to route around; `preferStations`
+  // = bias through station/structure systems; `safe` = extra safe systems (the
+  // caller's structures). Comma-separated id lists, capped to keep the URL sane.
+  const idList = (v: unknown, cap: number) =>
+    new Set(String(v ?? '').split(',').map((s) => parseInt(s, 10)).filter(Boolean).slice(0, cap));
+  const avoid = idList(req.query.avoid, 200);
+  const extraSafe = idList(req.query.safe, 400);
+  const preferSafe = req.query.preferStations === 'true' || req.query.preferStations === '1';
   if (!from || !to || !rangeLy) {
     return res.status(400).json({ error: 'from, to and rangeLy are required' });
   }
   try {
     if ((await jumpGraphSize()) === 0) return res.json({ hasCoords: false, route: null });
-    const route = await planJumpRoute(from, to, rangeLy, objective);
+    const route = await planJumpRoute(from, to, rangeLy, objective, { avoid, preferSafe, extraSafe });
     return res.json({ hasCoords: true, route });
   } catch (err) {
     log.error('jump-route failed:', err);

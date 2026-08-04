@@ -1934,6 +1934,10 @@
     "dockCant": "{{ship}} не может пристыковаться к {{name}} ({{type}}).",
     "dockTether": "{{ship}} может только затетериться к {{name}} ({{type}}), но не пристыковаться.",
     "structureFallback": "Структура",
-    "npcStation": "NPC-станция"
+    "npcStation": "NPC-станция",
+    "avoid": "Избегать",
+    "avoidAdd": "Система для избегания…",
+    "avoidNone": "Нечего избегать",
+    "preferStations": "Предпочитать системы со станцией"
   }
 }
