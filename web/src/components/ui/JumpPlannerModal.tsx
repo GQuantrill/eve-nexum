@@ -223,15 +223,18 @@ function Field({ label, value, onPick }: { label: string; value: Picked; onPick:
           placeholder={t('jumpPlanner.searchSystem')} onChange={(e) => setQuery(e.target.value)} />
       )}
       {!value && show && (
-        <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 30, maxHeight: 220, overflowY: 'auto', background: 'var(--bg-elevated, #161b22)', border: '1px solid #30363d', borderRadius: 6 }}>
-          {loading && <div className="map-sidebar__hint" style={{ padding: '6px 8px' }}>{t('jumpPlanner.searching')}</div>}
+        // Same two-column layout as the map's Add System search: name left,
+        // region (systemResultLabel) right — reuses the shared search-results CSS.
+        <ul className="search-results">
+          {loading && <li className="search-results__item" style={{ cursor: 'default', opacity: 0.6 }}>{t('jumpPlanner.searching')}</li>}
           {kspace.map((r) => (
-            <button key={r.id} type="button" onClick={() => { onPick({ id: r.id, name: r.name }); setQuery(''); }}
-              style={{ display: 'block', width: '100%', textAlign: 'left', padding: '5px 8px', background: 'transparent', border: 'none', color: 'inherit', cursor: 'pointer', fontSize: 13 }}>
-              {systemResultLabel(r)}
-            </button>
+            <li key={r.id} className="search-results__item" role="option"
+              onMouseDown={(e) => { e.preventDefault(); onPick({ id: r.id, name: r.name }); setQuery(''); }}>
+              <span>{r.name}</span>
+              <span className="search-results__class">{systemResultLabel(r)}</span>
+            </li>
           ))}
-        </div>
+        </ul>
       )}
     </div>
   );
