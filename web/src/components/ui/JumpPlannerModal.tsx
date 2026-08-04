@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { XIcon } from '../../icons';
+import { Select } from './Select';
 import { api } from '../../api/client';
 import { useEsiSearch, systemResultLabel } from '../../hooks/useEsiSearch';
 import { useJdcLevel } from '../../hooks/useJumpRange';
@@ -101,13 +102,12 @@ export function JumpPlannerModal({ onClose }: { onClose: () => void }) {
 
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, alignItems: 'flex-end' }}>
             <Labelled label={t('jumpPlanner.ship')}>
-              <select value={shipClass} onChange={(e) => setShipClass(e.target.value)}>
-                {JUMP_CLASSES.map((c) => <option key={c.key} value={c.key}>{c.label}</option>)}
-              </select>
+              <Select value={shipClass} onChange={setShipClass} ariaLabel={t('jumpPlanner.ship')}
+                options={JUMP_CLASSES.map((c) => ({ value: c.key, label: c.label }))} />
             </Labelled>
-            <Labelled label="JDC (range)"><Skill value={jdc} onChange={setJdc} /></Labelled>
-            <Labelled label="Jump Fuel Conservation"><Skill value={jfc} onChange={setJfc} /></Labelled>
-            {isJf && <Labelled label="Jump Freighters"><Skill value={jfSkill} onChange={setJfSkill} /></Labelled>}
+            <Labelled label="JDC (range)"><Skill value={jdc} onChange={setJdc} ariaLabel="Jump Drive Calibration" /></Labelled>
+            <Labelled label="Jump Fuel Conservation"><Skill value={jfc} onChange={setJfc} ariaLabel="Jump Fuel Conservation" /></Labelled>
+            {isJf && <Labelled label="Jump Freighters"><Skill value={jfSkill} onChange={setJfSkill} ariaLabel="Jump Freighters" /></Labelled>}
             <span style={{ color: 'var(--text-subtle)', fontSize: 12 }}>{t('jumpPlanner.range')}: <strong>{rangeLy.toFixed(1)} ly</strong></span>
           </div>
 
@@ -195,11 +195,11 @@ function Labelled({ label, children }: { label: string; children: React.ReactNod
   );
 }
 
-function Skill({ value, onChange, readOnly }: { value: number; onChange?: (n: number) => void; readOnly?: boolean }) {
+const SKILL_LABELS = ['0', 'I', 'II', 'III', 'IV', 'V'];
+function Skill({ value, onChange, readOnly, ariaLabel }: { value: number; onChange?: (n: number) => void; readOnly?: boolean; ariaLabel?: string }) {
   return (
-    <select value={value} disabled={readOnly} onChange={(e) => onChange?.(Number(e.target.value))}>
-      {[0, 1, 2, 3, 4, 5].map((l) => <option key={l} value={l}>{['0', 'I', 'II', 'III', 'IV', 'V'][l]}</option>)}
-    </select>
+    <Select value={String(value)} onChange={(v) => onChange?.(Number(v))} disabled={readOnly} ariaLabel={ariaLabel}
+      options={[0, 1, 2, 3, 4, 5].map((l) => ({ value: String(l), label: SKILL_LABELS[l] }))} />
   );
 }
 
