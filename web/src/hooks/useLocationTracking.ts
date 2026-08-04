@@ -131,12 +131,30 @@ const isKspaceSkip = (cls: string) => KSPACE_SKIP.has(cls);
 export type OnConnectionJump = (info: { connId: string; fromMapSystemId: string; toMapSystemId: string }) => void;
 
 export function applyJump(system: JumpSystem, prevMapSystemId: string | null, canAdd: boolean, onJump?: OnConnectionJump): string | null {
-  const { map, addSystem, addConnection, updateConnection, snapToGrid } = useMapStore.getState();
+  const { map, addSystem, addConnection, updateConnection, updateSystem, snapToGrid } = useMapStore.getState();
 
   let mapSystemId: string;
-  const existing = map.systems.find((s) => s.eveSystemId === system.eveSystemId);
+  // Match by eve id; also match an UNRESOLVED (null eve id) node by name — e.g. a
+  // demo-map or manually-typed node that never resolved its system id — so the
+  // jump upgrades it in place instead of dropping a duplicate. "Unknown"
+  // placeholders never collide (their name isn't a real system name).
+  const existing = map.systems.find((s) =>
+    (s.eveSystemId != null && s.eveSystemId === system.eveSystemId) ||
+    (s.eveSystemId == null && s.name.toLowerCase() === system.name.toLowerCase()),
+  );
   if (existing) {
     mapSystemId = existing.id;
+    // Fill an unresolved node in with the real system's details.
+    if (existing.eveSystemId == null && system.eveSystemId != null) {
+      updateSystem(existing.id, {
+        eveSystemId: system.eveSystemId,
+        systemClass: system.systemClass as SystemClass,
+        effect:      system.effect as WormholeEffect,
+        statics:     system.statics,
+        regionName:  system.regionName,
+        npcType:     system.npcType,
+      });
+    }
   } else {
     if (!canAdd) return null;
     // Placement cell = the largest full node footprint (height included), so
