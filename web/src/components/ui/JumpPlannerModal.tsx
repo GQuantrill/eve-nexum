@@ -16,7 +16,7 @@ import { JUMP_CLASSES, jumpRange, estimateFuel } from '../../data/jumpDrives';
 interface RouteHop { eveSystemId: number; name: string; systemClass: string; lyFromPrev: number; x: number; y: number }
 interface RouteResp { hasCoords: boolean; route: { hops: RouteHop[]; jumps: number; totalLy: number } | null }
 interface SavedPlan { id: string; name: string; fromEveId: number; toEveId: number; fromName: string | null; toName: string | null; shipClass: string; objective: 'hops' | 'fuel' }
-interface CorpStructure { structureId: number; name: string; typeName: string; solarSystemId: number | null; systemName: string | null; systemClass: string | null }
+interface CorpStructure { key: string; name: string; typeName: string; solarSystemId: number | null; systemName: string | null; systemClass: string | null; source: 'corp' | 'map' }
 type Picked = { id: number; name: string } | null;
 
 export function JumpPlannerModal({ onClose }: { onClose: () => void }) {
@@ -257,7 +257,7 @@ function Field({ label, value, onPick, structures }: { label: string; value: Pic
         // region (systemResultLabel) right — reuses the shared search-results CSS.
         <ul className="search-results">
           {structMatches.map((s) => (
-            <li key={`st-${s.structureId}`} className="search-results__item" role="option"
+            <li key={`st-${s.key}`} className="search-results__item" role="option"
               onMouseDown={(e) => { e.preventDefault(); onPick({ id: s.solarSystemId!, name: s.name }); setQuery(''); }}>
               <span>{s.name}</span>
               <span className="search-results__class">{s.typeName || 'Structure'} · {s.systemName}</span>
