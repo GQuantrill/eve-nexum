@@ -16,12 +16,14 @@ export const CLASS_COLORS: Record<SystemClass, string> = {
   Thera: 'var(--cv-class-thera)',
   Pochven: 'var(--cv-class-pochven)',
   Drifter: 'var(--cv-class-drifter)',
+  unknown: 'var(--cv-conn-expired)',   // red — marks an unmapped placeholder node
 };
 
 export const CLASS_LABELS: Record<SystemClass, string> = {
   C1: 'C1', C2: 'C2', C3: 'C3', C4: 'C4', C5: 'C5', C6: 'C6', C13: 'C13',
   HS: 'Hi-Sec', LS: 'Low-Sec', NS: 'Null-Sec',
   Thera: 'Thera', Pochven: 'Pochven', Drifter: 'Drifter',
+  unknown: '?',
 };
 
 export const EFFECT_LABELS: Record<WormholeEffect, string> = {

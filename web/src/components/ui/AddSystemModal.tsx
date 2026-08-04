@@ -53,7 +53,9 @@ export function AddSystemModal({ position, onClose, onSubmit }: Props) {
 
   const isSelected  = selectedId !== null;
   const showResults = !isSelected && results.length > 0 && query.length >= 2;
-  const showEmpty   = !isSelected && results.length === 0 && query.length >= 2 && !loading;
+  // Offer an "Unknown" placeholder node when the query is a prefix of "unknown".
+  const showUnknown = !isSelected && query.trim().length >= 2 && 'unknown'.startsWith(query.trim().toLowerCase());
+  const showEmpty   = !isSelected && results.length === 0 && query.length >= 2 && !loading && !showUnknown;
 
   useEffect(() => {
     const t = setTimeout(() => inputRef.current?.focus(), 0);
@@ -63,13 +65,15 @@ export function AddSystemModal({ position, onClose, onSubmit }: Props) {
   useEffect(() => { setActiveIndex(-1); }, [results]);
 
   useEffect(() => {
-    if (results.length > 0 && searchFieldRef.current) {
+    const want = results.length > 0
+      || (!isSelected && query.trim().length >= 2 && 'unknown'.startsWith(query.trim().toLowerCase()));
+    if (want && searchFieldRef.current) {
       const r = searchFieldRef.current.getBoundingClientRect();
       setDropdownPos({ top: r.bottom + 4, left: r.left, width: r.width });
     } else {
       setDropdownPos(null);
     }
-  }, [results]);
+  }, [results, query, isSelected]);
 
   async function selectResult(id: number, name: string) {
     if (isOnMap(id, name)) return;
@@ -92,6 +96,19 @@ export function AddSystemModal({ position, onClose, onSubmit }: Props) {
     } finally {
       setLoadingDetail(false);
     }
+  }
+
+  // Add an "Unknown" placeholder node (no eve id). Numbered so several can
+  // coexist — the store dedupes placeholders by name, and multiple unmapped
+  // wormholes is the whole point.
+  function selectUnknown() {
+    const taken = new Set(map.systems.filter((s) => s.eveSystemId == null).map((s) => s.name.toLowerCase()));
+    let name = 'Unknown', n = 1;
+    while (taken.has(name.toLowerCase())) { n += 1; name = `Unknown ${n}`; }
+    const opts: SystemOpts = { eveSystemId: null, effect: 'none', statics: [], regionName: null, npcType: null };
+    if (onSubmit) onSubmit(name, 'unknown', position, opts);
+    else storeAddSystem(name, 'unknown', position, opts);
+    onClose();
   }
 
   function clearSelection() {
@@ -254,12 +271,19 @@ export function AddSystemModal({ position, onClose, onSubmit }: Props) {
     </div>,
     document.body,
     )}
-    {showResults && dropdownPos && createPortal(
+    {(showResults || showUnknown) && dropdownPos && createPortal(
       <ul
         className="search-results"
         role="listbox"
         style={{ position: 'fixed', top: dropdownPos.top, left: dropdownPos.left, width: dropdownPos.width, zIndex: 2000 }}
       >
+        {showUnknown && (
+          <li className="search-results__item" role="option"
+            onMouseDown={(e) => { e.preventDefault(); selectUnknown(); }}>
+            <span>{t('addSystem.unknownOption')}</span>
+            <span className="search-results__class">?</span>
+          </li>
+        )}
         {results.map((r, i) => {
           const alreadyOnMap = isOnMap(r.id, r.name);
           return (

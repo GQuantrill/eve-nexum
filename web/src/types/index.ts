@@ -1,7 +1,8 @@
 export type SystemClass =
   | 'C1' | 'C2' | 'C3' | 'C4' | 'C5' | 'C6' | 'C13'
   | 'HS' | 'LS' | 'NS'
-  | 'Thera' | 'Pochven' | 'Drifter';
+  | 'Thera' | 'Pochven' | 'Drifter'
+  | 'unknown';   // placeholder node — an unmapped wormhole destination (no eve id)
 
 export type WormholeEffect =
   | 'none' | 'pulsar' | 'black_hole' | 'cataclysmic_variable'

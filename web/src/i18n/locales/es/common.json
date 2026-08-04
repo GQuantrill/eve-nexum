@@ -409,7 +409,8 @@
     "staticsPlaceholder": "rellenado automáticamente desde la base de datos",
     "loading": "Cargando…",
     "add": "Añadir sistema",
-    "onMap": "en el mapa"
+    "onMap": "en el mapa",
+    "unknownOption": "Desconocido (wormhole sin mapear)"
   },
   "commandPalette": {
     "placeholder": "Buscar sistemas y mapas…",

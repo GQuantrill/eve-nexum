@@ -447,7 +447,8 @@
     "staticsPlaceholder": "auto-filled from database",
     "loading": "Loading…",
     "add": "Add System",
-    "onMap": "on map"
+    "onMap": "on map",
+    "unknownOption": "Unknown (unmapped wormhole)"
   },
   "commandPalette": {
     "placeholder": "Search systems and maps…",

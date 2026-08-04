@@ -409,7 +409,8 @@
     "staticsPlaceholder": "rempli automatiquement depuis la base de données",
     "loading": "Chargement…",
     "add": "Ajouter le système",
-    "onMap": "sur la carte"
+    "onMap": "sur la carte",
+    "unknownOption": "Inconnu (wormhole non cartographié)"
   },
   "commandPalette": {
     "placeholder": "Rechercher systèmes et cartes…",

@@ -409,7 +409,8 @@
     "staticsPlaceholder": "automatisch aus der Datenbank gefüllt",
     "loading": "Lädt…",
     "add": "System hinzufügen",
-    "onMap": "auf Karte"
+    "onMap": "auf Karte",
+    "unknownOption": "Unbekannt (unerforschtes Wurmloch)"
   },
   "commandPalette": {
     "placeholder": "Systeme und Karten suchen…",

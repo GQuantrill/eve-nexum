@@ -202,6 +202,12 @@
   }
 }
 
+/* Unknown placeholder node (unmapped wormhole) — a clear red outline so it reads
+   as "destination not yet known", distinct from a resolved system. */
+.system-node.system-node--unknown {
+  border: 2px solid var(--cv-conn-expired);
+}
+
 /* Uniform-size mode — every node is padded up to the natural width /
    height of the largest visible node. The min-width / min-height values
    are applied inline from SystemNode after a ResizeObserver measures

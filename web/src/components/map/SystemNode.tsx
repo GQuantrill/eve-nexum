@@ -289,7 +289,7 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
   return (
     <div
       ref={nodeRef}
-      className={`system-node${sys.locked ? ' nopan' : ''}${isTarget ? ' system-node--connect-target' : ''}${isStale ? ' system-node--stale' : ''}${isSovHostile ? ' system-node--sov-hostile' : ''}${isSovBlue ? ' system-node--sov-blue' : ''}${uniformSize ? ' system-node--uniform' : ''}${compactMode ? ' system-node--compact' : ''}${watchDef ? ' system-node--watched' : ''}${filteredOut ? ' system-node--filtered-out' : ''}${contentMatch ? ' system-node--content-match' : ''}${sys.dimmed ? ' system-node--dimmed' : ''}${sys.routeHighlighted ? ' system-node--route' : ''}`}
+      className={`system-node${sys.locked ? ' nopan' : ''}${isTarget ? ' system-node--connect-target' : ''}${isStale ? ' system-node--stale' : ''}${isSovHostile ? ' system-node--sov-hostile' : ''}${isSovBlue ? ' system-node--sov-blue' : ''}${uniformSize ? ' system-node--uniform' : ''}${compactMode ? ' system-node--compact' : ''}${watchDef ? ' system-node--watched' : ''}${filteredOut ? ' system-node--filtered-out' : ''}${contentMatch ? ' system-node--content-match' : ''}${sys.dimmed ? ' system-node--dimmed' : ''}${sys.routeHighlighted ? ' system-node--route' : ''}${sys.systemClass === 'unknown' ? ' system-node--unknown' : ''}`}
       style={{
         '--class-color': color,
         ...(intelColor ? { '--intel-color': intelColor } : null),

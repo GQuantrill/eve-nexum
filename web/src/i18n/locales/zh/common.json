@@ -409,7 +409,8 @@
     "staticsPlaceholder": "从数据库自动填充",
     "loading": "加载中…",
     "add": "添加星系",
-    "onMap": "已在地图上"
+    "onMap": "已在地图上",
+    "unknownOption": "未知（未探明的虫洞）"
   },
   "commandPalette": {
     "placeholder": "搜索星系和地图…",

@@ -409,7 +409,8 @@
     "staticsPlaceholder": "데이터베이스에서 자동 채움",
     "loading": "불러오는 중…",
     "add": "성계 추가",
-    "onMap": "지도에 있음"
+    "onMap": "지도에 있음",
+    "unknownOption": "알 수 없음 (미탐사 웜홀)"
   },
   "commandPalette": {
     "placeholder": "성계와 지도 검색…",
