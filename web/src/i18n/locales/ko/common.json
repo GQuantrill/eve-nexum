@@ -1854,5 +1854,30 @@
     "unknown": "알 수 없음",
     "unknownShip": "알 수 없는 함선",
     "ago": "{{d}} 전"
+  },
+  "jumpPlanner": {
+    "title": "점프 플래너",
+    "close": "닫기",
+    "savedHdr": "저장된 계획 (클릭하여 불러오기)",
+    "savedEmpty": "아직 없음 — 경로를 계획하고 아래에 이름을 입력한 후 저장을 누르세요.",
+    "from": "출발 (로우/널)",
+    "to": "도착 (로우/널)",
+    "ship": "함선",
+    "range": "범위",
+    "fewestJumps": "최소 점프",
+    "leastFuel": "최소 연료",
+    "planRoute": "경로 계획",
+    "planning": "계획 중…",
+    "nameToSave": "저장할 이름…",
+    "save": "저장",
+    "errNoCoords": "이 배포에는 3D 좌표가 로드되어 있지 않습니다 (좌표 백필을 실행하세요).",
+    "errNoRoute": "범위 내 경로 없음 — 더 긴 항속의 함선이나 더 높은 JDC를 사용해 보세요.",
+    "errFailed": "경로 계산 실패.",
+    "searching": "검색 중…",
+    "searchSystem": "성계 검색…",
+    "result": "{{jumps}} 점프 · {{ly}} ly · ~{{fuel}} 아이소토프 (추정)",
+    "loadPlan": "이 계획 불러오기",
+    "deletePlan": "계획 삭제",
+    "change": "변경"
   }
 }

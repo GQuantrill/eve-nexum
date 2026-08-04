@@ -575,8 +575,8 @@ export function Toolbar() {
         <button
           className="toolbar__toggle toolbar__toggle--icon toolbar__toggle--prominent"
           onClick={() => setShowJumpPlanner(true)}
-          data-tooltip="Jump Planner"
-          aria-label="Jump Planner"
+          data-tooltip={t('jumpPlanner.title')}
+          aria-label={t('jumpPlanner.title')}
         >
           <NavigationArrowIcon size={18} weight="regular" />
         </button>

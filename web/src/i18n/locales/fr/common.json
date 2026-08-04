@@ -1854,5 +1854,30 @@
     "unknown": "Inconnu",
     "unknownShip": "Vaisseau inconnu",
     "ago": "il y a {{d}}"
+  },
+  "jumpPlanner": {
+    "title": "Planificateur de saut",
+    "close": "Fermer",
+    "savedHdr": "Plans enregistrés (cliquer pour charger)",
+    "savedEmpty": "Aucun pour l’instant — planifiez une route, saisissez un nom ci-dessous et cliquez Enregistrer.",
+    "from": "De (low/null)",
+    "to": "Vers (low/null)",
+    "ship": "Vaisseau",
+    "range": "Portée",
+    "fewestJumps": "Moins de sauts",
+    "leastFuel": "Moins de carburant",
+    "planRoute": "Planifier la route",
+    "planning": "Planification…",
+    "nameToSave": "Nom à enregistrer…",
+    "save": "Enregistrer",
+    "errNoCoords": "Ce déploiement n’a pas de coordonnées 3D chargées (lancez le backfill des coordonnées).",
+    "errNoRoute": "Aucune route à portée — essayez un vaisseau à plus longue portée ou un JDC plus élevé.",
+    "errFailed": "Échec du calcul de route.",
+    "searching": "Recherche…",
+    "searchSystem": "Rechercher un système…",
+    "result": "{{jumps}} sauts · {{ly}} ly · ~{{fuel}} isotopes (estimation)",
+    "loadPlan": "Charger ce plan",
+    "deletePlan": "Supprimer le plan",
+    "change": "Modifier"
   }
 }

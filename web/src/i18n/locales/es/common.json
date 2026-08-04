@@ -1854,5 +1854,30 @@
     "unknown": "Desconocido",
     "unknownShip": "Nave desconocida",
     "ago": "hace {{d}}"
+  },
+  "jumpPlanner": {
+    "title": "Planificador de saltos",
+    "close": "Cerrar",
+    "savedHdr": "Planes guardados (clic para cargar)",
+    "savedEmpty": "Ninguno todavía — planifica una ruta, escribe un nombre abajo y pulsa Guardar.",
+    "from": "Desde (low/null)",
+    "to": "Hasta (low/null)",
+    "ship": "Nave",
+    "range": "Alcance",
+    "fewestJumps": "Menos saltos",
+    "leastFuel": "Menos combustible",
+    "planRoute": "Planificar ruta",
+    "planning": "Planificando…",
+    "nameToSave": "Nombre para guardar…",
+    "save": "Guardar",
+    "errNoCoords": "Esta instalación no tiene cargadas las coordenadas 3D (ejecuta el backfill de coordenadas).",
+    "errNoRoute": "Sin ruta al alcance — prueba una nave de mayor alcance o un JDC más alto.",
+    "errFailed": "Error al calcular la ruta.",
+    "searching": "Buscando…",
+    "searchSystem": "Buscar un sistema…",
+    "result": "{{jumps}} saltos · {{ly}} ly · ~{{fuel}} isótopos (estimación)",
+    "loadPlan": "Cargar este plan",
+    "deletePlan": "Eliminar plan",
+    "change": "Cambiar"
   }
 }
