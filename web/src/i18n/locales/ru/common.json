@@ -1922,6 +1922,18 @@
     "result": "{{jumps}} прыжков · {{ly}} ly · ~{{fuel}} изотопов (оценка)",
     "loadPlan": "Загрузить этот план",
     "deletePlan": "Удалить план",
-    "change": "Изменить"
+    "change": "Изменить",
+    "structures": "Структуры",
+    "syncFromEsi": "Синхронизировать из ESI",
+    "syncing": "Синхронизация…",
+    "synced": "Синхронизировано: {{count}}",
+    "syncReauth": "Выйдите и войдите снова, чтобы предоставить доступ к структурам",
+    "syncNoRole": "Требуется роль Station Manager или Director",
+    "syncNoCorp": "Корпорация не указана",
+    "syncFailed": "Ошибка синхронизации",
+    "dockCant": "{{ship}} не может пристыковаться к {{name}} ({{type}}).",
+    "dockTether": "{{ship}} может только затетериться к {{name}} ({{type}}), но не пристыковаться.",
+    "structureFallback": "Структура",
+    "npcStation": "NPC-станция"
   }
 }

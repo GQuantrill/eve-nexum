@@ -43,15 +43,15 @@ export function JumpPlannerModal({ onClose }: { onClose: () => void }) {
   // Pull the corp's structures from ESI (role- + scope-gated server-side); the
   // status covers re-auth / role / no-corp outcomes, not just success.
   const syncStructures = async () => {
-    setStructSync('Syncing…');
+    setStructSync(t('jumpPlanner.syncing'));
     try {
       const r = await api<{ status: string; count?: number }>('/api/structures/refresh', { method: 'POST' });
-      if (r.status === 'ok') { setStructSync(`Synced ${r.count ?? 0}`); loadStructures(); }
-      else if (r.status === 'needs_reauth') setStructSync('Log out and back in to grant structure access');
-      else if (r.status === 'no_role') setStructSync('Needs the Station Manager or Director role');
-      else if (r.status === 'no_corp') setStructSync('No corporation on record');
-      else setStructSync('Sync failed');
-    } catch { setStructSync('Sync failed'); }
+      if (r.status === 'ok') { setStructSync(t('jumpPlanner.synced', { count: r.count ?? 0 })); loadStructures(); }
+      else if (r.status === 'needs_reauth') setStructSync(t('jumpPlanner.syncReauth'));
+      else if (r.status === 'no_role') setStructSync(t('jumpPlanner.syncNoRole'));
+      else if (r.status === 'no_corp') setStructSync(t('jumpPlanner.syncNoCorp'));
+      else setStructSync(t('jumpPlanner.syncFailed'));
+    } catch { setStructSync(t('jumpPlanner.syncFailed')); }
   };
   const savePlan = async () => {
     if (!from || !to || !saveName.trim()) return;
@@ -76,8 +76,9 @@ export function JumpPlannerModal({ onClose }: { onClose: () => void }) {
     .map((p) => {
       if (!p?.structureType) return null;
       const st = dockState(shipClass, p.structureType);
-      if (st === 'undock') return { bad: true,  msg: `${cls.label} can't dock at ${p.name} (${p.structureType}).` };
-      if (st === 'tether') return { bad: false, msg: `${cls.label} can only tether at ${p.name} (${p.structureType}), not dock.` };
+      const vars = { ship: cls.label, name: p.name, type: p.structureType };
+      if (st === 'undock') return { bad: true,  msg: t('jumpPlanner.dockCant', vars) };
+      if (st === 'tether') return { bad: false, msg: t('jumpPlanner.dockTether', vars) };
       return null;
     })
     .filter((w): w is { bad: boolean; msg: string } => w !== null);
@@ -131,8 +132,8 @@ export function JumpPlannerModal({ onClose }: { onClose: () => void }) {
             <Field label={t('jumpPlanner.to')}   value={to}   onPick={setTo}   structures={structures} />
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 12, color: 'var(--text-subtle)' }}>
-            <span>Structures: <strong>{structures.length}</strong></span>
-            <button type="button" className="btn btn--ghost" onClick={syncStructures}>Sync from ESI</button>
+            <span>{t('jumpPlanner.structures')}: <strong>{structures.length}</strong></span>
+            <button type="button" className="btn btn--ghost" onClick={syncStructures}>{t('jumpPlanner.syncFromEsi')}</button>
             {structSync && <span style={{ color: 'var(--text-faint)' }}>{structSync}</span>}
           </div>
 
@@ -287,14 +288,14 @@ function Field({ label, value, onPick, structures }: { label: string; value: Pic
             <li key={`st-${s.key}`} className="search-results__item" role="option"
               onMouseDown={(e) => { e.preventDefault(); onPick({ id: s.solarSystemId!, name: s.name, structureType: s.typeName || null }); setQuery(''); }}>
               <span>{s.name}</span>
-              <span className="search-results__class">{s.typeName || 'Structure'} · {s.systemName}</span>
+              <span className="search-results__class">{s.typeName || t('jumpPlanner.structureFallback')} · {s.systemName}</span>
             </li>
           ))}
           {stationSys.map((s) => (
             <li key={`sta-${s.solarSystemId}`} className="search-results__item" role="option"
               onMouseDown={(e) => { e.preventDefault(); onPick({ id: s.solarSystemId, name: s.systemName, structureType: 'station' }); setQuery(''); }}>
               <span>{s.systemName}</span>
-              <span className="search-results__class">NPC station</span>
+              <span className="search-results__class">{t('jumpPlanner.npcStation')}</span>
             </li>
           ))}
           {loading && <li className="search-results__item" style={{ cursor: 'default', opacity: 0.6 }}>{t('jumpPlanner.searching')}</li>}

@@ -1882,6 +1882,18 @@
     "result": "{{jumps}} 跳 · {{ly}} ly · ~{{fuel}} 同位素（估算）",
     "loadPlan": "加载此规划",
     "deletePlan": "删除规划",
-    "change": "更改"
+    "change": "更改",
+    "structures": "建筑",
+    "syncFromEsi": "从 ESI 同步",
+    "syncing": "同步中…",
+    "synced": "已同步 {{count}}",
+    "syncReauth": "退出并重新登录以授予建筑访问权限",
+    "syncNoRole": "需要 Station Manager 或 Director 角色",
+    "syncNoCorp": "未记录军团",
+    "syncFailed": "同步失败",
+    "dockCant": "{{ship}} 无法在 {{name}}（{{type}}）停靠。",
+    "dockTether": "{{ship}} 只能在 {{name}}（{{type}}）系留，无法停靠。",
+    "structureFallback": "建筑",
+    "npcStation": "NPC 空间站"
   }
 }

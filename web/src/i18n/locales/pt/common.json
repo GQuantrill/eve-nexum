@@ -1882,6 +1882,18 @@
     "result": "{{jumps}} saltos · {{ly}} ly · ~{{fuel}} isótopos (estimativa)",
     "loadPlan": "Carregar este plano",
     "deletePlan": "Eliminar plano",
-    "change": "Alterar"
+    "change": "Alterar",
+    "structures": "Estruturas",
+    "syncFromEsi": "Sincronizar do ESI",
+    "syncing": "A sincronizar…",
+    "synced": "{{count}} sincronizadas",
+    "syncReauth": "Termine e reinicie sessão para conceder acesso a estruturas",
+    "syncNoRole": "Requer o cargo Station Manager ou Director",
+    "syncNoCorp": "Sem corporação registada",
+    "syncFailed": "Falha na sincronização",
+    "dockCant": "{{ship}} não pode atracar em {{name}} ({{type}}).",
+    "dockTether": "{{ship}} só pode fazer tether em {{name}} ({{type}}), não atracar.",
+    "structureFallback": "Estrutura",
+    "npcStation": "Estação NPC"
   }
 }

@@ -1882,6 +1882,18 @@
     "result": "{{jumps}} ジャンプ · {{ly}} ly · ~{{fuel}} アイソトープ（推定）",
     "loadPlan": "このプランを読み込む",
     "deletePlan": "プランを削除",
-    "change": "変更"
+    "change": "変更",
+    "structures": "ストラクチャ",
+    "syncFromEsi": "ESIから同期",
+    "syncing": "同期中…",
+    "synced": "{{count}} 件同期しました",
+    "syncReauth": "ストラクチャへのアクセスを許可するには再ログインしてください",
+    "syncNoRole": "Station Manager または Director ロールが必要です",
+    "syncNoCorp": "コーポレーションが登録されていません",
+    "syncFailed": "同期に失敗しました",
+    "dockCant": "{{ship}} は {{name}}（{{type}}）にドッキングできません。",
+    "dockTether": "{{ship}} は {{name}}（{{type}}）でテザーのみ可能で、ドッキングはできません。",
+    "structureFallback": "ストラクチャ",
+    "npcStation": "NPCステーション"
   }
 }

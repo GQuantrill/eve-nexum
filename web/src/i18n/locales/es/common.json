@@ -1882,6 +1882,18 @@
     "result": "{{jumps}} saltos · {{ly}} ly · ~{{fuel}} isótopos (estimación)",
     "loadPlan": "Cargar este plan",
     "deletePlan": "Eliminar plan",
-    "change": "Cambiar"
+    "change": "Cambiar",
+    "structures": "Estructuras",
+    "syncFromEsi": "Sincronizar desde ESI",
+    "syncing": "Sincronizando…",
+    "synced": "{{count}} sincronizadas",
+    "syncReauth": "Cierra sesión y vuelve a entrar para conceder acceso a estructuras",
+    "syncNoRole": "Requiere el rol Station Manager o Director",
+    "syncNoCorp": "Sin corporación registrada",
+    "syncFailed": "Error de sincronización",
+    "dockCant": "{{ship}} no puede atracar en {{name}} ({{type}}).",
+    "dockTether": "{{ship}} solo puede hacer tether en {{name}} ({{type}}), no atracar.",
+    "structureFallback": "Estructura",
+    "npcStation": "Estación PNJ"
   }
 }

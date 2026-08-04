@@ -1882,6 +1882,18 @@
     "result": "{{jumps}} 점프 · {{ly}} ly · ~{{fuel}} 아이소토프 (추정)",
     "loadPlan": "이 계획 불러오기",
     "deletePlan": "계획 삭제",
-    "change": "변경"
+    "change": "변경",
+    "structures": "구조물",
+    "syncFromEsi": "ESI에서 동기화",
+    "syncing": "동기화 중…",
+    "synced": "{{count}}개 동기화됨",
+    "syncReauth": "구조물 접근 권한을 부여하려면 로그아웃 후 다시 로그인하세요",
+    "syncNoRole": "Station Manager 또는 Director 역할 필요",
+    "syncNoCorp": "등록된 콥이 없습니다",
+    "syncFailed": "동기화 실패",
+    "dockCant": "{{ship}}은(는) {{name}}({{type}})에 도킹할 수 없습니다.",
+    "dockTether": "{{ship}}은(는) {{name}}({{type}})에서 테더만 가능하고 도킹은 불가합니다.",
+    "structureFallback": "구조물",
+    "npcStation": "NPC 스테이션"
   }
 }

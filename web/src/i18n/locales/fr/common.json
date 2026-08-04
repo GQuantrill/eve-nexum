@@ -1882,6 +1882,18 @@
     "result": "{{jumps}} sauts · {{ly}} ly · ~{{fuel}} isotopes (estimation)",
     "loadPlan": "Charger ce plan",
     "deletePlan": "Supprimer le plan",
-    "change": "Modifier"
+    "change": "Modifier",
+    "structures": "Structures",
+    "syncFromEsi": "Synchroniser depuis l'ESI",
+    "syncing": "Synchronisation…",
+    "synced": "{{count}} synchronisées",
+    "syncReauth": "Déconnectez-vous et reconnectez-vous pour accorder l'accès aux structures",
+    "syncNoRole": "Nécessite le rôle Station Manager ou Director",
+    "syncNoCorp": "Aucune corporation enregistrée",
+    "syncFailed": "Échec de la synchronisation",
+    "dockCant": "{{ship}} ne peut pas s'amarrer à {{name}} ({{type}}).",
+    "dockTether": "{{ship}} peut seulement rester en tether à {{name}} ({{type}}), pas s'amarrer.",
+    "structureFallback": "Structure",
+    "npcStation": "Station PNJ"
   }
 }

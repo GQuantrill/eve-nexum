@@ -1882,6 +1882,18 @@
     "result": "{{jumps}} jumps · {{ly}} ly · ~{{fuel}} isotopes (estimate)",
     "loadPlan": "Load this plan",
     "deletePlan": "Delete plan",
-    "change": "Change"
+    "change": "Change",
+    "structures": "Structures",
+    "syncFromEsi": "Sync from ESI",
+    "syncing": "Syncing…",
+    "synced": "Synced {{count}}",
+    "syncReauth": "Log out and back in to grant structure access",
+    "syncNoRole": "Needs the Station Manager or Director role",
+    "syncNoCorp": "No corporation on record",
+    "syncFailed": "Sync failed",
+    "dockCant": "{{ship}} can't dock at {{name}} ({{type}}).",
+    "dockTether": "{{ship}} can only tether at {{name}} ({{type}}), not dock.",
+    "structureFallback": "Structure",
+    "npcStation": "NPC station"
   }
 }

@@ -1882,6 +1882,18 @@
     "result": "{{jumps}} Sprünge · {{ly}} ly · ~{{fuel}} Isotope (Schätzung)",
     "loadPlan": "Diesen Plan laden",
     "deletePlan": "Plan löschen",
-    "change": "Ändern"
+    "change": "Ändern",
+    "structures": "Strukturen",
+    "syncFromEsi": "Von ESI synchronisieren",
+    "syncing": "Synchronisiere…",
+    "synced": "{{count}} synchronisiert",
+    "syncReauth": "Ab- und wieder anmelden, um Strukturzugriff zu gewähren",
+    "syncNoRole": "Benötigt die Rolle Station Manager oder Director",
+    "syncNoCorp": "Keine Corporation hinterlegt",
+    "syncFailed": "Synchronisierung fehlgeschlagen",
+    "dockCant": "{{ship}} kann nicht an {{name}} ({{type}}) andocken.",
+    "dockTether": "{{ship}} kann an {{name}} ({{type}}) nur tethern, nicht andocken.",
+    "structureFallback": "Struktur",
+    "npcStation": "NPC-Station"
   }
 }
