@@ -65,6 +65,26 @@ structuresRouter.get('/', async (req, res) => {
   } catch (err) { log.error('list failed', err); return res.status(500).json({ error: 'Database query failed' }); }
 });
 
+// GET /api/structures/stations?systems=id,id — of the given systems, the LS/NS
+// ones that hold at least one NPC station (endpoints where normal caps can dock).
+// One row per system: all NPC stations dock the same, so the station identity
+// doesn't matter for routing, only that the system has one.
+structuresRouter.get('/stations', async (req, res) => {
+  const ids = String(req.query.systems ?? '').split(',').map((s) => parseInt(s, 10)).filter(Boolean).slice(0, 30);
+  if (!ids.length) return res.json([]);
+  try {
+    const { rows } = await db.query(
+      `SELECT DISTINCT ss.id AS "solarSystemId", ss.name AS "systemName", ss.class AS "systemClass"
+         FROM npc_stations n
+         JOIN solar_systems ss ON ss.id = n.solar_system_id
+        WHERE n.solar_system_id = ANY($1::int[]) AND ss.class IN ('LS','NS')
+        ORDER BY ss.name`,
+      [ids],
+    );
+    return res.json(rows);
+  } catch (err) { log.error('stations lookup failed', err); return res.status(500).json({ error: 'Database query failed' }); }
+});
+
 // POST /api/structures/refresh — sync from ESI. Non-'ok' non-'error' outcomes
 // (no_corp / no_role / needs_reauth) are 200s carrying a status the UI explains.
 structuresRouter.post('/refresh', async (req, res) => {

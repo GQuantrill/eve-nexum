@@ -99,6 +99,7 @@ async function main() {
   await importConstellations(zip, constellationRegion);
   await importSolarSystems(zip, whMap, constellationRegion);
   await importStargates(zip);
+  await importNpcStations(zip);
   await importCategories(zip);
   await importGroups(zip);
   await importTypes(zip);
@@ -793,6 +794,30 @@ async function importStargates(zip: Zip) {
     ['id', 'system_id', 'destination_gate_id', 'destination_system_id'],
     'id', rows, 1000);
   console.log(`${rows.length} stargates`);
+}
+
+// NPC stations -> npc_stations (jump-planner endpoints). The SDE has no station
+// names (they're generated), so we keep id / system / type and label by system +
+// station type when queried.
+async function importNpcStations(zip: Zip) {
+  process.stdout.write('Importing NPC stations... ');
+  await db.query(`
+    CREATE TABLE IF NOT EXISTS npc_stations (
+      station_id BIGINT PRIMARY KEY, solar_system_id INTEGER, type_id INTEGER
+    );
+    CREATE INDEX IF NOT EXISTS idx_npc_stations_system ON npc_stations (solar_system_id);
+  `);
+  const lines = await readJsonl(zip, 'npcStations.jsonl');
+  const rows: [number, number, number][] = [];
+  for (const line of lines) {
+    try {
+      const o = JSON.parse(line);
+      if (!o._key || !o.solarSystemID || !o.typeID) continue;
+      rows.push([o._key, o.solarSystemID, o.typeID]);
+    } catch { /* skip */ }
+  }
+  await batchUpsert('npc_stations', ['station_id', 'solar_system_id', 'type_id'], 'station_id', rows, 1000);
+  console.log(`${rows.length} NPC stations`);
 }
 
 async function importCategories(zip: Zip) {

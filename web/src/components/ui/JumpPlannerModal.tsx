@@ -256,7 +256,17 @@ function Field({ label, value, onPick, structures }: { label: string; value: Pic
   const structMatches = q.length >= 2
     ? structures.filter((s) => s.solarSystemId != null && (s.systemClass === 'LS' || s.systemClass === 'NS') && s.name.toLowerCase().includes(q)).slice(0, 6)
     : [];
-  const show = query.trim().length >= 2 && (structMatches.length > 0 || kspace.length > 0 || loading);
+  // NPC stations in the matched LS/NS systems (one per system — all dock alike).
+  const kspaceIds = kspace.map((r) => r.id).join(',');
+  const [stationSys, setStationSys] = useState<{ solarSystemId: number; systemName: string }[]>([]);
+  useEffect(() => {
+    if (!kspaceIds) { setStationSys([]); return; }
+    let off = false;
+    api<{ solarSystemId: number; systemName: string }[]>(`/api/structures/stations?systems=${kspaceIds}`)
+      .then((r) => { if (!off) setStationSys(r); }).catch(() => { if (!off) setStationSys([]); });
+    return () => { off = true; };
+  }, [kspaceIds]);
+  const show = query.trim().length >= 2 && (structMatches.length > 0 || stationSys.length > 0 || kspace.length > 0 || loading);
   return (
     <div style={{ position: 'relative' }}>
       <div style={{ fontSize: 12, color: 'var(--text-subtle)', marginBottom: 3 }}>{label}</div>
@@ -278,6 +288,13 @@ function Field({ label, value, onPick, structures }: { label: string; value: Pic
               onMouseDown={(e) => { e.preventDefault(); onPick({ id: s.solarSystemId!, name: s.name, structureType: s.typeName || null }); setQuery(''); }}>
               <span>{s.name}</span>
               <span className="search-results__class">{s.typeName || 'Structure'} · {s.systemName}</span>
+            </li>
+          ))}
+          {stationSys.map((s) => (
+            <li key={`sta-${s.solarSystemId}`} className="search-results__item" role="option"
+              onMouseDown={(e) => { e.preventDefault(); onPick({ id: s.solarSystemId, name: s.systemName, structureType: 'station' }); setQuery(''); }}>
+              <span>{s.systemName}</span>
+              <span className="search-results__class">NPC station</span>
             </li>
           ))}
           {loading && <li className="search-results__item" style={{ cursor: 'default', opacity: 0.6 }}>{t('jumpPlanner.searching')}</li>}

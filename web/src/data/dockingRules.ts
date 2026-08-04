@@ -28,6 +28,9 @@ const STRUCTURE_COLUMN: Record<string, StructCol> = {
   "'Horizon' Fortizar": 'fortizar', "'Prometheus' Fortizar": 'fortizar',
   Sotiyo: 'sotiyo',
   Keepstar: 'keepstar',
+  // Synthetic marker the planner uses for an NPC-station endpoint (not an SDE
+  // type name — real station types never collide with this lowercase key).
+  station: 'station',
 };
 
 // JUMP_CLASSES key -> matrix row.

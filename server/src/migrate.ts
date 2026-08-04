@@ -942,6 +942,17 @@ export async function migrate() {
       updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
     CREATE INDEX IF NOT EXISTS idx_structures_corp ON structures (corporation_id);
+
+    -- NPC stations from the SDE (npcStations.jsonl), for jump-planner endpoints.
+    -- Names aren't in the SDE (they're generated), so we store id/system/type and
+    -- label them by system + station type at query time. Populated by setup-db's
+    -- importNpcStations or scripts/backfill-npc-stations.ts.
+    CREATE TABLE IF NOT EXISTS npc_stations (
+      station_id      BIGINT  PRIMARY KEY,
+      solar_system_id INTEGER,
+      type_id         INTEGER
+    );
+    CREATE INDEX IF NOT EXISTS idx_npc_stations_system ON npc_stations (solar_system_id);
   `);
 
   await encryptLegacyTokens();
