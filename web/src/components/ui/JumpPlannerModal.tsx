@@ -203,6 +203,7 @@ export function JumpPlannerModal({ onClose }: { onClose: () => void }) {
             </div>
             <Labelled label={t('jumpPlanner.preferStations')}>
               <Select value={preferLevel} onChange={setPreferLevel} ariaLabel={t('jumpPlanner.preferStations')}
+                title={t('jumpPlanner.preferHelp')}
                 options={[
                   { value: 'off', label: t('jumpPlanner.preferOff') },
                   { value: 'prefer', label: t('jumpPlanner.preferPrefer') },

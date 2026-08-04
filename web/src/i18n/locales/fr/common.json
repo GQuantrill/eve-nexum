@@ -1908,6 +1908,7 @@
     "waypoints": "Points de passage",
     "waypointAdd": "Ajouter un point de passage…",
     "moveUp": "Monter",
-    "moveDown": "Descendre"
+    "moveDown": "Descendre",
+    "preferHelp": "Désactivé : route la plus courte. Préférer : orienter la route vers les systèmes avec station ou structure. Fort : privilégier fortement les systèmes avec station, même si cela ajoute des sauts."
   }
 }

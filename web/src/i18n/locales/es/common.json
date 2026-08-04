@@ -1908,6 +1908,7 @@
     "waypoints": "Puntos de paso",
     "waypointAdd": "Añadir punto de paso…",
     "moveUp": "Subir",
-    "moveDown": "Bajar"
+    "moveDown": "Bajar",
+    "preferHelp": "Desactivado: ruta más corta. Preferir: guiar la ruta por sistemas con estación o estructura. Fuerte: favorecer mucho los sistemas con estación, aunque añada saltos."
   }
 }

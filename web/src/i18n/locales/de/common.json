@@ -1908,6 +1908,7 @@
     "waypoints": "Wegpunkte",
     "waypointAdd": "Wegpunkt hinzufügen…",
     "moveUp": "Nach oben",
-    "moveDown": "Nach unten"
+    "moveDown": "Nach unten",
+    "preferHelp": "Aus: kürzeste Route. Bevorzugen: die Route sanft durch Systeme mit Station/Struktur lenken. Stark: Stationssysteme stark bevorzugen, auch wenn es Sprünge kostet."
   }
 }

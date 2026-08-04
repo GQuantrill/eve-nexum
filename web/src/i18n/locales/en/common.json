@@ -1908,6 +1908,7 @@
     "waypoints": "Waypoints",
     "waypointAdd": "Add a waypoint…",
     "moveUp": "Move up",
-    "moveDown": "Move down"
+    "moveDown": "Move down",
+    "preferHelp": "Off: shortest route. Prefer: nudge the route through systems with a station or structure. Strong: strongly favour station systems, even if it adds jumps."
   }
 }
