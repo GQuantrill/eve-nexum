@@ -1623,6 +1623,10 @@
       "jumpRange": {
         "title": "Jump-drive range",
         "desc": "Pick a staging system and highlight every low/null system within jump range of it, colour-banded by ship class (Black Ops, Carrier, Super, JF) at your Jump Drive Calibration. Tag cyno-jump routes on connections, auto-annotated with the light-year distance and which classes can make the jump."
+      },
+      "jumpPlanner": {
+        "title": "Jump planner",
+        "desc": "Plot a multi-hop capital jump route between any two low/null systems. Pick a ship class and your skills, choose fewest jumps or least fuel, and see the route mapped with per-hop light-years and an isotope estimate. Save and reload your routes."
       }
     },
     "corpFeatures": {

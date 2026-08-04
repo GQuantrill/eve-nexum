@@ -1553,6 +1553,10 @@
       "jumpRange": {
         "title": "Sprungantriebs-Reichweite",
         "desc": "Wähle ein Staging-System und markiere jedes Low-/Null-System in Sprungreichweite, nach Schiffsklasse (Black Ops, Carrier, Super, JF) bei deiner Jump Drive Calibration farblich gestaffelt. Markiere Cyno-Sprungrouten an Verbindungen — automatisch mit Lichtjahr-Distanz und den passenden Klassen beschriftet."
+      },
+      "jumpPlanner": {
+        "title": "Sprungplaner",
+        "desc": "Plane eine mehrstufige Capital-Sprungroute zwischen zwei beliebigen Low-/Null-Systemen. Wähle eine Schiffsklasse und deine Skills, entscheide dich für wenigste Sprünge oder wenigsten Treibstoff und sieh die Route mit Lichtjahren pro Sprung und einer Isotopen-Schätzung. Speichere und lade deine Routen."
       }
     },
     "corpFeatures": {

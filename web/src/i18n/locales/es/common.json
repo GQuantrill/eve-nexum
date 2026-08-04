@@ -1553,6 +1553,10 @@
       "jumpRange": {
         "title": "Alcance del motor de salto",
         "desc": "Elige un sistema de staging y resalta cada sistema low/null dentro del alcance de salto, coloreado por clase de nave (Black Ops, Carrier, Super, JF) según tu Jump Drive Calibration. Etiqueta rutas de salto cyno en las conexiones, anotadas automáticamente con la distancia en años luz y qué clases pueden saltar."
+      },
+      "jumpPlanner": {
+        "title": "Planificador de saltos",
+        "desc": "Traza una ruta de salto capital de varios saltos entre dos sistemas low/null. Elige una clase de nave y tus habilidades, opta por menos saltos o menos combustible, y ve la ruta trazada con años luz por salto y una estimación de isótopos. Guarda y recarga tus rutas."
       }
     },
     "corpFeatures": {

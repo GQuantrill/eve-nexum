@@ -7,7 +7,7 @@ import {
   LinkBreakIcon, BroomIcon, TimerIcon,
   UsersIcon, UsersThreeIcon, StackIcon, ArrowsMergeIcon, ArrowsClockwiseIcon, LockIcon, ShieldCheckIcon,
   CardsIcon, WaveformIcon, BuildingsIcon, SparkleIcon, ChartLineIcon, FlagBannerIcon, SwordIcon, HandshakeIcon,
-  PathIcon, StarIcon, SnowflakeIcon, LightningIcon, WarningIcon, NavigationArrowIcon, TargetIcon, MapPinIcon, BroadcastIcon, BellRingingIcon, DiscordLogoIcon, BinocularsIcon,
+  PathIcon, StarIcon, SnowflakeIcon, LightningIcon, WarningIcon, NavigationArrowIcon, TargetIcon, PlanetIcon, MapPinIcon, BroadcastIcon, BellRingingIcon, DiscordLogoIcon, BinocularsIcon,
   CommandIcon, HouseIcon, SkullIcon, ChartBarIcon, PulseIcon, EyeIcon, SidebarIcon, EyeglassesIcon,
   SquaresFourIcon, UserGearIcon, TableIcon, ChartDonutIcon, ClockIcon, ClipboardTextIcon, TagIcon, IdentificationCardIcon,
   KeyIcon,
@@ -34,7 +34,7 @@ type FeatureId =
   | 'systemPanel' | 'sigMgmt' | 'labels' | 'structImport' | 'autoStruct' | 'activityCharts'
   | 'sovStation' | 'killboard' | 'effectDigest' | 'standings'
   | 'scout' | 'a0' | 'iceBelt' | 'storms' | 'proximity' | 'discordNotif' | 'watchlist'
-  | 'chains' | 'routePlanner' | 'jumpRange' | 'locationTracking' | 'presence' | 'onlineStatus'
+  | 'chains' | 'routePlanner' | 'jumpRange' | 'jumpPlanner' | 'locationTracking' | 'presence' | 'onlineStatus'
   | 'commandPalette' | 'homeHotkey' | 'killHighlights' | 'userStats' | 'apiKeys'
   | 'serverStatus' | 'demoMap' | 'sidebar' | 'colorVision';
 type CorpFeatureId =
@@ -102,6 +102,7 @@ const FEATURE_SECTIONS: FeatureSection[] = [
       { icon: LineSegmentsIcon,    id: 'chains'           },
       { icon: NavigationArrowIcon, id: 'routePlanner'     },
       { icon: TargetIcon,          id: 'jumpRange'        },
+      { icon: PlanetIcon,          id: 'jumpPlanner'      },
       { icon: MapPinIcon,          id: 'locationTracking' },
       { icon: UsersIcon,           id: 'presence'         },
       { icon: BroadcastIcon,       id: 'onlineStatus'     },

@@ -1553,6 +1553,10 @@
       "jumpRange": {
         "title": "Portée du disque de saut",
         "desc": "Choisissez un système de staging et mettez en évidence chaque système low/null à portée de saut, coloré par classe de vaisseau (Black Ops, Carrier, Super, JF) selon votre Jump Drive Calibration. Étiquetez les routes de saut cyno sur les connexions, annotées automatiquement avec la distance en années-lumière et les classes capables de sauter."
+      },
+      "jumpPlanner": {
+        "title": "Planificateur de saut",
+        "desc": "Tracez une route de saut capital multi-étapes entre deux systèmes low/null. Choisissez une classe de vaisseau et vos compétences, optez pour le moins de sauts ou le moins de carburant, et voyez la route cartographiée avec les années-lumière par saut et une estimation en isotopes. Enregistrez et rechargez vos routes."
       }
     },
     "corpFeatures": {
