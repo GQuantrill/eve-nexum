@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { XIcon } from '../../icons';
+import { XIcon, CaretUpIcon, CaretDownIcon } from '../../icons';
 import { Select } from './Select';
 import { api } from '../../api/client';
 import { useEsiSearch, systemResultLabel } from '../../hooks/useEsiSearch';
@@ -37,6 +37,7 @@ export function JumpPlannerModal({ onClose }: { onClose: () => void }) {
   const [structures, setStructures] = useState<CorpStructure[]>([]);
   const [structSync, setStructSync] = useState<string | null>(null);
   const [avoid, setAvoid] = useState<{ id: number; name: string }[]>([]);
+  const [waypoints, setWaypoints] = useState<{ id: number; name: string }[]>([]);
   const [preferLevel, setPreferLevel] = useUserSetting<string>('nexum.jump.preferLevel', 'off');
 
   const refreshPlans = () => { api<SavedPlan[]>('/api/jump-plans').then(setPlans).catch(() => {}); };
@@ -66,6 +67,11 @@ export function JumpPlannerModal({ onClose }: { onClose: () => void }) {
     setShipClass(p.shipClass); setObjective(p.objective); setResult(null); setError(null);
   };
   const deletePlan = async (id: string) => { await api(`/api/jump-plans/${id}`, { method: 'DELETE' }).catch(() => {}); refreshPlans(); };
+  const moveWaypoint = (i: number, dir: -1 | 1) => setWaypoints((w) => {
+    const j = i + dir;
+    if (j < 0 || j >= w.length) return w;
+    const c = [...w]; [c[i], c[j]] = [c[j], c[i]]; return c;
+  });
 
   const cls = JUMP_CLASSES.find((c) => c.key === shipClass) ?? JUMP_CLASSES[0];
   const rangeLy = jumpRange(cls.base, jdc);
@@ -92,6 +98,7 @@ export function JumpPlannerModal({ onClose }: { onClose: () => void }) {
       const params = new URLSearchParams({
         from: String(from.id), to: String(to.id), rangeLy: rangeLy.toFixed(2), objective,
       });
+      if (waypoints.length) params.set('via', waypoints.map((w) => w.id).join(','));
       if (avoid.length) params.set('avoid', avoid.map((a) => a.id).join(','));
       if (preferLevel !== 'off') {
         params.set('preferStations', preferLevel);
@@ -141,6 +148,22 @@ export function JumpPlannerModal({ onClose }: { onClose: () => void }) {
             <Field label={t('jumpPlanner.from')} value={from} onPick={setFrom} structures={structures} />
             <Field label={t('jumpPlanner.to')}   value={to}   onPick={setTo}   structures={structures} />
           </div>
+          <div>
+            <div style={{ fontSize: 12, color: 'var(--text-subtle)', marginBottom: 4 }}>{t('jumpPlanner.waypoints')}</div>
+            {waypoints.length > 0 && (
+              <ol style={{ margin: '0 0 6px', padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 4 }}>
+                {waypoints.map((w, i) => (
+                  <li key={w.id} style={{ display: 'flex', alignItems: 'center', gap: 4, border: '1px solid #30363d', borderRadius: 6, padding: '3px 6px 3px 10px', fontSize: 13 }}>
+                    <span style={{ flex: 1 }}>{i + 1}. {w.name}</span>
+                    <button type="button" className="icon-btn" title={t('jumpPlanner.moveUp')} disabled={i === 0} onClick={() => moveWaypoint(i, -1)}><CaretUpIcon size={12} /></button>
+                    <button type="button" className="icon-btn" title={t('jumpPlanner.moveDown')} disabled={i === waypoints.length - 1} onClick={() => moveWaypoint(i, 1)}><CaretDownIcon size={12} /></button>
+                    <button type="button" className="icon-btn" onClick={() => setWaypoints((v) => v.filter((x) => x.id !== w.id))}><XIcon size={11} /></button>
+                  </li>
+                ))}
+              </ol>
+            )}
+            <AddSystemSearch placeholder={t('jumpPlanner.waypointAdd')} onAdd={(s) => setWaypoints((w) => (w.some((x) => x.id === s.id) ? w : [...w, s]))} />
+          </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 12, color: 'var(--text-subtle)' }}>
             <span>{t('jumpPlanner.structures')}: <strong>{structures.length}</strong></span>
             <button type="button" className="btn btn--ghost" onClick={syncStructures}>{t('jumpPlanner.syncFromEsi')}</button>
@@ -161,7 +184,7 @@ export function JumpPlannerModal({ onClose }: { onClose: () => void }) {
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, alignItems: 'flex-start' }}>
             <div style={{ flex: '1 1 260px', minWidth: 220 }}>
               <div style={{ fontSize: 12, color: 'var(--text-subtle)', marginBottom: 4 }}>{t('jumpPlanner.avoid')}</div>
-              <AvoidPicker onAdd={(s) => setAvoid((a) => (a.some((x) => x.id === s.id) ? a : [...a, s]))} />
+              <AddSystemSearch placeholder={t('jumpPlanner.avoidAdd')} onAdd={(s) => setAvoid((a) => (a.some((x) => x.id === s.id) ? a : [...a, s]))} />
               {avoid.length > 0 && (
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 6 }}>
                   {avoid.map((a) => (
@@ -286,9 +309,9 @@ function Labelled({ label, children }: { label: string; children: React.ReactNod
   );
 }
 
-// LS/NS system search that adds picks to a list (the avoidance list) rather than
-// holding a single value. Reuses the shared search-results dropdown.
-function AvoidPicker({ onAdd }: { onAdd: (s: { id: number; name: string }) => void }) {
+// LS/NS system search that adds picks to a list (avoidance / waypoints) rather
+// than holding a single value. Reuses the shared search-results dropdown.
+function AddSystemSearch({ onAdd, placeholder }: { onAdd: (s: { id: number; name: string }) => void; placeholder: string }) {
   const { t } = useTranslation();
   const [query, setQuery] = useState('');
   const { results, loading } = useEsiSearch(query);
@@ -297,7 +320,7 @@ function AvoidPicker({ onAdd }: { onAdd: (s: { id: number; name: string }) => vo
   return (
     <div style={{ position: 'relative' }}>
       <input className="chains-new__name" style={{ width: '100%' }} type="text" value={query}
-        placeholder={t('jumpPlanner.avoidAdd')} onChange={(e) => setQuery(e.target.value)} />
+        placeholder={placeholder} onChange={(e) => setQuery(e.target.value)} />
       {show && (
         <ul className="search-results">
           {loading && <li className="search-results__item" style={{ cursor: 'default', opacity: 0.6 }}>{t('jumpPlanner.searching')}</li>}

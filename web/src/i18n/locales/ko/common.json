@@ -1904,6 +1904,10 @@
     "legendHop": "경유",
     "preferOff": "끄기",
     "preferPrefer": "우선",
-    "preferStrong": "강함"
+    "preferStrong": "강함",
+    "waypoints": "경유지",
+    "waypointAdd": "경유지 추가…",
+    "moveUp": "위로",
+    "moveDown": "아래로"
   }
 }

@@ -1904,6 +1904,10 @@
     "legendHop": "経由",
     "preferOff": "オフ",
     "preferPrefer": "優先",
-    "preferStrong": "強"
+    "preferStrong": "強",
+    "waypoints": "経由地",
+    "waypointAdd": "経由地を追加…",
+    "moveUp": "上へ",
+    "moveDown": "下へ"
   }
 }

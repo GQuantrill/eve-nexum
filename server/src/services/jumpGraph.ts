@@ -168,5 +168,31 @@ export async function planJumpRoute(
   return { hops, jumps: path.length - 1, totalLy };
 }
 
+/**
+ * Route through an ordered list of systems `[from, ...waypoints, to]`, planning
+ * each consecutive leg and stitching them into one route. Returns null if any
+ * leg is unreachable within range. The shared junction system between legs is
+ * de-duplicated, so jumps/totalLy stay correct across the whole path.
+ */
+export async function planJumpRouteVia(
+  waypoints: number[], rangeLy: number, objective: 'hops' | 'fuel', opts: PlanOpts = {},
+): Promise<JumpRouteResult | null> {
+  if (waypoints.length < 2) return null;
+  const legs: JumpRouteResult[] = [];
+  for (let i = 0; i < waypoints.length - 1; i++) {
+    const leg = await planJumpRoute(waypoints[i], waypoints[i + 1], rangeLy, objective, opts);
+    if (!leg) return null;                 // one unreachable leg => no route
+    legs.push(leg);
+  }
+  const hops: JumpRouteHop[] = [...legs[0].hops];
+  let jumps = legs[0].jumps, totalLy = legs[0].totalLy;
+  for (let i = 1; i < legs.length; i++) {
+    hops.push(...legs[i].hops.slice(1));   // drop the junction shared with the prior leg
+    jumps += legs[i].jumps;
+    totalLy += legs[i].totalLy;
+  }
+  return { hops, jumps, totalLy };
+}
+
 /** Reset the cache (call after an SDE re-import so new coords are picked up). */
 export function resetJumpGraph(): void { systems = null; byId = null; loading = null; }

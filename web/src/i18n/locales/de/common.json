@@ -1904,6 +1904,10 @@
     "legendHop": "Zwischenstopp",
     "preferOff": "Aus",
     "preferPrefer": "Bevorzugen",
-    "preferStrong": "Stark"
+    "preferStrong": "Stark",
+    "waypoints": "Wegpunkte",
+    "waypointAdd": "Wegpunkt hinzufügen…",
+    "moveUp": "Nach oben",
+    "moveDown": "Nach unten"
   }
 }

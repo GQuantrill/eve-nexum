@@ -1904,6 +1904,10 @@
     "legendHop": "Waypoint",
     "preferOff": "Off",
     "preferPrefer": "Prefer",
-    "preferStrong": "Strong"
+    "preferStrong": "Strong",
+    "waypoints": "Waypoints",
+    "waypointAdd": "Add a waypoint…",
+    "moveUp": "Move up",
+    "moveDown": "Move down"
   }
 }

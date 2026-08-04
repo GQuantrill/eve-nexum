@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import { db } from '../db.js';
 import { createLogger } from '../utils/logger.js';
 import { esiFetch } from '../utils/esi.js';
-import { planJumpRoute, jumpGraphSize } from '../services/jumpGraph.js';
+import { planJumpRouteVia, jumpGraphSize } from '../services/jumpGraph.js';
 
 export const systemsRouter = Router();
 const log = createLogger('systems');
@@ -399,6 +399,8 @@ systemsRouter.get('/jump-route', async (req, res) => {
     new Set(String(v ?? '').split(',').map((s) => parseInt(s, 10)).filter(Boolean).slice(0, cap));
   const avoid = idList(req.query.avoid, 200);
   const extraSafe = idList(req.query.safe, 400);
+  // Ordered intermediate waypoints (order matters, so an array not a Set).
+  const via = String(req.query.via ?? '').split(',').map((s) => parseInt(s, 10)).filter(Boolean).slice(0, 20);
   const pref = String(req.query.preferStations ?? '');
   const preferSafe = pref === 'strong' ? 'strong' as const
     : (pref === 'prefer' || pref === '1' || pref === 'true') ? 'prefer' as const : undefined;
@@ -407,7 +409,7 @@ systemsRouter.get('/jump-route', async (req, res) => {
   }
   try {
     if ((await jumpGraphSize()) === 0) return res.json({ hasCoords: false, route: null });
-    const route = await planJumpRoute(from, to, rangeLy, objective, { avoid, preferSafe, extraSafe });
+    const route = await planJumpRouteVia([from, ...via, to], rangeLy, objective, { avoid, preferSafe, extraSafe });
     return res.json({ hasCoords: true, route });
   } catch (err) {
     log.error('jump-route failed:', err);

@@ -1944,6 +1944,10 @@
     "legendHop": "Промежуточная",
     "preferOff": "Выкл",
     "preferPrefer": "Предпочитать",
-    "preferStrong": "Сильно"
+    "preferStrong": "Сильно",
+    "waypoints": "Точки маршрута",
+    "waypointAdd": "Добавить точку…",
+    "moveUp": "Вверх",
+    "moveDown": "Вниз"
   }
 }

@@ -1904,6 +1904,10 @@
     "legendHop": "Étape",
     "preferOff": "Désactivé",
     "preferPrefer": "Préférer",
-    "preferStrong": "Fort"
+    "preferStrong": "Fort",
+    "waypoints": "Points de passage",
+    "waypointAdd": "Ajouter un point de passage…",
+    "moveUp": "Monter",
+    "moveDown": "Descendre"
   }
 }
