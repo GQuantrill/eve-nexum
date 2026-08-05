@@ -1181,7 +1181,11 @@
     "colAge": "경과",
     "colUpdated": "업데이트",
     "columns": "열",
-    "namePlaceholder": "사이트 이름"
+    "namePlaceholder": "사이트 이름",
+    "colSafe": "안전",
+    "safeYes": "안전 — 전투 없음",
+    "safeNo": "위험 — 적 스폰 가능",
+    "safeHint": "유물/데이터 사이트 안전성"
   },
   "anomalies": {
     "pasteHint": "EVE의 탐사 스캐너에서 직접 어노말리를 복사하여 붙여넣을 수 있습니다. 탐사 스캐너를 열고 Ctrl+A로 모두 선택, Ctrl+C로 복사한 다음 Ctrl+V로 여기에 붙여넣으세요. 시그니처와 어노말리를 함께 붙여넣으면 자동으로 올바른 패널로 분류됩니다.",

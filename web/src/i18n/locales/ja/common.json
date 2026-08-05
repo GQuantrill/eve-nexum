@@ -1181,7 +1181,11 @@
     "colAge": "経過",
     "colUpdated": "更新",
     "columns": "列",
-    "namePlaceholder": "サイト名"
+    "namePlaceholder": "サイト名",
+    "colSafe": "安全",
+    "safeYes": "安全 — 戦闘なし",
+    "safeNo": "危険 — 敵が出現する可能性",
+    "safeHint": "遺物/データサイトの安全性"
   },
   "anomalies": {
     "pasteHint": "EVE のプローブスキャナーからアノマリーを直接コピー＆ペーストできます。プローブスキャナーを開き、Ctrl+A ですべて選択、Ctrl+C でコピーし、Ctrl+V でここに貼り付けてください。シグネチャとアノマリーを一緒に貼り付けると、自動的に正しいパネルに振り分けられます。",

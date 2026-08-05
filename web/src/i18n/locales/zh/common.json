@@ -1181,7 +1181,11 @@
     "colAge": "存在时长",
     "colUpdated": "更新时间",
     "columns": "列",
-    "namePlaceholder": "站点名称"
+    "namePlaceholder": "站点名称",
+    "colSafe": "安全",
+    "safeYes": "安全 — 无战斗",
+    "safeNo": "不安全 — 可能刷怪",
+    "safeHint": "遗迹/数据站点安全性"
   },
   "anomalies": {
     "pasteHint": "你可以直接从 EVE 中的探针扫描器复制并粘贴异常空间。打开你的探针扫描器，按 Ctrl+A 全选，Ctrl+C 复制，然后按 Ctrl+V 粘贴到此处。一起粘贴的信号和异常空间会自动分类到正确的面板。",

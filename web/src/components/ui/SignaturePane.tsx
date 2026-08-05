@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { api } from '../../api/client';
 import { useMapStore, awaitSystemCreate } from '../../store/mapStore';
@@ -6,13 +7,13 @@ import { useCanEditContent } from '../../hooks/useCanEditContent';
 import { useShareMode } from '../../context/ShareModeContext';
 import { systemDisplayName } from '../../utils/systemName';
 import { useUserSetting } from '../../hooks/useUserSetting';
-import { useClickOutside } from '../../hooks/useClickOutside';
+import { usePopover } from '../../hooks/usePopover';
 import type { Signature, SigType } from '../../types';
 import { ConfirmModal, shouldSkipConfirm } from './ConfirmModal';
 import { NotesEditor } from './NotesEditor';
 import { WormholeTypePicker } from './WormholeTypePicker';
 import { Select } from './Select';
-import { XIcon, CopyIcon, ColumnsIcon } from '../../icons';
+import { XIcon, CopyIcon, ColumnsIcon, CheckIcon, XCircleIcon } from '../../icons';
 import { LeadsToDropdown } from './LeadsToDropdown';
 import { toast } from './Toaster';
 import { reevaluateConnectionsForSystem } from '../../utils/whAutoDetect';
@@ -109,7 +110,7 @@ function parseSigClipboard(text: string): ParsedSig[] {
 }
 
 type SortCol = 'sigId' | 'sigType' | 'whType' | 'whLeadsTo' | 'name' | 'createdAt' | 'updatedAt';
-type ColKey  = 'id' | 'type' | 'whtype' | 'leadsto' | 'name' | 'notes' | 'created' | 'updated';
+type ColKey  = 'id' | 'type' | 'whtype' | 'leadsto' | 'name' | 'safe' | 'notes' | 'created' | 'updated';
 
 const DEFAULT_WIDTHS: Record<ColKey, number> = {
   id:      72,
@@ -117,6 +118,7 @@ const DEFAULT_WIDTHS: Record<ColKey, number> = {
   whtype:  170,
   leadsto: 132,
   name:    140,
+  safe:    52,
   notes:   220,
   created: 80,
   updated: 80,
@@ -136,6 +138,7 @@ const LEADSTO_MIN_WIDTH = 132;
 // so a later-added hideable column defaults visible without migration.
 const HIDEABLE_COLS = [
   { key: 'name',    labelKey: 'signatures.colName' },
+  { key: 'safe',    labelKey: 'signatures.colSafe' },
   { key: 'notes',   labelKey: 'signatures.colNotes' },
   { key: 'created', labelKey: 'signatures.colAge' },
   { key: 'updated', labelKey: 'signatures.colUpdated' },
@@ -156,6 +159,37 @@ const SIG_TYPE_FILTER_ORDER: SigType[] = ['wormhole', 'data', 'relic', 'gas', 'o
 // Signature-type Select options, alphabetical by label. Used for both the
 // per-row type picker and the bulk "set type" dropdown.
 const SIG_TYPE_OPTIONS: SigType[] = ['combat', 'data', 'gas', 'ore', 'relic', 'unknown', 'wormhole'];
+
+// Relic/data site safety, keyed on the first word of the scanned site name (per
+// the site-safety table). "Safe" sites have no NPCs; "not safe" ones can spawn
+// combat. Only relic + data sigs qualify; anything else has no safety verdict.
+const SAFE_SITE_PREFIXES   = new Set(['crumbling', 'decayed', 'ruined', 'local', 'regional', 'central']);
+const UNSAFE_SITE_PREFIXES = new Set(['forgotten', 'unsecured', 'aegis', 'scc']);
+function siteSafety(sig: Signature): 'safe' | 'unsafe' | null {
+  if (sig.sigType !== 'relic' && sig.sigType !== 'data') return null;
+  const words = (sig.name ?? '').trim().toLowerCase().split(/\s+/).filter(Boolean);
+  // Names can be prefixed with "Detected " (e.g. "Detected Central Sansha…"),
+  // so the safety keyword is the first non-"detected" word.
+  const key = words[0] === 'detected' ? words[1] : words[0];
+  if (!key) return null;
+  if (SAFE_SITE_PREFIXES.has(key))   return 'safe';
+  if (UNSAFE_SITE_PREFIXES.has(key)) return 'unsafe';
+  return null;
+}
+
+// The "Safe" cell: green tick / red cross for relic-and-data site safety, blank
+// otherwise.
+function SafeCell({ sig }: { sig: Signature }) {
+  const { t } = useTranslation();
+  const s = siteSafety(sig);
+  return (
+    <td className="sig-td--safe" style={{ textAlign: 'center' }}
+      title={s === 'safe' ? t('signatures.safeYes') : s === 'unsafe' ? t('signatures.safeNo') : undefined}>
+      {s === 'safe'   && <CheckIcon size={14} weight="bold" color="#3ddc84" />}
+      {s === 'unsafe' && <XCircleIcon size={14} weight="bold" color="#e5484d" />}
+    </td>
+  );
+}
 
 // Single module-level 1 s tick shared across every ElapsedCell instance.
 // Previously each SignaturePane drove a state update every second, which
@@ -268,9 +302,9 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   const isColVisible = useCallback((c: ColKey) => !hiddenCols.has(c), [hiddenCols]);
   const toggleCol = (c: ColKey) =>
     setHiddenColsArr((prev) => (prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c]));
-  const [colMenuOpen, setColMenuOpen] = useState(false);
-  const colMenuRef = useRef<HTMLDivElement>(null);
-  useClickOutside(colMenuOpen, colMenuRef, () => setColMenuOpen(false));
+  // Portalled popover so the columns menu escapes the pane's overflow and stays
+  // on-screen + scrollable even when the pane is short (viewport-aware maxHeight).
+  const { open: colMenuOpen, setOpen: setColMenuOpen, pos: colPos, btnRef: colBtnRef, dropdownRef: colDropRef, openAt: openColMenu } = usePopover();
 
   const pendingUpdates = useRef<Map<string, Partial<Signature>>>(new Map());
   const debounceTimers = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
@@ -830,19 +864,32 @@ export function SignaturePane({ systemId }: { systemId: string }) {
               {t('signatures.filterClear')}
             </button>
           )}
-          <div className="sig-col-menu" ref={colMenuRef}>
+          <div className="sig-col-menu">
             <button
+              ref={colBtnRef}
               type="button"
               className={`icon-btn sig-col-menu__btn${hiddenCols.size > 0 ? ' sig-col-menu__btn--active' : ''}`}
-              onClick={() => setColMenuOpen((o) => !o)}
+              onClick={() => (colMenuOpen ? setColMenuOpen(false) : openColMenu())}
               aria-expanded={colMenuOpen}
               aria-label={t('signatures.columns')}
               data-tooltip={t('signatures.columns')}
             >
               <ColumnsIcon size={14} weight="regular" />
             </button>
-            {colMenuOpen && (
-              <div className="sig-col-menu__pop" role="menu">
+            {colMenuOpen && createPortal(
+              <div
+                ref={colDropRef}
+                className="sig-col-menu__pop"
+                role="menu"
+                style={{
+                  position: 'fixed',
+                  top: colPos.top,
+                  left: Math.max(8, Math.min(colPos.left, window.innerWidth - 180)),
+                  right: 'auto',
+                  maxHeight: colPos.maxHeight,
+                  overflowY: 'auto',
+                }}
+              >
                 <div className="sig-col-menu__title">{t('signatures.columns')}</div>
                 {HIDEABLE_COLS.map(({ key, labelKey }) => (
                   <label key={key} className="sig-col-menu__item">
@@ -854,7 +901,8 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                     <span>{t(labelKey)}</span>
                   </label>
                 ))}
-              </div>
+              </div>,
+              document.body,
             )}
           </div>
         </div>
@@ -880,6 +928,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
             <col style={{ width: colWidths.whtype }} className="sig-col--whtype" />
             <col style={{ width: colWidths.leadsto }} />
             {isColVisible('name')    && <col style={{ width: colWidths.name }} />}
+            {isColVisible('safe')    && <col style={{ width: colWidths.safe }} />}
             {isColVisible('notes')   && <col style={{ width: colWidths.notes }} />}
             {isColVisible('created') && <col style={{ width: colWidths.created }} />}
             {isColVisible('updated') && <col style={{ width: colWidths.updated }} />}
@@ -918,6 +967,12 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                 <th className="sig-th sig-th--sortable" onClick={() => handleSort('name')}>
                   {t('signatures.colName')}{sortInd('name')}
                   <div className="sig-th__resize" onMouseDown={(e) => startResize('name', e)} />
+                </th>
+              )}
+              {isColVisible('safe') && (
+                <th className="sig-th" title={t('signatures.safeHint')}>
+                  {t('signatures.colSafe')}
+                  <div className="sig-th__resize" onMouseDown={(e) => startResize('safe', e)} />
                 </th>
               )}
               {isColVisible('notes') && (
@@ -1040,6 +1095,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                     )}
                   </td>
                 )}
+                {isColVisible('safe') && <SafeCell sig={sig} />}
                 {isColVisible('notes') && (
                   <td className="sig-notes-cell">
                     <NotesEditor

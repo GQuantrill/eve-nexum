@@ -1181,7 +1181,11 @@
     "colAge": "Alter",
     "colUpdated": "Aktualisiert",
     "columns": "Spalten",
-    "namePlaceholder": "Seitenname"
+    "namePlaceholder": "Seitenname",
+    "colSafe": "Sicher",
+    "safeYes": "Sicher — kein Kampf",
+    "safeNo": "Nicht sicher — kann Gegner spawnen",
+    "safeHint": "Sicherheit von Relikt-/Datenstätten"
   },
   "anomalies": {
     "pasteHint": "Du kannst Anomalien direkt aus dem Sondenscanner in EVE kopieren und einfügen. Öffne deinen Sondenscanner, drücke Strg+A, um alle auszuwählen, Strg+C zum Kopieren und dann Strg+V, um sie hier einzufügen. Zusammen eingefügte Signaturen und Anomalien werden automatisch ins richtige Panel sortiert.",

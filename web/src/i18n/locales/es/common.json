@@ -1181,7 +1181,11 @@
     "colAge": "Antigüedad",
     "colUpdated": "Actualizado",
     "columns": "Columnas",
-    "namePlaceholder": "Nombre del sitio"
+    "namePlaceholder": "Nombre del sitio",
+    "colSafe": "Seguro",
+    "safeYes": "Seguro — sin combate",
+    "safeNo": "No seguro — puede generar enemigos",
+    "safeHint": "Seguridad de sitios de reliquia/datos"
   },
   "anomalies": {
     "pasteHint": "Puedes copiar y pegar anomalías directamente desde el escáner de sondas en EVE. Abre tu escáner de sondas, pulsa Ctrl+A para seleccionarlas todas, Ctrl+C para copiar y luego Ctrl+V para pegarlas aquí. Las firmas y anomalías pegadas juntas se ordenan automáticamente en el panel correcto.",

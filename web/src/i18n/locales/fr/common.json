@@ -1181,7 +1181,11 @@
     "colAge": "Âge",
     "colUpdated": "Mis à jour",
     "columns": "Colonnes",
-    "namePlaceholder": "Nom du site"
+    "namePlaceholder": "Nom du site",
+    "colSafe": "Sûr",
+    "safeYes": "Sûr — pas de combat",
+    "safeNo": "Pas sûr — peut faire apparaître des ennemis",
+    "safeHint": "Sûreté des sites relique/données"
   },
   "anomalies": {
     "pasteHint": "Vous pouvez copier-coller des anomalies directement depuis le scanner de sondes dans EVE. Ouvrez votre scanner de sondes, appuyez sur Ctrl+A pour tout sélectionner, Ctrl+C pour copier, puis Ctrl+V pour les coller ici. Les signatures et anomalies collées ensemble sont automatiquement triées dans le bon panneau.",

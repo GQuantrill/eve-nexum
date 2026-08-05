@@ -1251,7 +1251,11 @@
     "colAge": "Age",
     "colUpdated": "Updated",
     "columns": "Columns",
-    "namePlaceholder": "Site name"
+    "namePlaceholder": "Site name",
+    "colSafe": "Safe",
+    "safeYes": "Safe — no combat",
+    "safeNo": "Not safe — may spawn combat",
+    "safeHint": "Relic / data site safety"
   },
   "anomalies": {
     "pasteHint": "You can copy and paste anomalies directly from the Probe scanner in Eve. Open your probe scanner, press Ctrl+A to select all, Ctrl+C to copy, then Ctrl+V to paste them here. Signatures and anomalies pasted together are sorted into the right panel automatically.",
