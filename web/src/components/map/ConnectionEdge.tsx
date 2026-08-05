@@ -95,6 +95,11 @@ export const ConnectionEdge = memo(({
   const cynoEdge = conn?.connectionType === 'cyno';
   const srcEve = useMapStore((s) => (cynoEdge ? (s.map.systems.find((x) => x.id === conn.sourceId)?.eveSystemId ?? null) : null));
   const tgtEve = useMapStore((s) => (cynoEdge ? (s.map.systems.find((x) => x.id === conn.targetId)?.eveSystemId ?? null) : null));
+  // High-sec endpoint → only JF / Black Ops are relevant (caps don't operate there).
+  const cynoHighsec = useMapStore((s) => cynoEdge && (
+    s.map.systems.find((x) => x.id === conn.sourceId)?.systemClass === 'HS' ||
+    s.map.systems.find((x) => x.id === conn.targetId)?.systemClass === 'HS'
+  ));
   const cynoLy = useJumpDistance(srcEve, tgtEve, cynoEdge);
   const [jdc] = useJdcLevel();
 
@@ -222,7 +227,7 @@ export const ConnectionEdge = memo(({
           const typeNode = isCyno
             ? <span className="connection-label__cyno" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
                 CJ{cynoLy != null ? ` ${cynoLy.toFixed(1)}ly` : ''}
-                {cynoLy != null && classesInRange(cynoLy, jdc).map((c) => (
+                {cynoLy != null && classesInRange(cynoLy, jdc, cynoHighsec).map((c) => (
                   <span key={c.key} title={c.label}
                     style={{ width: 6, height: 6, borderRadius: '50%', background: c.color, display: 'inline-block' }} />
                 ))}

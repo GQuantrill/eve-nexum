@@ -11,19 +11,22 @@ export interface JumpClass {
   fuelPerLy: number;  // base isotopes/ly at JFC 0 (estimateFuel applies the JFC cut)
 }
 
-// Colours are from the Wong colour-blind-safe palette (sky-blue / yellow /
-// reddish-purple / bluish-green / orange) so the range tiers stay distinguishable
-// across vision types without needing per-palette CSS vars.
+// Colours are from the Wong colour-blind-safe palette so the range tiers stay
+// distinguishable across vision types without needing per-palette CSS vars.
+// Ordered longest-range first (widest reach first in classesInRange).
 export const JUMP_CLASSES: JumpClass[] = [
-  // fuelPerLy measured in-game at JFC 0 (single ~7.4 ly jumps): JF 4700,
-  // Rorqual 4000, Blops 700, Carrier/Dread/FAX 3000, Super/Titan 3000. JF and
-  // Rorqual share max range (10 ly) but differ in fuel, and only the JF gets the
-  // Jump Freighters skill cut, so they are separate classes.
-  { key: 'jf',      label: 'Jump Freighter',           base: 5.0, color: '#56b4e9', fuelPerLy: 4700 },
-  { key: 'rorqual', label: 'Rorqual',                  base: 5.0, color: '#f0e442', fuelPerLy: 4000 },
-  { key: 'blops',   label: 'Black Ops',                base: 4.0, color: '#cc79a7', fuelPerLy: 700 },
-  { key: 'carrier', label: 'Carrier / Dread / FAX',    base: 3.5, color: '#009e73', fuelPerLy: 3000 },
-  { key: 'super',   label: 'Super / Titan',            base: 3.0, color: '#e69f00', fuelPerLy: 3000 },
+  // Ranges at JDC V (base * 2): JF/Rorqual 10, Blops/Lancer 8, Command Carrier
+  // 7.5, Carrier/Dread/FAX 7, Super/Titan 6 ly. fuelPerLy measured in-game at
+  // JFC 0: JF 4700, Rorqual 4000, Blops 700, everything cap-fuelled 3000. Lancer
+  // has a dread's fuel but a Black Ops' range; Command Carrier is its own 7.5 ly
+  // tier — both are separate classes because range ≠ fuel here.
+  { key: 'jf',        label: 'Jump Freighter',        base: 5.0,  color: '#56b4e9', fuelPerLy: 4700 },
+  { key: 'rorqual',   label: 'Rorqual',               base: 5.0,  color: '#f0e442', fuelPerLy: 4000 },
+  { key: 'blops',     label: 'Black Ops',             base: 4.0,  color: '#cc79a7', fuelPerLy: 700 },
+  { key: 'lancer',    label: 'Lancer Dreadnought',    base: 4.0,  color: '#d55e00', fuelPerLy: 3000 },
+  { key: 'cmdcarrier',label: 'Command Carrier',       base: 3.75, color: '#999999', fuelPerLy: 3000 },
+  { key: 'carrier',   label: 'Carrier / Dread / FAX', base: 3.5,  color: '#009e73', fuelPerLy: 3000 },
+  { key: 'super',     label: 'Super / Titan',         base: 3.0,  color: '#e69f00', fuelPerLy: 3000 },
 ];
 
 /** Effective max jump range (ly) for a base range at a given JDC skill level. */
@@ -85,9 +88,14 @@ export function formatMinutes(min: number): string {
   return rem ? `${h}h ${rem}m` : `${h}h`;
 }
 
-/** Classes (longest-range first) that can make a jump of `ly` light years at `jdc`. */
-export function classesInRange(ly: number, jdc: number): JumpClass[] {
-  return JUMP_CLASSES.filter((c) => ly <= jumpRange(c.base, jdc));
+/**
+ * Classes (longest-range first) that can make a jump of `ly` light years at
+ * `jdc`. When `highsec` is set (an endpoint is high-sec), only JF and Black Ops
+ * are relevant — caps don't operate around high-sec — so the rest are dropped.
+ */
+export function classesInRange(ly: number, jdc: number, highsec = false): JumpClass[] {
+  const inRange = JUMP_CLASSES.filter((c) => ly <= jumpRange(c.base, jdc));
+  return highsec ? inRange.filter((c) => c.key === 'jf' || c.key === 'blops') : inRange;
 }
 
 /** The widest range any class can make at this JDC — how far the overlay fetches. */
