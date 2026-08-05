@@ -6,7 +6,7 @@
     "email": "gq@area404.org",
     "url": "https://area404.org"
   },
-  "version": "3.23.1",
+  "version": "3.23.2",
   "private": true,
   "scripts": {
     "dev": "tsx watch src/index.ts",
@@ -22,8 +22,10 @@
   "resolutions": {
     "qs": "^6.15.2",
     "esbuild": "^0.28.1",
-    "undici": "^7.28.0",
-    "body-parser": "^1.20.6"
+    "undici": "^7.29.0",
+    "body-parser": "^1.20.6",
+    "ip-address": "^10.3.1",
+    "postcss": "^8.5.23"
   },
   "dependencies": {
     "cheerio": "^1.2.0",
