@@ -225,12 +225,16 @@ export const ConnectionEdge = memo(({
         )}
         {!broken && (() => {
           const typeNode = isCyno
-            ? <span className="connection-label__cyno" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                CJ{cynoLy != null ? ` ${cynoLy.toFixed(1)}ly` : ''}
-                {cynoLy != null && classesInRange(cynoLy, jdc, cynoHighsec).map((c) => (
-                  <span key={c.key} title={c.label}
-                    style={{ width: 6, height: 6, borderRadius: '50%', background: c.color, display: 'inline-block' }} />
-                ))}
+            ? <span className="connection-label__cyno" style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+                <span>CJ{cynoLy != null ? ` ${cynoLy.toFixed(1)}ly` : ''}</span>
+                {cynoLy != null && classesInRange(cynoLy, jdc, cynoHighsec).length > 0 && (
+                  <span style={{ display: 'inline-flex', gap: 4 }}>
+                    {classesInRange(cynoLy, jdc, cynoHighsec).map((c) => (
+                      <span key={c.key} title={c.label}
+                        style={{ width: 6, height: 6, borderRadius: '50%', background: c.color, display: 'inline-block' }} />
+                    ))}
+                  </span>
+                )}
               </span>
             : isJumpgate
             ? <span className="connection-label__jumpgate">JG</span>
