@@ -1918,6 +1918,8 @@
     "peakFatigue": "최대 피로도",
     "runTime": "소요 시간",
     "fatigueCapped": "5시간 상한",
-    "fatigueHint": "점프당 재활성화 쿨다운. 피로도 0에서 시작해 연속 점프를 가정; 피로도는 5시간 상한."
+    "fatigueHint": "점프당 재활성화 쿨다운. 피로도 0에서 시작해 연속 점프를 가정; 피로도는 5시간 상한.",
+    "fatigueLabel": "점프 피로도",
+    "cooldownLabel": "재활성화 쿨다운"
   }
 }

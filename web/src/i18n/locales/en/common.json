@@ -1918,6 +1918,8 @@
     "peakFatigue": "Peak fatigue",
     "runTime": "Run time",
     "fatigueCapped": "5h cap",
-    "fatigueHint": "Reactivation cooldown per jump. Assumes a fresh start (0 fatigue) and back-to-back jumps; fatigue caps at 5h."
+    "fatigueHint": "Reactivation cooldown per jump. Assumes a fresh start (0 fatigue) and back-to-back jumps; fatigue caps at 5h.",
+    "fatigueLabel": "Jump fatigue",
+    "cooldownLabel": "Reactivation cooldown"
   }
 }

@@ -1918,6 +1918,8 @@
     "peakFatigue": "Fatiga máx.",
     "runTime": "Duración",
     "fatigueCapped": "tope 5 h",
-    "fatigueHint": "Enfriamiento de reactivación por salto. Asume inicio sin fatiga y saltos seguidos; la fatiga tope es 5 h."
+    "fatigueHint": "Enfriamiento de reactivación por salto. Asume inicio sin fatiga y saltos seguidos; la fatiga tope es 5 h.",
+    "fatigueLabel": "Fatiga de salto",
+    "cooldownLabel": "Enfriamiento de reactivación"
   }
 }

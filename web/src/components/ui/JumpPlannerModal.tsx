@@ -237,8 +237,13 @@ export function JumpPlannerModal({ onClose }: { onClose: () => void }) {
                   <li key={h.eveSystemId} style={{ fontSize: 13 }}>
                     {h.name} <span style={{ color: 'var(--text-faint)' }}>{h.systemClass}</span>
                     {i > 0 && <span style={{ color: 'var(--text-subtle)' }}> — {h.lyFromPrev.toFixed(2)} ly</span>}
-                    {i > 0 && fatigue?.perHop[i] != null && (
-                      <span style={{ color: 'var(--text-faint)' }}> · {formatMinutes(fatigue.perHop[i]!)}</span>
+                    {i > 0 && fatigue?.perHop[i] && (
+                      <span style={{ color: 'var(--text-faint)' }}>
+                        {' · '}
+                        <span title={t('jumpPlanner.fatigueLabel')} style={{ color: '#56b4e9' }}>{formatMinutes(fatigue.perHop[i]!.fatigueMin)}</span>
+                        {' / '}
+                        <span title={t('jumpPlanner.cooldownLabel')} style={{ color: 'var(--cv-conn-eol, #e69f00)' }}>{formatMinutes(fatigue.perHop[i]!.cooldownMin)}</span>
+                      </span>
                     )}
                   </li>
                 ))}

@@ -1918,6 +1918,8 @@
     "peakFatigue": "Fadiga máx.",
     "runTime": "Duração",
     "fatigueCapped": "limite 5 h",
-    "fatigueHint": "Cooldown de reativação por salto. Assume início sem fadiga e saltos seguidos; a fadiga limita em 5 h."
+    "fatigueHint": "Cooldown de reativação por salto. Assume início sem fadiga e saltos seguidos; a fadiga limita em 5 h.",
+    "fatigueLabel": "Fadiga de salto",
+    "cooldownLabel": "Cooldown de reativação"
   }
 }

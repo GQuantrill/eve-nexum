@@ -1918,6 +1918,8 @@
     "peakFatigue": "Spitzenermüdung",
     "runTime": "Laufzeit",
     "fatigueCapped": "5-Std-Limit",
-    "fatigueHint": "Reaktivierungs-Cooldown pro Sprung. Nimmt einen frischen Start (0 Ermüdung) und aufeinanderfolgende Sprünge an; Ermüdung bei 5 Std gedeckelt."
+    "fatigueHint": "Reaktivierungs-Cooldown pro Sprung. Nimmt einen frischen Start (0 Ermüdung) und aufeinanderfolgende Sprünge an; Ermüdung bei 5 Std gedeckelt.",
+    "fatigueLabel": "Sprungermüdung",
+    "cooldownLabel": "Reaktivierungs-Cooldown"
   }
 }

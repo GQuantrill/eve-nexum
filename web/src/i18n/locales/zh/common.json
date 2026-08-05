@@ -1918,6 +1918,8 @@
     "peakFatigue": "峰值疲劳",
     "runTime": "运行时间",
     "fatigueCapped": "5小时上限",
-    "fatigueHint": "每次跳跃的重新激活冷却。假设从零疲劳开始并连续跳跃；疲劳上限为5小时。"
+    "fatigueHint": "每次跳跃的重新激活冷却。假设从零疲劳开始并连续跳跃；疲劳上限为5小时。",
+    "fatigueLabel": "跳跃疲劳",
+    "cooldownLabel": "重新激活冷却"
   }
 }

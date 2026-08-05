@@ -1918,6 +1918,8 @@
     "peakFatigue": "Fatigue max",
     "runTime": "Durée",
     "fatigueCapped": "plafond 5 h",
-    "fatigueHint": "Délai de réactivation par saut. Suppose un départ à zéro fatigue et des sauts enchaînés ; fatigue plafonnée à 5 h."
+    "fatigueHint": "Délai de réactivation par saut. Suppose un départ à zéro fatigue et des sauts enchaînés ; fatigue plafonnée à 5 h.",
+    "fatigueLabel": "Fatigue de saut",
+    "cooldownLabel": "Délai de réactivation"
   }
 }

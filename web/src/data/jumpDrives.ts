@@ -51,9 +51,10 @@ export function estimateFuel(totalLy: number, classKey: string, jfc: number, jum
 //   cooldown = max(fatigue / 10, 1 + d)                    // from the NEW fatigue
 // We assume a fresh start (0 fatigue) and back-to-back jumps (decay ignored), so
 // this is the worst-case run. Fatigue caps at 300 min (5 hours).
+export interface FatigueHop { fatigueMin: number; cooldownMin: number }
 export interface FatigueResult {
-  /** Reactivation cooldown (min) for the jump into each hop; null for the origin. */
-  perHop: (number | null)[];
+  /** Fatigue + reactivation cooldown (min) for the jump into each hop; null for the origin. */
+  perHop: (FatigueHop | null)[];
   peakFatigueMin: number;
   totalCooldownMin: number;   // sum of cooldowns = the run's wall-clock jump time
   hitCap: boolean;            // true if fatigue ever pinned the 5h cap
@@ -62,7 +63,7 @@ export interface FatigueResult {
 export function computeFatigue(hops: { lyFromPrev: number }[]): FatigueResult {
   let fatigue = 0, total = 0, peak = 0;
   let hitCap = false;
-  const perHop: (number | null)[] = [];
+  const perHop: (FatigueHop | null)[] = [];
   hops.forEach((h, i) => {
     if (i === 0) { perHop.push(null); return; }   // origin — no jump
     const d = h.lyFromPrev;
@@ -71,7 +72,7 @@ export function computeFatigue(hops: { lyFromPrev: number }[]): FatigueResult {
     if (fatigue >= 300) hitCap = true;
     peak = Math.max(peak, fatigue);
     total += cooldown;
-    perHop.push(cooldown);
+    perHop.push({ fatigueMin: fatigue, cooldownMin: cooldown });
   });
   return { perHop, peakFatigueMin: peak, totalCooldownMin: total, hitCap };
 }
