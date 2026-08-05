@@ -35,27 +35,15 @@ export function JumpPlannerModal({ onClose }: { onClose: () => void }) {
   const [plans, setPlans]     = useState<SavedPlan[]>([]);
   const [saveName, setSaveName] = useState('');
   const [structures, setStructures] = useState<CorpStructure[]>([]);
-  const [structSync, setStructSync] = useState<string | null>(null);
   const [avoid, setAvoid] = useState<{ id: number; name: string }[]>([]);
   const [waypoints, setWaypoints] = useState<{ id: number; name: string }[]>([]);
   const [preferLevel, setPreferLevel] = useUserSetting<string>('nexum.jump.preferLevel', 'off');
 
   const refreshPlans = () => { api<SavedPlan[]>('/api/jump-plans').then(setPlans).catch(() => {}); };
+  // Structures (corp ESI-synced on login + map-tagged) feed the From/To search;
+  // no manual sync control — role-holders' logins populate the corp set.
   const loadStructures = () => { api<CorpStructure[]>('/api/structures').then(setStructures).catch(() => {}); };
   useEffect(() => { refreshPlans(); loadStructures(); }, []);
-  // Pull the corp's structures from ESI (role- + scope-gated server-side); the
-  // status covers re-auth / role / no-corp outcomes, not just success.
-  const syncStructures = async () => {
-    setStructSync(t('jumpPlanner.syncing'));
-    try {
-      const r = await api<{ status: string; count?: number }>('/api/structures/refresh', { method: 'POST' });
-      if (r.status === 'ok') { setStructSync(t('jumpPlanner.synced', { count: r.count ?? 0 })); loadStructures(); }
-      else if (r.status === 'needs_reauth') setStructSync(t('jumpPlanner.syncReauth'));
-      else if (r.status === 'no_role') setStructSync(t('jumpPlanner.syncNoRole'));
-      else if (r.status === 'no_corp') setStructSync(t('jumpPlanner.syncNoCorp'));
-      else setStructSync(t('jumpPlanner.syncFailed'));
-    } catch { setStructSync(t('jumpPlanner.syncFailed')); }
-  };
   const savePlan = async () => {
     if (!from || !to || !saveName.trim()) return;
     await api('/api/jump-plans', { method: 'POST', body: JSON.stringify({
@@ -168,11 +156,6 @@ export function JumpPlannerModal({ onClose }: { onClose: () => void }) {
               </ol>
             )}
             <AddSystemSearch placeholder={t('jumpPlanner.waypointAdd')} onAdd={(s) => setWaypoints((w) => (w.some((x) => x.id === s.id) ? w : [...w, s]))} />
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 12, color: 'var(--text-subtle)' }}>
-            <span>{t('jumpPlanner.structures')}: <strong>{structures.length}</strong></span>
-            <button type="button" className="btn btn--ghost" onClick={syncStructures}>{t('jumpPlanner.syncFromEsi')}</button>
-            {structSync && <span style={{ color: 'var(--text-faint)' }}>{structSync}</span>}
           </div>
 
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, alignItems: 'flex-end' }}>

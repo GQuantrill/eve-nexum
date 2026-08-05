@@ -77,6 +77,10 @@ async function main() {
     }
     if (remoteVer === storedVer) {
       console.log(`SDE up to date (build ${remoteVer}). Skipping.`);
+      // Self-heal: an older deploy imported before npc_stations existed, so the
+      // full import was skipped and the table is empty. Top it up on its own
+      // (never fatal — a failure here must not break boot).
+      await topUpNpcStations(haveData);
       console.log('Set FORCE_SDE_IMPORT=1 to re-import anyway.');
       await db.end();
       return;
@@ -818,6 +822,30 @@ async function importNpcStations(zip: Zip) {
   }
   await batchUpsert('npc_stations', ['station_id', 'solar_system_id', 'type_id'], 'station_id', rows, 1000);
   console.log(`${rows.length} NPC stations`);
+}
+
+// Targeted, NON-FATAL npc_stations back-fill for deploys that skip the full SDE
+// import (SDE already current) but predate the station table. Pulls a fresh SDE
+// only to import stations, then drops the zip. Any failure is swallowed so it
+// can never break server startup.
+async function topUpNpcStations(haveData: boolean): Promise<void> {
+  try {
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS npc_stations (
+        station_id BIGINT PRIMARY KEY, solar_system_id INTEGER, type_id INTEGER
+      );
+      CREATE INDEX IF NOT EXISTS idx_npc_stations_system ON npc_stations (solar_system_id);
+    `);
+    const { rows } = await db.query<{ n: number }>('SELECT count(*)::int AS n FROM npc_stations');
+    if (rows[0].n > 0) return;
+    console.log('npc_stations empty — pulling the SDE to back-fill station endpoints...');
+    const resolved = await resolveZip(haveData);
+    const zip = await unzipper.Open.file(resolved.path);
+    await importNpcStations(zip);
+    if (resolved.path === SDE_ZIP) await rm(SDE_ZIP, { force: true }).catch(() => {});
+  } catch (err) {
+    console.warn(`npc_stations back-fill skipped (non-fatal): ${(err as Error).message}`);
+  }
 }
 
 async function importCategories(zip: Zip) {
