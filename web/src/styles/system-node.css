@@ -208,6 +208,25 @@
   border: 2px solid var(--cv-conn-expired);
 }
 
+/* Gate-jump count from the route origin — a small badge that only appears while
+   hovering the node (k-space systems only; a full title gives "N jumps from X"). */
+.system-node__gate-jumps {
+  position: absolute;
+  bottom: 4px;
+  right: 6px;
+  display: none;
+  padding: 0 5px;
+  font-size: calc(11px * var(--font-scale, 1));
+  font-weight: 700;
+  line-height: 16px;
+  color: var(--text-bright);
+  background: rgba(13, 17, 23, 0.85);
+  border: 1px solid var(--border-accent);
+  border-radius: 4px;
+  pointer-events: none;
+}
+.system-node:hover .system-node__gate-jumps { display: block; }
+
 /* Uniform-size mode — every node is padded up to the natural width /
    height of the largest visible node. The min-width / min-height values
    are applied inline from SystemNode after a ResizeObserver measures

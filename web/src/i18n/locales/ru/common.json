@@ -1788,7 +1788,9 @@
     "scoutConnections_other": "{{name}}: соединений",
     "scoutConnectionsMulti": "Соединения: {{names}}",
     "undivedWhTitle": "Неисследованная червоточина",
-    "undivedUnknown": "неизвестно"
+    "undivedUnknown": "неизвестно",
+    "jumps": "{{count}} прыжков",
+    "jumpsFrom": "{{count}} прыжков от {{origin}}"
   },
   "mapEdge": {
     "lessThan24h": "< 24 ч",

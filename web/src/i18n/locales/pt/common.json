@@ -1748,7 +1748,9 @@
     "scoutConnections_other": "Conexões de {{name}}",
     "scoutConnectionsMulti": "Conexões de {{names}}",
     "undivedWhTitle": "Buraco de minhoca inexplorado",
-    "undivedUnknown": "desconhecido"
+    "undivedUnknown": "desconhecido",
+    "jumps": "{{count}} saltos",
+    "jumpsFrom": "{{count}} saltos de {{origin}}"
   },
   "mapEdge": {
     "lessThan24h": "< 24h",

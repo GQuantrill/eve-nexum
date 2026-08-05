@@ -1748,7 +1748,9 @@
     "scoutConnections_other": "{{name}} 接続",
     "scoutConnectionsMulti": "{{names}} 接続",
     "undivedWhTitle": "未探索のワームホール",
-    "undivedUnknown": "不明"
+    "undivedUnknown": "不明",
+    "jumps": "{{count}} ジャンプ",
+    "jumpsFrom": "{{origin}} から {{count}} ジャンプ"
   },
   "mapEdge": {
     "lessThan24h": "< 24h",

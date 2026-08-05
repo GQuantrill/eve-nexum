@@ -1748,7 +1748,9 @@
     "scoutConnections_other": "Conexiones de {{name}}",
     "scoutConnectionsMulti": "Conexiones de {{names}}",
     "undivedWhTitle": "Agujero de gusano inexplorado",
-    "undivedUnknown": "desconocido"
+    "undivedUnknown": "desconocido",
+    "jumps": "{{count}} saltos",
+    "jumpsFrom": "{{count}} saltos desde {{origin}}"
   },
   "mapEdge": {
     "lessThan24h": "< 24h",

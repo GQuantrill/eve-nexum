@@ -12,6 +12,7 @@ import { useMapStore } from '../../store/mapStore';
 import { usePresenceStore } from '../../store/presenceStore';
 import { useSystemKill, RECENT_KILL_MS } from '../../store/killStore';
 import { useJumpRangeStore } from '../../store/jumpRangeStore';
+import { useGateJumpsStore } from '../../store/gateJumpsStore';
 import { JUMP_CLASSES } from '../../data/jumpDrives';
 import { iskCompact } from '../../utils/isk';
 import { useAccountLocations } from '../../hooks/useAccountLocations';
@@ -270,6 +271,10 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
   const jrInfo    = useJumpRangeStore((s) => (sys.eveSystemId != null ? s.inRange.get(sys.eveSystemId) : undefined));
   const jrStaging = useJumpRangeStore((s) => s.stagingId != null && s.stagingId === sys.eveSystemId);
   const jrFilter  = useJumpRangeStore((s) => s.filterClass);
+  // Gate jumps from the route origin (shown on hover for k-space systems).
+  const gateJumps    = useGateJumpsStore((s) => (sys.eveSystemId != null ? s.jumps.get(sys.eveSystemId) : undefined));
+  const gateOrigin   = useGateJumpsStore((s) => s.originName);
+  const isGateOrigin = useGateJumpsStore((s) => s.originId != null && s.originId === sys.eveSystemId);
   let jrGlow: string | null = null;
   let jrDim = false;
   if (jrActive) {
@@ -339,6 +344,18 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
           })}
         </div>
       ) : null}
+
+      {/* Gate jumps from the route origin — appears on hover for k-space systems. */}
+      {gateJumps != null && !isGateOrigin && (
+        <span
+          className="system-node__gate-jumps"
+          title={gateOrigin
+            ? t('mapNode.jumpsFrom', { count: gateJumps, origin: gateOrigin })
+            : t('mapNode.jumps', { count: gateJumps })}
+        >
+          {gateJumps}
+        </span>
+      )}
 
       {/* Always present so existing edge handle references stay valid across mode toggles */}
       <Handle type="source" position={Position.Top}    id="top"    className={easyConnect ? 'system-handle system-handle--ghost' : 'system-handle'} />

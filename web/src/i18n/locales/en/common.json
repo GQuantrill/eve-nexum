@@ -1818,7 +1818,9 @@
     "suppressed": "Suppressed",
     "scoutConnections_one": "{{name}} connection",
     "scoutConnections_other": "{{name}} connections",
-    "scoutConnectionsMulti": "{{names}} connections"
+    "scoutConnectionsMulti": "{{names}} connections",
+    "jumps": "{{count}} jumps",
+    "jumpsFrom": "{{count}} jumps from {{origin}}"
   },
   "mapEdge": {
     "lessThan24h": "< 24h",

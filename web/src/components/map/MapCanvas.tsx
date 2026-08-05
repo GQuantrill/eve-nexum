@@ -55,6 +55,7 @@ import { findFreePosition, normalizePlacement, PLACEMENT_GAP } from '../../hooks
 import { CLASS_COLORS } from '../../data/wormholes';
 import { cssVarToHex } from '../../utils/cssVar';
 import { useJumpRangeStore } from '../../store/jumpRangeStore';
+import { useGateJumps } from '../../hooks/useGateJumps';
 import { pickHandles } from './edgeUtils';
 import { setDestination, addWaypoint } from '../../api/waypoint';
 import { toast } from '../ui/Toaster';
@@ -158,6 +159,7 @@ export function MapCanvas() {
   const addConnection        = useMapStore((s) => s.addConnection);
   const addSystem            = useMapStore((s) => s.addSystem);
   const moveSystem           = useMapStore((s) => s.moveSystem);
+  useGateJumps();   // publish gate-jump distances from the route origin for per-node hover
   const lockSystem           = useMapStore((s) => s.lockSystem);
   const updateSystem         = useMapStore((s) => s.updateSystem);
   const removeSystem         = useMapStore((s) => s.removeSystem);

@@ -1748,7 +1748,9 @@
     "scoutConnections_other": "{{name}} 连接",
     "scoutConnectionsMulti": "{{names}} 连接",
     "undivedWhTitle": "未探索的虫洞",
-    "undivedUnknown": "未知"
+    "undivedUnknown": "未知",
+    "jumps": "{{count}} 跳",
+    "jumpsFrom": "距 {{origin}} {{count}} 跳"
   },
   "mapEdge": {
     "lessThan24h": "< 24h",
