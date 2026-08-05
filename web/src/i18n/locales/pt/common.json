@@ -1914,6 +1914,10 @@
     "waypointAdd": "Adicionar ponto de passagem…",
     "moveUp": "Subir",
     "moveDown": "Descer",
-    "preferHelp": "Desativado: rota mais curta. Preferir: orientar a rota por sistemas com estação ou estrutura. Forte: favorecer fortemente sistemas com estação, mesmo que adicione saltos."
+    "preferHelp": "Desativado: rota mais curta. Preferir: orientar a rota por sistemas com estação ou estrutura. Forte: favorecer fortemente sistemas com estação, mesmo que adicione saltos.",
+    "peakFatigue": "Fadiga máx.",
+    "runTime": "Duração",
+    "fatigueCapped": "limite 5 h",
+    "fatigueHint": "Cooldown de reativação por salto. Assume início sem fadiga e saltos seguidos; a fadiga limita em 5 h."
   }
 }

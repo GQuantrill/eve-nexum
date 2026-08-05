@@ -1914,6 +1914,10 @@
     "waypointAdd": "Add a waypoint…",
     "moveUp": "Move up",
     "moveDown": "Move down",
-    "preferHelp": "Off: shortest route. Prefer: nudge the route through systems with a station or structure. Strong: strongly favour station systems, even if it adds jumps."
+    "preferHelp": "Off: shortest route. Prefer: nudge the route through systems with a station or structure. Strong: strongly favour station systems, even if it adds jumps.",
+    "peakFatigue": "Peak fatigue",
+    "runTime": "Run time",
+    "fatigueCapped": "5h cap",
+    "fatigueHint": "Reactivation cooldown per jump. Assumes a fresh start (0 fatigue) and back-to-back jumps; fatigue caps at 5h."
   }
 }

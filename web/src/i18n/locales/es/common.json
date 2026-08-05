@@ -1914,6 +1914,10 @@
     "waypointAdd": "Añadir punto de paso…",
     "moveUp": "Subir",
     "moveDown": "Bajar",
-    "preferHelp": "Desactivado: ruta más corta. Preferir: guiar la ruta por sistemas con estación o estructura. Fuerte: favorecer mucho los sistemas con estación, aunque añada saltos."
+    "preferHelp": "Desactivado: ruta más corta. Preferir: guiar la ruta por sistemas con estación o estructura. Fuerte: favorecer mucho los sistemas con estación, aunque añada saltos.",
+    "peakFatigue": "Fatiga máx.",
+    "runTime": "Duración",
+    "fatigueCapped": "tope 5 h",
+    "fatigueHint": "Enfriamiento de reactivación por salto. Asume inicio sin fatiga y saltos seguidos; la fatiga tope es 5 h."
   }
 }

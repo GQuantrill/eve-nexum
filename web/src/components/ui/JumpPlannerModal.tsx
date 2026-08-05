@@ -7,7 +7,7 @@ import { api } from '../../api/client';
 import { useEsiSearch, systemResultLabel } from '../../hooks/useEsiSearch';
 import { useJdcLevel } from '../../hooks/useJumpRange';
 import { useUserSetting } from '../../hooks/useUserSetting';
-import { JUMP_CLASSES, jumpRange, estimateFuel } from '../../data/jumpDrives';
+import { JUMP_CLASSES, jumpRange, estimateFuel, computeFatigue, formatMinutes } from '../../data/jumpDrives';
 import { dockState } from '../../data/dockingRules';
 
 // Jump Planner. Pick source/dest, a ship class + skills (JDC / Jump Fuel
@@ -108,6 +108,7 @@ export function JumpPlannerModal({ onClose }: { onClose: () => void }) {
   };
 
   const fuel = result?.route ? estimateFuel(result.route.totalLy, shipClass, jfc, jfSkill) : 0;
+  const fatigue = result?.route ? computeFatigue(result.route.hops) : null;
 
   return createPortal(
     <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
@@ -223,12 +224,22 @@ export function JumpPlannerModal({ onClose }: { onClose: () => void }) {
               <div style={{ fontSize: 14, marginBottom: 8 }}>
                 {t('jumpPlanner.result', { jumps: result.route.jumps, ly: result.route.totalLy.toFixed(1), fuel: fuel.toLocaleString() })}
               </div>
+              {fatigue && result.route.jumps > 0 && (
+                <div title={t('jumpPlanner.fatigueHint')} style={{ fontSize: 13, marginBottom: 8, color: fatigue.hitCap ? 'var(--cv-conn-eol, #e69f00)' : 'var(--text-subtle)' }}>
+                  {t('jumpPlanner.peakFatigue')}: <strong>{formatMinutes(fatigue.peakFatigueMin)}</strong>
+                  {fatigue.hitCap && ` (${t('jumpPlanner.fatigueCapped')})`}
+                  {' · '}{t('jumpPlanner.runTime')}: <strong>{formatMinutes(fatigue.totalCooldownMin)}</strong>
+                </div>
+              )}
               <RouteMap hops={result.route.hops} />
               <ol style={{ margin: '10px 0 0', paddingLeft: 20, display: 'flex', flexDirection: 'column', gap: 2 }}>
                 {result.route.hops.map((h, i) => (
                   <li key={h.eveSystemId} style={{ fontSize: 13 }}>
                     {h.name} <span style={{ color: 'var(--text-faint)' }}>{h.systemClass}</span>
                     {i > 0 && <span style={{ color: 'var(--text-subtle)' }}> — {h.lyFromPrev.toFixed(2)} ly</span>}
+                    {i > 0 && fatigue?.perHop[i] != null && (
+                      <span style={{ color: 'var(--text-faint)' }}> · {formatMinutes(fatigue.perHop[i]!)}</span>
+                    )}
                   </li>
                 ))}
               </ol>

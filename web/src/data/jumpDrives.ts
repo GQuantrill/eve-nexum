@@ -43,6 +43,47 @@ export function estimateFuel(totalLy: number, classKey: string, jfc: number, jum
   return Math.round(totalLy * c.fuelPerLy * factor);
 }
 
+// ── Jump fatigue ─────────────────────────────────────────────────────────────
+// EVE jump-fatigue model (per the narcolepsy calculator). Jump drives get no
+// fatigue bonus, so bonus = 0 for everything the planner routes. Per jump of d
+// light-years, starting from the previous fatigue:
+//   fatigue  = min(300, max(prevFatigue, 10) * (1 + d))   // minutes, caps at 5h
+//   cooldown = max(fatigue / 10, 1 + d)                    // from the NEW fatigue
+// We assume a fresh start (0 fatigue) and back-to-back jumps (decay ignored), so
+// this is the worst-case run. Fatigue caps at 300 min (5 hours).
+export interface FatigueResult {
+  /** Reactivation cooldown (min) for the jump into each hop; null for the origin. */
+  perHop: (number | null)[];
+  peakFatigueMin: number;
+  totalCooldownMin: number;   // sum of cooldowns = the run's wall-clock jump time
+  hitCap: boolean;            // true if fatigue ever pinned the 5h cap
+}
+
+export function computeFatigue(hops: { lyFromPrev: number }[]): FatigueResult {
+  let fatigue = 0, total = 0, peak = 0;
+  let hitCap = false;
+  const perHop: (number | null)[] = [];
+  hops.forEach((h, i) => {
+    if (i === 0) { perHop.push(null); return; }   // origin — no jump
+    const d = h.lyFromPrev;
+    fatigue = Math.min(300, Math.max(fatigue, 10) * (1 + d));
+    const cooldown = Math.max(fatigue / 10, 1 + d);
+    if (fatigue >= 300) hitCap = true;
+    peak = Math.max(peak, fatigue);
+    total += cooldown;
+    perHop.push(cooldown);
+  });
+  return { perHop, peakFatigueMin: peak, totalCooldownMin: total, hitCap };
+}
+
+/** Minutes → compact "5h" / "1h 30m" / "45m". */
+export function formatMinutes(min: number): string {
+  const m = Math.round(min);
+  if (m < 60) return `${m}m`;
+  const h = Math.floor(m / 60), rem = m % 60;
+  return rem ? `${h}h ${rem}m` : `${h}h`;
+}
+
 /** Classes (longest-range first) that can make a jump of `ly` light years at `jdc`. */
 export function classesInRange(ly: number, jdc: number): JumpClass[] {
   return JUMP_CLASSES.filter((c) => ly <= jumpRange(c.base, jdc));

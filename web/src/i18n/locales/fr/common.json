@@ -1914,6 +1914,10 @@
     "waypointAdd": "Ajouter un point de passage…",
     "moveUp": "Monter",
     "moveDown": "Descendre",
-    "preferHelp": "Désactivé : route la plus courte. Préférer : orienter la route vers les systèmes avec station ou structure. Fort : privilégier fortement les systèmes avec station, même si cela ajoute des sauts."
+    "preferHelp": "Désactivé : route la plus courte. Préférer : orienter la route vers les systèmes avec station ou structure. Fort : privilégier fortement les systèmes avec station, même si cela ajoute des sauts.",
+    "peakFatigue": "Fatigue max",
+    "runTime": "Durée",
+    "fatigueCapped": "plafond 5 h",
+    "fatigueHint": "Délai de réactivation par saut. Suppose un départ à zéro fatigue et des sauts enchaînés ; fatigue plafonnée à 5 h."
   }
 }
