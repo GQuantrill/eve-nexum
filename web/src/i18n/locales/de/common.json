@@ -1063,7 +1063,7 @@
     "noConnections": "Keine {{system}}-Verbindungen.",
     "expiring": "läuft ab",
     "sortLabel": "Sortieren",
-    "sortAge": "WH-Alter",
+    "sortAge": "Wurmloch-Lebensdauer",
     "sortShortest": "Kürzeste Route",
     "sortSecure": "Sichere Route"
   },

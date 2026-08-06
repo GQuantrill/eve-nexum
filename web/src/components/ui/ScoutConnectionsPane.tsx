@@ -57,10 +57,12 @@ function secClassColor(cls: string | null): string | undefined {
   return undefined;
 }
 
+// Remaining wormhole lifetime — an upper bound from eve-scout ("< N hours"), so
+// it's shown with a leading "<", matching the source's meaning (time left, not age).
 function formatRemaining(t: TFunction, hours: number): string {
   if (hours <= 0) return t('scout.expiring');
-  if (hours < 1)  return '<1h';
-  return `${Math.floor(hours)}h`;
+  if (hours < 1)  return '< 1h';
+  return `< ${Math.floor(hours)}h`;
 }
 
 export function ScoutConnectionsPane({ scoutSystem }: Props) {

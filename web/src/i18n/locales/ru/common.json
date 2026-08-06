@@ -1091,7 +1091,7 @@
     "noConnections": "Нет соединений {{system}}.",
     "expiring": "истекает",
     "sortLabel": "Сортировка",
-    "sortAge": "Возраст ЧД",
+    "sortAge": "Время жизни червоточины",
     "sortShortest": "Кратчайший маршрут",
     "sortSecure": "Безопасный маршрут"
   },

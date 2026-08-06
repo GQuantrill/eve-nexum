@@ -1063,7 +1063,7 @@
     "noConnections": "Não há conexões de {{system}}.",
     "expiring": "a expirar",
     "sortLabel": "Ordenar",
-    "sortAge": "Idade do WH",
+    "sortAge": "Tempo de vida do wormhole",
     "sortShortest": "Rota mais curta",
     "sortSecure": "Rota segura"
   },

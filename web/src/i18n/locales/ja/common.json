@@ -1063,7 +1063,7 @@
     "noConnections": "{{system}} の接続はありません。",
     "expiring": "まもなく期限切れ",
     "sortLabel": "並び替え",
-    "sortAge": "WH 寿命",
+    "sortAge": "ワームホール寿命",
     "sortShortest": "最短ルート",
     "sortSecure": "安全ルート"
   },

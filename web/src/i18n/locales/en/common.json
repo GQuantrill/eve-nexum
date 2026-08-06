@@ -1133,7 +1133,7 @@
     "noConnections": "No {{system}} connections.",
     "expiring": "expiring",
     "sortLabel": "Sort",
-    "sortAge": "WH age",
+    "sortAge": "Wormhole Lifetime",
     "sortShortest": "Shortest route",
     "sortSecure": "Secure route"
   },
