@@ -601,16 +601,22 @@ async function computeExitIntel(mapId: string, exitNodeId: string): Promise<Exit
   const maxShipSize = chainMaxSize(whSizes);
 
   // Nearest trade hub by stargate jumps from the exit's eve system.
-  let hub: { name: string; jumps: number } | null = null;
   const exitEve = nodes.get(exitNodeId)?.eve ?? null;
-  if (exitEve != null) {
-    const routes = await shortestRoutes(exitEve, TRADE_HUBS.map((h) => h.id), 'shortest');
-    for (const h of TRADE_HUBS) {
-      const entry = routes[h.id];
-      if (entry && (hub === null || entry.jumps < hub.jumps)) hub = { name: h.name, jumps: entry.jumps };
-    }
-  }
+  const hub = exitEve != null ? await nearestTradeHub(exitEve) : null;
   return { pathNames, whJumps, gateJumps, maxShipSize, hub, total: whJumps + gateJumps + (hub?.jumps ?? 0) };
+}
+
+// Nearest trade hub to a k-space system by stargate jumps, or null if none is
+// reachable (or the route graph is unavailable). Used both by the rich exit
+// intel and by the plain connection embed when an endpoint is k-space.
+async function nearestTradeHub(exitEve: number): Promise<{ name: string; jumps: number } | null> {
+  const routes = await shortestRoutes(exitEve, TRADE_HUBS.map((h) => h.id), 'shortest');
+  let hub: { name: string; jumps: number } | null = null;
+  for (const h of TRADE_HUBS) {
+    const entry = routes[h.id];
+    if (entry && (hub === null || entry.jumps < hub.jumps)) hub = { name: h.name, jumps: entry.jumps };
+  }
+  return hub;
 }
 
 interface KspaceExitPick {
@@ -642,6 +648,26 @@ function pickKspaceExit(r: {
   if (r.homeA && !r.homeB) return sideB;
   if (r.homeB && !r.homeA) return sideA;
   return (r.secB as number) > (r.secA as number) ? sideB : sideA;
+}
+
+// The k-space endpoint whose nearest trade hub the plain connection embed should
+// report — the exit you'd travel to. When exactly one side is k-space it's that
+// side; when both are (e.g. a NS↔HS static) the non-home side, then the
+// higher-security one. Wormhole-only connections have no hub, so return null.
+function kspaceHubEve(r: {
+  classA: string; classB: string; eveA: number | null; eveB: number | null;
+  homeA: boolean; homeB: boolean; secA: number | null; secB: number | null;
+}): number | null {
+  const aOk = KSPACE_EXIT_CLASSES.has(r.classA) && r.eveA != null;
+  const bOk = KSPACE_EXIT_CLASSES.has(r.classB) && r.eveB != null;
+  if (aOk && !bOk) return r.eveA;
+  if (bOk && !aOk) return r.eveB;
+  if (aOk && bOk) {
+    if (r.homeA && !r.homeB) return r.eveB;
+    if (r.homeB && !r.homeA) return r.eveA;
+    return (r.secB ?? 0) > (r.secA ?? 0) ? r.eveB : r.eveA;
+  }
+  return null;
 }
 
 // Broadcast a wormhole connection — at most once per connection. Keyed on the
@@ -768,7 +794,21 @@ function maybeBroadcastConnection(meta: MapMeta, mapId: string, connId: string, 
     } catch (e) {
       discordLog.warn(`k-space exit intel failed for ${r.a} <-> ${r.b} (falling back to plain embed): ${(e as Error).message}`);
     }
-    notifyDiscord(r.connectionsWebhook, connectionEmbed({ a: r.a, b: r.b, whType: ev.whType || r.whType, size: effSize, mapName: r.mapName, actor }));
+    // Plain embed still carries the nearest trade hub when one endpoint is
+    // k-space (the exit you'd travel to) — best-effort, so a route-graph miss
+    // just omits the field rather than dropping the whole notification.
+    let hub: { name: string; jumps: number } | null = null;
+    const hubEve = kspaceHubEve(r);
+    if (hubEve != null) {
+      try { hub = await nearestTradeHub(hubEve); }
+      catch (e) { discordLog.warn(`trade-hub lookup failed for ${r.a} <-> ${r.b}: ${(e as Error).message}`); }
+    }
+    notifyDiscord(r.connectionsWebhook, connectionEmbed({
+      a: r.a, b: r.b, whType: ev.whType || r.whType,
+      size: effSize ? (SIZE_LABEL[effSize] ?? effSize) : null,
+      hubName: hub?.name ?? null, hubJumps: hub?.jumps ?? null,
+      mapName: r.mapName, actor,
+    }));
   }).catch((e) => discordLog.warn(`connection dispatch query failed: ${(e as Error).message}`));
 }
 

@@ -145,11 +145,23 @@ export function k162Embed(p: {
 }
 
 export function connectionEmbed(p: {
-  a: string; b: string; whType: string | null; size: string | null; mapName: string; actor: string | null;
+  a: string; b: string; whType: string | null; size: string | null;
+  hubName?: string | null; hubJumps?: number | null;
+  mapName: string; actor: string | null;
 }): DiscordEmbed {
   const fields: NonNullable<DiscordEmbed['fields']> = [];
   if (p.whType) fields.push({ name: 'Type', value: p.whType, inline: true });
-  if (p.size)   fields.push({ name: 'Size', value: p.size,   inline: true });
+  // "Size" reads as "Maximum ship size" (matching the rich exit embed) — it's the
+  // largest hull the hole passes.
+  if (p.size)   fields.push({ name: 'Maximum ship size', value: p.size, inline: true });
+  // When one endpoint is k-space, how far the nearest trade hub is by stargate —
+  // the same routing intel the exit embed carries, for connections that don't
+  // qualify for the full exit layout (no home set, or unreachable from it).
+  // Full-width (not inline) so the hub drops onto its own line below the
+  // Type / Maximum ship size row rather than packing onto it.
+  if (p.hubName != null && p.hubJumps != null) {
+    fields.push({ name: 'Nearest trade hub', value: `${p.hubName} — ${p.hubJumps} stargate jump${p.hubJumps === 1 ? '' : 's'}` });
+  }
   return {
     title:       '🔗 New connection',
     description: `**${p.a}** ↔ **${p.b}** on **${p.mapName}**`,
