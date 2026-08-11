@@ -2,9 +2,12 @@
 #
 # Deploy nexum with the Traefik overlay: pull latest, rebuild, restart.
 #
-# BOTH compose files are required — a plain `up` without the traefik overlay
-# 404s the live site. Passing explicit -f flags also means the dev-only
+# The traefik + www overlays are required — a plain `up` without the traefik
+# overlay 404s the live site. Passing explicit -f flags also means the dev-only
 # docker-compose.override.yml is deliberately NOT loaded.
+#
+# Self-updating: if `git pull` changes this script, it re-execs the pulled
+# version once (see the re-exec guard below) so a deploy never runs stale logic.
 #
 # `set -e` matters here: if `git pull` or `build` fails, the script stops
 # BEFORE `up`, so a broken build never replaces the running site.
@@ -34,10 +37,25 @@ main() {
     echo "==> PG_HOST_BIND=${PG_HOST_BIND} set: publishing Postgres on the host"
   fi
 
-  echo "==> [1/3] git pull"
+  echo "==> [1/4] git pull"
+  local before after script
+  before=$(git rev-parse HEAD)
   git pull
+  after=$(git rev-parse HEAD)
 
-  echo "==> [2/3] docker compose build"
+  # If this pull changed the deploy script itself, the copy currently running is
+  # stale: bash parsed the pre-pull version up front (see the main() note above),
+  # so it would deploy with the OLD compose list / logic — exactly the "run it
+  # twice" trap. Re-exec the freshly-pulled version ONCE so a deploy always runs
+  # current code. NEXUM_DEPLOY_REEXECED guards against an infinite loop.
+  script=$(basename "$0")
+  if [[ "${before}" != "${after}" && -z "${NEXUM_DEPLOY_REEXECED:-}" ]] \
+     && ! git diff --quiet "${before}" "${after}" -- "${script}"; then
+    echo "==> deploy script changed in this pull — re-running the updated version"
+    NEXUM_DEPLOY_REEXECED=1 exec "$0" "$@"
+  fi
+
+  echo "==> [2/4] docker compose build"
   docker compose "${compose[@]}" build
 
   echo "==> [3/4] docker compose up -d"
