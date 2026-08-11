@@ -15,7 +15,10 @@ $ErrorActionPreference = 'Stop'
 # Run from the script's own directory (repo root), regardless of cwd.
 Set-Location -Path $PSScriptRoot
 
-$compose = @('-f', 'docker-compose.yml', '-f', 'docker-compose.traefik.yml')
+# docker-compose.www.yml adds the www.<DOMAIN> -> apex 301 redirect (prod runs on
+# the apex eve-nexum.com with a www DNS record). The QA stack deploys with its own
+# explicit command (see QA-SETUP.md) and omits it.
+$compose = @('-f', 'docker-compose.yml', '-f', 'docker-compose.traefik.yml', '-f', 'docker-compose.www.yml')
 
 # Opt-in: set PG_HOST_BIND to publish Postgres on the host (loopback by
 # default - see docker-compose.dbhost.yml). Unset => Postgres stays internal to

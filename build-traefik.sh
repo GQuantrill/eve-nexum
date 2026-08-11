@@ -19,7 +19,11 @@ main() {
   # Run from the repo root (where the compose files are), regardless of cwd.
   cd "$(dirname "$0")"
 
-  local compose=(-f docker-compose.yml -f docker-compose.traefik.yml)
+  # docker-compose.www.yml adds the www.<DOMAIN> -> apex 301 redirect. Prod runs
+  # on the apex eve-nexum.com with a www DNS record, so it belongs here. The QA
+  # stack deploys with its own explicit command (see QA-SETUP.md) and omits it,
+  # since www.qa.<DOMAIN> wouldn't resolve.
+  local compose=(-f docker-compose.yml -f docker-compose.traefik.yml -f docker-compose.www.yml)
 
   # Opt-in: set PG_HOST_BIND to publish Postgres on the host (loopback by
   # default -- see docker-compose.dbhost.yml). Unset => Postgres stays internal

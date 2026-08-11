@@ -1,0 +1,29 @@
+# Optional www → apex 301 redirect overlay. Use ONLY when Nexum is served from
+# an apex/registrable domain (e.g. DOMAIN=eve-nexum.com) and a www.<DOMAIN> DNS
+# record points at this host. Layer it on top of the base + traefik files:
+#   docker compose -f docker-compose.yml -f docker-compose.traefik.yml -f docker-compose.www.yml up -d --build
+#
+# DO NOT use this on a subdomain deployment (e.g. DOMAIN=nexum.example.com or a
+# QA stack on qa.<DOMAIN>): www.<subdomain> won't resolve, so its ACME order
+# would fail and churn. That's exactly why this lives in its own file instead of
+# the shared traefik overlay — the QA stack simply omits it.
+#
+# A SEPARATE pair of routers (its own Let's Encrypt cert order) so a www cert
+# hiccup can never affect the apex cert. Labels merge additively with the web
+# service's traefik-overlay labels.
+
+services:
+  web:
+    labels:
+      - "traefik.http.routers.${STACK:-eve-nexum}-www.rule=Host(`www.${DOMAIN}`)"
+      - "traefik.http.routers.${STACK:-eve-nexum}-www.entrypoints=websecure"
+      - "traefik.http.routers.${STACK:-eve-nexum}-www.tls=true"
+      - "traefik.http.routers.${STACK:-eve-nexum}-www.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.${STACK:-eve-nexum}-www.middlewares=${STACK:-eve-nexum}-www-to-apex"
+      - "traefik.http.routers.${STACK:-eve-nexum}-www-http.rule=Host(`www.${DOMAIN}`)"
+      - "traefik.http.routers.${STACK:-eve-nexum}-www-http.entrypoints=web"
+      - "traefik.http.routers.${STACK:-eve-nexum}-www-http.middlewares=${STACK:-eve-nexum}-www-to-apex"
+      # Strip the leading www. and force https, preserving path — a single 301.
+      - "traefik.http.middlewares.${STACK:-eve-nexum}-www-to-apex.redirectregex.regex=^https?://www\\.(.+)"
+      - "traefik.http.middlewares.${STACK:-eve-nexum}-www-to-apex.redirectregex.replacement=https://$${1}"
+      - "traefik.http.middlewares.${STACK:-eve-nexum}-www-to-apex.redirectregex.permanent=true"
