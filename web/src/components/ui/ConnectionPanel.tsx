@@ -309,27 +309,32 @@ export function ConnectionPanel() {
 
   return (
     <aside className="system-panel">
-      <div className="system-panel__header">
-        <h2 className="system-panel__title">
-          {src ? systemDisplayName(src) : '?'} → {tgt ? systemDisplayName(tgt) : '?'}
-        </h2>
-        <button className="icon-btn" onClick={() => selectConnection(null)} title={t('actions.close')}><XIcon size={14} weight="bold" /></button>
-      </div>
-
-      {conn.broken && (
-        <div className="conn-broken-banner">
-          <span className="conn-broken-banner__text">{t('connPanel.brokenNotice')}</span>
-          <button
-            type="button"
-            className="sys-btn"
-            disabled={!canEdit}
-            onClick={() => update({ broken: false })}
-            title={t('connPanel.restoreTitle')}
-          >
-            {t('connPanel.restore')}
-          </button>
+      {/* Title + broken banner stack as one left column, so the banner sits
+          directly under the connection name and wraps within it instead of
+          becoming its own squeezed column that overlaps on narrow screens. */}
+      <div className="conn-headcol">
+        <div className="system-panel__header">
+          <h2 className="system-panel__title">
+            {src ? systemDisplayName(src) : '?'} → {tgt ? systemDisplayName(tgt) : '?'}
+          </h2>
+          <button className="icon-btn" onClick={() => selectConnection(null)} title={t('actions.close')}><XIcon size={14} weight="bold" /></button>
         </div>
-      )}
+
+        {conn.broken && (
+          <div className="conn-broken-banner">
+            <span className="conn-broken-banner__text">{t('connPanel.brokenNotice')}</span>
+            <button
+              type="button"
+              className="sys-btn"
+              disabled={!canEdit}
+              onClick={() => update({ broken: false })}
+              title={t('connPanel.restoreTitle')}
+            >
+              {t('connPanel.restore')}
+            </button>
+          </div>
+        )}
+      </div>
 
       {!isWormhole && (
         <p className="conn-gate-note">

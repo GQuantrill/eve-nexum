@@ -130,12 +130,27 @@
   border-radius: 50%;
 }
 
-/* Broken-connection banner in the connection side panel. */
+/* Title + broken banner as the connection panel's left column: the banner
+   stacks under the connection name rather than becoming its own squeezed
+   column between the name and the wormhole fields. */
+.conn-headcol {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex-shrink: 0;
+  align-self: flex-start;
+}
+
+/* Broken-connection banner in the connection side panel. Stacks (text over the
+   Restore button) within a bounded width so it wraps neatly under the name and
+   doesn't overflow the panel on small screens. */
 .conn-broken-banner {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
   gap: 8px;
-  margin: 0 0 10px;
+  max-width: 240px;
+  margin: 0;
   padding: 8px 10px;
   border-radius: 6px;
   color: var(--cv-conn-expired);
@@ -144,7 +159,6 @@
 }
 
 .conn-broken-banner__text {
-  flex: 1;
   font-size: calc(12px * var(--font-scale, 1));
   line-height: 1.35;
 }
