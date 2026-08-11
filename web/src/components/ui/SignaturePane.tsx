@@ -109,6 +109,16 @@ function parseSigClipboard(text: string): ParsedSig[] {
     });
 }
 
+// A signature carrying no information at all: no scan ID, no name, no notes, no
+// wormhole data, and the default 'unknown' type — i.e. an "Add signature" row
+// that was never filled in. The overwrite sweep normally skips blank-ID rows to
+// protect in-progress manual entries, but these carry nothing to protect, so a
+// clear-down should remove them instead of leaving them to accumulate forever.
+function isContentlessSig(s: Signature): boolean {
+  return !s.sigId && !s.name?.trim() && !s.notes?.trim()
+      && !s.whType && !s.whLeadsTo && s.sigType === 'unknown';
+}
+
 type SortCol = 'sigId' | 'sigType' | 'whType' | 'whLeadsTo' | 'name' | 'createdAt' | 'updatedAt';
 type ColKey  = 'id' | 'type' | 'whtype' | 'leadsto' | 'name' | 'safe' | 'notes' | 'created' | 'updated';
 
@@ -623,7 +633,13 @@ export function SignaturePane({ systemId }: { systemId: string }) {
     if (overwrite) {
       const pastedIds = new Set(parsed.map((p) => p.sigId));
       for (const s of existing) {
-        if (!s.sigId) continue;
+        if (!s.sigId) {
+          // Blank-ID rows are usually in-progress manual entries — leave them
+          // be. A truly empty one (an unfilled "Add signature" click) is just
+          // litter, so sweep it as part of the clear-down.
+          if (isContentlessSig(s)) scheduleRemoval(s.id, delaySec);
+          continue;
+        }
         if (pastedIds.has(s.sigId)) clearRemoval(s.id);
         else scheduleRemoval(s.id, delaySec);
       }
