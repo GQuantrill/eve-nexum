@@ -14,6 +14,8 @@
     <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="robots" content="index, follow" />
 
+    <script src="/vendor/lang-picker.js" defer></script>
+
     <meta property="og:type" content="article" />
     <meta property="og:url" content="https://eve-nexum.com/guides/rolling/" />
     <meta property="og:title" content="How to Roll a Wormhole in EVE Online — Mass Guide + Calculator" />
@@ -56,7 +58,7 @@
       body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--text); line-height: 1.6; }
       .wrap { max-width: 820px; margin: 0 auto; padding: 32px 20px 64px; }
       a { color: var(--accent); }
-      .topnav { font-size: 14px; }
+      .topnav { font-size: 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
       .topnav a { color: var(--muted); text-decoration: none; }
       header.hero { margin: 24px 0 8px; }
       .logo { font-size: 30px; color: var(--accent); line-height: 1; }
@@ -79,74 +81,435 @@
   </head>
   <body>
     <div class="wrap">
-      <nav class="topnav"><a href="/">&larr; Nexum home</a></nav>
+      <nav class="topnav">
+        <a href="/" data-i18n="nav">&larr; Nexum home</a>
+        <!-- Stylized language dropdown with SVG flags, built by
+             /vendor/lang-picker.js (a native <select> can't render the flags,
+             and flag emoji show as bare country codes on Windows). -->
+        <div class="lang-picker" data-lang-picker></div>
+      </nav>
 
       <header class="hero">
         <div class="logo" aria-hidden="true">&#9672;</div>
-        <h1>How to Roll a Wormhole in EVE Online</h1>
-        <p class="sub">Understand wormhole mass, roll safely, and never strand your fleet on the wrong side.</p>
+        <h1 data-i18n="h1">How to Roll a Wormhole in EVE Online</h1>
+        <p class="sub" data-i18n="sub">Understand wormhole mass, roll safely, and never strand your fleet on the wrong side.</p>
       </header>
-      <p class="updated">A Nexum wormhole guide</p>
+      <p class="updated" data-i18n="updated">A Nexum wormhole guide</p>
 
-      <p class="lede">"Rolling" a wormhole means deliberately collapsing it by pushing ship mass through until it dies, then letting a fresh connection spawn. Corps roll holes to reach a new random system, to close a chain a hostile is coming down, or to control exactly who can reach their home. Get the mass maths wrong and you either fail to close the hole or, worse, strand pilots on the far side. This guide covers the mechanics and the safe method.</p>
+      <p class="lede" data-i18n="lede">"Rolling" a wormhole means deliberately collapsing it by pushing ship mass through until it dies, then letting a fresh connection spawn. Corps roll holes to reach a new random system, to close a chain a hostile is coming down, or to control exactly who can reach their home. Get the mass maths wrong and you either fail to close the hole or, worse, strand pilots on the far side. This guide covers the mechanics and the safe method.</p>
 
-      <h2>How wormhole mass works</h2>
-      <p>Every wormhole has two mass numbers that matter for rolling:</p>
+      <h2 data-i18n="h2mass">How wormhole mass works</h2>
+      <p data-i18n="massP1">Every wormhole has two mass numbers that matter for rolling:</p>
       <ul>
-        <li><strong>Total mass</strong> - the combined ship mass the hole can pass before it collapses (for example ~2,000,000,000 kg on many C1-C3 statics, up to ~3,300,000,000 kg on big cap holes).</li>
-        <li><strong>Per-jump (maximum jump) mass</strong> - the heaviest single ship that can use it. Too heavy and the ship simply cannot jump.</li>
+        <li data-i18n="massLi1"><strong>Total mass</strong> - the combined ship mass the hole can pass before it collapses (for example ~2,000,000,000 kg on many C1-C3 statics, up to ~3,300,000,000 kg on big cap holes).</li>
+        <li data-i18n="massLi2"><strong>Per-jump (maximum jump) mass</strong> - the heaviest single ship that can use it. Too heavy and the ship simply cannot jump.</li>
       </ul>
-      <p>Each ship that jumps subtracts its own mass from the remaining total. When the remaining mass hits zero, the hole collapses on that jump. The catch: <strong>both numbers vary by plus or minus 10%</strong> and you cannot see the exact figure in game. So the real collapse point is a <em>window</em>, not a precise value - which is exactly why rolling has risk and why a calculator helps.</p>
+      <p data-i18n="massP2">Each ship that jumps subtracts its own mass from the remaining total. When the remaining mass hits zero, the hole collapses on that jump. The catch: <strong>both numbers vary by plus or minus 10%</strong> and you cannot see the exact figure in game. So the real collapse point is a <em>window</em>, not a precise value - which is exactly why rolling has risk and why a calculator helps.</p>
 
       <div class="card">
-        <h3>Reading the stages in game</h3>
-        <p>The wormhole's on-screen description tells you roughly how much mass is left: "not yet had its stability significantly disrupted" (over ~50% remaining), "had its stability reduced" (under ~50%, "destabilised"), and "on the verge of collapse" (under ~10%, "critical"). Those bands are what a rolling tracker turns into pass counts.</p>
+        <h3 data-i18n="stagesH">Reading the stages in game</h3>
+        <p data-i18n="stagesB">The wormhole's on-screen description tells you roughly how much mass is left: "not yet had its stability significantly disrupted" (over ~50% remaining), "had its stability reduced" (under ~50%, "destabilised"), and "on the verge of collapse" (under ~10%, "critical"). Those bands are what a rolling tracker turns into pass counts.</p>
       </div>
 
-      <h2>Hot vs cold pass mass</h2>
-      <p>Ship mass changes depending on whether your propulsion module is running:</p>
+      <h2 data-i18n="h2hotcold">Hot vs cold pass mass</h2>
+      <p data-i18n="hotcoldP1">Ship mass changes depending on whether your propulsion module is running:</p>
       <ul>
-        <li><strong>Cold pass</strong> - prop mod off. The ship jumps at its base hull mass.</li>
-        <li><strong>Hot pass</strong> - microwarpdrive or afterburner active. An active prop mod adds roughly <strong>50,000,000 kg</strong> for that jump.</li>
+        <li data-i18n="coldLi"><strong>Cold pass</strong> - prop mod off. The ship jumps at its base hull mass.</li>
+        <li data-i18n="hotLi"><strong>Hot pass</strong> - microwarpdrive or afterburner active. An active prop mod adds roughly <strong>50,000,000 kg</strong> for that jump.</li>
       </ul>
-      <p>Rolling crews alternate hot and cold passes to land the running total inside the collapse window instead of overshooting. A common tool is a Higgs Anchor rig, which multiplies hull mass so a single battleship carries a large, predictable chunk of the total - fewer jumps, tighter control.</p>
+      <p data-i18n="hotcoldP2">Rolling crews alternate hot and cold passes to land the running total inside the collapse window instead of overshooting. A common tool is a Higgs Anchor rig, which multiplies hull mass so a single battleship carries a large, predictable chunk of the total - fewer jumps, tighter control.</p>
 
-      <h2>The safe rolling method</h2>
+      <h2 data-i18n="h2method">The safe rolling method</h2>
       <ol>
-        <li><strong>Know the hole.</strong> Identify the wormhole type so you know its total and per-jump mass (a mapper shows this from the code, e.g. a K162 is the far side of a named type).</li>
-        <li><strong>Pick your roller.</strong> Battleships (often with a Higgs rig and a prop mod) are the standard. Two pilots, or one pilot bouncing back and forth, is typical.</li>
-        <li><strong>Always end on the home side.</strong> Plan your pass count so the <em>last</em> pass that collapses the hole leaves your roller at home - never stranded in the unknown far system.</li>
-        <li><strong>Pass, check the description, repeat.</strong> After each jump, re-read the mass stage. As you approach "critical", switch to your lightest safe pass so you do not overshoot into a strand.</li>
-        <li><strong>When it is critical, roll it closed from the home side.</strong> The final pass should be one you can afford to make one-way if it does not collapse - and that lands you home if it does.</li>
+        <li data-i18n="methodLi1"><strong>Know the hole.</strong> Identify the wormhole type so you know its total and per-jump mass (a mapper shows this from the code, e.g. a K162 is the far side of a named type).</li>
+        <li data-i18n="methodLi2"><strong>Pick your roller.</strong> Battleships (often with a Higgs rig and a prop mod) are the standard. Two pilots, or one pilot bouncing back and forth, is typical.</li>
+        <li data-i18n="methodLi3"><strong>Always end on the home side.</strong> Plan your pass count so the <em>last</em> pass that collapses the hole leaves your roller at home - never stranded in the unknown far system.</li>
+        <li data-i18n="methodLi4"><strong>Pass, check the description, repeat.</strong> After each jump, re-read the mass stage. As you approach "critical", switch to your lightest safe pass so you do not overshoot into a strand.</li>
+        <li data-i18n="methodLi5"><strong>When it is critical, roll it closed from the home side.</strong> The final pass should be one you can afford to make one-way if it does not collapse - and that lands you home if it does.</li>
       </ol>
 
       <div class="card warn">
-        <h3>Stranding: the failure you are avoiding</h3>
-        <p>If the hole collapses while your roller is on the <em>far</em> side, that pilot is stuck in a random unknown system with no way back except scanning a new exit. That is a stranding. The whole point of counting passes and ending home-side is to make stranding impossible - which is exactly what a rolling calculator enforces for you.</p>
+        <h3 data-i18n="strandH">Stranding: the failure you are avoiding</h3>
+        <p data-i18n="strandB">If the hole collapses while your roller is on the <em>far</em> side, that pilot is stuck in a random unknown system with no way back except scanning a new exit. That is a stranding. The whole point of counting passes and ending home-side is to make stranding impossible - which is exactly what a rolling calculator enforces for you.</p>
       </div>
 
-      <h2>Let a rolling calculator do the maths</h2>
-      <p><a href="/">Nexum</a> has a built-in <strong>rolling calculator</strong> on every wormhole connection. Set your roller's cold and hot mass (or hit "use my ship"), tell it which side you are on, and it tracks the cumulative mass, shows the plus/minus 10% variance band, tells you how many safe passes remain, and warns you before a pass would strand you on the far side. It also keeps a shared jump log of who passed the hole, so a whole fleet can roll off one synced count instead of everyone guessing. Because it is real-time and collaborative, two pilots rolling from opposite ends see the same numbers.</p>
+      <h2 data-i18n="h2calc">Let a rolling calculator do the maths</h2>
+      <p data-i18n="calcP"><a href="/">Nexum</a> has a built-in <strong>rolling calculator</strong> on every wormhole connection. Set your roller's cold and hot mass (or hit "use my ship"), tell it which side you are on, and it tracks the cumulative mass, shows the plus/minus 10% variance band, tells you how many safe passes remain, and warns you before a pass would strand you on the far side. It also keeps a shared jump log of who passed the hole, so a whole fleet can roll off one synced count instead of everyone guessing. Because it is real-time and collaborative, two pilots rolling from opposite ends see the same numbers.</p>
 
       <div class="cta">
-        <p><strong>Roll with confidence.</strong> Nexum's rolling calculator is free - map your chain and track every pass.</p>
-        <a class="btn" href="/">Open Nexum</a>
+        <p data-i18n="ctaP"><strong>Roll with confidence.</strong> Nexum's rolling calculator is free - map your chain and track every pass.</p>
+        <a class="btn" href="/" data-i18n="ctaBtn">Open Nexum</a>
       </div>
 
       <div class="related">
-        <h2>Related guides</h2>
+        <h2 data-i18n="relatedH">Related guides</h2>
         <ul>
-          <li><a href="/guides/classes/">EVE wormhole classes and statics explained</a></li>
-          <li><a href="/guides/mapping/">How to map a wormhole chain</a></li>
-          <li><a href="/guides/scanning/">How to scan signatures in EVE Online</a></li>
-          <li><a href="/guides/statics/">EVE wormhole types &amp; statics list</a></li>
-          <li><a href="/compare/">Nexum vs Pathfinder vs Tripwire vs Wanderer</a></li>
+          <li><a href="/guides/classes/" data-i18n="rel1">EVE wormhole classes and statics explained</a></li>
+          <li><a href="/guides/mapping/" data-i18n="rel2">How to map a wormhole chain</a></li>
+          <li><a href="/guides/scanning/" data-i18n="rel3">How to scan signatures in EVE Online</a></li>
+          <li><a href="/guides/statics/" data-i18n="rel4">EVE wormhole types &amp; statics list</a></li>
+          <li><a href="/compare/" data-i18n="rel5">Nexum vs Pathfinder vs Tripwire vs Wanderer</a></li>
         </ul>
       </div>
 
       <footer>
-        <p>EVE Online and the EVE logo are the registered trademarks of CCP hf. All rights reserved worldwide. Nexum is a third-party tool and is not affiliated with or endorsed by CCP hf. See the full <a href="/license/">license &amp; EVE IP notice</a>.</p>
+        <p data-i18n="footP">EVE Online and the EVE logo are the registered trademarks of CCP hf. All rights reserved worldwide. Nexum is a third-party tool and is not affiliated with or endorsed by CCP hf. See the full <a href="/license/">license &amp; EVE IP notice</a>.</p>
       </footer>
     </div>
+
+    <!--
+      Runtime language swap. This page is static HTML (not part of the React SPA),
+      so it can't use react-i18next. We read the same `nexum.lang` localStorage key
+      the app's language detector uses (falling back to the browser language) and
+      replace the text of every [data-i18n] element with its translated equivalent.
+      SEO crawlers index the English source only (see the canonical / og:locale).
+    -->
+    <script>
+      (function () {
+        try {
+          var lang = localStorage.getItem('nexum.lang');
+          if (!lang) lang = (navigator.language || '').slice(0, 2);
+
+          // Languages with a translation dictionary below. English is the
+          // untranslated source, so it has no entry.
+          var SUPPORTED = { de:1, fr:1, es:1, pt:1, zh:1, ko:1, ja:1, ru:1 };
+
+          // Tell the stylized picker (/vendor/lang-picker.js) which language this
+          // page actually rendered, so it highlights the matching entry. The
+          // picker itself handles the switch (persist to nexum.lang + reload).
+          window.__nexumResolvedLang = SUPPORTED[lang] ? lang : 'en';
+
+          if (!SUPPORTED[lang]) return;
+
+          // SECURITY: innerHTML is used because these strings intentionally
+          // contain markup (<a>, <strong>, <kbd>). This is ONLY safe because every
+          // value in DICTS is a hard-coded, trusted literal in this file. Do NOT
+          // ever populate DICTS from user input, an API, or URL params.
+          var DICTS = {};
+          DICTS.de = {
+            __title: 'Wie man ein Wurmloch in EVE Online rollt — Massen-Leitfaden + Rolling-Rechner',
+            nav: '&larr; Nexum Startseite',
+            h1: 'Wie man ein Wurmloch in EVE Online rollt',
+            sub: 'Verstehe die Wurmloch-Masse, rolle sicher und lass deine Flotte nie auf der falschen Seite stranden.',
+            updated: 'Ein Nexum-Wurmloch-Leitfaden',
+            lede: 'Ein Wurmloch zu "rollen" bedeutet, es absichtlich zum Kollabieren zu bringen, indem man Schiffsmasse hindurchschickt, bis es stirbt, und dann eine frische Verbindung entstehen lässt. Corps rollen Löcher, um ein neues zufälliges System zu erreichen, um eine Kette zu schließen, über die ein Feind herunterkommt, oder um genau zu kontrollieren, wer ihr Zuhause erreichen kann. Verrechne dich bei der Masse und du schließt entweder das Loch nicht oder, schlimmer, du strandest Piloten auf der anderen Seite. Dieser Leitfaden behandelt die Mechanik und die sichere Methode.',
+            h2mass: 'Wie Wurmloch-Masse funktioniert',
+            massP1: 'Jedes Wurmloch hat zwei Massenwerte, die für das Rollen wichtig sind:',
+            massLi1: '<strong>Gesamtmasse</strong> — die kombinierte Schiffsmasse, die das Loch passieren lassen kann, bevor es kollabiert (zum Beispiel ~2,000,000,000 kg bei vielen C1-C3-Statics, bis zu ~3,300,000,000 kg bei großen Cap-Löchern).',
+            massLi2: '<strong>Masse pro Sprung (maximaler Sprung)</strong> — das schwerste Einzelschiff, das es nutzen kann. Zu schwer, und das Schiff kann schlicht nicht springen.',
+            massP2: 'Jedes Schiff, das springt, zieht seine eigene Masse von der verbleibenden Gesamtmasse ab. Wenn die verbleibende Masse null erreicht, kollabiert das Loch bei diesem Sprung. Der Haken: <strong>beide Werte schwanken um ±10 %</strong> und du kannst den genauen Wert im Spiel nicht sehen. Der echte Kollaps-Punkt ist also ein <em>Fenster</em>, kein exakter Wert — genau deshalb birgt das Rollen Risiko und genau deshalb hilft ein Rechner.',
+            stagesH: 'Die Stufen im Spiel ablesen',
+            stagesB: 'Die Bildschirmbeschreibung des Wurmlochs verrät dir grob, wie viel Masse noch übrig ist: "hatte seine Stabilität noch nicht wesentlich gestört" (über ~50 % verbleibend), "hatte seine Stabilität reduziert" (unter ~50 %, "destabilisiert") und "am Rande des Kollapses" (unter ~10 %, "kritisch"). Aus diesen Stufen macht ein Rolling-Tracker die Anzahl der Durchflüge.',
+            h2hotcold: 'Masse bei heißem vs. kaltem Durchflug',
+            hotcoldP1: 'Die Schiffsmasse ändert sich, je nachdem, ob dein Antriebsmodul läuft:',
+            coldLi: '<strong>Kalter Durchflug</strong> — Prop-Mod aus. Das Schiff springt mit seiner Basis-Rumpfmasse.',
+            hotLi: '<strong>Heißer Durchflug</strong> — microwarpdrive oder afterburner aktiv. Ein aktives Prop-Mod fügt für diesen Sprung rund <strong>50,000,000 kg</strong> hinzu.',
+            hotcoldP2: 'Rolling-Crews wechseln heiße und kalte Durchflüge ab, um die laufende Gesamtmasse ins Kollaps-Fenster zu bringen, statt darüber hinauszuschießen. Ein gängiges Werkzeug ist ein Higgs Anchor rig, das die Rumpfmasse vervielfacht, sodass ein einzelnes Schlachtschiff einen großen, vorhersehbaren Teil der Gesamtmasse trägt — weniger Sprünge, engere Kontrolle.',
+            h2method: 'Die sichere Rolling-Methode',
+            methodLi1: '<strong>Kenne das Loch.</strong> Identifiziere den Wurmloch-Typ, damit du seine Gesamt- und Pro-Sprung-Masse kennst (ein Mapper zeigt das anhand des Codes an, z. B. ist ein K162 die Gegenseite eines benannten Typs).',
+            methodLi2: '<strong>Wähle deinen Roller.</strong> Schlachtschiffe (oft mit einem Higgs rig und einem Prop-Mod) sind der Standard. Zwei Piloten oder ein Pilot, der hin und her springt, ist üblich.',
+            methodLi3: '<strong>Ende immer auf der Heimatseite.</strong> Plane deine Anzahl an Durchflügen so, dass der <em>letzte</em> Durchflug, der das Loch schließt, deinen Roller zu Hause zurücklässt — niemals gestrandet im unbekannten fernen System.',
+            methodLi4: '<strong>Durchfliegen, Beschreibung prüfen, wiederholen.</strong> Lies nach jedem Sprung die Massenstufe erneut. Wenn du dich "kritisch" näherst, wechsle zu deinem leichtesten sicheren Durchflug, damit du nicht in eine Strandung hinausschießt.',
+            methodLi5: '<strong>Ist es kritisch, rolle es von der Heimatseite aus zu.</strong> Der letzte Durchflug sollte einer sein, den du dir als Einbahn leisten kannst, falls er nicht kollabiert — und der dich nach Hause bringt, falls doch.',
+            strandH: 'Strandung: das Scheitern, das du vermeidest',
+            strandB: 'Wenn das Loch kollabiert, während dein Roller auf der <em>fernen</em> Seite ist, steckt dieser Pilot in einem zufälligen unbekannten System fest, ohne Rückweg außer dem Scannen eines neuen Ausgangs. Das ist eine Strandung. Der ganze Sinn des Zählens der Durchflüge und des Endens auf der Heimatseite ist, eine Strandung unmöglich zu machen — genau das erzwingt ein Rolling-Rechner für dich.',
+            h2calc: 'Lass einen Rolling-Rechner die Mathematik übernehmen',
+            calcP: '<a href="/">Nexum</a> hat an jeder Wurmloch-Verbindung einen eingebauten <strong>Rolling-Rechner</strong>. Lege die kalte und heiße Masse deines Rollers fest (oder klicke auf "mein Schiff verwenden"), sage ihm, auf welcher Seite du bist, und er verfolgt die kumulative Masse, zeigt das ±10-%-Varianzband, sagt dir, wie viele sichere Durchflüge übrig sind, und warnt dich, bevor ein Durchflug dich auf der fernen Seite stranden würde. Er führt außerdem ein geteiltes Sprung-Log darüber, wer das Loch passiert hat, sodass eine ganze Flotte nach einer synchronisierten Zählung rollen kann, statt dass jeder rät. Weil er in Echtzeit und kollaborativ ist, sehen zwei Piloten, die von entgegengesetzten Enden rollen, dieselben Zahlen.',
+            ctaP: '<strong>Rolle mit Zuversicht.</strong> Nexums Rolling-Rechner ist kostenlos — kartiere deine Kette und verfolge jeden Durchflug.',
+            ctaBtn: 'Nexum öffnen',
+            relatedH: 'Verwandte Anleitungen',
+            rel1: 'EVE-Wurmloch-Klassen &amp; Statics erklärt',
+            rel2: 'Wie man eine Wurmloch-Kette kartiert',
+            rel3: 'Wie man Signaturen in EVE Online scannt',
+            rel4: 'EVE-Wurmloch-Typen &amp; Statics-Liste',
+            rel5: 'Nexum vs. Pathfinder vs. Tripwire vs. Wanderer',
+            footP: 'EVE Online und das EVE-Logo sind eingetragene Marken von CCP hf. Alle Rechte weltweit vorbehalten. Nexum ist ein Drittanbieter-Tool und steht in keiner Verbindung zu CCP hf und wird nicht von CCP hf unterstützt. Siehe den vollständigen <a href="/license/">Lizenz- &amp; EVE-IP-Hinweis</a>.',
+          };
+          DICTS.fr = {
+            __title: 'Comment roller un trou de ver dans EVE Online — Guide de masse + calculateur de rolling',
+            nav: '&larr; Accueil Nexum',
+            h1: 'Comment roller un trou de ver dans EVE Online',
+            sub: 'Comprenez la masse des trous de ver, rollez en sécurité et ne laissez jamais votre flotte échouée du mauvais côté.',
+            updated: 'Un guide Nexum sur les trous de ver',
+            lede: '« Roller » un trou de ver signifie le faire s\'effondrer délibérément en y poussant de la masse de vaisseaux jusqu\'à ce qu\'il meure, puis en laissant une nouvelle connexion apparaître. Les corps rollent les trous pour atteindre un nouveau système aléatoire, pour fermer une chaîne par laquelle un hostile descend, ou pour contrôler exactement qui peut atteindre leur base. Trompez-vous dans les calculs de masse et soit vous ne fermez pas le trou, soit, pire, vous échouez des pilotes de l\'autre côté. Ce guide couvre les mécaniques et la méthode sûre.',
+            h2mass: 'Comment fonctionne la masse des trous de ver',
+            massP1: 'Chaque trou de ver a deux valeurs de masse importantes pour le rolling :',
+            massLi1: '<strong>Masse totale</strong> — la masse de vaisseaux combinée que le trou peut laisser passer avant de s\'effondrer (par exemple ~2,000,000,000 kg sur beaucoup de statics C1-C3, jusqu\'à ~3,300,000,000 kg sur les gros trous à capitaux).',
+            massLi2: '<strong>Masse par saut (saut maximum)</strong> — le vaisseau individuel le plus lourd qui peut l\'emprunter. Trop lourd, et le vaisseau ne peut tout simplement pas sauter.',
+            massP2: 'Chaque vaisseau qui saute soustrait sa propre masse du total restant. Quand la masse restante atteint zéro, le trou s\'effondre à ce saut. Le piège : <strong>les deux valeurs varient de ±10 %</strong> et vous ne pouvez pas voir le chiffre exact en jeu. Le vrai point d\'effondrement est donc une <em>fenêtre</em>, pas une valeur précise — c\'est exactement pourquoi le rolling comporte un risque et pourquoi un calculateur aide.',
+            stagesH: 'Lire les étapes en jeu',
+            stagesB: 'La description à l\'écran du trou de ver vous indique grossièrement combien de masse il reste : « sa stabilité n\'a pas encore été significativement perturbée » (plus de ~50 % restants), « sa stabilité a été réduite » (moins de ~50 %, « déstabilisé ») et « au bord de l\'effondrement » (moins de ~10 %, « critique »). Ce sont ces paliers qu\'un tracker de rolling convertit en nombres de passages.',
+            h2hotcold: 'Masse de passage à chaud vs à froid',
+            hotcoldP1: 'La masse du vaisseau change selon que votre module de propulsion est actif ou non :',
+            coldLi: '<strong>Passage à froid</strong> — prop mod éteint. Le vaisseau saute à sa masse de coque de base.',
+            hotLi: '<strong>Passage à chaud</strong> — microwarpdrive ou afterburner actif. Un prop mod actif ajoute environ <strong>50,000,000 kg</strong> pour ce saut.',
+            hotcoldP2: 'Les équipes de rolling alternent passages à chaud et à froid pour amener le total courant dans la fenêtre d\'effondrement au lieu de la dépasser. Un outil courant est un Higgs Anchor rig, qui multiplie la masse de coque afin qu\'un seul battleship porte une part importante et prévisible du total — moins de sauts, un contrôle plus serré.',
+            h2method: 'La méthode de rolling sûre',
+            methodLi1: '<strong>Connaissez le trou.</strong> Identifiez le type de trou de ver pour connaître sa masse totale et par saut (un mapper l\'indique à partir du code, par ex. un K162 est le côté opposé d\'un type nommé).',
+            methodLi2: '<strong>Choisissez votre roller.</strong> Les battleships (souvent avec un Higgs rig et un prop mod) sont la norme. Deux pilotes, ou un seul pilote faisant des allers-retours, est typique.',
+            methodLi3: '<strong>Terminez toujours du côté de la base.</strong> Planifiez votre nombre de passages pour que le <em>dernier</em> passage qui effondre le trou laisse votre roller à la maison — jamais échoué dans le système lointain inconnu.',
+            methodLi4: '<strong>Passez, vérifiez la description, répétez.</strong> Après chaque saut, relisez le palier de masse. À l\'approche de « critique », passez à votre passage sûr le plus léger pour ne pas dépasser et vous échouer.',
+            methodLi5: '<strong>Quand c\'est critique, rollez-le fermé depuis le côté de la base.</strong> Le dernier passage devrait être un que vous pouvez vous permettre de faire à sens unique s\'il ne s\'effondre pas — et qui vous ramène à la maison s\'il le fait.',
+            strandH: 'L\'échouage : l\'échec que vous évitez',
+            strandB: 'Si le trou s\'effondre alors que votre roller est du côté <em>lointain</em>, ce pilote est bloqué dans un système inconnu aléatoire sans retour possible autre que scanner une nouvelle sortie. C\'est un échouage. Tout l\'intérêt de compter les passages et de finir côté base est de rendre l\'échouage impossible — c\'est exactement ce qu\'un calculateur de rolling impose pour vous.',
+            h2calc: 'Laissez un calculateur de rolling faire les calculs',
+            calcP: '<a href="/">Nexum</a> intègre un <strong>calculateur de rolling</strong> sur chaque connexion de trou de ver. Réglez la masse à froid et à chaud de votre roller (ou cliquez sur « utiliser mon vaisseau »), indiquez-lui de quel côté vous êtes, et il suit la masse cumulée, affiche la bande de variance ±10 %, vous dit combien de passages sûrs restent et vous avertit avant qu\'un passage ne vous échoue du côté lointain. Il tient aussi un journal de sauts partagé indiquant qui a franchi le trou, si bien qu\'une flotte entière peut roller sur un seul décompte synchronisé au lieu que chacun devine. Comme il est en temps réel et collaboratif, deux pilotes rollant depuis des extrémités opposées voient les mêmes chiffres.',
+            ctaP: '<strong>Rollez en confiance.</strong> Le calculateur de rolling de Nexum est gratuit — cartographiez votre chaîne et suivez chaque passage.',
+            ctaBtn: 'Ouvrir Nexum',
+            relatedH: 'Guides connexes',
+            rel1: 'Les classes de trous de ver EVE &amp; les statics expliqués',
+            rel2: 'Comment cartographier une chaîne de trous de ver',
+            rel3: 'Comment scanner les signatures dans EVE Online',
+            rel4: 'Liste des types de trous de ver EVE &amp; statics',
+            rel5: 'Nexum vs Pathfinder vs Tripwire vs Wanderer',
+            footP: 'EVE Online et le logo EVE sont des marques déposées de CCP hf. Tous droits réservés dans le monde entier. Nexum est un outil tiers et n\'est ni affilié à CCP hf ni approuvé par lui. Consultez l\'<a href="/license/">avis complet de licence &amp; de PI EVE</a>.',
+          };
+          DICTS.es = {
+            __title: 'Cómo rolar un wormhole en EVE Online — Guía de masa + calculadora de rolling',
+            nav: '&larr; Inicio de Nexum',
+            h1: 'Cómo rolar un wormhole en EVE Online',
+            sub: 'Entiende la masa de los wormholes, rola con seguridad y nunca dejes a tu flota varada en el lado equivocado.',
+            updated: 'Una guía de wormholes de Nexum',
+            lede: '"Rolar" un wormhole significa colapsarlo deliberadamente empujando masa de naves a través de él hasta que muere, y luego dejar que aparezca una conexión nueva. Las corps rolan agujeros para alcanzar un nuevo sistema aleatorio, para cerrar una cadena por la que baja un hostil, o para controlar exactamente quién puede llegar a su base. Equivócate en las cuentas de masa y o bien no cierras el agujero o, peor aún, dejas varados a pilotos en el otro lado. Esta guía cubre las mecánicas y el método seguro.',
+            h2mass: 'Cómo funciona la masa de los wormholes',
+            massP1: 'Cada wormhole tiene dos valores de masa que importan para rolar:',
+            massLi1: '<strong>Masa total</strong> — la masa combinada de naves que el agujero puede dejar pasar antes de colapsar (por ejemplo ~2,000,000,000 kg en muchos statics C1-C3, hasta ~3,300,000,000 kg en grandes agujeros de capitales).',
+            massLi2: '<strong>Masa por salto (salto máximo)</strong> — la nave individual más pesada que puede usarlo. Demasiado pesada, y la nave simplemente no puede saltar.',
+            massP2: 'Cada nave que salta resta su propia masa del total restante. Cuando la masa restante llega a cero, el agujero colapsa en ese salto. El truco: <strong>ambos valores varían un ±10 %</strong> y no puedes ver la cifra exacta en el juego. Así que el verdadero punto de colapso es una <em>ventana</em>, no un valor preciso — que es justo por lo que rolar tiene riesgo y por lo que ayuda una calculadora.',
+            stagesH: 'Leer las etapas en el juego',
+            stagesB: 'La descripción en pantalla del wormhole te dice a grandes rasgos cuánta masa queda: "aún no ha visto su estabilidad significativamente perturbada" (más de ~50 % restante), "ha visto reducida su estabilidad" (menos de ~50 %, "desestabilizado") y "al borde del colapso" (menos de ~10 %, "crítico"). Esas franjas son lo que un rastreador de rolling convierte en número de pasadas.',
+            h2hotcold: 'Masa de pasada en caliente vs en frío',
+            hotcoldP1: 'La masa de la nave cambia según si tu módulo de propulsión está activo:',
+            coldLi: '<strong>Pasada en frío</strong> — prop mod apagado. La nave salta con su masa de casco base.',
+            hotLi: '<strong>Pasada en caliente</strong> — microwarpdrive o afterburner activo. Un prop mod activo añade unos <strong>50,000,000 kg</strong> en ese salto.',
+            hotcoldP2: 'Los equipos de rolling alternan pasadas en caliente y en frío para dejar el total acumulado dentro de la ventana de colapso en vez de pasarse. Una herramienta común es un Higgs Anchor rig, que multiplica la masa del casco de modo que un solo battleship carga una porción grande y predecible del total — menos saltos, control más ajustado.',
+            h2method: 'El método de rolling seguro',
+            methodLi1: '<strong>Conoce el agujero.</strong> Identifica el tipo de wormhole para saber su masa total y por salto (un mapper lo muestra a partir del código, p. ej. un K162 es el lado opuesto de un tipo con nombre).',
+            methodLi2: '<strong>Elige tu roller.</strong> Los battleships (a menudo con un Higgs rig y un prop mod) son el estándar. Dos pilotos, o un solo piloto yendo y viniendo, es lo típico.',
+            methodLi3: '<strong>Termina siempre en el lado de casa.</strong> Planifica tu número de pasadas para que la <em>última</em> pasada que colapsa el agujero deje a tu roller en casa — nunca varado en el sistema lejano desconocido.',
+            methodLi4: '<strong>Pasa, revisa la descripción, repite.</strong> Tras cada salto, vuelve a leer la etapa de masa. Al acercarte a "crítico", cambia a tu pasada segura más ligera para no pasarte y quedar varado.',
+            methodLi5: '<strong>Cuando esté crítico, rólalo cerrado desde el lado de casa.</strong> La pasada final debería ser una que puedas permitirte hacer de ida si no colapsa — y que te deje en casa si lo hace.',
+            strandH: 'Quedar varado: el fallo que estás evitando',
+            strandB: 'Si el agujero colapsa mientras tu roller está en el lado <em>lejano</em>, ese piloto queda atrapado en un sistema desconocido aleatorio sin más vuelta que escanear una nueva salida. Eso es quedar varado. Todo el sentido de contar pasadas y terminar en el lado de casa es hacer imposible el varado — que es exactamente lo que una calculadora de rolling impone por ti.',
+            h2calc: 'Deja que una calculadora de rolling haga las cuentas',
+            calcP: '<a href="/">Nexum</a> tiene una <strong>calculadora de rolling</strong> integrada en cada conexión de wormhole. Configura la masa en frío y en caliente de tu roller (o pulsa "usar mi nave"), dile en qué lado estás, y hace seguimiento de la masa acumulada, muestra la banda de variación del ±10 %, te dice cuántas pasadas seguras quedan y te avisa antes de que una pasada te deje varado en el lado lejano. También mantiene un registro de saltos compartido de quién ha pasado el agujero, para que toda una flota pueda rolar con un único recuento sincronizado en vez de que cada uno adivine. Al ser en tiempo real y colaborativa, dos pilotos rolando desde extremos opuestos ven los mismos números.',
+            ctaP: '<strong>Rola con confianza.</strong> La calculadora de rolling de Nexum es gratis — mapea tu cadena y registra cada pasada.',
+            ctaBtn: 'Abrir Nexum',
+            relatedH: 'Guías relacionadas',
+            rel1: 'Clases de wormhole de EVE &amp; statics explicados',
+            rel2: 'Cómo mapear una cadena de wormholes',
+            rel3: 'Cómo escanear firmas en EVE Online',
+            rel4: 'Lista de tipos de wormhole de EVE &amp; statics',
+            rel5: 'Nexum vs Pathfinder vs Tripwire vs Wanderer',
+            footP: 'EVE Online y el logotipo de EVE son marcas registradas de CCP hf. Todos los derechos reservados en todo el mundo. Nexum es una herramienta de terceros y no está afiliada ni respaldada por CCP hf. Consulta el <a href="/license/">aviso completo de licencia &amp; PI de EVE</a>.',
+          };
+          DICTS.pt = {
+            __title: 'Como fazer rolling de um wormhole no EVE Online — Guia de massa + calculadora de rolling',
+            nav: '&larr; Início do Nexum',
+            h1: 'Como fazer rolling de um wormhole no EVE Online',
+            sub: 'Compreende a massa dos wormholes, faz rolling em segurança e nunca deixes a tua frota presa do lado errado.',
+            updated: 'Um guia de wormholes do Nexum',
+            lede: 'Fazer "rolling" de um wormhole significa colapsá-lo deliberadamente, empurrando massa de naves através dele até morrer, deixando depois surgir uma nova ligação. As corps fazem rolling de buracos para alcançar um novo sistema aleatório, para fechar uma cadeia por onde desce um hostil, ou para controlar exatamente quem pode chegar à sua base. Erra as contas de massa e ou não fechas o buraco ou, pior, deixas pilotos presos do outro lado. Este guia cobre as mecânicas e o método seguro.',
+            h2mass: 'Como funciona a massa dos wormholes',
+            massP1: 'Cada wormhole tem dois valores de massa que importam para o rolling:',
+            massLi1: '<strong>Massa total</strong> — a massa combinada de naves que o buraco consegue deixar passar antes de colapsar (por exemplo ~2,000,000,000 kg em muitos statics C1-C3, até ~3,300,000,000 kg em grandes buracos de capitais).',
+            massLi2: '<strong>Massa por salto (salto máximo)</strong> — a nave individual mais pesada que o pode usar. Demasiado pesada, e a nave simplesmente não consegue saltar.',
+            massP2: 'Cada nave que salta subtrai a sua própria massa do total restante. Quando a massa restante chega a zero, o buraco colapsa nesse salto. O senão: <strong>ambos os valores variam ±10 %</strong> e não consegues ver o número exato no jogo. Por isso o verdadeiro ponto de colapso é uma <em>janela</em>, não um valor preciso — que é exatamente porque o rolling tem risco e porque uma calculadora ajuda.',
+            stagesH: 'Ler as fases no jogo',
+            stagesB: 'A descrição do wormhole no ecrã diz-te grosso modo quanta massa resta: "ainda não teve a sua estabilidade significativamente perturbada" (mais de ~50 % restante), "teve a sua estabilidade reduzida" (menos de ~50 %, "desestabilizado") e "à beira do colapso" (menos de ~10 %, "crítico"). São essas faixas que um rastreador de rolling converte em número de passagens.',
+            h2hotcold: 'Massa de passagem a quente vs a frio',
+            hotcoldP1: 'A massa da nave muda consoante o teu módulo de propulsão esteja ligado ou não:',
+            coldLi: '<strong>Passagem a frio</strong> — prop mod desligado. A nave salta com a sua massa de casco base.',
+            hotLi: '<strong>Passagem a quente</strong> — microwarpdrive ou afterburner ativo. Um prop mod ativo adiciona cerca de <strong>50,000,000 kg</strong> nesse salto.',
+            hotcoldP2: 'As equipas de rolling alternam passagens a quente e a frio para colocar o total acumulado dentro da janela de colapso em vez de a ultrapassar. Uma ferramenta comum é um Higgs Anchor rig, que multiplica a massa do casco para que um único battleship transporte uma fatia grande e previsível do total — menos saltos, controlo mais apertado.',
+            h2method: 'O método de rolling seguro',
+            methodLi1: '<strong>Conhece o buraco.</strong> Identifica o tipo de wormhole para saberes a sua massa total e por salto (um mapper mostra isto a partir do código, p. ex. um K162 é o lado oposto de um tipo com nome).',
+            methodLi2: '<strong>Escolhe o teu roller.</strong> Os battleships (muitas vezes com um Higgs rig e um prop mod) são o padrão. Dois pilotos, ou um só piloto a ir e voltar, é o típico.',
+            methodLi3: '<strong>Termina sempre no lado de casa.</strong> Planeia o teu número de passagens para que a <em>última</em> passagem que colapsa o buraco deixe o teu roller em casa — nunca preso no sistema distante desconhecido.',
+            methodLi4: '<strong>Passa, verifica a descrição, repete.</strong> Após cada salto, relê a fase de massa. Ao aproximares-te de "crítico", muda para a tua passagem segura mais leve para não ultrapassares e ficares preso.',
+            methodLi5: '<strong>Quando estiver crítico, faz rolling para o fechar a partir do lado de casa.</strong> A passagem final deve ser uma que possas dar-te ao luxo de fazer só de ida se não colapsar — e que te deixe em casa se colapsar.',
+            strandH: 'Ficar preso: a falha que estás a evitar',
+            strandB: 'Se o buraco colapsar enquanto o teu roller está no lado <em>distante</em>, esse piloto fica preso num sistema desconhecido aleatório sem regresso a não ser escanear uma nova saída. Isso é ficar preso. Todo o objetivo de contar passagens e terminar do lado de casa é tornar impossível ficar preso — que é exatamente o que uma calculadora de rolling impõe por ti.',
+            h2calc: 'Deixa uma calculadora de rolling fazer as contas',
+            calcP: '<a href="/">O Nexum</a> tem uma <strong>calculadora de rolling</strong> integrada em cada ligação de wormhole. Define a massa a frio e a quente do teu roller (ou carrega em "usar a minha nave"), diz-lhe em que lado estás, e ele acompanha a massa acumulada, mostra a banda de variância de ±10 %, diz-te quantas passagens seguras restam e avisa-te antes de uma passagem te deixar preso do lado distante. Mantém também um registo de saltos partilhado de quem passou o buraco, para que uma frota inteira possa fazer rolling a partir de uma única contagem sincronizada em vez de cada um adivinhar. Por ser em tempo real e colaborativa, dois pilotos a fazer rolling de extremos opostos veem os mesmos números.',
+            ctaP: '<strong>Faz rolling com confiança.</strong> A calculadora de rolling do Nexum é gratuita — mapeia a tua cadeia e regista cada passagem.',
+            ctaBtn: 'Abrir o Nexum',
+            relatedH: 'Guias relacionados',
+            rel1: 'Classes de wormhole do EVE &amp; statics explicados',
+            rel2: 'Como mapear uma cadeia de wormholes',
+            rel3: 'Como escanear assinaturas no EVE Online',
+            rel4: 'Lista de tipos de wormhole do EVE &amp; statics',
+            rel5: 'Nexum vs Pathfinder vs Tripwire vs Wanderer',
+            footP: 'EVE Online e o logótipo do EVE são marcas registadas da CCP hf. Todos os direitos reservados em todo o mundo. O Nexum é uma ferramenta de terceiros e não está afiliado nem é apoiado pela CCP hf. Consulta o <a href="/license/">aviso completo de licença &amp; PI do EVE</a>.',
+          };
+          DICTS.zh = {
+            __title: '如何在 EVE Online 中滚洞（rolling）——质量指南 + 滚洞计算器',
+            nav: '&larr; Nexum 主页',
+            h1: '如何在 EVE Online 中滚洞（rolling）',
+            sub: '理解虫洞质量，安全滚洞，绝不让你的舰队被困在错误的一侧。',
+            updated: 'Nexum 虫洞指南',
+            lede: '"滚洞"（rolling）虫洞是指通过让舰船质量不断穿过虫洞直到其消亡，从而故意使其坍缩，然后让一个新的连接刷新出来。军团滚洞是为了通向一个新的随机星系、封闭一条敌对正在下来的链路，或精确控制谁能到达自己的家园。质量计算算错，你要么关不掉虫洞，更糟的是会把飞行员困在另一侧。本指南介绍其机制与安全方法。',
+            h2mass: '虫洞质量如何运作',
+            massP1: '每个虫洞都有两个对滚洞至关重要的质量数值：',
+            massLi1: '<strong>总质量</strong> —— 虫洞在坍缩前可以通过的舰船质量总和（例如许多 C1-C3 static 约为 ~2,000,000,000 kg，大型旗舰洞可达 ~3,300,000,000 kg）。',
+            massLi2: '<strong>单次跳跃（最大跳跃）质量</strong> —— 能够使用它的最重单艘舰船。太重的话，舰船根本无法跳跃。',
+            massP2: '每艘跳跃的舰船都会从剩余总量中减去自身质量。当剩余质量归零时，虫洞就在那次跳跃时坍缩。关键在于：<strong>这两个数值都有 ±10% 的浮动</strong>，而且你在游戏中看不到确切数字。所以真正的坍缩点是一个<em>区间</em>，而非精确值 —— 这正是滚洞有风险、以及计算器有帮助的原因。',
+            stagesH: '在游戏中读取各阶段',
+            stagesB: '虫洞的屏幕描述会大致告诉你还剩多少质量："其稳定性尚未受到明显扰动"（剩余超过 ~50%）、"其稳定性已降低"（低于 ~50%，即"已失稳"），以及"濒临坍缩"（低于 ~10%，即"临界"）。滚洞追踪器正是把这些区间换算成通过次数。',
+            h2hotcold: '热穿越与冷穿越质量',
+            hotcoldP1: '舰船质量会因你的推进模块是否开启而变化：',
+            coldLi: '<strong>冷穿越</strong> —— 推进模块关闭。舰船以其基础船体质量跳跃。',
+            hotLi: '<strong>热穿越</strong> —— microwarpdrive 或 afterburner 开启。启用的推进模块在该次跳跃中大约增加 <strong>50,000,000 kg</strong>。',
+            hotcoldP2: '滚洞小队会交替进行热穿越和冷穿越，使累计总量落入坍缩区间内，而不是冲过头。一个常用工具是 Higgs Anchor rig，它会成倍增加船体质量，让单艘 battleship 承担总量中一大块可预测的份额 —— 更少的跳跃，更严的控制。',
+            h2method: '安全的滚洞方法',
+            methodLi1: '<strong>了解这个洞。</strong> 辨明虫洞类型，从而知道它的总质量和单次跳跃质量（mapper 会根据代码显示这些，例如 K162 是某个命名类型的另一侧）。',
+            methodLi2: '<strong>选好你的滚洞舰。</strong> battleship（通常配 Higgs rig 和推进模块）是标准配置。两名飞行员，或一名飞行员来回往返，是常见做法。',
+            methodLi3: '<strong>始终结束在家园一侧。</strong> 规划你的通过次数，使坍缩虫洞的<em>最后一次</em>穿越把你的滚洞舰留在家里 —— 绝不困在未知的远端星系。',
+            methodLi4: '<strong>穿越、查看描述、重复。</strong> 每次跳跃后，重新读取质量阶段。接近"临界"时，改用你最轻的安全穿越，以免冲过头而被困。',
+            methodLi5: '<strong>到临界时，从家园一侧把它滚闭。</strong> 最后一次穿越应当是即便它没坍缩、你也能承受单程的那种 —— 而如果它坍缩了，也能把你带回家。',
+            strandH: '被困：你要避免的失败',
+            strandB: '如果虫洞在你的滚洞舰处于<em>远端</em>一侧时坍缩，那名飞行员就被困在一个随机的未知星系中，除了扫描一个新出口别无归途。这就是被困。计数穿越次数并结束在家园一侧的全部意义，就是让被困变得不可能 —— 而这正是滚洞计算器为你强制执行的。',
+            h2calc: '让滚洞计算器来算这些数',
+            calcP: '<a href="/">Nexum</a> 在每一条虫洞连接上都内置了<strong>滚洞计算器</strong>。设置你滚洞舰的冷、热质量（或点击"使用我的舰船"），告诉它你在哪一侧，它就会追踪累计质量、显示 ±10% 的浮动区间、告诉你还剩多少次安全穿越，并在某次穿越会把你困在远端之前发出警告。它还保存一份共享的跳跃日志，记录谁穿过了洞，这样整支舰队都能依据同一个同步计数来滚洞，而不是各自猜测。因为它是实时且协作的，从两端相对滚洞的两名飞行员看到的是相同的数字。',
+            ctaP: '<strong>放心滚洞。</strong> Nexum 的滚洞计算器免费 —— 绘制你的链路并追踪每一次穿越。',
+            ctaBtn: '打开 Nexum',
+            relatedH: '相关指南',
+            rel1: 'EVE 虫洞级别 &amp; static 详解',
+            rel2: '如何绘制一条虫洞链路',
+            rel3: '如何在 EVE Online 中扫描信号',
+            rel4: 'EVE 虫洞类型 &amp; static 列表',
+            rel5: 'Nexum vs Pathfinder vs Tripwire vs Wanderer',
+            footP: 'EVE Online 和 EVE 标志是 CCP hf. 的注册商标。在全球范围内保留所有权利。Nexum 是第三方工具，与 CCP hf. 无关联，也未获其认可。请查看完整的 <a href="/license/">许可 &amp; EVE 知识产权声明</a>。',
+          };
+          DICTS.ko = {
+            __title: 'EVE Online에서 웜홀 롤링하는 법 — 질량 가이드 + 롤링 계산기',
+            nav: '&larr; Nexum 홈',
+            h1: 'EVE Online에서 웜홀 롤링하는 법',
+            sub: '웜홀 질량을 이해하고, 안전하게 롤링하며, 함대를 절대 반대쪽에 고립시키지 마세요.',
+            updated: 'Nexum 웜홀 가이드',
+            lede: '웜홀 "롤링"이란 함선 질량을 계속 통과시켜 웜홀이 소멸할 때까지 의도적으로 붕괴시킨 뒤, 새로운 연결이 생성되도록 하는 것을 뜻합니다. 콥은 새로운 무작위 성계에 닿기 위해, 적이 내려오는 체인을 닫기 위해, 또는 누가 자신의 홈에 도달할 수 있는지 정확히 통제하기 위해 웜홀을 롤링합니다. 질량 계산을 틀리면 웜홀을 닫지 못하거나, 더 나쁘게는 파일럿을 반대쪽에 고립시키게 됩니다. 이 가이드는 그 메커니즘과 안전한 방법을 다룹니다.',
+            h2mass: '웜홀 질량은 어떻게 작동하는가',
+            massP1: '모든 웜홀에는 롤링에 중요한 두 가지 질량 수치가 있습니다:',
+            massLi1: '<strong>총 질량</strong> — 웜홀이 붕괴하기 전에 통과시킬 수 있는 함선 질량의 합 (예를 들어 많은 C1-C3 static에서 ~2,000,000,000 kg, 대형 캐피탈 웜홀에서는 최대 ~3,300,000,000 kg).',
+            massLi2: '<strong>점프당(최대 점프) 질량</strong> — 그것을 사용할 수 있는 가장 무거운 단일 함선. 너무 무거우면 함선은 아예 점프할 수 없습니다.',
+            massP2: '점프하는 각 함선은 남은 총량에서 자신의 질량을 뺍니다. 남은 질량이 0에 도달하면 그 점프에서 웜홀이 붕괴합니다. 함정은: <strong>두 수치 모두 ±10% 변동</strong>하며 게임 내에서 정확한 값을 볼 수 없다는 것입니다. 그래서 실제 붕괴 지점은 정확한 값이 아니라 <em>범위</em>입니다 — 바로 이것이 롤링에 위험이 따르고 계산기가 도움이 되는 이유입니다.',
+            stagesH: '게임 내에서 단계 읽기',
+            stagesB: '웜홀의 화면 설명은 질량이 얼마나 남았는지 대략 알려줍니다: "안정성이 아직 크게 교란되지 않음"(약 ~50% 이상 남음), "안정성이 감소함"(~50% 미만, "불안정"), 그리고 "붕괴 직전"(~10% 미만, "임계"). 롤링 트래커는 바로 이 구간들을 통과 횟수로 환산합니다.',
+            h2hotcold: '핫 패스 vs 콜드 패스 질량',
+            hotcoldP1: '함선 질량은 추진 모듈이 켜져 있는지에 따라 달라집니다:',
+            coldLi: '<strong>콜드 패스</strong> — 추진 모듈 꺼짐. 함선은 기본 선체 질량으로 점프합니다.',
+            hotLi: '<strong>핫 패스</strong> — microwarpdrive 또는 afterburner 활성. 활성화된 추진 모듈은 그 점프에서 대략 <strong>50,000,000 kg</strong>을 더합니다.',
+            hotcoldP2: '롤링 크루는 핫 패스와 콜드 패스를 번갈아 하여 누적 총량이 초과되지 않고 붕괴 범위 안에 들도록 맞춥니다. 흔히 쓰는 도구는 Higgs Anchor rig로, 선체 질량을 배가시켜 단일 battleship이 총량의 크고 예측 가능한 몫을 감당하게 합니다 — 더 적은 점프, 더 촘촘한 통제.',
+            h2method: '안전한 롤링 방법',
+            methodLi1: '<strong>웜홀을 파악하세요.</strong> 웜홀 유형을 식별해 그 총 질량과 점프당 질량을 알아두세요 (mapper는 코드로부터 이를 보여주며, 예를 들어 K162는 명명된 유형의 반대쪽입니다).',
+            methodLi2: '<strong>롤러를 고르세요.</strong> battleship(흔히 Higgs rig와 추진 모듈 장착)이 표준입니다. 두 명의 파일럿, 또는 한 명이 왔다 갔다 하는 것이 일반적입니다.',
+            methodLi3: '<strong>항상 홈 쪽에서 끝내세요.</strong> 웜홀을 붕괴시키는 <em>마지막</em> 패스가 롤러를 홈에 남기도록 통과 횟수를 계획하세요 — 절대 미지의 먼 성계에 고립되지 않도록.',
+            methodLi4: '<strong>통과하고, 설명을 확인하고, 반복하세요.</strong> 매 점프 후 질량 단계를 다시 읽으세요. "임계"에 가까워지면 초과해 고립되지 않도록 가장 가벼운 안전한 패스로 전환하세요.',
+            methodLi5: '<strong>임계 상태가 되면 홈 쪽에서 롤링해 닫으세요.</strong> 마지막 패스는 붕괴하지 않더라도 편도로 감당할 수 있는 것이어야 하며 — 붕괴하면 당신을 홈에 남기는 것이어야 합니다.',
+            strandH: '고립: 당신이 피하려는 실패',
+            strandB: '롤러가 <em>먼</em> 쪽에 있는 동안 웜홀이 붕괴하면, 그 파일럿은 새 출구를 스캔하는 것 외에는 돌아올 길 없이 무작위의 미지 성계에 갇힙니다. 그것이 고립입니다. 통과 횟수를 세고 홈 쪽에서 끝내는 것의 전체 목적은 고립을 불가능하게 만드는 것이며 — 바로 이것이 롤링 계산기가 당신을 위해 강제하는 바입니다.',
+            h2calc: '롤링 계산기에 계산을 맡기세요',
+            calcP: '<a href="/">Nexum</a>은 모든 웜홀 연결에 <strong>롤링 계산기</strong>를 내장하고 있습니다. 롤러의 콜드 및 핫 질량을 설정하고(또는 "내 함선 사용"을 누르고), 당신이 어느 쪽에 있는지 알려주면, 누적 질량을 추적하고 ±10% 변동 대역을 보여주며 안전한 패스가 몇 번 남았는지 알려주고, 어떤 패스가 당신을 먼 쪽에 고립시키기 전에 경고합니다. 또한 누가 웜홀을 통과했는지 공유되는 점프 로그를 유지하여, 함대 전체가 각자 추측하는 대신 하나의 동기화된 카운트로 롤링할 수 있습니다. 실시간 협업이기 때문에, 반대쪽 끝에서 롤링하는 두 파일럿이 같은 숫자를 봅니다.',
+            ctaP: '<strong>자신 있게 롤링하세요.</strong> Nexum의 롤링 계산기는 무료입니다 — 체인을 매핑하고 모든 패스를 추적하세요.',
+            ctaBtn: 'Nexum 열기',
+            relatedH: '관련 가이드',
+            rel1: 'EVE 웜홀 등급 &amp; static 설명',
+            rel2: '웜홀 체인 매핑하는 법',
+            rel3: 'EVE Online에서 시그니처 스캔하는 법',
+            rel4: 'EVE 웜홀 유형 &amp; static 목록',
+            rel5: 'Nexum vs Pathfinder vs Tripwire vs Wanderer',
+            footP: 'EVE Online과 EVE 로고는 CCP hf.의 등록 상표입니다. 전 세계 모든 권리가 보유됩니다. Nexum은 서드파티 도구이며 CCP hf.와 제휴하거나 그로부터 보증받지 않았습니다. 전체 <a href="/license/">라이선스 &amp; EVE IP 고지</a>를 참조하세요.',
+          };
+          DICTS.ja = {
+            __title: 'EVE Online でワームホールをロールする方法 — 質量ガイド + ローリング計算機',
+            nav: '&larr; Nexum ホーム',
+            h1: 'EVE Online でワームホールをロールする方法',
+            sub: 'ワームホールの質量を理解し、安全にロールして、艦隊を反対側に絶対に取り残さないようにしましょう。',
+            updated: 'Nexum のワームホールガイド',
+            lede: 'ワームホールを「ロール」するとは、艦船の質量を通し続けてワームホールが消滅するまで意図的に崩壊させ、新しい接続をスポーンさせることを意味します。コープがホールをロールするのは、新しいランダムな星系に到達するため、敵が降りてくるチェーンを閉じるため、あるいは誰が自分のホームに到達できるかを正確に管理するためです。質量計算を誤ると、ホールを閉じられないか、さらに悪ければパイロットを反対側に取り残してしまいます。このガイドではその仕組みと安全な方法を扱います。',
+            h2mass: 'ワームホールの質量の仕組み',
+            massP1: 'どのワームホールにも、ロールに関わる2つの質量値があります：',
+            massLi1: '<strong>総質量</strong> — ホールが崩壊するまでに通せる艦船質量の合計（たとえば多くの C1-C3 static で ~2,000,000,000 kg、大型キャピタルホールで最大 ~3,300,000,000 kg）。',
+            massLi2: '<strong>ジャンプ毎（最大ジャンプ）質量</strong> — それを使える最も重い単一の艦船。重すぎると艦船はそもそもジャンプできません。',
+            massP2: 'ジャンプする各艦船は、残りの総量から自身の質量を差し引きます。残り質量がゼロに達すると、そのジャンプでホールが崩壊します。厄介なのは、<strong>どちらの値も ±10% 変動する</strong>うえ、ゲーム内で正確な数値を見られないことです。つまり本当の崩壊点は正確な値ではなく<em>幅</em>であり — これこそがロールにリスクがあり、計算機が役立つ理由です。',
+            stagesH: 'ゲーム内で段階を読む',
+            stagesB: 'ワームホールの画面上の説明は、残り質量のおおよそを教えてくれます：「安定性はまだ大きく乱されていない」（残り ~50% 超）、「安定性が低下した」（~50% 未満、「不安定化」）、そして「崩壊寸前」（~10% 未満、「クリティカル」）。ローリングトラッカーはまさにこれらの段階を通過回数に換算します。',
+            h2hotcold: 'ホットパス vs コールドパスの質量',
+            hotcoldP1: '艦船の質量は、推進モジュールが作動しているかどうかで変わります：',
+            coldLi: '<strong>コールドパス</strong> — 推進モジュールオフ。艦船は基本船体質量でジャンプします。',
+            hotLi: '<strong>ホットパス</strong> — microwarpdrive または afterburner 作動中。作動中の推進モジュールはそのジャンプで約 <strong>50,000,000 kg</strong> を加えます。',
+            hotcoldP2: 'ローリングのクルーはホットパスとコールドパスを交互に行い、累計をオーバーさせずに崩壊の幅に収めます。よく使われる道具が Higgs Anchor rig で、船体質量を倍増させ、1隻の battleship が総量のうち大きく予測可能な分を担えるようにします — ジャンプは少なく、制御はより緻密に。',
+            h2method: '安全なロール方法',
+            methodLi1: '<strong>ホールを把握する。</strong> ワームホールのタイプを特定して総質量とジャンプ毎質量を知りましょう（mapper はコードからこれを表示します。たとえば K162 は名前付きタイプの反対側です）。',
+            methodLi2: '<strong>ローラーを選ぶ。</strong> battleship（多くは Higgs rig と推進モジュール付き）が標準です。2人のパイロット、または1人が行き来するのが一般的です。',
+            methodLi3: '<strong>常にホーム側で終える。</strong> ホールを崩壊させる<em>最後</em>のパスがローラーをホームに残すよう、通過回数を計画しましょう — 未知の遠い星系に取り残されることのないように。',
+            methodLi4: '<strong>通過し、説明を確認し、繰り返す。</strong> 各ジャンプの後で質量段階を読み直します。「クリティカル」に近づいたら、オーバーして取り残されないよう最も軽い安全なパスに切り替えましょう。',
+            methodLi5: '<strong>クリティカルになったら、ホーム側からロールして閉じる。</strong> 最後のパスは、崩壊しなくても片道で行えるものにし — 崩壊すればあなたをホームに残すものにしましょう。',
+            strandH: '取り残し：あなたが避けている失敗',
+            strandB: 'ローラーが<em>遠い</em>側にいる間にホールが崩壊すると、そのパイロットは新しい出口をスキャンする以外に戻る手段のない、ランダムな未知の星系に閉じ込められます。それが取り残しです。通過回数を数えてホーム側で終えることの目的はすべて、取り残しを不可能にすることであり — まさにそれをローリング計算機があなたのために強制します。',
+            h2calc: 'ローリング計算機に計算を任せる',
+            calcP: '<a href="/">Nexum</a> はすべてのワームホール接続に<strong>ローリング計算機</strong>を内蔵しています。ローラーのコールドとホットの質量を設定し（または「自分の艦船を使う」を押し）、自分がどちら側にいるかを伝えると、累積質量を追跡し、±10% の変動帯を表示し、安全なパスがあと何回残っているかを教え、あるパスがあなたを遠い側に取り残す前に警告します。さらに誰がホールを通過したかの共有ジャンプログを保持するので、各自が推測するのではなく、艦隊全体が1つの同期されたカウントでロールできます。リアルタイムかつ協調的なので、反対の端からロールする2人のパイロットは同じ数字を見ます。',
+            ctaP: '<strong>自信を持ってロールしよう。</strong> Nexum のローリング計算機は無料です — チェーンをマッピングし、すべてのパスを追跡しましょう。',
+            ctaBtn: 'Nexum を開く',
+            relatedH: '関連ガイド',
+            rel1: 'EVE ワームホールのクラス &amp; static 解説',
+            rel2: 'ワームホールチェーンをマッピングする方法',
+            rel3: 'EVE Online でシグネチャをスキャンする方法',
+            rel4: 'EVE ワームホールのタイプ &amp; static 一覧',
+            rel5: 'Nexum vs Pathfinder vs Tripwire vs Wanderer',
+            footP: 'EVE Online と EVE ロゴは CCP hf. の登録商標です。世界中ですべての権利が留保されています。Nexum はサードパーティ製ツールであり、CCP hf. と提携しておらず、その承認も受けていません。完全な <a href="/license/">ライセンス &amp; EVE IP 表示</a> をご覧ください。',
+          };
+          DICTS.ru = {
+            __title: 'Как роллить червоточину в EVE Online — гайд по массе + калькулятор роллинга',
+            nav: '&larr; Главная Nexum',
+            h1: 'Как роллить червоточину в EVE Online',
+            sub: 'Разберитесь в массе червоточин, роллите безопасно и никогда не оставляйте флот на неправильной стороне.',
+            updated: 'Гайд Nexum по червоточинам',
+            lede: '«Роллинг» червоточины означает намеренно схлопнуть её, прогоняя через неё массу кораблей, пока она не умрёт, а затем позволить появиться новому соединению. Корпорации роллят дыры, чтобы попасть в новую случайную систему, закрыть цепочку, по которой спускается враг, или точно контролировать, кто может добраться до их дома. Ошибитесь в расчётах массы — и вы либо не закроете дыру, либо, что хуже, оставите пилотов на дальней стороне. Этот гайд охватывает механику и безопасный метод.',
+            h2mass: 'Как работает масса червоточины',
+            massP1: 'У каждой червоточины есть два значения массы, важных для роллинга:',
+            massLi1: '<strong>Полная масса</strong> — суммарная масса кораблей, которую дыра может пропустить до схлопывания (например ~2,000,000,000 kg на многих статиках C1-C3, до ~3,300,000,000 kg на больших капитальных дырах).',
+            massLi2: '<strong>Масса за прыжок (максимальный прыжок)</strong> — самый тяжёлый одиночный корабль, который может ею воспользоваться. Слишком тяжёлый — и корабль просто не сможет прыгнуть.',
+            massP2: 'Каждый прыгающий корабль вычитает свою массу из оставшегося общего запаса. Когда оставшаяся масса достигает нуля, дыра схлопывается на этом прыжке. Загвоздка: <strong>оба значения варьируются на ±10 %</strong>, и точную цифру в игре увидеть нельзя. Так что реальная точка схлопывания — это <em>диапазон</em>, а не точное значение — именно поэтому в роллинге есть риск и именно поэтому помогает калькулятор.',
+            stagesH: 'Чтение стадий в игре',
+            stagesB: 'Описание червоточины на экране примерно сообщает, сколько массы осталось: «его стабильность ещё не была значительно нарушена» (осталось более ~50 %), «его стабильность снижена» (менее ~50 %, «дестабилизирована») и «на грани схлопывания» (менее ~10 %, «критическая»). Именно эти диапазоны трекер роллинга превращает в число проходов.',
+            h2hotcold: 'Масса горячего и холодного прохода',
+            hotcoldP1: 'Масса корабля меняется в зависимости от того, работает ли ваш двигательный модуль:',
+            coldLi: '<strong>Холодный проход</strong> — двигательный модуль выключен. Корабль прыгает со своей базовой массой корпуса.',
+            hotLi: '<strong>Горячий проход</strong> — активен microwarpdrive или afterburner. Активный двигательный модуль добавляет примерно <strong>50,000,000 kg</strong> на этот прыжок.',
+            hotcoldP2: 'Команды роллинга чередуют горячие и холодные проходы, чтобы вывести текущую сумму внутрь окна схлопывания, а не проскочить его. Распространённый инструмент — Higgs Anchor rig, который умножает массу корпуса, так что один battleship несёт большую предсказуемую долю от общей массы — меньше прыжков, более плотный контроль.',
+            h2method: 'Безопасный метод роллинга',
+            methodLi1: '<strong>Знайте дыру.</strong> Определите тип червоточины, чтобы знать её полную массу и массу за прыжок (mapper показывает это по коду, например K162 — это дальняя сторона именованного типа).',
+            methodLi2: '<strong>Выберите роллер.</strong> Battleship (часто с Higgs rig и двигательным модулем) — стандарт. Обычно это два пилота или один пилот, снующий туда-обратно.',
+            methodLi3: '<strong>Всегда заканчивайте на домашней стороне.</strong> Спланируйте число проходов так, чтобы <em>последний</em> проход, схлопывающий дыру, оставил ваш роллер дома — никогда не застрявшим в неизвестной дальней системе.',
+            methodLi4: '<strong>Пройдите, проверьте описание, повторите.</strong> После каждого прыжка перечитывайте стадию массы. Приближаясь к «критической», переключайтесь на самый лёгкий безопасный проход, чтобы не проскочить и не застрять.',
+            methodLi5: '<strong>Когда она критическая, доролльте её до закрытия с домашней стороны.</strong> Последний проход должен быть таким, который вы можете позволить себе в один конец, если дыра не схлопнется — и который вернёт вас домой, если схлопнется.',
+            strandH: 'Застревание: провал, которого вы избегаете',
+            strandB: 'Если дыра схлопнется, пока ваш роллер на <em>дальней</em> стороне, этот пилот застрянет в случайной неизвестной системе без пути назад, кроме сканирования нового выхода. Это и есть застревание. Весь смысл подсчёта проходов и завершения на домашней стороне — сделать застревание невозможным — именно это калькулятор роллинга обеспечивает за вас.',
+            h2calc: 'Пусть калькулятор роллинга сделает расчёты',
+            calcP: 'У <a href="/">Nexum</a> есть встроенный <strong>калькулятор роллинга</strong> на каждом соединении червоточины. Задайте холодную и горячую массу вашего роллера (или нажмите «использовать мой корабль»), укажите, на какой вы стороне, и он отслеживает накопленную массу, показывает полосу разброса ±10 %, сообщает, сколько безопасных проходов осталось, и предупреждает вас, прежде чем проход оставит вас на дальней стороне. Он также ведёт общий журнал прыжков о том, кто прошёл дыру, так что весь флот может роллить по одному синхронизированному счёту, а не гадать поодиночке. Поскольку он работает в реальном времени и совместно, два пилота, роллящих с противоположных концов, видят одни и те же цифры.',
+            ctaP: '<strong>Роллите уверенно.</strong> Калькулятор роллинга Nexum бесплатен — картируйте свою цепочку и отслеживайте каждый проход.',
+            ctaBtn: 'Открыть Nexum',
+            relatedH: 'Похожие руководства',
+            rel1: 'Классы червоточин EVE &amp; статики: объяснение',
+            rel2: 'Как картировать цепочку червоточин',
+            rel3: 'Как сканировать сигнатуры в EVE Online',
+            rel4: 'Список типов червоточин EVE &amp; статиков',
+            rel5: 'Nexum vs Pathfinder vs Tripwire vs Wanderer',
+            footP: 'EVE Online и логотип EVE являются зарегистрированными торговыми марками CCP hf. Все права защищены по всему миру. Nexum — это сторонний инструмент, не связанный с CCP hf. и не одобренный ею. См. полное <a href="/license/">уведомление о лицензии &amp; ИС EVE</a>.',
+          };
+
+          var DICT = DICTS[lang];
+          document.documentElement.lang = lang;
+          if (DICT.__title) document.title = DICT.__title;
+          document.querySelectorAll('[data-i18n]').forEach(function (el) {
+            var key = el.getAttribute('data-i18n');
+            if (DICT[key] != null) el.innerHTML = DICT[key];
+          });
+        } catch (e) {
+          // Leave the English source intact on any error.
+        }
+      })();
+    </script>
   </body>
 </html>

@@ -14,6 +14,8 @@
     <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="robots" content="index, follow" />
 
+    <script src="/vendor/lang-picker.js" defer></script>
+
     <meta property="og:type" content="article" />
     <meta property="og:url" content="https://eve-nexum.com/guides/mapping/" />
     <meta property="og:title" content="How to Map a Wormhole Chain in EVE Online" />
@@ -59,7 +61,7 @@
       body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--text); line-height: 1.6; }
       .wrap { max-width: 820px; margin: 0 auto; padding: 32px 20px 64px; }
       a { color: var(--accent); }
-      .topnav { font-size: 14px; }
+      .topnav { font-size: 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
       .topnav a { color: var(--muted); text-decoration: none; }
       header.hero { margin: 24px 0 8px; }
       .logo { font-size: 30px; color: var(--accent); line-height: 1; }
@@ -81,61 +83,358 @@
   </head>
   <body>
     <div class="wrap">
-      <nav class="topnav"><a href="/">&larr; Nexum home</a></nav>
+      <nav class="topnav">
+        <a href="/" data-i18n="nav">&larr; Nexum home</a>
+        <!-- Stylized language dropdown with SVG flags, built by
+             /vendor/lang-picker.js (a native <select> can't render the flags,
+             and flag emoji show as bare country codes on Windows). -->
+        <div class="lang-picker" data-lang-picker></div>
+      </nav>
 
       <header class="hero">
         <div class="logo" aria-hidden="true">&#9672;</div>
-        <h1>How to Map a Wormhole Chain in EVE Online</h1>
-        <p class="sub">Scan it, read it, record it, and share it live with your corp.</p>
+        <h1 data-i18n="h1">How to Map a Wormhole Chain in EVE Online</h1>
+        <p class="sub" data-i18n="sub">Scan it, read it, record it, and share it live with your corp.</p>
       </header>
-      <p class="updated">A Nexum wormhole guide</p>
+      <p class="updated" data-i18n="updated">A Nexum wormhole guide</p>
 
-      <p class="lede">A wormhole "chain" is the tree of systems you can reach from your home through wormholes - your statics, the wandering holes into them, and the k-space exits at the far ends. Because those holes shift and die constantly, the chain is never the same twice, so wormhole corps keep a live <strong>map</strong> of it. This guide walks through building one from scratch and keeping it current.</p>
+      <p class="lede" data-i18n="lede">A wormhole "chain" is the tree of systems you can reach from your home through wormholes - your statics, the wandering holes into them, and the k-space exits at the far ends. Because those holes shift and die constantly, the chain is never the same twice, so wormhole corps keep a live <strong>map</strong> of it. This guide walks through building one from scratch and keeping it current.</p>
 
-      <h2>Step 1: Scan your home</h2>
-      <p>Open the probe scanner and resolve every cosmic signature in your system to 100%. Filter for the <strong>wormhole</strong> signatures - those are your ways out (and other people's ways in). Data/relic/gas sites matter for ISK, but for mapping it is the wormholes you care about.</p>
+      <h2 data-i18n="h2_1">Step 1: Scan your home</h2>
+      <p data-i18n="p_1">Open the probe scanner and resolve every cosmic signature in your system to 100%. Filter for the <strong>wormhole</strong> signatures - those are your ways out (and other people's ways in). Data/relic/gas sites matter for ISK, but for mapping it is the wormholes you care about.</p>
 
-      <h2>Step 2: Identify each wormhole</h2>
-      <p>Warp to a wormhole and look at it. If it shows a named type (like "N062" or "C247"), that side tells you the destination class, total mass and lifetime. If it shows a <strong>K162</strong>, it is the exit side of a hole someone opened from elsewhere - jump through and read the named signature on the far side to learn what it really is. Note the mass stage ("not significantly disrupted", "reduced", "on the verge of collapse") and the lifetime ("not yet begun to decay" vs "reaching the end of its natural lifetime").</p>
+      <h2 data-i18n="h2_2">Step 2: Identify each wormhole</h2>
+      <p data-i18n="p_2">Warp to a wormhole and look at it. If it shows a named type (like "N062" or "C247"), that side tells you the destination class, total mass and lifetime. If it shows a <strong>K162</strong>, it is the exit side of a hole someone opened from elsewhere - jump through and read the named signature on the far side to learn what it really is. Note the mass stage ("not significantly disrupted", "reduced", "on the verge of collapse") and the lifetime ("not yet begun to decay" vs "reaching the end of its natural lifetime").</p>
 
       <div class="card">
-        <h3>Paste, do not retype</h3>
-        <p>In game you can copy your whole probe-scanner signature list. A good mapper lets you paste it straight in, matches it against what is already on the map, and auto-tags wormholes - so you are not hand-typing six-character sig IDs under time pressure.</p>
+        <h3 data-i18n="card1_h">Paste, do not retype</h3>
+        <p data-i18n="card1_b">In game you can copy your whole probe-scanner signature list. A good mapper lets you paste it straight in, matches it against what is already on the map, and auto-tags wormholes - so you are not hand-typing six-character sig IDs under time pressure.</p>
       </div>
 
-      <h2>Step 3: Record it on a map</h2>
-      <p>As you identify each hole, add the system and the connection to your map. A dedicated wormhole mapper beats in-game bookmarks because it shows the whole tree at a glance, remembers wormhole types and mass, ages holes automatically as they decay, and does not clutter your bookmark folder. Mark your home, tag connections (frigate hole, EOL, critical mass), and note anything you found - occupied POCOs, a tower, recent kills.</p>
+      <h2 data-i18n="h2_3">Step 3: Record it on a map</h2>
+      <p data-i18n="p_3">As you identify each hole, add the system and the connection to your map. A dedicated wormhole mapper beats in-game bookmarks because it shows the whole tree at a glance, remembers wormhole types and mass, ages holes automatically as they decay, and does not clutter your bookmark folder. Mark your home, tag connections (frigate hole, EOL, critical mass), and note anything you found - occupied POCOs, a tower, recent kills.</p>
 
-      <h2>Step 4: Follow the chain outward</h2>
-      <p>Jump into each connected system and repeat: scan, identify, record. Keep going until you have mapped out to the k-space exits (highsec/lowsec/nullsec) and any dead-end holes. The result is a full picture of everywhere you can go and everywhere something can come from - which is the difference between roaming safely and warping blind.</p>
+      <h2 data-i18n="h2_4">Step 4: Follow the chain outward</h2>
+      <p data-i18n="p_4">Jump into each connected system and repeat: scan, identify, record. Keep going until you have mapped out to the k-space exits (highsec/lowsec/nullsec) and any dead-end holes. The result is a full picture of everywhere you can go and everywhere something can come from - which is the difference between roaming safely and warping blind.</p>
 
-      <h2>Step 5: Share it live with your corp</h2>
-      <p>The single biggest upgrade to wormhole life is a <strong>real-time collaborative</strong> map. Instead of one person scanning and everyone else asking "what's the chain?", every pilot sees the same map update instantly as it is scanned. Threats, mass status, and who is where are visible to the whole fleet at once. That is what turns mapping from a chore into a shared situational picture.</p>
+      <h2 data-i18n="h2_5">Step 5: Share it live with your corp</h2>
+      <p data-i18n="p_5">The single biggest upgrade to wormhole life is a <strong>real-time collaborative</strong> map. Instead of one person scanning and everyone else asking "what's the chain?", every pilot sees the same map update instantly as it is scanned. Threats, mass status, and who is where are visible to the whole fleet at once. That is what turns mapping from a chore into a shared situational picture.</p>
 
       <div class="card">
-        <h3>Keep it current, automatically</h3>
-        <p>Holes decay and collapse whether or not anyone updates the map. A good mapper ages wormholes toward end-of-life on its own, flags stale connections, and (with opt-in tracking) even follows your pilots as they jump - so the chain reflects reality without constant babysitting.</p>
+        <h3 data-i18n="card2_h">Keep it current, automatically</h3>
+        <p data-i18n="card2_b">Holes decay and collapse whether or not anyone updates the map. A good mapper ages wormholes toward end-of-life on its own, flags stale connections, and (with opt-in tracking) even follows your pilots as they jump - so the chain reflects reality without constant babysitting.</p>
       </div>
 
       <div class="cta">
-        <p><strong>Map your chain in real time - free.</strong> Nexum syncs every edit live to everyone viewing the map.</p>
-        <a class="btn" href="/">Open Nexum</a>
+        <p data-i18n="cta"><strong>Map your chain in real time - free.</strong> Nexum syncs every edit live to everyone viewing the map.</p>
+        <a class="btn" href="/" data-i18n="ctaBtn">Open Nexum</a>
       </div>
 
       <div class="related">
-        <h2>Related guides</h2>
+        <h2 data-i18n="relatedH">Related guides</h2>
         <ul>
-          <li><a href="/guides/rolling/">How to roll a wormhole (mass guide + calculator)</a></li>
-          <li><a href="/guides/classes/">EVE wormhole classes and statics explained</a></li>
-          <li><a href="/guides/scanning/">How to scan signatures in EVE Online</a></li>
-          <li><a href="/guides/statics/">EVE wormhole types &amp; statics list</a></li>
-          <li><a href="/compare/">Nexum vs Pathfinder vs Tripwire vs Wanderer</a></li>
+          <li><a href="/guides/rolling/" data-i18n="rel1">How to roll a wormhole (mass guide + calculator)</a></li>
+          <li><a href="/guides/classes/" data-i18n="rel2">EVE wormhole classes and statics explained</a></li>
+          <li><a href="/guides/scanning/" data-i18n="rel3">How to scan signatures in EVE Online</a></li>
+          <li><a href="/guides/statics/" data-i18n="rel4">EVE wormhole types &amp; statics list</a></li>
+          <li><a href="/compare/" data-i18n="rel5">Nexum vs Pathfinder vs Tripwire vs Wanderer</a></li>
         </ul>
       </div>
 
       <footer>
-        <p>EVE Online and the EVE logo are the registered trademarks of CCP hf. All rights reserved worldwide. Nexum is a third-party tool and is not affiliated with or endorsed by CCP hf. See the full <a href="/license/">license &amp; EVE IP notice</a>.</p>
+        <p data-i18n="footP">EVE Online and the EVE logo are the registered trademarks of CCP hf. All rights reserved worldwide. Nexum is a third-party tool and is not affiliated with or endorsed by CCP hf. See the full <a href="/license/">license &amp; EVE IP notice</a>.</p>
       </footer>
     </div>
+
+    <!--
+      Runtime language swap. This page is static HTML (not part of the React SPA),
+      so it can't use react-i18next. We read the same `nexum.lang` localStorage key
+      the app's language detector uses (falling back to the browser language) and
+      replace the text of every [data-i18n] element with its translated equivalent.
+      SEO crawlers index the English source only (see the canonical / og:locale).
+    -->
+    <script>
+      (function () {
+        try {
+          var lang = localStorage.getItem('nexum.lang');
+          if (!lang) lang = (navigator.language || '').slice(0, 2);
+
+          // Languages with a translation dictionary below. English is the
+          // untranslated source, so it has no entry.
+          var SUPPORTED = { de:1, fr:1, es:1, pt:1, zh:1, ko:1, ja:1, ru:1 };
+
+          // Tell the stylized picker (/vendor/lang-picker.js) which language this
+          // page actually rendered, so it highlights the matching entry. The
+          // picker itself handles the switch (persist to nexum.lang + reload).
+          window.__nexumResolvedLang = SUPPORTED[lang] ? lang : 'en';
+
+          if (!SUPPORTED[lang]) return;
+
+          // SECURITY: innerHTML is used because these strings intentionally
+          // contain markup (<a>, <strong>). This is ONLY safe because every
+          // value in DICTS is a hard-coded, trusted literal in this file. Do NOT
+          // ever populate DICTS from user input, an API, or URL params.
+          var DICTS = {};
+          DICTS.de = {
+            __title: 'Wie man in EVE Online eine Wurmlochkette kartiert — Einsteigerleitfaden',
+            nav: '&larr; Nexum Startseite',
+            h1: 'Wie man in EVE Online eine Wurmlochkette kartiert',
+            sub: 'Scanne sie, lies sie, halte sie fest und teile sie live mit deiner Corp.',
+            updated: 'Ein Nexum-Wurmloch-Leitfaden',
+            lede: 'Eine Wurmloch-„Kette“ ist der Baum von Systemen, die du von deinem Zuhause aus durch Wurmlöcher erreichen kannst — deine Statics, die wandernden Löcher hinein und die K-Space-Ausgänge an den fernen Enden. Da sich diese Löcher ständig verschieben und sterben, ist die Kette nie zweimal gleich, deshalb halten Wurmloch-Corps eine Live-<strong>Karte</strong> davon. Dieser Leitfaden führt dich durch den Aufbau einer Karte von Grund auf und wie du sie aktuell hältst.',
+            h2_1: 'Schritt 1: Scanne dein Zuhause',
+            p_1: 'Öffne den Sondenscanner und löse jede kosmische Signatur in deinem System auf 100 % auf. Filtere nach den <strong>Wurmloch</strong>-Signaturen — das sind deine Wege hinaus (und die Wege anderer hinein). Data-/Relic-/Gas-Sites zählen für ISK, aber fürs Kartieren sind es die Wurmlöcher, auf die es ankommt.',
+            h2_2: 'Schritt 2: Identifiziere jedes Wurmloch',
+            p_2: 'Warpe zu einem Wurmloch und sieh es dir an. Zeigt es einen benannten Typ (wie „N062“ oder „C247“), verrät dir diese Seite Zielklasse, Gesamtmasse und Lebensdauer. Zeigt es ein <strong>K162</strong>, ist es die Ausgangsseite eines Lochs, das jemand von anderswo geöffnet hat — springe hindurch und lies die benannte Signatur auf der Gegenseite, um zu erfahren, was es wirklich ist. Notiere das Massenstadium („nicht wesentlich gestört“, „reduziert“, „kurz vor dem Kollaps“) und die Lebensdauer („hat noch nicht begonnen zu verfallen“ vs. „erreicht das Ende seiner natürlichen Lebensdauer“).',
+            card1_h: 'Einfügen, nicht abtippen',
+            card1_b: 'Im Spiel kannst du deine gesamte Sondenscanner-Signaturliste kopieren. Ein guter Mapper lässt dich sie direkt einfügen, gleicht sie mit dem ab, was schon auf der Karte ist, und markiert Wurmlöcher automatisch — so tippst du nicht unter Zeitdruck sechsstellige Sig-IDs von Hand.',
+            h2_3: 'Schritt 3: Halte sie auf einer Karte fest',
+            p_3: 'Sobald du ein Loch identifizierst, füge das System und die Verbindung deiner Karte hinzu. Ein spezieller Wurmloch-Mapper schlägt Ingame-Lesezeichen, weil er den ganzen Baum auf einen Blick zeigt, sich Wurmloch-Typen und Masse merkt, Löcher beim Verfall automatisch altern lässt und deinen Lesezeichenordner nicht zumüllt. Markiere dein Zuhause, tagge Verbindungen (Frigatten-Loch, EOL, kritische Masse) und notiere alles, was du gefunden hast — besetzte POCOs, einen Turm, kürzliche Kills.',
+            h2_4: 'Schritt 4: Folge der Kette nach außen',
+            p_4: 'Springe in jedes verbundene System und wiederhole: scannen, identifizieren, festhalten. Mach weiter, bis du bis zu den K-Space-Ausgängen (Highsec/Lowsec/Nullsec) und allen Sackgassen-Löchern kartiert hast. Das Ergebnis ist ein vollständiges Bild davon, wohin du überall gehen kannst und woher überall etwas kommen kann — das ist der Unterschied zwischen sicherem Roamen und blindem Warpen.',
+            h2_5: 'Schritt 5: Teile sie live mit deiner Corp',
+            p_5: 'Die mit Abstand größte Verbesserung fürs Wurmloch-Leben ist eine <strong>echtzeit-kollaborative</strong> Karte. Statt dass eine Person scannt und alle anderen fragen „Wie sieht die Kette aus?“, sieht jeder Pilot dieselbe Karte sofort aktualisiert, während sie gescannt wird. Bedrohungen, Massenstatus und wer wo ist, sind für die ganze Flotte auf einmal sichtbar. Das verwandelt Kartieren von einer lästigen Pflicht in ein geteiltes Lagebild.',
+            card2_h: 'Halte sie automatisch aktuell',
+            card2_b: 'Löcher verfallen und kollabieren, ob jemand die Karte aktualisiert oder nicht. Ein guter Mapper lässt Wurmlöcher von selbst zum End-of-Life hin altern, markiert veraltete Verbindungen und folgt (mit Opt-in-Tracking) sogar deinen Piloten, während sie springen — so spiegelt die Kette die Realität wider, ohne ständiges Babysitten.',
+            cta: '<strong>Kartiere deine Kette in Echtzeit — kostenlos.</strong> Nexum synchronisiert jede Änderung live an alle, die die Karte ansehen.',
+            ctaBtn: 'Nexum öffnen',
+            rel1: 'Wie man ein Wurmloch rollt (Massen-Leitfaden + Rechner)',
+            rel2: 'EVE-Wurmlochklassen und Statics erklärt',
+            rel3: 'Wie man in EVE Online Signaturen scannt',
+            rel4: 'EVE-Wurmlochtypen &amp; Statics-Liste',
+            rel5: 'Nexum vs. Pathfinder vs. Tripwire vs. Wanderer',
+            relatedH: 'Verwandte Anleitungen',
+            footP: 'EVE Online und das EVE-Logo sind eingetragene Marken von CCP hf. Alle Rechte weltweit vorbehalten. Nexum ist ein Drittanbieter-Tool und steht in keiner Verbindung zu CCP hf und wird nicht von CCP hf unterstützt. Siehe den vollständigen <a href="/license/">Lizenz- &amp; EVE-IP-Hinweis</a>.',
+          };
+          DICTS.fr = {
+            __title: 'Comment cartographier une chaîne de trous de ver dans EVE Online — Guide du débutant',
+            nav: '&larr; Accueil Nexum',
+            h1: 'Comment cartographier une chaîne de trous de ver dans EVE Online',
+            sub: 'Scannez-la, lisez-la, enregistrez-la et partagez-la en direct avec votre corp.',
+            updated: 'Un guide des trous de ver Nexum',
+            lede: 'Une « chaîne » de trous de ver est l\'arbre des systèmes que vous pouvez atteindre depuis chez vous par les trous de ver — vos statics, les trous errants qui y mènent et les sorties k-space aux extrémités. Comme ces trous se déplacent et meurent sans cesse, la chaîne n\'est jamais deux fois la même, c\'est pourquoi les corps de trous de ver en tiennent une <strong>carte</strong> en direct. Ce guide vous accompagne pour en construire une de zéro et la maintenir à jour.',
+            h2_1: 'Étape 1 : Scannez votre système',
+            p_1: 'Ouvrez le scanner de sondes et résolvez chaque signature cosmique de votre système à 100 %. Filtrez les signatures <strong>trou de ver</strong> — ce sont vos sorties (et les entrées des autres). Les sites data/relic/gas comptent pour l\'ISK, mais pour la cartographie ce sont les trous de ver qui vous intéressent.',
+            h2_2: 'Étape 2 : Identifiez chaque trou de ver',
+            p_2: 'Warpez vers un trou de ver et observez-le. S\'il affiche un type nommé (comme « N062 » ou « C247 »), ce côté vous indique la classe de destination, la masse totale et la durée de vie. S\'il affiche un <strong>K162</strong>, c\'est le côté de sortie d\'un trou ouvert par quelqu\'un ailleurs — sautez à travers et lisez la signature nommée de l\'autre côté pour savoir ce que c\'est vraiment. Notez le stade de masse (« pas significativement perturbé », « réduit », « au bord de l\'effondrement ») et la durée de vie (« n\'a pas encore commencé à se dégrader » vs « atteint la fin de sa vie naturelle »).',
+            card1_h: 'Collez, ne retapez pas',
+            card1_b: 'En jeu, vous pouvez copier toute votre liste de signatures du scanner de sondes. Un bon mapper vous laisse la coller directement, la compare à ce qui est déjà sur la carte et taggue les trous de ver automatiquement — vous ne saisissez donc pas à la main des ID de sig à six caractères sous la pression.',
+            h2_3: 'Étape 3 : Enregistrez-la sur une carte',
+            p_3: 'À mesure que vous identifiez chaque trou, ajoutez le système et la connexion à votre carte. Un mapper de trous de ver dédié surpasse les signets en jeu, car il montre tout l\'arbre d\'un coup d\'œil, mémorise les types et la masse des trous de ver, vieillit les trous automatiquement à mesure qu\'ils se dégradent et n\'encombre pas votre dossier de signets. Marquez votre home, taggez les connexions (trou à frégates, EOL, masse critique) et notez tout ce que vous avez trouvé — POCOs occupés, une tour, des kills récents.',
+            h2_4: 'Étape 4 : Suivez la chaîne vers l\'extérieur',
+            p_4: 'Sautez dans chaque système connecté et recommencez : scannez, identifiez, enregistrez. Continuez jusqu\'à avoir cartographié jusqu\'aux sorties k-space (highsec/lowsec/nullsec) et tous les trous en impasse. Le résultat est une image complète de partout où vous pouvez aller et d\'où quelque chose peut venir — c\'est la différence entre roamer en sécurité et warper à l\'aveugle.',
+            h2_5: 'Étape 5 : Partagez-la en direct avec votre corp',
+            p_5: 'La plus grande amélioration pour la vie en trou de ver est une carte <strong>collaborative en temps réel</strong>. Au lieu qu\'une personne scanne et que tous les autres demandent « c\'est quoi la chaîne ? », chaque pilote voit la même carte se mettre à jour instantanément à mesure qu\'elle est scannée. Les menaces, l\'état de masse et qui est où sont visibles par toute la flotte en même temps. C\'est ce qui transforme la cartographie d\'une corvée en une image de situation partagée.',
+            card2_h: 'Gardez-la à jour, automatiquement',
+            card2_b: 'Les trous se dégradent et s\'effondrent que quelqu\'un mette la carte à jour ou non. Un bon mapper vieillit les trous de ver vers la fin de vie tout seul, signale les connexions périmées et (avec un suivi opt-in) suit même vos pilotes quand ils sautent — la chaîne reflète donc la réalité sans surveillance constante.',
+            cta: '<strong>Cartographiez votre chaîne en temps réel — gratuitement.</strong> Nexum synchronise chaque modification en direct pour tous ceux qui regardent la carte.',
+            ctaBtn: 'Ouvrir Nexum',
+            rel1: 'Comment roller un trou de ver (guide de masse + calculateur)',
+            rel2: 'Les classes de trous de ver EVE et les statics expliqués',
+            rel3: 'Comment scanner des signatures dans EVE Online',
+            rel4: 'Types de trous de ver EVE &amp; liste des statics',
+            rel5: 'Nexum vs Pathfinder vs Tripwire vs Wanderer',
+            relatedH: 'Guides connexes',
+            footP: 'EVE Online et le logo EVE sont des marques déposées de CCP hf. Tous droits réservés dans le monde entier. Nexum est un outil tiers et n\'est ni affilié à CCP hf ni approuvé par lui. Consultez l\'<a href="/license/">avis complet de licence &amp; de PI EVE</a>.',
+          };
+          DICTS.es = {
+            __title: 'Cómo mapear una cadena de agujeros de gusano en EVE Online — Guía para principiantes',
+            nav: '&larr; Inicio de Nexum',
+            h1: 'Cómo mapear una cadena de agujeros de gusano en EVE Online',
+            sub: 'Escanéala, léela, regístrala y compártela en directo con tu corp.',
+            updated: 'Una guía de agujeros de gusano de Nexum',
+            lede: 'Una «cadena» de agujeros de gusano es el árbol de sistemas que puedes alcanzar desde tu hogar a través de agujeros de gusano — tus statics, los agujeros errantes que llevan a ellos y las salidas al k-space en los extremos lejanos. Como esos agujeros cambian y mueren constantemente, la cadena nunca es igual dos veces, por eso las corps de agujeros de gusano mantienen un <strong>mapa</strong> en vivo de ella. Esta guía te lleva paso a paso a construir uno desde cero y mantenerlo actualizado.',
+            h2_1: 'Paso 1: Escanea tu hogar',
+            p_1: 'Abre el escáner de sondas y resuelve al 100 % cada firma cósmica de tu sistema. Filtra por las firmas de <strong>agujero de gusano</strong> — esas son tus salidas (y las entradas de otros). Los sitios de datos/reliquias/gas importan por el ISK, pero para mapear lo que te interesa son los agujeros de gusano.',
+            h2_2: 'Paso 2: Identifica cada agujero de gusano',
+            p_2: 'Warpea a un agujero de gusano y míralo. Si muestra un tipo con nombre (como «N062» o «C247»), ese lado te indica la clase de destino, la masa total y la vida útil. Si muestra un <strong>K162</strong>, es el lado de salida de un agujero que alguien abrió desde otro lugar — salta a través y lee la firma con nombre del otro lado para saber qué es realmente. Anota la etapa de masa («no perturbado significativamente», «reducido», «al borde del colapso») y la vida útil («aún no ha comenzado a decaer» vs «alcanzando el fin de su vida natural»).',
+            card1_h: 'Pega, no vuelvas a escribir',
+            card1_b: 'En el juego puedes copiar toda tu lista de firmas del escáner de sondas. Un buen mapper te deja pegarla directamente, la coteja con lo que ya está en el mapa y etiqueta los agujeros de gusano automáticamente — así no tecleas a mano IDs de firma de seis caracteres bajo presión.',
+            h2_3: 'Paso 3: Regístrala en un mapa',
+            p_3: 'A medida que identificas cada agujero, añade el sistema y la conexión a tu mapa. Un mapper de agujeros de gusano dedicado supera a los marcadores del juego porque muestra todo el árbol de un vistazo, recuerda los tipos y la masa de los agujeros, envejece los agujeros automáticamente a medida que decaen y no atesta tu carpeta de marcadores. Marca tu hogar, etiqueta conexiones (agujero de fragatas, EOL, masa crítica) y anota todo lo que encuentres — POCOs ocupados, una torre, kills recientes.',
+            h2_4: 'Paso 4: Sigue la cadena hacia afuera',
+            p_4: 'Salta a cada sistema conectado y repite: escanea, identifica, registra. Sigue hasta que hayas mapeado hasta las salidas al k-space (highsec/lowsec/nullsec) y cualquier agujero sin salida. El resultado es una imagen completa de todo lo que puedes alcanzar y de todo lo que puede venir — que es la diferencia entre roamear con seguridad y warpear a ciegas.',
+            h2_5: 'Paso 5: Compártela en directo con tu corp',
+            p_5: 'La mayor mejora para la vida en agujeros de gusano es un mapa <strong>colaborativo en tiempo real</strong>. En vez de que una persona escanee y todos los demás pregunten «¿cómo está la cadena?», cada piloto ve el mismo mapa actualizarse al instante a medida que se escanea. Las amenazas, el estado de masa y quién está dónde son visibles para toda la flota a la vez. Eso es lo que convierte el mapeo de una tarea pesada en una imagen situacional compartida.',
+            card2_h: 'Mantenla actualizada, automáticamente',
+            card2_b: 'Los agujeros decaen y colapsan tanto si alguien actualiza el mapa como si no. Un buen mapper envejece los agujeros de gusano hacia el fin de su vida por sí solo, marca las conexiones obsoletas y (con seguimiento opcional) hasta sigue a tus pilotos mientras saltan — así la cadena refleja la realidad sin vigilancia constante.',
+            cta: '<strong>Mapea tu cadena en tiempo real — gratis.</strong> Nexum sincroniza cada edición en directo con todos los que ven el mapa.',
+            ctaBtn: 'Abrir Nexum',
+            rel1: 'Cómo rolar un agujero de gusano (guía de masa + calculadora)',
+            rel2: 'Clases de agujeros de gusano de EVE y statics explicados',
+            rel3: 'Cómo escanear firmas en EVE Online',
+            rel4: 'Tipos de agujeros de gusano de EVE &amp; lista de statics',
+            rel5: 'Nexum vs Pathfinder vs Tripwire vs Wanderer',
+            relatedH: 'Guías relacionadas',
+            footP: 'EVE Online y el logotipo de EVE son marcas registradas de CCP hf. Todos los derechos reservados en todo el mundo. Nexum es una herramienta de terceros y no está afiliada ni respaldada por CCP hf. Consulta el <a href="/license/">aviso completo de licencia &amp; PI de EVE</a>.',
+          };
+          DICTS.pt = {
+            __title: 'Como mapear uma cadeia de buracos de minhoca no EVE Online — Guia para iniciantes',
+            nav: '&larr; Início do Nexum',
+            h1: 'Como mapear uma cadeia de buracos de minhoca no EVE Online',
+            sub: 'Faz o scan, lê-a, regista-a e partilha-a ao vivo com a tua corp.',
+            updated: 'Um guia de buracos de minhoca da Nexum',
+            lede: 'Uma «cadeia» de buracos de minhoca é a árvore de sistemas que consegues alcançar a partir da tua casa através de buracos de minhoca — os teus statics, os buracos errantes que levam a eles e as saídas para o k-space nas pontas distantes. Como esses buracos mudam e morrem constantemente, a cadeia nunca é igual duas vezes, por isso as corps de buracos de minhoca mantêm um <strong>mapa</strong> ao vivo dela. Este guia acompanha-te na construção de um a partir do zero e em mantê-lo atualizado.',
+            h2_1: 'Passo 1: Faz o scan da tua casa',
+            p_1: 'Abre o scanner de sondas e resolve a 100 % cada assinatura cósmica do teu sistema. Filtra pelas assinaturas de <strong>buraco de minhoca</strong> — essas são as tuas saídas (e as entradas dos outros). Os sites de dados/relíquias/gás importam pelo ISK, mas para o mapeamento o que interessa são os buracos de minhoca.',
+            h2_2: 'Passo 2: Identifica cada buraco de minhoca',
+            p_2: 'Faz warp até um buraco de minhoca e observa-o. Se mostrar um tipo com nome (como «N062» ou «C247»), esse lado diz-te a classe de destino, a massa total e o tempo de vida. Se mostrar um <strong>K162</strong>, é o lado de saída de um buraco que alguém abriu de outro lugar — salta através dele e lê a assinatura com nome do outro lado para saberes o que é realmente. Anota a fase de massa («não significativamente perturbado», «reduzido», «à beira do colapso») e o tempo de vida («ainda não começou a decair» vs «a chegar ao fim da sua vida natural»).',
+            card1_h: 'Cola, não voltes a escrever',
+            card1_b: 'No jogo podes copiar toda a tua lista de assinaturas do scanner de sondas. Um bom mapper deixa-te colá-la diretamente, compara-a com o que já está no mapa e etiqueta os buracos de minhoca automaticamente — assim não escreves à mão IDs de assinatura de seis caracteres sob pressão.',
+            h2_3: 'Passo 3: Regista-a num mapa',
+            p_3: 'À medida que identificas cada buraco, adiciona o sistema e a ligação ao teu mapa. Um mapper de buracos de minhoca dedicado supera os marcadores do jogo porque mostra toda a árvore de relance, memoriza os tipos e a massa dos buracos, envelhece os buracos automaticamente à medida que decaem e não entope a tua pasta de marcadores. Marca a tua casa, etiqueta ligações (buraco de fragatas, EOL, massa crítica) e anota tudo o que encontraste — POCOs ocupados, uma torre, kills recentes.',
+            h2_4: 'Passo 4: Segue a cadeia para fora',
+            p_4: 'Salta para cada sistema ligado e repete: scan, identifica, regista. Continua até teres mapeado até às saídas para o k-space (highsec/lowsec/nullsec) e a quaisquer buracos sem saída. O resultado é uma imagem completa de todos os sítios aonde podes ir e de onde algo pode vir — que é a diferença entre roamar em segurança e fazer warp às cegas.',
+            h2_5: 'Passo 5: Partilha-a ao vivo com a tua corp',
+            p_5: 'A maior melhoria para a vida nos buracos de minhoca é um mapa <strong>colaborativo em tempo real</strong>. Em vez de uma pessoa fazer o scan e todos os outros perguntarem «como está a cadeia?», cada piloto vê o mesmo mapa atualizar-se instantaneamente à medida que é escaneado. As ameaças, o estado de massa e quem está onde são visíveis para toda a frota ao mesmo tempo. É isso que transforma o mapeamento de uma tarefa maçadora numa imagem situacional partilhada.',
+            card2_h: 'Mantém-na atualizada, automaticamente',
+            card2_b: 'Os buracos decaem e colapsam quer alguém atualize o mapa quer não. Um bom mapper envelhece os buracos de minhoca em direção ao fim de vida por si só, sinaliza ligações desatualizadas e (com rastreio opcional) até segue os teus pilotos enquanto saltam — assim a cadeia reflete a realidade sem vigilância constante.',
+            cta: '<strong>Mapeia a tua cadeia em tempo real — grátis.</strong> A Nexum sincroniza cada edição ao vivo para todos os que veem o mapa.',
+            ctaBtn: 'Abrir o Nexum',
+            rel1: 'Como rolar um buraco de minhoca (guia de massa + calculadora)',
+            rel2: 'Classes de buracos de minhoca do EVE e statics explicados',
+            rel3: 'Como fazer scan de assinaturas no EVE Online',
+            rel4: 'Tipos de buracos de minhoca do EVE &amp; lista de statics',
+            rel5: 'Nexum vs Pathfinder vs Tripwire vs Wanderer',
+            relatedH: 'Guias relacionados',
+            footP: 'EVE Online e o logótipo do EVE são marcas registadas da CCP hf. Todos os direitos reservados em todo o mundo. O Nexum é uma ferramenta de terceiros e não está afiliado nem é apoiado pela CCP hf. Consulta o <a href="/license/">aviso completo de licença &amp; PI do EVE</a>.',
+          };
+          DICTS.zh = {
+            __title: '如何在 EVE Online 中绘制虫洞链 — 新手指南',
+            nav: '&larr; Nexum 主页',
+            h1: '如何在 EVE Online 中绘制虫洞链',
+            sub: '扫描它、解读它、记录它，并与你的军团实时共享。',
+            updated: '一份 Nexum 虫洞指南',
+            lede: '虫洞“链”是你能从家园通过虫洞抵达的系统树——你的固定虫洞（static）、通向它们的游荡虫洞，以及远端通往 k-space 的出口。由于这些虫洞不断变化和消亡，这条链永远不会两次相同，因此虫洞军团会为它保留一份实时<strong>地图</strong>。本指南将带你从零开始构建一份地图并保持其更新。',
+            h2_1: '第 1 步：扫描你的家园',
+            p_1: '打开探针扫描器，将你系统中的每个宇宙信号都解析到 100%。筛选出<strong>虫洞</strong>信号——那些是你外出的通道（也是别人进入的通道）。数据/遗迹/气云点关系到 ISK，但对于绘图而言，你关心的是虫洞。',
+            h2_2: '第 2 步：辨识每个虫洞',
+            p_2: '跃迁到一个虫洞并查看它。如果它显示一个命名类型（如“N062”或“C247”），这一侧会告诉你目标等级、总质量和寿命。如果它显示一个 <strong>K162</strong>，那就是别人从别处开启的虫洞的出口侧——跳过去并阅读另一侧的命名信号，弄清它究竟是什么。记下质量阶段（“未受到显著扰动”“已减少”“濒临崩溃”）和寿命（“尚未开始衰减”对比“即将到达其自然寿命的尽头”）。',
+            card1_h: '粘贴，别重新输入',
+            card1_b: '在游戏中你可以复制整份探针扫描器信号列表。一个好的绘图工具让你直接粘贴进去，将其与地图上已有的内容匹配，并自动标记虫洞——这样你就不必在时间压力下手动输入六位字符的信号 ID。',
+            h2_3: '第 3 步：将它记录到地图上',
+            p_3: '在你辨识每个虫洞时，把系统和连接添加到你的地图上。专用的虫洞绘图工具胜过游戏内书签，因为它能一目了然地展示整棵树，记住虫洞类型和质量，随着虫洞衰减自动为其计龄，而且不会塞满你的书签文件夹。标记你的家园，为连接打标签（护卫舰虫洞、EOL、临界质量），并记下你发现的一切——被占用的 POCO、一座堡垒、近期的击杀。',
+            h2_4: '第 4 步：沿着链向外延伸',
+            p_4: '跳进每个相连的系统并重复：扫描、辨识、记录。一直进行下去，直到你已绘制到 k-space 出口（高安/低安/零安）以及所有死胡同虫洞。其结果是一幅完整的图景，涵盖你能去的每一处和某物可能来自的每一处——这就是安全漫游与盲目跃迁之间的区别。',
+            h2_5: '第 5 步：与你的军团实时共享',
+            p_5: '虫洞生活最大的一次升级就是一份<strong>实时协作</strong>地图。不再是一个人扫描、其他所有人都在问“链是什么样？”，而是每位飞行员在扫描的同时看到同一份地图即时更新。威胁、质量状态以及谁在何处，整支舰队同时可见。这正是让绘图从一件苦差事变成共享态势图的关键。',
+            card2_h: '自动保持更新',
+            card2_b: '无论有没有人更新地图，虫洞都会衰减和崩溃。一个好的绘图工具会自行让虫洞朝寿终方向计龄，标记过时的连接，并（在选择加入追踪后）甚至随着你的飞行员跳跃而跟随他们——这样这条链无需持续照看就能反映现实。',
+            cta: '<strong>实时绘制你的链——免费。</strong>Nexum 将每一次编辑实时同步给所有查看地图的人。',
+            ctaBtn: '打开 Nexum',
+            rel1: '如何滚动虫洞（质量指南 + 计算器）',
+            rel2: 'EVE 虫洞等级与固定虫洞（static）详解',
+            rel3: '如何在 EVE Online 中扫描信号',
+            rel4: 'EVE 虫洞类型 &amp; 固定虫洞（static）列表',
+            rel5: 'Nexum 对比 Pathfinder、Tripwire、Wanderer',
+            relatedH: '相关指南',
+            footP: 'EVE Online 和 EVE 标志是 CCP hf. 的注册商标。在全球范围内保留所有权利。Nexum 是第三方工具，与 CCP hf. 无关联，也未获其认可。请查看完整的 <a href="/license/">许可 &amp; EVE 知识产权声明</a>。',
+          };
+          DICTS.ko = {
+            __title: 'EVE Online에서 웜홀 체인을 지도로 만드는 방법 — 초보자 가이드',
+            nav: '&larr; Nexum 홈',
+            h1: 'EVE Online에서 웜홀 체인을 지도로 만드는 방법',
+            sub: '스캔하고, 읽고, 기록하고, 코프와 실시간으로 공유하세요.',
+            updated: 'Nexum 웜홀 가이드',
+            lede: '웜홀 «체인»은 웜홀을 통해 홈에서 도달할 수 있는 시스템의 트리입니다 — 여러분의 스태틱, 그곳으로 이어지는 떠도는 홀, 그리고 먼 끝의 k-space 출구들이죠. 이 홀들은 끊임없이 이동하고 사라지기 때문에 체인은 결코 두 번 같지 않으며, 그래서 웜홀 코프는 이를 실시간 <strong>지도</strong>로 유지합니다. 이 가이드는 지도를 처음부터 구축하고 최신 상태로 유지하는 과정을 안내합니다.',
+            h2_1: '1단계: 홈을 스캔하세요',
+            p_1: '탐사 프로브 스캐너를 열고 시스템 내 모든 우주 시그니처를 100%까지 해석하세요. <strong>웜홀</strong> 시그니처를 필터링하세요 — 그것이 여러분의 출구(그리고 남들의 입구)입니다. 데이터/유물/가스 사이트는 ISK 때문에 중요하지만, 지도 작성에서는 웜홀이 관심사입니다.',
+            h2_2: '2단계: 각 웜홀을 식별하세요',
+            p_2: '웜홀로 워프해서 살펴보세요. 이름이 붙은 유형(예: «N062» 또는 «C247»)을 표시하면, 그쪽 면이 목적지 등급, 총 질량, 수명을 알려줍니다. <strong>K162</strong>를 표시하면, 그것은 누군가 다른 곳에서 연 홀의 출구 면입니다 — 통과해서 반대편의 이름 붙은 시그니처를 읽어 실제로 무엇인지 파악하세요. 질량 단계(«크게 교란되지 않음», «감소됨», «붕괴 직전»)와 수명(«아직 붕괴가 시작되지 않음» 대 «자연 수명의 끝에 도달») 을 기록하세요.',
+            card1_h: '다시 입력하지 말고 붙여넣으세요',
+            card1_b: '게임 내에서 프로브 스캐너 시그니처 목록 전체를 복사할 수 있습니다. 좋은 매퍼는 그것을 바로 붙여넣게 해주고, 이미 지도에 있는 것과 대조하며, 웜홀을 자동으로 태그합니다 — 그래서 시간 압박 속에서 여섯 글자짜리 시그 ID를 손으로 입력할 필요가 없습니다.',
+            h2_3: '3단계: 지도에 기록하세요',
+            p_3: '각 홀을 식별할 때마다 시스템과 연결을 지도에 추가하세요. 전용 웜홀 매퍼는 게임 내 북마크보다 낫습니다. 전체 트리를 한눈에 보여주고, 웜홀 유형과 질량을 기억하며, 홀이 붕괴됨에 따라 자동으로 나이를 매기고, 북마크 폴더를 어지럽히지 않기 때문입니다. 홈을 표시하고, 연결에 태그를 달고(프리깃 홀, EOL, 임계 질량), 발견한 모든 것을 기록하세요 — 점유된 POCO, 타워, 최근 킬.',
+            h2_4: '4단계: 체인을 바깥으로 따라가세요',
+            p_4: '연결된 각 시스템으로 점프해 반복하세요: 스캔, 식별, 기록. k-space 출구(하이섹/로섹/널섹)와 막다른 홀까지 모두 지도로 만들 때까지 계속하세요. 그 결과는 여러분이 갈 수 있는 모든 곳과 무언가가 올 수 있는 모든 곳의 완전한 그림입니다 — 이것이 안전하게 로밍하는 것과 눈먼 채 워프하는 것의 차이입니다.',
+            h2_5: '5단계: 코프와 실시간으로 공유하세요',
+            p_5: '웜홀 생활에서 가장 큰 업그레이드는 <strong>실시간 협업</strong> 지도입니다. 한 사람이 스캔하고 나머지 모두가 «체인이 어떻게 돼?»라고 묻는 대신, 모든 파일럿이 스캔되는 즉시 같은 지도가 갱신되는 것을 봅니다. 위협, 질량 상태, 누가 어디 있는지가 전체 함대에 동시에 보입니다. 그것이 지도 작성을 잡일에서 공유된 상황 그림으로 바꾸는 것입니다.',
+            card2_h: '자동으로 최신 상태를 유지하세요',
+            card2_b: '누군가 지도를 갱신하든 말든 홀은 붕괴하고 사라집니다. 좋은 매퍼는 웜홀을 스스로 수명 종료 쪽으로 나이 매기고, 오래된 연결을 표시하며, (옵트인 추적으로) 파일럿이 점프할 때 그들을 따라가기까지 합니다 — 그래서 체인은 끊임없이 돌보지 않아도 현실을 반영합니다.',
+            cta: '<strong>여러분의 체인을 실시간으로 지도화하세요 — 무료입니다.</strong> Nexum은 모든 편집을 지도를 보는 모든 이에게 실시간으로 동기화합니다.',
+            ctaBtn: 'Nexum 열기',
+            rel1: '웜홀을 롤링하는 방법 (질량 가이드 + 계산기)',
+            rel2: 'EVE 웜홀 등급과 스태틱 설명',
+            rel3: 'EVE Online에서 시그니처를 스캔하는 방법',
+            rel4: 'EVE 웜홀 유형 &amp; 스태틱 목록',
+            rel5: 'Nexum 대 Pathfinder 대 Tripwire 대 Wanderer',
+            relatedH: '관련 가이드',
+            footP: 'EVE Online과 EVE 로고는 CCP hf.의 등록 상표입니다. 전 세계 모든 권리가 보유됩니다. Nexum은 서드파티 도구이며 CCP hf.와 제휴하거나 그로부터 보증받지 않았습니다. 전체 <a href="/license/">라이선스 &amp; EVE IP 고지</a>를 참조하세요.',
+          };
+          DICTS.ja = {
+            __title: 'EVE Online でワームホールチェーンをマッピングする方法 — 初心者ガイド',
+            nav: '&larr; Nexum ホーム',
+            h1: 'EVE Online でワームホールチェーンをマッピングする方法',
+            sub: 'スキャンし、読み取り、記録し、コープとリアルタイムで共有しましょう。',
+            updated: 'Nexum のワームホールガイド',
+            lede: 'ワームホールの「チェーン」とは、ホームからワームホールを通じて到達できるシステムのツリーです — あなたのスタティック、そこへ通じる放浪ホール、そして遠端の k-space 出口です。これらのホールは絶えず移り変わり消滅するため、チェーンは二度と同じにならず、だからこそワームホールコープはそれをリアルタイムの<strong>マップ</strong>として保持します。このガイドでは、マップをゼロから構築し最新に保つ手順を解説します。',
+            h2_1: 'ステップ 1: ホームをスキャンする',
+            p_1: 'プローブスキャナーを開き、システム内のすべての宇宙シグネチャを 100% まで解析しましょう。<strong>ワームホール</strong>シグネチャで絞り込みます — それがあなたの出口（そして他人の入口）です。データ/レリック/ガスサイトは ISK の点で重要ですが、マッピングで気にすべきはワームホールです。',
+            h2_2: 'ステップ 2: 各ワームホールを識別する',
+            p_2: 'ワームホールへワープして見てみましょう。名前付きのタイプ（「N062」や「C247」など）が表示されていれば、その側が行き先のクラス、総質量、寿命を教えてくれます。<strong>K162</strong> が表示されていれば、それは誰かが別の場所から開けたホールの出口側です — 通り抜けて反対側の名前付きシグネチャを読み、それが実際に何かを確かめましょう。質量段階（「大きく乱されていない」「減少」「崩壊寸前」）と寿命（「まだ劣化が始まっていない」対「自然寿命の終わりに近づいている」）を記録します。',
+            card1_h: '打ち直さず、貼り付けよう',
+            card1_b: 'ゲーム内でプローブスキャナーのシグネチャ一覧を丸ごとコピーできます。優れたマッパーならそれをそのまま貼り付けさせ、すでにマップ上にあるものと照合し、ワームホールを自動でタグ付けします — だから時間に追われて六文字のシグ ID を手入力せずに済みます。',
+            h2_3: 'ステップ 3: マップに記録する',
+            p_3: '各ホールを識別するたびに、システムと接続をマップに追加しましょう。専用のワームホールマッパーはゲーム内ブックマークに勝ります。ツリー全体を一目で見せ、ワームホールのタイプと質量を記憶し、ホールが劣化するにつれ自動で経年させ、ブックマークフォルダを散らかさないからです。ホームを印し、接続にタグを付け（フリゲートホール、EOL、臨界質量）、見つけたものをすべて記録しましょう — 占拠された POCO、タワー、最近のキル。',
+            h2_4: 'ステップ 4: チェーンを外へたどる',
+            p_4: '接続された各システムにジャンプして繰り返します: スキャン、識別、記録。k-space 出口（ハイセク/ローセク/ヌルセク）と行き止まりのホールまでマッピングし終えるまで続けましょう。その結果は、あなたが行けるあらゆる場所と何かが来うるあらゆる場所の完全な図です — それが安全にローミングすることと盲目的にワープすることの違いです。',
+            h2_5: 'ステップ 5: コープとリアルタイムで共有する',
+            p_5: 'ワームホール生活における最大の進化は<strong>リアルタイム協働</strong>マップです。一人がスキャンし他の全員が「チェーンはどうなってる？」と尋ねる代わりに、各パイロットがスキャンされるそばから同じマップが即座に更新されるのを見ます。脅威、質量状態、誰がどこにいるかが、艦隊全体に同時に見えます。それがマッピングを雑用から共有された状況図へと変えるのです。',
+            card2_h: '自動で最新に保つ',
+            card2_b: '誰かがマップを更新するかどうかに関わらず、ホールは劣化し崩壊します。優れたマッパーはワームホールをひとりでに寿命終了へ向けて経年させ、古い接続を印し、（オプトイン追跡で）ジャンプするパイロットを追いかけさえします — だからチェーンは絶え間ない世話なしに現実を反映します。',
+            cta: '<strong>あなたのチェーンをリアルタイムでマッピング — 無料。</strong>Nexum はすべての編集をマップを見る全員へリアルタイムで同期します。',
+            ctaBtn: 'Nexum を開く',
+            rel1: 'ワームホールをロールする方法（質量ガイド + 計算機）',
+            rel2: 'EVE のワームホールクラスとスタティックの解説',
+            rel3: 'EVE Online でシグネチャをスキャンする方法',
+            rel4: 'EVE のワームホールタイプ &amp; スタティック一覧',
+            rel5: 'Nexum 対 Pathfinder 対 Tripwire 対 Wanderer',
+            relatedH: '関連ガイド',
+            footP: 'EVE Online と EVE ロゴは CCP hf. の登録商標です。世界中ですべての権利が留保されています。Nexum はサードパーティ製ツールであり、CCP hf. と提携しておらず、その承認も受けていません。完全な <a href="/license/">ライセンス &amp; EVE IP 表示</a> をご覧ください。',
+          };
+          DICTS.ru = {
+            __title: 'Как составить карту цепочки червоточин в EVE Online — Руководство для новичков',
+            nav: '&larr; Главная Nexum',
+            h1: 'Как составить карту цепочки червоточин в EVE Online',
+            sub: 'Просканируйте её, прочтите, запишите и делитесь ею вживую со своей корпорацией.',
+            updated: 'Руководство Nexum по червоточинам',
+            lede: '«Цепочка» червоточин — это дерево систем, до которых вы можете добраться из дома через червоточины: ваши статики, блуждающие дыры в них и выходы в k-space на дальних концах. Поскольку эти дыры постоянно смещаются и умирают, цепочка никогда не бывает одинаковой дважды, поэтому корпорации червоточин ведут её живую <strong>карту</strong>. Это руководство проведёт вас через построение карты с нуля и её поддержание в актуальном состоянии.',
+            h2_1: 'Шаг 1: Просканируйте свой дом',
+            p_1: 'Откройте сканер зондов и разрешите каждую космическую сигнатуру в вашей системе до 100 %. Отфильтруйте сигнатуры <strong>червоточин</strong> — это ваши выходы (и чужие входы). Сайты данных/реликвий/газа важны ради ISK, но для картирования вас интересуют именно червоточины.',
+            h2_2: 'Шаг 2: Опознайте каждую червоточину',
+            p_2: 'Прыгните варпом к червоточине и осмотрите её. Если она показывает именованный тип (например, «N062» или «C247»), эта сторона сообщает вам класс назначения, общую массу и время жизни. Если она показывает <strong>K162</strong>, это выходная сторона дыры, которую кто-то открыл откуда-то ещё — прыгните через неё и прочтите именованную сигнатуру на дальней стороне, чтобы узнать, что это на самом деле. Отметьте стадию массы («существенно не нарушена», «уменьшена», «на грани коллапса») и время жизни («ещё не начала распадаться» против «достигает конца своего естественного срока жизни»).',
+            card1_h: 'Вставляйте, а не перепечатывайте',
+            card1_b: 'В игре вы можете скопировать весь свой список сигнатур со сканера зондов. Хороший маппер позволяет вставить его напрямую, сопоставляет с тем, что уже есть на карте, и автоматически размечает червоточины — так вам не придётся вручную набивать шестизначные ID сигнатур под давлением времени.',
+            h2_3: 'Шаг 3: Запишите её на карту',
+            p_3: 'По мере того как вы опознаёте каждую дыру, добавляйте систему и связь на свою карту. Специализированный маппер червоточин превосходит внутриигровые закладки, потому что показывает всё дерево с одного взгляда, помнит типы и массу червоточин, автоматически состаривает дыры по мере их распада и не захламляет вашу папку закладок. Отметьте свой дом, размечайте связи (фрегатная дыра, EOL, критическая масса) и записывайте всё найденное — занятые POCO, башню, недавние килы.',
+            h2_4: 'Шаг 4: Следуйте по цепочке наружу',
+            p_4: 'Прыгайте в каждую связанную систему и повторяйте: сканируйте, опознавайте, записывайте. Продолжайте, пока не составите карту вплоть до выходов в k-space (хайсек/лоусек/нулсек) и всех тупиковых дыр. В результате получается полная картина всех мест, куда вы можете попасть, и всех мест, откуда что-то может прийти — в этом разница между безопасным роумингом и слепым варпом.',
+            h2_5: 'Шаг 5: Делитесь ею вживую со своей корпорацией',
+            p_5: 'Самое большое улучшение жизни в червоточинах — это <strong>совместная карта в реальном времени</strong>. Вместо того чтобы один человек сканировал, а все остальные спрашивали «какая там цепочка?», каждый пилот видит, как одна и та же карта мгновенно обновляется по мере сканирования. Угрозы, состояние массы и кто где находится видны всему флоту одновременно. Именно это превращает картирование из рутины в общую картину обстановки.',
+            card2_h: 'Держите её актуальной автоматически',
+            card2_b: 'Дыры распадаются и коллапсируют независимо от того, обновляет ли кто-то карту. Хороший маппер сам состаривает червоточины к концу их жизни, помечает устаревшие связи и (с согласием на отслеживание) даже следует за вашими пилотами, когда они прыгают — так цепочка отражает реальность без постоянной опеки.',
+            cta: '<strong>Составляйте карту своей цепочки в реальном времени — бесплатно.</strong> Nexum синхронизирует каждую правку вживую со всеми, кто смотрит на карту.',
+            ctaBtn: 'Открыть Nexum',
+            rel1: 'Как роллить червоточину (руководство по массе + калькулятор)',
+            rel2: 'Классы червоточин EVE и статики: объяснение',
+            rel3: 'Как сканировать сигнатуры в EVE Online',
+            rel4: 'Типы червоточин EVE &amp; список статиков',
+            rel5: 'Nexum против Pathfinder, Tripwire и Wanderer',
+            relatedH: 'Похожие руководства',
+            footP: 'EVE Online и логотип EVE являются зарегистрированными торговыми марками CCP hf. Все права защищены по всему миру. Nexum — это сторонний инструмент, не связанный с CCP hf. и не одобренный ею. См. полное <a href="/license/">уведомление о лицензии &amp; ИС EVE</a>.',
+          };
+
+          var DICT = DICTS[lang];
+          document.documentElement.lang = lang;
+          if (DICT.__title) document.title = DICT.__title;
+          document.querySelectorAll('[data-i18n]').forEach(function (el) {
+            var key = el.getAttribute('data-i18n');
+            if (DICT[key] != null) el.innerHTML = DICT[key];
+          });
+        } catch (e) {
+          // On any error, leave the English source intact.
+        }
+      })();
+    </script>
   </body>
 </html>

@@ -14,6 +14,8 @@
     <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="robots" content="index, follow" />
 
+    <script src="/vendor/lang-picker.js" defer></script>
+
     <meta property="og:type" content="article" />
     <meta property="og:url" content="https://eve-nexum.com/guides/scanning/" />
     <meta property="og:title" content="How to Scan Signatures in EVE Online" />
@@ -71,7 +73,7 @@
       body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--text); line-height: 1.6; }
       .wrap { max-width: 820px; margin: 0 auto; padding: 32px 20px 64px; }
       a { color: var(--accent); }
-      .topnav { font-size: 14px; }
+      .topnav { font-size: 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
       .topnav a { color: var(--muted); text-decoration: none; }
       header.hero { margin: 24px 0 8px; }
       .logo { font-size: 30px; color: var(--accent); line-height: 1; }
@@ -93,75 +95,453 @@
   </head>
   <body>
     <div class="wrap">
-      <nav class="topnav"><a href="/">&larr; Nexum home</a></nav>
+      <nav class="topnav">
+        <a href="/" data-i18n="nav">&larr; Nexum home</a>
+        <!-- Stylized language dropdown with SVG flags, built by
+             /vendor/lang-picker.js (a native <select> can't render the flags,
+             and flag emoji show as bare country codes on Windows). -->
+        <div class="lang-picker" data-lang-picker></div>
+      </nav>
 
       <header class="hero">
         <div class="logo" aria-hidden="true">&#9672;</div>
-        <h1>How to Scan Signatures in EVE Online</h1>
-        <p class="sub">Probes, signal strength, and getting to 100% - the exploration and wormhole basics.</p>
+        <h1 data-i18n="h1">How to Scan Signatures in EVE Online</h1>
+        <p class="sub" data-i18n="sub">Probes, signal strength, and getting to 100% - the exploration and wormhole basics.</p>
       </header>
-      <p class="updated">A Nexum wormhole guide</p>
+      <p class="updated" data-i18n="updated">A Nexum wormhole guide</p>
 
-      <p class="lede">Almost everything worth finding in EVE - wormholes, data and relic sites, gas clouds, hidden combat pockets - starts as a <strong>cosmic signature</strong>: a faint red dot the game won't let you warp to until you scan it down. Scanning is the skill that turns those dots into places you can go. This guide covers the gear, the workflow, and how to read what you find.</p>
+      <p class="lede" data-i18n="lede">Almost everything worth finding in EVE - wormholes, data and relic sites, gas clouds, hidden combat pockets - starts as a <strong>cosmic signature</strong>: a faint red dot the game won't let you warp to until you scan it down. Scanning is the skill that turns those dots into places you can go. This guide covers the gear, the workflow, and how to read what you find.</p>
 
-      <h2>What you need</h2>
-      <p>To scan cosmic signatures you need a ship with a <strong>Core Probe Launcher</strong> fitted and a set of <strong>Core Scanner Probes</strong> loaded (Combat Scanner Probes work too and can additionally scan down ships, at a small strength penalty). Beyond that, four things make scanning faster and easier:</p>
+      <h2 data-i18n="h2need">What you need</h2>
+      <p data-i18n="needP">To scan cosmic signatures you need a ship with a <strong>Core Probe Launcher</strong> fitted and a set of <strong>Core Scanner Probes</strong> loaded (Combat Scanner Probes work too and can additionally scan down ships, at a small strength penalty). Beyond that, four things make scanning faster and easier:</p>
       <ul>
-        <li><strong>Astrometrics</strong> and its support skills (Rangefinding, Acquisition, Pinpointing) - more signal strength, faster scans, tighter results.</li>
-        <li><strong>Scanning rigs and upgrades</strong> - Gravity Capacitor rigs and a rangefinding array add strength.</li>
-        <li><strong>Sisters gear</strong> - the Sisters Core Probe Launcher and Sisters Core Scanner Probes give a strength bonus over the tech-1 versions.</li>
-        <li><strong>An exploration hull</strong> - the Astero and Stratios have built-in scanning bonuses and cloaks; any covert-ops frigate is a strong starter.</li>
+        <li data-i18n="needLi1"><strong>Astrometrics</strong> and its support skills (Rangefinding, Acquisition, Pinpointing) - more signal strength, faster scans, tighter results.</li>
+        <li data-i18n="needLi2"><strong>Scanning rigs and upgrades</strong> - Gravity Capacitor rigs and a rangefinding array add strength.</li>
+        <li data-i18n="needLi3"><strong>Sisters gear</strong> - the Sisters Core Probe Launcher and Sisters Core Scanner Probes give a strength bonus over the tech-1 versions.</li>
+        <li data-i18n="needLi4"><strong>An exploration hull</strong> - the Astero and Stratios have built-in scanning bonuses and cloaks; any covert-ops frigate is a strong starter.</li>
       </ul>
-      <p>None of this is mandatory - a basic launcher on any ship will scan - but strength is the difference between resolving a tough wormhole in two passes and fighting it for ten.</p>
+      <p data-i18n="needNote">None of this is mandatory - a basic launcher on any ship will scan - but strength is the difference between resolving a tough wormhole in two passes and fighting it for ten.</p>
 
-      <h2>The scanning workflow</h2>
-      <p>Open the <strong>Probe Scanner</strong> window (Alt+P). Every signature in the system shows as an unresolved dot with a percentage. The loop is always the same: <em>cover, scan, narrow, repeat.</em></p>
+      <h2 data-i18n="h2flow">The scanning workflow</h2>
+      <p data-i18n="flowP">Open the <strong>Probe Scanner</strong> window (Alt+P). Every signature in the system shows as an unresolved dot with a percentage. The loop is always the same: <em>cover, scan, narrow, repeat.</em></p>
       <ol>
-        <li><strong>Launch your probes.</strong> In space, launch the scanner probes. They appear as a movable formation (a cube of 7 by default) with a range slider.</li>
-        <li><strong>Cover a signature.</strong> Drag the formation over one unresolved signature and set the scan range so the cube comfortably surrounds it. Hit <strong>Analyze</strong> (scan).</li>
-        <li><strong>Read the result.</strong> Each scan returns a <strong>signal strength</strong> (a percentage) and a <strong>result shape</strong> - a large sphere when the location is vague, shrinking toward a single dot as you close in.</li>
-        <li><strong>Narrow.</strong> Re-center the probe formation on the new result and roughly halve the scan range, then scan again. Strength climbs each pass.</li>
-        <li><strong>Resolve.</strong> At <strong>100%</strong> the signature identifies its type and becomes a warpable result. Warp to 0 for wormholes; a safe range is fine for sites you plan to scout first.</li>
+        <li data-i18n="flowLi1"><strong>Launch your probes.</strong> In space, launch the scanner probes. They appear as a movable formation (a cube of 7 by default) with a range slider.</li>
+        <li data-i18n="flowLi2"><strong>Cover a signature.</strong> Drag the formation over one unresolved signature and set the scan range so the cube comfortably surrounds it. Hit <strong>Analyze</strong> (scan).</li>
+        <li data-i18n="flowLi3"><strong>Read the result.</strong> Each scan returns a <strong>signal strength</strong> (a percentage) and a <strong>result shape</strong> - a large sphere when the location is vague, shrinking toward a single dot as you close in.</li>
+        <li data-i18n="flowLi4"><strong>Narrow.</strong> Re-center the probe formation on the new result and roughly halve the scan range, then scan again. Strength climbs each pass.</li>
+        <li data-i18n="flowLi5"><strong>Resolve.</strong> At <strong>100%</strong> the signature identifies its type and becomes a warpable result. Warp to 0 for wormholes; a safe range is fine for sites you plan to scout first.</li>
       </ol>
 
       <div class="card">
-        <h3>Signal strength: why 100% matters</h3>
-        <p>You can only warp to a signature once it reaches 100% signal strength. Below that, the game only knows the rough area. Weak sites (deep wormholes, some relic sites) need more strength to close out - that is exactly where skills, rigs and Sisters probes earn their keep.</p>
+        <h3 data-i18n="cardStrH">Signal strength: why 100% matters</h3>
+        <p data-i18n="cardStrB">You can only warp to a signature once it reaches 100% signal strength. Below that, the game only knows the rough area. Weak sites (deep wormholes, some relic sites) need more strength to close out - that is exactly where skills, rigs and Sisters probes earn their keep.</p>
       </div>
 
-      <h2>Reading what you find</h2>
-      <p>When a signature resolves, its <strong>group</strong> tells you what it is:</p>
+      <h2 data-i18n="h2read">Reading what you find</h2>
+      <p data-i18n="readP">When a signature resolves, its <strong>group</strong> tells you what it is:</p>
       <ul>
-        <li><strong>Wormhole</strong> - a connection to another system. Warp to it and read the name (a type like <em>N062</em>, or a <em>K162</em> exit) to learn the destination class, mass and lifetime.</li>
-        <li><strong>Data / Relic</strong> - hacking sites; run the containers with a Data or Relic Analyzer for blueprints, materials and salvage.</li>
-        <li><strong>Gas</strong> - gas clouds you harvest with gas cloud harvesters (big in wormhole space).</li>
-        <li><strong>Combat</strong> - hidden pockets of NPCs. Cosmic <em>anomalies</em>, by contrast, already show in the probe scanner without any scanning.</li>
+        <li data-i18n="readLi1"><strong>Wormhole</strong> - a connection to another system. Warp to it and read the name (a type like <em>N062</em>, or a <em>K162</em> exit) to learn the destination class, mass and lifetime.</li>
+        <li data-i18n="readLi2"><strong>Data / Relic</strong> - hacking sites; run the containers with a Data or Relic Analyzer for blueprints, materials and salvage.</li>
+        <li data-i18n="readLi3"><strong>Gas</strong> - gas clouds you harvest with gas cloud harvesters (big in wormhole space).</li>
+        <li data-i18n="readLi4"><strong>Combat</strong> - hidden pockets of NPCs. Cosmic <em>anomalies</em>, by contrast, already show in the probe scanner without any scanning.</li>
       </ul>
-      <p>For wormhole mapping, the wormholes are the ones you care about - each is a doorway into your chain. See <a href="/guides/statics/">the wormhole types and statics list</a> for what each code leads to, and <a href="/guides/mapping/">how to map a wormhole chain</a> to turn a system full of holes into a live map.</p>
+      <p data-i18n="readNote">For wormhole mapping, the wormholes are the ones you care about - each is a doorway into your chain. See <a href="/guides/statics/">the wormhole types and statics list</a> for what each code leads to, and <a href="/guides/mapping/">how to map a wormhole chain</a> to turn a system full of holes into a live map.</p>
 
       <div class="card">
-        <h3>Copy the whole list, don't retype it</h3>
-        <p>In the Probe Scanner you can select all your signatures (Ctrl+A) and copy them (Ctrl+C). A good mapper lets you paste that list straight in - it matches what's already on the map, auto-tags the wormholes, and ages them for you - so you're never hand-typing six-character sig IDs under time pressure.</p>
+        <h3 data-i18n="cardCopyH">Copy the whole list, don't retype it</h3>
+        <p data-i18n="cardCopyB">In the Probe Scanner you can select all your signatures (Ctrl+A) and copy them (Ctrl+C). A good mapper lets you paste that list straight in - it matches what's already on the map, auto-tags the wormholes, and ages them for you - so you're never hand-typing six-character sig IDs under time pressure.</p>
       </div>
 
       <div class="cta">
-        <p><strong>Paste your scan straight into a live map - free.</strong> Nexum tags wormholes, tracks mass, and syncs to your whole corp.</p>
-        <a class="btn" href="/">Open Nexum</a>
+        <p data-i18n="ctaP"><strong>Paste your scan straight into a live map - free.</strong> Nexum tags wormholes, tracks mass, and syncs to your whole corp.</p>
+        <a class="btn" href="/" data-i18n="ctaBtn">Open Nexum</a>
       </div>
 
       <div class="related">
-        <h2>Related guides</h2>
+        <h2 data-i18n="related">Related guides</h2>
         <ul>
-          <li><a href="/guides/mapping/">How to map a wormhole chain in EVE Online</a></li>
-          <li><a href="/guides/statics/">EVE wormhole types &amp; statics list</a></li>
-          <li><a href="/guides/classes/">EVE wormhole classes and statics explained</a></li>
-          <li><a href="/guides/rolling/">How to roll a wormhole (mass guide + calculator)</a></li>
+          <li><a href="/guides/mapping/" data-i18n="relMap">How to map a wormhole chain in EVE Online</a></li>
+          <li><a href="/guides/statics/" data-i18n="relStatics">EVE wormhole types &amp; statics list</a></li>
+          <li><a href="/guides/classes/" data-i18n="relClasses">EVE wormhole classes and statics explained</a></li>
+          <li><a href="/guides/rolling/" data-i18n="relRolling">How to roll a wormhole (mass guide + calculator)</a></li>
         </ul>
       </div>
 
       <footer>
-        <p>EVE Online and the EVE logo are the registered trademarks of CCP hf. All rights reserved worldwide. Nexum is a third-party tool and is not affiliated with or endorsed by CCP hf. See the full <a href="/license/">license &amp; EVE IP notice</a>.</p>
+        <p data-i18n="footP">EVE Online and the EVE logo are the registered trademarks of CCP hf. All rights reserved worldwide. Nexum is a third-party tool and is not affiliated with or endorsed by CCP hf. See the full <a href="/license/">license &amp; EVE IP notice</a>.</p>
       </footer>
     </div>
+
+    <!--
+      Runtime language swap. This page is static HTML (not part of the React SPA),
+      so it can't use react-i18next. We read the same `nexum.lang` localStorage key
+      the app's language detector uses (falling back to the browser language) and
+      replace the text of every [data-i18n] element with its translated equivalent.
+      SEO crawlers index the English source only (see the canonical / og:locale).
+    -->
+    <script>
+      (function () {
+        try {
+          var lang = localStorage.getItem('nexum.lang');
+          if (!lang) lang = (navigator.language || '').slice(0, 2);
+
+          // Languages with a translation dictionary below. English is the
+          // untranslated source, so it has no entry.
+          var SUPPORTED = { de:1, fr:1, es:1, pt:1, zh:1, ko:1, ja:1, ru:1 };
+
+          // Tell the stylized picker (/vendor/lang-picker.js) which language this
+          // page actually rendered, so it highlights the matching entry. The
+          // picker itself handles the switch (persist to nexum.lang + reload).
+          window.__nexumResolvedLang = SUPPORTED[lang] ? lang : 'en';
+
+          if (!SUPPORTED[lang]) return;
+
+          // SECURITY: innerHTML is used because these strings intentionally
+          // contain markup (<a>, <strong>, <kbd>). This is ONLY safe because every
+          // value in DICTS is a hard-coded, trusted literal in this file. Do NOT
+          // ever populate DICTS from user input, an API, or URL params.
+          var DICTS = {};
+          DICTS.de = {
+            __title: 'Wie man in EVE Online Signaturen scannt — Sondenscan-Anleitung',
+            nav: '&larr; Nexum Startseite',
+            h1: 'Wie man in EVE Online Signaturen scannt',
+            sub: 'Sonden, Signalstärke und der Weg zu 100 % — die Grundlagen von Erkundung und Wurmlöchern.',
+            updated: 'Eine Nexum-Wurmloch-Anleitung',
+            lede: 'Fast alles, was in EVE lohnenswert zu finden ist — Wurmlöcher, Daten- und Relikt-Sites, Gaswolken, versteckte Kampf-Taschen — beginnt als <strong>kosmische Signatur</strong>: ein schwacher roter Punkt, zu dem dich das Spiel erst warpen lässt, wenn du ihn eingescannt hast. Scannen ist die Fähigkeit, die diese Punkte in Orte verwandelt, zu denen du fliegen kannst. Diese Anleitung behandelt die Ausrüstung, den Ablauf und wie du liest, was du findest.',
+            h2need: 'Was du brauchst',
+            needP: 'Um kosmische Signaturen zu scannen, brauchst du ein Schiff mit einem angebrachten <strong>Core Probe Launcher</strong> und geladenen <strong>Core Scanner Probes</strong> (Combat Scanner Probes funktionieren ebenfalls und können zusätzlich Schiffe auffangen, mit einem kleinen Stärke-Nachteil). Darüber hinaus machen vier Dinge das Scannen schneller und einfacher:',
+            needLi1: '<strong>Astrometrics</strong> und seine Unterstützungsfähigkeiten (Rangefinding, Acquisition, Pinpointing) — mehr Signalstärke, schnellere Scans, engere Ergebnisse.',
+            needLi2: '<strong>Scan-Rigs und -Upgrades</strong> — Gravity-Capacitor-Rigs und ein Rangefinding-Array erhöhen die Stärke.',
+            needLi3: '<strong>Sisters-Ausrüstung</strong> — der Sisters Core Probe Launcher und die Sisters Core Scanner Probes geben einen Stärkebonus gegenüber den Tech-1-Versionen.',
+            needLi4: '<strong>Ein Erkundungsrumpf</strong> — die Astero und Stratios haben eingebaute Scan-Boni und Tarnvorrichtungen; jede Covert-Ops-Fregatte ist ein starker Einstieg.',
+            needNote: 'Nichts davon ist zwingend — ein einfacher Launcher auf jedem Schiff scannt — aber Stärke ist der Unterschied zwischen dem Auflösen eines zähen Wurmlochs in zwei Durchgängen und dem Kampf darum über zehn.',
+            h2flow: 'Der Scan-Ablauf',
+            flowP: 'Öffne das Fenster <strong>Probe Scanner</strong> (Alt+P). Jede Signatur im System erscheint als ungelöster Punkt mit einem Prozentwert. Die Schleife ist immer dieselbe: <em>abdecken, scannen, eingrenzen, wiederholen.</em>',
+            flowLi1: '<strong>Starte deine Sonden.</strong> Starte im Weltraum die Scan-Sonden. Sie erscheinen als bewegliche Formation (standardmäßig ein Würfel aus 7) mit einem Reichweitenregler.',
+            flowLi2: '<strong>Decke eine Signatur ab.</strong> Ziehe die Formation über eine ungelöste Signatur und stelle die Scan-Reichweite so ein, dass der Würfel sie bequem umschließt. Drücke <strong>Analyze</strong> (scannen).',
+            flowLi3: '<strong>Lies das Ergebnis.</strong> Jeder Scan liefert eine <strong>Signalstärke</strong> (einen Prozentwert) und eine <strong>Ergebnisform</strong> — eine große Kugel, wenn der Ort vage ist, die zu einem einzelnen Punkt schrumpft, während du näher kommst.',
+            flowLi4: '<strong>Grenze ein.</strong> Zentriere die Sondenformation neu auf das neue Ergebnis und halbiere die Scan-Reichweite grob, dann scanne erneut. Die Stärke steigt mit jedem Durchgang.',
+            flowLi5: '<strong>Löse auf.</strong> Bei <strong>100 %</strong> identifiziert die Signatur ihren Typ und wird zu einem anwarpbaren Ergebnis. Warpe für Wurmlöcher auf 0; eine sichere Distanz ist in Ordnung für Sites, die du zuerst auskundschaften willst.',
+            cardStrH: 'Signalstärke: warum 100 % zählen',
+            cardStrB: 'Du kannst eine Signatur erst anwarpen, wenn sie 100 % Signalstärke erreicht. Darunter kennt das Spiel nur die ungefähre Gegend. Schwache Sites (tiefe Wurmlöcher, manche Relikt-Sites) brauchen mehr Stärke zum Abschluss — genau dort verdienen sich Fähigkeiten, Rigs und Sisters-Sonden ihr Geld.',
+            h2read: 'Lesen, was du findest',
+            readP: 'Wenn eine Signatur aufgelöst wird, sagt dir ihre <strong>Gruppe</strong>, was sie ist:',
+            readLi1: '<strong>Wurmloch</strong> — eine Verbindung zu einem anderen System. Warpe hin und lies den Namen (ein Typ wie <em>N062</em> oder ein <em>K162</em>-Ausgang), um Zielklasse, Masse und Lebensdauer zu erfahren.',
+            readLi2: '<strong>Daten / Relikt</strong> — Hacking-Sites; durchlaufe die Container mit einem Data- oder Relic-Analyzer für Blaupausen, Materialien und Bergungsgut.',
+            readLi3: '<strong>Gas</strong> — Gaswolken, die du mit Gas Cloud Harvestern erntest (groß im Wurmloch-Raum).',
+            readLi4: '<strong>Kampf</strong> — versteckte Taschen von NPCs. Kosmische <em>Anomalien</em> hingegen erscheinen bereits im Probe Scanner ohne jegliches Scannen.',
+            readNote: 'Für die Wurmloch-Kartierung sind die Wurmlöcher das, worauf es dir ankommt — jedes ist eine Tür in deine Kette. Siehe <a href="/guides/statics/">die Liste der Wurmloch-Typen und Statics</a> dafür, wohin jeder Code führt, und <a href="/guides/mapping/">wie man eine Wurmloch-Kette kartiert</a>, um ein System voller Löcher in eine Live-Karte zu verwandeln.',
+            cardCopyH: 'Kopiere die ganze Liste, tippe sie nicht neu ab',
+            cardCopyB: 'Im Probe Scanner kannst du alle deine Signaturen auswählen (Strg+A) und kopieren (Strg+C). Ein guter Mapper lässt dich diese Liste direkt einfügen — er gleicht sie mit dem ab, was bereits auf der Karte ist, taggt die Wurmlöcher automatisch und altert sie für dich — sodass du nie sechsstellige Sig-IDs unter Zeitdruck von Hand eintippst.',
+            ctaP: '<strong>Füge deinen Scan direkt in eine Live-Karte ein — kostenlos.</strong> Nexum taggt Wurmlöcher, verfolgt die Masse und synchronisiert mit deiner ganzen Corp.',
+            ctaBtn: 'Nexum öffnen',
+            related: 'Verwandte Anleitungen',
+            relMap: 'Wie man in EVE Online eine Wurmloch-Kette kartiert',
+            relStatics: 'EVE Wurmloch-Typen &amp; Statics-Liste',
+            relClasses: 'EVE Wurmloch-Klassen und Statics erklärt',
+            relRolling: 'Wie man ein Wurmloch rollt (Massen-Guide + Rechner)',
+            footP: 'EVE Online und das EVE-Logo sind eingetragene Marken von CCP hf. Alle Rechte weltweit vorbehalten. Nexum ist ein Drittanbieter-Tool und steht in keiner Verbindung zu CCP hf und wird nicht von CCP hf unterstützt. Siehe den vollständigen <a href="/license/">Lizenz- &amp; EVE-IP-Hinweis</a>.',
+          };
+          DICTS.fr = {
+            __title: 'Comment scanner les signatures dans EVE Online — Guide de scan à sondes',
+            nav: '&larr; Accueil Nexum',
+            h1: 'Comment scanner les signatures dans EVE Online',
+            sub: 'Les sondes, la force du signal et l\'atteinte des 100 % — les bases de l\'exploration et des trous de ver.',
+            updated: 'Un guide trou de ver de Nexum',
+            lede: 'Presque tout ce qui vaut la peine d\'être trouvé dans EVE — trous de ver, sites de données et de reliques, nuages de gaz, poches de combat cachées — commence comme une <strong>signature cosmique</strong> : un faible point rouge vers lequel le jeu ne vous laisse pas warper tant que vous ne l\'avez pas scanné. Le scan est la compétence qui transforme ces points en endroits où vous pouvez aller. Ce guide couvre le matériel, la méthode et comment lire ce que vous trouvez.',
+            h2need: 'Ce qu\'il vous faut',
+            needP: 'Pour scanner des signatures cosmiques, il vous faut un vaisseau équipé d\'un <strong>Core Probe Launcher</strong> et d\'un jeu de <strong>Core Scanner Probes</strong> chargées (les Combat Scanner Probes fonctionnent aussi et peuvent en plus scanner des vaisseaux, avec une légère pénalité de force). Au-delà, quatre choses rendent le scan plus rapide et plus facile :',
+            needLi1: '<strong>Astrometrics</strong> et ses compétences de soutien (Rangefinding, Acquisition, Pinpointing) — plus de force de signal, des scans plus rapides, des résultats plus serrés.',
+            needLi2: '<strong>Les rigs et améliorations de scan</strong> — les rigs Gravity Capacitor et un rangefinding array ajoutent de la force.',
+            needLi3: '<strong>L\'équipement Sisters</strong> — le Sisters Core Probe Launcher et les Sisters Core Scanner Probes offrent un bonus de force par rapport aux versions tech-1.',
+            needLi4: '<strong>Une coque d\'exploration</strong> — l\'Astero et le Stratios ont des bonus de scan intégrés et des camouflages ; n\'importe quelle frégate covert-ops est un excellent début.',
+            needNote: 'Rien de tout cela n\'est obligatoire — un lanceur de base sur n\'importe quel vaisseau scanne — mais la force fait la différence entre résoudre un trou de ver coriace en deux passes et se battre dix passes.',
+            h2flow: 'La méthode de scan',
+            flowP: 'Ouvrez la fenêtre <strong>Probe Scanner</strong> (Alt+P). Chaque signature du système apparaît comme un point non résolu avec un pourcentage. La boucle est toujours la même : <em>couvrir, scanner, resserrer, répéter.</em>',
+            flowLi1: '<strong>Lancez vos sondes.</strong> Dans l\'espace, lancez les sondes de scan. Elles apparaissent en formation mobile (un cube de 7 par défaut) avec un curseur de portée.',
+            flowLi2: '<strong>Couvrez une signature.</strong> Faites glisser la formation sur une signature non résolue et réglez la portée de scan pour que le cube l\'entoure confortablement. Appuyez sur <strong>Analyze</strong> (scanner).',
+            flowLi3: '<strong>Lisez le résultat.</strong> Chaque scan renvoie une <strong>force de signal</strong> (un pourcentage) et une <strong>forme de résultat</strong> — une grande sphère quand l\'emplacement est vague, se réduisant vers un point unique à mesure que vous approchez.',
+            flowLi4: '<strong>Resserrez.</strong> Recentrez la formation de sondes sur le nouveau résultat et divisez grossièrement la portée de scan par deux, puis scannez à nouveau. La force monte à chaque passe.',
+            flowLi5: '<strong>Résolvez.</strong> À <strong>100 %</strong>, la signature identifie son type et devient un résultat warpable. Warpez à 0 pour les trous de ver ; une portée sûre convient pour les sites que vous comptez repérer d\'abord.',
+            cardStrH: 'Force du signal : pourquoi les 100 % comptent',
+            cardStrB: 'Vous ne pouvez warper vers une signature qu\'une fois qu\'elle atteint 100 % de force de signal. En dessous, le jeu ne connaît que la zone approximative. Les sites faibles (trous de ver profonds, certains sites de reliques) nécessitent plus de force pour être finalisés — c\'est exactement là que les compétences, les rigs et les sondes Sisters se révèlent utiles.',
+            h2read: 'Lire ce que vous trouvez',
+            readP: 'Quand une signature se résout, son <strong>groupe</strong> vous indique ce que c\'est :',
+            readLi1: '<strong>Trou de ver</strong> — une connexion vers un autre système. Warpez-y et lisez le nom (un type comme <em>N062</em>, ou une sortie <em>K162</em>) pour connaître la classe de destination, la masse et la durée de vie.',
+            readLi2: '<strong>Données / Reliques</strong> — des sites de hacking ; parcourez les conteneurs avec un Data ou Relic Analyzer pour des plans, des matériaux et du salvage.',
+            readLi3: '<strong>Gaz</strong> — des nuages de gaz que vous récoltez avec des Gas Cloud Harvesters (importants dans l\'espace des trous de ver).',
+            readLi4: '<strong>Combat</strong> — des poches cachées de PNJ. Les <em>anomalies</em> cosmiques, en revanche, apparaissent déjà dans le probe scanner sans aucun scan.',
+            readNote: 'Pour la cartographie des trous de ver, ce sont les trous de ver qui vous intéressent — chacun est une porte vers votre chaîne. Consultez <a href="/guides/statics/">la liste des types de trous de ver et des statics</a> pour savoir où mène chaque code, et <a href="/guides/mapping/">comment cartographier une chaîne de trous de ver</a> pour transformer un système plein de trous en une carte en direct.',
+            cardCopyH: 'Copiez toute la liste, ne la retapez pas',
+            cardCopyB: 'Dans le Probe Scanner, vous pouvez sélectionner toutes vos signatures (Ctrl+A) et les copier (Ctrl+C). Un bon mapper vous laisse coller cette liste directement — il la compare à ce qui est déjà sur la carte, tague automatiquement les trous de ver et les fait vieillir pour vous — pour que vous n\'ayez jamais à taper à la main des ID de sig à six caractères sous la pression.',
+            ctaP: '<strong>Collez votre scan directement dans une carte en direct — gratuitement.</strong> Nexum tague les trous de ver, suit la masse et se synchronise avec toute votre corp.',
+            ctaBtn: 'Ouvrir Nexum',
+            related: 'Guides connexes',
+            relMap: 'Comment cartographier une chaîne de trous de ver dans EVE Online',
+            relStatics: 'Types de trous de ver &amp; liste des statics d\'EVE',
+            relClasses: 'Classes de trous de ver d\'EVE et statics expliqués',
+            relRolling: 'Comment roller un trou de ver (guide de masse + calculateur)',
+            footP: 'EVE Online et le logo EVE sont des marques déposées de CCP hf. Tous droits réservés dans le monde entier. Nexum est un outil tiers et n\'est ni affilié à CCP hf ni approuvé par lui. Consultez l\'<a href="/license/">avis complet de licence &amp; de PI EVE</a>.',
+          };
+          DICTS.es = {
+            __title: 'Cómo escanear firmas en EVE Online — Guía de escaneo con sondas',
+            nav: '&larr; Inicio de Nexum',
+            h1: 'Cómo escanear firmas en EVE Online',
+            sub: 'Sondas, intensidad de señal y llegar al 100 % — los fundamentos de la exploración y los agujeros de gusano.',
+            updated: 'Una guía de agujeros de gusano de Nexum',
+            lede: 'Casi todo lo que vale la pena encontrar en EVE — agujeros de gusano, sitios de datos y reliquias, nubes de gas, bolsas de combate ocultas — empieza como una <strong>firma cósmica</strong>: un tenue punto rojo al que el juego no te deja saltar hasta que lo escaneas. Escanear es la habilidad que convierte esos puntos en lugares a los que puedes ir. Esta guía cubre el equipo, el flujo de trabajo y cómo leer lo que encuentras.',
+            h2need: 'Lo que necesitas',
+            needP: 'Para escanear firmas cósmicas necesitas una nave con un <strong>Core Probe Launcher</strong> montado y un juego de <strong>Core Scanner Probes</strong> cargadas (las Combat Scanner Probes también sirven y además pueden escanear naves, con una pequeña penalización de intensidad). Más allá de eso, cuatro cosas hacen que escanear sea más rápido y fácil:',
+            needLi1: '<strong>Astrometrics</strong> y sus habilidades de apoyo (Rangefinding, Acquisition, Pinpointing) — más intensidad de señal, escaneos más rápidos, resultados más ajustados.',
+            needLi2: '<strong>Rigs y mejoras de escaneo</strong> — los rigs Gravity Capacitor y un rangefinding array añaden intensidad.',
+            needLi3: '<strong>Equipo Sisters</strong> — el Sisters Core Probe Launcher y las Sisters Core Scanner Probes dan un bono de intensidad sobre las versiones tech-1.',
+            needLi4: '<strong>Un casco de exploración</strong> — la Astero y la Stratios tienen bonos de escaneo integrados y camuflajes; cualquier fragata covert-ops es un buen inicio.',
+            needNote: 'Nada de esto es obligatorio — un lanzador básico en cualquier nave escanea — pero la intensidad es la diferencia entre resolver un agujero de gusano difícil en dos pasadas y pelearlo durante diez.',
+            h2flow: 'El flujo de escaneo',
+            flowP: 'Abre la ventana <strong>Probe Scanner</strong> (Alt+P). Cada firma del sistema aparece como un punto sin resolver con un porcentaje. El bucle siempre es el mismo: <em>cubrir, escanear, acotar, repetir.</em>',
+            flowLi1: '<strong>Lanza tus sondas.</strong> En el espacio, lanza las sondas de escaneo. Aparecen como una formación móvil (un cubo de 7 por defecto) con un control deslizante de alcance.',
+            flowLi2: '<strong>Cubre una firma.</strong> Arrastra la formación sobre una firma sin resolver y ajusta el alcance de escaneo para que el cubo la rodee con holgura. Pulsa <strong>Analyze</strong> (escanear).',
+            flowLi3: '<strong>Lee el resultado.</strong> Cada escaneo devuelve una <strong>intensidad de señal</strong> (un porcentaje) y una <strong>forma de resultado</strong> — una esfera grande cuando la ubicación es vaga, que se encoge hacia un solo punto a medida que te acercas.',
+            flowLi4: '<strong>Acota.</strong> Vuelve a centrar la formación de sondas sobre el nuevo resultado y reduce aproximadamente a la mitad el alcance de escaneo, luego escanea de nuevo. La intensidad sube en cada pasada.',
+            flowLi5: '<strong>Resuelve.</strong> Al <strong>100 %</strong> la firma identifica su tipo y se convierte en un resultado al que puedes saltar. Salta a 0 para los agujeros de gusano; un alcance seguro está bien para sitios que planeas explorar primero.',
+            cardStrH: 'Intensidad de señal: por qué importa el 100 %',
+            cardStrB: 'Solo puedes saltar a una firma una vez que alcanza el 100 % de intensidad de señal. Por debajo, el juego solo conoce la zona aproximada. Los sitios débiles (agujeros de gusano profundos, algunos sitios de reliquias) necesitan más intensidad para cerrarse — ahí es exactamente donde las habilidades, los rigs y las sondas Sisters se ganan su lugar.',
+            h2read: 'Leer lo que encuentras',
+            readP: 'Cuando una firma se resuelve, su <strong>grupo</strong> te dice qué es:',
+            readLi1: '<strong>Agujero de gusano</strong> — una conexión a otro sistema. Salta hacia él y lee el nombre (un tipo como <em>N062</em>, o una salida <em>K162</em>) para conocer la clase de destino, la masa y la vida útil.',
+            readLi2: '<strong>Datos / Reliquias</strong> — sitios de hacking; recorre los contenedores con un Data o Relic Analyzer para planos, materiales y salvage.',
+            readLi3: '<strong>Gas</strong> — nubes de gas que recolectas con Gas Cloud Harvesters (importantes en el espacio de agujeros de gusano).',
+            readLi4: '<strong>Combate</strong> — bolsas ocultas de NPC. Las <em>anomalías</em> cósmicas, en cambio, ya aparecen en el probe scanner sin ningún escaneo.',
+            readNote: 'Para el mapeo de agujeros de gusano, los agujeros de gusano son los que te importan — cada uno es una puerta a tu cadena. Consulta <a href="/guides/statics/">la lista de tipos de agujeros de gusano y statics</a> para saber a dónde lleva cada código, y <a href="/guides/mapping/">cómo mapear una cadena de agujeros de gusano</a> para convertir un sistema lleno de agujeros en un mapa en vivo.',
+            cardCopyH: 'Copia la lista entera, no la reescribas',
+            cardCopyB: 'En el Probe Scanner puedes seleccionar todas tus firmas (Ctrl+A) y copiarlas (Ctrl+C). Un buen mapper te deja pegar esa lista directamente — la coteja con lo que ya está en el mapa, etiqueta automáticamente los agujeros de gusano y los envejece por ti — para que nunca tengas que teclear a mano IDs de firma de seis caracteres bajo presión.',
+            ctaP: '<strong>Pega tu escaneo directamente en un mapa en vivo — gratis.</strong> Nexum etiqueta agujeros de gusano, rastrea la masa y se sincroniza con toda tu corp.',
+            ctaBtn: 'Abrir Nexum',
+            related: 'Guías relacionadas',
+            relMap: 'Cómo mapear una cadena de agujeros de gusano en EVE Online',
+            relStatics: 'Tipos de agujeros de gusano &amp; lista de statics de EVE',
+            relClasses: 'Clases de agujeros de gusano de EVE y statics explicados',
+            relRolling: 'Cómo rolar un agujero de gusano (guía de masa + calculadora)',
+            footP: 'EVE Online y el logotipo de EVE son marcas registradas de CCP hf. Todos los derechos reservados en todo el mundo. Nexum es una herramienta de terceros y no está afiliada ni respaldada por CCP hf. Consulta el <a href="/license/">aviso completo de licencia &amp; PI de EVE</a>.',
+          };
+          DICTS.pt = {
+            __title: 'Como fazer scan de assinaturas no EVE Online — Guia de scan com sondas',
+            nav: '&larr; Início do Nexum',
+            h1: 'Como fazer scan de assinaturas no EVE Online',
+            sub: 'Sondas, intensidade de sinal e chegar aos 100 % — os fundamentos da exploração e dos buracos de minhoca.',
+            updated: 'Um guia de buracos de minhoca do Nexum',
+            lede: 'Quase tudo o que vale a pena encontrar no EVE — buracos de minhoca, sites de dados e relíquias, nuvens de gás, bolsas de combate escondidas — começa como uma <strong>assinatura cósmica</strong>: um ténue ponto vermelho para o qual o jogo não te deixa fazer warp até o teres escaneado. O scan é a habilidade que transforma esses pontos em lugares onde podes ir. Este guia cobre o equipamento, o fluxo de trabalho e como ler o que encontras.',
+            h2need: 'O que precisas',
+            needP: 'Para fazer scan de assinaturas cósmicas precisas de uma nave com um <strong>Core Probe Launcher</strong> montado e um conjunto de <strong>Core Scanner Probes</strong> carregadas (as Combat Scanner Probes também funcionam e podem ainda fazer scan de naves, com uma pequena penalização de intensidade). Para além disso, quatro coisas tornam o scan mais rápido e fácil:',
+            needLi1: '<strong>Astrometrics</strong> e as suas habilidades de apoio (Rangefinding, Acquisition, Pinpointing) — mais intensidade de sinal, scans mais rápidos, resultados mais apertados.',
+            needLi2: '<strong>Rigs e melhorias de scan</strong> — os rigs Gravity Capacitor e um rangefinding array acrescentam intensidade.',
+            needLi3: '<strong>Equipamento Sisters</strong> — o Sisters Core Probe Launcher e as Sisters Core Scanner Probes dão um bónus de intensidade em relação às versões tech-1.',
+            needLi4: '<strong>Um casco de exploração</strong> — a Astero e a Stratios têm bónus de scan incorporados e camuflagens; qualquer fragata covert-ops é um bom começo.',
+            needNote: 'Nada disto é obrigatório — um lançador básico em qualquer nave faz scan — mas a intensidade é a diferença entre resolver um buraco de minhoca difícil em duas passagens e lutar com ele durante dez.',
+            h2flow: 'O fluxo de scan',
+            flowP: 'Abre a janela <strong>Probe Scanner</strong> (Alt+P). Cada assinatura no sistema aparece como um ponto por resolver com uma percentagem. O ciclo é sempre o mesmo: <em>cobrir, fazer scan, apertar, repetir.</em>',
+            flowLi1: '<strong>Lança as tuas sondas.</strong> No espaço, lança as sondas de scan. Aparecem como uma formação móvel (um cubo de 7 por predefinição) com um cursor de alcance.',
+            flowLi2: '<strong>Cobre uma assinatura.</strong> Arrasta a formação sobre uma assinatura por resolver e ajusta o alcance de scan para que o cubo a envolva confortavelmente. Carrega em <strong>Analyze</strong> (fazer scan).',
+            flowLi3: '<strong>Lê o resultado.</strong> Cada scan devolve uma <strong>intensidade de sinal</strong> (uma percentagem) e uma <strong>forma de resultado</strong> — uma esfera grande quando a localização é vaga, encolhendo até um único ponto à medida que te aproximas.',
+            flowLi4: '<strong>Aperta.</strong> Volta a centrar a formação de sondas no novo resultado e reduz o alcance de scan grosseiramente para metade, depois faz scan de novo. A intensidade sobe a cada passagem.',
+            flowLi5: '<strong>Resolve.</strong> Aos <strong>100 %</strong> a assinatura identifica o seu tipo e torna-se um resultado para onde podes fazer warp. Faz warp para 0 nos buracos de minhoca; um alcance seguro serve para sites que planeias explorar primeiro.',
+            cardStrH: 'Intensidade de sinal: porque é que os 100 % importam',
+            cardStrB: 'Só podes fazer warp para uma assinatura depois de ela atingir 100 % de intensidade de sinal. Abaixo disso, o jogo só conhece a área aproximada. Os sites fracos (buracos de minhoca profundos, alguns sites de relíquias) precisam de mais intensidade para fechar — é exatamente aí que as habilidades, os rigs e as sondas Sisters ganham o seu valor.',
+            h2read: 'Ler o que encontras',
+            readP: 'Quando uma assinatura se resolve, o seu <strong>grupo</strong> diz-te o que é:',
+            readLi1: '<strong>Buraco de minhoca</strong> — uma ligação a outro sistema. Faz warp até ele e lê o nome (um tipo como <em>N062</em>, ou uma saída <em>K162</em>) para saber a classe de destino, a massa e o tempo de vida.',
+            readLi2: '<strong>Dados / Relíquias</strong> — sites de hacking; percorre os contentores com um Data ou Relic Analyzer para blueprints, materiais e salvage.',
+            readLi3: '<strong>Gás</strong> — nuvens de gás que colhes com Gas Cloud Harvesters (importantes no espaço dos buracos de minhoca).',
+            readLi4: '<strong>Combate</strong> — bolsas escondidas de NPCs. As <em>anomalias</em> cósmicas, por outro lado, já aparecem no probe scanner sem qualquer scan.',
+            readNote: 'Para o mapeamento de buracos de minhoca, os buracos de minhoca são o que te interessa — cada um é uma porta para a tua cadeia. Vê <a href="/guides/statics/">a lista de tipos de buracos de minhoca e statics</a> para saber para onde leva cada código, e <a href="/guides/mapping/">como mapear uma cadeia de buracos de minhoca</a> para transformar um sistema cheio de buracos num mapa ao vivo.',
+            cardCopyH: 'Copia a lista toda, não a reescrevas',
+            cardCopyB: 'No Probe Scanner podes selecionar todas as tuas assinaturas (Ctrl+A) e copiá-las (Ctrl+C). Um bom mapper deixa-te colar essa lista diretamente — compara-a com o que já está no mapa, etiqueta automaticamente os buracos de minhoca e envelhece-os por ti — para que nunca tenhas de escrever à mão IDs de assinatura de seis caracteres sob pressão.',
+            ctaP: '<strong>Cola o teu scan diretamente num mapa ao vivo — grátis.</strong> O Nexum etiqueta buracos de minhoca, acompanha a massa e sincroniza com toda a tua corp.',
+            ctaBtn: 'Abrir o Nexum',
+            related: 'Guias relacionados',
+            relMap: 'Como mapear uma cadeia de buracos de minhoca no EVE Online',
+            relStatics: 'Tipos de buracos de minhoca &amp; lista de statics do EVE',
+            relClasses: 'Classes de buracos de minhoca do EVE e statics explicados',
+            relRolling: 'Como fazer roll a um buraco de minhoca (guia de massa + calculadora)',
+            footP: 'EVE Online e o logótipo do EVE são marcas registadas da CCP hf. Todos os direitos reservados em todo o mundo. O Nexum é uma ferramenta de terceiros e não está afiliado nem é apoiado pela CCP hf. Consulta o <a href="/license/">aviso completo de licença &amp; PI do EVE</a>.',
+          };
+          DICTS.zh = {
+            __title: '如何在 EVE Online 中扫描信号 — 探针扫描指南',
+            nav: '&larr; Nexum 主页',
+            h1: '如何在 EVE Online 中扫描信号',
+            sub: '探针、信号强度以及达到 100 %——探索与虫洞的基础。',
+            updated: '一份 Nexum 虫洞指南',
+            lede: '在 EVE 中几乎所有值得寻找的东西——虫洞、数据与遗迹站点、气云、隐藏的战斗区域——最初都是一个<strong>宇宙信号</strong>：一个微弱的红点，在你把它扫描出来之前游戏不会让你跃迁过去。扫描就是把这些红点变成你能前往之地的技能。本指南涵盖装备、流程，以及如何解读你的发现。',
+            h2need: '你需要什么',
+            needP: '要扫描宇宙信号，你需要一艘装配了 <strong>Core Probe Launcher</strong> 并装填了一组 <strong>Core Scanner Probes</strong> 的舰船（Combat Scanner Probes 也可以使用，还能额外扫描舰船，但有少许强度惩罚）。除此之外，有四样东西能让扫描更快更轻松：',
+            needLi1: '<strong>Astrometrics</strong> 及其辅助技能（Rangefinding、Acquisition、Pinpointing）——更高的信号强度、更快的扫描、更紧凑的结果。',
+            needLi2: '<strong>扫描改装件与升级</strong>——Gravity Capacitor 改装件和 rangefinding array 能增加强度。',
+            needLi3: '<strong>Sisters 装备</strong>——Sisters Core Probe Launcher 和 Sisters Core Scanner Probes 相比 tech-1 版本提供强度加成。',
+            needLi4: '<strong>一艘探索舰船</strong>——Astero 和 Stratios 内置扫描加成和隐形装置；任何 covert-ops 护卫舰都是很好的入门选择。',
+            needNote: '这些都不是必需的——任何舰船上一个基础发射器都能扫描——但强度决定了你是两轮解出一个棘手虫洞，还是苦战十轮。',
+            h2flow: '扫描流程',
+            flowP: '打开 <strong>Probe Scanner</strong> 窗口（Alt+P）。系统中的每个信号都显示为一个带百分比的未解析红点。循环始终相同：<em>覆盖、扫描、缩小、重复。</em>',
+            flowLi1: '<strong>发射你的探针。</strong> 在太空中发射扫描探针。它们会以一个可移动的编队出现（默认是 7 个组成的立方体），带有一个范围滑块。',
+            flowLi2: '<strong>覆盖一个信号。</strong> 把编队拖到一个未解析的信号上，并调整扫描范围，使立方体从容地把它包住。点击 <strong>Analyze</strong>（扫描）。',
+            flowLi3: '<strong>解读结果。</strong> 每次扫描都会返回一个<strong>信号强度</strong>（百分比）和一个<strong>结果形状</strong>——当位置模糊时是一个大球体，随着你逐渐逼近而收缩为一个单点。',
+            flowLi4: '<strong>缩小范围。</strong> 把探针编队重新对准新结果，并把扫描范围大致减半，然后再次扫描。每一轮强度都会上升。',
+            flowLi5: '<strong>解析。</strong> 到 <strong>100 %</strong> 时，信号会识别出其类型并变成可跃迁的结果。对虫洞跃迁到 0；对于你打算先侦察的站点，一个安全距离即可。',
+            cardStrH: '信号强度：为什么 100 % 很重要',
+            cardStrB: '只有当信号达到 100 % 信号强度时，你才能跃迁过去。在此之下，游戏只知道大致区域。较弱的站点（深层虫洞、某些遗迹站点）需要更多强度才能收尾——这正是技能、改装件和 Sisters 探针发挥价值的地方。',
+            h2read: '解读你的发现',
+            readP: '当一个信号被解析后，它的<strong>组别</strong>会告诉你它是什么：',
+            readLi1: '<strong>虫洞</strong>——通往另一个星系的连接。跃迁过去并读取其名称（像 <em>N062</em> 这样的类型，或一个 <em>K162</em> 出口），以了解目的地等级、质量和寿命。',
+            readLi2: '<strong>数据 / 遗迹</strong>——黑客站点；用 Data 或 Relic Analyzer 破解容器，获得蓝图、材料和打捞物。',
+            readLi3: '<strong>气云</strong>——你用 Gas Cloud Harvesters 采集的气云（在虫洞空间中很重要）。',
+            readLi4: '<strong>战斗</strong>——隐藏的 NPC 区域。相比之下，宇宙<em>异常</em>无需任何扫描就已显示在 probe scanner 中。',
+            readNote: '对于虫洞绘图而言，你真正关心的是虫洞——每一个都是通往你链条的门户。查看<a href="/guides/statics/">虫洞类型与 statics 列表</a>了解每个代码通向何处，以及<a href="/guides/mapping/">如何绘制虫洞链</a>，把一个满是虫洞的星系变成一张实时地图。',
+            cardCopyH: '复制整个列表，别重新打字',
+            cardCopyB: '在 Probe Scanner 中，你可以选中所有信号（Ctrl+A）并复制它们（Ctrl+C）。一个好的绘图工具让你把这个列表直接粘贴进去——它会与地图上已有的内容匹配、自动标记虫洞，并为你计算它们的时效——这样你就永远不必在时间压力下手动输入六位信号 ID。',
+            ctaP: '<strong>把你的扫描直接粘贴进一张实时地图——免费。</strong> Nexum 会标记虫洞、追踪质量，并与你整个军团同步。',
+            ctaBtn: '打开 Nexum',
+            related: '相关指南',
+            relMap: '如何在 EVE Online 中绘制虫洞链',
+            relStatics: 'EVE 虫洞类型 &amp; statics 列表',
+            relClasses: 'EVE 虫洞等级与 statics 详解',
+            relRolling: '如何滚洞（质量指南 + 计算器）',
+            footP: 'EVE Online 和 EVE 标志是 CCP hf. 的注册商标。在全球范围内保留所有权利。Nexum 是第三方工具，与 CCP hf. 无关联，也未获其认可。请查看完整的 <a href="/license/">许可 &amp; EVE 知识产权声明</a>。',
+          };
+          DICTS.ko = {
+            __title: 'EVE Online에서 시그니처 스캔하는 법 — 프로브 스캔 가이드',
+            nav: '&larr; Nexum 홈',
+            h1: 'EVE Online에서 시그니처 스캔하는 법',
+            sub: '프로브, 신호 강도, 그리고 100 %에 도달하기 — 탐사와 웜홀의 기본.',
+            updated: 'Nexum 웜홀 가이드',
+            lede: 'EVE에서 찾을 가치가 있는 거의 모든 것 — 웜홀, 데이터 및 유물 사이트, 가스 구름, 숨겨진 전투 구역 — 은 <strong>우주 시그니처</strong>로 시작합니다: 스캔하기 전까지는 게임이 워프를 허용하지 않는 희미한 빨간 점입니다. 스캔은 그 점들을 갈 수 있는 장소로 바꾸는 기술입니다. 이 가이드는 장비, 작업 흐름, 그리고 찾은 것을 읽는 법을 다룹니다.',
+            h2need: '필요한 것',
+            needP: '우주 시그니처를 스캔하려면 <strong>Core Probe Launcher</strong>를 장착하고 <strong>Core Scanner Probes</strong> 한 세트를 장전한 함선이 필요합니다(Combat Scanner Probes도 사용할 수 있고 약간의 강도 페널티로 함선도 스캔할 수 있습니다). 그 외에, 네 가지가 스캔을 더 빠르고 쉽게 만듭니다:',
+            needLi1: '<strong>Astrometrics</strong>와 그 지원 스킬(Rangefinding, Acquisition, Pinpointing) — 더 높은 신호 강도, 더 빠른 스캔, 더 좁은 결과.',
+            needLi2: '<strong>스캔 리그와 업그레이드</strong> — Gravity Capacitor 리그와 rangefinding array가 강도를 더해줍니다.',
+            needLi3: '<strong>Sisters 장비</strong> — Sisters Core Probe Launcher와 Sisters Core Scanner Probes는 tech-1 버전보다 강도 보너스를 줍니다.',
+            needLi4: '<strong>탐사용 선체</strong> — Astero와 Stratios는 내장 스캔 보너스와 클록을 갖추고 있으며, 어떤 covert-ops 프리깃도 훌륭한 입문용입니다.',
+            needNote: '이 중 어느 것도 필수는 아닙니다 — 어떤 함선의 기본 런처로도 스캔은 됩니다 — 하지만 강도는 까다로운 웜홀을 두 번에 해석하느냐 열 번을 씨름하느냐의 차이입니다.',
+            h2flow: '스캔 작업 흐름',
+            flowP: '<strong>Probe Scanner</strong> 창(Alt+P)을 엽니다. 시스템의 모든 시그니처는 백분율이 붙은 미해석 점으로 표시됩니다. 반복은 항상 같습니다: <em>덮기, 스캔, 좁히기, 반복.</em>',
+            flowLi1: '<strong>프로브를 발사하세요.</strong> 우주에서 스캐너 프로브를 발사합니다. 범위 슬라이더가 있는 이동 가능한 편대(기본값은 7개로 된 정육면체)로 나타납니다.',
+            flowLi2: '<strong>시그니처를 덮으세요.</strong> 편대를 미해석 시그니처 하나 위로 끌어와 정육면체가 그것을 여유 있게 감싸도록 스캔 범위를 설정합니다. <strong>Analyze</strong>(스캔)를 누릅니다.',
+            flowLi3: '<strong>결과를 읽으세요.</strong> 각 스캔은 <strong>신호 강도</strong>(백분율)와 <strong>결과 형태</strong>를 반환합니다 — 위치가 모호할 때는 큰 구체이며, 가까워질수록 하나의 점으로 줄어듭니다.',
+            flowLi4: '<strong>좁히세요.</strong> 프로브 편대를 새 결과 위로 다시 중심을 맞추고 스캔 범위를 대략 절반으로 줄인 다음 다시 스캔합니다. 강도는 매 회 올라갑니다.',
+            flowLi5: '<strong>해석하세요.</strong> <strong>100 %</strong>에서 시그니처는 그 유형을 식별하고 워프 가능한 결과가 됩니다. 웜홀은 0으로 워프하세요; 먼저 정찰하려는 사이트는 안전 거리면 충분합니다.',
+            cardStrH: '신호 강도: 100 %가 중요한 이유',
+            cardStrB: '시그니처가 100 % 신호 강도에 도달해야만 워프할 수 있습니다. 그 아래에서는 게임이 대략적인 구역만 압니다. 약한 사이트(깊은 웜홀, 일부 유물 사이트)는 마무리에 더 많은 강도가 필요합니다 — 바로 그곳에서 스킬, 리그, Sisters 프로브가 제 값을 합니다.',
+            h2read: '찾은 것 읽기',
+            readP: '시그니처가 해석되면, 그 <strong>그룹</strong>이 무엇인지 알려줍니다:',
+            readLi1: '<strong>웜홀</strong> — 다른 시스템으로의 연결. 워프해서 이름(<em>N062</em> 같은 유형이나 <em>K162</em> 출구)을 읽어 목적지 등급, 질량, 수명을 파악하세요.',
+            readLi2: '<strong>데이터 / 유물</strong> — 해킹 사이트; Data 또는 Relic Analyzer로 컨테이너를 처리해 블루프린트, 재료, 샐비지를 얻습니다.',
+            readLi3: '<strong>가스</strong> — Gas Cloud Harvesters로 채집하는 가스 구름(웜홀 공간에서 큰 비중).',
+            readLi4: '<strong>전투</strong> — 숨겨진 NPC 구역. 반면 우주 <em>어노말리</em>는 스캔 없이도 이미 probe scanner에 표시됩니다.',
+            readNote: '웜홀 매핑에서는 웜홀이 바로 당신이 신경 쓰는 대상입니다 — 각각이 당신 체인으로 들어가는 문입니다. 각 코드가 어디로 이어지는지는 <a href="/guides/statics/">웜홀 유형과 statics 목록</a>을, 구멍으로 가득한 시스템을 실시간 지도로 바꾸는 법은 <a href="/guides/mapping/">웜홀 체인 매핑하는 법</a>을 참조하세요.',
+            cardCopyH: '전체 목록을 복사하세요, 다시 타이핑하지 마세요',
+            cardCopyB: 'Probe Scanner에서 모든 시그니처를 선택(Ctrl+A)하고 복사(Ctrl+C)할 수 있습니다. 좋은 매퍼는 그 목록을 곧바로 붙여넣게 해줍니다 — 이미 지도에 있는 것과 매칭하고, 웜홀을 자동으로 태그하고, 시효를 계산해 줍니다 — 그래서 시간 압박 속에서 여섯 자리 시그 ID를 손으로 입력할 일이 없습니다.',
+            ctaP: '<strong>스캔을 실시간 지도에 바로 붙여넣으세요 — 무료.</strong> Nexum은 웜홀을 태그하고, 질량을 추적하며, 당신의 전체 코프와 동기화합니다.',
+            ctaBtn: 'Nexum 열기',
+            related: '관련 가이드',
+            relMap: 'EVE Online에서 웜홀 체인 매핑하는 법',
+            relStatics: 'EVE 웜홀 유형 &amp; statics 목록',
+            relClasses: 'EVE 웜홀 등급과 statics 설명',
+            relRolling: '웜홀 롤링하는 법(질량 가이드 + 계산기)',
+            footP: 'EVE Online과 EVE 로고는 CCP hf.의 등록 상표입니다. 전 세계 모든 권리가 보유됩니다. Nexum은 서드파티 도구이며 CCP hf.와 제휴하거나 그로부터 보증받지 않았습니다. 전체 <a href="/license/">라이선스 &amp; EVE IP 고지</a>를 참조하세요.',
+          };
+          DICTS.ja = {
+            __title: 'EVE Online でシグネチャをスキャンする方法 — プローブスキャンガイド',
+            nav: '&larr; Nexum ホーム',
+            h1: 'EVE Online でシグネチャをスキャンする方法',
+            sub: 'プローブ、信号強度、そして 100 % への到達 — 探検とワームホールの基本。',
+            updated: 'Nexum のワームホールガイド',
+            lede: 'EVE で見つける価値のあるものはほぼすべて — ワームホール、データ・レリックサイト、ガスクラウド、隠れた戦闘ポケット — が<strong>コズミックシグネチャ</strong>として始まります。スキャンで絞り込むまでゲームがワープを許さない、かすかな赤い点です。スキャンは、その点をあなたが行ける場所へと変える技術です。このガイドでは装備、手順、そして見つけたものの読み方を解説します。',
+            h2need: '必要なもの',
+            needP: 'コズミックシグネチャをスキャンするには、<strong>Core Probe Launcher</strong> を装備し <strong>Core Scanner Probes</strong> を装填した艦が必要です（Combat Scanner Probes も使え、わずかな強度ペナルティで艦もスキャンできます）。それ以外に、スキャンを速く楽にするものが四つあります:',
+            needLi1: '<strong>Astrometrics</strong> とその補助スキル（Rangefinding、Acquisition、Pinpointing）— 信号強度の向上、スキャンの高速化、より絞り込まれた結果。',
+            needLi2: '<strong>スキャン用リグとアップグレード</strong> — Gravity Capacitor リグと rangefinding array が強度を上げます。',
+            needLi3: '<strong>Sisters 装備</strong> — Sisters Core Probe Launcher と Sisters Core Scanner Probes は tech-1 版より強度ボーナスを与えます。',
+            needLi4: '<strong>探検用ハル</strong> — Astero と Stratios は内蔵のスキャンボーナスとクロークを備え、どの covert-ops フリゲートも強力な入門機です。',
+            needNote: 'どれも必須ではありません — どんな艦でも基本のランチャーがあればスキャンできます — が、強度は手強いワームホールを二巡で解けるか、十巡も苦戦するかの差になります。',
+            h2flow: 'スキャンの手順',
+            flowP: '<strong>Probe Scanner</strong> ウィンドウ（Alt+P）を開きます。システム内の各シグネチャは、パーセンテージ付きの未解決の点として表示されます。ループは常に同じです: <em>覆う、スキャン、絞る、繰り返す。</em>',
+            flowLi1: '<strong>プローブを射出します。</strong> 宇宙空間でスキャナープローブを射出します。範囲スライダー付きの可動フォーメーション（デフォルトは 7 個の立方体）として現れます。',
+            flowLi2: '<strong>シグネチャを覆います。</strong> フォーメーションを未解決のシグネチャ一つの上にドラッグし、立方体が余裕をもってそれを囲むようにスキャン範囲を設定します。<strong>Analyze</strong>（スキャン）を押します。',
+            flowLi3: '<strong>結果を読みます。</strong> 各スキャンは <strong>信号強度</strong>（パーセンテージ）と <strong>結果の形</strong> を返します — 位置が曖昧なときは大きな球体で、近づくにつれ一つの点へと縮んでいきます。',
+            flowLi4: '<strong>絞り込みます。</strong> プローブフォーメーションを新しい結果の上に中心を合わせ直し、スキャン範囲をおおよそ半分にして、再度スキャンします。強度は毎巡上がります。',
+            flowLi5: '<strong>解決します。</strong> <strong>100 %</strong> でシグネチャは種類を識別し、ワープ可能な結果になります。ワームホールには 0 へワープを; 先に偵察する予定のサイトなら安全距離で構いません。',
+            cardStrH: '信号強度: なぜ 100 % が重要か',
+            cardStrB: 'シグネチャへワープできるのは、信号強度が 100 % に達してからだけです。それ未満では、ゲームはおおよその領域しか把握していません。弱いサイト（深いワームホール、一部のレリックサイト）は仕上げにより多くの強度を要します — まさにそこでスキル、リグ、Sisters プローブが真価を発揮します。',
+            h2read: '見つけたものを読む',
+            readP: 'シグネチャが解決すると、その <strong>グループ</strong> がそれが何かを教えてくれます:',
+            readLi1: '<strong>ワームホール</strong> — 別のシステムへの接続。ワープして名前（<em>N062</em> のような種類、または <em>K162</em> の出口）を読み、目的地のクラス、質量、寿命を把握します。',
+            readLi2: '<strong>データ / レリック</strong> — ハッキングサイト; Data または Relic Analyzer でコンテナを解いて、ブループリント、素材、サルベージを得ます。',
+            readLi3: '<strong>ガス</strong> — Gas Cloud Harvesters で採取するガスクラウド（ワームホール空間で重要）。',
+            readLi4: '<strong>戦闘</strong> — 隠れた NPC のポケット。対照的に、コズミック <em>アノマリー</em> はスキャンなしで既に probe scanner に表示されます。',
+            readNote: 'ワームホールマッピングでは、あなたが気にかけるのはワームホールです — それぞれがあなたのチェーンへの扉です。各コードがどこへ通じるかは <a href="/guides/statics/">ワームホールの種類と statics 一覧</a> を、穴だらけのシステムをライブマップに変える方法は <a href="/guides/mapping/">ワームホールチェーンのマッピング方法</a> を参照してください。',
+            cardCopyH: 'リスト全体をコピーしましょう、打ち直さないで',
+            cardCopyB: 'Probe Scanner では、すべてのシグネチャを選択（Ctrl+A）してコピー（Ctrl+C）できます。良いマッパーなら、そのリストをそのまま貼り付けられます — 既にマップにあるものと照合し、ワームホールを自動タグ付けし、経過時間を計算してくれます — だから時間に追われながら 6 文字の sig ID を手打ちすることは決してありません。',
+            ctaP: '<strong>スキャンをライブマップにそのまま貼り付け — 無料。</strong> Nexum はワームホールをタグ付けし、質量を追跡し、コープ全体と同期します。',
+            ctaBtn: 'Nexum を開く',
+            related: '関連ガイド',
+            relMap: 'EVE Online でワームホールチェーンをマッピングする方法',
+            relStatics: 'EVE ワームホールの種類 &amp; statics 一覧',
+            relClasses: 'EVE ワームホールのクラスと statics の解説',
+            relRolling: 'ワームホールのロール方法（質量ガイド + 計算機）',
+            footP: 'EVE Online と EVE ロゴは CCP hf. の登録商標です。世界中ですべての権利が留保されています。Nexum はサードパーティ製ツールであり、CCP hf. と提携しておらず、その承認も受けていません。完全な <a href="/license/">ライセンス &amp; EVE IP 表示</a> をご覧ください。',
+          };
+          DICTS.ru = {
+            __title: 'Как сканировать сигнатуры в EVE Online — руководство по сканированию зондами',
+            nav: '&larr; Главная Nexum',
+            h1: 'Как сканировать сигнатуры в EVE Online',
+            sub: 'Зонды, сила сигнала и достижение 100 % — основы исследования и червоточин.',
+            updated: 'Руководство Nexum по червоточинам',
+            lede: 'Почти всё, что стоит найти в EVE — червоточины, сайты данных и реликвий, газовые облака, скрытые боевые карманы — начинается как <strong>космическая сигнатура</strong>: слабая красная точка, к которой игра не даст варпнуть, пока ты её не отсканируешь. Сканирование — это навык, превращающий эти точки в места, куда можно попасть. Это руководство охватывает снаряжение, порядок действий и то, как читать найденное.',
+            h2need: 'Что нужно',
+            needP: 'Чтобы сканировать космические сигнатуры, нужен корабль с установленным <strong>Core Probe Launcher</strong> и заряженным набором <strong>Core Scanner Probes</strong> (Combat Scanner Probes тоже подходят и вдобавок могут сканировать корабли, с небольшим штрафом к силе). Помимо этого, четыре вещи делают сканирование быстрее и легче:',
+            needLi1: '<strong>Astrometrics</strong> и его вспомогательные навыки (Rangefinding, Acquisition, Pinpointing) — больше силы сигнала, более быстрые сканы, более точные результаты.',
+            needLi2: '<strong>Сканирующие риги и апгрейды</strong> — риги Gravity Capacitor и rangefinding array добавляют силу.',
+            needLi3: '<strong>Снаряжение Sisters</strong> — Sisters Core Probe Launcher и Sisters Core Scanner Probes дают бонус к силе по сравнению с версиями tech-1.',
+            needLi4: '<strong>Исследовательский корпус</strong> — у Astero и Stratios есть встроенные бонусы к сканированию и клоки; любой фрегат covert-ops — отличное начало.',
+            needNote: 'Ничего из этого не обязательно — базовый лаунчер на любом корабле будет сканировать — но сила определяет, разрешишь ли ты трудную червоточину за два прохода или будешь биться над ней десять.',
+            h2flow: 'Порядок сканирования',
+            flowP: 'Открой окно <strong>Probe Scanner</strong> (Alt+P). Каждая сигнатура в системе показывается как неразрешённая точка с процентом. Цикл всегда один и тот же: <em>накрыть, сканировать, сузить, повторить.</em>',
+            flowLi1: '<strong>Запусти зонды.</strong> В космосе запусти сканирующие зонды. Они появляются как подвижная формация (по умолчанию куб из 7) с ползунком дальности.',
+            flowLi2: '<strong>Накрой сигнатуру.</strong> Перетащи формацию на одну неразрешённую сигнатуру и задай дальность скана так, чтобы куб свободно её охватывал. Нажми <strong>Analyze</strong> (сканировать).',
+            flowLi3: '<strong>Прочитай результат.</strong> Каждый скан возвращает <strong>силу сигнала</strong> (процент) и <strong>форму результата</strong> — большую сферу, когда местоположение расплывчато, сжимающуюся к одной точке по мере приближения.',
+            flowLi4: '<strong>Сузь.</strong> Перецентрируй формацию зондов на новый результат и примерно вдвое уменьши дальность скана, затем сканируй снова. Сила растёт с каждым проходом.',
+            flowLi5: '<strong>Разреши.</strong> На <strong>100 %</strong> сигнатура определяет свой тип и становится результатом, к которому можно варпнуть. К червоточинам варпай на 0; для сайтов, которые ты планируешь сначала разведать, подойдёт безопасная дальность.',
+            cardStrH: 'Сила сигнала: почему важны 100 %',
+            cardStrB: 'Варпнуть к сигнатуре можно только после того, как она достигнет 100 % силы сигнала. Ниже этого игра знает лишь примерный район. Слабые сайты (глубокие червоточины, некоторые сайты реликвий) требуют больше силы, чтобы их закрыть — именно там навыки, риги и зонды Sisters оправдывают себя.',
+            h2read: 'Как читать найденное',
+            readP: 'Когда сигнатура разрешается, её <strong>группа</strong> говорит, что это:',
+            readLi1: '<strong>Червоточина</strong> — соединение с другой системой. Варпни к ней и прочитай имя (тип вроде <em>N062</em> или выход <em>K162</em>), чтобы узнать класс назначения, массу и время жизни.',
+            readLi2: '<strong>Данные / Реликвии</strong> — сайты для взлома; проходи контейнеры с Data или Relic Analyzer ради чертежей, материалов и сальважа.',
+            readLi3: '<strong>Газ</strong> — газовые облака, которые ты собираешь с помощью Gas Cloud Harvesters (важны в пространстве червоточин).',
+            readLi4: '<strong>Бой</strong> — скрытые карманы NPC. Космические <em>аномалии</em>, напротив, уже отображаются в probe scanner без всякого сканирования.',
+            readNote: 'Для картирования червоточин важны именно червоточины — каждая это дверь в твою цепочку. Смотри <a href="/guides/statics/">список типов червоточин и statics</a>, чтобы узнать, куда ведёт каждый код, и <a href="/guides/mapping/">как картировать цепочку червоточин</a>, чтобы превратить систему, полную дыр, в живую карту.',
+            cardCopyH: 'Скопируй весь список, не перепечатывай',
+            cardCopyB: 'В Probe Scanner можно выделить все свои сигнатуры (Ctrl+A) и скопировать их (Ctrl+C). Хороший маппер позволяет вставить этот список напрямую — он сопоставляет его с тем, что уже на карте, автоматически помечает червоточины и отслеживает их возраст — так что тебе никогда не придётся вручную набирать шестизначные ID сигнатур под давлением времени.',
+            ctaP: '<strong>Вставь свой скан прямо в живую карту — бесплатно.</strong> Nexum помечает червоточины, отслеживает массу и синхронизируется со всей твоей корпорацией.',
+            ctaBtn: 'Открыть Nexum',
+            related: 'Похожие руководства',
+            relMap: 'Как картировать цепочку червоточин в EVE Online',
+            relStatics: 'Типы червоточин &amp; список statics EVE',
+            relClasses: 'Классы червоточин EVE и statics объяснены',
+            relRolling: 'Как роллить червоточину (руководство по массе + калькулятор)',
+            footP: 'EVE Online и логотип EVE являются зарегистрированными торговыми марками CCP hf. Все права защищены по всему миру. Nexum — это сторонний инструмент, не связанный с CCP hf. и не одобренный ею. См. полное <a href="/license/">уведомление о лицензии &amp; ИС EVE</a>.',
+          };
+
+          var DICT = DICTS[lang];
+          document.documentElement.lang = lang;
+          if (DICT.__title) document.title = DICT.__title;
+          var nodes = document.querySelectorAll('[data-i18n]');
+          for (var i = 0; i < nodes.length; i++) {
+            var key = nodes[i].getAttribute('data-i18n');
+            if (DICT[key] != null) nodes[i].innerHTML = DICT[key];
+          }
+        } catch (e) {
+          // On any error, leave the English source intact.
+        }
+      })();
+    </script>
   </body>
 </html>

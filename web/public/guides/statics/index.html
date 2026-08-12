@@ -14,6 +14,8 @@
     <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="robots" content="index, follow" />
 
+    <script src="/vendor/lang-picker.js" defer></script>
+
     <meta property="og:type" content="article" />
     <meta property="og:url" content="https://eve-nexum.com/guides/statics/" />
     <meta property="og:title" content="EVE Online Wormhole Types &amp; Statics List" />
@@ -56,7 +58,7 @@
       body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--text); line-height: 1.6; }
       .wrap { max-width: 900px; margin: 0 auto; padding: 32px 20px 64px; }
       a { color: var(--accent); }
-      .topnav { font-size: 14px; }
+      .topnav { font-size: 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
       .topnav a { color: var(--muted); text-decoration: none; }
       header.hero { margin: 24px 0 8px; }
       .logo { font-size: 30px; color: var(--accent); line-height: 1; }
@@ -85,38 +87,44 @@
   </head>
   <body>
     <div class="wrap">
-      <nav class="topnav"><a href="/">&larr; Nexum home</a></nav>
+      <nav class="topnav">
+        <a href="/" data-i18n="nav">&larr; Nexum home</a>
+        <!-- Stylized language dropdown with SVG flags, built by
+             /vendor/lang-picker.js (a native <select> can't render the flags,
+             and flag emoji show as bare country codes on Windows). -->
+        <div class="lang-picker" data-lang-picker></div>
+      </nav>
 
       <header class="hero">
         <div class="logo" aria-hidden="true">&#9672;</div>
-        <h1>EVE Online Wormhole Types &amp; Statics List</h1>
-        <p class="sub">Every wormhole code - where it leads, whether it's static, and its mass and lifetime.</p>
+        <h1 data-i18n="h1">EVE Online Wormhole Types &amp; Statics List</h1>
+        <p class="sub" data-i18n="sub">Every wormhole code - where it leads, whether it's static, and its mass and lifetime.</p>
       </header>
-      <p class="updated">A Nexum wormhole reference</p>
+      <p class="updated" data-i18n="updated">A Nexum wormhole reference</p>
 
-      <p class="lede">Every wormhole in EVE has a <strong>type code</strong> - like <em>N062</em>, <em>C247</em> or <em>O477</em> - and that code always tells you the same three things: where it leads, the biggest ship that fits, and how much mass it can take before it collapses. This page is the full lookup table, plus a short primer on statics so the columns make sense.</p>
+      <p class="lede" data-i18n="lede">Every wormhole in EVE has a <strong>type code</strong> - like <em>N062</em>, <em>C247</em> or <em>O477</em> - and that code always tells you the same three things: where it leads, the biggest ship that fits, and how much mass it can take before it collapses. This page is the full lookup table, plus a short primer on statics so the columns make sense.</p>
 
-      <h2>Statics vs wandering connections</h2>
-      <p>A <strong>static</strong> is a connection a system <em>always</em> regenerates to a fixed destination class. When a system's static dies - collapsed or expired - a new one of the same type spawns somewhere else. So a C3 with a highsec static always has a route to highsec; the specific highsec system changes, the guarantee does not. That is why corps choose a home by its static: a highsec static makes logistics easy, a C5 static means constant capital content. A <strong>wandering</strong> connection, by contrast, is random and temporary - a hole that happened to open into your system from somewhere else. A <strong>K162</strong> is always the exit side of a hole opened elsewhere; jump through and read the named signature on the far side to identify what it really is. For what the classes themselves mean, see <a href="/guides/classes/">wormhole classes explained</a>.</p>
+      <h2 data-i18n="h2_statics">Statics vs wandering connections</h2>
+      <p data-i18n="p_statics">A <strong>static</strong> is a connection a system <em>always</em> regenerates to a fixed destination class. When a system's static dies - collapsed or expired - a new one of the same type spawns somewhere else. So a C3 with a highsec static always has a route to highsec; the specific highsec system changes, the guarantee does not. That is why corps choose a home by its static: a highsec static makes logistics easy, a C5 static means constant capital content. A <strong>wandering</strong> connection, by contrast, is random and temporary - a hole that happened to open into your system from somewhere else. A <strong>K162</strong> is always the exit side of a hole opened elsewhere; jump through and read the named signature on the far side to identify what it really is. For what the classes themselves mean, see <a href="/guides/classes/">wormhole classes explained</a>.</p>
 
-      <h2>How to read the table</h2>
+      <h2 data-i18n="h2_read">How to read the table</h2>
       <ul>
-        <li><strong>Type</strong> - the wormhole's code, shown on the named side of the hole.</li>
-        <li><strong>Respawn</strong> - whether the hole appears as a <em>static</em> (guaranteed, regenerating), a <em>wandering</em> connection, or the <em>reverse</em> (K162) side.</li>
-        <li><strong>Spawns in</strong> - the space where the named side is found.</li>
-        <li><strong>Leads to</strong> - the class of space on the other end.</li>
-        <li><strong>Max ship</strong> - the largest hull that can jump the hole (per-jump mass limit).</li>
-        <li><strong>Total mass</strong> - the mass budget before the hole collapses (what you deplete when rolling).</li>
-        <li><strong>Lifetime</strong> - how long the hole lives before it expires on its own.</li>
+        <li data-i18n="li_type"><strong>Type</strong> - the wormhole's code, shown on the named side of the hole.</li>
+        <li data-i18n="li_respawn"><strong>Respawn</strong> - whether the hole appears as a <em>static</em> (guaranteed, regenerating), a <em>wandering</em> connection, or the <em>reverse</em> (K162) side.</li>
+        <li data-i18n="li_spawns"><strong>Spawns in</strong> - the space where the named side is found.</li>
+        <li data-i18n="li_leads"><strong>Leads to</strong> - the class of space on the other end.</li>
+        <li data-i18n="li_maxship"><strong>Max ship</strong> - the largest hull that can jump the hole (per-jump mass limit).</li>
+        <li data-i18n="li_totalmass"><strong>Total mass</strong> - the mass budget before the hole collapses (what you deplete when rolling).</li>
+        <li data-i18n="li_lifetime"><strong>Lifetime</strong> - how long the hole lives before it expires on its own.</li>
       </ul>
 
-      <h2>Wormhole type reference</h2>
-      <p>Every wormhole type in New Eden, sorted by code. Values match the live data Nexum uses to tag and age wormholes automatically.</p>
+      <h2 data-i18n="h2_ref">Wormhole type reference</h2>
+      <p data-i18n="p_ref">Every wormhole type in New Eden, sorted by code. Values match the live data Nexum uses to tag and age wormholes automatically.</p>
       <div class="tablewrap">
         <table class="wh">
           <thead>
             <tr>
-              <th>Type</th><th>Respawn</th><th>Spawns in</th><th>Leads to</th><th>Max ship</th><th>Total mass</th><th>Lifetime</th>
+              <th data-i18n="th_type">Type</th><th data-i18n="th_respawn">Respawn</th><th data-i18n="th_spawns">Spawns in</th><th data-i18n="th_leads">Leads to</th><th data-i18n="th_maxship">Max ship</th><th data-i18n="th_totalmass">Total mass</th><th data-i18n="th_lifetime">Lifetime</th>
             </tr>
           </thead>
           <tbody>
@@ -226,28 +234,368 @@
       </div>
 
       <div class="card">
-        <h3>Don't memorise this - let the map do it</h3>
-        <p>Nexum recognises wormhole codes as you scan and paste them: it tags each hole's destination, ship size and mass, ages it toward end-of-life, and warns you before a roll strands a ship. The whole chain, always current, shared live with your corp.</p>
+        <h3 data-i18n="cardH">Don't memorise this - let the map do it</h3>
+        <p data-i18n="cardP">Nexum recognises wormhole codes as you scan and paste them: it tags each hole's destination, ship size and mass, ages it toward end-of-life, and warns you before a roll strands a ship. The whole chain, always current, shared live with your corp.</p>
       </div>
 
       <div class="cta">
-        <p><strong>Map your chain with wormhole data built in - free.</strong></p>
-        <a class="btn" href="/">Open Nexum</a>
+        <p data-i18n="ctaP"><strong>Map your chain with wormhole data built in - free.</strong></p>
+        <a class="btn" href="/" data-i18n="ctaBtn">Open Nexum</a>
       </div>
 
       <div class="related">
-        <h2>Related guides</h2>
+        <h2 data-i18n="relatedH">Related guides</h2>
         <ul>
-          <li><a href="/guides/classes/">EVE wormhole classes and statics explained</a></li>
-          <li><a href="/guides/rolling/">How to roll a wormhole (mass guide + calculator)</a></li>
-          <li><a href="/guides/scanning/">How to scan signatures in EVE Online</a></li>
-          <li><a href="/guides/mapping/">How to map a wormhole chain in EVE Online</a></li>
+          <li><a href="/guides/classes/" data-i18n="rel_classes">EVE wormhole classes and statics explained</a></li>
+          <li><a href="/guides/rolling/" data-i18n="rel_rolling">How to roll a wormhole (mass guide + calculator)</a></li>
+          <li><a href="/guides/scanning/" data-i18n="rel_scanning">How to scan signatures in EVE Online</a></li>
+          <li><a href="/guides/mapping/" data-i18n="rel_mapping">How to map a wormhole chain in EVE Online</a></li>
         </ul>
       </div>
 
       <footer>
-        <p>EVE Online and the EVE logo are the registered trademarks of CCP hf. All rights reserved worldwide. Nexum is a third-party tool and is not affiliated with or endorsed by CCP hf. See the full <a href="/license/">license &amp; EVE IP notice</a>.</p>
+        <p data-i18n="footP">EVE Online and the EVE logo are the registered trademarks of CCP hf. All rights reserved worldwide. Nexum is a third-party tool and is not affiliated with or endorsed by CCP hf. See the full <a href="/license/">license &amp; EVE IP notice</a>.</p>
       </footer>
     </div>
+
+    <!--
+      Runtime language swap. This page is static HTML (not part of the React SPA),
+      so it can't use react-i18next. We read the same `nexum.lang` localStorage key
+      the app's language detector uses (falling back to the browser language) and
+      replace the text of every [data-i18n] element with its translated equivalent.
+      SEO crawlers index the English source only (see the canonical / og:locale).
+    -->
+    <script>
+      (function () {
+        try {
+          var lang = localStorage.getItem('nexum.lang');
+          if (!lang) lang = (navigator.language || '').slice(0, 2);
+
+          // Languages with a translation dictionary below. English is the
+          // untranslated source, so it has no entry.
+          var SUPPORTED = { de:1, fr:1, es:1, pt:1, zh:1, ko:1, ja:1, ru:1 };
+
+          // Tell the stylized picker (/vendor/lang-picker.js) which language this
+          // page actually rendered, so it highlights the matching entry. The
+          // picker itself handles the switch (persist to nexum.lang + reload).
+          window.__nexumResolvedLang = SUPPORTED[lang] ? lang : 'en';
+
+          if (!SUPPORTED[lang]) return;
+
+          // SECURITY: innerHTML is used because these strings intentionally
+          // contain markup (<a>, <strong>, <kbd>). This is ONLY safe because every
+          // value in DICTS is a hard-coded, trusted literal in this file. Do NOT
+          // ever populate DICTS from user input, an API, or URL params.
+          var DICTS = {};
+          DICTS.de = {
+            __title: 'EVE Online Wurmloch-Typen & Statics-Liste — Ziele, Masse & Lebensdauer',
+            nav: '&larr; Nexum Startseite',
+            h1: 'EVE Online Wurmloch-Typen &amp; Statics-Liste',
+            sub: 'Jeder Wurmloch-Code — wohin er führt, ob er statisch ist, sowie Masse und Lebensdauer.',
+            updated: 'Eine Nexum-Wurmloch-Referenz',
+            lede: 'Jedes Wurmloch in EVE hat einen <strong>Typ-Code</strong> — wie <em>N062</em>, <em>C247</em> oder <em>O477</em> — und dieser Code verrät dir immer dieselben drei Dinge: wohin es führt, das größte Schiff, das hindurchpasst, und wie viel Masse es aufnehmen kann, bevor es kollabiert. Diese Seite ist die vollständige Nachschlagetabelle, plus eine kurze Einführung zu Statics, damit die Spalten Sinn ergeben.',
+            h2_statics: 'Statics vs. wandernde Verbindungen',
+            p_statics: 'Ein <strong>Static</strong> ist eine Verbindung, die ein System <em>immer</em> zu einer festen Zielklasse regeneriert. Wenn der Static eines Systems stirbt — kollabiert oder abgelaufen —, entsteht anderswo ein neuer desselben Typs. Ein C3 mit einem Highsec-Static hat also stets eine Route nach Highsec; das konkrete Highsec-System wechselt, die Garantie bleibt. Deshalb wählen Corps ihr Zuhause nach dem Static: ein Highsec-Static erleichtert die Logistik, ein C5-Static bedeutet ständigen Capital-Content. Eine <strong>wandernde</strong> Verbindung ist dagegen zufällig und temporär — ein Loch, das von irgendwoher zufällig in dein System aufgegangen ist. Ein <strong>K162</strong> ist immer die Ausgangsseite eines anderswo geöffneten Lochs; springe hindurch und lies die benannte Signatur auf der Gegenseite, um zu erkennen, was es wirklich ist. Was die Klassen selbst bedeuten, erfährst du unter <a href="/guides/classes/">Wurmloch-Klassen erklärt</a>.',
+            h2_read: 'So liest du die Tabelle',
+            li_type: '<strong>Typ</strong> — der Code des Wurmlochs, angezeigt auf der benannten Seite des Lochs.',
+            li_respawn: '<strong>Respawn</strong> — ob das Loch als <em>Static</em> (garantiert, regenerierend), als <em>wandernde</em> Verbindung oder als <em>umgekehrte</em> (K162) Seite erscheint.',
+            li_spawns: '<strong>Erscheint in</strong> — der Raum, in dem die benannte Seite zu finden ist.',
+            li_leads: '<strong>Führt nach</strong> — die Raumklasse am anderen Ende.',
+            li_maxship: '<strong>Max. Schiff</strong> — der größte Rumpf, der das Loch springen kann (Massenlimit pro Sprung).',
+            li_totalmass: '<strong>Gesamtmasse</strong> — das Massenbudget, bevor das Loch kollabiert (was du beim Rollen aufbrauchst).',
+            li_lifetime: '<strong>Lebensdauer</strong> — wie lange das Loch lebt, bevor es von allein abläuft.',
+            h2_ref: 'Wurmloch-Typ-Referenz',
+            p_ref: 'Jeder Wurmloch-Typ in New Eden, nach Code sortiert. Die Werte entsprechen den Live-Daten, die Nexum nutzt, um Wurmlöcher automatisch zu markieren und altern zu lassen.',
+            th_type: 'Typ',
+            th_respawn: 'Respawn',
+            th_spawns: 'Erscheint in',
+            th_leads: 'Führt nach',
+            th_maxship: 'Max. Schiff',
+            th_totalmass: 'Gesamtmasse',
+            th_lifetime: 'Lebensdauer',
+            cardH: 'Merk dir das nicht — lass die Karte das übernehmen',
+            cardP: 'Nexum erkennt Wurmloch-Codes, während du sie scannst und einfügst: Es markiert Ziel, Schiffsgröße und Masse jedes Lochs, lässt es zum End-of-Life altern und warnt dich, bevor ein Roll ein Schiff strandet. Die ganze Kette, immer aktuell, live mit deiner Corp geteilt.',
+            ctaP: '<strong>Kartiere deine Kette mit eingebauten Wurmloch-Daten — kostenlos.</strong>',
+            ctaBtn: 'Nexum öffnen',
+            relatedH: 'Verwandte Anleitungen',
+            rel_classes: 'EVE-Wurmloch-Klassen und Statics erklärt',
+            rel_rolling: 'Wie man ein Wurmloch rollt (Massen-Guide + Rechner)',
+            rel_scanning: 'Wie man Signaturen in EVE Online scannt',
+            rel_mapping: 'Wie man eine Wurmlochkette in EVE Online kartiert',
+            footP: 'EVE Online und das EVE-Logo sind eingetragene Marken von CCP hf. Alle Rechte weltweit vorbehalten. Nexum ist ein Drittanbieter-Tool und steht in keiner Verbindung zu CCP hf und wird nicht von CCP hf unterstützt. Siehe den vollständigen <a href="/license/">Lizenz- &amp; EVE-IP-Hinweis</a>.',
+          };
+          DICTS.fr = {
+            __title: 'Types de trous de ver & liste des statics EVE Online — Destinations, masse & durée de vie',
+            nav: '&larr; Accueil Nexum',
+            h1: 'Types de trous de ver &amp; liste des statics EVE Online',
+            sub: 'Chaque code de trou de ver — où il mène, s\'il est statique, ainsi que sa masse et sa durée de vie.',
+            updated: 'Une référence de trous de ver Nexum',
+            lede: 'Chaque trou de ver dans EVE possède un <strong>code de type</strong> — comme <em>N062</em>, <em>C247</em> ou <em>O477</em> — et ce code vous indique toujours les trois mêmes choses : où il mène, le plus gros vaisseau qui passe, et combien de masse il peut encaisser avant de s\'effondrer. Cette page est le tableau de référence complet, plus une courte introduction aux statics pour que les colonnes aient du sens.',
+            h2_statics: 'Statics vs connexions errantes',
+            p_statics: 'Un <strong>static</strong> est une connexion qu\'un système régénère <em>toujours</em> vers une classe de destination fixe. Quand le static d\'un système meurt — effondré ou expiré —, un nouveau du même type apparaît ailleurs. Ainsi, un C3 avec un static highsec a toujours une route vers le highsec ; le système highsec précis change, la garantie non. C\'est pourquoi les corps choisissent leur foyer selon leur static : un static highsec facilite la logistique, un static C5 signifie du contenu capital permanent. Une connexion <strong>errante</strong>, en revanche, est aléatoire et temporaire — un trou qui s\'est ouvert par hasard dans votre système depuis ailleurs. Un <strong>K162</strong> est toujours le côté de sortie d\'un trou ouvert ailleurs ; sautez à travers et lisez la signature nommée de l\'autre côté pour identifier ce que c\'est vraiment. Pour comprendre ce que signifient les classes elles-mêmes, voyez <a href="/guides/classes/">les classes de trous de ver expliquées</a>.',
+            h2_read: 'Comment lire le tableau',
+            li_type: '<strong>Type</strong> — le code du trou de ver, affiché sur le côté nommé du trou.',
+            li_respawn: '<strong>Réapparition</strong> — si le trou apparaît comme un <em>static</em> (garanti, se régénérant), une connexion <em>errante</em>, ou le côté <em>inverse</em> (K162).',
+            li_spawns: '<strong>Apparaît dans</strong> — l\'espace où se trouve le côté nommé.',
+            li_leads: '<strong>Mène à</strong> — la classe d\'espace à l\'autre bout.',
+            li_maxship: '<strong>Vaisseau max</strong> — la plus grosse coque qui peut sauter le trou (limite de masse par saut).',
+            li_totalmass: '<strong>Masse totale</strong> — le budget de masse avant que le trou ne s\'effondre (ce que vous épuisez en rollant).',
+            li_lifetime: '<strong>Durée de vie</strong> — combien de temps le trou vit avant d\'expirer de lui-même.',
+            h2_ref: 'Référence des types de trous de ver',
+            p_ref: 'Chaque type de trou de ver dans New Eden, trié par code. Les valeurs correspondent aux données en direct que Nexum utilise pour taguer et faire vieillir les trous de ver automatiquement.',
+            th_type: 'Type',
+            th_respawn: 'Réapparition',
+            th_spawns: 'Apparaît dans',
+            th_leads: 'Mène à',
+            th_maxship: 'Vaisseau max',
+            th_totalmass: 'Masse totale',
+            th_lifetime: 'Durée de vie',
+            cardH: 'Ne mémorisez pas ceci — laissez la carte le faire',
+            cardP: 'Nexum reconnaît les codes de trous de ver au fur et à mesure que vous les scannez et les collez : il tague la destination, la taille de vaisseau et la masse de chaque trou, le fait vieillir vers sa fin de vie et vous avertit avant qu\'un roll ne bloque un vaisseau. Toute la chaîne, toujours à jour, partagée en direct avec votre corp.',
+            ctaP: '<strong>Cartographiez votre chaîne avec les données de trous de ver intégrées — gratuit.</strong>',
+            ctaBtn: 'Ouvrir Nexum',
+            relatedH: 'Guides connexes',
+            rel_classes: 'Les classes de trous de ver et statics d\'EVE expliquées',
+            rel_rolling: 'Comment roller un trou de ver (guide de masse + calculateur)',
+            rel_scanning: 'Comment scanner les signatures dans EVE Online',
+            rel_mapping: 'Comment cartographier une chaîne de trous de ver dans EVE Online',
+            footP: 'EVE Online et le logo EVE sont des marques déposées de CCP hf. Tous droits réservés dans le monde entier. Nexum est un outil tiers et n\'est ni affilié à CCP hf ni approuvé par lui. Consultez l\'<a href="/license/">avis complet de licence &amp; de PI EVE</a>.',
+          };
+          DICTS.es = {
+            __title: 'Tipos de agujeros de gusano y lista de statics de EVE Online — Destinos, masa y duración',
+            nav: '&larr; Inicio de Nexum',
+            h1: 'Tipos de agujeros de gusano y lista de statics de EVE Online',
+            sub: 'Cada código de agujero de gusano: adónde lleva, si es estático, y su masa y duración.',
+            updated: 'Una referencia de agujeros de gusano de Nexum',
+            lede: 'Cada agujero de gusano en EVE tiene un <strong>código de tipo</strong> — como <em>N062</em>, <em>C247</em> u <em>O477</em> — y ese código siempre te dice las mismas tres cosas: adónde lleva, la nave más grande que cabe y cuánta masa puede soportar antes de colapsar. Esta página es la tabla de consulta completa, más una breve introducción a los statics para que las columnas tengan sentido.',
+            h2_statics: 'Statics frente a conexiones errantes',
+            p_statics: 'Un <strong>static</strong> es una conexión que un sistema regenera <em>siempre</em> hacia una clase de destino fija. Cuando el static de un sistema muere — colapsado o expirado —, aparece otro del mismo tipo en otra parte. Así, un C3 con un static highsec siempre tiene ruta a highsec; el sistema highsec concreto cambia, la garantía no. Por eso los corps eligen su hogar según su static: un static highsec facilita la logística, un static C5 significa contenido capital constante. Una conexión <strong>errante</strong>, en cambio, es aleatoria y temporal — un agujero que se abrió por casualidad hacia tu sistema desde otro lugar. Un <strong>K162</strong> es siempre el lado de salida de un agujero abierto en otra parte; salta a través y lee la firma nombrada del otro lado para identificar lo que realmente es. Para saber qué significan las clases en sí, consulta <a href="/guides/classes/">las clases de agujeros de gusano explicadas</a>.',
+            h2_read: 'Cómo leer la tabla',
+            li_type: '<strong>Tipo</strong> — el código del agujero de gusano, mostrado en el lado nombrado del agujero.',
+            li_respawn: '<strong>Reaparición</strong> — si el agujero aparece como un <em>static</em> (garantizado, que se regenera), una conexión <em>errante</em>, o el lado <em>inverso</em> (K162).',
+            li_spawns: '<strong>Aparece en</strong> — el espacio donde se encuentra el lado nombrado.',
+            li_leads: '<strong>Lleva a</strong> — la clase de espacio en el otro extremo.',
+            li_maxship: '<strong>Nave máx.</strong> — el casco más grande que puede saltar el agujero (límite de masa por salto).',
+            li_totalmass: '<strong>Masa total</strong> — el presupuesto de masa antes de que el agujero colapse (lo que agotas al rollear).',
+            li_lifetime: '<strong>Duración</strong> — cuánto tiempo vive el agujero antes de expirar por sí solo.',
+            h2_ref: 'Referencia de tipos de agujeros de gusano',
+            p_ref: 'Cada tipo de agujero de gusano en New Eden, ordenado por código. Los valores coinciden con los datos en vivo que Nexum usa para etiquetar y envejecer agujeros de gusano automáticamente.',
+            th_type: 'Tipo',
+            th_respawn: 'Reaparición',
+            th_spawns: 'Aparece en',
+            th_leads: 'Lleva a',
+            th_maxship: 'Nave máx.',
+            th_totalmass: 'Masa total',
+            th_lifetime: 'Duración',
+            cardH: 'No te lo memorices — deja que el mapa lo haga',
+            cardP: 'Nexum reconoce los códigos de agujeros de gusano a medida que los escaneas y pegas: etiqueta el destino, el tamaño de nave y la masa de cada agujero, lo envejece hacia el fin de su vida y te avisa antes de que un roll deje varada una nave. Toda la cadena, siempre actualizada, compartida en vivo con tu corp.',
+            ctaP: '<strong>Mapea tu cadena con datos de agujeros de gusano integrados — gratis.</strong>',
+            ctaBtn: 'Abrir Nexum',
+            relatedH: 'Guías relacionadas',
+            rel_classes: 'Clases de agujeros de gusano y statics de EVE explicadas',
+            rel_rolling: 'Cómo rollear un agujero de gusano (guía de masa + calculadora)',
+            rel_scanning: 'Cómo escanear firmas en EVE Online',
+            rel_mapping: 'Cómo mapear una cadena de agujeros de gusano en EVE Online',
+            footP: 'EVE Online y el logotipo de EVE son marcas registradas de CCP hf. Todos los derechos reservados en todo el mundo. Nexum es una herramienta de terceros y no está afiliada ni respaldada por CCP hf. Consulta el <a href="/license/">aviso completo de licencia &amp; PI de EVE</a>.',
+          };
+          DICTS.pt = {
+            __title: 'Tipos de buracos de minhoca e lista de statics do EVE Online — Destinos, massa e duração',
+            nav: '&larr; Início do Nexum',
+            h1: 'Tipos de buracos de minhoca e lista de statics do EVE Online',
+            sub: 'Cada código de buraco de minhoca: para onde leva, se é estático, e a sua massa e duração.',
+            updated: 'Uma referência de buracos de minhoca do Nexum',
+            lede: 'Cada buraco de minhoca no EVE tem um <strong>código de tipo</strong> — como <em>N062</em>, <em>C247</em> ou <em>O477</em> — e esse código diz-te sempre as mesmas três coisas: para onde leva, a maior nave que passa, e quanta massa aguenta antes de colapsar. Esta página é a tabela de consulta completa, mais uma breve introdução aos statics para que as colunas façam sentido.',
+            h2_statics: 'Statics vs ligações errantes',
+            p_statics: 'Um <strong>static</strong> é uma ligação que um sistema regenera <em>sempre</em> para uma classe de destino fixa. Quando o static de um sistema morre — colapsado ou expirado —, surge outro do mesmo tipo noutro sítio. Assim, um C3 com um static highsec tem sempre uma rota para highsec; o sistema highsec específico muda, a garantia não. É por isso que as corps escolhem a sua casa pelo static: um static highsec facilita a logística, um static C5 significa conteúdo capital constante. Uma ligação <strong>errante</strong>, por outro lado, é aleatória e temporária — um buraco que por acaso se abriu para o teu sistema a partir de outro lugar. Um <strong>K162</strong> é sempre o lado de saída de um buraco aberto noutro sítio; salta através e lê a assinatura nomeada do outro lado para identificar o que realmente é. Para saber o que as próprias classes significam, vê <a href="/guides/classes/">as classes de buracos de minhoca explicadas</a>.',
+            h2_read: 'Como ler a tabela',
+            li_type: '<strong>Tipo</strong> — o código do buraco de minhoca, mostrado no lado nomeado do buraco.',
+            li_respawn: '<strong>Reaparição</strong> — se o buraco aparece como um <em>static</em> (garantido, que se regenera), uma ligação <em>errante</em>, ou o lado <em>inverso</em> (K162).',
+            li_spawns: '<strong>Aparece em</strong> — o espaço onde se encontra o lado nomeado.',
+            li_leads: '<strong>Leva a</strong> — a classe de espaço na outra ponta.',
+            li_maxship: '<strong>Nave máx.</strong> — o maior casco que pode saltar o buraco (limite de massa por salto).',
+            li_totalmass: '<strong>Massa total</strong> — o orçamento de massa antes de o buraco colapsar (o que esgotas ao rollar).',
+            li_lifetime: '<strong>Duração</strong> — quanto tempo o buraco vive antes de expirar por si só.',
+            h2_ref: 'Referência de tipos de buracos de minhoca',
+            p_ref: 'Cada tipo de buraco de minhoca em New Eden, ordenado por código. Os valores correspondem aos dados em tempo real que o Nexum usa para etiquetar e envelhecer buracos de minhoca automaticamente.',
+            th_type: 'Tipo',
+            th_respawn: 'Reaparição',
+            th_spawns: 'Aparece em',
+            th_leads: 'Leva a',
+            th_maxship: 'Nave máx.',
+            th_totalmass: 'Massa total',
+            th_lifetime: 'Duração',
+            cardH: 'Não decores isto — deixa o mapa fazê-lo',
+            cardP: 'O Nexum reconhece os códigos de buracos de minhoca à medida que os escaneias e colas: etiqueta o destino, o tamanho de nave e a massa de cada buraco, envelhece-o rumo ao fim de vida e avisa-te antes de um roll deixar uma nave presa. Toda a cadeia, sempre atualizada, partilhada em direto com a tua corp.',
+            ctaP: '<strong>Mapeia a tua cadeia com dados de buracos de minhoca integrados — grátis.</strong>',
+            ctaBtn: 'Abrir o Nexum',
+            relatedH: 'Guias relacionados',
+            rel_classes: 'Classes de buracos de minhoca e statics do EVE explicadas',
+            rel_rolling: 'Como rollar um buraco de minhoca (guia de massa + calculadora)',
+            rel_scanning: 'Como escanear assinaturas no EVE Online',
+            rel_mapping: 'Como mapear uma cadeia de buracos de minhoca no EVE Online',
+            footP: 'EVE Online e o logótipo do EVE são marcas registadas da CCP hf. Todos os direitos reservados em todo o mundo. O Nexum é uma ferramenta de terceiros e não está afiliado nem é apoiado pela CCP hf. Consulta o <a href="/license/">aviso completo de licença &amp; PI do EVE</a>.',
+          };
+          DICTS.zh = {
+            __title: 'EVE Online 虫洞类型与固定虫洞（static）列表 — 目的地、质量与寿命',
+            nav: '&larr; Nexum 主页',
+            h1: 'EVE Online 虫洞类型与固定虫洞（static）列表',
+            sub: '每个虫洞代码——它通向何处、是否为固定虫洞，以及它的质量和寿命。',
+            updated: 'Nexum 虫洞参考资料',
+            lede: 'EVE 中的每个虫洞都有一个<strong>类型代码</strong>——例如 <em>N062</em>、<em>C247</em> 或 <em>O477</em>——这个代码始终告诉你相同的三件事：它通向何处、能通过的最大舰船，以及它在坍缩前能承受多少质量。本页是完整的查询表，另附一段关于固定虫洞（static）的简短说明，帮助你理解各列的含义。',
+            h2_statics: '固定虫洞（static）与游荡连接的区别',
+            p_statics: '<strong>固定虫洞（static）</strong>是系统<em>始终</em>会向固定目标等级再生的连接。当一个系统的 static 消失（坍缩或过期）时，会在别处生成一个相同类型的新 static。因此，拥有 highsec static 的 C3 始终有通往 highsec 的路线；具体的 highsec 星系会变，但这份保证不变。这就是军团按 static 选择据点的原因：highsec static 让后勤变得轻松，C5 static 意味着源源不断的旗舰级内容。相比之下，<strong>游荡（wandering）</strong>连接是随机且临时的——只是碰巧从别处开到你星系的一个虫洞。<strong>K162</strong> 始终是从别处开启的虫洞的出口一侧；跳过去并读取另一侧带名称的信号，才能确定它究竟是什么。关于各等级本身的含义，请参阅<a href="/guides/classes/">虫洞等级详解</a>。',
+            h2_read: '如何阅读此表',
+            li_type: '<strong>类型</strong>——虫洞的代码，显示在虫洞带名称的一侧。',
+            li_respawn: '<strong>再生</strong>——该洞是以<em>固定虫洞（static）</em>（有保证、可再生）、<em>游荡（wandering）</em>连接，还是以<em>反向</em>（K162）一侧出现。',
+            li_spawns: '<strong>出现于</strong>——带名称的一侧所在的空间。',
+            li_leads: '<strong>通向</strong>——另一端空间的等级。',
+            li_maxship: '<strong>最大舰船</strong>——能跳过此洞的最大舰体（单次跳跃质量上限）。',
+            li_totalmass: '<strong>总质量</strong>——虫洞坍缩前的质量预算（滚洞时你所消耗的量）。',
+            li_lifetime: '<strong>寿命</strong>——虫洞在自行过期前存在多久。',
+            h2_ref: '虫洞类型参考',
+            p_ref: 'New Eden 中的每一种虫洞类型，按代码排序。数值与 Nexum 用于自动标记虫洞并计算其老化的实时数据一致。',
+            th_type: '类型',
+            th_respawn: '再生',
+            th_spawns: '出现于',
+            th_leads: '通向',
+            th_maxship: '最大舰船',
+            th_totalmass: '总质量',
+            th_lifetime: '寿命',
+            cardH: '不必死记硬背——交给地图来处理',
+            cardP: '当你扫描并粘贴虫洞代码时，Nexum 会自动识别它们：标记每个洞的目的地、舰船尺寸和质量，随时间推进其老化直至寿命结束，并在滚洞可能困住舰船前向你发出警告。整条链路始终保持最新，并与你的军团实时共享。',
+            ctaP: '<strong>用内置的虫洞数据绘制你的链路——免费。</strong>',
+            ctaBtn: '打开 Nexum',
+            relatedH: '相关指南',
+            rel_classes: 'EVE 虫洞等级与固定虫洞（static）详解',
+            rel_rolling: '如何滚洞（质量指南 + 计算器）',
+            rel_scanning: '如何在 EVE Online 中扫描信号',
+            rel_mapping: '如何在 EVE Online 中绘制虫洞链路',
+            footP: 'EVE Online 和 EVE 标志是 CCP hf. 的注册商标。在全球范围内保留所有权利。Nexum 是第三方工具，与 CCP hf. 无关联，也未获其认可。请查看完整的 <a href="/license/">许可 &amp; EVE 知识产权声明</a>。',
+          };
+          DICTS.ko = {
+            __title: 'EVE Online 웜홀 유형 & static 목록 — 목적지, 질량 & 수명',
+            nav: '&larr; Nexum 홈',
+            h1: 'EVE Online 웜홀 유형 &amp; static 목록',
+            sub: '모든 웜홀 코드 — 어디로 이어지는지, static인지, 그리고 질량과 수명.',
+            updated: 'Nexum 웜홀 참고 자료',
+            lede: 'EVE의 모든 웜홀에는 <strong>유형 코드</strong>가 있습니다 — <em>N062</em>, <em>C247</em>, <em>O477</em> 등 — 그리고 이 코드는 항상 같은 세 가지를 알려줍니다: 어디로 이어지는지, 통과할 수 있는 가장 큰 함선, 그리고 붕괴하기 전까지 감당할 수 있는 질량. 이 페이지는 전체 조회 표이며, 각 열을 이해할 수 있도록 static에 대한 짧은 안내도 함께 제공합니다.',
+            h2_statics: 'static과 떠도는 연결의 차이',
+            p_statics: '<strong>static</strong>은 시스템이 고정된 목적지 등급으로 <em>항상</em> 재생성하는 연결입니다. 시스템의 static이 소멸하면(붕괴하거나 만료되면) 같은 유형의 새 static이 다른 곳에 생성됩니다. 따라서 highsec static을 가진 C3는 언제나 highsec로 가는 경로가 있습니다. 구체적인 highsec 성계는 바뀌지만 보장은 바뀌지 않습니다. 그래서 군단은 static을 기준으로 본거지를 정합니다. highsec static은 물류를 수월하게 하고, C5 static은 끊임없는 캐피탈 콘텐츠를 의미합니다. 반면 <strong>wandering(떠도는)</strong> 연결은 무작위이고 일시적입니다 — 어딘가에서 우연히 당신의 시스템으로 열린 웜홀일 뿐입니다. <strong>K162</strong>는 언제나 다른 곳에서 열린 웜홀의 출구 쪽입니다. 통과해서 반대편의 이름 있는 시그니처를 읽어야 그것이 실제로 무엇인지 알 수 있습니다. 등급 자체의 의미는 <a href="/guides/classes/">웜홀 등급 설명</a>을 참조하세요.',
+            h2_read: '표를 읽는 방법',
+            li_type: '<strong>유형</strong> — 웜홀의 코드로, 웜홀의 이름이 있는 쪽에 표시됩니다.',
+            li_respawn: '<strong>재생성</strong> — 웜홀이 <em>static</em>(보장되며 재생성됨), <em>wandering</em>(떠도는) 연결, 또는 <em>역방향</em>(K162) 쪽으로 나타나는지 여부.',
+            li_spawns: '<strong>생성 위치</strong> — 이름이 있는 쪽이 나타나는 공간.',
+            li_leads: '<strong>연결 대상</strong> — 반대편 끝에 있는 공간의 등급.',
+            li_maxship: '<strong>최대 함선</strong> — 웜홀을 통과할 수 있는 가장 큰 선체(점프당 질량 제한).',
+            li_totalmass: '<strong>총 질량</strong> — 웜홀이 붕괴하기 전까지의 질량 예산(롤링할 때 소모하는 값).',
+            li_lifetime: '<strong>수명</strong> — 웜홀이 스스로 만료되기 전까지 얼마나 지속되는지.',
+            h2_ref: '웜홀 유형 참고표',
+            p_ref: 'New Eden의 모든 웜홀 유형을 코드순으로 정렬했습니다. 값은 Nexum이 웜홀을 자동으로 태그하고 노화시키는 데 사용하는 실시간 데이터와 일치합니다.',
+            th_type: '유형',
+            th_respawn: '재생성',
+            th_spawns: '생성 위치',
+            th_leads: '연결 대상',
+            th_maxship: '최대 함선',
+            th_totalmass: '총 질량',
+            th_lifetime: '수명',
+            cardH: '외우지 마세요 — 지도가 대신 해줍니다',
+            cardP: 'Nexum은 당신이 스캔하고 붙여 넣을 때 웜홀 코드를 인식합니다. 각 웜홀의 목적지, 함선 크기, 질량을 태그하고, 수명 종료를 향해 노화시키며, 롤링이 함선을 고립시키기 전에 경고합니다. 전체 체인은 항상 최신 상태로 유지되며 군단과 실시간으로 공유됩니다.',
+            ctaP: '<strong>웜홀 데이터가 내장된 상태로 체인을 그려보세요 — 무료입니다.</strong>',
+            ctaBtn: 'Nexum 열기',
+            relatedH: '관련 가이드',
+            rel_classes: 'EVE 웜홀 등급과 static 설명',
+            rel_rolling: '웜홀 롤링하는 법 (질량 가이드 + 계산기)',
+            rel_scanning: 'EVE Online에서 시그니처를 스캔하는 방법',
+            rel_mapping: 'EVE Online에서 웜홀 체인을 지도로 그리는 방법',
+            footP: 'EVE Online과 EVE 로고는 CCP hf.의 등록 상표입니다. 전 세계 모든 권리가 보유됩니다. Nexum은 서드파티 도구이며 CCP hf.와 제휴하거나 그로부터 보증받지 않았습니다. 전체 <a href="/license/">라이선스 &amp; EVE IP 고지</a>를 참조하세요.',
+          };
+          DICTS.ja = {
+            __title: 'EVE Online ワームホールタイプ & static 一覧 — 行き先・質量・寿命',
+            nav: '&larr; Nexum ホーム',
+            h1: 'EVE Online ワームホールタイプ &amp; static 一覧',
+            sub: 'すべてのワームホールコード — どこへ通じるか、static かどうか、質量と寿命。',
+            updated: 'Nexum のワームホール・リファレンス',
+            lede: 'EVE のすべてのワームホールには <strong>タイプコード</strong> があり — <em>N062</em>、<em>C247</em>、<em>O477</em> など — このコードは常に同じ 3 つのことを教えてくれます。どこへ通じるか、通り抜けられる最大の艦船、そして崩壊するまでに受け止められる質量です。このページは完全な参照表に加え、各列の意味がわかるよう static についての短い解説を添えています。',
+            h2_statics: 'static と wandering（漂流）接続の違い',
+            p_statics: '<strong>static</strong> とは、システムが固定された行き先クラスへ<em>常に</em>再生成する接続です。あるシステムの static が消滅すると（崩壊または期限切れ）、同じタイプの新しいものが別の場所に発生します。つまり highsec static を持つ C3 には常に highsec への経路があります。具体的な highsec のシステムは変わりますが、その保証は変わりません。だからこそコープは static を基準に拠点を選びます。highsec static は物流を楽にし、C5 static は絶え間ないキャピタルコンテンツを意味します。対照的に <strong>wandering（漂流）</strong> 接続はランダムかつ一時的で — たまたま別の場所からあなたのシステムへ開いた穴にすぎません。<strong>K162</strong> は常に別の場所で開かれた穴の出口側です。通り抜けて反対側の名前付きシグネチャを読むことで、それが本当は何かを識別できます。クラスそのものの意味については <a href="/guides/classes/">ワームホールクラスの解説</a> をご覧ください。',
+            h2_read: '表の読み方',
+            li_type: '<strong>タイプ</strong> — ワームホールのコード。穴の名前が付いている側に表示されます。',
+            li_respawn: '<strong>リスポーン</strong> — 穴が <em>static</em>（保証あり・再生成される）、<em>wandering</em>（漂流）接続、あるいは <em>逆側</em>（K162）として現れるか。',
+            li_spawns: '<strong>出現場所</strong> — 名前が付いている側が見つかる宙域。',
+            li_leads: '<strong>行き先</strong> — 反対側の宙域クラス。',
+            li_maxship: '<strong>最大艦船</strong> — 穴を跳べる最大の艦体（1 ジャンプあたりの質量上限）。',
+            li_totalmass: '<strong>総質量</strong> — 穴が崩壊するまでの質量バジェット（ローリング時に消費する分）。',
+            li_lifetime: '<strong>寿命</strong> — 穴が自然に消滅するまでどれくらい存続するか。',
+            h2_ref: 'ワームホールタイプ・リファレンス',
+            p_ref: 'New Eden のすべてのワームホールタイプをコード順に並べています。値は、Nexum がワームホールを自動的にタグ付けし経過管理するために使用するライブデータと一致します。',
+            th_type: 'タイプ',
+            th_respawn: 'リスポーン',
+            th_spawns: '出現場所',
+            th_leads: '行き先',
+            th_maxship: '最大艦船',
+            th_totalmass: '総質量',
+            th_lifetime: '寿命',
+            cardH: 'これを暗記しないで — 地図に任せましょう',
+            cardP: 'Nexum は、あなたがスキャンして貼り付けるそばからワームホールコードを認識します。各穴の行き先・艦船サイズ・質量をタグ付けし、寿命終了へ向けて経過管理し、ローリングで艦船が取り残される前に警告します。チェーン全体が常に最新で、コープとリアルタイムに共有されます。',
+            ctaP: '<strong>ワームホールデータを内蔵した状態でチェーンをマッピング — 無料。</strong>',
+            ctaBtn: 'Nexum を開く',
+            relatedH: '関連ガイド',
+            rel_classes: 'EVE のワームホールクラスと static の解説',
+            rel_rolling: 'ワームホールのローリング方法（質量ガイド + 計算機）',
+            rel_scanning: 'EVE Online でシグネチャをスキャンする方法',
+            rel_mapping: 'EVE Online でワームホールチェーンをマッピングする方法',
+            footP: 'EVE Online と EVE ロゴは CCP hf. の登録商標です。世界中ですべての権利が留保されています。Nexum はサードパーティ製ツールであり、CCP hf. と提携しておらず、その承認も受けていません。完全な <a href="/license/">ライセンス &amp; EVE IP 表示</a> をご覧ください。',
+          };
+          DICTS.ru = {
+            __title: 'Типы червоточин и список статиков EVE Online — Назначения, масса и время жизни',
+            nav: '&larr; Главная Nexum',
+            h1: 'Типы червоточин и список статиков EVE Online',
+            sub: 'Каждый код червоточины — куда ведёт, статик ли он, а также масса и время жизни.',
+            updated: 'Справочник по червоточинам от Nexum',
+            lede: 'У каждой червоточины в EVE есть <strong>код типа</strong> — например <em>N062</em>, <em>C247</em> или <em>O477</em> — и этот код всегда сообщает одни и те же три вещи: куда он ведёт, самый крупный корабль, который пройдёт, и сколько массы он выдержит до схлопывания. Эта страница — полная справочная таблица плюс короткое введение в статики, чтобы столбцы стали понятны.',
+            h2_statics: 'Статики против блуждающих соединений',
+            p_statics: '<strong>Статик</strong> — это соединение, которое система <em>всегда</em> восстанавливает к фиксированному классу назначения. Когда статик системы гибнет — схлопывается или истекает — где-то в другом месте появляется новый того же типа. Так, C3 с хайсек-статиком всегда имеет маршрут в хайсек; конкретная хайсек-система меняется, а гарантия — нет. Вот почему корпорации выбирают дом по статику: хайсек-статик упрощает логистику, C5-статик означает постоянный капитальный контент. <strong>Блуждающее</strong> же соединение случайно и временно — дыра, которая случайно открылась в вашу систему откуда-то ещё. <strong>K162</strong> — это всегда выходная сторона дыры, открытой в другом месте; прыгните через неё и прочтите именованную сигнатуру на той стороне, чтобы понять, что это на самом деле. О том, что означают сами классы, см. <a href="/guides/classes/">объяснение классов червоточин</a>.',
+            h2_read: 'Как читать таблицу',
+            li_type: '<strong>Тип</strong> — код червоточины, показанный на именованной стороне дыры.',
+            li_respawn: '<strong>Возрождение</strong> — появляется ли дыра как <em>статик</em> (гарантированный, восстанавливающийся), <em>блуждающее</em> соединение или <em>обратная</em> (K162) сторона.',
+            li_spawns: '<strong>Появляется в</strong> — пространство, где находится именованная сторона.',
+            li_leads: '<strong>Ведёт в</strong> — класс пространства на другом конце.',
+            li_maxship: '<strong>Макс. корабль</strong> — самый крупный корпус, способный прыгнуть через дыру (лимит массы за прыжок).',
+            li_totalmass: '<strong>Общая масса</strong> — запас массы до схлопывания дыры (то, что вы расходуете при роллинге).',
+            li_lifetime: '<strong>Время жизни</strong> — сколько дыра живёт, прежде чем истечёт сама.',
+            h2_ref: 'Справочник типов червоточин',
+            p_ref: 'Каждый тип червоточины в New Eden, отсортированный по коду. Значения соответствуют «живым» данным, которые Nexum использует для автоматической маркировки и старения червоточин.',
+            th_type: 'Тип',
+            th_respawn: 'Возрождение',
+            th_spawns: 'Появляется в',
+            th_leads: 'Ведёт в',
+            th_maxship: 'Макс. корабль',
+            th_totalmass: 'Общая масса',
+            th_lifetime: 'Время жизни',
+            cardH: 'Не заучивайте это — доверьте карте',
+            cardP: 'Nexum распознаёт коды червоточин по мере того, как вы их сканируете и вставляете: помечает назначение, размер корабля и массу каждой дыры, отслеживает её старение к концу жизни и предупреждает, прежде чем роллинг оставит корабль в ловушке. Вся цепочка всегда актуальна и в реальном времени доступна вашей корпорации.',
+            ctaP: '<strong>Стройте карту цепочки со встроенными данными о червоточинах — бесплатно.</strong>',
+            ctaBtn: 'Открыть Nexum',
+            relatedH: 'Похожие руководства',
+            rel_classes: 'Классы червоточин и статики EVE — объяснение',
+            rel_rolling: 'Как роллить червоточину (гайд по массе + калькулятор)',
+            rel_scanning: 'Как сканировать сигнатуры в EVE Online',
+            rel_mapping: 'Как составить карту цепочки червоточин в EVE Online',
+            footP: 'EVE Online и логотип EVE являются зарегистрированными торговыми марками CCP hf. Все права защищены по всему миру. Nexum — это сторонний инструмент, не связанный с CCP hf. и не одобренный ею. См. полное <a href="/license/">уведомление о лицензии &amp; ИС EVE</a>.',
+          };
+
+          var DICT = DICTS[lang];
+          document.documentElement.lang = lang;
+          if (DICT.__title) document.title = DICT.__title;
+          var nodes = document.querySelectorAll('[data-i18n]');
+          for (var i = 0; i < nodes.length; i++) {
+            var key = nodes[i].getAttribute('data-i18n');
+            if (DICT[key] != null) nodes[i].innerHTML = DICT[key];
+          }
+        } catch (e) {
+          // Leave the English source intact on any error.
+        }
+      })();
+    </script>
   </body>
 </html>

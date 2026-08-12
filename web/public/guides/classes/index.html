@@ -14,6 +14,8 @@
     <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="robots" content="index, follow" />
 
+    <script src="/vendor/lang-picker.js" defer></script>
+
     <meta property="og:type" content="article" />
     <meta property="og:url" content="https://eve-nexum.com/guides/classes/" />
     <meta property="og:title" content="EVE Online Wormhole Classes &amp; Statics Explained" />
@@ -56,7 +58,7 @@
       body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--text); line-height: 1.6; }
       .wrap { max-width: 820px; margin: 0 auto; padding: 32px 20px 64px; }
       a { color: var(--accent); }
-      .topnav { font-size: 14px; }
+      .topnav { font-size: 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
       .topnav a { color: var(--muted); text-decoration: none; }
       header.hero { margin: 24px 0 8px; }
       .logo { font-size: 30px; color: var(--accent); line-height: 1; }
@@ -83,80 +85,549 @@
   </head>
   <body>
     <div class="wrap">
-      <nav class="topnav"><a href="/">&larr; Nexum home</a></nav>
+      <nav class="topnav">
+        <a href="/" data-i18n="nav">&larr; Nexum home</a>
+        <!-- Stylized language dropdown with SVG flags, built by
+             /vendor/lang-picker.js (a native <select> can't render the flags,
+             and flag emoji show as bare country codes on Windows). -->
+        <div class="lang-picker" data-lang-picker></div>
+      </nav>
 
       <header class="hero">
         <div class="logo" aria-hidden="true">&#9672;</div>
-        <h1>EVE Online Wormhole Classes &amp; Statics Explained</h1>
-        <p class="sub">C1-C6, frigate holes, Thera and shattered systems, effects, and how statics work.</p>
+        <h1 data-i18n="h1">EVE Online Wormhole Classes &amp; Statics Explained</h1>
+        <p class="sub" data-i18n="sub">C1-C6, frigate holes, Thera and shattered systems, effects, and how statics work.</p>
       </header>
-      <p class="updated">A Nexum wormhole guide</p>
+      <p class="updated" data-i18n="updated">A Nexum wormhole guide</p>
 
-      <p class="lede">Wormhole space - "J-space" - is the ~2,600 unknown systems that only connect through wormholes, never gates. Each system has a <strong>class</strong> that sets its difficulty and rewards, sometimes a <strong>system effect</strong> that buffs or nerfs your ships, and a <strong>static</strong> that decides where it reliably connects. Understanding these three things is most of what you need to live in, or roam through, wormholes.</p>
+      <p class="lede" data-i18n="lede">Wormhole space - "J-space" - is the ~2,600 unknown systems that only connect through wormholes, never gates. Each system has a <strong>class</strong> that sets its difficulty and rewards, sometimes a <strong>system effect</strong> that buffs or nerfs your ships, and a <strong>static</strong> that decides where it reliably connects. Understanding these three things is most of what you need to live in, or roam through, wormholes.</p>
 
-      <h2>The wormhole classes (C1-C6)</h2>
-      <p>The main classes scale in Sleeper NPC difficulty, loot, and - importantly for movement - wormhole mass allowances.</p>
+      <h2 data-i18n="h2cls">The wormhole classes (C1-C6)</h2>
+      <p data-i18n="pcls">The main classes scale in Sleeper NPC difficulty, loot, and - importantly for movement - wormhole mass allowances.</p>
       <div class="table-scroll">
         <table>
-          <thead><tr><th>Class</th><th>Feel</th><th>Notes</th></tr></thead>
+          <thead><tr><th data-i18n="thcls">Class</th><th data-i18n="thfeel">Feel</th><th data-i18n="thnotes">Notes</th></tr></thead>
           <tbody>
-            <tr><th>C1</th><td>Starter</td><td>Low ship-mass holes; cruiser-friendly. Often has a highsec static.</td></tr>
-            <tr><th>C2</th><td>Casual</td><td>Two statics is common; a frequent choice for small corps.</td></tr>
-            <tr><th>C3</th><td>Solid ISK</td><td>Popular home class; strong ratting for the risk, usually a k-space static.</td></tr>
-            <tr><th>C4</th><td>Defensive</td><td>Dual wormhole statics and no direct k-space static - hard to find, hard to invade.</td></tr>
-            <tr><th>C5</th><td>Capital</td><td>High mass holes; capital ratting and escalations. Serious PvP.</td></tr>
-            <tr><th>C6</th><td>Endgame</td><td>Maximum mass and reward; large-scale capital brawls.</td></tr>
+            <tr><th>C1</th><td data-i18n="c1feel">Starter</td><td data-i18n="c1notes">Low ship-mass holes; cruiser-friendly. Often has a highsec static.</td></tr>
+            <tr><th>C2</th><td data-i18n="c2feel">Casual</td><td data-i18n="c2notes">Two statics is common; a frequent choice for small corps.</td></tr>
+            <tr><th>C3</th><td data-i18n="c3feel">Solid ISK</td><td data-i18n="c3notes">Popular home class; strong ratting for the risk, usually a k-space static.</td></tr>
+            <tr><th>C4</th><td data-i18n="c4feel">Defensive</td><td data-i18n="c4notes">Dual wormhole statics and no direct k-space static - hard to find, hard to invade.</td></tr>
+            <tr><th>C5</th><td data-i18n="c5feel">Capital</td><td data-i18n="c5notes">High mass holes; capital ratting and escalations. Serious PvP.</td></tr>
+            <tr><th>C6</th><td data-i18n="c6feel">Endgame</td><td data-i18n="c6notes">Maximum mass and reward; large-scale capital brawls.</td></tr>
           </tbody>
         </table>
       </div>
 
-      <h3>Special classes</h3>
+      <h3 data-i18n="h3spec">Special classes</h3>
       <ul>
-        <li><strong>C13</strong> - frigate-sized "shattered" holes; only frigates, destroyers and a few small hulls fit through the tiny mass limits.</li>
-        <li><strong>Shattered systems</strong> - no planets you can anchor on, often multiple statics and a static effect; used for daytripping and hunting.</li>
-        <li><strong>Thera</strong> - a unique, large shattered system with many static exits all over New Eden. It is a hub for explorers and roamers and is heavily patrolled.</li>
+        <li data-i18n="lic13"><strong>C13</strong> - frigate-sized "shattered" holes; only frigates, destroyers and a few small hulls fit through the tiny mass limits.</li>
+        <li data-i18n="lishat"><strong>Shattered systems</strong> - no planets you can anchor on, often multiple statics and a static effect; used for daytripping and hunting.</li>
+        <li data-i18n="lithera"><strong>Thera</strong> - a unique, large shattered system with many static exits all over New Eden. It is a hub for explorers and roamers and is heavily patrolled.</li>
       </ul>
 
-      <h2>System effects</h2>
-      <p>Many wormhole systems have a persistent <strong>effect</strong> that changes your ship stats - and the strength scales with class (a C6 effect is far stronger than a C1). The main ones:</p>
+      <h2 data-i18n="h2eff">System effects</h2>
+      <p data-i18n="peff">Many wormhole systems have a persistent <strong>effect</strong> that changes your ship stats - and the strength scales with class (a C6 effect is far stronger than a C1). The main ones:</p>
       <ul>
-        <li><strong>Pulsar</strong> - boosts shields, reduces armour resists, cuts capacitor recharge.</li>
-        <li><strong>Magnetar</strong> - boosts damage and drone stats but hurts tracking, missile explosion and targeting.</li>
-        <li><strong>Black Hole</strong> - boosts speed, range and missile velocity; hurts tracking and inertia.</li>
-        <li><strong>Red Giant</strong> - boosts overheat, smartbombs, bombs and precision.</li>
-        <li><strong>Cataclysmic Variable</strong> - boosts remote reps and capacitor capacity; reduces recharge and local rep.</li>
-        <li><strong>Wolf-Rayet</strong> - big boost to armour resists and small weapon damage; reduces shield HP - a small-ship brawler's effect.</li>
+        <li data-i18n="lipulsar"><strong>Pulsar</strong> - boosts shields, reduces armour resists, cuts capacitor recharge.</li>
+        <li data-i18n="limag"><strong>Magnetar</strong> - boosts damage and drone stats but hurts tracking, missile explosion and targeting.</li>
+        <li data-i18n="libh"><strong>Black Hole</strong> - boosts speed, range and missile velocity; hurts tracking and inertia.</li>
+        <li data-i18n="lirg"><strong>Red Giant</strong> - boosts overheat, smartbombs, bombs and precision.</li>
+        <li data-i18n="licv"><strong>Cataclysmic Variable</strong> - boosts remote reps and capacitor capacity; reduces recharge and local rep.</li>
+        <li data-i18n="liwr"><strong>Wolf-Rayet</strong> - big boost to armour resists and small weapon damage; reduces shield HP - a small-ship brawler's effect.</li>
       </ul>
-      <p>Always check a system's effect before you commit a fight in it - a Magnetar can double a brawler's damage, and a Pulsar can flip a fit's tank on its head.</p>
+      <p data-i18n="peffwarn">Always check a system's effect before you commit a fight in it - a Magnetar can double a brawler's damage, and a Pulsar can flip a fit's tank on its head.</p>
 
-      <h2>Statics vs wandering connections</h2>
-      <p>A <strong>static</strong> is a connection a system <em>always</em> regenerates to a fixed destination class. When a system's static dies (collapsed or expired), a new one of the same type spawns somewhere else. So a C3 with a highsec static will always have a route to highsec - the specific highsec system changes, the guarantee does not. Statics are why corps pick a home class: a reliable highsec static makes logistics easy; a C5 static makes for constant capital content.</p>
-      <p><strong>Wandering</strong> connections are the random, temporary holes that open into your system from elsewhere. They are unpredictable and are the usual way roamers and invaders arrive - which is why you scan your home every day.</p>
+      <h2 data-i18n="h2stat">Statics vs wandering connections</h2>
+      <p data-i18n="pstat1">A <strong>static</strong> is a connection a system <em>always</em> regenerates to a fixed destination class. When a system's static dies (collapsed or expired), a new one of the same type spawns somewhere else. So a C3 with a highsec static will always have a route to highsec - the specific highsec system changes, the guarantee does not. Statics are why corps pick a home class: a reliable highsec static makes logistics easy; a C5 static makes for constant capital content.</p>
+      <p data-i18n="pstat2"><strong>Wandering</strong> connections are the random, temporary holes that open into your system from elsewhere. They are unpredictable and are the usual way roamers and invaders arrive - which is why you scan your home every day.</p>
 
       <div class="card">
-        <h3>K162 - the exit side</h3>
-        <p>Every wormhole has two ends. The side that was opened <em>from the other system</em> shows up as a <strong>K162</strong> and carries no mass/type info of its own. To know the real hole type, mass and lifetime, you read the named signature (e.g. "N062", "C247") on the opposite side. A mapper resolves this for you automatically from your scan results.</p>
+        <h3 data-i18n="cardh">K162 - the exit side</h3>
+        <p data-i18n="cardb">Every wormhole has two ends. The side that was opened <em>from the other system</em> shows up as a <strong>K162</strong> and carries no mass/type info of its own. To know the real hole type, mass and lifetime, you read the named signature (e.g. "N062", "C247") on the opposite side. A mapper resolves this for you automatically from your scan results.</p>
       </div>
 
       <div class="cta">
-        <p><strong>Map every class as you scan it.</strong> Nexum labels wormhole types, statics, effects and mass automatically - free.</p>
-        <a class="btn" href="/">Open Nexum</a>
+        <p data-i18n="ctap"><strong>Map every class as you scan it.</strong> Nexum labels wormhole types, statics, effects and mass automatically - free.</p>
+        <a class="btn" href="/" data-i18n="ctabtn">Open Nexum</a>
       </div>
 
       <div class="related">
-        <h2>Related guides</h2>
+        <h2 data-i18n="relh">Related guides</h2>
         <ul>
-          <li><a href="/guides/rolling/">How to roll a wormhole (mass guide + calculator)</a></li>
-          <li><a href="/guides/mapping/">How to map a wormhole chain</a></li>
-          <li><a href="/guides/statics/">EVE wormhole types &amp; statics list</a></li>
-          <li><a href="/guides/scanning/">How to scan signatures in EVE Online</a></li>
-          <li><a href="/compare/">Nexum vs Pathfinder vs Tripwire vs Wanderer</a></li>
+          <li><a href="/guides/rolling/" data-i18n="relroll">How to roll a wormhole (mass guide + calculator)</a></li>
+          <li><a href="/guides/mapping/" data-i18n="relmap">How to map a wormhole chain</a></li>
+          <li><a href="/guides/statics/" data-i18n="relstat">EVE wormhole types &amp; statics list</a></li>
+          <li><a href="/guides/scanning/" data-i18n="relscan">How to scan signatures in EVE Online</a></li>
+          <li><a href="/compare/" data-i18n="relcmp">Nexum vs Pathfinder vs Tripwire vs Wanderer</a></li>
         </ul>
       </div>
 
       <footer>
-        <p>EVE Online and the EVE logo are the registered trademarks of CCP hf. All rights reserved worldwide. Nexum is a third-party tool and is not affiliated with or endorsed by CCP hf. See the full <a href="/license/">license &amp; EVE IP notice</a>.</p>
+        <p data-i18n="footP">EVE Online and the EVE logo are the registered trademarks of CCP hf. All rights reserved worldwide. Nexum is a third-party tool and is not affiliated with or endorsed by CCP hf. See the full <a href="/license/">license &amp; EVE IP notice</a>.</p>
       </footer>
     </div>
+
+    <!--
+      Runtime language swap. This page is static HTML (not part of the React SPA),
+      so it can't use react-i18next. We read the same `nexum.lang` localStorage key
+      the app's language detector uses (falling back to the browser language) and
+      replace the text of every [data-i18n] element with its translated equivalent.
+      SEO crawlers index the English source only (see the canonical / og:locale).
+    -->
+    <script>
+      (function () {
+        try {
+          var lang = localStorage.getItem('nexum.lang');
+          if (!lang) lang = (navigator.language || '').slice(0, 2);
+
+          // Languages with a translation dictionary below. English is the
+          // untranslated source, so it has no entry.
+          var SUPPORTED = { de:1, fr:1, es:1, pt:1, zh:1, ko:1, ja:1, ru:1 };
+
+          // Tell the stylized picker (/vendor/lang-picker.js) which language this
+          // page actually rendered, so it highlights the matching entry. The
+          // picker itself handles the switch (persist to nexum.lang + reload).
+          window.__nexumResolvedLang = SUPPORTED[lang] ? lang : 'en';
+
+          if (!SUPPORTED[lang]) return;
+
+          // SECURITY: innerHTML is used because these strings intentionally
+          // contain markup (<a>, <strong>, <kbd>). This is ONLY safe because every
+          // value in DICTS is a hard-coded, trusted literal in this file. Do NOT
+          // ever populate DICTS from user input, an API, or URL params.
+          var DICTS = {};
+          DICTS.de = {
+            __title: 'EVE Online Wurmloch-Klassen &amp; Statics erklärt',
+            nav: '&larr; Nexum Startseite',
+            h1: 'EVE Online Wurmloch-Klassen &amp; Statics erklärt',
+            sub: 'C1-C6, Frigatten-Löcher, Thera und shattered Systeme, Effekte und wie Statics funktionieren.',
+            updated: 'Ein Nexum Wurmloch-Leitfaden',
+            lede: 'Der Wurmloch-Raum - "J-space" - besteht aus den ~2.600 unbekannten Systemen, die sich nur über Wurmlöcher verbinden, nie über Tore. Jedes System hat eine <strong>Klasse</strong>, die seine Schwierigkeit und Belohnungen festlegt, manchmal einen <strong>System-Effekt</strong>, der deine Schiffe stärkt oder schwächt, und einen <strong>Static</strong>, der bestimmt, wohin es zuverlässig verbindet. Diese drei Dinge zu verstehen ist der Großteil dessen, was du brauchst, um in Wurmlöchern zu leben oder durch sie zu streifen.',
+            h2cls: 'Die Wurmloch-Klassen (C1-C6)',
+            pcls: 'Die Hauptklassen skalieren in der Schwierigkeit der Sleeper-NPCs, der Beute und - wichtig für die Bewegung - den Massengrenzen der Wurmlöcher.',
+            thcls: 'Klasse',
+            thfeel: 'Gefühl',
+            thnotes: 'Notizen',
+            c1feel: 'Einsteiger',
+            c1notes: 'Löcher mit geringer Schiffsmasse; kreuzerfreundlich. Hat oft einen Highsec-Static.',
+            c2feel: 'Locker',
+            c2notes: 'Zwei Statics sind üblich; eine häufige Wahl für kleine Corps.',
+            c3feel: 'Solide ISK',
+            c3notes: 'Beliebte Heimatklasse; starkes Ratting für das Risiko, meist ein k-space-Static.',
+            c4feel: 'Defensiv',
+            c4notes: 'Zwei Wurmloch-Statics und kein direkter k-space-Static - schwer zu finden, schwer zu überfallen.',
+            c5feel: 'Capital',
+            c5notes: 'Löcher mit hoher Masse; Capital-Ratting und Eskalationen. Ernsthaftes PvP.',
+            c6feel: 'Endgame',
+            c6notes: 'Maximale Masse und Belohnung; groß angelegte Capital-Schlachten.',
+            h3spec: 'Spezialklassen',
+            lic13: '<strong>C13</strong> - frigattengroße "shattered" Löcher; nur Frigatten, Zerstörer und ein paar kleine Rümpfe passen durch die winzigen Massengrenzen.',
+            lishat: '<strong>Shattered Systeme</strong> - keine Planeten, an denen du ankern kannst, oft mehrere Statics und ein statischer Effekt; genutzt für Tagesausflüge und die Jagd.',
+            lithera: '<strong>Thera</strong> - ein einzigartiges, großes shattered System mit vielen Static-Ausgängen über ganz New Eden. Es ist ein Knotenpunkt für Entdecker und Roamer und wird stark patrouilliert.',
+            h2eff: 'System-Effekte',
+            peff: 'Viele Wurmloch-Systeme haben einen dauerhaften <strong>Effekt</strong>, der deine Schiffswerte verändert - und die Stärke skaliert mit der Klasse (ein C6-Effekt ist weit stärker als ein C1). Die wichtigsten:',
+            lipulsar: '<strong>Pulsar</strong> - stärkt Schilde, reduziert Panzerungsresistenzen, senkt die Kondensator-Aufladung.',
+            limag: '<strong>Magnetar</strong> - stärkt Schaden und Drohnenwerte, schadet aber Tracking, Raketenexplosion und Zielerfassung.',
+            libh: '<strong>Black Hole</strong> - stärkt Geschwindigkeit, Reichweite und Raketengeschwindigkeit; schadet Tracking und Trägheit.',
+            lirg: '<strong>Red Giant</strong> - stärkt Überhitzung, Smartbombs, Bomben und Präzision.',
+            licv: '<strong>Cataclysmic Variable</strong> - stärkt Fernreparaturen und Kondensatorkapazität; reduziert Aufladung und lokale Reparatur.',
+            liwr: '<strong>Wolf-Rayet</strong> - großer Schub für Panzerungsresistenzen und Schaden kleiner Waffen; reduziert Schild-HP - ein Effekt für Nahkämpfer mit kleinen Schiffen.',
+            peffwarn: 'Prüfe immer den Effekt eines Systems, bevor du dich dort auf einen Kampf einlässt - ein Magnetar kann den Schaden eines Nahkämpfers verdoppeln, und ein Pulsar kann die Tankung eines Fits völlig auf den Kopf stellen.',
+            h2stat: 'Statics vs. wandernde Verbindungen',
+            pstat1: 'Ein <strong>Static</strong> ist eine Verbindung, die ein System <em>immer</em> zu einer festen Zielklasse regeneriert. Wenn der Static eines Systems stirbt (kollabiert oder abgelaufen), entsteht anderswo ein neuer desselben Typs. Ein C3 mit einem Highsec-Static hat also immer eine Route nach Highsec - das konkrete Highsec-System ändert sich, die Garantie nicht. Statics sind der Grund, warum Corps eine Heimatklasse wählen: ein zuverlässiger Highsec-Static macht die Logistik einfach; ein C5-Static sorgt für ständigen Capital-Content.',
+            pstat2: '<strong>Wandernde</strong> Verbindungen sind die zufälligen, temporären Löcher, die sich von anderswo in dein System öffnen. Sie sind unvorhersehbar und der übliche Weg, auf dem Roamer und Invasoren ankommen - weshalb du dein Zuhause jeden Tag scannst.',
+            cardh: 'K162 - die Ausgangsseite',
+            cardb: 'Jedes Wurmloch hat zwei Enden. Die Seite, die <em>vom anderen System aus</em> geöffnet wurde, erscheint als <strong>K162</strong> und trägt selbst keine Massen-/Typinformationen. Um den echten Lochtyp, die Masse und Lebensdauer zu kennen, liest du die benannte Signatur (z. B. "N062", "C247") auf der gegenüberliegenden Seite. Ein Mapper löst dies automatisch aus deinen Scan-Ergebnissen für dich auf.',
+            ctap: '<strong>Kartiere jede Klasse, während du sie scannst.</strong> Nexum beschriftet Wurmloch-Typen, Statics, Effekte und Masse automatisch - kostenlos.',
+            ctabtn: 'Nexum öffnen',
+            relh: 'Verwandte Anleitungen',
+            relroll: 'Wie man ein Wurmloch rollt (Massen-Leitfaden + Rechner)',
+            relmap: 'Wie man eine Wurmloch-Kette kartiert',
+            relstat: 'EVE Wurmloch-Typen &amp; Static-Liste',
+            relscan: 'Wie man Signaturen in EVE Online scannt',
+            relcmp: 'Nexum vs. Pathfinder vs. Tripwire vs. Wanderer',
+            footP: 'EVE Online und das EVE-Logo sind eingetragene Marken von CCP hf. Alle Rechte weltweit vorbehalten. Nexum ist ein Drittanbieter-Tool und steht in keiner Verbindung zu CCP hf und wird nicht von CCP hf unterstützt. Siehe den vollständigen <a href="/license/">Lizenz- &amp; EVE-IP-Hinweis</a>.',
+          };
+          DICTS.fr = {
+            __title: 'Classes de trous de ver &amp; statiques d\'EVE Online expliquées',
+            nav: '&larr; Accueil Nexum',
+            h1: 'Classes de trous de ver &amp; statiques d\'EVE Online expliquées',
+            sub: 'C1-C6, trous à frégates, Thera et systèmes shattered, effets, et comment fonctionnent les statiques.',
+            updated: 'Un guide des trous de ver de Nexum',
+            lede: 'L\'espace des trous de ver - le "J-space" - ce sont les ~2 600 systèmes inconnus qui ne se connectent que par des trous de ver, jamais par des portes. Chaque système a une <strong>classe</strong> qui définit sa difficulté et ses récompenses, parfois un <strong>effet de système</strong> qui renforce ou affaiblit vos vaisseaux, et une <strong>statique</strong> qui décide où il se connecte de façon fiable. Comprendre ces trois choses représente l\'essentiel de ce qu\'il faut pour vivre dans les trous de ver, ou les parcourir.',
+            h2cls: 'Les classes de trous de ver (C1-C6)',
+            pcls: 'Les classes principales évoluent en difficulté des PNJ Sleeper, en butin et - point important pour les déplacements - en tolérance de masse des trous de ver.',
+            thcls: 'Classe',
+            thfeel: 'Ambiance',
+            thnotes: 'Notes',
+            c1feel: 'Débutant',
+            c1notes: 'Trous à faible masse de vaisseau ; adaptés aux croiseurs. Ont souvent une statique highsec.',
+            c2feel: 'Décontracté',
+            c2notes: 'Deux statiques sont courantes ; un choix fréquent pour les petites corps.',
+            c3feel: 'Bon ISK',
+            c3notes: 'Classe de résidence populaire ; bon ratting pour le risque, généralement une statique k-space.',
+            c4feel: 'Défensif',
+            c4notes: 'Deux statiques de trou de ver et aucune statique k-space directe - dur à trouver, dur à envahir.',
+            c5feel: 'Capital',
+            c5notes: 'Trous à haute masse ; ratting et escalades en capitaux. PvP sérieux.',
+            c6feel: 'Endgame',
+            c6notes: 'Masse et récompense maximales ; combats de capitaux à grande échelle.',
+            h3spec: 'Classes spéciales',
+            lic13: '<strong>C13</strong> - trous "shattered" de taille frégate ; seuls les frégates, destroyers et quelques petites coques passent par les minuscules limites de masse.',
+            lishat: '<strong>Systèmes shattered</strong> - aucune planète où s\'ancrer, souvent plusieurs statiques et un effet statique ; utilisés pour les sorties à la journée et la chasse.',
+            lithera: '<strong>Thera</strong> - un système shattered unique et vaste, avec de nombreuses sorties statiques partout dans New Eden. C\'est un carrefour pour les explorateurs et les roamers, et il est très patrouillé.',
+            h2eff: 'Effets de système',
+            peff: 'De nombreux systèmes de trous de ver ont un <strong>effet</strong> persistant qui modifie les stats de votre vaisseau - et sa puissance évolue avec la classe (un effet C6 est bien plus fort qu\'un C1). Les principaux :',
+            lipulsar: '<strong>Pulsar</strong> - renforce les boucliers, réduit les résistances de blindage, diminue la recharge de condensateur.',
+            limag: '<strong>Magnetar</strong> - renforce les dégâts et les stats des drones, mais pénalise le tracking, l\'explosion des missiles et le ciblage.',
+            libh: '<strong>Black Hole</strong> - renforce la vitesse, la portée et la vélocité des missiles ; pénalise le tracking et l\'inertie.',
+            lirg: '<strong>Red Giant</strong> - renforce la surchauffe, les smartbombs, les bombes et la précision.',
+            licv: '<strong>Cataclysmic Variable</strong> - renforce les réparations à distance et la capacité de condensateur ; réduit la recharge et la réparation locale.',
+            liwr: '<strong>Wolf-Rayet</strong> - gros bonus aux résistances de blindage et aux dégâts des petites armes ; réduit les PV de bouclier - un effet de brawler en petit vaisseau.',
+            peffwarn: 'Vérifiez toujours l\'effet d\'un système avant d\'y engager un combat - un Magnetar peut doubler les dégâts d\'un brawler, et un Pulsar peut renverser complètement le tank d\'un fit.',
+            h2stat: 'Statiques vs connexions errantes',
+            pstat1: 'Une <strong>statique</strong> est une connexion qu\'un système régénère <em>toujours</em> vers une classe de destination fixe. Quand la statique d\'un système meurt (effondrée ou expirée), une nouvelle du même type apparaît ailleurs. Ainsi, un C3 avec une statique highsec aura toujours une route vers le highsec - le système highsec précis change, la garantie non. Les statiques expliquent pourquoi les corps choisissent une classe de résidence : une statique highsec fiable facilite la logistique ; une statique C5 assure un contenu capital constant.',
+            pstat2: 'Les connexions <strong>errantes</strong> sont les trous aléatoires et temporaires qui s\'ouvrent dans votre système depuis ailleurs. Elles sont imprévisibles et c\'est la façon habituelle dont arrivent roamers et envahisseurs - raison pour laquelle vous scannez votre résidence chaque jour.',
+            cardh: 'K162 - le côté sortie',
+            cardb: 'Chaque trou de ver a deux extrémités. Le côté ouvert <em>depuis l\'autre système</em> apparaît comme un <strong>K162</strong> et ne porte aucune info de masse/type propre. Pour connaître le vrai type de trou, sa masse et sa durée de vie, vous lisez la signature nommée (p. ex. "N062", "C247") du côté opposé. Un mapper résout cela automatiquement pour vous à partir de vos résultats de scan.',
+            ctap: '<strong>Cartographiez chaque classe au fur et à mesure que vous la scannez.</strong> Nexum étiquette automatiquement les types de trous de ver, les statiques, les effets et la masse - gratuitement.',
+            ctabtn: 'Ouvrir Nexum',
+            relh: 'Guides connexes',
+            relroll: 'Comment roll un trou de ver (guide de masse + calculateur)',
+            relmap: 'Comment cartographier une chaîne de trous de ver',
+            relstat: 'Types de trous de ver &amp; liste des statiques d\'EVE',
+            relscan: 'Comment scanner des signatures dans EVE Online',
+            relcmp: 'Nexum vs Pathfinder vs Tripwire vs Wanderer',
+            footP: 'EVE Online et le logo EVE sont des marques déposées de CCP hf. Tous droits réservés dans le monde entier. Nexum est un outil tiers et n\'est ni affilié à CCP hf ni approuvé par lui. Consultez l\'<a href="/license/">avis complet de licence &amp; de PI EVE</a>.',
+          };
+          DICTS.es = {
+            __title: 'Clases de agujeros de gusano &amp; estáticos de EVE Online explicados',
+            nav: '&larr; Inicio de Nexum',
+            h1: 'Clases de agujeros de gusano &amp; estáticos de EVE Online explicados',
+            sub: 'C1-C6, agujeros de fragatas, Thera y sistemas shattered, efectos, y cómo funcionan los estáticos.',
+            updated: 'Una guía de agujeros de gusano de Nexum',
+            lede: 'El espacio de agujeros de gusano - el "J-space" - son los ~2.600 sistemas desconocidos que solo se conectan mediante agujeros de gusano, nunca por puertas. Cada sistema tiene una <strong>clase</strong> que fija su dificultad y recompensas, a veces un <strong>efecto de sistema</strong> que potencia o debilita tus naves, y un <strong>estático</strong> que decide dónde se conecta de forma fiable. Entender estas tres cosas es la mayor parte de lo que necesitas para vivir en agujeros de gusano, o recorrerlos.',
+            h2cls: 'Las clases de agujeros de gusano (C1-C6)',
+            pcls: 'Las clases principales escalan en dificultad de los NPC Sleeper, botín y - importante para el movimiento - los límites de masa de los agujeros de gusano.',
+            thcls: 'Clase',
+            thfeel: 'Sensación',
+            thnotes: 'Notas',
+            c1feel: 'Iniciación',
+            c1notes: 'Agujeros de baja masa de nave; aptos para cruceros. A menudo tienen un estático a highsec.',
+            c2feel: 'Casual',
+            c2notes: 'Dos estáticos es lo común; una elección frecuente para corps pequeñas.',
+            c3feel: 'Buen ISK',
+            c3notes: 'Clase de hogar popular; buen ratting para el riesgo, normalmente un estático a k-space.',
+            c4feel: 'Defensivo',
+            c4notes: 'Dos estáticos de agujero de gusano y ningún estático directo a k-space - difícil de encontrar, difícil de invadir.',
+            c5feel: 'Capital',
+            c5notes: 'Agujeros de alta masa; ratting con capitales y escaladas. PvP serio.',
+            c6feel: 'Endgame',
+            c6notes: 'Masa y recompensa máximas; peleas de capitales a gran escala.',
+            h3spec: 'Clases especiales',
+            lic13: '<strong>C13</strong> - agujeros "shattered" del tamaño de fragata; solo fragatas, destructores y unos pocos cascos pequeños pasan por los diminutos límites de masa.',
+            lishat: '<strong>Sistemas shattered</strong> - sin planetas donde anclar, a menudo con varios estáticos y un efecto estático; usados para excursiones de un día y para cazar.',
+            lithera: '<strong>Thera</strong> - un sistema shattered único y enorme con muchas salidas estáticas por todo New Eden. Es un centro para exploradores y roamers y está muy patrullado.',
+            h2eff: 'Efectos de sistema',
+            peff: 'Muchos sistemas de agujeros de gusano tienen un <strong>efecto</strong> persistente que cambia las estadísticas de tu nave - y la potencia escala con la clase (un efecto C6 es mucho más fuerte que un C1). Los principales:',
+            lipulsar: '<strong>Pulsar</strong> - potencia escudos, reduce resistencias de blindaje, recorta la recarga de condensador.',
+            limag: '<strong>Magnetar</strong> - potencia el daño y las estadísticas de drones, pero perjudica el tracking, la explosión de misiles y el fijado.',
+            libh: '<strong>Black Hole</strong> - potencia velocidad, alcance y velocidad de misiles; perjudica el tracking y la inercia.',
+            lirg: '<strong>Red Giant</strong> - potencia el sobrecalentamiento, las smartbombs, las bombas y la precisión.',
+            licv: '<strong>Cataclysmic Variable</strong> - potencia las reparaciones remotas y la capacidad de condensador; reduce la recarga y la reparación local.',
+            liwr: '<strong>Wolf-Rayet</strong> - gran aumento de las resistencias de blindaje y del daño de armas pequeñas; reduce los PV de escudo - un efecto de brawler en naves pequeñas.',
+            peffwarn: 'Comprueba siempre el efecto de un sistema antes de entrar en combate en él - un Magnetar puede duplicar el daño de un brawler, y un Pulsar puede dar la vuelta por completo al tanque de un fit.',
+            h2stat: 'Estáticos vs conexiones errantes',
+            pstat1: 'Un <strong>estático</strong> es una conexión que un sistema regenera <em>siempre</em> hacia una clase de destino fija. Cuando el estático de un sistema muere (colapsado o expirado), aparece otro del mismo tipo en otro lugar. Así, un C3 con un estático a highsec siempre tendrá una ruta a highsec - el sistema highsec concreto cambia, la garantía no. Los estáticos son la razón por la que las corps eligen una clase de hogar: un estático a highsec fiable facilita la logística; un estático C5 asegura contenido capital constante.',
+            pstat2: 'Las conexiones <strong>errantes</strong> son los agujeros aleatorios y temporales que se abren hacia tu sistema desde otro lugar. Son impredecibles y son la forma habitual en que llegan roamers e invasores - por eso escaneas tu hogar cada día.',
+            cardh: 'K162 - el lado de salida',
+            cardb: 'Cada agujero de gusano tiene dos extremos. El lado abierto <em>desde el otro sistema</em> aparece como un <strong>K162</strong> y no lleva información propia de masa/tipo. Para conocer el tipo real del agujero, su masa y su vida útil, lees la signatura con nombre (p. ej. "N062", "C247") del lado opuesto. Un mapper resuelve esto por ti automáticamente a partir de tus resultados de escaneo.',
+            ctap: '<strong>Mapea cada clase mientras la escaneas.</strong> Nexum etiqueta automáticamente los tipos de agujeros de gusano, los estáticos, los efectos y la masa - gratis.',
+            ctabtn: 'Abrir Nexum',
+            relh: 'Guías relacionadas',
+            relroll: 'Cómo roll un agujero de gusano (guía de masa + calculadora)',
+            relmap: 'Cómo mapear una cadena de agujeros de gusano',
+            relstat: 'Tipos de agujeros de gusano &amp; lista de estáticos de EVE',
+            relscan: 'Cómo escanear signaturas en EVE Online',
+            relcmp: 'Nexum vs Pathfinder vs Tripwire vs Wanderer',
+            footP: 'EVE Online y el logotipo de EVE son marcas registradas de CCP hf. Todos los derechos reservados en todo el mundo. Nexum es una herramienta de terceros y no está afiliada ni respaldada por CCP hf. Consulta el <a href="/license/">aviso completo de licencia &amp; PI de EVE</a>.',
+          };
+          DICTS.pt = {
+            __title: 'Classes de buracos de minhoca &amp; estáticos do EVE Online explicados',
+            nav: '&larr; Início do Nexum',
+            h1: 'Classes de buracos de minhoca &amp; estáticos do EVE Online explicados',
+            sub: 'C1-C6, buracos de fragatas, Thera e sistemas shattered, efeitos, e como os estáticos funcionam.',
+            updated: 'Um guia de buracos de minhoca do Nexum',
+            lede: 'O espaço dos buracos de minhoca - o "J-space" - são os ~2.600 sistemas desconhecidos que só se ligam por buracos de minhoca, nunca por portões. Cada sistema tem uma <strong>classe</strong> que define a sua dificuldade e recompensas, por vezes um <strong>efeito de sistema</strong> que reforça ou enfraquece as tuas naves, e um <strong>estático</strong> que decide onde se liga de forma fiável. Compreender estas três coisas é a maior parte do que precisas para viver em buracos de minhoca, ou percorrê-los.',
+            h2cls: 'As classes de buracos de minhoca (C1-C6)',
+            pcls: 'As classes principais escalam na dificuldade dos NPC Sleeper, no saque e - importante para a movimentação - nos limites de massa dos buracos de minhoca.',
+            thcls: 'Classe',
+            thfeel: 'Sensação',
+            thnotes: 'Notas',
+            c1feel: 'Iniciante',
+            c1notes: 'Buracos de baixa massa de nave; adequados a cruzadores. Muitas vezes têm um estático para highsec.',
+            c2feel: 'Casual',
+            c2notes: 'Dois estáticos é comum; uma escolha frequente para corps pequenas.',
+            c3feel: 'Bom ISK',
+            c3notes: 'Classe de casa popular; bom ratting para o risco, normalmente um estático para k-space.',
+            c4feel: 'Defensivo',
+            c4notes: 'Dois estáticos de buraco de minhoca e nenhum estático direto para k-space - difícil de encontrar, difícil de invadir.',
+            c5feel: 'Capital',
+            c5notes: 'Buracos de alta massa; ratting com capitais e escaladas. PvP a sério.',
+            c6feel: 'Endgame',
+            c6notes: 'Massa e recompensa máximas; batalhas de capitais em grande escala.',
+            h3spec: 'Classes especiais',
+            lic13: '<strong>C13</strong> - buracos "shattered" do tamanho de fragata; só fragatas, destruidores e alguns cascos pequenos passam pelos minúsculos limites de massa.',
+            lishat: '<strong>Sistemas shattered</strong> - sem planetas onde ancorar, muitas vezes com vários estáticos e um efeito estático; usados para excursões de um dia e para caçar.',
+            lithera: '<strong>Thera</strong> - um sistema shattered único e enorme, com muitas saídas estáticas por todo o New Eden. É um ponto de encontro para exploradores e roamers e é muito patrulhado.',
+            h2eff: 'Efeitos de sistema',
+            peff: 'Muitos sistemas de buracos de minhoca têm um <strong>efeito</strong> persistente que altera os atributos da tua nave - e a intensidade escala com a classe (um efeito C6 é muito mais forte do que um C1). Os principais:',
+            lipulsar: '<strong>Pulsar</strong> - reforça escudos, reduz resistências de blindagem, corta a recarga de condensador.',
+            limag: '<strong>Magnetar</strong> - reforça o dano e os atributos de drones, mas prejudica o tracking, a explosão de mísseis e a fixação de alvos.',
+            libh: '<strong>Black Hole</strong> - reforça velocidade, alcance e velocidade de mísseis; prejudica o tracking e a inércia.',
+            lirg: '<strong>Red Giant</strong> - reforça o sobreaquecimento, as smartbombs, as bombas e a precisão.',
+            licv: '<strong>Cataclysmic Variable</strong> - reforça as reparações remotas e a capacidade de condensador; reduz a recarga e a reparação local.',
+            liwr: '<strong>Wolf-Rayet</strong> - grande aumento das resistências de blindagem e do dano de armas pequenas; reduz os HP de escudo - um efeito de brawler em naves pequenas.',
+            peffwarn: 'Verifica sempre o efeito de um sistema antes de entrares em combate nele - um Magnetar pode duplicar o dano de um brawler, e um Pulsar pode virar por completo o tank de um fit.',
+            h2stat: 'Estáticos vs ligações errantes',
+            pstat1: 'Um <strong>estático</strong> é uma ligação que um sistema regenera <em>sempre</em> para uma classe de destino fixa. Quando o estático de um sistema morre (colapsado ou expirado), surge outro do mesmo tipo noutro lugar. Assim, um C3 com um estático para highsec terá sempre uma rota para highsec - o sistema highsec concreto muda, a garantia não. Os estáticos são a razão pela qual as corps escolhem uma classe de casa: um estático fiável para highsec facilita a logística; um estático C5 garante conteúdo capital constante.',
+            pstat2: 'As ligações <strong>errantes</strong> são os buracos aleatórios e temporários que se abrem para o teu sistema a partir de outro lugar. São imprevisíveis e são a forma habitual como chegam roamers e invasores - razão pela qual escaneias a tua casa todos os dias.',
+            cardh: 'K162 - o lado de saída',
+            cardb: 'Cada buraco de minhoca tem duas pontas. O lado aberto <em>a partir do outro sistema</em> aparece como um <strong>K162</strong> e não transporta informação própria de massa/tipo. Para saberes o tipo real do buraco, a massa e o tempo de vida, lês a assinatura nomeada (p. ex. "N062", "C247") do lado oposto. Um mapper resolve isto por ti automaticamente a partir dos teus resultados de scan.',
+            ctap: '<strong>Mapeia cada classe à medida que a escaneias.</strong> O Nexum etiqueta automaticamente os tipos de buracos de minhoca, os estáticos, os efeitos e a massa - grátis.',
+            ctabtn: 'Abrir o Nexum',
+            relh: 'Guias relacionados',
+            relroll: 'Como fazer roll a um buraco de minhoca (guia de massa + calculadora)',
+            relmap: 'Como mapear uma cadeia de buracos de minhoca',
+            relstat: 'Tipos de buracos de minhoca &amp; lista de estáticos do EVE',
+            relscan: 'Como escanear assinaturas no EVE Online',
+            relcmp: 'Nexum vs Pathfinder vs Tripwire vs Wanderer',
+            footP: 'EVE Online e o logótipo do EVE são marcas registadas da CCP hf. Todos os direitos reservados em todo o mundo. O Nexum é uma ferramenta de terceiros e não está afiliado nem é apoiado pela CCP hf. Consulta o <a href="/license/">aviso completo de licença &amp; PI do EVE</a>.',
+          };
+          DICTS.zh = {
+            __title: 'EVE Online 虫洞级别与静态口详解',
+            nav: '&larr; Nexum 主页',
+            h1: 'EVE Online 虫洞级别与静态口详解',
+            sub: 'C1-C6、护卫舰洞、Thera 与 shattered 星系、效应，以及静态口的运作方式。',
+            updated: '一份 Nexum 虫洞指南',
+            lede: '虫洞空间 - 即 "J-space" - 是那约 2,600 个只能通过虫洞相连、从不通过星门的未知星系。每个星系都有一个决定其难度与奖励的<strong>级别</strong>，有时还有一个增强或削弱你舰船的<strong>系统效应</strong>，以及一个决定它可靠通向何处的<strong>静态口</strong>。理解这三点，基本上就是在虫洞中定居或穿行所需的大部分知识。',
+            h2cls: '虫洞级别（C1-C6）',
+            pcls: '主要级别在 Sleeper NPC 难度、战利品，以及 - 对移动至关重要的 - 虫洞质量上限方面依次递增。',
+            thcls: '级别',
+            thfeel: '感受',
+            thnotes: '说明',
+            c1feel: '入门',
+            c1notes: '舰船质量上限较低的洞；适合巡洋舰。通常带有一个通向 highsec 的静态口。',
+            c2feel: '休闲',
+            c2notes: '两个静态口很常见；小型军团的常见选择。',
+            c3feel: '稳定 ISK',
+            c3notes: '热门的定居级别；相对风险刷怪收益不错，通常带有一个通向 k-space 的静态口。',
+            c4feel: '防守',
+            c4notes: '两个虫洞静态口且没有直接通向 k-space 的静态口 - 难以找到，难以入侵。',
+            c5feel: '旗舰',
+            c5notes: '高质量上限的洞；旗舰刷怪与升级。硬核 PvP。',
+            c6feel: '终局',
+            c6notes: '最高质量与奖励；大规模旗舰混战。',
+            h3spec: '特殊级别',
+            lic13: '<strong>C13</strong> - 护卫舰大小的 "shattered" 洞；只有护卫舰、驱逐舰和少数小型船体能通过其极小的质量上限。',
+            lishat: '<strong>Shattered 星系</strong> - 没有可供锚定的行星，通常有多个静态口和一个固定效应；用于当日往返和猎杀。',
+            lithera: '<strong>Thera</strong> - 一个独特的大型 shattered 星系，拥有遍布 New Eden 的众多静态出口。它是探险者和游荡者的枢纽，且被严密巡逻。',
+            h2eff: '系统效应',
+            peff: '许多虫洞星系都有一个持续的<strong>效应</strong>，会改变你的舰船属性 - 其强度随级别递增（C6 效应远强于 C1）。主要的有：',
+            lipulsar: '<strong>Pulsar</strong> - 增强护盾，降低装甲抗性，削减电容回充。',
+            limag: '<strong>Magnetar</strong> - 增强伤害和无人机属性，但削弱跟踪、导弹爆炸和锁定。',
+            libh: '<strong>Black Hole</strong> - 增强速度、射程和导弹飞行速度；削弱跟踪和惯性。',
+            lirg: '<strong>Red Giant</strong> - 增强过载、智能炸弹、炸弹和精度。',
+            licv: '<strong>Cataclysmic Variable</strong> - 增强远程维修和电容容量；降低回充和本地维修。',
+            liwr: '<strong>Wolf-Rayet</strong> - 大幅增强装甲抗性和小型武器伤害；降低护盾 HP - 一种适合小型舰船近战的效应。',
+            peffwarn: '在星系内投入战斗之前，务必先查看它的效应 - Magnetar 可以让近战舰船的伤害翻倍，而 Pulsar 可以彻底颠覆一套配装的抗性。',
+            h2stat: '静态口 vs 游荡连接',
+            pstat1: '<strong>静态口</strong>是一个星系<em>始终</em>会再生成、通向固定目标级别的连接。当一个星系的静态口消失（被压塌或到期）时，另一个相同类型的静态口会在别处生成。因此，一个带有 highsec 静态口的 C3 始终会有一条通向 highsec 的路线 - 具体的 highsec 星系会变，但这个保证不会变。静态口正是军团选择定居级别的原因：一个可靠的 highsec 静态口让后勤变得轻松；一个 C5 静态口带来源源不断的旗舰内容。',
+            pstat2: '<strong>游荡</strong>连接是从别处随机、临时开向你星系的洞。它们无法预测，是游荡者和入侵者到来的常见方式 - 这也是你每天都要扫描自家星系的原因。',
+            cardh: 'K162 - 出口一侧',
+            cardb: '每个虫洞都有两端。<em>从另一个星系一侧</em>打开的那端会显示为 <strong>K162</strong>，本身不携带质量/类型信息。要知道洞的真实类型、质量和寿命，你需要读取对面那一侧带名称的信号（如 "N062"、"C247"）。绘图工具会根据你的扫描结果自动为你解析出来。',
+            ctap: '<strong>扫描到哪个级别就绘制哪个级别。</strong>Nexum 会自动标注虫洞类型、静态口、效应和质量 - 免费。',
+            ctabtn: '打开 Nexum',
+            relh: '相关指南',
+            relroll: '如何压塌虫洞（质量指南 + 计算器）',
+            relmap: '如何绘制虫洞链',
+            relstat: 'EVE 虫洞类型 &amp; 静态口列表',
+            relscan: '如何在 EVE Online 中扫描信号',
+            relcmp: 'Nexum vs Pathfinder vs Tripwire vs Wanderer',
+            footP: 'EVE Online 和 EVE 标志是 CCP hf. 的注册商标。在全球范围内保留所有权利。Nexum 是第三方工具，与 CCP hf. 无关联，也未获其认可。请查看完整的 <a href="/license/">许可 &amp; EVE 知识产权声明</a>。',
+          };
+          DICTS.ko = {
+            __title: 'EVE Online 웜홀 클래스 및 스태틱 설명',
+            nav: '&larr; Nexum 홈',
+            h1: 'EVE Online 웜홀 클래스 및 스태틱 설명',
+            sub: 'C1-C6, 프리깃 홀, Thera와 shattered 성계, 효과, 그리고 스태틱의 작동 방식.',
+            updated: 'Nexum 웜홀 가이드',
+            lede: '웜홀 공간 - "J-space" - 은 게이트가 아니라 오직 웜홀로만 연결되는 약 2,600개의 미지의 성계입니다. 각 성계에는 난이도와 보상을 정하는 <strong>클래스</strong>가 있고, 때로는 함선을 강화하거나 약화시키는 <strong>시스템 효과</strong>가 있으며, 어디로 확실히 연결되는지를 결정하는 <strong>스태틱</strong>이 있습니다. 이 세 가지를 이해하는 것이 웜홀에 거주하거나 웜홀을 누비는 데 필요한 지식의 대부분입니다.',
+            h2cls: '웜홀 클래스 (C1-C6)',
+            pcls: '주요 클래스는 Sleeper NPC 난이도, 전리품, 그리고 - 이동에 중요한 - 웜홀 질량 허용치에 따라 등급이 올라갑니다.',
+            thcls: '클래스',
+            thfeel: '성격',
+            thnotes: '비고',
+            c1feel: '입문',
+            c1notes: '함선 질량 한도가 낮은 홀; 순양함에 적합. 보통 highsec 스태틱을 가짐.',
+            c2feel: '캐주얼',
+            c2notes: '스태틱 두 개가 일반적; 소규모 콥에 자주 선택됨.',
+            c3feel: '안정적 ISK',
+            c3notes: '인기 있는 거주 클래스; 위험 대비 좋은 래팅, 보통 k-space 스태틱을 가짐.',
+            c4feel: '방어형',
+            c4notes: '웜홀 스태틱 두 개에 직접적인 k-space 스태틱은 없음 - 찾기 어렵고 침공하기 어려움.',
+            c5feel: '캐피탈',
+            c5notes: '질량 한도가 높은 홀; 캐피탈 래팅과 에스컬레이션. 본격적인 PvP.',
+            c6feel: '엔드게임',
+            c6notes: '최대 질량과 보상; 대규모 캐피탈 난전.',
+            h3spec: '특수 클래스',
+            lic13: '<strong>C13</strong> - 프리깃 크기의 "shattered" 홀; 극히 작은 질량 한도 때문에 프리깃, 구축함, 그리고 일부 소형 선체만 통과할 수 있음.',
+            lishat: '<strong>Shattered 성계</strong> - 앵커링할 행성이 없고, 흔히 여러 스태틱과 고정 효과를 가짐; 당일치기와 사냥에 사용됨.',
+            lithera: '<strong>Thera</strong> - New Eden 전역에 걸친 수많은 스태틱 출구를 가진 독특하고 거대한 shattered 성계. 탐험가와 로머의 허브이며 순찰이 심함.',
+            h2eff: '시스템 효과',
+            peff: '많은 웜홀 성계에는 함선 스탯을 바꾸는 지속적인 <strong>효과</strong>가 있으며 - 그 강도는 클래스에 따라 커집니다 (C6 효과는 C1보다 훨씬 강함). 주요 효과는 다음과 같습니다:',
+            lipulsar: '<strong>Pulsar</strong> - 실드를 강화하고, 장갑 저항을 낮추며, 커패시터 재충전을 줄임.',
+            limag: '<strong>Magnetar</strong> - 데미지와 드론 스탯을 강화하지만 트래킹, 미사일 폭발, 타겟팅을 저하시킴.',
+            libh: '<strong>Black Hole</strong> - 속도, 사거리, 미사일 속도를 강화; 트래킹과 관성을 저하시킴.',
+            lirg: '<strong>Red Giant</strong> - 오버히트, 스마트밤, 폭탄, 정밀도를 강화.',
+            licv: '<strong>Cataclysmic Variable</strong> - 원격 수리와 커패시터 용량을 강화; 재충전과 로컬 수리를 줄임.',
+            liwr: '<strong>Wolf-Rayet</strong> - 장갑 저항과 소형 무기 데미지를 크게 강화; 실드 HP를 낮춤 - 소형함 난전용 효과.',
+            peffwarn: '어느 성계에서 전투를 벌이기 전에 항상 그 효과를 확인하세요 - Magnetar는 난전함의 데미지를 두 배로 만들 수 있고, Pulsar는 핏의 탱크를 완전히 뒤집어 놓을 수 있습니다.',
+            h2stat: '스태틱 vs 유동 연결',
+            pstat1: '<strong>스태틱</strong>은 성계가 <em>항상</em> 고정된 목적지 클래스로 재생성하는 연결입니다. 한 성계의 스태틱이 사라지면(붕괴되거나 만료되면) 같은 유형의 새 스태틱이 다른 곳에 생성됩니다. 따라서 highsec 스태틱을 가진 C3는 항상 highsec으로 가는 경로가 있습니다 - 구체적인 highsec 성계는 바뀌지만 그 보장은 바뀌지 않습니다. 스태틱은 콥이 거주 클래스를 고르는 이유입니다: 믿을 만한 highsec 스태틱은 물류를 쉽게 만들고, C5 스태틱은 끊임없는 캐피탈 콘텐츠를 제공합니다.',
+            pstat2: '<strong>유동</strong> 연결은 다른 곳에서 당신의 성계로 무작위로, 일시적으로 열리는 홀입니다. 예측할 수 없으며 로머와 침공자가 도착하는 일반적인 경로입니다 - 그래서 매일 자기 거주지를 스캔하는 것입니다.',
+            cardh: 'K162 - 출구 쪽',
+            cardb: '모든 웜홀에는 양쪽 끝이 있습니다. <em>다른 성계 쪽에서</em> 열린 쪽은 <strong>K162</strong>로 표시되며 자체적인 질량/유형 정보를 담고 있지 않습니다. 홀의 실제 유형, 질량, 수명을 알려면 반대편의 명명된 시그니처(예: "N062", "C247")를 읽어야 합니다. 매퍼가 당신의 스캔 결과로부터 이를 자동으로 해석해 줍니다.',
+            ctap: '<strong>스캔하는 대로 모든 클래스를 지도에 그리세요.</strong> Nexum은 웜홀 유형, 스태틱, 효과, 질량을 자동으로 라벨링합니다 - 무료로.',
+            ctabtn: 'Nexum 열기',
+            relh: '관련 가이드',
+            relroll: '웜홀 롤링하는 법 (질량 가이드 + 계산기)',
+            relmap: '웜홀 체인을 지도로 그리는 법',
+            relstat: 'EVE 웜홀 유형 &amp; 스태틱 목록',
+            relscan: 'EVE Online에서 시그니처 스캔하는 법',
+            relcmp: 'Nexum vs Pathfinder vs Tripwire vs Wanderer',
+            footP: 'EVE Online과 EVE 로고는 CCP hf.의 등록 상표입니다. 전 세계 모든 권리가 보유됩니다. Nexum은 서드파티 도구이며 CCP hf.와 제휴하거나 그로부터 보증받지 않았습니다. 전체 <a href="/license/">라이선스 &amp; EVE IP 고지</a>를 참조하세요.',
+          };
+          DICTS.ja = {
+            __title: 'EVE Online ワームホールクラス＆スタティック解説',
+            nav: '&larr; Nexum ホーム',
+            h1: 'EVE Online ワームホールクラス＆スタティック解説',
+            sub: 'C1-C6、フリゲートホール、Thera と shattered 星系、効果、そしてスタティックの仕組み。',
+            updated: 'Nexum のワームホールガイド',
+            lede: 'ワームホール空間 - "J-space" - は、ゲートではなくワームホールだけでつながる約2,600の未知の星系です。各星系には難易度と報酬を決める<strong>クラス</strong>があり、時には艦船を強化または弱体化する<strong>システム効果</strong>があり、そしてどこへ確実につながるかを決める<strong>スタティック</strong>があります。この3つを理解することが、ワームホールに住む、あるいは駆け抜けるのに必要な知識のほとんどです。',
+            h2cls: 'ワームホールクラス (C1-C6)',
+            pcls: '主要なクラスは、Sleeper NPC の難易度、戦利品、そして - 移動にとって重要な - ワームホールの質量許容量が段階的に上がります。',
+            thcls: 'クラス',
+            thfeel: '雰囲気',
+            thnotes: '備考',
+            c1feel: '入門',
+            c1notes: '艦船質量制限が低いホール。巡洋艦向き。多くの場合 highsec スタティックを持つ。',
+            c2feel: 'カジュアル',
+            c2notes: 'スタティック2つが一般的。小規模コープの定番。',
+            c3feel: '安定した ISK',
+            c3notes: '人気の居住クラス。リスクの割に良いラッティング、通常は k-space スタティックを持つ。',
+            c4feel: '防御的',
+            c4notes: 'ワームホールスタティック2つで、直接の k-space スタティックはなし - 見つけにくく、侵攻しにくい。',
+            c5feel: 'キャピタル',
+            c5notes: '質量制限が高いホール。キャピタルラッティングとエスカレーション。本格的な PvP。',
+            c6feel: 'エンドゲーム',
+            c6notes: '最大の質量と報酬。大規模なキャピタル戦。',
+            h3spec: '特殊クラス',
+            lic13: '<strong>C13</strong> - フリゲートサイズの "shattered" ホール。極小の質量制限のため、フリゲート、駆逐艦、一部の小型ハルしか通れない。',
+            lishat: '<strong>Shattered 星系</strong> - アンカーできる惑星がなく、多くの場合複数のスタティックと固定効果を持つ。日帰りやハンティングに使われる。',
+            lithera: '<strong>Thera</strong> - New Eden 全域に多数のスタティック出口を持つ、唯一無二の巨大な shattered 星系。探検家やローマーのハブであり、厳重に巡回されている。',
+            h2eff: 'システム効果',
+            peff: '多くのワームホール星系には艦船のステータスを変える持続的な<strong>効果</strong>があり - その強さはクラスに応じて増します（C6 の効果は C1 よりはるかに強い）。主なものは：',
+            lipulsar: '<strong>Pulsar</strong> - シールドを強化し、アーマー抵抗を下げ、キャパシタ回復を削る。',
+            limag: '<strong>Magnetar</strong> - ダメージとドローンのステータスを強化するが、トラッキング、ミサイル爆発、ターゲティングを損なう。',
+            libh: '<strong>Black Hole</strong> - 速度、射程、ミサイル速度を強化。トラッキングと慣性を損なう。',
+            lirg: '<strong>Red Giant</strong> - オーバーヒート、スマートボム、ボム、精度を強化。',
+            licv: '<strong>Cataclysmic Variable</strong> - リモートリペアとキャパシタ容量を強化。回復とローカルリペアを下げる。',
+            liwr: '<strong>Wolf-Rayet</strong> - アーマー抵抗と小型武器ダメージを大きく強化。シールド HP を下げる - 小型艦の乱戦向けの効果。',
+            peffwarn: '星系内で戦闘を仕掛ける前に、必ずその効果を確認してください - Magnetar は乱戦艦のダメージを2倍にすることがあり、Pulsar はフィットのタンクを根本から覆すことがあります。',
+            h2stat: 'スタティック vs 流動接続',
+            pstat1: '<strong>スタティック</strong>とは、星系が<em>常に</em>固定の目的地クラスへ再生成する接続です。ある星系のスタティックが消える（崩壊または期限切れ）と、同じタイプの新しいものが別の場所に発生します。したがって highsec スタティックを持つ C3 には常に highsec への経路があります - 具体的な highsec 星系は変わっても、その保証は変わりません。スタティックはコープが居住クラスを選ぶ理由です。信頼できる highsec スタティックは物流を楽にし、C5 スタティックは絶え間ないキャピタルコンテンツをもたらします。',
+            pstat2: '<strong>流動</strong>接続とは、別の場所からあなたの星系へランダムかつ一時的に開くホールです。予測できず、ローマーや侵攻者が到着する通常の経路です - だからこそ毎日自分の拠点をスキャンするのです。',
+            cardh: 'K162 - 出口側',
+            cardb: 'すべてのワームホールには2つの端があります。<em>反対の星系側から</em>開かれた側は <strong>K162</strong> として表示され、それ自体は質量/タイプ情報を持ちません。ホールの本当のタイプ、質量、寿命を知るには、反対側の名前付きシグネチャ（例：「N062」「C247」）を読みます。マッパーがあなたのスキャン結果から自動でこれを解決してくれます。',
+            ctap: '<strong>スキャンしたクラスをその都度マッピングしましょう。</strong>Nexum はワームホールのタイプ、スタティック、効果、質量を自動でラベル付けします - 無料で。',
+            ctabtn: 'Nexum を開く',
+            relh: '関連ガイド',
+            relroll: 'ワームホールのロール方法（質量ガイド + 計算機）',
+            relmap: 'ワームホールチェーンのマッピング方法',
+            relstat: 'EVE ワームホールタイプ &amp; スタティック一覧',
+            relscan: 'EVE Online でのシグネチャのスキャン方法',
+            relcmp: 'Nexum vs Pathfinder vs Tripwire vs Wanderer',
+            footP: 'EVE Online と EVE ロゴは CCP hf. の登録商標です。世界中ですべての権利が留保されています。Nexum はサードパーティ製ツールであり、CCP hf. と提携しておらず、その承認も受けていません。完全な <a href="/license/">ライセンス &amp; EVE IP 表示</a> をご覧ください。',
+          };
+          DICTS.ru = {
+            __title: 'Классы червоточин и статики EVE Online: разбор',
+            nav: '&larr; Главная Nexum',
+            h1: 'Классы червоточин и статики EVE Online: разбор',
+            sub: 'C1-C6, фрегатные дыры, Thera и shattered-системы, эффекты и как работают статики.',
+            updated: 'Руководство Nexum по червоточинам',
+            lede: 'Пространство червоточин - "J-space" - это около 2600 неизвестных систем, которые соединяются только через червоточины, никогда через врата. У каждой системы есть <strong>класс</strong>, задающий сложность и награды, иногда <strong>системный эффект</strong>, усиливающий или ослабляющий ваши корабли, и <strong>статик</strong>, определяющий, куда она надёжно ведёт. Понимание этих трёх вещей - это большая часть того, что нужно, чтобы жить в червоточинах или странствовать по ним.',
+            h2cls: 'Классы червоточин (C1-C6)',
+            pcls: 'Основные классы растут по сложности NPC Sleeper, добыче и - что важно для перемещения - по допустимой массе червоточин.',
+            thcls: 'Класс',
+            thfeel: 'Характер',
+            thnotes: 'Примечания',
+            c1feel: 'Стартовый',
+            c1notes: 'Дыры с малым лимитом массы корабля; подходят для крейсеров. Часто имеют статик в highsec.',
+            c2feel: 'Непринуждённый',
+            c2notes: 'Два статика - обычное дело; частый выбор небольших корпораций.',
+            c3feel: 'Хороший ISK',
+            c3notes: 'Популярный домашний класс; хороший раттинг за свой риск, обычно статик в k-space.',
+            c4feel: 'Оборонительный',
+            c4notes: 'Два статика-червоточины и никакого прямого статика в k-space - трудно найти, трудно вторгнуться.',
+            c5feel: 'Капитальный',
+            c5notes: 'Дыры с высоким лимитом массы; раттинг на капиталах и эскалации. Серьёзный PvP.',
+            c6feel: 'Эндгейм',
+            c6notes: 'Максимальная масса и награда; масштабные капитальные баталии.',
+            h3spec: 'Особые классы',
+            lic13: '<strong>C13</strong> - "shattered"-дыры фрегатного размера; сквозь их крошечные лимиты массы проходят только фрегаты, эсминцы и несколько мелких корпусов.',
+            lishat: '<strong>Shattered-системы</strong> - нет планет, к которым можно приякориться, часто несколько статиков и постоянный эффект; используются для однодневных вылазок и охоты.',
+            lithera: '<strong>Thera</strong> - уникальная, огромная shattered-система с множеством статических выходов по всему New Eden. Это узел для исследователей и роумеров, и она усиленно патрулируется.',
+            h2eff: 'Системные эффекты',
+            peff: 'У многих систем-червоточин есть постоянный <strong>эффект</strong>, меняющий характеристики вашего корабля - и его сила растёт с классом (эффект C6 гораздо сильнее, чем C1). Основные:',
+            lipulsar: '<strong>Pulsar</strong> - усиливает щиты, снижает резисты брони, урезает восстановление конденсатора.',
+            limag: '<strong>Magnetar</strong> - усиливает урон и характеристики дронов, но вредит трекингу, взрыву ракет и захвату цели.',
+            libh: '<strong>Black Hole</strong> - усиливает скорость, дальность и скорость ракет; вредит трекингу и инерции.',
+            lirg: '<strong>Red Giant</strong> - усиливает перегрев, смартбомбы, бомбы и точность.',
+            licv: '<strong>Cataclysmic Variable</strong> - усиливает удалённый ремонт и ёмкость конденсатора; снижает восстановление и локальный ремонт.',
+            liwr: '<strong>Wolf-Rayet</strong> - сильно повышает резисты брони и урон малого оружия; снижает HP щита - эффект для ближнего боя на малых кораблях.',
+            peffwarn: 'Всегда проверяйте эффект системы, прежде чем ввязываться в ней в бой - Magnetar может удвоить урон бойца ближнего боя, а Pulsar может перевернуть танк фита с ног на голову.',
+            h2stat: 'Статики vs блуждающие соединения',
+            pstat1: '<strong>Статик</strong> - это соединение, которое система <em>всегда</em> восстанавливает к фиксированному классу назначения. Когда статик системы исчезает (схлопнут или истёк), где-то появляется новый того же типа. Так что у C3 со статиком в highsec всегда будет маршрут в highsec - конкретная highsec-система меняется, а гарантия нет. Статики - причина, по которой корпорации выбирают домашний класс: надёжный статик в highsec упрощает логистику; статик C5 обеспечивает постоянный капитальный контент.',
+            pstat2: '<strong>Блуждающие</strong> соединения - это случайные, временные дыры, которые открываются в вашу систему откуда-то ещё. Они непредсказуемы и являются обычным способом появления роумеров и захватчиков - вот почему вы каждый день сканируете свой дом.',
+            cardh: 'K162 - сторона выхода',
+            cardb: 'У каждой червоточины два конца. Сторона, открытая <em>из другой системы</em>, отображается как <strong>K162</strong> и сама не несёт информации о массе/типе. Чтобы узнать настоящий тип дыры, её массу и время жизни, вы читаете именованную сигнатуру (напр. "N062", "C247") на противоположной стороне. Маппер разрешает это за вас автоматически по результатам сканирования.',
+            ctap: '<strong>Наносите на карту каждый класс по мере сканирования.</strong> Nexum автоматически подписывает типы червоточин, статики, эффекты и массу - бесплатно.',
+            ctabtn: 'Открыть Nexum',
+            relh: 'Похожие руководства',
+            relroll: 'Как схлопнуть червоточину (руководство по массе + калькулятор)',
+            relmap: 'Как нанести на карту цепочку червоточин',
+            relstat: 'Типы червоточин EVE &amp; список статиков',
+            relscan: 'Как сканировать сигнатуры в EVE Online',
+            relcmp: 'Nexum vs Pathfinder vs Tripwire vs Wanderer',
+            footP: 'EVE Online и логотип EVE являются зарегистрированными торговыми марками CCP hf. Все права защищены по всему миру. Nexum — это сторонний инструмент, не связанный с CCP hf. и не одобренный ею. См. полное <a href="/license/">уведомление о лицензии &amp; ИС EVE</a>.',
+          };
+
+          var DICT = DICTS[lang];
+          if (!DICT) return;
+
+          document.documentElement.lang = lang;
+          if (DICT.__title) document.title = DICT.__title;
+
+          var nodes = document.querySelectorAll('[data-i18n]');
+          for (var i = 0; i < nodes.length; i++) {
+            var key = nodes[i].getAttribute('data-i18n');
+            if (DICT[key] != null) nodes[i].innerHTML = DICT[key];
+          }
+        } catch (e) {
+          // Leave the English source intact on any error.
+        }
+      })();
+    </script>
   </body>
 </html>
