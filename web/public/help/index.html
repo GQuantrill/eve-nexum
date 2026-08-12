@@ -14,6 +14,8 @@
     <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="robots" content="index, follow" />
 
+    <script src="/vendor/lang-picker.js" defer></script>
+
     <meta property="og:type"        content="article" />
     <meta property="og:url"         content="https://eve-nexum.com/help/" />
     <meta property="og:title"       content="Nexum Help — How to use the EVE Online wormhole mapper" />
@@ -37,14 +39,6 @@
       a { color: var(--accent); }
       .topnav { font-size: 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
       .topnav a { color: var(--muted); text-decoration: none; }
-      .lang-select {
-        background: var(--panel2); color: var(--text); border: 1px solid var(--border);
-        border-radius: 4px; padding: 4px 8px; font-size: 13px; font-family: inherit; cursor: pointer;
-        transition: border-color 0.15s ease;
-      }
-      .lang-select:hover { border-color: var(--accent); }
-      .lang-select:focus-visible { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px rgba(91,155,255,0.25); }
-      .lang-select option { background: var(--panel); color: var(--text); }
       header.hero { text-align: center; margin: 28px 0 8px; }
       .logo { font-size: 34px; color: var(--accent); line-height: 1; }
       h1 { color: var(--head); font-size: 30px; line-height: 1.25; margin: 12px 0 6px; }
@@ -69,17 +63,10 @@
     <div class="wrap">
       <nav class="topnav">
         <a href="/" data-i18n="nav">&larr; Nexum home</a>
-        <select id="lang-select" class="lang-select" aria-label="Language / Sprache / Langue">
-          <option value="en">English</option>
-          <option value="de">Deutsch</option>
-          <option value="fr">Français</option>
-          <option value="es">Español</option>
-          <option value="pt">Português</option>
-          <option value="zh">简体中文</option>
-          <option value="ko">한국어</option>
-          <option value="ja">日本語</option>
-          <option value="ru">Русский</option>
-        </select>
+        <!-- Stylized language dropdown with SVG flags, built by
+             /vendor/lang-picker.js (a native <select> can't render the flags,
+             and flag emoji show as bare country codes on Windows). -->
+        <div class="lang-picker" data-lang-picker></div>
       </nav>
 
       <header class="hero">
@@ -306,14 +293,10 @@
           // untranslated source, so it has no entry.
           var SUPPORTED = { de:1, fr:1, es:1, pt:1, zh:1, ko:1, ja:1, ru:1 };
 
-          var sel = document.getElementById('lang-select');
-          if (sel) {
-            sel.value = SUPPORTED[lang] ? lang : 'en';
-            sel.addEventListener('change', function () {
-              try { localStorage.setItem('nexum.lang', sel.value); } catch (e) { /* ignore */ }
-              location.reload();
-            });
-          }
+          // Tell the stylized picker (/vendor/lang-picker.js) which language this
+          // page actually rendered, so it highlights the matching entry. The
+          // picker itself handles the switch (persist to nexum.lang + reload).
+          window.__nexumResolvedLang = SUPPORTED[lang] ? lang : 'en';
 
           if (!SUPPORTED[lang]) return;
 

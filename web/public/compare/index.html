@@ -15,6 +15,8 @@
     <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="robots" content="index, follow" />
 
+    <script src="/vendor/lang-picker.js" defer></script>
+
     <!-- Open Graph -->
     <meta property="og:type"        content="article" />
     <meta property="og:url"         content="https://eve-nexum.com/compare/" />
@@ -102,16 +104,6 @@
       a { color: var(--accent); }
       .topnav { font-size: 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
       .topnav a { color: var(--muted); text-decoration: none; }
-      .lang-select {
-        background: var(--panel2); color: var(--text); border: 1px solid var(--border);
-        border-radius: 4px; padding: 4px 8px; font-size: 13px; font-family: inherit; cursor: pointer;
-        transition: border-color 0.15s ease;
-      }
-      .lang-select:hover { border-color: var(--accent); }
-      .lang-select:focus-visible {
-        outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px rgba(91,155,255,0.25);
-      }
-      .lang-select option { background: var(--panel); color: var(--text); }
       header.hero { text-align: center; margin: 28px 0 8px; }
       .logo { font-size: 34px; color: var(--accent); line-height: 1; }
       h1 { color: var(--head); font-size: 30px; line-height: 1.25; margin: 12px 0 6px; }
@@ -142,7 +134,9 @@
       .cta a.btn { display: inline-block; margin-top: 8px; padding: 9px 18px; background: var(--accent); color: #04060c; border-radius: 8px; text-decoration: none; font-weight: 700; }
       .langs { background: var(--panel2); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; margin: 36px 0 0; text-align: center; }
       .lang-chips { list-style: none; padding: 0; margin: 14px 0 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 9px; }
-      .lang-chips li { margin: 0; padding: 6px 13px; background: rgba(91,155,255,0.08); border: 1px solid rgba(91,155,255,0.28); border-radius: 999px; color: var(--text); font-size: 14px; font-weight: 600; white-space: nowrap; }
+      .lang-chips li { margin: 0; padding: 6px 13px; background: rgba(91,155,255,0.08); border: 1px solid rgba(91,155,255,0.28); border-radius: 999px; color: var(--text); font-size: 14px; font-weight: 600; white-space: nowrap; display: inline-flex; align-items: center; gap: 7px; }
+      /* SVG flags (not emoji) so they render on Windows, which shows flag emoji as bare country codes. */
+      .lang-chips img { width: 20px; height: 13px; border-radius: 2px; display: block; box-shadow: 0 0 0 1px rgba(0,0,0,0.35); }
       footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--border); color: var(--muted2); font-size: 13px; }
     </style>
   </head>
@@ -150,17 +144,10 @@
     <div class="wrap">
       <nav class="topnav">
         <a href="/" data-i18n="nav">&larr; Nexum home</a>
-        <select id="lang-select" class="lang-select" aria-label="Language / Sprache / Langue">
-          <option value="en">English</option>
-          <option value="de">Deutsch</option>
-          <option value="fr">Français</option>
-          <option value="es">Español</option>
-          <option value="pt">Português</option>
-          <option value="zh">简体中文</option>
-          <option value="ko">한국어</option>
-          <option value="ja">日本語</option>
-          <option value="ru">Русский</option>
-        </select>
+        <!-- Stylized language dropdown with SVG flags, built by
+             /vendor/lang-picker.js (a native <select> can't render the flags,
+             and flag emoji show as bare country codes on Windows). -->
+        <div class="lang-picker" data-lang-picker></div>
       </nav>
 
       <header class="hero">
@@ -456,15 +443,15 @@
         <h2 data-i18n="h2Languages">Available in your language</h2>
         <p data-i18n="langP">Nexum is fully translated into nine languages — with your language auto-detected from your browser the first time you visit. Read this comparison, and use Nexum, in:</p>
         <ul class="lang-chips">
-          <li>🇬🇧 English</li>
-          <li>🇩🇪 Deutsch</li>
-          <li>🇫🇷 Français</li>
-          <li>🇪🇸 Español</li>
-          <li>🇵🇹 Português</li>
-          <li>🇨🇳 简体中文</li>
-          <li>🇰🇷 한국어</li>
-          <li>🇯🇵 日本語</li>
-          <li>🇷🇺 Русский</li>
+          <li><img src="/vendor/flags/GB.svg" alt=""> English</li>
+          <li><img src="/vendor/flags/DE.svg" alt=""> Deutsch</li>
+          <li><img src="/vendor/flags/FR.svg" alt=""> Français</li>
+          <li><img src="/vendor/flags/ES.svg" alt=""> Español</li>
+          <li><img src="/vendor/flags/PT.svg" alt=""> Português</li>
+          <li><img src="/vendor/flags/CN.svg" alt=""> 简体中文</li>
+          <li><img src="/vendor/flags/KR.svg" alt=""> 한국어</li>
+          <li><img src="/vendor/flags/JP.svg" alt=""> 日本語</li>
+          <li><img src="/vendor/flags/RU.svg" alt=""> Русский</li>
         </ul>
       </div>
 
@@ -499,18 +486,10 @@
           // untranslated source, so it has no entry.
           var SUPPORTED = { de: 1, fr: 1, es: 1, pt: 1, zh: 1, ko: 1, ja: 1, ru: 1 };
 
-          // Wire up the language picker regardless of the current language so a
-          // visitor can switch between any language (including back to English).
-          // Persists to the same nexum.lang key the app uses, then reloads to
-          // re-run the swap.
-          var sel = document.getElementById('lang-select');
-          if (sel) {
-            sel.value = SUPPORTED[lang] ? lang : 'en';
-            sel.addEventListener('change', function () {
-              try { localStorage.setItem('nexum.lang', sel.value); } catch (e) { /* ignore */ }
-              location.reload();
-            });
-          }
+          // Tell the stylized picker (/vendor/lang-picker.js) which language this
+          // page actually rendered, so it highlights the matching entry. The
+          // picker itself handles the switch (persist to nexum.lang + reload).
+          window.__nexumResolvedLang = SUPPORTED[lang] ? lang : 'en';
 
           if (!SUPPORTED[lang]) return;
 
