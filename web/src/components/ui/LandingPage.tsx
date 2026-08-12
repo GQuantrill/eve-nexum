@@ -383,6 +383,7 @@ export function LandingPage() {
             <span>{t('landing.cta.joinDiscord')}</span>
           </a>
           <a href="/help/" className="landing__switch-link">{t('landing.helpLink')}</a>
+          <a href="/help/#guides" className="landing__switch-link">{t('landing.guidesLink')}</a>
         </div>
         {FEATURE_SECTIONS.map((section) => (
           <section key={section.id} className="landing__section landing__section--features">
