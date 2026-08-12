@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>EVE Online Wormhole Types &amp; Statics List — Destinations, Mass &amp; Lifetime</title>
+    <meta name="description" content="A full reference list of EVE Online wormhole types: what each wormhole code leads to, whether it is a static or wandering connection, the maximum ship size, total mass, and lifetime. Look up any wormhole code (N062, C247, K162 and more)." />
+    <meta name="keywords" content="eve wormhole statics list, wormhole types eve, wormhole destinations, wormhole mass chart, wormhole code list, N062 C247 K162, wormhole static destination, wormhole ship size, wormhole lifetime, eve online wormhole chart" />
+    <meta name="author" content="Area 404" />
+    <meta name="theme-color" content="#06080f" />
+    <link rel="canonical" href="https://eve-nexum.com/guides/statics/" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <meta name="robots" content="index, follow" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://eve-nexum.com/guides/statics/" />
+    <meta property="og:title" content="EVE Online Wormhole Types &amp; Statics List" />
+    <meta property="og:description" content="Every wormhole code: where it leads, static or wandering, max ship size, total mass and lifetime." />
+    <meta property="og:image" content="https://eve-nexum.com/hero.png" />
+    <meta property="og:site_name" content="Nexum" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="EVE Online Wormhole Types &amp; Statics List" />
+    <meta name="twitter:description" content="Every wormhole code: destination, static or wandering, ship size, mass and lifetime." />
+    <meta name="twitter:image" content="https://eve-nexum.com/hero.png" />
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "EVE Online Wormhole Types & Statics List",
+      "about": "Reference of wormhole connection types, destinations, mass and lifetime in EVE Online",
+      "author": { "@type": "Organization", "name": "Area 404" },
+      "publisher": { "@type": "Organization", "name": "Nexum", "url": "https://eve-nexum.com/" },
+      "mainEntityOfPage": "https://eve-nexum.com/guides/statics/",
+      "inLanguage": "en"
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        { "@type": "Question", "name": "What is a wormhole static?", "acceptedAnswer": { "@type": "Answer", "text": "A static is a wormhole connection a system always regenerates to a fixed destination class. When the static dies, a new one of the same type spawns elsewhere, so the guarantee of a route to that class never goes away - only the specific system on the far end changes. Wandering connections are random and temporary by contrast." } },
+        { "@type": "Question", "name": "How do I know where a wormhole leads?", "acceptedAnswer": { "@type": "Answer", "text": "Read the wormhole's name. Each type - like N062, C247 or O477 - always leads to the same class of space. A K162 is the exit side of a hole opened from elsewhere, so jump through and read the named signature on the far side to identify it. The table on this page lists the destination for every type." } },
+        { "@type": "Question", "name": "What does the mass and ship size on a wormhole mean?", "acceptedAnswer": { "@type": "Answer", "text": "Every wormhole has a maximum jump mass (the largest ship that can pass) and a total mass budget that depletes as ships jump through. Once the total is used up the hole collapses. That is what lets you 'roll' a hole deliberately by jumping heavy ships back and forth." } }
+      ]
+    }
+    </script>
+
+    <style>
+      :root { --bg:#06080f; --panel:#111827; --panel2:#141c2e; --border:#1e2740; --text:#c8d2e6; --head:#eaf0fb; --muted:#8a98b8; --muted2:#6a7898; --accent:#5b9bff; --green:#3ddc84; --amber:#f0a030; --red:#e05a5a; }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; background: var(--bg); }
+      body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--text); line-height: 1.6; }
+      .wrap { max-width: 900px; margin: 0 auto; padding: 32px 20px 64px; }
+      a { color: var(--accent); }
+      .topnav { font-size: 14px; }
+      .topnav a { color: var(--muted); text-decoration: none; }
+      header.hero { margin: 24px 0 8px; }
+      .logo { font-size: 30px; color: var(--accent); line-height: 1; }
+      h1 { color: var(--head); font-size: 30px; line-height: 1.25; margin: 12px 0 6px; }
+      .sub { color: var(--muted); margin: 0; }
+      .updated { color: var(--muted2); font-size: 13px; margin: 6px 0 28px; }
+      h2 { color: var(--head); font-size: 23px; margin: 40px 0 10px; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+      h3 { color: var(--head); font-size: 18px; margin: 22px 0 4px; }
+      p { margin: 10px 0; }
+      .lede { font-size: 17px; color: var(--text); }
+      ul, ol { padding-left: 20px; } li { margin: 5px 0; }
+      .card { background: var(--panel); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 8px; padding: 4px 16px 14px; margin: 16px 0; }
+      .cta { background: var(--panel2); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; margin: 36px 0 0; text-align: center; }
+      .cta a.btn { display: inline-block; margin-top: 8px; padding: 9px 18px; background: var(--accent); color: #04060c; border-radius: 8px; text-decoration: none; font-weight: 700; }
+      .related { margin: 30px 0 0; padding: 16px 20px; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; }
+      .related h2 { border: 0; margin: 0 0 8px; font-size: 16px; }
+      footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--border); color: var(--muted2); font-size: 13px; }
+      .tablewrap { overflow-x: auto; margin: 16px 0; border: 1px solid var(--border); border-radius: 8px; }
+      table.wh { border-collapse: collapse; width: 100%; font-size: 13px; min-width: 640px; }
+      table.wh th, table.wh td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+      table.wh thead th { position: sticky; top: 0; background: var(--panel2); color: var(--head); font-size: 12px; text-transform: uppercase; letter-spacing: .03em; }
+      table.wh tbody tr:hover { background: var(--panel); }
+      table.wh td.code { color: var(--head); font-weight: 700; font-variant-numeric: tabular-nums; }
+      table.wh td.static { color: var(--green); }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <nav class="topnav"><a href="/">&larr; Nexum home</a></nav>
+
+      <header class="hero">
+        <div class="logo" aria-hidden="true">&#9672;</div>
+        <h1>EVE Online Wormhole Types &amp; Statics List</h1>
+        <p class="sub">Every wormhole code - where it leads, whether it's static, and its mass and lifetime.</p>
+      </header>
+      <p class="updated">A Nexum wormhole reference</p>
+
+      <p class="lede">Every wormhole in EVE has a <strong>type code</strong> - like <em>N062</em>, <em>C247</em> or <em>O477</em> - and that code always tells you the same three things: where it leads, the biggest ship that fits, and how much mass it can take before it collapses. This page is the full lookup table, plus a short primer on statics so the columns make sense.</p>
+
+      <h2>Statics vs wandering connections</h2>
+      <p>A <strong>static</strong> is a connection a system <em>always</em> regenerates to a fixed destination class. When a system's static dies - collapsed or expired - a new one of the same type spawns somewhere else. So a C3 with a highsec static always has a route to highsec; the specific highsec system changes, the guarantee does not. That is why corps choose a home by its static: a highsec static makes logistics easy, a C5 static means constant capital content. A <strong>wandering</strong> connection, by contrast, is random and temporary - a hole that happened to open into your system from somewhere else. A <strong>K162</strong> is always the exit side of a hole opened elsewhere; jump through and read the named signature on the far side to identify what it really is. For what the classes themselves mean, see <a href="/guides/classes/">wormhole classes explained</a>.</p>
+
+      <h2>How to read the table</h2>
+      <ul>
+        <li><strong>Type</strong> - the wormhole's code, shown on the named side of the hole.</li>
+        <li><strong>Respawn</strong> - whether the hole appears as a <em>static</em> (guaranteed, regenerating), a <em>wandering</em> connection, or the <em>reverse</em> (K162) side.</li>
+        <li><strong>Spawns in</strong> - the space where the named side is found.</li>
+        <li><strong>Leads to</strong> - the class of space on the other end.</li>
+        <li><strong>Max ship</strong> - the largest hull that can jump the hole (per-jump mass limit).</li>
+        <li><strong>Total mass</strong> - the mass budget before the hole collapses (what you deplete when rolling).</li>
+        <li><strong>Lifetime</strong> - how long the hole lives before it expires on its own.</li>
+      </ul>
+
+      <h2>Wormhole type reference</h2>
+      <p>Every wormhole type in New Eden, sorted by code. Values match the live data Nexum uses to tag and age wormholes automatically.</p>
+      <div class="tablewrap">
+        <table class="wh">
+          <thead>
+            <tr>
+              <th>Type</th><th>Respawn</th><th>Spawns in</th><th>Leads to</th><th>Max ship</th><th>Total mass</th><th>Lifetime</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="code">A009</td><td>Wandering</td><td>Class 1, Class 2, Class 3, Class 4, Class 5, Class 6, NullSec, Class 12 - Thera, Class 13 - Shattered</td><td>C13</td><td>up to Destroyer</td><td>3 000 000 000 kg</td><td>4.5h</td></tr>
+            <tr><td class="code">A239</td><td class="static">Static</td><td>Class 2</td><td>LS</td><td>up to Battleship</td><td>2 000 000 000 kg</td><td>24h</td></tr>
+            <tr><td class="code">A641</td><td>Wandering</td><td>HighSec</td><td>HS</td><td>up to Freighter</td><td>2 000 000 000 kg</td><td>16h</td></tr>
+            <tr><td class="code">A982</td><td>Wandering</td><td>Class 3, Class 12 - Thera</td><td>C6</td><td>up to Battleship</td><td>3 000 000 000 kg</td><td>24h</td></tr>
+            <tr><td class="code">B041</td><td>Wandering</td><td>HighSec</td><td>C6</td><td>up to Freighter</td><td>3 000 000 000 kg</td><td>48h</td></tr>
+            <tr><td class="code">B274</td><td class="static">Static, Wandering</td><td>Class 2</td><td>HS</td><td>up to Battleship</td><td>2 000 000 000 kg</td><td>24h</td></tr>
+            <tr><td class="code">B449</td><td>Wandering</td><td>LowSec, NullSec</td><td>HS</td><td>up to Freighter</td><td>2 000 000 000 kg</td><td>16h</td></tr>
+            <tr><td class="code">B520</td><td>Wandering</td><td>Class 6</td><td>HS</td><td>up to Freighter</td><td>3 000 000 000 kg</td><td>48h</td></tr>
+            <tr><td class="code">B735</td><td>Wandering</td><td>HighSec, LowSec, NullSec, Jove Observatories</td><td>Liberated Barbican</td><td>up to Battleship</td><td>750 000 000 kg</td><td>16h</td></tr>
+            <tr><td class="code">C008</td><td>Wandering</td><td>Class 1, Class 2, Class 3, Class 4, Class 5, Class 6, Class 12 - Thera, Class 13 - Shattered</td><td>C5</td><td>up to Destroyer</td><td>3 000 000 000 kg</td><td>4.5h</td></tr>
+            <tr><td class="code">C125</td><td>Wandering</td><td>Class 1</td><td>C2</td><td>up to Battlecruiser</td><td>1 000 000 000 kg</td><td>16h</td></tr>
+            <tr><td class="code">C140</td><td>Wandering</td><td>Class 5, Class 6</td><td>LS</td><td>up to Capital</td><td>3 300 000 000 kg</td><td>24h</td></tr>
+            <tr><td class="code">C247</td><td class="static">Static, Wandering</td><td>Class 4</td><td>C3</td><td>up to Battleship</td><td>2 000 000 000 kg</td><td>16h</td></tr>
+            <tr><td class="code">C248</td><td>Wandering</td><td>Class 6</td><td>NS</td><td>up to Capital</td><td>3 300 000 000 kg</td><td>24h</td></tr>
+            <tr><td class="code">C391</td><td>Wandering</td><td>Class 6</td><td>LS</td><td>up to Capital</td><td>3 300 000 000 kg</td><td>48h</td></tr>
+            <tr><td class="code">C414</td><td>Wandering</td><td>HighSec, LowSec, NullSec, Jove Observatories</td><td>Conflux Eyrie</td><td>up to Battleship</td><td>750 000 000 kg</td><td>16h</td></tr>
+            <tr><td class="code">C729</td><td class="static">Static</td><td>Pochven ▲ Trig space</td><td>HS, LS, NS</td><td>up to Freighter</td><td>1 000 000 000 kg</td><td>12h</td></tr>
+            <tr><td class="code">D364</td><td class="static">Static</td><td>Class 5</td><td>C2</td><td>up to Battleship</td><td>1 000 000 000 kg</td><td>16h</td></tr>
+            <tr><td class="code">D382</td><td class="static">Static, Wandering</td><td>Class 2, Drifter wormholes</td><td>C2</td><td>up to Battleship</td><td>2 000 000 000 kg</td><td>16h</td></tr>
+            <tr><td class="code">D792</td><td>Wandering</td><td>Class 5, Class 6</td><td>HS</td><td>up to Freighter</td><td>3 000 000 000 kg</td><td>24h</td></tr>
+            <tr><td class="code">D845</td><td class="static">Static</td><td>Class 3</td><td>HS</td><td>up to Battleship</td><td>5 000 000 000 kg</td><td>24h</td></tr>
+            <tr><td class="code">E004</td><td>Wandering</td><td>Class 1, Class 2, Class 3, Class 4, Class 5, Class 6, Class 12 - Thera, Class 13 - Shattered</td><td>C1</td><td>up to Destroyer</td><td>3 000 000 000 kg</td><td>4.5h</td></tr>
+            <tr><td class="code">E175</td><td class="static">Static, Wandering</td><td>Class 5</td><td>C4</td><td>up to Battleship</td><td>2 000 000 000 kg</td><td>16h</td></tr>
+            <tr><td class="code">E545</td><td class="static">Static</td><td>Class 2</td><td>NS</td><td>up to Battleship</td><td>2 000 000 000 kg</td><td>16h</td></tr>
+            <tr><td class="code">E587</td><td class="static">Static</td><td>Class 12 - Thera</td><td>NS</td><td>up to Freighter</td><td>3 000 000 000 kg</td><td>16h</td></tr>
+            <tr><td class="code">F135</td><td>Wandering, Reverse</td><td>Class 2, Class 3, Class 4, Class 5, Class 6</td><td>Thera</td><td>up to Battleship</td><td>750 000 000 kg</td><td>16h</td></tr>
+            <tr><td class="code">F216</td><td>Wandering, Reverse</td><td>Class 2, Class 3, Class 4, Class 5, Class 6</td><td>Pochven</td><td>up to Battleship</td><td>1 000 000 000 kg</td><td>12h</td></tr>
+            <tr><td class="code">F353</td><td>Wandering, Reverse</td><td>Class 1</td><td>Thera</td><td>up to Battlecruiser</td><td>100 000 000 kg</td><td>16h</td></tr>
+            <tr><td class="code">G008</td><td>Wandering</td><td>Class 1, Class 2, Class 3, Class 4, Class 5, Class 6, Class 12 - Thera, Class 13 - Shattered</td><td>C6</td><td>up to Destroyer</td><td>3 000 000 000 kg</td><td>4.5h</td></tr>
+            <tr><td class="code">G024</td><td class="static">Static</td><td>Class 6</td><td>C2</td><td>up to Battleship</td><td>2 000 000 000 kg</td><td>16h</td></tr>
+            <tr><td class="code">GEAR</td><td>&#8212;</td><td>&#8212;</td><td>drifter blackhole</td><td>&#8212;</td><td>&#8212;</td><td>&#8212;</td></tr>
+            <tr><td class="code">H121</td><td>Wandering</td><td>Class 1</td><td>C1</td><td>up to Battlecruiser</td><td>500 000 000 kg</td><td>16h</td></tr>
+            <tr><td class="code">H296</td><td class="static">Static, Wandering</td><td>Class 5</td><td>C5</td><td>up to Capital</td><td>3 300 000 000 kg</td><td>24h</td></tr>
+            <tr><td class="code">H900</td><td class="static">Static, Wandering</td><td>Class 4</td><td>C5</td><td>up to Battleship</td><td>3 000 000 000 kg</td><td>24h</td></tr>
+            <tr><td class="code">I078</td><td>&#8212;</td><td>Pochven ▲ Trig space</td><td>Pochven</td><td>up to Battlecruiser</td><td>100 000 000 kg</td><td>4.5h</td></tr>
+            <tr><td class="code">I182</td><td>Wandering</td><td>Class 3, Class 12 - Thera</td><td>C2</td><td>up to Battleship</td><td>2 000 000 000 kg</td><td>16h</td></tr>
+            <tr><td class="code">J244</td><td class="static">Static</td><td>Class 1</td><td>LS</td><td>up to Battlecruiser</td><td>1 000 000 000 kg</td><td>24h</td></tr>
+            <tr><td class="code">J377</td><td>Wandering, Reverse</td><td>Class 1, Class 2, Class 3, Class 4, Class 12 - Thera</td><td>LS</td><td>up to Battlecruiser</td><td>1 000 000 000 kg</td><td>24h</td></tr>
+            <tr><td class="code">J492</td><td>Wandering, Reverse</td><td>Class 1, Class 2, Class 3, Class 4</td><td>LS</td><td>up to Battlecruiser</td><td>1 000 000 000 kg</td><td>24h</td></tr>
+            <tr><td class="code">K162</td><td>&#8212;</td><td>EXIT</td><td>jump to identify</td><td>&#8212;</td><td>&#8212;</td><td>&#8212;</td></tr>
+            <tr><td class="code">K329</td><td>Wandering</td><td>Class 4</td><td>NS</td><td>up to Battleship</td><td>3 000 000 000 kg</td><td>16h</td></tr>
+            <tr><td class="code">K346</td><td class="static">Static</td><td>Class 3</td><td>NS</td><td>up to Battleship</td><td>3 000 000 000 kg</td><td>16h</td></tr>
+            <tr><td class="code">L005</td><td>Wandering</td><td>Class 1, Class 2, Class 3, Class 4, Class 5, Class 6, Class 12 - Thera, Class 13 - Shattered</td><td>C2</td><td>up to Destroyer</td><td>3 000 000 000 kg</td><td>4.5h</td></tr>
+            <tr><td class="code">L031</td><td>Wandering, Reverse</td><td>NullSec</td><td>Thera</td><td>up to Freighter</td><td>3 000 000 000 kg</td><td>16h</td></tr>
+            <tr><td class="code">L477</td><td class="static">Static</td><td>Class 6</td><td>C3</td><td>up to Battleship</td><td>2 000 000 000 kg</td><td>16h</td></tr>
+            <tr><td class="code">L614</td><td>Wandering</td><td>Class 1, NullSec</td><td>C5</td><td>up to Battlecruiser</td><td>1 000 000 000 kg</td><td>24h</td></tr>
+            <tr><td class="code">L687</td><td>&#8212;</td><td>Pochven ▲ Trig space</td><td>Pochven</td><td>up to Battlecruiser</td><td>100 000 000 kg</td><td>4.5h</td></tr>
+            <tr><td class="code">M001</td><td>Wandering</td><td>Class 1, Class 2, Class 3, Class 4, Class 5, Class 6, Class 12 - Thera, Class 13 - Shattered</td><td>C4</td><td>up to Destroyer</td><td>3 000 000 000 kg</td><td>4.5h</td></tr>
+            <tr><td class="code">M164</td><td>Wandering, Reverse</td><td>LowSec</td><td>Thera</td><td>up to Freighter</td><td>2 000 000 000 kg</td><td>16h</td></tr>
+            <tr><td class="code">M267</td><td class="static">Static</td><td>Class 5</td><td>C3</td><td>up to Battleship</td><td>1 000 000 000 kg</td><td>16h</td></tr>
+            <tr><td class="code">M555</td><td>Wandering</td><td>HighSec</td><td>C5</td><td>up to Freighter</td><td>3 000 000 000 kg</td><td>24h</td></tr>
+            <tr><td class="code">M609</td><td>Wandering</td><td>Class 1</td><td>C4</td><td>up to Battlecruiser</td><td>1 000 000 000 kg</td><td>16h</td></tr>
+            <tr><td class="code">N062</td><td class="static">Static, Wandering</td><td>Class 2, Drifter wormholes</td><td>C5</td><td>up to Battleship</td><td>3 000 000 000 kg</td><td>24h</td></tr>
+            <tr><td class="code">N110</td><td class="static">Static</td><td>Class 1</td><td>HS</td><td>up to Battlecruiser</td><td>1 000 000 000 kg</td><td>24h</td></tr>
+            <tr><td class="code">N290</td><td>Wandering</td><td>Class 4</td><td>LS</td><td>up to Battleship</td><td>3 000 000 000 kg</td><td>24h</td></tr>
+            <tr><td class="code">N432</td><td>Wandering</td><td>LowSec, NullSec</td><td>C5</td><td>up to Capital</td><td>3 300 000 000 kg</td><td>24h</td></tr>
+            <tr><td class="code">N766</td><td class="static">Static</td><td>Class 4</td><td>C2</td><td>up to Battleship</td><td>2 000 000 000 kg</td><td>16h</td></tr>
+            <tr><td class="code">N770</td><td>Wandering</td><td>Class 3, Class 12 - Thera</td><td>C5</td><td>up to Battleship</td><td>3 000 000 000 kg</td><td>24h</td></tr>
+            <tr><td class="code">N944</td><td>Wandering</td><td>LowSec, NullSec</td><td>LS</td><td>up to Capital</td><td>3 300 000 000 kg</td><td>24h</td></tr>
+            <tr><td class="code">N968</td><td>Wandering</td><td>Class 3, Class 12 - Thera</td><td>C3</td><td>up to Battleship</td><td>2 000 000 000 kg</td><td>16h</td></tr>
+            <tr><td class="code">O128</td><td>Wandering</td><td>HighSec, LowSec, NullSec, never spawn</td><td>C4</td><td>up to Battleship</td><td>1 000 000 000 kg</td><td>24h</td></tr>
+            <tr><td class="code">O477</td><td class="static">Static, Wandering</td><td>Class 2, Drifter wormholes</td><td>C3</td><td>up to Battleship</td><td>2 000 000 000 kg</td><td>16h</td></tr>
+            <tr><td class="code">O546</td><td>&#8212;</td><td>Pochven ▲ Trig space</td><td>Pochven</td><td>up to Battlecruiser</td><td>100 000 000 kg</td><td>4.5h</td></tr>
+            <tr><td class="code">O883</td><td>Wandering</td><td>Class 1, NullSec</td><td>C3</td><td>up to Battlecruiser</td><td>1 000 000 000 kg</td><td>16h</td></tr>
+            <tr><td class="code">P060</td><td class="static">Static</td><td>Class 4</td><td>C1</td><td>up to Battlecruiser</td><td>500 000 000 kg</td><td>16h</td></tr>
+            <tr><td class="code">Q003</td><td>Wandering</td><td>Class 1, Class 2, Class 3, Class 4, Class 5, Class 6, Class 12 - Thera, Class 13 - Shattered</td><td>NS</td><td>up to Destroyer</td><td>3 000 000 000 kg</td><td>4.5h</td></tr>
+            <tr><td class="code">Q063</td><td class="static">Static</td><td>Class 12 - Thera</td><td>HS</td><td>up to Battlecruiser</td><td>500 000 000 kg</td><td>16h</td></tr>
+            <tr><td class="code">Q317</td><td class="static">Static</td><td>Class 6</td><td>C1</td><td>up to Battlecruiser</td><td>500 000 000 kg</td><td>16h</td></tr>
+            <tr><td class="code">R051</td><td>Wandering</td><td>HighSec</td><td>LS</td><td>up to Freighter</td><td>3 000 000 000 kg</td><td>16h</td></tr>
+            <tr><td class="code">R081</td><td>Wandering</td><td>Pochven ▲ Trig space</td><td>C4</td><td>up to Battleship</td><td>1 000 000 000 kg</td><td>12h</td></tr>
+            <tr><td class="code">R259</td><td>Wandering</td><td>HighSec, LowSec, NullSec, Jove Observatories</td><td>Azdaja Redoubt</td><td>up to Battleship</td><td>750 000 000 kg</td><td>16h</td></tr>
+            <tr><td class="code">R474</td><td class="static">Static, Wandering</td><td>Class 2, Drifter wormholes</td><td>C6</td><td>up to Battleship</td><td>3 000 000 000 kg</td><td>24h</td></tr>
+            <tr><td class="code">R943</td><td>Wandering</td><td>HighSec, LowSec, NullSec</td><td>C2</td><td>up to Battleship</td><td>750 000 000 kg</td><td>16h</td></tr>
+            <tr><td class="code">S047</td><td>Wandering</td><td>Class 4</td><td>HS</td><td>up to Battleship</td><td>3 000 000 000 kg</td><td>24h</td></tr>
+            <tr><td class="code">S199</td><td>Wandering</td><td>LowSec, NullSec</td><td>NS</td><td>up to Capital</td><td>3 300 000 000 kg</td><td>24h</td></tr>
+            <tr><td class="code">S804</td><td>Wandering</td><td>Class 1, NullSec</td><td>C6</td><td>up to Battlecruiser</td><td>1 000 000 000 kg</td><td>24h</td></tr>
+            <tr><td class="code">S877</td><td>Wandering</td><td>HighSec, LowSec, NullSec, Jove Observatories</td><td>Sentinel MZ</td><td>up to Battleship</td><td>750 000 000 kg</td><td>16h</td></tr>
+            <tr><td class="code">T405</td><td>Wandering</td><td>Class 3, Class 12 - Thera</td><td>C4</td><td>up to Battleship</td><td>2 000 000 000 kg</td><td>16h</td></tr>
+            <tr><td class="code">T458</td><td>Wandering, Reverse</td><td>HighSec</td><td>Thera</td><td>up to Battlecruiser</td><td>500 000 000 kg</td><td>16h</td></tr>
+            <tr><td class="code">U210</td><td class="static">Static</td><td>Class 3</td><td>LS</td><td>up to Battleship</td><td>3 000 000 000 kg</td><td>24h</td></tr>
+            <tr><td class="code">U319</td><td>Wandering</td><td>LowSec, NullSec</td><td>C6</td><td>up to Capital</td><td>3 300 000 000 kg</td><td>48h</td></tr>
+            <tr><td class="code">U372</td><td>Wandering, Reverse</td><td>Drone Regions</td><td>Pochven</td><td>up to Battleship</td><td>1 000 000 000 kg</td><td>12h</td></tr>
+            <tr><td class="code">U574</td><td class="static">Static, Wandering</td><td>Class 4</td><td>C6</td><td>up to Battleship</td><td>3 000 000 000 kg</td><td>24h</td></tr>
+            <tr><td class="code">V283</td><td>Wandering</td><td>HighSec</td><td>NS</td><td>up to Freighter</td><td>3 000 000 000 kg</td><td>16h</td></tr>
+            <tr><td class="code">V301</td><td>Wandering</td><td>Class 3, Class 12 - Thera</td><td>C1</td><td>up to Battlecruiser</td><td>500 000 000 kg</td><td>16h</td></tr>
+            <tr><td class="code">V753</td><td class="static">Static, Wandering</td><td>Class 5</td><td>C6</td><td>up to Capital</td><td>3 300 000 000 kg</td><td>24h</td></tr>
+            <tr><td class="code">V898</td><td class="static">Static</td><td>Class 12 - Thera</td><td>LS</td><td>up to Freighter</td><td>2 000 000 000 kg</td><td>16h</td></tr>
+            <tr><td class="code">V911</td><td class="static">Static, Wandering</td><td>Class 6</td><td>C5</td><td>up to Capital</td><td>3 300 000 000 kg</td><td>24h</td></tr>
+            <tr><td class="code">V928</td><td>Wandering</td><td>HighSec, LowSec, NullSec, Jove Observatories</td><td>Sanctified Vidette</td><td>up to Battleship</td><td>750 000 000 kg</td><td>16h</td></tr>
+            <tr><td class="code">W237</td><td class="static">Static, Wandering</td><td>Class 6</td><td>C6</td><td>up to Capital</td><td>3 300 000 000 kg</td><td>24h</td></tr>
+            <tr><td class="code">X450</td><td>Wandering</td><td>Pochven ▲ Trig space</td><td>NS</td><td>up to Battleship</td><td>1 000 000 000 kg</td><td>12h</td></tr>
+            <tr><td class="code">X702</td><td>Wandering</td><td>HighSec, LowSec, NullSec</td><td>C3</td><td>up to Battleship</td><td>1 000 000 000 kg</td><td>24h</td></tr>
+            <tr><td class="code">X877</td><td class="static">Static, Wandering</td><td>Class 4</td><td>C4</td><td>up to Battleship</td><td>2 000 000 000 kg</td><td>16h</td></tr>
+            <tr><td class="code">Y683</td><td class="static">Static, Wandering</td><td>Class 2, Drifter wormholes</td><td>C4</td><td>up to Battleship</td><td>2 000 000 000 kg</td><td>16h</td></tr>
+            <tr><td class="code">Y790</td><td class="static">Static</td><td>Class 5</td><td>C1</td><td>up to Battlecruiser</td><td>500 000 000 kg</td><td>16h</td></tr>
+            <tr><td class="code">Z006</td><td>Wandering</td><td>Class 1, Class 2, Class 3, Class 4, Class 5, Class 6, Class 12 - Thera, Class 13 - Shattered</td><td>C3</td><td>up to Destroyer</td><td>3 000 000 000 kg</td><td>4.5h</td></tr>
+            <tr><td class="code">Z060</td><td class="static">Static</td><td>Class 1</td><td>NS</td><td>up to Battlecruiser</td><td>1 000 000 000 kg</td><td>16h</td></tr>
+            <tr><td class="code">Z142</td><td>Wandering</td><td>Class 5, Class 6</td><td>NS</td><td>up to Capital</td><td>3 300 000 000 kg</td><td>16h</td></tr>
+            <tr><td class="code">Z457</td><td class="static">Static, Wandering</td><td>Class 6</td><td>C4</td><td>up to Battleship</td><td>2 000 000 000 kg</td><td>16h</td></tr>
+            <tr><td class="code">Z647</td><td class="static">Static, Wandering</td><td>Class 2, Drifter wormholes</td><td>C1</td><td>up to Battlecruiser</td><td>500 000 000 kg</td><td>16h</td></tr>
+            <tr><td class="code">Z971</td><td>Wandering</td><td>HighSec, LowSec, NullSec</td><td>C1</td><td>up to Battlecruiser</td><td>100 000 000 kg</td><td>16h</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3>Don't memorise this - let the map do it</h3>
+        <p>Nexum recognises wormhole codes as you scan and paste them: it tags each hole's destination, ship size and mass, ages it toward end-of-life, and warns you before a roll strands a ship. The whole chain, always current, shared live with your corp.</p>
+      </div>
+
+      <div class="cta">
+        <p><strong>Map your chain with wormhole data built in - free.</strong></p>
+        <a class="btn" href="/">Open Nexum</a>
+      </div>
+
+      <div class="related">
+        <h2>Related guides</h2>
+        <ul>
+          <li><a href="/guides/classes/">EVE wormhole classes and statics explained</a></li>
+          <li><a href="/guides/rolling/">How to roll a wormhole (mass guide + calculator)</a></li>
+          <li><a href="/guides/scanning/">How to scan signatures in EVE Online</a></li>
+          <li><a href="/guides/mapping/">How to map a wormhole chain in EVE Online</a></li>
+        </ul>
+      </div>
+
+      <footer>
+        <p>EVE Online and the EVE logo are the registered trademarks of CCP hf. All rights reserved worldwide. Nexum is a third-party tool and is not affiliated with or endorsed by CCP hf. See the full <a href="/license/">license &amp; EVE IP notice</a>.</p>
+      </footer>
+    </div>
+  </body>
+</html>

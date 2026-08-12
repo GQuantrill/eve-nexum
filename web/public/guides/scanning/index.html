@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>How to Scan Signatures in EVE Online — Probe Scanning Guide</title>
+    <meta name="description" content="A beginner's guide to scanning cosmic signatures in EVE Online: fitting a probe launcher, launching core scanner probes, narrowing the signal to 100%, and identifying wormholes, data, relic and gas sites so you can warp to them." />
+    <meta name="keywords" content="how to scan signatures eve, eve probe scanning, core scanner probes, how to scan wormholes eve, cosmic signature, probe scanner, eve exploration guide, astrometrics, scanning 100 percent, eve online scanning" />
+    <meta name="author" content="Area 404" />
+    <meta name="theme-color" content="#06080f" />
+    <link rel="canonical" href="https://eve-nexum.com/guides/scanning/" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <meta name="robots" content="index, follow" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://eve-nexum.com/guides/scanning/" />
+    <meta property="og:title" content="How to Scan Signatures in EVE Online" />
+    <meta property="og:description" content="Fitting probes, launching them, narrowing the signal to 100%, and identifying wormholes, data, relic and gas sites." />
+    <meta property="og:image" content="https://eve-nexum.com/hero.png" />
+    <meta property="og:site_name" content="Nexum" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="How to Scan Signatures in EVE Online" />
+    <meta name="twitter:description" content="Fitting probes, launching them, narrowing to 100%, and identifying wormholes, data, relic and gas sites." />
+    <meta name="twitter:image" content="https://eve-nexum.com/hero.png" />
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "How to Scan Signatures in EVE Online",
+      "about": "Scanning cosmic signatures with core scanner probes in EVE Online",
+      "author": { "@type": "Organization", "name": "Area 404" },
+      "publisher": { "@type": "Organization", "name": "Nexum", "url": "https://eve-nexum.com/" },
+      "mainEntityOfPage": "https://eve-nexum.com/guides/scanning/",
+      "inLanguage": "en"
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "HowTo",
+      "name": "How to scan a cosmic signature in EVE Online",
+      "step": [
+        { "@type": "HowToStep", "name": "Fit a probe launcher", "text": "Fit a Core Probe Launcher loaded with Core Scanner Probes. Combat Scanner Probes also find signatures and can additionally scan down ships." },
+        { "@type": "HowToStep", "name": "Launch your probes", "text": "In space, launch the probes. They appear as a formation you control from the Probe Scanner window (Alt+P)." },
+        { "@type": "HowToStep", "name": "Center probes on a signature", "text": "Move the probe formation over an unresolved signature and set the scan range so the cube comfortably covers it, then hit Analyze." },
+        { "@type": "HowToStep", "name": "Narrow the signal", "text": "Each scan returns a signal strength and a smaller result shape. Re-center the probes and halve the range, then scan again until the signal reaches 100%." },
+        { "@type": "HowToStep", "name": "Identify and warp", "text": "At 100% the signature resolves to a type - Wormhole, Data, Relic, Gas or Combat - and becomes a warpable result. Warp to 0 for wormholes." }
+      ]
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        { "@type": "Question", "name": "What do I need to scan signatures in EVE Online?", "acceptedAnswer": { "@type": "Answer", "text": "A ship with a Core Probe Launcher fitted and a set of Core Scanner Probes loaded. Astrometrics skills, scanning rigs, and dedicated exploration ships like the Astero make it faster and reach 100% more easily, but any ship that can fit a launcher can scan." } },
+        { "@type": "Question", "name": "How do I get a signature to 100%?", "acceptedAnswer": { "@type": "Answer", "text": "Center your probe formation on the signature and scan, then re-center on the result and reduce the probe range each pass. As the result shrinks from a sphere to a dot the signal strength climbs; once it hits 100% the signature is identified and you can warp to it." } },
+        { "@type": "Question", "name": "What is the difference between the probe scanner and the directional scanner?", "acceptedAnswer": { "@type": "Answer", "text": "The directional scanner (D-scan) is instant, needs no probes, and shows nearby ships, drones and structures. Scanning cosmic signatures - wormholes and exploration sites - requires launching probes and narrowing each signature down over several passes." } },
+        { "@type": "Question", "name": "How do I know if a signature is a wormhole?", "acceptedAnswer": { "@type": "Answer", "text": "Once a signature resolves it lists its group. Wormholes show as 'Wormhole'; the others are Data, Relic, Gas or Combat sites. Warp to a wormhole and read its name (like N062 or a K162) to learn where it leads." } }
+      ]
+    }
+    </script>
+
+    <style>
+      :root { --bg:#06080f; --panel:#111827; --panel2:#141c2e; --border:#1e2740; --text:#c8d2e6; --head:#eaf0fb; --muted:#8a98b8; --muted2:#6a7898; --accent:#5b9bff; --green:#3ddc84; --amber:#f0a030; --red:#e05a5a; }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; background: var(--bg); }
+      body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--text); line-height: 1.6; }
+      .wrap { max-width: 820px; margin: 0 auto; padding: 32px 20px 64px; }
+      a { color: var(--accent); }
+      .topnav { font-size: 14px; }
+      .topnav a { color: var(--muted); text-decoration: none; }
+      header.hero { margin: 24px 0 8px; }
+      .logo { font-size: 30px; color: var(--accent); line-height: 1; }
+      h1 { color: var(--head); font-size: 30px; line-height: 1.25; margin: 12px 0 6px; }
+      .sub { color: var(--muted); margin: 0; }
+      .updated { color: var(--muted2); font-size: 13px; margin: 6px 0 28px; }
+      h2 { color: var(--head); font-size: 23px; margin: 40px 0 10px; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+      h3 { color: var(--head); font-size: 18px; margin: 22px 0 4px; }
+      p { margin: 10px 0; }
+      .lede { font-size: 17px; color: var(--text); }
+      ul, ol { padding-left: 20px; } li { margin: 5px 0; }
+      .card { background: var(--panel); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 8px; padding: 4px 16px 14px; margin: 16px 0; }
+      .cta { background: var(--panel2); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; margin: 36px 0 0; text-align: center; }
+      .cta a.btn { display: inline-block; margin-top: 8px; padding: 9px 18px; background: var(--accent); color: #04060c; border-radius: 8px; text-decoration: none; font-weight: 700; }
+      .related { margin: 30px 0 0; padding: 16px 20px; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; }
+      .related h2 { border: 0; margin: 0 0 8px; font-size: 16px; }
+      footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--border); color: var(--muted2); font-size: 13px; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <nav class="topnav"><a href="/">&larr; Nexum home</a></nav>
+
+      <header class="hero">
+        <div class="logo" aria-hidden="true">&#9672;</div>
+        <h1>How to Scan Signatures in EVE Online</h1>
+        <p class="sub">Probes, signal strength, and getting to 100% - the exploration and wormhole basics.</p>
+      </header>
+      <p class="updated">A Nexum wormhole guide</p>
+
+      <p class="lede">Almost everything worth finding in EVE - wormholes, data and relic sites, gas clouds, hidden combat pockets - starts as a <strong>cosmic signature</strong>: a faint red dot the game won't let you warp to until you scan it down. Scanning is the skill that turns those dots into places you can go. This guide covers the gear, the workflow, and how to read what you find.</p>
+
+      <h2>What you need</h2>
+      <p>To scan cosmic signatures you need a ship with a <strong>Core Probe Launcher</strong> fitted and a set of <strong>Core Scanner Probes</strong> loaded (Combat Scanner Probes work too and can additionally scan down ships, at a small strength penalty). Beyond that, four things make scanning faster and easier:</p>
+      <ul>
+        <li><strong>Astrometrics</strong> and its support skills (Rangefinding, Acquisition, Pinpointing) - more signal strength, faster scans, tighter results.</li>
+        <li><strong>Scanning rigs and upgrades</strong> - Gravity Capacitor rigs and a rangefinding array add strength.</li>
+        <li><strong>Sisters gear</strong> - the Sisters Core Probe Launcher and Sisters Core Scanner Probes give a strength bonus over the tech-1 versions.</li>
+        <li><strong>An exploration hull</strong> - the Astero and Stratios have built-in scanning bonuses and cloaks; any covert-ops frigate is a strong starter.</li>
+      </ul>
+      <p>None of this is mandatory - a basic launcher on any ship will scan - but strength is the difference between resolving a tough wormhole in two passes and fighting it for ten.</p>
+
+      <h2>The scanning workflow</h2>
+      <p>Open the <strong>Probe Scanner</strong> window (Alt+P). Every signature in the system shows as an unresolved dot with a percentage. The loop is always the same: <em>cover, scan, narrow, repeat.</em></p>
+      <ol>
+        <li><strong>Launch your probes.</strong> In space, launch the scanner probes. They appear as a movable formation (a cube of 7 by default) with a range slider.</li>
+        <li><strong>Cover a signature.</strong> Drag the formation over one unresolved signature and set the scan range so the cube comfortably surrounds it. Hit <strong>Analyze</strong> (scan).</li>
+        <li><strong>Read the result.</strong> Each scan returns a <strong>signal strength</strong> (a percentage) and a <strong>result shape</strong> - a large sphere when the location is vague, shrinking toward a single dot as you close in.</li>
+        <li><strong>Narrow.</strong> Re-center the probe formation on the new result and roughly halve the scan range, then scan again. Strength climbs each pass.</li>
+        <li><strong>Resolve.</strong> At <strong>100%</strong> the signature identifies its type and becomes a warpable result. Warp to 0 for wormholes; a safe range is fine for sites you plan to scout first.</li>
+      </ol>
+
+      <div class="card">
+        <h3>Signal strength: why 100% matters</h3>
+        <p>You can only warp to a signature once it reaches 100% signal strength. Below that, the game only knows the rough area. Weak sites (deep wormholes, some relic sites) need more strength to close out - that is exactly where skills, rigs and Sisters probes earn their keep.</p>
+      </div>
+
+      <h2>Reading what you find</h2>
+      <p>When a signature resolves, its <strong>group</strong> tells you what it is:</p>
+      <ul>
+        <li><strong>Wormhole</strong> - a connection to another system. Warp to it and read the name (a type like <em>N062</em>, or a <em>K162</em> exit) to learn the destination class, mass and lifetime.</li>
+        <li><strong>Data / Relic</strong> - hacking sites; run the containers with a Data or Relic Analyzer for blueprints, materials and salvage.</li>
+        <li><strong>Gas</strong> - gas clouds you harvest with gas cloud harvesters (big in wormhole space).</li>
+        <li><strong>Combat</strong> - hidden pockets of NPCs. Cosmic <em>anomalies</em>, by contrast, already show in the probe scanner without any scanning.</li>
+      </ul>
+      <p>For wormhole mapping, the wormholes are the ones you care about - each is a doorway into your chain. See <a href="/guides/statics/">the wormhole types and statics list</a> for what each code leads to, and <a href="/guides/mapping/">how to map a wormhole chain</a> to turn a system full of holes into a live map.</p>
+
+      <div class="card">
+        <h3>Copy the whole list, don't retype it</h3>
+        <p>In the Probe Scanner you can select all your signatures (Ctrl+A) and copy them (Ctrl+C). A good mapper lets you paste that list straight in - it matches what's already on the map, auto-tags the wormholes, and ages them for you - so you're never hand-typing six-character sig IDs under time pressure.</p>
+      </div>
+
+      <div class="cta">
+        <p><strong>Paste your scan straight into a live map - free.</strong> Nexum tags wormholes, tracks mass, and syncs to your whole corp.</p>
+        <a class="btn" href="/">Open Nexum</a>
+      </div>
+
+      <div class="related">
+        <h2>Related guides</h2>
+        <ul>
+          <li><a href="/guides/mapping/">How to map a wormhole chain in EVE Online</a></li>
+          <li><a href="/guides/statics/">EVE wormhole types &amp; statics list</a></li>
+          <li><a href="/guides/classes/">EVE wormhole classes and statics explained</a></li>
+          <li><a href="/guides/rolling/">How to roll a wormhole (mass guide + calculator)</a></li>
+        </ul>
+      </div>
+
+      <footer>
+        <p>EVE Online and the EVE logo are the registered trademarks of CCP hf. All rights reserved worldwide. Nexum is a third-party tool and is not affiliated with or endorsed by CCP hf. See the full <a href="/license/">license &amp; EVE IP notice</a>.</p>
+      </footer>
+    </div>
+  </body>
+</html>
