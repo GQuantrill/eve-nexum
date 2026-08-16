@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useMapStore, type RemoteEvent } from '../store/mapStore';
 import { usePresenceStore, type PresenceViewer } from '../store/presenceStore';
 import { useKillStore, type KillRow } from '../store/killStore';
+import { refreshCurrentKills } from './useCurrentHourKills';
 import { useJumpLogStore, type JumpRow } from '../store/jumpLogStore';
 import { useRemoteActivity } from '../store/remoteActivityStore';
 import { apiUrl } from '../api/client';
@@ -71,6 +72,9 @@ export function useMapEventStream(): void {
               npc:                 !!data.npc,
               finalBlow:           (data.finalBlow as KillRow['finalBlow']) ?? null,
             });
+            // Also nudge the kills heatmap to refetch (debounced), so it reflects
+            // this kill within ~a second instead of on the 5-min poll.
+            refreshCurrentKills();
             return;
           case 'jump.logged':
             // Ephemeral connection intel — append to the jump-log store. Handled

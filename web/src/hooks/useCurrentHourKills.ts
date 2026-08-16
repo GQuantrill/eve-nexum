@@ -22,9 +22,10 @@ function notify(d: Map<number, SystemKills>) {
   subscribers.forEach(fn => fn(d));
 }
 
-// True when two polls hold identical kill counts, so we keep the previous Map
-// reference and skip the all-node re-render (kills change at most every ~hour,
-// but the poll runs every 5 min — most polls are no-ops).
+// True when two fetches hold identical kill counts, so we keep the previous Map
+// reference and skip the all-node re-render. The 5-min poll is a reconciliation
+// backstop (it also catches kills aging out of the live window, which fire no
+// event); most polls are no-ops, and live kills refresh via refreshCurrentKills.
 function sameKills(a: Map<number, SystemKills>, b: Map<number, SystemKills>): boolean {
   if (a.size !== b.size) return false;
   for (const [k, va] of a) {
@@ -52,6 +53,21 @@ function load() {
     })
     .catch(() => { inflight = null; return cache; });
   return inflight;
+}
+
+let refreshTimer: ReturnType<typeof setTimeout> | null = null;
+
+// Trigger a refetch from the live kill feed (called on each `kill.recent` SSE),
+// so the heatmap updates within ~a second of a kill instead of waiting for the
+// 5-min poll. Debounced: a burst of kills coalesces into ONE refetch, and the
+// server holds the authoritative windowed count so this can't drift (unlike an
+// optimistic bump). No-op when nothing is displaying the heatmap.
+export function refreshCurrentKills(): void {
+  if (refreshTimer || subscribers.size === 0) return;
+  refreshTimer = setTimeout(() => {
+    refreshTimer = null;
+    load();
+  }, 1500);
 }
 
 export function useCurrentHourKills(): Map<number, SystemKills> {
