@@ -50,40 +50,46 @@ export function recentKillsForSystems(systemIds: Set<number>, limit: number): Bu
     .slice(0, limit);
 }
 
-// ── Wormhole kill heat counter ──────────────────────────────────────────────
-// Per-system rolling tally of EVERY wormhole kill — unlike `buffer` above, which
-// is value-filtered for the kill log, this counts them all so the activity
-// heatmap can light up J-space. CCP's ESI system_kills aggregate excludes
-// wormhole systems entirely, so this is the only source of per-system WH kill
-// intensity. Tracked only for wormhole systems (the caller gates on the J-space
-// id range); each kill is one tick, split ship vs pod to mirror ESI's metrics.
-interface KillTick { atMs: number; pod: boolean; }
-const whTicks = new Map<number, KillTick[]>();
-const whRetentionMs = Math.max(60_000, config.killFeed.heatWindowSeconds * 1_000);
+// ── Live kill heat counter ──────────────────────────────────────────────────
+// Per-system rolling tally of EVERY kill, cluster-wide — unlike `buffer` above,
+// which is value-filtered for the kill log, this counts them all so the activity
+// heatmap can run off the live feed. The activity route prefers this live count
+// over CCP's hourly ESI snapshot per system (it overrides, never sums), giving a
+// near-real-time heatmap that also covers wormhole space — which ESI's
+// system_kills aggregate omits entirely. Each kill is one tick, bucketed to
+// mirror ESI: npc (killed by NPCs) / pod (capsule victim) / ship (everything
+// else).
+export type KillBucket = 'ship' | 'pod' | 'npc';
+interface KillTick { atMs: number; bucket: KillBucket; }
+const liveTicks = new Map<number, KillTick[]>();
+const liveRetentionMs = Math.max(60_000, config.killFeed.heatWindowSeconds * 1_000);
 
-export function recordWormholeKill(eveSystemId: number, atMs: number, pod: boolean): void {
-  let ticks = whTicks.get(eveSystemId);
-  if (!ticks) { ticks = []; whTicks.set(eveSystemId, ticks); }
-  ticks.push({ atMs, pod });
-  const cutoff = Date.now() - whRetentionMs;
+export function recordLiveKill(eveSystemId: number, atMs: number, bucket: KillBucket): void {
+  let ticks = liveTicks.get(eveSystemId);
+  if (!ticks) { ticks = []; liveTicks.set(eveSystemId, ticks); }
+  ticks.push({ atMs, bucket });
+  const cutoff = Date.now() - liveRetentionMs;
   while (ticks.length && ticks[0].atMs < cutoff) ticks.shift();
-  if (ticks.length === 0) whTicks.delete(eveSystemId);
+  if (ticks.length === 0) liveTicks.delete(eveSystemId);
 }
 
-export interface WhKillCount { shipKills: number; podKills: number; }
+export interface LiveKillCount { shipKills: number; podKills: number; npcKills: number; }
 
-// Per-system wormhole kill counts within the last `windowMs`, split into ship
-// vs pod losses (matching ESI's ship_kills / pod_kills). Prunes fully-stale
+// Per-system kill counts within the last `windowMs`, split into ship / pod / npc
+// losses (matching ESI's ship_kills / pod_kills / npc_kills). Prunes fully-stale
 // systems as it reads so the map can't accumulate dead entries.
-export function wormholeKillCounts(windowMs: number): Map<number, WhKillCount> {
+export function liveKillCounts(windowMs: number): Map<number, LiveKillCount> {
   const cutoff = Date.now() - windowMs;
-  const out = new Map<number, WhKillCount>();
-  for (const [sysId, ticks] of whTicks) {
+  const out = new Map<number, LiveKillCount>();
+  for (const [sysId, ticks] of liveTicks) {
     while (ticks.length && ticks[0].atMs < cutoff) ticks.shift();
-    if (ticks.length === 0) { whTicks.delete(sysId); continue; }
-    let ship = 0, pod = 0;
-    for (const t of ticks) { if (t.atMs >= cutoff) { t.pod ? pod++ : ship++; } }
-    if (ship || pod) out.set(sysId, { shipKills: ship, podKills: pod });
+    if (ticks.length === 0) { liveTicks.delete(sysId); continue; }
+    let ship = 0, pod = 0, npc = 0;
+    for (const t of ticks) {
+      if (t.atMs < cutoff) continue;
+      if (t.bucket === 'npc') npc++; else if (t.bucket === 'pod') pod++; else ship++;
+    }
+    if (ship || pod || npc) out.set(sysId, { shipKills: ship, podKills: pod, npcKills: npc });
   }
   return out;
 }

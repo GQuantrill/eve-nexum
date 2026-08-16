@@ -10,7 +10,7 @@ async function load() {
   return import('./killBuffer.js');
 }
 
-describe('wormhole kill heat counter', () => {
+describe('live kill heat counter', () => {
   beforeEach(() => {
     vi.resetModules();
     vi.useFakeTimers();
@@ -18,38 +18,40 @@ describe('wormhole kill heat counter', () => {
   });
   afterEach(() => vi.useRealTimers());
 
-  it('counts ship vs pod kills per system within the window', async () => {
-    const { recordWormholeKill, wormholeKillCounts } = await load();
+  it('counts ship / pod / npc kills per system within the window', async () => {
+    const { recordLiveKill, liveKillCounts } = await load();
     const now = Date.now();
-    recordWormholeKill(31000123, now, false); // ship
-    recordWormholeKill(31000123, now, true);  // pod
-    recordWormholeKill(31000123, now, false); // ship
-    recordWormholeKill(31000456, now, false); // ship, different WH system
+    // A wormhole system and a k-space system — the counter is source-agnostic.
+    recordLiveKill(31000123, now, 'ship');
+    recordLiveKill(31000123, now, 'pod');
+    recordLiveKill(31000123, now, 'ship');
+    recordLiveKill(31000123, now, 'npc');
+    recordLiveKill(30000142, now, 'ship'); // Jita (k-space)
 
-    const counts = wormholeKillCounts(WINDOW);
-    expect(counts.get(31000123)).toEqual({ shipKills: 2, podKills: 1 });
-    expect(counts.get(31000456)).toEqual({ shipKills: 1, podKills: 0 });
+    const counts = liveKillCounts(WINDOW);
+    expect(counts.get(31000123)).toEqual({ shipKills: 2, podKills: 1, npcKills: 1 });
+    expect(counts.get(30000142)).toEqual({ shipKills: 1, podKills: 0, npcKills: 0 });
   });
 
   it('excludes kills older than the window', async () => {
-    const { recordWormholeKill, wormholeKillCounts } = await load();
+    const { recordLiveKill, liveKillCounts } = await load();
     const now = Date.now();
-    recordWormholeKill(31000999, now - 10 * MIN, false); // 10m ago — in window
-    recordWormholeKill(31000999, now - 30 * MIN, false); // 30m ago — in window
+    recordLiveKill(31000999, now - 10 * MIN, 'ship'); // 10m ago
+    recordLiveKill(31000999, now - 30 * MIN, 'ship'); // 30m ago
 
-    // A 45-minute window drops nothing here; a 20-minute window drops the 30m one.
-    expect(wormholeKillCounts(45 * MIN).get(31000999)).toEqual({ shipKills: 2, podKills: 0 });
-    expect(wormholeKillCounts(20 * MIN).get(31000999)).toEqual({ shipKills: 1, podKills: 0 });
+    // A 45-minute window keeps both; a 20-minute window drops the 30m one.
+    expect(liveKillCounts(45 * MIN).get(31000999)).toEqual({ shipKills: 2, podKills: 0, npcKills: 0 });
+    expect(liveKillCounts(20 * MIN).get(31000999)).toEqual({ shipKills: 1, podKills: 0, npcKills: 0 });
   });
 
   it('omits systems whose only kills are stale', async () => {
-    const { recordWormholeKill, wormholeKillCounts } = await load();
-    recordWormholeKill(31000777, Date.now() - 2 * WINDOW, false); // 2h ago, beyond retention
-    expect(wormholeKillCounts(WINDOW).has(31000777)).toBe(false);
+    const { recordLiveKill, liveKillCounts } = await load();
+    recordLiveKill(31000777, Date.now() - 2 * WINDOW, 'ship'); // 2h ago, beyond retention
+    expect(liveKillCounts(WINDOW).has(31000777)).toBe(false);
   });
 
-  it('is empty when no wormhole kills were recorded', async () => {
-    const { wormholeKillCounts } = await load();
-    expect(wormholeKillCounts(WINDOW).size).toBe(0);
+  it('is empty when no kills were recorded', async () => {
+    const { liveKillCounts } = await load();
+    expect(liveKillCounts(WINDOW).size).toBe(0);
   });
 });

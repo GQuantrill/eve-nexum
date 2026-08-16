@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { esiFetch } from '../utils/esi.js';
 import { db } from '../db.js';
 import { config } from '../config.js';
-import { wormholeKillCounts } from '../services/killBuffer.js';
+import { liveKillCounts } from '../services/killBuffer.js';
 import { optionalAuth } from '../middleware/optionalAuth.js';
 
 const router = Router();
@@ -236,12 +236,13 @@ router.get('/current-kills', async (_req, res) => {
   // system's full metric set (ship/pod/npc kills + jumps) in one payload —
   // feeds the activity heatmaps. Jumps is a separate ESI map and covers
   // different systems (e.g. a quiet system with jumps but no kills).
-  const arr: { systemId: number; shipKills: number; podKills: number; npcKills: number; jumps: number }[] = [];
+  type Row = { systemId: number; shipKills: number; podKills: number; npcKills: number; jumps: number };
+  const bySys = new Map<number, Row>();
   if (snap) {
     const ids = new Set<number>([...snap.kills.keys(), ...snap.jumps.keys()]);
     for (const id of ids) {
       const k = snap.kills.get(id);
-      arr.push({
+      bySys.set(id, {
         systemId:  id,
         shipKills: k?.ship_kills ?? 0,
         podKills:  k?.pod_kills ?? 0,
@@ -250,15 +251,20 @@ router.get('/current-kills', async (_req, res) => {
       });
     }
   }
-  // ESI's system_kills omits wormhole space, so backfill J-space kill intensity
-  // from the live R2Z2 feed (all kills, not the value-filtered log buffer). No
-  // overlap with the ESI systems above — WH ids are a disjoint range — so no
-  // double counting. Empty when the feed is disabled, leaving J-space blank as
-  // before. npcKills/jumps stay 0 (WH have no jumps metric).
-  for (const [systemId, c] of wormholeKillCounts(config.killFeed.heatWindowSeconds * 1_000)) {
-    arr.push({ systemId, shipKills: c.shipKills, podKills: c.podKills, npcKills: 0, jumps: 0 });
+  // The live R2Z2 feed OVERRIDES ESI's kill counts per system — it never sums,
+  // so there's no double counting. This makes the heatmap near-real-time for any
+  // system with recent kills and covers wormhole space (absent from ESI). ESI's
+  // jumps are kept (the feed has no jumps metric). Systems the feed hasn't seen
+  // recently fall back to ESI; when the feed is disabled this is a no-op and the
+  // heatmap is pure ESI as before.
+  for (const [systemId, c] of liveKillCounts(config.killFeed.heatWindowSeconds * 1_000)) {
+    const row = bySys.get(systemId) ?? { systemId, shipKills: 0, podKills: 0, npcKills: 0, jumps: 0 };
+    row.shipKills = c.shipKills;
+    row.podKills  = c.podKills;
+    row.npcKills  = c.npcKills;
+    bySys.set(systemId, row);
   }
-  res.json(arr);
+  res.json([...bySys.values()]);
 });
 
 export default router;

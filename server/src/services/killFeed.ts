@@ -4,7 +4,7 @@ import { createLogger } from '../utils/logger.js';
 import { activeMapIds, publishToMap } from './mapEvents.js';
 import { resolveEntityNames } from './entityNames.js';
 import { notifyDiscord, killEmbed } from './discord.js';
-import { recordKill, recordWormholeKill, type BufferedKill } from './killBuffer.js';
+import { recordKill, recordLiveKill, type BufferedKill } from './killBuffer.js';
 
 // A single decorated kill, shared by the live SSE `kill.recent` event and the
 // REST backfill (routes/maps.ts). Every display name is resolved by US from a
@@ -181,15 +181,18 @@ async function processKill(body: EphemeralKill): Promise<void> {
   if (!markSeen(killmailId)) return;
   stats.seen++;
 
-  // Tally EVERY wormhole kill (BEFORE the value filter below) into the per-system
-  // heat counter, so /activity/current-kills can light up J-space on the map —
-  // CCP's ESI system_kills aggregate excludes wormhole space. J-space system ids
-  // are the 31000000-31999999 range; k-space is handled authoritatively by ESI.
-  if (solarSystemId >= 31_000_000 && solarSystemId <= 31_999_999) {
+  // Tally EVERY kill (BEFORE the value filter below) into the per-system live
+  // heat counter, cluster-wide. /activity/current-kills prefers this live count
+  // over ESI's hourly snapshot per system (it overrides, never sums, so no
+  // double counting), giving a near-real-time heatmap that also covers wormhole
+  // space — which CCP's ESI system_kills aggregate omits. Bucketed to mirror
+  // ESI: npc = killed by NPCs, else pod (capsule victim: 670 / Genolution 33328),
+  // else ship.
+  {
     const victimShip = Number(km.victim?.ship_type_id) || 0;
-    const isPod = victimShip === 670 || victimShip === 33328; // Capsule / Genolution 'Auroral' capsule
+    const bucket = body.zkb?.npc ? 'npc' : (victimShip === 670 || victimShip === 33328 ? 'pod' : 'ship');
     const kmTime = km.killmail_time ? Date.parse(km.killmail_time) : NaN;
-    recordWormholeKill(solarSystemId, Number.isFinite(kmTime) ? kmTime : Date.now(), isPod);
+    recordLiveKill(solarSystemId, Number.isFinite(kmTime) ? kmTime : Date.now(), bucket);
   }
 
   const totalValue = Number(body.zkb?.totalValue ?? 0);
