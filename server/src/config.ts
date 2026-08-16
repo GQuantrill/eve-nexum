@@ -192,6 +192,10 @@ export const config = {
     // How far back the kill-log backfill looks (seconds) — i.e. how long the
     // in-memory kill buffer retains kills. Longer = more history in the log.
     backfillSeconds: intEnv(process.env.KILL_FEED_BACKFILL_SECONDS, 10_800), // 3h
+    // Rolling window (seconds) the activity heatmap sums wormhole kills over.
+    // ESI's system_kills aggregate excludes J-space, so the live feed backfills
+    // it; ~matches ESI's hourly cadence. Only used when the feed is enabled.
+    heatWindowSeconds: intEnv(process.env.KILL_FEED_HEAT_WINDOW_SECONDS, 3_600), // 60m
   },
   // Required in non-dev (guarded above). The dev fallback is randomised per
   // boot rather than a known literal, so a dev instance accidentally exposed

@@ -4,7 +4,7 @@ import { createLogger } from '../utils/logger.js';
 import { activeMapIds, publishToMap } from './mapEvents.js';
 import { resolveEntityNames } from './entityNames.js';
 import { notifyDiscord, killEmbed } from './discord.js';
-import { recordKill, type BufferedKill } from './killBuffer.js';
+import { recordKill, recordWormholeKill, type BufferedKill } from './killBuffer.js';
 
 // A single decorated kill, shared by the live SSE `kill.recent` event and the
 // REST backfill (routes/maps.ts). Every display name is resolved by US from a
@@ -180,6 +180,17 @@ async function processKill(body: EphemeralKill): Promise<void> {
   if (!Number.isFinite(killmailId) || !Number.isFinite(solarSystemId)) return;
   if (!markSeen(killmailId)) return;
   stats.seen++;
+
+  // Tally EVERY wormhole kill (BEFORE the value filter below) into the per-system
+  // heat counter, so /activity/current-kills can light up J-space on the map —
+  // CCP's ESI system_kills aggregate excludes wormhole space. J-space system ids
+  // are the 31000000-31999999 range; k-space is handled authoritatively by ESI.
+  if (solarSystemId >= 31_000_000 && solarSystemId <= 31_999_999) {
+    const victimShip = Number(km.victim?.ship_type_id) || 0;
+    const isPod = victimShip === 670 || victimShip === 33328; // Capsule / Genolution 'Auroral' capsule
+    const kmTime = km.killmail_time ? Date.parse(km.killmail_time) : NaN;
+    recordWormholeKill(solarSystemId, Number.isFinite(kmTime) ? kmTime : Date.now(), isPod);
+  }
 
   const totalValue = Number(body.zkb?.totalValue ?? 0);
   if (!(totalValue >= config.killFeed.minValueIsk)) return;
