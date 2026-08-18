@@ -165,11 +165,15 @@ adminReadRouter.get('/users', async (_req, res) => {
       SELECT user_id, COUNT(*)::int AS cnt FROM user_events GROUP BY user_id
     ) e ON e.user_id = u.id
     LEFT JOIN (
-      SELECT m.user_id, COUNT(*)::int AS cnt
-      FROM reportable_signatures ms
-      JOIN map_systems sys ON sys.id = ms.system_id
-      JOIN maps m          ON m.id  = sys.map_id
-      GROUP BY m.user_id
+      -- Attribute each signature to the character who SCANNED it
+      -- (created_by_user_id), not the map's owner. Grouping by the owner piled
+      -- every corp-map signature onto the one director and showed 0 for everyone
+      -- else, while the systems count (from user_events, keyed on the actor)
+      -- stayed correct — the reported "systems work, signatures don't" bug.
+      SELECT created_by_user_id AS user_id, COUNT(*)::int AS cnt
+      FROM reportable_signatures
+      WHERE created_by_user_id IS NOT NULL
+      GROUP BY created_by_user_id
     ) s ON s.user_id = u.id
     ORDER BY u.last_login_at DESC NULLS LAST
   `);
