@@ -1929,6 +1929,7 @@
 
 .sig-col--check   { width: 24px; }
 .sig-col--whtype  { overflow: visible; }
+.sig-col--bookmark { width: 28px; }
 .sig-col--actions { width: 28px; }
 
 /* When the resizable columns sum wider than the pane, let the table scroll
@@ -2289,13 +2290,8 @@ select.sig-toolbar-btn option {
   position: relative;
 }
 
-/* Leads-to cell: the destination picker plus the copy-bookmark button. */
-.sig-leads-cell {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-.sig-leads-cell > :first-child { flex: 1; min-width: 0; }
+/* Bookmark column: centre the copy button in its narrow fixed-width cell. */
+.sig-td--bookmark { text-align: center; }
 
 .sig-th--time {
   text-align: right;

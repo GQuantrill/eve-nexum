@@ -18,7 +18,7 @@ import { LeadsToDropdown } from './LeadsToDropdown';
 import { toast } from './Toaster';
 import { reevaluateConnectionsForSystem } from '../../utils/whAutoDetect';
 import { alertInboundK162 } from '../../utils/k162Alert';
-import { formatBookmarkName, DEFAULT_BOOKMARK_FORMAT, formatSiteBookmarkName, DEFAULT_SITE_BOOKMARK_FORMAT, SITE_BOOKMARK_TYPES } from '../../utils/signatureBookmark';
+import { formatBookmarkName, DEFAULT_BOOKMARK_FORMAT, formatSiteBookmarkName, DEFAULT_SITE_BOOKMARK_FORMAT } from '../../utils/signatureBookmark';
 import { useWormholeTypes } from '../../hooks/useWormholeTypes';
 import { duration, DASH } from '../../i18n/format';
 
@@ -957,6 +957,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
             <col style={{ width: colWidths.type }} />
             <col style={{ width: colWidths.whtype }} className="sig-col--whtype" />
             <col style={{ width: colWidths.leadsto }} />
+            {!isShareMode && <col className="sig-col--bookmark" />}
             {isColVisible('name')    && <col style={{ width: colWidths.name }} />}
             {isColVisible('safe')    && <col style={{ width: colWidths.safe }} />}
             {isColVisible('notes')   && <col style={{ width: colWidths.notes }} />}
@@ -993,6 +994,8 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                 {t('signatures.colLeadsTo')}{sortInd('whLeadsTo')}
                 <div className="sig-th__resize" onMouseDown={(e) => startResize('leadsto', e)} />
               </th>
+              {/* Bookmark column — no title; the copy button aligns for every row. */}
+              {!isShareMode && <th className="sig-th" />}
               {isColVisible('name') && (
                 <th className="sig-th sig-th--sortable" onClick={() => handleSort('name')}>
                   {t('signatures.colName')}{sortInd('name')}
@@ -1092,32 +1095,28 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                   )}
                 </td>
                 <td className="sig-td--wh">
-                  {sig.sigType === 'wormhole' ? (
+                  {sig.sigType === 'wormhole' && (
                     isShareMode
                       ? <span className="sig-text">{sig.whLeadsTo || ''}</span>
-                      : (
-                        <div className="sig-leads-cell">
-                          <LeadsToDropdown
-                            value={sig.whLeadsTo}
-                            connectedSystems={connectedSystems}
-                            onChange={(leadsTo) => updateSig(sig.id, { whLeadsTo: leadsTo })}
-                          />
-                          <button
-                            className="icon-btn"
-                            onClick={() => copyBookmark(sig)}
-                            title={t('signatures.copyBookmark')}
-                          ><CopyIcon size={12} weight="bold" /></button>
-                        </div>
-                      )
-                  ) : !isShareMode && SITE_BOOKMARK_TYPES.has(sig.sigType) ? (
-                    // Relic / data / gas: same copy-bookmark button (site format).
+                      : <LeadsToDropdown
+                          value={sig.whLeadsTo}
+                          connectedSystems={connectedSystems}
+                          onChange={(leadsTo) => updateSig(sig.id, { whLeadsTo: leadsTo })}
+                        />
+                  )}
+                </td>
+                {/* Dedicated bookmark column so the button aligns for every sig
+                    type: wormholes use the WH format, all other sigs the site
+                    format. */}
+                {!isShareMode && (
+                  <td className="sig-td--bookmark">
                     <button
                       className="icon-btn"
-                      onClick={() => copySiteBookmark(sig)}
+                      onClick={() => (sig.sigType === 'wormhole' ? copyBookmark(sig) : copySiteBookmark(sig))}
                       title={t('signatures.copyBookmark')}
                     ><CopyIcon size={12} weight="bold" /></button>
-                  ) : null}
-                </td>
+                  </td>
+                )}
                 {isColVisible('name') && (
                   <td>
                     {isShareMode ? (

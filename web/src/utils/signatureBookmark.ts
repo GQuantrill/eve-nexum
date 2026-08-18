@@ -95,9 +95,6 @@ export const SITE_BOOKMARK_TOKENS: { token: string; desc: string }[] = [
 
 export const DEFAULT_SITE_BOOKMARK_FORMAT = '{type} {sig} {name}';
 
-// Site types this format (and its copy button) apply to.
-export const SITE_BOOKMARK_TYPES = new Set(['relic', 'data', 'gas']);
-
 const SITE_TOKEN_RE = /\{sig_letters\}|\{sig\}|\{type\}|\{name\}|\{notes\}|\{age\}/g;
 
 /**
