@@ -258,7 +258,7 @@
         "colLastKnown": "Último sistema conocido",
         "colSystemsAdded": "Sistemas añadidos",
         "colSystemsDeleted": "Sistemas eliminados",
-        "colLastCorpSignature": "Última firma corp",
+        "colLastCorpSignature": "Última firma",
         "colTotalSignatures": "Firmas totales",
         "colLastActive": "Última actividad"
       },

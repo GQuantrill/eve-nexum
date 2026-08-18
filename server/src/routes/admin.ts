@@ -927,12 +927,10 @@ reportsRouter.get('/users', async (req, res) => {
       conditions.push(`u.updated_at >= NOW() - ${intervalParam}`);
     } else if (filter === 'signatures') {
       conditions.push(`EXISTS (
-        SELECT 1 FROM reportable_signatures s
-        JOIN map_systems sys ON sys.id = s.system_id
-        JOIN maps        m   ON m.id   = sys.map_id
-        WHERE s.created_by_user_id = u.id
-          AND ${corpSql}
-          AND s.created_at >= NOW() - ${intervalParam}
+        SELECT 1 FROM user_events e
+        WHERE e.user_id = u.id
+          AND e.event_type = 'signature'
+          AND e.created_at >= NOW() - ${intervalParam}
       )`);
     } else if (filter === 'structures') {
       conditions.push(`EXISTS (
@@ -948,10 +946,8 @@ reportsRouter.get('/users', async (req, res) => {
     // filter + 'all' window → at least one such activity ever
     if (filter === 'signatures') {
       conditions.push(`EXISTS (
-        SELECT 1 FROM reportable_signatures s
-        JOIN map_systems sys ON sys.id = s.system_id
-        JOIN maps        m   ON m.id   = sys.map_id
-        WHERE s.created_by_user_id = u.id AND ${corpSql}
+        SELECT 1 FROM user_events e
+        WHERE e.user_id = u.id AND e.event_type = 'signature'
       )`);
     } else if (filter === 'structures') {
       conditions.push(`EXISTS (
@@ -967,12 +963,12 @@ reportsRouter.get('/users', async (req, res) => {
 
   const { rows } = await db.query(`
     WITH last_corp_sig AS (
-      SELECT s.created_by_user_id AS user_id, MAX(s.created_at) AS ts
-      FROM reportable_signatures s
-      JOIN map_systems sys ON sys.id = s.system_id
-      JOIN maps         m  ON m.id   = sys.map_id
-      WHERE ${corpSql} AND s.created_by_user_id IS NOT NULL
-      GROUP BY s.created_by_user_id
+      -- Last signature the user scanned, anywhere (from the scan-event log,
+      -- map-agnostic). Surfaced as the "Last Signature" column.
+      SELECT user_id, MAX(created_at) AS ts
+      FROM user_events
+      WHERE event_type = 'signature'
+      GROUP BY user_id
     ),
     -- "Last active" = the most recent time a user did something of value on a
     -- corp map: added or edited a signature, anomaly, or structure. Combined
@@ -981,11 +977,9 @@ reportsRouter.get('/users', async (req, res) => {
     -- just the original add.
     last_active AS (
       SELECT user_id, MAX(ts) AS ts FROM (
-        SELECT s.created_by_user_id AS user_id, GREATEST(s.created_at, s.updated_at) AS ts
-          FROM reportable_signatures s
-          JOIN map_systems sys ON sys.id = s.system_id
-          JOIN maps         m  ON m.id   = sys.map_id
-          WHERE ${corpSql} AND s.created_by_user_id IS NOT NULL
+        SELECT user_id, created_at AS ts
+          FROM user_events
+          WHERE event_type = 'signature'
         UNION ALL
         SELECT a.created_by_user_id, GREATEST(a.created_at, a.updated_at)
           FROM map_anomalies a
@@ -1002,17 +996,16 @@ reportsRouter.get('/users', async (req, res) => {
       GROUP BY user_id
     ),
     sig_breakdown AS (
-      -- Count live signatures (not the historical event log) so deletions
-      -- are reflected. corp scope applies via the maps join so an admin
-      -- viewing the report only sees activity on their corp's maps.
-      SELECT s.created_by_user_id AS user_id, s.sig_type, COUNT(*)::int AS cnt
-      FROM reportable_signatures s
-      JOIN map_systems sys ON sys.id = s.system_id
-      JOIN maps         m  ON m.id   = sys.map_id
-      WHERE s.created_by_user_id IS NOT NULL
-        AND s.sig_type IS NOT NULL
-        AND ${corpSql}
-      GROUP BY s.created_by_user_id, s.sig_type
+      -- Historical scan activity from the event log — every signature the user
+      -- ever scanned, like Systems Added — NOT current live sigs. So a scan
+      -- still counts after the hole collapses / the sig despawns / an
+      -- overwrite-paste removes it, and cross-map-synced copies don't inflate
+      -- it (only real scans via createSignature log an event). Map-agnostic:
+      -- the count reflects the user's scanning wherever they did it.
+      SELECT user_id, sig_type, COUNT(*)::int AS cnt
+      FROM user_events
+      WHERE event_type = 'signature' AND sig_type IS NOT NULL
+      GROUP BY user_id, sig_type
     ),
     corp_system_events AS (
       SELECT e.user_id, e.event_type, COUNT(*)::int AS cnt

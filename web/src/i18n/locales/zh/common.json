@@ -258,7 +258,7 @@
         "colLastKnown": "最后已知星系",
         "colSystemsAdded": "添加的星系",
         "colSystemsDeleted": "删除的星系",
-        "colLastCorpSignature": "上次军团信号",
+        "colLastCorpSignature": "上次信号",
         "colTotalSignatures": "信号总数",
         "colLastActive": "最后活跃"
       },

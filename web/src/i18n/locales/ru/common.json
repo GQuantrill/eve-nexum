@@ -258,7 +258,7 @@
         "colLastKnown": "Последняя известная система",
         "colSystemsAdded": "Систем добавлено",
         "colSystemsDeleted": "Систем удалено",
-        "colLastCorpSignature": "Последняя корп-сигнатура",
+        "colLastCorpSignature": "Последняя сигнатура",
         "colTotalSignatures": "Всего сигнатур",
         "colLastActive": "Последняя активность"
       },

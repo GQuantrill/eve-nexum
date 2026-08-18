@@ -308,7 +308,7 @@
         "colSystemsAdded": "Systems added",
         "colSystemsDeleted": "Systems deleted",
         "colLastActive": "Last active",
-        "colLastCorpSignature": "Last corp signature",
+        "colLastCorpSignature": "Last signature",
         "colTotalSignatures": "Total signatures"
       },
       "systems": {

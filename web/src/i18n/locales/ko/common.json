@@ -258,7 +258,7 @@
         "colLastKnown": "마지막으로 확인된 성계",
         "colSystemsAdded": "추가한 성계",
         "colSystemsDeleted": "삭제한 성계",
-        "colLastCorpSignature": "마지막 군단 시그니처",
+        "colLastCorpSignature": "마지막 시그니처",
         "colTotalSignatures": "전체 시그니처",
         "colLastActive": "마지막 활동"
       },
