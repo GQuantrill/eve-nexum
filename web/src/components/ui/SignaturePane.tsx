@@ -18,7 +18,7 @@ import { LeadsToDropdown } from './LeadsToDropdown';
 import { toast } from './Toaster';
 import { reevaluateConnectionsForSystem } from '../../utils/whAutoDetect';
 import { alertInboundK162 } from '../../utils/k162Alert';
-import { formatBookmarkName, DEFAULT_BOOKMARK_FORMAT } from '../../utils/signatureBookmark';
+import { formatBookmarkName, DEFAULT_BOOKMARK_FORMAT, formatSiteBookmarkName, DEFAULT_SITE_BOOKMARK_FORMAT, SITE_BOOKMARK_TYPES } from '../../utils/signatureBookmark';
 import { useWormholeTypes } from '../../hooks/useWormholeTypes';
 import { duration, DASH } from '../../i18n/format';
 
@@ -364,6 +364,12 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   const bookmarkFormat = mapBookmarkFormat && mapBookmarkFormat.trim()
     ? mapBookmarkFormat
     : userBookmarkFormat;
+  // Same map-overrides-personal resolution for the relic/data/gas SITE format.
+  const [userSiteBookmarkFormat] = useUserSetting<string>('nexum.sig.siteBookmarkFormat', DEFAULT_SITE_BOOKMARK_FORMAT);
+  const mapSiteBookmarkFormat = useMapStore((s) => s.map.siteBookmarkFormat);
+  const siteBookmarkFormat = mapSiteBookmarkFormat && mapSiteBookmarkFormat.trim()
+    ? mapSiteBookmarkFormat
+    : userSiteBookmarkFormat;
   // Full wormhole catalog — needed so size/mass tokens resolve for every WH
   // type (the static map only covers k-space statics).
   const whTypes = useWormholeTypes();
@@ -375,6 +381,14 @@ export function SignaturePane({ systemId }: { systemId: string }) {
       .then(() => toast.success(t('signatures.bookmarkCopied', { name })))
       .catch(() => toast.error(t('signatures.bookmarkCopyFailed')));
   }, [bookmarkFormat, whTypes, t]);
+
+  const copySiteBookmark = useCallback((sig: Signature) => {
+    const name = formatSiteBookmarkName(siteBookmarkFormat, sig);
+    if (!name) return;
+    navigator.clipboard.writeText(name)
+      .then(() => toast.success(t('signatures.bookmarkCopied', { name })))
+      .catch(() => toast.error(t('signatures.bookmarkCopyFailed')));
+  }, [siteBookmarkFormat, t]);
 
   // Sigs currently shown with the pending-removal indicator, plus the timers
   // that delete them once the grace period elapses.
@@ -1078,7 +1092,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                   )}
                 </td>
                 <td className="sig-td--wh">
-                  {sig.sigType === 'wormhole' && (
+                  {sig.sigType === 'wormhole' ? (
                     isShareMode
                       ? <span className="sig-text">{sig.whLeadsTo || ''}</span>
                       : (
@@ -1095,7 +1109,14 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                           ><CopyIcon size={12} weight="bold" /></button>
                         </div>
                       )
-                  )}
+                  ) : !isShareMode && SITE_BOOKMARK_TYPES.has(sig.sigType) ? (
+                    // Relic / data / gas: same copy-bookmark button (site format).
+                    <button
+                      className="icon-btn"
+                      onClick={() => copySiteBookmark(sig)}
+                      title={t('signatures.copyBookmark')}
+                    ><CopyIcon size={12} weight="bold" /></button>
+                  ) : null}
                 </td>
                 {isColVisible('name') && (
                   <td>

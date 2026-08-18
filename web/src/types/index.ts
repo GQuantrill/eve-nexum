@@ -235,6 +235,10 @@ export interface WormholeMap {
    *  this map copies bookmarks in this format; when null/absent, each user falls
    *  back to their own nexum.sig.bookmarkFormat global setting. */
   bookmarkFormat?: string | null;
+  /** Per-map override for the relic/data/gas SITE bookmark format, mirroring
+   *  bookmarkFormat (which is wormhole-only). Null/absent = each user falls back
+   *  to their own nexum.sig.siteBookmarkFormat. */
+  siteBookmarkFormat?: string | null;
   /** Present when the map has an active or expired share link. The token
    *  itself is in shareToken; shareExpiresAt is the cutoff. The owner UI
    *  treats an expired token as "no link" — regenerate to share again.

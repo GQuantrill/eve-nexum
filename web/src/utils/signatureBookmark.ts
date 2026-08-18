@@ -76,3 +76,53 @@ export function formatBookmarkName(
 
   return format.replace(TOKEN_RE, (m) => subs[m] ?? '').trim().replace(/\s+/g, ' ');
 }
+
+// ── Relic / data / gas site bookmarks ────────────────────────────────────────
+// Non-wormhole sites (relic, data, gas) share ONE "site" format — none of the
+// wormhole-specific tokens ({dest_type}, {size}, {mass}, {leads_to}) apply, so
+// the available set is the type-agnostic tokens plus a {type} that resolves to
+// the site kind (Relic / Data / Gas). Resolution + storage mirror the wormhole
+// format exactly: map-wide default overrides the personal setting overrides the
+// builtin below.
+export const SITE_BOOKMARK_TOKENS: { token: string; desc: string }[] = [
+  { token: '{sig}',         desc: 'Full signature ID (ABC-123)' },
+  { token: '{sig_letters}', desc: 'First 3 chars (ABC)' },
+  { token: '{type}',        desc: 'Site kind (Relic / Data / Gas)' },
+  { token: '{name}',        desc: 'Site name' },
+  { token: '{notes}',       desc: 'Signature notes' },
+  { token: '{age}',         desc: 'Hours since first seen (2h)' },
+];
+
+export const DEFAULT_SITE_BOOKMARK_FORMAT = '{type} {sig} {name}';
+
+// Site types this format (and its copy button) apply to.
+export const SITE_BOOKMARK_TYPES = new Set(['relic', 'data', 'gas']);
+
+const SITE_TOKEN_RE = /\{sig_letters\}|\{sig\}|\{type\}|\{name\}|\{notes\}|\{age\}/g;
+
+/**
+ * In-game bookmark name for a relic/data/gas site signature. Same squeeze rules
+ * as the wormhole formatter — unfillable tokens collapse and whitespace is
+ * normalised — so a partially-scanned site still yields a tidy name.
+ */
+export function formatSiteBookmarkName(
+  format: string,
+  sig: Signature,
+  now: number = Date.now(),
+): string {
+  const ageH = sig.createdAt
+    ? Math.max(0, Math.floor((now - new Date(sig.createdAt).getTime()) / 3_600_000))
+    : null;
+  const type = sig.sigType ? sig.sigType.charAt(0).toUpperCase() + sig.sigType.slice(1) : '';
+
+  const subs: Record<string, string> = {
+    '{sig}':         sig.sigId ?? '',
+    '{sig_letters}': (sig.sigId ?? '').slice(0, 3).toUpperCase(),
+    '{type}':        type,
+    '{name}':        sig.name ?? '',
+    '{notes}':       sig.notes ?? '',
+    '{age}':         ageH != null ? `${ageH}h` : '',
+  };
+
+  return format.replace(SITE_TOKEN_RE, (m) => subs[m] ?? '').trim().replace(/\s+/g, ' ');
+}

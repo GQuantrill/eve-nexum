@@ -109,6 +109,7 @@ export async function loadFullMap(mapId: string) {
               skip_kspace                 AS "skipKspace",
               collapse_grace_hours        AS "collapseGraceHours",
               bookmark_format             AS "bookmarkFormat",
+              site_bookmark_format        AS "siteBookmarkFormat",
               share_token              AS "shareToken",
               share_expires_at         AS "shareExpiresAt",
               share_include_sigs       AS "shareIncludeSigs",

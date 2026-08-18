@@ -22,7 +22,7 @@ import { useUserSetting } from "../../hooks/useUserSetting";
 import { normalizePlacement } from "../../hooks/useLocationTracking";
 import { NOTIFY } from "../../utils/notificationPrefs";
 import { useResettableState } from "../../hooks/useResettableState";
-import { DEFAULT_BOOKMARK_FORMAT, BOOKMARK_TOKENS } from "../../utils/signatureBookmark";
+import { DEFAULT_BOOKMARK_FORMAT, BOOKMARK_TOKENS, DEFAULT_SITE_BOOKMARK_FORMAT, SITE_BOOKMARK_TOKENS } from "../../utils/signatureBookmark";
 import { toPng } from "html-to-image";
 import { CaretLeftIcon, CaretRightIcon, GearIcon, DiscordLogoIcon } from "@phosphor-icons/react";
 import { DISCORD_INVITE_URL } from "../../data/links";
@@ -141,6 +141,7 @@ function CollapsibleSection({
 type SectionId =
   | "mapOptions"
   | "wormholeBookmarks"
+  | "bookmarks"
   | "mapControls"
   | "systemOptions"
   | "contentFilter"
@@ -588,18 +589,40 @@ function CorpKspaceToggle() {
 //
 // In the sidebar this is just a trigger — the actual editor + token reference
 // opens in its own modal (below), since the sidebar is too tight for both.
+// True when the current user may manage this map's shared bookmark formats: the
+// owner, or (on a shared corp/alliance map) a 'full'-control user or an admin —
+// alliance-admin for alliance maps, admin for corp maps. 'full' and up can edit;
+// shared personal maps stay owner-only. Mirrors the server gate on PATCH /maps.
+function canEditMapBookmark(
+  map: { isCorpMap?: boolean; isAllianceMap?: boolean },
+  role: Role,
+  isMapOwner: boolean,
+): boolean {
+  if (isMapOwner) return true;
+  if (map.isAllianceMap) return role === "full" || isAllianceAdminRole(role);
+  if (map.isCorpMap) return role === "full" || isAdminRole(role);
+  return false;
+}
+
+// The shared bookmark section: only rendered for users who can edit it (so
+// non-editors don't get an empty collapsible). Wraps the format trigger + modal.
+function MapBookmarkSection({ sectionProps }: { sectionProps: { isOpen: boolean; onToggle: () => void } }) {
+  const { t } = useTranslation();
+  const map = useMapStore((s) => s.map);
+  const { user } = useAuth();
+  const isMapOwner = useIsMapOwner();
+  if (!canEditMapBookmark(map, user?.role ?? "readonly", isMapOwner)) return null;
+  return (
+    <CollapsibleSection title={t("mapSidebar.sections.bookmarks")} {...sectionProps}>
+      <MapBookmarkFormat />
+    </CollapsibleSection>
+  );
+}
+
 function MapBookmarkFormat() {
   const { t } = useTranslation();
   const map = useMapStore((s) => s.map);
-  // Shared per-map policy — owner/admin only (alliance admin for alliance maps,
-  // admin for corp maps, owner for personal), mirroring the server gate.
-  const { user } = useAuth();
-  const isMapOwner = useIsMapOwner();
-  const role = user?.role ?? "readonly";
-  const canEdit = map.isAllianceMap ? isAllianceAdminRole(role) : map.isCorpMap ? isAdminRole(role) : isMapOwner;
   const [open, setOpen] = useState(false);
-
-  if (!canEdit) return null; // only owner/admins manage the shared policy
 
   const current = map.bookmarkFormat?.trim();
   return (
@@ -626,35 +649,45 @@ function MapBookmarkFormatModal({ onClose }: { onClose: () => void }) {
   const { t } = useTranslation();
   const map = useMapStore((s) => s.map);
   const [value, setValue] = useResettableState(map.bookmarkFormat ?? "");
+  const [siteValue, setSiteValue] = useResettableState(map.siteBookmarkFormat ?? "");
   const [saving, setSaving] = useState(false);
 
-  function setInStore(v: string | null) {
+  // One PATCH field per format; the store keeps both keys in sync. `field` is the
+  // API/store key, `col` selects which map property to read the previous value.
+  function setInStore(field: "bookmarkFormat" | "siteBookmarkFormat", v: string | null) {
     useMapStore.setState((s) => ({
-      map: { ...s.map, bookmarkFormat: v },
-      maps: s.maps.map((m) => (m.id === map.id ? { ...m, bookmarkFormat: v } : m)),
+      map: { ...s.map, [field]: v },
+      maps: s.maps.map((m) => (m.id === map.id ? { ...m, [field]: v } : m)),
     }));
   }
 
-  async function commit() {
-    const trimmed = value.trim();
+  async function commitField(
+    field: "bookmarkFormat" | "siteBookmarkFormat",
+    raw: string,
+    setLocal: (v: string) => void,
+  ) {
+    const trimmed = raw.trim();
     const next = trimmed === "" ? null : trimmed;
-    const prev = map.bookmarkFormat ?? null;
+    const prev = (map[field] ?? null) as string | null;
     if (next === prev) return;
     setSaving(true);
-    setInStore(next);
+    setInStore(field, next);
     try {
-      await api(`/api/maps/${map.id}`, { method: "PATCH", body: JSON.stringify({ bookmarkFormat: next }) });
+      await api(`/api/maps/${map.id}`, { method: "PATCH", body: JSON.stringify({ [field]: next }) });
     } catch (e) {
-      setInStore(prev);
-      setValue(prev ?? "");
+      setInStore(field, prev);
+      setLocal(prev ?? "");
       toast.error(e instanceof Error ? e.message : t("mapSidebar.updateSettingFailed"));
     } finally {
       setSaving(false);
     }
   }
 
-  // Save (optimistically) then close; commit is a no-op when nothing changed.
-  function close() { void commit(); onClose(); }
+  const commitWh   = () => commitField("bookmarkFormat", value, setValue);
+  const commitSite = () => commitField("siteBookmarkFormat", siteValue, setSiteValue);
+
+  // Save both (optimistically) then close; each commit is a no-op when unchanged.
+  function close() { void commitWh(); void commitSite(); onClose(); }
 
   // Portal to <body> so the fixed overlay isn't trapped by the sidebar's
   // transform/stacking context (which would pin it inside the sidebar).
@@ -666,6 +699,9 @@ function MapBookmarkFormatModal({ onClose }: { onClose: () => void }) {
           <button type="button" className="icon-btn" onClick={close} aria-label={t("actions.close")}>✕</button>
         </div>
         <div className="modal__body">
+          <p className="map-sidebar__help">{t("mapSidebar.mapBookmarkHelp")}</p>
+
+          <label className="map-sidebar__label">{t("mapSidebar.mapBookmarkWh")}</label>
           <input
             className="map-sidebar__select map-sidebar__select--full"
             type="text"
@@ -675,13 +711,29 @@ function MapBookmarkFormatModal({ onClose }: { onClose: () => void }) {
             disabled={saving}
             placeholder={t("mapSidebar.mapBookmarkPlaceholder")}
             onChange={(e) => setValue(e.target.value)}
-            onBlur={commit}
+            onBlur={commitWh}
             onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }}
           />
-          <p className="map-sidebar__help">{t("mapSidebar.mapBookmarkHelp")}</p>
-          <p className="map-sidebar__help">{t("mapSidebar.bookmarkHelp")}</p>
           <ul className="map-sidebar__tokens">
             {BOOKMARK_TOKENS.map((b) => (
+              <li key={b.token}><code>{b.token}</code> - {b.desc}</li>
+            ))}
+          </ul>
+
+          <label className="map-sidebar__label">{t("mapSidebar.mapBookmarkSite")}</label>
+          <input
+            className="map-sidebar__select map-sidebar__select--full"
+            type="text"
+            spellCheck={false}
+            value={siteValue}
+            disabled={saving}
+            placeholder={t("mapSidebar.mapBookmarkPlaceholder")}
+            onChange={(e) => setSiteValue(e.target.value)}
+            onBlur={commitSite}
+            onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }}
+          />
+          <ul className="map-sidebar__tokens">
+            {SITE_BOOKMARK_TOKENS.map((b) => (
               <li key={b.token}><code>{b.token}</code> - {b.desc}</li>
             ))}
           </ul>
@@ -869,6 +921,7 @@ export function MapSidebar() {
   const [placement, setPlacement] = useUserSetting<string>("nexum.map.placement", "east");
   const [colorVision, setColorVision] = useUserSetting<string>("nexum.a11y.colorVision", "off");
   const [sigBookmarkFmt, setSigBookmarkFmt] = useUserSetting<string>("nexum.sig.bookmarkFormat", DEFAULT_BOOKMARK_FORMAT);
+  const [siteBookmarkFmt, setSiteBookmarkFmt] = useUserSetting<string>("nexum.sig.siteBookmarkFormat", DEFAULT_SITE_BOOKMARK_FORMAT);
   const uniformSize = useMapStore((s) => s.uniformSize);
   const setUniformSize = useMapStore((s) => s.setUniformSize);
   const showStatics = useMapStore((s) => s.showStatics);
@@ -1206,10 +1259,12 @@ export function MapSidebar() {
               <LazyWhSweepToggle />
             </>
           )}
-          {/* Shared bookmark-name format for this map — owner/admin only; the
-              component renders null for everyone else. */}
-          <MapBookmarkFormat />
         </CollapsibleSection>
+
+        {/* Shared bookmark formats (wormhole + relic/data/gas) for this map.
+            Its own section since it's no longer wormhole-only; renders nothing
+            for users who can't manage the shared policy. */}
+        <MapBookmarkSection sectionProps={sectionProps("bookmarks")} />
 
         <CollapsibleSection title={t("mapSidebar.sections.tracking")} {...sectionProps("tracking")}>
           {isCorpMap || isAllianceMap ? (
@@ -1619,6 +1674,16 @@ export function MapSidebar() {
                   <p className="map-sidebar__help">{t("mapSidebar.bookmarkHelp")}</p>
                   <ul className="map-sidebar__tokens">
                     {BOOKMARK_TOKENS.map((b) => (
+                      <li key={b.token}><code>{b.token}</code> - {b.desc}</li>
+                    ))}
+                  </ul>
+                  <div className="map-sidebar__field">
+                    <label className="map-sidebar__label" htmlFor="site-bookmark-fmt">{t("mapSidebar.siteBookmark")}</label>
+                    <input id="site-bookmark-fmt" className="map-sidebar__select map-sidebar__select--full" type="text" spellCheck={false} value={siteBookmarkFmt} onChange={(e) => setSiteBookmarkFmt(e.target.value)} placeholder={DEFAULT_SITE_BOOKMARK_FORMAT} />
+                  </div>
+                  <p className="map-sidebar__help">{t("mapSidebar.siteBookmarkHelp")}</p>
+                  <ul className="map-sidebar__tokens">
+                    {SITE_BOOKMARK_TOKENS.map((b) => (
                       <li key={b.token}><code>{b.token}</code> - {b.desc}</li>
                     ))}
                   </ul>

@@ -154,6 +154,11 @@ export async function migrate() {
     -- so shared bookmarks stay consistent across the group.
     ALTER TABLE maps ADD COLUMN IF NOT EXISTS bookmark_format TEXT;
 
+    -- Per-map override for the relic/data/gas SITE bookmark format, mirroring
+    -- bookmark_format above (which is wormhole-only). NULL = no map policy;
+    -- users fall back to their own nexum.sig.siteBookmarkFormat.
+    ALTER TABLE maps ADD COLUMN IF NOT EXISTS site_bookmark_format TEXT;
+
     -- Per-corp Discord notification settings (region filter). No row => the
     -- defaults below => notify for every region. The regions column holds
     -- region NAMES, matched directly against map_systems.region_name.

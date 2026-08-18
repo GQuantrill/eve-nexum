@@ -2239,9 +2239,9 @@ mapsRouter.post('/:mapId/presence', async (req, res) => {
 // toggle merge-source eligibility (corp maps, full/admin only)
 mapsRouter.patch('/:mapId', async (req, res) => {
   const { mapId } = req.params;
-  const { name, locked, allowAsMergeSource, allowAsMergeDestination, lazyRemoveWormholes, collapseGraceHours, bookmarkFormat, skipKspace } = req.body as {
+  const { name, locked, allowAsMergeSource, allowAsMergeDestination, lazyRemoveWormholes, collapseGraceHours, bookmarkFormat, siteBookmarkFormat, skipKspace } = req.body as {
     name?: string; locked?: boolean; allowAsMergeSource?: boolean; allowAsMergeDestination?: boolean;
-    lazyRemoveWormholes?: boolean; collapseGraceHours?: number; bookmarkFormat?: string | null; skipKspace?: boolean;
+    lazyRemoveWormholes?: boolean; collapseGraceHours?: number; bookmarkFormat?: string | null; siteBookmarkFormat?: string | null; skipKspace?: boolean;
   };
 
   const access = await requireMapWrite(res, mapId, req);
@@ -2335,20 +2335,33 @@ mapsRouter.patch('/:mapId', async (req, res) => {
   // value clears the override so users fall back to their own global format.
   // Stored trimmed and length-capped.
   let normalizedBookmarkFmt: string | null | undefined;
-  if (bookmarkFormat !== undefined) {
+  let normalizedSiteBookmarkFmt: string | null | undefined;
+  // Wormhole and site bookmark formats share the same owner/admin gate; check
+  // it once, then apply whichever field(s) were sent.
+  if (bookmarkFormat !== undefined || siteBookmarkFormat !== undefined) {
     const role = req.session.role ?? 'readonly';
     if (access.accessKind === 'shared') {
       res.status(403).json({ error: 'Only the map owner can change the shared bookmark format' }); return;
     }
     if (access.corpId !== null || access.allianceId !== null) {
       const allianceScoped = access.allianceId !== null;
-      if (allianceScoped ? !isAllianceAdmin(role) : !isAdmin(role)) {
-        res.status(403).json({ error: allianceScoped ? 'Alliance admin access required' : 'Admin access required' }); return;
+      // 'full' control (and up) may manage the shared bookmark formats, alongside
+      // the corp/alliance admin tiers.
+      const allowed = role === 'full' || (allianceScoped ? isAllianceAdmin(role) : isAdmin(role));
+      if (!allowed) {
+        res.status(403).json({ error: allianceScoped ? 'Full or alliance-admin access required' : 'Full or admin access required' }); return;
       }
     }
-    const trimmed = typeof bookmarkFormat === 'string' ? bookmarkFormat.trim().slice(0, MAX_BOOKMARK_FMT_LEN) : '';
-    normalizedBookmarkFmt = trimmed === '' ? null : trimmed;
-    sets.push(`bookmark_format = $${vals.length + 1}`); vals.push(normalizedBookmarkFmt);
+    if (bookmarkFormat !== undefined) {
+      const trimmed = typeof bookmarkFormat === 'string' ? bookmarkFormat.trim().slice(0, MAX_BOOKMARK_FMT_LEN) : '';
+      normalizedBookmarkFmt = trimmed === '' ? null : trimmed;
+      sets.push(`bookmark_format = $${vals.length + 1}`); vals.push(normalizedBookmarkFmt);
+    }
+    if (siteBookmarkFormat !== undefined) {
+      const trimmed = typeof siteBookmarkFormat === 'string' ? siteBookmarkFormat.trim().slice(0, MAX_BOOKMARK_FMT_LEN) : '';
+      normalizedSiteBookmarkFmt = trimmed === '' ? null : trimmed;
+      sets.push(`site_bookmark_format = $${vals.length + 1}`); vals.push(normalizedSiteBookmarkFmt);
+    }
   }
 
   if (sets.length === 1) { res.status(400).json({ error: 'Nothing to update' }); return; }
@@ -2358,13 +2371,14 @@ mapsRouter.patch('/:mapId', async (req, res) => {
   // show on the canvas; the bookmark format must propagate live so everyone
   // copying a hole gets the same name without a reload. Merge-source flags are
   // sidebar-only, so not pushed.
-  if (name !== undefined || locked !== undefined || normalizedBookmarkFmt !== undefined) {
+  if (name !== undefined || locked !== undefined || normalizedBookmarkFmt !== undefined || normalizedSiteBookmarkFmt !== undefined) {
     publishToMap(mapId, {
       type: 'map.meta',
       actor: req.get('x-client-id') ?? null,
       ...(name !== undefined ? { name: String(name).slice(0, MAX_MAP_NAME_LEN) } : {}),
       ...(locked !== undefined ? { locked } : {}),
       ...(normalizedBookmarkFmt !== undefined ? { bookmarkFormat: normalizedBookmarkFmt } : {}),
+      ...(normalizedSiteBookmarkFmt !== undefined ? { siteBookmarkFormat: normalizedSiteBookmarkFmt } : {}),
     });
   }
   res.json({ ok: true });

@@ -396,7 +396,7 @@ export type RemoteEvent =
   | { type: 'route.update';      id: string; updates: Partial<SavedRoute> }
   | { type: 'route.remove';      id: string }
   | { type: 'route.reorder';     orderedIds: string[] }
-  | { type: 'map.meta';          name?: string; locked?: boolean; bookmarkFormat?: string | null }
+  | { type: 'map.meta';          name?: string; locked?: boolean; bookmarkFormat?: string | null; siteBookmarkFormat?: string | null }
   | { type: 'map.resync' }
   | { type: 'sig.changed';       systemId: string }
   | { type: 'structure.changed'; systemId: string }
@@ -1362,6 +1362,7 @@ export const useMapStore = create<MapStore>()((set, get) => {
             ...(event.name   !== undefined ? { name:   event.name }   : {}),
             ...(event.locked !== undefined ? { locked: event.locked } : {}),
             ...(event.bookmarkFormat !== undefined ? { bookmarkFormat: event.bookmarkFormat } : {}),
+            ...(event.siteBookmarkFormat !== undefined ? { siteBookmarkFormat: event.siteBookmarkFormat } : {}),
           };
           set((s) => ({
             map: { ...s.map, ...patch },
