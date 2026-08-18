@@ -208,10 +208,11 @@ authRouter.get('/callback', async (req, res) => {
     //     'admin' and force-upgrade existing rows on every login.
     //   - Restricted mode: ADMIN_CHAR_ID is pinned to the deployment's top tier
     //     (alliance_admin when alliance mode is on, else admin); other new users
-    //     default to readonly so an admin has to promote them.
+    //     default to config.defaultUserRole (DEFAULT_USER_ROLE, 'readonly' unless
+    //     the deployment opts members straight into 'edit'/'full').
     const isAdminChar = characterId === config.adminCharId;
     const bootstrapRole = config.allianceMode ? 'alliance_admin' : 'admin';
-    const defaultRole = !config.restrictedMode ? 'admin' : isAdminChar ? bootstrapRole : 'readonly';
+    const defaultRole = !config.restrictedMode ? 'admin' : isAdminChar ? bootstrapRole : config.defaultUserRole;
 
     const { rows } = await db.query<{ id: number; role: string; blocked: boolean }>(
       `INSERT INTO users (character_id, character_name, access_token, refresh_token, token_expires_at, role, corp_id, alliance_id, last_login_at)

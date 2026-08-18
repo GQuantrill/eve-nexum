@@ -37,6 +37,22 @@ const ADMIN_CHAR_ID = process.env.ADMIN_CHAR_ID ? parseInt(process.env.ADMIN_CHA
 const REPORTS_CHAR_ID = process.env.RV_REPORT_ID ? parseInt(process.env.RV_REPORT_ID, 10) : null;
 const CORP_MAP_TIME = parseInt(process.env.CORP_MAP_TIME ?? '30', 10);
 
+// Role a NEW user is created with on a restricted (corp/alliance) instance.
+// Existing users keep whatever role they already have. Deliberately limited to
+// the non-admin editing tiers ('readonly' | 'edit' | 'full') so a deployment can
+// start members at 'edit' — but can NEVER auto-mint admins here; 'admin' /
+// 'alliance_admin' must always be granted per-user by an admin. Anything unknown
+// or disallowed falls back to the safe 'readonly' default (no behaviour change).
+const DEFAULT_ROLE_CHOICES = ['readonly', 'edit', 'full'] as const;
+type DefaultRole = (typeof DEFAULT_ROLE_CHOICES)[number];
+function parseDefaultRole(raw: string | undefined): DefaultRole {
+  const v = (raw ?? '').trim().toLowerCase();
+  if ((DEFAULT_ROLE_CHOICES as readonly string[]).includes(v)) return v as DefaultRole;
+  if (v) console.warn(`DEFAULT_USER_ROLE="${raw}" is not one of ${DEFAULT_ROLE_CHOICES.join(', ')} — new users will default to 'readonly'`);
+  return 'readonly';
+}
+const DEFAULT_USER_ROLE = parseDefaultRole(process.env.DEFAULT_USER_ROLE);
+
 // When true, every member of any listed corp can see every corp map regardless
 // of which corp created it. When false (default), corp maps are visible only
 // to members of the corp that created them — Corp A's chain is invisible to
@@ -150,6 +166,8 @@ export const config = {
   // OFF in a wide-open solo install but ON the moment logins are restricted.
   restrictedMode:      CORP_IDS.length > 0 || ALLIANCE_IDS.length > 0,
   adminCharId:         ADMIN_CHAR_ID,
+  // Role new users start at on a restricted instance (default 'readonly').
+  defaultUserRole:     DEFAULT_USER_ROLE,
   reportsCharId:       REPORTS_CHAR_ID && Number.isInteger(REPORTS_CHAR_ID) && REPORTS_CHAR_ID > 0 ? REPORTS_CHAR_ID : null,
   corpMapExpireDays:   CORP_MAP_TIME,
   maxUserMaps:         parseInt(process.env.MAX_USER_MAPS ?? '5', 10),
