@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { db } from '../db.js';
+import { config } from '../config.js';
 import { requireAuth } from '../middleware/requireAuth.js';
 import { refreshStandingsForUser, loadOrgContacts } from '../services/standings.js';
 import { revalidateActiveSessions } from '../services/accessRevalidate.js';
@@ -164,8 +165,16 @@ standingsRouter.post('/refresh', async (req, res) => {
     ? await revalidateActiveSessions()
     : { usersEvicted: 0, sessionsKilled: 0, grantsPruned: 0 };
 
+  // Whether the syncing character actually belongs to the deployment's
+  // configured corp/alliance. Only a member can read that org's ESI contacts,
+  // so when this is false the org sync did nothing — the UI uses it to say
+  // "a member must sync" instead of a misleading "no role".
+  const inOrg = (corp_id !== null && config.corpIds.includes(corp_id))
+             || (alliance_id !== null && config.allianceIds.includes(alliance_id));
+
   res.json({
     ok: true,
+    inOrg,
     counts: {
       character: charCnt.rows[0]?.count ?? 0,
       corp:      corpCnt.rows[0]?.count ?? 0,

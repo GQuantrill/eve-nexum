@@ -1,4 +1,5 @@
 import { db } from '../db.js';
+import { config } from '../config.js';
 import { esiFetch } from '../utils/esi.js';
 import { createLogger } from '../utils/logger.js';
 
@@ -166,8 +167,13 @@ export async function refreshStandingsForUser(params: {
     })().catch((err) => log.error('character standings fetch errored:', err)));
   }
 
-  // Corp — requires the Contact Manager role; 403 is the common case.
-  if (corpId !== null && await shouldRefresh('corp', corpId)) {
+  // Corp — access-control standings for the DEPLOYMENT'S configured corp(s), not
+  // the syncing user's own corp. Gated to config.corpIds so a member of an
+  // unrelated corp (e.g. whoever set the instance up) can never populate corp
+  // standings the access gate would ignore anyway. Reading ESI corp contacts
+  // also requires the syncing character to be IN this corp with the Contact
+  // Manager role, so in practice this only fires for a configured-corp member.
+  if (corpId !== null && config.corpIds.includes(corpId) && await shouldRefresh('corp', corpId)) {
     tasks.push((async () => {
       const r = await fetchAllContacts(
         `https://esi.evetech.net/v2/corporations/${corpId}/contacts/`,
@@ -184,9 +190,11 @@ export async function refreshStandingsForUser(params: {
     })().catch((err) => log.error('corp standings fetch errored:', err)));
   }
 
-  // Alliance — requires the character to be in the executor corp with the
-  // appropriate role; very rare. 403 is the common case.
-  if (allianceId !== null && await shouldRefresh('alliance', allianceId)) {
+  // Alliance — access-control standings for the DEPLOYMENT'S configured
+  // alliance(s), not the syncing user's own. Gated to config.allianceIds for the
+  // same reason as corp above; reading ESI alliance contacts requires the
+  // character be in the alliance with the appropriate role.
+  if (allianceId !== null && config.allianceIds.includes(allianceId) && await shouldRefresh('alliance', allianceId)) {
     tasks.push((async () => {
       const r = await fetchAllContacts(
         `https://esi.evetech.net/v2/alliances/${allianceId}/contacts/`,
