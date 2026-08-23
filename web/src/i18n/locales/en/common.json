@@ -59,7 +59,8 @@
     "revoke": "Revoke",
     "revokeConfirm": "Revoke \"{{name}}\"? Any tool using this key will immediately lose access.",
     "revoked": "Revoked \"{{name}}\"",
-    "revokeFailed": "Couldn't revoke the key. Please try again."
+    "revokeFailed": "Couldn't revoke the key. Please try again.",
+    "disabled": "API keys disabled"
   },
   "session": {
     "idleLogout": "Signed out due to inactivity.",

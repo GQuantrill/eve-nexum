@@ -1801,7 +1801,8 @@
     "revoke": "취소",
     "revokeConfirm": "\"{{name}}\"을(를) 취소하시겠습니까? 이 키를 사용하는 모든 도구가 즉시 접근을 잃습니다.",
     "revoked": "\"{{name}}\" 취소됨",
-    "revokeFailed": "키를 취소할 수 없습니다. 다시 시도하세요."
+    "revokeFailed": "키를 취소할 수 없습니다. 다시 시도하세요.",
+    "disabled": "API 키 비활성화됨"
   },
   "whChart": {
     "open": "⊟ 웜홀 참조",

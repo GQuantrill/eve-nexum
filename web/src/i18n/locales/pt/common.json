@@ -1801,7 +1801,8 @@
     "revoke": "Revogar",
     "revokeConfirm": "Revogar \"{{name}}\"? Qualquer ferramenta que use esta chave perderá o acesso imediatamente.",
     "revoked": "\"{{name}}\" revogada",
-    "revokeFailed": "Não foi possível revogar a chave. Tenta novamente."
+    "revokeFailed": "Não foi possível revogar a chave. Tenta novamente.",
+    "disabled": "Chaves de API desativadas"
   },
   "whChart": {
     "open": "⊟ Referência de buracos de minhoca",

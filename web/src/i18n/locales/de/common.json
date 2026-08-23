@@ -1801,7 +1801,8 @@
     "revoke": "Widerrufen",
     "revokeConfirm": "\"{{name}}\" widerrufen? Jedes Tool, das diesen Schlüssel nutzt, verliert sofort den Zugriff.",
     "revoked": "\"{{name}}\" widerrufen",
-    "revokeFailed": "Schlüssel konnte nicht widerrufen werden. Bitte erneut versuchen."
+    "revokeFailed": "Schlüssel konnte nicht widerrufen werden. Bitte erneut versuchen.",
+    "disabled": "API-Schlüssel deaktiviert"
   },
   "whChart": {
     "open": "⊟ Wurmloch-Referenz",

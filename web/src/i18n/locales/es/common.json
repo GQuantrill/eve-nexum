@@ -1801,7 +1801,8 @@
     "revoke": "Revocar",
     "revokeConfirm": "¿Revocar «{{name}}»? Cualquier herramienta que use esta clave perderá el acceso inmediatamente.",
     "revoked": "«{{name}}» revocada",
-    "revokeFailed": "No se pudo revocar la clave. Inténtalo de nuevo."
+    "revokeFailed": "No se pudo revocar la clave. Inténtalo de nuevo.",
+    "disabled": "Claves API desactivadas"
   },
   "whChart": {
     "open": "⊟ Referencia de agujeros de gusano",

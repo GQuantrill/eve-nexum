@@ -1801,7 +1801,8 @@
     "revoke": "撤销",
     "revokeConfirm": "撤销「{{name}}」？使用此密钥的任何工具将立即失去访问权限。",
     "revoked": "已撤销「{{name}}」",
-    "revokeFailed": "无法撤销密钥。请重试。"
+    "revokeFailed": "无法撤销密钥。请重试。",
+    "disabled": "API 密钥已禁用"
   },
   "whChart": {
     "open": "⊟ 虫洞参考",

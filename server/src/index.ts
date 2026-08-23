@@ -146,7 +146,11 @@ app.use('/api/standings',         appLimiter, standingsRouter);
 app.use('/api/keys',              appLimiter, keysRouter);
 // External read API (Bearer key or session). Reuses the app limiter for now;
 // a per-key limiter (keyed on token id) is a planned safety follow-up.
-app.use('/api/v1',                appLimiter, apiV1Router);
+// DISABLE_EXTERNAL_API turns the whole surface off (403) without revoking keys.
+app.use('/api/v1', (req, res, next) => {
+  if (config.externalApiDisabled) return res.status(403).json({ error: 'External API is disabled' });
+  next();
+}, appLimiter, apiV1Router);
 app.use('/api/search',            esiLimiter, searchRouter);
 
 app.get('/health', (_req, res) => res.json({ ok: true }));

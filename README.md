@@ -235,6 +235,8 @@ Generate a consistent, paste-ready name for a wormhole and drop it straight into
 
 Read **and drive** your maps programmatically — pull the live chain into a fleet bot, auto-import scan results from an intel tool, run a "is home open to highsec?" checker, or your own scripts. Authenticated with a long-lived **API key** you generate, instead of a browser session.
 
+> **Turning it off (self-hosters).** Set `DISABLE_EXTERNAL_API=true` in the server environment to switch this whole surface off. Every `/api/v1` request then returns `403` — reads, writes, and the live event stream alike — and the app disables API-key creation (the 🔑 toolbar button greys out with an "API keys disabled" tooltip). Already-issued keys stop working but aren't deleted, so setting it back to `false` (the default) restores them without re-issuing. Only affects inbound API access — it doesn't touch the app's own UI or outbound Discord / webhook pushes.
+
 **Generate a key.** Click the 🔑 icon in the toolbar (next to the language switcher). Give it a name, pick which of your characters it **acts as** (the key can do exactly what that character can — same maps, same role), choose its **access** (see scopes below), and optionally set an expiry. The key is shown **once** at creation — copy it then; it's stored only as a hash and can't be retrieved again. Revoke any key from the same panel and any tool using it loses access immediately.
 
 **Scopes** (each includes the ones above it):

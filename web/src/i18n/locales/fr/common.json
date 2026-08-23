@@ -1801,7 +1801,8 @@
     "revoke": "Révoquer",
     "revokeConfirm": "Révoquer « {{name}} » ? Tout outil utilisant cette clé perdra immédiatement l'accès.",
     "revoked": "« {{name}} » révoquée",
-    "revokeFailed": "Impossible de révoquer la clé. Veuillez réessayer."
+    "revokeFailed": "Impossible de révoquer la clé. Veuillez réessayer.",
+    "disabled": "Clés API désactivées"
   },
   "whChart": {
     "open": "⊟ Référence trous de ver",

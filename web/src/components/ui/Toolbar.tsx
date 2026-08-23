@@ -717,9 +717,11 @@ export function Toolbar() {
         <LanguageSwitcher compact />
         <button
           className="toolbar__toggle toolbar__toggle--icon"
-          onClick={() => setShowKeys(true)}
-          data-tooltip={t('apiKeys.title')}
-          aria-label={t('apiKeys.title')}
+          onClick={() => { if (!user.externalApiDisabled) setShowKeys(true); }}
+          aria-disabled={user.externalApiDisabled || undefined}
+          style={user.externalApiDisabled ? { opacity: 0.45, cursor: 'not-allowed' } : undefined}
+          data-tooltip={user.externalApiDisabled ? t('apiKeys.disabled') : t('apiKeys.title')}
+          aria-label={user.externalApiDisabled ? t('apiKeys.disabled') : t('apiKeys.title')}
         >
           <KeyIcon size={18} weight="regular" />
         </button>

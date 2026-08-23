@@ -65,6 +65,13 @@ const CORP_MAP_SHARED = parseBool(process.env.CORP_MAP_SHARED);
 // owns it.
 const ALLIANCE_MAP_SHARED = parseBool(process.env.ALLIANCE_MAP_SHARED);
 
+// Kill switch for the inbound external read API (/api/v1 — the Bearer-key REST
+// + SSE surface external clients use to read maps/systems/signatures). Default
+// false (API enabled). Set DISABLE_EXTERNAL_API=true to turn it off entirely,
+// without having to revoke every issued key. Does not affect the app's own
+// same-origin API or outbound integrations (Discord / webhooks).
+const EXTERNAL_API_DISABLED = parseBool(process.env.DISABLE_EXTERNAL_API);
+
 // A restricted (non-solo) deployment — corp OR alliance gated — needs a
 // bootstrap admin so someone can always administer it.
 if ((CORP_IDS.length > 0 || ALLIANCE_IDS.length > 0) && ADMIN_CHAR_ID === null) {
@@ -161,6 +168,8 @@ export const config = {
   allianceMode:        ALLIANCE_IDS.length > 0,
   allianceIds:         ALLIANCE_IDS,
   allianceMapShared:   ALLIANCE_MAP_SHARED,
+  // Kill switch for the inbound external read API (/api/v1). Default off.
+  externalApiDisabled: EXTERNAL_API_DISABLED,
   // True for any non-solo deployment (corp- or alliance-gated). Drives role
   // enforcement, map scoping and the idle-map sweep — everything that must be
   // OFF in a wide-open solo install but ON the moment logins are restricted.

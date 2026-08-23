@@ -529,6 +529,8 @@ authRouter.get('/me', async (req, res) => {
       uiSettings:    prefs.uiSettings ?? {},
       panelOrder:    prefs.panelOrder,
       canViewReports: config.reportsCharId !== null && req.session.characterId === config.reportsCharId,
+      // When the external API is off, the UI hides/disables API-key creation.
+      externalApiDisabled: config.externalApiDisabled,
     },
   });
 });

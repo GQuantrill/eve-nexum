@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { db } from '../db.js';
+import { config } from '../config.js';
 import { requireAuth } from '../middleware/requireAuth.js';
 import { resolveOwnerId } from '../utils/owner.js';
 import { generateApiKey } from '../utils/apiKeys.js';
@@ -51,6 +52,12 @@ keysRouter.get('/', async (req, res) => {
 // Body: { name, contextCharacterId, scope?, expiresAt? }. Returns the raw key
 // exactly once.
 keysRouter.post('/', async (req, res) => {
+  // No new keys while the external API is switched off (DISABLE_EXTERNAL_API) —
+  // they'd be dead on arrival. The UI also disables the control; this is the
+  // server-side backstop.
+  if (config.externalApiDisabled) {
+    res.status(403).json({ error: 'External API is disabled' }); return;
+  }
   const ownerId = await resolveOwnerId(req);
   if (ownerId == null) { res.status(401).json({ error: 'Not authenticated' }); return; }
 

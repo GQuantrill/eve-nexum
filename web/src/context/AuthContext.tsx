@@ -71,6 +71,8 @@ export interface AuthUser {
   uiSettings: Record<string, unknown>;
   panelOrder: string[];
   canViewReports: boolean;
+  /** External read API (/api/v1) is switched off — the UI disables API-key creation. */
+  externalApiDisabled?: boolean;
 }
 
 interface AuthContextValue {
