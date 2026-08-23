@@ -1929,6 +1929,12 @@
     "fatigueCapped": "5h cap",
     "fatigueHint": "Reactivation cooldown per jump. Assumes a fresh start (0 fatigue) and back-to-back jumps; fatigue caps at 5h.",
     "fatigueLabel": "Jump fatigue",
-    "cooldownLabel": "Reactivation cooldown"
+    "cooldownLabel": "Reactivation cooldown",
+    "regionalGates": "Regional gates",
+    "regionalGatesUse": "Use where shorter",
+    "regionalGatesHelp": "Allow the route to take regional (cross-region) stargate jumps instead of jumping around them. These gates are chokepoints and are often camped, so use with caution.",
+    "viaGates": "incl. {{gates}} regional gate(s)",
+    "regionalGateHop": "regional gate",
+    "legendGate": "regional gate"
   }
 }

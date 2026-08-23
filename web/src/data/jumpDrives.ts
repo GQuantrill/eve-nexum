@@ -63,12 +63,14 @@ export interface FatigueResult {
   hitCap: boolean;            // true if fatigue ever pinned the 5h cap
 }
 
-export function computeFatigue(hops: { lyFromPrev: number }[]): FatigueResult {
+export function computeFatigue(hops: { lyFromPrev: number; viaGate?: boolean }[]): FatigueResult {
   let fatigue = 0, total = 0, peak = 0;
   let hitCap = false;
   const perHop: (FatigueHop | null)[] = [];
   hops.forEach((h, i) => {
-    if (i === 0) { perHop.push(null); return; }   // origin — no jump
+    // Origin, and regional-gate hops (a gate jump is not a jump-drive
+    // activation), add no fatigue.
+    if (i === 0 || h.viaGate) { perHop.push(null); return; }
     const d = h.lyFromPrev;
     fatigue = Math.min(300, Math.max(fatigue, 10) * (1 + d));
     const cooldown = Math.max(fatigue / 10, 1 + d);

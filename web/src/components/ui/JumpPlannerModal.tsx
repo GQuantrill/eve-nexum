@@ -14,8 +14,8 @@ import { dockState } from '../../data/dockingRules';
 // Conservation / Jump Freighters) and an objective (fewest jumps or least fuel),
 // plot a multi-hop jump route with totals + a route map, and save/load plans.
 // EVE skill names, ship-class labels and "ly" stay English; the rest is i18n'd.
-interface RouteHop { eveSystemId: number; name: string; systemClass: string; lyFromPrev: number; x: number; y: number }
-interface RouteResp { hasCoords: boolean; route: { hops: RouteHop[]; jumps: number; totalLy: number } | null }
+interface RouteHop { eveSystemId: number; name: string; systemClass: string; lyFromPrev: number; x: number; y: number; viaGate?: boolean }
+interface RouteResp { hasCoords: boolean; route: { hops: RouteHop[]; jumps: number; gates: number; totalLy: number } | null }
 interface SavedPlan { id: string; name: string; fromEveId: number; toEveId: number; fromName: string | null; toName: string | null; shipClass: string; objective: 'hops' | 'fuel'; avoid: { id: number; name: string }[]; waypoints: { id: number; name: string }[]; preferLevel: string }
 interface CorpStructure { key: string; name: string; typeName: string; solarSystemId: number | null; systemName: string | null; systemClass: string | null; source: 'corp' | 'map' }
 type Picked = { id: number; name: string; structureType?: string | null } | null;
@@ -38,6 +38,9 @@ export function JumpPlannerModal({ onClose }: { onClose: () => void }) {
   const [avoid, setAvoid] = useState<{ id: number; name: string }[]>([]);
   const [waypoints, setWaypoints] = useState<{ id: number; name: string }[]>([]);
   const [preferLevel, setPreferLevel] = useUserSetting<string>('nexum.jump.preferLevel', 'off');
+  // Opt-in: let the route take regional (cross-region) stargate jumps. Off by
+  // default — these gates are chokepoints and are often camped.
+  const [regionalGates, setRegionalGates] = useUserSetting<boolean>('nexum.jump.regionalGates', false);
 
   const refreshPlans = () => { api<SavedPlan[]>('/api/jump-plans').then(setPlans).catch(() => {}); };
   // Structures (corp ESI-synced on login + map-tagged) feed the From/To search;
@@ -93,6 +96,7 @@ export function JumpPlannerModal({ onClose }: { onClose: () => void }) {
       });
       if (waypoints.length) params.set('via', waypoints.map((w) => w.id).join(','));
       if (avoid.length) params.set('avoid', avoid.map((a) => a.id).join(','));
+      if (regionalGates) params.set('regionalGates', '1');
       if (preferLevel !== 'off') {
         params.set('preferStations', preferLevel);
         // Pass the caller's structure systems so they count as "safe" too.
@@ -194,6 +198,13 @@ export function JumpPlannerModal({ onClose }: { onClose: () => void }) {
                   { value: 'strong', label: t('jumpPlanner.preferStrong') },
                 ]} />
             </Labelled>
+            <Labelled label={t('jumpPlanner.regionalGates')}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, cursor: 'pointer', whiteSpace: 'nowrap' }}
+                title={t('jumpPlanner.regionalGatesHelp')}>
+                <input type="checkbox" checked={regionalGates} onChange={(e) => setRegionalGates(e.target.checked)} />
+                {t('jumpPlanner.regionalGatesUse')}
+              </span>
+            </Labelled>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -223,6 +234,9 @@ export function JumpPlannerModal({ onClose }: { onClose: () => void }) {
             <div style={{ borderTop: '1px solid #30363d', paddingTop: 10 }}>
               <div style={{ fontSize: 14, marginBottom: 8 }}>
                 {t('jumpPlanner.result', { jumps: result.route.jumps, ly: result.route.totalLy.toFixed(1), fuel: fuel.toLocaleString() })}
+                {result.route.gates > 0 && (
+                  <span style={{ color: 'var(--cv-conn-eol, #e69f00)' }}> · {t('jumpPlanner.viaGates', { gates: result.route.gates })}</span>
+                )}
               </div>
               {fatigue && result.route.jumps > 0 && (
                 <div title={t('jumpPlanner.fatigueHint')} style={{ fontSize: 13, marginBottom: 8, color: fatigue.hitCap ? 'var(--cv-conn-eol, #e69f00)' : 'var(--text-subtle)' }}>
@@ -236,7 +250,9 @@ export function JumpPlannerModal({ onClose }: { onClose: () => void }) {
                 {result.route.hops.map((h, i) => (
                   <li key={h.eveSystemId} style={{ fontSize: 13 }}>
                     {h.name} <span style={{ color: 'var(--text-faint)' }}>{h.systemClass}</span>
-                    {i > 0 && <span style={{ color: 'var(--text-subtle)' }}> — {h.lyFromPrev.toFixed(2)} ly</span>}
+                    {i > 0 && (h.viaGate
+                      ? <span style={{ color: 'var(--cv-conn-eol, #e69f00)' }}> — {t('jumpPlanner.regionalGateHop')}</span>
+                      : <span style={{ color: 'var(--text-subtle)' }}> — {h.lyFromPrev.toFixed(2)} ly</span>)}
                     {i > 0 && fatigue?.perHop[i] && (
                       <span style={{ color: 'var(--text-faint)' }}>
                         {' · '}
@@ -273,6 +289,7 @@ function RouteMap({ hops }: { hops: RouteHop[] }) {
   // this the map renders upside-down (a northern destination appears south).
   const sy = (y: number) => oy + (maxY - y) * scale;
   const pts = hops.map((h) => ({ x: sx(h.x), y: sy(h.y), h }));
+  const hasGate = hops.some((h) => h.viaGate);
   const dot = (color: string) => (
     <span style={{ display: 'inline-block', width: 11, height: 11, borderRadius: '50%', background: color, border: '2px solid #56b4e9', boxSizing: 'border-box' }} />
   );
@@ -282,7 +299,13 @@ function RouteMap({ hops }: { hops: RouteHop[] }) {
   return (
     <div style={{ position: 'relative' }}>
       <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 300, background: '#0d1117', borderRadius: 6, display: 'block' }}>
-        <polyline points={pts.map((p) => `${p.x},${p.y}`).join(' ')} fill="none" stroke="#56b4e9" strokeWidth={2} opacity={0.85} />
+        {/* One line per leg so a regional-gate jump can render dashed/amber. */}
+        {pts.slice(1).map((p, idx) => {
+          const prev = pts[idx];
+          return <line key={p.h.eveSystemId} x1={prev.x} y1={prev.y} x2={p.x} y2={p.y}
+            stroke={p.h.viaGate ? '#e69f00' : '#56b4e9'} strokeWidth={2} opacity={0.85}
+            strokeDasharray={p.h.viaGate ? '5 4' : undefined} />;
+        })}
         {pts.map((p, i) => {
           const first = i === 0, last = i === pts.length - 1;
           return (
@@ -290,7 +313,11 @@ function RouteMap({ hops }: { hops: RouteHop[] }) {
               <circle cx={p.x} cy={p.y} r={first || last ? 6 : 4}
                 fill={first ? '#3ddc84' : last ? '#e69f00' : '#161b22'} stroke="#56b4e9" strokeWidth={2} />
               {(first || last || pts.length <= 12) && (
-                <text x={p.x} y={p.y - 9} fill="#c9d1d9" fontSize={11} textAnchor="middle">{p.h.name}</text>
+                // Alternate labels above/below along the path so clustered
+                // systems don't overprint each other; a dark halo keeps them
+                // readable over lines and adjacent labels.
+                <text x={p.x} y={p.y + (i % 2 === 0 ? -9 : 18)} fill="#c9d1d9" fontSize={11} textAnchor="middle"
+                  stroke="#0d1117" strokeWidth={3} paintOrder="stroke">{p.h.name}</text>
               )}
             </g>
           );
@@ -300,6 +327,11 @@ function RouteMap({ hops }: { hops: RouteHop[] }) {
         {legendItem('#3ddc84', t('jumpPlanner.legendOrigin'))}
         {pts.length > 2 && legendItem('#161b22', t('jumpPlanner.legendHop'))}
         {legendItem('#e69f00', t('jumpPlanner.legendDest'))}
+        {hasGate && (
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+            <span style={{ display: 'inline-block', width: 14, borderTop: '2px dashed #e69f00' }} /> {t('jumpPlanner.legendGate')}
+          </span>
+        )}
       </div>
     </div>
   );
@@ -320,7 +352,9 @@ function AddSystemSearch({ onAdd, placeholder }: { onAdd: (s: { id: number; name
   const { t } = useTranslation();
   const [query, setQuery] = useState('');
   const { results, loading } = useEsiSearch(query);
-  const kspace = results.filter((r) => r.systemClass === 'LS' || r.systemClass === 'NS');
+  // Pochven (Triglavian) systems read LS/NS by security but can't be jumped
+  // to/through, so they're never valid jump points — exclude them.
+  const kspace = results.filter((r) => (r.systemClass === 'LS' || r.systemClass === 'NS') && r.npcType !== 'Triglavian');
   const show = query.trim().length >= 2 && (kspace.length > 0 || loading);
   return (
     <div style={{ position: 'relative' }}>
@@ -357,7 +391,9 @@ function Field({ label, value, onPick, structures }: { label: string; value: Pic
   const { t } = useTranslation();
   const [query, setQuery] = useState('');
   const { results, loading } = useEsiSearch(query);
-  const kspace = results.filter((r) => r.systemClass === 'LS' || r.systemClass === 'NS');
+  // Pochven (Triglavian) systems read LS/NS by security but can't be jumped
+  // to/through, so they're never valid jump points — exclude them.
+  const kspace = results.filter((r) => (r.systemClass === 'LS' || r.systemClass === 'NS') && r.npcType !== 'Triglavian');
   const q = query.trim().toLowerCase();
   const structMatches = q.length >= 2
     ? structures.filter((s) => s.solarSystemId != null && (s.systemClass === 'LS' || s.systemClass === 'NS') && s.name.toLowerCase().includes(q)).slice(0, 6)

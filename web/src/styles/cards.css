@@ -204,6 +204,18 @@
     caret-color: var(--text-default);
   }
 
+  /* react-md-editor stacks a transparent <textarea> (real text + caret) under a
+     highlighted <pre><code> overlay (the text you actually see). The library
+     hard-codes that overlay to 14px !important, but the textarea above is our
+     13px note size, so the caret is positioned by 13px metrics while the glyphs
+     render at 14px -- the caret drifts ~1px per character. Pin both layers (and
+     their shared parent) to the SAME size so the caret sits on the text. */
+  .w-md-editor-text,
+  .w-md-editor-text-pre,
+  .w-md-editor-text-pre > code {
+    font-size: calc(13px * var(--font-scale, 1)) !important;
+  }
+
   .wmde-markdown {
     background: transparent;
     color: var(--text-default);

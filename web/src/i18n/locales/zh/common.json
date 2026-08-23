@@ -1929,6 +1929,12 @@
     "fatigueCapped": "5小时上限",
     "fatigueHint": "每次跳跃的重新激活冷却。假设从零疲劳开始并连续跳跃；疲劳上限为5小时。",
     "fatigueLabel": "跳跃疲劳",
-    "cooldownLabel": "重新激活冷却"
+    "cooldownLabel": "重新激活冷却",
+    "regionalGates": "星域之门",
+    "regionalGatesUse": "更短时使用",
+    "regionalGatesHelp": "允许路线使用跨星域星门（星域之门），而不是绕行跳跃。这些门是咽喉要道，常被蹲守，请谨慎使用。",
+    "viaGates": "含 {{gates}} 个星域之门",
+    "regionalGateHop": "星域之门",
+    "legendGate": "星域之门"
   }
 }

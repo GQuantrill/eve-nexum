@@ -1929,6 +1929,12 @@
     "fatigueCapped": "tope 5 h",
     "fatigueHint": "Enfriamiento de reactivación por salto. Asume inicio sin fatiga y saltos seguidos; la fatiga tope es 5 h.",
     "fatigueLabel": "Fatiga de salto",
-    "cooldownLabel": "Enfriamiento de reactivación"
+    "cooldownLabel": "Enfriamiento de reactivación",
+    "regionalGates": "Puertas regionales",
+    "regionalGatesUse": "Usar si es más corto",
+    "regionalGatesHelp": "Permite que la ruta use puertas estelares regionales (entre regiones) en lugar de saltar alrededor. Estas puertas son puntos de estrangulamiento y suelen estar vigiladas; úsalas con precaución.",
+    "viaGates": "incl. {{gates}} puerta(s) regional(es)",
+    "regionalGateHop": "puerta regional",
+    "legendGate": "puerta regional"
   }
 }

@@ -1929,6 +1929,12 @@
     "fatigueCapped": "plafond 5 h",
     "fatigueHint": "Délai de réactivation par saut. Suppose un départ à zéro fatigue et des sauts enchaînés ; fatigue plafonnée à 5 h.",
     "fatigueLabel": "Fatigue de saut",
-    "cooldownLabel": "Délai de réactivation"
+    "cooldownLabel": "Délai de réactivation",
+    "regionalGates": "Portes régionales",
+    "regionalGatesUse": "Utiliser si plus court",
+    "regionalGatesHelp": "Autorise l'itinéraire à emprunter des portes stellaires régionales (inter-régions) au lieu de sauter autour. Ces portes sont des goulots d'étranglement souvent campés : à utiliser avec prudence.",
+    "viaGates": "incl. {{gates}} porte(s) régionale(s)",
+    "regionalGateHop": "porte régionale",
+    "legendGate": "porte régionale"
   }
 }

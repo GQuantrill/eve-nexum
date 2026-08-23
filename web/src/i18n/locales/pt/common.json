@@ -1929,6 +1929,12 @@
     "fatigueCapped": "limite 5 h",
     "fatigueHint": "Cooldown de reativação por salto. Assume início sem fadiga e saltos seguidos; a fadiga limita em 5 h.",
     "fatigueLabel": "Fadiga de salto",
-    "cooldownLabel": "Cooldown de reativação"
+    "cooldownLabel": "Cooldown de reativação",
+    "regionalGates": "Portões regionais",
+    "regionalGatesUse": "Usar se for mais curto",
+    "regionalGatesHelp": "Permite que a rota use portões estelares regionais (entre regiões) em vez de saltar ao redor. Esses portões são pontos de estrangulamento e costumam ser vigiados; use com cautela.",
+    "viaGates": "incl. {{gates}} portão(ões) regional(is)",
+    "regionalGateHop": "portão regional",
+    "legendGate": "portão regional"
   }
 }

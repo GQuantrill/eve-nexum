@@ -404,12 +404,15 @@ systemsRouter.get('/jump-route', async (req, res) => {
   const pref = String(req.query.preferStations ?? '');
   const preferSafe = pref === 'strong' ? 'strong' as const
     : (pref === 'prefer' || pref === '1' || pref === 'true') ? 'prefer' as const : undefined;
+  // Opt-in: allow regional (cross-region) stargate jumps as free 1-hop edges.
+  const rg = String(req.query.regionalGates ?? '');
+  const regionalGates = rg === '1' || rg === 'true';
   if (!from || !to || !rangeLy) {
     return res.status(400).json({ error: 'from, to and rangeLy are required' });
   }
   try {
     if ((await jumpGraphSize()) === 0) return res.json({ hasCoords: false, route: null });
-    const route = await planJumpRouteVia([from, ...via, to], rangeLy, objective, { avoid, preferSafe, extraSafe });
+    const route = await planJumpRouteVia([from, ...via, to], rangeLy, objective, { avoid, preferSafe, extraSafe, regionalGates });
     return res.json({ hasCoords: true, route });
   } catch (err) {
     log.error('jump-route failed:', err);

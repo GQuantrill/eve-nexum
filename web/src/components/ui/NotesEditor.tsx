@@ -53,6 +53,11 @@ export function NotesEditor({ value, onChange, compact = false, readOnly = false
   const [draft, setDraft] = useState(value);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pending   = useRef<string | null>(null);
+  // The last value we emitted via onChange. Our own save round-trips back
+  // through the store as a new `value` prop; we must NOT re-adopt that echo (see
+  // the adopt block below), or a stale intermediate echo can revert `draft` and
+  // strand the cursor mid-note.
+  const lastEmitted = useRef<string | null>(null);
   // Keep the latest onChange in a ref so the debounced flush never goes stale.
   const onChangeRef = useRef(onChange);
   useEffect(() => { onChangeRef.current = onChange; }, [onChange]);
@@ -60,20 +65,25 @@ export function NotesEditor({ value, onChange, compact = false, readOnly = false
   const flush = useCallback(() => {
     if (saveTimer.current) { clearTimeout(saveTimer.current); saveTimer.current = null; }
     if (pending.current !== null) {
+      lastEmitted.current = pending.current;
       onChangeRef.current(pending.current);
       pending.current = null;
     }
   }, []);
 
   // Adopt external updates (e.g. a remote edit) when the value prop actually
-  // changes — but never while the user is actively editing, which would clobber
-  // their typing. Done during render (React's recommended "adjust state on prop
-  // change" pattern) rather than in an effect, so there's no extra render pass
-  // and no risk of reverting an in-flight edit on blur.
+  // changes — but never while the user is actively editing (which would clobber
+  // their typing), and never the echo of our OWN debounced save round-tripping
+  // back through the store. Adopting that echo is the bug behind the stranded
+  // cursor: a stale intermediate save (e.g. an earlier debounce flush) can arrive
+  // as `value` during the blur->refocus window and revert `draft` shorter than
+  // what's typed, so the controlled textarea then caps the cursor mid-note.
+  // Done during render (React's "adjust state on prop change" pattern) rather
+  // than in an effect, so there's no extra render pass.
   const [seenValue, setSeenValue] = useState(value);
   if (value !== seenValue) {
     setSeenValue(value);
-    if (!focused) setDraft(value);
+    if (!focused && value !== lastEmitted.current) setDraft(value);
   }
 
   // Flush any pending save when the editor unmounts.
@@ -92,7 +102,14 @@ export function NotesEditor({ value, onChange, compact = false, readOnly = false
     if (readOnly || focused) return;
     setFocused(true);
     setTimeout(() => {
-      containerRef.current?.querySelector<HTMLTextAreaElement>('textarea')?.focus();
+      const ta = containerRef.current?.querySelector<HTMLTextAreaElement>('textarea');
+      if (!ta) return;
+      ta.focus();
+      // Put the caret at the very end. A bare focus() lets react-md-editor
+      // restore a stale caret (it landed one char before the end), so pin it
+      // explicitly — entering a note to append is the common case anyway.
+      const end = ta.value.length;
+      ta.setSelectionRange(end, end);
     }, 0);
   };
 

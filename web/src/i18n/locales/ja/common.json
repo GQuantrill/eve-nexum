@@ -1929,6 +1929,12 @@
     "fatigueCapped": "5時間上限",
     "fatigueHint": "ジャンプごとの再有効化クールダウン。疲労0からの連続ジャンプを想定。疲労は5時間で上限。",
     "fatigueLabel": "ジャンプ疲労",
-    "cooldownLabel": "再有効化クールダウン"
+    "cooldownLabel": "再有効化クールダウン",
+    "regionalGates": "リージョンゲート",
+    "regionalGatesUse": "短ければ使用",
+    "regionalGatesHelp": "迂回してジャンプする代わりに、リージョン間のスターゲート（リージョンゲート）を経路に使用できます。これらのゲートは要所でキャンプされやすいため、注意して使用してください。",
+    "viaGates": "リージョンゲート {{gates}} 箇所を含む",
+    "regionalGateHop": "リージョンゲート",
+    "legendGate": "リージョンゲート"
   }
 }

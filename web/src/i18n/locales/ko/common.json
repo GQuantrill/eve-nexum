@@ -1929,6 +1929,12 @@
     "fatigueCapped": "5시간 상한",
     "fatigueHint": "점프당 재활성화 쿨다운. 피로도 0에서 시작해 연속 점프를 가정; 피로도는 5시간 상한.",
     "fatigueLabel": "점프 피로도",
-    "cooldownLabel": "재활성화 쿨다운"
+    "cooldownLabel": "재활성화 쿨다운",
+    "regionalGates": "지역 관문",
+    "regionalGatesUse": "더 짧을 때 사용",
+    "regionalGatesHelp": "경로가 주위를 도는 대신 지역 간 스타게이트(지역 관문)를 이용하도록 허용합니다. 이 관문은 길목이며 자주 캠핑당하므로 주의해서 사용하세요.",
+    "viaGates": "지역 관문 {{gates}}개 포함",
+    "regionalGateHop": "지역 관문",
+    "legendGate": "지역 관문"
   }
 }
