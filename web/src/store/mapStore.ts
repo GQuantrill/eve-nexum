@@ -402,6 +402,21 @@ export type RemoteEvent =
   | { type: 'structure.changed'; systemId: string }
   | { type: 'anom.changed';      systemId: string };
 
+// Cross-tab sync for the /auth/preferences-backed UI prefs (compact mode, snap,
+// minimap, uniform size, statics, connection thickness, route mode, ui zoom,
+// easy-connect, panel order). These live in this store, not localStorage, so the
+// useUserSetting storage-event sync doesn't reach them. `savePref` persists to
+// the server AND broadcasts the change to sibling tabs; the listener installed
+// just after the store applies an incoming change to the store WITHOUT
+// re-persisting or re-broadcasting (so no echo/loop).
+const prefsChannel: BroadcastChannel | null =
+  typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel('nexum-prefs') : null;
+
+function savePref(patch: Record<string, unknown>): void {
+  api('/auth/preferences', { method: 'PATCH', body: JSON.stringify(patch) }).catch(console.error);
+  prefsChannel?.postMessage(patch);
+}
+
 export const useMapStore = create<MapStore>()((set, get) => {
 
   async function applyUndo(cmd: UndoCommand): Promise<void> {
@@ -630,7 +645,7 @@ export const useMapStore = create<MapStore>()((set, get) => {
 
     setPanelOrder: (order) => {
       set({ panelOrder: order });
-      api('/auth/preferences', { method: 'PATCH', body: JSON.stringify({ panelOrder: order }) }).catch(console.error);
+      savePref({ panelOrder: order });
     },
 
     // ── Maps management ───────────────────────────────────────────────────────
@@ -785,7 +800,7 @@ export const useMapStore = create<MapStore>()((set, get) => {
 
     setSnapToGrid: (v) => {
       set({ snapToGrid: v });
-      api('/auth/preferences', { method: 'PATCH', body: JSON.stringify({ snapToGrid: v }) }).catch(console.error);
+      savePref({ snapToGrid: v });
     },
 
     setCompactMode: (v) => {
@@ -796,17 +811,17 @@ export const useMapStore = create<MapStore>()((set, get) => {
       // nodes, and the inflated min keeps them measuring big when compact comes
       // back on. Reset forces a clean re-measure of the natural sizes.
       get().resetUniformSizes();
-      api('/auth/preferences', { method: 'PATCH', body: JSON.stringify({ compactMode: v }) }).catch(console.error);
+      savePref({ compactMode: v });
     },
 
     setShowMinimap: (v) => {
       set({ showMinimap: v });
-      api('/auth/preferences', { method: 'PATCH', body: JSON.stringify({ showMinimap: v }) }).catch(console.error);
+      savePref({ showMinimap: v });
     },
 
     setUniformSize: (v) => {
       set({ uniformSize: v });
-      api('/auth/preferences', { method: 'PATCH', body: JSON.stringify({ uniformSize: v }) }).catch(console.error);
+      savePref({ uniformSize: v });
     },
 
     setShowStatics: (v) => {
@@ -814,23 +829,23 @@ export const useMapStore = create<MapStore>()((set, get) => {
       // Same as compact mode: showing/hiding statics changes WH nodes' natural
       // height (and which nodes count toward the uniform max), so re-measure.
       get().resetUniformSizes();
-      api('/auth/preferences', { method: 'PATCH', body: JSON.stringify({ showStatics: v }) }).catch(console.error);
+      savePref({ showStatics: v });
     },
 
     setConnectionThickness: (v) => {
       set({ connectionThickness: v });
-      api('/auth/preferences', { method: 'PATCH', body: JSON.stringify({ connectionThickness: v }) }).catch(console.error);
+      savePref({ connectionThickness: v });
     },
 
     setRouteMode: (v) => {
       set({ routeMode: v });
-      api('/auth/preferences', { method: 'PATCH', body: JSON.stringify({ routeMode: v }) }).catch(console.error);
+      savePref({ routeMode: v });
     },
 
     setUiZoom: (v) => {
       const clamped = Math.min(1.5, Math.max(0.8, Number.isFinite(v) ? v : 1));
       set({ uiZoom: clamped });
-      api('/auth/preferences', { method: 'PATCH', body: JSON.stringify({ uiZoom: clamped }) }).catch(console.error);
+      savePref({ uiZoom: clamped });
     },
 
     setTrackJumps: (v) => {
@@ -901,7 +916,7 @@ export const useMapStore = create<MapStore>()((set, get) => {
 
     setEasyConnect: (v) => {
       set({ easyConnect: v });
-      api('/auth/preferences', { method: 'PATCH', body: JSON.stringify({ easyConnect: v }) }).catch(console.error);
+      savePref({ easyConnect: v });
     },
     setMapOptionsOpen: (v) => set({ mapOptionsOpen: v }),
     setEdgeStyle: (v) => set({ edgeStyle: v }),
@@ -1397,3 +1412,16 @@ export const useMapStore = create<MapStore>()((set, get) => {
     },
   };
 });
+
+// Apply a UI-pref change broadcast by a sibling tab (see savePref). The payload
+// IS the store patch — its keys are store fields — so apply it directly, without
+// persisting or re-broadcasting (no echo). Compact-mode / statics changes also
+// need a uniform-size re-measure here, mirroring their own setters.
+if (prefsChannel) {
+  prefsChannel.onmessage = (e: MessageEvent) => {
+    const patch = e.data as Record<string, unknown> | null;
+    if (!patch || typeof patch !== 'object') return;
+    useMapStore.setState(patch as Partial<MapStore>);
+    if ('compactMode' in patch || 'showStatics' in patch) useMapStore.getState().resetUniformSizes();
+  };
+}

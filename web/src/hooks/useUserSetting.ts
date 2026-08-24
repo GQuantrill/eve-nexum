@@ -170,4 +170,24 @@ if (typeof window !== 'undefined') {
   window.addEventListener('beforeunload', () => {
     if (patchTimer) flush();
   });
+
+  // Cross-tab sync. The `storage` event fires in every OTHER same-origin tab
+  // when localStorage changes (never in the tab that made the write, so there's
+  // no echo). Adopt the new value into the cache and wake any component watching
+  // that key, so a setting toggled in one tab updates in all of them without a
+  // reload. Scoped to our own `nexum.` keys (the settings namespace).
+  window.addEventListener('storage', (e) => {
+    if (e.storageArea !== localStorage) return;
+    if (!e.key || !e.key.startsWith('nexum.')) return;
+    if (e.newValue === null) {
+      delete cache[e.key];
+    } else {
+      // Cache once so getSnapshot returns a stable reference (useSyncExternalStore
+      // requires it); mirrors readSetting's raw-string fallback.
+      let parsed: unknown;
+      try { parsed = JSON.parse(e.newValue); } catch { parsed = e.newValue; }
+      cache[e.key] = parsed;
+    }
+    emit(e.key);
+  });
 }
