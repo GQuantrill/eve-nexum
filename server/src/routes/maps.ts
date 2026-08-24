@@ -2249,6 +2249,8 @@ mapsRouter.patch('/:mapId', async (req, res) => {
 
   const sets: string[] = ['updated_at = NOW()'];
   const vals: unknown[] = [];
+  // Captured (validated) collapse-grace value, for the live-sync broadcast below.
+  let normalizedGrace: number | undefined;
 
   // Merge opt-in flags are corp-map sharing policy: only meaningful on a corp
   // map, and gated above ordinary edit access to full/admin.
@@ -2326,6 +2328,7 @@ mapsRouter.patch('/:mapId', async (req, res) => {
       res.status(400).json({ error: 'collapseGraceHours must be a number between 0 and 24' }); return;
     }
     sets.push(`collapse_grace_hours = $${vals.length + 1}`); vals.push(n);
+    normalizedGrace = n;
   }
 
   // Per-map bookmark-name format: a shared policy that overrides every member's
@@ -2367,16 +2370,20 @@ mapsRouter.patch('/:mapId', async (req, res) => {
   if (sets.length === 1) { res.status(400).json({ error: 'Nothing to update' }); return; }
 
   await db.query(`UPDATE maps SET ${sets.join(', ')} WHERE id = $${vals.length + 1}`, [...vals, mapId]);
-  // Live-sync rename / lock / bookmark-format to other viewers. Rename + lock
-  // show on the canvas; the bookmark format must propagate live so everyone
-  // copying a hole gets the same name without a reload. Merge-source flags are
-  // sidebar-only, so not pushed.
-  if (name !== undefined || locked !== undefined || normalizedBookmarkFmt !== undefined || normalizedSiteBookmarkFmt !== undefined) {
+  // Live-sync every map-level setting to the other viewers (and the same user's
+  // other tabs). All of these are per-map state that must stay consistent
+  // without a reload; the originating client suppresses its own echo by actor.
+  if (sets.length > 1) {
     publishToMap(mapId, {
       type: 'map.meta',
       actor: req.get('x-client-id') ?? null,
       ...(name !== undefined ? { name: String(name).slice(0, MAX_MAP_NAME_LEN) } : {}),
       ...(locked !== undefined ? { locked } : {}),
+      ...(allowAsMergeSource !== undefined ? { allowAsMergeSource: allowAsMergeSource === true } : {}),
+      ...(allowAsMergeDestination !== undefined ? { allowAsMergeDestination: allowAsMergeDestination === true } : {}),
+      ...(skipKspace !== undefined ? { skipKspace: skipKspace === true } : {}),
+      ...(lazyRemoveWormholes !== undefined ? { lazyRemoveWormholes: lazyRemoveWormholes === true } : {}),
+      ...(normalizedGrace !== undefined ? { collapseGraceHours: normalizedGrace } : {}),
       ...(normalizedBookmarkFmt !== undefined ? { bookmarkFormat: normalizedBookmarkFmt } : {}),
       ...(normalizedSiteBookmarkFmt !== undefined ? { siteBookmarkFormat: normalizedSiteBookmarkFmt } : {}),
     });
