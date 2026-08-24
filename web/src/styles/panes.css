@@ -281,7 +281,12 @@
 
 /* Connection panel is a horizontal bottom bar; group its wormhole fields into
    a few vertical columns (WH type + sigs / mass-time-size / flag / roller) so
-   they stack instead of overflowing the width into one clipped row. */
+   they stack instead of overflowing the width into one clipped row. When even
+   the columns don't all fit, wrap them onto a second row rather than letting the
+   flexible ones collapse and overlap. Scoped via :has so the system panel (same
+   base class, different children) keeps its own single-row layout. */
+.system-panel:has(.conn-col) { flex-wrap: wrap; }
+
 .conn-col {
   display: flex;
   flex-direction: column;
@@ -289,6 +294,12 @@
   align-self: flex-start;
   min-width: 0;
 }
+/* Give the wormhole-type/sig and mass/time/size columns a floor width too —
+   without it they inherit min-width:0 and, when the flag/roller/jumplog columns
+   claim their mins on a narrow viewport, collapse to nothing so their labels
+   break mid-word (e.g. "FAT-6P") and overlap the controls. */
+.conn-col--wh     { min-width: 160px; }
+.conn-col--status { min-width: 150px; }
 .conn-col--flag   { min-width: 150px; }
 .conn-col--roller { min-width: 300px; }
 /* The neighbouring rolling-calculator column wraps its content in a bordered

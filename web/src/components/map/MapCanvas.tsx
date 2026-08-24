@@ -15,6 +15,7 @@ import { useWatchlistAlerts } from '../../hooks/useWatchlistAlerts';
 import { useMapSignatureIndex } from '../../hooks/useMapSignatureIndex';
 import { useUndivedWormholeIndex } from '../../hooks/useUndivedWormholeIndex';
 import { useLeadsToIndex } from '../../hooks/useLeadsToIndex';
+import { useReviveBackedConnections } from '../../hooks/useReviveBackedConnections';
 import { useWormholeTypes } from '../../hooks/useWormholeTypes';
 import { knownMaxLifeHours, effectiveExpiryMs, lifeBucket, type TimeBucket } from '../../utils/whLifetime';
 import { useCanEdit } from '../../hooks/useCanEdit';
@@ -136,6 +137,7 @@ export function MapCanvas() {
   useMapSignatureIndex();
   useUndivedWormholeIndex();
   useLeadsToIndex();
+  useReviveBackedConnections();
   useWatchlistAlerts();
   const systems              = useMapStore((s) => s.map.systems);
   const connections          = useMapStore((s) => s.map.connections);

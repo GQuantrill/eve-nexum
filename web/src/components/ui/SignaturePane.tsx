@@ -320,6 +320,12 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   const debounceTimers = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
   const sigsRef        = useRef<Signature[]>([]);
   useEffect(() => { sigsRef.current = sigs; }, [sigs]);
+  // Which system the currently-loaded `sigs` belong to. `sigs` is state and lags
+  // the `systemId` prop by a render on a system switch, so effects that pair the
+  // two (e.g. the wormhole quarantine below) must not act until they agree —
+  // otherwise the PREVIOUS system's sigs get evaluated against the NEW system,
+  // wrongly quarantining its connections. Set only when real sigs land.
+  const sigsSystemRef  = useRef<string | null>(null);
 
   // Feed this system's scanned wormhole-sig types into the map-wide index so the
   // watchlist can match them live — the user's own edits don't bump sigRev, so
@@ -332,6 +338,9 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   // the "undived wormhole" content filter — so scanning/pinning a hole here
   // updates its pill immediately, not on the next reload.
   useEffect(() => {
+    // Don't publish the previous system's sigs under this systemId mid-switch
+    // (see sigsSystemRef) — it would corrupt the map-wide wormhole index.
+    if (sigsSystemRef.current !== systemId) return;
     setSystemWhSigs(systemId, sigs
       .filter((s) => s.sigType === 'wormhole')
       .map((s) => ({ id: s.id, sigId: s.sigId ?? '', whType: s.whType ?? '', leadsTo: s.whLeadsTo ?? '' })));
@@ -451,6 +460,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
       const sys = useMapStore.getState().map.systems.find((s) => s.id === systemId);
       const embedded = (sys as { signatures?: Signature[] } | undefined)?.signatures ?? [];
       setSigs(embedded);
+      sigsSystemRef.current = systemId;
       return;
     }
 
@@ -461,7 +471,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
     const fetchSigs = () => {
       if (cancelled) return;
       api<Signature[]>(`/api/maps/${activeMapId}/systems/${systemId}/signatures`)
-        .then((data) => { if (!cancelled) setSigs(data); })
+        .then((data) => { if (!cancelled) { setSigs(data); sigsSystemRef.current = systemId; } })
         .catch(() => { if (!cancelled) toast.error(t('signatures.loadFailed')); });
     };
     const pending = awaitSystemCreate(systemId);
@@ -475,7 +485,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   useEffect(() => {
     if (!activeMapId || isShareMode || sigRev === 0) return;
     api<Signature[]>(`/api/maps/${activeMapId}/systems/${systemId}/signatures`)
-      .then(setSigs)
+      .then((data) => { setSigs(data); sigsSystemRef.current = systemId; })
       .catch(() => {});
   }, [sigRev, activeMapId, systemId, isShareMode]);
 
@@ -563,6 +573,11 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   // connections (no conn.type) are left alone.
   useEffect(() => {
     if (!canEdit || isShareMode || sigs.length === 0) return;
+    // Only act once `sigs` are the loaded set for THIS system — otherwise the
+    // previous system's sigs (mid system-switch) would quarantine this system's
+    // connections. This guard is the fix for connections going "broken" for no
+    // reason just by navigating the chain.
+    if (sigsSystemRef.current !== systemId) return;
     const hasWh = sigs.some((s) => s.sigType === 'wormhole' || s.sigType === 'unknown' || !!s.whType);
     if (hasWh) return;
     const { map: m, updateConnection } = useMapStore.getState();
