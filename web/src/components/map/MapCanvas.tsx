@@ -16,6 +16,7 @@ import { useMapSignatureIndex } from '../../hooks/useMapSignatureIndex';
 import { useUndivedWormholeIndex } from '../../hooks/useUndivedWormholeIndex';
 import { useLeadsToIndex } from '../../hooks/useLeadsToIndex';
 import { useReviveBackedConnections } from '../../hooks/useReviveBackedConnections';
+import { useJumpRange } from '../../hooks/useJumpRange';
 import { useWormholeTypes } from '../../hooks/useWormholeTypes';
 import { knownMaxLifeHours, effectiveExpiryMs, lifeBucket, type TimeBucket } from '../../utils/whLifetime';
 import { useCanEdit } from '../../hooks/useCanEdit';
@@ -138,6 +139,10 @@ export function MapCanvas() {
   useUndivedWormholeIndex();
   useLeadsToIndex();
   useReviveBackedConnections();
+  // Drives the jump-range overlay from the store's staging system, so the
+  // "Jump range from here" context-menu action highlights reachable systems
+  // even when the Jump Range pane isn't open.
+  useJumpRange();
   useWatchlistAlerts();
   const systems              = useMapStore((s) => s.map.systems);
   const connections          = useMapStore((s) => s.map.connections);

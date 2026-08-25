@@ -1,18 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { api } from '../api/client';
 import { useUserSetting } from './useUserSetting';
-import { useJumpRangeStore, type InRangeInfo } from '../store/jumpRangeStore';
+import { useJumpRangeStore, type InRangeInfo, type JumpTarget } from '../store/jumpRangeStore';
 import { useMapStore } from '../store/mapStore';
 import { classesInRange, maxRangeLy } from '../data/jumpDrives';
 
-export interface JumpTarget {
-  eveSystemId: number;
-  name:        string;
-  systemClass: string;      // 'LS' | 'NS'
-  security:    number;
-  regionName:  string | null;
-  ly:          number;
-}
+export type { JumpTarget };
 
 // Light-year distance between two systems, cached per unordered pair (distance is
 // symmetric + static). `enabled` gates the fetch so non-cyno edges never call out.
@@ -41,21 +34,25 @@ export function useJdcLevel(): [number, (n: number) => void] {
 
 /**
  * Fetches every LS/NS system within jump range of the store's staging system,
- * annotates each with the ship classes that can reach it (at the user's JDC), and
- * pushes the reachable set into the store so map nodes can highlight. Returns the
- * ordered target list for the panel. No staging → empty + store cleared.
+ * annotates each with the ship classes that can reach it (at the user's JDC),
+ * and pushes both the map-highlight set (`inRange`) and the pane-facing target
+ * list into the store. Mounted ONCE, globally (in MapCanvas), so the overlay
+ * lights up straight from the "Jump range from here" context-menu action —
+ * whether or not the Jump Range pane is open. No staging → everything cleared.
+ * It's a side-effect hook; the pane reads targets/loading/hasCoords off the store.
  */
-export function useJumpRange(): { targets: JumpTarget[]; loading: boolean; jdc: number; hasCoords: boolean } {
+export function useJumpRange(): void {
   const [jdc] = useJdcLevel();
   const stagingId = useJumpRangeStore((s) => s.stagingId);
   const setInRange = useJumpRangeStore((s) => s.setInRange);
+  const setResult = useJumpRangeStore((s) => s.setResult);
   const [rows, setRows] = useState<JumpTarget[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasCoords, setHasCoords] = useState(true);
   const maxLy = maxRangeLy(jdc);
 
   useEffect(() => {
-    if (stagingId == null) { setRows([]); setHasCoords(true); setInRange(new Map()); return; }
+    if (stagingId == null) { setRows([]); setHasCoords(true); setLoading(false); return; }
     let cancelled = false;
     setLoading(true);
     api<{ hasCoords: boolean; systems: JumpTarget[] }>(`/api/systems/${stagingId}/jump-range?maxLy=${maxLy.toFixed(2)}`)
@@ -63,7 +60,7 @@ export function useJumpRange(): { targets: JumpTarget[]; loading: boolean; jdc: 
       .catch(() => { if (!cancelled) { setRows([]); setHasCoords(true); } })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
-  }, [stagingId, maxLy, setInRange]);
+  }, [stagingId, maxLy]);
 
   // Scope to systems ON THE CURRENT MAP — the endpoint returns every LS/NS system
   // in range (all of New Eden), but the overlay only highlights placed systems, so
@@ -73,6 +70,8 @@ export function useJumpRange(): { targets: JumpTarget[]; loading: boolean; jdc: 
     const onMap = new Set(mapSystems.map((s) => s.eveSystemId).filter((id): id is number => id != null));
     return rows.filter((r) => r.ly <= maxLy && onMap.has(r.eveSystemId));
   }, [rows, maxLy, mapSystems]);
+
+  // Map highlight set (SystemNode reads `inRange`).
   useEffect(() => {
     const m = new Map<number, InRangeInfo>();
     for (const t of targets) {
@@ -86,5 +85,9 @@ export function useJumpRange(): { targets: JumpTarget[]; loading: boolean; jdc: 
     setInRange(m);
   }, [targets, jdc, setInRange]);
 
-  return { targets, loading, jdc, hasCoords };
+  // Pane-facing result — the pane reads these off the store instead of running
+  // its own fetch, so there's a single source of truth and a single request.
+  useEffect(() => {
+    setResult({ targets, loading, hasCoords });
+  }, [targets, loading, hasCoords, setResult]);
 }

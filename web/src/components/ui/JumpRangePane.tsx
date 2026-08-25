@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useJumpRangeStore } from '../../store/jumpRangeStore';
-import { useJumpRange, useJdcLevel } from '../../hooks/useJumpRange';
+import { useJdcLevel } from '../../hooks/useJumpRange';
 import { JUMP_CLASSES, jumpRange } from '../../data/jumpDrives';
 import { useEsiSearch, systemResultLabel } from '../../hooks/useEsiSearch';
 
@@ -16,7 +16,11 @@ export function JumpRangePane() {
   const stagingName = useJumpRangeStore((s) => s.stagingName);
   const stagingId   = useJumpRangeStore((s) => s.stagingId);
   const setStaging  = useJumpRangeStore((s) => s.setStaging);
-  const { targets, loading, hasCoords } = useJumpRange();
+  // Results are computed by the globally-mounted useJumpRange (in MapCanvas) and
+  // read off the store here, so the overlay works with the pane closed too.
+  const targets   = useJumpRangeStore((s) => s.targets);
+  const loading   = useJumpRangeStore((s) => s.loading);
+  const hasCoords = useJumpRangeStore((s) => s.hasCoords);
   const filter    = useJumpRangeStore((s) => s.filterClass);   // class key, null = all
   const setFilter = useJumpRangeStore((s) => s.setFilterClass);
 
