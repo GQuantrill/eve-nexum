@@ -55,9 +55,9 @@ export function NotesEditor({ value, onChange, compact = false, readOnly = false
   const pending   = useRef<string | null>(null);
   // The last value we emitted via onChange. Our own save round-trips back
   // through the store as a new `value` prop; we must NOT re-adopt that echo (see
-  // the adopt block below), or a stale intermediate echo can revert `draft` and
-  // strand the cursor mid-note.
-  const lastEmitted = useRef<string | null>(null);
+  // the adopt block below), or a stale intermediate echo can revert `draft`.
+  // State (not a ref) so the adopt guard can read it during render.
+  const [lastEmitted, setLastEmitted] = useState<string | null>(null);
   // Keep the latest onChange in a ref so the debounced flush never goes stale.
   const onChangeRef = useRef(onChange);
   useEffect(() => { onChangeRef.current = onChange; }, [onChange]);
@@ -65,7 +65,7 @@ export function NotesEditor({ value, onChange, compact = false, readOnly = false
   const flush = useCallback(() => {
     if (saveTimer.current) { clearTimeout(saveTimer.current); saveTimer.current = null; }
     if (pending.current !== null) {
-      lastEmitted.current = pending.current;
+      setLastEmitted(pending.current);
       onChangeRef.current(pending.current);
       pending.current = null;
     }
@@ -83,7 +83,7 @@ export function NotesEditor({ value, onChange, compact = false, readOnly = false
   const [seenValue, setSeenValue] = useState(value);
   if (value !== seenValue) {
     setSeenValue(value);
-    if (!focused && value !== lastEmitted.current) setDraft(value);
+    if (!focused && value !== lastEmitted) setDraft(value);
   }
 
   // Flush any pending save when the editor unmounts.
