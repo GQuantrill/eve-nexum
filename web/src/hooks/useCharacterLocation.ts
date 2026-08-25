@@ -35,7 +35,10 @@ interface RawLocationResponse {
   ship:   CharacterShip | null;
 }
 
-const POLL_MS = 10_000;
+// ESI caches character location for ~5 s, so 5 s is the fastest cadence that
+// still returns fresh data — a system change is detected within ~5 s. Polling
+// faster would just re-read the same cached ESI value.
+const POLL_MS = 5_000;
 const EMPTY: CharacterLocation = { online: false, system: null, ship: null };
 
 // The users.id of the character THIS TAB currently acts as: the per-tab pinned
