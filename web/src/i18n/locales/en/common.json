@@ -1032,7 +1032,8 @@
     "failAddWaypoint": "Failed to add waypoint",
     "canvasHint": "Right-click canvas to add system · Drag between handles to connect · Shift+click or drag to multi-select · Right click system to interact",
     "jumpRangeFrom": "Jump range from here",
-    "jumpCyno": "Cyno Jump"
+    "jumpCyno": "Cyno Jump",
+    "jumpRangeClear": "Clear jump range"
   },
   "panel": {
     "notes": "Notes",

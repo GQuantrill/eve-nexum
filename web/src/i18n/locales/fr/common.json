@@ -961,7 +961,8 @@
     "tag": "Marqueur",
     "clearTag": "Effacer le marqueur",
     "jumpRangeFrom": "Portée de saut d’ici",
-    "jumpCyno": "Saut cyno"
+    "jumpCyno": "Saut cyno",
+    "jumpRangeClear": "Effacer la portée de saut"
   },
   "panel": {
     "notes": "Notes",

@@ -961,7 +961,8 @@
     "tag": "标记",
     "clearTag": "清除标记",
     "jumpRangeFrom": "从此处的跳跃范围",
-    "jumpCyno": "Cyno 跳跃"
+    "jumpCyno": "Cyno 跳跃",
+    "jumpRangeClear": "清除跳跃范围"
   },
   "panel": {
     "notes": "笔记",

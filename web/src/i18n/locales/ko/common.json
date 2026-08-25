@@ -961,7 +961,8 @@
     "tag": "태그",
     "clearTag": "태그 지우기",
     "jumpRangeFrom": "여기서부터 점프 범위",
-    "jumpCyno": "사이노 점프"
+    "jumpCyno": "사이노 점프",
+    "jumpRangeClear": "점프 범위 지우기"
   },
   "panel": {
     "notes": "노트",

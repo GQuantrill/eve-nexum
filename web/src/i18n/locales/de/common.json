@@ -961,7 +961,8 @@
     "tag": "Tag",
     "clearTag": "Tag entfernen",
     "jumpRangeFrom": "Sprungreichweite von hier",
-    "jumpCyno": "Cyno-Sprung"
+    "jumpCyno": "Cyno-Sprung",
+    "jumpRangeClear": "Sprungreichweite löschen"
   },
   "panel": {
     "notes": "Notizen",

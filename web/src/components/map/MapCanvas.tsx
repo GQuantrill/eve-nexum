@@ -954,6 +954,13 @@ export function MapCanvas() {
             icon: <MapPinSimpleIcon size={16} weight="regular" color="#b57bff" />,
             action: () => useJumpRangeStore.getState().setStaging(sys.eveSystemId!, sys.name),
           },
+          // Only while the overlay is active, on any system, so the dimming can be
+          // cleared without opening the Jump Range pane.
+          ...(useJumpRangeStore.getState().stagingId != null ? [{
+            label: t('ctxMenu.jumpRangeClear'),
+            icon: <XIcon size={16} weight="regular" color="#b57bff" />,
+            action: () => useJumpRangeStore.getState().setStaging(null),
+          }] : []),
         ];
       }
       // Pane menu — only "Select All" survives.
@@ -1115,6 +1122,11 @@ export function MapCanvas() {
           icon: <MapPinSimpleIcon size={16} weight="regular" color="#b57bff" />,
           action: () => useJumpRangeStore.getState().setStaging(sys.eveSystemId!, sys.name),
         },
+        ...(useJumpRangeStore.getState().stagingId != null ? [{
+          label: t('ctxMenu.jumpRangeClear'),
+          icon: <XIcon size={16} weight="regular" color="#b57bff" />,
+          action: () => useJumpRangeStore.getState().setStaging(null),
+        }] : []),
       ] : [];
 
       const multiItems = multiSelected ? [

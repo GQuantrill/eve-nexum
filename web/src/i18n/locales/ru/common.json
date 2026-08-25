@@ -981,7 +981,8 @@
     "tag": "Тег",
     "clearTag": "Убрать тег",
     "jumpRangeFrom": "Дальность прыжка отсюда",
-    "jumpCyno": "Cyno-прыжок"
+    "jumpCyno": "Cyno-прыжок",
+    "jumpRangeClear": "Сбросить дальность прыжка"
   },
   "panel": {
     "notes": "Заметки",

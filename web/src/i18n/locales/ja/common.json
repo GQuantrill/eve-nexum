@@ -961,7 +961,8 @@
     "tag": "タグ",
     "clearTag": "タグを消去",
     "jumpRangeFrom": "ここからのジャンプ範囲",
-    "jumpCyno": "サイノジャンプ"
+    "jumpCyno": "サイノジャンプ",
+    "jumpRangeClear": "ジャンプ範囲をクリア"
   },
   "panel": {
     "notes": "メモ",
