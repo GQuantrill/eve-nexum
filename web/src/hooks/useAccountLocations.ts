@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
 import { api } from '../api/client';
 import { useShareMode } from '../context/ShareModeContext';
+import { createPolledStore } from './createPolledStore';
 
 export interface AccountCharLocation {
   charId:        number;
@@ -33,11 +33,6 @@ interface RawResponse {
 const POLL_MS = 5_000;
 const EMPTY: AccountLocations = { bySystem: new Map(), byChar: new Map() };
 
-let moduleCache: { data: AccountLocations; fetchedAt: number } | null = null;
-let inflight: Promise<AccountLocations> | null = null;
-const subscribers = new Set<(d: AccountLocations) => void>();
-let pollTimer: ReturnType<typeof setInterval> | null = null;
-
 function indexBySystem(list: AccountCharLocation[]): Map<number, AccountCharLocation[]> {
   const idx = new Map<number, AccountCharLocation[]>();
   for (const c of list) {
@@ -47,8 +42,6 @@ function indexBySystem(list: AccountCharLocation[]): Map<number, AccountCharLoca
   }
   return idx;
 }
-
-function notify(d: AccountLocations) { subscribers.forEach((fn) => fn(d)); }
 
 // True when two polls describe the same characters in the same places, so we
 // can keep the previous reference and skip the all-node re-render. Keyed by
@@ -67,26 +60,17 @@ function sameLocations(a: AccountLocations, b: AccountLocations): boolean {
   return true;
 }
 
-function load() {
-  if (inflight) return inflight;
-  inflight = api<RawResponse>('/api/character/account-locations')
-    .then((r) => {
-      inflight = null;
-      const byChar = new Map<number, AccountCharLocation>();
-      for (const c of r.characters) byChar.set(c.charId, c);
-      const data: AccountLocations = { bySystem: indexBySystem(r.characters), byChar };
-      const prev = moduleCache?.data;
-      if (prev && sameLocations(prev, data)) {
-        moduleCache = { data: prev, fetchedAt: Date.now() };
-        return prev;
-      }
-      moduleCache = { data, fetchedAt: Date.now() };
-      notify(data);
-      return data;
-    })
-    .catch(() => { inflight = null; return moduleCache?.data ?? EMPTY; });
-  return inflight;
-}
+const store = createPolledStore<AccountLocations>({
+  pollMs: POLL_MS,
+  empty: EMPTY,
+  equals: sameLocations,
+  fetch: async () => {
+    const r = await api<RawResponse>('/api/character/account-locations');
+    const byChar = new Map<number, AccountCharLocation>();
+    for (const c of r.characters) byChar.set(c.charId, c);
+    return { bySystem: indexBySystem(r.characters), byChar };
+  },
+});
 
 /**
  * The signed-in account's OTHER characters (alts) and where each is — live when
@@ -95,20 +79,5 @@ function load() {
  */
 export function useAccountLocations(): AccountLocations {
   const { isShareMode } = useShareMode();
-  const [data, setData] = useState<AccountLocations>(moduleCache?.data ?? EMPTY);
-
-  useEffect(() => {
-    if (isShareMode) return;
-    subscribers.add(setData);
-    const now = Date.now();
-    if (!moduleCache || now - moduleCache.fetchedAt >= POLL_MS) load();
-    else setData(moduleCache.data);
-    if (!pollTimer) pollTimer = setInterval(load, POLL_MS);
-    return () => {
-      subscribers.delete(setData);
-      if (subscribers.size === 0 && pollTimer) { clearInterval(pollTimer); pollTimer = null; }
-    };
-  }, [isShareMode]);
-
-  return isShareMode ? EMPTY : data;
+  return store.use(!isShareMode);
 }

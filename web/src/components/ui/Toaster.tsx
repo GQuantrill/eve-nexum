@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useSyncExternalStore } from 'react';
 import styles from './Toaster.module.css';
 
 // Tiny event-driven toaster. Module-level emitter so any call site can do
@@ -37,12 +37,23 @@ interface Toast {
   dedupeKey?: string;
 }
 
-const subscribers = new Set<(toasts: Toast[]) => void>();
+const subscribers = new Set<() => void>();
 let current: Toast[] = [];
 let nextId = 1;
 
 function notify() {
-  subscribers.forEach((fn) => fn(current));
+  subscribers.forEach((fn) => fn());
+}
+
+// useSyncExternalStore plumbing. `current` is reassigned to a NEW array on every
+// change (see show/dismiss), so getSnapshot's reference identity tracks changes
+// and stays stable in between.
+function subscribe(cb: () => void): () => void {
+  subscribers.add(cb);
+  return () => { subscribers.delete(cb); };
+}
+function getSnapshot(): Toast[] {
+  return current;
 }
 
 function dismiss(id: number) {
@@ -74,16 +85,10 @@ export const toast = {
 };
 
 export function Toaster() {
-  const [toasts, setToasts] = useState<Toast[]>(current);
-
-  useEffect(() => {
-    subscribers.add(setToasts);
-    // Sync immediately in case a toast was emitted before this subscribe ran
-    // — e.g. AppShell's on-load ?added / ?link_error effect fires before the
-    // Toaster's effect (tree order), so without this the queued toast is lost.
-    setToasts(current);
-    return () => { subscribers.delete(setToasts); };
-  }, []);
+  // useSyncExternalStore reads the current queue on subscribe, so a toast
+  // emitted before this mounts (e.g. AppShell's on-load ?added / ?link_error
+  // firing first in tree order) is picked up without a mount-effect sync.
+  const toasts = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 
   if (toasts.length === 0) return null;
 

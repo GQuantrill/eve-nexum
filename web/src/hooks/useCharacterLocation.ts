@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useSyncExternalStore } from 'react';
 import { api } from '../api/client';
 import { flushQueue } from '../store/pendingQueue';
 import { useShareMode } from '../context/ShareModeContext';
@@ -55,12 +55,23 @@ let inflight: Promise<CharacterLocation> | null = null;
 // The acting char id the in-flight request is for — so we only reuse it when
 // it's still the character we want, not a stale one.
 let inflightCharId: number | null = null;
-const subscribers = new Set<(d: CharacterLocation) => void>();
+const subscribers = new Set<() => void>();
 let pollTimer: ReturnType<typeof setInterval> | null = null;
 
-function notify(d: CharacterLocation) {
-  subscribers.forEach(fn => fn(d));
+function notify() { subscribers.forEach((fn) => fn()); }
+
+function subscribe(cb: () => void): () => void {
+  subscribers.add(cb);
+  if (!pollTimer) pollTimer = setInterval(load, POLL_MS);
+  return () => {
+    subscribers.delete(cb);
+    if (subscribers.size === 0 && pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+  };
 }
+// Stable references for useSyncExternalStore.
+const noopSubscribe = (): (() => void) => () => {};
+const getSnapshot = () => moduleCache?.data ?? EMPTY;
+const getEmpty = () => EMPTY;
 
 function load(): Promise<CharacterLocation> {
   const charId = currentActingId;
@@ -77,7 +88,7 @@ function load(): Promise<CharacterLocation> {
       moduleCache = { charId, data, fetchedAt: Date.now() };
       // Successful round-trip — give the offline-write queue a chance to drain.
       flushQueue();
-      notify(data);
+      notify();
       return data;
     })
     .catch(() => {
@@ -99,33 +110,25 @@ export function useCharacterLocation(): CharacterLocation {
   // Explicit acting id: a pin, else this tab's own character. Null only before
   // auth has loaded.
   const effective = routeCharId ?? user?.id ?? null;
-  const [data, setData] = useState<CharacterLocation>(moduleCache?.data ?? EMPTY);
+  const enabled = !isShareMode;
 
+  // Point the shared poll at this tab's acting character and (re)fetch whenever
+  // it changes (pin toggled, or the session identity changed). Side-effect only
+  // — the value comes from the store below. When the cache already holds a fresh
+  // result for this character we skip the fetch; when it's a different character
+  // the previous location lingers until the new one arrives (the store keeps
+  // returning it), exactly as before.
   useEffect(() => {
-    if (isShareMode) return;
-    subscribers.add(setData);
-    if (!pollTimer) pollTimer = setInterval(load, POLL_MS);
-    return () => {
-      subscribers.delete(setData);
-      if (subscribers.size === 0 && pollTimer) {
-        clearInterval(pollTimer);
-        pollTimer = null;
-      }
-    };
-  }, [isShareMode]);
-
-  // Point the shared poll at the effective acting character and fetch right away
-  // whenever it changes (pin toggled, or the session identity changed).
-  useEffect(() => {
-    if (isShareMode) return;
+    if (!enabled) return;
     currentActingId = effective;
-    if (moduleCache && moduleCache.charId === effective && Date.now() - moduleCache.fetchedAt < POLL_MS) {
-      setData(moduleCache.data);
-    } else {
-      if (moduleCache && moduleCache.charId !== effective) moduleCache = null;
-      load();
-    }
-  }, [effective, isShareMode]);
+    const fresh = !!moduleCache && moduleCache.charId === effective
+      && Date.now() - moduleCache.fetchedAt < POLL_MS;
+    if (!fresh) load();
+  }, [effective, enabled]);
 
-  return isShareMode ? EMPTY : data;
+  return useSyncExternalStore(
+    enabled ? subscribe : noopSubscribe,
+    enabled ? getSnapshot : getEmpty,
+    getEmpty,
+  );
 }

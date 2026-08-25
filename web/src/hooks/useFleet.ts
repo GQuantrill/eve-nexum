@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
 import { api } from '../api/client';
 import { useShareMode } from '../context/ShareModeContext';
+import { createPolledStore } from './createPolledStore';
 
 export interface FleetMember {
   characterId:     number;
@@ -30,11 +30,6 @@ interface RawResponse {
 const POLL_MS = 20_000;
 const EMPTY: FleetState = { inFleet: false, members: [], bySystem: new Map() };
 
-let moduleCache: { data: FleetState; fetchedAt: number } | null = null;
-let inflight: Promise<FleetState> | null = null;
-const subscribers = new Set<(d: FleetState) => void>();
-let pollTimer: ReturnType<typeof setInterval> | null = null;
-
 function indexBySystem(members: FleetMember[]): Map<number, FleetMember[]> {
   const idx = new Map<number, FleetMember[]>();
   for (const m of members) {
@@ -43,10 +38,6 @@ function indexBySystem(members: FleetMember[]): Map<number, FleetMember[]> {
     else idx.set(m.solarSystemId, [m]);
   }
   return idx;
-}
-
-function notify(d: FleetState) {
-  subscribers.forEach((fn) => fn(d));
 }
 
 // True when two polls describe the same fleet in the same places, so we can
@@ -65,62 +56,29 @@ function sameFleet(a: FleetState, b: FleetState): boolean {
   return true;
 }
 
-function load() {
-  if (inflight) return inflight;
-  inflight = api<RawResponse>('/api/character/fleet')
-    .then((r) => {
-      inflight = null;
-      const members: FleetMember[] = r.members.map((m) => ({
-        characterId:     m.character_id,
-        characterName:   m.character_name ?? null,
-        solarSystemId:   m.solar_system_id,
-        solarSystemName: m.solar_system_name ?? null,
-      }));
-      const data: FleetState = { inFleet: r.inFleet, members, bySystem: indexBySystem(members) };
-      const prev = moduleCache?.data;
-      if (prev && sameFleet(prev, data)) {
-        moduleCache = { data: prev, fetchedAt: Date.now() };
-        return prev;
-      }
-      moduleCache = { data, fetchedAt: Date.now() };
-      notify(data);
-      return data;
-    })
-    .catch(() => {
-      inflight = null;
-      return moduleCache?.data ?? EMPTY;
-    });
-  return inflight;
-}
+const store = createPolledStore<FleetState>({
+  pollMs: POLL_MS,
+  empty: EMPTY,
+  equals: sameFleet,
+  fetch: async () => {
+    const r = await api<RawResponse>('/api/character/fleet');
+    const members: FleetMember[] = r.members.map((m) => ({
+      characterId:     m.character_id,
+      characterName:   m.character_name ?? null,
+      solarSystemId:   m.solar_system_id,
+      solarSystemName: m.solar_system_name ?? null,
+    }));
+    return { inFleet: r.inFleet, members, bySystem: indexBySystem(members) };
+  },
+});
 
 /**
  * Subscribe to the user's current fleet roster. Shared module cache means
  * every component on the page consumes a single poll; switching from one
- * SystemNode to another doesn't multiply the ESI cost.
+ * SystemNode to another doesn't multiply the ESI cost. Share viewers have no
+ * session (the endpoint would 401), so they opt out and get the empty state.
  */
 export function useFleet(): FleetState {
   const { isShareMode } = useShareMode();
-  const [data, setData] = useState<FleetState>(moduleCache?.data ?? EMPTY);
-
-  useEffect(() => {
-    // Share viewers don't have a session; the /api/character/fleet endpoint
-    // would 401. Short-circuit to the empty state so the SystemNode dot
-    // never renders for a guest.
-    if (isShareMode) return;
-
-    subscribers.add(setData);
-    const now = Date.now();
-    if (!moduleCache || now - moduleCache.fetchedAt >= POLL_MS) load();
-    else setData(moduleCache.data);
-    if (!pollTimer) pollTimer = setInterval(load, POLL_MS);
-    return () => {
-      subscribers.delete(setData);
-      if (subscribers.size === 0 && pollTimer) {
-        clearInterval(pollTimer);
-        pollTimer = null;
-      }
-    };
-  }, [isShareMode]);
-
-  return isShareMode ? EMPTY : data;
+  return store.use(!isShareMode);
 }

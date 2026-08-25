@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { createKeyedStore } from './createKeyedStore';
 
 const ESI = 'https://esi.evetech.net/latest';
 
@@ -18,10 +18,10 @@ export interface EsiSystemData {
   constellationName: string | null;
 }
 
-// Static reference data — no TTL needed; a page refresh recovers from any CCP patch.
-const cache = new Map<number, EsiSystemData>();
-// Track in-flight requests so concurrent callers share one fetch, not N.
-const inflight = new Map<number, Promise<EsiSystemData>>();
+const BLANK: EsiSystemData = {
+  stationIds: [], planetCount: 0, moonCount: 0, beltCount: 0,
+  stargateCount: 0, securityStatus: null, constellationName: null,
+};
 
 const constellationCache = new Map<number, string>();
 
@@ -66,69 +66,51 @@ async function fetchConstellationName(constellationId: number): Promise<string |
   }
 }
 
-async function loadSystem(eveSystemId: number): Promise<EsiSystemData> {
-  const cached = cache.get(eveSystemId);
-  if (cached) return cached;
-
-  const existing = inflight.get(eveSystemId);
-  if (existing) return existing;
-
-  const promise = (async (): Promise<EsiSystemData> => {
+// Static reference data, cached by the keyed store for the page's lifetime (a
+// reload recovers from any CCP patch); concurrent callers for the same system
+// share one fetch. A bad `system` response yields BLANK (cached, no retry); a
+// network failure throws, so the store leaves it uncached and a later access
+// retries — matching the original hook.
+const store = createKeyedStore<number, EsiSystemData>({
+  fetch: async (eveSystemId): Promise<EsiSystemData> => {
+    let sys: {
+      stations?: number[];
+      planets?: EsiPlanet[];
+      stargates?: number[];
+      security_status?: number;
+      constellation_id?: number;
+    } | undefined;
     await acquireSlot();
     try {
       const res = await fetch(`${ESI}/universe/systems/${eveSystemId}/`);
-      if (!res.ok) return { stationIds: [], planetCount: 0, moonCount: 0, beltCount: 0, stargateCount: 0, securityStatus: null, constellationName: null };
-      const data = await res.json() as {
-        stations?: number[];
-        planets?: EsiPlanet[];
-        stargates?: number[];
-        security_status?: number;
-        constellation_id?: number;
-      };
-      // Release before the constellation fetch — that call acquires its own
-      // slot, and holding two slots per system would halve our effective
-      // concurrency.
+      if (res.ok) sys = await res.json();
+    } finally {
+      // Release before the constellation fetch — it acquires its own slot, and
+      // holding two per system would halve effective concurrency.
       releaseSlot();
-      const constellationName = data.constellation_id
-        ? await fetchConstellationName(data.constellation_id)
-        : null;
-      const result: EsiSystemData = {
-        stationIds:        data.stations ?? [],
-        planetCount:       data.planets?.length ?? 0,
-        moonCount:         data.planets?.reduce((n, p) => n + (p.moons?.length ?? 0), 0) ?? 0,
-        beltCount:         data.planets?.reduce((n, p) => n + (p.asteroid_belts?.length ?? 0), 0) ?? 0,
-        stargateCount:     data.stargates?.length ?? 0,
-        securityStatus:    data.security_status ?? null,
-        constellationName,
-      };
-      cache.set(eveSystemId, result);
-      inflight.delete(eveSystemId);
-      return result;
-    } catch {
-      releaseSlot();
-      inflight.delete(eveSystemId);
-      return { stationIds: [], planetCount: 0, moonCount: 0, beltCount: 0, stargateCount: 0, securityStatus: null, constellationName: null };
     }
-  })();
+    if (!sys) return BLANK;
+    const constellationName = sys.constellation_id
+      ? await fetchConstellationName(sys.constellation_id)
+      : null;
+    return {
+      stationIds:        sys.stations ?? [],
+      planetCount:       sys.planets?.length ?? 0,
+      moonCount:         sys.planets?.reduce((n, p) => n + (p.moons?.length ?? 0), 0) ?? 0,
+      beltCount:         sys.planets?.reduce((n, p) => n + (p.asteroid_belts?.length ?? 0), 0) ?? 0,
+      stargateCount:     sys.stargates?.length ?? 0,
+      securityStatus:    sys.security_status ?? null,
+      constellationName,
+    };
+  },
+});
 
-  inflight.set(eveSystemId, promise);
-  return promise;
+export function useEsiSystem(eveSystemId: number | null): EsiSystemData | null {
+  return store.use(eveSystemId);
 }
 
-export function useEsiSystem(eveSystemId: number | null) {
-  const [data, setData] = useState<EsiSystemData | null>(() =>
-    eveSystemId ? (cache.get(eveSystemId) ?? null) : null,
-  );
-
-  useEffect(() => {
-    if (!eveSystemId) { setData(null); return; }
-    const hit = cache.get(eveSystemId);
-    if (hit) { setData(hit); return; }
-    loadSystem(eveSystemId).then(setData).catch(() => {});
-  }, [eveSystemId]);
-
-  return data;
+// For components that only need the station IDs (NpcStationsPane). Never null —
+// a failed load resolves to BLANK, matching the original contract.
+export function loadSystem(eveSystemId: number): Promise<EsiSystemData> {
+  return store.load(eveSystemId).then((d) => d ?? BLANK);
 }
-
-// For components that only need the station IDs (NpcStationsPane).
-export { loadSystem };
