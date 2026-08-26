@@ -1,7 +1,7 @@
 {
   "name": "nexum-web",
   "private": true,
-  "version": "3.33.8",
+  "version": "3.33.9",
   "license": "AGPL-3.0-or-later",
   "type": "module",
   "author": {
