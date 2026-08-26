@@ -226,6 +226,29 @@ export function MapCanvas() {
     [heatMetric, heatMax, heatIntensity, colorVision],
   );
 
+  // Precompute each node's minimap colour once. Resolving it inside the MiniMap's
+  // nodeColor callback did a systems.find (O(n)) plus a cssVarToHex
+  // (getComputedStyle = forced reflow) PER NODE — re-run every frame the minimap
+  // redraws while the viewport pans, which is the pan stutter. Resolve each class
+  // once (colorVision drives the --cv-* vars, so recompute when it changes).
+  const minimapColorById = useMemo(() => {
+    const byClass = new Map<string, string>();
+    const byId = new Map<string, string>();
+    for (const s of systems) {
+      let hex = byClass.get(s.systemClass);
+      if (hex === undefined) {
+        const color = CLASS_COLORS[s.systemClass];
+        hex = color ? cssVarToHex(color) : '#333';
+        byClass.set(s.systemClass, hex);
+      }
+      byId.set(s.id, hex);
+    }
+    return byId;
+  // colorVision is an implicit dep: it drives the --cv-* CSS vars cssVarToHex
+  // reads, which eslint can't see — keep it so colours refresh on a mode change.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [systems, colorVision]);
+
   const [pendingPosition, setPendingPosition] = useState<{ x: number; y: number } | null>(null);
   // systemId whose custom-label dialog is open (null = closed).
   const [labelDialogFor, setLabelDialogFor] = useState<string | null>(null);
@@ -1510,13 +1533,7 @@ export function MapCanvas() {
             pannable
             zoomable
             position={minimapPosition}
-            nodeColor={(n) => {
-              const sys = systems.find((s) => s.id === n.id);
-              // CLASS_COLORS can miss (corrupt/unknown systemClass) → undefined;
-              // fall back rather than feed undefined into the colour resolver.
-              const color = sys ? CLASS_COLORS[sys.systemClass] : undefined;
-              return color ? cssVarToHex(color) : '#333';
-            }}
+            nodeColor={(n) => minimapColorById.get(n.id) ?? '#333'}
             maskColor="rgba(13,17,23,0.85)"
             onClick={(_e, position) => {
               const zoom = getZoom();
