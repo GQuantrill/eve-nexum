@@ -323,13 +323,6 @@ export function LandingPage() {
       </header>
 
       <div className="landing__content">
-                <div className="landing__demo">
-          <p className="landing__demo-note">
-            {t('landing.demoNote')}
-          </p>
-          <DemoMap />
-        </div>
-
         <div className="landing__cta">
           {errorMessage && (
             <div className="landing__error">
@@ -384,6 +377,13 @@ export function LandingPage() {
           </a>
           <a href="/help/" className="landing__switch-link">{t('landing.helpLink')}</a>
           <a href="/help/#guides" className="landing__switch-link">{t('landing.guidesLink')}</a>
+        </div>
+
+        <div className="landing__demo">
+          <p className="landing__demo-note">
+            {t('landing.demoNote')}
+          </p>
+          <DemoMap />
         </div>
         {FEATURE_SECTIONS.map((section) => (
           <section key={section.id} className="landing__section landing__section--features">
