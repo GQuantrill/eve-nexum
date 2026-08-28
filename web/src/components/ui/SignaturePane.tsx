@@ -15,6 +15,7 @@ import { WormholeTypePicker } from './WormholeTypePicker';
 import { Select } from './Select';
 import { XIcon, CopyIcon, ColumnsIcon, CheckIcon, XCircleIcon } from '../../icons';
 import { LeadsToDropdown } from './LeadsToDropdown';
+import { loadStargateNeighbors, isKnownStargateAdjacent } from '../../utils/stargateAdjacency';
 import { toast } from './Toaster';
 import { reevaluateConnectionsForSystem } from '../../utils/whAutoDetect';
 import { alertInboundK162 } from '../../utils/k162Alert';
@@ -257,6 +258,21 @@ export function SignaturePane({ systemId }: { systemId: string }) {
     [mapSystems, systemId],
   );
 
+  // This system's EVE id, for the stargate-adjacency filter below.
+  const currentEveId = useMemo(
+    () => mapSystems.find((m) => m.id === systemId)?.eveSystemId ?? null,
+    [mapSystems, systemId],
+  );
+  // Bumps once this system's stargate neighbours load, so connectedSystems
+  // re-filters against them (the adjacency check reads a cache warmed async).
+  const [adjReady, setAdjReady] = useState(0);
+  useEffect(() => {
+    if (currentEveId == null) return;
+    let cancelled = false;
+    loadStargateNeighbors(currentEveId).then(() => { if (!cancelled) setAdjReady((v) => v + 1); });
+    return () => { cancelled = true; };
+  }, [currentEveId]);
+
   const connectedSystems = useMemo(() => {
     const conns = mapConnections.filter(
       (c) => c.sourceId === systemId || c.targetId === systemId,
@@ -264,9 +280,20 @@ export function SignaturePane({ systemId }: { systemId: string }) {
     return conns.flatMap((c) => {
       const otherId = c.sourceId === systemId ? c.targetId : c.sourceId;
       const sys = mapSystems.find((m) => m.id === otherId);
-      return sys ? [{ id: sys.id, name: sys.name, systemClass: sys.systemClass }] : [];
+      if (!sys) return [];
+      // A wormhole never leads to a stargate-adjacent system, so drop gate
+      // connections and any system we know is a stargate neighbour. Non-adjacent
+      // (manually drawn / wormhole) connections still show; unknown adjacency is
+      // kept rather than hidden.
+      const adjacent = c.connectionType === 'gate'
+        || (currentEveId != null && sys.eveSystemId != null
+            && isKnownStargateAdjacent(currentEveId, sys.eveSystemId));
+      if (adjacent) return [];
+      return [{ id: sys.id, name: sys.name, systemClass: sys.systemClass }];
     });
-  }, [mapConnections, mapSystems, systemId]);
+  // adjReady bumps when neighbours load so the filter applies post-fetch.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mapConnections, mapSystems, systemId, currentEveId, adjReady]);
 
   const [sigs, setSigs]               = useState<Signature[]>([]);
   const [selected, setSelected]       = useState<Set<string>>(new Set());

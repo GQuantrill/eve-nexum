@@ -147,6 +147,7 @@ export function MapCanvas() {
   const systems              = useMapStore((s) => s.map.systems);
   const connections          = useMapStore((s) => s.map.connections);
   const selectedSystemId     = useMapStore((s) => s.selectedSystemId);
+  const selectSystem         = useMapStore((s) => s.selectSystem);
   const selectedConnectionId = useMapStore((s) => s.selectedConnectionId);
   const routeHighlight       = useMapStore((s) => s.routeHighlight);
   const snapToGrid           = useMapStore((s) => s.snapToGrid);
@@ -381,8 +382,14 @@ export function MapCanvas() {
   // "Centre on me" map-control: recentre on the pilot's current system node
   // (the you-are-here node). Disabled when the pilot isn't in a mapped system.
   const centerOnMe = useCallback(() => {
-    if (currentSystemId) centerOnSystem(currentSystemId);
-  }, [currentSystemId, centerOnSystem]);
+    if (!currentSystemId) return;
+    // Also select the pilot's system so its details open. Selecting opens the
+    // bottom panel (which shrinks the canvas), so recentre a frame later — the
+    // centre-on-select toggle only recentres when it's on, and this button must
+    // always recentre.
+    selectSystem(currentSystemId);
+    requestAnimationFrame(() => centerOnSystem(currentSystemId));
+  }, [currentSystemId, centerOnSystem, selectSystem]);
 
   // On first load after login, centre the viewport on the pilot's last known
   // system (from /auth/me) if it's present on this map — so you land where you
