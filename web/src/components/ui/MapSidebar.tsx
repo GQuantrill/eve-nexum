@@ -944,6 +944,65 @@ export function MapSidebar() {
   const connectionCount = useMapStore((s) => s.map.connections.length);
   const systemCount = useMapStore((s) => s.map.systems.length);
 
+  // One-shot repair: retype wormhole connections that are really stargates (both
+  // ends gate-adjacent per the SDE) to gates. The server applies + broadcasts the
+  // retypes, so open clients update live.
+  const [reclassifying, setReclassifying] = useState(false);
+  const reclassifyGates = async () => {
+    const mapId = useMapStore.getState().activeMapId;
+    if (!mapId) return;
+    setReclassifying(true);
+    try {
+      const r = await api<{ reclassified: number }>(
+        `/api/maps/${mapId}/reclassify-gates`, { method: "POST" });
+      toast.success(t("mapSidebar.reclassifyGatesDone", { n: r.reclassified }));
+    } catch {
+      toast.error(t("mapSidebar.reclassifyGatesFailed"));
+    } finally {
+      // Hold the overlay a beat past the response so it covers the live
+      // re-render as the broadcast updates stream in and apply.
+      setTimeout(() => setReclassifying(false), 450);
+    }
+  };
+
+  // "Tidy layout" — snap resolved K-space systems back to their true New Eden
+  // positions (SDE pos2d). The server repositions + broadcasts, so open clients
+  // move live; wormhole/unresolved/locked nodes are left untouched.
+  const [tidyingLayout, setTidyingLayout] = useState(false);
+  const tidyLayout = async () => {
+    const mapId = useMapStore.getState().activeMapId;
+    if (!mapId) return;
+    setTidyingLayout(true);
+    try {
+      const r = await api<{ repositioned: number }>(
+        `/api/maps/${mapId}/geographic-layout`, { method: "POST" });
+      toast.success(t("mapSidebar.tidyLayoutDone", { n: r.repositioned }));
+    } catch {
+      toast.error(t("mapSidebar.tidyLayoutFailed"));
+    } finally {
+      setTimeout(() => setTidyingLayout(false), 450);
+    }
+  };
+
+  // "Untangle" — force-directed layout. Ignores geography and instead pulls
+  // connected systems together / pushes everything apart, so long crossing
+  // wormhole lines collapse. The server repositions + broadcasts live.
+  const [untangling, setUntangling] = useState(false);
+  const untangleLayout = async () => {
+    const mapId = useMapStore.getState().activeMapId;
+    if (!mapId) return;
+    setUntangling(true);
+    try {
+      const r = await api<{ repositioned: number }>(
+        `/api/maps/${mapId}/untangle-layout`, { method: "POST" });
+      toast.success(t("mapSidebar.untangleLayoutDone", { n: r.repositioned }));
+    } catch {
+      toast.error(t("mapSidebar.untangleLayoutFailed"));
+    } finally {
+      setTimeout(() => setUntangling(false), 450);
+    }
+  };
+
   // Import creates a PERSONAL map, so the cap is the personal-map limit — count
   // only maps the user owns (not corp/alliance maps or ones merely shared with
   // them). Matches the server's quota (owner_id, corp/alliance NULL). Counting
@@ -1048,6 +1107,19 @@ export function MapSidebar() {
 
   return (
     <div className={`map-sidebar${mapOptionsOpen ? " map-sidebar--open" : ""}`}>
+      {(reclassifying || tidyingLayout || untangling) && createPortal(
+        <div className="layout-busy" role="status" aria-live="polite">
+          <div className="layout-busy__spinner" />
+          <div className="layout-busy__label">
+            {reclassifying
+              ? t("mapSidebar.reclassifyGatesBusy")
+              : tidyingLayout
+                ? t("mapSidebar.tidyLayoutBusy")
+                : t("mapSidebar.untangleLayoutBusy")}
+          </div>
+        </div>,
+        document.body,
+      )}
       <button
         className="map-sidebar__tab"
         onClick={() => setMapOptionsOpen(!mapOptionsOpen)}
@@ -1255,6 +1327,30 @@ export function MapSidebar() {
                 data-tooltip={t("mapSidebar.spreadNodesTooltip")}
               >
                 {t("mapSidebar.spreadNodes")}
+              </button>
+              <button
+                className="map-sidebar__action"
+                onClick={reclassifyGates}
+                disabled={connectionCount === 0 || reclassifying}
+                data-tooltip={t("mapSidebar.reclassifyGatesTooltip")}
+              >
+                {reclassifying ? t("mapSidebar.reclassifyGatesBusy") : t("mapSidebar.reclassifyGates")}
+              </button>
+              <button
+                className="map-sidebar__action"
+                onClick={tidyLayout}
+                disabled={systemCount < 2 || tidyingLayout}
+                data-tooltip={t("mapSidebar.tidyLayoutTooltip")}
+              >
+                {tidyingLayout ? t("mapSidebar.tidyLayoutBusy") : t("mapSidebar.tidyLayout")}
+              </button>
+              <button
+                className="map-sidebar__action"
+                onClick={untangleLayout}
+                disabled={systemCount < 2 || untangling}
+                data-tooltip={t("mapSidebar.untangleLayoutTooltip")}
+              >
+                {untangling ? t("mapSidebar.untangleLayoutBusy") : t("mapSidebar.untangleLayout")}
               </button>
               <LazyWhSweepToggle />
             </>

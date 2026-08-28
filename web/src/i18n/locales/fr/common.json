@@ -674,7 +674,22 @@
       "inRange": "{{count}} systèmes à portée",
       "all": "Tous",
       "legend": "Atteignable par :"
-    }
+    },
+    "reclassifyGates": "Reclasser les portes",
+    "reclassifyGatesBusy": "Reclassement…",
+    "reclassifyGatesTooltip": "Reclasser en portes les liens de trou de ver qui sont en fait des portes stellaires (systèmes adjacents)",
+    "reclassifyGatesDone": "{{n}} connexion(s) reclassée(s) en portes",
+    "reclassifyGatesFailed": "Échec du reclassement",
+    "tidyLayout": "Ranger la disposition",
+    "tidyLayoutBusy": "Rangement…",
+    "tidyLayoutTooltip": "Replacer les systèmes connus à leur vraie position sur la carte du jeu",
+    "tidyLayoutDone": "{{n}} système(s) repositionné(s)",
+    "tidyLayoutFailed": "Échec de la disposition",
+    "untangleLayout": "Démêler",
+    "untangleLayoutBusy": "Démêlage…",
+    "untangleLayoutTooltip": "Réorganiser selon les connexions (et non la géographie) pour rapprocher les systèmes liés et raccourcir les lignes qui se croisent",
+    "untangleLayoutDone": "{{n}} système(s) démêlé(s)",
+    "untangleLayoutFailed": "Échec du démêlage"
   },
   "customIntel": {
     "title": "Intel personnalisée",

@@ -674,7 +674,22 @@
       "inRange": "{{count}} sistemas al alcance",
       "all": "Todos",
       "legend": "Alcanzable por:"
-    }
+    },
+    "reclassifyGates": "Reclasificar puertas",
+    "reclassifyGatesBusy": "Reclasificando…",
+    "reclassifyGatesTooltip": "Reclasificar como puertas los enlaces de agujero de gusano que en realidad son puertas estelares (sistemas adyacentes)",
+    "reclassifyGatesDone": "{{n}} conexión(es) reclasificada(s) como puertas",
+    "reclassifyGatesFailed": "Error al reclasificar",
+    "tidyLayout": "Ordenar disposición",
+    "tidyLayoutBusy": "Ordenando…",
+    "tidyLayoutTooltip": "Volver a colocar los sistemas conocidos en su posición real del mapa del juego",
+    "tidyLayoutDone": "{{n}} sistema(s) reposicionado(s)",
+    "tidyLayoutFailed": "Error en la disposición",
+    "untangleLayout": "Desenredar",
+    "untangleLayoutBusy": "Desenredando…",
+    "untangleLayoutTooltip": "Reorganizar por conexiones (no por geografía) para juntar los sistemas enlazados y acortar las líneas que se cruzan",
+    "untangleLayoutDone": "{{n}} sistema(s) desenredado(s)",
+    "untangleLayoutFailed": "Error al desenredar"
   },
   "customIntel": {
     "title": "Intel personalizada",

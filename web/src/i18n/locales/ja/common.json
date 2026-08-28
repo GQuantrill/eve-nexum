@@ -674,7 +674,22 @@
       "inRange": "範囲内に {{count}} 星系",
       "all": "すべて",
       "legend": "到達可能:"
-    }
+    },
+    "reclassifyGates": "ゲートを再分類",
+    "reclassifyGatesBusy": "再分類中…",
+    "reclassifyGatesTooltip": "実際にはスターゲート（隣接システム）であるワームホール接続をゲートに再分類します",
+    "reclassifyGatesDone": "{{n}} 件の接続をゲートに再分類しました",
+    "reclassifyGatesFailed": "再分類に失敗しました",
+    "tidyLayout": "レイアウトを整える",
+    "tidyLayoutBusy": "整理中…",
+    "tidyLayoutTooltip": "既知のシステムをゲーム内マップの実際の位置に戻します",
+    "tidyLayoutDone": "{{n}} 件のシステムを再配置しました",
+    "tidyLayoutFailed": "レイアウトに失敗しました",
+    "untangleLayout": "ほぐす",
+    "untangleLayoutBusy": "整理中…",
+    "untangleLayoutTooltip": "地理ではなく接続に基づいて再配置し、つながったシステムを近づけて交差する線を短くします",
+    "untangleLayoutDone": "{{n}} 件のシステムを整理しました",
+    "untangleLayoutFailed": "整理に失敗しました"
   },
   "customIntel": {
     "title": "カスタムインテル",

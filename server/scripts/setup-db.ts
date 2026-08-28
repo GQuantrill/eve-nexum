@@ -21,6 +21,7 @@ import { mkdir, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { pipeline } from 'node:stream/promises';
 import { Readable, Transform } from 'node:stream';
+import { createInterface } from 'node:readline';
 import * as unzipper from 'unzipper';
 import { db } from '../src/db.js';
 
@@ -691,9 +692,9 @@ async function importStars(zip: Zip) {
 // Runs after importStargates. All static, so it only re-runs on a re-seed.
 async function importCelestialCounts(zip: Zip) {
   process.stdout.write('Counting celestials (moons, belts, gates)... ');
-  const moonCounts = tallyBySystem(await readJsonl(zip, 'mapMoons.jsonl'));
+  const moonCounts = await tallyBySystem(zip, 'mapMoons.jsonl');
   await applyCounts('moon_count', moonCounts);
-  const beltCounts = tallyBySystem(await readJsonl(zip, 'mapAsteroidBelts.jsonl'));
+  const beltCounts = await tallyBySystem(zip, 'mapAsteroidBelts.jsonl');
   await applyCounts('belt_count', beltCounts);
 
   await db.query(`
@@ -751,16 +752,30 @@ async function importShattered(zip: Zip) {
   console.log(`${ids.length} shattered`);
 }
 
-// Tally records by their solarSystemID. Pulls the id out with a regex to skip
-// JSON.parse over the giant moon/belt files; falls back to a parse on a miss.
-function tallyBySystem(lines: string[]): Map<number, number> {
+// Tally records by their solarSystemID, STREAMING the entry line-by-line rather
+// than buffering it whole. mapMoons/mapAsteroidBelts are hundreds of thousands
+// of rows; readJsonl's decompress -> toString -> split -> filter holds four huge
+// allocations at once and OOM-kills small import containers (exit 137). Here we
+// only ever hold one line plus the counts map. Pulls the id out with a regex to
+// skip JSON.parse on the hot path; falls back to a parse on a miss.
+async function tallyBySystem(zip: Zip, filename: string): Promise<Map<number, number>> {
+  const entry = zip.files.find(f => f.path === filename);
+  if (!entry) throw new Error(`${filename} not found in SDE zip`);
   const counts = new Map<number, number>();
-  for (const line of lines) {
+  const input  = entry.stream();
+  const rl     = createInterface({ input, crlfDelay: Infinity });
+  rl.on('line', (line) => {
+    if (!line.trim()) return;
     const m   = line.match(/"solarSystemID":\s*(\d+)/);
     let   sys = m ? parseInt(m[1], 10) : 0;
     if (!sys) { try { sys = JSON.parse(line).solarSystemID ?? 0; } catch { sys = 0; } }
     if (sys) counts.set(sys, (counts.get(sys) ?? 0) + 1);
-  }
+  });
+  await new Promise<void>((resolve, reject) => {
+    rl.on('close', resolve);
+    rl.on('error', reject);
+    input.on('error', reject);
+  });
   return counts;
 }
 

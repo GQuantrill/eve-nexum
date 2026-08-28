@@ -674,7 +674,22 @@
       "inRange": "{{count}} sistemas ao alcance",
       "all": "Todos",
       "legend": "Alcançável por:"
-    }
+    },
+    "reclassifyGates": "Reclassificar portões",
+    "reclassifyGatesBusy": "Reclassificando…",
+    "reclassifyGatesTooltip": "Reclassificar como portões as ligações de buraco de minhoca que na verdade são portões estelares (sistemas adjacentes)",
+    "reclassifyGatesDone": "{{n}} conexão(ões) reclassificada(s) como portões",
+    "reclassifyGatesFailed": "Falha ao reclassificar",
+    "tidyLayout": "Organizar disposição",
+    "tidyLayoutBusy": "Organizando…",
+    "tidyLayoutTooltip": "Recolocar os sistemas conhecidos na sua posição real no mapa do jogo",
+    "tidyLayoutDone": "{{n}} sistema(s) reposicionado(s)",
+    "tidyLayoutFailed": "Falha na disposição",
+    "untangleLayout": "Desembaraçar",
+    "untangleLayoutBusy": "Desembaraçando…",
+    "untangleLayoutTooltip": "Reorganizar por ligações (não por geografia) para aproximar os sistemas ligados e encurtar as linhas que se cruzam",
+    "untangleLayoutDone": "{{n}} sistema(s) desembaraçado(s)",
+    "untangleLayoutFailed": "Falha ao desembaraçar"
   },
   "customIntel": {
     "title": "Intel personalizada",

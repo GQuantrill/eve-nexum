@@ -2724,6 +2724,480 @@ mapsRouter.post('/:mapId/connections', async (req, res) => {
   res.status(201).json({ ok: true, connectionType: effectiveType });
 });
 
+// POST /api/maps/:mapId/reclassify-gates — one-shot repair. Retype 'standard'
+// (wormhole) connections whose two endpoints are actually stargate-adjacent
+// (per the SDE map_stargates) to 'gate'. Fixes maps built while map_stargates
+// was unseeded, or connections created before gate auto-classification, where
+// gate hops piled up as wormhole lines. Never touches a connection carrying a
+// wormhole type (a real scanned hole) or one already typed gate/jumpgate.
+mapsRouter.post('/:mapId/reclassify-gates', async (req, res) => {
+  const { mapId } = req.params;
+  const access = await requireMapWrite(res, mapId, req);
+  if (!access) return;
+  try {
+    const { rows } = await db.query<{ id: string }>(
+      `UPDATE map_connections c
+          SET connection_type = 'gate'
+        WHERE c.map_id = $1
+          AND c.connection_type = 'standard'
+          AND (c.wh_type IS NULL OR c.wh_type = '')
+          AND EXISTS (
+            SELECT 1 FROM map_systems s, map_systems t
+             WHERE s.id = c.source_id AND t.id = c.target_id
+               AND s.eve_system_id IS NOT NULL AND t.eve_system_id IS NOT NULL
+               AND EXISTS (
+                 SELECT 1 FROM map_stargates g
+                  WHERE (g.system_id = s.eve_system_id AND g.destination_system_id = t.eve_system_id)
+                     OR (g.system_id = t.eve_system_id AND g.destination_system_id = s.eve_system_id)
+               )
+          )
+        RETURNING c.id`,
+      [mapId],
+    );
+    if (rows.length > 0) {
+      await touchMap(mapId);
+      // Server-originated → actor null so every viewer applies the retype live.
+      for (const r of rows) {
+        publishToMap(mapId, { type: 'connection.update', actor: null, id: r.id, updates: { connectionType: 'gate' } });
+      }
+    }
+    res.json({ ok: true, reclassified: rows.length });
+  } catch (err) {
+    log.error(`reclassify-gates failed for map ${mapId}:`, err);
+    res.status(500).json({ error: 'Reclassify failed' });
+  }
+});
+
+// Re-pick every connection's attach handles for a fresh set of system positions
+// — the server-side equivalent of the client "optimise connections" — so a
+// layout repair also tidies which side of each node its lines meet. Mirrors the
+// client's pickHandles() (pure dx/dy geometry). Bulk-updates only the changed
+// handles and broadcasts them; a connection whose endpoints aren't both in `pos`
+// is skipped.
+async function optimizeConnectionHandles(
+  mapId: string,
+  pos: Map<string, { x: number; y: number }>,
+  conns: { id: string; sourceId: string; targetId: string; sourceHandle: string | null; targetHandle: string | null }[],
+): Promise<void> {
+  const changed: { id: string; sh: string; th: string }[] = [];
+  for (const c of conns) {
+    const s = pos.get(c.sourceId), t = pos.get(c.targetId);
+    if (!s || !t) continue;
+    const dx = t.x - s.x, dy = t.y - s.y;
+    const [sh, th] = Math.abs(dx) >= Math.abs(dy)
+      ? (dx >= 0 ? ['right', 'left'] : ['left', 'right'])
+      : (dy >= 0 ? ['bottom', 'top'] : ['top', 'bottom']);
+    if (c.sourceHandle !== sh || c.targetHandle !== th) changed.push({ id: c.id, sh, th });
+  }
+  if (!changed.length) return;
+  const values: string[] = [];
+  const params: unknown[] = [mapId];
+  let i = 2;
+  for (const c of changed) {
+    values.push(`($${i}::text, $${i + 1}::text, $${i + 2}::text)`);
+    params.push(c.id, c.sh, c.th);
+    i += 3;
+  }
+  await db.query(
+    `UPDATE map_connections AS m
+        SET source_handle = v.sh, target_handle = v.th
+       FROM (VALUES ${values.join(',')}) AS v(id, sh, th)
+      WHERE m.id::text = v.id AND m.map_id = $1`,
+    params,
+  );
+  for (const c of changed) {
+    publishToMap(mapId, { type: 'connection.update', actor: null, id: c.id, updates: { sourceHandle: c.sh, targetHandle: c.th } });
+  }
+}
+
+// POST /api/maps/:mapId/geographic-layout — one-shot "tidy layout". Geography in
+// EVE is only meaningful *within* a region (systems in one region sit close;
+// regions are galactically far apart), so a single global scale would collapse
+// each region into an unreadable pile. Instead we (1) group resolved K-space
+// systems by their SDE region and lay each region out in its true local shape
+// (scaled to a readable pitch, de-overlapped); (2) pack the region blobs
+// compactly onto the canvas; (3) drop wormhole / unresolved systems next to
+// whatever they connect to. Locked systems stay put and act as fixed anchors.
+// Nothing ever overlaps.
+mapsRouter.post('/:mapId/geographic-layout', async (req, res) => {
+  const { mapId } = req.params;
+  const access = await requireMapWrite(res, mapId, req);
+  if (!access) return;
+  try {
+    const [sysQ, connQ] = await Promise.all([
+      db.query<{ id: string; eveId: number | null; regionId: number | null; px: number | null; py: number | null; locked: boolean; curX: number | null; curY: number | null }>(
+        `SELECT ms.id, ms.eve_system_id AS "eveId", ms.locked,
+                ms.position_x AS "curX", ms.position_y AS "curY",
+                s.pos2d_x AS px, s.pos2d_y AS py, s.region_id AS "regionId"
+           FROM map_systems ms
+           LEFT JOIN solar_systems s ON s.id = ms.eve_system_id
+          WHERE ms.map_id = $1`,
+        [mapId],
+      ),
+      db.query<{ id: string; sourceId: string; targetId: string; sourceHandle: string | null; targetHandle: string | null }>(
+        `SELECT id, source_id AS "sourceId", target_id AS "targetId",
+                source_handle AS "sourceHandle", target_handle AS "targetHandle"
+           FROM map_connections WHERE map_id = $1`,
+        [mapId],
+      ),
+    ]);
+    const sysRows = sysQ.rows;
+    if (sysRows.length < 2) { res.json({ ok: true, repositioned: 0 }); return; }
+
+    const PITCH  = 340;             // target gap between neighbouring systems
+    const BOX_W  = 270, BOX_H = 175; // nominal node footprint for de-overlap
+    const GAP    = 190;             // padding between packed region blobs
+    const MARGIN = 120;
+    type Pt = { id: string; x: number; y: number };
+
+    // Push apart any pair whose nominal boxes intersect, along the shallower
+    // axis. `fixed` ids never move (locked systems). O(n^2) per pass; n small.
+    const deOverlap = (nodes: Pt[], fixed?: Set<string>) => {
+      for (let iter = 0; iter < 200; iter++) {
+        let moved = false;
+        for (let a = 0; a < nodes.length; a++) {
+          for (let b = a + 1; b < nodes.length; b++) {
+            const dx = nodes[b].x - nodes[a].x;
+            const dy = nodes[b].y - nodes[a].y;
+            const ox = BOX_W - Math.abs(dx);
+            const oy = BOX_H - Math.abs(dy);
+            if (ox <= 0 || oy <= 0) continue;
+            const fa = fixed?.has(nodes[a].id) ?? false;
+            const fb = fixed?.has(nodes[b].id) ?? false;
+            if (fa && fb) continue;
+            const sa = fa ? 0 : (fb ? 1 : 0.5);
+            const sb = fb ? 0 : (fa ? 1 : 0.5);
+            if (ox < oy) {
+              const push = ox * (dx < 0 ? -1 : 1);
+              nodes[a].x -= push * sa; nodes[b].x += push * sb;
+            } else {
+              const push = oy * (dy < 0 ? -1 : 1);
+              nodes[a].y -= push * sa; nodes[b].y += push * sb;
+            }
+            moved = true;
+          }
+        }
+        if (!moved) break;
+      }
+    };
+
+    // Partition: anchored (resolved K-space with a real SDE position -> region
+    // layout), locked (user-pinned, never moved), floating (wormhole / unresolved
+    // -> placed by their connections).
+    const anchored = sysRows.filter((r) => !r.locked && r.eveId != null && r.eveId < 31000000 && r.px != null && r.py != null && r.regionId != null);
+    const anchoredIds = new Set(anchored.map((r) => r.id));
+    const lockedPos = new Map<string, Pt>();
+    for (const r of sysRows) if (r.locked && r.curX != null && r.curY != null) lockedPos.set(r.id, { id: r.id, x: r.curX, y: r.curY });
+
+    // Level 1 — lay out each region in its true local shape.
+    const byRegion = new Map<number, typeof anchored>();
+    for (const r of anchored) {
+      const g = byRegion.get(r.regionId!);
+      if (g) g.push(r); else byRegion.set(r.regionId!, [r]);
+    }
+    type Blob = { pos: Map<string, Pt>; w: number; h: number };
+    const blobs: Blob[] = [];
+    for (const members of byRegion.values()) {
+      if (members.length === 1) {
+        blobs.push({ pos: new Map([[members[0].id, { id: members[0].id, x: 0, y: 0 }]]), w: BOX_W, h: BOX_H });
+        continue;
+      }
+      const minX = Math.min(...members.map((m) => m.px!));
+      const maxY = Math.max(...members.map((m) => m.py!));
+      const nn: number[] = [];
+      for (let a = 0; a < members.length; a++) {
+        let best = Infinity;
+        for (let b = 0; b < members.length; b++) {
+          if (a === b) continue;
+          const d = Math.hypot(members[a].px! - members[b].px!, members[a].py! - members[b].py!);
+          if (d > 0 && d < best) best = d;
+        }
+        if (best < Infinity) nn.push(best);
+      }
+      nn.sort((a, b) => a - b);
+      const med = nn.length ? nn[Math.floor(nn.length / 2)] : 0;
+      const scale = med > 0 ? PITCH / med : PITCH;
+      const nodes: Pt[] = members.map((m, k) => ({
+        id: m.id,
+        x: (m.px! - minX) * scale + (k % 5) - 2,
+        y: (maxY - m.py!) * scale + (Math.floor(k / 5) % 5) - 2, // flip Y: SDE grows up, screen grows down
+      }));
+      deOverlap(nodes);
+      const nx = Math.min(...nodes.map((n) => n.x)), ny = Math.min(...nodes.map((n) => n.y));
+      const pos = new Map<string, Pt>();
+      for (const n of nodes) pos.set(n.id, { id: n.id, x: n.x - nx, y: n.y - ny });
+      const w = Math.max(...nodes.map((n) => n.x)) - nx + BOX_W;
+      const h = Math.max(...nodes.map((n) => n.y)) - ny + BOX_H;
+      blobs.push({ pos, w, h });
+    }
+
+    // Level 2 — shelf-pack the region blobs into a compact ~square.
+    blobs.sort((a, b) => b.h - a.h);
+    const targetW = Math.max(BOX_W, Math.sqrt(blobs.reduce((s, b) => s + b.w * b.h, 0)) * 1.4);
+    const placed = new Map<string, Pt>();
+    let cx = 0, cy = 0, rowH = 0;
+    for (const bl of blobs) {
+      if (cx > 0 && cx + bl.w > targetW) { cx = 0; cy += rowH + GAP; rowH = 0; }
+      for (const p of bl.pos.values()) placed.set(p.id, { id: p.id, x: p.x + cx + MARGIN, y: p.y + cy + MARGIN });
+      cx += bl.w + GAP; rowH = Math.max(rowH, bl.h);
+    }
+    for (const p of lockedPos.values()) placed.set(p.id, p); // fixed reference points
+
+    // Floating — place wormhole / unresolved systems by their connections,
+    // repeating so multi-hop chains settle next to their entry point.
+    const neighbors = new Map<string, string[]>();
+    const addNb = (a: string, b: string) => { const l = neighbors.get(a); if (l) l.push(b); else neighbors.set(a, [b]); };
+    for (const c of connQ.rows) { addNb(c.sourceId, c.targetId); addNb(c.targetId, c.sourceId); }
+    const floating = sysRows.filter((r) => !r.locked && !anchoredIds.has(r.id));
+    for (let pass = 0; pass < 12; pass++) {
+      let progressed = false;
+      for (const f of floating) {
+        if (placed.has(f.id)) continue;
+        const known = (neighbors.get(f.id) ?? []).map((n) => placed.get(n)).filter((p): p is Pt => !!p);
+        if (!known.length) continue;
+        const mx = known.reduce((s, p) => s + p.x, 0) / known.length;
+        const my = known.reduce((s, p) => s + p.y, 0) / known.length;
+        placed.set(f.id, { id: f.id, x: mx + BOX_W, y: my + 40 });
+        progressed = true;
+      }
+      if (!progressed) break;
+    }
+    // Anything still unplaced (disconnected, or a map with no K-space anchors at
+    // all) drops into a grid below everything so it's never lost off-canvas.
+    const leftover = floating.filter((f) => !placed.has(f.id));
+    if (leftover.length) {
+      const baseY = (placed.size ? Math.max(...[...placed.values()].map((p) => p.y)) : 0) + BOX_H + GAP;
+      const cols = Math.max(1, Math.ceil(Math.sqrt(leftover.length)));
+      leftover.forEach((f, k) => placed.set(f.id, { id: f.id, x: MARGIN + (k % cols) * BOX_W, y: baseY + Math.floor(k / cols) * BOX_H }));
+    }
+
+    // Final de-overlap over everything (locked stay fixed), then persist the
+    // non-locked systems we positioned.
+    const all = [...placed.values()];
+    deOverlap(all, new Set(lockedPos.keys()));
+    const movable = all.filter((p) => !lockedPos.has(p.id));
+    for (const p of movable) { p.x = Math.round(p.x); p.y = Math.round(p.y); }
+    if (!movable.length) { res.json({ ok: true, repositioned: 0 }); return; }
+
+    const values: string[] = [];
+    const params: unknown[] = [mapId];
+    let i = 2;
+    for (const p of movable) {
+      values.push(`($${i}::text, $${i + 1}::float8, $${i + 2}::float8)`);
+      params.push(p.id, p.x, p.y);
+      i += 3;
+    }
+    await db.query(
+      `UPDATE map_systems AS m
+          SET position_x = v.px, position_y = v.py
+         FROM (VALUES ${values.join(',')}) AS v(id, px, py)
+        WHERE m.id::text = v.id AND m.map_id = $1`,
+      params,
+    );
+    await touchMap(mapId);
+    for (const p of movable) {
+      publishToMap(mapId, { type: 'system.update', actor: null, id: p.id, updates: { position: { x: p.x, y: p.y } } });
+    }
+    // Also optimise connection handles for the new positions (runs the client's
+    // "optimise connections" server-side, for every client, in one shot).
+    await optimizeConnectionHandles(mapId, placed, connQ.rows);
+    res.json({ ok: true, repositioned: movable.length });
+  } catch (err) {
+    log.error(`geographic-layout failed for map ${mapId}:`, err);
+    res.status(500).json({ error: 'Layout failed' });
+  }
+});
+
+// POST /api/maps/:mapId/untangle-layout — one-shot "untangle". A force-directed
+// (Fruchterman-Reingold) layout: connected systems attract, all systems repel,
+// so anything a hop apart ends up adjacent and the long crossing lines collapse.
+// Geography is ignored on purpose — this minimises edge length/crossings, which
+// is what actually makes a busy wormhole map readable. Each connected component
+// is laid out independently, normalised to a readable edge length, then the
+// components are shelf-packed. Locked systems stay put (fixed obstacles) and
+// nothing overlaps.
+mapsRouter.post('/:mapId/untangle-layout', async (req, res) => {
+  const { mapId } = req.params;
+  const access = await requireMapWrite(res, mapId, req);
+  if (!access) return;
+  try {
+    const [sysQ, connQ] = await Promise.all([
+      db.query<{ id: string; locked: boolean; curX: number | null; curY: number | null }>(
+        `SELECT id, locked, position_x AS "curX", position_y AS "curY" FROM map_systems WHERE map_id = $1`,
+        [mapId],
+      ),
+      db.query<{ id: string; sourceId: string; targetId: string; sourceHandle: string | null; targetHandle: string | null }>(
+        `SELECT id, source_id AS "sourceId", target_id AS "targetId",
+                source_handle AS "sourceHandle", target_handle AS "targetHandle"
+           FROM map_connections WHERE map_id = $1`,
+        [mapId],
+      ),
+    ]);
+    const sysRows = sysQ.rows;
+    if (sysRows.length < 2) { res.json({ ok: true, repositioned: 0 }); return; }
+
+    const TARGET = 320;             // normalised edge length
+    const BOX_W  = 270, BOX_H = 175; // nominal node footprint for de-overlap
+    const GAP    = 190;             // padding between packed components
+    const MARGIN = 120;
+    type Pt = { id: string; x: number; y: number };
+
+    const deOverlap = (nodes: Pt[], fixed?: Set<string>) => {
+      for (let iter = 0; iter < 200; iter++) {
+        let moved = false;
+        for (let a = 0; a < nodes.length; a++) {
+          for (let b = a + 1; b < nodes.length; b++) {
+            const dx = nodes[b].x - nodes[a].x;
+            const dy = nodes[b].y - nodes[a].y;
+            const ox = BOX_W - Math.abs(dx);
+            const oy = BOX_H - Math.abs(dy);
+            if (ox <= 0 || oy <= 0) continue;
+            const fa = fixed?.has(nodes[a].id) ?? false;
+            const fb = fixed?.has(nodes[b].id) ?? false;
+            if (fa && fb) continue;
+            const sa = fa ? 0 : (fb ? 1 : 0.5);
+            const sb = fb ? 0 : (fa ? 1 : 0.5);
+            if (ox < oy) {
+              const push = ox * (dx < 0 ? -1 : 1);
+              nodes[a].x -= push * sa; nodes[b].x += push * sb;
+            } else {
+              const push = oy * (dy < 0 ? -1 : 1);
+              nodes[a].y -= push * sa; nodes[b].y += push * sb;
+            }
+            moved = true;
+          }
+        }
+        if (!moved) break;
+      }
+    };
+
+    // Locked systems are excluded from the untangle (kept at their pinned spot)
+    // but act as fixed obstacles in the final de-overlap.
+    const lockedPos = new Map<string, Pt>();
+    for (const r of sysRows) if (r.locked && r.curX != null && r.curY != null) lockedPos.set(r.id, { id: r.id, x: r.curX, y: r.curY });
+    const movableIds = sysRows.filter((r) => !r.locked).map((r) => r.id);
+    const movableSet = new Set(movableIds);
+
+    // Adjacency over movable systems only.
+    const adj = new Map<string, string[]>();
+    for (const id of movableIds) adj.set(id, []);
+    for (const c of connQ.rows) {
+      if (movableSet.has(c.sourceId) && movableSet.has(c.targetId)) {
+        adj.get(c.sourceId)!.push(c.targetId);
+        adj.get(c.targetId)!.push(c.sourceId);
+      }
+    }
+
+    // Connected components via union-find.
+    const parent = new Map<string, string>(movableIds.map((id) => [id, id]));
+    const find = (x: string): string => {
+      let r = x;
+      while (parent.get(r) !== r) r = parent.get(r)!;
+      while (parent.get(x) !== r) { const n = parent.get(x)!; parent.set(x, r); x = n; }
+      return r;
+    };
+    for (const id of movableIds) for (const nb of adj.get(id)!) if (id < nb) parent.set(find(id), find(nb));
+    const groups = new Map<string, string[]>();
+    for (const id of movableIds) { const r = find(id); const g = groups.get(r); if (g) g.push(id); else groups.set(r, [id]); }
+
+    // Force-directed layout of one component, normalised so its median edge
+    // length is TARGET, de-overlapped, translated to a (0,0) origin.
+    const layoutComponent = (ids: string[]): { pos: Pt[]; w: number; h: number } => {
+      const N = ids.length;
+      const GA = Math.PI * (3 - Math.sqrt(5)); // golden-angle spiral seed (deterministic)
+      const P: (Pt & { dx: number; dy: number })[] = ids.map((id, i) => {
+        const r = TARGET * 0.6 * Math.sqrt(i + 1);
+        return { id, x: Math.cos(i * GA) * r, y: Math.sin(i * GA) * r, dx: 0, dy: 0 };
+      });
+      if (N > 1) {
+        const idx = new Map(ids.map((id, i) => [id, i]));
+        const k = TARGET;
+        let temp = TARGET * 1.5;
+        for (let it = 0; it < 450; it++) {
+          for (const p of P) { p.dx = 0; p.dy = 0; }
+          for (let a = 0; a < N; a++) for (let b = a + 1; b < N; b++) {
+            const dx = P[a].x - P[b].x, dy = P[a].y - P[b].y, d = Math.hypot(dx, dy) || 0.01;
+            const f = (k * k) / d, ux = dx / d, uy = dy / d;
+            P[a].dx += ux * f; P[a].dy += uy * f; P[b].dx -= ux * f; P[b].dy -= uy * f;
+          }
+          for (const id of ids) for (const nb of adj.get(id)!) if (id < nb) {
+            const A = P[idx.get(id)!], B = P[idx.get(nb)!];
+            const dx = A.x - B.x, dy = A.y - B.y, d = Math.hypot(dx, dy) || 0.01;
+            const f = (d * d) / k, ux = dx / d, uy = dy / d;
+            A.dx -= ux * f; A.dy -= uy * f; B.dx += ux * f; B.dy += uy * f;
+          }
+          for (const p of P) { p.dx += -p.x * 0.02; p.dy += -p.y * 0.02; } // mild centring
+          for (const p of P) { const d = Math.hypot(p.dx, p.dy) || 0.01; p.x += (p.dx / d) * Math.min(d, temp); p.y += (p.dy / d) * Math.min(d, temp); }
+          temp *= 0.985;
+        }
+        // Normalise scale so the median edge length is TARGET.
+        const el: number[] = [];
+        for (const id of ids) for (const nb of adj.get(id)!) if (id < nb) {
+          const A = P[idx.get(id)!], B = P[idx.get(nb)!];
+          el.push(Math.hypot(A.x - B.x, A.y - B.y));
+        }
+        el.sort((a, b) => a - b);
+        const med = el.length ? el[el.length >> 1] : TARGET;
+        const s = med > 0 ? TARGET / med : 1;
+        for (const p of P) { p.x *= s; p.y *= s; }
+      }
+      deOverlap(P);
+      const nx = Math.min(...P.map((p) => p.x)), ny = Math.min(...P.map((p) => p.y));
+      const pos = P.map((p) => ({ id: p.id, x: p.x - nx, y: p.y - ny }));
+      const w = Math.max(...P.map((p) => p.x)) - nx + BOX_W;
+      const h = Math.max(...P.map((p) => p.y)) - ny + BOX_H;
+      return { pos, w, h };
+    };
+
+    const blobs = [...groups.values()].map(layoutComponent);
+
+    // Shelf-pack the components into a compact ~square.
+    blobs.sort((a, b) => b.h - a.h);
+    const targetW = Math.max(BOX_W, Math.sqrt(blobs.reduce((s, b) => s + b.w * b.h, 0)) * 1.4);
+    const placed = new Map<string, Pt>();
+    let cx = 0, cy = 0, rowH = 0;
+    for (const bl of blobs) {
+      if (cx > 0 && cx + bl.w > targetW) { cx = 0; cy += rowH + GAP; rowH = 0; }
+      for (const p of bl.pos) placed.set(p.id, { id: p.id, x: p.x + cx + MARGIN, y: p.y + cy + MARGIN });
+      cx += bl.w + GAP; rowH = Math.max(rowH, bl.h);
+    }
+    for (const p of lockedPos.values()) placed.set(p.id, p);
+
+    const all = [...placed.values()];
+    deOverlap(all, new Set(lockedPos.keys()));
+    const movable = all.filter((p) => !lockedPos.has(p.id));
+    for (const p of movable) { p.x = Math.round(p.x); p.y = Math.round(p.y); }
+    if (!movable.length) { res.json({ ok: true, repositioned: 0 }); return; }
+
+    const values: string[] = [];
+    const params: unknown[] = [mapId];
+    let i = 2;
+    for (const p of movable) {
+      values.push(`($${i}::text, $${i + 1}::float8, $${i + 2}::float8)`);
+      params.push(p.id, p.x, p.y);
+      i += 3;
+    }
+    await db.query(
+      `UPDATE map_systems AS m
+          SET position_x = v.px, position_y = v.py
+         FROM (VALUES ${values.join(',')}) AS v(id, px, py)
+        WHERE m.id::text = v.id AND m.map_id = $1`,
+      params,
+    );
+    await touchMap(mapId);
+    for (const p of movable) {
+      publishToMap(mapId, { type: 'system.update', actor: null, id: p.id, updates: { position: { x: p.x, y: p.y } } });
+    }
+    // Also optimise connection handles for the new positions (runs the client's
+    // "optimise connections" server-side, for every client, in one shot).
+    await optimizeConnectionHandles(mapId, placed, connQ.rows);
+    res.json({ ok: true, repositioned: movable.length });
+  } catch (err) {
+    log.error(`untangle-layout failed for map ${mapId}:`, err);
+    res.status(500).json({ error: 'Layout failed' });
+  }
+});
+
 mapsRouter.patch('/:mapId/connections/:connectionId', async (req, res) => {
   const { mapId, connectionId } = req.params;
 

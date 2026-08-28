@@ -674,7 +674,22 @@
       "inRange": "范围内 {{count}} 个星系",
       "all": "全部",
       "legend": "可到达："
-    }
+    },
+    "reclassifyGates": "重新归类星门",
+    "reclassifyGatesBusy": "正在归类…",
+    "reclassifyGatesTooltip": "将实际为星门（相邻星系）的虫洞连接重新归类为星门",
+    "reclassifyGatesDone": "已将 {{n}} 个连接重新归类为星门",
+    "reclassifyGatesFailed": "重新归类失败",
+    "tidyLayout": "整理布局",
+    "tidyLayoutBusy": "正在整理…",
+    "tidyLayoutTooltip": "将已知星系还原到其在游戏星图中的真实位置",
+    "tidyLayoutDone": "已重新定位 {{n}} 个星系",
+    "tidyLayoutFailed": "布局失败",
+    "untangleLayout": "理顺布局",
+    "untangleLayoutBusy": "正在理顺…",
+    "untangleLayoutTooltip": "按连接（而非地理位置）重新排列，使相连星系聚拢并缩短交叉连线",
+    "untangleLayoutDone": "已理顺 {{n}} 个星系",
+    "untangleLayoutFailed": "理顺失败"
   },
   "customIntel": {
     "title": "自定义情报",

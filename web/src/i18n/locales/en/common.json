@@ -732,7 +732,22 @@
       "inRange": "{{count}} systems in range",
       "all": "All",
       "legend": "Reachable by:"
-    }
+    },
+    "reclassifyGates": "Reclassify gates",
+    "reclassifyGatesBusy": "Reclassifying…",
+    "reclassifyGatesTooltip": "Retype wormhole links that are actually stargates (gate-adjacent systems) as gates",
+    "reclassifyGatesDone": "Reclassified {{n}} connection(s) as gates",
+    "reclassifyGatesFailed": "Reclassify failed",
+    "tidyLayout": "Tidy layout",
+    "tidyLayoutBusy": "Tidying…",
+    "tidyLayoutTooltip": "Snap known systems back to their real in-game map positions",
+    "tidyLayoutDone": "Repositioned {{n}} system(s)",
+    "tidyLayoutFailed": "Layout failed",
+    "untangleLayout": "Untangle",
+    "untangleLayoutBusy": "Untangling…",
+    "untangleLayoutTooltip": "Rearrange by connections (not geography) to pull linked systems together and shorten crossing lines",
+    "untangleLayoutDone": "Untangled {{n}} system(s)",
+    "untangleLayoutFailed": "Untangle failed"
   },
   "customIntel": {
     "title": "Custom Intel",
