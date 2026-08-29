@@ -275,8 +275,23 @@ export function applyTrackedJump(
     const fromJspace = prev !== null && !isKspaceSkip(prev.systemClass);
     const viaWormhole = prev !== null && isKspaceSkip(prev.systemClass)
       && isDefiniteWormholeHop(prev.eveSystemId, curr.eveSystemId);
-    if (fromJspace || viaWormhole) {
+    if (fromJspace) {
+      // First K-space of this excursion, entered from J-space: the J-space
+      // departure is the live anchor, so connect straight from it.
       const mapSystemId = applyJump(curr, prevMapSystemId, true, onJump);
+      return { mapSystemId, anchor: mapSystemId };
+    }
+    if (viaWormhole) {
+      // Wormhole / Ansiblex out of a K-space system into another K-space one.
+      // The departure system (`prev`) may itself have been a skipped gate
+      // arrival, in which case the anchor (`prevMapSystemId`) is a stale, far-off
+      // system — connecting from it would fabricate a bogus link and record the
+      // crossing against the wrong system's holes. Connect from the ACTUAL
+      // departure, adding it if it was skipped, exactly like the K-space ->
+      // J-space jump below.
+      const prevOnMap = systems().find((s) => s.eveSystemId === prev!.eveSystemId)?.id ?? null;
+      const source = prevOnMap ?? applyJump(prev!, null, true);
+      const mapSystemId = applyJump(curr, source, true, onJump);
       return { mapSystemId, anchor: mapSystemId };
     }
     return { mapSystemId: systems().find((s) => s.eveSystemId === curr.eveSystemId)?.id ?? null, anchor: 'keep' };
