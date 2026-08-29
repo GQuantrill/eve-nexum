@@ -3008,13 +3008,13 @@ mapsRouter.post('/:mapId/geographic-layout', async (req, res) => {
   }
 });
 
-// POST /api/maps/:mapId/untangle-layout — one-shot "untangle". A force-directed
-// (Fruchterman-Reingold) layout run per connected component: connected systems
-// attract, all systems repel, so every system settles ~one hop from its
-// neighbours — single-connection "leaf" systems snap right next to theirs — and
-// edge crossings drop sharply. Each component is then normalised to a readable
-// edge length, de-overlapped, and shelf-packed. Locked systems stay put as fixed
-// obstacles; connection handles are re-picked afterwards for the new positions.
+// POST /api/maps/:mapId/untangle-layout — one-shot "untangle". Per connected
+// component: a force-directed (Fruchterman-Reingold) pass settles every system
+// ~one hop from its neighbours (single-connection "leaf" systems snap next to
+// theirs) and drops crossings; then an orthogonalisation pass nudges most links
+// onto horizontal/vertical so the result reads like a tidy hand-arranged map
+// while staying compact. Normalised to a readable edge length, de-overlapped,
+// shelf-packed. Locked systems stay put; connection handles re-picked after.
 mapsRouter.post('/:mapId/untangle-layout', async (req, res) => {
   const { mapId } = req.params;
   const access = await requireMapWrite(res, mapId, req);
@@ -3145,6 +3145,30 @@ mapsRouter.post('/:mapId/untangle-layout', async (req, res) => {
         const s = med > 0 ? TARGET / med : 1;
         for (const p of P) { p.x *= s; p.y *= s; }
       }
+      // Orthogonalisation: nudge each edge's endpoints toward a shared axis so
+      // most links become horizontal/vertical (the aligned "hand-arranged" look)
+      // while staying compact. A soft pass aligns everything it can; the second
+      // "crisp" pass only snaps edges already near an axis, leaving genuine
+      // diagonal cross-links alone (forcing those just reintroduces stretch).
+      const orthoPass = (iters: number, damp: number, onlyNear: boolean) => {
+        for (let it = 0; it < iters; it++) {
+          const mvx = new Float64Array(N), mvy = new Float64Array(N), mvn = new Int32Array(N);
+          for (const id of ids) for (const nb of adj.get(id)!) if (id < nb) {
+            const A = P[idx.get(id)!], B = P[idx.get(nb)!];
+            const dx = B.x - A.x, dy = B.y - A.y;
+            if (onlyNear) {
+              const ang = (Math.atan2(Math.abs(dy), Math.abs(dx)) * 180) / Math.PI;
+              if (ang >= 25 && ang <= 65) continue; // leave genuine diagonals
+            }
+            const iu = idx.get(id)!, iv = idx.get(nb)!;
+            if (Math.abs(dx) >= Math.abs(dy)) { const mY = (A.y + B.y) / 2; mvy[iu] += mY - A.y; mvn[iu]++; mvy[iv] += mY - B.y; mvn[iv]++; }
+            else { const mX = (A.x + B.x) / 2; mvx[iu] += mX - A.x; mvn[iu]++; mvx[iv] += mX - B.x; mvn[iv]++; }
+          }
+          for (let i = 0; i < N; i++) if (mvn[i]) { P[i].x += (damp * mvx[i]) / mvn[i]; P[i].y += (damp * mvy[i]) / mvn[i]; }
+          deOverlap(P);
+        }
+      };
+      if (N > 2) { orthoPass(400, 0.8, false); orthoPass(150, 0.9, true); }
       deOverlap(P);
       const nx = Math.min(...P.map((p) => p.x)), ny = Math.min(...P.map((p) => p.y));
       const pos = P.map((p) => ({ id: p.id, x: Math.round(p.x - nx), y: Math.round(p.y - ny) }));
