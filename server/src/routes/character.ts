@@ -41,67 +41,120 @@ function isReallyOnline(data: EsiOnlineResponse): boolean {
   return login >= logout;
 }
 
+// ── Cached ESI reads ─────────────────────────────────────────────────────────
+// A character's online+location (and ship) is read on every location poll AND
+// for every online alt in account-locations. ESI already caches these ~5 s, so a
+// short per-character cache is lossless — it just collapses the token + ESI
+// round-trips (and matching DB item lookup) when the same character is read
+// repeatedly inside the window: several tabs, the account-locations fan-out, an
+// alt watched from two places. Scales the per-poll ESI cost down as the user base
+// grows. The side effects (jump events, last_known) still run per request.
+type EsiLoc =
+  | { status: 'offline' }
+  | { status: 'online'; solarSystemId: number | null }
+  | { status: 'error' };
+type ShipInfo = { typeId: number; typeName: string; shipName: string; mass: number | null };
+
+const esiLocCache = new TtlCache<number, EsiLoc>(5_000, 60_000);      // keyed by characterId
+const esiLocInflight = new Map<number, Promise<EsiLoc>>();            // dedupe concurrent reads
+const esiShipCache = new TtlCache<number, ShipInfo | null>(5_000, 60_000);
+const esiShipInflight = new Map<number, Promise<ShipInfo | null>>();
+
+// Online + current system for a character. Real 'online'/'offline' outcomes are
+// cached; a transient token/ESI failure returns 'error' and is NOT cached, so
+// recovery is immediate. Never throws.
+async function readEsiLocation(userId: number, characterId: number): Promise<EsiLoc> {
+  const hit = esiLocCache.get(characterId);
+  if (hit) return hit.value;
+  const existing = esiLocInflight.get(characterId);
+  if (existing) return existing;
+  const p = (async (): Promise<EsiLoc> => {
+    let token: string;
+    try { token = await getValidToken(userId); } catch { return { status: 'error' }; }
+    const onlineRes = await esiFetch(`https://esi.evetech.net/latest/characters/${characterId}/online/`,
+      { headers: { Authorization: `Bearer ${token}` } });
+    if (!onlineRes.ok) return { status: 'error' };
+    if (!isReallyOnline(await onlineRes.json() as EsiOnlineResponse)) return { status: 'offline' };
+    const locRes = await esiFetch(`https://esi.evetech.net/latest/characters/${characterId}/location/`,
+      { headers: { Authorization: `Bearer ${token}` } });
+    if (!locRes.ok) return { status: 'online', solarSystemId: null };
+    const { solar_system_id } = await locRes.json() as { solar_system_id: number };
+    return { status: 'online', solarSystemId: solar_system_id };
+  })();
+  esiLocInflight.set(characterId, p);
+  try {
+    const val = await p;
+    if (val.status === 'offline' || (val.status === 'online' && val.solarSystemId != null)) esiLocCache.set(characterId, val);
+    return val;
+  } finally {
+    esiLocInflight.delete(characterId);
+  }
+}
+
+// The character's current ship resolved to SDE type name + mass. Only successful
+// reads are cached.
+async function readEsiShip(userId: number, characterId: number): Promise<ShipInfo | null> {
+  const hit = esiShipCache.get(characterId);
+  if (hit) return hit.value;
+  const existing = esiShipInflight.get(characterId);
+  if (existing) return existing;
+  const p = (async (): Promise<ShipInfo | null> => {
+    let token: string;
+    try { token = await getValidToken(userId); } catch { return null; }
+    const shipRes = await esiFetch(`https://esi.evetech.net/latest/characters/${characterId}/ship/`,
+      { headers: { Authorization: `Bearer ${token}` } });
+    if (!shipRes.ok) return null;
+    const shipData = await shipRes.json() as { ship_type_id: number; ship_name: string };
+    const { rows } = await db.query<{ name: string; mass: string | null }>(
+      `SELECT name, mass FROM item_types WHERE id = $1`, [shipData.ship_type_id]);
+    const massNum = rows[0]?.mass == null ? null : Number(rows[0].mass);
+    return {
+      typeId:   shipData.ship_type_id,
+      typeName: rows[0]?.name ?? `Type ${shipData.ship_type_id}`,
+      shipName: shipData.ship_name,
+      mass:     massNum != null && Number.isFinite(massNum) ? massNum : null,
+    };
+  })();
+  esiShipInflight.set(characterId, p);
+  try {
+    const val = await p;
+    if (val) esiShipCache.set(characterId, val);
+    return val;
+  } finally {
+    esiShipInflight.delete(characterId);
+  }
+}
+
 // Read a character's live location (online + current system + ship) by Nexum
-// user id, using that character's own stored token. Records a jump + persists
-// last_known_system keyed by userId, so reading any of an account's characters
-// keeps its profile fresh. Returns the wire payload; throws on token/ESI errors.
+// user id. Records a jump + persists last_known_system keyed by userId, so
+// reading any of an account's characters keeps its profile fresh.
 type LocationPayload =
   | { online: false }
-  | { online: true; system: Record<string, unknown> | null; ship: { typeId: number; typeName: string; shipName: string; mass: number | null } | null };
+  | { online: true; system: Record<string, unknown> | null; ship: ShipInfo | null };
 
 async function getLocationPayload(userId: number): Promise<LocationPayload> {
   const { rows: userRows } = await db.query<{ character_id: number }>(
     `SELECT character_id FROM users WHERE id = $1`, [userId]);
   if (!userRows.length) return { online: false };
-
-  const token       = await getValidToken(userId);
   const characterId = userRows[0].character_id;
 
-  const onlineRes = await esiFetch(
-    `https://esi.evetech.net/latest/characters/${characterId}/online/`,
-    { headers: { Authorization: `Bearer ${token}` } },
-  );
-  if (!onlineRes.ok || onlineRes.status === 401 || onlineRes.status === 403) return { online: false };
-  const onlineData = await onlineRes.json() as EsiOnlineResponse;
-  if (!isReallyOnline(onlineData)) { lastSeenSystem.delete(userId); return { online: false }; }
+  const loc = await readEsiLocation(userId, characterId);
+  if (loc.status === 'error') return { online: false };
+  if (loc.status === 'offline') { lastSeenSystem.delete(userId); return { online: false }; }
 
-  const [locRes, shipRes] = await Promise.all([
-    esiFetch(`https://esi.evetech.net/latest/characters/${characterId}/location/`,
-      { headers: { Authorization: `Bearer ${token}` } }),
-    esiFetch(`https://esi.evetech.net/latest/characters/${characterId}/ship/`,
-      { headers: { Authorization: `Bearer ${token}` } }),
-  ]);
-  if (!locRes.ok) return { online: true, system: null, ship: null };
-
-  const loc = await locRes.json() as { solar_system_id: number };
-
-  // Ship is best-effort — a transient ESI hiccup on /ship/ shouldn't hide the
-  // rest of the payload. Type name comes from SDE-seeded item_types.
-  let ship: { typeId: number; typeName: string; shipName: string; mass: number | null } | null = null;
-  if (shipRes.ok) {
-    const shipData = await shipRes.json() as { ship_type_id: number; ship_name: string };
-    const { rows: typeRows } = await db.query<{ name: string; mass: string | null }>(
-      `SELECT name, mass FROM item_types WHERE id = $1`, [shipData.ship_type_id]);
-    const massRaw = typeRows[0]?.mass;
-    const massNum = massRaw == null ? null : Number(massRaw);
-    ship = {
-      typeId:   shipData.ship_type_id,
-      typeName: typeRows[0]?.name ?? `Type ${shipData.ship_type_id}`,
-      shipName: shipData.ship_name,
-      mass:     massNum != null && Number.isFinite(massNum) ? massNum : null,
-    };
-  }
+  const ship = await readEsiShip(userId, characterId);
+  if (loc.solarSystemId == null) return { online: true, system: null, ship };
 
   // Jump event + last-known persistence, keyed per character.
   const prevSys = lastSeenSystem.get(userId);
-  if (prevSys !== undefined && prevSys !== loc.solar_system_id) {
+  if (prevSys !== undefined && prevSys !== loc.solarSystemId) {
     db.query(`INSERT INTO user_events (user_id, event_type) VALUES ($1, 'jump')`, [userId]).catch(console.error);
   }
-  if (prevSys !== loc.solar_system_id) {
+  if (prevSys !== loc.solarSystemId) {
     db.query(`UPDATE users SET last_known_system_id = $1, last_known_system_at = NOW() WHERE id = $2`,
-      [loc.solar_system_id, userId]).catch(console.error);
+      [loc.solarSystemId, userId]).catch(console.error);
   }
-  lastSeenSystem.set(userId, loc.solar_system_id);
+  lastSeenSystem.set(userId, loc.solarSystemId);
 
   const { rows } = await db.query(
     `SELECT s.id AS "eveSystemId", s.name, s.class AS "systemClass",
@@ -110,7 +163,7 @@ async function getLocationPayload(userId: number): Promise<LocationPayload> {
      FROM solar_systems s
      LEFT JOIN map_regions r ON r.id = s.region_id
      WHERE s.id = $1`,
-    [loc.solar_system_id],
+    [loc.solarSystemId],
   );
   return { online: true, system: rows.length ? rows[0] : null, ship };
 }
@@ -158,24 +211,18 @@ characterRouter.get('/:targetUserId/location', async (req, res) => {
   }
 });
 
-// Lightweight current-system read for the map markers: online + system only
-// (no ship, no jump event — background detection mustn't inflate stats).
-// Refreshes last_known as a free side effect. Throws on a dead token.
+// Lightweight current-system read for the map markers: online + system only (no
+// ship, no jump event — background detection mustn't inflate stats). Refreshes
+// last_known as a free side effect. Uses the shared cached ESI read, so the
+// account-locations fan-out is cheap even with many alts / tabs.
 async function readCharacterSystem(userId: number, characterId: number): Promise<{ online: boolean; eveSystemId: number; name: string; systemClass: string | null } | null> {
-  const token = await getValidToken(userId);
-  const onlineRes = await esiFetch(`https://esi.evetech.net/latest/characters/${characterId}/online/`,
-    { headers: { Authorization: `Bearer ${token}` } });
-  if (!onlineRes.ok) return null;
-  if (!isReallyOnline(await onlineRes.json() as EsiOnlineResponse)) return null;
-  const locRes = await esiFetch(`https://esi.evetech.net/latest/characters/${characterId}/location/`,
-    { headers: { Authorization: `Bearer ${token}` } });
-  if (!locRes.ok) return null;
-  const { solar_system_id } = await locRes.json() as { solar_system_id: number };
+  const loc = await readEsiLocation(userId, characterId);
+  if (loc.status !== 'online' || loc.solarSystemId == null) return null;
   db.query(`UPDATE users SET last_known_system_id = $1, last_known_system_at = NOW()
               WHERE id = $2 AND last_known_system_id IS DISTINCT FROM $1`,
-    [solar_system_id, userId]).catch(() => {});
+    [loc.solarSystemId, userId]).catch(() => {});
   const { rows } = await db.query<{ eveSystemId: number; name: string; systemClass: string | null }>(
-    `SELECT id AS "eveSystemId", name, class AS "systemClass" FROM solar_systems WHERE id = $1`, [solar_system_id]);
+    `SELECT id AS "eveSystemId", name, class AS "systemClass" FROM solar_systems WHERE id = $1`, [loc.solarSystemId]);
   return rows.length ? { online: true, eveSystemId: rows[0].eveSystemId, name: rows[0].name, systemClass: rows[0].systemClass } : null;
 }
 
