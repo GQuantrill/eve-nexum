@@ -2853,7 +2853,7 @@ mapsRouter.post('/:mapId/geographic-layout', async (req, res) => {
     // Push apart any pair whose nominal boxes intersect, along the shallower
     // axis. `fixed` ids never move (locked systems). O(n^2) per pass; n small.
     const deOverlap = (nodes: Pt[], fixed?: Set<string>) => {
-      for (let iter = 0; iter < 200; iter++) {
+      for (let iter = 0; iter < 400; iter++) {
         let moved = false;
         for (let a = 0; a < nodes.length; a++) {
           for (let b = a + 1; b < nodes.length; b++) {
@@ -3009,13 +3009,12 @@ mapsRouter.post('/:mapId/geographic-layout', async (req, res) => {
 });
 
 // POST /api/maps/:mapId/untangle-layout — one-shot "untangle". A force-directed
-// (Fruchterman-Reingold) layout: connected systems attract, all systems repel,
-// so anything a hop apart ends up adjacent and the long crossing lines collapse.
-// Geography is ignored on purpose — this minimises edge length/crossings, which
-// is what actually makes a busy wormhole map readable. Each connected component
-// is laid out independently, normalised to a readable edge length, then the
-// components are shelf-packed. Locked systems stay put (fixed obstacles) and
-// nothing overlaps.
+// (Fruchterman-Reingold) layout run per connected component: connected systems
+// attract, all systems repel, so every system settles ~one hop from its
+// neighbours — single-connection "leaf" systems snap right next to theirs — and
+// edge crossings drop sharply. Each component is then normalised to a readable
+// edge length, de-overlapped, and shelf-packed. Locked systems stay put as fixed
+// obstacles; connection handles are re-picked afterwards for the new positions.
 mapsRouter.post('/:mapId/untangle-layout', async (req, res) => {
   const { mapId } = req.params;
   const access = await requireMapWrite(res, mapId, req);
@@ -3036,14 +3035,15 @@ mapsRouter.post('/:mapId/untangle-layout', async (req, res) => {
     const sysRows = sysQ.rows;
     if (sysRows.length < 2) { res.json({ ok: true, repositioned: 0 }); return; }
 
-    const TARGET = 320;             // normalised edge length
-    const BOX_W  = 270, BOX_H = 175; // nominal node footprint for de-overlap
-    const GAP    = 190;             // padding between packed components
+    const K      = 300;             // ideal edge length driving the force sim
+    const TARGET = 380;             // final edge length after normalisation
+    const BOX_W  = 280, BOX_H = 185; // nominal node footprint for de-overlap
+    const GAP    = 400;             // padding between packed components
     const MARGIN = 120;
     type Pt = { id: string; x: number; y: number };
 
     const deOverlap = (nodes: Pt[], fixed?: Set<string>) => {
-      for (let iter = 0; iter < 200; iter++) {
+      for (let iter = 0; iter < 400; iter++) {
         let moved = false;
         for (let a = 0; a < nodes.length; a++) {
           for (let b = a + 1; b < nodes.length; b++) {
@@ -3100,37 +3100,39 @@ mapsRouter.post('/:mapId/untangle-layout', async (req, res) => {
     const groups = new Map<string, string[]>();
     for (const id of movableIds) { const r = find(id); const g = groups.get(r); if (g) g.push(id); else groups.set(r, [id]); }
 
-    // Force-directed layout of one component, normalised so its median edge
-    // length is TARGET, de-overlapped, translated to a (0,0) origin.
+    // Force-directed (Fruchterman-Reingold) layout of one component: repulsion
+    // spreads all systems apart, edge springs pull neighbours to ~one hop, then
+    // normalise so the median edge length is TARGET, de-overlap, and translate to
+    // a (0,0) origin. Returns positions + block size for packing.
     const layoutComponent = (ids: string[]): { pos: Pt[]; w: number; h: number } => {
       const N = ids.length;
+      const idx = new Map(ids.map((id, i) => [id, i]));
       const GA = Math.PI * (3 - Math.sqrt(5)); // golden-angle spiral seed (deterministic)
       const P: (Pt & { dx: number; dy: number })[] = ids.map((id, i) => {
-        const r = TARGET * 0.6 * Math.sqrt(i + 1);
+        const r = K * 0.6 * Math.sqrt(i + 1);
         return { id, x: Math.cos(i * GA) * r, y: Math.sin(i * GA) * r, dx: 0, dy: 0 };
       });
       if (N > 1) {
-        const idx = new Map(ids.map((id, i) => [id, i]));
-        const k = TARGET;
-        let temp = TARGET * 1.5;
-        for (let it = 0; it < 450; it++) {
+        let temp = K * 1.6;
+        for (let it = 0; it < 700; it++) {
           for (const p of P) { p.dx = 0; p.dy = 0; }
           for (let a = 0; a < N; a++) for (let b = a + 1; b < N; b++) {
             const dx = P[a].x - P[b].x, dy = P[a].y - P[b].y, d = Math.hypot(dx, dy) || 0.01;
-            const f = (k * k) / d, ux = dx / d, uy = dy / d;
+            const f = (K * K) / d, ux = dx / d, uy = dy / d;
             P[a].dx += ux * f; P[a].dy += uy * f; P[b].dx -= ux * f; P[b].dy -= uy * f;
           }
           for (const id of ids) for (const nb of adj.get(id)!) if (id < nb) {
             const A = P[idx.get(id)!], B = P[idx.get(nb)!];
             const dx = A.x - B.x, dy = A.y - B.y, d = Math.hypot(dx, dy) || 0.01;
-            const f = (d * d) / k, ux = dx / d, uy = dy / d;
+            const f = (d * d) / K, ux = dx / d, uy = dy / d;
             A.dx -= ux * f; A.dy -= uy * f; B.dx += ux * f; B.dy += uy * f;
           }
-          for (const p of P) { p.dx += -p.x * 0.02; p.dy += -p.y * 0.02; } // mild centring
+          for (const p of P) { p.dx += -p.x * 0.015; p.dy += -p.y * 0.015; } // mild centring gravity
           for (const p of P) { const d = Math.hypot(p.dx, p.dy) || 0.01; p.x += (p.dx / d) * Math.min(d, temp); p.y += (p.dy / d) * Math.min(d, temp); }
-          temp *= 0.985;
+          temp *= 0.992;
         }
-        // Normalise scale so the median edge length is TARGET.
+        // Normalise so the median edge length is TARGET (uniform scale preserves
+        // the crossing count and the shape).
         const el: number[] = [];
         for (const id of ids) for (const nb of adj.get(id)!) if (id < nb) {
           const A = P[idx.get(id)!], B = P[idx.get(nb)!];
@@ -3143,7 +3145,7 @@ mapsRouter.post('/:mapId/untangle-layout', async (req, res) => {
       }
       deOverlap(P);
       const nx = Math.min(...P.map((p) => p.x)), ny = Math.min(...P.map((p) => p.y));
-      const pos = P.map((p) => ({ id: p.id, x: p.x - nx, y: p.y - ny }));
+      const pos = P.map((p) => ({ id: p.id, x: Math.round(p.x - nx), y: Math.round(p.y - ny) }));
       const w = Math.max(...P.map((p) => p.x)) - nx + BOX_W;
       const h = Math.max(...P.map((p) => p.y)) - ny + BOX_H;
       return { pos, w, h };
