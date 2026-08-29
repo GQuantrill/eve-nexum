@@ -26,11 +26,11 @@ interface RawResponse {
   }>;
 }
 
-// Matches the active character's location cadence (useCharacterLocation) so a
-// tracked alt's dot keeps up gate-to-gate instead of lagging behind. 5 s is the
-// fastest useful cadence — ESI caches location for ~5 s, so polling faster just
-// re-reads the same value.
-const POLL_MS = 5_000;
+// Matches the active character's location cadence (useCharacterLocation, 10 s)
+// so a tracked alt's dot keeps up without doubling the per-session request rate.
+// This poll plus location/online/fleet all share the esiLimiter, so several open
+// tabs add up fast; 10 s (ESI caches location ~5 s anyway) keeps well clear.
+const POLL_MS = 10_000;
 const EMPTY: AccountLocations = { bySystem: new Map(), byChar: new Map() };
 
 function indexBySystem(list: AccountCharLocation[]): Map<number, AccountCharLocation[]> {
@@ -60,15 +60,23 @@ function sameLocations(a: AccountLocations, b: AccountLocations): boolean {
   return true;
 }
 
+function fromList(list: AccountCharLocation[]): AccountLocations {
+  const byChar = new Map<number, AccountCharLocation>();
+  for (const c of list) byChar.set(c.charId, c);
+  return { bySystem: indexBySystem(list), byChar };
+}
+
 const store = createPolledStore<AccountLocations>({
   pollMs: POLL_MS,
   empty: EMPTY,
   equals: sameLocations,
-  fetch: async () => {
-    const r = await api<RawResponse>('/api/character/account-locations');
-    const byChar = new Map<number, AccountCharLocation>();
-    for (const c of r.characters) byChar.set(c.charId, c);
-    return { bySystem: indexBySystem(r.characters), byChar };
+  fetch: async () => fromList((await api<RawResponse>('/api/character/account-locations')).characters),
+  // Account-wide (same for every tab of this session) — share it across tabs so
+  // several open tabs make one poll total, not one each.
+  crossTab: {
+    key: 'account-locations',
+    serialize: (v) => [...v.byChar.values()],
+    deserialize: (j) => fromList(j as AccountCharLocation[]),
   },
 });
 

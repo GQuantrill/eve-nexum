@@ -9,11 +9,14 @@ export const authLimiter = rateLimit({
   message: { error: 'Too many requests, please slow down.' },
 });
 
-// Looser: per-session ESI proxies. Bounded by ESI's own rate limits anyway,
-// but a runaway client shouldn't be able to spin our process.
+// Looser: per-session ESI proxies (location, online, fleet, account-locations —
+// all polled). Bounded by ESI's own rate limits anyway, but a runaway client
+// shouldn't be able to spin our process. 300/min (5/sec) leaves headroom for a
+// legit multi-tab / multi-character session — a few tabs each poll ~1.5/sec —
+// while still stopping an actual runaway.
 export const esiLimiter = rateLimit({
   windowMs: 60_000,
-  limit: 120,
+  limit: 300,
   standardHeaders: 'draft-7',
   legacyHeaders: false,
   message: { error: 'Too many requests, please slow down.' },

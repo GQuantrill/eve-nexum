@@ -1,5 +1,6 @@
 import { useEffect, useSyncExternalStore } from 'react';
 import { api } from '../api/client';
+import { readXTab, writeXTab, xTabStorageKey } from './crossTabPoll';
 import { flushQueue } from '../store/pendingQueue';
 import { useShareMode } from '../context/ShareModeContext';
 import { useMapStore } from '../store/mapStore';
@@ -69,12 +70,21 @@ function notify() { subscribers.forEach((fn) => fn()); }
 // an in-flight request, so a double focus/visibility fire is harmless.
 function catchUp(): void { if (document.visibilityState === 'visible') load(); }
 
+// Live-adopt a location another tab (acting as the same character) publishes, so
+// a tab that skipped the network updates the instant a peer fetches.
+function onLocStorage(e: StorageEvent): void {
+  const cid = currentActingId;
+  if (cid == null || !e.newValue || e.key !== xTabStorageKey(xTabKey(cid))) return;
+  try { adopt(cid, (JSON.parse(e.newValue) as { v: CharacterLocation }).v); } catch { /* ignore malformed */ }
+}
+
 function subscribe(cb: () => void): () => void {
   subscribers.add(cb);
   if (!pollTimer) {
     pollTimer = setInterval(load, POLL_MS);
     document.addEventListener('visibilitychange', catchUp);
     window.addEventListener('focus', catchUp);
+    window.addEventListener('storage', onLocStorage);
   }
   return () => {
     subscribers.delete(cb);
@@ -82,6 +92,7 @@ function subscribe(cb: () => void): () => void {
       clearInterval(pollTimer); pollTimer = null;
       document.removeEventListener('visibilitychange', catchUp);
       window.removeEventListener('focus', catchUp);
+      window.removeEventListener('storage', onLocStorage);
     }
   };
 }
@@ -90,10 +101,24 @@ const noopSubscribe = (): (() => void) => () => {};
 const getSnapshot = () => moduleCache?.data ?? EMPTY;
 const getEmpty = () => EMPTY;
 
+const xTabKey = (charId: number): string => `location:${charId}`;
+
+// Adopt a location as current for `charId` (from our own fetch or another tab).
+function adopt(charId: number, data: CharacterLocation): void {
+  if (currentActingId !== charId) return; // acting char changed meanwhile — ignore
+  moduleCache = { charId, data, fetchedAt: Date.now() };
+  notify();
+}
+
 function load(): Promise<CharacterLocation> {
   const charId = currentActingId;
   if (charId == null) return Promise.resolve(moduleCache?.data ?? EMPTY);
   if (inflight && inflightCharId === charId) return inflight;
+  // If another tab acting as this same character fetched within the interval,
+  // reuse it — no network call. Keyed by charId so a tab pinned to a different
+  // pilot still fetches its own.
+  const shared = readXTab(xTabKey(charId), POLL_MS);
+  if (shared !== undefined) { const data = shared as CharacterLocation; adopt(charId, data); return Promise.resolve(data); }
   inflightCharId = charId;
   inflight = api<RawLocationResponse>(`/api/character/${charId}/location`)
     .then(r => {
@@ -102,10 +127,10 @@ function load(): Promise<CharacterLocation> {
       // The acting character may have changed while this was in flight — if so,
       // discard rather than caching/broadcasting a stale character's location.
       if (currentActingId !== charId) return data;
-      moduleCache = { charId, data, fetchedAt: Date.now() };
+      writeXTab(xTabKey(charId), data); // let peer tabs skip their own fetch
+      adopt(charId, data);
       // Successful round-trip — give the offline-write queue a chance to drain.
       flushQueue();
-      notify();
       return data;
     })
     .catch(() => {

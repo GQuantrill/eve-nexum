@@ -56,19 +56,29 @@ function sameFleet(a: FleetState, b: FleetState): boolean {
   return true;
 }
 
+function fromMembers(inFleet: boolean, members: FleetMember[]): FleetState {
+  return { inFleet, members, bySystem: indexBySystem(members) };
+}
+
 const store = createPolledStore<FleetState>({
   pollMs: POLL_MS,
   empty: EMPTY,
   equals: sameFleet,
   fetch: async () => {
     const r = await api<RawResponse>('/api/character/fleet');
-    const members: FleetMember[] = r.members.map((m) => ({
+    return fromMembers(r.inFleet, r.members.map((m) => ({
       characterId:     m.character_id,
       characterName:   m.character_name ?? null,
       solarSystemId:   m.solar_system_id,
       solarSystemName: m.solar_system_name ?? null,
-    }));
-    return { inFleet: r.inFleet, members, bySystem: indexBySystem(members) };
+    })));
+  },
+  // The session character's fleet — the same in every tab of this session, so
+  // share it across tabs to collapse several polls into one.
+  crossTab: {
+    key: 'fleet',
+    serialize: (v) => ({ inFleet: v.inFleet, members: v.members }),
+    deserialize: (j) => { const p = j as { inFleet: boolean; members: FleetMember[] }; return fromMembers(p.inFleet, p.members); },
   },
 });
 
