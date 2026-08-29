@@ -35,10 +35,12 @@ interface RawLocationResponse {
   ship:   CharacterShip | null;
 }
 
-// ESI caches character location for ~5 s, so 5 s is the fastest cadence that
-// still returns fresh data — a system change is detected within ~5 s. Polling
-// faster would just re-read the same cached ESI value.
-const POLL_MS = 5_000;
+// ESI caches character location for ~5 s. We poll every 10 s: a system change
+// is still caught within ~10 s, while keeping the per-session request rate low
+// — a faster 5 s cadence pushed enough traffic to risk rate-limit stalls (which
+// surfaced as the location going out of sync). A visibility/focus catch-up
+// (below) covers the gap the moment the tab is looked at.
+const POLL_MS = 10_000;
 const EMPTY: CharacterLocation = { online: false, system: null, ship: null };
 
 // The users.id of the character THIS TAB currently acts as: the per-tab pinned
@@ -60,12 +62,27 @@ let pollTimer: ReturnType<typeof setInterval> | null = null;
 
 function notify() { subscribers.forEach((fn) => fn()); }
 
+// Browsers throttle (or pause) timers in hidden/background tabs — and an EVE
+// mapper usually sits behind the game client — so the interval can stall and the
+// location go stale. Refetch immediately whenever the tab becomes visible or the
+// window regains focus, so it's fresh the moment it's looked at. load() dedupes
+// an in-flight request, so a double focus/visibility fire is harmless.
+function catchUp(): void { if (document.visibilityState === 'visible') load(); }
+
 function subscribe(cb: () => void): () => void {
   subscribers.add(cb);
-  if (!pollTimer) pollTimer = setInterval(load, POLL_MS);
+  if (!pollTimer) {
+    pollTimer = setInterval(load, POLL_MS);
+    document.addEventListener('visibilitychange', catchUp);
+    window.addEventListener('focus', catchUp);
+  }
   return () => {
     subscribers.delete(cb);
-    if (subscribers.size === 0 && pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+    if (subscribers.size === 0 && pollTimer) {
+      clearInterval(pollTimer); pollTimer = null;
+      document.removeEventListener('visibilitychange', catchUp);
+      window.removeEventListener('focus', catchUp);
+    }
   };
 }
 // Stable references for useSyncExternalStore.
