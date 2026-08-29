@@ -3036,8 +3036,9 @@ mapsRouter.post('/:mapId/untangle-layout', async (req, res) => {
     if (sysRows.length < 2) { res.json({ ok: true, repositioned: 0 }); return; }
 
     const K      = 300;             // ideal edge length driving the force sim
-    const TARGET = 380;             // final edge length after normalisation
-    const BOX_W  = 280, BOX_H = 185; // nominal node footprint for de-overlap
+    const CUTOFF = 1200;            // ignore repulsion beyond this — keeps the map compact
+    const TARGET = 280;             // final edge length after normalisation
+    const BOX_W  = 245, BOX_H = 160; // nominal node footprint for de-overlap
     const GAP    = 400;             // padding between packed components
     const MARGIN = 120;
     type Pt = { id: string; x: number; y: number };
@@ -3118,6 +3119,7 @@ mapsRouter.post('/:mapId/untangle-layout', async (req, res) => {
           for (const p of P) { p.dx = 0; p.dy = 0; }
           for (let a = 0; a < N; a++) for (let b = a + 1; b < N; b++) {
             const dx = P[a].x - P[b].x, dy = P[a].y - P[b].y, d = Math.hypot(dx, dy) || 0.01;
+            if (d > CUTOFF) continue; // distant nodes don't repel — stops the layout ballooning
             const f = (K * K) / d, ux = dx / d, uy = dy / d;
             P[a].dx += ux * f; P[a].dy += uy * f; P[b].dx -= ux * f; P[b].dy -= uy * f;
           }
