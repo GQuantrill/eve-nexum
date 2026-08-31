@@ -22,6 +22,9 @@ import { alertInboundK162 } from '../../utils/k162Alert';
 import { formatBookmarkName, DEFAULT_BOOKMARK_FORMAT, formatSiteBookmarkName, DEFAULT_SITE_BOOKMARK_FORMAT } from '../../utils/signatureBookmark';
 import { useWormholeTypes } from '../../hooks/useWormholeTypes';
 import { duration, DASH } from '../../i18n/format';
+import {
+  scheduleSigRemoval, cancelSigRemoval, pendingRemovalIds, subscribeSigRemovals,
+} from '../../store/sigRemovalQueue';
 
 // Aging bands for wormhole signatures, anchored to the WH type's known
 // lifetime from the SDE catalog (useWormholeTypes) — the single source, so
@@ -426,16 +429,31 @@ export function SignaturePane({ systemId }: { systemId: string }) {
       .catch(() => toast.error(t('signatures.bookmarkCopyFailed')));
   }, [siteBookmarkFormat, t]);
 
-  // Sigs currently shown with the pending-removal indicator, plus the timers
-  // that delete them once the grace period elapses.
+  // Sigs currently drawn with the pending-removal indicator. The timers that
+  // actually delete them live in the removal queue — unmounting this pane (or
+  // switching system) must not cancel a deletion the user has already asked
+  // for, which is what used to leave despawned sigs behind.
   const [removing, setRemoving] = useState<Set<string>>(new Set());
-  const removalTimers = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
 
-  // Clear any outstanding removal timers when the pane unmounts.
-  useEffect(() => () => {
-    for (const tm of removalTimers.current.values()) clearTimeout(tm);
-    removalTimers.current.clear();
-  }, []);
+  // Follow the queue: drop the row when its removal lands, and keep the
+  // indicator in step when another pane instance schedules or cancels one.
+  useEffect(() => subscribeSigRemovals((e) => {
+    if (e.systemId !== systemId) return;
+    if (e.kind === 'removed') {
+      setSigs((prev) => prev.filter((s) => s.id !== e.sigRowId));
+      setSelected((prev) => { const next = new Set(prev); next.delete(e.sigRowId); return next; });
+      // A sig backing a wormhole vanishing means the hole collapsed: sever the
+      // connection but keep it on the map.
+      if (e.sig?.whType && e.sig.whLeadsTo) {
+        reevaluateConnectionsForSystem(systemId, sigsRef.current.filter((s) => s.id !== e.sigRowId), e.sig, true);
+      }
+    }
+    setRemoving((prev) => {
+      const next = new Set(prev);
+      if (e.kind === 'scheduled') next.add(e.sigRowId); else next.delete(e.sigRowId);
+      return next;
+    });
+  }), [systemId]);
 
   // Track whether Shift is physically held — the `paste` ClipboardEvent itself
   // carries no modifier state, so Shift+Ctrl+V is detected via this ref.
@@ -471,11 +489,12 @@ export function SignaturePane({ systemId }: { systemId: string }) {
 
   useEffect(() => {
     if (!activeMapId) return;
-    // Cancel any pending overwrite-removals carried over from the previous
-    // system — their timers reference rows that are about to be cleared.
-    for (const tm of removalTimers.current.values()) clearTimeout(tm);
-    removalTimers.current.clear();
-    setRemoving(new Set());
+    // Pending overwrite-removals are NOT cancelled here. They live in the
+    // module-level queue with the map + system they belong to, so switching
+    // system just changes which of them this pane draws — it no longer abandons
+    // deletions the user has already asked for (which is what left despawned
+    // sigs behind: clearing bookmarks means hopping the chain).
+    setRemoving(pendingRemovalIds(systemId));
     setSigs([]);
     setSelected(new Set());
 
@@ -619,8 +638,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   // Drop any pending overwrite-removal timer/indicator for this id (the row is
   // being deleted now, whether by the timer firing or a manual delete).
   const clearRemoval = (id: string) => {
-    const tm = removalTimers.current.get(id);
-    if (tm) { clearTimeout(tm); removalTimers.current.delete(id); }
+    cancelSigRemoval(id);
     setRemoving((prev) => {
       if (!prev.has(id)) return prev;
       const next = new Set(prev); next.delete(id); return next;
@@ -647,18 +665,15 @@ export function SignaturePane({ systemId }: { systemId: string }) {
 
   // Mark a despawned sig for removal after `delaySec`, keeping it visible with
   // the indicator meanwhile. delaySec <= 0 deletes immediately. Reschedules
-  // cleanly if the sig was already pending.
+  // cleanly if the sig was already pending. The timer lives in the removal
+  // queue, not this component, so navigating away doesn't drop the deletion —
+  // the pane's own subscription (below) drops the row when it lands.
   const scheduleRemoval = (id: string, delaySec: number) => {
-    const existing = removalTimers.current.get(id);
-    if (existing) clearTimeout(existing);
-    if (delaySec <= 0) {
-      removalTimers.current.delete(id);
-      deleteSig(id);
-      return;
-    }
-    setRemoving((prev) => { const next = new Set(prev); next.add(id); return next; });
-    const tm = setTimeout(() => deleteSig(id), delaySec * 1000);
-    removalTimers.current.set(id, tm);
+    if (!activeMapId) return;
+    const sig = sigsRef.current.find((s) => s.id === id);
+    if (!sig) return;
+    if (delaySec > 0) setRemoving((prev) => { const next = new Set(prev); next.add(id); return next; });
+    scheduleSigRemoval(activeMapId, systemId, sig, delaySec);
   };
 
   const processPaste = useCallback(async (parsed: ParsedSig[], overwrite: boolean, delaySec: number) => {
