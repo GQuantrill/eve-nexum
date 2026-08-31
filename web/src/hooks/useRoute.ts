@@ -43,11 +43,19 @@ export interface RouteEntry {
  *   - 'all': every map the user can see, unioned server-side — for the Closest
  *     Systems pane, a per-user tool where the chain you're actually in should
  *     route regardless of which tab is active.
+ *
+ * `excludeScout` drops one scout hub's shortcut edges even when the user has
+ * that toggle on. The Thera / Turnur panes rank their own exits by distance, so
+ * routing *through* the hub they belong to is circular: every exit comes out at
+ * (jumps to the hub + 1), identical for the whole list, which flattens the
+ * "closest" sort into a no-op. Excluding just that hub keeps the other one (and
+ * mapped chains) available as genuine shortcuts.
  */
 export function useRoute(
   from: number | null,
   targets: number[],
   whScope: 'active' | 'all' = 'active',
+  opts: { excludeScout?: 'thera' | 'turnur' } = {},
 ): Record<string, RouteEntry> {
   const [data, setData] = useState<Record<string, RouteEntry>>({});
   const routeMode   = useMapStore((s) => s.routeMode);
@@ -59,6 +67,8 @@ export function useRoute(
 
   const allScope = whScope === 'all';
   const targetsKey = [...targets].sort((a, b) => a - b).join(',');
+  const wantThera  = inclThera  && opts.excludeScout !== 'thera';
+  const wantTurnur = inclTurnur && opts.excludeScout !== 'turnur';
   // In 'all' scope the server resolves the map set itself, so no active map is
   // required — the chains still apply when routing from another region's tab.
   const wantWh   = inclWormholes && (allScope || !!activeMapId);
@@ -71,8 +81,8 @@ export function useRoute(
     }
     let cancelled = false;
     let url = `/api/route?from=${from}&to=${targetsKey}&mode=${routeMode}`;
-    if (inclThera)  url += '&includeThera=true';
-    if (inclTurnur) url += '&includeTurnur=true';
+    if (wantThera)  url += '&includeThera=true';
+    if (wantTurnur) url += '&includeTurnur=true';
     if (wantWh)     url += '&includeWormholes=true';
     if (wantAnsi)   url += '&includeAnsiblex=true';
     if (wantWh || wantAnsi) url += allScope ? '&whScope=all' : `&mapId=${activeMapId}`;
@@ -80,7 +90,7 @@ export function useRoute(
       .then(r => { if (!cancelled) setData(r); })
       .catch(() => { if (!cancelled) setData({}); });
     return () => { cancelled = true; };
-  }, [from, targetsKey, routeMode, inclThera, inclTurnur, wantWh, wantAnsi, allScope, activeMapId]);
+  }, [from, targetsKey, routeMode, wantThera, wantTurnur, wantWh, wantAnsi, allScope, activeMapId]);
 
   return data;
 }
