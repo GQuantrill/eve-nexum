@@ -5,7 +5,7 @@ import { timeAgo, jumps } from '../../i18n/format';
 import { useMapStore } from '../../store/mapStore';
 import { useAuth, formatRole, isAdminRole } from '../../context/AuthContext';
 import { useOnlineStatus } from '../../hooks/useOnlineStatus';
-import { useCharacterLocation } from '../../hooks/useCharacterLocation';
+import { useCharacterLocation, useCharacterLocationCheckedAt } from '../../hooks/useCharacterLocation';
 import { useSystemAlias } from '../../hooks/useSystemAlias';
 import { useCanEdit } from '../../hooks/useCanEdit';
 import { useCanEditContent } from '../../hooks/useCanEditContent';
@@ -152,6 +152,11 @@ function onlineTooltip(t: TFunction, online: boolean | null, lastLoginIso: strin
 // Compact "last checked" indicator: a clock icon whose tooltip carries the
 // "checked Xs ago" text. Owns its own 5 s tick so the rest of the Toolbar
 // doesn't re-render every five seconds along with it.
+//
+// It sits next to the system name, so it reports the LOCATION poll (10 s). It
+// used to read the online-status poll's timestamp instead — a separate 30 s
+// check — so a location refreshed seconds ago routinely read "checked 25s ago"
+// and looked stale when it wasn't.
 function CheckedAtIcon({ checkedAt }: { checkedAt: Date }) {
   const { t } = useTranslation();
   const [, setTick] = useState(0);
@@ -270,7 +275,8 @@ export function Toolbar() {
   const noCreateOption = atMapLimit
     && (!canCorpCreate || atCorpMapLimit)
     && (!canAllianceCreate || atAllianceMapLimit);
-  const { online, checkedAt, lastLogin } = useOnlineStatus(!!user);
+  const { online, lastLogin } = useOnlineStatus(!!user);
+  const locCheckedAt = useCharacterLocationCheckedAt();
   // The character THIS TAB acts as: the per-tab pinned character (a routeOrigin
   // override) when set, else the session-active character. The avatar, name and
   // you-are-here follow it; the role badge stays on the session identity below.
@@ -704,7 +710,7 @@ export function Toolbar() {
                 {shownSystemDisplay}
               </span>
             ))}
-            {checkedAt && <CheckedAtIcon checkedAt={checkedAt} />}
+            {locCheckedAt != null && <CheckedAtIcon checkedAt={new Date(locCheckedAt)} />}
           </div>
         </div>
         <CharacterSwitcher />

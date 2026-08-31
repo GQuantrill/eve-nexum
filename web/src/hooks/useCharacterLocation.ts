@@ -75,7 +75,10 @@ function catchUp(): void { if (document.visibilityState === 'visible') load(); }
 function onLocStorage(e: StorageEvent): void {
   const cid = currentActingId;
   if (cid == null || !e.newValue || e.key !== xTabStorageKey(xTabKey(cid))) return;
-  try { adopt(cid, (JSON.parse(e.newValue) as { v: CharacterLocation }).v); } catch { /* ignore malformed */ }
+  try {
+    const p = JSON.parse(e.newValue) as { v: CharacterLocation; at: number };
+    adopt(cid, p.v, p.at);
+  } catch { /* ignore malformed */ }
 }
 
 function subscribe(cb: () => void): () => void {
@@ -100,13 +103,19 @@ function subscribe(cb: () => void): () => void {
 const noopSubscribe = (): (() => void) => () => {};
 const getSnapshot = () => moduleCache?.data ?? EMPTY;
 const getEmpty = () => EMPTY;
+const getFetchedAt = () => moduleCache?.fetchedAt ?? null;
+const getNoFetchedAt = () => null;
 
 const xTabKey = (charId: number): string => `location:${charId}`;
 
 // Adopt a location as current for `charId` (from our own fetch or another tab).
-function adopt(charId: number, data: CharacterLocation): void {
+// `at` is when the location was actually READ — a peer's publish time when we
+// adopt its value, not now. Stamping Date.now() there would report a value that
+// is nearly a full interval old as brand new, both to the freshness indicator
+// and to the mount-time staleness check.
+function adopt(charId: number, data: CharacterLocation, at: number = Date.now()): void {
   if (currentActingId !== charId) return; // acting char changed meanwhile — ignore
-  moduleCache = { charId, data, fetchedAt: Date.now() };
+  moduleCache = { charId, data, fetchedAt: at };
   notify();
 }
 
@@ -118,7 +127,11 @@ function load(): Promise<CharacterLocation> {
   // reuse it — no network call. Keyed by charId so a tab pinned to a different
   // pilot still fetches its own.
   const shared = readXTab(xTabKey(charId), POLL_MS);
-  if (shared !== undefined) { const data = shared as CharacterLocation; adopt(charId, data); return Promise.resolve(data); }
+  if (shared !== undefined) {
+    const data = shared.v as CharacterLocation;
+    adopt(charId, data, shared.at);
+    return Promise.resolve(data);
+  }
   inflightCharId = charId;
   inflight = api<RawLocationResponse>(`/api/character/${charId}/location`)
     .then(r => {
@@ -172,5 +185,22 @@ export function useCharacterLocation(): CharacterLocation {
     enabled ? subscribe : noopSubscribe,
     enabled ? getSnapshot : getEmpty,
     getEmpty,
+  );
+}
+
+/**
+ * When the location shown by {@link useCharacterLocation} was last read from
+ * ESI, as an epoch ms timestamp (null before the first read). Drives the
+ * toolbar's "checked X ago" indicator, which sits next to the system name and
+ * must therefore age THIS poll — not the separate 30 s online-status check it
+ * used to read, which made a location refreshed seconds ago look 20-30 s stale.
+ */
+export function useCharacterLocationCheckedAt(): number | null {
+  const { isShareMode } = useShareMode();
+  const enabled = !isShareMode;
+  return useSyncExternalStore(
+    enabled ? subscribe : noopSubscribe,
+    enabled ? getFetchedAt : getNoFetchedAt,
+    getNoFetchedAt,
   );
 }
