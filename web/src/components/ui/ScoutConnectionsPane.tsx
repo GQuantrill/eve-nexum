@@ -92,13 +92,21 @@ export function ScoutConnectionsPane({ scoutSystem }: Props) {
   const canRoute = origin.systemId !== null;
 
   const targetIds = useMemo(() => filtered.map(c => c.inSystemId), [filtered]);
-  const routes = useRoute(origin.systemId, targetIds);
+  // Route to each exit WITHOUT this pane's own scout hub spliced in: a route to
+  // a Turnur exit that travels through Turnur is circular — it's the hole you'd
+  // be taking, so every exit scores (jumps to Turnur + 1) and the whole list
+  // ties. What's wanted here is how far each exit sits from you by ordinary
+  // travel. The other hub and mapped chains stay in — those are real shortcuts.
+  const routes = useRoute(origin.systemId, targetIds, 'active', {
+    excludeScout: scoutSystem === 'Thera' ? 'thera' : 'turnur',
+  });
 
   // Two sort modes:
   //  - 'age'     : remaining time descending — freshest holes at the top, the
   //                soon-to-collapse ones drop to the bottom.
   //  - 'closest' : fewest jumps via the active route preference (shortest /
-  //                secure) ascending. Connections without a usable route (no
+  //                secure) ascending, excluding this pane's own hub (see the
+  //                useRoute call above). Connections without a usable route (no
   //                k-space location, or wormhole-class target) fall to the
   //                bottom. Age then name break ties in both modes.
   const sorted = useMemo(() => {
