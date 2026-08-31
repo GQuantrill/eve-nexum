@@ -10,16 +10,21 @@ const PREFIX = 'nexum.xpoll.';
 /** The localStorage key a given poll key is stored under (for raw listeners). */
 export const xTabStorageKey = (key: string): string => PREFIX + key;
 
-interface Entry { v: unknown; at: number }
+export interface Entry { v: unknown; at: number }
 
-/** A fresh cross-tab value for `key` (younger than maxAgeMs), or undefined. */
-export function readXTab(key: string, maxAgeMs: number): unknown | undefined {
+/**
+ * A fresh cross-tab value for `key` (published less than maxAgeMs ago), or
+ * undefined. The publish time comes back with it: an adopting tab must age the
+ * value from when the PEER fetched it, not from when it read it, or a value
+ * that's nearly a full interval old is recorded — and displayed — as brand new.
+ */
+export function readXTab(key: string, maxAgeMs: number): Entry | undefined {
   try {
     const raw = localStorage.getItem(PREFIX + key);
     if (!raw) return undefined;
     const e = JSON.parse(raw) as Entry;
     if (typeof e.at !== 'number' || Date.now() - e.at >= maxAgeMs) return undefined;
-    return e.v;
+    return e;
   } catch { return undefined; }
 }
 
@@ -30,11 +35,11 @@ export function writeXTab(key: string, v: unknown): void {
 }
 
 /** Notify when another tab publishes a new value for `key`. Returns a cleanup. */
-export function subscribeXTab(key: string, cb: (v: unknown) => void): () => void {
+export function subscribeXTab(key: string, cb: (v: unknown, at: number) => void): () => void {
   const full = PREFIX + key;
   const handler = (e: StorageEvent): void => {
     if (e.key !== full || !e.newValue) return;
-    try { cb((JSON.parse(e.newValue) as Entry).v); } catch { /* ignore malformed */ }
+    try { const p = JSON.parse(e.newValue) as Entry; cb(p.v, p.at); } catch { /* ignore malformed */ }
   };
   window.addEventListener('storage', handler);
   return () => window.removeEventListener('storage', handler);

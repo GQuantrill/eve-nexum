@@ -43,8 +43,10 @@ export function createPolledStore<T>(opts: {
   const subscribers = new Set<() => void>();
 
   // Adopt a value (freshly fetched, or received from another tab) as current.
-  function apply(next: T): void {
-    fetchedAt = Date.now();
+  // `at` is when the value was actually FETCHED — for a peer's value that's the
+  // peer's fetch time, not now, so the staleness check below stays honest.
+  function apply(next: T, at: number = Date.now()): void {
+    fetchedAt = at;
     loaded = true;
     if (equals && equals(cache, next)) return;   // equivalent — keep ref, no re-render
     cache = next;
@@ -56,7 +58,7 @@ export function createPolledStore<T>(opts: {
     // If another tab already fetched within this interval, reuse it — no network.
     if (crossTab) {
       const shared = readXTab(crossTab.key, pollMs);
-      if (shared !== undefined) { apply(crossTab.deserialize(shared)); return Promise.resolve(); }
+      if (shared !== undefined) { apply(crossTab.deserialize(shared.v), shared.at); return Promise.resolve(); }
     }
     inflight = doFetch()
       .then((next) => {
@@ -76,7 +78,7 @@ export function createPolledStore<T>(opts: {
     if (!timer) timer = setInterval(load, pollMs);
     // Live-adopt values another tab fetches, so a tab that skipped the network
     // still updates the instant a peer publishes.
-    if (crossTab && !unsubX) unsubX = subscribeXTab(crossTab.key, (v) => apply(crossTab.deserialize(v)));
+    if (crossTab && !unsubX) unsubX = subscribeXTab(crossTab.key, (v, at) => apply(crossTab.deserialize(v), at));
     return () => {
       subscribers.delete(cb);
       if (subscribers.size === 0 && timer) {
