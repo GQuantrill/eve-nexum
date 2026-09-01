@@ -168,7 +168,8 @@ export async function isSystemInMap(systemId: string, mapId: string): Promise<bo
 export async function loadSystemSignatures(systemId: string) {
   const { rows } = await db.query(
     `SELECT id, sig_id AS "sigId", sig_type AS "sigType", name, notes,
-            wh_type AS "whType", wh_leads_to AS "whLeadsTo", created_at AS "createdAt"
+            wh_type AS "whType", wh_leads_to AS "whLeadsTo",
+            created_at AS "createdAt", updated_at AS "updatedAt"
        FROM map_signatures WHERE system_id = $1 ORDER BY created_at`,
     [systemId],
   );
