@@ -2,6 +2,9 @@ import { db } from '../db.js';
 import { publishToMap } from './mapEvents.js';
 import { syncSignature, syncAnomaly } from './crossMapSync.js';
 import { recordGhostSiteIfMatch } from './ghostSites.js';
+import { createLogger } from '../utils/logger.js';
+
+const log = createLogger('map-write');
 
 // Shared per-system CONTENT writes (signatures, anomalies, structures) — the
 // single source of truth behind both the cookie map routes and the external
@@ -33,7 +36,22 @@ export interface SignatureInput {
   sigId: string; sigType: string; name: string; notes: string; whType: string; whLeadsTo: string;
 }
 
+// A signature carrying nothing at all — no scan id, no name, no notes, no
+// wormhole data. "Add signature" legitimately creates one (an empty row to type
+// into), but they have also been appearing on live maps that nobody added by
+// hand, so log every one with the actor and client that asked for it. clientId
+// is the browser tab's x-client-id and is null for API-key writes, which
+// separates the app from an integration. Diagnostic — remove once the source of
+// the unexplained ones is identified.
+function logIfContentless(mapId: string, systemId: string, d: SignatureInput, actor: WriteActor): void {
+  if (d.sigId || d.name || d.notes || d.whType || d.whLeadsTo) return;
+  log.warn('contentless signature created', JSON.stringify({
+    mapId, systemId, sigType: d.sigType, userId: actor.userId, clientId: actor.clientId,
+  }));
+}
+
 export async function createSignature(mapId: string, systemId: string, d: SignatureInput, actor: WriteActor) {
+  logIfContentless(mapId, systemId, d, actor);
   const { rows } = await db.query(
     `INSERT INTO map_signatures (system_id, sig_id, sig_type, name, notes, wh_type, wh_leads_to, created_by_user_id)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
@@ -65,6 +83,16 @@ export async function updateSignature(
     const { rows: prev } = await db.query<{ wh_type: string | null }>(
       `SELECT wh_type FROM map_signatures WHERE id = $1 AND system_id = $2`, [sigId, systemId]);
     prevWasK162 = (prev[0]?.wh_type ?? '').toUpperCase() === 'K162';
+  }
+
+  // The other way a blank row can appear: an existing signature's scan id being
+  // cleared. Only the ID input writes this, on every keystroke, so a legitimate
+  // retype logs one line — worth the noise while the unexplained blanks are
+  // being traced. Diagnostic, paired with logIfContentless above.
+  if ('sigId' in updates && !updates.sigId) {
+    log.warn('signature scan id cleared', JSON.stringify({
+      mapId, systemId, sigRowId: sigId, userId: actor.userId, clientId: actor.clientId,
+    }));
   }
 
   const sets: string[] = ['updated_at = NOW()'];
