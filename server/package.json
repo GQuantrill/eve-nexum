@@ -6,7 +6,7 @@
     "email": "gq@area404.org",
     "url": "https://area404.org"
   },
-  "version": "3.33.20",
+  "version": "3.33.21",
   "private": true,
   "scripts": {
     "dev": "tsx watch src/index.ts",
