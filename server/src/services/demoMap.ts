@@ -2,11 +2,20 @@ import { randomUUID } from 'node:crypto';
 import { db } from '../db.js';
 
 // First-login starter map. A small chain so new users land on something
-// readable instead of a blank canvas: Jita (home) → C2 → C4 → C5 main line,
-// with a C3 → lowsec side branch off the C4.
+// readable instead of a blank canvas:
 //
-// Real EVE system IDs are populated where they exist (Jita, Amamake); J-codes
-// leave eve_system_id null, matching how the import path handles unknowns.
+//   Jita ──B274── J150137 (C2) ──Y683── J150026 (C4) ──C247── J150048 (C3) ──U210── Amamake
+//                                            └──X877── J150044 (C4)
+//
+// Every system is real and every connection is one of its actual statics. The
+// class/effect/statics below are only a fallback: seedDemoMap looks each system
+// up in the SDE and uses the live row, so the starter map can't drift from the
+// game the way the previous hand-written data had (it carried static sets that
+// can't occur — the wormhole catalogue's `src` records which class each code
+// comes from, and wormholers spot an impossible one immediately).
+//
+// eve_system_id is filled from the SDE too, J-codes included, so the starter
+// map behaves like a real one rather than a set of detached placeholders.
 //
 // No-op when the user already has any map.
 export async function seedDemoMap(userId: number): Promise<void> {
@@ -34,7 +43,7 @@ export async function seedDemoMap(userId: number): Promise<void> {
       jita:    randomUUID(),
       c2:      randomUUID(),
       c4:      randomUUID(),
-      c5:      randomUUID(),
+      c4b:     randomUUID(),
       c3:      randomUUID(),
       amamake: randomUUID(),
     };
@@ -53,13 +62,33 @@ export async function seedDemoMap(userId: number): Promise<void> {
       status:   string;
     }
     const systems: DemoSystem[] = [
-      { id: ids.jita,    eveId: 30000142, name: 'Jita',    cls: 'HS', effect: 'none',   statics: [],       region: 'The Forge', x: 0,   y: 0,    home: true,  status: 'visited' },
-      { id: ids.c2,      eveId: null,     name: 'J164417', cls: 'C2', effect: 'none',   statics: ['B274'], region: null,        x: 240, y: 0,    home: false, status: 'visited' },
-      { id: ids.c4,      eveId: null,     name: 'J160225', cls: 'C4', effect: 'none',   statics: ['X877'], region: null,        x: 480, y: 0,    home: false, status: 'visited' },
-      { id: ids.c5,      eveId: null,     name: 'J152820', cls: 'C5', effect: 'pulsar', statics: ['H296'], region: null,        x: 720, y: -80,  home: false, status: 'unknown' },
-      { id: ids.c3,      eveId: null,     name: 'J160650', cls: 'C3', effect: 'none',   statics: ['U210'], region: null,        x: 480, y: 200,  home: false, status: 'visited' },
-      { id: ids.amamake, eveId: 30002537, name: 'Amamake', cls: 'LS', effect: 'none',   statics: [],       region: 'Heimatar',  x: 720, y: 200,  home: false, status: 'unknown' },
+      { id: ids.jita,    eveId: 30000142, name: 'Jita',    cls: 'HS', effect: 'none',       statics: [],               region: 'The Forge', x: 0,   y: 0,    home: true,  status: 'visited' },
+      { id: ids.c2,      eveId: null,     name: 'J150137', cls: 'C2', effect: 'none',       statics: ['B274', 'Y683'], region: null,        x: 240, y: 0,    home: false, status: 'visited' },
+      { id: ids.c4,      eveId: null,     name: 'J150026', cls: 'C4', effect: 'wolf_rayet', statics: ['C247', 'X877'], region: null,        x: 480, y: 0,    home: false, status: 'visited' },
+      { id: ids.c4b,     eveId: null,     name: 'J150044', cls: 'C4', effect: 'none',       statics: ['C247', 'X877'], region: null,        x: 720, y: -80,  home: false, status: 'unknown' },
+      { id: ids.c3,      eveId: null,     name: 'J150048', cls: 'C3', effect: 'none',       statics: ['U210'],         region: null,        x: 480, y: 200,  home: false, status: 'visited' },
+      { id: ids.amamake, eveId: 30002537, name: 'Amamake', cls: 'LS', effect: 'none',       statics: [],               region: 'Heimatar',  x: 720, y: 200,  home: false, status: 'unknown' },
     ];
+
+    // Overlay the SDE's own row for each system, so class / effect / statics and
+    // the EVE id are whatever the game actually says. Systems missing from the
+    // SDE (not seeded yet) keep the fallback values above.
+    const { rows: sde } = await client.query<{
+      id: number; name: string; systemClass: string | null; effect: string | null; statics: string[] | null;
+    }>(
+      `SELECT id, name, class AS "systemClass", effect, statics
+         FROM solar_systems WHERE name = ANY($1::text[])`,
+      [systems.map((s) => s.name)],
+    );
+    const sdeByName = new Map(sde.map((r) => [r.name, r]));
+    for (const sys of systems) {
+      const row = sdeByName.get(sys.name);
+      if (!row) continue;
+      sys.eveId = row.id;
+      if (row.systemClass) sys.cls = row.systemClass;
+      sys.effect = row.effect ?? 'none';
+      if (row.statics) sys.statics = row.statics;
+    }
 
     const sysCols = 15;
     const sysPlaceholders: string[] = [];
@@ -81,11 +110,14 @@ export async function seedDemoMap(userId: number): Promise<void> {
       sysValues,
     );
 
+    // Each hop is the static of the system it leaves from. All five codes have a
+    // 375 Mkg jump limit in the SDE, i.e. 'large' — the previous X877 'xl' was
+    // wrong, that size belongs to capital-passable holes like H296 (2 Gkg).
     const connections: Array<{ src: string; tgt: string; size: string; whType: string }> = [
       { src: ids.jita,  tgt: ids.c2,      size: 'large', whType: 'B274' },
-      { src: ids.c2,    tgt: ids.c4,      size: 'large', whType: 'K162' },
-      { src: ids.c4,    tgt: ids.c5,      size: 'xl',    whType: 'X877' },
-      { src: ids.c4,    tgt: ids.c3,      size: 'large', whType: 'K162' },
+      { src: ids.c2,    tgt: ids.c4,      size: 'large', whType: 'Y683' },
+      { src: ids.c4,    tgt: ids.c3,      size: 'large', whType: 'C247' },
+      { src: ids.c4,    tgt: ids.c4b,     size: 'large', whType: 'X877' },
       { src: ids.c3,    tgt: ids.amamake, size: 'large', whType: 'U210' },
     ];
     const connCols = 7;
@@ -105,7 +137,7 @@ export async function seedDemoMap(userId: number): Promise<void> {
 
     await client.query(
       `INSERT INTO map_signatures (system_id, sig_id, sig_type, name, wh_type, wh_leads_to)
-       VALUES ($1, 'ABC-123', 'wormhole', 'Outbound to lowsec', 'U210', 'Amamake')`,
+       VALUES ($1, 'LPZ-471', 'wormhole', 'Outbound to lowsec', 'U210', 'Amamake')`,
       [ids.c3],
     );
 
