@@ -29,20 +29,34 @@ interface DemoSys {
 
 // ── pre-populated chain ──────────────────────────────────────
 
+// Real systems, taken from the SDE the app itself runs on — J-codes, classes,
+// effects and statics all match live data. The invented ones this replaced had
+// static sets that can't occur: the wormhole catalogue records which class each
+// code originates FROM (`src`), and by that measure a C3 can hold neither C247
+// (src c4) nor Z971 (src hs/ls/ns), and a C2 can hold neither D364 (src c5) nor
+// N766 (src c4). Wormholers spot that instantly, so the demo read as fake.
+//
+// The chain is consistent end to end — every connection below is one of these
+// systems' actual statics:
+//
+//   Jita ──B274── J150137 (C2) ──Y683── J150026 (C4) ──C247── J150048 (C3) ──U210── Amamake
+//
+// J150026's second static (X877 → C4) is deliberately left unopened, which is
+// what a chain mid-scan actually looks like.
 const SEED_SYSTEMS: DemoSys[] = [
-  { id: 'ds1', name: 'J213422',  systemClass: 'C3', effect: 'pulsar',     statics: ['C247', 'Z971'], regionName: null },
-  { id: 'ds2', name: 'J123456',  systemClass: 'C2', effect: 'none',       statics: ['D364', 'N766'], regionName: null },
-  { id: 'ds3', name: 'J456789',  systemClass: 'C5', effect: 'magnetar',   statics: ['H296'],         regionName: null },
-  { id: 'ds4', name: 'Jita',     systemClass: 'HS', effect: 'none',       statics: [],               regionName: 'The Forge' },
-  { id: 'ds5', name: 'J789012',  systemClass: 'C4', effect: 'wolf_rayet', statics: ['E175', 'X877'], regionName: null },
+  { id: 'ds1', name: 'Jita',     systemClass: 'HS', effect: 'none',       statics: [],               regionName: 'The Forge' },
+  { id: 'ds2', name: 'J150137',  systemClass: 'C2', effect: 'none',       statics: ['B274', 'Y683'], regionName: null },
+  { id: 'ds3', name: 'J150026',  systemClass: 'C4', effect: 'wolf_rayet', statics: ['C247', 'X877'], regionName: null },
+  { id: 'ds4', name: 'J150048',  systemClass: 'C3', effect: 'none',       statics: ['U210'],         regionName: null },
+  { id: 'ds5', name: 'Amamake',  systemClass: 'LS', effect: 'none',       statics: [],               regionName: 'Heimatar' },
 ];
 
 const SEED_POSITIONS: { x: number; y: number }[] = [
-  { x: 300, y: 140 },
-  { x: 60,  y: 290 },
-  { x: 540, y: 290 },
-  { x: -80, y: 430 },
-  { x: 700, y: 80  },
+  { x: -80, y: 330 },
+  { x: 170, y: 300 },
+  { x: 420, y: 150 },
+  { x: 660, y: 310 },
+  { x: 880, y: 400 },
 ];
 
 const INITIAL_NODES: Node[] = SEED_SYSTEMS.map((s, i) => ({
@@ -52,10 +66,12 @@ const INITIAL_NODES: Node[] = SEED_SYSTEMS.map((s, i) => ({
   data: s as unknown as Record<string, unknown>,
 }));
 
+// One edge per opened static, in chain order.
 const INITIAL_EDGES: Edge[] = [
   { id: 'de1', source: 'ds1', target: 'ds2', type: 'demoConnection', ...pickHandles(SEED_POSITIONS[0], SEED_POSITIONS[1]) },
-  { id: 'de2', source: 'ds1', target: 'ds3', type: 'demoConnection', ...pickHandles(SEED_POSITIONS[0], SEED_POSITIONS[2]) },
-  { id: 'de3', source: 'ds2', target: 'ds4', type: 'demoConnection', ...pickHandles(SEED_POSITIONS[1], SEED_POSITIONS[3]) },
+  { id: 'de2', source: 'ds2', target: 'ds3', type: 'demoConnection', ...pickHandles(SEED_POSITIONS[1], SEED_POSITIONS[2]) },
+  { id: 'de3', source: 'ds3', target: 'ds4', type: 'demoConnection', ...pickHandles(SEED_POSITIONS[2], SEED_POSITIONS[3]) },
+  { id: 'de4', source: 'ds4', target: 'ds5', type: 'demoConnection', ...pickHandles(SEED_POSITIONS[3], SEED_POSITIONS[4]) },
 ];
 
 // ── demo edge ────────────────────────────────────────────────
