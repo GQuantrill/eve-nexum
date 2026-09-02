@@ -153,7 +153,10 @@
       "threshold10": "+10 のみ（優秀）",
       "threshold5": "+5 以上（良好以上）",
       "settingsSaveFailed": "設定の保存に失敗しました",
-      "standingsSessionsEnded": "アクティブなセッション {{count}} 件を終了しました（許可されなくなりました）。"
+      "standingsSessionsEnded": "アクティブなセッション {{count}} 件を終了しました（許可されなくなりました）。",
+      "roleDefault": "デフォルトのロール",
+      "colInviteRole": "招待時のロール",
+      "inviteRoleHint": "このパイロットが初めてサインインしたときに適用されます。既存アカウントのロールは変更しません。"
     },
     "loading": "読み込み中…",
     "exportCsv": "CSV としてエクスポート",

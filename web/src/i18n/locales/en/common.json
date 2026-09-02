@@ -203,7 +203,10 @@
       "threshold10": "+10 only (Excellent)",
       "threshold5": "+5 and above (Good or better)",
       "settingsSaveFailed": "Failed to save setting",
-      "standingsSessionsEnded": "{{count}} active session(s) ended — no longer permitted."
+      "standingsSessionsEnded": "{{count}} active session(s) ended — no longer permitted.",
+      "roleDefault": "Default role",
+      "colInviteRole": "Invited role",
+      "inviteRoleHint": "Applied the first time this pilot signs in — it never changes the role of an account that already exists."
     },
     "loading": "Loading…",
     "exportCsv": "Export as CSV",

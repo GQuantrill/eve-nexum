@@ -153,7 +153,10 @@
       "threshold10": "Apenas +10 (Excelente)",
       "threshold5": "+5 e acima (Bom ou melhor)",
       "settingsSaveFailed": "Falha ao guardar a definição",
-      "standingsSessionsEnded": "{{count}} sessão(ões) ativa(s) terminada(s) — já não são permitidas."
+      "standingsSessionsEnded": "{{count}} sessão(ões) ativa(s) terminada(s) — já não são permitidas.",
+      "roleDefault": "Função predefinida",
+      "colInviteRole": "Função atribuída",
+      "inviteRoleHint": "Aplicada no primeiro início de sessão deste piloto — nunca altera a função de uma conta que já exista."
     },
     "loading": "A carregar…",
     "exportCsv": "Exportar como CSV",

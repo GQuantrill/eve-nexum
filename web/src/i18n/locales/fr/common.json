@@ -153,7 +153,10 @@
       "threshold10": "+10 uniquement (Excellent)",
       "threshold5": "+5 et plus (Bon ou mieux)",
       "settingsSaveFailed": "Échec de l'enregistrement du réglage",
-      "standingsSessionsEnded": "{{count}} session(s) active(s) terminée(s) — plus autorisée(s)."
+      "standingsSessionsEnded": "{{count}} session(s) active(s) terminée(s) — plus autorisée(s).",
+      "roleDefault": "Rôle par défaut",
+      "colInviteRole": "Rôle attribué",
+      "inviteRoleHint": "Appliqué à la première connexion de ce pilote — ne modifie jamais le rôle d'un compte déjà existant."
     },
     "loading": "Chargement…",
     "exportCsv": "Exporter en CSV",

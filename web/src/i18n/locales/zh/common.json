@@ -153,7 +153,10 @@
       "threshold10": "仅 +10（优秀）",
       "threshold5": "+5 及以上（良好或更高）",
       "settingsSaveFailed": "保存设置失败",
-      "standingsSessionsEnded": "已结束 {{count}} 个活动会话 — 不再被允许。"
+      "standingsSessionsEnded": "已结束 {{count}} 个活动会话 — 不再被允许。",
+      "roleDefault": "默认角色",
+      "colInviteRole": "邀请角色",
+      "inviteRoleHint": "在该飞行员首次登录时应用，绝不会更改已有账号的角色。"
     },
     "loading": "加载中…",
     "exportCsv": "导出为 CSV",

@@ -153,7 +153,10 @@
       "threshold10": "+10만 (탁월)",
       "threshold5": "+5 이상 (양호 이상)",
       "settingsSaveFailed": "설정을 저장하지 못했습니다",
-      "standingsSessionsEnded": "활성 세션 {{count}}개를 종료했습니다 — 더 이상 허용되지 않습니다."
+      "standingsSessionsEnded": "활성 세션 {{count}}개를 종료했습니다 — 더 이상 허용되지 않습니다.",
+      "roleDefault": "기본 역할",
+      "colInviteRole": "초대 역할",
+      "inviteRoleHint": "해당 파일럿이 처음 로그인할 때 적용되며, 이미 존재하는 계정의 역할은 변경하지 않습니다."
     },
     "loading": "불러오는 중…",
     "exportCsv": "CSV로 내보내기",

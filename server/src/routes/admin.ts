@@ -396,8 +396,9 @@ adminRouter.get('/access-grants', async (_req, res) => {
   const { rows } = await db.query<{
     id: string; kind: GrantKind; eve_id: string; source: string;
     note: string | null; created_at: string; added_by_name: string | null;
+    role: string | null;
   }>(
-    `SELECT g.id, g.kind, g.eve_id, g.source, g.note, g.created_at,
+    `SELECT g.id, g.kind, g.eve_id, g.source, g.note, g.created_at, g.role,
             u.character_name AS added_by_name
        FROM access_grants g
        LEFT JOIN users u ON u.id = g.added_by_user
@@ -471,6 +472,28 @@ adminRouter.post('/access-grants', async (req, res) => {
   if (kind !== 'corp' && kind !== 'alliance' && kind !== 'character') {
     res.status(400).json({ error: 'kind must be corp, alliance, or character' }); return;
   }
+
+  // Optional role to hand the character on first login. Same guards as
+  // PATCH /users/:id/role, because this grants exactly the same thing — just
+  // ahead of the account existing, where there's no users row to check against.
+  const roleRaw = req.body?.role;
+  let invitedRole: Role | null = null;
+  if (roleRaw !== undefined && roleRaw !== null && roleRaw !== '') {
+    if (kind !== 'character') {
+      // A corp/alliance grant admits everyone in it; a role there would promote
+      // an entire organisation on first login.
+      res.status(400).json({ error: 'role_character_only', message: 'A role can only be set on a character grant.' }); return;
+    }
+    if (!ROLES.includes(roleRaw as Role)) {
+      res.status(400).json({ error: `role must be one of: ${ROLES.join(', ')}` }); return;
+    }
+    // Only an alliance admin may mint an alliance admin — mirrors the guard on
+    // PATCH /users/:id/role, so an invite can't be used to route around it.
+    if (roleRaw === 'alliance_admin' && !isAllianceAdmin(req.session.role ?? 'readonly')) {
+      res.status(403).json({ error: 'Only an alliance admin can manage the alliance admin role' }); return;
+    }
+    invitedRole = roleRaw as Role;
+  }
   if (!Number.isInteger(eveId) || eveId <= 0) {
     res.status(400).json({ error: 'invalid eveId' }); return;
   }
@@ -487,14 +510,15 @@ adminRouter.post('/access-grants', async (req, res) => {
   }
 
   const { rows } = await db.query<{ id: string }>(
-    `INSERT INTO access_grants (kind, eve_id, source, note, added_by_user)
-     VALUES ($1, $2, 'admin', $3, $4)
+    `INSERT INTO access_grants (kind, eve_id, source, note, added_by_user, role)
+     VALUES ($1, $2, 'admin', $3, $4, $5)
      ON CONFLICT (kind, eve_id) DO NOTHING
      RETURNING id`,
-    [kind, eveId, note, req.session.userId ?? null],
+    [kind, eveId, note, req.session.userId ?? null, invitedRole],
   );
   if (!rows.length) { res.status(409).json({ error: 'already_granted' }); return; }
-  await audit(req, null, kind === 'character' ? eveId : null, 'access_grant_add', null, `${kind}:${eveId}`);
+  await audit(req, null, kind === 'character' ? eveId : null, 'access_grant_add', null,
+    invitedRole ? `${kind}:${eveId} role=${invitedRole}` : `${kind}:${eveId}`);
   res.status(201).json({ ok: true, id: rows[0].id });
 });
 

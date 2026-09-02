@@ -153,7 +153,10 @@
       "threshold10": "Solo +10 (Excelente)",
       "threshold5": "+5 y superior (Bueno o mejor)",
       "settingsSaveFailed": "Error al guardar el ajuste",
-      "standingsSessionsEnded": "{{count}} sesión(es) activa(s) finalizada(s): ya no están permitidas."
+      "standingsSessionsEnded": "{{count}} sesión(es) activa(s) finalizada(s): ya no están permitidas.",
+      "roleDefault": "Rol predeterminado",
+      "colInviteRole": "Rol asignado",
+      "inviteRoleHint": "Se aplica la primera vez que este piloto inicia sesión; nunca cambia el rol de una cuenta que ya existe."
     },
     "loading": "Cargando…",
     "exportCsv": "Exportar como CSV",

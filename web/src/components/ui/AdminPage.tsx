@@ -140,6 +140,7 @@ interface AccessGrant {
   createdAt:   string;
   label:       string;
   immutable:   boolean;
+  role:        string | null;   // role to give a character on first login (invite)
 }
 
 // Turn an access-grant API failure into the clearest message we can show: a
@@ -194,6 +195,10 @@ function AccessTab() {
   const KINDS: GrantPickKind[] = allowAlliance ? ['corp', 'alliance', 'character'] : ['corp', 'character'];
 
   const [grants, setGrants]   = useState<AccessGrant[]>([]);
+  // Role to hand an invited character the first time they sign in. '' = the
+  // deployment default. Only offered for character grants: a corp/alliance
+  // grant admits everyone in it, and the server refuses a role on those.
+  const [inviteRole, setInviteRole] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError]     = useState<string | null>(null);
 
@@ -295,8 +300,12 @@ function AccessTab() {
     if (!match) return;
     setSubmitting(true); setAddError(null);
     try {
-      await api('/api/admin/access-grants', { method: 'POST', body: JSON.stringify({ kind, eveId: match.id }) });
-      setQuery(''); setMatch(null);
+      // role is only meaningful for a character invite; '' means "leave the
+      // deployment default", which is what every grant did before invites.
+      const body: Record<string, unknown> = { kind, eveId: match.id };
+      if (kind === 'character' && inviteRole) body.role = inviteRole;
+      await api('/api/admin/access-grants', { method: 'POST', body: JSON.stringify(body) });
+      setQuery(''); setMatch(null); setInviteRole('');
       await load();
     } catch (e) {
       setAddError(grantErrorMessage(e, t, t('admin.access.addFailed')));
@@ -381,10 +390,27 @@ function AccessTab() {
             : t('admin.access.noMatch')}
           {match && <EveWhoLink kind={kind} id={match.id} t={t} />}
         </span>
+        {kind === 'character' && (
+          <Select
+            value={inviteRole}
+            onChange={setInviteRole}
+            options={[
+              { value: '', label: t('admin.access.roleDefault') },
+              // Same filter the Users tab applies, mirroring the server guard:
+              // only an alliance admin can hand out the alliance_admin tier.
+              ...ROLES
+                .filter((r) => r !== 'alliance_admin' || isAllianceAdminRole(user?.role ?? 'readonly'))
+                .map((r) => ({ value: r, label: formatRole(r) })),
+            ]}
+          />
+        )}
         <button type="button" className="btn btn--ghost btn--sm" disabled={!match || submitting} onClick={addGrant}>
           {submitting ? t('admin.access.adding') : t('admin.access.add')}
         </button>
       </div>
+      {kind === 'character' && inviteRole && (
+        <p className={styles.acHint}>{t('admin.access.inviteRoleHint')}</p>
+      )}
       {addError && <div className={styles.pgError}>{addError}</div>}
 
       {loading ? <div className={styles.pgLoading}>{t('admin.access.loading')}</div>
@@ -396,6 +422,7 @@ function AccessTab() {
               <tr>
                 <th>{t('admin.access.colKind')}</th>
                 <th>{t('admin.access.colEntity')}</th>
+                <th>{t('admin.access.colInviteRole')}</th>
                 <th>{t('admin.access.colSource')}</th>
                 <th>{t('admin.access.colAddedBy')}</th>
                 <th />
@@ -408,6 +435,13 @@ function AccessTab() {
                   <td title={String(g.eveId)}>
                     {g.label}
                     <EveWhoLink kind={g.kind} id={g.eveId} t={t} />
+                  </td>
+                  <td>
+                    {g.role
+                      ? <span className={`role-badge role-badge--${g.role}`} title={t('admin.access.inviteRoleHint')}>
+                          {formatRole(g.role as Role)}
+                        </span>
+                      : <span className={styles.mMono}>{DASH}</span>}
                   </td>
                   <td>{g.source === 'env' ? t('admin.access.sourceEnv') : g.source}</td>
                   <td>{g.addedByName ?? (g.source === 'env' ? t('admin.access.sourceEnv') : DASH)}</td>
