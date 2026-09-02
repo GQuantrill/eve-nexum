@@ -79,6 +79,62 @@ describe.skipIf(!dbReady)('admin access-grants endpoints (integration)', () => {
     expect(res.status).toBe(201);
   });
 
+  // ── invited role (the admin-page invite flow) ──────────────────────────────
+
+  it('stores a role on a character grant, to be applied at that pilot\'s first login', async () => {
+    const res = await request(app)
+      .post('/api/admin/access-grants')
+      .send({ kind: 'character', eveId: 4242, role: 'edit' });
+    expect(res.status).toBe(201);
+    const { rows } = await db.query(`SELECT role FROM access_grants WHERE kind = 'character' AND eve_id = 4242`);
+    expect(rows[0].role).toBe('edit');
+  });
+
+  it('leaves the role NULL when none is asked for, so the deployment default still applies', async () => {
+    await request(app).post('/api/admin/access-grants').send({ kind: 'character', eveId: 4243 });
+    const { rows } = await db.query(`SELECT role FROM access_grants WHERE eve_id = 4243`);
+    expect(rows[0].role).toBeNull();
+  });
+
+  it('refuses a corp grant with a role — it would promote the whole corp', async () => {
+    await corpStanding(500, 5);
+    const res = await request(app)
+      .post('/api/admin/access-grants')
+      .send({ kind: 'corp', eveId: 500, role: 'edit' });
+    expect(res.status).toBe(400);
+    expect(res.body.error).toBe('role_character_only');
+  });
+
+  it('refuses an unknown role', async () => {
+    const res = await request(app)
+      .post('/api/admin/access-grants')
+      .send({ kind: 'character', eveId: 4244, role: 'superuser' });
+    expect(res.status).toBe(400);
+  });
+
+  // The escalation that matters: an invite must not become a way around the
+  // guard on PATCH /users/:id/role, which only lets an alliance admin mint an
+  // alliance admin.
+  it('refuses a corp admin inviting someone as alliance_admin (403)', async () => {
+    const res = await request(app)
+      .post('/api/admin/access-grants')
+      .send({ kind: 'character', eveId: 4245, role: 'alliance_admin' });
+    expect(res.status).toBe(403);
+    const { rowCount } = await db.query(`SELECT 1 FROM access_grants WHERE eve_id = 4245`);
+    expect(rowCount).toBe(0);
+  });
+
+  it('allows an alliance admin to invite an alliance_admin', async () => {
+    const allyAdmin = await seedUser({ characterId: 888, corpId: 1000, role: 'alliance_admin' });
+    state.sessionUserId = allyAdmin;
+    const res = await request(app)
+      .post('/api/admin/access-grants')
+      .send({ kind: 'character', eveId: 4246, role: 'alliance_admin' });
+    expect(res.status).toBe(201);
+    const { rows } = await db.query(`SELECT role FROM access_grants WHERE eve_id = 4246`);
+    expect(rows[0].role).toBe('alliance_admin');
+  });
+
   it('refuses to delete an env-seeded grant (400 env_immutable)', async () => {
     const { rows } = await db.query<{ id: string }>(`INSERT INTO access_grants (kind, eve_id, source) VALUES ('corp', 500, 'env') RETURNING id`);
     const res = await request(app).delete(`/api/admin/access-grants/${rows[0].id}`);

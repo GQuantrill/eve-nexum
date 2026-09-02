@@ -153,7 +153,17 @@
       "threshold10": "Nur +10 (Hervorragend)",
       "threshold5": "+5 und höher (Gut oder besser)",
       "settingsSaveFailed": "Einstellung konnte nicht gespeichert werden",
-      "standingsSessionsEnded": "{{count}} aktive Sitzung(en) beendet — nicht mehr zugelassen."
+      "standingsSessionsEnded": "{{count}} aktive Sitzung(en) beendet — nicht mehr zugelassen.",
+      "roleDefault": "Standardrolle",
+      "colInviteRole": "Eingeladene Rolle",
+      "inviteRoleHint": "Wird bei der ersten Anmeldung dieses Piloten vergeben — die Rolle eines bereits bestehenden Kontos wird nie geändert.",
+      "inviteMail": "Einladung mailen",
+      "inviteMailSending": "Wird geöffnet…",
+      "inviteMailHint": "Öffnet eine vorausgefüllte EVE-Mail in deinem Client — du prüfst sie und sendest sie ab. Du musst im Spiel angemeldet sein.",
+      "inviteMailOpened": "Mail-Fenster im EVE-Client geöffnet",
+      "inviteMailFailed": "Das Mail-Fenster konnte nicht geöffnet werden. Bist du in EVE angemeldet?",
+      "inviteMailSubject": "Eine Einladung zu Nexum",
+      "inviteMailBody": "Kartografiere mit uns auf Nexum — ein Live-Wurmloch-Mapper für EVE.\n\nDein Zugang ist bereits eingerichtet: Melde dich mit EVE SSO an, und die Karten sind da.\n\n%URL%"
     },
     "loading": "Lädt…",
     "exportCsv": "Als CSV exportieren",

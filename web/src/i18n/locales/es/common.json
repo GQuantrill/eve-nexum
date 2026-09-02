@@ -153,7 +153,17 @@
       "threshold10": "Solo +10 (Excelente)",
       "threshold5": "+5 y superior (Bueno o mejor)",
       "settingsSaveFailed": "Error al guardar el ajuste",
-      "standingsSessionsEnded": "{{count}} sesión(es) activa(s) finalizada(s): ya no están permitidas."
+      "standingsSessionsEnded": "{{count}} sesión(es) activa(s) finalizada(s): ya no están permitidas.",
+      "roleDefault": "Rol predeterminado",
+      "colInviteRole": "Rol asignado",
+      "inviteRoleHint": "Se aplica la primera vez que este piloto inicia sesión; nunca cambia el rol de una cuenta que ya existe.",
+      "inviteMail": "Enviar invitación",
+      "inviteMailSending": "Abriendo…",
+      "inviteMailHint": "Abre un correo de EVE ya redactado en tu cliente; lo revisas y lo envías. Debes tener la sesión iniciada en el juego.",
+      "inviteMailOpened": "Ventana de correo abierta en tu cliente de EVE",
+      "inviteMailFailed": "No se pudo abrir la ventana de correo. ¿Tienes la sesión iniciada en EVE?",
+      "inviteMailSubject": "Una invitación a Nexum",
+      "inviteMailBody": "Ven a mapear con nosotros en Nexum, un mapeador de agujeros de gusano en tiempo real para EVE.\n\nTu acceso ya está preparado: inicia sesión con EVE SSO y los mapas estarán ahí.\n\n%URL%"
     },
     "loading": "Cargando…",
     "exportCsv": "Exportar como CSV",

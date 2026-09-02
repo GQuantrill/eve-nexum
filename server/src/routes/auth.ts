@@ -210,9 +210,22 @@ authRouter.get('/callback', async (req, res) => {
     //     (alliance_admin when alliance mode is on, else admin); other new users
     //     default to config.defaultUserRole (DEFAULT_USER_ROLE, 'readonly' unless
     //     the deployment opts members straight into 'edit'/'full').
+    //   - Invited: an admin can attach a role to a character allow-list entry
+    //     ahead of that person ever logging in (the invite flow in the admin
+    //     Access tab). It only feeds the INSERT below, so it seeds the account
+    //     being created and never touches an existing one — a stale invite can't
+    //     re-promote someone an admin has since demoted. ADMIN_CHAR_ID and solo
+    //     mode still win, since both are deployment-level policy.
     const isAdminChar = characterId === config.adminCharId;
     const bootstrapRole = config.allianceMode ? 'alliance_admin' : 'admin';
-    const defaultRole = !config.restrictedMode ? 'admin' : isAdminChar ? bootstrapRole : config.defaultUserRole;
+    const { rows: invite } = await db.query<{ role: string | null }>(
+      `SELECT role FROM access_grants WHERE kind = 'character' AND eve_id = $1`,
+      [characterId],
+    );
+    const invitedRole = invite[0]?.role ?? null;
+    const defaultRole = !config.restrictedMode ? 'admin'
+      : isAdminChar ? bootstrapRole
+      : (invitedRole ?? config.defaultUserRole);
 
     const { rows } = await db.query<{ id: number; role: string; blocked: boolean }>(
       `INSERT INTO users (character_id, character_name, access_token, refresh_token, token_expires_at, role, corp_id, alliance_id, last_login_at)

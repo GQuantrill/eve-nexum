@@ -153,7 +153,17 @@
       "threshold10": "+10 のみ（優秀）",
       "threshold5": "+5 以上（良好以上）",
       "settingsSaveFailed": "設定の保存に失敗しました",
-      "standingsSessionsEnded": "アクティブなセッション {{count}} 件を終了しました（許可されなくなりました）。"
+      "standingsSessionsEnded": "アクティブなセッション {{count}} 件を終了しました（許可されなくなりました）。",
+      "roleDefault": "デフォルトのロール",
+      "colInviteRole": "招待時のロール",
+      "inviteRoleHint": "このパイロットが初めてサインインしたときに適用されます。既存アカウントのロールは変更しません。",
+      "inviteMail": "メールで招待",
+      "inviteMailSending": "開いています…",
+      "inviteMailHint": "入力済みの EVE メールをクライアントで開きます。内容を確認して自分で送信してください。ゲームにログインしている必要があります。",
+      "inviteMailOpened": "EVE クライアントでメールウィンドウを開きました",
+      "inviteMailFailed": "メールウィンドウを開けませんでした。EVE にログインしていますか？",
+      "inviteMailSubject": "Nexum への招待",
+      "inviteMailBody": "Nexum で一緒にマッピングしませんか — EVE 向けのリアルタイム・ワームホールマッパーです。\n\nアクセス権は設定済みです。EVE SSO でサインインすればマップが表示されます。\n\n%URL%"
     },
     "loading": "読み込み中…",
     "exportCsv": "CSV としてエクスポート",

@@ -203,7 +203,17 @@
       "threshold10": "+10 only (Excellent)",
       "threshold5": "+5 and above (Good or better)",
       "settingsSaveFailed": "Failed to save setting",
-      "standingsSessionsEnded": "{{count}} active session(s) ended — no longer permitted."
+      "standingsSessionsEnded": "{{count}} active session(s) ended — no longer permitted.",
+      "roleDefault": "Default role",
+      "colInviteRole": "Invited role",
+      "inviteRoleHint": "Applied the first time this pilot signs in — it never changes the role of an account that already exists.",
+      "inviteMail": "Mail invite",
+      "inviteMailSending": "Opening…",
+      "inviteMailHint": "Opens a pre-filled EVE mail in your client — you review it and press send. You must be logged into the game.",
+      "inviteMailOpened": "Mail window opened in your EVE client",
+      "inviteMailFailed": "Couldn't open the mail window. Are you logged into EVE?",
+      "inviteMailSubject": "An invite to Nexum",
+      "inviteMailBody": "Come and map with us on Nexum — a live wormhole mapper for EVE.\n\nYour access is already set up: sign in with EVE SSO and the maps will be there.\n\n%URL%"
     },
     "loading": "Loading…",
     "exportCsv": "Export as CSV",

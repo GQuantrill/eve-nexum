@@ -1,5 +1,6 @@
 import { Router, type Request } from 'express';
 import { esiFetch } from '../utils/esi.js';
+import { getValidToken } from '../utils/eveToken.js';
 import { db } from '../db.js';
 import { requireAdmin } from '../middleware/requireAdmin.js';
 import { requireAdminRead } from '../middleware/requireAdminRead.js';
@@ -396,8 +397,9 @@ adminRouter.get('/access-grants', async (_req, res) => {
   const { rows } = await db.query<{
     id: string; kind: GrantKind; eve_id: string; source: string;
     note: string | null; created_at: string; added_by_name: string | null;
+    role: string | null;
   }>(
-    `SELECT g.id, g.kind, g.eve_id, g.source, g.note, g.created_at,
+    `SELECT g.id, g.kind, g.eve_id, g.source, g.note, g.created_at, g.role,
             u.character_name AS added_by_name
        FROM access_grants g
        LEFT JOIN users u ON u.id = g.added_by_user
@@ -471,6 +473,28 @@ adminRouter.post('/access-grants', async (req, res) => {
   if (kind !== 'corp' && kind !== 'alliance' && kind !== 'character') {
     res.status(400).json({ error: 'kind must be corp, alliance, or character' }); return;
   }
+
+  // Optional role to hand the character on first login. Same guards as
+  // PATCH /users/:id/role, because this grants exactly the same thing — just
+  // ahead of the account existing, where there's no users row to check against.
+  const roleRaw = req.body?.role;
+  let invitedRole: Role | null = null;
+  if (roleRaw !== undefined && roleRaw !== null && roleRaw !== '') {
+    if (kind !== 'character') {
+      // A corp/alliance grant admits everyone in it; a role there would promote
+      // an entire organisation on first login.
+      res.status(400).json({ error: 'role_character_only', message: 'A role can only be set on a character grant.' }); return;
+    }
+    if (!ROLES.includes(roleRaw as Role)) {
+      res.status(400).json({ error: `role must be one of: ${ROLES.join(', ')}` }); return;
+    }
+    // Only an alliance admin may mint an alliance admin — mirrors the guard on
+    // PATCH /users/:id/role, so an invite can't be used to route around it.
+    if (roleRaw === 'alliance_admin' && !isAllianceAdmin(req.session.role ?? 'readonly')) {
+      res.status(403).json({ error: 'Only an alliance admin can manage the alliance admin role' }); return;
+    }
+    invitedRole = roleRaw as Role;
+  }
   if (!Number.isInteger(eveId) || eveId <= 0) {
     res.status(400).json({ error: 'invalid eveId' }); return;
   }
@@ -487,15 +511,81 @@ adminRouter.post('/access-grants', async (req, res) => {
   }
 
   const { rows } = await db.query<{ id: string }>(
-    `INSERT INTO access_grants (kind, eve_id, source, note, added_by_user)
-     VALUES ($1, $2, 'admin', $3, $4)
+    `INSERT INTO access_grants (kind, eve_id, source, note, added_by_user, role)
+     VALUES ($1, $2, 'admin', $3, $4, $5)
      ON CONFLICT (kind, eve_id) DO NOTHING
      RETURNING id`,
-    [kind, eveId, note, req.session.userId ?? null],
+    [kind, eveId, note, req.session.userId ?? null, invitedRole],
   );
   if (!rows.length) { res.status(409).json({ error: 'already_granted' }); return; }
-  await audit(req, null, kind === 'character' ? eveId : null, 'access_grant_add', null, `${kind}:${eveId}`);
+  await audit(req, null, kind === 'character' ? eveId : null, 'access_grant_add', null,
+    invitedRole ? `${kind}:${eveId} role=${invitedRole}` : `${kind}:${eveId}`);
   res.status(201).json({ ok: true, id: rows[0].id });
+});
+
+// POST /api/admin/access-grants/:id/invite-mail — open a pre-filled EVE mail in
+// the ADMIN's own client, inviting the granted character to the deployment.
+//
+// Uses ESI's openwindow/newmail, which is covered by esi-ui.open_window.v1 —
+// already in SSO_SCOPES, so this needs no new consent and no re-login. It also
+// sends nothing on anyone's behalf: the window opens in the caller's client and
+// they press send, exactly like the autopilot-waypoint route.
+//
+// Wording comes from the caller (the admin UI has the translations); the LINK
+// does not — the server substitutes %URL% with FRONTEND_URL, so the invite always
+// points at this deployment and a client can't aim it somewhere else.
+const FRONTEND_URL = process.env.FRONTEND_URL ?? 'http://localhost:5174';
+// Deliberately NOT i18next's {{ }} syntax: the wording is translated client-side,
+// so a {{url}} token would be interpolated away there and never reach us.
+const URL_PLACEHOLDER = '%URL%';
+
+adminRouter.post('/access-grants/:id/invite-mail', async (req, res) => {
+  const { rows } = await db.query<{ kind: GrantKind; eve_id: string }>(
+    `SELECT kind, eve_id FROM access_grants WHERE id = $1`, [req.params.id],
+  );
+  if (!rows.length) { res.status(404).json({ error: 'not_found' }); return; }
+  if (rows[0].kind !== 'character') {
+    // Corp and alliance grants have no single mail recipient.
+    res.status(400).json({ error: 'character_only', message: 'Only a character grant can be mailed an invite.' }); return;
+  }
+  const recipientId = Number(rows[0].eve_id);
+  if (!Number.isInteger(recipientId) || recipientId <= 0) {
+    res.status(400).json({ error: 'invalid_recipient' }); return;
+  }
+
+  const subject = String(req.body?.subject ?? '').trim().slice(0, 200);
+  const bodyRaw = String(req.body?.body ?? '').trim().slice(0, 4000);
+  if (!subject || !bodyRaw) { res.status(400).json({ error: 'subject and body are required' }); return; }
+
+  // Always end up with the link in the mail: substitute the placeholder, and if
+  // a translation has lost it, append rather than send an invite with no URL.
+  const body = bodyRaw.includes(URL_PLACEHOLDER)
+    ? bodyRaw.split(URL_PLACEHOLDER).join(FRONTEND_URL)
+    : `${bodyRaw}\n\n${FRONTEND_URL}`;
+
+  try {
+    const token = await getValidToken(req.session.userId!);
+    const esiRes = await esiFetch('https://esi.evetech.net/latest/ui/openwindow/newmail/', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        subject,
+        body,
+        recipients: [{ recipient_id: recipientId, recipient_type: 'character' }],
+      }),
+    });
+    if (!esiRes.ok) {
+      // 520 is ESI's "the client isn't running / can't be reached" case, which
+      // is the common one here and worth telling the admin apart from a fault.
+      log.warn(`invite mail openwindow failed: ESI ${esiRes.status}`);
+      res.status(502).json({ error: 'esi_failed', status: esiRes.status }); return;
+    }
+    await audit(req, null, recipientId, 'access_grant_invite_mail', null, String(recipientId));
+    res.json({ ok: true });
+  } catch (err) {
+    log.error('Invite mail failed:', err);
+    res.status(500).json({ error: 'invite_mail_failed' });
+  }
 });
 
 // DELETE /api/admin/access-grants/:id — revoke a grant. env rows are immutable.

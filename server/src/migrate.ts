@@ -986,6 +986,17 @@ export async function migrate() {
     );
     CREATE INDEX IF NOT EXISTS idx_access_grants_lookup ON access_grants (kind, eve_id);
 
+    -- Role to give an invited character the first time they log in. NULL keeps
+    -- the deployment default (DEFAULT_USER_ROLE), which is what every grant made
+    -- before this column did. Only meaningful for kind='character': a corp or
+    -- alliance grant admits many people, and handing a whole corp a role on
+    -- first login is not something an admin should be able to do in one click.
+    -- Applied ONLY when the users row is created — see the role policy in
+    -- routes/auth.ts — so a stale invite can never re-promote someone an admin
+    -- has since demoted.
+    ALTER TABLE access_grants ADD COLUMN IF NOT EXISTS role TEXT
+      CHECK (role IS NULL OR role IN ('alliance_admin','admin','full','edit','readonly'));
+
     -- Deployment-level key/value settings (distinct from per-user ui_settings).
     -- Phase 3 uses standings_login_enabled ('true'|'false') and
     -- standings_login_threshold ('5'|'10') for the standings auto-admit toggle.

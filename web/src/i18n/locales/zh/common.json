@@ -153,7 +153,17 @@
       "threshold10": "仅 +10（优秀）",
       "threshold5": "+5 及以上（良好或更高）",
       "settingsSaveFailed": "保存设置失败",
-      "standingsSessionsEnded": "已结束 {{count}} 个活动会话 — 不再被允许。"
+      "standingsSessionsEnded": "已结束 {{count}} 个活动会话 — 不再被允许。",
+      "roleDefault": "默认角色",
+      "colInviteRole": "邀请角色",
+      "inviteRoleHint": "在该飞行员首次登录时应用，绝不会更改已有账号的角色。",
+      "inviteMail": "邮件邀请",
+      "inviteMailSending": "正在打开…",
+      "inviteMailHint": "在你的客户端中打开一封已填好的 EVE 邮件 —— 你确认后自行发送。需要先登录游戏。",
+      "inviteMailOpened": "已在 EVE 客户端中打开邮件窗口",
+      "inviteMailFailed": "无法打开邮件窗口。你登录 EVE 了吗？",
+      "inviteMailSubject": "Nexum 邀请",
+      "inviteMailBody": "来和我们一起使用 Nexum 绘制星图 —— 一款面向 EVE 的实时虫洞地图工具。\n\n你的访问权限已经配置好了：使用 EVE SSO 登录即可看到地图。\n\n%URL%"
     },
     "loading": "加载中…",
     "exportCsv": "导出为 CSV",

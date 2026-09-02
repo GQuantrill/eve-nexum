@@ -153,7 +153,17 @@
       "threshold10": "Apenas +10 (Excelente)",
       "threshold5": "+5 e acima (Bom ou melhor)",
       "settingsSaveFailed": "Falha ao guardar a definição",
-      "standingsSessionsEnded": "{{count}} sessão(ões) ativa(s) terminada(s) — já não são permitidas."
+      "standingsSessionsEnded": "{{count}} sessão(ões) ativa(s) terminada(s) — já não são permitidas.",
+      "roleDefault": "Função predefinida",
+      "colInviteRole": "Função atribuída",
+      "inviteRoleHint": "Aplicada no primeiro início de sessão deste piloto — nunca altera a função de uma conta que já exista.",
+      "inviteMail": "Enviar convite",
+      "inviteMailSending": "A abrir…",
+      "inviteMailHint": "Abre um email do EVE já preenchido no teu cliente — revê-lo e envias. Tens de ter sessão iniciada no jogo.",
+      "inviteMailOpened": "Janela de email aberta no teu cliente EVE",
+      "inviteMailFailed": "Não foi possível abrir a janela de email. Tens sessão iniciada no EVE?",
+      "inviteMailSubject": "Um convite para o Nexum",
+      "inviteMailBody": "Vem mapear connosco no Nexum — um mapeador de wormholes em tempo real para EVE.\n\nO teu acesso já está preparado: inicia sessão com EVE SSO e os mapas estarão lá.\n\n%URL%"
     },
     "loading": "A carregar…",
     "exportCsv": "Exportar como CSV",
