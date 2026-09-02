@@ -50,6 +50,7 @@ type AdjacentSystem = {
 import { CustomLabelDialog } from '../ui/CustomLabelDialog';
 import { PromptModal } from '../ui/PromptModal';
 import type { MapSystem, SystemIntel, SystemClass } from '../../types';
+import { isDefiniteWormholeHop, prefetchStargateNeighbors } from '../../utils/stargateAdjacency';
 import { api } from '../../api/client';
 import { truesecColor } from '../../utils/truesec';
 import { readUserSetting } from '../../hooks/useUserSetting';
@@ -941,9 +942,16 @@ export function MapCanvas() {
       if (isShareMode) return;
       e.preventDefault();
       e.stopPropagation();
+      // Warm this pair's stargate neighbours so the jump-type submenu can tell a
+      // real gate from an impossible one. Fire-and-forget and cached — if it
+      // hasn't landed by the time the menu renders, the option stays enabled and
+      // the server rejects it instead.
+      const conn = connections.find((c) => c.id === edge.id);
+      const srcEve = systems.find((x) => x.id === conn?.sourceId)?.eveSystemId;
+      if (srcEve != null) prefetchStargateNeighbors(srcEve);
       setContextMenu({ screenX: e.clientX, screenY: e.clientY, flowX: 0, flowY: 0, edgeId: edge.id, openedAt: Date.now() });
     },
-    [isShareMode],
+    [isShareMode, connections, systems],
   );
 
   // Click on the SVG edge path itself (the curve) selects the connection so
@@ -1007,6 +1015,22 @@ export function MapCanvas() {
     if (contextMenu.edgeId) {
       const conn = connections.find((c) => c.id === contextMenu.edgeId);
       const connType    = conn?.connectionType ?? 'standard';
+      // Jump types the SDE rules out for this pair, greyed rather than offered
+      // and rejected by the server: a stargate needs actual stargate
+      // neighbours, and an Ansiblex / cyno can't touch wormhole space.
+      // Conservative on both counts — an unresolved endpoint, or neighbours not
+      // in the client cache yet, leaves the option enabled and the server has
+      // the final say.
+      const edgeSrc = systems.find((x) => x.id === conn?.sourceId);
+      const edgeTgt = systems.find((x) => x.id === conn?.targetId);
+      const jspace = (c?: SystemClass) => c !== undefined && c !== 'unknown'
+        && !['HS', 'LS', 'NS', 'Pochven'].includes(c);
+      const touchesJspace = jspace(edgeSrc?.systemClass as SystemClass | undefined)
+        || jspace(edgeTgt?.systemClass as SystemClass | undefined);
+      const noGate = touchesJspace || (
+        edgeSrc?.eveSystemId != null && edgeTgt?.eveSystemId != null
+        && isDefiniteWormholeHop(edgeSrc.eveSystemId, edgeTgt.eveSystemId)
+      );
       const timeStatus  = conn?.timeStatus  ?? 'fresh';
       const massStatus  = conn?.massStatus  ?? 'stable';
       const eid = contextMenu.edgeId;
@@ -1028,16 +1052,19 @@ export function MapCanvas() {
             {
               label: t('ctxMenu.jumpStargate'),
               checked: connType === 'gate',
+              disabled: noGate && connType !== 'gate',
               action: () => updateConnection(eid, { connectionType: 'gate' }),
             },
             {
               label: t('ctxMenu.jumpAnsiblex'),
               checked: connType === 'jumpgate',
+              disabled: touchesJspace && connType !== 'jumpgate',
               action: () => updateConnection(eid, { connectionType: 'jumpgate' }),
             },
             {
               label: t('ctxMenu.jumpCyno'),
               checked: connType === 'cyno',
+              disabled: touchesJspace && connType !== 'cyno',
               action: () => updateConnection(eid, { connectionType: 'cyno' }),
             },
           ],

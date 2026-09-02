@@ -14,6 +14,7 @@ import { audit } from '../services/audit.js';
 import { publishToMap } from '../services/mapEvents.js';
 import { streamMapEvents } from '../services/mapStream.js';
 import { listVisibleMaps, loadFullMap, loadSystemSignatures, loadSystemAnomalies, loadSystemStructures, CONNECTION_COLS } from '../services/mapRead.js';
+import { connectionTypeError, connectionEndpointEveIds, systemEveIds } from '../services/connectionRules.js';
 import { sdeSystemFacts } from '../services/sdeFacts.js';
 import { listConnectionJumps, recordConnectionJump, setConnectionJumpHot, clearConnectionJumps } from '../services/connectionJumps.js';
 import {
@@ -2706,6 +2707,17 @@ mapsRouter.post('/:mapId/connections', async (req, res) => {
     } catch { /* stargate table absent / query failed — keep client's type */ }
   }
 
+  // A client-supplied 'gate'/'jumpgate'/'cyno' was previously taken on trust, so
+  // an impossible edge (a stargate between two wormhole systems) could be
+  // created outright. Anything auto-classified above passes by construction.
+  const typeError = await connectionTypeError(
+    effectiveType,
+    (typeof sourceEveId === 'number' && typeof targetEveId === 'number')
+      ? { sourceEveId, targetEveId }
+      : await systemEveIds(sourceId, targetId),
+  );
+  if (typeError) { res.status(400).json({ error: typeError }); return; }
+
   let inserted = 0;
   try {
     const ins = await db.query(
@@ -3269,6 +3281,18 @@ mapsRouter.patch('/:mapId/connections/:connectionId', async (req, res) => {
   };
 
   const updates: Record<string, unknown> = { ...(req.body as Record<string, unknown>) };
+
+  // Jump type: the same SDE rules the create route applies. Without this an edge
+  // that couldn't be created as a gate could still be switched to one afterwards.
+  if ('connectionType' in updates) {
+    const next = updates.connectionType;
+    if (typeof next !== 'string') { res.status(400).json({ error: 'invalid connectionType' }); return; }
+    const ep = await connectionEndpointEveIds(mapId, connectionId);
+    if (ep) {
+      const err = await connectionTypeError(next, ep);
+      if (err) { res.status(400).json({ error: err }); return; }
+    }
+  }
 
   // Validate the two time-bucket fields. The whitelist below trusts values
   // verbatim, so reject anything malformed here (a bad ISO string would 22007
