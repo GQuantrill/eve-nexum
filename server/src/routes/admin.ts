@@ -568,11 +568,11 @@ adminRouter.post('/access-grants/:id/invite-mail', async (req, res) => {
     const esiRes = await esiFetch('https://esi.evetech.net/latest/ui/openwindow/newmail/', {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        subject,
-        body,
-        recipients: [{ recipient_id: recipientId, recipient_type: 'character' }],
-      }),
+      // recipients is an array of bare character ids. NOT the {recipient_id,
+      // recipient_type} objects that POST /characters/{id}/mail/ takes — the two
+      // endpoints look alike and don't share a schema. Sending the object form
+      // gets: "failed to coerce value '{...}' into type integer".
+      body: JSON.stringify({ subject, body, recipients: [recipientId] }),
     });
     if (!esiRes.ok) {
       // Say WHICH failure it was. The two that actually happen:
