@@ -19,6 +19,83 @@ async function encryptLegacyTokens() {
   console.log(`Encrypted OAuth tokens for ${rows.length} legacy user row(s)`);
 }
 
+// One-shot pass that makes existing map systems agree with the SDE. Idempotent
+// and self-limiting — both statements only match rows that are still wrong, so
+// after the first boot they update nothing and stay silent. Safe on a database
+// with no SDE seeded: every join simply finds nothing.
+//
+// This lives here rather than in scripts/backfill-system-facts.ts because
+// deployments are docker builds — nobody runs a manual script inside a
+// container, and self-hosters would never see one. The script remains for
+// inspecting a database on demand — it dry-runs by default and also reports
+// connections whose jump type the SDE contradicts, which this pass leaves
+// alone.
+async function syncSystemFactsFromSde() {
+  // solar_systems is created by the SDE importer (setup-db), NOT by migrate, so
+  // on a database that has never imported it the table simply isn't there —
+  // a fresh self-host, and the integration-test databases. Querying it anyway
+  // throws 42P01 and takes the whole migration (and the server start) with it.
+  const { rows: [sde] } = await db.query<{ present: boolean }>(
+    `SELECT to_regclass('public.solar_systems') IS NOT NULL AS present`);
+  if (!sde?.present) return;
+
+  // Sorted so a difference in order alone doesn't count as drift.
+  const sorted = (col: string) =>
+    `COALESCE((SELECT array_agg(x ORDER BY x) FROM unnest(${col}) x), '{}')`;
+
+  // J-code nodes stored with no eve_system_id — the old hardcoded starter map
+  // wrote thousands of them. Detached placeholders: no routing, no ESI identity,
+  // and whatever statics the seeder happened to carry. Only ^J\d{6}$ names are
+  // matched: a J-code is unambiguous, whereas resolving arbitrary names risks
+  // re-pointing a custom node someone named after a real system.
+  //
+  // map_systems is unique on (map_id, eve_system_id), so rows whose map already
+  // holds that system are left alone, and where several rows in one map would
+  // resolve to the same system only the oldest is taken.
+  const resolved = await db.query(`
+    UPDATE map_systems ms
+       SET eve_system_id = c.eve_id,
+           system_class  = c.class,
+           effect        = c.effect,
+           statics       = c.statics
+      FROM (
+        SELECT ms2.id,
+               ss.id AS eve_id,
+               ss.class,
+               COALESCE(ss.effect, 'none') AS effect,
+               COALESCE(ss.statics, '{}')  AS statics,
+               ROW_NUMBER() OVER (PARTITION BY ms2.map_id, ss.id
+                                  ORDER BY ms2.created_at, ms2.id) AS rn
+          FROM map_systems ms2
+          JOIN solar_systems ss ON ss.name = ms2.name
+         WHERE ms2.eve_system_id IS NULL
+           AND ms2.name ~ '^J[0-9]{6}$'
+           AND NOT EXISTS (SELECT 1 FROM map_systems x
+                            WHERE x.map_id = ms2.map_id AND x.eve_system_id = ss.id)
+      ) c
+     WHERE ms.id = c.id AND c.rn = 1`);
+  if ((resolved.rowCount ?? 0) > 0) {
+    console.log(`Resolved ${resolved.rowCount} placeholder wormhole system(s) to their real system`);
+  }
+
+  // Systems that resolve to a real one but disagree with it — class, effect or
+  // statics typed over before those fields became SDE-derived.
+  const resynced = await db.query(`
+    UPDATE map_systems ms
+       SET system_class = ss.class,
+           effect       = COALESCE(ss.effect, 'none'),
+           statics      = COALESCE(ss.statics, '{}')
+      FROM solar_systems ss
+     WHERE ss.id = ms.eve_system_id
+       AND (upper(ms.system_class) IS DISTINCT FROM upper(ss.class)
+         OR COALESCE(ms.effect, 'none') IS DISTINCT FROM COALESCE(ss.effect, 'none')
+         OR ${sorted('ms.statics')} IS DISTINCT FROM ${sorted('ss.statics')})`);
+  if ((resynced.rowCount ?? 0) > 0) {
+    console.log(`Re-synced ${resynced.rowCount} map system(s) to the SDE`);
+  }
+
+}
+
 export async function migrate() {
   await db.query(`
     CREATE TABLE IF NOT EXISTS users (
@@ -965,4 +1042,5 @@ export async function migrate() {
   `);
 
   await encryptLegacyTokens();
+  await syncSystemFactsFromSde();
 }
