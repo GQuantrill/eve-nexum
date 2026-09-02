@@ -226,7 +226,7 @@ export function AddSystemModal({ position, onClose, onSubmit }: Props) {
               <Select
                 value={systemClass}
                 onChange={(v) => setSystemClass(v as SystemClass)}
-                disabled={loadingDetail}
+                disabled={loadingDetail || isSelected}
                 options={SYSTEM_CLASSES.map((c) => ({ value: c, label: CLASS_LABELS[c] }))}
               />
             </label>
@@ -236,7 +236,7 @@ export function AddSystemModal({ position, onClose, onSubmit }: Props) {
               <Select
                 value={effect}
                 onChange={(v) => setEffect(v as WormholeEffect)}
-                disabled={loadingDetail}
+                disabled={loadingDetail || isSelected}
                 options={WORMHOLE_EFFECTS.map((ef) => ({ value: ef, label: EFFECT_LABELS[ef] || t('addSystem.effectNone') }))}
               />
             </label>
@@ -251,6 +251,7 @@ export function AddSystemModal({ position, onClose, onSubmit }: Props) {
                 value={statics}
                 onChange={(e) => setStatics(e.target.value)}
                 placeholder={t('addSystem.staticsPlaceholder')}
+                readOnly
                 disabled={loadingDetail || !isSelected}
               />
             </label>
