@@ -15,6 +15,7 @@ import { publishToMap } from '../services/mapEvents.js';
 import { streamMapEvents } from '../services/mapStream.js';
 import { listVisibleMaps, loadFullMap, loadSystemSignatures, loadSystemAnomalies, loadSystemStructures, CONNECTION_COLS } from '../services/mapRead.js';
 import { connectionTypeError, connectionEndpointEveIds, systemEveIds } from '../services/connectionRules.js';
+import { sdeSystemFacts } from '../services/sdeFacts.js';
 import { listConnectionJumps, recordConnectionJump, setConnectionJumpHot, clearConnectionJumps } from '../services/connectionJumps.js';
 import {
   createSignature, updateSignature, deleteSignature,
@@ -2428,6 +2429,15 @@ mapsRouter.post('/:mapId/systems', async (req, res) => {
 
   const resolvedEveId = await resolveEveSystemId(eveSystemId, name);
 
+  // Class / effect / statics are CCP's, not the caller's: when the system
+  // resolves to a real one the SDE row wins. Unresolved systems (custom nodes,
+  // unmapped-wormhole placeholders) keep what was sent — there's nothing to
+  // defer to, and those are exactly the ones that need to stay editable.
+  const facts = await sdeSystemFacts(resolvedEveId);
+  const finalClass   = facts?.systemClass ?? systemClass;
+  const finalEffect  = facts ? facts.effect  : (effect ?? 'none');
+  const finalStatics = facts ? facts.statics : (statics ?? []);
+
   try {
     await db.query(
       `INSERT INTO map_systems
@@ -2435,8 +2445,8 @@ mapsRouter.post('/:mapId/systems', async (req, res) => {
           position_x, position_y, status, is_home, locked, notes)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
        ON CONFLICT (id) DO NOTHING`,
-      [id, mapId, resolvedEveId, name, systemClass, effect ?? 'none',
-       statics ?? [], regionName ?? null, npcType ?? null,
+      [id, mapId, resolvedEveId, name, finalClass, finalEffect,
+       finalStatics, regionName ?? null, npcType ?? null,
        position?.x ?? 0, position?.y ?? 0,
        status ?? 'unknown', isHome ?? false, locked ?? false, notes ?? ''],
     );
@@ -2496,7 +2506,23 @@ mapsRouter.post('/:mapId/systems', async (req, res) => {
 
 mapsRouter.patch('/:mapId/systems/:systemId', async (req, res) => {
   const { mapId, systemId } = req.params;
-  const updates = req.body as Record<string, unknown>;
+  const updates = { ...(req.body as Record<string, unknown>) };
+
+  // Same rule as create: for a system that resolves to a real one, the SDE owns
+  // class / effect / statics, so drop any attempt to edit them rather than
+  // letting the map drift from the game. Everything else on the row is the
+  // user's (name, notes, status, home, lock, alias, intel).
+  if ('systemClass' in updates || 'effect' in updates || 'statics' in updates) {
+    const { rows } = await db.query<{ eve: number | null }>(
+      `SELECT eve_system_id AS eve FROM map_systems WHERE id = $1 AND map_id = $2`,
+      [systemId, mapId],
+    );
+    if (rows.length && await sdeSystemFacts(rows[0].eve)) {
+      delete updates.systemClass;
+      delete updates.effect;
+      delete updates.statics;
+    }
+  }
 
   // map camelCase → snake_case for the DB columns we accept
   const colMap: Record<string, string> = {
