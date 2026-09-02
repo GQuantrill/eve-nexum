@@ -161,9 +161,11 @@
       "inviteMailSending": "Ouverture…",
       "inviteMailHint": "Ouvre un mail EVE pré-rempli dans ton client — tu le relis et tu l'envoies. Tu dois être connecté au jeu.",
       "inviteMailOpened": "Fenêtre de mail ouverte dans ton client EVE",
-      "inviteMailFailed": "Impossible d'ouvrir la fenêtre de mail. Es-tu connecté à EVE ?",
+      "inviteMailFailed": "Impossible d'ouvrir la fenêtre de mail. {{detail}}",
       "inviteMailSubject": "Une invitation à Nexum",
-      "inviteMailBody": "Viens cartographier avec nous sur Nexum — un mappeur de trous de ver en direct pour EVE.\n\nTon accès est déjà en place : connecte-toi avec EVE SSO et les cartes seront là.\n\n%URL%"
+      "inviteMailBody": "Viens cartographier avec nous sur Nexum — un mappeur de trous de ver en direct pour EVE.\n\nTon accès est déjà en place : connecte-toi avec EVE SSO et les cartes seront là.\n\n%URL%",
+      "inviteMailNoClient": "EVE n'a pas pu joindre ton client. Ouvre EVE et connecte-toi avec le même personnage que sur Nexum, puis réessaie.",
+      "inviteMailScope": "Ta session EVE est antérieure à l'autorisation nécessaire pour ouvrir des fenêtres. Déconnecte-toi de Nexum puis reconnecte-toi et réessaie."
     },
     "loading": "Chargement…",
     "exportCsv": "Exporter en CSV",

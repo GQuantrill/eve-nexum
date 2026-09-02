@@ -211,9 +211,11 @@
       "inviteMailSending": "Opening…",
       "inviteMailHint": "Opens a pre-filled EVE mail in your client — you review it and press send. You must be logged into the game.",
       "inviteMailOpened": "Mail window opened in your EVE client",
-      "inviteMailFailed": "Couldn't open the mail window. Are you logged into EVE?",
+      "inviteMailFailed": "Couldn't open the mail window. {{detail}}",
       "inviteMailSubject": "An invite to Nexum",
-      "inviteMailBody": "Come and map with us on Nexum — a live wormhole mapper for EVE.\n\nYour access is already set up: sign in with EVE SSO and the maps will be there.\n\n%URL%"
+      "inviteMailBody": "Come and map with us on Nexum — a live wormhole mapper for EVE.\n\nYour access is already set up: sign in with EVE SSO and the maps will be there.\n\n%URL%",
+      "inviteMailNoClient": "EVE couldn't reach your game client. Open EVE and log in as the same character you're signed into Nexum with, then try again.",
+      "inviteMailScope": "Your EVE session predates the permission needed to open windows. Sign out of Nexum and back in, then try again."
     },
     "loading": "Loading…",
     "exportCsv": "Export as CSV",
