@@ -161,9 +161,11 @@
       "inviteMailSending": "Wird geöffnet…",
       "inviteMailHint": "Öffnet eine vorausgefüllte EVE-Mail in deinem Client — du prüfst sie und sendest sie ab. Du musst im Spiel angemeldet sein.",
       "inviteMailOpened": "Mail-Fenster im EVE-Client geöffnet",
-      "inviteMailFailed": "Das Mail-Fenster konnte nicht geöffnet werden. Bist du in EVE angemeldet?",
+      "inviteMailFailed": "Das Mail-Fenster konnte nicht geöffnet werden. {{detail}}",
       "inviteMailSubject": "Eine Einladung zu Nexum",
-      "inviteMailBody": "Kartografiere mit uns auf Nexum — ein Live-Wurmloch-Mapper für EVE.\n\nDein Zugang ist bereits eingerichtet: Melde dich mit EVE SSO an, und die Karten sind da.\n\n%URL%"
+      "inviteMailBody": "Kartografiere mit uns auf Nexum — ein Live-Wurmloch-Mapper für EVE.\n\nDein Zugang ist bereits eingerichtet: Melde dich mit EVE SSO an, und die Karten sind da.\n\n%URL%",
+      "inviteMailNoClient": "EVE konnte deinen Client nicht erreichen. Öffne EVE und melde dich mit demselben Charakter an, mit dem du bei Nexum angemeldet bist, und versuche es erneut.",
+      "inviteMailScope": "Deine EVE-Sitzung stammt aus der Zeit vor der Berechtigung zum Öffnen von Fenstern. Melde dich bei Nexum ab und wieder an und versuche es erneut."
     },
     "loading": "Lädt…",
     "exportCsv": "Als CSV exportieren",

@@ -326,10 +326,17 @@ function AccessTab() {
         }),
       });
       toast.success(t('admin.access.inviteMailOpened'));
-    } catch {
-      // Much the likeliest cause is the admin not being logged into the game,
-      // since the window has to open in a running client.
-      setError(t('admin.access.inviteMailFailed'));
+    } catch (e) {
+      // Say which failure it was rather than guessing at the commonest one —
+      // "are you logged in?" is useless when the real answer is a stale token.
+      const code = e instanceof ApiError ? e.code : undefined;
+      setError(
+        code === 'client_unreachable' ? t('admin.access.inviteMailNoClient')
+        : code === 'scope_missing'    ? t('admin.access.inviteMailScope')
+        : t('admin.access.inviteMailFailed', {
+            detail: (e instanceof ApiError && e.serverMessage) || (e instanceof Error ? e.message : ''),
+          }),
+      );
     } finally { setMailing(null); }
   };
 

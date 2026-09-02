@@ -161,9 +161,11 @@
       "inviteMailSending": "正在打开…",
       "inviteMailHint": "在你的客户端中打开一封已填好的 EVE 邮件 —— 你确认后自行发送。需要先登录游戏。",
       "inviteMailOpened": "已在 EVE 客户端中打开邮件窗口",
-      "inviteMailFailed": "无法打开邮件窗口。你登录 EVE 了吗？",
+      "inviteMailFailed": "无法打开邮件窗口。{{detail}}",
       "inviteMailSubject": "Nexum 邀请",
-      "inviteMailBody": "来和我们一起使用 Nexum 绘制星图 —— 一款面向 EVE 的实时虫洞地图工具。\n\n你的访问权限已经配置好了：使用 EVE SSO 登录即可看到地图。\n\n%URL%"
+      "inviteMailBody": "来和我们一起使用 Nexum 绘制星图 —— 一款面向 EVE 的实时虫洞地图工具。\n\n你的访问权限已经配置好了：使用 EVE SSO 登录即可看到地图。\n\n%URL%",
+      "inviteMailNoClient": "EVE 无法连接到你的游戏客户端。请打开 EVE 并使用与登录 Nexum 相同的角色登录，然后重试。",
+      "inviteMailScope": "你的 EVE 会话早于打开窗口所需的权限。请退出 Nexum 后重新登录，然后重试。"
     },
     "loading": "加载中…",
     "exportCsv": "导出为 CSV",

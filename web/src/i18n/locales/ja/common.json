@@ -161,9 +161,11 @@
       "inviteMailSending": "開いています…",
       "inviteMailHint": "入力済みの EVE メールをクライアントで開きます。内容を確認して自分で送信してください。ゲームにログインしている必要があります。",
       "inviteMailOpened": "EVE クライアントでメールウィンドウを開きました",
-      "inviteMailFailed": "メールウィンドウを開けませんでした。EVE にログインしていますか？",
+      "inviteMailFailed": "メールウィンドウを開けませんでした。{{detail}}",
       "inviteMailSubject": "Nexum への招待",
-      "inviteMailBody": "Nexum で一緒にマッピングしませんか — EVE 向けのリアルタイム・ワームホールマッパーです。\n\nアクセス権は設定済みです。EVE SSO でサインインすればマップが表示されます。\n\n%URL%"
+      "inviteMailBody": "Nexum で一緒にマッピングしませんか — EVE 向けのリアルタイム・ワームホールマッパーです。\n\nアクセス権は設定済みです。EVE SSO でサインインすればマップが表示されます。\n\n%URL%",
+      "inviteMailNoClient": "EVE がゲームクライアントに接続できませんでした。EVE を起動し、Nexum にサインインしているのと同じキャラクターでログインしてから再試行してください。",
+      "inviteMailScope": "EVE のセッションが、ウィンドウを開く権限より前に発行されています。Nexum からサインアウトして再度サインインしてから、もう一度お試しください。"
     },
     "loading": "読み込み中…",
     "exportCsv": "CSV としてエクスポート",

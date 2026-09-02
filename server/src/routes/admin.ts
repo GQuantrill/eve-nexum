@@ -575,10 +575,21 @@ adminRouter.post('/access-grants/:id/invite-mail', async (req, res) => {
       }),
     });
     if (!esiRes.ok) {
-      // 520 is ESI's "the client isn't running / can't be reached" case, which
-      // is the common one here and worth telling the admin apart from a fault.
-      log.warn(`invite mail openwindow failed: ESI ${esiRes.status}`);
-      res.status(502).json({ error: 'esi_failed', status: esiRes.status }); return;
+      // Say WHICH failure it was. The two that actually happen:
+      //   520 — ESI can't reach a running client for this character. Either the
+      //         game isn't open, or it's open as a different pilot than the one
+      //         this Nexum session is bound to.
+      //   403 — the token predates esi-ui.open_window.v1 (it has been in
+      //         SSO_SCOPES from the start, but a session issued before a scope
+      //         change carries the older grant), so a re-login fixes it.
+      // Anything else is passed through verbatim rather than guessed at.
+      const detail = await esiRes.text().catch(() => '');
+      log.warn(`invite mail openwindow failed: ESI ${esiRes.status} ${detail.slice(0, 200)}`);
+      const code = esiRes.status === 520 ? 'client_unreachable'
+                 : esiRes.status === 403 ? 'scope_missing'
+                 : 'esi_failed';
+      res.status(502).json({ error: code, status: esiRes.status, message: `ESI returned ${esiRes.status}` });
+      return;
     }
     await audit(req, null, recipientId, 'access_grant_invite_mail', null, String(recipientId));
     res.json({ ok: true });
