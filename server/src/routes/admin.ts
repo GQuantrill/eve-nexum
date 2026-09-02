@@ -1,5 +1,6 @@
 import { Router, type Request } from 'express';
 import { esiFetch } from '../utils/esi.js';
+import { getValidToken } from '../utils/eveToken.js';
 import { db } from '../db.js';
 import { requireAdmin } from '../middleware/requireAdmin.js';
 import { requireAdminRead } from '../middleware/requireAdminRead.js';
@@ -520,6 +521,71 @@ adminRouter.post('/access-grants', async (req, res) => {
   await audit(req, null, kind === 'character' ? eveId : null, 'access_grant_add', null,
     invitedRole ? `${kind}:${eveId} role=${invitedRole}` : `${kind}:${eveId}`);
   res.status(201).json({ ok: true, id: rows[0].id });
+});
+
+// POST /api/admin/access-grants/:id/invite-mail — open a pre-filled EVE mail in
+// the ADMIN's own client, inviting the granted character to the deployment.
+//
+// Uses ESI's openwindow/newmail, which is covered by esi-ui.open_window.v1 —
+// already in SSO_SCOPES, so this needs no new consent and no re-login. It also
+// sends nothing on anyone's behalf: the window opens in the caller's client and
+// they press send, exactly like the autopilot-waypoint route.
+//
+// Wording comes from the caller (the admin UI has the translations); the LINK
+// does not — the server substitutes %URL% with FRONTEND_URL, so the invite always
+// points at this deployment and a client can't aim it somewhere else.
+const FRONTEND_URL = process.env.FRONTEND_URL ?? 'http://localhost:5174';
+// Deliberately NOT i18next's {{ }} syntax: the wording is translated client-side,
+// so a {{url}} token would be interpolated away there and never reach us.
+const URL_PLACEHOLDER = '%URL%';
+
+adminRouter.post('/access-grants/:id/invite-mail', async (req, res) => {
+  const { rows } = await db.query<{ kind: GrantKind; eve_id: string }>(
+    `SELECT kind, eve_id FROM access_grants WHERE id = $1`, [req.params.id],
+  );
+  if (!rows.length) { res.status(404).json({ error: 'not_found' }); return; }
+  if (rows[0].kind !== 'character') {
+    // Corp and alliance grants have no single mail recipient.
+    res.status(400).json({ error: 'character_only', message: 'Only a character grant can be mailed an invite.' }); return;
+  }
+  const recipientId = Number(rows[0].eve_id);
+  if (!Number.isInteger(recipientId) || recipientId <= 0) {
+    res.status(400).json({ error: 'invalid_recipient' }); return;
+  }
+
+  const subject = String(req.body?.subject ?? '').trim().slice(0, 200);
+  const bodyRaw = String(req.body?.body ?? '').trim().slice(0, 4000);
+  if (!subject || !bodyRaw) { res.status(400).json({ error: 'subject and body are required' }); return; }
+
+  // Always end up with the link in the mail: substitute the placeholder, and if
+  // a translation has lost it, append rather than send an invite with no URL.
+  const body = bodyRaw.includes(URL_PLACEHOLDER)
+    ? bodyRaw.split(URL_PLACEHOLDER).join(FRONTEND_URL)
+    : `${bodyRaw}\n\n${FRONTEND_URL}`;
+
+  try {
+    const token = await getValidToken(req.session.userId!);
+    const esiRes = await esiFetch('https://esi.evetech.net/latest/ui/openwindow/newmail/', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        subject,
+        body,
+        recipients: [{ recipient_id: recipientId, recipient_type: 'character' }],
+      }),
+    });
+    if (!esiRes.ok) {
+      // 520 is ESI's "the client isn't running / can't be reached" case, which
+      // is the common one here and worth telling the admin apart from a fault.
+      log.warn(`invite mail openwindow failed: ESI ${esiRes.status}`);
+      res.status(502).json({ error: 'esi_failed', status: esiRes.status }); return;
+    }
+    await audit(req, null, recipientId, 'access_grant_invite_mail', null, String(recipientId));
+    res.json({ ok: true });
+  } catch (err) {
+    log.error('Invite mail failed:', err);
+    res.status(500).json({ error: 'invite_mail_failed' });
+  }
 });
 
 // DELETE /api/admin/access-grants/:id — revoke a grant. env rows are immutable.

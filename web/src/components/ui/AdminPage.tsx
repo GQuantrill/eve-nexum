@@ -312,6 +312,27 @@ function AccessTab() {
     } finally { setSubmitting(false); }
   };
 
+  // Open a pre-filled EVE mail in the admin's own client. The server swaps
+  // %URL% for FRONTEND_URL, so the invite always points at this deployment.
+  const [mailing, setMailing] = useState<string | null>(null);
+  const mailInvite = async (g: AccessGrant) => {
+    setMailing(g.id); setError(null);
+    try {
+      await api(`/api/admin/access-grants/${g.id}/invite-mail`, {
+        method: 'POST',
+        body: JSON.stringify({
+          subject: t('admin.access.inviteMailSubject'),
+          body:    t('admin.access.inviteMailBody', { name: g.label }),
+        }),
+      });
+      toast.success(t('admin.access.inviteMailOpened'));
+    } catch {
+      // Much the likeliest cause is the admin not being logged into the game,
+      // since the window has to open in a running client.
+      setError(t('admin.access.inviteMailFailed'));
+    } finally { setMailing(null); }
+  };
+
   const removeGrant = async (g: AccessGrant) => {
     if (g.immutable) return;
     try {
@@ -446,6 +467,17 @@ function AccessTab() {
                   <td>{g.source === 'env' ? t('admin.access.sourceEnv') : g.source}</td>
                   <td>{g.addedByName ?? (g.source === 'env' ? t('admin.access.sourceEnv') : DASH)}</td>
                   <td>
+                    {g.kind === 'character' && (
+                      <button
+                        type="button"
+                        className="btn btn--ghost btn--sm"
+                        disabled={mailing === g.id}
+                        title={t('admin.access.inviteMailHint')}
+                        onClick={() => mailInvite(g)}
+                      >
+                        {mailing === g.id ? t('admin.access.inviteMailSending') : t('admin.access.inviteMail')}
+                      </button>
+                    )}
                     {g.immutable
                       ? <span className={styles.mPill} title={t('admin.access.envLockedHint')}>{t('admin.access.envLocked')}</span>
                       : <button type="button" className={`btn btn--ghost btn--sm ${styles.mDanger}`} onClick={() => removeGrant(g)}>
