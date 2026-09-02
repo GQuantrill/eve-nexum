@@ -31,6 +31,14 @@ async function encryptLegacyTokens() {
 // connections whose jump type the SDE contradicts, which this pass leaves
 // alone.
 async function syncSystemFactsFromSde() {
+  // solar_systems is created by the SDE importer (setup-db), NOT by migrate, so
+  // on a database that has never imported it the table simply isn't there —
+  // a fresh self-host, and the integration-test databases. Querying it anyway
+  // throws 42P01 and takes the whole migration (and the server start) with it.
+  const { rows: [sde] } = await db.query<{ present: boolean }>(
+    `SELECT to_regclass('public.solar_systems') IS NOT NULL AS present`);
+  if (!sde?.present) return;
+
   // Sorted so a difference in order alone doesn't count as drift.
   const sorted = (col: string) =>
     `COALESCE((SELECT array_agg(x ORDER BY x) FROM unnest(${col}) x), '{}')`;
