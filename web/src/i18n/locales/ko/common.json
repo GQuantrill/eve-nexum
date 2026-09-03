@@ -987,7 +987,7 @@
     "noHomeSet": "설정된 홈 성계가 없습니다. 성계를 우클릭 → “홈으로 설정”.",
     "failSetDest": "목적지 설정 실패",
     "failAddWaypoint": "경유지 추가 실패",
-    "canvasHint": "캔버스를 우클릭하여 성계 추가 · 핸들 사이를 드래그하여 연결 · Shift+클릭 또는 드래그로 다중 선택 · 성계를 우클릭하여 상호작용",
+    "canvasHint": "캔버스를 우클릭하여 성계 추가 · 핸들 사이를 드래그하여 연결 · Shift 또는 ⌘/Ctrl+클릭, 혹은 드래그로 다중 선택 · 성계를 우클릭하여 상호작용",
     "optimizeConnections": "연결 최적화",
     "spreadNodes": "노드 펼치기",
     "removeOrphans": "고립 성계 제거 ({{count}})",

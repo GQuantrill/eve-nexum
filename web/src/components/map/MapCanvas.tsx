@@ -70,6 +70,18 @@ import { HeatmapContext } from '../../context/HeatmapContext';
 import { heatValue, type HeatMetric } from '../../utils/heatmap';
 import { resolveIntelColor } from '../../utils/intelColors';
 
+// Modifier keys that add a system to the current selection on click, alongside
+// the shift-drag selection box.
+//
+// Ctrl on Windows/Linux, Cmd on macOS — NOT both. On a Mac, Ctrl+click IS a
+// right-click: it fires `contextmenu`, which opens the node menu, and no click
+// event follows. Binding Ctrl there would advertise a gesture that either does
+// nothing or fights the context menu, so each platform gets the modifier its
+// users already expect for multi-select.
+const IS_MAC = typeof navigator !== 'undefined'
+  && /mac|iphone|ipad|ipod/i.test(navigator.userAgent);
+const MULTI_SELECT_KEYS = ['Shift', IS_MAC ? 'Meta' : 'Control'];
+
 const NODE_TYPES = { system: SystemNode };
 
 // Zoom bounds — shared by the <ReactFlow> props and the inverted-wheel handler.
@@ -1534,7 +1546,10 @@ export function MapCanvas() {
         connectionMode={ConnectionMode.Loose}
         nodesConnectable={canEdit}
         nodesDraggable={canEdit}
-        multiSelectionKeyCode="Shift"
+        // Selection BOX stays shift-only: dragging with Ctrl/Cmd held is a
+        // pan or zoom gesture on most setups, so co-opting it would be worse
+        // than leaving it. Only click-to-add gains the extra modifier.
+        multiSelectionKeyCode={MULTI_SELECT_KEYS}
         selectionKeyCode="Shift"
         snapToGrid={snapToGrid}
         snapGrid={[20, 20]}

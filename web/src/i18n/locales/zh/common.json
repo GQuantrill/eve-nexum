@@ -987,7 +987,7 @@
     "noHomeSet": "未设置母星系。右键点击一个星系 →「设为母星系」。",
     "failSetDest": "设置目的地失败",
     "failAddWaypoint": "添加航路点失败",
-    "canvasHint": "右键画布添加星系 · 在连接点之间拖动以连接 · Shift+点击或拖动进行多选 · 右键星系进行交互",
+    "canvasHint": "右键点击画布添加星系 · 在连接点之间拖动以建立连接 · Shift 或 ⌘/Ctrl+点击，或拖动，可多选 · 右键点击星系进行操作",
     "optimizeConnections": "优化连接",
     "spreadNodes": "散开节点",
     "removeOrphans": "移除孤立星系 ({{count}})",

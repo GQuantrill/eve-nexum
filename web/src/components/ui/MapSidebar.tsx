@@ -1803,7 +1803,7 @@ export function MapSidebar() {
                   <div className="map-sidebar__shortcut"><kbd>H</kbd><span>{t("mapSidebar.shortcut.centreHome")}</span></div>
                   <div className="map-sidebar__shortcut"><kbd>Del</kbd><span>{t("mapSidebar.shortcut.removeSelected")}</span></div>
                   <div className="map-sidebar__shortcut"><kbd>⌘/Ctrl + Z</kbd><span>{t("mapSidebar.shortcut.undo")}</span></div>
-                  <div className="map-sidebar__shortcut"><kbd>Shift + click</kbd><span>{t("mapSidebar.shortcut.multiSelect")}</span></div>
+                  <div className="map-sidebar__shortcut"><kbd>Shift or ⌘/Ctrl + click</kbd><span>{t("mapSidebar.shortcut.multiSelect")}</span></div>
                   <div className="map-sidebar__shortcut"><kbd>Shift + drag</kbd><span>{t("mapSidebar.shortcut.rubberBand")}</span></div>
                   <div className="map-sidebar__shortcut"><kbd>Shift + ⌘/Ctrl + V</kbd><span>{t("mapSidebar.shortcut.overwriteSigs")}</span></div>
                   <p className="map-sidebar__shortcut-note">{t("mapSidebar.shortcut.vivaldiNote")}</p>
