@@ -43,6 +43,14 @@
     "searchPlaceholder": "パイロットまたはシステムで絞り込み",
     "noMatches": "一致なし"
   },
+  "pilotsOnline": {
+    "title": "オンラインのパイロット",
+    "none": "ここ数分でコーポのパイロットは確認されていません。",
+    "noMatches": "該当するパイロットがいません。",
+    "searchPlaceholder": "パイロット・艦船・システムで絞り込み",
+    "unknownLoc": "不明",
+    "hint": "直近5分間に Nexum が確認したパイロットです。時刻は最後の報告時点で、リアルタイムの位置ではありません。"
+  },
   "language": {
     "label": "言語"
   },

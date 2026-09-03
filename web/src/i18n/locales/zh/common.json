@@ -43,6 +43,14 @@
     "searchPlaceholder": "按飞行员或星系筛选",
     "noMatches": "无匹配项"
   },
+  "pilotsOnline": {
+    "title": "在线飞行员",
+    "none": "最近几分钟内没有看到军团飞行员。",
+    "noMatches": "没有匹配的飞行员。",
+    "searchPlaceholder": "按飞行员、舰船或星系筛选",
+    "unknownLoc": "未知",
+    "hint": "Nexum 在过去 5 分钟内看到的飞行员。时间为最后一次上报，并非实时位置。"
+  },
   "language": {
     "label": "语言"
   },

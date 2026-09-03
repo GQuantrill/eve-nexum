@@ -43,6 +43,14 @@
     "searchPlaceholder": "Filtrer par pilote ou système",
     "noMatches": "Aucun résultat"
   },
+  "pilotsOnline": {
+    "title": "Pilotes en ligne",
+    "none": "Aucun pilote de corpo vu ces dernières minutes.",
+    "noMatches": "Aucun pilote correspondant.",
+    "searchPlaceholder": "Filtrer par pilote, vaisseau ou système",
+    "unknownLoc": "Inconnu",
+    "hint": "Pilotes vus par Nexum ces 5 dernières minutes. L'heure correspond au dernier signalement, pas à une position en direct."
+  },
   "language": {
     "label": "Langue"
   },

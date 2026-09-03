@@ -43,6 +43,14 @@
     "searchPlaceholder": "파일럿 또는 시스템으로 필터",
     "noMatches": "일치 항목 없음"
   },
+  "pilotsOnline": {
+    "title": "접속 중인 파일럿",
+    "none": "최근 몇 분 동안 확인된 코퍼레이션 파일럿이 없습니다.",
+    "noMatches": "일치하는 파일럿이 없습니다.",
+    "searchPlaceholder": "파일럿, 함선 또는 성계로 필터",
+    "unknownLoc": "알 수 없음",
+    "hint": "최근 5분 이내에 Nexum이 확인한 파일럿입니다. 시간은 마지막으로 보고된 시점이며 실시간 위치가 아닙니다."
+  },
   "language": {
     "label": "언어"
   },
