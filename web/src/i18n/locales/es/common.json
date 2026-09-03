@@ -639,6 +639,8 @@
     "lazyRemoveWhHint": "Elimina periódicamente las firmas de agujero de gusano más antiguas que la vida útil máxima de su tipo. Si la firma sostenía una conexión sin nada más que la mantuviera, la conexión se marca como rota (en cuarentena) en lugar de eliminarse. Se ejecuta en el servidor, así que se aplica incluso cuando el mapa no está abierto.",
     "skipKspace": "No seguir el K-space",
     "skipKspaceHint": "Cuando está activado, solo registra el primer sistema K-space al que saltas desde el J-space y el último antes de volver a saltar al J-space, omitiendo todo lo que atraviesas por puertas en medio. Solo HS/LS/NS; Pochven siempre se rastrea.",
+    "hidePresence": "Ocultar mi presencia",
+    "hidePresenceHint": "Las demás personas que vean este mapa no sabrán dónde estás. Tu propio marcador sigue visible, y esto es independiente del seguimiento de saltos.",
     "corpSkipKspace": "No seguir el K-space (corp/alianza)",
     "corpSkipKspaceHint": "Cuando está activado, nadie en este mapa registra saltos por K-space. Solo el propietario o los administradores pueden cambiarlo.",
     "collapseGrace": "Margen de colapso",

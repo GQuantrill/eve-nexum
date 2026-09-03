@@ -1377,6 +1377,17 @@ export function MapSidebar() {
               <div className="map-sidebar__hint">{t("mapSidebar.skipKspaceHint")}</div>
             </>
           )}
+          {/* Separate from "track jumps": that one decides whether the map GROWS
+              as you fly, this one decides whether other people looking at the map
+              can see where you are. Someone who turns tracking off to stop
+              cluttering a map hasn't asked to disappear from their corp, so the
+              two stay independent. Your own you-are-here dot is unaffected. */}
+          <SettingToggle
+            settingKey="nexum.presence.hidden"
+            label={t("mapSidebar.hidePresence")}
+            defaultOn={false}
+          />
+          <div className="map-sidebar__hint">{t("mapSidebar.hidePresenceHint")}</div>
         </CollapsibleSection>
 
         <CollapsibleSection title={t("mapSidebar.sections.route")} {...sectionProps("route")}>
