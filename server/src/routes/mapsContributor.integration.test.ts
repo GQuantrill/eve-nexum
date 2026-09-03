@@ -167,15 +167,21 @@ describe.skipIf(!dbReady)('contributor role (integration)', () => {
   // ── the alt case ───────────────────────────────────────────────────────────
 
   it('accepts a tracked add from an alt on the same account', async () => {
+    // owner_id is a FK to owners(id) — the multi-account grouping — not a
+    // users.id. Both characters have to point at one real owner row, which is
+    // exactly the shape resolveOwnerId reads.
+    const ownerId = (await db.query<{ id: number }>(
+      `INSERT INTO owners DEFAULT VALUES RETURNING id`)).rows[0].id;
     const altId = await seedUser({ characterId: 3, corpId: CORP, role: 'contributor' });
-    await db.query(`UPDATE users SET owner_id = $1, last_known_system_id = 30000144 WHERE id = $2`, [contributor.id, altId]);
-    await db.query(`UPDATE users SET owner_id = $1, last_known_system_id = 30009999 WHERE id = $1`, [contributor.id]);
+    // The ALT is in the system being added; the session character is elsewhere.
+    await db.query(`UPDATE users SET owner_id = $1, last_known_system_id = 30000144 WHERE id = $2`, [ownerId, altId]);
+    await db.query(`UPDATE users SET owner_id = $1, last_known_system_id = 30009999 WHERE id = $2`, [ownerId, contributor.id]);
     const app = express();
     app.use(express.json());
     app.use((req, _res, next) => {
       (req as express.Request & { session: Record<string, unknown> }).session = {
         userId: contributor.id, characterId: 2, role: 'contributor',
-        userCorpId: CORP, userAllianceId: null, ownerId: contributor.id,
+        userCorpId: CORP, userAllianceId: null, ownerId,
       };
       next();
     });
