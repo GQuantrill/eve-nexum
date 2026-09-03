@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { charPortrait } from '../../utils/eveImages';
+import { CLASS_COLORS } from '../../data/wormholes';
+import type { SystemClass } from '../../types';
 import { usePilotsOnline } from '../../hooks/usePilotsOnline';
 import { useSystemAlias } from '../../hooks/useSystemAlias';
 import { timeAgo } from '../../i18n/format';
@@ -62,27 +64,46 @@ export function PilotsOnlinePane() {
                   : p.shipTypeName)
               : null;
             const where = p.systemName ? aliasName(p.systemName) : null;
+            const classColor = p.systemClass
+              ? CLASS_COLORS[p.systemClass as SystemClass]
+              : undefined;
             return (
-              <li key={p.characterId} className="fleet-pane__row">
+              <li key={p.characterId} className="pilots-card">
                 <img
-                  className="fleet-pane__avatar"
-                  src={charPortrait(p.characterId, 32)}
+                  className="pilots-card__avatar"
+                  src={charPortrait(p.characterId, 64)}
                   alt=""
                   loading="lazy"
                 />
-                <span className="fleet-pane__name" title={p.characterName}>{p.characterName}</span>
-                <span className="fleet-pane__loc" title={ship ?? undefined}>
-                  {ship ?? DASH}
-                </span>
-                <span
-                  className="fleet-pane__loc"
-                  title={p.regionName ? `${where} — ${p.regionName}` : undefined}
-                >
-                  {where ?? t('pilotsOnline.unknownLoc')}
-                </span>
-                <span className="fleet-pane__jumps" title={new Date(p.lastSeenAt).toLocaleString()}>
-                  {timeAgo(t, new Date(p.lastSeenAt))}
-                </span>
+                <div className="pilots-card__body">
+                  {/* The name gets the whole first line. It's the field you
+                      scan for, and sharing the line with the age cost it ~50px
+                      in a 239px sidebar — enough to truncate most EVE names.
+                      The age moves to the location line, where losing a few
+                      characters off a region name matters far less. */}
+                  <div className="pilots-card__name" title={p.characterName}>
+                    {p.characterName}
+                  </div>
+                  <div className="pilots-card__ship" title={ship ?? undefined}>
+                    {ship ?? DASH}
+                  </div>
+                  <div className="pilots-card__line">
+                    <span className="pilots-card__loc">
+                      <span style={classColor ? { color: classColor } : undefined}>
+                        {where ?? t('pilotsOnline.unknownLoc')}
+                      </span>
+                      {p.regionName && (
+                        <span className="pilots-card__region"> {p.regionName}</span>
+                      )}
+                    </span>
+                    <span
+                      className="pilots-card__age"
+                      title={new Date(p.lastSeenAt).toLocaleString()}
+                    >
+                      {timeAgo(t, new Date(p.lastSeenAt))}
+                    </span>
+                  </div>
+                </div>
               </li>
             );
           })}
