@@ -23,7 +23,7 @@ import {
   createAnomaly, updateAnomaly, deleteAnomaly,
   createStructure, updateStructure, deleteStructure,
 } from '../services/mapWrite.js';
-import { reportPresence } from '../services/presence.js';
+import { reportPresence, removePresence } from '../services/presence.js';
 import { copyMap } from '../services/mapCopy.js';
 import { notifyDiscord, k162Embed, connectionEmbed, chainEmbed, kspaceExitEmbed } from '../services/discord.js';
 import { shortestRoutes } from '../services/routeGraph.js';
@@ -2198,6 +2198,21 @@ mapsRouter.get('/:mapId/kills/backfill', async (req, res) => {
   const buffered = recentKillsForSystems(systemIds, 200);
   const kills = await Promise.all(buffered.map(buildKillRow));
   res.json(kills);
+});
+
+// DELETE /api/maps/:mapId/presence — drop this viewer from the roster now.
+// Sent when someone turns on "hide my presence": the heartbeat stopping would
+// clear them eventually, but the 60 s TTL means up to a minute still visible
+// after asking not to be. Identity is the session's, so this can only ever
+// remove yourself.
+mapsRouter.delete('/:mapId/presence', async (req, res) => {
+  const { mapId } = req.params;
+  const access = await getMapAccess(mapId, req);
+  if (!access) { res.status(404).json({ error: 'Map not found' }); return; }
+  const characterId = req.session.characterId;
+  if (!characterId) { res.status(401).json({ error: 'No character on session' }); return; }
+  removePresence(mapId, characterId);
+  res.json({ ok: true });
 });
 
 // POST /api/maps/:mapId/presence — a viewer reports its current location.

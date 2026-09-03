@@ -647,6 +647,8 @@
     "lazyRemoveWhHint": "Remove periodicamente assinaturas de buraco de minhoca mais antigas que a vida útil máxima do seu tipo. Se a assinatura sustentava uma conexão sem mais nada a segurá-la, a conexão é marcada como quebrada (em quarentena) em vez de eliminada. É executado no servidor, por isso aplica-se mesmo quando o mapa não está aberto.",
     "skipKspace": "Não rastrear o K-space",
     "skipKspaceHint": "Quando ativado, registra apenas o primeiro sistema K-space em que você entra a partir do J-space e o último antes de saltar de volta ao J-space — ignorando tudo o que você atravessa por portões no meio. Apenas HS/LS/NS; Pochven é sempre rastreado.",
+    "hidePresence": "Ocultar a minha presença",
+    "hidePresenceHint": "As outras pessoas a ver este mapa não verão onde estás. O teu próprio marcador continua visível e isto é independente do registo de saltos.",
     "corpSkipKspace": "Não rastrear o K-space (corp/aliança)",
     "corpSkipKspaceHint": "Quando ativado, ninguém neste mapa registra saltos pelo K-space. Apenas o proprietário/administradores podem alterar isso.",
     "collapseGrace": "Margem de colapso",
