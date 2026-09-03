@@ -361,6 +361,68 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+/* ── Pilots Online cards ──────────────────────────────────────────────────
+   The fleet row packs name / location / jumps onto one line, which works for
+   three short fields. Pilots Online carries four — name, ship, system and how
+   long ago — and squeezing those into a row truncated every one of them (the
+   name lost outright, since .fleet-pane__loc alone claims 42% twice over).
+   A card gives each its own line and full width. Sizes use --font-scale like
+   the rest of the panel so they follow the user's own scaling. */
+.pilots-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 6px;
+  border-radius: 6px;
+  background: var(--surface-raised);
+}
+.pilots-card:hover { background: var(--surface-hover); }
+.pilots-card__avatar {
+  width: calc(40px * var(--font-scale, 1));
+  height: calc(40px * var(--font-scale, 1));
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.pilots-card__body {
+  flex: 1;
+  min-width: 0;          /* lets the ellipsis work inside a flex child */
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.pilots-card__line {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px;
+  min-width: 0;
+}
+.pilots-card__name {
+  min-width: 0;
+  max-width: 100%;
+  color: var(--text-default);
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pilots-card__age {
+  flex-shrink: 0;
+  color: var(--text-faintest);
+  font-size: calc(11px * var(--font-scale, 1));
+  white-space: nowrap;
+}
+.pilots-card__ship,
+.pilots-card__loc {
+  color: var(--text-subtle);
+  font-size: calc(12px * var(--font-scale, 1));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pilots-card__region { color: var(--text-faintest); }
+
 .fleet-pane__jumps {
   flex-shrink: 0;
   color: #9fb3cd;
