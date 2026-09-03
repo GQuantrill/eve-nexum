@@ -898,6 +898,18 @@ export async function migrate() {
     ALTER TABLE users ADD COLUMN IF NOT EXISTS last_known_system_id INTEGER;
     ALTER TABLE users ADD COLUMN IF NOT EXISTS last_known_system_at TIMESTAMPTZ;
 
+    -- "Pilots online" needs two things last_known_system_at can't give it.
+    -- That column is written only when a pilot MOVES, so it means "last jumped",
+    -- not "last seen" — someone docked for an hour reads as long gone. last_seen_at
+    -- is touched on every location read instead (throttled to once a minute), so
+    -- recency actually means recency. Ship is recorded on the same write: the
+    -- location poll already fetches it, so this costs no extra ESI call.
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS last_seen_at   TIMESTAMPTZ;
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS ship_type_id   INTEGER;
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS ship_name      TEXT;
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS ship_type_name TEXT;
+    CREATE INDEX IF NOT EXISTS idx_users_last_seen ON users (last_seen_at DESC) WHERE last_seen_at IS NOT NULL;
+
     -- True last-login timestamp, written only on an SSO auth (see auth callback).
     -- Distinct from updated_at, which is bumped by token refreshes, location
     -- tracking, the SDE/standings jobs, etc. — so it can't stand in for "last

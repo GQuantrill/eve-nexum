@@ -19,6 +19,39 @@ const SESSIONS_DDL = `
     expire timestamp(6) NOT NULL
   );`;
 
+// solar_systems / map_regions come from the SDE importer (setup-db), not from
+// migrate(), so a test database has neither — and any route that joins them
+// (account-locations, pilots-online, the region reads) 500s with "relation does
+// not exist". Created here with the same shape setup-db uses, left EMPTY: suites
+// that need a system seed one, and everything else behaves exactly as before
+// against a table with no rows.
+//
+// The column list matters. A narrower stub is worse than nothing: migrate()'s
+// SDE sync sees the table exist and then fails on the columns it's missing,
+// which breaks every suite rather than one.
+const SDE_DDL = `
+  CREATE TABLE IF NOT EXISTS map_regions (
+    id       INTEGER PRIMARY KEY,
+    name     TEXT,
+    npc_type TEXT
+  );
+  CREATE TABLE IF NOT EXISTS solar_systems (
+    id               INTEGER      PRIMARY KEY,
+    name             TEXT         NOT NULL,
+    security         NUMERIC(6,4) NOT NULL DEFAULT 0,
+    class            TEXT,
+    effect           TEXT,
+    statics          TEXT[]       NOT NULL DEFAULT '{}',
+    constellation_id INTEGER,
+    region_id        INTEGER,
+    shattered        BOOLEAN      NOT NULL DEFAULT FALSE,
+    pos_x            DOUBLE PRECISION,
+    pos_y            DOUBLE PRECISION,
+    pos_z            DOUBLE PRECISION,
+    pos2d_x          DOUBLE PRECISION,
+    pos2d_y          DOUBLE PRECISION
+  );`;
+
 let ready: Promise<boolean> | null = null;
 
 export function ensureIntegrationDb(): Promise<boolean> {
@@ -31,6 +64,7 @@ export function ensureIntegrationDb(): Promise<boolean> {
       }
       await migrate();
       await db.query(SESSIONS_DDL);
+      await db.query(SDE_DDL);
       return true;
     })();
   }
@@ -38,6 +72,7 @@ export function ensureIntegrationDb(): Promise<boolean> {
 }
 
 const TABLES = [
+  'solar_systems', 'map_regions',
   'access_grants', 'app_settings', 'map_shares', 'maps',
   'corp_standings', 'alliance_standings', 'character_standings',
   'standings_refresh', 'entity_names', 'sessions', 'user_events', 'users',

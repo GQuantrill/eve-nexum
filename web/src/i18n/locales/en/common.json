@@ -82,6 +82,14 @@
     "searchPlaceholder": "Filter by pilot or system",
     "noMatches": "No matches"
   },
+  "pilotsOnline": {
+    "title": "Pilots Online",
+    "none": "No corp pilots seen in the last few minutes.",
+    "noMatches": "No pilots match.",
+    "searchPlaceholder": "Filter by pilot, ship or system",
+    "unknownLoc": "Unknown",
+    "hint": "Pilots seen by Nexum in the last 5 minutes. The time is when they last checked in, not a live position."
+  },
   "language": {
     "label": "Language"
   },

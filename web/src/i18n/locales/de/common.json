@@ -43,6 +43,14 @@
     "searchPlaceholder": "Nach Pilot oder System filtern",
     "noMatches": "Keine Treffer"
   },
+  "pilotsOnline": {
+    "title": "Piloten online",
+    "none": "In den letzten Minuten wurden keine Corp-Piloten gesehen.",
+    "noMatches": "Keine passenden Piloten.",
+    "searchPlaceholder": "Nach Pilot, Schiff oder System filtern",
+    "unknownLoc": "Unbekannt",
+    "hint": "Von Nexum in den letzten 5 Minuten gesehene Piloten. Die Zeit ist die letzte Rückmeldung, keine Live-Position."
+  },
   "language": {
     "label": "Sprache"
   },

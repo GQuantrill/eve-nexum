@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { config } from '../config.js';
 import { esiFetch } from '../utils/esi.js';
 import { db } from '../db.js';
 import { requireAuth } from '../middleware/requireAuth.js';
@@ -156,6 +157,21 @@ async function getLocationPayload(userId: number): Promise<LocationPayload> {
   }
   lastSeenSystem.set(userId, loc.solarSystemId);
 
+  // Liveness + ship for the Pilots Online panel. Throttled to once a minute:
+  // this path runs every 10 s per active pilot, and the panel only needs to know
+  // they were around recently, not to the second. Fire-and-forget — a failed
+  // touch must never affect the location read that the map depends on.
+  db.query(
+    `UPDATE users
+        SET last_seen_at    = NOW(),
+            ship_type_id    = $2,
+            ship_name       = $3,
+            ship_type_name  = $4
+      WHERE id = $1
+        AND (last_seen_at IS NULL OR last_seen_at < NOW() - interval '1 minute')`,
+    [userId, ship?.typeId ?? null, ship?.shipName ?? null, ship?.typeName ?? null],
+  ).catch(() => { /* best-effort liveness */ });
+
   const { rows } = await db.query(
     `SELECT s.id AS "eveSystemId", s.name, s.class AS "systemClass",
             COALESCE(s.effect, 'none') AS effect, s.statics,
@@ -229,6 +245,60 @@ async function readCharacterSystem(userId: number, characterId: number): Promise
 // GET /api/character/account-locations — where each of the account's OTHER
 // characters currently is (live when online, else their last known system), so
 // the map can show your alts. The active character has its own you-are-here.
+// GET /api/character/pilots-online — everyone in the caller's corp (or alliance
+// on an alliance install) seen recently, with where they were and what they were
+// flying.
+//
+// "Online" here means "recently seen by Nexum", inferred from last_seen_at
+// rather than asked of ESI: a live check would be one ESI call per corp member
+// per viewer, which is exactly the fan-out the rate limiting exists to prevent.
+// The honest reading of a row is "was here N minutes ago", which is why the
+// client shows the age rather than a bare green dot.
+//
+// Anyone with "hide my presence" set is left out. Hiding from the map but
+// appearing on a list of everyone's whereabouts would make that setting a lie.
+const PILOTS_ONLINE_WINDOW_MIN = 5;
+
+characterRouter.get('/pilots-online', async (req, res) => {
+  const me = req.session;
+  if (!me.userId) { res.status(401).json({ error: 'Not authenticated' }); return; }
+
+  // Alliance installs scope to the alliance, corp installs to the corp. Neither
+  // set means a solo install, where there is nobody else to list.
+  const scopeCol = config.allianceMode && me.userAllianceId ? 'alliance_id' : 'corp_id';
+  const scopeVal = scopeCol === 'alliance_id' ? me.userAllianceId : me.userCorpId;
+  if (scopeVal == null) { res.json([]); return; }
+
+  try {
+    const { rows } = await db.query(
+      `SELECT u.character_id                       AS "characterId",
+              u.character_name                     AS "characterName",
+              u.ship_type_name                     AS "shipTypeName",
+              u.ship_name                          AS "shipName",
+              u.last_seen_at                       AS "lastSeenAt",
+              u.last_known_system_at               AS "lastMovedAt",
+              s.id                                 AS "eveSystemId",
+              s.name                               AS "systemName",
+              s.class                              AS "systemClass",
+              r.name                               AS "regionName"
+         FROM users u
+         LEFT JOIN solar_systems s ON s.id = u.last_known_system_id
+         LEFT JOIN map_regions   r ON r.id = s.region_id
+        WHERE u.${scopeCol} = $1
+          AND u.id <> $2
+          AND u.blocked = FALSE
+          AND u.last_seen_at > NOW() - ($3 || ' minutes')::interval
+          AND COALESCE(u.ui_settings->>'nexum.presence.hidden', 'false') <> 'true'
+        ORDER BY u.last_seen_at DESC`,
+      [scopeVal, me.userId, String(PILOTS_ONLINE_WINDOW_MIN)],
+    );
+    res.json(rows);
+  } catch (err) {
+    log.error('pilots-online failed:', err);
+    res.status(500).json({ error: 'Failed to load pilots' });
+  }
+});
+
 characterRouter.get('/account-locations', async (req, res) => {
   const ownerId = await resolveOwnerId(req);
   if (ownerId == null) { res.json({ characters: [] }); return; }

@@ -6,6 +6,7 @@ import type { DragEndEvent, Modifier } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 import { DraggableCard } from './DraggableCard';
 import { ScoutConnectionsPane } from './ScoutConnectionsPane';
+import { PilotsOnlinePane } from './PilotsOnlinePane';
 import { A0Pane } from './A0Pane';
 import { ClosestSystemsPane } from './ClosestSystemsPane';
 import { FleetPane } from './FleetPane';
@@ -32,9 +33,9 @@ function loadWidth(): number {
 }
 
 type Side    = 'left' | 'right';
-type PanelId = 'watchlist' | 'chains' | 'thera' | 'turnur' | 'a0' | 'closest' | 'fleet';
+type PanelId = 'watchlist' | 'chains' | 'thera' | 'turnur' | 'a0' | 'closest' | 'fleet' | 'pilotsOnline';
 
-const DEFAULT_ORDER: PanelId[] = ['watchlist', 'chains', 'closest', 'thera', 'turnur', 'fleet', 'a0'];
+const DEFAULT_ORDER: PanelId[] = ['watchlist', 'chains', 'closest', 'thera', 'turnur', 'fleet', 'pilotsOnline', 'a0'];
 const VALID_PANEL_IDS: ReadonlySet<PanelId> = new Set(DEFAULT_ORDER);
 
 // The panels form a single vertical column, so a drag should only ever move a
@@ -63,6 +64,7 @@ export function Sidebar() {
     a0:      t('sidebar.a0'),
     closest: t('sidebar.closest'),
     fleet:   t('sidebar.fleet'),
+    pilotsOnline: t('pilotsOnline.title'),
   };
   // Cross-device prefs via useUserSetting (server-backed JSONB).
   const [sideRaw,      setSide]      = useUserSetting<Side>(SIDE_KEY, 'left');
@@ -144,6 +146,7 @@ export function Sidebar() {
     a0:      <A0Pane />,
     closest: <ClosestSystemsPane />,
     fleet:   <FleetPane />,
+    pilotsOnline: <PilotsOnlinePane />,
   };
 
   return (
