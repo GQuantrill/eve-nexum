@@ -13,5 +13,8 @@ export function useCanEditContent(): boolean {
 
   if (!user) return false;
   if (!isCorpMap && !isAllianceMap) return true;
-  return isAdminRole(user.role) || user.role === 'full' || user.role === 'edit';
+  // 'contributor' belongs here and NOT in useCanEdit: signatures, anomalies,
+  // structures and notes are theirs to edit; the map's layout isn't.
+  return isAdminRole(user.role) || user.role === 'full' || user.role === 'edit'
+      || user.role === 'contributor';
 }

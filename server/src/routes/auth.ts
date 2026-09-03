@@ -252,7 +252,7 @@ authRouter.get('/callback', async (req, res) => {
     );
 
     const userId = rows[0].id;
-    const role   = rows[0].role as 'alliance_admin' | 'admin' | 'full' | 'edit' | 'readonly';
+    const role   = rows[0].role as 'alliance_admin' | 'admin' | 'full' | 'edit' | 'contributor' | 'readonly';
 
     // Blocked users can never sign in. ADMIN_CHAR_ID is the safety hatch:
     // it can't be blocked by the role/block flow, but if the DB row somehow
@@ -397,7 +397,7 @@ authRouter.post('/switch-character', async (req, res) => {
   req.session.userId        = targetId;
   req.session.characterId   = u.character_id;
   req.session.characterName = u.character_name;
-  req.session.role          = u.role as 'alliance_admin' | 'admin' | 'full' | 'edit' | 'readonly';
+  req.session.role          = u.role as 'alliance_admin' | 'admin' | 'full' | 'edit' | 'contributor' | 'readonly';
   req.session.userCorpId    = u.corp_id;
   // Critical: refresh the alliance too, else the switched-to character keeps the
   // PREVIOUS character's alliance and gets cross-alliance map access/write/mgmt.
@@ -471,7 +471,7 @@ authRouter.get('/me', async (req, res) => {
       uiSettings:  row?.ui_settings ?? {},
       panelOrder:  row?.panel_order  ?? ['notes', 'signatures'],
     };
-    role = (row?.role as 'alliance_admin' | 'admin' | 'full' | 'edit' | 'readonly') ?? 'readonly';
+    role = (row?.role as 'alliance_admin' | 'admin' | 'full' | 'edit' | 'contributor' | 'readonly') ?? 'readonly';
     req.session.prefs = prefs;
     req.session.role  = role;
   }

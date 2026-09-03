@@ -3,7 +3,7 @@ import { db } from '../db.js';
 import { config } from '../config.js';
 import { isAdmin, type Role } from './authContext.js';
 
-const KNOWN_ROLES = new Set<Role>(['alliance_admin', 'admin', 'full', 'edit', 'readonly']);
+const KNOWN_ROLES = new Set<Role>(['alliance_admin', 'admin', 'full', 'edit', 'contributor', 'readonly']);
 
 export async function requireAdminRead(req: Request, res: Response, next: NextFunction) {
   if (!req.session.userId) {

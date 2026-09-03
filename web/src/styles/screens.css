@@ -144,5 +144,9 @@
 .role-badge--admin    { background: #3a1c2a; color: #f0a8c0; border-color: #6a2e48; }
 .role-badge--full     { background: var(--border); color: var(--accent-light); border-color: var(--border-accent-strong); }
 .role-badge--edit     { background: #1a2e1a; color: #8ad08a; border-color: #2e5a2e; }
+/* Contributor sits between edit and readonly: a cooler, dimmer green than
+   edit, so the two read as related capabilities at a glance without being
+   mistaken for each other. */
+.role-badge--contributor { background: #16282c; color: #7fc4c4; border-color: #2a4d52; }
 .role-badge--readonly { background: var(--surface-hover); color: var(--text-subtle); border-color: var(--border-strong); }
 

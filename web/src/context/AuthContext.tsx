@@ -4,7 +4,7 @@ import { toast } from '../components/ui/Toaster';
 import i18n from '../i18n';
 
 // Role tiers, low to high: readonly < edit < full < admin < alliance_admin.
-export type Role = 'alliance_admin' | 'admin' | 'full' | 'edit' | 'readonly';
+export type Role = 'alliance_admin' | 'admin' | 'full' | 'edit' | 'contributor' | 'readonly';
 
 /** True for corp admin OR alliance admin — every admin capability. */
 export function isAdminRole(role: Role): boolean {
@@ -17,7 +17,7 @@ export function isAllianceAdminRole(role: Role): boolean {
 
 // The canonical role order (highest tier first), for pickers and the roles
 // explainer. `readonly` is the default for a new member.
-export const ROLE_ORDER: Role[] = ['alliance_admin', 'admin', 'full', 'edit', 'readonly'];
+export const ROLE_ORDER: Role[] = ['alliance_admin', 'admin', 'full', 'edit', 'contributor', 'readonly'];
 
 /** Human display label for a role id: 'alliance_admin' -> 'Alliance admin'. */
 export function formatRole(role: Role): string {

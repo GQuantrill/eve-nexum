@@ -5,7 +5,7 @@ declare module 'express-session' {
     userId: number;
     characterId: number;
     characterName: string;
-    role: 'alliance_admin' | 'admin' | 'full' | 'edit' | 'readonly';
+    role: 'alliance_admin' | 'admin' | 'full' | 'edit' | 'contributor' | 'readonly';
     userCorpId?: number | null;
     userAllianceId?: number | null;
     // The account (human) this session belongs to. All of the owner's

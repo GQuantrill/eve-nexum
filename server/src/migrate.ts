@@ -994,8 +994,14 @@ export async function migrate() {
     -- Applied ONLY when the users row is created — see the role policy in
     -- routes/auth.ts — so a stale invite can never re-promote someone an admin
     -- has since demoted.
-    ALTER TABLE access_grants ADD COLUMN IF NOT EXISTS role TEXT
-      CHECK (role IS NULL OR role IN ('alliance_admin','admin','full','edit','readonly'));
+    ALTER TABLE access_grants ADD COLUMN IF NOT EXISTS role TEXT;
+    -- The role vocabulary grows ('contributor' was added after this column
+    -- shipped), so the constraint is replaced rather than created once —
+    -- ADD COLUMN IF NOT EXISTS won't revisit a CHECK on a column that already
+    -- exists, which would leave a deployed database rejecting the new role.
+    ALTER TABLE access_grants DROP CONSTRAINT IF EXISTS access_grants_role_check;
+    ALTER TABLE access_grants ADD CONSTRAINT access_grants_role_check
+      CHECK (role IS NULL OR role IN ('alliance_admin','admin','full','edit','contributor','readonly'));
 
     -- Deployment-level key/value settings (distinct from per-user ui_settings).
     -- Phase 3 uses standings_login_enabled ('true'|'false') and

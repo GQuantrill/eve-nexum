@@ -2,7 +2,7 @@ import type { Request, Response, NextFunction } from 'express';
 import { db } from '../db.js';
 import { isAdmin, type Role } from './authContext.js';
 
-const KNOWN_ROLES = new Set<Role>(['alliance_admin', 'admin', 'full', 'edit', 'readonly']);
+const KNOWN_ROLES = new Set<Role>(['alliance_admin', 'admin', 'full', 'edit', 'contributor', 'readonly']);
 
 // Re-verifies admin role against the DB on every call so a freshly-demoted
 // admin can't keep using their old session. The session field is kept in
