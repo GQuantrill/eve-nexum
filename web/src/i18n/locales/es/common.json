@@ -358,6 +358,7 @@
         "admin": "Administración de corporación: gestiona los usuarios de tu corp (cambiar roles, bloquear), bloquea mapas y todo lo que puede Full.",
         "full": "Crear, eliminar y bloquear mapas de corp y alianza, además de toda la edición.",
         "edit": "Editar mapas: sistemas, conexiones, firmas, estructuras y notas, pero no crear, eliminar ni bloquear mapas.",
+        "contributor": "Editar firmas, anomalías y estructuras. Los sistemas y conexiones solo se registran con su propio movimiento; no puede añadirlos, moverlos ni borrarlos a mano.",
         "readonly": "Solo lectura. Puede ver los mapas pero no cambiar nada."
       }
     }

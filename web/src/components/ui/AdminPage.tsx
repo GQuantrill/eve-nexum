@@ -27,8 +27,8 @@ import styles from './AdminPage.module.css';
 // Register only the chart pieces we actually use — keeps the bundle lean.
 ChartJS.register(ArcElement, CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend, Filler);
 
-type Role = 'alliance_admin' | 'admin' | 'full' | 'edit' | 'readonly';
-const ROLES: Role[] = ['alliance_admin', 'admin', 'full', 'edit', 'readonly'];
+type Role = 'alliance_admin' | 'admin' | 'full' | 'edit' | 'contributor' | 'readonly';
+const ROLES: Role[] = ['alliance_admin', 'admin', 'full', 'edit', 'contributor', 'readonly'];
 
 // Explainer modal for the role tiers, opened from the "Roles?" button on the
 // users tab. The alliance tier is only listed when the deployment uses it.

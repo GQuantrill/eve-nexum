@@ -3,7 +3,7 @@ import { esiFetch } from '../utils/esi.js';
 import type { Request, Response } from 'express';
 import { db } from '../db.js';
 import { requireAuth } from '../middleware/requireAuth.js';
-import { authUser, isAdmin, isAllianceAdmin } from '../middleware/authContext.js';
+import { authUser, isAdmin, isAllianceAdmin, canEditTopology } from '../middleware/authContext.js';
 import { config } from '../config.js';
 import { standingPermitsTarget, grantKindAllowedForInstall, requiresPositiveStanding } from '../services/accessGrants.js';
 import { decryptToken } from '../utils/tokenCrypto.js';
@@ -16,6 +16,7 @@ import { streamMapEvents } from '../services/mapStream.js';
 import { listVisibleMaps, loadFullMap, loadSystemSignatures, loadSystemAnomalies, loadSystemStructures, CONNECTION_COLS } from '../services/mapRead.js';
 import { connectionTypeError, connectionEndpointEveIds, systemEveIds } from '../services/connectionRules.js';
 import { sdeSystemFacts } from '../services/sdeFacts.js';
+import { contributorIsAtSystem, contributorMayLinkSystems } from '../services/contributorMovement.js';
 import { listConnectionJumps, recordConnectionJump, setConnectionJumpHot, clearConnectionJumps } from '../services/connectionJumps.js';
 import {
   createSignature, updateSignature, deleteSignature,
@@ -266,9 +267,28 @@ export async function requireMapContentWrite(res: Response, mapId: string, req: 
   return access;
 }
 
-async function requireMapWrite(res: Response, mapId: string, req: Request): Promise<MapMeta | null> {
+// `movementExempt` is for the two routes a 'contributor' may reach — creating
+// the system they just jumped into and the connection that jump implies. They
+// still have to PROVE it (contributorIsAtSystem / contributorMayLinkSystems in
+// the handlers); this flag only stops the blanket role refusal below from
+// rejecting them before that check can run.
+async function requireMapWrite(
+  res: Response, mapId: string, req: Request, movementExempt = false,
+): Promise<MapMeta | null> {
   const access = await requireMapContentWrite(res, mapId, req);
   if (!access) return null;
+
+  // A map's shape isn't a contributor's to change: no manual system add, no
+  // moving or deleting systems, no connections, no rename. Content — signatures,
+  // anomalies, structures, notes — went through requireMapContentWrite above and
+  // stays open to them. The map's own owner is exempt: it's their map.
+  if (!movementExempt && access.accessKind !== 'owner' && !canEditTopology(authUser(req).role)) {
+    res.status(403).json({
+      error: 'topology_forbidden',
+      message: 'Your role can edit signatures, anomalies and structures, but not the map layout.',
+    });
+    return null;
+  }
 
   // Topology (systems/connections/rename) is human-only — even a 'write' key,
   // which clears requireMapContentWrite above, can't reshape the map.
@@ -2422,12 +2442,26 @@ mapsRouter.delete('/:mapId', async (req, res) => {
 
 mapsRouter.post('/:mapId/systems', async (req, res) => {
   const { mapId } = req.params;
-  const access = await requireMapWrite(res, mapId, req);
+  const access = await requireMapWrite(res, mapId, req, true);
   if (!access) return;
 
   const { id, eveSystemId, name, systemClass, effect, statics, regionName, npcType, position, status, isHome, locked, notes } = req.body;
 
   const resolvedEveId = await resolveEveSystemId(eveSystemId, name);
+
+  // A contributor may only add the system they are actually sitting in — that
+  // is what "added by tracking" means, checked against the location poll rather
+  // than trusted from the request. A right-click "add system" or "add adjacent"
+  // names somewhere they aren't, so it lands here and is refused.
+  if (access.accessKind !== 'owner' && !canEditTopology(authUser(req).role)) {
+    if (resolvedEveId == null || !(await contributorIsAtSystem(req, resolvedEveId))) {
+      res.status(403).json({
+        error: 'topology_forbidden',
+        message: 'Your role can only add the system you are currently in.',
+      });
+      return;
+    }
+  }
 
   // Class / effect / statics are CCP's, not the caller's: when the system
   // resolves to a real one the SDE row wins. Unresolved systems (custom nodes,
@@ -2663,8 +2697,21 @@ mapsRouter.post('/:mapId/connections', async (req, res) => {
   const { mapId } = req.params;
   const { id, sourceId, targetId, sourceHandle, targetHandle, connectionType, massStatus, timeStatus, size, sourceEveId, targetEveId } = req.body;
 
-  const access = await requireMapWrite(res, mapId, req);
+  const access = await requireMapWrite(res, mapId, req, true);
   if (!access) return;
+
+  // Same rule for the link a jump implies: one end has to be where the caller
+  // actually is. Drawing a connection between two other systems isn't movement
+  // and is refused.
+  if (access.accessKind !== 'owner' && !canEditTopology(authUser(req).role)) {
+    if (!(await contributorMayLinkSystems(req, String(sourceId), String(targetId)))) {
+      res.status(403).json({
+        error: 'topology_forbidden',
+        message: 'Your role can only create the connection your own jump makes.',
+      });
+      return;
+    }
+  }
 
   // Auto-classify in-game gates: a connection between two stargate-adjacent SDE
   // systems is a gate, not a wormhole. Only when the client sent the default

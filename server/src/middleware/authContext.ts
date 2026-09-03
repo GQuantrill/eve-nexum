@@ -10,7 +10,7 @@ import type { Request } from 'express';
 // (the whole alliance vs a single corp), not editing capability. Use the
 // isAdmin/isAllianceAdmin helpers below rather than bare `=== 'admin'` so
 // alliance admins inherit every admin capability.
-export type Role = 'alliance_admin' | 'admin' | 'full' | 'edit' | 'readonly';
+export type Role = 'alliance_admin' | 'admin' | 'full' | 'edit' | 'contributor' | 'readonly';
 
 // True for any identity with admin capability (corp admin OR alliance admin):
 // lock bypass, corp-map lifecycle, admin tooling. NOT a scope check — see
@@ -23,6 +23,16 @@ export function isAdmin(role: Role): boolean {
 // alliance maps, manage roles across the whole alliance, grant alliance_admin).
 export function isAllianceAdmin(role: Role): boolean {
   return role === 'alliance_admin';
+}
+
+// May this role reshape a map — add/move/delete systems, draw or edit
+// connections, rename? 'contributor' is the role this exists for: it edits
+// signatures, anomalies and structures freely, but the map's SHAPE is not
+// theirs to change. The one exception is their own movement, which the system
+// and connection create routes handle by verifying the caller is actually in
+// the system being added; see contributorIsAtSystem.
+export function canEditTopology(role: Role): boolean {
+  return role !== 'readonly' && role !== 'contributor';
 }
 
 export interface AuthUser {

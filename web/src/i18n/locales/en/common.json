@@ -131,6 +131,7 @@
         "admin": "Corp administration — manage your corp's users (change roles, block), lock maps, and everything Full can do.",
         "full": "Create, delete and lock corp and alliance maps, in addition to all editing.",
         "edit": "Edit maps — systems, connections, signatures, structures and notes — but can't create, delete or lock maps.",
+        "contributor": "Edit signatures, anomalies and structures. Systems and connections are recorded by their own movement only — they can't add, move or delete them by hand.",
         "readonly": "View only. Can see maps but can't change anything."
       }
     },

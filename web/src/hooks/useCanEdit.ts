@@ -31,6 +31,10 @@ export function useCanEdit(): boolean {
   if (accessKind === undefined && !isCorpMap && !isAllianceMap) return true;
 
   // Everyone else (member or edit-share recipient) is role-gated: 'edit',
-  // 'full', 'admin', 'alliance_admin' may write; 'readonly' may not.
+  // 'full', 'admin', 'alliance_admin' may reshape the map. 'readonly' may not,
+  // and neither may 'contributor' — they edit content (useCanEditContent) but
+  // the layout is not theirs. Their own movement still records itself: tracking
+  // posts the system and the jump's connection, and the server allows those
+  // after checking they really are in that system.
   return isAdminRole(user.role) || user.role === 'full' || user.role === 'edit';
 }

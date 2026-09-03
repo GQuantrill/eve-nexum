@@ -41,7 +41,7 @@ adminReadRouter.use(requireAdminRead);
 export const reportsRouter = Router();
 reportsRouter.use(requireReportsAccess);
 
-const ROLES = ['alliance_admin', 'admin', 'full', 'edit', 'readonly'] as const;
+const ROLES = ['alliance_admin', 'admin', 'full', 'edit', 'contributor', 'readonly'] as const;
 type Role = (typeof ROLES)[number];
 
 // Small in-memory cache for ESI corporation lookups. Tickers don't change

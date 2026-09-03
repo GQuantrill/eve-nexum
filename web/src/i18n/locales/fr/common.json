@@ -358,6 +358,7 @@
         "admin": "Administration de corporation — gère les utilisateurs de votre corpo (changer les rôles, bloquer), verrouille les cartes et tout ce que peut faire Full.",
         "full": "Créer, supprimer et verrouiller les cartes de corpo et d'alliance, en plus de toute l'édition.",
         "edit": "Modifier les cartes — systèmes, connexions, signatures, structures et notes — mais pas créer, supprimer ni verrouiller de cartes.",
+        "contributor": "Modifier signatures, anomalies et structures. Les systèmes et connexions ne sont enregistrés que par leurs propres déplacements — impossible d'en ajouter, déplacer ou supprimer à la main.",
         "readonly": "Lecture seule. Peut voir les cartes mais rien modifier."
       }
     }
