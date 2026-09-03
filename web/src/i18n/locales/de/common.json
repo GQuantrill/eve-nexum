@@ -987,7 +987,7 @@
     "noHomeSet": "Kein Heimatsystem festgelegt. Rechtsklick auf ein System → \"Als Heimat festlegen\".",
     "failSetDest": "Ziel konnte nicht festgelegt werden",
     "failAddWaypoint": "Wegpunkt konnte nicht hinzugefügt werden",
-    "canvasHint": "Rechtsklick auf die Leinwand zum Hinzufügen · Zwischen den Griffen ziehen zum Verbinden · Shift+Klick oder Ziehen für Mehrfachauswahl · Rechtsklick auf System zum Interagieren",
+    "canvasHint": "Rechtsklick auf die Fläche, um ein System hinzuzufügen · Zwischen Griffen ziehen, um zu verbinden · Shift oder ⌘/Strg+Klick, oder ziehen, für Mehrfachauswahl · Rechtsklick auf ein System für Aktionen",
     "optimizeConnections": "Verbindungen optimieren",
     "spreadNodes": "Knoten verteilen",
     "removeOrphans": "Verwaiste Systeme entfernen ({{count}})",

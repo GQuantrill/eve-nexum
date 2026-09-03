@@ -1068,7 +1068,7 @@
     "noHomeSet": "No home system set. Right-click a system → \"Set as home\".",
     "failSetDest": "Failed to set destination",
     "failAddWaypoint": "Failed to add waypoint",
-    "canvasHint": "Right-click canvas to add system · Drag between handles to connect · Shift+click or drag to multi-select · Right click system to interact",
+    "canvasHint": "Right-click canvas to add system · Drag between handles to connect · Shift or ⌘/Ctrl+click, or drag, to multi-select · Right click system to interact",
     "jumpRangeFrom": "Jump range from here",
     "jumpCyno": "Cyno Jump",
     "jumpRangeClear": "Clear jump range"

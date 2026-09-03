@@ -987,7 +987,7 @@
     "noHomeSet": "Nenhum sistema de origem definido. Clica com o botão direito num sistema → «Definir como origem».",
     "failSetDest": "Falha ao definir o destino",
     "failAddWaypoint": "Falha ao adicionar o ponto de rota",
-    "canvasHint": "Clique direito na tela para adicionar sistema · Arrasta entre as pegas para conectar · Shift+clique ou arrastar para seleção múltipla · Clique direito num sistema para interagir",
+    "canvasHint": "Clique com o botão direito na tela para adicionar um sistema · Arrasta entre as pegas para ligar · Shift ou ⌘/Ctrl+clique, ou arrastar, para seleção múltipla · Clique com o botão direito num sistema para interagir",
     "optimizeConnections": "Otimizar conexões",
     "spreadNodes": "Espalhar nós",
     "removeOrphans": "Remover sistemas órfãos ({{count}})",
