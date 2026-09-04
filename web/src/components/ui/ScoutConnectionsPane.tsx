@@ -12,6 +12,7 @@ import { truesecColor } from '../../utils/truesec';
 import { useMapStore } from '../../store/mapStore';
 import { MapPinSimpleIcon, PathIcon } from '../../icons';
 import { Select } from './Select';
+import { DASH } from '../../i18n/format';
 
 interface Props {
   scoutSystem: 'Thera' | 'Turnur';
@@ -201,7 +202,22 @@ export function ScoutConnectionsPane({ scoutSystem }: Props) {
                   return cls ? whSizeShort(cls) : (SIZE_LABELS[c.maxShipSize] ?? c.maxShipSize);
                 })()}
               </span>
-              <span className="scout-row__sig">{c.inSignature}</span>
+            </div>
+
+            {/* Both ends of the hole, labelled. eve-scout names them from the
+                hub's point of view: outSig is the signature in Thera/Turnur (the
+                one you warp to in order to LEAVE), inSig is the signature in the
+                system at the far end. Only inSig was shown before, which is the
+                wrong one if you're sitting in the hub trying to get out. */}
+            <div className="scout-row__sigs">
+              <span className="scout-row__sig" title={t('scout.outSigHint', { system: scoutSystem })}>
+                <span className="scout-row__sig-label">{t('scout.outSig')}</span>
+                {c.outSignature || DASH}
+              </span>
+              <span className="scout-row__sig" title={t('scout.inSigHint', { system: aliasName(c.inSystemName) })}>
+                <span className="scout-row__sig-label">{t('scout.inSig')}</span>
+                {c.inSignature || DASH}
+              </span>
             </div>
 
             <div className="scout-row__actions">

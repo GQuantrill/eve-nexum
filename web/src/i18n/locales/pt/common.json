@@ -1110,7 +1110,11 @@
     "sortLabel": "Ordenar",
     "sortAge": "Tempo de vida do wormhole",
     "sortShortest": "Rota mais curta",
-    "sortSecure": "Rota segura"
+    "sortSecure": "Rota segura",
+    "inSig": "inSig",
+    "outSig": "outSig",
+    "inSigHint": "ID da assinatura em {{system}} — a outra ponta do buraco",
+    "outSigHint": "ID da assinatura em {{system}} — a ponta para onde fazes warp a partir daqui"
   },
   "route": {
     "fromLastKnown": "Saltos a partir de {{system}} (última localização conhecida)",

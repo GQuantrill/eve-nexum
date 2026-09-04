@@ -1181,7 +1181,11 @@
     "sortLabel": "Sort",
     "sortAge": "Wormhole Lifetime",
     "sortShortest": "Shortest route",
-    "sortSecure": "Secure route"
+    "sortSecure": "Secure route",
+    "inSig": "inSig",
+    "outSig": "outSig",
+    "inSigHint": "Signature ID in {{system}} — the far end of the hole",
+    "outSigHint": "Signature ID in {{system}} — the end you warp to from here"
   },
   "route": {
     "fromLastKnown": "Jumps from {{system}} (last known location)",

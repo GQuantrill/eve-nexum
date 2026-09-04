@@ -1110,7 +1110,11 @@
     "sortLabel": "Trier",
     "sortAge": "Durée de vie du wormhole",
     "sortShortest": "Route la plus courte",
-    "sortSecure": "Route sécurisée"
+    "sortSecure": "Route sécurisée",
+    "inSig": "inSig",
+    "outSig": "outSig",
+    "inSigHint": "Identifiant de signature dans {{system}} — l'autre extrémité du trou",
+    "outSigHint": "Identifiant de signature dans {{system}} — l'extrémité vers laquelle tu warpes d'ici"
   },
   "route": {
     "fromLastKnown": "Sauts depuis {{system}} (dernière position connue)",

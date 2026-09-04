@@ -1110,7 +1110,11 @@
     "sortLabel": "Sortieren",
     "sortAge": "Wurmloch-Lebensdauer",
     "sortShortest": "Kürzeste Route",
-    "sortSecure": "Sichere Route"
+    "sortSecure": "Sichere Route",
+    "inSig": "inSig",
+    "outSig": "outSig",
+    "inSigHint": "Signatur-ID in {{system}} — das andere Ende des Lochs",
+    "outSigHint": "Signatur-ID in {{system}} — das Ende, das du von hier aus anwarpst"
   },
   "route": {
     "fromLastKnown": "Sprünge ab {{system}} (letzter bekannter Standort)",
