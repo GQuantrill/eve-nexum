@@ -1110,7 +1110,11 @@
     "sortLabel": "排序",
     "sortAge": "虫洞剩余寿命",
     "sortShortest": "最短路线",
-    "sortSecure": "安全路线"
+    "sortSecure": "安全路线",
+    "inSig": "入口签名",
+    "outSig": "出口签名",
+    "inSigHint": "{{system}} 中的信号 ID —— 虫洞的另一端",
+    "outSigHint": "{{system}} 中的信号 ID —— 从这里跃迁前往的一端"
   },
   "route": {
     "fromLastKnown": "从 {{system}} 起的跳跃数（最后已知位置）",

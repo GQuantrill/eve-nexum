@@ -191,10 +191,30 @@
   color: #c0a878;
 }
 
+/* Both signature IDs on their own line rather than trailing the WH type: two
+   labelled codes don't fit beside the type and size in a docked sidebar, and
+   truncating a signature makes it useless. */
+.scout-row__sigs {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 2px 8px;
+  /* The pair only just fits a docked sidebar at the default scale, and this
+     panel's text follows --font-scale — so let the second one drop to its own
+     line rather than overflow or truncate. A half-shown signature ID is no use
+     to anyone. */
+  flex-wrap: wrap;
+  font-size: calc(13px * var(--font-scale, 1));
+}
 .scout-row__sig {
   font-family: monospace;
-  margin-left: auto;
   color: var(--text-faint);
+  white-space: nowrap;
+}
+.scout-row__sig-label {
+  font-family: var(--font-ui, inherit);
+  margin-right: 4px;
+  color: var(--text-faintest);
 }
 
 .scout-row__actions {

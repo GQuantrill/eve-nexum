@@ -1110,7 +1110,11 @@
     "sortLabel": "정렬",
     "sortAge": "웜홀 수명",
     "sortShortest": "최단 경로",
-    "sortSecure": "안전 경로"
+    "sortSecure": "안전 경로",
+    "inSig": "입구 시그",
+    "outSig": "출구 시그",
+    "inSigHint": "{{system}}의 시그니처 ID — 웜홀의 반대쪽 끝입니다",
+    "outSigHint": "{{system}}의 시그니처 ID — 여기서 워프해 갈 쪽입니다"
   },
   "route": {
     "fromLastKnown": "{{system}}에서의 점프 (마지막으로 확인된 위치)",

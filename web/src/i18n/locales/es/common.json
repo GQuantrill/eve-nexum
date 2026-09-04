@@ -1110,7 +1110,11 @@
     "sortLabel": "Ordenar",
     "sortAge": "Vida del wormhole",
     "sortShortest": "Ruta más corta",
-    "sortSecure": "Ruta segura"
+    "sortSecure": "Ruta segura",
+    "inSig": "inSig",
+    "outSig": "outSig",
+    "inSigHint": "ID de firma en {{system}}: el extremo lejano del agujero",
+    "outSigHint": "ID de firma en {{system}}: el extremo al que warpeas desde aquí"
   },
   "route": {
     "fromLastKnown": "Saltos desde {{system}} (última ubicación conocida)",
