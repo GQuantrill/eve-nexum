@@ -21,7 +21,7 @@
     "extract-wormholes": "tsx scripts/extract-wormholes.ts"
   },
   "resolutions": {
-    "qs": "^6.15.2",
+    "qs": "^6.16.0",
     "esbuild": "^0.28.1",
     "undici": "^7.29.0",
     "body-parser": "^1.20.6",
