@@ -15,6 +15,7 @@ import { WatchlistBlock } from './WatchlistBlock';
 import { ChainsPane } from './ChainsPane';
 import { CaretLeftIcon, CaretRightIcon, ArrowLineLeftIcon, ArrowLineRightIcon } from '../../icons';
 import { useUserSetting } from '../../hooks/useUserSetting';
+import { useAuth } from '../../context/AuthContext';
 
 const SIDE_KEY      = 'nexum.sidebar.side';
 const COLLAPSED_KEY = 'nexum.sidebar.collapsed';
@@ -57,6 +58,7 @@ function sanitiseOrder(raw: unknown): PanelId[] {
 
 export function Sidebar() {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const panelTitle: Record<PanelId, string> = {
     watchlist: t('sidebar.watchlist'),
     chains:  t('sidebar.chains'),
@@ -140,6 +142,17 @@ export function Sidebar() {
     );
   }
 
+  // Presence is an org feature: the server lists nobody unless Nexum is deployed
+  // for a corp or an alliance (see the pilots-online route). Rendering the panel
+  // regardless would leave a permanently empty card holding sidebar space on a
+  // personal or public install. Hide it there instead.
+  //
+  // Filtered at render rather than removed from the saved order, so it reappears
+  // in the position the user put it if the deployment later gains a corp or
+  // alliance.
+  const orgInstall   = !!user?.corpMode || !!user?.allianceMode;
+  const visibleOrder = order.filter((id) => id !== 'pilotsOnline' || orgInstall);
+
   const cards: Record<PanelId, ReactNode> = {
     watchlist: <WatchlistBlock />,
     chains:  <ChainsPane />,
@@ -187,9 +200,9 @@ export function Sidebar() {
       </div>
 
       <DndContext sensors={sensors} collisionDetection={closestCenter} modifiers={[restrictToVerticalAxis]} onDragEnd={handleDragEnd}>
-        <SortableContext items={order} strategy={verticalListSortingStrategy}>
+        <SortableContext items={visibleOrder} strategy={verticalListSortingStrategy}>
           <div className="sidebar__content">
-            {order.map(id => (
+            {visibleOrder.map(id => (
               <DraggableCard key={id} id={id} title={panelTitle[id]}>
                 {cards[id]}
               </DraggableCard>
