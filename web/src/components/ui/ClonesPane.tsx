@@ -99,10 +99,14 @@ export function ClonesPane() {
                         : <CaretRightIcon size={11} weight="bold" />}
                       {t('clones.implants', { count: r.implants.length })}
                     </button>
+                  ) : r.key === 'home' ? (
+                    // Nothing at all for the medical clone. It's where you
+                    // respawn, so it has no implants by definition — printing a
+                    // dash or a zero implies the number means something here.
+                    // The empty span keeps the jump count right-aligned.
+                    <span />
                   ) : (
-                    <span className="pilots-card__loc">
-                      {r.key === 'home' ? DASH : t('clones.implants', { count: 0 })}
-                    </span>
+                    <span className="pilots-card__loc">{t('clones.implants', { count: 0 })}</span>
                   )}
                   <span className="pilots-card__age">
                     {route ? jumpsLabel(t, route.jumps) : DASH}
