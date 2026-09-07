@@ -1980,5 +1980,15 @@
     "viaGates": "含 {{gates}} 个星域之门",
     "regionalGateHop": "星域之门",
     "legendGate": "星域之门"
+  },
+  "clones": {
+    "title": "克隆体",
+    "medical": "医疗克隆",
+    "jumpClone": "跳跃克隆",
+    "none": "未找到克隆体。如果一直为空，请退出并重新登录以授予克隆体权限。",
+    "unknownLocation": "位置不可用",
+    "implants": "{{count}} 个植入体",
+    "implants_other": "{{count}} 个植入体",
+    "notEnabled": "此部署未启用克隆体追踪。管理员可在 EVE 应用中添加克隆体权限后，通过 ESI_CLONES_SCOPE 启用。"
   }
 }

@@ -187,6 +187,13 @@ export const config = {
   // last_known_system is refreshed from ESI on this cadence so positions stay
   // current without anyone being logged into Nexum.
   locationPollMinutes: Math.max(0, parseInt(process.env.LOCATION_POLL_MINUTES ?? '0', 10) || 0),
+  // Opt-in, and it MUST default off. Requesting a scope the deployment's EVE
+  // application doesn't have makes SSO reject the whole authorize request with
+  // invalid_scope — every login fails, not just the feature. So an upgrade can
+  // never start asking for this on its own; an operator enables it on their EVE
+  // app first, then sets this. Everything that uses clone data degrades to the
+  // pre-existing behaviour while it's off.
+  cloneScope: /^(1|true|yes|on)$/i.test(process.env.ESI_CLONES_SCOPE ?? ''),
   // Cadence (minutes) of the login-access re-validation sweep, which evicts live
   // sessions the current gate no longer permits (standings toggled off/tightened,
   // a standing drifting below threshold, or leaving an admitted corp). Restricted

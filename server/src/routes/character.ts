@@ -54,7 +54,11 @@ type EsiLoc =
   | { status: 'offline' }
   | { status: 'online'; solarSystemId: number | null }
   | { status: 'error' };
-type ShipInfo = { typeId: number; typeName: string; shipName: string; mass: number | null };
+// itemId is the ship's unique item id, not its type. It's what tells a flight
+// apart from a teleport: fly a hole and it's the same hull, die or clone-jump
+// and you wake in a DIFFERENT one — including pod to pod, where the type alone
+// is identical and says nothing.
+type ShipInfo = { itemId: number | null; typeId: number; typeName: string; shipName: string; mass: number | null };
 
 const esiLocCache = new TtlCache<number, EsiLoc>(5_000, 60_000);      // keyed by characterId
 const esiLocInflight = new Map<number, Promise<EsiLoc>>();            // dedupe concurrent reads
@@ -105,11 +109,12 @@ async function readEsiShip(userId: number, characterId: number): Promise<ShipInf
     const shipRes = await esiFetch(`https://esi.evetech.net/latest/characters/${characterId}/ship/`,
       { headers: { Authorization: `Bearer ${token}` } });
     if (!shipRes.ok) return null;
-    const shipData = await shipRes.json() as { ship_type_id: number; ship_name: string };
+    const shipData = await shipRes.json() as { ship_type_id: number; ship_name: string; ship_item_id?: number };
     const { rows } = await db.query<{ name: string; mass: string | null }>(
       `SELECT name, mass FROM item_types WHERE id = $1`, [shipData.ship_type_id]);
     const massNum = rows[0]?.mass == null ? null : Number(rows[0].mass);
     return {
+      itemId:   typeof shipData.ship_item_id === 'number' ? shipData.ship_item_id : null,
       typeId:   shipData.ship_type_id,
       typeName: rows[0]?.name ?? `Type ${shipData.ship_type_id}`,
       shipName: shipData.ship_name,
@@ -258,6 +263,122 @@ async function readCharacterSystem(userId: number, characterId: number): Promise
 // Anyone with "hide my presence" set is left out. Hiding from the map but
 // appearing on a list of everyone's whereabouts would make that setting a lie.
 const PILOTS_ONLINE_WINDOW_MIN = 5;
+
+// ── Clone locations ──────────────────────────────────────────────────────────
+// Where a character's medical clone and jump clones are. Two consumers: the
+// Clones panel, and location tracking — which needs to know a clone jump from a
+// flown jump so a death clone stops drawing a wormhole between the system you
+// left and the one you woke up in.
+//
+// ESI gives a location_id, not a system, so each has to be resolved. Stations
+// come from the SDE table; structures from the corp's synced list, falling back
+// to ESI with the character's own token (esi-universe.read_structures, which we
+// already request) — a pilot can virtually always see the structure their own
+// clone is sitting in, including a private one we'd otherwise know nothing about.
+interface EsiClones {
+  home_location?: { location_id?: number; location_type?: string };
+  jump_clones?: Array<{ jump_clone_id: number; location_id: number; location_type: string; name?: string; implants?: number[] }>;
+  last_clone_jump_date?: string;
+}
+
+const clonesCache = new TtlCache<number, unknown>(120_000, 600_000);  // ESI caches /clones/ ~2 min
+
+async function locationToSystemId(
+  userId: number, locationId: number | undefined, locationType: string | undefined,
+): Promise<number | null> {
+  if (!locationId) return null;
+  if (locationType === 'station') {
+    const { rows } = await db.query<{ s: number | null }>(
+      `SELECT solar_system_id AS s FROM npc_stations WHERE station_id = $1`, [locationId]);
+    if (rows[0]?.s != null) return rows[0].s;
+    try {
+      const r = await esiFetch(`https://esi.evetech.net/latest/universe/stations/${locationId}/`);
+      if (r.ok) return (await r.json() as { system_id?: number }).system_id ?? null;
+    } catch { /* fall through */ }
+    return null;
+  }
+  if (locationType === 'structure') {
+    const { rows } = await db.query<{ s: number | null }>(
+      `SELECT solar_system_id AS s FROM structures WHERE structure_id = $1`, [locationId]);
+    if (rows[0]?.s != null) return rows[0].s;
+    try {
+      const token = await getValidToken(userId);
+      const r = await esiFetch(`https://esi.evetech.net/latest/universe/structures/${locationId}/`,
+        { headers: { Authorization: `Bearer ${token}` } });
+      if (r.ok) return (await r.json() as { solar_system_id?: number }).solar_system_id ?? null;
+    } catch { /* no docking access / gone — leave unresolved */ }
+    return null;
+  }
+  return null;   // item_hangar and anything new: not a place we can map
+}
+
+characterRouter.get('/clones', async (req, res) => {
+  const userId = req.session.userId;
+  if (!userId) { res.status(401).json({ error: 'Not authenticated' }); return; }
+
+  // Deployment hasn't opted into the scope, so we never asked for it and no
+  // token has it. Answered as a normal payload with enabled:false rather than
+  // an error — the panel can then say "not enabled here" instead of telling
+  // people to sign in again, which wouldn't help.
+  if (!config.cloneScope) {
+    res.json({ enabled: false, lastCloneJumpDate: null, home: null, jumpClones: [] });
+    return;
+  }
+
+  const hit = clonesCache.get(userId);
+  if (hit) { res.json(hit.value); return; }
+
+  try {
+    const { rows: userRows } = await db.query<{ character_id: number }>(
+      `SELECT character_id FROM users WHERE id = $1`, [userId]);
+    if (!userRows.length) { res.status(404).json({ error: 'User not found' }); return; }
+
+    const token = await getValidToken(userId);
+    const r = await esiFetch(
+      `https://esi.evetech.net/latest/characters/${userRows[0].character_id}/clones/`,
+      { headers: { Authorization: `Bearer ${token}` } });
+    if (!r.ok) {
+      // 403 here means the session predates the clones scope — the caller shows
+      // a re-login prompt rather than an empty panel that looks like "no clones".
+      res.status(r.status === 403 ? 403 : 502)
+         .json({ error: r.status === 403 ? 'scope_missing' : 'esi_failed', status: r.status });
+      return;
+    }
+    const data = await r.json() as EsiClones;
+
+    const homeSystemId = await locationToSystemId(userId, data.home_location?.location_id, data.home_location?.location_type);
+    const jumps = await Promise.all((data.jump_clones ?? []).map(async (jc) => ({
+      id:         jc.jump_clone_id,
+      name:       jc.name ?? null,
+      implants:   (jc.implants ?? []).length,
+      systemId:   await locationToSystemId(userId, jc.location_id, jc.location_type),
+    })));
+
+    // Enrich every resolved system in one query.
+    const ids = [homeSystemId, ...jumps.map((j) => j.systemId)].filter((x): x is number => x != null);
+    const byId = new Map<number, { name: string; systemClass: string | null; regionName: string | null }>();
+    if (ids.length) {
+      const { rows } = await db.query<{ id: number; name: string; systemClass: string | null; regionName: string | null }>(
+        `SELECT s.id, s.name, s.class AS "systemClass", r.name AS "regionName"
+           FROM solar_systems s LEFT JOIN map_regions r ON r.id = s.region_id
+          WHERE s.id = ANY($1::int[])`, [ids]);
+      for (const row of rows) byId.set(row.id, row);
+    }
+    const enrich = (id: number | null) => (id == null ? null : { eveSystemId: id, ...(byId.get(id) ?? { name: null, systemClass: null, regionName: null }) });
+
+    const payload = {
+      enabled: true,
+      lastCloneJumpDate: data.last_clone_jump_date ?? null,
+      home: enrich(homeSystemId),
+      jumpClones: jumps.map((j) => ({ id: j.id, name: j.name, implants: j.implants, system: enrich(j.systemId) })),
+    };
+    clonesCache.set(userId, payload);
+    res.json(payload);
+  } catch (err) {
+    log.error('clones read failed:', err);
+    res.status(500).json({ error: 'Failed to read clones' });
+  }
+});
 
 characterRouter.get('/pilots-online', async (req, res) => {
   const me = req.session;

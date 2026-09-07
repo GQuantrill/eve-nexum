@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useMapStore, getPlacementCell, registerPlacementFix } from '../store/mapStore';
 import { useCharacterLocation } from './useCharacterLocation';
+import { useClones, cloneSystemIds } from './useClones';
 import { useCanEdit } from './useCanEdit';
 import { useAuth } from '../context/AuthContext';
 import { readUserSetting } from './useUserSetting';
@@ -130,7 +131,15 @@ const isKspaceSkip = (cls: string) => KSPACE_SKIP.has(cls);
  *  placement or mass. */
 export type OnConnectionJump = (info: { connId: string; fromMapSystemId: string; toMapSystemId: string }) => void;
 
-export function applyJump(system: JumpSystem, prevMapSystemId: string | null, canAdd: boolean, onJump?: OnConnectionJump): string | null {
+export function applyJump(
+  system: JumpSystem,
+  prevMapSystemId: string | null,
+  canAdd: boolean,
+  onJump?: OnConnectionJump,
+  /** True when the pilot got here by clone jump rather than by flying — the
+   *  system is still recorded, but no connection is drawn to it. */
+  teleported = false,
+): string | null {
   const { map, addSystem, addConnection, updateConnection, updateSystem, snapToGrid } = useMapStore.getState();
 
   let mapSystemId: string;
@@ -196,8 +205,12 @@ export function applyJump(system: JumpSystem, prevMapSystemId: string | null, ca
     }
   }
 
+  // `teleported` records the system but draws no connection: a clone jump puts
+  // the pilot somewhere with no hole between the two, and drawing one invents a
+  // wormhole that was never there.
   let jumpConnId: string | null = null;
-  if (canAdd && prevMapSystemId && prevMapSystemId !== mapSystemId && map.systems.some((s) => s.id === prevMapSystemId)) {
+  if (!teleported
+      && canAdd && prevMapSystemId && prevMapSystemId !== mapSystemId && map.systems.some((s) => s.id === prevMapSystemId)) {
     const freshConnections = useMapStore.getState().map.connections;
     const existingConn = freshConnections.find(
       (c) =>
@@ -257,9 +270,10 @@ export function applyTrackedJump(
   curr: JumpSystem,
   prev: JumpSystem | null,
   prevMapSystemId: string | null,
-  opts: { skipKspace: boolean; canAdd: boolean },
+  opts: { skipKspace: boolean; canAdd: boolean; teleported?: boolean },
   onJump?: OnConnectionJump,
 ): { mapSystemId: string | null; anchor: string | null | 'keep' } {
+  const tp = opts.teleported ?? false;
   const skip = opts.skipKspace && opts.canAdd;
   const systems = () => useMapStore.getState().map.systems;
 
@@ -278,7 +292,7 @@ export function applyTrackedJump(
     if (fromJspace) {
       // First K-space of this excursion, entered from J-space: the J-space
       // departure is the live anchor, so connect straight from it.
-      const mapSystemId = applyJump(curr, prevMapSystemId, true, onJump);
+      const mapSystemId = applyJump(curr, prevMapSystemId, true, onJump, tp);
       return { mapSystemId, anchor: mapSystemId };
     }
     if (viaWormhole) {
@@ -290,8 +304,8 @@ export function applyTrackedJump(
       // departure, adding it if it was skipped, exactly like the K-space ->
       // J-space jump below.
       const prevOnMap = systems().find((s) => s.eveSystemId === prev!.eveSystemId)?.id ?? null;
-      const source = prevOnMap ?? applyJump(prev!, null, true);
-      const mapSystemId = applyJump(curr, source, true, onJump);
+      const source = prevOnMap ?? applyJump(prev!, null, true, undefined, tp);
+      const mapSystemId = applyJump(curr, source, true, onJump, tp);
       return { mapSystemId, anchor: mapSystemId };
     }
     return { mapSystemId: systems().find((s) => s.eveSystemId === curr.eveSystemId)?.id ?? null, anchor: 'keep' };
@@ -301,12 +315,12 @@ export function applyTrackedJump(
     // Arriving in J-space (or Pochven) from K-space: record the K-space system
     // we jumped from — retroactively if it was skipped — and link it to here.
     const prevOnMap = systems().find((s) => s.eveSystemId === prev.eveSystemId)?.id ?? null;
-    const source = prevOnMap ?? applyJump(prev, null, true); // add the last K-space isolated
-    const mapSystemId = applyJump(curr, source, true, onJump); // then connect it through
+    const source = prevOnMap ?? applyJump(prev, null, true, undefined, tp); // add the last K-space isolated
+    const mapSystemId = applyJump(curr, source, true, onJump, tp); // then connect it through
     return { mapSystemId, anchor: mapSystemId };
   }
 
-  const mapSystemId = applyJump(curr, prevMapSystemId, opts.canAdd, onJump);
+  const mapSystemId = applyJump(curr, prevMapSystemId, opts.canAdd, onJump, tp);
   return { mapSystemId, anchor: mapSystemId };
 }
 
@@ -318,6 +332,7 @@ export function applyTrackedJump(
  */
 export function useLocationTracking(enabled: boolean) {
   const location = useCharacterLocation();
+  const clones = useClones();
   const { user } = useAuth();
   // The effective acting character (pin, else this tab's own character). Any
   // change to it must reset the jump refs below, so the new character's system
@@ -341,6 +356,12 @@ export function useLocationTracking(enabled: boolean) {
   // flickers (which resets lastEveSystemId and would otherwise re-select the
   // same system, yanking the user off whatever they'd manually clicked).
   const lastSelectedEveId = useRef<number | null>(null);
+  // The ship's ITEM id when we last saw the pilot — the specific hull, not its
+  // type. Fly a hole or a gate and it's the same hull the whole way; die or
+  // activate a jump clone and you wake in a different one. The type alone
+  // isn't enough: being podded while already in a pod, or clone jumping from a
+  // pod, is Capsule to Capsule and looks like nothing changed.
+  const lastShipItemId = useRef<number | null>(null);
 
   useEffect(() => {
     if (!enabled) return;
@@ -360,6 +381,7 @@ export function useLocationTracking(enabled: boolean) {
       lastMapSystemId.current = null;
       lastSelectedEveId.current = null;
       prevPhysical.current = null;
+      lastShipItemId.current = null;
     }
 
     const system = location.system;
@@ -367,9 +389,38 @@ export function useLocationTracking(enabled: boolean) {
       lastEveSystemId.current = null;
       lastMapSystemId.current = null;
       prevPhysical.current = null;
+      lastShipItemId.current = null;
       setCurrentSystem(null);
       return;
     }
+
+    // Did they fly here, or wake up here? A clone jump has to satisfy BOTH of
+    // these, because either one alone gets it wrong:
+    //
+    //   hull changed  — fly a hole or a gate and it's the same hull the whole
+    //     way; die or activate a jump clone and you wake in a different one.
+    //     Alone it's wrong when you're podded AT a hole and jump through it in
+    //     the pod, which would suppress a wormhole that really exists.
+    //   arrived at one of this pilot's clones — medical or jump. Alone it's
+    //     wrong when you legitimately fly to a system you keep a clone in, which
+    //     for staging systems is most of the time.
+    //
+    // Only a clone jump makes both true: dying at a hole doesn't put you at your
+    // medical clone, and flying to your staging doesn't change your hull.
+    //
+    // Computed and recorded BEFORE the unchanged-system return below: swapping
+    // ship while sitting still has to update the remembered hull too, or the
+    // next genuine jump would compare against a stale one and lose its
+    // connection.
+    const shipItemIdNow = location.ship?.itemId ?? null;
+    const hullChanged =
+      lastShipItemId.current != null && shipItemIdNow != null
+      && lastShipItemId.current !== shipItemIdNow;
+    if (shipItemIdNow != null) lastShipItemId.current = shipItemIdNow;
+    // No clone data (scope not yet granted, ESI down) means no suppression at
+    // all — the old behaviour. A missing connection nobody notices is worse than
+    // a wrong one somebody deletes.
+    const teleported = hullChanged && cloneSystemIds(clones).has(system.eveSystemId);
 
     if (system.eveSystemId === lastEveSystemId.current) return;
 
@@ -432,7 +483,7 @@ export function useLocationTracking(enabled: boolean) {
         })
       : undefined;
 
-    const { mapSystemId, anchor } = applyTrackedJump(curr, prev, prevMapSystemId, { skipKspace, canAdd }, onJump);
+    const { mapSystemId, anchor } = applyTrackedJump(curr, prev, prevMapSystemId, { skipKspace, canAdd, teleported }, onJump);
     if (anchor !== 'keep') lastMapSystemId.current = anchor;
 
     if (mapSystemId === null) {
