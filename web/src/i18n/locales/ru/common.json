@@ -2030,6 +2030,7 @@
     "implants": "{{count}} имплант",
     "implants_few": "{{count}} импланта",
     "implants_many": "{{count}} имплантов",
-    "implants_other": "{{count}} имплантов"
+    "implants_other": "{{count}} имплантов",
+    "notEnabled": "Отслеживание клонов не включено в этой установке. Администратор может включить его через ESI_CLONES_SCOPE, добавив разрешение на клонов в приложение EVE."
   }
 }

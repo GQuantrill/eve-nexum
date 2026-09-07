@@ -1988,6 +1988,7 @@
     "none": "No clones found. If this stays empty, sign out and back in to grant the clones permission.",
     "unknownLocation": "Location unavailable",
     "implants": "{{count}} implant",
-    "implants_other": "{{count}} implants"
+    "implants_other": "{{count}} implants",
+    "notEnabled": "Clone tracking isn't enabled on this deployment. An administrator can turn it on with ESI_CLONES_SCOPE after adding the clones permission to the EVE application."
   }
 }

@@ -1988,6 +1988,7 @@
     "none": "No se han encontrado clones. Si sigue vacío, cierra sesión y vuelve a entrar para conceder el permiso de clones.",
     "unknownLocation": "Ubicación no disponible",
     "implants": "{{count}} implante",
-    "implants_other": "{{count}} implantes"
+    "implants_other": "{{count}} implantes",
+    "notEnabled": "El seguimiento de clones no está habilitado en esta instalación. Un administrador puede activarlo con ESI_CLONES_SCOPE tras añadir el permiso de clones a la aplicación de EVE."
   }
 }

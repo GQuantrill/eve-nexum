@@ -14,12 +14,15 @@ export interface JumpClone {
   system:   CloneSystem | null;
 }
 export interface Clones {
+  /** False when this deployment hasn't opted into the clones scope, so no token
+   *  has it and there is nothing to read. Distinct from "granted but empty". */
+  enabled:           boolean;
   lastCloneJumpDate: string | null;
   home:              CloneSystem | null;
   jumpClones:        JumpClone[];
 }
 
-const EMPTY: Clones = { lastCloneJumpDate: null, home: null, jumpClones: [] };
+const EMPTY: Clones = { enabled: false, lastCloneJumpDate: null, home: null, jumpClones: [] };
 
 // Clones move only when a pilot deliberately moves them, and ESI caches the
 // endpoint for ~2 minutes, so this is a slow poll — it exists to be CURRENT
@@ -28,6 +31,7 @@ const EMPTY: Clones = { lastCloneJumpDate: null, home: null, jumpClones: [] };
 const POLL_MS = 5 * 60 * 1000;
 
 function same(a: Clones, b: Clones): boolean {
+  if (a.enabled !== b.enabled) return false;
   if (a.lastCloneJumpDate !== b.lastCloneJumpDate) return false;
   if ((a.home?.eveSystemId ?? null) !== (b.home?.eveSystemId ?? null)) return false;
   if (a.jumpClones.length !== b.jumpClones.length) return false;

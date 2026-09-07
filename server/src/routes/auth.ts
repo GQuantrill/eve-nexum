@@ -22,6 +22,10 @@ const FRONTEND_URL  = process.env.FRONTEND_URL ?? 'http://localhost:5174';
 const EVE_AUTH_URL  = 'https://login.eveonline.com/v2/oauth/authorize';
 const EVE_TOKEN_URL = 'https://login.eveonline.com/v2/oauth/token';
 
+// Base scopes: every one of these must be enabled on the deployment's EVE
+// application, or SSO refuses every login with invalid_scope. Nothing may be
+// added here without operators enabling it first — see OPTIONAL_SCOPES below
+// for how a new scope is introduced safely.
 const SSO_SCOPES = [
   'esi-location.read_location.v1',
   'esi-location.read_ship_type.v1',
@@ -37,17 +41,25 @@ const SSO_SCOPES = [
   // only succeed for characters with the Contact Manager role; reads gracefully
   // no-op otherwise.
   'esi-characters.read_contacts.v1',
-  // Clone locations. Needed to tell a clone jump from a flown jump: tracking
-  // must not draw a wormhole between the system a pilot left and the one their
-  // medical or jump clone woke them up in. Also drives the Clones panel.
-  'esi-clones.read_clones.v1',
   'esi-corporations.read_contacts.v1',
   'esi-alliances.read_contacts.v1',
   // Fleet member tracking — show fleet-mate locations on the map as purple
   // dots. Requires the character to be the fleet boss or a wing/squad
   // commander; ESI returns 403 to everyone else and the UI degrades silently.
   'esi-fleets.read_fleet.v1',
-].join(' ');
+];
+
+// Scopes a deployment opts into AFTER enabling them on its own EVE application.
+// They can never be added to the list above: requesting a scope the application
+// doesn't have makes SSO reject the entire authorize request with invalid_scope,
+// so an unconditional addition would lock every user out of every deployment on
+// upgrade — not degrade a feature, break the door. Off by default; each feature
+// behind one degrades to its pre-existing behaviour while it's off.
+function ssoScopes(): string {
+  const scopes = [...SSO_SCOPES];
+  if (config.cloneScope) scopes.push('esi-clones.read_clones.v1');
+  return scopes.join(' ');
+}
 
 // Build the SSO authorize redirect with a fresh CSRF state and send the user.
 function beginSso(req: Request, res: Response): void {
@@ -57,7 +69,7 @@ function beginSso(req: Request, res: Response): void {
     response_type: 'code',
     redirect_uri:  CALLBACK_URL,
     client_id:     CLIENT_ID,
-    scope:         SSO_SCOPES,
+    scope:         ssoScopes(),
     state,
   });
   req.session.save((err) => {

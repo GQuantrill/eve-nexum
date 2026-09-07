@@ -34,6 +34,12 @@ export function ClonesPane() {
   );
   const routes = useRoute(origin.systemId, targetIds);
 
+  // Nothing to show for two different reasons, and they need different words:
+  // the deployment never asked for the scope, versus it did and this character
+  // has no clones (or hasn't re-authorised yet).
+  if (!clones.enabled) {
+    return <div className="scout-pane__empty">{t('clones.notEnabled')}</div>;
+  }
   if (rows.length === 0) {
     return <div className="scout-pane__empty">{t('clones.none')}</div>;
   }

@@ -316,6 +316,15 @@ characterRouter.get('/clones', async (req, res) => {
   const userId = req.session.userId;
   if (!userId) { res.status(401).json({ error: 'Not authenticated' }); return; }
 
+  // Deployment hasn't opted into the scope, so we never asked for it and no
+  // token has it. Answered as a normal payload with enabled:false rather than
+  // an error — the panel can then say "not enabled here" instead of telling
+  // people to sign in again, which wouldn't help.
+  if (!config.cloneScope) {
+    res.json({ enabled: false, lastCloneJumpDate: null, home: null, jumpClones: [] });
+    return;
+  }
+
   const hit = clonesCache.get(userId);
   if (hit) { res.json(hit.value); return; }
 
@@ -358,6 +367,7 @@ characterRouter.get('/clones', async (req, res) => {
     const enrich = (id: number | null) => (id == null ? null : { eveSystemId: id, ...(byId.get(id) ?? { name: null, systemClass: null, regionName: null }) });
 
     const payload = {
+      enabled: true,
       lastCloneJumpDate: data.last_clone_jump_date ?? null,
       home: enrich(homeSystemId),
       jumpClones: jumps.map((j) => ({ id: j.id, name: j.name, implants: j.implants, system: enrich(j.systemId) })),
