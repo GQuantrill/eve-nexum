@@ -1980,5 +1980,14 @@
     "viaGates": "incl. {{gates}} portão(ões) regional(is)",
     "regionalGateHop": "portão regional",
     "legendGate": "portão regional"
+  },
+  "clones": {
+    "title": "Clones",
+    "medical": "Clone médico",
+    "jumpClone": "Clone de salto",
+    "none": "Nenhum clone encontrado. Se continuar vazio, termina sessão e volta a entrar para conceder a permissão de clones.",
+    "unknownLocation": "Localização indisponível",
+    "implants": "{{count}} implante",
+    "implants_other": "{{count}} implantes"
   }
 }

@@ -1980,5 +1980,14 @@
     "viaGates": "inkl. {{gates}} Regionaltor(en)",
     "regionalGateHop": "Regionaltor",
     "legendGate": "Regionaltor"
+  },
+  "clones": {
+    "title": "Klone",
+    "medical": "Medizinischer Klon",
+    "jumpClone": "Sprungklon",
+    "none": "Keine Klone gefunden. Bleibt das leer, melde dich ab und wieder an, um die Klon-Berechtigung zu erteilen.",
+    "unknownLocation": "Ort nicht verfügbar",
+    "implants": "{{count}} Implantat",
+    "implants_other": "{{count}} Implantate"
   }
 }

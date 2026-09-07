@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useMapStore, getPlacementCell, registerPlacementFix } from '../store/mapStore';
 import { useCharacterLocation } from './useCharacterLocation';
+import { useClones, cloneSystemIds } from './useClones';
 import { useCanEdit } from './useCanEdit';
 import { useAuth } from '../context/AuthContext';
 import { readUserSetting } from './useUserSetting';
@@ -331,6 +332,7 @@ export function applyTrackedJump(
  */
 export function useLocationTracking(enabled: boolean) {
   const location = useCharacterLocation();
+  const clones = useClones();
   const { user } = useAuth();
   // The effective acting character (pin, else this tab's own character). Any
   // change to it must reset the jump refs below, so the new character's system
@@ -392,21 +394,33 @@ export function useLocationTracking(enabled: boolean) {
       return;
     }
 
-    // Did they fly here, or wake up here? Same hull = they flew it. A different
-    // hull between two samples means a clone jump (death or jump clone), which
-    // teleports the pilot and must not draw a connection. Decided only when BOTH
-    // samples know the hull; an unknown on either side records the jump as
-    // before, since losing a real connection is the worse failure.
+    // Did they fly here, or wake up here? A clone jump has to satisfy BOTH of
+    // these, because either one alone gets it wrong:
+    //
+    //   hull changed  — fly a hole or a gate and it's the same hull the whole
+    //     way; die or activate a jump clone and you wake in a different one.
+    //     Alone it's wrong when you're podded AT a hole and jump through it in
+    //     the pod, which would suppress a wormhole that really exists.
+    //   arrived at one of this pilot's clones — medical or jump. Alone it's
+    //     wrong when you legitimately fly to a system you keep a clone in, which
+    //     for staging systems is most of the time.
+    //
+    // Only a clone jump makes both true: dying at a hole doesn't put you at your
+    // medical clone, and flying to your staging doesn't change your hull.
     //
     // Computed and recorded BEFORE the unchanged-system return below: swapping
     // ship while sitting still has to update the remembered hull too, or the
     // next genuine jump would compare against a stale one and lose its
     // connection.
     const shipItemIdNow = location.ship?.itemId ?? null;
-    const teleported =
+    const hullChanged =
       lastShipItemId.current != null && shipItemIdNow != null
       && lastShipItemId.current !== shipItemIdNow;
     if (shipItemIdNow != null) lastShipItemId.current = shipItemIdNow;
+    // No clone data (scope not yet granted, ESI down) means no suppression at
+    // all — the old behaviour. A missing connection nobody notices is worse than
+    // a wrong one somebody deletes.
+    const teleported = hullChanged && cloneSystemIds(clones).has(system.eveSystemId);
 
     if (system.eveSystemId === lastEveSystemId.current) return;
 

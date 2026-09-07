@@ -1980,5 +1980,14 @@
     "viaGates": "リージョンゲート {{gates}} 箇所を含む",
     "regionalGateHop": "リージョンゲート",
     "legendGate": "リージョンゲート"
+  },
+  "clones": {
+    "title": "クローン",
+    "medical": "メディカルクローン",
+    "jumpClone": "ジャンプクローン",
+    "none": "クローンが見つかりません。空のままの場合は、サインアウトして再度サインインし、クローンの権限を許可してください。",
+    "unknownLocation": "場所を取得できません",
+    "implants": "インプラント {{count}} 個",
+    "implants_other": "インプラント {{count}} 個"
   }
 }

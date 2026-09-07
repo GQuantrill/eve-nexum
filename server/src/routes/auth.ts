@@ -37,6 +37,10 @@ const SSO_SCOPES = [
   // only succeed for characters with the Contact Manager role; reads gracefully
   // no-op otherwise.
   'esi-characters.read_contacts.v1',
+  // Clone locations. Needed to tell a clone jump from a flown jump: tracking
+  // must not draw a wormhole between the system a pilot left and the one their
+  // medical or jump clone woke them up in. Also drives the Clones panel.
+  'esi-clones.read_clones.v1',
   'esi-corporations.read_contacts.v1',
   'esi-alliances.read_contacts.v1',
   // Fleet member tracking — show fleet-mate locations on the map as purple
