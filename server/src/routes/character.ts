@@ -264,6 +264,12 @@ async function readCharacterSystem(userId: number, characterId: number): Promise
 // appearing on a list of everyone's whereabouts would make that setting a lie.
 const PILOTS_ONLINE_WINDOW_MIN = 5;
 
+// EVE allocates NPC corporation ids below 2,000,000; player corporations start
+// at 98,000,000. The rookie/starter corps in that range hold tens of thousands
+// of unrelated pilots, so an NPC corp is not an organisation and must never be
+// treated as one for presence.
+const MIN_PLAYER_CORP_ID = 2_000_000;
+
 // ── Clone locations ──────────────────────────────────────────────────────────
 // Where a character's medical clone and jump clones are. Two consumers: the
 // Clones panel, and location tracking — which needs to know a clone jump from a
@@ -405,11 +411,22 @@ characterRouter.get('/pilots-online', async (req, res) => {
   const me = req.session;
   if (!me.userId) { res.status(401).json({ error: 'Not authenticated' }); return; }
 
-  // Alliance installs scope to the alliance, corp installs to the corp. Neither
-  // set means a solo install, where there is nobody else to list.
-  const scopeCol = config.allianceMode && me.userAllianceId ? 'alliance_id' : 'corp_id';
-  const scopeVal = scopeCol === 'alliance_id' ? me.userAllianceId : me.userCorpId;
+  // Presence is an ORG feature: it only means anything where Nexum is deployed
+  // for a corp or an alliance. This used to fall back to the caller's corp_id
+  // whichever way the install was configured, which on a PUBLIC install grouped
+  // unrelated strangers by their in-game corp and showed each of them the
+  // others' ship and current system. In EVE a pilot's current system is hunting
+  // intel, so that is a leak and not a cosmetic bug.
+  //
+  // Scope only to an org the install is actually deployed for; anything else
+  // lists nobody. NPC corps never count, even on a corp install: EVE's starter
+  // corps hold tens of thousands of pilots with no relationship to each other.
+  const useAlliance = config.allianceMode && me.userAllianceId != null;
+  const scopeCol    = useAlliance ? 'alliance_id' : 'corp_id';
+  const scopeVal    = useAlliance ? me.userAllianceId
+                    : (config.corpMode ? me.userCorpId : null);
   if (scopeVal == null) { res.json([]); return; }
+  if (!useAlliance && scopeVal < MIN_PLAYER_CORP_ID) { res.json([]); return; }
 
   try {
     const { rows } = await db.query(
