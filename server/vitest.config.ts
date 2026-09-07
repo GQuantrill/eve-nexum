@@ -6,6 +6,9 @@ export default defineConfig({
     include: ['src/**/*.test.ts'],
     // Loads .env, relaxes prod guards, and redirects the pool to a *_test DB.
     setupFiles: ['./vitest.setup.ts'],
+    // Runs once per invocation: refuses to start when another test run already
+    // holds the shared *_test database (see the file for why that matters).
+    globalSetup: ['./src/test/globalSetup.ts'],
     // The *.integration.test.ts suites share one test database and TRUNCATE
     // between tests, so files must not run in parallel or they clobber each
     // other. The suite is small, so serial files cost little.
