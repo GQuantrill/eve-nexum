@@ -13,7 +13,9 @@ import { db } from '../db.js';
 import { characterRouter } from './character.js';
 
 const dbReady = await ensureIntegrationDb();
-const CORP = 1000, OTHER_CORP = 2000, ALLY = 5000;
+// Real EVE id ranges matter here: player corps start at 98,000,000 and anything
+// below 2,000,000 is an NPC corp, which presence deliberately refuses to scope to.
+const CORP = 98000001, OTHER_CORP = 98000002, ALLY = 99000001, NPC_CORP = 1000045;
 
 function appFor(userId: number, corpId: number | null, allianceId: number | null = null) {
   const app = express();
@@ -65,6 +67,25 @@ describe.skipIf(!dbReady)('pilots-online (integration)', () => {
     expect(res.body[0].shipName).toBe('Scout One');
     expect(res.body[0].systemName).toBe('Jita');
     expect(res.body[0].regionName).toBe('The Forge');
+  });
+
+  // Regression: presence used to fall back to the caller's corp_id whatever the
+  // install was, so on a PUBLIC deployment two strangers who happened to share an
+  // NPC starter corp saw each other's ship and current system.
+  it('lists nobody on a public install, even for corp mates', async () => {
+    state.over = { corpMode: false, allianceMode: false, restrictedMode: true };
+    const mate = await seedUser({ characterId: 20, corpId: CORP, role: 'full' });
+    await seen(mate, 1, { ship: 'Heron' });
+    const res = await request(appFor(me, CORP)).get('/api/character/pilots-online').expect(200);
+    expect(res.body).toEqual([]);
+  });
+
+  it('lists nobody when the caller is in an NPC corp', async () => {
+    state.over = { corpMode: true, allianceMode: false, corpIds: [NPC_CORP], restrictedMode: true };
+    const npcMate = await seedUser({ characterId: 21, corpId: NPC_CORP, role: 'full' });
+    await seen(npcMate, 1, { ship: 'Ibis' });
+    const res = await request(appFor(me, NPC_CORP)).get('/api/character/pilots-online').expect(200);
+    expect(res.body).toEqual([]);
   });
 
   it('excludes anyone not seen inside the window', async () => {
