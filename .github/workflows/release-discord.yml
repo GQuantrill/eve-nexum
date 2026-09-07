@@ -1,94 +1,68 @@
 name: Patch notes to Discord
 
-# When `release` is merged into `main` (a push to main), post the patch notes
-# to the Discord #patch-notes channel.
+# Post a release's notes to the Discord #patch-notes channel when the GitHub
+# release is published (`gh release create ...` publishes the tag). Triggering on
+# the release event rather than the push to main means a dropped push event no
+# longer loses the announcement, and we post the curated release body instead of
+# raw commit subjects.
 #
-# Notes = titles of the PRs that merged into the `release` branch and arrived in
-# this push (base = release). Filtering on base = release naturally excludes the
-# release->main promotion PR itself, and any direct pushes to main.
+# Manual backstop — re-post any tag if an automatic run is ever missed:
+#   gh workflow run "Patch notes to Discord" -f tag=v3.33.9
 #
 # Requires repo secret DISCORD_WEBHOOK_URL = the patch-notes channel webhook.
-# (This is a GitHub Actions secret, independent of the app's runtime
-# DISCORD_WEBHOOK_URL env var — make sure it's the public patch-notes webhook.)
-#
-# VERSIONING (later): once tags/versions exist, replace the git-log note
-# generation below with the tag-based `gh api .../releases/generate-notes`
-# (which also honours .github/release.yml categorisation), and trigger on the
-# published release/tag instead of push.
+# (A GitHub Actions secret, independent of the app's runtime DISCORD_WEBHOOK_URL
+# env var — make sure it's the public patch-notes webhook.)
 
 on:
-  push:
-    branches: [main]
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to post (e.g. v3.33.9)"
+        required: true
 
 permissions:
   contents: read
-  pull-requests: read
 
 jobs:
   patch-notes:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0          # full history so we can diff the pushed range
-
-      - name: Build and post patch notes
+      - name: Post release notes to Discord
         env:
           GH_TOKEN: ${{ github.token }}
           WEBHOOK:  ${{ secrets.DISCORD_WEBHOOK_URL }}
-          BEFORE:   ${{ github.event.before }}
-          AFTER:    ${{ github.event.after }}
-          COMPARE:  ${{ github.event.compare }}
+          REPO:     ${{ github.repository }}
+          TAG:      ${{ github.event.release.tag_name || inputs.tag }}
         run: |
           set -euo pipefail
           if [ -z "${WEBHOOK:-}" ]; then
             echo "::error::DISCORD_WEBHOOK_URL secret is not set"; exit 1
           fi
-
-          # Range of commits introduced by this push. Guard the zero-SHA case
-          # (first push / force-push) by falling back to the latest commit.
-          ZERO="0000000000000000000000000000000000000000"
-          if [ "$BEFORE" = "$ZERO" ] || ! git cat-file -e "${BEFORE}^{commit}" 2>/dev/null; then
-            RANGE="${AFTER}~1..${AFTER}"
-          else
-            RANGE="${BEFORE}..${AFTER}"
+          if [ -z "${TAG:-}" ]; then
+            echo "::error::no release tag to post"; exit 1
           fi
 
-          # PR numbers referenced by merge commits in this push.
-          mapfile -t PRS < <(git log --merges --pretty=format:'%s' "$RANGE" \
-                               | grep -oE '#[0-9]+' | tr -d '#' | sort -un || true)
+          # Curated notes for this tag. body/name/url come from the API and are
+          # JSON-encoded via jq below — never shell-eval'd.
+          BODY=$(gh release view "$TAG" --repo "$REPO" --json body -q .body)
+          NAME=$(gh release view "$TAG" --repo "$REPO" --json name -q .name)
+          URL=$( gh release view "$TAG" --repo "$REPO" --json url  -q .url)
 
-          # Keep only PRs whose base was `release` (the actual features); this
-          # drops the release->main promotion PR (base = main). PR titles come
-          # from the API and are JSON-encoded via jq below — never shell-eval'd.
-          NOTES=""
-          for pr in "${PRS[@]:-}"; do
-            [ -z "$pr" ] && continue
-            base=$(gh pr view "$pr" --json baseRefName -q .baseRefName 2>/dev/null || echo "")
-            if [ "$base" = "release" ]; then
-              title=$(gh pr view "$pr" --json title -q .title 2>/dev/null || echo "PR #$pr")
-              NOTES="${NOTES}- ${title} (#${pr})"$'\n'
-            fi
-          done
-
-          # Fallback: no qualifying PRs (e.g. a direct push) — use commit subjects.
-          if [ -z "$NOTES" ]; then
-            NOTES="$(git log --no-merges --pretty=format:'- %s' "$RANGE" | head -n 30 || true)"
-          fi
-          if [ -z "$NOTES" ]; then
-            echo "Nothing to announce for $RANGE"; exit 0
+          if [ -z "${BODY//[[:space:]]/}" ]; then
+            echo "Release $TAG has no notes to announce"; exit 0
           fi
 
           # Discord embed descriptions cap at ~4096 chars.
-          if [ "${#NOTES}" -gt 3800 ]; then
-            NOTES="${NOTES:0:3800}"$'\n'"… and more — ${COMPARE}"
+          if [ "${#BODY}" -gt 3800 ]; then
+            BODY="${BODY:0:3800}"$'\n'"… full notes: ${URL}"
           fi
 
-          DATE="$(date -u +%Y-%m-%d)"
           payload=$(jq -n \
-            --arg title "◈ Nexum update — ${DATE}" \
-            --arg desc  "$NOTES" \
-            --arg url   "${COMPARE}" \
+            --arg title "◈ Nexum ${NAME:-$TAG}" \
+            --arg desc  "$BODY" \
+            --arg url   "$URL" \
             '{ embeds: [ {
                  title: $title,
                  url: $url,
@@ -98,4 +72,4 @@ jobs:
             } ] }')
 
           curl -fsSL -X POST -H "Content-Type: application/json" -d "$payload" "$WEBHOOK"
-          echo "Posted patch notes for $RANGE"
+          echo "Posted patch notes for $TAG"
