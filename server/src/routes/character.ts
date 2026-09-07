@@ -54,7 +54,11 @@ type EsiLoc =
   | { status: 'offline' }
   | { status: 'online'; solarSystemId: number | null }
   | { status: 'error' };
-type ShipInfo = { typeId: number; typeName: string; shipName: string; mass: number | null };
+// itemId is the ship's unique item id, not its type. It's what tells a flight
+// apart from a teleport: fly a hole and it's the same hull, die or clone-jump
+// and you wake in a DIFFERENT one — including pod to pod, where the type alone
+// is identical and says nothing.
+type ShipInfo = { itemId: number | null; typeId: number; typeName: string; shipName: string; mass: number | null };
 
 const esiLocCache = new TtlCache<number, EsiLoc>(5_000, 60_000);      // keyed by characterId
 const esiLocInflight = new Map<number, Promise<EsiLoc>>();            // dedupe concurrent reads
@@ -105,11 +109,12 @@ async function readEsiShip(userId: number, characterId: number): Promise<ShipInf
     const shipRes = await esiFetch(`https://esi.evetech.net/latest/characters/${characterId}/ship/`,
       { headers: { Authorization: `Bearer ${token}` } });
     if (!shipRes.ok) return null;
-    const shipData = await shipRes.json() as { ship_type_id: number; ship_name: string };
+    const shipData = await shipRes.json() as { ship_type_id: number; ship_name: string; ship_item_id?: number };
     const { rows } = await db.query<{ name: string; mass: string | null }>(
       `SELECT name, mass FROM item_types WHERE id = $1`, [shipData.ship_type_id]);
     const massNum = rows[0]?.mass == null ? null : Number(rows[0].mass);
     return {
+      itemId:   typeof shipData.ship_item_id === 'number' ? shipData.ship_item_id : null,
       typeId:   shipData.ship_type_id,
       typeName: rows[0]?.name ?? `Type ${shipData.ship_type_id}`,
       shipName: shipData.ship_name,

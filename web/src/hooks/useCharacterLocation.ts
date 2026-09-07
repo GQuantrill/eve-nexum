@@ -17,6 +17,10 @@ export interface CharacterLocationSystem {
 }
 
 export interface CharacterShip {
+  /** The ship's unique item id — a different hull, not just a different type.
+   *  Null when ESI didn't supply it. See the clone-jump check in
+   *  useLocationTracking. */
+  itemId:   number | null;
   typeId:   number;
   typeName: string;
   shipName: string;
