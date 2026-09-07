@@ -7,10 +7,16 @@ export interface CloneSystem {
   systemClass: string | null;
   regionName:  string | null;
 }
+export interface Implant {
+  typeId: number;
+  name:   string;
+}
 export interface JumpClone {
   id:       number;
   name:     string | null;
-  implants: number;
+  /** The implants plugged into THIS clone, from the /clones/ payload — not the
+   *  active body's, which would need a separate scope we don't request. */
+  implants: Implant[];
   system:   CloneSystem | null;
 }
 export interface Clones {

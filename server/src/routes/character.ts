@@ -348,11 +348,23 @@ characterRouter.get('/clones', async (req, res) => {
 
     const homeSystemId = await locationToSystemId(userId, data.home_location?.location_id, data.home_location?.location_type);
     const jumps = await Promise.all((data.jump_clones ?? []).map(async (jc) => ({
-      id:         jc.jump_clone_id,
-      name:       jc.name ?? null,
-      implants:   (jc.implants ?? []).length,
-      systemId:   await locationToSystemId(userId, jc.location_id, jc.location_type),
+      id:          jc.jump_clone_id,
+      name:        jc.name ?? null,
+      implantIds:  jc.implants ?? [],
+      systemId:    await locationToSystemId(userId, jc.location_id, jc.location_type),
     })));
+
+    // Implant NAMES come from the SDE, not another ESI call. The type ids are
+    // already in the /clones/ payload under esi-clones.read_clones — the separate
+    // read_implants scope is for the ACTIVE clone's implants, which this panel
+    // doesn't show, so it isn't needed.
+    const implantIds = [...new Set(jumps.flatMap((j) => j.implantIds))];
+    const implantName = new Map<number, string>();
+    if (implantIds.length) {
+      const { rows } = await db.query<{ id: number; name: string }>(
+        `SELECT id, name FROM item_types WHERE id = ANY($1::int[])`, [implantIds]);
+      for (const r of rows) implantName.set(r.id, r.name);
+    }
 
     // Enrich every resolved system in one query.
     const ids = [homeSystemId, ...jumps.map((j) => j.systemId)].filter((x): x is number => x != null);
@@ -370,7 +382,16 @@ characterRouter.get('/clones', async (req, res) => {
       enabled: true,
       lastCloneJumpDate: data.last_clone_jump_date ?? null,
       home: enrich(homeSystemId),
-      jumpClones: jumps.map((j) => ({ id: j.id, name: j.name, implants: j.implants, system: enrich(j.systemId) })),
+      jumpClones: jumps.map((j) => ({
+        id:     j.id,
+        name:   j.name,
+        system: enrich(j.systemId),
+        // Sorted by name so the list reads consistently; an id the SDE doesn't
+        // know (a very new implant) still shows rather than vanishing.
+        implants: j.implantIds
+          .map((id) => ({ typeId: id, name: implantName.get(id) ?? `Type ${id}` }))
+          .sort((a, b) => a.name.localeCompare(b.name)),
+      })),
     };
     clonesCache.set(userId, payload);
     res.json(payload);
