@@ -467,3 +467,40 @@
   background: rgba(200, 164, 90, 0.08);
 }
 
+/* ── Clones panel ─────────────────────────────────────────────────────────
+   Builds on the pilots-card layout; only the bits unique to clones live here. */
+.clones-card__implant-toggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  color: var(--text-subtle);
+  font-size: calc(12px * var(--font-scale, 1));
+  font-family: inherit;
+}
+.clones-card__implant-toggle:hover { color: var(--text-default); }
+.clones-card__implants {
+  list-style: none;
+  margin: 2px 0 0;
+  padding: 0 0 0 14px;   /* aligns under the caret, not the card edge */
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  color: var(--text-faint);
+  font-size: calc(12px * var(--font-scale, 1));
+}
+/* Implant names are long ("Ocular Filter - Improved"); a docked sidebar can't
+   show them whole, and the title attribute carries the full text. */
+.clones-card__implants li {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.clones-card__actions {
+  display: flex;
+  gap: 4px;
+  margin-top: 4px;
+}
