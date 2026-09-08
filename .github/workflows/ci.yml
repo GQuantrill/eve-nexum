@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   web:
-    name: web (lint + build)
+    name: web (lint + test + build)
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -27,6 +27,7 @@ jobs:
           cache-dependency-path: web/yarn.lock
       - run: yarn install --frozen-lockfile
       - run: yarn lint
+      - run: yarn test
       - run: yarn build
 
   server:
