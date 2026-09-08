@@ -93,8 +93,8 @@
   --cv-sec-06: #55ff00;
   --cv-sec-05: #99ff00;
   --cv-sec-04: #ffff00;
-  --cv-sec-03: #ff9900;
-  --cv-sec-02: #ff8000;
+  --cv-sec-03: #ffcc00;
+  --cv-sec-02: #ff9900;
   --cv-sec-01: #ff6600;
   --cv-sec-00: #ff3300;
   --cv-sec-neg: #ff0000;
@@ -168,15 +168,15 @@
 :root[data-color-vision="deuteranopia"],
 :root[data-color-vision="protanopia"] {
   --cv-sec-09: #fde725;
-  --cv-sec-08: #b5de2b;
-  --cv-sec-07: #6ece58;
-  --cv-sec-06: #35b779;
-  --cv-sec-05: #1f9e89;
-  --cv-sec-04: #26828e;
-  --cv-sec-03: #31688e;
-  --cv-sec-02: #375b8d;
-  --cv-sec-01: #3e4a89;
-  --cv-sec-00: #482878;
+  --cv-sec-08: #bcdf2a;
+  --cv-sec-07: #7cd14f;
+  --cv-sec-06: #46be6f;
+  --cv-sec-05: #28a883;
+  --cv-sec-04: #23908c;
+  --cv-sec-03: #2a788e;
+  --cv-sec-02: #355f8d;
+  --cv-sec-01: #404386;
+  --cv-sec-00: #482474;
   --cv-sec-neg: #440154;
 
   --cv-class-c1: #56b4e9;
@@ -247,15 +247,15 @@
    reuse the viridis security ramp (lightness-monotonic, safe here too). */
 :root[data-color-vision="tritanopia"] {
   --cv-sec-09: #fde725;
-  --cv-sec-08: #b5de2b;
-  --cv-sec-07: #6ece58;
-  --cv-sec-06: #35b779;
-  --cv-sec-05: #1f9e89;
-  --cv-sec-04: #26828e;
-  --cv-sec-03: #31688e;
-  --cv-sec-02: #375b8d;
-  --cv-sec-01: #3e4a89;
-  --cv-sec-00: #482878;
+  --cv-sec-08: #bcdf2a;
+  --cv-sec-07: #7cd14f;
+  --cv-sec-06: #46be6f;
+  --cv-sec-05: #28a883;
+  --cv-sec-04: #23908c;
+  --cv-sec-03: #2a788e;
+  --cv-sec-02: #355f8d;
+  --cv-sec-01: #404386;
+  --cv-sec-00: #482474;
   --cv-sec-neg: #440154;
 
   --cv-class-c1: #44aa99;
