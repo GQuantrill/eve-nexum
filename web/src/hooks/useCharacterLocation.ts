@@ -134,8 +134,15 @@ function load(): Promise<CharacterLocation> {
   // If another tab acting as this same character fetched within the interval,
   // reuse it — no network call. Keyed by charId so a tab pinned to a different
   // pilot still fetches its own.
+  // Only adopt a value a PEER published more recently than our own last read.
+  // Without the comparison a lone tab reads back its own entry: it publishes at
+  // fetch-completion (a fraction of a second INTO the interval), so at the next
+  // tick that entry is a shade under POLL_MS old and still counts as fresh. The
+  // tab then adopts its own value and skips the fetch, taking the real cadence
+  // to 20s and doubling how long a jump goes unnoticed.
+  const ownAt = moduleCache?.charId === charId ? moduleCache.fetchedAt : 0;
   const shared = readXTab(xTabKey(charId), POLL_MS);
-  if (shared !== undefined) {
+  if (shared !== undefined && shared.at > ownAt) {
     const data = shared.v as CharacterLocation;
     adopt(charId, data, shared.at);
     return Promise.resolve(data);

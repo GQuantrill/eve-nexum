@@ -67,8 +67,14 @@ export function createPolledStore<T>(opts: {
     if (inflight && Date.now() - inflightAt < STUCK_MS) return inflight;
     // If another tab already fetched within this interval, reuse it — no network.
     if (crossTab) {
+      // Strictly newer than our own last read -- otherwise a lone tab adopts the
+      // entry it published itself moments into the interval, skips every other
+      // fetch, and quietly polls at half the configured rate.
       const shared = readXTab(crossTab.key, pollMs);
-      if (shared !== undefined) { apply(crossTab.deserialize(shared.v), shared.at); return Promise.resolve(); }
+      if (shared !== undefined && shared.at > fetchedAt) {
+        apply(crossTab.deserialize(shared.v), shared.at);
+        return Promise.resolve();
+      }
     }
     inflightAt = Date.now();
     const mine = doFetch()
