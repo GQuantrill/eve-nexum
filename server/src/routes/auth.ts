@@ -2,6 +2,7 @@ import { Router, type Request, type Response } from 'express';
 import { randomBytes } from 'node:crypto';
 import { db } from '../db.js';
 import { config } from '../config.js';
+import { WALLET_SCOPE } from '../services/iskDonations.js';
 import { encryptToken } from '../utils/tokenCrypto.js';
 import { createLogger } from '../utils/logger.js';
 import { esiFetch } from '../utils/esi.js';
@@ -111,6 +112,83 @@ authRouter.get('/add-character', async (req, res) => {
   beginSso(req, res);
 });
 
+// GET /auth/wallet-reader — admin-only authorisation of the corp wallet reader
+// used by ISK-for-maps. A separate errand from logging in: it asks for ONE extra
+// scope, and that scope stays out of ssoScopes() so no ordinary user is ever
+// prompted for wallet access (and a deployment whose EVE application lacks the
+// scope can't have every login broken by it).
+authRouter.get('/wallet-reader', async (req, res) => {
+  const role = req.session.role;
+  if (!req.session.userId || !(role === 'admin' || role === 'alliance_admin')) {
+    res.redirect(`${FRONTEND_URL}?error=not_authenticated`);
+    return;
+  }
+  if (!config.iskMaps.enabled || config.iskMaps.readerCharId <= 0) {
+    res.redirect(`${FRONTEND_URL}/admin?wallet_error=not_configured`);
+    return;
+  }
+  req.session.walletReaderFlow = true;
+  const state = randomBytes(32).toString('hex');
+  req.session.oauthState = state;
+  const params = new URLSearchParams({
+    response_type: 'code',
+    redirect_uri:  CALLBACK_URL,
+    client_id:     CLIENT_ID,
+    scope:         WALLET_SCOPE,
+    state,
+  });
+  req.session.save((err) => {
+    if (err) { res.status(500).json({ error: 'Session error' }); return; }
+    res.redirect(`${EVE_AUTH_URL}?${params}`);
+  });
+});
+
+// Finish a wallet-reader authorisation. Stores the token ONLY for the character
+// the deployment nominated, so an admin can't point the reader at themselves (or
+// anyone else) by accident, and a stolen admin session can't attach a wallet.
+async function completeWalletReaderAuth(code: string, res: Response): Promise<void> {
+  const tokenRes = await fetch(EVE_TOKEN_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      Authorization: `Basic ${Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64')}`,
+    },
+    body: new URLSearchParams({ grant_type: 'authorization_code', code, redirect_uri: CALLBACK_URL }),
+  });
+  if (!tokenRes.ok) { res.redirect(`${FRONTEND_URL}/admin?wallet_error=token_exchange`); return; }
+
+  const tokens = await tokenRes.json() as { access_token: string; refresh_token: string };
+  const claims = JSON.parse(
+    Buffer.from(tokens.access_token.split('.')[1], 'base64url').toString('utf8'),
+  ) as { sub: string; name?: string; scp?: string | string[] };
+
+  const characterId = parseInt(claims.sub.split(':')[2], 10);
+  if (characterId !== config.iskMaps.readerCharId) {
+    res.redirect(`${FRONTEND_URL}/admin?wallet_error=wrong_character`);
+    return;
+  }
+  const scopes = Array.isArray(claims.scp) ? claims.scp : (claims.scp ? [claims.scp] : []);
+  if (!scopes.includes(WALLET_SCOPE)) {
+    res.redirect(`${FRONTEND_URL}/admin?wallet_error=missing_scope`);
+    return;
+  }
+
+  // credit_from is set once, on first connect, and preserved on re-auth: it is
+  // what stops the 30 days of history ESI still returns from being credited
+  // retroactively, and a token refresh must not move that line.
+  await db.query(
+    `INSERT INTO wallet_reader (character_id, character_name, refresh_token, scopes)
+     VALUES ($1, $2, $3, $4)
+     ON CONFLICT (character_id) DO UPDATE
+       SET refresh_token = EXCLUDED.refresh_token,
+           character_name = EXCLUDED.character_name,
+           scopes = EXCLUDED.scopes,
+           last_error = NULL`,
+    [characterId, claims.name ?? '', encryptToken(tokens.refresh_token), scopes.join(' ')],
+  );
+  res.redirect(`${FRONTEND_URL}/admin?wallet=connected`);
+}
+
 // GET /auth/callback  — EVE SSO returns here
 authRouter.get('/callback', async (req, res) => {
   const { code, state } = req.query as Record<string, string>;
@@ -121,6 +199,15 @@ authRouter.get('/callback', async (req, res) => {
     return;
   }
   delete req.session.oauthState;
+
+  // A wallet-reader authorisation shares this callback but is not a login: it
+  // must never fall through into the user upsert below.
+  if (req.session.walletReaderFlow) {
+    delete req.session.walletReaderFlow;
+    await completeWalletReaderAuth(code, res);
+    return;
+  }
+
   // Captured before any session.regenerate(): if set, this SSO round-trip is
   // an authenticated "add character" link, not a fresh login.
   const addCharacterOwnerId = req.session.addCharacterOwnerId;

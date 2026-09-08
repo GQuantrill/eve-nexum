@@ -369,6 +369,21 @@
         "contributor": "Modifier signatures, anomalies et structures. Les systèmes et connexions ne sont enregistrés que par leurs propres déplacements — impossible d'en ajouter, déplacer ou supprimer à la main.",
         "readonly": "Lecture seule. Peut voir les cartes mais rien modifier."
       }
+    },
+    "iskMaps": {
+      "title": "ISK pour des cartes supplémentaires",
+      "notConnected": "Lecteur de portefeuille non connecté. Les dons ne sont pas crédités.",
+      "readerError": "Le lecteur de portefeuille échoue : {{error}}",
+      "readerOk": "Lecture du portefeuille de corporation en tant que {{name}}. Dernière vérification réussie : {{when}}.",
+      "connect": "Connecter le lecteur de portefeuille",
+      "reconnect": "Reconnecter le lecteur de portefeuille",
+      "unmatchedTitle": "Dons non attribués",
+      "unmatchedHint": "Ils proviennent de personnages qui ne sont liés à aucun compte. Ils seront crédités automatiquement si le donateur lie ce personnage plus tard.",
+      "colWhen": "Quand",
+      "colCharacter": "ID du personnage",
+      "colAmount": "Montant",
+      "assign": "Attribuer",
+      "assignPlaceholder": "ID du personnage"
     }
   },
   "proximityOptIn": {
@@ -1370,7 +1385,8 @@
     "resetLayout": "Réinitialiser la disposition de la barre d'outils",
     "updateAvailable": "Mise à jour disponible",
     "updateAvailableVersion": "Mise à jour disponible : v{{version}}",
-    "copyThisMap": "Copier cette carte"
+    "copyThisMap": "Copier cette carte",
+    "getMoreMaps": "+ Obtenir plus de cartes"
   },
   "landing": {
     "tagline": "Cartographie de chaînes de trous de ver pour EVE Online",
@@ -1990,5 +2006,20 @@
     "implants": "{{count}} implant",
     "implants_other": "{{count}} implants",
     "notEnabled": "Le suivi des clones n'est pas activé sur cette installation. Un administrateur peut l'activer avec ESI_CLONES_SCOPE après avoir ajouté la permission clones à l'application EVE."
+  },
+  "getMoreMaps": {
+    "title": "Obtenir plus de cartes",
+    "intro": "Faites un don de {{amount}} ISK à {{corp}} et votre limite de cartes personnelles augmente de {{maps}}. Vous pouvez recommencer autant de fois que vous le souhaitez.",
+    "step1": "Ouvrez la corporation {{corp}} en jeu et choisissez « Donner de l’argent ».",
+    "step2": "Envoyez {{amount}} ISK.",
+    "step3": "Vos cartes supplémentaires apparaissent automatiquement dès que le don est détecté.",
+    "recipient": "Envoyer à",
+    "copyCorp": "Copier le nom de la corporation",
+    "timing": "EVE ne publie les portefeuilles de corporation qu’une fois par heure : cela peut donc prendre jusqu’à une heure.",
+    "mustBeLinked": "Faites le don depuis un personnage lié à ce compte, sinon nous ne pourrons pas rattacher le paiement.",
+    "using": "{{used}} cartes sur {{cap}} utilisées.",
+    "contributed": "Vous avez contribué {{amount}} ISK.",
+    "toNext": "Encore {{amount}} ISK pour les {{maps}} suivantes.",
+    "loadFailed": "Impossible de charger les détails de votre don."
   }
 }

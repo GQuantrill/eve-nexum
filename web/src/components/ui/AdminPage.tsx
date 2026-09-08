@@ -948,6 +948,129 @@ function MapsTab() {
           onConfirm={() => destroy(deleteTarget)}
         />
       )}
+
+      <IskMapsSection />
+    </>
+  );
+}
+
+// ── ISK for extra maps ───────────────────────────────────────────────────────
+
+interface UnmatchedDonation {
+  journalId: number; characterId: number; amount: string; reason: string; occurredAt: string;
+}
+interface IskMapsStatus {
+  enabled: boolean;
+  corpId?: number; readerCharId?: number; priceIsk?: number; mapsPerGrant?: number;
+  reader?: { characterId: number; characterName: string; creditFrom: string;
+             lastOkAt: string | null; lastError: string | null } | null;
+  unmatched?: UnmatchedDonation[];
+  totalIsk?: number; matchedIsk?: number;
+}
+
+/**
+ * Operating surface for ISK-for-maps. Renders nothing at all when the feature is
+ * disabled, which is every corp and alliance deployment.
+ *
+ * The point of it is that a wallet reader which has quietly stopped working —
+ * token expired, in-game role removed, character left the corp — is invisible
+ * otherwise: donations simply stop being credited and the first you hear is a
+ * complaint. So lastOkAt and lastError are shown prominently rather than logged.
+ */
+function IskMapsSection() {
+  const { t } = useTranslation();
+  const [data, setData] = useState<IskMapsStatus | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [assignTo, setAssignTo] = useState<Record<number, string>>({});
+
+  const load = useCallback(async () => {
+    try { setData(await api<IskMapsStatus>('/api/admin/isk-maps')); }
+    catch { setData({ enabled: false }); }
+  }, []);
+
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { void load(); }, [load]);
+
+  if (!data?.enabled) return null;
+
+  const reader = data.reader ?? null;
+  const stale  = !reader || !!reader.lastError;
+
+  async function assign(journalId: number) {
+    const characterId = Number(assignTo[journalId]);
+    if (!Number.isInteger(characterId) || characterId <= 0) return;
+    setBusy(true);
+    try {
+      await api('/api/admin/isk-maps/assign', {
+        method: 'POST', body: JSON.stringify({ journalId, characterId }),
+      });
+      await load();
+    } catch { /* surfaced by the row staying put */ }
+    finally { setBusy(false); }
+  }
+
+  return (
+    <>
+      <h2 className={styles.pgSectionTitle}>{t('admin.iskMaps.title')}</h2>
+
+      <div className={stale ? styles.pgError : styles.pgEmpty}>
+        {!reader
+          ? t('admin.iskMaps.notConnected')
+          : reader.lastError
+            ? t('admin.iskMaps.readerError', { error: reader.lastError })
+            : t('admin.iskMaps.readerOk', {
+                name: reader.characterName || reader.characterId,
+                when: reader.lastOkAt ? new Date(reader.lastOkAt).toLocaleString() : '-',
+              })}
+      </div>
+
+      <p>
+        <a className="btn btn--ghost" href="/auth/wallet-reader">
+          {reader ? t('admin.iskMaps.reconnect') : t('admin.iskMaps.connect')}
+        </a>
+      </p>
+
+      {data.unmatched && data.unmatched.length > 0 && (
+        <>
+          <h3>{t('admin.iskMaps.unmatchedTitle')}</h3>
+          <div className={styles.pgEmpty}>{t('admin.iskMaps.unmatchedHint')}</div>
+          <table className={styles.mTable}>
+            <thead>
+              <tr>
+                <th>{t('admin.iskMaps.colWhen')}</th>
+                <th>{t('admin.iskMaps.colCharacter')}</th>
+                <th>{t('admin.iskMaps.colAmount')}</th>
+                <th aria-label={t('actions.column')} />
+              </tr>
+            </thead>
+            <tbody>
+              {data.unmatched.map((d) => (
+                <tr key={d.journalId}>
+                  <td>{new Date(d.occurredAt).toLocaleString()}</td>
+                  <td className={styles.mMono}>{d.characterId}</td>
+                  <td>{Number(d.amount).toLocaleString()}</td>
+                  <td>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      placeholder={t('admin.iskMaps.assignPlaceholder')}
+                      value={assignTo[d.journalId] ?? ''}
+                      onChange={(e) => setAssignTo((m) => ({ ...m, [d.journalId]: e.target.value }))}
+                    />
+                    <button
+                      className="btn btn--ghost"
+                      disabled={busy}
+                      onClick={() => void assign(d.journalId)}
+                    >
+                      {t('admin.iskMaps.assign')}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      )}
     </>
   );
 }

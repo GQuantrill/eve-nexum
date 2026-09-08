@@ -369,6 +369,21 @@
         "contributor": "Editar firmas, anomalías y estructuras. Los sistemas y conexiones solo se registran con su propio movimiento; no puede añadirlos, moverlos ni borrarlos a mano.",
         "readonly": "Solo lectura. Puede ver los mapas pero no cambiar nada."
       }
+    },
+    "iskMaps": {
+      "title": "ISK por mapas adicionales",
+      "notConnected": "El lector de cartera no está conectado. Las donaciones no se están acreditando.",
+      "readerError": "El lector de cartera está fallando: {{error}}",
+      "readerOk": "Leyendo la cartera de la corporación como {{name}}. Última comprobación correcta: {{when}}.",
+      "connect": "Conectar lector de cartera",
+      "reconnect": "Reconectar lector de cartera",
+      "unmatchedTitle": "Donaciones sin asignar",
+      "unmatchedHint": "Provienen de personajes que no están vinculados a ninguna cuenta. Se acreditarán automáticamente si el donante vincula ese personaje más adelante.",
+      "colWhen": "Cuándo",
+      "colCharacter": "ID de personaje",
+      "colAmount": "Cantidad",
+      "assign": "Asignar",
+      "assignPlaceholder": "ID de personaje"
     }
   },
   "proximityOptIn": {
@@ -1370,7 +1385,8 @@
     "resetLayout": "Restablecer disposición de la barra de herramientas",
     "updateAvailable": "Actualización disponible",
     "updateAvailableVersion": "Actualización disponible: v{{version}}",
-    "copyThisMap": "Copiar este mapa"
+    "copyThisMap": "Copiar este mapa",
+    "getMoreMaps": "+ Obtener más mapas"
   },
   "landing": {
     "tagline": "Cartografía de cadenas de agujeros de gusano para EVE Online",
@@ -1990,5 +2006,20 @@
     "implants": "{{count}} implante",
     "implants_other": "{{count}} implantes",
     "notEnabled": "El seguimiento de clones no está habilitado en esta instalación. Un administrador puede activarlo con ESI_CLONES_SCOPE tras añadir el permiso de clones a la aplicación de EVE."
+  },
+  "getMoreMaps": {
+    "title": "Obtener más mapas",
+    "intro": "Dona {{amount}} ISK a {{corp}} y tu límite de mapas personales aumentará en {{maps}}. Puedes hacerlo tantas veces como quieras.",
+    "step1": "Abre la corporación {{corp}} en el juego y elige «Dar dinero».",
+    "step2": "Envía {{amount}} ISK.",
+    "step3": "Tus mapas adicionales aparecerán automáticamente cuando se detecte la donación.",
+    "recipient": "Enviar a",
+    "copyCorp": "Copiar el nombre de la corporación",
+    "timing": "EVE solo publica las carteras de corporación una vez por hora, así que puede tardar hasta una hora en aparecer.",
+    "mustBeLinked": "Dona desde un personaje vinculado a esta cuenta o no podremos asociar el pago contigo.",
+    "using": "Usando {{used}} de {{cap}} mapas.",
+    "contributed": "Has aportado {{amount}} ISK.",
+    "toNext": "{{amount}} ISK más para los siguientes {{maps}}.",
+    "loadFailed": "No se han podido cargar los detalles de tu donación."
   }
 }

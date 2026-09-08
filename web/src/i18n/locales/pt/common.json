@@ -369,6 +369,21 @@
         "contributor": "Editar assinaturas, anomalias e estruturas. Os sistemas e ligações são registados apenas pelo seu próprio movimento — não os pode adicionar, mover ou apagar manualmente.",
         "readonly": "Somente leitura. Pode ver mapas mas não alterar nada."
       }
+    },
+    "iskMaps": {
+      "title": "ISK por mapas adicionais",
+      "notConnected": "Leitor de carteira não ligado. As doações não estão a ser creditadas.",
+      "readerError": "O leitor de carteira está a falhar: {{error}}",
+      "readerOk": "A ler a carteira da corporação como {{name}}. Última verificação bem-sucedida: {{when}}.",
+      "connect": "Ligar leitor de carteira",
+      "reconnect": "Voltar a ligar o leitor de carteira",
+      "unmatchedTitle": "Doações por atribuir",
+      "unmatchedHint": "Vieram de personagens que não estão associados a nenhuma conta. Serão creditadas automaticamente se o doador associar esse personagem mais tarde.",
+      "colWhen": "Quando",
+      "colCharacter": "ID do personagem",
+      "colAmount": "Montante",
+      "assign": "Atribuir",
+      "assignPlaceholder": "ID do personagem"
     }
   },
   "proximityOptIn": {
@@ -1370,7 +1385,8 @@
     "resetLayout": "Repor disposição da barra de ferramentas",
     "updateAvailable": "Atualização disponível",
     "updateAvailableVersion": "Atualização disponível: v{{version}}",
-    "copyThisMap": "Copiar este mapa"
+    "copyThisMap": "Copiar este mapa",
+    "getMoreMaps": "+ Obter mais mapas"
   },
   "landing": {
     "tagline": "Cartografia de cadeias de buracos de minhoca para EVE Online",
@@ -1990,5 +2006,20 @@
     "implants": "{{count}} implante",
     "implants_other": "{{count}} implantes",
     "notEnabled": "O registo de clones não está ativado nesta instalação. Um administrador pode ativá-lo com ESI_CLONES_SCOPE depois de adicionar a permissão de clones à aplicação EVE."
+  },
+  "getMoreMaps": {
+    "title": "Obter mais mapas",
+    "intro": "Doe {{amount}} ISK para {{corp}} e o seu limite de mapas pessoais aumenta em {{maps}}. Pode repetir as vezes que quiser.",
+    "step1": "Abra a corporação {{corp}} no jogo e escolha «Dar dinheiro».",
+    "step2": "Envie {{amount}} ISK.",
+    "step3": "Os seus mapas extra aparecem automaticamente assim que a doação for detetada.",
+    "recipient": "Enviar para",
+    "copyCorp": "Copiar o nome da corporação",
+    "timing": "O EVE só publica as carteiras de corporação uma vez por hora, por isso pode demorar até uma hora a aparecer.",
+    "mustBeLinked": "Doe a partir de um personagem associado a esta conta, caso contrário não conseguimos associar o pagamento.",
+    "using": "A usar {{used}} de {{cap}} mapas.",
+    "contributed": "Já contribuiu com {{amount}} ISK.",
+    "toNext": "Faltam {{amount}} ISK para os próximos {{maps}}.",
+    "loadFailed": "Não foi possível carregar os detalhes da sua doação."
   }
 }

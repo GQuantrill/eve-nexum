@@ -9,6 +9,7 @@ import { standingPermitsTarget, grantKindAllowedForInstall, requiresPositiveStan
 import { decryptToken } from '../utils/tokenCrypto.js';
 import { createLogger } from '../utils/logger.js';
 import { resolveOwnerId } from '../utils/owner.js';
+import { mapCapFor, countPersonalMaps, mapAllowanceFor } from '../services/mapAllowance.js';
 import { resolveEntityNames } from '../services/entityNames.js';
 import { audit } from '../services/audit.js';
 import { publishToMap } from '../services/mapEvents.js';
@@ -965,6 +966,11 @@ mapsRouter.get('/', async (req, res) => {
   const userCorpId     = req.session.userCorpId ?? null;
   const userAllianceId = req.session.userAllianceId ?? null;
   const rows = await gatherVisibleMaps(req);
+  // The personal cap is per-account and can be raised by ISK donations or an
+  // admin adjustment, so report the caller's ACTUAL allowance rather than the
+  // deployment default — the client gates "New map" and the "get more maps"
+  // prompt on this number.
+  const maxMaps = await mapCapFor(await resolveOwnerId(req));
 
   // Count corp maps for the user's own corp (the per-corp limit applies to
   // each corp independently — Corp A's slots are separate from Corp B's).
@@ -977,7 +983,10 @@ mapsRouter.get('/', async (req, res) => {
 
   res.json({
     maps: rows,
-    maxMaps: config.maxUserMaps,
+    maxMaps,
+    // Whether to offer "get more maps" at all. Unrestricted installs only, so a
+    // corp or alliance deployment never sees the option.
+    iskMapsEnabled: config.iskMaps.enabled,
     maxCorpMaps: config.maxCorpMaps,
     corpMapCount,
     maxAllianceMaps: config.maxAllianceMaps,
@@ -990,6 +999,35 @@ mapsRouter.get('/', async (req, res) => {
 // change when the active map tab does). Deduped by eve system id — the same
 // home flagged on two maps surfaces once. Registered before GET /:mapId so the
 // literal path wins the match.
+// GET /api/maps/allowance — what this account may hold and what it has donated.
+// Feeds the "Get more maps" modal. Registered above /:mapId so the literal path
+// can't be swallowed by the map-id route.
+//
+// Returns only the CALLER's own figures; donation rows are never exposed to
+// anyone else, and the corp/price details are what the modal needs to give
+// instructions, not secrets.
+mapsRouter.get('/allowance', async (req, res) => {
+  const ownerId = await resolveOwnerId(req);
+  const a = await mapAllowanceFor(ownerId);
+  const donations = a.enabled && ownerId != null
+    ? (await db.query(
+        `SELECT amount, occurred_at AS "occurredAt"
+           FROM isk_donations WHERE owner_id = $1
+          ORDER BY occurred_at DESC LIMIT 20`, [ownerId])).rows
+    : [];
+  // Resolve the recipient corp's NAME server-side rather than shipping a
+  // hardcoded string to the client: the corp is deployment config, so a
+  // self-hoster pointing this at their own corp gets the right name for free.
+  const corpId = config.iskMaps.enabled ? config.iskMaps.corpId : null;
+  const names  = corpId ? await resolveEntityNames([corpId]) : null;
+  res.json({
+    ...a,
+    corpId,
+    corpName: corpId ? (names?.get(corpId)?.name ?? null) : null,
+    donations,
+  });
+});
+
 mapsRouter.get('/homes', async (req, res) => {
   const mapIds = await visibleMapIds(req);
   if (mapIds.length === 0) return res.json({ homes: [] });
@@ -1056,11 +1094,7 @@ mapsRouter.post('/', async (req, res) => {
     // creation, so an account that merged past the cap keeps its maps and just
     // can't make new ones until it deletes back under.
     const ownerId = await resolveOwnerId(req);
-    const { rowCount } = await db.query(
-      `SELECT 1 FROM maps WHERE owner_id = $1 AND corp_id IS NULL AND alliance_id IS NULL`,
-      [ownerId],
-    );
-    if ((rowCount ?? 0) >= config.maxUserMaps) {
+    if (await countPersonalMaps(ownerId) >= await mapCapFor(ownerId)) {
       res.status(403).json({ error: 'Maximum maps reached' });
       return;
     }
@@ -1127,10 +1161,7 @@ mapsRouter.post('/:mapId/copy', async (req, res) => {
     if ((rowCount ?? 0) >= config.maxCorpMaps) { res.status(403).json({ error: 'Maximum corp maps reached' }); return; }
   } else {
     const oid = await resolveOwnerId(req);
-    const { rowCount } = await db.query(
-      `SELECT 1 FROM maps WHERE owner_id = $1 AND corp_id IS NULL AND alliance_id IS NULL`, [oid],
-    );
-    if ((rowCount ?? 0) >= config.maxUserMaps) { res.status(403).json({ error: 'Maximum maps reached' }); return; }
+    if (await countPersonalMaps(oid) >= await mapCapFor(oid)) { res.status(403).json({ error: 'Maximum maps reached' }); return; }
   }
 
   const name = String(req.body.name ?? '').trim().slice(0, MAX_MAP_NAME_LEN);
@@ -1193,8 +1224,7 @@ mapsRouter.post('/from-region', async (req, res) => {
     if ((rowCount ?? 0) >= config.maxCorpMaps) { res.status(403).json({ error: 'Maximum corp maps reached' }); return; }
   } else {
     const oid = await resolveOwnerId(req);
-    const { rowCount } = await db.query(`SELECT 1 FROM maps WHERE owner_id = $1 AND corp_id IS NULL AND alliance_id IS NULL`, [oid]);
-    if ((rowCount ?? 0) >= config.maxUserMaps) { res.status(403).json({ error: 'Maximum maps reached' }); return; }
+    if (await countPersonalMaps(oid) >= await mapCapFor(oid)) { res.status(403).json({ error: 'Maximum maps reached' }); return; }
   }
 
   // Region systems (with coordinates) + region name.
@@ -1415,11 +1445,7 @@ mapsRouter.post('/import', async (req, res) => {
     }
   } else {
     const oid = await resolveOwnerId(req);
-    const { rowCount } = await db.query(
-      `SELECT 1 FROM maps WHERE owner_id = $1 AND corp_id IS NULL AND alliance_id IS NULL`,
-      [oid],
-    );
-    if ((rowCount ?? 0) >= config.maxUserMaps) {
+    if (await countPersonalMaps(oid) >= await mapCapFor(oid)) {
       res.status(403).json({ error: 'Maximum maps reached' });
       return;
     }
@@ -1612,8 +1638,7 @@ mapsRouter.post('/import/wanderer', async (req, res) => {
 
   // v1 imports to a PERSONAL map — enforce that scope's quota.
   const oid = await resolveOwnerId(req);
-  const quota = await db.query(`SELECT 1 FROM maps WHERE owner_id = $1 AND corp_id IS NULL AND alliance_id IS NULL`, [oid]);
-  if ((quota.rowCount ?? 0) >= config.maxUserMaps) { res.status(403).json({ error: 'Maximum maps reached' }); return; }
+  if (await countPersonalMaps(oid) >= await mapCapFor(oid)) { res.status(403).json({ error: 'Maximum maps reached' }); return; }
 
   const eveIds = [...new Set(systems.map((s) => Number(s.id)).filter((n) => Number.isInteger(n) && n > 0))];
   if (eveIds.length === 0) { res.status(400).json({ error: 'No valid EVE system ids in the file' }); return; }

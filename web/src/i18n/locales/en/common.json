@@ -408,6 +408,21 @@
       "colExclude": "Exclude",
       "killWebhook": "Kill webhook",
       "killMinIsk": "Minimum ISK"
+    },
+    "iskMaps": {
+      "title": "ISK for extra maps",
+      "notConnected": "Wallet reader not connected. Donations are not being credited.",
+      "readerError": "Wallet reader failing: {{error}}",
+      "readerOk": "Reading the corporation wallet as {{name}}. Last successful check: {{when}}.",
+      "connect": "Connect wallet reader",
+      "reconnect": "Reconnect wallet reader",
+      "unmatchedTitle": "Unmatched donations",
+      "unmatchedHint": "These came from characters that are not linked to any account. They are credited automatically if the donor links that character later.",
+      "colWhen": "When",
+      "colCharacter": "Character ID",
+      "colAmount": "Amount",
+      "assign": "Assign",
+      "assignPlaceholder": "Character ID"
     }
   },
   "proximityOptIn": {
@@ -1441,7 +1456,8 @@
       "hostileSov": "Hostile sov",
       "threat": "Threat",
       "closest": "Closest {{label}} system"
-    }
+    },
+    "getMoreMaps": "+ Get more maps"
   },
   "landing": {
     "tagline": "Wormhole chain mapping for EVE Online",
@@ -1990,5 +2006,20 @@
     "implants": "{{count}} implant",
     "implants_other": "{{count}} implants",
     "notEnabled": "Clone tracking isn't enabled on this deployment. An administrator can turn it on with ESI_CLONES_SCOPE after adding the clones permission to the EVE application."
+  },
+  "getMoreMaps": {
+    "title": "Get more maps",
+    "intro": "Donate {{amount}} ISK to {{corp}} and your personal map limit goes up by {{maps}}. You can do this as many times as you like.",
+    "step1": "Open the corporation {{corp}} in game and choose Give Money.",
+    "step2": "Send {{amount}} ISK.",
+    "step3": "Your extra maps appear automatically once the donation is seen.",
+    "recipient": "Send to",
+    "copyCorp": "Copy corporation name",
+    "timing": "EVE only publishes corporation wallets once an hour, so this can take up to an hour to appear.",
+    "mustBeLinked": "Donate from a character linked to this account, or we cannot match the payment to you.",
+    "using": "Using {{used}} of {{cap}} maps.",
+    "contributed": "You have contributed {{amount}} ISK.",
+    "toNext": "{{amount}} ISK more for the next {{maps}}.",
+    "loadFailed": "Could not load your donation details."
   }
 }

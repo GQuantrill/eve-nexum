@@ -39,6 +39,7 @@ import { startSdeAutoUpdate } from './services/sdeUpdate.js';
 import { startLocationPoller } from './services/locationPoll.js';
 import { startWhSweeper } from './services/whSweep.js';
 import { startConnLifetimeSweeper } from './services/connLifetimeSweep.js';
+import { startIskDonationPoller } from './services/iskDonations.js';
 import { startKillFeed } from './services/killFeed.js';
 import { startAccessRevalidation } from './services/accessRevalidate.js';
 import { startTelemetry } from './services/telemetry.js';
@@ -193,6 +194,7 @@ migrate()
     startLocationPoller();
     startWhSweeper();
     startConnLifetimeSweeper();
+    startIskDonationPoller();
     startAccessRevalidation();
     startKillFeed();
     void startTelemetry();

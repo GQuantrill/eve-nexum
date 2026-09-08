@@ -12,6 +12,7 @@ import { useCanEditContent } from '../../hooks/useCanEditContent';
 import { useIsMapOwner } from '../../hooks/useIsMapOwner';
 import { useCanCreateMaps, useCanManageAllianceMaps } from '../../hooks/useCanCreateMaps';
 import { UserStatsModal } from './UserStatsModal';
+import { GetMoreMapsModal } from './GetMoreMapsModal';
 import { ConfirmModal } from './ConfirmModal';
 import { CreateMapModal } from './CreateMapModal';
 import { CopyMapModal } from './CopyMapModal';
@@ -223,6 +224,7 @@ export function Toolbar() {
   const connectionCount = useMapStore((s) => s.map.connections.length);
   const maps            = useMapStore((s) => s.maps);
   const maxMaps         = useMapStore((s) => s.maxMaps);
+  const iskMapsEnabled  = useMapStore((s) => s.iskMapsEnabled);
   const maxCorpMaps     = useMapStore((s) => s.maxCorpMaps);
   const corpMapCount    = useMapStore((s) => s.corpMapCount);
   const maxAllianceMaps  = useMapStore((s) => s.maxAllianceMaps);
@@ -306,6 +308,7 @@ export function Toolbar() {
   const [showMaps, setShowMaps]   = useState(false);
   const [showStats, setShowStats] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
+  const [showGetMore, setShowGetMore] = useState(false);
   const [showCopy, setShowCopy] = useState(false);
   const [showKeys, setShowKeys] = useState(false);
   const [showWhChart, setShowWhChart] = useState(false);
@@ -455,6 +458,16 @@ export function Toolbar() {
                   {t('toolbar.newMap')}
                 </button>
               </span>
+              {/* Only once they've actually run out, and only where the
+                  deployment offers it (unrestricted installs). */}
+              {iskMapsEnabled && atMapLimit && (
+                <button
+                  className="map-dropdown__item map-dropdown__item--action"
+                  onClick={() => { setShowMaps(false); setShowGetMore(true); }}
+                >
+                  {t('toolbar.getMoreMaps')}
+                </button>
+              )}
               {!readonlyCorpActive && !activeIsShared && (
                 <span
                   className={`map-dropdown__new-wrap${atMapLimit ? ' map-dropdown__new-wrap--disabled' : ''}`}
@@ -785,6 +798,7 @@ export function Toolbar() {
 
     {showStats && <UserStatsModal onClose={() => setShowStats(false)} />}
     {showCreate && <CreateMapModal onClose={() => setShowCreate(false)} />}
+    {showGetMore && <GetMoreMapsModal onClose={() => setShowGetMore(false)} />}
     {showCopy && <CopyMapModal onClose={() => setShowCopy(false)} />}
     {showKeys && <ApiKeysModal onClose={() => setShowKeys(false)} />}
     {showWhChart && <WhTypeChartModal onClose={() => setShowWhChart(false)} />}

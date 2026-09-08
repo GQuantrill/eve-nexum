@@ -369,6 +369,21 @@
         "contributor": "Signaturen, Anomalien und Strukturen bearbeiten. Systeme und Verbindungen entstehen nur durch die eigene Bewegung — von Hand können sie weder hinzugefügt, verschoben noch gelöscht werden.",
         "readonly": "Nur Ansicht. Kann Karten sehen, aber nichts ändern."
       }
+    },
+    "iskMaps": {
+      "title": "ISK für zusätzliche Karten",
+      "notConnected": "Wallet-Leser nicht verbunden. Spenden werden nicht gutgeschrieben.",
+      "readerError": "Wallet-Leser fehlerhaft: {{error}}",
+      "readerOk": "Corporation-Geldbörse wird als {{name}} gelesen. Letzte erfolgreiche Prüfung: {{when}}.",
+      "connect": "Wallet-Leser verbinden",
+      "reconnect": "Wallet-Leser neu verbinden",
+      "unmatchedTitle": "Nicht zugeordnete Spenden",
+      "unmatchedHint": "Diese stammen von Charakteren, die mit keinem Konto verknüpft sind. Sie werden automatisch gutgeschrieben, sobald der Spender den Charakter verknüpft.",
+      "colWhen": "Wann",
+      "colCharacter": "Charakter-ID",
+      "colAmount": "Betrag",
+      "assign": "Zuordnen",
+      "assignPlaceholder": "Charakter-ID"
     }
   },
   "proximityOptIn": {
@@ -1370,7 +1385,8 @@
     "resetLayout": "Symbolleisten-Layout zurücksetzen",
     "updateAvailable": "Update verfügbar",
     "updateAvailableVersion": "Update verfügbar: v{{version}}",
-    "copyThisMap": "Diese Karte kopieren"
+    "copyThisMap": "Diese Karte kopieren",
+    "getMoreMaps": "+ Mehr Karten erhalten"
   },
   "landing": {
     "tagline": "Wurmloch-Kettenkartierung für EVE Online",
@@ -1990,5 +2006,20 @@
     "implants": "{{count}} Implantat",
     "implants_other": "{{count}} Implantate",
     "notEnabled": "Klon-Tracking ist auf dieser Installation nicht aktiviert. Eine Administratorin kann es mit ESI_CLONES_SCOPE einschalten, nachdem die Klon-Berechtigung in der EVE-Anwendung ergänzt wurde."
+  },
+  "getMoreMaps": {
+    "title": "Mehr Karten erhalten",
+    "intro": "Spende {{amount}} ISK an {{corp}} und dein persönliches Kartenlimit steigt um {{maps}}. Du kannst das beliebig oft wiederholen.",
+    "step1": "Öffne im Spiel die Corporation {{corp}} und wähle „Geld geben“.",
+    "step2": "Sende {{amount}} ISK.",
+    "step3": "Deine zusätzlichen Karten erscheinen automatisch, sobald die Spende erkannt wurde.",
+    "recipient": "Senden an",
+    "copyCorp": "Corporation-Namen kopieren",
+    "timing": "EVE veröffentlicht Corporation-Geldbörsen nur einmal pro Stunde, daher kann es bis zu eine Stunde dauern.",
+    "mustBeLinked": "Spende von einem Charakter, der mit diesem Konto verknüpft ist, sonst können wir die Zahlung nicht zuordnen.",
+    "using": "{{used}} von {{cap}} Karten belegt.",
+    "contributed": "Du hast {{amount}} ISK beigetragen.",
+    "toNext": "Noch {{amount}} ISK bis zu den nächsten {{maps}}.",
+    "loadFailed": "Spendendetails konnten nicht geladen werden."
   }
 }

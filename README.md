@@ -362,7 +362,46 @@ When registering your application at [developers.eveonline.com](https://develope
 | `esi-corporations.read_contacts.v1` | Read the **corporation's** shared contact list. Only succeeds for characters with the in-game **Contact Manager** role; the call is gracefully skipped for anyone else. When it does succeed, the entire corp benefits from the pulled standings until the next refresh. |
 | `esi-alliances.read_contacts.v1` | Read the **alliance's** shared contact list. Requires the character to be in the alliance executor corp with the right role; almost always denied for normal members, and that's fine — the call no-ops without breaking login. |
 | `esi-clones.read_clones.v1` | **Opt-in — off by default.** Read where the character's medical clone and jump clones are. Two uses: location tracking needs it to tell a **clone jump from a flown jump**, so a death clone or jump clone no longer draws a wormhole between the system you left and the one you woke up in; and it powers the **Clones** panel showing where your clones sit relative to the chain. Read-only, and never exposed to anyone but the character themselves. **Add it to your EVE application first, then set `ESI_CLONES_SCOPE=true`** — the app does not request it otherwise. Asking for a scope your application lacks makes SSO reject *every* login with `invalid_scope`, so this is never enabled for you automatically. While it's off, clone-jump detection and the Clones panel simply stay dormant and nothing else changes. |
+| `esi-wallet.read_corporation_wallets.v1` | **Opt-in — off by default, and never requested at login.** Reads the wallet journal of the corporation nominated by `ISK_MAPS_CORP_ID` so that ISK donations can raise a pilot's personal map limit (see **ISK for extra maps** below). Unlike every other scope here this one is NOT part of the login request: it is granted once, by an admin, through *Admin → Maps → Connect wallet reader*, and only for the single character in `ISK_MAPS_READER_CHAR_ID`. That character needs the in-game **Accountant** or **Junior Accountant** role in the recipient corporation or ESI answers 403. No ordinary user is ever asked for wallet access, and a deployment whose EVE application lacks the scope cannot have its logins broken by it. |
 | `esi-fleets.read_fleet.v1` | Read the character's current fleet composition (members + their solar systems) so fleet-mates show up as purple dots on the map with a hover tooltip listing names. Member-list reads require the character to be the **fleet boss**; wing/squad commanders see "in a fleet, no member visibility" and the UI degrades silently. |
+
+#### ISK for extra maps
+
+A public deployment can let pilots raise their **own** personal map limit by donating ISK
+to a corporation you nominate. It is off by default, and it is ignored entirely when
+`CORP_ID` or `ALLIANCE_ID` is set — a corp or alliance install manages its own limits and
+never sees the option.
+
+How it works: the recipient corporation's wallet journal is polled, each `player_donation`
+is matched to the donating character's Nexum account, and the account's cap becomes
+
+```
+MAX_USER_MAPS + floor(total donated / ISK_MAPS_PRICE) * ISK_MAPS_PER_GRANT + admin adjustment
+```
+
+Entitlement **accumulates** rather than counting donations, so two half payments earn a
+grant and one double payment earns two.
+
+Setting it up, in this order:
+
+1. Add `esi-wallet.read_corporation_wallets.v1` to your EVE application and let it propagate.
+2. Set `ISK_MAPS_ENABLED`, `ISK_MAPS_CORP_ID` and `ISK_MAPS_READER_CHAR_ID` (see `.env.example`), then restart.
+3. Go to **Admin → Maps → Connect wallet reader** and log in as the reader character.
+
+Things worth knowing before you turn it on:
+
+- **The reader character needs the in-game Accountant or Junior Accountant role** in the
+  recipient corporation. Without it ESI returns 403 and nothing is credited.
+- **Crediting takes up to an hour.** EVE publishes corporation wallets hourly; polling
+  faster just re-reads the same cached page. The donation modal says so.
+- **Only donations made after you connect the reader count.** ESI still returns 30 days of
+  history, and crediting it retroactively would be a surprise.
+- **A donation from a character not linked to any account is held, not lost.** It appears
+  under Admin → Maps for you to assign, and is credited automatically if the donor links
+  that character later.
+- **If the reader stops working** — token revoked, role removed, character leaves the corp —
+  the admin page says so. Watch it: ESI only keeps 30 days, so a reader left broken for
+  longer than that loses those donations permanently.
 
 #### One-command deploy scripts
 

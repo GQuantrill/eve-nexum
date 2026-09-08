@@ -1068,6 +1068,48 @@ export async function migrate() {
       type_id         INTEGER
     );
     CREATE INDEX IF NOT EXISTS idx_npc_stations_system ON npc_stations (solar_system_id);
+
+    -- ── ISK for extra maps (config.iskMaps, services/iskDonations.ts) ─────────
+    -- The operator token that reads the donation corp's wallet journal.
+    --
+    -- In its OWN table, deliberately, not on the users row: login upserts
+    -- refresh_token, so the reader character's next ordinary login would replace
+    -- a wallet-scoped token with one that lacks the scope, and crediting would
+    -- stop dead with nothing to show why.
+    CREATE TABLE IF NOT EXISTS wallet_reader (
+      character_id   INTEGER     PRIMARY KEY,
+      character_name TEXT        NOT NULL DEFAULT '',
+      refresh_token  TEXT        NOT NULL,
+      scopes         TEXT        NOT NULL DEFAULT '',
+      -- Donations count only from here on. ESI still returns 30 days of history,
+      -- and connecting a reader must not retroactively hand out maps for it.
+      credit_from    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      last_ok_at     TIMESTAMPTZ,
+      last_error     TEXT,
+      created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
+    -- One row per journal entry seen. journal_id is ESI's own unique reference,
+    -- so re-reading a page — which the hourly cache makes routine — can never
+    -- credit the same donation twice.
+    CREATE TABLE IF NOT EXISTS isk_donations (
+      journal_id   BIGINT        PRIMARY KEY,
+      character_id INTEGER       NOT NULL,
+      -- NULL means the donating character isn't linked to any account. Held for
+      -- an admin to assign rather than silently dropped.
+      owner_id     INTEGER       REFERENCES owners(id) ON DELETE SET NULL,
+      amount       NUMERIC(20,2) NOT NULL,
+      reason       TEXT          NOT NULL DEFAULT '',
+      occurred_at  TIMESTAMPTZ   NOT NULL,
+      credited_at  TIMESTAMPTZ   NOT NULL DEFAULT NOW()
+    );
+    CREATE INDEX IF NOT EXISTS idx_isk_donations_owner ON isk_donations (owner_id);
+    CREATE INDEX IF NOT EXISTS idx_isk_donations_unmatched
+      ON isk_donations (occurred_at) WHERE owner_id IS NULL;
+
+    -- Manual adjustment to an account's map allowance: admin goodwill, a refund,
+    -- or crediting a donation that came from an unlinked character.
+    ALTER TABLE owners ADD COLUMN IF NOT EXISTS map_bonus INTEGER NOT NULL DEFAULT 0;
   `);
 
   await encryptLegacyTokens();
