@@ -21,6 +21,7 @@ export function truesecColor(sec: number): string {
   if (shown >= 0.5) return 'var(--cv-sec-05)';
   if (shown >= 0.4) return 'var(--cv-sec-04)';
   if (shown >= 0.3) return 'var(--cv-sec-03)';
+  if (shown >= 0.2) return 'var(--cv-sec-02)';
   if (shown >= 0.1) return 'var(--cv-sec-01)';
   // Below 0.1 the raw sign still decides, unchanged: a system with a tiny
   // positive security is 0.0 space rather than negative space, and the two are
