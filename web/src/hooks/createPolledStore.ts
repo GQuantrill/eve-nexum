@@ -38,6 +38,7 @@ export function createPolledStore<T>(opts: {
   let fetchedAt = 0;
   let loaded = false;
   let inflight: Promise<void> | null = null;
+  let inflightAt = 0;
   let timer: ReturnType<typeof setInterval> | null = null;
   let unsubX: (() => void) | null = null;
   const subscribers = new Set<() => void>();
@@ -53,20 +54,31 @@ export function createPolledStore<T>(opts: {
     subscribers.forEach((fn) => fn());
   }
 
+  // How long an in-flight request may block new ones before it is written off.
+  // `fetch` has no timeout of its own, so a socket that dies quietly (suspended
+  // laptop, dropped wifi, a proxy holding the connection) leaves its promise
+  // pending forever -- and the de-dupe below then hands that same dead promise
+  // to every later tick, so the store stops polling for the life of the page and
+  // only a reload brings it back. Abandon it instead and let the next tick try
+  // again; the orphan settles or is collected on its own.
+  const STUCK_MS = Math.max(pollMs * 3, 30_000);
+
   function load(): Promise<void> {
-    if (inflight) return inflight;
+    if (inflight && Date.now() - inflightAt < STUCK_MS) return inflight;
     // If another tab already fetched within this interval, reuse it — no network.
     if (crossTab) {
       const shared = readXTab(crossTab.key, pollMs);
       if (shared !== undefined) { apply(crossTab.deserialize(shared.v), shared.at); return Promise.resolve(); }
     }
-    inflight = doFetch()
+    inflightAt = Date.now();
+    const mine = doFetch()
       .then((next) => {
         if (crossTab) writeXTab(crossTab.key, crossTab.serialize(next)); // let other tabs skip
         apply(next);
       })
       .catch(() => { /* keep the last good value */ })
-      .finally(() => { inflight = null; });
+      .finally(() => { if (inflight === mine) inflight = null; });
+    inflight = mine;
     return inflight;
   }
 

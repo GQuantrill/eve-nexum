@@ -56,7 +56,20 @@ export class ApiError extends Error {
   }
 }
 
-export async function api<T = unknown>(path: string, options?: RequestInit): Promise<T> {
+/**
+ * `timeoutMs` aborts a request that hasn't finished in time. Opt-in, because a
+ * blanket timeout would cut off the genuinely slow endpoints (route solving,
+ * standings refreshes).
+ *
+ * It matters most to the polls. A `fetch` has no timeout of its own, so a
+ * request can stay pending forever when the socket dies without an error --
+ * a laptop suspending, wifi dropping, a proxy holding the connection open. A
+ * poll that de-dupes on an in-flight promise then has nothing to resolve it,
+ * and stops polling for the life of the page.
+ */
+export type ApiOptions = RequestInit & { timeoutMs?: number };
+
+export async function api<T = unknown>(path: string, options?: ApiOptions): Promise<T> {
   const method = (options?.method ?? 'GET').toUpperCase();
 
   // Dry-run: swallow writes before any network work so they neither send nor
@@ -75,14 +88,27 @@ export async function api<T = unknown>(path: string, options?: RequestInit): Pro
     finalPath = path + (path.includes('?') ? '&' : '?') + `shareToken=${encodeURIComponent(shareToken)}`;
   }
 
-  const { headers: optHeaders, ...rest } = options ?? {};
-  const res = await fetch(`${BASE}${finalPath}`, {
-    credentials: 'include',
-    ...rest,
-    // Merge last so Content-Type / client id survive even when a caller passes
-    // its own headers (previously `...options` could replace them wholesale).
-    headers: { 'Content-Type': 'application/json', 'X-Client-Id': CLIENT_ID, ...optHeaders },
-  });
+  const { headers: optHeaders, timeoutMs, ...rest } = options ?? {};
+
+  // Only fit an abort when asked for one and the caller isn't managing its own
+  // signal. Cleared in the finally below so a completed request doesn't leave a
+  // timer running.
+  const controller = timeoutMs != null && rest.signal == null ? new AbortController() : null;
+  const abortTimer = controller ? setTimeout(() => controller.abort(), timeoutMs) : null;
+
+  let res: Response;
+  try {
+    res = await fetch(`${BASE}${finalPath}`, {
+      credentials: 'include',
+      ...rest,
+      ...(controller ? { signal: controller.signal } : {}),
+      // Merge last so Content-Type / client id survive even when a caller passes
+      // its own headers (previously `...options` could replace them wholesale).
+      headers: { 'Content-Type': 'application/json', 'X-Client-Id': CLIENT_ID, ...optHeaders },
+    });
+  } finally {
+    if (abortTimer) clearTimeout(abortTimer);
+  }
   if (!res.ok) {
     // Read the error body (JSON { error, message }) so callers can show the
     // real reason. Tolerant of non-JSON / empty error bodies.
