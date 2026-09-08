@@ -46,6 +46,10 @@ interface RawLocationResponse {
 // surfaced as the location going out of sync). A visibility/focus catch-up
 // (below) covers the gap the moment the tab is looked at.
 const POLL_MS = 10_000;
+// Shorter than the interval on purpose: a request that hasn't answered within
+// one poll period is not going to be useful, and letting it outlive its own tick
+// is what used to wedge tracking. See the load() de-dupe below.
+const POLL_TIMEOUT_MS = 8_000;
 const EMPTY: CharacterLocation = { online: false, system: null, ship: null };
 
 // The users.id of the character THIS TAB currently acts as: the per-tab pinned
@@ -130,14 +134,29 @@ function load(): Promise<CharacterLocation> {
   // If another tab acting as this same character fetched within the interval,
   // reuse it — no network call. Keyed by charId so a tab pinned to a different
   // pilot still fetches its own.
+  // Only adopt a value a PEER published more recently than our own last read.
+  // Without the comparison a lone tab reads back its own entry: it publishes at
+  // fetch-completion (a fraction of a second INTO the interval), so at the next
+  // tick that entry is a shade under POLL_MS old and still counts as fresh. The
+  // tab then adopts its own value and skips the fetch, taking the real cadence
+  // to 20s and doubling how long a jump goes unnoticed.
+  const ownAt = moduleCache?.charId === charId ? moduleCache.fetchedAt : 0;
   const shared = readXTab(xTabKey(charId), POLL_MS);
-  if (shared !== undefined) {
+  if (shared !== undefined && shared.at > ownAt) {
     const data = shared.v as CharacterLocation;
     adopt(charId, data, shared.at);
     return Promise.resolve(data);
   }
   inflightCharId = charId;
-  inflight = api<RawLocationResponse>(`/api/character/${charId}/location`)
+  // The timeout is what makes the de-dupe above safe. `fetch` never times out on
+  // its own, so a socket that dies quietly -- a suspended laptop, dropped wifi, a
+  // proxy holding the connection -- left this promise pending forever. Every
+  // later tick, and every visibility/focus catch-up, then returned that same dead
+  // promise instead of making a request, so the pilot's location silently stopped
+  // updating until the page was reloaded. Worse, the eventual catch-up treated
+  // the whole gap as ONE jump and drew a connection from wherever they were when
+  // it stalled.
+  inflight = api<RawLocationResponse>(`/api/character/${charId}/location`, { timeoutMs: POLL_TIMEOUT_MS })
     .then(r => {
       const data: CharacterLocation = { online: r.online, system: r.system, ship: r.ship ?? null };
       inflight = null;

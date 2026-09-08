@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useMapStore, getPlacementCell, registerPlacementFix } from '../store/mapStore';
-import { useCharacterLocation } from './useCharacterLocation';
+import { useCharacterLocation, useCharacterLocationCheckedAt } from './useCharacterLocation';
 import { useClones, cloneSystemIds } from './useClones';
 import { useCanEdit } from './useCanEdit';
 import { useAuth } from '../context/AuthContext';
@@ -130,6 +130,16 @@ const isKspaceSkip = (cls: string) => KSPACE_SKIP.has(cls);
  *  its endpoints so a caller can log the crossing (jump log). Never affects
  *  placement or mass. */
 export type OnConnectionJump = (info: { connId: string; fromMapSystemId: string; toMapSystemId: string }) => void;
+
+// A jump is only trusted when the two readings that bracket it are close
+// together. This sits well clear of one minute on purpose: a hidden tab -- which
+// is where the mapper usually is, behind the game client -- gets its timers
+// clamped by the browser to roughly one tick per minute, so a threshold near 60s
+// would start discarding perfectly real connections during ordinary background
+// use. Three minutes is long enough that normal throttling never trips it, and
+// short enough to catch the case this guards: a pilot crossing several systems
+// while tracking was stalled.
+const MAX_TRACKING_GAP_MS = 180_000;
 
 export function applyJump(
   system: JumpSystem,
@@ -332,6 +342,9 @@ export function applyTrackedJump(
  */
 export function useLocationTracking(enabled: boolean) {
   const location = useCharacterLocation();
+  // When the location was last READ successfully, not when it last changed. The
+  // gap between consecutive reads is what says whether a jump can be trusted.
+  const checkedAt = useCharacterLocationCheckedAt();
   const clones = useClones();
   const { user } = useAuth();
   // The effective acting character (pin, else this tab's own character). Any
@@ -362,6 +375,8 @@ export function useLocationTracking(enabled: boolean) {
   // isn't enough: being podded while already in a pod, or clone jumping from a
   // pod, is Capsule to Capsule and looks like nothing changed.
   const lastShipItemId = useRef<number | null>(null);
+  // The previous successful location read, for measuring the gap to this one.
+  const lastCheckedAt = useRef<number | null>(null);
 
   useEffect(() => {
     if (!enabled) return;
@@ -382,6 +397,7 @@ export function useLocationTracking(enabled: boolean) {
       lastSelectedEveId.current = null;
       prevPhysical.current = null;
       lastShipItemId.current = null;
+      lastCheckedAt.current = null;
     }
 
     const system = location.system;
@@ -390,6 +406,7 @@ export function useLocationTracking(enabled: boolean) {
       lastMapSystemId.current = null;
       prevPhysical.current = null;
       lastShipItemId.current = null;
+      lastCheckedAt.current = null;
       setCurrentSystem(null);
       return;
     }
@@ -420,7 +437,21 @@ export function useLocationTracking(enabled: boolean) {
     // No clone data (scope not yet granted, ESI down) means no suppression at
     // all — the old behaviour. A missing connection nobody notices is worse than
     // a wrong one somebody deletes.
-    const teleported = hullChanged && cloneSystemIds(clones).has(system.eveSystemId);
+    const cloneJumped = hullChanged && cloneSystemIds(clones).has(system.eveSystemId);
+
+    // How long since the last SUCCESSFUL read. A pilot who has been unobserved
+    // for minutes may have crossed several systems, so the change we are looking
+    // at is not necessarily one jump: connecting its ends would assert a hole
+    // that does not exist, which is worse than drawing nothing. A missing
+    // connection is obvious and a scout adds it; a false one makes the map lie
+    // about topology and routes people through a hole that isn't there.
+    const prevCheckedAt = lastCheckedAt.current;
+    if (checkedAt != null) lastCheckedAt.current = checkedAt;
+    const unobserved = prevCheckedAt != null && checkedAt != null
+      && checkedAt - prevCheckedAt > MAX_TRACKING_GAP_MS;
+
+    // Same treatment as a clone jump: record the system, draw no connection.
+    const teleported = cloneJumped || unobserved;
 
     if (system.eveSystemId === lastEveSystemId.current) return;
 
@@ -501,5 +532,5 @@ export function useLocationTracking(enabled: boolean) {
       lastSelectedEveId.current = system.eveSystemId;
       selectSystem(mapSystemId, { fromJump: true });
     }
-  }, [enabled, location, canEdit, followedId]);
+  }, [enabled, location, checkedAt, canEdit, followedId]);
 }
