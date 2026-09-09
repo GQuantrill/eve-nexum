@@ -779,7 +779,16 @@ export function SystemPanel() {
         <SortableContext items={dockedIds} strategy={verticalListSortingStrategy}>
           <div className="panel-stack">
             {dockedIds.map((id) => (
-              <DraggableCard key={id} id={id} title={panelTitle[id] ?? id} onUndock={() => undock(id)}>
+              <DraggableCard
+                key={id}
+                id={id}
+                title={panelTitle[id] ?? id}
+                onUndock={() => undock(id)}
+                // Signatures and anomalies split a single window-level paste
+                // between them, so both must stay mounted to receive it even
+                // when collapsed. See DraggableCard's keepMounted.
+                keepMounted={id === 'signatures' || id === 'anomalies'}
+              >
                 {cards[id]}
               </DraggableCard>
             ))}
