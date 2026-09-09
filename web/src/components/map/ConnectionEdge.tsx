@@ -176,6 +176,24 @@ export const ConnectionEdge = memo(({
   const strokeWidth = emphasized ? baseWidth + 2 : baseWidth;
   const massLabel   = !noLifetime && conn?.massStatus ? (MASS_LABELS[conn.massStatus] ?? null) : null;
 
+  // A frigate-sized hole gets its own dash. Dashing already marks Ansiblex and
+  // cyno routes, but neither can also be a wormhole, so the channel is free
+  // here. A broken hole keeps its severed dash — being dead outranks being
+  // small.
+  const frigHole = !noLifetime && !broken && conn?.size === 'small';
+  const dash = broken ? '5 7' : isCyno ? '2 6' : isJumpgate ? '10 5' : frigHole ? '4 4' : undefined;
+
+  // Mass rides a SECOND channel rather than competing for colour, which
+  // lifetime already owns. A thin core in the mass colour runs inside the
+  // line, so a hole that is both EOL and critical reads as both at once
+  // instead of one state overwriting the other. Same tokens as the mass
+  // label, so the line and the text agree.
+  const massCore = !noLifetime && !broken
+    ? conn?.massStatus === 'critical'     ? 'var(--cv-conn-expired)'
+    : conn?.massStatus === 'destabilized' ? 'var(--cv-conn-1h)'
+    : null
+    : null;
+
   // Prefer the live bucket label; fall back to the stored category label only
   // for a connection whose lifetime is unknown but which carries a legacy
   // timeStatus value (e.g. a hand-set band on an untyped hole).
@@ -201,7 +219,7 @@ export const ConnectionEdge = memo(({
           // stays readable even while highlighted.
           stroke: strokeColor,
           strokeWidth: watchColor ? strokeWidth + 1 : strokeWidth,
-          strokeDasharray: broken ? '5 7' : isCyno ? '2 6' : isJumpgate ? '10 5' : undefined,
+          strokeDasharray: dash,
           filter: [
             emphasized ? `drop-shadow(0 0 6px ${strokeColor})` : null,
             watchColor ? `drop-shadow(0 0 5px ${watchColor}) drop-shadow(0 0 2px ${watchColor})` : null,
@@ -210,6 +228,22 @@ export const ConnectionEdge = memo(({
         }}
         markerEnd={undefined}
       />
+      {/* Mass core, painted over the main stroke and following the same path
+          and dash so it reads as one line with a coloured centre rather than
+          two overlapping edges. Non-interactive: the BaseEdge underneath keeps
+          all hit-testing. */}
+      {massCore && (
+        <path
+          d={edgePath}
+          fill="none"
+          stroke={massCore}
+          strokeWidth={Math.max(1, (watchColor ? strokeWidth + 1 : strokeWidth) - 2.5)}
+          strokeDasharray={dash}
+          strokeLinecap="round"
+          pointerEvents="none"
+          opacity={conn?.dimmed ? 0.1 : 0.95}
+        />
+      )}
       <EdgeLabelRenderer>
         {broken && (
           <div
