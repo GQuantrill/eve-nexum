@@ -369,6 +369,21 @@
         "contributor": "可编辑信号、异常和建筑。星系与连接仅通过本人的移动自动记录，无法手动添加、移动或删除。",
         "readonly": "仅查看。可以查看地图但不能更改任何内容。"
       }
+    },
+    "iskMaps": {
+      "title": "用 ISK 获取更多地图",
+      "notConnected": "钱包读取器未连接。捐赠未被记入。",
+      "readerError": "钱包读取器出错：{{error}}",
+      "readerOk": "正以 {{name}} 的身份读取军团钱包。上次成功检查：{{when}}。",
+      "connect": "连接钱包读取器",
+      "reconnect": "重新连接钱包读取器",
+      "unmatchedTitle": "未匹配的捐赠",
+      "unmatchedHint": "这些来自尚未关联任何账户的角色。如果捐赠者之后关联该角色，将自动记入。",
+      "colWhen": "时间",
+      "colCharacter": "角色 ID",
+      "colAmount": "金额",
+      "assign": "分配",
+      "assignPlaceholder": "角色 ID"
     }
   },
   "proximityOptIn": {
@@ -1370,7 +1385,8 @@
     "resetLayout": "重置工具栏布局",
     "updateAvailable": "有可用更新",
     "updateAvailableVersion": "有可用更新：v{{version}}",
-    "copyThisMap": "复制此地图"
+    "copyThisMap": "复制此地图",
+    "getMoreMaps": "+ 获取更多地图"
   },
   "landing": {
     "tagline": "EVE Online 的虫洞链路绘图",
@@ -1990,5 +2006,20 @@
     "implants": "{{count}} 个植入体",
     "implants_other": "{{count}} 个植入体",
     "notEnabled": "此部署未启用克隆体追踪。管理员可在 EVE 应用中添加克隆体权限后，通过 ESI_CLONES_SCOPE 启用。"
+  },
+  "getMoreMaps": {
+    "title": "获取更多地图",
+    "intro": "向 {{corp}} 捐赠 {{amount}} ISK，个人地图上限将增加 {{maps}} 个。可以重复任意次数。",
+    "step1": "在游戏中打开军团 {{corp}}，选择“给予金钱”。",
+    "step2": "发送 {{amount}} ISK。",
+    "step3": "捐赠被识别后，额外的地图会自动生效。",
+    "recipient": "收款方",
+    "copyCorp": "复制军团名称",
+    "timing": "EVE 每小时才发布一次军团钱包记录，因此最多可能需要一小时才会显示。",
+    "mustBeLinked": "请使用已关联此账户的角色捐赠，否则我们无法将付款与你匹配。",
+    "using": "已使用 {{cap}} 个地图中的 {{used}} 个。",
+    "contributed": "你已捐赠 {{amount}} ISK。",
+    "toNext": "距离下一批 {{maps}} 个还差 {{amount}} ISK。",
+    "loadFailed": "无法加载你的捐赠信息。"
   }
 }

@@ -194,6 +194,42 @@ export const config = {
   // app first, then sets this. Everything that uses clone data degrades to the
   // pre-existing behaviour while it's off.
   cloneScope: /^(1|true|yes|on)$/i.test(process.env.ESI_CLONES_SCOPE ?? ''),
+
+  // ── ISK for extra maps (unrestricted installs only) ─────────────────────────
+  // Lets a public deployment hand out extra PERSONAL maps in exchange for an
+  // in-game ISK donation: the nominated corporation's wallet journal is polled,
+  // `player_donation` entries are matched to the donor's account, and their map
+  // cap rises. See services/iskDonations.ts.
+  //
+  // OFF by default, and hard-gated to unrestricted installs on top of the flag —
+  // a corp or alliance deployment manages its own limits and must never be shown
+  // any of this, however the env is set.
+  //
+  // Reading a corp wallet needs esi-wallet.read_corporation_wallets.v1 AND the
+  // in-game Accountant / Junior_Accountant role, so it runs on ONE operator
+  // token obtained through its own admin-only OAuth flow. That scope is
+  // deliberately kept out of the normal login scopes: asking every user for
+  // wallet access would be indefensible, and if the EVE application didn't have
+  // the scope yet it would fail EVERY login with invalid_scope, not just this.
+  iskMaps: {
+    enabled:      /^(1|true|yes|on)$/i.test(process.env.ISK_MAPS_ENABLED ?? '')
+                  && CORP_IDS.length === 0 && ALLIANCE_IDS.length === 0,
+    // Corporation that receives donations, and the character whose token reads
+    // its journal. The reader is pinned by id so the admin OAuth flow can refuse
+    // to store a token for anyone else.
+    corpId:       intEnv(process.env.ISK_MAPS_CORP_ID, 0),
+    readerCharId: intEnv(process.env.ISK_MAPS_READER_CHAR_ID, 0),
+    // Wallet division to read. Player donations land in division 1 (master).
+    division:     intEnv(process.env.ISK_MAPS_DIVISION, 1, 1),
+    // ISK per grant, and maps per grant. Entitlement accumulates rather than
+    // counting donations, so 300m + 200m earns a grant and 1b earns two.
+    priceIsk:     Math.max(1, Number(process.env.ISK_MAPS_PRICE ?? 500_000_000)),
+    mapsPerGrant: intEnv(process.env.ISK_MAPS_PER_GRANT, 5, 1),
+    // Poll cadence. ESI caches the journal for an hour, so anything under that
+    // re-reads the same page; 15 minutes just keeps the lag after the cache
+    // expires short. The corp-wallet rate limit is 300 per 15 min.
+    pollMinutes:  intEnv(process.env.ISK_MAPS_POLL_MINUTES, 15, 1),
+  },
   // Cadence (minutes) of the login-access re-validation sweep, which evicts live
   // sessions the current gate no longer permits (standings toggled off/tightened,
   // a standing drifting below threshold, or leaving an admitted corp). Restricted

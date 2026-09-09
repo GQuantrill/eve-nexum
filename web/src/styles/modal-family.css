@@ -581,3 +581,46 @@
 .standings-viewer__name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .standings-viewer__col-ticker { color: var(--text-subtle); white-space: nowrap; }
 .standings-viewer__col-standing { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
+
+/* ── Get more maps ─────────────────────────────────────────────────────────
+   The ISK-donation instructions modal. Uses the shared .modal shell; only the
+   pieces with no existing equivalent are styled here. */
+.get-more-maps__steps {
+  margin: 8px 0;
+  padding-left: 20px;
+  line-height: 1.6;
+}
+
+.get-more-maps__corp {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* The corporation name has to be copied EXACTLY into the in-game search, so it
+   is set as code: unambiguous spacing, and no font substitution to argue with. */
+.get-more-maps__corp code {
+  flex: 1;
+  padding: 6px 10px;
+  background: var(--surface-well);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  user-select: all;
+}
+
+.get-more-maps__history {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+  max-height: 140px;
+  overflow-y: auto;
+}
+
+.get-more-maps__history li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 3px 0;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-dim);
+}

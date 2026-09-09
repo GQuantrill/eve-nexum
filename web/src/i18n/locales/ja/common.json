@@ -369,6 +369,21 @@
         "contributor": "シグネチャ・アノマリー・ストラクチャを編集できます。システムと接続は本人の移動によってのみ記録され、手動での追加・移動・削除はできません。",
         "readonly": "閲覧のみ。マップを見ることはできますが、変更はできません。"
       }
+    },
+    "iskMaps": {
+      "title": "ISK でマップを追加",
+      "notConnected": "ウォレットリーダーが未接続です。寄付は反映されていません。",
+      "readerError": "ウォレットリーダーでエラーが発生しています: {{error}}",
+      "readerOk": "{{name}} としてコーポレーションのウォレットを読み取っています。最後に成功した確認: {{when}}。",
+      "connect": "ウォレットリーダーを接続",
+      "reconnect": "ウォレットリーダーを再接続",
+      "unmatchedTitle": "未照合の寄付",
+      "unmatchedHint": "いずれのアカウントにも連携していないキャラクターからの寄付です。寄付者が後からそのキャラクターを連携すると自動的に反映されます。",
+      "colWhen": "日時",
+      "colCharacter": "キャラクターID",
+      "colAmount": "金額",
+      "assign": "割り当て",
+      "assignPlaceholder": "キャラクターID"
     }
   },
   "proximityOptIn": {
@@ -1370,7 +1385,8 @@
     "resetLayout": "ツールバーのレイアウトをリセット",
     "updateAvailable": "アップデートが利用可能",
     "updateAvailableVersion": "アップデートが利用可能: v{{version}}",
-    "copyThisMap": "このマップをコピー"
+    "copyThisMap": "このマップをコピー",
+    "getMoreMaps": "+ マップを追加する"
   },
   "landing": {
     "tagline": "EVE Online のためのワームホールチェーン・マッピング",
@@ -1990,5 +2006,20 @@
     "implants": "インプラント {{count}} 個",
     "implants_other": "インプラント {{count}} 個",
     "notEnabled": "このデプロイではクローン追跡が有効になっていません。管理者が EVE アプリケーションにクローンの権限を追加したうえで、ESI_CLONES_SCOPE で有効にできます。"
+  },
+  "getMoreMaps": {
+    "title": "マップを追加する",
+    "intro": "{{corp}} に {{amount}} ISK を寄付すると、個人マップの上限が {{maps}} 枚増えます。何度でも繰り返せます。",
+    "step1": "ゲーム内でコーポレーション {{corp}} を開き、「送金」を選択します。",
+    "step2": "{{amount}} ISK を送金します。",
+    "step3": "寄付が確認されると、追加のマップが自動的に反映されます。",
+    "recipient": "送金先",
+    "copyCorp": "コーポレーション名をコピー",
+    "timing": "EVE はコーポレーションのウォレットを1時間ごとにしか公開しないため、反映まで最大1時間かかることがあります。",
+    "mustBeLinked": "このアカウントに連携しているキャラクターから寄付してください。連携していないと支払いを照合できません。",
+    "using": "{{cap}} 枚中 {{used}} 枚を使用中。",
+    "contributed": "これまでに {{amount}} ISK を寄付しています。",
+    "toNext": "次の {{maps}} 枚まであと {{amount}} ISK。",
+    "loadFailed": "寄付情報を読み込めませんでした。"
   }
 }

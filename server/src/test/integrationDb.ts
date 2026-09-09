@@ -76,6 +76,9 @@ const TABLES = [
   'access_grants', 'app_settings', 'map_shares', 'maps',
   'corp_standings', 'alliance_standings', 'character_standings',
   'standings_refresh', 'entity_names', 'sessions', 'user_events', 'users',
+  // ISK-for-maps. `owners` last: users.owner_id and maps.owner_id reference it,
+  // and TRUNCATE ... CASCADE needs it in the same statement to clear cleanly.
+  'isk_donations', 'wallet_reader', 'owners',
 ];
 
 export async function truncateAll(): Promise<void> {

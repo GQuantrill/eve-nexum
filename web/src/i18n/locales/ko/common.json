@@ -369,6 +369,21 @@
         "contributor": "시그니처, 아노말리, 구조물을 편집할 수 있습니다. 성계와 연결은 본인의 이동으로만 기록되며, 직접 추가·이동·삭제할 수 없습니다.",
         "readonly": "보기 전용. 맵을 볼 수 있지만 아무것도 변경할 수 없습니다."
       }
+    },
+    "iskMaps": {
+      "title": "ISK로 맵 추가",
+      "notConnected": "지갑 리더가 연결되지 않았습니다. 기부가 적립되지 않고 있습니다.",
+      "readerError": "지갑 리더 오류: {{error}}",
+      "readerOk": "{{name}}(으)로 코퍼레이션 지갑을 읽고 있습니다. 마지막 성공 확인: {{when}}.",
+      "connect": "지갑 리더 연결",
+      "reconnect": "지갑 리더 다시 연결",
+      "unmatchedTitle": "미확인 기부",
+      "unmatchedHint": "어떤 계정에도 연결되지 않은 캐릭터에서 온 기부입니다. 기부자가 나중에 해당 캐릭터를 연결하면 자동으로 적립됩니다.",
+      "colWhen": "시각",
+      "colCharacter": "캐릭터 ID",
+      "colAmount": "금액",
+      "assign": "할당",
+      "assignPlaceholder": "캐릭터 ID"
     }
   },
   "proximityOptIn": {
@@ -1370,7 +1385,8 @@
     "resetLayout": "툴바 레이아웃 초기화",
     "updateAvailable": "업데이트 사용 가능",
     "updateAvailableVersion": "업데이트 사용 가능: v{{version}}",
-    "copyThisMap": "이 지도 복사"
+    "copyThisMap": "이 지도 복사",
+    "getMoreMaps": "+ 맵 추가하기"
   },
   "landing": {
     "tagline": "EVE Online을 위한 웜홀 체인 지도 작성",
@@ -1990,5 +2006,20 @@
     "implants": "임플란트 {{count}}개",
     "implants_other": "임플란트 {{count}}개",
     "notEnabled": "이 배포에서는 클론 추적이 활성화되어 있지 않습니다. 관리자가 EVE 애플리케이션에 클론 권한을 추가한 뒤 ESI_CLONES_SCOPE로 켤 수 있습니다."
+  },
+  "getMoreMaps": {
+    "title": "맵 추가하기",
+    "intro": "{{corp}}에 {{amount}} ISK를 기부하면 개인 맵 한도가 {{maps}}개 늘어납니다. 원하는 만큼 반복할 수 있습니다.",
+    "step1": "게임에서 {{corp}} 코퍼레이션을 열고 ‘자금 전달’을 선택하세요.",
+    "step2": "{{amount}} ISK를 보내세요.",
+    "step3": "기부가 확인되면 추가 맵이 자동으로 적용됩니다.",
+    "recipient": "받는 곳",
+    "copyCorp": "코퍼레이션 이름 복사",
+    "timing": "EVE는 코퍼레이션 지갑을 한 시간에 한 번만 공개하므로 최대 한 시간이 걸릴 수 있습니다.",
+    "mustBeLinked": "이 계정에 연결된 캐릭터로 기부하세요. 그렇지 않으면 결제를 확인할 수 없습니다.",
+    "using": "맵 {{cap}}개 중 {{used}}개 사용 중.",
+    "contributed": "지금까지 {{amount}} ISK를 기부했습니다.",
+    "toNext": "다음 {{maps}}개까지 {{amount}} ISK 남았습니다.",
+    "loadFailed": "기부 정보를 불러오지 못했습니다."
   }
 }

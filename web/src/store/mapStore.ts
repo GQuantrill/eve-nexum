@@ -201,6 +201,8 @@ interface MapStore {
   // Maps list
   maps: MapListItem[];
   maxMaps: number;
+  /** Deployment offers extra personal maps for an ISK donation. */
+  iskMapsEnabled: boolean;
   maxCorpMaps: number;
   corpMapCount: number;
   maxAllianceMaps: number;
@@ -557,6 +559,7 @@ export const useMapStore = create<MapStore>()((set, get) => {
   return {
     maps: [],
     maxMaps: 10,
+    iskMapsEnabled: false,
     maxCorpMaps: 5,
     corpMapCount: 0,
     maxAllianceMaps: 5,
@@ -651,9 +654,9 @@ export const useMapStore = create<MapStore>()((set, get) => {
     // ── Maps management ───────────────────────────────────────────────────────
 
     loadMaps: async () => {
-      const { maps, maxMaps, maxCorpMaps, corpMapCount, maxAllianceMaps, allianceMapCount } = await api<{ maps: MapListItem[]; maxMaps: number; maxCorpMaps: number; corpMapCount: number; maxAllianceMaps: number; allianceMapCount: number }>('/api/maps');
+      const { maps, maxMaps, iskMapsEnabled, maxCorpMaps, corpMapCount, maxAllianceMaps, allianceMapCount } = await api<{ maps: MapListItem[]; maxMaps: number; iskMapsEnabled?: boolean; maxCorpMaps: number; corpMapCount: number; maxAllianceMaps: number; allianceMapCount: number }>('/api/maps');
       const activeId = get().activeMapId;
-      set({ maps, maxMaps, maxCorpMaps, corpMapCount, maxAllianceMaps, allianceMapCount });
+      set({ maps, maxMaps, iskMapsEnabled: !!iskMapsEnabled, maxCorpMaps, corpMapCount, maxAllianceMaps, allianceMapCount });
 
       // Pick an initial map if none is active yet, falling back to the
       // user's last-viewed id when it's still in the list.

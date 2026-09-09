@@ -1368,3 +1368,105 @@ adminRouter.get('/audit', async (_req, res) => {
   `);
   res.json({ entries: rows });
 });
+
+// ── ISK for extra maps ───────────────────────────────────────────────────────
+// Operating surface for the donation feature: whether the wallet reader is
+// working, donations that arrived from a character nobody has linked, and a
+// manual lever for refunds and goodwill.
+//
+// Every route here is behind requireAdmin (applied to the whole router) and
+// returns nothing unless the feature is enabled, so a corp or alliance
+// deployment sees an inert, empty surface.
+
+adminRouter.get('/isk-maps', async (_req, res) => {
+  if (!config.iskMaps.enabled) { res.json({ enabled: false }); return; }
+
+  const { rows: reader } = await db.query(
+    `SELECT character_id AS "characterId", character_name AS "characterName",
+            scopes, credit_from AS "creditFrom", last_ok_at AS "lastOkAt", last_error AS "lastError"
+       FROM wallet_reader WHERE character_id = $1`,
+    [config.iskMaps.readerCharId],
+  );
+  // Donations whose character isn't linked to any account. The poller re-matches
+  // these automatically if the donor links that character later, so anything
+  // lingering here genuinely needs a human.
+  const { rows: unmatched } = await db.query(
+    `SELECT journal_id AS "journalId", character_id AS "characterId", amount,
+            reason, occurred_at AS "occurredAt"
+       FROM isk_donations WHERE owner_id IS NULL
+      ORDER BY occurred_at DESC LIMIT 100`,
+  );
+  const { rows: totals } = await db.query<{ credited: string; matched: string }>(
+    `SELECT COALESCE(SUM(amount), 0) AS credited,
+            COALESCE(SUM(amount) FILTER (WHERE owner_id IS NOT NULL), 0) AS matched
+       FROM isk_donations`,
+  );
+
+  res.json({
+    enabled:      true,
+    corpId:       config.iskMaps.corpId,
+    readerCharId: config.iskMaps.readerCharId,
+    priceIsk:     config.iskMaps.priceIsk,
+    mapsPerGrant: config.iskMaps.mapsPerGrant,
+    reader:       reader[0] ?? null,
+    unmatched,
+    totalIsk:     Number(totals[0]?.credited ?? 0),
+    matchedIsk:   Number(totals[0]?.matched ?? 0),
+  });
+});
+
+// Attach an unmatched donation to an account, by any character of that account.
+adminRouter.post('/isk-maps/assign', async (req, res) => {
+  if (!config.iskMaps.enabled) { res.status(404).json({ error: 'not enabled' }); return; }
+  const journalId  = Number(req.body?.journalId);
+  const characterId = Number(req.body?.characterId);
+  if (!Number.isFinite(journalId) || !Number.isInteger(characterId) || characterId <= 0) {
+    res.status(400).json({ error: 'journalId and characterId are required' }); return;
+  }
+
+  const { rows: owner } = await db.query<{ owner_id: number | null }>(
+    `SELECT owner_id FROM users WHERE character_id = $1`, [characterId],
+  );
+  if (!owner.length || owner[0].owner_id == null) {
+    res.status(404).json({ error: 'No account found for that character' }); return;
+  }
+
+  // Only ever fills a NULL owner. An already-credited donation cannot be moved
+  // between accounts here, so a mis-click can't silently take maps off someone.
+  const { rowCount } = await db.query(
+    `UPDATE isk_donations SET owner_id = $1 WHERE journal_id = $2 AND owner_id IS NULL`,
+    [owner[0].owner_id, journalId],
+  );
+  if (!rowCount) { res.status(409).json({ error: 'Donation not found, or already assigned' }); return; }
+
+  await audit(req, req.session.userId!, characterId, 'isk_donation_assign', String(journalId), String(owner[0].owner_id));
+  res.json({ ok: true });
+});
+
+// Manual allowance adjustment: goodwill, a refund, or crediting something that
+// arrived outside the donation flow entirely.
+adminRouter.post('/isk-maps/bonus', async (req, res) => {
+  const characterId = Number(req.body?.characterId);
+  const bonus       = Number(req.body?.bonus);
+  if (!Number.isInteger(characterId) || characterId <= 0 || !Number.isInteger(bonus)) {
+    res.status(400).json({ error: 'characterId and an integer bonus are required' }); return;
+  }
+  if (bonus < -1000 || bonus > 1000) { res.status(400).json({ error: 'bonus out of range' }); return; }
+
+  const { rows } = await db.query<{ owner_id: number | null }>(
+    `SELECT owner_id FROM users WHERE character_id = $1`, [characterId],
+  );
+  if (!rows.length || rows[0].owner_id == null) {
+    res.status(404).json({ error: 'No account found for that character' }); return;
+  }
+
+  // Read the old value first rather than trying to get it back from RETURNING:
+  // a subquery there reads the statement's own snapshot and it is not obvious
+  // which value you get.
+  const { rows: before } = await db.query<{ map_bonus: number }>(
+    `SELECT map_bonus FROM owners WHERE id = $1`, [rows[0].owner_id],
+  );
+  await db.query(`UPDATE owners SET map_bonus = $1 WHERE id = $2`, [bonus, rows[0].owner_id]);
+  await audit(req, req.session.userId!, characterId, 'map_bonus', String(before[0]?.map_bonus ?? 0), String(bonus));
+  res.json({ ok: true });
+});

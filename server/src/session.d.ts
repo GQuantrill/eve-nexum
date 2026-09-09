@@ -16,6 +16,9 @@ declare module 'express-session' {
     // OAuth callback links the returning character to this owner instead of
     // starting a fresh login. Cleared once consumed.
     addCharacterOwnerId?: number;
+    /** True while an admin is authorising the ISK-donation wallet reader, so the
+     *  shared SSO callback knows this round-trip is not a login. */
+    walletReaderFlow?: boolean;
     // Cached UI preferences — kept in sync by PATCH /auth/preferences so
     // /auth/me doesn't have to hit the DB on every page load.
     prefs: {
