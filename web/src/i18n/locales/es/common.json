@@ -1386,7 +1386,8 @@
     "updateAvailable": "Actualización disponible",
     "updateAvailableVersion": "Actualización disponible: v{{version}}",
     "copyThisMap": "Copiar este mapa",
-    "getMoreMaps": "+ Obtener más mapas"
+    "getMoreMaps": "+ Obtener más mapas",
+    "sharedBy": "Compartido por {{name}}"
   },
   "landing": {
     "tagline": "Cartografía de cadenas de agujeros de gusano para EVE Online",

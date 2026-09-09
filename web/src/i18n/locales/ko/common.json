@@ -1386,7 +1386,8 @@
     "updateAvailable": "업데이트 사용 가능",
     "updateAvailableVersion": "업데이트 사용 가능: v{{version}}",
     "copyThisMap": "이 지도 복사",
-    "getMoreMaps": "+ 맵 추가하기"
+    "getMoreMaps": "+ 맵 추가하기",
+    "sharedBy": "{{name}} 님이 공유"
   },
   "landing": {
     "tagline": "EVE Online을 위한 웜홀 체인 지도 작성",

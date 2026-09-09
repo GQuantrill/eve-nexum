@@ -1386,7 +1386,8 @@
     "updateAvailable": "有可用更新",
     "updateAvailableVersion": "有可用更新：v{{version}}",
     "copyThisMap": "复制此地图",
-    "getMoreMaps": "+ 获取更多地图"
+    "getMoreMaps": "+ 获取更多地图",
+    "sharedBy": "由 {{name}} 共享"
   },
   "landing": {
     "tagline": "EVE Online 的虫洞链路绘图",

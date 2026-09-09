@@ -168,6 +168,19 @@
 .map-dropdown__badge--corp { background: rgba(100,160,255,0.15); color: var(--accent-light); border: 1px solid rgba(100,160,255,0.3); }
 .map-dropdown__badge--alliance { background: rgba(245,166,35,0.15); color: var(--warning-alt); border: 1px solid rgba(245,166,35,0.3); }
 .map-dropdown__badge--shared { background: rgba(192,132,252,0.15); color: var(--accent-violet); border: 1px solid rgba(192,132,252,0.3); }
+
+/* Who a shared map belongs to, after its name in the map list. Muted, with a
+   separator dot, so it reads as an attribution rather than part of the name.
+   Deliberately inline: the row is display:block and shared with the action
+   items, so it is not turned into a flex container just for this. */
+/* Its own line under the map name. Inline, it competed with the name for a
+   narrow dropdown and broke it mid-word ("Shared catch / me - addelee"); a
+   deliberate second line reads as an attribution instead of a wrap. No
+   font-size of its own — it inherits, so the user's text scaling still applies. */
+.map-dropdown__owner {
+  display: block;
+  color: var(--text-dim);
+}
 .map-dropdown__badge--lock { background: transparent; border: none; font-size: calc(12px * var(--font-scale, 1)); }
 
 .toolbar__actions { display: flex; gap: 8px; }

@@ -394,7 +394,14 @@ export function Toolbar() {
               const active = maps.find((m) => m.id === activeMapId);
               if (!active) return null;
               if (active.sharedWithMe) {
-                return <span className="toolbar__map-type toolbar__map-type--shared">{t('toolbar.mapType.shared')}</span>;
+                return (
+                  <span
+                    className="toolbar__map-type toolbar__map-type--shared"
+                    data-tooltip={active.ownerName ? t('toolbar.sharedBy', { name: active.ownerName }) : undefined}
+                  >
+                    {t('toolbar.mapType.shared')}
+                  </span>
+                );
               }
               if (active.isAllianceMap) {
                 return <span className="toolbar__map-type toolbar__map-type--alliance">{t('toolbar.mapType.alliance')}</span>;
@@ -443,6 +450,12 @@ export function Toolbar() {
                   {!m.sharedWithMe && m.isCorpMap && <span className="map-dropdown__badge map-dropdown__badge--corp">{t('toolbar.mapType.corp')}</span>}
                   {m.locked    && <span className="map-dropdown__badge map-dropdown__badge--lock">🔒</span>}
                   {m.name}
+                  {/* Whose map this is. Only for shares: on your own maps the
+                      owner is you, and on corp/alliance maps the badge already
+                      says who it belongs to. */}
+                  {m.sharedWithMe && m.ownerName && (
+                    <span className="map-dropdown__owner">{m.ownerName}</span>
+                  )}
                 </button>
               ))}
               <div className="map-dropdown__divider" />
