@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { readUserSetting, writeUserSetting } from '../hooks/useUserSetting';
 import { v4 as uuid } from 'uuid';
 import { api } from '../api/client';
-import { enqueue } from './pendingQueue';
+import { enqueue, isPermanentRejection } from './pendingQueue';
 import { toast } from '../components/ui/Toaster';
 import type { WormholeMap, MapSystem, MapConnection, SavedRoute, SystemClass, WormholeEffect } from '../types';
 import type { WhSig, UndivedHole } from '../utils/undivedWormholes';
@@ -1012,7 +1012,21 @@ export const useMapStore = create<MapStore>()((set, get) => {
                 },
               }));
             })
-            .catch(() => enqueue(`addSystem:${added.name}`, url, 'POST', body));
+            .catch((err) => {
+              // The server refused the row outright — most often because the
+              // system is already on this map (uq_map_systems_eve_system). The
+              // optimistic node has to go: left standing it looks like a real
+              // duplicate that has to be deleted by hand, while existing
+              // nowhere but this tab. Queueing it would only retry a refusal.
+              if (isPermanentRejection(err)) {
+                console.warn(`[map] system "${added.name}" rejected by the server; dropping the local copy`);
+                set((s) => ({
+                  map: { ...s.map, systems: s.map.systems.filter((sys) => sys.id !== id) },
+                }));
+                return;
+              }
+              enqueue(`addSystem:${added.name}`, url, 'POST', body);
+            });
           // Publish the settle signal so the jump's connection POST and the
           // system panel's sig/structure/anomaly GETs wait for the row to exist
           // instead of racing it. Never rejects; self-cleans after settling.
@@ -1187,7 +1201,19 @@ export const useMapStore = create<MapStore>()((set, get) => {
               }
               return ct;
             })
-            .catch(() => { enqueue(`addConnection:${id}`, url, 'POST', body); return 'unknown'; });
+            .catch((err) => {
+              // Same reasoning as addSystem: a refused connection that stays on
+              // the map is a link the server has never heard of.
+              if (isPermanentRejection(err)) {
+                console.warn(`[map] connection ${id} rejected by the server; dropping the local copy`);
+                set((s) => ({
+                  map: { ...s.map, connections: s.map.connections.filter((c) => c.id !== id) },
+                }));
+                return 'unknown';
+              }
+              enqueue(`addConnection:${id}`, url, 'POST', body);
+              return 'unknown';
+            });
           connClassPromises.set(id, classifyP);
           void classifyP.finally(() => connClassPromises.delete(id));
         }
