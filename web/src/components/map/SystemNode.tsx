@@ -585,6 +585,30 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
         </div>
       )}
 
+      {/* Statics in compact mode. The block above is hidden there, which loses
+          the one thing a wormholer routes by, so the destination classes alone
+          sit along the bottom — what Pathfinder and Wanderer show — in a single
+          short row rather than a titled list. Hover still gives full detail
+          through WHTypeInfo, and the code is shown when the destination can't
+          be resolved so nothing silently disappears. */}
+      {compactMode && showStatics && sys.statics.length > 0 && (
+        <div className="system-node__statics-compact">
+          {sys.statics.map((s) => {
+            const dest = whDestClass(s, whTypes);
+            return (
+              <WHTypeInfo key={s} code={s}>
+                <span
+                  className="system-node__static-mini"
+                  style={dest ? { color: CLASS_COLORS[dest] } : undefined}
+                >
+                  {dest ?? s}
+                </span>
+              </WHTypeInfo>
+            );
+          })}
+        </div>
+      )}
+
       {showUndivedWh && undivedHoles && undivedHoles.length > 0 && (
         <div className="system-node__holes">
           {undivedHoles.map((h) => {

@@ -569,6 +569,24 @@
   &::before { content: '→'; color: var(--text-dim); margin-right: 1px; }
 }
 
+/* Statics in compact mode: destination classes only, bottom-left. Compact mode
+   hides the titled block above, so this restores the information in one short
+   row. No background or padding — a bare coloured label reads at a glance and
+   adds a single line rather than several. */
+.system-node__statics-compact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 3px;
+}
+
+.system-node__static-mini {
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--text-default);
+}
+
 /* Scanned-but-not-dived wormholes: a row of small capsules just under the node,
    coloured by destination class (neutral when the type/destination is unknown).
    Absolutely positioned so they never affect node sizing or the handles. */
