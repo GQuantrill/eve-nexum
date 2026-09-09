@@ -353,7 +353,10 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
             ? t('mapNode.jumpsFrom', { count: gateJumps, origin: gateOrigin })
             : t('mapNode.jumps', { count: gateJumps })}
         >
-          {gateJumps}
+          {/* The word, not a bare number: "38" alone on a node was routinely
+              read as anything but a jump count. i18next picks the singular so
+              an adjacent system reads "1 jump", not "1 jumps". */}
+          {t('mapNode.jumps', { count: gateJumps })}
         </span>
       )}
 
