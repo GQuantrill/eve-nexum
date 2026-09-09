@@ -8,6 +8,7 @@ import { systemDisplayName } from '../../utils/systemName';
 import { useUserSetting } from '../../hooks/useUserSetting';
 import { useClickOutside } from '../../hooks/useClickOutside';
 import type { Anomaly, AnomType } from '../../types';
+import { parseAnomClipboard, type ParsedAnom } from '../../utils/anomParse';
 import { ConfirmModal, shouldSkipConfirm } from './ConfirmModal';
 import { NotesEditor } from './NotesEditor';
 import { Select } from './Select';
@@ -16,11 +17,7 @@ import { toast } from './Toaster';
 import { duration, DASH } from '../../i18n/format';
 
 // Cosmic anomalies don't need scanning — the probe scanner lists them at 100%
-// straight away. The scanner's "group" column is "Cosmic Anomaly" (vs "Cosmic
-// Signature" for sigs), so a single Ctrl+A / Ctrl+C of the whole window can be
-// routed by group: this pane takes the anomalies, the signature pane takes the
-// signatures (see SignaturePane's parser, which now rejects anomaly rows).
-const ANOM_GROUP = 'cosmic anomaly';
+// straight away. Paste parsing and classification live in utils/anomParse.
 
 const ANOM_TYPE_LABELS: Record<AnomType, string> = {
   unknown:   'Unknown',
@@ -28,36 +25,6 @@ const ANOM_TYPE_LABELS: Record<AnomType, string> = {
   ore:       'Ore',
   homefront: 'Homefront',
 };
-
-// Scanner "type" column → our enum. Combat Site / Ore Site (ice belts also
-// report as Ore Sites — only the name differs) / Homefront Operations.
-const EVE_ANOM_TYPE: Record<string, AnomType> = {
-  'combat site':         'combat',
-  'ore site':            'ore',
-  'homefront operations': 'homefront',
-};
-
-interface ParsedAnom { anomId: string; anomType: AnomType; name: string; }
-
-function parseAnomClipboard(text: string): ParsedAnom[] {
-  return text
-    .split('\n')
-    .map((l) => l.trim())
-    .filter(Boolean)
-    .flatMap((line): ParsedAnom[] => {
-      const parts = line.split('\t');
-      const anomId = parts[0]?.trim().toUpperCase() ?? '';
-      if (!/^[A-Z]{3}-\d{3}$/.test(anomId)) return [];
-      // Only rows the scanner classes as a Cosmic Anomaly — everything else
-      // (signatures) is left for the signature pane.
-      if ((parts[1]?.trim().toLowerCase() ?? '') !== ANOM_GROUP) return [];
-      const type = parts[2]?.trim().toLowerCase() ?? '';
-      const anomType = EVE_ANOM_TYPE[type] ?? 'unknown';
-      const col3 = parts[3]?.trim() ?? '';
-      const name = /^\d+\.?\d*%$/.test(col3) ? '' : col3;
-      return [{ anomId, anomType, name }];
-    });
-}
 
 type SortCol = 'anomId' | 'anomType' | 'name' | 'createdAt' | 'updatedAt';
 type ColKey  = 'id' | 'type' | 'name' | 'notes' | 'created' | 'updated';
