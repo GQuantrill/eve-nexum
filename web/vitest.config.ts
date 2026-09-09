@@ -11,6 +11,9 @@ export default defineConfig({
   plugins: [react()],
   test: {
     environment: 'jsdom',
+    // Unmounts each render between tests — see the file for why this is needed
+    // rather than relying on Testing Library's automatic cleanup.
+    setupFiles: ['./vitest.setup.ts'],
     include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
     // Each test gets clean module state: these stores are module-level
     // singletons holding caches and in-flight promises, so leaking one test's
