@@ -28,7 +28,18 @@
      TooltipLayer.tsx), which clamps the chip inside the viewport so it can't
      spill off-screen the way this centred pseudo-element does. The ::after
      above is kept (invisible) so the legacy markup/variant classes are inert
-     rather than removed wholesale. */
+     rather than removed wholesale.
+
+     display:none rather than opacity:0 alone. An absolutely positioned,
+     nowrap ::after still contributes to its ancestors' scrollable overflow
+     even at zero opacity, so a long tooltip string silently widened the
+     scroll area by its own text width. Harmless on the map, but inside the
+     undocked signature panel it produced a horizontal scrollbar that scrolled
+     to nothing but blank space. Nothing sets opacity:1 on this pseudo
+     anywhere, so it is inert in every sense now rather than only visually. */
+  &::after {
+    display: none;
+  }
 }
 
 /* Portal-rendered floating tooltip (see Tooltip.tsx). Anchored via

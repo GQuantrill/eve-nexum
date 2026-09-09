@@ -459,12 +459,15 @@
 
 .sig-pane__controls .sig-pane__toolbar {
   margin-left: auto;
-  /* Deliberately NOT shrinkable, and no min-width:0. The buttons have no slack
-     in them, so letting this shrink just moved the overflow inside the toolbar.
-     The filter above absorbs the squeeze instead, and when there is genuinely
-     no room the whole toolbar wraps to its own line — which is the old layout,
-     reached only when it is actually needed. */
-  flex: 0 0 auto;
+  /* Shrinkable, but only because it can wrap. Without flex-wrap the buttons had
+     no slack and shrinking merely moved the overflow inside the toolbar, so it
+     was pinned at its natural width instead — which then forced a horizontal
+     scrollbar whenever the pane was narrower than that, as it is in an undocked
+     window. Wrapping lets it give way properly: buttons stack, nothing clips,
+     and nothing overflows. */
+  flex: 0 1 auto;
+  flex-wrap: wrap;
+  min-width: 0;
 }
 
 .sig-pane__toolbar {
