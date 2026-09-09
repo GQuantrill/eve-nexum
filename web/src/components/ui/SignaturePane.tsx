@@ -881,6 +881,11 @@ export function SignaturePane({ systemId }: { systemId: string }) {
       {!isShareMode && sigs.length === 0 && (
         <p className="sig-pane__hint">{t('signatures.pasteHint')}</p>
       )}
+      {/* Filters and actions share ONE row. This pane is tall and vertical space
+          is the scarce resource here, so the two no longer take a line each.
+          The filter is placed on the left with CSS `order` rather than by
+          moving the markup, which keeps the tab order (actions first) intact. */}
+      <div className="sig-pane__controls">
       {canEdit && !isShareMode && (
         <div className="sig-pane__toolbar">
           <button className="icon-btn" onClick={addSig} title={t('signatures.addSignature')}>{t('signatures.addSignature')}</button>
@@ -994,6 +999,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
           </div>
         </div>
       )}
+      </div>
 
       {sigs.length === 0 ? (
         <div className={`sig-pane__empty${isShareMode ? ' sig-pane__empty--shared' : ''}`}>

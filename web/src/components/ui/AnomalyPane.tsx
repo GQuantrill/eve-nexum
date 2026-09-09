@@ -488,6 +488,11 @@ export function AnomalyPane({ systemId }: { systemId: string }) {
       {anoms.length === 0 && (
         <p className="sig-pane__hint">{t('anomalies.pasteHint')}</p>
       )}
+      {/* Filters and actions share ONE row. This pane is tall and vertical space
+          is the scarce resource here, so the two no longer take a line each.
+          The filter is placed on the left with CSS `order` rather than by
+          moving the markup, which keeps the tab order (actions first) intact. */}
+      <div className="sig-pane__controls">
       {canEdit && (
         <div className="sig-pane__toolbar">
           <button className="icon-btn" onClick={addAnom} title={t('anomalies.addAnomaly')}>{t('anomalies.addAnomaly')}</button>
@@ -573,6 +578,7 @@ export function AnomalyPane({ systemId }: { systemId: string }) {
           </div>
         </div>
       )}
+      </div>
 
       {anoms.length === 0 ? (
         <div className="sig-pane__empty">{t('anomalies.empty')}</div>
