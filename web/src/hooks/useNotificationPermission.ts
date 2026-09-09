@@ -24,6 +24,8 @@ export function useNotificationPermission(): NotificationPermission {
 
   useEffect(() => {
     subscribers.add(setPerm);
+    // Deliberate: seeds from the live permission value on subscribe.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPerm(read());
 
     let teardown: (() => void) | null = null;

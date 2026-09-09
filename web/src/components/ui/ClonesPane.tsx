@@ -8,7 +8,7 @@ import { CLASS_COLORS } from '../../data/wormholes';
 import type { SystemClass } from '../../types';
 import { jumps as jumpsLabel } from '../../i18n/format';
 import { DASH } from '../../i18n/format';
-import { setWaypoint, canSetAutopilot } from './routeUi';
+import { setWaypoint, canSetAutopilot } from '../../utils/routeActions';
 import { MapPinSimpleIcon, PathIcon, CaretDownIcon, CaretRightIcon } from '../../icons';
 import type { Implant } from '../../hooks/useClones';
 

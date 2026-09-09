@@ -29,6 +29,24 @@ function scheduleFlush(delayMs = 600): void {
   flushTimer = setTimeout(() => { flushTimer = null; void flushQueue(); }, delayMs);
 }
 
+/**
+ * Did the server refuse this write on its own terms, rather than fail to receive
+ * it? A 4xx is a decision — the same request will be refused again, so queueing
+ * it just burns retries and, worse, leaves the optimistic local object standing
+ * as though it had been accepted.
+ *
+ * 401 is excluded deliberately: the session expired, and the write should still
+ * be waiting when the user logs back in. 408 and 429 are timing, not judgement.
+ * Anything without a status (network down, request aborted) is exactly what the
+ * queue is for.
+ */
+export function isPermanentRejection(err: unknown): boolean {
+  const status = (err as { status?: unknown } | null)?.status;
+  if (typeof status !== 'number') return false;
+  if (status === 401 || status === 408 || status === 429) return false;
+  return status >= 400 && status < 500;
+}
+
 export function enqueue(label: string, url: string, method: string, body: string) {
   queue.push({ id: opId(), label, url, method, body, attempts: 0 });
   console.warn(`[queue] Enqueued (${queue.length} pending): ${label}`);

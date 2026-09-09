@@ -11,7 +11,8 @@ import { useEsiSearch } from '../../hooks/useEsiSearch';
 import { useMapStore } from '../../store/mapStore';
 import { useAllMapHomes } from '../../hooks/useMapHomes';
 import { useUserSetting } from '../../hooks/useUserSetting';
-import { setWaypoint, RouteSquares, canSetAutopilot } from './routeUi';
+import { RouteSquares } from './routeUi';
+import { setWaypoint, canSetAutopilot } from '../../utils/routeActions';
 import { useSystemAlias } from '../../hooks/useSystemAlias';
 import { useRouteOrigin } from '../../hooks/useRouteOrigin';
 import { jumps as jumpsLabel } from '../../i18n/format';
@@ -180,12 +181,16 @@ export function ClosestSystemsPane() {
   const addRowRef               = useRef<HTMLDivElement>(null);
 
   useEffect(() => { if (adding) inputRef.current?.focus(); }, [adding]);
+  // Deliberate: resets the highlighted row / dropdown for a new query.
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setActiveIndex(-1); }, [results]);
 
   // Recompute the portal position any time the search row or results
   // shift. The portal lives on document.body so it escapes the info
   // card's overflow: hidden (which clips inline-positioned dropdowns).
   useEffect(() => {
+    // Deliberate: resets the highlighted row / dropdown for a new query.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (!adding) { setDropdownPos(null); return; }
     function update() {
       const el = addRowRef.current;

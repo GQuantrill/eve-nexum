@@ -12,11 +12,23 @@ interface Props {
   /** When provided, an "undock" button pops this card out into a floating
    *  window. Only the bottom dock passes it; the sidebar cards omit it. */
   onUndock?: () => void;
+  /** Keep the body MOUNTED (just hidden) while collapsed.
+   *
+   *  Collapsing normally unmounts the body, which is what stops a collapsed
+   *  card polling. That is right for most cards and wrong for the two that
+   *  listen for a window-level paste: an unmounted pane registers no listener,
+   *  so a single Ctrl+V of a full probe-scanner window silently lost whichever
+   *  half belonged to a collapsed pane.
+   *
+   *  Only pass this for cards that must react to events they don't own. It
+   *  costs their mount-time work while collapsed, so it is opt-in rather than
+   *  the default. */
+  keepMounted?: boolean;
 }
 
 function storageKey(id: string) { return `nexum.panel.collapsed.${id}`; }
 
-export function DraggableCard({ id, title, children, onUndock }: Props) {
+export function DraggableCard({ id, title, children, onUndock, keepMounted = false }: Props) {
   const { t } = useTranslation();
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
 
@@ -66,7 +78,11 @@ export function DraggableCard({ id, title, children, onUndock }: Props) {
           ⠿
         </button>
       </div>
-      {!collapsed && !isDragging && <div className="info-card__body">{children}</div>}
+      {!collapsed && !isDragging
+        ? <div className="info-card__body">{children}</div>
+        // `hidden` rather than unmounting: effects keep running, so a paste
+        // listener registered by the body survives the card being collapsed.
+        : keepMounted ? <div className="info-card__body" hidden>{children}</div> : null}
     </div>
   );
 }

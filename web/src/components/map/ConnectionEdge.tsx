@@ -37,6 +37,13 @@ const TIME_COLORS: Record<string, string> = {
   expired:    'var(--cv-conn-expired)',
 };
 
+// Ship-size limit, shown beside the wormhole type. The code already implies it
+// to anyone who has the table memorised; this is for everyone else, and for the
+// untyped / bare-K162 holes where the size is whatever a scout set by hand.
+const SIZE_LABELS: Record<string, string> = {
+  xl: 'XL', large: 'L', medium: 'M', small: 'S',
+};
+
 const MASS_LABELS: Record<string, { text: string; cls: string }> = {
   stable:       { text: '> 50%', cls: 'connection-label__mass' },
   destabilized: { text: '< 50%', cls: 'connection-label__mass connection-label__mass--warn' },
@@ -176,6 +183,29 @@ export const ConnectionEdge = memo(({
   const strokeWidth = emphasized ? baseWidth + 2 : baseWidth;
   const massLabel   = !noLifetime && conn?.massStatus ? (MASS_LABELS[conn.massStatus] ?? null) : null;
 
+  // A frigate-sized hole gets its own dash. Dashing already marks Ansiblex and
+  // cyno routes, but neither can also be a wormhole, so the channel is free
+  // here. A broken hole keeps its severed dash — being dead outranks being
+  // small.
+  const frigHole = !noLifetime && !broken && conn?.size === 'small';
+  // Only wormholes have a size worth stating; a gate or an Ansiblex takes
+  // anything. Small and medium are flagged as restrictions because they change
+  // what you can bring — medium especially, since nothing on the LINE marks it.
+  const sizeText = !noLifetime && conn?.size ? (SIZE_LABELS[conn.size] ?? null) : null;
+  const sizeRestrictive = conn?.size === 'small' || conn?.size === 'medium';
+  const dash = broken ? '5 7' : isCyno ? '2 6' : isJumpgate ? '10 5' : frigHole ? '4 4' : undefined;
+
+  // Mass rides a SECOND channel rather than competing for colour, which
+  // lifetime already owns. A thin core in the mass colour runs inside the
+  // line, so a hole that is both EOL and critical reads as both at once
+  // instead of one state overwriting the other. Same tokens as the mass
+  // label, so the line and the text agree.
+  const massCore = !noLifetime && !broken
+    ? conn?.massStatus === 'critical'     ? 'var(--cv-conn-expired)'
+    : conn?.massStatus === 'destabilized' ? 'var(--cv-conn-1h)'
+    : null
+    : null;
+
   // Prefer the live bucket label; fall back to the stored category label only
   // for a connection whose lifetime is unknown but which carries a legacy
   // timeStatus value (e.g. a hand-set band on an untyped hole).
@@ -201,7 +231,7 @@ export const ConnectionEdge = memo(({
           // stays readable even while highlighted.
           stroke: strokeColor,
           strokeWidth: watchColor ? strokeWidth + 1 : strokeWidth,
-          strokeDasharray: broken ? '5 7' : isCyno ? '2 6' : isJumpgate ? '10 5' : undefined,
+          strokeDasharray: dash,
           filter: [
             emphasized ? `drop-shadow(0 0 6px ${strokeColor})` : null,
             watchColor ? `drop-shadow(0 0 5px ${watchColor}) drop-shadow(0 0 2px ${watchColor})` : null,
@@ -210,6 +240,22 @@ export const ConnectionEdge = memo(({
         }}
         markerEnd={undefined}
       />
+      {/* Mass core, painted over the main stroke and following the same path
+          and dash so it reads as one line with a coloured centre rather than
+          two overlapping edges. Non-interactive: the BaseEdge underneath keeps
+          all hit-testing. */}
+      {massCore && (
+        <path
+          d={edgePath}
+          fill="none"
+          stroke={massCore}
+          strokeWidth={Math.max(1, (watchColor ? strokeWidth + 1 : strokeWidth) - 2.5)}
+          strokeDasharray={dash}
+          strokeLinecap="round"
+          pointerEvents="none"
+          opacity={conn?.dimmed ? 0.1 : 0.95}
+        />
+      )}
       <EdgeLabelRenderer>
         {broken && (
           <div
@@ -241,11 +287,17 @@ export const ConnectionEdge = memo(({
             : isGate
               ? <span className="connection-label__gate">G</span>
               : conn?.type
-                ? <span className="connection-label__type">{conn.type}</span>
+                ? <span className="connection-label__type">
+                    {conn.type}
+                    {sizeText && <span className={`connection-label__size${sizeRestrictive ? ' connection-label__size--limit' : ''}`}>{sizeText}</span>}
+                  </span>
                 // Typeless wormhole normally shows no badge; surface a "WH" one
                 // while hovered so every traced link reveals its jump type.
                 : highlighted
-                  ? <span className="connection-label__type">WH</span>
+                  ? <span className="connection-label__type">
+                      WH
+                      {sizeText && <span className={`connection-label__size${sizeRestrictive ? ' connection-label__size--limit' : ''}`}>{sizeText}</span>}
+                    </span>
                   : null;
           const massNode = !noLifetime && massLabel
             ? <span className={massLabel.cls}>{massLabel.text}</span>

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { api } from '../../api/client';
+import i18n from '../../i18n';
 import { useMapStore, awaitSystemCreate } from '../../store/mapStore';
 import { useCanEditContent } from '../../hooks/useCanEditContent';
 import { useShareMode } from '../../context/ShareModeContext';
@@ -8,19 +9,17 @@ import { systemDisplayName } from '../../utils/systemName';
 import { useUserSetting } from '../../hooks/useUserSetting';
 import { useClickOutside } from '../../hooks/useClickOutside';
 import type { Anomaly, AnomType } from '../../types';
-import { ConfirmModal, shouldSkipConfirm } from './ConfirmModal';
+import { parseAnomClipboard, type ParsedAnom } from '../../utils/anomParse';
+import { ConfirmModal } from './ConfirmModal';
+import { shouldSkipConfirm } from '../../utils/confirmPref';
 import { NotesEditor } from './NotesEditor';
 import { Select } from './Select';
 import { XIcon, ColumnsIcon } from '../../icons';
-import { toast } from './Toaster';
+import { toast } from '../../utils/toastStore';
 import { duration, DASH } from '../../i18n/format';
 
 // Cosmic anomalies don't need scanning — the probe scanner lists them at 100%
-// straight away. The scanner's "group" column is "Cosmic Anomaly" (vs "Cosmic
-// Signature" for sigs), so a single Ctrl+A / Ctrl+C of the whole window can be
-// routed by group: this pane takes the anomalies, the signature pane takes the
-// signatures (see SignaturePane's parser, which now rejects anomaly rows).
-const ANOM_GROUP = 'cosmic anomaly';
+// straight away. Paste parsing and classification live in utils/anomParse.
 
 const ANOM_TYPE_LABELS: Record<AnomType, string> = {
   unknown:   'Unknown',
@@ -28,36 +27,6 @@ const ANOM_TYPE_LABELS: Record<AnomType, string> = {
   ore:       'Ore',
   homefront: 'Homefront',
 };
-
-// Scanner "type" column → our enum. Combat Site / Ore Site (ice belts also
-// report as Ore Sites — only the name differs) / Homefront Operations.
-const EVE_ANOM_TYPE: Record<string, AnomType> = {
-  'combat site':         'combat',
-  'ore site':            'ore',
-  'homefront operations': 'homefront',
-};
-
-interface ParsedAnom { anomId: string; anomType: AnomType; name: string; }
-
-function parseAnomClipboard(text: string): ParsedAnom[] {
-  return text
-    .split('\n')
-    .map((l) => l.trim())
-    .filter(Boolean)
-    .flatMap((line): ParsedAnom[] => {
-      const parts = line.split('\t');
-      const anomId = parts[0]?.trim().toUpperCase() ?? '';
-      if (!/^[A-Z]{3}-\d{3}$/.test(anomId)) return [];
-      // Only rows the scanner classes as a Cosmic Anomaly — everything else
-      // (signatures) is left for the signature pane.
-      if ((parts[1]?.trim().toLowerCase() ?? '') !== ANOM_GROUP) return [];
-      const type = parts[2]?.trim().toLowerCase() ?? '';
-      const anomType = EVE_ANOM_TYPE[type] ?? 'unknown';
-      const col3 = parts[3]?.trim() ?? '';
-      const name = /^\d+\.?\d*%$/.test(col3) ? '' : col3;
-      return [{ anomId, anomType, name }];
-    });
-}
 
 type SortCol = 'anomId' | 'anomType' | 'name' | 'createdAt' | 'updatedAt';
 type ColKey  = 'id' | 'type' | 'name' | 'notes' | 'created' | 'updated';
@@ -224,6 +193,8 @@ export function AnomalyPane({ systemId }: { systemId: string }) {
     if (!activeMapId) return;
     for (const tm of removalTimers.current.values()) clearTimeout(tm);
     removalTimers.current.clear();
+    // Deliberate: clears this pane's own state when the record it shows changes.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setRemoving(new Set());
     setAnoms([]);
     setSelected(new Set());
@@ -240,7 +211,7 @@ export function AnomalyPane({ systemId }: { systemId: string }) {
       if (cancelled) return;
       api<Anomaly[]>(`/api/maps/${activeMapId}/systems/${systemId}/anomalies`)
         .then((data) => { if (!cancelled) setAnoms(data); })
-        .catch(() => { if (!cancelled) toast.error(t('anomalies.loadFailed')); });
+        .catch(() => { if (!cancelled) toast.error(i18n.t('anomalies.loadFailed')); });
     };
     const pending = awaitSystemCreate(systemId);
     if (pending) void pending.then(fetchAnoms); else fetchAnoms();
@@ -488,6 +459,11 @@ export function AnomalyPane({ systemId }: { systemId: string }) {
       {anoms.length === 0 && (
         <p className="sig-pane__hint">{t('anomalies.pasteHint')}</p>
       )}
+      {/* Filters and actions share ONE row. This pane is tall and vertical space
+          is the scarce resource here, so the two no longer take a line each.
+          The filter is placed on the left with CSS `order` rather than by
+          moving the markup, which keeps the tab order (actions first) intact. */}
+      <div className="sig-pane__controls">
       {canEdit && (
         <div className="sig-pane__toolbar">
           <button className="icon-btn" onClick={addAnom} title={t('anomalies.addAnomaly')}>{t('anomalies.addAnomaly')}</button>
@@ -573,6 +549,7 @@ export function AnomalyPane({ systemId }: { systemId: string }) {
           </div>
         </div>
       )}
+      </div>
 
       {anoms.length === 0 ? (
         <div className="sig-pane__empty">{t('anomalies.empty')}</div>

@@ -5,7 +5,7 @@ import { XIcon } from '../../icons';
 import { api } from '../../api/client';
 import { useMapStore } from '../../store/mapStore';
 import { useAuth, isAdminRole, isAllianceAdminRole } from '../../context/AuthContext';
-import { toast } from './Toaster';
+import { toast } from '../../utils/toastStore';
 
 type MapType = 'personal' | 'corp' | 'alliance';
 const TYPE_LABEL = { personal: 'copyMap.typePersonal', corp: 'copyMap.typeCorp', alliance: 'copyMap.typeAlliance' } as const;

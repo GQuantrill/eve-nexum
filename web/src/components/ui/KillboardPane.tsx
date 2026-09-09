@@ -288,6 +288,8 @@ export function KillboardPane({ eveSystemId }: Props) {
   // Reset the lazy window whenever the system or filter changes — otherwise
   // a system with 8 visible kills carries over its expanded count to the
   // next system the user clicks on, which is jarring.
+  // Deliberate: resets paging when the system changes.
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setVisibleCount(PAGE_SIZE); }, [eveSystemId, includeNpc]);
 
   if (!eveSystemId) {

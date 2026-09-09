@@ -10,7 +10,7 @@ import { useMapStore } from '../../store/mapStore';
 import { useCanEdit } from '../../hooks/useCanEdit';
 import { useWormholeTypes } from '../../hooks/useWormholeTypes';
 import { api } from '../../api/client';
-import { toast } from './Toaster';
+import { toast } from '../../utils/toastStore';
 import { buildChainPath, buildChainSteps, reverseRoute } from '../../utils/chains';
 import type { ChainStep } from '../../utils/chains';
 import { whSizeForType, whSizeLabel } from '../../utils/wormholeSize';

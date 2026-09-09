@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { api, ApiError } from '../../api/client';
 import { useMapStore } from '../../store/mapStore';
 import { useAuth } from '../../context/AuthContext';
-import { toast } from './Toaster';
+import { toast } from '../../utils/toastStore';
 import { XIcon, PlusIcon } from '../../icons';
 
 interface ShareRow {
@@ -73,6 +73,8 @@ export function MapSharesSection() {
 
   // Re-load shares whenever the active map changes; clear any staging.
   useEffect(() => {
+    // Deliberate: clears this pane's own state when the record it shows changes.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setStaged([]);
     if (!mapId) { setShares([]); return; }
     setLoading(true);
@@ -88,6 +90,8 @@ export function MapSharesSection() {
   const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
     if (searchTimer.current) clearTimeout(searchTimer.current);
+    // Deliberate: clears this pane's own state when the record it shows changes.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMatch(null);
     const q = query.trim();
     if (q.length < 3) { setSearching(false); return; }

@@ -532,5 +532,5 @@ export function useLocationTracking(enabled: boolean) {
       lastSelectedEveId.current = system.eveSystemId;
       selectSystem(mapSystemId, { fromJump: true });
     }
-  }, [enabled, location, checkedAt, canEdit, followedId]);
+  }, [enabled, location, checkedAt, canEdit, followedId, clones]);
 }

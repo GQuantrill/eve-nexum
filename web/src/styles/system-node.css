@@ -248,6 +248,37 @@
   margin-bottom: 4px;
 }
 
+/* Signature scan progress. Pushed to the right of the meta row so it never
+   competes with the class badge, and deliberately NOT a progress bar — the
+   number is the whole signal.
+
+   Muted at 100% (nothing to do) and highlighted below it, so the moment a new
+   unscanned signature lands in a finished system the node changes appearance on
+   its own. */
+.system-node__scan {
+  position: absolute;
+  bottom: 4px;
+  right: 6px;
+  font-size: calc(11px * var(--font-scale, 1));
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 16px;
+  color: var(--text-dim);
+  pointer-events: none;
+}
+
+.system-node__scan--partial {
+  color: var(--warning);
+}
+
+/* The gate-jump badge occupies this same corner on hover, but only on k-space
+   systems. Stand down for it rather than overlap — the percentage comes back
+   the moment the pointer leaves. :has() keeps this to the nodes that actually
+   have a jump badge, so wormhole systems (which never do) keep theirs on hover. */
+.system-node:hover:has(.system-node__gate-jumps) .system-node__scan {
+  display: none;
+}
+
 .system-node__class-badge {
   font-size: calc(13px * var(--font-scale, 1));
   font-weight: 700;
@@ -569,6 +600,45 @@
   &::before { content: '→'; color: var(--text-dim); margin-right: 1px; }
 }
 
+/* Statics in compact mode: destination classes only, bottom-left. Compact mode
+   hides the titled block above, so this restores the information in one short
+   row. No background or padding — a bare coloured label reads at a glance and
+   adds a single line rather than several. */
+.system-node__statics-compact {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 5px;
+  margin-top: 3px;
+}
+
+/* The WHTypeInfo wrapper carries its own margin-left, which indented the first
+   static past the name and class lines above it. Spacing here comes from the
+   container's gap instead, so the row starts flush with the rest of the node. */
+.system-node__statics-compact > * {
+  margin-left: 0;
+}
+
+/* "Statics" — without it a bare pair of class labels under the system's own
+   class reads as though the system were two classes at once. The colon lives in
+   CSS so the label reuses the existing translated string rather than needing a
+   punctuated copy of it in all nine locales. */
+.system-node__statics-compact-label {
+  font-size: calc(13px * var(--font-scale, 1));
+  color: var(--text-dim);
+}
+
+.system-node__statics-compact-label::after {
+  content: ':';
+}
+
+.system-node__static-mini {
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--text-default);
+}
+
 /* Scanned-but-not-dived wormholes: a row of small capsules just under the node,
    coloured by destination class (neutral when the type/destination is unknown).
    Absolutely positioned so they never affect node sizing or the handles. */
@@ -654,6 +724,12 @@
   cursor: default;
   filter: drop-shadow(0 0 3px #f0a03088);
   position: relative;
+}
+
+/* Pulse the glyph only. On the wrapper the opacity animation cascades to the
+   whole subtree, so the hover tooltip blinked along with the skull and was
+   unreadable. Same fix the recent-kill icon already carries. */
+.system-node__insurgency-icon svg {
   animation: skull-flash 1.4s ease-in-out infinite;
 }
 
@@ -742,6 +818,12 @@
   cursor: default;
   filter: drop-shadow(0 0 3px #e05a5a88);
   position: relative;
+}
+
+/* Pulse the glyph only. On the wrapper the opacity animation cascades to the
+   whole subtree, so the hover tooltip blinked along with the skull and was
+   unreadable. Same fix the recent-kill icon already carries. */
+.system-node__incursion-icon svg {
   animation: skull-flash 1.4s ease-in-out infinite;
 }
 

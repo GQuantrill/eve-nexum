@@ -6,7 +6,7 @@ import { XIcon } from '../../icons';
 import { api } from '../../api/client';
 import { useMapStore, type MapListItem } from '../../store/mapStore';
 import { useAuth, isAdminRole } from '../../context/AuthContext';
-import { toast } from './Toaster';
+import { toast } from '../../utils/toastStore';
 import { Select } from './Select';
 
 interface MergeResult {

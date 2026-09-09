@@ -45,6 +45,8 @@ export function useEsiSearch(query: string, debounceMs = 300) {
 
   useEffect(() => {
     if (query.length < 2) {
+      // Deliberate: clears results when the query stops qualifying.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setResults([]);
       return;
     }

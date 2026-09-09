@@ -402,6 +402,8 @@ function Field({ label, value, onPick, structures }: { label: string; value: Pic
   const kspaceIds = kspace.map((r) => r.id).join(',');
   const [stationSys, setStationSys] = useState<{ solarSystemId: number; systemName: string }[]>([]);
   useEffect(() => {
+    // Deliberate: clears this pane's own state when the record it shows changes.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (!kspaceIds) { setStationSys([]); return; }
     let off = false;
     api<{ solarSystemId: number; systemName: string }[]>(`/api/structures/stations?systems=${kspaceIds}`)

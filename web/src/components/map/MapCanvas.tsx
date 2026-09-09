@@ -27,7 +27,8 @@ import { ConnectionEdge } from './ConnectionEdge';
 import { AddSystemModal } from '../ui/AddSystemModal';
 import { ContextMenu } from '../ui/ContextMenu';
 import type { ContextMenuItem } from '../ui/ContextMenu';
-import { ConfirmModal, shouldSkipConfirm } from '../ui/ConfirmModal';
+import { ConfirmModal } from '../ui/ConfirmModal';
+import { shouldSkipConfirm } from '../../utils/confirmPref';
 import {
   PathIcon, MapPinSimpleIcon, HouseIcon, LockIcon, LockOpenIcon,
   XIcon, CheckIcon, PlusIcon, SelectionAllIcon, EyeIcon, CrosshairSimpleIcon,
@@ -61,7 +62,8 @@ import { useJumpRangeStore } from '../../store/jumpRangeStore';
 import { useGateJumps } from '../../hooks/useGateJumps';
 import { pickHandles } from './edgeUtils';
 import { setDestination, addWaypoint } from '../../api/waypoint';
-import { toast } from '../ui/Toaster';
+import { toast } from '../../utils/toastStore';
+import i18n from '../../i18n';
 import { useCustomIntel } from '../../hooks/useCustomIntel';
 import { useUserSetting } from '../../hooks/useUserSetting';
 import { useCurrentHourKills } from '../../hooks/useCurrentHourKills';
@@ -511,7 +513,7 @@ export function MapCanvas() {
         if (home) {
           centerOnSystem(home.id);
         } else {
-          toast.info(t('ctxMenu.noHomeSet'));
+          toast.info(i18n.t('ctxMenu.noHomeSet'));
         }
       }
     };

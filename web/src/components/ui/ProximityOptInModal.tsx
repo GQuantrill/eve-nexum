@@ -23,6 +23,8 @@ export function ProximityOptInModal() {
     if (typeof Notification === 'undefined') return;
     if (Notification.permission !== 'default')  return;
     if (localStorage.getItem(ASKED_KEY))         return;
+    // Deliberate: one-shot gate, evaluated once on mount.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setShow(true);
   }, []);
 

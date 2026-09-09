@@ -2,8 +2,8 @@ import { create } from 'zustand';
 import { readUserSetting, writeUserSetting } from '../hooks/useUserSetting';
 import { v4 as uuid } from 'uuid';
 import { api } from '../api/client';
-import { enqueue } from './pendingQueue';
-import { toast } from '../components/ui/Toaster';
+import { enqueue, isPermanentRejection } from './pendingQueue';
+import { toast } from '../utils/toastStore';
 import type { WormholeMap, MapSystem, MapConnection, SavedRoute, SystemClass, WormholeEffect } from '../types';
 import type { WhSig, UndivedHole } from '../utils/undivedWormholes';
 import { pickHandles } from '../components/map/edgeUtils';
@@ -345,6 +345,17 @@ interface MapStore {
   // chain — not just connections/statics. Loaded in bulk on map switch and
   // kept fresh by the open sig pane + remote sig.changed events.
   sigTypesBySystem: Record<string, string[]>;
+  // Scan progress per system: how many of its signatures have been identified
+  // (any type other than 'unknown') out of the total. Drives the "% scanned"
+  // badge on the node, which is how an unscanned sig appearing in your home
+  // system announces itself without opening the pane.
+  scanBySystem: Record<string, { total: number; scanned: number }>;
+  setScanBulk: (next: Record<string, { total: number; scanned: number }>) => void;
+  // Single-system update, pushed by the open signature pane. The bulk loader
+  // only re-runs on sigRev, which the user's OWN edits deliberately don't bump,
+  // so without this the badge would ignore every paste, add, edit and delete
+  // until something remote happened or the map was reloaded.
+  setSystemScan: (systemId: string, value: { total: number; scanned: number }) => void;
   setSigTypesBulk: (next: Record<string, string[]>) => void;
   setSystemSigTypes: (systemId: string, types: string[]) => void;
 
@@ -597,6 +608,11 @@ export const useMapStore = create<MapStore>()((set, get) => {
     structRev: {},
     anomRev: {},
     sigTypesBySystem: {},
+    scanBySystem: {},
+    setScanBulk: (next) => set({ scanBySystem: next }),
+    setSystemScan: (systemId, value) => set((st) => ({
+      scanBySystem: { ...st.scanBySystem, [systemId]: value },
+    })),
     setSigTypesBulk: (next) => set({ sigTypesBySystem: next }),
     setSystemSigTypes: (systemId, types) => set((s) => ({
       sigTypesBySystem: { ...s.sigTypesBySystem, [systemId]: types },
@@ -709,7 +725,7 @@ export const useMapStore = create<MapStore>()((set, get) => {
         const keepSel     = prev.sel     && map.systems.some((s) => s.id === prev.sel)      ? prev.sel     : null;
         const keepConn    = prev.conn    && map.connections.some((c) => c.id === prev.conn) ? prev.conn    : null;
         const keepCurrent = prev.current && map.systems.some((s) => s.id === prev.current)  ? prev.current : null;
-        set({ map, activeMapId: id, selectedSystemId: keepSel, selectedConnectionId: keepConn, currentSystemId: keepCurrent, undoStack: [], sigTypesBySystem: {}, contentBySystem: {}, whSigsBySystem: {}, undivedWhBySystem: {}, contentFilter: { sigTypes: [], anomTypes: [], nameQuery: '', undivedWh: false } });
+        set({ map, activeMapId: id, selectedSystemId: keepSel, selectedConnectionId: keepConn, currentSystemId: keepCurrent, undoStack: [], sigTypesBySystem: {}, scanBySystem: {}, contentBySystem: {}, whSigsBySystem: {}, undivedWhBySystem: {}, contentFilter: { sigTypes: [], anomTypes: [], nameQuery: '', undivedWh: false } });
       } catch (err) {
         // 403/404 — the grant was revoked, or the map was deleted. Reload
         // the list (which will trigger the revocation-detection path above
@@ -996,7 +1012,21 @@ export const useMapStore = create<MapStore>()((set, get) => {
                 },
               }));
             })
-            .catch(() => enqueue(`addSystem:${added.name}`, url, 'POST', body));
+            .catch((err) => {
+              // The server refused the row outright — most often because the
+              // system is already on this map (uq_map_systems_eve_system). The
+              // optimistic node has to go: left standing it looks like a real
+              // duplicate that has to be deleted by hand, while existing
+              // nowhere but this tab. Queueing it would only retry a refusal.
+              if (isPermanentRejection(err)) {
+                console.warn(`[map] system "${added.name}" rejected by the server; dropping the local copy`);
+                set((s) => ({
+                  map: { ...s.map, systems: s.map.systems.filter((sys) => sys.id !== id) },
+                }));
+                return;
+              }
+              enqueue(`addSystem:${added.name}`, url, 'POST', body);
+            });
           // Publish the settle signal so the jump's connection POST and the
           // system panel's sig/structure/anomaly GETs wait for the row to exist
           // instead of racing it. Never rejects; self-cleans after settling.
@@ -1171,7 +1201,19 @@ export const useMapStore = create<MapStore>()((set, get) => {
               }
               return ct;
             })
-            .catch(() => { enqueue(`addConnection:${id}`, url, 'POST', body); return 'unknown'; });
+            .catch((err) => {
+              // Same reasoning as addSystem: a refused connection that stays on
+              // the map is a link the server has never heard of.
+              if (isPermanentRejection(err)) {
+                console.warn(`[map] connection ${id} rejected by the server; dropping the local copy`);
+                set((s) => ({
+                  map: { ...s.map, connections: s.map.connections.filter((c) => c.id !== id) },
+                }));
+                return 'unknown';
+              }
+              enqueue(`addConnection:${id}`, url, 'POST', body);
+              return 'unknown';
+            });
           connClassPromises.set(id, classifyP);
           void classifyP.finally(() => connClassPromises.delete(id));
         }

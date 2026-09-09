@@ -41,6 +41,8 @@ export function useStats(open: boolean) {
 
   useEffect(() => {
     if (!open) return;
+    // Deliberate: clears this pane's own state when the record it shows changes.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
     setError(null);
     api<StatsResponse>('/api/stats')

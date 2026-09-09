@@ -88,6 +88,20 @@
   padding: 1px 5px;
 }
 
+/* Ship-size limit, tucked against the wormhole type rather than taking a fourth
+   label row. Muted for L / XL, which impose nothing worth noticing; called out
+   for S and M, which decide what you can actually bring through. */
+.connection-label__size {
+  margin-left: 5px;
+  font-weight: 700;
+  opacity: 0.65;
+}
+
+.connection-label__size--limit {
+  color: var(--cv-conn-1h);
+  opacity: 1;
+}
+
 .connection-label__mass {
   font-size: calc(13px * var(--font-scale, 1));
   font-weight: 700;
@@ -431,6 +445,43 @@
   margin: 0 0 6px;
   font-style: italic;
   margin: 10px;
+}
+
+/* Filters and actions on ONE row. Both panes are tall and their vertical space
+   is the scarce resource, so the type filter and the action buttons no longer
+   take a line each.
+   
+   The filter is pulled left with `order` rather than by reordering the markup:
+   the actions stay first in the DOM, so tab order still reaches Add signature
+   before the filter chips. Both children keep wrapping, so a narrow sidebar
+   falls back to the old stacked layout instead of overflowing. */
+.sig-pane__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.sig-pane__controls .sig-pane__filter {
+  order: -1;
+  flex: 1 1 auto;
+  /* min-width:0 is load-bearing. A flex item defaults to min-width:auto, which
+     refuses to shrink below its content — the chips then stopped wrapping and
+     pushed the row into horizontal overflow instead. */
+  min-width: 0;
+}
+
+.sig-pane__controls .sig-pane__toolbar {
+  margin-left: auto;
+  /* Shrinkable, but only because it can wrap. Without flex-wrap the buttons had
+     no slack and shrinking merely moved the overflow inside the toolbar, so it
+     was pinned at its natural width instead — which then forced a horizontal
+     scrollbar whenever the pane was narrower than that, as it is in an undocked
+     window. Wrapping lets it give way properly: buttons stack, nothing clips,
+     and nothing overflows. */
+  flex: 0 1 auto;
+  flex-wrap: wrap;
+  min-width: 0;
 }
 
 .sig-pane__toolbar {

@@ -15,6 +15,8 @@ export function useJumpDistance(from: number | null, to: number | null, enabled:
   const [ly, setLy] = useState<number | null>(key && distanceCache.has(key) ? distanceCache.get(key)! : null);
   useEffect(() => {
     if (!enabled || key == null || from == null || to == null) return;
+    // Deliberate: serves a cached value, or clears for a new query.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (distanceCache.has(key)) { setLy(distanceCache.get(key)!); return; }
     let cancelled = false;
     api<{ ly: number | null }>(`/api/systems/${from}/distance?to=${to}`)
@@ -52,6 +54,8 @@ export function useJumpRange(): void {
   const maxLy = maxRangeLy(jdc);
 
   useEffect(() => {
+    // Deliberate: serves a cached value, or clears for a new query.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (stagingId == null) { setRows([]); setHasCoords(true); setLoading(false); return; }
     let cancelled = false;
     setLoading(true);

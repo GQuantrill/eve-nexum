@@ -210,6 +210,7 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
   // Scanned-but-not-dived wormholes here — rendered as pills under the node and
   // matched by the content filter's "undived wormhole" state.
   const undivedHoles    = useMapStore((s) => s.undivedWhBySystem[sys.id]);
+  const scan            = useMapStore((s) => s.scanBySystem[sys.id]);
   const [showUndivedWh] = useUserSetting<boolean>('nexum.map.showUndivedWh', true);
   // SDE-derived wormhole catalog (the single source of truth for destinations),
   // used to colour statics and undived-hole pills consistently with the rest of
@@ -345,6 +346,23 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
         </div>
       ) : null}
 
+      {/* Scan progress, bottom-right. Absolutely positioned so it takes no
+          layout space and cannot be squeezed: the meta row fills up with kill,
+          effect and sovereignty icons, and anything sharing that row loses.
+          The bottom-LEFT corner is left alone for the undived-wormhole capsules.
+
+          Hidden when a system has no signatures — "0%" on every unvisited system
+          would be noise. Amber below 100%, so a new unscanned signature landing
+          in a system you had finished changes the node on its own. */}
+      {scan && scan.total > 0 && (
+        <span
+          className={`system-node__scan${scan.scanned < scan.total ? ' system-node__scan--partial' : ''}`}
+          title={t('mapNode.scanned', { scanned: scan.scanned, total: scan.total })}
+        >
+          {Math.round((scan.scanned / scan.total) * 100)}%
+        </span>
+      )}
+
       {/* Gate jumps from the route origin — appears on hover for k-space systems. */}
       {gateJumps != null && !isGateOrigin && (
         <span
@@ -353,7 +371,10 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
             ? t('mapNode.jumpsFrom', { count: gateJumps, origin: gateOrigin })
             : t('mapNode.jumps', { count: gateJumps })}
         >
-          {gateJumps}
+          {/* The word, not a bare number: "38" alone on a node was routinely
+              read as anything but a jump count. i18next picks the singular so
+              an adjacent system reads "1 jump", not "1 jumps". */}
+          {t('mapNode.jumps', { count: gateJumps })}
         </span>
       )}
 
@@ -442,7 +463,12 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
         )}
         {sys.tag && <span className="system-node__tag">{sys.tag}</span>}
         <span className="system-node__name">{systemDisplayName(sys) || t('mapNode.unknown')}</span>
-        {sys.security != null && Number.isFinite(Number(sys.security)) && (
+        {/* K-space only. Every J-space system is -1.0, so printing it on a
+            wormhole node is a constant dressed up as data — it takes header
+            space and reads as though it distinguishes one hole from another.
+            The class badge below already says C1..C6 / Thera / Drifter, which
+            is the number that actually varies. */}
+        {isKspace && sys.security != null && Number.isFinite(Number(sys.security)) && (
           <span className="system-node__truesec" style={{ color: truesecColor(Number(sys.security)) }}>
             {Number(sys.security).toFixed(1)}
           </span>
@@ -579,6 +605,31 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
                   </span>
                 )}
               </span>
+              </WHTypeInfo>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Statics in compact mode. The block above is hidden there, which loses
+          the one thing a wormholer routes by, so the destination classes alone
+          sit along the bottom — what Pathfinder and Wanderer show — in a single
+          short row rather than a titled list. Hover still gives full detail
+          through WHTypeInfo, and the code is shown when the destination can't
+          be resolved so nothing silently disappears. */}
+      {compactMode && showStatics && sys.statics.length > 0 && (
+        <div className="system-node__statics-compact">
+          <span className="system-node__statics-compact-label">{t('mapNode.statics')}</span>
+          {sys.statics.map((s) => {
+            const dest = whDestClass(s, whTypes);
+            return (
+              <WHTypeInfo key={s} code={s}>
+                <span
+                  className="system-node__static-mini"
+                  style={dest ? { color: CLASS_COLORS[dest] } : undefined}
+                >
+                  {dest ?? s}
+                </span>
               </WHTypeInfo>
             );
           })}

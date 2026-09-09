@@ -3,7 +3,7 @@ import { charPortrait } from '../../utils/eveImages';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { api, ApiError } from '../../api/client';
-import { toast } from './Toaster';
+import { toast } from '../../utils/toastStore';
 import { useAuth, isAdminRole, isAllianceAdminRole, formatRole, ROLE_ORDER } from '../../context/AuthContext';
 import type { Role as AuthRole } from '../../context/AuthContext';
 import { useHashRoute } from '../../hooks/useHashRoute';
@@ -282,6 +282,8 @@ function AccessTab() {
 
   // Debounced exact-name lookup for the currently-selected kind.
   useEffect(() => {
+    // Deliberate: clears this pane's own state when the record it shows changes.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMatch(null); setAddError(null);
     const q = query.trim();
     if (q.length < 3) { setSearching(false); return; }
