@@ -253,6 +253,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   const mapConnections  = useMapStore((s) => s.map.connections);
   const currentSystemId = useMapStore((s) => s.currentSystemId);
   const setSystemSigTypes = useMapStore((s) => s.setSystemSigTypes);
+  const setSystemScan     = useMapStore((s) => s.setSystemScan);
   const setSystemWhSigs = useMapStore((s) => s.setSystemWhSigs);
   const canEdit         = useCanEditContent();
 
@@ -363,6 +364,17 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   useEffect(() => {
     setSystemSigTypes(systemId, sigs.filter((s) => s.whType).map((s) => s.whType.toUpperCase()));
   }, [sigs, systemId, setSystemSigTypes]);
+
+  // Scan progress for the node badge, from the same live list. Runs on every
+  // change to `sigs`, so pasting, adding a row by hand, setting a row's type and
+  // deleting all move the percentage immediately — the bulk index would not see
+  // any of them, for the reason above.
+  useEffect(() => {
+    setSystemScan(systemId, {
+      total:   sigs.length,
+      scanned: sigs.filter((s) => s.sigType && s.sigType !== 'unknown').length,
+    });
+  }, [sigs, systemId, setSystemScan]);
 
   // Same, for the richer wormhole-sig index that drives undived-hole pills and
   // the "undived wormhole" content filter — so scanning/pinning a hole here

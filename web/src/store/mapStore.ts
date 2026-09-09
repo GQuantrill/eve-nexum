@@ -351,6 +351,11 @@ interface MapStore {
   // system announces itself without opening the pane.
   scanBySystem: Record<string, { total: number; scanned: number }>;
   setScanBulk: (next: Record<string, { total: number; scanned: number }>) => void;
+  // Single-system update, pushed by the open signature pane. The bulk loader
+  // only re-runs on sigRev, which the user's OWN edits deliberately don't bump,
+  // so without this the badge would ignore every paste, add, edit and delete
+  // until something remote happened or the map was reloaded.
+  setSystemScan: (systemId: string, value: { total: number; scanned: number }) => void;
   setSigTypesBulk: (next: Record<string, string[]>) => void;
   setSystemSigTypes: (systemId: string, types: string[]) => void;
 
@@ -605,6 +610,9 @@ export const useMapStore = create<MapStore>()((set, get) => {
     sigTypesBySystem: {},
     scanBySystem: {},
     setScanBulk: (next) => set({ scanBySystem: next }),
+    setSystemScan: (systemId, value) => set((st) => ({
+      scanBySystem: { ...st.scanBySystem, [systemId]: value },
+    })),
     setSigTypesBulk: (next) => set({ sigTypesBySystem: next }),
     setSystemSigTypes: (systemId, types) => set((s) => ({
       sigTypesBySystem: { ...s.sigTypesBySystem, [systemId]: types },
