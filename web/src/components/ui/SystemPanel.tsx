@@ -155,6 +155,14 @@ const WIDTH_KEY  = 'nexum.panelInfoWidth';
 const COLLAPSE_KEY = 'nexum.panelInfoCollapsed';
 const MIN_H      = 80;
 const DEFAULT_H  = 300;
+// Column mode keeps its own size. Sharing one number with row mode means
+// switching layouts hands you a 300px-wide panel because that was your height.
+const SIDE_KEY   = 'nexum.panelSideWidth';
+const DEFAULT_SW = 460;
+const MIN_SW     = 320;
+function clampSide(v: number) {
+  return Math.min(Math.floor(window.innerWidth * 0.7), Math.max(MIN_SW, v));
+}
 // System-info column width: the previous fixed 400px is the max; users can drag
 // it narrower down to a still-readable minimum, and the panel-stack fills the
 // space freed up (or the whole panel when the column is fully collapsed).
@@ -217,6 +225,21 @@ export function SystemPanel() {
     return v ? clamp(parseInt(v, 10)) : DEFAULT_H;
   });
   const heightRef = useRef(height);
+
+  // Side-by-side layout: the panel becomes a column beside the map instead of a
+  // row beneath it. Only the docked panel moves — the workspace sidebar keeps
+  // its own left/right setting, and floating panes are unaffected.
+  const sideBySide = useMapStore((st) => st.panelSideBySide);
+  const requestFitView = useMapStore((st) => st.requestFitView);
+  const [sideWidth, setSideWidth] = useState(() => {
+    const v = localStorage.getItem(SIDE_KEY);
+    return v ? clampSide(parseInt(v, 10)) : DEFAULT_SW;
+  });
+  const sideWidthRef = useRef(sideWidth);
+
+  // React Flow keeps its old viewport when the container changes shape, so the
+  // map has to be told to refit when the split flips.
+  useEffect(() => { requestFitView(); }, [sideBySide, requestFitView]);
 
   const [infoWidth, setInfoWidth] = useState(() => {
     const v = localStorage.getItem(WIDTH_KEY);
@@ -293,17 +316,28 @@ export function SystemPanel() {
 
   const onResizeMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
+    // Row mode drags the top edge (height); column mode drags the left edge
+    // (width). Same handle, same idiom, different axis.
     const startY = e.clientY;
+    const startX = e.clientX;
     const startH = heightRef.current;
+    const startW = sideWidthRef.current;
 
     const onMove = (ev: MouseEvent) => {
+      if (sideBySide) {
+        const next = clampSide(startW + (startX - ev.clientX));
+        sideWidthRef.current = next;
+        setSideWidth(next);
+        return;
+      }
       const next = clamp(startH + (startY - ev.clientY));
       heightRef.current = next;
       setHeight(next);
     };
 
     const onUp = () => {
-      localStorage.setItem(HEIGHT_KEY, String(heightRef.current));
+      if (sideBySide) localStorage.setItem(SIDE_KEY, String(sideWidthRef.current));
+      else localStorage.setItem(HEIGHT_KEY, String(heightRef.current));
       document.removeEventListener('mousemove', onMove);
       document.removeEventListener('mouseup', onUp);
     };
@@ -410,7 +444,10 @@ export function SystemPanel() {
 
   return (
     <>
-    <aside className="system-panel" style={{ height }}>
+    <aside
+      className={`system-panel${sideBySide ? ' system-panel--side' : ''}`}
+      style={sideBySide ? { width: sideWidth } : { height }}
+    >
       <div className="system-panel__resize-handle" onMouseDown={onResizeMouseDown} />
 
       {infoCollapsed ? (

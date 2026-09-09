@@ -914,6 +914,8 @@ export function MapSidebar() {
   const snapToGrid = useMapStore((s) => s.snapToGrid);
   const setSnapToGrid = useMapStore((s) => s.setSnapToGrid);
   const compactMode = useMapStore((s) => s.compactMode);
+  const panelSideBySide = useMapStore((s) => s.panelSideBySide);
+  const setPanelSideBySide = useMapStore((s) => s.setPanelSideBySide);
   const setCompactMode = useMapStore((s) => s.setCompactMode);
   const showMinimap = useMapStore((s) => s.showMinimap);
   const setShowMinimap = useMapStore((s) => s.setShowMinimap);
@@ -1199,6 +1201,20 @@ export function MapSidebar() {
           title={t("mapSidebar.sections.systemOptions")}
           {...sectionProps("systemOptions")}
         >
+          {/* Where the docked panel sits: beneath the map (default) or beside
+              it. The workspace sidebar has its own left/right control and is
+              unaffected. */}
+          <div className="map-sidebar__row">
+            <label className="map-sidebar__label">{t("mapSidebar.panelLayout")}</label>
+            <button
+              className={`toolbar__toggle${panelSideBySide ? " toolbar__toggle--on" : ""}`}
+              onClick={() => setPanelSideBySide(!panelSideBySide)}
+              aria-pressed={panelSideBySide}
+            >
+              {panelSideBySide ? t("mapSidebar.panelBeside") : t("mapSidebar.panelBelow")}
+            </button>
+          </div>
+
           <div className="map-sidebar__row">
             <label className="map-sidebar__label">{t("mapSidebar.compact")}</label>
             <button

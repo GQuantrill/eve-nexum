@@ -219,6 +219,9 @@ interface MapStore {
   currentSystemId: string | null;
   snapToGrid: boolean;
   compactMode: boolean;
+  /** Docked panel beside the map (column layout) rather than beneath it. */
+  panelSideBySide: boolean;
+  setPanelSideBySide: (v: boolean) => void;
   showMinimap: boolean;
   uniformSize: boolean;
   showStatics: boolean;
@@ -583,6 +586,8 @@ export const useMapStore = create<MapStore>()((set, get) => {
     currentSystemId: null,
     snapToGrid: false,
     compactMode: false,
+    panelSideBySide: readUserSetting<boolean>('nexum.panelSideBySide', false),
+    setPanelSideBySide: (v) => { writeUserSetting('nexum.panelSideBySide', v); set({ panelSideBySide: v }); },
     showMinimap: true,
     uniformSize: true,
     showStatics: true,

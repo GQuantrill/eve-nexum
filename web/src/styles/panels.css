@@ -20,6 +20,28 @@
   > .btn { align-self: flex-end; }
 }
 
+/* Column mode. The panel's insides flip too: system info sits ABOVE the pane
+   stack rather than beside it, because at ~460px there isn't room for both. */
+.system-panel--side {
+  flex-direction: column;
+  height: 100%;
+  border-top: none;
+  border-left: 1px solid var(--border);
+  padding: 12px 16px 12px 16px;
+  overflow-y: auto;
+}
+
+/* The handle moves to the left edge and drags horizontally. */
+.system-panel--side .system-panel__resize-handle {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: auto;
+  width: 6px;
+  height: auto;
+  cursor: ew-resize;
+}
+
 .system-panel__resize-handle {
   position: absolute;
   top: 0;

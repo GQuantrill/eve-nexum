@@ -123,6 +123,25 @@
   position: relative; /* anchor for .map-sidebar */
 }
 
+/* Positioning context for the map and its right-edge overlay. Also the flex
+   child that gives up space to the docked panel in either layout. */
+.layout__map {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Side-by-side layout: the docked panel becomes a column to the right of the
+   map instead of a row beneath it. The workspace sidebar is a sibling of
+   .layout__main, so its own left/right setting is untouched by this. */
+.layout__main--side {
+  flex-direction: row;
+}
+
 
 /* ── Workspace sidebar ───────────────────────────────────── */
 .sidebar {

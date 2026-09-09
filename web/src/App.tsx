@@ -111,6 +111,8 @@ function MapApp() {
     return () => window.removeEventListener('focus', onFocus);
   }, [userId, loadMaps]);
 
+  const panelSideBySide = useMapStore((s) => s.panelSideBySide);
+
   useLocationTracking(!!mapId);
   useMapEventStream();
   useAnnouncerEvents();
@@ -122,9 +124,15 @@ function MapApp() {
         <Toolbar />
         <div className="layout__body">
           <Sidebar />
-          <div className="layout__main">
-            <MapCanvas />
-            <MapSidebar />
+          <div className={`layout__main${panelSideBySide ? ' layout__main--side' : ''}`}>
+            {/* The map and its overlay share a positioning context, so the
+                map-sidebar anchors to the MAP's right edge rather than the
+                whole main area — otherwise it floats over the docked panel in
+                the side-by-side layout. */}
+            <div className="layout__map">
+              <MapCanvas />
+              <MapSidebar />
+            </div>
             {selectedSystemId && <SystemPanel />}
             {selectedConnectionId && <ConnectionPanel />}
           </div>
