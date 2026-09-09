@@ -26,13 +26,16 @@ const EVE_ANOM_TYPE: Record<string, AnomType> = {
 // "Unknown". Two intakes: the original three, and the five-player operations
 // added in 2023.
 const HOMEFRONT_NAMES = new Set([
+  // 3-player operations
   'salvage research',
   'stabilize rift',
   'traffic stop',
   // 5-player operations
-  'abyssal attack',
+  'abyssal artifact recovery',
   'dread assault',
   'emergency aid',
+  'metaliminal meteoroid',
+  'raid',
   'suspicious signal',
 ]);
 

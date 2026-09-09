@@ -17,12 +17,24 @@ describe('anomaly classification', () => {
   // The reported miss: these three arrive with a type column that doesn't
   // resolve, so they landed as Unknown. Matched on the site name instead.
   it.each([
-    // The original operations
-    'Salvage Research', 'Traffic Stop', 'Stabilize Rift',
-    // The five-player operations added in 2023
-    'Abyssal Attack', 'Dread Assault', 'Emergency Aid', 'Suspicious Signal',
+    // 3-player operations
+    'Salvage Research', 'Stabilize Rift', 'Traffic Stop',
+    // 5-player operations
+    'Abyssal Artifact Recovery', 'Dread Assault', 'Emergency Aid',
+    'Metaliminal Meteoroid', 'Raid', 'Suspicious Signal',
   ])('classifies the homefront site "%s" even when the type column does not resolve', (name) => {
     expect(classifyAnom('', name)).toBe('homefront');
+  });
+
+  // All nine, so a future edit that drops one is caught rather than quietly
+  // sending that site back to Unknown.
+  it('knows all nine homefront operations', () => {
+    const all = [
+      'Salvage Research', 'Stabilize Rift', 'Traffic Stop',
+      'Abyssal Artifact Recovery', 'Dread Assault', 'Emergency Aid',
+      'Metaliminal Meteoroid', 'Raid', 'Suspicious Signal',
+    ];
+    expect(all.filter((n) => classifyAnom('', n) === 'homefront')).toHaveLength(9);
   });
 
   it('matches those names whatever the casing or padding', () => {
