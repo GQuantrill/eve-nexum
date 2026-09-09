@@ -206,6 +206,10 @@ export function SystemPanel() {
   // Undocked (floating) panels: id -> {x,y,w,h}, persisted per user. `topFloat`
   // is the last-focused floating window, lifted above the others.
   const [floatingPanels, setFloatingPanels] = useUserSetting<Record<string, PanelGeometry>>('nexum.floatingPanels', {});
+  // Last geometry each pane had while undocked, kept after it is redocked so
+  // popping it out again restores the window you had sized rather than the
+  // default 460x320 every time.
+  const [lastFloatGeo, setLastFloatGeo] = useUserSetting<Record<string, PanelGeometry>>('nexum.floatingPanelsLast', {});
   const [topFloat, setTopFloat] = useState<string | null>(null);
 
   const [height, setHeight] = useState(() => {
@@ -368,14 +372,36 @@ export function SystemPanel() {
   const undock = (id: string) => setFloatingPanels((prev) => {
     if (prev[id]) return prev;
     const n = Object.keys(prev).length;
-    return { ...prev, [id]: { x: 140 + n * 28, y: 120 + n * 28, w: 460, h: 320 } };
+    const remembered = lastFloatGeo[id];
+    // Reopen at the size and place it was last used, clamped so a window saved
+    // on a bigger screen can't come back off the edge of a smaller one.
+    let geo = { x: 140 + n * 28, y: 120 + n * 28, w: 460, h: 320 };
+    if (remembered) {
+      // Size first, then position against THAT size — clamping the corner
+      // against a fixed margin instead would let a window as wide as the
+      // screen still open 1560px in, with most of itself off the right edge.
+      const w = Math.max(240, Math.min(remembered.w, window.innerWidth));
+      const h = Math.max(160, Math.min(remembered.h, window.innerHeight));
+      geo = {
+        w, h,
+        x: Math.max(0, Math.min(remembered.x, window.innerWidth  - w)),
+        y: Math.max(0, Math.min(remembered.y, window.innerHeight - h)),
+      };
+    }
+    return { ...prev, [id]: geo };
   });
   const redock = (id: string) => setFloatingPanels((prev) => {
+    // Remember where and how big it was before it goes away, so the next
+    // undock is not back to square one.
+    if (prev[id]) setLastFloatGeo((last) => ({ ...last, [id]: prev[id] }));
     const next = { ...prev };
     delete next[id];
     return next;
   });
-  const commitGeo = (id: string, g: PanelGeometry) => setFloatingPanels((prev) => ({ ...prev, [id]: g }));
+  const commitGeo = (id: string, g: PanelGeometry) => {
+    setFloatingPanels((prev) => ({ ...prev, [id]: g }));
+    setLastFloatGeo((last) => ({ ...last, [id]: g }));
+  };
 
   // Docked (stacked) panes = order minus anything floating, minus share-hidden.
   const dockedIds = panelOrder.filter((id) => !floatingPanels[id]).filter(shareVisible);
