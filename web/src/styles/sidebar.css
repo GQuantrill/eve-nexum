@@ -2293,12 +2293,16 @@ select.sig-toolbar-btn option {
 /* Bookmark column: centre the copy button in its narrow fixed-width cell. */
 .sig-td--bookmark { text-align: center; }
 
+/* Age / Updated. Left-aligned so the values sit directly under their headings.
+   They used to be right-aligned, but only the CELL carried padding-right, so
+   the heading sat flush to the column edge and every value was inset 8px from
+   it -- close enough to look like a mistake, which it was. */
 .sig-th--time {
-  text-align: right;
+  text-align: left;
 }
 
 .sig-td--time {
-  text-align: right;
+  text-align: left;
   font-variant-numeric: tabular-nums;
   font-size: calc(13px * var(--font-scale, 1));
   color: var(--text-muted);
