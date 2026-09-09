@@ -88,6 +88,20 @@
   padding: 1px 5px;
 }
 
+/* Ship-size limit, tucked against the wormhole type rather than taking a fourth
+   label row. Muted for L / XL, which impose nothing worth noticing; called out
+   for S and M, which decide what you can actually bring through. */
+.connection-label__size {
+  margin-left: 5px;
+  font-weight: 700;
+  opacity: 0.65;
+}
+
+.connection-label__size--limit {
+  color: var(--cv-conn-1h);
+  opacity: 1;
+}
+
 .connection-label__mass {
   font-size: calc(13px * var(--font-scale, 1));
   font-weight: 700;

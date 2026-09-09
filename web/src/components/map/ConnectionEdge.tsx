@@ -37,6 +37,13 @@ const TIME_COLORS: Record<string, string> = {
   expired:    'var(--cv-conn-expired)',
 };
 
+// Ship-size limit, shown beside the wormhole type. The code already implies it
+// to anyone who has the table memorised; this is for everyone else, and for the
+// untyped / bare-K162 holes where the size is whatever a scout set by hand.
+const SIZE_LABELS: Record<string, string> = {
+  xl: 'XL', large: 'L', medium: 'M', small: 'S',
+};
+
 const MASS_LABELS: Record<string, { text: string; cls: string }> = {
   stable:       { text: '> 50%', cls: 'connection-label__mass' },
   destabilized: { text: '< 50%', cls: 'connection-label__mass connection-label__mass--warn' },
@@ -181,6 +188,11 @@ export const ConnectionEdge = memo(({
   // here. A broken hole keeps its severed dash — being dead outranks being
   // small.
   const frigHole = !noLifetime && !broken && conn?.size === 'small';
+  // Only wormholes have a size worth stating; a gate or an Ansiblex takes
+  // anything. Small and medium are flagged as restrictions because they change
+  // what you can bring — medium especially, since nothing on the LINE marks it.
+  const sizeText = !noLifetime && conn?.size ? (SIZE_LABELS[conn.size] ?? null) : null;
+  const sizeRestrictive = conn?.size === 'small' || conn?.size === 'medium';
   const dash = broken ? '5 7' : isCyno ? '2 6' : isJumpgate ? '10 5' : frigHole ? '4 4' : undefined;
 
   // Mass rides a SECOND channel rather than competing for colour, which
@@ -275,11 +287,17 @@ export const ConnectionEdge = memo(({
             : isGate
               ? <span className="connection-label__gate">G</span>
               : conn?.type
-                ? <span className="connection-label__type">{conn.type}</span>
+                ? <span className="connection-label__type">
+                    {conn.type}
+                    {sizeText && <span className={`connection-label__size${sizeRestrictive ? ' connection-label__size--limit' : ''}`}>{sizeText}</span>}
+                  </span>
                 // Typeless wormhole normally shows no badge; surface a "WH" one
                 // while hovered so every traced link reveals its jump type.
                 : highlighted
-                  ? <span className="connection-label__type">WH</span>
+                  ? <span className="connection-label__type">
+                      WH
+                      {sizeText && <span className={`connection-label__size${sizeRestrictive ? ' connection-label__size--limit' : ''}`}>{sizeText}</span>}
+                    </span>
                   : null;
           const massNode = !noLifetime && massLabel
             ? <span className={massLabel.cls}>{massLabel.text}</span>
