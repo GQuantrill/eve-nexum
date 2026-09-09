@@ -1809,6 +1809,7 @@
     "killsTooltip": "{{ships}} vaisseau · {{pods}} capsule détruits cette heure",
     "killsTooltipHint": "Décompte horaire CCP · le killmail peut ne pas encore être sur zKillboard",
     "recentKill": "Kill il y a {{ago}} min ({{value}} ISK)",
+    "scanned": "{{scanned}} signatures sur {{total}} scannées",
     "scoutConnectionsMulti": "Connexions {{names}}",
     "scoutConnections_one": "Connexion {{name}}",
     "scoutConnections_other": "Connexions {{name}}",

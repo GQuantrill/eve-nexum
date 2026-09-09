@@ -345,6 +345,12 @@ interface MapStore {
   // chain — not just connections/statics. Loaded in bulk on map switch and
   // kept fresh by the open sig pane + remote sig.changed events.
   sigTypesBySystem: Record<string, string[]>;
+  // Scan progress per system: how many of its signatures have been identified
+  // (any type other than 'unknown') out of the total. Drives the "% scanned"
+  // badge on the node, which is how an unscanned sig appearing in your home
+  // system announces itself without opening the pane.
+  scanBySystem: Record<string, { total: number; scanned: number }>;
+  setScanBulk: (next: Record<string, { total: number; scanned: number }>) => void;
   setSigTypesBulk: (next: Record<string, string[]>) => void;
   setSystemSigTypes: (systemId: string, types: string[]) => void;
 
@@ -597,6 +603,8 @@ export const useMapStore = create<MapStore>()((set, get) => {
     structRev: {},
     anomRev: {},
     sigTypesBySystem: {},
+    scanBySystem: {},
+    setScanBulk: (next) => set({ scanBySystem: next }),
     setSigTypesBulk: (next) => set({ sigTypesBySystem: next }),
     setSystemSigTypes: (systemId, types) => set((s) => ({
       sigTypesBySystem: { ...s.sigTypesBySystem, [systemId]: types },
@@ -709,7 +717,7 @@ export const useMapStore = create<MapStore>()((set, get) => {
         const keepSel     = prev.sel     && map.systems.some((s) => s.id === prev.sel)      ? prev.sel     : null;
         const keepConn    = prev.conn    && map.connections.some((c) => c.id === prev.conn) ? prev.conn    : null;
         const keepCurrent = prev.current && map.systems.some((s) => s.id === prev.current)  ? prev.current : null;
-        set({ map, activeMapId: id, selectedSystemId: keepSel, selectedConnectionId: keepConn, currentSystemId: keepCurrent, undoStack: [], sigTypesBySystem: {}, contentBySystem: {}, whSigsBySystem: {}, undivedWhBySystem: {}, contentFilter: { sigTypes: [], anomTypes: [], nameQuery: '', undivedWh: false } });
+        set({ map, activeMapId: id, selectedSystemId: keepSel, selectedConnectionId: keepConn, currentSystemId: keepCurrent, undoStack: [], sigTypesBySystem: {}, scanBySystem: {}, contentBySystem: {}, whSigsBySystem: {}, undivedWhBySystem: {}, contentFilter: { sigTypes: [], anomTypes: [], nameQuery: '', undivedWh: false } });
       } catch (err) {
         // 403/404 — the grant was revoked, or the map was deleted. Reload
         // the list (which will trigger the revocation-detection path above

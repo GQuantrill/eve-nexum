@@ -248,6 +248,37 @@
   margin-bottom: 4px;
 }
 
+/* Signature scan progress. Pushed to the right of the meta row so it never
+   competes with the class badge, and deliberately NOT a progress bar — the
+   number is the whole signal.
+
+   Muted at 100% (nothing to do) and highlighted below it, so the moment a new
+   unscanned signature lands in a finished system the node changes appearance on
+   its own. */
+.system-node__scan {
+  position: absolute;
+  bottom: 4px;
+  right: 6px;
+  font-size: calc(11px * var(--font-scale, 1));
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 16px;
+  color: var(--text-dim);
+  pointer-events: none;
+}
+
+.system-node__scan--partial {
+  color: var(--warning);
+}
+
+/* The gate-jump badge occupies this same corner on hover, but only on k-space
+   systems. Stand down for it rather than overlap — the percentage comes back
+   the moment the pointer leaves. :has() keeps this to the nodes that actually
+   have a jump badge, so wormhole systems (which never do) keep theirs on hover. */
+.system-node:hover:has(.system-node__gate-jumps) .system-node__scan {
+  display: none;
+}
+
 .system-node__class-badge {
   font-size: calc(13px * var(--font-scale, 1));
   font-weight: 700;

@@ -25,6 +25,7 @@ function uniqPush(arr: string[], v: string) {
 export function useMapSignatureIndex() {
   const activeMapId = useMapStore((s) => s.activeMapId);
   const setSigTypesBulk = useMapStore((s) => s.setSigTypesBulk);
+  const setScanBulk = useMapStore((s) => s.setScanBulk);
   const setContentBulk = useMapStore((s) => s.setContentBulk);
   const setWhSigsBulk = useMapStore((s) => s.setWhSigsBulk);
   const { isShareMode } = useShareMode();
@@ -38,7 +39,7 @@ export function useMapSignatureIndex() {
   });
 
   useEffect(() => {
-    if (!activeMapId || isShareMode) { setSigTypesBulk({}); setContentBulk({}); setWhSigsBulk({}); return; }
+    if (!activeMapId || isShareMode) { setSigTypesBulk({}); setScanBulk({}); setContentBulk({}); setWhSigsBulk({}); return; }
     let cancelled = false;
     Promise.all([
       api<SigRow[]>(`/api/maps/${activeMapId}/signatures`).catch(() => [] as SigRow[]),
@@ -49,6 +50,11 @@ export function useMapSignatureIndex() {
         const whBySystem: Record<string, string[]> = {};
         const whSigs: Record<string, WhSig[]> = {};
         const content: Record<string, SystemContent> = {};
+        // Scan progress. Derived from the same fetch, so the badge costs no
+        // extra request: a signature counts as scanned once it has any type
+        // other than 'unknown', which is what the probe-scanner paste leaves
+        // behind for a hole nobody has identified yet.
+        const scan: Record<string, { total: number; scanned: number }> = {};
         const ensure = (id: string): SystemContent => (content[id] ??= { sigTypes: [], anomTypes: [], names: [] });
 
         for (const r of sigs) {
@@ -61,6 +67,9 @@ export function useMapSignatureIndex() {
           const c = ensure(r.systemId);
           uniqPush(c.sigTypes, r.sigType);
           if (r.name) uniqPush(c.names, r.name.toLowerCase());
+          const sc = (scan[r.systemId] ??= { total: 0, scanned: 0 });
+          sc.total++;
+          if (r.sigType && r.sigType !== 'unknown') sc.scanned++;
         }
         for (const r of anoms) {
           const c = ensure(r.systemId);
@@ -68,10 +77,11 @@ export function useMapSignatureIndex() {
           if (r.name) uniqPush(c.names, r.name.toLowerCase());
         }
         setSigTypesBulk(whBySystem);
+        setScanBulk(scan);
         setContentBulk(content);
         setWhSigsBulk(whSigs);
       })
       .catch(() => { /* non-fatal — filter/watchlist just won't see unopened content */ });
     return () => { cancelled = true; };
-  }, [activeMapId, isShareMode, rev, setSigTypesBulk, setContentBulk, setWhSigsBulk]);
+  }, [activeMapId, isShareMode, rev, setSigTypesBulk, setScanBulk, setContentBulk, setWhSigsBulk]);
 }

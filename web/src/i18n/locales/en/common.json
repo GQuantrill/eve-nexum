@@ -1880,6 +1880,7 @@
     "killsTooltip": "{{ships}} ship · {{pods}} pod kills this hour",
     "killsTooltipHint": "CCP hourly count · killmail may not be on zKillboard yet",
     "recentKill": "Kill {{ago}}m ago ({{value}} ISK)",
+    "scanned": "{{scanned}} of {{total}} signatures scanned",
     "scoutConnectionsMulti": "{{names}} connections",
     "scoutConnections_one": "{{name}} connection",
     "scoutConnections_other": "{{name}} connections",

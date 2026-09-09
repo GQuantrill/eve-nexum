@@ -210,6 +210,7 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
   // Scanned-but-not-dived wormholes here — rendered as pills under the node and
   // matched by the content filter's "undived wormhole" state.
   const undivedHoles    = useMapStore((s) => s.undivedWhBySystem[sys.id]);
+  const scan            = useMapStore((s) => s.scanBySystem[sys.id]);
   const [showUndivedWh] = useUserSetting<boolean>('nexum.map.showUndivedWh', true);
   // SDE-derived wormhole catalog (the single source of truth for destinations),
   // used to colour statics and undived-hole pills consistently with the rest of
@@ -344,6 +345,23 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
           })}
         </div>
       ) : null}
+
+      {/* Scan progress, bottom-right. Absolutely positioned so it takes no
+          layout space and cannot be squeezed: the meta row fills up with kill,
+          effect and sovereignty icons, and anything sharing that row loses.
+          The bottom-LEFT corner is left alone for the undived-wormhole capsules.
+
+          Hidden when a system has no signatures — "0%" on every unvisited system
+          would be noise. Amber below 100%, so a new unscanned signature landing
+          in a system you had finished changes the node on its own. */}
+      {scan && scan.total > 0 && (
+        <span
+          className={`system-node__scan${scan.scanned < scan.total ? ' system-node__scan--partial' : ''}`}
+          title={t('mapNode.scanned', { scanned: scan.scanned, total: scan.total })}
+        >
+          {Math.round((scan.scanned / scan.total) * 100)}%
+        </span>
+      )}
 
       {/* Gate jumps from the route origin — appears on hover for k-space systems. */}
       {gateJumps != null && !isGateOrigin && (

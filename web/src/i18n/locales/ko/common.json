@@ -1809,6 +1809,7 @@
     "killsTooltip": "이번 시간 {{ships}} 함선 · {{pods}} 캡슐 킬",
     "killsTooltipHint": "CCP 시간별 집계 · 킬메일이 아직 zKillboard에 없을 수 있음",
     "recentKill": "{{ago}}분 전 격추 ({{value}} ISK)",
+    "scanned": "시그니처 {{total}}개 중 {{scanned}}개 스캔 완료",
     "scoutConnectionsMulti": "{{names}} 연결",
     "scoutConnections_one": "{{name}} 연결",
     "scoutConnections_other": "{{name}} 연결",

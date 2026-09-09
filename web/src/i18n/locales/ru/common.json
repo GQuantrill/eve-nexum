@@ -1851,6 +1851,7 @@
     "killsTooltip": "{{ships}} кораблей · {{pods}} капсул убито за этот час",
     "killsTooltipHint": "Почасовой подсчёт CCP · killmail может ещё не быть на zKillboard",
     "recentKill": "Килл {{ago}} мин назад ({{value}} ISK)",
+    "scanned": "Просканировано {{scanned}} из {{total}} сигнатур",
     "scoutConnectionsMulti": "Соединения: {{names}}",
     "scoutConnections_few": "{{name}}: соединения",
     "scoutConnections_many": "{{name}}: соединений",

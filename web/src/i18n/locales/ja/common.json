@@ -1809,6 +1809,7 @@
     "killsTooltip": "今時間 {{ships}} 艦船 · {{pods}} ポッドキル",
     "killsTooltipHint": "CCP の時間別集計 · killmail はまだ zKillboard にない場合があります",
     "recentKill": "{{ago}}分前のキル ({{value}} ISK)",
+    "scanned": "{{total}} 件中 {{scanned}} 件のシグネチャをスキャン済み",
     "scoutConnectionsMulti": "{{names}} 接続",
     "scoutConnections_one": "{{name}} 接続",
     "scoutConnections_other": "{{name}} 接続",

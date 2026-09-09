@@ -1809,6 +1809,7 @@
     "killsTooltip": "本小时 {{ships}} 舰船 · {{pods}} 太空舱击杀",
     "killsTooltipHint": "CCP 每小时统计 · 击杀报告可能尚未出现在 zKillboard",
     "recentKill": "{{ago}} 分钟前击杀 ({{value}} ISK)",
+    "scanned": "已扫描 {{total}} 个信号中的 {{scanned}} 个",
     "scoutConnectionsMulti": "{{names}} 连接",
     "scoutConnections_one": "{{name}} 连接",
     "scoutConnections_other": "{{name}} 连接",
