@@ -724,6 +724,12 @@
   cursor: default;
   filter: drop-shadow(0 0 3px #f0a03088);
   position: relative;
+}
+
+/* Pulse the glyph only. On the wrapper the opacity animation cascades to the
+   whole subtree, so the hover tooltip blinked along with the skull and was
+   unreadable. Same fix the recent-kill icon already carries. */
+.system-node__insurgency-icon svg {
   animation: skull-flash 1.4s ease-in-out infinite;
 }
 
@@ -812,6 +818,12 @@
   cursor: default;
   filter: drop-shadow(0 0 3px #e05a5a88);
   position: relative;
+}
+
+/* Pulse the glyph only. On the wrapper the opacity animation cascades to the
+   whole subtree, so the hover tooltip blinked along with the skull and was
+   unreadable. Same fix the recent-kill icon already carries. */
+.system-node__incursion-icon svg {
   animation: skull-flash 1.4s ease-in-out infinite;
 }
 
