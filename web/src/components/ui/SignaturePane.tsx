@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { api } from '../../api/client';
+import i18n from '../../i18n';
 import { useMapStore, awaitSystemCreate } from '../../store/mapStore';
 import { useCanEditContent } from '../../hooks/useCanEditContent';
 import { useShareMode } from '../../context/ShareModeContext';
@@ -9,14 +10,15 @@ import { systemDisplayName } from '../../utils/systemName';
 import { useUserSetting } from '../../hooks/useUserSetting';
 import { usePopover } from '../../hooks/usePopover';
 import type { Signature, SigType } from '../../types';
-import { ConfirmModal, shouldSkipConfirm } from './ConfirmModal';
+import { ConfirmModal } from './ConfirmModal';
+import { shouldSkipConfirm } from '../../utils/confirmPref';
 import { NotesEditor } from './NotesEditor';
 import { WormholeTypePicker } from './WormholeTypePicker';
 import { Select } from './Select';
 import { XIcon, CopyIcon, ColumnsIcon, CheckIcon, XCircleIcon } from '../../icons';
 import { LeadsToDropdown } from './LeadsToDropdown';
 import { loadStargateNeighbors, isKnownStargateAdjacent } from '../../utils/stargateAdjacency';
-import { toast } from './Toaster';
+import { toast } from '../../utils/toastStore';
 import { reevaluateConnectionsForSystem } from '../../utils/whAutoDetect';
 import { alertInboundK162 } from '../../utils/k162Alert';
 import { formatBookmarkName, DEFAULT_BOOKMARK_FORMAT, formatSiteBookmarkName, DEFAULT_SITE_BOOKMARK_FORMAT } from '../../utils/signatureBookmark';
@@ -506,6 +508,8 @@ export function SignaturePane({ systemId }: { systemId: string }) {
     // system just changes which of them this pane draws — it no longer abandons
     // deletions the user has already asked for (which is what left despawned
     // sigs behind: clearing bookmarks means hopping the chain).
+    // Deliberate: clears this pane's own state when the record it shows changes.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setRemoving(pendingRemovalIds(systemId));
     setSigs([]);
     setSelected(new Set());
@@ -530,7 +534,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
       if (cancelled) return;
       api<Signature[]>(`/api/maps/${activeMapId}/systems/${systemId}/signatures`)
         .then((data) => { if (!cancelled) { setSigs(data); sigsSystemRef.current = systemId; } })
-        .catch(() => { if (!cancelled) toast.error(t('signatures.loadFailed')); });
+        .catch(() => { if (!cancelled) toast.error(i18n.t('signatures.loadFailed')); });
     };
     const pending = awaitSystemCreate(systemId);
     if (pending) void pending.then(fetchSigs); else fetchSigs();
@@ -616,6 +620,8 @@ export function SignaturePane({ systemId }: { systemId: string }) {
         const t = conn.type?.toUpperCase();
         if (t && t !== 'K162') { source = conn.type; break; }
       }
+      // Deliberate: clears this pane's own state when the record it shows changes.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (source) updateSig(sig.id, { notes: source });
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -644,7 +650,6 @@ export function SignaturePane({ systemId }: { systemId: string }) {
       if (conn.sourceId !== systemId && conn.targetId !== systemId) continue;
       updateConnection(conn.id, { broken: true });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sigs, systemId, canEdit, isShareMode]);
 
   // Drop any pending overwrite-removal timer/indicator for this id (the row is

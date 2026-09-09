@@ -2,16 +2,18 @@ import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { api } from '../../api/client';
+import i18n from '../../i18n';
 import { useMapStore, awaitSystemCreate } from '../../store/mapStore';
 import { useShareMode } from '../../context/ShareModeContext';
 import type { Structure, StructureType } from '../../types';
 import { NotesEditor } from './NotesEditor';
-import { ConfirmModal, shouldSkipConfirm } from './ConfirmModal';
+import { ConfirmModal } from './ConfirmModal';
+import { shouldSkipConfirm } from '../../utils/confirmPref';
 import { Select } from './Select';
 import { ContextMenu } from './ContextMenu';
 import { XIcon, PathIcon, MapPinSimpleIcon } from '../../icons';
 import { setDestination, addWaypoint } from '../../api/waypoint';
-import { toast } from './Toaster';
+import { toast } from '../../utils/toastStore';
 import { useCanEditContent } from '../../hooks/useCanEditContent';
 import { useStandings } from '../../hooks/useStandings';
 
@@ -89,6 +91,8 @@ export function StructuresPane({ systemId }: { systemId: string }) {
 
   useEffect(() => {
     if (!activeMapId) return;
+    // Deliberate: clears this pane's own state when the record it shows changes.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setStructures([]);
 
     // Share viewers have structures embedded per-system in the share
@@ -108,7 +112,7 @@ export function StructuresPane({ systemId }: { systemId: string }) {
       if (cancelled) return;
       api<Structure[]>(`/api/maps/${activeMapId}/systems/${systemId}/structures`)
         .then((data) => { if (!cancelled) setStructures(data); })
-        .catch(() => { if (!cancelled) toast.error(t('structures.loadFailed')); });
+        .catch(() => { if (!cancelled) toast.error(i18n.t('structures.loadFailed')); });
     };
     const pending = awaitSystemCreate(systemId);
     if (pending) void pending.then(fetchStructures); else fetchStructures();

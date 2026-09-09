@@ -249,6 +249,8 @@ export function ActivityPane({ eveSystemId }: { eveSystemId: number | null }) {
 
   useEffect(() => {
     if (!eveSystemId) return;
+    // Deliberate: clears this pane's own state when the record it shows changes.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setData([]);
     setLoading(true);
 

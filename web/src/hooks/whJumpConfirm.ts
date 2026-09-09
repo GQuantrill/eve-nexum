@@ -1,5 +1,5 @@
 import { api } from '../api/client';
-import { toast } from '../components/ui/Toaster';
+import { toast } from '../utils/toastStore';
 import { reevaluateConnectionsForSystem } from '../utils/whAutoDetect';
 import { isUnresolvedLeadsTo } from '../utils/whDest';
 import { useMapStore, awaitConnectionType } from '../store/mapStore';

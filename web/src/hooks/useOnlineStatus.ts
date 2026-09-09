@@ -32,6 +32,8 @@ export function useOnlineStatus(enabled: boolean): OnlineStatus {
 
   useEffect(() => {
     if (!enabled) return;
+    // Deliberate: kicks off the first poll on mount.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     check();
     const id = setInterval(check, POLL_MS);
     return () => clearInterval(id);

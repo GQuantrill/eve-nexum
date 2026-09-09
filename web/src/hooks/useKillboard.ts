@@ -87,6 +87,8 @@ export function useKillboard(eveSystemId: number | null, options: UseKillboardOp
   useEffect(() => {
     systemRef.current = eveSystemId;
     if (!eveSystemId) {
+      // Deliberate: clears this pane's own state when the record it shows changes.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setRawKills([]);
       setError(null);
       setLastUpdated(null);
@@ -133,6 +135,8 @@ export function useLastKill(eveSystemId: number | null, enabled: boolean) {
   const [lastKillTime, setLastKillTime] = useState<string | null | undefined>(undefined);
 
   useEffect(() => {
+    // Deliberate: clears this pane's own state when the record it shows changes.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (!eveSystemId || !enabled) { setLastKillTime(undefined); return; }
 
     const cached = lastKillClientCache.get(eveSystemId);

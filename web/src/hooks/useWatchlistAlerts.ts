@@ -5,7 +5,7 @@ import { useUserSetting } from './useUserSetting';
 import { useWatchlist } from './useWatchlist';
 import { systemDisplayName } from '../utils/systemName';
 import { matchSystem, matchConnection } from '../utils/watchMatch';
-import { toast } from '../components/ui/Toaster';
+import { toast } from '../utils/toastStore';
 import { NOTIFY, fireDesktopNotification } from '../utils/notificationPrefs';
 
 // Lazily-created shared audio context (autoplay policy: only on first sound).

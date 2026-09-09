@@ -3,7 +3,7 @@ import { useCharacterLocation } from './useCharacterLocation';
 import { useAuth } from '../context/AuthContext';
 import { useMapStore } from '../store/mapStore';
 import { useUserSetting } from './useUserSetting';
-import { KSPACE_CLASSES } from '../components/ui/routeUi';
+import { KSPACE_CLASSES } from '../utils/routeActions';
 
 export interface RouteOrigin {
   /** EVE system id to route FROM, or null when there's no usable origin. */

@@ -145,6 +145,8 @@ export function ConnectionPanel() {
   // gate / Ansiblex links, which are never wormholes.
   useEffect(() => {
     if (!conn || !src || !tgt || !map.id || conn.connectionType !== 'standard') {
+      // Deliberate: clears this pane's own state when the record it shows changes.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setEndpointSigs({ src: [], tgt: [] });
       return;
     }

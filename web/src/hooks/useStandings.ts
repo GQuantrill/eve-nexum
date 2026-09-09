@@ -129,7 +129,11 @@ export function useStandings() {
     getStanding,
     self: cache ? { characterId: cache.characterId, corpId: cache.corpId, allianceId: cache.allianceId } : null,
     refresh: refreshFromEsi,
-  // `tick` (bumped by notify) is the data-version key; getStanding is stable.
+  // `tick` (bumped by notify) is the data-version key: the memo has to rebuild
+  // when the cache changes, and nothing inside it reads `tick` directly, so the
+  // rule sees it as surplus. Removing it would leave every consumer holding a
+  // stale standings snapshot.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }), [tick, getStanding]);
 }
 

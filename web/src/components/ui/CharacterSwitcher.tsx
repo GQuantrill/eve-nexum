@@ -6,7 +6,7 @@ import { CaretDownIcon, PlusIcon, CheckIcon, MapPinIcon, TrashIcon } from '../..
 import { useAuth } from '../../context/AuthContext';
 import { useMapStore } from '../../store/mapStore';
 import { api, apiUrl } from '../../api/client';
-import { toast } from './Toaster';
+import { toast } from '../../utils/toastStore';
 import { ConfirmModal } from './ConfirmModal';
 
 interface CharLocationResponse {

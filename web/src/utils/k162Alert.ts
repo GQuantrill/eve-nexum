@@ -1,4 +1,4 @@
-import { toast } from '../components/ui/Toaster';
+import { toast } from './toastStore';
 import { NOTIFY, notifyOn, fireDesktopNotification } from './notificationPrefs';
 
 // Audio context is created lazily on first use to avoid autoplay-policy issues.

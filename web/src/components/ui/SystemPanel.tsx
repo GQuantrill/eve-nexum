@@ -23,7 +23,7 @@ import { NotesEditor } from './NotesEditor';
 import { KillboardPane } from './KillboardPane';
 import { ActivityPane } from './ActivityPane';
 import { useStandings, type ContactKind } from '../../hooks/useStandings';
-import { toast } from './Toaster';
+import { toast } from '../../utils/toastStore';
 import { truesecColor } from '../../utils/truesec';
 import { systemDisplayName } from '../../utils/systemName';
 import { useIncursions, findIncursion } from '../../hooks/useIncursions';

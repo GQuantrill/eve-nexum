@@ -5,7 +5,7 @@ import { XIcon } from '../../icons';
 import { api } from '../../api/client';
 import { useMapStore } from '../../store/mapStore';
 import { useAuth, isAdminRole, isAllianceAdminRole } from '../../context/AuthContext';
-import { toast } from './Toaster';
+import { toast } from '../../utils/toastStore';
 import { Select } from './Select';
 
 type MapScope = 'personal' | 'corp' | 'alliance';

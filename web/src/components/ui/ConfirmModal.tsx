@@ -1,12 +1,7 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-
-const SKIP_KEY = 'nexum.skipDeleteConfirm';
-
-export function shouldSkipConfirm(): boolean {
-  return localStorage.getItem(SKIP_KEY) === 'true';
-}
+import { setSkipConfirm } from '../../utils/confirmPref';
 
 interface Props {
   message: string;
@@ -29,7 +24,7 @@ export function ConfirmModal({ message, onConfirm, onCancel, confirmLabel, dange
   const label = confirmLabel ?? t('actions.delete');
 
   const handleConfirm = () => {
-    if (showDontAskAgain && dontShowAgain) localStorage.setItem(SKIP_KEY, 'true');
+    if (showDontAskAgain && dontShowAgain) setSkipConfirm(true);
     onConfirm();
   };
 

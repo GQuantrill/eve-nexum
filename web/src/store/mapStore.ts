@@ -3,7 +3,7 @@ import { readUserSetting, writeUserSetting } from '../hooks/useUserSetting';
 import { v4 as uuid } from 'uuid';
 import { api } from '../api/client';
 import { enqueue, isPermanentRejection } from './pendingQueue';
-import { toast } from '../components/ui/Toaster';
+import { toast } from '../utils/toastStore';
 import type { WormholeMap, MapSystem, MapConnection, SavedRoute, SystemClass, WormholeEffect } from '../types';
 import type { WhSig, UndivedHole } from '../utils/undivedWormholes';
 import { pickHandles } from '../components/map/edgeUtils';

@@ -1,5 +1,5 @@
 import { api } from './client';
-import { toast } from '../components/ui/Toaster';
+import { toast } from '../utils/toastStore';
 import i18n from '../i18n';
 
 // Fire the ESI waypoint endpoint and surface the outcome via toast. On success

@@ -5,7 +5,8 @@ import { jumps } from '../../i18n/format';
 import { useA0Systems } from '../../hooks/useA0Systems';
 import { useRouteOrigin } from '../../hooks/useRouteOrigin';
 import { useRoute } from '../../hooks/useRoute';
-import { setWaypoint, RouteSquares, canSetAutopilot } from './routeUi';
+import { RouteSquares } from './routeUi';
+import { setWaypoint, canSetAutopilot } from '../../utils/routeActions';
 import { useSystemAlias } from '../../hooks/useSystemAlias';
 import { useMapStore } from '../../store/mapStore';
 

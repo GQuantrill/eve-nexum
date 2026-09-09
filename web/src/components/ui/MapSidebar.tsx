@@ -10,7 +10,7 @@ import { expiresIn } from "../../i18n/format";
 import { useMapStore } from "../../store/mapStore";
 import { useAuth, isAdminRole, isAllianceAdminRole, type Role } from "../../context/AuthContext";
 import { api } from "../../api/client";
-import { toast } from "./Toaster";
+import { toast } from '../../utils/toastStore';
 import { Select } from "./Select";
 import { useProximityThreshold } from "../../hooks/useProximityAlerts";
 import { useStaleThreshold } from "../../hooks/useStaleThreshold";

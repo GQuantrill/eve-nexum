@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { ReactFlowProvider } from '@xyflow/react';
-import { AuthProvider, useAuth, isAdminRole } from './context/AuthContext';
+import { AuthProvider } from './context/AuthProvider';
+import { useAuth, isAdminRole } from './context/AuthContext';
 import { seedUserSettings, readUserSetting, useUserSetting } from './hooks/useUserSetting';
 import { MapCanvas } from './components/map/MapCanvas';
 import { SystemPanel } from './components/ui/SystemPanel';
@@ -11,7 +12,8 @@ import { Sidebar } from './components/ui/Sidebar';
 import { ProximityOptInModal } from './components/ui/ProximityOptInModal';
 import { CommandPaletteModal } from './components/ui/CommandPaletteModal';
 import { LandingPage } from './components/ui/LandingPage';
-import { Toaster, toast } from './components/ui/Toaster';
+import { Toaster } from './components/ui/Toaster';
+import { toast } from './utils/toastStore';
 import i18n from './i18n';
 import { TooltipLayer } from './components/ui/TooltipLayer';
 import { AdminPage } from './components/ui/AdminPage';

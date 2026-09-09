@@ -40,6 +40,8 @@ export function SystemCombobox({ systems, value, onChange, placeholder, excludeI
 
   // Position the portalled dropdown under the field; track while open.
   useEffect(() => {
+    // Deliberate: clears the portalled dropdown position when it closes.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (!open) { setPos(null); return; }
     const place = () => {
       const r = wrapRef.current?.getBoundingClientRect();

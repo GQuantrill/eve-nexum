@@ -76,6 +76,8 @@ export function useRoute(
 
   useEffect(() => {
     if (!from || !targetsKey) {
+      // Deliberate: clears this pane's own state when the record it shows changes.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setData({});
       return;
     }

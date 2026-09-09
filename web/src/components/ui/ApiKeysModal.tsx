@@ -6,7 +6,7 @@ import { api } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { europeanDate, timeAgo } from '../../i18n/format';
 import { useNow30s } from '../../hooks/useNow30s';
-import { toast } from './Toaster';
+import { toast } from '../../utils/toastStore';
 import { ConfirmModal } from './ConfirmModal';
 import { Select } from './Select';
 import styles from './ApiKeysModal.module.css';

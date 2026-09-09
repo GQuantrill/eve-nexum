@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { api } from '../../api/client';
+import i18n from '../../i18n';
 import { useMapStore, awaitSystemCreate } from '../../store/mapStore';
 import { useCanEditContent } from '../../hooks/useCanEditContent';
 import { useShareMode } from '../../context/ShareModeContext';
@@ -9,11 +10,12 @@ import { useUserSetting } from '../../hooks/useUserSetting';
 import { useClickOutside } from '../../hooks/useClickOutside';
 import type { Anomaly, AnomType } from '../../types';
 import { parseAnomClipboard, type ParsedAnom } from '../../utils/anomParse';
-import { ConfirmModal, shouldSkipConfirm } from './ConfirmModal';
+import { ConfirmModal } from './ConfirmModal';
+import { shouldSkipConfirm } from '../../utils/confirmPref';
 import { NotesEditor } from './NotesEditor';
 import { Select } from './Select';
 import { XIcon, ColumnsIcon } from '../../icons';
-import { toast } from './Toaster';
+import { toast } from '../../utils/toastStore';
 import { duration, DASH } from '../../i18n/format';
 
 // Cosmic anomalies don't need scanning — the probe scanner lists them at 100%
@@ -191,6 +193,8 @@ export function AnomalyPane({ systemId }: { systemId: string }) {
     if (!activeMapId) return;
     for (const tm of removalTimers.current.values()) clearTimeout(tm);
     removalTimers.current.clear();
+    // Deliberate: clears this pane's own state when the record it shows changes.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setRemoving(new Set());
     setAnoms([]);
     setSelected(new Set());
@@ -207,7 +211,7 @@ export function AnomalyPane({ systemId }: { systemId: string }) {
       if (cancelled) return;
       api<Anomaly[]>(`/api/maps/${activeMapId}/systems/${systemId}/anomalies`)
         .then((data) => { if (!cancelled) setAnoms(data); })
-        .catch(() => { if (!cancelled) toast.error(t('anomalies.loadFailed')); });
+        .catch(() => { if (!cancelled) toast.error(i18n.t('anomalies.loadFailed')); });
     };
     const pending = awaitSystemCreate(systemId);
     if (pending) void pending.then(fetchAnoms); else fetchAnoms();

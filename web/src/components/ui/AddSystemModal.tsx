@@ -62,6 +62,8 @@ export function AddSystemModal({ position, onClose, onSubmit }: Props) {
     return () => clearTimeout(t);
   }, []);
 
+  // Deliberate: resets the highlighted row when the result list changes.
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setActiveIndex(-1); }, [results]);
 
   useEffect(() => {

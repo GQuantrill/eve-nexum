@@ -5,7 +5,7 @@ import { ReactFlowProvider } from '@xyflow/react';
 import { useMapStore } from '../../store/mapStore';
 import { MapCanvas } from '../map/MapCanvas';
 import { SystemPanel } from './SystemPanel';
-import { ShareModeProvider } from '../../context/ShareModeContext';
+import { ShareModeProvider } from '../../context/ShareModeProvider';
 import type { MapSystem, MapConnection, Signature, Structure } from '../../types';
 import { expiresIn } from '../../i18n/format';
 
