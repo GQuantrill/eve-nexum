@@ -35,11 +35,26 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import {
-  WarningIcon, SkullIcon, NavigationArrowIcon, XCircleIcon, QuestionIcon,
-  ShieldStarIcon, ChartBarIcon, SlidersHorizontalIcon, FootprintsIcon,
-  SignOutIcon, PlanetIcon, LinkSimpleIcon, ClockCountdownIcon, MapPinIcon,
-  KeyIcon, GraphIcon, ArrowCounterClockwiseIcon, DotsSixVerticalIcon,
+  ArrowCounterClockwiseIcon,
+  ChartBarIcon,
+  ClockCountdownIcon,
+  ColumnsIcon,
   DiscordLogoIcon,
+  DotsSixVerticalIcon,
+  FootprintsIcon,
+  GraphIcon,
+  KeyIcon,
+  LinkSimpleIcon,
+  MapPinIcon,
+  NavigationArrowIcon,
+  PlanetIcon,
+  QuestionIcon,
+  ShieldStarIcon,
+  SignOutIcon,
+  SkullIcon,
+  SlidersHorizontalIcon,
+  WarningIcon,
+  XCircleIcon,
 } from '../../icons';
 import type { Icon as PhosphorIcon } from '../../icons';
 import { UpdateIndicator } from './UpdateIndicator';
@@ -225,6 +240,8 @@ export function Toolbar() {
   const maps            = useMapStore((s) => s.maps);
   const maxMaps         = useMapStore((s) => s.maxMaps);
   const iskMapsEnabled  = useMapStore((s) => s.iskMapsEnabled);
+  const panelSideBySide = useMapStore((s) => s.panelSideBySide);
+  const setPanelSideBySide = useMapStore((s) => s.setPanelSideBySide);
   const maxCorpMaps     = useMapStore((s) => s.maxCorpMaps);
   const corpMapCount    = useMapStore((s) => s.corpMapCount);
   const maxAllianceMaps  = useMapStore((s) => s.maxAllianceMaps);
@@ -611,6 +628,19 @@ export function Toolbar() {
           aria-label={t('jumpPlanner.title')}
         >
           <NavigationArrowIcon size={18} weight="regular" />
+        </button>
+
+        {/* Layout switch. Lives here rather than in the sidebar's display
+            options: those are set once, whereas people flip this back and
+            forth while deciding which layout suits them. */}
+        <button
+          className={`toolbar__toggle toolbar__toggle--icon toolbar__toggle--prominent${panelSideBySide ? ' toolbar__toggle--on' : ''}`}
+          onClick={() => setPanelSideBySide(!panelSideBySide)}
+          aria-pressed={panelSideBySide}
+          data-tooltip={panelSideBySide ? t('toolbar.layoutBesideTooltip') : t('toolbar.layoutBelowTooltip')}
+          aria-label={t('mapSidebar.panelLayout')}
+        >
+          <ColumnsIcon size={18} weight="regular" />
         </button>
 
         <HeatmapMenu />
