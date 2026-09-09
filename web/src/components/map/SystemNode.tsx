@@ -463,7 +463,12 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
         )}
         {sys.tag && <span className="system-node__tag">{sys.tag}</span>}
         <span className="system-node__name">{systemDisplayName(sys) || t('mapNode.unknown')}</span>
-        {sys.security != null && Number.isFinite(Number(sys.security)) && (
+        {/* K-space only. Every J-space system is -1.0, so printing it on a
+            wormhole node is a constant dressed up as data — it takes header
+            space and reads as though it distinguishes one hole from another.
+            The class badge below already says C1..C6 / Thera / Drifter, which
+            is the number that actually varies. */}
+        {isKspace && sys.security != null && Number.isFinite(Number(sys.security)) && (
           <span className="system-node__truesec" style={{ color: truesecColor(Number(sys.security)) }}>
             {Number(sys.security).toFixed(1)}
           </span>
