@@ -1386,7 +1386,8 @@
     "updateAvailable": "アップデートが利用可能",
     "updateAvailableVersion": "アップデートが利用可能: v{{version}}",
     "copyThisMap": "このマップをコピー",
-    "getMoreMaps": "+ マップを追加する"
+    "getMoreMaps": "+ マップを追加する",
+    "sharedBy": "{{name}} が共有"
   },
   "landing": {
     "tagline": "EVE Online のためのワームホールチェーン・マッピング",

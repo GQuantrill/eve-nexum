@@ -1386,7 +1386,8 @@
     "updateAvailable": "Atualização disponível",
     "updateAvailableVersion": "Atualização disponível: v{{version}}",
     "copyThisMap": "Copiar este mapa",
-    "getMoreMaps": "+ Obter mais mapas"
+    "getMoreMaps": "+ Obter mais mapas",
+    "sharedBy": "Partilhado por {{name}}"
   },
   "landing": {
     "tagline": "Cartografia de cadeias de buracos de minhoca para EVE Online",

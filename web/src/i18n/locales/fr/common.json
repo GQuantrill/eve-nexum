@@ -1386,7 +1386,8 @@
     "updateAvailable": "Mise à jour disponible",
     "updateAvailableVersion": "Mise à jour disponible : v{{version}}",
     "copyThisMap": "Copier cette carte",
-    "getMoreMaps": "+ Obtenir plus de cartes"
+    "getMoreMaps": "+ Obtenir plus de cartes",
+    "sharedBy": "Partagée par {{name}}"
   },
   "landing": {
     "tagline": "Cartographie de chaînes de trous de ver pour EVE Online",

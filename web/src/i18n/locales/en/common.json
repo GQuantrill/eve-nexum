@@ -1457,7 +1457,8 @@
       "threat": "Threat",
       "closest": "Closest {{label}} system"
     },
-    "getMoreMaps": "+ Get more maps"
+    "getMoreMaps": "+ Get more maps",
+    "sharedBy": "Shared by {{name}}"
   },
   "landing": {
     "tagline": "Wormhole chain mapping for EVE Online",

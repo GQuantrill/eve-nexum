@@ -1424,7 +1424,8 @@
     "updateAvailable": "Доступно обновление",
     "updateAvailableVersion": "Доступно обновление: v{{version}}",
     "copyThisMap": "Копировать эту карту",
-    "getMoreMaps": "+ Получить больше карт"
+    "getMoreMaps": "+ Получить больше карт",
+    "sharedBy": "Поделился {{name}}"
   },
   "landing": {
     "tagline": "Картирование цепочек червоточин для EVE Online",

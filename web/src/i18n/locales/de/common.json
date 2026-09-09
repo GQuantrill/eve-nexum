@@ -1386,7 +1386,8 @@
     "updateAvailable": "Update verfügbar",
     "updateAvailableVersion": "Update verfügbar: v{{version}}",
     "copyThisMap": "Diese Karte kopieren",
-    "getMoreMaps": "+ Mehr Karten erhalten"
+    "getMoreMaps": "+ Mehr Karten erhalten",
+    "sharedBy": "Geteilt von {{name}}"
   },
   "landing": {
     "tagline": "Wurmloch-Kettenkartierung für EVE Online",
