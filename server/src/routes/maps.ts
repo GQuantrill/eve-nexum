@@ -2459,7 +2459,10 @@ mapsRouter.delete('/:mapId', async (req, res) => {
   const access = await getMapAccess(mapId, req);
   if (!access) { res.status(404).json({ error: 'Map not found' }); return; }
 
-  const isOwner       = access.userId === req.session.userId;
+  // Same as sharing: account-level ownership, not the creating character. An
+  // alt could not delete a map its own account made (admins were unaffected,
+  // which is what kept this hidden).
+  const isOwner       = access.accessKind === 'owner';
   const isCorpMap     = access.corpId !== null;
   const isAllianceMap = access.allianceId !== null;
   const role          = req.session.role ?? 'readonly';
@@ -3904,7 +3907,12 @@ async function requireShareAdmin(res: Response, mapId: string, req: Request): Pr
       res.status(403).json({ error: 'Only an admin can share a corp map' });
       return null;
     }
-  } else if (access.userId !== userId) {
+  } else if (access.accessKind !== 'owner') {
+    // Ownership is decided ONCE, in getMapAccess, which treats every character
+    // on an account as the owner of that account's maps. Re-deriving it here by
+    // comparing the map's CREATING character against the session lost that:
+    // a map made by one of your characters could not be shared while logged in
+    // as another, even though you could edit and see it perfectly well.
     res.status(403).json({ error: 'Only the owner can share this map' });
     return null;
   }
