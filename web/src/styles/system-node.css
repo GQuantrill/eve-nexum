@@ -576,8 +576,29 @@
 .system-node__statics-compact {
   display: flex;
   flex-wrap: wrap;
+  align-items: baseline;
   gap: 5px;
   margin-top: 3px;
+}
+
+/* The WHTypeInfo wrapper carries its own margin-left, which indented the first
+   static past the name and class lines above it. Spacing here comes from the
+   container's gap instead, so the row starts flush with the rest of the node. */
+.system-node__statics-compact > * {
+  margin-left: 0;
+}
+
+/* "Statics" — without it a bare pair of class labels under the system's own
+   class reads as though the system were two classes at once. The colon lives in
+   CSS so the label reuses the existing translated string rather than needing a
+   punctuated copy of it in all nine locales. */
+.system-node__statics-compact-label {
+  font-size: calc(13px * var(--font-scale, 1));
+  color: var(--text-dim);
+}
+
+.system-node__statics-compact-label::after {
+  content: ':';
 }
 
 .system-node__static-mini {

@@ -593,6 +593,7 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
           be resolved so nothing silently disappears. */}
       {compactMode && showStatics && sys.statics.length > 0 && (
         <div className="system-node__statics-compact">
+          <span className="system-node__statics-compact-label">{t('mapNode.statics')}</span>
           {sys.statics.map((s) => {
             const dest = whDestClass(s, whTypes);
             return (
