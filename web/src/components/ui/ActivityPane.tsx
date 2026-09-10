@@ -1,6 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
+import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import type { DragEndEvent } from '@dnd-kit/core';
+import { SortableContext, arrayMove, rectSortingStrategy, useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { api } from '../../api/client';
 import { useUserSetting } from '../../hooks/useUserSetting';
 import styles from './ActivityPane.module.css';
@@ -25,7 +29,9 @@ const SLOTS  = 24; // always render a 24-slot x-axis
 // Fixed x-axis tick positions (hours-ago, right-anchored)
 const X_TICKS = [0, 4, 8, 12, 16, 20];
 
-function MiniLineChart({ title, values, color, signed = false }: {
+function MiniLineChart({ id, title, values, color, signed = false }: {
+  /** Sortable id — the chart key. Charts reorder by drag, so each needs one. */
+  id:      string;
   title:   string;
   values:  number[];
   color:   string;
@@ -35,6 +41,7 @@ function MiniLineChart({ title, values, color, signed = false }: {
   signed?: boolean;
 }) {
   const { t } = useTranslation();
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
   const [hover, setHover] = useState<HoverState | null>(null);
   const n      = values.length;
   const avg    = n > 0 ? values.reduce((s, v) => s + v, 0) / n : 0;
@@ -67,8 +74,30 @@ function MiniLineChart({ title, values, color, signed = false }: {
   const polyline = values.map((v, i) => `${xOfIdx(i).toFixed(1)},${yOf(v).toFixed(1)}`).join(' ');
 
   return (
-    <div className={styles.chart}>
-      <div className={styles.title}>{title}</div>
+    <div
+      ref={setNodeRef}
+      className={styles.chart}
+      style={{
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.4 : 1,
+        zIndex:  isDragging ? 10 : undefined,
+      }}
+    >
+      <div className={styles.titleRow}>
+        <div className={styles.title}>{title}</div>
+        {/* Handle rather than whole-card drag: the plot itself is covered in
+            hover targets for the per-point tooltip. */}
+        <button
+          type="button"
+          className={styles.dragHandle}
+          {...listeners}
+          {...attributes}
+          title={t('closest.dragToReorder')}
+        >
+          ⠿
+        </button>
+      </div>
       <div className={styles.plot}>
       <svg
         className={styles.svg}
@@ -177,6 +206,10 @@ function hoursAgoLabel(t: TFunction, h: number): string {
   return t('time.hoursAgo', { value: h });
 }
 
+/** Chart identities, and the order they ship in. */
+type ChartKey = 'jumps' | 'shipKills' | 'podKills' | 'npcKills' | 'npcDelta';
+const DEFAULT_CHART_ORDER: ChartKey[] = ['jumps', 'shipKills', 'podKills', 'npcKills', 'npcDelta'];
+
 function ActivityChartsView({ data }: { data: HourlyPoint[] }) {
   const { t } = useTranslation();
   // Per-chart visibility — defaults on, persisted cross-device via
@@ -187,6 +220,9 @@ function ActivityChartsView({ data }: { data: HourlyPoint[] }) {
   const [showNpcKills]  = useUserSetting<boolean>('nexum.activity.showNpcKills',  true);
   const [showNpcDelta]  = useUserSetting<boolean>('nexum.activity.showNpcDelta',  true);
 
+  // Reading order, persisted the same way. Drag a chart's grip to change it.
+  const [savedOrder, setOrder] = useUserSetting<ChartKey[]>('nexum.activity.order', DEFAULT_CHART_ORDER);
+
   // NPC delta = each hour's NPC kill count minus the 24h mean. Positive
   // values mark hours of above-baseline rattering (ganking opportunity);
   // negative values mark unusually quiet hours. Same baseline approach
@@ -195,50 +231,61 @@ function ActivityChartsView({ data }: { data: HourlyPoint[] }) {
   const npcMean  = npcKills.length > 0 ? npcKills.reduce((s, v) => s + v, 0) / npcKills.length : 0;
   const npcDelta = npcKills.map((v) => v - npcMean);
 
-  const anyVisible = showJumps || showShipKills || showPodKills || showNpcKills || showNpcDelta;
-  if (!anyVisible) {
+  const charts: Record<ChartKey, { title: string; values: number[]; color: string; signed?: boolean; shown: boolean }> = {
+    jumps:     { title: t('mapSidebar.activityJumps'),     values: data.map((p) => p.jumps),     color: '#4dd9ac', shown: showJumps },
+    shipKills: { title: t('mapSidebar.activityShipKills'), values: data.map((p) => p.shipKills), color: '#e05a5a', shown: showShipKills },
+    podKills:  { title: t('mapSidebar.activityPodKills'),  values: data.map((p) => p.podKills),  color: '#c084fc', shown: showPodKills },
+    npcKills:  { title: t('mapSidebar.activityNpcKills'),  values: npcKills,                     color: '#5a9af8', shown: showNpcKills },
+    npcDelta:  { title: t('mapSidebar.activityNpcDelta'),  values: npcDelta,                     color: '#f59e0b', shown: showNpcDelta, signed: true },
+  };
+
+  // A saved order can be stale in both directions: it may name a chart that no
+  // longer exists, and it won't name one added since. Keep what we recognise,
+  // then append anything new, so a later release's chart appears rather than
+  // silently going missing.
+  const order = useMemo(() => {
+    const saved = Array.isArray(savedOrder) ? savedOrder : DEFAULT_CHART_ORDER;
+    const known = saved.filter((k): k is ChartKey => DEFAULT_CHART_ORDER.includes(k as ChartKey));
+    return [...known, ...DEFAULT_CHART_ORDER.filter((k) => !known.includes(k))];
+  }, [savedOrder]);
+
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
+
+  function handleDragEnd(e: DragEndEvent) {
+    const { active, over } = e;
+    if (!over || active.id === over.id) return;
+    // Reorder the full list, not just the visible slice, so hidden charts keep
+    // their place for whenever they're switched back on.
+    const from = order.indexOf(active.id as ChartKey);
+    const to   = order.indexOf(over.id as ChartKey);
+    if (from < 0 || to < 0) return;
+    setOrder(arrayMove(order, from, to));
+  }
+
+  const visible = order.filter((k) => charts[k].shown);
+  if (visible.length === 0) {
     return <div className="sig-pane__empty">{t('activity.allHidden')}</div>;
   }
 
   return (
-    <div className={styles.pane}>
-      {showJumps && (
-        <MiniLineChart
-          title={t('mapSidebar.activityJumps')}
-          values={data.map((p) => p.jumps)}
-          color="#4dd9ac"
-        />
-      )}
-      {showShipKills && (
-        <MiniLineChart
-          title={t('mapSidebar.activityShipKills')}
-          values={data.map((p) => p.shipKills)}
-          color="#e05a5a"
-        />
-      )}
-      {showPodKills && (
-        <MiniLineChart
-          title={t('mapSidebar.activityPodKills')}
-          values={data.map((p) => p.podKills)}
-          color="#c084fc"
-        />
-      )}
-      {showNpcKills && (
-        <MiniLineChart
-          title={t('mapSidebar.activityNpcKills')}
-          values={data.map((p) => p.npcKills)}
-          color="#5a9af8"
-        />
-      )}
-      {showNpcDelta && (
-        <MiniLineChart
-          title={t('mapSidebar.activityNpcDelta')}
-          values={npcDelta}
-          color="#f59e0b"
-          signed
-        />
-      )}
-    </div>
+    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+      {/* Rect strategy, not the vertical one the panel stack uses: these wrap
+          into a grid once the pane is wide enough for two across. */}
+      <SortableContext items={visible} strategy={rectSortingStrategy}>
+        <div className={styles.pane}>
+          {visible.map((key) => (
+            <MiniLineChart
+              key={key}
+              id={key}
+              title={charts[key].title}
+              values={charts[key].values}
+              color={charts[key].color}
+              signed={charts[key].signed}
+            />
+          ))}
+        </div>
+      </SortableContext>
+    </DndContext>
   );
 }
 

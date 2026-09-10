@@ -40,6 +40,29 @@
   border: 1px solid var(--surface-hover);
 }
 
+.titleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.dragHandle {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: grab;
+  font-size: calc(14px * var(--font-scale, 1));
+  line-height: 1;
+  padding: 0 2px;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.dragHandle:hover { color: var(--text-faint); }
+
+.dragHandle:active { cursor: grabbing; }
+
 .title {
   font-size: calc(13px * var(--font-scale, 1));
   font-weight: 600;

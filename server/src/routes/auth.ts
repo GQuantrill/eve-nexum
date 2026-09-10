@@ -723,6 +723,13 @@ authRouter.patch('/preferences', async (req, res) => {
 // shallow-merged into users.ui_settings via Postgres' `||` operator,
 // so unrelated keys are preserved. Allow-list keeps junk out.
 const SETTINGS_ALLOWLIST = new Set<string>([
+  // Activity charts: which are shown, and the order they read in.
+  'nexum.activity.showJumps',
+  'nexum.activity.showShipKills',
+  'nexum.activity.showPodKills',
+  'nexum.activity.showNpcKills',
+  'nexum.activity.showNpcDelta',
+  'nexum.activity.order',
   'nexum.closestSystems.hiddenHome',
   'nexum.closestSystems.list',
   'nexum.killboardIncludeNpc',
