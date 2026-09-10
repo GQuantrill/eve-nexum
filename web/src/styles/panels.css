@@ -28,7 +28,24 @@
   border-top: none;
   border-left: 1px solid var(--border);
   padding: 12px 16px 12px 16px;
+  overflow: hidden;
+}
+
+/* Stacked, the wrapper is inert — its children lay out as if it weren't there. */
+.system-panel__scroll { display: contents; }
+
+/* Column mode: one scroller for the whole column, and it's this wrapper rather
+   than the panel, so the resize rail stays pinned to the panel's left edge
+   instead of scrolling out of reach. */
+.system-panel--side .system-panel__scroll {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
+  /* Keep the wheel in the column: at either end it would otherwise chain to
+     the page and rubber-band the whole app. */
+  overscroll-behavior: contain;
 }
 
 /* Info spans the panel here rather than sitting in a fixed-width column with
@@ -43,6 +60,18 @@
   /* The panel itself scrolls in this mode; a second scroller here would trap
      the wheel over the info block. */
   overflow-y: visible;
+}
+
+/* One scroller for the whole column — the panel itself. Stacked, the pane
+   stack sits BESIDE the info and rightly scrolls on its own; here it sits
+   under it, and two nested scrollers meant the wheel did nothing at all while
+   the cursor was over the info block. The stack now sizes to its content and
+   lets the panel do the scrolling, so the column scrolls as one wherever you
+   point. */
+.system-panel--side .panel-stack {
+  flex: 0 0 auto;
+  overflow-y: visible;
+  min-width: 0;
 }
 
 /* Collapsed, the info block folds upwards, so its rail is a bar across the
@@ -64,6 +93,9 @@
   width: 6px;
   height: auto;
   cursor: ew-resize;
+  /* Above the cards, which are positioned and come later in the DOM — without
+     this they take the drag anywhere they overlap the rail. */
+  z-index: 2;
 }
 
 .system-panel__resize-handle {
