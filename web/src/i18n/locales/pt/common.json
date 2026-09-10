@@ -308,6 +308,10 @@
       "events": "Difusões",
       "broadcastChains": "Difundir cadeias guardadas",
       "broadcastChainsHint": "Quando ativado, guardar uma cadeia de buracos de minhoca publica-a no Discord com o nome, sistemas de início e fim, tamanho máximo de nave e número de saltos.",
+      "broadcastK162": "Anunciar K162 recebidos",
+      "broadcastK162Hint": "Quando ativo, uma assinatura identificada como K162 é publicada no Discord assim que o seu destino for conhecido. Desativado por predefinição.",
+      "broadcastExits": "Anunciar saídas para k-space",
+      "broadcastExitsHint": "Quando ativo, uma ligação que revela uma saída para k-space com a segurança indicada abaixo ou superior publica um resumo de rota: a saída, o caminho até ela e o centro comercial mais próximo. Desativado por predefinição; a ligação em si é anunciada de qualquer forma.",
       "webhooks": "Webhooks",
       "webhooksHint": "Onde as notificações são publicadas. Cola um URL de webhook do Discord para cada canal; deixa um campo vazio para desativar esse tipo.",
       "connectionsWebhook": "Ligações (K162 + novas ligações)",
@@ -1449,6 +1453,12 @@
     "notifK162": "K162 de entrada",
     "notifProximity": "Ameaças de proximidade",
     "notifWatchlist": "Correspondência da lista de observação",
+    "notifExits": "Saídas para k-space",
+    "notifExitsMinSec": "Alertar sobre saídas de",
+    "notifExitsHiSec": "Apenas alta segurança",
+    "notifExitsLowSec": "Baixa segurança ou melhor",
+    "notifExitsAny": "Qualquer k-space",
+    "notifExitsHint": "Alerta uma vez quando surge na cadeia uma saída com pelo menos esta segurança. Desativado por predefinição.",
     "openOptions": "Opções de mapa",
     "optimizeConnections": "⟳ Otimizar conexões",
     "panelBelow": "Abaixo do mapa",
@@ -2039,5 +2049,9 @@
     "connectedSystems": "Sistemas conectados",
     "other": "Outros",
     "inbound": "de entrada"
+  },
+  "exits": {
+    "notifTitle": "Saída para k-space",
+    "appeared": "{{name}} ({{security}}) está na cadeia"
   }
 }

@@ -308,6 +308,10 @@
       "events": "Übertragungen",
       "broadcastChains": "Gespeicherte Ketten übertragen",
       "broadcastChainsHint": "Wenn aktiviert, wird beim Speichern einer Wurmloch-Kette diese mit Name, Start- und Zielsystem, maximaler Schiffsgröße und Anzahl der Sprünge in Discord gepostet.",
+      "broadcastK162": "Eingehende K162 melden",
+      "broadcastK162Hint": "Wenn aktiv, wird eine als K162 identifizierte Signatur an Discord gemeldet, sobald ihr Ziel bekannt ist. Standardmäßig aus.",
+      "broadcastExits": "K-Space-Ausgänge melden",
+      "broadcastExitsHint": "Wenn aktiv, meldet eine Verbindung, die einen K-Space-Ausgang mit mindestens der unten gewählten Sicherheit aufdeckt, eine Routen-Übersicht — Ausgang, Weg dorthin und nächstes Handelszentrum. Standardmäßig aus; die Verbindung selbst wird ohnehin gemeldet.",
       "webhooks": "Webhooks",
       "webhooksHint": "Wohin Benachrichtigungen gepostet werden. Füge für jeden Kanal eine Discord-Webhook-URL ein; leer lassen, um diesen Typ zu deaktivieren.",
       "connectionsWebhook": "Verbindungen (K162 + neue Verbindungen)",
@@ -1449,6 +1453,12 @@
     "notifK162": "Eingehendes K162",
     "notifProximity": "Nahe Bedrohungen",
     "notifWatchlist": "Beobachtungslisten-Treffer",
+    "notifExits": "K-Space-Ausgänge",
+    "notifExitsMinSec": "Melden bei Ausgängen ab",
+    "notifExitsHiSec": "Nur Hi-Sec",
+    "notifExitsLowSec": "Low-Sec und besser",
+    "notifExitsAny": "Jeder K-Space",
+    "notifExitsHint": "Meldet einmalig, wenn ein Ausgang mit mindestens dieser Sicherheit in der Kette auftaucht. Standardmäßig aus.",
     "openOptions": "Kartenoptionen",
     "optimizeConnections": "⟳ Verbindungen optimieren",
     "panelBelow": "Unter Karte",
@@ -2039,5 +2049,9 @@
     "connectedSystems": "Verbundene Systeme",
     "other": "Andere",
     "inbound": "eingehend"
+  },
+  "exits": {
+    "notifTitle": "K-Space-Ausgang",
+    "appeared": "{{name}} ({{security}}) ist in der Kette"
   }
 }

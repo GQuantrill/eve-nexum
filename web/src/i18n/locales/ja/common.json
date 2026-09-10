@@ -308,6 +308,10 @@
       "events": "ブロードキャスト",
       "broadcastChains": "保存したチェーンをブロードキャスト",
       "broadcastChainsHint": "オンにすると、ワームホールチェーンを保存したときに、名前・開始/終了星系・最大艦船サイズ・ホップ数を Discord に投稿します。",
+      "broadcastK162": "着信K162を通知",
+      "broadcastK162Hint": "有効にすると、K162と判定されたシグネチャを、接続先が判明した時点でDiscordに投稿します。既定ではオフです。",
+      "broadcastExits": "k-spaceの出口を通知",
+      "broadcastExitsHint": "有効にすると、下で指定したセキュリティ以上のk-space出口が判明した接続について、出口・そこまでの経路・最寄りの交易ハブをまとめて投稿します。既定ではオフで、接続自体はどちらの場合も通知されます。",
       "webhooks": "Webhook",
       "webhooksHint": "通知の投稿先です。各チャンネルの Discord Webhook URL を貼り付けてください。空欄にするとその種類を無効にします。",
       "connectionsWebhook": "接続（K162 + 新規接続）",
@@ -1449,6 +1453,12 @@
     "notifK162": "着信 K162",
     "notifProximity": "近接の脅威",
     "notifWatchlist": "ウォッチリスト一致",
+    "notifExits": "k-spaceの出口",
+    "notifExitsMinSec": "通知する出口のセキュリティ",
+    "notifExitsHiSec": "ハイセクのみ",
+    "notifExitsLowSec": "ローセク以上",
+    "notifExitsAny": "すべてのk-space",
+    "notifExitsHint": "この値以上のセキュリティの出口がチェーンに現れたとき、一度だけ通知します。既定ではオフです。",
     "openOptions": "マップオプション",
     "optimizeConnections": "⟳ 接続を最適化",
     "panelBelow": "マップの下",
@@ -2039,5 +2049,9 @@
     "connectedSystems": "接続された星系",
     "other": "その他",
     "inbound": "インバウンド"
+  },
+  "exits": {
+    "notifTitle": "k-spaceの出口",
+    "appeared": "{{name}}（{{security}}）がチェーンに出現"
   }
 }

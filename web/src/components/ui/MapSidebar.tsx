@@ -20,7 +20,7 @@ import {
 } from "../../hooks/useMinimapPosition";
 import { useUserSetting } from "../../hooks/useUserSetting";
 import { normalizePlacement } from "../../hooks/useLocationTracking";
-import { NOTIFY } from "../../utils/notificationPrefs";
+import { NOTIFY, notifyDefault, EXITS_MIN_SECURITY_KEY, EXITS_MIN_SECURITY_DEFAULT } from "../../utils/notificationPrefs";
 import { useResettableState } from "../../hooks/useResettableState";
 import { DEFAULT_BOOKMARK_FORMAT, BOOKMARK_TOKENS, DEFAULT_SITE_BOOKMARK_FORMAT, SITE_BOOKMARK_TOKENS } from "../../utils/signatureBookmark";
 import { toPng } from "html-to-image";
@@ -66,17 +66,16 @@ function SettingToggle({
 
 // One event row in the Notifications grid: an event label with independent
 // desktop + sound checkboxes, each backed by its own ui_settings key.
-function NotifRow({
-  label, desktopKey, soundKey, desktopDefault = true, soundDefault = true,
-}: {
+function NotifRow({ label, desktopKey, soundKey }: {
   label: string;
   desktopKey: string;
   soundKey: string;
-  desktopDefault?: boolean;
-  soundDefault?: boolean;
 }) {
-  const [desktop, setDesktop] = useUserSetting<boolean>(desktopKey, desktopDefault);
-  const [sound, setSound]     = useUserSetting<boolean>(soundKey, soundDefault);
+  // Defaults come from NOTIFY_DEFAULTS, the same table the alerts read at fire
+  // time. They used to be per-row props, which let a box render ticked for an
+  // alert that was actually off.
+  const [desktop, setDesktop] = useUserSetting<boolean>(desktopKey, notifyDefault(desktopKey));
+  const [sound, setSound]     = useUserSetting<boolean>(soundKey, notifyDefault(soundKey));
   return (
     <div className="notif-grid__row">
       <span className="notif-grid__label">{label}</span>
@@ -915,6 +914,7 @@ export function MapSidebar() {
   const setSnapToGrid = useMapStore((s) => s.setSnapToGrid);
   const compactMode = useMapStore((s) => s.compactMode);
   const panelSideBySide = useMapStore((s) => s.panelSideBySide);
+  const [exitsMinSec, setExitsMinSec] = useUserSetting<number>(EXITS_MIN_SECURITY_KEY, EXITS_MIN_SECURITY_DEFAULT);
   const setPanelSideBySide = useMapStore((s) => s.setPanelSideBySide);
   const setCompactMode = useMapStore((s) => s.setCompactMode);
   const showMinimap = useMapStore((s) => s.showMinimap);
@@ -1543,9 +1543,28 @@ export function MapSidebar() {
               label={t("mapSidebar.notifWatchlist")}
               desktopKey={NOTIFY.watchlistDesktop}
               soundKey={NOTIFY.watchlistSound}
-              desktopDefault={false}
+            />
+            <NotifRow
+              label={t("mapSidebar.notifExits")}
+              desktopKey={NOTIFY.exitsDesktop}
+              soundKey={NOTIFY.exitsSound}
             />
           </div>
+          {/* Which exits count. Only meaningful with the row above switched on,
+              so it sits under the grid rather than in it. */}
+          <label className="map-sidebar__field">
+            <span>{t("mapSidebar.notifExitsMinSec")}</span>
+            <Select
+              value={String(exitsMinSec)}
+              onChange={(v) => setExitsMinSec(Number(v))}
+              options={[
+                { value: "0.45", label: t("mapSidebar.notifExitsHiSec") },
+                { value: "0.05", label: t("mapSidebar.notifExitsLowSec") },
+                { value: "-1",   label: t("mapSidebar.notifExitsAny") },
+              ]}
+            />
+          </label>
+          <div className="map-sidebar__hint">{t("mapSidebar.notifExitsHint")}</div>
         </CollapsibleSection>
 
         <CollapsibleSection title={t("mapSidebar.sections.announcer")} {...sectionProps("announcer")}>

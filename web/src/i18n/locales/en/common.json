@@ -320,6 +320,10 @@
       "events": "Broadcasts",
       "broadcastChains": "Broadcast saved chains",
       "broadcastChainsHint": "When on, saving a wormhole chain posts it to Discord with its name, start and end systems, max ship size and hop count.",
+      "broadcastK162": "Broadcast inbound K162s",
+      "broadcastK162Hint": "When on, a signature identified as a K162 posts to Discord once its destination is known. Off by default.",
+      "broadcastExits": "Broadcast k-space exits",
+      "broadcastExitsHint": "When on, a connection revealing a k-space exit at or above the security below posts a routing summary — the exit, the path to it and the nearest trade hub. Off by default; the connection itself is still announced either way.",
       "webhooks": "Webhooks",
       "webhooksHint": "Where notifications are posted. Paste a Discord webhook URL for each channel; leave a field empty to turn that type off.",
       "connectionsWebhook": "Connections (K162 + new connections)",
@@ -1449,6 +1453,12 @@
     "notifK162": "Inbound K162",
     "notifProximity": "Proximity threats",
     "notifWatchlist": "Watchlist match",
+    "notifExits": "K-space exits",
+    "notifExitsMinSec": "Alert on exits of",
+    "notifExitsHiSec": "High-sec only",
+    "notifExitsLowSec": "Low-sec and better",
+    "notifExitsAny": "Any k-space",
+    "notifExitsHint": "Alerts once when an exit of at least this security appears on the chain. Off by default.",
     "openOptions": "Map options",
     "optimizeConnections": "⟳ Optimize Connections",
     "panelBelow": "Below map",
@@ -2039,5 +2049,9 @@
     "connectedSystems": "Connected Systems",
     "other": "Other",
     "inbound": "inbound"
+  },
+  "exits": {
+    "notifTitle": "K-space exit",
+    "appeared": "{{name}} ({{security}}) is on the chain"
   }
 }

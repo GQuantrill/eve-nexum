@@ -15,19 +15,42 @@ export const NOTIFY = {
   proximitySound:   'nexum.notify.proximity.sound',
   watchlistDesktop: 'nexum.notify.watchlist.desktop',
   watchlistSound:   'nexum.watchlist.sound',
+  exitsDesktop:     'nexum.notify.exits.desktop',
+  exitsSound:       'nexum.notify.exits.sound',
 } as const;
 
-// Defaults preserve today's behaviour: K162 and proximity alert on both
-// channels; the watchlist keeps its sound but desktop is opt-in (it never had
-// a desktop notification before).
+/** Lowest security that counts as an exit worth alerting on. */
+export const EXITS_MIN_SECURITY_KEY = 'nexum.notify.exitsMinSecurity';
+export const EXITS_MIN_SECURITY_DEFAULT = 0.45;
+
+// Proximity alerts on both channels and the watchlist keeps its sound (desktop
+// there was always opt-in). K162 and exits are opt-in: both are chain-wide
+// chatter rather than something happening to you, and on a busy chain they fire
+// constantly, so they stay quiet until asked for.
 export const NOTIFY_DEFAULTS: Record<string, boolean> = {
-  [NOTIFY.k162Desktop]:      true,
-  [NOTIFY.k162Sound]:        true,
+  [NOTIFY.k162Desktop]:      false,
+  [NOTIFY.k162Sound]:        false,
   [NOTIFY.proximityDesktop]: true,
   [NOTIFY.proximitySound]:   true,
   [NOTIFY.watchlistDesktop]: false,
   [NOTIFY.watchlistSound]:   true,
+  [NOTIFY.exitsDesktop]:     false,
+  [NOTIFY.exitsSound]:       false,
 };
+
+/**
+ * Whether an alert should fire at all. For the opt-in alerts both channels off
+ * means silence — including the in-app toast, which otherwise shows regardless
+ * and would leave the feature only half-off.
+ */
+export function anyChannelOn(desktopKey: string, soundKey: string): boolean {
+  return notifyOn(desktopKey) || notifyOn(soundKey);
+}
+
+/** A channel's shipped default, for UI that has to render before any choice. */
+export function notifyDefault(key: string): boolean {
+  return NOTIFY_DEFAULTS[key] ?? true;
+}
 
 /** Whether a given notification channel is enabled (sync read at fire time). */
 export function notifyOn(key: string): boolean {

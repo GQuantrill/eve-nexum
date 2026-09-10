@@ -377,6 +377,8 @@ const DISCORD_SETTINGS_COLS = `
   COALESCE(cds.all_regions,   ads.all_regions,   TRUE)          AS "allRegions",
   COALESCE(cds.regions,       ads.regions,       '{}'::text[])  AS "regions",
   COALESCE(cds.notify_chains, ads.notify_chains, TRUE)          AS "notifyChains",
+  COALESCE(cds.notify_k162,   ads.notify_k162,   FALSE)         AS "notifyK162",
+  COALESCE(cds.notify_exits,  ads.notify_exits,  FALSE)         AS "notifyExits",
   COALESCE(cds.connections_webhook, ads.connections_webhook)    AS "connectionsWebhook",
   COALESCE(cds.chains_webhook,      ads.chains_webhook)         AS "chainsWebhook",
   COALESCE(cds.exits_min_security,  ads.exits_min_security, 0.45) AS "exitsMinSecurity"`;
@@ -404,7 +406,7 @@ async function fireK162(sigId: string, actor: string | null): Promise<void> {
     const { rows } = await db.query<{
       whType: string | null; leadsTo: string | null; system: string; systemClass: string;
       region: string | null; mapName: string; mapEnabled: boolean; allRegions: boolean; regions: string[];
-      connectionsWebhook: string | null; connectedToDest: boolean;
+      connectionsWebhook: string | null; connectedToDest: boolean; notifyK162: boolean;
     }>(
       // `connectedToDest`: a wormhole connection already links this K162's system
       // to the system its leads-to names — i.e. the far side of a hole we've
@@ -433,6 +435,7 @@ async function fireK162(sigId: string, actor: string | null): Promise<void> {
     const r = rows[0];
     if (!r) { discordLog.info(`K162 (sig ${sigId}) removed before send — skipping`); return; }
     if (!r.connectionsWebhook) { discordLog.info(`K162 (sig ${sigId}) suppressed — no connections webhook configured`); return; }
+    if (!r.notifyK162) { discordLog.info(`K162 (sig ${sigId}) suppressed — K162 pings off for this org`); return; }
     if ((r.whType ?? '').toUpperCase() !== 'K162') {
       discordLog.info(`K162 (sig ${sigId}) changed to "${r.whType ?? ''}" before send — skipping`);
       return;
@@ -708,6 +711,7 @@ function maybeBroadcastConnection(meta: MapMeta, mapId: string, connId: string, 
     eveA: number | null; eveB: number | null; secA: number | null; secB: number | null; homeA: boolean; homeB: boolean;
     mapName: string; mapEnabled: boolean; allRegions: boolean; regions: string[];
     whTypes: string[]; whClasses: string[]; whSizes: string[]; connectionsWebhook: string | null; exitsMinSecurity: number;
+    notifyExits: boolean;
   }>(
     `SELECT c.source_id AS "sourceId", c.target_id AS "targetId", c.connection_type AS "connType",
             c.discord_notified AS "notified", c.discord_notified_known AS "notifiedKnown", c.size, c.wh_type AS "whType",
@@ -799,7 +803,10 @@ function maybeBroadcastConnection(meta: MapMeta, mapId: string, connId: string, 
     // (or an unreachable / home-less exit) falls back to the plain embed so the
     // send still happens.
     try {
-      const exit = pickKspaceExit(r);
+      // Off by default: without the opt-in this falls through to the plain
+      // connection embed below, so the connection is still announced — it just
+      // doesn't get the exit-specific alert and routing intel.
+      const exit = r.notifyExits ? pickKspaceExit(r) : null;
       if (exit) {
         const intel = await computeExitIntel(mapId, exit.nodeId);
         if (intel) {

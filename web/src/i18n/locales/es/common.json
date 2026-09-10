@@ -308,6 +308,10 @@
       "events": "Difusiones",
       "broadcastChains": "Difundir cadenas guardadas",
       "broadcastChainsHint": "Cuando está activado, al guardar una cadena de agujeros de gusano se publica en Discord con su nombre, sistemas de inicio y fin, tamaño máximo de nave y número de saltos.",
+      "broadcastK162": "Anunciar K162 entrantes",
+      "broadcastK162Hint": "Cuando está activo, una firma identificada como K162 se publica en Discord en cuanto se conoce su destino. Desactivado por defecto.",
+      "broadcastExits": "Anunciar salidas a k-space",
+      "broadcastExitsHint": "Cuando está activo, una conexión que revela una salida a k-space con la seguridad indicada abajo o superior publica un resumen de ruta: la salida, el camino hasta ella y el centro comercial más cercano. Desactivado por defecto; la conexión en sí se anuncia igualmente.",
       "webhooks": "Webhooks",
       "webhooksHint": "Dónde se publican las notificaciones. Pega una URL de webhook de Discord para cada canal; deja un campo vacío para desactivar ese tipo.",
       "connectionsWebhook": "Conexiones (K162 + conexiones nuevas)",
@@ -1449,6 +1453,12 @@
     "notifK162": "K162 entrante",
     "notifProximity": "Amenazas de proximidad",
     "notifWatchlist": "Coincidencia de lista de seguimiento",
+    "notifExits": "Salidas a k-space",
+    "notifExitsMinSec": "Avisar de salidas de",
+    "notifExitsHiSec": "Solo alta seguridad",
+    "notifExitsLowSec": "Baja seguridad o mejor",
+    "notifExitsAny": "Cualquier k-space",
+    "notifExitsHint": "Avisa una vez cuando aparece en la cadena una salida con al menos esta seguridad. Desactivado por defecto.",
     "openOptions": "Opciones de mapa",
     "optimizeConnections": "⟳ Optimizar conexiones",
     "panelBelow": "Debajo del mapa",
@@ -2039,5 +2049,9 @@
     "connectedSystems": "Sistemas conectados",
     "other": "Otros",
     "inbound": "entrante"
+  },
+  "exits": {
+    "notifTitle": "Salida a k-space",
+    "appeared": "{{name}} ({{security}}) está en la cadena"
   }
 }

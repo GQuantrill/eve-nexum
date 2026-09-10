@@ -12,6 +12,7 @@ import { useMapStore, getPlacementCell } from '../../store/mapStore';
 import { useAuth } from '../../context/AuthContext';
 import { useAccountLocations } from '../../hooks/useAccountLocations';
 import { useWatchlistAlerts } from '../../hooks/useWatchlistAlerts';
+import { useExitAlerts } from '../../hooks/useExitAlerts';
 import { useMapSignatureIndex } from '../../hooks/useMapSignatureIndex';
 import { useUndivedWormholeIndex } from '../../hooks/useUndivedWormholeIndex';
 import { useLeadsToIndex } from '../../hooks/useLeadsToIndex';
@@ -159,6 +160,7 @@ export function MapCanvas() {
   // even when the Jump Range pane isn't open.
   useJumpRange();
   useWatchlistAlerts();
+  useExitAlerts();
   const systems              = useMapStore((s) => s.map.systems);
   const connections          = useMapStore((s) => s.map.connections);
   const selectedSystemId     = useMapStore((s) => s.selectedSystemId);

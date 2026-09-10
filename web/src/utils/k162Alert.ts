@@ -1,5 +1,5 @@
 import { toast } from './toastStore';
-import { NOTIFY, notifyOn, fireDesktopNotification } from './notificationPrefs';
+import { NOTIFY, notifyOn, anyChannelOn, fireDesktopNotification } from './notificationPrefs';
 
 // Audio context is created lazily on first use to avoid autoplay-policy issues.
 let audioCtx: AudioContext | null = null;
@@ -30,6 +30,8 @@ function playBeep() {
  * and always shows.
  */
 export function alertInboundK162(sysName: string) {
+  // Opt-in, so the toast is gated too — with both channels off this is silent.
+  if (!anyChannelOn(NOTIFY.k162Desktop, NOTIFY.k162Sound)) return;
   toast.info(`Inbound K162 in ${sysName}`);
   if (notifyOn(NOTIFY.k162Desktop)) {
     fireDesktopNotification('Inbound K162', `New K162 wormhole identified in ${sysName}`, `nexum-k162-${sysName}`);

@@ -1117,6 +1117,16 @@ export async function migrate() {
     -- name on a paste; stored here once a scout picks one by hand, so a
     -- mis-scanned or hand-typed name can be corrected without editing the name.
     ALTER TABLE map_signatures ADD COLUMN IF NOT EXISTS ghost_type TEXT NOT NULL DEFAULT '';
+
+    -- K162 and k-space-exit pings are opt-in. Both default FALSE: an exit ping
+    -- is new, and K162 previously fired for anyone with a connections webhook
+    -- whether they wanted it or not. Existing orgs therefore lose K162 pings on
+    -- upgrade until an admin switches them back on — a deliberate reset, since
+    -- there was never a way to say no to them.
+    ALTER TABLE corp_discord_settings     ADD COLUMN IF NOT EXISTS notify_k162  BOOLEAN NOT NULL DEFAULT FALSE;
+    ALTER TABLE corp_discord_settings     ADD COLUMN IF NOT EXISTS notify_exits BOOLEAN NOT NULL DEFAULT FALSE;
+    ALTER TABLE alliance_discord_settings ADD COLUMN IF NOT EXISTS notify_k162  BOOLEAN NOT NULL DEFAULT FALSE;
+    ALTER TABLE alliance_discord_settings ADD COLUMN IF NOT EXISTS notify_exits BOOLEAN NOT NULL DEFAULT FALSE;
   `);
 
   await encryptLegacyTokens();

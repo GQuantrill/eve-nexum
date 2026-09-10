@@ -1917,6 +1917,8 @@ interface DiscordSettings {
   allRegions:   boolean;
   regions:      string[];
   notifyChains: boolean;
+  notifyK162: boolean;
+  notifyExits: boolean;
   whTypes:      string[];
   whClasses:    string[];
   whSizes:      string[];
@@ -2003,7 +2005,7 @@ function DiscordTab() {
     try {
       // Send every field the PUT can wipe (it defaults absent flags/lists), so a
       // save never silently resets the chain toggle or another filter dimension.
-      await api('/api/admin/discord', { method: 'PUT', body: JSON.stringify({ allRegions, regions, notifyChains: data.notifyChains, whTypes, whClasses, whSizes, connectionsWebhook: connWebhook.trim(), chainsWebhook: chainWebhook.trim(), exitsMinSecurity: exitMinSec, killWebhook: killWebhook.trim(), killMinIsk }) });
+      await api('/api/admin/discord', { method: 'PUT', body: JSON.stringify({ allRegions, regions, notifyChains: data.notifyChains, notifyK162: data.notifyK162, notifyExits: data.notifyExits, whTypes, whClasses, whSizes, connectionsWebhook: connWebhook.trim(), chainsWebhook: chainWebhook.trim(), exitsMinSecurity: exitMinSec, killWebhook: killWebhook.trim(), killMinIsk }) });
       setData((d) => (d ? { ...d, allRegions, regions, whTypes, whClasses, whSizes, connectionsWebhook: connWebhook.trim(), chainsWebhook: chainWebhook.trim(), exitsMinSecurity: exitMinSec, killWebhook: killWebhook.trim(), killMinIsk } : d));
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
@@ -2015,15 +2017,23 @@ function DiscordTab() {
   }
 
   // Broadcast toggles persist immediately, using the last-saved filters so an
-  // unsaved draft isn't dragged along and no other filter is wiped.
-  async function toggleChains(next: boolean) {
+  // unsaved draft isn't dragged along and no other filter is wiped. Every event
+  // flag goes up on each call — omitting one reads as "off" server-side.
+  async function toggleEvent(field: 'notifyChains' | 'notifyK162' | 'notifyExits', next: boolean) {
     if (!data) return;
-    const prev = data.notifyChains;
-    setData((d) => (d ? { ...d, notifyChains: next } : d));
+    const prev = data[field];
+    setData((d) => (d ? { ...d, [field]: next } : d));
     try {
-      await api('/api/admin/discord', { method: 'PUT', body: JSON.stringify({ allRegions: data.allRegions, regions: data.regions, notifyChains: next, whTypes: data.whTypes, whClasses: data.whClasses, whSizes: data.whSizes, connectionsWebhook: data.connectionsWebhook, chainsWebhook: data.chainsWebhook, exitsMinSecurity: data.exitsMinSecurity, killWebhook: data.killWebhook, killMinIsk: data.killMinIsk }) });
+      await api('/api/admin/discord', { method: 'PUT', body: JSON.stringify({
+        allRegions: data.allRegions, regions: data.regions,
+        notifyChains: data.notifyChains, notifyK162: data.notifyK162, notifyExits: data.notifyExits,
+        [field]: next,
+        whTypes: data.whTypes, whClasses: data.whClasses, whSizes: data.whSizes,
+        connectionsWebhook: data.connectionsWebhook, chainsWebhook: data.chainsWebhook,
+        exitsMinSecurity: data.exitsMinSecurity, killWebhook: data.killWebhook, killMinIsk: data.killMinIsk,
+      }) });
     } catch (e) {
-      setData((d) => (d ? { ...d, notifyChains: prev } : d));
+      setData((d) => (d ? { ...d, [field]: prev } : d));
       setError(e instanceof Error ? e.message : t('admin.discord.saveFailed'));
     }
   }
@@ -2246,10 +2256,22 @@ function DiscordTab() {
       <section className={styles.dcSection}>
         <h3 className={styles.dcHeading}>{t('admin.discord.events')}</h3>
         <label className={styles.dcRadio}>
-          <input type="checkbox" checked={data.notifyChains} onChange={(e) => toggleChains(e.target.checked)} />
+          <input type="checkbox" checked={data.notifyChains} onChange={(e) => toggleEvent('notifyChains', e.target.checked)} />
           {t('admin.discord.broadcastChains')}
         </label>
         <p className={styles.dcHint}>{t('admin.discord.broadcastChainsHint')}</p>
+
+        <label className={styles.dcRadio}>
+          <input type="checkbox" checked={data.notifyK162} onChange={(e) => toggleEvent('notifyK162', e.target.checked)} />
+          {t('admin.discord.broadcastK162')}
+        </label>
+        <p className={styles.dcHint}>{t('admin.discord.broadcastK162Hint')}</p>
+
+        <label className={styles.dcRadio}>
+          <input type="checkbox" checked={data.notifyExits} onChange={(e) => toggleEvent('notifyExits', e.target.checked)} />
+          {t('admin.discord.broadcastExits')}
+        </label>
+        <p className={styles.dcHint}>{t('admin.discord.broadcastExitsHint')}</p>
       </section>
 
       <section className={styles.dcSection}>
