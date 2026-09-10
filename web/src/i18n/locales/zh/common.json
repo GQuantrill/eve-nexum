@@ -759,7 +759,7 @@
   "ghostTier": {
     "hisec": "出现在高安",
     "lowsec": "出现在低安",
-    "nullWh": "出现在零安和虫洞空间",
+    "nullsec": "出现在零安",
     "wh": "出现在虫洞空间"
   },
   "iconPicker": {

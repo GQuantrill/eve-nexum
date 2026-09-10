@@ -759,7 +759,7 @@
   "ghostTier": {
     "hisec": "하이섹에 등장",
     "lowsec": "로우섹에 등장",
-    "nullWh": "널섹과 웜홀 공간에 등장",
+    "nullsec": "널섹에 등장",
     "wh": "웜홀 공간에 등장"
   },
   "iconPicker": {

@@ -759,7 +759,7 @@
   "ghostTier": {
     "hisec": "In Hi-Sec zu finden",
     "lowsec": "In Low-Sec zu finden",
-    "nullWh": "In Null-Sec und Wurmlochraum zu finden",
+    "nullsec": "In Null-Sec zu finden",
     "wh": "Im Wurmlochraum zu finden"
   },
   "iconPicker": {

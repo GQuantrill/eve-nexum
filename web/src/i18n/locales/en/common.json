@@ -759,7 +759,7 @@
   "ghostTier": {
     "hisec": "Found in high-sec",
     "lowsec": "Found in low-sec",
-    "nullWh": "Found in null-sec and wormhole space",
+    "nullsec": "Found in null-sec",
     "wh": "Found in wormhole space"
   },
   "iconPicker": {

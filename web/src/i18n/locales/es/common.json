@@ -759,7 +759,7 @@
   "ghostTier": {
     "hisec": "Se encuentra en alta seguridad",
     "lowsec": "Se encuentra en baja seguridad",
-    "nullWh": "Se encuentra en nula seguridad y espacio de agujeros de gusano",
+    "nullsec": "Se encuentra en nula seguridad",
     "wh": "Se encuentra en espacio de agujeros de gusano"
   },
   "iconPicker": {

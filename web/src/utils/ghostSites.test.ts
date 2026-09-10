@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { GHOST_SUFFIX, ghostTier } from './ghostSites';
+import { GHOST_SUFFIX, defaultGhostTier, ghostTier } from './ghostSites';
 
 describe('ghost site detection', () => {
   // The scanner's type column is unreliable for these — the name is the signal.
@@ -22,7 +22,7 @@ describe('ghostTier', () => {
   it.each([
     ['Lesser Sansha Covert Research Facility',          'Lesser',   'ghostTier.hisec'],
     ['Serpentis Covert Research Facility',              'Standard', 'ghostTier.lowsec'],
-    ['Improved Guristas Covert Research Facility',      'Improved', 'ghostTier.nullWh'],
+    ['Improved Guristas Covert Research Facility',      'Improved', 'ghostTier.nullsec'],
     ['Superior Blood Raider Covert Research Facility',  'Superior', 'ghostTier.wh'],
   ])('reads %s as %s', (name, tier, space) => {
     expect(ghostTier('ghost', name)).toEqual({ tier, space });
@@ -42,5 +42,29 @@ describe('ghostTier', () => {
     expect(ghostTier('data', 'Superior Blood Raider Covert Research Facility')).toBeNull();
     expect(ghostTier('ghost', 'Ruined Sansha Monument')).toBeNull();
     expect(ghostTier('relic', 'Ruined Sansha Monument')).toBeNull();
+  });
+});
+
+describe('defaultGhostTier', () => {
+  // The space a scout is in decides the tier, so a hand-added ghost site can
+  // seed its picker from the system's class.
+  it.each([
+    ['HS', 'Lesser'],
+    ['LS', 'Standard'],
+    ['NS', 'Improved'],
+    ['Pochven', 'Improved'],
+  ])('seeds %s with %s', (cls, tier) => {
+    expect(defaultGhostTier(cls)).toBe(tier);
+  });
+
+  it.each(['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C13', 'Thera', 'Drifter'])(
+    'seeds wormhole space (%s) with Superior', (cls) => {
+      expect(defaultGhostTier(cls)).toBe('Superior');
+    });
+
+  // An unmapped placeholder node could be anywhere — seed nothing rather than
+  // guess, and let the scout pick.
+  it('seeds nothing for an unknown system', () => {
+    expect(defaultGhostTier('unknown')).toBe('');
   });
 });

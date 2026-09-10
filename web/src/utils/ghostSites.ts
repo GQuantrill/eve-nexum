@@ -11,12 +11,12 @@ export const GHOST_SUFFIX = /covert research facility$/i;
  * plain "<Faction> Covert Research Facility" — so it never matches by name and
  * is the fallback below.
  */
-export type GhostSpaceKey = 'ghostTier.hisec' | 'ghostTier.lowsec' | 'ghostTier.nullWh' | 'ghostTier.wh';
+export type GhostSpaceKey = 'ghostTier.hisec' | 'ghostTier.lowsec' | 'ghostTier.nullsec' | 'ghostTier.wh';
 
 export const GHOST_TIERS: { value: string; match: RegExp | null; space: GhostSpaceKey }[] = [
   { value: 'Lesser',   match: /\blesser\b/i,   space: 'ghostTier.hisec'  },
   { value: 'Standard', match: null,            space: 'ghostTier.lowsec' },
-  { value: 'Improved', match: /\bimproved\b/i, space: 'ghostTier.nullWh' },
+  { value: 'Improved', match: /\bimproved\b/i, space: 'ghostTier.nullsec' },
   { value: 'Superior', match: /\bsuperior\b/i, space: 'ghostTier.wh'     },
 ];
 
@@ -50,9 +50,8 @@ export function ghostTier(
 /**
  * The tier to expect in a given space. Ghost sites spawn by security band, so
  * a scout flagging one by hand already knows which it is from where they are:
- * high-sec runs Lesser, low-sec the plain Standard, and null-sec the Improved
- * variant. Wormhole space runs Improved in the lower classes and Superior in
- * the high-end ones (C5/C6, and the shattered C13s).
+ * high-sec runs Lesser, low-sec the plain Standard, null-sec the Improved
+ * variant, and every class of wormhole space the Superior one.
  *
  * A pre-fill, not a rule — it seeds the picker on a manual add and the scout
  * can change it. `unknown` placeholder nodes seed nothing: we don't know where
@@ -62,9 +61,10 @@ const TIER_BY_CLASS: Record<string, string> = {
   HS: 'Lesser',
   LS: 'Standard',
   NS: 'Improved',
-  C1: 'Improved', C2: 'Improved', C3: 'Improved', C4: 'Improved',
-  C5: 'Superior', C6: 'Superior', C13: 'Superior', Drifter: 'Superior',
-  Thera: 'Improved',
+  C1: 'Superior', C2: 'Superior', C3: 'Superior',
+  C4: 'Superior', C5: 'Superior', C6: 'Superior',
+  C13: 'Superior', Thera: 'Superior', Drifter: 'Superior',
+  // Triglavian space, not wormhole space — it runs with the null-sec tier.
   Pochven: 'Improved',
 };
 

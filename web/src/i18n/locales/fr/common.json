@@ -759,7 +759,7 @@
   "ghostTier": {
     "hisec": "Présent en haute sécurité",
     "lowsec": "Présent en basse sécurité",
-    "nullWh": "Présent en zone nulle et espace des trous de ver",
+    "nullsec": "Présent en zone nulle",
     "wh": "Présent dans l’espace des trous de ver"
   },
   "iconPicker": {

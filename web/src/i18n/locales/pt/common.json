@@ -759,7 +759,7 @@
   "ghostTier": {
     "hisec": "Encontrado em alta segurança",
     "lowsec": "Encontrado em baixa segurança",
-    "nullWh": "Encontrado em segurança nula e espaço de wormholes",
+    "nullsec": "Encontrado em segurança nula",
     "wh": "Encontrado em espaço de wormholes"
   },
   "iconPicker": {
