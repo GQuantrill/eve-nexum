@@ -457,11 +457,11 @@ export function SystemPanel() {
           onClick={toggleInfoCollapsed}
           title={t('systemPanel.expandInfo')}
         >
-          ›
+          {sideBySide ? '\u2304' : '\u203A'}
         </button>
       ) : (
       <>
-      <div className="system-panel__left" style={{ width: infoWidth }}>
+      <div className="system-panel__left" style={sideBySide ? undefined : { width: infoWidth }}>
         <div className="system-panel__header">
           <h2 className="system-panel__title">
             {sys.alias?.trim()
@@ -492,7 +492,7 @@ export function SystemPanel() {
           </div>
           {/* Collapse caret pinned to the panel's top-right corner, independent
               of the Set Destination / Waypoint buttons (which wrap below). */}
-          <button type="button" className="icon-btn system-panel__collapse" onClick={toggleInfoCollapsed} title={t('systemPanel.collapseInfo')}>‹</button>
+          <button type="button" className="icon-btn system-panel__collapse" onClick={toggleInfoCollapsed} title={t('systemPanel.collapseInfo')}>{sideBySide ? '\u2303' : '\u2039'}</button>
         </div>
 
         <div className={styles.info}>
@@ -804,11 +804,15 @@ export function SystemPanel() {
 
         </div>
       </div>
-      <div
-        className="system-panel__col-resize"
-        onMouseDown={onColResizeMouseDown}
-        title={t('systemPanel.resizeInfo')}
-      />
+      {/* Drags the info column's width — meaningless in column mode, where
+          info spans the panel and the panes sit under it. */}
+      {!sideBySide && (
+        <div
+          className="system-panel__col-resize"
+          onMouseDown={onColResizeMouseDown}
+          title={t('systemPanel.resizeInfo')}
+        />
+      )}
       </>
       )}
 

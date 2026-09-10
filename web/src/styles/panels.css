@@ -31,6 +31,30 @@
   overflow-y: auto;
 }
 
+/* Info spans the panel here rather than sitting in a fixed-width column with
+   the pane stack beside it — there is nothing to its right to divide from. */
+.system-panel--side .system-panel__left {
+  width: 100%;
+  min-width: 0;
+  padding-right: 0;
+  border-right: none;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 12px;
+  /* The panel itself scrolls in this mode; a second scroller here would trap
+     the wheel over the info block. */
+  overflow-y: visible;
+}
+
+/* Collapsed, the info block folds upwards, so its rail is a bar across the
+   top rather than a slim column down the side. */
+.system-panel--side .system-panel__expand {
+  width: 100%;
+  align-self: auto;
+  height: 18px;
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
 /* The handle moves to the left edge and drags horizontally. */
 .system-panel--side .system-panel__resize-handle {
   top: 0;
