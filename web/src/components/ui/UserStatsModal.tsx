@@ -124,6 +124,7 @@ const SIG_ROWS: { key: keyof SigBreakdown }[] = [
   { key: 'gas' },
   { key: 'ore' },
   { key: 'combat' },
+  { key: 'ghost' },
 ];
 
 interface Props { onClose: () => void; }
@@ -149,6 +150,7 @@ export function UserStatsModal({ onClose }: Props) {
     gas:      t('sigType.gas'),
     ore:      t('sigType.ore'),
     combat:   t('sigType.combat'),
+    ghost:    t('sigType.ghost'),
   };
 
   return (

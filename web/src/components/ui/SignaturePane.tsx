@@ -19,7 +19,7 @@ import { XIcon, CopyIcon, ColumnsIcon, CheckIcon, XCircleIcon } from '../../icon
 import { LeadsToDropdown } from './LeadsToDropdown';
 import { loadStargateNeighbors, isKnownStargateAdjacent } from '../../utils/stargateAdjacency';
 import { toast } from '../../utils/toastStore';
-import { GHOST_SUFFIX, GHOST_TIERS, ghostTier } from '../../utils/ghostSites';
+import { GHOST_SUFFIX, GHOST_TIERS, defaultGhostTier, ghostTier } from '../../utils/ghostSites';
 import { reevaluateConnectionsForSystem } from '../../utils/whAutoDetect';
 import { alertInboundK162 } from '../../utils/k162Alert';
 import { formatBookmarkName, DEFAULT_BOOKMARK_FORMAT, formatSiteBookmarkName, DEFAULT_SITE_BOOKMARK_FORMAT } from '../../utils/signatureBookmark';
@@ -299,6 +299,12 @@ export function SignaturePane({ systemId }: { systemId: string }) {
 
   const systemStatics = useMemo(
     () => mapSystems.find((sys) => sys.id === systemId)?.statics ?? [],
+    [mapSystems, systemId],
+  );
+
+  // This system's class, for seeding a hand-added ghost site's tier.
+  const systemClass = useMemo(
+    () => mapSystems.find((sys) => sys.id === systemId)?.systemClass ?? 'unknown',
     [mapSystems, systemId],
   );
 
@@ -1195,7 +1201,17 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                     <Select
                       className="sig-type-select"
                       value={sig.sigType}
-                      onChange={(v) => updateSig(sig.id, { sigType: v as SigType })}
+                      onChange={(v) => {
+                        const sigType = v as SigType;
+                        // Flagging a row as a ghost site by hand: seed the tier
+                        // from the space we're in, which is what decides it. A
+                        // name that already carries a tier (a pasted scan) is
+                        // left to derive from the name instead.
+                        const seed = sigType === 'ghost' && !sig.ghostType && !ghostTier('ghost', sig.name)
+                          ? defaultGhostTier(systemClass)
+                          : '';
+                        updateSig(sig.id, { sigType, ...(seed ? { ghostType: seed } : {}) });
+                      }}
                       options={SIG_TYPE_OPTIONS.map((st) => ({
                         value: st,
                         text:  sigTypeLabel(st),

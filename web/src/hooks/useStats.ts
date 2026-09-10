@@ -11,6 +11,9 @@ export interface SigBreakdown {
   ore:      number;
   combat:   number;
   wormhole: number;
+  /** Ghost sites. Only counted since they became their own type — before
+   *  that they were scanned as data sites and stay counted as such. */
+  ghost:    number;
   unknown:  number;
 }
 

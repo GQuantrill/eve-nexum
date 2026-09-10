@@ -5,7 +5,7 @@ import { optionalAuth } from '../middleware/optionalAuth.js';
 const router = Router();
 router.use(optionalAuth);
 
-const SIG_TYPES = ['data', 'relic', 'gas', 'ore', 'combat', 'wormhole', 'unknown'] as const;
+const SIG_TYPES = ['data', 'relic', 'gas', 'ore', 'combat', 'wormhole', 'ghost', 'unknown'] as const;
 type SigType = typeof SIG_TYPES[number];
 
 interface PeriodStats {
@@ -16,7 +16,7 @@ interface PeriodStats {
 function emptyPeriod(): PeriodStats {
   return {
     jumps: 0,
-    signatures: { total: 0, data: 0, relic: 0, gas: 0, ore: 0, combat: 0, wormhole: 0, unknown: 0 },
+    signatures: { total: 0, data: 0, relic: 0, gas: 0, ore: 0, combat: 0, wormhole: 0, ghost: 0, unknown: 0 },
   };
 }
 

@@ -46,3 +46,29 @@ export function ghostTier(
   // a blank or hand-typed row shows nothing rather than a guess.
   return GHOST_SUFFIX.test(name) ? { tier: 'Standard', space: 'ghostTier.lowsec' } : null;
 }
+
+/**
+ * The tier to expect in a given space. Ghost sites spawn by security band, so
+ * a scout flagging one by hand already knows which it is from where they are:
+ * high-sec runs Lesser, low-sec the plain Standard, and null-sec the Improved
+ * variant. Wormhole space runs Improved in the lower classes and Superior in
+ * the high-end ones (C5/C6, and the shattered C13s).
+ *
+ * A pre-fill, not a rule — it seeds the picker on a manual add and the scout
+ * can change it. `unknown` placeholder nodes seed nothing: we don't know where
+ * they are yet.
+ */
+const TIER_BY_CLASS: Record<string, string> = {
+  HS: 'Lesser',
+  LS: 'Standard',
+  NS: 'Improved',
+  C1: 'Improved', C2: 'Improved', C3: 'Improved', C4: 'Improved',
+  C5: 'Superior', C6: 'Superior', C13: 'Superior', Drifter: 'Superior',
+  Thera: 'Improved',
+  Pochven: 'Improved',
+};
+
+/** Tier to seed a hand-added ghost site with, or '' when the space is unknown. */
+export function defaultGhostTier(systemClass: string): string {
+  return TIER_BY_CLASS[systemClass] ?? '';
+}
