@@ -308,6 +308,10 @@
       "events": "广播",
       "broadcastChains": "广播已保存的链路",
       "broadcastChainsHint": "开启后，保存虫洞链路时会将其名称、起点和终点星系、最大舰船尺寸和跳数发布到 Discord。",
+      "broadcastK162": "播报入口 K162",
+      "broadcastK162Hint": "开启后，被识别为 K162 的信号会在其目的地确定时发布到 Discord。默认关闭。",
+      "broadcastExits": "播报 k-space 出口",
+      "broadcastExitsHint": "开启后，凡是揭示出安全等级不低于下方设定的 k-space 出口的连接，都会发布一份路线摘要：出口、前往的路径和最近的贸易枢纽。默认关闭；无论是否开启，连接本身都会照常播报。",
       "webhooks": "Webhook",
       "webhooksHint": "通知发布的位置。为每个频道粘贴 Discord Webhook URL；留空则关闭该类型。",
       "connectionsWebhook": "连接（K162 + 新连接）",
@@ -1449,6 +1453,12 @@
     "notifK162": "传入 K162",
     "notifProximity": "邻近威胁",
     "notifWatchlist": "监视列表匹配",
+    "notifExits": "k-space 出口",
+    "notifExitsMinSec": "提醒的出口安全等级",
+    "notifExitsHiSec": "仅高安",
+    "notifExitsLowSec": "低安及以上",
+    "notifExitsAny": "任意 k-space",
+    "notifExitsHint": "当链上出现不低于该安全等级的出口时提醒一次。默认关闭。",
     "openOptions": "地图选项",
     "optimizeConnections": "⟳ 优化连接",
     "panelBelow": "地图下方",
@@ -2039,5 +2049,9 @@
     "connectedSystems": "已连接星系",
     "other": "其他",
     "inbound": "入向"
+  },
+  "exits": {
+    "notifTitle": "k-space 出口",
+    "appeared": "{{name}}（{{security}}）已出现在链上"
   }
 }

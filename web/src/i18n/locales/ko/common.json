@@ -308,6 +308,10 @@
       "events": "브로드캐스트",
       "broadcastChains": "저장된 체인 브로드캐스트",
       "broadcastChainsHint": "켜면 웜홀 체인을 저장할 때 이름, 시작/종료 성계, 최대 함선 크기, 홉 수와 함께 Discord에 게시합니다.",
+      "broadcastK162": "인바운드 K162 알림",
+      "broadcastK162Hint": "켜면 K162로 확인된 시그니처를 목적지가 밝혀지는 즉시 디스코드에 게시합니다. 기본값은 꺼짐입니다.",
+      "broadcastExits": "k-space 출구 알림",
+      "broadcastExitsHint": "켜면 아래에서 지정한 보안도 이상의 k-space 출구가 드러난 연결에 대해 출구, 그곳까지의 경로, 가장 가까운 교역 허브를 요약해 게시합니다. 기본값은 꺼짐이며, 연결 자체는 어느 쪽이든 알립니다.",
       "webhooks": "웹훅",
       "webhooksHint": "알림이 게시되는 위치입니다. 각 채널의 Discord 웹훅 URL을 붙여넣으세요. 비워 두면 해당 유형이 꺼집니다.",
       "connectionsWebhook": "연결 (K162 + 새 연결)",
@@ -1449,6 +1453,12 @@
     "notifK162": "수신 K162",
     "notifProximity": "근접 위협",
     "notifWatchlist": "워치리스트 일치",
+    "notifExits": "k-space 출구",
+    "notifExitsMinSec": "알릴 출구 보안도",
+    "notifExitsHiSec": "하이섹만",
+    "notifExitsLowSec": "로우섹 이상",
+    "notifExitsAny": "모든 k-space",
+    "notifExitsHint": "이 보안도 이상의 출구가 체인에 나타나면 한 번 알립니다. 기본값은 꺼짐입니다.",
     "openOptions": "지도 옵션",
     "optimizeConnections": "⟳ 연결 최적화",
     "panelBelow": "지도 아래",
@@ -2039,5 +2049,9 @@
     "connectedSystems": "연결된 성계",
     "other": "기타",
     "inbound": "들어오는"
+  },
+  "exits": {
+    "notifTitle": "k-space 출구",
+    "appeared": "{{name}}({{security}})이(가) 체인에 있습니다"
   }
 }

@@ -308,6 +308,10 @@
       "events": "Diffusions",
       "broadcastChains": "Diffuser les chaînes enregistrées",
       "broadcastChainsHint": "Lorsque activé, l'enregistrement d'une chaîne de trous de ver la publie sur Discord avec son nom, ses systèmes de départ et d'arrivée, la taille de vaisseau maximale et le nombre de sauts.",
+      "broadcastK162": "Signaler les K162 entrants",
+      "broadcastK162Hint": "Lorsque cette option est active, une signature identifiée comme K162 est publiée sur Discord dès que sa destination est connue. Désactivé par défaut.",
+      "broadcastExits": "Signaler les sorties vers le k-space",
+      "broadcastExitsHint": "Lorsque cette option est active, une connexion révélant une sortie vers le k-space au niveau de sécurité choisi ci-dessous ou au-delà publie un résumé d’itinéraire : la sortie, le chemin pour s’y rendre et le hub commercial le plus proche. Désactivé par défaut ; la connexion elle-même est annoncée dans tous les cas.",
       "webhooks": "Webhooks",
       "webhooksHint": "Où les notifications sont publiées. Collez une URL de webhook Discord pour chaque canal ; laissez un champ vide pour désactiver ce type.",
       "connectionsWebhook": "Connexions (K162 + nouvelles connexions)",
@@ -1449,6 +1453,12 @@
     "notifK162": "K162 entrant",
     "notifProximity": "Menaces de proximité",
     "notifWatchlist": "Correspondance de liste de surveillance",
+    "notifExits": "Sorties vers le k-space",
+    "notifExitsMinSec": "Alerter pour les sorties de",
+    "notifExitsHiSec": "Haute sécurité uniquement",
+    "notifExitsLowSec": "Basse sécurité ou mieux",
+    "notifExitsAny": "Tout k-space",
+    "notifExitsHint": "Alerte une fois lorsqu’une sortie d’au moins cette sécurité apparaît dans la chaîne. Désactivé par défaut.",
     "openOptions": "Options de carte",
     "optimizeConnections": "⟳ Optimiser les connexions",
     "panelBelow": "Sous la carte",
@@ -2039,5 +2049,9 @@
     "connectedSystems": "Systèmes connectés",
     "other": "Autre",
     "inbound": "entrant"
+  },
+  "exits": {
+    "notifTitle": "Sortie vers le k-space",
+    "appeared": "{{name}} ({{security}}) est dans la chaîne"
   }
 }
