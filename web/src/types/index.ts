@@ -103,7 +103,9 @@ export interface MapSystem {
   lastActivityAt: string; // ISO timestamp, updated when system or its sigs are touched
 }
 
-export type SigType = 'unknown' | 'wormhole' | 'data' | 'relic' | 'combat' | 'gas' | 'ore';
+// 'ghost' is a Covert Research Facility — a ghost site. The probe scanner
+// reports them as ordinary sites, so they are identified by name on paste.
+export type SigType = 'unknown' | 'wormhole' | 'data' | 'relic' | 'combat' | 'gas' | 'ore' | 'ghost';
 
 export interface Signature {
   id: string;

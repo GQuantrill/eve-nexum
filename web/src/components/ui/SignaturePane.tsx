@@ -19,6 +19,7 @@ import { XIcon, CopyIcon, ColumnsIcon, CheckIcon, XCircleIcon } from '../../icon
 import { LeadsToDropdown } from './LeadsToDropdown';
 import { loadStargateNeighbors, isKnownStargateAdjacent } from '../../utils/stargateAdjacency';
 import { toast } from '../../utils/toastStore';
+import { GHOST_SUFFIX, ghostTier } from '../../utils/ghostSites';
 import { reevaluateConnectionsForSystem } from '../../utils/whAutoDetect';
 import { alertInboundK162 } from '../../utils/k162Alert';
 import { formatBookmarkName, DEFAULT_BOOKMARK_FORMAT, formatSiteBookmarkName, DEFAULT_SITE_BOOKMARK_FORMAT } from '../../utils/signatureBookmark';
@@ -80,6 +81,7 @@ const SIG_TYPE_LABELS: Record<SigType, string> = {
   combat:   'Combat',
   gas:      'Gas',
   ore:      'Ore',
+  ghost:    'Ghost',
 };
 
 const EVE_GROUP_TO_TYPE: Record<string, SigType> = {
@@ -108,9 +110,14 @@ function parseSigClipboard(text: string): ParsedSig[] {
       // Rows without a group column (partial/manual pastes) still pass through.
       if ((parts[1]?.trim().toLowerCase() ?? '') === 'cosmic anomaly') return [];
       const group = parts[2]?.trim() ?? '';
-      const sigType = EVE_GROUP_TO_TYPE[group.toLowerCase()] ?? 'unknown';
       const col3 = parts[3]?.trim() ?? '';
       const name = /^\d+\.?\d*%$/.test(col3) ? '' : col3;
+      // Ghost sites report as an ordinary site in the scanner's type column —
+      // the name is what gives them away ("Superior Blood Raider Covert
+      // Research Facility"). Same string the server already uses to log them.
+      const sigType: SigType = GHOST_SUFFIX.test(name)
+        ? 'ghost'
+        : (EVE_GROUP_TO_TYPE[group.toLowerCase()] ?? 'unknown');
       return [{ sigId, sigType, name }];
     });
 }
@@ -170,11 +177,11 @@ function formatDelay(sec: number): string {
 }
 
 // Order the type-filter chips most-useful-first. Covers every SigType.
-const SIG_TYPE_FILTER_ORDER: SigType[] = ['wormhole', 'data', 'relic', 'gas', 'ore', 'combat', 'unknown'];
+const SIG_TYPE_FILTER_ORDER: SigType[] = ['wormhole', 'data', 'relic', 'gas', 'ore', 'combat', 'ghost', 'unknown'];
 
 // Signature-type Select options, alphabetical by label. Used for both the
 // per-row type picker and the bulk "set type" dropdown.
-const SIG_TYPE_OPTIONS: SigType[] = ['combat', 'data', 'gas', 'ore', 'relic', 'unknown', 'wormhole'];
+const SIG_TYPE_OPTIONS: SigType[] = ['combat', 'data', 'gas', 'ghost', 'ore', 'relic', 'unknown', 'wormhole'];
 
 // Relic/data site safety, keyed on the first word of the scanned site name (per
 // the site-safety table). "Safe" sites have no NPCs; "not safe" ones can spawn
@@ -1141,6 +1148,15 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                   )}
                 </td>
                 <td>
+                  {/* Ghost tier sits with the type, not the name: the name
+                      column can be hidden, and the tier is the bit that says
+                      what you're walking into. */}
+                  {(() => {
+                    const g = ghostTier(sig.sigType, sig.name);
+                    return g ? (
+                      <span className="sig-ghost-tier" data-tooltip={t(g.space)}>{g.tier}</span>
+                    ) : null;
+                  })()}
                   {isShareMode ? (
                     <span className={`sig-text sig-text--type sig-select--type-${sig.sigType}`}>
                       {sigTypeLabel(sig.sigType)}

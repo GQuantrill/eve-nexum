@@ -1501,6 +1501,7 @@ const SIG_TYPE_COLORS: Record<string, string> = {
   gas:      'var(--cv-sig-gas)',
   ore:      'var(--cv-sig-ore)',
   combat:   'var(--cv-sig-combat)',
+  ghost:    'var(--cv-sig-ghost)',
   unknown:  'var(--cv-sig-unknown)',
 };
 

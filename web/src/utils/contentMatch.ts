@@ -2,7 +2,7 @@ import type { SystemContent, ContentFilter } from '../store/mapStore';
 
 // Signature / anomaly types offered in the content filter (most-useful first).
 // Labels come from the existing sigType.* / anomType.* i18n namespaces.
-export const FILTER_SIG_TYPES = ['wormhole', 'gas', 'data', 'relic', 'combat', 'ore'] as const;
+export const FILTER_SIG_TYPES = ['wormhole', 'gas', 'data', 'relic', 'combat', 'ore', 'ghost'] as const;
 export const FILTER_ANOM_TYPES = ['combat', 'ore', 'homefront'] as const;
 
 /** Is any filter criterion set? When false the whole map shows normally. */

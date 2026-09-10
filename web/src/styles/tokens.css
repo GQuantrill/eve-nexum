@@ -160,6 +160,7 @@
   --cv-sig-gas: #8ad08a;
   --cv-sig-ore: #f5b96a;
   --cv-sig-combat: #f87171;
+  --cv-sig-ghost: #b17df0;
   --cv-sig-unknown: #7a8aa8;
 }
 
@@ -240,6 +241,7 @@
   --cv-sig-gas: #009e73;
   --cv-sig-ore: #e69f00;
   --cv-sig-combat: #d55e00;
+  --cv-sig-ghost: #56b4e9;
   --cv-sig-unknown: #999999;
 }
 
@@ -319,5 +321,6 @@
   --cv-sig-gas: #117733;
   --cv-sig-ore: #ee9944;
   --cv-sig-combat: #cc3311;
+  --cv-sig-ghost: #6699cc;
   --cv-sig-unknown: #999999;
 }
