@@ -60,11 +60,12 @@ async function siblingSystems(mapId: string, scope: SourceScope): Promise<{ syst
 
 interface SigRow {
   sig_id: string; sig_type: string; name: string; notes: string; wh_type: string; wh_leads_to: string;
+  ghost_type: string;
 }
 
 async function upsertSigToSibling(sibSystemId: string, sibMapId: string, sig: SigRow, userId: number): Promise<void> {
   const { rows } = await db.query<{ id: string } & SigRow>(
-    `SELECT id, sig_type, name, notes, wh_type, wh_leads_to
+    `SELECT id, sig_type, name, notes, wh_type, wh_leads_to, ghost_type
      FROM map_signatures WHERE system_id = $1 AND sig_id = $2`,
     [sibSystemId, sig.sig_id],
   );
@@ -83,15 +84,16 @@ async function upsertSigToSibling(sibSystemId: string, sibMapId: string, sig: Si
     fill('notes', existing.notes, sig.notes);
     fill('wh_type', existing.wh_type, sig.wh_type);
     fill('wh_leads_to', existing.wh_leads_to, sig.wh_leads_to);
+    fill('ghost_type', existing.ghost_type, sig.ghost_type);
     if (sets.length === 0) return;
     sets.push('updated_at = NOW()');
     await db.query(`UPDATE map_signatures SET ${sets.join(', ')} WHERE id = $${vals.length + 1}`, [...vals, existing.id]);
   } else {
     // New on this sibling. from_merge = TRUE so it doesn't inflate scan stats.
     await db.query(
-      `INSERT INTO map_signatures (system_id, sig_id, sig_type, name, notes, wh_type, wh_leads_to, created_by_user_id, from_merge)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, TRUE)`,
-      [sibSystemId, sig.sig_id, sig.sig_type, sig.name, sig.notes, sig.wh_type, sig.wh_leads_to, userId],
+      `INSERT INTO map_signatures (system_id, sig_id, sig_type, name, notes, wh_type, wh_leads_to, ghost_type, created_by_user_id, from_merge)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, TRUE)`,
+      [sibSystemId, sig.sig_id, sig.sig_type, sig.name, sig.notes, sig.wh_type, sig.wh_leads_to, sig.ghost_type, userId],
     );
   }
   publishToMap(sibMapId, { type: 'sig.changed', actor: null, systemId: sibSystemId });
@@ -103,7 +105,7 @@ export function syncSignature(mapId: string, systemId: string, sigRowId: string,
   void (async () => {
     if (!(await syncEnabled(userId))) return;
     const { rows } = await db.query<SigRow>(
-      `SELECT sig_id, sig_type, name, notes, wh_type, wh_leads_to FROM map_signatures WHERE id = $1`,
+      `SELECT sig_id, sig_type, name, notes, wh_type, wh_leads_to, ghost_type FROM map_signatures WHERE id = $1`,
       [sigRowId],
     );
     const sig = rows[0];

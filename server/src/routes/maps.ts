@@ -2023,9 +2023,9 @@ mapsRouter.post('/:mapId/merge', async (req, res) => {
     // ── Signatures: upsert by sig_id within the destination system ───────
     let addedSignatures = 0, updatedSignatures = 0;
     if (include.signatures && srcSysIds.length > 0) {
-      const srcSigs = await client.query<{ systemId: string; sigId: string; sigType: string; name: string; notes: string; whType: string; whLeadsTo: string }>(
+      const srcSigs = await client.query<{ systemId: string; sigId: string; sigType: string; name: string; notes: string; whType: string; whLeadsTo: string; ghostType: string }>(
         `SELECT system_id AS "systemId", sig_id AS "sigId", sig_type AS "sigType", name, notes,
-                wh_type AS "whType", wh_leads_to AS "whLeadsTo"
+                wh_type AS "whType", wh_leads_to AS "whLeadsTo", ghost_type AS "ghostType"
            FROM map_signatures WHERE system_id = ANY($1::uuid[])`, [srcSysIds]);
       const destSigs = await client.query<{ id: string; systemId: string; sigId: string }>(
         `SELECT id, system_id AS "systemId", sig_id AS "sigId"
@@ -2038,42 +2038,44 @@ mapsRouter.post('/:mapId/merge', async (req, res) => {
       const sigPh: string[] = []; const sigVals: unknown[] = [];
       // Collisions are collected and flushed as one set-based UPDATE (below)
       // instead of a query per row inside the transaction.
-      const sigUp: { id: string; sigType: string; name: string; notes: string; whType: string; whLeadsTo: string }[] = [];
+      const sigUp: { id: string; sigType: string; name: string; notes: string; whType: string; whLeadsTo: string; ghostType: string }[] = [];
       for (const sg of srcSigs.rows) {
         const destSysId = idMap.get(sg.systemId);
         if (!destSysId) continue;
         const k = sg.sigId.trim().toLowerCase();
         const existing = k ? destSigMap.get(`${destSysId}|${k}`) : undefined;
         if (existing) {
-          sigUp.push({ id: existing, sigType: sg.sigType, name: sg.name, notes: sg.notes, whType: sg.whType, whLeadsTo: sg.whLeadsTo });
+          sigUp.push({ id: existing, sigType: sg.sigType, name: sg.name, notes: sg.notes, whType: sg.whType, whLeadsTo: sg.whLeadsTo, ghostType: sg.ghostType });
           updatedSignatures++;
         } else {
           const base = sigVals.length;
-          sigPh.push(`(${Array.from({ length: 9 }, (_, i) => `$${base + i + 1}`).join(',')})`);
+          sigPh.push(`(${Array.from({ length: 10 }, (_, i) => `$${base + i + 1}`).join(',')})`);
           // from_merge = TRUE → excluded from user stats / admin reporting; the
           // sig was copied in, not scanned. (The update branch above leaves
           // pre-existing dest sigs as-is, so they stay countable.)
-          sigVals.push(destSysId, sg.sigId, sg.sigType, sg.name, sg.notes, sg.whType, sg.whLeadsTo, req.session.userId, true);
+          sigVals.push(destSysId, sg.sigId, sg.sigType, sg.name, sg.notes, sg.whType, sg.whLeadsTo, sg.ghostType, req.session.userId, true);
           addedSignatures++;
         }
       }
       if (sigUp.length > 0) {
-        // One UPDATE for every collision — unnest of per-column arrays (6 params
+        // One UPDATE for every collision — unnest of per-column arrays (7 params
         // total, no param-cap / no per-row round-trips).
         await client.query(
           `UPDATE map_signatures AS m
               SET sig_type = v.sig_type, name = v.name, notes = v.notes,
-                  wh_type = v.wh_type, wh_leads_to = v.wh_leads_to, updated_at = NOW()
-             FROM unnest($1::uuid[], $2::text[], $3::text[], $4::text[], $5::text[], $6::text[])
-                  AS v(id, sig_type, name, notes, wh_type, wh_leads_to)
+                  wh_type = v.wh_type, wh_leads_to = v.wh_leads_to,
+                  ghost_type = v.ghost_type, updated_at = NOW()
+             FROM unnest($1::uuid[], $2::text[], $3::text[], $4::text[], $5::text[], $6::text[], $7::text[])
+                  AS v(id, sig_type, name, notes, wh_type, wh_leads_to, ghost_type)
             WHERE m.id = v.id`,
           [sigUp.map(u => u.id), sigUp.map(u => u.sigType), sigUp.map(u => u.name),
-           sigUp.map(u => u.notes), sigUp.map(u => u.whType), sigUp.map(u => u.whLeadsTo)],
+           sigUp.map(u => u.notes), sigUp.map(u => u.whType), sigUp.map(u => u.whLeadsTo),
+           sigUp.map(u => u.ghostType)],
         );
       }
       if (sigPh.length > 0) {
         await client.query(
-          `INSERT INTO map_signatures (system_id, sig_id, sig_type, name, notes, wh_type, wh_leads_to, created_by_user_id, from_merge)
+          `INSERT INTO map_signatures (system_id, sig_id, sig_type, name, notes, wh_type, wh_leads_to, ghost_type, created_by_user_id, from_merge)
            VALUES ${sigPh.join(',')}`, sigVals,
         );
       }
@@ -3712,10 +3714,10 @@ mapsRouter.post('/:mapId/systems/:systemId/signatures', async (req, res) => {
   const access = await requireMapContentWrite(res, mapId, req);
   if (!access) return;
   if (!(await verifySystemInMap(res, systemId, mapId))) return;
-  const { sigId = '', sigType = 'unknown', name = '', notes = '', whType = '', whLeadsTo = '' } = req.body as Record<string, string>;
+  const { sigId = '', sigType = 'unknown', name = '', notes = '', whType = '', whLeadsTo = '', ghostType = '' } = req.body as Record<string, string>;
   const me = authUser(req);
   const row = await createSignature(
-    mapId, systemId, { sigId, sigType, name, notes, whType, whLeadsTo },
+    mapId, systemId, { sigId, sigType, name, notes, whType, whLeadsTo, ghostType },
     { userId: me.userId, clientId: req.get('x-client-id') ?? null },
   );
   if ((whType ?? '').toUpperCase() === 'K162') dispatchK162(access, row.id, systemId, me.characterName);

@@ -2156,18 +2156,6 @@
 
 /* Ghost-site tier chip, shown beside the type. Muted and small: it qualifies
    the type rather than competing with it. */
-.sig-ghost-tier {
-  display: inline-block;
-  margin-right: 5px;
-  padding: 0 4px;
-  border: 1px solid #b17df0;
-  border-radius: 3px;
-  color: #b17df0;
-  font-size: calc(11px * var(--font-scale, 1));
-  font-weight: 700;
-  vertical-align: middle;
-}
-
 /* Full-width themed <Select> in the sig/anomaly/structure type cells (the old
    native .sig-select was width:100%). Type tinting now comes from the option
    labels reusing .sig-select--type-*, so this is layout only. */

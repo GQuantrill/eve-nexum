@@ -11,7 +11,7 @@ import type { Signature } from '../types';
 
 const sig = (id: string): Signature => ({
   id, sigId: 'ABC-123', sigType: 'wormhole', name: '', notes: '',
-  whType: '', whLeadsTo: '', createdAt: '', updatedAt: '',
+  whType: '', whLeadsTo: '', ghostType: '', createdAt: '', updatedAt: '',
 });
 const MAP = 'map-1', SYS = 'sys-1';
 

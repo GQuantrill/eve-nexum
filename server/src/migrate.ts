@@ -384,6 +384,7 @@ export async function migrate() {
       notes       TEXT        NOT NULL DEFAULT '',
       wh_type     TEXT        NOT NULL DEFAULT '',
       wh_leads_to TEXT        NOT NULL DEFAULT '',
+      ghost_type  TEXT        NOT NULL DEFAULT '',
       created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
@@ -1110,6 +1111,12 @@ export async function migrate() {
     -- Manual adjustment to an account's map allowance: admin goodwill, a refund,
     -- or crediting a donation that came from an unlinked character.
     ALTER TABLE owners ADD COLUMN IF NOT EXISTS map_bonus INTEGER NOT NULL DEFAULT 0;
+
+    -- Ghost sites carry a tier (Lesser/Standard/Improved/Superior) that sets how
+    -- hard the rats hit and which space the site belongs in. Read from the site
+    -- name on a paste; stored here once a scout picks one by hand, so a
+    -- mis-scanned or hand-typed name can be corrected without editing the name.
+    ALTER TABLE map_signatures ADD COLUMN IF NOT EXISTS ghost_type TEXT NOT NULL DEFAULT '';
   `);
 
   await encryptLegacyTokens();

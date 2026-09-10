@@ -139,8 +139,8 @@ async function writeScope(req: Request, res: Response) {
 apiV1Router.post('/maps/:mapId/systems/:systemId/signatures', async (req, res) => {
   const access = await writeScope(req, res); if (!access) return;
   const { mapId, systemId } = req.params;
-  const { sigId = '', sigType = 'unknown', name = '', notes = '', whType = '', whLeadsTo = '' } = req.body as Record<string, string>;
-  const row = await createSignature(mapId, systemId, { sigId, sigType, name, notes, whType, whLeadsTo }, writeActor(req));
+  const { sigId = '', sigType = 'unknown', name = '', notes = '', whType = '', whLeadsTo = '', ghostType = '' } = req.body as Record<string, string>;
+  const row = await createSignature(mapId, systemId, { sigId, sigType, name, notes, whType, whLeadsTo, ghostType }, writeActor(req));
   if ((whType ?? '').toUpperCase() === 'K162') dispatchK162(access, row.id, systemId, authUser(req).characterName);
   res.status(201).json(row);
 });

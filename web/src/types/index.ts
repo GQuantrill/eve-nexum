@@ -115,6 +115,9 @@ export interface Signature {
   notes: string;
   whType: string;
   whLeadsTo: string;
+  /** Ghost sites only: the tier a scout picked by hand. Blank means "read it
+   *  from the site name", which is what a pasted scan gives you. */
+  ghostType: string;
   createdAt: string;
   updatedAt: string;
 }

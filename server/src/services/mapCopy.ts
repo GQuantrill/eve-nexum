@@ -103,21 +103,21 @@ export async function copyMap(params: {
     if (include.signatures) {
       const sigRes = await client.query<{
         id: string; systemId: string; sigId: string; sigType: string; name: string;
-        notes: string; whType: string; whLeadsTo: string;
+        notes: string; whType: string; whLeadsTo: string; ghostType: string;
       }>(
         `SELECT id, system_id AS "systemId", sig_id AS "sigId", sig_type AS "sigType", name, notes,
-                wh_type AS "whType", wh_leads_to AS "whLeadsTo"
+                wh_type AS "whType", wh_leads_to AS "whLeadsTo", ghost_type AS "ghostType"
            FROM map_signatures
           WHERE system_id = ANY($1::uuid[])`,
         [[...sysIdMap.keys()]],
       );
       for (const g of sigRes.rows) sigIdMap.set(g.id, crypto.randomUUID());
       await insertBatch(client, 'map_signatures',
-        ['id', 'system_id', 'sig_id', 'sig_type', 'name', 'notes', 'wh_type', 'wh_leads_to',
+        ['id', 'system_id', 'sig_id', 'sig_type', 'name', 'notes', 'wh_type', 'wh_leads_to', 'ghost_type',
          'created_by_user_id', 'from_merge'],
         sigRes.rows.map((g) => [
           sigIdMap.get(g.id), sysIdMap.get(g.systemId), g.sigId, g.sigType, g.name, g.notes,
-          g.whType, g.whLeadsTo, userId, true,
+          g.whType, g.whLeadsTo, g.ghostType, userId, true,
         ]),
       );
     }

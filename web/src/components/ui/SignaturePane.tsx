@@ -19,7 +19,7 @@ import { XIcon, CopyIcon, ColumnsIcon, CheckIcon, XCircleIcon } from '../../icon
 import { LeadsToDropdown } from './LeadsToDropdown';
 import { loadStargateNeighbors, isKnownStargateAdjacent } from '../../utils/stargateAdjacency';
 import { toast } from '../../utils/toastStore';
-import { GHOST_SUFFIX, ghostTier } from '../../utils/ghostSites';
+import { GHOST_SUFFIX, GHOST_TIERS, ghostTier } from '../../utils/ghostSites';
 import { reevaluateConnectionsForSystem } from '../../utils/whAutoDetect';
 import { alertInboundK162 } from '../../utils/k162Alert';
 import { formatBookmarkName, DEFAULT_BOOKMARK_FORMAT, formatSiteBookmarkName, DEFAULT_SITE_BOOKMARK_FORMAT } from '../../utils/signatureBookmark';
@@ -132,6 +132,37 @@ function isContentlessSig(s: Signature): boolean {
       && !s.whType && !s.whLeadsTo && s.sigType === 'unknown';
 }
 
+/**
+ * The type cell for a ghost site: its tier. Blank `ghostType` means "read the
+ * tier off the name", which is what a paste gives you; picking one pins it, so
+ * a mis-scanned or hand-typed name can still be corrected. The em-dash option
+ * clears back to the name-derived value.
+ */
+function GhostTypeCell({ sig, isShareMode, onChange }: {
+  sig:         Signature;
+  isShareMode: boolean;
+  onChange:    (ghostType: string) => void;
+}) {
+  const { t } = useTranslation();
+  const g = ghostTier(sig.sigType, sig.name, sig.ghostType);
+
+  if (isShareMode) return <span className="sig-text">{g?.tier ?? ''}</span>;
+
+  return (
+    <Select
+      className="sig-type-select"
+      value={g?.tier ?? ''}
+      ariaLabel={t('signatures.colWh')}
+      title={g ? t(g.space) : undefined}
+      onChange={onChange}
+      options={[
+        { value: '', label: '\u2014', text: '' },
+        ...GHOST_TIERS.map((gt) => ({ value: gt.value, label: gt.value })),
+      ]}
+    />
+  );
+}
+
 type SortCol = 'sigId' | 'sigType' | 'whType' | 'whLeadsTo' | 'name' | 'createdAt' | 'updatedAt';
 type ColKey  = 'id' | 'type' | 'whtype' | 'leadsto' | 'name' | 'safe' | 'notes' | 'created' | 'updated';
 
@@ -155,7 +186,7 @@ const DEFAULT_WIDTHS: Record<ColKey, number> = {
 const LEADSTO_MIN_WIDTH = 132;
 
 // Columns the user can hide to slim the pane down (handy for an undocked, narrow
-// window). ID / Type / WH Type / Leads To always stay — they're the core scan
+// window). ID / Group / Type / Leads To always stay — they're the core scan
 // data. Label keys reuse the existing header translations. Hidden columns are
 // stored as a list under one ui_settings key; empty (the default) = all shown,
 // so a later-added hideable column defaults visible without migration.
@@ -855,9 +886,17 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   const sortedSigs = useMemo(() => {
     const base = typeFilter.size ? sigs.filter((s) => typeFilter.has(s.sigType)) : sigs;
     if (!sortCol) return base;
+    // The type column shows a different field per group, so sort it on what's
+    // actually on screen rather than on whType alone — otherwise ghost rows all
+    // sort as blank.
+    const key = (s: Signature) => (
+      sortCol === 'whType' && s.sigType === 'ghost'
+        ? (ghostTier(s.sigType, s.name, s.ghostType)?.tier ?? '')
+        : (s[sortCol] ?? '')
+    );
     return [...base].sort((a, b) => {
-      const av = (a[sortCol] ?? '').toLowerCase();
-      const bv = (b[sortCol] ?? '').toLowerCase();
+      const av = key(a).toLowerCase();
+      const bv = key(b).toLowerCase();
       const cmp = av.localeCompare(bv);
       return sortDir === 'asc' ? cmp : -cmp;
     });
@@ -1148,15 +1187,6 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                   )}
                 </td>
                 <td>
-                  {/* Ghost tier sits with the type, not the name: the name
-                      column can be hidden, and the tier is the bit that says
-                      what you're walking into. */}
-                  {(() => {
-                    const g = ghostTier(sig.sigType, sig.name);
-                    return g ? (
-                      <span className="sig-ghost-tier" data-tooltip={t(g.space)}>{g.tier}</span>
-                    ) : null;
-                  })()}
                   {isShareMode ? (
                     <span className={`sig-text sig-text--type sig-select--type-${sig.sigType}`}>
                       {sigTypeLabel(sig.sigType)}
@@ -1176,6 +1206,9 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                     />
                   )}
                 </td>
+                {/* The specific type within the row's group: a wormhole's
+                    code, a ghost site's tier. Groups with no meaningful
+                    sub-type leave it blank. */}
                 <td className="sig-td--wh">
                   {sig.sigType === 'wormhole' && (
                     isShareMode
@@ -1188,6 +1221,13 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                             ...(!sig.whLeadsTo && leadsTo ? { whLeadsTo: leadsTo } : {}),
                           })}
                         />
+                  )}
+                  {sig.sigType === 'ghost' && (
+                    <GhostTypeCell
+                      sig={sig}
+                      isShareMode={isShareMode}
+                      onChange={(ghostType) => updateSig(sig.id, { ghostType })}
+                    />
                   )}
                 </td>
                 <td className="sig-td--wh">
