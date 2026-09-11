@@ -20,6 +20,7 @@ import { LeadsToDropdown } from './LeadsToDropdown';
 import { loadStargateNeighbors, isKnownStargateAdjacent } from '../../utils/stargateAdjacency';
 import { toast } from '../../utils/toastStore';
 import { GHOST_SUFFIX, GHOST_TIERS, defaultGhostTier, ghostTier } from '../../utils/ghostSites';
+import { leadsToFromSigName } from '../../utils/whDest';
 import { reevaluateConnectionsForSystem } from '../../utils/whAutoDetect';
 import { alertInboundK162 } from '../../utils/k162Alert';
 import { formatBookmarkName, DEFAULT_BOOKMARK_FORMAT, formatSiteBookmarkName, DEFAULT_SITE_BOOKMARK_FORMAT } from '../../utils/signatureBookmark';
@@ -93,7 +94,7 @@ const EVE_GROUP_TO_TYPE: Record<string, SigType> = {
   'wormhole':    'wormhole',
 };
 
-interface ParsedSig { sigId: string; sigType: SigType; name: string; }
+interface ParsedSig { sigId: string; sigType: SigType; name: string; whLeadsTo: string; }
 
 function parseSigClipboard(text: string): ParsedSig[] {
   return text
@@ -118,7 +119,12 @@ function parseSigClipboard(text: string): ParsedSig[] {
       const sigType: SigType = GHOST_SUFFIX.test(name)
         ? 'ghost'
         : (EVE_GROUP_TO_TYPE[group.toLowerCase()] ?? 'unknown');
-      return [{ sigId, sigType, name }];
+      // "Unidentified Wormhole" is a Drifter hole and says so before anyone
+      // identifies it. Only for a row we already know is a wormhole — the
+      // leads-to cell isn't rendered for other types, so it would be storing a
+      // value nobody could see or correct.
+      const whLeadsTo = sigType === 'wormhole' ? leadsToFromSigName(name) : '';
+      return [{ sigId, sigType, name, whLeadsTo }];
     });
 }
 
@@ -749,6 +755,8 @@ export function SignaturePane({ systemId }: { systemId: string }) {
         const updates: Partial<Signature> = {};
         if (p.sigType !== 'unknown') updates.sigType = p.sigType;
         if (p.name) updates.name = p.name;
+        // Fill a blank only — never overwrite a destination someone scouted.
+        if (p.whLeadsTo && !match.whLeadsTo) updates.whLeadsTo = p.whLeadsTo;
         toUpdate.push({ id: match.id, updates });
       } else {
         toCreate.push(p);
@@ -787,7 +795,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
       toCreate.map((p) =>
         api<Signature>(
           `/api/maps/${activeMapId}/systems/${systemId}/signatures`,
-          { method: 'POST', body: JSON.stringify({ sigId: p.sigId, sigType: p.sigType, name: p.name }) },
+          { method: 'POST', body: JSON.stringify({ sigId: p.sigId, sigType: p.sigType, name: p.name, whLeadsTo: p.whLeadsTo }) },
         ).catch(() => null),
       ),
     )).filter((s): s is Signature => s !== null);

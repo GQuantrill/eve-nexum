@@ -97,3 +97,19 @@ export function holeDisplay(
   if (dc) return { label: CLASS_LABELS[dc], color: CLASS_COLORS[dc] };
   return leadsToDisplay(leadsTo);
 }
+
+/**
+ * A Drifter hole reads as "Unidentified Wormhole" in the probe scanner, where
+ * every other hole is "Unstable Wormhole". That name is the only thing that
+ * distinguishes it before it's identified, and it names the destination
+ * outright — so a paste can fill the leads-to in.
+ *
+ * Matched loosely: the scanner's own string is exact, but a hand-typed or
+ * re-pasted name may carry a prefix.
+ */
+const UNIDENTIFIED_WH = /\bunidentified\s+wormhole\b/i;
+
+/** The leads-to a scanned name implies on its own, or '' when it implies none. */
+export function leadsToFromSigName(name: string): string {
+  return UNIDENTIFIED_WH.test(name) ? 'Drifter' : '';
+}
