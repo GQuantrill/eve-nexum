@@ -225,26 +225,6 @@ export function AddSystemModal({ position, onClose, onSubmit }: Props) {
         </div>
 
         <form className="modal__body" onSubmit={handleSubmit}>
-          {/* One click to add where you're standing — the common case. Shown
-              disabled rather than hidden once it's on the map, so the reason is
-              visible instead of the button just not being there. */}
-          {here && (
-            <>
-              <button
-                type="button"
-                className="btn btn--primary add-system__here"
-                onClick={() => void addHere()}
-                disabled={hereOnMap || addingHere}
-                title={hereOnMap ? t('addSystem.hereOnMap', { system: here.name }) : undefined}
-              >
-                {addingHere ? t('addSystem.loading') : t('addSystem.addHere', { system: here.name })}
-              </button>
-              {hereOnMap && (
-                <p className="add-system__here-hint">{t('addSystem.hereOnMap', { system: here.name })}</p>
-              )}
-            </>
-          )}
-
           <div className="search-field" ref={searchFieldRef}>
             <label className="field__label">{t('addSystem.systemName')}</label>
             <div className="search-field__wrap">
@@ -328,6 +308,20 @@ export function AddSystemModal({ position, onClose, onSubmit }: Props) {
             >
               {loadingDetail ? t('addSystem.loading') : t('addSystem.add')}
             </button>
+            {/* One click to add where you're standing. Disabled with the reason
+                on hover once it's on the map, rather than hidden, so it doesn't
+                just silently go missing. */}
+            {here && (
+              <button
+                type="button"
+                className="btn btn--primary add-system__here"
+                onClick={() => void addHere()}
+                disabled={hereOnMap || addingHere}
+                title={hereOnMap ? t('addSystem.hereOnMap', { system: here.name }) : undefined}
+              >
+                {addingHere ? t('addSystem.loading') : t('addSystem.addHere', { system: here.name })}
+              </button>
+            )}
           </div>
         </form>
       </div>

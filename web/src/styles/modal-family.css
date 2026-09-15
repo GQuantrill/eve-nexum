@@ -56,6 +56,9 @@
   justify-content: flex-end;
   gap: 8px;
   padding-top: 4px;
+  /* Three buttons don't always fit a narrow modal; wrap rather than squash the
+     labels, which carry a system name. */
+  flex-wrap: wrap;
 }
 
 
@@ -625,21 +628,9 @@
   color: var(--text-dim);
 }
 
-/* "Add <where you are>" shortcut at the top of the Add System modal. Full width
-   so it reads as the primary action, with the search below as the fallback for
-   adding anywhere else. */
-.add-system__here {
-  width: 100%;
-  justify-content: center;
-}
-
+/* "Add <where you are>" shortcut, sitting in the Add System modal's action row
+   beside Cancel and Add System. */
 .add-system__here:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-}
-
-.add-system__here-hint {
-  margin: 4px 0 0;
-  color: var(--text-dim);
-  font-size: calc(12px * var(--font-scale, 1));
 }
