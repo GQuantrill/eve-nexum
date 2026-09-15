@@ -624,3 +624,22 @@
   border-bottom: 1px solid var(--border);
   color: var(--text-dim);
 }
+
+/* "Add <where you are>" shortcut at the top of the Add System modal. Full width
+   so it reads as the primary action, with the search below as the fallback for
+   adding anywhere else. */
+.add-system__here {
+  width: 100%;
+  justify-content: center;
+}
+
+.add-system__here:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.add-system__here-hint {
+  margin: 4px 0 0;
+  color: var(--text-dim);
+  font-size: calc(12px * var(--font-scale, 1));
+}

@@ -5,6 +5,8 @@ import type { SystemClass, WormholeEffect } from '../../types';
 import { SYSTEM_CLASSES, WORMHOLE_EFFECTS, CLASS_LABELS, EFFECT_LABELS } from '../../data/wormholes';
 import { useEsiSearch, fetchSystemDetail, systemResultLabel } from '../../hooks/useEsiSearch';
 import { useMapStore } from '../../store/mapStore';
+import { useCharacterLocation } from '../../hooks/useCharacterLocation';
+import { useAuth } from '../../context/AuthContext';
 import { Select } from './Select';
 
 type SystemOpts = {
@@ -33,6 +35,44 @@ export function AddSystemModal({ position, onClose, onSubmit }: Props) {
   function isOnMap(id: number, name: string) {
     if (onSubmit) return false;
     return onMapIds.has(id) || onMapNames.has(name.toLowerCase());
+  }
+
+  // Where the pilot is: their live location, falling back to the last system
+  // they were seen in — the same fallback the routing panes use, so the button
+  // is still there while you're logged out of EVE.
+  const liveHere  = useCharacterLocation().system;
+  const lastKnown = useAuth().user?.lastKnownSystem ?? null;
+  const here = liveHere
+    ? { eveSystemId: liveHere.eveSystemId, name: liveHere.name }
+    : (lastKnown?.id != null && lastKnown.name
+        ? { eveSystemId: lastKnown.id, name: lastKnown.name }
+        : null);
+  const hereOnMap = here ? isOnMap(here.eveSystemId, here.name) : false;
+  const [addingHere, setAddingHere] = useState(false);
+
+  async function addHere() {
+    if (!here) return;
+    setAddingHere(true);
+    try {
+      // Resolve class / effect / statics exactly as picking from the search
+      // does, so the node is identical however it was added. The last-known
+      // fallback carries none of that, and even the live location is worth
+      // re-reading rather than trusting two code paths to agree.
+      const detail = await fetchSystemDetail(here.eveSystemId);
+      const opts: SystemOpts = {
+        eveSystemId: here.eveSystemId,
+        effect:      (detail.effect as WormholeEffect) ?? 'none',
+        statics:     detail.statics,
+        regionName:  detail.regionName ?? null,
+        npcType:     detail.npcType ?? null,
+      };
+      const cls = (detail.systemClass as SystemClass) ?? 'C3';
+      if (onSubmit) onSubmit(here.name, cls, position, opts);
+      else storeAddSystem(here.name, cls, position, opts);
+      onClose();
+    } catch {
+      setAddingHere(false);   // leave the modal open so it can be retried
+    }
   }
 
   const [query, setQuery] = useState('');
@@ -185,6 +225,26 @@ export function AddSystemModal({ position, onClose, onSubmit }: Props) {
         </div>
 
         <form className="modal__body" onSubmit={handleSubmit}>
+          {/* One click to add where you're standing — the common case. Shown
+              disabled rather than hidden once it's on the map, so the reason is
+              visible instead of the button just not being there. */}
+          {here && (
+            <>
+              <button
+                type="button"
+                className="btn btn--primary add-system__here"
+                onClick={() => void addHere()}
+                disabled={hereOnMap || addingHere}
+                title={hereOnMap ? t('addSystem.hereOnMap', { system: here.name }) : undefined}
+              >
+                {addingHere ? t('addSystem.loading') : t('addSystem.addHere', { system: here.name })}
+              </button>
+              {hereOnMap && (
+                <p className="add-system__here-hint">{t('addSystem.hereOnMap', { system: here.name })}</p>
+              )}
+            </>
+          )}
+
           <div className="search-field" ref={searchFieldRef}>
             <label className="field__label">{t('addSystem.systemName')}</label>
             <div className="search-field__wrap">

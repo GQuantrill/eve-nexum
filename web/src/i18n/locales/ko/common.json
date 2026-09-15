@@ -59,7 +59,9 @@
     "loading": "불러오는 중…",
     "add": "성계 추가",
     "onMap": "지도에 있음",
-    "unknownOption": "알 수 없음 (미탐사 웜홀)"
+    "unknownOption": "알 수 없음 (미탐사 웜홀)",
+    "addHere": "{{system}} 추가",
+    "hereOnMap": "{{system}}은(는) 이미 이 맵에 있습니다"
   },
   "admin": {
     "back": "지도로 돌아가기",

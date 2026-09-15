@@ -59,7 +59,9 @@
     "loading": "加载中…",
     "add": "添加星系",
     "onMap": "已在地图上",
-    "unknownOption": "未知（未探明的虫洞）"
+    "unknownOption": "未知（未探明的虫洞）",
+    "addHere": "添加 {{system}}",
+    "hereOnMap": "{{system}} 已在此地图上"
   },
   "admin": {
     "back": "返回地图",

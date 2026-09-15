@@ -59,7 +59,9 @@
     "loading": "Loading…",
     "add": "Add System",
     "onMap": "on map",
-    "unknownOption": "Unknown (unmapped wormhole)"
+    "unknownOption": "Unknown (unmapped wormhole)",
+    "addHere": "Add {{system}}",
+    "hereOnMap": "{{system}} is already on this map"
   },
   "admin": {
     "back": "Back to maps",

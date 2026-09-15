@@ -59,7 +59,9 @@
     "loading": "Chargement…",
     "add": "Ajouter le système",
     "onMap": "sur la carte",
-    "unknownOption": "Inconnu (wormhole non cartographié)"
+    "unknownOption": "Inconnu (wormhole non cartographié)",
+    "addHere": "Ajouter {{system}}",
+    "hereOnMap": "{{system}} est déjà sur cette carte"
   },
   "admin": {
     "back": "Retour aux cartes",

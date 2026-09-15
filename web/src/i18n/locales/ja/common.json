@@ -59,7 +59,9 @@
     "loading": "読み込み中…",
     "add": "星系を追加",
     "onMap": "マップ上",
-    "unknownOption": "不明（未マッピングのワームホール）"
+    "unknownOption": "不明（未マッピングのワームホール）",
+    "addHere": "{{system}}を追加",
+    "hereOnMap": "{{system}}はすでにこのマップにあります"
   },
   "admin": {
     "back": "マップに戻る",

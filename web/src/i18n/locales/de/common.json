@@ -59,7 +59,9 @@
     "loading": "Lädt…",
     "add": "System hinzufügen",
     "onMap": "auf Karte",
-    "unknownOption": "Unbekannt (unerforschtes Wurmloch)"
+    "unknownOption": "Unbekannt (unerforschtes Wurmloch)",
+    "addHere": "{{system}} hinzufügen",
+    "hereOnMap": "{{system}} ist bereits auf dieser Karte"
   },
   "admin": {
     "back": "Zurück zu den Karten",

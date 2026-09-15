@@ -59,7 +59,9 @@
     "loading": "Cargando…",
     "add": "Añadir sistema",
     "onMap": "en el mapa",
-    "unknownOption": "Desconocido (wormhole sin mapear)"
+    "unknownOption": "Desconocido (wormhole sin mapear)",
+    "addHere": "Añadir {{system}}",
+    "hereOnMap": "{{system}} ya está en este mapa"
   },
   "admin": {
     "back": "Volver a los mapas",
