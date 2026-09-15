@@ -700,6 +700,8 @@
     "spreadNodes": "散开节点",
     "removeOrphans": "移除孤立星系 ({{count}})",
     "removeOrphansConfirm": "移除 {{count}} 个孤立星系？它们没有有效连接（没有连接，或只有断开的连接）。母星系和锁定星系将保留。此操作可撤销。",
+    "removeStranded": "移除与母星系失联的星系 ({{count}})",
+    "removeStrandedConfirm": "移除 {{count}} 个无法返回 {{home}} 的星系？母星系和已锁定的星系会保留。这是批量删除——撤销会逐个恢复，且仅保留最近 50 次删除。",
     "labels": "标签",
     "customLabel": "自定义标签",
     "clearLabels": "清除",

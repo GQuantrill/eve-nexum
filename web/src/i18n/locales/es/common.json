@@ -700,6 +700,8 @@
     "spreadNodes": "Distribuir nodos",
     "removeOrphans": "Eliminar sistemas huérfanos ({{count}})",
     "removeOrphansConfirm": "¿Eliminar {{count}} sistema(s) huérfano(s)? No tienen ninguna conexión válida (ninguna, o solo rotas). Los sistemas de origen y bloqueados se conservan. Esto se puede deshacer.",
+    "removeStranded": "Eliminar sistemas sin conexión al hogar ({{count}})",
+    "removeStrandedConfirm": "¿Eliminar {{count}} sistema(s) sin ruta de vuelta a {{home}}? Se conservan el sistema hogar y los bloqueados. Es un borrado masivo: deshacer los restaura de uno en uno y solo se guardan las últimas 50 eliminaciones.",
     "labels": "Etiquetas",
     "customLabel": "Etiqueta personalizada",
     "clearLabels": "Borrar",

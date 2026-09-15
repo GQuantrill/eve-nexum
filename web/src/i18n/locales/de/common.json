@@ -700,6 +700,8 @@
     "spreadNodes": "Knoten verteilen",
     "removeOrphans": "Verwaiste Systeme entfernen ({{count}})",
     "removeOrphansConfirm": "{{count}} verwaiste(s) System(e) entfernen? Diese haben keine gültige Verbindung (keine oder nur unterbrochene). Heimat- und gesperrte Systeme bleiben erhalten. Dies kann rückgängig gemacht werden.",
+    "removeStranded": "Von Heimat getrennte Systeme entfernen ({{count}})",
+    "removeStrandedConfirm": "{{count}} System(e) ohne Weg zurück nach {{home}} entfernen? Heimat- und gesperrte Systeme bleiben erhalten. Dies ist eine Massenlöschung — das Rückgängigmachen stellt sie einzeln wieder her, und nur die letzten 50 Löschungen werden vorgehalten.",
     "labels": "Labels",
     "customLabel": "Eigenes Label",
     "clearLabels": "Löschen",

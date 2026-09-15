@@ -700,6 +700,8 @@
     "spreadNodes": "노드 펼치기",
     "removeOrphans": "고립 성계 제거 ({{count}})",
     "removeOrphansConfirm": "{{count}}개의 고립 성계를 제거하시겠습니까? 이들은 유효한 연결이 없습니다(없거나 끊긴 것만). 홈과 잠긴 성계는 유지됩니다. 실행 취소할 수 있습니다.",
+    "removeStranded": "홈과 끊긴 시스템 제거 ({{count}})",
+    "removeStrandedConfirm": "{{home}}(으)로 돌아가는 경로가 없는 시스템 {{count}}개를 제거할까요? 홈과 잠긴 시스템은 유지됩니다. 일괄 삭제이므로 실행 취소는 하나씩 복원하며, 최근 50개의 삭제만 보관됩니다.",
     "labels": "라벨",
     "customLabel": "사용자 라벨",
     "clearLabels": "지우기",

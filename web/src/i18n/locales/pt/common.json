@@ -700,6 +700,8 @@
     "spreadNodes": "Espalhar nós",
     "removeOrphans": "Remover sistemas órfãos ({{count}})",
     "removeOrphansConfirm": "Remover {{count}} sistema(s) órfão(s)? Estes não têm conexão válida (nenhuma, ou apenas quebradas). Os sistemas de origem e bloqueados são mantidos. Isto pode ser desfeito.",
+    "removeStranded": "Remover sistemas sem ligação à base ({{count}})",
+    "removeStrandedConfirm": "Remover {{count}} sistema(s) sem rota de volta a {{home}}? A base e os sistemas bloqueados são mantidos. Isto é uma eliminação em massa — anular restaura-os um a um, e apenas as últimas 50 remoções são guardadas.",
     "labels": "Etiquetas",
     "customLabel": "Etiqueta personalizada",
     "clearLabels": "Limpar",

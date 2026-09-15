@@ -30,11 +30,12 @@ import { ContextMenu } from '../ui/ContextMenu';
 import type { ContextMenuItem } from '../ui/ContextMenu';
 import { ConfirmModal } from '../ui/ConfirmModal';
 import { shouldSkipConfirm } from '../../utils/confirmPref';
+import { systemDisplayName } from '../../utils/systemName';
 import {
   PathIcon, MapPinSimpleIcon, HouseIcon, LockIcon, LockOpenIcon,
   XIcon, CheckIcon, PlusIcon, SelectionAllIcon, EyeIcon, CrosshairSimpleIcon,
   LinkSimpleIcon, LinkBreakIcon, ArrowsOutIcon, BookmarkSimpleIcon, TextAaIcon, TrashIcon,
-  HashIcon, ProhibitIcon,
+  HashIcon, ProhibitIcon, BroomIcon,
 } from '../../icons';
 import { PREDEFINED_LABELS } from '../../data/labels';
 
@@ -274,6 +275,8 @@ export function MapCanvas() {
   const [contextMenu, setContextMenu]         = useState<CtxMenu | null>(null);
   // Pending "remove orphan systems" sweep, held while the confirm modal is up.
   const [orphanConfirm, setOrphanConfirm]     = useState<{ ids: string[] } | null>(null);
+  // Pending "remove systems with no route home" sweep, held while its confirm is up.
+  const [strandedConfirm, setStrandedConfirm] = useState<{ ids: string[]; home: string } | null>(null);
   // Gate-adjacent systems per k-space eveSystemId, fetched lazily when a node's
   // context menu opens. 'loading'/'error' are transient states for the submenu.
   const [adjacent, setAdjacent] = useState<Record<number, AdjacentSystem[] | 'loading' | 'error'>>({});
@@ -1484,6 +1487,35 @@ export function MapCanvas() {
       )
       .map((s) => s.id);
 
+    // Systems with no route back to home — a branch left behind when a chain
+    // collapsed, rather than anything still reachable.
+    const homeSystem = systems.find((s) => s.isHome) ?? null;
+    const strandedIds = (() => {
+      if (!homeSystem) return [];
+      // Broken links still count as links here. "Broken" means re-scout, not
+      // gone, and this is a bulk delete — keeping a system that turns out to be
+      // reachable is far cheaper than wiping a live chain over one flagged hop.
+      const adj = new Map<string, string[]>();
+      const link = (a: string, b: string) => {
+        const list = adj.get(a);
+        if (list) list.push(b); else adj.set(a, [b]);
+      };
+      for (const c of connections) { link(c.sourceId, c.targetId); link(c.targetId, c.sourceId); }
+
+      const reached = new Set<string>([homeSystem.id]);
+      const queue = [homeSystem.id];
+      for (let i = 0; i < queue.length; i++) {
+        for (const next of adj.get(queue[i]) ?? []) {
+          if (reached.has(next)) continue;
+          reached.add(next);
+          queue.push(next);
+        }
+      }
+      // Locked systems are protected, same as the orphan sweep — locking one is
+      // how you say "leave this alone".
+      return systems.filter((sys) => !reached.has(sys.id) && !sys.locked).map((sys) => sys.id);
+    })();
+
     return [
       {
         label: t('ctxMenu.addSystem'),
@@ -1518,6 +1550,19 @@ export function MapCanvas() {
           else setOrphanConfirm({ ids: orphanIds });
         },
         disabled: orphanIds.length === 0,
+      },
+      {
+        label: t('ctxMenu.removeStranded', { count: strandedIds.length }),
+        icon: <BroomIcon size={15} weight="regular" color="#e25a5a" />,
+        action: () => {
+          if (strandedIds.length === 0 || !homeSystem) return;
+          // Honours the same "don't ask again" preference as the orphan sweep —
+          // the shared confirm offers that checkbox, so ignoring it here would
+          // be a promise the dialog doesn't keep.
+          if (shouldSkipConfirm()) strandedIds.forEach((id) => removeSystem(id));
+          else setStrandedConfirm({ ids: strandedIds, home: systemDisplayName(homeSystem) });
+        },
+        disabled: strandedIds.length === 0,
       },
     ];
   })();
@@ -1655,6 +1700,20 @@ export function MapCanvas() {
           />
         );
       })()}
+
+      {strandedConfirm && (
+        <ConfirmModal
+          message={t('ctxMenu.removeStrandedConfirm', {
+            count: strandedConfirm.ids.length,
+            home:  strandedConfirm.home,
+          })}
+          onConfirm={() => {
+            strandedConfirm.ids.forEach((id) => removeSystem(id));
+            setStrandedConfirm(null);
+          }}
+          onCancel={() => setStrandedConfirm(null)}
+        />
+      )}
 
       {orphanConfirm && (
         <ConfirmModal
