@@ -1691,7 +1691,9 @@
     "inSig": "入口签名",
     "outSig": "出口签名",
     "inSigHint": "{{system}} 中的信号 ID —— 虫洞的另一端",
-    "outSigHint": "{{system}} 中的信号 ID —— 从这里跃迁前往的一端"
+    "outSigHint": "{{system}} 中的信号 ID —— 从这里跃迁前往的一端",
+    "markExpired": "报告该洞已坍塌",
+    "unmarkExpired": "其实没有坍塌"
   },
   "session": {
     "idleLogout": "因长时间未操作已退出登录。",

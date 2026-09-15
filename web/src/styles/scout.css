@@ -33,6 +33,22 @@
   font-size: calc(13px * var(--font-scale, 1));
 }
 
+/* Reported collapsed: still listed, so the flag is visible and reversible and
+   you can see someone already checked it — it just no longer routes. Dimmed
+   rather than hidden, with the system name struck through. The flag button
+   itself stays at full strength so it can be found and undone. */
+.scout-row--expired {
+  opacity: 0.55;
+}
+
+.scout-row--expired .scout-row__name {
+  text-decoration: line-through;
+}
+
+.scout-row--expired .scout-row__btn--icon {
+  opacity: 1;
+}
+
 .scout-row:last-child { border-bottom: none; }
 
 .scout-row__sys {

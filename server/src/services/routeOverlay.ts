@@ -34,11 +34,14 @@ function addEdge(o: RouteOverlay, a: number, b: number, meta: EdgeMeta): void {
 
 // Thera/Turnur scout connections. Each connection touches its hub on one end and
 // a (usually k-space) exit on the other; add both if the hub is enabled.
-async function addScoutEdges(o: RouteOverlay, thera: boolean, turnur: boolean): Promise<boolean> {
+async function addScoutEdges(o: RouteOverlay, thera: boolean, turnur: boolean, expired: Set<string>): Promise<boolean> {
   const { thera: theraId, turnur: turnurId } = await getHubIds();
   const conns = await getScoutConnections();
   let added = false;
   for (const c of conns) {
+    // Flagged collapsed by this requester's scope — routing through it would
+    // send them to a hole that isn't there.
+    if (expired.has(c.id)) continue;
     const isThera  = theraId  != null && (c.outSystemId === theraId  || c.inSystemId === theraId);
     const isTurnur = turnurId != null && (c.outSystemId === turnurId || c.inSystemId === turnurId);
     if (isThera  && !thera)  continue;
@@ -138,11 +141,14 @@ async function fillInfo(o: RouteOverlay): Promise<void> {
  */
 export async function buildRouteOverlay(opts: {
   thera: boolean; turnur: boolean; wormholes: boolean; ansiblex: boolean; mapIds?: string[];
+  /** Scout connections the requester has flagged collapsed; never routed through. */
+  expiredScout?: Set<string>;
 }): Promise<RouteOverlay | undefined> {
   const o = emptyOverlay();
   const mapIds = opts.mapIds ?? [];
+  const expired = opts.expiredScout ?? new Set<string>();
   let any = false;
-  if (opts.thera || opts.turnur) any = (await addScoutEdges(o, opts.thera, opts.turnur)) || any;
+  if (opts.thera || opts.turnur) any = (await addScoutEdges(o, opts.thera, opts.turnur, expired)) || any;
   if (opts.wormholes && mapIds.length) any = (await addWormholeEdges(o, mapIds)) || any;
   if (opts.ansiblex && mapIds.length)  any = (await addAnsiblexEdges(o, mapIds)) || any;
   if (!any) return undefined;

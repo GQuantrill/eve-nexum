@@ -3,6 +3,7 @@ import { requireAuth } from '../middleware/requireAuth.js';
 import { createLogger } from '../utils/logger.js';
 import { shortestRoutes, type RouteMode } from '../services/routeGraph.js';
 import { buildRouteOverlay } from '../services/routeOverlay.js';
+import { expiredScoutIds } from './scout.js';
 import { getMapAccess, visibleMapIds } from './maps.js';
 
 const router = Router();
@@ -71,8 +72,10 @@ router.get('/', async (req, res) => {
   }
 
   try {
+    // Only worth the lookup when a scout hub is actually in play.
+    const expiredScout = (includeThera || includeTurnur) ? await expiredScoutIds(req) : undefined;
     const overlay = (includeThera || includeTurnur || includeWormholes || includeAnsiblex)
-      ? await buildRouteOverlay({ thera: includeThera, turnur: includeTurnur, wormholes: includeWormholes, ansiblex: includeAnsiblex, mapIds })
+      ? await buildRouteOverlay({ thera: includeThera, turnur: includeTurnur, wormholes: includeWormholes, ansiblex: includeAnsiblex, mapIds, expiredScout })
       : undefined;
     const result = await shortestRoutes(from, targets, mode, overlay);
     return res.json(result);

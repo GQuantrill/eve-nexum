@@ -1691,7 +1691,9 @@
     "inSig": "inSig",
     "outSig": "outSig",
     "inSigHint": "Identifiant de signature dans {{system}} — l'autre extrémité du trou",
-    "outSigHint": "Identifiant de signature dans {{system}} — l'extrémité vers laquelle tu warpes d'ici"
+    "outSigHint": "Identifiant de signature dans {{system}} — l'extrémité vers laquelle tu warpes d'ici",
+    "markExpired": "Signaler ce trou comme effondré",
+    "unmarkExpired": "Finalement pas effondré"
   },
   "session": {
     "idleLogout": "Déconnecté pour inactivité.",

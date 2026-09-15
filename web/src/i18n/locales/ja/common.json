@@ -1691,7 +1691,9 @@
     "inSig": "入口シグ",
     "outSig": "出口シグ",
     "inSigHint": "{{system}} 側のシグネチャ ID — ワームホールの反対側です",
-    "outSigHint": "{{system}} 側のシグネチャ ID — ここからワープする側です"
+    "outSigHint": "{{system}} 側のシグネチャ ID — ここからワープする側です",
+    "markExpired": "このホールの消滅を報告",
+    "unmarkExpired": "消滅していなかった"
   },
   "session": {
     "idleLogout": "非アクティブのためサインアウトしました。",

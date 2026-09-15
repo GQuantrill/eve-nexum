@@ -1691,7 +1691,9 @@
     "inSig": "입구 시그",
     "outSig": "출구 시그",
     "inSigHint": "{{system}}의 시그니처 ID — 웜홀의 반대쪽 끝입니다",
-    "outSigHint": "{{system}}의 시그니처 ID — 여기서 워프해 갈 쪽입니다"
+    "outSigHint": "{{system}}의 시그니처 ID — 여기서 워프해 갈 쪽입니다",
+    "markExpired": "이 홀이 붕괴했다고 보고",
+    "unmarkExpired": "붕괴하지 않았음"
   },
   "session": {
     "idleLogout": "비활성으로 인해 로그아웃되었습니다.",

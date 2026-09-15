@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
-import { useScoutConnections } from '../../hooks/useScoutConnections';
+import { useScoutConnections, setScoutExpired } from '../../hooks/useScoutConnections';
 import { useWormholeTypes } from '../../hooks/useWormholeTypes';
 import { whSizeForType, whSizeShort } from '../../utils/wormholeSize';
 import { useRouteOrigin } from '../../hooks/useRouteOrigin';
@@ -11,7 +11,7 @@ import { setWaypoint, canSetAutopilot } from '../../utils/routeActions';
 import { useSystemAlias } from '../../hooks/useSystemAlias';
 import { truesecColor } from '../../utils/truesec';
 import { useMapStore } from '../../store/mapStore';
-import { MapPinSimpleIcon, PathIcon } from '../../icons';
+import { MapPinSimpleIcon, PathIcon, ProhibitIcon } from '../../icons';
 import { Select } from './Select';
 import { DASH } from '../../i18n/format';
 
@@ -175,7 +175,7 @@ export function ScoutConnectionsPane({ scoutSystem }: Props) {
         // through a hole/Ansiblex — EVE routes there via gates regardless.
         const canAutopilot = canSetAutopilot(route);
         return (
-          <div key={c.id} className="scout-row">
+          <div key={c.id} className={`scout-row${c.expired ? ' scout-row--expired' : ''}`}>
             <div className="scout-row__sys">
               <span className="scout-row__name">{aliasName(c.inSystemName)}</span>
               {c.inSystemClass && (
@@ -247,6 +247,18 @@ export function ScoutConnectionsPane({ scoutSystem }: Props) {
                   </button>
                 </>
               )}
+              {/* Report the hole collapsed. It stays listed and marked rather
+                  than vanishing, so a mis-flag is visible and reversible. */}
+              <button
+                type="button"
+                className="sys-btn scout-row__btn scout-row__btn--icon"
+                onClick={() => void setScoutExpired(c.id, !c.expired)}
+                aria-pressed={!!c.expired}
+                aria-label={t(c.expired ? 'scout.unmarkExpired' : 'scout.markExpired')}
+                data-tooltip={t(c.expired ? 'scout.unmarkExpired' : 'scout.markExpired')}
+              >
+                <ProhibitIcon size={14} weight="regular" color={c.expired ? '#e05a5a' : '#7a90a8'} />
+              </button>
               {route && (
                 <button
                   type="button"

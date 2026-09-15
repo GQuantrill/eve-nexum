@@ -1691,7 +1691,9 @@
     "inSig": "inSig",
     "outSig": "outSig",
     "inSigHint": "ID de firma en {{system}}: el extremo lejano del agujero",
-    "outSigHint": "ID de firma en {{system}}: el extremo al que warpeas desde aquí"
+    "outSigHint": "ID de firma en {{system}}: el extremo al que warpeas desde aquí",
+    "markExpired": "Informar de que este agujero ha colapsado",
+    "unmarkExpired": "No ha colapsado"
   },
   "session": {
     "idleLogout": "Sesión cerrada por inactividad.",

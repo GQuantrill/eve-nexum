@@ -1691,7 +1691,9 @@
     "inSig": "inSig",
     "outSig": "outSig",
     "inSigHint": "Signatur-ID in {{system}} — das andere Ende des Lochs",
-    "outSigHint": "Signatur-ID in {{system}} — das Ende, das du von hier aus anwarpst"
+    "outSigHint": "Signatur-ID in {{system}} — das Ende, das du von hier aus anwarpst",
+    "markExpired": "Dieses Loch als kollabiert melden",
+    "unmarkExpired": "Doch nicht kollabiert"
   },
   "session": {
     "idleLogout": "Wegen Inaktivität abgemeldet.",

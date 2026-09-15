@@ -1127,6 +1127,31 @@ export async function migrate() {
     ALTER TABLE corp_discord_settings     ADD COLUMN IF NOT EXISTS notify_exits BOOLEAN NOT NULL DEFAULT FALSE;
     ALTER TABLE alliance_discord_settings ADD COLUMN IF NOT EXISTS notify_k162  BOOLEAN NOT NULL DEFAULT FALSE;
     ALTER TABLE alliance_discord_settings ADD COLUMN IF NOT EXISTS notify_exits BOOLEAN NOT NULL DEFAULT FALSE;
+
+    -- Thera/Turnur holes a scout has found already collapsed. eve-scout keeps
+    -- listing them until someone reports it, and routing through a dead hole
+    -- sends people on a wasted trip, so a flag here drops the connection from
+    -- the route graph.
+    --
+    -- Scoped, never deployment-wide: on a corp/alliance install the flag is
+    -- shared so one scout spares everyone the trip, otherwise it's the user's
+    -- own. A stranger on a public instance can't affect anyone else's routing.
+    -- The key is eve-scout's own signature id, which is unique per hole, so a
+    -- new hole can never inherit a flag.
+    CREATE TABLE IF NOT EXISTS scout_expired (
+      connection_id TEXT        NOT NULL,
+      scope_kind    TEXT        NOT NULL CHECK (scope_kind IN ('user', 'corp', 'alliance')),
+      scope_id      INTEGER     NOT NULL,
+      flagged_by    INTEGER     REFERENCES users(id) ON DELETE SET NULL,
+      created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      PRIMARY KEY (connection_id, scope_kind, scope_id)
+    );
+    CREATE INDEX IF NOT EXISTS idx_scout_expired_scope
+      ON scout_expired (scope_kind, scope_id);
+    -- Prune key: rows outlive the hole they describe, and nothing reads one
+    -- once it's gone from the feed.
+    CREATE INDEX IF NOT EXISTS idx_scout_expired_created
+      ON scout_expired (created_at);
   `);
 
   await encryptLegacyTokens();

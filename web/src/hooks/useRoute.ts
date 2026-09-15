@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { api } from '../api/client';
 import { useMapStore } from '../store/mapStore';
 import { useUserSetting } from './useUserSetting';
+import { useScoutFlagRevision } from './useScoutConnections';
 
 // Metadata for a shortcut hop (wormhole chain link / Thera / Turnur scout
 // connection) — mirrors the server EdgeMeta, used to mark the gap between two
@@ -64,6 +65,10 @@ export function useRoute(
   const [inclTurnur]    = useUserSetting<boolean>('nexum.route.includeTurnur', false);
   const [inclWormholes] = useUserSetting<boolean>('nexum.route.includeWormholes', false);
   const [inclAnsiblex]  = useUserSetting<boolean>('nexum.route.includeAnsiblex', false);
+  // Bumped when a scout connection is flagged/unflagged collapsed. The server
+  // reads the flags, but they're invisible to this request's inputs, so without
+  // this the stale route would stand.
+  const flagRevision = useScoutFlagRevision();
 
   const allScope = whScope === 'all';
   const targetsKey = [...targets].sort((a, b) => a - b).join(',');
@@ -92,7 +97,7 @@ export function useRoute(
       .then(r => { if (!cancelled) setData(r); })
       .catch(() => { if (!cancelled) setData({}); });
     return () => { cancelled = true; };
-  }, [from, targetsKey, routeMode, wantThera, wantTurnur, wantWh, wantAnsi, allScope, activeMapId]);
+  }, [from, targetsKey, routeMode, wantThera, wantTurnur, wantWh, wantAnsi, allScope, activeMapId, flagRevision]);
 
   return data;
 }
