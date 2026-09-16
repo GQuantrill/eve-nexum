@@ -1459,6 +1459,7 @@
     "notifWatchlist": "ウォッチリスト一致",
     "notifExits": "k-spaceの出口",
     "notifExitsMinSec": "通知する出口のセキュリティ",
+    "notifExitsOff": "オフ — 通知しない",
     "notifExitsHiSec": "ハイセクのみ",
     "notifExitsLowSec": "ローセク以上",
     "notifExitsAny": "すべてのk-space",

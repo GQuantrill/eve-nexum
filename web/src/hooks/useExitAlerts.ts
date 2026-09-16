@@ -6,6 +6,7 @@ import { systemDisplayName } from '../utils/systemName';
 import { toast } from '../utils/toastStore';
 import {
   NOTIFY, alertGain, fireDesktopNotification, EXITS_MIN_SECURITY_KEY, EXITS_MIN_SECURITY_DEFAULT,
+  EXITS_MIN_SECURITY_OFF,
 } from '../utils/notificationPrefs';
 
 // The k-space classes that can be an exit. Wormhole systems never are.
@@ -60,9 +61,10 @@ export function useExitAlerts() {
   });
 
   useEffect(() => {
-    if (!soundOn && !desktopOn) {
-      // Off — drop any seeded state so switching it on later doesn't
-      // immediately announce everything already on the chain.
+    if (minSec >= EXITS_MIN_SECURITY_OFF || (!soundOn && !desktopOn)) {
+      // Off, either by threshold or by having no channel on. Drop any seeded
+      // state so switching it back on doesn't immediately announce everything
+      // already on the chain.
       stateRef.current = { mapId: activeMapId, alerted: new Set(), armAt: 0 };
       return;
     }

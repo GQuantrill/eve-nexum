@@ -1459,6 +1459,7 @@
     "notifWatchlist": "Beobachtungslisten-Treffer",
     "notifExits": "K-Space-Ausgänge",
     "notifExitsMinSec": "Melden bei Ausgängen ab",
+    "notifExitsOff": "Aus — nie melden",
     "notifExitsHiSec": "Nur Hi-Sec",
     "notifExitsLowSec": "Low-Sec und besser",
     "notifExitsAny": "Jeder K-Space",

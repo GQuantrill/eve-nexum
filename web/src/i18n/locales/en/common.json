@@ -1459,6 +1459,7 @@
     "notifWatchlist": "Watchlist match",
     "notifExits": "K-space exits",
     "notifExitsMinSec": "Alert on exits of",
+    "notifExitsOff": "Off — never alert",
     "notifExitsHiSec": "High-sec only",
     "notifExitsLowSec": "Low-sec and better",
     "notifExitsAny": "Any k-space",

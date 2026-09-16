@@ -1473,6 +1473,7 @@
     "notifWatchlist": "Совпадение списка наблюдения",
     "notifExits": "Выходы в k-space",
     "notifExitsMinSec": "Оповещать о выходах от",
+    "notifExitsOff": "Выключено — не оповещать",
     "notifExitsHiSec": "Только хайсек",
     "notifExitsLowSec": "Лоусек и выше",
     "notifExitsAny": "Любой k-space",

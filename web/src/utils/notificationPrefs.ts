@@ -69,6 +69,13 @@ export function previewAlertVolume(): void {
 /** Lowest security that counts as an exit worth alerting on. */
 export const EXITS_MIN_SECURITY_KEY = 'nexum.notify.exitsMinSecurity';
 export const EXITS_MIN_SECURITY_DEFAULT = 0.45;
+/**
+ * "Never alert" — above the 1.0 ceiling, so no system can ever meet it and the
+ * alert simply has nothing to fire on. Unticking both channels silences it too,
+ * but that's a thing you have to know; an explicit Off in the same dropdown you
+ * used to switch it on is where people look for it.
+ */
+export const EXITS_MIN_SECURITY_OFF = 2;
 
 // Proximity alerts on both channels and the watchlist keeps its sound (desktop
 // there was always opt-in). K162 and exits are opt-in: both are chain-wide

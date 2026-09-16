@@ -1459,6 +1459,7 @@
     "notifWatchlist": "Correspondência da lista de observação",
     "notifExits": "Saídas para k-space",
     "notifExitsMinSec": "Alertar sobre saídas de",
+    "notifExitsOff": "Desligado — nunca alertar",
     "notifExitsHiSec": "Apenas alta segurança",
     "notifExitsLowSec": "Baixa segurança ou melhor",
     "notifExitsAny": "Qualquer k-space",

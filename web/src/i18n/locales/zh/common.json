@@ -1459,6 +1459,7 @@
     "notifWatchlist": "监视列表匹配",
     "notifExits": "k-space 出口",
     "notifExitsMinSec": "提醒的出口安全等级",
+    "notifExitsOff": "关闭 — 从不提醒",
     "notifExitsHiSec": "仅高安",
     "notifExitsLowSec": "低安及以上",
     "notifExitsAny": "任意 k-space",

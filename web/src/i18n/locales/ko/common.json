@@ -1459,6 +1459,7 @@
     "notifWatchlist": "워치리스트 일치",
     "notifExits": "k-space 출구",
     "notifExitsMinSec": "알릴 출구 보안도",
+    "notifExitsOff": "끔 — 알리지 않음",
     "notifExitsHiSec": "하이섹만",
     "notifExitsLowSec": "로우섹 이상",
     "notifExitsAny": "모든 k-space",
