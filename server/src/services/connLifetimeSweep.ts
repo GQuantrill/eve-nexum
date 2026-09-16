@@ -61,7 +61,8 @@ async function collapseMap(mapId: string, conns: Row[]): Promise<void> {
   try {
     await client.query('BEGIN');
     if (sigIds.length) await client.query(`DELETE FROM map_signatures WHERE id = ANY($1::uuid[])`, [sigIds]);
-    await client.query(`UPDATE map_connections SET broken = TRUE WHERE id = ANY($1::uuid[])`, [connIds]);
+    await client.query(
+      `UPDATE map_connections SET broken = TRUE, broken_at = NOW() WHERE id = ANY($1::uuid[])`, [connIds]);
     await client.query(`UPDATE maps SET updated_at = NOW() WHERE id = $1`, [mapId]);
     await client.query('COMMIT');
   } catch (err) {

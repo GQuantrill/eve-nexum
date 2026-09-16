@@ -125,7 +125,8 @@ async function sweepMap(mapId: string, expired: CandidateRow[]): Promise<void> {
       .map((c) => c.id);
 
     if (brokenIds.length > 0) {
-      await client.query(`UPDATE map_connections SET broken = TRUE WHERE id = ANY($1::uuid[])`, [brokenIds]);
+      await client.query(
+        `UPDATE map_connections SET broken = TRUE, broken_at = NOW() WHERE id = ANY($1::uuid[])`, [brokenIds]);
     }
     await client.query(`UPDATE maps SET updated_at = NOW() WHERE id = $1`, [mapId]);
 
@@ -148,6 +149,52 @@ async function sweepMap(mapId: string, expired: CandidateRow[]): Promise<void> {
     publishToMap(mapId, { type: 'connection.update', actor: null, id, updates: { broken: true } });
   }
   log.info(`map ${mapId}: removed ${expiredIds.length} aged WH sig(s), quarantined ${brokenIds.length} connection(s)`);
+}
+
+/**
+ * Delete connections that have been quarantined longer than the configured
+ * grace period, on maps with auto-removal on.
+ *
+ * Quarantine alone never cleaned anything up: the sig went, the line greyed
+ * out, and it sat there until somebody deleted it by hand. The grey line is the
+ * warning — this is what eventually acts on it, late enough that a wrongly
+ * severed link can still be restored (which clears broken_at and resets the
+ * clock).
+ */
+async function removeStaleBrokenConnections(): Promise<void> {
+  const hours = config.brokenConnRemoveHours;
+  if (hours <= 0) return;
+
+  let rows: Array<{ id: string; mapId: string }>;
+  try {
+    const res = await db.query<{ id: string; mapId: string }>(
+      `DELETE FROM map_connections c
+        USING maps m
+        WHERE m.id = c.map_id
+          AND m.lazy_remove_wormholes = TRUE
+          AND c.broken = TRUE
+          AND c.broken_at IS NOT NULL
+          AND c.broken_at < NOW() - ($1 || ' hours')::interval
+        RETURNING c.id, c.map_id AS "mapId"`,
+      [String(hours)],
+    );
+    rows = res.rows;
+  } catch (err) {
+    log.warn(`broken-connection cleanup failed: ${err instanceof Error ? err.message : String(err)}`);
+    return;
+  }
+  if (rows.length === 0) return;
+
+  const byMap = new Map<string, string[]>();
+  for (const r of rows) {
+    const list = byMap.get(r.mapId);
+    if (list) list.push(r.id); else byMap.set(r.mapId, [r.id]);
+  }
+  for (const [mapId, ids] of byMap) {
+    await db.query(`UPDATE maps SET updated_at = NOW() WHERE id = $1`, [mapId]).catch(() => {});
+    for (const id of ids) publishToMap(mapId, { type: 'connection.remove', actor: null, id });
+    log.info(`map ${mapId}: removed ${ids.length} connection(s) broken for over ${hours}h`);
+  }
 }
 
 /** One sweep pass over every opted-in map. */
@@ -229,7 +276,7 @@ async function quarantineOrphans(): Promise<void> {
         SELECT system_id FROM sig_stats WHERE n > 0 AND wh = 0
       )
       UPDATE map_connections c
-         SET broken = TRUE
+         SET broken = TRUE, broken_at = NOW()
        WHERE c.connection_type = 'standard'
          AND c.broken = FALSE
          AND COALESCE(c.wh_type, '') <> ''
@@ -266,7 +313,15 @@ export function startWhSweeper(): void {
   const mins = config.lazyWhSweepMinutes;
   if (mins <= 0) { log.info('lazy WH-removal sweep disabled (LAZY_WH_SWEEP_MINUTES=0)'); return; }
   log.info(`lazy WH-removal sweep enabled (every ${mins} min)`);
-  const tick = () => { void sweepAll(); void quarantineOrphans(); };
+  // Order matters: quarantine first so a hole that just died is stamped, then
+  // clean up anything that has been stamped long enough.
+  const tick = () => {
+    void (async () => {
+      await sweepAll();
+      await quarantineOrphans();
+      await removeStaleBrokenConnections();
+    })();
+  };
   setTimeout(tick, 60_000);
   setInterval(tick, mins * 60_000);
 }

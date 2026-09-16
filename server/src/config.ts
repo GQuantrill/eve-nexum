@@ -240,6 +240,10 @@ export const config = {
   // WH sigs (and quarantines the connections they backed) on maps that have
   // opted in. Default 15; set to 0 to disable the sweep globally.
   lazyWhSweepMinutes:  intEnv(process.env.LAZY_WH_SWEEP_MINUTES, 15),
+  // How long a quarantined connection stays on the map before the lazy sweep
+  // deletes it. Only applies to maps with auto-removal on. 0 disables the
+  // deletion, leaving the old behaviour: greyed out, kept until removed by hand.
+  brokenConnRemoveHours: intEnv(process.env.BROKEN_CONN_REMOVE_HOURS, 3),
   // Cadence (minutes) of the connection-lifetime sweep, which re-buckets each
   // wormhole connection's time status (fresh / <1d / <4h / <1h / expired) from
   // its age so holes visibly decay on their own. Default 60; 0 disables it.

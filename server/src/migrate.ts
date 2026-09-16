@@ -1128,6 +1128,18 @@ export async function migrate() {
     ALTER TABLE alliance_discord_settings ADD COLUMN IF NOT EXISTS notify_k162  BOOLEAN NOT NULL DEFAULT FALSE;
     ALTER TABLE alliance_discord_settings ADD COLUMN IF NOT EXISTS notify_exits BOOLEAN NOT NULL DEFAULT FALSE;
 
+    -- When a connection was quarantined. The lazy-removal sweep greys a dead
+    -- hole's line out first and deletes it once it has stayed broken this long,
+    -- so a wrongly-severed link can still be restored in between.
+    --
+    -- Existing broken rows are stamped NOW() rather than back-dated, so the
+    -- first sweep after an upgrade doesn't wipe every line a map has been
+    -- carrying for weeks — they each get a full grace period instead.
+    ALTER TABLE map_connections ADD COLUMN IF NOT EXISTS broken_at TIMESTAMPTZ;
+    UPDATE map_connections SET broken_at = NOW() WHERE broken = TRUE AND broken_at IS NULL;
+    CREATE INDEX IF NOT EXISTS idx_map_connections_broken_at
+      ON map_connections (broken_at) WHERE broken = TRUE;
+
     -- Thera/Turnur holes a scout has found already collapsed. eve-scout keeps
     -- listing them until someone reports it, and routing through a dead hole
     -- sends people on a wasted trip, so a flag here drops the connection from

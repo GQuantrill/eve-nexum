@@ -3374,7 +3374,7 @@ mapsRouter.patch('/:mapId/connections/:connectionId', async (req, res) => {
     timeStatus: 'time_status', size: 'size',
     sourceHandle: 'source_handle', targetHandle: 'target_handle',
     type: 'wh_type', massUsed: 'mass_used',
-    eolAt: 'eol_at', lifetimeExpiresAt: 'lifetime_expires_at', broken: 'broken',
+    eolAt: 'eol_at', lifetimeExpiresAt: 'lifetime_expires_at', broken: 'broken', brokenAt: 'broken_at',
     flagIcon: 'flag_icon', flagNote: 'flag_note', flagBlink: 'flag_blink', flagColor: 'flag_color',
     sourceSignatureId: 'source_signature_id', targetSignatureId: 'target_signature_id',
   };
@@ -3470,6 +3470,13 @@ mapsRouter.patch('/:mapId/connections/:connectionId', async (req, res) => {
         if (expiry != null) updates.timeStatus = lifeBucket(expiry - Date.now());
       }
     } catch { /* leave time_status as-is on any lookup failure */ }
+  }
+
+  // Keep broken_at in step with broken, so the removal sweep measures from when
+  // the link actually broke. Restoring one clears the stamp, which also resets
+  // its grace period if it breaks again later.
+  if ('broken' in updates) {
+    updates.brokenAt = updates.broken === true ? new Date().toISOString() : null;
   }
 
   const sets: string[] = [];
