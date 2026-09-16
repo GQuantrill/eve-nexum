@@ -2441,7 +2441,8 @@ select.sig-toolbar-btn option {
 }
 
 .sig-whstate__chip {
-  min-width: 26px;
+  /* Fits "<50%" — the widest label either chip carries. */
+  min-width: 40px;
   padding: 0 4px;
   border: 1px solid var(--border);
   border-radius: 3px;

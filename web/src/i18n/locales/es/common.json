@@ -1781,7 +1781,7 @@
     "colLeadsTo": "Lleva a",
     "colWhState": "Estado",
     "colWhStateHint": "Masa y vida restante del agujero. Ambas se leen en el propio agujero, así que pueden fijarse antes de saltarlo.",
-    "whStateMass": "Masa: clic para estable / reducida / crítica",
+    "whStateMass": "Masa: clic para ciclar completa / menos del 50 % / menos del 10 %",
     "whStateLife": "Vida: clic para marcar fin de vida",
     "colName": "Nombre",
     "colNotes": "Notas",

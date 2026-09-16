@@ -1781,7 +1781,7 @@
     "colLeadsTo": "通往",
     "colWhState": "状态",
     "colWhStateHint": "虫洞的质量与剩余寿命。二者在太空中看洞即可得知，因此跳跃前就能记录。",
-    "whStateMass": "质量：点击切换 稳定 / 减少 / 临界",
+    "whStateMass": "质量：点击切换 充足 / 低于 50% / 低于 10%",
     "whStateLife": "寿命：点击标记为寿命末期",
     "colName": "名称",
     "colNotes": "笔记",

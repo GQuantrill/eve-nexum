@@ -191,7 +191,11 @@ function WhStateCell({ sig, conn, isShareMode, onChange }: {
   if (sig.sigType !== 'wormhole') return null;
 
   const state = effectiveWhState(sig, conn);
-  const massLabel = state.massStatus === 'critical' ? '!' : state.massStatus === 'destabilized' ? '~' : '\u2013';
+  // EVE's own wording for the two reduced states — clearer than a symbol,
+  // and it matches what show-info tells you at the hole.
+  const massLabel = state.massStatus === 'critical' ? '<10%'
+                  : state.massStatus === 'destabilized' ? '<50%'
+                  : '\u2013';
   const timeLabel = state.timeStatus ? 'EOL' : '\u2013';
 
   if (isShareMode) {
@@ -236,8 +240,8 @@ const DEFAULT_WIDTHS: Record<ColKey, number> = {
   id:      72,
   type:    108,
   whtype:  170,
-  leadsto: 132,
-  whstate: 84,
+  leadsto: 190,
+  whstate: 104,
   name:    140,
   safe:    52,
   notes:   220,
@@ -1181,6 +1185,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
             <col style={{ width: colWidths.id }} />
             <col style={{ width: colWidths.type }} />
             <col style={{ width: colWidths.whtype }} className="sig-col--whtype" />
+            {isColVisible('whstate') && <col style={{ width: colWidths.whstate }} />}
             <col style={{ width: colWidths.leadsto }} />
             {!isShareMode && <col className="sig-col--bookmark" />}
             {isColVisible('name')    && <col style={{ width: colWidths.name }} />}
