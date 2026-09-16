@@ -1135,6 +1135,15 @@ export async function migrate() {
     -- Existing broken rows are stamped NOW() rather than back-dated, so the
     -- first sweep after an upgrade doesn't wipe every line a map has been
     -- carrying for weeks — they each get a full grace period instead.
+    -- A hole's mass/life as observed at the signature, BEFORE it has been
+    -- jumped and a connection exists to hold them. You can read both off a
+    -- wormhole in space without going through it, so a scout can record them at
+    -- scan time; these are staging only. Once a connection backs the sig the
+    -- connection owns the state (one hole, two sigs, one connection — the
+    -- connection is the single copy both sides read), and these are cleared.
+    ALTER TABLE map_signatures ADD COLUMN IF NOT EXISTS mass_status TEXT NOT NULL DEFAULT '';
+    ALTER TABLE map_signatures ADD COLUMN IF NOT EXISTS time_status TEXT NOT NULL DEFAULT '';
+
     ALTER TABLE map_connections ADD COLUMN IF NOT EXISTS broken_at TIMESTAMPTZ;
     UPDATE map_connections SET broken_at = NOW() WHERE broken = TRUE AND broken_at IS NULL;
     CREATE INDEX IF NOT EXISTS idx_map_connections_broken_at

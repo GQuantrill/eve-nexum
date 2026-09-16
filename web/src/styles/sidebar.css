@@ -2432,3 +2432,44 @@ select.sig-toolbar-btn option {
 .wh-picker__placeholder { color: var(--text-bright); font-size: calc(14px * var(--font-scale, 1)); }
 .wh-picker__inbound { color: var(--text-faintest); font-size: calc(13px * var(--font-scale, 1)); font-style: italic; margin-left: 4px; }
 
+/* Wormhole mass/life chips in the signature table. Two chips rather than two
+   columns — the table is crowded enough already. Colours match the connection
+   edge so the map and the table read the same. */
+.sig-whstate {
+  display: inline-flex;
+  gap: 3px;
+}
+
+.sig-whstate__chip {
+  min-width: 26px;
+  padding: 0 4px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: none;
+  color: var(--text-dim);
+  font-size: calc(11px * var(--font-scale, 1));
+  font-weight: 700;
+  line-height: 1.5;
+  cursor: pointer;
+  user-select: none;
+}
+
+.sig-whstate__chip:hover { border-color: var(--border-accent); }
+
+.sig-whstate__chip--mass-destabilized {
+  border-color: var(--cv-conn-1h);
+  color: var(--cv-conn-1h);
+}
+
+.sig-whstate__chip--mass-critical {
+  border-color: var(--cv-conn-expired);
+  color: var(--cv-conn-expired);
+}
+
+.sig-whstate__chip--time-eol,
+.sig-whstate__chip--time-lessThan4h,
+.sig-whstate__chip--time-lessThan1h,
+.sig-whstate__chip--time-expired {
+  border-color: var(--cv-conn-eol);
+  color: var(--cv-conn-eol);
+}

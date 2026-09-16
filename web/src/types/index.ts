@@ -118,6 +118,11 @@ export interface Signature {
   /** Ghost sites only: the tier a scout picked by hand. Blank means "read it
    *  from the site name", which is what a pasted scan gives you. */
   ghostType: string;
+  /** Mass/life observed at the hole before it was jumped. Staging only: once a
+   *  connection backs this sig the connection owns the state and these clear.
+   *  See utils/whState.ts. */
+  massStatus: MassStatus | '';
+  timeStatus: TimeStatus | '';
   createdAt: string;
   updatedAt: string;
 }

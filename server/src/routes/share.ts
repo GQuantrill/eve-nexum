@@ -189,6 +189,7 @@ shareRouter.get('/:token', async (req, res) => {
             `SELECT s.id, s.system_id AS "systemId", s.sig_id AS "sigId",
                     s.sig_type AS "sigType", s.name, s.notes,
                     s.wh_type AS "whType", s.wh_leads_to AS "whLeadsTo", s.ghost_type AS "ghostType",
+                    s.mass_status AS "massStatus", s.time_status AS "timeStatus",
                     s.created_at AS "createdAt", s.updated_at AS "updatedAt"
              FROM map_signatures s
              JOIN map_systems sys ON sys.id = s.system_id

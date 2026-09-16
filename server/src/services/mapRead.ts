@@ -169,6 +169,7 @@ export async function loadSystemSignatures(systemId: string) {
   const { rows } = await db.query(
     `SELECT id, sig_id AS "sigId", sig_type AS "sigType", name, notes,
             wh_type AS "whType", wh_leads_to AS "whLeadsTo", ghost_type AS "ghostType",
+            mass_status AS "massStatus", time_status AS "timeStatus",
             created_at AS "createdAt", updated_at AS "updatedAt"
        FROM map_signatures WHERE system_id = $1 ORDER BY created_at`,
     [systemId],

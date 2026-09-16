@@ -35,6 +35,8 @@ const inThisMap = (n: number) => `system_id IN (SELECT id FROM map_systems WHERE
 export interface SignatureInput {
   sigId: string; sigType: string; name: string; notes: string; whType: string; whLeadsTo: string;
   ghostType: string;
+  massStatus: string;
+  timeStatus: string;
 }
 
 // A signature carrying nothing at all — no scan id, no name, no notes, no
@@ -54,11 +56,13 @@ function logIfContentless(mapId: string, systemId: string, d: SignatureInput, ac
 export async function createSignature(mapId: string, systemId: string, d: SignatureInput, actor: WriteActor) {
   logIfContentless(mapId, systemId, d, actor);
   const { rows } = await db.query(
-    `INSERT INTO map_signatures (system_id, sig_id, sig_type, name, notes, wh_type, wh_leads_to, ghost_type, created_by_user_id)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+    `INSERT INTO map_signatures (system_id, sig_id, sig_type, name, notes, wh_type, wh_leads_to, ghost_type, mass_status, time_status, created_by_user_id)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
      RETURNING id, sig_id AS "sigId", sig_type AS "sigType", name, notes, wh_type AS "whType", wh_leads_to AS "whLeadsTo",
-               ghost_type AS "ghostType", created_at AS "createdAt"`,
-    [systemId, d.sigId, d.sigType, d.name, d.notes, d.whType, d.whLeadsTo, d.ghostType, actor.userId],
+               ghost_type AS "ghostType", mass_status AS "massStatus", time_status AS "timeStatus",
+               created_at AS "createdAt"`,
+    [systemId, d.sigId, d.sigType, d.name, d.notes, d.whType, d.whLeadsTo, d.ghostType,
+     d.massStatus, d.timeStatus, actor.userId],
   );
   db.query(`INSERT INTO user_events (user_id, event_type, sig_type) VALUES ($1, 'signature', $2)`,
     [actor.userId, d.sigType]).catch(console.error);
@@ -71,7 +75,7 @@ export async function createSignature(mapId: string, systemId: string, d: Signat
 
 const SIG_COLS: Record<string, string> = {
   sigId: 'sig_id', sigType: 'sig_type', name: 'name', notes: 'notes', whType: 'wh_type', whLeadsTo: 'wh_leads_to',
-  ghostType: 'ghost_type',
+  ghostType: 'ghost_type', massStatus: 'mass_status', timeStatus: 'time_status',
 };
 
 // Updates the signature and returns flags the route uses to drive the K162
