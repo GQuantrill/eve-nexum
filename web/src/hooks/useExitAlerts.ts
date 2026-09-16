@@ -5,7 +5,7 @@ import { useUserSetting } from './useUserSetting';
 import { systemDisplayName } from '../utils/systemName';
 import { toast } from '../utils/toastStore';
 import {
-  NOTIFY, fireDesktopNotification, EXITS_MIN_SECURITY_KEY, EXITS_MIN_SECURITY_DEFAULT,
+  NOTIFY, alertGain, fireDesktopNotification, EXITS_MIN_SECURITY_KEY, EXITS_MIN_SECURITY_DEFAULT,
 } from '../utils/notificationPrefs';
 
 // The k-space classes that can be an exit. Wormhole systems never are.
@@ -29,7 +29,7 @@ function playExitChime() {
     o.frequency.value = 660;
     o.type = 'square';
     g.gain.setValueAtTime(0.001, ctx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.14, ctx.currentTime + 0.02);
+    g.gain.exponentialRampToValueAtTime(alertGain(0.14), ctx.currentTime + 0.02);
     g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
     o.connect(g);
     g.connect(ctx.destination);

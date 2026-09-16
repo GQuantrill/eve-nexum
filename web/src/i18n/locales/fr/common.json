@@ -1463,6 +1463,7 @@
     "notifExitsLowSec": "Basse sécurité ou mieux",
     "notifExitsAny": "Tout k-space",
     "notifExitsHint": "Alerte une fois lorsqu’une sortie d’au moins cette sécurité apparaît dans la chaîne. Désactivé par défaut.",
+    "notifVolume": "Volume des alertes — {{pct}} %",
     "openOptions": "Options de carte",
     "optimizeConnections": "⟳ Optimiser les connexions",
     "panelBelow": "Sous la carte",

@@ -1463,6 +1463,7 @@
     "notifExitsLowSec": "Low-sec and better",
     "notifExitsAny": "Any k-space",
     "notifExitsHint": "Alerts once when an exit of at least this security appears on the chain. Off by default.",
+    "notifVolume": "Alert volume — {{pct}}%",
     "openOptions": "Map options",
     "optimizeConnections": "⟳ Optimize Connections",
     "panelBelow": "Below map",

@@ -20,7 +20,7 @@ import {
 } from "../../hooks/useMinimapPosition";
 import { useUserSetting } from "../../hooks/useUserSetting";
 import { normalizePlacement } from "../../hooks/useLocationTracking";
-import { NOTIFY, notifyDefault, EXITS_MIN_SECURITY_KEY, EXITS_MIN_SECURITY_DEFAULT } from "../../utils/notificationPrefs";
+import { NOTIFY, notifyDefault, previewAlertVolume, ALERT_VOLUME_KEY, ALERT_VOLUME_DEFAULT, EXITS_MIN_SECURITY_KEY, EXITS_MIN_SECURITY_DEFAULT } from "../../utils/notificationPrefs";
 import { useResettableState } from "../../hooks/useResettableState";
 import { DEFAULT_BOOKMARK_FORMAT, BOOKMARK_TOKENS, DEFAULT_SITE_BOOKMARK_FORMAT, SITE_BOOKMARK_TOKENS } from "../../utils/signatureBookmark";
 import { toPng } from "html-to-image";
@@ -915,6 +915,7 @@ export function MapSidebar() {
   const compactMode = useMapStore((s) => s.compactMode);
   const panelSideBySide = useMapStore((s) => s.panelSideBySide);
   const [exitsMinSec, setExitsMinSec] = useUserSetting<number>(EXITS_MIN_SECURITY_KEY, EXITS_MIN_SECURITY_DEFAULT);
+  const [alertVolume, setAlertVolume] = useUserSetting<number>(ALERT_VOLUME_KEY, ALERT_VOLUME_DEFAULT);
   const setPanelSideBySide = useMapStore((s) => s.setPanelSideBySide);
   const setCompactMode = useMapStore((s) => s.setCompactMode);
   const showMinimap = useMapStore((s) => s.showMinimap);
@@ -1565,6 +1566,25 @@ export function MapSidebar() {
             />
           </label>
           <div className="map-sidebar__hint">{t("mapSidebar.notifExitsHint")}</div>
+
+          {/* Alert volume. The chimes are generated in code rather than played
+              from a file, so this scales their gain — and macOS has no per-app
+              volume to fall back on. Releasing the slider plays a sample, since
+              a number alone tells you nothing about how loud it actually is. */}
+          <label className="map-sidebar__field">
+            <span>{t("mapSidebar.notifVolume", { pct: alertVolume })}</span>
+            <input
+              type="range"
+              min={0}
+              max={100}
+              step={5}
+              value={alertVolume}
+              onChange={(e) => setAlertVolume(Number(e.target.value))}
+              onMouseUp={() => previewAlertVolume()}
+              onKeyUp={() => previewAlertVolume()}
+              aria-label={t("mapSidebar.notifVolume", { pct: alertVolume })}
+            />
+          </label>
         </CollapsibleSection>
 
         <CollapsibleSection title={t("mapSidebar.sections.announcer")} {...sectionProps("announcer")}>

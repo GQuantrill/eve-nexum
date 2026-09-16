@@ -761,6 +761,7 @@ const SETTINGS_ALLOWLIST = new Set<string>([
   'nexum.notify.proximity.sound',
   'nexum.notify.watchlist.desktop',
   'nexum.notify.exits.desktop',
+  'nexum.notify.volume',
   'nexum.notify.exits.sound',
   'nexum.notify.exitsMinSecurity',
   'nexum.customIntel',

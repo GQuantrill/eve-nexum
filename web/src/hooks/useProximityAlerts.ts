@@ -6,7 +6,7 @@ import { useRoute } from './useRoute';
 import { useStandings } from './useStandings';
 import { ensureSovLoaded, getSovEntries } from './useSovData';
 import { useUserSetting, readUserSetting, writeUserSetting } from './useUserSetting';
-import { NOTIFY, notifyOn } from '../utils/notificationPrefs';
+import { NOTIFY, notifyOn, alertGain } from '../utils/notificationPrefs';
 import { useDebugFlag } from '../utils/debugFlags';
 
 export type ThreatKind = 'incursion' | 'insurgency' | 'hostile-sov';
@@ -57,7 +57,7 @@ function playBeep() {
     o.frequency.value = 880;
     o.type = 'sine';
     g.gain.setValueAtTime(0.001, ctx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.25, ctx.currentTime + 0.02);
+    g.gain.exponentialRampToValueAtTime(alertGain(0.25), ctx.currentTime + 0.02);
     g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
     o.connect(g);
     g.connect(ctx.destination);

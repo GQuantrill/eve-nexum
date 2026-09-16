@@ -1,5 +1,5 @@
 import { toast } from './toastStore';
-import { NOTIFY, notifyOn, anyChannelOn, fireDesktopNotification } from './notificationPrefs';
+import { NOTIFY, notifyOn, anyChannelOn, alertGain, fireDesktopNotification } from './notificationPrefs';
 
 // Audio context is created lazily on first use to avoid autoplay-policy issues.
 let audioCtx: AudioContext | null = null;
@@ -14,7 +14,7 @@ function playBeep() {
     o.frequency.value = 1320;
     o.type = 'sawtooth';
     g.gain.setValueAtTime(0.001, ctx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.18, ctx.currentTime + 0.02);
+    g.gain.exponentialRampToValueAtTime(alertGain(0.18), ctx.currentTime + 0.02);
     g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
     o.connect(g);
     g.connect(ctx.destination);

@@ -6,7 +6,7 @@ import { useWatchlist } from './useWatchlist';
 import { systemDisplayName } from '../utils/systemName';
 import { matchSystem, matchConnection } from '../utils/watchMatch';
 import { toast } from '../utils/toastStore';
-import { NOTIFY, fireDesktopNotification } from '../utils/notificationPrefs';
+import { NOTIFY, alertGain, fireDesktopNotification } from '../utils/notificationPrefs';
 
 // Lazily-created shared audio context (autoplay policy: only on first sound).
 let audioCtx: AudioContext | null = null;
@@ -24,7 +24,7 @@ function playWatchChime() {
     o.frequency.value = 988;
     o.type = 'triangle';
     g.gain.setValueAtTime(0.001, ctx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.16, ctx.currentTime + 0.02);
+    g.gain.exponentialRampToValueAtTime(alertGain(0.16), ctx.currentTime + 0.02);
     g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
     o.connect(g);
     g.connect(ctx.destination);

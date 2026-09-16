@@ -19,6 +19,53 @@ export const NOTIFY = {
   exitsSound:       'nexum.notify.exits.sound',
 } as const;
 
+/**
+ * Alert volume, 0–100. Nexum's chimes are generated rather than played from a
+ * file, so their loudness is a gain value in code — there was no way to turn
+ * them down, and macOS has no per-app volume to fall back on.
+ */
+export const ALERT_VOLUME_KEY = 'nexum.notify.volume';
+export const ALERT_VOLUME_DEFAULT = 100;
+
+/**
+ * Scale a chime's peak gain by the user's volume. Each alert keeps its own
+ * relative loudness (they're deliberately different, so the ear can tell them
+ * apart) — this just moves them all together.
+ */
+export function alertGain(peak: number): number {
+  const pct = readUserSetting<number>(ALERT_VOLUME_KEY, ALERT_VOLUME_DEFAULT);
+  const clamped = Math.min(100, Math.max(0, Number(pct) || 0));
+  // Perceived loudness is closer to the square of amplitude than to amplitude,
+  // so square the fraction — a 50% slider then sounds about half as loud.
+  const scale = (clamped / 100) ** 2;
+  // Web Audio's exponential ramps can't reach 0, so floor at something
+  // inaudible rather than silent. Muting is the channel toggle's job.
+  return Math.max(peak * scale, 0.00001);
+}
+
+/**
+ * Play a short sample at the current volume, so the slider can be set by ear.
+ * Deliberately the proximity tone (the loudest of the four) — set that
+ * comfortably and nothing else will startle you.
+ */
+export function previewAlertVolume(): void {
+  try {
+    const Ctx = window.AudioContext
+      ?? (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    const ctx = new Ctx();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.frequency.value = 880;
+    o.type = 'sine';
+    g.gain.setValueAtTime(0.001, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(alertGain(0.25), ctx.currentTime + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(); o.stop(ctx.currentTime + 0.34);
+    setTimeout(() => void ctx.close(), 600);
+  } catch { /* audio blocked / unavailable — silent fail */ }
+}
+
 /** Lowest security that counts as an exit worth alerting on. */
 export const EXITS_MIN_SECURITY_KEY = 'nexum.notify.exitsMinSecurity';
 export const EXITS_MIN_SECURITY_DEFAULT = 0.45;
