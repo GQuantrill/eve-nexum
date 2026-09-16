@@ -180,16 +180,36 @@ function GhostTypeCell({ sig, isShareMode, onChange }: {
  */
 const MASS_CYCLE: Array<MassStatus | ''> = ['', 'destabilized', 'critical'];
 
-function WhStateCell({ sig, conn, isShareMode, onChange }: {
+function WhStateCell({ sig, conn, whTypes, isShareMode, onChange }: {
   sig:         Signature;
   conn:        MapConnection | undefined;
+  whTypes:     ReturnType<typeof useWormholeTypes>;
   isShareMode: boolean;
   onChange:    (patch: { massStatus?: MassStatus | ''; timeStatus?: TimeStatus | '' }) => void;
 }) {
   const { t } = useTranslation();
+  // Drive off the shared tick rather than the module's `tickNow` directly:
+  // that value only advances while something is subscribed, and the Age /
+  // Updated columns that normally do the subscribing can be hidden. Reading it
+  // unsubscribed froze the clock at page load, so a hole an hour from closing
+  // still measured as four hours out.
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    const fn = () => setTick((n) => n + 1);
+    tickSubs.add(fn);
+    startTickIfNeeded();
+    return () => {
+      tickSubs.delete(fn);
+      if (tickSubs.size === 0 && tickTimer) {
+        clearInterval(tickTimer);
+        tickTimer = null;
+      }
+    };
+  }, []);
+
   if (sig.sigType !== 'wormhole') return null;
 
-  const state = effectiveWhState(sig, conn);
+  const state = effectiveWhState(sig, conn, whTypes, tickNow);
   // EVE's own wording for the two reduced states — clearer than a symbol,
   // and it matches what show-info tells you at the hole.
   const massLabel = state.massStatus === 'critical' ? '<10%'
@@ -1361,6 +1381,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                     <WhStateCell
                       sig={sig}
                       conn={connectionForSig(sig.id, mapConnections)}
+                      whTypes={whTypes}
                       isShareMode={isShareMode}
                       onChange={(patch) => setWhState(sig, patch)}
                     />

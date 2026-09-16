@@ -1,4 +1,6 @@
 import type { MapConnection, MassStatus, Signature, TimeStatus } from '../types';
+import type { WormholeSpec } from '../hooks/useWormholeTypes';
+import { effectiveExpiryMs, lifeBucket } from './whLifetime';
 
 /**
  * A wormhole is one physical hole described by three rows: a signature each
@@ -33,19 +35,36 @@ export function connectionForSig(
   );
 }
 
-/** What to SHOW for a signature: the connection's state, else its own staging. */
-export function effectiveWhState(sig: Signature, conn: MapConnection | undefined): WhState {
+/**
+ * What to SHOW for a signature: the connection's state, else its own staging.
+ *
+ * The life bucket is DERIVED from the hole's expiry, exactly as the map edge
+ * derives it — not read from the stored `timeStatus`. The two can drift (a hole
+ * ages past its stored bucket, or an older write set a bucket without an
+ * expiry), and when they do, the table and the map disagree in front of the
+ * user. One source, one answer.
+ */
+export function effectiveWhState(
+  sig: Signature,
+  conn: MapConnection | undefined,
+  whTypes: Record<string, WormholeSpec> = {},
+  now: number = Date.now(),
+): WhState {
   if (conn) {
     // A connection spells "nothing noted" as stable/fresh; the sig cell spells
     // it blank. Normalise both, or the chip can't find its place in the cycle
     // and sticks on its first value.
     const mass = conn.massStatus ?? '';
-    const time = conn.timeStatus ?? '';
+    const expiry = effectiveExpiryMs(conn, whTypes);
+    // No known lifetime (untyped hole) → fall back to whatever bucket is stored.
+    const bucket = expiry != null
+      ? lifeBucket(expiry - now)
+      : ((conn.timeStatus ?? '') as TimeStatus | '');
     return {
       massStatus: mass === 'stable' ? '' : (mass as MassStatus | ''),
       // 'fresh' means nothing worth showing; every warning bucket is shown as
       // itself so the chip reads the same as the edge label.
-      timeStatus: time === 'fresh' ? '' : (time as TimeStatus | ''),
+      timeStatus: bucket === 'fresh' ? '' : bucket,
     };
   }
   return { massStatus: sig.massStatus ?? '', timeStatus: sig.timeStatus ?? '' };
@@ -87,7 +106,12 @@ export function lifePatch(
   conn: Pick<MapConnection, 'type'>,
   whTypes: Record<string, { lifetimeHours?: number }> = {},
 ): Partial<MapConnection> {
-  const inMs = (h: number) => new Date(Date.now() + h * 3_600_000).toISOString();
+  // Land just INSIDE the bucket, not exactly on its edge. The boundary test is
+  // inclusive (<=), and the map edge only re-reads the clock every 30s — so an
+  // expiry set to exactly 4h reads as "a shade over 4h" there and renders as
+  // the bucket above, leaving the table and the map disagreeing.
+  const INSET_MS = 60_000;
+  const inMs = (h: number) => new Date(Date.now() + h * 3_600_000 - INSET_MS).toISOString();
   const hours = bucket ? BUCKET_HOURS[bucket] : undefined;
   if (hours != null) {
     return { timeStatus: bucket as TimeStatus, eolAt: null, lifetimeExpiresAt: inMs(hours) };
