@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   ReactFlow, Background, Controls, ControlButton, MiniMap,
@@ -89,6 +89,10 @@ const MULTI_SELECT_KEYS = ['Shift', IS_MAC ? 'Meta' : 'Control'];
 const NODE_TYPES = { system: SystemNode };
 
 // Zoom bounds — shared by the <ReactFlow> props and the inverted-wheel handler.
+// Frames to hold the viewport after a docked panel opens/closes, covering the
+// 400ms re-fit animation at 60fps with headroom. Short enough that it can't
+// noticeably fight a user pan.
+const VIEWPORT_HOLD_FRAMES = 32;
 const MIN_ZOOM = 0.2;
 const MAX_ZOOM = 2;
 
@@ -167,6 +171,7 @@ export function MapCanvas() {
   const selectedSystemId     = useMapStore((s) => s.selectedSystemId);
   const selectSystem         = useMapStore((s) => s.selectSystem);
   const selectedConnectionId = useMapStore((s) => s.selectedConnectionId);
+  const activeMapId          = useMapStore((s) => s.activeMapId);
   const routeHighlight       = useMapStore((s) => s.routeHighlight);
   const snapToGrid           = useMapStore((s) => s.snapToGrid);
   const showMinimap          = useMapStore((s) => s.showMinimap);
@@ -696,6 +701,40 @@ export function MapCanvas() {
     });
     return () => { cancelAnimationFrame(raf1); cancelAnimationFrame(raf2); };
   }, [fitViewPending, clearFitView, fitView, getNodes]);
+
+  // Opening a docked panel resizes the canvas, and React Flow re-fits the view
+  // to the new size — which yanks the map out from under you the first time you
+  // click a system ("the whole map zooms out"). It only bites when the panel
+  // OPENS, since clicking a second system while it's already open resizes
+  // nothing, which is why it looked intermittent.
+  //
+  // The zoom the user set is theirs, so hold it across the resize rather than
+  // trying to out-argue React Flow's internal re-fit bookkeeping. Captured in a
+  // layout effect (before the browser paints the new size) and reasserted for
+  // the length of the re-fit animation, so the viewport simply never moves.
+  const panelOpen = selectedSystemId != null || selectedConnectionId != null;
+  const prevPanelOpen = useRef(panelOpen);
+  const heldForMapId  = useRef(activeMapId);
+  useLayoutEffect(() => {
+    const mapChanged = heldForMapId.current !== activeMapId;
+    heldForMapId.current = activeMapId;
+    if (panelOpen === prevPanelOpen.current) return;
+    prevPanelOpen.current = panelOpen;
+    // Switching maps clears the selection, so the panel closes in the same tick
+    // — but that map genuinely needs fitting to. Hold only when the panel is the
+    // only thing that moved.
+    if (mapChanged) return;
+    // A fit we asked for ourselves (region seed) must still win.
+    if (useMapStore.getState().fitViewPending) return;
+
+    const held = getViewport();
+    let frames = 0;
+    let raf = requestAnimationFrame(function hold() {
+      setViewport(held);
+      if (++frames < VIEWPORT_HOLD_FRAMES) raf = requestAnimationFrame(hold);
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [panelOpen, activeMapId, getViewport, setViewport]);
 
   // Sweep expired EOL connections every minute. A connection is considered
   // expired 4 h + 30 min grace after the user marked it EOL. The 30 min grace
