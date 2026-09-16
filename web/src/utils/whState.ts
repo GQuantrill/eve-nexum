@@ -17,6 +17,12 @@ export interface WhState {
   timeStatus: TimeStatus | '';
 }
 
+/**
+ * A hole's life is tracked as an EXPIRY, with the warning bucket derived from
+ * it — there is no 'eol' bucket to set. ('eolAt' is a legacy column nothing
+ * writes any more.) So recording a life state means writing the expiry.
+ */
+
 /** The connection backing a signature, if one has been linked to it. */
 export function connectionForSig(
   sigId: string,
@@ -37,7 +43,9 @@ export function effectiveWhState(sig: Signature, conn: MapConnection | undefined
     const time = conn.timeStatus ?? '';
     return {
       massStatus: mass === 'stable' ? '' : (mass as MassStatus | ''),
-      timeStatus: time === 'fresh'  ? '' : (time as TimeStatus | ''),
+      // 'fresh' means nothing worth showing; every warning bucket is shown as
+      // itself so the chip reads the same as the edge label.
+      timeStatus: time === 'fresh' ? '' : (time as TimeStatus | ''),
     };
   }
   return { massStatus: sig.massStatus ?? '', timeStatus: sig.timeStatus ?? '' };
@@ -53,4 +61,38 @@ export function pendingWhState(sig: Signature): Partial<WhState> | null {
   if (sig.massStatus) patch.massStatus = sig.massStatus;
   if (sig.timeStatus) patch.timeStatus = sig.timeStatus;
   return Object.keys(patch).length > 0 ? patch : null;
+}
+
+/**
+ * The hours of life each bucket represents. Marking a bucket sets the expiry
+ * that far out; the bucket itself is derived from the expiry, so writing it on
+ * its own is recomputed away within seconds.
+ */
+const BUCKET_HOURS: Partial<Record<TimeStatus, number>> = {
+  lessThan24h: 24,
+  lessThan4h:  4,
+  lessThan1h:  1,
+};
+
+/** Life states the chip cycles through: unknown, then EVE's three warnings. */
+export const LIFE_CYCLE: Array<TimeStatus | ''> = ['', 'lessThan24h', 'lessThan4h', 'lessThan1h'];
+
+/**
+ * The connection patch for a chosen life bucket, or for clearing back to
+ * unknown — which restores the hole's full life when its type is known, and
+ * otherwise just drops the manual expiry so it ages naturally again.
+ */
+export function lifePatch(
+  bucket: TimeStatus | '',
+  conn: Pick<MapConnection, 'type'>,
+  whTypes: Record<string, { lifetimeHours?: number }> = {},
+): Partial<MapConnection> {
+  const inMs = (h: number) => new Date(Date.now() + h * 3_600_000).toISOString();
+  const hours = bucket ? BUCKET_HOURS[bucket] : undefined;
+  if (hours != null) {
+    return { timeStatus: bucket as TimeStatus, eolAt: null, lifetimeExpiresAt: inMs(hours) };
+  }
+  const code = (conn.type ?? '').trim().toUpperCase();
+  const maxLife = code ? (code === 'K162' ? 24 : whTypes[code]?.lifetimeHours ?? null) : null;
+  return { timeStatus: 'fresh', eolAt: null, lifetimeExpiresAt: maxLife ? inMs(maxLife) : null };
 }

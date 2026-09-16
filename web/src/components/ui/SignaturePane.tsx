@@ -10,7 +10,7 @@ import { systemDisplayName } from '../../utils/systemName';
 import { useUserSetting } from '../../hooks/useUserSetting';
 import { usePopover } from '../../hooks/usePopover';
 import type { Signature, SigType, MapConnection, MassStatus, TimeStatus } from '../../types';
-import { connectionForSig, effectiveWhState } from '../../utils/whState';
+import { connectionForSig, effectiveWhState, lifePatch, LIFE_CYCLE } from '../../utils/whState';
 import { ConfirmModal } from './ConfirmModal';
 import { shouldSkipConfirm } from '../../utils/confirmPref';
 import { NotesEditor } from './NotesEditor';
@@ -179,7 +179,6 @@ function GhostTypeCell({ sig, isShareMode, onChange }: {
  * appears. Two chips rather than two columns — the table is crowded enough.
  */
 const MASS_CYCLE: Array<MassStatus | ''> = ['', 'destabilized', 'critical'];
-const TIME_CYCLE: Array<TimeStatus | ''> = ['', 'eol'];
 
 function WhStateCell({ sig, conn, isShareMode, onChange }: {
   sig:         Signature;
@@ -196,7 +195,11 @@ function WhStateCell({ sig, conn, isShareMode, onChange }: {
   const massLabel = state.massStatus === 'critical' ? '<10%'
                   : state.massStatus === 'destabilized' ? '<50%'
                   : '\u2013';
-  const timeLabel = state.timeStatus ? 'EOL' : '\u2013';
+  const timeLabel = state.timeStatus === 'lessThan1h'  ? '<1h'
+                  : state.timeStatus === 'lessThan4h'  ? '<4h'
+                  : state.timeStatus === 'lessThan24h' ? '<24h'
+                  : state.timeStatus === 'expired'     ? '!'
+                  : '\u2013';
 
   if (isShareMode) {
     return (
@@ -223,7 +226,7 @@ function WhStateCell({ sig, conn, isShareMode, onChange }: {
       <button
         type="button"
         className={`sig-whstate__chip sig-whstate__chip--time-${state.timeStatus || 'none'}`}
-        onClick={() => onChange({ timeStatus: cycle(TIME_CYCLE, state.timeStatus) })}
+        onClick={() => onChange({ timeStatus: cycle(LIFE_CYCLE, state.timeStatus) })}
         title={t('signatures.whStateLife')}
         aria-label={t('signatures.whStateLife')}
       >
@@ -681,7 +684,10 @@ export function SignaturePane({ systemId }: { systemId: string }) {
         // The connection spells "nothing noted" as stable/fresh; the sig cell
         // spells it blank. Translate rather than storing a third vocabulary.
         ...(patch.massStatus !== undefined ? { massStatus: patch.massStatus || 'stable' } : {}),
-        ...(patch.timeStatus !== undefined ? { timeStatus: patch.timeStatus || 'fresh' } : {}),
+        // A hole's life is tracked as an EXPIRY; timeStatus is derived from it.
+        // Setting the bucket on its own is recomputed away within seconds, which
+        // is why marking EOL used to come back as "< 1 day".
+        ...(patch.timeStatus !== undefined ? lifePatch(patch.timeStatus, conn, whTypes) : {}),
       });
       return;
     }

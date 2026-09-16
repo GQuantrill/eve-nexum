@@ -1782,7 +1782,7 @@
     "colWhState": "Status",
     "colWhStateHint": "Masse und Restlebensdauer eines Wurmlochs. Beides lässt sich im All am Loch ablesen, also schon vor dem Sprung eintragbar.",
     "whStateMass": "Masse: klicken für voll / unter 50 % / unter 10 %",
-    "whStateLife": "Lebensdauer: klicken für Lebensende",
+    "whStateLife": "Lebensdauer: klicken für unbekannt / unter 1 Tag / unter 4 Stunden / unter 1 Stunde",
     "colName": "Name",
     "colNotes": "Notizen",
     "colAge": "Alter",

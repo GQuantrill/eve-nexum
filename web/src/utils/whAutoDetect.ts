@@ -1,6 +1,6 @@
 import { useMapStore } from '../store/mapStore';
 import type { Signature, MapConnection } from '../types';
-import { pendingWhState } from './whState';
+import { pendingWhState, lifePatch } from './whState';
 
 /**
  * After a signature was edited or deleted, re-evaluate every connection that
@@ -113,7 +113,12 @@ export function reevaluateConnectionsForSystem(
           const staged = pendingWhState(linkSig);
           if (staged) {
             if (staged.massStatus && !conn.massStatus) patch.massStatus = staged.massStatus;
-            if (staged.timeStatus && !conn.timeStatus) patch.timeStatus = staged.timeStatus;
+            // Life is an expiry with the bucket derived from it, so hand the
+            // staged EOL over as an expiry — copying the bucket alone would be
+            // recomputed away seconds later.
+            if (staged.timeStatus && !conn.lifetimeExpiresAt) {
+              Object.assign(patch, lifePatch(staged.timeStatus, conn));
+            }
             onStagedConsumed?.(linkSig.id);
           }
         }

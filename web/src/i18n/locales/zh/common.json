@@ -1782,7 +1782,7 @@
     "colWhState": "状态",
     "colWhStateHint": "虫洞的质量与剩余寿命。二者在太空中看洞即可得知，因此跳跃前就能记录。",
     "whStateMass": "质量：点击切换 充足 / 低于 50% / 低于 10%",
-    "whStateLife": "寿命：点击标记为寿命末期",
+    "whStateLife": "寿命：点击切换 未知 / 不足 1 天 / 不足 4 小时 / 不足 1 小时",
     "colName": "名称",
     "colNotes": "笔记",
     "colAge": "存在时长",

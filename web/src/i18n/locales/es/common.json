@@ -1782,7 +1782,7 @@
     "colWhState": "Estado",
     "colWhStateHint": "Masa y vida restante del agujero. Ambas se leen en el propio agujero, así que pueden fijarse antes de saltarlo.",
     "whStateMass": "Masa: clic para ciclar completa / menos del 50 % / menos del 10 %",
-    "whStateLife": "Vida: clic para marcar fin de vida",
+    "whStateLife": "Vida: clic para ciclar desconocida / menos de 1 día / menos de 4 horas / menos de 1 hora",
     "colName": "Nombre",
     "colNotes": "Notas",
     "colAge": "Antigüedad",

@@ -2467,10 +2467,20 @@ select.sig-toolbar-btn option {
   color: var(--cv-conn-expired);
 }
 
-.sig-whstate__chip--time-eol,
-.sig-whstate__chip--time-lessThan4h,
-.sig-whstate__chip--time-lessThan1h,
-.sig-whstate__chip--time-expired {
+/* Life buckets use the same colours as the edge label, so the table and the
+   map agree at a glance: < 1 day neutral, then amber, then red. */
+.sig-whstate__chip--time-lessThan24h {
   border-color: var(--cv-conn-eol);
   color: var(--cv-conn-eol);
+}
+
+.sig-whstate__chip--time-lessThan4h {
+  border-color: var(--cv-conn-4h);
+  color: var(--cv-conn-4h);
+}
+
+.sig-whstate__chip--time-lessThan1h,
+.sig-whstate__chip--time-expired {
+  border-color: var(--cv-conn-expired);
+  color: var(--cv-conn-expired);
 }
