@@ -100,7 +100,7 @@ export function ScoutConnectionsPane({ scoutSystem }: Props) {
   // ties. What's wanted here is how far each exit sits from you by ordinary
   // travel. The other hub and mapped chains stay in — those are real shortcuts.
   const routes = useRoute(origin.systemId, targetIds, 'active', {
-    excludeScout: scoutSystem === 'Thera' ? 'thera' : 'turnur',
+    viaScout: scoutSystem === 'Thera' ? 'thera' : 'turnur',
   });
 
   // Two sort modes:
