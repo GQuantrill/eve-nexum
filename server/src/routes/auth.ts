@@ -777,6 +777,7 @@ const SETTINGS_ALLOWLIST = new Set<string>([
   'nexum.anomPane.overwriteDelay',
   'nexum.sidebar.collapsed',
   'nexum.sidebar.hidden',
+  'nexum.systemPanel.hidden',
   'nexum.sidebar.order',
   'nexum.sidebar.side',
   'nexum.staleThresholdH',

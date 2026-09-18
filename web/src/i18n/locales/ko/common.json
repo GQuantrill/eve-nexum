@@ -1888,7 +1888,9 @@
     "standingsNotLoaded": "스탠딩이 아직 로드되지 않았습니다. 계속 이 상태라면, 로그아웃 후 다시 로그인하여 read_contacts 스코프를 부여하세요.",
     "standingNotInBucket": "{{label}}: 어느 쪽에도 속하지 않음",
     "standingNotSet": "{{label}}: 스탠딩이 설정되지 않음",
-    "standingValue": "{{label}}: {{value}}"
+    "standingValue": "{{label}}: {{value}}",
+    "panesTitle": "패널",
+    "panesHint": "아래에 표시할 패널을 선택하세요. 숨긴 패널도 위치를 유지하므로 다시 켜면 원래 자리로 돌아옵니다."
   },
   "time": {
     "justNow": "방금",

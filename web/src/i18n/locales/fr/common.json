@@ -1888,7 +1888,9 @@
     "standingsNotLoaded": "Standings pas encore chargés. Si cela persiste, déconnectez-vous et reconnectez-vous pour accorder les scopes read_contacts.",
     "standingNotInBucket": "{{label}} : vous n'êtes dans aucun",
     "standingNotSet": "{{label}} : aucun standing défini",
-    "standingValue": "{{label}} : {{value}}"
+    "standingValue": "{{label}} : {{value}}",
+    "panesTitle": "Panneaux",
+    "panesHint": "Choisissez les panneaux affichés ci-dessous. Ceux masqués conservent leur place et y reviennent une fois réactivés."
   },
   "time": {
     "justNow": "à l'instant",

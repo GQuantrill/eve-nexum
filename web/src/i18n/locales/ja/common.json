@@ -1888,7 +1888,9 @@
     "standingsNotLoaded": "スタンディングがまだ読み込まれていません。これが続く場合は、ログアウトして再ログインし read_contacts スコープを付与してください。",
     "standingNotInBucket": "{{label}}: どれにも属していません",
     "standingNotSet": "{{label}}: スタンディング未設定",
-    "standingValue": "{{label}}: {{value}}"
+    "standingValue": "{{label}}: {{value}}",
+    "panesTitle": "パネル",
+    "panesHint": "下に表示するパネルを選びます。非表示にしたものも位置は保持され、再表示すると元の場所に戻ります。"
   },
   "time": {
     "justNow": "たった今",

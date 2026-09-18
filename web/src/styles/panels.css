@@ -199,6 +199,7 @@
   right: 0;
 }
 
+
 .system-panel__title {
   font-size: calc(16px * var(--font-scale, 1));
   font-weight: 600;
@@ -578,3 +579,11 @@
 .sys-info__chain-fx__tip-good { color: var(--success); }
 .sys-info__chain-fx__tip-bad  { color: var(--danger); }
 
+/* Thin bar above the pane stack holding the panel chooser. Lives with the
+   stack rather than in the system-info header, which can be collapsed away. */
+.system-panel__stack-bar {
+  display: flex;
+  justify-content: flex-end;
+  flex-shrink: 0;
+  margin-bottom: -2px;
+}

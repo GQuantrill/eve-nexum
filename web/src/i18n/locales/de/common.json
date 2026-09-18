@@ -1888,7 +1888,9 @@
     "standingsNotLoaded": "Standings noch nicht geladen. Wenn dies bestehen bleibt, melde dich ab und wieder an, um die read_contacts-Scopes zu gewähren.",
     "standingNotInBucket": "{{label}}: du bist in keiner",
     "standingNotSet": "{{label}}: kein Standing gesetzt",
-    "standingValue": "{{label}}: {{value}}"
+    "standingValue": "{{label}}: {{value}}",
+    "panesTitle": "Bereiche",
+    "panesHint": "Wähle, welche Bereiche unten erscheinen. Ausgeblendete behalten ihren Platz und kehren beim Wiedereinschalten dorthin zurück."
   },
   "time": {
     "justNow": "gerade eben",

@@ -1888,7 +1888,9 @@
     "standingsNotLoaded": "声望尚未加载。如果一直如此，请登出后重新登录以授予 read_contacts 权限。",
     "standingNotInBucket": "{{label}}：你不属于任何一类",
     "standingNotSet": "{{label}}：未设置声望",
-    "standingValue": "{{label}}：{{value}}"
+    "standingValue": "{{label}}：{{value}}",
+    "panesTitle": "面板",
+    "panesHint": "选择下方显示的面板。隐藏的面板会保留位置，重新开启时回到原处。"
   },
   "time": {
     "justNow": "刚刚",

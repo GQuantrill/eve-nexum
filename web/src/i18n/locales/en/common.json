@@ -1888,7 +1888,9 @@
     "standingsNotLoaded": "Standings not loaded yet. If this stays here, log out and back in to grant the read_contacts scopes.",
     "standingNotInBucket": "{{label}}: you are not in one",
     "standingNotSet": "{{label}}: no standing set",
-    "standingValue": "{{label}}: {{value}}"
+    "standingValue": "{{label}}: {{value}}",
+    "panesTitle": "Panels",
+    "panesHint": "Choose which panels appear below. Hidden ones keep their place, so switching one back on returns it to where you had it."
   },
   "time": {
     "justNow": "just now",

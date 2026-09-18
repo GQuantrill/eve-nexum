@@ -1918,7 +1918,9 @@
     "standingsNotLoaded": "Стендинги ещё не загружены. Если это не исчезнет, выйдите и войдите снова, чтобы выдать области read_contacts.",
     "standingNotInBucket": "{{label}}: вы не в одной из них",
     "standingNotSet": "{{label}}: стендинг не задан",
-    "standingValue": "{{label}}: {{value}}"
+    "standingValue": "{{label}}: {{value}}",
+    "panesTitle": "Панели",
+    "panesHint": "Выберите, какие панели показывать ниже. Скрытые сохраняют своё место и возвращаются на него при включении."
   },
   "time": {
     "justNow": "только что",

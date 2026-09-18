@@ -1888,7 +1888,9 @@
     "standingsNotLoaded": "Standings ainda não carregados. Se isto persistir, termina a sessão e volta a entrar para conceder os scopes read_contacts.",
     "standingNotInBucket": "{{label}}: não estás em nenhum",
     "standingNotSet": "{{label}}: sem standing definido",
-    "standingValue": "{{label}}: {{value}}"
+    "standingValue": "{{label}}: {{value}}",
+    "panesTitle": "Painéis",
+    "panesHint": "Escolha que painéis aparecem abaixo. Os ocultos mantêm o seu lugar e regressam a ele quando os reativar."
   },
   "time": {
     "justNow": "agora mesmo",

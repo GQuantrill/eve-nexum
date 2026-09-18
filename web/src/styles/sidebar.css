@@ -2485,20 +2485,20 @@ select.sig-toolbar-btn option {
   color: var(--cv-conn-expired);
 }
 
-/* Sidebar section chooser. */
-.sidebar-panels__hint {
+/* Panel-visibility chooser, shared by the sidebar and the system panel. */
+.panel-visibility__hint {
   margin: 0 0 10px;
   color: var(--text-dim);
   font-size: calc(12px * var(--font-scale, 1));
 }
 
-.sidebar-panels__list {
+.panel-visibility__list {
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
 
-.sidebar-panels__item {
+.panel-visibility__item {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -2508,7 +2508,7 @@ select.sig-toolbar-btn option {
   font-size: calc(13px * var(--font-scale, 1));
 }
 
-.sidebar-panels__item:hover { background: var(--surface-hover); }
+.panel-visibility__item:hover { background: var(--surface-hover); }
 
 /* Shown when every section has been switched off, so the column explains
    itself instead of just looking broken. */
@@ -2526,7 +2526,7 @@ select.sig-toolbar-btn option {
 
 .sidebar__empty p { margin: 0; }
 
-.sidebar-panels__empty {
+.panel-visibility__empty {
   margin: 10px 0 0;
   color: var(--cv-conn-1h);
   font-size: calc(12px * var(--font-scale, 1));

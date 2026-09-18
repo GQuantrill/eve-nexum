@@ -14,7 +14,7 @@ import { FleetPane } from './FleetPane';
 import { WatchlistBlock } from './WatchlistBlock';
 import { ChainsPane } from './ChainsPane';
 import { CaretLeftIcon, CaretRightIcon, ArrowLineLeftIcon, ArrowLineRightIcon, SquaresFourIcon } from '../../icons';
-import { SidebarPanelsModal } from './SidebarPanelsModal';
+import { PanelVisibilityModal } from './PanelVisibilityModal';
 import { useUserSetting } from '../../hooks/useUserSetting';
 import { useAuth } from '../../context/AuthContext';
 
@@ -250,7 +250,9 @@ export function Sidebar() {
       </DndContext>
 
       {panelsOpen && (
-        <SidebarPanelsModal
+        <PanelVisibilityModal
+          title={t('sidebar.panelsTitle')}
+          hint={t('sidebar.panelsHint')}
           panels={available.map((id) => ({ id, title: panelTitle[id] }))}
           isVisible={(id) => !hidden.has(id)}
           onToggle={togglePanel}
