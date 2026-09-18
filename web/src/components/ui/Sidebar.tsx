@@ -230,7 +230,17 @@ export function Sidebar() {
       <DndContext sensors={sensors} collisionDetection={closestCenter} modifiers={[restrictToVerticalAxis]} onDragEnd={handleDragEnd}>
         <SortableContext items={visibleOrder} strategy={verticalListSortingStrategy}>
           <div className="sidebar__content">
-            {visibleOrder.map(id => (
+            {visibleOrder.length === 0 ? (
+              // Everything switched off leaves a blank column that reads as a
+              // bug. Say what happened, and put the way back right here rather
+              // than relying on the header icon being recognised.
+              <div className="sidebar__empty">
+                <p>{t('sidebar.emptyTitle')}</p>
+                <button type="button" className="btn btn--ghost" onClick={() => setPanelsOpen(true)}>
+                  {t('sidebar.panelsTitle')}
+                </button>
+              </div>
+            ) : visibleOrder.map(id => (
               <DraggableCard key={id} id={id} title={panelTitle[id]}>
                 {cards[id]}
               </DraggableCard>

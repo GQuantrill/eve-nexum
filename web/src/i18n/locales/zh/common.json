@@ -1738,7 +1738,8 @@
     "moveToRight": "将侧栏移到右侧",
     "panelsTitle": "侧边栏板块",
     "panelsHint": "选择侧边栏中显示的板块。隐藏的板块会保留位置，重新开启时回到原处。",
-    "panelsAllHidden": "所有板块都已隐藏 — 侧边栏将是空的。"
+    "panelsAllHidden": "所有板块都已隐藏 — 侧边栏将是空的。",
+    "emptyTitle": "当前没有显示任何板块。在此选择要显示的板块。"
   },
   "sigType": {
     "combat": "战斗",

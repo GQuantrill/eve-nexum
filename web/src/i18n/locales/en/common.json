@@ -1738,7 +1738,8 @@
     "moveToRight": "Move sidebar to right",
     "panelsTitle": "Sidebar sections",
     "panelsHint": "Choose which sections appear in the sidebar. Hidden ones keep their place, so switching one back on returns it to where you had it.",
-    "panelsAllHidden": "Every section is hidden — the sidebar will be empty."
+    "panelsAllHidden": "Every section is hidden — the sidebar will be empty.",
+    "emptyTitle": "No sections are showing. Choose which ones you want here."
   },
   "sigType": {
     "combat": "Combat",

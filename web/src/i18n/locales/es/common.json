@@ -1738,7 +1738,8 @@
     "moveToRight": "Mover barra lateral a la derecha",
     "panelsTitle": "Secciones de la barra lateral",
     "panelsHint": "Elige qué secciones aparecen en la barra lateral. Las ocultas conservan su posición y vuelven a ella al reactivarlas.",
-    "panelsAllHidden": "Todas las secciones están ocultas: la barra lateral quedará vacía."
+    "panelsAllHidden": "Todas las secciones están ocultas: la barra lateral quedará vacía.",
+    "emptyTitle": "No se muestra ninguna sección. Elige aquí las que quieras."
   },
   "sigType": {
     "combat": "Combate",
