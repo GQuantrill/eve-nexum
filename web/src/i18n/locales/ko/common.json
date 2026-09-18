@@ -1735,7 +1735,10 @@
     "resize": "사이드바 크기 조정",
     "collapse": "사이드바 접기",
     "moveToLeft": "사이드바를 왼쪽으로 이동",
-    "moveToRight": "사이드바를 오른쪽으로 이동"
+    "moveToRight": "사이드바를 오른쪽으로 이동",
+    "panelsTitle": "사이드바 섹션",
+    "panelsHint": "사이드바에 표시할 섹션을 선택하세요. 숨긴 섹션도 위치를 유지하므로 다시 켜면 원래 자리로 돌아옵니다.",
+    "panelsAllHidden": "모든 섹션이 숨겨져 있습니다 — 사이드바가 비어 있게 됩니다."
   },
   "sigType": {
     "combat": "전투",

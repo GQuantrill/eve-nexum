@@ -1735,7 +1735,10 @@
     "resize": "Redimensionar barra lateral",
     "collapse": "Plegar barra lateral",
     "moveToLeft": "Mover barra lateral a la izquierda",
-    "moveToRight": "Mover barra lateral a la derecha"
+    "moveToRight": "Mover barra lateral a la derecha",
+    "panelsTitle": "Secciones de la barra lateral",
+    "panelsHint": "Elige qué secciones aparecen en la barra lateral. Las ocultas conservan su posición y vuelven a ella al reactivarlas.",
+    "panelsAllHidden": "Todas las secciones están ocultas: la barra lateral quedará vacía."
   },
   "sigType": {
     "combat": "Combate",

@@ -1735,7 +1735,10 @@
     "resize": "Resize sidebar",
     "collapse": "Collapse sidebar",
     "moveToLeft": "Move sidebar to left",
-    "moveToRight": "Move sidebar to right"
+    "moveToRight": "Move sidebar to right",
+    "panelsTitle": "Sidebar sections",
+    "panelsHint": "Choose which sections appear in the sidebar. Hidden ones keep their place, so switching one back on returns it to where you had it.",
+    "panelsAllHidden": "Every section is hidden — the sidebar will be empty."
   },
   "sigType": {
     "combat": "Combat",

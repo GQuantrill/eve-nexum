@@ -1735,7 +1735,10 @@
     "resize": "调整侧栏大小",
     "collapse": "收起侧栏",
     "moveToLeft": "将侧栏移到左侧",
-    "moveToRight": "将侧栏移到右侧"
+    "moveToRight": "将侧栏移到右侧",
+    "panelsTitle": "侧边栏板块",
+    "panelsHint": "选择侧边栏中显示的板块。隐藏的板块会保留位置，重新开启时回到原处。",
+    "panelsAllHidden": "所有板块都已隐藏 — 侧边栏将是空的。"
   },
   "sigType": {
     "combat": "战斗",

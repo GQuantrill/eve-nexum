@@ -1735,7 +1735,10 @@
     "resize": "Redimensionner la barre latérale",
     "collapse": "Replier la barre latérale",
     "moveToLeft": "Déplacer la barre latérale à gauche",
-    "moveToRight": "Déplacer la barre latérale à droite"
+    "moveToRight": "Déplacer la barre latérale à droite",
+    "panelsTitle": "Sections de la barre latérale",
+    "panelsHint": "Choisissez les sections affichées dans la barre latérale. Celles masquées conservent leur place et y reviennent une fois réactivées.",
+    "panelsAllHidden": "Toutes les sections sont masquées — la barre latérale sera vide."
   },
   "sigType": {
     "combat": "Combat",

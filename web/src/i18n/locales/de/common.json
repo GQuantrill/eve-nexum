@@ -1735,7 +1735,10 @@
     "resize": "Seitenleiste anpassen",
     "collapse": "Seitenleiste einklappen",
     "moveToLeft": "Seitenleiste nach links verschieben",
-    "moveToRight": "Seitenleiste nach rechts verschieben"
+    "moveToRight": "Seitenleiste nach rechts verschieben",
+    "panelsTitle": "Seitenleisten-Abschnitte",
+    "panelsHint": "Wähle, welche Abschnitte in der Seitenleiste erscheinen. Ausgeblendete behalten ihren Platz und kehren beim Wiedereinschalten dorthin zurück.",
+    "panelsAllHidden": "Alle Abschnitte sind ausgeblendet — die Seitenleiste bleibt leer."
   },
   "sigType": {
     "combat": "Kampf",

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
@@ -13,7 +13,8 @@ import { ClosestSystemsPane } from './ClosestSystemsPane';
 import { FleetPane } from './FleetPane';
 import { WatchlistBlock } from './WatchlistBlock';
 import { ChainsPane } from './ChainsPane';
-import { CaretLeftIcon, CaretRightIcon, ArrowLineLeftIcon, ArrowLineRightIcon } from '../../icons';
+import { CaretLeftIcon, CaretRightIcon, ArrowLineLeftIcon, ArrowLineRightIcon, SquaresFourIcon } from '../../icons';
+import { SidebarPanelsModal } from './SidebarPanelsModal';
 import { useUserSetting } from '../../hooks/useUserSetting';
 import { useAuth } from '../../context/AuthContext';
 
@@ -21,6 +22,7 @@ const SIDE_KEY      = 'nexum.sidebar.side';
 const COLLAPSED_KEY = 'nexum.sidebar.collapsed';
 const ORDER_KEY     = 'nexum.sidebar.order';
 const WIDTH_KEY     = 'nexum.sidebar.width';
+const HIDDEN_KEY    = 'nexum.sidebar.hidden';
 
 const MIN_WIDTH = 180;
 const MAX_WIDTH = 360;
@@ -76,6 +78,20 @@ export function Sidebar() {
   const [collapsed,    setCollapsed] = useUserSetting<boolean>(COLLAPSED_KEY, false);
   const [orderRaw,     setOrder]     = useUserSetting<PanelId[]>(ORDER_KEY, DEFAULT_ORDER);
   const order = sanitiseOrder(orderRaw);
+  // Store what's HIDDEN, not what's shown, so a section added in a later
+  // release is visible by default instead of silently missing.
+  const [hiddenRaw, setHidden] = useUserSetting<PanelId[]>(HIDDEN_KEY, []);
+  const hidden = useMemo(
+    () => new Set((Array.isArray(hiddenRaw) ? hiddenRaw : []).filter(
+      (id): id is PanelId => VALID_PANEL_IDS.has(id as PanelId))),
+    [hiddenRaw],
+  );
+  const togglePanel = (id: PanelId) =>
+    setHidden((prev) => {
+      const list = Array.isArray(prev) ? prev : [];
+      return list.includes(id) ? list.filter((x) => x !== id) : [...list, id];
+    });
+  const [panelsOpen, setPanelsOpen] = useState(false);
   // Width stays per-device — different monitors / window widths want
   // different sizes.
   const [width, setWidth] = useState<number>(loadWidth);
@@ -150,8 +166,11 @@ export function Sidebar() {
   // Filtered at render rather than removed from the saved order, so it reappears
   // in the position the user put it if the deployment later gains a corp or
   // alliance.
-  const orgInstall   = !!user?.corpMode || !!user?.allianceMode;
-  const visibleOrder = order.filter((id) => id !== 'pilotsOnline' || orgInstall);
+  const orgInstall = !!user?.corpMode || !!user?.allianceMode;
+  const available  = order.filter((id) => id !== 'pilotsOnline' || orgInstall);
+  // Hidden sections are filtered at render and kept in the saved order, so
+  // switching one back on returns it to where the user had it.
+  const visibleOrder = available.filter((id) => !hidden.has(id));
 
   const cards: Record<PanelId, ReactNode> = {
     watchlist: <WatchlistBlock />,
@@ -189,6 +208,15 @@ export function Sidebar() {
         <button
           type="button"
           className="icon-btn"
+          onClick={() => setPanelsOpen(true)}
+          data-tooltip={t('sidebar.panelsTitle')}
+          aria-label={t('sidebar.panelsTitle')}
+        >
+          <SquaresFourIcon size={14} weight="bold" />
+        </button>
+        <button
+          type="button"
+          className="icon-btn"
           onClick={() => setCollapsed(true)}
           data-tooltip={t('sidebar.collapse')}
           aria-label={t('sidebar.collapse')}
@@ -210,6 +238,15 @@ export function Sidebar() {
           </div>
         </SortableContext>
       </DndContext>
+
+      {panelsOpen && (
+        <SidebarPanelsModal
+          panels={available.map((id) => ({ id, title: panelTitle[id] }))}
+          isVisible={(id) => !hidden.has(id)}
+          onToggle={togglePanel}
+          onClose={() => setPanelsOpen(false)}
+        />
+      )}
     </aside>
   );
 }

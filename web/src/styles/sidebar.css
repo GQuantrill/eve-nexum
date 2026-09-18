@@ -2484,3 +2484,34 @@ select.sig-toolbar-btn option {
   border-color: var(--cv-conn-expired);
   color: var(--cv-conn-expired);
 }
+
+/* Sidebar section chooser. */
+.sidebar-panels__hint {
+  margin: 0 0 10px;
+  color: var(--text-dim);
+  font-size: calc(12px * var(--font-scale, 1));
+}
+
+.sidebar-panels__list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sidebar-panels__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: calc(13px * var(--font-scale, 1));
+}
+
+.sidebar-panels__item:hover { background: var(--surface-hover); }
+
+.sidebar-panels__empty {
+  margin: 10px 0 0;
+  color: var(--cv-conn-1h);
+  font-size: calc(12px * var(--font-scale, 1));
+}
