@@ -591,17 +591,6 @@ export function Toolbar() {
           <QuestionIcon size={18} weight="regular" />
         </a>
 
-        <a
-          className="toolbar__toggle toolbar__toggle--prominent toolbar__discord"
-          href={DISCORD_INVITE_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          data-tooltip={t('actions.joinDiscord')}
-          aria-label={t('actions.joinDiscord')}
-        >
-          <DiscordLogoIcon size={18} weight="fill" color="#5865F2" />
-          <span>{t('toolbar.discord')}</span>
-        </a>
 
         <button
           className="toolbar__toggle toolbar__toggle--icon toolbar__toggle--prominent"
@@ -633,15 +622,6 @@ export function Toolbar() {
         {/* Layout switch. Lives here rather than in the sidebar's display
             options: those are set once, whereas people flip this back and
             forth while deciding which layout suits them. */}
-        <button
-          className={`toolbar__toggle toolbar__toggle--icon toolbar__toggle--prominent${panelSideBySide ? ' toolbar__toggle--on' : ''}`}
-          onClick={() => setPanelSideBySide(!panelSideBySide)}
-          aria-pressed={panelSideBySide}
-          data-tooltip={panelSideBySide ? t('toolbar.layoutBesideTooltip') : t('toolbar.layoutBelowTooltip')}
-          aria-label={t('mapSidebar.panelLayout')}
-        >
-          <ColumnsIcon size={18} weight="regular" />
-        </button>
 
         <HeatmapMenu />
 
@@ -655,18 +635,6 @@ export function Toolbar() {
           <SlidersHorizontalIcon size={18} weight="regular" />
         </button>
 
-        <button
-          className={`toolbar__toggle toolbar__toggle--icon toolbar__toggle--prominent${trackJumps ? ' toolbar__toggle--on' : ''}`}
-          onClick={() => setTrackJumps(!trackJumps)}
-          aria-pressed={trackJumps}
-          aria-label={trackJumps ? t('toolbar.trackJumpsOn') : t('toolbar.trackJumpsOff')}
-          data-tooltip={trackJumps
-            ? t('toolbar.trackJumpsTooltipOn')
-            : t('toolbar.trackJumpsTooltipOff')}
-        >
-          <FootprintsIcon size={18} weight="regular" />
-          <span className={`toolbar__toggle-led${trackJumps ? ' toolbar__toggle-led--on' : ' toolbar__toggle-led--off'}`} />
-        </button>
       </div>
     ),
 
@@ -776,6 +744,41 @@ export function Toolbar() {
     // Language, API keys and sign-out travel together as one movable block.
     actions: user ? (
       <div className="toolbar__group">
+        {/* Discord, jump tracking and the panel-layout toggle sit with the
+            account controls rather than among the map tools: they're about the
+            pilot and how they want the app arranged, not about the open map. */}
+        <a
+          className="toolbar__toggle toolbar__toggle--prominent toolbar__discord"
+          href={DISCORD_INVITE_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          data-tooltip={t('actions.joinDiscord')}
+          aria-label={t('actions.joinDiscord')}
+        >
+          <DiscordLogoIcon size={18} weight="fill" color="#5865F2" />
+          <span>{t('toolbar.discord')}</span>
+        </a>
+        <button
+          className={`toolbar__toggle toolbar__toggle--icon toolbar__toggle--prominent${panelSideBySide ? ' toolbar__toggle--on' : ''}`}
+          onClick={() => setPanelSideBySide(!panelSideBySide)}
+          aria-pressed={panelSideBySide}
+          data-tooltip={panelSideBySide ? t('toolbar.layoutBesideTooltip') : t('toolbar.layoutBelowTooltip')}
+          aria-label={t('mapSidebar.panelLayout')}
+        >
+          <ColumnsIcon size={18} weight="regular" />
+        </button>
+        <button
+          className={`toolbar__toggle toolbar__toggle--icon toolbar__toggle--prominent${trackJumps ? ' toolbar__toggle--on' : ''}`}
+          onClick={() => setTrackJumps(!trackJumps)}
+          aria-pressed={trackJumps}
+          aria-label={trackJumps ? t('toolbar.trackJumpsOn') : t('toolbar.trackJumpsOff')}
+          data-tooltip={trackJumps
+            ? t('toolbar.trackJumpsTooltipOn')
+            : t('toolbar.trackJumpsTooltipOff')}
+        >
+          <FootprintsIcon size={18} weight="regular" />
+          <span className={`toolbar__toggle-led${trackJumps ? ' toolbar__toggle-led--on' : ' toolbar__toggle-led--off'}`} />
+        </button>
         <LanguageSwitcher compact />
         <button
           className="toolbar__toggle toolbar__toggle--icon"
