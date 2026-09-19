@@ -2072,5 +2072,21 @@
   "exits": {
     "notifTitle": "Salida a k-space",
     "appeared": "{{name}} ({{security}}) está en la cadena"
+  },
+  "tripwire": {
+    "title": "Importar desde Tripwire",
+    "button": "↑ Importar desde Tripwire",
+    "buttonTitle": "Traer una cadena de Tripwire con sus firmas",
+    "step1": "Abre tu pestaña de Tripwire e inicia sesión como siempre.",
+    "step2": "Abre la consola del navegador (F12), pega la línea de abajo y pulsa Enter. Copiará tu cadena actual al portapapeles.",
+    "step3": "Pégala aquí e importa. Nunca se le pide la contraseña a Tripwire.",
+    "pasteLabel": "Datos de la cadena",
+    "pastePlaceholder": "Pega aquí el JSON copiado",
+    "scopeNote": "Trae la cadena que Tripwire muestra ahora alrededor de tu sistema, con sus firmas, tipos de agujero y la masa y vida restante de cada uno. Llega como un mapa personal nuevo.",
+    "import": "Importar",
+    "importing": "Importando…",
+    "copied": "Copiado",
+    "imported": "Importados {{systems}} sistemas, {{connections}} conexiones y {{signatures}} firmas desde Tripwire",
+    "notTripwireData": "Esto no parece datos de cadena de Tripwire: no contiene firmas"
   }
 }

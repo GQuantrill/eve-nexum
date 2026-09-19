@@ -1754,6 +1754,233 @@ mapsRouter.post('/import/wanderer', async (req, res) => {
   }
 });
 
+// ── Tripwire import ─────────────────────────────────────────────────────────
+// Tripwire has no export button, so this takes the JSON its own web client
+// receives from `refresh.php?mode=init` (see the console snippet the import
+// dialog hands out). Richer than the Wanderer export: it carries signatures and
+// each hole's mass/life, so a chain arrives with its scan data intact.
+//
+// Shapes, per Tripwire's client and the long-standing shortcircuit reader:
+//   signatures: { <id>: { id, signatureID: "ABC-123"|"???"|null, systemID, type, name } }
+//   wormholes:  { <id>: { initialID, secondaryID, type: "K162"|"GATE"|…,
+//                         life: "stable"|"critical", mass: "stable"|"destab"|"critical" } }
+// Both are objects keyed by id, but arrive as [] when empty.
+const TW_MASS: Record<string, string> = { stable: 'stable', destab: 'destabilized', critical: 'critical' };
+// Tripwire's sig categories -> ours. Anything unrecognised lands as 'unknown',
+// which is also what its own "unknown until scanned" rows mean.
+const TW_SIG_TYPE: Record<string, string> = {
+  wormhole: 'wormhole', combat: 'combat', data: 'data', relic: 'relic',
+  gas: 'gas', ore: 'ore', ghost: 'ghost',
+};
+
+interface TwSig  { id?: unknown; signatureID?: unknown; systemID?: unknown; type?: unknown; name?: unknown }
+interface TwHole { initialID?: unknown; secondaryID?: unknown; type?: unknown; life?: unknown; mass?: unknown }
+
+/** Tripwire sends `{}`-keyed maps, or `[]` when empty. Normalise to an array. */
+function twValues<T>(v: unknown): T[] {
+  if (Array.isArray(v)) return v as T[];
+  if (v && typeof v === 'object') return Object.values(v as Record<string, T>);
+  return [];
+}
+
+/**
+ * Lay a chain out as breadth-first layers from its busiest system. Tripwire's
+ * feed carries no coordinates — it draws a list, not a node graph — so without
+ * this every system would land on top of the others. Layers read like a chain,
+ * which is what the data usually is; anything fancier is what Untangle is for.
+ */
+function layoutChain(eveIds: number[], edges: Array<[number, number]>): Map<number, { x: number; y: number }> {
+  const adj = new Map<number, number[]>();
+  for (const id of eveIds) adj.set(id, []);
+  for (const [a, b] of edges) { adj.get(a)?.push(b); adj.get(b)?.push(a); }
+
+  const pos = new Map<number, { x: number; y: number }>();
+  const seen = new Set<number>();
+  const COL = 260, ROW = 170;
+  let nextFreeRow = 0;
+
+  // Busiest system first so the main chain forms the spine; leftover islands
+  // (Tripwire keeps stale fragments) start their own rows below it.
+  const roots = [...eveIds].sort((a, b) => (adj.get(b)?.length ?? 0) - (adj.get(a)?.length ?? 0));
+  for (const root of roots) {
+    if (seen.has(root)) continue;
+    let layer = [root];
+    seen.add(root);
+    let depth = 0;
+    const startRow = nextFreeRow;
+    while (layer.length > 0) {
+      layer.forEach((id, i) => pos.set(id, { x: depth * COL, y: (startRow + i) * ROW }));
+      nextFreeRow = Math.max(nextFreeRow, startRow + layer.length);
+      const next: number[] = [];
+      for (const id of layer) {
+        for (const n of adj.get(id) ?? []) {
+          if (seen.has(n)) continue;
+          seen.add(n);
+          next.push(n);
+        }
+      }
+      layer = next;
+      depth += 1;
+    }
+    nextFreeRow += 1; // blank row between disconnected fragments
+  }
+  return pos;
+}
+
+mapsRouter.post('/import/tripwire', async (req, res) => {
+  const body = req.body as { name?: unknown; signatures?: unknown; wormholes?: unknown };
+  const sigs  = twValues<TwSig>(body.signatures);
+  const holes = twValues<TwHole>(body.wormholes);
+  if (sigs.length === 0) { res.status(400).json({ error: 'No signatures in that data — is it a Tripwire chain?' }); return; }
+  if (holes.length > MAX_IMPORT_CONNECTIONS) { res.status(413).json({ error: `Too many connections (max ${MAX_IMPORT_CONNECTIONS})` }); return; }
+
+  // Signature rows are keyed by their own id; wormholes point at those ids.
+  const sigById = new Map<string, TwSig>();
+  for (const sig of sigs) if (sig.id != null) sigById.set(String(sig.id), sig);
+
+  const sysOf = (sigId: unknown): number | null => {
+    const sig = sigById.get(String(sigId));
+    const n = Number(sig?.systemID);
+    return Number.isInteger(n) && n > 0 ? n : null;
+  };
+
+  const eveIds = [...new Set(sigs.map((s) => Number(s.systemID)).filter((n) => Number.isInteger(n) && n > 0))];
+  if (eveIds.length === 0)                 { res.status(400).json({ error: 'No valid EVE system ids in that data' }); return; }
+  if (eveIds.length > MAX_IMPORT_SYSTEMS)  { res.status(413).json({ error: `Too many systems (max ${MAX_IMPORT_SYSTEMS})` }); return; }
+
+  const oid = await resolveOwnerId(req);
+  if (await countPersonalMaps(oid) >= await mapCapFor(oid)) { res.status(403).json({ error: 'Maximum maps reached' }); return; }
+
+  const { rows: sde } = await db.query<{ id: number; name: string; systemClass: string | null; effect: string | null; statics: string[]; regionName: string | null }>(
+    `SELECT s.id, s.name, s.class AS "systemClass", s.effect, s.statics, r.name AS "regionName"
+       FROM solar_systems s LEFT JOIN map_regions r ON r.id = s.region_id
+      WHERE s.id = ANY($1::int[])`,
+    [eveIds],
+  );
+  const sdeById = new Map(sde.map((r) => [r.id, r]));
+  const kept = eveIds.filter((id) => sdeById.has(id));
+  if (kept.length === 0) { res.status(400).json({ error: 'None of the systems were recognised (not in the EVE SDE)' }); return; }
+
+  // Edges first — the layout needs them, and both endpoints must have survived.
+  const keptSet = new Set(kept);
+  const pairKey = (a: number, b: number) => (a < b ? `${a}|${b}` : `${b}|${a}`);
+  const edges: Array<{ a: number; b: number; hole: TwHole }> = [];
+  const seenPair = new Set<string>();
+  for (const hole of holes) {
+    const a = sysOf(hole.initialID), b = sysOf(hole.secondaryID);
+    if (a == null || b == null || a === b) continue;
+    if (!keptSet.has(a) || !keptSet.has(b)) continue;
+    const key = pairKey(a, b);
+    if (seenPair.has(key)) continue;
+    seenPair.add(key);
+    edges.push({ a, b, hole });
+  }
+
+  const pos = layoutChain(kept, edges.map((e) => [e.a, e.b] as [number, number]));
+
+  const client = await db.connect();
+  try {
+    await client.query('BEGIN');
+    const name = String(typeof body.name === 'string' && body.name.trim() ? body.name : 'Imported from Tripwire').slice(0, MAX_MAP_NAME_LEN);
+    const mapRes = await client.query<{ id: string }>(
+      `INSERT INTO maps (user_id, owner_id, name) VALUES ($1, $2, $3) RETURNING id`,
+      [req.session.userId, oid, name],
+    );
+    const mapId = mapRes.rows[0].id;
+
+    const idByEve = new Map<number, string>();
+    const SYSCOLS = 13;
+    const sysPh: string[] = []; const sysVals: unknown[] = [];
+    kept.forEach((eve) => {
+      const info = sdeById.get(eve)!;
+      const newId = crypto.randomUUID();
+      idByEve.set(eve, newId);
+      const p = pos.get(eve) ?? { x: 0, y: 0 };
+      const base = sysVals.length;
+      sysPh.push(`(${Array.from({ length: SYSCOLS }, (_, k) => `$${base + k + 1}`).join(',')})`);
+      sysVals.push(
+        newId, mapId, eve, info.name, info.systemClass ?? 'unknown',
+        info.effect ?? 'none', info.statics ?? [], info.regionName ?? null, null,
+        p.x, p.y, 'unknown', false,
+      );
+    });
+    await client.query(
+      `INSERT INTO map_systems
+         (id, map_id, eve_system_id, name, system_class, effect, statics, region_name, npc_type,
+          position_x, position_y, status, is_home)
+       VALUES ${sysPh.join(',')}`,
+      sysVals,
+    );
+
+    // Connections. A "GATE" hole is Tripwire's way of recording a stargate, so
+    // it becomes a gate link with no wormhole code.
+    const CONNCOLS = 8;
+    const connPh: string[] = []; const connVals: unknown[] = [];
+    for (const { a, b, hole } of edges) {
+      const rawType = typeof hole.type === 'string' ? hole.type.trim() : '';
+      const isGate  = rawType.toUpperCase() === 'GATE';
+      const base = connVals.length;
+      connPh.push(`(${Array.from({ length: CONNCOLS }, (_, k) => `$${base + k + 1}`).join(',')})`);
+      connVals.push(
+        crypto.randomUUID(), mapId, idByEve.get(a), idByEve.get(b),
+        isGate ? 'gate' : 'standard',
+        isGate ? null : (rawType || null),
+        isGate ? 'stable' : (TW_MASS[String(hole.mass)] ?? 'stable'),
+        // Tripwire's life is stable/critical, where critical means EOL. Ours is
+        // an expiry with the band derived from it, so record the band's worth of
+        // life rather than the band alone — a band on its own is recomputed away.
+        String(hole.life) === 'critical' ? new Date(Date.now() + 4 * 3_600_000 - 60_000).toISOString() : null,
+      );
+    }
+    if (connPh.length > 0) {
+      await client.query(
+        `INSERT INTO map_connections
+           (id, map_id, source_id, target_id, connection_type, wh_type, mass_status, lifetime_expires_at)
+         VALUES ${connPh.join(',')}`,
+        connVals,
+      );
+    }
+
+    // Signatures — the reason this import beats a screenshot.
+    const SIGCOLS = 6;
+    const sigPh: string[] = []; const sigVals: unknown[] = [];
+    for (const sig of sigs) {
+      const sysId = idByEve.get(Number(sig.systemID));
+      if (!sysId) continue;
+      // "???" is Tripwire's placeholder for an unscanned id, not a real one.
+      const rawSigId = typeof sig.signatureID === 'string' ? sig.signatureID.trim().toUpperCase() : '';
+      const sigId = rawSigId && rawSigId !== '???' ? rawSigId.slice(0, 7) : '';
+      const type  = TW_SIG_TYPE[String(sig.type).toLowerCase()] ?? 'unknown';
+      const base = sigVals.length;
+      sigPh.push(`(${Array.from({ length: SIGCOLS }, (_, k) => `$${base + k + 1}`).join(',')})`);
+      sigVals.push(
+        crypto.randomUUID(), sysId, sigId, type,
+        typeof sig.name === 'string' ? sig.name.slice(0, 200) : '',
+        req.session.userId,
+      );
+    }
+    if (sigPh.length > 0) {
+      await client.query(
+        `INSERT INTO map_signatures (id, system_id, sig_id, sig_type, name, created_by_user_id)
+         VALUES ${sigPh.join(',')}`,
+        sigVals,
+      );
+    }
+
+    await client.query('COMMIT');
+    res.status(201).json({
+      id: mapId,
+      imported: { systems: sysPh.length, connections: connPh.length, signatures: sigPh.length,
+                  skipped: eveIds.length - kept.length },
+    });
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    client.release();
+  }
+});
+
 // Merge a source system note into a destination note. Destination is truth:
 // fill it if empty, otherwise append the source note under a divider so
 // nothing is lost. Returns the new note string, or null when no change is

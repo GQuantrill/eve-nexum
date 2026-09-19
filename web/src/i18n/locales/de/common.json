@@ -2072,5 +2072,21 @@
   "exits": {
     "notifTitle": "K-Space-Ausgang",
     "appeared": "{{name}} ({{security}}) ist in der Kette"
+  },
+  "tripwire": {
+    "title": "Aus Tripwire importieren",
+    "button": "↑ Aus Tripwire importieren",
+    "buttonTitle": "Eine Tripwire-Kette samt Signaturen übernehmen",
+    "step1": "Öffne deinen Tripwire-Tab und melde dich wie gewohnt an.",
+    "step2": "Öffne die Browser-Konsole (F12), füge die Zeile unten ein und drücke Enter. Damit wird deine aktuelle Kette in die Zwischenablage kopiert.",
+    "step3": "Hier einfügen und importieren. Tripwire wird nie nach deinem Passwort gefragt.",
+    "pasteLabel": "Kettendaten",
+    "pastePlaceholder": "Kopiertes JSON hier einfügen",
+    "scopeNote": "Übernommen wird die Kette, die Tripwire aktuell um dein System zeigt — mit Signaturen, Wurmlochtypen sowie Masse und Restlebensdauer jedes Lochs. Sie erscheint als neue persönliche Karte.",
+    "import": "Importieren",
+    "importing": "Importiere…",
+    "copied": "Kopiert",
+    "imported": "{{systems}} Systeme, {{connections}} Verbindungen und {{signatures}} Signaturen aus Tripwire importiert",
+    "notTripwireData": "Das sehen nicht nach Tripwire-Kettendaten aus — keine Signaturen enthalten"
   }
 }

@@ -2072,5 +2072,21 @@
   "exits": {
     "notifTitle": "Saída para k-space",
     "appeared": "{{name}} ({{security}}) está na cadeia"
+  },
+  "tripwire": {
+    "title": "Importar do Tripwire",
+    "button": "↑ Importar do Tripwire",
+    "buttonTitle": "Trazer uma cadeia do Tripwire com as suas assinaturas",
+    "step1": "Abra o seu separador do Tripwire e inicie sessão como habitualmente.",
+    "step2": "Abra a consola do navegador (F12), cole a linha abaixo e prima Enter. Copia a sua cadeia atual para a área de transferência.",
+    "step3": "Cole aqui e importe. A palavra-passe do Tripwire nunca é pedida.",
+    "pasteLabel": "Dados da cadeia",
+    "pastePlaceholder": "Cole aqui o JSON copiado",
+    "scopeNote": "Traz a cadeia que o Tripwire mostra agora à volta do seu sistema, com assinaturas, tipos de buraco e a massa e vida restante de cada um. Chega como um novo mapa pessoal.",
+    "import": "Importar",
+    "importing": "A importar…",
+    "copied": "Copiado",
+    "imported": "Importados {{systems}} sistemas, {{connections}} ligações e {{signatures}} assinaturas do Tripwire",
+    "notTripwireData": "Isto não parece dados de cadeia do Tripwire — não tem assinaturas"
   }
 }

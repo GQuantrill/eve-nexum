@@ -2072,5 +2072,21 @@
   "exits": {
     "notifTitle": "k-space 出口",
     "appeared": "{{name}}（{{security}}）已出现在链上"
+  },
+  "tripwire": {
+    "title": "从 Tripwire 导入",
+    "button": "↑ 从 Tripwire 导入",
+    "buttonTitle": "连同信号一起导入 Tripwire 链",
+    "step1": "打开你的 Tripwire 标签页并照常登录。",
+    "step2": "打开浏览器控制台（F12），粘贴下面这行并按回车。当前的链会复制到剪贴板。",
+    "step3": "粘贴到这里并导入。全程不会向 Tripwire 索要密码。",
+    "pasteLabel": "链数据",
+    "pastePlaceholder": "在此粘贴复制的 JSON",
+    "scopeNote": "导入 Tripwire 当前在你所在星系周围显示的链，包含信号、虫洞类型以及每个洞的质量和剩余寿命。会创建为一张新的个人地图。",
+    "import": "导入",
+    "importing": "正在导入…",
+    "copied": "已复制",
+    "imported": "已从 Tripwire 导入 {{systems}} 个星系、{{connections}} 条连接和 {{signatures}} 个信号",
+    "notTripwireData": "这看起来不是 Tripwire 的链数据 — 其中没有信号"
   }
 }

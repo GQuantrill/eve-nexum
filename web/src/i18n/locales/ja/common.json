@@ -2072,5 +2072,21 @@
   "exits": {
     "notifTitle": "k-spaceの出口",
     "appeared": "{{name}}（{{security}}）がチェーンに出現"
+  },
+  "tripwire": {
+    "title": "Tripwire からインポート",
+    "button": "↑ Tripwire からインポート",
+    "buttonTitle": "Tripwire のチェーンをシグネチャごと取り込む",
+    "step1": "Tripwire のタブを開き、いつも通りログインします。",
+    "step2": "ブラウザのコンソール（F12）を開き、下の行を貼り付けて Enter を押します。現在のチェーンがクリップボードにコピーされます。",
+    "step3": "ここに貼り付けてインポートします。Tripwire のパスワードを尋ねることはありません。",
+    "pasteLabel": "チェーンのデータ",
+    "pastePlaceholder": "コピーした JSON をここに貼り付け",
+    "scopeNote": "Tripwire が現在あなたのシステム周辺に表示しているチェーンを、シグネチャ・ワームホールの種類・各ホールの質量と残り寿命ごと取り込みます。新しい個人マップとして作成されます。",
+    "import": "インポート",
+    "importing": "インポート中…",
+    "copied": "コピーしました",
+    "imported": "Tripwire から {{systems}} システム、{{connections}} 接続、{{signatures}} シグネチャをインポートしました",
+    "notTripwireData": "Tripwire のチェーンデータではないようです — シグネチャがありません"
   }
 }

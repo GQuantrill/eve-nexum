@@ -2072,5 +2072,21 @@
   "exits": {
     "notifTitle": "Sortie vers le k-space",
     "appeared": "{{name}} ({{security}}) est dans la chaîne"
+  },
+  "tripwire": {
+    "title": "Importer depuis Tripwire",
+    "button": "↑ Importer depuis Tripwire",
+    "buttonTitle": "Récupérer une chaîne Tripwire avec ses signatures",
+    "step1": "Ouvrez votre onglet Tripwire et connectez-vous comme d’habitude.",
+    "step2": "Ouvrez la console du navigateur (F12), collez la ligne ci-dessous et appuyez sur Entrée. Votre chaîne actuelle est copiée dans le presse-papiers.",
+    "step3": "Collez-la ici et importez. Le mot de passe Tripwire n’est jamais demandé.",
+    "pasteLabel": "Données de la chaîne",
+    "pastePlaceholder": "Collez ici le JSON copié",
+    "scopeNote": "Récupère la chaîne que Tripwire affiche actuellement autour de votre système, avec ses signatures, les types de trous et la masse et durée de vie restante de chacun. Elle arrive comme une nouvelle carte personnelle.",
+    "import": "Importer",
+    "importing": "Importation…",
+    "copied": "Copié",
+    "imported": "{{systems}} systèmes, {{connections}} connexions et {{signatures}} signatures importés depuis Tripwire",
+    "notTripwireData": "Cela ne ressemble pas à des données de chaîne Tripwire — aucune signature"
   }
 }

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { Trans, useTranslation } from "react-i18next";
+import { TripwireImportModal } from "./TripwireImportModal";
 import type { TFunction } from "i18next";
 import {
   useNotificationPermission,
@@ -1061,6 +1062,44 @@ export function MapSidebar() {
     }
   }
 
+  // Import a Tripwire chain from the JSON its own client fetches. Unlike the
+  // Wanderer export this carries signatures and each hole's mass/life, so a
+  // chain arrives with its scan data rather than just its shape.
+  const [tripwireOpen, setTripwireOpen] = useState(false);
+  async function handleImportTripwire(raw: string) {
+    let parsed: { signatures?: unknown; wormholes?: unknown };
+    try {
+      parsed = JSON.parse(raw) as { signatures?: unknown; wormholes?: unknown };
+    } catch {
+      toast.error(t("mapSidebar.invalidJson"));
+      return;
+    }
+    if (!parsed.signatures) {
+      toast.error(t("tripwire.notTripwireData"));
+      return;
+    }
+    try {
+      const { id, imported } = await api<{ id: string; imported: { systems: number; connections: number; signatures: number; skipped: number } }>(
+        "/api/maps/import/tripwire",
+        { method: "POST", body: JSON.stringify({ signatures: parsed.signatures, wormholes: parsed.wormholes ?? {} }) },
+      );
+      await useMapStore.getState().loadMaps();
+      await useMapStore.getState().switchMap(id);
+      setTripwireOpen(false);
+      // Same deferral as the Wanderer import: the canvas needs the new nodes
+      // mounted before handles can be routed to them.
+      setTimeout(() => {
+        useMapStore.getState().optimizeConnections();
+        useMapStore.getState().requestFitView();
+      }, 500);
+      toast.success(t("tripwire.imported", {
+        systems: imported.systems, connections: imported.connections, signatures: imported.signatures,
+      }));
+    } catch (err) {
+      toast.error(t("mapSidebar.importFailed", { error: err instanceof Error ? err.message : String(err) }));
+    }
+  }
+
   // Import a map exported from Wanderer. Its shape differs from a Nexum export
   // (systems carry only an EVE id + layout; connections use source/target + numeric
   // codes), so it goes to a dedicated endpoint that enriches from the SDE and
@@ -1685,6 +1724,14 @@ export function MapSidebar() {
                 >
                   {t("mapSidebar.importWanderer")}
                 </button>
+                <button
+                  className="map-sidebar__action"
+                  onClick={() => setTripwireOpen(true)}
+                  disabled={atMapLimit}
+                  title={t("tripwire.buttonTitle")}
+                >
+                  {t("tripwire.button")}
+                </button>
               </div>
 
               <button className="map-sidebar__action" onClick={handleExport}>
@@ -1751,6 +1798,10 @@ export function MapSidebar() {
       />
 
       {patchNotesOpen && <PatchNotesModal onClose={() => setPatchNotesOpen(false)} />}
+
+      {tripwireOpen && (
+        <TripwireImportModal onImport={handleImportTripwire} onClose={() => setTripwireOpen(false)} />
+      )}
 
       {settingsOpen && createPortal(
         <div className="settings-modal__overlay" onClick={() => setSettingsOpen(false)}>

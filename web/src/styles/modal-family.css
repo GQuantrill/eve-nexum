@@ -634,3 +634,51 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* Tripwire import: numbered steps, the console snippet, and a paste box. */
+.tripwire-modal { max-width: 620px; }
+
+.tripwire-modal__steps {
+  margin: 0 0 12px;
+  padding-left: 20px;
+  color: var(--text-dim);
+  font-size: calc(12px * var(--font-scale, 1));
+  line-height: 1.55;
+}
+
+.tripwire-modal__steps li { margin-bottom: 4px; }
+
+.tripwire-modal__snippet {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 8px;
+  background: var(--surface-base);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.tripwire-modal__snippet code {
+  flex: 1;
+  min-width: 0;
+  color: var(--text-bright);
+  font-size: calc(11px * var(--font-scale, 1));
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.tripwire-modal__input {
+  width: 100%;
+  resize: vertical;
+  font-family: inherit;
+  font-size: calc(12px * var(--font-scale, 1));
+}
+
+.tripwire-modal__note {
+  margin: 10px 0 0;
+  color: var(--text-dim);
+  font-size: calc(12px * var(--font-scale, 1));
+  line-height: 1.5;
+}

@@ -2072,5 +2072,21 @@
   "exits": {
     "notifTitle": "K-space exit",
     "appeared": "{{name}} ({{security}}) is on the chain"
+  },
+  "tripwire": {
+    "title": "Import from Tripwire",
+    "button": "↑ Import from Tripwire",
+    "buttonTitle": "Bring a Tripwire chain in, with its signatures",
+    "step1": "Open your Tripwire tab and sign in as usual.",
+    "step2": "Open the browser console (F12), paste the line below and press Enter. It copies your current chain to the clipboard.",
+    "step3": "Paste it here and import. Tripwire is never asked for your password.",
+    "pasteLabel": "Chain data",
+    "pastePlaceholder": "Paste the copied JSON here",
+    "scopeNote": "This brings in the chain Tripwire currently shows around your system, with its signatures, wormhole types and each hole’s mass and remaining life. It arrives as a new personal map.",
+    "import": "Import",
+    "importing": "Importing…",
+    "copied": "Copied",
+    "imported": "Imported {{systems}} systems, {{connections}} connections and {{signatures}} signatures from Tripwire",
+    "notTripwireData": "That doesn’t look like Tripwire chain data — no signatures in it"
   }
 }
