@@ -24,22 +24,30 @@ import { XIcon } from '../../icons';
  *   - every one of those calls also stamps that system as where you are, so
  *     corp-mates watching Tripwire would see you skip down the chain. The last
  *     line puts you back where you started.
+ *
+ * It all sits inside an async IIFE rather than at the top level. Tripwire's own
+ * page declares globals of its own — `var chain` among them — and a top-level
+ * `const chain` in the console collides with it outright ("Identifier 'chain'
+ * has already been declared"). Scoping the lot also makes the snippet safe to
+ * paste twice.
  */
-const SNIPPET = `const here = new URLSearchParams(location.search).get('system') || '30000142';
-const get = q => fetch('/refresh.php?' + q, { credentials: 'same-origin' }).then(r => r.json());
-const chain = await get('mode=init&systemID=' + here);
-const sigs = Object.values(chain.signatures || {});
-const ids = [...new Set(sigs.map(s => String(s.systemID)))];
-const notes = {}, sticky = new Map();
-for (const id of ids) {
-  const n = sigs.filter(s => String(s.systemID) === id || s.type === 'wormhole').length;
-  const r = await get('mode=refresh&systemID=' + id + '&signatureCount=' + n + '&signatureTime=2100-01-01&commentCount=-1&commentTime=1970-01-01');
-  for (const c of r.comments || []) c.sticky ? sticky.set(c.id, c) : (notes[id] = notes[id] || []).push(c);
-}
-notes['0'] = [...sticky.values()];
-await get('mode=refresh&systemID=' + here);
-copy(JSON.stringify({ ...chain, origin: here, notes }));
-console.log('Copied ' + ids.length + ' systems.');`;
+const SNIPPET = `await (async () => {
+  const here = new URLSearchParams(location.search).get('system') || '30000142';
+  const get = q => fetch('/refresh.php?' + q, { credentials: 'same-origin' }).then(r => r.json());
+  const data = await get('mode=init&systemID=' + here);
+  const sigs = Object.values(data.signatures || {});
+  const ids = [...new Set(sigs.map(s => String(s.systemID)))];
+  const notes = {}, sticky = new Map();
+  for (const id of ids) {
+    const n = sigs.filter(s => String(s.systemID) === id || s.type === 'wormhole').length;
+    const r = await get('mode=refresh&systemID=' + id + '&signatureCount=' + n + '&signatureTime=2100-01-01&commentCount=-1&commentTime=1970-01-01');
+    for (const c of r.comments || []) c.sticky ? sticky.set(c.id, c) : (notes[id] = notes[id] || []).push(c);
+  }
+  notes['0'] = [...sticky.values()];
+  await get('mode=refresh&systemID=' + here);
+  copy(JSON.stringify({ ...data, origin: here, notes }));
+  console.log('Copied ' + ids.length + ' systems.');
+})();`;
 
 export function TripwireImportModal({ onImport, onClose }: {
   onImport: (json: string) => Promise<void>;
