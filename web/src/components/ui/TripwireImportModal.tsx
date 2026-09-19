@@ -34,8 +34,15 @@ import { XIcon } from '../../icons';
  * `const chain` in the console collides with it outright ("Identifier 'chain'
  * has already been declared"). Scoping the lot also makes the snippet safe to
  * paste twice.
+ *
+ * `copy()` is DevTools' own console helper, and it's only in scope while the
+ * pasted statement is still running synchronously — by the first `await` it's
+ * gone ("copy is not defined"). So it's captured up front, and the result is
+ * parked on `window.twChain` regardless, leaving `copy(twChain)` as a one-word
+ * second step if the captured helper won't fire.
  */
 const SNIPPET = `await (async () => {
+  const cp = typeof copy === 'function' ? copy : null;
   const here = String(window.viewingSystemID || '');
   if (!here) throw new Error('No system in view - open your Tripwire map first, then run this again.');
   const get = async q => {
@@ -54,8 +61,9 @@ const SNIPPET = `await (async () => {
   }
   notes['0'] = [...sticky.values()];
   await get('mode=refresh&systemID=' + here);
-  copy(JSON.stringify({ ...data, origin: here, notes }));
-  console.log('Copied ' + ids.length + ' systems.');
+  window.twChain = JSON.stringify({ ...data, origin: here, notes });
+  try { cp(twChain); console.log('Copied ' + ids.length + ' systems to the clipboard.'); }
+  catch (e) { console.log('Collected ' + ids.length + ' systems. Now run:  copy(twChain)'); }
 })();`;
 
 export function TripwireImportModal({ onImport, onClose }: {
