@@ -22,8 +22,11 @@ import { XIcon } from '../../icons';
  * blind spot, needs no walk, and doesn't stamp you as present in each system it
  * asks about.
  *
- * refresh.php is still called once, only to learn which mask the session is on:
- * api.php requires that id and nothing hands it over on its own.
+ * The mask id that api.php requires is read off the page — Tripwire keeps the
+ * list in `tripwire.masks` with the active one flagged, and renders it into
+ * `#mask` as `data-mask`. refresh.php is only a fallback for it, and a poor one:
+ * the id can be recovered from a signature row, which means an empty mask has
+ * nowhere to get it from at all.
  *
  * Two details about the console itself:
  *   - everything sits inside an async IIFE. Tripwire's page declares globals of
@@ -43,10 +46,15 @@ const SNIPPET = `await (async () => {
     if (!r.ok) throw new Error('Tripwire replied ' + r.status + ' for ' + what);
     return r.json();
   };
-  const init = await grab('/refresh.php?mode=init&systemID=' + here, 'the chain');
-  const maskFrom = o => { for (const v of Object.values(o || {})) if (v && v.maskID) return String(v.maskID); return ''; };
-  const mask = maskFrom(init.signatures) || maskFrom(init.wormholes) || String((window.tripwire && tripwire.mask) || '');
-  if (!mask) throw new Error('Could not work out which mask you are on - is there anything scanned on it?');
+  const active = (window.tripwire && Array.isArray(tripwire.masks) && tripwire.masks.find(m => m.active)) || null;
+  const el = document.querySelector('#mask [data-mask]') || document.querySelector('#mask-menu .active [data-mask]');
+  let mask = String((active && active.mask) || (el && el.dataset.mask) || '');
+  if (!mask) {
+    const init = await grab('/refresh.php?mode=init&systemID=' + here, 'the chain');
+    const from = o => { for (const v of Object.values(o || {})) if (v && v.maskID) return String(v.maskID); return ''; };
+    mask = from(init.signatures) || from(init.wormholes);
+  }
+  if (!mask) throw new Error('Could not work out which mask you are on - is the Tripwire map fully loaded?');
   const api = res => grab('/api.php?q=/' + res + '&maskID=' + mask, res);
   const [sigs, whs, comments] = await Promise.all([api('signatures'), api('wormholes'), api('comments')]);
   const byId = rows => Object.fromEntries(rows.map(r => [String(r.id), r]));
