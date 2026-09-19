@@ -561,25 +561,6 @@ export function Toolbar() {
     // All the explicit action buttons travel together as one movable block.
     tools: (
       <div className="toolbar__group">
-        {showAdmin && (
-          <button
-            className="toolbar__toggle toolbar__toggle--icon toolbar__toggle--prominent"
-            onClick={() => { window.location.hash = '#/admin/users'; }}
-            data-tooltip={t('toolbar.admin')}
-            aria-label={t('toolbar.admin')}
-          >
-            <ShieldStarIcon size={18} weight="regular" />
-          </button>
-        )}
-        <button
-          className="toolbar__toggle toolbar__toggle--icon toolbar__toggle--prominent"
-          onClick={() => setShowStats(true)}
-          data-tooltip={t('toolbar.userStats')}
-          aria-label={t('toolbar.userStats')}
-        >
-          <ChartBarIcon size={18} weight="regular" />
-        </button>
-
         <a
           className="toolbar__toggle toolbar__toggle--icon toolbar__toggle--prominent"
           href="/help/"
@@ -744,9 +725,27 @@ export function Toolbar() {
     // Language, API keys and sign-out travel together as one movable block.
     actions: user ? (
       <div className="toolbar__group">
-        {/* Discord, jump tracking and the panel-layout toggle sit with the
-            account controls rather than among the map tools: they're about the
-            pilot and how they want the app arranged, not about the open map. */}
+        {/* Everything about the PILOT lives here — who they are, what they can
+            reach, and how they want the app arranged — leaving the other group
+            for tools that act on the open map. */}
+        {showAdmin && (
+          <button
+            className="toolbar__toggle toolbar__toggle--icon toolbar__toggle--prominent"
+            onClick={() => { window.location.hash = '#/admin/users'; }}
+            data-tooltip={t('toolbar.admin')}
+            aria-label={t('toolbar.admin')}
+          >
+            <ShieldStarIcon size={18} weight="regular" />
+          </button>
+        )}
+        <button
+          className="toolbar__toggle toolbar__toggle--icon toolbar__toggle--prominent"
+          onClick={() => setShowStats(true)}
+          data-tooltip={t('toolbar.userStats')}
+          aria-label={t('toolbar.userStats')}
+        >
+          <ChartBarIcon size={18} weight="regular" />
+        </button>
         <a
           className="toolbar__toggle toolbar__toggle--prominent toolbar__discord"
           href={DISCORD_INVITE_URL}
