@@ -22,11 +22,18 @@ import { XIcon } from '../../icons';
  *     mask-wide, but notes and the non-wormhole signature types come back only
  *     for the system asked about, so this walks the chain to collect them.
  *
- * The walk reaches every system that has a hole on it and no others, which is
- * the one thing path 1 does better: a system someone annotated but never
- * connected is invisible to refresh.php however many times you run it, because
- * nothing will name it. Worth preferring path 1 for, and worth saying out loud
- * in the console when we fall back.
+ * Path 1 is preferred because of one thing path 2 cannot do on its own: name a
+ * system that isn't already known. Only three things in a refresh.php reply are
+ * mask-wide — the wormhole signatures, and `flares` and `occupied`, which come
+ * back on every reply whatever was asked — so the walk seeds its candidates
+ * from all three. That reaches the chain, anything someone flare-marked, and
+ * anywhere a mask member is sitting right now.
+ *
+ * A system that is none of those and was only ever annotated stays invisible:
+ * nothing in refresh.php will ever utter its id. Rather than pretend otherwise,
+ * the walk accepts `window.twExtra` — system names or ids set before running —
+ * and resolves names through `findSystemID`, the lookup Tripwire's own page
+ * already defines. The console says all of this when it falls back.
  *
  * The mask id that api.php needs is read off the page — Tripwire keeps the list
  * in `tripwire.masks` with the active one flagged, and renders it into `#mask`
@@ -65,10 +72,19 @@ const SNIPPET = `await (async () => {
     for (const n of c) (notes[String(n.systemID)] = notes[String(n.systemID)] || []).push(n);
   } catch (e) {
     console.log('Whole-mask API unavailable here (' + e.message + ') - walking the chain instead.');
-    console.log('Systems with notes but no wormhole on them cannot be reached this way.');
     const init = await grab('/refresh.php?mode=init&systemID=' + here, 'the chain');
     sigs = { ...init.signatures }; whs = { ...init.wormholes };
-    const ids = [...new Set(Object.values(sigs).map(x => String(x.systemID)))];
+    const named = v => /^\\d+$/.test(String(v)) ? String(v)
+      : String((typeof findSystemID === 'function' && findSystemID(String(v))) || '');
+    const ids = [...new Set([
+      ...Object.values(sigs).map(x => String(x.systemID)),
+      ...(((init.flares || {}).flares) || []).map(f => String(f.systemID)),
+      ...(init.occupied || []).map(o => String(o.systemID)),
+      ...(Array.isArray(window.twExtra) ? window.twExtra.map(named) : []),
+    ])].filter(id => id && id !== '0');
+    console.log('Checking ' + ids.length + ' systems (chain, flares, occupancy). A system that is none of');
+    console.log('those and only has a note cannot be named from here - add it with');
+    console.log('window.twExtra = [\\'J123456\\', \\'Jita\\'] before running.');
     const sticky = new Map();
     for (const [i, id] of ids.entries()) {
       const r = await grab('/refresh.php?mode=refresh&systemID=' + id + '&signatureCount=-1&signatureTime=1970-01-01&commentCount=-1&commentTime=1970-01-01', 'system ' + id);
