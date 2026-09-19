@@ -39,6 +39,7 @@ import {
   ChartBarIcon,
   ClockCountdownIcon,
   ColumnsIcon,
+  GearIcon,
   DiscordLogoIcon,
   DotsSixVerticalIcon,
   FootprintsIcon,
@@ -242,6 +243,7 @@ export function Toolbar() {
   const iskMapsEnabled  = useMapStore((s) => s.iskMapsEnabled);
   const panelSideBySide = useMapStore((s) => s.panelSideBySide);
   const setPanelSideBySide = useMapStore((s) => s.setPanelSideBySide);
+  const setMapSettingsOpen = useMapStore((s) => s.setMapSettingsOpen);
   const maxCorpMaps     = useMapStore((s) => s.maxCorpMaps);
   const corpMapCount    = useMapStore((s) => s.corpMapCount);
   const maxAllianceMaps  = useMapStore((s) => s.maxAllianceMaps);
@@ -757,6 +759,14 @@ export function Toolbar() {
           <DiscordLogoIcon size={18} weight="fill" color="#5865F2" />
           <span>{t('toolbar.discord')}</span>
         </a>
+        <button
+          className="toolbar__toggle toolbar__toggle--icon toolbar__toggle--prominent"
+          onClick={() => setMapSettingsOpen(true)}
+          data-tooltip={t('mapSidebar.settings')}
+          aria-label={t('mapSidebar.settings')}
+        >
+          <GearIcon size={18} weight="regular" />
+        </button>
         <button
           className={`toolbar__toggle toolbar__toggle--icon toolbar__toggle--prominent${panelSideBySide ? ' toolbar__toggle--on' : ''}`}
           onClick={() => setPanelSideBySide(!panelSideBySide)}

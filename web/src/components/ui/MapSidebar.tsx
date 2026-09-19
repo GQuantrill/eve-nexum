@@ -25,7 +25,7 @@ import { NOTIFY, notifyDefault, previewAlertVolume, ALERT_VOLUME_KEY, ALERT_VOLU
 import { useResettableState } from "../../hooks/useResettableState";
 import { DEFAULT_BOOKMARK_FORMAT, BOOKMARK_TOKENS, DEFAULT_SITE_BOOKMARK_FORMAT, SITE_BOOKMARK_TOKENS } from "../../utils/signatureBookmark";
 import { toPng } from "html-to-image";
-import { CaretLeftIcon, CaretRightIcon, GearIcon, DiscordLogoIcon } from "@phosphor-icons/react";
+import { CaretLeftIcon, CaretRightIcon, DiscordLogoIcon } from "@phosphor-icons/react";
 import { DISCORD_INVITE_URL } from "../../data/links";
 import { ChainExitsSection } from "./ChainExitsSection";
 import { JumpRangePane } from "./JumpRangePane";
@@ -847,7 +847,10 @@ export function MapSidebar() {
   });
   // Preferences live in a Settings dialog (gear button) rather than crowding
   // the sidebar; the sidebar keeps only the live mapping tools.
-  const [settingsOpen, setSettingsOpen] = useState(false);
+  // Open state lives in the store: the button that opens this now sits in the
+  // toolbar, with the rest of the pilot's controls.
+  const settingsOpen = useMapStore((s) => s.mapSettingsOpen);
+  const setSettingsOpen = useMapStore((s) => s.setMapSettingsOpen);
   const [settingsTab, setSettingsTab] = useState<"display" | "signatures" | "shortcuts">("display");
   const [patchNotesOpen, setPatchNotesOpen] = useState(false);
   const notifPermission = useNotificationPermission();
@@ -1210,15 +1213,6 @@ export function MapSidebar() {
           <DiscordLogoIcon size={14} weight="fill" color="#5865F2" />
           {t("actions.joinDiscord")}
         </a>
-
-        <button
-          type="button"
-          className="map-sidebar__settings-btn"
-          onClick={() => setSettingsOpen(true)}
-        >
-          <GearIcon size={14} weight="bold" />
-          {t("mapSidebar.settings")}
-        </button>
 
         <CollapsibleSection title={t("mapSidebar.sections.mapControls")} {...sectionProps("mapControls")}>
           <SettingToggle

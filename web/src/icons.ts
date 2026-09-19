@@ -56,6 +56,7 @@ export { FireIcon } from '@phosphor-icons/react/dist/csr/Fire';
 export { FlagBannerIcon } from '@phosphor-icons/react/dist/csr/FlagBanner';
 export { FootprintsIcon } from '@phosphor-icons/react/dist/csr/Footprints';
 export { GaugeIcon } from '@phosphor-icons/react/dist/csr/Gauge';
+export { GearIcon } from '@phosphor-icons/react/dist/csr/Gear';
 export { GraphIcon } from '@phosphor-icons/react/dist/csr/Graph';
 export { HandshakeIcon } from '@phosphor-icons/react/dist/csr/Handshake';
 export { HashIcon } from '@phosphor-icons/react/dist/csr/Hash';
