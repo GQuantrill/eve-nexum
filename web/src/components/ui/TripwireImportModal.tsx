@@ -25,6 +25,10 @@ import { XIcon } from '../../icons';
  *     corp-mates watching Tripwire would see you skip down the chain. The last
  *     line puts you back where you started.
  *
+ * Which system you're on comes from `viewingSystemID`, the page global
+ * Tripwire's own sync reads. The `?system=` in the URL is the system's NAME,
+ * not its id, and refresh.php answers a name with a 500.
+ *
  * It all sits inside an async IIFE rather than at the top level. Tripwire's own
  * page declares globals of its own — `var chain` among them — and a top-level
  * `const chain` in the console collides with it outright ("Identifier 'chain'
@@ -32,8 +36,13 @@ import { XIcon } from '../../icons';
  * paste twice.
  */
 const SNIPPET = `await (async () => {
-  const here = new URLSearchParams(location.search).get('system') || '30000142';
-  const get = q => fetch('/refresh.php?' + q, { credentials: 'same-origin' }).then(r => r.json());
+  const here = String(window.viewingSystemID || '');
+  if (!here) throw new Error('No system in view - open your Tripwire map first, then run this again.');
+  const get = async q => {
+    const r = await fetch('/refresh.php?' + q, { credentials: 'same-origin' });
+    if (!r.ok) throw new Error('Tripwire replied ' + r.status + ' to ' + q);
+    return r.json();
+  };
   const data = await get('mode=init&systemID=' + here);
   const sigs = Object.values(data.signatures || {});
   const ids = [...new Set(sigs.map(s => String(s.systemID)))];
