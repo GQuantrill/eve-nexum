@@ -659,6 +659,16 @@
   border-radius: 4px;
 }
 
+.tripwire-modal__extra {
+  width: 100%;
+}
+
+.tripwire-modal__hint {
+  display: block;
+  margin-top: 4px;
+  color: var(--text-dim);
+}
+
 /* The snippet is a short script, not a one-liner: it scrolls in place rather
    than pushing the paste box and the buttons off the modal. */
 .tripwire-modal__snippet pre {
