@@ -2078,15 +2078,16 @@
     "button": "↑ Importer depuis Tripwire",
     "buttonTitle": "Récupérer une chaîne Tripwire avec ses signatures",
     "step1": "Ouvrez votre onglet Tripwire et connectez-vous comme d’habitude.",
-    "step2": "Ouvrez la console du navigateur (F12), collez la ligne ci-dessous et appuyez sur Entrée. Votre chaîne actuelle est copiée dans le presse-papiers.",
+    "step2": "Ouvrez la console du navigateur (F12), collez le script ci-dessous et appuyez sur Entrée. Il parcourt votre chaîne pour récupérer les notes, puis copie le tout dans le presse-papiers — quelques secondes sur une longue chaîne.",
     "step3": "Collez-la ici et importez. Le mot de passe Tripwire n’est jamais demandé.",
     "pasteLabel": "Données de la chaîne",
     "pastePlaceholder": "Collez ici le JSON copié",
-    "scopeNote": "Récupère la chaîne que Tripwire affiche actuellement autour de votre système, avec ses signatures, les types de trous et la masse et durée de vie restante de chacun. Elle arrive comme une nouvelle carte personnelle.",
+    "scopeNote": "Récupère la chaîne que Tripwire affiche actuellement autour de votre système, avec ses signatures, les types de trous, la masse et la durée de vie restante de chacun, ainsi que les notes écrites sur ses systèmes. Elle arrive comme une nouvelle carte personnelle.",
     "import": "Importer",
     "importing": "Importation…",
     "copied": "Copié",
     "imported": "{{systems}} systèmes, {{connections}} connexions et {{signatures}} signatures importés depuis Tripwire",
+    "importedWithNotes": "{{systems}} systèmes, {{connections}} connexions, {{signatures}} signatures et les notes de {{notes}} systèmes importés depuis Tripwire",
     "notTripwireData": "Cela ne ressemble pas à des données de chaîne Tripwire — aucune signature"
   }
 }

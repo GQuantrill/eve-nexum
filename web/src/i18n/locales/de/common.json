@@ -2078,15 +2078,16 @@
     "button": "↑ Aus Tripwire importieren",
     "buttonTitle": "Eine Tripwire-Kette samt Signaturen übernehmen",
     "step1": "Öffne deinen Tripwire-Tab und melde dich wie gewohnt an.",
-    "step2": "Öffne die Browser-Konsole (F12), füge die Zeile unten ein und drücke Enter. Damit wird deine aktuelle Kette in die Zwischenablage kopiert.",
+    "step2": "Öffne die Browser-Konsole (F12), füge das Skript unten ein und drücke Enter. Es geht deine Kette durch, sammelt die Notizen und kopiert alles in die Zwischenablage — bei einer langen Kette dauert das ein paar Sekunden.",
     "step3": "Hier einfügen und importieren. Tripwire wird nie nach deinem Passwort gefragt.",
     "pasteLabel": "Kettendaten",
     "pastePlaceholder": "Kopiertes JSON hier einfügen",
-    "scopeNote": "Übernommen wird die Kette, die Tripwire aktuell um dein System zeigt — mit Signaturen, Wurmlochtypen sowie Masse und Restlebensdauer jedes Lochs. Sie erscheint als neue persönliche Karte.",
+    "scopeNote": "Übernommen wird die Kette, die Tripwire aktuell um dein System zeigt — mit Signaturen, Wurmlochtypen, Masse und Restlebensdauer jedes Lochs sowie den Notizen zu den Systemen. Sie erscheint als neue persönliche Karte.",
     "import": "Importieren",
     "importing": "Importiere…",
     "copied": "Kopiert",
     "imported": "{{systems}} Systeme, {{connections}} Verbindungen und {{signatures}} Signaturen aus Tripwire importiert",
+    "importedWithNotes": "{{systems}} Systeme, {{connections}} Verbindungen, {{signatures}} Signaturen und Notizen zu {{notes}} Systemen aus Tripwire importiert",
     "notTripwireData": "Das sehen nicht nach Tripwire-Kettendaten aus — keine Signaturen enthalten"
   }
 }

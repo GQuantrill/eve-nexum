@@ -2078,15 +2078,16 @@
     "button": "↑ Importar do Tripwire",
     "buttonTitle": "Trazer uma cadeia do Tripwire com as suas assinaturas",
     "step1": "Abra o seu separador do Tripwire e inicie sessão como habitualmente.",
-    "step2": "Abra a consola do navegador (F12), cole a linha abaixo e prima Enter. Copia a sua cadeia atual para a área de transferência.",
+    "step2": "Abra a consola do navegador (F12), cole o script abaixo e prima Enter. Percorre a sua cadeia para recolher as notas e copia tudo para a área de transferência — numa cadeia longa demora alguns segundos.",
     "step3": "Cole aqui e importe. A palavra-passe do Tripwire nunca é pedida.",
     "pasteLabel": "Dados da cadeia",
     "pastePlaceholder": "Cole aqui o JSON copiado",
-    "scopeNote": "Traz a cadeia que o Tripwire mostra agora à volta do seu sistema, com assinaturas, tipos de buraco e a massa e vida restante de cada um. Chega como um novo mapa pessoal.",
+    "scopeNote": "Traz a cadeia que o Tripwire mostra agora à volta do seu sistema, com assinaturas, tipos de buraco, a massa e vida restante de cada um, e as notas escritas nos seus sistemas. Chega como um novo mapa pessoal.",
     "import": "Importar",
     "importing": "A importar…",
     "copied": "Copiado",
     "imported": "Importados {{systems}} sistemas, {{connections}} ligações e {{signatures}} assinaturas do Tripwire",
+    "importedWithNotes": "Importados {{systems}} sistemas, {{connections}} ligações, {{signatures}} assinaturas e notas de {{notes}} sistemas do Tripwire",
     "notTripwireData": "Isto não parece dados de cadeia do Tripwire — não tem assinaturas"
   }
 }

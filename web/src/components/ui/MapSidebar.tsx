@@ -1067,9 +1067,9 @@ export function MapSidebar() {
   // chain arrives with its scan data rather than just its shape.
   const [tripwireOpen, setTripwireOpen] = useState(false);
   async function handleImportTripwire(raw: string) {
-    let parsed: { signatures?: unknown; wormholes?: unknown };
+    let parsed: { signatures?: unknown; wormholes?: unknown; notes?: unknown; origin?: unknown };
     try {
-      parsed = JSON.parse(raw) as { signatures?: unknown; wormholes?: unknown };
+      parsed = JSON.parse(raw) as { signatures?: unknown; wormholes?: unknown; notes?: unknown; origin?: unknown };
     } catch {
       toast.error(t("mapSidebar.invalidJson"));
       return;
@@ -1079,9 +1079,15 @@ export function MapSidebar() {
       return;
     }
     try {
-      const { id, imported } = await api<{ id: string; imported: { systems: number; connections: number; signatures: number; skipped: number } }>(
+      const { id, imported } = await api<{ id: string; imported: { systems: number; connections: number; signatures: number; notes: number; skipped: number } }>(
         "/api/maps/import/tripwire",
-        { method: "POST", body: JSON.stringify({ signatures: parsed.signatures, wormholes: parsed.wormholes ?? {} }) },
+        { method: "POST", body: JSON.stringify({
+          signatures: parsed.signatures,
+          wormholes:  parsed.wormholes ?? {},
+          // Both absent from a paste made before the snippet collected notes.
+          notes:      parsed.notes ?? {},
+          origin:     parsed.origin ?? null,
+        }) },
       );
       await useMapStore.getState().loadMaps();
       await useMapStore.getState().switchMap(id);
@@ -1092,8 +1098,9 @@ export function MapSidebar() {
         useMapStore.getState().optimizeConnections();
         useMapStore.getState().requestFitView();
       }, 500);
-      toast.success(t("tripwire.imported", {
-        systems: imported.systems, connections: imported.connections, signatures: imported.signatures,
+      toast.success(t(imported.notes > 0 ? "tripwire.importedWithNotes" : "tripwire.imported", {
+        systems: imported.systems, connections: imported.connections,
+        signatures: imported.signatures, notes: imported.notes,
       }));
     } catch (err) {
       toast.error(t("mapSidebar.importFailed", { error: err instanceof Error ? err.message : String(err) }));

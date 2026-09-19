@@ -2078,15 +2078,16 @@
     "button": "↑ Tripwire에서 가져오기",
     "buttonTitle": "Tripwire 체인을 시그니처와 함께 가져오기",
     "step1": "Tripwire 탭을 열고 평소처럼 로그인하세요.",
-    "step2": "브라우저 콘솔(F12)을 열고 아래 줄을 붙여넣은 뒤 Enter를 누르세요. 현재 체인이 클립보드에 복사됩니다.",
+    "step2": "브라우저 콘솔(F12)을 열고 아래 스크립트를 붙여넣은 뒤 Enter를 누르세요. 체인을 돌며 메모를 모은 뒤 전부를 클립보드에 복사합니다. 긴 체인이라면 몇 초 걸립니다.",
     "step3": "여기에 붙여넣고 가져오세요. Tripwire 비밀번호는 묻지 않습니다.",
     "pasteLabel": "체인 데이터",
     "pastePlaceholder": "복사한 JSON을 여기에 붙여넣기",
-    "scopeNote": "Tripwire가 현재 내 시스템 주변에 표시하는 체인을 시그니처, 웜홀 종류, 각 홀의 질량과 남은 수명까지 함께 가져옵니다. 새 개인 맵으로 만들어집니다.",
+    "scopeNote": "Tripwire가 현재 내 시스템 주변에 표시하는 체인을 시그니처, 원홀 종류, 각 홀의 질량과 남은 수명, 그리고 시스템에 적힌 메모까지 함께 가져옵니다. 새 개인 맵으로 만들어집니다.",
     "import": "가져오기",
     "importing": "가져오는 중…",
     "copied": "복사됨",
     "imported": "Tripwire에서 시스템 {{systems}}개, 연결 {{connections}}개, 시그니처 {{signatures}}개를 가져왔습니다",
+    "importedWithNotes": "Tripwire에서 시스템 {{systems}}개, 연결 {{connections}}개, 시그니처 {{signatures}}개, 시스템 메모 {{notes}}개를 가져왔습니다",
     "notTripwireData": "Tripwire 체인 데이터가 아닌 것 같습니다 — 시그니처가 없습니다"
   }
 }

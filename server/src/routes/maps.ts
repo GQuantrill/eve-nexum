@@ -32,6 +32,7 @@ import { whSizeForCode } from './wormholes.js';
 import { effectiveExpiryMs, lifeBucket } from '../data/whLifetimes.js';
 import { buildKillRow } from '../services/killFeed.js';
 import { recentKillsForSystems } from '../services/killBuffer.js';
+import { twNotesBySystem } from '../utils/tripwireNotes.js';
 
 const log = createLogger('maps');
 const discordLog = createLogger('discord');
@@ -1765,6 +1766,13 @@ mapsRouter.post('/import/wanderer', async (req, res) => {
 //   wormholes:  { <id>: { initialID, secondaryID, type: "K162"|"GATE"|…,
 //                         life: "stable"|"critical", mass: "stable"|"destab"|"critical" } }
 // Both are objects keyed by id, but arrive as [] when empty.
+//
+// System notes are not in that reply: refresh.php only ever returns the
+// comments for the ONE system it was asked about (plus the map-wide sticky
+// one), so the snippet walks the chain and collects them, handing them over as
+//   notes: { <systemID>: [ { comment, createdByName } ], "0": [ …sticky… ] }
+// and `origin` for the system it was run from. Pastes without either still
+// import fine.
 const TW_MASS: Record<string, string> = { stable: 'stable', destab: 'destabilized', critical: 'critical' };
 // Tripwire's sig categories -> ours. Anything unrecognised lands as 'unknown',
 // which is also what its own "unknown until scanned" rows mean.
@@ -1775,7 +1783,6 @@ const TW_SIG_TYPE: Record<string, string> = {
 
 interface TwSig  { id?: unknown; signatureID?: unknown; systemID?: unknown; type?: unknown; name?: unknown }
 interface TwHole { initialID?: unknown; secondaryID?: unknown; type?: unknown; life?: unknown; mass?: unknown }
-
 /** Tripwire sends `{}`-keyed maps, or `[]` when empty. Normalise to an array. */
 function twValues<T>(v: unknown): T[] {
   if (Array.isArray(v)) return v as T[];
@@ -1828,7 +1835,7 @@ function layoutChain(eveIds: number[], edges: Array<[number, number]>): Map<numb
 }
 
 mapsRouter.post('/import/tripwire', async (req, res) => {
-  const body = req.body as { name?: unknown; signatures?: unknown; wormholes?: unknown };
+  const body = req.body as { name?: unknown; signatures?: unknown; wormholes?: unknown; notes?: unknown; origin?: unknown };
   const sigs  = twValues<TwSig>(body.signatures);
   const holes = twValues<TwHole>(body.wormholes);
   if (sigs.length === 0) { res.status(400).json({ error: 'No signatures in that data — is it a Tripwire chain?' }); return; }
@@ -1878,6 +1885,11 @@ mapsRouter.post('/import/tripwire', async (req, res) => {
 
   const pos = layoutChain(kept, edges.map((e) => [e.a, e.b] as [number, number]));
 
+  // System notes, when the snippet was run by a build that collects them.
+  // Older pastes simply carry none.
+  const originId = Number(body.origin);
+  const noteBySys = twNotesBySystem(body.notes, Number.isInteger(originId) && keptSet.has(originId) ? originId : null);
+
   const client = await db.connect();
   try {
     await client.query('BEGIN');
@@ -1889,7 +1901,7 @@ mapsRouter.post('/import/tripwire', async (req, res) => {
     const mapId = mapRes.rows[0].id;
 
     const idByEve = new Map<number, string>();
-    const SYSCOLS = 13;
+    const SYSCOLS = 14;
     const sysPh: string[] = []; const sysVals: unknown[] = [];
     kept.forEach((eve) => {
       const info = sdeById.get(eve)!;
@@ -1901,13 +1913,13 @@ mapsRouter.post('/import/tripwire', async (req, res) => {
       sysVals.push(
         newId, mapId, eve, info.name, info.systemClass ?? 'unknown',
         info.effect ?? 'none', info.statics ?? [], info.regionName ?? null, null,
-        p.x, p.y, 'unknown', false,
+        p.x, p.y, 'unknown', false, noteBySys.get(eve) ?? '',
       );
     });
     await client.query(
       `INSERT INTO map_systems
          (id, map_id, eve_system_id, name, system_class, effect, statics, region_name, npc_type,
-          position_x, position_y, status, is_home)
+          position_x, position_y, status, is_home, notes)
        VALUES ${sysPh.join(',')}`,
       sysVals,
     );
@@ -1971,6 +1983,7 @@ mapsRouter.post('/import/tripwire', async (req, res) => {
     res.status(201).json({
       id: mapId,
       imported: { systems: sysPh.length, connections: connPh.length, signatures: sigPh.length,
+                  notes: kept.filter((eve) => noteBySys.get(eve)).length,
                   skipped: eveIds.length - kept.length },
     });
   } catch (err) {

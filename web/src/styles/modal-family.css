@@ -659,14 +659,22 @@
   border-radius: 4px;
 }
 
-.tripwire-modal__snippet code {
+/* The snippet is a short script, not a one-liner: it scrolls in place rather
+   than pushing the paste box and the buttons off the modal. */
+.tripwire-modal__snippet pre {
   flex: 1;
   min-width: 0;
+  max-height: 200px;
+  margin: 0;
+  overflow: auto;
+}
+
+.tripwire-modal__snippet code {
+  display: block;
   color: var(--text-bright);
   font-size: calc(11px * var(--font-scale, 1));
   line-height: 1.5;
-  white-space: pre-wrap;
-  word-break: break-all;
+  white-space: pre;
 }
 
 .tripwire-modal__input {
