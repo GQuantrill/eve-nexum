@@ -2078,7 +2078,7 @@
     "button": "↑ Importar do Tripwire",
     "buttonTitle": "Trazer uma cadeia do Tripwire com as suas assinaturas",
     "step1": "Abra o seu separador do Tripwire e inicie sessão como habitualmente.",
-    "step2": "Abra a consola do navegador (F12), cole o script abaixo e prima Enter. Percorre a sua cadeia para recolher as notas e copia tudo para a área de transferência — numa cadeia longa demora alguns segundos.",
+    "step2": "Abra a consola do navegador (F12), cole o script abaixo e prima Enter. Percorre toda a cadeia a recolher as assinaturas e notas de cada sistema e copia tudo para a área de transferência — numa cadeia longa demora alguns segundos. Basta executá-lo uma vez, a partir de qualquer sistema.",
     "step3": "Cole aqui e importe. A palavra-passe do Tripwire nunca é pedida.",
     "pasteLabel": "Dados da cadeia",
     "pastePlaceholder": "Cole aqui o JSON copiado",

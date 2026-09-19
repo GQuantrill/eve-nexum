@@ -2078,7 +2078,7 @@
     "button": "↑ Importar desde Tripwire",
     "buttonTitle": "Traer una cadena de Tripwire con sus firmas",
     "step1": "Abre tu pestaña de Tripwire e inicia sesión como siempre.",
-    "step2": "Abre la consola del navegador (F12), pega el script de abajo y pulsa Enter. Recorre tu cadena para recoger las notas y lo copia todo al portapapeles; en una cadena larga tarda unos segundos.",
+    "step2": "Abre la consola del navegador (F12), pega el script de abajo y pulsa Enter. Recorre toda la cadena recogiendo las firmas y notas de cada sistema y lo copia todo al portapapeles; en una cadena larga tarda unos segundos. Solo hace falta ejecutarlo una vez, desde cualquier sistema.",
     "step3": "Pégala aquí e importa. Nunca se le pide la contraseña a Tripwire.",
     "pasteLabel": "Datos de la cadena",
     "pastePlaceholder": "Pega aquí el JSON copiado",

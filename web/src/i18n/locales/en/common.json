@@ -2078,7 +2078,7 @@
     "button": "↑ Import from Tripwire",
     "buttonTitle": "Bring a Tripwire chain in, with its signatures",
     "step1": "Open your Tripwire tab and sign in as usual.",
-    "step2": "Open the browser console (F12), paste the script below and press Enter. It walks your chain to collect its notes, then copies everything to the clipboard — a few seconds on a long chain.",
+    "step2": "Open the browser console (F12), paste the script below and press Enter. It walks your whole chain collecting each system's signatures and notes, then copies everything to the clipboard - a few seconds on a long chain. You only need to run it once, on any system.",
     "step3": "Paste it here and import. Tripwire is never asked for your password.",
     "pasteLabel": "Chain data",
     "pastePlaceholder": "Paste the copied JSON here",

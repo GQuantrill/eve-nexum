@@ -12,15 +12,18 @@ import { XIcon } from '../../icons';
  * result, and no Tripwire credentials are involved at any point — which is the
  * whole reason for doing it this way rather than asking for a login.
  *
- * System notes need a second pass. Tripwire's chain reply carries the comments
- * for the one system it was asked about and nothing else, so the snippet walks
- * the systems it just learned about and asks for each one's notes. Two details
- * that cost nothing and matter:
- *   - the `commentCount`/`commentTime` pair is deliberately impossible to
- *     match, which is what makes Tripwire send the notes rather than "no
- *     change". The signature count is the opposite: it's the best guess we can
- *     make from the chain we already hold, and where it lands on the real
- *     number Tripwire skips resending that system's signatures.
+ * One call is enough for the SHAPE of the chain — refresh.php returns the
+ * mask's whole `wormholes` table and every wormhole signature, not just what's
+ * on screen — but not for its contents. Notes come back only for the system
+ * asked about, and so do the other signature types (relic, data, gas, combat,
+ * ghost). So the snippet walks the systems it just learned about and collects
+ * both, which is why one run on any system brings in the whole chain rather
+ * than needing a pass per tab. Three details that matter:
+ *   - the `signatureCount`/`commentCount` pairs are deliberately impossible to
+ *     match. That's what makes Tripwire send the data rather than "no change".
+ *   - signatures merge over the initial reply rather than replacing it: each
+ *     call returns that system's own sigs plus every wormhole, so the union
+ *     across the walk is the full chain.
  *   - every one of those calls also stamps that system as where you are, so
  *     corp-mates watching Tripwire would see you skip down the chain. The last
  *     line puts you back where you started.
@@ -53,17 +56,19 @@ const SNIPPET = `await (async () => {
   const data = await get('mode=init&systemID=' + here);
   const sigs = Object.values(data.signatures || {});
   const ids = [...new Set(sigs.map(s => String(s.systemID)))];
-  const notes = {}, sticky = new Map();
-  for (const id of ids) {
-    const n = sigs.filter(s => String(s.systemID) === id || s.type === 'wormhole').length;
-    const r = await get('mode=refresh&systemID=' + id + '&signatureCount=' + n + '&signatureTime=2100-01-01&commentCount=-1&commentTime=1970-01-01');
+  const notes = {}, sticky = new Map(), all = { ...data.signatures };
+  for (const [i, id] of ids.entries()) {
+    const r = await get('mode=refresh&systemID=' + id + '&signatureCount=-1&signatureTime=1970-01-01&commentCount=-1&commentTime=1970-01-01');
+    Object.assign(all, r.signatures || {});
     for (const c of r.comments || []) c.sticky ? sticky.set(c.id, c) : (notes[id] = notes[id] || []).push(c);
+    if (ids.length > 20 && i % 10 === 9) console.log((i + 1) + '/' + ids.length + ' systems...');
   }
   notes['0'] = [...sticky.values()];
   await get('mode=refresh&systemID=' + here);
-  window.twChain = JSON.stringify({ ...data, origin: here, notes });
-  try { cp(twChain); console.log('Copied ' + ids.length + ' systems to the clipboard.'); }
-  catch (e) { console.log('Collected ' + ids.length + ' systems. Now run:  copy(twChain)'); }
+  window.twChain = JSON.stringify({ ...data, signatures: all, origin: here, notes });
+  const tally = ids.length + ' systems, ' + Object.keys(all).length + ' signatures';
+  try { cp(twChain); console.log('Copied ' + tally + ' to the clipboard.'); }
+  catch (e) { console.log('Collected ' + tally + '. Now run:  copy(twChain)'); }
 })();`;
 
 export function TripwireImportModal({ onImport, onClose }: {
