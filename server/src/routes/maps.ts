@@ -1767,12 +1767,15 @@ mapsRouter.post('/import/wanderer', async (req, res) => {
 //                         life: "stable"|"critical", mass: "stable"|"destab"|"critical" } }
 // Both are objects keyed by id, but arrive as [] when empty.
 //
-// System notes are not in that reply: refresh.php only ever returns the
-// comments for the ONE system it was asked about (plus the map-wide sticky
-// one), so the snippet walks the chain and collects them, handing them over as
+// System notes come through as
 //   notes: { <systemID>: [ { comment, createdByName } ], "0": [ …sticky… ] }
-// and `origin` for the system it was run from. Pastes without either still
-// import fine.
+// with `origin` naming the system the snippet was run from. Pastes made before
+// the snippet collected notes carry neither and still import fine.
+//
+// A system can arrive on its notes alone. Tripwire has no node list — its map
+// is drawn from the wormhole table — so a system someone annotated without ever
+// connecting it exists only as a comment row. Dropping those would quietly lose
+// exactly the systems a person took the trouble to write about.
 const TW_MASS: Record<string, string> = { stable: 'stable', destab: 'destabilized', critical: 'critical' };
 // Tripwire's sig categories -> ours. Anything unrecognised lands as 'unknown',
 // which is also what its own "unknown until scanned" rows mean.
@@ -1838,7 +1841,10 @@ mapsRouter.post('/import/tripwire', async (req, res) => {
   const body = req.body as { name?: unknown; signatures?: unknown; wormholes?: unknown; notes?: unknown; origin?: unknown };
   const sigs  = twValues<TwSig>(body.signatures);
   const holes = twValues<TwHole>(body.wormholes);
-  if (sigs.length === 0) { res.status(400).json({ error: 'No signatures in that data — is it a Tripwire chain?' }); return; }
+  // Systems carrying a note. Resolved with no origin so the map-wide sticky
+  // note (key "0") doesn't invent a system of its own.
+  const noteSysIds = [...twNotesBySystem(body.notes, null).keys()];
+  if (sigs.length === 0 && noteSysIds.length === 0) { res.status(400).json({ error: 'No signatures in that data — is it a Tripwire chain?' }); return; }
   if (holes.length > MAX_IMPORT_CONNECTIONS) { res.status(413).json({ error: `Too many connections (max ${MAX_IMPORT_CONNECTIONS})` }); return; }
 
   // Signature rows are keyed by their own id; wormholes point at those ids.
@@ -1851,7 +1857,10 @@ mapsRouter.post('/import/tripwire', async (req, res) => {
     return Number.isInteger(n) && n > 0 ? n : null;
   };
 
-  const eveIds = [...new Set(sigs.map((s) => Number(s.systemID)).filter((n) => Number.isInteger(n) && n > 0))];
+  const eveIds = [...new Set([
+    ...sigs.map((s) => Number(s.systemID)).filter((n) => Number.isInteger(n) && n > 0),
+    ...noteSysIds,
+  ])];
   if (eveIds.length === 0)                 { res.status(400).json({ error: 'No valid EVE system ids in that data' }); return; }
   if (eveIds.length > MAX_IMPORT_SYSTEMS)  { res.status(413).json({ error: `Too many systems (max ${MAX_IMPORT_SYSTEMS})` }); return; }
 
