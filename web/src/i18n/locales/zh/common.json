@@ -1890,7 +1890,8 @@
     "standingNotSet": "{{label}}：未设置声望",
     "standingValue": "{{label}}：{{value}}",
     "panesTitle": "面板",
-    "panesHint": "选择下方显示的面板。隐藏的面板会保留位置，重新开启时回到原处。"
+    "panesHint": "选择下方显示的面板。隐藏的面板会保留位置，重新开启时回到原处。",
+    "openAnoikis": "在 anoik.is 中打开"
   },
   "time": {
     "justNow": "刚刚",

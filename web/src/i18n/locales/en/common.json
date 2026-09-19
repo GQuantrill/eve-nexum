@@ -1890,7 +1890,8 @@
     "standingNotSet": "{{label}}: no standing set",
     "standingValue": "{{label}}: {{value}}",
     "panesTitle": "Panels",
-    "panesHint": "Choose which panels appear below. Hidden ones keep their place, so switching one back on returns it to where you had it."
+    "panesHint": "Choose which panels appear below. Hidden ones keep their place, so switching one back on returns it to where you had it.",
+    "openAnoikis": "Open in anoik.is"
   },
   "time": {
     "justNow": "just now",

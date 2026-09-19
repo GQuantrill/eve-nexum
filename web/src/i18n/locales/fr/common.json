@@ -1890,7 +1890,8 @@
     "standingNotSet": "{{label}} : aucun standing défini",
     "standingValue": "{{label}} : {{value}}",
     "panesTitle": "Panneaux",
-    "panesHint": "Choisissez les panneaux affichés ci-dessous. Ceux masqués conservent leur place et y reviennent une fois réactivés."
+    "panesHint": "Choisissez les panneaux affichés ci-dessous. Ceux masqués conservent leur place et y reviennent une fois réactivés.",
+    "openAnoikis": "Ouvrir dans anoik.is"
   },
   "time": {
     "justNow": "à l'instant",

@@ -179,6 +179,10 @@ function clampWidth(v: number) {
 // Classes for which a Dotlan #npc_delta map is meaningful. Wormhole and
 // Drifter systems get no link — dotlan has those pages but no NPC data.
 const DOTLAN_CLASSES = new Set(['HS', 'LS', 'NS', 'Thera', 'Pochven']);
+// anoik.is covers J-space only: the numbered classes, the shattered C13s,
+// Thera and the Drifter systems (which carry J-codes too). Pochven is
+// Triglavian rather than wormhole space, so it has no page there.
+const ANOIKIS_CLASSES = new Set(['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C13', 'Thera', 'Drifter']);
 
 function clamp(v: number) {
   return Math.min(Math.floor(window.innerHeight * 0.85), Math.max(MIN_H, v));
@@ -810,6 +814,18 @@ export function SystemPanel() {
                         className={styles.extLink}
                       >
                         <img src="/vendor/dotlan.ico" alt="Dotlan" className={styles.extIcon} loading="lazy" />
+                      </a>
+                    </Tooltip>
+                  )}
+                  {sys.name && ANOIKIS_CLASSES.has(sys.systemClass) && (
+                    <Tooltip label={t('systemPanel.openAnoikis')} placement="right">
+                      <a
+                        href={`https://anoik.is/systems/${encodeURIComponent(sys.name)}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className={styles.extLink}
+                      >
+                        <img src="/vendor/anoikis.png" alt="Anoikis" className={styles.extIcon} loading="lazy" />
                       </a>
                     </Tooltip>
                   )}

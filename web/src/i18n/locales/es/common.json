@@ -1890,7 +1890,8 @@
     "standingNotSet": "{{label}}: sin standing establecido",
     "standingValue": "{{label}}: {{value}}",
     "panesTitle": "Paneles",
-    "panesHint": "Elige qué paneles aparecen abajo. Los ocultos conservan su posición y vuelven a ella al reactivarlos."
+    "panesHint": "Elige qué paneles aparecen abajo. Los ocultos conservan su posición y vuelven a ella al reactivarlos.",
+    "openAnoikis": "Abrir en anoik.is"
   },
   "time": {
     "justNow": "ahora mismo",

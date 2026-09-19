@@ -1890,7 +1890,8 @@
     "standingNotSet": "{{label}}: スタンディング未設定",
     "standingValue": "{{label}}: {{value}}",
     "panesTitle": "パネル",
-    "panesHint": "下に表示するパネルを選びます。非表示にしたものも位置は保持され、再表示すると元の場所に戻ります。"
+    "panesHint": "下に表示するパネルを選びます。非表示にしたものも位置は保持され、再表示すると元の場所に戻ります。",
+    "openAnoikis": "anoik.is で開く"
   },
   "time": {
     "justNow": "たった今",
