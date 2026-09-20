@@ -1755,6 +1755,178 @@ mapsRouter.post('/import/wanderer', async (req, res) => {
   }
 });
 
+// ── Pathfinder import ───────────────────────────────────────────────────────
+// Pathfinder (exodus4d) has a real export: Map settings -> Export writes
+// `JSON.stringify(getMapDataFromClient(['hasId']))` to a .json file, shaped
+//   { config: { name, ... }, data: { systems: [...], connections: [...] } }
+//
+// Systems carry BOTH ids: `systemId` is the EVE one, `id` is Pathfinder's own
+// row id — and connections reference the latter, so the two have to be kept
+// apart while wiring the edges up.
+//
+// As with the Wanderer import, the export's own name/class/effect/statics/
+// region are ignored in favour of our SDE: it is the same data, and ours is
+// the one the rest of the app agrees with. Not in the export at all:
+// signatures, system descriptions, and wormhole codes (N062/K162).
+const PF_INTEL: Record<number, string> = { 2: 'friendly', 3: 'occupied', 4: 'hostile', 5: 'empty' };
+// Pathfinder's link scopes. 'abyssal' has no counterpart here and lands as a
+// plain wormhole link, which is what it draws like anyway.
+const PF_SCOPE: Record<string, string> = { stargate: 'gate', jumpbridge: 'jumpgate', wh: 'standard', abyssal: 'standard' };
+// Connection flags arrive as an array of css-ish type names.
+const PF_MASS: Record<string, string> = { wh_reduced: 'destabilized', wh_critical: 'critical' };
+const PF_SIZE: Record<string, string> = {
+  frigate: 'small', wh_jump_mass_s: 'small', wh_jump_mass_m: 'medium',
+  wh_jump_mass_l: 'large', wh_jump_mass_xl: 'xl',
+};
+
+interface PfSystem {
+  id?: unknown; systemId?: unknown; alias?: unknown; locked?: unknown;
+  status?: { id?: unknown }; position?: { x?: unknown; y?: unknown };
+}
+interface PfConn { source?: unknown; target?: unknown; scope?: unknown; type?: unknown }
+
+mapsRouter.post('/import/pathfinder', async (req, res) => {
+  const body = req.body as { name?: unknown; config?: { name?: unknown }; data?: unknown; systems?: unknown; connections?: unknown };
+  // Accept the file as exported, and also a pre-unwrapped `data` object.
+  const data = (body.data && typeof body.data === 'object' ? body.data : body) as { systems?: unknown; connections?: unknown };
+  const systems = Array.isArray(data.systems) ? (data.systems as PfSystem[]) : null;
+  const conns   = Array.isArray(data.connections) ? (data.connections as PfConn[]) : [];
+  if (!systems)                             { res.status(400).json({ error: 'No systems in that file — is it a Pathfinder export?' }); return; }
+  if (systems.length > MAX_IMPORT_SYSTEMS)  { res.status(413).json({ error: `Too many systems (max ${MAX_IMPORT_SYSTEMS})` }); return; }
+  if (conns.length > MAX_IMPORT_CONNECTIONS) { res.status(413).json({ error: `Too many connections (max ${MAX_IMPORT_CONNECTIONS})` }); return; }
+
+  const oid = await resolveOwnerId(req);
+  if (await countPersonalMaps(oid) >= await mapCapFor(oid)) { res.status(403).json({ error: 'Maximum maps reached' }); return; }
+
+  const eveOf = (s: PfSystem) => Number(s.systemId);
+  const eveIds = [...new Set(systems.map(eveOf).filter((n) => Number.isInteger(n) && n > 0))];
+  if (eveIds.length === 0) { res.status(400).json({ error: 'No valid EVE system ids in that file' }); return; }
+
+  const { rows: sde } = await db.query<{ id: number; name: string; systemClass: string | null; effect: string | null; statics: string[]; regionName: string | null }>(
+    `SELECT s.id, s.name, s.class AS "systemClass", s.effect, s.statics, r.name AS "regionName"
+       FROM solar_systems s LEFT JOIN map_regions r ON r.id = s.region_id
+      WHERE s.id = ANY($1::int[])`,
+    [eveIds],
+  );
+  const sdeById = new Map(sde.map((r) => [r.id, r]));
+
+  // One row per EVE system: a Pathfinder map can't hold the same system twice,
+  // but a hand-edited file could.
+  const seenEve = new Set<number>();
+  const kept: Array<{ s: PfSystem; eve: number }> = [];
+  for (const s of systems) {
+    const eve = eveOf(s);
+    if (!Number.isInteger(eve) || !sdeById.has(eve) || seenEve.has(eve)) continue;
+    seenEve.add(eve);
+    kept.push({ s, eve });
+  }
+  if (kept.length === 0) { res.status(400).json({ error: 'None of the systems were recognised (not in the EVE SDE)' }); return; }
+
+  // Pathfinder's nodes are smaller than ours, so its spacing has to be opened
+  // out — same treatment the Wanderer layout gets.
+  const coords = kept.map(({ s }) => ({ x: Number(s.position?.x) || 0, y: Number(s.position?.y) || 0 }));
+  deOverlapCoords(coords);
+
+  const client = await db.connect();
+  try {
+    await client.query('BEGIN');
+    const fromFile = typeof body.name === 'string' && body.name.trim() ? body.name
+      : (typeof body.config?.name === 'string' && body.config.name.trim() ? body.config.name : 'Imported from Pathfinder');
+    const name = String(fromFile).slice(0, MAX_MAP_NAME_LEN);
+    const mapRes = await client.query<{ id: string }>(
+      `INSERT INTO maps (user_id, owner_id, name) VALUES ($1, $2, $3) RETURNING id`,
+      [req.session.userId, oid, name],
+    );
+    const mapId = mapRes.rows[0].id;
+
+    // Connections address systems by Pathfinder's own row id, not the EVE one.
+    const idByPf = new Map<string, string>();
+    const SYSCOLS = 15;
+    const sysPh: string[] = []; const sysVals: unknown[] = [];
+    kept.forEach(({ s, eve }, i) => {
+      const info = sdeById.get(eve)!;
+      const newId = crypto.randomUUID();
+      if (s.id != null) idByPf.set(String(s.id), newId);
+      // Pathfinder's alias is a display-only rename, the same thing ours is, so
+      // it maps straight across. It defaults to the system's own name, which
+      // would just be a rename to what it is already called.
+      const alias = typeof s.alias === 'string' ? s.alias.trim() : '';
+      const base = sysVals.length;
+      sysPh.push(`(${Array.from({ length: SYSCOLS }, (_, k) => `$${base + k + 1}`).join(',')})`);
+      sysVals.push(
+        newId, mapId, eve, info.name, info.systemClass ?? 'unknown',
+        info.effect ?? 'none', info.statics ?? [], info.regionName ?? null, null,
+        coords[i].x, coords[i].y, 'unknown', false, s.locked === true || s.locked === 1,
+        alias && alias !== info.name ? alias.slice(0, 100) : null,
+      );
+    });
+    await client.query(
+      `INSERT INTO map_systems
+         (id, map_id, eve_system_id, name, system_class, effect, statics, region_name, npc_type,
+          position_x, position_y, status, is_home, locked, alias)
+       VALUES ${sysPh.join(',')}`,
+      sysVals,
+    );
+
+    // Intel is a separate pass: most systems carry none, so a second statement
+    // for the few that do beats widening every row.
+    const intelRows = kept
+      .map(({ s }) => ({ id: s.id != null ? idByPf.get(String(s.id)) : undefined, intel: PF_INTEL[Number(s.status?.id)] }))
+      .filter((r): r is { id: string; intel: string } => !!r.id && !!r.intel);
+    for (const r of intelRows) {
+      await client.query(`UPDATE map_systems SET intel = $1 WHERE id = $2`, [r.intel, r.id]);
+    }
+
+    const CONNCOLS = 8;
+    const connPh: string[] = []; const connVals: unknown[] = [];
+    const seenPair = new Set<string>();
+    for (const c of conns) {
+      const src = idByPf.get(String(c.source)), tgt = idByPf.get(String(c.target));
+      if (!src || !tgt || src === tgt) continue;
+      const key = src < tgt ? `${src}|${tgt}` : `${tgt}|${src}`;
+      if (seenPair.has(key)) continue;
+      seenPair.add(key);
+
+      const flags = Array.isArray(c.type) ? (c.type as unknown[]).map(String) : [];
+      const connType = PF_SCOPE[String(c.scope)] ?? 'standard';
+      const isWh = connType === 'standard';
+      const mass = flags.map((f) => PF_MASS[f]).find(Boolean) ?? 'stable';
+      const size = flags.map((f) => PF_SIZE[f]).find(Boolean) ?? 'large';
+      const base = connVals.length;
+      connPh.push(`(${Array.from({ length: CONNCOLS }, (_, k) => `$${base + k + 1}`).join(',')})`);
+      connVals.push(
+        crypto.randomUUID(), mapId, src, tgt, connType,
+        isWh ? mass : 'stable',
+        size,
+        // EOL is a band here, not a flag: record the life it implies and let
+        // the bucket be derived, or marking it does nothing (a bare time_status
+        // gets recomputed away).
+        isWh && flags.includes('wh_eol') ? new Date(Date.now() + 4 * 3_600_000 - 60_000).toISOString() : null,
+      );
+    }
+    if (connPh.length > 0) {
+      await client.query(
+        `INSERT INTO map_connections
+           (id, map_id, source_id, target_id, connection_type, mass_status, size, lifetime_expires_at)
+         VALUES ${connPh.join(',')}`,
+        connVals,
+      );
+    }
+
+    await client.query('COMMIT');
+    res.status(201).json({
+      id: mapId,
+      imported: { systems: sysPh.length, connections: connPh.length, intel: intelRows.length,
+                  skipped: systems.length - kept.length },
+    });
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    client.release();
+  }
+});
+
 // ── Tripwire import ─────────────────────────────────────────────────────────
 // Tripwire has no export button, so this takes the JSON its own web client
 // receives from `refresh.php?mode=init` (see the console snippet the import

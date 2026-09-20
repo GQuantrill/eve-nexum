@@ -833,6 +833,7 @@ export function MapSidebar() {
   const { t } = useTranslation();
   const importInputRef = useRef<HTMLInputElement>(null);
   const wandererInputRef = useRef<HTMLInputElement>(null);
+  const pathfinderInputRef = useRef<HTMLInputElement>(null);
   const [threshold, setThreshold] = useProximityThreshold();
   const [staleHours, setStaleHours] = useStaleThreshold();
   // Single source of truth for which section is expanded. Defaults to
@@ -1154,6 +1155,49 @@ export function MapSidebar() {
       toast.error(
         t("mapSidebar.importFailed", { error: err instanceof Error ? err.message : String(err) }),
       );
+    }
+  }
+
+  // Import a map exported from Pathfinder (Map settings -> Export). Unlike
+  // Tripwire it writes a real .json file, so this is a plain file pick. Its
+  // systems carry two ids — the EVE one and Pathfinder's own, which the
+  // connections reference — and the server keeps those apart. Creates a new
+  // personal map.
+  async function handleImportPathfinder(file: File) {
+    let parsed: { config?: { name?: unknown }; data?: { systems?: unknown; connections?: unknown } };
+    try {
+      parsed = JSON.parse(await file.text()) as typeof parsed;
+    } catch {
+      toast.error(t("mapSidebar.invalidJson"));
+      return;
+    }
+    if (!Array.isArray(parsed.data?.systems)) {
+      toast.error(t("mapSidebar.notPathfinderMap"));
+      return;
+    }
+    // The map's own name is in the file; the filename is whatever they saved
+    // it as, so it only stands in when the export has no name of its own.
+    const name = (typeof parsed.config?.name === "string" && parsed.config.name.trim())
+      ? parsed.config.name
+      : file.name.replace(/\.json$/i, "") || "Imported from Pathfinder";
+    try {
+      const { id, imported } = await api<{ id: string; imported: { systems: number; connections: number; intel: number; skipped: number } }>(
+        "/api/maps/import/pathfinder",
+        { method: "POST", body: JSON.stringify({ name, data: parsed.data }) },
+      );
+      await useMapStore.getState().loadMaps();
+      await useMapStore.getState().switchMap(id);
+      // Same deferral as the other imports: the canvas needs the new nodes
+      // mounted before handles can be routed to them.
+      setTimeout(() => {
+        useMapStore.getState().optimizeConnections();
+        useMapStore.getState().requestFitView();
+      }, 500);
+      toast.success(t("mapSidebar.pathfinderImported", {
+        systems: imported.systems, connections: imported.connections, skipped: imported.skipped,
+      }));
+    } catch (err) {
+      toast.error(t("mapSidebar.importFailed", { error: err instanceof Error ? err.message : String(err) }));
     }
   }
 
@@ -1727,6 +1771,14 @@ export function MapSidebar() {
                 </button>
                 <button
                   className="map-sidebar__action"
+                  onClick={() => pathfinderInputRef.current?.click()}
+                  disabled={atMapLimit}
+                  title={t("mapSidebar.importPathfinderTitle")}
+                >
+                  {t("mapSidebar.importPathfinder")}
+                </button>
+                <button
+                  className="map-sidebar__action"
                   onClick={() => setTripwireOpen(true)}
                   disabled={atMapLimit}
                   title={t("tripwire.buttonTitle")}
@@ -1794,6 +1846,18 @@ export function MapSidebar() {
         onChange={(e) => {
           const file = e.target.files?.[0];
           if (file) handleImportWanderer(file);
+          e.target.value = "";
+        }}
+      />
+
+      <input
+        ref={pathfinderInputRef}
+        type="file"
+        accept=".json,application/json"
+        style={{ display: "none" }}
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) handleImportPathfinder(file);
           e.target.value = "";
         }}
       />
