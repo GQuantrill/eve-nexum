@@ -2079,7 +2079,7 @@
   },
   "tripwire": {
     "title": "Importer depuis Tripwire",
-    "button": "↑ Importer depuis Tripwire",
+    "button": "↑ Importer depuis Tripwire (expérimental)",
     "buttonTitle": "Récupérer une chaîne Tripwire avec ses signatures",
     "step1": "Ouvrez votre onglet Tripwire et connectez-vous comme d’habitude.",
     "step2": "Ouvrez la console du navigateur (F12), collez le script ci-dessous et appuyez sur Entrée. Il récupère votre carte Tripwire et la copie dans le presse-papiers — quelques secondes sur une longue chaîne. Une seule exécution suffit, depuis n'importe quel système.",

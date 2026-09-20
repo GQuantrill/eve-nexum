@@ -2079,7 +2079,7 @@
   },
   "tripwire": {
     "title": "Importar desde Tripwire",
-    "button": "↑ Importar desde Tripwire",
+    "button": "↑ Importar desde Tripwire (experimental)",
     "buttonTitle": "Traer una cadena de Tripwire con sus firmas",
     "step1": "Abre tu pestaña de Tripwire e inicia sesión como siempre.",
     "step2": "Abre la consola del navegador (F12), pega el script de abajo y pulsa Enter. Recoge tu mapa de Tripwire y lo copia al portapapeles; en una cadena larga tarda unos segundos. Ejecútalo una vez, desde cualquier sistema.",

@@ -2079,7 +2079,7 @@
   },
   "tripwire": {
     "title": "从 Tripwire 导入",
-    "button": "↑ 从 Tripwire 导入",
+    "button": "↑ 从 Tripwire 导入（实验性）",
     "buttonTitle": "连同信号一起导入 Tripwire 链",
     "step1": "打开你的 Tripwire 标签页并照常登录。",
     "step2": "打开浏览器控制台（F12），粘贴下面的脚本并按回车。它会收集你的 Tripwire 地图并复制到剪贴板；链较长时需要几秒。在任意星系运行一次即可。",

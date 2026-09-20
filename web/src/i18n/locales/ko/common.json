@@ -2079,7 +2079,7 @@
   },
   "tripwire": {
     "title": "Tripwire에서 가져오기",
-    "button": "↑ Tripwire에서 가져오기",
+    "button": "↑ Tripwire에서 가져오기 (실험적)",
     "buttonTitle": "Tripwire 체인을 시그니처와 함께 가져오기",
     "step1": "Tripwire 탭을 열고 평소처럼 로그인하세요.",
     "step2": "브라우저 콘솔(F12)을 열고 아래 스크립트를 붙여넣은 뒤 Enter를 누르세요. Tripwire 맵을 모아 클립보드에 복사합니다. 긴 체인이라면 몇 초 걸립니다. 어느 시스템에서든 한 번만 실행하면 됩니다.",

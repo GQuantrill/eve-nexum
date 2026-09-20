@@ -2079,7 +2079,7 @@
   },
   "tripwire": {
     "title": "Aus Tripwire importieren",
-    "button": "↑ Aus Tripwire importieren",
+    "button": "↑ Aus Tripwire importieren (experimentell)",
     "buttonTitle": "Eine Tripwire-Kette samt Signaturen übernehmen",
     "step1": "Öffne deinen Tripwire-Tab und melde dich wie gewohnt an.",
     "step2": "Öffne die Browser-Konsole (F12), füge das Skript unten ein und drücke Enter. Es sammelt deine Tripwire-Karte und kopiert sie in die Zwischenablage — bei einer langen Kette dauert das ein paar Sekunden. Einmal ausführen reicht, von jedem System aus.",
