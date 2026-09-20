@@ -2078,7 +2078,7 @@
     "appeared": "{{name}} ({{security}}) está en la cadena"
   },
   "tripwire": {
-    "title": "Importar desde Tripwire",
+    "title": "Importar desde Tripwire (experimental)",
     "button": "↑ Importar desde Tripwire (experimental)",
     "buttonTitle": "Traer una cadena de Tripwire con sus firmas",
     "step1": "Abre tu pestaña de Tripwire e inicia sesión como siempre.",

@@ -2078,7 +2078,7 @@
     "appeared": "{{name}}({{security}})이(가) 체인에 있습니다"
   },
   "tripwire": {
-    "title": "Tripwire에서 가져오기",
+    "title": "Tripwire에서 가져오기 (실험적)",
     "button": "↑ Tripwire에서 가져오기 (실험적)",
     "buttonTitle": "Tripwire 체인을 시그니처와 함께 가져오기",
     "step1": "Tripwire 탭을 열고 평소처럼 로그인하세요.",

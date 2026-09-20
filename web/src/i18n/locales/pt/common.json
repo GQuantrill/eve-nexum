@@ -2078,7 +2078,7 @@
     "appeared": "{{name}} ({{security}}) está na cadeia"
   },
   "tripwire": {
-    "title": "Importar do Tripwire",
+    "title": "Importar do Tripwire (experimental)",
     "button": "↑ Importar do Tripwire (experimental)",
     "buttonTitle": "Trazer uma cadeia do Tripwire com as suas assinaturas",
     "step1": "Abra o seu separador do Tripwire e inicie sessão como habitualmente.",

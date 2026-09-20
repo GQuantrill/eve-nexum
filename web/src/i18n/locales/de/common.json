@@ -2078,7 +2078,7 @@
     "appeared": "{{name}} ({{security}}) ist in der Kette"
   },
   "tripwire": {
-    "title": "Aus Tripwire importieren",
+    "title": "Aus Tripwire importieren (experimentell)",
     "button": "↑ Aus Tripwire importieren (experimentell)",
     "buttonTitle": "Eine Tripwire-Kette samt Signaturen übernehmen",
     "step1": "Öffne deinen Tripwire-Tab und melde dich wie gewohnt an.",

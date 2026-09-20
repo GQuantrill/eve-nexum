@@ -2078,7 +2078,7 @@
     "appeared": "{{name}} ({{security}}) is on the chain"
   },
   "tripwire": {
-    "title": "Import from Tripwire",
+    "title": "Import from Tripwire (experimental)",
     "button": "↑ Import from Tripwire (experimental)",
     "buttonTitle": "Bring a Tripwire chain in, with its signatures",
     "step1": "Open your Tripwire tab and sign in as usual.",

@@ -2124,7 +2124,7 @@
     "appeared": "{{name}} ({{security}}) появился в цепочке"
   },
   "tripwire": {
-    "title": "Импорт из Tripwire",
+    "title": "Импорт из Tripwire (экспериментально)",
     "button": "↑ Импорт из Tripwire (экспериментально)",
     "buttonTitle": "Перенести цепочку Tripwire вместе с сигнатурами",
     "step1": "Откройте вкладку Tripwire и войдите как обычно.",

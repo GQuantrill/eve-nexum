@@ -2078,7 +2078,7 @@
     "appeared": "{{name}}（{{security}}）已出现在链上"
   },
   "tripwire": {
-    "title": "从 Tripwire 导入",
+    "title": "从 Tripwire 导入（实验性）",
     "button": "↑ 从 Tripwire 导入（实验性）",
     "buttonTitle": "连同信号一起导入 Tripwire 链",
     "step1": "打开你的 Tripwire 标签页并照常登录。",

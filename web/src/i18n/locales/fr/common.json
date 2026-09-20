@@ -2078,7 +2078,7 @@
     "appeared": "{{name}} ({{security}}) est dans la chaîne"
   },
   "tripwire": {
-    "title": "Importer depuis Tripwire",
+    "title": "Importer depuis Tripwire (expérimental)",
     "button": "↑ Importer depuis Tripwire (expérimental)",
     "buttonTitle": "Récupérer une chaîne Tripwire avec ses signatures",
     "step1": "Ouvrez votre onglet Tripwire et connectez-vous comme d’habitude.",

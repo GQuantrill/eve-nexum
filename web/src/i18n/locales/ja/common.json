@@ -2078,7 +2078,7 @@
     "appeared": "{{name}}（{{security}}）がチェーンに出現"
   },
   "tripwire": {
-    "title": "Tripwire からインポート",
+    "title": "Tripwire からインポート（実験的）",
     "button": "↑ Tripwire からインポート（実験的）",
     "buttonTitle": "Tripwire のチェーンをシグネチャごと取り込む",
     "step1": "Tripwire のタブを開き、いつも通りログインします。",
