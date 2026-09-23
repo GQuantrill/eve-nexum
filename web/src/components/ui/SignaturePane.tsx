@@ -568,13 +568,28 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   // type (the static map only covers k-space statics).
   const whTypes = useWormholeTypes();
 
+  // Class of every system on the map, by name. A solved hole's leads-to IS a
+  // system name, so this is what keeps {dest_type} filled after the jump.
+  const classBySystemName = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const sys of mapSystems) {
+      // 'unknown' is the placeholder-node class (an unmapped destination) — as
+      // a bookmark it would read worse than leaving the token empty.
+      if (sys.name && sys.systemClass && sys.systemClass !== 'unknown') {
+        m.set(sys.name.trim().toUpperCase(), sys.systemClass);
+      }
+    }
+    return m;
+  }, [mapSystems]);
+
   const copyBookmark = useCallback((sig: Signature) => {
-    const name = formatBookmarkName(bookmarkFormat, sig, whTypes);
+    const name = formatBookmarkName(bookmarkFormat, sig, whTypes, Date.now(),
+      (n) => classBySystemName.get(n.trim().toUpperCase()) ?? null);
     if (!name) return;
     navigator.clipboard.writeText(name)
       .then(() => toast.success(t('signatures.bookmarkCopied', { name })))
       .catch(() => toast.error(t('signatures.bookmarkCopyFailed')));
-  }, [bookmarkFormat, whTypes, t]);
+  }, [bookmarkFormat, whTypes, classBySystemName, t]);
 
   const copySiteBookmark = useCallback((sig: Signature) => {
     const name = formatSiteBookmarkName(siteBookmarkFormat, sig);

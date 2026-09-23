@@ -45,18 +45,28 @@ export function formatBookmarkName(
   sig: Signature,
   whTypes: Record<string, WormholeSpec> = {},
   now: number = Date.now(),
+  /** A system's class by name. Lets {dest_type} stay filled once a hole has
+   *  been jumped and its leads-to is a real system rather than a band. */
+  classOfSystem?: (name: string) => string | null | undefined,
 ): string {
   // The full wormhole catalog (useWormholeTypes) keyed by type code — the small
   // static map only covers k-space statics, so most holes (e.g. A641) miss it.
   const wh   = sig.whType ? whTypes[sig.whType] : undefined;
-  // {dest_type} is the destination CLASS — from the wormhole type (D364 -> C2),
-  // falling back to the leads-to only when that is itself a class/band (e.g. a
-  // K162 the user tagged "C4"), never a pinned system. {leads_to} carries the
-  // raw leads-to: a pinned system (J110555) or the class/band the user set.
+  // {dest_type} is the destination CLASS; {leads_to} carries the raw leads-to —
+  // a pinned system (J110555) or the class/band the user set.
   const leadsToRaw = (sig.whLeadsTo ?? '').trim();
   const leadsTo    = leadsToRaw.toLowerCase() === 'unknown' ? '' : leadsToRaw;
   const destClass  = whDestClass(sig.whType, whTypes);
-  const destType   = destClass ?? (leadsTo && isUnresolvedLeadsTo(leadsTo) ? leadsTo : '');
+  // Three ways to know where a hole goes, in order of confidence:
+  //   1. the wormhole type says so outright (D364 -> C2);
+  //   2. it doesn't (K162), but the leads-to is still the band it was scanned
+  //      as ("C1-C3");
+  //   3. it doesn't, and the leads-to is now the system it turned out to be —
+  //      so look that system's class up.
+  // Without (3), jumping a K162 and re-copying its bookmark silently dropped
+  // the class it had before the jump, which is exactly when it is best known.
+  const destType   = destClass
+    ?? (isUnresolvedLeadsTo(leadsTo) ? leadsTo : (classOfSystem?.(leadsTo) || ''));
   const ageH = sig.createdAt
     ? Math.max(0, Math.floor((now - new Date(sig.createdAt).getTime()) / 3_600_000))
     : null;
