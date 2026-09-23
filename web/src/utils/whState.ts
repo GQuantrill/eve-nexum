@@ -91,10 +91,19 @@ const BUCKET_HOURS: Partial<Record<TimeStatus, number>> = {
   lessThan24h: 24,
   lessThan4h:  4,
   lessThan1h:  1,
+  // 0 hours puts the expiry in the past once the inset below is applied, which
+  // is what 'expired' means — the same state a hole reaches on its own when its
+  // clock runs out, rather than a separate flag.
+  expired:     0,
 };
 
-/** Life states the chip cycles through: unknown, then EVE's three warnings. */
-export const LIFE_CYCLE: Array<TimeStatus | ''> = ['', 'lessThan24h', 'lessThan4h', 'lessThan1h'];
+/**
+ * Life states the chip cycles through: unknown, EVE's three warnings, then
+ * expired. A hole reaches 'expired' on its own when its clock runs out, and the
+ * chip has always been able to show it — this is what lets someone SET it, for
+ * the hole they watched collapse.
+ */
+export const LIFE_CYCLE: Array<TimeStatus | ''> = ['', 'lessThan24h', 'lessThan4h', 'lessThan1h', 'expired'];
 
 /**
  * The connection patch for a chosen life bucket, or for clearing back to
@@ -112,7 +121,9 @@ export function lifePatch(
   // the bucket above, leaving the table and the map disagreeing.
   const INSET_MS = 60_000;
   const inMs = (h: number) => new Date(Date.now() + h * 3_600_000 - INSET_MS).toISOString();
-  const hours = bucket ? BUCKET_HOURS[bucket] : undefined;
+  // `?? undefined` rather than a truthiness test: 'expired' is 0 hours, and a
+  // falsy check would send it down the "clear back to unknown" path instead.
+  const hours = bucket ? BUCKET_HOURS[bucket] ?? undefined : undefined;
   if (hours != null) {
     return { timeStatus: bucket as TimeStatus, eolAt: null, lifetimeExpiresAt: inMs(hours) };
   }
