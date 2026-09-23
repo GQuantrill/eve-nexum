@@ -1790,7 +1790,7 @@
     "colWhState": "État",
     "colWhStateHint": "Masse et durée de vie restante du trou de ver. Les deux se lisent sur le trou lui-même, donc avant de le franchir.",
     "whStateMass": "Masse : cliquer pour pleine / moins de 50 % / moins de 10 %",
-    "whStateLife": "Durée de vie : cliquer pour inconnue / moins d’un jour / moins de 4 heures / moins d’une heure",
+    "whStateLife": "Durée de vie : cliquer pour inconnue / moins d’un jour / moins de 4 heures / moins d’une heure / expirée",
     "colName": "Nom",
     "colNotes": "Notes",
     "colAge": "Âge",

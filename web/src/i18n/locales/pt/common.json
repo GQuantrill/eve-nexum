@@ -1790,7 +1790,7 @@
     "colWhState": "Estado",
     "colWhStateHint": "Massa e vida restante do buraco. Ambas se leem no próprio buraco, por isso podem ser definidas antes de o saltar.",
     "whStateMass": "Massa: clicar para completa / menos de 50 % / menos de 10 %",
-    "whStateLife": "Vida: clicar para desconhecida / menos de 1 dia / menos de 4 horas / menos de 1 hora",
+    "whStateLife": "Vida: clicar para desconhecida / menos de 1 dia / menos de 4 horas / menos de 1 hora / expirada",
     "colName": "Nome",
     "colNotes": "Notas",
     "colAge": "Idade",

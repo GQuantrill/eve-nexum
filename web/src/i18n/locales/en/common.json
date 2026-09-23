@@ -1790,7 +1790,7 @@
     "colWhState": "State",
     "colWhStateHint": "A wormhole's mass and remaining life. You can read both off the hole in space, so they can be set before you jump it.",
     "whStateMass": "Mass: click to cycle full / under 50% / under 10%",
-    "whStateLife": "Life: click to cycle unknown / under 1 day / under 4 hours / under 1 hour",
+    "whStateLife": "Life: click to cycle unknown / under 1 day / under 4 hours / under 1 hour / expired",
     "colName": "Name",
     "colNotes": "Notes",
     "colAge": "Age",
