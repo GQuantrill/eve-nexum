@@ -278,6 +278,8 @@ export function MapCanvas() {
   const [labelDialogFor, setLabelDialogFor] = useState<string | null>(null);
   const [aliasDialogFor, setAliasDialogFor] = useState<string | null>(null);
   const [contextMenu, setContextMenu]         = useState<CtxMenu | null>(null);
+  const connectSourceId  = useMapStore((s) => s.connectSourceId);
+  const setConnectSource = useMapStore((s) => s.setConnectSource);
   // Pending "remove orphan systems" sweep, held while the confirm modal is up.
   const [orphanConfirm, setOrphanConfirm]     = useState<{ ids: string[] } | null>(null);
   // Pending "remove systems with no route home" sweep, held while its confirm is up.
@@ -491,6 +493,13 @@ export function MapCanvas() {
         if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) return;
         e.preventDefault();
         undo().catch(console.error);
+        return;
+      }
+
+      // Escape abandons a staged "Connect to system" — the map is otherwise
+      // waiting for a click the user may no longer want to make.
+      if (e.key === 'Escape' && useMapStore.getState().connectSourceId) {
+        useMapStore.getState().setConnectSource(null);
         return;
       }
 
@@ -1021,7 +1030,33 @@ export function MapCanvas() {
     [selectConnection],
   );
 
-  const onPaneClick = useCallback(() => setContextMenu(null), []);
+  // Second half of "Connect to system": with a source staged, the next node
+  // clicked is the target. Same handle-picking as a dragged connection, so the
+  // two routes produce identical edges. Clicking the source again cancels —
+  // a system can't connect to itself, and that's the nearest gesture to "oops".
+  const onNodeClick = useCallback(
+    (_: React.MouseEvent, node: Node) => {
+      if (!connectSourceId) return;
+      if (node.id === connectSourceId) { setConnectSource(null); return; }
+      const src = systems.find((s) => s.id === connectSourceId);
+      const tgt = systems.find((s) => s.id === node.id);
+      if (src && tgt) {
+        const { sourceHandle, targetHandle } = pickHandles(src.position, tgt.position);
+        addConnection(src.id, tgt.id, sourceHandle, targetHandle);
+        toast.success(i18n.t('ctxMenu.connectToDone', {
+          from: systemDisplayName(src), to: systemDisplayName(tgt),
+        }));
+      }
+      setConnectSource(null);
+    },
+    [connectSourceId, setConnectSource, systems, addConnection],
+  );
+
+  // Clicking empty space abandons a staged connect as well as closing the menu.
+  const onPaneClick = useCallback(() => {
+    setContextMenu(null);
+    setConnectSource(null);
+  }, [setConnectSource]);
 
   const ctxItems = (() => {
     if (!contextMenu) return [];
@@ -1260,6 +1295,21 @@ export function MapCanvas() {
           label: t("ctxMenu.markCleared", { count: selectedNodes.length }),
           icon: <CheckIcon size={16} weight="regular" />,
           action: () => selectedNodes.forEach((n) => updateSystem(n.id, { status: 'cleared' })),
+        },
+      ] : [];
+
+      // Draw a connection by picking two systems instead of dragging between
+      // handles: this stages the source, and the next node clicked becomes the
+      // target. Single selection only — the target is what the next click
+      // means, so a multi-select source has no sensible reading.
+      const connectItem = !multiSelected ? [
+        {
+          label: t('ctxMenu.connectTo'),
+          icon: <LinkSimpleIcon size={16} weight="regular" color="#5a9af8" />,
+          action: () => {
+            setConnectSource(contextMenu.nodeId!);
+            toast.info(t('ctxMenu.connectToHint', { system: sys?.alias || sys?.name || '' }));
+          },
         },
       ] : [];
 
@@ -1506,6 +1556,7 @@ export function MapCanvas() {
             }
           },
         }] : []),
+        ...connectItem,
         ...homeItem,
         ...aliasItem,
         ...tagItem,
@@ -1627,6 +1678,7 @@ export function MapCanvas() {
         onEdgeClick={onEdgeClick}
         proOptions={{ hideAttribution: true }}
         onSelectionContextMenu={onSelectionContextMenu}
+        onNodeClick={onNodeClick}
         onPaneClick={onPaneClick}
         onSelectionChange={onSelectionChange}
         nodeTypes={NODE_TYPES}

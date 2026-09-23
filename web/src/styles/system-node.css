@@ -210,6 +210,14 @@
     border-style: dashed;
     box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.4), 0 0 18px rgba(56, 189, 248, 0.3);
   }
+
+  /* The system a menu-staged connection is being drawn FROM. Solid where the
+     candidates are dashed, so it reads as the fixed end of the pair. */
+  &.system-node--connect-source {
+    border-color: #38bdf8;
+    border-style: solid;
+    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.75), 0 0 22px rgba(56, 189, 248, 0.45);
+  }
 }
 
 /* Unknown placeholder node (unmapped wormhole) — a clear red outline so it reads

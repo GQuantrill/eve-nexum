@@ -233,7 +233,13 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
       ? t('mapNode.scoutConnections', { name: names[0], count: scoutMatches.length })
       : t('mapNode.scoutConnectionsMulti', { names: names.join(' & ') });
   }, [scoutMatches, t, aliasName]);
-  const isTarget        = connection.inProgress && connection.fromNode?.id !== sys.id;
+  // A connection is being drawn to this node — either dragged from a handle, or
+  // staged from the context menu and waiting for its target click. Both mean
+  // "this node is a candidate", so they share the highlight.
+  const connectSourceId = useMapStore((s) => s.connectSourceId);
+  const isTarget        = (connection.inProgress && connection.fromNode?.id !== sys.id)
+                          || (!!connectSourceId && connectSourceId !== sys.id);
+  const isConnectSource = connectSourceId === sys.id;
 
   // Measure the node so the map store can compute the largest natural
   // width/height across all visible nodes — that becomes the min size
@@ -295,7 +301,7 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
   return (
     <div
       ref={nodeRef}
-      className={`system-node${sys.locked ? ' nopan' : ''}${isTarget ? ' system-node--connect-target' : ''}${isStale ? ' system-node--stale' : ''}${isSovHostile ? ' system-node--sov-hostile' : ''}${isSovBlue ? ' system-node--sov-blue' : ''}${uniformSize ? ' system-node--uniform' : ''}${compactMode ? ' system-node--compact' : ''}${easyConnect ? ' system-node--easy' : ''}${watchDef ? ' system-node--watched' : ''}${filteredOut ? ' system-node--filtered-out' : ''}${contentMatch ? ' system-node--content-match' : ''}${sys.dimmed ? ' system-node--dimmed' : ''}${sys.routeHighlighted ? ' system-node--route' : ''}${sys.systemClass === 'unknown' ? ' system-node--unknown' : ''}`}
+      className={`system-node${sys.locked ? ' nopan' : ''}${isTarget ? ' system-node--connect-target' : ''}${isConnectSource ? ' system-node--connect-source' : ''}${isStale ? ' system-node--stale' : ''}${isSovHostile ? ' system-node--sov-hostile' : ''}${isSovBlue ? ' system-node--sov-blue' : ''}${uniformSize ? ' system-node--uniform' : ''}${compactMode ? ' system-node--compact' : ''}${easyConnect ? ' system-node--easy' : ''}${watchDef ? ' system-node--watched' : ''}${filteredOut ? ' system-node--filtered-out' : ''}${contentMatch ? ' system-node--content-match' : ''}${sys.dimmed ? ' system-node--dimmed' : ''}${sys.routeHighlighted ? ' system-node--route' : ''}${sys.systemClass === 'unknown' ? ' system-node--unknown' : ''}`}
       style={{
         '--class-color': color,
         ...(intelColor ? { '--intel-color': intelColor } : null),

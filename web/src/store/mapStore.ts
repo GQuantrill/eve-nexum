@@ -229,6 +229,12 @@ interface MapStore {
   // never persisted.
   mapSettingsOpen: boolean;
   setMapSettingsOpen: (v: boolean) => void;
+  // "Connect to system" staging: the system a connection is being drawn FROM
+  // via the context menu, waiting for its target to be clicked. Dragging
+  // between handles is unaffected — this is the pick-two-systems alternative.
+  // Ephemeral; never persisted.
+  connectSourceId: string | null;
+  setConnectSource: (id: string | null) => void;
   showMinimap: boolean;
   uniformSize: boolean;
   showStatics: boolean;
@@ -597,6 +603,8 @@ export const useMapStore = create<MapStore>()((set, get) => {
     setPanelSideBySide: (v) => { writeUserSetting('nexum.panelSideBySide', v); set({ panelSideBySide: v }); },
     mapSettingsOpen: false,
     setMapSettingsOpen: (v) => set({ mapSettingsOpen: v }),
+    connectSourceId: null,
+    setConnectSource: (id) => set({ connectSourceId: id }),
     showMinimap: true,
     uniformSize: true,
     showStatics: true,
