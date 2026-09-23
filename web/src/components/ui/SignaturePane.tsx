@@ -305,9 +305,11 @@ function formatDelay(sec: number): string {
 // Order the type-filter chips most-useful-first. Covers every SigType.
 const SIG_TYPE_FILTER_ORDER: SigType[] = ['wormhole', 'data', 'relic', 'gas', 'ore', 'combat', 'ghost', 'unknown'];
 
-// Signature-type Select options, alphabetical by label. Used for both the
-// per-row type picker and the bulk "set type" dropdown.
-const SIG_TYPE_OPTIONS: SigType[] = ['combat', 'data', 'gas', 'ghost', 'ore', 'relic', 'unknown', 'wormhole'];
+// Signature-type Select options. Wormhole leads because it is far and away the
+// most common thing anyone picks here; the rest follow in label order (which
+// holds for English — the labels are translated, the order isn't). Used for
+// both the per-row type picker and the bulk "set type" dropdown.
+const SIG_TYPE_OPTIONS: SigType[] = ['wormhole', 'combat', 'data', 'gas', 'ghost', 'ore', 'relic', 'unknown'];
 
 // Relic/data site safety, keyed on the first word of the scanned site name (per
 // the site-safety table). "Safe" sites have no NPCs; "not safe" ones can spawn
