@@ -14,6 +14,16 @@
   filter: none;
 }
 
+/* Fading the card with `opacity` also makes it see-through, so an edge routed
+   BEHIND a stale system was visible straight through the node — a jump-range
+   line reading as though it passed through the middle of the card. The
+   wrapper is not faded, so it carries an opaque fill of the same shape for the
+   card to sit on. Radius matches .system-node. */
+.react-flow__node:has(> .system-node--stale) {
+  background: var(--surface-panel);
+  border-radius: 8px;
+}
+
 /* Content filter (map-wide spotlight): systems whose scanned content doesn't
    match the active filter fade right back; matches stay lit with a soft accent
    ring so they pop against the dimmed map. Hovering a faded node restores it. */
