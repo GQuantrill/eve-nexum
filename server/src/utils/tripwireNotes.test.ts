@@ -16,6 +16,29 @@ describe('twNoteText', () => {
     expect(twNoteText('<script>alert(1)</script>hi<img src=x onerror=y>')).toBe('alert(1)hi');
   });
 
+  it('leaves nothing tag-shaped however the input is spliced', () => {
+    // Nesting a tag inside its own name is the shape that defeats a single
+    // removal pass in general. It does not defeat this chain — the generic
+    // strip is greedy over `[^>]*`, so it swallows the inner `<` — but the
+    // property is worth pinning rather than re-deriving.
+    expect(twNoteText('<b<b>>')).toBe('');
+    expect(twNoteText('<<i>i>text')).toBe('text');
+    // Nesting the name inside itself: what's left over is inert text ("ipt>"),
+    // and crucially nothing tag-shaped.
+    const spliced = twNoteText('<scr<script>ipt>alert(1)</scr</script>ipt>');
+    expect(spliced).not.toMatch(/<[^>]*>/);
+    expect(spliced).toContain('alert(1)');
+  });
+
+  it('gives up on angle brackets rather than looping on hostile input', () => {
+    // Deeply nested beyond the pass limit: the text survives, the brackets
+    // don't. What it must never do is return something still tag-shaped.
+    const nested = '<'.repeat(40) + 'b' + '>'.repeat(40) + 'text';
+    const out = twNoteText(nested);
+    expect(out).not.toMatch(/<[^>]*>/);
+    expect(out).toContain('text');
+  });
+
   it('decodes entities only after tags are gone, so escaped markup stays text', () => {
     // Tripwire escapes what a user typed; decoding first would rebuild a tag
     // that the strip pass has already run past.

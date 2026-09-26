@@ -1,5 +1,15 @@
 import { describe, it, expect } from 'vitest';
+import ts from 'typescript';
 import { buildSnippet, parseExtraSystems } from './tripwireSnippet';
+
+// Parse the snippet rather than compiling it with `new Function`. Both answer
+// "is this valid JavaScript", but parsing never produces an executable, so
+// nothing here can run the string it is checking.
+const syntaxErrors = (code: string): number =>
+  (ts.transpileModule(code, {
+    reportDiagnostics: true,
+    compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext },
+  }).diagnostics ?? []).length;
 
 describe('parseExtraSystems', () => {
   it('accepts either commas or whitespace as the separator', () => {
@@ -32,9 +42,13 @@ describe('buildSnippet', () => {
 
   it('is valid JavaScript with or without extras', () => {
     for (const extra of [[], ['J123456']]) {
-      // Wrapped the way the console evaluates it — a syntax error throws here.
-      expect(() => new Function(`return (async () => {${buildSnippet(extra)}})`)).not.toThrow();
+      expect(syntaxErrors(buildSnippet(extra))).toBe(0);
     }
+  });
+
+  it('the syntax check would actually catch a broken snippet', () => {
+    // Guards the guard: a checker that passes everything proves nothing.
+    expect(syntaxErrors('await (async () => { const a = ; })();')).toBeGreaterThan(0);
   });
 
   it('asks Tripwire for the whole mask before falling back to a walk', () => {

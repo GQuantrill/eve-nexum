@@ -23,6 +23,22 @@ const HTML_ENTITIES: Record<string, string> = {
   deg: '\u00b0', times: '\u00d7', frac12: '\u00bd',
 };
 
+// Remove tag-shaped spans until the text stops changing. A single pass can
+// splice two fragments into a fresh tag — `<b<b>>` survives one removal as
+// `<b>` — so removing once is not the same as removing. Bounded, because the
+// point is to terminate on hostile input, not to win a race with it: whatever
+// still looks like markup after a few passes loses its angle brackets outright.
+const MAX_STRIP_PASSES = 5;
+function stripTags(input: string): string {
+  let out = input;
+  for (let pass = 0; pass < MAX_STRIP_PASSES; pass++) {
+    const next = out.replace(/<[^>]*>/g, '');
+    if (next === out) return out;
+    out = next;
+  }
+  return out.replace(/[<>]/g, '');
+}
+
 /**
  * Tripwire stores its system comments as HTML — its note box is a rich-text
  * editor — while ours are markdown rendered through a sanitiser. Convert the
@@ -36,13 +52,17 @@ const HTML_ENTITIES: Record<string, string> = {
  */
 export function twNoteText(raw: unknown): string {
   if (typeof raw !== 'string') return '';
-  return raw.slice(0, MAX_TW_NOTE_LEN)
+  // Turn the handful of tags that carry meaning into their markdown equivalent.
+  // These are single-pass and can leave a tag behind on spliced input, which is
+  // why the strip that follows has to be the thorough one.
+  const converted = raw.slice(0, MAX_TW_NOTE_LEN)
     .replace(/<br\s*\/?>/gi, '\n')
     .replace(/<\/(p|div|li|tr|h[1-6])>/gi, '\n')
     .replace(/<li[^>]*>/gi, '- ')
     .replace(/<\/?(b|strong)>/gi, '**')
-    .replace(/<\/?(i|em)>/gi, '*')
-    .replace(/<[^>]*>/g, '')
+    .replace(/<\/?(i|em)>/gi, '*');
+
+  return stripTags(converted)
     .replace(/&(#\d{1,7}|#[xX][0-9a-fA-F]{1,6}|[a-zA-Z][a-zA-Z0-9]{1,31});/g, (whole, body: string) => {
       if (body[0] !== '#') return HTML_ENTITIES[body.toLowerCase()] ?? whole;
       const code = body[1] === 'x' || body[1] === 'X'
