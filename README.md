@@ -439,6 +439,41 @@ NEXUM_TAG=4.8.0
 Each release is tagged three ways: the exact version (`4.8.0`), the minor series
 (`4.8`), and `latest`.
 
+##### There is no importer image — it is the server image
+
+Three app services, two images. The `importer` runs the **same** image as the
+server, started with a different command:
+
+```yaml
+importer:
+  image: ghcr.io/gquantrill/nexum-server:${NEXUM_TAG:-latest}
+  command: ["node", "dist/scripts/setup-db.js"]   # overrides the image's CMD
+
+server:
+  image: ghcr.io/gquantrill/nexum-server:${NEXUM_TAG:-latest}
+  # image CMD: node dist/src/index.js
+```
+
+The importer script is compiled into the same `dist/` the image already ships
+(`tsconfig.json` includes `scripts`), so no second build is needed. Keeping them
+as one image also means the two halves can't drift: the importer creates the SDE
+schema the server boots against, and sharing an image makes it impossible to
+release one without the other.
+
+**This matters if you write your own compose file rather than using ours.** The
+`command:` override is not optional — without it the importer starts a second
+API server, never exits, and the real server waits on it forever, because it
+depends on that container *completing*:
+
+```yaml
+depends_on:
+  importer:
+    condition: service_completed_successfully
+```
+
+A stack that hangs at startup with a healthy Postgres and two idle server
+containers is this mistake.
+
 ##### What you should know before relying on them
 
 These are the trade-offs that come with a pre-built image rather than your own
