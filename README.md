@@ -24,6 +24,7 @@
   - [Docker (recommended)](#option-1--docker-recommended)
   - [Local development](#option-2--local-development)
   - [EVE developer app scopes](#eve-developer-app-scopes)
+  - [Pre-built images](#pre-built-images)
   - [One-command deploy scripts](#one-command-deploy-scripts)
   - [Updating the SDE](#updating-the-sde)
   - [Refreshing wormhole types](#refreshing-wormhole-types)
@@ -402,6 +403,88 @@ Things worth knowing before you turn it on:
 - **If the reader stops working** — token revoked, role removed, character leaves the corp —
   the admin page says so. Watch it: ESI only keeps 30 days, so a reader left broken for
   longer than that loses those donations permanently.
+
+#### Pre-built images
+
+Each release publishes two images to GitHub Container Registry, so you can run a
+tagged build instead of pulling the repo and compiling it yourself:
+
+```
+ghcr.io/gquantrill/nexum-server
+ghcr.io/gquantrill/nexum-web
+```
+
+Two images cover all three app services — the `importer` is the server image run
+with a different command, and Postgres comes from upstream.
+
+Both are named in `docker-compose.yml` alongside the existing `build:` blocks, so
+the same file serves either habit:
+
+```bash
+# Run published images (no repo build)
+docker compose pull
+docker compose up -d
+
+# Build from source, exactly as before
+docker compose build
+docker compose up -d
+```
+
+Pin a version with `NEXUM_TAG` in your `.env` — unset means `latest`:
+
+```bash
+NEXUM_TAG=4.8.0
+```
+
+Each release is tagged three ways: the exact version (`4.8.0`), the minor series
+(`4.8`), and `latest`.
+
+##### What you should know before relying on them
+
+These are the trade-offs that come with a pre-built image rather than your own
+build. None of them are bugs; they're consequences of deciding things at build
+time instead of yours.
+
+- **No analytics are baked in.** The optional Google Tag Manager ID is a *build
+  argument* that Vite inlines, so an image built with it set would report to
+  whoever built it. The publish workflow deliberately never passes it, and the
+  published images therefore contain no GTM container at all. If you want
+  analytics on your own deployment, you have to build the image yourself with
+  `VITE_GTM_ID` set. See [Frontend analytics](#frontend-analytics-google-tag-manager--off-by-default).
+
+- **The voice announcer model is fixed at `q8`, and it dominates the image
+  size.** The weights are downloaded into the web image at build time and the
+  precision is inlined by Vite, so a published image can only carry one. At the
+  `q8` default that is ~88 MB of weights, ~116 MB of model assets all in, out of
+  a ~238 MB web image — most of what you pull is the announcer. (The server
+  image is ~354 MB.) If you want `fp16` (~163 MB of weights) or `fp32` (~326 MB),
+  build the web image yourself with `ANNOUNCER_DTYPE` set; there is no runtime
+  switch.
+
+- **`linux/amd64` only.** There are no arm64 images yet. Building arm64 in CI
+  would mean QEMU emulation, and the web image emulates badly — a yarn install, a
+  Vite build and the model download, all interpreted. On a Pi or an ARM NAS,
+  build from source for now. If you want arm64 published, say so in an issue;
+  it's a question of build minutes, not feasibility.
+
+- **Watchtower: use notification mode, not auto-update.** The server applies
+  database migrations on start. Letting Watchtower pull and restart unattended
+  means a new schema is applied with nobody watching, and a rollback to the
+  previous image is then *not* automatically safe — the old code may not
+  understand the new schema. Point Watchtower at the tag and have it tell you a
+  version is available; do the upgrade yourself, after a
+  [backup](#backup--restore).
+
+- **`docker compose up` will not silently switch you between the two.** Compose
+  uses a locally built image when one exists and only fetches when it doesn't, so
+  an existing source-built deployment keeps building. `docker compose pull` is
+  the explicit "give me the published image" step; `docker compose build` is the
+  explicit opposite. If you have been building locally and want to switch, pull
+  and then recreate the containers.
+
+- **The published images are the released code, not `main`.** The workflow checks
+  out the release tag rather than whatever `main` is at when it runs, so an image
+  matches its version even if `main` has moved on.
 
 #### One-command deploy scripts
 

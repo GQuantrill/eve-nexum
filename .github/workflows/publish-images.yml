@@ -1,0 +1,119 @@
+name: Publish images to GHCR
+
+# Build and push the server + web images when a GitHub release is published,
+# so self-hosters can run a tagged image instead of pulling the repo and
+# building it themselves. Same trigger as the patch-notes workflow: the release
+# event rather than a push, so a dropped push event can't skip a version.
+#
+# Two images cover all three app services — the `importer` service reuses the
+# server image, and Postgres is upstream.
+#
+#   ghcr.io/<owner>/nexum-server
+#   ghcr.io/<owner>/nexum-web
+#
+# Manual backstop — (re)publish any tag if an automatic run is ever missed:
+#   gh workflow run "Publish images to GHCR" -f tag=v4.8.0
+#
+# No secrets to configure: GITHUB_TOKEN with `packages: write` is enough to push
+# to this repo's own GHCR namespace. The packages are created PRIVATE on first
+# push and have to be made public once, by hand, in the repo's Packages settings.
+#
+# DELIBERATELY NOT PASSED: VITE_GTM_ID. It is a build arg that Vite inlines, so
+# baking it here would ship our analytics container ID to every self-hosted
+# deployment. It must stay unset in published images. See README, "Pre-built
+# images".
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to publish (e.g. v4.8.0)"
+        required: true
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    strategy:
+      # Don't let a web failure cancel an in-flight server push (or vice
+      # versa) — a half-published release is easier to finish than to unpick.
+      fail-fast: false
+      matrix:
+        include:
+          - name: server
+            context: ./server
+            image: nexum-server
+          - name: web
+            context: ./web
+            image: nexum-web
+
+    steps:
+      - name: Resolve tag
+        id: ver
+        env:
+          # Both through env rather than interpolated into the script: a `${{ }}`
+          # inside `run:` is substituted before the shell sees it, so anything
+          # attacker-shaped in it would be executed rather than read.
+          TAG:        ${{ github.event.release.tag_name || inputs.tag }}
+          OWNER_RAW:  ${{ github.repository_owner }}
+        run: |
+          set -euo pipefail
+          if [ -z "${TAG:-}" ]; then
+            echo "::error::no release tag to publish"; exit 1
+          fi
+          # v4.8.0 -> 4.8.0. Image tags conventionally drop the leading v.
+          VERSION="${TAG#v}"
+          if ! printf '%s' "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::$TAG is not a plain vMAJOR.MINOR.PATCH tag"; exit 1
+          fi
+          # Lowercase the owner: GHCR rejects uppercase in image names, and
+          # github.repository_owner preserves the account's own casing.
+          OWNER=$(printf '%s' "$OWNER_RAW" | tr '[:upper:]' '[:lower:]')
+          {
+            echo "tag=$TAG"
+            echo "version=$VERSION"
+            echo "major_minor=${VERSION%.*}"
+            echo "owner=$OWNER"
+          } >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@v4
+        with:
+          # Build the released code, not whatever main happens to be at now.
+          ref: ${{ steps.ver.outputs.tag }}
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - name: Build and push ${{ matrix.name }}
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.context }}
+          push: true
+          # amd64 only for now. arm64 builds here would need QEMU emulation,
+          # and the web image emulates badly — a yarn install, a Vite build and
+          # an ~86 MB model download, all interpreted. Revisit with native arm
+          # runners, or if someone asks for it.
+          platforms: linux/amd64
+          tags: |
+            ghcr.io/${{ steps.ver.outputs.owner }}/${{ matrix.image }}:${{ steps.ver.outputs.version }}
+            ghcr.io/${{ steps.ver.outputs.owner }}/${{ matrix.image }}:${{ steps.ver.outputs.major_minor }}
+            ghcr.io/${{ steps.ver.outputs.owner }}/${{ matrix.image }}:latest
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.version=${{ steps.ver.outputs.version }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.licenses=AGPL-3.0-or-later
+          # Layer cache in the registry, so a release only rebuilds what changed.
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

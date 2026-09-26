@@ -19,6 +19,12 @@ services:
   # populated, so this is safe to run on every `up` (no re-download). Set
   # FORCE_SDE_IMPORT=1 to force a re-import after a new CCP SDE release.
   importer:
+    # `image` names the build result AND is what gets pulled when nothing has
+    # been built locally, so one file serves both: `docker compose build` (or
+    # ./build.sh) builds from source as before, while `docker compose pull`
+    # fetches the published image instead. NEXUM_TAG pins a version; unset
+    # means `latest`. See README, "Pre-built images".
+    image: ghcr.io/gquantrill/nexum-server:${NEXUM_TAG:-latest}
     build:
       context: ./server
       dockerfile: Dockerfile
@@ -81,6 +87,9 @@ services:
         condition: service_healthy
 
   server:
+    # Same image as the importer above — it is the same build, run with a
+    # different command.
+    image: ghcr.io/gquantrill/nexum-server:${NEXUM_TAG:-latest}
     build:
       context: ./server
       dockerfile: Dockerfile
@@ -104,6 +113,7 @@ services:
         condition: service_completed_successfully
 
   web:
+    image: ghcr.io/gquantrill/nexum-web:${NEXUM_TAG:-latest}
     build:
       context: ./web
       dockerfile: Dockerfile
