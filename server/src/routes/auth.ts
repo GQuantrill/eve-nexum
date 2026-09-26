@@ -782,6 +782,17 @@ const SETTINGS_ALLOWLIST = new Set<string>([
   'nexum.sidebar.side',
   'nexum.staleThresholdH',
   'nexum.trackJumps',
+  // Announcer: master switch, voice, and the five per-event toggles. Absent
+  // from this list they were dropped here while the endpoint still answered
+  // 200 {applied:0}, so they survived only in the browser that set them —
+  // every other device kept announcing with the defaults.
+  'nexum.announcer.enabled',
+  'nexum.announcer.voice',
+  'nexum.announcer.ev.connect',
+  'nexum.announcer.ev.incursions',
+  'nexum.announcer.ev.lawless',
+  'nexum.announcer.ev.kills',
+  'nexum.announcer.ev.newChain',
 ]);
 
 authRouter.patch('/settings', async (req, res) => {

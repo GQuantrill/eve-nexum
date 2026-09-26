@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { alertGain } from '../utils/notificationPrefs';
 
 // In-browser voice announcer (Kokoro-82M via kokoro-js + ONNX). The model and all
 // generation run in a Web Worker (ttsWorker.ts) so multi-second WASM/CPU inference
@@ -138,7 +139,15 @@ async function playSamples(samples: Float32Array, sampleRate: number): Promise<v
   buffer.getChannelData(0).set(samples);
   const source = ctx.createBufferSource();
   source.buffer = buffer;
-  source.connect(ctx.destination);
+  // Speech goes through the same volume the alert beeps use. It used to connect
+  // straight to the destination with no gain stage at all, so the slider
+  // governed the pips and nothing else — turning it to zero silenced the beeps
+  // and left the voice at full blast, which is exactly how it was reported.
+  // Peak 1 so the setting maps to the voice's natural level.
+  const gain = ctx.createGain();
+  gain.gain.value = alertGain(1);
+  source.connect(gain);
+  gain.connect(ctx.destination);
   currentSource = source;
   await new Promise<void>((resolve) => {
     source.onended = () => { if (currentSource === source) currentSource = null; resolve(); };
