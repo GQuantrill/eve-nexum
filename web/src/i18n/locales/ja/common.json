@@ -1471,7 +1471,7 @@
     "notifExitsLowSec": "ローセク以上",
     "notifExitsAny": "すべてのk-space",
     "notifExitsHint": "この値以上のセキュリティの出口がチェーンに現れたとき、一度だけ通知します。既定ではオフです。",
-    "notifVolume": "通知音量 — {{pct}}%",
+    "notifVolume": "通知・アナウンス音量 — {{pct}}%",
     "openOptions": "マップオプション",
     "optimizeConnections": "⟳ 接続を最適化",
     "panelBelow": "マップの下",

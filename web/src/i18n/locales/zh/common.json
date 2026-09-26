@@ -1471,7 +1471,7 @@
     "notifExitsLowSec": "低安及以上",
     "notifExitsAny": "任意 k-space",
     "notifExitsHint": "当链上出现不低于该安全等级的出口时提醒一次。默认关闭。",
-    "notifVolume": "提醒音量 — {{pct}}%",
+    "notifVolume": "提醒与语音播报音量 — {{pct}}%",
     "openOptions": "地图选项",
     "optimizeConnections": "⟳ 优化连接",
     "panelBelow": "地图下方",

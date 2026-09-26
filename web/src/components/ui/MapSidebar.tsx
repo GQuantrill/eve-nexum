@@ -1652,10 +1652,13 @@ export function MapSidebar() {
           </label>
           <div className="map-sidebar__hint">{t("mapSidebar.notifExitsHint")}</div>
 
-          {/* Alert volume. The chimes are generated in code rather than played
-              from a file, so this scales their gain — and macOS has no per-app
-              volume to fall back on. Releasing the slider plays a sample, since
-              a number alone tells you nothing about how loud it actually is. */}
+          {/* Volume for everything the app makes a sound with: the generated
+              chimes AND the spoken announcer in the section below. The chimes
+              come from code rather than a file, so this scales their gain — and
+              macOS has no per-app volume to fall back on. Releasing the slider
+              plays a sample, since a number alone tells you nothing about how
+              loud it actually is. The sample is a chime; the announcer would
+              need the model loaded to preview. */}
           <label className="map-sidebar__field">
             <span>{t("mapSidebar.notifVolume", { pct: alertVolume })}</span>
             <input

@@ -1471,7 +1471,7 @@
     "notifExitsLowSec": "Low-Sec und besser",
     "notifExitsAny": "Jeder K-Space",
     "notifExitsHint": "Meldet einmalig, wenn ein Ausgang mit mindestens dieser Sicherheit in der Kette auftaucht. Standardmäßig aus.",
-    "notifVolume": "Warnlautstärke — {{pct}} %",
+    "notifVolume": "Lautstärke für Warnungen & Ansagen — {{pct}} %",
     "openOptions": "Kartenoptionen",
     "optimizeConnections": "⟳ Verbindungen optimieren",
     "panelBelow": "Unter Karte",

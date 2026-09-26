@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { useAnnouncer, primeAudioOnGesture } from '../audio/announcer';
 import { useUserSetting } from './useUserSetting';
+import { alertMuted } from '../utils/notificationPrefs';
 import { useCharacterLocation } from './useCharacterLocation';
 import { useAccountLocations } from './useAccountLocations';
 import { useAuth } from '../context/AuthContext';
@@ -68,8 +69,15 @@ export function useAnnouncerEvents(): void {
   // first event can be heard. Cheap and idempotent.
   useEffect(() => { if (enabled) primeAudioOnGesture(); }, [enabled]);
 
-  // A speak wrapper that no-ops unless the announcer is enabled.
-  const say = useMemo(() => (text: string) => { if (enabled) void speak(text); }, [enabled, speak]);
+  // A speak wrapper that no-ops unless the announcer is enabled AND audible.
+  // The volume check is deliberately here rather than inside speak(): an
+  // automatic announcement nobody can hear isn't worth downloading the model
+  // and running inference for, while the Preview button stays working for
+  // someone deliberately testing it with the slider down.
+  const say = useMemo(
+    () => (text: string) => { if (enabled && !alertMuted()) void speak(text); },
+    [enabled, speak],
+  );
 
   // ---- Incursions: nearest reachable one, fire-once-on-entry -----------------
   const incursionIds = useMemo(() => incursions.map((i) => i.systemId), [incursions]);

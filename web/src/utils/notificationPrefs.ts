@@ -44,6 +44,19 @@ export function alertGain(peak: number): number {
 }
 
 /**
+ * Volume slider sitting at zero. The gain floor above is inaudible rather than
+ * truly silent, so callers can't test the returned gain for "muted" — ask here.
+ *
+ * Worth checking before work that only exists to make a sound: the announcer
+ * downloads an ~86 MB model and runs inference on the user's own CPU, and doing
+ * that to play something nobody can hear is pure waste.
+ */
+export function alertMuted(): boolean {
+  const pct = readUserSetting<number>(ALERT_VOLUME_KEY, ALERT_VOLUME_DEFAULT);
+  return Math.min(100, Math.max(0, Number(pct) || 0)) === 0;
+}
+
+/**
  * Play a short sample at the current volume, so the slider can be set by ear.
  * Deliberately the proximity tone (the loudest of the four) — set that
  * comfortably and nothing else will startle you.

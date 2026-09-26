@@ -1471,7 +1471,7 @@
     "notifExitsLowSec": "로우섹 이상",
     "notifExitsAny": "모든 k-space",
     "notifExitsHint": "이 보안도 이상의 출구가 체인에 나타나면 한 번 알립니다. 기본값은 꺼짐입니다.",
-    "notifVolume": "알림 음량 — {{pct}}%",
+    "notifVolume": "알림 및 음성 안내 음량 — {{pct}}%",
     "openOptions": "지도 옵션",
     "optimizeConnections": "⟳ 연결 최적화",
     "panelBelow": "지도 아래",

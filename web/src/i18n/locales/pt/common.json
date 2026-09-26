@@ -1471,7 +1471,7 @@
     "notifExitsLowSec": "Baixa segurança ou melhor",
     "notifExitsAny": "Qualquer k-space",
     "notifExitsHint": "Alerta uma vez quando surge na cadeia uma saída com pelo menos esta segurança. Desativado por predefinição.",
-    "notifVolume": "Volume dos alertas — {{pct}} %",
+    "notifVolume": "Volume de alertas e anúncios — {{pct}} %",
     "openOptions": "Opções de mapa",
     "optimizeConnections": "⟳ Otimizar conexões",
     "panelBelow": "Abaixo do mapa",
