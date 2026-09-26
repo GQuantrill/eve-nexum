@@ -721,14 +721,21 @@ export function MapCanvas() {
   // trying to out-argue React Flow's internal re-fit bookkeeping. Captured in a
   // layout effect (before the browser paints the new size) and reasserted for
   // the length of the re-fit animation, so the viewport simply never moves.
-  const panelOpen = selectedSystemId != null || selectedConnectionId != null;
-  const prevPanelOpen = useRef(panelOpen);
-  const heldForMapId  = useRef(activeMapId);
+  // Keyed on WHICH panel is showing, not merely whether one is. The connection
+  // panel and the system panel share a slot and are wildly different heights —
+  // a gate's panel is ~44px against a system's ~256px — so swapping between
+  // them resizes the map as much as opening one does. A boolean missed that:
+  // selecting a link and then a system kept it `true` throughout, the hold
+  // never armed, and the map re-fitted to the whole chain. Switching between
+  // two systems can resize too, and is covered by the same key.
+  const panelKey = `${selectedSystemId ?? ''}|${selectedConnectionId ?? ''}`;
+  const prevPanelKey = useRef(panelKey);
+  const heldForMapId = useRef(activeMapId);
   useLayoutEffect(() => {
     const mapChanged = heldForMapId.current !== activeMapId;
     heldForMapId.current = activeMapId;
-    if (panelOpen === prevPanelOpen.current) return;
-    prevPanelOpen.current = panelOpen;
+    if (panelKey === prevPanelKey.current) return;
+    prevPanelKey.current = panelKey;
     // Switching maps clears the selection, so the panel closes in the same tick
     // — but that map genuinely needs fitting to. Hold only when the panel is the
     // only thing that moved.
@@ -743,7 +750,7 @@ export function MapCanvas() {
       if (++frames < VIEWPORT_HOLD_FRAMES) raf = requestAnimationFrame(hold);
     });
     return () => cancelAnimationFrame(raf);
-  }, [panelOpen, activeMapId, getViewport, setViewport]);
+  }, [panelKey, activeMapId, getViewport, setViewport]);
 
   // Sweep expired EOL connections every minute. A connection is considered
   // expired 4 h + 30 min grace after the user marked it EOL. The 30 min grace
