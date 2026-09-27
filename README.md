@@ -329,6 +329,7 @@ Edit `.env` and fill in the required values:
 | `EVE_CALLBACK_URL` | Yes | Must match the callback registered in your EVE app — e.g. `https://yourdomain.com/auth/callback` |
 | `FRONTEND_URL` | Yes | Public URL of the app — e.g. `https://yourdomain.com` |
 | `DOMAIN` | Traefik only | Bare hostname for the Traefik router rule — e.g. `nexum.yourdomain.com` |
+| `TRUST_PROXY` | When proxied | How many reverse proxies sit in front of the app. Express uses it to pick the client's address out of `X-Forwarded-For`, and the per-IP rate limits are bucketed on that address — **set it too low and every request looks like it came from your proxy, so a single shared bucket rate-limits your whole instance**. `1` (default) for the plain compose (nginx → server); **`2` when running behind Traefik** (Traefik → nginx → server); add one for each further proxy, e.g. `3` behind Cloudflare as well. |
 | `CORP_ID` | Optional | Restricts logins to specific EVE corporations. **Comma-separated list** of corporation IDs — anyone whose corp is not admitted is rejected at the OAuth callback (unless their alliance is in `ALLIANCE_ID`). Leave empty/unset to allow any EVE character to log in. Example single corp: `98000001`. Example multi-corp: `98000001,98000002`. **On boot this list _seeds_ the login allow-list** (see [Admitting friends without editing `.env`](#admitting-friends-without-editing-env)): the env-seeded entries are the immutable "core" — additional corps, alliances, or individual characters are admitted live from the admin area without editing `.env` or restarting. Removing a corp from `CORP_ID` removes its core entry on the next boot. |
 | `ALLIANCE_ID` | Optional | Restricts logins to specific EVE alliances, and adds the **alliance map** scope. **Comma-separated list** of alliance IDs. A character is admitted if their corp is in `CORP_ID` **or** their alliance is in `ALLIANCE_ID`, so a whole alliance can be permitted without listing every member corp. Like `CORP_ID`, this seeds the immutable core of the login allow-list. The list also forms the coalition for `ALLIANCE_MAP_SHARED`. Example: `99000001` or `99000001,99000002`. |
 | `ADMIN_CHAR_ID` | When `CORP_ID` or `ALLIANCE_ID` is set | EVE character ID of the bootstrap admin. Forced to the top role on first login (`alliance_admin` when `ALLIANCE_ID` is set, otherwise `admin`) and cannot be demoted or blocked by other admins. **Not a membership exemption** — this character still has to be in a listed corp or alliance to log in. See [What happens when a user leaves the corp](#what-happens-when-a-user-leaves-the-corp). |
@@ -569,6 +570,13 @@ To front the stack with Traefik for TLS and a public URL, add `DOMAIN=nexum.your
 docker compose -f docker-compose.yml -f docker-compose.traefik.yml up -d
 ```
 Traefik will handle TLS termination and HTTP→HTTPS redirects. The `docker-compose.traefik.yml` overlay assumes a Traefik network named `traefik-public` and a cert resolver named `letsencrypt`.
+
+> **Set `TRUST_PROXY=2` when you add Traefik.** It puts a second proxy in front
+> of the app (Traefik → nginx → server), and the server has to be told, because
+> the count decides which `X-Forwarded-For` entry is read as the client. Leave it
+> at the default of `1` and every request resolves to Traefik's own address —
+> so instead of a rate limit per user you get one bucket shared by everyone on
+> the instance, and a busy evening starts returning `429` to all of them.
 
 > **Tip — avoid retyping the overlay.** Every `docker compose ...` command below uses the standard form. If you run with the Traefik overlay, either prefix each command with `-f docker-compose.yml -f docker-compose.traefik.yml`, or set it once per shell session:
 > ```bash
