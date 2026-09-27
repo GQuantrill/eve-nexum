@@ -1349,7 +1349,7 @@
       "announce": "Anunciar:",
       "evConnect": "Personagem ligado / desligado",
       "evIncursions": "Incursões no alcance",
-      "evLawless": "Sistemas sem lei no alcance",
+      "evLawless": "Low-sec / null-sec no alcance",
       "evKills": "Naves destruídas recentes no alcance",
       "evNewChain": "Nova cadeia adicionada por outros",
       "threshold": "«No alcance» usa o limiar dos alertas de proximidade.",

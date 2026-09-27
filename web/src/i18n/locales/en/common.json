@@ -1349,7 +1349,7 @@
       "announce": "Announce:",
       "evConnect": "Character connect / disconnect",
       "evIncursions": "Incursions in range",
-      "evLawless": "Lawless systems in range",
+      "evLawless": "Low-sec / null-sec in range",
       "evKills": "Recent kills in range",
       "evNewChain": "New chain added by others",
       "threshold": "\"In range\" uses the Proximity Alerts threshold.",

@@ -1349,7 +1349,7 @@
       "announce": "播报：",
       "evConnect": "角色上线 / 下线",
       "evIncursions": "范围内的入侵",
-      "evLawless": "范围内的无法治系统",
+      "evLawless": "范围内的 Low-sec / Null-sec",
       "evKills": "范围内的最近击杀",
       "evNewChain": "他人新增的虫洞链",
       "threshold": "“范围内”使用接近警报的阈值。",

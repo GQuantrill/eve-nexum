@@ -1349,7 +1349,7 @@
       "announce": "안내 항목:",
       "evConnect": "캐릭터 접속 / 접속 종료",
       "evIncursions": "범위 내 인커전",
-      "evLawless": "범위 내 무법 성계",
+      "evLawless": "범위 내 Low-sec / Null-sec",
       "evKills": "범위 내 최근 킬",
       "evNewChain": "다른 사용자가 추가한 새 체인",
       "threshold": "‘범위 내’는 근접 경보 임계값을 사용합니다.",
