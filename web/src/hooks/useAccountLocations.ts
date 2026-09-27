@@ -1,4 +1,5 @@
 import { api } from '../api/client';
+import { pilotIsOffline } from './pilotActivity';
 import { useShareMode } from '../context/ShareModeContext';
 import { createPolledStore } from './createPolledStore';
 
@@ -31,6 +32,9 @@ interface RawResponse {
 // This poll plus location/online/fleet all share the esiLimiter, so several open
 // tabs add up fast; 10 s (ESI caches location ~5 s anyway) keeps well clear.
 const POLL_MS = 10_000;
+// Used only when the acting pilot AND every alt are logged out, at which point
+// no location on the account can change.
+const OFFLINE_POLL_MS = 60_000;
 const EMPTY: AccountLocations = { bySystem: new Map(), byChar: new Map() };
 
 function indexBySystem(list: AccountCharLocation[]): Map<number, AccountCharLocation[]> {
@@ -66,11 +70,23 @@ function fromList(list: AccountCharLocation[]): AccountLocations {
   return { bySystem: indexBySystem(list), byChar };
 }
 
+// Gating this on the ACTING pilot alone would be wrong: an alt can be in game
+// while the character you're logged in as is not, and showing where those alts
+// are is exactly what this endpoint is for. So it self-regulates — backing off
+// only when its own last answer said nobody on the account is online either.
+let anyAltOnline = false;
+
 const store = createPolledStore<AccountLocations>({
   pollMs: POLL_MS,
+  idlePollMs: OFFLINE_POLL_MS,
+  idle: () => pilotIsOffline() && !anyAltOnline,
   empty: EMPTY,
   equals: sameLocations,
-  fetch: async () => fromList((await api<RawResponse>('/api/character/account-locations')).characters),
+  fetch: async () => {
+    const list = (await api<RawResponse>('/api/character/account-locations')).characters;
+    anyAltOnline = list.some((c) => c.online);
+    return fromList(list);
+  },
   // Account-wide (same for every tab of this session) — share it across tabs so
   // several open tabs make one poll total, not one each.
   crossTab: {

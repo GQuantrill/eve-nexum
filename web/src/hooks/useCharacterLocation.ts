@@ -1,6 +1,7 @@
 import { useEffect, useSyncExternalStore } from 'react';
 import { api } from '../api/client';
 import { readXTab, writeXTab, xTabStorageKey } from './crossTabPoll';
+import { setPilotOnline, pilotIsOffline } from './pilotActivity';
 import { flushQueue } from '../store/pendingQueue';
 import { useShareMode } from '../context/ShareModeContext';
 import { useMapStore } from '../store/mapStore';
@@ -46,6 +47,11 @@ interface RawLocationResponse {
 // surfaced as the location going out of sync). A visibility/focus catch-up
 // (below) covers the gap the moment the tab is looked at.
 const POLL_MS = 10_000;
+// Cadence while the pilot is logged OUT of EVE. Their location cannot change,
+// so the only thing this poll is still watching for is them coming back — and
+// 60s is a fine latency for that, against six times the traffic. The moment the
+// answer flips to online the fast cadence resumes.
+const OFFLINE_POLL_MS = 60_000;
 // Shorter than the interval on purpose: a request that hasn't answered within
 // one poll period is not going to be useful, and letting it outlive its own tick
 // is what used to wedge tracking. See the load() de-dupe below.
@@ -67,7 +73,7 @@ let inflight: Promise<CharacterLocation> | null = null;
 // it's still the character we want, not a stale one.
 let inflightCharId: number | null = null;
 const subscribers = new Set<() => void>();
-let pollTimer: ReturnType<typeof setInterval> | null = null;
+let pollTimer: ReturnType<typeof setTimeout> | null = null;
 
 function notify() { subscribers.forEach((fn) => fn()); }
 
@@ -89,10 +95,21 @@ function onLocStorage(e: StorageEvent): void {
   } catch { /* ignore malformed */ }
 }
 
+// setTimeout rather than setInterval: the gap is re-read every tick, so the
+// cadence can change the moment the pilot logs in or out.
+function scheduleNext(): void {
+  if (pollTimer) clearTimeout(pollTimer);
+  if (subscribers.size === 0) { pollTimer = null; return; }
+  // Next tick is scheduled before this one runs, not after it settles — a
+  // hung request must not be able to stop the poll (see load()'s timeout note).
+  pollTimer = setTimeout(() => { scheduleNext(); void load(); },
+                         pilotIsOffline() ? OFFLINE_POLL_MS : POLL_MS);
+}
+
 function subscribe(cb: () => void): () => void {
   subscribers.add(cb);
   if (!pollTimer) {
-    pollTimer = setInterval(load, POLL_MS);
+    scheduleNext();
     document.addEventListener('visibilitychange', catchUp);
     window.addEventListener('focus', catchUp);
     window.addEventListener('storage', onLocStorage);
@@ -100,7 +117,7 @@ function subscribe(cb: () => void): () => void {
   return () => {
     subscribers.delete(cb);
     if (subscribers.size === 0 && pollTimer) {
-      clearInterval(pollTimer); pollTimer = null;
+      clearTimeout(pollTimer); pollTimer = null;
       document.removeEventListener('visibilitychange', catchUp);
       window.removeEventListener('focus', catchUp);
       window.removeEventListener('storage', onLocStorage);
@@ -160,6 +177,8 @@ function load(): Promise<CharacterLocation> {
     .then(r => {
       const data: CharacterLocation = { online: r.online, system: r.system, ship: r.ship ?? null };
       inflight = null;
+      // Feeds the shared signal every other poller backs off on.
+      setPilotOnline(r.online);
       // The acting character may have changed while this was in flight — if so,
       // discard rather than caching/broadcasting a stale character's location.
       if (currentActingId !== charId) return data;
