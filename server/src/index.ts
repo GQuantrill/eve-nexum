@@ -60,7 +60,10 @@ const PgStore = connectPgSimple(session);
 const app = express();
 const PORT = process.env.PORT ?? 3001;
 
-app.set('trust proxy', 1);
+// Number of proxies in front of us — see config.trustProxy. Express uses this
+// to pick the client's address out of X-Forwarded-For, which is what every
+// IP-keyed rate limit is bucketed on.
+app.set('trust proxy', config.trustProxy);
 app.disable('x-powered-by');
 
 // Default Helmet is safe for a JSON API: HSTS (HTTPS only), nosniff,

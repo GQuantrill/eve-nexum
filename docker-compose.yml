@@ -52,6 +52,7 @@ services:
       - PG_PASSWORD
       - PG_POOL_MAX
       - PORT
+      - TRUST_PROXY
       - SESSION_SECRET
       - TOKEN_ENCRYPTION_KEY
       - EVE_CLIENT_ID
