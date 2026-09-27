@@ -112,12 +112,19 @@ export function useAnnouncerEvents(): void {
   // endpoint routes over stargates from the current k-space system.
   const nearestLawlessRef = useRef<NearbyLawless | null>(null);
   const lawlessInZone = useRef(false);
+  // The system the pilot was in before this one. Coming out of lowsec into
+  // highsec makes the system you just left the nearest lawless one, and being
+  // told "Lowsec one jump out" about it is telling you where you have just
+  // been. Read synchronously below, before the await, because the tracker
+  // effect further down updates it while the request is in flight.
+  const cameFromRef = useRef<number | null>(null);
   useEffect(() => {
     if (!enabled || !evLawless || currentSys === null || !inHighsec) {
       lawlessInZone.current = false;
       nearestLawlessRef.current = null;
       return;
     }
+    const cameFrom = cameFromRef.current;
     let cancelled = false;
     (async () => {
       try {
@@ -130,8 +137,14 @@ export function useAnnouncerEvents(): void {
         const nearest = rows[0] ?? null;   // endpoint orders by jumps
         nearestLawlessRef.current = nearest;
         if (nearest && !lawlessInZone.current) {
-          const kind = nearest.security > 0 ? 'Lowsec' : 'Nullsec';
-          say(`${kind} ${jumpWord(nearest.jumps)} out, ${nearest.name}.`);
+          // Still count as "in the zone" when it's the system we just left, so
+          // this doesn't re-fire the moment something else recalculates — it
+          // announces again only after leaving lawless range entirely, exactly
+          // as an announced one would.
+          if (nearest.eveSystemId !== cameFrom) {
+            const kind = nearest.security > 0 ? 'Lowsec' : 'Nullsec';
+            say(`${kind} ${jumpWord(nearest.jumps)} out, ${nearest.name}.`);
+          }
           lawlessInZone.current = true;
         } else if (!nearest) {
           lawlessInZone.current = false;
@@ -140,6 +153,10 @@ export function useAnnouncerEvents(): void {
     })();
     return () => { cancelled = true; };
   }, [currentSys, threshold, enabled, evLawless, inHighsec, say]);
+
+  // Declared AFTER the effect above so that, on the render where the pilot
+  // moves, that effect still sees the previous system here.
+  useEffect(() => { cameFromRef.current = currentSys; }, [currentSys]);
 
   // ---- Kills: each new kill within threshold, seeded by id (no backlog) ------
   const killSysIds = useMemo(
