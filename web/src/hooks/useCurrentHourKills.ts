@@ -37,6 +37,13 @@ const store = createPolledStore<Map<number, SystemKills>>({
     const rows = await api<SystemKills[]>('/api/activity/current-kills');
     return new Map(rows.map((r) => [r.systemId, r]));
   },
+  // Cluster-wide kill counts — identical in every tab. The store holds a Map,
+  // which JSON cannot carry, so it travels as the row array it was built from.
+  crossTab: {
+    key: 'current-kills',
+    serialize: (v) => [...v.values()],
+    deserialize: (j) => new Map((j as SystemKills[]).map((r) => [r.systemId, r])),
+  },
 });
 
 let refreshTimer: ReturnType<typeof setTimeout> | null = null;

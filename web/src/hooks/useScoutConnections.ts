@@ -49,6 +49,12 @@ const store = createPolledStore<ScoutConnection[]>({
   empty: EMPTY,
   equals: sameScout,
   fetch: () => api<ScoutConnection[]>('/api/scout'),
+  // Thera/Turnur exits are the same for every tab, so one fetch serves them all.
+  crossTab: {
+    key: 'scout',
+    serialize: (v) => v,
+    deserialize: (j) => j as ScoutConnection[],
+  },
 });
 
 export function findScoutConnections(
