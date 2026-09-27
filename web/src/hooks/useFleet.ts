@@ -1,4 +1,5 @@
 import { api } from '../api/client';
+import { pilotIsOffline } from './pilotActivity';
 import { useShareMode } from '../context/ShareModeContext';
 import { createPolledStore } from './createPolledStore';
 
@@ -28,6 +29,9 @@ interface RawResponse {
 }
 
 const POLL_MS = 20_000;
+// A logged-out pilot is in no fleet and joins none, so this only has to notice
+// them coming back — which the location poll spots first anyway.
+const OFFLINE_POLL_MS = 120_000;
 const EMPTY: FleetState = { inFleet: false, members: [], bySystem: new Map() };
 
 function indexBySystem(members: FleetMember[]): Map<number, FleetMember[]> {
@@ -62,6 +66,8 @@ function fromMembers(inFleet: boolean, members: FleetMember[]): FleetState {
 
 const store = createPolledStore<FleetState>({
   pollMs: POLL_MS,
+  idlePollMs: OFFLINE_POLL_MS,
+  idle: pilotIsOffline,
   empty: EMPTY,
   equals: sameFleet,
   fetch: async () => {

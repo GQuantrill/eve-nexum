@@ -31,15 +31,25 @@ export function createPolledStore<T>(opts: {
   // the request rate). `serialize`/`deserialize` round-trip through JSON — needed
   // because the stored value can hold Maps.
   crossTab?: { key: string; serialize: (v: T) => unknown; deserialize: (j: unknown) => T };
+  // A slower cadence for data that cannot change while the pilot is logged out
+  // of EVE. `idle()` is consulted on every tick, so the rate follows them in and
+  // out of game without the store being torn down. Omit both to poll at one rate.
+  idlePollMs?: number;
+  idle?: () => boolean;
 }): PolledStore<T> {
-  const { fetch: doFetch, pollMs, empty, equals, crossTab } = opts;
+  const { fetch: doFetch, pollMs, empty, equals, crossTab, idlePollMs, idle } = opts;
+
+  // Current gap between ticks. Read fresh each time rather than captured, so a
+  // pilot logging in speeds the poll back up on the following tick.
+  const currentPollMs = (): number =>
+    (idlePollMs != null && idle?.() ? idlePollMs : pollMs);
 
   let cache: T = empty;
   let fetchedAt = 0;
   let loaded = false;
   let inflight: Promise<void> | null = null;
   let inflightAt = 0;
-  let timer: ReturnType<typeof setInterval> | null = null;
+  let timer: ReturnType<typeof setTimeout> | null = null;
   let unsubX: (() => void) | null = null;
   const subscribers = new Set<() => void>();
 
@@ -70,7 +80,7 @@ export function createPolledStore<T>(opts: {
       // Strictly newer than our own last read -- otherwise a lone tab adopts the
       // entry it published itself moments into the interval, skips every other
       // fetch, and quietly polls at half the configured rate.
-      const shared = readXTab(crossTab.key, pollMs);
+      const shared = readXTab(crossTab.key, currentPollMs());
       if (shared !== undefined && shared.at > fetchedAt) {
         apply(crossTab.deserialize(shared.v), shared.at);
         return Promise.resolve();
@@ -88,19 +98,31 @@ export function createPolledStore<T>(opts: {
     return inflight;
   }
 
+  // setTimeout rather than setInterval so the gap is re-read every tick and the
+  // cadence can change while the store stays subscribed.
+  function scheduleNext(): void {
+    if (timer) clearTimeout(timer);
+    if (subscribers.size === 0) { timer = null; return; }
+    // Schedule the NEXT tick before firing this one, never off the request
+    // settling: a fetch that hangs forever (dead socket, suspended laptop) would
+    // otherwise never reschedule and the poll would stop until a reload. The
+    // stuck-request de-dupe above is what keeps the overlap safe.
+    timer = setTimeout(() => { scheduleNext(); void load(); }, currentPollMs());
+  }
+
   function subscribe(cb: () => void): () => void {
     subscribers.add(cb);
     // Fetch on the first mount and whenever the cache has gone stale; the poll
     // runs while anyone is watching.
-    if (!loaded || Date.now() - fetchedAt >= pollMs) load();
-    if (!timer) timer = setInterval(load, pollMs);
+    if (!loaded || Date.now() - fetchedAt >= currentPollMs()) load();
+    if (!timer) scheduleNext();
     // Live-adopt values another tab fetches, so a tab that skipped the network
     // still updates the instant a peer publishes.
     if (crossTab && !unsubX) unsubX = subscribeXTab(crossTab.key, (v, at) => apply(crossTab.deserialize(v), at));
     return () => {
       subscribers.delete(cb);
       if (subscribers.size === 0 && timer) {
-        clearInterval(timer); timer = null;
+        clearTimeout(timer); timer = null;
         if (unsubX) { unsubX(); unsubX = null; }
       }
     };

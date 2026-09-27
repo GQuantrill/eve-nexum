@@ -1,5 +1,6 @@
 import { api } from '../api/client';
 import { createPolledStore } from './createPolledStore';
+import { pilotIsOffline } from './pilotActivity';
 
 // A corp/alliance pilot Nexum has seen recently, with where they were and what
 // they were flying. "Recently" is the server's window (5 min) — see the
@@ -21,6 +22,14 @@ export interface PilotOnline {
 // de-duplicated like the other account-wide polls: several open tabs make one
 // request per interval between them, not one each.
 const POLL_MS = 30_000;
+// Gentler back-off than the other polls get while you're out of game, because
+// this is the one whose answer CAN still change then: it's who else is around,
+// not where you are, and a tab left open to watch for corpmates coming on is a
+// real reason to keep it moving. So a third of the rate rather than a quarter --
+// at most a minute and a half of notice, against the once-a-minute granularity
+// noted above. The other idle polls go further only because their data genuinely
+// cannot change while you're out; this one is a trade, so it's a small one.
+const OFFLINE_POLL_MS = 90_000;
 const EMPTY: PilotOnline[] = [];
 
 function samePilots(a: PilotOnline[], b: PilotOnline[]): boolean {
@@ -39,6 +48,8 @@ const store = createPolledStore<PilotOnline[]>({
   empty: EMPTY,
   equals: samePilots,
   fetch: () => api<PilotOnline[]>('/api/character/pilots-online'),
+  idlePollMs: OFFLINE_POLL_MS,
+  idle: pilotIsOffline,
   crossTab: {
     key: 'pilots-online',
     serialize: (v) => v,
