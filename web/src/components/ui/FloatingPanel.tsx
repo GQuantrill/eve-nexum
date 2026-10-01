@@ -14,6 +14,15 @@ interface Props {
   /** When given, the bar also carries a close button. Panels that are only ever
    *  docked or floating (never dismissed) leave this off and show redock only. */
   onClose?:   () => void;
+  /** Size the window's HEIGHT to its content instead of to `geometry.h`,
+   *  clamped to what's left of the viewport below it. Width stays as set: a
+   *  window that re-widened itself as you clicked between items would be far
+   *  more jarring than one that gets shorter. Dragging the corner takes over
+   *  and switches this off. */
+  autoHeight?: boolean;
+  /** Fired once when a resize gesture starts, so the owner can record that the
+   *  pilot has taken manual control of the size. */
+  onManualResize?: () => void;
   onFocus?:   () => void;
   zIndex?:    number;
   children:   ReactNode;
@@ -29,7 +38,9 @@ const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v
 // canvas. Drag via the title bar, resize from the bottom-right corner — both use
 // the pointer-capture idiom used elsewhere (Sidebar resize), and geometry is
 // committed to the parent only on release to avoid re-rendering on every move.
-export function FloatingPanel({ title, geometry, onCommit, onRedock, onClose, onFocus, zIndex, children }: Props) {
+export function FloatingPanel({
+  title, geometry, onCommit, onRedock, onClose, autoHeight, onManualResize, onFocus, zIndex, children,
+}: Props) {
   const { t } = useTranslation();
   const [geo, setGeo] = useState<PanelGeometry>(geometry);
   const latest = useRef<PanelGeometry>(geo);
@@ -37,6 +48,13 @@ export function FloatingPanel({ title, geometry, onCommit, onRedock, onClose, on
 
   const dragRef   = useRef<{ px: number; py: number; ox: number; oy: number } | null>(null);
   const resizeRef = useRef<{ px: number; py: number; ow: number; oh: number } | null>(null);
+  const boxRef    = useRef<HTMLDivElement | null>(null);
+
+  // Local latch so the switch to a fixed height happens on THIS frame. The
+  // parent's autoHeight only flips after its state round-trips, and until it
+  // did the window would keep auto-sizing and fight the drag.
+  const [manualH, setManualH] = useState(false);
+  const useAuto = !!autoHeight && !manualH;
 
   const onBarPointerDown = (e: React.PointerEvent) => {
     if (e.button !== 0) return;
@@ -58,7 +76,16 @@ export function FloatingPanel({ title, geometry, onCommit, onRedock, onClose, on
     e.stopPropagation();
     onFocus?.();
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-    resizeRef.current = { px: e.clientX, py: e.clientY, ow: latest.current.w, oh: latest.current.h };
+    // While auto-sized the stored height is whatever it was last pinned to and
+    // has nothing to do with what's on screen, so drag from the height the
+    // window actually has or it jumps on the first pixel of movement.
+    const rendered = boxRef.current?.getBoundingClientRect().height;
+    if (useAuto) { setManualH(true); onManualResize?.(); }
+    resizeRef.current = {
+      px: e.clientX, py: e.clientY,
+      ow: latest.current.w,
+      oh: useAuto && rendered ? Math.round(rendered) : latest.current.h,
+    };
   };
   const onResizePointerMove = (e: React.PointerEvent) => {
     const r = resizeRef.current;
@@ -71,8 +98,19 @@ export function FloatingPanel({ title, geometry, onCommit, onRedock, onClose, on
 
   return createPortal(
     <div
+      ref={boxRef}
       className="floating-panel"
-      style={{ left: geo.x, top: geo.y, width: geo.w, height: geo.h, zIndex }}
+      style={{
+        left: geo.x, top: geo.y, width: geo.w, zIndex,
+        // Auto-sized: let the content set the height, but never past the bottom
+        // of the screen -- the body scrolls once it would.
+        height:    useAuto ? 'auto' : geo.h,
+        maxHeight: useAuto ? `calc(100vh - ${geo.y}px - 8px)` : undefined,
+        // The 140px floor exists so a hand-dragged window can't become a
+        // sliver. Auto-sizing has no such problem -- the content is the floor --
+        // and leaving it on would re-introduce the empty space this is for.
+        minHeight: useAuto ? 0 : undefined,
+      }}
       onPointerDown={onFocus}
     >
       <div

@@ -143,6 +143,11 @@ export function ConnectionPanel() {
   // cross-device settings, so the panel comes back where it was left.
   const [floating, setFloating] = useUserSetting<boolean>('nexum.connPanel.float', true);
   const [savedGeo, setSavedGeo] = useUserSetting<PanelGeometry>('nexum.connPanel.geometry', DEFAULT_GEO);
+  // Height follows the content until the pilot drags the corner. A stargate link
+  // is two lines and a button; a wormhole with a jump log is many times that, and
+  // one fixed height cannot serve both without leaving the short one mostly
+  // empty. Dragging the corner is taken as "I want this size" and ends it.
+  const [autoHeight, setAutoHeight] = useUserSetting<boolean>('nexum.connPanel.autoHeight', true);
 
   // No-op the mutation calls when the user lacks topology permission. The
   // panel still renders so readonly users can inspect the connection.
@@ -883,6 +888,8 @@ export function ConnectionPanel() {
       onCommit={setSavedGeo}
       onRedock={() => setFloating(false)}
       onClose={() => selectConnection(null)}
+      autoHeight={autoHeight}
+      onManualResize={() => setAutoHeight(false)}
       zIndex={47}
     >
       {body}

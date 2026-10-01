@@ -797,6 +797,7 @@ const SETTINGS_ALLOWLIST = new Set<string>([
   // geometry.
   'nexum.connPanel.float',
   'nexum.connPanel.geometry',
+  'nexum.connPanel.autoHeight',
   // Undocked system-panel panes and the side-by-side layout toggle. Both were
   // written through useUserSetting but missing here, so the PATCH dropped them
   // and answered 200 {applied:0} — the layout survived only in the browser that
