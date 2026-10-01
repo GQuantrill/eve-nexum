@@ -14,7 +14,9 @@ import { whSizeForType } from '../../utils/wormholeSize';
 import { effectiveExpiryMs, lifeBucket, knownMaxLifeHours } from '../../utils/whLifetime';
 import { ConfirmModal } from './ConfirmModal';
 import { IconPickerDialog } from './IconPickerDialog';
-import { XIcon, TagIcon } from '../../icons';
+import { FloatingPanel, type PanelGeometry } from './FloatingPanel';
+import { useUserSetting } from '../../hooks/useUserSetting';
+import { XIcon, TagIcon, ArrowSquareOutIcon } from '../../icons';
 import { DynamicIcon } from '../DynamicIcon';
 import { api } from '../../api/client';
 import type { MassStatus, TimeStatus, ConnectionSize, Signature, SystemClass } from '../../types';
@@ -34,6 +36,11 @@ const PRESETS: Array<{ label: string; kg: number }> = [
   { label: '+ BS hot (200)',   kg: 200_000_000 },
   { label: '+ Dread (1300)',   kg: 1_300_000_000 },
 ];
+
+// Where the floating connection window opens the first time, before the pilot
+// has dragged it anywhere. Deliberately modest: the docked strip used to take a
+// third of the viewport, and the point of the window is to stop doing that.
+const DEFAULT_GEO: PanelGeometry = { x: 120, y: 120, w: 560, h: 420 };
 
 // Compact mass for button labels: "200M", "1.3B".
 function massShort(kg: number): string {
@@ -130,6 +137,13 @@ export function ConnectionPanel() {
   // and the per-end "backing signature" link dropdowns below.
   const [endpointSigs, setEndpointSigs] = useState<{ src: Signature[]; tgt: Signature[] }>({ src: [], tgt: [] });
 
+  // Docked strip vs floating window. Floating is the default: docked, this panel
+  // is six columns of controls and took roughly a third of the viewport, over
+  // the map it describes. Both the choice and the window geometry are
+  // cross-device settings, so the panel comes back where it was left.
+  const [floating, setFloating] = useUserSetting<boolean>('nexum.connPanel.float', true);
+  const [savedGeo, setSavedGeo] = useUserSetting<PanelGeometry>('nexum.connPanel.geometry', DEFAULT_GEO);
+
   // No-op the mutation calls when the user lacks topology permission. The
   // panel still renders so readonly users can inspect the connection.
   const updateConnection: typeof rawUpdate = (...args) => { if (canEdit) rawUpdate(...args); };
@@ -208,6 +222,17 @@ export function ConnectionPanel() {
 
   // Persist the roller config whenever the pilot tweaks it.
   useEffect(() => { saveRoller(roller); }, [roller]);
+
+  // Escape closes the panel, so it is dismissable without hunting for a button.
+  // Skipped while either of this panel's own dialogs is up — those close on
+  // Escape themselves, and stealing the key would shut the whole panel instead
+  // of the dialog in front of it.
+  useEffect(() => {
+    if (!selectedConnectionId || flagPickerOpen || pendingPass) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') selectConnection(null); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [selectedConnectionId, flagPickerOpen, pendingPass, selectConnection]);
 
   // Load the roll session (side + undo stack) when the selected connection
   // changes. Done during render (React's "adjust state on prop change" pattern)
@@ -309,18 +334,37 @@ export function ConnectionPanel() {
   // don't apply to stargates or Ansiblex jump bridges — only 'standard' links.
   const isWormhole = conn.connectionType === 'standard';
 
-  return (
-    <aside className="system-panel">
+  const body = (
+    <aside className={`system-panel${floating ? ' system-panel--float' : ''}`}>
       {/* Title + broken banner stack as one left column, so the banner sits
           directly under the connection name and wraps within it instead of
           becoming its own squeezed column that overlaps on narrow screens. */}
       <div className="conn-headcol">
-        <div className="system-panel__header">
-          <h2 className="system-panel__title">
-            {src ? systemDisplayName(src) : '?'} → {tgt ? systemDisplayName(tgt) : '?'}
-          </h2>
-          <button className="icon-btn" onClick={() => selectConnection(null)} title={t('actions.close')}><XIcon size={14} weight="bold" /></button>
-        </div>
+        {/* Floating mode draws its own title bar (with the same two buttons), so
+            this header would be a duplicate title inside the window. */}
+        {!floating && (
+          <div className="system-panel__header">
+            <h2 className="system-panel__title">
+              {src ? systemDisplayName(src) : '?'} → {tgt ? systemDisplayName(tgt) : '?'}
+            </h2>
+            <button
+              className="icon-btn"
+              onClick={() => setFloating(true)}
+              title={t('panel.undock')}
+              aria-label={t('panel.undock')}
+            >
+              <ArrowSquareOutIcon size={14} weight="regular" />
+            </button>
+            <button
+              className="icon-btn"
+              onClick={() => selectConnection(null)}
+              title={t('actions.close')}
+              aria-label={t('actions.close')}
+            >
+              <XIcon size={14} weight="bold" />
+            </button>
+          </div>
+        )}
 
         {conn.broken && (
           <div className="conn-broken-banner">
@@ -812,5 +856,31 @@ export function ConnectionPanel() {
         {t('connPanel.removeConnection')}
       </button>
     </aside>
+  );
+
+  if (!floating) return body;
+
+  // Clamp the remembered geometry to the CURRENT viewport, so a window placed on
+  // a larger screen doesn't reopen off the edge of a smaller one with no way to
+  // drag it back. Size first, then the corner against that size.
+  const w = Math.max(320, Math.min(savedGeo.w, window.innerWidth));
+  const h = Math.max(200, Math.min(savedGeo.h, window.innerHeight));
+  const geometry: PanelGeometry = {
+    w, h,
+    x: Math.max(0, Math.min(savedGeo.x, window.innerWidth  - w)),
+    y: Math.max(0, Math.min(savedGeo.y, window.innerHeight - h)),
+  };
+
+  return (
+    <FloatingPanel
+      title={`${src ? systemDisplayName(src) : '?'} → ${tgt ? systemDisplayName(tgt) : '?'}`}
+      geometry={geometry}
+      onCommit={setSavedGeo}
+      onRedock={() => setFloating(false)}
+      onClose={() => selectConnection(null)}
+      zIndex={47}
+    >
+      {body}
+    </FloatingPanel>
   );
 }

@@ -148,6 +148,16 @@
   padding: 0 2px;
 }
 .floating-panel__redock:hover { color: var(--accent-light); }
+.floating-panel__close {
+  display: inline-flex;
+  align-items: center;
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 0 2px;
+}
+.floating-panel__close:hover { color: var(--danger); }
 .floating-panel__body {
   flex: 1;
   overflow: auto;

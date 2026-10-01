@@ -1,7 +1,7 @@
 import { useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowSquareInIcon } from '../../icons';
+import { ArrowSquareInIcon, XIcon } from '../../icons';
 
 export interface PanelGeometry { x: number; y: number; w: number; h: number; }
 
@@ -11,6 +11,9 @@ interface Props {
   /** Called on drag/resize end with the settled geometry (parent persists). */
   onCommit:   (g: PanelGeometry) => void;
   onRedock:   () => void;
+  /** When given, the bar also carries a close button. Panels that are only ever
+   *  docked or floating (never dismissed) leave this off and show redock only. */
+  onClose?:   () => void;
   onFocus?:   () => void;
   zIndex?:    number;
   children:   ReactNode;
@@ -26,7 +29,7 @@ const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v
 // canvas. Drag via the title bar, resize from the bottom-right corner — both use
 // the pointer-capture idiom used elsewhere (Sidebar resize), and geometry is
 // committed to the parent only on release to avoid re-rendering on every move.
-export function FloatingPanel({ title, geometry, onCommit, onRedock, onFocus, zIndex, children }: Props) {
+export function FloatingPanel({ title, geometry, onCommit, onRedock, onClose, onFocus, zIndex, children }: Props) {
   const { t } = useTranslation();
   const [geo, setGeo] = useState<PanelGeometry>(geometry);
   const latest = useRef<PanelGeometry>(geo);
@@ -90,6 +93,18 @@ export function FloatingPanel({ title, geometry, onCommit, onRedock, onFocus, zI
         >
           <ArrowSquareInIcon size={14} weight="regular" />
         </button>
+        {onClose && (
+          <button
+            type="button"
+            className="floating-panel__close"
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={onClose}
+            title={t('actions.close')}
+            aria-label={t('actions.close')}
+          >
+            <XIcon size={14} weight="bold" />
+          </button>
+        )}
       </div>
       <div className="floating-panel__body">{children}</div>
       <div

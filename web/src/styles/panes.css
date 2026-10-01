@@ -301,6 +301,28 @@
    base class, different children) keeps its own single-row layout. */
 .system-panel:has(.conn-col) { flex-wrap: wrap; }
 
+/* ── Connection panel inside a floating window ────────────────────────
+   The docked strip spans the viewport and owns its own chrome: a top border,
+   a background, and 48px of left padding that clears the watchlist tab. None
+   of that applies inside a FloatingPanel, which supplies its own frame, its
+   own padding and the scroll container — so the panel here is just the
+   columns, wrapping to whatever width the pilot has dragged the window to. */
+.system-panel--float {
+  border-top: none;
+  background: none;
+  padding: 0;
+  /* The window body scrolls; clipping here would hide the lower columns
+     instead of letting them scroll into view. */
+  overflow: visible;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+}
+/* Narrow windows: let every column fall to full width rather than squeezing
+   two together and overflowing sideways. */
+.system-panel--float .conn-col { flex: 1 1 220px; }
+.system-panel--float .conn-col--roller  { flex-basis: 280px; }
+.system-panel--float .conn-col--jumplog { flex-basis: 240px; max-width: none; }
+
 .conn-col {
   display: flex;
   flex-direction: column;

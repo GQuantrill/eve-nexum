@@ -793,6 +793,16 @@ const SETTINGS_ALLOWLIST = new Set<string>([
   'nexum.announcer.ev.lawless',
   'nexum.announcer.ev.kills',
   'nexum.announcer.ev.newChain',
+  // Connection panel: docked strip vs floating window, and that window's
+  // geometry.
+  'nexum.connPanel.float',
+  'nexum.connPanel.geometry',
+  // Undocked system-panel panes and the side-by-side layout toggle. Both were
+  // written through useUserSetting but missing here, so the PATCH dropped them
+  // and answered 200 {applied:0} — the layout survived only in the browser that
+  // set it. Same failure the announcer keys above had.
+  'nexum.floatingPanels',
+  'nexum.panelSideBySide',
 ]);
 
 authRouter.patch('/settings', async (req, res) => {
