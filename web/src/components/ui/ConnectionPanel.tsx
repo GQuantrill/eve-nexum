@@ -339,9 +339,13 @@ export function ConnectionPanel() {
       {/* Title + broken banner stack as one left column, so the banner sits
           directly under the connection name and wraps within it instead of
           becoming its own squeezed column that overlaps on narrow screens. */}
+      {/* Floating mode draws its own title bar, so the header below would be a
+          duplicate title inside the window — and with nothing left in it the
+          column would still sit in the flex row contributing a gap, reading as
+          an indent on everything after it. Dropped entirely unless the broken
+          banner needs somewhere to live. */}
+      {(!floating || conn.broken) && (
       <div className="conn-headcol">
-        {/* Floating mode draws its own title bar (with the same two buttons), so
-            this header would be a duplicate title inside the window. */}
         {!floating && (
           <div className="system-panel__header">
             <h2 className="system-panel__title">
@@ -381,6 +385,7 @@ export function ConnectionPanel() {
           </div>
         )}
       </div>
+      )}
 
       {!isWormhole && (
         <p className="conn-gate-note">
