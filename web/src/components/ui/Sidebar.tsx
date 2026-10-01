@@ -13,6 +13,7 @@ import { ClosestSystemsPane } from './ClosestSystemsPane';
 import { FleetPane } from './FleetPane';
 import { WatchlistBlock } from './WatchlistBlock';
 import { ChainsPane } from './ChainsPane';
+import { RoutePlannerPane } from './RoutePlannerPane';
 import { CaretLeftIcon, CaretRightIcon, ArrowLineLeftIcon, ArrowLineRightIcon, SquaresFourIcon } from '../../icons';
 import { PanelVisibilityModal } from './PanelVisibilityModal';
 import { useUserSetting } from '../../hooks/useUserSetting';
@@ -37,9 +38,9 @@ function loadWidth(): number {
 }
 
 type Side    = 'left' | 'right';
-type PanelId = 'watchlist' | 'chains' | 'thera' | 'turnur' | 'a0' | 'closest' | 'fleet' | 'pilotsOnline' | 'clones';
+type PanelId = 'watchlist' | 'routePlanner' | 'chains' | 'thera' | 'turnur' | 'a0' | 'closest' | 'fleet' | 'pilotsOnline' | 'clones';
 
-const DEFAULT_ORDER: PanelId[] = ['watchlist', 'chains', 'closest', 'thera', 'turnur', 'fleet', 'pilotsOnline', 'clones', 'a0'];
+const DEFAULT_ORDER: PanelId[] = ['watchlist', 'routePlanner', 'chains', 'closest', 'thera', 'turnur', 'fleet', 'pilotsOnline', 'clones', 'a0'];
 const VALID_PANEL_IDS: ReadonlySet<PanelId> = new Set(DEFAULT_ORDER);
 
 // The panels form a single vertical column, so a drag should only ever move a
@@ -63,6 +64,7 @@ export function Sidebar() {
   const { user } = useAuth();
   const panelTitle: Record<PanelId, string> = {
     watchlist: t('sidebar.watchlist'),
+    routePlanner: t('sidebar.routePlanner'),
     chains:  t('sidebar.chains'),
     thera:   t('sidebar.thera'),
     turnur:  t('sidebar.turnur'),
@@ -174,6 +176,7 @@ export function Sidebar() {
 
   const cards: Record<PanelId, ReactNode> = {
     watchlist: <WatchlistBlock />,
+    routePlanner: <RoutePlannerPane />,
     chains:  <ChainsPane />,
     thera:   <ScoutConnectionsPane scoutSystem="Thera" />,
     turnur:  <ScoutConnectionsPane scoutSystem="Turnur" />,

@@ -1690,9 +1690,9 @@
     "viaAnsiblex": "Ansiblex 跳跃门"
   },
   "routeToast": {
-    "destinationSet": "目的地已设为 {{system}}",
-    "waypointAdded": "{{system}} 已成功添加到航点。",
-    "failed": "设置航路点失败 — 你的角色在线吗？"
+    "destinationSet": "游戏内自动驾驶已设为 {{system}}",
+    "waypointAdded": "{{system}} 已加入你的游戏内自动驾驶路线。",
+    "failed": "无法连接自动驾驶 — 你的角色登录了吗？"
   },
   "scout": {
     "noConnections": "没有 {{system}} 连接。",
@@ -1746,7 +1746,8 @@
     "panelsTitle": "侧边栏板块",
     "panelsHint": "选择侧边栏中显示的板块。隐藏的板块会保留位置，重新开启时回到原处。",
     "panelsAllHidden": "所有板块都已隐藏 — 侧边栏将是空的。",
-    "emptyTitle": "当前没有显示任何板块。在此选择要显示的板块。"
+    "emptyTitle": "当前没有显示任何板块。在此选择要显示的板块。",
+    "routePlanner": "路线规划器"
   },
   "sigType": {
     "combat": "战斗",
@@ -2037,8 +2038,8 @@
     "dropToUngroup": "拖放到此处以移出分组"
   },
   "waypoint": {
-    "setDestination": "设为目的地",
-    "addWaypoint": "添加航路点"
+    "setDestination": "设置游戏内目的地",
+    "addWaypoint": "添加游戏内途经点"
   },
   "whChart": {
     "open": "⊟ 虫洞参考",
@@ -2100,5 +2101,24 @@
     "imported": "已从 Tripwire 导入 {{systems}} 个星系、{{connections}} 条连接和 {{signatures}} 个信号",
     "importedWithNotes": "已从 Tripwire 导入 {{systems}} 个星系、{{connections}} 条连接、{{signatures}} 个信号，以及 {{notes}} 个星系的备注",
     "notTripwireData": "这看起来不是 Tripwire 的链数据 — 其中没有信号"
+  },
+  "routePlanner": {
+    "from": "起点",
+    "to": "终点",
+    "searchSystem": "搜索星系…",
+    "searching": "搜索中…",
+    "clearField": "清除",
+    "useMyLocation": "使用我的当前位置",
+    "swap": "交换起点和终点",
+    "followingLocation": "从 {{system}} — 你的当前位置",
+    "pickBoth": "选择起点和终点星系以规划路线。",
+    "sameSystem": "起点和终点是同一个星系。",
+    "noRoute": "未找到这两个星系之间的路线。",
+    "savedHdr": "已保存的路线",
+    "savedEmpty": "暂无 — 规划一条路线，在下方命名并保存。",
+    "nameToSave": "保存名称…",
+    "save": "保存",
+    "loadPlan": "载入此路线",
+    "deletePlan": "删除此路线"
   }
 }

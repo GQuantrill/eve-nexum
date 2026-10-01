@@ -1690,9 +1690,9 @@
     "viaAnsiblex": "Ansiblex ジャンプゲート"
   },
   "routeToast": {
-    "destinationSet": "目的地を {{system}} に設定しました",
-    "waypointAdded": "{{system}} を経由地に追加しました。",
-    "failed": "ウェイポイントの設定に失敗しました — キャラクターはオンラインですか？"
+    "destinationSet": "ゲーム内のオートパイロットを {{system}} に設定しました",
+    "waypointAdded": "{{system}} をゲーム内のオートパイロット経路に追加しました。",
+    "failed": "オートパイロットに接続できません — キャラクターはログインしていますか？"
   },
   "scout": {
     "noConnections": "{{system}} の接続はありません。",
@@ -1746,7 +1746,8 @@
     "panelsTitle": "サイドバーのセクション",
     "panelsHint": "サイドバーに表示するセクションを選びます。非表示にしたものも位置は保持され、再表示すると元の場所に戻ります。",
     "panelsAllHidden": "すべてのセクションが非表示です — サイドバーは空になります。",
-    "emptyTitle": "表示中のセクションがありません。ここで表示するものを選べます。"
+    "emptyTitle": "表示中のセクションがありません。ここで表示するものを選べます。",
+    "routePlanner": "ルートプランナー"
   },
   "sigType": {
     "combat": "コンバット",
@@ -2037,8 +2038,8 @@
     "dropToUngroup": "グループから外すにはここにドロップ"
   },
   "waypoint": {
-    "setDestination": "目的地に設定",
-    "addWaypoint": "ウェイポイントを追加"
+    "setDestination": "ゲーム内の目的地に設定",
+    "addWaypoint": "ゲーム内の経由地に追加"
   },
   "whChart": {
     "open": "⊟ ワームホール一覧",
@@ -2100,5 +2101,24 @@
     "imported": "Tripwire から {{systems}} システム、{{connections}} 接続、{{signatures}} シグネチャをインポートしました",
     "importedWithNotes": "Tripwire から {{systems}} システム、{{connections}} 接続、{{signatures}} シグネチャ、{{notes}} システムのメモをインポートしました",
     "notTripwireData": "Tripwire のチェーンデータではないようです — シグネチャがありません"
+  },
+  "routePlanner": {
+    "from": "出発",
+    "to": "目的地",
+    "searchSystem": "システムを検索…",
+    "searching": "検索中…",
+    "clearField": "クリア",
+    "useMyLocation": "現在地を使用",
+    "swap": "出発地と目的地を入れ替え",
+    "followingLocation": "{{system}} から — 現在地",
+    "pickBoth": "ルートを計算するには出発システムと目的システムを選択してください。",
+    "sameSystem": "出発地と目的地が同じシステムです。",
+    "noRoute": "これらのシステム間のルートが見つかりません。",
+    "savedHdr": "保存したルート",
+    "savedEmpty": "まだありません — ルートを計算し、下で名前を付けて保存してください。",
+    "nameToSave": "保存する名前…",
+    "save": "保存",
+    "loadPlan": "このルートを読み込む",
+    "deletePlan": "このルートを削除"
   }
 }

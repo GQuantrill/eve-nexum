@@ -1690,9 +1690,9 @@
     "viaAnsiblex": "Puerta de salto Ansiblex"
   },
   "routeToast": {
-    "destinationSet": "Destino establecido en {{system}}",
-    "waypointAdded": "{{system}} añadido a los puntos de ruta correctamente.",
-    "failed": "No se pudo establecer el punto de ruta — ¿está tu personaje en línea?"
+    "destinationSet": "Piloto automático del juego fijado en {{system}}",
+    "waypointAdded": "{{system}} añadido a la ruta del piloto automático del juego.",
+    "failed": "No se pudo acceder al piloto automático: ¿tu personaje está conectado?"
   },
   "scout": {
     "noConnections": "No hay conexiones de {{system}}.",
@@ -1746,7 +1746,8 @@
     "panelsTitle": "Secciones de la barra lateral",
     "panelsHint": "Elige qué secciones aparecen en la barra lateral. Las ocultas conservan su posición y vuelven a ella al reactivarlas.",
     "panelsAllHidden": "Todas las secciones están ocultas: la barra lateral quedará vacía.",
-    "emptyTitle": "No se muestra ninguna sección. Elige aquí las que quieras."
+    "emptyTitle": "No se muestra ninguna sección. Elige aquí las que quieras.",
+    "routePlanner": "Planificador de rutas"
   },
   "sigType": {
     "combat": "Combate",
@@ -2037,8 +2038,8 @@
     "dropToUngroup": "Suelta aquí para quitar del grupo"
   },
   "waypoint": {
-    "setDestination": "Establecer destino",
-    "addWaypoint": "Añadir punto de ruta"
+    "setDestination": "Fijar destino en el juego",
+    "addWaypoint": "Añadir waypoint en el juego"
   },
   "whChart": {
     "open": "⊟ Referencia de agujeros de gusano",
@@ -2101,5 +2102,24 @@
     "imported": "Importados {{systems}} sistemas, {{connections}} conexiones y {{signatures}} firmas desde Tripwire",
     "importedWithNotes": "Importados {{systems}} sistemas, {{connections}} conexiones, {{signatures}} firmas y notas de {{notes}} sistemas desde Tripwire",
     "notTripwireData": "Esto no parece datos de cadena de Tripwire: no contiene firmas"
+  },
+  "routePlanner": {
+    "from": "Desde",
+    "to": "Hasta",
+    "searchSystem": "Buscar un sistema…",
+    "searching": "Buscando…",
+    "clearField": "Borrar",
+    "useMyLocation": "Usar mi ubicación actual",
+    "swap": "Intercambiar origen y destino",
+    "followingLocation": "Desde {{system}} — tu ubicación actual",
+    "pickBoth": "Elige un sistema de origen y uno de destino para planear una ruta.",
+    "sameSystem": "El origen y el destino son el mismo sistema.",
+    "noRoute": "No se encontró ruta entre esos sistemas.",
+    "savedHdr": "Rutas guardadas",
+    "savedEmpty": "Ninguna todavía: planea una ruta, ponle nombre abajo y pulsa Guardar.",
+    "nameToSave": "Nombre para guardar…",
+    "save": "Guardar",
+    "loadPlan": "Cargar esta ruta",
+    "deletePlan": "Eliminar esta ruta"
   }
 }

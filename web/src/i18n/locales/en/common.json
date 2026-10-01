@@ -1690,9 +1690,9 @@
     "jspaceNoWaypoint": "Wormhole systems can't be set as an autopilot destination."
   },
   "routeToast": {
-    "destinationSet": "Destination set to {{system}}",
-    "waypointAdded": "{{system}} successfully added to waypoints.",
-    "failed": "Failed to set waypoint — is your character online?"
+    "destinationSet": "In-game autopilot set to {{system}}",
+    "waypointAdded": "{{system}} added to your in-game autopilot route.",
+    "failed": "Couldn't reach your autopilot — is your character logged in?"
   },
   "scout": {
     "noConnections": "No {{system}} connections.",
@@ -1746,7 +1746,8 @@
     "panelsTitle": "Sidebar sections",
     "panelsHint": "Choose which sections appear in the sidebar. Hidden ones keep their place, so switching one back on returns it to where you had it.",
     "panelsAllHidden": "Every section is hidden — the sidebar will be empty.",
-    "emptyTitle": "No sections are showing. Choose which ones you want here."
+    "emptyTitle": "No sections are showing. Choose which ones you want here.",
+    "routePlanner": "Route Planner"
   },
   "sigType": {
     "combat": "Combat",
@@ -2037,8 +2038,8 @@
     "duplicate": "Already on watchlist"
   },
   "waypoint": {
-    "setDestination": "Set Destination",
-    "addWaypoint": "Add Waypoint"
+    "setDestination": "Set in-game destination",
+    "addWaypoint": "Add in-game waypoint"
   },
   "whChart": {
     "open": "⊟ Wormhole reference",
@@ -2101,5 +2102,24 @@
     "imported": "Imported {{systems}} systems, {{connections}} connections and {{signatures}} signatures from Tripwire",
     "importedWithNotes": "Imported {{systems}} systems, {{connections}} connections, {{signatures}} signatures and notes on {{notes}} systems from Tripwire",
     "notTripwireData": "That doesn’t look like Tripwire chain data — no signatures in it"
+  },
+  "routePlanner": {
+    "from": "From",
+    "to": "To",
+    "searchSystem": "Search a system…",
+    "searching": "Searching…",
+    "clearField": "Clear",
+    "useMyLocation": "Use my current location",
+    "swap": "Swap from and to",
+    "followingLocation": "From {{system}} — your current location",
+    "pickBoth": "Pick a start and an end system to plan a route.",
+    "sameSystem": "Start and end are the same system.",
+    "noRoute": "No route found between those systems.",
+    "savedHdr": "Saved routes",
+    "savedEmpty": "None yet — plan a route, name it below, and hit Save.",
+    "nameToSave": "Name to save…",
+    "save": "Save",
+    "loadPlan": "Load this route",
+    "deletePlan": "Delete this route"
   }
 }

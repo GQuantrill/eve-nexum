@@ -1690,9 +1690,9 @@
     "viaAnsiblex": "Ansiblex 점프 게이트"
   },
   "routeToast": {
-    "destinationSet": "목적지가 {{system}}(으)로 설정됨",
-    "waypointAdded": "{{system}}이(가) 경유지에 추가되었습니다.",
-    "failed": "경유지 설정 실패 — 당신의 캐릭터가 온라인인가요?"
+    "destinationSet": "게임 내 오토파일럿을 {{system}}(으)로 설정했습니다",
+    "waypointAdded": "{{system}}을(를) 게임 내 오토파일럿 경로에 추가했습니다.",
+    "failed": "오토파일럿에 연결할 수 없습니다 — 캐릭터가 접속해 있나요?"
   },
   "scout": {
     "noConnections": "{{system}} 연결이 없습니다.",
@@ -1746,7 +1746,8 @@
     "panelsTitle": "사이드바 섹션",
     "panelsHint": "사이드바에 표시할 섹션을 선택하세요. 숨긴 섹션도 위치를 유지하므로 다시 켜면 원래 자리로 돌아옵니다.",
     "panelsAllHidden": "모든 섹션이 숨겨져 있습니다 — 사이드바가 비어 있게 됩니다.",
-    "emptyTitle": "표시 중인 섹션이 없습니다. 여기에서 원하는 섹션을 선택하세요."
+    "emptyTitle": "표시 중인 섹션이 없습니다. 여기에서 원하는 섹션을 선택하세요.",
+    "routePlanner": "경로 플래너"
   },
   "sigType": {
     "combat": "전투",
@@ -2037,8 +2038,8 @@
     "dropToUngroup": "그룹에서 빼려면 여기에 놓으세요"
   },
   "waypoint": {
-    "setDestination": "목적지 설정",
-    "addWaypoint": "경유지 추가"
+    "setDestination": "게임 내 목적지 설정",
+    "addWaypoint": "게임 내 경유지 추가"
   },
   "whChart": {
     "open": "⊟ 웜홀 참조",
@@ -2100,5 +2101,24 @@
     "imported": "Tripwire에서 시스템 {{systems}}개, 연결 {{connections}}개, 시그니처 {{signatures}}개를 가져왔습니다",
     "importedWithNotes": "Tripwire에서 시스템 {{systems}}개, 연결 {{connections}}개, 시그니처 {{signatures}}개, 시스템 메모 {{notes}}개를 가져왔습니다",
     "notTripwireData": "Tripwire 체인 데이터가 아닌 것 같습니다 — 시그니처가 없습니다"
+  },
+  "routePlanner": {
+    "from": "출발",
+    "to": "도착",
+    "searchSystem": "시스템 검색…",
+    "searching": "검색 중…",
+    "clearField": "지우기",
+    "useMyLocation": "현재 위치 사용",
+    "swap": "출발지와 도착지 바꾸기",
+    "followingLocation": "{{system}} 에서 — 현재 위치",
+    "pickBoth": "경로를 계획하려면 출발 시스템과 도착 시스템을 선택하세요.",
+    "sameSystem": "출발지와 도착지가 같은 시스템입니다.",
+    "noRoute": "두 시스템 사이의 경로를 찾을 수 없습니다.",
+    "savedHdr": "저장된 경로",
+    "savedEmpty": "아직 없습니다 — 경로를 계획하고 아래에 이름을 입력한 뒤 저장하세요.",
+    "nameToSave": "저장할 이름…",
+    "save": "저장",
+    "loadPlan": "이 경로 불러오기",
+    "deletePlan": "이 경로 삭제"
   }
 }
