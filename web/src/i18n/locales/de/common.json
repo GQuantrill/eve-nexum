@@ -443,13 +443,17 @@
     "disabled": "API-Schlüssel deaktiviert"
   },
   "chainExits": {
-    "noExits": "Keine K-Space-Ausgänge in dieser Kette.",
-    "hint": "K-Space-Systeme aktuell auf der Karte, nach Sicherheitsklasse. Jita-Route nur über Gates — Wurmloch-Abkürzungen nicht gezählt.",
+    "title": "Chain-Ausgänge",
+    "noExits": "Keine K-Space-Ausgänge in dieser Chain.",
+    "hint": "Nächster Ausgang zu jedem deiner Favoriten",
+    "allExits": "Alle K-Space-Ausgänge",
+    "noFavourites": "Noch keine Favoriten — füge welche im Panel „Nächste Systeme“ hinzu.",
+    "noRoute": "keine Route",
+    "inChain": "in der Chain",
+    "via": "über",
     "highSec": "High-Sec",
     "lowSec": "Low-Sec",
-    "nullSec": "Null-Sec",
-    "nearestJita": "Nächstes Jita:",
-    "via": "über"
+    "nullSec": "Null-Sec"
   },
   "chains": {
     "from": "Von…",
@@ -1527,7 +1531,6 @@
       "tracking": "Verfolgung",
       "route": "Route",
       "chains": "Ketten",
-      "chainExits": "Ketten-Ausgänge",
       "proximityAlerts": "Näherungswarnungen",
       "activity": "Aktivität",
       "fleet": "Flotte",
