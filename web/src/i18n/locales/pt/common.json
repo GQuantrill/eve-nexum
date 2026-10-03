@@ -72,7 +72,8 @@
       "maps": "Mapas",
       "reports": "Relatórios",
       "discord": "Discord",
-      "audit": "Registo de auditoria"
+      "audit": "Registo de auditoria",
+      "flags": "Predefinições"
     },
     "access": {
       "title": "Acesso de início de sessão",
@@ -362,6 +363,16 @@
       "colAmount": "Montante",
       "assign": "Atribuir",
       "assignPlaceholder": "ID do personagem"
+    },
+    "flags": {
+      "title": "Predefinições de marca",
+      "hintCorp": "Predefinições que todos os membros da tua corporação veem acima das suas, para que um ícone signifique o mesmo para todos. Até {{max}}.",
+      "hintAlliance": "Predefinições que todos os membros da tua aliança veem acima das suas, para que um ícone signifique o mesmo para todos. Até {{max}}.",
+      "noCorp": "Esta instalação não tem corporação nem aliança, por isso não há com quem padronizar.",
+      "saving": "A guardar…",
+      "saved": "Guardado",
+      "loadFailed": "Não foi possível carregar as predefinições.",
+      "saveFailed": "Não foi possível guardar as predefinições."
     }
   },
   "anomType": {
@@ -2101,5 +2112,16 @@
     "imported": "Importados {{systems}} sistemas, {{connections}} ligações e {{signatures}} assinaturas do Tripwire",
     "importedWithNotes": "Importados {{systems}} sistemas, {{connections}} ligações, {{signatures}} assinaturas e notas de {{notes}} sistemas do Tripwire",
     "notTripwireData": "Isto não parece dados de cadeia do Tripwire — não tem assinaturas"
+  },
+  "flagPresets": {
+    "title": "Predefinições de marca",
+    "hint": "Combinações guardadas de ícone, cor e nome que podes aplicar a uma ligação com um clique.",
+    "newItem": "Nova predefinição",
+    "add": "Adicionar predefinição",
+    "remove": "Remover predefinição",
+    "pickIcon": "Escolher ícone",
+    "max": "Até {{count}} predefinições",
+    "orgGroup": "Organização",
+    "mineGroup": "Minhas"
   }
 }

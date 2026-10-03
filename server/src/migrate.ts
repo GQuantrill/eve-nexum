@@ -251,6 +251,24 @@ export async function migrate() {
     -- admin turns them off.
     ALTER TABLE corp_discord_settings ADD COLUMN IF NOT EXISTS notify_chains BOOLEAN NOT NULL DEFAULT TRUE;
 
+    -- Connection-flag presets, so a corp can standardise its signals ("red
+    -- skull always means DO NOT ROLL"). Mirrored corp/alliance pair for the
+    -- same reason the Discord settings are: a map is corp- OR alliance-scoped,
+    -- never both, so a read touches exactly one of these.
+    --
+    -- The list is JSONB rather than a row per preset: it is small, capped, and
+    -- always read and written whole, and its order is part of the value.
+    CREATE TABLE IF NOT EXISTS corp_flag_presets (
+      corp_id    INTEGER     PRIMARY KEY,
+      presets    JSONB       NOT NULL DEFAULT '[]'::jsonb,
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+    CREATE TABLE IF NOT EXISTS alliance_flag_presets (
+      alliance_id INTEGER     PRIMARY KEY,
+      presets     JSONB       NOT NULL DEFAULT '[]'::jsonb,
+      updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
     -- Alliance mirror of corp_discord_settings, so alliance maps get the same
     -- region filter + per-event-type toggles. A map is corp- OR alliance-scoped,
     -- never both, so its dispatch reads exactly one of these tables.

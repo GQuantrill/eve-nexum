@@ -72,7 +72,8 @@
       "maps": "Mapas",
       "reports": "Informes",
       "discord": "Discord",
-      "audit": "Registro de auditoría"
+      "audit": "Registro de auditoría",
+      "flags": "Plantillas"
     },
     "access": {
       "title": "Acceso de inicio de sesión",
@@ -362,6 +363,16 @@
       "colAmount": "Cantidad",
       "assign": "Asignar",
       "assignPlaceholder": "ID de personaje"
+    },
+    "flags": {
+      "title": "Plantillas de marca",
+      "hintCorp": "Plantillas que cada miembro de tu corporación ve encima de las suyas, para que un icono signifique lo mismo para todos. Hasta {{max}}.",
+      "hintAlliance": "Plantillas que cada miembro de tu alianza ve encima de las suyas, para que un icono signifique lo mismo para todos. Hasta {{max}}.",
+      "noCorp": "Esta instalación no tiene corporación ni alianza, así que no hay con quién estandarizar.",
+      "saving": "Guardando…",
+      "saved": "Guardado",
+      "loadFailed": "No se pudieron cargar las plantillas.",
+      "saveFailed": "No se pudieron guardar las plantillas."
     }
   },
   "anomType": {
@@ -2101,5 +2112,16 @@
     "imported": "Importados {{systems}} sistemas, {{connections}} conexiones y {{signatures}} firmas desde Tripwire",
     "importedWithNotes": "Importados {{systems}} sistemas, {{connections}} conexiones, {{signatures}} firmas y notas de {{notes}} sistemas desde Tripwire",
     "notTripwireData": "Esto no parece datos de cadena de Tripwire: no contiene firmas"
+  },
+  "flagPresets": {
+    "title": "Plantillas de marca",
+    "hint": "Combinaciones guardadas de icono, color y nombre que puedes aplicar a una conexión con un clic.",
+    "newItem": "Nueva plantilla",
+    "add": "Añadir plantilla",
+    "remove": "Eliminar plantilla",
+    "pickIcon": "Elegir icono",
+    "max": "Hasta {{count}} plantillas",
+    "orgGroup": "Organización",
+    "mineGroup": "Mías"
   }
 }

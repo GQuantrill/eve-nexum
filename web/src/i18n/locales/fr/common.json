@@ -72,7 +72,8 @@
       "maps": "Cartes",
       "reports": "Rapports",
       "discord": "Discord",
-      "audit": "Journal d'audit"
+      "audit": "Journal d'audit",
+      "flags": "Modèles"
     },
     "access": {
       "title": "Accès de connexion",
@@ -362,6 +363,16 @@
       "colAmount": "Montant",
       "assign": "Attribuer",
       "assignPlaceholder": "ID du personnage"
+    },
+    "flags": {
+      "title": "Modèles de marqueur",
+      "hintCorp": "Modèles que chaque membre de votre corporation voit au-dessus des siens, pour qu'une icône ait le même sens pour tous. Jusqu'à {{max}}.",
+      "hintAlliance": "Modèles que chaque membre de votre alliance voit au-dessus des siens, pour qu'une icône ait le même sens pour tous. Jusqu'à {{max}}.",
+      "noCorp": "Ce déploiement n'a ni corporation ni alliance : il n'y a personne avec qui harmoniser.",
+      "saving": "Enregistrement…",
+      "saved": "Enregistré",
+      "loadFailed": "Impossible de charger les modèles.",
+      "saveFailed": "Impossible d'enregistrer les modèles."
     }
   },
   "anomType": {
@@ -2101,5 +2112,16 @@
     "imported": "{{systems}} systèmes, {{connections}} connexions et {{signatures}} signatures importés depuis Tripwire",
     "importedWithNotes": "{{systems}} systèmes, {{connections}} connexions, {{signatures}} signatures et les notes de {{notes}} systèmes importés depuis Tripwire",
     "notTripwireData": "Cela ne ressemble pas à des données de chaîne Tripwire — aucune signature"
+  },
+  "flagPresets": {
+    "title": "Modèles de marqueur",
+    "hint": "Combinaisons enregistrées d'icône, de couleur et de nom, applicables à une connexion en un clic.",
+    "newItem": "Nouveau modèle",
+    "add": "Ajouter un modèle",
+    "remove": "Supprimer le modèle",
+    "pickIcon": "Choisir une icône",
+    "max": "Jusqu'à {{count}} modèles",
+    "orgGroup": "Organisation",
+    "mineGroup": "Les miens"
   }
 }

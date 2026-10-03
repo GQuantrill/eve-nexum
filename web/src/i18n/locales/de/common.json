@@ -72,7 +72,8 @@
       "maps": "Karten",
       "reports": "Berichte",
       "discord": "Discord",
-      "audit": "Audit-Log"
+      "audit": "Audit-Log",
+      "flags": "Flaggen-Vorlagen"
     },
     "access": {
       "title": "Anmeldezugang",
@@ -362,6 +363,16 @@
       "colAmount": "Betrag",
       "assign": "Zuordnen",
       "assignPlaceholder": "Charakter-ID"
+    },
+    "flags": {
+      "title": "Flaggen-Vorlagen",
+      "hintCorp": "Vorlagen, die jedes Mitglied deines Corps über den eigenen sieht, damit ein Symbol für alle dasselbe bedeutet. Bis zu {{max}}.",
+      "hintAlliance": "Vorlagen, die jedes Mitglied deiner Allianz über den eigenen sieht, damit ein Symbol für alle dasselbe bedeutet. Bis zu {{max}}.",
+      "noCorp": "Diese Installation hat weder Corp noch Allianz — es gibt niemanden, mit dem man sich abstimmen könnte.",
+      "saving": "Speichern…",
+      "saved": "Gespeichert",
+      "loadFailed": "Vorlagen konnten nicht geladen werden.",
+      "saveFailed": "Vorlagen konnten nicht gespeichert werden."
     }
   },
   "anomType": {
@@ -2101,5 +2112,16 @@
     "imported": "{{systems}} Systeme, {{connections}} Verbindungen und {{signatures}} Signaturen aus Tripwire importiert",
     "importedWithNotes": "{{systems}} Systeme, {{connections}} Verbindungen, {{signatures}} Signaturen und Notizen zu {{notes}} Systemen aus Tripwire importiert",
     "notTripwireData": "Das sehen nicht nach Tripwire-Kettendaten aus — keine Signaturen enthalten"
+  },
+  "flagPresets": {
+    "title": "Flaggen-Vorlagen",
+    "hint": "Gespeicherte Kombinationen aus Symbol, Farbe und Name, die du mit einem Klick auf eine Verbindung anwendest.",
+    "newItem": "Neue Vorlage",
+    "add": "Vorlage hinzufügen",
+    "remove": "Vorlage entfernen",
+    "pickIcon": "Symbol wählen",
+    "max": "Bis zu {{count}} Vorlagen",
+    "orgGroup": "Organisation",
+    "mineGroup": "Meine"
   }
 }

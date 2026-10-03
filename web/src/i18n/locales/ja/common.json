@@ -72,7 +72,8 @@
       "maps": "マップ",
       "reports": "レポート",
       "discord": "Discord",
-      "audit": "監査ログ"
+      "audit": "監査ログ",
+      "flags": "フラグプリセット"
     },
     "access": {
       "title": "ログインアクセス",
@@ -362,6 +363,16 @@
       "colAmount": "金額",
       "assign": "割り当て",
       "assignPlaceholder": "キャラクターID"
+    },
+    "flags": {
+      "title": "フラグのプリセット",
+      "hintCorp": "コーポレーションの全員が自分のプリセットの上に見る共通プリセットです。バッジの意味を全員で統一できます。最大 {{max}} 件。",
+      "hintAlliance": "アライアンスの全員が自分のプリセットの上に見る共通プリセットです。バッジの意味を全員で統一できます。最大 {{max}} 件。",
+      "noCorp": "このデプロイにはコーポレーションもアライアンスもないため、統一する相手がいません。",
+      "saving": "保存中…",
+      "saved": "保存しました",
+      "loadFailed": "プリセットを読み込めませんでした。",
+      "saveFailed": "プリセットを保存できませんでした。"
     }
   },
   "anomType": {
@@ -2100,5 +2111,16 @@
     "imported": "Tripwire から {{systems}} システム、{{connections}} 接続、{{signatures}} シグネチャをインポートしました",
     "importedWithNotes": "Tripwire から {{systems}} システム、{{connections}} 接続、{{signatures}} シグネチャ、{{notes}} システムのメモをインポートしました",
     "notTripwireData": "Tripwire のチェーンデータではないようです — シグネチャがありません"
+  },
+  "flagPresets": {
+    "title": "フラグのプリセット",
+    "hint": "アイコン・色・名前の組み合わせを保存し、接続のフラグにワンクリックで適用します。",
+    "newItem": "新しいプリセット",
+    "add": "プリセットを追加",
+    "remove": "プリセットを削除",
+    "pickIcon": "アイコンを選択",
+    "max": "最大 {{count}} 件",
+    "orgGroup": "組織",
+    "mineGroup": "自分"
   }
 }

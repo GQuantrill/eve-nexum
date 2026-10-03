@@ -72,7 +72,8 @@
       "maps": "地图",
       "reports": "报告",
       "discord": "Discord",
-      "audit": "审计日志"
+      "audit": "审计日志",
+      "flags": "标记预设"
     },
     "access": {
       "title": "登录访问",
@@ -362,6 +363,16 @@
       "colAmount": "金额",
       "assign": "分配",
       "assignPlaceholder": "角色 ID"
+    },
+    "flags": {
+      "title": "标记预设",
+      "hintCorp": "军团每位成员都会在自己的预设之上看到这些预设，让同一个图标对所有人含义一致。最多 {{max}} 个。",
+      "hintAlliance": "联盟每位成员都会在自己的预设之上看到这些预设，让同一个图标对所有人含义一致。最多 {{max}} 个。",
+      "noCorp": "此部署没有军团或联盟，没有需要统一的对象。",
+      "saving": "保存中…",
+      "saved": "已保存",
+      "loadFailed": "无法加载预设。",
+      "saveFailed": "无法保存预设。"
     }
   },
   "anomType": {
@@ -2100,5 +2111,16 @@
     "imported": "已从 Tripwire 导入 {{systems}} 个星系、{{connections}} 条连接和 {{signatures}} 个信号",
     "importedWithNotes": "已从 Tripwire 导入 {{systems}} 个星系、{{connections}} 条连接、{{signatures}} 个信号，以及 {{notes}} 个星系的备注",
     "notTripwireData": "这看起来不是 Tripwire 的链数据 — 其中没有信号"
+  },
+  "flagPresets": {
+    "title": "标记预设",
+    "hint": "保存的图标 + 颜色 + 名称组合，可一键应用到连接标记。",
+    "newItem": "新建预设",
+    "add": "添加预设",
+    "remove": "删除预设",
+    "pickIcon": "选择图标",
+    "max": "最多 {{count}} 个预设",
+    "orgGroup": "组织",
+    "mineGroup": "我的"
   }
 }

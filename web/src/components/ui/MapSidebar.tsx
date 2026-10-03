@@ -27,12 +27,13 @@ import { DEFAULT_BOOKMARK_FORMAT, BOOKMARK_TOKENS, DEFAULT_SITE_BOOKMARK_FORMAT,
 import { toPng } from "html-to-image";
 import { CaretLeftIcon, CaretRightIcon, DiscordLogoIcon } from "@phosphor-icons/react";
 import { DISCORD_INVITE_URL } from "../../data/links";
-import { ChainExitsSection } from "./ChainExitsSection";
 import { JumpRangePane } from "./JumpRangePane";
 import { AnnouncerSection } from "./AnnouncerSection";
 import { MapSharesSection } from "./MapSharesSection";
 import { MergeMapModal } from "./MergeMapModal";
+import { ChainExitsSection } from "./ChainExitsSection";
 import { CustomIntelBlock } from "./CustomIntelBlock";
+import { FlagPresetsBlock } from "./FlagPresetsBlock";
 import { PatchNotesModal } from "./PatchNotesModal";
 import { ContentFilterBlock } from "./ContentFilterBlock";
 import { useIsMapOwner } from "../../hooks/useIsMapOwner";
@@ -1456,6 +1457,8 @@ export function MapSidebar() {
               <LazyWhSweepToggle />
             </>
           )}
+
+          <FlagPresetsBlock />
         </CollapsibleSection>
 
         {/* Shared bookmark formats (wormhole + relic/data/gas) for this map.

@@ -84,7 +84,8 @@
       "maps": "Maps",
       "reports": "Reports",
       "discord": "Discord",
-      "audit": "Audit log"
+      "audit": "Audit log",
+      "flags": "Flag presets"
     },
     "access": {
       "title": "Login access",
@@ -362,6 +363,16 @@
       "colAmount": "Amount",
       "assign": "Assign",
       "assignPlaceholder": "Character ID"
+    },
+    "flags": {
+      "title": "Flag presets",
+      "hintCorp": "Presets every member of your corporation sees above their own, so a badge means the same thing to everyone. Up to {{max}}.",
+      "hintAlliance": "Presets every member of your alliance sees above their own, so a badge means the same thing to everyone. Up to {{max}}.",
+      "noCorp": "This deployment has no corporation or alliance, so there is nobody to standardise with.",
+      "saving": "Saving…",
+      "saved": "Saved",
+      "loadFailed": "Couldn't load the presets.",
+      "saveFailed": "Couldn't save the presets."
     }
   },
   "anomType": {
@@ -2101,5 +2112,16 @@
     "imported": "Imported {{systems}} systems, {{connections}} connections and {{signatures}} signatures from Tripwire",
     "importedWithNotes": "Imported {{systems}} systems, {{connections}} connections, {{signatures}} signatures and notes on {{notes}} systems from Tripwire",
     "notTripwireData": "That doesn’t look like Tripwire chain data — no signatures in it"
+  },
+  "flagPresets": {
+    "title": "Flag presets",
+    "hint": "Saved icon + colour + name combos you can apply to a connection flag in one click.",
+    "newItem": "New preset",
+    "add": "Add preset",
+    "remove": "Remove preset",
+    "pickIcon": "Choose icon",
+    "max": "Up to {{count}} presets",
+    "orgGroup": "Org",
+    "mineGroup": "Mine"
   }
 }

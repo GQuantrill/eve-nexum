@@ -72,7 +72,8 @@
       "maps": "지도",
       "reports": "보고서",
       "discord": "Discord",
-      "audit": "감사 로그"
+      "audit": "감사 로그",
+      "flags": "플래그 프리셋"
     },
     "access": {
       "title": "로그인 접근",
@@ -362,6 +363,16 @@
       "colAmount": "금액",
       "assign": "할당",
       "assignPlaceholder": "캐릭터 ID"
+    },
+    "flags": {
+      "title": "플래그 프리셋",
+      "hintCorp": "코퍼레이션의 모든 구성원이 자신의 프리셋 위에서 보게 되는 공통 프리셋입니다. 최대 {{max}}개.",
+      "hintAlliance": "얼라이언스의 모든 구성원이 자신의 프리셋 위에서 보게 되는 공통 프리셋입니다. 최대 {{max}}개.",
+      "noCorp": "이 배포에는 코퍼레이션이나 얼라이언스가 없어 표준화할 대상이 없습니다.",
+      "saving": "저장 중…",
+      "saved": "저장됨",
+      "loadFailed": "프리셋을 불러오지 못했습니다.",
+      "saveFailed": "프리셋을 저장하지 못했습니다."
     }
   },
   "anomType": {
@@ -2100,5 +2111,16 @@
     "imported": "Tripwire에서 시스템 {{systems}}개, 연결 {{connections}}개, 시그니처 {{signatures}}개를 가져왔습니다",
     "importedWithNotes": "Tripwire에서 시스템 {{systems}}개, 연결 {{connections}}개, 시그니처 {{signatures}}개, 시스템 메모 {{notes}}개를 가져왔습니다",
     "notTripwireData": "Tripwire 체인 데이터가 아닌 것 같습니다 — 시그니처가 없습니다"
+  },
+  "flagPresets": {
+    "title": "플래그 프리셋",
+    "hint": "아이콘·색상·이름 조합을 저장해 연결 플래그에 한 번에 적용합니다.",
+    "newItem": "새 프리셋",
+    "add": "프리셋 추가",
+    "remove": "프리셋 삭제",
+    "pickIcon": "아이콘 선택",
+    "max": "최대 {{count}}개",
+    "orgGroup": "조직",
+    "mineGroup": "내 것"
   }
 }

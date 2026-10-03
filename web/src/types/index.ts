@@ -31,6 +31,21 @@ export interface CustomIntel {
   color: string;
 }
 
+/**
+ * A saved connection-flag template: apply it and the connection gets this icon,
+ * colour and note in one click, after which the note stays editable.
+ *
+ * The bounds mirror the ones the connection PATCH enforces (icon <= 64, name
+ * <= 200 since it lands in flagNote, colour a plain #rrggbb) -- a preset that
+ * breaks them would save fine and then fail every time anyone applied it.
+ */
+export interface FlagPreset {
+  id:    string;
+  name:  string;
+  icon:  string;
+  color: string;
+}
+
 /** A user's personal "holes I'm hunting" watchlist. Stored per-user (not per
  *  map) so it follows them everywhere. `marker` picks the icon/colour/cue from
  *  WATCH_MARKERS. */
