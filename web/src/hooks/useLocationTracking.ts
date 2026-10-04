@@ -18,6 +18,27 @@ function boxesOverlap(ax: number, ay: number, bx: number, by: number, w: number,
   return ax < bx + w + gap && ax + w + gap > bx && ay < by + h + gap && ay + h + gap > by;
 }
 
+// The two real capsule hulls — the Genolution variant is the same pod with a
+// different type id. (The server's kill feed classifies pod kills off the same
+// pair; the SDE's other "Capsule ..." rows are SKINs, not hulls.)
+const CAPSULE_TYPE_IDS = new Set([670, 33328]);
+
+/**
+ * Did the pilot wake up in a pod rather than fly here?
+ *
+ * Getting podded always ends the same way: a BRAND NEW capsule at your medical
+ * clone, which is routinely a trade hub on the far side of the cluster. Both
+ * halves are needed — a new hull alone is a ship swap, and being in a pod alone
+ * is just someone flying a pod, which is a perfectly normal thing to do through
+ * a wormhole.
+ *
+ * Exported for the tests: the rule is small but the cost of getting it wrong is
+ * a map that lies about its topology.
+ */
+export function arrivedInPod(hullChanged: boolean, shipTypeId: number | null | undefined): boolean {
+  return hullChanged && shipTypeId != null && CAPSULE_TYPE_IDS.has(shipTypeId);
+}
+
 // Snap-grid size — must match MapCanvas's snapGrid ([20,20]) and mapStore's GRID.
 const GRID = 20;
 // Auto-placed systems always sit a consistent 3 grid squares clear of the
@@ -439,6 +460,27 @@ export function useLocationTracking(enabled: boolean) {
     // a wrong one somebody deletes.
     const cloneJumped = hullChanged && cloneSystemIds(clones).has(system.eveSystemId);
 
+    // Woke up in a pod somewhere else. Getting podded always ends the same way:
+    // a BRAND NEW capsule at your medical clone, which is routinely a trade hub
+    // on the far side of the cluster. Connecting that to the hole you died at
+    // asserts a wormhole straight into Jita.
+    //
+    // This is the same event the clone check above is meant to catch, but it
+    // needs no extra ESI scope. That matters: cloneSystemIds is empty whenever
+    // the clones scope hasn't been granted, and the fallback there is to
+    // suppress nothing — so on those deployments a pod death drew a phantom
+    // connection with nothing to stop it. That is the reported case.
+    //
+    // It does not re-break the case the hull check was careful about — being
+    // podded AT a hole and then jumping through it in the pod. The hull change
+    // is consumed by the poll that sees the death (same system, and
+    // lastShipItemId is updated before the unchanged-system return above), so
+    // the later jump compares pod against the same pod and draws its connection
+    // normally. Only a death and a hole jump inside one poll interval would lose
+    // it, and a missing connection a scout re-adds beats a false one that makes
+    // the map lie about topology.
+    const wokeInPod = arrivedInPod(hullChanged, location.ship?.typeId);
+
     // How long since the last SUCCESSFUL read. A pilot who has been unobserved
     // for minutes may have crossed several systems, so the change we are looking
     // at is not necessarily one jump: connecting its ends would assert a hole
@@ -451,7 +493,7 @@ export function useLocationTracking(enabled: boolean) {
       && checkedAt - prevCheckedAt > MAX_TRACKING_GAP_MS;
 
     // Same treatment as a clone jump: record the system, draw no connection.
-    const teleported = cloneJumped || unobserved;
+    const teleported = cloneJumped || wokeInPod || unobserved;
 
     if (system.eveSystemId === lastEveSystemId.current) return;
 
