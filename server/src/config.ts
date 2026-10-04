@@ -49,13 +49,20 @@ const TRUST_PROXY = Number.isInteger(TRUST_PROXY_RAW) && TRUST_PROXY_RAW >= 0 ? 
 
 // Role a NEW user is created with on a restricted (corp/alliance) instance.
 // Existing users keep whatever role they already have. Deliberately limited to
-// the non-admin editing tiers ('readonly' | 'edit' | 'full') so a deployment can
-// start members at 'edit' — but can NEVER auto-mint admins here; 'admin' /
-// 'alliance_admin' must always be granted per-user by an admin. Anything unknown
-// or disallowed falls back to the safe 'readonly' default (no behaviour change).
-const DEFAULT_ROLE_CHOICES = ['readonly', 'edit', 'full'] as const;
+// the non-admin tiers so a deployment can start members above 'readonly' — but
+// can NEVER auto-mint admins here; 'admin' / 'alliance_admin' must always be
+// granted per-user by an admin. Anything unknown or disallowed falls back to
+// the safe 'readonly' default.
+//
+// 'contributor' belongs here and was missing: it is the tier BELOW 'edit' (it
+// can log signatures, anomalies and structures but not reshape the map), and it
+// is already a valid role everywhere else — the invite flow accepts it, the
+// access_grants CHECK lists it, and admins can assign it by hand. Leaving it out
+// meant DEFAULT_USER_ROLE=contributor silently admitted everyone as 'readonly',
+// with only a boot-time warning an operator was unlikely to see.
+export const DEFAULT_ROLE_CHOICES = ['readonly', 'contributor', 'edit', 'full'] as const;
 type DefaultRole = (typeof DEFAULT_ROLE_CHOICES)[number];
-function parseDefaultRole(raw: string | undefined): DefaultRole {
+export function parseDefaultRole(raw: string | undefined): DefaultRole {
   const v = (raw ?? '').trim().toLowerCase();
   if ((DEFAULT_ROLE_CHOICES as readonly string[]).includes(v)) return v as DefaultRole;
   if (v) console.warn(`DEFAULT_USER_ROLE="${raw}" is not one of ${DEFAULT_ROLE_CHOICES.join(', ')} — new users will default to 'readonly'`);
