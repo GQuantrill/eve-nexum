@@ -1690,9 +1690,9 @@
     "viaAnsiblex": "Portão de salto Ansiblex"
   },
   "routeToast": {
-    "destinationSet": "Destino definido para {{system}}",
-    "waypointAdded": "{{system}} adicionado aos pontos de passagem com sucesso.",
-    "failed": "Falha ao definir o ponto de rota — a tua personagem está online?"
+    "destinationSet": "Piloto automático do jogo definido para {{system}}",
+    "waypointAdded": "{{system}} adicionado à rota do piloto automático no jogo.",
+    "failed": "Não foi possível aceder ao piloto automático — a tua personagem está ligada?"
   },
   "scout": {
     "noConnections": "Não há conexões de {{system}}.",
@@ -1746,7 +1746,8 @@
     "panelsTitle": "Secções da barra lateral",
     "panelsHint": "Escolha que secções aparecem na barra lateral. As ocultas mantêm o seu lugar e regressam a ele quando as reativar.",
     "panelsAllHidden": "Todas as secções estão ocultas — a barra lateral ficará vazia.",
-    "emptyTitle": "Não há secções visíveis. Escolha aqui as que pretende."
+    "emptyTitle": "Não há secções visíveis. Escolha aqui as que pretende.",
+    "routePlanner": "Planeador de rotas"
   },
   "sigType": {
     "combat": "Combate",
@@ -2037,8 +2038,8 @@
     "dropToUngroup": "Larga aqui para remover do grupo"
   },
   "waypoint": {
-    "setDestination": "Definir destino",
-    "addWaypoint": "Adicionar ponto de rota"
+    "setDestination": "Definir destino no jogo",
+    "addWaypoint": "Adicionar waypoint no jogo"
   },
   "whChart": {
     "open": "⊟ Referência de buracos de minhoca",
@@ -2101,5 +2102,24 @@
     "imported": "Importados {{systems}} sistemas, {{connections}} ligações e {{signatures}} assinaturas do Tripwire",
     "importedWithNotes": "Importados {{systems}} sistemas, {{connections}} ligações, {{signatures}} assinaturas e notas de {{notes}} sistemas do Tripwire",
     "notTripwireData": "Isto não parece dados de cadeia do Tripwire — não tem assinaturas"
+  },
+  "routePlanner": {
+    "from": "De",
+    "to": "Para",
+    "searchSystem": "Procurar um sistema…",
+    "searching": "A procurar…",
+    "clearField": "Limpar",
+    "useMyLocation": "Usar a minha localização atual",
+    "swap": "Trocar origem e destino",
+    "followingLocation": "De {{system}} — a tua localização atual",
+    "pickBoth": "Escolhe um sistema de origem e de destino para planear uma rota.",
+    "sameSystem": "A origem e o destino são o mesmo sistema.",
+    "noRoute": "Nenhuma rota encontrada entre esses sistemas.",
+    "savedHdr": "Rotas guardadas",
+    "savedEmpty": "Nenhuma ainda — planeia uma rota, dá-lhe um nome abaixo e guarda.",
+    "nameToSave": "Nome para guardar…",
+    "save": "Guardar",
+    "loadPlan": "Carregar esta rota",
+    "deletePlan": "Eliminar esta rota"
   }
 }

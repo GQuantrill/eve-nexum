@@ -1690,9 +1690,9 @@
     "viaAnsiblex": "Ansiblex-Sprungtor"
   },
   "routeToast": {
-    "destinationSet": "Ziel festgelegt auf {{system}}",
-    "waypointAdded": "{{system}} erfolgreich zu den Wegpunkten hinzugefügt.",
-    "failed": "Wegpunkt konnte nicht gesetzt werden — ist dein Charakter online?"
+    "destinationSet": "Autopilot im Spiel auf {{system}} gesetzt",
+    "waypointAdded": "{{system}} zur Autopilot-Route im Spiel hinzugefügt.",
+    "failed": "Autopilot nicht erreichbar — ist dein Charakter eingeloggt?"
   },
   "scout": {
     "noConnections": "Keine {{system}}-Verbindungen.",
@@ -1746,7 +1746,8 @@
     "panelsTitle": "Seitenleisten-Abschnitte",
     "panelsHint": "Wähle, welche Abschnitte in der Seitenleiste erscheinen. Ausgeblendete behalten ihren Platz und kehren beim Wiedereinschalten dorthin zurück.",
     "panelsAllHidden": "Alle Abschnitte sind ausgeblendet — die Seitenleiste bleibt leer.",
-    "emptyTitle": "Es werden keine Abschnitte angezeigt. Wähle hier aus, welche du möchtest."
+    "emptyTitle": "Es werden keine Abschnitte angezeigt. Wähle hier aus, welche du möchtest.",
+    "routePlanner": "Routenplaner"
   },
   "sigType": {
     "combat": "Kampf",
@@ -2037,8 +2038,8 @@
     "dropToUngroup": "Hierher ziehen, um aus der Gruppe zu entfernen"
   },
   "waypoint": {
-    "setDestination": "Ziel festlegen",
-    "addWaypoint": "Wegpunkt hinzufügen"
+    "setDestination": "Ziel im Spiel setzen",
+    "addWaypoint": "Wegpunkt im Spiel hinzufügen"
   },
   "whChart": {
     "open": "⊟ Wurmloch-Referenz",
@@ -2101,5 +2102,24 @@
     "imported": "{{systems}} Systeme, {{connections}} Verbindungen und {{signatures}} Signaturen aus Tripwire importiert",
     "importedWithNotes": "{{systems}} Systeme, {{connections}} Verbindungen, {{signatures}} Signaturen und Notizen zu {{notes}} Systemen aus Tripwire importiert",
     "notTripwireData": "Das sehen nicht nach Tripwire-Kettendaten aus — keine Signaturen enthalten"
+  },
+  "routePlanner": {
+    "from": "Von",
+    "to": "Nach",
+    "searchSystem": "System suchen…",
+    "searching": "Suche…",
+    "clearField": "Leeren",
+    "useMyLocation": "Aktuellen Standort verwenden",
+    "swap": "Start und Ziel tauschen",
+    "followingLocation": "Von {{system}} — dein aktueller Standort",
+    "pickBoth": "Wähle ein Start- und ein Zielsystem, um eine Route zu planen.",
+    "sameSystem": "Start und Ziel sind dasselbe System.",
+    "noRoute": "Keine Route zwischen diesen Systemen gefunden.",
+    "savedHdr": "Gespeicherte Routen",
+    "savedEmpty": "Noch keine — plane eine Route, benenne sie unten und speichere sie.",
+    "nameToSave": "Name zum Speichern…",
+    "save": "Speichern",
+    "loadPlan": "Diese Route laden",
+    "deletePlan": "Diese Route löschen"
   }
 }

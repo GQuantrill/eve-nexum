@@ -748,6 +748,7 @@ const SETTINGS_ALLOWLIST = new Set<string>([
   'nexum.panel.collapsed.a0',
   'nexum.panel.collapsed.closest',
   'nexum.panel.collapsed.notes',
+  'nexum.panel.collapsed.routePlanner',
   'nexum.panel.collapsed.signatures',
   'nexum.panel.collapsed.structures',
   'nexum.panel.collapsed.thera',

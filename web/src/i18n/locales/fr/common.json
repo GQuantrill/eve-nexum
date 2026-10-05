@@ -1690,9 +1690,9 @@
     "viaAnsiblex": "Porte de saut Ansiblex"
   },
   "routeToast": {
-    "destinationSet": "Destination définie sur {{system}}",
-    "waypointAdded": "{{system}} ajouté aux points de passage avec succès.",
-    "failed": "Échec de la définition du point de cheminement — votre personnage est-il en ligne ?"
+    "destinationSet": "Pilote automatique en jeu réglé sur {{system}}",
+    "waypointAdded": "{{system}} ajouté à votre itinéraire de pilote automatique en jeu.",
+    "failed": "Pilote automatique injoignable — votre personnage est-il connecté ?"
   },
   "scout": {
     "noConnections": "Aucune connexion {{system}}.",
@@ -1746,7 +1746,8 @@
     "panelsTitle": "Sections de la barre latérale",
     "panelsHint": "Choisissez les sections affichées dans la barre latérale. Celles masquées conservent leur place et y reviennent une fois réactivées.",
     "panelsAllHidden": "Toutes les sections sont masquées — la barre latérale sera vide.",
-    "emptyTitle": "Aucune section n’est affichée. Choisissez ici celles que vous voulez."
+    "emptyTitle": "Aucune section n’est affichée. Choisissez ici celles que vous voulez.",
+    "routePlanner": "Planificateur d'itinéraire"
   },
   "sigType": {
     "combat": "Combat",
@@ -2037,8 +2038,8 @@
     "dropToUngroup": "Déposez ici pour retirer du groupe"
   },
   "waypoint": {
-    "setDestination": "Définir la destination",
-    "addWaypoint": "Ajouter un point de cheminement"
+    "setDestination": "Définir la destination en jeu",
+    "addWaypoint": "Ajouter un point de passage en jeu"
   },
   "whChart": {
     "open": "⊟ Référence trous de ver",
@@ -2101,5 +2102,24 @@
     "imported": "{{systems}} systèmes, {{connections}} connexions et {{signatures}} signatures importés depuis Tripwire",
     "importedWithNotes": "{{systems}} systèmes, {{connections}} connexions, {{signatures}} signatures et les notes de {{notes}} systèmes importés depuis Tripwire",
     "notTripwireData": "Cela ne ressemble pas à des données de chaîne Tripwire — aucune signature"
+  },
+  "routePlanner": {
+    "from": "De",
+    "to": "À",
+    "searchSystem": "Rechercher un système…",
+    "searching": "Recherche…",
+    "clearField": "Effacer",
+    "useMyLocation": "Utiliser ma position actuelle",
+    "swap": "Inverser départ et arrivée",
+    "followingLocation": "Depuis {{system}} — votre position actuelle",
+    "pickBoth": "Choisissez un système de départ et d'arrivée pour planifier un itinéraire.",
+    "sameSystem": "Le départ et l'arrivée sont le même système.",
+    "noRoute": "Aucun itinéraire trouvé entre ces systèmes.",
+    "savedHdr": "Itinéraires enregistrés",
+    "savedEmpty": "Aucun pour l'instant — planifiez un itinéraire, nommez-le ci-dessous et enregistrez.",
+    "nameToSave": "Nom à enregistrer…",
+    "save": "Enregistrer",
+    "loadPlan": "Charger cet itinéraire",
+    "deletePlan": "Supprimer cet itinéraire"
   }
 }

@@ -1044,6 +1044,22 @@ export async function migrate() {
     ALTER TABLE jump_plans ADD COLUMN IF NOT EXISTS waypoint_system_ids INTEGER[] NOT NULL DEFAULT '{}';
     ALTER TABLE jump_plans ADD COLUMN IF NOT EXISTS prefer_level        TEXT      NOT NULL DEFAULT 'off';
 
+    -- Saved gate routes (account-scoped). Same shape and reasoning as
+    -- jump_plans above -- inputs only, the route itself is recomputed on load so
+    -- a saved plan reflects the chain as it stands today rather than a snapshot
+    -- of whatever holes were open when it was saved. Named to pair with
+    -- jump_plans (capital jumps) rather than overload "routes", which map_routes
+    -- already uses for saved chains through a single map.
+    CREATE TABLE IF NOT EXISTS route_plans (
+      id          UUID        PRIMARY KEY,
+      owner_id    INTEGER     NOT NULL,
+      name        TEXT        NOT NULL,
+      from_eve_id INTEGER     NOT NULL,
+      to_eve_id   INTEGER     NOT NULL,
+      created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+    CREATE INDEX IF NOT EXISTS idx_route_plans_owner ON route_plans (owner_id);
+
     -- Corp structures pulled from ESI (esi-corporations.read_structures.v1),
     -- scoped by corporation. Populated by a role-holding member's refresh; any
     -- corp member can read them (e.g. as jump-planner endpoints). The full set
