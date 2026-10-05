@@ -20,6 +20,40 @@
   > .btn { align-self: flex-end; }
 }
 
+/* ── Connection panel inside a floating window ─────────────────────────
+   Lives in THIS file, immediately after the rule it overrides: these are
+   single-class selectors of equal specificity, so the later one wins and
+   panels.css loads after panes.css. Put this anywhere earlier and the base
+   padding and border-top above silently take precedence.
+
+   The docked strip spans the viewport and carries its own chrome: a top
+   border, a background, and 48px of left padding that clears the watchlist
+   tab. None of that applies inside a FloatingPanel, which supplies the frame,
+   the padding and the scroll container. */
+.system-panel--float {
+  border-top: none;
+  background: none;
+  padding: 0;
+  /* The window body is the scroll container; clipping here would hide the
+     lower content instead of letting it scroll into view. */
+  overflow: visible;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  justify-content: flex-start;
+  gap: 10px 14px;
+
+  /* Base rule drops the button to the bottom of the strip, which in a wrapped
+     window reads as a stray indent on its own line. Keep it with the content. */
+  > .btn { align-self: flex-start; }
+}
+/* Narrow windows: let a column take the full width rather than squeezing two
+   side by side and overflowing. */
+.system-panel--float .conn-col { flex: 1 1 220px; }
+.system-panel--float .conn-col--roller  { flex-basis: 280px; }
+.system-panel--float .conn-col--jumplog { flex-basis: 240px; max-width: none; }
+/* Gate / jump-bridge note: its own full-width row, flush with everything else. */
+.system-panel--float .conn-gate-note { flex: 1 1 100%; padding-left: 0; }
+
 /* Column mode. The panel's insides flip too: system info sits ABOVE the pane
    stack rather than beside it, because at ~460px there isn't room for both. */
 .system-panel--side {
@@ -190,14 +224,29 @@
      top-right corner (out of the flex flow) rather than riding with the
      Set Destination / Waypoint buttons. */
   position: relative;
-  padding-right: 24px;
+  /* Gutter for the two corner buttons (collapse + close), both pinned out of
+     the flex flow so the wrapping action buttons never push them around.
+     Sized from their measured widths: close is 26px at the corner, collapse
+     17px inboard of it, so the pair ends 47px in. */
+  padding-right: 56px;
 }
 
 .system-panel__collapse {
   position: absolute;
   top: 0;
+  /* Clears the 26px-wide close button at the corner, plus a 4px gap. At 24px
+     the two overlapped by 2px and the hit areas fought each other. */
+  right: 30px;
+}
+/* Close sits in the corner proper, with collapse inboard of it — the outermost
+   control being the one that dismisses matches the floating window's title bar
+   and every other window chrome the user meets. */
+.system-panel__close {
+  position: absolute;
+  top: 0;
   right: 0;
 }
+.system-panel__close:hover { color: var(--danger); }
 
 
 .system-panel__title {

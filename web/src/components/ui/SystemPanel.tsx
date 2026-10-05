@@ -15,7 +15,7 @@ import { whDestClass } from '../../utils/whDest';
 import { DraggableCard } from './DraggableCard';
 import { FloatingPanel, type PanelGeometry } from './FloatingPanel';
 import { useUserSetting } from '../../hooks/useUserSetting';
-import { SquaresFourIcon } from '../../icons';
+import { SquaresFourIcon, XIcon } from '../../icons';
 import { PanelVisibilityModal } from './PanelVisibilityModal';
 import { SignaturePane } from './SignaturePane';
 import { AnomalyPane } from './AnomalyPane';
@@ -524,6 +524,19 @@ export function SystemPanel() {
             {/* Collapse caret pinned to the panel's top-right corner, independent
                 of the Set Destination / Waypoint buttons (which wrap below). */}
             <button type="button" className="icon-btn system-panel__collapse" onClick={toggleInfoCollapsed} title={t('systemPanel.collapseInfo')}>{sideBySide ? '\u2303' : '\u2039'}</button>
+            {/* Dismiss the panel entirely. Collapsing only folds the info column
+                away and leaves the panel in place, so without this the only way
+                out was to click another system — the panel could be narrowed but
+                never actually closed. */}
+            <button
+              type="button"
+              className="icon-btn system-panel__close"
+              onClick={() => selectSystem(null)}
+              title={t('actions.close')}
+              aria-label={t('actions.close')}
+            >
+              <XIcon size={14} weight="bold" />
+            </button>
           </div>
 
           <div className={styles.info}>
