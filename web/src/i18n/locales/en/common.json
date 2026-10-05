@@ -749,7 +749,8 @@
     "canvasHint": "Right-click canvas to add system · Drag between handles to connect · Shift or ⌘/Ctrl+click, or drag, to multi-select · Right click system to interact",
     "jumpRangeFrom": "Jump range from here",
     "jumpCyno": "Cyno Jump",
-    "jumpRangeClear": "Clear jump range"
+    "jumpRangeClear": "Clear jump range",
+    "copyName": "Copy system name"
   },
   "customIntel": {
     "title": "Custom Intel",
@@ -1935,7 +1936,10 @@
     "standingValue": "{{label}}: {{value}}",
     "panesTitle": "Panels",
     "panesHint": "Choose which panels appear below. Hidden ones keep their place, so switching one back on returns it to where you had it.",
-    "openAnoikis": "Open in anoik.is"
+    "openAnoikis": "Open in anoik.is",
+    "copyName": "Copy system name",
+    "nameCopied": "Copied {{name}}",
+    "copyFailed": "Couldn't copy — select and copy manually."
   },
   "time": {
     "justNow": "just now",

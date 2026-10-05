@@ -749,7 +749,8 @@
     "clearTag": "Limpar marca",
     "jumpRangeFrom": "Alcance de salto a partir daqui",
     "jumpCyno": "Salto cyno",
-    "jumpRangeClear": "Limpar alcance de salto"
+    "jumpRangeClear": "Limpar alcance de salto",
+    "copyName": "Copiar nome do sistema"
   },
   "customIntel": {
     "title": "Intel personalizada",
@@ -1935,7 +1936,10 @@
     "standingValue": "{{label}}: {{value}}",
     "panesTitle": "Painéis",
     "panesHint": "Escolha que painéis aparecem abaixo. Os ocultos mantêm o seu lugar e regressam a ele quando os reativar.",
-    "openAnoikis": "Abrir no anoik.is"
+    "openAnoikis": "Abrir no anoik.is",
+    "copyName": "Copiar nome do sistema",
+    "nameCopied": "{{name}} copiado",
+    "copyFailed": "Não foi possível copiar — seleciona e copia manualmente."
   },
   "time": {
     "justNow": "agora mesmo",

@@ -36,6 +36,7 @@ import {
   XIcon, CheckIcon, PlusIcon, SelectionAllIcon, EyeIcon, CrosshairSimpleIcon,
   LinkSimpleIcon, LinkBreakIcon, ArrowsOutIcon, BookmarkSimpleIcon, TextAaIcon, TrashIcon,
   HashIcon, ProhibitIcon, BroomIcon,
+  CopyIcon,
 } from '../../icons';
 import { PREDEFINED_LABELS } from '../../data/labels';
 
@@ -1262,6 +1263,20 @@ export function MapCanvas() {
       const selectedNodes   = nodes.filter((n) => selectedNodeIds.includes(n.id));
       const multiSelected   = selectedNodes.length > 1;
 
+      // Copy the system name. On the node rather than only in the panel because
+      // the map is where you are when someone asks "what's it called?", and a
+      // visible button on every node would clutter the canvas for a rare action.
+      // Copies the REAL name, never the alias — it is for pasting into the game.
+      const copyNameItem = !multiSelected && sys ? [{
+        label: t('ctxMenu.copyName'),
+        icon: <CopyIcon size={16} weight="regular" color="#9aa7bd" />,
+        action: () => {
+          navigator.clipboard.writeText(sys.name)
+            .then(() => toast.success(t('systemPanel.nameCopied', { name: sys.name })))
+            .catch(() => toast.error(t('systemPanel.copyFailed')));
+        },
+      }] : [];
+
       const waypointItems = !multiSelected && sys?.eveSystemId ? [
         { separator: true as const },
         {
@@ -1565,6 +1580,7 @@ export function MapCanvas() {
         }] : []),
         ...connectItem,
         ...homeItem,
+        ...copyNameItem,
         ...aliasItem,
         ...tagItem,
         ...intelItem,

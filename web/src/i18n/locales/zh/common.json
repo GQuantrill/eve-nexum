@@ -749,7 +749,8 @@
     "clearTag": "清除标记",
     "jumpRangeFrom": "从此处的跳跃范围",
     "jumpCyno": "Cyno 跳跃",
-    "jumpRangeClear": "清除跳跃范围"
+    "jumpRangeClear": "清除跳跃范围",
+    "copyName": "复制星系名称"
   },
   "customIntel": {
     "title": "自定义情报",
@@ -1935,7 +1936,10 @@
     "standingValue": "{{label}}：{{value}}",
     "panesTitle": "面板",
     "panesHint": "选择下方显示的面板。隐藏的面板会保留位置，重新开启时回到原处。",
-    "openAnoikis": "在 anoik.is 中打开"
+    "openAnoikis": "在 anoik.is 中打开",
+    "copyName": "复制星系名称",
+    "nameCopied": "已复制 {{name}}",
+    "copyFailed": "无法复制 — 请手动选择并复制。"
   },
   "time": {
     "justNow": "刚刚",

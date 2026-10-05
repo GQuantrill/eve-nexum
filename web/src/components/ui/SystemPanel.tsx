@@ -15,7 +15,7 @@ import { whDestClass } from '../../utils/whDest';
 import { DraggableCard } from './DraggableCard';
 import { FloatingPanel, type PanelGeometry } from './FloatingPanel';
 import { useUserSetting } from '../../hooks/useUserSetting';
-import { SquaresFourIcon, XIcon } from '../../icons';
+import { SquaresFourIcon, XIcon, CopyIcon } from '../../icons';
 import { PanelVisibilityModal } from './PanelVisibilityModal';
 import { SignaturePane } from './SignaturePane';
 import { AnomalyPane } from './AnomalyPane';
@@ -500,6 +500,22 @@ export function SystemPanel() {
                 : (sys.name || t('systemPanel.unknownSystem'))}
             </h2>
             <div className="system-panel__actions">
+              {/* Copies the REAL name, never the alias: this is here to be
+                  pasted into the game's search or into chat, where a local
+                  nickname means nothing to anyone. */}
+              <button
+                type="button"
+                className="icon-btn"
+                onClick={() => {
+                  navigator.clipboard.writeText(sys.name)
+                    .then(() => toast.success(t('systemPanel.nameCopied', { name: sys.name })))
+                    .catch(() => toast.error(t('systemPanel.copyFailed')));
+                }}
+                title={t('systemPanel.copyName')}
+                aria-label={t('systemPanel.copyName')}
+              >
+                <CopyIcon size={14} weight="regular" />
+              </button>
               {sys.eveSystemId && !isShareMode && (
                 <>
                   <button
