@@ -794,7 +794,86 @@ const SETTINGS_ALLOWLIST = new Set<string>([
   'nexum.announcer.ev.lawless',
   'nexum.announcer.ev.kills',
   'nexum.announcer.ev.newChain',
+
+  // ── Layout and display ────────────────────────────────────────────────────
+  // These were all missing, so they lived only in the browser that set them.
+  // That is invisible when it happens -- the PATCH still answers 200 -- which is
+  // how the announcer keys above got lost too, and how the presence bug below
+  // survived.
+  'nexum.a11y.colorVision',
+  'nexum.toolbar.order',
+  'nexum.minimap.position',
+  'nexum.mapSidebar.openSection',
+  'nexum.panelSideBySide',
+  'nexum.floatingPanels',
+  'nexum.floatingPanelsLast',
+  'nexum.sigPane.hiddenCols',
+  'nexum.sigPane.colWidths',
+  'nexum.anomPane.hiddenCols',
+  'nexum.anomPane.colWidths',
+  'nexum.watchlist.collapsedGroups',
+  'nexum.fleet.showMembers',
+  'nexum.fleet.sortBy',
+  'nexum.fleet.sortDir',
+
+  // ── Map behaviour ─────────────────────────────────────────────────────────
+  'nexum.map.heatmap',
+  'nexum.map.heatIntensity',
+  'nexum.map.placement',
+  'nexum.map.centerOnJump',
+  'nexum.map.centerOnSelect',
+  'nexum.map.invertZoom',
+  'nexum.map.showUndivedWh',
+  'nexum.tracking.skipKspace',
+  'nexum.skipDeleteConfirm',
+  'nexum.roller',
+
+  // ── Jump planner: the pilot's own skills and preferences ──────────────────
+  // Per-pilot by nature, and they follow the pilot between devices. (They are
+  // deliberately excluded from org defaults -- one person's skills would give
+  // everyone else wrong range and fuel figures.)
+  'nexum.jump.jdc',
+  'nexum.jump.jf',
+  'nexum.jump.jfc',
+  'nexum.jump.planShip',
+  'nexum.jump.preferLevel',
+  'nexum.jump.regionalGates',
+
+  // ── Account / privacy ─────────────────────────────────────────────────────
+  'nexum.account.showOnMap',
+  // Not merely unsynced: the server itself reads this key out of ui_settings to
+  // decide whether to hide a pilot from the map (see the presence filter in
+  // routes/character.ts). Being absent here meant the PATCH discarded it, so the
+  // column could only ever read 'false' and "hide me" silently did nothing.
+  'nexum.presence.hidden',
 ]);
+
+// Allowed key PREFIXES, for settings whose keys are generated rather than
+// written out -- a collapsed flag per panel id, per system-info section. Listing
+// the ids instead means the list silently drifts every time one is added, which
+// is exactly what happened to the panel-collapsed keys: seven were enumerated
+// and the rest never synced.
+const SETTINGS_ALLOWED_PREFIXES = [
+  'nexum.panel.collapsed.',
+  'nexum.sysinfo.collapse.',
+];
+
+export function settingAllowed(key: string): boolean {
+  return SETTINGS_ALLOWLIST.has(key)
+    || SETTINGS_ALLOWED_PREFIXES.some((p) => key.startsWith(p));
+}
+
+// Deliberately NOT synced, so the reasoning survives the next audit:
+//   nexum.xpoll.*                      cross-tab poll cache, not a preference
+//   nexum.sidebar.width, panelHeight,
+//   panelInfoWidth/Collapsed,
+//   panelSideWidth, notesEditorHeight  pixel sizes; a 27-inch layout is wrong
+//                                      on a laptop
+//   nexum.lastMapId, last_character,
+//   lastActivity, eveStatus            per-device session state and caches
+//   nexum.seenMapHint,
+//   proximityOptInAsked                one-shot prompts, per-device
+//   nexum.lang                         owned by the i18next language detector
 
 authRouter.patch('/settings', async (req, res) => {
   if (!req.session.userId) { res.status(401).json({ error: 'Not authenticated' }); return; }
@@ -806,7 +885,7 @@ authRouter.patch('/settings', async (req, res) => {
   }
   const filtered: Record<string, unknown> = {};
   for (const [k, v] of Object.entries(entries)) {
-    if (SETTINGS_ALLOWLIST.has(k)) filtered[k] = v;
+    if (settingAllowed(k)) filtered[k] = v;
   }
   if (Object.keys(filtered).length === 0) {
     res.json({ ok: true, applied: 0 });
