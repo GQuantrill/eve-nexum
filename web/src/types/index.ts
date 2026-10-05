@@ -140,6 +140,11 @@ export interface Signature {
   timeStatus: TimeStatus | '';
   createdAt: string;
   updatedAt: string;
+  /** Who scanned it. Null for rows created before attribution existed, and for
+   *  a user who has since been deleted — the column is ON DELETE SET NULL, so
+   *  the signature outlives the account. Treat absence as "nobody knows". */
+  createdByName?: string | null;
+  createdByCharId?: number | string | null;
 }
 
 // Cosmic anomalies are only ever "Combat Site" or "Ore Site" on the probe
@@ -155,6 +160,11 @@ export interface Anomaly {
   notes: string;
   createdAt: string;
   updatedAt: string;
+  /** Who scanned it. Null for rows created before attribution existed, and for
+   *  a user who has since been deleted — the column is ON DELETE SET NULL, so
+   *  the signature outlives the account. Treat absence as "nobody knows". */
+  createdByName?: string | null;
+  createdByCharId?: number | string | null;
 }
 
 export type StructureType =
