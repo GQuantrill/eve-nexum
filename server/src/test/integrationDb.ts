@@ -81,8 +81,35 @@ const TABLES = [
   'isk_donations', 'wallet_reader', 'owners',
 ];
 
+// Postgres's deadlock_detected. Transient by definition: one side is rolled
+// back and a retry succeeds.
+const DEADLOCK = '40P01';
+
 export async function truncateAll(): Promise<void> {
-  await db.query(`TRUNCATE ${TABLES.join(', ')} RESTART IDENTITY CASCADE`);
+  // TRUNCATE grabs ACCESS EXCLUSIVE on every table at once. Some request
+  // handlers fire writes WITHOUT awaiting them -- character.ts updates
+  // last_known_system_id that way on purpose, to keep the location poll fast --
+  // so one can still be in flight on another pooled connection when the next
+  // test truncates. The two then take locks in different orders and deadlock.
+  //
+  // Postgres only notices after deadlock_timeout, 1s by default, which is why
+  // this failed at ~1015ms every time it failed. It reproduced about once in
+  // four full-suite runs and never in isolation, which is what made it look
+  // like a mystery rather than a lock-order problem.
+  //
+  // Retrying here rather than awaiting those writes in the handlers: they are
+  // unawaited deliberately, and slowing a production poll to tidy up a test
+  // would be the wrong trade.
+  for (let attempt = 0; ; attempt++) {
+    try {
+      await db.query(`TRUNCATE ${TABLES.join(', ')} RESTART IDENTITY CASCADE`);
+      return;
+    } catch (err) {
+      if ((err as { code?: string }).code !== DEADLOCK || attempt >= 4) throw err;
+      // Brief, growing pause so the in-flight write can finish and release.
+      await new Promise((r) => setTimeout(r, 25 * (attempt + 1)));
+    }
+  }
 }
 
 export interface SeedUser {
