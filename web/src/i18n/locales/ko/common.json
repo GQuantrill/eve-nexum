@@ -72,7 +72,9 @@
       "maps": "지도",
       "reports": "보고서",
       "discord": "Discord",
-      "audit": "감사 로그"
+      "audit": "감사 로그",
+      "flags": "플래그 프리셋",
+      "defaults": "기본 레이아웃"
     },
     "access": {
       "title": "로그인 접근",
@@ -362,6 +364,35 @@
       "colAmount": "금액",
       "assign": "할당",
       "assignPlaceholder": "캐릭터 ID"
+    },
+    "flags": {
+      "title": "플래그 프리셋",
+      "hintCorp": "코퍼레이션의 모든 구성원이 자신의 프리셋 위에서 보게 되는 공통 프리셋입니다. 최대 {{max}}개.",
+      "hintAlliance": "얼라이언스의 모든 구성원이 자신의 프리셋 위에서 보게 되는 공통 프리셋입니다. 최대 {{max}}개.",
+      "noCorp": "이 배포에는 코퍼레이션이나 얼라이언스가 없어 표준화할 대상이 없습니다.",
+      "saving": "저장 중…",
+      "saved": "저장됨",
+      "loadFailed": "프리셋을 불러오지 못했습니다.",
+      "saveFailed": "프리셋을 저장하지 못했습니다."
+    },
+    "defaults": {
+      "title": "기본 레이아웃",
+      "hintCorp": "코퍼레이션의 모든 구성원이 시작점으로 사용하는 구성입니다. 원하는 대로 레이아웃을 정리한 뒤 여기에 저장하세요.",
+      "hintAlliance": "얼라이언스의 모든 구성원이 시작점으로 사용하는 구성입니다. 원하는 대로 레이아웃을 정리한 뒤 여기에 저장하세요.",
+      "limitExisting": "구성원은 직접 변경한 적 없는 설정을 물려받습니다. 이미 설정한 항목은 그대로 유지됩니다. 패널 순서, 확대/축소 등 표시 옵션은 신규 구성원에게만 적용됩니다.",
+      "limitSession": "이미 로그인한 구성원은 다음 로그인 시 반영됩니다.",
+      "noCorp": "이 배포에는 코퍼레이션이나 얼라이언스가 없어 기본값을 적용할 대상이 없습니다.",
+      "none": "아직 기본값이 없습니다.",
+      "summary": "{{count}}개 설정 저장됨",
+      "lastSet": "{{who}}님이 {{when}}에 설정",
+      "showList": "포함 항목 보기",
+      "hideList": "목록 숨기기",
+      "capture": "현재 레이아웃을 기본값으로 저장",
+      "clear": "기본값 지우기",
+      "saving": "저장 중…",
+      "saved": "저장됨",
+      "loadFailed": "기본값을 불러오지 못했습니다.",
+      "saveFailed": "기본값을 저장하지 못했습니다."
     }
   },
   "anomType": {
@@ -444,8 +475,8 @@
   },
   "chainExits": {
     "title": "체인 출구",
-    "noExits": "이 체인에는 K-space 출구가 없습니다.",
-    "hint": "즐겨찾기 시스템별 가장 가까운 출구",
+    "noExits": "이 체인에 K-스페이스 출구가 없습니다.",
+    "hint": "현재 지도에 있는 K-스페이스 성계를 보안 등급별로 표시합니다. Jita 경로는 게이트 전용입니다 — 웜홀 지름길은 계산하지 않습니다.",
     "allExits": "모든 K-space 출구",
     "noFavourites": "즐겨찾기 시스템이 아직 없습니다 — '가까운 시스템' 패널에서 추가하세요.",
     "noRoute": "경로 없음",
@@ -453,7 +484,8 @@
     "via": "경유",
     "highSec": "하이섹",
     "lowSec": "로우섹",
-    "nullSec": "널섹"
+    "nullSec": "널섹",
+    "nearestJita": "가장 가까운 Jita:"
   },
   "chains": {
     "from": "출발…",
@@ -1542,7 +1574,8 @@
       "shortcuts": "단축키",
       "notifications": "알림",
       "announcer": "음성 안내",
-      "jumpRange": "점프 범위"
+      "jumpRange": "점프 범위",
+      "chainExits": "체인 출구"
     },
     "settings": "설정",
     "shareActiveHint": "실시간 공유 링크. 아래에서 게스트가 보는 내용을 전환하세요. 이전에 링크가 생성되었다면 변경 사항이 자동으로 적용되며 다시 생성할 필요가 없습니다.",
@@ -1693,9 +1726,9 @@
     "viaAnsiblex": "Ansiblex 점프 게이트"
   },
   "routeToast": {
-    "destinationSet": "게임 내 오토파일럿을 {{system}}(으)로 설정했습니다",
-    "waypointAdded": "{{system}}을(를) 게임 내 오토파일럿 경로에 추가했습니다.",
-    "failed": "오토파일럿에 연결할 수 없습니다 — 캐릭터가 접속해 있나요?"
+    "destinationSet": "목적지가 {{system}}(으)로 설정됨",
+    "waypointAdded": "{{system}}이(가) 경유지에 추가되었습니다.",
+    "failed": "경유지 설정 실패 — 당신의 캐릭터가 온라인인가요?"
   },
   "scout": {
     "noConnections": "{{system}} 연결이 없습니다.",
@@ -2041,8 +2074,8 @@
     "dropToUngroup": "그룹에서 빼려면 여기에 놓으세요"
   },
   "waypoint": {
-    "setDestination": "게임 내 목적지 설정",
-    "addWaypoint": "게임 내 경유지 추가"
+    "setDestination": "목적지 설정",
+    "addWaypoint": "경유지 추가"
   },
   "whChart": {
     "open": "⊟ 웜홀 참조",
@@ -2123,5 +2156,16 @@
     "save": "저장",
     "loadPlan": "이 경로 불러오기",
     "deletePlan": "이 경로 삭제"
+  },
+  "flagPresets": {
+    "title": "플래그 프리셋",
+    "hint": "아이콘·색상·이름 조합을 저장해 연결 플래그에 한 번에 적용합니다.",
+    "newItem": "새 프리셋",
+    "add": "프리셋 추가",
+    "remove": "프리셋 삭제",
+    "pickIcon": "아이콘 선택",
+    "max": "최대 {{count}}개",
+    "orgGroup": "조직",
+    "mineGroup": "내 것"
   }
 }

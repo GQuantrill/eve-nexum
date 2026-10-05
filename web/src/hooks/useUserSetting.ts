@@ -19,6 +19,9 @@ import { api } from '../api/client';
  */
 
 let cache: Record<string, unknown> = {};
+// The org's starting configuration: consulted only where the user has no value
+// of their own. Never written to, never persisted, never mixed into `cache`.
+let orgDefaults: Record<string, unknown> = {};
 let hydrated = false;
 
 // Subscribers per key. Using a Map<key, Set<listener>> so we can notify
@@ -47,8 +50,13 @@ function schedule(): void {
   patchTimer = setTimeout(flush, 500);
 }
 
-export function seedUserSettings(initial: Record<string, unknown>): void {
+export function seedUserSettings(
+  initial: Record<string, unknown>,
+  orgDefaultSettings: Record<string, unknown> = {},
+): void {
   cache = { ...initial };
+  // Assigned, not merged into cache -- see the layering note in readSetting.
+  orgDefaults = orgDefaultSettings;
   hydrated = true;
 
   // Migration: any localStorage value that isn't on the server yet gets
@@ -84,6 +92,21 @@ export function seedUserSettings(initial: Record<string, unknown>): void {
 
 function readSetting<T>(key: string, defaultValue: T): T {
   if (cache[key] !== undefined) return cache[key] as T;
+  // The org's default, under the user's own value and over the shipped one.
+  //
+  // Kept as its own layer rather than merged into `cache` at seed time, which
+  // would look simpler and break three things. The worst is silent data loss:
+  // the localStorage migration below only uploads keys that are ABSENT from
+  // `cache`, so an org default sitting in that slot would stop a user's
+  // pre-database value from ever reaching the server -- it would just be
+  // replaced. Keeping the layers apart also means inherited stays
+  // distinguishable from chosen, which "reset to the org default" would need.
+  //
+  // Returned BY REFERENCE, never copied. getSnapshot is this function, and
+  // useSyncExternalStore throws "The result of getSnapshot should be cached" if
+  // an object identity changes between reads -- and most of these values are
+  // arrays or objects.
+  if (orgDefaults[key] !== undefined) return orgDefaults[key] as T;
   // Pre-hydration fall-through to localStorage so first-paint isn't
   // a flash of defaults. Cache the parsed value so `getSnapshot`
   // returns the same reference on every call — useSyncExternalStore
@@ -158,6 +181,7 @@ export function isHydrated(): boolean { return hydrated; }
 // Helper for tests / forced re-init.
 export function _resetUserSettingsForTests(): void {
   cache = {};
+  orgDefaults = {};
   hydrated = false;
   pendingPatch = {};
   if (patchTimer) { clearTimeout(patchTimer); patchTimer = null; }

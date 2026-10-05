@@ -72,7 +72,9 @@
       "maps": "Mapas",
       "reports": "Informes",
       "discord": "Discord",
-      "audit": "Registro de auditoría"
+      "audit": "Registro de auditoría",
+      "flags": "Plantillas",
+      "defaults": "Diseño por defecto"
     },
     "access": {
       "title": "Acceso de inicio de sesión",
@@ -362,6 +364,35 @@
       "colAmount": "Cantidad",
       "assign": "Asignar",
       "assignPlaceholder": "ID de personaje"
+    },
+    "flags": {
+      "title": "Plantillas de marca",
+      "hintCorp": "Plantillas que cada miembro de tu corporación ve encima de las suyas, para que un icono signifique lo mismo para todos. Hasta {{max}}.",
+      "hintAlliance": "Plantillas que cada miembro de tu alianza ve encima de las suyas, para que un icono signifique lo mismo para todos. Hasta {{max}}.",
+      "noCorp": "Esta instalación no tiene corporación ni alianza, así que no hay con quién estandarizar.",
+      "saving": "Guardando…",
+      "saved": "Guardado",
+      "loadFailed": "No se pudieron cargar las plantillas.",
+      "saveFailed": "No se pudieron guardar las plantillas."
+    },
+    "defaults": {
+      "title": "Diseño por defecto",
+      "hintCorp": "La configuración con la que empieza cada miembro de tu corporación. Organiza tu propio diseño y guárdalo aquí.",
+      "hintAlliance": "La configuración con la que empieza cada miembro de tu alianza. Organiza tu propio diseño y guárdalo aquí.",
+      "limitExisting": "Los miembros heredan cualquier ajuste que nunca hayan cambiado. Lo que ya hayan configurado sigue siendo suyo. El orden de paneles, el zoom y las demás opciones de visualización solo se aplican a miembros nuevos.",
+      "limitSession": "Los miembros ya conectados verán el cambio la próxima vez que inicien sesión.",
+      "noCorp": "Esta instalación no tiene corporación ni alianza, así que no hay para quién definir ajustes.",
+      "none": "Aún no hay ajustes por defecto.",
+      "summary": "{{count}} ajustes guardados",
+      "lastSet": "Definido por {{who}} el {{when}}",
+      "showList": "Ver qué incluye",
+      "hideList": "Ocultar la lista",
+      "capture": "Guardar mi diseño actual como predeterminado",
+      "clear": "Borrar ajustes",
+      "saving": "Guardando…",
+      "saved": "Guardado",
+      "loadFailed": "No se pudieron cargar los ajustes.",
+      "saveFailed": "No se pudieron guardar los ajustes."
     }
   },
   "anomType": {
@@ -444,16 +475,17 @@
   },
   "chainExits": {
     "title": "Salidas de la cadena",
-    "noExits": "No hay salidas a K-space en esta cadena.",
-    "hint": "Salida más cercana a cada uno de tus sistemas favoritos",
+    "noExits": "No hay salidas de K-space en esta cadena.",
+    "hint": "Sistemas de K-space actualmente en el mapa, por clase de seguridad. La ruta a Jita es solo por puertas — los atajos por agujero de gusano no se cuentan.",
     "allExits": "Todas las salidas a K-space",
     "noFavourites": "Aún no hay sistemas favoritos: añade algunos en el panel Sistemas cercanos.",
     "noRoute": "sin ruta",
     "inChain": "en la cadena",
     "via": "vía",
-    "highSec": "Alta seguridad",
-    "lowSec": "Baja seguridad",
-    "nullSec": "Nula seguridad"
+    "highSec": "High-sec",
+    "lowSec": "Low-sec",
+    "nullSec": "Null-sec",
+    "nearestJita": "Jita más cercano:"
   },
   "chains": {
     "from": "Desde…",
@@ -1542,7 +1574,8 @@
       "shortcuts": "Atajos",
       "notifications": "Notificaciones",
       "announcer": "Anuncios de voz",
-      "jumpRange": "Alcance de salto"
+      "jumpRange": "Alcance de salto",
+      "chainExits": "Salidas de la cadena"
     },
     "settings": "Ajustes",
     "shareActiveHint": "Enlace de compartir en vivo. Cambia abajo lo que ven los invitados. Si ya se generó un enlace, los cambios surten efecto automáticamente y NO necesitas regenerarlo.",
@@ -1693,9 +1726,9 @@
     "viaAnsiblex": "Puerta de salto Ansiblex"
   },
   "routeToast": {
-    "destinationSet": "Piloto automático del juego fijado en {{system}}",
-    "waypointAdded": "{{system}} añadido a la ruta del piloto automático del juego.",
-    "failed": "No se pudo acceder al piloto automático: ¿tu personaje está conectado?"
+    "destinationSet": "Destino establecido en {{system}}",
+    "waypointAdded": "{{system}} añadido a los puntos de ruta correctamente.",
+    "failed": "No se pudo establecer el punto de ruta — ¿está tu personaje en línea?"
   },
   "scout": {
     "noConnections": "No hay conexiones de {{system}}.",
@@ -2041,8 +2074,8 @@
     "dropToUngroup": "Suelta aquí para quitar del grupo"
   },
   "waypoint": {
-    "setDestination": "Fijar destino en el juego",
-    "addWaypoint": "Añadir waypoint en el juego"
+    "setDestination": "Establecer destino",
+    "addWaypoint": "Añadir punto de ruta"
   },
   "whChart": {
     "open": "⊟ Referencia de agujeros de gusano",
@@ -2124,5 +2157,16 @@
     "save": "Guardar",
     "loadPlan": "Cargar esta ruta",
     "deletePlan": "Eliminar esta ruta"
+  },
+  "flagPresets": {
+    "title": "Plantillas de marca",
+    "hint": "Combinaciones guardadas de icono, color y nombre que puedes aplicar a una conexión con un clic.",
+    "newItem": "Nueva plantilla",
+    "add": "Añadir plantilla",
+    "remove": "Eliminar plantilla",
+    "pickIcon": "Elegir icono",
+    "max": "Hasta {{count}} plantillas",
+    "orgGroup": "Organización",
+    "mineGroup": "Mías"
   }
 }

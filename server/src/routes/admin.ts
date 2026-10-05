@@ -12,6 +12,10 @@ import { getVersionStatus } from '../services/versionCheck.js';
 import { createLogger } from '../utils/logger.js';
 import { invalidateSessionsForUser } from '../utils/sessionInvalidate.js';
 import { audit } from '../services/audit.js';
+import {
+  parsePresets, resolveWriteScope, readScopePresets, writeScopePresets, MAX_FLAG_PRESETS,
+} from '../services/flagPresets.js';
+import { readDefaults, captureFrom, clearDefaults } from '../services/uiDefaults.js';
 import { resolveEntityNames } from '../services/entityNames.js';
 import {
   standingPermitsTarget, grantKindAllowedForInstall,
@@ -650,6 +654,97 @@ adminRouter.patch('/access-settings', async (req, res) => {
   const { sessionsKilled } = await revalidateActiveSessions();
   const s = await getStandingsLoginSettings();
   res.json({ standingsLoginEnabled: s.enabled, standingsLoginThreshold: s.threshold, sessionsKilled });
+});
+
+// ── Org default UI settings ───────────────────────────────────────────────────
+// The org's starting layout, captured from an admin's own configuration.
+
+adminRouter.get('/ui-defaults', async (req, res) => {
+  const scope = resolveWriteScope(req);
+  // No org: a personal deployment has nobody to set defaults for. Answer the
+  // empty shape so the tab can say so, rather than erroring.
+  if (!scope) { res.json({ scope: null, settings: {}, prefs: {}, updatedAt: null, updatedByName: null }); return; }
+  try {
+    res.json({ scope: scope.kind, ...(await readDefaults(scope)) });
+  } catch (err) {
+    log.error('ui-defaults read failed:', err);
+    res.status(500).json({ error: 'Database query failed' });
+  }
+});
+
+// PUT captures the CALLER's own configuration. It deliberately accepts no body:
+// the server can read everything it needs from the caller's row, which means
+// the allowlist and the never-capture rules hold by construction instead of by
+// validating whatever a client chose to send.
+adminRouter.put('/ui-defaults', async (req, res) => {
+  const scope = resolveWriteScope(req);
+  if (!scope) { res.status(400).json({ error: 'No org context' }); return; }
+  const userId = req.session.userId;
+  if (!userId) { res.status(401).json({ error: 'Not authenticated' }); return; }
+  try {
+    const before = await readDefaults(scope);
+    const after  = await captureFrom(userId, scope);
+    await audit(req, null, null, 'ui_defaults_update',
+      JSON.stringify({ settings: Object.keys(before.settings).length }),
+      JSON.stringify({ settings: Object.keys(after.settings).length }));
+    res.json({ scope: scope.kind, ...after });
+  } catch (err) {
+    log.error('ui-defaults capture failed:', err);
+    res.status(500).json({ error: 'Database query failed' });
+  }
+});
+
+adminRouter.delete('/ui-defaults', async (req, res) => {
+  const scope = resolveWriteScope(req);
+  if (!scope) { res.status(400).json({ error: 'No org context' }); return; }
+  try {
+    await clearDefaults(scope);
+    await audit(req, null, null, 'ui_defaults_clear', null, null);
+    res.json({ ok: true });
+  } catch (err) {
+    log.error('ui-defaults clear failed:', err);
+    res.status(500).json({ error: 'Database query failed' });
+  }
+});
+
+// ── Connection flag presets ───────────────────────────────────────────────────
+// Saved {icon, colour, name} templates for connection flags, so an org can
+// standardise what a given badge means instead of each pilot inventing their
+// own. Scoped like the Discord settings: the admin's own corp, or the alliance
+// when an alliance admin runs an alliance-mode deployment.
+
+// GET /api/admin/flag-presets — the org's saved presets, for the admin editor.
+adminRouter.get('/flag-presets', async (req, res) => {
+  const scope = resolveWriteScope(req);
+  // No org: a personal deployment. Answer the empty shape rather than an error
+  // so the tab can render its "no corp" state, as the Discord tab does.
+  if (!scope) { res.json({ scope: null, presets: [], max: MAX_FLAG_PRESETS }); return; }
+  try {
+    const presets = await readScopePresets(scope);
+    res.json({ scope: scope.kind, presets, max: MAX_FLAG_PRESETS });
+  } catch (err) {
+    log.error('flag-presets read failed:', err);
+    res.status(500).json({ error: 'Database query failed' });
+  }
+});
+
+// PUT /api/admin/flag-presets — replace the org's list wholesale.
+adminRouter.put('/flag-presets', async (req, res) => {
+  const scope = resolveWriteScope(req);
+  if (!scope) { res.status(400).json({ error: 'No org context' }); return; }
+  // Reject the whole list rather than dropping bad entries: an admin who typed
+  // a malformed colour should be told, not left wondering where a preset went.
+  const presets = parsePresets((req.body as { presets?: unknown })?.presets);
+  if (!presets) { res.status(400).json({ error: 'invalid presets' }); return; }
+  try {
+    const before = await readScopePresets(scope);
+    await writeScopePresets(scope, presets);
+    await audit(req, null, null, 'flag_presets_update', JSON.stringify(before), JSON.stringify(presets));
+    res.json({ ok: true, scope: scope.kind, presets });
+  } catch (err) {
+    log.error('flag-presets write failed:', err);
+    res.status(500).json({ error: 'Database query failed' });
+  }
 });
 
 // GET /api/admin/maps — every corp map in the system with owner + stats.

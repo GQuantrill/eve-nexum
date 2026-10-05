@@ -84,7 +84,9 @@
       "maps": "Maps",
       "reports": "Reports",
       "discord": "Discord",
-      "audit": "Audit log"
+      "audit": "Audit log",
+      "flags": "Flag presets",
+      "defaults": "Default layout"
     },
     "access": {
       "title": "Login access",
@@ -362,6 +364,35 @@
       "colAmount": "Amount",
       "assign": "Assign",
       "assignPlaceholder": "Character ID"
+    },
+    "flags": {
+      "title": "Flag presets",
+      "hintCorp": "Presets every member of your corporation sees above their own, so a badge means the same thing to everyone. Up to {{max}}.",
+      "hintAlliance": "Presets every member of your alliance sees above their own, so a badge means the same thing to everyone. Up to {{max}}.",
+      "noCorp": "This deployment has no corporation or alliance, so there is nobody to standardise with.",
+      "saving": "Saving…",
+      "saved": "Saved",
+      "loadFailed": "Couldn't load the presets.",
+      "saveFailed": "Couldn't save the presets."
+    },
+    "defaults": {
+      "title": "Default layout",
+      "hintCorp": "The configuration every member of your corporation starts from. Arrange your own layout how you want it, then capture it here.",
+      "hintAlliance": "The configuration every member of your alliance starts from. Arrange your own layout how you want it, then capture it here.",
+      "limitExisting": "Members inherit any setting they have never changed themselves. Anything they have already set stays theirs. Panel order, zoom and the other display options apply to new members only.",
+      "limitSession": "Members already signed in pick up a change next time they sign in.",
+      "noCorp": "This deployment has no corporation or alliance, so there is nobody to set defaults for.",
+      "none": "No defaults set yet.",
+      "summary": "{{count}} settings captured",
+      "lastSet": "Last set by {{who}} on {{when}}",
+      "showList": "Show what this includes",
+      "hideList": "Hide the list",
+      "capture": "Save my current layout as the default",
+      "clear": "Clear defaults",
+      "saving": "Saving…",
+      "saved": "Saved",
+      "loadFailed": "Couldn't load the defaults.",
+      "saveFailed": "Couldn't save the defaults."
     }
   },
   "anomType": {
@@ -445,7 +476,7 @@
   "chainExits": {
     "title": "Chain exits",
     "noExits": "No K-space exits in this chain.",
-    "hint": "Nearest exit to each of your favourite systems",
+    "hint": "K-space systems currently on the map, by security class. Jita route is gates-only — wormhole shortcuts not counted.",
     "allExits": "All K-space exits",
     "noFavourites": "No favourite systems yet — add some in the Closest Systems panel.",
     "noRoute": "no route",
@@ -453,7 +484,8 @@
     "via": "via",
     "highSec": "High-sec",
     "lowSec": "Low-sec",
-    "nullSec": "Null-sec"
+    "nullSec": "Null-sec",
+    "nearestJita": "Nearest Jita:"
   },
   "chains": {
     "from": "From…",
@@ -1542,7 +1574,8 @@
       "shareMap": "Share Map",
       "shortcuts": "Shortcuts",
       "announcer": "Announcer",
-      "jumpRange": "Jump Range"
+      "jumpRange": "Jump Range",
+      "chainExits": "Chain Exits"
     },
     "settings": "Settings",
     "shareActiveHint": "Live share link. Toggle below to change what guests see. If a link was previously generated, the changes will take effect automatically and you DO NOT need to regenerate.",
@@ -1693,9 +1726,9 @@
     "jspaceNoWaypoint": "Wormhole systems can't be set as an autopilot destination."
   },
   "routeToast": {
-    "destinationSet": "In-game autopilot set to {{system}}",
-    "waypointAdded": "{{system}} added to your in-game autopilot route.",
-    "failed": "Couldn't reach your autopilot — is your character logged in?"
+    "destinationSet": "Destination set to {{system}}",
+    "waypointAdded": "{{system}} successfully added to waypoints.",
+    "failed": "Failed to set waypoint — is your character online?"
   },
   "scout": {
     "noConnections": "No {{system}} connections.",
@@ -2041,8 +2074,8 @@
     "duplicate": "Already on watchlist"
   },
   "waypoint": {
-    "setDestination": "Set in-game destination",
-    "addWaypoint": "Add in-game waypoint"
+    "setDestination": "Set Destination",
+    "addWaypoint": "Add Waypoint"
   },
   "whChart": {
     "open": "⊟ Wormhole reference",
@@ -2124,5 +2157,16 @@
     "save": "Save",
     "loadPlan": "Load this route",
     "deletePlan": "Delete this route"
+  },
+  "flagPresets": {
+    "title": "Flag presets",
+    "hint": "Saved icon + colour + name combos you can apply to a connection flag in one click.",
+    "newItem": "New preset",
+    "add": "Add preset",
+    "remove": "Remove preset",
+    "pickIcon": "Choose icon",
+    "max": "Up to {{count}} presets",
+    "orgGroup": "Org",
+    "mineGroup": "Mine"
   }
 }

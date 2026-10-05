@@ -72,7 +72,9 @@
       "maps": "地图",
       "reports": "报告",
       "discord": "Discord",
-      "audit": "审计日志"
+      "audit": "审计日志",
+      "flags": "标记预设",
+      "defaults": "默认布局"
     },
     "access": {
       "title": "登录访问",
@@ -362,6 +364,35 @@
       "colAmount": "金额",
       "assign": "分配",
       "assignPlaceholder": "角色 ID"
+    },
+    "flags": {
+      "title": "标记预设",
+      "hintCorp": "军团每位成员都会在自己的预设之上看到这些预设，让同一个图标对所有人含义一致。最多 {{max}} 个。",
+      "hintAlliance": "联盟每位成员都会在自己的预设之上看到这些预设，让同一个图标对所有人含义一致。最多 {{max}} 个。",
+      "noCorp": "此部署没有军团或联盟，没有需要统一的对象。",
+      "saving": "保存中…",
+      "saved": "已保存",
+      "loadFailed": "无法加载预设。",
+      "saveFailed": "无法保存预设。"
+    },
+    "defaults": {
+      "title": "默认布局",
+      "hintCorp": "军团每位成员的起始配置。先把自己的布局调整好，再在此保存。",
+      "hintAlliance": "联盟每位成员的起始配置。先把自己的布局调整好，再在此保存。",
+      "limitExisting": "成员会继承自己从未改过的设置；已经设置过的仍归他们自己。面板顺序、缩放等显示选项仅对新成员生效。",
+      "limitSession": "已登录的成员将在下次登录时生效。",
+      "noCorp": "此部署没有军团或联盟，没有可应用默认值的对象。",
+      "none": "尚未设置默认值。",
+      "summary": "已保存 {{count}} 项设置",
+      "lastSet": "由 {{who}} 于 {{when}} 设置",
+      "showList": "查看包含内容",
+      "hideList": "隐藏列表",
+      "capture": "将我当前的布局保存为默认",
+      "clear": "清除默认值",
+      "saving": "保存中…",
+      "saved": "已保存",
+      "loadFailed": "无法加载默认值。",
+      "saveFailed": "无法保存默认值。"
     }
   },
   "anomType": {
@@ -444,8 +475,8 @@
   },
   "chainExits": {
     "title": "链路出口",
-    "noExits": "此链路中没有 K-space 出口。",
-    "hint": "到每个收藏星系的最近出口",
+    "noExits": "此链中没有 K空间出口。",
+    "hint": "当前地图上的 K空间星系，按安全等级分类。前往 Jita 的路线仅经星门 — 不计虫洞捷径。",
     "allExits": "所有 K-space 出口",
     "noFavourites": "还没有收藏的星系 — 在“最近星系”面板中添加。",
     "noRoute": "无路线",
@@ -453,7 +484,8 @@
     "via": "经由",
     "highSec": "高安",
     "lowSec": "低安",
-    "nullSec": "零安"
+    "nullSec": "零安",
+    "nearestJita": "最近的 Jita："
   },
   "chains": {
     "from": "起点…",
@@ -1542,7 +1574,8 @@
       "shortcuts": "快捷键",
       "notifications": "通知",
       "announcer": "语音播报",
-      "jumpRange": "跳跃范围"
+      "jumpRange": "跳跃范围",
+      "chainExits": "链出口"
     },
     "settings": "设置",
     "shareActiveHint": "实时共享链接。在下方切换访客可见的内容。如果之前已生成链接，更改会自动生效，你无需重新生成。",
@@ -1693,9 +1726,9 @@
     "viaAnsiblex": "Ansiblex 跳跃门"
   },
   "routeToast": {
-    "destinationSet": "游戏内自动驾驶已设为 {{system}}",
-    "waypointAdded": "{{system}} 已加入你的游戏内自动驾驶路线。",
-    "failed": "无法连接自动驾驶 — 你的角色登录了吗？"
+    "destinationSet": "目的地已设为 {{system}}",
+    "waypointAdded": "{{system}} 已成功添加到航点。",
+    "failed": "设置航路点失败 — 你的角色在线吗？"
   },
   "scout": {
     "noConnections": "没有 {{system}} 连接。",
@@ -2041,8 +2074,8 @@
     "dropToUngroup": "拖放到此处以移出分组"
   },
   "waypoint": {
-    "setDestination": "设置游戏内目的地",
-    "addWaypoint": "添加游戏内途经点"
+    "setDestination": "设为目的地",
+    "addWaypoint": "添加航路点"
   },
   "whChart": {
     "open": "⊟ 虫洞参考",
@@ -2123,5 +2156,16 @@
     "save": "保存",
     "loadPlan": "载入此路线",
     "deletePlan": "删除此路线"
+  },
+  "flagPresets": {
+    "title": "标记预设",
+    "hint": "保存的图标 + 颜色 + 名称组合，可一键应用到连接标记。",
+    "newItem": "新建预设",
+    "add": "添加预设",
+    "remove": "删除预设",
+    "pickIcon": "选择图标",
+    "max": "最多 {{count}} 个预设",
+    "orgGroup": "组织",
+    "mineGroup": "我的"
   }
 }

@@ -72,7 +72,9 @@
       "maps": "Mapas",
       "reports": "Relatórios",
       "discord": "Discord",
-      "audit": "Registo de auditoria"
+      "audit": "Registo de auditoria",
+      "flags": "Predefinições",
+      "defaults": "Esquema predefinido"
     },
     "access": {
       "title": "Acesso de início de sessão",
@@ -362,6 +364,35 @@
       "colAmount": "Montante",
       "assign": "Atribuir",
       "assignPlaceholder": "ID do personagem"
+    },
+    "flags": {
+      "title": "Predefinições de marca",
+      "hintCorp": "Predefinições que todos os membros da tua corporação veem acima das suas, para que um ícone signifique o mesmo para todos. Até {{max}}.",
+      "hintAlliance": "Predefinições que todos os membros da tua aliança veem acima das suas, para que um ícone signifique o mesmo para todos. Até {{max}}.",
+      "noCorp": "Esta instalação não tem corporação nem aliança, por isso não há com quem padronizar.",
+      "saving": "A guardar…",
+      "saved": "Guardado",
+      "loadFailed": "Não foi possível carregar as predefinições.",
+      "saveFailed": "Não foi possível guardar as predefinições."
+    },
+    "defaults": {
+      "title": "Esquema predefinido",
+      "hintCorp": "A configuração com que cada membro da tua corporação começa. Organiza o teu próprio esquema e guarda-o aqui.",
+      "hintAlliance": "A configuração com que cada membro da tua aliança começa. Organiza o teu próprio esquema e guarda-o aqui.",
+      "limitExisting": "Os membros herdam qualquer definição que nunca tenham alterado. O que já tiverem definido continua a ser deles. A ordem dos painéis, o zoom e as restantes opções de visualização aplicam-se apenas a novos membros.",
+      "limitSession": "Os membros já com sessão iniciada verão a alteração no próximo início de sessão.",
+      "noCorp": "Esta instalação não tem corporação nem aliança, por isso não há para quem definir predefinições.",
+      "none": "Ainda sem predefinições.",
+      "summary": "{{count}} definições guardadas",
+      "lastSet": "Definido por {{who}} em {{when}}",
+      "showList": "Ver o que inclui",
+      "hideList": "Ocultar a lista",
+      "capture": "Guardar o meu esquema atual como predefinição",
+      "clear": "Limpar predefinições",
+      "saving": "A guardar…",
+      "saved": "Guardado",
+      "loadFailed": "Não foi possível carregar as predefinições.",
+      "saveFailed": "Não foi possível guardar as predefinições."
     }
   },
   "anomType": {
@@ -444,16 +475,17 @@
   },
   "chainExits": {
     "title": "Saídas da cadeia",
-    "noExits": "Sem saídas para K-space nesta cadeia.",
-    "hint": "Saída mais próxima de cada um dos teus sistemas favoritos",
+    "noExits": "Não há saídas de K-space nesta cadeia.",
+    "hint": "Sistemas de K-space atualmente no mapa, por classe de segurança. A rota para Jita é só por portões — os atalhos por buraco de minhoca não são contados.",
     "allExits": "Todas as saídas para K-space",
     "noFavourites": "Ainda não há sistemas favoritos — adiciona alguns no painel Sistemas próximos.",
     "noRoute": "sem rota",
     "inChain": "na cadeia",
     "via": "via",
-    "highSec": "Alta segurança",
-    "lowSec": "Baixa segurança",
-    "nullSec": "Segurança nula"
+    "highSec": "High-sec",
+    "lowSec": "Low-sec",
+    "nullSec": "Null-sec",
+    "nearestJita": "Jita mais próximo:"
   },
   "chains": {
     "from": "De…",
@@ -1542,7 +1574,8 @@
       "shortcuts": "Atalhos",
       "notifications": "Notificações",
       "announcer": "Anúncios de voz",
-      "jumpRange": "Alcance de salto"
+      "jumpRange": "Alcance de salto",
+      "chainExits": "Saídas da cadeia"
     },
     "settings": "Configurações",
     "shareActiveHint": "Ligação de partilha em direto. Alterna abaixo o que os convidados veem. Se já foi gerada uma ligação, as alterações têm efeito automaticamente e NÃO precisas de a regenerar.",
@@ -1693,9 +1726,9 @@
     "viaAnsiblex": "Portão de salto Ansiblex"
   },
   "routeToast": {
-    "destinationSet": "Piloto automático do jogo definido para {{system}}",
-    "waypointAdded": "{{system}} adicionado à rota do piloto automático no jogo.",
-    "failed": "Não foi possível aceder ao piloto automático — a tua personagem está ligada?"
+    "destinationSet": "Destino definido para {{system}}",
+    "waypointAdded": "{{system}} adicionado aos pontos de passagem com sucesso.",
+    "failed": "Falha ao definir o ponto de rota — a tua personagem está online?"
   },
   "scout": {
     "noConnections": "Não há conexões de {{system}}.",
@@ -2041,8 +2074,8 @@
     "dropToUngroup": "Larga aqui para remover do grupo"
   },
   "waypoint": {
-    "setDestination": "Definir destino no jogo",
-    "addWaypoint": "Adicionar waypoint no jogo"
+    "setDestination": "Definir destino",
+    "addWaypoint": "Adicionar ponto de rota"
   },
   "whChart": {
     "open": "⊟ Referência de buracos de minhoca",
@@ -2124,5 +2157,16 @@
     "save": "Guardar",
     "loadPlan": "Carregar esta rota",
     "deletePlan": "Eliminar esta rota"
+  },
+  "flagPresets": {
+    "title": "Predefinições de marca",
+    "hint": "Combinações guardadas de ícone, cor e nome que podes aplicar a uma ligação com um clique.",
+    "newItem": "Nova predefinição",
+    "add": "Adicionar predefinição",
+    "remove": "Remover predefinição",
+    "pickIcon": "Escolher ícone",
+    "max": "Até {{count}} predefinições",
+    "orgGroup": "Organização",
+    "mineGroup": "Minhas"
   }
 }

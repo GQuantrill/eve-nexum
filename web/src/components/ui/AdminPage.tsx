@@ -12,6 +12,8 @@ import { useWormholeTypes } from '../../hooks/useWormholeTypes';
 import { cssVarToHex } from '../../utils/cssVar';
 import { timeAgo, europeanDate, DASH } from '../../i18n/format';
 import { ConfirmModal } from './ConfirmModal';
+import { FlagPresetEditor } from './FlagPresetEditor';
+import type { FlagPreset } from '../../types';
 import { StandingsViewerModal } from './StandingsViewerModal';
 import { Select } from './Select';
 import {
@@ -61,7 +63,7 @@ function RolesInfoModal({ onClose }: { onClose: () => void }) {
   );
 }
 
-type Tab = 'users' | 'access' | 'maps' | 'reports' | 'audit' | 'discord';
+type Tab = 'users' | 'access' | 'maps' | 'reports' | 'audit' | 'discord' | 'flags' | 'defaults';
 
 const ALL_TABS: { key: Tab; path: string }[] = [
   { key: 'users',   path: '/admin/users'   },
@@ -69,6 +71,8 @@ const ALL_TABS: { key: Tab; path: string }[] = [
   { key: 'maps',    path: '/admin/maps'    },
   { key: 'reports', path: '/admin/reports' },
   { key: 'discord', path: '/admin/discord' },
+  { key: 'flags',   path: '/admin/flags'   },
+  { key: 'defaults', path: '/admin/defaults' },
   { key: 'audit',   path: '/admin/audit'   },
 ];
 
@@ -112,6 +116,8 @@ export function AdminPage() {
         {tab === 'maps'    && isAdmin       && <MapsTab />}
         {tab === 'reports' && (isAdmin || canSeeReports) && <ReportsTab />}
         {tab === 'discord' && isAdmin       && <DiscordTab />}
+        {tab === 'flags'   && isAdmin       && <FlagPresetsTab />}
+        {tab === 'defaults' && isAdmin      && <UiDefaultsTab />}
         {tab === 'audit'   && isAdmin       && <AuditTab />}
       </main>
     </div>
@@ -124,6 +130,8 @@ function pathToTab(path: string, isAdmin: boolean, canSeeReports: boolean): Tab 
   if (path.startsWith('/admin/maps'))    return isAdmin       ? 'maps'    : fallback;
   if (path.startsWith('/admin/reports')) return (isAdmin || canSeeReports) ? 'reports' : fallback;
   if (path.startsWith('/admin/discord')) return isAdmin       ? 'discord' : fallback;
+  if (path.startsWith('/admin/flags'))   return isAdmin       ? 'flags'   : fallback;
+  if (path.startsWith('/admin/defaults')) return isAdmin     ? 'defaults' : fallback;
   if (path.startsWith('/admin/audit'))   return isAdmin       ? 'audit'   : fallback;
   return fallback;
 }
@@ -1073,6 +1081,189 @@ function IskMapsSection() {
           </table>
         </>
       )}
+    </>
+  );
+}
+
+// ── Org default layout tab ──────────────────────────────────────────────────
+// The org's starting configuration, captured from this admin's own setup.
+
+interface UiDefaultsPayload {
+  scope: 'corp' | 'alliance' | null;
+  settings: Record<string, unknown>;
+  prefs: Record<string, unknown>;
+  updatedAt: string | null;
+  updatedByName: string | null;
+}
+
+function UiDefaultsTab() {
+  const { t } = useTranslation();
+  const [data, setData]     = useState<UiDefaultsPayload | null>(null);
+  const [error, setError]   = useState<string | null>(null);
+  const [busy, setBusy]     = useState(false);
+  const [saved, setSaved]   = useState(false);
+  const [showList, setShowList] = useState(false);
+
+  const load = useCallback(async () => {
+    try { setData(await api<UiDefaultsPayload>('/api/admin/ui-defaults')); }
+    catch { setError(t('admin.defaults.loadFailed')); }
+  }, [t]);
+
+  useEffect(() => {
+    // Deliberate: seeds this tab from the server on mount.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void load();
+  }, [load]);
+
+  if (!data && error) return (<><h2 className={styles.pgSectionTitle}>{t('admin.defaults.title')}</h2><div className={styles.pgError}>{error}</div></>);
+  if (!data)          return (<><h2 className={styles.pgSectionTitle}>{t('admin.defaults.title')}</h2><div className={styles.pgLoading}>{t('admin.loading')}</div></>);
+  if (data.scope == null) return (<><h2 className={styles.pgSectionTitle}>{t('admin.defaults.title')}</h2><div className={styles.pgEmpty}>{t('admin.defaults.noCorp')}</div></>);
+
+  const keys = Object.keys(data.settings).sort();
+  const run = async (fn: () => Promise<unknown>) => {
+    setBusy(true); setError(null);
+    try { await fn(); await load(); setSaved(true); setTimeout(() => setSaved(false), 2000); }
+    catch { setError(t('admin.defaults.saveFailed')); }
+    finally { setBusy(false); }
+  };
+
+  return (
+    <>
+      <h2 className={styles.pgSectionTitle}>{t('admin.defaults.title')}</h2>
+      <section className={styles.dcSection}>
+        <p className={styles.dcHint}>
+          {t(data.scope === 'alliance' ? 'admin.defaults.hintAlliance' : 'admin.defaults.hintCorp')}
+        </p>
+        {/* Both limits stated plainly rather than discovered later. */}
+        <p className={styles.dcHint}>{t('admin.defaults.limitExisting')}</p>
+        <p className={styles.dcHint}>{t('admin.defaults.limitSession')}</p>
+
+        <div className={styles.dcHeading}>
+          {keys.length === 0
+            ? t('admin.defaults.none')
+            : t('admin.defaults.summary', { count: keys.length })}
+        </div>
+        {data.updatedByName && data.updatedAt && (
+          <div className={styles.dcHint}>
+            {t('admin.defaults.lastSet', {
+              who: data.updatedByName,
+              when: europeanDate(new Date(data.updatedAt)),
+            })}
+          </div>
+        )}
+
+        {keys.length > 0 && (
+          <>
+            <button type="button" className="btn btn--ghost" onClick={() => setShowList((v) => !v)}>
+              {t(showList ? 'admin.defaults.hideList' : 'admin.defaults.showList')}
+            </button>
+            {showList && (
+              <ul className={styles.dcChips}>
+                {keys.map((k) => <li key={k} className={styles.dcChip}>{k}</li>)}
+              </ul>
+            )}
+          </>
+        )}
+
+        {error && <div className={styles.pgError}>{error}</div>}
+        <div className={styles.dcActions}>
+          <button
+            className="btn btn--primary"
+            disabled={busy}
+            onClick={() => run(() => api('/api/admin/ui-defaults', { method: 'PUT' }))}
+          >
+            {busy ? t('admin.defaults.saving') : t('admin.defaults.capture')}
+          </button>
+          {keys.length > 0 && (
+            <button
+              className="btn btn--ghost"
+              disabled={busy}
+              onClick={() => run(() => api('/api/admin/ui-defaults', { method: 'DELETE' }))}
+            >
+              {t('admin.defaults.clear')}
+            </button>
+          )}
+          {saved && <span className={styles.dcSaved}>{t('admin.defaults.saved')}</span>}
+        </div>
+      </section>
+    </>
+  );
+}
+
+// ── Flag presets tab ────────────────────────────────────────────────────────
+// The org's standardised connection-flag templates. Members see these above
+// their own presets in the connection panel, so a corp can agree that a red
+// skull means DO NOT ROLL instead of each pilot inventing a badge.
+
+interface FlagPresetsPayload { scope: 'corp' | 'alliance' | null; presets: FlagPreset[]; max: number }
+
+function FlagPresetsTab() {
+  const { t } = useTranslation();
+  const [data, setData]     = useState<FlagPresetsPayload | null>(null);
+  const [working, setWork]  = useState<FlagPreset[]>([]);
+  const [error, setError]   = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved]   = useState(false);
+
+  const load = useCallback(async () => {
+    try {
+      const d = await api<FlagPresetsPayload>('/api/admin/flag-presets');
+      setData(d);
+      setWork(d.presets);
+    } catch {
+      setError(t('admin.flags.loadFailed'));
+    }
+  }, [t]);
+
+  useEffect(() => {
+    // Deliberate: seeds this tab's working copy from the server on mount.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void load();
+  }, [load]);
+
+  if (!data && error) return (<><h2 className={styles.pgSectionTitle}>{t('admin.flags.title')}</h2><div className={styles.pgError}>{error}</div></>);
+  if (!data)          return (<><h2 className={styles.pgSectionTitle}>{t('admin.flags.title')}</h2><div className={styles.pgLoading}>{t('admin.loading')}</div></>);
+  // No corp or alliance: a personal deployment has no one to standardise with.
+  if (data.scope == null) return (<><h2 className={styles.pgSectionTitle}>{t('admin.flags.title')}</h2><div className={styles.pgEmpty}>{t('admin.flags.noCorp')}</div></>);
+
+  // Order is part of the value here (it sets the display order for every
+  // member), so compare the list as written rather than order-insensitively.
+  const dirty = JSON.stringify(working) !== JSON.stringify(data.presets);
+
+  const save = async () => {
+    setSaving(true);
+    setError(null);
+    try {
+      const r = await api<{ presets: FlagPreset[] }>('/api/admin/flag-presets', {
+        method: 'PUT',
+        body: JSON.stringify({ presets: working }),
+      });
+      setData((d) => (d ? { ...d, presets: r.presets } : d));
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch {
+      setError(t('admin.flags.saveFailed'));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <>
+      <h2 className={styles.pgSectionTitle}>{t('admin.flags.title')}</h2>
+      <section className={styles.dcSection}>
+        <p className={styles.dcHint}>
+          {t(data.scope === 'alliance' ? 'admin.flags.hintAlliance' : 'admin.flags.hintCorp', { max: data.max })}
+        </p>
+        <FlagPresetEditor items={working} onChange={setWork} disabled={saving} />
+        {error && <div className={styles.pgError}>{error}</div>}
+        <div className={styles.dcActions}>
+          <button className="btn btn--primary" disabled={!dirty || saving} onClick={save}>
+            {saving ? t('admin.flags.saving') : t('actions.save')}
+          </button>
+          {saved && <span className={styles.dcSaved}>{t('admin.flags.saved')}</span>}
+        </div>
+      </section>
     </>
   );
 }

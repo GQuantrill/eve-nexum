@@ -32,6 +32,7 @@ import { AnnouncerSection } from "./AnnouncerSection";
 import { MapSharesSection } from "./MapSharesSection";
 import { MergeMapModal } from "./MergeMapModal";
 import { CustomIntelBlock } from "./CustomIntelBlock";
+import { FlagPresetsBlock } from "./FlagPresetsBlock";
 import { PatchNotesModal } from "./PatchNotesModal";
 import { ContentFilterBlock } from "./ContentFilterBlock";
 import { useIsMapOwner } from "../../hooks/useIsMapOwner";
@@ -1454,6 +1455,8 @@ export function MapSidebar() {
               <LazyWhSweepToggle />
             </>
           )}
+
+          <FlagPresetsBlock />
         </CollapsibleSection>
 
         {/* Shared bookmark formats (wormhole + relic/data/gas) for this map.

@@ -72,7 +72,9 @@
       "maps": "Karten",
       "reports": "Berichte",
       "discord": "Discord",
-      "audit": "Audit-Log"
+      "audit": "Audit-Log",
+      "flags": "Flaggen-Vorlagen",
+      "defaults": "Standard-Layout"
     },
     "access": {
       "title": "Anmeldezugang",
@@ -362,6 +364,35 @@
       "colAmount": "Betrag",
       "assign": "Zuordnen",
       "assignPlaceholder": "Charakter-ID"
+    },
+    "flags": {
+      "title": "Flaggen-Vorlagen",
+      "hintCorp": "Vorlagen, die jedes Mitglied deines Corps über den eigenen sieht, damit ein Symbol für alle dasselbe bedeutet. Bis zu {{max}}.",
+      "hintAlliance": "Vorlagen, die jedes Mitglied deiner Allianz über den eigenen sieht, damit ein Symbol für alle dasselbe bedeutet. Bis zu {{max}}.",
+      "noCorp": "Diese Installation hat weder Corp noch Allianz — es gibt niemanden, mit dem man sich abstimmen könnte.",
+      "saving": "Speichern…",
+      "saved": "Gespeichert",
+      "loadFailed": "Vorlagen konnten nicht geladen werden.",
+      "saveFailed": "Vorlagen konnten nicht gespeichert werden."
+    },
+    "defaults": {
+      "title": "Standard-Layout",
+      "hintCorp": "Die Konfiguration, mit der jedes Mitglied deines Corps startet. Richte dein eigenes Layout ein und übernimm es hier.",
+      "hintAlliance": "Die Konfiguration, mit der jedes Mitglied deiner Allianz startet. Richte dein eigenes Layout ein und übernimm es hier.",
+      "limitExisting": "Mitglieder übernehmen jede Einstellung, die sie nie selbst geändert haben. Bereits Gesetztes bleibt ihres. Panel-Reihenfolge, Zoom und die übrigen Anzeigeoptionen gelten nur für neue Mitglieder.",
+      "limitSession": "Bereits angemeldete Mitglieder übernehmen Änderungen bei der nächsten Anmeldung.",
+      "noCorp": "Diese Installation hat weder Corp noch Allianz — es gibt niemanden, für den Standards gelten könnten.",
+      "none": "Noch keine Standards gesetzt.",
+      "summary": "{{count}} Einstellungen übernommen",
+      "lastSet": "Zuletzt gesetzt von {{who}} am {{when}}",
+      "showList": "Anzeigen, was enthalten ist",
+      "hideList": "Liste ausblenden",
+      "capture": "Mein aktuelles Layout als Standard speichern",
+      "clear": "Standards löschen",
+      "saving": "Speichern…",
+      "saved": "Gespeichert",
+      "loadFailed": "Standards konnten nicht geladen werden.",
+      "saveFailed": "Standards konnten nicht gespeichert werden."
     }
   },
   "anomType": {
@@ -444,8 +475,8 @@
   },
   "chainExits": {
     "title": "Chain-Ausgänge",
-    "noExits": "Keine K-Space-Ausgänge in dieser Chain.",
-    "hint": "Nächster Ausgang zu jedem deiner Favoriten",
+    "noExits": "Keine K-Space-Ausgänge in dieser Kette.",
+    "hint": "K-Space-Systeme aktuell auf der Karte, nach Sicherheitsklasse. Jita-Route nur über Gates — Wurmloch-Abkürzungen nicht gezählt.",
     "allExits": "Alle K-Space-Ausgänge",
     "noFavourites": "Noch keine Favoriten — füge welche im Panel „Nächste Systeme“ hinzu.",
     "noRoute": "keine Route",
@@ -453,7 +484,8 @@
     "via": "über",
     "highSec": "High-Sec",
     "lowSec": "Low-Sec",
-    "nullSec": "Null-Sec"
+    "nullSec": "Null-Sec",
+    "nearestJita": "Nächstes Jita:"
   },
   "chains": {
     "from": "Von…",
@@ -1542,7 +1574,8 @@
       "shortcuts": "Tastenkürzel",
       "notifications": "Benachrichtigungen",
       "announcer": "Sprachansage",
-      "jumpRange": "Sprungreichweite"
+      "jumpRange": "Sprungreichweite",
+      "chainExits": "Ketten-Ausgänge"
     },
     "settings": "Einstellungen",
     "shareActiveHint": "Aktiver Freigabe-Link. Schalte unten um, was Gäste sehen. Falls zuvor ein Link erzeugt wurde, werden die Änderungen automatisch wirksam und du musst ihn NICHT neu erzeugen.",
@@ -1693,9 +1726,9 @@
     "viaAnsiblex": "Ansiblex-Sprungtor"
   },
   "routeToast": {
-    "destinationSet": "Autopilot im Spiel auf {{system}} gesetzt",
-    "waypointAdded": "{{system}} zur Autopilot-Route im Spiel hinzugefügt.",
-    "failed": "Autopilot nicht erreichbar — ist dein Charakter eingeloggt?"
+    "destinationSet": "Ziel festgelegt auf {{system}}",
+    "waypointAdded": "{{system}} erfolgreich zu den Wegpunkten hinzugefügt.",
+    "failed": "Wegpunkt konnte nicht gesetzt werden — ist dein Charakter online?"
   },
   "scout": {
     "noConnections": "Keine {{system}}-Verbindungen.",
@@ -2041,8 +2074,8 @@
     "dropToUngroup": "Hierher ziehen, um aus der Gruppe zu entfernen"
   },
   "waypoint": {
-    "setDestination": "Ziel im Spiel setzen",
-    "addWaypoint": "Wegpunkt im Spiel hinzufügen"
+    "setDestination": "Ziel festlegen",
+    "addWaypoint": "Wegpunkt hinzufügen"
   },
   "whChart": {
     "open": "⊟ Wurmloch-Referenz",
@@ -2124,5 +2157,16 @@
     "save": "Speichern",
     "loadPlan": "Diese Route laden",
     "deletePlan": "Diese Route löschen"
+  },
+  "flagPresets": {
+    "title": "Flaggen-Vorlagen",
+    "hint": "Gespeicherte Kombinationen aus Symbol, Farbe und Name, die du mit einem Klick auf eine Verbindung anwendest.",
+    "newItem": "Neue Vorlage",
+    "add": "Vorlage hinzufügen",
+    "remove": "Vorlage entfernen",
+    "pickIcon": "Symbol wählen",
+    "max": "Bis zu {{count}} Vorlagen",
+    "orgGroup": "Organisation",
+    "mineGroup": "Meine"
   }
 }

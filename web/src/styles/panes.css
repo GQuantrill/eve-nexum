@@ -394,6 +394,42 @@
 }
 
 /* ── Connection flag (corp/alliance-shared icon + note) ──── */
+/* Saved flag templates, above the free-choice picker. Each chip wears its own
+   preset colour so the standard is recognisable before you read the name. */
+.conn-flag__presets {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+.conn-flag__presets-label {
+  font-size: calc(10px * var(--font-scale, 1));
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-right: 2px;
+}
+.conn-flag__preset {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 150px;
+  padding: 2px 7px;
+  border: 1px solid;
+  border-radius: 999px;
+  background: rgba(8, 9, 15, 0.4);
+  cursor: pointer;
+  font-size: calc(11px * var(--font-scale, 1));
+}
+.conn-flag__preset > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.conn-flag__preset:disabled { opacity: 0.5; cursor: default; }
+.conn-flag__preset:not(:disabled):hover { background: rgba(110, 160, 255, 0.12); }
+
 .conn-flag__row {
   display: flex;
   align-items: center;

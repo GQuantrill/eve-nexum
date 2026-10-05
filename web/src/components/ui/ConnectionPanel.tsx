@@ -19,6 +19,8 @@ import { useUserSetting } from '../../hooks/useUserSetting';
 import { XIcon, TagIcon, ArrowSquareOutIcon } from '../../icons';
 import { DynamicIcon } from '../DynamicIcon';
 import { api } from '../../api/client';
+import { useFlagPresets } from '../../hooks/useFlagPresets';
+import { useOrgFlagPresets } from '../../hooks/useOrgFlagPresets';
 import type { MassStatus, TimeStatus, ConnectionSize, Signature, SystemClass } from '../../types';
 import {
   massRange, collapseState, passOutcome, safePassesLeft, flipSide,
@@ -133,6 +135,11 @@ export function ConnectionPanel() {
   const [rollerCustom, setRollerCustom] = useState(false);
   // Open state for the connection-flag icon picker.
   const [flagPickerOpen, setFlagPickerOpen] = useState(false);
+  // Saved flag templates: the org's standardised set first, then the pilot's
+  // own. Applying one is an ordinary field update, so it syncs, undoes and
+  // renders on the edge exactly like a hand-set flag.
+  const [myPresets]  = useFlagPresets();
+  const orgPresets   = useOrgFlagPresets();
   // Signatures on the two endpoint systems — feeds both the WH-type auto-detect
   // and the per-end "backing signature" link dropdowns below.
   const [endpointSigs, setEndpointSigs] = useState<{ src: Signature[]; tgt: Signature[] }>({ src: [], tgt: [] });
@@ -514,6 +521,48 @@ export function ConnectionPanel() {
           old one. Synced to every viewer via the connection update path. */}
       <label className="field conn-flag">
         <span>{t('connPanel.flagLabel')}</span>
+        {(orgPresets.length > 0 || myPresets.length > 0) && (
+          <div className="conn-flag__presets">
+            {orgPresets.length > 0 && (
+              <>
+                <span className="conn-flag__presets-label">{t('flagPresets.orgGroup')}</span>
+                {orgPresets.map((p) => (
+                  <button
+                    key={`org-${p.id}`}
+                    type="button"
+                    className="conn-flag__preset"
+                    disabled={!canEdit}
+                    style={{ borderColor: p.color, color: p.color }}
+                    title={p.name}
+                    onClick={() => update({ flagIcon: p.icon, flagColor: p.color, flagNote: p.name })}
+                  >
+                    <DynamicIcon name={p.icon} size={13} weight="fill" />
+                    <span>{p.name}</span>
+                  </button>
+                ))}
+              </>
+            )}
+            {myPresets.length > 0 && (
+              <>
+                {orgPresets.length > 0 && <span className="conn-flag__presets-label">{t('flagPresets.mineGroup')}</span>}
+                {myPresets.map((p) => (
+                  <button
+                    key={`me-${p.id}`}
+                    type="button"
+                    className="conn-flag__preset"
+                    disabled={!canEdit}
+                    style={{ borderColor: p.color, color: p.color }}
+                    title={p.name}
+                    onClick={() => update({ flagIcon: p.icon, flagColor: p.color, flagNote: p.name })}
+                  >
+                    <DynamicIcon name={p.icon} size={13} weight="fill" />
+                    <span>{p.name}</span>
+                  </button>
+                ))}
+              </>
+            )}
+          </div>
+        )}
         <div className="conn-flag__row">
           {(() => {
             return (

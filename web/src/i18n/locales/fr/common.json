@@ -72,7 +72,9 @@
       "maps": "Cartes",
       "reports": "Rapports",
       "discord": "Discord",
-      "audit": "Journal d'audit"
+      "audit": "Journal d'audit",
+      "flags": "Modèles",
+      "defaults": "Disposition par défaut"
     },
     "access": {
       "title": "Accès de connexion",
@@ -362,6 +364,35 @@
       "colAmount": "Montant",
       "assign": "Attribuer",
       "assignPlaceholder": "ID du personnage"
+    },
+    "flags": {
+      "title": "Modèles de marqueur",
+      "hintCorp": "Modèles que chaque membre de votre corporation voit au-dessus des siens, pour qu'une icône ait le même sens pour tous. Jusqu'à {{max}}.",
+      "hintAlliance": "Modèles que chaque membre de votre alliance voit au-dessus des siens, pour qu'une icône ait le même sens pour tous. Jusqu'à {{max}}.",
+      "noCorp": "Ce déploiement n'a ni corporation ni alliance : il n'y a personne avec qui harmoniser.",
+      "saving": "Enregistrement…",
+      "saved": "Enregistré",
+      "loadFailed": "Impossible de charger les modèles.",
+      "saveFailed": "Impossible d'enregistrer les modèles."
+    },
+    "defaults": {
+      "title": "Disposition par défaut",
+      "hintCorp": "La configuration de départ de chaque membre de votre corporation. Organisez votre propre disposition, puis enregistrez-la ici.",
+      "hintAlliance": "La configuration de départ de chaque membre de votre alliance. Organisez votre propre disposition, puis enregistrez-la ici.",
+      "limitExisting": "Les membres héritent de tout réglage qu'ils n'ont jamais modifié. Ce qu'ils ont déjà défini reste le leur. L'ordre des panneaux, le zoom et les autres options d'affichage ne s'appliquent qu'aux nouveaux membres.",
+      "limitSession": "Les membres déjà connectés verront le changement à leur prochaine connexion.",
+      "noCorp": "Ce déploiement n'a ni corporation ni alliance : il n'y a personne à qui appliquer des valeurs par défaut.",
+      "none": "Aucune valeur par défaut définie.",
+      "summary": "{{count}} réglages enregistrés",
+      "lastSet": "Défini par {{who}} le {{when}}",
+      "showList": "Voir ce que cela inclut",
+      "hideList": "Masquer la liste",
+      "capture": "Enregistrer ma disposition actuelle par défaut",
+      "clear": "Effacer les valeurs par défaut",
+      "saving": "Enregistrement…",
+      "saved": "Enregistré",
+      "loadFailed": "Impossible de charger les valeurs par défaut.",
+      "saveFailed": "Impossible d'enregistrer les valeurs par défaut."
     }
   },
   "anomType": {
@@ -445,15 +476,16 @@
   "chainExits": {
     "title": "Sorties de la chaîne",
     "noExits": "Aucune sortie K-space dans cette chaîne.",
-    "hint": "Sortie la plus proche de chacun de vos systèmes favoris",
+    "hint": "Systèmes K-space actuellement sur la carte, par classe de sécurité. L'itinéraire vers Jita passe uniquement par les portails — les raccourcis par trou de ver ne sont pas comptés.",
     "allExits": "Toutes les sorties K-space",
     "noFavourites": "Aucun système favori — ajoutez-en dans le panneau Systèmes proches.",
     "noRoute": "aucun itinéraire",
     "inChain": "dans la chaîne",
     "via": "via",
-    "highSec": "Haute sécurité",
-    "lowSec": "Basse sécurité",
-    "nullSec": "Zone nulle"
+    "highSec": "High-sec",
+    "lowSec": "Low-sec",
+    "nullSec": "Null-sec",
+    "nearestJita": "Jita le plus proche :"
   },
   "chains": {
     "from": "De…",
@@ -1542,7 +1574,8 @@
       "shortcuts": "Raccourcis",
       "notifications": "Notifications",
       "announcer": "Annonces vocales",
-      "jumpRange": "Portée de saut"
+      "jumpRange": "Portée de saut",
+      "chainExits": "Sorties de chaîne"
     },
     "settings": "Paramètres",
     "shareActiveHint": "Lien de partage en direct. Basculez ci-dessous ce que voient les invités. Si un lien a déjà été généré, les changements prennent effet automatiquement et vous n'avez PAS besoin de le régénérer.",
@@ -1693,9 +1726,9 @@
     "viaAnsiblex": "Porte de saut Ansiblex"
   },
   "routeToast": {
-    "destinationSet": "Pilote automatique en jeu réglé sur {{system}}",
-    "waypointAdded": "{{system}} ajouté à votre itinéraire de pilote automatique en jeu.",
-    "failed": "Pilote automatique injoignable — votre personnage est-il connecté ?"
+    "destinationSet": "Destination définie sur {{system}}",
+    "waypointAdded": "{{system}} ajouté aux points de passage avec succès.",
+    "failed": "Échec de la définition du point de cheminement — votre personnage est-il en ligne ?"
   },
   "scout": {
     "noConnections": "Aucune connexion {{system}}.",
@@ -2041,8 +2074,8 @@
     "dropToUngroup": "Déposez ici pour retirer du groupe"
   },
   "waypoint": {
-    "setDestination": "Définir la destination en jeu",
-    "addWaypoint": "Ajouter un point de passage en jeu"
+    "setDestination": "Définir la destination",
+    "addWaypoint": "Ajouter un point de cheminement"
   },
   "whChart": {
     "open": "⊟ Référence trous de ver",
@@ -2124,5 +2157,16 @@
     "save": "Enregistrer",
     "loadPlan": "Charger cet itinéraire",
     "deletePlan": "Supprimer cet itinéraire"
+  },
+  "flagPresets": {
+    "title": "Modèles de marqueur",
+    "hint": "Combinaisons enregistrées d'icône, de couleur et de nom, applicables à une connexion en un clic.",
+    "newItem": "Nouveau modèle",
+    "add": "Ajouter un modèle",
+    "remove": "Supprimer le modèle",
+    "pickIcon": "Choisir une icône",
+    "max": "Jusqu'à {{count}} modèles",
+    "orgGroup": "Organisation",
+    "mineGroup": "Les miens"
   }
 }

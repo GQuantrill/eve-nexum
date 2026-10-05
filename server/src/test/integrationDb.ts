@@ -76,9 +76,10 @@ const TABLES = [
   'access_grants', 'app_settings', 'map_shares', 'maps',
   'corp_standings', 'alliance_standings', 'character_standings',
   'standings_refresh', 'entity_names', 'sessions', 'user_events', 'users',
-  // Account-scoped saved plans. No FK to users/owners, so CASCADE below does
-  // not reach them and rows would otherwise leak between cases.
+  // Account- and org-scoped config. None of these has an FK to users/owners, so
+  // the CASCADE below does not reach them and rows would leak between cases.
   'route_plans',
+  'corp_flag_presets', 'alliance_flag_presets', 'org_ui_defaults',
   // ISK-for-maps. `owners` last: users.owner_id and maps.owner_id reference it,
   // and TRUNCATE ... CASCADE needs it in the same statement to clear cleanly.
   'isk_donations', 'wallet_reader', 'owners',
