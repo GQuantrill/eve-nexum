@@ -20,6 +20,7 @@ import { ApiKeysModal } from './ApiKeysModal';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { CharacterSwitcher } from './CharacterSwitcher';
 import { HeatmapMenu } from './HeatmapMenu';
+import { ChainExitsMenu } from './ChainExitsMenu';
 import { WhTypeChartModal } from './WhTypeChartModal';
 import { KillLogPanel } from './KillLogPanel';
 import { JumpPlannerModal } from './JumpPlannerModal';
@@ -607,6 +608,8 @@ export function Toolbar() {
             forth while deciding which layout suits them. */}
 
         <HeatmapMenu />
+
+        <ChainExitsMenu />
 
         <button
           className={`toolbar__toggle toolbar__toggle--icon toolbar__toggle--prominent${mapOptionsOpen ? ' toolbar__toggle--on' : ''}`}

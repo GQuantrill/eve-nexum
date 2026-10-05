@@ -552,6 +552,103 @@
 .toolbar__toggle-led--off { background: var(--danger); box-shadow: 0 0 4px #e05a5a66; }
 
 /* Heatmap toolbar control — icon button + horizontal popover (type + intensity). */
+/* ── Chain Exits toolbar menu ──────────────────────────────────────────────
+   Its own prefix on purpose: .chain-exits__list / __row / __name / __jumps are
+   already defined TWICE, in this file and in panes.css, for two unrelated
+   widgets with different rules -- whichever stylesheet loads later wins. A
+   third consumer would be a third way to break. Only the colours are shared,
+   and those come from the component. */
+.chain-exits-menu { position: relative; display: inline-flex; }
+
+/* Counts sit beside the icon rather than overlaying it: three numbers don't fit
+   in a corner dot, and the whole point is that they're readable at a glance. */
+.chain-exits-menu__badge {
+  display: inline-flex;
+  gap: 3px;
+  margin-left: 5px;
+  font-size: calc(11px * var(--font-scale, 1));
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.chain-exits-menu__pop {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 1000;
+  width: 290px;
+  max-height: 70vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--surface-well);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+  padding: 10px;
+}
+
+.chain-exits-menu__chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chain-exits-menu__chip {
+  font-size: calc(11px * var(--font-scale, 1));
+  padding: 2px 8px;
+  border: 1px solid;
+  border-radius: 999px;
+  background: rgba(8, 9, 15, 0.4);
+}
+.chain-exits-menu__chip strong { font-weight: 700; margin-right: 3px; }
+
+.chain-exits-menu__hint {
+  font-size: calc(11px * var(--font-scale, 1));
+  color: var(--text-subtle);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.chain-exits-menu__empty {
+  font-size: calc(12px * var(--font-scale, 1));
+  color: var(--text-faint);
+  font-style: italic;
+}
+
+.chain-exits-menu__favs,
+.chain-exits-menu__exits {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+.chain-exits-menu__exits { max-height: 180px; overflow-y: auto; }
+
+.chain-exits-menu__fav,
+.chain-exits-menu__exit {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 4px 8px;
+  font-size: calc(12px * var(--font-scale, 1));
+  border-bottom: 1px solid var(--surface-panel);
+}
+.chain-exits-menu__fav:last-child,
+.chain-exits-menu__exit:last-child { border-bottom: none; }
+
+.chain-exits-menu__fav-name { flex: 1; min-width: 0; font-weight: 600; }
+.chain-exits-menu__fav-route { white-space: nowrap; }
+.chain-exits-menu__fav-route--none,
+.chain-exits-menu__fav-route--in { color: var(--text-faint); font-style: italic; }
+.chain-exits-menu__via { color: var(--text-faint); }
+
+.chain-exits-menu__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  align-self: center;
+}
+.chain-exits-menu__exit-name { flex: 1; min-width: 0; }
+
 .heatmap-menu { position: relative; display: inline-flex; }
 .heatmap-menu__pop {
   position: absolute;

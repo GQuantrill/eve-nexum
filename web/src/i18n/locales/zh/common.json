@@ -443,13 +443,17 @@
     "disabled": "API 密钥已禁用"
   },
   "chainExits": {
-    "noExits": "此链中没有 K空间出口。",
-    "hint": "当前地图上的 K空间星系，按安全等级分类。前往 Jita 的路线仅经星门 — 不计虫洞捷径。",
+    "title": "链路出口",
+    "noExits": "此链路中没有 K-space 出口。",
+    "hint": "到每个收藏星系的最近出口",
+    "allExits": "所有 K-space 出口",
+    "noFavourites": "还没有收藏的星系 — 在“最近星系”面板中添加。",
+    "noRoute": "无路线",
+    "inChain": "在链路内",
+    "via": "经由",
     "highSec": "高安",
     "lowSec": "低安",
-    "nullSec": "零安",
-    "nearestJita": "最近的 Jita：",
-    "via": "经由"
+    "nullSec": "零安"
   },
   "chains": {
     "from": "起点…",
@@ -1527,7 +1531,6 @@
       "tracking": "跟踪",
       "route": "路线",
       "chains": "虫洞链",
-      "chainExits": "链出口",
       "proximityAlerts": "接近警报",
       "activity": "活动",
       "fleet": "舰队",

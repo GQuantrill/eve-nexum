@@ -27,7 +27,6 @@ import { DEFAULT_BOOKMARK_FORMAT, BOOKMARK_TOKENS, DEFAULT_SITE_BOOKMARK_FORMAT,
 import { toPng } from "html-to-image";
 import { CaretLeftIcon, CaretRightIcon, DiscordLogoIcon } from "@phosphor-icons/react";
 import { DISCORD_INVITE_URL } from "../../data/links";
-import { ChainExitsSection } from "./ChainExitsSection";
 import { JumpRangePane } from "./JumpRangePane";
 import { AnnouncerSection } from "./AnnouncerSection";
 import { MapSharesSection } from "./MapSharesSection";
@@ -148,7 +147,6 @@ type SectionId =
   | "connections"
   | "tracking"
   | "route"
-  | "chainExits"
   | "jumpRange"
   | "proximityAlerts"
   | "notifications"
@@ -1534,12 +1532,6 @@ export function MapSidebar() {
           </p>
         </CollapsibleSection>
 
-        <CollapsibleSection
-          title={t("mapSidebar.sections.chainExits")}
-          {...sectionProps("chainExits")}
-        >
-          <ChainExitsSection />
-        </CollapsibleSection>
 
         <CollapsibleSection title={t("mapSidebar.sections.jumpRange")} {...sectionProps("jumpRange")}>
           <JumpRangePane />

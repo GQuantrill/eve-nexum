@@ -443,13 +443,17 @@
     "disabled": "APIキーは無効です"
   },
   "chainExits": {
-    "noExits": "このチェーンに Kスペース出口はありません。",
-    "hint": "現在マップ上にある Kスペース星系を、セキュリティクラス別に表示します。Jita へのルートはゲートのみ — ワームホールの近道は数えません。",
+    "title": "チェーンの出口",
+    "noExits": "このチェーンに K-space の出口はありません。",
+    "hint": "お気に入りシステムごとの最寄りの出口",
+    "allExits": "すべての K-space 出口",
+    "noFavourites": "お気に入りのシステムがまだありません — 「最寄りシステム」パネルで追加してください。",
+    "noRoute": "ルートなし",
+    "inChain": "チェーン内",
+    "via": "経由",
     "highSec": "ハイセク",
     "lowSec": "ローセク",
-    "nullSec": "ヌルセク",
-    "nearestJita": "最寄りの Jita:",
-    "via": "経由"
+    "nullSec": "ヌルセク"
   },
   "chains": {
     "from": "出発…",
@@ -1527,7 +1531,6 @@
       "tracking": "追跡",
       "route": "ルート",
       "chains": "チェーン",
-      "chainExits": "チェーン出口",
       "proximityAlerts": "近接アラート",
       "activity": "アクティビティ",
       "fleet": "フリート",

@@ -443,13 +443,17 @@
     "disabled": "API 키 비활성화됨"
   },
   "chainExits": {
-    "noExits": "이 체인에 K-스페이스 출구가 없습니다.",
-    "hint": "현재 지도에 있는 K-스페이스 성계를 보안 등급별로 표시합니다. Jita 경로는 게이트 전용입니다 — 웜홀 지름길은 계산하지 않습니다.",
+    "title": "체인 출구",
+    "noExits": "이 체인에는 K-space 출구가 없습니다.",
+    "hint": "즐겨찾기 시스템별 가장 가까운 출구",
+    "allExits": "모든 K-space 출구",
+    "noFavourites": "즐겨찾기 시스템이 아직 없습니다 — '가까운 시스템' 패널에서 추가하세요.",
+    "noRoute": "경로 없음",
+    "inChain": "체인 내",
+    "via": "경유",
     "highSec": "하이섹",
     "lowSec": "로우섹",
-    "nullSec": "널섹",
-    "nearestJita": "가장 가까운 Jita:",
-    "via": "경유"
+    "nullSec": "널섹"
   },
   "chains": {
     "from": "출발…",
@@ -1527,7 +1531,6 @@
       "tracking": "추적",
       "route": "경로",
       "chains": "체인",
-      "chainExits": "체인 출구",
       "proximityAlerts": "근접 경보",
       "activity": "활동",
       "fleet": "함대",

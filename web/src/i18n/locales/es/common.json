@@ -443,13 +443,17 @@
     "disabled": "Claves API desactivadas"
   },
   "chainExits": {
-    "noExits": "No hay salidas de K-space en esta cadena.",
-    "hint": "Sistemas de K-space actualmente en el mapa, por clase de seguridad. La ruta a Jita es solo por puertas — los atajos por agujero de gusano no se cuentan.",
-    "highSec": "High-sec",
-    "lowSec": "Low-sec",
-    "nullSec": "Null-sec",
-    "nearestJita": "Jita más cercano:",
-    "via": "vía"
+    "title": "Salidas de la cadena",
+    "noExits": "No hay salidas a K-space en esta cadena.",
+    "hint": "Salida más cercana a cada uno de tus sistemas favoritos",
+    "allExits": "Todas las salidas a K-space",
+    "noFavourites": "Aún no hay sistemas favoritos: añade algunos en el panel Sistemas cercanos.",
+    "noRoute": "sin ruta",
+    "inChain": "en la cadena",
+    "via": "vía",
+    "highSec": "Alta seguridad",
+    "lowSec": "Baja seguridad",
+    "nullSec": "Nula seguridad"
   },
   "chains": {
     "from": "Desde…",
@@ -1527,7 +1531,6 @@
       "tracking": "Seguimiento",
       "route": "Ruta",
       "chains": "Cadenas",
-      "chainExits": "Salidas de la cadena",
       "proximityAlerts": "Alertas de proximidad",
       "activity": "Actividad",
       "fleet": "Flota",

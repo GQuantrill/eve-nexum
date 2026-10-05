@@ -443,13 +443,17 @@
     "disabled": "API keys disabled"
   },
   "chainExits": {
+    "title": "Chain exits",
     "noExits": "No K-space exits in this chain.",
-    "hint": "K-space systems currently on the map, by security class. Jita route is gates-only — wormhole shortcuts not counted.",
+    "hint": "Nearest exit to each of your favourite systems",
+    "allExits": "All K-space exits",
+    "noFavourites": "No favourite systems yet — add some in the Closest Systems panel.",
+    "noRoute": "no route",
+    "inChain": "in chain",
+    "via": "via",
     "highSec": "High-sec",
     "lowSec": "Low-sec",
-    "nullSec": "Null-sec",
-    "nearestJita": "Nearest Jita:",
-    "via": "via"
+    "nullSec": "Null-sec"
   },
   "chains": {
     "from": "From…",
@@ -1527,7 +1531,6 @@
       "tracking": "Tracking",
       "route": "Route",
       "chains": "Chains",
-      "chainExits": "Chain Exits",
       "proximityAlerts": "Proximity Alerts",
       "notifications": "Notifications",
       "activity": "Activity",
