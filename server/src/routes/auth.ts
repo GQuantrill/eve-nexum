@@ -10,6 +10,7 @@ import { refreshStandingsForUser } from '../services/standings.js';
 import { syncCorpStructures } from '../services/structureSync.js';
 import { isLoginPermitted, standingsPermitLogin } from '../services/accessGrants.js';
 import { seedDemoMap } from '../services/demoMap.js';
+import { applyPrefsToNewUser, orgScopeFor, readDefaults, resolveReadScope } from '../services/uiDefaults.js';
 
 const log = createLogger('auth');
 
@@ -330,7 +331,7 @@ authRouter.get('/callback', async (req, res) => {
       : isAdminChar ? bootstrapRole
       : (invitedRole ?? config.defaultUserRole);
 
-    const { rows } = await db.query<{ id: number; role: string; blocked: boolean }>(
+    const { rows } = await db.query<{ id: number; role: string; blocked: boolean; inserted: boolean }>(
       `INSERT INTO users (character_id, character_name, access_token, refresh_token, token_expires_at, role, corp_id, alliance_id, last_login_at)
        VALUES ($1, $2, $3, $4, $5, $6, $8, $10, NOW())
        ON CONFLICT (character_id) DO UPDATE SET
@@ -349,12 +350,18 @@ authRouter.get('/callback', async (req, res) => {
            ELSE users.role
          END,
          updated_at       = NOW()
-       RETURNING id, role, blocked`,
+       -- xmax is 0 only on a genuine INSERT; an ON CONFLICT update leaves the
+       -- deleting-transaction id set. This is how we tell a brand-new account
+       -- from a returning login, which decides whether the org's default layout
+       -- is applied (it seeds an account at creation and never touches one
+       -- that already exists -- the same rule the invited role above follows).
+       RETURNING id, role, blocked, (xmax = 0) AS inserted`,
       [characterId, jwtPayload.name, encryptToken(tokens.access_token), encryptToken(tokens.refresh_token), expiresAt,
        defaultRole, config.adminCharId, userCorpId, !config.restrictedMode, userAllianceId, bootstrapRole],
     );
 
     const userId = rows[0].id;
+    const isNewAccount = rows[0].inserted === true;
     const role   = rows[0].role as 'alliance_admin' | 'admin' | 'full' | 'edit' | 'contributor' | 'readonly';
 
     // Blocked users can never sign in. ADMIN_CHAR_ID is the safety hatch:
@@ -413,6 +420,18 @@ authRouter.get('/callback', async (req, res) => {
     // First login: seed a starter "Demo Map" so the canvas isn't blank.
     // No-op when the user already has a map. Skipped when INCLUDE_DEMO_MAP is off.
     if (config.includeDemoMap) await seedDemoMap(userId);
+
+    // A brand-new account starts from the org's captured layout, if one is set.
+    // Only at creation: the pref columns are NOT NULL with schema defaults, so
+    // for an existing member "never touched" cannot be told from "chose the
+    // default", and overwriting would discard a real choice. Placed before the
+    // snapshot below so the session picks the values up with no extra query.
+    if (isNewAccount) {
+      // Scope from the ids resolved above, not from the session: the session is
+      // not assigned until a few lines further down.
+      await applyPrefsToNewUser(userId, orgScopeFor(userCorpId, userAllianceId))
+        .catch((e) => log.error('org defaults:', e));
+    }
 
     // Snapshot prefs into the session so /auth/me can answer without a DB call.
     const prefRows = await db.query<{ compact_mode: boolean; snap_to_grid: boolean; show_minimap: boolean; uniform_size: boolean; show_statics: boolean; easy_connect: boolean; connection_thickness: string; route_mode: string; ui_zoom: string; ui_settings: Record<string, unknown>; panel_order: string[] }>(
@@ -619,6 +638,19 @@ authRouter.get('/me', async (req, res) => {
     active:              c.id === req.session.userId,
   }));
 
+  // Cheap: one indexed read on a two-column key, and only for a member who has
+  // an org at all. Not cached on the session deliberately -- prefs are, and that
+  // cache has no invalidation, so a changed default would never reach anyone
+  // already logged in.
+  let orgDefaultSettings: Record<string, unknown> = {};
+  try {
+    orgDefaultSettings = (await readDefaults(resolveReadScope(req))).settings;
+  } catch (err) {
+    // Never block sign-in on this: no defaults just means everyone starts from
+    // the shipped ones.
+    log.error('org defaults read failed:', err);
+  }
+
   res.json({
     user: {
       id:            req.session.userId,
@@ -647,6 +679,13 @@ authRouter.get('/me', async (req, res) => {
       canViewReports: config.reportsCharId !== null && req.session.characterId === config.reportsCharId,
       // When the external API is off, the UI hides/disables API-key creation.
       externalApiDisabled: config.externalApiDisabled,
+      // The org's starting layout. Delivered here rather than from its own
+      // endpoint because it is needed before first paint -- a second round-trip
+      // would show the wrong layout and then visibly re-lay-out. Settings only:
+      // the pref columns are seeded at account creation (see the login callback)
+      // because an untouched NOT NULL column is indistinguishable from a chosen
+      // one.
+      orgDefaults: orgDefaultSettings,
     },
   });
 });

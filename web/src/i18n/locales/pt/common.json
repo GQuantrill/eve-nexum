@@ -73,7 +73,8 @@
       "reports": "Relatórios",
       "discord": "Discord",
       "audit": "Registo de auditoria",
-      "flags": "Predefinições"
+      "flags": "Predefinições",
+      "defaults": "Esquema predefinido"
     },
     "access": {
       "title": "Acesso de início de sessão",
@@ -369,6 +370,25 @@
       "hintCorp": "Predefinições que todos os membros da tua corporação veem acima das suas, para que um ícone signifique o mesmo para todos. Até {{max}}.",
       "hintAlliance": "Predefinições que todos os membros da tua aliança veem acima das suas, para que um ícone signifique o mesmo para todos. Até {{max}}.",
       "noCorp": "Esta instalação não tem corporação nem aliança, por isso não há com quem padronizar.",
+      "saving": "A guardar…",
+      "saved": "Guardado",
+      "loadFailed": "Não foi possível carregar as predefinições.",
+      "saveFailed": "Não foi possível guardar as predefinições."
+    },
+    "defaults": {
+      "title": "Esquema predefinido",
+      "hintCorp": "A configuração com que cada membro da tua corporação começa. Organiza o teu próprio esquema e guarda-o aqui.",
+      "hintAlliance": "A configuração com que cada membro da tua aliança começa. Organiza o teu próprio esquema e guarda-o aqui.",
+      "limitExisting": "Os membros herdam qualquer definição que nunca tenham alterado. O que já tiverem definido continua a ser deles. A ordem dos painéis, o zoom e as restantes opções de visualização aplicam-se apenas a novos membros.",
+      "limitSession": "Os membros já com sessão iniciada verão a alteração no próximo início de sessão.",
+      "noCorp": "Esta instalação não tem corporação nem aliança, por isso não há para quem definir predefinições.",
+      "none": "Ainda sem predefinições.",
+      "summary": "{{count}} definições guardadas",
+      "lastSet": "Definido por {{who}} em {{when}}",
+      "showList": "Ver o que inclui",
+      "hideList": "Ocultar a lista",
+      "capture": "Guardar o meu esquema atual como predefinição",
+      "clear": "Limpar predefinições",
       "saving": "A guardar…",
       "saved": "Guardado",
       "loadFailed": "Não foi possível carregar as predefinições.",

@@ -86,7 +86,7 @@ function MapApp() {
       if (hydratedForUserId !== user.id) {
         hydratedForUserId = user.id;
         applyPreferences({ compactMode: user.compactMode, snapToGrid: user.snapToGrid, showMinimap: user.showMinimap, uniformSize: user.uniformSize, showStatics: user.showStatics, easyConnect: user.easyConnect, connectionThickness: user.connectionThickness, routeMode: user.routeMode, uiZoom: user.uiZoom, panelOrder: user.panelOrder });
-        seedUserSettings(user.uiSettings ?? {});
+        seedUserSettings(user.uiSettings ?? {}, user.orgDefaults ?? {});
         // Push the now-canonical trackJumps from the hydrated user-settings
         // cache into the map store. (mapStore's init runs before /auth/me
         // resolves, so it pulled from localStorage only.)

@@ -73,7 +73,8 @@
       "reports": "报告",
       "discord": "Discord",
       "audit": "审计日志",
-      "flags": "标记预设"
+      "flags": "标记预设",
+      "defaults": "默认布局"
     },
     "access": {
       "title": "登录访问",
@@ -373,6 +374,25 @@
       "saved": "已保存",
       "loadFailed": "无法加载预设。",
       "saveFailed": "无法保存预设。"
+    },
+    "defaults": {
+      "title": "默认布局",
+      "hintCorp": "军团每位成员的起始配置。先把自己的布局调整好，再在此保存。",
+      "hintAlliance": "联盟每位成员的起始配置。先把自己的布局调整好，再在此保存。",
+      "limitExisting": "成员会继承自己从未改过的设置；已经设置过的仍归他们自己。面板顺序、缩放等显示选项仅对新成员生效。",
+      "limitSession": "已登录的成员将在下次登录时生效。",
+      "noCorp": "此部署没有军团或联盟，没有可应用默认值的对象。",
+      "none": "尚未设置默认值。",
+      "summary": "已保存 {{count}} 项设置",
+      "lastSet": "由 {{who}} 于 {{when}} 设置",
+      "showList": "查看包含内容",
+      "hideList": "隐藏列表",
+      "capture": "将我当前的布局保存为默认",
+      "clear": "清除默认值",
+      "saving": "保存中…",
+      "saved": "已保存",
+      "loadFailed": "无法加载默认值。",
+      "saveFailed": "无法保存默认值。"
     }
   },
   "anomType": {

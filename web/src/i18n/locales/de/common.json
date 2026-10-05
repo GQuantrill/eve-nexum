@@ -73,7 +73,8 @@
       "reports": "Berichte",
       "discord": "Discord",
       "audit": "Audit-Log",
-      "flags": "Flaggen-Vorlagen"
+      "flags": "Flaggen-Vorlagen",
+      "defaults": "Standard-Layout"
     },
     "access": {
       "title": "Anmeldezugang",
@@ -373,6 +374,25 @@
       "saved": "Gespeichert",
       "loadFailed": "Vorlagen konnten nicht geladen werden.",
       "saveFailed": "Vorlagen konnten nicht gespeichert werden."
+    },
+    "defaults": {
+      "title": "Standard-Layout",
+      "hintCorp": "Die Konfiguration, mit der jedes Mitglied deines Corps startet. Richte dein eigenes Layout ein und übernimm es hier.",
+      "hintAlliance": "Die Konfiguration, mit der jedes Mitglied deiner Allianz startet. Richte dein eigenes Layout ein und übernimm es hier.",
+      "limitExisting": "Mitglieder übernehmen jede Einstellung, die sie nie selbst geändert haben. Bereits Gesetztes bleibt ihres. Panel-Reihenfolge, Zoom und die übrigen Anzeigeoptionen gelten nur für neue Mitglieder.",
+      "limitSession": "Bereits angemeldete Mitglieder übernehmen Änderungen bei der nächsten Anmeldung.",
+      "noCorp": "Diese Installation hat weder Corp noch Allianz — es gibt niemanden, für den Standards gelten könnten.",
+      "none": "Noch keine Standards gesetzt.",
+      "summary": "{{count}} Einstellungen übernommen",
+      "lastSet": "Zuletzt gesetzt von {{who}} am {{when}}",
+      "showList": "Anzeigen, was enthalten ist",
+      "hideList": "Liste ausblenden",
+      "capture": "Mein aktuelles Layout als Standard speichern",
+      "clear": "Standards löschen",
+      "saving": "Speichern…",
+      "saved": "Gespeichert",
+      "loadFailed": "Standards konnten nicht geladen werden.",
+      "saveFailed": "Standards konnten nicht gespeichert werden."
     }
   },
   "anomType": {

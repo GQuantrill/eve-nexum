@@ -78,7 +78,7 @@ const TABLES = [
   'standings_refresh', 'entity_names', 'sessions', 'user_events', 'users',
   // Org-scoped config. No FK to users/owners, so the CASCADE below does not
   // reach these and rows would leak between cases.
-  'corp_flag_presets', 'alliance_flag_presets',
+  'corp_flag_presets', 'alliance_flag_presets', 'org_ui_defaults',
   // ISK-for-maps. `owners` last: users.owner_id and maps.owner_id reference it,
   // and TRUNCATE ... CASCADE needs it in the same statement to clear cleanly.
   'isk_donations', 'wallet_reader', 'owners',

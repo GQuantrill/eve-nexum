@@ -66,6 +66,11 @@ export interface AuthUser {
   routeMode: string;
   uiZoom: number;
   uiSettings: Record<string, unknown>;
+  /** The org's starting configuration, applied only where the user has no value
+   *  of their own. Settings only — the column-backed prefs above are seeded into
+   *  the account when it is created, because an untouched NOT NULL column can't
+   *  be told from a chosen one. */
+  orgDefaults?: Record<string, unknown>;
   panelOrder: string[];
   canViewReports: boolean;
   /** External read API (/api/v1) is switched off — the UI disables API-key creation. */

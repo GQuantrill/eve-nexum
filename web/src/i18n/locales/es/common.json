@@ -73,7 +73,8 @@
       "reports": "Informes",
       "discord": "Discord",
       "audit": "Registro de auditoría",
-      "flags": "Plantillas"
+      "flags": "Plantillas",
+      "defaults": "Diseño por defecto"
     },
     "access": {
       "title": "Acceso de inicio de sesión",
@@ -373,6 +374,25 @@
       "saved": "Guardado",
       "loadFailed": "No se pudieron cargar las plantillas.",
       "saveFailed": "No se pudieron guardar las plantillas."
+    },
+    "defaults": {
+      "title": "Diseño por defecto",
+      "hintCorp": "La configuración con la que empieza cada miembro de tu corporación. Organiza tu propio diseño y guárdalo aquí.",
+      "hintAlliance": "La configuración con la que empieza cada miembro de tu alianza. Organiza tu propio diseño y guárdalo aquí.",
+      "limitExisting": "Los miembros heredan cualquier ajuste que nunca hayan cambiado. Lo que ya hayan configurado sigue siendo suyo. El orden de paneles, el zoom y las demás opciones de visualización solo se aplican a miembros nuevos.",
+      "limitSession": "Los miembros ya conectados verán el cambio la próxima vez que inicien sesión.",
+      "noCorp": "Esta instalación no tiene corporación ni alianza, así que no hay para quién definir ajustes.",
+      "none": "Aún no hay ajustes por defecto.",
+      "summary": "{{count}} ajustes guardados",
+      "lastSet": "Definido por {{who}} el {{when}}",
+      "showList": "Ver qué incluye",
+      "hideList": "Ocultar la lista",
+      "capture": "Guardar mi diseño actual como predeterminado",
+      "clear": "Borrar ajustes",
+      "saving": "Guardando…",
+      "saved": "Guardado",
+      "loadFailed": "No se pudieron cargar los ajustes.",
+      "saveFailed": "No se pudieron guardar los ajustes."
     }
   },
   "anomType": {

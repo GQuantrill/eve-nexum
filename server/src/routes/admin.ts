@@ -15,6 +15,7 @@ import { audit } from '../services/audit.js';
 import {
   parsePresets, resolveWriteScope, readScopePresets, writeScopePresets, MAX_FLAG_PRESETS,
 } from '../services/flagPresets.js';
+import { readDefaults, captureFrom, clearDefaults } from '../services/uiDefaults.js';
 import { resolveEntityNames } from '../services/entityNames.js';
 import {
   standingPermitsTarget, grantKindAllowedForInstall,
@@ -653,6 +654,57 @@ adminRouter.patch('/access-settings', async (req, res) => {
   const { sessionsKilled } = await revalidateActiveSessions();
   const s = await getStandingsLoginSettings();
   res.json({ standingsLoginEnabled: s.enabled, standingsLoginThreshold: s.threshold, sessionsKilled });
+});
+
+// ── Org default UI settings ───────────────────────────────────────────────────
+// The org's starting layout, captured from an admin's own configuration.
+
+adminRouter.get('/ui-defaults', async (req, res) => {
+  const scope = resolveWriteScope(req);
+  // No org: a personal deployment has nobody to set defaults for. Answer the
+  // empty shape so the tab can say so, rather than erroring.
+  if (!scope) { res.json({ scope: null, settings: {}, prefs: {}, updatedAt: null, updatedByName: null }); return; }
+  try {
+    res.json({ scope: scope.kind, ...(await readDefaults(scope)) });
+  } catch (err) {
+    log.error('ui-defaults read failed:', err);
+    res.status(500).json({ error: 'Database query failed' });
+  }
+});
+
+// PUT captures the CALLER's own configuration. It deliberately accepts no body:
+// the server can read everything it needs from the caller's row, which means
+// the allowlist and the never-capture rules hold by construction instead of by
+// validating whatever a client chose to send.
+adminRouter.put('/ui-defaults', async (req, res) => {
+  const scope = resolveWriteScope(req);
+  if (!scope) { res.status(400).json({ error: 'No org context' }); return; }
+  const userId = req.session.userId;
+  if (!userId) { res.status(401).json({ error: 'Not authenticated' }); return; }
+  try {
+    const before = await readDefaults(scope);
+    const after  = await captureFrom(userId, scope);
+    await audit(req, null, null, 'ui_defaults_update',
+      JSON.stringify({ settings: Object.keys(before.settings).length }),
+      JSON.stringify({ settings: Object.keys(after.settings).length }));
+    res.json({ scope: scope.kind, ...after });
+  } catch (err) {
+    log.error('ui-defaults capture failed:', err);
+    res.status(500).json({ error: 'Database query failed' });
+  }
+});
+
+adminRouter.delete('/ui-defaults', async (req, res) => {
+  const scope = resolveWriteScope(req);
+  if (!scope) { res.status(400).json({ error: 'No org context' }); return; }
+  try {
+    await clearDefaults(scope);
+    await audit(req, null, null, 'ui_defaults_clear', null, null);
+    res.json({ ok: true });
+  } catch (err) {
+    log.error('ui-defaults clear failed:', err);
+    res.status(500).json({ error: 'Database query failed' });
+  }
 });
 
 // ── Connection flag presets ───────────────────────────────────────────────────

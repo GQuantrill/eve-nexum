@@ -85,7 +85,8 @@
       "reports": "Reports",
       "discord": "Discord",
       "audit": "Audit log",
-      "flags": "Flag presets"
+      "flags": "Flag presets",
+      "defaults": "Default layout"
     },
     "access": {
       "title": "Login access",
@@ -373,6 +374,25 @@
       "saved": "Saved",
       "loadFailed": "Couldn't load the presets.",
       "saveFailed": "Couldn't save the presets."
+    },
+    "defaults": {
+      "title": "Default layout",
+      "hintCorp": "The configuration every member of your corporation starts from. Arrange your own layout how you want it, then capture it here.",
+      "hintAlliance": "The configuration every member of your alliance starts from. Arrange your own layout how you want it, then capture it here.",
+      "limitExisting": "Members inherit any setting they have never changed themselves. Anything they have already set stays theirs. Panel order, zoom and the other display options apply to new members only.",
+      "limitSession": "Members already signed in pick up a change next time they sign in.",
+      "noCorp": "This deployment has no corporation or alliance, so there is nobody to set defaults for.",
+      "none": "No defaults set yet.",
+      "summary": "{{count}} settings captured",
+      "lastSet": "Last set by {{who}} on {{when}}",
+      "showList": "Show what this includes",
+      "hideList": "Hide the list",
+      "capture": "Save my current layout as the default",
+      "clear": "Clear defaults",
+      "saving": "Saving…",
+      "saved": "Saved",
+      "loadFailed": "Couldn't load the defaults.",
+      "saveFailed": "Couldn't save the defaults."
     }
   },
   "anomType": {
