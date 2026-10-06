@@ -288,6 +288,12 @@ export function MapCanvas() {
   // Gate-adjacent systems per k-space eveSystemId, fetched lazily when a node's
   // context menu opens. 'loading'/'error' are transient states for the submenu.
   const [adjacent, setAdjacent] = useState<Record<number, AdjacentSystem[] | 'loading' | 'error'>>({});
+
+  // Add-and-connect: right-click a system, search for another, and the pick is
+  // added (or reused if already mapped) and linked in one step. Holds the source
+  // node and the slot the new system would occupy, chosen when the menu item is
+  // clicked so the position does not drift while the dialog is open.
+  const [connectAdd, setConnectAdd] = useState<{ nodeId: string; position: { x: number; y: number } } | null>(null);
   const [customIntel] = useCustomIntel();
   const wrapperRef = useRef<HTMLDivElement>(null);
 
@@ -1551,6 +1557,21 @@ export function MapCanvas() {
           };
         });
       };
+      const addConnectedItem: ContextMenuItem[] = !multiSelected ? [{
+        label: t('ctxMenu.addConnected'),
+        icon:  <PlusIcon size={16} weight="regular" color="#4dd9ac" />,
+        action: () => {
+          const src = systems.find((s) => s.id === contextMenu.nodeId);
+          if (!src) return;
+          // Same placement rule as "Add adjacent" and live tracking: the next
+          // free slot around the source in the user's preferred direction.
+          const cell = getPlacementCell();
+          const direction = normalizePlacement(readUserSetting<string>('nexum.map.placement', 'east'));
+          const pos = findFreePosition(src.position, systems, cell.w || 220, cell.h || 120, PLACEMENT_GAP, direction, snapToGrid);
+          setConnectAdd({ nodeId: contextMenu.nodeId!, position: pos });
+        },
+      }] : [];
+
       const adjacentItem: ContextMenuItem[] = isKspace ? [{
         label: t('ctxMenu.addAdjacent'),
         icon:  <PlusIcon size={16} weight="regular" color="#5a9af8" />,
@@ -1579,6 +1600,7 @@ export function MapCanvas() {
           },
         }] : []),
         ...connectItem,
+        ...addConnectedItem,
         ...homeItem,
         ...copyNameItem,
         ...aliasItem,
@@ -1785,6 +1807,37 @@ export function MapCanvas() {
 
       {pendingPosition && (
         <AddSystemModal position={pendingPosition} onClose={() => setPendingPosition(null)} />
+      )}
+      {connectAdd && (
+        <AddSystemModal
+          position={connectAdd.position}
+          title={t('ctxMenu.addConnected')}
+          onClose={() => setConnectAdd(null)}
+          onSubmit={(name, cls, pos, opts) => {
+            const src = systems.find((sy) => sy.id === connectAdd.nodeId);
+            if (!src) return;
+            // Picking something already mapped links to THAT node rather than
+            // dropping a duplicate -- which also makes this a one-dialog
+            // replacement for "Connect to" + a second click on the canvas.
+            const existing = systems.find((sy) =>
+              (opts.eveSystemId != null && sy.eveSystemId === opts.eveSystemId)
+              || sy.name.toLowerCase() === name.toLowerCase());
+            if (existing?.id === connectAdd.nodeId) return;   // itself
+
+            const targetId  = existing ? existing.id : addSystem(name, cls, pos, opts);
+            const targetPos = existing ? existing.position : pos;
+
+            // Never a second edge between the same pair: the chain reads as one
+            // hole per link, and a duplicate would show as two.
+            const linked = connections.some((c) =>
+              (c.sourceId === connectAdd.nodeId && c.targetId === targetId)
+              || (c.targetId === connectAdd.nodeId && c.sourceId === targetId));
+            if (!linked) {
+              const { sourceHandle, targetHandle } = pickHandles(src.position, targetPos);
+              addConnection(connectAdd.nodeId, targetId, sourceHandle, targetHandle);
+            }
+          }}
+        />
       )}
 
       {labelDialogFor && (() => {

@@ -732,6 +732,7 @@
     "removeSystem": "Удалить систему",
     "connectTo": "Соединить с системой…",
     "connectToHint": "Щёлкните систему, с которой соединить {{system}} — Esc для отмены",
+    "addConnected": "Добавить связанную систему...",
     "connectToDone": "{{from}} соединена с {{to}}",
     "removeSystems": "Удалить {{count}} систем",
     "addSystem": "Добавить систему",

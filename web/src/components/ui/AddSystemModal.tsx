@@ -22,9 +22,12 @@ interface Props {
   onClose: () => void;
   /** When provided, called instead of the store's addSystem (e.g. demo mode). */
   onSubmit?: (name: string, systemClass: SystemClass, position: { x: number; y: number }, opts: SystemOpts) => void;
+  /** Overrides the heading. The dialog is also used to add-and-connect, where
+   *  "Add System" alone understates what picking a result will do. */
+  title?: string;
 }
 
-export function AddSystemModal({ position, onClose, onSubmit }: Props) {
+export function AddSystemModal({ position, onClose, onSubmit, title }: Props) {
   const { t } = useTranslation();
   const storeAddSystem = useMapStore((s) => s.addSystem);
   const map            = useMapStore((s) => s.map);
@@ -220,7 +223,7 @@ export function AddSystemModal({ position, onClose, onSubmit }: Props) {
     <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="modal" role="dialog" aria-modal="true">
         <div className="modal__header">
-          <h2 className="modal__title">{t('addSystem.title')}</h2>
+          <h2 className="modal__title">{title ?? t('addSystem.title')}</h2>
           <button className="icon-btn" onClick={onClose}>✕</button>
         </div>
 
