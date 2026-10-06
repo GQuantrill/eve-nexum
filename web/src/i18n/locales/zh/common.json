@@ -1525,6 +1525,7 @@
     "panelBelow": "地图下方",
     "panelBeside": "地图旁",
     "panelLayout": "面板布局",
+    "panelLayoutTooltip": "系统面板的位置：位于地图下方，或作为右侧的竖向栏位于旁边。",
     "patchNotesEmpty": "暂无更新日志。",
     "patchNotesFailed": "无法加载更新日志。",
     "patchNotesNoNotes": "此版本没有说明。",
@@ -1641,7 +1642,8 @@
     "version": "版本",
     "wandererImported": "已从 Wanderer 导入：{{systems}} 个星系，{{connections}} 条连接（跳过 {{skipped}} 个）。",
     "working": "处理中…",
-    "panelColumns": "面板列数"
+    "panelColumns": "面板列数",
+    "panelColumnsTooltip": "将面板中的各个窗格拆分为并排的栏，使笔记或击杀板显示在信号旁边而非下方。"
   },
   "mass": {
     "billionKg": "{{value}} 十亿 kg",

@@ -1299,6 +1299,7 @@ export function MapSidebar() {
               className={`toolbar__toggle${panelSideBySide ? " toolbar__toggle--on" : ""}`}
               onClick={() => setPanelSideBySide(!panelSideBySide)}
               aria-pressed={panelSideBySide}
+              data-tooltip={t("mapSidebar.panelLayoutTooltip")}
             >
               {panelSideBySide ? t("mapSidebar.panelBeside") : t("mapSidebar.panelBelow")}
             </button>
@@ -1311,7 +1312,10 @@ export function MapSidebar() {
           {!panelSideBySide && (
             <div className="map-sidebar__row">
               <label className="map-sidebar__label">{t("mapSidebar.panelColumns")}</label>
-              <div className="map-sidebar__btn-group">
+              <div
+                className="map-sidebar__btn-group map-sidebar__btn-group--inline"
+                data-tooltip={t("mapSidebar.panelColumnsTooltip")}
+              >
                 {[1, 2, 3].map((n) => (
                   <button
                     key={n}

@@ -1539,6 +1539,7 @@
     "panelBelow": "Под картой",
     "panelBeside": "Рядом с картой",
     "panelLayout": "Расположение панели",
+    "panelLayoutTooltip": "Где располагается панель системы: под картой или сбоку, высокой колонкой справа.",
     "patchNotesEmpty": "Пока нет списка изменений.",
     "patchNotesFailed": "Не удалось загрузить список изменений.",
     "patchNotesNoNotes": "Нет заметок для этой версии.",
@@ -1657,7 +1658,8 @@
     "version": "Версия",
     "wandererImported": "Импортировано из Wanderer: {{systems}} систем, {{connections}} соединений ({{skipped}} пропущено).",
     "working": "Обработка…",
-    "panelColumns": "Столбцы панелей"
+    "panelColumns": "Столбцы панелей",
+    "panelColumnsTooltip": "Разделяет панели на колонки, чтобы заметки или killboard располагались рядом с сигнатурами, а не под ними."
   },
   "mass": {
     "billionKg": "{{value}} млрд кг",
