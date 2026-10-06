@@ -43,7 +43,8 @@
   "activity": {
     "thisHour": "今時間",
     "allHidden": "すべてのグラフが非表示です。マップオプション → アクティビティ でオンにしてください。",
-    "loading": "アクティビティを読み込み中…"
+    "loading": "アクティビティを読み込み中…",
+    "peak": "ピーク {{value}}"
   },
   "addSystem": {
     "title": "星系を追加",
@@ -1367,6 +1368,8 @@
   },
   "mapSidebar": {
     "activityHint": "次のグラフを表示:",
+    "activityCombined": "1つのグラフにまとめる",
+    "activityCombinedHint": "すべての指標を共通の軸に表示し、各系列を24時間のピークで正規化します。正確な値はホバーで表示されます。",
     "activityJumps": "ジャンプ",
     "activityNpcDelta": "NPC 差分",
     "activityNpcKills": "NPC キル",

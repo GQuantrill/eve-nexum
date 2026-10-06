@@ -43,7 +43,8 @@
   "activity": {
     "thisHour": "this hour",
     "allHidden": "All charts hidden. Toggle them on in Map Options → Activity.",
-    "loading": "Loading activity…"
+    "loading": "Loading activity…",
+    "peak": "peak {{value}}"
   },
   "addSystem": {
     "title": "Add System",
@@ -1367,6 +1368,8 @@
   },
   "mapSidebar": {
     "activityHint": "Show graphs for the following:",
+    "activityCombined": "Combine into one graph",
+    "activityCombinedHint": "One set of axes for all metrics, each scaled to its own 24h peak. Exact values appear on hover.",
     "activityJumps": "Jumps",
     "activityNpcDelta": "NPC Delta",
     "activityNpcKills": "NPC Kills",

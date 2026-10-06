@@ -1703,6 +1703,14 @@ export function MapSidebar() {
           <div className="map-sidebar__hint">
             {t("mapSidebar.activityHint")}
           </div>
+          <SettingToggle
+            settingKey="nexum.activity.combined"
+            label={t("mapSidebar.activityCombined")}
+            defaultOn={false}
+          />
+          <div className="map-sidebar__hint">
+            {t("mapSidebar.activityCombinedHint")}
+          </div>
           <SettingToggle settingKey="nexum.activity.showJumps" label={t("mapSidebar.activityJumps")} />
           <SettingToggle
             settingKey="nexum.activity.showShipKills"

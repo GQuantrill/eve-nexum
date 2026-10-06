@@ -43,7 +43,8 @@
   "activity": {
     "thisHour": "本小时",
     "allHidden": "所有图表已隐藏。在地图选项 → 活动中开启它们。",
-    "loading": "正在加载活动…"
+    "loading": "正在加载活动…",
+    "peak": "峰值 {{value}}"
   },
   "addSystem": {
     "title": "添加星系",
@@ -1367,6 +1368,8 @@
   },
   "mapSidebar": {
     "activityHint": "显示以下图表：",
+    "activityCombined": "合并为单个图表",
+    "activityCombinedHint": "所有指标共用一组坐标轴，各系列按各自的 24 小时峰值缩放。悬停可查看精确数值。",
     "activityJumps": "跳跃",
     "activityNpcDelta": "NPC 增量",
     "activityNpcKills": "NPC 击杀",
