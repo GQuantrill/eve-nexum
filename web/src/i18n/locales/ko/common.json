@@ -43,7 +43,8 @@
   "activity": {
     "thisHour": "이번 시간",
     "allHidden": "모든 그래프가 숨겨져 있습니다. 지도 옵션 → 활동에서 켜세요.",
-    "loading": "활동을 불러오는 중…"
+    "loading": "활동을 불러오는 중…",
+    "peak": "최고 {{value}}"
   },
   "addSystem": {
     "title": "성계 추가",
@@ -1366,6 +1367,8 @@
   },
   "mapSidebar": {
     "activityHint": "다음 그래프 표시:",
+    "activityCombined": "하나의 그래프로 통합",
+    "activityCombinedHint": "모든 지표를 공통 축에 표시하며, 각 계열은 24시간 최고값 기준으로 정규화됩니다. 정확한 값은 마우스를 올리면 표시됩니다.",
     "activityJumps": "점프",
     "activityNpcDelta": "NPC 변화량",
     "activityNpcKills": "NPC 킬",

@@ -769,6 +769,7 @@ const SETTINGS_ALLOWLIST = new Set<string>([
   'nexum.activity.showNpcKills',
   'nexum.activity.showNpcDelta',
   'nexum.activity.order',
+  'nexum.activity.combined',
   'nexum.closestSystems.hiddenHome',
   'nexum.closestSystems.list',
   'nexum.killboardIncludeNpc',

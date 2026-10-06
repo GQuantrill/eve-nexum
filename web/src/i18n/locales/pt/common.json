@@ -43,7 +43,8 @@
   "activity": {
     "thisHour": "esta hora",
     "allHidden": "Todos os gráficos ocultos. Ativa-os em Opções de mapa → Atividade.",
-    "loading": "A carregar atividade…"
+    "loading": "A carregar atividade…",
+    "peak": "pico {{value}}"
   },
   "addSystem": {
     "title": "Adicionar sistema",
@@ -1366,6 +1367,8 @@
   },
   "mapSidebar": {
     "activityHint": "Mostrar gráficos do seguinte:",
+    "activityCombined": "Combinar num só gráfico",
+    "activityCombinedHint": "Um só conjunto de eixos para todas as métricas, cada uma escalada ao seu próprio pico de 24 h. Os valores exatos aparecem ao passar o cursor.",
     "activityJumps": "Saltos",
     "activityNpcDelta": "Delta de PNJ",
     "activityNpcKills": "PNJ destruídos",

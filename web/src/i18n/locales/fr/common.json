@@ -43,7 +43,8 @@
   "activity": {
     "thisHour": "cette heure",
     "allHidden": "Tous les graphiques sont masqués. Activez-les dans Options de carte → Activité.",
-    "loading": "Chargement de l'activité…"
+    "loading": "Chargement de l'activité…",
+    "peak": "pic {{value}}"
   },
   "addSystem": {
     "title": "Ajouter un système",
@@ -1366,6 +1367,8 @@
   },
   "mapSidebar": {
     "activityHint": "Afficher les graphiques pour :",
+    "activityCombined": "Combiner en un seul graphique",
+    "activityCombinedHint": "Des axes communs pour toutes les métriques, chacune mise à l'échelle de son propre pic sur 24 h. Les valeurs exactes s'affichent au survol.",
     "activityJumps": "Sauts",
     "activityNpcDelta": "Delta PNJ",
     "activityNpcKills": "PNJ détruits",

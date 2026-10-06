@@ -43,7 +43,8 @@
   "activity": {
     "thisHour": "diese Stunde",
     "allHidden": "Alle Diagramme ausgeblendet. Aktiviere sie unter Kartenoptionen → Aktivität.",
-    "loading": "Aktivität wird geladen…"
+    "loading": "Aktivität wird geladen…",
+    "peak": "Max. {{value}}"
   },
   "addSystem": {
     "title": "System hinzufügen",
@@ -1366,6 +1367,8 @@
   },
   "mapSidebar": {
     "activityHint": "Graphen für Folgendes anzeigen:",
+    "activityCombined": "Zu einem Graphen zusammenfassen",
+    "activityCombinedHint": "Ein Achsensystem für alle Metriken, jede auf ihr eigenes 24-h-Maximum skaliert. Genaue Werte beim Daraufzeigen.",
     "activityJumps": "Sprünge",
     "activityNpcDelta": "NPC-Delta",
     "activityNpcKills": "NPC-Abschüsse",
