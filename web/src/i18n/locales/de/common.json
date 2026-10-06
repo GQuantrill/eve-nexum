@@ -1525,6 +1525,7 @@
     "panelBelow": "Unter Karte",
     "panelBeside": "Neben Karte",
     "panelLayout": "Panel-Layout",
+    "panelLayoutTooltip": "Wo das Systempanel sitzt: unter der Karte oder daneben als hohe Spalte rechts.",
     "patchNotesEmpty": "Noch keine Patchnotes.",
     "patchNotesFailed": "Patchnotes konnten nicht geladen werden.",
     "patchNotesNoNotes": "Keine Notizen für diese Version.",
@@ -1641,7 +1642,8 @@
     "version": "Version",
     "wandererImported": "Aus Wanderer importiert: {{systems}} Systeme, {{connections}} Verbindungen ({{skipped}} übersprungen).",
     "working": "Arbeitet…",
-    "panelColumns": "Panel-Spalten"
+    "panelColumns": "Panel-Spalten",
+    "panelColumnsTooltip": "Teilt die Bereiche des Panels in nebeneinanderliegende Spalten, sodass Notizen oder das Killboard neben den Signaturen statt darunter stehen."
   },
   "mass": {
     "billionKg": "{{value}} Mrd. kg",

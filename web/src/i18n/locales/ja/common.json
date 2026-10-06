@@ -1525,6 +1525,7 @@
     "panelBelow": "マップの下",
     "panelBeside": "マップの横",
     "panelLayout": "パネルの配置",
+    "panelLayoutTooltip": "システムパネルの位置: マップの下、または右側の縦長の列として横に配置します。",
     "patchNotesEmpty": "まだパッチノートがありません。",
     "patchNotesFailed": "パッチノートを読み込めませんでした。",
     "patchNotesNoNotes": "このバージョンのノートはありません。",
@@ -1641,7 +1642,8 @@
     "version": "バージョン",
     "wandererImported": "Wanderer からインポート：{{systems}} システム、{{connections}} 接続（{{skipped}} 件スキップ）。",
     "working": "処理中…",
-    "panelColumns": "パネルの列数"
+    "panelColumns": "パネルの列数",
+    "panelColumnsTooltip": "パネル内のペインを横並びの列に分割し、メモやキルボードをシグネチャの下ではなく横に表示します。"
   },
   "mass": {
     "billionKg": "{{value}}十億 kg",

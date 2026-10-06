@@ -2666,3 +2666,11 @@ select.sig-toolbar-btn option {
   color: var(--cv-conn-1h);
   font-size: calc(12px * var(--font-scale, 1));
 }
+
+/* Digit-sized options (the 1/2/3 column picker) belong on one line: the shared
+   group stacks vertically, which is right for word-length choices but turns
+   three single characters into three rows of a sidebar that is already short of
+   height. */
+.map-sidebar__btn-group--inline {
+  flex-direction: row;
+}

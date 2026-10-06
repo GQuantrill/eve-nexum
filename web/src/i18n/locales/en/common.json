@@ -1525,6 +1525,7 @@
     "panelBelow": "Below map",
     "panelBeside": "Beside map",
     "panelLayout": "Panel layout",
+    "panelLayoutTooltip": "Where the system panel sits: beneath the map, or beside it as a tall column on the right.",
     "patchNotesEmpty": "No patch notes yet.",
     "patchNotesFailed": "Couldn't load patch notes.",
     "patchNotesNoNotes": "No notes for this release.",
@@ -1641,7 +1642,8 @@
     "version": "Version",
     "wandererImported": "Imported from Wanderer: {{systems}} systems, {{connections}} connections ({{skipped}} skipped).",
     "working": "Working…",
-    "panelColumns": "Panel columns"
+    "panelColumns": "Panel columns",
+    "panelColumnsTooltip": "Splits the panel's panes into side-by-side columns, so notes or the killboard can sit beside signatures instead of below them."
   },
   "mass": {
     "billionKg": "{{value}} B kg",

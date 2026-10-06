@@ -1525,6 +1525,7 @@
     "panelBelow": "Sous la carte",
     "panelBeside": "À côté de la carte",
     "panelLayout": "Disposition du panneau",
+    "panelLayoutTooltip": "Où se place le panneau de système : sous la carte, ou à côté sous forme de colonne à droite.",
     "patchNotesEmpty": "Aucune note de version pour l'instant.",
     "patchNotesFailed": "Impossible de charger les notes de version.",
     "patchNotesNoNotes": "Aucune note pour cette version.",
@@ -1641,7 +1642,8 @@
     "version": "Version",
     "wandererImported": "Importé depuis Wanderer : {{systems}} systèmes, {{connections}} connexions ({{skipped}} ignorés).",
     "working": "En cours…",
-    "panelColumns": "Colonnes de panneaux"
+    "panelColumns": "Colonnes de panneaux",
+    "panelColumnsTooltip": "Répartit les volets du panneau en colonnes côte à côte, pour que les notes ou le killboard soient à côté des signatures plutôt qu'en dessous."
   },
   "mass": {
     "billionKg": "{{value}} Md kg",

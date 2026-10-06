@@ -1525,6 +1525,7 @@
     "panelBelow": "지도 아래",
     "panelBeside": "지도 옆",
     "panelLayout": "패널 배치",
+    "panelLayoutTooltip": "시스템 패널의 위치: 지도 아래 또는 오른쪽에 세로 열로 배치합니다.",
     "patchNotesEmpty": "아직 패치 노트가 없습니다.",
     "patchNotesFailed": "패치 노트를 불러오지 못했습니다.",
     "patchNotesNoNotes": "이 버전에 대한 노트가 없습니다.",
@@ -1641,7 +1642,8 @@
     "version": "버전",
     "wandererImported": "Wanderer에서 가져옴: 성계 {{systems}}개, 연결 {{connections}}개 ({{skipped}}개 건너뜀).",
     "working": "처리 중…",
-    "panelColumns": "패널 열 수"
+    "panelColumns": "패널 열 수",
+    "panelColumnsTooltip": "패널의 창을 나란한 열로 나누어, 메모나 killboard가 시그니처 아래가 아니라 옆에 표시되도록 합니다."
   },
   "mass": {
     "billionKg": "{{value}}십억 kg",

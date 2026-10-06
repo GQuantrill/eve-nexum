@@ -1525,6 +1525,7 @@
     "panelBelow": "Abaixo do mapa",
     "panelBeside": "Ao lado do mapa",
     "panelLayout": "Esquema do painel",
+    "panelLayoutTooltip": "Onde fica o painel de sistema: por baixo do mapa ou ao lado, como uma coluna alta à direita.",
     "patchNotesEmpty": "Ainda não há notas de versão.",
     "patchNotesFailed": "Não foi possível carregar as notas de versão.",
     "patchNotesNoNotes": "Sem notas para esta versão.",
@@ -1641,7 +1642,8 @@
     "version": "Versão",
     "wandererImported": "Importado do Wanderer: {{systems}} sistemas, {{connections}} ligações ({{skipped}} ignorados).",
     "working": "A processar…",
-    "panelColumns": "Colunas de painéis"
+    "panelColumns": "Colunas de painéis",
+    "panelColumnsTooltip": "Divide os painéis em colunas lado a lado, para que as notas ou o killboard fiquem junto às assinaturas em vez de por baixo."
   },
   "mass": {
     "billionKg": "{{value}} mil M kg",
