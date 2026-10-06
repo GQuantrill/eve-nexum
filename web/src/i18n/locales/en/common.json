@@ -732,6 +732,7 @@
     "removeSystem": "Remove System",
     "connectTo": "Connect to system…",
     "connectToHint": "Click the system to connect {{system}} to — Esc to cancel",
+    "addConnected": "Add connected system...",
     "connectToDone": "Connected {{from}} to {{to}}",
     "removeSystems": "Remove {{count}} Systems",
     "removeOrphans": "Remove Orphan Systems ({{count}})",

@@ -724,6 +724,7 @@
     "removeSystem": "Retirer le système",
     "connectTo": "Connecter à un système…",
     "connectToHint": "Cliquez sur le système auquel connecter {{system}} — Échap pour annuler",
+    "addConnected": "Ajouter un systeme connecte...",
     "connectToDone": "{{from}} connecté à {{to}}",
     "removeSystems": "Retirer {{count}} systèmes",
     "addSystem": "Ajouter un système",

@@ -724,6 +724,7 @@
     "removeSystem": "System entfernen",
     "connectTo": "Mit System verbinden …",
     "connectToHint": "Klicke das System an, mit dem {{system}} verbunden werden soll — Esc bricht ab",
+    "addConnected": "Verbundenes System hinzufuegen ...",
     "connectToDone": "{{from}} mit {{to}} verbunden",
     "removeSystems": "{{count}} Systeme entfernen",
     "addSystem": "System hinzufügen",
