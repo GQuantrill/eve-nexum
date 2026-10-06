@@ -751,7 +751,45 @@
   padding: var(--sp-16) var(--sp-12);
   gap: var(--sp-8);
   overflow-y: auto;
+  /* This list is taller than the panel it sits in -- the sidebar is bounded by
+     the MAP's height (see .layout__map), so with the docked panel open there can
+     be several hundred pixels of settings below the fold. It scrolled fine, but
+     nothing SAID so: the last row cut off at the panel edge and read as "the
+     rest is hidden underneath the panel".
+
+     The cue is a shadow at whichever edge has more content past it, not a
+     scrollbar. A scrollbar cannot be relied on here: macOS overlay scrollbars
+     take no layout width and stay hidden until you scroll, which is the state
+     that caused the confusion, and whether they show at all is the viewer's OS
+     setting rather than ours. The gradients below need no JS and no scroll
+     listener -- the `local` layers scroll with the content and uncover the
+     `scroll` shadow layers only while there is something to scroll to, so the
+     shadow disappears at each end on its own.
+
+     The scrollbar styling is kept as well, for viewers whose system does show
+     classic bars. It just isn't the thing being depended on. */
+  background-color: var(--surface-well);
+  background-image:
+    linear-gradient(var(--surface-well) 30%, rgba(0, 0, 0, 0)),
+    linear-gradient(rgba(0, 0, 0, 0), var(--surface-well) 70%),
+    radial-gradient(farthest-side at 50% 0,    rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0)),
+    radial-gradient(farthest-side at 50% 100%, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0));
+  background-position: 0 0, 0 100%, 0 0, 0 100%;
+  background-size: 100% 24px, 100% 24px, 100% 10px, 100% 10px;
+  background-repeat: no-repeat;
+  background-attachment: local, local, scroll, scroll;
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-muted) transparent;
 }
+.map-sidebar__content::-webkit-scrollbar { width: 10px; }
+.map-sidebar__content::-webkit-scrollbar-track { background: transparent; }
+.map-sidebar__content::-webkit-scrollbar-thumb {
+  background: var(--surface-muted);
+  border-radius: 5px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+.map-sidebar__content::-webkit-scrollbar-thumb:hover { background: #3d5f86; }
 
 .map-sidebar__section-title {
   font-size: calc(13px * var(--font-scale, 1));
