@@ -1628,7 +1628,8 @@
     "updateShareFailed": "공유 옵션 업데이트 실패",
     "version": "버전",
     "wandererImported": "Wanderer에서 가져옴: 성계 {{systems}}개, 연결 {{connections}}개 ({{skipped}}개 건너뜀).",
-    "working": "처리 중…"
+    "working": "처리 중…",
+    "panelColumns": "패널 열 수"
   },
   "mass": {
     "billionKg": "{{value}}십억 kg",
@@ -1935,7 +1936,9 @@
     "standingValue": "{{label}}: {{value}}",
     "panesTitle": "패널",
     "panesHint": "아래에 표시할 패널을 선택하세요. 숨긴 패널도 위치를 유지하므로 다시 켜면 원래 자리로 돌아옵니다.",
-    "openAnoikis": "anoik.is에서 열기"
+    "openAnoikis": "anoik.is에서 열기",
+    "moveLeft": "이전 열로 이동",
+    "moveRight": "다음 열로 이동"
   },
   "time": {
     "justNow": "방금",

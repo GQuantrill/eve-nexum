@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { ArrowSquareOutIcon } from '../../icons';
+import { ArrowSquareOutIcon, CaretLeftIcon, CaretRightIcon } from '../../icons';
 import { useUserSetting } from '../../hooks/useUserSetting';
 
 interface Props {
@@ -12,6 +12,11 @@ interface Props {
   /** When provided, an "undock" button pops this card out into a floating
    *  window. Only the bottom dock passes it; the sidebar cards omit it. */
   onUndock?: () => void;
+  /** Move this card to the neighbouring column. Optional because the Sidebar
+   *  shares this component and has no columns; absent means no arrows. */
+  onMoveColumn?: (dir: -1 | 1) => void;
+  canMoveLeft?: boolean;
+  canMoveRight?: boolean;
   /** Keep the body MOUNTED (just hidden) while collapsed.
    *
    *  Collapsing normally unmounts the body, which is what stops a collapsed
@@ -28,7 +33,9 @@ interface Props {
 
 function storageKey(id: string) { return `nexum.panel.collapsed.${id}`; }
 
-export function DraggableCard({ id, title, children, onUndock, keepMounted = false }: Props) {
+export function DraggableCard({
+  id, title, children, onUndock, onMoveColumn, canMoveLeft, canMoveRight, keepMounted = false,
+}: Props) {
   const { t } = useTranslation();
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
 
@@ -56,6 +63,32 @@ export function DraggableCard({ id, title, children, onUndock, keepMounted = fal
           <span className={`info-card__chevron${collapsed ? ' info-card__chevron--collapsed' : ''}`}>▾</span>
         </button>
         <span className="info-card__title">{title}</span>
+        {/* Move between columns. stopPropagation because the header itself
+            toggles collapse, and nudging a card sideways should not fold it. */}
+        {onMoveColumn && (
+          <>
+            <button
+              type="button"
+              className="info-card__col-btn"
+              disabled={!canMoveLeft}
+              onClick={(e) => { e.stopPropagation(); onMoveColumn(-1); }}
+              title={t('systemPanel.moveLeft')}
+              aria-label={t('systemPanel.moveLeft')}
+            >
+              <CaretLeftIcon size={12} weight="bold" />
+            </button>
+            <button
+              type="button"
+              className="info-card__col-btn"
+              disabled={!canMoveRight}
+              onClick={(e) => { e.stopPropagation(); onMoveColumn(1); }}
+              title={t('systemPanel.moveRight')}
+              aria-label={t('systemPanel.moveRight')}
+            >
+              <CaretRightIcon size={12} weight="bold" />
+            </button>
+          </>
+        )}
         {onUndock && (
           <button
             type="button"

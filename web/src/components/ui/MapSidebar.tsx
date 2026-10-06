@@ -841,6 +841,9 @@ export function MapSidebar() {
     "nexum.mapSidebar.openSection",
     "mapControls",
   );
+  // Parallel columns in the system panel's pane stack. Read here and in
+  // SystemPanel from the same key.
+  const [panelColumns, setPanelColumns] = useUserSetting<number>('nexum.systemPanel.columns', 1);
   const sectionProps = (id: SectionId) => ({
     isOpen: openSection === id,
     onToggle: () => setOpenSection((cur) => (cur === id ? null : id)),
@@ -1298,6 +1301,28 @@ export function MapSidebar() {
               {panelSideBySide ? t("mapSidebar.panelBeside") : t("mapSidebar.panelBelow")}
             </button>
           </div>
+
+          {/* Split the pane stack into parallel columns, so notes or killboard
+              can sit BESIDE signatures rather than below them. Only offered in
+              the below-the-map layout: the beside layout is a narrow strip and
+              splitting it would leave both halves unreadable. */}
+          {!panelSideBySide && (
+            <div className="map-sidebar__row">
+              <label className="map-sidebar__label">{t("mapSidebar.panelColumns")}</label>
+              <div className="map-sidebar__btn-group">
+                {[1, 2, 3].map((n) => (
+                  <button
+                    key={n}
+                    className={`toolbar__toggle${panelColumns === n ? " toolbar__toggle--on" : ""}`}
+                    onClick={() => setPanelColumns(n)}
+                    aria-pressed={panelColumns === n}
+                  >
+                    {n}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="map-sidebar__row">
             <label className="map-sidebar__label">{t("mapSidebar.compact")}</label>

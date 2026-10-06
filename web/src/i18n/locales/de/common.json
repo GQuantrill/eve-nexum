@@ -1628,7 +1628,8 @@
     "updateShareFailed": "Freigabeoptionen konnten nicht aktualisiert werden",
     "version": "Version",
     "wandererImported": "Aus Wanderer importiert: {{systems}} Systeme, {{connections}} Verbindungen ({{skipped}} übersprungen).",
-    "working": "Arbeitet…"
+    "working": "Arbeitet…",
+    "panelColumns": "Panel-Spalten"
   },
   "mass": {
     "billionKg": "{{value}} Mrd. kg",
@@ -1935,7 +1936,9 @@
     "standingValue": "{{label}}: {{value}}",
     "panesTitle": "Bereiche",
     "panesHint": "Wähle, welche Bereiche unten erscheinen. Ausgeblendete behalten ihren Platz und kehren beim Wiedereinschalten dorthin zurück.",
-    "openAnoikis": "In anoik.is öffnen"
+    "openAnoikis": "In anoik.is öffnen",
+    "moveLeft": "In die vorherige Spalte verschieben",
+    "moveRight": "In die nächste Spalte verschieben"
   },
   "time": {
     "justNow": "gerade eben",

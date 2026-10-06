@@ -1628,7 +1628,8 @@
     "updateShareFailed": "Falha ao atualizar as opções de partilha",
     "version": "Versão",
     "wandererImported": "Importado do Wanderer: {{systems}} sistemas, {{connections}} ligações ({{skipped}} ignorados).",
-    "working": "A processar…"
+    "working": "A processar…",
+    "panelColumns": "Colunas de painéis"
   },
   "mass": {
     "billionKg": "{{value}} mil M kg",
@@ -1935,7 +1936,9 @@
     "standingValue": "{{label}}: {{value}}",
     "panesTitle": "Painéis",
     "panesHint": "Escolha que painéis aparecem abaixo. Os ocultos mantêm o seu lugar e regressam a ele quando os reativar.",
-    "openAnoikis": "Abrir no anoik.is"
+    "openAnoikis": "Abrir no anoik.is",
+    "moveLeft": "Mover para a coluna anterior",
+    "moveRight": "Mover para a coluna seguinte"
   },
   "time": {
     "justNow": "agora mesmo",

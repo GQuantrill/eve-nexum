@@ -1644,7 +1644,8 @@
     "updateShareFailed": "Не удалось обновить параметры доступа",
     "version": "Версия",
     "wandererImported": "Импортировано из Wanderer: {{systems}} систем, {{connections}} соединений ({{skipped}} пропущено).",
-    "working": "Обработка…"
+    "working": "Обработка…",
+    "panelColumns": "Столбцы панелей"
   },
   "mass": {
     "billionKg": "{{value}} млрд кг",
@@ -1965,7 +1966,9 @@
     "standingValue": "{{label}}: {{value}}",
     "panesTitle": "Панели",
     "panesHint": "Выберите, какие панели показывать ниже. Скрытые сохраняют своё место и возвращаются на него при включении.",
-    "openAnoikis": "Открыть в anoik.is"
+    "openAnoikis": "Открыть в anoik.is",
+    "moveLeft": "Переместить в предыдущий столбец",
+    "moveRight": "Переместить в следующий столбец"
   },
   "time": {
     "justNow": "только что",

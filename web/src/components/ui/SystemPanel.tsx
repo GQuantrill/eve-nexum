@@ -7,7 +7,7 @@ import { useSystemInfo } from '../../hooks/useSystemInfo';
 import { setDestination, addWaypoint } from '../../api/waypoint';
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import type { DragEndEvent } from '@dnd-kit/core';
-import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { useMapStore } from '../../store/mapStore';
 import { CLASS_COLORS, CLASS_LABELS, EFFECT_LABELS, EFFECT_MODIFIERS } from '../../data/wormholes';
 import { useWormholeTypes } from '../../hooks/useWormholeTypes';
@@ -15,6 +15,10 @@ import { whDestClass } from '../../utils/whDest';
 import { DraggableCard } from './DraggableCard';
 import { FloatingPanel, type PanelGeometry } from './FloatingPanel';
 import { useUserSetting } from '../../hooks/useUserSetting';
+import {
+  clampColumnCount, bucketIntoColumns, movePane, reorderWithinColumn, columnOf,
+  type ColumnMap,
+} from '../../utils/panelColumns';
 import { SquaresFourIcon, XIcon } from '../../icons';
 import { PanelVisibilityModal } from './PanelVisibilityModal';
 import { SignaturePane } from './SignaturePane';
@@ -169,7 +173,11 @@ function clampSide(v: number) {
 // it narrower down to a still-readable minimum, and the panel-stack fills the
 // space freed up (or the whole panel when the column is fully collapsed).
 const MIN_W      = 280;
-const MAX_W      = 400;
+// Raised from 400 (the old fixed width, which had become the ceiling, so the
+// column could only ever be dragged NARROWER). Widening takes space from the
+// pane stack, so it pulls against the column feature rather than with it --
+// that is the user's trade to make.
+const MAX_W      = 640;
 const DEFAULT_W  = 400;
 
 function clampWidth(v: number) {
@@ -217,6 +225,12 @@ export function SystemPanel() {
       const list = Array.isArray(prev) ? prev : [];
       return list.includes(id) ? list.filter((x) => x !== id) : [...list, id];
     });
+  // How many parallel columns the stack is split into, and which column each
+  // pane sits in. Default 1 and {} -- the layout that shipped, so nothing moves
+  // for anyone who does not turn this on. The count is SET in Map Options; this
+  // only reads it.
+  const [colCountRaw] = useUserSetting<number>('nexum.systemPanel.columns', 1);
+  const [paneColumns, setPaneColumns] = useUserSetting<ColumnMap>('nexum.panelColumns', {});
   const [panesOpen, setPanesOpen] = useState(false);
   const updateSystem     = useMapStore((s) => s.updateSystem);
   const selectSystem     = useMapStore((s) => s.selectSystem);
@@ -249,6 +263,10 @@ export function SystemPanel() {
   // row beneath it. Only the docked panel moves — the workspace sidebar keeps
   // its own left/right setting, and floating panes are unaffected.
   const sideBySide = useMapStore((st) => st.panelSideBySide);
+  // Side-by-side is a narrow right-hand strip (460px by default, 320 floor), so
+  // splitting it would leave both halves unreadable. One column there, always.
+  const colCount = sideBySide ? 1 : clampColumnCount(colCountRaw);
+
   const requestFitView = useMapStore((st) => st.requestFitView);
   const [sideWidth, setSideWidth] = useState(() => {
     const v = localStorage.getItem(SIDE_KEY);
@@ -326,11 +344,14 @@ export function SystemPanel() {
       .catch(() => { setWaypointStatus('err'); setTimeout(() => setWaypointStatus('idle'), 2000); });
   };
 
-  const handleDragEnd = (event: DragEndEvent) => {
+  // Each column is its own sortable list, so a drag only ever reorders within
+  // one. The new sequence is written back into the slots that column already
+  // occupied in panelOrder, which leaves the other columns untouched.
+  const handleDragEnd = (columnIds: string[]) => (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
-    const next = arrayMove(panelOrder, panelOrder.indexOf(String(active.id)), panelOrder.indexOf(String(over.id)));
-    setPanelOrder(next);
+    const next = reorderWithinColumn(panelOrder, columnIds, String(active.id), String(over.id));
+    if (next !== panelOrder) setPanelOrder(next);
   };
 
   const onResizeMouseDown = (e: React.MouseEvent) => {
@@ -466,6 +487,11 @@ export function SystemPanel() {
   // would leave its floating window on screen with no way to reach it.
   const floatingIds = Object.keys(floatingPanels)
     .filter((id) => cards[id] && shareVisible(id) && !hiddenPanes.has(id));
+
+  const columnsOfIds = bucketIntoColumns(dockedIds, paneColumns, colCount);
+  const moveColumn = (id: string, dir: -1 | 1) => {
+    setPaneColumns((prev) => movePane(prev, id, columnOf(id, prev, colCount) + dir, colCount));
+  };
 
   return (
     <>
@@ -875,40 +901,57 @@ export function SystemPanel() {
         {/* Deliberately NOT in the system-info header: that block collapses, and a
           control people need in order to find their panels must not be able to
           disappear. This bar sits with the stack it configures. */}
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-          <SortableContext items={dockedIds} strategy={verticalListSortingStrategy}>
-            <div className="panel-stack">
-              {/* Deliberately NOT in the system-info header: that block
-                  collapses, and the control people need in order to find their
-                  panels must not be able to disappear with it. */}
-              <div className="system-panel__stack-bar">
-                <button
-                  type="button"
-                  className="icon-btn"
-                  onClick={() => setPanesOpen(true)}
-                  data-tooltip={t('systemPanel.panesTitle')}
-                  aria-label={t('systemPanel.panesTitle')}
-                >
-                  <SquaresFourIcon size={14} weight="bold" />
-                </button>
-              </div>
-              {dockedIds.map((id) => (
-                <DraggableCard
-                  key={id}
-                  id={id}
-                  title={panelTitle[id] ?? id}
-                  onUndock={() => undock(id)}
-                  // Signatures and anomalies split a single window-level paste
-                  // between them, so both must stay mounted to receive it even
-                  // when collapsed. See DraggableCard's keepMounted.
-                  keepMounted={id === 'signatures' || id === 'anomalies'}
-                >
-                  {cards[id]}
-                </DraggableCard>
-              ))}
+      <div className="panel-stack">
+        {/* Deliberately NOT in the system-info header: that block
+            collapses, and the control people need in order to find their
+            panels must not be able to disappear with it. */}
+        <div className="system-panel__stack-bar">
+          <button
+            type="button"
+            className="icon-btn"
+            onClick={() => setPanesOpen(true)}
+            data-tooltip={t('systemPanel.panesTitle')}
+            aria-label={t('systemPanel.panesTitle')}
+          >
+            <SquaresFourIcon size={14} weight="bold" />
+          </button>
+        </div>
+        {/* One scroller for the whole stack (.panel-stack, above). Giving each
+            column its own would re-create the nested-scroller trap documented
+            in panels.css: two of them meant the wheel did nothing at all while
+            the cursor sat over the wrong block. */}
+        <div className={`panel-stack__cols${colCount > 1 ? ' panel-stack__cols--multi' : ''}`}>
+          {columnsOfIds.map((ids, col) => (
+            <div className="panel-stack__col" key={col}>
+              {/* A DndContext per column: a drag stays inside the list it
+                  started in, which is what keeps the existing single-list
+                  sortable working untouched. Moving BETWEEN columns is the
+                  header arrows' job. */}
+              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd(ids)}>
+                <SortableContext items={ids} strategy={verticalListSortingStrategy}>
+                  {ids.map((id) => (
+                    <DraggableCard
+                      key={id}
+                      id={id}
+                      title={panelTitle[id] ?? id}
+                      onUndock={() => undock(id)}
+                      onMoveColumn={colCount > 1 ? (dir) => moveColumn(id, dir) : undefined}
+                      canMoveLeft={col > 0}
+                      canMoveRight={col < colCount - 1}
+                      // Signatures and anomalies split a single window-level paste
+                      // between them, so both must stay mounted to receive it even
+                      // when collapsed. See DraggableCard's keepMounted.
+                      keepMounted={id === 'signatures' || id === 'anomalies'}
+                    >
+                      {cards[id]}
+                    </DraggableCard>
+                  ))}
+                </SortableContext>
+              </DndContext>
             </div>
-          </SortableContext>
-  </DndContext>
+          ))}
+        </div>
+      </div>
       </div>
     </aside>
 
