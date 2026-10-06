@@ -121,14 +121,23 @@ export function RoutePlannerPane() {
   const { t } = useTranslation();
   const origin = useRouteOrigin();
 
-  // `null` means "follow my current location", so the origin tracks the pilot
-  // as they fly until they deliberately pick somewhere else. Derived rather
-  // than copied into state on a timer -- syncing it would fight the poll.
-  const [fromOverride, setFromOverride] = useState<Picked | null>(null);
+  // THREE states, not two, because "cleared" and "follow me" are different
+  // intents that used to share `null`:
+  //   undefined  follow my current location (the default, tracks as you fly)
+  //   null       deliberately emptied -- stay empty, waiting for a start system
+  //   Picked     a system chosen by hand
+  // Collapsing the first two meant the clear button set "follow me", which
+  // instantly refilled the field with the pilot's system: the field could not
+  // be emptied at all.
+  //
+  // Derived rather than copied into state on a timer -- syncing it would fight
+  // the location poll.
+  const [fromOverride, setFromOverride] = useState<Picked | null | undefined>(undefined);
   const [to, setTo] = useState<Picked | null>(null);
-  const from: Picked | null = fromOverride
-    ?? (origin.systemId != null ? { id: origin.systemId, name: origin.name ?? String(origin.systemId) } : null);
-  const followingPilot = fromOverride === null && origin.systemId != null;
+  const from: Picked | null = fromOverride !== undefined
+    ? fromOverride
+    : (origin.systemId != null ? { id: origin.systemId, name: origin.name ?? String(origin.systemId) } : null);
+  const followingPilot = fromOverride === undefined && origin.systemId != null;
 
   // Same source the other route panes read -- the store, not a settings key.
   const routeMode = useMapStore((s) => s.routeMode);
@@ -195,7 +204,7 @@ export function RoutePlannerPane() {
           <button
             type="button"
             className="icon-btn"
-            onClick={() => setFromOverride(null)}
+            onClick={() => setFromOverride(undefined)}
             title={t('routePlanner.useMyLocation')}
             aria-label={t('routePlanner.useMyLocation')}
           >
