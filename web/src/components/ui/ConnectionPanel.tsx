@@ -10,7 +10,7 @@ import { systemDisplayName } from '../../utils/systemName';
 import { useCharacterLocation } from '../../hooks/useCharacterLocation';
 import { WHTypeInfo } from './WHTypeInfo';
 import { Select } from './Select';
-import { whSizeForType } from '../../utils/wormholeSize';
+import { inferredSize } from '../../utils/wormholeSize';
 import { effectiveExpiryMs, lifeBucket, knownMaxLifeHours } from '../../utils/whLifetime';
 import { ConfirmModal } from './ConfirmModal';
 import { IconPickerDialog } from './IconPickerDialog';
@@ -221,16 +221,24 @@ export function ConnectionPanel() {
   const sizeSyncedFor = useRef<string | null>(null);
   useEffect(() => {
     if (!conn || conn.connectionType !== 'standard') return;
-    const code = conn.type?.toUpperCase();
-    if (!code) return;
-    const key = `${conn.id}:${code}`;
+    const code = conn.type?.toUpperCase() ?? null;
+    // Re-runs when an endpoint's class arrives, not just when the code changes:
+    // a K162 drawn before the far system resolved still gets capped.
+    const key = `${conn.id}:${code ?? ''}:${src?.systemClass ?? ''}:${tgt?.systemClass ?? ''}`;
     if (key === sizeSyncedFor.current) return;
-    const cls = whSizeForType(code, whTypes);
-    if (!cls) return; // types not loaded yet / unknown code — retry on load
+
+    const next = inferredSize({
+      code, whTypes, currentSize: conn.size,
+      classA: src?.systemClass, classB: tgt?.systemClass,
+    });
+    // Nothing to apply. Leave the key unset while the types are still loading so
+    // a known code still syncs once they arrive.
+    if (!next) { if (code && whTypes[code]) sizeSyncedFor.current = key; return; }
+
     sizeSyncedFor.current = key;
-    if (cls !== conn.size) updateConnection(conn.id, { size: cls });
+    if (next !== conn.size) updateConnection(conn.id, { size: next });
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [conn?.id, conn?.type, conn?.connectionType, whTypes]);
+  }, [conn?.id, conn?.type, conn?.connectionType, conn?.size, src?.systemClass, tgt?.systemClass, whTypes]);
 
   // Persist the roller config whenever the pilot tweaks it.
   useEffect(() => { saveRoller(roller); }, [roller]);

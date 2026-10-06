@@ -13,6 +13,43 @@
   min-height: 0;
 }
 
+/* Parallel columns inside the stack. The stack itself stays the single
+   scroller — per-column scrollers would re-create the nested-scroller trap
+   documented in panels.css, where two of them meant the wheel did nothing at
+   all while the cursor sat over the wrong block. The cost is honest: the
+   columns scroll together, and a short one leaves space below it. */
+.panel-stack__cols { display: flex; flex-direction: column; gap: 6px; }
+
+.panel-stack__cols--multi {
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+/* flex-basis 0 with no min-width: the columns share whatever width there is
+   rather than forcing the panel to scroll sideways. Picking three on a narrow
+   window makes them cramped, which is visible and reversible — a hard floor
+   would instead overflow the panel, which is neither. */
+.panel-stack__cols--multi > .panel-stack__col {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.panel-stack__col { display: flex; flex-direction: column; gap: 6px; }
+
+.info-card__col-btn {
+  display: inline-flex;
+  align-items: center;
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 0 1px;
+  line-height: 1;
+}
+.info-card__col-btn:hover:not(:disabled) { color: var(--accent-light); }
+.info-card__col-btn:disabled { opacity: 0.25; cursor: default; }
+
 .info-card {
   background: var(--surface-base);
   border: 1px solid var(--border);

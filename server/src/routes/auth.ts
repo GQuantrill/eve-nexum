@@ -850,6 +850,11 @@ const SETTINGS_ALLOWLIST = new Set<string>([
   'nexum.minimap.position',
   'nexum.mapSidebar.openSection',
   'nexum.panelSideBySide',
+  // How many parallel columns the pane stack is split into, and which column
+  // each pane sits in. A layout choice rather than a pixel size, so unlike
+  // panelHeight/panelInfoWidth these do belong across devices.
+  'nexum.systemPanel.columns',
+  'nexum.panelColumns',
   'nexum.floatingPanels',
   'nexum.floatingPanelsLast',
   'nexum.sigPane.hiddenCols',

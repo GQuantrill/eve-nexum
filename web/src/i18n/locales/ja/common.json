@@ -1628,7 +1628,8 @@
     "updateShareFailed": "共有オプションの更新に失敗しました",
     "version": "バージョン",
     "wandererImported": "Wanderer からインポート：{{systems}} システム、{{connections}} 接続（{{skipped}} 件スキップ）。",
-    "working": "処理中…"
+    "working": "処理中…",
+    "panelColumns": "パネルの列数"
   },
   "mass": {
     "billionKg": "{{value}}十億 kg",
@@ -1935,7 +1936,9 @@
     "standingValue": "{{label}}: {{value}}",
     "panesTitle": "パネル",
     "panesHint": "下に表示するパネルを選びます。非表示にしたものも位置は保持され、再表示すると元の場所に戻ります。",
-    "openAnoikis": "anoik.is で開く"
+    "openAnoikis": "anoik.is で開く",
+    "moveLeft": "前の列へ移動",
+    "moveRight": "次の列へ移動"
   },
   "time": {
     "justNow": "たった今",

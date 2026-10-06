@@ -1628,7 +1628,8 @@
     "updateShareFailed": "更新共享选项失败",
     "version": "版本",
     "wandererImported": "已从 Wanderer 导入：{{systems}} 个星系，{{connections}} 条连接（跳过 {{skipped}} 个）。",
-    "working": "处理中…"
+    "working": "处理中…",
+    "panelColumns": "面板列数"
   },
   "mass": {
     "billionKg": "{{value}} 十亿 kg",
@@ -1935,7 +1936,9 @@
     "standingValue": "{{label}}：{{value}}",
     "panesTitle": "面板",
     "panesHint": "选择下方显示的面板。隐藏的面板会保留位置，重新开启时回到原处。",
-    "openAnoikis": "在 anoik.is 中打开"
+    "openAnoikis": "在 anoik.is 中打开",
+    "moveLeft": "移到上一列",
+    "moveRight": "移到下一列"
   },
   "time": {
     "justNow": "刚刚",
