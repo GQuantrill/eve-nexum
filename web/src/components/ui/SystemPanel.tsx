@@ -921,7 +921,14 @@ export function SystemPanel() {
             in panels.css: two of them meant the wheel did nothing at all while
             the cursor sat over the wrong block. */}
         <div className={`panel-stack__cols${colCount > 1 ? ' panel-stack__cols--multi' : ''}`}>
-          {columnsOfIds.map((ids, col) => (
+          {/* An empty column is not rendered at all. Every column takes an equal
+              share of the width, so an empty one shows up as a block of dead
+              space -- a third of the panel, with three columns and panes in two.
+              Nothing is lost by hiding it: panes are moved with the header
+              arrows rather than dropped, so an empty column is not a drop target
+              and has no reason to occupy space. It reappears the moment a pane
+              is moved into it. */}
+          {columnsOfIds.map((ids, col) => (ids.length === 0 ? null : (
             <div className="panel-stack__col" key={col}>
               {/* A DndContext per column: a drag stays inside the list it
                   started in, which is what keeps the existing single-list
@@ -949,7 +956,7 @@ export function SystemPanel() {
                 </SortableContext>
               </DndContext>
             </div>
-          ))}
+          )))}
         </div>
       </div>
       </div>

@@ -52,7 +52,11 @@ describe('bucketing', () => {
     expect(cols.flat().sort()).toEqual([...ORDER].sort());   // nothing lost
   });
 
-  it('gives every column an entry even when empty, so it stays a drop target', () => {
+  it('still returns an entry for an empty column', () => {
+    // The bucketing keeps empty columns so the arrows know how many there are.
+    // The RENDER skips them: every column takes an equal share of the width, so
+    // an empty one would show as a block of dead space -- a third of the panel,
+    // with three columns and panes in two.
     expect(bucketIntoColumns(ORDER, {}, 3)).toEqual([ORDER, [], []]);
   });
 
