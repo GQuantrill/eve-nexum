@@ -749,7 +749,8 @@
     "clearTag": "タグを消去",
     "jumpRangeFrom": "ここからのジャンプ範囲",
     "jumpCyno": "サイノジャンプ",
-    "jumpRangeClear": "ジャンプ範囲をクリア"
+    "jumpRangeClear": "ジャンプ範囲をクリア",
+    "copyName": "システム名をコピー"
   },
   "customIntel": {
     "title": "カスタムインテル",
@@ -1938,7 +1939,10 @@
     "panesHint": "下に表示するパネルを選びます。非表示にしたものも位置は保持され、再表示すると元の場所に戻ります。",
     "openAnoikis": "anoik.is で開く",
     "moveLeft": "前の列へ移動",
-    "moveRight": "次の列へ移動"
+    "moveRight": "次の列へ移動",
+    "copyName": "システム名をコピー",
+    "nameCopied": "{{name}} をコピーしました",
+    "copyFailed": "コピーできませんでした — 選択して手動でコピーしてください。"
   },
   "time": {
     "justNow": "たった今",

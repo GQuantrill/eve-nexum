@@ -749,7 +749,8 @@
     "clearTag": "Tag entfernen",
     "jumpRangeFrom": "Sprungreichweite von hier",
     "jumpCyno": "Cyno-Sprung",
-    "jumpRangeClear": "Sprungreichweite löschen"
+    "jumpRangeClear": "Sprungreichweite löschen",
+    "copyName": "Systemnamen kopieren"
   },
   "customIntel": {
     "title": "Eigene Intel",
@@ -1938,7 +1939,10 @@
     "panesHint": "Wähle, welche Bereiche unten erscheinen. Ausgeblendete behalten ihren Platz und kehren beim Wiedereinschalten dorthin zurück.",
     "openAnoikis": "In anoik.is öffnen",
     "moveLeft": "In die vorherige Spalte verschieben",
-    "moveRight": "In die nächste Spalte verschieben"
+    "moveRight": "In die nächste Spalte verschieben",
+    "copyName": "Systemnamen kopieren",
+    "nameCopied": "{{name}} kopiert",
+    "copyFailed": "Kopieren fehlgeschlagen — bitte manuell markieren und kopieren."
   },
   "time": {
     "justNow": "gerade eben",
