@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { charPortrait } from '../../utils/eveImages';
 import { api } from '../../api/client';
 import i18n from '../../i18n';
 import { useMapStore, awaitSystemCreate } from '../../store/mapStore';
@@ -79,7 +80,12 @@ function startTickIfNeeded() {
   }, 1000);
 }
 
-function ElapsedCell({ iso, className }: { iso: string | undefined; className?: string }) {
+function ElapsedCell({ iso, className, byCharId, byName }: {
+  iso: string | undefined;
+  className?: string;
+  byCharId?: number | string | null;
+  byName?: string | null;
+}) {
   const { t } = useTranslation();
   const [, setTick] = useState(0);
   useEffect(() => {
@@ -97,7 +103,23 @@ function ElapsedCell({ iso, className }: { iso: string | undefined; className?: 
   const text = iso
     ? duration(t, Math.floor((tickNow - new Date(iso).getTime()) / 1000))
     : DASH;
-  return <td className={className}>{text}</td>;
+  return (
+    <td className={className}>
+      {/* Who scanned it, where the eye already is when reading the age.
+          Nothing is rendered when the row predates attribution or the scout's
+          account is gone -- a placeholder face would imply we know and don't. */}
+      {byCharId != null && (
+        <img
+          className="sig-td__scout"
+          src={charPortrait(byCharId, 32)}
+          alt=""
+          loading="lazy"
+          data-tooltip={byName ?? String(byCharId)}
+        />
+      )}
+      <span>{text}</span>
+    </td>
+  );
 }
 
 export function AnomalyPane({ systemId }: { systemId: string }) {
@@ -667,7 +689,14 @@ export function AnomalyPane({ systemId }: { systemId: string }) {
                     />
                   </td>
                 )}
-                {isColVisible('created') && <ElapsedCell iso={anom.createdAt} className="sig-td--time" />}
+                {isColVisible('created') && (
+                  <ElapsedCell
+                    iso={anom.createdAt}
+                    byCharId={anom.createdByCharId}
+                    byName={anom.createdByName}
+                    className="sig-td--time"
+                  />
+                )}
                 {isColVisible('updated') && <ElapsedCell iso={anom.updatedAt} className="sig-td--time sig-td--updated" />}
                 <td className="sig-cell--actions">
                   {canEdit && (

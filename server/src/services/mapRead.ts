@@ -167,11 +167,18 @@ export async function isSystemInMap(systemId: string, mapId: string): Promise<bo
 
 export async function loadSystemSignatures(systemId: string) {
   const { rows } = await db.query(
-    `SELECT id, sig_id AS "sigId", sig_type AS "sigType", name, notes,
-            wh_type AS "whType", wh_leads_to AS "whLeadsTo", ghost_type AS "ghostType",
-            mass_status AS "massStatus", time_status AS "timeStatus",
-            created_at AS "createdAt", updated_at AS "updatedAt"
-       FROM map_signatures WHERE system_id = $1 ORDER BY created_at`,
+    // LEFT JOIN, not JOIN: created_by_user_id is nullable by design -- rows
+    // predate the column, and it is ON DELETE SET NULL so removing a user does
+    // not take their signatures with them. An inner join would silently hide
+    // those rows, which is a far worse bug than an unattributed one.
+    `SELECT s.id, s.sig_id AS "sigId", s.sig_type AS "sigType", s.name, s.notes,
+            s.wh_type AS "whType", s.wh_leads_to AS "whLeadsTo", s.ghost_type AS "ghostType",
+            s.mass_status AS "massStatus", s.time_status AS "timeStatus",
+            s.created_at AS "createdAt", s.updated_at AS "updatedAt",
+            u.character_name AS "createdByName", u.character_id AS "createdByCharId"
+       FROM map_signatures s
+       LEFT JOIN users u ON u.id = s.created_by_user_id
+      WHERE s.system_id = $1 ORDER BY s.created_at`,
     [systemId],
   );
   return rows;
@@ -179,9 +186,12 @@ export async function loadSystemSignatures(systemId: string) {
 
 export async function loadSystemAnomalies(systemId: string) {
   const { rows } = await db.query(
-    `SELECT id, anom_id AS "anomId", anom_type AS "anomType", name, notes,
-            created_at AS "createdAt", updated_at AS "updatedAt"
-       FROM map_anomalies WHERE system_id = $1 ORDER BY created_at`,
+    `SELECT a.id, a.anom_id AS "anomId", a.anom_type AS "anomType", a.name, a.notes,
+            a.created_at AS "createdAt", a.updated_at AS "updatedAt",
+            u.character_name AS "createdByName", u.character_id AS "createdByCharId"
+       FROM map_anomalies a
+       LEFT JOIN users u ON u.id = a.created_by_user_id
+      WHERE a.system_id = $1 ORDER BY a.created_at`,
     [systemId],
   );
   return rows;

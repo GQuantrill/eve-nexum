@@ -396,6 +396,21 @@
 /* ── Connection flag (corp/alliance-shared icon + note) ──── */
 /* Saved flag templates, above the free-choice picker. Each chip wears its own
    preset colour so the standard is recognisable before you read the name. */
+/* Scout portrait in the Added column. Inline with the age rather than a column
+   of its own: the column is already narrow and resizable, and an extra one
+   would cost more width than the face is worth. */
+.sig-td__scout {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  vertical-align: middle;
+  margin-right: 5px;
+  flex-shrink: 0;
+  /* The portrait comes from CCP's image server; a failed load must not leave a
+     broken-image glyph sitting in the table. */
+  background: var(--surface-panel);
+}
+
 .conn-flag__presets {
   display: flex;
   flex-wrap: wrap;
