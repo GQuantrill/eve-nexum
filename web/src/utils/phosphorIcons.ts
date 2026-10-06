@@ -54,10 +54,22 @@ export const usePhosphorStore = create<PhosphorState>((set) => ({
 
 // Synchronous resolve from the loaded module. Returns null until the lazy import
 // finishes — callers subscribe via usePhosphorIcons so they re-render then.
+//
+// Accepts BOTH spellings of a name. The picker stores the base ('Tag', the form
+// `names` lists), but code has also written the export name ('TagIcon') -- and a
+// bare `mod[name + SUFFIX]` turns that into 'TagIconIcon', which resolves to
+// nothing and renders an empty control. Tolerating the suffixed form fixes
+// icons already saved that way without a data migration.
 export function iconComponent(name: string): Icon | null {
-  if (!mod) return null;
-  const c = mod[`${name}${SUFFIX}`];
-  return isComponent(c) ? (c as Icon) : null;
+  if (!mod || !name) return null;
+  const direct = mod[`${name}${SUFFIX}`];
+  if (isComponent(direct)) return direct as Icon;
+  // Already carries the suffix: look it up as-is.
+  if (name.endsWith(SUFFIX)) {
+    const asIs = mod[name];
+    if (isComponent(asIs)) return asIs as Icon;
+  }
+  return null;
 }
 
 // Ensures the set is loading and re-renders the caller when it's ready. `names`

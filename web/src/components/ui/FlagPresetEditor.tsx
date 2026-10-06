@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { v4 as uuid } from 'uuid';
-import { TrashIcon, PlusIcon } from '../../icons';
+import { TrashIcon, PlusIcon, TagIcon } from '../../icons';
 import { DynamicIcon } from '../DynamicIcon';
 import { IconPickerDialog } from './IconPickerDialog';
 import { MAX_FLAG_PRESETS, FLAG_NAME_MAX } from '../../hooks/useFlagPresets';
@@ -9,7 +9,9 @@ import type { FlagPreset } from '../../types';
 import styles from './CustomIntelBlock.module.css';
 
 const DEFAULT_COLOR = '#f0a030';   // the same amber the flag colour input defaults to
-const DEFAULT_ICON  = 'TagIcon';
+// The base name, as IconPickerDialog stores it -- NOT 'TagIcon', which
+// resolves to 'TagIconIcon' and renders nothing.
+const DEFAULT_ICON  = 'Tag';
 
 /**
  * Edit a list of connection-flag presets.
@@ -75,7 +77,12 @@ export function FlagPresetEditor({ items, onChange, disabled }: {
                 title={t('flagPresets.pickIcon')}
                 aria-label={t('flagPresets.pickIcon')}
               >
-                <DynamicIcon name={it.icon} size={16} weight="fill" />
+                <DynamicIcon
+                  name={it.icon}
+                  size={16}
+                  weight="fill"
+                  fallback={<TagIcon size={16} />}
+                />
               </button>
               <input
                 type="text"
