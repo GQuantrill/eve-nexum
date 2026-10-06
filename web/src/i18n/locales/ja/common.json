@@ -1857,6 +1857,7 @@
     "safeNo": "危険 — 敵が出現する可能性",
     "safeHint": "遺物/データサイトの安全性",
     "countFiltered": "{{total}} 件中 {{shown}} 件",
+    "countTotal": "シグネチャ合計: {{count}}",
     "countHint": "このシステムのシグネチャ",
     "countFilteredHint": "システム全体のうち表示されているシグネチャ"
   },

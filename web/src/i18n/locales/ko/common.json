@@ -1857,6 +1857,7 @@
     "safeNo": "위험 — 적 스폰 가능",
     "safeHint": "유물/데이터 사이트 안전성",
     "countFiltered": "{{total}}개 중 {{shown}}개",
+    "countTotal": "전체 시그니처: {{count}}",
     "countHint": "이 성계의 시그니처",
     "countFilteredHint": "성계 전체 중 표시된 시그니처"
   },

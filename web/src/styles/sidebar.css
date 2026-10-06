@@ -2062,6 +2062,7 @@
   }
 }
 
+.sig-col--scout   { width: 26px; }
 .sig-col--check   { width: 24px; }
 .sig-col--whtype  { overflow: visible; }
 .sig-col--bookmark { width: 28px; }

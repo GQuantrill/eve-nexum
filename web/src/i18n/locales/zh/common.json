@@ -1857,6 +1857,7 @@
     "safeNo": "不安全 — 可能刷怪",
     "safeHint": "遗迹/数据站点安全性",
     "countFiltered": "{{total}} 中的 {{shown}}",
+    "countTotal": "信号总数：{{count}}",
     "countHint": "该星系的信号",
     "countFilteredHint": "已显示的信号数 / 星系总数"
   },

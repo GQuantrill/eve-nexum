@@ -1857,6 +1857,7 @@
     "safeNo": "Not safe — may spawn combat",
     "safeHint": "Relic / data site safety",
     "countFiltered": "{{shown}} of {{total}}",
+    "countTotal": "Total Sigs: {{count}}",
     "countHint": "Signatures in this system",
     "countFilteredHint": "Signatures shown of the system total"
   },

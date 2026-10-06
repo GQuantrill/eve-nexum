@@ -1857,6 +1857,7 @@
     "safeNo": "Não seguro — pode gerar inimigos",
     "safeHint": "Segurança de sites de relíquia/dados",
     "countFiltered": "{{shown}} de {{total}}",
+    "countTotal": "Total de assinaturas: {{count}}",
     "countHint": "Assinaturas neste sistema",
     "countFilteredHint": "Assinaturas mostradas do total do sistema"
   },
