@@ -2,27 +2,27 @@
 .info {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--sp-10);
   font-size: calc(13px * var(--font-scale, 1));
   /* Fills the (now resizable) system-panel__left column; the column's inline
      width is what drives the size. */
   width: 100%;
-  padding-bottom: 4px;
+  padding-bottom: var(--sp-4);
 }
 
 .headline {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--sp-10);
   flex-wrap: wrap;
-  padding-bottom: 8px;
+  padding-bottom: var(--sp-8);
   border-bottom: 1px solid var(--surface-hover);
 }
 
 .section {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--sp-6);
 }
 
 .sectionLabel {
@@ -33,7 +33,7 @@
   letter-spacing: 0.08em;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--sp-6);
 }
 
 /* The clickable part of a collapsible section's label — styled to look exactly
@@ -41,7 +41,7 @@
 .sectionToggle {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--sp-6);
   background: none;
   border: none;
   padding: 0;
@@ -68,11 +68,11 @@
   display: inline-flex;
   align-self: flex-start;
   align-items: center;
-  gap: 4px;
+  gap: var(--sp-4);
   background: var(--surface-panel);
   border: 1px solid var(--surface-hover);
   border-radius: 4px;
-  padding: 3px 8px;
+  padding: var(--sp-3) var(--sp-8);
   font-size: calc(13px * var(--font-scale, 1));
   color: var(--text-default);
 }
@@ -82,7 +82,7 @@
   border: 1px solid #2a3550;
   color: var(--text-dim);
   border-radius: 3px;
-  padding: 0 5px;
+  padding: 0 var(--sp-5);
   font-size: calc(11px * var(--font-scale, 1));
   line-height: 1.4;
   cursor: pointer;
@@ -102,14 +102,14 @@
 .row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--sp-8);
   flex-wrap: wrap;
 }
 
 .kvGrid {
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: 3px 12px;
+  gap: var(--sp-3) var(--sp-12);
   align-items: baseline;
 }
 
@@ -127,7 +127,7 @@
 .links {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--sp-10);
 }
 
 .extLink {
@@ -151,17 +151,17 @@
 .celestials {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--sp-8);
 }
 
 .celestial {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--sp-4);
   background: var(--surface-panel);
   border: 1px solid var(--surface-hover);
   border-radius: 4px;
-  padding: 3px 8px;
+  padding: var(--sp-3) var(--sp-8);
   font-size: calc(13px * var(--font-scale, 1));
   color: var(--text-default);
 }
@@ -203,8 +203,8 @@
 .intel {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 1px 8px 1px 5px;
+  gap: var(--sp-5);
+  padding: var(--sp-1) var(--sp-8) var(--sp-1) var(--sp-5);
   border: 1px solid;
   border-radius: 999px;
   font-size: calc(12px * var(--font-scale, 1));
@@ -222,12 +222,12 @@
 .effectMods {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: var(--sp-6);
 }
 
 .effectMod {
   font-size: calc(13px * var(--font-scale, 1));
-  padding: 3px 8px;
+  padding: var(--sp-3) var(--sp-8);
   border-radius: 4px;
   white-space: nowrap;
 }
@@ -247,11 +247,11 @@
 .staticChip {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: var(--sp-5);
   background: var(--surface-panel);
   border: 1px solid var(--border-accent);
   border-radius: 4px;
-  padding: 2px 8px;
+  padding: var(--sp-2) var(--sp-8);
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
   font-size: calc(13px * var(--font-scale, 1));
   color: var(--text-default);
@@ -265,7 +265,7 @@
 .sovBlock {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--sp-6);
   width: 100%;
 }
 
@@ -275,11 +275,11 @@
      of squeezing the name column until it breaks character-by-character. */
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
+  gap: var(--sp-8);
   background: var(--surface-panel);
   border: 1px solid var(--surface-hover);
   border-radius: 6px;
-  padding: 6px 8px;
+  padding: var(--sp-6) var(--sp-8);
 }
 
 .sovLogo {
@@ -293,7 +293,7 @@
 .sovText {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: var(--sp-1);
   /* Claim ~120px so the standings wrap below once the row can't hold name +
      badges; min-width: 0 still lets the name word-wrap when space is tight. */
   flex: 1 1 120px;
@@ -322,18 +322,18 @@
 
 .insurgencyRings {
   display: flex;
-  gap: 12px;
+  gap: var(--sp-12);
 }
 
 .insurgencyRingCell {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--sp-10);
   flex: 1;
   background: var(--surface-panel);
   border: 1px solid var(--surface-hover);
   border-radius: 6px;
-  padding: 8px 10px;
+  padding: var(--sp-8) var(--sp-10);
 }
 
 .insurgencySvg {
@@ -345,7 +345,7 @@
 .insurgencyRingInfo {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--sp-2);
 }
 
 .insurgencyRingLabel {
@@ -367,11 +367,11 @@
 .incursionCard {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
+  gap: var(--sp-10);
   background: rgba(224, 90, 90, 0.08);
   border: 1px solid rgba(224, 90, 90, 0.3);
   border-radius: 6px;
-  padding: 8px 10px;
+  padding: var(--sp-8) var(--sp-10);
 }
 
 .incursionLogo {
@@ -385,7 +385,7 @@
 .incursionDetail {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--sp-4);
   min-width: 0;
   flex: 1;
 }
@@ -399,12 +399,12 @@
 .incursionMeta {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: var(--sp-4);
 }
 
 .incursionState {
   font-size: calc(13px * var(--font-scale, 1));
-  padding: 1px 6px;
+  padding: var(--sp-1) var(--sp-6);
   border-radius: 3px;
   font-weight: 500;
 
@@ -416,7 +416,7 @@
 .incursionStaging,
 .incursionBoss {
   font-size: calc(13px * var(--font-scale, 1));
-  padding: 1px 6px;
+  padding: var(--sp-1) var(--sp-6);
   border-radius: 3px;
   background: rgba(77,157,224,0.15);
   color: var(--accent-alt);
@@ -425,7 +425,7 @@
 .incursionInfluence {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--sp-6);
   margin-top: 2px;
 }
 

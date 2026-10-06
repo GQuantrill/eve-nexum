@@ -1436,6 +1436,13 @@
     "fleetHeatmap": "Fleet heatmap",
     "fleetHint": "Render fleet-mates as purple dots on the system they're in. Hover a dot to see the names.",
     "fontSize": "Font Size",
+    "density": "Interface density",
+    "densityHint": "Spacing around panel text. Font size is separate, so you can keep large text in tighter chrome.",
+    "densityOptions": {
+      "comfortable": "Comfortable",
+      "compact": "Compact",
+      "dense": "Dense"
+    },
     "heatIntensity": "Intensity",
     "heatmap": "Heatmap",
     "heatmapOptions": {

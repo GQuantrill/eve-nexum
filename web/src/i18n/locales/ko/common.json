@@ -1436,6 +1436,13 @@
     "fleetHeatmap": "플릿 히트맵",
     "fleetHint": "함대원을 그들이 있는 성계 위에 보라색 점으로 표시합니다. 점에 마우스를 올리면 이름을 볼 수 있습니다.",
     "fontSize": "글꼴 크기",
+    "density": "인터페이스 밀도",
+    "densityHint": "패널 텍스트 주변의 여백입니다. 글꼴 크기와는 별개이므로 큰 글씨를 유지하면서 여백만 줄일 수 있습니다.",
+    "densityOptions": {
+      "comfortable": "넉넉하게",
+      "compact": "콤팩트",
+      "dense": "조밀하게"
+    },
     "heatIntensity": "강도",
     "heatmap": "히트맵",
     "heatmapOptions": {

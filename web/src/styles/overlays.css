@@ -12,7 +12,7 @@
 .toolbar__map-name-btn {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: var(--sp-5);
   background: transparent;
   border: 1px solid var(--border);
   border-radius: 5px;
@@ -20,7 +20,7 @@
   cursor: pointer;
   font-size: calc(14px * var(--font-scale, 1));
   font-weight: 600;
-  padding: 4px 10px;
+  padding: var(--sp-4) var(--sp-10);
   white-space: nowrap;
   max-width: 180px;
   overflow: hidden;
@@ -34,7 +34,7 @@
 .toolbar__map-type {
   font-size: calc(11px * var(--font-scale, 1));
   font-weight: 600;
-  padding: 1px 6px;
+  padding: var(--sp-1) var(--sp-6);
   border-radius: 3px;
   margin-right: 6px;
   vertical-align: middle;
@@ -47,9 +47,9 @@
 .toolbar__locked-chip {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: var(--sp-5);
   margin-left: 8px;
-  padding: 2px 8px;
+  padding: var(--sp-2) var(--sp-8);
   border-radius: 4px;
   font-size: calc(11px * var(--font-scale, 1));
   font-weight: 600;
@@ -86,7 +86,7 @@
   border: 1px solid var(--border-accent);
   border-radius: 7px;
   min-width: 180px;
-  padding: 4px 0;
+  padding: var(--sp-4) 0;
   z-index: 2000;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
 }
@@ -100,7 +100,7 @@
   cursor: pointer;
   font-family: inherit;
   font-size: calc(13px * var(--font-scale, 1));
-  padding: 7px 14px;
+  padding: var(--sp-7) var(--sp-14);
   text-align: left;
 
   &:hover { background: var(--border); color: var(--text-bright); }
@@ -140,7 +140,7 @@
   border-radius: 5px;
   color: var(--text-secondary);
   font-size: calc(16px * var(--font-scale, 1));
-  padding: 4px 10px;
+  padding: var(--sp-4) var(--sp-10);
   white-space: nowrap;
   pointer-events: none;
   opacity: 0;
@@ -158,7 +158,7 @@
 .map-dropdown__badge {
   display: inline-block;
   font-size: calc(11px * var(--font-scale, 1));
-  padding: 1px 5px;
+  padding: var(--sp-1) var(--sp-5);
   border-radius: 3px;
   margin-right: 6px;
   font-weight: 600;
@@ -190,8 +190,8 @@
 .tag-picker {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  gap: 4px;
-  padding: 8px;
+  gap: var(--sp-4);
+  padding: var(--sp-8);
 }
 
 .tag-picker__cell {
@@ -237,7 +237,7 @@
   z-index: 2000;
   list-style: none;
   margin: 0;
-  padding: 4px 0;
+  padding: var(--sp-4) 0;
   background: var(--surface-well);
   border: 1px solid var(--border-accent);
   user-select: none;
@@ -250,14 +250,14 @@
 .context-menu__item {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--sp-8);
   width: 100%;
   background: transparent;
   border: none;
   color: var(--text-default);
   font-size: calc(13px * var(--font-scale, 1));
   font-family: inherit;
-  padding: 7px 14px;
+  padding: var(--sp-7) var(--sp-14);
   text-align: left;
   cursor: pointer;
 
@@ -295,7 +295,7 @@
 
 .context-menu__arrow {
   margin-left: auto;
-  padding-left: 8px;
+  padding-left: var(--sp-8);
   font-size: calc(13px * var(--font-scale, 1));
   color: var(--text-faintest);
 }
@@ -318,7 +318,7 @@
   background: var(--surface-panel);
   border: 1px solid #2a6a70;
   border-radius: 3px;
-  padding: 1px 4px;
+  padding: var(--sp-1) var(--sp-4);
 }
 
 /* In-game stargate label ("G") — palette-aware via --cv-conn-gate. */
@@ -329,7 +329,7 @@
   background: color-mix(in srgb, var(--cv-conn-gate) 16%, var(--surface-sunken));
   border: 1px solid color-mix(in srgb, var(--cv-conn-gate) 45%, var(--surface-sunken));
   border-radius: 3px;
-  padding: 1px 4px;
+  padding: var(--sp-1) var(--sp-4);
 }
 
 /* Cyno-jump label ("CJ") — palette-aware via --cv-conn-cyno. */
@@ -340,6 +340,6 @@
   background: color-mix(in srgb, var(--cv-conn-cyno) 16%, var(--surface-sunken));
   border: 1px solid color-mix(in srgb, var(--cv-conn-cyno) 45%, var(--surface-sunken));
   border-radius: 3px;
-  padding: 1px 4px;
+  padding: var(--sp-1) var(--sp-4);
 }
 

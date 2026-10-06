@@ -1436,6 +1436,13 @@
     "fleetHeatmap": "舰队热力图",
     "fleetHint": "将舰队成员显示为其所在星系上的紫色圆点。悬停圆点可查看名称。",
     "fontSize": "字体大小",
+    "density": "界面密度",
+    "densityHint": "面板文字周围的间距。字号为独立设置，因此可以在更紧凑的界面中保留较大的文字。",
+    "densityOptions": {
+      "comfortable": "宽松",
+      "compact": "紧凑",
+      "dense": "密集"
+    },
     "heatIntensity": "强度",
     "heatmap": "热力图",
     "heatmapOptions": {

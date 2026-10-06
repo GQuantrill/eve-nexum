@@ -19,6 +19,7 @@ import {
   useMinimapPosition,
   type MinimapPosition,
 } from "../../hooks/useMinimapPosition";
+import type { Density } from '../../utils/density';
 import { useUserSetting } from "../../hooks/useUserSetting";
 import { normalizePlacement } from "../../hooks/useLocationTracking";
 import { NOTIFY, notifyDefault, previewAlertVolume, ALERT_VOLUME_KEY, ALERT_VOLUME_DEFAULT, EXITS_MIN_SECURITY_KEY, EXITS_MIN_SECURITY_DEFAULT, EXITS_MIN_SECURITY_OFF } from "../../utils/notificationPrefs";
@@ -948,6 +949,7 @@ export function MapSidebar() {
   const routeMode = useMapStore((s) => s.routeMode);
   const setRouteMode = useMapStore((s) => s.setRouteMode);
   const uiZoom = useMapStore((s) => s.uiZoom);
+  const [density, setDensity] = useUserSetting<Density>('nexum.ui.density', 'comfortable');
   const setUiZoom = useMapStore((s) => s.setUiZoom);
   const optimizeConnections = useMapStore((s) => s.optimizeConnections);
   const requestAutoLayout = useMapStore((s) => s.requestAutoLayout);
@@ -1953,6 +1955,17 @@ export function MapSidebar() {
                         {Math.round(uiZoom * 100)}%
                       </button>
                     </div>
+                  </div>
+                  <div className="map-sidebar__row">
+                    <label className="map-sidebar__label" htmlFor="ui-density">{t("mapSidebar.density")}</label>
+                    <Select id="ui-density" value={density} onChange={(v) => setDensity(v as Density)} options={[
+                      { value: "comfortable", label: t("mapSidebar.densityOptions.comfortable") },
+                      { value: "compact",     label: t("mapSidebar.densityOptions.compact") },
+                      { value: "dense",       label: t("mapSidebar.densityOptions.dense") },
+                    ]} />
+                  </div>
+                  <div className="map-sidebar__hint">
+                    {t("mapSidebar.densityHint")}
                   </div>
                   <div className="map-sidebar__row">
                     <label className="map-sidebar__label" htmlFor="placement-dir">{t("mapSidebar.placement")}</label>

@@ -9,13 +9,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
+  gap: var(--sp-3);
   cursor: pointer;
 }
 
 .connection-label__row {
   display: flex;
-  gap: 3px;
+  gap: var(--sp-3);
   align-items: center;
 }
 
@@ -26,7 +26,7 @@
   background: var(--surface-panel);
   border: 1px solid var(--border);
   border-radius: 3px;
-  padding: 1px 4px;
+  padding: var(--sp-1) var(--sp-4);
 }
 
 /* Corp/alliance-shared flag badge — sits beside the type badge, amber-tinted
@@ -39,7 +39,7 @@
   background: color-mix(in srgb, var(--flag-color, var(--cv-conn-4h)) 16%, var(--surface-panel));
   border: 1px solid color-mix(in srgb, var(--flag-color, var(--cv-conn-4h)) 40%, var(--surface-panel));
   border-radius: 3px;
-  padding: 1px 4px;
+  padding: var(--sp-1) var(--sp-4);
   margin-left: 3px;
   cursor: pointer;
 }
@@ -75,7 +75,7 @@
   background: color-mix(in srgb, var(--cv-conn-4h) 16%, var(--surface-sunken));
   border: 1px solid color-mix(in srgb, var(--cv-conn-4h) 38%, var(--surface-sunken));
   border-radius: 3px;
-  padding: 1px 4px;
+  padding: var(--sp-1) var(--sp-4);
 }
 
 .connection-label__crit {
@@ -85,7 +85,7 @@
   background: color-mix(in srgb, var(--cv-conn-expired) 16%, var(--surface-sunken));
   border: 1px solid color-mix(in srgb, var(--cv-conn-expired) 38%, var(--surface-sunken));
   border-radius: 3px;
-  padding: 1px 5px;
+  padding: var(--sp-1) var(--sp-5);
 }
 
 /* Ship-size limit, tucked against the wormhole type rather than taking a fourth
@@ -109,7 +109,7 @@
   background: var(--surface-panel);
   border: 1px solid var(--border);
   border-radius: 3px;
-  padding: 1px 4px;
+  padding: var(--sp-1) var(--sp-4);
 
   &.connection-label__mass--warn {
     color: var(--cv-conn-1h);
@@ -150,7 +150,7 @@
 .conn-headcol {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--sp-10);
   flex-shrink: 0;
   align-self: flex-start;
 }
@@ -162,10 +162,10 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 8px;
+  gap: var(--sp-8);
   max-width: 240px;
   margin: 0;
-  padding: 8px 10px;
+  padding: var(--sp-8) var(--sp-10);
   border-radius: 6px;
   color: var(--cv-conn-expired);
   background: color-mix(in srgb, var(--cv-conn-expired) 12%, var(--surface-sunken));
@@ -190,7 +190,7 @@
   border-radius: 5px;
   color: var(--text-bright);
   font-size: calc(13px * var(--font-scale, 1));
-  padding: 7px 10px;
+  padding: var(--sp-7) var(--sp-10);
   outline: none;
   box-sizing: border-box;
 }
@@ -210,7 +210,7 @@
   flex: none;
   background: none; border: none;
   color: var(--text-dim); cursor: grab; user-select: none;
-  padding: 0 2px 0 6px;
+  padding: 0 var(--sp-2) 0 var(--sp-6);
   font-size: calc(13px * var(--font-scale, 1)); line-height: 1;
 }
 .chain-item__drag-handle:hover { color: var(--text-subtle); }
@@ -219,7 +219,7 @@
   flex: 1; min-width: 0;
   display: flex; align-items: center; gap: 6px;
   background: none; border: none; cursor: pointer; text-align: left;
-  padding: 7px 8px; color: var(--text-secondary);
+  padding: var(--sp-7) var(--sp-8); color: var(--text-secondary);
   font-size: calc(13px * var(--font-scale, 1));
 }
 .chain-item__name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -241,7 +241,7 @@
 .chain-exits__toggle {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--sp-4);
   width: 100%;
   background: none;
   border: none;
@@ -260,7 +260,7 @@
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 8px;
+  gap: var(--sp-8);
   font-size: calc(12px * var(--font-scale, 1));
 }
 .chain-exits__name  { color: var(--text-default); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -281,7 +281,7 @@
 }
 .chain-step__warp { display: inline-flex; align-items: center; gap: 4px; }
 .chain-step__wh {
-  padding: 0 5px; border-radius: 4px;
+  padding: 0 var(--sp-5); border-radius: 4px;
   background: var(--surface-raised); color: var(--text-secondary);
   font-family: monospace; font-size: calc(10px * var(--font-scale, 1));
 }
@@ -289,7 +289,7 @@
 /* Type / Size line under a wormhole hop's "warp to" line. */
 .chain-step__meta {
   display: flex; flex-wrap: wrap; gap: 4px 12px;
-  padding-left: 16px;
+  padding-left: var(--sp-16);
   font-size: calc(12px * var(--font-scale, 1)); color: var(--text-subtle);
 }
 
@@ -304,7 +304,7 @@
 .conn-col {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--sp-10);
   align-self: flex-start;
   min-width: 0;
 }
@@ -330,7 +330,7 @@
   background: none; border: none; cursor: pointer;
   color: var(--text-subtle);
   font-size: calc(11px * var(--font-scale, 1));
-  padding: 0 2px;
+  padding: 0 var(--sp-2);
 }
 /* Per-jump Cold/Hot marker: a viewer flips it once they know whether that pilot's
    prop was active, and that jump's mass counts base (cold) or base + prop (hot).
@@ -340,7 +340,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  padding: 0 6px;
+  padding: 0 var(--sp-6);
   border-radius: 4px;
   border: 1px solid var(--surface-overlay);
   color: var(--text-subtle);
@@ -365,7 +365,7 @@
   max-height: 168px; overflow-y: auto;
 }
 .jumplog__row {
-  padding: 5px 7px;
+  padding: var(--sp-5) var(--sp-7);
   border: 1px solid var(--surface-overlay);
   border-radius: 5px;
   background: var(--surface-base);
@@ -382,7 +382,7 @@
 /* Per-end "backing signature" link controls in the connection panel. */
 .conn-siglink {
   margin: 4px 0 2px;
-  padding-top: 8px;
+  padding-top: var(--sp-8);
   border-top: 1px solid var(--surface-overlay);
 }
 
@@ -415,7 +415,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 4px;
+  gap: var(--sp-4);
   margin-bottom: 6px;
 }
 .conn-flag__presets-label {
@@ -428,9 +428,9 @@
 .conn-flag__preset {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--sp-4);
   max-width: 150px;
-  padding: 2px 7px;
+  padding: var(--sp-2) var(--sp-7);
   border: 1px solid;
   border-radius: 999px;
   background: rgba(8, 9, 15, 0.4);
@@ -448,13 +448,13 @@
 .conn-flag__row {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--sp-6);
 }
 
 .conn-flag__pick {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--sp-6);
 }
 
 .conn-flag__remove { color: var(--text-subtle); }
@@ -474,7 +474,7 @@
 .conn-flag__blink {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--sp-6);
   margin-top: 4px;
   font-size: calc(12px * var(--font-scale, 1));
   color: var(--text-secondary);
@@ -487,7 +487,7 @@
 .sig-pane {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--sp-6);
 }
 
 .sig-pane__hint {
@@ -510,7 +510,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 6px;
+  gap: var(--sp-6);
 }
 
 .sig-pane__controls .sig-pane__filter {
@@ -546,14 +546,14 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 6px;
-  padding: 4px 0 6px;
+  gap: var(--sp-6);
+  padding: var(--sp-4) 0 var(--sp-6);
 }
 
 /* ── Inline sov standings badges ─────────────────────────── */
 .sys-info__sov-standings {
   display: flex;
-  gap: 4px;
+  gap: var(--sp-4);
   /* No margin-left:auto — the grown text column pushes the badges right on a
      shared line, and when they wrap to their own line they sit left-aligned. */
 }
@@ -562,8 +562,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  padding: 1px 6px;
+  gap: var(--sp-4);
+  padding: var(--sp-1) var(--sp-6);
   border-radius: 3px;
   font-size: calc(11px * var(--font-scale, 1));
   font-variant-numeric: tabular-nums;
@@ -631,7 +631,7 @@
 .admin-page__stat-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 10px;
+  gap: var(--sp-10);
   margin-bottom: 8px;
 }
 
@@ -639,11 +639,11 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: var(--sp-4);
   background: var(--surface-sunken);
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 14px 12px;
+  padding: var(--sp-14) var(--sp-12);
 }
 
 .admin-page__stat-card--accent { border-color: var(--border-accent-strong); background: var(--surface-panel); }
@@ -680,7 +680,7 @@
 .admin-page__chart-row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 16px;
+  gap: var(--sp-16);
   margin-bottom: 24px;
 }
 
@@ -688,10 +688,10 @@
   background: var(--surface-sunken);
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 14px 16px 18px;
+  padding: var(--sp-14) var(--sp-16) 18px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--sp-10);
 }
 
 .admin-page__chart-title {

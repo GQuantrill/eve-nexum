@@ -7,7 +7,7 @@
   color: var(--text-faintest);
   cursor: pointer;
   font-size: calc(14px * var(--font-scale, 1));
-  padding: 2px 6px;
+  padding: var(--sp-2) var(--sp-6);
   border-radius: 4px;
   flex-shrink: 0;
 
@@ -32,7 +32,7 @@
   cursor: pointer;
   font-size: calc(13px * var(--font-scale, 1));
   font-weight: 600;
-  padding: 7px 14px;
+  padding: var(--sp-7) var(--sp-14);
   transition: background 0.15s;
 
   &--ghost {

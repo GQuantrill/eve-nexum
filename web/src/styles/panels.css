@@ -8,11 +8,11 @@
   display: flex;
   flex-direction: row;
   align-items: stretch;
-  gap: 12px;
+  gap: var(--sp-12);
   /* Extra left padding clears the watchlist panel's left-edge tab (a persistent
      ~38px handle, vertically centred) so it never overlaps the system name /
      panel content when the panel is tall. */
-  padding: 0 16px 12px 48px;
+  padding: 0 var(--sp-16) var(--sp-12) 48px;
   overflow: hidden;
   flex-shrink: 0;
   position: relative;
@@ -40,7 +40,7 @@
   flex-wrap: wrap;
   align-content: flex-start;
   justify-content: flex-start;
-  gap: 10px 14px;
+  gap: var(--sp-10) var(--sp-14);
 
   /* Base rule drops the button to the bottom of the strip, which in a wrapped
      window reads as a stray indent on its own line. Keep it with the content. */
@@ -61,7 +61,7 @@
   height: 100%;
   border-top: none;
   border-left: 1px solid var(--border);
-  padding: 12px 16px 12px 16px;
+  padding: var(--sp-12) var(--sp-16) var(--sp-12) var(--sp-16);
   overflow: hidden;
 }
 
@@ -90,7 +90,7 @@
   padding-right: 0;
   border-right: none;
   border-bottom: 1px solid var(--border);
-  padding-bottom: 12px;
+  padding-bottom: var(--sp-12);
   /* The panel itself scrolls in this mode; a second scroller here would trap
      the wheel over the info block. */
   overflow-y: visible;
@@ -203,11 +203,11 @@
 .system-panel__left {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--sp-8);
   flex-shrink: 0;
   min-width: 160px;
-  padding-top: 12px;
-  padding-right: 12px;
+  padding-top: var(--sp-12);
+  padding-right: var(--sp-12);
   border-right: 1px solid var(--border);
   overflow-y: auto;
 }
@@ -216,7 +216,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px 12px;
+  gap: var(--sp-8) var(--sp-12);
   /* When the panel is narrowed, the action buttons wrap to a second line
      rather than crushing the system name — the title keeps its own line. */
   flex-wrap: wrap;
@@ -273,7 +273,7 @@
 .system-panel__actions {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--sp-6);
   flex-shrink: 0;
 }
 
@@ -285,7 +285,7 @@
   cursor: pointer;
   font-size: calc(13px * var(--font-scale, 1));
   font-weight: 500;
-  padding: 3px 8px;
+  padding: var(--sp-3) var(--sp-8);
   white-space: nowrap;
 
   &:hover { background: var(--border); color: #a0ccf8; }
@@ -307,8 +307,8 @@
 .mass-tracker {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 8px 10px;
+  gap: var(--sp-6);
+  padding: var(--sp-8) var(--sp-10);
   border: 1px solid var(--border);
   border-radius: 6px;
   background: var(--surface-well);
@@ -356,7 +356,7 @@
 .mass-tracker__budget {
   font-size: calc(12px * var(--font-scale, 1));
   color: var(--accent-bright);
-  padding: 4px 8px;
+  padding: var(--sp-4) var(--sp-8);
   background: rgba(110, 160, 255, 0.06);
   border-left: 2px solid var(--accent-bright);
   border-radius: 0 3px 3px 0;
@@ -378,7 +378,7 @@
 .mass-tracker__buttons {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: var(--sp-4);
   margin-top: 2px;
 }
 
@@ -393,7 +393,7 @@
 }
 
 .mass-tracker__hint {
-  padding: 8px 10px;
+  padding: var(--sp-8) var(--sp-10);
   font-size: calc(13px * var(--font-scale, 1));
   color: var(--text-faint);
   font-style: italic;
@@ -404,7 +404,7 @@
 /* Shown for gate / jump-bridge connections in place of the wormhole fields. */
 .conn-gate-note {
   margin: 0;
-  padding: 8px 10px;
+  padding: var(--sp-8) var(--sp-10);
   font-size: calc(13px * var(--font-scale, 1));
   color: var(--text-muted);
   font-style: italic;
@@ -432,7 +432,7 @@
 .roll-pill {
   font-size: calc(11px * var(--font-scale, 1));
   font-weight: 600;
-  padding: 1px 7px;
+  padding: var(--sp-1) var(--sp-7);
   border-radius: 10px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -444,21 +444,21 @@
 .roller {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--sp-6);
 }
 .roller__row {
   display: flex;
-  gap: 6px;
+  gap: var(--sp-6);
 }
 .roller__row select { flex: 1; }
 .roller__masses {
   display: flex;
-  gap: 8px;
+  gap: var(--sp-8);
 }
 .roller__mass {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--sp-4);
   flex: 1;
   font-size: calc(12px * var(--font-scale, 1));
   color: var(--text-subtle);
@@ -472,7 +472,7 @@
 .roll-side {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--sp-6);
   font-size: calc(13px * var(--font-scale, 1));
   color: var(--text-subtle);
 }
@@ -488,7 +488,7 @@
 
 .roll-pass {
   display: flex;
-  gap: 6px;
+  gap: var(--sp-6);
 }
 .roll-pass__btn {
   flex: 1;
@@ -501,7 +501,7 @@
 
 .roll-guidance {
   font-size: calc(12px * var(--font-scale, 1));
-  padding: 5px 8px;
+  padding: var(--sp-5) var(--sp-8);
   border-radius: 4px;
   border-left: 2px solid;
   line-height: 1.35;
@@ -512,7 +512,7 @@
 
 .roll-actions {
   display: flex;
-  gap: 6px;
+  gap: var(--sp-6);
 }
 .roll-actions .sys-btn { flex: 1; }
 
@@ -522,21 +522,21 @@
 }
 .roll-other summary {
   cursor: pointer;
-  padding: 2px 0;
+  padding: var(--sp-2) 0;
   user-select: none;
 }
 
 .field {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--sp-4);
   font-size: calc(13px * var(--font-scale, 1));
   color: var(--text-secondary);
 
   &--checkbox {
     flex-direction: row;
     align-items: center;
-    gap: 8px;
+    gap: var(--sp-8);
     color: var(--text-default);
   }
 
@@ -549,7 +549,7 @@
     border-radius: 5px;
     color: var(--text-bright);
     font-size: calc(13px * var(--font-scale, 1));
-    padding: 6px 8px;
+    padding: var(--sp-6) var(--sp-8);
     outline: none;
     font-family: inherit;
     resize: vertical;
@@ -566,8 +566,8 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 6px;
-  padding: 6px 0;
+  gap: var(--sp-6);
+  padding: var(--sp-6) 0;
   border-bottom: 1px solid var(--border);
   font-size: calc(13px * var(--font-scale, 1));
 }
@@ -581,8 +581,8 @@
 .sys-info__chain-fx__chip {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 2px 8px;
+  gap: var(--sp-4);
+  padding: var(--sp-2) var(--sp-8);
   border-radius: 12px;
   background: var(--surface-raised);
   border: 1px solid var(--border-strong);
@@ -615,11 +615,11 @@
   background: var(--surface-panel);
   border: 1px solid var(--border-strong);
   border-radius: 6px;
-  padding: 6px 10px;
+  padding: var(--sp-6) var(--sp-10);
   font-size: calc(12px * var(--font-scale, 1));
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--sp-2);
   pointer-events: none;
   max-width: 280px;
   white-space: normal;

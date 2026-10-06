@@ -5,11 +5,11 @@
 .panel-stack {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--sp-6);
   flex: 1;
   min-width: 260px;
   overflow-y: auto;
-  padding-top: 12px;
+  padding-top: var(--sp-12);
   min-height: 0;
 }
 
@@ -23,7 +23,7 @@
 .panel-stack__cols--multi {
   flex-direction: row;
   align-items: flex-start;
-  gap: 10px;
+  gap: var(--sp-10);
 }
 
 /* flex-basis 0 with no min-width: the columns share whatever width there is
@@ -44,7 +44,7 @@
   border: none;
   color: var(--text-dim);
   cursor: pointer;
-  padding: 0 1px;
+  padding: 0 var(--sp-1);
   line-height: 1;
 }
 .info-card__col-btn:hover:not(:disabled) { color: var(--accent-light); }
@@ -67,8 +67,8 @@
 .info-card__header {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 5px 8px;
+  gap: var(--sp-6);
+  padding: var(--sp-5) var(--sp-8);
   border-bottom: 1px solid var(--border);
   background: var(--surface-well);
   cursor: pointer;
@@ -114,7 +114,7 @@
   cursor: grab;
   font-size: calc(14px * var(--font-scale, 1));
   line-height: 1;
-  padding: 0 2px;
+  padding: 0 var(--sp-2);
   user-select: none;
 
   &:hover { color: var(--text-faint); }
@@ -122,7 +122,7 @@
 }
 
 .info-card__body {
-  padding: 8px 10px;
+  padding: var(--sp-8) var(--sp-10);
 }
 
 /* Undock button in a dock card header — subtle, brightens on hover. */
@@ -133,7 +133,7 @@
   border: none;
   color: var(--text-dim);
   cursor: pointer;
-  padding: 0 2px;
+  padding: 0 var(--sp-2);
   line-height: 1;
 }
 .info-card__undock-btn:hover { color: var(--accent-light); }
@@ -155,8 +155,8 @@
 .floating-panel__bar {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 10px;
+  gap: var(--sp-6);
+  padding: var(--sp-6) var(--sp-10);
   background: var(--surface-panel);
   border-bottom: 1px solid var(--border);
   cursor: move;
@@ -182,7 +182,7 @@
   border: none;
   color: var(--text-dim);
   cursor: pointer;
-  padding: 0 2px;
+  padding: 0 var(--sp-2);
 }
 .floating-panel__redock:hover { color: var(--accent-light); }
 .floating-panel__close {
@@ -192,13 +192,13 @@
   border: none;
   color: var(--text-dim);
   cursor: pointer;
-  padding: 0 2px;
+  padding: 0 var(--sp-2);
 }
 .floating-panel__close:hover { color: var(--danger); }
 .floating-panel__body {
   flex: 1;
   overflow: auto;
-  padding: 8px 10px;
+  padding: var(--sp-8) var(--sp-10);
 }
 .floating-panel__resize {
   position: absolute;
@@ -287,12 +287,12 @@
 
 .notes-editor--empty {
   cursor: text;
-  padding: 3px 6px;
+  padding: var(--sp-3) var(--sp-6);
 }
 
 .notes-editor--preview {
   cursor: text;
-  padding: 3px 6px;
+  padding: var(--sp-3) var(--sp-6);
   font-size: calc(13px * var(--font-scale, 1));
   color: var(--text-secondary);
   white-space: nowrap;

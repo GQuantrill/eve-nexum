@@ -10,8 +10,8 @@
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: flex-start;
-  gap: 8px;
-  padding: 8px;
+  gap: var(--sp-8);
+  padding: var(--sp-8);
   box-sizing: border-box;
 }
 
@@ -32,7 +32,7 @@
   flex-direction: column;
   border: 1px solid var(--surface-hover);
   border-radius: 4px;
-  padding: 0 6px 6px;
+  padding: 0 var(--sp-6) var(--sp-6);
   box-sizing: border-box;
 }
 
@@ -44,7 +44,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 6px;
+  gap: var(--sp-6);
 }
 
 .dragHandle {
@@ -54,7 +54,7 @@
   cursor: grab;
   font-size: calc(14px * var(--font-scale, 1));
   line-height: 1;
-  padding: 0 2px;
+  padding: 0 var(--sp-2);
   user-select: none;
   flex-shrink: 0;
 }
@@ -69,7 +69,7 @@
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--text-muted);
-  padding: 2px 0 4px;
+  padding: var(--sp-2) 0 var(--sp-4);
   white-space: nowrap;
 }
 
@@ -95,14 +95,14 @@
   background: var(--surface-panel);
   border: 1px solid var(--border);
   border-radius: 4px;
-  padding: 3px 7px;
+  padding: var(--sp-3) var(--sp-7);
   font-size: calc(11px * var(--font-scale, 1));
   color: var(--text-primary);
   white-space: nowrap;
   pointer-events: none;
   z-index: 5;
   display: flex;
-  gap: 6px;
+  gap: var(--sp-6);
   align-items: baseline;
 }
 
@@ -129,10 +129,10 @@
   flex: 1 1 100%;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--sp-4);
   border: 1px solid var(--surface-hover);
   border-radius: 4px;
-  padding: 6px;
+  padding: var(--sp-6);
   box-sizing: border-box;
 }
 
@@ -145,15 +145,15 @@
   flex-direction: column;
   border: 1px solid var(--surface-hover);
   border-radius: 4px;
-  padding: 0 6px 6px;
+  padding: 0 var(--sp-6) var(--sp-6);
   box-sizing: border-box;
 }
 
 .legend {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px 12px;
-  padding: 0 2px;
+  gap: var(--sp-4) var(--sp-12);
+  padding: 0 var(--sp-2);
   font-size: calc(10px * var(--font-scale, 1));
   color: var(--text-muted);
 }
@@ -161,7 +161,7 @@
 .legendItem {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: var(--sp-5);
 }
 
 /* The real magnitude the shared axis deliberately drops. */
@@ -183,7 +183,7 @@
   background: var(--bg-elevated, #0d1117);
   border: 1px solid var(--border-subtle, #1f2a3a);
   border-radius: 4px;
-  padding: 4px 7px;
+  padding: var(--sp-4) var(--sp-7);
   font-size: calc(11px * var(--font-scale, 1));
   color: var(--text-primary);
   white-space: nowrap;
@@ -191,13 +191,13 @@
   z-index: 5;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--sp-2);
 }
 
 .tooltipRow {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--sp-6);
 }
 
 .tooltipName {
@@ -211,8 +211,8 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 6px;
-  padding: 6px 8px 0;
+  gap: var(--sp-6);
+  padding: var(--sp-6) var(--sp-8) 0;
   font-size: calc(10px * var(--font-scale, 1));
   color: var(--text-muted);
   cursor: pointer;
