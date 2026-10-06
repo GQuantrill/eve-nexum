@@ -1435,6 +1435,13 @@
     "fleetHeatmap": "Mapa de calor da frota",
     "fleetHint": "Mostra os companheiros de frota como pontos roxos no sistema em que estão. Passa o rato sobre um ponto para ver os nomes.",
     "fontSize": "Tamanho da letra",
+    "density": "Densidade da interface",
+    "densityHint": "Espacamento a volta do texto dos paineis. O tamanho da letra e independente, por isso podes manter texto grande numa interface mais compacta.",
+    "densityOptions": {
+      "comfortable": "Confortavel",
+      "compact": "Compacta",
+      "dense": "Densa"
+    },
     "heatIntensity": "Intensidade",
     "heatmap": "Mapa de calor",
     "heatmapOptions": {

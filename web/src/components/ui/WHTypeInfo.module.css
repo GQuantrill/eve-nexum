@@ -27,10 +27,10 @@
   background: var(--surface-well);
   border: 1px solid var(--border-accent);
   border-radius: 6px;
-  padding: 8px 10px;
+  padding: var(--sp-8) var(--sp-10);
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--sp-4);
   z-index: 9999;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
 }
@@ -48,7 +48,7 @@
   font-weight: 700;
   font-size: calc(13px * var(--font-scale, 1));
   color: var(--text-default);
-  padding-bottom: 4px;
+  padding-bottom: var(--sp-4);
   border-bottom: 1px solid var(--border);
   margin-bottom: 2px;
 }
@@ -57,7 +57,7 @@
   display: flex;
   justify-content: space-between;
   font-size: calc(13px * var(--font-scale, 1));
-  gap: 12px;
+  gap: var(--sp-12);
 }
 
 .label { color: var(--text-faint); }

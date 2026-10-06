@@ -18,7 +18,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 6px;
+  gap: var(--sp-6);
   width: 100%;
   box-sizing: border-box;
   background: var(--surface-base);
@@ -28,7 +28,7 @@
   font-family: inherit;
   font-size: calc(13px * var(--font-scale, 1));
   line-height: 1.3;
-  padding: 4px 8px;
+  padding: var(--sp-4) var(--sp-8);
   cursor: pointer;
   white-space: nowrap;
   text-align: left;
@@ -70,7 +70,7 @@
 .list {
   min-height: 0;
   overflow-y: auto;
-  padding: 2px 0;
+  padding: var(--sp-2) 0;
   scrollbar-width: thin;
   scrollbar-color: var(--surface-muted) transparent;
 }
@@ -78,8 +78,8 @@
 .option {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 10px;
+  gap: var(--sp-8);
+  padding: var(--sp-6) var(--sp-10);
   cursor: pointer;
   white-space: nowrap;
   color: var(--text-secondary);

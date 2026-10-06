@@ -324,3 +324,70 @@
   --cv-sig-ghost: #6699cc;
   --cv-sig-unknown: #999999;
 }
+
+/* ── Interface density ────────────────────────────────────────────────────────
+ *
+ * Spacing steps for the panel chrome (cards, panes, panels, sidebar, layout,
+ * buttons, forms, overlays). Font size already scales through --font-scale;
+ * these are the box metrics around the text, which did not, so turning the font
+ * down only ever produced small text floating in full-size chrome.
+ *
+ * Each token is NAMED FOR ITS DEFAULT PIXEL VALUE, so --sp-6 is 6px at the
+ * default density. That makes every call site reviewable against what it
+ * replaced, and it is why the default column below is not a design choice: it
+ * reproduces the existing sizing exactly, value for value.
+ *
+ * The two tighter columns are hand-picked integers rather than a multiplier,
+ * because a computed scale lands on fractional pixels and a 4.5px padding
+ * renders as a blurry edge against a 1px border. They sit near 0.8x and 0.65x.
+ * 1px never shrinks: at that size it is a hairline doing alignment work, not
+ * rhythm.
+ *
+ * Map nodes are deliberately NOT covered -- their density is the separate
+ * "compact mode" switch, which is about what a node displays, not how the
+ * chrome is packed.
+ */
+:root {
+  --sp-1:   1px;
+  --sp-2:   2px;
+  --sp-3:   3px;
+  --sp-4:   4px;
+  --sp-5:   5px;
+  --sp-6:   6px;
+  --sp-7:   7px;
+  --sp-8:   8px;
+  --sp-10: 10px;
+  --sp-12: 12px;
+  --sp-14: 14px;
+  --sp-16: 16px;
+}
+
+:root[data-density='compact'] {
+  --sp-1:   1px;
+  --sp-2:   2px;
+  --sp-3:   2px;
+  --sp-4:   3px;
+  --sp-5:   4px;
+  --sp-6:   5px;
+  --sp-7:   6px;
+  --sp-8:   6px;
+  --sp-10:  8px;
+  --sp-12: 10px;
+  --sp-14: 11px;
+  --sp-16: 13px;
+}
+
+:root[data-density='dense'] {
+  --sp-1:   1px;
+  --sp-2:   1px;
+  --sp-3:   2px;
+  --sp-4:   3px;
+  --sp-5:   3px;
+  --sp-6:   4px;
+  --sp-7:   5px;
+  --sp-8:   5px;
+  --sp-10:  7px;
+  --sp-12:  8px;
+  --sp-14:  9px;
+  --sp-16: 10px;
+}

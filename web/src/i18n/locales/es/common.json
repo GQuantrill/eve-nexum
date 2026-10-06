@@ -1435,6 +1435,13 @@
     "fleetHeatmap": "Mapa de calor de flota",
     "fleetHint": "Muestra a los compañeros de flota como puntos morados en el sistema en el que están. Pasa el ratón por un punto para ver los nombres.",
     "fontSize": "Tamaño de fuente",
+    "density": "Densidad de la interfaz",
+    "densityHint": "Espaciado alrededor del texto de los paneles. El tamano de fuente es independiente, asi que puedes mantener texto grande en una interfaz mas compacta.",
+    "densityOptions": {
+      "comfortable": "Comoda",
+      "compact": "Compacta",
+      "dense": "Densa"
+    },
     "heatIntensity": "Intensidad",
     "heatmap": "Mapa de calor",
     "heatmapOptions": {

@@ -1435,6 +1435,13 @@
     "fleetHeatmap": "Carte de chaleur de flotte",
     "fleetHint": "Afficher les membres de la flotte sous forme de points violets sur leur système. Survolez un point pour voir les noms.",
     "fontSize": "Taille de police",
+    "density": "Densite de l'interface",
+    "densityHint": "Espacement autour du texte des panneaux. La taille de police est independante : vous pouvez garder un grand texte dans une interface plus compacte.",
+    "densityOptions": {
+      "comfortable": "Confortable",
+      "compact": "Compacte",
+      "dense": "Dense"
+    },
     "heatIntensity": "Intensité",
     "heatmap": "Carte de chaleur",
     "heatmapOptions": {

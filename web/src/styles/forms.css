@@ -18,7 +18,7 @@
   border-radius: 5px;
   color: var(--text-bright);
   font-size: calc(13px * var(--font-scale, 1));
-  padding: 7px 30px 7px 10px;
+  padding: var(--sp-7) 30px var(--sp-7) var(--sp-10);
   outline: none;
   box-sizing: border-box;
 
@@ -42,7 +42,7 @@
   color: #4a6a5a;
   cursor: pointer;
   font-size: calc(13px * var(--font-scale, 1));
-  padding: 2px 4px;
+  padding: var(--sp-2) var(--sp-4);
   line-height: 1;
   border-radius: 3px;
 
@@ -66,14 +66,14 @@
   margin: 6px 0 0;
   font-size: calc(13px * var(--font-scale, 1));
   color: #4a5a7a;
-  padding: 0 2px;
+  padding: 0 var(--sp-2);
 }
 
 .search-field__duplicate {
   margin: 6px 0 0;
   font-size: calc(13px * var(--font-scale, 1));
   color: #c47a2a;
-  padding: 0 2px;
+  padding: 0 var(--sp-2);
 }
 
 @keyframes spin { to { transform: translateY(-50%) rotate(360deg); } }
@@ -88,7 +88,7 @@
   border-radius: 5px;
   list-style: none;
   margin: 0;
-  padding: 4px 0;
+  padding: var(--sp-4) 0;
   z-index: 10;
   max-height: 200px;
   overflow-y: auto;
@@ -98,7 +98,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 7px 12px;
+  padding: var(--sp-7) var(--sp-12);
   font-size: calc(13px * var(--font-scale, 1));
   color: var(--text-default);
   cursor: pointer;

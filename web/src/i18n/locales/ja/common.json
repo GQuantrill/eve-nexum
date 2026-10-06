@@ -1435,6 +1435,13 @@
     "fleetHeatmap": "フリートヒートマップ",
     "fleetHint": "フリートメンバーを、いる星系の上に紫の点として表示します。点にカーソルを合わせると名前が表示されます。",
     "fontSize": "フォントサイズ",
+    "density": "インターフェースの密度",
+    "densityHint": "パネル内テキストの余白。フォントサイズとは独立しているため、大きな文字のまま余白を詰めることもできます。",
+    "densityOptions": {
+      "comfortable": "ゆったり",
+      "compact": "コンパクト",
+      "dense": "高密度"
+    },
     "heatIntensity": "強度",
     "heatmap": "ヒートマップ",
     "heatmapOptions": {

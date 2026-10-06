@@ -14,6 +14,7 @@ import { CommandPaletteModal } from './components/ui/CommandPaletteModal';
 import { LandingPage } from './components/ui/LandingPage';
 import { Toaster } from './components/ui/Toaster';
 import { toast } from './utils/toastStore';
+import { applyDensity, normaliseDensity, DEFAULT_DENSITY } from './utils/density';
 import i18n from './i18n';
 import { TooltipLayer } from './components/ui/TooltipLayer';
 import { AdminPage } from './components/ui/AdminPage';
@@ -72,6 +73,15 @@ function MapApp() {
       delete document.documentElement.dataset.colorVision;
     }
   }, [colorVision]);
+
+  // Interface density → data attribute on <html>, same mechanism as the colour
+  // palette above. This is the box metrics around the text; --font-scale above
+  // is the text itself. They are deliberately independent, so large type in
+  // tight chrome is a reachable combination.
+  const [density] = useUserSetting<string>('nexum.ui.density', DEFAULT_DENSITY);
+  useEffect(() => {
+    applyDensity(normaliseDensity(density));
+  }, [density]);
 
   // Only re-run when the user's identity changes, not on every shape mutation
   // of the user object (panel reorder, prefs toggle, etc).

@@ -1435,6 +1435,13 @@
     "fleetHeatmap": "Flotten-Heatmap",
     "fleetHint": "Flottenmitglieder als violette Punkte auf ihrem System anzeigen. Punkt überfahren, um die Namen zu sehen.",
     "fontSize": "Schriftgröße",
+    "density": "Oberflaechendichte",
+    "densityHint": "Abstaende um Panel-Texte. Die Schriftgroesse ist davon getrennt, grosse Schrift in kompakterer Oberflaeche ist also moeglich.",
+    "densityOptions": {
+      "comfortable": "Komfortabel",
+      "compact": "Kompakt",
+      "dense": "Dicht"
+    },
     "heatIntensity": "Intensität",
     "heatmap": "Heatmap",
     "heatmapOptions": {

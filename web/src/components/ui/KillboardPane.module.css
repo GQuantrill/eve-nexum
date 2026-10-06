@@ -2,7 +2,7 @@
 .state {
   font-size: calc(13px * var(--font-scale, 1));
   color: var(--text-secondary);
-  padding: 8px 4px;
+  padding: var(--sp-8) var(--sp-4);
   margin: 0;
 }
 
@@ -16,7 +16,7 @@
   justify-content: space-between;
   font-size: calc(16px * var(--font-scale, 1));
   color: var(--text-faint);
-  padding: 2px 4px 6px;
+  padding: var(--sp-2) var(--sp-4) var(--sp-6);
 }
 
 .loadMore {
@@ -29,7 +29,7 @@
   cursor: pointer;
   font-size: calc(12px * var(--font-scale, 1));
   letter-spacing: 0.04em;
-  padding: 6px 14px;
+  padding: var(--sp-6) var(--sp-14);
   transition: background 120ms ease, color 120ms ease;
 
   &:hover { background: var(--border); color: var(--text-bright); }
@@ -38,7 +38,7 @@
 .npcToggle {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--sp-4);
   font-size: calc(11px * var(--font-scale, 1));
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -77,8 +77,8 @@
 .kill {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 5px 6px;
+  gap: var(--sp-10);
+  padding: var(--sp-5) var(--sp-6);
   border-bottom: 1px solid var(--surface-raised);
   text-decoration: none;
   transition: background 0.1s;
@@ -119,14 +119,14 @@
    pills (red for hostile, blue for friendly). */
 .killBad {
   border-left: 3px solid var(--danger-strong);
-  padding-left: 6px;
+  padding-left: var(--sp-6);
   background: linear-gradient(to right, rgba(231,76,60,0.18), rgba(231,76,60,0) 35%);
 }
 .killBad:hover  { background: linear-gradient(to right, rgba(231,76,60,0.28), rgba(231,76,60,0.04) 50%); }
 
 .killGood {
   border-left: 3px solid var(--accent);
-  padding-left: 6px;
+  padding-left: var(--sp-6);
   background: linear-gradient(to right, rgba(91,155,255,0.18), rgba(91,155,255,0) 35%);
 }
 .killGood:hover { background: linear-gradient(to right, rgba(91,155,255,0.28), rgba(91,155,255,0.04) 50%); }
@@ -153,7 +153,7 @@
   left:  -4px;
   min-width: 16px;
   height: 16px;
-  padding: 0 4px;
+  padding: 0 var(--sp-4);
   border-radius: 8px;
   background: var(--border);
   border: 1px solid var(--surface-well);
@@ -187,7 +187,7 @@
   border-radius: 5px;
   color: var(--text-primary);
   font-size: calc(11px * var(--font-scale, 1));
-  padding: 3px 7px;
+  padding: var(--sp-3) var(--sp-7);
   white-space: nowrap;
   pointer-events: none;
   opacity: 0;
@@ -206,7 +206,7 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 4px;
+  gap: var(--sp-4);
   flex-shrink: 0;
 }
 
@@ -220,7 +220,7 @@
 .names {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: var(--sp-1);
   min-width: 0;
   max-width: 160px;
 }
@@ -250,7 +250,7 @@
 .nameAffil {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--sp-4);
   font-size: calc(12px * var(--font-scale, 1));
   color: var(--text-muted);
 }
@@ -272,7 +272,7 @@
 .right {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--sp-10);
   margin-left: auto;
   flex-shrink: 0;
 }
@@ -280,7 +280,7 @@
 .attacker {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--sp-6);
   flex-shrink: 0;
 }
 
@@ -310,7 +310,7 @@
     border-radius: 5px;
     color: var(--text-primary);
     font-size: calc(11px * var(--font-scale, 1));
-    padding: 3px 7px;
+    padding: var(--sp-3) var(--sp-7);
     white-space: nowrap;
     pointer-events: none;
     opacity: 0;
@@ -336,7 +336,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 1px;
+  gap: var(--sp-1);
   flex-shrink: 0;
   min-width: 70px;
 }
