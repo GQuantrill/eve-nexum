@@ -372,7 +372,7 @@ function ActivityChartsView({ data }: { data: HourlyPoint[] }) {
 
   // Opt-in: one set of axes instead of a chart each, to save vertical room.
   // Default off, so the pane is unchanged for anyone who does not ask for it.
-  const [combined] = useUserSetting<boolean>('nexum.activity.combined', false);
+  const [combined, setCombined] = useUserSetting<boolean>('nexum.activity.combined', false);
 
   // Reading order, persisted the same way. Drag a chart's grip to change it.
   const [savedOrder, setOrder] = useUserSetting<ChartKey[]>('nexum.activity.order', DEFAULT_CHART_ORDER);
@@ -421,6 +421,20 @@ function ActivityChartsView({ data }: { data: HourlyPoint[] }) {
     return <div className="sig-pane__empty">{t('activity.allHidden')}</div>;
   }
 
+  // The same setting Map Options writes, surfaced where the charts are: this is
+  // a layout choice you make while looking at them, and Map Options is three
+  // clicks and a different panel away.
+  const toolbar = (
+    <label className={styles.toolbar}>
+      <input
+        type="checkbox"
+        checked={combined}
+        onChange={(e) => setCombined(e.target.checked)}
+      />
+      <span>{t('mapSidebar.activityCombined')}</span>
+    </label>
+  );
+
   // npcDelta is excluded from the shared axis on purpose. It is a signed
   // departure from a baseline, so its zero means something ("normal"), while
   // the combined axis runs 0..peak and its zero means "nothing happened".
@@ -433,6 +447,8 @@ function ActivityChartsView({ data }: { data: HourlyPoint[] }) {
   if (combined && mergeable.length > 1) {
     const rest = visible.filter((k) => charts[k].signed);
     return (
+      <>
+      {toolbar}
       <div className={styles.pane}>
         <CombinedChart
           series={mergeable.map((k) => ({
@@ -453,10 +469,13 @@ function ActivityChartsView({ data }: { data: HourlyPoint[] }) {
           </div>
         ))}
       </div>
+      </>
     );
   }
 
   return (
+    <>
+    {toolbar}
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
       {/* Rect strategy, not the vertical one the panel stack uses: these wrap
           into a grid once the pane is wide enough for two across. */}
@@ -475,6 +494,7 @@ function ActivityChartsView({ data }: { data: HourlyPoint[] }) {
         </div>
       </SortableContext>
     </DndContext>
+    </>
   );
 }
 

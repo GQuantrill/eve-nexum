@@ -204,3 +204,22 @@
   color: var(--text-muted);
   margin-right: auto;
 }
+
+/* The combine switch, sitting with the charts rather than only in Map Options.
+   Right-aligned and muted: it is a layout control, not part of the data. */
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  padding: 6px 8px 0;
+  font-size: calc(10px * var(--font-scale, 1));
+  color: var(--text-muted);
+  cursor: pointer;
+  user-select: none;
+}
+
+.toolbar input {
+  cursor: pointer;
+  margin: 0;
+}
