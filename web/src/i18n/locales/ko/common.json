@@ -1986,8 +1986,6 @@
     "getMoreMaps": "+ 맵 추가하기",
     "help": "도움말 및 사용법",
     "lastKnownSystem": "마지막으로 확인된 성계",
-    "layoutBelowTooltip": "패널이 지도 아래에 있음 — 옆으로 전환",
-    "layoutBesideTooltip": "패널이 지도 옆에 있음 — 아래로 전환",
     "leaveMapConfirm": "목록에서 “{{name}}”을(를) 제거할까요? 소유자가 나중에 다시 공유할 수 있습니다.",
     "leaveThisMap": "공유된 지도 나가기",
     "locked": "잠김",

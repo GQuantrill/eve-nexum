@@ -1986,8 +1986,6 @@
     "getMoreMaps": "+ Get more maps",
     "help": "Help & how-to",
     "lastKnownSystem": "Last known system",
-    "layoutBelowTooltip": "Panel is below the map — switch to beside",
-    "layoutBesideTooltip": "Panel is beside the map — switch to below",
     "leaveMapConfirm": "Remove \"{{name}}\" from your list? The owner can share it again later.",
     "leaveThisMap": "Leave shared map",
     "locked": "Locked",

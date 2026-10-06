@@ -1986,8 +1986,6 @@
     "getMoreMaps": "+ 获取更多地图",
     "help": "帮助与使用指南",
     "lastKnownSystem": "最后已知星系",
-    "layoutBelowTooltip": "面板在地图下方 — 切换到旁边",
-    "layoutBesideTooltip": "面板在地图旁 — 切换到下方",
     "leaveMapConfirm": "从你的列表中移除「{{name}}」？所有者之后可以再次共享。",
     "leaveThisMap": "退出共享地图",
     "locked": "已锁定",

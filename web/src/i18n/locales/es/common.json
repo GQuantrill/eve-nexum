@@ -1986,8 +1986,6 @@
     "getMoreMaps": "+ Obtener más mapas",
     "help": "Ayuda y guía",
     "lastKnownSystem": "Último sistema conocido",
-    "layoutBelowTooltip": "El panel está debajo del mapa: cambiar a un lado",
-    "layoutBesideTooltip": "El panel está junto al mapa: cambiar a debajo",
     "leaveMapConfirm": "¿Quitar «{{name}}» de tu lista? El propietario puede volver a compartirlo más tarde.",
     "leaveThisMap": "Salir del mapa compartido",
     "locked": "Bloqueado",

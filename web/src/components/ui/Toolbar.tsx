@@ -39,7 +39,6 @@ import {
   ArrowCounterClockwiseIcon,
   ChartBarIcon,
   ClockCountdownIcon,
-  ColumnsIcon,
   GearIcon,
   DiscordLogoIcon,
   DotsSixVerticalIcon,
@@ -242,8 +241,6 @@ export function Toolbar() {
   const maps            = useMapStore((s) => s.maps);
   const maxMaps         = useMapStore((s) => s.maxMaps);
   const iskMapsEnabled  = useMapStore((s) => s.iskMapsEnabled);
-  const panelSideBySide = useMapStore((s) => s.panelSideBySide);
-  const setPanelSideBySide = useMapStore((s) => s.setPanelSideBySide);
   const setMapSettingsOpen = useMapStore((s) => s.setMapSettingsOpen);
   const maxCorpMaps     = useMapStore((s) => s.maxCorpMaps);
   const corpMapCount    = useMapStore((s) => s.corpMapCount);
@@ -769,15 +766,6 @@ export function Toolbar() {
           aria-label={t('mapSidebar.settings')}
         >
           <GearIcon size={18} weight="regular" />
-        </button>
-        <button
-          className={`toolbar__toggle toolbar__toggle--icon toolbar__toggle--prominent${panelSideBySide ? ' toolbar__toggle--on' : ''}`}
-          onClick={() => setPanelSideBySide(!panelSideBySide)}
-          aria-pressed={panelSideBySide}
-          data-tooltip={panelSideBySide ? t('toolbar.layoutBesideTooltip') : t('toolbar.layoutBelowTooltip')}
-          aria-label={t('mapSidebar.panelLayout')}
-        >
-          <ColumnsIcon size={18} weight="regular" />
         </button>
         <button
           className={`toolbar__toggle toolbar__toggle--icon toolbar__toggle--prominent${trackJumps ? ' toolbar__toggle--on' : ''}`}

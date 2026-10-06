@@ -1986,8 +1986,6 @@
     "getMoreMaps": "+ Obtenir plus de cartes",
     "help": "Aide & guide",
     "lastKnownSystem": "Dernier système connu",
-    "layoutBelowTooltip": "Panneau sous la carte — passer à côté",
-    "layoutBesideTooltip": "Panneau à côté de la carte — passer en dessous",
     "leaveMapConfirm": "Retirer « {{name}} » de votre liste ? Le propriétaire pourra la repartager plus tard.",
     "leaveThisMap": "Quitter la carte partagée",
     "locked": "Verrouillée",
