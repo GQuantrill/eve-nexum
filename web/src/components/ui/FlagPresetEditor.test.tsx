@@ -15,7 +15,7 @@ vi.mock('uuid', () => ({ v4: () => 'generated-id' }));
 import { FlagPresetEditor } from './FlagPresetEditor';
 import { MAX_FLAG_PRESETS } from '../../hooks/useFlagPresets';
 
-const P = (id: string) => ({ id, name: `Preset ${id}`, icon: 'SkullIcon', color: '#e05a5a' });
+const P = (id: string) => ({ id, name: `Preset ${id}`, icon: 'Skull', color: '#e05a5a' });
 
 describe('FlagPresetEditor', () => {
   it('adds a preset through the callback rather than owning state', () => {
@@ -23,7 +23,7 @@ describe('FlagPresetEditor', () => {
     render(<FlagPresetEditor items={[]} onChange={onChange} />);
     fireEvent.click(screen.getByText(/flagPresets\.add/));
     expect(onChange).toHaveBeenCalledWith([
-      { id: 'generated-id', name: 'flagPresets.newItem', icon: 'TagIcon', color: '#f0a030' },
+      { id: 'generated-id', name: 'flagPresets.newItem', icon: 'Tag', color: '#f0a030' },
     ]);
   });
 
