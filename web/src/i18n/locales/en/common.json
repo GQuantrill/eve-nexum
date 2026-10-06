@@ -1845,7 +1845,10 @@
     "colSafe": "Safe",
     "safeYes": "Safe — no combat",
     "safeNo": "Not safe — may spawn combat",
-    "safeHint": "Relic / data site safety"
+    "safeHint": "Relic / data site safety",
+    "countFiltered": "{{shown}} of {{total}}",
+    "countHint": "Signatures in this system",
+    "countFilteredHint": "Signatures shown of the system total"
   },
   "stats": {
     "title": "User Stats",
@@ -2121,7 +2124,8 @@
     "searchPlaceholder": "Search…",
     "connectedSystems": "Connected Systems",
     "other": "Other",
-    "inbound": "inbound"
+    "inbound": "inbound",
+    "exactClass": "Exact class"
   },
   "exits": {
     "notifTitle": "K-space exit",

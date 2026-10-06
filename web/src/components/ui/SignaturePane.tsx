@@ -1187,6 +1187,18 @@ export function SignaturePane({ systemId }: { systemId: string }) {
               {t('signatures.filterClear')}
             </button>
           )}
+          {/* Deliberately "shown of total" while a filter is on: a bare number
+              next to active filter chips reads as the system's signature count
+              and would understate it. No plural form, so it behaves the same in
+              languages that have none. */}
+          <span
+            className="sig-pane__count"
+            title={typeFilter.size > 0 ? t('signatures.countFilteredHint') : t('signatures.countHint')}
+          >
+            {typeFilter.size > 0
+              ? t('signatures.countFiltered', { shown: sortedSigs.length, total: sigs.length })
+              : sigs.length}
+          </span>
           <div className="sig-col-menu">
             <button
               ref={colBtnRef}

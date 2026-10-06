@@ -1845,7 +1845,10 @@
     "colSafe": "Sûr",
     "safeYes": "Sûr — pas de combat",
     "safeNo": "Pas sûr — peut faire apparaître des ennemis",
-    "safeHint": "Sûreté des sites relique/données"
+    "safeHint": "Sûreté des sites relique/données",
+    "countFiltered": "{{shown}} sur {{total}}",
+    "countHint": "Signatures dans ce systeme",
+    "countFilteredHint": "Signatures affichees sur le total du systeme"
   },
   "stats": {
     "title": "Statistiques utilisateur",
@@ -2121,7 +2124,8 @@
     "searchPlaceholder": "Rechercher…",
     "connectedSystems": "Systèmes connectés",
     "other": "Autre",
-    "inbound": "entrant"
+    "inbound": "entrant",
+    "exactClass": "Classe exacte"
   },
   "exits": {
     "notifTitle": "Sortie vers le k-space",

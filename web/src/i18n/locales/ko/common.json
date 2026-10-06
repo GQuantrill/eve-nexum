@@ -1845,7 +1845,10 @@
     "colSafe": "안전",
     "safeYes": "안전 — 전투 없음",
     "safeNo": "위험 — 적 스폰 가능",
-    "safeHint": "유물/데이터 사이트 안전성"
+    "safeHint": "유물/데이터 사이트 안전성",
+    "countFiltered": "{{total}}개 중 {{shown}}개",
+    "countHint": "이 성계의 시그니처",
+    "countFilteredHint": "성계 전체 중 표시된 시그니처"
   },
   "stats": {
     "title": "사용자 통계",
@@ -2121,7 +2124,8 @@
     "searchPlaceholder": "검색…",
     "connectedSystems": "연결된 성계",
     "other": "기타",
-    "inbound": "들어오는"
+    "inbound": "들어오는",
+    "exactClass": "정확한 등급"
   },
   "exits": {
     "notifTitle": "k-space 출구",

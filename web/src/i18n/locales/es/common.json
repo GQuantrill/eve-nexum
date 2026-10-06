@@ -1845,7 +1845,10 @@
     "colSafe": "Seguro",
     "safeYes": "Seguro — sin combate",
     "safeNo": "No seguro — puede generar enemigos",
-    "safeHint": "Seguridad de sitios de reliquia/datos"
+    "safeHint": "Seguridad de sitios de reliquia/datos",
+    "countFiltered": "{{shown}} de {{total}}",
+    "countHint": "Firmas en este sistema",
+    "countFilteredHint": "Firmas mostradas del total del sistema"
   },
   "stats": {
     "title": "Estadísticas de usuario",
@@ -2121,7 +2124,8 @@
     "searchPlaceholder": "Buscar…",
     "connectedSystems": "Sistemas conectados",
     "other": "Otros",
-    "inbound": "entrante"
+    "inbound": "entrante",
+    "exactClass": "Clase exacta"
   },
   "exits": {
     "notifTitle": "Salida a k-space",

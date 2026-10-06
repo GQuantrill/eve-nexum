@@ -32,6 +32,18 @@ const J_SPACE: DestOption[] = [
   { value: 'Pochven', label: CLASS_LABELS.Pochven, color: CLASS_COLORS.Pochven },
   { value: 'Drifter', label: CLASS_LABELS.Drifter, color: CLASS_COLORS.Drifter },
 ];
+// The bands above are what an UNSCANNED hole's info window tells you. The visual
+// appearance of the hole itself is more specific than its description, so a
+// scout who recognises it can pin the exact class instead of the band. Stored
+// as a plain class ('C2'), which every consumer already understands --
+// leadsToClasses resolves it, isUnresolvedLeadsTo lists it, and the button
+// label/colour path handles it as `isClass`.
+//
+// C6 is absent deliberately: it has no band, so it is already an exact answer
+// and lives with the description-level options above.
+const J_EXACT: DestOption[] = (['C1', 'C2', 'C3', 'C4', 'C5'] as SystemClass[])
+  .map((c) => ({ value: c, label: CLASS_LABELS[c], color: CLASS_COLORS[c] }));
+
 const K_SPACE: SystemClass[] = ['HS', 'LS', 'NS'];
 
 export function LeadsToDropdown({ value, onChange, connectedSystems = [] }: Props) {
@@ -56,6 +68,10 @@ export function LeadsToDropdown({ value, onChange, connectedSystems = [] }: Prop
 
   const filteredJSpace = useMemo(() =>
     J_SPACE.filter(o => !q || o.value.toUpperCase().includes(q) || o.label.toUpperCase().includes(q)),
+    [q]);
+
+  const filteredJExact = useMemo(() =>
+    J_EXACT.filter(o => !q || o.value.toUpperCase().includes(q) || o.label.toUpperCase().includes(q)),
     [q]);
 
   const filteredKSpace = useMemo(() =>
@@ -177,6 +193,26 @@ export function LeadsToDropdown({ value, onChange, connectedSystems = [] }: Prop
                   >
                     <span className="wh-picker__dest" style={{ color: CLASS_COLORS[cls] }}>
                       {CLASS_LABELS[cls]}
+                    </span>
+                  </div>
+                ))}
+              </>
+            )}
+
+            {filteredJExact.length > 0 && (
+              <>
+                <div className="wh-picker__group-hdr">
+                  {t('whPicker.exactClass')}
+                  <span className="wh-picker__group-count">({J_EXACT.length})</span>
+                </div>
+                {filteredJExact.map(o => (
+                  <div
+                    key={o.value}
+                    className={`wh-picker__option${value === o.value ? ' wh-picker__option--active' : ''}`}
+                    onMouseDown={() => select(o.value)}
+                  >
+                    <span className="wh-picker__dest" style={{ color: o.color }}>
+                      {o.label}
                     </span>
                   </div>
                 ))}

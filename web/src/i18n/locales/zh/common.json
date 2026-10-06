@@ -1845,7 +1845,10 @@
     "colSafe": "安全",
     "safeYes": "安全 — 无战斗",
     "safeNo": "不安全 — 可能刷怪",
-    "safeHint": "遗迹/数据站点安全性"
+    "safeHint": "遗迹/数据站点安全性",
+    "countFiltered": "{{total}} 中的 {{shown}}",
+    "countHint": "该星系的信号",
+    "countFilteredHint": "已显示的信号数 / 星系总数"
   },
   "stats": {
     "title": "用户统计",
@@ -2121,7 +2124,8 @@
     "searchPlaceholder": "搜索…",
     "connectedSystems": "已连接星系",
     "other": "其他",
-    "inbound": "入向"
+    "inbound": "入向",
+    "exactClass": "精确星域等级"
   },
   "exits": {
     "notifTitle": "k-space 出口",
