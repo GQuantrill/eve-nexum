@@ -724,7 +724,7 @@
     "removeSystem": "Remover sistema",
     "connectTo": "Ligar a sistema…",
     "connectToHint": "Clique no sistema ao qual ligar {{system}} — Esc para cancelar",
-    "addConnected": "Adicionar sistema ligado...",
+    "addConnected": "Adicionar sistema ligado…",
     "connectToDone": "{{from}} ligado a {{to}}",
     "removeSystems": "Remover {{count}} sistemas",
     "addSystem": "Adicionar sistema",
@@ -1437,9 +1437,9 @@
     "fleetHint": "Mostra os companheiros de frota como pontos roxos no sistema em que estão. Passa o rato sobre um ponto para ver os nomes.",
     "fontSize": "Tamanho da letra",
     "density": "Densidade da interface",
-    "densityHint": "Espacamento a volta do texto dos paineis. O tamanho da letra e independente, por isso podes manter texto grande numa interface mais compacta.",
+    "densityHint": "Espaçamento à volta do texto dos painéis. O tamanho da letra é independente, por isso podes manter texto grande numa interface mais compacta.",
     "densityOptions": {
-      "comfortable": "Confortavel",
+      "comfortable": "Confortável",
       "compact": "Compacta",
       "dense": "Densa"
     },

@@ -724,7 +724,7 @@
     "removeSystem": "移除星系",
     "connectTo": "连接到星系…",
     "connectToHint": "点击要与 {{system}} 相连的星系 —— 按 Esc 取消",
-    "addConnected": "添加相连星系...",
+    "addConnected": "添加相连星系…",
     "connectToDone": "已将 {{from}} 连接到 {{to}}",
     "removeSystems": "移除 {{count}} 个星系",
     "addSystem": "添加星系",

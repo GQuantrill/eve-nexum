@@ -724,7 +724,7 @@
     "removeSystem": "星系を削除",
     "connectTo": "システムと接続…",
     "connectToHint": "{{system}} の接続先システムをクリックしてください — Esc でキャンセル",
-    "addConnected": "接続先システムを追加...",
+    "addConnected": "接続先システムを追加…",
     "connectToDone": "{{from}} を {{to}} に接続しました",
     "removeSystems": "{{count}} 星系を削除",
     "addSystem": "星系を追加",

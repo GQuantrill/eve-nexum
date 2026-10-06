@@ -724,7 +724,7 @@
     "removeSystem": "Retirer le système",
     "connectTo": "Connecter à un système…",
     "connectToHint": "Cliquez sur le système auquel connecter {{system}} — Échap pour annuler",
-    "addConnected": "Ajouter un systeme connecte...",
+    "addConnected": "Ajouter un système connecté…",
     "connectToDone": "{{from}} connecté à {{to}}",
     "removeSystems": "Retirer {{count}} systèmes",
     "addSystem": "Ajouter un système",
@@ -1436,8 +1436,8 @@
     "fleetHeatmap": "Carte de chaleur de flotte",
     "fleetHint": "Afficher les membres de la flotte sous forme de points violets sur leur système. Survolez un point pour voir les noms.",
     "fontSize": "Taille de police",
-    "density": "Densite de l'interface",
-    "densityHint": "Espacement autour du texte des panneaux. La taille de police est independante : vous pouvez garder un grand texte dans une interface plus compacte.",
+    "density": "Densité de l'interface",
+    "densityHint": "Espacement autour du texte des panneaux. La taille de police est indépendante : vous pouvez garder un grand texte dans une interface plus compacte.",
     "densityOptions": {
       "comfortable": "Confortable",
       "compact": "Compacte",
@@ -1855,8 +1855,8 @@
     "safeNo": "Pas sûr — peut faire apparaître des ennemis",
     "safeHint": "Sûreté des sites relique/données",
     "countFiltered": "{{shown}} sur {{total}}",
-    "countHint": "Signatures dans ce systeme",
-    "countFilteredHint": "Signatures affichees sur le total du systeme"
+    "countHint": "Signatures dans ce système",
+    "countFilteredHint": "Signatures affichées sur le total du système"
   },
   "stats": {
     "title": "Statistiques utilisateur",
