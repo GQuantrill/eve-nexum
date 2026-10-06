@@ -1845,7 +1845,10 @@
     "colSafe": "安全",
     "safeYes": "安全 — 戦闘なし",
     "safeNo": "危険 — 敵が出現する可能性",
-    "safeHint": "遺物/データサイトの安全性"
+    "safeHint": "遺物/データサイトの安全性",
+    "countFiltered": "{{total}} 件中 {{shown}} 件",
+    "countHint": "このシステムのシグネチャ",
+    "countFilteredHint": "システム全体のうち表示されているシグネチャ"
   },
   "stats": {
     "title": "ユーザー統計",
@@ -2121,7 +2124,8 @@
     "searchPlaceholder": "検索…",
     "connectedSystems": "接続された星系",
     "other": "その他",
-    "inbound": "インバウンド"
+    "inbound": "インバウンド",
+    "exactClass": "正確なクラス"
   },
   "exits": {
     "notifTitle": "k-spaceの出口",

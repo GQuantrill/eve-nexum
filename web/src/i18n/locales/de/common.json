@@ -1845,7 +1845,10 @@
     "colSafe": "Sicher",
     "safeYes": "Sicher — kein Kampf",
     "safeNo": "Nicht sicher — kann Gegner spawnen",
-    "safeHint": "Sicherheit von Relikt-/Datenstätten"
+    "safeHint": "Sicherheit von Relikt-/Datenstätten",
+    "countFiltered": "{{shown}} von {{total}}",
+    "countHint": "Signaturen in diesem System",
+    "countFilteredHint": "Angezeigte Signaturen von der Gesamtzahl des Systems"
   },
   "stats": {
     "title": "Benutzerstatistik",
@@ -2121,7 +2124,8 @@
     "searchPlaceholder": "Suchen…",
     "connectedSystems": "Verbundene Systeme",
     "other": "Andere",
-    "inbound": "eingehend"
+    "inbound": "eingehend",
+    "exactClass": "Genaue Klasse"
   },
   "exits": {
     "notifTitle": "K-Space-Ausgang",

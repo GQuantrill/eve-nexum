@@ -707,3 +707,15 @@
   height: 240px;
 }
 
+
+/* Signature total, sitting at the end of the filter row. Pushed right so it
+   reads as a summary of the list rather than another filter chip. */
+.sig-pane__count {
+  margin-left: auto;
+  padding-left: var(--sp-6, 6px);
+  color: var(--text-muted);
+  font-size: calc(11px * var(--font-scale, 1));
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  cursor: default;
+}
