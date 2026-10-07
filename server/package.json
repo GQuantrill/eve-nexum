@@ -21,12 +21,14 @@
     "extract-wormholes": "tsx scripts/extract-wormholes.ts"
   },
   "resolutions": {
-    "qs": "^6.16.0",
-    "esbuild": "^0.28.1",
-    "undici": "^7.29.1",
     "body-parser": "^1.20.6",
+    "esbuild": "^0.28.1",
     "ip-address": "^10.5.1",
-    "postcss": "^8.5.23"
+    "postcss": "^8.5.23",
+    "proxy-addr": "^2.0.8",
+    "qs": "^6.16.0",
+    "source-map-js": "^1.2.2",
+    "undici": "^7.29.1"
   },
   "dependencies": {
     "cheerio": "^1.2.0",
