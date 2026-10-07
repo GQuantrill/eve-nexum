@@ -79,9 +79,9 @@
   border-width: 4px;
 
   /* Hover keeps the intel colour (toggling borders on hover read as jumpy).
-     Selection is intentionally NOT held here so a selected node falls through
-     to the white highlight from the base rules — otherwise a selected
-     "occupied" system stays orange and is indistinguishable from the tag. */
+     Selection no longer needs an exception: it draws a ring outside the border
+     rather than recolouring it, so an "occupied" system stays orange AND reads
+     as selected, instead of having to give up one to show the other. */
   &:hover {
     border-color: var(--intel-color);
   }
@@ -184,13 +184,23 @@
     box-shadow: 0 0 12px color-mix(in srgb, var(--class-color) 30%, transparent);
   }
 
-  /* Selected node: white border + soft white glow, matching the current-system
-     treatment so neither collides with the orange "occupied" bezel. Kept a
-     touch lighter than data-current (below) so "where you are" still reads
-     slightly stronger; data-current wins when a node is both. */
+  /* Selected node: a detached accent ring, NOT a white border.
+     
+     Selection and "you are here" both used to paint the border white and
+     differed only by glow opacity (0.4 against 0.55), which is not a
+     difference anyone can see. The result was several white nodes on a map
+     where exactly one of them meant "you", so white stopped meaning anything.
+     White is now reserved for data-current alone.
+
+     The ring is a SHAPE rather than another colour because every class colour
+     is a --cv-* token that shifts with the colour-vision modes, so no hue is
+     reliably free. Sitting outside the border on its own offset, it also
+     leaves the border free to keep saying what it said before -- so a selected
+     node with an intel tag now shows both facts at once instead of trading one
+     for the other, and a node that is both selected and current shows both. */
   &[data-selected='true'] {
-    border-color: #ffffff;
-    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.4), 0 0 14px rgba(255, 255, 255, 0.28);
+    outline: 2px solid var(--accent-bright);
+    outline-offset: 2px;
   }
 
   &[data-home='true'] {
