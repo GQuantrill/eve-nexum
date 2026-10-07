@@ -1957,6 +1957,7 @@
     "openAnoikis": "anoik.is で開く",
     "moveLeft": "前の列へ移動",
     "moveRight": "次の列へ移動",
+    "resizeColumns": "ドラッグで列幅を変更、ダブルクリックで均等に戻します",
     "copyName": "システム名をコピー",
     "nameCopied": "{{name}} をコピーしました",
     "copyFailed": "コピーできませんでした — 選択して手動でコピーしてください。"

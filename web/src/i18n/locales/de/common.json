@@ -1957,6 +1957,7 @@
     "openAnoikis": "In anoik.is öffnen",
     "moveLeft": "In die vorherige Spalte verschieben",
     "moveRight": "In die nächste Spalte verschieben",
+    "resizeColumns": "Ziehen, um die Spaltenbreite zu ändern; Doppelklick gleicht sie an",
     "copyName": "Systemnamen kopieren",
     "nameCopied": "{{name}} kopiert",
     "copyFailed": "Kopieren fehlgeschlagen — bitte manuell markieren und kopieren."

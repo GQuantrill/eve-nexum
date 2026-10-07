@@ -310,3 +310,34 @@
   padding: 0;
 }
 
+
+/* Column divider. A thin hit target with a hairline drawn inside it: the grab
+   area needs to be wide enough to hit without hunting, while the line itself
+   stays quiet enough not to read as a border on the panes either side. */
+.panel-stack__divider {
+  flex: 0 0 var(--sp-8);
+  align-self: stretch;
+  min-height: var(--sp-16);
+  margin: 0 calc(var(--sp-4) * -1);
+  cursor: col-resize;
+  position: relative;
+  border-radius: 2px;
+}
+
+.panel-stack__divider::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  transform: translateX(-50%);
+  background: var(--border);
+  transition: background 0.12s ease;
+}
+
+.panel-stack__divider:hover::before,
+.panel-stack__divider:active::before {
+  background: var(--accent-bright);
+  width: 2px;
+}

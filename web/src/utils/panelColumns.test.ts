@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
-  clampColumnCount, columnOf, bucketIntoColumns, movePane, reorderWithinColumn,
-} from './panelColumns';
+  clampColumnCount, columnOf, bucketIntoColumns, movePane, reorderWithinColumn, normaliseWeights, resizeWeights } from './panelColumns';
 
 const ORDER = ['activity', 'killboard', 'notes', 'signatures', 'anomalies'];
 
@@ -101,5 +100,59 @@ describe('reordering within a column', () => {
     const next = reorderWithinColumn(ORDER, col, 'anomalies', 'killboard');
     expect([...next].sort()).toEqual([...ORDER].sort());
     expect(next).toHaveLength(ORDER.length);
+  });
+});
+
+describe('normaliseWeights', () => {
+  it('defaults to equal weights when nothing is stored', () => {
+    expect(normaliseWeights(undefined, 3)).toEqual([1, 1, 1]);
+    expect(normaliseWeights([], 2)).toEqual([1, 1]);
+  });
+
+  it('pads and truncates to the current column count', () => {
+    expect(normaliseWeights([2], 3)).toEqual([2, 1, 1]);
+    expect(normaliseWeights([2, 3, 4], 2)).toEqual([2, 3]);
+  });
+
+  it('replaces values that would collapse a column', () => {
+    // A zero or NaN weight leaves a column with no width and no handle to
+    // drag it back, so it must never survive.
+    expect(normaliseWeights([0, -1, NaN], 3)).toEqual([1, 1, 1]);
+    expect(normaliseWeights(['2', null, Infinity], 3)).toEqual([1, 1, 1]);
+  });
+});
+
+describe('resizeWeights', () => {
+  it('moves width from one column to its neighbour', () => {
+    const next = resizeWeights([1, 1], 0, 1, 100, 1000);
+    expect(next[0]).toBeGreaterThan(1);
+    expect(next[1]).toBeLessThan(1);
+  });
+
+  it('keeps the pair total constant, so other columns do not move', () => {
+    const next = resizeWeights([1, 1, 1], 0, 1, 150, 800);
+    expect(next[0] + next[1]).toBeCloseTo(2);
+    expect(next[2]).toBe(1);          // untouched
+  });
+
+  it('refuses to drag a column away to nothing', () => {
+    const far = resizeWeights([1, 1], 0, 1, -99999, 1000);
+    expect(far[0]).toBeGreaterThan(0);
+    expect(far[0] / (far[0] + far[1])).toBeCloseTo(0.15);
+  });
+
+  it('leaves the weights alone when the geometry is unusable', () => {
+    const w = [1, 1];
+    expect(resizeWeights(w, 0, 1, 50, 0)).toBe(w);      // pre-paint, zero width
+    expect(resizeWeights(w, 0, 1, NaN, 500)).toBe(w);
+    expect(resizeWeights(w, 1, 2, 50, 500)).toBe(w);    // no column to the right
+  });
+
+  it('resizes across a skipped empty column', () => {
+    // Column 1 is empty and unrendered, so the handle sits between 0 and 2.
+    const next = resizeWeights([1, 1, 1], 0, 2, 120, 900);
+    expect(next[0]).toBeGreaterThan(1);
+    expect(next[2]).toBeLessThan(1);
+    expect(next[1]).toBe(1);          // the skipped column is untouched
   });
 });

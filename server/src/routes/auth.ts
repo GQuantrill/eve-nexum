@@ -857,6 +857,7 @@ const SETTINGS_ALLOWLIST = new Set<string>([
   // panelHeight/panelInfoWidth these do belong across devices.
   'nexum.systemPanel.columns',
   'nexum.panelColumns',
+  'nexum.panelColumns.widths',
   'nexum.floatingPanels',
   'nexum.floatingPanelsLast',
   'nexum.sigPane.hiddenCols',

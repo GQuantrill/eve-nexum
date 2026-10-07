@@ -1957,6 +1957,7 @@
     "openAnoikis": "Ouvrir dans anoik.is",
     "moveLeft": "Déplacer vers la colonne précédente",
     "moveRight": "Déplacer vers la colonne suivante",
+    "resizeColumns": "Faites glisser pour redimensionner les colonnes, double-cliquez pour les égaliser",
     "copyName": "Copier le nom du système",
     "nameCopied": "{{name}} copié",
     "copyFailed": "Copie impossible — sélectionnez et copiez manuellement."
