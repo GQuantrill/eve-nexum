@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { charPortrait } from '../../utils/eveImages';
+import { siteSafety } from '../../utils/siteSafety';
 import { api } from '../../api/client';
 import i18n from '../../i18n';
 import { useMapStore, awaitSystemCreate } from '../../store/mapStore';
@@ -311,23 +312,6 @@ const SIG_TYPE_FILTER_ORDER: SigType[] = ['wormhole', 'data', 'relic', 'gas', 'o
 // holds for English — the labels are translated, the order isn't). Used for
 // both the per-row type picker and the bulk "set type" dropdown.
 const SIG_TYPE_OPTIONS: SigType[] = ['wormhole', 'combat', 'data', 'gas', 'ghost', 'ore', 'relic', 'unknown'];
-
-// Relic/data site safety, keyed on the first word of the scanned site name (per
-// the site-safety table). "Safe" sites have no NPCs; "not safe" ones can spawn
-// combat. Only relic + data sigs qualify; anything else has no safety verdict.
-const SAFE_SITE_PREFIXES   = new Set(['crumbling', 'decayed', 'ruined', 'local', 'regional', 'central']);
-const UNSAFE_SITE_PREFIXES = new Set(['forgotten', 'unsecured', 'aegis', 'scc']);
-function siteSafety(sig: Signature): 'safe' | 'unsafe' | null {
-  if (sig.sigType !== 'relic' && sig.sigType !== 'data') return null;
-  const words = (sig.name ?? '').trim().toLowerCase().split(/\s+/).filter(Boolean);
-  // Names can be prefixed with "Detected " (e.g. "Detected Central Sansha…"),
-  // so the safety keyword is the first non-"detected" word.
-  const key = words[0] === 'detected' ? words[1] : words[0];
-  if (!key) return null;
-  if (SAFE_SITE_PREFIXES.has(key))   return 'safe';
-  if (UNSAFE_SITE_PREFIXES.has(key)) return 'unsafe';
-  return null;
-}
 
 // The "Safe" cell: green tick / red cross for relic-and-data site safety, blank
 // otherwise.
