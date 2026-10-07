@@ -1857,6 +1857,7 @@
     "safeNo": "Nicht sicher — kann Gegner spawnen",
     "safeHint": "Sicherheit von Relikt-/Datenstätten",
     "countFiltered": "{{shown}} von {{total}}",
+    "countTotal": "Signaturen gesamt: {{count}}",
     "countHint": "Signaturen in diesem System",
     "countFilteredHint": "Angezeigte Signaturen von der Gesamtzahl des Systems"
   },

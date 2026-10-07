@@ -1857,6 +1857,7 @@
     "safeNo": "No seguro — puede generar enemigos",
     "safeHint": "Seguridad de sitios de reliquia/datos",
     "countFiltered": "{{shown}} de {{total}}",
+    "countTotal": "Firmas totales: {{count}}",
     "countHint": "Firmas en este sistema",
     "countFilteredHint": "Firmas mostradas del total del sistema"
   },

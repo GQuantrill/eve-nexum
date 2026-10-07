@@ -719,3 +719,15 @@
   white-space: nowrap;
   cursor: default;
 }
+
+/* Scout portrait column: first, so attribution is readable without scrolling a
+   narrow panel sideways. The margin that separated it from the age text is
+   wrong now it stands alone in its own cell. */
+.sig-td--scout {
+  padding: 0 var(--sp-2, 2px);
+  text-align: center;
+}
+
+.sig-td--scout .sig-td__scout {
+  margin-right: 0;
+}

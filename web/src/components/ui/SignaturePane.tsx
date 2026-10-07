@@ -358,11 +358,39 @@ function startTickIfNeeded() {
   }, 1000);
 }
 
-function ElapsedCell({ iso, className, byCharId, byName }: {
-  iso: string | undefined;
-  className?: string;
+/**
+ * Who scanned the row, as the leading column.
+ *
+ * It sat beside the age before, which put it behind a horizontal scroll on any
+ * panel narrow enough to need one -- the attribution was there but unreachable
+ * without dragging the table sideways. First column costs no width worth
+ * speaking of and is visible whatever the panel is doing.
+ *
+ * Nothing is rendered when the row predates attribution or the scout's account
+ * is gone: a placeholder face would imply we know and don't.
+ */
+function ScoutCell({ byCharId, byName }: {
   byCharId?: number | string | null;
   byName?: string | null;
+}) {
+  return (
+    <td className="sig-td--scout">
+      {byCharId != null && (
+        <img
+          className="sig-td__scout"
+          src={charPortrait(byCharId, 32)}
+          alt=""
+          loading="lazy"
+          data-tooltip={byName ?? String(byCharId)}
+        />
+      )}
+    </td>
+  );
+}
+
+function ElapsedCell({ iso, className }: {
+  iso: string | undefined;
+  className?: string;
 }) {
   const { t } = useTranslation();
   const [, setTick] = useState(0);
@@ -383,18 +411,6 @@ function ElapsedCell({ iso, className, byCharId, byName }: {
     : DASH;
   return (
     <td className={className}>
-      {/* Who scanned it, where the eye already is when reading the age.
-          Nothing is rendered when the row predates attribution or the scout's
-          account is gone -- a placeholder face would imply we know and don't. */}
-      {byCharId != null && (
-        <img
-          className="sig-td__scout"
-          src={charPortrait(byCharId, 32)}
-          alt=""
-          loading="lazy"
-          data-tooltip={byName ?? String(byCharId)}
-        />
-      )}
       <span>{text}</span>
     </td>
   );
@@ -1197,7 +1213,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
           >
             {typeFilter.size > 0
               ? t('signatures.countFiltered', { shown: sortedSigs.length, total: sigs.length })
-              : sigs.length}
+              : t('signatures.countTotal', { count: sigs.length })}
           </span>
           <div className="sig-col-menu">
             <button
@@ -1258,6 +1274,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                 gone, so their <col> entries must drop too — otherwise
                 table-layout:fixed maps them onto the wrong cells and
                 the ID column inherits the 24px checkbox width. */}
+            <col className="sig-col--scout" />
             {!isShareMode && <col className="sig-col--check" />}
             <col style={{ width: colWidths.id }} />
             <col style={{ width: colWidths.type }} />
@@ -1274,6 +1291,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
           </colgroup>
           <thead>
             <tr>
+              <th className="sig-th sig-th--scout" />
               {!isShareMode && (
                 <th>
                   <input
@@ -1349,6 +1367,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                 className={`${selected.has(sig.id) ? 'sig-row--selected' : ''} ${sig.sigType === 'unknown' ? 'sig-row--unknown' : ''} ${whAgeRowClass(sig.sigType, sig.whType, sig.createdAt, tickNow, whTypes)} ${removing.has(sig.id) ? 'sig-row--removing' : ''}`}
                 style={removing.has(sig.id) && overwriteDelay > 0 ? { animationDuration: `${overwriteDelay}s` } : undefined}
               >
+                <ScoutCell byCharId={sig.createdByCharId} byName={sig.createdByName} />
                 {!isShareMode && (
                   <td>
                     <input
@@ -1489,8 +1508,6 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                 {isColVisible('created') && (
                   <ElapsedCell
                     iso={sig.createdAt}
-                    byCharId={sig.createdByCharId}
-                    byName={sig.createdByName}
                     className={`sig-td--time${
                       isSigStale(sig.sigType, sig.whType, sig.createdAt, tickNow)
                         ? ' sig-td--age-stale'
