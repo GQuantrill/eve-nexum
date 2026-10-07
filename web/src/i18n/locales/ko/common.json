@@ -1957,6 +1957,7 @@
     "openAnoikis": "anoik.is에서 열기",
     "moveLeft": "이전 열로 이동",
     "moveRight": "다음 열로 이동",
+    "resizeColumns": "끌어서 열 너비를 조절하고, 더블클릭하면 균등하게 맞춥니다",
     "copyName": "시스템 이름 복사",
     "nameCopied": "{{name}} 복사됨",
     "copyFailed": "복사하지 못했습니다 — 직접 선택해 복사하세요."

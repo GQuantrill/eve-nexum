@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
@@ -17,6 +17,7 @@ import { FloatingPanel, type PanelGeometry } from './FloatingPanel';
 import { useUserSetting } from '../../hooks/useUserSetting';
 import {
   clampColumnCount, bucketIntoColumns, movePane, reorderWithinColumn, columnOf,
+  equalWeights, normaliseWeights, resizeWeights,
   type ColumnMap,
 } from '../../utils/panelColumns';
 import { SquaresFourIcon, XIcon, CopyIcon } from '../../icons';
@@ -266,6 +267,9 @@ export function SystemPanel() {
   // Side-by-side is a narrow right-hand strip (460px by default, 320 floor), so
   // splitting it would leave both halves unreadable. One column there, always.
   const colCount = sideBySide ? 1 : clampColumnCount(colCountRaw);
+  const [storedWeights, setStoredWeights] = useUserSetting<number[]>('nexum.panelColumns.widths', []);
+  const colWeights = normaliseWeights(storedWeights, colCount);
+  const colsRef = useRef<HTMLDivElement | null>(null);
 
   const requestFitView = useMapStore((st) => st.requestFitView);
   const [sideWidth, setSideWidth] = useState(() => {
@@ -489,6 +493,39 @@ export function SystemPanel() {
     .filter((id) => cards[id] && shareVisible(id) && !hiddenPanes.has(id));
 
   const columnsOfIds = bucketIntoColumns(dockedIds, paneColumns, colCount);
+
+  // Only the columns that actually render, each keeping its real index: an
+  // empty column is skipped, so a divider can sit between columns 0 and 2.
+  const renderedCols = columnsOfIds
+    .map((ids, col) => ({ ids, col }))
+    .filter((c) => c.ids.length > 0);
+
+
+  // Drag a divider: the two columns either side share their combined width,
+  // everything else holds still. Weights rather than pixels, so the split
+  // survives the panel and the window being resized.
+  const startColResize = (left: number, right: number) => (e: React.PointerEvent) => {
+    e.preventDefault();
+    const startX = e.clientX;
+    const base = colWeights;
+    const cols = colsRef.current?.children ?? null;
+    // Width of the pair as drawn right now, which is what the pointer delta is
+    // measured against.
+    const boxes = cols ? [...cols].filter((el) => el.classList.contains('panel-stack__col')) : [];
+    const li = renderedCols.findIndex((c) => c.col === left);
+    const ri = renderedCols.findIndex((c) => c.col === right);
+    const pairPx = (boxes[li]?.getBoundingClientRect().width ?? 0)
+                 + (boxes[ri]?.getBoundingClientRect().width ?? 0);
+
+    const move = (ev: PointerEvent) =>
+      setStoredWeights(resizeWeights(base, left, right, ev.clientX - startX, pairPx));
+    const up = () => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+  };
   const moveColumn = (id: string, dir: -1 | 1) => {
     setPaneColumns((prev) => movePane(prev, id, columnOf(id, prev, colCount) + dir, colCount));
   };
@@ -936,7 +973,10 @@ export function SystemPanel() {
             column its own would re-create the nested-scroller trap documented
             in panels.css: two of them meant the wheel did nothing at all while
             the cursor sat over the wrong block. */}
-        <div className={`panel-stack__cols${colCount > 1 ? ' panel-stack__cols--multi' : ''}`}>
+        <div
+          ref={colsRef}
+          className={`panel-stack__cols${colCount > 1 ? ' panel-stack__cols--multi' : ''}`}
+        >
           {/* An empty column is not rendered at all. Every column takes an equal
               share of the width, so an empty one shows up as a block of dead
               space -- a third of the panel, with three columns and panes in two.
@@ -944,8 +984,24 @@ export function SystemPanel() {
               arrows rather than dropped, so an empty column is not a drop target
               and has no reason to occupy space. It reappears the moment a pane
               is moved into it. */}
-          {columnsOfIds.map((ids, col) => (ids.length === 0 ? null : (
-            <div className="panel-stack__col" key={col}>
+          {renderedCols.map(({ ids, col }, i) => (
+            <Fragment key={col}>
+            {i > 0 && (
+              /* Divider belongs to the pair either side of it, so it carries
+                 both real column indices rather than assuming they adjoin.
+                 Double-click resets to an even split -- the only way back once
+                 a column has been dragged narrow. */
+              <div
+                className="panel-stack__divider"
+                role="separator"
+                aria-orientation="vertical"
+                aria-label={t('systemPanel.resizeColumns')}
+                data-tooltip={t('systemPanel.resizeColumns')}
+                onPointerDown={startColResize(renderedCols[i - 1].col, col)}
+                onDoubleClick={() => setStoredWeights(equalWeights(colCount))}
+              />
+            )}
+            <div className="panel-stack__col" style={{ flexGrow: colWeights[col] }}>
               {/* A DndContext per column: a drag stays inside the list it
                   started in, which is what keeps the existing single-list
                   sortable working untouched. Moving BETWEEN columns is the
@@ -972,7 +1028,8 @@ export function SystemPanel() {
                 </SortableContext>
               </DndContext>
             </div>
-          )))}
+            </Fragment>
+          ))}
         </div>
       </div>
       </div>
