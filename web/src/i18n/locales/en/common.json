@@ -1764,7 +1764,8 @@
     "copyNothing": "Nothing to copy — those signatures are already on the map",
     "copyDone": "Signatures: {{added}} added, {{updated}} updated",
     "copyPartial": "Added {{added}}, {{failed}} failed",
-    "copyFailed": "Could not copy the signatures"
+    "copyFailed": "Could not copy the signatures",
+    "copyDoneLinks": "Signatures: {{added}} added, {{updated}} updated · {{links}} connection(s) drawn"
   },
   "session": {
     "idleLogout": "Signed out due to inactivity.",

@@ -1764,7 +1764,8 @@
     "copyNothing": "Nichts zu kopieren – diese Signaturen sind bereits auf der Karte",
     "copyDone": "Signaturen: {{added}} hinzugefügt, {{updated}} aktualisiert",
     "copyPartial": "{{added}} hinzugefügt, {{failed}} fehlgeschlagen",
-    "copyFailed": "Signaturen konnten nicht kopiert werden"
+    "copyFailed": "Signaturen konnten nicht kopiert werden",
+    "copyDoneLinks": "Signaturen: {{added}} hinzugefügt, {{updated}} aktualisiert · {{links}} Verbindung(en) gezeichnet"
   },
   "session": {
     "idleLogout": "Wegen Inaktivität abgemeldet.",

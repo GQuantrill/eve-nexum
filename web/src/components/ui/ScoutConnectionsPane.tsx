@@ -11,12 +11,13 @@ import { setWaypoint, canSetAutopilot } from '../../utils/routeActions';
 import { useSystemAlias } from '../../hooks/useSystemAlias';
 import { truesecColor } from '../../utils/truesec';
 import { useMapStore } from '../../store/mapStore';
+import { pickHandles } from '../map/edgeUtils';
 import { CopyIcon, MapPinSimpleIcon, PathIcon, ProhibitIcon } from '../../icons';
 import { Select } from './Select';
 import { DASH } from '../../i18n/format';
 import { api } from '../../api/client';
 import { toast } from '../../utils/toastStore';
-import { allSigWrites, sigKey, type SigWrite } from '../../utils/scoutSigCopy';
+import { allSigWrites, allConnWrites, sigKey, pairKey, type SigWrite } from '../../utils/scoutSigCopy';
 
 interface Props {
   scoutSystem: 'Thera' | 'Turnur';
@@ -186,6 +187,32 @@ export function ScoutConnectionsPane({ scoutSystem }: Props) {
         );
       }));
 
+      // Draw the hole itself where both of its ends are on the map. Copying
+      // the signatures without it leaves two systems sitting next to each
+      // other with the exit recorded at each end and nothing joining them,
+      // which is the one thing the chain is actually for.
+      const store = useMapStore.getState();
+      const linked = new Set(store.map.connections.map((c) => pairKey(c.sourceId, c.targetId)));
+      const byId = new Map(store.map.systems.map((sy) => [sy.id, sy]));
+      let connsAdded = 0;
+      for (const cw of allConnWrites(list, systemsForCopy, scoutSystem)) {
+        if (linked.has(pairKey(cw.fromId, cw.toId))) continue;   // already joined
+        const a = byId.get(cw.fromId), b = byId.get(cw.toId);
+        if (!a || !b) continue;
+        const { sourceHandle, targetHandle } = pickHandles(a.position, b.position);
+        // Seeded on create rather than patched afterwards: the create POST
+        // waits for both endpoints to exist, so a follow-up update can reach
+        // the server first and be dropped on the floor.
+        store.addConnection(cw.fromId, cw.toId, sourceHandle, targetHandle, {
+          connectionType: 'standard',
+          type: cw.whType,
+          ...(cw.size ? { size: cw.size } : null),
+          ...(cw.timeStatus ? { timeStatus: cw.timeStatus } : null),
+        });
+        linked.add(pairKey(cw.fromId, cw.toId));
+        connsAdded++;
+      }
+
       // Tell any open pane for these systems to re-read. The live-update path
       // skips the client that made the change, so without this the signature
       // we just wrote stays invisible until the system is clicked off and on.
@@ -199,7 +226,8 @@ export function ScoutConnectionsPane({ scoutSystem }: Props) {
       const failed  = results.length - added - updated;
 
       if (failed > 0) toast.error(t('scout.copyPartial', { added, failed }));
-      else            toast.success(t('scout.copyDone', { added, updated }));
+      else if (connsAdded > 0) toast.success(t('scout.copyDoneLinks', { added, updated, links: connsAdded }));
+      else                     toast.success(t('scout.copyDone', { added, updated }));
     } catch {
       toast.error(t('scout.copyFailed'));
     } finally {

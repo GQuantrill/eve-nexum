@@ -5,7 +5,7 @@
 // which of those belong on the map and what each row should say.
 //
 import { lifeBucket } from './whLifetime';
-import type { TimeStatus } from '../types';
+import type { ConnectionSize, TimeStatus } from '../types';
 
 // Names come from eve-scout's point of view, which is the HUB's: "out" is the
 // signature inside Thera/Turnur that you warp to in order to leave, "in" is the
@@ -53,12 +53,13 @@ export function scoutTimeStatus(remainingHours: number | null | undefined): Time
   return lifeBucket(remainingHours * 3_600_000);
 }
 
-/** eve-scout's size vocabulary, as the connection size values used here. */
-const SIZE_FROM_SCOUT: Record<string, string> = {
+/** eve-scout's size vocabulary, as the connection size values used here.
+ *  Typed to the union so an unmapped word cannot reach a connection. */
+const SIZE_FROM_SCOUT: Record<string, ConnectionSize> = {
   small: 'small', medium: 'medium', large: 'large', xlarge: 'xl',
 };
 
-export function scoutSizeToConnSize(maxShipSize: string): string | null {
+export function scoutSizeToConnSize(maxShipSize: string): ConnectionSize | null {
   return SIZE_FROM_SCOUT[(maxShipSize ?? '').toLowerCase()] ?? null;
 }
 
@@ -133,4 +134,60 @@ export function allSigWrites(
     }
   }
   return out;
+}
+
+/** A wormhole to draw between two mapped systems. */
+export interface ConnWrite {
+  fromId:     string;   // the far system's map id
+  toId:       string;   // the hub's map id
+  whType:     string;
+  size:       ConnectionSize | null;
+  timeStatus: TimeStatus | '';
+}
+
+/**
+ * The connection a scout entry implies, when BOTH of its ends are on the map.
+ *
+ * Only then: a hole needs two nodes to join, and inventing the missing one
+ * would be adding systems to somebody's map as a side effect of copying
+ * signatures. Returns null otherwise, which is the common case.
+ *
+ * Size comes from eve-scout's own max-ship-size rather than being inferred
+ * from the type, because the feed reports it directly and a K162 at the hub
+ * end carries no type to infer from.
+ */
+export function connWriteFor(
+  conn: ScoutLike, systems: MappedSystem[], hubName: string,
+): ConnWrite | null {
+  const far = systems.find((s) => s.eveSystemId === conn.inSystemId);
+  const hub = systems.find((s) => s.name.toLowerCase() === hubName.toLowerCase());
+  if (!far || !hub || far.id === hub.id) return null;
+  return {
+    fromId: far.id, toId: hub.id,
+    whType: conn.whType,
+    size: scoutSizeToConnSize(conn.maxShipSize),
+    timeStatus: scoutTimeStatus(conn.remainingHours),
+  };
+}
+
+/** Every connection `conns` implies, deduped by the pair of systems. */
+export function allConnWrites(
+  conns: ScoutLike[], systems: MappedSystem[], hubName: string,
+): ConnWrite[] {
+  const seen = new Set<string>();
+  const out: ConnWrite[] = [];
+  for (const c of conns) {
+    const w = connWriteFor(c, systems, hubName);
+    if (!w) continue;
+    const k = pairKey(w.fromId, w.toId);
+    if (seen.has(k)) continue;
+    seen.add(k);
+    out.push(w);
+  }
+  return out;
+}
+
+/** Order-independent key for "a connection between these two systems". */
+export function pairKey(a: string, b: string): string {
+  return a < b ? `${a}|${b}` : `${b}|${a}`;
 }

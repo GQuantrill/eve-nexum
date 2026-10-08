@@ -1764,7 +1764,8 @@
     "copyNothing": "Nada a copiar — essas assinaturas já estão no mapa",
     "copyDone": "Assinaturas: {{added}} adicionadas, {{updated}} atualizadas",
     "copyPartial": "{{added}} adicionadas, {{failed}} falharam",
-    "copyFailed": "Não foi possível copiar as assinaturas"
+    "copyFailed": "Não foi possível copiar as assinaturas",
+    "copyDoneLinks": "Assinaturas: {{added}} adicionadas, {{updated}} atualizadas · {{links}} ligação(ões) criada(s)"
   },
   "session": {
     "idleLogout": "Sessão terminada por inatividade.",

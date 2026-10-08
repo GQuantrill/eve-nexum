@@ -1764,7 +1764,8 @@
     "copyNothing": "コピーするものがありません — すでにマップ上にあります",
     "copyDone": "シグネチャ: {{added}} 件追加、{{updated}} 件更新",
     "copyPartial": "{{added}} 件追加、{{failed}} 件失敗",
-    "copyFailed": "シグネチャをコピーできませんでした"
+    "copyFailed": "シグネチャをコピーできませんでした",
+    "copyDoneLinks": "シグネチャ: {{added}} 件追加、{{updated}} 件更新 · 接続 {{links}} 本を作成"
   },
   "session": {
     "idleLogout": "非アクティブのためサインアウトしました。",

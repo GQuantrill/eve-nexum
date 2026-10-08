@@ -1764,7 +1764,8 @@
     "copyNothing": "Nada que copiar: esas firmas ya están en el mapa",
     "copyDone": "Firmas: {{added}} añadidas, {{updated}} actualizadas",
     "copyPartial": "{{added}} añadidas, {{failed}} fallidas",
-    "copyFailed": "No se pudieron copiar las firmas"
+    "copyFailed": "No se pudieron copiar las firmas",
+    "copyDoneLinks": "Firmas: {{added}} añadidas, {{updated}} actualizadas · {{links}} conexión(es) creada(s)"
   },
   "session": {
     "idleLogout": "Sesión cerrada por inactividad.",

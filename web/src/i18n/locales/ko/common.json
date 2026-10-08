@@ -1764,7 +1764,8 @@
     "copyNothing": "복사할 것이 없습니다 — 이미 지도에 있습니다",
     "copyDone": "시그니처: {{added}}개 추가, {{updated}}개 갱신",
     "copyPartial": "{{added}}개 추가, {{failed}}개 실패",
-    "copyFailed": "시그니처를 복사하지 못했습니다"
+    "copyFailed": "시그니처를 복사하지 못했습니다",
+    "copyDoneLinks": "시그니처: {{added}}개 추가, {{updated}}개 갱신 · 연결 {{links}}개 생성"
   },
   "session": {
     "idleLogout": "비활성으로 인해 로그아웃되었습니다.",

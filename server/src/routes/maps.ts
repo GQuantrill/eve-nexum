@@ -3168,7 +3168,7 @@ mapsRouter.delete('/:mapId/systems/:systemId', async (req, res) => {
 
 mapsRouter.post('/:mapId/connections', async (req, res) => {
   const { mapId } = req.params;
-  const { id, sourceId, targetId, sourceHandle, targetHandle, connectionType, massStatus, timeStatus, size, sourceEveId, targetEveId } = req.body;
+  const { id, sourceId, targetId, sourceHandle, targetHandle, connectionType, massStatus, timeStatus, size, type, sourceEveId, targetEveId } = req.body;
 
   const access = await requireMapWrite(res, mapId, req, true);
   if (!access) return;
@@ -3240,14 +3240,21 @@ mapsRouter.post('/:mapId/connections', async (req, res) => {
 
   let inserted = 0;
   try {
+    // `type` (the wormhole code) is accepted on create as well as on update.
+    // It used to be update-only on the reasoning that a fresh connection
+    // carries no type yet -- true when a hole is drawn by hand or by a jump,
+    // but not when it is copied from eve-scout, which knows the code up front.
+    // Patching it afterwards is not an option: this POST is deferred until
+    // both endpoints exist, so a follow-up PATCH can overtake it and be lost.
     const ins = await db.query(
       `INSERT INTO map_connections
          (id, map_id, source_id, target_id, source_handle, target_handle,
-          connection_type, mass_status, time_status, size)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
+          connection_type, mass_status, time_status, size, wh_type)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
        ON CONFLICT (id) DO NOTHING`,
       [id, mapId, sourceId, targetId, sourceHandle ?? null, targetHandle ?? null,
-       effectiveType, massStatus ?? null, timeStatus ?? null, size ?? 'large'],
+       effectiveType, massStatus ?? null, timeStatus ?? null, size ?? 'large',
+       typeof type === 'string' && type.trim() ? type.trim().toUpperCase() : null],
     );
     inserted = ins.rowCount ?? 0;
   } catch (err) {

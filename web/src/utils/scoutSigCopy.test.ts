@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { sigWritesFor, allSigWrites, sigKey, scoutSizeToConnSize, scoutTimeStatus } from './scoutSigCopy';
+import { sigWritesFor, allSigWrites, sigKey, scoutSizeToConnSize, scoutTimeStatus,
+         connWriteFor, allConnWrites, pairKey } from './scoutSigCopy';
 import type { ScoutLike, MappedSystem } from './scoutSigCopy';
 
 const conn = (over: Partial<ScoutLike> = {}): ScoutLike => ({
@@ -109,5 +110,40 @@ describe('sigKey', () => {
   it('keeps signatures in different systems apart', () => {
     // The same scanner id in two systems is ordinary; they must not collide.
     expect(sigKey('s1', 'ABC-123')).not.toBe(sigKey('s2', 'ABC-123'));
+  });
+});
+
+describe('connWriteFor', () => {
+  const far = sys('s1', 'Jita', 30000142);
+  const hub = sys('h', 'Thera', 31000005);
+
+  it('describes the hole when both ends are mapped', () => {
+    expect(connWriteFor(conn(), [far, hub], 'Thera')).toEqual({
+      fromId: 's1', toId: 'h', whType: 'C729', size: 'medium', timeStatus: 'lessThan24h',
+    });
+  });
+
+  it('returns nothing when only one end is mapped', () => {
+    // Drawing a hole would mean adding the other system to someone's map as a
+    // side effect of copying signatures.
+    expect(connWriteFor(conn(), [far], 'Thera')).toBeNull();
+    expect(connWriteFor(conn(), [hub], 'Thera')).toBeNull();
+  });
+
+  it('takes size from the feed, which reports it directly', () => {
+    expect(connWriteFor(conn({ maxShipSize: 'xlarge' }), [far, hub], 'Thera')?.size).toBe('xl');
+    expect(connWriteFor(conn({ maxShipSize: 'frigate' }), [far, hub], 'Thera')?.size).toBeNull();
+  });
+});
+
+describe('allConnWrites', () => {
+  const systems = [sys('s1', 'Jita', 30000142), sys('h', 'Thera', 31000005)];
+
+  it('does not describe the same pair twice', () => {
+    expect(allConnWrites([conn(), conn()], systems, 'Thera')).toHaveLength(1);
+  });
+
+  it('pairKey ignores the order the two systems are given in', () => {
+    expect(pairKey('a', 'b')).toBe(pairKey('b', 'a'));
   });
 });
