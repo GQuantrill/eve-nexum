@@ -1762,7 +1762,7 @@
     "copyAllHint": "Adiciona as assinaturas de cada ligação de {{system}} cujo sistema esteja no mapa",
     "copyOne": "Copiar as assinaturas desta ligação para o mapa",
     "copyNothing": "Nada a copiar — essas assinaturas já estão no mapa",
-    "copyDone": "Assinaturas adicionadas: {{count}}",
+    "copyDone": "Assinaturas: {{added}} adicionadas, {{updated}} atualizadas",
     "copyPartial": "{{added}} adicionadas, {{failed}} falharam",
     "copyFailed": "Não foi possível copiar as assinaturas"
   },

@@ -1762,7 +1762,7 @@
     "copyAllHint": "Añade las firmas de cada conexión de {{system}} cuyo sistema esté en el mapa",
     "copyOne": "Copiar las firmas de esta conexión al mapa",
     "copyNothing": "Nada que copiar: esas firmas ya están en el mapa",
-    "copyDone": "Firmas añadidas: {{count}}",
+    "copyDone": "Firmas: {{added}} añadidas, {{updated}} actualizadas",
     "copyPartial": "{{added}} añadidas, {{failed}} fallidas",
     "copyFailed": "No se pudieron copiar las firmas"
   },

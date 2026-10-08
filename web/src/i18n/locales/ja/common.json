@@ -1762,7 +1762,7 @@
     "copyAllHint": "マップ上にあるシステムの {{system}} 接続のシグネチャをまとめて追加します",
     "copyOne": "この接続のシグネチャをマップへコピー",
     "copyNothing": "コピーするものがありません — すでにマップ上にあります",
-    "copyDone": "追加したシグネチャ: {{count}}",
+    "copyDone": "シグネチャ: {{added}} 件追加、{{updated}} 件更新",
     "copyPartial": "{{added}} 件追加、{{failed}} 件失敗",
     "copyFailed": "シグネチャをコピーできませんでした"
   },

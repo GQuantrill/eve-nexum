@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { sigWritesFor, pendingSigWrites, sigKey, scoutSizeToConnSize, scoutTimeStatus } from './scoutSigCopy';
+import { sigWritesFor, allSigWrites, sigKey, scoutSizeToConnSize, scoutTimeStatus } from './scoutSigCopy';
 import type { ScoutLike, MappedSystem } from './scoutSigCopy';
 
 const conn = (over: Partial<ScoutLike> = {}): ScoutLike => ({
@@ -44,27 +44,32 @@ describe('sigWritesFor', () => {
   });
 });
 
-describe('pendingSigWrites', () => {
+describe('allSigWrites', () => {
   const systems = [sys('s1', 'Jita', 30000142)];
 
-  it('leaves alone a signature already on the map', () => {
-    const have = [sigKey('s1', 'ABC-123')];
-    expect(pendingSigWrites([conn()], systems, 'Thera', have)).toEqual([]);
+  it('still lists a signature that is already on the map', () => {
+    // Copying is an upsert: the row may have been deleted by accident, or the
+    // hole's remaining life may have moved on since it was first copied.
+    // Filtering it out here would silence the button in exactly those cases.
+    expect(allSigWrites([conn()], systems, 'Thera')).toHaveLength(1);
   });
 
-  it('matches existing ids case- and space-insensitively', () => {
-    expect(pendingSigWrites([conn()], systems, 'Thera', [sigKey('s1', ' abc-123 ')])).toEqual([]);
+  it('does not list the same signature twice within one batch', () => {
+    expect(allSigWrites([conn(), conn()], systems, 'Thera')).toHaveLength(1);
   });
 
-  it('does not write the same signature twice within one batch', () => {
-    const dup = [conn(), conn()];
-    expect(pendingSigWrites(dup, systems, 'Thera', [])).toHaveLength(1);
-  });
-
-  it('returns what is genuinely missing', () => {
+  it('lists every mapped connection', () => {
     const two = [conn(), conn({ inSignature: 'DEF-456' })];
-    const w = pendingSigWrites(two, systems, 'Thera', [sigKey('s1', 'ABC-123')]);
-    expect(w.map((x) => x.sigId)).toEqual(['DEF-456']);
+    expect(allSigWrites(two, systems, 'Thera').map((w) => w.sigId)).toEqual(['ABC-123', 'DEF-456']);
+  });
+
+  it('lists nothing when no end is on the map', () => {
+    expect(allSigWrites([conn()], [sys('x', 'Amarr', 30002187)], 'Thera')).toEqual([]);
+  });
+
+  it('carries the current life state, so a repeat copy refreshes it', () => {
+    const [w] = allSigWrites([conn({ remainingHours: 0.5 })], systems, 'Thera');
+    expect(w.timeStatus).toBe('lessThan1h');
   });
 });
 
@@ -90,5 +95,19 @@ describe('scoutTimeStatus', () => {
     expect(scoutTimeStatus(null)).toBe('');
     expect(scoutTimeStatus(undefined)).toBe('');
     expect(scoutTimeStatus(NaN)).toBe('');
+  });
+});
+
+describe('sigKey', () => {
+  // This is what matches a feed row against one already on the map, so it
+  // decides whether a copy updates an existing row or duplicates it. Scanner
+  // ids arrive with stray case and whitespace from pastes and hand entry.
+  it('matches the same signature however it was typed', () => {
+    expect(sigKey('s1', ' abc-123 ')).toBe(sigKey('s1', 'ABC-123'));
+  });
+
+  it('keeps signatures in different systems apart', () => {
+    // The same scanner id in two systems is ordinary; they must not collide.
+    expect(sigKey('s1', 'ABC-123')).not.toBe(sigKey('s2', 'ABC-123'));
   });
 });

@@ -109,24 +109,25 @@ export function sigKey(systemId: string, sigId: string): string {
 }
 
 /**
- * The writes from `conns` that are not on the map already.
+ * Every signature row `conns` implies, for the ends that are mapped.
  *
- * Existing rows are left completely alone rather than updated. A scout who has
- * since set a leads-to by hand, or renamed the row, knows something the feed
- * does not -- eve-scout keeps listing a hole until somebody reports it gone.
- * Adding what is missing is useful; overwriting what is there is not.
+ * Deliberately NOT filtered against what is already on the map. Copying is an
+ * upsert: a row somebody deleted by accident should come back, and a hole whose
+ * remaining life has moved on since the last copy should be brought up to date.
+ * Filtering here would make the button go quiet in exactly the two cases where
+ * pressing it again is the point.
+ *
+ * Deduped within the batch, since two feed entries can name the same signature.
  */
-export function pendingSigWrites(
+export function allSigWrites(
   conns: ScoutLike[], systems: MappedSystem[], hubName: string,
-  existing: Iterable<string>,
 ): SigWrite[] {
-  const have = new Set(existing);
   const seen = new Set<string>();
   const out: SigWrite[] = [];
   for (const c of conns) {
     for (const w of sigWritesFor(c, systems, hubName)) {
       const k = sigKey(w.systemId, w.sigId);
-      if (have.has(k) || seen.has(k)) continue;   // already there, or a duplicate within this batch
+      if (seen.has(k)) continue;
       seen.add(k);
       out.push(w);
     }

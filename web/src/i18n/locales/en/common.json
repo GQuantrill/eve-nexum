@@ -1762,7 +1762,7 @@
     "copyAllHint": "Add the signatures for every {{system}} connection whose system is on the map",
     "copyOne": "Copy this connection's signatures to the map",
     "copyNothing": "Nothing to copy — those signatures are already on the map",
-    "copyDone": "Signatures added: {{count}}",
+    "copyDone": "Signatures: {{added}} added, {{updated}} updated",
     "copyPartial": "Added {{added}}, {{failed}} failed",
     "copyFailed": "Could not copy the signatures"
   },

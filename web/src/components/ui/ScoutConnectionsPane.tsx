@@ -16,7 +16,7 @@ import { Select } from './Select';
 import { DASH } from '../../i18n/format';
 import { api } from '../../api/client';
 import { toast } from '../../utils/toastStore';
-import { pendingSigWrites, sigKey, type SigWrite } from '../../utils/scoutSigCopy';
+import { allSigWrites, sigKey, type SigWrite } from '../../utils/scoutSigCopy';
 
 interface Props {
   scoutSystem: 'Thera' | 'Turnur';
@@ -148,11 +148,6 @@ export function ScoutConnectionsPane({ scoutSystem }: Props) {
   const activeMapId = useMapStore((st) => st.activeMapId);
   const mapSystems  = useMapStore((st) => st.map.systems);
   const [copying, setCopying] = useState(false);
-  // Signatures written during this session. The button's count is derived, and
-  // deriving it from the server would mean polling the whole map's signature
-  // list just to label a button; remembering what we just wrote keeps the count
-  // honest after a copy without any extra request.
-  const [justCopied, setJustCopied] = useState<Set<string>>(new Set());
 
   const systemsForCopy = useMemo(
     () => mapSystems.map((sy) => ({ id: sy.id, name: sy.name, eveSystemId: sy.eveSystemId })),
@@ -163,39 +158,41 @@ export function ScoutConnectionsPane({ scoutSystem }: Props) {
     if (!activeMapId || copying) return;
     setCopying(true);
     try {
-      // One map-wide read tells us every signature that already exists, so a
-      // bulk copy costs one request rather than one per system -- and so a row
-      // somebody has already filled in by hand is never overwritten.
-      const existing = await api<{ systemId: string; sigId: string }[]>(
+      // One map-wide read tells us what is already there, so a bulk copy costs
+      // one request rather than one per system -- and gives us each existing
+      // row's id, which is what turns this into an update rather than a
+      // duplicate.
+      const existing = await api<{ id: string; systemId: string; sigId: string | null }[]>(
         `/api/maps/${activeMapId}/signatures`,
       );
-      const have = existing.map((e) => sigKey(e.systemId, e.sigId ?? ''));
-      const todo: SigWrite[] = pendingSigWrites(list, systemsForCopy, scoutSystem, have);
+      const idByKey = new Map(existing.map((e) => [sigKey(e.systemId, e.sigId ?? ''), e.id]));
+      const todo: SigWrite[] = allSigWrites(list, systemsForCopy, scoutSystem);
 
       if (todo.length === 0) { toast.info(t('scout.copyNothing')); return; }
 
-      const results = await Promise.allSettled(todo.map((w) =>
-        api(`/api/maps/${activeMapId}/systems/${w.systemId}/signatures`, {
-          method: 'POST',
-          body: JSON.stringify({
-            sigId: w.sigId, sigType: 'wormhole',
-            whType: w.whType, whLeadsTo: w.whLeadsTo,
-            timeStatus: w.timeStatus,
-          }),
-        })));
-      const ok = todo.filter((_, i) => results[i].status === 'fulfilled');
-      setJustCopied((prev) => {
-        const next = new Set(prev);
-        for (const w of ok) next.add(sigKey(w.systemId, w.sigId));
-        return next;
-      });
-      const added = ok.length;
-      const failed = results.length - added;
-      // Reported rather than thrown: a partial copy is a normal outcome when
-      // somebody else is editing the same map, and the rows that did land are
-      // still useful.
+      // Upsert. A row that is already there is brought up to date rather than
+      // skipped: the feed's remaining life moves on, and a signature somebody
+      // deleted by accident should come back when the button is pressed again.
+      // Name and notes are left alone -- those are the scout's, not the feed's.
+      const results = await Promise.allSettled(todo.map((w) => {
+        const hit = idByKey.get(sigKey(w.systemId, w.sigId));
+        const body = JSON.stringify(hit
+          ? { whType: w.whType, whLeadsTo: w.whLeadsTo, timeStatus: w.timeStatus }
+          : { sigId: w.sigId, sigType: 'wormhole', whType: w.whType,
+              whLeadsTo: w.whLeadsTo, timeStatus: w.timeStatus });
+        return api(
+          `/api/maps/${activeMapId}/systems/${w.systemId}/signatures${hit ? `/${hit}` : ''}`,
+          { method: hit ? 'PATCH' : 'POST', body },
+        );
+      }));
+
+      const okFlags = results.map((r) => r.status === 'fulfilled');
+      const added   = todo.filter((w, i) => okFlags[i] && !idByKey.has(sigKey(w.systemId, w.sigId))).length;
+      const updated = todo.filter((w, i) => okFlags[i] &&  idByKey.has(sigKey(w.systemId, w.sigId))).length;
+      const failed  = results.length - added - updated;
+
       if (failed > 0) toast.error(t('scout.copyPartial', { added, failed }));
-      else            toast.success(t('scout.copyDone', { count: added }));
+      else            toast.success(t('scout.copyDone', { added, updated }));
     } catch {
       toast.error(t('scout.copyFailed'));
     } finally {
@@ -206,8 +203,8 @@ export function ScoutConnectionsPane({ scoutSystem }: Props) {
   // How many rows a bulk copy would add, for the button's label. Cheap enough
   // to recompute: it is only the mapped ends, not a request.
   const copyableCount = useMemo(
-    () => pendingSigWrites(sorted, systemsForCopy, scoutSystem, justCopied).length,
-    [sorted, systemsForCopy, scoutSystem, justCopied],
+    () => allSigWrites(sorted, systemsForCopy, scoutSystem).length,
+    [sorted, systemsForCopy, scoutSystem],
   );
 
   if (sorted.length === 0) {
@@ -312,7 +309,7 @@ export function ScoutConnectionsPane({ scoutSystem }: Props) {
               {route && <span className="scout-row__jumps">{t('units.jumps', { count: route.jumps })}</span>}
               {/* Shown only when this connection actually touches the map --
                   a button that silently does nothing is worse than no button. */}
-              {pendingSigWrites([c], systemsForCopy, scoutSystem, justCopied).length > 0 && (
+              {allSigWrites([c], systemsForCopy, scoutSystem).length > 0 && (
                 <button
                   type="button"
                   className="sys-btn scout-row__btn scout-row__btn--icon"

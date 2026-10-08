@@ -1762,7 +1762,7 @@
     "copyAllHint": "Ajoute les signatures de chaque connexion {{system}} dont le système est sur la carte",
     "copyOne": "Copier les signatures de cette connexion vers la carte",
     "copyNothing": "Rien à copier : ces signatures sont déjà sur la carte",
-    "copyDone": "Signatures ajoutées : {{count}}",
+    "copyDone": "Signatures : {{added}} ajoutées, {{updated}} mises à jour",
     "copyPartial": "{{added}} ajoutées, {{failed}} en échec",
     "copyFailed": "Impossible de copier les signatures"
   },

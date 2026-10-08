@@ -1762,7 +1762,7 @@
     "copyAllHint": "为地图上已有星系的所有 {{system}} 连接添加信号",
     "copyOne": "将此连接的信号复制到地图",
     "copyNothing": "没有可复制的内容 — 这些信号已在地图上",
-    "copyDone": "已添加信号：{{count}}",
+    "copyDone": "信号：新增 {{added}} 个，更新 {{updated}} 个",
     "copyPartial": "已添加 {{added}} 个，{{failed}} 个失败",
     "copyFailed": "无法复制信号"
   },
