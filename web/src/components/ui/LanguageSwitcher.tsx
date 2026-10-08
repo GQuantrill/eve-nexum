@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CaretDownIcon, CheckIcon } from '../../icons';
-import { SUPPORTED_LANGUAGES, LANGUAGE_NAMES, type SupportedLanguage } from '../../i18n';
+import { SUPPORTED_LANGUAGES, LANGUAGE_NAMES, ensureLanguage, type SupportedLanguage } from '../../i18n';
 import { useClickOutside } from '../../hooks/useClickOutside';
 import { LangFlag } from './LangFlag';
 
@@ -18,7 +18,9 @@ export function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
   useClickOutside(open, wrapRef, () => setOpen(false));
 
   const choose = (lng: SupportedLanguage) => {
-    void i18n.changeLanguage(lng);
+    // Load the strings first: switching before they arrive would blank the UI
+    // back to English for a frame.
+    void ensureLanguage(lng).then(() => i18n.changeLanguage(lng));
     setOpen(false);
   };
 
