@@ -506,6 +506,21 @@ export async function migrate() {
     -- live signature pane still reads the real table (merged sigs show on the
     -- map, they just don't inflate anyone's numbers).
     ALTER TABLE map_signatures ADD COLUMN IF NOT EXISTS from_merge BOOLEAN NOT NULL DEFAULT FALSE;
+
+    -- Provenance for rows written by the Thera/Turnur copy button, so the same
+    -- button can later clear up after itself without touching anything a
+    -- person made. NULL on every hand-created signature, which is what makes
+    -- manual rows structurally unreachable by that cleanup.
+    --
+    -- scout_last_seen is the last time the feed still listed this hole. The
+    -- cleanup needs "gone for a while", not "gone right now": eve-scout lists
+    -- a hole until somebody reports it collapsed, so a single stale or partial
+    -- read would otherwise delete live holes out of a chain.
+    ALTER TABLE map_signatures  ADD COLUMN IF NOT EXISTS scout_connection_id TEXT;
+    ALTER TABLE map_signatures  ADD COLUMN IF NOT EXISTS scout_last_seen     TIMESTAMPTZ;
+    ALTER TABLE map_connections ADD COLUMN IF NOT EXISTS scout_connection_id TEXT;
+    CREATE INDEX IF NOT EXISTS idx_map_signatures_scout  ON map_signatures  (scout_connection_id) WHERE scout_connection_id IS NOT NULL;
+    CREATE INDEX IF NOT EXISTS idx_map_connections_scout ON map_connections (scout_connection_id) WHERE scout_connection_id IS NOT NULL;
     CREATE OR REPLACE VIEW reportable_signatures AS
       SELECT * FROM map_signatures WHERE from_merge = FALSE;
 

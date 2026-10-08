@@ -1765,7 +1765,8 @@
     "copyDone": "信号：新增 {{added}} 个，更新 {{updated}} 个",
     "copyPartial": "已添加 {{added}} 个，{{failed}} 个失败",
     "copyFailed": "无法复制信号",
-    "copyDoneLinks": "信号：新增 {{added}} 个，更新 {{updated}} 个 · 已绘制 {{links}} 条连接"
+    "copyDoneLinks": "信号：新增 {{added}} 个，更新 {{updated}} 个 · 已绘制 {{links}} 条连接",
+    "copyDoneSwept": "信号：新增 {{added}} 个，更新 {{updated}} 个 · 已清理 {{removed}} 个已坍塌虫洞"
   },
   "session": {
     "idleLogout": "因长时间未操作已退出登录。",

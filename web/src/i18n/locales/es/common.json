@@ -1765,7 +1765,8 @@
     "copyDone": "Firmas: {{added}} añadidas, {{updated}} actualizadas",
     "copyPartial": "{{added}} añadidas, {{failed}} fallidas",
     "copyFailed": "No se pudieron copiar las firmas",
-    "copyDoneLinks": "Firmas: {{added}} añadidas, {{updated}} actualizadas · {{links}} conexión(es) creada(s)"
+    "copyDoneLinks": "Firmas: {{added}} añadidas, {{updated}} actualizadas · {{links}} conexión(es) creada(s)",
+    "copyDoneSwept": "Firmas: {{added}} añadidas, {{updated}} actualizadas · {{removed}} agujero(s) colapsado(s) eliminados"
   },
   "session": {
     "idleLogout": "Sesión cerrada por inactividad.",

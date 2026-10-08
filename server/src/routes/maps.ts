@@ -1,5 +1,13 @@
 import { Router } from 'express';
 import { esiFetch } from '../utils/esi.js';
+import { getScoutConnections } from './scout.js';
+
+// How long a hole must have been missing from the eve-scout feed before the
+// copy button's cleanup will remove the rows it wrote for it. The feed lists a
+// hole until somebody reports it collapsed, so absence is usually real -- but a
+// single stale or partial read would otherwise delete live holes out of a
+// chain, and carrying a dead hole for an hour is much cheaper than that.
+const SCOUT_GRACE_MINUTES = 60;
 import type { Request, Response } from 'express';
 import { db } from '../db.js';
 import { requireAuth } from '../middleware/requireAuth.js';
@@ -3168,7 +3176,7 @@ mapsRouter.delete('/:mapId/systems/:systemId', async (req, res) => {
 
 mapsRouter.post('/:mapId/connections', async (req, res) => {
   const { mapId } = req.params;
-  const { id, sourceId, targetId, sourceHandle, targetHandle, connectionType, massStatus, timeStatus, size, type, sourceEveId, targetEveId } = req.body;
+  const { id, sourceId, targetId, sourceHandle, targetHandle, connectionType, massStatus, timeStatus, size, type, scoutConnectionId, sourceEveId, targetEveId } = req.body;
 
   const access = await requireMapWrite(res, mapId, req, true);
   if (!access) return;
@@ -3249,12 +3257,13 @@ mapsRouter.post('/:mapId/connections', async (req, res) => {
     const ins = await db.query(
       `INSERT INTO map_connections
          (id, map_id, source_id, target_id, source_handle, target_handle,
-          connection_type, mass_status, time_status, size, wh_type)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
+          connection_type, mass_status, time_status, size, wh_type, scout_connection_id)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)
        ON CONFLICT (id) DO NOTHING`,
       [id, mapId, sourceId, targetId, sourceHandle ?? null, targetHandle ?? null,
        effectiveType, massStatus ?? null, timeStatus ?? null, size ?? 'large',
-       typeof type === 'string' && type.trim() ? type.trim().toUpperCase() : null],
+       typeof type === 'string' && type.trim() ? type.trim().toUpperCase() : null,
+       typeof scoutConnectionId === 'string' && scoutConnectionId ? scoutConnectionId : null],
     );
     inserted = ins.rowCount ?? 0;
   } catch (err) {
@@ -4157,9 +4166,12 @@ mapsRouter.post('/:mapId/systems/:systemId/signatures', async (req, res) => {
   if (!access) return;
   if (!(await verifySystemInMap(res, systemId, mapId))) return;
   const { sigId = '', sigType = 'unknown', name = '', notes = '', whType = '', whLeadsTo = '', ghostType = '', massStatus = '', timeStatus = '' } = req.body as Record<string, string>;
+  // Read separately so widening the cast doesn't make every field nullable.
+  const scoutConnectionId = (req.body as { scoutConnectionId?: unknown }).scoutConnectionId;
   const me = authUser(req);
   const row = await createSignature(
-    mapId, systemId, { sigId, sigType, name, notes, whType, whLeadsTo, ghostType, massStatus, timeStatus },
+    mapId, systemId, { sigId, sigType, name, notes, whType, whLeadsTo, ghostType, massStatus, timeStatus,
+      scoutConnectionId: typeof scoutConnectionId === 'string' && scoutConnectionId ? scoutConnectionId : null },
     { userId: me.userId, clientId: req.get('x-client-id') ?? null },
   );
   if ((whType ?? '').toUpperCase() === 'K162') dispatchK162(access, row.id, systemId, me.characterName);
@@ -4197,6 +4209,77 @@ mapsRouter.delete('/:mapId/systems/:systemId/signatures/:sigId', async (req, res
 // content anywhere in the chain without opening every system's sig pane —
 // powers the watchlist (wh_type matching) and the content filter (sig type +
 // name). Returns only the (systemId, sigType, name, whType) tuple per sig.
+// Clean up after the Thera/Turnur copy button: drop the rows it wrote for
+// holes the feed no longer lists, and sever the connections behind them.
+//
+// Server-side on purpose. It reads the feed itself rather than taking a list
+// of live ids from the caller, so a stale or doctored client cannot talk the
+// server into deleting a chain.
+mapsRouter.post('/:mapId/scout-cleanup', async (req, res) => {
+  const { mapId } = req.params;
+  const access = await requireMapContentWrite(res, mapId, req);
+  if (!access) return;
+
+  const hub = String((req.body as { hub?: unknown }).hub ?? '');
+  if (hub !== 'Thera' && hub !== 'Turnur') {
+    res.status(400).json({ error: 'hub must be Thera or Turnur' });
+    return;
+  }
+
+  const live = (await getScoutConnections())
+    .filter((c) => c.outSystemName === hub)
+    .map((c) => c.id);
+
+  // Anything still listed had its clock reset by the copy itself; this covers
+  // rows on systems the copy skipped this time round.
+  await db.query(
+    `UPDATE map_signatures s SET scout_last_seen = NOW()
+       FROM map_systems ms
+      WHERE s.system_id = ms.id AND ms.map_id = $1
+        AND s.scout_connection_id = ANY($2::text[])`,
+    [mapId, live],
+  );
+
+  // Delete only rows that are ALL of: ours to begin with, absent from the
+  // feed, absent for long enough that a glitchy read cannot be the cause, and
+  // untouched since we wrote them.
+  //
+  // "Untouched" is name and notes still empty and the type still wormhole --
+  // the fields a person fills in. It is deliberately conservative: a row
+  // somebody has annotated stays, even if its hole really is gone, because
+  // leaving a dead hole on a map costs a scout one delete and removing a live
+  // note costs them work they cannot get back.
+  const { rows: removed } = await db.query<{ id: string; scout_connection_id: string }>(
+    `DELETE FROM map_signatures s
+       USING map_systems ms
+      WHERE s.system_id = ms.id AND ms.map_id = $1
+        AND s.scout_connection_id IS NOT NULL
+        AND NOT (s.scout_connection_id = ANY($2::text[]))
+        AND s.scout_last_seen < NOW() - ($3 || ' minutes')::interval
+        AND s.name = '' AND s.notes = '' AND s.sig_type = 'wormhole'
+      RETURNING s.id, s.scout_connection_id`,
+    [mapId, live, SCOUT_GRACE_MINUTES],
+  );
+
+  // The connection is severed, not deleted -- same treatment any wormhole gets
+  // when its backing signature goes, so a collapsed Thera exit reads like a
+  // collapsed hole rather than vanishing out of the chain.
+  const goneIds = [...new Set(removed.map((r) => r.scout_connection_id))];
+  const { rowCount: broken } = goneIds.length === 0
+    ? { rowCount: 0 }
+    : await db.query(
+        `UPDATE map_connections SET broken = TRUE
+          WHERE map_id = $1 AND scout_connection_id = ANY($2::text[]) AND broken = FALSE`,
+        [mapId, goneIds],
+      );
+
+  if (removed.length > 0 || (broken ?? 0) > 0) {
+    await touchMap(mapId);
+    publishToMap(mapId, { type: 'map.resync', actor: req.get('x-client-id') ?? null });
+  }
+  res.json({ removed: removed.length, broken: broken ?? 0 });
+});
+
 mapsRouter.get('/:mapId/signatures', async (req, res) => {
   const { mapId } = req.params;
   const access = await getMapAccess(mapId, req);

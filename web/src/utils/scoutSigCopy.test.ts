@@ -4,7 +4,7 @@ import { sigWritesFor, allSigWrites, sigKey, scoutSizeToConnSize, scoutTimeStatu
 import type { ScoutLike, MappedSystem } from './scoutSigCopy';
 
 const conn = (over: Partial<ScoutLike> = {}): ScoutLike => ({
-  whType: 'C729', maxShipSize: 'medium', remainingHours: 16,
+  id: 'sc-1', whType: 'C729', maxShipSize: 'medium', remainingHours: 16,
   inSystemId: 30000142, inSystemName: 'Jita',
   inSignature: 'ABC-123', outSignature: 'XYZ-789', ...over,
 });
@@ -15,13 +15,15 @@ describe('sigWritesFor', () => {
   it('writes the far end when that system is on the map', () => {
     const w = sigWritesFor(conn(), [sys('s1', 'Jita', 30000142)], 'Thera');
     expect(w).toEqual([{ systemId: 's1', systemName: 'Jita', sigId: 'ABC-123',
-                         whType: 'C729', whLeadsTo: 'Thera', timeStatus: 'lessThan24h' }]);
+                         whType: 'C729', whLeadsTo: 'Thera', timeStatus: 'lessThan24h',
+                         scoutId: 'sc-1' }]);
   });
 
   it('writes the hub end too when the hub is mapped, pointing back', () => {
     const w = sigWritesFor(conn(), [sys('h', 'Thera', 31000005)], 'Thera');
     expect(w).toEqual([{ systemId: 'h', systemName: 'Thera', sigId: 'XYZ-789',
-                         whType: 'C729', whLeadsTo: 'Jita', timeStatus: 'lessThan24h' }]);
+                         whType: 'C729', whLeadsTo: 'Jita', timeStatus: 'lessThan24h',
+                         scoutId: 'sc-1' }]);
   });
 
   it('writes both ends when both are mapped', () => {
@@ -119,7 +121,8 @@ describe('connWriteFor', () => {
 
   it('describes the hole when both ends are mapped', () => {
     expect(connWriteFor(conn(), [far, hub], 'Thera')).toEqual({
-      fromId: 's1', toId: 'h', whType: 'C729', size: 'medium', timeStatus: 'lessThan24h',
+      fromId: 's1', toId: 'h', scoutId: 'sc-1',
+      whType: 'C729', size: 'medium', timeStatus: 'lessThan24h',
     });
   });
 

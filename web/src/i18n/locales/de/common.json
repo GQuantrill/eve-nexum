@@ -1765,7 +1765,8 @@
     "copyDone": "Signaturen: {{added}} hinzugefügt, {{updated}} aktualisiert",
     "copyPartial": "{{added}} hinzugefügt, {{failed}} fehlgeschlagen",
     "copyFailed": "Signaturen konnten nicht kopiert werden",
-    "copyDoneLinks": "Signaturen: {{added}} hinzugefügt, {{updated}} aktualisiert · {{links}} Verbindung(en) gezeichnet"
+    "copyDoneLinks": "Signaturen: {{added}} hinzugefügt, {{updated}} aktualisiert · {{links}} Verbindung(en) gezeichnet",
+    "copyDoneSwept": "Signaturen: {{added}} hinzugefügt, {{updated}} aktualisiert · {{removed}} kollabierte Löcher entfernt"
   },
   "session": {
     "idleLogout": "Wegen Inaktivität abgemeldet.",

@@ -1765,7 +1765,8 @@
     "copyDone": "Signatures: {{added}} added, {{updated}} updated",
     "copyPartial": "Added {{added}}, {{failed}} failed",
     "copyFailed": "Could not copy the signatures",
-    "copyDoneLinks": "Signatures: {{added}} added, {{updated}} updated · {{links}} connection(s) drawn"
+    "copyDoneLinks": "Signatures: {{added}} added, {{updated}} updated · {{links}} connection(s) drawn",
+    "copyDoneSwept": "Signatures: {{added}} added, {{updated}} updated · {{removed}} collapsed hole(s) cleared"
   },
   "session": {
     "idleLogout": "Signed out due to inactivity.",

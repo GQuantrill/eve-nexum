@@ -178,9 +178,11 @@ export function ScoutConnectionsPane({ scoutSystem }: Props) {
       const results = await Promise.allSettled(todo.map((w) => {
         const hit = idByKey.get(sigKey(w.systemId, w.sigId));
         const body = JSON.stringify(hit
-          ? { whType: w.whType, whLeadsTo: w.whLeadsTo, timeStatus: w.timeStatus }
+          ? { whType: w.whType, whLeadsTo: w.whLeadsTo, timeStatus: w.timeStatus,
+              scoutConnectionId: w.scoutId }
           : { sigId: w.sigId, sigType: 'wormhole', whType: w.whType,
-              whLeadsTo: w.whLeadsTo, timeStatus: w.timeStatus });
+              whLeadsTo: w.whLeadsTo, timeStatus: w.timeStatus,
+              scoutConnectionId: w.scoutId });
         return api(
           `/api/maps/${activeMapId}/systems/${w.systemId}/signatures${hit ? `/${hit}` : ''}`,
           { method: hit ? 'PATCH' : 'POST', body },
@@ -206,11 +208,24 @@ export function ScoutConnectionsPane({ scoutSystem }: Props) {
         store.addConnection(cw.fromId, cw.toId, sourceHandle, targetHandle, {
           connectionType: 'standard',
           type: cw.whType,
+          scoutConnectionId: cw.scoutId,
           ...(cw.size ? { size: cw.size } : null),
           ...(cw.timeStatus ? { timeStatus: cw.timeStatus } : null),
         });
         linked.add(pairKey(cw.fromId, cw.toId));
         connsAdded++;
+      }
+
+      // Clear up holes this button wrote that the feed has since dropped. The
+      // server decides what goes -- it reads the feed itself and applies the
+      // grace period, so a stale client cannot argue a live chain away. Only
+      // after a full copy: a single-row copy says nothing about the others.
+      let swept = { removed: 0, broken: 0 };
+      if (list.length > 1) {
+        swept = await api<{ removed: number; broken: number }>(
+          `/api/maps/${activeMapId}/scout-cleanup`,
+          { method: 'POST', body: JSON.stringify({ hub: scoutSystem }) },
+        ).catch(() => ({ removed: 0, broken: 0 }));
       }
 
       // Tell any open pane for these systems to re-read. The live-update path
@@ -226,8 +241,9 @@ export function ScoutConnectionsPane({ scoutSystem }: Props) {
       const failed  = results.length - added - updated;
 
       if (failed > 0) toast.error(t('scout.copyPartial', { added, failed }));
-      else if (connsAdded > 0) toast.success(t('scout.copyDoneLinks', { added, updated, links: connsAdded }));
-      else                     toast.success(t('scout.copyDone', { added, updated }));
+      else if (swept.removed > 0) toast.success(t('scout.copyDoneSwept', { added, updated, removed: swept.removed }));
+      else if (connsAdded > 0)    toast.success(t('scout.copyDoneLinks', { added, updated, links: connsAdded }));
+      else                        toast.success(t('scout.copyDone', { added, updated }));
     } catch {
       toast.error(t('scout.copyFailed'));
     } finally {
