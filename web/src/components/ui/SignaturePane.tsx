@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { charPortrait } from '../../utils/eveImages';
 import { siteSafety } from '../../utils/siteSafety';
+import { sigSortKey } from '../../utils/sigSort';
 import { api } from '../../api/client';
 import i18n from '../../i18n';
 import { useMapStore, awaitSystemCreate } from '../../store/mapStore';
@@ -1054,17 +1055,9 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   const sortedSigs = useMemo(() => {
     const base = typeFilter.size ? sigs.filter((s) => typeFilter.has(s.sigType)) : sigs;
     if (!sortCol) return base;
-    // The type column shows a different field per group, so sort it on what's
-    // actually on screen rather than on whType alone — otherwise ghost rows all
-    // sort as blank.
-    const key = (s: Signature) => (
-      sortCol === 'whType' && s.sigType === 'ghost'
-        ? (ghostTier(s.sigType, s.name, s.ghostType)?.tier ?? '')
-        : (s[sortCol] ?? '')
-    );
     return [...base].sort((a, b) => {
-      const av = key(a).toLowerCase();
-      const bv = key(b).toLowerCase();
+      const av = sigSortKey(a, sortCol).toLowerCase();
+      const bv = sigSortKey(b, sortCol).toLowerCase();
       const cmp = av.localeCompare(bv);
       return sortDir === 'asc' ? cmp : -cmp;
     });
