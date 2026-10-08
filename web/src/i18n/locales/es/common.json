@@ -1757,7 +1757,15 @@
     "inSigHint": "ID de firma en {{system}}: el extremo lejano del agujero",
     "outSigHint": "ID de firma en {{system}}: el extremo al que warpeas desde aquí",
     "markExpired": "Informar de que este agujero ha colapsado",
-    "unmarkExpired": "No ha colapsado"
+    "unmarkExpired": "No ha colapsado",
+    "copyAll": "Copiar {{count}} al mapa",
+    "copyAllHint": "Añade las firmas de cada conexión de {{system}} cuyo sistema esté en el mapa",
+    "copyOne": "Copiar las firmas de esta conexión al mapa",
+    "copyNothing": "Nada que copiar: esas firmas ya están en el mapa",
+    "copyDone": "Firmas: {{added}} añadidas, {{updated}} actualizadas",
+    "copyPartial": "{{added}} añadidas, {{failed}} fallidas",
+    "copyFailed": "No se pudieron copiar las firmas",
+    "copyDoneLinks": "Firmas: {{added}} añadidas, {{updated}} actualizadas · {{links}} conexión(es) creada(s)"
   },
   "session": {
     "idleLogout": "Sesión cerrada por inactividad.",

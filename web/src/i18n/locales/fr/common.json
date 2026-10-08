@@ -1757,7 +1757,15 @@
     "inSigHint": "Identifiant de signature dans {{system}} — l'autre extrémité du trou",
     "outSigHint": "Identifiant de signature dans {{system}} — l'extrémité vers laquelle tu warpes d'ici",
     "markExpired": "Signaler ce trou comme effondré",
-    "unmarkExpired": "Finalement pas effondré"
+    "unmarkExpired": "Finalement pas effondré",
+    "copyAll": "Copier {{count}} vers la carte",
+    "copyAllHint": "Ajoute les signatures de chaque connexion {{system}} dont le système est sur la carte",
+    "copyOne": "Copier les signatures de cette connexion vers la carte",
+    "copyNothing": "Rien à copier : ces signatures sont déjà sur la carte",
+    "copyDone": "Signatures : {{added}} ajoutées, {{updated}} mises à jour",
+    "copyPartial": "{{added}} ajoutées, {{failed}} en échec",
+    "copyFailed": "Impossible de copier les signatures",
+    "copyDoneLinks": "Signatures : {{added}} ajoutées, {{updated}} mises à jour · {{links}} connexion(s) tracée(s)"
   },
   "session": {
     "idleLogout": "Déconnecté pour inactivité.",

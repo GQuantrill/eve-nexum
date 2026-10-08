@@ -331,7 +331,10 @@ interface MapStore {
   moveSystem: (id: string, position: { x: number; y: number }, opts?: { skipUndo?: boolean }) => void;
 
   // Connections
-  addConnection: (sourceId: string, targetId: string, sourceHandle?: string | null, targetHandle?: string | null) => string;
+  /** `init` seeds fields on the new connection. They go into the create POST
+   *  itself: the POST is deferred until both endpoints exist, so a follow-up
+   *  updateConnection can reach the server first and be dropped. */
+  addConnection: (sourceId: string, targetId: string, sourceHandle?: string | null, targetHandle?: string | null, init?: Partial<Omit<MapConnection, 'id' | 'sourceId' | 'targetId'>>) => string;
   updateConnection: (id: string, updates: Partial<Omit<MapConnection, 'id'>>) => void;
   removeConnection: (id: string) => void;
   // Re-route every connection's handles to the nearest sides given current
@@ -353,6 +356,11 @@ interface MapStore {
   // system's signatures/structures. The open pane watches its system's value
   // and re-fetches when it ticks (sigs/structures live in pane state, not here).
   sigRev: Record<string, number>;
+  /** Mark a system's signatures as changed by THIS client, so an open pane
+   *  re-fetches. The SSE path deliberately skips the originating client to
+   *  avoid an echo, which leaves a write made outside the pane (copying the
+   *  Thera/Turnur exits in) invisible until the system is re-selected. */
+  bumpSigRev: (systemId: string) => void;
   structRev: Record<string, number>;
   anomRev: Record<string, number>;
 
@@ -627,6 +635,8 @@ export const useMapStore = create<MapStore>()((set, get) => {
     routeHighlight: null,
     routeOrigin: null,
     sigRev: {},
+    bumpSigRev: (systemId) =>
+      set((s) => ({ sigRev: { ...s.sigRev, [systemId]: (s.sigRev[systemId] ?? 0) + 1 } })),
     structRev: {},
     anomRev: {},
     sigTypesBySystem: {},
@@ -1157,7 +1167,7 @@ export const useMapStore = create<MapStore>()((set, get) => {
 
     // ── Connections ───────────────────────────────────────────────────────────
 
-    addConnection: (sourceId, targetId, sourceHandle = null, targetHandle = null) => {
+    addConnection: (sourceId, targetId, sourceHandle = null, targetHandle = null, init) => {
       const { activeMapId } = get();
       const id = uuid();
 
@@ -1180,7 +1190,8 @@ export const useMapStore = create<MapStore>()((set, get) => {
                 massUsed: 0, eolAt: null,
                 sourceSignatureId: null, targetSignatureId: null, broken: false,
                 flagIcon: null, flagNote: null, flagBlink: false, flagColor: null,
-                createdAt: new Date().toISOString() },
+                createdAt: new Date().toISOString(),
+                ...init },
             ],
           },
         };

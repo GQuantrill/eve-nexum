@@ -588,3 +588,17 @@
 .route-planner__chip .icon-btn { padding: 0 7px; border-left: 1px solid var(--border); }
 .route-planner__save { display: flex; gap: 6px; align-items: center; }
 .route-planner__save > input { flex: 1; min-width: 0; }
+
+/* The bulk-copy button sits on its own line beneath the sort control. Full
+   width so the label has room: it carries a count and a system name, which is
+   more text than fits beside a select in a sidebar-width pane. */
+.scout-pane__copy-row {
+  display: flex;
+  padding: 0 var(--sp-8, 8px) var(--sp-6, 6px);
+}
+
+.scout-pane__copy {
+  flex: 1;
+  justify-content: center;
+  white-space: nowrap;
+}

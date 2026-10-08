@@ -1757,7 +1757,15 @@
     "inSigHint": "ID da assinatura em {{system}} — a outra ponta do buraco",
     "outSigHint": "ID da assinatura em {{system}} — a ponta para onde fazes warp a partir daqui",
     "markExpired": "Comunicar que este buraco colapsou",
-    "unmarkExpired": "Afinal não colapsou"
+    "unmarkExpired": "Afinal não colapsou",
+    "copyAll": "Copiar {{count}} para o mapa",
+    "copyAllHint": "Adiciona as assinaturas de cada ligação de {{system}} cujo sistema esteja no mapa",
+    "copyOne": "Copiar as assinaturas desta ligação para o mapa",
+    "copyNothing": "Nada a copiar — essas assinaturas já estão no mapa",
+    "copyDone": "Assinaturas: {{added}} adicionadas, {{updated}} atualizadas",
+    "copyPartial": "{{added}} adicionadas, {{failed}} falharam",
+    "copyFailed": "Não foi possível copiar as assinaturas",
+    "copyDoneLinks": "Assinaturas: {{added}} adicionadas, {{updated}} atualizadas · {{links}} ligação(ões) criada(s)"
   },
   "session": {
     "idleLogout": "Sessão terminada por inatividade.",

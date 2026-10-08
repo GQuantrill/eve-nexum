@@ -1757,7 +1757,15 @@
     "inSigHint": "Signatur-ID in {{system}} — das andere Ende des Lochs",
     "outSigHint": "Signatur-ID in {{system}} — das Ende, das du von hier aus anwarpst",
     "markExpired": "Dieses Loch als kollabiert melden",
-    "unmarkExpired": "Doch nicht kollabiert"
+    "unmarkExpired": "Doch nicht kollabiert",
+    "copyAll": "{{count}} auf die Karte",
+    "copyAllHint": "Signaturen für alle {{system}}-Verbindungen hinzufügen, deren System auf der Karte ist",
+    "copyOne": "Signaturen dieser Verbindung auf die Karte kopieren",
+    "copyNothing": "Nichts zu kopieren – diese Signaturen sind bereits auf der Karte",
+    "copyDone": "Signaturen: {{added}} hinzugefügt, {{updated}} aktualisiert",
+    "copyPartial": "{{added}} hinzugefügt, {{failed}} fehlgeschlagen",
+    "copyFailed": "Signaturen konnten nicht kopiert werden",
+    "copyDoneLinks": "Signaturen: {{added}} hinzugefügt, {{updated}} aktualisiert · {{links}} Verbindung(en) gezeichnet"
   },
   "session": {
     "idleLogout": "Wegen Inaktivität abgemeldet.",
