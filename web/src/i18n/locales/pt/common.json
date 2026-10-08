@@ -1765,7 +1765,8 @@
     "copyDone": "Assinaturas: {{added}} adicionadas, {{updated}} atualizadas",
     "copyPartial": "{{added}} adicionadas, {{failed}} falharam",
     "copyFailed": "Não foi possível copiar as assinaturas",
-    "copyDoneLinks": "Assinaturas: {{added}} adicionadas, {{updated}} atualizadas · {{links}} ligação(ões) criada(s)"
+    "copyDoneLinks": "Assinaturas: {{added}} adicionadas, {{updated}} atualizadas · {{links}} ligação(ões) criada(s)",
+    "copyDoneSwept": "Assinaturas: {{added}} adicionadas, {{updated}} atualizadas · {{removed}} buraco(s) colapsado(s) removidos"
   },
   "session": {
     "idleLogout": "Sessão terminada por inatividade.",

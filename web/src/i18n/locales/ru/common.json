@@ -1781,7 +1781,8 @@
     "copyDone": "Сигнатуры: добавлено {{added}}, обновлено {{updated}}",
     "copyPartial": "Добавлено {{added}}, не удалось {{failed}}",
     "copyFailed": "Не удалось скопировать сигнатуры",
-    "copyDoneLinks": "Сигнатуры: добавлено {{added}}, обновлено {{updated}} · соединений создано: {{links}}"
+    "copyDoneLinks": "Сигнатуры: добавлено {{added}}, обновлено {{updated}} · соединений создано: {{links}}",
+    "copyDoneSwept": "Сигнатуры: добавлено {{added}}, обновлено {{updated}} · удалено схлопнувшихся дыр: {{removed}}"
   },
   "session": {
     "idleLogout": "Выход из-за неактивности.",

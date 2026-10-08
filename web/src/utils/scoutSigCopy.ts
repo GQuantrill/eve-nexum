@@ -13,6 +13,7 @@ import type { ConnectionSize, TimeStatus } from '../types';
 
 /** The parts of a scout connection this needs. */
 export interface ScoutLike {
+  id:            string;
   whType:        string;
   maxShipSize:   string;
   remainingHours: number | null;
@@ -33,6 +34,9 @@ export interface MappedSystem {
 export interface SigWrite {
   systemId:   string;   // map system id
   systemName: string;
+  /** The eve-scout connection this row came from, stored as provenance so the
+   *  cleanup can tell our rows from a person's. */
+  scoutId:    string;
   sigId:      string;
   whType:     string;
   whLeadsTo:  string;
@@ -86,7 +90,7 @@ export function sigWritesFor(
     out.push({
       systemId: far.id, systemName: far.name,
       sigId: conn.inSignature, whType: conn.whType, whLeadsTo: hubName,
-      timeStatus: scoutTimeStatus(conn.remainingHours),
+      timeStatus: scoutTimeStatus(conn.remainingHours), scoutId: conn.id,
     });
   }
 
@@ -97,7 +101,7 @@ export function sigWritesFor(
     out.push({
       systemId: hub.id, systemName: hub.name,
       sigId: conn.outSignature, whType: conn.whType, whLeadsTo: conn.inSystemName,
-      timeStatus: scoutTimeStatus(conn.remainingHours),
+      timeStatus: scoutTimeStatus(conn.remainingHours), scoutId: conn.id,
     });
   }
 
@@ -140,6 +144,7 @@ export function allSigWrites(
 export interface ConnWrite {
   fromId:     string;   // the far system's map id
   toId:       string;   // the hub's map id
+  scoutId:    string;
   whType:     string;
   size:       ConnectionSize | null;
   timeStatus: TimeStatus | '';
@@ -163,7 +168,7 @@ export function connWriteFor(
   const hub = systems.find((s) => s.name.toLowerCase() === hubName.toLowerCase());
   if (!far || !hub || far.id === hub.id) return null;
   return {
-    fromId: far.id, toId: hub.id,
+    fromId: far.id, toId: hub.id, scoutId: conn.id,
     whType: conn.whType,
     size: scoutSizeToConnSize(conn.maxShipSize),
     timeStatus: scoutTimeStatus(conn.remainingHours),

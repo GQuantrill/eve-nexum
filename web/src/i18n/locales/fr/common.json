@@ -1765,7 +1765,8 @@
     "copyDone": "Signatures : {{added}} ajoutées, {{updated}} mises à jour",
     "copyPartial": "{{added}} ajoutées, {{failed}} en échec",
     "copyFailed": "Impossible de copier les signatures",
-    "copyDoneLinks": "Signatures : {{added}} ajoutées, {{updated}} mises à jour · {{links}} connexion(s) tracée(s)"
+    "copyDoneLinks": "Signatures : {{added}} ajoutées, {{updated}} mises à jour · {{links}} connexion(s) tracée(s)",
+    "copyDoneSwept": "Signatures : {{added}} ajoutées, {{updated}} mises à jour · {{removed}} trou(s) effondré(s) retirés"
   },
   "session": {
     "idleLogout": "Déconnecté pour inactivité.",

@@ -13,6 +13,7 @@ import { ProximityOptInModal } from './components/ui/ProximityOptInModal';
 import { CommandPaletteModal } from './components/ui/CommandPaletteModal';
 import { Toaster } from './components/ui/Toaster';
 import { toast } from './utils/toastStore';
+import { useRefreshLastKnown } from './hooks/useRefreshLastKnown';
 
 // Route-level code splitting. Each of these is reached by exactly one branch
 // of the switch in AppShell, and most people hit none of them:
@@ -55,6 +56,8 @@ let hydratedForUserId: number | null = null;
 
 function MapApp() {
   const { user } = useAuth();
+  // Keeps the cached last-known location honest once the pilot logs off.
+  useRefreshLastKnown();
   const mapId               = useMapStore((s) => s.map.id);
   const selectedSystemId    = useMapStore((s) => s.selectedSystemId);
   const selectedConnectionId = useMapStore((s) => s.selectedConnectionId);

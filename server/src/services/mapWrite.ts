@@ -37,6 +37,10 @@ export interface SignatureInput {
   ghostType: string;
   massStatus: string;
   timeStatus: string;
+  /** Set only by the Thera/Turnur copy, to the eve-scout connection id this
+   *  row came from. Null everywhere else, which is what lets the cleanup tell
+   *  "we wrote this" from "a person wrote this". */
+  scoutConnectionId?: string | null;
 }
 
 // A signature carrying nothing at all — no scan id, no name, no notes, no
@@ -63,8 +67,10 @@ export async function createSignature(mapId: string, systemId: string, d: Signat
   // insert, and the join is on a user we already have the id for.
   const { rows } = await db.query(
     `WITH ins AS (
-       INSERT INTO map_signatures (system_id, sig_id, sig_type, name, notes, wh_type, wh_leads_to, ghost_type, mass_status, time_status, created_by_user_id)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+       INSERT INTO map_signatures (system_id, sig_id, sig_type, name, notes, wh_type, wh_leads_to, ghost_type, mass_status, time_status, created_by_user_id,
+                                   scout_connection_id, scout_last_seen)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11,
+               $12, CASE WHEN $12::text IS NULL THEN NULL ELSE NOW() END)
        RETURNING *
      )
      SELECT ins.id, ins.sig_id AS "sigId", ins.sig_type AS "sigType", ins.name, ins.notes,
@@ -74,7 +80,7 @@ export async function createSignature(mapId: string, systemId: string, d: Signat
             u.character_name AS "createdByName", u.character_id AS "createdByCharId"
        FROM ins LEFT JOIN users u ON u.id = ins.created_by_user_id`,
     [systemId, d.sigId, d.sigType, d.name, d.notes, d.whType, d.whLeadsTo, d.ghostType,
-     d.massStatus, d.timeStatus, actor.userId],
+     d.massStatus, d.timeStatus, actor.userId, d.scoutConnectionId ?? null],
   );
   db.query(`INSERT INTO user_events (user_id, event_type, sig_type) VALUES ($1, 'signature', $2)`,
     [actor.userId, d.sigType]).catch(console.error);
@@ -88,6 +94,9 @@ export async function createSignature(mapId: string, systemId: string, d: Signat
 const SIG_COLS: Record<string, string> = {
   sigId: 'sig_id', sigType: 'sig_type', name: 'name', notes: 'notes', whType: 'wh_type', whLeadsTo: 'wh_leads_to',
   ghostType: 'ghost_type', massStatus: 'mass_status', timeStatus: 'time_status',
+  // Re-copying a hole that is still listed refreshes both, which is what keeps
+  // the grace period meaningful: scout_last_seen is "the feed still had it".
+  scoutConnectionId: 'scout_connection_id',
 };
 
 // Updates the signature and returns flags the route uses to drive the K162
@@ -118,6 +127,12 @@ export async function updateSignature(
   const vals: unknown[] = [];
   for (const [key, col] of Object.entries(SIG_COLS)) {
     if (key in updates) { sets.push(`${col} = $${vals.length + 1}`); vals.push(updates[key]); }
+  }
+  // Writing the provenance also stamps when the feed last confirmed the hole.
+  // Kept here rather than in SIG_COLS because the value is NOW(), not
+  // something the caller supplies.
+  if ('scoutConnectionId' in updates && updates.scoutConnectionId != null) {
+    sets.push('scout_last_seen = NOW()');
   }
   await db.query(
     `UPDATE map_signatures SET ${sets.join(', ')} WHERE id = $${vals.length + 1} AND system_id = $${vals.length + 2} AND ${inThisMap(vals.length + 3)}`,
