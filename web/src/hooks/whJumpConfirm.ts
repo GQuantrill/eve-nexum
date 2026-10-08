@@ -83,13 +83,16 @@ export async function maybeConfirmWhJump(ctx: WhJumpContext): Promise<void> {
   // Write a hole's leads-to and re-run the same connection auto-detect the sig
   // pane uses on edit, so the map edge picks up the WH type. `oldSig` is the
   // pre-write state — it lets the auto-detect follow/clear the right link.
+  // `s` is the hole the pilot picked (or the only candidate), so pass it as the
+  // preferred backing signature -- otherwise the auto-detect's K162 tie-break
+  // can attribute the jump to the other hole leading to the same system.
   const writeLeadsTo = (s: Signature, value: string, oldSig: Signature): void => {
     api(`/api/maps/${mapId}/systems/${fromMapSystemId}/signatures/${s.id}`, {
       method: 'PATCH',
       body:   JSON.stringify({ whLeadsTo: value }),
     }).catch(() => { /* best-effort; the user can still set it by hand */ });
     const updated = sigs.map((x) => (x.id === s.id ? { ...x, whLeadsTo: value } : x));
-    reevaluateConnectionsForSystem(fromMapSystemId, updated, oldSig);
+    reevaluateConnectionsForSystem(fromMapSystemId, updated, oldSig, false, undefined, s.id);
   };
 
   // One plausible hole → fill it directly (no prompt), with an undo. Several →

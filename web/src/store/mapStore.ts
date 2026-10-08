@@ -1091,6 +1091,27 @@ export const useMapStore = create<MapStore>()((set, get) => {
           systems: s.map.systems.map((sys) => (sys.id === id ? { ...sys, ...updates } : sys)),
         },
       }));
+
+      // A system's class can arrive AFTER the holes touching it already have a
+      // type -- jumping into an unresolved placeholder names the system first
+      // and classifies it a moment later. Size depends on both ends (a hole
+      // touching a C1 caps at medium), so re-derive this system's connections
+      // once its class is known, or that cap would only ever be applied by
+      // opening the connection panel.
+      if (typeof updates.systemClass === 'string') {
+        const after = get().map;
+        for (const c of after.connections) {
+          if (c.sourceId !== id && c.targetId !== id) continue;
+          if (c.connectionType !== 'standard' || !c.type) continue;
+          const a = after.systems.find((sy) => sy.id === c.sourceId);
+          const b = after.systems.find((sy) => sy.id === c.targetId);
+          const size = inferredSize({
+            code: c.type, whTypes: wormholeTypesSnapshot(),
+            currentSize: c.size, classA: a?.systemClass, classB: b?.systemClass,
+          });
+          if (size && size !== c.size) get().updateConnection(c.id, { size });
+        }
+      }
       if (activeMapId) {
         const url  = `/api/maps/${activeMapId}/systems/${id}`;
         const body = JSON.stringify(updates);

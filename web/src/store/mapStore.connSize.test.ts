@@ -83,3 +83,42 @@ describe('connection size follows the wormhole type', () => {
     expect(sizeNow()).toBe('large');
   });
 });
+
+describe('the C1 cap through the store path', () => {
+  it('caps a bare K162 out of a C1 at medium', () => {
+    // The original #650 report. K162 carries no size of its own, so it sat at
+    // the 'large' default and claimed a battleship fits. Previously only the
+    // connection panel could correct this; now any path that sets the type does.
+    seed('C1', 'HS');
+    useMapStore.getState().updateConnection('c1', { type: 'K162' });
+    expect(sizeNow()).toBe('medium');
+  });
+
+  it('leaves a K162 alone when neither end is a C1', () => {
+    seed('C5', 'HS');
+    useMapStore.getState().updateConnection('c1', { type: 'K162' });
+    expect(sizeNow()).toBe('large');
+  });
+});
+
+describe('a class that resolves after the type is known', () => {
+  it('applies the C1 cap once the far system is classified', () => {
+    // Jumping into an unresolved placeholder names the system first and
+    // classifies it a moment later, so the hole already has its type by the
+    // time we learn an end is a C1. Without this the cap would wait for
+    // somebody to open the connection panel.
+    seed('HS', 'unknown');
+    useMapStore.getState().updateConnection('c1', { type: 'B274' });
+    expect(sizeNow()).toBe('large');            // nothing yet says otherwise
+
+    useMapStore.getState().updateSystem('b', { systemClass: 'C1' });
+    expect(sizeNow()).toBe('medium');
+  });
+
+  it('leaves the size alone when the class resolves to something uncapped', () => {
+    seed('HS', 'unknown');
+    useMapStore.getState().updateConnection('c1', { type: 'B274' });
+    useMapStore.getState().updateSystem('b', { systemClass: 'C5' });
+    expect(sizeNow()).toBe('large');
+  });
+});

@@ -32,6 +32,10 @@ export function reevaluateConnectionsForSystem(
   // Called with a signature's id once its staged mass/life has been moved onto
   // a connection, so the caller can clear the sig's copy.
   onStagedConsumed?: (sigId: string) => void,
+  // The signature the PILOT said they jumped. When two holes in a system lead
+  // to the same place, the tie-break below cannot tell them apart and guesses;
+  // this is the answer, so it wins outright.
+  preferSigId?: string,
 ): void {
   const { map, updateConnection } = useMapStore.getState();
   const oldType  = oldSig?.whType?.toUpperCase();
@@ -59,7 +63,19 @@ export function reevaluateConnectionsForSystem(
         (s.whLeadsTo.toUpperCase() === oc || s.whLeadsTo.toUpperCase() === on),
     );
     const backingCodes = backing.map((s) => (s.whType ?? '').toUpperCase());
-    const best = backingCodes.find(t => t !== 'K162') ?? backingCodes[0];
+
+    // Normally prefer a typed sig over a K162: a K162 names no type of its
+    // own, so when both back a link the typed one says more.
+    //
+    // But that is a guess, and it was overriding a fact. With two holes to the
+    // same system -- a K162 and, say, a C008 frigate hole -- the pilot is asked
+    // which one they jumped, and this then stamped the C008 on it regardless.
+    // An answer beats a heuristic, so a chosen signature wins even when it is
+    // the K162.
+    const chosen = preferSigId ? backing.find((s) => s.id === preferSigId) : undefined;
+    const best = (chosen?.whType ?? '').toUpperCase()
+      || backingCodes.find(t => t !== 'K162')
+      || backingCodes[0];
 
     // True when this connection's current type was auto-filled from the sig
     // being re-evaluated (its OLD whType still equals conn.type, and its old
