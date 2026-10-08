@@ -66,7 +66,11 @@ export default defineConfig(({ mode }) => {
             if (id.includes('@phosphor-icons')) return 'phosphor';
             if (id.includes('@xyflow') || id.includes('@dnd-kit')) return 'xyflow';
             if (id.includes('chart.js')) return 'chartjs';
-            if (id.includes('/src/i18n/locales/')) return 'locales';
+            // No manual chunk for locales: each non-English file is its own
+            // dynamic import (see i18n/index.ts) and naming them all 'locales'
+            // would glue them back into one eager chunk, which is what this
+            // used to do -- 339K gzipped of nine languages for the one being
+            // read. English is static and lands in the entry.
           },
         },
       },

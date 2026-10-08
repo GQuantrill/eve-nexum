@@ -928,6 +928,11 @@ export function settingAllowed(key: string): boolean {
 //   proximityOptInAsked                one-shot prompts, per-device
 //   nexum.lang                         owned by the i18next language detector
 
+// Generous by design: a real account carries well under a hundred keys and a
+// few KB. These exist to stop unbounded growth, not to ration normal use.
+const MAX_SETTING_KEYS  = 500;
+const MAX_SETTINGS_BYTES = 256 * 1024;
+
 authRouter.patch('/settings', async (req, res) => {
   if (!req.session.userId) { res.status(401).json({ error: 'Not authenticated' }); return; }
   const body = req.body as { entries?: Record<string, unknown> };
@@ -944,10 +949,35 @@ authRouter.patch('/settings', async (req, res) => {
     res.json({ ok: true, applied: 0 });
     return;
   }
-  await db.query(
-    `UPDATE users SET ui_settings = ui_settings || $1::jsonb, updated_at = NOW() WHERE id = $2`,
-    [JSON.stringify(filtered), req.session.userId],
+  // Caps on the stored blob. Two of the allowed PREFIXES match any suffix, so
+  // without a limit a signed-in account can grow its own ui_settings without
+  // bound — and ui_settings is read on every session hydrate, so the cost of a
+  // bloated row lands on every page load.
+  //
+  // Checked on the POST-MERGE value inside the UPDATE rather than in JS first:
+  // two concurrent PATCHes would each pass a read-then-write check and both
+  // write. Testing the merged result also means changing a key you already
+  // have always succeeds (the count does not grow), and shrinking a value
+  // always succeeds, so the cap restricts growth rather than locking the
+  // account out of its own settings.
+  const capped = await db.query(
+    `UPDATE users
+        SET ui_settings = ui_settings || $1::jsonb, updated_at = NOW()
+      WHERE id = $2
+        AND (SELECT count(*) FROM jsonb_object_keys(ui_settings || $1::jsonb)) <= $3
+        AND length((ui_settings || $1::jsonb)::text) <= $4
+      RETURNING 1`,
+    [JSON.stringify(filtered), req.session.userId, MAX_SETTING_KEYS, MAX_SETTINGS_BYTES],
   );
+  if (capped.rowCount === 0) {
+    // Nothing was written. Say so plainly rather than reporting success, or
+    // the client keeps a value the server does not have.
+    res.status(413).json({
+      error: 'settings_too_large',
+      message: `Settings are limited to ${MAX_SETTING_KEYS} keys and ${Math.floor(MAX_SETTINGS_BYTES / 1024)} KB.`,
+    });
+    return;
+  }
   // Keep the session cache in sync so /auth/me on the same session sees
   // the same data without a DB round-trip.
   if (req.session.prefs) {
