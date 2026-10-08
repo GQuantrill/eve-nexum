@@ -100,3 +100,25 @@ describe('the C1 cap through the store path', () => {
     expect(sizeNow()).toBe('large');
   });
 });
+
+describe('a class that resolves after the type is known', () => {
+  it('applies the C1 cap once the far system is classified', () => {
+    // Jumping into an unresolved placeholder names the system first and
+    // classifies it a moment later, so the hole already has its type by the
+    // time we learn an end is a C1. Without this the cap would wait for
+    // somebody to open the connection panel.
+    seed('HS', 'unknown');
+    useMapStore.getState().updateConnection('c1', { type: 'B274' });
+    expect(sizeNow()).toBe('large');            // nothing yet says otherwise
+
+    useMapStore.getState().updateSystem('b', { systemClass: 'C1' });
+    expect(sizeNow()).toBe('medium');
+  });
+
+  it('leaves the size alone when the class resolves to something uncapped', () => {
+    seed('HS', 'unknown');
+    useMapStore.getState().updateConnection('c1', { type: 'B274' });
+    useMapStore.getState().updateSystem('b', { systemClass: 'C5' });
+    expect(sizeNow()).toBe('large');
+  });
+});
