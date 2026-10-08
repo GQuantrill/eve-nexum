@@ -15,6 +15,13 @@ export function createStaticResource<Raw, R = Raw>(
   let cache: R | null = null;
   let inflight: Promise<R> | null = null;
 
+  /** The loaded value, or null before it arrives. For code outside React that
+   *  needs the data but must not block on it -- the store derives a wormhole's
+   *  size from its type, and has no hooks available. */
+  function peek(): R | null {
+    return cache;
+  }
+
   function load(): Promise<R> {
     if (cache) return Promise.resolve(cache);
     if (inflight) return inflight;
@@ -37,5 +44,5 @@ export function createStaticResource<Raw, R = Raw>(
     return data;
   }
 
-  return { useResource, load };
+  return { peek, useResource, load };
 }
