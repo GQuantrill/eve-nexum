@@ -180,6 +180,7 @@ export function ScoutConnectionsPane({ scoutSystem }: Props) {
           body: JSON.stringify({
             sigId: w.sigId, sigType: 'wormhole',
             whType: w.whType, whLeadsTo: w.whLeadsTo,
+            timeStatus: w.timeStatus,
           }),
         })));
       const ok = todo.filter((_, i) => results[i].status === 'fulfilled');

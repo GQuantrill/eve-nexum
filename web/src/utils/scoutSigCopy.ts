@@ -4,6 +4,9 @@
 // signature id at each end, the hole's type, and how big it is. This works out
 // which of those belong on the map and what each row should say.
 //
+import { lifeBucket } from './whLifetime';
+import type { TimeStatus } from '../types';
+
 // Names come from eve-scout's point of view, which is the HUB's: "out" is the
 // signature inside Thera/Turnur that you warp to in order to leave, "in" is the
 // one in the system at the far end.
@@ -12,6 +15,7 @@
 export interface ScoutLike {
   whType:        string;
   maxShipSize:   string;
+  remainingHours: number | null;
   inSystemId:    number;
   inSystemName:  string;
   inSignature:   string | null;
@@ -32,6 +36,21 @@ export interface SigWrite {
   sigId:      string;
   whType:     string;
   whLeadsTo:  string;
+  /** '' when the feed gives no lifetime, which leaves the field unset rather
+   *  than asserting a state nobody has observed. */
+  timeStatus: TimeStatus | '';
+}
+
+/**
+ * eve-scout's remaining hours as the app's life bucket.
+ *
+ * Routed through the same lifeBucket the rest of the app uses, so a hole
+ * copied from the feed lands in the same bucket a scout would have set by
+ * hand, and the thresholds cannot drift apart.
+ */
+export function scoutTimeStatus(remainingHours: number | null | undefined): TimeStatus | '' {
+  if (remainingHours == null || !Number.isFinite(remainingHours)) return '';
+  return lifeBucket(remainingHours * 3_600_000);
 }
 
 /** eve-scout's size vocabulary, as the connection size values used here. */
@@ -66,6 +85,7 @@ export function sigWritesFor(
     out.push({
       systemId: far.id, systemName: far.name,
       sigId: conn.inSignature, whType: conn.whType, whLeadsTo: hubName,
+      timeStatus: scoutTimeStatus(conn.remainingHours),
     });
   }
 
@@ -76,6 +96,7 @@ export function sigWritesFor(
     out.push({
       systemId: hub.id, systemName: hub.name,
       sigId: conn.outSignature, whType: conn.whType, whLeadsTo: conn.inSystemName,
+      timeStatus: scoutTimeStatus(conn.remainingHours),
     });
   }
 

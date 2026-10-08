@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { sigWritesFor, pendingSigWrites, sigKey, scoutSizeToConnSize } from './scoutSigCopy';
+import { sigWritesFor, pendingSigWrites, sigKey, scoutSizeToConnSize, scoutTimeStatus } from './scoutSigCopy';
 import type { ScoutLike, MappedSystem } from './scoutSigCopy';
 
 const conn = (over: Partial<ScoutLike> = {}): ScoutLike => ({
-  whType: 'C729', maxShipSize: 'medium',
+  whType: 'C729', maxShipSize: 'medium', remainingHours: 16,
   inSystemId: 30000142, inSystemName: 'Jita',
   inSignature: 'ABC-123', outSignature: 'XYZ-789', ...over,
 });
@@ -14,13 +14,13 @@ describe('sigWritesFor', () => {
   it('writes the far end when that system is on the map', () => {
     const w = sigWritesFor(conn(), [sys('s1', 'Jita', 30000142)], 'Thera');
     expect(w).toEqual([{ systemId: 's1', systemName: 'Jita', sigId: 'ABC-123',
-                         whType: 'C729', whLeadsTo: 'Thera' }]);
+                         whType: 'C729', whLeadsTo: 'Thera', timeStatus: 'lessThan24h' }]);
   });
 
   it('writes the hub end too when the hub is mapped, pointing back', () => {
     const w = sigWritesFor(conn(), [sys('h', 'Thera', 31000005)], 'Thera');
     expect(w).toEqual([{ systemId: 'h', systemName: 'Thera', sigId: 'XYZ-789',
-                         whType: 'C729', whLeadsTo: 'Jita' }]);
+                         whType: 'C729', whLeadsTo: 'Jita', timeStatus: 'lessThan24h' }]);
   });
 
   it('writes both ends when both are mapped', () => {
@@ -73,5 +73,22 @@ describe('scoutSizeToConnSize', () => {
     expect(scoutSizeToConnSize('xlarge')).toBe('xl');
     expect(scoutSizeToConnSize('MEDIUM')).toBe('medium');
     expect(scoutSizeToConnSize('frigate')).toBeNull();
+  });
+});
+
+describe('scoutTimeStatus', () => {
+  it('maps the feed\'s remaining hours onto the life buckets', () => {
+    expect(scoutTimeStatus(30)).toBe('fresh');
+    expect(scoutTimeStatus(16)).toBe('lessThan24h');
+    expect(scoutTimeStatus(3)).toBe('lessThan4h');
+    expect(scoutTimeStatus(0.5)).toBe('lessThan1h');
+    expect(scoutTimeStatus(0)).toBe('expired');
+  });
+
+  it('asserts nothing when the feed has no lifetime', () => {
+    // Better an unset field than a state nobody observed.
+    expect(scoutTimeStatus(null)).toBe('');
+    expect(scoutTimeStatus(undefined)).toBe('');
+    expect(scoutTimeStatus(NaN)).toBe('');
   });
 });
