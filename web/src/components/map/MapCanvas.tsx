@@ -1705,6 +1705,13 @@ export function MapCanvas() {
   return (
     <HeatmapContext.Provider value={heatmapState}>
     <div className="map-canvas" ref={wrapperRef}>
+      {/* connectOnClick={false}: React Flow joins a source handle to a target
+          handle on CLICK by default. Easy Connect lays a full-node source
+          handle over every system so you can drag from anywhere on it, which
+          also turns "click one system, then click another" into a connection
+          -- silently linking two systems somebody was only trying to look at.
+          Connections are made by dragging, here and from the context menu's
+          "Connect to system", so the click route was only ever a surprise. */}
       <ReactFlow
         ariaLabelConfig={ariaLabelConfig}
         nodes={nodes}
@@ -1712,6 +1719,7 @@ export function MapCanvas() {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
+        connectOnClick={false}
         onNodeDragStart={onNodeDragStart}
         onNodeDrag={onNodeDrag}
         onNodeDragStop={onNodeDragStop}
