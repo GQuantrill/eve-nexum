@@ -234,9 +234,13 @@ export function ScoutConnectionsPane({ scoutSystem }: Props) {
             { value: 'closest', label: t(routeMode === 'secure' ? 'scout.sortSecure' : 'scout.sortShortest') },
           ]}
         />
-        {/* Copy every mapped connection at once. Disabled with a count of zero
-            when nothing here touches the map, which is the common case before
-            a chain reaches Thera. */}
+      </div>
+      {/* Its own row, not beside the sort control: the pane is a sidebar
+          column, and sharing a line with a label and a select left the button
+          truncated mid-word. Disabled with a count of zero when nothing here
+          touches the map, which is the common case before a chain reaches the
+          hub. */}
+      <div className="scout-pane__copy-row">
         <button
           type="button"
           className="sys-btn scout-pane__copy"
