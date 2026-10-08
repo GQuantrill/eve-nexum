@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { ReactFlowProvider } from '@xyflow/react';
 import { AuthProvider } from './context/AuthProvider';
 import { useAuth, isAdminRole } from './context/AuthContext';
@@ -11,14 +11,31 @@ import { MapSidebar } from './components/ui/MapSidebar';
 import { Sidebar } from './components/ui/Sidebar';
 import { ProximityOptInModal } from './components/ui/ProximityOptInModal';
 import { CommandPaletteModal } from './components/ui/CommandPaletteModal';
-import { LandingPage } from './components/ui/LandingPage';
 import { Toaster } from './components/ui/Toaster';
 import { toast } from './utils/toastStore';
+
+// Route-level code splitting. Each of these is reached by exactly one branch
+// of the switch in AppShell, and most people hit none of them:
+//   AdminPage      2.5k lines + chart.js, for admins only
+//   LandingPage    the public page + its interactive DemoMap, for the logged out
+//   SharedMapView  only ever reached through a /share/<token> link
+// Statically imported, all three shipped to every mapper on every load.
+const LandingPage   = lazy(() => import('./components/ui/LandingPage').then((m) => ({ default: m.LandingPage })));
+const AdminPage     = lazy(() => import('./components/ui/AdminPage').then((m) => ({ default: m.AdminPage })));
+const SharedMapView = lazy(() => import('./components/ui/SharedMapView').then((m) => ({ default: m.SharedMapView })));
+
+// The same screen the auth check already shows while it waits, reused so a
+// route chunk arriving looks like loading rather than like a flicker.
+function RouteLoading() {
+  return (
+    <div className="loading-screen">
+      <img className="loading-screen__logo" src="/screen.png" alt="Nexum" />
+    </div>
+  );
+}
 import { applyDensity, normaliseDensity, DEFAULT_DENSITY } from './utils/density';
 import i18n from './i18n';
 import { TooltipLayer } from './components/ui/TooltipLayer';
-import { AdminPage } from './components/ui/AdminPage';
-import { SharedMapView } from './components/ui/SharedMapView';
 import { useMapStore } from './store/mapStore';
 import { useLocationTracking } from './hooks/useLocationTracking';
 import { useMapEventStream } from './hooks/useMapEventStream';
@@ -220,17 +237,11 @@ function AppShell() {
   // Share links bypass the entire auth gate — a guest with the URL should
   // be able to load the map without ever seeing the landing page. Matched
   // (shareMatch is computed above) BEFORE the user/loading checks below.
-  if (shareMatch) return <SharedMapView token={shareMatch[1]} />;
+  if (shareMatch) return <Suspense fallback={<RouteLoading />}><SharedMapView token={shareMatch[1]} /></Suspense>;
 
-  if (loading) {
-    return (
-      <div className="loading-screen">
-        <img className="loading-screen__logo" src="/screen.png" alt="Nexum" />
-      </div>
-    );
-  }
+  if (loading) return <RouteLoading />;
 
-  if (!user) return <LandingPage />;
+  if (!user) return <Suspense fallback={<RouteLoading />}><LandingPage /></Suspense>;
 
   // Idle-locked: session is still valid, the UI is just paused. Rendering this
   // instead of the map unmounts the map (and its ESI polling); "Continue"
@@ -241,7 +252,7 @@ function AppShell() {
   // (corp/alliance) deployment; solo mode has no other users to manage, so the
   // section is hidden. The reports character is always allowed regardless.
   if (path.startsWith('/admin') && (user.canViewReports || (isAdminRole(user.role) && (user.corpMode || user.allianceMode)))) {
-    return <AdminPage />;
+    return <Suspense fallback={<RouteLoading />}><AdminPage /></Suspense>;
   }
 
   return <MapApp />;
