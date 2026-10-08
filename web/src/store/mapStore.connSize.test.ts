@@ -83,3 +83,20 @@ describe('connection size follows the wormhole type', () => {
     expect(sizeNow()).toBe('large');
   });
 });
+
+describe('the C1 cap through the store path', () => {
+  it('caps a bare K162 out of a C1 at medium', () => {
+    // The original #650 report. K162 carries no size of its own, so it sat at
+    // the 'large' default and claimed a battleship fits. Previously only the
+    // connection panel could correct this; now any path that sets the type does.
+    seed('C1', 'HS');
+    useMapStore.getState().updateConnection('c1', { type: 'K162' });
+    expect(sizeNow()).toBe('medium');
+  });
+
+  it('leaves a K162 alone when neither end is a C1', () => {
+    seed('C5', 'HS');
+    useMapStore.getState().updateConnection('c1', { type: 'K162' });
+    expect(sizeNow()).toBe('large');
+  });
+});
