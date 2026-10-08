@@ -186,6 +186,13 @@ export function ScoutConnectionsPane({ scoutSystem }: Props) {
         );
       }));
 
+      // Tell any open pane for these systems to re-read. The live-update path
+      // skips the client that made the change, so without this the signature
+      // we just wrote stays invisible until the system is clicked off and on.
+      const touched = new Set(todo.filter((_, i) => results[i].status === 'fulfilled')
+        .map((w) => w.systemId));
+      for (const id of touched) useMapStore.getState().bumpSigRev(id);
+
       const okFlags = results.map((r) => r.status === 'fulfilled');
       const added   = todo.filter((w, i) => okFlags[i] && !idByKey.has(sigKey(w.systemId, w.sigId))).length;
       const updated = todo.filter((w, i) => okFlags[i] &&  idByKey.has(sigKey(w.systemId, w.sigId))).length;

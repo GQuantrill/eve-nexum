@@ -353,6 +353,11 @@ interface MapStore {
   // system's signatures/structures. The open pane watches its system's value
   // and re-fetches when it ticks (sigs/structures live in pane state, not here).
   sigRev: Record<string, number>;
+  /** Mark a system's signatures as changed by THIS client, so an open pane
+   *  re-fetches. The SSE path deliberately skips the originating client to
+   *  avoid an echo, which leaves a write made outside the pane (copying the
+   *  Thera/Turnur exits in) invisible until the system is re-selected. */
+  bumpSigRev: (systemId: string) => void;
   structRev: Record<string, number>;
   anomRev: Record<string, number>;
 
@@ -627,6 +632,8 @@ export const useMapStore = create<MapStore>()((set, get) => {
     routeHighlight: null,
     routeOrigin: null,
     sigRev: {},
+    bumpSigRev: (systemId) =>
+      set((s) => ({ sigRev: { ...s.sigRev, [systemId]: (s.sigRev[systemId] ?? 0) + 1 } })),
     structRev: {},
     anomRev: {},
     sigTypesBySystem: {},

@@ -55,12 +55,24 @@ function logIfContentless(mapId: string, systemId: string, d: SignatureInput, ac
 
 export async function createSignature(mapId: string, systemId: string, d: SignatureInput, actor: WriteActor) {
   logIfContentless(mapId, systemId, d, actor);
+  // Returns the creator alongside the row. The client inserts this response
+  // straight into the open pane, and without the character the "added by"
+  // portrait stayed blank until something forced a re-fetch -- which looked
+  // like the row had no author rather than like a missing field.
+  // A CTE rather than a second round trip: the id is only known after the
+  // insert, and the join is on a user we already have the id for.
   const { rows } = await db.query(
-    `INSERT INTO map_signatures (system_id, sig_id, sig_type, name, notes, wh_type, wh_leads_to, ghost_type, mass_status, time_status, created_by_user_id)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-     RETURNING id, sig_id AS "sigId", sig_type AS "sigType", name, notes, wh_type AS "whType", wh_leads_to AS "whLeadsTo",
-               ghost_type AS "ghostType", mass_status AS "massStatus", time_status AS "timeStatus",
-               created_at AS "createdAt"`,
+    `WITH ins AS (
+       INSERT INTO map_signatures (system_id, sig_id, sig_type, name, notes, wh_type, wh_leads_to, ghost_type, mass_status, time_status, created_by_user_id)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+       RETURNING *
+     )
+     SELECT ins.id, ins.sig_id AS "sigId", ins.sig_type AS "sigType", ins.name, ins.notes,
+            ins.wh_type AS "whType", ins.wh_leads_to AS "whLeadsTo",
+            ins.ghost_type AS "ghostType", ins.mass_status AS "massStatus",
+            ins.time_status AS "timeStatus", ins.created_at AS "createdAt",
+            u.character_name AS "createdByName", u.character_id AS "createdByCharId"
+       FROM ins LEFT JOIN users u ON u.id = ins.created_by_user_id`,
     [systemId, d.sigId, d.sigType, d.name, d.notes, d.whType, d.whLeadsTo, d.ghostType,
      d.massStatus, d.timeStatus, actor.userId],
   );
