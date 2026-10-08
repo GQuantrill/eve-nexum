@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { useScoutConnections, setScoutExpired } from '../../hooks/useScoutConnections';
@@ -11,9 +11,12 @@ import { setWaypoint, canSetAutopilot } from '../../utils/routeActions';
 import { useSystemAlias } from '../../hooks/useSystemAlias';
 import { truesecColor } from '../../utils/truesec';
 import { useMapStore } from '../../store/mapStore';
-import { MapPinSimpleIcon, PathIcon, ProhibitIcon } from '../../icons';
+import { CopyIcon, MapPinSimpleIcon, PathIcon, ProhibitIcon } from '../../icons';
 import { Select } from './Select';
 import { DASH } from '../../i18n/format';
+import { api } from '../../api/client';
+import { toast } from '../../utils/toastStore';
+import { pendingSigWrites, sigKey, type SigWrite } from '../../utils/scoutSigCopy';
 
 interface Props {
   scoutSystem: 'Thera' | 'Turnur';
@@ -139,6 +142,73 @@ export function ScoutConnectionsPane({ scoutSystem }: Props) {
     });
   }
 
+  // ── Copy connections into the map's signature lists ────────────────────────
+  // eve-scout already knows the signature id, type and size at both ends, so
+  // retyping them is busywork. Writes only into systems that are on the map.
+  const activeMapId = useMapStore((st) => st.activeMapId);
+  const mapSystems  = useMapStore((st) => st.map.systems);
+  const [copying, setCopying] = useState(false);
+  // Signatures written during this session. The button's count is derived, and
+  // deriving it from the server would mean polling the whole map's signature
+  // list just to label a button; remembering what we just wrote keeps the count
+  // honest after a copy without any extra request.
+  const [justCopied, setJustCopied] = useState<Set<string>>(new Set());
+
+  const systemsForCopy = useMemo(
+    () => mapSystems.map((sy) => ({ id: sy.id, name: sy.name, eveSystemId: sy.eveSystemId })),
+    [mapSystems],
+  );
+
+  const copyToMap = useCallback(async (list: typeof sorted) => {
+    if (!activeMapId || copying) return;
+    setCopying(true);
+    try {
+      // One map-wide read tells us every signature that already exists, so a
+      // bulk copy costs one request rather than one per system -- and so a row
+      // somebody has already filled in by hand is never overwritten.
+      const existing = await api<{ systemId: string; sigId: string }[]>(
+        `/api/maps/${activeMapId}/signatures`,
+      );
+      const have = existing.map((e) => sigKey(e.systemId, e.sigId ?? ''));
+      const todo: SigWrite[] = pendingSigWrites(list, systemsForCopy, scoutSystem, have);
+
+      if (todo.length === 0) { toast.info(t('scout.copyNothing')); return; }
+
+      const results = await Promise.allSettled(todo.map((w) =>
+        api(`/api/maps/${activeMapId}/systems/${w.systemId}/signatures`, {
+          method: 'POST',
+          body: JSON.stringify({
+            sigId: w.sigId, sigType: 'wormhole',
+            whType: w.whType, whLeadsTo: w.whLeadsTo,
+          }),
+        })));
+      const ok = todo.filter((_, i) => results[i].status === 'fulfilled');
+      setJustCopied((prev) => {
+        const next = new Set(prev);
+        for (const w of ok) next.add(sigKey(w.systemId, w.sigId));
+        return next;
+      });
+      const added = ok.length;
+      const failed = results.length - added;
+      // Reported rather than thrown: a partial copy is a normal outcome when
+      // somebody else is editing the same map, and the rows that did land are
+      // still useful.
+      if (failed > 0) toast.error(t('scout.copyPartial', { added, failed }));
+      else            toast.success(t('scout.copyDone', { count: added }));
+    } catch {
+      toast.error(t('scout.copyFailed'));
+    } finally {
+      setCopying(false);
+    }
+  }, [activeMapId, copying, systemsForCopy, scoutSystem, t]);
+
+  // How many rows a bulk copy would add, for the button's label. Cheap enough
+  // to recompute: it is only the mapped ends, not a request.
+  const copyableCount = useMemo(
+    () => pendingSigWrites(sorted, systemsForCopy, scoutSystem, justCopied).length,
+    [sorted, systemsForCopy, scoutSystem, justCopied],
+  );
+
   if (sorted.length === 0) {
     return <div className="scout-pane__empty">{t('scout.noConnections', { system: scoutSystem })}</div>;
   }
@@ -164,6 +234,18 @@ export function ScoutConnectionsPane({ scoutSystem }: Props) {
             { value: 'closest', label: t(routeMode === 'secure' ? 'scout.sortSecure' : 'scout.sortShortest') },
           ]}
         />
+        {/* Copy every mapped connection at once. Disabled with a count of zero
+            when nothing here touches the map, which is the common case before
+            a chain reaches Thera. */}
+        <button
+          type="button"
+          className="sys-btn scout-pane__copy"
+          onClick={() => copyToMap(sorted)}
+          disabled={copying || copyableCount === 0}
+          data-tooltip={t('scout.copyAllHint', { system: scoutSystem })}
+        >
+          {t('scout.copyAll', { count: copyableCount })}
+        </button>
       </div>
       {sorted.map(c => {
         const route   = canRoute ? routes[String(c.inSystemId)] : undefined;
@@ -223,6 +305,20 @@ export function ScoutConnectionsPane({ scoutSystem }: Props) {
 
             <div className="scout-row__actions">
               {route && <span className="scout-row__jumps">{t('units.jumps', { count: route.jumps })}</span>}
+              {/* Shown only when this connection actually touches the map --
+                  a button that silently does nothing is worse than no button. */}
+              {pendingSigWrites([c], systemsForCopy, scoutSystem, justCopied).length > 0 && (
+                <button
+                  type="button"
+                  className="sys-btn scout-row__btn scout-row__btn--icon"
+                  onClick={() => copyToMap([c])}
+                  disabled={copying}
+                  aria-label={t('scout.copyOne')}
+                  data-tooltip={t('scout.copyOne')}
+                >
+                  <CopyIcon size={14} weight="regular" color="#4dd9ac" />
+                </button>
+              )}
               {isKspaceTarget && (
                 <>
                   <button

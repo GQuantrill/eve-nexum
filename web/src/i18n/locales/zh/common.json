@@ -1757,7 +1757,14 @@
     "inSigHint": "{{system}} 中的信号 ID —— 虫洞的另一端",
     "outSigHint": "{{system}} 中的信号 ID —— 从这里跃迁前往的一端",
     "markExpired": "报告该洞已坍塌",
-    "unmarkExpired": "其实没有坍塌"
+    "unmarkExpired": "其实没有坍塌",
+    "copyAll": "复制 {{count}} 项到地图",
+    "copyAllHint": "为地图上已有星系的所有 {{system}} 连接添加信号",
+    "copyOne": "将此连接的信号复制到地图",
+    "copyNothing": "没有可复制的内容 — 这些信号已在地图上",
+    "copyDone": "已添加信号：{{count}}",
+    "copyPartial": "已添加 {{added}} 个，{{failed}} 个失败",
+    "copyFailed": "无法复制信号"
   },
   "session": {
     "idleLogout": "因长时间未操作已退出登录。",

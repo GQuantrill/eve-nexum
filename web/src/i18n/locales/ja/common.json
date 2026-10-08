@@ -1757,7 +1757,14 @@
     "inSigHint": "{{system}} 側のシグネチャ ID — ワームホールの反対側です",
     "outSigHint": "{{system}} 側のシグネチャ ID — ここからワープする側です",
     "markExpired": "このホールの消滅を報告",
-    "unmarkExpired": "消滅していなかった"
+    "unmarkExpired": "消滅していなかった",
+    "copyAll": "{{count}} 件をマップへ",
+    "copyAllHint": "マップ上にあるシステムの {{system}} 接続のシグネチャをまとめて追加します",
+    "copyOne": "この接続のシグネチャをマップへコピー",
+    "copyNothing": "コピーするものがありません — すでにマップ上にあります",
+    "copyDone": "追加したシグネチャ: {{count}}",
+    "copyPartial": "{{added}} 件追加、{{failed}} 件失敗",
+    "copyFailed": "シグネチャをコピーできませんでした"
   },
   "session": {
     "idleLogout": "非アクティブのためサインアウトしました。",
