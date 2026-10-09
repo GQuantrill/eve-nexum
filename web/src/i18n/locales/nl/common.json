@@ -1,33 +1,33 @@
 {
   "a0": {
-    "signIn": "Sign in and dock in K-space to see nearby A0 systems.",
-    "computing": "Computing routes…",
-    "noneReachable": "No A0 systems reachable.",
-    "showing": "Showing the {{count}} closest A0 systems.",
-    "showRoute": "Show {{mode}} route",
-    "hideRoute": "Hide {{mode}} route",
-    "modeShortest": "shortest",
-    "modeSecure": "secure"
+    "signIn": "Log in en dock in K-space om A0-systemen in de buurt te zien.",
+    "computing": "Routes berekenen…",
+    "noneReachable": "Geen A0-systemen bereikbaar.",
+    "showing": "De {{count}} dichtstbijzijnde A0-systemen worden getoond.",
+    "showRoute": "{{mode}} route tonen",
+    "hideRoute": "{{mode}} route verbergen",
+    "modeShortest": "kortste",
+    "modeSecure": "veiligste"
   },
   "account": {
-    "switchCharacter": "Switch character",
-    "addCharacter": "Add character",
-    "blocked": "blocked",
-    "characterAdded": "Added {{name}}",
-    "switchTo": "Switch to {{name}}",
-    "focusLocation": "Track, centre & route from {{name}} on this tab",
-    "noLocation": "No known location for {{name}}",
-    "linkFailedNotInCorp": "Couldn't add that character — they're not in a permitted corporation or alliance.",
-    "linkFailed": "Couldn't add that character. Please try again.",
-    "remove": "Remove",
-    "removeCharacter": "Remove {{name}}",
-    "removeConfirm": "Remove {{name}} from your account? You can add them again later by linking the character.",
-    "characterRemoved": "Removed {{name}}",
-    "removeFailed": "Couldn't remove that character. Please try again.",
-    "locationUnknown": "Location unknown"
+    "switchCharacter": "Character wisselen",
+    "addCharacter": "Character toevoegen",
+    "blocked": "geblokkeerd",
+    "characterAdded": "{{name}} toegevoegd",
+    "switchTo": "Overschakelen naar {{name}}",
+    "focusLocation": "Volg, centreer en plan routes vanaf {{name}} op dit tabblad",
+    "noLocation": "Geen bekende locatie voor {{name}}",
+    "linkFailedNotInCorp": "Kon dat character niet toevoegen — het zit niet in een toegestane corporation of alliance.",
+    "linkFailed": "Kon dat character niet toevoegen. Probeer het opnieuw.",
+    "remove": "Verwijderen",
+    "removeCharacter": "{{name}} verwijderen",
+    "removeConfirm": "{{name}} uit je account verwijderen? Je kunt het later opnieuw toevoegen door het character te koppelen.",
+    "characterRemoved": "{{name}} verwijderd",
+    "removeFailed": "Kon dat character niet verwijderen. Probeer het opnieuw.",
+    "locationUnknown": "Locatie onbekend"
   },
   "actions": {
-    "joinDiscord": "Word lid van Discord",
+    "joinDiscord": "Lid worden van Discord",
     "save": "Opslaan",
     "cancel": "Annuleren",
     "delete": "Verwijderen",
@@ -41,28 +41,28 @@
     "collapse": "Inklappen"
   },
   "activity": {
-    "thisHour": "this hour",
-    "allHidden": "All charts hidden. Toggle them on in Map Options → Activity.",
-    "loading": "Loading activity…",
-    "peak": "peak {{value}}"
+    "thisHour": "dit uur",
+    "allHidden": "Alle grafieken verborgen. Zet ze aan bij Kaartopties → Activiteit.",
+    "loading": "Activiteit laden…",
+    "peak": "piek {{value}}"
   },
   "addSystem": {
-    "title": "Add System",
-    "systemName": "System name",
-    "searchPlaceholder": "Type to search EVE systems…",
-    "clearSelection": "Clear selection",
-    "noResults": "No systems found for \"{{query}}\"",
-    "class": "Class",
+    "title": "Systeem toevoegen",
+    "systemName": "Systeemnaam",
+    "searchPlaceholder": "Typ om EVE-systemen te zoeken…",
+    "clearSelection": "Selectie wissen",
+    "noResults": "Geen systemen gevonden voor \"{{query}}\"",
+    "class": "Klasse",
     "effect": "Effect",
-    "effectNone": "None",
+    "effectNone": "Geen",
     "statics": "Statics",
-    "staticsPlaceholder": "auto-filled from database",
-    "loading": "Loading…",
-    "add": "Add System",
-    "onMap": "on map",
-    "unknownOption": "Unknown (unmapped wormhole)",
-    "addHere": "Add {{system}}",
-    "hereOnMap": "{{system}} is already on this map"
+    "staticsPlaceholder": "automatisch gevuld uit de database",
+    "loading": "Laden…",
+    "add": "Systeem toevoegen",
+    "onMap": "op de kaart",
+    "unknownOption": "Onbekend (niet-gekarteerd wormgat)",
+    "addHere": "{{system}} toevoegen",
+    "hereOnMap": "{{system}} staat al op deze kaart"
   },
   "admin": {
     "back": "Back to maps",
@@ -397,7 +397,7 @@
     }
   },
   "anomType": {
-    "unknown": "Unknown",
+    "unknown": "Onbekend",
     "combat": "Combat",
     "ore": "Ore",
     "homefront": "Homefront"
@@ -475,18 +475,18 @@
     "disabled": "API-sleutels uitgeschakeld"
   },
   "chainExits": {
-    "title": "Chain exits",
-    "noExits": "No K-space exits in this chain.",
-    "hint": "K-space systems currently on the map, by security class. Jita route is gates-only — wormhole shortcuts not counted.",
-    "allExits": "All K-space exits",
-    "noFavourites": "No favourite systems yet — add some in the Closest Systems panel.",
-    "noRoute": "no route",
-    "inChain": "in chain",
+    "title": "Ketenuitgangen",
+    "noExits": "Geen K-space-uitgangen in deze keten.",
+    "hint": "K-space-systemen die nu op de kaart staan, per beveiligingsklasse. De Jita-route gaat alleen via gates — wormgat-sluiproutes tellen niet mee.",
+    "allExits": "Alle K-space-uitgangen",
+    "noFavourites": "Nog geen favoriete systemen — voeg ze toe in het paneel Dichtstbijzijnde systemen.",
+    "noRoute": "geen route",
+    "inChain": "in keten",
     "via": "via",
     "highSec": "High-sec",
     "lowSec": "Low-sec",
     "nullSec": "Null-sec",
-    "nearestJita": "Nearest Jita:"
+    "nearestJita": "Dichtstbij Jita:"
   },
   "chains": {
     "from": "Van…",
@@ -516,35 +516,35 @@
     "title": "Clones",
     "medical": "Medical clone",
     "jumpClone": "Jump clone",
-    "none": "No clones found. If this stays empty, sign out and back in to grant the clones permission.",
-    "unknownLocation": "Location unavailable",
+    "none": "Geen clones gevonden. Blijft dit leeg, log dan uit en weer in om de clones-permissie te geven.",
+    "unknownLocation": "Locatie niet beschikbaar",
     "implants": "{{count}} implant",
     "implants_other": "{{count}} implants",
-    "notEnabled": "Clone tracking isn't enabled on this deployment. An administrator can turn it on with ESI_CLONES_SCOPE after adding the clones permission to the EVE application."
+    "notEnabled": "Clone-registratie staat niet aan op deze installatie. Een beheerder kan het aanzetten met ESI_CLONES_SCOPE nadat de clones-permissie aan de EVE-applicatie is toegevoegd."
   },
   "closest": {
-    "dragToReorder": "Drag to reorder",
-    "home": "Home",
-    "noJumps": "— jumps",
-    "removeFromList": "Remove from list",
-    "signIn": "Sign in and dock in K-space to see jumps to hubs, or enable the route shortcut options to route from a wormhole or Thera.",
-    "searchPlaceholder": "Search system name…",
-    "onList": "on list",
-    "noMatch": "No systems match \"{{query}}\""
+    "dragToReorder": "Sleep om te herschikken",
+    "home": "Thuis",
+    "noJumps": "— sprongen",
+    "removeFromList": "Uit de lijst verwijderen",
+    "signIn": "Log in en dock in K-space om sprongen naar hubs te zien, of zet de route-sluiproutes aan om vanaf een wormgat of Thera te routeren.",
+    "searchPlaceholder": "Zoek op systeemnaam…",
+    "onList": "in de lijst",
+    "noMatch": "Geen systemen komen overeen met \"{{query}}\""
   },
   "commandPalette": {
-    "placeholder": "Search systems and maps…",
-    "search": "Search",
-    "noMatches": "No matches",
-    "openMap": "↪ open map: {{name}}",
-    "switchMap": "(switch map)",
-    "navigate": "navigate",
-    "open": "open",
-    "close": "close"
+    "placeholder": "Zoek systemen en kaarten…",
+    "search": "Zoeken",
+    "noMatches": "Geen overeenkomsten",
+    "openMap": "↪ kaart openen: {{name}}",
+    "switchMap": "(kaart wisselen)",
+    "navigate": "navigeren",
+    "open": "openen",
+    "close": "sluiten"
   },
   "confirm": {
-    "title": "Are you sure?",
-    "dontShowAgain": "Don't show this again"
+    "title": "Weet je het zeker?",
+    "dontShowAgain": "Dit niet meer tonen"
   },
   "connPanel": {
     "brokenNotice": "Verbinding verbroken — de onderliggende wormgat-signatuur is verwijderd. Blijft op de kaart staan, maar wordt uitgesloten van routering.",
@@ -631,15 +631,15 @@
     "removeConnection": "Verbinding verwijderen"
   },
   "contentFilter": {
-    "hint": "Spotlight systems by their scanned content. Pick signature or anomaly types, or search a site name; matching systems stay lit and the rest fade out.",
-    "sigs": "Signatures",
-    "anoms": "Anomalies",
-    "holes": "Wormholes",
-    "undivedWh": "Unexplored",
-    "namePlaceholder": "Site name contains…",
-    "matchCount_one": "{{count}} system matches",
-    "matchCount_other": "{{count}} systems match",
-    "clear": "Clear filter"
+    "hint": "Licht systemen uit op basis van wat er gescand is. Kies signatuur- of anomalietypes, of zoek op een sitenaam; overeenkomende systemen blijven licht en de rest vervaagt.",
+    "sigs": "Signaturen",
+    "anoms": "Anomalieën",
+    "holes": "Wormgaten",
+    "undivedWh": "Onverkend",
+    "namePlaceholder": "Sitenaam bevat…",
+    "matchCount_one": "{{count}} systeem komt overeen",
+    "matchCount_other": "{{count}} systemen komen overeen",
+    "clear": "Filter wissen"
   },
   "copyMap": {
     "title": "Kaart kopiëren",
@@ -755,68 +755,68 @@
     "copyName": "Systeemnaam kopiëren"
   },
   "customIntel": {
-    "title": "Custom Intel",
-    "hint": "Define your own intel tags with a colour. They appear in the system right-click menu alongside the built-ins.",
-    "newItem": "New Intel",
+    "title": "Eigen intel",
+    "hint": "Definieer je eigen inteltags met een kleur. Ze verschijnen in het rechtsklikmenu van een systeem naast de standaardtags.",
+    "newItem": "Nieuwe intel",
     "labelPlaceholder": "Label",
-    "remove": "Remove intel option",
-    "max": "Maximum {{count}} custom intel tags",
-    "add": "Add intel"
+    "remove": "Inteloptie verwijderen",
+    "max": "Maximaal {{count}} eigen inteltags",
+    "add": "Intel toevoegen"
   },
   "demo": {
-    "hintClick": "Click a system to view its details here.",
-    "hintAdd": "Right-click the map to add a system.",
-    "hintConnect": "Drag from a node handle to connect systems.",
-    "hintLimit": "Demo limited to {{count}} systems — no limit when signed in.",
-    "systemsCount": "{{count}} / {{max}} systems",
-    "signInMore": "Sign in to view kills, signatures, structures, activity, sovereignty, and more.",
-    "addSystemHere": "Add System here",
-    "addSystemLimit": "Add System (limit {{max}} reached)"
+    "hintClick": "Klik een systeem om de details hier te zien.",
+    "hintAdd": "Rechtsklik op de kaart om een systeem toe te voegen.",
+    "hintConnect": "Sleep vanaf een handle van een node om systemen te verbinden.",
+    "hintLimit": "Demo beperkt tot {{count}} systemen — geen limiet als je ingelogd bent.",
+    "systemsCount": "{{count}} / {{max}} systemen",
+    "signInMore": "Log in om kills, signaturen, structures, activiteit, sovereignty en meer te bekijken.",
+    "addSystemHere": "Hier een systeem toevoegen",
+    "addSystemLimit": "Systeem toevoegen (limiet van {{max}} bereikt)"
   },
   "duration": {
     "seconds": "{{value}}s",
     "minutesSeconds": "{{minutes}}m {{seconds}}s",
-    "hoursMinutes": "{{hours}}h {{minutes}}m",
-    "daysHoursMinutes": "{{days}}d {{hours}}h {{minutes}}m"
+    "hoursMinutes": "{{hours}}u {{minutes}}m",
+    "daysHoursMinutes": "{{days}}d {{hours}}u {{minutes}}m"
   },
   "fleet": {
-    "notInFleet": "Not in a fleet",
-    "noMembers": "No fleet members visible",
-    "sortDistance": "Distance",
-    "sortName": "Name",
-    "ascending": "Ascending",
-    "descending": "Descending",
-    "unknownLoc": "Unknown",
-    "unknownPilot": "Unknown pilot",
-    "searchPlaceholder": "Filter by pilot or system",
-    "noMatches": "No matches"
+    "notInFleet": "Niet in een fleet",
+    "noMembers": "Geen fleetleden zichtbaar",
+    "sortDistance": "Afstand",
+    "sortName": "Naam",
+    "ascending": "Oplopend",
+    "descending": "Aflopend",
+    "unknownLoc": "Onbekend",
+    "unknownPilot": "Onbekende pilot",
+    "searchPlaceholder": "Filteren op pilot of systeem",
+    "noMatches": "Geen overeenkomsten"
   },
   "getMoreMaps": {
-    "title": "Get more maps",
-    "intro": "Donate {{amount}} ISK to {{corp}} and your personal map limit goes up by {{maps}}. You can do this as many times as you like.",
-    "step1": "Open the corporation {{corp}} in game and choose Give Money.",
-    "step2": "Send {{amount}} ISK.",
-    "step3": "Your extra maps appear automatically once the donation is seen.",
-    "recipient": "Send to",
-    "copyCorp": "Copy corporation name",
-    "timing": "EVE only publishes corporation wallets once an hour, so this can take up to an hour to appear.",
-    "mustBeLinked": "Donate from a character linked to this account, or we cannot match the payment to you.",
-    "using": "Using {{used}} of {{cap}} maps.",
-    "contributed": "You have contributed {{amount}} ISK.",
-    "toNext": "{{amount}} ISK more for the next {{maps}}.",
-    "loadFailed": "Could not load your donation details."
+    "title": "Meer kaarten krijgen",
+    "intro": "Doneer {{amount}} ISK aan {{corp}} en je limiet voor persoonlijke kaarten gaat met {{maps}} omhoog. Je mag dit zo vaak doen als je wilt.",
+    "step1": "Open de corporation {{corp}} in het spel en kies Give Money.",
+    "step2": "Stuur {{amount}} ISK.",
+    "step3": "Je extra kaarten verschijnen automatisch zodra de donatie gezien is.",
+    "recipient": "Sturen naar",
+    "copyCorp": "Corporationnaam kopiëren",
+    "timing": "EVE publiceert corporation-wallets maar één keer per uur, dus het kan tot een uur duren voordat dit verschijnt.",
+    "mustBeLinked": "Doneer vanaf een character dat aan dit account gekoppeld is, anders kunnen we de betaling niet aan jou koppelen.",
+    "using": "Je gebruikt {{used}} van {{cap}} kaarten.",
+    "contributed": "Je hebt {{amount}} ISK bijgedragen.",
+    "toNext": "Nog {{amount}} ISK voor de volgende {{maps}}.",
+    "loadFailed": "Kon je donatiegegevens niet laden."
   },
   "ghostTier": {
-    "hisec": "Found in high-sec",
-    "lowsec": "Found in low-sec",
-    "nullsec": "Found in null-sec",
-    "wh": "Found in wormhole space"
+    "hisec": "Te vinden in high-sec",
+    "lowsec": "Te vinden in low-sec",
+    "nullsec": "Te vinden in null-sec",
+    "wh": "Te vinden in wormgatruimte"
   },
   "iconPicker": {
-    "title": "Choose an icon",
-    "search": "Search icons...",
-    "loading": "Loading icons...",
-    "more": "Refine your search to see more"
+    "title": "Kies een pictogram",
+    "search": "Pictogrammen zoeken...",
+    "loading": "Pictogrammen laden...",
+    "more": "Verfijn je zoekopdracht om meer te zien"
   },
   "jumpPlanner": {
     "title": "Sprongplanner",
@@ -883,16 +883,16 @@
     "legendGate": "regionale gate"
   },
   "killLog": {
-    "title": "Kill Log",
-    "tooltip": "Recent kills on this map",
-    "empty": "No recent kills",
-    "loading": "Loading kills...",
-    "error": "Couldn't load kills",
-    "viewOnZkb": "View on zKillboard",
-    "showOnMap": "Show on map",
-    "unknown": "Unknown",
-    "unknownShip": "Unknown ship",
-    "ago": "{{d}} ago"
+    "title": "Killlogboek",
+    "tooltip": "Recente kills op deze kaart",
+    "empty": "Geen recente kills",
+    "loading": "Kills laden...",
+    "error": "Kon kills niet laden",
+    "viewOnZkb": "Bekijken op zKillboard",
+    "showOnMap": "Op de kaart tonen",
+    "unknown": "Onbekend",
+    "unknownShip": "Onbekend schip",
+    "ago": "{{d}} geleden"
   },
   "killboard": {
     "hoursMinutesAgo": "{{hours}}u {{minutes}}m geleden",
@@ -919,15 +919,15 @@
     "loadMore": "Meer laden ({{count}} resterend)"
   },
   "labelsDialog": {
-    "title": "Custom labels",
-    "max": "Up to {{n}} custom labels",
-    "textPlaceholder": "Label text",
-    "addText": "Add",
-    "searchIcons": "Search icons…",
-    "moreIcons": "Showing {{shown}} of {{total}} — search to narrow",
-    "remove": "Remove",
-    "colour": "Colour",
-    "maxReached": "Maximum of {{n}} custom labels reached — remove one to add another."
+    "title": "Eigen labels",
+    "max": "Maximaal {{n}} eigen labels",
+    "textPlaceholder": "Labeltekst",
+    "addText": "Toevoegen",
+    "searchIcons": "Pictogrammen zoeken…",
+    "moreIcons": "{{shown}} van {{total}} getoond — zoek om te beperken",
+    "remove": "Verwijderen",
+    "colour": "Kleur",
+    "maxReached": "Maximum van {{n}} eigen labels bereikt — verwijder er een om een nieuwe toe te voegen."
   },
   "landing": {
     "tagline": "Wormhole chain mapping for EVE Online",
@@ -1274,24 +1274,24 @@
     "footer": "EVE Online and the EVE logo are the registered trademarks of CCP hf. All rights reserved worldwide. Nexum is a third-party tool and is not affiliated with or endorsed by CCP hf. · <license>License & EVE IP notice</license>"
   },
   "language": {
-    "label": "Language"
+    "label": "Taal"
   },
   "mapControls": {
-    "panel": "Control panel",
-    "zoomIn": "Zoom in",
-    "zoomOut": "Zoom out",
-    "fitView": "Fit view",
-    "interactive": "Toggle interactivity",
-    "centerOnMe": "Centre on my location"
+    "panel": "Bedieningspaneel",
+    "zoomIn": "Inzoomen",
+    "zoomOut": "Uitzoomen",
+    "fitView": "Alles in beeld",
+    "interactive": "Interactiviteit aan/uit",
+    "centerOnMe": "Centreren op mijn locatie"
   },
   "mapEdge": {
-    "lessThan24h": "< 24h",
-    "lessThan4h": "< 4 hrs",
-    "lessThan1h": "< 1 hr",
-    "broken": "Connection broken — the wormhole sig was deleted (hole collapsed)"
+    "lessThan24h": "< 24u",
+    "lessThan4h": "< 4 uur",
+    "lessThan1h": "< 1 uur",
+    "broken": "Verbinding verbroken — de wormgat-signatuur is verwijderd (gat ingestort)"
   },
   "mapNode": {
-    "a0Sun": "A0-ster",
+    "a0Sun": "A0-zon",
     "altLastKnown": "(laatst bekend)",
     "characterFallback": "Character {{id}}",
     "corrupted": "Corrupted",
@@ -1307,7 +1307,7 @@
     "jumps_one": "{{count}} sprong",
     "jumps_other": "{{count}} sprongen",
     "killsTooltip": "{{ships}} schip · {{pods}} pod kills dit uur",
-    "killsTooltipHint": "Uurtelling van CCP · killmail staat mogelijk nog niet op zKillboard",
+    "killsTooltipHint": "Uurtelling van CCP · killmail staat misschien nog niet op zKillboard",
     "recentKill": "Kill {{ago}}m geleden ({{value}} ISK)",
     "scanned": "{{scanned}} van {{total}} signaturen gescand",
     "scoutConnectionsMulti": "{{names}}-verbindingen",
@@ -1646,8 +1646,8 @@
     "panelColumnsTooltip": "Splits the panel's panes into side-by-side columns, so notes or the killboard can sit beside signatures instead of below them."
   },
   "mass": {
-    "billionKg": "{{value}} B kg",
-    "millionKg": "{{value}} M kg",
+    "billionKg": "{{value}} mld kg",
+    "millionKg": "{{value}} mln kg",
     "kg": "{{value}} kg"
   },
   "merge": {
@@ -1699,51 +1699,51 @@
     }
   },
   "panel": {
-    "notes": "Notes",
-    "signatures": "Signatures",
-    "anomalies": "Anomalies",
+    "notes": "Notities",
+    "signatures": "Signaturen",
+    "anomalies": "Anomalieën",
     "structures": "Structures",
-    "npcStations": "NPC Stations",
+    "npcStations": "NPC-stations",
     "killboard": "zKillboard",
-    "activity": "Activity",
-    "undock": "Undock to a floating window",
-    "redock": "Dock back"
+    "activity": "Activiteit",
+    "undock": "Losmaken naar een zwevend venster",
+    "redock": "Weer vastzetten"
   },
   "panes": {
-    "noEveSystem": "No EVE system linked",
-    "addNote": "Add note…"
+    "noEveSystem": "Geen EVE-systeem gekoppeld",
+    "addNote": "Notitie toevoegen…"
   },
   "pilotsOnline": {
-    "title": "Pilots Online",
-    "none": "No corp pilots seen in the last few minutes.",
-    "noMatches": "No pilots match.",
-    "searchPlaceholder": "Filter by pilot, ship or system",
-    "unknownLoc": "Unknown",
-    "hint": "Pilots seen by Nexum in the last 5 minutes. The time is when they last checked in, not a live position."
+    "title": "Pilots online",
+    "none": "Geen corp-pilots gezien in de laatste paar minuten.",
+    "noMatches": "Geen pilots komen overeen.",
+    "searchPlaceholder": "Filteren op pilot, schip of systeem",
+    "unknownLoc": "Onbekend",
+    "hint": "Pilots die Nexum in de laatste 5 minuten gezien heeft. De tijd is wanneer ze zich voor het laatst meldden, geen live positie."
   },
   "proximityOptIn": {
-    "title": "Enable threat alerts?",
-    "body": "New Eden is a dangerous place. Nexum can give you a desktop notification and a short audio ping when you're within a few jumps of an active <strong>incursion</strong> or <strong>insurgency</strong> — so you don't blindly autopilot into one.",
-    "sub": "You can change the threshold or turn this off at any time in <em>Map Options → Proximity Alerts</em>.",
-    "maybeLater": "Maybe later",
-    "enable": "Enable notifications"
+    "title": "Dreigingsmeldingen aanzetten?",
+    "body": "New Eden is een gevaarlijke plek. Nexum kan je een desktopmelding en een korte pieptoon geven als je binnen een paar sprongen van een actieve <strong>incursion</strong> of <strong>insurgency</strong> zit — zodat je er niet blind met de autopilot in vliegt.",
+    "sub": "Je kunt de drempel altijd aanpassen of dit uitzetten bij <em>Kaartopties → Nabijheidsmeldingen</em>.",
+    "maybeLater": "Misschien later",
+    "enable": "Meldingen aanzetten"
   },
   "route": {
-    "fromLastKnown": "Jumps from {{system}} (last known location)",
-    "fromCharacter": "Jumps from {{character}} — {{system}}",
-    "viaWormhole": "Wormhole jump",
+    "fromLastKnown": "Sprongen vanaf {{system}} (laatst bekende locatie)",
+    "fromCharacter": "Sprongen vanaf {{character}} — {{system}}",
+    "viaWormhole": "Wormgatsprong",
     "viaThera": "Via Thera",
     "viaTurnur": "Via Turnur",
     "viaAnsiblex": "Ansiblex jump gate",
     "riskEol": "EOL",
-    "riskCritical": "Critical mass",
+    "riskCritical": "Kritieke massa",
     "riskFrig": "Frigate hole",
-    "jspaceNoWaypoint": "Wormhole systems can't be set as an autopilot destination."
+    "jspaceNoWaypoint": "Wormgatsystemen kunnen niet als autopilot-bestemming worden ingesteld."
   },
   "routeToast": {
-    "destinationSet": "Destination set to {{system}}",
-    "waypointAdded": "{{system}} successfully added to waypoints.",
-    "failed": "Failed to set waypoint — is your character online?"
+    "destinationSet": "Bestemming ingesteld op {{system}}",
+    "waypointAdded": "{{system}} is toegevoegd aan de waypoints.",
+    "failed": "Waypoint instellen mislukt — is je character online?"
   },
   "scout": {
     "noConnections": "Geen verbindingen met {{system}}.",
@@ -1769,26 +1769,26 @@
     "copyDoneSwept": "Signaturen: {{added}} toegevoegd, {{updated}} bijgewerkt · {{removed}} ingestorte gat(en) opgeruimd"
   },
   "session": {
-    "idleLogout": "Signed out due to inactivity.",
-    "ended": "Your session ended — please log in again.",
-    "lockedTitle": "Paused",
-    "lockedHint": "You were idle, so mapping was paused. Your login is still active.",
-    "resumeAs": "Continue as {{name}}",
-    "logOut": "Log out"
+    "idleLogout": "Uitgelogd wegens inactiviteit.",
+    "ended": "Je sessie is beëindigd — log opnieuw in.",
+    "lockedTitle": "Gepauzeerd",
+    "lockedHint": "Je was inactief, dus het karteren is gepauzeerd. Je login is nog actief.",
+    "resumeAs": "Doorgaan als {{name}}",
+    "logOut": "Uitloggen"
   },
   "share": {
-    "expired": "expired",
-    "expiresInHM": "expires in {{hours}}h {{minutes}}m",
-    "expiresInM": "expires in {{minutes}}m"
+    "expired": "verlopen",
+    "expiresInHM": "verloopt over {{hours}}u {{minutes}}m",
+    "expiresInM": "verloopt over {{minutes}}m"
   },
   "shareView": {
-    "expiredTitle": "Share link expired",
-    "expiredBody": "This shared view of <strong>{{map}}</strong> was published by <strong>{{owner}}</strong> and expired on <strong>{{date}}</strong>.",
-    "expiredHint": "Ask {{owner}} for a fresh link.",
-    "notFoundTitle": "Share link not found",
-    "notFoundBody": "This link doesn't match a known shared map. It may have been revoked, or the URL may be incorrect.",
-    "sharedBy": "shared by <strong>{{owner}}</strong>",
-    "cta": "Create maps with Nexum today!"
+    "expiredTitle": "Sharelink verlopen",
+    "expiredBody": "Deze gedeelde weergave van <strong>{{map}}</strong> is gepubliceerd door <strong>{{owner}}</strong> en is op <strong>{{date}}</strong> verlopen.",
+    "expiredHint": "Vraag {{owner}} om een nieuwe link.",
+    "notFoundTitle": "Sharelink niet gevonden",
+    "notFoundBody": "Deze link hoort niet bij een bekende gedeelde kaart. Hij is misschien ingetrokken, of de URL is onjuist.",
+    "sharedBy": "gedeeld door <strong>{{owner}}</strong>",
+    "cta": "Maak vandaag je eigen kaarten met Nexum!"
   },
   "sidebar": {
     "watchlist": "Volglijst",
@@ -1871,21 +1871,21 @@
     "countFilteredHint": "Getoonde signaturen van het totaal in het systeem"
   },
   "stats": {
-    "title": "User Stats",
-    "loading": "Loading…",
-    "jumps": "Jumps",
-    "signatures": "Signatures",
-    "activity": "Activity",
-    "dailyActivity": "Daily activity — last 30 days",
-    "byType": "Signatures by type",
+    "title": "Gebruikersstatistieken",
+    "loading": "Laden…",
+    "jumps": "Sprongen",
+    "signatures": "Signaturen",
+    "activity": "Activiteit",
+    "dailyActivity": "Dagelijkse activiteit — laatste 30 dagen",
+    "byType": "Signaturen per type",
     "type": "Type",
-    "count": "Count",
+    "count": "Aantal",
     "period": {
-      "day": "Last 24h",
-      "week": "Last 7 days",
-      "month": "Last 30 days",
-      "year": "Last 365 days",
-      "forever": "All Time"
+      "day": "Laatste 24 uur",
+      "week": "Laatste 7 dagen",
+      "month": "Laatste 30 dagen",
+      "year": "Laatste 365 dagen",
+      "forever": "Alle tijden"
     }
   },
   "structures": {
@@ -1932,15 +1932,15 @@
     "region": "Regio",
     "constellation": "Constellatie",
     "npc": "NPC",
-    "links": "Links",
-    "openNpcDelta": "NPC-delta openen op Dotlan",
-    "openDotlan": "Systeem openen op Dotlan",
-    "openZkb": "Systeem openen op zKillboard",
+    "links": "Verbindingen",
+    "openNpcDelta": "NPC-delta op Dotlan openen",
+    "openDotlan": "Systeem op Dotlan openen",
+    "openZkb": "Systeem op zKillboard openen",
     "celestials": "Hemellichamen",
-    "sunType": "Type ster",
-    "collapseInfo": "Systeeminfo inklappen",
+    "sunType": "Type zon",
+    "collapseInfo": "Systeeminfo invouwen",
     "expandInfo": "Systeeminfo tonen",
-    "resizeInfo": "Sleep om het formaat aan te passen",
+    "resizeInfo": "Sleep om te verkleinen of vergroten",
     "planets_one": "planeet",
     "planets_other": "planeten",
     "moons_one": "maan",
@@ -1954,19 +1954,19 @@
     "corp": "Corp",
     "faction": "Factie",
     "personal": "Persoonlijk",
-    "refreshStandings": "Standings nu verversen vanuit ESI (negeert de TTL van 6 uur)",
-    "standingsRefreshed": "Standings ververst — {{personal}} persoonlijk · {{corp}} corp · {{alliance}} alliance contacten",
-    "noContactsRefreshed": "Er konden geen contacten ververst worden. Mogelijk mist het token de read_contacts-scope — meld je af en weer aan.",
-    "standingsNotLoaded": "Standings nog niet geladen. Blijft dit staan, meld je dan af en weer aan om de read_contacts-scopes te geven.",
+    "refreshStandings": "Standings nu vernieuwen vanuit ESI (negeert de TTL van 6 uur)",
+    "standingsRefreshed": "Standings vernieuwd — {{personal}} persoonlijke · {{corp}} corp- · {{alliance}} alliance-contacts",
+    "noContactsRefreshed": "Er konden geen contacts worden vernieuwd. Het token mist mogelijk de read_contacts-scope — log uit en weer in.",
+    "standingsNotLoaded": "Standings zijn nog niet geladen. Blijft dit staan, log dan uit en weer in om de read_contacts-scopes te geven.",
     "standingNotInBucket": "{{label}}: je zit er niet in",
     "standingNotSet": "{{label}}: geen standing ingesteld",
     "standingValue": "{{label}}: {{value}}",
     "panesTitle": "Panelen",
-    "panesHint": "Kies welke panelen hieronder verschijnen. Verborgen panelen houden hun plek, dus als je er een weer aanzet komt hij terug waar hij stond.",
+    "panesHint": "Kies welke panelen hieronder verschijnen. Verborgen panelen houden hun plek, dus als je er een weer aanzet komt hij terug waar je hem had.",
     "openAnoikis": "Openen in anoik.is",
     "moveLeft": "Naar de vorige kolom verplaatsen",
     "moveRight": "Naar de volgende kolom verplaatsen",
-    "resizeColumns": "Sleep om kolommen te verbreden, dubbelklik om ze gelijk te maken",
+    "resizeColumns": "Sleep om kolommen te verkleinen of vergroten, dubbelklik om ze gelijk te maken",
     "copyName": "Systeemnaam kopiëren",
     "nameCopied": "{{name}} gekopieerd",
     "copyFailed": "Kopiëren mislukt — selecteer en kopieer handmatig."
@@ -1986,7 +1986,7 @@
     "admin": "Beheer",
     "centerOnSystem": "Centreer de kaart op {{system}}",
     "checkedAgo": "gecontroleerd {{time}}",
-    "checking": "Bezig met controleren…",
+    "checking": "Controleren…",
     "copyThisMap": "Deze kaart kopiëren",
     "currentSystem": "Huidig systeem",
     "deleteMapConfirm": "\"{{name}}\" verwijderen? Dit kan niet ongedaan worden gemaakt.",
@@ -1994,13 +1994,13 @@
     "discord": "Discord",
     "esiOffline": "ESI: offline",
     "esiOnline": "ESI: online",
-    "getMoreMaps": "+ Meer kaarten",
+    "getMoreMaps": "+ Meer kaarten krijgen",
     "help": "Help en uitleg",
     "lastKnownSystem": "Laatst bekende systeem",
     "leaveMapConfirm": "\"{{name}}\" uit je lijst verwijderen? De eigenaar kan hem later opnieuw delen.",
     "leaveThisMap": "Gedeelde kaart verlaten",
     "locked": "Vergrendeld",
-    "lockedTooltip": "Kaart is vergrendeld — systemen en verbindingen liggen vast. Signaturen, structures en notities kun je nog wel bewerken.",
+    "lockedTooltip": "De kaart is vergrendeld — systemen en verbindingen staan vast. Signaturen, structures en notities kun je nog wel bewerken.",
     "mapLimitReached": "Kaartlimiet bereikt",
     "mapOptions": "Kaartopties",
     "mapType": {
@@ -2028,16 +2028,16 @@
     "resetLayout": "Werkbalkindeling herstellen",
     "role": "Rol: {{role}}",
     "sharedBy": "Gedeeld door {{name}}",
-    "signOut": "Afmelden",
+    "signOut": "Uitloggen",
     "switchMap": "Kaart wisselen",
     "totalConnections": "Totaal verbindingen",
     "totalSystems": "Totaal systemen",
     "tqOffline": "Tranquility: offline",
     "tqOnline": "Tranquility: online",
-    "trackJumpsOff": "Sprongen volgen: uit",
-    "trackJumpsOn": "Sprongen volgen: aan",
-    "trackJumpsTooltipOff": "Sprongen worden niet gevolgd — alleen bestaande systemen krijgen de je-bent-hier markering",
-    "trackJumpsTooltipOn": "Sprongen worden gevolgd — nieuwe systemen worden toegevoegd terwijl je vliegt",
+    "trackJumpsOff": "Sprongen bijhouden: uit",
+    "trackJumpsOn": "Sprongen bijhouden: aan",
+    "trackJumpsTooltipOff": "Sprongen worden niet bijgehouden — alleen bestaande systemen krijgen de je-bent-hier-aanduiding",
+    "trackJumpsTooltipOn": "Sprongen worden bijgehouden — nieuwe systemen worden toegevoegd terwijl je beweegt",
     "updateAvailable": "Update beschikbaar",
     "updateAvailableVersion": "Update beschikbaar: v{{version}}",
     "userStats": "Gebruikersstatistieken"
@@ -2061,11 +2061,11 @@
     "months_other": "{{count}} maanden"
   },
   "watchMarker": {
-    "target": "Target",
+    "target": "Doelwit",
     "honeypot": "Honeypot",
-    "avoid": "Avoid",
-    "friendly": "Friendly",
-    "watch": "Watch"
+    "avoid": "Vermijden",
+    "friendly": "Vriendelijk",
+    "watch": "In de gaten houden"
   },
   "watchlist": {
     "hint": "Gaten waar je op jaagt. Houd een systeem, een wormgattype of een kenmerk in de gaten (shattered, een effect, frig holes); overeenkomsten worden op de kaart gemarkeerd (en geven één keer een geluidssignaal, als dat aanstaat).",
@@ -2110,45 +2110,45 @@
     "addWaypoint": "Routepunt toevoegen"
   },
   "whChart": {
-    "open": "⊟ Wormhole reference",
-    "tooltip": "Look up any wormhole type — spawn, destination, ship size, mass and lifetime",
-    "title": "Wormhole type reference",
-    "searchPlaceholder": "Filter…",
-    "colWormholes": "Wormholes",
+    "open": "⊟ Wormgatoverzicht",
+    "tooltip": "Zoek elk wormgattype op — spawn, bestemming, scheepsgrootte, massa en levensduur",
+    "title": "Overzicht van wormgattypes",
+    "searchPlaceholder": "Filteren…",
+    "colWormholes": "Wormgaten",
     "colRespawn": "Respawn",
-    "colSpawnIn": "Spawn in",
-    "colLeadsTo": "Leads to",
-    "colShipSize": "Ship jump size",
-    "colTotalMass": "Total mass",
-    "colLifetime": "Lifetime"
+    "colSpawnIn": "Spawnt in",
+    "colLeadsTo": "Leidt naar",
+    "colShipSize": "Scheepsgrootte sprong",
+    "colTotalMass": "Totale massa",
+    "colLifetime": "Levensduur"
   },
   "whInfo": {
-    "leadsTo": "Leads to",
-    "lifetime": "Lifetime",
-    "totalMass": "Total mass",
-    "maxJump": "Max jump",
-    "infoAria": "{{code}} info",
-    "specTooltip": "{{code}} spec"
+    "leadsTo": "Leidt naar",
+    "lifetime": "Levensduur",
+    "totalMass": "Totale massa",
+    "maxJump": "Max sprong",
+    "infoAria": "{{code}}-info",
+    "specTooltip": "{{code}}-specificatie"
   },
   "whJump": {
-    "confirmOne": "Jumped to {{system}}. Mark {{sig}} as leading there?",
-    "confirmMany": "Jumped to {{system}}. Which signature did you jump?",
-    "confirm": "Confirm",
-    "differentHole": "Different hole",
-    "unmapped": "Unmapped hole",
-    "filled": "{{sig}} now leads to {{system}}",
-    "undo": "Undo"
+    "confirmOne": "Gesprongen naar {{system}}. {{sig}} markeren als het gat dat daarheen leidt?",
+    "confirmMany": "Gesprongen naar {{system}}. Door welke signatuur ben je gesprongen?",
+    "confirm": "Bevestigen",
+    "differentHole": "Ander gat",
+    "unmapped": "Niet-gekarteerd gat",
+    "filled": "{{sig}} leidt nu naar {{system}}",
+    "undo": "Ongedaan maken"
   },
   "whPicker": {
-    "searchPlaceholder": "Search…",
-    "connectedSystems": "Connected Systems",
-    "other": "Other",
-    "inbound": "inbound",
-    "exactClass": "Exact class"
+    "searchPlaceholder": "Zoeken…",
+    "connectedSystems": "Verbonden systemen",
+    "other": "Overig",
+    "inbound": "inkomend",
+    "exactClass": "Exacte klasse"
   },
   "exits": {
-    "notifTitle": "K-space exit",
-    "appeared": "{{name}} ({{security}}) is on the chain"
+    "notifTitle": "K-space-uitgang",
+    "appeared": "{{name}} ({{security}}) staat in de keten"
   },
   "tripwire": {
     "title": "Importeren uit Tripwire (experimenteel)",
@@ -2173,33 +2173,33 @@
     "notTripwireData": "Dit lijken geen Tripwire-ketengegevens — er zitten geen signaturen in"
   },
   "routePlanner": {
-    "from": "From",
-    "to": "To",
-    "searchSystem": "Search a system…",
-    "searching": "Searching…",
-    "clearField": "Clear",
-    "useMyLocation": "Use my current location",
-    "swap": "Swap from and to",
-    "followingLocation": "From {{system}} — your current location",
-    "pickBoth": "Pick a start and an end system to plan a route.",
-    "sameSystem": "Start and end are the same system.",
-    "noRoute": "No route found between those systems.",
-    "savedHdr": "Saved routes",
-    "savedEmpty": "None yet — plan a route, name it below, and hit Save.",
-    "nameToSave": "Name to save…",
-    "save": "Save",
-    "loadPlan": "Load this route",
-    "deletePlan": "Delete this route"
+    "from": "Van",
+    "to": "Naar",
+    "searchSystem": "Zoek een systeem…",
+    "searching": "Zoeken…",
+    "clearField": "Wissen",
+    "useMyLocation": "Mijn huidige locatie gebruiken",
+    "swap": "Van en naar omwisselen",
+    "followingLocation": "Van {{system}} — je huidige locatie",
+    "pickBoth": "Kies een begin- en eindsysteem om een route te plannen.",
+    "sameSystem": "Begin en eind zijn hetzelfde systeem.",
+    "noRoute": "Geen route gevonden tussen die systemen.",
+    "savedHdr": "Opgeslagen routes",
+    "savedEmpty": "Nog geen — plan een route, geef hem hieronder een naam en klik op Opslaan.",
+    "nameToSave": "Naam om op te slaan…",
+    "save": "Opslaan",
+    "loadPlan": "Deze route laden",
+    "deletePlan": "Deze route verwijderen"
   },
   "flagPresets": {
-    "title": "Flag presets",
-    "hint": "Saved icon + colour + name combos you can apply to a connection flag in one click.",
-    "newItem": "New preset",
-    "add": "Add preset",
-    "remove": "Remove preset",
-    "pickIcon": "Choose icon",
-    "max": "Up to {{count}} presets",
+    "title": "Markeringsvoorinstellingen",
+    "hint": "Opgeslagen combinaties van pictogram, kleur en naam die je met één klik op een verbindingsmarkering kunt toepassen.",
+    "newItem": "Nieuwe voorinstelling",
+    "add": "Voorinstelling toevoegen",
+    "remove": "Voorinstelling verwijderen",
+    "pickIcon": "Pictogram kiezen",
+    "max": "Maximaal {{count}} voorinstellingen",
     "orgGroup": "Org",
-    "mineGroup": "Mine"
+    "mineGroup": "Eigen"
   }
 }
