@@ -249,7 +249,7 @@
             </tr>
             <tr>
               <th scope="row" data-i18n="gMultiLingual">Multi-lingual</th>
-              <td class="nexum" data-i18n="gMultiLingualN"><span class="yes">Yes</span> — currently 9 languages</td>
+              <td class="nexum" data-i18n="gMultiLingualN"><span class="yes">Yes</span> — currently 10 languages</td>
               <td data-i18n="no"><span class="no">No</span></td>
               <td data-i18n="no"><span class="no">No</span></td>
               <td data-i18n="no"><span class="no">No</span></td>
@@ -441,10 +441,11 @@
 
       <div class="langs">
         <h2 data-i18n="h2Languages">Available in your language</h2>
-        <p data-i18n="langP">Nexum is fully translated into nine languages — with your language auto-detected from your browser the first time you visit. Read this comparison, and use Nexum, in:</p>
+        <p data-i18n="langP">Nexum is fully translated into ten languages — with your language auto-detected from your browser the first time you visit. Read this comparison, and use Nexum, in:</p>
         <ul class="lang-chips">
           <li><img src="/vendor/flags/GB.svg" alt=""> English</li>
           <li><img src="/vendor/flags/DE.svg" alt=""> Deutsch</li>
+          <li><img src="/vendor/flags/NL.svg" alt=""> Nederlands</li>
           <li><img src="/vendor/flags/FR.svg" alt=""> Français</li>
           <li><img src="/vendor/flags/ES.svg" alt=""> Español</li>
           <li><img src="/vendor/flags/PT.svg" alt=""> Português</li>
@@ -484,7 +485,7 @@
 
           // Languages with a translation dictionary below. English is the
           // untranslated source, so it has no entry.
-          var SUPPORTED = { de: 1, fr: 1, es: 1, pt: 1, zh: 1, ko: 1, ja: 1, ru: 1 };
+          var SUPPORTED = { de: 1, nl: 1, fr: 1, es: 1, pt: 1, zh: 1, ko: 1, ja: 1, ru: 1 };
 
           // Tell the stylized picker (/vendor/lang-picker.js) which language this
           // page actually rendered, so it highlights the matching entry. The
@@ -513,7 +514,7 @@
             gWatchlist: 'Signatur-/Wurmloch-/System-Beobachtungsliste',
             gMass: 'Wurmloch-Masse / Rolling',
             gMultiLingual: 'Mehrsprachig',
-            gMultiLingualN: '<span class="yes">Ja</span> — derzeit 9 Sprachen',
+            gMultiLingualN: '<span class="yes">Ja</span> — derzeit 10 Sprachen',
             no: '<span class="no">Nein</span>',
             gTech: 'Tech-Stack',
             gCost: 'Kosten',
@@ -590,13 +591,111 @@
             faqA6: 'Selbst-Hosting ist bei allen vier kostenlos. Wenn du lieber keinen Server betreiben willst, ist Nexums öffentliche Instanz kostenlos und ohne Abo; Wanderers Cloud braucht dagegen ein kostenpflichtiges Karten-Abo.',
 
             h2Languages: 'In deiner Sprache verfügbar',
-            langP: 'Nexum ist vollständig in neun Sprachen übersetzt — wobei deine Sprache beim ersten Besuch automatisch anhand deines Browsers erkannt wird. Lies diesen Vergleich und nutze Nexum in:',
+            langP: 'Nexum ist vollständig in zehn Sprachen übersetzt — wobei deine Sprache beim ersten Besuch automatisch anhand deines Browsers erkannt wird. Lies diesen Vergleich und nutze Nexum in:',
             ctaP: '<strong>Nexum ist kostenlos.</strong> Nutze die gehostete Version oder hoste die Kette deiner Corp in Minuten selbst.',
             ctaBtn: 'Jetzt loslegen',
             ctaGh: 'Auf GitHub holen',
             footP1: 'Vergleich gepflegt vom Nexum-Team · zuletzt verifiziert im Mai 2026. Details der Konkurrenz ändern sich mit der Zeit — folge den Links oben, um die aktuellen Funktionen zu bestätigen. Eine Ungenauigkeit entdeckt? <a href="https://github.com/GQuantrill/eve-nexum/issues">Eröffne ein Issue</a>.',
             footP2: 'EVE Online und das EVE-Logo sind eingetragene Marken von CCP hf. Alle Rechte weltweit vorbehalten. Nexum ist ein Drittanbieter-Tool und steht in keiner Verbindung zu CCP hf., Pathfinder, Tripwire oder Wanderer und wird von ihnen nicht unterstützt. Siehe den vollständigen <a href="/license/">Lizenz- &amp; EVE-IP-Hinweis</a>.'
           };
+          DICTS.nl = {
+            __title: 'Vergelijking van EVE Online-wormgatmappers: Nexum vs Pathfinder vs Tripwire vs Wanderer (2026)',
+            nav: '&larr; Nexum-startpagina',
+            h1: 'Vergelijking van EVE Online-wormgatmappers:<br />Nexum vs Pathfinder vs Tripwire vs Wanderer',
+            sub: 'Hoe de toonaangevende wormgatmappers voor EVE Online zich tot elkaar verhouden — en waarom Nexum standaard het meeste kan.',
+            upd: 'Laatst bijgewerkt op 27 mei 2026 · onderhouden door het Nexum-team',
+            lede: 'Scout of woon je in J-space, dan is een goede wormgatmapper onmisbaar. <strong>Nexum</strong> is een moderne open-source mapper — gebruik de gratis gehoste versie of host zelf — die de hele werkwijze afdekt: ketens karteren in realtime, signaturen en massa bijhouden, en daarbovenop een echte rolcalculator, hele regio\'s inladen, standings- en sov-lagen en Discord-meldingen. Hieronder vergelijken we hem met de andere gangbare opties — <strong>Tripwire</strong>, <strong>Pathfinder</strong> en <strong>Wanderer</strong>. Wij maken Nexum, dus uiteraard vinden wij het voor de meeste corps de sterkste keus — maar we houden de feiten over de concurrentie correct en voorzien van links, zodat je zelf kunt oordelen.',
+            h2Glance: 'In één oogopslag',
+            cap1: 'Kernvergelijking. Geverifieerd in mei 2026 — de functies van de concurrentie veranderen; volg de links om het te bevestigen.',
+            gOpenSource: 'Open source',
+            gSelfHost: 'Zelf te hosten',
+            gCloud: 'Beheerde cloudoptie',
+            gSso: 'Inloggen met EVE SSO',
+            gSync: 'Realtime synchronisatie met meerdere gebruikers',
+            gSigPaste: 'Signaturen plakken &amp; bijhouden',
+            gWatchlist: 'Volglijst voor signaturen / wormgaten / systemen',
+            gMass: 'Wormgatmassa / rollen',
+            gMultiLingual: 'Meertalig',
+            gMultiLingualN: '<span class="yes">Ja</span> — momenteel 10 talen',
+            no: '<span class="no">Nee</span>',
+            gTech: 'Techniek',
+            gCost: 'Kosten',
+            yes: '<span class="yes">Ja</span>',
+            yesMit: '<span class="yes">Ja</span> (MIT)',
+            yesDocker: '<span class="yes">Ja</span> (Docker)',
+            yesCe: '<span class="yes">Ja</span> (Community Edition)',
+            free: '<span class="yes">Gratis</span>',
+            freeBoth: '<span class="yes">Gratis</span> zelf gehost · <span class="meh">cloud tegen betaling</span>',
+            gCloudN: '<span class="yes">Ja</span> — gratis openbare installatie op eve-nexum.com, plus zelf hosten',
+            gCloudP: '<span class="meh">Installaties die de community draait</span>',
+            gCloudT: '<span class="meh">Openbare host in 2024 gesloten</span>',
+            gCloudW: '<span class="meh">Tegen betaling</span> — „Wanderer Cloud” vereist een kaartabonnement',
+            gMassN: 'Eigen rolcalculator (marge van ±10%, waarschuwingen voor stranden)',
+            massStatus: 'Massastatus bijhouden',
+            gKill: 'Live kill feed',
+            gKillN: '<span class="yes">Ja</span> — live zKill-feed + killlogboekpaneel',
+            f11h: '<strong>Gesproken meldingen</strong> — een stem op je apparaat leest live informatie voor (characters die inloggen, incursions, low-/nullsec binnen bereik, kills, nieuwe ketens) en draait volledig in de browser',
+            h2Further: 'Waar Nexum verder gaat',
+            furtherIntro: 'Alle vier beheersen de basis goed. Dit zijn de mogelijkheden die Nexum ingebouwd heeft en die de andere doorgaans niet als gedocumenteerde, meteen bruikbare functie bieden — de redenen waarom corps ervoor kiezen:',
+            cap2: 'De bijzondere functies van Nexum. „—” betekent dat het geen gedocumenteerde, ingebouwde kernfunctie van die tools is (functies veranderen — gebruik de links hieronder om het te controleren).',
+            fFeature: 'Functie',
+            f1h: '<strong>Rolcalculator</strong> voor wormgaten — modelleert de massamarge van ±10%, met koude en warme roller inclusief zijkantregistratie, en waarschuwt voordat een passage je roller achterlaat of het gat sluit',
+            f1o: 'Eenvoudig bijhouden van de massastatus',
+            f2h: '<strong>Een kaart uit een hele EVE-regio maken</strong> — Dotlan-achtige automatische indeling met elke stargate binnen de regio al getekend',
+            f3h: '<strong>Twee kaarten samenvoegen</strong> tot één, met dubbele systemen eruit en signaturen, structures en notities erbij',
+            f4h: '<strong>Discord-meldingen</strong> — meldingen over inkomende K162\'s en nieuwe verbindingen naar je kanaal gestuurd, ook als niemand de kaart in de gaten houdt',
+            f5h: '<strong>Standings- en sovereignty-laag</strong> gevoed door je eigen EVE-contacts — vijandig/vriendelijk kleuren in de hele keten, killboard en sov-halo\'s',
+            f6h: '<strong>Live aanwezigheid van kaartkijkers</strong> — een stip voor iedereen die de kaart bekijkt, niet alleen je fleet — plus fleetposities',
+            f6o: 'Fleetposities verschillen',
+            f7h: '<strong>Informatielagen over de omgeving</strong> — nullsec-stormen, A0-zonnen, ice belts, wormgateffecten in de keten en nabijheidsmeldingen voor incursion en insurgency',
+            f8h: '<strong>Corp-suite</strong> — rollen, gedeelde kaarten, beheerdersdashboard, gebruikers- en systeemrapporten, auditlogboek en toewijzing per character',
+            f10h: '<strong>Modi voor kleurenblindheid</strong> — paletten voor deuteranopie, protanopie en tritanopie die elke status-, klasse- en standingkleur in de hele app opnieuw toewijzen',
+            f8o: 'Verschilt',
+            f9h: '<strong>Synchroniseren tussen kaarten</strong> — scan je een systeem op de ene kaart, dan komen de signaturen en anomalieën zonder iets te overschrijven ook op hetzelfde systeem op je andere kaarten (persoonlijke kaarten met je persoonlijke kaarten, corpkaarten met die van de corp)',
+            h2Detail: 'De tools in detail',
+            twP: 'De klassieke, op signaturen gerichte wormgatmapper waarmee een groot deel van de J-space-spelers is opgegroeid. Hij is snel en gefocust, en bij veteranen zit de werkwijze in het spiergeheugen. De langlopende openbare installatie (tripwire.eve-apps.com) ging halverwege 2024 dicht, maar Tripwire is open source en leeft dus voort via zelf hosten en installaties die de community draait.',
+            twBest: '<strong>Het beste voor:</strong> groepen die de vertrouwde Tripwire-werkwijze met signaturen willen en bereid zijn zelf te hosten. <a href="https://bitbucket.org/daimian/tripwire">Broncode &rarr;</a>',
+            pfP: 'De meest uitgegroeide en functierijkste zelf gehoste mapper. Hij heeft veel bepaald van wat wormgatbewoners verwachten — rijke wormgatgegevens, Thera-verbindingen via EVE-Scout, een live zKillboard-killstream, een plugin-API en meer. De keerzijde is het onderhoud: het is een PHP/MySQL-stack die meer werk kost om op te zetten en bij te werken dan een app in één container.',
+            pfBest: '<strong>Het beste voor:</strong> groepen die maximale functionaliteit willen en geen bezwaar hebben tegen een zwaardere stack. <a href="https://github.com/exodus4d/pathfinder">GitHub &rarr;</a>',
+            wdP: 'De moderne uitdager, gepresenteerd als een licht en snel alternatief voor Pathfinder. Gebouwd op Elixir/Phoenix met een React-frontend en open source onder MIT, is hij de enige van de vier met een <em>officiële beheerde cloud</em>-versie — zodat een groep hem kan gebruiken zonder zelf infrastructuur te draaien — en hij biedt daarnaast een gratis zelf gehoste Community Edition.',
+            wdBest: '<strong>Het beste voor:</strong> groepen die een gepolijste interface willen en de mogelijkheid om zelf hosten helemaal over te slaan. <a href="https://wanderer.ltd/">Website &rarr;</a> · <a href="https://github.com/wanderer-industries/wanderer">GitHub &rarr;</a>',
+            nxP: 'Een moderne, open-source, zelf te hosten mapper die in de eerste plaats voor corps is gebouwd. Hij dekt de kernwerkwijze af — in realtime samen karteren (live wijzigingen voor iedereen op de kaart), signaturen plakken met verouderende wormgaten en het bijhouden van verbindingen — en legt daar extra\'s bovenop die gericht zijn op het runnen van de keten van een corp:',
+            nxLi1: '<strong>Rolcalculator voor wormgaten</strong> die de massamarge van ±10% modelleert, elke passage voorspelt als veilig / kan sluiten / sluit zeker, en waarschuwt voordat een passage je roller zou achterlaten.',
+            nxLi2: '<strong>Een hele EVE-regio als Dotlan-achtige kaart inladen</strong> en <strong>kaarten samenvoegen</strong>.',
+            nxLi3: '<strong>Standings- en sovereignty-lagen</strong>, een live killboard en grafieken met sprong- en killactiviteit.',
+            nxLi4: '<strong>Aanwezigheid van pilots en fleetposities</strong> op de kaart, plus het optioneel bijhouden van je locatie.',
+            nxLi5: 'De openbare <strong>Thera- en Turnur</strong>-verbindingen van EVE-Scout.',
+            nxLi6: '<strong>Corp-modus</strong>: rollen, gedeelde kaarten, beheerrapporten, een auditlogboek en <strong>Discord-meldingen</strong> bij inkomende K162\'s en nieuwe verbindingen.',
+            nxP2: 'Hij draait als een kleine Docker-stack (React + Node + Postgres) en logt in met EVE SSO — gebruik de gratis openbare installatie op eve-nexum.com of host zelf. Als jongste van de vier heeft hij een kleinere community.',
+            nxBest: '<strong>Het beste voor:</strong> corps die een moderne mapper willen met rollen, regio\'s inladen, standings en Discord ingebouwd — voor je gehost of zelf gehost. <a href="/">Begin nu &rarr;</a> · <a href="https://github.com/GQuantrill/eve-nexum">GitHub &rarr;</a>',
+            h2Choose: 'Welke moet je kiezen?',
+            chooseP1: '<strong>Voor de meeste corps die opnieuw beginnen zouden we met Nexum starten.</strong> Hij is modern, staat met Docker in minuten overeind, en bundelt de rolcalculator, het inladen van regio\'s, de standings-lagen en de Discord-meldingen die je anders zelf aan elkaar moet knopen — allemaal in één kaart om in realtime op samen te werken. <a href="/">Begin nu</a> en overtuig jezelf.',
+            chooseP2: 'De andere zijn ook goede tools en passen in bepaalde gevallen misschien beter:',
+            chooseLi1: '<strong>Al vloeiend in de klassieke Tripwire-werkwijze met signaturen?</strong> Tripwire doet dat nog steeds goed — nu zelf gehost.',
+            chooseLi2: '<strong>Heb je het diepste, meest uitgegroeide functiepakket nodig en draai je graag een zwaardere PHP-stack?</strong> Pathfinder.',
+            chooseLi3: '<strong>Wil je helemaal geen server draaien?</strong> Gebruik de gratis openbare installatie van Nexum — geen abonnement, niets te hosten.',
+            h2Faq: 'Veelgestelde vragen',
+            faqQ1: 'Wat is de beste wormgatmapper voor EVE Online?',
+            faqA1: 'Nexum. Hij bundelt de meeste ingebouwde functies van alle mappers — een rolcalculator voor wormgaten, hele regio\'s inladen, standings- en sov-lagen en Discord-meldingen — in één kaart om in realtime op samen te werken, gratis te gebruiken, zelf gehost of gehost. Tripwire is nog altijd een degelijk klassiek signatuurtool, Pathfinder is functierijk maar wordt niet meer actief ontwikkeld, en de beheerde cloud van Wanderer kost geld.',
+            faqQ2: 'Is Tripwire nog beschikbaar?',
+            faqA2: 'De langlopende openbare installatie ging halverwege 2024 dicht, maar Tripwire is open source, dus je kunt hem zelf hosten of een installatie gebruiken die de community draait.',
+            faqQ3: 'Wordt Pathfinder nog ontwikkeld?',
+            faqA3: 'Nee — niet actief. De oorspronkelijke Pathfinder (van exodus4d) heeft sinds 2020 geen nieuwe release gehad, en de community-fork die hem voortzette had begin 2025 zijn laatste commit, zonder release daarna. De actieve ontwikkeling ligt feitelijk stil — een van de redenen dat nieuwere, actief onderhouden mappers als Nexum bestaan.',
+            faqQ4: 'Wat is een goed open-source alternatief voor Pathfinder en Tripwire?',
+            faqA4: 'Nexum en Wanderer zijn allebei moderne open-source mappers. Nexum is in beide gevallen gratis — gehost of zelf gehost — met EVE SSO, samenwerken in realtime, een rolcalculator en corpgereedschap; Wanderer is MIT-gelicentieerd met gratis zelf hosten plus een betaalde beheerde cloud.',
+            faqQ5: 'Kan ik een EVE Online-wormgatmapper zelf hosten?',
+            faqA5: 'Ja — Nexum, Pathfinder, Tripwire en de Community Edition van Wanderer zijn allemaal zelf te hosten. Nexum draait met Docker op Postgres en logt in met EVE SSO.',
+            faqQ6: 'Zijn deze wormgatmappers gratis?',
+            faqA6: 'Zelf hosten is bij alle vier gratis. Wil je liever geen server draaien, dan is de openbare installatie van Nexum gratis en zonder abonnement; de cloud van Wanderer vereist daarentegen een betaald kaartabonnement.',
+            h2Languages: 'Beschikbaar in jouw taal',
+            langP: 'Nexum is volledig vertaald in tien talen — en bij je eerste bezoek wordt je taal automatisch uit je browser overgenomen. Lees deze vergelijking, en gebruik Nexum, in:',
+            ctaP: '<strong>Nexum is gratis.</strong> Gebruik de gehoste versie of zet de keten van je corp in minuten zelf op.',
+            ctaBtn: 'Begin nu',
+            ctaGh: 'Haal het op GitHub',
+            footP1: 'Vergelijking onderhouden door het Nexum-team · laatst geverifieerd in mei 2026. Details over de concurrentie veranderen in de loop van de tijd — volg de links hierboven om de actuele functies te bevestigen. Een onnauwkeurigheid gevonden? <a href="https://github.com/GQuantrill/eve-nexum/issues">Open een issue</a>.',
+            footP2: 'EVE Online en het EVE-logo zijn geregistreerde handelsmerken van CCP hf. Alle rechten wereldwijd voorbehouden. Nexum is een tool van derden en is niet verbonden met of goedgekeurd door CCP hf., Pathfinder, Tripwire of Wanderer. Zie de volledige <a href="/license/">licentie- &amp; EVE IP-vermelding</a>.',
+          };
+
 
           // French — apostrophes use the typographic ’ (U+2019) so they don’t
           // terminate these single-quoted strings.
@@ -619,7 +718,7 @@
             gWatchlist: 'Liste de surveillance de signatures / trous de ver / systèmes',
             gMass: 'Masse / rolling de trou de ver',
             gMultiLingual: 'Multilingue',
-            gMultiLingualN: '<span class="yes">Oui</span> — actuellement 9 langues',
+            gMultiLingualN: '<span class="yes">Oui</span> — actuellement 10 langues',
             no: '<span class="no">Non</span>',
             gTech: 'Stack technique',
             gCost: 'Coût',
@@ -696,7 +795,7 @@
             faqA6: 'L’auto-hébergement est gratuit pour les quatre. Si vous préférez ne pas gérer de serveur, l’instance publique de Nexum est gratuite et sans abonnement ; le cloud de Wanderer, lui, nécessite un abonnement de carte payant.',
 
             h2Languages: 'Disponible dans votre langue',
-            langP: 'Nexum est entièrement traduit en neuf langues — votre langue étant détectée automatiquement depuis votre navigateur lors de votre première visite. Lisez ce comparatif, et utilisez Nexum, en :',
+            langP: 'Nexum est entièrement traduit en dix langues — votre langue étant détectée automatiquement depuis votre navigateur lors de votre première visite. Lisez ce comparatif, et utilisez Nexum, en :',
             ctaP: '<strong>Nexum est gratuit.</strong> Utilisez la version hébergée ou auto-hébergez la chaîne de votre corp en quelques minutes.',
             ctaBtn: 'Commencer maintenant',
             ctaGh: 'L’obtenir sur GitHub',
@@ -725,7 +824,7 @@
             gWatchlist: 'Lista de seguimiento de firmas / agujeros de gusano / sistemas',
             gMass: 'Masa / rolling de agujeros de gusano',
             gMultiLingual: 'Multilingüe',
-            gMultiLingualN: '<span class="yes">Sí</span> — actualmente 9 idiomas',
+            gMultiLingualN: '<span class="yes">Sí</span> — actualmente 10 idiomas',
             no: '<span class="no">No</span>',
             gTech: 'Stack tecnológico',
             gCost: 'Coste',
@@ -802,7 +901,7 @@
             faqA6: 'El autoalojamiento es gratis para los cuatro. Si prefieres no ejecutar un servidor, la instancia pública de Nexum es gratis y sin suscripción; la nube de Wanderer, en cambio, requiere una suscripción de mapa de pago.',
 
             h2Languages: 'Disponible en tu idioma',
-            langP: 'Nexum está totalmente traducido a nueve idiomas — con tu idioma detectado automáticamente desde tu navegador la primera vez que lo visitas. Lee esta comparativa, y usa Nexum, en:',
+            langP: 'Nexum está totalmente traducido a diez idiomas — con tu idioma detectado automáticamente desde tu navegador la primera vez que lo visitas. Lee esta comparativa, y usa Nexum, en:',
             ctaP: '<strong>Nexum es gratis.</strong> Usa la versión alojada o autoaloja la cadena de tu corp en minutos.',
             ctaBtn: 'Empieza ahora',
             ctaGh: 'Conseguirlo en GitHub',
@@ -831,7 +930,7 @@
             gWatchlist: 'Lista de vigilância de assinaturas / buracos de minhoca / sistemas',
             gMass: 'Massa / rolling de buracos de minhoca',
             gMultiLingual: 'Multilíngue',
-            gMultiLingualN: '<span class="yes">Sim</span> — atualmente 9 idiomas',
+            gMultiLingualN: '<span class="yes">Sim</span> — atualmente 10 idiomas',
             no: '<span class="no">Não</span>',
             gTech: 'Stack tecnológico',
             gCost: 'Custo',
@@ -908,7 +1007,7 @@
             faqA6: 'O auto-alojamento é grátis para os quatro. Se preferires não executar um servidor, a instância pública do Nexum é grátis e sem subscrição; a nuvem do Wanderer, por outro lado, exige uma subscrição de mapa paga.',
 
             h2Languages: 'Disponível no seu idioma',
-            langP: 'O Nexum está totalmente traduzido para nove idiomas — com o seu idioma detetado automaticamente a partir do navegador na primeira visita. Leia esta comparação, e use o Nexum, em:',
+            langP: 'O Nexum está totalmente traduzido para dez idiomas — com o seu idioma detetado automaticamente a partir do navegador na primeira visita. Leia esta comparação, e use o Nexum, em:',
             ctaP: '<strong>O Nexum é grátis.</strong> Usa a versão alojada ou auto-aloja a cadeia da tua corp em minutos.',
             ctaBtn: 'Começa agora',
             ctaGh: 'Obtê-lo no GitHub',
@@ -936,7 +1035,7 @@
             gWatchlist: '信号 / 虫洞 / 星系关注列表',
             gMass: '虫洞质量 / 关洞',
             gMultiLingual: '多语言',
-            gMultiLingualN: '<span class="yes">是</span> — 目前支持 9 种语言',
+            gMultiLingualN: '<span class="yes">是</span> — 目前支持 10 种语言',
             no: '<span class="no">否</span>',
             gTech: '技术栈',
             gCost: '成本',
@@ -1013,7 +1112,7 @@
             faqA6: '四者的自托管都免费。如果你不想运行服务器，Nexum 的公共实例免费且无需订阅；相比之下，Wanderer 的云端需要付费的地图订阅。',
 
             h2Languages: '支持您的语言',
-            langP: 'Nexum 已完整翻译为九种语言——并在您首次访问时根据浏览器自动检测您的语言。您可以用以下语言阅读本对比并使用 Nexum：',
+            langP: 'Nexum 已完整翻译为十种语言——并在您首次访问时根据浏览器自动检测您的语言。您可以用以下语言阅读本对比并使用 Nexum：',
             ctaP: '<strong>Nexum 免费。</strong>使用托管版本，或在几分钟内自托管你军团的链。',
             ctaBtn: '立即开始',
             ctaGh: '在 GitHub 上获取',
@@ -1041,7 +1140,7 @@
             gWatchlist: '시그니처 / 웜홀 / 성계 관심 목록',
             gMass: '웜홀 질량 / 롤링',
             gMultiLingual: '다국어 지원',
-            gMultiLingualN: '<span class="yes">예</span> — 현재 9개 언어',
+            gMultiLingualN: '<span class="yes">예</span> — 현재 10개 언어',
             no: '<span class="no">아니요</span>',
             gTech: '기술 스택',
             gCost: '비용',
@@ -1118,7 +1217,7 @@
             faqA6: '자체 호스팅은 넷 모두 무료입니다. 서버를 운영하고 싶지 않다면 Nexum의 공개 인스턴스는 무료이며 구독이 필요 없습니다; 반면 Wanderer의 클라우드는 유료 지도 구독이 필요합니다.',
 
             h2Languages: '당신의 언어로 제공됩니다',
-            langP: 'Nexum은 아홉 개 언어로 완전히 번역되어 있으며, 처음 방문할 때 브라우저에서 사용자의 언어를 자동으로 감지합니다. 다음 언어로 이 비교를 읽고 Nexum을 사용하세요:',
+            langP: 'Nexum은 열 개 언어로 완전히 번역되어 있으며, 처음 방문할 때 브라우저에서 사용자의 언어를 자동으로 감지합니다. 다음 언어로 이 비교를 읽고 Nexum을 사용하세요:',
             ctaP: '<strong>Nexum은 무료입니다.</strong> 호스팅 버전을 쓰거나 몇 분 만에 군단의 체인을 직접 호스팅하세요.',
             ctaBtn: '지금 시작하기',
             ctaGh: 'GitHub에서 받기',
@@ -1146,7 +1245,7 @@
             gWatchlist: 'シグネチャ / ワームホール / 星系のウォッチリスト',
             gMass: 'ワームホール質量 / ロール',
             gMultiLingual: '多言語対応',
-            gMultiLingualN: '<span class="yes">はい</span> — 現在9言語',
+            gMultiLingualN: '<span class="yes">はい</span> — 現在10言語',
             no: '<span class="no">いいえ</span>',
             gTech: '技術スタック',
             gCost: 'コスト',
@@ -1223,7 +1322,7 @@
             faqA6: 'セルフホストは 4 つとも無料です。サーバーを運用したくない場合、Nexum のパブリックインスタンスは無料でサブスク不要です。一方、Wanderer のクラウドは有料のマップサブスクが必要です。',
 
             h2Languages: 'あなたの言語で使えます',
-            langP: 'Nexum は9つの言語に完全に翻訳されており、初回アクセス時にブラウザからあなたの言語を自動検出します。次の言語でこの比較を読み、Nexum を使えます：',
+            langP: 'Nexum は10の言語に完全に翻訳されており、初回アクセス時にブラウザからあなたの言語を自動検出します。次の言語でこの比較を読み、Nexum を使えます：',
             ctaP: '<strong>Nexum は無料です。</strong>ホスティング版を使うか、数分でコーポのチェーンをセルフホストしてください。',
             ctaBtn: '今すぐ始める',
             ctaGh: 'GitHub で入手',
@@ -1251,7 +1350,7 @@
             gWatchlist: 'Список наблюдения за сигнатурами / червоточинами / системами',
             gMass: 'Масса / роллинг червоточин',
             gMultiLingual: 'Многоязычность',
-            gMultiLingualN: '<span class="yes">Да</span> — сейчас 9 языков',
+            gMultiLingualN: '<span class="yes">Да</span> — сейчас 10 языков',
             no: '<span class="no">Нет</span>',
             gTech: 'Технологический стек',
             gCost: 'Стоимость',
@@ -1328,7 +1427,7 @@
             faqA6: 'Самостоятельный хостинг бесплатен для всех четырёх. Если вы предпочитаете не держать сервер, публичный экземпляр Nexum бесплатен и без подписки; облако Wanderer, напротив, требует платную подписку на карту.',
 
             h2Languages: 'Доступен на вашем языке',
-            langP: 'Nexum полностью переведён на девять языков — ваш язык определяется автоматически по браузеру при первом визите. Читайте это сравнение и пользуйтесь Nexum на:',
+            langP: 'Nexum полностью переведён на десять языков — ваш язык определяется автоматически по браузеру при первом визите. Читайте это сравнение и пользуйтесь Nexum на:',
             ctaP: '<strong>Nexum бесплатен.</strong> Используйте хостинг-версию или поднимите цепочку своей корпорации самостоятельно за минуты.',
             ctaBtn: 'Начать сейчас',
             ctaGh: 'Взять на GitHub',

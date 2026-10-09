@@ -168,7 +168,7 @@ Open <http://localhost> and click **Log in with EVE Online**. That's it.
 - **Demo map** — the landing page mounts a non-editable demo map so visitors can see what the tool does before logging in.
 - **Collapsible sidebar** — Map Options, Connections, Proximity Alerts, Stale System Fade, and Shortcuts each expand or collapse independently. Per-section open/closed state persists per browser via `localStorage`.
 - **European date format** — DD-MM-YYYY everywhere a date is displayed (chart axes, relative-time fallbacks for events older than a month). ISO timestamps are still used in CSV exports for spreadsheet sortability.
-- **Multi-lingual** — the entire UI is translated into nine languages: English, Deutsch, Français, Español, Português, 简体中文, 한국어, 日本語, and Русский. The language is auto-detected from the browser (regional locales like `es-MX` or `en-GB` map to the base language) and can be changed any time from the in-app language switcher; the choice persists per browser. The public landing and comparison pages are localised too.
+- **Multi-lingual** — the entire UI is translated into ten languages: English, Deutsch, Nederlands, Français, Español, Português, 简体中文, 한국어, 日本語, and Русский. The language is auto-detected from the browser (regional locales like `es-MX` or `en-GB` map to the base language) and can be changed any time from the in-app language switcher; the choice persists per browser. The public landing and comparison pages are localised too.
 
 ### For corporations & alliances
 
