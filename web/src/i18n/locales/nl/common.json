@@ -930,348 +930,348 @@
     "maxReached": "Maximum van {{n}} eigen labels bereikt — verwijder er een om een nieuwe toe te voegen."
   },
   "landing": {
-    "tagline": "Wormhole chain mapping for EVE Online",
-    "demoNote": "◈ Interactive demo — a simplified preview. Sign in to access signatures, kill feeds, connection tracking, activity history, and more.",
+    "tagline": "Wormgatketens karteren voor EVE Online",
+    "demoNote": "◈ Interactieve demo — een vereenvoudigde voorvertoning. Log in voor signaturen, kill feeds, het bijhouden van verbindingen, activiteitsgeschiedenis en meer.",
     "cta": {
-      "continueAs": "Continue as",
-      "sessionExpired": "Session expired — click your portrait to log back in via EVE SSO.",
-      "switchChar": "Log in as a different character",
-      "secureLogin": "Secure EVE SSO login — no passwords stored. Character identity only.",
-      "loginAlt": "Log in with EVE Online",
-      "joinDiscord": "Join the Nexum Discord"
+      "continueAs": "Doorgaan als",
+      "sessionExpired": "Sessie verlopen — klik op je portret om opnieuw in te loggen via EVE SSO.",
+      "switchChar": "Inloggen als een ander character",
+      "secureLogin": "Veilige EVE SSO-login — er worden geen wachtwoorden opgeslagen. Alleen de identiteit van je character.",
+      "loginAlt": "Inloggen met EVE Online",
+      "joinDiscord": "Word lid van de Nexum-Discord"
     },
     "errors": {
-      "not_in_corp": "Your character isn't in a corporation or alliance permitted to access this Nexum instance. Access is restricted to authorised members only.",
-      "corp_check_failed": "Could not verify your corporation membership due to an ESI error. Please try again in a moment.",
-      "unknown": "An unknown error occurred. Please try again."
+      "not_in_corp": "Je character zit niet in een corporation of alliance die toegang heeft tot deze Nexum-installatie. De toegang is beperkt tot bevoegde leden.",
+      "corp_check_failed": "Door een ESI-fout kon je corporation-lidmaatschap niet worden gecontroleerd. Probeer het straks opnieuw.",
+      "unknown": "Er is een onbekende fout opgetreden. Probeer het opnieuw."
     },
     "sections": {
-      "mapping": "Mapping",
-      "personalCorp": "Personal, Corp & Alliance maps",
-      "sysIntel": "System intelligence",
+      "mapping": "Karteren",
+      "personalCorp": "Persoonlijke, corp- en alliancekaarten",
+      "sysIntel": "Systeeminformatie",
       "liveOps": "Live ops",
-      "productivity": "Productivity & UX",
-      "forCorps": "For Corporations & Alliances",
-      "compare": "How does Nexum compare?",
-      "languages": "Available in your language",
-      "discordCta": "Got questions, ideas, or bugs?",
-      "about": "About Nexum",
-      "aboutMe": "About Me",
-      "techStack": "Tech Stack",
-      "faqs": "FAQs"
+      "productivity": "Productiviteit en gebruiksgemak",
+      "forCorps": "Voor corporations en alliances",
+      "compare": "Hoe verhoudt Nexum zich?",
+      "languages": "Beschikbaar in jouw taal",
+      "discordCta": "Vragen, ideeën of bugs?",
+      "about": "Over Nexum",
+      "aboutMe": "Over mij",
+      "techStack": "Techniek",
+      "faqs": "Veelgestelde vragen"
     },
     "features": {
       "interactiveMap": {
-        "title": "Interactive map",
-        "desc": "Drag systems, draw connections, set wormhole class / type / status per connection. Snap-to-grid and an optional minimap."
+        "title": "Interactieve kaart",
+        "desc": "Sleep systemen, teken verbindingen en stel per verbinding de klasse, het type en de status van het wormgat in. Met uitlijnen op een raster en een optionele minikaart."
       },
       "seedRegion": {
-        "title": "Seed a map from a region",
-        "desc": "Spin up a new map pre-populated with an entire EVE region — every system laid out from CCP's 2D star-map projection (a Dotlan-style layout) with all stargate connections drawn. Pick a region when creating a map, or leave it blank for an empty one."
+        "title": "Een kaart vullen met een regio",
+        "desc": "Start een nieuwe kaart die al een hele EVE-regio bevat — elk systeem geplaatst volgens de 2D-sterrenkaartprojectie van CCP (een Dotlan-achtige indeling), met alle stargate-verbindingen getekend. Kies een regio bij het aanmaken van een kaart, of laat het leeg voor een lege kaart."
       },
       "whIntel": {
-        "title": "Wormhole intel",
-        "desc": "Per-connection mass status (stable / destabilized / critical), end-of-life flag with countdown, K162-aware static identification, and frig-hole / gas-site auto-tagging from sig type."
+        "title": "Wormgatinformatie",
+        "desc": "Massastatus per verbinding (stabiel / gedestabiliseerd / kritiek), een end-of-life-markering met aftelling, K162-bewuste identificatie van statics, en automatische tags voor frig holes en gassites op basis van het signatuurtype."
       },
       "rollingCalc": {
-        "title": "Rolling calculator",
-        "desc": "Plan and track collapsing a hole from its connection panel. Models the ±10% mass variance and forecasts each pass safe / may-collapse / will-collapse against the worst case. Define a roller ship (cold + prop-on mass, or pull your flown ship from ESI), step through passes with side-tracking that warns before a pass strands you on the far side, and see an \"≈ N passes left\" estimate. Cumulative mass syncs live to everyone viewing the hole."
+        "title": "Rolcalculator",
+        "desc": "Plan en volg het instorten van een gat vanuit het verbindingspaneel. De calculator modelleert de massamarge van ±10% en voorspelt per passage of die veilig is, het gat kan laten instorten of het zeker laat instorten, uitgaand van het slechtste geval. Definieer een rollerschip (massa koud en met prop aan, of haal het schip waarin je vliegt op uit ESI), loop de passages door met zijkantregistratie die waarschuwt voordat een passage je aan de overzijde achterlaat, en zie een schatting van \"nog ≈ N passages\". De cumulatieve massa wordt live gedeeld met iedereen die het gat bekijkt."
       },
       "whPicker": {
-        "title": "Wormhole type picker",
-        "desc": "Searchable popover for assigning the exact wormhole type to a connection. Statics quick-info on hover shows destination class, mass, and lifetime."
+        "title": "Kiezer voor wormgattypes",
+        "desc": "Doorzoekbare popover om het exacte wormgattype aan een verbinding toe te kennen. De snelle info over statics laat bij het zweven de klasse van de bestemming, de massa en de levensduur zien."
       },
       "multiSelect": {
-        "title": "Multi-select bulk operations",
-        "desc": "Shift-click to select multiple systems or signatures, then bulk-assign type, delete, or rename in a single action."
+        "title": "Bulkbewerkingen met meervoudige selectie",
+        "desc": "Shift-klik om meerdere systemen of signaturen te selecteren, en ken ze vervolgens in één handeling een type toe, verwijder ze of geef ze een nieuwe naam."
       },
       "pngExport": {
-        "title": "PNG export",
-        "desc": "Render the current map — with sig counts, connections, and status — to a PNG you can drop into a fleet ping or a corp Discord."
+        "title": "PNG-export",
+        "desc": "Zet de huidige kaart — met het aantal signaturen, de verbindingen en de status — om naar een PNG die je in een fleet ping of de Discord van je corp kunt plaatsen."
       },
       "sigAging": {
-        "title": "Wormhole sig aging",
-        "desc": "Wormhole sigs tint by their position in the WH type's known lifetime — yellow at 50%, orange at 90%, red past expected close. Catches forgotten chains before they collapse on someone."
+        "title": "Verouderende wormgat-signaturen",
+        "desc": "Wormgat-signaturen kleuren mee met hun plek in de bekende levensduur van het WH-type — geel bij 50%, oranje bij 90%, rood voorbij de verwachte sluiting. Zo vang je vergeten ketens op voordat ze bij iemand instorten."
       },
       "brokenChain": {
-        "title": "Broken-chain detection",
-        "desc": "Delete a wormhole sig and the connection it backed isn't left silently joined — it's quarantined: kept on the map but rendered severed (red dashed with a ✂ marker) and excluded from routing, so a collapsed chain is obvious instead of looking complete. Auto-restores if a sig backs the link again or you jump it."
+        "title": "Detectie van verbroken ketens",
+        "desc": "Verwijder je een wormgat-signatuur, dan blijft de verbinding die erop leunde niet stil verbonden — hij wordt uitgesloten: hij blijft op de kaart staan, maar wordt doorgesneden weergegeven (rode stippellijn met een ✂-markering) en uit de routering gehaald, zodat een ingestorte keten opvalt in plaats van compleet te lijken. Hij herstelt zich automatisch als er weer een signatuur onder de verbinding komt of als je erdoor springt."
       },
       "orphanCleanup": {
-        "title": "Orphan cleanup",
-        "desc": "One right-click sweep removes orphaned systems — those with no live connection, or only broken ones — while protecting your home and any locked systems. Keeps a working chain tidy without hunting down strays by hand."
+        "title": "Verweesde systemen opruimen",
+        "desc": "Eén rechtsklik veegt verweesde systemen weg — die zonder actieve verbinding, of met alleen verbroken verbindingen — terwijl je thuissysteem en vergrendelde systemen beschermd blijven. Zo houd je een werkende keten netjes zonder met de hand naar losse eindjes te zoeken."
       },
       "lazyWhRemoval": {
-        "title": "Auto-remove aged wormholes",
-        "desc": "Opt-in per map: a server-side sweep removes wormhole sigs once they pass their type's maximum lifetime, quarantining any connection they backed. Runs even when nobody has the map open, so synced and corp chains stay current on their own."
+        "title": "Verouderde wormgaten automatisch verwijderen",
+        "desc": "Per kaart aan te zetten: een veegronde op de server verwijdert wormgat-signaturen zodra ze de maximale levensduur van hun type voorbij zijn en sluit elke verbinding die erop leunde uit van routering. Dit loopt ook als niemand de kaart open heeft, dus gesynchroniseerde en corp-ketens blijven vanzelf actueel."
       },
       "soloCorp": {
-        "title": "Solo / Corp split",
-        "desc": "Every user has personal maps that are always private; in corp mode each corp also gets shared corp maps. Cross-corp visibility is opt-in via a single env flag."
+        "title": "Scheiding tussen solo en corp",
+        "desc": "Iedere gebruiker heeft persoonlijke kaarten die altijd privé zijn; in corp-modus krijgt elke corp daarnaast gedeelde corpkaarten. Zichtbaarheid tussen corps zet je zelf aan met één env-vlag."
       },
       "multiCharacter": {
-        "title": "Multi-character accounts",
-        "desc": "Link your alts to one account and switch between them without logging in again — each character's maps merge in on link. Follow an alt's live location while you fly your main, and unlink a character whenever you like."
+        "title": "Accounts met meerdere characters",
+        "desc": "Koppel je alts aan één account en wissel tussen ze zonder opnieuw in te loggen — de kaarten van elk character komen bij het koppelen mee. Volg de live locatie van een alt terwijl je je main vliegt, en ontkoppel een character wanneer je wilt."
       },
       "multiMap": {
-        "title": "Multi-map support",
-        "desc": "Each character (or corp) can maintain multiple independent maps up to configured limits — separate chains for separate ops without losing context."
+        "title": "Meerdere kaarten",
+        "desc": "Elk character (of elke corp) kan meerdere onafhankelijke kaarten bijhouden tot de ingestelde limieten — gescheiden ketens voor gescheiden operaties, zonder dat je overzicht verliest."
       },
       "mergeMaps": {
-        "title": "Merge maps",
-        "desc": "Fold one map into another. The destination is kept as the source of truth — only missing systems and connections are added, with signatures, structures, and notes merged in, and new systems slotted into the existing layout. Corp maps opt in per role as a merge source and/or destination."
+        "title": "Kaarten samenvoegen",
+        "desc": "Vouw de ene kaart in de andere. De doelkaart blijft de bron van waarheid — alleen ontbrekende systemen en verbindingen worden toegevoegd, met signaturen, structures en notities erbij, en nieuwe systemen worden in de bestaande indeling geplaatst. Voor corpkaarten stel je per rol in of ze bron en/of doel van een samenvoeging mogen zijn."
       },
       "crossMapSync": {
-        "title": "Cross-map sync",
-        "desc": "Have the same system on several maps? Opt in and scanning it on one map copies its signatures and anomalies to the same system on your others — personal maps sync with your other personal maps, corp maps with the corp's. Non-destructive: it only adds missing entries and fills blanks, never overwriting what you've already entered or deleting anything."
+        "title": "Synchroniseren tussen kaarten",
+        "desc": "Staat hetzelfde systeem op meerdere kaarten? Zet dit aan en als je het op één kaart scant, worden de signaturen en anomalieën gekopieerd naar hetzelfde systeem op je andere kaarten — persoonlijke kaarten met je andere persoonlijke kaarten, corpkaarten met die van de corp. Niet-destructief: alleen ontbrekende gegevens worden toegevoegd en lege velden gevuld, nooit wordt iets overschreven of verwijderd."
       },
       "realtime": {
-        "title": "Real-time collaboration",
-        "desc": "Edits sync live to everyone viewing the same map — systems, connections, rename/lock, signatures, structures, and merges all appear for other viewers within moments, no refresh. Streamed per map (you only get events for maps you can see), with your own changes echo-suppressed and an auto-resync on reconnect."
+        "title": "Samenwerken in realtime",
+        "desc": "Wijzigingen komen live binnen bij iedereen die dezelfde kaart bekijkt — systemen, verbindingen, hernoemen en vergrendelen, signaturen, structures en samenvoegingen verschijnen binnen een paar tellen bij andere kijkers, zonder verversen. Het gaat per kaart (je krijgt alleen events voor kaarten die je mag zien), met echo-onderdrukking van je eigen wijzigingen en een automatische hersynchronisatie als de verbinding terugkomt."
       },
       "mapLocking": {
-        "title": "Map locking",
-        "desc": "Admins can freeze a corp map's topology. Systems and connections lock for non-admins, but signatures, structures, and per-system notes stay editable so ops continue while the layout is pinned."
+        "title": "Kaarten vergrendelen",
+        "desc": "Beheerders kunnen de structuur van een corpkaart vastzetten. Systemen en verbindingen staan dan vast voor niet-beheerders, maar signaturen, structures en notities per systeem blijven te bewerken, zodat de operatie doorgaat terwijl de indeling vastligt."
       },
       "rbac": {
-        "title": "Role-based access",
-        "desc": "Four tiers — readonly, edit, full, admin — gating corp-map actions. Personal maps stay yours regardless of role."
+        "title": "Toegang op basis van rollen",
+        "desc": "Vier niveaus — alleen lezen, bewerken, volledig en beheerder — bepalen wat er met corpkaarten mag. Persoonlijke kaarten blijven altijd van jou, los van je rol."
       },
       "systemPanel": {
-        "title": "System panel",
-        "desc": "Per-system cards for signatures, structures, NPC stations, notes, killboard, and activity charts. Cards are reorderable via drag-and-drop and persist per-user."
+        "title": "Systeempaneel",
+        "desc": "Kaarten per systeem voor signaturen, structures, NPC-stations, notities, killboard en activiteitsgrafieken. Je kunt ze met slepen herschikken en de volgorde wordt per gebruiker bewaard."
       },
       "sigMgmt": {
-        "title": "Signature management",
-        "desc": "Paste straight from the probe scanner. Tracks created / updated age per signature, auto-deletes sigs missing from a re-paste, and supports bulk type assignment for multi-select."
+        "title": "Signaturen beheren",
+        "desc": "Plak rechtstreeks uit de probe scanner. Nexum houdt per signatuur bij wanneer hij is aangemaakt en bijgewerkt, verwijdert automatisch signaturen die bij een nieuwe plakactie ontbreken, en ondersteunt het toekennen van een type aan een hele selectie."
       },
       "structImport": {
-        "title": "Structure import",
-        "desc": "Paste EVE overview data to import player-owned structures with names, types, owners, and notes in one operation."
+        "title": "Structures importeren",
+        "desc": "Plak gegevens uit je EVE-overview om structures van spelers in één handeling te importeren, met naam, type, eigenaar en notities."
       },
       "autoStruct": {
-        "title": "Auto-discovered structures",
-        "desc": "Your corp's citadels (via ESI when a member with the Station Manager role logs in) and any publicly-listed structures from a third-party feed appear automatically in the structures pane as read-only entries — already tinted by your standings toward the owner."
+        "title": "Automatisch gevonden structures",
+        "desc": "De citadels van je corp (via ESI zodra een lid met de rol Station Manager inlogt) en openbaar vermelde structures uit een externe feed verschijnen automatisch als alleen-lezen regels in het structures-paneel — al gekleurd naar je standings tegenover de eigenaar."
       },
       "activityCharts": {
-        "title": "Activity charts",
-        "desc": "24-hour rolling history of jumps, ship / pod kills, and NPC kills per system, polled from ESI hourly. The poller persists data for every k-space system — not just ones someone has opened — so charts populate the moment you view a new system."
+        "title": "Activiteitsgrafieken",
+        "desc": "Een voortschrijdende geschiedenis van 24 uur met sprongen, scheeps- en pod kills en NPC-kills per systeem, elk uur opgehaald uit ESI. De poller bewaart gegevens voor elk k-space-systeem — niet alleen voor die iemand heeft opengeklikt — dus de grafieken zijn direct gevuld als je een nieuw systeem bekijkt."
       },
       "sovStation": {
-        "title": "Sovereignty & station data",
-        "desc": "Live alliance / corp / faction sov info and NPC station services, with in-game waypoint and destination actions."
+        "title": "Sovereignty- en stationgegevens",
+        "desc": "Live sov-informatie over alliance, corp en faction plus de diensten van NPC-stations, met acties om in het spel een waypoint of bestemming te zetten."
       },
       "killboard": {
-        "title": "Killboard pane",
-        "desc": "Recent zKillboard activity per system, with NPC-only kills hidden by default (toggle to include). Rows tint red when a hostile actor is in the chain or a blue gets killed; blue when a friendly scores or a hostile dies. Recent kills also bubble up as highlights on the map."
+        "title": "Killboard-paneel",
+        "desc": "Recente zKillboard-activiteit per systeem, met kills tegen alleen NPC's standaard verborgen (aan te zetten). Rijen kleuren rood als er een vijandige partij in de keten zit of als een blauwe sneuvelt; blauw als een vriend scoort of een vijand sterft. Recente kills komen ook als uitgelichte systemen op de kaart naar boven."
       },
       "effectDigest": {
-        "title": "Chain-wide effect digest",
-        "desc": "A one-line summary at the top of the system info panel lists every Pulsar / Wolf-Rayet / Magnetar / etc. on the current chain. Hover for the modifier list; click to centre."
+        "title": "Overzicht van effecten in de keten",
+        "desc": "Een regel bovenaan het systeeminfopaneel somt elke Pulsar, Wolf-Rayet, Magnetar enzovoort in de huidige keten op. Zweef eroverheen voor de modifiers; klik om erop te centreren."
       },
       "standings": {
-        "title": "Standings overlay",
-        "desc": "Your EVE contact list (personal, corp, and alliance — fetched via ESI on login and re-pullable on demand) drives a chain-wide visual layer. Sov holders show inline P/C/A standing pills; structures resolved via their EVE structure ID tint by owner-corp standing; sov-holder system nodes get a coloured halo so hostile territory stands out on the map."
+        "title": "Standings-laag",
+        "desc": "Je EVE-contactlijst (persoonlijk, corp en alliance — bij het inloggen via ESI opgehaald en desgewenst opnieuw op te halen) voedt een visuele laag over de hele keten. Sov-houders krijgen inline P/C/A-standingpillen; structures die via hun EVE structure-ID zijn herkend kleuren naar de standing van de eigenaar-corp; systeemnodes van sov-houders krijgen een kleurenhalo, zodat vijandig gebied op de kaart opvalt."
       },
       "scout": {
-        "title": "Scout connections",
-        "desc": "Thera and Turnur public Eve-Scout connections surfaced into the sidebar so you can jump straight to known holes."
+        "title": "Scout-verbindingen",
+        "desc": "De openbare Eve-Scout-verbindingen van Thera en Turnur komen in de zijbalk terecht, zodat je direct naar bekende gaten kunt springen."
       },
       "a0": {
-        "title": "A0 sun detection",
-        "desc": "Auto-flags systems with A0 (yellow) suns visible via ESI for capital-friendly skirmish planning."
+        "title": "A0-zonnen vinden",
+        "desc": "Markeert automatisch systemen met een A0-zon (geel) die via ESI te zien zijn, handig bij het plannen van capital-vriendelijke schermutselingen."
       },
       "iceBelt": {
-        "title": "Ice belt systems",
-        "desc": "Flags Empire-space systems that spawn ice anomalies with a ❄ icon — handy when staging mining ops or looking for an alternate harvest spot. Static dataset committed in-repo and resolved to system IDs at startup."
+        "title": "Systemen met ice belts",
+        "desc": "Markeert systemen in Empire-ruimte waar ice-anomalieën spawnen met een ❄-pictogram — handig bij het opzetten van mining-operaties of het zoeken van een alternatieve oogstplek. De statische dataset zit in de repo en wordt bij het opstarten omgezet naar systeem-ID's."
       },
       "storms": {
-        "title": "Storm tracking",
-        "desc": "Active null-sec storms — Electric, Gamma, Exotic, Plasma — sourced from the community-maintained EveScout Rescue stormtrack feed surface as a colour-coded ⚡ on matching system nodes. Tooltip shows storm name, last report, and reporter. Refreshed every 30 minutes."
+        "title": "Stormen volgen",
+        "desc": "Actieve null-sec-stormen — Electric, Gamma, Exotic, Plasma — uit de door de community onderhouden stormtrack-feed van EveScout Rescue verschijnen als een kleurgecodeerde ⚡ op de bijbehorende systeemnodes. De tooltip toont de naam van de storm, de laatste melding en wie hem meldde. Elke 30 minuten verversd."
       },
       "proximity": {
-        "title": "Proximity alerts",
-        "desc": "Browser notification plus an audio ping when you're within a configurable number of jumps of an active incursion, pirate insurgency, or a sov-holding system whose corp / alliance you've set to red. Persistent toolbar chip shows the nearest threat at a glance."
+        "title": "Nabijheidsmeldingen",
+        "desc": "Een browsermelding plus een pieptoon als je binnen een instelbaar aantal sprongen zit van een actieve incursion, een pirate insurgency of een sov-houdend systeem waarvan je de corp of alliance op rood hebt gezet. Een blijvend chipje in de werkbalk toont de dichtstbijzijnde dreiging in één oogopslag."
       },
       "watchlist": {
-        "title": "Watchlist",
-        "desc": "A personal, hand-edited list of holes you're hunting — a specific system, a wormhole type, or a characteristic (shattered, an effect, frig holes). Matches are highlighted on the map with your chosen marker and chime when they appear; one click jumps the view to any match."
+        "title": "Volglijst",
+        "desc": "Een persoonlijke, zelf samengestelde lijst van gaten waar je op jaagt — een bepaald systeem, een wormgattype of een kenmerk (shattered, een effect, frig holes). Overeenkomsten worden op de kaart gemarkeerd met de markering die je kiest en geven een geluidssignaal als ze verschijnen; met één klik springt het beeld naar een match."
       },
       "discordNotif": {
-        "title": "Discord notifications",
-        "desc": "Push corp chain intel to a Discord channel so alerts land even when nobody's watching the tab. Fires server-side on an inbound K162 or a new wormhole connection, scoped to corp maps. Admins filter which regions and maps notify from the admin panel. Best-effort and rate-limit-aware; bulk operations like region seeding never spam the channel."
+        "title": "Discord-meldingen",
+        "desc": "Stuur de keteninformatie van je corp naar een Discord-kanaal, zodat meldingen aankomen ook als niemand het tabblad in de gaten houdt. Het gebeurt op de server bij een inkomende K162 of een nieuwe wormgatverbinding, alleen voor corpkaarten. Beheerders filteren in het beheerpaneel welke regio's en kaarten melden. Het is best-effort en houdt rekening met rate limits; bulkacties zoals het vullen van een regio spammen het kanaal nooit."
       },
       "routePlanner": {
-        "title": "Route planner",
-        "desc": "Server-side BFS over stargates plus your live chain, so a route through a wormhole hop is a single click."
+        "title": "Routeplanner",
+        "desc": "Een BFS op de server over stargates plus je live keten, zodat een route via een wormgatsprong één klik is."
       },
       "locationTracking": {
-        "title": "Location tracking",
-        "desc": "Opt-in live character location dot in the toolbar, plus a per-map \"you are here\" indicator that updates every 10 seconds via ESI."
+        "title": "Locatie bijhouden",
+        "desc": "Een live locatiestip van je character in de werkbalk, naar keuze aan te zetten, plus een je-bent-hier-aanduiding per kaart die elke 10 seconden via ESI wordt bijgewerkt."
       },
       "presence": {
-        "title": "Pilot presence",
-        "desc": "See where everyone viewing the same map is right now — a blue dot (pilot name on hover) marks each other viewer's current system, live as they jump. Covers anyone with the map open, not just your fleet; opt-in and nothing is stored."
+        "title": "Aanwezigheid van pilots",
+        "desc": "Zie waar iedereen die dezelfde kaart bekijkt nu is — een blauwe stip (met de naam van de pilot bij zweven) markeert het huidige systeem van elke andere kijker, live terwijl ze springen. Dit geldt voor iedereen die de kaart open heeft, niet alleen je fleet; het is optioneel en er wordt niets opgeslagen."
       },
       "onlineStatus": {
-        "title": "Online status",
-        "desc": "Toolbar dot shows whether each logged-in user is currently signed into EVE Online, so you can see at a glance who's actually on grid."
+        "title": "Online-status",
+        "desc": "Een stip in de werkbalk laat zien of elke ingelogde gebruiker op dit moment in EVE Online zit, zodat je in één oogopslag ziet wie echt in de ruimte is."
       },
       "commandPalette": {
-        "title": "Command palette",
-        "desc": "⌘ / Ctrl + K opens a fuzzy search across systems, sigs, and actions — jump to a system, set a waypoint, or toggle a pane without touching the mouse."
+        "title": "Opdrachtenpalet",
+        "desc": "⌘ / Ctrl + K opent een zoekveld over systemen, signaturen en acties — spring naar een systeem, zet een waypoint of zet een paneel aan of uit zonder de muis aan te raken."
       },
       "homeHotkey": {
-        "title": "Home hotkey",
-        "desc": "Hit H to jump the viewport back to your home system from any panel. Right-click a system to set or change which one is home."
+        "title": "Sneltoets voor thuis",
+        "desc": "Druk op H om het beeld vanuit elk paneel terug naar je thuissysteem te brengen. Rechtsklik een systeem om in te stellen of te wijzigen welk systeem thuis is."
       },
       "killHighlights": {
-        "title": "Recent-kill highlights",
-        "desc": "Systems with kills in the last hour get a coloured halo so you can see fresh activity at a glance across the chain."
+        "title": "Recente kills uitgelicht",
+        "desc": "Systemen met kills in het afgelopen uur krijgen een kleurenhalo, zodat je verse activiteit in de hele keten in één oogopslag ziet."
       },
       "userStats": {
-        "title": "User stats modal",
-        "desc": "Per-character totals: jumps, signatures by type, broken down by day / week / month / year / forever."
+        "title": "Venster met gebruikersstatistieken",
+        "desc": "Totalen per character: sprongen en signaturen per type, uitgesplitst per dag, week, maand, jaar of over alle tijd."
       },
       "serverStatus": {
-        "title": "Server status widget",
-        "desc": "Live Tranquility server status, player count, and ESI health in the toolbar. Cross-tab cached so all your open windows share a single ESI poll."
+        "title": "Serverstatus-widget",
+        "desc": "De live status van Tranquility, het aantal spelers en de gezondheid van ESI in de werkbalk. Gegevens worden over tabbladen gedeeld, zodat al je open vensters één enkele ESI-aanvraag delen."
       },
       "demoMap": {
-        "title": "Demo map",
-        "desc": "The landing page mounts a non-editable demo map so visitors can see what the tool does before logging in."
+        "title": "Demokaart",
+        "desc": "De startpagina toont een niet-bewerkbare demokaart, zodat bezoekers zien wat de tool doet voordat ze inloggen."
       },
       "sidebar": {
-        "title": "Collapsible sidebar",
-        "desc": "Map Options, Connections, Proximity Alerts, Stale System Fade, and Shortcuts each expand or collapse independently. Per-section state persists per browser via localStorage."
+        "title": "Invouwbare zijbalk",
+        "desc": "Kaartopties, Verbindingen, Nabijheidsmeldingen, Verouderde systemen laten vervagen en Sneltoetsen vouwen allemaal los van elkaar open en dicht. De stand per sectie wordt per browser bewaard in localStorage."
       },
       "colorVision": {
-        "title": "Colour-blind modes",
-        "desc": "Deuteranopia, protanopia and tritanopia palettes that re-map every status, class and standings colour across the app."
+        "title": "Modi voor kleurenblindheid",
+        "desc": "Paletten voor deuteranopie, protanopie en tritanopie die elke status-, klasse- en standingkleur in de hele app opnieuw toewijzen."
       },
       "labels": {
-        "title": "System labels",
-        "desc": "Tag any system with coloured labels — toggle the built-in A/B/C and 1/2/3 set, or add up to three custom labels of your own (free text or a Phosphor icon) with a pick-your-own background colour. They render as pills above the node and sync to everyone on a corp map."
+        "title": "Systeemlabels",
+        "desc": "Geef elk systeem gekleurde labels — zet de ingebouwde sets A/B/C en 1/2/3 aan, of voeg tot drie eigen labels toe (vrije tekst of een Phosphor-pictogram) met een zelfgekozen achtergrondkleur. Ze verschijnen als pillen boven de node en worden met iedereen op een corpkaart gedeeld."
       },
       "apiKeys": {
-        "title": "API key management",
-        "desc": "Generate and revoke personal API keys to drive external tools against your maps. Each key acts as a chosen character and is scoped — read-only, read + live events, or read + write content — so it can only ever do what that character can."
+        "title": "Beheer van API-sleutels",
+        "desc": "Maak en trek persoonlijke API-sleutels in om externe tools op je kaarten te laten werken. Elke sleutel handelt als een gekozen character en heeft een bereik — alleen lezen, lezen + live events, of lezen + inhoud schrijven — zodat hij nooit meer kan dan dat character."
       },
       "chains": {
-        "title": "Saved wormhole chains",
-        "desc": "Record any path through your map as a named chain — pick a start and end system and the route is saved with its hop count. Hover a chain to dim everything off it and light up just its systems and connections, centre on any hop, and reorder your saved chains. Broken hops flag themselves for a re-scout."
+        "title": "Opgeslagen wormgatketens",
+        "desc": "Leg elk pad door je kaart vast als een benoemde keten — kies een begin- en eindsysteem en de route wordt opgeslagen met het aantal stappen. Zweef over een keten om alles eromheen te dimmen en alleen die systemen en verbindingen op te lichten, centreer op elke stap, en herschik je opgeslagen ketens. Verbroken stappen melden zich zelf voor een nieuwe verkenning."
       },
       "jumpRange": {
-        "title": "Jump-drive range",
-        "desc": "Pick a staging system and highlight every low/null system within jump range of it, colour-banded by ship class (Black Ops, Carrier, Super, JF) at your Jump Drive Calibration. Tag cyno-jump routes on connections, auto-annotated with the light-year distance and which classes can make the jump."
+        "title": "Bereik van de jump drive",
+        "desc": "Kies een stagingsysteem en licht elk low/null-systeem binnen sprongbereik op, met kleurbanden per scheepsklasse (Black Ops, Carrier, Super, JF) bij jouw Jump Drive Calibration. Markeer cyno-sprongroutes op verbindingen, automatisch voorzien van de afstand in lichtjaren en welke klassen de sprong kunnen maken."
       },
       "jumpPlanner": {
-        "title": "Jump planner",
-        "desc": "Plot a multi-hop capital jump route between any two low/null systems. Pick a ship class and your skills, choose fewest jumps or least fuel, and see the route mapped with per-hop light-years and an isotope estimate. Save and reload your routes."
+        "title": "Sprongplanner",
+        "desc": "Plan een capital-sprongroute met meerdere stappen tussen twee willekeurige low/null-systemen. Kies een scheepsklasse en je skills, kies de minste sprongen of de minste brandstof, en zie de route op de kaart met lichtjaren per stap en een schatting van de isotopen. Je routes bewaren en opnieuw laden kan ook."
       }
     },
     "corpFeatures": {
       "multiCorp": {
-        "title": "Multi-corp deployments",
-        "desc": "CORP_ID accepts a comma-separated list of corporation IDs. One Nexum instance can host several corps; each corp's maps stay scoped to its own members unless CORP_MAP_SHARED=true."
+        "title": "Installaties met meerdere corps",
+        "desc": "CORP_ID accepteert een lijst met corporation-ID's, gescheiden door komma's. Eén Nexum-installatie kan verschillende corps huisvesten; de kaarten van elke corp blijven bij de eigen leden, tenzij CORP_MAP_SHARED=true."
       },
       "allianceMaps": {
-        "title": "Alliance-wide maps",
-        "desc": "ALLIANCE_ID adds a third map scope above corp: alliance maps every member of the alliance can see. Set ALLIANCE_MAP_SHARED=true to share them across a coalition of alliances."
+        "title": "Kaarten voor de hele alliance",
+        "desc": "ALLIANCE_ID voegt een derde kaartniveau boven corp toe: alliancekaarten die elk lid van de alliance kan zien. Zet ALLIANCE_MAP_SHARED=true om ze binnen een coalitie van alliances te delen."
       },
       "allianceRoles": {
-        "title": "Alliance admin role",
-        "desc": "A dedicated alliance_admin tier manages alliance maps and every member's role across the whole alliance — a superset of the corp admin. Any corp inside the alliance can still keep its own corp-private maps, no CORP_ID list needed."
+        "title": "Rol van alliancebeheerder",
+        "desc": "Een apart niveau alliance_admin beheert alliancekaarten en de rol van elk lid in de hele alliance — een superset van de corpbeheerder. Elke corp binnen de alliance kan nog steeds eigen corp-private kaarten houden, zonder dat er een CORP_ID-lijst nodig is."
       },
       "adminDash": {
-        "title": "Admin dashboard",
-        "desc": "A dedicated /admin page with four tabs: Users, Maps, Reports, and Audit log. Admins reach it from the toolbar's Admin button."
+        "title": "Beheerdersdashboard",
+        "desc": "Een eigen /admin-pagina met vier tabbladen: Gebruikers, Kaarten, Rapporten en Auditlogboek. Beheerders komen er via de knop Beheer in de werkbalk."
       },
       "userMgmt": {
-        "title": "User management",
-        "desc": "Change roles, block / unblock, and force an ESI corp-membership re-check on demand. Self-block, self-demote, and changes to ADMIN_CHAR_ID are guarded against."
+        "title": "Gebruikersbeheer",
+        "desc": "Rollen wijzigen, blokkeren en deblokkeren, en desgewenst een nieuwe ESI-controle van het corplidmaatschap forceren. Jezelf blokkeren of degraderen en wijzigingen aan ADMIN_CHAR_ID worden tegengehouden."
       },
       "mapMgmt": {
-        "title": "Map management",
-        "desc": "Admins see every corp map with owner avatar, corp ticker, system / connection counts, lock state, and last-active time. Force-lock, force-unlock, and force-delete are one-click each."
+        "title": "Kaartbeheer",
+        "desc": "Beheerders zien elke corpkaart met de avatar van de eigenaar, de corpticker, het aantal systemen en verbindingen, de vergrendelstatus en wanneer de kaart het laatst actief was. Vergrendelen, ontgrendelen en verwijderen forceren kost elk één klik."
       },
       "usersReport": {
-        "title": "Users report",
-        "desc": "Per-character last login, systems added / deleted, structures added, signatures broken down by type, and last-corp-activity timestamps. Sortable, filterable by activity and time window, exportable as CSV."
+        "title": "Gebruikersrapport",
+        "desc": "Per character de laatste login, toegevoegde en verwijderde systemen, toegevoegde structures, signaturen uitgesplitst per type, en wanneer er voor het laatst corpactiviteit was. Sorteerbaar, te filteren op activiteit en tijdvak, en te exporteren als CSV."
       },
       "systemsReport": {
-        "title": "Systems report",
-        "desc": "Aggregate corp-map signatures with a sig-type donut, a daily / monthly activity line chart (bucketing adapts to the window), and a sortable wormhole-type breakdown."
+        "title": "Systeemrapport",
+        "desc": "Signaturen van corpkaarten bij elkaar, met een donut per signatuurtype, een lijngrafiek met dagelijkse of maandelijkse activiteit (de indeling past zich aan het tijdvak aan) en een sorteerbare uitsplitsing per wormgattype."
       },
       "timeWindowed": {
-        "title": "Time-windowed reporting",
-        "desc": "Every report can be scoped to past 24 hours, week, month, year, or all time. Chart bucketing adapts automatically: hourly for 24h, daily for week / month, monthly for year and all-time."
+        "title": "Rapporten per tijdvak",
+        "desc": "Elk rapport kan worden beperkt tot de laatste 24 uur, week, maand, jaar of alle tijd. De indeling van de grafieken past zich automatisch aan: per uur bij 24 uur, per dag bij een week of maand, per maand bij een jaar en alle tijd."
       },
       "auditLog": {
-        "title": "Audit log",
-        "desc": "Every admin action — role change, block / unblock, force-lock, force-delete, ESI corp change, auto-block on corp departure — is recorded with actor, target, old → new value, and timestamp. Exportable as CSV."
+        "title": "Auditlogboek",
+        "desc": "Elke beheeractie — rolwijziging, blokkeren en deblokkeren, vergrendelen of verwijderen forceren, een ESI-corpwijziging, automatisch blokkeren bij vertrek uit de corp — wordt vastgelegd met wie het deed, op wie het betrekking had, de oude → nieuwe waarde en een tijdstempel. Te exporteren als CSV."
       },
       "corpTicker": {
-        "title": "Corp ticker resolution",
-        "desc": "Corp IDs in the Users and Maps reports are resolved to in-game tickers via ESI, with a 1-hour in-memory cache to keep report loads cheap."
+        "title": "Corptickers opzoeken",
+        "desc": "Corp-ID's in de gebruikers- en kaartrapporten worden via ESI omgezet naar de tickers uit het spel, met een cache van een uur in het geheugen om het laden van rapporten goedkoop te houden."
       },
       "perCharAttr": {
-        "title": "Per-character attribution",
-        "desc": "Sigs, structures, and system add / delete actions are recorded with the user who made them, so reports can answer \"who has been scanning what\" with no manual logging."
+        "title": "Toewijzing per character",
+        "desc": "Signaturen, structures en het toevoegen of verwijderen van systemen worden vastgelegd met de gebruiker die het deed, zodat rapporten kunnen vertellen wie wat gescand heeft, zonder dat iemand iets hoeft bij te houden."
       },
       "accessControl": {
-        "title": "User access control",
-        "desc": "Decide who can sign in beyond your .env core: a DB allow-list (seeded from CORP_ID/ALLIANCE_ID) managed in the admin area, optional auto-admit of friendly corps/alliances by in-game standing (+5/+10), and a standings viewer that groups your contacts by band. Sessions are re-checked live, so revoking access — or a pilot leaving an admitted corp — logs them out."
+        "title": "Toegangscontrole voor gebruikers",
+        "desc": "Bepaal wie er naast je .env-kern kan inloggen: een toegangslijst in de database (gevuld vanuit CORP_ID/ALLIANCE_ID) die je in het beheergedeelte onderhoudt, het optioneel automatisch toelaten van vriendelijke corps en alliances op basis van de standing in het spel (+5/+10), en een standings-overzicht dat je contacten per band groepeert. Sessies worden live opnieuw gecontroleerd, dus wie de toegang verliest — of een pilot die een toegelaten corp verlaat — wordt uitgelogd."
       }
     },
-    "forCorpsBody": "Run Nexum as a shared deployment for your corp or alliance. Members get visible-to-the-corp chain maps and private personal maps in one tool, with role-based permissions, admin tooling, and per-character activity reporting.",
-    "compareBody": "See how Nexum stacks up against Pathfinder, Tripwire and Wanderer — features, hosting and cost, side by side.",
-    "languagesBody": "Nexum is fully translated into nine languages — and it auto-detects yours from your browser the first time you visit. Prefer a different one? Switch any time from the language picker in the toolbar.",
-    "compareLink": "Compare Nexum vs Pathfinder, Tripwire & Wanderer →",
-    "helpLink": "New here? Read the how-to guide →",
-    "guidesLink": "Wormhole guides & tutorials →",
-    "discordCtaBody": "Drop into the Nexum Discord — feedback, feature requests, scanning chat and o7s all welcome.",
-    "aboutBody1": "Nexum is a wormhole and exploration tool. It can be used for mapping routes and logging signatures. It was heavily inspired by Pathfinder — but with Pathfinder no longer actively developed (no new release since 2020), rather than complain about it, Nexum was created.",
-    "aboutBody2": "Nexum is built by a single developer. I'm adding features as we go but get in contact if you want support or feature requests",
-    "aboutMe": "Nexum is written by Addelee as a solo project. I've played eve since Beta back in 2003. You might see me hanging out in the Help channels or the Scanning channel. I've played in all areas of space from living in wormholes and thera, running missions in High Sec, gate camping in lowsec and now, null life with Goonswarm.<br></br><br></br>As a day job, I am a programmer and run <area404>Area 404</area404>. Because of this, I decided I'd write this tool. I'm an avid explorer in Eve therefore I wanted a tool that worked for me.<br></br><br></br>Nexum is open source and I welcome anyone to contribute. I would definitely appreciate feedback and any bugs you encounter so please flag things on <gh>GitHub</gh>",
-    "techStack1": "Nexum is held together with the finest space-age materials money and caffeine can buy. The frontend is <strong>React</strong> with <strong>TypeScript</strong> — because arguing with a compiler is still more productive than arguing with a nullsec alliance. Maps are rendered with <strong>ReactFlow</strong>, which handles all the node-dragging shenanigans so I didn't have to. State is managed by <strong>Zustand</strong>, which is delightfully small and has never once told me to \"just use Redux\".",
-    "techStack2": "The backend is <strong>Node.js</strong> with <strong>Express</strong> — proven, boring, and it works. Data lives in <strong>PostgreSQL</strong>, seeded with CCP's Static Data Export so Nexum actually knows what J213422 is without asking the ESI every five seconds. Authentication is handled by <strong>EVE Online SSO</strong> — your credentials never touch this server, which is exactly how it should be.",
-    "techStack3": "Live system intelligence comes from the <strong>EVE ESI</strong> (CCP's official API) and kill data from <strong>zKillboard</strong>. The whole thing is containerised with <strong>Docker</strong> and proxied through <strong>nginx</strong>, because someone has to keep the lights on while you're getting evicted from your wormhole.",
+    "forCorpsBody": "Zet Nexum neer als een gedeelde installatie voor je corp of alliance. Leden krijgen in één tool ketenkaarten die voor de corp zichtbaar zijn en eigen persoonlijke kaarten, met rechten per rol, beheergereedschap en activiteitsrapporten per character.",
+    "compareBody": "Bekijk hoe Nexum zich verhoudt tot Pathfinder, Tripwire en Wanderer — functies, hosting en kosten naast elkaar.",
+    "languagesBody": "Nexum is volledig vertaald in negen talen — en bij je eerste bezoek wordt de jouwe automatisch uit je browser overgenomen. Liever een andere? Wissel wanneer je wilt via de taalkiezer in de werkbalk.",
+    "compareLink": "Vergelijk Nexum met Pathfinder, Tripwire en Wanderer →",
+    "helpLink": "Nieuw hier? Lees de handleiding →",
+    "guidesLink": "Wormgatgidsen en tutorials →",
+    "discordCtaBody": "Kom langs in de Nexum-Discord — feedback, ideeën voor functies, scannerpraat en o7's zijn allemaal welkom.",
+    "aboutBody1": "Nexum is een tool voor wormgaten en verkenning. Je kunt er routes mee karteren en signaturen mee vastleggen. De grote inspiratie was Pathfinder — maar omdat Pathfinder niet meer actief ontwikkeld wordt (geen nieuwe release sinds 2020), is er in plaats van klagen Nexum gekomen.",
+    "aboutBody2": "Nexum wordt door één ontwikkelaar gebouwd. Ik voeg onderweg functies toe, maar neem contact op als je hulp nodig hebt of een functie wilt voorstellen",
+    "aboutMe": "Nexum is geschreven door Addelee als soloproject. Ik speel EVE sinds de bèta in 2003. Je ziet me misschien rondhangen in de Help-kanalen of het Scanning-kanaal. Ik heb in alle delen van de ruimte gespeeld: wonen in wormgaten en Thera, missies lopen in High Sec, gate campen in lowsec en nu het nullleven bij Goonswarm.<br></br><br></br>In het dagelijks leven ben ik programmeur en run ik <area404>Area 404</area404>. Daarom besloot ik deze tool te schrijven. Ik ben een verwoed verkenner in EVE, dus ik wilde een tool die voor mij werkte.<br></br><br></br>Nexum is open source en iedereen mag bijdragen. Ik waardeer feedback en meldingen van bugs enorm, dus geef dingen door op <gh>GitHub</gh>",
+    "techStack1": "Nexum wordt bij elkaar gehouden door de beste ruimtematerialen die geld en cafeïne kunnen kopen. De frontend is <strong>React</strong> met <strong>TypeScript</strong> — want ruziën met een compiler is nog altijd productiever dan ruziën met een nullsec-alliance. De kaarten worden getekend met <strong>ReactFlow</strong>, dat al het sleepwerk met nodes afhandelt zodat ik dat niet hoefde te doen. De state wordt beheerd door <strong>Zustand</strong>, dat heerlijk klein is en me nog nooit heeft gezegd dat ik \"gewoon Redux moet gebruiken\".",
+    "techStack2": "De backend is <strong>Node.js</strong> met <strong>Express</strong> — bewezen, saai, en het werkt. De gegevens staan in <strong>PostgreSQL</strong>, gevuld met de Static Data Export van CCP, zodat Nexum echt weet wat J213422 is zonder elke vijf seconden de ESI te bevragen. Het inloggen gaat via <strong>EVE Online SSO</strong> — je inloggegevens raken deze server nooit, en zo hoort het ook.",
+    "techStack3": "De live systeeminformatie komt uit de <strong>EVE ESI</strong> (de officiële API van CCP) en de killgegevens van <strong>zKillboard</strong>. Het geheel zit in containers met <strong>Docker</strong> en gaat via <strong>nginx</strong>, want iemand moet het licht aan houden terwijl jij uit je wormgat wordt gezet.",
     "faq": {
       "whyNexum": {
-        "q": "Why Nexum?",
-        "a": "Nexum is the Latin word for a bond or connection — which felt appropriate for a tool built around mapping the connections between wormhole systems. It also sounds vaguely like something you'd find floating in a C6 magnetar, which was really the deciding factor."
+        "q": "Waarom Nexum?",
+        "a": "Nexum is het Latijnse woord voor een band of verbinding — wat goed paste bij een tool die draait om het karteren van de verbindingen tussen wormgatsystemen. Het klinkt ook vaag als iets dat je in een C6-magnetar ziet ronddrijven, en dat was eerlijk gezegd de beslissende factor."
       },
       "multipleAccounts": {
-        "q": "Can I use multiple accounts?",
-        "a": "Yes — each EVE character gets their own set of maps. Just log in with a different character via EVE SSO and Nexum will keep their maps completely separate. No cross-contamination, no accidental sharing of your super-secret wormhole chain with your alt corp."
+        "q": "Kan ik meerdere accounts gebruiken?",
+        "a": "Ja — elk EVE-character krijgt zijn eigen set kaarten. Log gewoon met een ander character in via EVE SSO en Nexum houdt die kaarten volledig gescheiden. Geen vermenging, en geen per ongeluk gedeelde supergeheime wormgatketen met je altcorp."
       },
       "dataSafe": {
-        "q": "Is my data safe?",
-        "a": "Nexum never sees your EVE password — authentication is handled entirely by CCP's EVE SSO. The only thing stored is your character identity and the maps you build. Your map data lives in a private database and is not shared with anyone. That said, don't use Nexum for your alliance's top-secret invasion route — no tool on the internet is a substitute for good operational security."
+        "q": "Zijn mijn gegevens veilig?",
+        "a": "Nexum ziet je EVE-wachtwoord nooit — het inloggen gaat volledig via EVE SSO van CCP. Het enige dat wordt bewaard is de identiteit van je character en de kaarten die je maakt. Je kaartgegevens staan in een privédatabase en worden met niemand gedeeld. Dat gezegd: gebruik Nexum niet voor de topgeheime invasieroute van je alliance — geen enkele tool op het internet vervangt goede operationele veiligheid."
       },
       "reportBugs": {
-        "q": "Can I report bugs, add feedback and request features?",
-        "a": "Absolutely. The project is open source on <gh>GitHub</gh> — open an issue for bugs or feature requests, or submit a pull request if you're feeling brave. Feedback via in-game mail to the character tied to this account also works if GitHub isn't your thing."
+        "q": "Kan ik bugs melden, feedback geven en functies voorstellen?",
+        "a": "Absoluut. Het project is open source op <gh>GitHub</gh> — open een issue voor bugs of ideeën, of stuur een pull request in als je je dapper voelt. Feedback via in-game mail naar het character achter dit account werkt ook, als GitHub niets voor je is."
       },
       "runYourself": {
-        "q": "Can I run this myself?",
-        "a": "Yes — Nexum is fully self-hostable. The source is on <gh>GitHub</gh> and the whole stack spins up with a single <code>docker compose up</code>. You'll need to register your own EVE application on the <devportal>CCP developer portal</devportal> to get SSO credentials, but beyond that the README covers everything — including importing the EVE static data and pointing Traefik at it if that's your thing. If something breaks, open an issue. If you fix it, please open a PR.<br></br><br></br>It isn't the most technical thing to run up but I'd recommend you have basic knownledge of docker and whatever server your running on (Linux?)"
+        "q": "Kan ik dit zelf hosten?",
+        "a": "Ja — Nexum is volledig zelf te hosten. De broncode staat op <gh>GitHub</gh> en de hele stack komt omhoog met één <code>docker compose up</code>. Je moet je eigen EVE-applicatie registreren op het <devportal>ontwikkelaarsportaal van CCP</devportal> om SSO-gegevens te krijgen, maar verder staat alles in de README — ook het importeren van de statische EVE-data en het erop richten van Traefik, als je dat wilt. Gaat er iets stuk, open dan een issue. Repareer je het, stuur dan graag een PR.<br></br><br></br>Het is niet het meest technische om op te zetten, maar ik raad wel basiskennis van Docker aan en van de server waarop je draait (Linux?)"
       },
       "goonTrust": {
-        "q": "But you're a Goon, why would we trust you?",
-        "a": "Fair question, and honestly the correct instinct to have in New Eden. The code is fully open source — you're welcome to read every line, run it yourself, or have someone you trust audit it. Nexum has no interest in your scouting routes, your corp's killboard shame, or whatever you've got parked in that C5. The worst thing a Goon has ever done in a wormhole is get evicted from one, and I'd like to help you avoid that fate."
+        "q": "Maar je bent een Goon, waarom zouden we je vertrouwen?",
+        "a": "Terechte vraag, en eerlijk gezegd precies het juiste instinct in New Eden. De code is volledig open source — je mag elke regel lezen, het zelf draaien, of iemand die je vertrouwt het laten doorlichten. Nexum heeft geen enkele belangstelling voor je scoutroutes, de killboardschande van je corp of wat je daar in die C5 hebt staan. Het ergste dat een Goon ooit in een wormgat heeft gedaan is eruit gezet worden, en ik help je dat lot graag vermijden."
       },
       "roadmap": {
-        "q": "Do you have a roadmap for new features?",
-        "a": "Loosely. Currently the system only works with solo players. The next logical thing would be to implement this for Corporations and Alliances. Once I iron out any bugs from this initial launch, I'll start work on that.<br></br>This does assume real life work doesn't get in the way!<br></br><br></br>If you have any pressing feature you want, drop me a message ingame and we can chat."
+        "q": "Heb je een roadmap voor nieuwe functies?",
+        "a": "Losjes. Op dit moment werkt het systeem alleen voor solospelers. De volgende logische stap is dit voor corporations en alliances uitwerken. Zodra de bugs uit deze eerste versie zijn, begin ik daaraan.<br></br>Dat gaat er wel van uit dat het echte leven niet in de weg komt!<br></br><br></br>Heb je een functie die je echt wilt, stuur me dan in het spel een bericht en dan praten we."
       },
       "donateIsk": {
-        "q": "Can I donate ISK?",
-        "a": "I prefer it if you did not, no. I'm not doing this for ISK so keep it and spend it on something to blow up in or blow someone else up in!"
+        "q": "Kan ik ISK doneren?",
+        "a": "Liever niet, nee. Ik doe dit niet voor de ISK, dus hou het en koop er iets van om in opgeblazen te worden of om iemand anders mee op te blazen!"
       }
     },
-    "footer": "EVE Online and the EVE logo are the registered trademarks of CCP hf. All rights reserved worldwide. Nexum is a third-party tool and is not affiliated with or endorsed by CCP hf. · <license>License & EVE IP notice</license>"
+    "footer": "EVE Online en het EVE-logo zijn geregistreerde handelsmerken van CCP hf. Alle rechten wereldwijd voorbehouden. Nexum is een tool van derden en is niet verbonden met of goedgekeurd door CCP hf. · <license>Licentie en EVE IP-vermelding</license>"
   },
   "language": {
     "label": "Taal"
