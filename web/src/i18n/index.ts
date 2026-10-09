@@ -77,7 +77,18 @@ export function ensureLanguage(lng: string): Promise<void> {
   let p = loaded.get(base);
   if (!p) {
     p = load()
-      .then((m) => { i18n.addResourceBundle(base, 'common', m.default, true, true); })
+      .then((m) => {
+        i18n.addResourceBundle(base, 'common', m.default, true, true);
+        // i18next fixes resolvedLanguage at init to the first language in the
+        // chain that HAS resources -- and at init only English does. So a lazy
+        // locale resolves to 'en' and stays there even once its bundle lands:
+        // the strings render translated while resolvedLanguage still reads
+        // 'en', which is what the language switcher labels itself from. Re-run
+        // changeLanguage so it re-resolves now the bundle is actually present.
+        if (i18n.resolvedLanguage !== base && (i18n.language || '').split('-')[0] === base) {
+          void i18n.changeLanguage(base);
+        }
+      })
       .catch(() => { /* keep English rather than failing the app */ });
     loaded.set(base, p);
   }
