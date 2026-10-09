@@ -15,6 +15,7 @@
   var LANGS = [
     { code: 'en', name: 'English',  flag: 'GB' },
     { code: 'de', name: 'Deutsch',  flag: 'DE' },
+    { code: 'nl', name: 'Nederlands', flag: 'NL' },
     { code: 'fr', name: 'Français', flag: 'FR' },
     { code: 'es', name: 'Español',  flag: 'ES' },
     { code: 'pt', name: 'Português', flag: 'PT' },
