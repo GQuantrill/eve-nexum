@@ -7,7 +7,7 @@ import enCommon from './locales/en/common.json';
 // Languages we ship translations for. Add a code here AND a matching
 // locales/<code>/common.json file to add a language. Native language names
 // live in the LanguageSwitcher (they read the same in every locale).
-export const SUPPORTED_LANGUAGES = ['en', 'de', 'fr', 'es', 'pt', 'zh', 'ko', 'ja', 'ru'] as const;
+export const SUPPORTED_LANGUAGES = ['en', 'de', 'nl', 'fr', 'es', 'pt', 'zh', 'ko', 'ja', 'ru'] as const;
 export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
 
 // Native language names, each prefixed with a flag emoji. These read the same
@@ -19,6 +19,7 @@ export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
 export const LANGUAGE_NAMES: Record<SupportedLanguage, string> = {
   en: 'English',
   de: 'Deutsch',
+  nl: 'Nederlands',
   fr: 'Français',
   es: 'Español',
   pt: 'Português',
@@ -48,6 +49,7 @@ export const resources = {
 // template literal so the bundler can see each path and give it its own chunk.
 const LOADERS: Record<string, () => Promise<{ default: object }>> = {
   de: () => import('./locales/de/common.json'),
+  nl: () => import('./locales/nl/common.json'),
   fr: () => import('./locales/fr/common.json'),
   es: () => import('./locales/es/common.json'),
   pt: () => import('./locales/pt/common.json'),
