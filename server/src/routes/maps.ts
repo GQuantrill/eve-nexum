@@ -346,6 +346,12 @@ const pendingK162 = new Map<string, PendingK162>();
 // Personal maps never notify, so we skip them without a DB round-trip.
 function hasOrg(meta: MapMeta): boolean { return meta.corpId != null || meta.allianceId != null; }
 
+/** True when this signature write came from the Thera/Turnur copy button,
+ *  identified by the provenance id that button stamps on every row it writes. */
+function fromScoutFeed(scoutConnectionId: unknown): boolean {
+  return typeof scoutConnectionId === 'string' && scoutConnectionId.length > 0;
+}
+
 export function dispatchK162(meta: MapMeta, sigId: string, systemId: string, actor: string | null): void {
   if (!hasOrg(meta)) {
     discordLog.info(`K162 detected (system ${systemId}) but not sending — personal map (no corp/alliance)`);
@@ -4174,7 +4180,14 @@ mapsRouter.post('/:mapId/systems/:systemId/signatures', async (req, res) => {
       scoutConnectionId: typeof scoutConnectionId === 'string' && scoutConnectionId ? scoutConnectionId : null },
     { userId: me.userId, clientId: req.get('x-client-id') ?? null },
   );
-  if ((whType ?? '').toUpperCase() === 'K162') dispatchK162(access, row.id, systemId, me.characterName);
+  // A K162 copied from the Thera/Turnur feed is bookkeeping, not a sighting:
+  // the hole was already on a public listing and the pilot is looking at the
+  // row as they press the button. Half of a bulk copy is K162 by definition
+  // (every hole is K162 at one end), so dispatching here would fire a notice
+  // per connection. Suppressed on provenance, like the other bulk writes.
+  if (!fromScoutFeed(scoutConnectionId) && (whType ?? '').toUpperCase() === 'K162') {
+    dispatchK162(access, row.id, systemId, me.characterName);
+  }
   res.status(201).json(row);
 });
 
@@ -4191,7 +4204,12 @@ mapsRouter.patch('/:mapId/systems/:systemId/signatures/:sigId', async (req, res)
   );
   // Discord notice fires once on a transition into K162; flush any pending
   // notice the moment the leads-to is known. (Both decided inside updateSignature.)
-  if (shouldDispatch) dispatchK162(access, sigId, systemId, me.characterName);
+  // See the POST above for why a feed-sourced K162 does not notify. A flush
+  // still runs: it only releases a notice an earlier, human K162 already
+  // queued, and that one is worth sending once its destination is known.
+  if (shouldDispatch && !fromScoutFeed(updates.scoutConnectionId)) {
+    dispatchK162(access, sigId, systemId, me.characterName);
+  }
   if (shouldFlush) flushK162(sigId);
   res.json({ ok: true });
 });

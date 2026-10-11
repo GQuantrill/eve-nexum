@@ -1,12 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import { sigWritesFor, allSigWrites, sigKey, scoutSizeToConnSize, scoutTimeStatus,
-         connWriteFor, allConnWrites, pairKey } from './scoutSigCopy';
+         connWriteFor, allConnWrites, pairKey, endTypes } from './scoutSigCopy';
 import type { ScoutLike, MappedSystem } from './scoutSigCopy';
 
 const conn = (over: Partial<ScoutLike> = {}): ScoutLike => ({
   id: 'sc-1', whType: 'C729', maxShipSize: 'medium', remainingHours: 16,
   inSystemId: 30000142, inSystemName: 'Jita',
-  inSignature: 'ABC-123', outSignature: 'XYZ-789', ...over,
+  inSignature: 'ABC-123', outSignature: 'XYZ-789', whExitsOutward: false, ...over,
 });
 const sys = (id: string, name: string, eveSystemId: number | null): MappedSystem =>
   ({ id, name, eveSystemId });
@@ -20,9 +20,11 @@ describe('sigWritesFor', () => {
   });
 
   it('writes the hub end too when the hub is mapped, pointing back', () => {
+    // K162, not C729: this hole spawned at the far end, so the hub side is the
+    // one you arrive at. Stamping C729 here would say Thera spawned it.
     const w = sigWritesFor(conn(), [sys('h', 'Thera', 31000005)], 'Thera');
     expect(w).toEqual([{ systemId: 'h', systemName: 'Thera', sigId: 'XYZ-789',
-                         whType: 'C729', whLeadsTo: 'Jita', timeStatus: 'lessThan24h',
+                         whType: 'K162', whLeadsTo: 'Jita', timeStatus: 'lessThan24h',
                          scoutId: 'sc-1' }]);
   });
 
@@ -44,6 +46,52 @@ describe('sigWritesFor', () => {
 
   it('matches the hub by name regardless of case', () => {
     expect(sigWritesFor(conn(), [sys('h', 'thera', 31000005)], 'Thera')).toHaveLength(1);
+  });
+
+  // A wormhole carries its code at ONE end and K162 at the other. eve-scout's
+  // listing shows the code for both, which is the right thing to read but the
+  // wrong thing to copy: it would claim each side spawned the hole.
+  it('puts the code on the far end and K162 at the hub for an inbound hole', () => {
+    const both = [sys('s1', 'Jita', 30000142), sys('h', 'Thera', 31000005)];
+    const w = sigWritesFor(conn({ whExitsOutward: false }), both, 'Thera');
+    expect(w.map((x) => [x.systemName, x.whType])).toEqual([['Jita', 'C729'], ['Thera', 'K162']]);
+  });
+
+  it('puts the code at the hub and K162 on the far end for an outbound hole', () => {
+    const both = [sys('s1', 'Jita', 30000142), sys('h', 'Thera', 31000005)];
+    const w = sigWritesFor(conn({ whExitsOutward: true }), both, 'Thera');
+    expect(w.map((x) => [x.systemName, x.whType])).toEqual([['Jita', 'K162'], ['Thera', 'C729']]);
+  });
+
+  it('points each end at the other whichever way the hole runs', () => {
+    // Direction decides the CODE, never the destination: both ends still lead
+    // to the system at the other end.
+    const both = [sys('s1', 'Jita', 30000142), sys('h', 'Thera', 31000005)];
+    for (const outward of [true, false]) {
+      const w = sigWritesFor(conn({ whExitsOutward: outward }), both, 'Thera');
+      expect(w.map((x) => x.whLeadsTo)).toEqual(['Thera', 'Jita']);
+    }
+  });
+});
+
+describe('endTypes', () => {
+  // For Thera the code alone would be enough -- the types that lead there lead
+  // ONLY there. Turnur is an ordinary low-sec system, so a low-to-low type
+  // like N944 is listed in both directions and the code cannot tell you which
+  // end is which. The feed's own flag is the only thing that can.
+  it('reads the same code in both directions off the feed flag', () => {
+    expect(endTypes({ whType: 'N944', whExitsOutward: true }))
+      .toEqual({ hub: 'N944', far: 'K162' });
+    expect(endTypes({ whType: 'N944', whExitsOutward: false }))
+      .toEqual({ hub: 'K162', far: 'N944' });
+  });
+
+  it('never puts the code on both ends', () => {
+    for (const outward of [true, false]) {
+      const { hub, far } = endTypes({ whType: 'C729', whExitsOutward: outward });
+      expect([hub, far].filter((c) => c === 'K162')).toHaveLength(1);
+      expect([hub, far].filter((c) => c === 'C729')).toHaveLength(1);
+    }
   });
 });
 
@@ -131,6 +179,13 @@ describe('connWriteFor', () => {
     // side effect of copying signatures.
     expect(connWriteFor(conn(), [far], 'Thera')).toBeNull();
     expect(connWriteFor(conn(), [hub], 'Thera')).toBeNull();
+  });
+
+  it('labels the hole with its real code whichever end spawned it', () => {
+    // The K162 belongs on a signature row, not on the connection: the map
+    // labels the link with the type that identifies the hole.
+    expect(connWriteFor(conn({ whExitsOutward: true }), [far, hub], 'Thera')?.whType).toBe('C729');
+    expect(connWriteFor(conn({ whExitsOutward: false }), [far, hub], 'Thera')?.whType).toBe('C729');
   });
 
   it('takes size from the feed, which reports it directly', () => {

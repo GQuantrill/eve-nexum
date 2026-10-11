@@ -21,6 +21,9 @@ export interface ScoutLike {
   inSystemName:  string;
   inSignature:   string | null;
   outSignature:  string | null;
+  /** True when the hole spawned at the HUB and exits outward, so the hub end
+   *  carries the code and the far end is the K162. False is the reverse. */
+  whExitsOutward: boolean;
 }
 
 /** The parts of a mapped system this needs. */
@@ -67,6 +70,31 @@ export function scoutSizeToConnSize(maxShipSize: string): ConnectionSize | null 
   return SIZE_FROM_SCOUT[(maxShipSize ?? '').toLowerCase()] ?? null;
 }
 
+/** The far side of every wormhole, named from the side that didn't spawn it. */
+const K162 = 'K162';
+
+/**
+ * The wormhole code to write at each end of a connection.
+ *
+ * A wormhole carries its designated code at exactly ONE end -- the side it
+ * spawned on -- and K162 at the other. eve-scout's listing reports only the
+ * code, at both ends, because the code is the useful thing to read; but
+ * copying it to both ends of the map asserts that each side spawned the hole,
+ * which is false for one of them and leaves (say) a pile of "leads to Thera"
+ * codes sitting inside Thera.
+ *
+ * `wh_exits_outward` is the feed's own answer to which end is which, and it
+ * is the only answer available: for Thera the code alone would do, since the
+ * types that lead there lead ONLY there, but Turnur is an ordinary low-sec
+ * system and a type like N944 (ls -> ls) shows up in both directions.
+ */
+export function endTypes(conn: Pick<ScoutLike, 'whType' | 'whExitsOutward'>):
+  { hub: string; far: string } {
+  return conn.whExitsOutward
+    ? { hub: conn.whType, far: K162 }
+    : { hub: K162, far: conn.whType };
+}
+
 /**
  * The signature rows a connection contributes, for whichever of its two ends
  * are on the map.
@@ -84,12 +112,15 @@ export function sigWritesFor(
   conn: ScoutLike, systems: MappedSystem[], hubName: string,
 ): SigWrite[] {
   const out: SigWrite[] = [];
+  // The code belongs on the end that spawned the hole; the other end is a
+  // K162. Writing the listing's code to both would claim each side spawned it.
+  const code = endTypes(conn);
 
   const far = systems.find((s) => s.eveSystemId === conn.inSystemId);
   if (far && conn.inSignature) {
     out.push({
       systemId: far.id, systemName: far.name,
-      sigId: conn.inSignature, whType: conn.whType, whLeadsTo: hubName,
+      sigId: conn.inSignature, whType: code.far, whLeadsTo: hubName,
       timeStatus: scoutTimeStatus(conn.remainingHours), scoutId: conn.id,
     });
   }
@@ -100,7 +131,7 @@ export function sigWritesFor(
   if (hub && conn.outSignature) {
     out.push({
       systemId: hub.id, systemName: hub.name,
-      sigId: conn.outSignature, whType: conn.whType, whLeadsTo: conn.inSystemName,
+      sigId: conn.outSignature, whType: code.hub, whLeadsTo: conn.inSystemName,
       timeStatus: scoutTimeStatus(conn.remainingHours), scoutId: conn.id,
     });
   }
