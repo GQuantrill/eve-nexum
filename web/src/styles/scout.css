@@ -87,6 +87,23 @@
 }
 
 /* "Add System" affordance at the bottom of the Closest Systems pane. */
+/* Scope toggle in Closest Systems: this pane routes across every map the user
+   can see, which is useful and was previously invisible. Quiet by default —
+   it reports a mode rather than inviting a change. */
+.closest-pane__scope {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  font-size: calc(12px * var(--font-scale, 1));
+  color: var(--text-dim);
+  cursor: pointer;
+  user-select: none;
+
+  &:hover { color: var(--text-secondary); }
+  input { cursor: pointer; margin: 0; }
+}
+
 .scout-pane__add {
   display: inline-flex;
   align-items: center;

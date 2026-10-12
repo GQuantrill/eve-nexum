@@ -530,7 +530,9 @@
     "signIn": "Melde dich an und docke in K-Space, um Sprünge zu Hubs zu sehen, oder aktiviere die Routen-Shortcut-Optionen, um von einem Wurmloch oder Thera aus zu routen.",
     "searchPlaceholder": "Systemname suchen…",
     "onList": "auf Liste",
-    "noMatch": "Keine Systeme passen zu \"{{query}}\""
+    "noMatch": "Keine Systeme passen zu \"{{query}}\"",
+    "allMaps": "Über alle meine Karten routen",
+    "allMapsHint": "Entfernungen dürfen die Wurmlochketten jeder für dich sichtbaren Karte nutzen, nicht nur der geöffneten. Schalte dies aus, um nur über die Karte auf dem Bildschirm zu routen."
   },
   "commandPalette": {
     "placeholder": "Systeme und Karten suchen…",
@@ -1738,7 +1740,8 @@
     "riskCritical": "Kritische Masse",
     "riskFrig": "Fregatten-Loch",
     "jspaceNoWaypoint": "Wurmloch-Systeme können nicht als Autopilot-Ziel gesetzt werden.",
-    "viaAnsiblex": "Ansiblex-Sprungtor"
+    "viaAnsiblex": "Ansiblex-Sprungtor",
+    "viaMap": "auf {{map}}"
   },
   "routeToast": {
     "destinationSet": "Ziel festgelegt auf {{system}}",
@@ -2040,7 +2043,12 @@
     "trackJumpsTooltipOn": "Sprünge werden verfolgt — neue Systeme werden hinzugefügt, während du dich bewegst",
     "updateAvailable": "Update verfügbar",
     "updateAvailableVersion": "Update verfügbar: v{{version}}",
-    "userStats": "Benutzerstatistik"
+    "userStats": "Benutzerstatistik",
+    "hideThisMap": "Aus meiner Liste ausblenden",
+    "hideThisMapHint": "Entfernt diese Karte nur aus deinem Umschalter. Sie wurde mit deiner Corp oder Allianz geteilt, es gibt also keine persönliche Freigabe aufzugeben — für alle anderen bleibt sie. Du kannst sie hier wiederherstellen.",
+    "hiddenMaps": "Ausgeblendete Karten ({{count}})",
+    "unhideMap": "wiederherstellen",
+    "unhideMapHint": "Diese Karte wieder in deiner Liste anzeigen"
   },
   "units": {
     "jumps_one": "{{count}} Sprung",

@@ -13,6 +13,9 @@ export interface EdgeMeta {
   critical?: boolean;
   frig?:     boolean;
   whType?:   string;
+  /** Which of the user's maps contributed this hop — the closest-systems pane
+   *  unions them all, so a hole can come from a map that isn't on screen. */
+  mapName?:  string;
 }
 
 export interface RoutePathNode {

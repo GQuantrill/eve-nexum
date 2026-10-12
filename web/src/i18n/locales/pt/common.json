@@ -530,7 +530,9 @@
     "signIn": "Inicia sessão e atraca em K-space para ver os saltos até aos hubs, ou ativa as opções de atalho de rota para traçar rotas a partir de um wormhole ou de Thera.",
     "searchPlaceholder": "Procurar nome de sistema…",
     "onList": "na lista",
-    "noMatch": "Nenhum sistema corresponde a «{{query}}»"
+    "noMatch": "Nenhum sistema corresponde a «{{query}}»",
+    "allMaps": "Calcular em todos os meus mapas",
+    "allMapsHint": "As distâncias podem usar as cadeias de buracos de minhoca de qualquer mapa que consiga ver, não apenas o aberto. Desligue para traçar rotas só pelo mapa no ecrã."
   },
   "commandPalette": {
     "placeholder": "Procurar sistemas e mapas…",
@@ -1738,7 +1740,8 @@
     "riskCritical": "Massa crítica",
     "riskFrig": "Buraco de fragata",
     "jspaceNoWaypoint": "Sistemas de buraco de minhoca não podem ser definidos como destino do piloto automático.",
-    "viaAnsiblex": "Portão de salto Ansiblex"
+    "viaAnsiblex": "Portão de salto Ansiblex",
+    "viaMap": "em {{map}}"
   },
   "routeToast": {
     "destinationSet": "Destino definido para {{system}}",
@@ -2040,7 +2043,12 @@
     "trackJumpsTooltipOn": "A seguir saltos — novos sistemas são adicionados à medida que te moves",
     "updateAvailable": "Atualização disponível",
     "updateAvailableVersion": "Atualização disponível: v{{version}}",
-    "userStats": "Estatísticas de utilizador"
+    "userStats": "Estatísticas de utilizador",
+    "hideThisMap": "Ocultar da minha lista",
+    "hideThisMapHint": "Remove este mapa apenas do seu seletor. Foi partilhado com a sua corporação ou aliança, por isso não há um acesso pessoal a abdicar — todos os outros mantêm-no. Pode restaurá-lo aqui.",
+    "hiddenMaps": "Mapas ocultos ({{count}})",
+    "unhideMap": "restaurar",
+    "unhideMapHint": "Mostrar este mapa novamente na sua lista"
   },
   "units": {
     "jumps_one": "{{count}} salto",

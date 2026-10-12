@@ -33,12 +33,16 @@ export interface CharacterLocation {
   online: boolean;
   system: CharacterLocationSystem | null;
   ship:   CharacterShip | null;
+  /** Docked in a station or structure. A clone jump needs one at both ends,
+   *  so the jump tracker uses this to tell one from a flown hop. */
+  docked: boolean;
 }
 
 interface RawLocationResponse {
   online: boolean;
   system: CharacterLocationSystem | null;
   ship:   CharacterShip | null;
+  docked?: boolean;
 }
 
 // ESI caches character location for ~5 s. We poll every 10 s: a system change
@@ -56,7 +60,7 @@ const OFFLINE_POLL_MS = 60_000;
 // one poll period is not going to be useful, and letting it outlive its own tick
 // is what used to wedge tracking. See the load() de-dupe below.
 const POLL_TIMEOUT_MS = 8_000;
-const EMPTY: CharacterLocation = { online: false, system: null, ship: null };
+const EMPTY: CharacterLocation = { online: false, system: null, ship: null, docked: false };
 
 // The users.id of the character THIS TAB currently acts as: the per-tab pinned
 // character (routeOrigin) when set, else the tab's own session-active character.
@@ -175,7 +179,7 @@ function load(): Promise<CharacterLocation> {
   // it stalled.
   inflight = api<RawLocationResponse>(`/api/character/${charId}/location`, { timeoutMs: POLL_TIMEOUT_MS })
     .then(r => {
-      const data: CharacterLocation = { online: r.online, system: r.system, ship: r.ship ?? null };
+      const data: CharacterLocation = { online: r.online, system: r.system, ship: r.ship ?? null, docked: r.docked ?? false };
       inflight = null;
       // Feeds the shared signal every other poller backs off on.
       setPilotOnline(r.online);

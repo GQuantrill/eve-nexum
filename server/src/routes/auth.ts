@@ -772,6 +772,8 @@ const SETTINGS_ALLOWLIST = new Set<string>([
   'nexum.activity.combined',
   'nexum.closestSystems.hiddenHome',
   'nexum.closestSystems.list',
+  'nexum.closestSystems.allMaps',
+  'nexum.maps.hidden',
   'nexum.killboardIncludeNpc',
   'nexum.mapSidebar.connections',
   'nexum.mapSidebar.export',

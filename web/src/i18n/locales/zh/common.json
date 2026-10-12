@@ -530,7 +530,9 @@
     "signIn": "登录并在 K空间停靠以查看到各枢纽的跳数，或启用路线快捷方式选项以从虫洞或 Thera 计算路线。",
     "searchPlaceholder": "搜索星系名称…",
     "onList": "在列表中",
-    "noMatch": "没有星系匹配「{{query}}」"
+    "noMatch": "没有星系匹配「{{query}}」",
+    "allMaps": "跨所有地图计算路线",
+    "allMapsHint": "距离可以使用你能看到的任何地图上的虫洞链，而不仅是当前打开的地图。关闭后将只通过屏幕上的地图计算路线。"
   },
   "commandPalette": {
     "placeholder": "搜索星系和地图…",
@@ -1738,7 +1740,8 @@
     "riskCritical": "质量临界",
     "riskFrig": "护卫舰洞",
     "jspaceNoWaypoint": "虫洞星系无法设为自动驾驶目的地。",
-    "viaAnsiblex": "Ansiblex 跳跃门"
+    "viaAnsiblex": "Ansiblex 跳跃门",
+    "viaMap": "来自 {{map}}"
   },
   "routeToast": {
     "destinationSet": "目的地已设为 {{system}}",
@@ -2040,7 +2043,12 @@
     "trackJumpsTooltipOn": "正在跟踪跳跃 — 随着你移动会添加新星系",
     "updateAvailable": "有可用更新",
     "updateAvailableVersion": "有可用更新：v{{version}}",
-    "userStats": "用户统计"
+    "userStats": "用户统计",
+    "hideThisMap": "从我的列表中隐藏",
+    "hideThisMapHint": "仅将此地图从你的切换器中移除。它是共享给你的军团或联盟的，因此没有可放弃的个人授权——其他人仍可看到。你可以在这里恢复它。",
+    "hiddenMaps": "已隐藏的地图（{{count}}）",
+    "unhideMap": "恢复",
+    "unhideMapHint": "在你的列表中重新显示此地图"
   },
   "units": {
     "jumps_one": "{{count}} 跳",

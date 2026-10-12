@@ -530,7 +530,9 @@
     "signIn": "Connectez-vous et arrimez en K-space pour voir les sauts vers les hubs, ou activez les options de raccourcis d'itinéraire pour calculer un itinéraire depuis un trou de ver ou Thera.",
     "searchPlaceholder": "Rechercher un nom de système…",
     "onList": "dans la liste",
-    "noMatch": "Aucun système ne correspond à « {{query}} »"
+    "noMatch": "Aucun système ne correspond à « {{query}} »",
+    "allMaps": "Calculer sur toutes mes cartes",
+    "allMapsHint": "Les distances peuvent emprunter les chaînes de trous de ver de toutes les cartes que vous pouvez voir, pas seulement celle ouverte. Désactivez ceci pour ne router que par la carte à l'écran."
   },
   "commandPalette": {
     "placeholder": "Rechercher systèmes et cartes…",
@@ -1738,7 +1740,8 @@
     "riskCritical": "Masse critique",
     "riskFrig": "Trou frégate",
     "jspaceNoWaypoint": "Les systèmes de trou de ver ne peuvent pas être définis comme destination du pilote automatique.",
-    "viaAnsiblex": "Porte de saut Ansiblex"
+    "viaAnsiblex": "Porte de saut Ansiblex",
+    "viaMap": "sur {{map}}"
   },
   "routeToast": {
     "destinationSet": "Destination définie sur {{system}}",
@@ -2040,7 +2043,12 @@
     "trackJumpsTooltipOn": "Suivi des sauts — de nouveaux systèmes sont ajoutés au fil de vos déplacements",
     "updateAvailable": "Mise à jour disponible",
     "updateAvailableVersion": "Mise à jour disponible : v{{version}}",
-    "userStats": "Statistiques utilisateur"
+    "userStats": "Statistiques utilisateur",
+    "hideThisMap": "Masquer de ma liste",
+    "hideThisMapHint": "Retire cette carte de votre sélecteur uniquement. Elle a été partagée avec votre corporation ou alliance : il n'y a donc aucun accès personnel à abandonner, et tous les autres la conservent. Vous pouvez la restaurer ici.",
+    "hiddenMaps": "Cartes masquées ({{count}})",
+    "unhideMap": "restaurer",
+    "unhideMapHint": "Réafficher cette carte dans votre liste"
   },
   "units": {
     "jumps_one": "{{count}} saut",

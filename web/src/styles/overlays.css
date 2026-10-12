@@ -181,6 +181,16 @@
   display: block;
   color: var(--text-dim);
 }
+/* A map the user has hidden from their own switcher, listed under the
+   "Hidden maps" row so it can be restored. Dimmed so it reads as parked
+   rather than selectable — clicking it restores rather than switches. */
+.map-dropdown__item--hidden {
+  color: var(--text-dim);
+  font-style: italic;
+
+  &:hover { color: var(--text-secondary); }
+}
+
 .map-dropdown__badge--lock { background: transparent; border: none; font-size: calc(12px * var(--font-scale, 1)); }
 
 .toolbar__actions { display: flex; gap: 8px; }
