@@ -1367,7 +1367,8 @@
     "shareCount": "Delen met {{count}}",
     "batchShared": "De kaart gedeeld met {{count}}.",
     "batchPartial": "Gedeeld met {{shared}}; {{skipped}} overgeslagen.",
-    "batchNone": "Kon niet delen — {{count}} overgeslagen."
+    "batchNone": "Kon niet delen — {{count}} overgeslagen.",
+    "optedOut": "{{count}} heeft deze kaart uit de eigen lijst verborgen. Ze houden toegang — een corp- of alliance-share kun je niet individueel verlaten."
   },
   "mapSidebar": {
     "activityHint": "Toon grafieken voor het volgende:",

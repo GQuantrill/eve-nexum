@@ -1367,7 +1367,8 @@
     "shareCount": "与 {{count}} 个共享",
     "batchShared": "已将地图共享给 {{count}} 个。",
     "batchPartial": "已共享 {{shared}} 个；跳过 {{skipped}} 个。",
-    "batchNone": "无法共享 — 跳过 {{count}} 个。"
+    "batchNone": "无法共享 — 跳过 {{count}} 个。",
+    "optedOut": "{{count}} 人已将此地图从自己的列表中隐藏。他们仍有访问权限——军团或联盟共享无法由个人退出。"
   },
   "mapSidebar": {
     "activityHint": "显示以下图表：",

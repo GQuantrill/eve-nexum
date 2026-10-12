@@ -1367,7 +1367,8 @@
     "shareCount": "Partager avec {{count}}",
     "batchShared": "Carte partagée avec {{count}}.",
     "batchPartial": "Partagé avec {{shared}} ; {{skipped}} ignoré(s).",
-    "batchNone": "Impossible de partager — {{count}} ignoré(s)."
+    "batchNone": "Impossible de partager — {{count}} ignoré(s).",
+    "optedOut": "{{count}} ont masqué cette carte de leur propre liste. Ils y ont toujours accès — un partage de corporation ou d'alliance ne peut pas être quitté individuellement."
   },
   "mapSidebar": {
     "activityHint": "Afficher les graphiques pour :",

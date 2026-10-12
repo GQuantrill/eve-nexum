@@ -252,6 +252,7 @@ export function Toolbar() {
   const requestFitView  = useMapStore((s) => s.requestFitView);
   const deleteMap       = useMapStore((s) => s.deleteMap);
   const leaveShare      = useMapStore((s) => s.leaveShare);
+  const restoreShare    = useMapStore((s) => s.restoreShare);
   const mapOptionsOpen  = useMapStore((s) => s.mapOptionsOpen);
   const setMapOptionsOpen = useMapStore((s) => s.setMapOptionsOpen);
   const trackJumps      = useMapStore((s) => s.trackJumps);
@@ -282,26 +283,24 @@ export function Toolbar() {
   // A map shared with this character specifically (not via corp/alliance) can be
   // dropped from their own list — gates the "Leave shared map" action below.
   const activeCanLeave = !!maps.find((m) => m.id === activeMapId)?.canLeaveShare;
-  // Shared maps this user has hidden from their own switcher. Leaving is only
-  // possible for a grant made to the character: one made to their corp or
-  // alliance has no row that represents them, and deleting it would take the
-  // map away from everyone in the org. Hiding is the per-user equivalent —
-  // it changes nobody else's view and is reversible from the same menu.
-  const [hiddenMapIds, setHiddenMapIds] = useUserSetting<string[]>('nexum.maps.hidden', []);
-  const hiddenSet = useMemo(() => new Set(hiddenMapIds), [hiddenMapIds]);
+  // Leaving an org-shared map records an opt-out server-side rather than
+  // deleting the grant (which belongs to the whole corp). The map keeps coming
+  // back in the payload flagged hiddenByMe, which is what lets the switcher
+  // offer it back — and lets the owner see that someone left.
   const [showHidden, setShowHidden] = useState(false);
-  // Only ever hide a map that was shared with you. Your own maps are deleted,
-  // and an org map disappearing from one member's list would be a puzzle.
-  const activeCanHide = activeIsShared && !activeCanLeave && !hiddenSet.has(activeMapId ?? '');
-  // A hidden map that is somehow still active (hidden in another tab, say) must
-  // stay listed, or the switcher would show nothing selected.
+  // Only ever hide a map shared with you. Your own are deleted, and a personal
+  // grant is properly left instead, which frees it on the owner's list.
+  const activeCanHide = activeIsShared && !activeCanLeave
+    && !maps.find((m) => m.id === activeMapId)?.hiddenByMe;
+  // A hidden map that is somehow still active must stay listed, or the
+  // switcher would show nothing selected.
   const visibleMaps = useMemo(
-    () => maps.filter((m) => !hiddenSet.has(m.id) || m.id === activeMapId),
-    [maps, hiddenSet, activeMapId],
+    () => maps.filter((m) => !m.hiddenByMe || m.id === activeMapId),
+    [maps, activeMapId],
   );
   const hiddenMaps = useMemo(
-    () => maps.filter((m) => hiddenSet.has(m.id) && m.id !== activeMapId),
-    [maps, hiddenSet, activeMapId],
+    () => maps.filter((m) => m.hiddenByMe && m.id !== activeMapId),
+    [maps, activeMapId],
   );
   const canManageMaps = useCanCreateMaps();
   const canManageAllianceMaps = useCanManageAllianceMaps();
@@ -547,16 +546,7 @@ export function Toolbar() {
                 <button
                   className="map-dropdown__item map-dropdown__item--danger"
                   data-tooltip={t('toolbar.hideThisMapHint')}
-                  onClick={() => {
-                    const id = activeMapId;
-                    if (!id) return;
-                    setShowMaps(false);
-                    // Move off it first: a hidden map stays listed while active,
-                    // so hiding without switching would look like nothing happened.
-                    const next = maps.find((m) => m.id !== id && !hiddenSet.has(m.id));
-                    setHiddenMapIds([...hiddenMapIds, id]);
-                    if (next) void switchMap(next.id).then(requestFitView);
-                  }}
+                  onClick={() => { setShowMaps(false); void handleLeaveShare(); }}
                 >
                   {t('toolbar.hideThisMap')}
                 </button>
@@ -574,7 +564,7 @@ export function Toolbar() {
                     <button
                       key={m.id}
                       className="map-dropdown__item map-dropdown__item--hidden"
-                      onClick={() => setHiddenMapIds(hiddenMapIds.filter((id) => id !== m.id))}
+                      onClick={() => void restoreShare(m.id)}
                       data-tooltip={t('toolbar.unhideMapHint')}
                     >
                       {m.name}

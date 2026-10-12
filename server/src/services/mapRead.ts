@@ -71,6 +71,14 @@ export async function listVisibleMaps(p: VisibleMapsParams) {
               SELECT 1 FROM map_shares ms
                WHERE ms.map_id = m.id AND ms.target_character_id = $3
             ) AS "canLeaveShare",
+            -- This account has left a map shared with its corp or alliance.
+            -- Reported rather than filtered out: the switcher needs it to
+            -- offer a way back, and an integration reading /api/v1 should not
+            -- lose a map because a human tidied their own list.
+            EXISTS (
+              SELECT 1 FROM map_share_optouts o
+               WHERE o.map_id = m.id AND o.owner_id = $5::int
+            ) AS "hiddenByMe",
             m.locked,
             ou.character_name             AS "ownerName",
             m.allow_as_merge_source       AS "allowAsMergeSource",

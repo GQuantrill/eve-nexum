@@ -46,6 +46,10 @@ export function MapSharesSection() {
   const { t } = useTranslation();
   const mapId  = useMapStore((s) => s.activeMapId);
   const [shares, setShares] = useState<ShareRow[]>([]);
+  // How many accounts have taken this map off their own list. Only an org
+  // grant can be left this way, so this is the only signal the owner gets
+  // that a corp share isn't actually wanted.
+  const [optedOut, setOptedOut] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState<string | null>(null);
 
@@ -76,11 +80,11 @@ export function MapSharesSection() {
     // Deliberate: clears this pane's own state when the record it shows changes.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setStaged([]);
-    if (!mapId) { setShares([]); return; }
+    if (!mapId) { setShares([]); setOptedOut(0); return; }
     setLoading(true);
     setError(null);
-    api<{ shares: ShareRow[] }>(`/api/maps/${mapId}/shares`)
-      .then((r) => setShares(r.shares))
+    api<{ shares: ShareRow[]; optedOut?: number }>(`/api/maps/${mapId}/shares`)
+      .then((r) => { setShares(r.shares); setOptedOut(r.optedOut ?? 0); })
       .catch((e: Error) => setError(e.message))
       .finally(() => setLoading(false));
   }, [mapId]);
@@ -300,6 +304,9 @@ export function MapSharesSection() {
         </button>
       </div>
 
+      {optedOut > 0 && (
+        <div className="map-sidebar__hint">{t('mapShares.optedOut', { count: optedOut })}</div>
+      )}
       <div className="map-shares__list">
         {loading
           ? <div className="map-sidebar__hint">{t('mapShares.loading')}</div>
