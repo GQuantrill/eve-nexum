@@ -1,6 +1,7 @@
 import { db } from '../db.js';
 import { getScoutConnections } from '../routes/scout.js';
 import { edgeKey, type RouteOverlay, type EdgeMeta } from './routeGraph.js';
+import { effectiveExpiryMs } from '../data/whLifetimes.js';
 
 // Thera/Turnur solar-system ids, resolved once by name from the SDE-seeded
 // solar_systems table (both are ordinary rows there) and cached for the process.
@@ -69,16 +70,23 @@ async function addWormholeEdges(o: RouteOverlay, mapIds: string[]): Promise<bool
   if (mapIds.length === 0) return false;
   const { rows } = await db.query<{
     a: number; b: number; whType: string | null;
-    critical: boolean; eol: boolean; frig: boolean;
+    critical: boolean; eol: boolean; frig: boolean; mapName: string;
+    lifetimeExpiresAt: Date | null; eolAt: Date | null; createdAt: Date; graceHours: number;
   }>(
     `SELECT s.eve_system_id AS a, t.eve_system_id AS b,
             c.wh_type AS "whType",
             (c.mass_status = 'critical') AS critical,
             (c.time_status = 'eol' OR (c.eol_at IS NOT NULL AND c.eol_at <= NOW())) AS eol,
-            (c.size = 'small') AS frig
+            (c.size = 'small') AS frig,
+            m.name AS "mapName",
+            c.lifetime_expires_at AS "lifetimeExpiresAt",
+            c.eol_at              AS "eolAt",
+            c.created_at          AS "createdAt",
+            m.collapse_grace_hours AS "graceHours"
        FROM map_connections c
        JOIN map_systems s ON s.id = c.source_id
        JOIN map_systems t ON t.id = c.target_id
+       JOIN maps m ON m.id = c.map_id
       WHERE c.map_id = ANY($1::uuid[])
         AND c.broken = FALSE
         AND c.connection_type = 'standard'
@@ -86,16 +94,46 @@ async function addWormholeEdges(o: RouteOverlay, mapIds: string[]): Promise<bool
         AND t.eve_system_id IS NOT NULL`,
     [mapIds],
   );
+  const now = Date.now();
+  let added = 0;
   for (const r of rows) {
+    if (isPastLife(r, now)) continue;
+    added++;
     addEdge(o, r.a, r.b, {
       kind: 'wormhole',
       whType: r.whType || undefined,
       critical: r.critical,
       eol: r.eol,
       frig: r.frig,
+      mapName: r.mapName,
     });
   }
-  return rows.length > 0;
+  return added > 0;
+}
+
+/**
+ * True when a hole is far enough past its estimated collapse that routing
+ * through it would send someone to a gap.
+ *
+ * Deliberately the SAME threshold the lifetime sweep uses to sever a hole
+ * (expiry + the map's collapse grace) and computed with the SAME shared
+ * helper, so routing and the map never disagree about whether a hole is dead.
+ * The difference is only that this applies everywhere: the sweep's severing is
+ * opt-in per map via lazy_remove_wormholes, which defaults off, so on an
+ * ordinary map a long-dead hole keeps its row and kept routing.
+ *
+ * An untyped hole has no computable expiry and is left alone — unknown is not
+ * the same as expired, and dropping those would quietly break hand-drawn
+ * chains that have no wormhole type set.
+ */
+export function isPastLife(
+  r: { lifetimeExpiresAt: Date | null; eolAt: Date | null; whType: string | null;
+       createdAt: Date; graceHours: number },
+  now: number,
+): boolean {
+  const expiry = effectiveExpiryMs(r);
+  if (expiry == null) return false;
+  return now > expiry + r.graceHours * 3_600_000;
 }
 
 // Player Ansiblex jump bridges known on the map (connection_type 'jumpgate').
@@ -104,11 +142,12 @@ async function addWormholeEdges(o: RouteOverlay, mapIds: string[]): Promise<bool
 // route is still flagged usesSpecial like a wormhole.
 async function addAnsiblexEdges(o: RouteOverlay, mapIds: string[]): Promise<boolean> {
   if (mapIds.length === 0) return false;
-  const { rows } = await db.query<{ a: number; b: number }>(
-    `SELECT s.eve_system_id AS a, t.eve_system_id AS b
+  const { rows } = await db.query<{ a: number; b: number; mapName: string }>(
+    `SELECT s.eve_system_id AS a, t.eve_system_id AS b, m.name AS "mapName"
        FROM map_connections c
        JOIN map_systems s ON s.id = c.source_id
        JOIN map_systems t ON t.id = c.target_id
+       JOIN maps m ON m.id = c.map_id
       WHERE c.map_id = ANY($1::uuid[])
         AND c.broken = FALSE
         AND c.connection_type = 'jumpgate'
@@ -116,7 +155,8 @@ async function addAnsiblexEdges(o: RouteOverlay, mapIds: string[]): Promise<bool
         AND t.eve_system_id IS NOT NULL`,
     [mapIds],
   );
-  for (const r of rows) addEdge(o, r.a, r.b, { kind: 'ansiblex' });
+  // A bridge is standing infrastructure, so no lifetime filter applies.
+  for (const r of rows) addEdge(o, r.a, r.b, { kind: 'ansiblex', mapName: r.mapName });
   return rows.length > 0;
 }
 

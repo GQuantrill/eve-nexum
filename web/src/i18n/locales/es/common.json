@@ -530,7 +530,9 @@
     "signIn": "Inicia sesión y atraca en K-space para ver los saltos a los hubs, o activa las opciones de atajos de ruta para calcular rutas desde un agujero de gusano o Thera.",
     "searchPlaceholder": "Buscar nombre de sistema…",
     "onList": "en la lista",
-    "noMatch": "Ningún sistema coincide con «{{query}}»"
+    "noMatch": "Ningún sistema coincide con «{{query}}»",
+    "allMaps": "Calcular en todos mis mapas",
+    "allMapsHint": "Las distancias pueden usar las cadenas de agujeros de gusano de cualquier mapa que puedas ver, no solo el abierto. Desactívalo para enrutar únicamente por el mapa en pantalla."
   },
   "commandPalette": {
     "placeholder": "Buscar sistemas y mapas…",
@@ -1738,7 +1740,8 @@
     "riskCritical": "Masa crítica",
     "riskFrig": "Agujero de fragata",
     "jspaceNoWaypoint": "Los sistemas de agujero de gusano no se pueden establecer como destino del piloto automático.",
-    "viaAnsiblex": "Puerta de salto Ansiblex"
+    "viaAnsiblex": "Puerta de salto Ansiblex",
+    "viaMap": "en {{map}}"
   },
   "routeToast": {
     "destinationSet": "Destino establecido en {{system}}",

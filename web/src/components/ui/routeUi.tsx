@@ -20,7 +20,12 @@ function viaLabel(t: TFunction, via: EdgeMeta): string {
     via.critical && t('route.riskCritical'),
     via.frig     && t('route.riskFrig'),
   ].filter(Boolean);
-  return risks.length ? `${kind} (${risks.join(', ')})` : kind;
+  const label = risks.length ? `${kind} (${risks.join(', ')})` : kind;
+  // Name the map a chain hop came from. Closest Systems routes across every
+  // map at once, so without this a hole from a map you are not looking at is
+  // indistinguishable from one in the chain on screen. Scout hubs carry no
+  // map — they come from the public feed.
+  return via.mapName ? `${label} — ${t('route.viaMap', { map: via.mapName })}` : label;
 }
 
 /**

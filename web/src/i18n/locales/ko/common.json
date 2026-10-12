@@ -530,7 +530,9 @@
     "signIn": "로그인하고 K-스페이스에 도킹하면 허브까지의 점프 수를 볼 수 있습니다. 웜홀이나 Thera에서 경로를 계산하려면 경로 지름길 옵션을 활성화하세요.",
     "searchPlaceholder": "성계 이름 검색…",
     "onList": "목록에 있음",
-    "noMatch": "“{{query}}”와 일치하는 성계가 없습니다"
+    "noMatch": "“{{query}}”와 일치하는 성계가 없습니다",
+    "allMaps": "모든 지도에서 경로 계산",
+    "allMapsHint": "거리 계산에 열려 있는 지도뿐 아니라 볼 수 있는 모든 지도의 웜홀 체인을 사용할 수 있습니다. 끄면 화면에 있는 지도로만 경로를 계산합니다."
   },
   "commandPalette": {
     "placeholder": "성계와 지도 검색…",
@@ -1738,7 +1740,8 @@
     "riskCritical": "임계 질량",
     "riskFrig": "프리깃 홀",
     "jspaceNoWaypoint": "웜홀 시스템은 자동 조종 목적지로 설정할 수 없습니다.",
-    "viaAnsiblex": "Ansiblex 점프 게이트"
+    "viaAnsiblex": "Ansiblex 점프 게이트",
+    "viaMap": "{{map}}에서"
   },
   "routeToast": {
     "destinationSet": "목적지가 {{system}}(으)로 설정됨",

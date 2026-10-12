@@ -12,6 +12,10 @@ export interface EdgeMeta {
   critical?: boolean;   // critical mass
   frig?:     boolean;   // frigate-sized hole
   whType?:   string;    // wormhole type code, when known
+  /** Which map contributed this hop. The closest-systems pane unions every map
+   *  the user can see, so without this a hole from a corp map they aren't
+   *  looking at is indistinguishable from one in the open chain. */
+  mapName?:  string;
 }
 
 // A per-request overlay of extra edges (+ their node info + edge metadata)

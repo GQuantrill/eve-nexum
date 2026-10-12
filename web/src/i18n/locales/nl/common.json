@@ -530,7 +530,9 @@
     "signIn": "Log in en dock in K-space om sprongen naar hubs te zien, of zet de route-sluiproutes aan om vanaf een wormgat of Thera te routeren.",
     "searchPlaceholder": "Zoek op systeemnaam…",
     "onList": "in de lijst",
-    "noMatch": "Geen systemen komen overeen met \"{{query}}\""
+    "noMatch": "Geen systemen komen overeen met \"{{query}}\"",
+    "allMaps": "Over al mijn kaarten routeren",
+    "allMapsHint": "Afstanden mogen de wormgatketens gebruiken van elke kaart die je kunt zien, niet alleen de geopende. Zet dit uit om alleen via de kaart op het scherm te routeren."
   },
   "commandPalette": {
     "placeholder": "Zoek systemen en kaarten…",
@@ -1738,7 +1740,8 @@
     "riskEol": "EOL",
     "riskCritical": "Kritieke massa",
     "riskFrig": "Frigate hole",
-    "jspaceNoWaypoint": "Wormgatsystemen kunnen niet als autopilot-bestemming worden ingesteld."
+    "jspaceNoWaypoint": "Wormgatsystemen kunnen niet als autopilot-bestemming worden ingesteld.",
+    "viaMap": "op {{map}}"
   },
   "routeToast": {
     "destinationSet": "Bestemming ingesteld op {{system}}",

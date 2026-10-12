@@ -530,7 +530,9 @@
     "signIn": "Sign in and dock in K-space to see jumps to hubs, or enable the route shortcut options to route from a wormhole or Thera.",
     "searchPlaceholder": "Search system name…",
     "onList": "on list",
-    "noMatch": "No systems match \"{{query}}\""
+    "noMatch": "No systems match \"{{query}}\"",
+    "allMaps": "Route across all my maps",
+    "allMapsHint": "Distances may use the wormhole chains of every map you can see, not just the open one. Turn this off to route only through the map on screen."
   },
   "commandPalette": {
     "placeholder": "Search systems and maps…",
@@ -1738,7 +1740,8 @@
     "riskEol": "EOL",
     "riskCritical": "Critical mass",
     "riskFrig": "Frigate hole",
-    "jspaceNoWaypoint": "Wormhole systems can't be set as an autopilot destination."
+    "jspaceNoWaypoint": "Wormhole systems can't be set as an autopilot destination.",
+    "viaMap": "on {{map}}"
   },
   "routeToast": {
     "destinationSet": "Destination set to {{system}}",

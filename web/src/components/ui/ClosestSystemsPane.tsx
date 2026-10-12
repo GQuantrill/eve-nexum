@@ -35,6 +35,11 @@ const LIST_KEY = 'nexum.closestSystems.list';
 // pane. If they later change home to a different system, the new home
 // still auto-appears because its ID isn't in this set.
 const HIDDEN_HOME_KEY = 'nexum.closestSystems.hiddenHome';
+// Whether distances may route through the wormhole chains of EVERY map the
+// user can see, or only the active one. Defaults to true, which is how this
+// pane has always behaved — the surprise is not the behaviour but that it was
+// invisible, so the toggle exposes it rather than changing it.
+const ALL_MAPS_KEY = 'nexum.closestSystems.allMaps';
 
 interface StoredEntry { id: number; name: string }
 
@@ -170,6 +175,7 @@ export function ClosestSystemsPane() {
   const [listRaw, setList]      = useUserSetting<StoredEntry[]>(LIST_KEY, HUB_DEFAULTS);
   const list = useMemo(() => sanitiseList(listRaw), [listRaw]);
   const [hiddenHomeArr, setHiddenHomeArr] = useUserSetting<number[]>(HIDDEN_HOME_KEY, []);
+  const [allMaps, setAllMaps] = useUserSetting<boolean>(ALL_MAPS_KEY, true);
   const hiddenHome = useMemo(() => new Set(hiddenHomeArr), [hiddenHomeArr]);
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
   const [adding, setAdding]     = useState(false);
@@ -230,9 +236,11 @@ export function ClosestSystemsPane() {
   }, [list, homes, homeIds, hiddenHome]);
 
   const targetIds = useMemo(() => items.map((i) => i.id), [items]);
-  // 'all' scope: union the wormhole chains of every map the user can see, so the
-  // chain they're actually in routes regardless of which map tab is active.
-  const routes    = useRoute(origin.systemId, targetIds, 'all');
+  // 'all' unions the wormhole chains of every map the user can see, so the chain
+  // they're actually in routes regardless of which tab is active; 'active'
+  // restricts it to the open map, for when a hop from a map you aren't looking
+  // at is more confusing than helpful.
+  const routes    = useRoute(origin.systemId, targetIds, allMaps ? 'all' : 'active');
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
 
@@ -345,6 +353,15 @@ export function ClosestSystemsPane() {
           ))}
         </SortableContext>
       </DndContext>
+
+      <label className="closest-pane__scope" data-tooltip={t('closest.allMapsHint')}>
+        <input
+          type="checkbox"
+          checked={allMaps}
+          onChange={(e) => setAllMaps(e.target.checked)}
+        />
+        {t('closest.allMaps')}
+      </label>
 
       {!adding ? (
         <button
