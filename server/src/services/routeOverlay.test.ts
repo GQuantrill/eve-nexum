@@ -44,11 +44,25 @@ describe('isPastLife', () => {
     expect(isPastLife(conn({ createdAt: new Date(NOW - 20 * HOUR) }), NOW)).toBe(false);
   });
 
-  it('keeps an untyped hole, because unknown is not expired', () => {
-    // Hand-drawn links often carry no type at all. There is no estimate to be
-    // past, and dropping them would silently break chains people rely on.
-    const untyped = { whType: null, createdAt: new Date(NOW - 500 * HOUR) };
+  it('keeps a recent untyped hole, so a hand-drawn chain still routes', () => {
+    const untyped = { whType: null, createdAt: new Date(NOW - 6 * HOUR) };
     expect(isPastLife(conn(untyped), NOW)).toBe(false);
+  });
+
+  it('drops an untyped hole past the 48h ceiling no wormhole outlives', () => {
+    // The real report: an untyped 'standard' connection 77h old was still
+    // routing, because nothing could compute an expiry for it. It does have a
+    // knowable ceiling though — a K162 is aged the same way for the same
+    // reason — so past it the hole cannot be open whatever it turned out to be.
+    expect(isPastLife(conn({ whType: null, createdAt: new Date(NOW - 77 * HOUR) }), NOW)).toBe(true);
+  });
+
+  it('puts the untyped cutoff at the ceiling plus the map grace', () => {
+    const at = (h: number, graceHours = 0.5) =>
+      isPastLife(conn({ whType: null, createdAt: new Date(NOW - h * HOUR), graceHours }), NOW);
+    expect(at(48)).toBe(false);    // exactly the ceiling, grace still to run
+    expect(at(48.4)).toBe(false);  // inside the default 30-minute grace
+    expect(at(48.6)).toBe(true);   // past it
   });
 
   it('ages a legacy eol mark out, allowing for the EOL window itself', () => {

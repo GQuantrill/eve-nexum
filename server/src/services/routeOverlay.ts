@@ -1,7 +1,7 @@
 import { db } from '../db.js';
 import { getScoutConnections } from '../routes/scout.js';
 import { edgeKey, type RouteOverlay, type EdgeMeta } from './routeGraph.js';
-import { effectiveExpiryMs } from '../data/whLifetimes.js';
+import { effectiveExpiryMs, MAX_WH_LIFETIME_HOURS } from '../data/whLifetimes.js';
 
 // Thera/Turnur solar-system ids, resolved once by name from the SDE-seeded
 // solar_systems table (both are ordinary rows there) and cached for the process.
@@ -112,27 +112,33 @@ async function addWormholeEdges(o: RouteOverlay, mapIds: string[]): Promise<bool
 }
 
 /**
- * True when a hole is far enough past its estimated collapse that routing
- * through it would send someone to a gap.
+ * True when a hole is far enough past its collapse that routing through it
+ * would send someone to a gap.
  *
  * Deliberately the SAME threshold the lifetime sweep uses to sever a hole
  * (expiry + the map's collapse grace) and computed with the SAME shared
- * helper, so routing and the map never disagree about whether a hole is dead.
- * The difference is only that this applies everywhere: the sweep's severing is
- * opt-in per map via lazy_remove_wormholes, which defaults off, so on an
- * ordinary map a long-dead hole keeps its row and kept routing.
+ * helper, so routing and the map never disagree about whether one is dead.
+ * The difference is that this applies everywhere: the sweep only severs on
+ * maps with lazy_remove_wormholes on, which defaults off, so on an ordinary
+ * map a long-dead hole keeps its row and used to keep routing.
  *
- * An untyped hole has no computable expiry and is left alone — unknown is not
- * the same as expired, and dropping those would quietly break hand-drawn
- * chains that have no wormhole type set.
+ * An UNTYPED hole still has a knowable ceiling. No wormhole in EVE outlives
+ * MAX_WH_LIFETIME_HOURS, which is already how a K162 — equally typeless, for
+ * the same reason — is aged. So one older than that cannot be open whatever it
+ * turned out to be, and routing through it is simply wrong. Below the ceiling
+ * it is left alone, which keeps a freshly hand-drawn chain intact.
+ *
+ * Note this only declines to USE the edge. Deleting an untyped connection is a
+ * separate, destructive decision and stays with the sweep, which still skips
+ * them.
  */
 export function isPastLife(
   r: { lifetimeExpiresAt: Date | null; eolAt: Date | null; whType: string | null;
        createdAt: Date; graceHours: number },
   now: number,
 ): boolean {
-  const expiry = effectiveExpiryMs(r);
-  if (expiry == null) return false;
+  const expiry = effectiveExpiryMs(r)
+    ?? new Date(r.createdAt).getTime() + MAX_WH_LIFETIME_HOURS * 3_600_000;
   return now > expiry + r.graceHours * 3_600_000;
 }
 
