@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { arrivedInPod } from './useLocationTracking';
+import { arrivedInPod, cloneJumpedBetween } from './useLocationTracking';
 
 const CAPSULE    = 670;
 const GENOLUTION = 33328;   // the same pod, different type id
@@ -45,5 +45,41 @@ describe('arrivedInPod', () => {
     for (const skin of [41579, 45482, 54744, 94187]) {
       expect(arrivedInPod(true, skin)).toBe(false);
     }
+  });
+});
+
+// ── Clone jumps ───────────────────────────────────────────────────────────────
+// Reported: a wormhole drawn out of a home system that has none, caused by a
+// clone jump to a staging system. Three guards were in place and none could
+// fire, because a clone jump is capsule to capsule — the hull does not change,
+// and BOTH the clone-list check and the pod check were `hullChanged && ...`.
+// Granting the ESI clones scope would not have helped; the dead half was the
+// hull. What a clone jump does need is a station or structure at each end.
+describe('cloneJumpedBetween', () => {
+  it('spots the clone jump that drew the phantom connection', () => {
+    expect(cloneJumpedBetween(true, true)).toBe(true);
+  });
+
+  it('leaves a hole jumped between two points in space alone', () => {
+    expect(cloneJumpedBetween(false, false)).toBe(false);
+  });
+
+  it('leaves a pilot who undocked and flew somewhere alone', () => {
+    // Docked, then in space elsewhere: they undocked and flew it.
+    expect(cloneJumpedBetween(true, false)).toBe(false);
+  });
+
+  it('leaves a pilot who flew somewhere and docked alone', () => {
+    // In space, then docked elsewhere — the ordinary "exit the chain and dock
+    // at the trade hub" move. Suppressing this would lose the exit connection,
+    // which is the one people most want recorded.
+    expect(cloneJumpedBetween(false, true)).toBe(false);
+  });
+
+  it('does not depend on the hull, which a clone jump never changes', () => {
+    // The whole point: this is decided without reference to the ship, so
+    // capsule-to-capsule no longer slips through.
+    expect(cloneJumpedBetween(true, true)).toBe(true);
+    expect(arrivedInPod(false, CAPSULE)).toBe(false);
   });
 });

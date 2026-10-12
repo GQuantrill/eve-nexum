@@ -52,7 +52,7 @@ function isReallyOnline(data: EsiOnlineResponse): boolean {
 // grows. The side effects (jump events, last_known) still run per request.
 type EsiLoc =
   | { status: 'offline' }
-  | { status: 'online'; solarSystemId: number | null }
+  | { status: 'online'; solarSystemId: number | null; docked?: boolean }
   | { status: 'error' };
 // itemId is the ship's unique item id, not its type. It's what tells a flight
 // apart from a teleport: fly a hole and it's the same hull, die or clone-jump
@@ -83,8 +83,18 @@ async function readEsiLocation(userId: number, characterId: number): Promise<Esi
     const locRes = await esiFetch(`https://esi.evetech.net/latest/characters/${characterId}/location/`,
       { headers: { Authorization: `Bearer ${token}` } });
     if (!locRes.ok) return { status: 'online', solarSystemId: null };
-    const { solar_system_id } = await locRes.json() as { solar_system_id: number };
-    return { status: 'online', solarSystemId: solar_system_id };
+    // station_id / structure_id are present only while docked. Kept because a
+    // clone jump needs a station or structure at BOTH ends, and you cannot
+    // traverse a wormhole docked — see the jump tracker, which uses this to
+    // tell a clone jump from a flown connection. No extra scope: read_location
+    // already returns them.
+    const { solar_system_id, station_id, structure_id } =
+      await locRes.json() as { solar_system_id: number; station_id?: number; structure_id?: number };
+    return {
+      status: 'online',
+      solarSystemId: solar_system_id,
+      docked: station_id != null || structure_id != null,
+    };
   })();
   esiLocInflight.set(characterId, p);
   try {
@@ -136,7 +146,10 @@ async function readEsiShip(userId: number, characterId: number): Promise<ShipInf
 // reading any of an account's characters keeps its profile fresh.
 type LocationPayload =
   | { online: false }
-  | { online: true; system: Record<string, unknown> | null; ship: ShipInfo | null };
+  | { online: true; system: Record<string, unknown> | null; ship: ShipInfo | null;
+      /** Docked in a station or structure. A clone jump needs one at both
+       *  ends, so the jump tracker uses this to tell one from a flown hop. */
+      docked: boolean };
 
 async function getLocationPayload(userId: number): Promise<LocationPayload> {
   const { rows: userRows } = await db.query<{ character_id: number }>(
@@ -149,7 +162,7 @@ async function getLocationPayload(userId: number): Promise<LocationPayload> {
   if (loc.status === 'offline') { lastSeenSystem.delete(userId); return { online: false }; }
 
   const ship = await readEsiShip(userId, characterId);
-  if (loc.solarSystemId == null) return { online: true, system: null, ship };
+  if (loc.solarSystemId == null) return { online: true, system: null, ship, docked: loc.docked ?? false };
 
   // Jump event + last-known persistence, keyed per character.
   const prevSys = lastSeenSystem.get(userId);
@@ -186,7 +199,7 @@ async function getLocationPayload(userId: number): Promise<LocationPayload> {
      WHERE s.id = $1`,
     [loc.solarSystemId],
   );
-  return { online: true, system: rows.length ? rows[0] : null, ship };
+  return { online: true, system: rows.length ? rows[0] : null, ship, docked: loc.docked ?? false };
 }
 
 // GET /api/character/location — the active character's location.
