@@ -2043,7 +2043,12 @@
     "trackJumpsTooltipOn": "Sprongen worden bijgehouden — nieuwe systemen worden toegevoegd terwijl je beweegt",
     "updateAvailable": "Update beschikbaar",
     "updateAvailableVersion": "Update beschikbaar: v{{version}}",
-    "userStats": "Gebruikersstatistieken"
+    "userStats": "Gebruikersstatistieken",
+    "hideThisMap": "Uit mijn lijst verbergen",
+    "hideThisMapHint": "Haalt deze kaart alleen uit jouw wisselaar. Hij is met je corp of alliance gedeeld, dus er is geen persoonlijke toegang om op te geven — voor alle anderen blijft hij staan. Je kunt hem hier terugzetten.",
+    "hiddenMaps": "Verborgen kaarten ({{count}})",
+    "unhideMap": "terugzetten",
+    "unhideMapHint": "Deze kaart weer in je lijst tonen"
   },
   "units": {
     "jumps_one": "{{count}} sprong",

@@ -2043,7 +2043,12 @@
     "trackJumpsTooltipOn": "Tracking jumps — new systems are added as you move",
     "updateAvailable": "Update available",
     "updateAvailableVersion": "Update available: v{{version}}",
-    "userStats": "User stats"
+    "userStats": "User stats",
+    "hideThisMap": "Hide from my list",
+    "hideThisMapHint": "Removes this map from your switcher only. It was shared with your corp or alliance, so there is no personal grant to give up — everyone else keeps it. You can restore it here.",
+    "hiddenMaps": "Hidden maps ({{count}})",
+    "unhideMap": "restore",
+    "unhideMapHint": "Show this map in your list again"
   },
   "units": {
     "jumps_one": "{{count}} jump",

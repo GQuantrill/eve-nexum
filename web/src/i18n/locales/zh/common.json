@@ -2043,7 +2043,12 @@
     "trackJumpsTooltipOn": "正在跟踪跳跃 — 随着你移动会添加新星系",
     "updateAvailable": "有可用更新",
     "updateAvailableVersion": "有可用更新：v{{version}}",
-    "userStats": "用户统计"
+    "userStats": "用户统计",
+    "hideThisMap": "从我的列表中隐藏",
+    "hideThisMapHint": "仅将此地图从你的切换器中移除。它是共享给你的军团或联盟的，因此没有可放弃的个人授权——其他人仍可看到。你可以在这里恢复它。",
+    "hiddenMaps": "已隐藏的地图（{{count}}）",
+    "unhideMap": "恢复",
+    "unhideMapHint": "在你的列表中重新显示此地图"
   },
   "units": {
     "jumps_one": "{{count}} 跳",

@@ -2043,7 +2043,12 @@
     "trackJumpsTooltipOn": "A seguir saltos — novos sistemas são adicionados à medida que te moves",
     "updateAvailable": "Atualização disponível",
     "updateAvailableVersion": "Atualização disponível: v{{version}}",
-    "userStats": "Estatísticas de utilizador"
+    "userStats": "Estatísticas de utilizador",
+    "hideThisMap": "Ocultar da minha lista",
+    "hideThisMapHint": "Remove este mapa apenas do seu seletor. Foi partilhado com a sua corporação ou aliança, por isso não há um acesso pessoal a abdicar — todos os outros mantêm-no. Pode restaurá-lo aqui.",
+    "hiddenMaps": "Mapas ocultos ({{count}})",
+    "unhideMap": "restaurar",
+    "unhideMapHint": "Mostrar este mapa novamente na sua lista"
   },
   "units": {
     "jumps_one": "{{count}} salto",

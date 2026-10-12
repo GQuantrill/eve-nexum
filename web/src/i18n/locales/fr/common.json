@@ -2043,7 +2043,12 @@
     "trackJumpsTooltipOn": "Suivi des sauts — de nouveaux systèmes sont ajoutés au fil de vos déplacements",
     "updateAvailable": "Mise à jour disponible",
     "updateAvailableVersion": "Mise à jour disponible : v{{version}}",
-    "userStats": "Statistiques utilisateur"
+    "userStats": "Statistiques utilisateur",
+    "hideThisMap": "Masquer de ma liste",
+    "hideThisMapHint": "Retire cette carte de votre sélecteur uniquement. Elle a été partagée avec votre corporation ou alliance : il n'y a donc aucun accès personnel à abandonner, et tous les autres la conservent. Vous pouvez la restaurer ici.",
+    "hiddenMaps": "Cartes masquées ({{count}})",
+    "unhideMap": "restaurer",
+    "unhideMapHint": "Réafficher cette carte dans votre liste"
   },
   "units": {
     "jumps_one": "{{count}} saut",

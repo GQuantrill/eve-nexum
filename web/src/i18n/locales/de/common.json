@@ -2043,7 +2043,12 @@
     "trackJumpsTooltipOn": "Sprünge werden verfolgt — neue Systeme werden hinzugefügt, während du dich bewegst",
     "updateAvailable": "Update verfügbar",
     "updateAvailableVersion": "Update verfügbar: v{{version}}",
-    "userStats": "Benutzerstatistik"
+    "userStats": "Benutzerstatistik",
+    "hideThisMap": "Aus meiner Liste ausblenden",
+    "hideThisMapHint": "Entfernt diese Karte nur aus deinem Umschalter. Sie wurde mit deiner Corp oder Allianz geteilt, es gibt also keine persönliche Freigabe aufzugeben — für alle anderen bleibt sie. Du kannst sie hier wiederherstellen.",
+    "hiddenMaps": "Ausgeblendete Karten ({{count}})",
+    "unhideMap": "wiederherstellen",
+    "unhideMapHint": "Diese Karte wieder in deiner Liste anzeigen"
   },
   "units": {
     "jumps_one": "{{count}} Sprung",

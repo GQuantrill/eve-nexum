@@ -2043,7 +2043,12 @@
     "trackJumpsTooltipOn": "점프 추적 중 — 이동함에 따라 새 성계가 추가됩니다",
     "updateAvailable": "업데이트 사용 가능",
     "updateAvailableVersion": "업데이트 사용 가능: v{{version}}",
-    "userStats": "사용자 통계"
+    "userStats": "사용자 통계",
+    "hideThisMap": "내 목록에서 숨기기",
+    "hideThisMapHint": "이 지도를 내 전환기에서만 제거합니다. 군단 또는 연합에 공유된 지도라 포기할 개인 권한이 없으며, 다른 사람에게는 그대로 남습니다. 여기에서 다시 복원할 수 있습니다.",
+    "hiddenMaps": "숨긴 지도 ({{count}})",
+    "unhideMap": "복원",
+    "unhideMapHint": "이 지도를 목록에 다시 표시"
   },
   "units": {
     "jumps_one": "{{count}} 점프",

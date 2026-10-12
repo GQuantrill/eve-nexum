@@ -2043,7 +2043,12 @@
     "trackJumpsTooltipOn": "ジャンプを追跡中 — 移動に合わせて新しい星系が追加されます",
     "updateAvailable": "アップデートが利用可能",
     "updateAvailableVersion": "アップデートが利用可能: v{{version}}",
-    "userStats": "ユーザー統計"
+    "userStats": "ユーザー統計",
+    "hideThisMap": "自分のリストから隠す",
+    "hideThisMapHint": "このマップをあなたの切り替えリストからのみ外します。コーポまたはアライアンスに共有されているため放棄できる個人の権限はなく、他の人には残ります。ここから元に戻せます。",
+    "hiddenMaps": "非表示のマップ ({{count}})",
+    "unhideMap": "元に戻す",
+    "unhideMapHint": "このマップをリストに再表示する"
   },
   "units": {
     "jumps_one": "{{count}} ジャンプ",
