@@ -1246,6 +1246,27 @@ export async function migrate() {
     -- once it's gone from the feed.
     CREATE INDEX IF NOT EXISTS idx_scout_expired_created
       ON scout_expired (created_at);
+
+    -- One person opting out of a map shared with their whole corp or alliance.
+    --
+    -- A map_shares row targets a character, a corp or an alliance, so an org
+    -- grant is ONE row meaning "everyone in it". There is nothing individual
+    -- to delete, and deleting the row would take the map from every member —
+    -- so leaving one is recorded here instead of touching the grant.
+    --
+    -- Keyed on the OWNER, not the user: personal maps are owner-scoped, so a
+    -- map left on your main stays left when you switch to an alt. Both sides
+    -- cascade — the row is meaningless once either the map or the account is
+    -- gone, and re-sharing a map is not supposed to resurrect an old opt-out.
+    CREATE TABLE IF NOT EXISTS map_share_optouts (
+      map_id     UUID        NOT NULL REFERENCES maps(id)   ON DELETE CASCADE,
+      owner_id   INTEGER     NOT NULL REFERENCES owners(id) ON DELETE CASCADE,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      PRIMARY KEY (map_id, owner_id)
+    );
+    -- Read per map when the owner asks how many have opted out.
+    CREATE INDEX IF NOT EXISTS idx_map_share_optouts_map
+      ON map_share_optouts (map_id);
   `);
 
   await encryptLegacyTokens();

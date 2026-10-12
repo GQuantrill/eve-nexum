@@ -1367,7 +1367,8 @@
     "shareCount": "Share with {{count}}",
     "batchShared": "Shared the map with {{count}}.",
     "batchPartial": "Shared with {{shared}}; {{skipped}} skipped.",
-    "batchNone": "Couldn't share — {{count}} skipped."
+    "batchNone": "Couldn't share — {{count}} skipped.",
+    "optedOut": "{{count}} hid this map from their own list. They still have access — a corp or alliance share cannot be left individually."
   },
   "mapSidebar": {
     "activityHint": "Show graphs for the following:",

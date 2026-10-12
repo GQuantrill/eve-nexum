@@ -1367,7 +1367,8 @@
     "shareCount": "Mit {{count}} teilen",
     "batchShared": "Karte mit {{count}} geteilt.",
     "batchPartial": "Mit {{shared}} geteilt; {{skipped}} übersprungen.",
-    "batchNone": "Konnte nicht teilen — {{count}} übersprungen."
+    "batchNone": "Konnte nicht teilen — {{count}} übersprungen.",
+    "optedOut": "{{count}} haben diese Karte aus ihrer eigenen Liste ausgeblendet. Sie haben weiterhin Zugriff — eine Corp- oder Allianz-Freigabe kann man nicht einzeln verlassen."
   },
   "mapSidebar": {
     "activityHint": "Graphen für Folgendes anzeigen:",

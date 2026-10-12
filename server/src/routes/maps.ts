@@ -4611,7 +4611,17 @@ mapsRouter.get('/:mapId/shares', async (req, res) => {
     .filter((x): x is number => x != null);
   const names = await resolveEntityNames(ids);
 
+  // How many accounts have taken this map off their own list. Only meaningful
+  // for an org grant — a personal one is left by deleting the grant, so there
+  // would be no row here to count. Reported so the owner can tell "nobody is
+  // using this" from "nobody can see it".
+  const { rows: outRows } = await db.query<{ n: string }>(
+    `SELECT count(*)::text AS n FROM map_share_optouts WHERE map_id = $1`, [mapId],
+  );
+  const optedOut = Number(outRows[0]?.n ?? 0);
+
   res.json({
+    optedOut,
     shares: rows.map((r) => {
       const kind = r.targetCharacterId != null ? 'character' : r.targetCorpId != null ? 'corp' : 'alliance';
       const targetId = (r.targetCharacterId ?? r.targetCorpId ?? r.targetAllianceId)!;
@@ -4777,7 +4787,46 @@ mapsRouter.delete('/:mapId/shares/mine', async (req, res) => {
     `DELETE FROM map_shares WHERE map_id = $1 AND target_character_id = $2`,
     [mapId, callerChar],
   );
-  if (!rowCount) { res.status(404).json({ error: 'No personal share to leave' }); return; }
+  if (rowCount) { res.json({ ok: true, kind: 'share-removed' }); return; }
+
+  // No personal grant. The map may still reach them through a corp or alliance
+  // grant, which is ONE row meaning everyone in the org — there is nothing
+  // individual to delete, and deleting it would take the map from every
+  // member. Record the opt-out instead, so leaving means the same thing to the
+  // person either way and the owner can see it happened.
+  //
+  // Confirm they can actually see the map first, via the same access check
+  // every other read uses, so this can't be used to probe for map ids or to
+  // accumulate rows against maps the caller has nothing to do with.
+  const access = await getMapAccess(mapId, req);
+  if (!access || access.accessKind !== 'shared') {
+    res.status(404).json({ error: 'No share to leave' }); return;
+  }
+  const ownerId = await resolveOwnerId(req);
+  if (ownerId == null) { res.status(400).json({ error: 'No account owner' }); return; }
+  await db.query(
+    `INSERT INTO map_share_optouts (map_id, owner_id) VALUES ($1, $2)
+     ON CONFLICT (map_id, owner_id) DO NOTHING`,
+    [mapId, ownerId],
+  );
+  res.json({ ok: true, kind: 'opted-out' });
+});
+
+// POST /api/maps/:mapId/shares/mine/restore — undo the opt-out above, putting
+// an org-shared map back in this account's list. Only ever deletes this
+// account's own row, so it cannot affect anyone else; a no-op if they never
+// opted out. There is deliberately no counterpart for a PERSONAL share: that
+// one deleted the grant itself, and only the owner can give it back.
+mapsRouter.post('/:mapId/shares/mine/restore', async (req, res) => {
+  const { mapId } = req.params;
+  if (!UUID_RE.test(mapId)) { res.status(404).json({ error: 'Map not found' }); return; }
+  if (!req.session.userId) { res.status(401).json({ error: 'Not authenticated' }); return; }
+  const ownerId = await resolveOwnerId(req);
+  if (ownerId == null) { res.status(400).json({ error: 'No account owner' }); return; }
+  await db.query(
+    `DELETE FROM map_share_optouts WHERE map_id = $1 AND owner_id = $2`,
+    [mapId, ownerId],
+  );
   res.json({ ok: true });
 });
 

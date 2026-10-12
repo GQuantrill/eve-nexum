@@ -1367,7 +1367,8 @@
     "shareCount": "{{count}}명과 공유",
     "batchShared": "맵을 {{count}}명과 공유했습니다.",
     "batchPartial": "{{shared}}명과 공유, {{skipped}}명 건너뜀.",
-    "batchNone": "공유하지 못했습니다 — {{count}}명 건너뜀."
+    "batchNone": "공유하지 못했습니다 — {{count}}명 건너뜀.",
+    "optedOut": "{{count}}명이 이 지도를 자신의 목록에서 숨겼습니다. 접근 권한은 그대로이며, 군단 또는 연합 공유는 개인이 나갈 수 없습니다."
   },
   "mapSidebar": {
     "activityHint": "다음 그래프 표시:",

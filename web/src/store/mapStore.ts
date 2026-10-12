@@ -160,6 +160,9 @@ export interface MapListItem {
   /** True when the caller has a CHARACTER-scoped share grant they can self-remove
    *  ("leave the share"). False for corp/alliance grants (org-owned — admin only). */
   canLeaveShare?: boolean;
+  /** This account has taken an org-shared map off its own list. The map stays
+   *  in the payload so the switcher can offer a way back. */
+  hiddenByMe?: boolean;
   locked: boolean;
   /** Owning character's name — shown in the merge picker to disambiguate maps. */
   ownerName?: string | null;
@@ -314,6 +317,7 @@ interface MapStore {
   createFromRegion: (regionId: number, name: string, isCorpMap: boolean, isAllianceMap?: boolean, skipKspace?: boolean) => Promise<void>;
   deleteMap: (id: string) => Promise<void>;
   leaveShare: (id: string) => Promise<void>;
+  restoreShare: (id: string) => Promise<void>;
 
   // Map metadata
   setMapName: (name: string) => void;
@@ -820,16 +824,30 @@ export const useMapStore = create<MapStore>()((set, get) => {
     // owner and everyone else. Local cleanup mirrors deleteMap (remove from the
     // list, switch away if it was active).
     leaveShare: async (id) => {
-      await api(`/api/maps/${id}/shares/mine`, { method: 'DELETE' });
-      const remaining = get().maps.filter((m) => m.id !== id);
-      set({ maps: remaining });
+      // Two outcomes, decided server-side by which kind of grant it was. A
+      // personal grant is deleted and the map is gone from the list; an org
+      // grant cannot be (it belongs to everyone in the corp), so the account's
+      // opt-out is recorded and the map stays in the payload flagged hidden —
+      // which is what lets the switcher offer it back.
+      const r = await api<{ ok: boolean; kind?: string }>(
+        `/api/maps/${id}/shares/mine`, { method: 'DELETE' });
+      const optedOut = r?.kind === 'opted-out';
+      set({
+        maps: optedOut
+          ? get().maps.map((m) => (m.id === id ? { ...m, hiddenByMe: true } : m))
+          : get().maps.filter((m) => m.id !== id),
+      });
+      // Either way it should stop being the map on screen.
       if (get().activeMapId === id) {
-        if (remaining.length > 0) {
-          await get().switchMap(remaining[0].id);
-        } else {
-          set({ map: emptyMap(), activeMapId: null });
-        }
+        const next = get().maps.find((m) => m.id !== id && !m.hiddenByMe);
+        if (next) await get().switchMap(next.id);
+        else set({ map: emptyMap(), activeMapId: null });
       }
+    },
+
+    restoreShare: async (id) => {
+      await api(`/api/maps/${id}/shares/mine/restore`, { method: 'POST' });
+      set({ maps: get().maps.map((m) => (m.id === id ? { ...m, hiddenByMe: false } : m)) });
     },
 
     // ── Map metadata ──────────────────────────────────────────────────────────

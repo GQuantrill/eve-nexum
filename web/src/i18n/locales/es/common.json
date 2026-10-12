@@ -1367,7 +1367,8 @@
     "shareCount": "Compartir con {{count}}",
     "batchShared": "Mapa compartido con {{count}}.",
     "batchPartial": "Compartido con {{shared}}; {{skipped}} omitido(s).",
-    "batchNone": "No se pudo compartir — {{count}} omitido(s)."
+    "batchNone": "No se pudo compartir — {{count}} omitido(s).",
+    "optedOut": "{{count}} han ocultado este mapa de su propia lista. Siguen teniendo acceso: un recurso compartido de corporación o alianza no se puede abandonar individualmente."
   },
   "mapSidebar": {
     "activityHint": "Mostrar gráficos de lo siguiente:",
