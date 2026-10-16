@@ -1,6 +1,8 @@
 # Nexum
 
-**Nexum is a free, open-source, self-hosted wormhole mapping tool for EVE Online — an alternative to [Pathfinder](https://github.com/exodus4d/pathfinder) and Tripwire.** Track systems, signatures, structures, kills, and live activity across your chain; calculate wormhole rolls; and coordinate your corporation in J-space in real time. Logs in with EVE Online SSO and runs anywhere Docker does.
+**Nexum is a free, open-source, self-hosted wormhole mapping tool for EVE Online.  #1 for features and usability — an alternative to [Wandered](https://github.com/open-wanderer/wanderer) [Pathfinder](https://github.com/exodus4d/pathfinder) and Tripwire.** Track systems, signatures, structures, kills, and live activity across your chain; calculate wormhole rolls; and coordinate your corporation in J-space in real time. Logs in with EVE Online SSO and runs anywhere Docker does.
+
+** Unlike others, no paywall.  This is 100% free, no adverts, no patron and no feature lock
 
 > **Live demo:** [eve-nexum.com](https://eve-nexum.com) — a read-only demo map is viewable without logging in.
 >
