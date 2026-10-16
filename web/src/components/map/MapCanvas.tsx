@@ -385,9 +385,21 @@ export function MapCanvas() {
     [systems, removeSystem, setNodes, canEdit],
   );
 
+  // While the panel-resize viewport hold (below) is reasserting the old view, a
+  // centre would be overwritten on the next frame -- so park it here and let the
+  // hold run it as it ends. That's also the right moment: the canvas has taken
+  // its new size by then, so the node lands centred above the opened panel.
+  const viewportHoldActive = useRef(false);
+  const pendingCentre      = useRef<(() => void) | null>(null);
+
   const centerOnSystem = useCallback((systemId: string, zoomOverride?: number) => {
     const node = getNode(systemId);
     if (!node) return false;
+
+    if (viewportHoldActive.current) {
+      pendingCentre.current = () => { centerOnSystem(systemId, zoomOverride); };
+      return true;
+    }
 
     const zoom   = zoomOverride ?? getZoom();
     const flowX  = node.position.x + (node.measured?.width  ?? 150) / 2;
@@ -752,11 +764,20 @@ export function MapCanvas() {
 
     const held = getViewport();
     let frames = 0;
+    viewportHoldActive.current = true;
     let raf = requestAnimationFrame(function hold() {
       setViewport(held);
-      if (++frames < VIEWPORT_HOLD_FRAMES) raf = requestAnimationFrame(hold);
+      if (++frames < VIEWPORT_HOLD_FRAMES) { raf = requestAnimationFrame(hold); return; }
+      viewportHoldActive.current = false;
+      const centre = pendingCentre.current;
+      pendingCentre.current = null;
+      centre?.();
     });
-    return () => cancelAnimationFrame(raf);
+    return () => {
+      cancelAnimationFrame(raf);
+      // A newer selection re-arms the hold and inherits any parked centre.
+      viewportHoldActive.current = false;
+    };
   }, [panelKey, activeMapId, getViewport, setViewport]);
 
   // Sweep expired EOL connections every minute. A connection is considered

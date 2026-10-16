@@ -477,7 +477,7 @@
   "chainExits": {
     "title": "Saídas da cadeia",
     "noExits": "Não há saídas de K-space nesta cadeia.",
-    "hint": "Sistemas de K-space atualmente no mapa, por classe de segurança. A rota para Jita é só por portões — os atalhos por buraco de minhoca não são contados.",
+    "hint": "Sistemas de K-space com um buraco de minhoca no mapa, por classe de segurança. A rota para Jita é só por portões — os atalhos por buraco de minhoca não são contados.",
     "allExits": "Todas as saídas para K-space",
     "noFavourites": "Ainda não há sistemas favoritos — adiciona alguns no painel Sistemas próximos.",
     "noRoute": "sem rota",

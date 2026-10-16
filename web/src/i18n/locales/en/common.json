@@ -477,7 +477,7 @@
   "chainExits": {
     "title": "Chain exits",
     "noExits": "No K-space exits in this chain.",
-    "hint": "K-space systems currently on the map, by security class. Jita route is gates-only — wormhole shortcuts not counted.",
+    "hint": "K-space systems with a wormhole on the map, by security class. Jita route is gates-only — wormhole shortcuts not counted.",
     "allExits": "All K-space exits",
     "noFavourites": "No favourite systems yet — add some in the Closest Systems panel.",
     "noRoute": "no route",
