@@ -5,6 +5,7 @@ import { config } from '../config.js';
 import { loadRouteGraph } from './routeGraph.js';
 import { resetA0Cache, resetShatteredCache } from '../routes/systems.js';
 import { resetWormholeCache } from '../routes/wormholes.js';
+import { resetRegionBordersCache } from '../routes/systems.js';
 import { createLogger } from '../utils/logger.js';
 
 const log = createLogger('sde-update');
@@ -149,6 +150,7 @@ export async function checkSde(): Promise<void> {
       resetA0Cache();
       resetShatteredCache();
       resetWormholeCache();
+      resetRegionBordersCache();
       result = 'updated';
     } else {
       log.info('SDE unchanged');

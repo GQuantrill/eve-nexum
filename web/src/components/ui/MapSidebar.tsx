@@ -938,6 +938,7 @@ export function MapSidebar() {
   const showStatics = useMapStore((s) => s.showStatics);
   const setShowStatics = useMapStore((s) => s.setShowStatics);
   const [showUndivedWh, setShowUndivedWh] = useUserSetting<boolean>('nexum.map.showUndivedWh', true);
+  const [showRegionBorders, setShowRegionBorders] = useUserSetting<boolean>('nexum.map.showRegionBorders', false);
   const easyConnect = useMapStore((s) => s.easyConnect);
   const setEasyConnect = useMapStore((s) => s.setEasyConnect);
   const mapOptionsOpen = useMapStore((s) => s.mapOptionsOpen);
@@ -1371,6 +1372,18 @@ export function MapSidebar() {
               aria-pressed={showUndivedWh}
             >
               {showUndivedWh ? t("actions.on") : t("actions.off")}
+            </button>
+          </div>
+
+          <div className="map-sidebar__row">
+            <label className="map-sidebar__label">{t("mapSidebar.showRegionBorders")}</label>
+            <button
+              className={`toolbar__toggle${showRegionBorders ? " toolbar__toggle--on" : ""}`}
+              onClick={() => setShowRegionBorders(!showRegionBorders)}
+              aria-pressed={showRegionBorders}
+              data-tooltip={t("mapSidebar.showRegionBordersTooltip")}
+            >
+              {showRegionBorders ? t("actions.on") : t("actions.off")}
             </button>
           </div>
 

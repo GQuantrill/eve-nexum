@@ -1324,6 +1324,7 @@
     "suppressed": "Supprimé",
     "undivedUnknown": "inconnu",
     "undivedWhTitle": "Trou de ver inexploré",
+    "regionBorderTitle": "Portail vers une autre région : {{regions}}",
     "unknown": "Inconnu"
   },
   "mapShares": {
@@ -1612,6 +1613,8 @@
     "showPatchNotes": "Voir les notes de version",
     "showStaticWhs": "Afficher les WH statiques",
     "showUndivedWhs": "Afficher les TdV non explorés",
+    "showRegionBorders": "Afficher les frontières de région",
+    "showRegionBordersTooltip": "Signale les systèmes dont les portails mènent vers une autre région, avec le nom de cette région. Le système voisin n'est pas ajouté à la carte.",
     "sigBookmark": "Signet de trou de ver",
     "siteBookmark": "Signet de site (relic / data / gas)",
     "siteBookmarkHelp": "Sur une ligne de signature relic, data ou gas, cliquez sur l'icône de copie pour un nom de signet prêt à coller. Construisez-le avec ces jetons :",

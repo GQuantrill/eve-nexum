@@ -1324,6 +1324,7 @@
     "suppressed": "Suppressed",
     "undivedUnknown": "unknown",
     "undivedWhTitle": "Unexplored Wormhole",
+    "regionBorderTitle": "Stargate to another region: {{regions}}",
     "unknown": "Unknown"
   },
   "mapShares": {
@@ -1612,6 +1613,8 @@
     "showPatchNotes": "Show patch notes",
     "showStaticWhs": "Show Static WHs",
     "showUndivedWhs": "Show Undived WHs",
+    "showRegionBorders": "Show Region Borders",
+    "showRegionBordersTooltip": "Label systems whose stargates lead into another region, naming the region. The neighbouring system isn't added to the map.",
     "sigBookmark": "Wormhole bookmark",
     "siteBookmark": "Site bookmark (relic / data / gas)",
     "siteBookmarkHelp": "On a relic, data, or gas signature row, click the copy icon for a paste-ready bookmark name. Build it with these tokens:",

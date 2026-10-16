@@ -878,6 +878,7 @@ const SETTINGS_ALLOWLIST = new Set<string>([
   'nexum.map.centerOnSelect',
   'nexum.map.invertZoom',
   'nexum.map.showUndivedWh',
+  'nexum.map.showRegionBorders',
   'nexum.tracking.skipKspace',
   'nexum.skipDeleteConfirm',
   'nexum.roller',

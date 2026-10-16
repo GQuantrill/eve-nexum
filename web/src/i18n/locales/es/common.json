@@ -1324,6 +1324,7 @@
     "suppressed": "Suprimido",
     "undivedUnknown": "desconocido",
     "undivedWhTitle": "Agujero de gusano inexplorado",
+    "regionBorderTitle": "Puerta hacia otra región: {{regions}}",
     "unknown": "Desconocido"
   },
   "mapShares": {
@@ -1612,6 +1613,8 @@
     "showPatchNotes": "Ver notas de la versión",
     "showStaticWhs": "Mostrar WH estáticos",
     "showUndivedWhs": "Mostrar WHs sin explorar",
+    "showRegionBorders": "Mostrar fronteras de región",
+    "showRegionBordersTooltip": "Marca los sistemas cuyas puertas llevan a otra región, con el nombre de esa región. El sistema vecino no se añade al mapa.",
     "sigBookmark": "Marcador de agujero de gusano",
     "siteBookmark": "Marcador de sitio (relic / data / gas)",
     "siteBookmarkHelp": "En una fila de firma relic, data o gas, haz clic en el icono de copiar para un nombre de marcador listo para pegar. Constrúyelo con estos tokens:",
