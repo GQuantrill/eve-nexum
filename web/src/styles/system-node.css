@@ -604,6 +604,30 @@
   font-style: italic;
 }
 
+/* Region border label: names the region(s) this system's gates lead into,
+   in the spirit of Dotlan's grey neighbour boxes but without adding them. */
+.system-node__region-border {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: fit-content;
+  max-width: 100%;
+  margin-top: 4px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: calc(11px * var(--font-scale, 1));
+  color: #c9a6ff;
+  background: rgba(160, 106, 216, 0.15);
+  border: 1px solid rgba(160, 106, 216, 0.45);
+}
+.system-node__region-border svg { flex-shrink: 0; }
+.system-node__region-border-names {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .system-node__statics {
   display: flex;
   flex-wrap: wrap;

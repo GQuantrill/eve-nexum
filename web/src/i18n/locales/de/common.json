@@ -1324,6 +1324,7 @@
     "suppressed": "Unterdrückt",
     "undivedUnknown": "unbekannt",
     "undivedWhTitle": "Unerforschtes Wurmloch",
+    "regionBorderTitle": "Stargate in eine andere Region: {{regions}}",
     "unknown": "Unbekannt"
   },
   "mapShares": {
@@ -1612,6 +1613,8 @@
     "showPatchNotes": "Patchnotes anzeigen",
     "showStaticWhs": "Statische WHs anzeigen",
     "showUndivedWhs": "Ungetauchte WHs zeigen",
+    "showRegionBorders": "Regionsgrenzen zeigen",
+    "showRegionBordersTooltip": "Markiert Systeme, deren Stargates in eine andere Region führen, mit dem Namen der Region. Das Nachbarsystem wird nicht zur Karte hinzugefügt.",
     "sigBookmark": "Wurmloch-Lesezeichen",
     "siteBookmark": "Site-Lesezeichen (relic / data / gas)",
     "siteBookmarkHelp": "Klicke in einer relic-, data- oder gas-Signaturzeile auf das Kopiersymbol für einen einfügefertigen Lesezeichennamen. Baue ihn mit diesen Tokens:",

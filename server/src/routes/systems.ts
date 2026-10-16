@@ -237,6 +237,49 @@ systemsRouter.get('/search', async (req, res) => {
   }
 });
 
+// GET /api/systems/region-borders — every system with a stargate into a
+// DIFFERENT region, keyed by eve system id, valued by the names of the regions
+// those gates lead to. Powers the optional "region border" label on map nodes,
+// so the map can say "this system leads to Providence" without the neighbour
+// being added. Static SDE (~670 systems cluster-wide), so it's built once and
+// served from memory; an SDE re-seed clears it via resetRegionBordersCache.
+let regionBorders: Record<number, string[]> | null = null;
+let regionBordersInflight: Promise<Record<number, string[]>> | null = null;
+
+export function resetRegionBordersCache(): void {
+  regionBorders = null;
+  regionBordersInflight = null;
+}
+
+function loadRegionBorders(): Promise<Record<number, string[]>> {
+  if (regionBorders) return Promise.resolve(regionBorders);
+  if (regionBordersInflight) return regionBordersInflight;
+  regionBordersInflight = db.query<{ id: number; regions: string[] }>(
+    `SELECT a.id, array_agg(DISTINCT r.name ORDER BY r.name) AS regions
+       FROM map_stargates g
+       JOIN solar_systems a ON a.id = g.system_id
+       JOIN solar_systems b ON b.id = g.destination_system_id
+       JOIN map_regions r   ON r.id = b.region_id
+      WHERE a.region_id IS NOT NULL AND b.region_id <> a.region_id
+      GROUP BY a.id`,
+  ).then(({ rows }) => {
+    const out: Record<number, string[]> = {};
+    for (const row of rows) out[row.id] = row.regions;
+    regionBorders = out;
+    return out;
+  }).finally(() => { regionBordersInflight = null; });
+  return regionBordersInflight;
+}
+
+systemsRouter.get('/region-borders', async (_req, res) => {
+  try {
+    return res.json(await loadRegionBorders());
+  } catch (err) {
+    log.error('Region-borders query failed:', err);
+    return res.status(500).json({ error: 'Database query failed' });
+  }
+});
+
 // GET /api/systems/:id/adjacent — k-space stargate neighbours of a system,
 // powering the "Add adjacent" map context-menu. Pure static-SDE read against
 // map_stargates (parameterized). Only k-space systems have stargates, so a

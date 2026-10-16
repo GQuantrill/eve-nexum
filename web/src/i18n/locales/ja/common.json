@@ -1324,6 +1324,7 @@
     "suppressed": "鎮圧",
     "undivedUnknown": "不明",
     "undivedWhTitle": "未探索のワームホール",
+    "regionBorderTitle": "別リージョンへのスターゲート：{{regions}}",
     "unknown": "不明"
   },
   "mapShares": {
@@ -1612,6 +1613,8 @@
     "showPatchNotes": "パッチノートを表示",
     "showStaticWhs": "スタティック WH を表示",
     "showUndivedWhs": "未ダイブWHを表示",
+    "showRegionBorders": "リージョン境界を表示",
+    "showRegionBordersTooltip": "スターゲートが別のリージョンへ繋がる星系に、そのリージョン名を表示します。隣接星系はマップに追加されません。",
     "sigBookmark": "ワームホールのブックマーク",
     "siteBookmark": "サイトのブックマーク（relic / data / gas）",
     "siteBookmarkHelp": "relic・data・gas のシグネチャ行でコピーアイコンをクリックすると、貼り付け可能なブックマーク名が得られます。次のトークンで組み立てます：",

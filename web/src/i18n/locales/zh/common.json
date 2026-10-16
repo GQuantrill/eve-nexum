@@ -1324,6 +1324,7 @@
     "suppressed": "已镇压",
     "undivedUnknown": "未知",
     "undivedWhTitle": "未探索的虫洞",
+    "regionBorderTitle": "星门通往其他星域：{{regions}}",
     "unknown": "未知"
   },
   "mapShares": {
@@ -1612,6 +1613,8 @@
     "showPatchNotes": "查看更新日志",
     "showStaticWhs": "显示固定虫洞",
     "showUndivedWhs": "显示未跳跃虫洞",
+    "showRegionBorders": "显示星域边界",
+    "showRegionBordersTooltip": "标记星门通往其他星域的星系，并显示该星域名称。相邻星系不会被添加到地图上。",
     "sigBookmark": "虫洞书签",
     "siteBookmark": "站点书签（relic / data / gas）",
     "siteBookmarkHelp": "在 relic、data 或 gas 信号行上，点击复制图标即可获得可粘贴的书签名称。使用以下标记来构建：",

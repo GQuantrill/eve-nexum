@@ -1324,6 +1324,7 @@
     "suppressed": "Suprimido",
     "undivedUnknown": "desconhecido",
     "undivedWhTitle": "Buraco de minhoca inexplorado",
+    "regionBorderTitle": "Portão para outra região: {{regions}}",
     "unknown": "Desconhecido"
   },
   "mapShares": {
@@ -1612,6 +1613,8 @@
     "showPatchNotes": "Ver notas de versão",
     "showStaticWhs": "Mostrar WH estáticos",
     "showUndivedWhs": "Mostrar WHs não mergulhados",
+    "showRegionBorders": "Mostrar fronteiras de região",
+    "showRegionBordersTooltip": "Marca os sistemas cujos portões levam a outra região, com o nome dessa região. O sistema vizinho não é adicionado ao mapa.",
     "sigBookmark": "Marcador de wormhole",
     "siteBookmark": "Marcador de site (relic / data / gas)",
     "siteBookmarkHelp": "Numa linha de assinatura relic, data ou gas, clica no ícone de copiar para um nome de marcador pronto a colar. Constrói-o com estes tokens:",

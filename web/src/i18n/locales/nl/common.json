@@ -1324,6 +1324,7 @@
     "suppressed": "Suppressed",
     "undivedUnknown": "onbekend",
     "undivedWhTitle": "Onverkend wormgat",
+    "regionBorderTitle": "Gate naar een andere regio: {{regions}}",
     "unknown": "Onbekend"
   },
   "mapShares": {
@@ -1612,6 +1613,8 @@
     "showPatchNotes": "Patchnotes tonen",
     "showStaticWhs": "Static-WH's tonen",
     "showUndivedWhs": "Onverkende WH's tonen",
+    "showRegionBorders": "Regiogrenzen tonen",
+    "showRegionBordersTooltip": "Markeert systemen waarvan een gate naar een andere regio leidt, met de naam van die regio. Het buursysteem wordt niet aan de kaart toegevoegd.",
     "sigBookmark": "Wormgat-bookmark",
     "siteBookmark": "Site-bookmark (relic / data / gas)",
     "siteBookmarkHelp": "Klik op een rij met een relic-, data- of gassignatuur op het kopieerpictogram voor een kant-en-klare bookmarknaam. Stel die samen met deze tokens:",

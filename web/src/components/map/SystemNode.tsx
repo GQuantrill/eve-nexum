@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Handle, Position, useConnection } from '@xyflow/react';
 import {
   HouseIcon, LockIcon, WarningIcon, SkullIcon, LightningIcon,
-  SunIcon, SnowflakeIcon, SwordIcon, SparkleIcon, DiamondsFourIcon,
+  SunIcon, SnowflakeIcon, SwordIcon, SparkleIcon, DiamondsFourIcon, SignOutIcon,
 } from '../../icons';
 import type { NodeProps } from '@xyflow/react';
 import type { MapSystem } from '../../types';
@@ -22,6 +22,7 @@ import { useFleet } from '../../hooks/useFleet';
 import { useAuth } from '../../context/AuthContext';
 import { useUserSetting } from '../../hooks/useUserSetting';
 import { useWormholeTypes } from '../../hooks/useWormholeTypes';
+import { useRegionBorders } from '../../hooks/useRegionBorders';
 import { holeDisplay, whDestClass } from '../../utils/whDest';
 import { useIncursions, findIncursion } from '../../hooks/useIncursions';
 import { useInsurgency, findInsurgency } from '../../hooks/useInsurgency';
@@ -212,6 +213,11 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
   const undivedHoles    = useMapStore((s) => s.undivedWhBySystem[sys.id]);
   const scan            = useMapStore((s) => s.scanBySystem[sys.id]);
   const [showUndivedWh] = useUserSetting<boolean>('nexum.map.showUndivedWh', true);
+  // Region border (opt-in): the other regions this system's stargates lead to,
+  // labelled on the node so the exit is visible without mapping the neighbour.
+  const [showRegionBorders] = useUserSetting<boolean>('nexum.map.showRegionBorders', false);
+  const regionBorders   = useRegionBorders(showRegionBorders && isKspace);
+  const borderRegions   = isKspace && sys.eveSystemId != null ? regionBorders[sys.eveSystemId] : undefined;
   // SDE-derived wormhole catalog (the single source of truth for destinations),
   // used to colour statics and undived-hole pills consistently with the rest of
   // the app rather than the drift-prone hardcoded map.
@@ -590,6 +596,16 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
       {!compactMode && isKspace && sys.regionName && (
         <div className="system-node__npc-type">
           {sys.regionName}{sys.npcType ? ` - ${sys.npcType}` : ''}
+        </div>
+      )}
+
+      {borderRegions && borderRegions.length > 0 && (
+        <div
+          className="system-node__region-border"
+          title={t('mapNode.regionBorderTitle', { regions: borderRegions.join(', ') })}
+        >
+          <SignOutIcon size={12} weight="bold" />
+          <span className="system-node__region-border-names">{borderRegions.join(' · ')}</span>
         </div>
       )}
 
