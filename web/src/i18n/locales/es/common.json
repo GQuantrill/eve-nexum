@@ -477,7 +477,7 @@
   "chainExits": {
     "title": "Salidas de la cadena",
     "noExits": "No hay salidas de K-space en esta cadena.",
-    "hint": "Sistemas de K-space actualmente en el mapa, por clase de seguridad. La ruta a Jita es solo por puertas — los atajos por agujero de gusano no se cuentan.",
+    "hint": "Sistemas de K-space con un agujero de gusano en el mapa, por clase de seguridad. La ruta a Jita es solo por puertas — los atajos por agujero de gusano no se cuentan.",
     "allExits": "Todas las salidas a K-space",
     "noFavourites": "Aún no hay sistemas favoritos: añade algunos en el panel Sistemas cercanos.",
     "noRoute": "sin ruta",

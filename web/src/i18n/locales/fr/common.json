@@ -477,7 +477,7 @@
   "chainExits": {
     "title": "Sorties de la chaîne",
     "noExits": "Aucune sortie K-space dans cette chaîne.",
-    "hint": "Systèmes K-space actuellement sur la carte, par classe de sécurité. L'itinéraire vers Jita passe uniquement par les portails — les raccourcis par trou de ver ne sont pas comptés.",
+    "hint": "Systèmes K-space reliés par un trou de ver sur la carte, par classe de sécurité. L'itinéraire vers Jita passe uniquement par les portails — les raccourcis par trou de ver ne sont pas comptés.",
     "allExits": "Toutes les sorties K-space",
     "noFavourites": "Aucun système favori — ajoutez-en dans le panneau Systèmes proches.",
     "noRoute": "aucun itinéraire",

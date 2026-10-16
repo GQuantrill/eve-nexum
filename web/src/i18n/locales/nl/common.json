@@ -477,7 +477,7 @@
   "chainExits": {
     "title": "Ketenuitgangen",
     "noExits": "Geen K-space-uitgangen in deze keten.",
-    "hint": "K-space-systemen die nu op de kaart staan, per beveiligingsklasse. De Jita-route gaat alleen via gates — wormgat-sluiproutes tellen niet mee.",
+    "hint": "K-space-systemen met een wormgat op de kaart, per beveiligingsklasse. De Jita-route gaat alleen via gates — wormgat-sluiproutes tellen niet mee.",
     "allExits": "Alle K-space-uitgangen",
     "noFavourites": "Nog geen favoriete systemen — voeg ze toe in het paneel Dichtstbijzijnde systemen.",
     "noRoute": "geen route",

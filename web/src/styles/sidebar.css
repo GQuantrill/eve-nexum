@@ -632,7 +632,22 @@
   border-bottom: 1px solid var(--surface-panel);
 }
 .chain-exits-menu__fav:last-child,
-.chain-exits-menu__exit:last-child { border-bottom: none; }
+.chain-exits-menu__exits li:last-child .chain-exits-menu__exit { border-bottom: none; }
+/* The exit row is a button (click to select + centre); strip the UA button
+   look so it renders exactly like the static row it replaced. */
+button.chain-exits-menu__exit {
+  width: 100%;
+  margin: 0;
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  color: inherit;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+button.chain-exits-menu__exit:hover { background: var(--surface-hover); }
 
 .chain-exits-menu__fav-name { flex: 1; min-width: 0; font-weight: 600; }
 .chain-exits-menu__fav-route { white-space: nowrap; }

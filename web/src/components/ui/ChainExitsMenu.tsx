@@ -90,22 +90,36 @@ function FavouriteRow({ fav, exits }: { fav: { id: number; name: string; isHome:
 export function ChainExitsMenu() {
   const { t } = useTranslation();
   const systems = useMapStore((s) => s.map.systems);
+  const connections = useMapStore((s) => s.map.connections);
   const favourites = useClosestSystemsList();
+  const selectSystem = useMapStore((s) => s.selectSystem);
+  const requestCenterOnNode = useMapStore((s) => s.requestCenterOnNode);
   const [open, setOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
 
   useClickOutside(open, wrapRef, () => setOpen(false));
 
-  // Every k-space system on the map with a resolved EVE id. Synthetic systems
-  // without one can't be routed, so they can't be exits.
-  const exits = useMemo<Exit[]>(() => systems
-    .filter((s) => isExitClass(s.systemClass) && s.eveSystemId != null)
-    .map((s) => ({
-      id: s.id,
-      eveId: s.eveSystemId as number,
-      name: systemDisplayName(s),
-      klass: s.systemClass as ExitClass,
-    })), [systems]);
+  // K-space systems with a live wormhole on them -- where the chain actually
+  // lets you out. A k-space system only reached by stargates (mapped while
+  // travelling out of an exit) isn't an exit itself; routing from the hole
+  // that leads to it already covers it. Collapsed holes don't count. Systems
+  // without a resolved EVE id can't be routed, so they can't be exits either.
+  const exits = useMemo<Exit[]>(() => {
+    const onWormhole = new Set<string>();
+    for (const c of connections) {
+      if (c.connectionType !== 'standard' || c.broken) continue;
+      onWormhole.add(c.sourceId);
+      onWormhole.add(c.targetId);
+    }
+    return systems
+      .filter((s) => isExitClass(s.systemClass) && s.eveSystemId != null && onWormhole.has(s.id))
+      .map((s) => ({
+        id: s.id,
+        eveId: s.eveSystemId as number,
+        name: systemDisplayName(s),
+        klass: s.systemClass as ExitClass,
+      }));
+  }, [systems, connections]);
 
   const counts: Record<ExitClass, number> = { HS: 0, LS: 0, NS: 0 };
   for (const e of exits) counts[e.klass]++;
@@ -182,9 +196,24 @@ export function ChainExitsMenu() {
               <div className="chain-exits-menu__hint">{t('chainExits.allExits')}</div>
               <ul className="chain-exits-menu__exits">
                 {sortedExits.map((e) => (
-                  <li key={e.id} className="chain-exits-menu__exit">
-                    <span className="chain-exits-menu__dot" style={{ background: EXIT_COLOR[e.klass] }} />
-                    <span className="chain-exits-menu__exit-name">{e.name}</span>
+                  <li key={e.id}>
+                    {/* Select it and fly the map there. The centre request
+                        zooms in regardless of the centre-on-select setting,
+                        since jumping to it is the whole point of the click. */}
+                    <button
+                      type="button"
+                      role="menuitem"
+                      className="chain-exits-menu__exit"
+                      title={t('chains.centerOn', { system: e.name })}
+                      onClick={() => {
+                        selectSystem(e.id);
+                        requestCenterOnNode(e.id);
+                        setOpen(false);
+                      }}
+                    >
+                      <span className="chain-exits-menu__dot" style={{ background: EXIT_COLOR[e.klass] }} />
+                      <span className="chain-exits-menu__exit-name">{e.name}</span>
+                    </button>
                   </li>
                 ))}
               </ul>
