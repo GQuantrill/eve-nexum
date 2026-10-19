@@ -604,15 +604,25 @@ export function SignaturePane({ systemId }: { systemId: string }) {
     }
     return m;
   }, [mapSystems]);
+  // Same keying, for {leads_to}: a jumped hole names its system by alias.
+  const aliasBySystemName = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const sys of mapSystems) {
+      const alias = sys.alias?.trim();
+      if (sys.name && alias) m.set(sys.name.trim().toUpperCase(), alias);
+    }
+    return m;
+  }, [mapSystems]);
 
   const copyBookmark = useCallback((sig: Signature) => {
     const name = formatBookmarkName(bookmarkFormat, sig, whTypes, Date.now(),
-      (n) => classBySystemName.get(n.trim().toUpperCase()) ?? null);
+      (n) => classBySystemName.get(n.trim().toUpperCase()) ?? null,
+      (n) => aliasBySystemName.get(n.trim().toUpperCase()) ?? null);
     if (!name) return;
     navigator.clipboard.writeText(name)
       .then(() => toast.success(t('signatures.bookmarkCopied', { name })))
       .catch(() => toast.error(t('signatures.bookmarkCopyFailed')));
-  }, [bookmarkFormat, whTypes, classBySystemName, t]);
+  }, [bookmarkFormat, whTypes, classBySystemName, aliasBySystemName, t]);
 
   const copySiteBookmark = useCallback((sig: Signature) => {
     const name = formatSiteBookmarkName(siteBookmarkFormat, sig);

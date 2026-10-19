@@ -59,3 +59,23 @@ describe('formatBookmarkName {dest_type}', () => {
       .toBe('ABC-123 C3');
   });
 });
+
+describe('formatBookmarkName {leads_to}', () => {
+  const jumped = sig({ whType: 'K162', whLeadsTo: 'J110555' });
+
+  it('names a pinned system by its alias when it has one', () => {
+    expect(formatBookmarkName('{sig} {leads_to}', jumped, WH_TYPES, Date.now(), undefined,
+      (n) => (n === 'J110555' ? 'Home' : null))).toBe('ABC-123 Home');
+  });
+
+  it('falls back to the system name when there is no alias', () => {
+    expect(formatBookmarkName('{leads_to}', jumped, WH_TYPES, Date.now(), undefined, () => null)).toBe('J110555');
+    expect(formatBookmarkName('{leads_to}', jumped, WH_TYPES, Date.now(), undefined, () => '  ')).toBe('J110555');
+  });
+
+  it('still looks the class up by the real name', () => {
+    const classOf = (n: string) => (n === 'J110555' ? 'C3' : null);
+    expect(formatBookmarkName('{dest_type} {leads_to}', jumped, WH_TYPES, Date.now(), classOf, () => 'Home'))
+      .toBe('C3 Home');
+  });
+});

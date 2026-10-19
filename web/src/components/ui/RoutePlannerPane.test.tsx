@@ -30,8 +30,10 @@ vi.mock('../../hooks/useEsiSearch', () => ({
   systemResultLabel: (r: { regionName?: string }) => r.regionName ?? '',
 }));
 
+// Systems on the current map -- only their aliases matter to this pane.
+const mapSystems = vi.hoisted(() => ({ list: [] as unknown[] }));
 vi.mock('../../store/mapStore', () => ({
-  useMapStore: (sel: (s: unknown) => unknown) => sel({ routeMode: 'shortest' }),
+  useMapStore: (sel: (s: unknown) => unknown) => sel({ routeMode: 'shortest', map: { systems: mapSystems.list } }),
 }));
 
 // RouteSquares brings its own context menu and alias lookups; the pane only
@@ -68,7 +70,35 @@ function setUp(opts: {
 }
 
 describe('RoutePlannerPane', () => {
-  beforeEach(() => { api.mockReset(); useRoute.mockReset(); useRouteOrigin.mockReset(); useEsiSearch.mockReset(); });
+  beforeEach(() => {
+    api.mockReset(); useRoute.mockReset(); useRouteOrigin.mockReset(); useEsiSearch.mockReset();
+    mapSystems.list = [];
+  });
+
+  it('finds a system by its alias on the map and shows the alias once picked', async () => {
+    mapSystems.list = [{ id: 'n1', eveSystemId: AMARR.id, name: 'Amarr', alias: 'Staging' }];
+    // ESI knows nothing called "stag" -- the match can only have come from the map.
+    setUp({ origin: { systemId: JITA.id, name: 'Jita' }, results: [], routes: { [String(AMARR.id)]: ROUTE } });
+    const { container } = render(<RoutePlannerPane />);
+    const input = container.querySelectorAll('input')[0] as HTMLInputElement;
+    fireEvent.change(input, { target: { value: 'stag' } });
+    fireEvent.click(await screen.findByText('Staging'));
+
+    // Routed by the real system, shown by the alias with the real name beside it.
+    await waitFor(() => expect(useRoute).toHaveBeenLastCalledWith(JITA.id, [AMARR.id]));
+    expect(screen.getByText('Staging', { selector: 'strong' })).toBeTruthy();
+    expect(container.querySelector('.route-planner__real-name')?.textContent).toBe('Amarr');
+  });
+
+  it('does not list a system twice when both its alias and ESI match', async () => {
+    mapSystems.list = [{ id: 'n1', eveSystemId: AMARR.id, name: 'Amarr', alias: 'Amarr staging' }];
+    setUp({ origin: { systemId: JITA.id, name: 'Jita' }, results: [AMARR] });
+    const { container } = render(<RoutePlannerPane />);
+    const input = container.querySelectorAll('input')[0] as HTMLInputElement;
+    fireEvent.change(input, { target: { value: 'Amarr' } });
+    await screen.findByText('Amarr staging');
+    expect(container.querySelectorAll('.search-results__item')).toHaveLength(1);
+  });
 
   it('asks for nothing until both ends are chosen', async () => {
     setUp();
