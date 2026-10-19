@@ -558,6 +558,8 @@
   padding: 5px 8px;
 }
 .route-planner__picked-actions { display: inline-flex; align-items: center; gap: 2px; }
+.route-planner__picked-name { display: inline-flex; align-items: baseline; gap: 6px; min-width: 0; }
+.route-planner__real-name { color: var(--text-subtle); font-size: calc(11px * var(--font-scale, 1)); }
 /* Anchors the absolutely-positioned results list to the input. */
 .route-planner__search { position: relative; display: flex; align-items: center; gap: 4px; }
 .route-planner__search > input { flex: 1; min-width: 0; }

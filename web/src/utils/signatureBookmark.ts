@@ -10,7 +10,7 @@ export const BOOKMARK_TOKENS: { token: string; desc: string }[] = [
   { token: '{sig_letters}', desc: 'First 3 chars (ABC)' },
   { token: '{type}',        desc: 'Wormhole type code (D382)' },
   { token: '{dest_type}',   desc: 'Destination class (C5, HS)' },
-  { token: '{leads_to}',    desc: 'Leads to — pinned system or class (J110555)' },
+  { token: '{leads_to}',    desc: 'Leads to — pinned system (its alias if set) or class (J110555)' },
   { token: '{size}',        desc: 'Hole size (S / M / L / XL)' },
   { token: '{mass}',        desc: 'Total mass in billions (3.0)' },
   { token: '{age}',         desc: 'Hours since first seen (2h)' },
@@ -48,6 +48,10 @@ export function formatBookmarkName(
   /** A system's class by name. Lets {dest_type} stay filled once a hole has
    *  been jumped and its leads-to is a real system rather than a band. */
   classOfSystem?: (name: string) => string | null | undefined,
+  /** A system's alias on this map by name, if it has one. {leads_to} names a
+   *  pinned system the way the pilot calls it; everything else keeps the real
+   *  name (the class lookup above needs it). */
+  aliasOfSystem?: (name: string) => string | null | undefined,
 ): string {
   // The full wormhole catalog (useWormholeTypes) keyed by type code — the small
   // static map only covers k-space statics, so most holes (e.g. A641) miss it.
@@ -76,7 +80,7 @@ export function formatBookmarkName(
     '{sig_letters}': (sig.sigId ?? '').slice(0, 3).toUpperCase(),
     '{type}':        sig.whType ?? '',
     '{dest_type}':   destType,
-    '{leads_to}':    leadsTo,
+    '{leads_to}':    (leadsTo && aliasOfSystem?.(leadsTo)?.trim()) || leadsTo,
     '{size}':        wh ? sizeLetter(wh.maxJumpMass) : '',
     '{mass}':        wh && wh.totalMass ? String(Number((wh.totalMass / 1_000_000_000).toFixed(1))) : '',
     '{age}':         ageH != null ? `${ageH}h` : '',

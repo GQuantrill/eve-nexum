@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { api } from '../../api/client';
 import { useEsiSearch, systemResultLabel, type SystemSearchResult } from '../../hooks/useEsiSearch';
 import { useRoute } from '../../hooks/useRoute';
 import { useRouteOrigin } from '../../hooks/useRouteOrigin';
 import { useMapStore } from '../../store/mapStore';
+import { useSystemAlias } from '../../hooks/useSystemAlias';
 import { RouteSquares } from './routeUi';
 import { canSetAutopilot } from '../../utils/routeActions';
 import { setDestination } from '../../api/waypoint';
@@ -27,6 +28,23 @@ import { XIcon, ArrowsLeftRightIcon, CrosshairIcon } from '../../icons';
 // on the current map -- Jita to Amarr has nothing to do with any map.
 
 interface Picked { id: number; name: string }
+
+// Most alias matches listed above the search results. Aliases are a handful per
+// map, so this only bites on a very short query.
+const MAX_ALIAS_MATCHES = 5;
+
+/** The picked system as the pilot knows it: its alias on this map when it has
+ *  one, with the real name alongside so the two never get confused. */
+function PickedName({ name }: { name: string }) {
+  const aliasName = useSystemAlias();
+  const shown = aliasName(name);
+  return (
+    <span className="route-planner__picked-name">
+      <strong>{shown}</strong>
+      {shown !== name && <span className="route-planner__real-name">{name}</span>}
+    </span>
+  );
+}
 
 interface SavedPlan {
   id: string;
@@ -56,7 +74,30 @@ function SystemSearchField({ label, value, onPick, extra }: {
   const { t } = useTranslation();
   const [query, setQuery] = useState('');
   const { results, loading } = useEsiSearch(query);
-  const open = query.trim().length >= 2 && (results.length > 0 || loading);
+
+  // Systems on the current map whose ALIAS matches, so "home" finds the system
+  // you've called home. ESI only knows real names, so these come from the map
+  // and sit above its results, which drop any system already listed here.
+  const systems = useMapStore((s) => s.map.systems);
+  const aliasMatches = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (q.length < 2) return [];
+    const seen = new Set<number>();
+    const out: Array<{ id: number; name: string; alias: string }> = [];
+    for (const s of systems) {
+      const alias = s.alias?.trim();
+      if (!alias || s.eveSystemId == null || seen.has(s.eveSystemId)) continue;
+      if (!alias.toLowerCase().includes(q)) continue;
+      seen.add(s.eveSystemId);
+      out.push({ id: s.eveSystemId, name: s.name, alias });
+      if (out.length >= MAX_ALIAS_MATCHES) break;
+    }
+    return out;
+  }, [systems, query]);
+  const aliasIds = new Set(aliasMatches.map((m) => m.id));
+  const esiResults = results.filter((r) => !aliasIds.has(r.id));
+
+  const open = query.trim().length >= 2 && (esiResults.length > 0 || aliasMatches.length > 0 || loading);
 
   const pick = (r: SystemSearchResult) => { onPick({ id: r.id, name: r.name }); setQuery(''); };
 
@@ -65,7 +106,7 @@ function SystemSearchField({ label, value, onPick, extra }: {
       <div className="route-planner__label">{label}</div>
       {value ? (
         <div className="route-planner__picked">
-          <strong>{value.name}</strong>
+          <PickedName name={value.name} />
           <span className="route-planner__picked-actions">
             {extra}
             <button
@@ -94,10 +135,22 @@ function SystemSearchField({ label, value, onPick, extra }: {
           {extra}
           {open && (
             <ul className="search-results">
-              {loading && results.length === 0 && (
+              {aliasMatches.map((m) => (
+                <li
+                  key={`alias-${m.id}`}
+                  className="search-results__item"
+                  role="option"
+                  aria-selected={false}
+                  onClick={() => { onPick({ id: m.id, name: m.name }); setQuery(''); }}
+                >
+                  {m.alias}
+                  <span className="search-results__class">{m.name}</span>
+                </li>
+              ))}
+              {loading && esiResults.length === 0 && aliasMatches.length === 0 && (
                 <li className="search-results__item route-planner__status">{t('routePlanner.searching')}</li>
               )}
-              {results.map((r) => (
+              {esiResults.map((r) => (
                 <li
                   key={r.id}
                   className="search-results__item"
@@ -120,6 +173,7 @@ function SystemSearchField({ label, value, onPick, extra }: {
 export function RoutePlannerPane() {
   const { t } = useTranslation();
   const origin = useRouteOrigin();
+  const aliasName = useSystemAlias();
 
   // THREE states, not two, because "cleared" and "follow me" are different
   // intents that used to share `null`:
@@ -231,8 +285,8 @@ export function RoutePlannerPane() {
       {followingPilot && from && (
         <div className="scout-pane__note scout-pane__note--lastknown">
           {origin.fromLastKnown
-            ? t('route.fromLastKnown', { system: from.name })
-            : t('routePlanner.followingLocation', { system: from.name })}
+            ? t('route.fromLastKnown', { system: aliasName(from.name) })
+            : t('routePlanner.followingLocation', { system: aliasName(from.name) })}
         </div>
       )}
 
@@ -278,7 +332,7 @@ export function RoutePlannerPane() {
                 <button type="button" onClick={() => loadPlan(p)} title={t('routePlanner.loadPlan')}>
                   <strong>{p.name}</strong>{' '}
                   <span className="route-planner__chip-ends">
-                    {p.fromName ?? p.fromEveId} → {p.toName ?? p.toEveId}
+                    {p.fromName ? aliasName(p.fromName) : p.fromEveId} → {p.toName ? aliasName(p.toName) : p.toEveId}
                   </span>
                 </button>
                 <button
