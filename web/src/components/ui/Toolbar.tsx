@@ -59,6 +59,7 @@ import {
 } from '../../icons';
 import type { Icon as PhosphorIcon } from '../../icons';
 import { UpdateIndicator } from './UpdateIndicator';
+import { OrgLogos } from './OrgLogos';
 import { charPortrait, typeIcon } from '../../utils/eveImages';
 import { DISCORD_INVITE_URL } from '../../data/links';
 
@@ -869,6 +870,7 @@ export function Toolbar() {
       {/* Fixed brand anchor — always top-left, never draggable. */}
       <div className="toolbar__brand">
         <img className="toolbar__logo" src="/screen.png" alt="Nexum" />
+        <OrgLogos className="toolbar__org-logos" size={26} />
       </div>
 
       <DndContext sensors={dragSensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>

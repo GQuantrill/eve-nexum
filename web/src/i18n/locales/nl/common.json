@@ -2213,5 +2213,9 @@
     "max": "Maximaal {{count}} voorinstellingen",
     "orgGroup": "Org",
     "mineGroup": "Eigen"
+  },
+  "orgLogos": {
+    "alliance": "Alliantielogo",
+    "corp": "Corporatielogo"
   }
 }
