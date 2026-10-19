@@ -19,6 +19,7 @@ import { SUPPORTED_LANGUAGES, LANGUAGE_NAMES } from '../../i18n';
 import { DemoMap } from './DemoMap';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { LangFlag } from './LangFlag';
+import { OrgLogos } from './OrgLogos';
 import portraitImg from '../../assets/portrait.jpeg';
 interface LastCharacter { characterId: number; characterName: string; }
 
@@ -330,6 +331,7 @@ export function LandingPage() {
               {errorMessage}
             </div>
           )}
+          <OrgLogos className="landing__org-logos" size={64} />
           {lastChar ? (
             <>
               <a href={apiUrl('/auth/login')} className="landing__returning">

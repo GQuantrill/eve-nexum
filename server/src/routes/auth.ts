@@ -563,6 +563,15 @@ authRouter.post('/remove-character', async (req, res) => {
   res.json({ ok: true });
 });
 
+// GET /auth/org -- public. Which corps / alliances this deployment is run for,
+// so the landing page can show their logos above the login button. IDs only:
+// they're public in EVE, and returning them grants nothing (login is still
+// checked against the character's live affiliation). Empty on an open
+// deployment, which shows no logos.
+authRouter.get('/org', (_req, res) => {
+  res.json({ corpIds: config.corpIds, allianceIds: config.allianceIds });
+});
+
 // GET /auth/me
 authRouter.get('/me', async (req, res) => {
   if (!req.session.userId) {

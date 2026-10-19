@@ -391,6 +391,21 @@
   gap: 16px;
 }
 
+/* Corp / alliance logos of a restricted deployment, above the login button. */
+.landing__org-logos {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+.landing__org-logos img {
+  width: calc(64px * var(--font-scale, 1));
+  height: calc(64px * var(--font-scale, 1));
+  object-fit: contain;
+  display: block;
+  border-radius: 8px;
+}
+
 .landing__login-wrap {
   display: block;
   opacity: 0.92;

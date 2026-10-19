@@ -2212,5 +2212,9 @@
     "max": "최대 {{count}}개",
     "orgGroup": "조직",
     "mineGroup": "내 것"
+  },
+  "orgLogos": {
+    "alliance": "얼라이언스 로고",
+    "corp": "코퍼레이션 로고"
   }
 }

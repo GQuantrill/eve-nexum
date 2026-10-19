@@ -47,8 +47,10 @@ services:
       # Passed through from the shell / Infisical when set, else from the
       # optional .env above. ADD NEW SERVER ENV VARS HERE so they reach the
       # container under both setups. (Vars unset in every source are omitted.)
-      - PG_DB
-      - PG_USER
+      # PG_DB / PG_USER default to the same values as the postgres service
+      # above, or a fresh install that leaves them unset can't log in.
+      - PG_DB=${PG_DB:-eve_nexum}
+      - PG_USER=${PG_USER:-nexum}
       - PG_PASSWORD
       - PG_POOL_MAX
       - PORT

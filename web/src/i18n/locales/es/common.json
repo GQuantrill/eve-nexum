@@ -2213,5 +2213,9 @@
     "max": "Hasta {{count}} plantillas",
     "orgGroup": "Organización",
     "mineGroup": "Mías"
+  },
+  "orgLogos": {
+    "alliance": "Logo de la alianza",
+    "corp": "Logo de la corporación"
   }
 }

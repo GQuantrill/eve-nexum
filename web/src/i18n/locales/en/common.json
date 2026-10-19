@@ -2213,5 +2213,9 @@
     "max": "Up to {{count}} presets",
     "orgGroup": "Org",
     "mineGroup": "Mine"
+  },
+  "orgLogos": {
+    "alliance": "Alliance logo",
+    "corp": "Corporation logo"
   }
 }

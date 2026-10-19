@@ -2213,5 +2213,9 @@
     "max": "Bis zu {{count}} Vorlagen",
     "orgGroup": "Organisation",
     "mineGroup": "Meine"
+  },
+  "orgLogos": {
+    "alliance": "Allianzlogo",
+    "corp": "Corp-Logo"
   }
 }

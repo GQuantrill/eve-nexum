@@ -2213,5 +2213,9 @@
     "max": "Até {{count}} predefinições",
     "orgGroup": "Organização",
     "mineGroup": "Minhas"
+  },
+  "orgLogos": {
+    "alliance": "Logo da aliança",
+    "corp": "Logo da corporação"
   }
 }
