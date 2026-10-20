@@ -439,7 +439,7 @@ export type RemoteEvent =
   | { type: 'route.update';      id: string; updates: Partial<SavedRoute> }
   | { type: 'route.remove';      id: string }
   | { type: 'route.reorder';     orderedIds: string[] }
-  | { type: 'map.meta';          name?: string; locked?: boolean; allowAsMergeSource?: boolean; allowAsMergeDestination?: boolean; skipKspace?: boolean; lazyRemoveWormholes?: boolean; collapseGraceHours?: number; bookmarkFormat?: string | null; siteBookmarkFormat?: string | null }
+  | { type: 'map.meta';          name?: string; locked?: boolean; allowAsMergeSource?: boolean; allowAsMergeDestination?: boolean; skipKspace?: boolean; crossMapSync?: boolean; lazyRemoveWormholes?: boolean; collapseGraceHours?: number; bookmarkFormat?: string | null; siteBookmarkFormat?: string | null }
   | { type: 'map.resync' }
   | { type: 'sig.changed';       systemId: string }
   | { type: 'structure.changed'; systemId: string }
@@ -1522,6 +1522,7 @@ export const useMapStore = create<MapStore>()((set, get) => {
             ...(event.allowAsMergeSource !== undefined ? { allowAsMergeSource: event.allowAsMergeSource } : {}),
             ...(event.allowAsMergeDestination !== undefined ? { allowAsMergeDestination: event.allowAsMergeDestination } : {}),
             ...(event.skipKspace !== undefined ? { skipKspace: event.skipKspace } : {}),
+            ...(event.crossMapSync !== undefined ? { crossMapSync: event.crossMapSync } : {}),
             ...(event.lazyRemoveWormholes !== undefined ? { lazyRemoveWormholes: event.lazyRemoveWormholes } : {}),
             ...(event.collapseGraceHours !== undefined ? { collapseGraceHours: event.collapseGraceHours } : {}),
             ...(event.bookmarkFormat !== undefined ? { bookmarkFormat: event.bookmarkFormat } : {}),

@@ -219,6 +219,12 @@ export async function migrate() {
     -- nexum.tracking.skipKspace while they are on the map. Only ever set on corp or
     -- alliance maps (personal maps keep the per-user setting). DEFAULT FALSE.
     ALTER TABLE maps ADD COLUMN IF NOT EXISTS skip_kspace BOOLEAN NOT NULL DEFAULT FALSE;
+    -- Corp/alliance maps only: opt this map in to cross-map sync. Sigs and anoms
+    -- scanned here are copied to the same system on the org's other maps that
+    -- also have it on (alliance maps with alliance maps, corp maps with corp
+    -- maps). Set by owner/admins. Personal maps use the per-user
+    -- nexum.crossMapSync setting instead. DEFAULT FALSE.
+    ALTER TABLE maps ADD COLUMN IF NOT EXISTS cross_map_sync BOOLEAN NOT NULL DEFAULT FALSE;
     -- Per-map grace period (hours) a connection stays past its expiry before the
     -- lifetime sweep collapses it (severs + drops its backing sigs) on lazy-removal
     -- maps. 0.5 = 30 min. Editable from the map settings; also applied to the sig

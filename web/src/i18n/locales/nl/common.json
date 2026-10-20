@@ -1427,7 +1427,10 @@
     "createShareFailed": "Sharelink aanmaken mislukt",
     "createShareLink": "Sharelink aanmaken",
     "crossMapSync": "Systeemgegevens over mijn kaarten synchroniseren",
-    "crossMapSyncHelp": "Als je signaturen en anomalieën bij een systeem toevoegt of bewerkt, kopieer ze dan naar hetzelfde systeem op je andere kaarten (persoonlijke kaarten synchroniseren met je andere persoonlijke kaarten; corpkaarten met de andere kaarten van de corp). Niet-destructief: alleen ontbrekende of lege velden worden gevuld — gegevens die je al hebt ingevoerd worden nooit overschreven en er wordt nooit iets verwijderd.",
+    "crossMapSyncHelp": "Wanneer je signatures en anomalieën in een systeem toevoegt of bewerkt, worden ze gekopieerd naar hetzelfde systeem op je andere persoonlijke kaarten, ook die van je andere characters. Corp- en alliantiekaarten hebben een eigen schakelaar. Niet-destructief: alleen ontbrekende of lege velden worden aangevuld — bestaande gegevens worden nooit overschreven of verwijderd.",
+    "crossMapSyncOrg": "Systeemgegevens synchroniseren met andere kaarten",
+    "crossMapSyncCorpHelp": "Signatures en anomalieën die hier worden toegevoegd of bewerkt, worden gekopieerd naar hetzelfde systeem op de andere kaarten van de corp waarop dit ook aanstaat. Niet-destructief: alleen ontbrekende of lege velden worden aangevuld. Alleen eigenaar/admins kunnen dit wijzigen.",
+    "crossMapSyncAllianceHelp": "Signatures en anomalieën die hier worden toegevoegd of bewerkt, worden gekopieerd naar hetzelfde systeem op de andere kaarten van de alliantie waarop dit ook aanstaat. Niet-destructief: alleen ontbrekende of lege velden worden aangevuld. Alleen alliantie-admins kunnen dit wijzigen.",
     "easyConnect": "Eenvoudig verbinden",
     "edgeStyle": {
       "bezier": "Standaard",

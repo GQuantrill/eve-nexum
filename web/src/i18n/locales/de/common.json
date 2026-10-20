@@ -1427,7 +1427,10 @@
     "createShareFailed": "Freigabe-Link konnte nicht erstellt werden",
     "createShareLink": "Freigabe-Link erstellen",
     "crossMapSync": "Systemdaten über meine Karten synchronisieren",
-    "crossMapSyncHelp": "Wenn du Signaturen und Anomalien an einem System hinzufügst oder bearbeitest, werden sie auf das gleiche System auf deinen anderen Karten kopiert (persönliche Karten mit deinen anderen persönlichen Karten; Corp-Karten mit den anderen Karten der Corp). Nicht-destruktiv: Es füllt nur fehlende oder leere Einträge — vorhandene Daten werden nie überschrieben oder gelöscht.",
+    "crossMapSyncHelp": "Wenn du Signaturen und Anomalien in einem System hinzufügst oder bearbeitest, werden sie in dasselbe System auf deinen anderen persönlichen Karten kopiert, auch auf die Karten deiner anderen Charaktere. Corp- und Allianzkarten haben einen eigenen Schalter. Nicht destruktiv: Es werden nur fehlende oder leere Einträge ergänzt — bereits eingegebene Daten werden nie überschrieben oder gelöscht.",
+    "crossMapSyncOrg": "Systemdaten mit anderen Karten synchronisieren",
+    "crossMapSyncCorpHelp": "Hier hinzugefügte oder bearbeitete Signaturen und Anomalien werden in dasselbe System auf den anderen Karten der Corp kopiert, bei denen dies ebenfalls aktiviert ist. Nicht destruktiv: Es werden nur fehlende oder leere Einträge ergänzt. Nur Besitzer/Admins können das ändern.",
+    "crossMapSyncAllianceHelp": "Hier hinzugefügte oder bearbeitete Signaturen und Anomalien werden in dasselbe System auf den anderen Karten der Allianz kopiert, bei denen dies ebenfalls aktiviert ist. Nicht destruktiv: Es werden nur fehlende oder leere Einträge ergänzt. Nur Allianz-Admins können das ändern.",
     "easyConnect": "Einfaches Verbinden",
     "edgeStyle": {
       "bezier": "Standard",

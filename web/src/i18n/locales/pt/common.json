@@ -1427,7 +1427,10 @@
     "createShareFailed": "Falha ao criar a ligação de partilha",
     "createShareLink": "Criar ligação de partilha",
     "crossMapSync": "Sincronizar dados do sistema entre os meus mapas",
-    "crossMapSyncHelp": "Quando adicionas ou editas assinaturas e anomalias num sistema, elas são copiadas para o mesmo sistema nos teus outros mapas (mapas pessoais sincronizam com os teus outros mapas pessoais; mapas de corp com os outros mapas da corp). Não destrutivo: apenas preenche entradas em falta ou vazias — nunca substitui dados já introduzidos nem apaga nada.",
+    "crossMapSyncHelp": "Quando você adiciona ou edita assinaturas e anomalias em um sistema, elas são copiadas para o mesmo sistema nos seus outros mapas pessoais, incluindo os mapas dos seus outros personagens. Mapas de corporação e de aliança têm sua própria opção. Não destrutivo: só preenche entradas ausentes ou em branco — nunca sobrescreve nem apaga dados que você já inseriu.",
+    "crossMapSyncOrg": "Sincronizar dados do sistema com outros mapas",
+    "crossMapSyncCorpHelp": "Assinaturas e anomalias adicionadas ou editadas aqui são copiadas para o mesmo sistema nos outros mapas da corporação que também tenham isto ativado. Não destrutivo: só preenche entradas ausentes ou em branco. Apenas o dono/admins podem alterar isto.",
+    "crossMapSyncAllianceHelp": "Assinaturas e anomalias adicionadas ou editadas aqui são copiadas para o mesmo sistema nos outros mapas da aliança que também tenham isto ativado. Não destrutivo: só preenche entradas ausentes ou em branco. Apenas admins da aliança podem alterar isto.",
     "easyConnect": "Conexão fácil",
     "edgeStyle": {
       "bezier": "Padrão",
