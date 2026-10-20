@@ -529,26 +529,30 @@ function LazyWhSweepToggle() {
   );
 }
 
-// Corp/alliance map-level "Don't track K-space" policy. When on, no one on this
-// map records K-space jumps, overriding each member's personal
-// nexum.tracking.skipKspace while they're on the map. Only owner/admins may
-// change it (alliance maps need the alliance admin role, corp maps an admin) —
+// A corp/alliance map-level policy switch, e.g. "Don't track K-space" (no one on
+// the map records K-space jumps, overriding each member's personal
+// nexum.tracking.skipKspace) or cross-map sync. Only owner/admins may change
+// one (alliance maps need the alliance admin role, corp maps an admin) --
 // everyone else sees the current state read-only. Same optimistic
 // PATCH-with-revert pattern as the lazy-sweep toggle.
-function CorpKspaceToggle() {
+function MapPolicyToggle({ field, label, hint }: {
+  field: "skipKspace" | "crossMapSync";
+  label: string;
+  hint: string;
+}) {
   const { t } = useTranslation();
   const map = useMapStore((s) => s.map);
   const { user } = useAuth();
-  const enabled = !!map.skipKspace;
+  const enabled = !!map[field];
   const [saving, setSaving] = useState(false);
 
   const role = user?.role ?? "readonly";
   const canEdit = map.isAllianceMap ? isAllianceAdminRole(role) : isAdminRole(role);
 
-  function setInStore(skip: boolean) {
+  function setInStore(on: boolean) {
     useMapStore.setState((s) => ({
-      map: { ...s.map, skipKspace: skip },
-      maps: s.maps.map((m) => (m.id === map.id ? { ...m, skipKspace: skip } : m)),
+      map: { ...s.map, [field]: on },
+      maps: s.maps.map((m) => (m.id === map.id ? { ...m, [field]: on } : m)),
     }));
   }
 
@@ -556,7 +560,7 @@ function CorpKspaceToggle() {
     setSaving(true);
     setInStore(next);
     try {
-      await api(`/api/maps/${map.id}`, { method: "PATCH", body: JSON.stringify({ skipKspace: next }) });
+      await api(`/api/maps/${map.id}`, { method: "PATCH", body: JSON.stringify({ [field]: next }) });
     } catch (e) {
       setInStore(!next);
       toast.error(e instanceof Error ? e.message : t("mapSidebar.updateSettingFailed"));
@@ -568,7 +572,7 @@ function CorpKspaceToggle() {
   return (
     <>
       <label className="map-sidebar__row map-sidebar__toggle-row">
-        <span className="map-sidebar__label">{t("mapSidebar.corpSkipKspace")}</span>
+        <span className="map-sidebar__label">{label}</span>
         <input
           type="checkbox"
           className="map-sidebar__toggle-input"
@@ -577,7 +581,7 @@ function CorpKspaceToggle() {
           onChange={(e) => persist(e.target.checked)}
         />
       </label>
-      <div className="map-sidebar__hint">{t("mapSidebar.corpSkipKspaceHint")}</div>
+      <div className="map-sidebar__hint">{hint}</div>
     </>
   );
 }
@@ -1279,12 +1283,24 @@ export function MapSidebar() {
             label={t("mapSidebar.invertZoom")}
             defaultOn={false}
           />
-          <SettingToggle
-            settingKey="nexum.crossMapSync"
-            label={t("mapSidebar.crossMapSync")}
-            defaultOn={false}
-          />
-          <p className="map-sidebar__help">{t("mapSidebar.crossMapSyncHelp")}</p>
+          {isCorpMap || isAllianceMap ? (
+            // Org maps opt in per map (set by admins), and only sync with the
+            // same corp's / alliance's other opted-in maps.
+            <MapPolicyToggle
+              field="crossMapSync"
+              label={t("mapSidebar.crossMapSyncOrg")}
+              hint={t(isAllianceMap ? "mapSidebar.crossMapSyncAllianceHelp" : "mapSidebar.crossMapSyncCorpHelp")}
+            />
+          ) : (
+            <>
+              <SettingToggle
+                settingKey="nexum.crossMapSync"
+                label={t("mapSidebar.crossMapSync")}
+                defaultOn={false}
+              />
+              <p className="map-sidebar__help">{t("mapSidebar.crossMapSyncHelp")}</p>
+            </>
+          )}
         </CollapsibleSection>
 
         <CollapsibleSection
@@ -1512,7 +1528,11 @@ export function MapSidebar() {
           {isCorpMap || isAllianceMap ? (
             // Corp/alliance maps use a map-level policy that overrides everyone's
             // personal K-space setting while they're on this map.
-            <CorpKspaceToggle />
+            <MapPolicyToggle
+              field="skipKspace"
+              label={t("mapSidebar.corpSkipKspace")}
+              hint={t("mapSidebar.corpSkipKspaceHint")}
+            />
           ) : (
             <>
               <SettingToggle

@@ -2745,9 +2745,10 @@ mapsRouter.post('/:mapId/presence', async (req, res) => {
 // toggle merge-source eligibility (corp maps, full/admin only)
 mapsRouter.patch('/:mapId', async (req, res) => {
   const { mapId } = req.params;
-  const { name, locked, allowAsMergeSource, allowAsMergeDestination, lazyRemoveWormholes, collapseGraceHours, bookmarkFormat, siteBookmarkFormat, skipKspace } = req.body as {
+  const { name, locked, allowAsMergeSource, allowAsMergeDestination, lazyRemoveWormholes, collapseGraceHours, bookmarkFormat, siteBookmarkFormat, skipKspace, crossMapSync } = req.body as {
     name?: string; locked?: boolean; allowAsMergeSource?: boolean; allowAsMergeDestination?: boolean;
     lazyRemoveWormholes?: boolean; collapseGraceHours?: number; bookmarkFormat?: string | null; siteBookmarkFormat?: string | null; skipKspace?: boolean;
+    crossMapSync?: boolean;
   };
 
   const access = await requireMapWrite(res, mapId, req);
@@ -2820,6 +2821,20 @@ mapsRouter.patch('/:mapId', async (req, res) => {
     }
     sets.push(`skip_kspace = $${vals.length + 1}`); vals.push(skipKspace === true);
   }
+  // Cross-map sync opt-in -- corp/alliance maps only, gated like the K-space
+  // policy above. Personal maps sync on the owner's own nexum.crossMapSync
+  // setting instead (see services/crossMapSync.ts).
+  if (crossMapSync !== undefined) {
+    if (access.corpId === null && access.allianceId === null) {
+      res.status(400).json({ error: 'Only corp/alliance maps have a cross-map sync setting' }); return;
+    }
+    const role = req.session.role ?? 'readonly';
+    const allianceScoped = access.allianceId !== null;
+    if (allianceScoped ? !isAllianceAdmin(role) : !isAdmin(role)) {
+      res.status(403).json({ error: allianceScoped ? 'Alliance admin access required' : 'Admin access required' }); return;
+    }
+    sets.push(`cross_map_sync = $${vals.length + 1}`); vals.push(crossMapSync === true);
+  }
   // Lazy WH-removal opt-in: a plain per-map behaviour toggle any editor can set
   // (no corp/admin gate). The sweep itself runs server-side on this cadence.
   if (lazyRemoveWormholes !== undefined) {
@@ -2888,6 +2903,7 @@ mapsRouter.patch('/:mapId', async (req, res) => {
       ...(allowAsMergeSource !== undefined ? { allowAsMergeSource: allowAsMergeSource === true } : {}),
       ...(allowAsMergeDestination !== undefined ? { allowAsMergeDestination: allowAsMergeDestination === true } : {}),
       ...(skipKspace !== undefined ? { skipKspace: skipKspace === true } : {}),
+      ...(crossMapSync !== undefined ? { crossMapSync: crossMapSync === true } : {}),
       ...(lazyRemoveWormholes !== undefined ? { lazyRemoveWormholes: lazyRemoveWormholes === true } : {}),
       ...(normalizedGrace !== undefined ? { collapseGraceHours: normalizedGrace } : {}),
       ...(normalizedBookmarkFmt !== undefined ? { bookmarkFormat: normalizedBookmarkFmt } : {}),
