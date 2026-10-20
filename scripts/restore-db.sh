@@ -6,7 +6,11 @@
 # Usage:
 #   scripts/restore-db.sh [BACKUP_FILE]
 #     - with a path: restores that .sql.gz
-#     - with no arg: restores the most recent backup in NEXUM_BACKUP_DIR
+#     - with no arg: restores the most recent backup for this instance, from
+#       NEXUM_BACKUP_DIR/<compose project>/ (where backup-db.sh writes).
+#       Older backups sitting directly in NEXUM_BACKUP_DIR (from before it used
+#       per-instance folders) are never picked automatically -- with several
+#       instances there's no telling whose they are -- so pass one by path.
 #
 # DESTRUCTIVE: the dumps are written with --clean --if-exists, so a restore
 # drops and recreates the dumped objects, replacing current data. The server
@@ -16,7 +20,7 @@
 # All paths are configurable via env vars (defaults shown):
 #
 #   NEXUM_PROJECT_DIR=/opt/eve-nexum     # docker-compose project root
-#   NEXUM_BACKUP_DIR=/var/backups/nexum  # where the .sql.gz files live
+#   NEXUM_BACKUP_DIR=/var/backups/nexum  # backup root, as for backup-db.sh
 #   NEXUM_FORCE=0                        # set to 1 to skip the confirm prompt
 #
 set -euo pipefail
@@ -34,18 +38,14 @@ if [ ! -d "$PROJECT_DIR" ]; then
 fi
 cd "$PROJECT_DIR"
 
-if [ ! -f .env ]; then
-  log "ERROR: .env not found in $PROJECT_DIR" >&2
-  exit 1
-fi
-
-# Read PG_USER / PG_DB from the deployed .env so this stays in sync with the
-# running stack (same as backup-db.sh). We do NOT `source` the file — .env is a
-# dotenv file, not a shell script, so `source` breaks on any line that isn't a
-# clean shell assignment. Read only the keys we need; last assignment wins,
-# surrounding quotes and a trailing CR trimmed.
+# Read one key from ./.env (optional -- a deploy may keep its config in a
+# secrets manager instead). We do NOT `source` the file — .env is a dotenv
+# file, not a shell script, so `source` breaks on any line that isn't a clean
+# shell assignment. Last assignment wins, surrounding quotes and a trailing CR
+# trimmed. Empty when there's no .env or no such key.
 read_env() {
   local val
+  [ -f .env ] || return 0
   val="$(grep -E "^[[:space:]]*${1}=" .env | tail -n1)" || return 0
   val="${val#*=}"
   val="${val%$'\r'}"
@@ -58,20 +58,30 @@ read_env() {
   printf '%s' "$val"
 }
 
-PG_USER="$(read_env PG_USER)"
-PG_DB="$(read_env PG_DB)"
+# Same project naming as backup-db.sh (and docker compose): COMPOSE_PROJECT_NAME
+# from .env, else the directory name.
 PROJ="$(read_env COMPOSE_PROJECT_NAME)"
-[ -n "$PROJ" ] && export COMPOSE_PROJECT_NAME="$PROJ"
+if [ -z "$PROJ" ]; then
+  PROJ="$(basename "$PWD" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9_-')"
+fi
+export COMPOSE_PROJECT_NAME="$PROJ"
 
-: "${PG_USER:?PG_USER not set in .env}"
-: "${PG_DB:?PG_DB not set in .env}"
+# Database and user: what the postgres container was started with, so this
+# matches the running stack wherever its config lives.
+# shellcheck disable=SC2016  # expanded inside the container, not here
+PG_USER="$(docker compose exec -T postgres sh -c 'printf %s "$POSTGRES_USER"')"
+# shellcheck disable=SC2016
+PG_DB="$(docker compose exec -T postgres sh -c 'printf %s "$POSTGRES_DB"')"
+
+: "${PG_USER:?could not read POSTGRES_USER from the postgres container (is the stack running?)}"
+: "${PG_DB:?could not read POSTGRES_DB from the postgres container (is the stack running?)}"
 
 # ── Resolve the backup file ───────────────────────────────────────────────────
 FILE="${1:-}"
 if [ -z "$FILE" ]; then
-  FILE="$(ls -1t "$BACKUP_DIR"/nexum-*.sql.gz 2>/dev/null | head -n1 || true)"
+  FILE="$(ls -1t "$BACKUP_DIR/$PROJ"/nexum-*.sql.gz 2>/dev/null | head -n1 || true)"
   if [ -z "$FILE" ]; then
-    log "ERROR: no backups found in $BACKUP_DIR (and no file given)" >&2
+    log "ERROR: no backups found in $BACKUP_DIR/$PROJ (and no file given)" >&2
     exit 1
   fi
   log "no file given; using most recent: $FILE"
@@ -82,7 +92,7 @@ if [ ! -f "$FILE" ]; then
 fi
 
 # ── Confirm (destructive) ─────────────────────────────────────────────────────
-log "About to restore '$FILE' into database '$PG_DB' on this deployment."
+log "About to restore '$FILE' into database '$PG_DB' on '$PROJ'."
 log "This OVERWRITES current data (drops & recreates the dumped objects)."
 if [ "$FORCE" != "1" ]; then
   read -r -p "Type the database name ('$PG_DB') to confirm: " ans
