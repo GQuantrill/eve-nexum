@@ -1834,6 +1834,7 @@
     "pasteDifferentSystem": "당신의 캐릭터는 현재 {{current}}에 있지만, {{selected}}에 시그니처를 붙여넣고 있습니다. 계속할까요?",
     "loadFailed": "시그니처를 불러오지 못했습니다",
     "saveFailed": "시그니처를 저장하지 못했습니다",
+    "duplicateId": "이 항성계에 시그니처 {{id}}이(가) 이미 있습니다",
     "deleteFailed": "시그니처를 삭제하지 못했습니다",
     "deleteSelectedConfirm_one": "선택한 시그니처 {{count}}개를 삭제할까요?",
     "deleteSelectedConfirm_other": "선택한 시그니처 {{count}}개를 삭제할까요?",

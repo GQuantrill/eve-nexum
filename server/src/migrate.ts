@@ -1273,6 +1273,87 @@ export async function migrate() {
     -- Read per map when the owner asks how many have opted out.
     CREATE INDEX IF NOT EXISTS idx_map_share_optouts_map
       ON map_share_optouts (map_id);
+
+    -- One row per scan id per system. Without it two pilots pasting the same
+    -- scan a moment apart (each browser only de-dupes against what it has
+    -- loaded) both create the signature. Blank ids are exempt: "Add signature"
+    -- makes an empty row to type into, and several can be open at once. Case is
+    -- ignored so a hand-typed id can't sit beside the pasted one.
+    --
+    -- Existing duplicates are merged first: the oldest row survives, each of its
+    -- empty fields is filled from the earliest duplicate that has a value,
+    -- connections pointing at a duplicate are re-pointed, then the extras go.
+    -- A no-op once the index exists.
+    DO $migration$
+    BEGIN
+      IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'uq_map_signatures_system_sig') THEN
+        CREATE TEMP TABLE _sig_dups ON COMMIT DROP AS
+        SELECT id AS loser_id, winner_id FROM (
+          SELECT id,
+                 FIRST_VALUE(id) OVER w AS winner_id,
+                 ROW_NUMBER()    OVER w AS rn
+            FROM map_signatures
+           WHERE sig_id <> ''
+          WINDOW w AS (PARTITION BY system_id, UPPER(sig_id) ORDER BY created_at, id)
+        ) ranked
+        WHERE rn > 1;
+
+        UPDATE map_signatures w SET
+            sig_type    = CASE WHEN w.sig_type = 'unknown' THEN COALESCE((
+                            SELECT l.sig_type FROM map_signatures l JOIN _sig_dups d ON d.loser_id = l.id
+                             WHERE d.winner_id = w.id AND l.sig_type <> 'unknown'
+                             ORDER BY l.created_at, l.id LIMIT 1), w.sig_type)
+                          ELSE w.sig_type END,
+            name        = CASE WHEN w.name = '' THEN COALESCE((
+                            SELECT l.name FROM map_signatures l JOIN _sig_dups d ON d.loser_id = l.id
+                             WHERE d.winner_id = w.id AND l.name <> ''
+                             ORDER BY l.created_at, l.id LIMIT 1), w.name)
+                          ELSE w.name END,
+            notes       = CASE WHEN w.notes = '' THEN COALESCE((
+                            SELECT l.notes FROM map_signatures l JOIN _sig_dups d ON d.loser_id = l.id
+                             WHERE d.winner_id = w.id AND l.notes <> ''
+                             ORDER BY l.created_at, l.id LIMIT 1), w.notes)
+                          ELSE w.notes END,
+            wh_type     = CASE WHEN w.wh_type = '' THEN COALESCE((
+                            SELECT l.wh_type FROM map_signatures l JOIN _sig_dups d ON d.loser_id = l.id
+                             WHERE d.winner_id = w.id AND l.wh_type <> ''
+                             ORDER BY l.created_at, l.id LIMIT 1), w.wh_type)
+                          ELSE w.wh_type END,
+            wh_leads_to = CASE WHEN w.wh_leads_to = '' THEN COALESCE((
+                            SELECT l.wh_leads_to FROM map_signatures l JOIN _sig_dups d ON d.loser_id = l.id
+                             WHERE d.winner_id = w.id AND l.wh_leads_to <> ''
+                             ORDER BY l.created_at, l.id LIMIT 1), w.wh_leads_to)
+                          ELSE w.wh_leads_to END,
+            ghost_type  = CASE WHEN w.ghost_type = '' THEN COALESCE((
+                            SELECT l.ghost_type FROM map_signatures l JOIN _sig_dups d ON d.loser_id = l.id
+                             WHERE d.winner_id = w.id AND l.ghost_type <> ''
+                             ORDER BY l.created_at, l.id LIMIT 1), w.ghost_type)
+                          ELSE w.ghost_type END,
+            mass_status = CASE WHEN w.mass_status = '' THEN COALESCE((
+                            SELECT l.mass_status FROM map_signatures l JOIN _sig_dups d ON d.loser_id = l.id
+                             WHERE d.winner_id = w.id AND l.mass_status <> ''
+                             ORDER BY l.created_at, l.id LIMIT 1), w.mass_status)
+                          ELSE w.mass_status END,
+            time_status = CASE WHEN w.time_status = '' THEN COALESCE((
+                            SELECT l.time_status FROM map_signatures l JOIN _sig_dups d ON d.loser_id = l.id
+                             WHERE d.winner_id = w.id AND l.time_status <> ''
+                             ORDER BY l.created_at, l.id LIMIT 1), w.time_status)
+                          ELSE w.time_status END,
+            updated_at  = NOW()
+         WHERE w.id IN (SELECT winner_id FROM _sig_dups);
+
+        UPDATE map_connections SET source_signature_id = d.winner_id
+          FROM _sig_dups d WHERE source_signature_id = d.loser_id;
+        UPDATE map_connections SET target_signature_id = d.winner_id
+          FROM _sig_dups d WHERE target_signature_id = d.loser_id;
+
+        DELETE FROM map_signatures WHERE id IN (SELECT loser_id FROM _sig_dups);
+
+        CREATE UNIQUE INDEX uq_map_signatures_system_sig
+          ON map_signatures (system_id, UPPER(sig_id)) WHERE sig_id <> '';
+      END IF;
+    END
+    $migration$;
   `);
 
   await encryptLegacyTokens();

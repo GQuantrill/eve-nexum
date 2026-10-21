@@ -1850,6 +1850,7 @@
     "pasteDifferentSystem": "Ваш персонаж сейчас в {{current}}, но вы вставляете сигнатуры в {{selected}}. Продолжить?",
     "loadFailed": "Не удалось загрузить сигнатуры",
     "saveFailed": "Не удалось сохранить сигнатуру",
+    "duplicateId": "Сигнатура {{id}} уже есть в этой системе",
     "deleteFailed": "Не удалось удалить сигнатуру",
     "deleteSelectedConfirm_one": "Удалить {{count}} выбранную сигнатуру?",
     "deleteSelectedConfirm_few": "Удалить {{count}} выбранные сигнатуры?",

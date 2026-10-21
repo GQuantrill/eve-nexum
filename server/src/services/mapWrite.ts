@@ -57,6 +57,12 @@ function logIfContentless(mapId: string, systemId: string, d: SignatureInput, ac
   }));
 }
 
+/** Thrown by updateSignature when the new scan id is already used by another
+ *  signature in the same system. Routes answer it with a 409. */
+export class DuplicateSignatureError extends Error {
+  constructor() { super('A signature with that ID already exists in this system'); }
+}
+
 export async function createSignature(mapId: string, systemId: string, d: SignatureInput, actor: WriteActor) {
   logIfContentless(mapId, systemId, d, actor);
   // Returns the creator alongside the row. The client inserts this response
@@ -65,15 +71,31 @@ export async function createSignature(mapId: string, systemId: string, d: Signat
   // like the row had no author rather than like a missing field.
   // A CTE rather than a second round trip: the id is only known after the
   // insert, and the join is on a user we already have the id for.
+  //
+  // The scan id is unique per system (uq_map_signatures_system_sig), so a
+  // create for an id that is already there -- two pilots pasting the same scan
+  // a moment apart -- lands on the existing row instead, filling only its
+  // empty fields (as a paste onto a known sig does) and leaving the author.
+  // `inserted` tells the two apart; xmax is 0 only on a freshly inserted row.
   const { rows } = await db.query(
     `WITH ins AS (
        INSERT INTO map_signatures (system_id, sig_id, sig_type, name, notes, wh_type, wh_leads_to, ghost_type, mass_status, time_status, created_by_user_id,
                                    scout_connection_id, scout_last_seen)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11,
                $12, CASE WHEN $12::text IS NULL THEN NULL ELSE NOW() END)
-       RETURNING *
+       ON CONFLICT (system_id, UPPER(sig_id)) WHERE sig_id <> '' DO UPDATE SET
+         sig_type    = CASE WHEN map_signatures.sig_type    = 'unknown' THEN EXCLUDED.sig_type    ELSE map_signatures.sig_type    END,
+         name        = CASE WHEN map_signatures.name        = ''        THEN EXCLUDED.name        ELSE map_signatures.name        END,
+         notes       = CASE WHEN map_signatures.notes       = ''        THEN EXCLUDED.notes       ELSE map_signatures.notes       END,
+         wh_type     = CASE WHEN map_signatures.wh_type     = ''        THEN EXCLUDED.wh_type     ELSE map_signatures.wh_type     END,
+         wh_leads_to = CASE WHEN map_signatures.wh_leads_to = ''        THEN EXCLUDED.wh_leads_to ELSE map_signatures.wh_leads_to END,
+         ghost_type  = CASE WHEN map_signatures.ghost_type  = ''        THEN EXCLUDED.ghost_type  ELSE map_signatures.ghost_type  END,
+         mass_status = CASE WHEN map_signatures.mass_status = ''        THEN EXCLUDED.mass_status ELSE map_signatures.mass_status END,
+         time_status = CASE WHEN map_signatures.time_status = ''        THEN EXCLUDED.time_status ELSE map_signatures.time_status END,
+         updated_at  = NOW()
+       RETURNING *, (xmax = 0) AS inserted
      )
-     SELECT ins.id, ins.sig_id AS "sigId", ins.sig_type AS "sigType", ins.name, ins.notes,
+     SELECT ins.inserted, ins.id, ins.sig_id AS "sigId", ins.sig_type AS "sigType", ins.name, ins.notes,
             ins.wh_type AS "whType", ins.wh_leads_to AS "whLeadsTo",
             ins.ghost_type AS "ghostType", ins.mass_status AS "massStatus",
             ins.time_status AS "timeStatus", ins.created_at AS "createdAt",
@@ -82,13 +104,18 @@ export async function createSignature(mapId: string, systemId: string, d: Signat
     [systemId, d.sigId, d.sigType, d.name, d.notes, d.whType, d.whLeadsTo, d.ghostType,
      d.massStatus, d.timeStatus, actor.userId, d.scoutConnectionId ?? null],
   );
-  db.query(`INSERT INTO user_events (user_id, event_type, sig_type) VALUES ($1, 'signature', $2)`,
-    [actor.userId, d.sigType]).catch(console.error);
+  const { inserted, ...row } = rows[0] as { inserted: boolean } & Record<string, unknown> & { id: string };
+  // Scan stats count signatures found, so a create that merged into an
+  // existing row isn't another one.
+  if (inserted) {
+    db.query(`INSERT INTO user_events (user_id, event_type, sig_type) VALUES ($1, 'signature', $2)`,
+      [actor.userId, d.sigType]).catch(console.error);
+  }
   bumpActivity(systemId);
   recordGhostSiteIfMatch(systemId, d.name);
   publishToMap(mapId, { type: 'sig.changed', actor: actor.clientId, systemId });
-  syncSignature(mapId, systemId, rows[0].id, actor.userId);
-  return rows[0];
+  syncSignature(mapId, systemId, row.id, actor.userId);
+  return { row, inserted };
 }
 
 const SIG_COLS: Record<string, string> = {
@@ -134,10 +161,16 @@ export async function updateSignature(
   if ('scoutConnectionId' in updates && updates.scoutConnectionId != null) {
     sets.push('scout_last_seen = NOW()');
   }
-  await db.query(
-    `UPDATE map_signatures SET ${sets.join(', ')} WHERE id = $${vals.length + 1} AND system_id = $${vals.length + 2} AND ${inThisMap(vals.length + 3)}`,
-    [...vals, sigId, systemId, mapId],
-  );
+  try {
+    await db.query(
+      `UPDATE map_signatures SET ${sets.join(', ')} WHERE id = $${vals.length + 1} AND system_id = $${vals.length + 2} AND ${inThisMap(vals.length + 3)}`,
+      [...vals, sigId, systemId, mapId],
+    );
+  } catch (err) {
+    const e = err as { code?: string; constraint?: string };
+    if (e.code === '23505' && e.constraint === 'uq_map_signatures_system_sig') throw new DuplicateSignatureError();
+    throw err;
+  }
   bumpActivity(systemId);
   if (typeof updates.name === 'string') recordGhostSiteIfMatch(systemId, updates.name);
   publishToMap(mapId, { type: 'sig.changed', actor: actor.clientId, systemId });

@@ -1834,6 +1834,7 @@
     "pasteDifferentSystem": "Tu personaje está actualmente en {{current}}, pero estás pegando firmas en {{selected}}. ¿Continuar?",
     "loadFailed": "No se pudieron cargar las firmas",
     "saveFailed": "No se pudo guardar la firma",
+    "duplicateId": "La firma {{id}} ya existe en este sistema",
     "deleteFailed": "No se pudo eliminar la firma",
     "deleteSelectedConfirm_one": "¿Eliminar {{count}} firma seleccionada?",
     "deleteSelectedConfirm_other": "¿Eliminar {{count}} firmas seleccionadas?",

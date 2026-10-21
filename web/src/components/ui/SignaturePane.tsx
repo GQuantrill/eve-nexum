@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { charPortrait } from '../../utils/eveImages';
 import { siteSafety } from '../../utils/siteSafety';
 import { sigSortKey } from '../../utils/sigSort';
-import { api } from '../../api/client';
+import { api, ApiError } from '../../api/client';
 import i18n from '../../i18n';
 import { useMapStore, awaitSystemCreate } from '../../store/mapStore';
 import { useCanEditContent } from '../../hooks/useCanEditContent';
@@ -799,10 +799,26 @@ export function SignaturePane({ systemId }: { systemId: string }) {
       const payload = pendingUpdates.current.get(id);
       if (!payload || !activeMapId) return;
       pendingUpdates.current.delete(id);
-      api(`/api/maps/${activeMapId}/systems/${systemId}/signatures/${id}`, {
-        method: 'PATCH',
-        body: JSON.stringify(payload),
-      }).catch(() => toast.error(t('signatures.saveFailed')));
+      const url = `/api/maps/${activeMapId}/systems/${systemId}/signatures/${id}`;
+      const reload = () => api<Signature[]>(`/api/maps/${activeMapId}/systems/${systemId}/signatures`)
+        .then((data) => { if (sigsSystemRef.current === systemId) setSigs(data); })
+        .catch(() => {});
+      api(url, { method: 'PATCH', body: JSON.stringify(payload) }).catch((err) => {
+        if (!(err instanceof ApiError && err.code === 'duplicate_sig')) {
+          toast.error(t('signatures.saveFailed'));
+          return;
+        }
+        // Another row in this system already has that scan id. Keep whatever
+        // else was edited alongside it, then re-fetch so the id cell shows what
+        // the server actually holds.
+        toast.error(t('signatures.duplicateId', { id: payload.sigId ?? '' }));
+        const rest = { ...payload };
+        delete rest.sigId;
+        const retry = Object.keys(rest).length
+          ? api(url, { method: 'PATCH', body: JSON.stringify(rest) })
+          : Promise.resolve();
+        void retry.catch(() => toast.error(t('signatures.saveFailed'))).finally(reload);
+      });
     }, 500));
   };
 
@@ -915,7 +931,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
     const toCreate: ParsedSig[] = [];
 
     for (const p of parsed) {
-      const match = existing.find((s) => s.sigId === p.sigId);
+      const match = existing.find((s) => s.sigId.toUpperCase() === p.sigId.toUpperCase());
       if (match) {
         const updates: Partial<Signature> = {};
         if (p.sigType !== 'unknown') updates.sigType = p.sigType;
@@ -965,7 +981,14 @@ export function SignaturePane({ systemId }: { systemId: string }) {
       ),
     )).filter((s): s is Signature => s !== null);
 
-    setSigs((prev) => [...prev, ...created].sort((a, b) => a.sigId.localeCompare(b.sigId)));
+    // A create for an id someone else added meanwhile comes back as THAT row
+    // (the server merges on scan id), which the live refresh may already have
+    // put in the list -- so merge by row id rather than appending.
+    setSigs((prev) => {
+      const byId = new Map(prev.map((s) => [s.id, s]));
+      for (const c of created) byId.set(c.id, { ...byId.get(c.id), ...c });
+      return [...byId.values()].sort((a, b) => a.sigId.localeCompare(b.sigId));
+    });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeMapId, systemId]);
 

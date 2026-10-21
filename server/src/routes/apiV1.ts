@@ -9,7 +9,7 @@ import {
   loadSystemSignatures, loadSystemAnomalies, loadSystemStructures,
 } from '../services/mapRead.js';
 import {
-  createSignature, updateSignature, deleteSignature,
+  createSignature, updateSignature, deleteSignature, DuplicateSignatureError,
   createAnomaly, updateAnomaly, deleteAnomaly,
   createStructure, updateStructure, deleteStructure,
 } from '../services/mapWrite.js';
@@ -140,16 +140,23 @@ apiV1Router.post('/maps/:mapId/systems/:systemId/signatures', async (req, res) =
   const access = await writeScope(req, res); if (!access) return;
   const { mapId, systemId } = req.params;
   const { sigId = '', sigType = 'unknown', name = '', notes = '', whType = '', whLeadsTo = '', ghostType = '', massStatus = '', timeStatus = '' } = req.body as Record<string, string>;
-  const row = await createSignature(mapId, systemId, { sigId, sigType, name, notes, whType, whLeadsTo, ghostType, massStatus, timeStatus }, writeActor(req));
-  if ((whType ?? '').toUpperCase() === 'K162') dispatchK162(access, row.id, systemId, authUser(req).characterName);
-  res.status(201).json(row);
+  const { row, inserted } = await createSignature(mapId, systemId, { sigId, sigType, name, notes, whType, whLeadsTo, ghostType, massStatus, timeStatus }, writeActor(req));
+  // An id already in the system merges into that row (200, not 201).
+  if (inserted && (whType ?? '').toUpperCase() === 'K162') dispatchK162(access, row.id, systemId, authUser(req).characterName);
+  res.status(inserted ? 201 : 200).json(row);
 });
 
 apiV1Router.patch('/maps/:mapId/systems/:systemId/signatures/:sigId', async (req, res) => {
   const access = await writeScope(req, res); if (!access) return;
   const { mapId, systemId, sigId } = req.params;
-  const { dispatchK162: shouldDispatch, flushK162: shouldFlush } =
-    await updateSignature(mapId, systemId, sigId, req.body as Record<string, unknown>, writeActor(req));
+  let result;
+  try {
+    result = await updateSignature(mapId, systemId, sigId, req.body as Record<string, unknown>, writeActor(req));
+  } catch (err) {
+    if (err instanceof DuplicateSignatureError) { res.status(409).json({ error: 'duplicate_sig', message: err.message }); return; }
+    throw err;
+  }
+  const { dispatchK162: shouldDispatch, flushK162: shouldFlush } = result;
   if (shouldDispatch) dispatchK162(access, sigId, systemId, authUser(req).characterName);
   if (shouldFlush) flushK162(sigId);
   res.json({ ok: true });

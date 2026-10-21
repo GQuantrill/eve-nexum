@@ -1834,6 +1834,7 @@
     "pasteDifferentSystem": "Your character is currently in {{current}}, but you are pasting signatures into {{selected}}. Continue?",
     "loadFailed": "Failed to load signatures",
     "saveFailed": "Failed to save signature",
+    "duplicateId": "Signature {{id}} already exists in this system",
     "deleteFailed": "Failed to delete signature",
     "deleteSelectedConfirm_one": "Delete {{count}} selected signature?",
     "deleteSelectedConfirm_other": "Delete {{count}} selected signatures?",

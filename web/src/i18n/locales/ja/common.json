@@ -1834,6 +1834,7 @@
     "pasteDifferentSystem": "あなたのキャラクターは現在 {{current}} にいますが、{{selected}} にシグネチャを貼り付けています。続行しますか？",
     "loadFailed": "シグネチャの読み込みに失敗しました",
     "saveFailed": "シグネチャの保存に失敗しました",
+    "duplicateId": "シグネチャー {{id}} はこの星系にすでに存在します",
     "deleteFailed": "シグネチャの削除に失敗しました",
     "deleteSelectedConfirm_one": "選択した {{count}} 件のシグネチャを削除しますか？",
     "deleteSelectedConfirm_other": "選択した {{count}} 件のシグネチャを削除しますか？",

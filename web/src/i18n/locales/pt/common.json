@@ -1834,6 +1834,7 @@
     "pasteDifferentSystem": "A tua personagem está atualmente em {{current}}, mas estás a colar assinaturas em {{selected}}. Continuar?",
     "loadFailed": "Falha ao carregar as assinaturas",
     "saveFailed": "Falha ao guardar a assinatura",
+    "duplicateId": "A assinatura {{id}} já existe neste sistema",
     "deleteFailed": "Falha ao eliminar a assinatura",
     "deleteSelectedConfirm_one": "Eliminar {{count}} assinatura selecionada?",
     "deleteSelectedConfirm_other": "Eliminar {{count}} assinaturas selecionadas?",
