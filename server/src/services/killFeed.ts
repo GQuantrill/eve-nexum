@@ -225,6 +225,14 @@ async function processKill(body: EphemeralKill): Promise<void> {
   };
   recordKill(buffered);
 
+  // A killmail arriving long after the kill (e.g. a feed catch-up replaying a
+  // backlog) is history, not news: keep it in the buffer for the kill log, but
+  // don't flash nodes or post to Discord as if it just happened.
+  if (Date.now() - atMs > config.killFeed.maxLagSeconds * 1000) {
+    stats.stale++;
+    return;
+  }
+
   // Two independent outputs:
   //  - SSE flash + log: only for maps a client is CURRENTLY watching (no point
   //    pushing to a disconnected browser).
@@ -314,10 +322,11 @@ let running = false;
 
 // Rolling counters for the heartbeat log, so "is the feed actually working?" is
 // observable: `seen` = killmails pulled from the firehose, `overMin` = those at
-// or above the ISK floor, `forwarded` = those in a currently-viewed map's
-// systems (the ones that flash a node). seen climbing with forwarded stuck at 0
+// or above the ISK floor, `stale` = of those, arrived too late to flash,
+// `forwarded` = those in a currently-viewed map's systems (the ones that flash
+// a node). seen climbing with forwarded stuck at 0
 // just means no big kill has happened in a mapped system yet — not a fault.
-const stats = { seen: 0, overMin: 0, forwarded: 0 };
+const stats = { seen: 0, overMin: 0, stale: 0, forwarded: 0 };
 const HEARTBEAT_MS = 120_000;
 
 async function loop(): Promise<void> {
@@ -366,7 +375,7 @@ export function startKillFeed(): void {
     // `watched` = maps with a live SSE client right now. If this is 0, no kill
     // can ever forward regardless of the feed — the browser's event stream isn't
     // registering (nothing to match against).
-    log.info(`heartbeat: ${stats.seen} seen, ${stats.overMin} >= min ISK, ${stats.forwarded} forwarded; ${activeMapIds().length} map(s) watched now`);
+    log.info(`heartbeat: ${stats.seen} seen, ${stats.overMin} >= min ISK, ${stats.stale} too late to flash, ${stats.forwarded} forwarded; ${activeMapIds().length} map(s) watched now`);
   }, HEARTBEAT_MS);
   hb.unref?.();
   void loop();

@@ -281,6 +281,10 @@ export const config = {
     contact:       process.env.KILL_FEED_CONTACT?.trim() || 'gq@area404.org',
     minValueIsk:   intEnv(process.env.KILL_FEED_MIN_ISK, 50_000_000),
     recentSeconds: intEnv(process.env.KILL_FEED_RECENT_SECONDS, 900),
+    // How late a killmail may arrive (killmail time -> receipt) and still flash
+    // nodes / post to Discord. zKill routinely delivers 15+ min late, but a feed
+    // catch-up can replay kills hours old; those go to the log/buffer only.
+    maxLagSeconds: intEnv(process.env.KILL_FEED_MAX_LAG_SECONDS, 3_600), // 1h
     // How far back the kill-log backfill looks (seconds) — i.e. how long the
     // in-memory kill buffer retains kills. Longer = more history in the log.
     backfillSeconds: intEnv(process.env.KILL_FEED_BACKFILL_SECONDS, 10_800), // 3h

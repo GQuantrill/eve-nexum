@@ -673,6 +673,7 @@ Flags recent high-value kills on your mapped systems and feeds a **Kill Log** pa
 | `KILL_FEED_CONTACT` | — | A reachable contact (email or URL) — it builds the zKillboard `User-Agent`. Required by zKill fair-use; a blank UA is Cloudflare-blocked. |
 | `KILL_FEED_MIN_ISK` | `50000000` | Only kills at or above this ISK value are flagged, logged, and buffered. |
 | `KILL_FEED_RECENT_SECONDS` | `900` (15 min) | How long a node stays flagged after a kill lands there. |
+| `KILL_FEED_MAX_LAG_SECONDS` | `3600` (1 h) | A killmail that reaches the feed more than this long after the kill (e.g. a backlog replay) still goes in the Kill Log, but doesn't flag its node or post to Discord. |
 | `KILL_FEED_BACKFILL_SECONDS` | `10800` (3 h) | How long the in-memory buffer retains kills — i.e. how far back the Kill Log shows on open. |
 
 Fair-use: the consumer is a single poller that stays under zKill's 15 req/s limit and waits ~10 s between checks when the feed is caught up. The Kill Log **backfill is served entirely from the in-memory buffer** — no per-system zKillboard requests — but it therefore only contains kills seen **since the server started**, filling in over the first few hours of uptime. On boot the consumer logs `[killFeed] live kill feed enabled …` (or `disabled …`), plus a periodic heartbeat and a line per forwarded kill (`… | grep killFeed`).
