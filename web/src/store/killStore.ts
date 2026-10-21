@@ -12,6 +12,11 @@ import { create } from 'zustand';
 // window; nodes also gate on it via the shared 30s ticker.
 export const RECENT_KILL_MS = 15 * 60 * 1000;
 
+// A live kill whose killmail is older than this on arrival is logged but doesn't
+// flag its node -- the server already holds these back (KILL_FEED_MAX_LAG_SECONDS);
+// this is the client's own guard, matching the server default.
+const MAX_FLAG_LAG_MS = 60 * 60 * 1000;
+
 // Newest-first log cap — plenty for the panel, bounded so a busy feed can't grow
 // the array without limit.
 const LOG_CAP = 300;
@@ -81,7 +86,8 @@ export const useKillStore = create<KillState>((set) => ({
     // flashes for the full window regardless of the killmail's (possibly stale)
     // timestamp.
     const existing = next.get(row.eveSystemId);
-    if (!existing || row.atMs >= existing.atMs) next.set(row.eveSystemId, { ...row, flaggedAtMs: now });
+    const timely = now - row.atMs <= MAX_FLAG_LAG_MS;
+    if (timely && (!existing || row.atMs >= existing.atMs)) next.set(row.eveSystemId, { ...row, flaggedAtMs: now });
     return { bySystem: next, log: prependDeduped(s.log, row) };
   }),
   seedBackfill: (rows) => set((s) => {
