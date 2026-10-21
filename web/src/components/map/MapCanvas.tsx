@@ -96,6 +96,8 @@ const NODE_TYPES = { system: SystemNode };
 const VIEWPORT_HOLD_FRAMES = 32;
 const MIN_ZOOM = 0.2;
 const MAX_ZOOM = 2;
+// Pointer travel (px) between press and release that still counts as a click.
+const NODE_CLICK_DISTANCE = 5;
 
 function resolveOverlaps(
   items: Array<{ id: string; x: number; y: number; w: number; h: number; locked: boolean }>,
@@ -1760,6 +1762,11 @@ export function MapCanvas() {
         connectionMode={ConnectionMode.Loose}
         nodesConnectable={canEdit}
         nodesDraggable={canEdit}
+        // A draggable node's click (which is what selects the system) is
+        // swallowed if the pointer moves at all between press and release --
+        // React Flow's default allowance is 0px, so a twitch of the mouse or
+        // trackpad made clicks randomly do nothing. A few px of slack fixes it.
+        nodeClickDistance={NODE_CLICK_DISTANCE}
         // Selection BOX stays shift-only: dragging with Ctrl/Cmd held is a
         // pan or zoom gesture on most setups, so co-opting it would be worse
         // than leaving it. Only click-to-add gains the extra modifier.
