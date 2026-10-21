@@ -124,7 +124,7 @@ interface SigRow {
 async function upsertSigToSibling(sibSystemId: string, sibMapId: string, sig: SigRow, userId: number): Promise<void> {
   const { rows } = await db.query<{ id: string } & SigRow>(
     `SELECT id, sig_type, name, notes, wh_type, wh_leads_to, ghost_type
-     FROM map_signatures WHERE system_id = $1 AND sig_id = $2`,
+     FROM map_signatures WHERE system_id = $1 AND UPPER(sig_id) = UPPER($2)`,
     [sibSystemId, sig.sig_id],
   );
   const existing = rows[0];
@@ -148,9 +148,11 @@ async function upsertSigToSibling(sibSystemId: string, sibMapId: string, sig: Si
     await db.query(`UPDATE map_signatures SET ${sets.join(', ')} WHERE id = $${vals.length + 1}`, [...vals, existing.id]);
   } else {
     // New on this sibling. from_merge = TRUE so it doesn't inflate scan stats.
+    // DO NOTHING: someone may have added it there since the lookup above.
     await db.query(
       `INSERT INTO map_signatures (system_id, sig_id, sig_type, name, notes, wh_type, wh_leads_to, ghost_type, created_by_user_id, from_merge)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, TRUE)`,
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, TRUE)
+       ON CONFLICT (system_id, UPPER(sig_id)) WHERE sig_id <> '' DO NOTHING`,
       [sibSystemId, sig.sig_id, sig.sig_type, sig.name, sig.notes, sig.wh_type, sig.wh_leads_to, sig.ghost_type, userId],
     );
   }

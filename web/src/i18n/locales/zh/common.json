@@ -1834,6 +1834,7 @@
     "pasteDifferentSystem": "你的角色当前在 {{current}}，但你正在将信号粘贴到 {{selected}}。继续吗？",
     "loadFailed": "加载信号失败",
     "saveFailed": "保存信号失败",
+    "duplicateId": "此星系中已存在信号 {{id}}",
     "deleteFailed": "删除信号失败",
     "deleteSelectedConfirm_one": "删除选定的 {{count}} 个信号？",
     "deleteSelectedConfirm_other": "删除选定的 {{count}} 个信号？",

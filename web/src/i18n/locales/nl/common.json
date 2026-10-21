@@ -1834,6 +1834,7 @@
     "pasteDifferentSystem": "Je character zit nu in {{current}}, maar je plakt signaturen in {{selected}}. Doorgaan?",
     "loadFailed": "Laden van signaturen mislukt",
     "saveFailed": "Opslaan van signatuur mislukt",
+    "duplicateId": "Signature {{id}} bestaat al in dit systeem",
     "deleteFailed": "Verwijderen van signatuur mislukt",
     "deleteSelectedConfirm_one": "{{count}} geselecteerde signatuur verwijderen?",
     "deleteSelectedConfirm_other": "{{count}} geselecteerde signaturen verwijderen?",

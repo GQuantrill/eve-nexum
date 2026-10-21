@@ -26,12 +26,14 @@ async function seedSystem(mapId: string, name: string): Promise<string> {
   await db.query(`INSERT INTO map_systems (id, map_id, name, system_class) VALUES ($1, $2, $3, 'C4')`, [id, mapId, name]);
   return id;
 }
-// A wormhole sig aged well past its type's max life (D382 = 16h).
+// A wormhole sig aged well past its type's max life (D382 = 16h). Scan ids are
+// unique per system, so each seeded sig gets its own.
+let sigSeq = 0;
 async function seedAgedSig(systemId: string, ageHours = 20): Promise<string> {
   const { rows } = await db.query<{ id: string }>(
     `INSERT INTO map_signatures (system_id, sig_id, sig_type, wh_type, created_at)
      VALUES ($1, $2, 'wormhole', 'D382', NOW() - ($3 || ' hours')::interval) RETURNING id`,
-    [systemId, `ABC-${Math.floor(ageHours)}`, String(ageHours)]);
+    [systemId, `ABC-${100 + ++sigSeq}`, String(ageHours)]);
   return rows[0].id;
 }
 async function seedConn(mapId: string, srcSys: string, tgtSys: string, sigId: string, lifetimeExpiresAt: string | null): Promise<void> {

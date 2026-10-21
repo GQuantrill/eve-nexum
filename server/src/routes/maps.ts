@@ -28,7 +28,7 @@ import { sdeSystemFacts } from '../services/sdeFacts.js';
 import { contributorIsAtSystem, contributorMayLinkSystems } from '../services/contributorMovement.js';
 import { listConnectionJumps, recordConnectionJump, setConnectionJumpHot, clearConnectionJumps } from '../services/connectionJumps.js';
 import {
-  createSignature, updateSignature, deleteSignature,
+  createSignature, updateSignature, deleteSignature, DuplicateSignatureError,
   createAnomaly, updateAnomaly, deleteAnomaly,
   createStructure, updateStructure, deleteStructure,
 } from '../services/mapWrite.js';
@@ -2169,7 +2169,8 @@ mapsRouter.post('/import/tripwire', async (req, res) => {
     if (sigPh.length > 0) {
       await client.query(
         `INSERT INTO map_signatures (id, system_id, sig_id, sig_type, name, created_by_user_id)
-         VALUES ${sigPh.join(',')}`,
+         VALUES ${sigPh.join(',')}
+         ON CONFLICT (system_id, UPPER(sig_id)) WHERE sig_id <> '' DO NOTHING`,
         sigVals,
       );
     }
@@ -2518,7 +2519,8 @@ mapsRouter.post('/:mapId/merge', async (req, res) => {
       if (sigPh.length > 0) {
         await client.query(
           `INSERT INTO map_signatures (system_id, sig_id, sig_type, name, notes, wh_type, wh_leads_to, ghost_type, created_by_user_id, from_merge)
-           VALUES ${sigPh.join(',')}`, sigVals,
+           VALUES ${sigPh.join(',')}
+           ON CONFLICT (system_id, UPPER(sig_id)) WHERE sig_id <> '' DO NOTHING`, sigVals,
         );
       }
     }
@@ -4191,7 +4193,7 @@ mapsRouter.post('/:mapId/systems/:systemId/signatures', async (req, res) => {
   // Read separately so widening the cast doesn't make every field nullable.
   const scoutConnectionId = (req.body as { scoutConnectionId?: unknown }).scoutConnectionId;
   const me = authUser(req);
-  const row = await createSignature(
+  const { row, inserted } = await createSignature(
     mapId, systemId, { sigId, sigType, name, notes, whType, whLeadsTo, ghostType, massStatus, timeStatus,
       scoutConnectionId: typeof scoutConnectionId === 'string' && scoutConnectionId ? scoutConnectionId : null },
     { userId: me.userId, clientId: req.get('x-client-id') ?? null },
@@ -4201,10 +4203,12 @@ mapsRouter.post('/:mapId/systems/:systemId/signatures', async (req, res) => {
   // row as they press the button. Half of a bulk copy is K162 by definition
   // (every hole is K162 at one end), so dispatching here would fire a notice
   // per connection. Suppressed on provenance, like the other bulk writes.
-  if (!fromScoutFeed(scoutConnectionId) && (whType ?? '').toUpperCase() === 'K162') {
+  // A create that landed on an existing row (someone else pasted it first) is
+  // not a new K162 sighting -- that notice, if any, went out with the first.
+  if (inserted && !fromScoutFeed(scoutConnectionId) && (whType ?? '').toUpperCase() === 'K162') {
     dispatchK162(access, row.id, systemId, me.characterName);
   }
-  res.status(201).json(row);
+  res.status(inserted ? 201 : 200).json(row);
 });
 
 mapsRouter.patch('/:mapId/systems/:systemId/signatures/:sigId', async (req, res) => {
@@ -4215,9 +4219,16 @@ mapsRouter.patch('/:mapId/systems/:systemId/signatures/:sigId', async (req, res)
 
   const updates = req.body as Record<string, unknown>;
   const me = authUser(req);
-  const { dispatchK162: shouldDispatch, flushK162: shouldFlush } = await updateSignature(
-    mapId, systemId, sigId, updates, { userId: me.userId, clientId: req.get('x-client-id') ?? null },
-  );
+  let result;
+  try {
+    result = await updateSignature(
+      mapId, systemId, sigId, updates, { userId: me.userId, clientId: req.get('x-client-id') ?? null },
+    );
+  } catch (err) {
+    if (err instanceof DuplicateSignatureError) { res.status(409).json({ error: 'duplicate_sig', message: err.message }); return; }
+    throw err;
+  }
+  const { dispatchK162: shouldDispatch, flushK162: shouldFlush } = result;
   // Discord notice fires once on a transition into K162; flush any pending
   // notice the moment the leads-to is known. (Both decided inside updateSignature.)
   // See the POST above for why a feed-sourced K162 does not notify. A flush

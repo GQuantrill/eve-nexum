@@ -90,7 +90,7 @@ describe.skipIf(!dbReady)('scout cleanup (integration)', () => {
 
   it('keeps one of ours that somebody has since annotated', async () => {
     await seedScoutSig(sysId, 'noted-1', 120, { notes: 'bubbled, do not use' });
-    await seedScoutSig(sysId, 'named-1', 120, { name: 'my exit' });
+    await seedScoutSig(sysId, 'named-1', 120, { sigId: 'DEF-456', name: 'my exit' });
     expect((await sweep()).body.removed).toBe(0);
     expect(await sigCount()).toBe(2);
   });

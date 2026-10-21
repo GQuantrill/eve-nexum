@@ -1834,6 +1834,7 @@
     "pasteDifferentSystem": "Votre personnage est actuellement dans {{current}}, mais vous collez des signatures dans {{selected}}. Continuer ?",
     "loadFailed": "Échec du chargement des signatures",
     "saveFailed": "Échec de l'enregistrement de la signature",
+    "duplicateId": "La signature {{id}} existe déjà dans ce système",
     "deleteFailed": "Échec de la suppression de la signature",
     "deleteSelectedConfirm_one": "Supprimer {{count}} signature sélectionnée ?",
     "deleteSelectedConfirm_other": "Supprimer {{count}} signatures sélectionnées ?",
