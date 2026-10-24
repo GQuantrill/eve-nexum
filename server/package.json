@@ -6,7 +6,7 @@
     "email": "gq@area404.org",
     "url": "https://area404.org"
   },
-  "version": "5.9.1",
+  "version": "5.9.2",
   "private": true,
   "scripts": {
     "dev": "tsx watch src/index.ts",
@@ -28,7 +28,8 @@
     "proxy-addr": "^2.0.8",
     "qs": "^6.16.0",
     "source-map-js": "^1.2.2",
-    "undici": "^7.29.1"
+    "undici": "^7.29.1",
+    "vite": "~8.1.6"
   },
   "dependencies": {
     "cheerio": "^1.2.0",

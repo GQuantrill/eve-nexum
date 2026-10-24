@@ -103,17 +103,24 @@ async function fetchEntityInfo(type: 'alliances' | 'corporations', id: number): 
 }
 
 export function useSovData(eveSystemId: number | null): SovResult | null {
-  const [sov, setSov] = useState<SovResult | null>(null);
+  // Each result is tagged with the system it was resolved for, and only handed
+  // back while that is still the system asked about. A long-lived consumer (the
+  // system panel stays mounted as the selection changes) otherwise kept showing
+  // the last sov holder it found: a system with no sov -- all of J-space --
+  // never produced a result to replace it, so null-sec sov stuck to every
+  // wormhole selected after it.
+  const [state, setState] = useState<{ id: number; sov: SovResult | null } | null>(null);
 
   useEffect(() => {
-    // Clear when there's no system to look up (a deliberate reset, not a sync).
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (!eveSystemId) { setSov(null); return; }
+    if (!eveSystemId) return;
     let cancelled = false;
+    const setSov = (sov: SovResult | null) => setState({ id: eveSystemId, sov });
 
     const run = () => Promise.all([ensureSovMap(), ensureFactions()]).then(async () => {
+      if (cancelled) return;
       const entry = sovMap.get(eveSystemId);
-      if (!entry || cancelled) return;
+      // No entry = nobody holds sov here (now, after a flip, or ever).
+      if (!entry) { setSov(null); return; }
       const [allianceInfo, corpInfo] = await Promise.all([
         entry.alliance_id    ? fetchEntityInfo('alliances',    entry.alliance_id)    : Promise.resolve(null),
         entry.corporation_id ? fetchEntityInfo('corporations', entry.corporation_id) : Promise.resolve(null),
@@ -142,7 +149,7 @@ export function useSovData(eveSystemId: number | null): SovResult | null {
 
       // Primary controller: alliance > corp > faction
       const primary = alliance ?? corp ?? faction;
-      if (!primary) return;
+      if (!primary) { setSov(null); return; }
 
       setSov({
         controller: primary.name,
@@ -165,5 +172,5 @@ export function useSovData(eveSystemId: number | null): SovResult | null {
     return () => { cancelled = true; clearInterval(id); };
   }, [eveSystemId]);
 
-  return sov;
+  return eveSystemId && state?.id === eveSystemId ? state.sov : null;
 }
