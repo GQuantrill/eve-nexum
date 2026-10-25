@@ -87,7 +87,10 @@ app.use(cors({
   origin: process.env.FRONTEND_URL ?? 'http://localhost:5174',
   credentials: true,
 }));
-app.use(express.json({ limit: '2mb' }));
+// inflate: false refuses compressed request bodies (415). Nothing we serve
+// sends them, and body-parser < 1.20.9 can be stalled by trailing bytes after
+// a compressed body (GHSA, Dependabot #58) -- this closes that path outright.
+app.use(express.json({ limit: '2mb', inflate: false }));
 
 // Derive cookie.secure from FRONTEND_URL's protocol rather than NODE_ENV.
 // Tying it to NODE_ENV breaks the common "production build running over plain
@@ -174,6 +177,12 @@ app.get('/health', (_req, res) => res.json({ ok: true }));
 app.use((err: Error & { status?: number; type?: string }, req: express.Request, res: express.Response, _next: express.NextFunction) => {
   if (err.type === 'entity.parse.failed') {
     res.status(400).json({ error: 'Invalid JSON body' });
+    return;
+  }
+  // A compressed body, refused by inflate: false above. Expected noise, not
+  // a server fault, so it is answered without logging.
+  if (err.type === 'encoding.unsupported') {
+    res.status(415).json({ error: 'Compressed request bodies are not supported' });
     return;
   }
   rootLog.error(`${req.method} ${req.originalUrl} →`, err);
