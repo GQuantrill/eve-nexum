@@ -6,7 +6,7 @@
     "email": "gq@area404.org",
     "url": "https://area404.org"
   },
-  "version": "5.9.3",
+  "version": "5.9.4",
   "private": true,
   "scripts": {
     "dev": "tsx watch src/index.ts",
@@ -23,7 +23,7 @@
   "resolutions": {
     "body-parser": "^1.20.6",
     "esbuild": "^0.28.1",
-    "ip-address": "^10.5.1",
+    "ip-address": "10.7.4",
     "postcss": "^8.5.23",
     "proxy-addr": "^2.0.8",
     "qs": "^6.16.0",
