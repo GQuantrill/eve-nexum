@@ -34,6 +34,14 @@ import {
   scheduleSigRemoval, cancelSigRemoval, pendingRemovalIds, subscribeSigRemovals,
 } from '../../store/sigRemovalQueue';
 
+// Whether deleting this sig could sever a wormhole: it names a hole and where
+// it goes, or a connection lists it as its backing signature (which holds
+// even when nobody filled in the destination).
+function backsALink(sig: Signature): boolean {
+  if (sig.whType && sig.whLeadsTo) return true;
+  return !!connectionForSig(sig.id, useMapStore.getState().map.connections);
+}
+
 // Aging bands for wormhole signatures, anchored to the WH type's known
 // lifetime from the SDE catalog (useWormholeTypes) — the single source, so
 // every code with a lifetime tints, not just a hardcoded handful. K162 and
@@ -647,7 +655,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
       setSelected((prev) => { const next = new Set(prev); next.delete(e.sigRowId); return next; });
       // A sig backing a wormhole vanishing means the hole collapsed: sever the
       // connection but keep it on the map.
-      if (e.sig?.whType && e.sig.whLeadsTo) {
+      if (e.sig && backsALink(e.sig)) {
         reevaluateConnectionsForSystem(systemId, sigsRef.current.filter((s) => s.id !== e.sigRowId), e.sig, true);
       }
     }
@@ -902,7 +910,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
 
     // If the deleted sig was backing a connection, quarantine it — the hole
     // collapsed, so the connection is severed (broken) but kept on the map.
-    if (deleted && deleted.whType && deleted.whLeadsTo) {
+    if (deleted && backsALink(deleted)) {
       const nextSigs = sigsRef.current.filter((s) => s.id !== id);
       reevaluateConnectionsForSystem(systemId, nextSigs, deleted, true);
     }

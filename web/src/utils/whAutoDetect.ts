@@ -87,6 +87,27 @@ export function reevaluateConnectionsForSystem(
       conn.type && conn.type.toUpperCase() === oldType
     );
 
+    const endField = conn.sourceId === systemId ? 'sourceSignatureId' : 'targetSignatureId';
+
+    // A deleted sig that was tied to THIS link specifically -- linked as its
+    // backing signature, or pinned to the connected system by name -- was the
+    // hole, whatever its type says. The type test in oldBackedThis misses the
+    // K162 end: a link labelled with the code on the far side is backed here
+    // by a K162, which never equals the label, so deleting it did nothing.
+    // (eve-scout copies hit this every time: the code goes on one end only.)
+    //
+    // And only another sig tied to the link just as tightly keeps it alive. A
+    // sig that merely leads to the same CLASS is a different hole -- Thera has
+    // dozens of "HS" exits -- and must not stand in for the one deleted.
+    if (breakOnOrphan && !conn.broken && oldSig) {
+      const linkedOld = conn[endField] === oldSig.id;
+      const pinnedOld = !!(oldSig.whType && on && oldLeads === on);
+      if (linkedOld || pinnedOld) {
+        const tied = !!on && backing.some((s) => (s.whLeadsTo ?? '').toUpperCase() === on);
+        if (!tied) { updateConnection(conn.id, { broken: true }); continue; }
+      }
+    }
+
     const patch: Partial<Omit<MapConnection, 'id'>> = {};
 
     if (best) {
@@ -110,7 +131,6 @@ export function reevaluateConnectionsForSystem(
       // system, or the sole backing hole on this end — and never overriding a
       // manual link. (A K162 twin pinned to the same system alongside the real
       // code is fine: the real code wins as the single non-K162 pinned hole.)
-      const endField = conn.sourceId === systemId ? 'sourceSignatureId' : 'targetSignatureId';
       if (!conn[endField]) {
         const pinned = backing.filter((s) => (s.whLeadsTo ?? '').toUpperCase() === on);
         const pinnedReal = pinned.filter((s) => (s.whType ?? '').toUpperCase() !== 'K162');
