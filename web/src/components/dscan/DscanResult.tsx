@@ -129,10 +129,13 @@ function DscanView({ data }: { data: DscanData }) {
         if (b.sectionTotals[s] === 0) return null;
         const items = itemsBySection[s];
         return (
-          <section key={s} className={styles.section}>
-            <h3 className={styles.sectionTitle}>
+          // Each section folds away on its own, so a scan full of structures
+          // doesn't bury the ships (or the other way round).
+          <details key={s} className={styles.section} open>
+            <summary className={styles.sectionTitle}>
               {t(SECTION_KEY[s])}<span className={styles.count}>{b.sectionTotals[s]}</span>
-            </h3>
+            </summary>
+            <div className={styles.sectionBody}>
             {items ? (
               <ul className={`${styles.rows} ${styles.flatRows}`}>
                 {items.map((it, i) => (
@@ -161,7 +164,8 @@ function DscanView({ data }: { data: DscanData }) {
                 </details>
               ))
             )}
-          </section>
+            </div>
+          </details>
         );
       })}
     </>
