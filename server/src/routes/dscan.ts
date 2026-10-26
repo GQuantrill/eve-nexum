@@ -29,6 +29,7 @@ dscanRouter.post('/', dscanCreateLimiter, dscanHourlyLimiter, async (req, res) =
   // to should fail outright, not quietly save an unpinned scan.
   let mapId: string | null = null;
   let eveSystemId: number | null = null;
+  let mapSystemName: string | null = null;
   if (body.mapId != null || body.systemId != null) {
     if (!req.session.userId) { res.status(401).json({ error: 'Not authenticated' }); return; }
     if (typeof body.mapId !== 'string' || typeof body.systemId !== 'string' ||
@@ -38,11 +39,12 @@ dscanRouter.post('/', dscanCreateLimiter, dscanHourlyLimiter, async (req, res) =
     }
     const access = await requireMapContentWrite(res, body.mapId, req);
     if (!access) return;
-    const { rows } = await db.query<{ eve_system_id: number | null }>(
-      `SELECT eve_system_id FROM map_systems WHERE id = $1 AND map_id = $2`, [body.systemId, body.mapId]);
+    const { rows } = await db.query<{ eve_system_id: number | null; name: string }>(
+      `SELECT eve_system_id, name FROM map_systems WHERE id = $1 AND map_id = $2`, [body.systemId, body.mapId]);
     if (!rows[0] || rows[0].eve_system_id == null) { res.status(404).json({ error: 'System not found' }); return; }
     mapId = body.mapId;
     eveSystemId = rows[0].eve_system_id;
+    mapSystemName = rows[0].name;
   }
 
   const parsed = parsePaste(body.text);
@@ -54,6 +56,11 @@ dscanRouter.post('/', dscanCreateLimiter, dscanHourlyLimiter, async (req, res) =
   } catch (err) {
     if (err instanceof LocalLookupError) { res.status(502).json({ error: 'lookup_failed' }); return; }
     throw err;
+  }
+  // A Sun in the paste says where the scan was taken, so it wins; failing
+  // that, the system it was pinned to.
+  if (!data.system && eveSystemId != null && mapSystemName) {
+    data.system = { id: eveSystemId, name: mapSystemName, from: 'map' };
   }
 
   const saved = await saveScan({ data, createdBy: req.session.userId ?? null, mapId, eveSystemId });

@@ -47,6 +47,7 @@ export function DscanResult({ scan }: { scan: StoredScan }) {
   return (
     <div className={styles.result}>
       <div className={styles.meta}>
+        {scan.data.system && <span className={styles.system}>{scan.data.system.name}</span>}
         <span className={styles.kind}>{scan.data.kind === 'local' ? t('dscan.kindLocal') : t('dscan.kindDscan')}</span>
         <span title={new Date(created).toLocaleString()}>{t('dscan.scanned', { ago: timeAgo(t, created) })}</span>
         <span>{expiresIn(t, expires - now)}</span>

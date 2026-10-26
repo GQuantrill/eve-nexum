@@ -158,8 +158,17 @@ export interface DscanTypeInfo {
   m: number | null;     // hull mass, kg
 }
 
+/** The system a scan was taken in, and how we know: a Sun in the paste names
+ *  it outright; otherwise it's the map system the scan was pinned to. */
+export interface ScanSystem {
+  id:   number;
+  name: string;
+  from: 'sun' | 'map';
+}
+
 export interface DscanData {
   kind: 'dscan';
+  system?: ScanSystem;
   onGridKm: number;
   types: Record<string, DscanTypeInfo>;
   /** [typeId, item name, distance km | null] -- compact, a big scan is long. */
@@ -175,6 +184,7 @@ export interface LocalPilot {
 
 export interface LocalData {
   kind: 'local';
+  system?: ScanSystem;
   pilots: LocalPilot[];
   /** Names ESI didn't recognise (typos, biomassed characters). */
   unknown: string[];
@@ -189,18 +199,51 @@ export type ScanSummary =
   | { kind: 'dscan'; total: number; ships: number }
   | { kind: 'local'; pilots: number };
 
+// SDE group id of suns. Every system has exactly one, so a Sun on the scan
+// says where it was taken.
+const SUN_GROUP_ID = 6;
+
+/**
+ * The system a sun's d-scan name points to. The client names a star
+ * "<system> - Star" (the suffix in the player's language), and system names
+ * never contain " - ", so the system is everything before the last one.
+ */
+export function systemNameFromSun(sunName: string): string | null {
+  const cut = sunName.lastIndexOf(' - ');
+  const name = (cut > 0 ? sunName.slice(0, cut) : sunName).trim();
+  return name ? name : null;
+}
+
+export async function systemFromSun(sunNames: string[]): Promise<ScanSystem | null> {
+  const wanted = [...new Set(sunNames.map(systemNameFromSun).filter((n): n is string => !!n))];
+  if (wanted.length === 0) return null;
+  try {
+    const { rows } = await db.query<{ id: number; name: string }>(
+      `SELECT id, name FROM solar_systems WHERE lower(name) = ANY($1::text[]) LIMIT 1`,
+      [wanted.map((n) => n.toLowerCase())]);
+    return rows[0] ? { id: rows[0].id, name: rows[0].name, from: 'sun' } : null;
+  } catch (err) {
+    // No SDE systems table (a fresh install before setup-db): the scan is
+    // still worth saving, just without a system.
+    log.warn('sun system lookup failed:', err);
+    return null;
+  }
+}
+
 export async function analyseDscan(rows: DscanRow[]): Promise<DscanData> {
   const ids = [...new Set(rows.map((r) => r.typeId))];
   const { rows: found } = await db.query<{
-    id: number; name: string; group_name: string; category_id: number; mass: string | null;
+    id: number; name: string; group_id: number; group_name: string; category_id: number; mass: string | null;
   }>(
-    `SELECT t.id, t.name, g.name AS group_name, g.category_id, t.mass
+    `SELECT t.id, t.name, t.group_id, g.name AS group_name, g.category_id, t.mass
        FROM item_types t JOIN item_groups g ON g.id = t.group_id
       WHERE t.id = ANY($1::int[])`,
     [ids],
   );
   const types: Record<string, DscanTypeInfo> = {};
+  const sunTypes = new Set<number>();
   for (const f of found) {
+    if (f.group_id === SUN_GROUP_ID) sunTypes.add(f.id);
     const mass = f.mass == null ? null : Number(f.mass);
     types[f.id] = {
       n: f.name, g: f.group_name, s: sectionFor(f.category_id),
@@ -212,8 +255,10 @@ export async function analyseDscan(rows: DscanRow[]): Promise<DscanData> {
   for (const r of rows) {
     if (!types[r.typeId]) types[r.typeId] = { n: r.typeName || String(r.typeId), g: '', s: 'other', m: null };
   }
+  const system = await systemFromSun(rows.filter((r) => sunTypes.has(r.typeId)).map((r) => r.name));
   return {
     kind: 'dscan', onGridKm: ON_GRID_KM, types,
+    ...(system ? { system } : {}),
     rows: rows.map((r) => [r.typeId, r.name, r.distanceKm == null ? null : Math.round(r.distanceKm)]),
   };
 }

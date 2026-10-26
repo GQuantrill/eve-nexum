@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parseDistanceKm, parseDscanLine, parsePaste, sectionFor, summarise, newScanId, SCAN_ID_RE } from './dscan.js';
+import { parseDistanceKm, parseDscanLine, parsePaste, sectionFor, summarise, newScanId, SCAN_ID_RE, systemNameFromSun } from './dscan.js';
 
 describe('parseDistanceKm', () => {
   it('reads km in the locales the client prints', () => {
@@ -98,5 +98,22 @@ describe('scan ids', () => {
     const ids = new Set(Array.from({ length: 200 }, newScanId));
     expect(ids.size).toBe(200);
     for (const id of ids) expect(id).toMatch(SCAN_ID_RE);
+  });
+});
+
+describe('systemNameFromSun', () => {
+  it('takes the system from a star\'s d-scan name', () => {
+    expect(systemNameFromSun('Jita - Star')).toBe('Jita');
+    expect(systemNameFromSun('J123456 - Star')).toBe('J123456');
+    // Hyphens inside a system name aren't the separator.
+    expect(systemNameFromSun('1DQ1-A - Star')).toBe('1DQ1-A');
+    expect(systemNameFromSun('Old Man Star - Star')).toBe('Old Man Star');
+    // Whatever language the suffix is in.
+    expect(systemNameFromSun('Amarr - Stern')).toBe('Amarr');
+  });
+
+  it('falls back to the whole name, and gives null for nothing', () => {
+    expect(systemNameFromSun('Thera')).toBe('Thera');
+    expect(systemNameFromSun('  ')).toBeNull();
   });
 });
