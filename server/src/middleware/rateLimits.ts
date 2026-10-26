@@ -59,6 +59,30 @@ export const publicLimiter = rateLimit({
   message: { error: 'Too many requests, please slow down.' },
 });
 
+// Creating a d-scan: open to anyone, and a local-scan paste fans out into
+// several ESI calls, so creation gets its own tight budget on top of the
+// router's. 20/min is a scan every three seconds -- far past any real use.
+export const dscanCreateLimiter = rateLimit({
+  keyGenerator: userOrIpKey,
+  windowMs: 60_000,
+  limit: 20,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  message: { error: 'Too many requests, please slow down.' },
+});
+
+// ...and an hourly ceiling, because each scan is stored for a day: at the
+// per-minute rate alone one address could park tens of thousands of rows. 120
+// an hour is still far beyond a fleet's worth of scouting.
+export const dscanHourlyLimiter = rateLimit({
+  keyGenerator: userOrIpKey,
+  windowMs: 60 * 60_000,
+  limit: 120,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  message: { error: 'Too many requests, please slow down.' },
+});
+
 // Authenticated app routes (maps, stats, standings, structures). Higher
 // ceiling than esiLimiter because a busy mapping session legitimately
 // fires many requests (sig save bursts, position drags, structure imports).

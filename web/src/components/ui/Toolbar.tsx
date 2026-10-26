@@ -24,6 +24,7 @@ import { ChainExitsMenu } from './ChainExitsMenu';
 import { WhTypeChartModal } from './WhTypeChartModal';
 import { KillLogPanel } from './KillLogPanel';
 import { JumpPlannerModal } from './JumpPlannerModal';
+import { DscanModal } from '../dscan/DscanModal';
 import { useProximityAlerts } from '../../hooks/useProximityAlerts';
 import { useClickOutside } from '../../hooks/useClickOutside';
 import { useUserSetting } from '../../hooks/useUserSetting';
@@ -48,6 +49,7 @@ import {
   LinkSimpleIcon,
   MapPinIcon,
   NavigationArrowIcon,
+  ScanIcon,
   PlanetIcon,
   QuestionIcon,
   ShieldStarIcon,
@@ -352,6 +354,7 @@ export function Toolbar() {
   const [showWhChart, setShowWhChart] = useState(false);
   const [showKillLog, setShowKillLog] = useState(false);
   const [showJumpPlanner, setShowJumpPlanner] = useState(false);
+  const [showDscan, setShowDscan] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [leaveConfirm, setLeaveConfirm] = useState(false);
   const mapSwitcherRef = useRef<HTMLDivElement>(null);
@@ -652,6 +655,15 @@ export function Toolbar() {
           <NavigationArrowIcon size={18} weight="regular" />
         </button>
 
+        <button
+          className="toolbar__toggle toolbar__toggle--icon toolbar__toggle--prominent"
+          onClick={() => setShowDscan(true)}
+          data-tooltip={t('dscan.title')}
+          aria-label={t('dscan.title')}
+        >
+          <ScanIcon size={18} weight="regular" />
+        </button>
+
         {/* Layout switch. Lives here rather than in the sidebar's display
             options: those are set once, whereas people flip this back and
             forth while deciding which layout suits them. */}
@@ -903,6 +915,7 @@ export function Toolbar() {
     {showWhChart && <WhTypeChartModal onClose={() => setShowWhChart(false)} />}
     {showKillLog && <KillLogPanel onClose={() => setShowKillLog(false)} />}
     {showJumpPlanner && <JumpPlannerModal onClose={() => setShowJumpPlanner(false)} />}
+    {showDscan && <DscanModal onClose={() => setShowDscan(false)} />}
     {deleteConfirm && (
       <ConfirmModal
         message={t('toolbar.deleteMapConfirm', { name: mapName })}

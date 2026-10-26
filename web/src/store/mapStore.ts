@@ -369,6 +369,10 @@ interface MapStore {
   bumpSigRev: (systemId: string) => void;
   structRev: Record<string, number>;
   anomRev: Record<string, number>;
+  /** D-scans pinned per EVE system id (scans pin by EVE id, not map node), so
+   *  a system panel's list re-reads when someone pins another. */
+  dscanRev: Record<number, number>;
+  bumpDscanRev: (eveSystemId: number) => void;
 
   // Map-wide index of scanned wormhole-signature types per system (uppercased
   // wh_type codes), so the watchlist can match a scanned sig anywhere in the
@@ -443,7 +447,8 @@ export type RemoteEvent =
   | { type: 'map.resync' }
   | { type: 'sig.changed';       systemId: string }
   | { type: 'structure.changed'; systemId: string }
-  | { type: 'anom.changed';      systemId: string };
+  | { type: 'anom.changed';      systemId: string }
+  | { type: 'dscan.changed';     eveSystemId: number };
 
 // Cross-tab sync for the /auth/preferences-backed UI prefs (compact mode, snap,
 // minimap, uniform size, statics, connection thickness, route mode, ui zoom,
@@ -645,6 +650,9 @@ export const useMapStore = create<MapStore>()((set, get) => {
       set((s) => ({ sigRev: { ...s.sigRev, [systemId]: (s.sigRev[systemId] ?? 0) + 1 } })),
     structRev: {},
     anomRev: {},
+    dscanRev: {},
+    bumpDscanRev: (eveSystemId) =>
+      set((s) => ({ dscanRev: { ...s.dscanRev, [eveSystemId]: (s.dscanRev[eveSystemId] ?? 0) + 1 } })),
     sigTypesBySystem: {},
     scanBySystem: {},
     setScanBulk: (next) => set({ scanBySystem: next }),
@@ -1550,6 +1558,10 @@ export const useMapStore = create<MapStore>()((set, get) => {
         }
         case 'anom.changed': {
           set((s) => ({ anomRev: { ...s.anomRev, [event.systemId]: (s.anomRev[event.systemId] ?? 0) + 1 } }));
+          break;
+        }
+        case 'dscan.changed': {
+          get().bumpDscanRev(event.eveSystemId);
           break;
         }
       }

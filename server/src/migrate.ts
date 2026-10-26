@@ -1354,6 +1354,26 @@ export async function migrate() {
       END IF;
     END
     $migration$;
+
+    -- D-scan / local-scan analyser results. Public by unguessable id, kept a day
+    -- (services/dscan.ts sweeps expired rows hourly). A logged-in pilot can pin
+    -- one to a system on a map; the pin is by EVE system id so it survives the
+    -- system being removed and re-added, and is dropped (not the scan) if the
+    -- map goes.
+    CREATE TABLE IF NOT EXISTS dscans (
+      id            TEXT        PRIMARY KEY,
+      kind          TEXT        NOT NULL,
+      data          JSONB       NOT NULL,
+      summary       JSONB       NOT NULL,
+      created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      expires_at    TIMESTAMPTZ NOT NULL,
+      created_by    INTEGER,
+      map_id        UUID        REFERENCES maps(id) ON DELETE SET NULL,
+      eve_system_id INTEGER
+    );
+    CREATE INDEX IF NOT EXISTS idx_dscans_expires ON dscans (expires_at);
+    CREATE INDEX IF NOT EXISTS idx_dscans_map_system
+      ON dscans (map_id, eve_system_id, created_at DESC) WHERE map_id IS NOT NULL;
   `);
 
   await encryptLegacyTokens();

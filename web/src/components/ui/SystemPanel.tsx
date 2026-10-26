@@ -37,6 +37,7 @@ import { useIncursions, findIncursion } from '../../hooks/useIncursions';
 import { useInsurgency, findInsurgency } from '../../hooks/useInsurgency';
 import { useCanEditContent } from '../../hooks/useCanEditContent';
 import { useShareMode } from '../../context/ShareModeContext';
+import { DscanSystemList } from '../dscan/DscanSystemList';
 import { useCustomIntel } from '../../hooks/useCustomIntel';
 import { resolveIntelColor, resolveIntelLabel } from '../../utils/intelColors';
 import { WHTypeInfo } from './WHTypeInfo';
@@ -238,6 +239,7 @@ export function SystemPanel() {
   const setPanelOrder    = useMapStore((s) => s.setPanelOrder);
   const canEdit          = useCanEditContent();
   const { isShareMode }  = useShareMode();
+  const activeMapId      = useMapStore((s) => s.activeMapId);
   // Per-category share-mode flags. Defaults are FALSE so a missing field
   // (older share payload, or a pre-flags map state) errs on hiding.
   const shareIncludesSigs       = useMapStore((s) => s.map.shareIncludeSigs       === true);
@@ -876,6 +878,14 @@ export function SystemPanel() {
                   </div>
                 )}
               </div>
+              </InfoSection>
+            )}
+
+            {/* Scans pinned here from the toolbar's d-scan analyser. Not in
+                share mode: listing them needs a session. */}
+            {sys.eveSystemId && activeMapId && !isShareMode && (
+              <InfoSection id="dscans" title={t('dscan.systemSection')}>
+                <DscanSystemList mapId={activeMapId} eveSystemId={sys.eveSystemId} />
               </InfoSection>
             )}
 
