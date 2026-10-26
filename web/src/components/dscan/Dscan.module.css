@@ -243,8 +243,10 @@
 }
 
 /* ── Modal (map toolbar) ───────────────────────────────────── */
-.modal {
-  width: min(44rem, calc(100vw - 2rem));
+/* Doubled up with the global .modal so these win over its fixed 360px width
+   whichever stylesheet loads last. */
+:global(.modal).modal {
+  width: min(64rem, calc(100vw - 2rem));
   max-height: calc(100vh - 4rem);
   display: flex;
   flex-direction: column;
