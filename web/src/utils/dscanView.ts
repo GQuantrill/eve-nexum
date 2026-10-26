@@ -6,8 +6,12 @@ export type DscanSection = 'ship' | 'structure' | 'deployable' | 'drone' | 'othe
 
 export interface DscanTypeInfo { n: string; g: string; s: DscanSection; m: number | null }
 
+/** Where the scan was taken: from a Sun in the paste, else the pinned system. */
+export interface ScanSystem { id: number; name: string; from: 'sun' | 'map' }
+
 export interface DscanData {
   kind: 'dscan';
+  system?: ScanSystem;
   onGridKm: number;
   types: Record<string, DscanTypeInfo>;
   rows: Array<[number, string, number | null]>;
@@ -17,6 +21,7 @@ export interface LocalPilot { n: string; id: number; c: number | null; a: number
 
 export interface LocalData {
   kind: 'local';
+  system?: ScanSystem;
   pilots: LocalPilot[];
   unknown: string[];
   names: Record<string, string>;

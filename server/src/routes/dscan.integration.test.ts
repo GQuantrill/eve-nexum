@@ -78,11 +78,13 @@ describe.skipIf(!dbReady)('d-scan analyser (integration)', () => {
     esi.down = false;
     state.over = { corpMode: true, allianceMode: false, corpIds: [CORP], restrictedMode: true, adminCharId: null };
 
-    await db.query(`INSERT INTO item_categories (id, name) VALUES (6, 'Ship'), (65, 'Structure')`);
+    await db.query(`INSERT INTO item_categories (id, name) VALUES (2, 'Celestial'), (6, 'Ship'), (65, 'Structure')`);
     await db.query(`INSERT INTO item_groups (id, name, category_id) VALUES
-      (963, 'Strategic Cruiser', 6), (30, 'Titan', 6), (1657, 'Citadel', 65)`);
+      (6, 'Sun', 2), (963, 'Strategic Cruiser', 6), (30, 'Titan', 6), (1657, 'Citadel', 65)`);
     await db.query(`INSERT INTO item_types (id, name, group_id, mass) VALUES
+      (45041, 'Sun G5 (Yellow)', 6, NULL),
       (29984, 'Tengu', 963, 8200000), (11567, 'Avatar', 30, 2278125000), (35832, 'Astrahus', 1657, 1000000)`);
+    await db.query(`INSERT INTO solar_systems (id, name, class) VALUES ($1, 'Jita', 'HS'), (30002187, 'Amarr', 'HS')`, [JITA]);
 
     const ownerId = await seedUser({ characterId: 1, corpId: CORP, role: 'full' });
     member   = { id: await seedUser({ characterId: 2, corpId: CORP, role: 'full' }), characterId: 2, role: 'full', corpId: CORP };
@@ -150,6 +152,35 @@ describe.skipIf(!dbReady)('d-scan analyser (integration)', () => {
   it('404s an unknown or malformed id', async () => {
     expect((await request(makeApp(null)).get('/api/dscan/AAAAAAAAAAAAAAAA')).status).toBe(404);
     expect((await request(makeApp(null)).get("/api/dscan/x' OR 1=1")).status).toBe(404);
+  });
+
+  it('names the system from a Sun on the scan', async () => {
+    const created = await request(makeApp(null)).post('/api/dscan')
+      .send({ text: `${SCAN}\n45041\tAmarr - Star\tSun G5 (Yellow)\t12 AU` });
+    expect(created.status).toBe(201);
+    const view = await request(makeApp(null)).get(`/api/dscan/${created.body.id}`);
+    expect(view.body.data.system).toEqual({ id: 30002187, name: 'Amarr', from: 'sun' });
+  });
+
+  it('leaves the system off when nothing names it', async () => {
+    const created = await request(makeApp(null)).post('/api/dscan').send({ text: SCAN });
+    const view = await request(makeApp(null)).get(`/api/dscan/${created.body.id}`);
+    expect(view.body.data.system).toBeUndefined();
+  });
+
+  it('names a pinned scan after its map system, but lets a Sun win', async () => {
+    const pinned = await request(makeApp(member)).post('/api/dscan').send({ text: SCAN, mapId, systemId: sysId });
+    expect((await request(makeApp(null)).get(`/api/dscan/${pinned.body.id}`)).body.data.system)
+      .toEqual({ id: JITA, name: 'Jita', from: 'map' });
+
+    const local = await request(makeApp(member)).post('/api/dscan').send({ text: 'Bob Pilot', mapId, systemId: sysId });
+    expect((await request(makeApp(null)).get(`/api/dscan/${local.body.id}`)).body.data.system)
+      .toEqual({ id: JITA, name: 'Jita', from: 'map' });
+
+    const withSun = await request(makeApp(member)).post('/api/dscan')
+      .send({ text: `${SCAN}\n45041\tAmarr - Star\tSun G5 (Yellow)\t12 AU`, mapId, systemId: sysId });
+    expect((await request(makeApp(null)).get(`/api/dscan/${withSun.body.id}`)).body.data.system)
+      .toEqual({ id: 30002187, name: 'Amarr', from: 'sun' });
   });
 
   it('pins a scan to a map system for a member who can write the map', async () => {

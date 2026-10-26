@@ -72,6 +72,11 @@
   font-weight: 600;
 }
 
+.system {
+  color: var(--accent-bright);
+  font-weight: 600;
+}
+
 .linkBar {
   display: flex;
   align-items: center;
