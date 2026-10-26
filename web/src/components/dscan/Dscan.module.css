@@ -181,6 +181,26 @@
   font-weight: 600;
 }
 
+/* A d-scan section is a <details>: the title is its summary, with the same
+   caret as the groups inside it. */
+details.section > .sectionTitle {
+  list-style: none;
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-6);
+  cursor: pointer;
+  user-select: none;
+}
+details.section > .sectionTitle::-webkit-details-marker { display: none; }
+details.section > .sectionTitle::before { content: '\25B8'; color: var(--text-faint); }
+details.section[open] > .sectionTitle::before { content: '\25BE'; }
+
+.sectionBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
 .group {
   border: 1px solid var(--border);
   border-radius: 5px;
