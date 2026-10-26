@@ -84,6 +84,7 @@ export { PlusIcon } from '@phosphor-icons/react/dist/csr/Plus';
 export { ProhibitIcon } from '@phosphor-icons/react/dist/csr/Prohibit';
 export { PulseIcon } from '@phosphor-icons/react/dist/csr/Pulse';
 export { QuestionIcon } from '@phosphor-icons/react/dist/csr/Question';
+export { ScanIcon } from '@phosphor-icons/react/dist/csr/Scan';
 export { SelectionAllIcon } from '@phosphor-icons/react/dist/csr/SelectionAll';
 export { SelectionIcon } from '@phosphor-icons/react/dist/csr/Selection';
 export { ShieldCheckIcon } from '@phosphor-icons/react/dist/csr/ShieldCheck';

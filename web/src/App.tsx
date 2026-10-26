@@ -14,6 +14,7 @@ import { CommandPaletteModal } from './components/ui/CommandPaletteModal';
 import { Toaster } from './components/ui/Toaster';
 import { toast } from './utils/toastStore';
 import { useRefreshLastKnown } from './hooks/useRefreshLastKnown';
+import { SCAN_ROUTE_RE } from './utils/dscanView';
 
 // Route-level code splitting. Each of these is reached by exactly one branch
 // of the switch in AppShell, and most people hit none of them:
@@ -24,6 +25,8 @@ import { useRefreshLastKnown } from './hooks/useRefreshLastKnown';
 const LandingPage   = lazy(() => import('./components/ui/LandingPage').then((m) => ({ default: m.LandingPage })));
 const AdminPage     = lazy(() => import('./components/ui/AdminPage').then((m) => ({ default: m.AdminPage })));
 const SharedMapView = lazy(() => import('./components/ui/SharedMapView').then((m) => ({ default: m.SharedMapView })));
+// The public d-scan analyser page (#/dscan, #/dscan/<id>).
+const DscanPage     = lazy(() => import('./components/dscan/DscanPage').then((m) => ({ default: m.DscanPage })));
 
 // The same screen the auth check already shows while it waits, reused so a
 // route chunk arriving looks like loading rather than like a flicker.
@@ -181,6 +184,8 @@ function AppShell() {
   // Share links bypass the auth gate (see the early return below); computed up
   // here so the analytics page label can account for them too.
   const shareMatch = path.match(/^\/share\/([0-9a-fA-F-]{36})$/);
+  // The d-scan analyser is public too: anyone can paste a scan or open a link.
+  const dscanMatch = SCAN_ROUTE_RE.exec(path);
 
   // Logical page for GA4. Landing and map share the same '/' URL, so we send a
   // view-derived path rather than the raw URL: '/landing' when signed out,
@@ -190,7 +195,9 @@ function AppShell() {
     ? null
     : shareMatch
       ? '/share'
-      : !user
+      : dscanMatch
+        ? '/dscan'
+        : !user
         ? '/landing'
         : path.startsWith('/admin') && (user.canViewReports || (isAdminRole(user.role) && (user.corpMode || user.allianceMode)))
           ? path
@@ -243,6 +250,10 @@ function AppShell() {
   if (shareMatch) return <Suspense fallback={<RouteLoading />}><SharedMapView token={shareMatch[1]} /></Suspense>;
 
   if (loading) return <RouteLoading />;
+
+  // After the auth check rather than before it, unlike share links: the page
+  // offers "back to map" or "home" depending on whether you are logged in.
+  if (dscanMatch) return <Suspense fallback={<RouteLoading />}><DscanPage id={dscanMatch[1]} /></Suspense>;
 
   if (!user) return <Suspense fallback={<RouteLoading />}><LandingPage /></Suspense>;
 

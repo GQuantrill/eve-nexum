@@ -50,6 +50,26 @@ const SDE_DDL = `
     pos_z            DOUBLE PRECISION,
     pos2d_x          DOUBLE PRECISION,
     pos2d_y          DOUBLE PRECISION
+  );
+  CREATE TABLE IF NOT EXISTS item_categories (
+    id        INTEGER PRIMARY KEY,
+    name      TEXT    NOT NULL,
+    published BOOLEAN NOT NULL DEFAULT false
+  );
+  CREATE TABLE IF NOT EXISTS item_groups (
+    id          INTEGER PRIMARY KEY,
+    name        TEXT    NOT NULL,
+    category_id INTEGER NOT NULL,
+    published   BOOLEAN NOT NULL DEFAULT false
+  );
+  CREATE TABLE IF NOT EXISTS item_types (
+    id          INTEGER  PRIMARY KEY,
+    name        TEXT     NOT NULL,
+    group_id    INTEGER  NOT NULL,
+    mass        NUMERIC,
+    volume      NUMERIC,
+    description TEXT,
+    published   BOOLEAN  NOT NULL DEFAULT false
   );`;
 
 let ready: Promise<boolean> | null = null;
@@ -72,7 +92,7 @@ export function ensureIntegrationDb(): Promise<boolean> {
 }
 
 const TABLES = [
-  'solar_systems', 'map_regions',
+  'solar_systems', 'map_regions', 'item_categories', 'item_groups', 'item_types', 'dscans',
   'access_grants', 'app_settings', 'map_shares', 'maps',
   'corp_standings', 'alliance_standings', 'character_standings',
   'standings_refresh', 'entity_names', 'sessions', 'user_events', 'users',

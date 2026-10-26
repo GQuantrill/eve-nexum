@@ -377,6 +377,8 @@ export function LandingPage() {
             <DiscordLogoIcon size={20} weight="fill" />
             <span>{t('landing.cta.joinDiscord')}</span>
           </a>
+          {/* Public tool: works without logging in. */}
+          <a href="#/dscan" className="landing__switch-link">{t('dscan.landingLink')}</a>
           <a href="/help/" className="landing__switch-link">{t('landing.helpLink')}</a>
           <a href="/help/#guides" className="landing__switch-link">{t('landing.guidesLink')}</a>
         </div>

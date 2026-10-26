@@ -52,6 +52,8 @@ import { keysRouter } from './routes/keys.js';
 import { apiV1Router } from './routes/apiV1.js';
 import { shareRouter } from './routes/share.js';
 import searchRouter from './routes/search.js';
+import { dscanRouter } from './routes/dscan.js';
+import { startDscanSweeper } from './services/dscan.js';
 import { authLimiter, esiLimiter, publicLimiter, appLimiter } from './middleware/rateLimits.js';
 import { originGuard } from './middleware/originGuard.js';
 import { createLogger } from './utils/logger.js';
@@ -163,6 +165,9 @@ app.use('/api/v1', (req, res, next) => {
   next();
 }, appLimiter, apiV1Router);
 app.use('/api/search',            esiLimiter, searchRouter);
+// D-scan analyser. Public: creating and viewing a scan needs no login (the
+// app limiter keys anonymous callers by IP; creation has its own tighter cap).
+app.use('/api/dscan',             appLimiter, dscanRouter);
 
 app.get('/health', (_req, res) => res.json({ ok: true }));
 
@@ -213,6 +218,7 @@ migrate()
     startIskDonationPoller();
     startAccessRevalidation();
     startKillFeed();
+    startDscanSweeper();
     void startTelemetry();
   })
   .catch((err) => { console.error('Migration failed:', err); process.exit(1); });
