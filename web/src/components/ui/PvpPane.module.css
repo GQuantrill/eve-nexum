@@ -71,8 +71,10 @@
   color: var(--text-faint);
   font-size: calc(11px * var(--font-scale, 1));
 
-  & select {
-    min-width: 0;
-    max-width: 100%;
-  }
+}
+
+.zoneSelect {
+  flex: 1;
+  min-width: 0;
+  max-width: 260px;
 }

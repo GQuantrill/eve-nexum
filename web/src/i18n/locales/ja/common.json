@@ -60,11 +60,13 @@
     "chartLabel": "今後 24 時間の時間帯別プレイヤーキル",
     "barTitle": "{{day}} {{time}}：{{n}}",
     "now": "現在",
-    "noteZkill": "zKillboard の過去 90 日間の UTC 曜日・時間帯別キル。暖色のバーほど普段から活発です。",
+    "noteZkill": "zKillboard の過去 90 日間の曜日・時間帯別キル（{{zone}} で表示）。暖色のバーほど普段から活発です。",
     "noteLive": "zKillboard に接続できないため、ここでこれまでに記録されたキルを使用しています。",
     "timesIn": "表示時刻",
     "zoneAuto": "ローカル（{{zone}}）",
-    "zoneUtc": "EVE 時間（UTC）"
+    "zoneUtc": "EVE 時間（UTC）",
+    "zoneSearch": "タイムゾーンを検索",
+    "zoneNoMatches": "一致するタイムゾーンがありません"
   },
   "addSystem": {
     "title": "星系を追加",

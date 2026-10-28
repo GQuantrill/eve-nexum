@@ -60,11 +60,13 @@
     "chartLabel": "Spelerkills per uur van de dag voor de komende 24 uur",
     "barTitle": "{{day}} {{time}}: {{n}}",
     "now": "nu",
-    "noteZkill": "Kills per UTC-weekdag en -uur over de afgelopen 90 dagen van zKillboard. Warmere balken zijn meestal drukker.",
+    "noteZkill": "Kills per weekdag en uur over de afgelopen 90 dagen van zKillboard, getoond in {{zone}}. Warmere balken zijn meestal drukker.",
     "noteLive": "zKillboard is onbereikbaar, dus dit gebruikt de kills die hier tot nu toe zijn bijgehouden.",
     "timesIn": "Tijden in",
     "zoneAuto": "Lokaal ({{zone}})",
-    "zoneUtc": "EVE-tijd (UTC)"
+    "zoneUtc": "EVE-tijd (UTC)",
+    "zoneSearch": "Tijdzones zoeken",
+    "zoneNoMatches": "Geen overeenkomende tijdzone"
   },
   "addSystem": {
     "title": "Systeem toevoegen",

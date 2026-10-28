@@ -60,11 +60,13 @@
     "chartLabel": "Abates de jogadores por hora do dia nas próximas 24 horas",
     "barTitle": "{{day}} {{time}}: {{n}}",
     "now": "agora",
-    "noteZkill": "Abates por dia da semana e hora UTC nos últimos 90 dias do zKillboard. Barras mais quentes costumam ser mais movimentadas.",
+    "noteZkill": "Abates por dia da semana e hora nos últimos 90 dias do zKillboard, mostrados em {{zone}}. Barras mais quentes costumam ser mais movimentadas.",
     "noteLive": "O zKillboard está inacessível, então isto usa os abates registrados aqui até agora.",
     "timesIn": "Horários em",
     "zoneAuto": "Local ({{zone}})",
-    "zoneUtc": "Hora do EVE (UTC)"
+    "zoneUtc": "Hora do EVE (UTC)",
+    "zoneSearch": "Pesquisar fusos horários",
+    "zoneNoMatches": "Nenhum fuso horário corresponde"
   },
   "addSystem": {
     "title": "Adicionar sistema",

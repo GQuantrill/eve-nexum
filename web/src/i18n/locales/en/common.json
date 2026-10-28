@@ -60,11 +60,13 @@
     "chartLabel": "Player kills by hour of day for the next 24 hours",
     "barTitle": "{{day}} {{time}}: {{n}}",
     "now": "now",
-    "noteZkill": "Kills by UTC weekday and hour over zKillboard's last 90 days. Hotter bars are usually busier.",
+    "noteZkill": "Kills by weekday and hour over zKillboard's last 90 days, shown in {{zone}}. Hotter bars are usually busier.",
     "noteLive": "zKillboard is unreachable, so this uses the kills recorded here so far.",
     "timesIn": "Times in",
     "zoneAuto": "Local ({{zone}})",
-    "zoneUtc": "EVE time (UTC)"
+    "zoneUtc": "EVE time (UTC)",
+    "zoneSearch": "Search timezones",
+    "zoneNoMatches": "No matching timezone"
   },
   "addSystem": {
     "title": "Add System",

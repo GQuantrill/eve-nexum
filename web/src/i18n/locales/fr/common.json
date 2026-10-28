@@ -60,11 +60,13 @@
     "chartLabel": "Kills de joueurs par heure de la journée pour les 24 prochaines heures",
     "barTitle": "{{day}} {{time}} : {{n}}",
     "now": "maint.",
-    "noteZkill": "Kills par jour de la semaine et heure UTC sur les 90 derniers jours de zKillboard. Les barres plus chaudes sont généralement plus actives.",
+    "noteZkill": "Kills par jour de la semaine et heure sur les 90 derniers jours de zKillboard, affichés en {{zone}}. Les barres plus chaudes sont généralement plus actives.",
     "noteLive": "zKillboard est injoignable, ceci utilise donc les kills enregistrés ici jusqu'à présent.",
     "timesIn": "Heures en",
     "zoneAuto": "Locale ({{zone}})",
-    "zoneUtc": "Heure EVE (UTC)"
+    "zoneUtc": "Heure EVE (UTC)",
+    "zoneSearch": "Rechercher un fuseau horaire",
+    "zoneNoMatches": "Aucun fuseau horaire correspondant"
   },
   "addSystem": {
     "title": "Ajouter un système",

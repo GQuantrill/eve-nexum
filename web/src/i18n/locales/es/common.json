@@ -60,11 +60,13 @@
     "chartLabel": "Muertes de jugadores por hora del día para las próximas 24 horas",
     "barTitle": "{{day}} {{time}}: {{n}}",
     "now": "ahora",
-    "noteZkill": "Muertes por día de la semana y hora UTC en los últimos 90 días de zKillboard. Las barras más cálidas suelen tener más actividad.",
+    "noteZkill": "Muertes por día de la semana y hora en los últimos 90 días de zKillboard, mostradas en {{zone}}. Las barras más cálidas suelen tener más actividad.",
     "noteLive": "No se puede acceder a zKillboard, así que se usan las muertes registradas aquí hasta ahora.",
     "timesIn": "Horas en",
     "zoneAuto": "Local ({{zone}})",
-    "zoneUtc": "Hora de EVE (UTC)"
+    "zoneUtc": "Hora de EVE (UTC)",
+    "zoneSearch": "Buscar zonas horarias",
+    "zoneNoMatches": "Ninguna zona horaria coincide"
   },
   "addSystem": {
     "title": "Añadir sistema",

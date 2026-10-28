@@ -7,6 +7,7 @@ import { heatColor } from '../../utils/heatmap';
 import {
   forecastBars, nextBusiest, resolveZone, zonedTime, zonedWeekday, allZones, type PvpForecastData,
 } from '../../utils/pvpForecast';
+import { Combobox } from './Combobox';
 import styles from './PvpPane.module.css';
 
 const REFRESH_MS = 10 * 60 * 1000;
@@ -14,7 +15,8 @@ const TICKS = [0, 6, 12, 18, 24];
 
 /**
  * When a system tends to see fights: its kills by UTC weekday and hour over
- * zKillboard's last 90 days, laid out as the next 24 hours from now. Hotter
+ * zKillboard's last 90 days, laid out as the next 24 hours from now in the
+ * timezone the user picked. Hotter
  * bars are hours that are usually busier; the headline names the busiest one
  * ahead, and the live (R2Z2) feed adds what's happened in the last day.
  */
@@ -69,6 +71,8 @@ export function PvpPane({ eveSystemId }: { eveSystemId: number | null }) {
   const lang = i18n.resolvedLanguage ?? i18n.language ?? 'en';
   const zone = resolveZone(zoneSetting);
   const localZone = resolveZone('auto');
+  const zoneLabel = (z: string) => z.replace(/_/g, ' ');
+  const shownIn = zoneSetting === 'UTC' ? t('pvp.zoneUtc') : zoneLabel(zone);
   return (
     <div className={styles.pane}>
       <div className={styles.head}>
@@ -97,15 +101,27 @@ export function PvpPane({ eveSystemId }: { eveSystemId: number | null }) {
         {TICKS.map((h) => <span key={h}>{h === 0 ? t('pvp.now') : `+${h}h`}</span>)}
       </div>
       {recent}
-      <span className={styles.note}>{data.source === 'zkill' ? t('pvp.noteZkill') : t('pvp.noteLive')}</span>
-      <label className={styles.zone}>
+      <span className={styles.note}>
+        {data.source === 'zkill' ? t('pvp.noteZkill', { zone: shownIn }) : t('pvp.noteLive')}
+      </span>
+      <div className={styles.zone}>
         <span>{t('pvp.timesIn')}</span>
-        <select value={zoneSetting} onChange={(e) => setZoneSetting(e.target.value)}>
-          <option value="auto">{t('pvp.zoneAuto', { zone: localZone })}</option>
-          <option value="UTC">{t('pvp.zoneUtc')}</option>
-          {zones.filter((z) => z !== 'UTC').map((z) => <option key={z} value={z}>{z.replace(/_/g, ' ')}</option>)}
-        </select>
-      </label>
+        <div className={styles.zoneSelect}>
+          <Combobox
+            value={zoneSetting}
+            onChange={(z) => setZoneSetting(z || 'auto')}
+            ariaLabel={t('pvp.timesIn')}
+            placeholder={t('pvp.zoneSearch')}
+            noMatchText={t('pvp.zoneNoMatches')}
+            limit={100}
+            options={[
+              { value: 'auto', label: t('pvp.zoneAuto', { zone: zoneLabel(localZone) }), search: `${t('pvp.zoneAuto', { zone: '' })} ${localZone}` },
+              { value: 'UTC',  label: t('pvp.zoneUtc'), search: `${t('pvp.zoneUtc')} UTC GMT` },
+              ...zones.filter((z) => z !== 'UTC').map((z) => ({ value: z, label: zoneLabel(z) })),
+            ]}
+          />
+        </div>
+      </div>
     </div>
   );
 }

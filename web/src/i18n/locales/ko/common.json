@@ -60,11 +60,13 @@
     "chartLabel": "앞으로 24시간 동안 시간대별 플레이어 킬",
     "barTitle": "{{day}} {{time}}: {{n}}",
     "now": "지금",
-    "noteZkill": "zKillboard 최근 90일의 UTC 요일·시간대별 킬. 색이 뜨거울수록 보통 더 활발합니다.",
+    "noteZkill": "zKillboard 최근 90일의 요일·시간대별 킬({{zone}} 기준). 색이 뜨거울수록 보통 더 활발합니다.",
     "noteLive": "zKillboard에 연결할 수 없어 지금까지 이곳에서 기록된 킬을 사용합니다.",
     "timesIn": "시간대",
     "zoneAuto": "현지 ({{zone}})",
-    "zoneUtc": "EVE 시간 (UTC)"
+    "zoneUtc": "EVE 시간 (UTC)",
+    "zoneSearch": "시간대 검색",
+    "zoneNoMatches": "일치하는 시간대가 없습니다"
   },
   "addSystem": {
     "title": "성계 추가",

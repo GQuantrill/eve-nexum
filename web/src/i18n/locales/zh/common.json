@@ -60,11 +60,13 @@
     "chartLabel": "未来 24 小时按时段的玩家击杀",
     "barTitle": "{{day}} {{time}}：{{n}}",
     "now": "现在",
-    "noteZkill": "按 UTC 星期和小时统计 zKillboard 过去 90 天的击杀。颜色越热通常越活跃。",
+    "noteZkill": "按星期和小时统计 zKillboard 过去 90 天的击杀，以 {{zone}} 显示。颜色越热通常越活跃。",
     "noteLive": "无法连接 zKillboard，因此使用此处目前记录的击杀。",
     "timesIn": "时区",
     "zoneAuto": "本地（{{zone}}）",
-    "zoneUtc": "EVE 时间（UTC）"
+    "zoneUtc": "EVE 时间（UTC）",
+    "zoneSearch": "搜索时区",
+    "zoneNoMatches": "没有匹配的时区"
   },
   "addSystem": {
     "title": "添加星系",
