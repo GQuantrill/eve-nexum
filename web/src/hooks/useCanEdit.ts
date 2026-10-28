@@ -38,3 +38,30 @@ export function useCanEdit(): boolean {
   // after checking they really are in that system.
   return isAdminRole(user.role) || user.role === 'full' || user.role === 'edit';
 }
+
+// A contributor can't reshape the map, but the map still has to record where
+// they fly or tracking does nothing for them. The server allows exactly that
+// (the system they are actually in, and the connection their jump made) and
+// checks it against their real location, so the client only has to let them
+// try. Everything else useCanEdit refuses still applies: a locked map, or a
+// view-only share.
+export function contributorMayTrack(
+  role: string | undefined,
+  locked: boolean,
+  accessKind: string | undefined,
+  shareCanWrite: boolean | null | undefined,
+): boolean {
+  if (role !== 'contributor' || locked) return false;
+  return !(accessKind === 'shared' && shareCanWrite === false);
+}
+
+// True when location tracking may add systems and connections to the active
+// map: anyone who can edit it, plus a contributor recording their own movement.
+export function useCanTrackJumps(): boolean {
+  const canEdit       = useCanEdit();
+  const role          = useAuth().user?.role;
+  const locked        = useMapStore((s) => !!s.map.locked);
+  const accessKind    = useMapStore((s) => s.map.accessKind);
+  const shareCanWrite = useMapStore((s) => s.map.shareCanWrite);
+  return canEdit || contributorMayTrack(role, locked, accessKind, shareCanWrite);
+}

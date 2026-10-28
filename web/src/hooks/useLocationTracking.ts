@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useMapStore, getPlacementCell, registerPlacementFix } from '../store/mapStore';
 import { useCharacterLocation, useCharacterLocationCheckedAt } from './useCharacterLocation';
-import { useCanEdit } from './useCanEdit';
+import { useCanTrackJumps } from './useCanEdit';
 import { useAuth } from '../context/AuthContext';
 import { readUserSetting } from './useUserSetting';
 import { pickHandles } from '../components/map/edgeUtils';
@@ -399,7 +399,9 @@ export function useLocationTracking(enabled: boolean) {
   // change to it must reset the jump refs below, so the new character's system
   // isn't linked back to the previous character's as a bogus connection.
   const followedId = useMapStore((s) => s.routeOrigin?.charId ?? null) ?? user?.id ?? null;
-  const canEdit  = useCanEdit();
+  // Who may grow the map by flying: editors, and contributors recording their
+  // own movement (the server verifies they really are where the add says).
+  const canEdit  = useCanTrackJumps();
   const lastEveSystemId = useRef<number | null>(null);
   const lastMapSystemId = useRef<string | null>(null);
   const lastActiveMapId = useRef<string | null>(null);
@@ -554,8 +556,8 @@ export function useLocationTracking(enabled: boolean) {
       }
     }
 
-    // A locked map never grows from passive tracking, nor does one a readonly /
-    // no-topology user is viewing; track-jumps off opts out of auto-add too.
+    // A locked map never grows from passive tracking, nor does one a readonly
+    // user is viewing; track-jumps off opts out of auto-add too.
     const trackJumps = useMapStore.getState().trackJumps;
     const canAdd = trackJumps && !map.locked && canEdit;
     // On a corp/alliance map the map-level policy overrides everyone's personal
