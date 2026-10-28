@@ -2296,7 +2296,9 @@
   },
   "exits": {
     "notifTitle": "K-space exit",
-    "appeared": "{{name}} ({{security}}) is on the chain"
+    "appeared": "{{name}} ({{security}}) is on the chain",
+    "appearedMany_one": "{{count}} new k-space exit on the chain",
+    "appearedMany_other": "{{count}} new k-space exits on the chain"
   },
   "alerts": {
     "killTitle": "Kill in {{system}}",

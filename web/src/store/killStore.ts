@@ -40,6 +40,8 @@ export interface KillRow {
   npc:                 boolean;
   /** Why it's a special kill: 'capital' | 'billion' | 'dictor' | 'smartbomb'. */
   special?:            string[];
+  /** Arrived on the live feed (rather than the history backfill). */
+  live?:               boolean;
   finalBlow: {
     characterId:   number | null;
     name:          string | null;
@@ -90,12 +92,13 @@ export const useKillStore = create<KillState>((set) => ({
     const existing = next.get(row.eveSystemId);
     const timely = now - row.atMs <= MAX_FLAG_LAG_MS;
     if (timely && (!existing || row.atMs >= existing.atMs)) next.set(row.eveSystemId, { ...row, flaggedAtMs: now });
-    return { bySystem: next, log: prependDeduped(s.log, row) };
+    return { bySystem: next, log: prependDeduped(s.log, { ...row, live: true }) };
   }),
   seedBackfill: (rows) => set((s) => {
     // Merge backfilled history into the log (deduped), newest first, capped.
     const byId = new Map<number, KillRow>();
-    for (const r of [...s.log, ...rows]) byId.set(r.killmailId, r);
+    // What's already in the log wins, so a live kill keeps its `live` mark.
+    for (const r of [...rows, ...s.log]) byId.set(r.killmailId, r);
     const log = [...byId.values()].sort((a, b) => b.atMs - a.atMs).slice(0, LOG_CAP);
     // Flag any backfilled kill that's STILL within the recency window so its
     // node pulses the moment the map loads (a kill 6 min ago should already be

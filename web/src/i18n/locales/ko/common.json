@@ -2296,7 +2296,8 @@
   },
   "exits": {
     "notifTitle": "k-space 출구",
-    "appeared": "{{name}}({{security}})이(가) 체인에 있습니다"
+    "appeared": "{{name}}({{security}})이(가) 체인에 있습니다",
+    "appearedMany_other": "체인에 새 k-스페이스 출구 {{count}}개"
   },
   "alerts": {
     "killTitle": "{{system}}에서 킬",

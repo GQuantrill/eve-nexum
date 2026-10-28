@@ -172,10 +172,14 @@ export function useProximityAlerts(): {
       if (notifyOn(NOTIFY.proximityDesktop)) fireBrowserNotification(nearest.kind, nearest.jumps, sysName);
       if (notifyOn(NOTIFY.proximitySound)) playBeep();
       inZoneRef.current = true;
-    } else if (!inZone) {
+    } else if (!inZone && (nearest || targetIds.length === 0)) {
+      // Only once we KNOW we're out of range: the nearest threat is beyond the
+      // threshold, or there are none. No location yet, or a route lookup that
+      // failed, says nothing either way — forgetting we'd alerted then would
+      // re-alert the same threat the moment the next lookup succeeds.
       inZoneRef.current = false;
     }
-  }, [nearest, threshold, nameMap]);
+  }, [nearest, threshold, nameMap, targetIds.length]);
 
   // Debug: surface a threat regardless of the alert threshold. Show the real
   // nearest one if there is any (with real jumps), otherwise a demo stand-in so

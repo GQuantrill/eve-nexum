@@ -28,6 +28,7 @@ export function useMapSignatureIndex() {
   const setScanBulk = useMapStore((s) => s.setScanBulk);
   const setContentBulk = useMapStore((s) => s.setContentBulk);
   const setWhSigsBulk = useMapStore((s) => s.setWhSigsBulk);
+  const setSigIndexMapId = useMapStore((s) => s.setSigIndexMapId);
   const { isShareMode } = useShareMode();
   // Sum of all per-system sig + anom revisions — bumps when any remote change
   // arrives, so we re-pull. Cheap; the map's system set is small.
@@ -39,11 +40,14 @@ export function useMapSignatureIndex() {
   });
 
   useEffect(() => {
-    if (!activeMapId || isShareMode) { setSigTypesBulk({}); setScanBulk({}); setContentBulk({}); setWhSigsBulk({}); return; }
+    if (!activeMapId || isShareMode) { setSigTypesBulk({}); setScanBulk({}); setContentBulk({}); setWhSigsBulk({}); setSigIndexMapId(null); return; }
     let cancelled = false;
+    // A failed fetch keeps what's already loaded rather than blanking it: an
+    // empty index followed by a good one makes every signature look new to the
+    // watchlist. The next sig change (or map switch) tries again.
     Promise.all([
-      api<SigRow[]>(`/api/maps/${activeMapId}/signatures`).catch(() => [] as SigRow[]),
-      api<AnomRow[]>(`/api/maps/${activeMapId}/anomalies`).catch(() => [] as AnomRow[]),
+      api<SigRow[]>(`/api/maps/${activeMapId}/signatures`),
+      api<AnomRow[]>(`/api/maps/${activeMapId}/anomalies`),
     ])
       .then(([sigs, anoms]) => {
         if (cancelled) return;
@@ -80,8 +84,9 @@ export function useMapSignatureIndex() {
         setScanBulk(scan);
         setContentBulk(content);
         setWhSigsBulk(whSigs);
+        setSigIndexMapId(activeMapId);
       })
       .catch(() => { /* non-fatal — filter/watchlist just won't see unopened content */ });
     return () => { cancelled = true; };
-  }, [activeMapId, isShareMode, rev, setSigTypesBulk, setScanBulk, setContentBulk, setWhSigsBulk]);
+  }, [activeMapId, isShareMode, rev, setSigTypesBulk, setScanBulk, setContentBulk, setWhSigsBulk, setSigIndexMapId]);
 }

@@ -2296,7 +2296,9 @@
   },
   "exits": {
     "notifTitle": "Saída para k-space",
-    "appeared": "{{name}} ({{security}}) está na cadeia"
+    "appeared": "{{name}} ({{security}}) está na cadeia",
+    "appearedMany_one": "{{count}} nova saída para k-space na cadeia",
+    "appearedMany_other": "{{count}} novas saídas para k-space na cadeia"
   },
   "alerts": {
     "killTitle": "Kill em {{system}}",

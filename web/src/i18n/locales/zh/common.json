@@ -2296,7 +2296,8 @@
   },
   "exits": {
     "notifTitle": "k-space 出口",
-    "appeared": "{{name}}（{{security}}）已出现在链上"
+    "appeared": "{{name}}（{{security}}）已出现在链上",
+    "appearedMany_other": "链上新增 {{count}} 个 K 空间出口"
   },
   "alerts": {
     "killTitle": "{{system}} 发生击杀",

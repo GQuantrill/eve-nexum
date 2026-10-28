@@ -23,3 +23,15 @@ describe('killStore.recordKill', () => {
     expect(s.log).toHaveLength(1);
   });
 });
+
+describe('killStore live marking', () => {
+  beforeEach(() => useKillStore.getState().reset());
+
+  it('marks live kills, not backfilled ones, and keeps the mark through a backfill', () => {
+    useKillStore.getState().recordKill(row({ killmailId: 1 }));
+    useKillStore.getState().seedBackfill([row({ killmailId: 1 }), row({ killmailId: 2, atMs: Date.now() - 60_000 })]);
+    const byId = new Map(useKillStore.getState().log.map((k) => [k.killmailId, k]));
+    expect(byId.get(1)?.live).toBe(true);
+    expect(byId.get(2)?.live).toBeUndefined();
+  });
+});

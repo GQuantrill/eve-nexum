@@ -2346,7 +2346,11 @@
   },
   "exits": {
     "notifTitle": "Выход в k-space",
-    "appeared": "{{name}} ({{security}}) появился в цепочке"
+    "appeared": "{{name}} ({{security}}) появился в цепочке",
+    "appearedMany_one": "{{count}} новый выход в k-space в цепочке",
+    "appearedMany_few": "{{count}} новых выхода в k-space в цепочке",
+    "appearedMany_many": "{{count}} новых выходов в k-space в цепочке",
+    "appearedMany_other": "{{count}} нового выхода в k-space в цепочке"
   },
   "alerts": {
     "killTitle": "Килл в {{system}}",

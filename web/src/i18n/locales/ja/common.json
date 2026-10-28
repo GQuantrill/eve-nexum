@@ -2296,7 +2296,8 @@
   },
   "exits": {
     "notifTitle": "k-spaceの出口",
-    "appeared": "{{name}}（{{security}}）がチェーンに出現"
+    "appeared": "{{name}}（{{security}}）がチェーンに出現",
+    "appearedMany_other": "チェーン上に新しいkスペース出口が{{count}}件"
   },
   "alerts": {
     "killTitle": "{{system}} でキル",

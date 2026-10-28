@@ -2296,7 +2296,9 @@
   },
   "exits": {
     "notifTitle": "K-space-uitgang",
-    "appeared": "{{name}} ({{security}}) staat in de keten"
+    "appeared": "{{name}} ({{security}}) staat in de keten",
+    "appearedMany_one": "{{count}} nieuwe k-space-uitgang in de keten",
+    "appearedMany_other": "{{count}} nieuwe k-space-uitgangen in de keten"
   },
   "alerts": {
     "killTitle": "Kill in {{system}}",

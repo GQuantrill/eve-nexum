@@ -102,10 +102,12 @@ export function useAnnouncerEvents(): void {
         say(jumps === 0 ? `Incursion in your system, ${name}.` : `Incursion ${jumpWord(jumps)} out, ${name}.`);
       }
       incInZone.current = true;
-    } else if (!inZone) {
+    } else if (!inZone && (nearestIncursion || incursionIds.length === 0)) {
+      // Out of range for certain — not just no location / a failed route
+      // lookup, which would otherwise re-announce the same incursion.
       incInZone.current = false;
     }
-  }, [nearestIncursion, threshold, enabled, evIncur, say]);
+  }, [nearestIncursion, incursionIds.length, threshold, enabled, evIncur, say]);
 
   // ---- Lawless: nearest lowsec/nullsec via server BFS, fire-once-on-entry ----
   // Only when the pilot is in highsec (in LS/NS you're already in lawless). The
@@ -175,6 +177,9 @@ export function useAnnouncerEvents(): void {
     for (const k of killLog) {
       if (seenKills.current.has(k.killmailId)) continue;
       seenKills.current.add(k.killmailId);
+      // Only kills from the live feed are news. History loaded in bulk (on
+      // page load and every map switch) lands here too, after the seed above.
+      if (!k.live) continue;
       const entry = killRoutes[String(k.eveSystemId)];
       if (!entry || entry.jumps > threshold) continue;
       const who = k.victimName ?? k.shipTypeName;

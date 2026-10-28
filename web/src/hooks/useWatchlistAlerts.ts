@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useMapStore } from '../store/mapStore';
 import { useUserSetting } from './useUserSetting';
 import { useWatchlist } from './useWatchlist';
+import { useShareMode } from '../context/ShareModeContext';
 import { systemDisplayName } from '../utils/systemName';
 import { matchSystem, matchConnection } from '../utils/watchMatch';
 import { toast } from '../utils/toastStore';
@@ -40,8 +41,10 @@ function playWatchChime() {
  * id) so a match is alerted once. On a map switch — or whenever the watchlist
  * entries themselves change (e.g. you tick a characteristic) — the present
  * matches are seeded silently, so neither loading a map nor editing the list
- * barrages you; only genuine new appearances chime. A target that leaves
- * re-arms.
+ * barrages you; only genuine new appearances chime. Seeding waits for the
+ * map's signature index, since watched sig types only show up once it loads.
+ * Each target alerts at most once per visit to a map: one that drops out and
+ * comes back (a refetch, an edit undone) isn't new.
  */
 // Settling window after a reseed (map switch / watchlist edit) during which
 // matches are absorbed silently. The map-wide sig index bulk-loads just after a
@@ -56,6 +59,8 @@ export function useWatchlistAlerts() {
   const activeMapId = useMapStore((s) => s.activeMapId);
   const sigTypesBySystem = useMapStore((s) => s.sigTypesBySystem);
   const leadsToClassesBySystem = useMapStore((s) => s.leadsToClassesBySystem);
+  const sigIndexMapId = useMapStore((s) => s.sigIndexMapId);
+  const { isShareMode } = useShareMode();
   const [entries]   = useWatchlist();
   const [soundOn]   = useUserSetting<boolean>(NOTIFY.watchlistSound, true);
   const [desktopOn] = useUserSetting<boolean>(NOTIFY.watchlistDesktop, false);
@@ -65,8 +70,12 @@ export function useWatchlistAlerts() {
   });
 
   useEffect(() => {
-    if (entries.length === 0) {
-      stateRef.current = { mapId: activeMapId, entries, alerted: new Set(), armAt: 0 };
+    // Nothing watched, or this map's signatures haven't loaded yet (a share
+    // link never loads them): forget everything, so the seed below runs
+    // silently once there's something to compare against.
+    const ready = isShareMode || sigIndexMapId === activeMapId;
+    if (entries.length === 0 || !ready) {
+      stateRef.current = { mapId: null, entries, alerted: new Set(), armAt: 0 };
       return;
     }
 
@@ -85,8 +94,9 @@ export function useWatchlistAlerts() {
     }
 
     const st = stateRef.current;
-    // Map switch → reseed and open a settling window (the sig index bulk-loads
-    // just after, async; absorb those silently).
+    // Map switch (or the sig index just arrived) → reseed and open a short
+    // settling window for anything derived from it a render later (leads-to
+    // classes), absorbing those silently.
     if (st.mapId !== activeMapId) {
       stateRef.current = { mapId: activeMapId, entries, alerted: new Set(present.keys()), armAt: Date.now() + ARM_DELAY_MS };
       return;
@@ -96,12 +106,12 @@ export function useWatchlistAlerts() {
     // wait for) so the very next genuine appearance chimes.
     if (st.entries !== entries) {
       st.entries = entries;
-      st.alerted = new Set(present.keys());
+      for (const key of present.keys()) st.alerted.add(key);
       return;
     }
     // Still settling after a map switch (e.g. sig index loading) → absorb.
     if (Date.now() < st.armAt) {
-      st.alerted = new Set(present.keys());
+      for (const key of present.keys()) st.alerted.add(key);
       return;
     }
 
@@ -114,8 +124,5 @@ export function useWatchlistAlerts() {
         fireDesktopNotification(t('watchlist.notifTitle'), `${info.marker}: ${info.name}`, `nexum-watch-${key}`);
       }
     }
-    for (const key of Array.from(st.alerted)) {
-      if (!present.has(key)) st.alerted.delete(key);
-    }
-  }, [systems, connections, activeMapId, sigTypesBySystem, leadsToClassesBySystem, entries, soundOn, desktopOn, t]);
+  }, [systems, connections, activeMapId, sigTypesBySystem, leadsToClassesBySystem, sigIndexMapId, isShareMode, entries, soundOn, desktopOn, t]);
 }

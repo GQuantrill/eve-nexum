@@ -16,6 +16,9 @@ const KSPACE_CLASSES = new Set(['HS', 'LS', 'NS']);
 // without this every exit already on the chain would fire at once.
 const ARM_DELAY_MS = 1500;
 
+// More new exits than this in one go and they're summarised in one alert.
+const MAX_SEPARATE_ALERTS = 3;
+
 let audioCtx: AudioContext | null = null;
 function playExitChime() {
   try {
@@ -40,66 +43,94 @@ function playExitChime() {
 }
 
 /**
- * Mounted once (in MapCanvas). Fires a one-shot alert the first time a k-space
- * exit at or above the configured security appears on the active map — the
- * in-app counterpart to the Discord exit broadcast, and opt-in in the same way.
+ * Mounted once (in MapCanvas). Fires a one-shot alert when a new wormhole
+ * connection puts a k-space system at or above the configured security on the
+ * active map — the in-app counterpart to the Discord exit broadcast, and
+ * opt-in in the same way.
  *
- * Off by default: with both channels off nothing fires, toast included, so the
- * alert is genuinely silent rather than half-on. Exits are keyed by system id
- * and alerted once; one that leaves the map re-arms.
+ * An exit is the k-space end of a wormhole. Systems joined by stargates,
+ * Ansiblexes or cynos are never exits, however many there are. Alerts are keyed
+ * by connection, so a second hole into a system already on the map is news,
+ * and a hole that collapses and is re-found (a new connection) is too. Each
+ * connection alerts at most once per visit to a map, even if it briefly drops
+ * out (an undo, a refetch).
+ *
+ * Off by default: with both channels off nothing fires, toast included. Turning
+ * it on, raising the threshold or switching map takes in what's already there
+ * silently — only connections that appear after that alert.
  */
 export function useExitAlerts() {
   const { t } = useTranslation();
   const systems     = useMapStore((s) => s.map.systems);
+  const connections = useMapStore((s) => s.map.connections);
   const activeMapId = useMapStore((s) => s.activeMapId);
   const [soundOn]   = useUserSetting<boolean>(NOTIFY.exitsSound, false);
   const [desktopOn] = useUserSetting<boolean>(NOTIFY.exitsDesktop, false);
   const [minSec]    = useUserSetting<number>(EXITS_MIN_SECURITY_KEY, EXITS_MIN_SECURITY_DEFAULT);
 
-  const stateRef = useRef<{ mapId: string | null; alerted: Set<string>; armAt: number }>({
-    mapId: null, alerted: new Set(), armAt: 0,
+  // `key` is what the seen set was built for (map + threshold). Anything that
+  // changes it re-seeds silently instead of announcing the whole chain.
+  const stateRef = useRef<{ key: string | null; alerted: Set<string>; armAt: number }>({
+    key: null, alerted: new Set(), armAt: 0,
   });
 
   useEffect(() => {
     if (minSec >= EXITS_MIN_SECURITY_OFF || (!soundOn && !desktopOn)) {
-      // Off, either by threshold or by having no channel on. Drop any seeded
-      // state so switching it back on doesn't immediately announce everything
-      // already on the chain.
-      stateRef.current = { mapId: activeMapId, alerted: new Set(), armAt: 0 };
+      // Off. Forget everything, so switching back on starts with a silent seed.
+      stateRef.current = { key: null, alerted: new Set(), armAt: 0 };
       return;
     }
 
-    const present = new Map<string, { name: string; security: number }>();
-    for (const sys of systems) {
-      if (!KSPACE_CLASSES.has(sys.systemClass)) continue;
-      const sec = sys.security;
+    const byId = new Map(systems.map((s) => [s.id, s]));
+    const exitEnd = (id: string) => {
+      const sys = byId.get(id);
+      if (!sys || !KSPACE_CLASSES.has(sys.systemClass)) return null;
       // An unresolved placeholder has no security yet; skip rather than guess.
-      if (sec == null || !Number.isFinite(Number(sec))) continue;
-      if (Number(sec) < minSec) continue;
-      present.set(sys.id, { name: systemDisplayName(sys) || '?', security: Number(sec) });
+      const sec = sys.security;
+      if (sec == null || !Number.isFinite(Number(sec)) || Number(sec) < minSec) return null;
+      return { id: sys.id, name: systemDisplayName(sys) || '?', security: Number(sec) };
+    };
+
+    // Live wormhole connections with a qualifying k-space end, by connection id.
+    const present = new Map<string, { id: string; name: string; security: number }>();
+    for (const c of connections) {
+      if (c.connectionType !== 'standard' || c.broken) continue;
+      const end = exitEnd(c.sourceId) ?? exitEnd(c.targetId);
+      if (end) present.set(c.id, end);
     }
 
     const st = stateRef.current;
-    // Map switch (or the alert being switched on) → seed silently and settle.
-    if (st.mapId !== activeMapId) {
-      stateRef.current = { mapId: activeMapId, alerted: new Set(present.keys()), armAt: Date.now() + ARM_DELAY_MS };
+    const key = `${activeMapId ?? ''}|${minSec}`;
+    // Switched on, map switched, or threshold changed → seed silently and settle.
+    if (st.key !== key) {
+      stateRef.current = { key, alerted: new Set(present.keys()), armAt: Date.now() + ARM_DELAY_MS };
       return;
     }
     if (Date.now() < st.armAt) {
-      st.alerted = new Set(present.keys());
+      for (const id of present.keys()) st.alerted.add(id);
       return;
     }
 
-    for (const [id, info] of present) {
-      if (st.alerted.has(id)) continue;
-      st.alerted.add(id);
-      const body = t('exits.appeared', { name: info.name, security: info.security.toFixed(1) });
-      toast.info(body);
+    // New this pass, one per system.
+    const fresh = new Map<string, { name: string; security: number }>();
+    for (const [connId, info] of present) {
+      if (st.alerted.has(connId)) continue;
+      st.alerted.add(connId);
+      fresh.set(info.id, info);
+    }
+    if (fresh.size > 0) {
+      // A burst (a pasted or imported chain) gets one summary, never a stream.
+      const alerts = fresh.size > MAX_SEPARATE_ALERTS
+        ? [{ tag: 'nexum-exit-many', body: t('exits.appearedMany', { count: fresh.size }) }]
+        : [...fresh].map(([id, info]) => ({
+            tag:  `nexum-exit-${id}`,
+            body: t('exits.appeared', { name: info.name, security: info.security.toFixed(1) }),
+          }));
+      for (const a of alerts) {
+        toast.info(a.body);
+        if (desktopOn) fireDesktopNotification(t('exits.notifTitle'), a.body, a.tag);
+      }
       if (soundOn) playExitChime();
-      if (desktopOn) fireDesktopNotification(t('exits.notifTitle'), body, `nexum-exit-${id}`);
     }
-    for (const id of Array.from(st.alerted)) {
-      if (!present.has(id)) st.alerted.delete(id);
-    }
-  }, [systems, activeMapId, soundOn, desktopOn, minSec, t]);
+  }, [systems, connections, activeMapId, soundOn, desktopOn, minSec, t]);
 }
