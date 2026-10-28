@@ -1,9 +1,10 @@
 // PvP history per system, for the "when is it busy" forecast.
 //
-// Every player kill the live feed sees is counted into its system's UTC hour
-// and kept for PVP_HISTORY_DAYS. Folded by hour of day, that says which hours a
-// system tends to see fights -- the forecast strip in the system panel. The
-// feed covers wormhole space, which CCP's hourly ESI aggregate leaves out.
+// The forecast's long history is zKillboard's weekday/hour activity grid
+// (zkillActivity.ts). Alongside it, every player kill the live R2Z2 feed sees is
+// counted into its system's UTC hour and kept for PVP_HISTORY_DAYS: that gives
+// the "last 24 hours" count straight away, and stands in for zKill's grid when
+// zKill can't be reached. The feed covers wormhole space too.
 //
 // Counts are batched in memory and flushed once a minute with an additive
 // upsert, so a busy feed costs one query a minute, not one per kill. The feed
@@ -11,6 +12,7 @@
 // counted twice across a restart; at worst a crash loses the last minute.
 import { db } from '../db.js';
 import { createLogger } from '../utils/logger.js';
+import { fetchZkillActivity, emptyGrid, ZKILL_ACTIVITY_DAYS, type ActivityGrid } from './zkillActivity.js';
 
 const log = createLogger('pvpHistory');
 
@@ -84,13 +86,17 @@ export async function prunePvpHistory(): Promise<number> {
 }
 
 export interface PvpForecast {
-  /** Kills in each UTC hour of the day (index 0 = 00:00-00:59 UTC), summed
-   *  over the history window. */
-  byHour: number[];
+  /** Where the weekday/hour grid came from: zKillboard's ~90-day history, or
+   *  (when zKill can't be reached) our own recording from the live feed. */
+  source: 'zkill' | 'live';
+  /** grid[weekday][hour] kill counts, weekday 0 = Sunday, hour UTC. */
+  grid: ActivityGrid;
   total: number;
-  /** How many days of history the counts cover: PVP_HISTORY_DAYS once we've
-   *  been collecting that long, fewer before. */
+  /** How many days the grid covers. */
   days: number;
+  /** Player kills the live (R2Z2) feed has seen here in the last 24 hours --
+   *  fresher than zKill's grid, and counted the moment they land. */
+  recent24h: number;
 }
 
 // Earliest hour on record, cluster-wide, cached: it only moves when the prune
@@ -111,21 +117,56 @@ export function resetPvpCaches(): void {
   pending.clear();
 }
 
-export async function getPvpForecast(eveSystemId: number): Promise<PvpForecast> {
-  const { rows } = await db.query<{ h: number; kills: string }>(
-    `SELECT EXTRACT(HOUR FROM hour AT TIME ZONE 'UTC')::int AS h, SUM(kills) AS kills
+/** Our own weekday/hour grid for a system from the recorded live feed. */
+export async function getLocalGrid(eveSystemId: number): Promise<{ grid: ActivityGrid; total: number; days: number }> {
+  const { rows } = await db.query<{ d: number; h: number; kills: string }>(
+    `SELECT EXTRACT(DOW  FROM hour AT TIME ZONE 'UTC')::int AS d,
+            EXTRACT(HOUR FROM hour AT TIME ZONE 'UTC')::int AS h,
+            SUM(kills) AS kills
        FROM system_pvp_hours
       WHERE eve_system_id = $1 AND hour >= NOW() - make_interval(days => $2)
-      GROUP BY 1`,
+      GROUP BY 1, 2`,
     [eveSystemId, PVP_HISTORY_DAYS],
   );
-  const byHour = new Array<number>(24).fill(0);
-  for (const r of rows) byHour[r.h] = Number(r.kills);
-  const total = byHour.reduce((a, b) => a + b, 0);
+  const grid = emptyGrid();
+  let total = 0;
+  for (const r of rows) {
+    const n = Number(r.kills);
+    grid[r.d][r.h] = n;
+    total += n;
+  }
   const earliest = await earliestHour();
   const days = earliest == null ? 0
     : Math.min(PVP_HISTORY_DAYS, Math.max(1, Math.ceil((Date.now() - earliest) / DAY_MS)));
-  return { byHour, total, days };
+  return { grid, total, days };
+}
+
+/** Player kills in the last 24 hours: what's flushed, plus what's still
+ *  waiting for the next flush so a kill shows within moments. */
+export async function recentPvpKills(eveSystemId: number, now = Date.now()): Promise<number> {
+  const since = hourFloor(now) - 23 * HOUR_MS;
+  const { rows } = await db.query<{ kills: string | null }>(
+    `SELECT SUM(kills) AS kills FROM system_pvp_hours WHERE eve_system_id = $1 AND hour >= $2`,
+    [eveSystemId, new Date(since)],
+  );
+  let n = Number(rows[0]?.kills ?? 0);
+  const prefix = `${eveSystemId}:`;
+  for (const [key, count] of pending) {
+    if (key.startsWith(prefix) && Number(key.slice(prefix.length)) >= since) n += count;
+  }
+  return n;
+}
+
+const sumGrid = (g: ActivityGrid) => g.reduce((a, row) => a + row.reduce((b, n) => b + n, 0), 0);
+
+export async function getPvpForecast(eveSystemId: number): Promise<PvpForecast> {
+  const [zkill, recent24h] = await Promise.all([fetchZkillActivity(eveSystemId), recentPvpKills(eveSystemId)]);
+  // zKill's grid is the long history and wins whenever we have it. Ours is the
+  // fallback; the two are never added together, because zKill already counts
+  // every kill the live feed hands us.
+  if (zkill) return { source: 'zkill', grid: zkill, total: sumGrid(zkill), days: ZKILL_ACTIVITY_DAYS, recent24h };
+  const local = await getLocalGrid(eveSystemId);
+  return { source: 'live', ...local, recent24h };
 }
 
 export function startPvpHistory(): void {

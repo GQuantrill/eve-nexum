@@ -50,14 +50,18 @@
     "loading": "PvP-Aktivität wird geladen…",
     "loadFailed": "PvP-Aktivität konnte nicht geladen werden.",
     "noHistory": "Noch kein PvP-Verlauf. Spielerkills hier werden ab jetzt erfasst.",
-    "noneInDays": "Keine Spielerkills hier in den letzten {{days}} Tagen.",
+    "noneInDays_one": "Keine Kills hier am letzten Tag.",
+    "noneInDays_other": "Keine Kills hier in den letzten {{count}} Tagen.",
     "busiestNow": "Jetzt am aktivsten ({{hour}} UTC)",
     "busiestNext": "Am aktivsten um {{hour}} UTC, in {{n}} Std.",
+    "quietAhead": "Die nächsten 24 Stunden ruhig",
     "killsInDays": "{{n}} in {{days}} T.",
+    "recent": "Live-Feed: {{n}} in den letzten 24 Std.",
     "chartLabel": "Spielerkills nach Tageszeit für die nächsten 24 Stunden",
-    "barTitle": "{{hour}} UTC: {{n}}",
+    "barTitle": "{{day}} {{hour}} UTC: {{n}}",
     "now": "jetzt",
-    "note": "Spielerkills nach UTC-Stunde. Wärmere Balken sind meist aktivere Stunden."
+    "noteZkill": "Kills nach UTC-Wochentag und -Stunde aus den letzten 90 Tagen von zKillboard. Wärmere Balken sind meist aktiver.",
+    "noteLive": "zKillboard ist nicht erreichbar, daher werden die hier bisher erfassten Kills verwendet."
   },
   "addSystem": {
     "title": "System hinzufügen",

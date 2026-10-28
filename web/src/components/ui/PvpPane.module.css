@@ -56,3 +56,9 @@
   color: var(--text-faint);
   font-size: calc(11px * var(--font-scale, 1));
 }
+
+/* What the live feed saw in the last day, under the strip. */
+.recent {
+  color: var(--text-default);
+  font-size: calc(12px * var(--font-scale, 1));
+}

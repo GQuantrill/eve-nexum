@@ -50,14 +50,18 @@
     "loading": "PvP-activiteit laden…",
     "loadFailed": "Kon PvP-activiteit niet laden.",
     "noHistory": "Nog geen PvP-geschiedenis. Spelerkills hier worden vanaf nu bijgehouden.",
-    "noneInDays": "Geen spelerkills hier in de afgelopen {{days}} dagen.",
+    "noneInDays_one": "Geen kills hier in de afgelopen dag.",
+    "noneInDays_other": "Geen kills hier in de afgelopen {{count}} dagen.",
     "busiestNow": "Nu het drukst ({{hour}} UTC)",
     "busiestNext": "Het drukst om {{hour}} UTC, over {{n}} u",
+    "quietAhead": "Rustig de komende 24 uur",
     "killsInDays": "{{n}} in {{days}} d",
+    "recent": "Live-feed: {{n}} in de afgelopen 24 u",
     "chartLabel": "Spelerkills per uur van de dag voor de komende 24 uur",
-    "barTitle": "{{hour}} UTC: {{n}}",
+    "barTitle": "{{day}} {{hour}} UTC: {{n}}",
     "now": "nu",
-    "note": "Spelerkills per UTC-uur. Warmere balken zijn uren die meestal drukker zijn."
+    "noteZkill": "Kills per UTC-weekdag en -uur over de afgelopen 90 dagen van zKillboard. Warmere balken zijn meestal drukker.",
+    "noteLive": "zKillboard is onbereikbaar, dus dit gebruikt de kills die hier tot nu toe zijn bijgehouden."
   },
   "addSystem": {
     "title": "Systeem toevoegen",

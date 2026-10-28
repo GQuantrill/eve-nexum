@@ -50,14 +50,18 @@
     "loading": "PvP アクティビティを読み込み中…",
     "loadFailed": "PvP アクティビティを読み込めませんでした。",
     "noHistory": "まだ PvP の履歴はありません。これ以降、ここでのプレイヤーキルが記録されます。",
-    "noneInDays": "過去 {{days}} 日間、ここでプレイヤーキルはありません。",
+    "noneInDays_one": "過去 1 日間、ここでキルはありません。",
+    "noneInDays_other": "過去 {{count}} 日間、ここでキルはありません。",
     "busiestNow": "現在が最も活発（{{hour}} UTC）",
     "busiestNext": "最も活発なのは {{hour}} UTC、{{n}} 時間後",
+    "quietAhead": "今後 24 時間は静か",
     "killsInDays": "{{days}} 日間で {{n}} 件",
+    "recent": "ライブフィード：過去 24 時間で {{n}} 件",
     "chartLabel": "今後 24 時間の時間帯別プレイヤーキル",
-    "barTitle": "{{hour}} UTC：{{n}}",
+    "barTitle": "{{day}} {{hour}} UTC：{{n}}",
     "now": "現在",
-    "note": "UTC の時間帯別プレイヤーキル。暖色のバーほど普段から活発な時間帯です。"
+    "noteZkill": "zKillboard の過去 90 日間の UTC 曜日・時間帯別キル。暖色のバーほど普段から活発です。",
+    "noteLive": "zKillboard に接続できないため、ここでこれまでに記録されたキルを使用しています。"
   },
   "addSystem": {
     "title": "星系を追加",
