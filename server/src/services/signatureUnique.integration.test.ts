@@ -56,6 +56,14 @@ describe.skipIf(!dbReady)('signature scan-id uniqueness (integration)', () => {
     expect(rows).toEqual([{ wh_leads_to: 'Bille' }]);
   });
 
+  it('a re-paste of an unscanned sig keeps a type set by hand', async () => {
+    // Marked a wormhole by hand, then pasted again while the scanner only shows
+    // "Cosmic Signature" (no type, no name): nothing known may be reset.
+    await createSignature(mapId, sysId, { ...blank, sigId: 'GHJ-321', sigType: 'wormhole', whType: 'B274' }, actor());
+    const { row } = await createSignature(mapId, sysId, { ...blank, sigId: 'GHJ-321', sigType: 'unknown' }, actor());
+    expect(row).toMatchObject({ sigType: 'wormhole', whType: 'B274' });
+  });
+
   it('blank ids are exempt', async () => {
     await createSignature(mapId, sysId, { ...blank, sigId: '' }, actor());
     await createSignature(mapId, sysId, { ...blank, sigId: '' }, actor());
