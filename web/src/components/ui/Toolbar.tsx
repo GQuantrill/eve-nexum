@@ -64,6 +64,7 @@ import { UpdateIndicator } from './UpdateIndicator';
 import { OrgLogos } from './OrgLogos';
 import { charPortrait, typeIcon } from '../../utils/eveImages';
 import { DISCORD_INVITE_URL } from '../../data/links';
+import { countPersonalMaps } from '../../utils/personalMaps';
 
 interface EveStatus {
   players:    number;
@@ -265,7 +266,7 @@ export function Toolbar() {
   // them (sharedWithMe) has a different owner and doesn't count server-side, so
   // exclude it here too — otherwise received shares wrongly eat into the cap and
   // disable "+ New Map" / "Copy".
-  const atMapLimit      = maps.filter((m) => !m.isCorpMap && !m.isAllianceMap && !m.sharedWithMe).length >= maxMaps;
+  const atMapLimit      = countPersonalMaps(maps) >= maxMaps;
   const atCorpMapLimit  = corpMapCount >= maxCorpMaps;
   const { user, logout } = useAuth();
   const canEdit       = useCanEdit();
