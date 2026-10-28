@@ -8,8 +8,9 @@
 //
 // Counts are batched in memory and flushed once a minute with an additive
 // upsert, so a busy feed costs one query a minute, not one per kill. The feed
-// starts at the CURRENT sequence on boot and never replays, so a kill can't be
-// counted twice across a restart; at worst a crash loses the last minute.
+// saves its position only after flushing these counts, and on boot replays
+// earlier killmails without counting them again (killFeed.ts), so a kill can't
+// be counted twice across a restart; at worst a crash loses the last minute.
 import { db } from '../db.js';
 import { createLogger } from '../utils/logger.js';
 import { fetchZkillActivity, emptyGrid, ZKILL_ACTIVITY_DAYS, type ActivityGrid } from './zkillActivity.js';

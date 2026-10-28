@@ -2651,8 +2651,8 @@ mapsRouter.get('/:mapId/events', async (req, res) => {
 // systems, to seed the kill-log panel on open. Served from the in-memory buffer
 // the live feed fills (services/killBuffer) — no zKillboard REST calls, so it's
 // instant and scales to any map size. Access-checked. Returns KillRow[]
-// newest-first. (The buffer only holds kills since the server booted, so right
-// after a restart the log fills in as the feed runs.)
+// newest-first. (After a restart the feed replays the last few hours from
+// R2Z2, so the log refills within minutes.)
 mapsRouter.get('/:mapId/kills/backfill', async (req, res) => {
   const { mapId } = req.params;
   const access = await getMapAccess(mapId, req);
@@ -2666,7 +2666,8 @@ mapsRouter.get('/:mapId/kills/backfill', async (req, res) => {
   const systemIds = new Set(rows.map((r) => r.eveSystemId));
   if (!systemIds.size) { res.json([]); return; }
 
-  const buffered = recentKillsForSystems(systemIds, 200);
+  // The buffer holds every kill; the kill log shows the notable ones.
+  const buffered = recentKillsForSystems(systemIds, 200, config.killFeed.minValueIsk);
   const kills = await Promise.all(buffered.map(buildKillRow));
   res.json(kills);
 });
