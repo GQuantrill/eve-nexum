@@ -1213,7 +1213,7 @@
     "features": {
       "interactiveMap": {
         "title": "Interactieve kaart",
-        "desc": "Sleep systemen, teken verbindingen en stel per verbinding de klasse, het type en de status van het wormgat in. Met uitlijnen op een raster en een optionele minikaart."
+        "desc": "Sleep systemen, teken verbindingen, stel per verbinding de wormgatklasse / het type / de status in. Uitlijnen op raster en een optionele minikaart."
       },
       "seedRegion": {
         "title": "Een kaart vullen met een regio",
@@ -1232,8 +1232,8 @@
         "desc": "Doorzoekbare popover om het exacte wormgattype aan een verbinding toe te kennen. De snelle info over statics laat bij het zweven de klasse van de bestemming, de massa en de levensduur zien."
       },
       "multiSelect": {
-        "title": "Bulkbewerkingen met meervoudige selectie",
-        "desc": "Shift-klik om meerdere systemen of signaturen te selecteren, en ken ze vervolgens in één handeling een type toe, verwijder ze of geef ze een nieuwe naam."
+        "title": "Bulkacties met meervoudige selectie",
+        "desc": "Shift- of Cmd- / Ctrl-klik om meerdere systemen of signaturen te selecteren, en ken daarna in één handeling een type toe, verwijder of hernoem ze."
       },
       "pngExport": {
         "title": "PNG-export",
@@ -1273,7 +1273,7 @@
       },
       "crossMapSync": {
         "title": "Synchroniseren tussen kaarten",
-        "desc": "Staat hetzelfde systeem op meerdere kaarten? Zet dit aan en als je het op één kaart scant, worden de signaturen en anomalieën gekopieerd naar hetzelfde systeem op je andere kaarten — persoonlijke kaarten met je andere persoonlijke kaarten, corpkaarten met die van de corp. Niet-destructief: alleen ontbrekende gegevens worden toegevoegd en lege velden gevuld, nooit wordt iets overschreven of verwijderd."
+        "desc": "Staat hetzelfde systeem op meerdere kaarten? Zet dit aan en als je het op één kaart scant, worden de signaturen en anomalieën gekopieerd naar hetzelfde systeem op je andere kaarten. Persoonlijke kaarten synchroniseren met je andere persoonlijke kaarten (ook die van je alts), en corp- of alliancekaarten met andere van dezelfde soort waarop synchronisatie aanstaat. Alleen ontbrekende gegevens worden toegevoegd en lege velden gevuld, nooit wordt iets overschreven of verwijderd."
       },
       "realtime": {
         "title": "Samenwerken in realtime",
@@ -1285,15 +1285,15 @@
       },
       "rbac": {
         "title": "Toegang op basis van rollen",
-        "desc": "Vier niveaus — alleen lezen, bewerken, volledig en beheerder — bepalen wat er met corpkaarten mag. Persoonlijke kaarten blijven altijd van jou, los van je rol."
+        "desc": "Alleen lezen, bijdrager, bewerken, volledig en beheerder, plus alliancebeheerder op alliance-installaties. Een bijdrager houdt signaturen, anomalieën en structuren bij en brengt de keten in kaart door hem te vliegen, maar kan hem niet met de hand omgooien. Persoonlijke kaarten blijven altijd van jou, los van je rol."
       },
       "systemPanel": {
         "title": "Systeempaneel",
-        "desc": "Kaarten per systeem voor signaturen, structures, NPC-stations, notities, killboard en activiteitsgrafieken. Je kunt ze met slepen herschikken en de volgorde wordt per gebruiker bewaard."
+        "desc": "Kaarten per systeem voor signaturen, anomalieën, structuren, NPC-stations, notities, killboard, PvP-activiteit, d-scans en activiteitsgrafieken, met links naar Dotlan, zKillboard en anoik.is. De kaarten zijn te herschikken met slepen en neerzetten en worden per gebruiker bewaard."
       },
       "sigMgmt": {
         "title": "Signaturen beheren",
-        "desc": "Plak rechtstreeks uit de probe scanner. Nexum houdt per signatuur bij wanneer hij is aangemaakt en bijgewerkt, verwijdert automatisch signaturen die bij een nieuwe plakactie ontbreken, en ondersteunt het toekennen van een type aan een hele selectie."
+        "desc": "Plak rechtstreeks uit de probe scanner. Toont wie elke signatuur heeft gescand en hoe oud hij is, kan signaturen die bij een nieuwe plakactie ontbreken na een wachttijd verwijderen, en maakt nooit een dubbele signatuur als twee piloten tegelijk plakken. Kopieer vanuit elke rij een bladwijzernaam die klaar is om te plakken, in je eigen formaat of dat van de kaart."
       },
       "structImport": {
         "title": "Structures importeren",
@@ -1305,15 +1305,15 @@
       },
       "activityCharts": {
         "title": "Activiteitsgrafieken",
-        "desc": "Een voortschrijdende geschiedenis van 24 uur met sprongen, scheeps- en pod kills en NPC-kills per systeem, elk uur opgehaald uit ESI. De poller bewaart gegevens voor elk k-space-systeem — niet alleen voor die iemand heeft opengeklikt — dus de grafieken zijn direct gevuld als je een nieuw systeem bekijkt."
+        "desc": "Doorlopende geschiedenis van 24 uur met sprongen, schip- / pod-kills en NPC-kills per systeem, elk uur via ESI opgehaald voor elk k-space-systeem. Toon ze gestapeld in je eigen volgorde, of gecombineerd op één set assen met exacte waarden bij aanwijzen."
       },
       "sovStation": {
-        "title": "Sovereignty- en stationgegevens",
-        "desc": "Live sov-informatie over alliance, corp en faction plus de diensten van NPC-stations, met acties om in het spel een waypoint of bestemming te zetten."
+        "title": "Soevereiniteits- en stationsgegevens",
+        "desc": "Live sov van alliance / corp / factie met de ADM van de hub en het volgende kwetsbaarheidsvenster, plus diensten van NPC-stations, met acties voor waypoint en bestemming in het spel."
       },
       "killboard": {
         "title": "Killboard-paneel",
-        "desc": "Recente zKillboard-activiteit per systeem, met kills tegen alleen NPC's standaard verborgen (aan te zetten). Rijen kleuren rood als er een vijandige partij in de keten zit of als een blauwe sneuvelt; blauw als een vriend scoort of een vijand sterft. Recente kills komen ook als uitgelichte systemen op de kaart naar boven."
+        "desc": "Recente kills van zKillboard en de live feed voor een systeem of je hele kaart, over het afgelopen uur, de afgelopen dag of week. Elke kill krijgt een label als hij op een gate gebeurde of als er een HIC, dictor of smartbomb bij betrokken was. NPC-kills zijn standaard verborgen. Rijen kleuren rood als er een vijand bij betrokken is of een blauwe sneuvelt, en blauw als een vriend scoort."
       },
       "effectDigest": {
         "title": "Overzicht van effecten in de keten",
@@ -1324,8 +1324,8 @@
         "desc": "Je EVE-contactlijst (persoonlijk, corp en alliance — bij het inloggen via ESI opgehaald en desgewenst opnieuw op te halen) voedt een visuele laag over de hele keten. Sov-houders krijgen inline P/C/A-standingpillen; structures die via hun EVE structure-ID zijn herkend kleuren naar de standing van de eigenaar-corp; systeemnodes van sov-houders krijgen een kleurenhalo, zodat vijandig gebied op de kaart opvalt."
       },
       "scout": {
-        "title": "Scout-verbindingen",
-        "desc": "De openbare Eve-Scout-verbindingen van Thera en Turnur komen in de zijbalk terecht, zodat je direct naar bekende gaten kunt springen."
+        "title": "Thera- en Turnur-verbindingen",
+        "desc": "De openbare Thera- en Turnur-verbindingen van Eve-Scout met beide signatuur-ID's en de route via de hub. Zet ze met één klik op je kaart (gaten die eve-scout niet meer vermeldt worden opgeruimd), en meld er een als ingestort zodat de routeplanning hem niet meer gebruikt."
       },
       "a0": {
         "title": "A0-zonnen vinden",
@@ -1349,11 +1349,11 @@
       },
       "discordNotif": {
         "title": "Discord-meldingen",
-        "desc": "Stuur de keteninformatie van je corp naar een Discord-kanaal, zodat meldingen aankomen ook als niemand het tabblad in de gaten houdt. Het gebeurt op de server bij een inkomende K162 of een nieuwe wormgatverbinding, alleen voor corpkaarten. Beheerders filteren in het beheerpaneel welke regio's en kaarten melden. Het is best-effort en houdt rekening met rate limits; bulkacties zoals het vullen van een regio spammen het kanaal nooit."
+        "desc": "Stuur ketenintel naar een Discord-kanaal zodat meldingen aankomen, ook als niemand naar het tabblad kijkt: nieuwe verbindingen en K162's, nieuwe k-space-uitgangen met hun route, kills in de keten en speciale kills, gaten die end-of-life gaan, en nieuwe Thera- en Turnur-gaten. Beheerders kiezen welke kaarten en regio's posten."
       },
       "routePlanner": {
         "title": "Routeplanner",
-        "desc": "Een BFS op de server over stargates plus je live keten, zodat een route via een wormgatsprong één klik is."
+        "desc": "Kies twee willekeurige systemen en krijg een route via stargates, je wormgatketens, Thera, Turnur en Ansiblex-bruggen. Vind systemen via de alias die je ze gaf, en bewaar de routes die je vaak vliegt."
       },
       "locationTracking": {
         "title": "Locatie bijhouden",
@@ -1377,7 +1377,7 @@
       },
       "killHighlights": {
         "title": "Recente kills uitgelicht",
-        "desc": "Systemen met kills in het afgelopen uur krijgen een kleurenhalo, zodat je verse activiteit in de hele keten in één oogopslag ziet."
+        "desc": "Systemen met kills krijgen een zwaard op de kaart met hun aantal kills van de afgelopen 24 uur, fel als er dit uur gevochten is, en een gekleurde gloed voor verse activiteit in de hele keten."
       },
       "userStats": {
         "title": "Venster met gebruikersstatistieken",
@@ -1392,8 +1392,8 @@
         "desc": "De startpagina toont een niet-bewerkbare demokaart, zodat bezoekers zien wat de tool doet voordat ze inloggen."
       },
       "sidebar": {
-        "title": "Invouwbare zijbalk",
-        "desc": "Kaartopties, Verbindingen, Nabijheidsmeldingen, Verouderde systemen laten vervagen en Sneltoetsen vouwen allemaal los van elkaar open en dicht. De stand per sectie wordt per browser bewaard in localStorage."
+        "title": "Kies je panelen",
+        "desc": "Elke sectie van de zijbalk en elk systeempaneel kan worden ingeklapt, herschikt of helemaal uitgezet. Je keuzes worden in je account bewaard en volgen je naar een andere computer."
       },
       "colorVision": {
         "title": "Modi voor kleurenblindheid",
@@ -1417,7 +1417,91 @@
       },
       "jumpPlanner": {
         "title": "Sprongplanner",
-        "desc": "Plan een capital-sprongroute met meerdere stappen tussen twee willekeurige low/null-systemen. Kies een scheepsklasse en je skills, kies de minste sprongen of de minste brandstof, en zie de route op de kaart met lichtjaren per stap en een schatting van de isotopen. Je routes bewaren en opnieuw laden kan ook."
+        "desc": "Plan een capital-sprongroute met meerdere stappen tussen twee willekeurige low/null-systemen. Kies een scheepsklasse en je skills, kies de minste sprongen of de minste brandstof, en zie de route met lichtjaren per stap, een schatting van de isotopen, jump fatigue en de reactivatietimer. Vermijd systemen, voeg waypoints toe, gebruik regionale gates en bewaar je routes."
+      },
+      "addConnect": {
+        "title": "Toevoegen en verbinden in één stap",
+        "desc": "Klik met rechts op een systeem om in één keer een verbonden systeem toe te voegen, of kies Verbinden met systeem en klik op het andere uiteinde. Het systeem waar je nu bent wordt als eerste aangeboden als je er een toevoegt, en een Onbekend-placeholder markeert een gat dat je nog niet hebt geïdentificeerd."
+      },
+      "mapGlance": {
+        "title": "De kaart in één oogopslag",
+        "desc": "Verbindingen tonen hun status op de lijn zelf: frigate-gaten zijn gestippeld, verminderde en kritieke gaten hebben een gekleurde kern, en de scheepsgrootte staat naast het type. Elk systeem laat zien hoeveel ervan gescand is, statics zijn ook in compacte modus zichtbaar, en als je over een k-space-systeem beweegt zie je hoeveel gate-sprongen het van je af ligt."
+      },
+      "regionBorders": {
+        "title": "Regiogrenzen",
+        "desc": "Systemen met een stargate naar een andere regio krijgen een klein label met de naam ervan, zodat je ziet waar je via een keten naar Providence of Curse kunt oversteken zonder het buursysteem toe te voegen. Standaard uit; zet het aan in Systeemopties."
+      },
+      "layoutTools": {
+        "title": "Indelingshulpmiddelen",
+        "desc": "Indeling opruimen schikt systemen in de vorm van hun echte regio's. Ontwarren trekt verbonden systemen samen in nette rijen en kolommen. Gates opnieuw indelen maakt van wormgatlijnen die eigenlijk stargates zijn gate-verbindingen. Vergrendelde systemen blijven staan waar je ze neerzette."
+      },
+      "flagPresets": {
+        "title": "Markeringsvoorinstellingen voor verbindingen",
+        "desc": "Sla een icoon, kleur en naam op als voorinstelling en pas die met één klik toe op een verbinding. Corps en alliances kunnen een standaardset voor iedereen publiceren."
+      },
+      "mapBackup": {
+        "title": "Import en volledige back-ups",
+        "desc": "Haal een kaart over uit Pathfinder (aliassen, intel-markeringen, massa en end-of-life komen mee) of uit Tripwire (experimenteel, met signaturen en systeemnotities). Exporteer een volledige JSON-back-up met signaturen, anomalieën, structuren en de massa en levensduur van elk gat, en importeer die terug als exacte kopie die van jou is."
+      },
+      "jumpConfirm": {
+        "title": "Sprongen vullen het gat in",
+        "desc": "Als je springt, zoekt nexum uit door welke signatuur je ging en vult in waar die heen leidt; er wordt alleen gevraagd als er meer dan één kan passen. De bijgewerkte bladwijzernaam van het gat komt op je klembord, klaar om in het spel te plakken. Kloonsprongen en pod-doden tekenen geen valse verbindingen."
+      },
+      "sharing": {
+        "title": "Kaarten delen",
+        "desc": "Deel een kaart met andere personages, je corp of je alliance, of maak een alleen-lezen link die iedereen zonder account kan openen, met een vervaldatum en een keuze wat gasten zien. Gedeelde kaarten laten zien van wie ze zijn, en een kaart die je niet gebruikt kun je verlaten of verbergen."
+      },
+      "mapHistory": {
+        "title": "Kaartgeschiedenis",
+        "desc": "Elke wijziging aan de opbouw van een kaart wordt vastgelegd met wie hem deed: systemen, verbindingen, signaturen, ketens, instellingen, delen en samenvoegingen. 30 dagen bewaard en in te zien door de eigenaar en beheerders van de kaart via de kaartzijbalk."
+      },
+      "dscan": {
+        "title": "D-scan- en local-analyse",
+        "desc": "Plak een directional scan voor schepen gegroepeerd op klasse en romp, een on-grid- / off-grid-filter, structuren met hun afstand en de totale massa op de scan. Plak local chat voor piloten gegroepeerd op alliance en corp. Elke scan krijgt een link die iedereen 24 uur lang kan openen, en scans die aan een systeem gekoppeld zijn verschijnen in het paneel ervan. Inloggen niet nodig."
+      },
+      "pvpForecast": {
+        "title": "PvP-activiteitsvoorspelling",
+        "desc": "Voor elk systeem 24 balken die laten zien hoe druk elk komend uur op die dag van de week meestal is, op basis van de laatste 90 dagen van zKillboard, met het drukste uur bij naam en een live telling van de laatste 24 uur. Tijden staan in je eigen tijdzone. Werkt ook in wormgatruimte."
+      },
+      "holeState": {
+        "title": "Massa en levensduur tijdens het scannen",
+        "desc": "Leg de massa (vol, onder 50%, onder 10%) en levensduur (tot verlopen) van een gat direct vast in de signaturenlijst, nog voordat iemand erdoor gesprongen is. Stel het in aan één kant en de andere kant en de lijn op de kaart lopen gelijk."
+      },
+      "siteDetails": {
+        "title": "Sitedetails in één oogopslag",
+        "desc": "Relic- en data-rijen laten zien of de site gevechts-NPC's spawnt, event-datasites tonen een vinkje voor veilig warpen, ghost sites zijn een eigen type met hun niveau uit de scan, en Drifter-gaten vullen hun eigen bestemming in."
+      },
+      "chainExits": {
+        "title": "Ketenuitgangen",
+        "desc": "Een lijst in de werkbalk met elk k-space-systeem met een open wormgat in je keten, met de route ernaartoe en naar je favoriete systemen via de uitgang die je zou nemen. Krijg een melding in de app of in Discord als er een nieuwe uitgang verschijnt: alleen high-sec, low-sec en beter, of elke k-space."
+      },
+      "closestSystems": {
+        "title": "Dichtstbijzijnde systemen",
+        "desc": "Een zijpaneel met hoe ver handelshubs en je eigen lijst met systemen weg zijn, geteld via gates, je wormgatketens, Thera en Turnur. Het kan elke kaart gebruiken die je kunt zien of alleen de open kaart, en elke wormgatstap noemt de kaart waar hij vandaan komt."
+      },
+      "clones": {
+        "title": "Kloonpaneel",
+        "desc": "Je medische kloon en jump clones met het systeem waar elk zich bevindt, hun implantaten, en knoppen om de bestemming of een waypoint in te stellen. Vereist de clones-scope."
+      },
+      "pilotsOnline": {
+        "title": "Pilots online",
+        "desc": "Op corp- en alliance-installaties zie je wie in je organisatie de afgelopen minuten actief was, waarin ze vliegen en waar. Iedereen kan de eigen aanwezigheid verbergen."
+      },
+      "announcer": {
+        "title": "Spraakomroeper",
+        "desc": "Gesproken meldingen terwijl je vliegt, van een stem die op je eigen apparaat draait: low-sec en null-sec binnen bereik, incursions, recente kills in de buurt, personages die verbinden, en nieuwe ketens die anderen hebben toegevoegd. Experimenteel, alleen in het Engels."
+      },
+      "desktopAlerts": {
+        "title": "Bureaublad- en geluidsmeldingen",
+        "desc": "Bureaubladmeldingen en geluiden voor kills in je keten, gaten die end-of-life gaan, nieuwe k-space-uitgangen, treffers op je volglijst en dreigingen in de buurt, elk apart aan te zetten met één volumeregeling. Alleen nieuwe dingen geven een melding, nooit twee keer hetzelfde."
+      },
+      "multiDestination": {
+        "title": "Bestemming voor al je personages",
+        "desc": "Stel in één keer een bestemming in of voeg een waypoint toe voor elk online personage op je account. Elk personage plant zijn eigen route vanaf waar het is, en je ziet per personage wat er gebeurde."
+      },
+      "panelLayout": {
+        "title": "Paneelindelingen",
+        "desc": "Zet de panelen onder of naast de kaart, verdeel ze over maximaal drie kolommen waarvan je de breedte kunt aanpassen, en kies Ruim, Compact of Dicht als afstand. Verberg panelen die je niet gebruikt, maak ze los als vensters, en je indeling volgt je account naar elk apparaat."
       }
     },
     "corpFeatures": {
@@ -1434,8 +1518,8 @@
         "desc": "Een apart niveau alliance_admin beheert alliancekaarten en de rol van elk lid in de hele alliance — een superset van de corpbeheerder. Elke corp binnen de alliance kan nog steeds eigen corp-private kaarten houden, zonder dat er een CORP_ID-lijst nodig is."
       },
       "adminDash": {
-        "title": "Beheerdersdashboard",
-        "desc": "Een eigen /admin-pagina met vier tabbladen: Gebruikers, Kaarten, Rapporten en Auditlogboek. Beheerders komen er via de knop Beheer in de werkbalk."
+        "title": "Beheerdashboard",
+        "desc": "Een eigen /admin-pagina met tabbladen voor Gebruikers, Toegang, Kaarten, Rapporten, Auditlogboek, Discord, Markeringsvoorinstellingen en Standaardindeling. Beheerders komen er via de knop Beheer in de werkbalk."
       },
       "userMgmt": {
         "title": "Gebruikersbeheer",
@@ -1472,6 +1556,22 @@
       "accessControl": {
         "title": "Toegangscontrole voor gebruikers",
         "desc": "Bepaal wie er naast je .env-kern kan inloggen: een toegangslijst in de database (gevuld vanuit CORP_ID/ALLIANCE_ID) die je in het beheergedeelte onderhoudt, het optioneel automatisch toelaten van vriendelijke corps en alliances op basis van de standing in het spel (+5/+10), en een standings-overzicht dat je contacten per band groepeert. Sessies worden live opnieuw gecontroleerd, dus wie de toegang verliest — of een pilot die een toegelaten corp verlaat — wordt uitgelogd."
+      },
+      "invites": {
+        "title": "Uitnodigingen met een rol",
+        "desc": "Zet een piloot op de toegangslijst nog voordat hij ooit heeft ingelogd en kies de rol waarmee hij binnenkomt. De knop Uitnodiging mailen opent een kant-en-klare EVE-mail in je eigen client. DEFAULT_USER_ROLE bepaalt de rol waarmee alle anderen beginnen."
+      },
+      "orgDefaults": {
+        "title": "Standaarden voor de organisatie",
+        "desc": "Leg je eigen paneelindeling vast als startindeling die nieuwe leden overnemen, en publiceer een standaardset markeringsvoorinstellingen voor verbindingen voor iedereen."
+      },
+      "orgBranding": {
+        "title": "Je eigen logo",
+        "desc": "Een installatie voor een corp of alliance toont het logo ervan boven de inlogknop op de voorpagina, en naast het nexum-logo in de werkbalk."
+      },
+      "prebuiltImages": {
+        "title": "Kant-en-klare images",
+        "desc": "Elke release wordt als direct bruikbare images gepubliceerd op GitHub Container Registry, dus bijwerken is een docker compose pull. Back-up- en herstelscripts kunnen overweg met meerdere installaties op één host."
       }
     },
     "forCorpsBody": "Zet Nexum neer als een gedeelde installatie voor je corp of alliance. Leden krijgen in één tool ketenkaarten die voor de corp zichtbaar zijn en eigen persoonlijke kaarten, met rechten per rol, beheergereedschap en activiteitsrapporten per character.",

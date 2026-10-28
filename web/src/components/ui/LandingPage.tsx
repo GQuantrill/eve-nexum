@@ -12,6 +12,9 @@ import {
   SquaresFourIcon, UserGearIcon, TableIcon, ChartDonutIcon, ClockIcon, ClipboardTextIcon, TagIcon, IdentificationCardIcon,
   KeyIcon,
   LineSegmentsIcon,
+  LinkSimpleIcon, ScanIcon, DiamondsFourIcon, SlidersHorizontalIcon, ShieldStarIcon, FootprintsIcon, ArrowSquareInIcon,
+  ArrowSquareOutIcon, ClockCountdownIcon, CheckIcon, FireIcon, CrosshairSimpleIcon, ArrowBendUpRightIcon, CrosshairIcon,
+  MapPinSimpleIcon, ColumnsIcon,
 } from '../../icons';
 import { apiUrl } from '../../api/client';
 import { DISCORD_INVITE_URL } from '../../data/links';
@@ -37,10 +40,15 @@ type FeatureId =
   | 'scout' | 'a0' | 'iceBelt' | 'storms' | 'proximity' | 'discordNotif' | 'watchlist'
   | 'chains' | 'routePlanner' | 'jumpRange' | 'jumpPlanner' | 'locationTracking' | 'presence' | 'onlineStatus'
   | 'commandPalette' | 'homeHotkey' | 'killHighlights' | 'userStats' | 'apiKeys'
-  | 'serverStatus' | 'demoMap' | 'sidebar' | 'colorVision';
+  | 'serverStatus' | 'demoMap' | 'sidebar' | 'colorVision'
+  | 'addConnect' | 'mapGlance' | 'regionBorders' | 'layoutTools' | 'flagPresets' | 'mapBackup' | 'jumpConfirm'
+  | 'sharing' | 'mapHistory' | 'dscan' | 'pvpForecast' | 'holeState' | 'siteDetails'
+  | 'chainExits' | 'closestSystems' | 'clones' | 'pilotsOnline' | 'announcer' | 'desktopAlerts' | 'multiDestination'
+  | 'panelLayout';
 type CorpFeatureId =
   | 'multiCorp' | 'allianceMaps' | 'allianceRoles' | 'accessControl' | 'adminDash' | 'userMgmt' | 'mapMgmt' | 'usersReport'
-  | 'systemsReport' | 'timeWindowed' | 'auditLog' | 'corpTicker' | 'perCharAttr';
+  | 'systemsReport' | 'timeWindowed' | 'auditLog' | 'corpTicker' | 'perCharAttr'
+  | 'invites' | 'orgDefaults' | 'orgBranding' | 'prebuiltImages';
 
 interface FeatureItem { icon: Icon; id: FeatureId }
 interface FeatureSection { id: SectionId; items: FeatureItem[] }
@@ -55,7 +63,14 @@ const FEATURE_SECTIONS: FeatureSection[] = [
       { icon: ArrowsClockwiseIcon, id: 'rollingCalc'    },
       { icon: MagnifyingGlassIcon, id: 'whPicker'       },
       { icon: SelectionIcon,       id: 'multiSelect'    },
+      { icon: LinkSimpleIcon,      id: 'addConnect'     },
+      { icon: ScanIcon,            id: 'mapGlance'      },
+      { icon: DiamondsFourIcon,    id: 'regionBorders'  },
+      { icon: SlidersHorizontalIcon, id: 'layoutTools'  },
+      { icon: ShieldStarIcon,      id: 'flagPresets'    },
+      { icon: FootprintsIcon,      id: 'jumpConfirm'    },
       { icon: ImageIcon,           id: 'pngExport'      },
+      { icon: ArrowSquareInIcon,   id: 'mapBackup'      },
       { icon: HourglassIcon,       id: 'sigAging'       },
       { icon: LinkBreakIcon,       id: 'brokenChain'    },
       { icon: BroomIcon,           id: 'orphanCleanup'  },
@@ -69,10 +84,12 @@ const FEATURE_SECTIONS: FeatureSection[] = [
       { icon: UsersThreeIcon,  id: 'multiCharacter' },
       { icon: StackIcon,       id: 'multiMap'       },
       { icon: ArrowsMergeIcon, id: 'mergeMaps'  },
+      { icon: ArrowSquareOutIcon, id: 'sharing'   },
       { icon: ArrowsClockwiseIcon, id: 'crossMapSync' },
       { icon: BroadcastIcon,   id: 'realtime'   },
       { icon: LockIcon,        id: 'mapLocking' },
       { icon: ShieldCheckIcon, id: 'rbac'       },
+      { icon: ClipboardTextIcon, id: 'mapHistory' },
     ],
   },
   {
@@ -80,12 +97,16 @@ const FEATURE_SECTIONS: FeatureSection[] = [
     items: [
       { icon: CardsIcon,      id: 'systemPanel'    },
       { icon: WaveformIcon,   id: 'sigMgmt'        },
+      { icon: ClockCountdownIcon, id: 'holeState'    },
+      { icon: CheckIcon,      id: 'siteDetails'    },
       { icon: TagIcon,        id: 'labels'         },
       { icon: BuildingsIcon,  id: 'structImport'   },
       { icon: SparkleIcon,    id: 'autoStruct'     },
       { icon: ChartLineIcon,  id: 'activityCharts' },
       { icon: FlagBannerIcon, id: 'sovStation'     },
       { icon: SwordIcon,      id: 'killboard'      },
+      { icon: FireIcon,       id: 'pvpForecast'    },
+      { icon: CrosshairSimpleIcon, id: 'dscan'       },
       { icon: SparkleIcon,    id: 'effectDigest'   },
       { icon: HandshakeIcon,  id: 'standings'      },
     ],
@@ -100,12 +121,19 @@ const FEATURE_SECTIONS: FeatureSection[] = [
       { icon: WarningIcon,         id: 'proximity'        },
       { icon: BinocularsIcon,      id: 'watchlist'        },
       { icon: BellRingingIcon,     id: 'discordNotif'     },
+      { icon: BellRingingIcon,     id: 'desktopAlerts'    },
+      { icon: WaveformIcon,        id: 'announcer'        },
+      { icon: ArrowBendUpRightIcon, id: 'chainExits'      },
       { icon: LineSegmentsIcon,    id: 'chains'           },
       { icon: NavigationArrowIcon, id: 'routePlanner'     },
+      { icon: CrosshairIcon,       id: 'closestSystems'   },
+      { icon: NavigationArrowIcon, id: 'multiDestination' },
       { icon: TargetIcon,          id: 'jumpRange'        },
       { icon: PlanetIcon,          id: 'jumpPlanner'      },
       { icon: MapPinIcon,          id: 'locationTracking' },
+      { icon: MapPinSimpleIcon,    id: 'clones'           },
       { icon: UsersIcon,           id: 'presence'         },
+      { icon: UsersThreeIcon,      id: 'pilotsOnline'     },
       { icon: BroadcastIcon,       id: 'onlineStatus'     },
     ],
   },
@@ -120,6 +148,7 @@ const FEATURE_SECTIONS: FeatureSection[] = [
       { icon: PulseIcon,    id: 'serverStatus'   },
       { icon: EyeIcon,        id: 'demoMap'     },
       { icon: SidebarIcon,    id: 'sidebar'     },
+      { icon: ColumnsIcon,    id: 'panelLayout' },
       { icon: EyeglassesIcon, id: 'colorVision' },
     ],
   },
@@ -132,6 +161,7 @@ const CORP_FEATURES: { icon: Icon; id: CorpFeatureId }[] = [
   { icon: HandshakeIcon,          id: 'allianceMaps'  },
   { icon: ShieldCheckIcon,        id: 'allianceRoles' },
   { icon: KeyIcon,                id: 'accessControl' },
+  { icon: UserGearIcon,           id: 'invites'       },
   { icon: SquaresFourIcon,        id: 'adminDash'     },
   { icon: UserGearIcon,           id: 'userMgmt'      },
   { icon: MapTrifoldIcon,         id: 'mapMgmt'       },
@@ -141,6 +171,9 @@ const CORP_FEATURES: { icon: Icon; id: CorpFeatureId }[] = [
   { icon: ClipboardTextIcon,      id: 'auditLog'      },
   { icon: TagIcon,                id: 'corpTicker'    },
   { icon: IdentificationCardIcon, id: 'perCharAttr'   },
+  { icon: SlidersHorizontalIcon,  id: 'orgDefaults'   },
+  { icon: ImageIcon,              id: 'orgBranding'   },
+  { icon: StackIcon,              id: 'prebuiltImages' },
 ];
 
 const VERT_SRC = `#version 300 es

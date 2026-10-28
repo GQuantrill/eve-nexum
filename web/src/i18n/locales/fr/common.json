@@ -1213,7 +1213,7 @@
     "features": {
       "interactiveMap": {
         "title": "Carte interactive",
-        "desc": "Glissez les systèmes, tracez des connexions, définissez la classe / le type / le statut du trou de ver par connexion. Alignement sur la grille et mini-carte optionnelle."
+        "desc": "Faites glisser les systèmes, tracez des connexions, définissez la classe / le type / le statut du trou de ver par connexion. Alignement sur la grille et minicarte optionnelle."
       },
       "seedRegion": {
         "title": "Générer une carte depuis une région",
@@ -1233,7 +1233,7 @@
       },
       "multiSelect": {
         "title": "Opérations groupées par sélection multiple",
-        "desc": "Maj+clic pour sélectionner plusieurs systèmes ou signatures, puis attribuez un type, supprimez ou renommez en une seule action."
+        "desc": "Maj ou Cmd / Ctrl+clic pour sélectionner plusieurs systèmes ou signatures, puis attribuez un type, supprimez ou renommez en une seule action."
       },
       "pngExport": {
         "title": "Export PNG",
@@ -1273,7 +1273,7 @@
       },
       "crossMapSync": {
         "title": "Synchronisation entre cartes",
-        "desc": "Le même système sur plusieurs cartes ? Activez l'option et, en le scannant sur une carte, ses signatures et anomalies sont copiées vers le même système sur vos autres cartes — les cartes personnelles se synchronisent avec vos autres cartes personnelles, celles de corpo avec celles de la corpo. Non destructif : seules les entrées manquantes sont ajoutées et les blancs comblés, sans jamais écraser ce que vous avez déjà saisi ni rien supprimer."
+        "desc": "Le même système sur plusieurs cartes ? Activez l'option et, en le scannant sur une carte, ses signatures et anomalies sont copiées vers le même système sur vos autres cartes. Les cartes personnelles se synchronisent avec vos autres cartes personnelles (y compris celles de vos alts), et les cartes de corpo ou d'alliance avec les autres cartes du même type où la synchronisation est activée. Seules les entrées manquantes sont ajoutées et les blancs comblés, sans jamais rien écraser ni supprimer."
       },
       "realtime": {
         "title": "Collaboration en temps réel",
@@ -1285,15 +1285,15 @@
       },
       "rbac": {
         "title": "Accès basé sur les rôles",
-        "desc": "Quatre niveaux — readonly, edit, full, admin — encadrant les actions sur les cartes de corp. Les cartes personnelles restent les vôtres quel que soit le rôle."
+        "desc": "Lecture seule, contributeur, modification, complet et admin, plus admin d'alliance sur les installations d'alliance. Un contributeur tient à jour signatures, anomalies et structures et cartographie la chaîne en la parcourant, mais ne peut pas la remanier à la main. Les cartes personnelles restent les vôtres quel que soit le rôle."
       },
       "systemPanel": {
         "title": "Panneau de système",
-        "desc": "Des tuiles par système pour les signatures, structures, stations PNJ, notes, killboard et graphiques d'activité. Les tuiles sont réorganisables par glisser-déposer et persistent par utilisateur."
+        "desc": "Des cartes par système pour les signatures, anomalies, structures, stations PNJ, notes, killboard, activité PvP, d-scans et graphiques d'activité, avec des liens Dotlan, zKillboard et anoik.is. Les cartes se réorganisent par glisser-déposer et l'ordre est conservé par utilisateur."
       },
       "sigMgmt": {
         "title": "Gestion des signatures",
-        "desc": "Collez directement depuis le scanner de sondes. Suit l'âge de création / mise à jour par signature, supprime automatiquement les sigs absentes d'un nouveau collage, et prend en charge l'attribution de type groupée pour la sélection multiple."
+        "desc": "Collez directement depuis le scanner de sondes. Indique qui a scanné chaque signature et depuis combien de temps, peut retirer après un délai de grâce les sigs absentes d'un nouveau collage, et ne duplique jamais une signature quand deux pilotes collent en même temps. Copiez depuis n'importe quelle ligne un nom de signet prêt à coller, dans votre propre format ou celui de la carte."
       },
       "structImport": {
         "title": "Import de structures",
@@ -1305,15 +1305,15 @@
       },
       "activityCharts": {
         "title": "Graphiques d'activité",
-        "desc": "Historique glissant sur 24 h des sauts, des kills de vaisseaux / capsules et des kills PNJ par système, interrogé depuis l'ESI toutes les heures. Le collecteur conserve les données de chaque système K-space — pas seulement ceux que quelqu'un a ouverts — pour que les graphiques se remplissent dès que vous consultez un nouveau système."
+        "desc": "Historique glissant sur 24 heures des sauts, des kills de vaisseaux / pods et des kills PNJ par système, interrogé toutes les heures auprès d'ESI pour chaque système K-space. Affichez-les empilés dans votre propre ordre, ou combinés sur un même jeu d'axes avec les valeurs exactes au survol."
       },
       "sovStation": {
-        "title": "Données de souveraineté & de station",
-        "desc": "Infos sov en direct alliance / corp / faction et services de station PNJ, avec actions de point de cheminement et de destination en jeu."
+        "title": "Souveraineté et données de station",
+        "desc": "Souveraineté en direct d'alliance / corpo / faction avec l'ADM du hub et sa prochaine fenêtre de vulnérabilité, plus les services des stations PNJ, avec des actions de point de passage et de destination en jeu."
       },
       "killboard": {
         "title": "Volet killboard",
-        "desc": "Activité zKillboard récente par système, avec les kills PNJ uniquement masqués par défaut (à basculer). Les lignes se teintent en rouge quand un acteur hostile est dans la chaîne ou qu'un ami se fait tuer ; en bleu quand un ami marque ou qu'un hostile meurt. Les kills récents ressortent aussi en surbrillance sur la carte."
+        "desc": "Kills récents de zKillboard et du flux en direct pour un système ou toute votre carte, sur la dernière heure, le dernier jour ou la dernière semaine. Chaque kill est signalé s'il a eu lieu sur un portail ou impliquait un HIC, un dictor ou une smartbomb. Les kills PNJ sont masqués par défaut. Les lignes se teintent en rouge quand un hostile est impliqué ou qu'un blue meurt, et en bleu quand un ami marque."
       },
       "effectDigest": {
         "title": "Synthèse des effets de la chaîne",
@@ -1324,8 +1324,8 @@
         "desc": "Votre liste de contacts EVE (perso, corp et alliance — récupérée via l'ESI à la connexion et réactualisable à la demande) alimente une couche visuelle sur toute la chaîne. Les détenteurs de sov affichent des pastilles de standing P/C/A en ligne ; les structures résolues via leur ID de structure EVE se teintent selon le standing de la corp propriétaire ; les nœuds des systèmes détenteurs de sov reçoivent un halo coloré pour que le territoire hostile ressorte sur la carte."
       },
       "scout": {
-        "title": "Connexions scout",
-        "desc": "Les connexions publiques Eve-Scout de Thera et Turnur apparaissent dans la barre latérale pour sauter directement vers les trous connus."
+        "title": "Connexions Thera et Turnur",
+        "desc": "Les connexions publiques Thera et Turnur d'Eve-Scout avec les deux IDs de signature et l'itinéraire par le hub. Copiez-les sur votre carte en un clic (les trous qu'eve-scout ne liste plus sont nettoyés), et signalez-en un comme effondré pour que le calcul d'itinéraire cesse de l'utiliser."
       },
       "a0": {
         "title": "Détection des soleils A0",
@@ -1349,11 +1349,11 @@
       },
       "discordNotif": {
         "title": "Notifications Discord",
-        "desc": "Poussez le renseignement de chaîne de la corp vers un canal Discord pour que les alertes arrivent même quand personne ne regarde l'onglet. Se déclenche côté serveur à l'arrivée d'un K162 ou d'une nouvelle connexion de trou de ver, limité aux cartes de corp. Les admins filtrent quelles régions et cartes notifient depuis le panneau d'administration. Au mieux et respectueux des limites de débit ; les opérations groupées comme le seeding de région ne spamment jamais le canal."
+        "desc": "Envoyez l'intel de la chaîne vers un salon Discord pour que les alertes arrivent même quand personne ne regarde l'onglet : nouvelles connexions et K162, nouvelles sorties K-space avec leur itinéraire, kills sur la chaîne et kills spéciaux, trous qui passent en fin de vie, et nouveaux trous Thera et Turnur. Les admins choisissent quelles cartes et régions publient."
       },
       "routePlanner": {
         "title": "Planificateur d'itinéraire",
-        "desc": "BFS côté serveur sur les portails plus votre chaîne en direct, pour qu'un itinéraire passant par un saut de trou de ver soit un seul clic."
+        "desc": "Choisissez deux systèmes quelconques et obtenez un itinéraire via les portails, vos chaînes de trous de ver, Thera, Turnur et les ponts Ansiblex. Trouvez les systèmes par l'alias que vous leur avez donné, et enregistrez les itinéraires que vous empruntez souvent."
       },
       "locationTracking": {
         "title": "Suivi de position",
@@ -1376,8 +1376,8 @@
         "desc": "Appuyez sur H pour ramener la vue à votre système d'origine depuis n'importe quel panneau. Clic droit sur un système pour définir ou changer lequel est l'origine."
       },
       "killHighlights": {
-        "title": "Surbrillance des kills récents",
-        "desc": "Les systèmes avec des kills dans la dernière heure reçoivent un halo coloré pour repérer d'un coup d'œil l'activité fraîche sur toute la chaîne."
+        "title": "Mise en avant des kills récents",
+        "desc": "Les systèmes avec des kills reçoivent une épée sur la carte avec leur nombre de kills sur 24 heures, vive quand il y a eu des combats dans l'heure, et un halo coloré pour l'activité récente sur toute la chaîne."
       },
       "userStats": {
         "title": "Fenêtre de statistiques utilisateur",
@@ -1392,8 +1392,8 @@
         "desc": "La page d'accueil intègre une carte de démo non modifiable pour que les visiteurs voient ce que fait l'outil avant de se connecter."
       },
       "sidebar": {
-        "title": "Barre latérale repliable",
-        "desc": "Options de carte, Connexions, Alertes de proximité, Atténuation des systèmes obsolètes et Raccourcis se déplient ou se replient indépendamment. L'état par section persiste par navigateur via localStorage."
+        "title": "Choisissez vos panneaux",
+        "desc": "Chaque section de la barre latérale et chaque panneau de système peut être replié, réorganisé ou entièrement désactivé. Vos choix sont enregistrés dans votre compte et vous suivent sur une autre machine."
       },
       "colorVision": {
         "title": "Modes daltoniens",
@@ -1417,7 +1417,91 @@
       },
       "jumpPlanner": {
         "title": "Planificateur de saut",
-        "desc": "Tracez une route de saut capital multi-étapes entre deux systèmes low/null. Choisissez une classe de vaisseau et vos compétences, optez pour le moins de sauts ou le moins de carburant, et voyez la route cartographiée avec les années-lumière par saut et une estimation en isotopes. Enregistrez et rechargez vos routes."
+        "desc": "Tracez une route de saut capital multi-étapes entre deux systèmes low/null. Choisissez une classe de vaisseau et vos compétences, optez pour le moins de sauts ou le moins de carburant, et voyez la route avec les années-lumière par saut, une estimation en isotopes, la fatigue de saut et le délai de réactivation. Évitez des systèmes, ajoutez des points de passage, utilisez les portails régionaux et enregistrez vos routes."
+      },
+      "addConnect": {
+        "title": "Ajouter et connecter en une étape",
+        "desc": "Clic droit sur un système pour ajouter un système connecté d'un seul coup, ou choisissez Connecter à un système et cliquez sur l'autre extrémité. Le système où vous vous trouvez est proposé en premier quand vous en ajoutez un, et un repère Inconnu marque un trou que vous n'avez pas encore identifié."
+      },
+      "mapGlance": {
+        "title": "La carte d'un coup d'œil",
+        "desc": "Les connexions affichent leur état sur la ligne elle-même : les trous pour frégates sont en pointillés, les trous réduits et critiques ont un cœur coloré, et la taille de vaisseau figure à côté du type. Chaque système indique la part déjà scannée, les statics restent visibles en mode compact, et le survol d'un système K-space indique à combien de sauts de portail il se trouve de vous."
+      },
+      "regionBorders": {
+        "title": "Frontières de région",
+        "desc": "Les systèmes dotés d'un portail vers une autre région reçoivent une petite étiquette qui la nomme, pour voir où une chaîne vous permet de passer dans Providence ou Curse sans ajouter le système voisin. Désactivé par défaut ; activez-le dans Options de système."
+      },
+      "layoutTools": {
+        "title": "Outils de disposition",
+        "desc": "Ranger la disposition organise les systèmes selon la forme de leurs régions réelles. Démêler regroupe les systèmes liés en lignes et colonnes bien ordonnées. Reclasser les portes transforme les lignes de trou de ver qui sont en fait des portails en connexions de portail. Les systèmes verrouillés restent là où vous les avez placés."
+      },
+      "flagPresets": {
+        "title": "Modèles de marqueur de connexion",
+        "desc": "Enregistrez une icône, une couleur et un nom comme modèle et appliquez-le à une connexion en un clic. Les corpos et alliances peuvent publier un jeu standard pour tout le monde."
+      },
+      "mapBackup": {
+        "title": "Import et sauvegardes complètes",
+        "desc": "Importez une carte depuis Pathfinder (alias, marqueurs d'intel, masse et fin de vie inclus) ou depuis Tripwire (expérimental, avec signatures et notes de système). Exportez une sauvegarde JSON complète avec signatures, anomalies, structures et la masse et la durée de vie de chaque trou, et réimportez-la en copie exacte qui vous appartient."
+      },
+      "jumpConfirm": {
+        "title": "Les sauts complètent le trou",
+        "desc": "Quand vous sautez, nexum détermine par quelle signature vous êtes passé et renseigne sa destination, en ne vous demandant que si plusieurs peuvent correspondre. Le nom de signet mis à jour du trou arrive dans votre presse-papiers, prêt à coller en jeu. Les sauts de clone et les morts en pod ne tracent pas de fausses connexions."
+      },
+      "sharing": {
+        "title": "Partage de cartes",
+        "desc": "Partagez une carte avec d'autres personnages, votre corpo ou votre alliance, ou créez un lien en lecture seule que n'importe qui peut ouvrir sans compte, avec une date d'expiration et un choix de ce que voient les invités. Les cartes partagées indiquent leur propriétaire, et vous pouvez quitter ou masquer celles que vous n'utilisez pas."
+      },
+      "mapHistory": {
+        "title": "Historique de la carte",
+        "desc": "Chaque modification de la structure d'une carte est enregistrée avec son auteur : systèmes, connexions, signatures, chaînes, paramètres, partages et fusions. Conservé 30 jours et consultable par le propriétaire et les admins de la carte depuis la barre latérale de la carte."
+      },
+      "dscan": {
+        "title": "Analyseur de d-scan et de local",
+        "desc": "Collez un scan directionnel pour obtenir les vaisseaux groupés par classe et coque, un filtre on-grid / off-grid, les structures avec leur distance et la masse totale du scan. Collez le chat local pour obtenir les pilotes groupés par alliance et corpo. Chaque scan reçoit un lien que tout le monde peut ouvrir pendant 24 heures, et les scans rattachés à un système apparaissent dans son panneau. Aucune connexion requise."
+      },
+      "pvpForecast": {
+        "title": "Prévision d'activité PvP",
+        "desc": "Pour n'importe quel système, 24 barres indiquant l'activité habituelle de chaque heure à venir pour ce jour de la semaine, d'après les 90 derniers jours de zKillboard, avec l'heure la plus chargée indiquée et un décompte en direct des dernières 24 heures. Les heures s'affichent dans votre propre fuseau horaire. Fonctionne aussi en espace wormhole."
+      },
+      "holeState": {
+        "title": "Masse et durée de vie pendant le scan",
+        "desc": "Indiquez la masse d'un trou (pleine, moins de 50 %, moins de 10 %) et sa durée de vie (jusqu'à expiré) directement depuis la liste des signatures, avant que quiconque l'ait traversé. Réglez-le d'un côté, et l'autre côté ainsi que la ligne sur la carte suivent."
+      },
+      "siteDetails": {
+        "title": "Détails des sites d'un coup d'œil",
+        "desc": "Les lignes relic et data indiquent si le site fait apparaître des PNJ de combat, les sites data d'événement affichent une coche de warp sans risque, les ghost sites sont un type à part avec leur niveau lu depuis le scan, et les trous Drifter renseignent eux-mêmes leur destination."
+      },
+      "chainExits": {
+        "title": "Sorties de la chaîne",
+        "desc": "Une liste dans la barre d'outils de chaque système K-space ayant un trou de ver ouvert sur votre chaîne, avec l'itinéraire vers chacun et vers vos systèmes favoris par la sortie que vous prendriez. Recevez une alerte dans l'application ou sur Discord quand une nouvelle sortie apparaît : high-sec seulement, low-sec et mieux, ou tout K-space."
+      },
+      "closestSystems": {
+        "title": "Systèmes les plus proches",
+        "desc": "Un panneau latéral indiquant la distance des hubs commerciaux et de votre propre liste de systèmes, en comptant les portails, vos chaînes de trous de ver, Thera et Turnur. Il peut utiliser toutes les cartes que vous voyez ou seulement celle ouverte, et chaque étape par trou de ver indique la carte dont elle provient."
+      },
+      "clones": {
+        "title": "Panneau des clones",
+        "desc": "Votre clone médical et vos clones de saut avec le système où se trouve chacun, leurs implants, et des boutons pour définir la destination ou ajouter un point de passage. Nécessite le scope des clones."
+      },
+      "pilotsOnline": {
+        "title": "Pilotes en ligne",
+        "desc": "Sur les installations de corpo et d'alliance, voyez qui dans votre organisation a été actif ces dernières minutes, ce qu'il pilote et où. Chacun peut masquer sa propre présence."
+      },
+      "announcer": {
+        "title": "Annonces vocales",
+        "desc": "Des alertes parlées pendant que vous volez, par une voix qui fonctionne sur votre propre appareil : low-sec et null-sec à portée, incursions, kills récents à proximité, personnages qui se connectent et nouvelles chaînes ajoutées par d'autres. Expérimental, en anglais uniquement."
+      },
+      "desktopAlerts": {
+        "title": "Alertes de bureau et sonores",
+        "desc": "Notifications de bureau et sons pour les kills sur votre chaîne, les trous qui passent en fin de vie, les nouvelles sorties K-space, les correspondances de liste de surveillance et les menaces proches, chacun activable séparément avec un seul réglage de volume. Seules les nouveautés déclenchent une alerte, jamais deux fois le même élément."
+      },
+      "multiDestination": {
+        "title": "Destination pour tous vos personnages",
+        "desc": "Définissez une destination ou ajoutez un point de passage pour tous les personnages en ligne de votre compte à la fois. Chacun trace son propre itinéraire depuis l'endroit où il se trouve, et vous voyez le résultat pour chaque personnage."
+      },
+      "panelLayout": {
+        "title": "Dispositions des panneaux",
+        "desc": "Placez les panneaux sous la carte ou à côté, répartissez-les sur jusqu'à trois colonnes redimensionnables, et choisissez un espacement Confortable, Compacte ou Dense. Masquez les panneaux que vous n'utilisez pas, détachez-les en fenêtres, et votre disposition suit votre compte sur n'importe quel appareil."
       }
     },
     "corpFeatures": {
@@ -1435,7 +1519,7 @@
       },
       "adminDash": {
         "title": "Tableau de bord d'administration",
-        "desc": "Une page /admin dédiée avec quatre onglets : Utilisateurs, Cartes, Rapports et Journal d'audit. Les admins y accèdent via le bouton Administration de la barre d'outils."
+        "desc": "Une page /admin dédiée avec des onglets Utilisateurs, Accès, Cartes, Rapports, Journal d'audit, Discord, Modèles de marqueur et Disposition par défaut. Les admins y accèdent via le bouton Administration de la barre d'outils."
       },
       "userMgmt": {
         "title": "Gestion des utilisateurs",
@@ -1472,6 +1556,22 @@
       "accessControl": {
         "title": "Contrôle d'accès des utilisateurs",
         "desc": "Décidez qui peut se connecter au-delà de votre noyau .env : une liste d'autorisation en base (initialisée depuis CORP_ID/ALLIANCE_ID) gérée dans l'admin, l'admission automatique optionnelle des corpos/alliances amies selon le standing (+5/+10), et un visualiseur de standings groupés par palier. Les sessions sont revérifiées en direct — révoquer un accès, ou un pilote quittant une corpo admise, le déconnecte."
+      },
+      "invites": {
+        "title": "Invitations avec un rôle",
+        "desc": "Ajoutez un pilote à la liste d'autorisation avant même sa première connexion et choisissez le rôle avec lequel il arrive. Le bouton Envoyer l'invitation ouvre un EVE mail déjà rédigé dans votre propre client. DEFAULT_USER_ROLE définit le rôle de départ de tous les autres."
+      },
+      "orgDefaults": {
+        "title": "Réglages par défaut de l'organisation",
+        "desc": "Enregistrez votre propre agencement de panneaux comme disposition de départ dont héritent les nouveaux membres, et publiez un jeu standard de modèles de marqueur de connexion pour tout le monde."
+      },
+      "orgBranding": {
+        "title": "Votre logo",
+        "desc": "Une instance gérée pour une corpo ou une alliance affiche son logo au-dessus du bouton de connexion sur la page d'accueil, et à côté du logo nexum dans la barre d'outils."
+      },
+      "prebuiltImages": {
+        "title": "Images prêtes à l'emploi",
+        "desc": "Chaque version est publiée sous forme d'images prêtes à lancer sur GitHub Container Registry, donc une mise à jour se résume à un docker compose pull. Les scripts de sauvegarde et de restauration gèrent plusieurs instances sur un même hôte."
       }
     },
     "forCorpsBody": "Faites tourner Nexum en déploiement partagé pour votre corp ou alliance. Les membres obtiennent des cartes de chaîne visibles par la corp et des cartes personnelles privées dans un seul outil, avec des permissions basées sur les rôles, des outils d'administration et des rapports d'activité par personnage.",

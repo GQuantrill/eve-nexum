@@ -1213,7 +1213,7 @@
     "features": {
       "interactiveMap": {
         "title": "Mapa interativo",
-        "desc": "Arrasta sistemas, traça conexões, define a classe / tipo / estado do buraco de minhoca por conexão. Ajuste à grade e minimapa opcional."
+        "desc": "Arrasta sistemas, desenha ligações e define classe / tipo / estado de buraco de minhoca por ligação. Ajuste à grelha e minimapa opcional."
       },
       "seedRegion": {
         "title": "Gerar um mapa a partir de uma região",
@@ -1232,8 +1232,8 @@
         "desc": "Popover pesquisável para atribuir o tipo exato de buraco de minhoca a uma conexão. A info rápida dos statics ao passar o rato mostra a classe de destino, a massa e a vida útil."
       },
       "multiSelect": {
-        "title": "Operações em lote por seleção múltipla",
-        "desc": "Shift+clique para selecionar vários sistemas ou assinaturas, depois atribui tipo, elimina ou renomeia numa só ação."
+        "title": "Operações em lote com seleção múltipla",
+        "desc": "Shift ou Cmd / Ctrl-clique para selecionar vários sistemas ou assinaturas e depois atribuir o tipo, eliminar ou mudar o nome em lote numa só ação."
       },
       "pngExport": {
         "title": "Exportação para PNG",
@@ -1273,7 +1273,7 @@
       },
       "crossMapSync": {
         "title": "Sincronização entre mapas",
-        "desc": "Tens o mesmo sistema em vários mapas? Ativa a opção e, ao examiná-lo num mapa, as suas assinaturas e anomalias são copiadas para o mesmo sistema nos teus outros mapas — os mapas pessoais sincronizam com os teus outros mapas pessoais, os de corp com os da corp. Não destrutivo: apenas adiciona entradas em falta e preenche espaços em branco, nunca substituindo o que já introduziste nem apagando nada."
+        "desc": "Tens o mesmo sistema em vários mapas? Ativa a opção e, ao analisá-lo num mapa, as suas assinaturas e anomalias são copiadas para o mesmo sistema nos outros. Os mapas pessoais sincronizam com os teus outros mapas pessoais (incluindo os dos teus alts), e os mapas de corp ou aliança com outros do mesmo tipo que tenham a sincronização ativada. Só adiciona entradas em falta e preenche espaços vazios, nunca sobrescreve nem elimina nada."
       },
       "realtime": {
         "title": "Colaboração em tempo real",
@@ -1285,15 +1285,15 @@
       },
       "rbac": {
         "title": "Acesso baseado em funções",
-        "desc": "Quatro níveis — readonly, edit, full, admin — que regem as ações sobre mapas de corp. Os mapas pessoais continuam a ser teus seja qual for a função."
+        "desc": "Só leitura, colaborador, edição, completo e admin, mais admin de aliança em instalações de aliança. Um colaborador mantém atualizadas as assinaturas, anomalias e estruturas e mapeia a cadeia ao voá-la, mas não a pode remodelar à mão. Os mapas pessoais continuam a ser teus seja qual for a função."
       },
       "systemPanel": {
         "title": "Painel de sistema",
-        "desc": "Mosaicos por sistema para assinaturas, estruturas, estações PNJ, notas, killboard e gráficos de atividade. Os mosaicos reordenam-se arrastando e largando e mantêm-se por utilizador."
+        "desc": "Cartões por sistema para assinaturas, anomalias, estruturas, estações de PNJ, notas, killboard, atividade PvP, d-scans e gráficos de atividade, com ligações para Dotlan, zKillboard e anoik.is. Os cartões podem ser reordenados arrastando e largando e ficam guardados por utilizador."
       },
       "sigMgmt": {
         "title": "Gestão de assinaturas",
-        "desc": "Cola diretamente do scanner de sondas. Acompanha a idade de criação / atualização por assinatura, elimina automaticamente as assinaturas ausentes numa nova colagem e suporta a atribuição de tipo em lote para a seleção múltipla."
+        "desc": "Cola diretamente do scanner de sondas. Mostra quem analisou cada assinatura e há quanto tempo, pode remover assinaturas que faltam numa nova colagem após um período de tolerância, e nunca duplica uma assinatura quando dois pilotos colam ao mesmo tempo. Copia de qualquer linha um nome de marcador pronto a colar, no teu próprio formato ou no do mapa."
       },
       "structImport": {
         "title": "Importação de estruturas",
@@ -1305,15 +1305,15 @@
       },
       "activityCharts": {
         "title": "Gráficos de atividade",
-        "desc": "Histórico móvel de 24 horas de saltos, kills de naves / cápsulas e kills de PNJ por sistema, consultado da ESI de hora a hora. O recoletor mantém os dados de cada sistema de K-space — não só dos que alguém abriu — para que os gráficos se preencham assim que vires um sistema novo."
+        "desc": "Histórico móvel de 24 horas de saltos, kills de naves / cápsulas e kills de PNJ por sistema, consultado da ESI de hora a hora para todos os sistemas de k-space. Mostra-os empilhados pela tua própria ordem, ou combinados num único par de eixos com valores exatos ao passar o rato."
       },
       "sovStation": {
-        "title": "Dados de soberania e de estação",
-        "desc": "Info de sov em direto de aliança / corp / facção e serviços de estação PNJ, com ações de ponto de rota e destino no jogo."
+        "title": "Dados de soberania e estações",
+        "desc": "Soberania de aliança / corp / fação ao vivo com o ADM do hub e a sua próxima janela de vulnerabilidade, além dos serviços das estações de PNJ, com ações de ponto de rota e destino no jogo."
       },
       "killboard": {
         "title": "Painel de killboard",
-        "desc": "Atividade recente do zKillboard por sistema, com os kills só de PNJ ocultos por defeito (alternável). As linhas tingem-se de vermelho quando um ator hostil está na cadeia ou matam um azul; de azul quando um amigo pontua ou morre um hostil. Os kills recentes também se destacam no mapa."
+        "desc": "Kills recentes do zKillboard e do feed ao vivo para um sistema ou para todo o teu mapa, na última hora, dia ou semana. Cada kill é etiquetado quando aconteceu num portão ou envolveu um HIC, um dictor ou uma smartbomb. Os kills de PNJ estão ocultos por defeito. As linhas tingem-se de vermelho quando há um hostil envolvido ou morre um azul, e de azul quando um amigo pontua."
       },
       "effectDigest": {
         "title": "Resumo de efeitos da cadeia",
@@ -1324,8 +1324,8 @@
         "desc": "A tua lista de contactos de EVE (pessoal, corp e aliança — obtida via ESI ao iniciar sessão e reatualizável a pedido) impulsiona uma camada visual em toda a cadeia. Os detentores de sov mostram pílulas de standing P/C/A inline; as estruturas resolvidas pelo seu ID de estrutura de EVE tingem-se conforme o standing da corp proprietária; os nós de sistemas com sov recebem um halo colorido para que o território hostil se destaque no mapa."
       },
       "scout": {
-        "title": "Conexões de scout",
-        "desc": "As conexões públicas do Eve-Scout de Thera e Turnur aparecem na barra lateral para que saltes diretamente para buracos conhecidos."
+        "title": "Ligações de Thera e Turnur",
+        "desc": "As ligações públicas de Thera e Turnur do Eve-Scout com ambos os IDs de assinatura e a rota através do hub. Copia-as para o teu mapa com um clique (os buracos que o eve-scout deixa de listar são arrumados), e reporta um como colapsado para que as rotas deixem de o usar."
       },
       "a0": {
         "title": "Deteção de sóis A0",
@@ -1349,11 +1349,11 @@
       },
       "discordNotif": {
         "title": "Notificações do Discord",
-        "desc": "Envia a inteligência de cadeia da corp para um canal do Discord para que os alertas cheguem mesmo quando ninguém está a ver o separador. Dispara no servidor perante um K162 de entrada ou uma nova conexão de buraco de minhoca, limitado a mapas de corp. Os admins filtram que regiões e mapas notificam a partir do painel de administração. Best-effort e consciente dos limites de taxa; as operações em lote como a sementeira de regiões nunca saturam o canal."
+        "desc": "Envia as informações da cadeia para um canal do Discord para que os alertas cheguem mesmo quando ninguém está a ver o separador: novas ligações e K162, novas saídas para k-space com a sua rota, kills na cadeia e kills especiais, buracos a entrar em fim de vida, e novos buracos de Thera e Turnur. Os admins escolhem que mapas e regiões publicam."
       },
       "routePlanner": {
         "title": "Planeador de rotas",
-        "desc": "BFS no servidor sobre os portões estelares mais a tua cadeia em direto, para que uma rota que passa por um salto de buraco de minhoca seja um só clique."
+        "desc": "Escolhe dois sistemas quaisquer e obtém uma rota por portões estelares, as tuas cadeias de buracos de minhoca, Thera, Turnur e pontes Ansiblex. Encontra sistemas pelo alias que lhes deste e guarda as rotas que voas com frequência."
       },
       "locationTracking": {
         "title": "Seguimento de localização",
@@ -1377,7 +1377,7 @@
       },
       "killHighlights": {
         "title": "Destaque de kills recentes",
-        "desc": "Os sistemas com kills na última hora recebem um halo colorido para que vejas de relance a atividade fresca em toda a cadeia."
+        "desc": "Os sistemas com kills recebem uma espada no mapa com a contagem de kills das últimas 24 horas, brilhante quando houve combate nesta hora, e um halo colorido para a atividade recente em toda a cadeia."
       },
       "userStats": {
         "title": "Janela de estatísticas de utilizador",
@@ -1392,8 +1392,8 @@
         "desc": "A página inicial monta um mapa de demonstração não editável para que os visitantes vejam o que a ferramenta faz antes de iniciar sessão."
       },
       "sidebar": {
-        "title": "Barra lateral recolhível",
-        "desc": "Opções de mapa, Conexões, Alertas de proximidade, Esmaecer sistemas obsoletos e Atalhos expandem ou recolhem de forma independente. O estado por secção mantém-se por navegador via localStorage."
+        "title": "Escolhe os teus painéis",
+        "desc": "Cada secção da barra lateral e cada painel de sistema pode ser recolhido, reordenado ou desativado por completo. As tuas escolhas ficam guardadas na tua conta e acompanham-te para outro computador."
       },
       "colorVision": {
         "title": "Modos para daltónicos",
@@ -1417,7 +1417,91 @@
       },
       "jumpPlanner": {
         "title": "Planeador de saltos",
-        "desc": "Trace uma rota de salto capital de vários saltos entre dois sistemas low/null. Escolha uma classe de nave e as suas skills, opte por menos saltos ou menos combustível, e veja a rota mapeada com anos-luz por salto e uma estimativa de isótopos. Guarde e recarregue as suas rotas."
+        "desc": "Traça uma rota de salto capital de vários saltos entre dois sistemas low/null quaisquer. Escolhe uma classe de nave e as tuas skills, opta por menos saltos ou menos combustível, e vê a rota com os anos-luz por salto, uma estimativa de isótopos, a fadiga de salto e o temporizador de reativação. Evita sistemas, adiciona pontos de rota, usa portões regionais e guarda as tuas rotas."
+      },
+      "addConnect": {
+        "title": "Adicionar e ligar num só passo",
+        "desc": "Clica com o botão direito num sistema para adicionar um sistema ligado de uma vez, ou escolhe Ligar a sistema e clica na outra ponta. Ao adicionares um, o sistema onde estás é sugerido primeiro, e um marcador Desconhecido assinala um buraco que ainda não identificaste."
+      },
+      "mapGlance": {
+        "title": "O mapa num relance",
+        "desc": "As ligações mostram o seu estado na própria linha: os buracos de fragata são tracejados, os reduzidos e críticos têm um núcleo colorido, e o tamanho de nave aparece ao lado do tipo. Cada sistema mostra quanto dele já foi analisado, os statics aparecem mesmo em modo compacto, e passar o rato sobre um sistema de k-space mostra a quantos saltos de portão está de ti."
+      },
+      "regionBorders": {
+        "title": "Fronteiras de região",
+        "desc": "Os sistemas com um portão estelar para outra região recebem uma pequena etiqueta com o nome dela, para veres onde uma cadeia te permite atravessar para Providence ou Curse sem adicionar o sistema vizinho. Desativado por defeito; ativa-o em Opções de sistema."
+      },
+      "layoutTools": {
+        "title": "Ferramentas de disposição",
+        "desc": "Organizar disposição dispõe os sistemas com a forma das suas regiões reais. Desembaraçar junta os sistemas ligados em linhas e colunas arrumadas. Reclassificar portões transforma em ligações de portão as linhas de buraco de minhoca que na verdade são portões estelares. Os sistemas bloqueados ficam onde os puseste."
+      },
+      "flagPresets": {
+        "title": "Predefinições de marca de ligação",
+        "desc": "Guarda um ícone, uma cor e um nome como predefinição e aplica-a a uma ligação com um clique. As corps e alianças podem publicar um conjunto padrão para todos."
+      },
+      "mapBackup": {
+        "title": "Importação e cópias de segurança completas",
+        "desc": "Traz um mapa do Pathfinder (com aliases, marcadores de informações, massa e fim de vida) ou do Tripwire (experimental, com assinaturas e notas de sistema). Exporta uma cópia de segurança JSON completa com assinaturas, anomalias, estruturas e a massa e vida de cada buraco, e importa-a de volta como uma cópia exata de que és proprietário."
+      },
+      "jumpConfirm": {
+        "title": "Os saltos preenchem o buraco",
+        "desc": "Quando saltas, o nexum descobre por que assinatura passaste e define para onde leva, perguntando apenas quando mais do que uma poderia corresponder. O nome de marcador atualizado do buraco fica na tua área de transferência, pronto a colar no jogo. Saltos de clone e mortes de cápsula não desenham ligações falsas."
+      },
+      "sharing": {
+        "title": "Partilha de mapas",
+        "desc": "Partilha um mapa com outras personagens, a tua corp ou a tua aliança, ou cria uma ligação só de leitura que qualquer pessoa pode abrir sem conta, com prazo de validade e à tua escolha o que os convidados veem. Os mapas partilhados mostram quem é o proprietário, e podes sair ou ocultar os que não usas."
+      },
+      "mapHistory": {
+        "title": "Histórico do mapa",
+        "desc": "Cada alteração à estrutura de um mapa é registada com quem a fez: sistemas, ligações, assinaturas, cadeias, definições, partilha e fusões. Guardado durante 30 dias, e consultável pelo proprietário e pelos admins do mapa a partir da barra lateral do mapa."
+      },
+      "dscan": {
+        "title": "Analisador de d-scan e local",
+        "desc": "Cola um scan direcional para ver as naves agrupadas por classe e casco, um filtro on-grid / off-grid, as estruturas com a sua distância e a massa total no scan. Cola o chat local para ver os pilotos agrupados por aliança e corp. Cada scan recebe uma ligação que qualquer pessoa pode abrir durante 24 horas, e os scans associados a um sistema aparecem no seu painel. Não é preciso iniciar sessão."
+      },
+      "pvpForecast": {
+        "title": "Previsão de atividade PvP",
+        "desc": "Para qualquer sistema, 24 barras que mostram quão movimentada costuma ser cada uma das próximas horas nesse dia da semana, com base nos últimos 90 dias do zKillboard, com a hora mais movimentada indicada e uma contagem ao vivo das últimas 24 horas. As horas aparecem no teu próprio fuso horário. Também funciona no espaço de buracos de minhoca."
+      },
+      "holeState": {
+        "title": "Massa e vida durante a análise",
+        "desc": "Regista a massa de um buraco (completa, abaixo de 50%, abaixo de 10%) e a vida (até expirado) diretamente na lista de assinaturas, antes de alguém o ter saltado. Define-o em qualquer das pontas e a outra ponta e a linha no mapa ficam iguais."
+      },
+      "siteDetails": {
+        "title": "Detalhes dos sites num relance",
+        "desc": "As linhas de relíquias e dados mostram se o site gera combate, os sites de dados de eventos mostram um visto de warp seguro, os sites fantasma têm o seu próprio tipo com o nível lido do scan, e os buracos Drifter preenchem o seu próprio destino."
+      },
+      "chainExits": {
+        "title": "Saídas da cadeia",
+        "desc": "Uma lista na barra de ferramentas com cada sistema de k-space com um buraco de minhoca aberto na tua cadeia, com a rota para cada um e para os teus sistemas favoritos através da saída por onde sairias. Recebe um alerta na app ou no Discord quando aparece uma nova saída: só high-sec, low-sec ou melhor, ou qualquer k-space."
+      },
+      "closestSystems": {
+        "title": "Sistemas mais próximos",
+        "desc": "Um painel lateral com a distância aos hubs comerciais e à tua própria lista de sistemas, contando portões, as tuas cadeias de buracos de minhoca, Thera e Turnur. Pode usar todos os mapas que consegues ver ou só o que está aberto, e cada salto por buraco de minhoca indica o mapa de onde veio."
+      },
+      "clones": {
+        "title": "Painel de clones",
+        "desc": "O teu clone médico e os teus clones de salto com o sistema onde está cada um, os seus implantes e botões para definir destino e adicionar ponto de rota. Requer a permissão de clones."
+      },
+      "pilotsOnline": {
+        "title": "Pilotos online",
+        "desc": "Em instalações de corp e aliança, vê quem da tua organização esteve ativo nos últimos minutos, o que está a pilotar e onde. Qualquer pessoa pode ocultar a sua própria presença."
+      },
+      "announcer": {
+        "title": "Anunciador de voz",
+        "desc": "Alertas falados enquanto voas, com uma voz que corre no teu próprio dispositivo: low-sec e null-sec ao alcance, incursões, kills recentes nas proximidades, personagens a ligar-se e novas cadeias adicionadas por outros. Experimental, só em inglês."
+      },
+      "desktopAlerts": {
+        "title": "Alertas de ambiente de trabalho e som",
+        "desc": "Notificações de ambiente de trabalho e sons para kills na tua cadeia, buracos a entrar em fim de vida, novas saídas para k-space, correspondências da lista de vigilância e ameaças próximas, cada um ativado em separado com um único controlo de volume. Só as novidades geram alertas, nunca o mesmo item duas vezes."
+      },
+      "multiDestination": {
+        "title": "Destino para todas as tuas personagens",
+        "desc": "Define um destino ou adiciona um ponto de rota para todas as personagens online da tua conta de uma vez. Cada uma traça a sua própria rota a partir de onde estiver, e vês o que aconteceu com cada personagem."
+      },
+      "panelLayout": {
+        "title": "Disposição dos painéis",
+        "desc": "Coloca os painéis por baixo do mapa ou ao lado, divide-os em até três colunas redimensionáveis e escolhe o espaçamento Confortável, Compacto ou Denso. Oculta os painéis que não usas, abre-os em janelas à parte, e a tua disposição acompanha a tua conta em qualquer dispositivo."
       }
     },
     "corpFeatures": {
@@ -1435,7 +1519,7 @@
       },
       "adminDash": {
         "title": "Painel de administração",
-        "desc": "Uma página /admin dedicada com quatro separadores: Utilizadores, Mapas, Relatórios e Registo de auditoria. Os admins acedem a ela a partir do botão Administração da barra de ferramentas."
+        "desc": "Uma página /admin dedicada com separadores para Utilizadores, Acesso, Mapas, Relatórios, Registo de auditoria, Discord, Predefinições e Esquema predefinido. Os admins acedem a ela a partir do botão Administração da barra de ferramentas."
       },
       "userMgmt": {
         "title": "Gestão de utilizadores",
@@ -1472,6 +1556,22 @@
       "accessControl": {
         "title": "Controlo de acesso de utilizadores",
         "desc": "Decida quem pode entrar para além do núcleo .env: uma lista de permissões em BD (semeada a partir de CORP_ID/ALLIANCE_ID) gerida na área de admin, admissão automática opcional de corps/alianças amigas por standing (+5/+10) e um visualizador de standings agrupados por nível. As sessões são revalidadas ao vivo — revogar acesso, ou um piloto sair de uma corp admitida, desliga-o."
+      },
+      "invites": {
+        "title": "Convites com função",
+        "desc": "Coloca um piloto na lista de permissões antes de alguma vez ter iniciado sessão e escolhe a função com que chega. Um botão Enviar convite abre um EVE mail já redigido no teu próprio cliente. DEFAULT_USER_ROLE define a função com que todos os outros começam."
+      },
+      "orgDefaults": {
+        "title": "Predefinições da organização",
+        "desc": "Guarda a tua própria disposição de painéis como esquema inicial herdado pelos novos membros, e publica um conjunto padrão de predefinições de marca de ligação para todos."
+      },
+      "orgBranding": {
+        "title": "O teu logótipo",
+        "desc": "Uma instância gerida para uma corp ou aliança mostra o seu logótipo por cima do botão de início de sessão na página inicial, e ao lado do logótipo do nexum na barra de ferramentas."
+      },
+      "prebuiltImages": {
+        "title": "Imagens pré-construídas",
+        "desc": "Cada versão é publicada como imagens prontas a usar no GitHub Container Registry, por isso atualizar é um docker compose pull. Os scripts de cópia de segurança e restauro tratam de várias instâncias num mesmo host."
       }
     },
     "forCorpsBody": "Executa o Nexum como uma implementação partilhada para a tua corp ou aliança. Os membros obtêm mapas de cadeia visíveis para a corp e mapas pessoais privados numa só ferramenta, com permissões baseadas em funções, ferramentas de administração e relatórios de atividade por personagem.",

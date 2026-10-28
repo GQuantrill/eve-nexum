@@ -1233,7 +1233,7 @@
       },
       "multiSelect": {
         "title": "Multi-select bulk operations",
-        "desc": "Shift-click to select multiple systems or signatures, then bulk-assign type, delete, or rename in a single action."
+        "desc": "Shift or Cmd / Ctrl-click to select multiple systems or signatures, then bulk-assign type, delete, or rename in a single action."
       },
       "pngExport": {
         "title": "PNG export",
@@ -1273,7 +1273,7 @@
       },
       "crossMapSync": {
         "title": "Cross-map sync",
-        "desc": "Have the same system on several maps? Opt in and scanning it on one map copies its signatures and anomalies to the same system on your others — personal maps sync with your other personal maps, corp maps with the corp's. Non-destructive: it only adds missing entries and fills blanks, never overwriting what you've already entered or deleting anything."
+        "desc": "Have the same system on several maps? Opt in and scanning it on one map copies its signatures and anomalies to the same system on your others. Personal maps sync with your other personal maps (your alts' included), and corp or alliance maps with others of the same kind that have sync switched on. It only adds missing entries and fills blanks, never overwriting or deleting anything."
       },
       "realtime": {
         "title": "Real-time collaboration",
@@ -1285,15 +1285,15 @@
       },
       "rbac": {
         "title": "Role-based access",
-        "desc": "Four tiers — readonly, edit, full, admin — gating corp-map actions. Personal maps stay yours regardless of role."
+        "desc": "Read only, contributor, edit, full and admin, plus alliance admin on alliance installs. A contributor keeps signatures, anomalies and structures up to date and maps the chain by flying it, but can't reshape it by hand. Personal maps stay yours regardless of role."
       },
       "systemPanel": {
         "title": "System panel",
-        "desc": "Per-system cards for signatures, structures, NPC stations, notes, killboard, and activity charts. Cards are reorderable via drag-and-drop and persist per-user."
+        "desc": "Per-system cards for signatures, anomalies, structures, NPC stations, notes, killboard, PvP activity, d-scans and activity charts, with Dotlan, zKillboard and anoik.is links. Cards are reorderable via drag-and-drop and persist per-user."
       },
       "sigMgmt": {
         "title": "Signature management",
-        "desc": "Paste straight from the probe scanner. Tracks created / updated age per signature, auto-deletes sigs missing from a re-paste, and supports bulk type assignment for multi-select."
+        "desc": "Paste straight from the probe scanner. Shows who scanned each signature and how old it is, can remove sigs missing from a re-paste after a grace period, and never duplicates a signature when two pilots paste at once. Copy a paste-ready bookmark name from any row, in your own format or the map's."
       },
       "structImport": {
         "title": "Structure import",
@@ -1305,15 +1305,15 @@
       },
       "activityCharts": {
         "title": "Activity charts",
-        "desc": "24-hour rolling history of jumps, ship / pod kills, and NPC kills per system, polled from ESI hourly. The poller persists data for every k-space system — not just ones someone has opened — so charts populate the moment you view a new system."
+        "desc": "24-hour rolling history of jumps, ship / pod kills, and NPC kills per system, polled from ESI hourly for every k-space system. Show them stacked in your own order, or combined on one set of axes with exact values on hover."
       },
       "sovStation": {
         "title": "Sovereignty & station data",
-        "desc": "Live alliance / corp / faction sov info and NPC station services, with in-game waypoint and destination actions."
+        "desc": "Live alliance / corp / faction sov with the hub's ADM and its next vulnerability window, plus NPC station services, with in-game waypoint and destination actions."
       },
       "killboard": {
         "title": "Killboard pane",
-        "desc": "Recent zKillboard activity per system, with NPC-only kills hidden by default (toggle to include). Rows tint red when a hostile actor is in the chain or a blue gets killed; blue when a friendly scores or a hostile dies. Recent kills also bubble up as highlights on the map."
+        "desc": "Recent zKillboard and live-feed kills for a system or your whole map, over the last hour, day or week. Each kill is tagged when it happened on a gate or involved a HIC, dictor or smartbomb. NPC kills are hidden by default. Rows tint red when a hostile is involved or a blue dies, and blue when a friendly scores."
       },
       "effectDigest": {
         "title": "Chain-wide effect digest",
@@ -1324,8 +1324,8 @@
         "desc": "Your EVE contact list (personal, corp, and alliance — fetched via ESI on login and re-pullable on demand) drives a chain-wide visual layer. Sov holders show inline P/C/A standing pills; structures resolved via their EVE structure ID tint by owner-corp standing; sov-holder system nodes get a coloured halo so hostile territory stands out on the map."
       },
       "scout": {
-        "title": "Scout connections",
-        "desc": "Thera and Turnur public Eve-Scout connections surfaced into the sidebar so you can jump straight to known holes."
+        "title": "Thera & Turnur connections",
+        "desc": "Eve-Scout's public Thera and Turnur connections with both signature IDs and the route through the hub. Copy them onto your map in one click (holes eve-scout stops listing are tidied away), and report one as collapsed so routing stops using it."
       },
       "a0": {
         "title": "A0 sun detection",
@@ -1349,11 +1349,11 @@
       },
       "discordNotif": {
         "title": "Discord notifications",
-        "desc": "Push corp chain intel to a Discord channel so alerts land even when nobody's watching the tab. Fires server-side on an inbound K162 or a new wormhole connection, scoped to corp maps. Admins filter which regions and maps notify from the admin panel. Best-effort and rate-limit-aware; bulk operations like region seeding never spam the channel."
+        "desc": "Push chain intel to a Discord channel so alerts land even when nobody's watching the tab: new connections and K162s, new k-space exits with their route, kills on the chain and special kills, holes going end-of-life, and new Thera and Turnur holes. Admins choose which maps and regions post."
       },
       "routePlanner": {
         "title": "Route planner",
-        "desc": "Server-side BFS over stargates plus your live chain, so a route through a wormhole hop is a single click."
+        "desc": "Pick any two systems and get a route over stargates, your wormhole chains, Thera, Turnur and Ansiblex bridges. Find systems by the alias you gave them, and save the routes you fly often."
       },
       "locationTracking": {
         "title": "Location tracking",
@@ -1377,7 +1377,7 @@
       },
       "killHighlights": {
         "title": "Recent-kill highlights",
-        "desc": "Systems with kills in the last hour get a coloured halo so you can see fresh activity at a glance across the chain."
+        "desc": "Systems with kills get a sword on the map with their 24-hour kill count, bright when there's been fighting this hour, and a coloured halo for fresh activity across the chain."
       },
       "userStats": {
         "title": "User stats modal",
@@ -1392,8 +1392,8 @@
         "desc": "The landing page mounts a non-editable demo map so visitors can see what the tool does before logging in."
       },
       "sidebar": {
-        "title": "Collapsible sidebar",
-        "desc": "Map Options, Connections, Proximity Alerts, Stale System Fade, and Shortcuts each expand or collapse independently. Per-section state persists per browser via localStorage."
+        "title": "Choose your panels",
+        "desc": "Every sidebar section and system panel can be collapsed, reordered or switched off entirely. Your choices are saved to your account and follow you to another machine."
       },
       "colorVision": {
         "title": "Colour-blind modes",
@@ -1417,7 +1417,91 @@
       },
       "jumpPlanner": {
         "title": "Jump planner",
-        "desc": "Plot a multi-hop capital jump route between any two low/null systems. Pick a ship class and your skills, choose fewest jumps or least fuel, and see the route mapped with per-hop light-years and an isotope estimate. Save and reload your routes."
+        "desc": "Plot a multi-hop capital jump route between any two low/null systems. Pick a ship class and your skills, choose fewest jumps or least fuel, and see the route with per-hop light-years, an isotope estimate, jump fatigue and the reactivation timer. Avoid systems, add waypoints, use regional gates, and save your routes."
+      },
+      "addConnect": {
+        "title": "Add and connect in one step",
+        "desc": "Right-click a system to add a connected system in one go, or pick Connect to system and click the other end. The system you're standing in is offered first when you add one, and an Unknown placeholder marks a hole you haven't identified yet."
+      },
+      "mapGlance": {
+        "title": "Map at a glance",
+        "desc": "Connections show their state on the line itself: frigate holes are dashed, reduced and critical holes carry a coloured core, and the ship size sits beside the type. Each system shows how much of it has been scanned, statics show even in compact mode, and hovering a k-space system shows how many gate jumps it is from you."
+      },
+      "regionBorders": {
+        "title": "Region borders",
+        "desc": "Systems with a stargate into another region get a small tag naming it, so you can see where a chain lets you cross into Providence or Curse without adding the neighbouring system. Off by default; switch it on in System Options."
+      },
+      "layoutTools": {
+        "title": "Layout tools",
+        "desc": "Tidy layout arranges systems in the shape of their real regions. Untangle pulls linked systems together into tidy rows and columns. Reclassify gates turns wormhole lines that are really stargates into gate connections. Locked systems stay where you put them."
+      },
+      "flagPresets": {
+        "title": "Connection flag presets",
+        "desc": "Save an icon, colour and name as a preset and apply it to a connection in one click. Corps and alliances can publish a standard set for everyone."
+      },
+      "mapBackup": {
+        "title": "Import and full backups",
+        "desc": "Bring a map over from Pathfinder (aliases, intel markers, mass and end-of-life come with it) or from Tripwire (experimental, with signatures and system notes). Export a full JSON backup with signatures, anomalies, structures and every hole's mass and life, and import it back as an exact copy you own."
+      },
+      "jumpConfirm": {
+        "title": "Jumps fill in the hole",
+        "desc": "When you jump, nexum works out which signature you went through and sets where it leads, asking only when more than one could fit. The hole's updated bookmark name lands on your clipboard ready to paste in game. Clone jumps and pod deaths don't draw fake connections."
+      },
+      "sharing": {
+        "title": "Map sharing",
+        "desc": "Share a map with other characters, your corp or your alliance, or create a read-only link anyone can open without an account, with an expiry and a choice of what guests see. Shared maps show who owns them, and you can leave or hide one you don't use."
+      },
+      "mapHistory": {
+        "title": "Map history",
+        "desc": "Every change to a map's layout is recorded with who made it: systems, connections, signatures, chains, settings, sharing and merges. Kept for 30 days, and readable by the map's owner and admins from the map sidebar."
+      },
+      "dscan": {
+        "title": "D-scan and local analyser",
+        "desc": "Paste a directional scan for ships grouped by class and hull, an on-grid / off-grid filter, structures with their distance and the total mass on scan. Paste local chat for pilots grouped by alliance and corp. Every scan gets a link anyone can open for 24 hours, and scans attached to a system show in its panel. No login needed."
+      },
+      "pvpForecast": {
+        "title": "PvP activity forecast",
+        "desc": "For any system, 24 bars showing how busy each coming hour usually is on that day of the week, from zKillboard's last 90 days, with the busiest hour named and a live count of the last 24 hours. Times show in your own timezone. Works in wormhole space too."
+      },
+      "holeState": {
+        "title": "Mass and life while scanning",
+        "desc": "Record a hole's mass (full, under 50%, under 10%) and life (down to expired) straight from the signature list, before anyone has jumped it. Set it on either end and the other end and the line on the map match."
+      },
+      "siteDetails": {
+        "title": "Site details at a glance",
+        "desc": "Relic and data rows show whether the site spawns combat, event data sites show a safe-to-warp tick, ghost sites are their own type with their tier read from the scan, and Drifter holes fill in their own destination."
+      },
+      "chainExits": {
+        "title": "Chain exits",
+        "desc": "A toolbar list of every k-space system with an open wormhole on your chain, with the route to each and to your favourite systems through the exit you'd leave by. Get an alert in the app or in Discord when a new exit appears: high-sec only, low-sec and better, or any k-space."
+      },
+      "closestSystems": {
+        "title": "Closest systems",
+        "desc": "A side panel with how far trade hubs and your own list of systems are, counting gates, your wormhole chains, Thera and Turnur. It can use every map you can see or just the open one, and each wormhole hop names the map it came from."
+      },
+      "clones": {
+        "title": "Clones panel",
+        "desc": "Your medical clone and jump clones with the system each one is in, their implants, and set-destination and waypoint buttons. Needs the clones scope."
+      },
+      "pilotsOnline": {
+        "title": "Pilots online",
+        "desc": "On corp and alliance installs, see who in your organisation has been active in the last few minutes, what they're flying and where. Anyone can hide their own presence."
+      },
+      "announcer": {
+        "title": "Voice announcer",
+        "desc": "Spoken alerts while you fly, from a voice that runs on your own device: low-sec and null-sec coming into range, incursions, recent kills nearby, characters connecting, and new chains added by others. Experimental, English only."
+      },
+      "desktopAlerts": {
+        "title": "Desktop and sound alerts",
+        "desc": "Desktop notifications and sounds for kills on your chain, holes going end-of-life, new k-space exits, watchlist matches and nearby threats, each switched on separately with one volume control. Only new things alert, never the same item twice."
+      },
+      "multiDestination": {
+        "title": "Destination for all your characters",
+        "desc": "Set a destination or add a waypoint for every online character on your account at once. Each one plots its own route from wherever it is, and you see what happened for each character."
+      },
+      "panelLayout": {
+        "title": "Panel layouts",
+        "desc": "Put the panels under the map or beside it, split them into up to three resizable columns, and pick Comfortable, Compact or Dense spacing. Hide the panels you don't use, pop them out as windows, and your layout follows your account to any device."
       }
     },
     "corpFeatures": {
@@ -1435,7 +1519,7 @@
       },
       "adminDash": {
         "title": "Admin dashboard",
-        "desc": "A dedicated /admin page with four tabs: Users, Maps, Reports, and Audit log. Admins reach it from the toolbar's Admin button."
+        "desc": "A dedicated /admin page with tabs for Users, Access, Maps, Reports, Audit log, Discord, Flag presets and Default layout. Admins reach it from the toolbar's Admin button."
       },
       "userMgmt": {
         "title": "User management",
@@ -1472,6 +1556,22 @@
       "accessControl": {
         "title": "User access control",
         "desc": "Decide who can sign in beyond your .env core: a DB allow-list (seeded from CORP_ID/ALLIANCE_ID) managed in the admin area, optional auto-admit of friendly corps/alliances by in-game standing (+5/+10), and a standings viewer that groups your contacts by band. Sessions are re-checked live, so revoking access — or a pilot leaving an admitted corp — logs them out."
+      },
+      "invites": {
+        "title": "Invites with a role",
+        "desc": "Allow-list a pilot before they've ever signed in and choose the role they arrive with. A Mail invite button opens a ready-written EVE mail in your own client. DEFAULT_USER_ROLE sets the role everyone else starts with."
+      },
+      "orgDefaults": {
+        "title": "Org defaults",
+        "desc": "Capture your own panel arrangement as the starting layout new members inherit, and publish a standard set of connection flag presets for everyone."
+      },
+      "orgBranding": {
+        "title": "Your logo",
+        "desc": "An instance run for a corp or alliance shows its logo above the login button on the front page, and next to the nexum logo in the toolbar."
+      },
+      "prebuiltImages": {
+        "title": "Pre-built images",
+        "desc": "Every release is published as ready-to-run images on GitHub Container Registry, so updating is a docker compose pull. Backup and restore scripts handle several instances on one host."
       }
     },
     "forCorpsBody": "Run Nexum as a shared deployment for your corp or alliance. Members get visible-to-the-corp chain maps and private personal maps in one tool, with role-based permissions, admin tooling, and per-character activity reporting.",
