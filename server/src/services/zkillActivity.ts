@@ -4,7 +4,7 @@
 // ourselves recently, zKill has always been counting.
 import { createLogger } from '../utils/logger.js';
 import { TtlCache } from '../utils/cache.js';
-import { ZKB_AGENT } from '../routes/killboard.js';
+import { ZKB_AGENT } from '../utils/zkill.js';
 
 const log = createLogger('zkillActivity');
 

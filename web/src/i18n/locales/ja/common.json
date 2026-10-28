@@ -52,16 +52,19 @@
     "noHistory": "まだ PvP の履歴はありません。これ以降、ここでのプレイヤーキルが記録されます。",
     "noneInDays_one": "過去 1 日間、ここでキルはありません。",
     "noneInDays_other": "過去 {{count}} 日間、ここでキルはありません。",
-    "busiestNow": "現在が最も活発（{{hour}} UTC）",
-    "busiestNext": "最も活発なのは {{hour}} UTC、{{n}} 時間後",
+    "busiestNow": "現在が最も活発（{{time}}）",
+    "busiestNext": "最も活発なのは {{time}}、{{n}} 時間後",
     "quietAhead": "今後 24 時間は静か",
     "killsInDays": "{{days}} 日間で {{n}} 件",
     "recent": "ライブフィード：過去 24 時間で {{n}} 件",
     "chartLabel": "今後 24 時間の時間帯別プレイヤーキル",
-    "barTitle": "{{day}} {{hour}} UTC：{{n}}",
+    "barTitle": "{{day}} {{time}}：{{n}}",
     "now": "現在",
     "noteZkill": "zKillboard の過去 90 日間の UTC 曜日・時間帯別キル。暖色のバーほど普段から活発です。",
-    "noteLive": "zKillboard に接続できないため、ここでこれまでに記録されたキルを使用しています。"
+    "noteLive": "zKillboard に接続できないため、ここでこれまでに記録されたキルを使用しています。",
+    "timesIn": "表示時刻",
+    "zoneAuto": "ローカル（{{zone}}）",
+    "zoneUtc": "EVE 時間（UTC）"
   },
   "addSystem": {
     "title": "星系を追加",
@@ -994,7 +997,33 @@
     "noKillsOnRecord": "記録されているキルはありません。",
     "noKillsNpc": "過去24時間にキルはありません — NPC のみ {{count}} 件を非表示。",
     "showThem": "表示する",
-    "loadMore": "さらに読み込む（残り {{count}}）"
+    "loadMore": "さらに読み込む（残り {{count}}）",
+    "scopeLabel": "キルの表示範囲",
+    "scopeSystem": "この星系",
+    "scopeMap": "マップ全体",
+    "windowLabel": "期間",
+    "window": {
+      "1h": "1時間",
+      "24h": "24時間",
+      "7d": "7日"
+    },
+    "showingOf": "{{total}} 件中 {{shown}} 件",
+    "tags": {
+      "gate": "ゲート",
+      "hic": "HIC",
+      "dic": "ディクター",
+      "sb": "SB",
+      "npc": "NPC",
+      "solo": "ソロ"
+    },
+    "tagTips": {
+      "gate": "スターゲートで撃沈",
+      "hic": "キルメールにヘビーインターディクターが含まれる",
+      "dic": "キルメールにインターディクターが含まれる",
+      "sb": "スマートボムで撃沈",
+      "npc": "キルメールは NPC のみ",
+      "solo": "攻撃者 1 名"
+    }
   },
   "labelsDialog": {
     "title": "カスタムラベル",
@@ -1385,7 +1414,9 @@
     "jumps_one": "{{count}} ジャンプ",
     "jumps_other": "{{count}} ジャンプ",
     "killsTooltip": "今時間 {{ships}} 艦船 · {{pods}} ポッドキル",
-    "killsTooltipHint": "CCP の時間別集計 · killmail はまだ zKillboard にない場合があります",
+    "kills24h_one": "過去 24 時間のプレイヤーキル {{count}} 件",
+    "kills24h_other": "過去 24 時間のプレイヤーキル {{count}} 件",
+    "killsTooltipHint": "ライブキルフィードと CCP の毎時集計による",
     "recentKill": "{{ago}}分前のキル ({{value}} ISK)",
     "scanned": "{{total}} 件中 {{scanned}} 件のシグネチャをスキャン済み",
     "scoutConnectionsMulti": "{{names}} 接続",

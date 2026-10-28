@@ -7,6 +7,8 @@ export interface SystemKills {
   podKills:  number;
   npcKills:  number;
   jumps:     number;
+  /** Player kills in the last 24 hours (the count on each map node). */
+  kills24h?: number;
 }
 
 const POLL_MS = 5 * 60 * 1000;
@@ -24,7 +26,8 @@ function sameKills(a: Map<number, SystemKills>, b: Map<number, SystemKills>): bo
         || vb.shipKills !== va.shipKills
         || vb.podKills  !== va.podKills
         || vb.npcKills  !== va.npcKills
-        || vb.jumps     !== va.jumps) return false;
+        || vb.jumps     !== va.jumps
+        || vb.kills24h  !== va.kills24h) return false;
   }
   return true;
 }

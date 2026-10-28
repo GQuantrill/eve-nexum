@@ -1105,6 +1105,20 @@
   position: relative;
 }
 
+/* Kills earlier in the day, none this hour: same icon, out of the way. */
+.system-node__kill-icon--quiet {
+  color: var(--text-faint);
+  filter: none;
+}
+
+.system-node__kill-count {
+  margin-left: 1px;
+  font-size: calc(10px * var(--font-scale, 1));
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  vertical-align: top;
+}
+
 .system-node__kill-tooltip {
   display: none;
   position: absolute;

@@ -52,16 +52,19 @@
     "noHistory": "아직 PvP 기록이 없습니다. 지금부터 이곳의 플레이어 킬이 기록됩니다.",
     "noneInDays_one": "지난 1일 동안 이곳에서 킬이 없었습니다.",
     "noneInDays_other": "지난 {{count}}일 동안 이곳에서 킬이 없었습니다.",
-    "busiestNow": "지금이 가장 활발함 ({{hour}} UTC)",
-    "busiestNext": "가장 활발한 시간 {{hour}} UTC, {{n}}시간 후",
+    "busiestNow": "지금이 가장 활발함 ({{time}})",
+    "busiestNext": "가장 활발한 시간 {{time}}, {{n}}시간 후",
     "quietAhead": "앞으로 24시간 동안 조용함",
     "killsInDays": "{{days}}일간 {{n}}건",
     "recent": "실시간 피드: 지난 24시간 {{n}}건",
     "chartLabel": "앞으로 24시간 동안 시간대별 플레이어 킬",
-    "barTitle": "{{day}} {{hour}} UTC: {{n}}",
+    "barTitle": "{{day}} {{time}}: {{n}}",
     "now": "지금",
     "noteZkill": "zKillboard 최근 90일의 UTC 요일·시간대별 킬. 색이 뜨거울수록 보통 더 활발합니다.",
-    "noteLive": "zKillboard에 연결할 수 없어 지금까지 이곳에서 기록된 킬을 사용합니다."
+    "noteLive": "zKillboard에 연결할 수 없어 지금까지 이곳에서 기록된 킬을 사용합니다.",
+    "timesIn": "시간대",
+    "zoneAuto": "현지 ({{zone}})",
+    "zoneUtc": "EVE 시간 (UTC)"
   },
   "addSystem": {
     "title": "성계 추가",
@@ -994,7 +997,33 @@
     "noKillsOnRecord": "기록된 킬이 없습니다.",
     "noKillsNpc": "지난 24시간 내 킬 없음 — NPC 전용 {{count}}개 숨김.",
     "showThem": "표시",
-    "loadMore": "더 불러오기 ({{count}}개 남음)"
+    "loadMore": "더 불러오기 ({{count}}개 남음)",
+    "scopeLabel": "킬 표시 범위",
+    "scopeSystem": "이 성계",
+    "scopeMap": "지도 전체",
+    "windowLabel": "기간",
+    "window": {
+      "1h": "1시간",
+      "24h": "24시간",
+      "7d": "7일"
+    },
+    "showingOf": "{{total}}건 중 {{shown}}건",
+    "tags": {
+      "gate": "게이트",
+      "hic": "HIC",
+      "dic": "딕터",
+      "sb": "SB",
+      "npc": "NPC",
+      "solo": "솔로"
+    },
+    "tagTips": {
+      "gate": "스타게이트에서 격추됨",
+      "hic": "킬메일에 헤비 인터딕터가 있음",
+      "dic": "킬메일에 인터딕터가 있음",
+      "sb": "스마트밤으로 격추됨",
+      "npc": "킬메일에 NPC만 있음",
+      "solo": "공격자 한 명"
+    }
   },
   "labelsDialog": {
     "title": "사용자 라벨",
@@ -1385,7 +1414,9 @@
     "jumps_one": "{{count}} 점프",
     "jumps_other": "{{count}} 점프",
     "killsTooltip": "이번 시간 {{ships}} 함선 · {{pods}} 캡슐 킬",
-    "killsTooltipHint": "CCP 시간별 집계 · 킬메일이 아직 zKillboard에 없을 수 있음",
+    "kills24h_one": "지난 24시간 플레이어 킬 {{count}}건",
+    "kills24h_other": "지난 24시간 플레이어 킬 {{count}}건",
+    "killsTooltipHint": "실시간 킬 피드와 CCP의 시간별 집계 기준",
     "recentKill": "{{ago}}분 전 격추 ({{value}} ISK)",
     "scanned": "시그니처 {{total}}개 중 {{scanned}}개 스캔 완료",
     "scoutConnectionsMulti": "{{names}} 연결",

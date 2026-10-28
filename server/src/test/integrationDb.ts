@@ -92,7 +92,7 @@ export function ensureIntegrationDb(): Promise<boolean> {
 }
 
 const TABLES = [
-  'solar_systems', 'map_regions', 'item_categories', 'item_groups', 'item_types', 'dscans', 'system_pvp_hours',
+  'solar_systems', 'map_regions', 'item_categories', 'item_groups', 'item_types', 'dscans', 'system_pvp_hours', 'recent_kills', 'system_activity',
   'access_grants', 'app_settings', 'map_shares', 'maps',
   'corp_standings', 'alliance_standings', 'character_standings',
   'standings_refresh', 'entity_names', 'sessions', 'user_events', 'users',

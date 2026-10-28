@@ -352,3 +352,66 @@
   font-size: calc(13px * var(--font-scale, 1));
   color: var(--text-faint);
 }
+
+/* Scope (this system / whole map) and time window, above the list. */
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-8);
+  padding: var(--sp-2) var(--sp-4) var(--sp-4);
+}
+
+.seg {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.segBtn {
+  background: transparent;
+  border: 0;
+  border-right: 1px solid var(--border);
+  color: var(--text-faint);
+  cursor: pointer;
+  font-size: calc(11px * var(--font-scale, 1));
+  letter-spacing: 0.04em;
+  padding: var(--sp-2) var(--sp-8);
+
+  &:last-child { border-right: 0; }
+  &:hover { color: var(--text-secondary); }
+}
+
+.segOn {
+  background: var(--surface-hover);
+  color: var(--text-bright);
+}
+
+/* Which system a kill was in (whole-map view). */
+.killSystem {
+  color: var(--text-secondary);
+}
+
+/* Kill-type chips: gate, HIC, dictor, smartbomb, NPC. */
+.tags {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--sp-2);
+}
+
+.tag {
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--text-secondary);
+  font-size: calc(10px * var(--font-scale, 1));
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 0 var(--sp-3);
+  text-transform: uppercase;
+}
+
+.tag_gate { color: var(--warning); border-color: currentColor; }
+.tag_hic,
+.tag_dic  { color: var(--accent-bright); border-color: currentColor; }
+.tag_sb   { color: #ff6060; border-color: currentColor; }

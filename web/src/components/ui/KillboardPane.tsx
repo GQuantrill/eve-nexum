@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
-import { useKillboard, useLastKill } from '../../hooks/useKillboard';
+import { useKillboard, useLastKill, KILL_WINDOWS, type KillTag, type KillWindow } from '../../hooks/useKillboard';
+import { useMapStore } from '../../store/mapStore';
+import { useShareMode } from '../../context/ShareModeContext';
 import { useStandings } from '../../hooks/useStandings';
 import { useUserSetting } from '../../hooks/useUserSetting';
 import { useNow30s } from '../../hooks/useNow30s';
-import { useSystemKillLog, RECENT_KILL_MS, type KillRow as FeedKill } from '../../store/killStore';
+import { useSystemKillLog, useKillLog, RECENT_KILL_MS, type KillRow as FeedKill } from '../../store/killStore';
 import { abbreviateValue, splitHoursMinutes } from '../../i18n/format';
 import type { ZkbKill } from '../../hooks/useKillboard';
 import styles from './KillboardPane.module.css';
@@ -36,6 +38,13 @@ function killRowToZkb(r: FeedKill): ZkbKill {
 }
 
 const NPC_TOGGLE_KEY = 'nexum.killboardIncludeNpc';
+const WINDOW_KEY = 'nexum.killboard.window';
+const SCOPE_KEY  = 'nexum.killboard.scope';
+const WINDOW_MS: Record<KillWindow, number> = { '1h': 3_600_000, '24h': 86_400_000, '7d': 604_800_000 };
+
+// Shown as chips on a kill. Solo is left out: the attacker-count badge already
+// says "1".
+const SHOWN_TAGS: KillTag[] = ['gate', 'hic', 'dic', 'sb', 'npc'];
 
 // How many kills to reveal initially and per "Load more" click. Sized to
 // match what fit on a single page under the old paginator so the default
@@ -245,7 +254,19 @@ function KillRow({ kill, standings, pulse }: { kill: ZkbKill; standings: ReturnT
 
         <div className={styles.killMeta}>
           <span className={styles.value}>{abbreviateValue(kill.zkb.totalValue)} ISK</span>
-          <span className={styles.time}>{timeAgo(t, kill.killmail_time)}</span>
+          <span className={styles.time}>
+            {kill.systemName && <span className={styles.killSystem}>{kill.systemName} · </span>}
+            {timeAgo(t, kill.killmail_time)}
+          </span>
+          {kill.tags && kill.tags.some((tag) => SHOWN_TAGS.includes(tag)) && (
+            <span className={styles.tags}>
+              {SHOWN_TAGS.filter((tag) => kill.tags!.includes(tag)).map((tag) => (
+                <span key={tag} className={`${styles.tag} ${styles[`tag_${tag}`] ?? ''}`} data-tip={t(`killboard.tagTips.${tag}`)}>
+                  {t(`killboard.tags.${tag}`)}
+                </span>
+              ))}
+            </span>
+          )}
         </div>
       </div>
     </div>
@@ -260,29 +281,45 @@ export function KillboardPane({ eveSystemId }: Props) {
   const { t } = useTranslation();
   const [includeNpc, setIncludeNpc] = useUserSetting<boolean>(NPC_TOGGLE_KEY, false);
 
-  const { kills, loading, error, lastUpdated, npcCount, refresh } = useKillboard(eveSystemId, { includeNpc });
+  const [windowRaw, setWindow] = useUserSetting<string>(WINDOW_KEY, '24h');
+  const killWindow: KillWindow = (KILL_WINDOWS as string[]).includes(windowRaw) ? (windowRaw as KillWindow) : '24h';
+  const [scopeRaw, setScope] = useUserSetting<string>(SCOPE_KEY, 'system');
+  const activeMapId = useMapStore((s) => s.activeMapId);
+  const { isShareMode } = useShareMode();
+  // The whole-map list is a signed-in map's; a share-link viewer stays on the system.
+  const canMapScope = !!activeMapId && !isShareMode;
+  const mapScope = scopeRaw === 'map' && canMapScope;
+
+  const { kills, total, loading, error, lastUpdated, npcCount, refresh } = useKillboard(eveSystemId, {
+    includeNpc, window: killWindow, mapId: mapScope ? activeMapId : null,
+  });
   const standings = useStandings();
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   // Merge the live kill feed for this system with the zKill REST list so recent
   // notable kills show immediately, without waiting on zKill's cached REST API.
-  const liveRows = useSystemKillLog(eveSystemId);
-  const now      = useNow30s();
+  const systemLive = useSystemKillLog(eveSystemId);
+  const mapLive    = useKillLog();
+  const now        = useNow30s();
+  const liveRows   = useMemo(
+    () => (mapScope ? mapLive : systemLive).filter((r) => now - r.atMs < WINDOW_MS[killWindow]),
+    [mapScope, mapLive, systemLive, now, killWindow],
+  );
   const liveIds  = useMemo(() => new Set(liveRows.map((r) => r.killmailId)), [liveRows]);
   const mergedKills = useMemo(() => {
     const byId = new Map<number, ZkbKill>();
     for (const k of kills) byId.set(k.killmail_id, k); // REST first — fuller attacker list wins on overlap
     for (const r of liveRows) {
       if (!includeNpc && r.npc) continue;              // respect the NPC toggle for live rows too
-      if (!byId.has(r.killmailId)) byId.set(r.killmailId, killRowToZkb(r));
+      if (!byId.has(r.killmailId)) byId.set(r.killmailId, { ...killRowToZkb(r), ...(mapScope ? { systemName: r.systemName } : {}) });
     }
     return [...byId.values()].sort((a, b) => Date.parse(b.killmail_time) - Date.parse(a.killmail_time));
-  }, [kills, liveRows, includeNpc]);
+  }, [kills, liveRows, includeNpc, mapScope]);
 
   // Nothing in the last 24h (and not merely NPC-filtered) → look up the last
   // kill of any age so the pane can say "last kill was X ago" instead of a bare
   // "no kills". Gated so active systems never trigger the extra lookup.
-  const trulyEmpty     = !loading && !error && kills.length === 0 && !(npcCount > 0 && !includeNpc);
+  const trulyEmpty     = !mapScope && !loading && !error && kills.length === 0 && !(npcCount > 0 && !includeNpc);
   const lastKillTime   = useLastKill(eveSystemId, trulyEmpty);
 
   // Reset the lazy window whenever the system or filter changes — otherwise
@@ -290,9 +327,9 @@ export function KillboardPane({ eveSystemId }: Props) {
   // next system the user clicks on, which is jarring.
   // Deliberate: resets paging when the system changes.
   // eslint-disable-next-line react-hooks/set-state-in-effect
-  useEffect(() => { setVisibleCount(PAGE_SIZE); }, [eveSystemId, includeNpc]);
+  useEffect(() => { setVisibleCount(PAGE_SIZE); }, [eveSystemId, includeNpc, killWindow, mapScope]);
 
-  if (!eveSystemId) {
+  if (!eveSystemId && !mapScope) {
     return <p className={styles.state}>{t('panes.noEveSystem')}</p>;
   }
 
@@ -304,9 +341,42 @@ export function KillboardPane({ eveSystemId }: Props) {
   // when the filter is hiding every kill.
   return (
     <div className={styles.pane}>
+      <div className={styles.controls}>
+        {canMapScope && (
+          <span className={styles.seg} role="group" aria-label={t('killboard.scopeLabel')}>
+            {(['system', 'map'] as const).map((sc) => (
+              <button
+                key={sc}
+                type="button"
+                className={`${styles.segBtn}${(sc === 'map') === mapScope ? ` ${styles.segOn}` : ''}`}
+                aria-pressed={(sc === 'map') === mapScope}
+                onClick={() => setScope(sc)}
+              >
+                {sc === 'map' ? t('killboard.scopeMap') : t('killboard.scopeSystem')}
+              </button>
+            ))}
+          </span>
+        )}
+        <span className={styles.seg} role="group" aria-label={t('killboard.windowLabel')}>
+          {KILL_WINDOWS.map((w) => (
+            <button
+              key={w}
+              type="button"
+              className={`${styles.segBtn}${w === killWindow ? ` ${styles.segOn}` : ''}`}
+              aria-pressed={w === killWindow}
+              onClick={() => setWindow(w)}
+            >
+              {t(`killboard.window.${w}`)}
+            </button>
+          ))}
+        </span>
+      </div>
       <div className={styles.paneMeta}>
         <span>
-          {t('units.kills', { count: mergedKills.length })}
+          {/* Only when the server capped the list -- not because NPC kills are hidden. */}
+          {total != null && total > kills.length + (includeNpc ? 0 : npcCount)
+            ? t('killboard.showingOf', { shown: mergedKills.length, total })
+            : t('units.kills', { count: mergedKills.length })}
           {!includeNpc && npcCount > 0 && (
             <span className={styles.npcHidden} data-tooltip={t('killboard.npcHiddenTooltip')}>
               {' '}· {t('killboard.npcHidden', { count: npcCount })}

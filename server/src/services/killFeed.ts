@@ -6,6 +6,8 @@ import { resolveEntityNames } from './entityNames.js';
 import { notifyDiscord, killEmbed } from './discord.js';
 import { recordKill, recordLiveKill, type BufferedKill } from './killBuffer.js';
 import { recordPvpKill, flushPvpKills } from './pvpHistory.js';
+import { storeKill } from './killStore.js';
+import { tagsFor, loadGroups, attackerTypeIds } from './killTags.js';
 import { getSetting, setSetting } from './appSettings.js';
 
 // A single decorated kill, shared by the live SSE `kill.recent` event and the
@@ -132,12 +134,12 @@ interface EsiKillmail {
   killmail_time?:   string;
   solar_system_id?: number;
   victim?:          { ship_type_id?: number; character_id?: number; corporation_id?: number; alliance_id?: number };
-  attackers?:       Array<{ character_id?: number; corporation_id?: number; alliance_id?: number; ship_type_id?: number; final_blow?: boolean }>;
+  attackers?:       Array<{ character_id?: number; corporation_id?: number; alliance_id?: number; ship_type_id?: number; weapon_type_id?: number; final_blow?: boolean }>;
 }
 interface EphemeralKill {
   killmail_id?: number;
   esi?:         EsiKillmail;       // the raw ESI killmail (R2Z2 nests it under `esi`)
-  zkb?:         { totalValue?: number; npc?: boolean; solo?: boolean };
+  zkb?:         { totalValue?: number; npc?: boolean; solo?: boolean; locationID?: number };
   uploaded_at?: number;            // unix seconds R2Z2 published it
 }
 
@@ -240,7 +242,15 @@ export async function processKill(body: EphemeralKill, replayed = false): Promis
     solo: !!body.zkb?.solo,
     npc,
   };
+  const typeIds = attackerTypeIds(km.attackers);
+  buffered.tags = tagsFor(
+    { locationId: Number(body.zkb?.locationID) || null, solo: buffered.solo, npc, typeIds },
+    await loadGroups(typeIds),
+  );
   recordKill(buffered);
+  // The week-long store behind the killboard's windows and whole-map view; the
+  // killmail id is its key, so a replayed kill is a no-op there.
+  storeKill({ ...buffered, tags: buffered.tags });
 
   if (!(totalValue >= config.killFeed.minValueIsk)) return;
   stats.overMin++;

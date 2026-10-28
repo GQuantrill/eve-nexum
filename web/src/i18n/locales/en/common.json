@@ -52,16 +52,19 @@
     "noHistory": "No PvP history yet. Player kills here are recorded from now on.",
     "noneInDays_one": "No kills here in the last day.",
     "noneInDays_other": "No kills here in the last {{count}} days.",
-    "busiestNow": "Busiest now ({{hour}} UTC)",
-    "busiestNext": "Busiest at {{hour}} UTC, in {{n}}h",
+    "busiestNow": "Busiest now ({{time}})",
+    "busiestNext": "Busiest at {{time}}, in {{n}}h",
     "quietAhead": "Quiet for the next 24 hours",
     "killsInDays": "{{n}} in {{days}}d",
     "recent": "Live feed: {{n}} in the last 24h",
     "chartLabel": "Player kills by hour of day for the next 24 hours",
-    "barTitle": "{{day}} {{hour}} UTC: {{n}}",
+    "barTitle": "{{day}} {{time}}: {{n}}",
     "now": "now",
     "noteZkill": "Kills by UTC weekday and hour over zKillboard's last 90 days. Hotter bars are usually busier.",
-    "noteLive": "zKillboard is unreachable, so this uses the kills recorded here so far."
+    "noteLive": "zKillboard is unreachable, so this uses the kills recorded here so far.",
+    "timesIn": "Times in",
+    "zoneAuto": "Local ({{zone}})",
+    "zoneUtc": "EVE time (UTC)"
   },
   "addSystem": {
     "title": "Add System",
@@ -994,7 +997,33 @@
     "noKillsOnRecord": "No kills on record.",
     "noKillsNpc": "No kills in the last 24h — {{count}} NPC-only hidden.",
     "showThem": "Show them",
-    "loadMore": "Load more ({{count}} remaining)"
+    "loadMore": "Load more ({{count}} remaining)",
+    "scopeLabel": "Show kills for",
+    "scopeSystem": "This system",
+    "scopeMap": "Whole map",
+    "windowLabel": "Time window",
+    "window": {
+      "1h": "1h",
+      "24h": "24h",
+      "7d": "7d"
+    },
+    "showingOf": "{{shown}} of {{total}} kills",
+    "tags": {
+      "gate": "Gate",
+      "hic": "HIC",
+      "dic": "Dictor",
+      "sb": "SB",
+      "npc": "NPC",
+      "solo": "Solo"
+    },
+    "tagTips": {
+      "gate": "Killed on a stargate",
+      "hic": "A heavy interdictor was on the killmail",
+      "dic": "An interdictor was on the killmail",
+      "sb": "Killed by a smartbomb",
+      "npc": "Only NPCs on the killmail",
+      "solo": "One attacker"
+    }
   },
   "labelsDialog": {
     "title": "Custom labels",
@@ -1385,7 +1414,9 @@
     "jumps_one": "{{count}} jump",
     "jumps_other": "{{count}} jumps",
     "killsTooltip": "{{ships}} ship · {{pods}} pod kills this hour",
-    "killsTooltipHint": "CCP hourly count · killmail may not be on zKillboard yet",
+    "kills24h_one": "{{count}} player kill in the last 24h",
+    "kills24h_other": "{{count}} player kills in the last 24h",
+    "killsTooltipHint": "From the live kill feed and CCP's hourly counts",
     "recentKill": "Kill {{ago}}m ago ({{value}} ISK)",
     "scanned": "{{scanned}} of {{total}} signatures scanned",
     "scoutConnectionsMulti": "{{names}} connections",

@@ -1384,6 +1384,29 @@ export async function migrate() {
       PRIMARY KEY (eve_system_id, hour)
     );
     CREATE INDEX IF NOT EXISTS idx_system_pvp_hours_hour ON system_pvp_hours (hour);
+
+    -- The last week of kills from the live feed (services/killStore.ts), for
+    -- the killboard's whole-map view and its 1h / 24h / 7d windows.
+    CREATE TABLE IF NOT EXISTS recent_kills (
+      killmail_id           BIGINT           PRIMARY KEY,
+      eve_system_id         INTEGER          NOT NULL,
+      killed_at             TIMESTAMPTZ      NOT NULL,
+      ship_type_id          INTEGER          NOT NULL DEFAULT 0,
+      total_value           DOUBLE PRECISION NOT NULL DEFAULT 0,
+      victim_character_id   INTEGER,
+      victim_corporation_id INTEGER,
+      victim_alliance_id    INTEGER,
+      fb_character_id       INTEGER,
+      fb_corporation_id     INTEGER,
+      fb_alliance_id        INTEGER,
+      fb_ship_type_id       INTEGER          NOT NULL DEFAULT 0,
+      attacker_count        INTEGER          NOT NULL DEFAULT 0,
+      solo                  BOOLEAN          NOT NULL DEFAULT FALSE,
+      npc                   BOOLEAN          NOT NULL DEFAULT FALSE,
+      tags                  TEXT[]           NOT NULL DEFAULT '{}'
+    );
+    CREATE INDEX IF NOT EXISTS idx_recent_kills_system_time ON recent_kills (eve_system_id, killed_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_recent_kills_time ON recent_kills (killed_at);
   `);
 
   await encryptLegacyTokens();
