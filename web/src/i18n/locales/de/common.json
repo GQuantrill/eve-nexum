@@ -1827,6 +1827,10 @@
     "routePreference": "Routenpräferenz",
     "routeSecure": "Sicher",
     "routeShortcutNote": "Routen über ein Wurmloch, Thera, Turnur oder ein Sprungtor können nicht als spielinternes Ziel oder Wegpunkt gesetzt werden — Rechtsklick auf ein K-Space-System in der Route, um stattdessen dorthin zu navigieren.",
+    "waypointSendTo": "Ziel geht an",
+    "waypointSendToMe": "Diesen Charakter",
+    "waypointSendToAllOnline": "Alle eingeloggten Charaktere",
+    "waypointSendToHint": "Gilt überall für „Ziel setzen“ und „Wegpunkt hinzufügen“. Jeder Charakter plant seine eigene Route von seinem Standort aus; nicht eingeloggte Charaktere werden übersprungen.",
     "routeShortest": "Kürzeste",
     "sections": {
       "mapOptions": "Kartenoptionen",
@@ -2012,7 +2016,19 @@
   "routeToast": {
     "destinationSet": "Ziel festgelegt auf {{system}}",
     "waypointAdded": "{{system}} erfolgreich zu den Wegpunkten hinzugefügt.",
-    "failed": "Wegpunkt konnte nicht gesetzt werden — ist dein Charakter online?"
+    "failed": "Wegpunkt konnte nicht gesetzt werden — ist dein Charakter online?",
+    "destinationSetFor_one": "Ziel {{system}} für {{count}} Charakter gesetzt",
+    "destinationSetFor_other": "Ziel {{system}} für {{count}} Charaktere gesetzt",
+    "waypointAddedFor_one": "{{system}} für {{count}} Charakter zu den Wegpunkten hinzugefügt",
+    "waypointAddedFor_other": "{{system}} für {{count}} Charaktere zu den Wegpunkten hinzugefügt",
+    "notSentTo": "Nicht gesendet an: {{list}}",
+    "noneSent": "Für keinen Charakter gesetzt: {{list}}",
+    "reason": {
+      "offline": "nicht eingeloggt",
+      "no_scope": "erneut einloggen, um Wegpunkte zu erlauben",
+      "token_expired": "erneut einloggen",
+      "esi_error": "EVE hat nicht geantwortet"
+    }
   },
   "scout": {
     "noConnections": "Keine {{system}}-Verbindungen.",
@@ -2387,7 +2403,13 @@
   },
   "waypoint": {
     "setDestination": "Ziel festlegen",
-    "addWaypoint": "Wegpunkt hinzufügen"
+    "addWaypoint": "Wegpunkt hinzufügen",
+    "sendTo": "An Charaktere senden…",
+    "sendToTitle": "{{system}} senden an…",
+    "sendToHint": "Jeder Charakter plant seine eigene Route von seinem Standort aus. Nur eingeloggte Charaktere können es empfangen.",
+    "you": "du",
+    "offline": "offline",
+    "noneOnline": "Keiner deiner Charaktere ist eingeloggt."
   },
   "whChart": {
     "open": "⊟ Wurmloch-Referenz",

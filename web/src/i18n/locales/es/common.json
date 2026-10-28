@@ -1827,6 +1827,10 @@
     "routePreference": "Preferencia de ruta",
     "routeSecure": "Segura",
     "routeShortcutNote": "Las rutas que usan un agujero de gusano, Thera, Turnur o una puerta de salto no se pueden establecer como destino o punto de ruta en el juego; haz clic derecho en un sistema k-space de la ruta para ir a él.",
+    "waypointSendTo": "El destino va a",
+    "waypointSendToMe": "Este personaje",
+    "waypointSendToAllOnline": "Todos los personajes conectados",
+    "waypointSendToHint": "Se aplica a Fijar destino y Añadir punto de ruta en todas partes. Cada personaje traza su propia ruta desde donde está; se omiten los que no están conectados.",
     "routeShortest": "Más corta",
     "sections": {
       "mapOptions": "Opciones de mapa",
@@ -2012,7 +2016,19 @@
   "routeToast": {
     "destinationSet": "Destino establecido en {{system}}",
     "waypointAdded": "{{system}} añadido a los puntos de ruta correctamente.",
-    "failed": "No se pudo establecer el punto de ruta — ¿está tu personaje en línea?"
+    "failed": "No se pudo establecer el punto de ruta — ¿está tu personaje en línea?",
+    "destinationSetFor_one": "Destino fijado en {{system}} para {{count}} personaje",
+    "destinationSetFor_other": "Destino fijado en {{system}} para {{count}} personajes",
+    "waypointAddedFor_one": "{{system}} añadido a los puntos de ruta de {{count}} personaje",
+    "waypointAddedFor_other": "{{system}} añadido a los puntos de ruta de {{count}} personajes",
+    "notSentTo": "No enviado a: {{list}}",
+    "noneSent": "No se pudo fijar para ningún personaje: {{list}}",
+    "reason": {
+      "offline": "no conectado",
+      "no_scope": "vuelve a iniciar sesión para permitir puntos de ruta",
+      "token_expired": "vuelve a iniciar sesión",
+      "esi_error": "EVE no respondió"
+    }
   },
   "scout": {
     "noConnections": "No hay conexiones de {{system}}.",
@@ -2387,7 +2403,13 @@
   },
   "waypoint": {
     "setDestination": "Establecer destino",
-    "addWaypoint": "Añadir punto de ruta"
+    "addWaypoint": "Añadir punto de ruta",
+    "sendTo": "Enviar a personajes…",
+    "sendToTitle": "Enviar {{system}} a…",
+    "sendToHint": "Cada personaje traza su propia ruta desde donde está. Solo los personajes conectados pueden recibirlo.",
+    "you": "tú",
+    "offline": "desconectado",
+    "noneOnline": "Ninguno de tus personajes está conectado."
   },
   "whChart": {
     "open": "⊟ Referencia de agujeros de gusano",

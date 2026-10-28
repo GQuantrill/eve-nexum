@@ -1827,6 +1827,10 @@
     "routePreference": "Preferência de rota",
     "routeSecure": "Segura",
     "routeShortcutNote": "Rotas que usam um buraco de minhoca, Thera, Turnur ou um portão de salto não podem ser definidas como destino ou ponto de rota no jogo — clique com o botão direito em um sistema k-space da rota para ir até ele.",
+    "waypointSendTo": "O destino vai para",
+    "waypointSendToMe": "Este personagem",
+    "waypointSendToAllOnline": "Todos os personagens online",
+    "waypointSendToHint": "Aplica-se a Definir destino e Adicionar waypoint em todo o lado. Cada personagem traça a sua própria rota a partir de onde está; os que não têm sessão iniciada são ignorados.",
     "routeShortest": "Mais curta",
     "sections": {
       "mapOptions": "Opções de mapa",
@@ -2012,7 +2016,19 @@
   "routeToast": {
     "destinationSet": "Destino definido para {{system}}",
     "waypointAdded": "{{system}} adicionado aos pontos de passagem com sucesso.",
-    "failed": "Falha ao definir o ponto de rota — a tua personagem está online?"
+    "failed": "Falha ao definir o ponto de rota — a tua personagem está online?",
+    "destinationSetFor_one": "Destino definido para {{system}} em {{count}} personagem",
+    "destinationSetFor_other": "Destino definido para {{system}} em {{count}} personagens",
+    "waypointAddedFor_one": "{{system}} adicionado aos waypoints de {{count}} personagem",
+    "waypointAddedFor_other": "{{system}} adicionado aos waypoints de {{count}} personagens",
+    "notSentTo": "Não enviado para: {{list}}",
+    "noneSent": "Não foi possível definir para nenhum personagem: {{list}}",
+    "reason": {
+      "offline": "sem sessão iniciada",
+      "no_scope": "inicie sessão de novo para permitir waypoints",
+      "token_expired": "inicie sessão de novo",
+      "esi_error": "o EVE não respondeu"
+    }
   },
   "scout": {
     "noConnections": "Não há conexões de {{system}}.",
@@ -2387,7 +2403,13 @@
   },
   "waypoint": {
     "setDestination": "Definir destino",
-    "addWaypoint": "Adicionar ponto de rota"
+    "addWaypoint": "Adicionar ponto de rota",
+    "sendTo": "Enviar para personagens…",
+    "sendToTitle": "Enviar {{system}} para…",
+    "sendToHint": "Cada personagem traça a sua própria rota a partir de onde está. Só personagens com sessão iniciada o podem receber.",
+    "you": "tu",
+    "offline": "offline",
+    "noneOnline": "Nenhum dos teus personagens tem sessão iniciada."
   },
   "whChart": {
     "open": "⊟ Referência de buracos de minhoca",

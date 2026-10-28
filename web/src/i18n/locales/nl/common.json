@@ -1827,6 +1827,10 @@
     "routePreference": "Routevoorkeur",
     "routeSecure": "Veiligste",
     "routeShortcutNote": "Routes via een wormgat, Thera, Turnur of jump gate kun je niet als bestemming of waypoint in het spel instellen — rechtsklik in plaats daarvan een k-space-systeem in de route om er een naartoe te zetten.",
+    "waypointSendTo": "Bestemming gaat naar",
+    "waypointSendToMe": "Dit personage",
+    "waypointSendToAllOnline": "Alle ingelogde personages",
+    "waypointSendToHint": "Geldt overal voor Bestemming instellen en Waypoint toevoegen. Elk personage plant zijn eigen route vanaf waar het is; niet-ingelogde personages worden overgeslagen.",
     "routeShortest": "Kortste",
     "sections": {
       "mapOptions": "Kaartopties",
@@ -2012,7 +2016,19 @@
   "routeToast": {
     "destinationSet": "Bestemming ingesteld op {{system}}",
     "waypointAdded": "{{system}} is toegevoegd aan de waypoints.",
-    "failed": "Waypoint instellen mislukt — is je character online?"
+    "failed": "Waypoint instellen mislukt — is je character online?",
+    "destinationSetFor_one": "Bestemming {{system}} ingesteld voor {{count}} personage",
+    "destinationSetFor_other": "Bestemming {{system}} ingesteld voor {{count}} personages",
+    "waypointAddedFor_one": "{{system}} toegevoegd aan de waypoints van {{count}} personage",
+    "waypointAddedFor_other": "{{system}} toegevoegd aan de waypoints van {{count}} personages",
+    "notSentTo": "Niet verzonden naar: {{list}}",
+    "noneSent": "Voor geen enkel personage ingesteld: {{list}}",
+    "reason": {
+      "offline": "niet ingelogd",
+      "no_scope": "log opnieuw in om waypoints toe te staan",
+      "token_expired": "log opnieuw in",
+      "esi_error": "EVE reageerde niet"
+    }
   },
   "scout": {
     "noConnections": "Geen verbindingen met {{system}}.",
@@ -2387,7 +2403,13 @@
   },
   "waypoint": {
     "setDestination": "Bestemming instellen",
-    "addWaypoint": "Routepunt toevoegen"
+    "addWaypoint": "Routepunt toevoegen",
+    "sendTo": "Naar personages sturen…",
+    "sendToTitle": "{{system}} sturen naar…",
+    "sendToHint": "Elk personage plant zijn eigen route vanaf waar het is. Alleen ingelogde personages kunnen het ontvangen.",
+    "you": "jij",
+    "offline": "offline",
+    "noneOnline": "Geen van je personages is ingelogd."
   },
   "whChart": {
     "open": "⊟ Wormgatoverzicht",

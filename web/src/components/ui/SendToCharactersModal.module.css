@@ -1,0 +1,61 @@
+/* ── Send destination to characters ───────────────────────── */
+.modal {
+  width: 380px;
+  max-width: 94vw;
+}
+
+.list {
+  list-style: none;
+  margin: 8px 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  background: var(--surface-base);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.offline {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.portrait {
+  width: 24px;
+  height: 24px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.name {
+  flex: 1;
+  min-width: 0;
+  color: var(--text-primary);
+  font-size: calc(13px * var(--font-scale, 1));
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tag {
+  color: var(--text-faint);
+  font-size: calc(11px * var(--font-scale, 1));
+  flex-shrink: 0;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}

@@ -1,6 +1,4 @@
-import { api } from '../api/client';
-import { toast } from './toastStore';
-import i18n from '../i18n';
+import { setDestination, addWaypoint } from '../api/waypoint';
 import type { RouteEntry } from '../hooks/useRoute';
 
 /**
@@ -28,16 +26,10 @@ export function canSetAutopilot(route?: RouteEntry): boolean {
   return dest ? dest.kspace : true;
 }
 
-/** Fire ESI waypoint endpoint; surface success/failure via toast. */
+/** Fire ESI waypoint endpoint; surface success/failure via toast. Goes to the
+ *  characters the "Destination goes to" setting picks (see api/waypoint). */
 export function setWaypoint(systemId: number, systemName: string, clear: boolean) {
-  api('/api/character/waypoint', {
-    method: 'POST',
-    body:   JSON.stringify({ destinationId: systemId, clearOtherWaypoints: clear }),
-  })
-    .then(() => toast.success(clear
-      ? i18n.t('routeToast.destinationSet', { system: systemName })
-      : i18n.t('routeToast.waypointAdded', { system: systemName })))
-    .catch(() => toast.error(i18n.t('routeToast.failed')));
+  (clear ? setDestination : addWaypoint)(systemId, systemName).catch(() => { /* toasted */ });
 }
 
 /** K-space classes from which a stargate route can be computed. */

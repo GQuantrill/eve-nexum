@@ -496,10 +496,41 @@ characterRouter.get('/account-locations', async (req, res) => {
   res.json({ characters: characters.filter((c) => c.eveSystemId != null) });
 });
 
+// One autopilot call for one character. The outcome is the per-character
+// result the multi-character form reports.
+type WaypointOutcome = 'ok' | 'offline' | 'no_scope' | 'token_expired' | 'esi_error';
+
+async function sendWaypoint(
+  userId: number, params: URLSearchParams,
+): Promise<Exclude<WaypointOutcome, 'offline'>> {
+  let token: string;
+  try { token = await getValidToken(userId); } catch { return 'token_expired'; }
+  const esiRes = await esiFetch(
+    `https://esi.evetech.net/latest/ui/autopilot/waypoint/?${params}`,
+    { method: 'POST', headers: { Authorization: `Bearer ${token}` } },
+  );
+  if (esiRes.ok) return 'ok';
+  // 401: the token no longer works. 403: it works but was never granted the
+  // waypoint scope -- a character linked before it was added. Both are fixed
+  // by logging that character in again.
+  if (esiRes.status === 401 || esiRes.status === 403) return 'no_scope';
+  return 'esi_error';
+}
+
+// Most characters one request will act on. A multiboxer runs a handful; this
+// only stops a malformed request fanning out.
+const MAX_WAYPOINT_TARGETS = 50;
+
 // POST /api/character/waypoint
+//
+// Without `to`, sets the waypoint for the signed-in character, as it always has.
+// With `to` -- 'allOnline', or a list of users.id -- sets it for several of the
+// account's own characters at once, each plotting its own route from where it
+// is. Characters that aren't logged in are skipped (ESI only takes waypoints
+// for a character in game), and the answer says what happened to each.
 characterRouter.post('/waypoint', async (req, res) => {
-  const { destinationId, addToBeginning = false, clearOtherWaypoints = false } =
-    req.body as { destinationId?: unknown; addToBeginning?: boolean; clearOtherWaypoints?: boolean };
+  const { destinationId, addToBeginning = false, clearOtherWaypoints = false, to } =
+    req.body as { destinationId?: unknown; addToBeginning?: boolean; clearOtherWaypoints?: boolean; to?: unknown };
 
   // EVE destination IDs are positive 32-bit integers (solar systems, stations,
   // structures). Coerce + range-check to keep arbitrary strings out of the ESI
@@ -509,30 +540,70 @@ characterRouter.post('/waypoint', async (req, res) => {
     res.status(400).json({ error: 'destinationId must be a positive integer' });
     return;
   }
+  const params = new URLSearchParams({
+    add_to_beginning:     String(addToBeginning),
+    clear_other_waypoints: String(clearOtherWaypoints),
+    destination_id:       String(destNum),
+  });
 
-  const { rows } = await db.query<{ character_id: number }>(
-    `SELECT character_id FROM users WHERE id = $1`,
-    [req.session.userId],
-  );
-  if (!rows.length) { res.status(404).json({ error: 'User not found' }); return; }
-
-  try {
-    const token  = await getValidToken(req.session.userId!);
-    const params = new URLSearchParams({
-      add_to_beginning:     String(addToBeginning),
-      clear_other_waypoints: String(clearOtherWaypoints),
-      destination_id:       String(destNum),
-    });
-    const esiRes = await esiFetch(
-      `https://esi.evetech.net/latest/ui/autopilot/waypoint/?${params}`,
-      { method: 'POST', headers: { Authorization: `Bearer ${token}` } },
+  if (to === undefined) {
+    const { rows } = await db.query<{ character_id: number }>(
+      `SELECT character_id FROM users WHERE id = $1`,
+      [req.session.userId],
     );
-    if (!esiRes.ok) { res.status(502).json({ error: `ESI returned ${esiRes.status}` }); return; }
-    res.json({ ok: true });
-  } catch (err) {
-    log.error('Waypoint set failed:', err);
-    res.status(500).json({ error: 'Failed to set waypoint' });
+    if (!rows.length) { res.status(404).json({ error: 'User not found' }); return; }
+    try {
+      const outcome = await sendWaypoint(req.session.userId!, params);
+      if (outcome === 'token_expired') { res.status(500).json({ error: 'Failed to set waypoint' }); return; }
+      if (outcome !== 'ok') { res.status(502).json({ error: 'ESI rejected the waypoint' }); return; }
+      res.json({ ok: true });
+    } catch (err) {
+      log.error('Waypoint set failed:', err);
+      res.status(500).json({ error: 'Failed to set waypoint' });
+    }
+    return;
   }
+
+  const requested = to === 'allOnline' ? null
+    : Array.isArray(to) && to.length > 0 && to.length <= MAX_WAYPOINT_TARGETS
+      && to.every((n) => Number.isInteger(n) && n > 0) ? new Set(to as number[])
+    : undefined;
+  if (requested === undefined) {
+    res.status(400).json({ error: `to must be 'allOnline' or a list of up to ${MAX_WAYPOINT_TARGETS} character ids` });
+    return;
+  }
+
+  // The account's characters: every one sharing the caller's owner, or just the
+  // caller on a session that predates accounts. Never anyone else's.
+  const ownerId = await resolveOwnerId(req);
+  const { rows: account } = await db.query<{ id: number; characterId: number; characterName: string }>(
+    `SELECT id, character_id AS "characterId", character_name AS "characterName"
+       FROM users
+      WHERE (id = $1 OR ($2::int IS NOT NULL AND owner_id = $2)) AND blocked = FALSE
+      ORDER BY (id = $1) DESC, character_name`,
+    [req.session.userId, ownerId],
+  );
+  if (requested && [...requested].some((id) => !account.some((c) => c.id === id))) {
+    res.status(403).json({ error: 'You can only set waypoints for your own characters' });
+    return;
+  }
+  const targets = requested ? account.filter((c) => requested.has(c.id)) : account;
+
+  const results = await Promise.all(targets.map(async (c) => {
+    let outcome: WaypointOutcome;
+    try {
+      // An error from the online check (no read_online scope, say) isn't proof
+      // the character is offline, so the waypoint is tried anyway and its own
+      // answer reported.
+      const loc = await readEsiLocation(c.id, c.characterId);
+      outcome = loc.status === 'offline' ? 'offline' : await sendWaypoint(c.id, params);
+    } catch (err) {
+      log.warn(`Waypoint for ${c.characterName} failed:`, err);
+      outcome = 'esi_error';
+    }
+    return { charId: c.id, characterId: c.characterId, characterName: c.characterName, status: outcome };
+  }));
+  res.json({ results });
 });
 
 // GET /api/character/online

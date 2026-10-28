@@ -1827,6 +1827,10 @@
     "routePreference": "경로 선호",
     "routeSecure": "안전",
     "routeShortcutNote": "웜홀, Thera, Turnur 또는 점프 게이트를 사용하는 경로는 게임 내 목적지나 경유지로 설정할 수 없습니다 — 경로의 K-스페이스 시스템을 우클릭하여 그곳으로 이동하세요.",
+    "waypointSendTo": "목적지 전송 대상",
+    "waypointSendToMe": "이 캐릭터",
+    "waypointSendToAllOnline": "접속 중인 모든 캐릭터",
+    "waypointSendToHint": "모든 곳의 목적지 설정과 경유지 추가에 적용됩니다. 각 캐릭터는 현재 위치에서 자신의 경로를 계산하며, 접속하지 않은 캐릭터는 건너뜁니다.",
     "routeShortest": "최단",
     "sections": {
       "mapOptions": "지도 옵션",
@@ -2012,7 +2016,17 @@
   "routeToast": {
     "destinationSet": "목적지가 {{system}}(으)로 설정됨",
     "waypointAdded": "{{system}}이(가) 경유지에 추가되었습니다.",
-    "failed": "경유지 설정 실패 — 당신의 캐릭터가 온라인인가요?"
+    "failed": "경유지 설정 실패 — 당신의 캐릭터가 온라인인가요?",
+    "destinationSetFor_other": "캐릭터 {{count}}명의 목적지를 {{system}}(으)로 설정했습니다",
+    "waypointAddedFor_other": "캐릭터 {{count}}명의 경유지에 {{system}}을(를) 추가했습니다",
+    "notSentTo": "전송되지 않음: {{list}}",
+    "noneSent": "어떤 캐릭터에도 설정하지 못했습니다: {{list}}",
+    "reason": {
+      "offline": "접속 안 함",
+      "no_scope": "경유지 권한을 위해 다시 로그인하세요",
+      "token_expired": "다시 로그인하세요",
+      "esi_error": "EVE가 응답하지 않았습니다"
+    }
   },
   "scout": {
     "noConnections": "{{system}} 연결이 없습니다.",
@@ -2387,7 +2401,13 @@
   },
   "waypoint": {
     "setDestination": "목적지 설정",
-    "addWaypoint": "경유지 추가"
+    "addWaypoint": "경유지 추가",
+    "sendTo": "캐릭터에게 보내기…",
+    "sendToTitle": "{{system}} 보내기…",
+    "sendToHint": "각 캐릭터는 현재 위치에서 자신의 경로를 계산합니다. 접속 중인 캐릭터만 받을 수 있습니다.",
+    "you": "나",
+    "offline": "오프라인",
+    "noneOnline": "접속 중인 캐릭터가 없습니다."
   },
   "whChart": {
     "open": "⊟ 웜홀 참조",

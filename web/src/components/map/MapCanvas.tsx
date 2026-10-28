@@ -37,6 +37,7 @@ import {
   LinkSimpleIcon, LinkBreakIcon, ArrowsOutIcon, BookmarkSimpleIcon, TextAaIcon, TrashIcon,
   HashIcon, ProhibitIcon, BroomIcon,
   CopyIcon,
+  UsersThreeIcon,
 } from '../../icons';
 import { PREDEFINED_LABELS } from '../../data/labels';
 
@@ -65,6 +66,8 @@ import { useJumpRangeStore } from '../../store/jumpRangeStore';
 import { useGateJumps } from '../../hooks/useGateJumps';
 import { pickHandles } from './edgeUtils';
 import { setDestination, addWaypoint } from '../../api/waypoint';
+import { SendToCharactersModal } from '../ui/SendToCharactersModal';
+import { useSendToStore } from '../../store/sendToStore';
 import { toast } from '../../utils/toastStore';
 import i18n from '../../i18n';
 import { useCustomIntel } from '../../hooks/useCustomIntel';
@@ -1095,6 +1098,15 @@ export function MapCanvas() {
     setConnectSource(null);
   }, [setConnectSource]);
 
+  // "Send to characters…" sits under the waypoint items, only for an account
+  // with more than one character.
+  const hasAlts = accountLocations.byChar.size > 0;
+  const sendToItem = (eveSystemId: number, name: string) => (hasAlts ? [{
+    label: t('waypoint.sendTo'),
+    icon: <UsersThreeIcon size={16} weight="regular" color="#5a9af8" />,
+    action: () => useSendToStore.getState().open(eveSystemId, name),
+  }] : []);
+
   const ctxItems = (() => {
     if (!contextMenu) return [];
 
@@ -1117,6 +1129,7 @@ export function MapCanvas() {
             icon: <PathIcon size={16} weight="regular" color="#5a9af8" />,
             action: () => { addWaypoint(sys.eveSystemId!, sys.name).catch(() => {}); },
           },
+          ...sendToItem(sys.eveSystemId, sys.name),
           {
             label: t('ctxMenu.jumpRangeFrom'),
             icon: <MapPinSimpleIcon size={16} weight="regular" color="#b57bff" />,
@@ -1318,6 +1331,7 @@ export function MapCanvas() {
           icon: <PathIcon size={16} weight="regular" color="#5a9af8" />,
           action: () => { addWaypoint(sys.eveSystemId!, sys.name).catch(() => {}); },
         },
+        ...sendToItem(sys.eveSystemId, sys.name),
         {
           label: t('ctxMenu.jumpRangeFrom'),
           icon: <MapPinSimpleIcon size={16} weight="regular" color="#b57bff" />,
@@ -1844,6 +1858,7 @@ export function MapCanvas() {
       {pendingPosition && (
         <AddSystemModal position={pendingPosition} onClose={() => setPendingPosition(null)} />
       )}
+      <SendToCharactersModal />
       {connectAdd && (
         <AddSystemModal
           position={connectAdd.position}

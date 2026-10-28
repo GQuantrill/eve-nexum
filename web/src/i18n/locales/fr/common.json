@@ -1827,6 +1827,10 @@
     "routePreference": "Préférence d'itinéraire",
     "routeSecure": "Sécurisé",
     "routeShortcutNote": "Les itinéraires passant par un trou de ver, Thera, Turnur ou une porte de saut ne peuvent pas être définis comme destination ou point de passage en jeu — faites un clic droit sur un système k-space de l’itinéraire pour vous y rendre.",
+    "waypointSendTo": "La destination va à",
+    "waypointSendToMe": "Ce personnage",
+    "waypointSendToAllOnline": "Tous les personnages connectés",
+    "waypointSendToHint": "S’applique partout à « Définir la destination » et « Ajouter un point de passage ». Chaque personnage calcule son propre trajet depuis sa position ; ceux qui ne sont pas connectés sont ignorés.",
     "routeShortest": "Le plus court",
     "sections": {
       "mapOptions": "Options de carte",
@@ -2012,7 +2016,19 @@
   "routeToast": {
     "destinationSet": "Destination définie sur {{system}}",
     "waypointAdded": "{{system}} ajouté aux points de passage avec succès.",
-    "failed": "Échec de la définition du point de cheminement — votre personnage est-il en ligne ?"
+    "failed": "Échec de la définition du point de cheminement — votre personnage est-il en ligne ?",
+    "destinationSetFor_one": "Destination {{system}} définie pour {{count}} personnage",
+    "destinationSetFor_other": "Destination {{system}} définie pour {{count}} personnages",
+    "waypointAddedFor_one": "{{system}} ajouté aux points de passage de {{count}} personnage",
+    "waypointAddedFor_other": "{{system}} ajouté aux points de passage de {{count}} personnages",
+    "notSentTo": "Non envoyé à : {{list}}",
+    "noneSent": "Impossible de la définir pour un personnage : {{list}}",
+    "reason": {
+      "offline": "non connecté",
+      "no_scope": "reconnectez-vous pour autoriser les points de passage",
+      "token_expired": "reconnectez-vous",
+      "esi_error": "EVE n’a pas répondu"
+    }
   },
   "scout": {
     "noConnections": "Aucune connexion {{system}}.",
@@ -2387,7 +2403,13 @@
   },
   "waypoint": {
     "setDestination": "Définir la destination",
-    "addWaypoint": "Ajouter un point de cheminement"
+    "addWaypoint": "Ajouter un point de cheminement",
+    "sendTo": "Envoyer aux personnages…",
+    "sendToTitle": "Envoyer {{system}} à…",
+    "sendToHint": "Chaque personnage calcule son propre trajet depuis sa position. Seuls les personnages connectés peuvent la recevoir.",
+    "you": "vous",
+    "offline": "hors ligne",
+    "noneOnline": "Aucun de vos personnages n’est connecté."
   },
   "whChart": {
     "open": "⊟ Référence trous de ver",

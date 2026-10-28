@@ -32,6 +32,8 @@ import { JumpRangePane } from "./JumpRangePane";
 import { AnnouncerSection } from "./AnnouncerSection";
 import { MapSharesSection } from "./MapSharesSection";
 import { MapAuditModal } from "./MapAuditModal";
+import { WAYPOINT_SEND_TO_KEY, type WaypointSendTo } from "../../api/waypoint";
+import { useAccountLocations } from "../../hooks/useAccountLocations";
 import { MergeMapModal } from "./MergeMapModal";
 import { CustomIntelBlock } from "./CustomIntelBlock";
 import { FlagPresetsBlock } from "./FlagPresetsBlock";
@@ -880,6 +882,10 @@ export function MapSidebar() {
   const auditMapId = useMapStore((s) => s.map.id);
   const auditMapName = useMapStore((s) => s.map.name);
   const [auditOpen, setAuditOpen] = useState(false);
+  // Sending a destination to several characters only means anything with
+  // more than one on the account.
+  const hasAlts = useAccountLocations().byChar.size > 0;
+  const [waypointSendTo, setWaypointSendTo] = useUserSetting<WaypointSendTo>(WAYPOINT_SEND_TO_KEY, "me");
   // The map-management buttons (optimize / spread / JSON / PNG / stale fade)
   // are hidden only when a readonly user is looking at a corp map. On their
   // own personal map a readonly user still owns the layout and can use the
@@ -1629,6 +1635,25 @@ export function MapSidebar() {
           <p className="map-sidebar__hint">
             {t("mapSidebar.routeShortcutNote")}
           </p>
+          {hasAlts && (
+            <>
+              <div className="map-sidebar__row">
+                <label className="map-sidebar__label" htmlFor="waypoint-send-to">
+                  {t("mapSidebar.waypointSendTo")}
+                </label>
+                <Select
+                  id="waypoint-send-to"
+                  value={waypointSendTo}
+                  onChange={(v) => setWaypointSendTo(v as WaypointSendTo)}
+                  options={[
+                    { value: "me", label: t("mapSidebar.waypointSendToMe") },
+                    { value: "allOnline", label: t("mapSidebar.waypointSendToAllOnline") },
+                  ]}
+                />
+              </div>
+              <p className="map-sidebar__hint">{t("mapSidebar.waypointSendToHint")}</p>
+            </>
+          )}
         </CollapsibleSection>
 
 

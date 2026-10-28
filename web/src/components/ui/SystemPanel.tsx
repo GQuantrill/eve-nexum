@@ -8,6 +8,8 @@ import { useNow30s } from '../../hooks/useNow30s';
 import { hoursMins } from '../../i18n/format';
 import { useSystemInfo } from '../../hooks/useSystemInfo';
 import { setDestination, addWaypoint } from '../../api/waypoint';
+import { useSendToStore } from '../../store/sendToStore';
+import { useAccountLocations } from '../../hooks/useAccountLocations';
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import type { DragEndEvent } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -23,7 +25,7 @@ import {
   equalWeights, normaliseWeights, resizeWeights,
   type ColumnMap,
 } from '../../utils/panelColumns';
-import { SquaresFourIcon, XIcon, CopyIcon } from '../../icons';
+import { SquaresFourIcon, XIcon, CopyIcon, UsersThreeIcon } from '../../icons';
 import { PanelVisibilityModal } from './PanelVisibilityModal';
 import { SignaturePane } from './SignaturePane';
 import { AnomalyPane } from './AnomalyPane';
@@ -338,6 +340,9 @@ export function SystemPanel() {
     return seen;
   }, [connections, selectedSystemId]);
 
+  // Shown only with more than one character on the account.
+  const hasAlts = useAccountLocations().byChar.size > 0;
+
   if (!sys) return null;
   const incursion  = findIncursion(incursions, sys.eveSystemId);
   const insurgency = findInsurgency(insurgencies, sys.eveSystemId);
@@ -605,6 +610,17 @@ export function SystemPanel() {
                   >
                     {t('systemPanel.addWaypointBtn')}
                   </button>
+                  {hasAlts && (
+                    <button
+                      type="button"
+                      className="sys-btn"
+                      onClick={() => useSendToStore.getState().open(sys.eveSystemId!, sys.name)}
+                      title={t('waypoint.sendTo')}
+                      aria-label={t('waypoint.sendTo')}
+                    >
+                      <UsersThreeIcon size={14} weight="regular" />
+                    </button>
+                  )}
                 </>
               )}
             </div>

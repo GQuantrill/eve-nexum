@@ -1827,6 +1827,10 @@
     "routePreference": "Route Preference",
     "routeSecure": "Secure",
     "routeShortcutNote": "Routes using a wormhole, Thera, Turnur, or jump gate can't be set as an in-game destination or waypoint — right-click a k-space system in the route to set one to it instead.",
+    "waypointSendTo": "Destination goes to",
+    "waypointSendToMe": "This character",
+    "waypointSendToAllOnline": "All online characters",
+    "waypointSendToHint": "Applies to Set Destination and Add Waypoint everywhere. Each character plots its own route from where it is; characters that aren't logged in are skipped.",
     "routeShortest": "Shortest",
     "sections": {
       "mapOptions": "Map Options",
@@ -2012,7 +2016,19 @@
   "routeToast": {
     "destinationSet": "Destination set to {{system}}",
     "waypointAdded": "{{system}} successfully added to waypoints.",
-    "failed": "Failed to set waypoint — is your character online?"
+    "failed": "Failed to set waypoint — is your character online?",
+    "destinationSetFor_one": "Destination set to {{system}} for {{count}} character",
+    "destinationSetFor_other": "Destination set to {{system}} for {{count}} characters",
+    "waypointAddedFor_one": "{{system}} added to waypoints for {{count}} character",
+    "waypointAddedFor_other": "{{system}} added to waypoints for {{count}} characters",
+    "notSentTo": "Not sent to: {{list}}",
+    "noneSent": "Couldn't set it for any character: {{list}}",
+    "reason": {
+      "offline": "not logged in",
+      "no_scope": "log in again to allow waypoints",
+      "token_expired": "log in again",
+      "esi_error": "EVE didn't respond"
+    }
   },
   "scout": {
     "noConnections": "No {{system}} connections.",
@@ -2387,7 +2403,13 @@
   },
   "waypoint": {
     "setDestination": "Set Destination",
-    "addWaypoint": "Add Waypoint"
+    "addWaypoint": "Add Waypoint",
+    "sendTo": "Send to characters…",
+    "sendToTitle": "Send {{system}} to…",
+    "sendToHint": "Each character plots its own route from where it is. Only logged-in characters can receive it.",
+    "you": "you",
+    "offline": "offline",
+    "noneOnline": "None of your characters are logged in."
   },
   "whChart": {
     "open": "⊟ Wormhole reference",

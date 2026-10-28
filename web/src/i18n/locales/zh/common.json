@@ -1827,6 +1827,10 @@
     "routePreference": "路线偏好",
     "routeSecure": "安全",
     "routeShortcutNote": "使用虫洞、Thera、Turnur 或跳跃门的路线无法设为游戏内目的地或途经点——右键点击路线中的已知空间星系以前往该处。",
+    "waypointSendTo": "目的地发送给",
+    "waypointSendToMe": "当前角色",
+    "waypointSendToAllOnline": "所有在线角色",
+    "waypointSendToHint": "适用于所有“设为目的地”和“添加路径点”。每个角色从自己所在位置规划路线；未登录的角色会被跳过。",
     "routeShortest": "最短",
     "sections": {
       "mapOptions": "地图选项",
@@ -2012,7 +2016,17 @@
   "routeToast": {
     "destinationSet": "目的地已设为 {{system}}",
     "waypointAdded": "{{system}} 已成功添加到航点。",
-    "failed": "设置航路点失败 — 你的角色在线吗？"
+    "failed": "设置航路点失败 — 你的角色在线吗？",
+    "destinationSetFor_other": "已为 {{count}} 个角色将目的地设为 {{system}}",
+    "waypointAddedFor_other": "已为 {{count}} 个角色将 {{system}} 加入路径点",
+    "notSentTo": "未发送给：{{list}}",
+    "noneSent": "未能为任何角色设置：{{list}}",
+    "reason": {
+      "offline": "未登录",
+      "no_scope": "请重新登录以允许设置路径点",
+      "token_expired": "请重新登录",
+      "esi_error": "EVE 没有响应"
+    }
   },
   "scout": {
     "noConnections": "没有 {{system}} 连接。",
@@ -2387,7 +2401,13 @@
   },
   "waypoint": {
     "setDestination": "设为目的地",
-    "addWaypoint": "添加航路点"
+    "addWaypoint": "添加航路点",
+    "sendTo": "发送给角色…",
+    "sendToTitle": "将 {{system}} 发送给…",
+    "sendToHint": "每个角色从自己所在位置规划路线。只有已登录的角色能收到。",
+    "you": "你",
+    "offline": "离线",
+    "noneOnline": "你的角色都没有登录。"
   },
   "whChart": {
     "open": "⊟ 虫洞参考",

@@ -1827,6 +1827,10 @@
     "routePreference": "ルート設定",
     "routeSecure": "安全",
     "routeShortcutNote": "ワームホール、Thera、Turnur、ジャンプゲートを経由するルートはゲーム内の目的地や経由地に設定できません — ルート上のK-スペースシステムを右クリックしてそこへ向かってください。",
+    "waypointSendTo": "目的地の送信先",
+    "waypointSendToMe": "このキャラクター",
+    "waypointSendToAllOnline": "ログイン中の全キャラクター",
+    "waypointSendToHint": "すべての「目的地に設定」と「ウェイポイントに追加」に適用されます。各キャラクターは現在地から自分のルートを計算します。ログインしていないキャラクターはスキップされます。",
     "routeShortest": "最短",
     "sections": {
       "mapOptions": "マップオプション",
@@ -2012,7 +2016,17 @@
   "routeToast": {
     "destinationSet": "目的地を {{system}} に設定しました",
     "waypointAdded": "{{system}} を経由地に追加しました。",
-    "failed": "ウェイポイントの設定に失敗しました — キャラクターはオンラインですか？"
+    "failed": "ウェイポイントの設定に失敗しました — キャラクターはオンラインですか？",
+    "destinationSetFor_other": "{{count}} キャラクターの目的地を {{system}} に設定しました",
+    "waypointAddedFor_other": "{{count}} キャラクターのウェイポイントに {{system}} を追加しました",
+    "notSentTo": "送信されなかったキャラクター: {{list}}",
+    "noneSent": "どのキャラクターにも設定できませんでした: {{list}}",
+    "reason": {
+      "offline": "ログインしていません",
+      "no_scope": "ウェイポイントを許可するには再ログインしてください",
+      "token_expired": "再ログインしてください",
+      "esi_error": "EVE が応答しませんでした"
+    }
   },
   "scout": {
     "noConnections": "{{system}} の接続はありません。",
@@ -2387,7 +2401,13 @@
   },
   "waypoint": {
     "setDestination": "目的地に設定",
-    "addWaypoint": "ウェイポイントを追加"
+    "addWaypoint": "ウェイポイントを追加",
+    "sendTo": "キャラクターに送信…",
+    "sendToTitle": "{{system}} を送信…",
+    "sendToHint": "各キャラクターは現在地から自分のルートを計算します。受け取れるのはログイン中のキャラクターだけです。",
+    "you": "自分",
+    "offline": "オフライン",
+    "noneOnline": "ログインしているキャラクターがいません。"
   },
   "whChart": {
     "open": "⊟ ワームホール一覧",
