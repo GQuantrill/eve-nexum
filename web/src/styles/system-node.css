@@ -1098,6 +1098,10 @@
 }
 
 .system-node__kill-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  white-space: nowrap;
   color: #ff6060;
   font-size: calc(13px * var(--font-scale, 1));
   cursor: default;
@@ -1112,11 +1116,10 @@
 }
 
 .system-node__kill-count {
-  margin-left: 1px;
   font-size: calc(10px * var(--font-scale, 1));
   font-weight: 600;
   font-variant-numeric: tabular-nums;
-  vertical-align: top;
+  line-height: 1;
 }
 
 .system-node__kill-tooltip {
