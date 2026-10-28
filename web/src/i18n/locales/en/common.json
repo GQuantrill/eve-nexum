@@ -50,14 +50,18 @@
     "loading": "Loading PvP activity…",
     "loadFailed": "Couldn't load PvP activity.",
     "noHistory": "No PvP history yet. Player kills here are recorded from now on.",
-    "noneInDays": "No player kills here in the last {{days}} days.",
+    "noneInDays_one": "No kills here in the last day.",
+    "noneInDays_other": "No kills here in the last {{count}} days.",
     "busiestNow": "Busiest now ({{hour}} UTC)",
     "busiestNext": "Busiest at {{hour}} UTC, in {{n}}h",
+    "quietAhead": "Quiet for the next 24 hours",
     "killsInDays": "{{n}} in {{days}}d",
+    "recent": "Live feed: {{n}} in the last 24h",
     "chartLabel": "Player kills by hour of day for the next 24 hours",
-    "barTitle": "{{hour}} UTC: {{n}}",
+    "barTitle": "{{day}} {{hour}} UTC: {{n}}",
     "now": "now",
-    "note": "Player kills by UTC hour of day. Hotter bars are hours that are usually busier."
+    "noteZkill": "Kills by UTC weekday and hour over zKillboard's last 90 days. Hotter bars are usually busier.",
+    "noteLive": "zKillboard is unreachable, so this uses the kills recorded here so far."
   },
   "addSystem": {
     "title": "Add System",

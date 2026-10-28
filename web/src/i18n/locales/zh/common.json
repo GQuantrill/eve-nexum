@@ -50,14 +50,18 @@
     "loading": "正在加载 PvP 活动…",
     "loadFailed": "无法加载 PvP 活动。",
     "noHistory": "暂无 PvP 记录。从现在起会记录此处的玩家击杀。",
-    "noneInDays": "过去 {{days}} 天此处没有玩家击杀。",
+    "noneInDays_one": "过去 1 天此处没有击杀。",
+    "noneInDays_other": "过去 {{count}} 天此处没有击杀。",
     "busiestNow": "当前最活跃（{{hour}} UTC）",
     "busiestNext": "最活跃时段 {{hour}} UTC，{{n}} 小时后",
+    "quietAhead": "未来 24 小时较为平静",
     "killsInDays": "{{days}} 天内 {{n}} 次",
+    "recent": "实时数据：过去 24 小时 {{n}} 次",
     "chartLabel": "未来 24 小时按时段的玩家击杀",
-    "barTitle": "{{hour}} UTC：{{n}}",
+    "barTitle": "{{day}} {{hour}} UTC：{{n}}",
     "now": "现在",
-    "note": "按 UTC 小时统计的玩家击杀。颜色越热表示该时段通常越活跃。"
+    "noteZkill": "按 UTC 星期和小时统计 zKillboard 过去 90 天的击杀。颜色越热通常越活跃。",
+    "noteLive": "无法连接 zKillboard，因此使用此处目前记录的击杀。"
   },
   "addSystem": {
     "title": "添加星系",

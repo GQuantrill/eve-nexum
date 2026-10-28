@@ -50,14 +50,18 @@
     "loading": "Carregando atividade PvP…",
     "loadFailed": "Não foi possível carregar a atividade PvP.",
     "noHistory": "Ainda sem histórico PvP. Abates de jogadores aqui são registrados a partir de agora.",
-    "noneInDays": "Nenhum abate de jogador aqui nos últimos {{days}} dias.",
+    "noneInDays_one": "Nenhum abate aqui no último dia.",
+    "noneInDays_other": "Nenhum abate aqui nos últimos {{count}} dias.",
     "busiestNow": "Mais movimentado agora ({{hour}} UTC)",
     "busiestNext": "Mais movimentado às {{hour}} UTC, em {{n}} h",
+    "quietAhead": "Tranquilo nas próximas 24 horas",
     "killsInDays": "{{n}} em {{days}} d",
+    "recent": "Feed ao vivo: {{n}} nas últimas 24 h",
     "chartLabel": "Abates de jogadores por hora do dia nas próximas 24 horas",
-    "barTitle": "{{hour}} UTC: {{n}}",
+    "barTitle": "{{day}} {{hour}} UTC: {{n}}",
     "now": "agora",
-    "note": "Abates de jogadores por hora UTC. Barras mais quentes são as horas geralmente mais movimentadas."
+    "noteZkill": "Abates por dia da semana e hora UTC nos últimos 90 dias do zKillboard. Barras mais quentes costumam ser mais movimentadas.",
+    "noteLive": "O zKillboard está inacessível, então isto usa os abates registrados aqui até agora."
   },
   "addSystem": {
     "title": "Adicionar sistema",
