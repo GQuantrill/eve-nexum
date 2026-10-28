@@ -5,6 +5,7 @@ import { activeMapIds, publishToMap } from './mapEvents.js';
 import { resolveEntityNames } from './entityNames.js';
 import { notifyDiscord, killEmbed } from './discord.js';
 import { recordKill, recordLiveKill, type BufferedKill } from './killBuffer.js';
+import { recordPvpKill } from './pvpHistory.js';
 
 // A single decorated kill, shared by the live SSE `kill.recent` event and the
 // REST backfill (routes/maps.ts). Every display name is resolved by US from a
@@ -192,7 +193,10 @@ async function processKill(body: EphemeralKill): Promise<void> {
     const victimShip = Number(km.victim?.ship_type_id) || 0;
     const bucket = body.zkb?.npc ? 'npc' : (victimShip === 670 || victimShip === 33328 ? 'pod' : 'ship');
     const kmTime = km.killmail_time ? Date.parse(km.killmail_time) : NaN;
-    recordLiveKill(solarSystemId, Number.isFinite(kmTime) ? kmTime : Date.now(), bucket);
+    const at = Number.isFinite(kmTime) ? kmTime : Date.now();
+    recordLiveKill(solarSystemId, at, bucket);
+    // Player kills only (pods included) for the PvP forecast.
+    if (bucket !== 'npc') recordPvpKill(solarSystemId, at);
   }
 
   const totalValue = Number(body.zkb?.totalValue ?? 0);

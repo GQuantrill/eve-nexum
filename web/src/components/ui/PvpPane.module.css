@@ -1,0 +1,58 @@
+/* PvP forecast pane: 24 hour bars, now on the left. */
+.pane {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-6);
+  padding: var(--sp-8);
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-8);
+  flex-wrap: wrap;
+}
+
+.headline {
+  color: var(--text-bright);
+  font-weight: 600;
+  font-size: calc(14px * var(--font-scale, 1));
+}
+
+.total {
+  color: var(--text-dim);
+  font-size: calc(12px * var(--font-scale, 1));
+  font-variant-numeric: tabular-nums;
+}
+
+.bars {
+  display: grid;
+  grid-template-columns: repeat(24, 1fr);
+  gap: 3px;
+  height: 2.25rem;
+}
+
+.bar {
+  border-radius: 3px;
+  background: var(--surface-hover);
+}
+
+/* The current hour: outlined so "now" is findable even when it's quiet. */
+.barNow {
+  outline: 1px solid var(--text-bright);
+  outline-offset: 1px;
+}
+
+/* now ... +24h, spread across the strip's width. */
+.ticks {
+  display: flex;
+  justify-content: space-between;
+  color: var(--text-faint);
+  font-size: calc(11px * var(--font-scale, 1));
+}
+
+.note {
+  color: var(--text-faint);
+  font-size: calc(11px * var(--font-scale, 1));
+}

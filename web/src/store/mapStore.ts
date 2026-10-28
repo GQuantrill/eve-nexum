@@ -677,7 +677,7 @@ export const useMapStore = create<MapStore>()((set, get) => {
     contentFilter: { sigTypes: [], anomTypes: [], nameQuery: '', undivedWh: false },
     setContentFilter: (next) => set((s) => ({ contentFilter: { ...s.contentFilter, ...next } })),
     clearContentFilter: () => set({ contentFilter: { sigTypes: [], anomTypes: [], nameQuery: '', undivedWh: false } }),
-    panelOrder: ['activity', 'killboard', 'notes', 'signatures', 'anomalies', 'structures', 'npcStations'],
+    panelOrder: ['activity', 'pvp', 'killboard', 'notes', 'signatures', 'anomalies', 'structures', 'npcStations'],
     undoStack: [],
 
     pushUndo: (cmd) =>
@@ -695,7 +695,7 @@ export const useMapStore = create<MapStore>()((set, get) => {
       // Whitelist of valid panel keys. `standings` was briefly a panel here
       // — kept in the filter so any persisted occurrence is silently
       // dropped on load now that standings live inline in the sov section.
-      const all = ['activity', 'killboard', 'notes', 'signatures', 'anomalies', 'structures', 'npcStations'];
+      const all = ['activity', 'pvp', 'killboard', 'notes', 'signatures', 'anomalies', 'structures', 'npcStations'];
       const merged = [
         ...panelOrder.filter((p) => all.includes(p)),
         ...all.filter((p) => !panelOrder.includes(p)),

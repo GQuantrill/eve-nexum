@@ -46,6 +46,19 @@
     "loading": "활동을 불러오는 중…",
     "peak": "최고 {{value}}"
   },
+  "pvp": {
+    "loading": "PvP 활동 불러오는 중…",
+    "loadFailed": "PvP 활동을 불러올 수 없습니다.",
+    "noHistory": "아직 PvP 기록이 없습니다. 지금부터 이곳의 플레이어 킬이 기록됩니다.",
+    "noneInDays": "지난 {{days}}일 동안 이곳에서 플레이어 킬이 없었습니다.",
+    "busiestNow": "지금이 가장 활발함 ({{hour}} UTC)",
+    "busiestNext": "가장 활발한 시간 {{hour}} UTC, {{n}}시간 후",
+    "killsInDays": "{{days}}일간 {{n}}건",
+    "chartLabel": "앞으로 24시간 동안 시간대별 플레이어 킬",
+    "barTitle": "{{hour}} UTC: {{n}}",
+    "now": "지금",
+    "note": "UTC 시간대별 플레이어 킬. 색이 뜨거울수록 보통 더 활발한 시간입니다."
+  },
   "addSystem": {
     "title": "성계 추가",
     "systemName": "성계 이름",
@@ -1775,7 +1788,8 @@
     "killboard": "zKillboard",
     "activity": "활동",
     "undock": "플로팅 창으로 분리",
-    "redock": "다시 도킹"
+    "redock": "다시 도킹",
+    "pvp": "PvP 활동"
   },
   "panes": {
     "noEveSystem": "연결된 EVE 성계 없음",

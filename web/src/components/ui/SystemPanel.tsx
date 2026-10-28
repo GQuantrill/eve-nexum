@@ -29,6 +29,7 @@ import { NpcStationsPane } from './NpcStationsPane';
 import { NotesEditor } from './NotesEditor';
 import { KillboardPane } from './KillboardPane';
 import { ActivityPane } from './ActivityPane';
+import { PvpPane } from './PvpPane';
 import { useStandings, type ContactKind } from '../../hooks/useStandings';
 import { toast } from '../../utils/toastStore';
 import { truesecColor } from '../../utils/truesec';
@@ -210,6 +211,7 @@ export function SystemPanel() {
     npcStations: t('panel.npcStations'),
     killboard:   t('panel.killboard'),
     activity:    t('panel.activity'),
+    pvp:         t('panel.pvp'),
   };
   const systems          = useMapStore((s) => s.map.systems);
   const connections      = useMapStore((s) => s.map.connections);
@@ -430,6 +432,7 @@ export function SystemPanel() {
     npcStations: <NpcStationsPane eveSystemId={sys.eveSystemId} />,
     killboard:   <KillboardPane eveSystemId={sys.eveSystemId} />,
     activity:    <ActivityPane eveSystemId={sys.eveSystemId} />,
+    pvp:         <PvpPane eveSystemId={sys.eveSystemId} />,
   };
 
   // Whether each pane still renders in share mode (guests only see the

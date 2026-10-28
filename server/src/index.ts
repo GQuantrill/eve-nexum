@@ -54,6 +54,7 @@ import { shareRouter } from './routes/share.js';
 import searchRouter from './routes/search.js';
 import { dscanRouter } from './routes/dscan.js';
 import { startDscanSweeper } from './services/dscan.js';
+import { startPvpHistory } from './services/pvpHistory.js';
 import { authLimiter, esiLimiter, publicLimiter, appLimiter } from './middleware/rateLimits.js';
 import { originGuard } from './middleware/originGuard.js';
 import { createLogger } from './utils/logger.js';
@@ -218,6 +219,7 @@ migrate()
     startIskDonationPoller();
     startAccessRevalidation();
     startKillFeed();
+    startPvpHistory();
     startDscanSweeper();
     void startTelemetry();
   })
