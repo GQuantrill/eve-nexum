@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import express, { Router } from 'express';
 import { esiFetch } from '../utils/esi.js';
 import { getScoutConnections } from './scout.js';
 
@@ -18,6 +18,7 @@ import { decryptToken } from '../utils/tokenCrypto.js';
 import { createLogger } from '../utils/logger.js';
 import { resolveOwnerId } from '../utils/owner.js';
 import { mapCapFor, countPersonalMaps, mapAllowanceFor } from '../services/mapAllowance.js';
+import { parseMapBackup, restoreMapBackup, buildMapBackup, BackupError } from '../services/mapBackup.js';
 import { resolveEntityNames } from '../services/entityNames.js';
 import { audit } from '../services/audit.js';
 import { publishToMap } from '../services/mapEvents.js';
@@ -1424,7 +1425,13 @@ mapsRouter.post('/from-region', async (req, res) => {
 });
 
 // POST /api/maps/import
-mapsRouter.post('/import', async (req, res) => {
+// A full backup can run past the app-wide 2 MB body limit, so this route reads
+// its own body (index.ts skips it), with a larger cap. It sits behind the
+// router's requireAuth, the origin guard and the rate limiter, so only a
+// signed-in user can send one.
+const importBodyParser = express.json({ limit: '8mb', inflate: false });
+
+mapsRouter.post('/import', importBodyParser, async (req, res) => {
   const importBody     = req.body as Record<string, unknown>;
   const isAllianceImport = config.allianceMode && importBody.isAllianceMap === true;
   const isCorpImport     = !isAllianceImport && (config.corpMode || config.allianceMode) && importBody.isCorpMap === true;
@@ -1473,149 +1480,62 @@ mapsRouter.post('/import', async (req, res) => {
     }
   }
 
-  const { name, systems = [], connections = [], skipKspace } = req.body as {
-    name?: string;
-    systems?: Array<Record<string, unknown>>;
-    connections?: Array<Record<string, unknown>>;
-    skipKspace?: boolean;
-  };
-
-  if (!Array.isArray(systems) || !Array.isArray(connections)) {
-    res.status(400).json({ error: 'systems and connections must be arrays' });
-    return;
+  // Untrusted file: parseMapBackup checks every field and drops what it can't
+  // use; only a file that isn't a map at all, or is over the limits, fails.
+  let backup: ReturnType<typeof parseMapBackup>;
+  try {
+    backup = parseMapBackup(importBody);
+  } catch (err) {
+    if (err instanceof BackupError) { res.status(err.status).json({ error: err.message }); return; }
+    throw err;
   }
-  if (systems.length > MAX_IMPORT_SYSTEMS) {
-    res.status(413).json({ error: `Too many systems (max ${MAX_IMPORT_SYSTEMS})` });
-    return;
-  }
-  if (connections.length > MAX_IMPORT_CONNECTIONS) {
-    res.status(413).json({ error: `Too many connections (max ${MAX_IMPORT_CONNECTIONS})` });
-    return;
-  }
+  const skipKspace = importBody.skipKspace === true;
 
   const client = await db.connect();
   try {
     await client.query('BEGIN');
 
-    const importName = String(name ?? 'Imported Map').slice(0, MAX_MAP_NAME_LEN);
+    const importName = backup.name.slice(0, MAX_MAP_NAME_LEN);
     const ownerId = await resolveOwnerId(req);
     // K-space tracking policy only applies to corp/alliance maps; false otherwise.
-    const importSkipKspace = skipKspace === true && (isCorpImport || isAllianceImport);
+    const importSkipKspace = skipKspace && (isCorpImport || isAllianceImport);
+    // The importer owns the new map, so its own behaviour settings come across.
+    const { settings } = backup;
     const mapRes = await client.query<{ id: string }>(
-      `INSERT INTO maps (user_id, owner_id, name, corp_id, alliance_id, skip_kspace) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
+      `INSERT INTO maps (user_id, owner_id, name, corp_id, alliance_id, skip_kspace,
+                         lazy_remove_wormholes, collapse_grace_hours, bookmark_format, site_bookmark_format)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, COALESCE($8, 0.5), $9, $10) RETURNING id`,
       [req.session.userId, ownerId, importName,
        isCorpImport ? (req.session.userCorpId ?? null) : null,
        isAllianceImport ? (req.session.userAllianceId ?? null) : null,
-       importSkipKspace],
+       importSkipKspace, settings.lazyRemoveWormholes, settings.collapseGraceHours,
+       settings.bookmarkFormat, settings.siteBookmarkFormat],
     );
     const mapId = mapRes.rows[0].id;
-
-    // Remap old system UUIDs → fresh ones to avoid any collisions on re-import.
-    // Build the rows up first, then bulk-insert in one round-trip each.
-    // Dedupe input by eve_system_id — a legacy export may carry the same
-    // K-space system twice. First occurrence wins; later refs get aliased
-    // to the same new UUID so connections that pointed at the duplicate
-    // re-attach correctly to the survivor.
-    const idMap = new Map<string, string>();
-    if (systems.length > 0) {
-      // Batch-resolve names → eve_system_id for any row that arrived without
-      // an ID. One SELECT amortised over the whole import beats N round-trips.
-      const namesNeedingResolve = [...new Set(
-        systems
-          .filter((s) => s.eveSystemId == null && typeof s.name === 'string' && s.name)
-          .map((s) => s.name as string),
-      )];
-      const nameToId = new Map<string, number>();
-      if (namesNeedingResolve.length > 0) {
-        const { rows } = await client.query<{ id: number; name: string }>(
-          `SELECT id, name FROM solar_systems WHERE name = ANY($1::text[])`,
-          [namesNeedingResolve],
-        );
-        for (const r of rows) nameToId.set(r.name, r.id);
-      }
-
-      const eveToNewId = new Map<number, string>();
-      const sysCols = 15;
-      const sysPlaceholders: string[] = [];
-      const sysValues: unknown[] = [];
-      for (const sys of systems) {
-        const eveId = (sys.eveSystemId as number | null | undefined)
-          ?? (typeof sys.name === 'string' ? nameToId.get(sys.name) ?? null : null);
-        if (eveId != null && eveToNewId.has(eveId)) {
-          // Already inserted for this map — alias the old UUID to the winner.
-          idMap.set(String(sys.id), eveToNewId.get(eveId)!);
-          continue;
-        }
-        const newId = crypto.randomUUID();
-        idMap.set(String(sys.id), newId);
-        if (eveId != null) eveToNewId.set(eveId, newId);
-        const pos = (sys.position as { x: number; y: number }) ?? { x: 0, y: 0 };
-        const base = sysValues.length;
-        sysPlaceholders.push(`(${Array.from({ length: sysCols }, (_, i) => `$${base + i + 1}`).join(',')})`);
-        sysValues.push(
-          newId, mapId, eveId, sys.name, sys.systemClass,
-          sys.effect ?? 'none', sys.statics ?? [], sys.regionName ?? null, sys.npcType ?? null,
-          pos.x, pos.y, sys.status ?? 'unknown', sys.isHome ?? false, sys.locked ?? false, sys.notes ?? '',
-        );
-      }
-      if (sysPlaceholders.length > 0) {
-        await client.query(
-          `INSERT INTO map_systems
-             (id, map_id, eve_system_id, name, system_class, effect, statics, region_name, npc_type,
-              position_x, position_y, status, is_home, locked, notes)
-           VALUES ${sysPlaceholders.join(',')}`,
-          sysValues,
-        );
-      }
-    }
-
-    // After eve_system_id dedup above, two distinct old UUIDs may alias to
-    // the same new UUID. Drop self-loops, and dedupe by undirected pair so
-    // we don't insert two connections between the same pair of nodes.
-    const seenPair = new Set<string>();
-    const validConns = connections
-      .map((conn) => {
-        const srcId = idMap.get(String(conn.sourceId));
-        const tgtId = idMap.get(String(conn.targetId));
-        if (!srcId || !tgtId || srcId === tgtId) return null;
-        const key = srcId < tgtId ? `${srcId}|${tgtId}` : `${tgtId}|${srcId}`;
-        if (seenPair.has(key)) return null;
-        seenPair.add(key);
-        return { conn, srcId, tgtId };
-      })
-      .filter((c): c is { conn: Record<string, unknown>; srcId: string; tgtId: string } => c !== null);
-
-    if (validConns.length > 0) {
-      const connCols = 10;
-      const connPlaceholders: string[] = [];
-      const connValues: unknown[] = [];
-      for (const { conn, srcId, tgtId } of validConns) {
-        const base = connValues.length;
-        connPlaceholders.push(`(${Array.from({ length: connCols }, (_, i) => `$${base + i + 1}`).join(',')})`);
-        connValues.push(
-          crypto.randomUUID(), mapId, srcId, tgtId,
-          conn.sourceHandle ?? null, conn.targetHandle ?? null,
-          conn.connectionType ?? 'standard', conn.massStatus ?? null,
-          conn.timeStatus ?? null, conn.size ?? 'large',
-        );
-      }
-      await client.query(
-        `INSERT INTO map_connections
-           (id, map_id, source_id, target_id, source_handle, target_handle,
-            connection_type, mass_status, time_status, size)
-         VALUES ${connPlaceholders.join(',')}`,
-        connValues,
-      );
-    }
+    const imported = await restoreMapBackup(client, mapId, backup, req.session.userId!);
 
     await client.query('COMMIT');
-    res.status(201).json({ id: mapId });
+    res.status(201).json({ id: mapId, imported });
   } catch (err) {
     await client.query('ROLLBACK');
     throw err;
   } finally {
     client.release();
   }
+});
+
+// GET /api/maps/:mapId/export -- a full backup of the map (see
+// services/mapBackup.ts): systems, connections with their clocks and flags,
+// signatures, anomalies and structures. Anyone who can open the map can back
+// it up; shares, share links, saved routes and jump history stay behind.
+mapsRouter.get('/:mapId/export', async (req, res) => {
+  const { mapId } = req.params;
+  if (!UUID_RE.test(mapId)) { res.status(404).json({ error: 'Map not found' }); return; }
+  const access = await getMapAccess(mapId, req);
+  if (!access) { res.status(404).json({ error: 'Map not found' }); return; }
+  const backup = await buildMapBackup(mapId);
+  if (!backup) { res.status(404).json({ error: 'Map not found' }); return; }
+  res.json(backup);
 });
 
 // ── Wanderer import ─────────────────────────────────────────────────────────

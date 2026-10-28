@@ -93,7 +93,14 @@ app.use(cors({
 // inflate: false refuses compressed request bodies (415). Nothing we serve
 // sends them, and body-parser < 1.20.9 can be stalled by trailing bytes after
 // a compressed body (GHSA, Dependabot #58) -- this closes that path outright.
-app.use(express.json({ limit: '2mb', inflate: false }));
+const jsonBody = express.json({ limit: '2mb', inflate: false });
+// Map import reads its own body, with a larger cap, once the router has
+// checked the session (routes/maps.ts) -- so a big upload is never parsed for
+// someone who isn't signed in.
+app.use((req, res, next) => {
+  if (req.method === 'POST' && req.path === '/api/maps/import') { next(); return; }
+  jsonBody(req, res, next);
+});
 
 // Derive cookie.secure from FRONTEND_URL's protocol rather than NODE_ENV.
 // Tying it to NODE_ENV breaks the common "production build running over plain
