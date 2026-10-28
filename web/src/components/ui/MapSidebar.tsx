@@ -38,6 +38,7 @@ import { PatchNotesModal } from "./PatchNotesModal";
 import { ContentFilterBlock } from "./ContentFilterBlock";
 import { useIsMapOwner } from "../../hooks/useIsMapOwner";
 import type { WormholeMap } from "../../types";
+import { countPersonalMaps } from '../../utils/personalMaps';
 
 // Single labelled checkbox row backed by useUserSetting so the on/off
 // state syncs cross-device via users.ui_settings. Used by the Activity
@@ -1024,7 +1025,7 @@ export function MapSidebar() {
   // only maps the user owns (not corp/alliance maps or ones merely shared with
   // them). Matches the server's quota (owner_id, corp/alliance NULL). Counting
   // every visible map wrongly disabled Import for corp/alliance members/admins.
-  const atMapLimit = maps.filter((m) => !m.isCorpMap && !m.isAllianceMap && !m.sharedWithMe).length >= maxMaps;
+  const atMapLimit = countPersonalMaps(maps) >= maxMaps;
 
 
   function handleExport() {
