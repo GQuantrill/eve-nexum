@@ -109,6 +109,8 @@ const AMBER = 0xf0a030;
 const BLUE  = 0x5b9bff;
 const GREEN = 0x3ddc84;
 const RED   = 0xe05a5a;
+const PURPLE = 0x9b6bff;
+const TEAL   = 0x2ec4b6;
 
 // Saved wormhole chain: name + start/end + how tight and how far.
 export function chainEmbed(p: {
@@ -196,6 +198,72 @@ export function killEmbed(p: {
       { name: 'System', value: p.regionName ? `${p.systemName} (${p.regionName})` : p.systemName, inline: true },
     ],
     timestamp: new Date(p.atMs).toISOString(),
+  };
+}
+
+// A special kill: a capital, 1B+ ISK, or a dictor/HIC or smartbomb on the mail.
+// Its own webhook so an org can route these to a channel that pings. The title
+// leads with the reason, since that's why anyone asked to be told.
+const SPECIAL_TITLE: Record<string, string> = {
+  capital:   '🛑 Capital down',
+  billion:   '💰 1B+ kill',
+  dictor:    '🫧 Dictor kill',
+  smartbomb: '💥 Smartbomb kill',
+};
+const SPECIAL_LABEL: Record<string, string> = {
+  capital: 'Capital', billion: '1B+ ISK', dictor: 'Dictor / HIC', smartbomb: 'Smartbomb',
+};
+export function specialKillEmbed(p: {
+  killmailId: number; systemName: string; regionName: string | null;
+  shipTypeName: string; totalValue: number;
+  victimName: string | null; victimCorpName: string | null; atMs: number;
+}, kinds: string[]): DiscordEmbed {
+  const base = killEmbed(p);
+  return {
+    ...base,
+    title:  `${SPECIAL_TITLE[kinds[0]] ?? '💀 Kill'} in ${p.systemName}`,
+    color:  kinds.includes('capital') || kinds.includes('billion') ? PURPLE : AMBER,
+    fields: [
+      ...(base.fields ?? []),
+      { name: 'Why', value: kinds.map((k) => SPECIAL_LABEL[k] ?? k).join(', '), inline: true },
+    ],
+  };
+}
+
+// A wormhole marked end of life (or later) by a pilot: anyone relying on it to
+// get home has a few hours at most.
+export function eolEmbed(p: {
+  a: string; b: string; whType: string | null; status: string; mapName: string; actor: string | null;
+}): DiscordEmbed {
+  const fields: NonNullable<DiscordEmbed['fields']> = [{ name: 'Time left', value: p.status, inline: true }];
+  if (p.whType) fields.push({ name: 'Type', value: p.whType, inline: true });
+  return {
+    title:       '⏳ Wormhole end of life',
+    description: `**${p.a}** ↔ **${p.b}** on **${p.mapName}** is end of life`,
+    color:       AMBER,
+    fields,
+    footer:      p.actor ? { text: `marked by ${p.actor}` } : undefined,
+    timestamp:   new Date().toISOString(),
+  };
+}
+
+// A hole into Thera or Turnur: a shortcut across the cluster.
+export function theraEmbed(p: {
+  hub: string; other: string; otherClass: string; otherRegion: string | null;
+  whType: string | null; size: string | null; mapName: string; actor: string | null;
+}): DiscordEmbed {
+  const fields: NonNullable<DiscordEmbed['fields']> = [
+    { name: 'Connected to', value: `${p.other} (${p.otherRegion ? `${p.otherClass}, ${p.otherRegion}` : p.otherClass})`, inline: true },
+  ];
+  if (p.whType) fields.push({ name: 'Type', value: p.whType, inline: true });
+  if (p.size)   fields.push({ name: 'Maximum ship size', value: p.size, inline: true });
+  return {
+    title:       `🌀 ${p.hub} connection`,
+    description: `New hole to **${p.hub}** from **${p.other}** on **${p.mapName}**`,
+    color:       TEAL,
+    fields,
+    footer:      p.actor ? { text: `added by ${p.actor}` } : undefined,
+    timestamp:   new Date().toISOString(),
   };
 }
 

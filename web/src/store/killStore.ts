@@ -38,6 +38,8 @@ export interface KillRow {
   victimCorporationId: number | null;
   victimCorpName:      string | null;
   npc:                 boolean;
+  /** Why it's a special kill: 'capital' | 'billion' | 'dictor' | 'smartbomb'. */
+  special?:            string[];
   finalBlow: {
     characterId:   number | null;
     name:          string | null;

@@ -7,6 +7,7 @@ import { useJumpLogStore, type JumpRow } from '../store/jumpLogStore';
 import { useRemoteActivity } from '../store/remoteActivityStore';
 import { apiUrl } from '../api/client';
 import { CLIENT_ID } from '../api/clientId';
+import { alertKill, alertConnectionEol } from '../utils/mapAlerts';
 
 // Subscribes to the active map's live-edit SSE stream and applies incoming
 // edits from other clients to the store. One stream at a time — it follows
@@ -53,10 +54,10 @@ export function useMapEventStream(): void {
           case 'presence.leave':
             presence.remove(data.characterId as number);
             return;
-          case 'kill.recent':
+          case 'kill.recent': {
             // Ephemeral, non-map state — route the whole decorated KillRow to the
             // kill store (flags the node + feeds the log), not mapStore.
-            useKillStore.getState().recordKill({
+            const kill: KillRow = {
               killmailId:          data.killmailId as number,
               atMs:                data.atMs as number,
               eveSystemId:         data.eveSystemId as number,
@@ -70,12 +71,18 @@ export function useMapEventStream(): void {
               victimCorporationId: (data.victimCorporationId as number | null) ?? null,
               victimCorpName:      (data.victimCorpName as string | null) ?? null,
               npc:                 !!data.npc,
+              special:             Array.isArray(data.special) ? (data.special as string[]) : [],
               finalBlow:           (data.finalBlow as KillRow['finalBlow']) ?? null,
-            });
+            };
+            useKillStore.getState().recordKill(kill);
+            // Live kills only: the REST backfill seeds the log without coming
+            // through here, so history never raises a notification.
+            alertKill(kill);
             // Also nudge the kills heatmap to refetch (debounced), so it reflects
             // this kill within ~a second instead of on the 5-min poll.
             refreshCurrentKills();
             return;
+          }
           case 'jump.logged':
             // Ephemeral connection intel — append to the jump-log store. Handled
             // before the echo check so the pilot who logged it also sees their own
@@ -91,6 +98,12 @@ export function useMapEventStream(): void {
         }
 
         if (data.actor === CLIENT_ID) return; // our own echo — already applied
+        // Someone else just marked a hole end of life. Notification only — the
+        // state change itself arrives as the usual connection.update.
+        if (data.type === 'connection.eol') {
+          alertConnectionEol(data.id as string, data.timeStatus as string);
+          return;
+        }
         // Another viewer saved a wormhole chain — count it for the voice
         // announcer's "new chain" event (only remote adds reach here, never our
         // own saves, and NOT plain map connections — only saved chains).

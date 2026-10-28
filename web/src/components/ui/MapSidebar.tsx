@@ -22,7 +22,7 @@ import {
 import type { Density } from '../../utils/density';
 import { useUserSetting } from "../../hooks/useUserSetting";
 import { normalizePlacement } from "../../hooks/useLocationTracking";
-import { NOTIFY, notifyDefault, previewAlertVolume, ALERT_VOLUME_KEY, ALERT_VOLUME_DEFAULT, EXITS_MIN_SECURITY_KEY, EXITS_MIN_SECURITY_DEFAULT, EXITS_MIN_SECURITY_OFF } from "../../utils/notificationPrefs";
+import { NOTIFY, notifyDefault, previewAlertVolume, ALERT_VOLUME_KEY, ALERT_VOLUME_DEFAULT, EXITS_MIN_SECURITY_KEY, EXITS_MIN_SECURITY_DEFAULT, EXITS_MIN_SECURITY_OFF, KILLS_FILTER_KEY, KILLS_FILTER_DEFAULT, type KillsFilter } from "../../utils/notificationPrefs";
 import { useResettableState } from "../../hooks/useResettableState";
 import { DEFAULT_BOOKMARK_FORMAT, BOOKMARK_TOKENS, DEFAULT_SITE_BOOKMARK_FORMAT, SITE_BOOKMARK_TOKENS } from "../../utils/signatureBookmark";
 import { toPng } from "html-to-image";
@@ -928,6 +928,7 @@ export function MapSidebar() {
   const compactMode = useMapStore((s) => s.compactMode);
   const panelSideBySide = useMapStore((s) => s.panelSideBySide);
   const [exitsMinSec, setExitsMinSec] = useUserSetting<number>(EXITS_MIN_SECURITY_KEY, EXITS_MIN_SECURITY_DEFAULT);
+  const [killsFilter, setKillsFilter] = useUserSetting<KillsFilter>(KILLS_FILTER_KEY, KILLS_FILTER_DEFAULT);
   const [alertVolume, setAlertVolume] = useUserSetting<number>(ALERT_VOLUME_KEY, ALERT_VOLUME_DEFAULT);
   const setPanelSideBySide = useMapStore((s) => s.setPanelSideBySide);
   const setCompactMode = useMapStore((s) => s.setCompactMode);
@@ -1716,6 +1717,16 @@ export function MapSidebar() {
               desktopKey={NOTIFY.exitsDesktop}
               soundKey={NOTIFY.exitsSound}
             />
+            <NotifRow
+              label={t("mapSidebar.notifKills")}
+              desktopKey={NOTIFY.killsDesktop}
+              soundKey={NOTIFY.killsSound}
+            />
+            <NotifRow
+              label={t("mapSidebar.notifEol")}
+              desktopKey={NOTIFY.eolDesktop}
+              soundKey={NOTIFY.eolSound}
+            />
           </div>
           {/* Which exits count. Only meaningful with the row above switched on,
               so it sits under the grid rather than in it. */}
@@ -1733,6 +1744,21 @@ export function MapSidebar() {
             />
           </label>
           <div className="map-sidebar__hint">{t("mapSidebar.notifExitsHint")}</div>
+
+          {/* Which kills count for the Kills row. */}
+          <label className="map-sidebar__field">
+            <span>{t("mapSidebar.notifKillsWhich")}</span>
+            <Select
+              value={killsFilter}
+              onChange={(v) => setKillsFilter(v as KillsFilter)}
+              options={[
+                { value: "special", label: t("mapSidebar.notifKillsSpecial") },
+                { value: "billion", label: t("mapSidebar.notifKillsBillion") },
+                { value: "all",     label: t("mapSidebar.notifKillsAll") },
+              ]}
+            />
+          </label>
+          <div className="map-sidebar__hint">{t("mapSidebar.notifKillsHint")}</div>
 
           {/* Volume for everything the app makes a sound with: the generated
               chimes AND the spoken announcer in the section below. The chimes

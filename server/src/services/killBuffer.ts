@@ -1,5 +1,5 @@
 import { config } from '../config.js';
-import type { KillTag } from './killTags.js';
+import type { KillTag, SpecialKind } from './killTags.js';
 
 // A kill recorded from the live R2Z2 feed -- every kill, whatever it's worth --
 // held in memory so the kill-log backfill (which applies the ISK floor) and the
@@ -25,6 +25,8 @@ export interface BufferedKill {
   npc:                   boolean;
   /** gate / hic / dic / sb / solo / npc (services/killTags.ts). */
   tags?:                 KillTag[];
+  /** Why it's a special kill, if it is (services/killTags.ts). */
+  special?:              SpecialKind[];
 }
 
 // Rolling in-memory buffer of recent kills, fed by the live consumer. Append

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { tagsFor, attackerTypeIds } from './killTags.js';
+import { tagsFor, attackerTypeIds, specialKinds } from './killTags.js';
 
 // A few SDE groups: HIC 894, interdictor 541, smartbomb 72, and a plain cruiser.
 const GROUPS: Record<number, number> = { 11995: 894, 22456: 541, 3937: 72, 620: 26 };
@@ -38,5 +38,27 @@ describe('attackerTypeIds', () => {
       { weapon_type_id: 0 },
     ]).sort()).toEqual([11995, 3937].sort());
     expect(attackerTypeIds(undefined)).toEqual([]);
+  });
+});
+
+describe('specialKinds', () => {
+  // Victim hulls: a dreadnought (485), a frigate (25) and a capsule.
+  const VICTIMS: Record<number, number> = { 19720: 485, 587: 25, 670: 29 };
+  const victimGroup = (id: number) => VICTIMS[id];
+
+  it('flags capitals and billion-ISK kills', () => {
+    expect(specialKinds({ shipTypeId: 19720, totalValue: 3e9 }, victimGroup)).toEqual(['capital', 'billion']);
+    expect(specialKinds({ shipTypeId: 587, totalValue: 1e9 }, victimGroup)).toEqual(['billion']);
+    expect(specialKinds({ shipTypeId: 587, totalValue: 999e6 }, victimGroup)).toEqual([]);
+  });
+
+  it('flags dictor, HIC and smartbomb kills, but not pods', () => {
+    expect(specialKinds({ shipTypeId: 587, totalValue: 2e6, tags: ['gate', 'dic'] }, victimGroup)).toEqual(['dictor']);
+    expect(specialKinds({ shipTypeId: 587, totalValue: 2e6, tags: ['hic', 'sb'] }, victimGroup)).toEqual(['dictor', 'smartbomb']);
+    expect(specialKinds({ shipTypeId: 670, totalValue: 1e5, tags: ['dic', 'sb'] }, victimGroup)).toEqual([]);
+  });
+
+  it('treats an unknown hull as not a capital', () => {
+    expect(specialKinds({ shipTypeId: 123, totalValue: 0, tags: ['solo'] }, victimGroup)).toEqual([]);
   });
 });

@@ -17,6 +17,10 @@ export const NOTIFY = {
   watchlistSound:   'nexum.watchlist.sound',
   exitsDesktop:     'nexum.notify.exits.desktop',
   exitsSound:       'nexum.notify.exits.sound',
+  killsDesktop:     'nexum.notify.kills.desktop',
+  killsSound:       'nexum.notify.kills.sound',
+  eolDesktop:       'nexum.notify.eol.desktop',
+  eolSound:         'nexum.notify.eol.sound',
 } as const;
 
 /**
@@ -90,6 +94,15 @@ export const EXITS_MIN_SECURITY_DEFAULT = 0.45;
  */
 export const EXITS_MIN_SECURITY_OFF = 2;
 
+/**
+ * Which live kills on the map raise the kill notification: only special ones
+ * (a capital, 1B+ ISK, a dictor/HIC or smartbomb on the mail), anything worth
+ * 1B+, or every kill the feed flags on the map.
+ */
+export const KILLS_FILTER_KEY = 'nexum.notify.killsFilter';
+export type KillsFilter = 'special' | 'billion' | 'all';
+export const KILLS_FILTER_DEFAULT: KillsFilter = 'special';
+
 // Proximity alerts on both channels and the watchlist keeps its sound (desktop
 // there was always opt-in). K162 and exits are opt-in: both are chain-wide
 // chatter rather than something happening to you, and on a busy chain they fire
@@ -103,6 +116,11 @@ export const NOTIFY_DEFAULTS: Record<string, boolean> = {
   [NOTIFY.watchlistSound]:   true,
   [NOTIFY.exitsDesktop]:     false,
   [NOTIFY.exitsSound]:       false,
+  // Kills and EOL are chain-wide chatter too, so also opt-in.
+  [NOTIFY.killsDesktop]:     false,
+  [NOTIFY.killsSound]:       false,
+  [NOTIFY.eolDesktop]:       false,
+  [NOTIFY.eolSound]:         false,
 };
 
 /**

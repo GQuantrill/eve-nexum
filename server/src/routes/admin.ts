@@ -8,6 +8,7 @@ import { requireReportsAccess, isReportsCharacter, corpScopeFor } from '../middl
 import { isAdmin, isAllianceAdmin } from '../middleware/authContext.js';
 import { config } from '../config.js';
 import { isDiscordWebhookUrl } from '../services/discord.js';
+import { SPECIAL_KINDS } from '../services/killTags.js';
 import { getVersionStatus } from '../services/versionCheck.js';
 import { createLogger } from '../utils/logger.js';
 import { invalidateSessionsForUser } from '../utils/sessionInvalidate.js';
@@ -894,25 +895,28 @@ const WH_TYPE_RE = /^[A-Z][0-9]{3}$/;
 
 interface WhSettingsRow {
   allRegions: boolean; regions: string[]; notifyChains: boolean;
-  notifyK162: boolean; notifyExits: boolean;
+  notifyK162: boolean; notifyExits: boolean; notifyEol: boolean; notifyThera: boolean;
   whTypes: string[]; whClasses: string[]; whSizes: string[];
   connectionsWebhook: string | null; chainsWebhook: string | null;
   exitsMinSecurity: number;
   killWebhook: string | null; killMinIsk: string; // kill_min_isk is BIGINT -> string
+  specialKillWebhook: string | null; specialKillKinds: string[];
 }
 const WH_SETTINGS_COLS = `all_regions AS "allRegions", regions, notify_chains AS "notifyChains",
                           notify_k162 AS "notifyK162", notify_exits AS "notifyExits",
+                          notify_eol AS "notifyEol", notify_thera AS "notifyThera",
                           wh_types AS "whTypes", wh_classes AS "whClasses", wh_sizes AS "whSizes",
                           connections_webhook AS "connectionsWebhook", chains_webhook AS "chainsWebhook",
                           exits_min_security AS "exitsMinSecurity",
-                          kill_webhook AS "killWebhook", kill_min_isk AS "killMinIsk"`;
+                          kill_webhook AS "killWebhook", kill_min_isk AS "killMinIsk",
+                          special_kill_webhook AS "specialKillWebhook", special_kill_kinds AS "specialKillKinds"`;
 
 // GET /api/admin/discord — current settings + this org's maps with their
 // excluded state (excluded = NOT discord_notify).
 adminRouter.get('/discord', async (req, res) => {
   const scope = resolveDiscordScope(req);
   if (!scope) {
-    res.json({ scope: null, allRegions: true, regions: [], notifyChains: true, notifyK162: false, notifyExits: false, whTypes: [], whClasses: [], whSizes: [], connectionsWebhook: '', chainsWebhook: '', exitsMinSecurity: 0.45, killWebhook: '', killMinIsk: 0, maps: [] });
+    res.json({ scope: null, allRegions: true, regions: [], notifyChains: true, notifyK162: false, notifyExits: false, notifyEol: false, notifyThera: false, whTypes: [], whClasses: [], whSizes: [], connectionsWebhook: '', chainsWebhook: '', exitsMinSecurity: 0.45, killWebhook: '', killMinIsk: 0, specialKillWebhook: '', specialKillKinds: [...SPECIAL_KINDS], maps: [] });
     return;
   }
   // Literal SQL per branch (no interpolated identifiers) so the settings table /
@@ -935,6 +939,8 @@ adminRouter.get('/discord', async (req, res) => {
     // Opt-in, so an org with no saved row reads as off rather than on.
     notifyK162:   row?.notifyK162 ?? false,
     notifyExits:  row?.notifyExits ?? false,
+    notifyEol:    row?.notifyEol ?? false,
+    notifyThera:  row?.notifyThera ?? false,
     whTypes:      row?.whTypes ?? [],
     whClasses:    row?.whClasses ?? [],
     whSizes:      row?.whSizes ?? [],
@@ -943,6 +949,8 @@ adminRouter.get('/discord', async (req, res) => {
     exitsMinSecurity:   row?.exitsMinSecurity ?? 0.45,
     killWebhook:        row?.killWebhook ?? '',
     killMinIsk:         Number(row?.killMinIsk ?? 0),
+    specialKillWebhook: row?.specialKillWebhook ?? '',
+    specialKillKinds:   row?.specialKillKinds ?? [...SPECIAL_KINDS],
     maps:         maps.rows,
   });
 });
@@ -958,12 +966,16 @@ adminRouter.put('/discord', async (req, res) => {
     whTypes?: unknown; whClasses?: unknown; whSizes?: unknown;
     connectionsWebhook?: unknown; chainsWebhook?: unknown; exitsMinSecurity?: unknown;
     killWebhook?: unknown; killMinIsk?: unknown;
+    notifyEol?: unknown; notifyThera?: unknown;
+    specialKillWebhook?: unknown; specialKillKinds?: unknown;
   };
   const allRegions   = body.allRegions !== false;   // default true
   const notifyChains = body.notifyChains !== false; // default true
   // These two are opt-in: anything but an explicit true reads as off.
   const notifyK162   = body.notifyK162  === true;
   const notifyExits  = body.notifyExits === true;
+  const notifyEol    = body.notifyEol   === true;
+  const notifyThera  = body.notifyThera === true;
 
   // Minimum kill ISK for the Discord kill alert. Non-negative integer; default 0
   // (notify for every kill the feed surfaces). Always written like the security
@@ -993,7 +1005,8 @@ adminRouter.put('/discord', async (req, res) => {
   const conn  = resolveWebhook(body.connectionsWebhook);
   const chain = resolveWebhook(body.chainsWebhook);
   const kill  = resolveWebhook(body.killWebhook);
-  if (conn.bad || chain.bad || kill.bad) {
+  const special = resolveWebhook(body.specialKillWebhook);
+  if (conn.bad || chain.bad || kill.bad || special.bad) {
     res.status(400).json({ error: 'Webhook must be a Discord webhook URL (https://discord.com/api/webhooks/…)' });
     return;
   }
@@ -1016,14 +1029,19 @@ adminRouter.put('/discord', async (req, res) => {
   const whTypes   = [...new Set(asStrings(body.whTypes).map((s) => s.trim().toUpperCase()).filter((s) => WH_TYPE_RE.test(s)))];
   const whClasses = [...new Set(asStrings(body.whClasses).map((s) => s.trim()).filter((s) => WH_CLASSES.has(s)))];
   const whSizes   = [...new Set(asStrings(body.whSizes).map((s) => s.trim().toLowerCase()).filter((s) => WH_SIZES.has(s)))];
+  // Which special kills to alert on. Absent keeps all four (the default); an
+  // empty list is allowed, and just means the webhook never fires.
+  const specialKillKinds = Array.isArray(body.specialKillKinds)
+    ? SPECIAL_KINDS.filter((k) => asStrings(body.specialKillKinds).includes(k))
+    : [...SPECIAL_KINDS];
 
   // On an existing row, only overwrite a webhook column when the field was
   // provided (CASE on the `provided` flag); otherwise keep the stored value.
-  const params = [scope.id, allRegions, regions, notifyChains, whTypes, whClasses, whSizes, conn.value, chain.value, conn.provided, chain.provided, exitsMinSecurity, kill.value, kill.provided, killMinIsk, notifyK162, notifyExits];
+  const params = [scope.id, allRegions, regions, notifyChains, whTypes, whClasses, whSizes, conn.value, chain.value, conn.provided, chain.provided, exitsMinSecurity, kill.value, kill.provided, killMinIsk, notifyK162, notifyExits, notifyEol, notifyThera, special.value, special.provided, specialKillKinds];
   if (scope.kind === 'alliance') {
     await db.query(
-      `INSERT INTO alliance_discord_settings (alliance_id, all_regions, regions, notify_chains, wh_types, wh_classes, wh_sizes, connections_webhook, chains_webhook, exits_min_security, kill_webhook, kill_min_isk, notify_k162, notify_exits, updated_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $12, $13, $15, $16, $17, NOW())
+      `INSERT INTO alliance_discord_settings (alliance_id, all_regions, regions, notify_chains, wh_types, wh_classes, wh_sizes, connections_webhook, chains_webhook, exits_min_security, kill_webhook, kill_min_isk, notify_k162, notify_exits, notify_eol, notify_thera, special_kill_webhook, special_kill_kinds, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $12, $13, $15, $16, $17, $18, $19, $20, $22, NOW())
        ON CONFLICT (alliance_id) DO UPDATE
          SET all_regions = EXCLUDED.all_regions, regions = EXCLUDED.regions,
              notify_chains = EXCLUDED.notify_chains, wh_types = EXCLUDED.wh_types,
@@ -1034,13 +1052,16 @@ adminRouter.put('/discord', async (req, res) => {
              kill_webhook = CASE WHEN $14 THEN EXCLUDED.kill_webhook ELSE alliance_discord_settings.kill_webhook END,
              kill_min_isk = EXCLUDED.kill_min_isk,
              notify_k162 = EXCLUDED.notify_k162, notify_exits = EXCLUDED.notify_exits,
+             notify_eol = EXCLUDED.notify_eol, notify_thera = EXCLUDED.notify_thera,
+             special_kill_webhook = CASE WHEN $21 THEN EXCLUDED.special_kill_webhook ELSE alliance_discord_settings.special_kill_webhook END,
+             special_kill_kinds = EXCLUDED.special_kill_kinds,
              updated_at = NOW()`,
       params,
     );
   } else {
     await db.query(
-      `INSERT INTO corp_discord_settings (corp_id, all_regions, regions, notify_chains, wh_types, wh_classes, wh_sizes, connections_webhook, chains_webhook, exits_min_security, kill_webhook, kill_min_isk, notify_k162, notify_exits, updated_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $12, $13, $15, $16, $17, NOW())
+      `INSERT INTO corp_discord_settings (corp_id, all_regions, regions, notify_chains, wh_types, wh_classes, wh_sizes, connections_webhook, chains_webhook, exits_min_security, kill_webhook, kill_min_isk, notify_k162, notify_exits, notify_eol, notify_thera, special_kill_webhook, special_kill_kinds, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $12, $13, $15, $16, $17, $18, $19, $20, $22, NOW())
        ON CONFLICT (corp_id) DO UPDATE
          SET all_regions = EXCLUDED.all_regions, regions = EXCLUDED.regions,
              notify_chains = EXCLUDED.notify_chains, wh_types = EXCLUDED.wh_types,
@@ -1051,11 +1072,14 @@ adminRouter.put('/discord', async (req, res) => {
              kill_webhook = CASE WHEN $14 THEN EXCLUDED.kill_webhook ELSE corp_discord_settings.kill_webhook END,
              kill_min_isk = EXCLUDED.kill_min_isk,
              notify_k162 = EXCLUDED.notify_k162, notify_exits = EXCLUDED.notify_exits,
+             notify_eol = EXCLUDED.notify_eol, notify_thera = EXCLUDED.notify_thera,
+             special_kill_webhook = CASE WHEN $21 THEN EXCLUDED.special_kill_webhook ELSE corp_discord_settings.special_kill_webhook END,
+             special_kill_kinds = EXCLUDED.special_kill_kinds,
              updated_at = NOW()`,
       params,
     );
   }
-  res.json({ ok: true, allRegions, regions, notifyChains, notifyK162, notifyExits, whTypes, whClasses, whSizes, exitsMinSecurity, killMinIsk });
+  res.json({ ok: true, allRegions, regions, notifyChains, notifyK162, notifyExits, notifyEol, notifyThera, whTypes, whClasses, whSizes, exitsMinSecurity, killMinIsk, specialKillKinds });
 });
 
 // PATCH /api/admin/maps/:id/discord — exclude / re-include one of the org's

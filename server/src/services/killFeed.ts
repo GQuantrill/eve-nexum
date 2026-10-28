@@ -3,11 +3,11 @@ import { db } from '../db.js';
 import { createLogger } from '../utils/logger.js';
 import { activeMapIds, publishToMap } from './mapEvents.js';
 import { resolveEntityNames } from './entityNames.js';
-import { notifyDiscord, killEmbed } from './discord.js';
+import { notifyDiscord, killEmbed, specialKillEmbed } from './discord.js';
 import { recordKill, recordLiveKill, type BufferedKill } from './killBuffer.js';
 import { recordPvpKill, flushPvpKills } from './pvpHistory.js';
 import { storeKill } from './killStore.js';
-import { tagsFor, loadGroups, attackerTypeIds } from './killTags.js';
+import { tagsFor, loadGroups, attackerTypeIds, specialKinds, type SpecialKind } from './killTags.js';
 import { getSetting, setSetting } from './appSettings.js';
 
 // A single decorated kill, shared by the live SSE `kill.recent` event and the
@@ -28,6 +28,8 @@ export interface KillRow {
   victimCorporationId: number | null;
   victimCorpName:      string | null;
   npc:                 boolean;
+  /** Why it's a special kill (capital, 1B+, dictor, smartbomb); empty if not. */
+  special:             SpecialKind[];
   finalBlow: {
     characterId:   number | null;
     name:          string | null;
@@ -91,6 +93,7 @@ export async function buildKillRow(k: BufferedKill): Promise<KillRow> {
     victimCorporationId: k.victimCorporationId,
     victimCorpName: k.victimCorporationId ? names.get(k.victimCorporationId)?.name ?? null : null,
     npc: k.npc,
+    special: k.special ?? [],
     finalBlow: hasFinalBlow ? {
       characterId:   k.finalBlowCharacterId,
       name:          k.finalBlowCharacterId ? names.get(k.finalBlowCharacterId)?.name ?? null : null,
@@ -243,16 +246,22 @@ export async function processKill(body: EphemeralKill, replayed = false): Promis
     npc,
   };
   const typeIds = attackerTypeIds(km.attackers);
+  // The victim's hull too, to spot a capital.
+  const groupOf = await loadGroups([...typeIds, shipTypeId]);
   buffered.tags = tagsFor(
     { locationId: Number(body.zkb?.locationID) || null, solo: buffered.solo, npc, typeIds },
-    await loadGroups(typeIds),
+    groupOf,
   );
+  buffered.special = specialKinds(buffered, groupOf);
   recordKill(buffered);
   // The week-long store behind the killboard's windows and whole-map view; the
   // killmail id is its key, so a replayed kill is a no-op there.
   storeKill({ ...buffered, tags: buffered.tags });
 
-  if (!(totalValue >= config.killFeed.minValueIsk)) return;
+  // A special kill goes out whatever its value: a dictor kill on a gate is
+  // often cheap, and it's exactly what the special-kill alerts are for.
+  const overMin = totalValue >= config.killFeed.minValueIsk;
+  if (!overMin && !buffered.special.length) return;
   stats.overMin++;
   // Already flashed and posted by the run that first saw it.
   if (replayed) return;
@@ -283,18 +292,21 @@ export async function processKill(body: EphemeralKill, replayed = false): Promis
       )).rows.map((r) => r.mapId)
     : [];
 
-  // Corp/alliance maps containing this system that have a kill webhook — viewers
-  // irrelevant. Deduped to distinct (webhook, min-ISK) pairs.
+  // Corp/alliance maps containing this system that have a kill or special-kill
+  // webhook — viewers irrelevant. Deduped to distinct settings.
   const hooks = anyHooks
-    ? (await db.query<{ killWebhook: string; killMinIsk: string }>(
+    ? (await db.query<KillHookRow>(
         `SELECT DISTINCT COALESCE(cds.kill_webhook, ads.kill_webhook)    AS "killWebhook",
-                COALESCE(cds.kill_min_isk, ads.kill_min_isk, 0) AS "killMinIsk"
+                COALESCE(cds.kill_min_isk, ads.kill_min_isk, 0) AS "killMinIsk",
+                COALESCE(cds.special_kill_webhook, ads.special_kill_webhook) AS "specialWebhook",
+                COALESCE(cds.special_kill_kinds, ads.special_kill_kinds, '{}'::text[]) AS "specialKinds"
            FROM map_systems ms
            JOIN maps m ON m.id = ms.map_id
            LEFT JOIN corp_discord_settings     cds ON cds.corp_id     = m.corp_id
            LEFT JOIN alliance_discord_settings ads ON ads.alliance_id = m.alliance_id
           WHERE ms.eve_system_id = $1
-            AND COALESCE(cds.kill_webhook, ads.kill_webhook) IS NOT NULL`,
+            AND (COALESCE(cds.kill_webhook, ads.kill_webhook) IS NOT NULL
+              OR COALESCE(cds.special_kill_webhook, ads.special_kill_webhook) IS NOT NULL)`,
         [solarSystemId],
       )).rows
     : [];
@@ -311,20 +323,38 @@ export async function processKill(body: EphemeralKill, replayed = false): Promis
     log.info(`forwarded kill in ${killRow.systemName} (${Math.round(totalValue / 1e6)}M ISK) -> ${liveMaps.length} map(s)`);
   }
 
-  dispatchDiscord(hooks, killRow);
+  dispatchDiscord(hooks, killRow, overMin);
 }
 
-// Send a Discord kill alert to the webhook of each matched corp/alliance map
-// that has one configured and whose per-org min-ISK the kill clears. Dedupes by
-// URL so two maps sharing a webhook get a single message. Best-effort — a webhook
-// lookup failure is logged and swallowed, never breaking the poll loop.
-function dispatchDiscord(hooks: { killWebhook: string; killMinIsk: string }[], kill: KillRow): void {
+interface KillHookRow {
+  killWebhook: string | null; killMinIsk: string;
+  specialWebhook: string | null; specialKinds: string[];
+}
+
+// Send Discord kill alerts for each matched corp/alliance map's settings:
+//  - a special-kill alert when the kill is one of the kinds the org asked for,
+//    whatever its value;
+//  - otherwise the ordinary kill alert, when the kill clears both the feed's
+//    floor and the org's own minimum.
+// Special alerts go first so that, where both point at the same webhook, the
+// channel gets the special one. Dedupes by URL so two maps sharing a webhook get
+// a single message.
+export function dispatchDiscord(hooks: KillHookRow[], kill: KillRow, overFeedMin: boolean): void {
   const sent = new Set<string>();
   for (const h of hooks) {
-    if (sent.has(h.killWebhook)) continue;
-    if (kill.totalValue < Number(h.killMinIsk)) continue;
-    sent.add(h.killWebhook);
-    notifyDiscord(h.killWebhook, killEmbed(kill)); // SSRF-guarded + queued inside
+    if (!h.specialWebhook || sent.has(h.specialWebhook)) continue;
+    const kinds = kill.special.filter((k) => h.specialKinds.includes(k));
+    if (!kinds.length) continue;
+    sent.add(h.specialWebhook);
+    notifyDiscord(h.specialWebhook, specialKillEmbed(kill, kinds)); // SSRF-guarded + queued inside
+  }
+  if (overFeedMin) {
+    for (const h of hooks) {
+      if (!h.killWebhook || sent.has(h.killWebhook)) continue;
+      if (kill.totalValue < Number(h.killMinIsk)) continue;
+      sent.add(h.killWebhook);
+      notifyDiscord(h.killWebhook, killEmbed(kill));
+    }
   }
   if (sent.size) log.info(`kill Discord: dispatched to ${sent.size} webhook(s) for ${kill.systemName}`);
 }
@@ -339,8 +369,8 @@ async function anyKillWebhooks(): Promise<boolean> {
   if (now - hooksCheckedAt < 60_000) return hooksPresent;
   try {
     const { rows } = await db.query<{ present: boolean }>(
-      `SELECT (EXISTS(SELECT 1 FROM corp_discord_settings     WHERE kill_webhook IS NOT NULL)
-            OR EXISTS(SELECT 1 FROM alliance_discord_settings WHERE kill_webhook IS NOT NULL)) AS present`,
+      `SELECT (EXISTS(SELECT 1 FROM corp_discord_settings     WHERE kill_webhook IS NOT NULL OR special_kill_webhook IS NOT NULL)
+            OR EXISTS(SELECT 1 FROM alliance_discord_settings WHERE kill_webhook IS NOT NULL OR special_kill_webhook IS NOT NULL)) AS present`,
     );
     hooksPresent = !!rows[0]?.present;
     hooksCheckedAt = now;

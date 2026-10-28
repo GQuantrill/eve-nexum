@@ -8,10 +8,15 @@ vi.mock('./pvpHistory.js', () => ({
   flushPvpKills: async () => {},
 }));
 vi.mock('./mapEvents.js', () => ({ activeMapIds: () => [], publishToMap: () => {} }));
-vi.mock('./discord.js', () => ({ notifyDiscord: async () => {}, killEmbed: () => ({}) }));
+const discord = vi.hoisted(() => ({ sent: [] as Array<{ url: string; kind: string; why?: string[] }> }));
+vi.mock('./discord.js', () => ({
+  notifyDiscord: (url: string, embed: { kind: string; why?: string[] }) => { discord.sent.push({ url, ...embed }); },
+  killEmbed: () => ({ kind: 'kill' }),
+  specialKillEmbed: (_k: unknown, why: string[]) => ({ kind: 'special', why }),
+}));
 vi.mock('./appSettings.js', () => ({ getSetting: async () => null, setSetting: async () => {} }));
 
-import { planStart, processKill } from './killFeed.js';
+import { planStart, processKill, dispatchDiscord, type KillRow } from './killFeed.js';
 import { recentKillsForSystems } from './killBuffer.js';
 import { config } from '../config.js';
 
@@ -94,5 +99,40 @@ describe('processKill', () => {
     await processKill(k);
     await processKill(k);
     expect(pvp.recorded.filter(([s]) => s === 31000004)).toHaveLength(1);
+  });
+});
+
+describe('dispatchDiscord', () => {
+  const kill = (totalValue: number, special: KillRow['special']) => ({
+    killmailId: 1, atMs: 0, eveSystemId: 30000142, systemName: 'Jita', regionName: 'The Forge',
+    shipTypeId: 587, shipTypeName: 'Rifter', totalValue, victimCharacterId: null, victimName: null,
+    victimCorporationId: null, victimCorpName: null, npc: false, special, finalBlow: null,
+  }) as KillRow;
+  const hook = (h: Partial<{ killWebhook: string | null; killMinIsk: string; specialWebhook: string | null; specialKinds: string[] }>) => ({
+    killWebhook: null, killMinIsk: '0', specialWebhook: null, specialKinds: ['capital', 'billion', 'dictor', 'smartbomb'], ...h,
+  });
+  beforeEach(() => { discord.sent = []; });
+
+  it('sends a special kill to the special webhook, for the kinds the org chose', () => {
+    dispatchDiscord([hook({ specialWebhook: 'S', specialKinds: ['dictor'] })], kill(5e6, ['dictor', 'smartbomb']), false);
+    expect(discord.sent).toEqual([{ url: 'S', kind: 'special', why: ['dictor'] }]);
+  });
+
+  it('skips the special webhook when none of the kinds were chosen', () => {
+    dispatchDiscord([hook({ specialWebhook: 'S', specialKinds: ['capital'] })], kill(5e6, ['dictor']), false);
+    expect(discord.sent).toEqual([]);
+  });
+
+  it('only sends the ordinary alert for kills over the feed floor and the org minimum', () => {
+    dispatchDiscord([hook({ killWebhook: 'K', killMinIsk: '100000000' })], kill(5e6, ['dictor']), false);
+    dispatchDiscord([hook({ killWebhook: 'K', killMinIsk: '100000000' })], kill(5e7, []), true);
+    expect(discord.sent).toEqual([]);
+    dispatchDiscord([hook({ killWebhook: 'K', killMinIsk: '100000000' })], kill(2e8, []), true);
+    expect(discord.sent).toEqual([{ url: 'K', kind: 'kill' }]);
+  });
+
+  it('posts once when both alerts share a webhook, as the special one', () => {
+    dispatchDiscord([hook({ killWebhook: 'X', specialWebhook: 'X' })], kill(2e9, ['billion']), true);
+    expect(discord.sent).toEqual([{ url: 'X', kind: 'special', why: ['billion'] }]);
   });
 });

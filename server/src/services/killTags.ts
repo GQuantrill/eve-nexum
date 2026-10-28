@@ -70,3 +70,35 @@ export function attackerTypeIds(attackers: Array<{ ship_type_id?: number; weapon
   }
   return [...out];
 }
+
+// ── Special kills ───────────────────────────────────────────────────────────
+// The kills worth interrupting someone for: a capital lost, a billion ISK or
+// more, or a dictor/HIC or smartbomb on the mail (a camp or a bubble trap).
+// Drives the Discord special-kill alert and the in-app kill notification.
+
+export type SpecialKind = 'capital' | 'billion' | 'dictor' | 'smartbomb';
+export const SPECIAL_KINDS: readonly SpecialKind[] = ['capital', 'billion', 'dictor', 'smartbomb'];
+
+// Titan, dreadnought, carrier, supercarrier, Rorqual, force auxiliary, lancer.
+const CAPITAL_GROUPS = new Set([30, 485, 547, 659, 883, 1538, 4594]);
+const BILLION_ISK = 1_000_000_000;
+// Capsule and Genolution capsule. A camp pods everyone it catches, so pods
+// would turn the dictor/smartbomb alerts into a stream of near-worthless kills.
+const CAPSULES = new Set([670, 33328]);
+
+/** Why a kill is special, in a fixed order; empty for an ordinary kill. */
+export function specialKinds(
+  k: { shipTypeId: number; totalValue: number; tags?: KillTag[] },
+  groupOf: (typeId: number) => number | null | undefined,
+): SpecialKind[] {
+  const kinds: SpecialKind[] = [];
+  const group = groupOf(k.shipTypeId);
+  if (group != null && CAPITAL_GROUPS.has(group)) kinds.push('capital');
+  if (k.totalValue >= BILLION_ISK) kinds.push('billion');
+  if (!CAPSULES.has(k.shipTypeId)) {
+    const tags = k.tags ?? [];
+    if (tags.includes('hic') || tags.includes('dic')) kinds.push('dictor');
+    if (tags.includes('sb')) kinds.push('smartbomb');
+  }
+  return kinds;
+}

@@ -1207,6 +1207,22 @@ export async function migrate() {
     ALTER TABLE alliance_discord_settings ADD COLUMN IF NOT EXISTS notify_k162  BOOLEAN NOT NULL DEFAULT FALSE;
     ALTER TABLE alliance_discord_settings ADD COLUMN IF NOT EXISTS notify_exits BOOLEAN NOT NULL DEFAULT FALSE;
 
+    -- More opt-in pings on the connections webhook: a hole marked end of life,
+    -- and a hole into Thera or Turnur (announced whatever the wormhole filters
+    -- say, since that's the point of asking for them).
+    ALTER TABLE corp_discord_settings     ADD COLUMN IF NOT EXISTS notify_eol   BOOLEAN NOT NULL DEFAULT FALSE;
+    ALTER TABLE corp_discord_settings     ADD COLUMN IF NOT EXISTS notify_thera BOOLEAN NOT NULL DEFAULT FALSE;
+    ALTER TABLE alliance_discord_settings ADD COLUMN IF NOT EXISTS notify_eol   BOOLEAN NOT NULL DEFAULT FALSE;
+    ALTER TABLE alliance_discord_settings ADD COLUMN IF NOT EXISTS notify_thera BOOLEAN NOT NULL DEFAULT FALSE;
+
+    -- Special kills (a capital lost, 1B+ ISK, a dictor/HIC or smartbomb on the
+    -- mail) get their own webhook, so they can go to a channel that pings, and
+    -- ignore kill_min_isk. NULL = off. The kinds default to all four.
+    ALTER TABLE corp_discord_settings     ADD COLUMN IF NOT EXISTS special_kill_webhook TEXT;
+    ALTER TABLE alliance_discord_settings ADD COLUMN IF NOT EXISTS special_kill_webhook TEXT;
+    ALTER TABLE corp_discord_settings     ADD COLUMN IF NOT EXISTS special_kill_kinds TEXT[] NOT NULL DEFAULT '{capital,billion,dictor,smartbomb}';
+    ALTER TABLE alliance_discord_settings ADD COLUMN IF NOT EXISTS special_kill_kinds TEXT[] NOT NULL DEFAULT '{capital,billion,dictor,smartbomb}';
+
     -- When a connection was quarantined. The lazy-removal sweep greys a dead
     -- hole's line out first and deletes it once it has stayed broken this long,
     -- so a wrongly-severed link can still be restored in between.

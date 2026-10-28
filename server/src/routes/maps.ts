@@ -35,7 +35,7 @@ import {
 } from '../services/mapWrite.js';
 import { reportPresence, removePresence } from '../services/presence.js';
 import { copyMap } from '../services/mapCopy.js';
-import { notifyDiscord, k162Embed, connectionEmbed, chainEmbed, kspaceExitEmbed } from '../services/discord.js';
+import { notifyDiscord, k162Embed, connectionEmbed, chainEmbed, kspaceExitEmbed, eolEmbed, theraEmbed } from '../services/discord.js';
 import { shortestRoutes } from '../services/routeGraph.js';
 import { whSizeForCode } from './wormholes.js';
 import { effectiveExpiryMs, lifeBucket } from '../data/whLifetimes.js';
@@ -396,6 +396,8 @@ const DISCORD_SETTINGS_COLS = `
   COALESCE(cds.notify_chains, ads.notify_chains, TRUE)          AS "notifyChains",
   COALESCE(cds.notify_k162,   ads.notify_k162,   FALSE)         AS "notifyK162",
   COALESCE(cds.notify_exits,  ads.notify_exits,  FALSE)         AS "notifyExits",
+  COALESCE(cds.notify_eol,    ads.notify_eol,    FALSE)         AS "notifyEol",
+  COALESCE(cds.notify_thera,  ads.notify_thera,  FALSE)         AS "notifyThera",
   COALESCE(cds.connections_webhook, ads.connections_webhook)    AS "connectionsWebhook",
   COALESCE(cds.chains_webhook,      ads.chains_webhook)         AS "chainsWebhook",
   COALESCE(cds.exits_min_security,  ads.exits_min_security, 0.45) AS "exitsMinSecurity"`;
@@ -713,6 +715,56 @@ function kspaceHubEve(r: {
   return null;
 }
 
+// Which end of a connection is Thera or Turnur, if either: the hub's name and
+// the system on the other side. Turnur is classed low-sec in the SDE, so it's
+// recognised by name.
+function theraSide(r: {
+  a: string; b: string; classA: string; classB: string; regionA: string | null; regionB: string | null;
+}): { hub: string; other: string; otherClass: string; otherRegion: string | null } | null {
+  const isHub = (name: string, cls: string) => cls === 'Thera' || name === 'Thera' || name === 'Turnur';
+  if (isHub(r.a, r.classA)) return { hub: r.a, other: r.b, otherClass: r.classB, otherRegion: r.regionB };
+  if (isHub(r.b, r.classB)) return { hub: r.b, other: r.a, otherClass: r.classA, otherRegion: r.regionA };
+  return null;
+}
+
+// A pilot just marked a wormhole end of life (or less). Tells the org's
+// connections channel, when it has asked for EOL pings. Same gates as the
+// new-connection broadcast: org map, not excluded, region filter, wormholes only.
+const EOL_STATUSES = new Set(['eol', 'lessThan4h', 'lessThan1h']);
+const EOL_LABEL: Record<string, string> = { eol: 'Under 4 hours', lessThan4h: 'Under 4 hours', lessThan1h: 'Under 1 hour' };
+function maybeBroadcastEol(meta: MapMeta, mapId: string, connId: string, status: string, actor: string | null): void {
+  if (!hasOrg(meta)) return;
+  db.query<{
+    connType: string; whType: string | null; a: string; b: string; regionA: string | null; regionB: string | null;
+    mapName: string; mapEnabled: boolean; allRegions: boolean; regions: string[];
+    connectionsWebhook: string | null; notifyEol: boolean;
+  }>(
+    `SELECT c.connection_type AS "connType", c.wh_type AS "whType",
+            a.name AS a, b.name AS b, a.region_name AS "regionA", b.region_name AS "regionB",
+            m.name AS "mapName", m.discord_notify AS "mapEnabled",
+            ${DISCORD_SETTINGS_COLS}
+       FROM map_connections c
+       JOIN maps m ON m.id = c.map_id
+       JOIN map_systems a ON a.id = c.source_id
+       JOIN map_systems b ON b.id = c.target_id
+       ${DISCORD_SETTINGS_JOIN}
+      WHERE c.id = $1 AND c.map_id = $2`,
+    [connId, mapId],
+  ).then(({ rows }) => {
+    const r = rows[0];
+    if (!r || r.connType !== 'standard') return;
+    if (!r.connectionsWebhook || !r.notifyEol) return;
+    if (!r.mapEnabled) { discordLog.info(`EOL ${r.a} <-> ${r.b} suppressed — map "${r.mapName}" is excluded from Discord`); return; }
+    if (!regionAllowed(r.allRegions, r.regions, [r.regionA, r.regionB])) {
+      discordLog.info(`EOL ${r.a} <-> ${r.b} suppressed — neither region (${r.regionA ?? '?'} / ${r.regionB ?? '?'}) in the org filter`);
+      return;
+    }
+    notifyDiscord(r.connectionsWebhook, eolEmbed({
+      a: r.a, b: r.b, whType: r.whType, status: EOL_LABEL[status] ?? status, mapName: r.mapName, actor,
+    }));
+  }).catch((e) => discordLog.warn(`EOL dispatch query failed: ${(e as Error).message}`));
+}
+
 // Broadcast a wormhole connection — at most once per connection. Keyed on the
 // connection id (not just its endpoints) so it can be re-checked whenever the
 // connection changes: created by a jump (sig already present), created manually
@@ -728,7 +780,7 @@ function maybeBroadcastConnection(meta: MapMeta, mapId: string, connId: string, 
     eveA: number | null; eveB: number | null; secA: number | null; secB: number | null; homeA: boolean; homeB: boolean;
     mapName: string; mapEnabled: boolean; allRegions: boolean; regions: string[];
     whTypes: string[]; whClasses: string[]; whSizes: string[]; connectionsWebhook: string | null; exitsMinSecurity: number;
-    notifyExits: boolean;
+    notifyExits: boolean; notifyThera: boolean;
   }>(
     `SELECT c.source_id AS "sourceId", c.target_id AS "targetId", c.connection_type AS "connType",
             c.discord_notified AS "notified", c.discord_notified_known AS "notifiedKnown", c.size, c.wh_type AS "whType",
@@ -783,6 +835,24 @@ function maybeBroadcastConnection(meta: MapMeta, mapId: string, connId: string, 
     // Already announced this hole and its type is still unknown — wait for a real
     // code before pinging again.
     if (r.notified && !known) return;
+    // A hole into Thera or Turnur, when the org asked for those: announced as
+    // such, whatever the wormhole filters below say.
+    const hubSide = theraSide(r);
+    if (hubSide && r.notifyThera) {
+      const claimed = await db.query(
+        `UPDATE map_connections
+            SET discord_notified = TRUE, discord_notified_known = discord_notified_known OR $2
+          WHERE id = $1 AND (discord_notified = FALSE OR (discord_notified_known = FALSE AND $2))`,
+        [connId, known]);
+      if (claimed.rowCount === 0) return;
+      const size = known ? ((await whSizeForCode(code)) ?? r.size ?? null) : null;
+      notifyDiscord(r.connectionsWebhook, theraEmbed({
+        hub: hubSide.hub, other: hubSide.other, otherClass: hubSide.otherClass, otherRegion: hubSide.otherRegion,
+        whType: ev.whType || r.whType, size: size ? (SIZE_LABEL[size] ?? size) : null,
+        mapName: r.mapName, actor,
+      }));
+      return;
+    }
     // Wormhole filters (dest class = the "to" end; size from the type).
     if (!whTypeAllows(r.whTypes, ev.whType)) {
       discordLog.info(`connection ${r.a} <-> ${r.b} suppressed — hole type "${ev.whType || '?'}" not in the org's type filter`);
@@ -3805,6 +3875,17 @@ mapsRouter.patch('/:mapId/connections/:connectionId', async (req, res) => {
       res.status(400).json({ error: 'invalid timeStatus' }); return;
     }
   }
+  // Whether a pilot is marking the hole end of life just now, rather than it
+  // already being EOL. Read before the auto-bucketing below, which can set
+  // timeStatus itself, so only an explicit mark counts.
+  let markedEol = false;
+  if (typeof updates.timeStatus === 'string' && EOL_STATUSES.has(updates.timeStatus)) {
+    const prev = await db.query<{ timeStatus: string | null }>(
+      `SELECT time_status AS "timeStatus" FROM map_connections WHERE id = $1 AND map_id = $2`,
+      [connectionId, mapId],
+    );
+    markedEol = prev.rows.length > 0 && !EOL_STATUSES.has(prev.rows[0].timeStatus ?? '');
+  }
   if ('lifetimeExpiresAt' in updates) {
     const v = updates.lifetimeExpiresAt;
     if (v !== null && (typeof v !== 'string' || Number.isNaN(Date.parse(v)))) {
@@ -3903,6 +3984,12 @@ mapsRouter.patch('/:mapId/connections/:connectionId', async (req, res) => {
   // it's deduped, so a connection already announced won't fire again.
   if (typeof updates.type === 'string' && updates.type.trim() !== '') {
     maybeBroadcastConnection(access, mapId, connectionId, req.session.characterName ?? null);
+  }
+  if (markedEol) {
+    // For the in-app EOL notification, which the regular update can't drive:
+    // the lifetime sweep re-buckets holes as they age, and that isn't news.
+    publishToMap(mapId, { type: 'connection.eol', actor: req.get('x-client-id') ?? null, id: connectionId, timeStatus: updates.timeStatus });
+    maybeBroadcastEol(access, mapId, connectionId, updates.timeStatus as string, req.session.characterName ?? null);
   }
   res.json({ ok: true });
 });

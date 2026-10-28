@@ -3,6 +3,9 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { useSovData } from '../../hooks/useSovData';
+import { useSovHub } from '../../hooks/useSovHub';
+import { useNow30s } from '../../hooks/useNow30s';
+import { hoursMins } from '../../i18n/format';
 import { useSystemInfo } from '../../hooks/useSystemInfo';
 import { setDestination, addWaypoint } from '../../api/waypoint';
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
@@ -880,6 +883,8 @@ export function SystemPanel() {
                     </div>
                   </div>
                 )}
+                {/* Only alliances hold sov hubs; faction warfare space has none. */}
+                {sov.alliance && <SovHubRows eveSystemId={sys.eveSystemId} />}
               </div>
               </InfoSection>
             )}
@@ -1074,6 +1079,53 @@ export function SystemPanel() {
       </FloatingPanel>
     ))}
     </>
+  );
+}
+
+// The system's sov hub: its ADM and the current or next vulnerability window.
+// Its own component so the 30s clock re-renders just these lines, and the
+// cluster-wide hub list is only fetched once a sov system is actually opened.
+function SovHubRows({ eveSystemId }: { eveSystemId: number | null }) {
+  const { t, i18n } = useTranslation();
+  const hub = useSovHub(eveSystemId);
+  const now = useNow30s();
+  if (!hub) return null;
+
+  // EVE time is UTC. Show the weekday only when the window isn't today.
+  const fmt = (d: Date, withDay: boolean) => new Intl.DateTimeFormat(i18n.language, {
+    ...(withDay ? { weekday: 'short' as const } : {}),
+    hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZone: 'UTC',
+  }).format(d);
+  const today = new Date(now).toISOString().slice(0, 10);
+  const otherDay = (d: Date) => d.toISOString().slice(0, 10) !== today;
+
+  let vuln: string | null = null;
+  const { vulnerableStart: start, vulnerableEnd: end } = hub;
+  if (start && end && end.getTime() > now) {
+    vuln = start.getTime() <= now
+      ? t('systemPanel.sovVulnerableNow', { end: fmt(end, otherDay(end)) })
+      : t('systemPanel.sovVulnerableNext', {
+          start: fmt(start, otherDay(start)),
+          end:   fmt(end, false),
+          in:    hoursMins(start.getTime() - now),
+        });
+  }
+
+  return (
+    <div className={styles.sovHub}>
+      {hub.adm != null && (
+        <div className={styles.sovHubItem} data-tooltip={t('systemPanel.sovAdmTip')}>
+          <span className={styles.sovLabel}>{t('systemPanel.sovAdm')}</span>
+          <span className={styles.sovName}>{hub.adm.toFixed(1)}</span>
+        </div>
+      )}
+      {vuln && (
+        <div className={styles.sovHubItem}>
+          <span className={styles.sovLabel}>{t('systemPanel.sovVulnerability')}</span>
+          <span className={styles.sovName}>{vuln}</span>
+        </div>
+      )}
+    </div>
   );
 }
 
