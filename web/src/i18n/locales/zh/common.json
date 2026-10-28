@@ -52,16 +52,19 @@
     "noHistory": "暂无 PvP 记录。从现在起会记录此处的玩家击杀。",
     "noneInDays_one": "过去 1 天此处没有击杀。",
     "noneInDays_other": "过去 {{count}} 天此处没有击杀。",
-    "busiestNow": "当前最活跃（{{hour}} UTC）",
-    "busiestNext": "最活跃时段 {{hour}} UTC，{{n}} 小时后",
+    "busiestNow": "当前最活跃（{{time}}）",
+    "busiestNext": "最活跃时段 {{time}}，{{n}} 小时后",
     "quietAhead": "未来 24 小时较为平静",
     "killsInDays": "{{days}} 天内 {{n}} 次",
     "recent": "实时数据：过去 24 小时 {{n}} 次",
     "chartLabel": "未来 24 小时按时段的玩家击杀",
-    "barTitle": "{{day}} {{hour}} UTC：{{n}}",
+    "barTitle": "{{day}} {{time}}：{{n}}",
     "now": "现在",
     "noteZkill": "按 UTC 星期和小时统计 zKillboard 过去 90 天的击杀。颜色越热通常越活跃。",
-    "noteLive": "无法连接 zKillboard，因此使用此处目前记录的击杀。"
+    "noteLive": "无法连接 zKillboard，因此使用此处目前记录的击杀。",
+    "timesIn": "时区",
+    "zoneAuto": "本地（{{zone}}）",
+    "zoneUtc": "EVE 时间（UTC）"
   },
   "addSystem": {
     "title": "添加星系",
@@ -994,7 +997,33 @@
     "noKillsOnRecord": "无击杀记录。",
     "noKillsNpc": "过去 24 小时内无击杀 — {{count}} 个纯 NPC 已隐藏。",
     "showThem": "显示它们",
-    "loadMore": "加载更多（剩余 {{count}}）"
+    "loadMore": "加载更多（剩余 {{count}}）",
+    "scopeLabel": "显示击杀范围",
+    "scopeSystem": "此星系",
+    "scopeMap": "整张地图",
+    "windowLabel": "时间范围",
+    "window": {
+      "1h": "1小时",
+      "24h": "24小时",
+      "7d": "7天"
+    },
+    "showingOf": "{{total}} 次击杀中的 {{shown}} 次",
+    "tags": {
+      "gate": "星门",
+      "hic": "HIC",
+      "dic": "拦截",
+      "sb": "SB",
+      "npc": "NPC",
+      "solo": "单杀"
+    },
+    "tagTips": {
+      "gate": "在星门处被击杀",
+      "hic": "击杀邮件中有重型拦截舰",
+      "dic": "击杀邮件中有拦截舰",
+      "sb": "被智能炸弹击杀",
+      "npc": "击杀邮件中只有 NPC",
+      "solo": "仅一名攻击者"
+    }
   },
   "labelsDialog": {
     "title": "自定义标签",
@@ -1385,7 +1414,9 @@
     "jumps_one": "{{count}} 跳",
     "jumps_other": "{{count}} 跳",
     "killsTooltip": "本小时 {{ships}} 舰船 · {{pods}} 太空舱击杀",
-    "killsTooltipHint": "CCP 每小时统计 · 击杀报告可能尚未出现在 zKillboard",
+    "kills24h_one": "过去 24 小时 {{count}} 次玩家击杀",
+    "kills24h_other": "过去 24 小时 {{count}} 次玩家击杀",
+    "killsTooltipHint": "来自实时击杀数据和 CCP 的每小时统计",
     "recentKill": "{{ago}} 分钟前击杀 ({{value}} ISK)",
     "scanned": "已扫描 {{total}} 个信号中的 {{scanned}} 个",
     "scoutConnectionsMulti": "{{names}} 连接",

@@ -52,16 +52,19 @@
     "noHistory": "Pas encore d'historique PvP. Les kills de joueurs ici sont enregistrés à partir de maintenant.",
     "noneInDays_one": "Aucun kill ici au cours du dernier jour.",
     "noneInDays_other": "Aucun kill ici ces {{count}} derniers jours.",
-    "busiestNow": "Pic d'activité maintenant ({{hour}} UTC)",
-    "busiestNext": "Pic d'activité à {{hour}} UTC, dans {{n}} h",
+    "busiestNow": "Pic d'activité maintenant ({{time}})",
+    "busiestNext": "Pic d'activité à {{time}}, dans {{n}} h",
     "quietAhead": "Calme pour les 24 prochaines heures",
     "killsInDays": "{{n}} en {{days}} j",
     "recent": "Flux en direct : {{n}} ces dernières 24 h",
     "chartLabel": "Kills de joueurs par heure de la journée pour les 24 prochaines heures",
-    "barTitle": "{{day}} {{hour}} UTC : {{n}}",
+    "barTitle": "{{day}} {{time}} : {{n}}",
     "now": "maint.",
     "noteZkill": "Kills par jour de la semaine et heure UTC sur les 90 derniers jours de zKillboard. Les barres plus chaudes sont généralement plus actives.",
-    "noteLive": "zKillboard est injoignable, ceci utilise donc les kills enregistrés ici jusqu'à présent."
+    "noteLive": "zKillboard est injoignable, ceci utilise donc les kills enregistrés ici jusqu'à présent.",
+    "timesIn": "Heures en",
+    "zoneAuto": "Locale ({{zone}})",
+    "zoneUtc": "Heure EVE (UTC)"
   },
   "addSystem": {
     "title": "Ajouter un système",
@@ -994,7 +997,33 @@
     "noKillsOnRecord": "Aucun kill enregistré.",
     "noKillsNpc": "Aucun kill ces dernières 24 h — {{count}} PNJ uniquement masqués.",
     "showThem": "Les afficher",
-    "loadMore": "Charger plus ({{count}} restants)"
+    "loadMore": "Charger plus ({{count}} restants)",
+    "scopeLabel": "Afficher les kills pour",
+    "scopeSystem": "Ce système",
+    "scopeMap": "Toute la carte",
+    "windowLabel": "Période",
+    "window": {
+      "1h": "1 h",
+      "24h": "24 h",
+      "7d": "7 j"
+    },
+    "showingOf": "{{shown}} sur {{total}} kills",
+    "tags": {
+      "gate": "Portail",
+      "hic": "HIC",
+      "dic": "Dictor",
+      "sb": "SB",
+      "npc": "PNJ",
+      "solo": "Solo"
+    },
+    "tagTips": {
+      "gate": "Tué sur un portail stellaire",
+      "hic": "Un heavy interdictor figurait sur le killmail",
+      "dic": "Un interdictor figurait sur le killmail",
+      "sb": "Tué par une smartbomb",
+      "npc": "Uniquement des PNJ sur le killmail",
+      "solo": "Un seul attaquant"
+    }
   },
   "labelsDialog": {
     "title": "Labels personnalisés",
@@ -1385,7 +1414,9 @@
     "jumps_one": "{{count}} saut",
     "jumps_other": "{{count}} sauts",
     "killsTooltip": "{{ships}} vaisseau · {{pods}} capsule détruits cette heure",
-    "killsTooltipHint": "Décompte horaire CCP · le killmail peut ne pas encore être sur zKillboard",
+    "kills24h_one": "{{count}} kill de joueur ces dernières 24 h",
+    "kills24h_other": "{{count}} kills de joueurs ces dernières 24 h",
+    "killsTooltipHint": "D'après le flux de kills en direct et les chiffres horaires de CCP",
     "recentKill": "Kill il y a {{ago}} min ({{value}} ISK)",
     "scanned": "{{scanned}} signatures sur {{total}} scannées",
     "scoutConnectionsMulti": "Connexions {{names}}",

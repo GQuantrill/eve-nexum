@@ -52,16 +52,19 @@
     "noHistory": "Aún no hay historial PvP. Las muertes de jugadores aquí se registran a partir de ahora.",
     "noneInDays_one": "Ninguna muerte aquí en el último día.",
     "noneInDays_other": "Ninguna muerte aquí en los últimos {{count}} días.",
-    "busiestNow": "Máxima actividad ahora ({{hour}} UTC)",
-    "busiestNext": "Máxima actividad a las {{hour}} UTC, en {{n}} h",
+    "busiestNow": "Máxima actividad ahora ({{time}})",
+    "busiestNext": "Máxima actividad a las {{time}}, en {{n}} h",
     "quietAhead": "Tranquilo durante las próximas 24 horas",
     "killsInDays": "{{n}} en {{days}} d",
     "recent": "Feed en vivo: {{n}} en las últimas 24 h",
     "chartLabel": "Muertes de jugadores por hora del día para las próximas 24 horas",
-    "barTitle": "{{day}} {{hour}} UTC: {{n}}",
+    "barTitle": "{{day}} {{time}}: {{n}}",
     "now": "ahora",
     "noteZkill": "Muertes por día de la semana y hora UTC en los últimos 90 días de zKillboard. Las barras más cálidas suelen tener más actividad.",
-    "noteLive": "No se puede acceder a zKillboard, así que se usan las muertes registradas aquí hasta ahora."
+    "noteLive": "No se puede acceder a zKillboard, así que se usan las muertes registradas aquí hasta ahora.",
+    "timesIn": "Horas en",
+    "zoneAuto": "Local ({{zone}})",
+    "zoneUtc": "Hora de EVE (UTC)"
   },
   "addSystem": {
     "title": "Añadir sistema",
@@ -994,7 +997,33 @@
     "noKillsOnRecord": "No hay kills registrados.",
     "noKillsNpc": "Sin kills en las últimas 24h — {{count}} solo de PNJ ocultos.",
     "showThem": "Mostrarlos",
-    "loadMore": "Cargar más ({{count}} restantes)"
+    "loadMore": "Cargar más ({{count}} restantes)",
+    "scopeLabel": "Mostrar muertes de",
+    "scopeSystem": "Este sistema",
+    "scopeMap": "Todo el mapa",
+    "windowLabel": "Periodo",
+    "window": {
+      "1h": "1 h",
+      "24h": "24 h",
+      "7d": "7 d"
+    },
+    "showingOf": "{{shown}} de {{total}} muertes",
+    "tags": {
+      "gate": "Puerta",
+      "hic": "HIC",
+      "dic": "Dictor",
+      "sb": "SB",
+      "npc": "NPC",
+      "solo": "Solo"
+    },
+    "tagTips": {
+      "gate": "Muerto en una puerta estelar",
+      "hic": "Había un heavy interdictor en el killmail",
+      "dic": "Había un interdictor en el killmail",
+      "sb": "Muerto por una smartbomb",
+      "npc": "Solo NPC en el killmail",
+      "solo": "Un único atacante"
+    }
   },
   "labelsDialog": {
     "title": "Etiquetas personalizadas",
@@ -1385,7 +1414,9 @@
     "jumps_one": "{{count}} salto",
     "jumps_other": "{{count}} saltos",
     "killsTooltip": "{{ships}} nave · {{pods}} cápsula destruidas esta hora",
-    "killsTooltipHint": "Recuento horario de CCP · puede que aún no esté en zKillboard",
+    "kills24h_one": "{{count}} muerte de jugador en las últimas 24 h",
+    "kills24h_other": "{{count}} muertes de jugadores en las últimas 24 h",
+    "killsTooltipHint": "Del feed de muertes en vivo y las cifras horarias de CCP",
     "recentKill": "Muerte hace {{ago}} min ({{value}} ISK)",
     "scanned": "{{scanned}} de {{total}} firmas escaneadas",
     "scoutConnectionsMulti": "Conexiones de {{names}}",

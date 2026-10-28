@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { api } from '../api/client';
 
+export type KillTag = 'gate' | 'hic' | 'dic' | 'sb' | 'solo' | 'npc';
+export type KillWindow = '1h' | '24h' | '7d';
+export const KILL_WINDOWS: KillWindow[] = ['1h', '24h', '7d'];
+
 export interface ZkbKill {
   killmail_id: number;
   killmail_time: string;
@@ -29,53 +33,75 @@ export interface ZkbKill {
     solo: boolean;
     npc: boolean;
   };
+  /** gate / hic / dic / sb / solo / npc, worked out by the server. */
+  tags?: KillTag[];
+  /** Whole-map lists: which system the kill was in. */
+  eveSystemId?: number;
+  systemName?: string;
 }
 
 interface CacheEntry {
   kills: ZkbKill[];
+  total: number | null;
   fetchedAt: number;
 }
 
 const CACHE_TTL_MS = 5 * 60 * 1000;
-// Cache the *raw* (unfiltered) zKillboard response so toggling NPC
-// inclusion doesn't require a refetch — we just re-apply the filter.
-const clientCache = new Map<number, CacheEntry>();
+// Cache the *raw* (unfiltered) response so toggling NPC inclusion doesn't
+// require a refetch — we just re-apply the filter. Keyed by what was asked for
+// (system or map, and the window).
+const clientCache = new Map<string, CacheEntry>();
 
 export interface UseKillboardOptions {
   /** Include NPC-only kills (zkb.npc === true). Defaults to false. */
   includeNpc?: boolean;
+  window?: KillWindow;
+  /** Set to list every system on this map instead of the one system. */
+  mapId?: string | null;
 }
 
 export function useKillboard(eveSystemId: number | null, options: UseKillboardOptions = {}) {
-  const { includeNpc = false } = options;
+  const { includeNpc = false, window = '24h', mapId = null } = options;
+  // What to load, as a cache key and URL; null = nothing to show.
+  const source = useMemo(() => {
+    if (mapId) return { key: `map:${mapId}:${window}`, url: `/api/maps/${mapId}/kills?window=${window}`, map: true };
+    if (eveSystemId) return { key: `sys:${eveSystemId}:${window}`, url: `/api/killboard/${eveSystemId}?window=${window}`, map: false };
+    return null;
+  }, [eveSystemId, mapId, window]);
+
   // Raw (unfiltered) data goes through state so toggling `includeNpc`
   // doesn't require a refetch — we re-apply the filter in a useMemo below.
   const [rawKills, setRawKills]     = useState<ZkbKill[]>([]);
+  const [total, setTotal]           = useState<number | null>(null);
   const [loading, setLoading]       = useState(false);
   const [error, setError]           = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const cancelledRef = useRef(false);
-  const systemRef    = useRef<number | null>(null);
+  const sourceRef    = useRef<typeof source>(null);
 
   // Stable fetcher exposed via the hook return so consumers (e.g. the
   // killboard pane's NPC toggle) can force-refresh on demand. `force=true`
   // skips the TTL cache check; otherwise the cache is honoured.
   const refresh = useCallback(async (force = false) => {
-    const id = systemRef.current;
-    if (!id) return;
-    const cached = clientCache.get(id);
+    const src = sourceRef.current;
+    if (!src) return;
+    const cached = clientCache.get(src.key);
     if (!force && cached && Date.now() - cached.fetchedAt < CACHE_TTL_MS) {
       setRawKills(cached.kills);
+      setTotal(cached.total);
       setLastUpdated(new Date(cached.fetchedAt));
       return;
     }
     setLoading(true);
     setError(null);
     try {
-      const data = await api<ZkbKill[]>(`/api/killboard/${id}`);
-      if (cancelledRef.current || systemRef.current !== id) return;
-      clientCache.set(id, { kills: data, fetchedAt: Date.now() });
-      setRawKills(data);
+      const body = await api<ZkbKill[] | { kills: ZkbKill[]; total: number }>(src.url);
+      if (cancelledRef.current || sourceRef.current?.key !== src.key) return;
+      const kills = Array.isArray(body) ? body : body.kills;
+      const tot = Array.isArray(body) ? null : body.total;
+      clientCache.set(src.key, { kills, total: tot, fetchedAt: Date.now() });
+      setRawKills(kills);
+      setTotal(tot);
       setLastUpdated(new Date());
     } catch {
       if (!cancelledRef.current) setError('Could not load kill data');
@@ -85,11 +111,12 @@ export function useKillboard(eveSystemId: number | null, options: UseKillboardOp
   }, []);
 
   useEffect(() => {
-    systemRef.current = eveSystemId;
-    if (!eveSystemId) {
+    sourceRef.current = source;
+    if (!source) {
       // Deliberate: clears this pane's own state when the record it shows changes.
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setRawKills([]);
+      setTotal(null);
       setError(null);
       setLastUpdated(null);
       return;
@@ -103,7 +130,7 @@ export function useKillboard(eveSystemId: number | null, options: UseKillboardOp
       cancelledRef.current = true;
       clearInterval(interval);
     };
-  }, [eveSystemId, refresh]);
+  }, [source, refresh]);
 
   // zKillboard flags `npc: true` on killmails where every attacker was an
   // NPC (CONCORD pops, ratter rage, null NPC fleets). Strip them by
@@ -117,8 +144,7 @@ export function useKillboard(eveSystemId: number | null, options: UseKillboardOp
     () => rawKills.reduce((n, k) => n + (k.zkb.npc ? 1 : 0), 0),
     [rawKills],
   );
-
-  return { kills, loading, error, lastUpdated, npcCount, refresh };
+  return { kills, total, loading, error, lastUpdated, npcCount, refresh, isMap: !!source?.map };
 }
 
 interface LastKillCacheEntry { time: string | null; at: number }

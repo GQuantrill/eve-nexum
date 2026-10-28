@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { forecastBars, nextBusiest, utcHourLabel, weekdayLabel } from './pvpForecast';
+import { forecastBars, nextBusiest, resolveZone, zonedTime, zonedWeekday } from './pvpForecast';
 
 // A grid with the given [weekday, hour, kills] cells set.
 const grid = (cells: Array<[number, number, number]>) => {
@@ -42,15 +42,22 @@ describe('nextBusiest', () => {
   });
 });
 
-describe('labels', () => {
-  it('pads the hour', () => {
-    expect(utcHourLabel(3)).toBe('03:00');
-    expect(utcHourLabel(18)).toBe('18:00');
+describe('timezones', () => {
+  it('shows a bar in the chosen zone, with the zone named', () => {
+    const bars = forecastBars(grid([]), WED_2140);
+    expect(bars[0].startMs).toBe(Date.UTC(2026, 9, 28, 21));
+    expect(zonedTime(bars[0].startMs, 'UTC', 'en')).toBe('21:00 UTC');
+    // A half-hour zone lands on :30.
+    expect(zonedTime(bars[0].startMs, 'Asia/Kolkata', 'en')).toMatch(/^02:30/);
+    // Across midnight, the weekday moves with it.
+    expect(zonedWeekday(bars[0].startMs, 'UTC', 'en')).toBe('Wed');
+    expect(zonedWeekday(bars[0].startMs, 'Asia/Tokyo', 'en')).toBe('Thu');
   });
 
-  it('names the weekday in the given language', () => {
-    expect(weekdayLabel(0, 'en')).toBe('Sun');
-    expect(weekdayLabel(3, 'en')).toBe('Wed');
-    expect(weekdayLabel(1, 'de')).toMatch(/^Mo/);
+  it('resolves auto to the browser zone, and anything unusable to UTC', () => {
+    expect(resolveZone('auto')).toBeTruthy();
+    expect(resolveZone('UTC')).toBe('UTC');
+    expect(resolveZone('Europe/London')).toBe('Europe/London');
+    expect(resolveZone('Not/AZone')).toBe('UTC');
   });
 });

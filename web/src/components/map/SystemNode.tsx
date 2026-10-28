@@ -155,6 +155,7 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
   const allKills        = useCurrentHourKills();
   const myKills         = sys.eveSystemId !== null ? allKills.get(sys.eveSystemId) : undefined;
   const hotKills        = !!myKills && myKills.shipKills + myKills.podKills > 0;
+  const kills24h        = myKills?.kills24h ?? 0;
   // Live "a kill just happened here" flag from the zKill feed (ephemeral, SSE).
   const recentKill      = useSystemKill(sys.eveSystemId);
 
@@ -510,13 +511,21 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
               </span>
             </span>
           )}
-          {hotKills && myKills && (
-            <span className="system-node__kill-icon">
+          {(hotKills || kills24h > 0) && myKills && (
+            // Sword + the last 24 hours' count; bright while there's been
+            // fighting this hour, dimmed when it's only earlier in the day.
+            <span className={`system-node__kill-icon${hotKills ? '' : ' system-node__kill-icon--quiet'}`}>
               <SwordIcon size={14} weight="regular" />
+              {kills24h > 0 && <span className="system-node__kill-count">{kills24h}</span>}
               <span className="system-node__kill-tooltip">
                 <span className="system-node__kill-tooltip-main">
-                  {t('mapNode.killsTooltip', { ships: myKills.shipKills, pods: myKills.podKills })}
+                  {t('mapNode.kills24h', { count: kills24h })}
                 </span>
+                {hotKills && (
+                  <span className="system-node__kill-tooltip-main">
+                    {t('mapNode.killsTooltip', { ships: myKills.shipKills, pods: myKills.podKills })}
+                  </span>
+                )}
                 <span className="system-node__kill-tooltip-hint">
                   {t('mapNode.killsTooltipHint')}
                 </span>

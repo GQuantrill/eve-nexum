@@ -41,6 +41,7 @@ import { whSizeForCode } from './wormholes.js';
 import { effectiveExpiryMs, lifeBucket } from '../data/whLifetimes.js';
 import { buildKillRow } from '../services/killFeed.js';
 import { recentKillsForSystems } from '../services/killBuffer.js';
+import { storedKills, windowSeconds } from './killboard.js';
 import { twNotesBySystem } from '../utils/tripwireNotes.js';
 
 const log = createLogger('maps');
@@ -2590,6 +2591,24 @@ mapsRouter.get('/:mapId/kills/backfill', async (req, res) => {
   const buffered = recentKillsForSystems(systemIds, 200, config.killFeed.minValueIsk);
   const kills = await Promise.all(buffered.map(buildKillRow));
   res.json(kills);
+});
+
+// GET /api/maps/:mapId/kills?window=1h|24h|7d — every kill in the map's
+// systems in the window, newest first (up to 200), with the system each was
+// in, for the killboard's whole-map view. Served from the live feed's week of
+// stored kills, so one query covers a map of any size -- no zKillboard request
+// per system. Access-checked.
+mapsRouter.get('/:mapId/kills', async (req, res) => {
+  const { mapId } = req.params;
+  const access = await getMapAccess(mapId, req);
+  if (!access) { res.status(404).json({ error: 'Map not found' }); return; }
+  const { rows } = await db.query<{ eveSystemId: number }>(
+    `SELECT DISTINCT eve_system_id AS "eveSystemId"
+       FROM map_systems WHERE map_id = $1 AND eve_system_id IS NOT NULL`,
+    [mapId],
+  );
+  const secs = windowSeconds(req.query.window);
+  res.json(await storedKills(rows.map((r) => r.eveSystemId), Date.now() - secs * 1000, 200, { systemNames: true }));
 });
 
 // DELETE /api/maps/:mapId/presence — drop this viewer from the roster now.

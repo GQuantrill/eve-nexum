@@ -31,6 +31,12 @@ describe('settings allowlist', () => {
     expect(settingAllowed('nexum.sysinfo.collapse.celestials')).toBe(true);
   });
 
+  it('allows the killboard window/scope and the PvP timezone', () => {
+    for (const k of ['nexum.killboard.window', 'nexum.killboard.scope', 'nexum.timeZone']) {
+      expect(settingAllowed(k), k).toBe(true);
+    }
+  });
+
   it('still refuses anything not asked for', () => {
     // The list is a boundary: arbitrary keys must not reach ui_settings.
     for (const k of ['nexum.notARealSetting', 'notNexum.anything', '', 'nexum.']) {

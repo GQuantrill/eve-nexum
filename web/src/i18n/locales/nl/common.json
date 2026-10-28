@@ -52,16 +52,19 @@
     "noHistory": "Nog geen PvP-geschiedenis. Spelerkills hier worden vanaf nu bijgehouden.",
     "noneInDays_one": "Geen kills hier in de afgelopen dag.",
     "noneInDays_other": "Geen kills hier in de afgelopen {{count}} dagen.",
-    "busiestNow": "Nu het drukst ({{hour}} UTC)",
-    "busiestNext": "Het drukst om {{hour}} UTC, over {{n}} u",
+    "busiestNow": "Nu het drukst ({{time}})",
+    "busiestNext": "Het drukst om {{time}}, over {{n}} u",
     "quietAhead": "Rustig de komende 24 uur",
     "killsInDays": "{{n}} in {{days}} d",
     "recent": "Live-feed: {{n}} in de afgelopen 24 u",
     "chartLabel": "Spelerkills per uur van de dag voor de komende 24 uur",
-    "barTitle": "{{day}} {{hour}} UTC: {{n}}",
+    "barTitle": "{{day}} {{time}}: {{n}}",
     "now": "nu",
     "noteZkill": "Kills per UTC-weekdag en -uur over de afgelopen 90 dagen van zKillboard. Warmere balken zijn meestal drukker.",
-    "noteLive": "zKillboard is onbereikbaar, dus dit gebruikt de kills die hier tot nu toe zijn bijgehouden."
+    "noteLive": "zKillboard is onbereikbaar, dus dit gebruikt de kills die hier tot nu toe zijn bijgehouden.",
+    "timesIn": "Tijden in",
+    "zoneAuto": "Lokaal ({{zone}})",
+    "zoneUtc": "EVE-tijd (UTC)"
   },
   "addSystem": {
     "title": "Systeem toevoegen",
@@ -994,7 +997,33 @@
     "noKillsOnRecord": "Geen kills bekend.",
     "noKillsNpc": "Geen kills in de laatste 24 uur — {{count}} met alleen NPC's verborgen.",
     "showThem": "Toon ze",
-    "loadMore": "Meer laden ({{count}} resterend)"
+    "loadMore": "Meer laden ({{count}} resterend)",
+    "scopeLabel": "Kills tonen voor",
+    "scopeSystem": "Dit systeem",
+    "scopeMap": "Hele kaart",
+    "windowLabel": "Tijdvenster",
+    "window": {
+      "1h": "1 u",
+      "24h": "24 u",
+      "7d": "7 d"
+    },
+    "showingOf": "{{shown}} van {{total}} kills",
+    "tags": {
+      "gate": "Gate",
+      "hic": "HIC",
+      "dic": "Dictor",
+      "sb": "SB",
+      "npc": "NPC",
+      "solo": "Solo"
+    },
+    "tagTips": {
+      "gate": "Gedood op een stargate",
+      "hic": "Er stond een heavy interdictor op de killmail",
+      "dic": "Er stond een interdictor op de killmail",
+      "sb": "Gedood door een smartbomb",
+      "npc": "Alleen NPC's op de killmail",
+      "solo": "Eén aanvaller"
+    }
   },
   "labelsDialog": {
     "title": "Eigen labels",
@@ -1385,7 +1414,9 @@
     "jumps_one": "{{count}} sprong",
     "jumps_other": "{{count}} sprongen",
     "killsTooltip": "{{ships}} schip · {{pods}} pod kills dit uur",
-    "killsTooltipHint": "Uurtelling van CCP · killmail staat misschien nog niet op zKillboard",
+    "kills24h_one": "{{count}} spelerkill in de afgelopen 24 u",
+    "kills24h_other": "{{count}} spelerkills in de afgelopen 24 u",
+    "killsTooltipHint": "Uit de live-killfeed en de uurlijkse cijfers van CCP",
     "recentKill": "Kill {{ago}}m geleden ({{value}} ISK)",
     "scanned": "{{scanned}} van {{total}} signaturen gescand",
     "scoutConnectionsMulti": "{{names}}-verbindingen",

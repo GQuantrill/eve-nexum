@@ -20,6 +20,8 @@ export interface ForecastBar {
   /** UTC weekday (0 = Sunday) and hour this bar stands for. */
   weekday: number;
   hour:    number;
+  /** When the bar's hour starts, for showing it in the viewer's timezone. */
+  startMs: number;
   kills:   number;
   /** kills / the busiest bar's kills, 0..1. */
   level:   number;
@@ -28,11 +30,13 @@ export interface ForecastBar {
 const HOUR_MS = 60 * 60 * 1000;
 
 export function forecastBars(grid: number[][], nowMs: number): ForecastBar[] {
+  const firstHour = nowMs - (((nowMs % HOUR_MS) + HOUR_MS) % HOUR_MS);
   const bars = Array.from({ length: 24 }, (_, offset) => {
-    const t = new Date(nowMs + offset * HOUR_MS);
+    const startMs = firstHour + offset * HOUR_MS;
+    const t = new Date(startMs);
     const weekday = t.getUTCDay();
     const hour = t.getUTCHours();
-    return { offset, weekday, hour, kills: grid[weekday]?.[hour] ?? 0, level: 0 };
+    return { offset, weekday, hour, startMs, kills: grid[weekday]?.[hour] ?? 0, level: 0 };
   });
   const max = Math.max(0, ...bars.map((b) => b.kills));
   if (max > 0) for (const b of bars) b.level = b.kills / max;
@@ -47,16 +51,42 @@ export function nextBusiest(bars: ForecastBar[]): ForecastBar | null {
   return best;
 }
 
-export function utcHourLabel(hour: number): string {
-  return `${String(hour).padStart(2, '0')}:00`;
+// ── Timezone ────────────────────────────────────────────────────────────────
+// The history is counted in UTC hours; only the labels move. 'auto' is the
+// browser's own zone, 'UTC' is EVE time, anything else an IANA zone name.
+
+export type ZoneSetting = 'auto' | 'UTC' | string;
+
+function validZone(zone: string): boolean {
+  try { new Intl.DateTimeFormat('en', { timeZone: zone }); return true; } catch { return false; }
 }
 
-/** Short weekday name in the viewer's language ("Tue", "Di", "火"). 2026-10-25
- *  was a Sunday, so day n of that week is weekday n. */
-export function weekdayLabel(weekday: number, lang: string): string {
+/** The IANA zone a setting means. Falls back to UTC for anything unusable. */
+export function resolveZone(setting: ZoneSetting | null | undefined): string {
+  if (!setting || setting === 'auto') {
+    try { return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'; } catch { return 'UTC'; }
+  }
+  return validZone(setting) ? setting : 'UTC';
+}
+
+/** "19:00 GMT+1", "18:00 UTC" -- a time in the zone, with the zone named. */
+export function zonedTime(ms: number, zone: string, lang: string): string {
+  const opts: Intl.DateTimeFormatOptions = { hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZone: zone, timeZoneName: 'short' };
+  try { return new Intl.DateTimeFormat(lang, opts).format(ms); } catch { return new Intl.DateTimeFormat('en', opts).format(ms); }
+}
+
+/** Short weekday of a moment in the zone ("Tue", "Di"). */
+export function zonedWeekday(ms: number, zone: string, lang: string): string {
+  const opts: Intl.DateTimeFormatOptions = { weekday: 'short', timeZone: zone };
+  try { return new Intl.DateTimeFormat(lang, opts).format(ms); } catch { return new Intl.DateTimeFormat('en', opts).format(ms); }
+}
+
+/** Every zone the browser knows, for the picker (empty on very old browsers). */
+export function allZones(): string[] {
   try {
-    return new Intl.DateTimeFormat(lang, { weekday: 'short', timeZone: 'UTC' }).format(Date.UTC(2026, 9, 25 + weekday, 12));
+    const f = (Intl as unknown as { supportedValuesOf?: (k: string) => string[] }).supportedValuesOf;
+    return f ? f('timeZone') : [];
   } catch {
-    return new Intl.DateTimeFormat('en', { weekday: 'short', timeZone: 'UTC' }).format(Date.UTC(2026, 9, 25 + weekday, 12));
+    return [];
   }
 }

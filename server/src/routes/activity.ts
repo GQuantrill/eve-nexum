@@ -241,6 +241,33 @@ router.get('/:systemId(\\d+)', async (req, res) => {
   res.json(systemHistory.get(eveSystemId) ?? []);
 });
 
+// Player kills per system over the last 24 hours, for the count on each map
+// node. Two sources, taking the higher per system rather than adding them
+// (they count the same kills): our own live-feed history covers wormhole space
+// and is up to the minute; CCP's hourly snapshots cover k-space for hours
+// before our feed was running. Cluster-wide, so cached briefly and shared.
+let kills24hCache: { at: number; value: Map<number, number> } | null = null;
+async function kills24h(): Promise<Map<number, number>> {
+  if (kills24hCache && Date.now() - kills24hCache.at < 60_000) return kills24hCache.value;
+  const out = new Map<number, number>();
+  try {
+    const [ours, ccp] = await Promise.all([
+      db.query<{ id: number; n: number }>(
+        `SELECT eve_system_id AS id, SUM(kills)::int AS n FROM system_pvp_hours
+          WHERE hour >= date_trunc('hour', NOW()) - interval '23 hours' GROUP BY 1`),
+      db.query<{ id: number; n: number }>(
+        `SELECT eve_system_id AS id, SUM(ship_kills + pod_kills)::int AS n FROM system_activity
+          WHERE hour >= NOW() - interval '24 hours' GROUP BY 1`),
+    ]);
+    for (const r of [...ours.rows, ...ccp.rows]) if (r.n > (out.get(r.id) ?? 0)) out.set(r.id, r.n);
+  } catch (err) {
+    console.error('[activity] 24h kill counts failed:', err);
+    return kills24hCache?.value ?? out;
+  }
+  kills24hCache = { at: Date.now(), value: out };
+  return out;
+}
+
 // Snapshot of the current ESI kills cache, used to highlight "hot" systems on
 // the map. One ESI call covers the whole cluster, already cached for 5 min by
 // fetchEsi(), so this endpoint adds no extra upstream load.
@@ -250,7 +277,7 @@ router.get('/current-kills', async (_req, res) => {
   // system's full metric set (ship/pod/npc kills + jumps) in one payload —
   // feeds the activity heatmaps. Jumps is a separate ESI map and covers
   // different systems (e.g. a quiet system with jumps but no kills).
-  type Row = { systemId: number; shipKills: number; podKills: number; npcKills: number; jumps: number };
+  type Row = { systemId: number; shipKills: number; podKills: number; npcKills: number; jumps: number; kills24h: number };
   const bySys = new Map<number, Row>();
   if (snap) {
     const ids = new Set<number>([...snap.kills.keys(), ...snap.jumps.keys()]);
@@ -262,6 +289,7 @@ router.get('/current-kills', async (_req, res) => {
         podKills:  k?.pod_kills ?? 0,
         npcKills:  k?.npc_kills ?? 0,
         jumps:     snap.jumps.get(id) ?? 0,
+        kills24h:  0,
       });
     }
   }
@@ -272,12 +300,19 @@ router.get('/current-kills', async (_req, res) => {
   // recently fall back to ESI; when the feed is disabled this is a no-op and the
   // heatmap is pure ESI as before.
   for (const [systemId, c] of liveKillCounts(config.killFeed.heatWindowSeconds * 1_000)) {
-    const row = bySys.get(systemId) ?? { systemId, shipKills: 0, podKills: 0, npcKills: 0, jumps: 0 };
+    const row = bySys.get(systemId) ?? { systemId, shipKills: 0, podKills: 0, npcKills: 0, jumps: 0, kills24h: 0 };
     row.shipKills = c.shipKills;
     row.podKills  = c.podKills;
     row.npcKills  = c.npcKills;
     bySys.set(systemId, row);
   }
+  for (const [systemId, n] of await kills24h()) {
+    const row = bySys.get(systemId) ?? { systemId, shipKills: 0, podKills: 0, npcKills: 0, jumps: 0, kills24h: 0 };
+    row.kills24h = n;
+    bySys.set(systemId, row);
+  }
+  // Never less than this hour's own count.
+  for (const row of bySys.values()) row.kills24h = Math.max(row.kills24h, row.shipKills + row.podKills);
   res.json([...bySys.values()]);
 });
 
