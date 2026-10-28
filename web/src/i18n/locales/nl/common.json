@@ -1883,6 +1883,8 @@
     "sigBookmark": "Wormgat-bookmark",
     "siteBookmark": "Site-bookmark (relic / data / gas)",
     "siteBookmarkHelp": "Klik op een rij met een relic-, data- of gassignatuur op het kopieerpictogram voor een kant-en-klare bookmarknaam. Stel die samen met deze tokens:",
+    "copyBookmarkOnJump": "Bookmarknaam kopiëren na een sprong",
+    "copyBookmarkOnJumpHelp": "Als een sprong invult waar een gat heen leidt, komt de bookmarknaam (in het formaat hierboven) op je klembord. Zit je op dat moment in de game, dan wordt hij gekopieerd zodra je terug in nexum klikt.",
     "skipKspace": "K-space niet bijhouden",
     "skipKspaceHint": "Staat dit aan, dan wordt alleen het K-space-systeem vastgelegd waar je vanuit J-space het eerst in springt en het laatste voordat je weer naar J-space springt — alles waar je tussendoor via gates langskomt wordt overgeslagen. Geldt alleen voor HS/LS/NS; Pochven wordt altijd bijgehouden.",
     "snapToGrid": "Op raster uitlijnen",

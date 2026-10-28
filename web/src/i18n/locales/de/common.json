@@ -1883,6 +1883,8 @@
     "sigBookmark": "Wurmloch-Lesezeichen",
     "siteBookmark": "Site-Lesezeichen (relic / data / gas)",
     "siteBookmarkHelp": "Klicke in einer relic-, data- oder gas-Signaturzeile auf das Kopiersymbol für einen einfügefertigen Lesezeichennamen. Baue ihn mit diesen Tokens:",
+    "copyBookmarkOnJump": "Lesezeichennamen nach einem Sprung kopieren",
+    "copyBookmarkOnJumpHelp": "Wenn ein Sprung einträgt, wohin ein Loch führt, landet sein Lesezeichenname (im Format oben) in deiner Zwischenablage. Bist du gerade im Spiel, wird er kopiert, sobald du wieder in nexum klickst.",
     "skipKspace": "K-Space nicht verfolgen",
     "skipKspaceHint": "Wenn aktiv, wird nur das erste K-Space-System nach dem Sprung aus dem J-Space und das letzte vor dem Sprung zurück in den J-Space erfasst — alles dazwischen wird übersprungen. Nur HS/LS/NS; Pochven wird immer verfolgt.",
     "snapToGrid": "Am Raster ausrichten",

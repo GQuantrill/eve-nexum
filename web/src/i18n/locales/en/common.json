@@ -1883,6 +1883,8 @@
     "sigBookmark": "Wormhole bookmark",
     "siteBookmark": "Site bookmark (relic / data / gas)",
     "siteBookmarkHelp": "On a relic, data, or gas signature row, click the copy icon for a paste-ready bookmark name. Build it with these tokens:",
+    "copyBookmarkOnJump": "Copy bookmark name after a jump",
+    "copyBookmarkOnJumpHelp": "When a jump fills in where a hole leads, its bookmark name (in the format above) goes on your clipboard. If you're in game at the time, it's copied as soon as you click back into nexum.",
     "skipKspace": "Don't track K-space",
     "skipKspaceHint": "When on, only records the K-space system you first jump into from J-space and the last one before you jump back into J-space — skipping everything you gate through in between. HS/LS/NS only; Pochven is always tracked.",
     "snapToGrid": "Snap to Grid",

@@ -25,6 +25,7 @@ import { normalizePlacement } from "../../hooks/useLocationTracking";
 import { NOTIFY, notifyDefault, previewAlertVolume, ALERT_VOLUME_KEY, ALERT_VOLUME_DEFAULT, EXITS_MIN_SECURITY_KEY, EXITS_MIN_SECURITY_DEFAULT, EXITS_MIN_SECURITY_OFF, KILLS_FILTER_KEY, KILLS_FILTER_DEFAULT, type KillsFilter } from "../../utils/notificationPrefs";
 import { useResettableState } from "../../hooks/useResettableState";
 import { DEFAULT_BOOKMARK_FORMAT, BOOKMARK_TOKENS, DEFAULT_SITE_BOOKMARK_FORMAT, SITE_BOOKMARK_TOKENS } from "../../utils/signatureBookmark";
+import { COPY_BOOKMARK_ON_JUMP } from "../../hooks/whJumpConfirm";
 import { toPng } from "html-to-image";
 import { CaretLeftIcon, CaretRightIcon, DiscordLogoIcon } from "@phosphor-icons/react";
 import { DISCORD_INVITE_URL } from "../../data/links";
@@ -2136,6 +2137,8 @@ export function MapSidebar() {
                       <li key={b.token}><code>{b.token}</code> - {b.desc}</li>
                     ))}
                   </ul>
+                  <SettingToggle settingKey={COPY_BOOKMARK_ON_JUMP} label={t("mapSidebar.copyBookmarkOnJump")} />
+                  <p className="map-sidebar__help">{t("mapSidebar.copyBookmarkOnJumpHelp")}</p>
                   <div className="map-sidebar__field">
                     <label className="map-sidebar__label" htmlFor="site-bookmark-fmt">{t("mapSidebar.siteBookmark")}</label>
                     <input id="site-bookmark-fmt" className="map-sidebar__select map-sidebar__select--full" type="text" spellCheck={false} value={siteBookmarkFmt} onChange={(e) => setSiteBookmarkFmt(e.target.value)} placeholder={DEFAULT_SITE_BOOKMARK_FORMAT} />

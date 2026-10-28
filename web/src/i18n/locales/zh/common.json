@@ -1883,6 +1883,8 @@
     "sigBookmark": "虫洞书签",
     "siteBookmark": "站点书签（relic / data / gas）",
     "siteBookmarkHelp": "在 relic、data 或 gas 信号行上，点击复制图标即可获得可粘贴的书签名称。使用以下标记来构建：",
+    "copyBookmarkOnJump": "跳跃后复制书签名称",
+    "copyBookmarkOnJumpHelp": "当一次跳跃填入虫洞的去向时，其书签名称（使用上方的格式）会复制到剪贴板。如果当时你在游戏中，则会在你点回 nexum 时立即复制。",
     "skipKspace": "不跟踪 K 空间",
     "skipKspaceHint": "开启后，仅记录你从 J 空间进入的第一个 K 空间星系，以及跳回 J 空间前的最后一个星系——中间经过的所有星系都会被跳过。仅限 HS/LS/NS；Pochven 始终会被跟踪。",
     "snapToGrid": "对齐网格",

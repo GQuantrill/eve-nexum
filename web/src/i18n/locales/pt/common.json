@@ -1883,6 +1883,8 @@
     "sigBookmark": "Marcador de wormhole",
     "siteBookmark": "Marcador de site (relic / data / gas)",
     "siteBookmarkHelp": "Numa linha de assinatura relic, data ou gas, clica no ícone de copiar para um nome de marcador pronto a colar. Constrói-o com estes tokens:",
+    "copyBookmarkOnJump": "Copiar o nome do marcador após um salto",
+    "copyBookmarkOnJumpHelp": "Quando um salto preenche para onde leva um buraco, o nome do marcador (no formato acima) vai para a tua área de transferência. Se estiveres no jogo nesse momento, é copiado assim que voltares a clicar no nexum.",
     "skipKspace": "Não rastrear o K-space",
     "skipKspaceHint": "Quando ativado, registra apenas o primeiro sistema K-space em que você entra a partir do J-space e o último antes de saltar de volta ao J-space — ignorando tudo o que você atravessa por portões no meio. Apenas HS/LS/NS; Pochven é sempre rastreado.",
     "snapToGrid": "Ajustar à grade",
