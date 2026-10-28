@@ -1213,7 +1213,7 @@
     "features": {
       "interactiveMap": {
         "title": "Mapa interactivo",
-        "desc": "Arrastra sistemas, traza conexiones, define la clase / tipo / estado del agujero de gusano por conexión. Ajuste a la cuadrícula y minimapa opcional."
+        "desc": "Arrastra sistemas, dibuja conexiones y asigna clase / tipo / estado de agujero de gusano a cada conexión. Ajuste a la cuadrícula y minimapa opcional."
       },
       "seedRegion": {
         "title": "Generar un mapa desde una región",
@@ -1232,8 +1232,8 @@
         "desc": "Popover con búsqueda para asignar el tipo exacto de agujero de gusano a una conexión. La info rápida de statics al pasar el ratón muestra la clase de destino, la masa y la vida útil."
       },
       "multiSelect": {
-        "title": "Operaciones en lote por selección múltiple",
-        "desc": "Mayús+clic para seleccionar varios sistemas o firmas, luego asigna tipo, elimina o renombra en una sola acción."
+        "title": "Operaciones en lote con selección múltiple",
+        "desc": "Haz Mayús o Cmd / Ctrl-clic para seleccionar varios sistemas o firmas, y luego asigna el tipo, elimina o renombra en lote en una sola acción."
       },
       "pngExport": {
         "title": "Exportación a PNG",
@@ -1261,7 +1261,7 @@
       },
       "crossMapSync": {
         "title": "Sincronización entre mapas",
-        "desc": "¿Tienes el mismo sistema en varios mapas? Actívalo y, al escanearlo en un mapa, sus firmas y anomalías se copian al mismo sistema en tus otros mapas — los mapas personales se sincronizan con tus otros mapas personales, y los de corp con los de la corp. No destructivo: solo añade entradas que faltan y rellena huecos, nunca sobrescribe lo que ya has introducido ni borra nada."
+        "desc": "¿Tienes el mismo sistema en varios mapas? Actívalo y, al escanearlo en un mapa, sus firmas y anomalías se copian al mismo sistema en los demás. Los mapas personales se sincronizan con tus otros mapas personales (incluidos los de tus alts), y los mapas de corp o alianza con otros del mismo tipo que tengan la sincronización activada. Solo añade entradas que faltan y rellena huecos, nunca sobrescribe ni elimina nada."
       },
       "realtime": {
         "title": "Colaboración en tiempo real",
@@ -1273,15 +1273,15 @@
       },
       "rbac": {
         "title": "Acceso basado en roles",
-        "desc": "Cuatro niveles — readonly, edit, full, admin — que rigen las acciones sobre mapas de corp. Los mapas personales siguen siendo tuyos sea cual sea el rol."
+        "desc": "Solo lectura, colaborador, edición, completo y admin, más admin de alianza en instalaciones de alianza. Un colaborador mantiene al día firmas, anomalías y estructuras y mapea la cadena volándola, pero no puede remodelarla a mano. Los mapas personales siguen siendo tuyos sea cual sea el rol."
       },
       "systemPanel": {
         "title": "Panel de sistema",
-        "desc": "Tarjetas por sistema para firmas, estructuras, estaciones PNJ, notas, killboard y gráficos de actividad. Las tarjetas se reordenan arrastrando y soltando y se conservan por usuario."
+        "desc": "Tarjetas por sistema para firmas, anomalías, estructuras, estaciones de PNJ, notas, killboard, actividad PvP, d-scans y gráficos de actividad, con enlaces a Dotlan, zKillboard y anoik.is. Las tarjetas se reordenan arrastrando y soltando y se guardan por usuario."
       },
       "sigMgmt": {
         "title": "Gestión de firmas",
-        "desc": "Pega directamente desde el escáner de sondas. Hace seguimiento de la antigüedad de creación / actualización por firma, elimina automáticamente las firmas ausentes en un nuevo pegado y admite la asignación de tipo en lote para la selección múltiple."
+        "desc": "Pega directamente desde el escáner de sondas. Muestra quién escaneó cada firma y su antigüedad, puede eliminar las firmas que faltan en un nuevo pegado tras un periodo de gracia, y nunca duplica una firma cuando dos pilotos pegan a la vez. Copia desde cualquier fila un nombre de marcador listo para pegar, en tu propio formato o en el del mapa."
       },
       "structImport": {
         "title": "Importación de estructuras",
@@ -1293,15 +1293,15 @@
       },
       "activityCharts": {
         "title": "Gráficos de actividad",
-        "desc": "Historial móvil de 24 horas de saltos, kills de naves / cápsulas y kills de PNJ por sistema, consultado de la ESI cada hora. El recolector conserva los datos de cada sistema de K-space — no solo de los que alguien ha abierto — para que los gráficos se llenen en cuanto veas un sistema nuevo."
+        "desc": "Historial móvil de 24 horas de saltos, kills de naves / cápsulas y kills de PNJ por sistema, consultado de la ESI cada hora para todos los sistemas de k-space. Muéstralos apilados en tu propio orden, o combinados en un único par de ejes con valores exactos al pasar el ratón."
       },
       "sovStation": {
-        "title": "Datos de soberanía y de estación",
-        "desc": "Info de sov en vivo de alianza / corp / facción y servicios de estación PNJ, con acciones de punto de ruta y destino en el juego."
+        "title": "Datos de soberanía y estaciones",
+        "desc": "Soberanía de alianza / corp / facción en vivo con el ADM del hub y su próxima ventana de vulnerabilidad, además de los servicios de las estaciones de PNJ, con acciones de punto de ruta y destino en el juego."
       },
       "killboard": {
         "title": "Panel de killboard",
-        "desc": "Actividad reciente de zKillboard por sistema, con los kills solo de PNJ ocultos por defecto (alternable). Las filas se tiñen de rojo cuando un actor hostil está en la cadena o matan a un azul; de azul cuando un amigo puntúa o muere un hostil. Los kills recientes también resaltan en el mapa."
+        "desc": "Kills recientes de zKillboard y del feed en vivo para un sistema o todo tu mapa, en la última hora, día o semana. Cada kill se etiqueta cuando ocurrió en una puerta o involucró un HIC, un dictor o una smartbomb. Los kills de PNJ se ocultan por defecto. Las filas se tiñen de rojo cuando hay un hostil implicado o muere un azul, y de azul cuando un amigo puntúa."
       },
       "effectDigest": {
         "title": "Resumen de efectos de la cadena",
@@ -1312,8 +1312,8 @@
         "desc": "Tu lista de contactos de EVE (personal, corp y alianza — obtenida vía la ESI al iniciar sesión y reactualizable bajo demanda) impulsa una capa visual en toda la cadena. Los poseedores de sov muestran píldoras de standing P/C/A en línea; las estructuras resueltas por su ID de estructura de EVE se tiñen según el standing de la corp propietaria; los nodos de sistemas con sov reciben un halo de color para que el territorio hostil destaque en el mapa."
       },
       "scout": {
-        "title": "Conexiones de scout",
-        "desc": "Las conexiones públicas de Eve-Scout de Thera y Turnur aparecen en la barra lateral para que saltes directamente a agujeros conocidos."
+        "title": "Conexiones de Thera y Turnur",
+        "desc": "Las conexiones públicas de Thera y Turnur de Eve-Scout con ambos IDs de firma y la ruta a través del hub. Cópialas a tu mapa con un clic (los agujeros que eve-scout deja de listar se retiran), y marca una como colapsada para que las rutas dejen de usarla."
       },
       "a0": {
         "title": "Detección de soles A0",
@@ -1337,11 +1337,11 @@
       },
       "discordNotif": {
         "title": "Notificaciones de Discord",
-        "desc": "Envía la inteligencia de cadena de la corp a un canal de Discord para que las alertas lleguen aunque nadie esté mirando la pestaña. Se dispara en el servidor ante un K162 entrante o una nueva conexión de agujero de gusano, limitado a mapas de corp. Los admins filtran qué regiones y mapas notifican desde el panel de administración. Best-effort y consciente de los límites de tasa; las operaciones en lote como el sembrado de regiones nunca saturan el canal."
+        "desc": "Envía la inteligencia de la cadena a un canal de Discord para que las alertas lleguen aunque nadie esté mirando la pestaña: nuevas conexiones y K162, nuevas salidas a k-space con su ruta, kills en la cadena y kills especiales, agujeros que entran en fin de vida, y nuevos agujeros de Thera y Turnur. Los admins eligen qué mapas y regiones publican."
       },
       "routePlanner": {
         "title": "Planificador de rutas",
-        "desc": "BFS en el servidor sobre las puertas estelares más tu cadena en vivo, para que una ruta que pasa por un salto de agujero de gusano sea un solo clic."
+        "desc": "Elige dos sistemas cualesquiera y obtén una ruta por puertas estelares, tus cadenas de agujeros de gusano, Thera, Turnur y puentes Ansiblex. Busca sistemas por el alias que les diste y guarda las rutas que vuelas a menudo."
       },
       "locationTracking": {
         "title": "Seguimiento de ubicación",
@@ -1365,7 +1365,7 @@
       },
       "killHighlights": {
         "title": "Resaltado de kills recientes",
-        "desc": "Los sistemas con kills en la última hora reciben un halo de color para que veas de un vistazo la actividad fresca en toda la cadena."
+        "desc": "Los sistemas con kills muestran una espada en el mapa con su recuento de kills de 24 horas, brillante cuando ha habido combate en la última hora, y un halo de color para la actividad reciente en toda la cadena."
       },
       "userStats": {
         "title": "Ventana de estadísticas de usuario",
@@ -1380,8 +1380,8 @@
         "desc": "La página de inicio monta un mapa de demostración no editable para que los visitantes vean lo que hace la herramienta antes de iniciar sesión."
       },
       "sidebar": {
-        "title": "Barra lateral plegable",
-        "desc": "Opciones de mapa, Conexiones, Alertas de proximidad, Atenuar sistemas obsoletos y Atajos se despliegan o pliegan de forma independiente. El estado por sección se conserva por navegador vía localStorage."
+        "title": "Elige tus paneles",
+        "desc": "Cada sección de la barra lateral y cada panel de sistema se puede contraer, reordenar o desactivar por completo. Tus elecciones se guardan en tu cuenta y te acompañan a otro equipo."
       },
       "colorVision": {
         "title": "Modos para daltónicos",
@@ -1417,7 +1417,91 @@
       },
       "jumpPlanner": {
         "title": "Planificador de saltos",
-        "desc": "Traza una ruta de salto capital de varios saltos entre dos sistemas low/null. Elige una clase de nave y tus habilidades, opta por menos saltos o menos combustible, y ve la ruta trazada con años luz por salto y una estimación de isótopos. Guarda y recarga tus rutas."
+        "desc": "Traza una ruta de salto capital de varios saltos entre dos sistemas low/null cualesquiera. Elige una clase de nave y tus habilidades, opta por menos saltos o menos combustible, y ve la ruta con los años luz por salto, una estimación de isótopos, la fatiga de salto y el temporizador de reactivación. Evita sistemas, añade puntos de ruta, usa puertas regionales y guarda tus rutas."
+      },
+      "addConnect": {
+        "title": "Añade y conecta en un solo paso",
+        "desc": "Haz clic derecho en un sistema para añadir un sistema conectado de una vez, o elige Conectar con sistema y haz clic en el otro extremo. Al añadir uno, se ofrece primero el sistema en el que estás, y un marcador Desconocido señala un agujero que aún no has identificado."
+      },
+      "mapGlance": {
+        "title": "El mapa de un vistazo",
+        "desc": "Las conexiones muestran su estado en la propia línea: los agujeros de fragata van discontinuos, los reducidos y críticos llevan un núcleo de color, y el tamaño de nave aparece junto al tipo. Cada sistema muestra cuánto se ha escaneado, los statics se ven incluso en modo compacto, y al pasar el ratón por un sistema de k-space ves a cuántos saltos de puerta está de ti."
+      },
+      "regionBorders": {
+        "title": "Fronteras de región",
+        "desc": "Los sistemas con una puerta estelar hacia otra región llevan una pequeña etiqueta con su nombre, para que veas por dónde una cadena te permite cruzar a Providence o Curse sin añadir el sistema vecino. Desactivado por defecto; actívalo en Opciones de sistema."
+      },
+      "layoutTools": {
+        "title": "Herramientas de disposición",
+        "desc": "Ordenar disposición coloca los sistemas con la forma de sus regiones reales. Desenredar agrupa los sistemas enlazados en filas y columnas ordenadas. Reclasificar puertas convierte en conexiones de puerta las líneas de agujero de gusano que en realidad son puertas estelares. Los sistemas bloqueados se quedan donde los pusiste."
+      },
+      "flagPresets": {
+        "title": "Plantillas de marca de conexión",
+        "desc": "Guarda un icono, un color y un nombre como plantilla y aplícala a una conexión con un clic. Las corps y alianzas pueden publicar un conjunto estándar para todos."
+      },
+      "mapBackup": {
+        "title": "Importación y copias de seguridad completas",
+        "desc": "Trae un mapa desde Pathfinder (con alias, marcadores de inteligencia, masa y fin de vida) o desde Tripwire (experimental, con firmas y notas de sistema). Exporta una copia de seguridad JSON completa con firmas, anomalías, estructuras y la masa y vida de cada agujero, e impórtala de nuevo como una copia exacta de tu propiedad."
+      },
+      "jumpConfirm": {
+        "title": "Los saltos completan el agujero",
+        "desc": "Cuando saltas, nexum averigua por qué firma has pasado y fija adónde lleva, y solo pregunta cuando podría ser más de una. El nombre de marcador actualizado del agujero queda en tu portapapeles, listo para pegar en el juego. Los saltos de clon y las muertes de cápsula no dibujan conexiones falsas."
+      },
+      "sharing": {
+        "title": "Compartir mapas",
+        "desc": "Comparte un mapa con otros personajes, tu corp o tu alianza, o crea un enlace de solo lectura que cualquiera puede abrir sin cuenta, con caducidad y a tu elección lo que ven los invitados. Los mapas compartidos muestran quién es su propietario, y puedes abandonar u ocultar los que no uses."
+      },
+      "mapHistory": {
+        "title": "Historial del mapa",
+        "desc": "Cada cambio en la estructura de un mapa queda registrado con quién lo hizo: sistemas, conexiones, firmas, cadenas, ajustes, uso compartido y fusiones. Se conserva 30 días, y el propietario y los admins del mapa pueden consultarlo desde la barra lateral del mapa."
+      },
+      "dscan": {
+        "title": "Analizador de d-scan y local",
+        "desc": "Pega un escaneo direccional para ver las naves agrupadas por clase y casco, un filtro en grid / fuera de grid, las estructuras con su distancia y la masa total en el escaneo. Pega el chat local para ver los pilotos agrupados por alianza y corp. Cada escaneo tiene un enlace que cualquiera puede abrir durante 24 horas, y los escaneos asociados a un sistema aparecen en su panel. No hace falta iniciar sesión."
+      },
+      "pvpForecast": {
+        "title": "Previsión de actividad PvP",
+        "desc": "Para cualquier sistema, 24 barras que muestran cuánta actividad suele haber en cada una de las próximas horas ese día de la semana, a partir de los últimos 90 días de zKillboard, con la hora de más actividad indicada y un recuento en vivo de las últimas 24 horas. Las horas se muestran en tu propia zona horaria. También funciona en el espacio de agujeros de gusano."
+      },
+      "holeState": {
+        "title": "Masa y vida mientras escaneas",
+        "desc": "Registra la masa de un agujero (completa, menos del 50%, menos del 10%) y su vida (hasta caducado) directamente desde la lista de firmas, antes de que nadie lo haya saltado. Fíjalo en cualquiera de los extremos y el otro extremo y la línea del mapa se igualan."
+      },
+      "siteDetails": {
+        "title": "Detalles de sitios de un vistazo",
+        "desc": "Las filas de reliquias y datos indican si el sitio genera combate, los sitios de datos de eventos muestran una marca de warp seguro, los sitios fantasma tienen su propio tipo con el nivel leído del escaneo, y los agujeros Drifter rellenan su propio destino."
+      },
+      "chainExits": {
+        "title": "Salidas de la cadena",
+        "desc": "Una lista en la barra de herramientas con cada sistema de k-space con un agujero de gusano abierto en tu cadena, con la ruta a cada uno y a tus sistemas favoritos a través de la salida por la que saldrías. Recibe una alerta en la app o en Discord cuando aparece una salida nueva: solo high-sec, low-sec o mejor, o cualquier k-space."
+      },
+      "closestSystems": {
+        "title": "Sistemas más cercanos",
+        "desc": "Un panel lateral con la distancia a los hubs comerciales y a tu propia lista de sistemas, contando puertas, tus cadenas de agujeros de gusano, Thera y Turnur. Puede usar todos los mapas que puedes ver o solo el abierto, y cada salto por agujero de gusano indica el mapa del que procede."
+      },
+      "clones": {
+        "title": "Panel de clones",
+        "desc": "Tu clon médico y tus clones de salto con el sistema en el que está cada uno, sus implantes y botones para fijar destino y añadir punto de ruta. Requiere el permiso de clones."
+      },
+      "pilotsOnline": {
+        "title": "Pilotos conectados",
+        "desc": "En instalaciones de corp y alianza, ve quién de tu organización ha estado activo en los últimos minutos, qué pilota y dónde está. Cualquiera puede ocultar su propia presencia."
+      },
+      "announcer": {
+        "title": "Anunciador de voz",
+        "desc": "Alertas habladas mientras vuelas, con una voz que funciona en tu propio dispositivo: low-sec y null-sec dentro del alcance, incursiones, kills recientes cercanos, personajes que se conectan y nuevas cadenas añadidas por otros. Experimental, solo en inglés."
+      },
+      "desktopAlerts": {
+        "title": "Alertas de escritorio y sonido",
+        "desc": "Notificaciones de escritorio y sonidos para kills en tu cadena, agujeros que entran en fin de vida, nuevas salidas a k-space, coincidencias de la lista de vigilancia y amenazas cercanas, cada una activable por separado con un único control de volumen. Solo alertan las novedades, nunca el mismo elemento dos veces."
+      },
+      "multiDestination": {
+        "title": "Destino para todos tus personajes",
+        "desc": "Fija un destino o añade un punto de ruta para todos los personajes conectados de tu cuenta a la vez. Cada uno traza su propia ruta desde donde esté, y ves qué ha pasado con cada personaje."
+      },
+      "panelLayout": {
+        "title": "Disposición de paneles",
+        "desc": "Coloca los paneles debajo del mapa o a su lado, divídelos en hasta tres columnas redimensionables y elige un espaciado Cómodo, Compacto o Denso. Oculta los paneles que no uses, ábrelos en ventanas aparte, y tu disposición te sigue con tu cuenta a cualquier dispositivo."
       }
     },
     "corpFeatures": {
@@ -1435,7 +1519,7 @@
       },
       "adminDash": {
         "title": "Panel de administración",
-        "desc": "Una página /admin dedicada con cuatro pestañas: Usuarios, Mapas, Informes y Registro de auditoría. Los admins acceden a ella desde el botón Administración de la barra de herramientas."
+        "desc": "Una página /admin dedicada con pestañas para Usuarios, Acceso, Mapas, Informes, Registro de auditoría, Discord, Plantillas y Diseño por defecto. Los admins acceden a ella desde el botón Administración de la barra de herramientas."
       },
       "userMgmt": {
         "title": "Gestión de usuarios",
@@ -1472,6 +1556,22 @@
       "accessControl": {
         "title": "Control de acceso de usuarios",
         "desc": "Decide quién puede iniciar sesión más allá de tu núcleo .env: una lista de permitidos en BD (sembrada desde CORP_ID/ALLIANCE_ID) gestionada en el panel, admisión automática opcional de corps/alianzas amigas por standing (+5/+10) y un visor de standings agrupados por nivel. Las sesiones se revalidan en vivo: revocar acceso —o un piloto que deja una corp admitida— lo desconecta."
+      },
+      "invites": {
+        "title": "Invitaciones con rol",
+        "desc": "Añade a un piloto a la lista de permitidos antes de que haya iniciado sesión nunca y elige el rol con el que llega. Un botón Enviar invitación abre un EVE mail ya redactado en tu propio cliente. DEFAULT_USER_ROLE fija el rol con el que empiezan todos los demás."
+      },
+      "orgDefaults": {
+        "title": "Valores por defecto de la organización",
+        "desc": "Guarda tu propia disposición de paneles como diseño inicial que heredan los miembros nuevos, y publica un conjunto estándar de plantillas de marca de conexión para todos."
+      },
+      "orgBranding": {
+        "title": "Tu logotipo",
+        "desc": "Una instancia gestionada para una corp o alianza muestra su logotipo encima del botón de inicio de sesión en la página principal, y junto al logotipo de nexum en la barra de herramientas."
+      },
+      "prebuiltImages": {
+        "title": "Imágenes precompiladas",
+        "desc": "Cada versión se publica como imágenes listas para usar en GitHub Container Registry, así que actualizar es un docker compose pull. Los scripts de copia de seguridad y restauración gestionan varias instancias en un mismo host."
       }
     },
     "forCorpsBody": "Ejecuta Nexum como un despliegue compartido para tu corp o alianza. Los miembros obtienen mapas de cadena visibles para la corp y mapas personales privados en una sola herramienta, con permisos basados en roles, herramientas de administración e informes de actividad por personaje.",
