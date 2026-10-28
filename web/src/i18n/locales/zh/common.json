@@ -46,6 +46,19 @@
     "loading": "正在加载活动…",
     "peak": "峰值 {{value}}"
   },
+  "pvp": {
+    "loading": "正在加载 PvP 活动…",
+    "loadFailed": "无法加载 PvP 活动。",
+    "noHistory": "暂无 PvP 记录。从现在起会记录此处的玩家击杀。",
+    "noneInDays": "过去 {{days}} 天此处没有玩家击杀。",
+    "busiestNow": "当前最活跃（{{hour}} UTC）",
+    "busiestNext": "最活跃时段 {{hour}} UTC，{{n}} 小时后",
+    "killsInDays": "{{days}} 天内 {{n}} 次",
+    "chartLabel": "未来 24 小时按时段的玩家击杀",
+    "barTitle": "{{hour}} UTC：{{n}}",
+    "now": "现在",
+    "note": "按 UTC 小时统计的玩家击杀。颜色越热表示该时段通常越活跃。"
+  },
   "addSystem": {
     "title": "添加星系",
     "systemName": "星系名称",
@@ -1775,7 +1788,8 @@
     "killboard": "zKillboard",
     "activity": "活动",
     "undock": "分离为浮动窗口",
-    "redock": "重新停靠"
+    "redock": "重新停靠",
+    "pvp": "PvP 活动"
   },
   "panes": {
     "noEveSystem": "未关联 EVE 星系",

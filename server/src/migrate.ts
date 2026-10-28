@@ -1374,6 +1374,16 @@ export async function migrate() {
     CREATE INDEX IF NOT EXISTS idx_dscans_expires ON dscans (expires_at);
     CREATE INDEX IF NOT EXISTS idx_dscans_map_system
       ON dscans (map_id, eve_system_id, created_at DESC) WHERE map_id IS NOT NULL;
+
+    -- Player kills per system per UTC hour, from the live kill feed, kept 90
+    -- days (services/pvpHistory.ts) for the system panel's PvP forecast.
+    CREATE TABLE IF NOT EXISTS system_pvp_hours (
+      eve_system_id INTEGER     NOT NULL,
+      hour          TIMESTAMPTZ NOT NULL,
+      kills         INTEGER     NOT NULL,
+      PRIMARY KEY (eve_system_id, hour)
+    );
+    CREATE INDEX IF NOT EXISTS idx_system_pvp_hours_hour ON system_pvp_hours (hour);
   `);
 
   await encryptLegacyTokens();

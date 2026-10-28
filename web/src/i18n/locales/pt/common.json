@@ -46,6 +46,19 @@
     "loading": "A carregar atividade…",
     "peak": "pico {{value}}"
   },
+  "pvp": {
+    "loading": "Carregando atividade PvP…",
+    "loadFailed": "Não foi possível carregar a atividade PvP.",
+    "noHistory": "Ainda sem histórico PvP. Abates de jogadores aqui são registrados a partir de agora.",
+    "noneInDays": "Nenhum abate de jogador aqui nos últimos {{days}} dias.",
+    "busiestNow": "Mais movimentado agora ({{hour}} UTC)",
+    "busiestNext": "Mais movimentado às {{hour}} UTC, em {{n}} h",
+    "killsInDays": "{{n}} em {{days}} d",
+    "chartLabel": "Abates de jogadores por hora do dia nas próximas 24 horas",
+    "barTitle": "{{hour}} UTC: {{n}}",
+    "now": "agora",
+    "note": "Abates de jogadores por hora UTC. Barras mais quentes são as horas geralmente mais movimentadas."
+  },
   "addSystem": {
     "title": "Adicionar sistema",
     "systemName": "Nome do sistema",
@@ -1775,7 +1788,8 @@
     "killboard": "zKillboard",
     "activity": "Atividade",
     "undock": "Desacoplar para uma janela flutuante",
-    "redock": "Reacoplar"
+    "redock": "Reacoplar",
+    "pvp": "Atividade PvP"
   },
   "panes": {
     "noEveSystem": "Nenhum sistema de EVE associado",

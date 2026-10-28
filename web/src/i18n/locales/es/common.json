@@ -46,6 +46,19 @@
     "loading": "Cargando actividad…",
     "peak": "máx. {{value}}"
   },
+  "pvp": {
+    "loading": "Cargando actividad PvP…",
+    "loadFailed": "No se pudo cargar la actividad PvP.",
+    "noHistory": "Aún no hay historial PvP. Las muertes de jugadores aquí se registran a partir de ahora.",
+    "noneInDays": "Ninguna muerte de jugador aquí en los últimos {{days}} días.",
+    "busiestNow": "Máxima actividad ahora ({{hour}} UTC)",
+    "busiestNext": "Máxima actividad a las {{hour}} UTC, en {{n}} h",
+    "killsInDays": "{{n}} en {{days}} d",
+    "chartLabel": "Muertes de jugadores por hora del día para las próximas 24 horas",
+    "barTitle": "{{hour}} UTC: {{n}}",
+    "now": "ahora",
+    "note": "Muertes de jugadores por hora UTC. Las barras más cálidas son las horas que suelen tener más actividad."
+  },
   "addSystem": {
     "title": "Añadir sistema",
     "systemName": "Nombre del sistema",
@@ -1775,7 +1788,8 @@
     "killboard": "zKillboard",
     "activity": "Actividad",
     "undock": "Desacoplar a una ventana flotante",
-    "redock": "Volver a acoplar"
+    "redock": "Volver a acoplar",
+    "pvp": "Actividad PvP"
   },
   "panes": {
     "noEveSystem": "Ningún sistema de EVE vinculado",

@@ -46,6 +46,19 @@
     "loading": "Loading activity…",
     "peak": "peak {{value}}"
   },
+  "pvp": {
+    "loading": "Loading PvP activity…",
+    "loadFailed": "Couldn't load PvP activity.",
+    "noHistory": "No PvP history yet. Player kills here are recorded from now on.",
+    "noneInDays": "No player kills here in the last {{days}} days.",
+    "busiestNow": "Busiest now ({{hour}} UTC)",
+    "busiestNext": "Busiest at {{hour}} UTC, in {{n}}h",
+    "killsInDays": "{{n}} in {{days}}d",
+    "chartLabel": "Player kills by hour of day for the next 24 hours",
+    "barTitle": "{{hour}} UTC: {{n}}",
+    "now": "now",
+    "note": "Player kills by UTC hour of day. Hotter bars are hours that are usually busier."
+  },
   "addSystem": {
     "title": "Add System",
     "systemName": "System name",
@@ -1775,7 +1788,8 @@
     "killboard": "zKillboard",
     "activity": "Activity",
     "undock": "Undock to a floating window",
-    "redock": "Dock back"
+    "redock": "Dock back",
+    "pvp": "PvP activity"
   },
   "panes": {
     "noEveSystem": "No EVE system linked",

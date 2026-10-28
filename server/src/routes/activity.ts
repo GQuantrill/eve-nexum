@@ -3,6 +3,7 @@ import { esiFetch } from '../utils/esi.js';
 import { db } from '../db.js';
 import { config } from '../config.js';
 import { liveKillCounts } from '../services/killBuffer.js';
+import { getPvpForecast } from '../services/pvpHistory.js';
 import { optionalAuth } from '../middleware/optionalAuth.js';
 
 const router = Router();
@@ -212,6 +213,19 @@ export async function initActivity(): Promise<void> {
     recordSnapshot().catch((err) => console.error('[activity] poll failed:', err));
   }, POLL_MS);
 }
+
+// Player kills in the system by UTC hour of day over the last 90 days, from the
+// live kill feed: the system panel's "when is it busy" forecast. Kill data is
+// public (zKillboard), so like the rest of this router it needs a login or a
+// share link but no particular map's access.
+router.get('/pvp/:systemId(\\d+)', async (req, res) => {
+  const eveSystemId = Number(req.params.systemId);
+  if (!Number.isInteger(eveSystemId) || eveSystemId <= 0 || eveSystemId > 2_147_483_647) {
+    res.status(400).json({ error: 'invalid system id' });
+    return;
+  }
+  res.json(await getPvpForecast(eveSystemId));
+});
 
 router.get('/:systemId(\\d+)', async (req, res) => {
   const eveSystemId = parseInt(req.params.systemId, 10);
