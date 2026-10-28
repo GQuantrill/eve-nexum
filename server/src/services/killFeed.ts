@@ -142,7 +142,7 @@ interface EsiKillmail {
 interface EphemeralKill {
   killmail_id?: number;
   esi?:         EsiKillmail;       // the raw ESI killmail (R2Z2 nests it under `esi`)
-  zkb?:         { totalValue?: number; npc?: boolean; solo?: boolean; locationID?: number };
+  zkb?:         { totalValue?: number; npc?: boolean; solo?: boolean; awox?: boolean; locationID?: number; labels?: unknown };
   uploaded_at?: number;            // unix seconds R2Z2 published it
 }
 
@@ -249,7 +249,7 @@ export async function processKill(body: EphemeralKill, replayed = false): Promis
   // The victim's hull too, to spot a capital.
   const groupOf = await loadGroups([...typeIds, shipTypeId]);
   buffered.tags = tagsFor(
-    { locationId: Number(body.zkb?.locationID) || null, solo: buffered.solo, npc, typeIds },
+    { locationId: Number(body.zkb?.locationID) || null, solo: buffered.solo, npc, awox: !!body.zkb?.awox, labels: body.zkb?.labels, typeIds },
     groupOf,
   );
   buffered.special = specialKinds(buffered, groupOf);

@@ -20,9 +20,18 @@ describe('tagsFor', () => {
     expect(tagsFor({ typeIds: [620, 3937] }, groupOf)).toEqual(['sb']);
   });
 
-  it('keeps a fixed order, with solo and npc last', () => {
-    expect(tagsFor({ locationId: 50000001, solo: true, npc: true, typeIds: [3937, 22456, 11995] }, groupOf))
-      .toEqual(['gate', 'hic', 'dic', 'sb', 'solo', 'npc']);
+  it("keeps a fixed order, with zKillboard's verdicts after the ship tags", () => {
+    expect(tagsFor({ locationId: 50000001, solo: true, npc: true, labels: ['ganked', 'awox', 'padding'], typeIds: [3937, 22456, 11995] }, groupOf))
+      .toEqual(['gate', 'hic', 'dic', 'sb', 'solo', 'ganked', 'awox', 'padding', 'npc']);
+  });
+
+  it("reads zKillboard's labels, and only the ones it knows", () => {
+    expect(tagsFor({ labels: ['tz:eu', 'cat:6', '#:1', 'pvp', 'loc:highsec', 'solo'], typeIds: [] }, groupOf)).toEqual(['solo']);
+    expect(tagsFor({ labels: ['ganked', 'pvp'], typeIds: [] }, groupOf)).toEqual(['ganked']);
+    expect(tagsFor({ labels: ['a:awox', 'awox'], typeIds: [] }, groupOf)).toEqual(['awox']);
+    expect(tagsFor({ awox: true, typeIds: [] }, groupOf)).toEqual(['awox']);
+    expect(tagsFor({ labels: 'ganked', typeIds: [] }, groupOf)).toEqual([]);
+    expect(tagsFor({ labels: [42, null, '<b>x</b>'], typeIds: [] }, groupOf)).toEqual([]);
   });
 
   it('ignores types it does not know', () => {

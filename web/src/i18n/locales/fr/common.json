@@ -1157,7 +1157,10 @@
       "dic": "Dictor",
       "sb": "SB",
       "npc": "PNJ",
-      "solo": "Solo"
+      "solo": "Solo",
+      "ganked": "Ganké",
+      "awox": "Awox",
+      "padding": "Padding"
     },
     "tagTips": {
       "gate": "Tué sur un portail stellaire",
@@ -1165,7 +1168,10 @@
       "dic": "Un interdictor figurait sur le killmail",
       "sb": "Tué par une smartbomb",
       "npc": "Uniquement des PNJ sur le killmail",
-      "solo": "Un seul attaquant"
+      "solo": "Un seul attaquant",
+      "ganked": "Tué par un gank : CONCORD figurait sur le killmail",
+      "awox": "Tué par sa propre corporation ou alliance",
+      "padding": "zKillboard le marque comme padding : un kill sans valeur pour gonfler les statistiques"
     }
   },
   "labelsDialog": {

@@ -1157,7 +1157,10 @@
       "dic": "Dictor",
       "sb": "SB",
       "npc": "NPC",
-      "solo": "Solo"
+      "solo": "Solo",
+      "ganked": "Ganked",
+      "awox": "Awox",
+      "padding": "Padding"
     },
     "tagTips": {
       "gate": "Killed on a stargate",
@@ -1165,7 +1168,10 @@
       "dic": "An interdictor was on the killmail",
       "sb": "Killed by a smartbomb",
       "npc": "Only NPCs on the killmail",
-      "solo": "One attacker"
+      "solo": "One attacker",
+      "ganked": "Killed by a gank: CONCORD was on the killmail",
+      "awox": "Killed by its own corp or alliance",
+      "padding": "zKillboard marks this as padding: a worthless kill to pump up stats"
     }
   },
   "labelsDialog": {

@@ -44,7 +44,7 @@ const WINDOW_MS: Record<KillWindow, number> = { '1h': 3_600_000, '24h': 86_400_0
 
 // Shown as chips on a kill. Solo is left out: the attacker-count badge already
 // says "1".
-const SHOWN_TAGS: KillTag[] = ['gate', 'hic', 'dic', 'sb', 'npc'];
+const SHOWN_TAGS: KillTag[] = ['gate', 'hic', 'dic', 'sb', 'solo', 'ganked', 'awox', 'padding', 'npc'];
 
 // How many kills to reveal initially and per "Load more" click. Sized to
 // match what fit on a single page under the old paginator so the default

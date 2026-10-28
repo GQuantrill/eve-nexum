@@ -1157,7 +1157,10 @@
       "dic": "拦截",
       "sb": "SB",
       "npc": "NPC",
-      "solo": "单杀"
+      "solo": "单杀",
+      "ganked": "Gank",
+      "awox": "内鬼",
+      "padding": "刷分"
     },
     "tagTips": {
       "gate": "在星门处被击杀",
@@ -1165,7 +1168,10 @@
       "dic": "击杀邮件中有拦截舰",
       "sb": "被智能炸弹击杀",
       "npc": "击杀邮件中只有 NPC",
-      "solo": "仅一名攻击者"
+      "solo": "仅一名攻击者",
+      "ganked": "被 Gank 击杀：CONCORD 出现在击毁报告上",
+      "awox": "被自己的军团或联盟击杀",
+      "padding": "zKillboard 将其标记为刷分：用来刷战绩的无价值击杀"
     }
   },
   "labelsDialog": {

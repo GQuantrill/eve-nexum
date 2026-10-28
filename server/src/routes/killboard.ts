@@ -24,7 +24,9 @@ interface ZkbEntry {
     totalValue: number;
     solo:       boolean;
     npc:        boolean;
+    awox?:      boolean;
     locationID?: number;
+    labels?:    string[];
   };
 }
 
@@ -240,6 +242,7 @@ export async function fetchSystemKills(
           zkb: zkb.zkb,
           tags: tagsFor({
             locationId: zkb.zkb?.locationID, solo: zkb.zkb?.solo, npc: zkb.zkb?.npc,
+            awox: zkb.zkb?.awox, labels: zkb.zkb?.labels,
             typeIds: attackerTypeIds(esi.attackers),
           }, groupOf),
         };

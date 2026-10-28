@@ -1,11 +1,12 @@
 // What kind of kill a killmail was, as short tags the killboard shows: on a
 // gate, with a heavy interdictor or interdictor on the mail, a smartbomb kill,
-// solo, or an NPC kill. Worked out here from numeric ids (zKill's locationID,
-// each attacker's ship and weapon type) against the SDE, so the client never
-// has to trust a label someone else wrote.
+// and zKillboard's own verdict on it (solo, ganked, awox, padding, NPC). The
+// first four are worked out here from numeric ids (zKill's locationID, each
+// attacker's ship and weapon type) against the SDE; the verdicts are zKill's
+// labels, matched against a fixed list so only known words become tags.
 import { db } from '../db.js';
 
-export type KillTag = 'gate' | 'hic' | 'dic' | 'sb' | 'solo' | 'npc';
+export type KillTag = 'gate' | 'hic' | 'dic' | 'sb' | 'solo' | 'ganked' | 'awox' | 'padding' | 'npc';
 
 // SDE ids. zKill's locationID is the celestial nearest the kill; item ids in
 // this range are stargates (stations are 60M+, other celestials 40M+).
@@ -19,6 +20,9 @@ export interface TagInput {
   locationId?: number | null;
   solo?: boolean;
   npc?: boolean;
+  awox?: boolean;
+  /** zKillboard's labels for the kill (zkb.labels). */
+  labels?: unknown;
   /** Attackers' ship and weapon type ids. */
   typeIds: number[];
 }
@@ -33,8 +37,12 @@ export function tagsFor(k: TagInput, groupOf: (typeId: number) => number | null 
   if (groups.has(GROUP_HIC)) tags.push('hic');
   if (groups.has(GROUP_DIC)) tags.push('dic');
   if (groups.has(GROUP_SMARTBOMB)) tags.push('sb');
-  if (k.solo) tags.push('solo');
-  if (k.npc) tags.push('npc');
+  const labels = new Set(Array.isArray(k.labels) ? k.labels.filter((l): l is string => typeof l === 'string') : []);
+  if (k.solo || labels.has('solo')) tags.push('solo');
+  if (labels.has('ganked')) tags.push('ganked');
+  if (k.awox || labels.has('awox')) tags.push('awox');
+  if (labels.has('padding')) tags.push('padding');
+  if (k.npc || labels.has('npc')) tags.push('npc');
   return tags;
 }
 
