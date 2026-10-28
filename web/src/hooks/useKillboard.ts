@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { api } from '../api/client';
 
-export type KillTag = 'gate' | 'hic' | 'dic' | 'sb' | 'solo' | 'npc';
+export type KillTag = 'gate' | 'hic' | 'dic' | 'sb' | 'solo' | 'ganked' | 'awox' | 'padding' | 'npc';
 export type KillWindow = '1h' | '24h' | '7d';
 export const KILL_WINDOWS: KillWindow[] = ['1h', '24h', '7d'];
 

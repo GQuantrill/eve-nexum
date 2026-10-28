@@ -415,3 +415,6 @@
 .tag_hic,
 .tag_dic  { color: var(--accent-bright); border-color: currentColor; }
 .tag_sb   { color: #ff6060; border-color: currentColor; }
+.tag_solo { color: var(--success-bright); border-color: currentColor; }
+.tag_ganked,
+.tag_awox { color: var(--danger); border-color: currentColor; }

@@ -1157,7 +1157,10 @@
       "dic": "Dictor",
       "sb": "SB",
       "npc": "NPC",
-      "solo": "Solo"
+      "solo": "Solo",
+      "ganked": "Gankeado",
+      "awox": "Awox",
+      "padding": "Padding"
     },
     "tagTips": {
       "gate": "Muerto en una puerta estelar",
@@ -1165,7 +1168,10 @@
       "dic": "Había un interdictor en el killmail",
       "sb": "Muerto por una smartbomb",
       "npc": "Solo NPC en el killmail",
-      "solo": "Un único atacante"
+      "solo": "Un único atacante",
+      "ganked": "Destruido en un gank: CONCORD aparecía en el killmail",
+      "awox": "Destruido por su propia corporación o alianza",
+      "padding": "zKillboard lo marca como padding: una kill sin valor para inflar estadísticas"
     }
   },
   "labelsDialog": {
