@@ -1,7 +1,9 @@
 import { config } from '../config.js';
 
-// A single high-value kill recorded from the live R2Z2 feed, held in memory so
-// the kill-log backfill can be served WITHOUT any zKillboard REST calls. Numeric
+// A kill recorded from the live R2Z2 feed -- every kill, whatever it's worth --
+// held in memory so the kill-log backfill (which applies the ISK floor) and the
+// killboard pane (which doesn't) can be served without waiting on zKillboard's
+// REST API, which zKill caches for up to an hour. Numeric
 // ids only (untrusted-safe); display names are resolved on read via buildKillRow.
 export interface BufferedKill {
   killmailId:            number;
@@ -11,16 +13,23 @@ export interface BufferedKill {
   totalValue:            number;
   victimCharacterId:     number | null;
   victimCorporationId:   number | null;
+  victimAllianceId?:     number | null;
   finalBlowCharacterId:  number | null;
   finalBlowCorporationId: number | null;
+  finalBlowAllianceId?:  number | null;
   finalBlowShipTypeId:   number;
+  /** How many attackers the killmail lists (the killboard shows "+N"). */
+  attackerCount?:        number;
+  solo?:                 boolean;
   npc:                   boolean;
 }
 
 // Rolling in-memory buffer of recent kills, fed by the live consumer. Append
 // order ~= time order (the feed is chronological). Bounded by BOTH age and a
-// hard MAX_ENTRIES so it can't grow without limit on a busy feed.
-const MAX_ENTRIES = 20_000;
+// hard MAX_ENTRIES so it can't grow without limit on a busy feed: New Eden
+// sees roughly 1,000-2,000 kills an hour, so the default 3h window sits far
+// below the cap.
+const MAX_ENTRIES = 30_000;
 const retentionMs = Math.max(60_000, config.killFeed.backfillSeconds * 1_000);
 
 const buffer: BufferedKill[] = [];
@@ -41,11 +50,12 @@ export function recordKill(k: BufferedKill): void {
   }
 }
 
-// Recent kills in the given systems, newest-first, capped to `limit`.
-export function recentKillsForSystems(systemIds: Set<number>, limit: number): BufferedKill[] {
+// Recent kills in the given systems worth at least `minValueIsk`, newest-first,
+// capped to `limit`.
+export function recentKillsForSystems(systemIds: Set<number>, limit: number, minValueIsk = 0): BufferedKill[] {
   const cutoff = Date.now() - retentionMs;
   return buffer
-    .filter((k) => k.atMs >= cutoff && systemIds.has(k.eveSystemId))
+    .filter((k) => k.atMs >= cutoff && systemIds.has(k.eveSystemId) && k.totalValue >= minValueIsk)
     .sort((a, b) => b.atMs - a.atMs)
     .slice(0, limit);
 }

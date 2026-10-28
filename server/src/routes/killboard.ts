@@ -4,6 +4,7 @@ import { createLogger } from '../utils/logger.js';
 import { TtlCache } from '../utils/cache.js';
 import { resolveEntityNames } from '../services/entityNames.js';
 import { esiFetch } from '../utils/esi.js';
+import { recentKillsForSystems, type BufferedKill } from '../services/killBuffer.js';
 
 const router = Router();
 router.use(optionalAuth);
@@ -244,6 +245,59 @@ export async function fetchSystemKills(
   }
 }
 
+/** A kill from the live feed's buffer, in the shape the killboard renders. The
+ *  feed keeps only the final-blow attacker, so the rest of the list is
+ *  placeholders -- the pane only needs the count ("+N") and the final blow. */
+export function liveKillToEntry(k: BufferedKill, names: Map<number, { name: string }>): KillEntry {
+  const name = (id: number | null | undefined) => (id ? names.get(id)?.name : undefined);
+  const others = Math.max(0, (k.attackerCount ?? 1) - 1);
+  return {
+    killmail_id:   k.killmailId,
+    killmail_time: new Date(k.atMs).toISOString(),
+    victim: {
+      character_id:     k.victimCharacterId ?? undefined,
+      character_name:   name(k.victimCharacterId),
+      corporation_id:   k.victimCorporationId ?? undefined,
+      corporation_name: name(k.victimCorporationId),
+      alliance_id:      k.victimAllianceId ?? undefined,
+      alliance_name:    name(k.victimAllianceId),
+      ship_type_id:     k.shipTypeId,
+    },
+    attackers: [
+      {
+        character_id:     k.finalBlowCharacterId ?? undefined,
+        character_name:   name(k.finalBlowCharacterId),
+        corporation_id:   k.finalBlowCorporationId ?? undefined,
+        corporation_name: name(k.finalBlowCorporationId),
+        alliance_id:      k.finalBlowAllianceId ?? undefined,
+        alliance_name:    name(k.finalBlowAllianceId),
+        ship_type_id:     k.finalBlowShipTypeId || undefined,
+        final_blow:       true,
+      },
+      ...Array.from({ length: others }, () => ({ final_blow: false })),
+    ],
+    zkb: { hash: '', totalValue: k.totalValue, solo: !!k.solo, npc: k.npc },
+  };
+}
+
+/** zKill's REST list plus anything the live feed has seen in the same window
+ *  that the list doesn't have yet. zKill caches that list for up to an hour, so
+ *  without this the newest kills -- the cheap ones especially, which never
+ *  reach the client's own live merge -- only turn up an hour late. */
+export async function withLiveKills(systemId: number, rest: KillEntry[], pastSeconds: number): Promise<KillEntry[]> {
+  const have = new Set(rest.map((k) => k.killmail_id));
+  const since = Date.now() - pastSeconds * 1000;
+  const live = recentKillsForSystems(new Set([systemId]), 1_000)
+    .filter((k) => k.atMs >= since && !have.has(k.killmailId));
+  if (live.length === 0) return rest;
+  const names = await resolveEntityNames(live.flatMap((k) => [
+    k.victimCharacterId, k.victimCorporationId, k.victimAllianceId,
+    k.finalBlowCharacterId, k.finalBlowCorporationId, k.finalBlowAllianceId,
+  ]));
+  return [...live.map((k) => liveKillToEntry(k, names)), ...rest]
+    .sort((a, b) => b.killmail_id - a.killmail_id);
+}
+
 router.get('/:systemId(\\d+)', async (req, res) => {
   // The route pattern already constrains this to digits, but parse to a bounded
   // integer so no attacker-controlled text can ever reach the outbound request.
@@ -251,7 +305,7 @@ router.get('/:systemId(\\d+)', async (req, res) => {
   if (!Number.isInteger(idNum) || idNum <= 0 || idNum > 100_000_000) {
     return res.status(400).json({ error: 'Invalid system id' });
   }
-  return res.json(await fetchSystemKills(idNum, 86_400));
+  return res.json(await withLiveKills(idNum, await fetchSystemKills(idNum, 86_400), 86_400));
 });
 
 // GET /:systemId/last — the timestamp of the most recent kill in the system,
