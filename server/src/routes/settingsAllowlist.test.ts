@@ -31,8 +31,8 @@ describe('settings allowlist', () => {
     expect(settingAllowed('nexum.sysinfo.collapse.celestials')).toBe(true);
   });
 
-  it('allows the killboard window/scope and the PvP timezone', () => {
-    for (const k of ['nexum.killboard.window', 'nexum.killboard.scope', 'nexum.timeZone']) {
+  it('allows the killboard window/scope, the PvP timezone and copy-bookmark-on-jump', () => {
+    for (const k of ['nexum.killboard.window', 'nexum.killboard.scope', 'nexum.timeZone', 'nexum.sig.copyBookmarkOnJump']) {
       expect(settingAllowed(k), k).toBe(true);
     }
   });

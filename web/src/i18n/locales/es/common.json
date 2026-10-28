@@ -1883,6 +1883,8 @@
     "sigBookmark": "Marcador de agujero de gusano",
     "siteBookmark": "Marcador de sitio (relic / data / gas)",
     "siteBookmarkHelp": "En una fila de firma relic, data o gas, haz clic en el icono de copiar para un nombre de marcador listo para pegar. Constrúyelo con estos tokens:",
+    "copyBookmarkOnJump": "Copiar el nombre del marcador tras un salto",
+    "copyBookmarkOnJumpHelp": "Cuando un salto rellena a dónde lleva un agujero, su nombre de marcador (con el formato de arriba) va a tu portapapeles. Si en ese momento estás en el juego, se copia en cuanto vuelvas a hacer clic en nexum.",
     "skipKspace": "No seguir el K-space",
     "skipKspaceHint": "Cuando está activado, solo registra el primer sistema K-space al que saltas desde el J-space y el último antes de volver a saltar al J-space, omitiendo todo lo que atraviesas por puertas en medio. Solo HS/LS/NS; Pochven siempre se rastrea.",
     "snapToGrid": "Ajustar a la cuadrícula",

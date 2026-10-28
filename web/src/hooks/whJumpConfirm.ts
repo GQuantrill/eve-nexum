@@ -5,6 +5,32 @@ import { isUnresolvedLeadsTo } from '../utils/whDest';
 import { useMapStore, awaitConnectionType } from '../store/mapStore';
 import i18n from '../i18n';
 import type { Signature } from '../types';
+import { readUserSetting } from './useUserSetting';
+import { wormholeTypesSnapshot } from './useWormholeTypes';
+import { formatBookmarkName, DEFAULT_BOOKMARK_FORMAT } from '../utils/signatureBookmark';
+import { copyWhenFocused } from '../utils/copyWhenFocused';
+
+export const COPY_BOOKMARK_ON_JUMP = 'nexum.sig.copyBookmarkOnJump';
+
+// The jumped hole's bookmark name, now that it leads somewhere known, onto the
+// clipboard -- the same name its row's copy button gives (map format over the
+// pilot's own), so they can rename the in-game bookmark without opening the
+// pane.
+function copyJumpedBookmark(sig: Signature): void {
+  if (!readUserSetting<boolean>(COPY_BOOKMARK_ON_JUMP, true)) return;
+  const map = useMapStore.getState().map;
+  const format = map.bookmarkFormat?.trim()
+    ? map.bookmarkFormat
+    : readUserSetting<string>('nexum.sig.bookmarkFormat', DEFAULT_BOOKMARK_FORMAT);
+  const byName = (n: string) => map.systems.find((s) => s.name?.trim().toUpperCase() === n.trim().toUpperCase());
+  const name = formatBookmarkName(format, sig, wormholeTypesSnapshot(), Date.now(),
+    (n) => { const c = byName(n)?.systemClass; return c && c !== 'unknown' ? c : null; },
+    (n) => byName(n)?.alias?.trim() || null);
+  if (!name) return;
+  void copyWhenFocused(name).then((ok) => {
+    if (ok) toast.success(i18n.t('signatures.bookmarkCopied', { name }));
+  });
+}
 
 // After a tracked wormhole jump, record which wormhole signature in the source
 // system was jumped — pinning its leads-to to the SPECIFIC arrival system. A
@@ -101,6 +127,7 @@ export async function maybeConfirmWhJump(ctx: WhJumpContext): Promise<void> {
     const sole = candidates[0];
     const prev = sole.whLeadsTo;
     writeLeadsTo(sole, toName, sole);
+    copyJumpedBookmark({ ...sole, whLeadsTo: toName });
     toast.show(t('whJump.filled', { sig: label(sole), system: toName }), {
       kind: 'success', dedupeKey, ttlMs: 8000,
       actions: [
@@ -113,7 +140,10 @@ export async function maybeConfirmWhJump(ctx: WhJumpContext): Promise<void> {
   toast.show(t('whJump.confirmMany', { system: toName }), {
     kind: 'info', sticky: true, dedupeKey,
     actions: [
-      ...candidates.map((s) => ({ label: label(s), onClick: () => writeLeadsTo(s, toName, s) })),
+      ...candidates.map((s) => ({ label: label(s), onClick: () => {
+        writeLeadsTo(s, toName, s);
+        copyJumpedBookmark({ ...s, whLeadsTo: toName });
+      } })),
       { label: t('whJump.unmapped'), onClick: () => { /* skip */ } },
     ],
   });

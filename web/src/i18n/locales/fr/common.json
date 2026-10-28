@@ -1883,6 +1883,8 @@
     "sigBookmark": "Signet de trou de ver",
     "siteBookmark": "Signet de site (relic / data / gas)",
     "siteBookmarkHelp": "Sur une ligne de signature relic, data ou gas, cliquez sur l'icône de copie pour un nom de signet prêt à coller. Construisez-le avec ces jetons :",
+    "copyBookmarkOnJump": "Copier le nom du signet après un saut",
+    "copyBookmarkOnJumpHelp": "Quand un saut renseigne la destination d'un trou, son nom de signet (au format ci-dessus) est placé dans votre presse-papiers. Si vous êtes en jeu à ce moment, il est copié dès que vous recliquez dans nexum.",
     "skipKspace": "Ne pas suivre le K-space",
     "skipKspaceHint": "Si activé, n'enregistre que le premier système K-space où vous entrez depuis le J-space et le dernier avant de repartir en J-space — tout ce qui est traversé entre les deux est ignoré. HS/LS/NS uniquement ; le Pochven est toujours suivi.",
     "snapToGrid": "Aligner sur la grille",
