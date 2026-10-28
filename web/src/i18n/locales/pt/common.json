@@ -506,6 +506,137 @@
     "revokeFailed": "Não foi possível revogar a chave. Tenta novamente.",
     "disabled": "Chaves de API desativadas"
   },
+  "audit": {
+    "title": "Registo de alterações",
+    "titleFor": "Registo de alterações — {{name}}",
+    "hint": "Alterações dos últimos {{days}} dias. Mover sistemas e a limpeza automática não são registados.",
+    "sidebarHint": "Quem adicionou, removeu ou alterou o quê neste mapa.",
+    "open": "Abrir registo de alterações",
+    "filter": "Mostrar",
+    "empty": "Ainda nada registado.",
+    "loading": "A carregar…",
+    "loadMore": "Carregar anteriores",
+    "unknownPilot": "Piloto desconhecido",
+    "viaApi": "API",
+    "on": "ligado",
+    "off": "desligado",
+    "cleared": "apagado",
+    "kind": {
+      "all": "Todas as alterações",
+      "system": "Sistemas",
+      "connection": "Ligações",
+      "signature": "Assinaturas",
+      "anomaly": "Anomalias",
+      "structure": "Estruturas",
+      "chain": "Cadeias",
+      "map": "Definições do mapa",
+      "share": "Partilha"
+    },
+    "action": {
+      "system": {
+        "add": "adicionou {{subject}}",
+        "update": "alterou {{subject}}",
+        "remove": "removeu {{subject}}"
+      },
+      "connection": {
+        "add": "ligou {{subject}}",
+        "update": "alterou {{subject}}",
+        "remove": "desligou {{subject}}"
+      },
+      "signature": {
+        "add": "adicionou a assinatura {{subject}}",
+        "update": "alterou a assinatura {{subject}}",
+        "remove": "removeu a assinatura {{subject}}"
+      },
+      "anomaly": {
+        "add": "adicionou a anomalia {{subject}}",
+        "update": "alterou a anomalia {{subject}}",
+        "remove": "removeu a anomalia {{subject}}"
+      },
+      "structure": {
+        "add": "adicionou a estrutura {{subject}}",
+        "update": "alterou a estrutura {{subject}}",
+        "remove": "removeu a estrutura {{subject}}"
+      },
+      "chain": {
+        "add": "guardou a cadeia {{subject}}",
+        "update": "alterou a cadeia {{subject}}",
+        "remove": "removeu a cadeia {{subject}}"
+      },
+      "map": {
+        "update": "alterou as definições do mapa",
+        "merge": "fundiu {{subject}}",
+        "scoutCleanup": "limpou os buracos de {{subject}}"
+      },
+      "share": {
+        "add": "partilhou o mapa com {{subject}}",
+        "remove": "deixou de partilhar com {{subject}}",
+        "link": {
+          "create": "criou um link de transmissão",
+          "update": "alterou o link de transmissão",
+          "revoke": "revogou o link de transmissão"
+        }
+      }
+    },
+    "field": {
+      "name": "Nome",
+      "alias": "Alcunha",
+      "notes": "Notas",
+      "status": "Estado",
+      "isHome": "Base",
+      "locked": "Bloqueado",
+      "intel": "Informações",
+      "tag": "Marca",
+      "labels": "Etiquetas",
+      "customLabels": "Etiquetas próprias",
+      "connectionType": "Tipo de salto",
+      "massStatus": "Massa",
+      "timeStatus": "Duração",
+      "size": "Tamanho",
+      "type": "Tipo de buraco",
+      "massUsed": "Massa usada",
+      "eolAt": "Hora EOL",
+      "lifetimeExpiresAt": "Expiração",
+      "broken": "Quebrado",
+      "flagIcon": "Ícone da bandeira",
+      "flagNote": "Nota da bandeira",
+      "flagBlink": "Bandeira a piscar",
+      "flagColor": "Cor da bandeira",
+      "sourceSignatureId": "Assinatura de origem",
+      "targetSignatureId": "Assinatura de destino",
+      "sigId": "ID da assinatura",
+      "sigType": "Grupo",
+      "whType": "Tipo de buraco",
+      "whLeadsTo": "Leva a",
+      "ghostType": "Local fantasma",
+      "anomId": "ID da anomalia",
+      "anomType": "Tipo",
+      "structureType": "Tipo de estrutura",
+      "ownerCorp": "Proprietário",
+      "eveId": "ID EVE",
+      "systemIds": "Sistemas",
+      "connectionIds": "Ligações",
+      "allowAsMergeSource": "Origem de fusão",
+      "allowAsMergeDestination": "Destino de fusão",
+      "lazyRemoveWormholes": "Remoção diferida de buracos",
+      "collapseGraceHours": "Margem de colapso (horas)",
+      "bookmarkFormat": "Formato dos marcadores",
+      "siteBookmarkFormat": "Formato dos marcadores de locais",
+      "skipKspace": "Ignorar k-space",
+      "crossMapSync": "Sincronização entre mapas",
+      "expiryHours": "Expiração (horas)",
+      "includeSigs": "Assinaturas",
+      "includeBridges": "Pontes",
+      "includeNotes": "Notas",
+      "includeStructures": "Estruturas",
+      "kind": "Partilhado com",
+      "canWrite": "Pode editar",
+      "systems": "Sistemas",
+      "connections": "Ligações",
+      "signatures": "Assinaturas",
+      "structures": "Estruturas"
+    }
+  },
   "chainExits": {
     "title": "Saídas da cadeia",
     "noExits": "Não há saídas de K-space nesta cadeia.",
@@ -1717,6 +1848,7 @@
       "mergeMaps": "Fundir mapas",
       "liveSharing": "Transmissão de mapa em direto",
       "shareMap": "Partilhar mapa",
+      "auditLog": "Registo de alterações",
       "shortcuts": "Atalhos",
       "notifications": "Notificações",
       "announcer": "Anúncios de voz",

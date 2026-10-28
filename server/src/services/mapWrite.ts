@@ -3,6 +3,7 @@ import { publishToMap } from './mapEvents.js';
 import { syncSignature, syncAnomaly } from './crossMapSync.js';
 import { recordGhostSiteIfMatch } from './ghostSites.js';
 import { createLogger } from '../utils/logger.js';
+import { recordMapAudit, inSystemLabel, type AuditActor, type AuditEntry } from './mapAudit.js';
 
 const log = createLogger('map-write');
 
@@ -20,7 +21,26 @@ export interface WriteActor {
   userId: number;
   /** x-client-id for SSE echo suppression (null for API-key writes). */
   clientId: string | null;
+  /** Who to record in the map's audit log. Absent for writes nobody made by
+   *  hand (cross-map sync, sweeps), which aren't audited. */
+  audit?: AuditActor;
 }
+
+// Audit a content change, labelled by the item and the system it's in.
+function audit(
+  actor: WriteActor, mapId: string, systemId: string, item: string,
+  entry: Omit<AuditEntry, 'subject'>,
+): void {
+  const who = actor.audit;
+  if (!who) return;
+  inSystemLabel(mapId, systemId, item)
+    .then((subject) => recordMapAudit(who, mapId, { ...entry, subject }))
+    .catch(console.error);
+}
+
+// How a signature or anomaly reads in the log: its scan id, else its name.
+const scanLabel = (scanId: string | null | undefined, name: string | null | undefined) =>
+  (scanId && scanId.trim()) || (name && name.trim()) || '';
 
 const bumpActivity = (systemId: string) =>
   db.query(`UPDATE map_systems SET last_activity_at = NOW() WHERE id = $1`, [systemId]).catch(console.error);
@@ -115,8 +135,17 @@ export async function createSignature(mapId: string, systemId: string, d: Signat
   recordGhostSiteIfMatch(systemId, d.name);
   publishToMap(mapId, { type: 'sig.changed', actor: actor.clientId, systemId });
   syncSignature(mapId, systemId, row.id, actor.userId);
+  if (inserted) {
+    audit(actor, mapId, systemId, scanLabel(d.sigId, d.name), {
+      action: 'signature.add', targetId: row.id, details: { values: { sigType: d.sigType, whType: d.whType || undefined } },
+    });
+  }
   return { row, inserted };
 }
+
+// Signature fields whose new value goes in the audit entry (short codes);
+// names and notes are listed by name only.
+const AUDITED_SIG_VALUES = new Set(['sigId', 'sigType', 'whType', 'whLeadsTo', 'massStatus', 'timeStatus']);
 
 const SIG_COLS: Record<string, string> = {
   sigId: 'sig_id', sigType: 'sig_type', name: 'name', notes: 'notes', whType: 'wh_type', whLeadsTo: 'wh_leads_to',
@@ -161,11 +190,13 @@ export async function updateSignature(
   if ('scoutConnectionId' in updates && updates.scoutConnectionId != null) {
     sets.push('scout_last_seen = NOW()');
   }
+  let updated: { sigId: string; name: string }[];
   try {
-    await db.query(
-      `UPDATE map_signatures SET ${sets.join(', ')} WHERE id = $${vals.length + 1} AND system_id = $${vals.length + 2} AND ${inThisMap(vals.length + 3)}`,
+    ({ rows: updated } = await db.query<{ sigId: string; name: string }>(
+      `UPDATE map_signatures SET ${sets.join(', ')} WHERE id = $${vals.length + 1} AND system_id = $${vals.length + 2} AND ${inThisMap(vals.length + 3)}
+       RETURNING sig_id AS "sigId", name`,
       [...vals, sigId, systemId, mapId],
-    );
+    ));
   } catch (err) {
     const e = err as { code?: string; constraint?: string };
     if (e.code === '23505' && e.constraint === 'uq_map_signatures_system_sig') throw new DuplicateSignatureError();
@@ -175,6 +206,14 @@ export async function updateSignature(
   if (typeof updates.name === 'string') recordGhostSiteIfMatch(systemId, updates.name);
   publishToMap(mapId, { type: 'sig.changed', actor: actor.clientId, systemId });
   syncSignature(mapId, systemId, sigId, actor.userId);
+  const changed = Object.keys(updates).filter((k) => k in SIG_COLS && k !== 'scoutConnectionId');
+  if (updated.length && changed.length) {
+    const values: Record<string, unknown> = {};
+    for (const k of changed) if (AUDITED_SIG_VALUES.has(k)) values[k] = updates[k];
+    audit(actor, mapId, systemId, scanLabel(updated[0].sigId, updated[0].name), {
+      action: 'signature.update', targetId: sigId, details: { fields: changed, values },
+    });
+  }
   return {
     dispatchK162: settingK162 && !prevWasK162,
     flushK162: typeof updates.whLeadsTo === 'string' && updates.whLeadsTo.trim().length > 0,
@@ -182,9 +221,13 @@ export async function updateSignature(
 }
 
 export async function deleteSignature(mapId: string, systemId: string, sigId: string, actor: WriteActor): Promise<void> {
-  await db.query(`DELETE FROM map_signatures WHERE id = $1 AND system_id = $2 AND ${inThisMap(3)}`, [sigId, systemId, mapId]);
+  const { rows } = await db.query<{ sigId: string; name: string }>(
+    `DELETE FROM map_signatures WHERE id = $1 AND system_id = $2 AND ${inThisMap(3)} RETURNING sig_id AS "sigId", name`,
+    [sigId, systemId, mapId],
+  );
   bumpActivity(systemId);
   publishToMap(mapId, { type: 'sig.changed', actor: actor.clientId, systemId });
+  if (rows.length) audit(actor, mapId, systemId, scanLabel(rows[0].sigId, rows[0].name), { action: 'signature.remove', targetId: sigId });
 }
 
 // ── Anomalies ─────────────────────────────────────────────────────────────────
@@ -201,6 +244,7 @@ export async function createAnomaly(mapId: string, systemId: string, d: AnomalyI
   bumpActivity(systemId);
   publishToMap(mapId, { type: 'anom.changed', actor: actor.clientId, systemId });
   syncAnomaly(mapId, systemId, rows[0].id, actor.userId);
+  audit(actor, mapId, systemId, scanLabel(d.anomId, d.name), { action: 'anomaly.add', targetId: rows[0].id });
   return rows[0];
 }
 
@@ -214,19 +258,30 @@ export async function updateAnomaly(
   for (const [key, col] of Object.entries(ANOM_COLS)) {
     if (key in updates) { sets.push(`${col} = $${vals.length + 1}`); vals.push(updates[key]); }
   }
-  await db.query(
-    `UPDATE map_anomalies SET ${sets.join(', ')} WHERE id = $${vals.length + 1} AND system_id = $${vals.length + 2} AND ${inThisMap(vals.length + 3)}`,
+  const { rows } = await db.query<{ anomId: string; name: string }>(
+    `UPDATE map_anomalies SET ${sets.join(', ')} WHERE id = $${vals.length + 1} AND system_id = $${vals.length + 2} AND ${inThisMap(vals.length + 3)}
+     RETURNING anom_id AS "anomId", name`,
     [...vals, anomId, systemId, mapId],
   );
   bumpActivity(systemId);
   publishToMap(mapId, { type: 'anom.changed', actor: actor.clientId, systemId });
   syncAnomaly(mapId, systemId, anomId, actor.userId);
+  const changed = Object.keys(updates).filter((k) => k in ANOM_COLS);
+  if (rows.length && changed.length) {
+    audit(actor, mapId, systemId, scanLabel(rows[0].anomId, rows[0].name), {
+      action: 'anomaly.update', targetId: anomId, details: { fields: changed },
+    });
+  }
 }
 
 export async function deleteAnomaly(mapId: string, systemId: string, anomId: string, actor: WriteActor): Promise<void> {
-  await db.query(`DELETE FROM map_anomalies WHERE id = $1 AND system_id = $2 AND ${inThisMap(3)}`, [anomId, systemId, mapId]);
+  const { rows } = await db.query<{ anomId: string; name: string }>(
+    `DELETE FROM map_anomalies WHERE id = $1 AND system_id = $2 AND ${inThisMap(3)} RETURNING anom_id AS "anomId", name`,
+    [anomId, systemId, mapId],
+  );
   bumpActivity(systemId);
   publishToMap(mapId, { type: 'anom.changed', actor: actor.clientId, systemId });
+  if (rows.length) audit(actor, mapId, systemId, scanLabel(rows[0].anomId, rows[0].name), { action: 'anomaly.remove', targetId: anomId });
 }
 
 // ── Structures ────────────────────────────────────────────────────────────────
@@ -246,6 +301,7 @@ export async function createStructure(mapId: string, systemId: string, d: Struct
     [systemId, d.name, d.structureType, d.ownerCorp, d.eveId, d.notes, actor.userId, d.ownerCorpId],
   );
   publishToMap(mapId, { type: 'structure.changed', actor: actor.clientId, systemId });
+  audit(actor, mapId, systemId, d.name || d.structureType, { action: 'structure.add', targetId: rows[0].id });
   return rows[0];
 }
 
@@ -261,14 +317,25 @@ export async function updateStructure(
   for (const [key, col] of Object.entries(STRUCT_COLS)) {
     if (key in updates) { sets.push(`${col} = $${vals.length + 1}`); vals.push(updates[key]); }
   }
-  await db.query(
-    `UPDATE map_structures SET ${sets.join(', ')} WHERE id = $${vals.length + 1} AND system_id = $${vals.length + 2} AND ${inThisMap(vals.length + 3)}`,
+  const { rows } = await db.query<{ name: string; structureType: string }>(
+    `UPDATE map_structures SET ${sets.join(', ')} WHERE id = $${vals.length + 1} AND system_id = $${vals.length + 2} AND ${inThisMap(vals.length + 3)}
+     RETURNING name, structure_type AS "structureType"`,
     [...vals, structureId, systemId, mapId],
   );
   publishToMap(mapId, { type: 'structure.changed', actor: actor.clientId, systemId });
+  const changed = Object.keys(updates).filter((k) => k in STRUCT_COLS);
+  if (rows.length && changed.length) {
+    audit(actor, mapId, systemId, rows[0].name || rows[0].structureType, {
+      action: 'structure.update', targetId: structureId, details: { fields: changed },
+    });
+  }
 }
 
 export async function deleteStructure(mapId: string, systemId: string, structureId: string, actor: WriteActor): Promise<void> {
-  await db.query(`DELETE FROM map_structures WHERE id = $1 AND system_id = $2 AND ${inThisMap(3)}`, [structureId, systemId, mapId]);
+  const { rows } = await db.query<{ name: string; structureType: string }>(
+    `DELETE FROM map_structures WHERE id = $1 AND system_id = $2 AND ${inThisMap(3)} RETURNING name, structure_type AS "structureType"`,
+    [structureId, systemId, mapId],
+  );
   publishToMap(mapId, { type: 'structure.changed', actor: actor.clientId, systemId });
+  if (rows.length) audit(actor, mapId, systemId, rows[0].name || rows[0].structureType, { action: 'structure.remove', targetId: structureId });
 }

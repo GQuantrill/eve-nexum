@@ -506,6 +506,137 @@
     "revokeFailed": "Kon de sleutel niet intrekken. Probeer het opnieuw.",
     "disabled": "API-sleutels uitgeschakeld"
   },
+  "audit": {
+    "title": "Wijzigingslog",
+    "titleFor": "Wijzigingslog — {{name}}",
+    "hint": "Wijzigingen van de afgelopen {{days}} dagen. Systemen verplaatsen en automatisch opruimen worden niet vastgelegd.",
+    "sidebarHint": "Wie wat op deze kaart heeft toegevoegd, verwijderd of gewijzigd.",
+    "open": "Wijzigingslog openen",
+    "filter": "Tonen",
+    "empty": "Nog niets vastgelegd.",
+    "loading": "Laden…",
+    "loadMore": "Oudere laden",
+    "unknownPilot": "Onbekende piloot",
+    "viaApi": "API",
+    "on": "aan",
+    "off": "uit",
+    "cleared": "gewist",
+    "kind": {
+      "all": "Alle wijzigingen",
+      "system": "Systemen",
+      "connection": "Verbindingen",
+      "signature": "Signaturen",
+      "anomaly": "Anomalieën",
+      "structure": "Structuren",
+      "chain": "Ketens",
+      "map": "Kaartinstellingen",
+      "share": "Delen"
+    },
+    "action": {
+      "system": {
+        "add": "heeft {{subject}} toegevoegd",
+        "update": "heeft {{subject}} gewijzigd",
+        "remove": "heeft {{subject}} verwijderd"
+      },
+      "connection": {
+        "add": "heeft {{subject}} verbonden",
+        "update": "heeft {{subject}} gewijzigd",
+        "remove": "heeft {{subject}} losgekoppeld"
+      },
+      "signature": {
+        "add": "heeft signatuur {{subject}} toegevoegd",
+        "update": "heeft signatuur {{subject}} gewijzigd",
+        "remove": "heeft signatuur {{subject}} verwijderd"
+      },
+      "anomaly": {
+        "add": "heeft anomalie {{subject}} toegevoegd",
+        "update": "heeft anomalie {{subject}} gewijzigd",
+        "remove": "heeft anomalie {{subject}} verwijderd"
+      },
+      "structure": {
+        "add": "heeft structuur {{subject}} toegevoegd",
+        "update": "heeft structuur {{subject}} gewijzigd",
+        "remove": "heeft structuur {{subject}} verwijderd"
+      },
+      "chain": {
+        "add": "heeft keten {{subject}} opgeslagen",
+        "update": "heeft keten {{subject}} gewijzigd",
+        "remove": "heeft keten {{subject}} verwijderd"
+      },
+      "map": {
+        "update": "heeft de kaartinstellingen gewijzigd",
+        "merge": "heeft {{subject}} samengevoegd",
+        "scoutCleanup": "heeft {{subject}}-gaten opgeruimd"
+      },
+      "share": {
+        "add": "heeft de kaart gedeeld met {{subject}}",
+        "remove": "deelt niet meer met {{subject}}",
+        "link": {
+          "create": "heeft een uitzendlink gemaakt",
+          "update": "heeft de uitzendlink gewijzigd",
+          "revoke": "heeft de uitzendlink ingetrokken"
+        }
+      }
+    },
+    "field": {
+      "name": "Naam",
+      "alias": "Alias",
+      "notes": "Notities",
+      "status": "Status",
+      "isHome": "Thuis",
+      "locked": "Vergrendeld",
+      "intel": "Intel",
+      "tag": "Markering",
+      "labels": "Labels",
+      "customLabels": "Eigen labels",
+      "connectionType": "Sprongtype",
+      "massStatus": "Massa",
+      "timeStatus": "Levensduur",
+      "size": "Grootte",
+      "type": "Wormholetype",
+      "massUsed": "Gebruikte massa",
+      "eolAt": "EOL-tijd",
+      "lifetimeExpiresAt": "Verloopt",
+      "broken": "Verbroken",
+      "flagIcon": "Vlagpictogram",
+      "flagNote": "Vlagnotitie",
+      "flagBlink": "Vlag knippert",
+      "flagColor": "Vlagkleur",
+      "sourceSignatureId": "Bronsignatuur",
+      "targetSignatureId": "Doelsignatuur",
+      "sigId": "Signatuur-ID",
+      "sigType": "Groep",
+      "whType": "Wormholetype",
+      "whLeadsTo": "Leidt naar",
+      "ghostType": "Spooklocatie",
+      "anomId": "Anomalie-ID",
+      "anomType": "Type",
+      "structureType": "Structuurtype",
+      "ownerCorp": "Eigenaar",
+      "eveId": "EVE-ID",
+      "systemIds": "Systemen",
+      "connectionIds": "Verbindingen",
+      "allowAsMergeSource": "Samenvoegbron",
+      "allowAsMergeDestination": "Samenvoegdoel",
+      "lazyRemoveWormholes": "Uitgesteld verwijderen van wormholes",
+      "collapseGraceHours": "Instortingsmarge (uren)",
+      "bookmarkFormat": "Bladwijzerformaat",
+      "siteBookmarkFormat": "Bladwijzerformaat voor locaties",
+      "skipKspace": "K-space overslaan",
+      "crossMapSync": "Synchronisatie tussen kaarten",
+      "expiryHours": "Verloopt (uren)",
+      "includeSigs": "Signaturen",
+      "includeBridges": "Bruggen",
+      "includeNotes": "Notities",
+      "includeStructures": "Structuren",
+      "kind": "Gedeeld met",
+      "canWrite": "Mag bewerken",
+      "systems": "Systemen",
+      "connections": "Verbindingen",
+      "signatures": "Signaturen",
+      "structures": "Structuren"
+    }
+  },
   "chainExits": {
     "title": "Ketenuitgangen",
     "noExits": "Geen K-space-uitgangen in deze keten.",
@@ -1718,6 +1849,7 @@
       "mergeMaps": "Kaarten samenvoegen",
       "liveSharing": "Live kaartuitzending",
       "shareMap": "Kaart delen",
+      "auditLog": "Wijzigingslog",
       "shortcuts": "Sneltoetsen",
       "announcer": "Omroeper",
       "jumpRange": "Sprongbereik",

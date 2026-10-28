@@ -31,6 +31,7 @@ import { DISCORD_INVITE_URL } from "../../data/links";
 import { JumpRangePane } from "./JumpRangePane";
 import { AnnouncerSection } from "./AnnouncerSection";
 import { MapSharesSection } from "./MapSharesSection";
+import { MapAuditModal } from "./MapAuditModal";
 import { MergeMapModal } from "./MergeMapModal";
 import { CustomIntelBlock } from "./CustomIntelBlock";
 import { FlagPresetsBlock } from "./FlagPresetsBlock";
@@ -158,6 +159,7 @@ type SectionId =
   | "fleet"
   | "share"
   | "shareGrants"
+  | "auditLog"
   | "mergeMaps"
   | "staleFade"
   | "export"
@@ -872,6 +874,12 @@ export function MapSidebar() {
   // admin for org maps). Hide the section for anyone else so it never suggests
   // an action the server would reject.
   const canManageShareGrants = canShareThisMap(user, isCorpMap, isAllianceMap, isMapOwner);
+  // The audit log answers to the same people as sharing (requireMapAdmin on
+  // the server): the owner, or the corp/alliance admins of an org map.
+  const canViewAudit = canManageShareGrants;
+  const auditMapId = useMapStore((s) => s.map.id);
+  const auditMapName = useMapStore((s) => s.map.name);
+  const [auditOpen, setAuditOpen] = useState(false);
   // The map-management buttons (optimize / spread / JSON / PNG / stale fade)
   // are hidden only when a readonly user is looking at a corp map. On their
   // own personal map a readonly user still owns the layout and can use the
@@ -1943,6 +1951,18 @@ export function MapSidebar() {
           </CollapsibleSection>
         )}
 
+        {canViewAudit && auditMapId && (
+          <CollapsibleSection
+            title={t("mapSidebar.sections.auditLog")}
+            {...sectionProps("auditLog")}
+          >
+            <div className="map-sidebar__hint">{t("audit.sidebarHint")}</div>
+            <button type="button" className="map-sidebar__action" onClick={() => setAuditOpen(true)}>
+              {t("audit.open")}
+            </button>
+          </CollapsibleSection>
+        )}
+
       </div>
 
       <input
@@ -1982,6 +2002,11 @@ export function MapSidebar() {
       />
 
       {patchNotesOpen && <PatchNotesModal onClose={() => setPatchNotesOpen(false)} />}
+
+      {auditOpen && auditMapId && createPortal(
+        <MapAuditModal mapId={auditMapId} mapName={auditMapName} onClose={() => setAuditOpen(false)} />,
+        document.body,
+      )}
 
       {tripwireOpen && (
         <TripwireImportModal onImport={handleImportTripwire} onClose={() => setTripwireOpen(false)} />

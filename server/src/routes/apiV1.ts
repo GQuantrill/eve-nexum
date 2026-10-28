@@ -13,6 +13,7 @@ import {
   createAnomaly, updateAnomaly, deleteAnomaly,
   createStructure, updateStructure, deleteStructure,
 } from '../services/mapWrite.js';
+import { auditActor } from '../services/mapAudit.js';
 
 // Versioned, stable external API. Authenticated by an account-scoped API key
 // (Authorization: Bearer nxm_…); a browser session also works, so the same
@@ -122,7 +123,7 @@ apiV1Router.get('/maps/:mapId/events', async (req, res) => {
 
 // Resolve the write context shared by every handler below.
 function writeActor(req: Request) {
-  return { userId: authUser(req).userId, clientId: req.get('x-client-id') ?? null };
+  return { userId: authUser(req).userId, clientId: req.get('x-client-id') ?? null, audit: auditActor(req) };
 }
 
 // Guard: content-write access + the system belongs to the map. Returns the

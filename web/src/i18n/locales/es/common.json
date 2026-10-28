@@ -506,6 +506,137 @@
     "revokeFailed": "No se pudo revocar la clave. Inténtalo de nuevo.",
     "disabled": "Claves API desactivadas"
   },
+  "audit": {
+    "title": "Registro de cambios",
+    "titleFor": "Registro de cambios — {{name}}",
+    "hint": "Cambios de los últimos {{days}} días. No se registra el movimiento de sistemas ni la limpieza automática.",
+    "sidebarHint": "Quién añadió, eliminó o cambió qué en este mapa.",
+    "open": "Abrir registro de cambios",
+    "filter": "Mostrar",
+    "empty": "Aún no hay nada registrado.",
+    "loading": "Cargando…",
+    "loadMore": "Cargar anteriores",
+    "unknownPilot": "Piloto desconocido",
+    "viaApi": "API",
+    "on": "activado",
+    "off": "desactivado",
+    "cleared": "borrado",
+    "kind": {
+      "all": "Todos los cambios",
+      "system": "Sistemas",
+      "connection": "Conexiones",
+      "signature": "Firmas",
+      "anomaly": "Anomalías",
+      "structure": "Estructuras",
+      "chain": "Cadenas",
+      "map": "Ajustes del mapa",
+      "share": "Compartir"
+    },
+    "action": {
+      "system": {
+        "add": "añadió {{subject}}",
+        "update": "cambió {{subject}}",
+        "remove": "eliminó {{subject}}"
+      },
+      "connection": {
+        "add": "conectó {{subject}}",
+        "update": "cambió {{subject}}",
+        "remove": "desconectó {{subject}}"
+      },
+      "signature": {
+        "add": "añadió la firma {{subject}}",
+        "update": "cambió la firma {{subject}}",
+        "remove": "eliminó la firma {{subject}}"
+      },
+      "anomaly": {
+        "add": "añadió la anomalía {{subject}}",
+        "update": "cambió la anomalía {{subject}}",
+        "remove": "eliminó la anomalía {{subject}}"
+      },
+      "structure": {
+        "add": "añadió la estructura {{subject}}",
+        "update": "cambió la estructura {{subject}}",
+        "remove": "eliminó la estructura {{subject}}"
+      },
+      "chain": {
+        "add": "guardó la cadena {{subject}}",
+        "update": "cambió la cadena {{subject}}",
+        "remove": "eliminó la cadena {{subject}}"
+      },
+      "map": {
+        "update": "cambió los ajustes del mapa",
+        "merge": "fusionó {{subject}}",
+        "scoutCleanup": "limpió los agujeros de {{subject}}"
+      },
+      "share": {
+        "add": "compartió el mapa con {{subject}}",
+        "remove": "dejó de compartir con {{subject}}",
+        "link": {
+          "create": "creó un enlace de difusión",
+          "update": "cambió el enlace de difusión",
+          "revoke": "revocó el enlace de difusión"
+        }
+      }
+    },
+    "field": {
+      "name": "Nombre",
+      "alias": "Alias",
+      "notes": "Notas",
+      "status": "Estado",
+      "isHome": "Base",
+      "locked": "Bloqueado",
+      "intel": "Inteligencia",
+      "tag": "Etiqueta",
+      "labels": "Etiquetas",
+      "customLabels": "Etiquetas propias",
+      "connectionType": "Tipo de salto",
+      "massStatus": "Masa",
+      "timeStatus": "Vida",
+      "size": "Tamaño",
+      "type": "Tipo de agujero",
+      "massUsed": "Masa usada",
+      "eolAt": "Hora EOL",
+      "lifetimeExpiresAt": "Caducidad",
+      "broken": "Roto",
+      "flagIcon": "Icono de bandera",
+      "flagNote": "Nota de bandera",
+      "flagBlink": "Bandera parpadeante",
+      "flagColor": "Color de bandera",
+      "sourceSignatureId": "Firma de origen",
+      "targetSignatureId": "Firma de destino",
+      "sigId": "ID de firma",
+      "sigType": "Grupo",
+      "whType": "Tipo de agujero",
+      "whLeadsTo": "Lleva a",
+      "ghostType": "Sitio fantasma",
+      "anomId": "ID de anomalía",
+      "anomType": "Tipo",
+      "structureType": "Tipo de estructura",
+      "ownerCorp": "Propietario",
+      "eveId": "ID de EVE",
+      "systemIds": "Sistemas",
+      "connectionIds": "Conexiones",
+      "allowAsMergeSource": "Origen de fusión",
+      "allowAsMergeDestination": "Destino de fusión",
+      "lazyRemoveWormholes": "Eliminación diferida de agujeros",
+      "collapseGraceHours": "Margen de colapso (horas)",
+      "bookmarkFormat": "Formato de marcadores",
+      "siteBookmarkFormat": "Formato de marcadores de sitios",
+      "skipKspace": "Omitir k-space",
+      "crossMapSync": "Sincronización entre mapas",
+      "expiryHours": "Caducidad (horas)",
+      "includeSigs": "Firmas",
+      "includeBridges": "Puentes",
+      "includeNotes": "Notas",
+      "includeStructures": "Estructuras",
+      "kind": "Compartido con",
+      "canWrite": "Puede editar",
+      "systems": "Sistemas",
+      "connections": "Conexiones",
+      "signatures": "Firmas",
+      "structures": "Estructuras"
+    }
+  },
   "chainExits": {
     "title": "Salidas de la cadena",
     "noExits": "No hay salidas de K-space en esta cadena.",
@@ -1717,6 +1848,7 @@
       "mergeMaps": "Fusionar mapas",
       "liveSharing": "Transmisión de mapa en vivo",
       "shareMap": "Compartir mapa",
+      "auditLog": "Registro de cambios",
       "shortcuts": "Atajos",
       "notifications": "Notificaciones",
       "announcer": "Anuncios de voz",

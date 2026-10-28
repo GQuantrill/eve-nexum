@@ -506,6 +506,137 @@
     "revokeFailed": "Schlüssel konnte nicht widerrufen werden. Bitte erneut versuchen.",
     "disabled": "API-Schlüssel deaktiviert"
   },
+  "audit": {
+    "title": "Änderungsprotokoll",
+    "titleFor": "Änderungsprotokoll — {{name}}",
+    "hint": "Änderungen der letzten {{days}} Tage. Verschieben von Systemen und automatische Bereinigung werden nicht erfasst.",
+    "sidebarHint": "Wer auf dieser Karte was hinzugefügt, entfernt oder geändert hat.",
+    "open": "Änderungsprotokoll öffnen",
+    "filter": "Anzeigen",
+    "empty": "Noch nichts erfasst.",
+    "loading": "Wird geladen…",
+    "loadMore": "Ältere laden",
+    "unknownPilot": "Unbekannter Pilot",
+    "viaApi": "API",
+    "on": "an",
+    "off": "aus",
+    "cleared": "gelöscht",
+    "kind": {
+      "all": "Alle Änderungen",
+      "system": "Systeme",
+      "connection": "Verbindungen",
+      "signature": "Signaturen",
+      "anomaly": "Anomalien",
+      "structure": "Strukturen",
+      "chain": "Ketten",
+      "map": "Karteneinstellungen",
+      "share": "Teilen"
+    },
+    "action": {
+      "system": {
+        "add": "hat {{subject}} hinzugefügt",
+        "update": "hat {{subject}} geändert",
+        "remove": "hat {{subject}} entfernt"
+      },
+      "connection": {
+        "add": "hat {{subject}} verbunden",
+        "update": "hat {{subject}} geändert",
+        "remove": "hat {{subject}} getrennt"
+      },
+      "signature": {
+        "add": "hat Signatur {{subject}} hinzugefügt",
+        "update": "hat Signatur {{subject}} geändert",
+        "remove": "hat Signatur {{subject}} entfernt"
+      },
+      "anomaly": {
+        "add": "hat Anomalie {{subject}} hinzugefügt",
+        "update": "hat Anomalie {{subject}} geändert",
+        "remove": "hat Anomalie {{subject}} entfernt"
+      },
+      "structure": {
+        "add": "hat Struktur {{subject}} hinzugefügt",
+        "update": "hat Struktur {{subject}} geändert",
+        "remove": "hat Struktur {{subject}} entfernt"
+      },
+      "chain": {
+        "add": "hat Kette {{subject}} gespeichert",
+        "update": "hat Kette {{subject}} geändert",
+        "remove": "hat Kette {{subject}} entfernt"
+      },
+      "map": {
+        "update": "hat die Karteneinstellungen geändert",
+        "merge": "hat {{subject}} zusammengeführt",
+        "scoutCleanup": "hat {{subject}}-Löcher bereinigt"
+      },
+      "share": {
+        "add": "hat die Karte mit {{subject}} geteilt",
+        "remove": "teilt nicht mehr mit {{subject}}",
+        "link": {
+          "create": "hat einen Übertragungslink erstellt",
+          "update": "hat den Übertragungslink geändert",
+          "revoke": "hat den Übertragungslink widerrufen"
+        }
+      }
+    },
+    "field": {
+      "name": "Name",
+      "alias": "Alias",
+      "notes": "Notizen",
+      "status": "Status",
+      "isHome": "Heimat",
+      "locked": "Gesperrt",
+      "intel": "Intel",
+      "tag": "Markierung",
+      "labels": "Labels",
+      "customLabels": "Eigene Labels",
+      "connectionType": "Sprungart",
+      "massStatus": "Masse",
+      "timeStatus": "Lebensdauer",
+      "size": "Größe",
+      "type": "Wurmlochtyp",
+      "massUsed": "Genutzte Masse",
+      "eolAt": "EOL-Zeit",
+      "lifetimeExpiresAt": "Ablauf",
+      "broken": "Unterbrochen",
+      "flagIcon": "Flaggen-Symbol",
+      "flagNote": "Flaggen-Notiz",
+      "flagBlink": "Flagge blinkt",
+      "flagColor": "Flaggenfarbe",
+      "sourceSignatureId": "Quellsignatur",
+      "targetSignatureId": "Zielsignatur",
+      "sigId": "Signatur-ID",
+      "sigType": "Gruppe",
+      "whType": "Wurmlochtyp",
+      "whLeadsTo": "Führt nach",
+      "ghostType": "Geisterstätte",
+      "anomId": "Anomalie-ID",
+      "anomType": "Typ",
+      "structureType": "Strukturtyp",
+      "ownerCorp": "Besitzer",
+      "eveId": "EVE-ID",
+      "systemIds": "Systeme",
+      "connectionIds": "Verbindungen",
+      "allowAsMergeSource": "Zusammenführungsquelle",
+      "allowAsMergeDestination": "Zusammenführungsziel",
+      "lazyRemoveWormholes": "Verzögertes Entfernen von Wurmlöchern",
+      "collapseGraceHours": "Kollaps-Toleranz (Stunden)",
+      "bookmarkFormat": "Lesezeichenformat",
+      "siteBookmarkFormat": "Lesezeichenformat für Stätten",
+      "skipKspace": "K-Space überspringen",
+      "crossMapSync": "Kartenübergreifende Synchronisierung",
+      "expiryHours": "Ablauf (Stunden)",
+      "includeSigs": "Signaturen",
+      "includeBridges": "Brücken",
+      "includeNotes": "Notizen",
+      "includeStructures": "Strukturen",
+      "kind": "Geteilt mit",
+      "canWrite": "Darf bearbeiten",
+      "systems": "Systeme",
+      "connections": "Verbindungen",
+      "signatures": "Signaturen",
+      "structures": "Strukturen"
+    }
+  },
   "chainExits": {
     "title": "Chain-Ausgänge",
     "noExits": "Keine K-Space-Ausgänge in dieser Kette.",
@@ -1717,6 +1848,7 @@
       "mergeMaps": "Karten zusammenführen",
       "liveSharing": "Live-Karten-Übertragung",
       "shareMap": "Karte teilen",
+      "auditLog": "Änderungsprotokoll",
       "shortcuts": "Tastenkürzel",
       "notifications": "Benachrichtigungen",
       "announcer": "Sprachansage",

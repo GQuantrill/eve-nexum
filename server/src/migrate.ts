@@ -1423,6 +1423,26 @@ export async function migrate() {
     );
     CREATE INDEX IF NOT EXISTS idx_recent_kills_system_time ON recent_kills (eve_system_id, killed_at DESC);
     CREATE INDEX IF NOT EXISTS idx_recent_kills_time ON recent_kills (killed_at);
+
+    -- Per-map audit log (services/mapAudit.ts): who changed what on a map, kept
+    -- 30 days. The actor's character and the subject are stored as text at the
+    -- time, so an entry still reads correctly after the character leaves or the
+    -- system/connection is deleted. Goes with the map.
+    CREATE TABLE IF NOT EXISTS map_audit (
+      id             BIGSERIAL   PRIMARY KEY,
+      map_id         UUID        NOT NULL REFERENCES maps(id) ON DELETE CASCADE,
+      user_id        INTEGER     REFERENCES users(id) ON DELETE SET NULL,
+      character_id   BIGINT,
+      character_name TEXT,
+      via_api        BOOLEAN     NOT NULL DEFAULT FALSE,
+      action         TEXT        NOT NULL,
+      target_id      TEXT,
+      subject        TEXT,
+      details        JSONB,
+      created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+    CREATE INDEX IF NOT EXISTS idx_map_audit_map_time ON map_audit (map_id, created_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_map_audit_time ON map_audit (created_at);
   `);
 
   await encryptLegacyTokens();

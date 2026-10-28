@@ -43,6 +43,7 @@ import { buildKillRow } from '../services/killFeed.js';
 import { recentKillsForSystems } from '../services/killBuffer.js';
 import { storedKills, windowSeconds } from './killboard.js';
 import { twNotesBySystem } from '../utils/tripwireNotes.js';
+import { recordMapAudit, auditActor, systemLabel, connectionLabel, chainLabel, MAP_AUDIT_RETENTION_DAYS } from '../services/mapAudit.js';
 
 const log = createLogger('maps');
 const discordLog = createLogger('discord');
@@ -2598,6 +2599,12 @@ mapsRouter.post('/:mapId/merge', async (req, res) => {
     // re-fetch rather than streaming hundreds of deltas. The initiator already
     // reloads in the merge modal, so it's echo-suppressed.
     publishToMap(destId, { type: 'map.resync', actor: req.get('x-client-id') ?? null });
+    recordMapAudit(req, destId, {
+      action: 'map.merge', targetId: sourceId, subject: srcMeta.name,
+      details: { values: {
+        systems: addedSystems, connections: addedConnections, signatures: addedSignatures, structures: addedStructures,
+      } },
+    });
 
     res.json({
       added:   { systems: addedSystems, connections: addedConnections, signatures: addedSignatures, structures: addedStructures },
@@ -2921,6 +2928,13 @@ mapsRouter.patch('/:mapId', async (req, res) => {
       ...(normalizedBookmarkFmt !== undefined ? { bookmarkFormat: normalizedBookmarkFmt } : {}),
       ...(normalizedSiteBookmarkFmt !== undefined ? { siteBookmarkFormat: normalizedSiteBookmarkFmt } : {}),
     });
+    const settings = {
+      name, locked, allowAsMergeSource, allowAsMergeDestination, lazyRemoveWormholes,
+      collapseGraceHours: normalizedGrace, bookmarkFormat: normalizedBookmarkFmt,
+      siteBookmarkFormat: normalizedSiteBookmarkFmt, skipKspace, crossMapSync,
+    };
+    const values = Object.fromEntries(Object.entries(settings).filter(([, v]) => v !== undefined));
+    recordMapAudit(req, mapId, { action: 'map.update', targetId: mapId, details: { fields: Object.keys(values), values } });
   }
   res.json({ ok: true });
 });
@@ -3045,6 +3059,7 @@ mapsRouter.post('/:mapId/systems', async (req, res) => {
       // Push to other viewers of this map (live sync). actor = originating
       // client → echo-suppressed.
       publishToMap(mapId, { type: 'system.add', actor: req.get('x-client-id') ?? null, system });
+      recordMapAudit(req, mapId, { action: 'system.add', targetId: id, subject: systemLabel({ name: r.name as string, alias: r.alias as string | null }) });
     }
   } catch (err) {
     console.error(err);
@@ -3181,12 +3196,18 @@ mapsRouter.patch('/:mapId/systems/:systemId', async (req, res) => {
   if (!access) return;
 
   // Append last_activity_at = NOW() to mark this system as active.
-  await db.query(
-    `UPDATE map_systems SET ${sets.join(', ')}, last_activity_at = NOW() WHERE id = $${vals.length + 1} AND map_id = $${vals.length + 2}`,
+  const { rows: updated } = await db.query<{ name: string; alias: string | null }>(
+    `UPDATE map_systems SET ${sets.join(', ')}, last_activity_at = NOW() WHERE id = $${vals.length + 1} AND map_id = $${vals.length + 2}
+     RETURNING name, alias`,
     [...vals, systemId, mapId],
   );
   await touchMap(mapId);
   publishToMap(mapId, { type: 'system.update', actor: req.get('x-client-id') ?? null, id: systemId, updates });
+  // Moving a node isn't a change worth auditing; anything else on the row is.
+  const changed = Object.keys(updates).filter((k) => k !== 'position');
+  if (updated.length && changed.length) {
+    recordMapAudit(req, mapId, { action: 'system.update', targetId: systemId, subject: systemLabel(updated[0]), details: { fields: changed } });
+  }
   res.json({ ok: true });
 });
 
@@ -3194,13 +3215,16 @@ mapsRouter.delete('/:mapId/systems/:systemId', async (req, res) => {
   const { mapId, systemId } = req.params;
   const access = await requireMapWrite(res, mapId, req);
   if (!access) return;
-  const { rowCount } = await db.query(`DELETE FROM map_systems WHERE id = $1 AND map_id = $2`, [systemId, mapId]);
-  if ((rowCount ?? 0) > 0) {
+  const { rows: removed } = await db.query<{ name: string; alias: string | null }>(
+    `DELETE FROM map_systems WHERE id = $1 AND map_id = $2 RETURNING name, alias`, [systemId, mapId],
+  );
+  if (removed.length > 0) {
     db.query(
       `INSERT INTO user_events (user_id, event_type, map_id) VALUES ($1, 'system_delete', $2)`,
       [req.session.userId, mapId],
     ).catch(console.error);
     publishToMap(mapId, { type: 'system.remove', actor: req.get('x-client-id') ?? null, id: systemId });
+    recordMapAudit(req, mapId, { action: 'system.remove', targetId: systemId, subject: systemLabel(removed[0]) });
   }
   await touchMap(mapId);
   res.json({ ok: true });
@@ -3326,6 +3350,11 @@ mapsRouter.post('/:mapId/connections', async (req, res) => {
   // the later type PATCH from sig auto-detect fires it instead.
   if (inserted > 0 && effectiveType === 'standard') {
     maybeBroadcastConnection(access, mapId, id, req.session.characterName ?? null);
+  }
+  if (inserted > 0) {
+    connectionLabel(mapId, String(sourceId), String(targetId))
+      .then((label) => recordMapAudit(req, mapId, { action: 'connection.add', targetId: id, subject: label, details: { values: { connectionType: effectiveType } } }))
+      .catch(console.error);
   }
   // Return the resolved type so the originating client can reflect an
   // auto-classified gate without waiting for a reload.
@@ -3834,6 +3863,10 @@ mapsRouter.post('/:mapId/untangle-layout', async (req, res) => {
   }
 });
 
+// Connection fields whose new value goes in the audit entry (short enums and
+// codes); the rest are listed by name only.
+const AUDITED_CONNECTION_VALUES = new Set(['connectionType', 'massStatus', 'timeStatus', 'size', 'type', 'broken']);
+
 mapsRouter.patch('/:mapId/connections/:connectionId', async (req, res) => {
   const { mapId, connectionId } = req.params;
 
@@ -3973,12 +4006,25 @@ mapsRouter.patch('/:mapId/connections/:connectionId', async (req, res) => {
 
   if (!sets.length) { res.status(400).json({ error: 'Nothing to update' }); return; }
 
-  await db.query(
-    `UPDATE map_connections SET ${sets.join(', ')} WHERE id = $${vals.length + 1} AND map_id = $${vals.length + 2}`,
+  const { rows: updatedConn } = await db.query<{ sourceId: string; targetId: string }>(
+    `UPDATE map_connections SET ${sets.join(', ')} WHERE id = $${vals.length + 1} AND map_id = $${vals.length + 2}
+     RETURNING source_id AS "sourceId", target_id AS "targetId"`,
     [...vals, connectionId, mapId],
   );
   await touchMap(mapId);
   publishToMap(mapId, { type: 'connection.update', actor: req.get('x-client-id') ?? null, id: connectionId, updates });
+  // What the caller asked to change — not the fields derived from it above, and
+  // not the handles, which only re-route the line.
+  const changed = Object.keys(req.body as Record<string, unknown>)
+    .filter((k) => k in colMap && k !== 'sourceHandle' && k !== 'targetHandle');
+  if (updatedConn.length && changed.length) {
+    const values: Record<string, unknown> = {};
+    for (const k of changed) if (AUDITED_CONNECTION_VALUES.has(k)) values[k] = updates[k];
+    const { sourceId, targetId } = updatedConn[0];
+    connectionLabel(mapId, sourceId, targetId)
+      .then((label) => recordMapAudit(req, mapId, { action: 'connection.update', targetId: connectionId, subject: label, details: { fields: changed, values } }))
+      .catch(console.error);
+  }
   // A wormhole type was just filled in — e.g. sig auto-detect labelling a
   // manually-drawn connection once its hole is scanned. Re-check the broadcast;
   // it's deduped, so a connection already announced won't fire again.
@@ -3998,9 +4044,19 @@ mapsRouter.delete('/:mapId/connections/:connectionId', async (req, res) => {
   const { mapId, connectionId } = req.params;
   const access = await requireMapWrite(res, mapId, req);
   if (!access) return;
-  await db.query(`DELETE FROM map_connections WHERE id = $1 AND map_id = $2`, [connectionId, mapId]);
+  const { rows: removedConn } = await db.query<{ sourceId: string; targetId: string }>(
+    `DELETE FROM map_connections WHERE id = $1 AND map_id = $2
+     RETURNING source_id AS "sourceId", target_id AS "targetId"`,
+    [connectionId, mapId],
+  );
   await touchMap(mapId);
   publishToMap(mapId, { type: 'connection.remove', actor: req.get('x-client-id') ?? null, id: connectionId });
+  if (removedConn.length) {
+    // The systems are still there, so the label reads as it did.
+    connectionLabel(mapId, removedConn[0].sourceId, removedConn[0].targetId)
+      .then((label) => recordMapAudit(req, mapId, { action: 'connection.remove', targetId: connectionId, subject: label }))
+      .catch(console.error);
+  }
   res.json({ ok: true });
 });
 
@@ -4140,6 +4196,10 @@ mapsRouter.post('/:mapId/routes', async (req, res) => {
       // Notify Discord that a chain was saved (corp/alliance maps only; gated by
       // the org's settings). Best-effort — never blocks or fails the save.
       if (inserted) dispatchChainSaved(access, mapId, route, req.session.characterName ?? null);
+      if (inserted) {
+        return chainLabel(mapId, route.name, route.systemIds)
+          .then((label) => recordMapAudit(req, mapId, { action: 'chain.add', targetId: id, subject: label }));
+      }
     }).catch(console.error);
   res.status(201).json({ ok: true });
 });
@@ -4158,12 +4218,18 @@ mapsRouter.patch('/:mapId/routes/:routeId', async (req, res) => {
     if (key in updates) { sets.push(`${col} = $${vals.length + 1}`); vals.push(updates[key]); }
   }
   if (!sets.length) { res.status(400).json({ error: 'Nothing to update' }); return; }
-  await db.query(
-    `UPDATE map_routes SET ${sets.join(', ')}, updated_at = NOW() WHERE id = $${vals.length + 1} AND map_id = $${vals.length + 2}`,
+  const { rows: updatedRoute } = await db.query<{ name: string; systemIds: string[] }>(
+    `UPDATE map_routes SET ${sets.join(', ')}, updated_at = NOW() WHERE id = $${vals.length + 1} AND map_id = $${vals.length + 2}
+     RETURNING name, system_ids AS "systemIds"`,
     [...vals, routeId, mapId],
   );
   await touchMap(mapId);
   publishToMap(mapId, { type: 'route.update', actor: req.get('x-client-id') ?? null, id: routeId, updates });
+  if (updatedRoute.length) {
+    chainLabel(mapId, updatedRoute[0].name, updatedRoute[0].systemIds)
+      .then((label) => recordMapAudit(req, mapId, { action: 'chain.update', targetId: routeId, subject: label, details: { fields: Object.keys(updates).filter((k) => k in colMap) } }))
+      .catch(console.error);
+  }
   res.json({ ok: true });
 });
 
@@ -4195,9 +4261,17 @@ mapsRouter.delete('/:mapId/routes/:routeId', async (req, res) => {
   const { mapId, routeId } = req.params;
   const access = await requireMapContentWrite(res, mapId, req);
   if (!access) return;
-  await db.query(`DELETE FROM map_routes WHERE id = $1 AND map_id = $2`, [routeId, mapId]);
+  const { rows: removedRoute } = await db.query<{ name: string; systemIds: string[] }>(
+    `DELETE FROM map_routes WHERE id = $1 AND map_id = $2 RETURNING name, system_ids AS "systemIds"`,
+    [routeId, mapId],
+  );
   await touchMap(mapId);
   publishToMap(mapId, { type: 'route.remove', actor: req.get('x-client-id') ?? null, id: routeId });
+  if (removedRoute.length) {
+    chainLabel(mapId, removedRoute[0].name, removedRoute[0].systemIds)
+      .then((label) => recordMapAudit(req, mapId, { action: 'chain.remove', targetId: routeId, subject: label }))
+      .catch(console.error);
+  }
   res.json({ ok: true });
 });
 
@@ -4223,7 +4297,7 @@ mapsRouter.post('/:mapId/systems/:systemId/signatures', async (req, res) => {
   const { row, inserted } = await createSignature(
     mapId, systemId, { sigId, sigType, name, notes, whType, whLeadsTo, ghostType, massStatus, timeStatus,
       scoutConnectionId: typeof scoutConnectionId === 'string' && scoutConnectionId ? scoutConnectionId : null },
-    { userId: me.userId, clientId: req.get('x-client-id') ?? null },
+    { userId: me.userId, clientId: req.get('x-client-id') ?? null, audit: auditActor(req) },
   );
   // A K162 copied from the Thera/Turnur feed is bookkeeping, not a sighting:
   // the hole was already on a public listing and the pilot is looking at the
@@ -4249,7 +4323,7 @@ mapsRouter.patch('/:mapId/systems/:systemId/signatures/:sigId', async (req, res)
   let result;
   try {
     result = await updateSignature(
-      mapId, systemId, sigId, updates, { userId: me.userId, clientId: req.get('x-client-id') ?? null },
+      mapId, systemId, sigId, updates, { userId: me.userId, clientId: req.get('x-client-id') ?? null, audit: auditActor(req) },
     );
   } catch (err) {
     if (err instanceof DuplicateSignatureError) { res.status(409).json({ error: 'duplicate_sig', message: err.message }); return; }
@@ -4273,7 +4347,7 @@ mapsRouter.delete('/:mapId/systems/:systemId/signatures/:sigId', async (req, res
   const access = await requireMapContentWrite(res, mapId, req);
   if (!access) return;
   if (!(await verifySystemInMap(res, systemId, mapId))) return;
-  await deleteSignature(mapId, systemId, sigId, { userId: authUser(req).userId, clientId: req.get('x-client-id') ?? null });
+  await deleteSignature(mapId, systemId, sigId, { userId: authUser(req).userId, clientId: req.get('x-client-id') ?? null, audit: auditActor(req) });
   res.json({ ok: true });
 });
 
@@ -4348,6 +4422,10 @@ mapsRouter.post('/:mapId/scout-cleanup', async (req, res) => {
   if (removed.length > 0 || (broken ?? 0) > 0) {
     await touchMap(mapId);
     publishToMap(mapId, { type: 'map.resync', actor: req.get('x-client-id') ?? null });
+    recordMapAudit(req, mapId, {
+      action: 'map.scoutCleanup', subject: hub,
+      details: { values: { signatures: removed.length, connections: broken ?? 0 } },
+    });
   }
   res.json({ removed: removed.length, broken: broken ?? 0 });
 });
@@ -4403,7 +4481,7 @@ mapsRouter.post('/:mapId/systems/:systemId/anomalies', async (req, res) => {
   if (!(await verifySystemInMap(res, systemId, mapId))) return;
   const { anomId = '', anomType = 'unknown', name = '', notes = '' } = req.body as Record<string, string>;
   const row = await createAnomaly(mapId, systemId, { anomId, anomType, name, notes },
-    { userId: authUser(req).userId, clientId: req.get('x-client-id') ?? null });
+    { userId: authUser(req).userId, clientId: req.get('x-client-id') ?? null, audit: auditActor(req) });
   res.status(201).json(row);
 });
 
@@ -4415,7 +4493,7 @@ mapsRouter.patch('/:mapId/systems/:systemId/anomalies/:anomId', async (req, res)
 
   const updates = req.body as Record<string, unknown>;
   await updateAnomaly(mapId, systemId, anomId, updates,
-    { userId: authUser(req).userId, clientId: req.get('x-client-id') ?? null });
+    { userId: authUser(req).userId, clientId: req.get('x-client-id') ?? null, audit: auditActor(req) });
   res.json({ ok: true });
 });
 
@@ -4424,7 +4502,7 @@ mapsRouter.delete('/:mapId/systems/:systemId/anomalies/:anomId', async (req, res
   const access = await requireMapContentWrite(res, mapId, req);
   if (!access) return;
   if (!(await verifySystemInMap(res, systemId, mapId))) return;
-  await deleteAnomaly(mapId, systemId, anomId, { userId: authUser(req).userId, clientId: req.get('x-client-id') ?? null });
+  await deleteAnomaly(mapId, systemId, anomId, { userId: authUser(req).userId, clientId: req.get('x-client-id') ?? null, audit: auditActor(req) });
   res.json({ ok: true });
 });
 
@@ -4454,7 +4532,7 @@ mapsRouter.post('/:mapId/systems/:systemId/structures', async (req, res) => {
 
   const row = await createStructure(mapId, systemId,
     { name, structureType, ownerCorp, notes, eveId: eveIdNum, ownerCorpId },
-    { userId: me.userId, clientId: req.get('x-client-id') ?? null });
+    { userId: me.userId, clientId: req.get('x-client-id') ?? null, audit: auditActor(req) });
   res.status(201).json(row);
 });
 
@@ -4466,7 +4544,7 @@ mapsRouter.patch('/:mapId/systems/:systemId/structures/:structureId', async (req
 
   const updates = req.body as Record<string, unknown>;
   await updateStructure(mapId, systemId, structureId, updates,
-    { userId: authUser(req).userId, clientId: req.get('x-client-id') ?? null });
+    { userId: authUser(req).userId, clientId: req.get('x-client-id') ?? null, audit: auditActor(req) });
   res.json({ ok: true });
 });
 
@@ -4475,7 +4553,7 @@ mapsRouter.delete('/:mapId/systems/:systemId/structures/:structureId', async (re
   const access = await requireMapContentWrite(res, mapId, req);
   if (!access) return;
   if (!(await verifySystemInMap(res, systemId, mapId))) return;
-  await deleteStructure(mapId, systemId, structureId, { userId: authUser(req).userId, clientId: req.get('x-client-id') ?? null });
+  await deleteStructure(mapId, systemId, structureId, { userId: authUser(req).userId, clientId: req.get('x-client-id') ?? null, audit: auditActor(req) });
   res.json({ ok: true });
 });
 
@@ -4485,8 +4563,18 @@ mapsRouter.delete('/:mapId/systems/:systemId/structures/:structureId', async (re
 // modify a corp map, but only an admin can hand out a public read-only link.
 // Personal maps still belong to their owner — only they can share.
 async function requireShareAdmin(res: Response, mapId: string, req: Request): Promise<MapMeta | null> {
+  return requireMapAdmin(res, mapId, req, 'share');
+}
+
+// The map's administrators: its owner for a personal map, the corp admins for a
+// corp map, the alliance admins for an alliance map. Shared with sharing and the
+// audit log, which both answer to the same people.
+async function requireMapAdmin(
+  res: Response, mapId: string, req: Request, purpose: 'share' | 'audit',
+): Promise<MapMeta | null> {
   const access = await getMapAccess(mapId, req);
   if (!access) { res.status(404).json({ error: 'Map not found' }); return null; }
+  const verb = purpose === 'share' ? 'share' : 'view the audit log of';
 
   const role = req.session.role ?? 'readonly';
   const userId = req.session.userId!;
@@ -4498,12 +4586,12 @@ async function requireShareAdmin(res: Response, mapId: string, req: Request): Pr
 
   if (isAllianceMap) {
     if (!isAllianceAdmin(role)) {
-      res.status(403).json({ error: 'Only an alliance admin can share an alliance map' });
+      res.status(403).json({ error: `Only an alliance admin can ${verb} an alliance map` });
       return null;
     }
   } else if (isCorpMap) {
     if (!isAdmin(role)) {
-      res.status(403).json({ error: 'Only an admin can share a corp map' });
+      res.status(403).json({ error: `Only an admin can ${verb} a corp map` });
       return null;
     }
   } else if (access.accessKind !== 'owner') {
@@ -4512,11 +4600,41 @@ async function requireShareAdmin(res: Response, mapId: string, req: Request): Pr
     // comparing the map's CREATING character against the session lost that:
     // a map made by one of your characters could not be shared while logged in
     // as another, even though you could edit and see it perfectly well.
-    res.status(403).json({ error: 'Only the owner can share this map' });
+    res.status(403).json({ error: `Only the owner can ${verb} this map` });
     return null;
   }
   return access;
 }
+
+// GET /api/maps/:mapId/audit — the map's audit log, newest first. Pages with
+// ?before=<entry id>; ?kind=system|connection|signature|anomaly|structure|chain|map|share
+// narrows it to one kind of change.
+const AUDIT_KINDS = new Set(['system', 'connection', 'signature', 'anomaly', 'structure', 'chain', 'map', 'share']);
+const AUDIT_PAGE = 100;
+
+mapsRouter.get('/:mapId/audit', async (req, res) => {
+  const { mapId } = req.params;
+  if (!(await requireMapAdmin(res, mapId, req, 'audit'))) return;
+
+  const before = Number(req.query.before);
+  const kind   = typeof req.query.kind === 'string' && AUDIT_KINDS.has(req.query.kind) ? req.query.kind : null;
+  const { rows } = await db.query(
+    `SELECT id::text AS id, created_at AS "createdAt", action, subject, details,
+            character_id::float8 AS "characterId", character_name AS "characterName", via_api AS "viaApi"
+       FROM map_audit
+      WHERE map_id = $1
+        AND ($2::bigint IS NULL OR id < $2)
+        AND ($3::text   IS NULL OR action LIKE $3 || '.%')
+      ORDER BY map_audit.id DESC   -- the table's bigint, not the text alias
+      LIMIT $4`,
+    [mapId, Number.isSafeInteger(before) && before > 0 ? before : null, kind, AUDIT_PAGE + 1],
+  );
+  res.json({
+    entries:   rows.slice(0, AUDIT_PAGE),
+    more:      rows.length > AUDIT_PAGE,
+    retentionDays: MAP_AUDIT_RETENTION_DAYS,
+  });
+});
 
 // Allowed expiry windows for share links (in hours). Anything outside
 // the allowlist falls back to the default — a user can't extend a link
@@ -4565,6 +4683,10 @@ mapsRouter.post('/:mapId/share', async (req, res) => {
       RETURNING share_expires_at AS "expiresAt"`,
     [token, mapId, includeSigs, includeBridges, expiryHours, includeNotes, includeStructures],
   );
+  recordMapAudit(req, mapId, {
+    action: 'share.link.create', targetId: mapId,
+    details: { values: { expiryHours, includeSigs, includeBridges, includeNotes, includeStructures } },
+  });
   const origin = (process.env.FRONTEND_URL ?? '').replace(/\/+$/, '');
   res.json({
     token,
@@ -4604,10 +4726,17 @@ mapsRouter.patch('/:mapId/share', async (req, res) => {
   }
   if (sets.length === 0) { res.json({ ok: true }); return; }
 
-  await db.query(
+  const { rowCount: linkUpdated } = await db.query(
     `UPDATE maps SET ${sets.join(', ')} WHERE id = $1 AND share_token IS NOT NULL`,
     values,
   );
+  if (linkUpdated) {
+    const changed = Object.keys(COLS).filter((k) => typeof req.body?.[k] === 'boolean');
+    recordMapAudit(req, mapId, {
+      action: 'share.link.update', targetId: mapId,
+      details: { fields: changed, values: Object.fromEntries(changed.map((k) => [k, req.body[k]])) },
+    });
+  }
   res.json({ ok: true });
 });
 
@@ -4615,10 +4744,11 @@ mapsRouter.patch('/:mapId/share', async (req, res) => {
 mapsRouter.delete('/:mapId/share', async (req, res) => {
   const { mapId } = req.params;
   if (!(await requireShareAdmin(res, mapId, req))) return;
-  await db.query(
-    `UPDATE maps SET share_token = NULL, share_expires_at = NULL WHERE id = $1`,
+  const { rowCount: revoked } = await db.query(
+    `UPDATE maps SET share_token = NULL, share_expires_at = NULL WHERE id = $1 AND share_token IS NOT NULL`,
     [mapId],
   );
+  if (revoked) recordMapAudit(req, mapId, { action: 'share.link.revoke', targetId: mapId });
   res.json({ ok: true });
 });
 
@@ -4794,6 +4924,10 @@ mapsRouter.post('/:mapId/shares', async (req, res) => {
 
     // Best-effort name resolve so the client can render immediately.
     const names = await resolveEntityNames([idNum]);
+    recordMapAudit(req, mapId, {
+      action: 'share.add', targetId: rows[0].id, subject: names.get(idNum)?.name ?? String(idNum),
+      details: { values: { kind, canWrite: grantCanWrite } },
+    });
     res.status(201).json({
       id:        rows[0].id,
       kind,
@@ -4892,11 +5026,23 @@ mapsRouter.delete('/:mapId/shares/:shareId', async (req, res) => {
   const access = await requireShareAdmin(res, mapId, req);
   if (!access) return;
 
-  const { rowCount } = await db.query(
-    `DELETE FROM map_shares WHERE id = $1 AND map_id = $2`,
+  const { rows: revokedShare } = await db.query<{ kind: string; targetId: number }>(
+    `DELETE FROM map_shares WHERE id = $1 AND map_id = $2
+     RETURNING CASE WHEN target_character_id IS NOT NULL THEN 'character'
+                    WHEN target_corp_id      IS NOT NULL THEN 'corp'
+                    ELSE 'alliance' END AS kind,
+               COALESCE(target_character_id, target_corp_id, target_alliance_id) AS "targetId"`,
     [shareId, mapId],
   );
-  if (!rowCount) { res.status(404).json({ error: 'Share not found' }); return; }
+  if (!revokedShare.length) { res.status(404).json({ error: 'Share not found' }); return; }
+  const { kind: revokedKind, targetId: revokedTarget } = revokedShare[0];
+  resolveEntityNames([Number(revokedTarget)])
+    .then((names) => recordMapAudit(req, mapId, {
+      action: 'share.remove', targetId: shareId,
+      subject: names.get(Number(revokedTarget))?.name ?? String(revokedTarget),
+      details: { values: { kind: revokedKind } },
+    }))
+    .catch(console.error);
   res.json({ ok: true });
 });
 

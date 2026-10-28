@@ -506,6 +506,137 @@
     "revokeFailed": "无法撤销密钥。请重试。",
     "disabled": "API 密钥已禁用"
   },
+  "audit": {
+    "title": "变更日志",
+    "titleFor": "变更日志 — {{name}}",
+    "hint": "最近 {{days}} 天的变更。移动星系和自动清理不会被记录。",
+    "sidebarHint": "谁在这张地图上添加、删除或修改了什么。",
+    "open": "打开变更日志",
+    "filter": "显示",
+    "empty": "暂无记录。",
+    "loading": "加载中…",
+    "loadMore": "加载更早记录",
+    "unknownPilot": "未知飞行员",
+    "viaApi": "API",
+    "on": "开",
+    "off": "关",
+    "cleared": "已清除",
+    "kind": {
+      "all": "全部变更",
+      "system": "星系",
+      "connection": "连接",
+      "signature": "信号",
+      "anomaly": "异常",
+      "structure": "建筑",
+      "chain": "链路",
+      "map": "地图设置",
+      "share": "共享"
+    },
+    "action": {
+      "system": {
+        "add": "添加了 {{subject}}",
+        "update": "修改了 {{subject}}",
+        "remove": "删除了 {{subject}}"
+      },
+      "connection": {
+        "add": "连接了 {{subject}}",
+        "update": "修改了 {{subject}}",
+        "remove": "断开了 {{subject}}"
+      },
+      "signature": {
+        "add": "添加了信号 {{subject}}",
+        "update": "修改了信号 {{subject}}",
+        "remove": "删除了信号 {{subject}}"
+      },
+      "anomaly": {
+        "add": "添加了异常 {{subject}}",
+        "update": "修改了异常 {{subject}}",
+        "remove": "删除了异常 {{subject}}"
+      },
+      "structure": {
+        "add": "添加了建筑 {{subject}}",
+        "update": "修改了建筑 {{subject}}",
+        "remove": "删除了建筑 {{subject}}"
+      },
+      "chain": {
+        "add": "保存了链路 {{subject}}",
+        "update": "修改了链路 {{subject}}",
+        "remove": "删除了链路 {{subject}}"
+      },
+      "map": {
+        "update": "修改了地图设置",
+        "merge": "合并了 {{subject}}",
+        "scoutCleanup": "清理了 {{subject}} 虫洞"
+      },
+      "share": {
+        "add": "与 {{subject}} 共享了地图",
+        "remove": "停止与 {{subject}} 共享",
+        "link": {
+          "create": "创建了直播链接",
+          "update": "修改了直播链接",
+          "revoke": "撤销了直播链接"
+        }
+      }
+    },
+    "field": {
+      "name": "名称",
+      "alias": "别名",
+      "notes": "备注",
+      "status": "状态",
+      "isHome": "家",
+      "locked": "锁定",
+      "intel": "情报",
+      "tag": "标记",
+      "labels": "标签",
+      "customLabels": "自定义标签",
+      "connectionType": "跳跃类型",
+      "massStatus": "质量",
+      "timeStatus": "寿命",
+      "size": "尺寸",
+      "type": "虫洞类型",
+      "massUsed": "已用质量",
+      "eolAt": "EOL 时间",
+      "lifetimeExpiresAt": "到期",
+      "broken": "已断开",
+      "flagIcon": "旗帜图标",
+      "flagNote": "旗帜备注",
+      "flagBlink": "旗帜闪烁",
+      "flagColor": "旗帜颜色",
+      "sourceSignatureId": "起点信号",
+      "targetSignatureId": "终点信号",
+      "sigId": "信号 ID",
+      "sigType": "分组",
+      "whType": "虫洞类型",
+      "whLeadsTo": "通往",
+      "ghostType": "幽灵站点",
+      "anomId": "异常 ID",
+      "anomType": "类型",
+      "structureType": "建筑类型",
+      "ownerCorp": "所有者",
+      "eveId": "EVE ID",
+      "systemIds": "星系",
+      "connectionIds": "连接",
+      "allowAsMergeSource": "合并来源",
+      "allowAsMergeDestination": "合并目标",
+      "lazyRemoveWormholes": "延迟移除虫洞",
+      "collapseGraceHours": "坍塌宽限（小时）",
+      "bookmarkFormat": "书签格式",
+      "siteBookmarkFormat": "站点书签格式",
+      "skipKspace": "跳过 K 空间",
+      "crossMapSync": "跨地图同步",
+      "expiryHours": "到期（小时）",
+      "includeSigs": "信号",
+      "includeBridges": "跳桥",
+      "includeNotes": "备注",
+      "includeStructures": "建筑",
+      "kind": "共享对象",
+      "canWrite": "可编辑",
+      "systems": "星系",
+      "connections": "连接",
+      "signatures": "信号",
+      "structures": "建筑"
+    }
+  },
   "chainExits": {
     "title": "链路出口",
     "noExits": "此链中没有 K空间出口。",
@@ -1717,6 +1848,7 @@
       "mergeMaps": "合并地图",
       "liveSharing": "实时地图广播",
       "shareMap": "共享地图",
+      "auditLog": "变更日志",
       "shortcuts": "快捷键",
       "notifications": "通知",
       "announcer": "语音播报",

@@ -1,0 +1,106 @@
+/* ── Map audit log modal ──────────────────────────────────── */
+.modal {
+  width: 640px;
+  max-width: 94vw;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 16px 8px;
+}
+
+.body {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 6px 8px;
+  background: var(--surface-base);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.portrait {
+  width: 28px;
+  height: 28px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  background: var(--surface-sunken);
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 6px;
+  font-size: calc(13px * var(--font-scale, 1));
+}
+
+.who {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.what {
+  color: var(--text-default);
+  overflow-wrap: anywhere;
+}
+
+.api {
+  font-size: calc(10px * var(--font-scale, 1));
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-weight: 600;
+  background: rgba(100,160,255,0.12);
+  color: var(--accent-light);
+  border: 1px solid rgba(100,160,255,0.3);
+}
+
+.detail {
+  color: var(--text-faint);
+  font-size: calc(12px * var(--font-scale, 1));
+  overflow-wrap: anywhere;
+}
+
+.when {
+  color: var(--text-faint);
+  font-size: calc(11px * var(--font-scale, 1));
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.empty {
+  color: var(--text-faint);
+  font-size: calc(12px * var(--font-scale, 1));
+  padding: 12px 0;
+  text-align: center;
+}

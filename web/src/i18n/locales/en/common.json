@@ -506,6 +506,137 @@
     "revokeFailed": "Couldn't revoke the key. Please try again.",
     "disabled": "API keys disabled"
   },
+  "audit": {
+    "title": "Audit log",
+    "titleFor": "Audit log — {{name}}",
+    "hint": "Changes from the last {{days}} days. Moving systems around and automatic cleanup aren't recorded.",
+    "sidebarHint": "Who added, removed or changed what on this map.",
+    "open": "Open audit log",
+    "filter": "Show",
+    "empty": "Nothing recorded yet.",
+    "loading": "Loading…",
+    "loadMore": "Load older",
+    "unknownPilot": "Unknown pilot",
+    "viaApi": "API",
+    "on": "on",
+    "off": "off",
+    "cleared": "cleared",
+    "kind": {
+      "all": "All changes",
+      "system": "Systems",
+      "connection": "Connections",
+      "signature": "Signatures",
+      "anomaly": "Anomalies",
+      "structure": "Structures",
+      "chain": "Chains",
+      "map": "Map settings",
+      "share": "Sharing"
+    },
+    "action": {
+      "system": {
+        "add": "added {{subject}}",
+        "update": "changed {{subject}}",
+        "remove": "removed {{subject}}"
+      },
+      "connection": {
+        "add": "connected {{subject}}",
+        "update": "changed {{subject}}",
+        "remove": "disconnected {{subject}}"
+      },
+      "signature": {
+        "add": "added signature {{subject}}",
+        "update": "changed signature {{subject}}",
+        "remove": "removed signature {{subject}}"
+      },
+      "anomaly": {
+        "add": "added anomaly {{subject}}",
+        "update": "changed anomaly {{subject}}",
+        "remove": "removed anomaly {{subject}}"
+      },
+      "structure": {
+        "add": "added structure {{subject}}",
+        "update": "changed structure {{subject}}",
+        "remove": "removed structure {{subject}}"
+      },
+      "chain": {
+        "add": "saved chain {{subject}}",
+        "update": "changed chain {{subject}}",
+        "remove": "removed chain {{subject}}"
+      },
+      "map": {
+        "update": "changed the map settings",
+        "merge": "merged in {{subject}}",
+        "scoutCleanup": "cleaned up {{subject}} holes"
+      },
+      "share": {
+        "add": "shared the map with {{subject}}",
+        "remove": "stopped sharing with {{subject}}",
+        "link": {
+          "create": "created a broadcast link",
+          "update": "changed the broadcast link",
+          "revoke": "revoked the broadcast link"
+        }
+      }
+    },
+    "field": {
+      "name": "Name",
+      "alias": "Alias",
+      "notes": "Notes",
+      "status": "Status",
+      "isHome": "Home",
+      "locked": "Locked",
+      "intel": "Intel",
+      "tag": "Tag",
+      "labels": "Labels",
+      "customLabels": "Custom labels",
+      "connectionType": "Jump type",
+      "massStatus": "Mass",
+      "timeStatus": "Lifetime",
+      "size": "Size",
+      "type": "Wormhole type",
+      "massUsed": "Mass used",
+      "eolAt": "EOL time",
+      "lifetimeExpiresAt": "Expiry",
+      "broken": "Broken",
+      "flagIcon": "Flag icon",
+      "flagNote": "Flag note",
+      "flagBlink": "Flag blink",
+      "flagColor": "Flag colour",
+      "sourceSignatureId": "Source signature",
+      "targetSignatureId": "Target signature",
+      "sigId": "Signature ID",
+      "sigType": "Group",
+      "whType": "Wormhole type",
+      "whLeadsTo": "Leads to",
+      "ghostType": "Ghost site",
+      "anomId": "Anomaly ID",
+      "anomType": "Type",
+      "structureType": "Structure type",
+      "ownerCorp": "Owner",
+      "eveId": "EVE ID",
+      "systemIds": "Systems",
+      "connectionIds": "Connections",
+      "allowAsMergeSource": "Merge source",
+      "allowAsMergeDestination": "Merge destination",
+      "lazyRemoveWormholes": "Lazy wormhole removal",
+      "collapseGraceHours": "Collapse grace (hours)",
+      "bookmarkFormat": "Bookmark format",
+      "siteBookmarkFormat": "Site bookmark format",
+      "skipKspace": "Skip k-space",
+      "crossMapSync": "Cross-map sync",
+      "expiryHours": "Expiry (hours)",
+      "includeSigs": "Signatures",
+      "includeBridges": "Bridges",
+      "includeNotes": "Notes",
+      "includeStructures": "Structures",
+      "kind": "Shared with",
+      "canWrite": "Can edit",
+      "systems": "Systems",
+      "connections": "Connections",
+      "signatures": "Signatures",
+      "structures": "Structures"
+    }
+  },
   "chainExits": {
     "title": "Chain exits",
     "noExits": "No K-space exits in this chain.",
@@ -1718,6 +1849,7 @@
       "mergeMaps": "Merge Maps",
       "liveSharing": "Live Map Broadcast",
       "shareMap": "Share Map",
+      "auditLog": "Audit Log",
       "shortcuts": "Shortcuts",
       "announcer": "Announcer",
       "jumpRange": "Jump Range",

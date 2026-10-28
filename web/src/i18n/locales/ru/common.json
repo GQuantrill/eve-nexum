@@ -512,6 +512,137 @@
     "revokeFailed": "Не удалось отозвать ключ. Попробуйте ещё раз.",
     "disabled": "API-ключи отключены"
   },
+  "audit": {
+    "title": "Журнал изменений",
+    "titleFor": "Журнал изменений — {{name}}",
+    "hint": "Изменения за последние {{days}} дн. Перемещение систем и автоматическая очистка не записываются.",
+    "sidebarHint": "Кто что добавил, удалил или изменил на этой карте.",
+    "open": "Открыть журнал изменений",
+    "filter": "Показать",
+    "empty": "Пока ничего не записано.",
+    "loading": "Загрузка…",
+    "loadMore": "Загрузить более ранние",
+    "unknownPilot": "Неизвестный пилот",
+    "viaApi": "API",
+    "on": "вкл.",
+    "off": "выкл.",
+    "cleared": "очищено",
+    "kind": {
+      "all": "Все изменения",
+      "system": "Системы",
+      "connection": "Соединения",
+      "signature": "Сигнатуры",
+      "anomaly": "Аномалии",
+      "structure": "Структуры",
+      "chain": "Цепочки",
+      "map": "Настройки карты",
+      "share": "Доступ"
+    },
+    "action": {
+      "system": {
+        "add": "добавил(а) {{subject}}",
+        "update": "изменил(а) {{subject}}",
+        "remove": "удалил(а) {{subject}}"
+      },
+      "connection": {
+        "add": "соединил(а) {{subject}}",
+        "update": "изменил(а) {{subject}}",
+        "remove": "разъединил(а) {{subject}}"
+      },
+      "signature": {
+        "add": "добавил(а) сигнатуру {{subject}}",
+        "update": "изменил(а) сигнатуру {{subject}}",
+        "remove": "удалил(а) сигнатуру {{subject}}"
+      },
+      "anomaly": {
+        "add": "добавил(а) аномалию {{subject}}",
+        "update": "изменил(а) аномалию {{subject}}",
+        "remove": "удалил(а) аномалию {{subject}}"
+      },
+      "structure": {
+        "add": "добавил(а) структуру {{subject}}",
+        "update": "изменил(а) структуру {{subject}}",
+        "remove": "удалил(а) структуру {{subject}}"
+      },
+      "chain": {
+        "add": "сохранил(а) цепочку {{subject}}",
+        "update": "изменил(а) цепочку {{subject}}",
+        "remove": "удалил(а) цепочку {{subject}}"
+      },
+      "map": {
+        "update": "изменил(а) настройки карты",
+        "merge": "объединил(а) с {{subject}}",
+        "scoutCleanup": "очистил(а) дыры {{subject}}"
+      },
+      "share": {
+        "add": "открыл(а) доступ к карте для {{subject}}",
+        "remove": "закрыл(а) доступ для {{subject}}",
+        "link": {
+          "create": "создал(а) ссылку трансляции",
+          "update": "изменил(а) ссылку трансляции",
+          "revoke": "отозвал(а) ссылку трансляции"
+        }
+      }
+    },
+    "field": {
+      "name": "Название",
+      "alias": "Псевдоним",
+      "notes": "Заметки",
+      "status": "Статус",
+      "isHome": "Дом",
+      "locked": "Заблокировано",
+      "intel": "Разведка",
+      "tag": "Метка",
+      "labels": "Ярлыки",
+      "customLabels": "Свои ярлыки",
+      "connectionType": "Тип прыжка",
+      "massStatus": "Масса",
+      "timeStatus": "Время жизни",
+      "size": "Размер",
+      "type": "Тип ВХ",
+      "massUsed": "Использованная масса",
+      "eolAt": "Время EOL",
+      "lifetimeExpiresAt": "Истекает",
+      "broken": "Разорвано",
+      "flagIcon": "Значок флага",
+      "flagNote": "Заметка флага",
+      "flagBlink": "Мигание флага",
+      "flagColor": "Цвет флага",
+      "sourceSignatureId": "Исходная сигнатура",
+      "targetSignatureId": "Целевая сигнатура",
+      "sigId": "ID сигнатуры",
+      "sigType": "Группа",
+      "whType": "Тип ВХ",
+      "whLeadsTo": "Ведёт в",
+      "ghostType": "Призрачный сайт",
+      "anomId": "ID аномалии",
+      "anomType": "Тип",
+      "structureType": "Тип структуры",
+      "ownerCorp": "Владелец",
+      "eveId": "EVE ID",
+      "systemIds": "Системы",
+      "connectionIds": "Соединения",
+      "allowAsMergeSource": "Источник объединения",
+      "allowAsMergeDestination": "Цель объединения",
+      "lazyRemoveWormholes": "Отложенное удаление ВХ",
+      "collapseGraceHours": "Запас до схлопывания (ч)",
+      "bookmarkFormat": "Формат закладок",
+      "siteBookmarkFormat": "Формат закладок сайтов",
+      "skipKspace": "Пропускать k-space",
+      "crossMapSync": "Синхронизация между картами",
+      "expiryHours": "Срок (ч)",
+      "includeSigs": "Сигнатуры",
+      "includeBridges": "Мосты",
+      "includeNotes": "Заметки",
+      "includeStructures": "Структуры",
+      "kind": "Доступ для",
+      "canWrite": "Может редактировать",
+      "systems": "Системы",
+      "connections": "Соединения",
+      "signatures": "Сигнатуры",
+      "structures": "Структуры"
+    }
+  },
   "chainExits": {
     "title": "Выходы из цепочки",
     "noExits": "В этой цепочке нет выходов в K-спейс.",
@@ -1737,6 +1868,7 @@
       "mergeMaps": "Объединить карты",
       "liveSharing": "Прямая трансляция карты",
       "shareMap": "Поделиться картой",
+      "auditLog": "Журнал изменений",
       "shortcuts": "Горячие клавиши",
       "notifications": "Уведомления",
       "announcer": "Голосовые оповещения",

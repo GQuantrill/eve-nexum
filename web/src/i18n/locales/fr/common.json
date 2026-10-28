@@ -506,6 +506,137 @@
     "revokeFailed": "Impossible de révoquer la clé. Veuillez réessayer.",
     "disabled": "Clés API désactivées"
   },
+  "audit": {
+    "title": "Journal des modifications",
+    "titleFor": "Journal des modifications — {{name}}",
+    "hint": "Modifications des {{days}} derniers jours. Le déplacement des systèmes et le nettoyage automatique ne sont pas enregistrés.",
+    "sidebarHint": "Qui a ajouté, supprimé ou modifié quoi sur cette carte.",
+    "open": "Ouvrir le journal",
+    "filter": "Afficher",
+    "empty": "Rien d’enregistré pour l’instant.",
+    "loading": "Chargement…",
+    "loadMore": "Charger les plus anciennes",
+    "unknownPilot": "Pilote inconnu",
+    "viaApi": "API",
+    "on": "activé",
+    "off": "désactivé",
+    "cleared": "effacé",
+    "kind": {
+      "all": "Toutes les modifications",
+      "system": "Systèmes",
+      "connection": "Connexions",
+      "signature": "Signatures",
+      "anomaly": "Anomalies",
+      "structure": "Structures",
+      "chain": "Chaînes",
+      "map": "Paramètres de la carte",
+      "share": "Partage"
+    },
+    "action": {
+      "system": {
+        "add": "a ajouté {{subject}}",
+        "update": "a modifié {{subject}}",
+        "remove": "a supprimé {{subject}}"
+      },
+      "connection": {
+        "add": "a connecté {{subject}}",
+        "update": "a modifié {{subject}}",
+        "remove": "a déconnecté {{subject}}"
+      },
+      "signature": {
+        "add": "a ajouté la signature {{subject}}",
+        "update": "a modifié la signature {{subject}}",
+        "remove": "a supprimé la signature {{subject}}"
+      },
+      "anomaly": {
+        "add": "a ajouté l’anomalie {{subject}}",
+        "update": "a modifié l’anomalie {{subject}}",
+        "remove": "a supprimé l’anomalie {{subject}}"
+      },
+      "structure": {
+        "add": "a ajouté la structure {{subject}}",
+        "update": "a modifié la structure {{subject}}",
+        "remove": "a supprimé la structure {{subject}}"
+      },
+      "chain": {
+        "add": "a enregistré la chaîne {{subject}}",
+        "update": "a modifié la chaîne {{subject}}",
+        "remove": "a supprimé la chaîne {{subject}}"
+      },
+      "map": {
+        "update": "a modifié les paramètres de la carte",
+        "merge": "a fusionné {{subject}}",
+        "scoutCleanup": "a nettoyé les trous de {{subject}}"
+      },
+      "share": {
+        "add": "a partagé la carte avec {{subject}}",
+        "remove": "ne partage plus avec {{subject}}",
+        "link": {
+          "create": "a créé un lien de diffusion",
+          "update": "a modifié le lien de diffusion",
+          "revoke": "a révoqué le lien de diffusion"
+        }
+      }
+    },
+    "field": {
+      "name": "Nom",
+      "alias": "Alias",
+      "notes": "Notes",
+      "status": "Statut",
+      "isHome": "Base",
+      "locked": "Verrouillé",
+      "intel": "Renseignement",
+      "tag": "Marqueur",
+      "labels": "Étiquettes",
+      "customLabels": "Étiquettes perso",
+      "connectionType": "Type de saut",
+      "massStatus": "Masse",
+      "timeStatus": "Durée de vie",
+      "size": "Taille",
+      "type": "Type de trou",
+      "massUsed": "Masse utilisée",
+      "eolAt": "Heure EOL",
+      "lifetimeExpiresAt": "Expiration",
+      "broken": "Rompu",
+      "flagIcon": "Icône du drapeau",
+      "flagNote": "Note du drapeau",
+      "flagBlink": "Drapeau clignotant",
+      "flagColor": "Couleur du drapeau",
+      "sourceSignatureId": "Signature d’origine",
+      "targetSignatureId": "Signature de destination",
+      "sigId": "ID de signature",
+      "sigType": "Groupe",
+      "whType": "Type de trou",
+      "whLeadsTo": "Mène à",
+      "ghostType": "Site fantôme",
+      "anomId": "ID d’anomalie",
+      "anomType": "Type",
+      "structureType": "Type de structure",
+      "ownerCorp": "Propriétaire",
+      "eveId": "ID EVE",
+      "systemIds": "Systèmes",
+      "connectionIds": "Connexions",
+      "allowAsMergeSource": "Source de fusion",
+      "allowAsMergeDestination": "Destination de fusion",
+      "lazyRemoveWormholes": "Suppression différée des trous",
+      "collapseGraceHours": "Délai d’effondrement (heures)",
+      "bookmarkFormat": "Format des signets",
+      "siteBookmarkFormat": "Format des signets de sites",
+      "skipKspace": "Ignorer le k-space",
+      "crossMapSync": "Synchronisation entre cartes",
+      "expiryHours": "Expiration (heures)",
+      "includeSigs": "Signatures",
+      "includeBridges": "Ponts",
+      "includeNotes": "Notes",
+      "includeStructures": "Structures",
+      "kind": "Partagé avec",
+      "canWrite": "Peut modifier",
+      "systems": "Systèmes",
+      "connections": "Connexions",
+      "signatures": "Signatures",
+      "structures": "Structures"
+    }
+  },
   "chainExits": {
     "title": "Sorties de la chaîne",
     "noExits": "Aucune sortie K-space dans cette chaîne.",
@@ -1717,6 +1848,7 @@
       "mergeMaps": "Fusionner les cartes",
       "liveSharing": "Diffusion de carte en direct",
       "shareMap": "Partager la carte",
+      "auditLog": "Journal des modifications",
       "shortcuts": "Raccourcis",
       "notifications": "Notifications",
       "announcer": "Annonces vocales",

@@ -506,6 +506,137 @@
     "revokeFailed": "キーを失効できませんでした。もう一度お試しください。",
     "disabled": "APIキーは無効です"
   },
+  "audit": {
+    "title": "変更履歴",
+    "titleFor": "変更履歴 — {{name}}",
+    "hint": "過去{{days}}日間の変更です。システムの移動や自動クリーンアップは記録されません。",
+    "sidebarHint": "このマップで誰が何を追加・削除・変更したか。",
+    "open": "変更履歴を開く",
+    "filter": "表示",
+    "empty": "まだ記録はありません。",
+    "loading": "読み込み中…",
+    "loadMore": "さらに古い履歴",
+    "unknownPilot": "不明なパイロット",
+    "viaApi": "API",
+    "on": "オン",
+    "off": "オフ",
+    "cleared": "クリア",
+    "kind": {
+      "all": "すべての変更",
+      "system": "システム",
+      "connection": "接続",
+      "signature": "シグネチャ",
+      "anomaly": "アノマリー",
+      "structure": "ストラクチャ",
+      "chain": "チェーン",
+      "map": "マップ設定",
+      "share": "共有"
+    },
+    "action": {
+      "system": {
+        "add": "{{subject}} を追加",
+        "update": "{{subject}} を変更",
+        "remove": "{{subject}} を削除"
+      },
+      "connection": {
+        "add": "{{subject}} を接続",
+        "update": "{{subject}} を変更",
+        "remove": "{{subject}} を切断"
+      },
+      "signature": {
+        "add": "シグネチャ {{subject}} を追加",
+        "update": "シグネチャ {{subject}} を変更",
+        "remove": "シグネチャ {{subject}} を削除"
+      },
+      "anomaly": {
+        "add": "アノマリー {{subject}} を追加",
+        "update": "アノマリー {{subject}} を変更",
+        "remove": "アノマリー {{subject}} を削除"
+      },
+      "structure": {
+        "add": "ストラクチャ {{subject}} を追加",
+        "update": "ストラクチャ {{subject}} を変更",
+        "remove": "ストラクチャ {{subject}} を削除"
+      },
+      "chain": {
+        "add": "チェーン {{subject}} を保存",
+        "update": "チェーン {{subject}} を変更",
+        "remove": "チェーン {{subject}} を削除"
+      },
+      "map": {
+        "update": "マップ設定を変更",
+        "merge": "{{subject}} を統合",
+        "scoutCleanup": "{{subject}} のホールを整理"
+      },
+      "share": {
+        "add": "{{subject}} とマップを共有",
+        "remove": "{{subject}} との共有を解除",
+        "link": {
+          "create": "配信リンクを作成",
+          "update": "配信リンクを変更",
+          "revoke": "配信リンクを取り消し"
+        }
+      }
+    },
+    "field": {
+      "name": "名前",
+      "alias": "別名",
+      "notes": "メモ",
+      "status": "ステータス",
+      "isHome": "ホーム",
+      "locked": "ロック",
+      "intel": "インテル",
+      "tag": "タグ",
+      "labels": "ラベル",
+      "customLabels": "カスタムラベル",
+      "connectionType": "ジャンプ種別",
+      "massStatus": "質量",
+      "timeStatus": "寿命",
+      "size": "サイズ",
+      "type": "ワームホール種別",
+      "massUsed": "使用質量",
+      "eolAt": "EOL時刻",
+      "lifetimeExpiresAt": "期限",
+      "broken": "切断",
+      "flagIcon": "フラグアイコン",
+      "flagNote": "フラグメモ",
+      "flagBlink": "フラグ点滅",
+      "flagColor": "フラグの色",
+      "sourceSignatureId": "発信側シグネチャ",
+      "targetSignatureId": "到着側シグネチャ",
+      "sigId": "シグネチャID",
+      "sigType": "グループ",
+      "whType": "ワームホール種別",
+      "whLeadsTo": "接続先",
+      "ghostType": "ゴーストサイト",
+      "anomId": "アノマリーID",
+      "anomType": "種類",
+      "structureType": "ストラクチャ種別",
+      "ownerCorp": "所有者",
+      "eveId": "EVE ID",
+      "systemIds": "システム",
+      "connectionIds": "接続",
+      "allowAsMergeSource": "統合元",
+      "allowAsMergeDestination": "統合先",
+      "lazyRemoveWormholes": "ワームホールの遅延削除",
+      "collapseGraceHours": "崩壊猶予（時間）",
+      "bookmarkFormat": "ブックマーク形式",
+      "siteBookmarkFormat": "サイトのブックマーク形式",
+      "skipKspace": "Kスペースを除外",
+      "crossMapSync": "マップ間同期",
+      "expiryHours": "期限（時間）",
+      "includeSigs": "シグネチャ",
+      "includeBridges": "ブリッジ",
+      "includeNotes": "メモ",
+      "includeStructures": "ストラクチャ",
+      "kind": "共有先",
+      "canWrite": "編集可",
+      "systems": "システム",
+      "connections": "接続",
+      "signatures": "シグネチャ",
+      "structures": "ストラクチャ"
+    }
+  },
   "chainExits": {
     "title": "チェーンの出口",
     "noExits": "このチェーンに Kスペース出口はありません。",
@@ -1717,6 +1848,7 @@
       "mergeMaps": "マップを統合",
       "liveSharing": "ライブマップ配信",
       "shareMap": "マップを共有",
+      "auditLog": "変更履歴",
       "shortcuts": "ショートカット",
       "notifications": "通知",
       "announcer": "音声アナウンス",

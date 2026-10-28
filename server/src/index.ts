@@ -54,6 +54,7 @@ import { shareRouter } from './routes/share.js';
 import searchRouter from './routes/search.js';
 import { dscanRouter } from './routes/dscan.js';
 import { startDscanSweeper } from './services/dscan.js';
+import { startMapAuditPruner } from './services/mapAudit.js';
 import { startPvpHistory } from './services/pvpHistory.js';
 import { startKillStore } from './services/killStore.js';
 import { authLimiter, esiLimiter, publicLimiter, appLimiter } from './middleware/rateLimits.js';
@@ -230,6 +231,7 @@ migrate()
     startPvpHistory();
     startKillStore();
     startDscanSweeper();
+    startMapAuditPruner();
     void startTelemetry();
   })
   .catch((err) => { console.error('Migration failed:', err); process.exit(1); });
