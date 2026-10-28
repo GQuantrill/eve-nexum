@@ -1028,37 +1028,59 @@ export function MapSidebar() {
   const atMapLimit = countPersonalMaps(maps) >= maxMaps;
 
 
-  function handleExport() {
+  // A full backup from the server: systems, connections with their clocks and
+  // flags, signatures, anomalies and structures. (The old export was the
+  // browser's copy of the map, which left the scan data behind and carried the
+  // share-link token.)
+  async function handleExport() {
     const { map } = useMapStore.getState();
-    const json = JSON.stringify(map, null, 2);
-    const blob = new Blob([json], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${map.name.replace(/[^a-z0-9]/gi, "_")}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+    try {
+      const backup = await api<unknown>(`/api/maps/${map.id}/export`);
+      const blob = new Blob([JSON.stringify(backup)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${map.name.replace(/[^a-z0-9]/gi, "_")}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      toast.error(t("mapSidebar.exportFailed", { error: err instanceof Error ? err.message : String(err) }));
+    }
   }
 
   async function handleImport(file: File) {
-    let parsed: WormholeMap;
+    let parsed: Partial<WormholeMap> & Record<string, unknown>;
     try {
-      parsed = JSON.parse(await file.text()) as WormholeMap;
+      parsed = JSON.parse(await file.text()) as Partial<WormholeMap> & Record<string, unknown>;
     } catch {
       toast.error(t("mapSidebar.invalidJson"));
       return;
     }
-    if (!parsed.systems || !parsed.connections) {
+    if (!parsed || !Array.isArray(parsed.systems) || !Array.isArray(parsed.connections)) {
       toast.error(t("mapSidebar.notNexumMap"));
       return;
     }
     try {
+      // Only the map's contents. An older export is the raw map state, which
+      // also carries its scope (isCorpMap...) and share token -- none of that
+      // should ride along into a new personal map. Settings sit on the map
+      // itself in those files.
+      const settings = parsed.settings ?? {
+        lazyRemoveWormholes: parsed.lazyRemoveWormholes,
+        collapseGraceHours:  parsed.collapseGraceHours,
+        bookmarkFormat:      parsed.bookmarkFormat,
+        siteBookmarkFormat:  parsed.siteBookmarkFormat,
+      };
       const { id } = await api<{ id: string }>("/api/maps/import", {
         method: "POST",
         body: JSON.stringify({
           name: parsed.name,
+          settings,
           systems: parsed.systems,
           connections: parsed.connections,
+          signatures: parsed.signatures,
+          anomalies: parsed.anomalies,
+          structures: parsed.structures,
         }),
       });
       await useMapStore.getState().loadMaps();
