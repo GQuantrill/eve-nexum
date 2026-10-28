@@ -397,7 +397,7 @@
   display: inline-flex;
   flex-wrap: wrap;
   justify-content: flex-end;
-  gap: var(--sp-2);
+  gap: var(--sp-4);
 }
 
 .tag {
