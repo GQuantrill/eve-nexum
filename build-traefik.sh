@@ -22,11 +22,25 @@ main() {
   # Run from the repo root (where the compose files are), regardless of cwd.
   cd "$(dirname "$0")"
 
-  # docker-compose.www.yml adds the www.<DOMAIN> -> apex 301 redirect. Prod runs
-  # on the apex eve-nexum.com with a www DNS record, so it belongs here. The QA
-  # stack deploys with its own explicit command (see QA-SETUP.md) and omits it,
-  # since www.qa.<DOMAIN> wouldn't resolve.
-  local compose=(-f docker-compose.yml -f docker-compose.traefik.yml -f docker-compose.www.yml)
+  local compose=(-f docker-compose.yml -f docker-compose.traefik.yml)
+
+  # docker-compose.www.yml adds the www.<DOMAIN> -> apex 301 redirect. It only
+  # belongs on an apex domain with a www DNS record (prod, eve-nexum.com). On a
+  # subdomain instance (karmafleet.eve-nexum.com, qa.eve-nexum.com) the name
+  # www.<subdomain> can't resolve -- the *.eve-nexum.com wildcard is one label
+  # deep -- so its certificate order failed on every Traefik start. Unset, it's
+  # on only when DOMAIN has a single dot; WWW_REDIRECT=1 or 0 forces it.
+  local domain="${DOMAIN:-$(sed -n 's/^DOMAIN=//p' .env 2>/dev/null | tail -1 | tr -d "\"'\r")}"
+  local www="${WWW_REDIRECT:-}"
+  if [[ -z "${www}" ]]; then
+    if [[ "${domain}" =~ ^[^.]+\.[^.]+$ ]]; then www=1; else www=0; fi
+  fi
+  if [[ "${www}" == "1" ]]; then
+    compose+=(-f docker-compose.www.yml)
+    echo "==> www.${domain} -> ${domain} redirect: on"
+  else
+    echo "==> www redirect: off (DOMAIN=${domain:-unset})"
+  fi
 
   # Opt-in: set PG_HOST_BIND to publish Postgres on the host (loopback by
   # default -- see docker-compose.dbhost.yml). Unset => Postgres stays internal

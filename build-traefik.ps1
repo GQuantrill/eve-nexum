@@ -15,10 +15,26 @@ $ErrorActionPreference = 'Stop'
 # Run from the script's own directory (repo root), regardless of cwd.
 Set-Location -Path $PSScriptRoot
 
-# docker-compose.www.yml adds the www.<DOMAIN> -> apex 301 redirect (prod runs on
-# the apex eve-nexum.com with a www DNS record). The QA stack deploys with its own
-# explicit command (see QA-SETUP.md) and omits it.
-$compose = @('-f', 'docker-compose.yml', '-f', 'docker-compose.traefik.yml', '-f', 'docker-compose.www.yml')
+$compose = @('-f', 'docker-compose.yml', '-f', 'docker-compose.traefik.yml')
+
+# docker-compose.www.yml adds the www.<DOMAIN> -> apex 301 redirect. It only
+# belongs on an apex domain with a www DNS record (prod, eve-nexum.com). On a
+# subdomain instance www.<subdomain> can't resolve, so its certificate order
+# failed on every Traefik start. Unset, it's on only when DOMAIN has a single
+# dot; WWW_REDIRECT=1 or 0 forces it. Same rule as build-traefik.sh.
+$domain = $env:DOMAIN
+if ([string]::IsNullOrEmpty($domain) -and (Test-Path .env)) {
+    $line = Get-Content .env | Where-Object { $_ -match '^DOMAIN=' } | Select-Object -Last 1
+    if ($line) { $domain = ($line -replace '^DOMAIN=', '').Trim().Trim('"', "'") }
+}
+$www = $env:WWW_REDIRECT
+if ([string]::IsNullOrEmpty($www)) { $www = if ($domain -match '^[^.]+\.[^.]+$') { '1' } else { '0' } }
+if ($www -eq '1') {
+    $compose += @('-f', 'docker-compose.www.yml')
+    Write-Host "==> www.$domain -> $domain redirect: on" -ForegroundColor Cyan
+} else {
+    Write-Host "==> www redirect: off (DOMAIN=$domain)" -ForegroundColor Cyan
+}
 
 # Opt-in: set PG_HOST_BIND to publish Postgres on the host (loopback by
 # default - see docker-compose.dbhost.yml). Unset => Postgres stays internal to
