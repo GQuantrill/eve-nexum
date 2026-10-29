@@ -46,6 +46,10 @@ const systemHistory  = new Map<number, HourlyPoint[]>();
 // new tracker.
 let   esiCache: EsiSnapshot | null = null;
 let   fetching: Promise<EsiSnapshot | null> | null = null;
+// When ESI was last ASKED, successful or not. A failed fetch leaves esiCache
+// stale, and without this every page view would retry at once -- each failure
+// spending the shared per-IP ESI error budget that our other instances use too.
+let   lastAttemptAt = 0;
 // Tracks the ESI snapshot timestamp that's already been written to the DB so
 // we don't keep INSERT...ON CONFLICTing the same rows on every request.
 let   lastWrittenFetchedAt = 0;
@@ -77,7 +81,10 @@ async function fetchEsi(): Promise<EsiSnapshot | null> {
   // Promise-cached so concurrent callers share one fetch (the old boolean
   // soft-lock raced — two callers could both see fetching=false).
   if (fetching) return fetching;
+  // At most one attempt a minute, whatever happened last time.
+  if (now - lastAttemptAt < MIN_CACHE_MS) return esiCache;
 
+  lastAttemptAt = now;
   fetching = (async () => {
     try {
       const [jRes, kRes] = await Promise.all([
