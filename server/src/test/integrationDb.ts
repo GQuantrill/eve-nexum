@@ -3,9 +3,10 @@
 // and provides truncate + seed helpers. Runs the REAL SQL — nothing here is
 // mocked — so it catches authz bugs that the mocked-db unit tests cannot.
 //
-// If the test DB is unreachable, ensureIntegrationDb() returns false and the
-// suites skip (describe.skipIf) rather than fail — so `yarn test` still runs the
-// unit suites on a machine with no Postgres. CI provides the DB, so they run there.
+// Where the database comes from: CI provides one, and locally the run starts its
+// own throwaway Postgres in Docker when none is reachable (src/test/globalSetup.ts).
+// Only with NEXUM_TEST_DB=skip is there none, and then ensureIntegrationDb()
+// returns false and the suites skip (describe.skipIf) rather than fail.
 import { db } from '../db.js';
 import { migrate } from '../migrate.js';
 

@@ -7,7 +7,7 @@
 // resolved name doesn't end in `_test`, we refuse to start.
 import { config as loadDotenv } from 'dotenv';
 
-loadDotenv();
+loadDotenv({ quiet: true });
 
 // Relax the prod-only guards in config.ts (SESSION_SECRET etc.) for tests.
 process.env.NODE_ENV = 'development';
