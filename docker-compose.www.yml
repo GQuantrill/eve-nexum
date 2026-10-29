@@ -3,6 +3,9 @@
 # record points at this host. Layer it on top of the base + traefik files:
 #   docker compose -f docker-compose.yml -f docker-compose.traefik.yml -f docker-compose.www.yml up -d --build
 #
+# build-traefik.sh / .ps1 include this file unless WWW_REDIRECT=0 -- set that
+# on a subdomain instance.
+#
 # DO NOT use this on a subdomain deployment (e.g. DOMAIN=nexum.example.com or a
 # QA stack on qa.<DOMAIN>): www.<subdomain> won't resolve, so its ACME order
 # would fail and churn. That's exactly why this lives in its own file instead of
@@ -18,7 +21,7 @@ services:
       - "traefik.http.routers.${STACK:-eve-nexum}-www.rule=Host(`www.${DOMAIN}`)"
       - "traefik.http.routers.${STACK:-eve-nexum}-www.entrypoints=websecure"
       - "traefik.http.routers.${STACK:-eve-nexum}-www.tls=true"
-      - "traefik.http.routers.${STACK:-eve-nexum}-www.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.${STACK:-eve-nexum}-www.tls.certresolver=${CERT_RESOLVER:-letsencrypt}"
       - "traefik.http.routers.${STACK:-eve-nexum}-www.middlewares=${STACK:-eve-nexum}-www-to-apex"
       - "traefik.http.routers.${STACK:-eve-nexum}-www-http.rule=Host(`www.${DOMAIN}`)"
       - "traefik.http.routers.${STACK:-eve-nexum}-www-http.entrypoints=web"

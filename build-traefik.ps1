@@ -15,10 +15,23 @@ $ErrorActionPreference = 'Stop'
 # Run from the script's own directory (repo root), regardless of cwd.
 Set-Location -Path $PSScriptRoot
 
-# docker-compose.www.yml adds the www.<DOMAIN> -> apex 301 redirect (prod runs on
-# the apex eve-nexum.com with a www DNS record). The QA stack deploys with its own
-# explicit command (see QA-SETUP.md) and omits it.
-$compose = @('-f', 'docker-compose.yml', '-f', 'docker-compose.traefik.yml', '-f', 'docker-compose.www.yml')
+$compose = @('-f', 'docker-compose.yml', '-f', 'docker-compose.traefik.yml')
+
+# docker-compose.www.yml adds the www.<DOMAIN> -> apex 301 redirect, and is
+# included as it always has been. Set WWW_REDIRECT=0 (in the environment or
+# .env) on an instance served from a subdomain: www.<subdomain> can't resolve,
+# so its certificate order fails on every Traefik start. Same rule as
+# build-traefik.sh.
+$www = $env:WWW_REDIRECT
+if ([string]::IsNullOrEmpty($www) -and (Test-Path .env)) {
+    $line = Get-Content .env | Where-Object { $_ -match '^WWW_REDIRECT=' } | Select-Object -Last 1
+    if ($line) { $www = ($line -replace '^WWW_REDIRECT=', '').Trim().Trim('"', "'") }
+}
+if ($www -eq '0') {
+    Write-Host "==> www redirect: off (WWW_REDIRECT=0)" -ForegroundColor Cyan
+} else {
+    $compose += @('-f', 'docker-compose.www.yml')
+}
 
 # Opt-in: set PG_HOST_BIND to publish Postgres on the host (loopback by
 # default - see docker-compose.dbhost.yml). Unset => Postgres stays internal to
