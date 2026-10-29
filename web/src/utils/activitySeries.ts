@@ -30,3 +30,46 @@ export function normaliseSeries(values: number[]): number[] {
   if (max <= 0) return values.map(() => 0);
   return values.map((v) => v / max);
 }
+
+// ── Placing points by their hour ─────────────────────────────────────────────
+
+const HOUR_MS = 3_600_000;
+
+export interface HourlyCounts {
+  hour:      number;
+  jumps:     number;
+  shipKills: number;
+  podKills:  number;
+  npcKills:  number;
+}
+
+/**
+ * Lay the server's hourly points out on the chart's 24-hour axis by their real
+ * hour, instead of right-aligning them and calling the newest "this hour".
+ *
+ * CCP publishes each hour's jumps and kills some time into the NEXT hour, so the
+ * newest point is normally last hour's, and `lag` says how many hours short of
+ * now the series ends (the chart shifts left by that much). An hour with no row
+ * inside the run is one with no activity -- the server only stores systems
+ * that had some -- so it is filled with zeros rather than closed up, which used
+ * to slide everything before it an hour to the right.
+ */
+export function alignHourly<T extends HourlyCounts>(
+  points: T[], slots: number, now = Date.now(),
+): { points: HourlyCounts[]; lag: number } {
+  const current = now - (now % HOUR_MS);
+  const oldest  = current - (slots - 1) * HOUR_MS;
+  const inRange = points.filter((p) => p.hour >= oldest && p.hour <= current);
+  if (inRange.length === 0) return { points: [], lag: 0 };
+  const byHour = new Map(inRange.map((p) => [p.hour, p]));
+  const first  = Math.min(...byHour.keys());
+  const last   = Math.max(...byHour.keys());
+  const out: HourlyCounts[] = [];
+  for (let h = first; h <= last; h += HOUR_MS) {
+    const p = byHour.get(h);
+    out.push(p
+      ? { hour: h, jumps: p.jumps, shipKills: p.shipKills, podKills: p.podKills, npcKills: p.npcKills }
+      : { hour: h, jumps: 0, shipKills: 0, podKills: 0, npcKills: 0 });
+  }
+  return { points: out, lag: Math.round((current - last) / HOUR_MS) };
+}

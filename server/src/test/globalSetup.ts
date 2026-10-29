@@ -65,17 +65,23 @@ async function startContainer(): Promise<Client> {
       '-e', `POSTGRES_USER=${TEST_USER}`, '-e', `POSTGRES_PASSWORD=${TEST_PASS}`, '-e', `POSTGRES_DB=${TEST_DB}`,
       '-p', '127.0.0.1::5432', // a free host port, local only
       'postgres:16', '-c', 'fsync=off', '-c', 'full_page_writes=off', // speed; the data is thrown away
-    ]);
+    // Long enough for a first-time image pull; short enough that a wedged
+    // Docker fails the run instead of hanging it.
+    ], { timeout: 180_000 });
   } catch (err) {
+    // A timed-out run may still create the container later; don't leave it.
+    void run('docker', ['rm', '-f', name], { timeout: 30_000 }).catch(() => {});
     throw new Error(
       'The database tests need Postgres, and none was reachable, so the test run tried to\n' +
       'start one in Docker and could not. Start Docker Desktop and run the tests again,\n' +
       'or set NEXUM_TEST_DB=skip to run without the database tests.\n\n' +
-      `docker said: ${(err as Error).message.split('\n')[0]}`,
+      // execFile's message is just "Command failed: <the command>"; what
+      // Docker actually said is on stderr.
+      `docker said: ${((err as { stderr?: string }).stderr || (err as Error).message).trim().split('\n')[0]}`,
     );
   }
   container = name;
-  const { stdout } = await run('docker', ['port', name, '5432/tcp']);
+  const { stdout } = await run('docker', ['port', name, '5432/tcp'], { timeout: 30_000 });
   const port = stdout.trim().split('\n')[0].split(':').pop()!;
 
   Object.assign(process.env, {
@@ -96,7 +102,7 @@ async function startContainer(): Promise<Client> {
     await new Promise((r) => setTimeout(r, 500));
   }
   // A failed setup gets no teardown, so clean up here.
-  await run('docker', ['stop', '-t', '1', name]).catch(() => {});
+  await run('docker', ['stop', '-t', '1', name], { timeout: 30_000 }).catch(() => {});
   container = null;
   throw new Error(`The test Postgres container ${name} did not start within 60s.`);
 }
@@ -149,7 +155,7 @@ export async function teardown(): Promise<void> {
   }
   if (container) {
     // Started with --rm, so stopping it also removes it.
-    await run('docker', ['stop', '-t', '1', container]).catch(() => {});
+    await run('docker', ['stop', '-t', '1', container], { timeout: 30_000 }).catch(() => {});
     container = null;
   }
 }

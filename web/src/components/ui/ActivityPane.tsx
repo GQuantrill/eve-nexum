@@ -7,7 +7,7 @@ import { SortableContext, arrayMove, rectSortingStrategy, useSortable } from '@d
 import { CSS } from '@dnd-kit/utilities';
 import { api } from '../../api/client';
 import { useUserSetting } from '../../hooks/useUserSetting';
-import { normaliseSeries, peakOf } from '../../utils/activitySeries';
+import { normaliseSeries, peakOf, alignHourly } from '../../utils/activitySeries';
 import styles from './ActivityPane.module.css';
 
 interface HoverState { index: number; xPct: number; yPct: number; value: number }
@@ -35,13 +35,15 @@ const X_TICKS = [0, 4, 8, 12, 16, 20];
  * charts and by the signed delta chart in combined mode, so the geometry has
  * one home.
  */
-function LineChartPlot({ values, color, signed = false }: {
+function LineChartPlot({ values, color, signed = false, lag = 0 }: {
   values: number[];
   color:  string;
   /** When true, the y-axis is symmetric around 0 — negatives plot below a
    *  zero baseline instead of the usual average line. Used for delta-style
    *  series where the sign carries meaning. */
   signed?: boolean;
+  /** Hours between the newest point and the current hour (see alignHourly). */
+  lag?: number;
 }) {
   const { t } = useTranslation();
   const [hover, setHover] = useState<HoverState | null>(null);
@@ -49,10 +51,10 @@ function LineChartPlot({ values, color, signed = false }: {
   const avg = n > 0 ? values.reduce((s, v) => s + v, 0) / n : 0;
 
   // slot 0 = oldest (left), slot SLOTS-1 = current hour (right)
-  // data is right-aligned: data point i maps to slot (SLOTS - n + i)
+  // data ends `lag` hours before now: data point i maps to slot (SLOTS - lag - n + i)
   const xOfSlot = (slot: number) => PAD.left + (slot / (SLOTS - 1)) * IW;
-  const xOfIdx  = (i:    number) => xOfSlot(SLOTS - n + i);
-  const slotOfIdx = (i: number) => SLOTS - n + i;
+  const slotOfIdx = (i: number) => SLOTS - lag - n + i;
+  const xOfIdx  = (i:    number) => xOfSlot(slotOfIdx(i));
 
   // Two y-axis modes:
   //   unsigned (default) — 0..maxVal, classic line over zero
@@ -178,13 +180,14 @@ function LineChartPlot({ values, color, signed = false }: {
   );
 }
 
-function MiniLineChart({ id, title, values, color, signed = false }: {
+function MiniLineChart({ id, title, values, color, signed = false, lag = 0 }: {
   /** Sortable id — the chart key. Charts reorder by drag, so each needs one. */
   id:      string;
   title:   string;
   values:  number[];
   color:   string;
   signed?: boolean;
+  lag?:    number;
 }) {
   const { t } = useTranslation();
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
@@ -214,7 +217,7 @@ function MiniLineChart({ id, title, values, color, signed = false }: {
           ⠿
         </button>
       </div>
-      <LineChartPlot values={values} color={color} signed={signed} />
+      <LineChartPlot values={values} color={color} signed={signed} lag={lag} />
     </div>
   );
 }
@@ -235,13 +238,14 @@ interface Series { key: string; title: string; color: string; values: number[] }
  * series that would be ~96 overlapping circles, and the useful question at an
  * hour is "what was everything doing", not "what was this one line doing".
  */
-function CombinedChart({ series }: { series: Series[] }) {
+function CombinedChart({ series, lag = 0 }: { series: Series[]; lag?: number }) {
   const { t } = useTranslation();
   const [hoverSlot, setHoverSlot] = useState<number | null>(null);
 
   const n = series[0]?.values.length ?? 0;
   const xOfSlot = (slot: number) => CPAD.left + (slot / (SLOTS - 1)) * CIW;
-  const xOfIdx  = (i: number) => xOfSlot(SLOTS - n + i);
+  const first   = SLOTS - lag - n; // slot of the oldest point
+  const xOfIdx  = (i: number) => xOfSlot(first + i);
   const yOf     = (frac: number) => CPAD.top + CIH - frac * CIH;
 
   const plotted = series.map((s) => ({
@@ -251,7 +255,7 @@ function CombinedChart({ series }: { series: Series[] }) {
       .map((f, i) => `${xOfIdx(i).toFixed(1)},${yOf(f).toFixed(1)}`).join(' '),
   }));
 
-  const hoverIdx = hoverSlot == null ? null : hoverSlot - (SLOTS - n);
+  const hoverIdx = hoverSlot == null ? null : hoverSlot - first;
   const hovered  = hoverIdx != null && hoverIdx >= 0 && hoverIdx < n ? hoverIdx : null;
 
   return (
@@ -301,7 +305,7 @@ function CombinedChart({ series }: { series: Series[] }) {
             return (
               <rect key={`hit-${i}`} x={xOfIdx(i) - half} y={CPAD.top}
                 width={half * 2} height={CIH} fill="transparent"
-                onMouseEnter={() => setHoverSlot(SLOTS - n + i)} />
+                onMouseEnter={() => setHoverSlot(first + i)} />
             );
           })}
 
@@ -324,7 +328,7 @@ function CombinedChart({ series }: { series: Series[] }) {
             }}
           >
             <div className={styles.tooltipWhen}>
-              {hoursAgoLabel(t, SLOTS - 1 - (SLOTS - n + hovered))}
+              {hoursAgoLabel(t, SLOTS - 1 - (first + hovered))}
             </div>
             {plotted.map((s) => (
               <div key={s.key} className={styles.tooltipRow}>
@@ -360,8 +364,11 @@ function hoursAgoLabel(t: TFunction, h: number): string {
 type ChartKey = 'jumps' | 'shipKills' | 'podKills' | 'npcKills' | 'npcDelta';
 const DEFAULT_CHART_ORDER: ChartKey[] = ['jumps', 'shipKills', 'podKills', 'npcKills', 'npcDelta'];
 
-function ActivityChartsView({ data }: { data: HourlyPoint[] }) {
+function ActivityChartsView({ data: raw }: { data: HourlyPoint[] }) {
   const { t } = useTranslation();
+  // Placed by real hour: the newest point is usually last hour's, since CCP
+  // publishes an hour's counts some way into the next one.
+  const { points: data, lag } = useMemo(() => alignHourly(raw, SLOTS), [raw]);
   // Per-chart visibility — defaults on, persisted cross-device via
   // users.ui_settings. Keys mirror the toggle labels in Map Options.
   const [showJumps]     = useUserSetting<boolean>('nexum.activity.showJumps',     true);
@@ -451,6 +458,7 @@ function ActivityChartsView({ data }: { data: HourlyPoint[] }) {
       {toolbar}
       <div className={styles.pane}>
         <CombinedChart
+          lag={lag}
           series={mergeable.map((k) => ({
             key: k, title: charts[k].title, color: charts[k].color, values: charts[k].values,
           }))}
@@ -465,6 +473,7 @@ function ActivityChartsView({ data }: { data: HourlyPoint[] }) {
               values={charts[key].values}
               color={charts[key].color}
               signed={charts[key].signed}
+              lag={lag}
             />
           </div>
         ))}
@@ -489,6 +498,7 @@ function ActivityChartsView({ data }: { data: HourlyPoint[] }) {
               values={charts[key].values}
               color={charts[key].color}
               signed={charts[key].signed}
+              lag={lag}
             />
           ))}
         </div>
