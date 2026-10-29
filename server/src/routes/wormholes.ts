@@ -128,8 +128,10 @@ async function loadSpecs(): Promise<Record<string, WormholeSpec>> {
         totalMass:     Math.round(parseFloat(row.total_mass   ?? '0')),
         maxJumpMass:   Math.round(parseFloat(row.max_jumpable ?? '0')),
         massRegen:     Math.round(parseFloat(row.mass_regen   ?? '0')),
+        // The attribute is minutes. Keep a tenth of an hour: frigate holes live
+        // 270 min, and whole hours turned their 4.5 h into 5 h everywhere.
         lifetimeHours: row.max_time != null
-                         ? Math.round(parseFloat(row.max_time) / 60) // attr is minutes
+                         ? Math.round(parseFloat(row.max_time) / 6) / 10
                          : cur?.lifetime ?? 0,
         dest,
         src:           cur?.src ?? [],
