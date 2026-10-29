@@ -23,8 +23,8 @@ import { XIcon, CopyIcon, ColumnsIcon, CheckIcon, XCircleIcon } from '../../icon
 import { LeadsToDropdown } from './LeadsToDropdown';
 import { loadStargateNeighbors, isKnownStargateAdjacent } from '../../utils/stargateAdjacency';
 import { toast } from '../../utils/toastStore';
-import { GHOST_SUFFIX, GHOST_TIERS, defaultGhostTier, ghostTier } from '../../utils/ghostSites';
-import { leadsToFromSigName } from '../../utils/whDest';
+import { GHOST_TIERS, defaultGhostTier, ghostTier } from '../../utils/ghostSites';
+import { parseSigClipboard, pasteUpdatesFor, type ParsedSig } from '../../utils/sigPaste';
 import { reevaluateConnectionsForSystem } from '../../utils/whAutoDetect';
 import { alertInboundK162 } from '../../utils/k162Alert';
 import { formatBookmarkName, DEFAULT_BOOKMARK_FORMAT, formatSiteBookmarkName, DEFAULT_SITE_BOOKMARK_FORMAT } from '../../utils/signatureBookmark';
@@ -96,49 +96,6 @@ const SIG_TYPE_LABELS: Record<SigType, string> = {
   ore:      'Ore',
   ghost:    'Ghost',
 };
-
-const EVE_GROUP_TO_TYPE: Record<string, SigType> = {
-  'data site':   'data',
-  'gas site':    'gas',
-  'relic site':  'relic',
-  'combat site': 'combat',
-  'ore site':    'ore',
-  'wormhole':    'wormhole',
-};
-
-interface ParsedSig { sigId: string; sigType: SigType; name: string; whLeadsTo: string; }
-
-function parseSigClipboard(text: string): ParsedSig[] {
-  return text
-    .split('\n')
-    .map((l) => l.trim())
-    .filter(Boolean)
-    .flatMap((line): ParsedSig[] => {
-      const parts = line.split('\t');
-      const sigId = parts[0]?.trim().toUpperCase() ?? '';
-      if (!/^[A-Z]{3}-\d{3}$/.test(sigId)) return [];
-      // Skip cosmic anomalies — they live in the Anomalies pane. The scanner's
-      // group column ("Cosmic Anomaly" vs "Cosmic Signature") lets a single
-      // Ctrl+A/Ctrl+C of the whole window route each row to the right pane.
-      // Rows without a group column (partial/manual pastes) still pass through.
-      if ((parts[1]?.trim().toLowerCase() ?? '') === 'cosmic anomaly') return [];
-      const group = parts[2]?.trim() ?? '';
-      const col3 = parts[3]?.trim() ?? '';
-      const name = /^\d+\.?\d*%$/.test(col3) ? '' : col3;
-      // Ghost sites report as an ordinary site in the scanner's type column —
-      // the name is what gives them away ("Superior Blood Raider Covert
-      // Research Facility"). Same string the server already uses to log them.
-      const sigType: SigType = GHOST_SUFFIX.test(name)
-        ? 'ghost'
-        : (EVE_GROUP_TO_TYPE[group.toLowerCase()] ?? 'unknown');
-      // "Unidentified Wormhole" is a Drifter hole and says so before anyone
-      // identifies it. Only for a row we already know is a wormhole — the
-      // leads-to cell isn't rendered for other types, so it would be storing a
-      // value nobody could see or correct.
-      const whLeadsTo = sigType === 'wormhole' ? leadsToFromSigName(name) : '';
-      return [{ sigId, sigType, name, whLeadsTo }];
-    });
-}
 
 // A signature carrying no information at all: no scan ID, no name, no notes, no
 // wormhole data, and the default 'unknown' type — i.e. an "Add signature" row
@@ -941,12 +898,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
     for (const p of parsed) {
       const match = existing.find((s) => s.sigId.toUpperCase() === p.sigId.toUpperCase());
       if (match) {
-        const updates: Partial<Signature> = {};
-        if (p.sigType !== 'unknown') updates.sigType = p.sigType;
-        if (p.name) updates.name = p.name;
-        // Fill a blank only — never overwrite a destination someone scouted.
-        if (p.whLeadsTo && !match.whLeadsTo) updates.whLeadsTo = p.whLeadsTo;
-        toUpdate.push({ id: match.id, updates });
+        toUpdate.push({ id: match.id, updates: pasteUpdatesFor(match, p) });
       } else {
         toCreate.push(p);
       }

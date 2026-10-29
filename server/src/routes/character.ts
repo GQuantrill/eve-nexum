@@ -170,7 +170,11 @@ async function getLocationPayload(userId: number): Promise<LocationPayload> {
     db.query(`INSERT INTO user_events (user_id, event_type) VALUES ($1, 'jump')`, [userId]).catch(console.error);
   }
   if (prevSys !== loc.solarSystemId) {
-    db.query(`UPDATE users SET last_known_system_id = $1, last_known_system_at = NOW() WHERE id = $2`,
+    // Awaited, not fire-and-forget: a contributor's tracked add is checked
+    // against last_known_system_id (contributorIsAtSystem), and the client
+    // posts that add as soon as this response says they moved. Answering first
+    // would race the write and get the add refused. Only runs on a move.
+    await db.query(`UPDATE users SET last_known_system_id = $1, last_known_system_at = NOW() WHERE id = $2`,
       [loc.solarSystemId, userId]).catch(console.error);
   }
   lastSeenSystem.set(userId, loc.solarSystemId);

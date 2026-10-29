@@ -4,6 +4,13 @@ vi.mock('../services/entityNames.js', () => ({
   resolveEntityNames: async (ids: Array<number | null | undefined>) =>
     new Map(ids.filter((x): x is number => !!x).map((id) => [id, { name: `name-${id}` }])),
 }));
+// The stored half of the kill list is Postgres. These tests are about merging
+// the in-memory live buffer, so give them an empty store rather than whatever
+// database .env happens to point at (no DB, or a wrong password, failed them
+// locally while CI's empty test DB let them pass).
+vi.mock('../services/killStore.js', () => ({
+  killsInSystems: async () => ({ kills: [], total: 0 }),
+}));
 
 import { liveKillToEntry, withLiveKills, type KillEntry } from './killboard.js';
 import { recordKill, type BufferedKill } from '../services/killBuffer.js';
