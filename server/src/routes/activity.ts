@@ -11,7 +11,12 @@ router.use(optionalAuth);
 const ESI         = 'https://esi.evetech.net/v1';
 const HOUR_MS     = 60 * 60 * 1000;
 const MAX_HISTORY = 24;
+// Fallback cache lifetime when ESI sends no Expires header.
 const ESI_CACHE_TTL = 5 * 60 * 1000;
+// Never treat a snapshot as stale sooner than this, even if its Expires has
+// already passed: CCP is sometimes late cutting the next one, and refetching on
+// every request until it does would hammer ESI for the same bytes.
+const MIN_CACHE_MS  = 60 * 1000;
 
 export interface HourlyPoint {
   hour:      number;
@@ -27,6 +32,10 @@ interface EsiSnapshot {
   jumps:     Map<number, number>;
   kills:     Map<number, EsiKill>;
   fetchedAt: number;
+  /** The hour this snapshot's counts belong to -- see snapshotHour. */
+  hour:      number;
+  /** When ESI says the next snapshot is due (its Expires header). */
+  expiresAt: number;
 }
 
 const systemHistory  = new Map<number, HourlyPoint[]>();
@@ -45,9 +54,26 @@ function hourFloor(ts = Date.now()): number {
   return ts - (ts % HOUR_MS);
 }
 
+// CCP rebuilds system_jumps / system_kills once an hour on its OWN cycle, not on
+// the hour (lately about a quarter past): Last-Modified is when a snapshot was
+// cut, it counts roughly the hour before that, and Expires is when the next one
+// is due. Filing a snapshot under the hour it was FETCHED in labelled most hours
+// wrong -- data for 08:15-09:15 fetched at 10:05 landed in the 10:00 bucket.
+// Instead it goes in the hour holding most of its window: the one containing
+// the window's midpoint, half an hour before the cut.
+export function snapshotHour(lastModifiedMs: number): number {
+  return hourFloor(lastModifiedMs - HOUR_MS / 2);
+}
+
+function headerMs(res: Response, name: string): number | null {
+  const v = res.headers.get(name);
+  const ms = v ? Date.parse(v) : NaN;
+  return Number.isFinite(ms) ? ms : null;
+}
+
 async function fetchEsi(): Promise<EsiSnapshot | null> {
   const now = Date.now();
-  if (esiCache && now - esiCache.fetchedAt < ESI_CACHE_TTL) return esiCache;
+  if (esiCache && now < Math.max(esiCache.expiresAt, esiCache.fetchedAt + MIN_CACHE_MS)) return esiCache;
   // Promise-cached so concurrent callers share one fetch (the old boolean
   // soft-lock raced — two callers could both see fetching=false).
   if (fetching) return fetching;
@@ -65,10 +91,16 @@ async function fetchEsi(): Promise<EsiSnapshot | null> {
         kRes.json() as Promise<EsiKill[]>,
       ]);
 
+      // Both endpoints are cut together; the kills one names the hour. Refresh
+      // when the later of the two is due, so neither is read stale.
+      const cutAt   = headerMs(kRes, 'last-modified') ?? headerMs(jRes, 'last-modified') ?? now;
+      const expires = Math.max(headerMs(kRes, 'expires') ?? 0, headerMs(jRes, 'expires') ?? 0);
       esiCache = {
         jumps:     new Map(jumps.map((j) => [j.system_id, j.ship_jumps])),
         kills:     new Map(kills.map((k) => [k.system_id, k])),
         fetchedAt: now,
+        hour:      snapshotHour(cutAt),
+        expiresAt: expires > 0 ? expires : now + ESI_CACHE_TTL,
       };
       return esiCache;
     } catch {
@@ -110,7 +142,7 @@ async function recordSnapshot(): Promise<void> {
   const snap = await fetchEsi();
   if (!snap) return;
 
-  const hour     = hourFloor();
+  const hour     = snap.hour;
   const hourDate = new Date(hour);
 
   // Union of every system that appears in either ESI snapshot — these are
@@ -143,8 +175,11 @@ async function recordSnapshot(): Promise<void> {
     };
     const history = systemHistory.get(sysId);
     if (history) {
-      if (history.length > 0 && history[history.length - 1].hour === hour) {
+      const last = history[history.length - 1];
+      if (last && last.hour === hour) {
         history[history.length - 1] = point;
+      } else if (last && last.hour > hour) {
+        // An older snapshot than one we already hold -- nothing to add.
       } else {
         history.push(point);
         if (history.length > MAX_HISTORY) history.shift();
@@ -194,12 +229,31 @@ async function pruneOldRows(): Promise<void> {
 // fire-on-import pattern would swallow a "relation does not exist" error and
 // then race writes against the migration on cold start.
 //
-// On boot we immediately call recordSnapshot() so the current hour's data
-// is captured (or refreshed via ON CONFLICT if a row already exists from
-// a previous server lifetime). Then a 61-minute interval keeps us
-// comfortably past CCP's 60-minute cache TTL on every subsequent poll,
-// so we never refetch the same hourly aggregate twice in a row.
-const POLL_MS = 61 * 60 * 1000;
+// On boot we immediately call recordSnapshot() so the latest snapshot is
+// captured (or refreshed via ON CONFLICT if a row already exists from a
+// previous server lifetime). After that each poll is timed off the snapshot's
+// own Expires, plus a short margin for ESI's cache to turn over, so a new
+// snapshot is picked up within a minute or so of CCP publishing it. A fixed
+// 61-minute interval drifted against CCP's cycle: the lag wandered between 0
+// and 60 minutes and, a minute later every hour, it skipped a snapshot outright
+// about every 60 hours.
+const POLL_MARGIN_MS = 30 * 1000;
+const POLL_MAX_MS    = 65 * 60 * 1000;
+
+/** Delay until the next poll, given when ESI says the next snapshot is due. */
+export function nextPollDelay(expiresAt: number | null, now = Date.now()): number {
+  if (expiresAt == null) return ESI_CACHE_TTL; // no snapshot yet (ESI down): retry soon
+  return Math.min(POLL_MAX_MS, Math.max(MIN_CACHE_MS, expiresAt - now + POLL_MARGIN_MS));
+}
+
+function schedulePoll(): void {
+  const t = setTimeout(async () => {
+    try { await recordSnapshot(); }
+    catch (err) { console.error('[activity] poll failed:', err); }
+    schedulePoll();
+  }, nextPollDelay(esiCache?.expiresAt ?? null));
+  t.unref?.();
+}
 
 export async function initActivity(): Promise<void> {
   await pruneOldRows();
@@ -209,9 +263,7 @@ export async function initActivity(): Promise<void> {
   try { await recordSnapshot(); }
   catch (err) { console.error('[activity] boot snapshot failed:', err); }
 
-  setInterval(() => {
-    recordSnapshot().catch((err) => console.error('[activity] poll failed:', err));
-  }, POLL_MS);
+  schedulePoll();
 }
 
 // Player kills in the system by UTC hour of day over the last 90 days, from the
