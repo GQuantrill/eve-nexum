@@ -3,9 +3,8 @@
 # record points at this host. Layer it on top of the base + traefik files:
 #   docker compose -f docker-compose.yml -f docker-compose.traefik.yml -f docker-compose.www.yml up -d --build
 #
-# build-traefik.sh / .ps1 add this file automatically when DOMAIN is an apex
-# (one dot, e.g. eve-nexum.com) and leave it out for subdomains. WWW_REDIRECT=1
-# or 0 overrides that.
+# build-traefik.sh / .ps1 include this file unless WWW_REDIRECT=0 -- set that
+# on a subdomain instance.
 #
 # DO NOT use this on a subdomain deployment (e.g. DOMAIN=nexum.example.com or a
 # QA stack on qa.<DOMAIN>): www.<subdomain> won't resolve, so its ACME order

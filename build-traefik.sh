@@ -24,22 +24,17 @@ main() {
 
   local compose=(-f docker-compose.yml -f docker-compose.traefik.yml)
 
-  # docker-compose.www.yml adds the www.<DOMAIN> -> apex 301 redirect. It only
-  # belongs on an apex domain with a www DNS record (prod, eve-nexum.com). On a
-  # subdomain instance (karmafleet.eve-nexum.com, qa.eve-nexum.com) the name
-  # www.<subdomain> can't resolve -- the *.eve-nexum.com wildcard is one label
-  # deep -- so its certificate order failed on every Traefik start. Unset, it's
-  # on only when DOMAIN has a single dot; WWW_REDIRECT=1 or 0 forces it.
-  local domain="${DOMAIN:-$(sed -n 's/^DOMAIN=//p' .env 2>/dev/null | tail -1 | tr -d "\"'\r")}"
-  local www="${WWW_REDIRECT:-}"
-  if [[ -z "${www}" ]]; then
-    if [[ "${domain}" =~ ^[^.]+\.[^.]+$ ]]; then www=1; else www=0; fi
-  fi
-  if [[ "${www}" == "1" ]]; then
-    compose+=(-f docker-compose.www.yml)
-    echo "==> www.${domain} -> ${domain} redirect: on"
+  # docker-compose.www.yml adds the www.<DOMAIN> -> apex 301 redirect, and is
+  # included as it always has been. Set WWW_REDIRECT=0 (in the environment or
+  # .env) on an instance served from a SUBDOMAIN (karmafleet.eve-nexum.com,
+  # qa.eve-nexum.com): www.<subdomain> can't resolve -- the *.eve-nexum.com
+  # wildcard is one label deep -- so its certificate order fails on every
+  # Traefik start.
+  local www="${WWW_REDIRECT:-$(sed -n 's/^WWW_REDIRECT=//p' .env 2>/dev/null | tail -1 | tr -d "\"'\r")}"
+  if [[ "${www}" == "0" ]]; then
+    echo "==> www redirect: off (WWW_REDIRECT=0)"
   else
-    echo "==> www redirect: off (DOMAIN=${domain:-unset})"
+    compose+=(-f docker-compose.www.yml)
   fi
 
   # Opt-in: set PG_HOST_BIND to publish Postgres on the host (loopback by
