@@ -40,22 +40,31 @@ export const EFFECT_LABELS: Record<WormholeEffect, string> = {
 export const WORMHOLE_DESTINATIONS: Record<string, SystemClass> = {
   // → C1
   P060: 'C1', Q317: 'C1', Y790: 'C1', Z647: 'C1', Z971: 'C1',
+  H121: 'C1', V301: 'C1',
   // → C2
   D364: 'C2', D382: 'C2', G024: 'C2', N766: 'C2',
+  C125: 'C2', I182: 'C2', R943: 'C2',
   // → C3
   C247: 'C3', L477: 'C3', M267: 'C3', O477: 'C3',
+  N968: 'C3', O883: 'C3', X702: 'C3',
   // → C4
   E175: 'C4', X877: 'C4', Y683: 'C4', Z457: 'C4',
+  M609: 'C4', O128: 'C4', T405: 'C4',
   // → C5
   H296: 'C5', H900: 'C5', N062: 'C5', N432: 'C5', V911: 'C5',
+  L614: 'C5', M555: 'C5', N770: 'C5',
   // → C6
   R474: 'C6', U574: 'C6', V753: 'C6', W237: 'C6',
+  A982: 'C6', B041: 'C6', S804: 'C6', U319: 'C6',
   // → Hi-Sec
   B274: 'HS', D845: 'HS', N110: 'HS', Q063: 'HS',
+  A641: 'HS', B449: 'HS', B520: 'HS', D792: 'HS',
   // → Low-Sec
   A239: 'LS', J244: 'LS', U210: 'LS', V898: 'LS',
+  C140: 'LS', C391: 'LS', N290: 'LS', N944: 'LS', R051: 'LS',
   // → Null-Sec
   E545: 'NS', E587: 'NS', K346: 'NS', S047: 'NS', Z060: 'NS',
+  C248: 'NS', K329: 'NS', S199: 'NS', V283: 'NS', Z142: 'NS',
   // → Thera
   F135: 'Thera', F353: 'Thera', L031: 'Thera', M164: 'Thera', T458: 'Thera',
   // → C13 (shattered)
