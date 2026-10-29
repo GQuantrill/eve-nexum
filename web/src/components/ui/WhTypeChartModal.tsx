@@ -3,30 +3,13 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { XIcon } from '../../icons';
 import { CLASS_COLORS } from '../../data/wormholes';
-import { WH_JUMP_MASS } from '../../utils/wormholeSize';
 import type { SystemClass } from '../../types';
 import {
   WH_CHART, RESPAWN_ORDER, SPAWN_ORDER, LEADS_ORDER, SHIP_ORDER, MASS_ORDER, LIFE_ORDER,
-  type WhChartEntry, type Respawn, type ShipSize,
+  type WhChartEntry, type Respawn,
 } from '../../data/whTypeChart';
+import { shipSizeFromSde, totalMassFromSde, lifetimeFromSde } from '../../utils/whChartSde';
 import { useWormholeTypes } from '../../hooks/useWormholeTypes';
-
-// The chart's ship-size column is derived live from the SDE per-jump cap
-// (wormholeMaxJumpMass) so it can't drift from a CCP rebalance. Maps to the
-// chart's five descriptive tiers; null when a code has no dogma (keeps the
-// curated value).
-function shipSizeFromSde(
-  code: string,
-  whTypes: Record<string, { maxJumpMass?: number } | undefined>,
-): ShipSize | null {
-  const m = whTypes[code.toUpperCase()]?.maxJumpMass;
-  if (!m) return null;
-  if (m >= WH_JUMP_MASS.capital) return 'up to Capital';
-  if (m >= WH_JUMP_MASS.xl)      return 'up to Freighter';
-  if (m >= WH_JUMP_MASS.large)   return 'up to Battleship';
-  if (m >= WH_JUMP_MASS.medium)  return 'up to Battlecruiser';
-  return 'up to Destroyer';
-}
 
 // A Nexum take on whtype.info: hover ANY cell — a wormhole code OR an attribute
 // value — and lines connect a code to its values (or a value to every code that
@@ -87,9 +70,16 @@ function attrKeysFor(e: WhChartEntry): string[] {
 export function WhTypeChartModal({ onClose }: { onClose: () => void }) {
   const { t } = useTranslation();
   const whTypes = useWormholeTypes();
-  // Override each entry's hardcoded ship_size with the SDE-derived size.
+  // Override each entry's hardcoded ship size, total mass and lifetime with the
+  // SDE's, so a CCP rebalance (or a slip in the bundled table) can't leave the
+  // chart wrong. The bundled values only stand in where the SDE has nothing.
   const chart = useMemo(
-    () => WH_CHART.map((e) => ({ ...e, ship_size: shipSizeFromSde(e.wormhole, whTypes) ?? e.ship_size })),
+    () => WH_CHART.map((e) => ({
+      ...e,
+      ship_size:  shipSizeFromSde(e.wormhole, whTypes) ?? e.ship_size,
+      total_mass: totalMassFromSde(e.wormhole, whTypes) ?? e.total_mass,
+      life_time:  lifetimeFromSde(e.wormhole, whTypes) ?? e.life_time,
+    })),
     [whTypes],
   );
   const [active, setActive] = useState<Active>(null);
