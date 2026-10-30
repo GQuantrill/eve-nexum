@@ -10,7 +10,8 @@ describe('settings allowlist', () => {
     for (const k of [
       'nexum.toolbar.order', 'nexum.minimap.position', 'nexum.panelSideBySide',
       'nexum.floatingPanels', 'nexum.sigPane.hiddenCols', 'nexum.anomPane.hiddenCols',
-      'nexum.sidebar.order', 'nexum.sig.bookmarkFormat', 'nexum.a11y.colorVision',
+      'nexum.sidebar.order', 'nexum.sig.bookmarkFormat', 'nexum.sig.k162BookmarkFormat',
+      'nexum.a11y.colorVision',
     ]) {
       expect(settingAllowed(k), k).toBe(true);
     }

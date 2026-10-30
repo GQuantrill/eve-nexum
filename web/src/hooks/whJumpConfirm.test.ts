@@ -56,6 +56,14 @@ describe('copy the bookmark name after a jump', () => {
     expect(copy).toHaveBeenCalledWith('XYZ-789 C2 L');
   });
 
+  it('copies a jumped K162 with the K162 format when the pilot has one', async () => {
+    settings['nexum.sig.bookmarkFormat'] = '{sig} {dest_type}';
+    settings['nexum.sig.k162BookmarkFormat'] = 'OUT {sig_letters} {leads_to}';
+    sigs.push(hole({ whType: 'K162' }));
+    await maybeConfirmWhJump(ctx);
+    expect(copy).toHaveBeenCalledWith('OUT ABC Home');
+  });
+
   it('copies nothing when the pilot has turned it off', async () => {
     settings['nexum.sig.copyBookmarkOnJump'] = false;
     sigs.push(hole({}));

@@ -27,7 +27,10 @@ import { GHOST_TIERS, defaultGhostTier, ghostTier } from '../../utils/ghostSites
 import { parseSigClipboard, pasteUpdatesFor, type ParsedSig } from '../../utils/sigPaste';
 import { reevaluateConnectionsForSystem } from '../../utils/whAutoDetect';
 import { alertInboundK162 } from '../../utils/k162Alert';
-import { formatBookmarkName, DEFAULT_BOOKMARK_FORMAT, formatSiteBookmarkName, DEFAULT_SITE_BOOKMARK_FORMAT } from '../../utils/signatureBookmark';
+import {
+  formatBookmarkName, DEFAULT_BOOKMARK_FORMAT, formatSiteBookmarkName, DEFAULT_SITE_BOOKMARK_FORMAT,
+  K162_BOOKMARK_FORMAT_KEY, wormholeBookmarkFormat,
+} from '../../utils/signatureBookmark';
 import { useWormholeTypes } from '../../hooks/useWormholeTypes';
 import { duration, DASH } from '../../i18n/format';
 import {
@@ -541,11 +544,11 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   // Token format for the per-row "copy bookmark name" button. The map can set a
   // shared format so everyone on it copies holes identically; when it hasn't,
   // each user falls back to their own global format (edited in Map Options).
+  // A K162 can have its own personal format (outbound holes are often named
+  // differently); see wormholeBookmarkFormat for the order.
   const [userBookmarkFormat] = useUserSetting<string>('nexum.sig.bookmarkFormat', DEFAULT_BOOKMARK_FORMAT);
+  const [userK162BookmarkFormat] = useUserSetting<string>(K162_BOOKMARK_FORMAT_KEY, '');
   const mapBookmarkFormat = useMapStore((s) => s.map.bookmarkFormat);
-  const bookmarkFormat = mapBookmarkFormat && mapBookmarkFormat.trim()
-    ? mapBookmarkFormat
-    : userBookmarkFormat;
   // Same map-overrides-personal resolution for the relic/data/gas SITE format.
   const [userSiteBookmarkFormat] = useUserSetting<string>('nexum.sig.siteBookmarkFormat', DEFAULT_SITE_BOOKMARK_FORMAT);
   const mapSiteBookmarkFormat = useMapStore((s) => s.map.siteBookmarkFormat);
@@ -580,14 +583,15 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   }, [mapSystems]);
 
   const copyBookmark = useCallback((sig: Signature) => {
-    const name = formatBookmarkName(bookmarkFormat, sig, whTypes, Date.now(),
+    const format = wormholeBookmarkFormat(sig, mapBookmarkFormat, userBookmarkFormat, userK162BookmarkFormat);
+    const name = formatBookmarkName(format, sig, whTypes, Date.now(),
       (n) => classBySystemName.get(n.trim().toUpperCase()) ?? null,
       (n) => aliasBySystemName.get(n.trim().toUpperCase()) ?? null);
     if (!name) return;
     navigator.clipboard.writeText(name)
       .then(() => toast.success(t('signatures.bookmarkCopied', { name })))
       .catch(() => toast.error(t('signatures.bookmarkCopyFailed')));
-  }, [bookmarkFormat, whTypes, classBySystemName, aliasBySystemName, t]);
+  }, [mapBookmarkFormat, userBookmarkFormat, userK162BookmarkFormat, whTypes, classBySystemName, aliasBySystemName, t]);
 
   const copySiteBookmark = useCallback((sig: Signature) => {
     const name = formatSiteBookmarkName(siteBookmarkFormat, sig);

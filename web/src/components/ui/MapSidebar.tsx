@@ -24,7 +24,7 @@ import { useUserSetting } from "../../hooks/useUserSetting";
 import { normalizePlacement } from "../../hooks/useLocationTracking";
 import { NOTIFY, notifyDefault, previewAlertVolume, ALERT_VOLUME_KEY, ALERT_VOLUME_DEFAULT, EXITS_MIN_SECURITY_KEY, EXITS_MIN_SECURITY_DEFAULT, EXITS_MIN_SECURITY_OFF, KILLS_FILTER_KEY, KILLS_FILTER_DEFAULT, type KillsFilter } from "../../utils/notificationPrefs";
 import { useResettableState } from "../../hooks/useResettableState";
-import { DEFAULT_BOOKMARK_FORMAT, BOOKMARK_TOKENS, DEFAULT_SITE_BOOKMARK_FORMAT, SITE_BOOKMARK_TOKENS } from "../../utils/signatureBookmark";
+import { DEFAULT_BOOKMARK_FORMAT, BOOKMARK_TOKENS, DEFAULT_SITE_BOOKMARK_FORMAT, SITE_BOOKMARK_TOKENS, K162_BOOKMARK_FORMAT_KEY } from "../../utils/signatureBookmark";
 import { COPY_BOOKMARK_ON_JUMP } from "../../hooks/whJumpConfirm";
 import { toPng } from "html-to-image";
 import { CaretLeftIcon, CaretRightIcon, DiscordLogoIcon } from "@phosphor-icons/react";
@@ -954,6 +954,7 @@ export function MapSidebar() {
   const [colorVision, setColorVision] = useUserSetting<string>("nexum.a11y.colorVision", "off");
   const [sigBookmarkFmt, setSigBookmarkFmt] = useUserSetting<string>("nexum.sig.bookmarkFormat", DEFAULT_BOOKMARK_FORMAT);
   const [siteBookmarkFmt, setSiteBookmarkFmt] = useUserSetting<string>("nexum.sig.siteBookmarkFormat", DEFAULT_SITE_BOOKMARK_FORMAT);
+  const [k162BookmarkFmt, setK162BookmarkFmt] = useUserSetting<string>(K162_BOOKMARK_FORMAT_KEY, "");
   const uniformSize = useMapStore((s) => s.uniformSize);
   const setUniformSize = useMapStore((s) => s.setUniformSize);
   const showStatics = useMapStore((s) => s.showStatics);
@@ -2137,6 +2138,11 @@ export function MapSidebar() {
                       <li key={b.token}><code>{b.token}</code> - {b.desc}</li>
                     ))}
                   </ul>
+                  <div className="map-sidebar__field">
+                    <label className="map-sidebar__label" htmlFor="k162-bookmark-fmt">{t("mapSidebar.k162Bookmark")}</label>
+                    <input id="k162-bookmark-fmt" className="map-sidebar__select map-sidebar__select--full" type="text" spellCheck={false} value={k162BookmarkFmt} onChange={(e) => setK162BookmarkFmt(e.target.value)} placeholder={t("mapSidebar.k162BookmarkPlaceholder")} />
+                  </div>
+                  <p className="map-sidebar__help">{t("mapSidebar.k162BookmarkHelp")}</p>
                   <SettingToggle settingKey={COPY_BOOKMARK_ON_JUMP} label={t("mapSidebar.copyBookmarkOnJump")} />
                   <p className="map-sidebar__help">{t("mapSidebar.copyBookmarkOnJumpHelp")}</p>
                   <div className="map-sidebar__field">
