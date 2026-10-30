@@ -68,6 +68,7 @@ import { pickHandles } from './edgeUtils';
 import { setDestination, addWaypoint } from '../../api/waypoint';
 import { SendToCharactersModal } from '../ui/SendToCharactersModal';
 import { useSendToStore } from '../../store/sendToStore';
+import { usePresenceStore } from '../../store/presenceStore';
 import { toast } from '../../utils/toastStore';
 import i18n from '../../i18n';
 import { useCustomIntel } from '../../hooks/useCustomIntel';
@@ -220,7 +221,10 @@ export function MapCanvas() {
   const setRouteOrigin       = useMapStore((s) => s.setRouteOrigin);
   const requestCenterOnEveSystem = useMapStore((s) => s.requestCenterOnEveSystem);
   const accountLocations     = useAccountLocations();
-  const pushUndo             = useMapStore((s) => s.pushUndo);
+  // Who's viewing this map and where — read by the bulk-remove sweeps so they
+  // never delete a system someone is sitting in.
+  const presenceBySystem     = usePresenceStore((s) => s.bySystem);
+  const pushUndo            = useMapStore((s) => s.pushUndo);
   const canEdit              = useCanEdit();
   const { screenToFlowPosition, setViewport, getViewport, getNode, getNodes, getZoom, fitView } = useReactFlow();
   // Invert mouse-wheel / trackpad zoom (per-user, cross-device). Off by default.
@@ -1650,11 +1654,23 @@ export function MapCanvas() {
       ];
     }
 
+    // Systems a pilot is in: you, anyone else viewing this map, your alts and
+    // your fleet. Both sweeps skip them. A hole whose only link expired is
+    // still where you're sitting, and deleting it under you loses its sigs.
+    const occupied = (s: typeof systems[number]) =>
+      s.id === currentSystemId ||
+      (s.eveSystemId != null && (
+        !!presenceBySystem.get(s.eveSystemId)?.length ||
+        !!accountLocations.bySystem.get(s.eveSystemId)?.length ||
+        !!heatFleet.bySystem.get(s.eveSystemId)?.length
+      ));
+
     // Orphans: systems with no *valid* connection — either no connection at all,
-    // or only broken (quarantined) ones. Home and locked systems are protected.
+    // or only broken (quarantined) ones. Home, locked and occupied systems are
+    // protected.
     const orphanIds = systems
       .filter((s) =>
-        !s.isHome && !s.locked &&
+        !s.isHome && !s.locked && !occupied(s) &&
         !connections.some((c) => !c.broken && (c.sourceId === s.id || c.targetId === s.id)),
       )
       .map((s) => s.id);
@@ -1683,9 +1699,9 @@ export function MapCanvas() {
           queue.push(next);
         }
       }
-      // Locked systems are protected, same as the orphan sweep — locking one is
-      // how you say "leave this alone".
-      return systems.filter((sys) => !reached.has(sys.id) && !sys.locked).map((sys) => sys.id);
+      // Locked and occupied systems are protected, same as the orphan sweep —
+      // locking one is how you say "leave this alone".
+      return systems.filter((sys) => !reached.has(sys.id) && !sys.locked && !occupied(sys)).map((sys) => sys.id);
     })();
 
     return [
