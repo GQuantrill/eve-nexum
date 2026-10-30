@@ -7,7 +7,9 @@ import i18n from '../i18n';
 import type { Signature } from '../types';
 import { readUserSetting } from './useUserSetting';
 import { wormholeTypesSnapshot } from './useWormholeTypes';
-import { formatBookmarkName, DEFAULT_BOOKMARK_FORMAT } from '../utils/signatureBookmark';
+import {
+  formatBookmarkName, DEFAULT_BOOKMARK_FORMAT, K162_BOOKMARK_FORMAT_KEY, wormholeBookmarkFormat,
+} from '../utils/signatureBookmark';
 import { copyWhenFocused } from '../utils/copyWhenFocused';
 
 export const COPY_BOOKMARK_ON_JUMP = 'nexum.sig.copyBookmarkOnJump';
@@ -19,9 +21,9 @@ export const COPY_BOOKMARK_ON_JUMP = 'nexum.sig.copyBookmarkOnJump';
 function copyJumpedBookmark(sig: Signature): void {
   if (!readUserSetting<boolean>(COPY_BOOKMARK_ON_JUMP, true)) return;
   const map = useMapStore.getState().map;
-  const format = map.bookmarkFormat?.trim()
-    ? map.bookmarkFormat
-    : readUserSetting<string>('nexum.sig.bookmarkFormat', DEFAULT_BOOKMARK_FORMAT);
+  const format = wormholeBookmarkFormat(sig, map.bookmarkFormat,
+    readUserSetting<string>('nexum.sig.bookmarkFormat', DEFAULT_BOOKMARK_FORMAT),
+    readUserSetting<string>(K162_BOOKMARK_FORMAT_KEY, ''));
   const byName = (n: string) => map.systems.find((s) => s.name?.trim().toUpperCase() === n.trim().toUpperCase());
   const name = formatBookmarkName(format, sig, wormholeTypesSnapshot(), Date.now(),
     (n) => { const c = byName(n)?.systemClass; return c && c !== 'unknown' ? c : null; },

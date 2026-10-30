@@ -826,6 +826,7 @@ const SETTINGS_ALLOWLIST = new Set<string>([
   'nexum.watchlist.panelOpen',
   'nexum.sig.bookmarkFormat',
   'nexum.sig.siteBookmarkFormat',
+  'nexum.sig.k162BookmarkFormat',
   'nexum.sig.copyBookmarkOnJump',
   'nexum.sigPane.overwriteOnPaste',
   'nexum.sigPane.overwriteDelay',

@@ -23,6 +23,30 @@ export const BOOKMARK_TOKENS: { token: string; desc: string }[] = [
 // anyone who wants it, just not in the default.
 export const DEFAULT_BOOKMARK_FORMAT = '{sig} {dest_type} {size}';
 
+// Personal format for K162s only: many pilots name the outbound side of a hole
+// differently from the holes they scan down. Empty (the default) means a K162
+// uses the wormhole format like any other hole.
+export const K162_BOOKMARK_FORMAT_KEY = 'nexum.sig.k162BookmarkFormat';
+
+/**
+ * The format to copy a wormhole sig's bookmark with. A map's shared format is
+ * a policy for everyone on it, so it wins outright; otherwise a K162 takes the
+ * pilot's K162 format when they've set one, and every other hole (or a K162
+ * with no K162 format) takes their wormhole format.
+ */
+export function wormholeBookmarkFormat(
+  sig: Pick<Signature, 'whType'>,
+  mapFormat: string | null | undefined,
+  userFormat: string,
+  userK162Format: string | null | undefined,
+): string {
+  if (mapFormat && mapFormat.trim()) return mapFormat;
+  if ((sig.whType ?? '').trim().toUpperCase() === 'K162' && userK162Format && userK162Format.trim()) {
+    return userK162Format;
+  }
+  return userFormat;
+}
+
 // Per-jump mass -> short size letter. Reuses the canonical classifier in
 // wormholeSize.ts so the bookmark {size} can never drift from the connection
 // panel (it used to have its own off-by-one `<=` thresholds — a 62M/375M/1B
