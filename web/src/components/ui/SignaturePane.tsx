@@ -14,6 +14,7 @@ import { useUserSetting } from '../../hooks/useUserSetting';
 import { usePopover } from '../../hooks/usePopover';
 import type { Signature, SigType, MapConnection, MassStatus, TimeStatus } from '../../types';
 import { connectionForSig, effectiveWhState, lifePatch, LIFE_CYCLE } from '../../utils/whState';
+import { leadsToForTypeChange } from '../../utils/whDest';
 import { ConfirmModal } from './ConfirmModal';
 import { shouldSkipConfirm } from '../../utils/confirmPref';
 import { NotesEditor } from './NotesEditor';
@@ -1406,10 +1407,10 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                       : <WormholeTypePicker
                           value={sig.whType}
                           statics={systemStatics}
-                          onChange={(whType, leadsTo) => updateSig(sig.id, {
-                            whType,
-                            ...(!sig.whLeadsTo && leadsTo ? { whLeadsTo: leadsTo } : {}),
-                          })}
+                          onChange={(whType) => {
+                            const whLeadsTo = leadsToForTypeChange(sig.whType, whType, sig.whLeadsTo, whTypes);
+                            updateSig(sig.id, { whType, ...(whLeadsTo !== undefined ? { whLeadsTo } : {}) });
+                          }}
                         />
                   )}
                   {sig.sigType === 'ghost' && (

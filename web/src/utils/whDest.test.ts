@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { leadsToFromSigName, isUnresolvedLeadsTo, leadsToClasses } from './whDest';
+import { leadsToFromSigName, isUnresolvedLeadsTo, leadsToClasses, leadsToForTypeChange } from './whDest';
 
 describe('leadsToFromSigName', () => {
   // A Drifter hole is the only one the scanner calls "Unidentified"; every
@@ -61,5 +61,37 @@ describe('leads-to tokens offered by the picker', () => {
   it('a pinned system name is resolved, and names no class', () => {
     expect(isUnresolvedLeadsTo('J145359')).toBe(false);
     expect(leadsToClasses('J145359')).toEqual([]);
+  });
+});
+
+describe('leadsToForTypeChange', () => {
+  const types = { D382: { dest: 'c2' }, H296: { dest: 'c5' }, B274: { dest: 'hs' } };
+
+  it('fills an empty leads-to from the type', () => {
+    expect(leadsToForTypeChange('', 'D382', '', types)).toBe('C2');
+  });
+
+  it('replaces the class the previous type filled in when the type is corrected', () => {
+    expect(leadsToForTypeChange('D382', 'H296', 'C2', types)).toBe('C5');
+    expect(leadsToForTypeChange('D382', 'B274', 'c2', types)).toBe('HS');
+  });
+
+  it('keeps a pinned system name', () => {
+    expect(leadsToForTypeChange('D382', 'H296', 'J123456', types)).toBeUndefined();
+  });
+
+  it('keeps a class picked by hand that the previous type did not imply', () => {
+    expect(leadsToForTypeChange('D382', 'H296', 'C4-C5', types)).toBeUndefined();
+    expect(leadsToForTypeChange('', 'H296', 'C3', types)).toBeUndefined();
+  });
+
+  it('clears the filled-in class when switching to K162 or clearing the type', () => {
+    expect(leadsToForTypeChange('D382', 'K162', 'C2', types)).toBe('');
+    expect(leadsToForTypeChange('D382', '', 'C2', types)).toBe('');
+  });
+
+  it('leaves an unchanged leads-to alone', () => {
+    expect(leadsToForTypeChange('', 'K162', '', types)).toBeUndefined();
+    expect(leadsToForTypeChange('D382', 'D382', 'C2', types)).toBeUndefined();
   });
 });
