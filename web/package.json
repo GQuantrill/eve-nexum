@@ -1,7 +1,7 @@
 {
   "name": "nexum-web",
   "private": true,
-  "version": "5.14.1",
+  "version": "5.14.2",
   "license": "AGPL-3.0-or-later",
   "type": "module",
   "author": {
@@ -62,6 +62,7 @@
     "brace-expansion": "^5.0.12",
     "browserslist": "^4.28.7",
     "kokoro-js": "1.2.1",
+    "minimatch": "^11.0.1",
     "postcss": "^8.5.18",
     "sharp": "^0.35.5",
     "source-map-js": "^1.2.2",
