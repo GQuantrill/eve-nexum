@@ -17,7 +17,7 @@
   flex-shrink: 0;
   position: relative;
 
-  > .btn { align-self: flex-end; }
+  > .btn, > .conn-remove { align-self: flex-end; }
 }
 
 /* ── Connection panel inside a floating window ─────────────────────────
@@ -44,7 +44,7 @@
 
   /* Base rule drops the button to the bottom of the strip, which in a wrapped
      window reads as a stray indent on its own line. Keep it with the content. */
-  > .btn { align-self: flex-start; }
+  > .btn, > .conn-remove { align-self: flex-start; }
 }
 /* Narrow windows: let a column take the full width rather than squeezing two
    side by side and overflowing. */
@@ -119,7 +119,8 @@
 }
 
 /* The handle moves to the left edge and drags horizontally. */
-.system-panel--side .system-panel__resize-handle {
+.system-panel--side .system-panel__resize-handle,
+.conn-side > .system-panel__resize-handle {
   top: 0;
   bottom: 0;
   left: 0;
@@ -498,6 +499,9 @@
 .roll-pass__btn--safe     { border-left-color: var(--success); }
 .roll-pass__btn--risky    { border-left-color: var(--warning); }
 .roll-pass__btn--collapse { border-left-color: var(--danger); }
+/* Disabled (hot pass over the hole's max jump) read exactly like enabled, so a
+   click looked like it did nothing. Same treatment as other disabled buttons. */
+.roll-pass__btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .roll-guidance {
   font-size: calc(12px * var(--font-scale, 1));

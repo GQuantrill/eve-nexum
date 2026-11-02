@@ -713,6 +713,7 @@
   },
   "connPanel": {
     "brokenNotice": "Connection broken — the backing wormhole sig was deleted. Kept on the map but quarantined from routing.",
+    "brokenNoticeRolled": "Connection collapsed — the rolling calculator logged enough mass to close it. Kept on the map but quarantined from routing. Undo the last pass if that was a mistake.",
     "flagLabel": "Flag",
     "flagAdd": "Add flag",
     "flagNotePlaceholder": "e.g. DO NOT ROLL - fleet inbound",
@@ -793,7 +794,8 @@
     "collapseConfirmStrand": " Your roller would be stranded on the Far side.",
     "collapseConfirmHome": " Your roller ends on the Home side.",
     "rollIt": "Roll it",
-    "removeConnection": "Remove Connection"
+    "removeConnection": "Remove connection only",
+    "removeConnectionAndSigs": "Remove connection and signatures"
   },
   "contentFilter": {
     "hint": "Spotlight systems by their scanned content. Pick signature or anomaly types, or search a site name; matching systems stay lit and the rest fade out.",
