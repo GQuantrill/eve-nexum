@@ -323,6 +323,10 @@
 }
 .system-panel--conn-side > .btn,
 .system-panel--conn-side > .conn-remove { align-self: flex-start; }
+/* The header keeps a 56px gutter for the system panel's corner buttons, which
+   are pinned out of the flow. This panel's undock/close sit in the flow, so the
+   gutter pushed them in from the edge once the header spans the column. */
+.system-panel--conn-side .system-panel__header { padding-right: 0; }
 /* The two remove buttons sit together wherever the single one used to. */
 .conn-remove {
   display: flex;
