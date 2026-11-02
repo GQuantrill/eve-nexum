@@ -220,14 +220,109 @@ export async function updateSignature(
   };
 }
 
+interface DeletedSig { sigId: string; name: string; whType: string; whLeadsTo: string }
+interface LinkRow {
+  id: string; sourceId: string; type: string | null;
+  sourceSigId: string | null; targetSigId: string | null;
+  otherName: string; otherClass: string;
+}
+
+/**
+ * The wormhole links a just-deleted sig was holding open, which nothing left in
+ * the system still holds. Same rules as the client's reevaluate on delete
+ * (utils/whAutoDetect.ts):
+ *  - a sig tied to the link (its backing signature, or pinned to the connected
+ *    system by name, typed or not) breaks it unless another sig is pinned there
+ *    by name;
+ *  - otherwise a sig whose type labels the link and whose leads-to points at the
+ *    other end breaks it when no remaining sig points there at all.
+ */
+function linksLeftOrphaned(systemId: string, sigId: string, deleted: DeletedSig, links: LinkRow[], remaining: DeletedSig[]): string[] {
+  const oldType = deleted.whType.toUpperCase();
+  const oldLeads = deleted.whLeadsTo.toUpperCase();
+  const out: string[] = [];
+  for (const c of links) {
+    const on = c.otherName.toUpperCase();
+    const oc = c.otherClass.toUpperCase();
+    const leadsHere = (s: DeletedSig) => {
+      const l = s.whLeadsTo.toUpperCase();
+      return !!s.whType && !!l && (l === on || l === oc);
+    };
+    const endSig = c.sourceId === systemId ? c.sourceSigId : c.targetSigId;
+    // Pinned by name counts with or without a type: a jump pins the hole it
+    // used to the arrival system before anyone has scanned its code.
+    const tiedOld = endSig === sigId || (!!on && oldLeads === on);
+    if (tiedOld) {
+      if (!remaining.some((s) => !!on && s.whLeadsTo.toUpperCase() === on)) out.push(c.id);
+      continue;
+    }
+    const labelledByOld = leadsHere(deleted) && !!c.type && c.type.toUpperCase() === oldType;
+    if (labelledByOld && !remaining.some(leadsHere)) out.push(c.id);
+  }
+  return out;
+}
+
+/**
+ * Delete a sig and quarantine (mark broken) any wormhole link it was holding.
+ *
+ * This used to be left to the browser, which only checked when the sig pane
+ * was showing that system as the delete landed. An overwrite paste deletes
+ * after a grace period, by which time the pilot has usually jumped on and the
+ * pane has followed them, so the link stayed live, was never stamped broken,
+ * and the broken-link cleanup never removed it. Doing it here, in the same
+ * transaction, catches every delete path.
+ */
 export async function deleteSignature(mapId: string, systemId: string, sigId: string, actor: WriteActor): Promise<void> {
-  const { rows } = await db.query<{ sigId: string; name: string }>(
-    `DELETE FROM map_signatures WHERE id = $1 AND system_id = $2 AND ${inThisMap(3)} RETURNING sig_id AS "sigId", name`,
-    [sigId, systemId, mapId],
-  );
+  const client = await db.connect();
+  let deleted: DeletedSig | undefined;
+  let brokenIds: string[] = [];
+  try {
+    await client.query('BEGIN');
+    // Read the links before the delete: their signature ids are ON DELETE SET
+    // NULL, so afterwards we couldn't tell which ones this sig was backing.
+    const links = await client.query<LinkRow>(
+      `SELECT c.id, c.source_id AS "sourceId", c.wh_type AS "type",
+              c.source_signature_id AS "sourceSigId", c.target_signature_id AS "targetSigId",
+              COALESCE(o.name, '') AS "otherName", COALESCE(o.system_class, '') AS "otherClass"
+         FROM map_connections c
+         JOIN map_systems o ON o.id = CASE WHEN c.source_id = $1 THEN c.target_id ELSE c.source_id END
+        WHERE c.map_id = $2 AND (c.source_id = $1 OR c.target_id = $1)
+          AND c.connection_type = 'standard' AND c.broken = FALSE`,
+      [systemId, mapId],
+    );
+    const { rows } = await client.query<DeletedSig>(
+      `DELETE FROM map_signatures WHERE id = $1 AND system_id = $2 AND ${inThisMap(3)}
+       RETURNING sig_id AS "sigId", name, COALESCE(wh_type, '') AS "whType", COALESCE(wh_leads_to, '') AS "whLeadsTo"`,
+      [sigId, systemId, mapId],
+    );
+    deleted = rows[0];
+    if (deleted && links.rows.length) {
+      const remaining = await client.query<DeletedSig>(
+        `SELECT sig_id AS "sigId", name, COALESCE(wh_type, '') AS "whType", COALESCE(wh_leads_to, '') AS "whLeadsTo"
+           FROM map_signatures WHERE system_id = $1`,
+        [systemId],
+      );
+      brokenIds = linksLeftOrphaned(systemId, sigId, deleted, links.rows, remaining.rows);
+      if (brokenIds.length) {
+        await client.query(
+          `UPDATE map_connections SET broken = TRUE, broken_at = NOW() WHERE id = ANY($1::uuid[])`, [brokenIds]);
+      }
+    }
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    client.release();
+  }
   bumpActivity(systemId);
   publishToMap(mapId, { type: 'sig.changed', actor: actor.clientId, systemId });
-  if (rows.length) audit(actor, mapId, systemId, scanLabel(rows[0].sigId, rows[0].name), { action: 'signature.remove', targetId: sigId });
+  // actor null so every client applies it, the one that deleted the sig too:
+  // its own pane may be showing another system and not have broken the link.
+  for (const id of brokenIds) {
+    publishToMap(mapId, { type: 'connection.update', actor: null, id, updates: { broken: true } });
+  }
+  if (deleted) audit(actor, mapId, systemId, scanLabel(deleted.sigId, deleted.name), { action: 'signature.remove', targetId: sigId });
 }
 
 // ── Anomalies ─────────────────────────────────────────────────────────────────

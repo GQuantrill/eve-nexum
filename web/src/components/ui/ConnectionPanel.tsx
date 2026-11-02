@@ -302,7 +302,11 @@ export function ConnectionPanel() {
     return s.whType ? `${code} · ${s.whType}` : code;
   };
 
-  const whSpec = conn.type ? whTypes[conn.type.toUpperCase()] : undefined;
+  // A catalog entry with no mass (K162: its numbers belong to the other end's
+  // type) is no spec at all. Treated as one, it read as a hole with nothing
+  // left and showed COLLAPSED, max jump "—".
+  const rawSpec = conn.type ? whTypes[conn.type.toUpperCase()] : undefined;
+  const whSpec = rawSpec && rawSpec.totalMass > 0 ? rawSpec : undefined;
   const massUsed = conn.massUsed ?? 0;
 
   const addMass = (kg: number) => {
