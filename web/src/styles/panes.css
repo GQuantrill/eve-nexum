@@ -301,6 +301,46 @@
    base class, different children) keeps its own single-row layout. */
 .system-panel:has(.conn-col) { flex-wrap: wrap; }
 
+/* Docked beside the map: a column in the system panel's slot. Sections stack
+   full width and the column scrolls, instead of the row-mode strip, whose
+   columns won't shrink and pushed the map out. Placed after the rule above, at
+   the same specificity, so its nowrap wins. */
+.system-panel--conn-side:has(.conn-col) {
+  flex-direction: column;
+  flex-wrap: nowrap;
+  height: 100%;
+  border-top: none;
+  border-left: 1px solid var(--border);
+  padding: var(--sp-12) var(--sp-16);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.system-panel--conn-side .conn-headcol,
+.system-panel--conn-side .conn-col {
+  align-self: stretch;
+  min-width: 0;
+  max-width: none;
+}
+.system-panel--conn-side > .btn,
+.system-panel--conn-side > .conn-remove { align-self: flex-start; }
+/* The header keeps a 56px gutter for the system panel's corner buttons, which
+   are pinned out of the flow. This panel's undock/close sit in the flow, so the
+   gutter pushed them in from the edge once the header spans the column. */
+.system-panel--conn-side .system-panel__header { padding-right: 0; }
+/* The two remove buttons sit together wherever the single one used to. */
+.conn-remove {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-6);
+}
+.conn-side {
+  position: relative; /* anchors the resize handle */
+  display: flex;
+  flex-shrink: 0;
+  height: 100%;
+}
+.conn-side > .system-panel--conn-side { flex: 1; min-width: 0; }
+
 .conn-col {
   display: flex;
   flex-direction: column;

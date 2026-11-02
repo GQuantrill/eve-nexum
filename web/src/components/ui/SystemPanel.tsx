@@ -17,6 +17,7 @@ import { useMapStore } from '../../store/mapStore';
 import { CLASS_COLORS, CLASS_LABELS, EFFECT_LABELS, EFFECT_MODIFIERS } from '../../data/wormholes';
 import { useWormholeTypes } from '../../hooks/useWormholeTypes';
 import { whDestClass } from '../../utils/whDest';
+import { SIDE_KEY, clampSide, readSideWidth } from '../../utils/panelSideWidth';
 import { DraggableCard } from './DraggableCard';
 import { FloatingPanel, type PanelGeometry } from './FloatingPanel';
 import { useUserSetting } from '../../hooks/useUserSetting';
@@ -169,14 +170,6 @@ const WIDTH_KEY  = 'nexum.panelInfoWidth';
 const COLLAPSE_KEY = 'nexum.panelInfoCollapsed';
 const MIN_H      = 80;
 const DEFAULT_H  = 300;
-// Column mode keeps its own size. Sharing one number with row mode means
-// switching layouts hands you a 300px-wide panel because that was your height.
-const SIDE_KEY   = 'nexum.panelSideWidth';
-const DEFAULT_SW = 460;
-const MIN_SW     = 320;
-function clampSide(v: number) {
-  return Math.min(Math.floor(window.innerWidth * 0.7), Math.max(MIN_SW, v));
-}
 // System-info column width: the previous fixed 400px is the max; users can drag
 // it narrower down to a still-readable minimum, and the panel-stack fills the
 // space freed up (or the whole panel when the column is fully collapsed).
@@ -281,10 +274,7 @@ export function SystemPanel() {
   const colsRef = useRef<HTMLDivElement | null>(null);
 
   const requestFitView = useMapStore((st) => st.requestFitView);
-  const [sideWidth, setSideWidth] = useState(() => {
-    const v = localStorage.getItem(SIDE_KEY);
-    return v ? clampSide(parseInt(v, 10)) : DEFAULT_SW;
-  });
+  const [sideWidth, setSideWidth] = useState(readSideWidth);
   const sideWidthRef = useRef(sideWidth);
 
   // React Flow keeps its old viewport when the container changes shape, so the

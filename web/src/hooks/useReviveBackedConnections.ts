@@ -3,6 +3,7 @@ import { useMapStore } from '../store/mapStore';
 import { useCanEdit } from './useCanEdit';
 import { useWormholeTypes } from './useWormholeTypes';
 import { whDestClass, leadsToClasses } from '../utils/whDest';
+import { collapseState } from '../utils/rolling';
 import type { MapSystem } from '../types';
 
 /**
@@ -51,6 +52,13 @@ export function useReviveBackedConnections() {
 
     for (const conn of connections) {
       if (conn.connectionType !== 'standard' || !conn.broken) continue;
+      // Rolled shut: the calculator logged enough mass to collapse it. Its old
+      // sigs are still listed on both ends (nobody re-scans a hole they just
+      // rolled), which is exactly what this revive looks for, so without this
+      // it undid every roll the moment it broke. Undo pass / Reset lower the
+      // mass and restore the link themselves.
+      const total = conn.type ? whTypes[conn.type.toUpperCase()]?.totalMass ?? 0 : 0;
+      if (total > 0 && collapseState(total, conn.massUsed ?? 0) === 'collapsed') continue;
       const a = byId.get(conn.sourceId);
       const b = byId.get(conn.targetId);
       if (!a || !b) continue;

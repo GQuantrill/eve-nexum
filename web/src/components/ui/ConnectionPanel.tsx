@@ -11,6 +11,7 @@ import { useCharacterLocation } from '../../hooks/useCharacterLocation';
 import { WHTypeInfo } from './WHTypeInfo';
 import { Select } from './Select';
 import { inferredSize } from '../../utils/wormholeSize';
+import { SIDE_KEY, clampSide, readSideWidth } from '../../utils/panelSideWidth';
 import { effectiveExpiryMs, lifeBucket, knownMaxLifeHours } from '../../utils/whLifetime';
 import { ConfirmModal } from './ConfirmModal';
 import { IconPickerDialog } from './IconPickerDialog';
@@ -19,6 +20,7 @@ import { useUserSetting } from '../../hooks/useUserSetting';
 import { XIcon, TagIcon, ArrowSquareOutIcon } from '../../icons';
 import { DynamicIcon } from '../DynamicIcon';
 import { api } from '../../api/client';
+import { scheduleSigRemoval } from '../../store/sigRemovalQueue';
 import { useFlagPresets } from '../../hooks/useFlagPresets';
 import { useOrgFlagPresets } from '../../hooks/useOrgFlagPresets';
 import type { MassStatus, TimeStatus, ConnectionSize, Signature, SystemClass } from '../../types';
@@ -170,6 +172,31 @@ export function ConnectionPanel() {
   // the map it describes. Both the choice and the window geometry are
   // cross-device settings, so the panel comes back where it was left.
   const [floating, setFloating] = useUserSetting<boolean>('nexum.connPanel.float', true);
+  // Beside the map, the docked panel is a column in the system panel's slot and
+  // at its width. Left as the row-mode strip, its columns wouldn't shrink, so in
+  // that row it pushed the map to zero width and filled the screen.
+  const sideBySide = useMapStore((s) => s.panelSideBySide);
+  const asColumn = !floating && sideBySide;
+  // The column's width is the system panel's: same setting, same handle, so
+  // resizing either one sets both.
+  const [sideWidth, setSideWidth] = useState(readSideWidth);
+  const onSideResize = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const startX = e.clientX;
+    const startW = sideWidth;
+    let next = startW;
+    const onMove = (ev: MouseEvent) => {
+      next = clampSide(startW + (startX - ev.clientX));
+      setSideWidth(next);
+    };
+    const onUp = () => {
+      localStorage.setItem(SIDE_KEY, String(next));
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+    };
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+  };
   const [savedGeo, setSavedGeo] = useUserSetting<PanelGeometry>('nexum.connPanel.geometry', DEFAULT_GEO);
   // Height follows the content until the pilot drags the corner. A stargate link
   // is two lines and a button; a wormhole with a jump log is many times that, and
@@ -302,7 +329,11 @@ export function ConnectionPanel() {
     return s.whType ? `${code} · ${s.whType}` : code;
   };
 
-  const whSpec = conn.type ? whTypes[conn.type.toUpperCase()] : undefined;
+  // A catalog entry with no mass (K162: its numbers belong to the other end's
+  // type) is no spec at all. Treated as one, it read as a hole with nothing
+  // left and showed COLLAPSED, max jump "—".
+  const rawSpec = conn.type ? whTypes[conn.type.toUpperCase()] : undefined;
+  const whSpec = rawSpec && rawSpec.totalMass > 0 ? rawSpec : undefined;
   const massUsed = conn.massUsed ?? 0;
 
   const addMass = (kg: number) => {
@@ -315,7 +346,20 @@ export function ConnectionPanel() {
     // destabilized.
     const r = massRange(whSpec.totalMass, next);
     const nextStatus = deriveStatus(r.worstRemaining / (r.worstTotal || 1));
-    update({ massUsed: next, massStatus: nextStatus });
+    update({ massUsed: next, massStatus: nextStatus, ...rollBrokenPatch(next) });
+  };
+
+  // Past even the best-case total, the hole is gone: mark the link broken, the
+  // same as a vanished sig, so auto-remove clears it. Backing out of that (undo,
+  // reset) restores it, but only a link the roll broke. One broken for another
+  // reason, like its sig disappearing, stays broken.
+  const rollBrokenPatch = (next: number): { broken?: boolean } => {
+    if (!whSpec || !conn) return {};
+    const was = collapseState(whSpec.totalMass, massUsed) === 'collapsed';
+    const now = collapseState(whSpec.totalMass, next) === 'collapsed';
+    if (now && !conn.broken) return { broken: true };
+    if (!now && was && conn.broken) return { broken: false };
+    return {};
   };
 
   // A roller pass: add its mass, flip the side, push onto the undo stack.
@@ -355,7 +399,7 @@ export function ConnectionPanel() {
     setStack([]);
     setSide('home');
     saveSession(conn.id, { side: 'home', stack: [] });
-    update({ massUsed: 0, massStatus: 'stable' });
+    update({ massUsed: 0, massStatus: 'stable', ...rollBrokenPatch(0) });
   };
 
   // Picking a mass status by hand also seeds massUsed to that band's boundary,
@@ -375,8 +419,17 @@ export function ConnectionPanel() {
   // don't apply to stargates or Ansiblex jump bridges — only 'standard' links.
   const isWormhole = conn.connectionType === 'standard';
 
+  // The backing sigs each end links to, as loaded for this panel.
+  const linkedSigs = ([
+    [conn.sourceId, conn.sourceSignatureId, endpointSigs.src],
+    [conn.targetId, conn.targetSignatureId, endpointSigs.tgt],
+  ] as Array<[string, string | null, Signature[]]>).flatMap(([systemId, sigId, sigs]) => {
+    const sig = sigId ? sigs.find((x) => x.id === sigId) : undefined;
+    return sig ? [{ systemId, sig }] : [];
+  });
+
   const body = (
-    <aside className={`system-panel${floating ? ' system-panel--float' : ''}`}>
+    <aside className={`system-panel${floating ? ' system-panel--float' : ''}${asColumn ? ' system-panel--conn-side' : ''}`}>
       {/* Title + broken banner stack as one left column, so the banner sits
           directly under the connection name and wraps within it instead of
           becoming its own squeezed column that overlaps on narrow screens. */}
@@ -413,7 +466,12 @@ export function ConnectionPanel() {
 
         {conn.broken && (
           <div className="conn-broken-banner">
-            <span className="conn-broken-banner__text">{t('connPanel.brokenNotice')}</span>
+            {/* Say why it broke: a roll past collapse, not a deleted sig. */}
+            <span className="conn-broken-banner__text">
+              {whSpec && collapseState(whSpec.totalMass, massUsed) === 'collapsed'
+                ? t('connPanel.brokenNoticeRolled')
+                : t('connPanel.brokenNotice')}
+            </span>
             <button
               type="button"
               className="sys-btn"
@@ -777,16 +835,8 @@ export function ConnectionPanel() {
                 <strong>{side === 'home' ? t('connPanel.homeSideLabel') : t('connPanel.farSideLabel')}</strong>
               </div>
 
+              {/* Cold then hot, the same order as the mass inputs above. */}
               <div className="roll-pass">
-                <button
-                  type="button"
-                  className={`sys-btn roll-pass__btn roll-pass__btn--${hotOutcome}`}
-                  disabled={!canEdit || tooHeavyHot}
-                  title={tooHeavyHot ? t('connPanel.tooHeavyHotTitle') : t('connPanel.passTitle', { mass: fmtMass(roller.hotKg), side: nextEndsFar ? t('connPanel.far') : t('connPanel.home') })}
-                  onClick={() => onPass(roller.hotKg)}
-                >
-                  {t('connPanel.passHot', { mass: massShort(roller.hotKg) })}
-                </button>
                 <button
                   type="button"
                   className={`sys-btn roll-pass__btn roll-pass__btn--${coldOutcome}`}
@@ -796,8 +846,21 @@ export function ConnectionPanel() {
                 >
                   {t('connPanel.passCold', { mass: massShort(roller.coldKg) })}
                 </button>
+                <button
+                  type="button"
+                  className={`sys-btn roll-pass__btn roll-pass__btn--${hotOutcome}`}
+                  disabled={!canEdit || tooHeavyHot}
+                  title={tooHeavyHot ? t('connPanel.tooHeavyHotTitle') : t('connPanel.passTitle', { mass: fmtMass(roller.hotKg), side: nextEndsFar ? t('connPanel.far') : t('connPanel.home') })}
+                  onClick={() => onPass(roller.hotKg)}
+                >
+                  {t('connPanel.passHot', { mass: massShort(roller.hotKg) })}
+                </button>
               </div>
 
+              {/* Say why the hot pass is off, not only in its tooltip. */}
+              {tooHeavyHot && (
+                <div className="roll-guidance roll-guidance--warn">{t('connPanel.tooHeavyHotTitle')}</div>
+              )}
               <div className={`roll-guidance roll-guidance--${guidanceLevel}`}>{guidanceText}</div>
 
               <div className="roll-actions">
@@ -935,15 +998,46 @@ export function ConnectionPanel() {
       )}
       </>)}
 
-      <button
-        className="btn btn--danger"
-        onClick={() => { removeConnection(conn.id); }}
-      >
-        {t('connPanel.removeConnection')}
-      </button>
+      <div className="conn-remove">
+        {/* Only offered when there is a linked sig to take with it. */}
+        {linkedSigs.length > 0 && (
+          <button
+            type="button"
+            className="btn btn--danger"
+            onClick={() => {
+              if (!canEdit) return;
+              // The hole is gone, so its linked sigs go with it, rather than
+              // being left in the sig lists to clear by hand. The connection
+              // goes first: deleting a sig that backs a live link would only
+              // mark it broken.
+              removeConnection(conn.id);
+              for (const { systemId, sig } of linkedSigs) scheduleSigRemoval(map.id, systemId, sig, 0);
+            }}
+          >
+            {t('connPanel.removeConnectionAndSigs')}
+          </button>
+        )}
+        <button
+          type="button"
+          className="btn btn--ghost"
+          onClick={() => { removeConnection(conn.id); }}
+        >
+          {t('connPanel.removeConnection')}
+        </button>
+      </div>
     </aside>
   );
 
+  // The handle sits on a wrapper rather than the panel, which scrolls in this
+  // layout and would carry a handle inside it out of reach.
+  if (asColumn) {
+    return (
+      <div className="conn-side" style={{ width: sideWidth }}>
+        <div className="system-panel__resize-handle" onMouseDown={onSideResize} />
+        {body}
+      </div>
+    );
+  }
   if (!floating) return body;
 
   // Clamp the remembered geometry to the CURRENT viewport, so a window placed on

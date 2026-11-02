@@ -713,6 +713,7 @@
   },
   "connPanel": {
     "brokenNotice": "Verbinding verbroken — de onderliggende wormgat-signatuur is verwijderd. Blijft op de kaart staan, maar wordt uitgesloten van routering.",
+    "brokenNoticeRolled": "Verbinding ingestort — de rolcalculator heeft genoeg massa geregistreerd om hem te sluiten. Blijft op de kaart staan, maar wordt uitgesloten van routering. Maak de laatste passage ongedaan als dat een vergissing was.",
     "flagLabel": "Markering",
     "flagAdd": "Markering toevoegen",
     "flagNotePlaceholder": "bv. NIET ROLLEN - fleet onderweg",
@@ -793,7 +794,8 @@
     "collapseConfirmStrand": " Je roller zou aan de overzijde vast komen te zitten.",
     "collapseConfirmHome": " Je roller eindigt aan de thuiszijde.",
     "rollIt": "Rollen",
-    "removeConnection": "Verbinding verwijderen"
+    "removeConnection": "Alleen verbinding verwijderen",
+    "removeConnectionAndSigs": "Verbinding en signaturen verwijderen"
   },
   "contentFilter": {
     "hint": "Licht systemen uit op basis van wat er gescand is. Kies signatuur- of anomalietypes, of zoek op een sitenaam; overeenkomende systemen blijven licht en de rest vervaagt.",
