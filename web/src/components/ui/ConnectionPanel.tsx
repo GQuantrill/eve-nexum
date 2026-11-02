@@ -104,6 +104,27 @@ function detectWhType(
   return matches.find(t => t !== 'K162') ?? matches[0];
 }
 
+// Roller mass field, in millions of kg. Holds its own text while you type, so
+// clearing it to retype (100 -> 200) works: a fully controlled number input
+// snaps the last digit straight back, because "" isn't a number. Focus or a
+// double-click selects the whole value for the same reason.
+function MassInput({ valueM, onCommit }: { valueM: number; onCommit: (m: number) => void }) {
+  const [draft, setDraft] = useState<string | null>(null);
+  const selectAll = (e: { currentTarget: HTMLInputElement }) => e.currentTarget.select();
+  return (
+    <input type="number" min={0} step={5}
+      value={draft ?? String(valueM)}
+      onFocus={selectAll}
+      onDoubleClick={selectAll}
+      onChange={(e) => {
+        setDraft(e.target.value);
+        const m = parseFloat(e.target.value);
+        if (!isNaN(m)) onCommit(m);
+      }}
+      onBlur={() => setDraft(null)} />
+  );
+}
+
 export function ConnectionPanel() {
   const { t } = useTranslation();
   const fmtMass = (kg: number) => mass(t, kg);
@@ -734,14 +755,12 @@ export function ConnectionPanel() {
             <div className="roller__masses">
               <label className="roller__mass">
                 <span>{t('connPanel.cold')}</span>
-                <input type="number" min={0} step={5} value={roller.coldKg / 1_000_000}
-                  onChange={(e) => { const m = parseFloat(e.target.value); if (!isNaN(m)) setMass('coldKg', m); }} />
+                <MassInput valueM={roller.coldKg / 1_000_000} onCommit={(m) => setMass('coldKg', m)} />
                 <span className="roller__unit">M</span>
               </label>
               <label className="roller__mass">
                 <span>{t('connPanel.hot')}</span>
-                <input type="number" min={0} step={5} value={roller.hotKg / 1_000_000}
-                  onChange={(e) => { const m = parseFloat(e.target.value); if (!isNaN(m)) setMass('hotKg', m); }} />
+                <MassInput valueM={roller.hotKg / 1_000_000} onCommit={(m) => setMass('hotKg', m)} />
                 <span className="roller__unit">M</span>
               </label>
             </div>

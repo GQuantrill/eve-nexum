@@ -27,6 +27,26 @@ export function whDestClass(code: string | null | undefined, types: WhTypeDest):
   return WORMHOLE_DESTINATIONS[c] ?? null;
 }
 
+/** The leads-to a sig should get when its wormhole type changes, or undefined
+ *  to leave it as it is. Picking a type fills in the class it leads to, and
+ *  re-picking replaces that class: correcting a mistaken C2 type to a C5 one
+ *  must not leave the row saying C2. Anything else stays, e.g. a pinned system
+ *  name. K162 carries no destination, so it never fills one in. */
+export function leadsToForTypeChange(
+  prevType: string | null | undefined,
+  nextType: string,
+  leadsTo:  string | null | undefined,
+  types:    WhTypeDest,
+): string | undefined {
+  const dest = (code: string | null | undefined) =>
+    (code ?? '').toUpperCase() === 'K162' ? '' : (whDestClass(code, types) ?? '');
+  const current = (leadsTo ?? '').trim();
+  const autoFilled = current === '' || current.toUpperCase() === dest(prevType).toUpperCase();
+  if (!autoFilled) return undefined;
+  const next = dest(nextType);
+  return next === current ? undefined : next;
+}
+
 // leads-to tokens that are a class/band/unknown rather than a pinned system. A
 // value NOT in here is a specific connected-system name — i.e. the hole is
 // already solved. Case-insensitive so every consumer agrees (this set was
