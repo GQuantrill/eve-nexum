@@ -265,6 +265,16 @@ const HIDEABLE_COLS = [
   { key: 'updated', labelKey: 'signatures.colUpdated' },
 ] as const satisfies ReadonlyArray<{ key: ColKey; labelKey: string }>;
 
+// Columns that only mean something for some sig types; the rest apply to all.
+// Type holds a wormhole's code or a ghost site's tier; Safe is only ever set
+// for relic and data sites (siteSafety).
+const COL_SIG_TYPES: Partial<Record<ColKey, readonly SigType[]>> = {
+  whtype:  ['wormhole', 'ghost'],
+  whstate: ['wormhole'],
+  leadsto: ['wormhole'],
+  safe:    ['relic', 'data'],
+};
+
 // Grace-period choices (seconds) offered before an overwrite-paste actually
 // deletes a despawned sig. 0 = delete immediately. Compact s/m labels read
 // fine across locales; only "Instant" is translated.
@@ -476,6 +486,14 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   const [hiddenColsArr, setHiddenColsArr] = useUserSetting<ColKey[]>('nexum.sigPane.hiddenCols', []);
   const hiddenCols = useMemo(() => new Set(hiddenColsArr), [hiddenColsArr]);
   const isColVisible = useCallback((c: ColKey) => !hiddenCols.has(c), [hiddenCols]);
+  // What the table actually draws: the user's choice, narrowed further while a
+  // type filter is on to the columns the filtered types use. A column needed by
+  // any selected type stays. No filter = every column the user hasn't hidden.
+  const isColShown = useCallback((c: ColKey) => {
+    if (!isColVisible(c)) return false;
+    const only = COL_SIG_TYPES[c];
+    return !only || typeFilter.size === 0 || only.some((ty) => typeFilter.has(ty));
+  }, [isColVisible, typeFilter]);
   const toggleCol = (c: ColKey) =>
     setHiddenColsArr((prev) => (prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c]));
   // Portalled popover so the columns menu escapes the pane's overflow and stays
@@ -653,8 +671,8 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   // spilled the copy button over the next column.
   const tableMinWidth = useMemo(
     () => (Object.entries(colWidths) as Array<[ColKey, number]>)
-      .reduce((a, [k, w]) => a + (isColVisible(k) ? w : 0), 0) + (isShareMode ? 0 : 24 + 28),
-    [colWidths, isShareMode, isColVisible],
+      .reduce((a, [k, w]) => a + (isColShown(k) ? w : 0), 0) + (isShareMode ? 0 : 24 + 28),
+    [colWidths, isShareMode, isColShown],
   );
 
   // Bumped when another client changes this system's sigs (live sync).
@@ -1253,15 +1271,15 @@ export function SignaturePane({ systemId }: { systemId: string }) {
             {!isShareMode && <col className="sig-col--check" />}
             <col style={{ width: colWidths.id }} />
             <col style={{ width: colWidths.type }} />
-            <col style={{ width: colWidths.whtype }} className="sig-col--whtype" />
-            {isColVisible('whstate') && <col style={{ width: colWidths.whstate }} />}
-            <col style={{ width: colWidths.leadsto }} />
+            {isColShown('whtype')  && <col style={{ width: colWidths.whtype }} className="sig-col--whtype" />}
+            {isColShown('whstate') && <col style={{ width: colWidths.whstate }} />}
+            {isColShown('leadsto') && <col style={{ width: colWidths.leadsto }} />}
             {!isShareMode && <col className="sig-col--bookmark" />}
-            {isColVisible('name')    && <col style={{ width: colWidths.name }} />}
-            {isColVisible('safe')    && <col style={{ width: colWidths.safe }} />}
-            {isColVisible('notes')   && <col style={{ width: colWidths.notes }} />}
-            {isColVisible('created') && <col style={{ width: colWidths.created }} />}
-            {isColVisible('updated') && <col style={{ width: colWidths.updated }} />}
+            {isColShown('name')    && <col style={{ width: colWidths.name }} />}
+            {isColShown('safe')    && <col style={{ width: colWidths.safe }} />}
+            {isColShown('notes')   && <col style={{ width: colWidths.notes }} />}
+            {isColShown('created') && <col style={{ width: colWidths.created }} />}
+            {isColShown('updated') && <col style={{ width: colWidths.updated }} />}
             {!isShareMode && <col className="sig-col--actions" />}
           </colgroup>
           <thead>
@@ -1286,47 +1304,51 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                 {t('signatures.colType')}{sortInd('sigType')}
                 <div className="sig-th__resize" onMouseDown={(e) => startResize('type', e)} />
               </th>
-              <th className="sig-th sig-th--sortable" onClick={() => handleSort('whType')}>
-                {t('signatures.colWh')}{sortInd('whType')}
-                <div className="sig-th__resize" onMouseDown={(e) => startResize('whtype', e)} />
-              </th>
-              {isColVisible('whstate') && (
+              {isColShown('whtype') && (
+                <th className="sig-th sig-th--sortable" onClick={() => handleSort('whType')}>
+                  {t('signatures.colWh')}{sortInd('whType')}
+                  <div className="sig-th__resize" onMouseDown={(e) => startResize('whtype', e)} />
+                </th>
+              )}
+              {isColShown('whstate') && (
                 <th className="sig-th" title={t('signatures.colWhStateHint')}>
                   {t('signatures.colWhState')}
                   <div className="sig-th__resize" onMouseDown={(e) => startResize('whstate', e)} />
                 </th>
               )}
-              <th className="sig-th sig-th--sortable" onClick={() => handleSort('whLeadsTo')}>
-                {t('signatures.colLeadsTo')}{sortInd('whLeadsTo')}
-                <div className="sig-th__resize" onMouseDown={(e) => startResize('leadsto', e)} />
-              </th>
+              {isColShown('leadsto') && (
+                <th className="sig-th sig-th--sortable" onClick={() => handleSort('whLeadsTo')}>
+                  {t('signatures.colLeadsTo')}{sortInd('whLeadsTo')}
+                  <div className="sig-th__resize" onMouseDown={(e) => startResize('leadsto', e)} />
+                </th>
+              )}
               {/* Bookmark column — no title; the copy button aligns for every row. */}
               {!isShareMode && <th className="sig-th" />}
-              {isColVisible('name') && (
+              {isColShown('name') && (
                 <th className="sig-th sig-th--sortable" onClick={() => handleSort('name')}>
                   {t('signatures.colName')}{sortInd('name')}
                   <div className="sig-th__resize" onMouseDown={(e) => startResize('name', e)} />
                 </th>
               )}
-              {isColVisible('safe') && (
+              {isColShown('safe') && (
                 <th className="sig-th" title={t('signatures.safeHint')}>
                   {t('signatures.colSafe')}
                   <div className="sig-th__resize" onMouseDown={(e) => startResize('safe', e)} />
                 </th>
               )}
-              {isColVisible('notes') && (
+              {isColShown('notes') && (
                 <th className="sig-th">
                   {t('signatures.colNotes')}
                   <div className="sig-th__resize" onMouseDown={(e) => startResize('notes', e)} />
                 </th>
               )}
-              {isColVisible('created') && (
+              {isColShown('created') && (
                 <th className="sig-th sig-th--sortable sig-th--time" onClick={() => handleSort('createdAt')}>
                   {t('signatures.colAge')}{sortInd('createdAt')}
                   <div className="sig-th__resize" onMouseDown={(e) => startResize('created', e)} />
                 </th>
               )}
-              {isColVisible('updated') && (
+              {isColShown('updated') && (
                 <th className="sig-th sig-th--sortable sig-th--time" onClick={() => handleSort('updatedAt')}>
                   {t('signatures.colUpdated')}{sortInd('updatedAt')}
                   <div className="sig-th__resize" onMouseDown={(e) => startResize('updated', e)} />
@@ -1400,28 +1422,30 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                 {/* The specific type within the row's group: a wormhole's
                     code, a ghost site's tier. Groups with no meaningful
                     sub-type leave it blank. */}
-                <td className="sig-td--wh">
-                  {sig.sigType === 'wormhole' && (
-                    isShareMode
-                      ? <span className="sig-text">{sig.whType || ''}</span>
-                      : <WormholeTypePicker
-                          value={sig.whType}
-                          statics={systemStatics}
-                          onChange={(whType) => {
-                            const whLeadsTo = leadsToForTypeChange(sig.whType, whType, sig.whLeadsTo, whTypes);
-                            updateSig(sig.id, { whType, ...(whLeadsTo !== undefined ? { whLeadsTo } : {}) });
-                          }}
-                        />
-                  )}
-                  {sig.sigType === 'ghost' && (
-                    <GhostTypeCell
-                      sig={sig}
-                      isShareMode={isShareMode}
-                      onChange={(ghostType) => updateSig(sig.id, { ghostType })}
-                    />
-                  )}
-                </td>
-                {isColVisible('whstate') && (
+                {isColShown('whtype') && (
+                  <td className="sig-td--wh">
+                    {sig.sigType === 'wormhole' && (
+                      isShareMode
+                        ? <span className="sig-text">{sig.whType || ''}</span>
+                        : <WormholeTypePicker
+                            value={sig.whType}
+                            statics={systemStatics}
+                            onChange={(whType) => {
+                              const whLeadsTo = leadsToForTypeChange(sig.whType, whType, sig.whLeadsTo, whTypes);
+                              updateSig(sig.id, { whType, ...(whLeadsTo !== undefined ? { whLeadsTo } : {}) });
+                            }}
+                          />
+                    )}
+                    {sig.sigType === 'ghost' && (
+                      <GhostTypeCell
+                        sig={sig}
+                        isShareMode={isShareMode}
+                        onChange={(ghostType) => updateSig(sig.id, { ghostType })}
+                      />
+                    )}
+                  </td>
+                )}
+                {isColShown('whstate') && (
                   <td className="sig-td--whstate">
                     <WhStateCell
                       sig={sig}
@@ -1432,17 +1456,19 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                     />
                   </td>
                 )}
-                <td className="sig-td--wh">
-                  {sig.sigType === 'wormhole' && (
-                    isShareMode
-                      ? <span className="sig-text">{sig.whLeadsTo || ''}</span>
-                      : <LeadsToDropdown
-                          value={sig.whLeadsTo}
-                          connectedSystems={connectedSystems}
-                          onChange={(leadsTo) => updateSig(sig.id, { whLeadsTo: leadsTo })}
-                        />
-                  )}
-                </td>
+                {isColShown('leadsto') && (
+                  <td className="sig-td--wh">
+                    {sig.sigType === 'wormhole' && (
+                      isShareMode
+                        ? <span className="sig-text">{sig.whLeadsTo || ''}</span>
+                        : <LeadsToDropdown
+                            value={sig.whLeadsTo}
+                            connectedSystems={connectedSystems}
+                            onChange={(leadsTo) => updateSig(sig.id, { whLeadsTo: leadsTo })}
+                          />
+                    )}
+                  </td>
+                )}
                 {/* Dedicated bookmark column so the button aligns for every sig
                     type: wormholes use the WH format, all other sigs the site
                     format. */}
@@ -1455,7 +1481,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                     ><CopyIcon size={12} weight="bold" /></button>
                   </td>
                 )}
-                {isColVisible('name') && (
+                {isColShown('name') && (
                   <td>
                     {isShareMode ? (
                       <span className="sig-text">{sig.name}</span>
@@ -1469,8 +1495,8 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                     )}
                   </td>
                 )}
-                {isColVisible('safe') && <SafeCell sig={sig} />}
-                {isColVisible('notes') && (
+                {isColShown('safe') && <SafeCell sig={sig} />}
+                {isColShown('notes') && (
                   <td className="sig-notes-cell">
                     <NotesEditor
                       value={sig.notes}
@@ -1480,7 +1506,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                     />
                   </td>
                 )}
-                {isColVisible('created') && (
+                {isColShown('created') && (
                   <ElapsedCell
                     iso={sig.createdAt}
                     className={`sig-td--time${
@@ -1490,7 +1516,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                     }`}
                   />
                 )}
-                {isColVisible('updated') && (
+                {isColShown('updated') && (
                   <ElapsedCell iso={sig.updatedAt} className="sig-td--time sig-td--updated" />
                 )}
                 {!isShareMode && (

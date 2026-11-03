@@ -160,6 +160,9 @@ function systemToNode(sys: MapSystem, selectedId: string | null, easyConnect = f
   };
 }
 
+// Diameter of the snap-grid dots (Settings > Grid style: Dots).
+const SNAP_DOT_SIZE = 1.4;
+
 export function MapCanvas() {
   const { t } = useTranslation();
   const whTypes = useWormholeTypes();
@@ -181,6 +184,10 @@ export function MapCanvas() {
   const activeMapId          = useMapStore((s) => s.activeMapId);
   const routeHighlight       = useMapStore((s) => s.routeHighlight);
   const snapToGrid           = useMapStore((s) => s.snapToGrid);
+  // Snap's grid drawn as lines (default) or dots on the snap points (Settings).
+  const [snapGridStyle]      = useUserSetting<'lines' | 'dots'>('nexum.snapGridStyle', 'lines');
+  const gridLines            = snapToGrid && snapGridStyle !== 'dots';
+  const gridDots             = snapToGrid && !gridLines;
   const showMinimap          = useMapStore((s) => s.showMinimap);
   const [minimapPosition]    = useMinimapPosition();
   // React Flow's <Controls> usually sits bottom-left. When the user docks
@@ -1812,10 +1819,18 @@ export function MapCanvas() {
         deleteKeyCode={null}
       >
         <Background
-          variant={snapToGrid ? BackgroundVariant.Lines : BackgroundVariant.Dots}
+          variant={gridLines ? BackgroundVariant.Lines : BackgroundVariant.Dots}
           gap={snapToGrid ? 20 : 24}
-          size={snapToGrid ? 1 : 1}
-          color={snapToGrid ? '#1a2240' : '#1a2040'}
+          // Snap dots mark the snap points, so they need to read clearly; the
+          // plain background dots (snap off) stay faint.
+          size={gridDots ? SNAP_DOT_SIZE : 1}
+          // The default offset lines the Lines grid up with the snap points but
+          // leaves dots half a cell off them. React Flow shifts the pattern by
+          // the offset, falling back to half the gap when it's 0, and draws a dot
+          // `radius` in from its tile's corner. An offset of the radius puts the
+          // dot centres on the snap points.
+          offset={gridDots ? SNAP_DOT_SIZE / 2 : undefined}
+          color={snapToGrid ? (gridLines ? '#1a2240' : '#3a4a7a') : '#1a2040'}
         />
         <Controls position={controlsPosition}>
           <ControlButton
