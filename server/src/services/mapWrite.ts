@@ -63,20 +63,6 @@ export interface SignatureInput {
   scoutConnectionId?: string | null;
 }
 
-// A signature carrying nothing at all — no scan id, no name, no notes, no
-// wormhole data. "Add signature" legitimately creates one (an empty row to type
-// into), but they have also been appearing on live maps that nobody added by
-// hand, so log every one with the actor and client that asked for it. clientId
-// is the browser tab's x-client-id and is null for API-key writes, which
-// separates the app from an integration. Diagnostic — remove once the source of
-// the unexplained ones is identified.
-function logIfContentless(mapId: string, systemId: string, d: SignatureInput, actor: WriteActor): void {
-  if (d.sigId || d.name || d.notes || d.whType || d.whLeadsTo) return;
-  log.warn('contentless signature created', JSON.stringify({
-    mapId, systemId, sigType: d.sigType, userId: actor.userId, clientId: actor.clientId,
-  }));
-}
-
 /** Thrown by updateSignature when the new scan id is already used by another
  *  signature in the same system. Routes answer it with a 409. */
 export class DuplicateSignatureError extends Error {
@@ -84,7 +70,6 @@ export class DuplicateSignatureError extends Error {
 }
 
 export async function createSignature(mapId: string, systemId: string, d: SignatureInput, actor: WriteActor) {
-  logIfContentless(mapId, systemId, d, actor);
   // Returns the creator alongside the row. The client inserts this response
   // straight into the open pane, and without the character the "added by"
   // portrait stayed blank until something forced a re-fetch -- which looked
@@ -171,8 +156,9 @@ export async function updateSignature(
 
   // The other way a blank row can appear: an existing signature's scan id being
   // cleared. Only the ID input writes this, on every keystroke, so a legitimate
-  // retype logs one line — worth the noise while the unexplained blanks are
-  // being traced. Diagnostic, paired with logIfContentless above.
+  // retype logs one line. The empty "Add signature" rows are explained (they're
+  // local drafts now), but a few blanks had no add in the audit log; this stays
+  // until those are accounted for. Diagnostic.
   if ('sigId' in updates && !updates.sigId) {
     log.warn('signature scan id cleared', JSON.stringify({
       mapId, systemId, sigRowId: sigId, userId: actor.userId, clientId: actor.clientId,
