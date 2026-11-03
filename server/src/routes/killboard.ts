@@ -4,7 +4,7 @@ import { createLogger } from '../utils/logger.js';
 import { TtlCache } from '../utils/cache.js';
 import { resolveEntityNames } from '../services/entityNames.js';
 import { esiFetch } from '../utils/esi.js';
-import { ZKB_AGENT } from '../utils/zkill.js';
+import { ZKB_AGENT, zkillPaused, noteZkillFailure } from '../utils/zkill.js';
 import { recentKillsForSystems, type BufferedKill } from '../services/killBuffer.js';
 import { killsInSystems } from '../services/killStore.js';
 import { tagsFor, loadGroups, attackerTypeIds, type KillTag } from '../services/killTags.js';
@@ -174,6 +174,9 @@ export async function fetchSystemKills(
   const fresh = cache.get(key);
   if (fresh) return fresh.value;
   const stale = cache.peek(key);
+  // zKill is timing out: answer now with what we have (the route adds the
+  // live feed's kills on top) instead of waiting another 8s.
+  if (zkillPaused()) return stale?.value ?? [];
 
   const zkbUrl = `https://zkillboard.com/api/kills/solarSystemID/${systemId}/pastSeconds/${secs}/`;
   const zkbHeaders: Record<string, string> = { 'User-Agent': ZKB_AGENT, Accept: 'application/json' };
@@ -273,6 +276,7 @@ export async function fetchSystemKills(
     cache.set(key, kills, etag ? { etag } : undefined);
     return kills;
   } catch (err) {
+    noteZkillFailure(err);
     log.warn(`Failed to reach zKillboard for system ${systemId}:`, (err as Error).message);
     if (stale) return stale.value;
     return [];
@@ -391,6 +395,7 @@ router.get('/:systemId(\\d+)/last', async (req, res) => {
   const fresh = lastKillCache.get(systemId);
   if (fresh) return res.json({ killmailTime: fresh.value });
   const stale = lastKillCache.peek(systemId);
+  if (zkillPaused()) return res.json({ killmailTime: stale?.value ?? null });
 
   // No pastSeconds → zKillboard returns the system's most recent kills, newest
   // first. We only need the first entry's time.
@@ -433,6 +438,7 @@ router.get('/:systemId(\\d+)/last', async (req, res) => {
     else if (stale) return res.json({ killmailTime: stale.value });
     return res.json({ killmailTime: time });
   } catch (err) {
+    noteZkillFailure(err);
     log.warn(`Failed to reach zKillboard (last) for system ${systemId}:`, (err as Error).message);
     if (stale) return res.json({ killmailTime: stale.value });
     return res.json({ killmailTime: null });
