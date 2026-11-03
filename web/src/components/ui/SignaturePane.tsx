@@ -488,11 +488,16 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   // picks up its default width without invalidating the saved layout. The
   // leads-to column is clamped to LEADSTO_MIN_WIDTH so a saved-narrow layout
   // can't reintroduce the picker/copy-button overlap.
+  // Widths are saved at 100% text size and scaled by the user's font scale
+  // here, so a larger font widens the columns with it instead of the text
+  // spilling under the next column (the ID slid under the Group picker at 130%).
+  const uiZoom = useMapStore((s) => s.uiZoom);
   const colWidths = useMemo(() => {
     const merged = { ...DEFAULT_WIDTHS, ...savedColWidths } as Record<ColKey, number>;
     merged.leadsto = Math.max(LEADSTO_MIN_WIDTH, merged.leadsto);
+    for (const k of Object.keys(merged) as ColKey[]) merged[k] = Math.round(merged[k] * uiZoom);
     return merged;
-  }, [savedColWidths]);
+  }, [savedColWidths, uiZoom]);
 
   // Hidden columns, persisted per user (shared across every Signature pane).
   const [hiddenColsArr, setHiddenColsArr] = useUserSetting<ColKey[]>('nexum.sigPane.hiddenCols', []);
@@ -1154,8 +1159,8 @@ export function SignaturePane({ systemId }: { systemId: string }) {
     document.body.style.userSelect = 'none';
 
     const onMove = (ev: MouseEvent) => {
-      const newWidth = Math.max(40, startWidth + ev.clientX - startX);
-      setColWidths((prev) => ({ ...prev, [col]: newWidth }));
+      const newWidth = Math.max(40, (startWidth + ev.clientX - startX) / uiZoom);
+      setColWidths((prev) => ({ ...prev, [col]: Math.round(newWidth) }));
     };
 
     const onUp = () => {

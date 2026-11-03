@@ -45,12 +45,14 @@ interface RawLocationResponse {
   docked?: boolean;
 }
 
-// ESI caches character location for ~5 s. We poll every 10 s: a system change
-// is still caught within ~10 s, while keeping the per-session request rate low
-// — a faster 5 s cadence pushed enough traffic to risk rate-limit stalls (which
-// surfaced as the location going out of sync). A visibility/focus catch-up
-// (below) covers the gap the moment the tab is looked at.
-const POLL_MS = 10_000;
+// ESI caches character location for ~5 s, and we poll at that rate: a quick
+// in-and-back-out visit (jump in, jump straight back) lasts only a few seconds,
+// and at 10 s those were often missed entirely. The server keeps each answer
+// only until ESI's copy expires, so this doesn't pile a second cache on top.
+// The aggregate is still well inside the per-user limit (see crossTabPoll: N
+// tabs cost one). A visibility/focus catch-up (below) covers the gap the moment
+// the tab is looked at.
+const POLL_MS = 5_000;
 // Cadence while the pilot is logged OUT of EVE. Their location cannot change,
 // so the only thing this poll is still watching for is them coming back — and
 // 60s is a fine latency for that, against six times the traffic. The moment the
@@ -59,7 +61,7 @@ const OFFLINE_POLL_MS = 60_000;
 // Shorter than the interval on purpose: a request that hasn't answered within
 // one poll period is not going to be useful, and letting it outlive its own tick
 // is what used to wedge tracking. See the load() de-dupe below.
-const POLL_TIMEOUT_MS = 8_000;
+const POLL_TIMEOUT_MS = 4_500;
 const EMPTY: CharacterLocation = { online: false, system: null, ship: null, docked: false };
 
 // The users.id of the character THIS TAB currently acts as: the per-tab pinned
