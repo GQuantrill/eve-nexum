@@ -19,7 +19,7 @@ function opId() {
 }
 
 // Retry the queue on our own shortly after a write is enqueued, rather than only
-// when the 10s location poll happens to flush it — and never at all when nothing
+// when the 5s location poll happens to flush it — and never at all when nothing
 // polls (the jump simulator, or a stationary/logged-out session). The short
 // delay lets an in-flight dependency land first: the common case is a connection
 // POST that 409'd because its endpoint system's POST hadn't committed yet, so a

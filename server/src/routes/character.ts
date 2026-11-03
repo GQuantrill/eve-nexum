@@ -52,7 +52,7 @@ function isReallyOnline(data: EsiOnlineResponse): boolean {
 // grows. The side effects (jump events, last_known) still run per request.
 type EsiLoc =
   | { status: 'offline' }
-  | { status: 'online'; solarSystemId: number | null; docked?: boolean }
+  | { status: 'online'; solarSystemId: number | null; docked?: boolean; expiresAt?: number }
   | { status: 'error' };
 // itemId is the ship's unique item id, not its type. It's what tells a flight
 // apart from a teleport: fly a hole and it's the same hull, die or clone-jump
@@ -61,6 +61,10 @@ type EsiLoc =
 type ShipInfo = { itemId: number | null; typeId: number; typeName: string; shipName: string; mass: number | null };
 
 const esiLocCache = new TtlCache<number, EsiLoc>(5_000, 60_000);      // keyed by characterId
+// Online is checked before every location read but changes rarely, and ESI
+// itself caches it for 60s, so it's kept for 30s: logging off or on still shows
+// within half a minute, and each location read costs one ESI call, not two.
+const esiOnlineCache = new TtlCache<number, boolean>(30_000, 120_000);
 const esiLocInflight = new Map<number, Promise<EsiLoc>>();            // dedupe concurrent reads
 const esiShipCache = new TtlCache<number, ShipInfo | null>(5_000, 60_000);
 const esiShipInflight = new Map<number, Promise<ShipInfo | null>>();
@@ -70,16 +74,24 @@ const esiShipInflight = new Map<number, Promise<ShipInfo | null>>();
 // recovery is immediate. Never throws.
 async function readEsiLocation(userId: number, characterId: number): Promise<EsiLoc> {
   const hit = esiLocCache.get(characterId);
-  if (hit) return hit.value;
+  // Kept only until ESI's own copy expires, not a flat 5s on top of it: stacked,
+  // the two caches could hide a short visit to a system (jump in, jump back).
+  const expiresAt = hit?.meta?.expiresAt;
+  if (hit && !(typeof expiresAt === 'number' && expiresAt <= Date.now())) return hit.value;
   const existing = esiLocInflight.get(characterId);
   if (existing) return existing;
   const p = (async (): Promise<EsiLoc> => {
     let token: string;
     try { token = await getValidToken(userId); } catch { return { status: 'error' }; }
-    const onlineRes = await esiFetch(`https://esi.evetech.net/latest/characters/${characterId}/online/`,
-      { headers: { Authorization: `Bearer ${token}` } });
-    if (!onlineRes.ok) return { status: 'error' };
-    if (!isReallyOnline(await onlineRes.json() as EsiOnlineResponse)) return { status: 'offline' };
+    let online = esiOnlineCache.get(characterId)?.value;
+    if (online === undefined) {
+      const onlineRes = await esiFetch(`https://esi.evetech.net/latest/characters/${characterId}/online/`,
+        { headers: { Authorization: `Bearer ${token}` } });
+      if (!onlineRes.ok) return { status: 'error' };
+      online = isReallyOnline(await onlineRes.json() as EsiOnlineResponse);
+      esiOnlineCache.set(characterId, online);
+    }
+    if (!online) return { status: 'offline' };
     const locRes = await esiFetch(`https://esi.evetech.net/latest/characters/${characterId}/location/`,
       { headers: { Authorization: `Bearer ${token}` } });
     if (!locRes.ok) return { status: 'online', solarSystemId: null };
@@ -94,12 +106,15 @@ async function readEsiLocation(userId: number, characterId: number): Promise<Esi
       status: 'online',
       solarSystemId: solar_system_id,
       docked: station_id != null || structure_id != null,
+      expiresAt: Date.parse(locRes.headers.get('expires') ?? ''),
     };
   })();
   esiLocInflight.set(characterId, p);
   try {
     const val = await p;
-    if (val.status === 'offline' || (val.status === 'online' && val.solarSystemId != null)) esiLocCache.set(characterId, val);
+    if (val.status === 'offline' || (val.status === 'online' && val.solarSystemId != null)) {
+      esiLocCache.set(characterId, val, { expiresAt: val.status === 'online' ? val.expiresAt : undefined });
+    }
     return val;
   } finally {
     esiLocInflight.delete(characterId);
@@ -180,7 +195,7 @@ async function getLocationPayload(userId: number): Promise<LocationPayload> {
   lastSeenSystem.set(userId, loc.solarSystemId);
 
   // Liveness + ship for the Pilots Online panel. Throttled to once a minute:
-  // this path runs every 10 s per active pilot, and the panel only needs to know
+  // this path runs every 5 s per active pilot, and the panel only needs to know
   // they were around recently, not to the second. Fire-and-forget — a failed
   // touch must never affect the location read that the map depends on.
   db.query(

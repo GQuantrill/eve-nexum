@@ -1,7 +1,7 @@
 // Is the acting character actually logged into EVE right now?
 //
 // Polling cadences are tuned for someone flying: the location poll runs every
-// 10s so a jump is noticed quickly. But a tab left open with the pilot logged
+// 5s so a jump is noticed quickly. But a tab left open with the pilot logged
 // OUT pays that same rate for data that cannot change — a character who isn't
 // in game does not move, does not join fleets, and does not undock. Overnight
 // that is thousands of requests returning the same answer.
