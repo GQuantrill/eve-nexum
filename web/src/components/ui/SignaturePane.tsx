@@ -106,6 +106,18 @@ const SIG_TYPE_LABELS: Record<SigType, string> = {
 // that was never filled in. The overwrite sweep normally skips blank-ID rows to
 // protect in-progress manual entries, but these carry nothing to protect, so a
 // clear-down should remove them instead of leaving them to accumulate forever.
+// "Add signature" rows start as drafts that only exist in this tab, and are
+// saved once something is typed into them. Saving the empty row straight away
+// left litter on the map whenever the button was clicked by mistake (e.g. to
+// focus the pane before pasting); other pilots saw a row with no ID and no data.
+const DRAFT_PREFIX = 'draft-';
+const isDraft = (id: string) => id.startsWith(DRAFT_PREFIX);
+// The fields a draft is saved with, which are also what can make it non-empty.
+const DRAFT_FIELDS = ['sigId', 'sigType', 'name', 'notes', 'whType', 'whLeadsTo', 'ghostType'] as const;
+// A re-fetch of this system's sigs, plus any unsaved drafts still open here.
+const withDrafts = (data: Signature[], current: Signature[]) =>
+  [...data, ...current.filter((s) => isDraft(s.id))];
+
 function isContentlessSig(s: Signature): boolean {
   return !s.sigId && !s.name?.trim() && !s.notes?.trim()
       && !s.whType && !s.whLeadsTo && s.sigType === 'unknown';
@@ -724,7 +736,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   useEffect(() => {
     if (!activeMapId || isShareMode || sigRev === 0) return;
     api<Signature[]>(`/api/maps/${activeMapId}/systems/${systemId}/signatures`)
-      .then((data) => { setSigs(data); sigsSystemRef.current = systemId; })
+      .then((data) => { setSigs(withDrafts(data, sigsRef.current)); sigsSystemRef.current = systemId; })
       .catch(() => {});
   }, [sigRev, activeMapId, systemId, isShareMode]);
 
@@ -752,7 +764,51 @@ export function SignaturePane({ systemId }: { systemId: string }) {
     updateSig(sig.id, patch as Partial<Signature>);
   };
 
+  // Save a draft once it holds something. Edits made while the create is in
+  // flight land on the draft row and are sent on to the saved row afterwards.
+  const savingDrafts = useRef<Set<string>>(new Set());
+  const saveDraft = async (draftId: string) => {
+    const draft = sigsRef.current.find((s) => s.id === draftId);
+    if (!draft || !activeMapId || isContentlessSig(draft) || savingDrafts.current.has(draftId)) return;
+    savingDrafts.current.add(draftId);
+    const sent = Object.fromEntries(DRAFT_FIELDS.map((k) => [k, draft[k]])) as Pick<Signature, typeof DRAFT_FIELDS[number]>;
+    try {
+      const saved = await api<Signature>(
+        `/api/maps/${activeMapId}/systems/${systemId}/signatures`,
+        { method: 'POST', body: JSON.stringify(sent) },
+      );
+      const now = sigsRef.current.find((s) => s.id === draftId);
+      // A typed id that already exists lands on that row server-side, so the
+      // draft folds into it rather than showing twice.
+      setSigs((prev) => prev.some((s) => s.id === saved.id)
+        ? prev.filter((s) => s.id !== draftId)
+        : prev.map((s) => (s.id === draftId ? { ...saved } : s)));
+      setSelected((prev) => {
+        if (!prev.has(draftId)) return prev;
+        const next = new Set(prev); next.delete(draftId); next.add(saved.id); return next;
+      });
+      // Carry over later edits, and run the wormhole fields through updateSig
+      // so connections are matched as they would be for any other edit.
+      const follow: Partial<Signature> = {};
+      for (const k of DRAFT_FIELDS) {
+        const v = now?.[k] ?? sent[k];
+        if (v !== saved[k] || ((k === 'whType' || k === 'whLeadsTo') && v)) (follow as Record<string, string>)[k] = v;
+      }
+      if (Object.keys(follow).length) updateSig(saved.id, follow);
+    } catch {
+      toast.error(t('signatures.saveFailed'));
+    } finally {
+      savingDrafts.current.delete(draftId);
+    }
+  };
+
   const updateSig = (id: string, updates: Partial<Signature>) => {
+    if (isDraft(id)) {
+      setSigs((prev) => prev.map((s) => (s.id === id ? { ...s, ...updates } : s)));
+      clearTimeout(debounceTimers.current.get(id));
+      debounceTimers.current.set(id, setTimeout(() => { void saveDraft(id); }, 500));
+      return;
+    }
     const existing = sigsRef.current.find((s) => s.id === id);
     const withTs = { ...updates, updatedAt: new Date().toISOString() };
     setSigs((prev) => prev.map((s) => s.id === id ? { ...s, ...withTs } : s));
@@ -789,7 +845,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
       pendingUpdates.current.delete(id);
       const url = `/api/maps/${activeMapId}/systems/${systemId}/signatures/${id}`;
       const reload = () => api<Signature[]>(`/api/maps/${activeMapId}/systems/${systemId}/signatures`)
-        .then((data) => { if (sigsSystemRef.current === systemId) setSigs(data); })
+        .then((data) => { if (sigsSystemRef.current === systemId) setSigs(withDrafts(data, sigsRef.current)); })
         .catch(() => {});
       api(url, { method: 'PATCH', body: JSON.stringify(payload) }).catch((err) => {
         if (!(err instanceof ApiError && err.code === 'duplicate_sig')) {
@@ -882,6 +938,12 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   };
 
   const deleteSig = (id: string) => {
+    if (isDraft(id)) {
+      clearTimeout(debounceTimers.current.get(id));
+      setSigs((prev) => prev.filter((s) => s.id !== id));
+      setSelected((prev) => { const next = new Set(prev); next.delete(id); return next; });
+      return;
+    }
     if (!activeMapId) return;
     clearRemoval(id);
     const deleted = sigsRef.current.find((s) => s.id === id);
@@ -914,7 +976,10 @@ export function SignaturePane({ systemId }: { systemId: string }) {
 
   const processPaste = useCallback(async (parsed: ParsedSig[], overwrite: boolean, delaySec: number) => {
     if (!activeMapId) return;
-    const existing = sigsRef.current;
+    // An empty draft was an "Add signature" click, most likely to focus the
+    // pane for this paste; drop it rather than leave a blank row behind.
+    for (const s of sigsRef.current) if (isDraft(s.id) && isContentlessSig(s)) deleteSig(s.id);
+    const existing = sigsRef.current.filter((s) => !isDraft(s.id));
     const toUpdate: { id: string; updates: Partial<Signature> }[] = [];
     const toCreate: ParsedSig[] = [];
 
@@ -1018,13 +1083,14 @@ export function SignaturePane({ systemId }: { systemId: string }) {
     return () => window.removeEventListener('paste', handlePaste);
   }, [activeMapId, systemId, currentSystemId, mapSystems, processPaste, overwriteOnPaste, overwriteDelay, t]);
 
-  const addSig = async () => {
+  const addSig = () => {
     if (!activeMapId) return;
-    const sig = await api<Signature>(
-      `/api/maps/${activeMapId}/systems/${systemId}/signatures`,
-      { method: 'POST', body: JSON.stringify({}) },
-    );
-    setSigs((prev) => [...prev, sig]);
+    const now = new Date().toISOString();
+    setSigs((prev) => [...prev, {
+      id: DRAFT_PREFIX + crypto.randomUUID(), sigId: '', sigType: 'unknown', name: '', notes: '',
+      whType: '', whLeadsTo: '', ghostType: '', massStatus: '', timeStatus: '',
+      createdAt: now, updatedAt: now,
+    }]);
   };
 
   const confirm = (message: string, action: () => void) => {
@@ -1128,7 +1194,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
       <div className="sig-pane__controls">
       {canEdit && !isShareMode && (
         <div className="sig-pane__toolbar">
-          <button className="icon-btn" onClick={addSig} title={t('signatures.addSignature')}>{t('signatures.addSignature')}</button>
+          <button className="sig-toolbar-btn" onClick={addSig} title={t('signatures.addSignature')}>{t('signatures.addSignature')}</button>
           <label
             className={`sig-overwrite-toggle${overwriteOnPaste ? ' sig-overwrite-toggle--active' : ''}`}
             data-tooltip={t('signatures.overwriteTooltip')}

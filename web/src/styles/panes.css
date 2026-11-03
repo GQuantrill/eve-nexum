@@ -578,6 +578,8 @@
 .sig-pane__toolbar {
   display: flex;
   justify-content: flex-end;
+  /* Same spacing as the filter chips; the buttons sat flush without it. */
+  gap: var(--sp-6);
 }
 
 /* Multi-select signature-type filter. Left-aligned chips above the table;
