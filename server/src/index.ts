@@ -60,6 +60,7 @@ import { startKillStore } from './services/killStore.js';
 import { authLimiter, esiLimiter, publicLimiter, appLimiter } from './middleware/rateLimits.js';
 import { originGuard } from './middleware/originGuard.js';
 import { slowRequests } from './middleware/slowRequests.js';
+import { startFreezeDetector } from './services/freezeDetector.js';
 import { createLogger } from './utils/logger.js';
 
 const rootLog = createLogger('http');
@@ -235,6 +236,7 @@ migrate()
     startKillStore();
     startDscanSweeper();
     startMapAuditPruner();
+    startFreezeDetector();
     void startTelemetry();
   })
   .catch((err) => { console.error('Migration failed:', err); process.exit(1); });
