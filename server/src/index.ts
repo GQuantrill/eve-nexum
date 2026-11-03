@@ -59,6 +59,7 @@ import { startPvpHistory } from './services/pvpHistory.js';
 import { startKillStore } from './services/killStore.js';
 import { authLimiter, esiLimiter, publicLimiter, appLimiter } from './middleware/rateLimits.js';
 import { originGuard } from './middleware/originGuard.js';
+import { slowRequests } from './middleware/slowRequests.js';
 import { createLogger } from './utils/logger.js';
 
 const rootLog = createLogger('http');
@@ -72,6 +73,8 @@ const PORT = process.env.PORT ?? 3001;
 // IP-keyed rate limit is bucketed on.
 app.set('trust proxy', config.trustProxy);
 app.disable('x-powered-by');
+// First, so the time counted includes everything after it (sessions included).
+app.use(slowRequests);
 
 // Default Helmet is safe for a JSON API: HSTS (HTTPS only), nosniff,
 // frameguard=deny, referrer-policy=no-referrer, etc. This server only ever

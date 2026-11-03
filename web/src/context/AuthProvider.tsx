@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { api, setUnauthorizedHandler } from '../api/client';
+import { api, ApiError, setUnauthorizedHandler } from '../api/client';
 import { toast } from '../utils/toastStore';
 import i18n from '../i18n';
 import { AuthContext, type AuthUser } from './AuthContext';
@@ -30,19 +30,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => setUnauthorizedHandler(null);
   }, []);
 
+  // The startup check. Only an answer from the server decides "not logged in":
+  // /auth/me says so with { user: null } (or a 401). A failed request -- the
+  // server slow to answer, a proxy timeout page, the network -- says nothing
+  // about the session, so it's retried rather than dropping a pilot whose
+  // session is fine onto the login page. Backs off to every 15s, and tells
+  // them once that it's still trying.
   useEffect(() => {
-    api<{ user: AuthUser | null }>('/auth/me')
-      .then((d) => {
-        setUser(d.user);
-        if (d.user) {
-          localStorage.setItem('nexum.last_character', JSON.stringify({
-            characterId:   d.user.characterId,
-            characterName: d.user.characterName,
-          }));
-        }
-      })
-      .catch(() => setUser(null))
-      .finally(() => setLoading(false));
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let attempt = 0;
+    const check = () => {
+      api<{ user: AuthUser | null }>('/auth/me')
+        .then((d) => {
+          if (cancelled) return;
+          setUser(d.user);
+          if (d.user) {
+            localStorage.setItem('nexum.last_character', JSON.stringify({
+              characterId:   d.user.characterId,
+              characterName: d.user.characterName,
+            }));
+          }
+          setLoading(false);
+        })
+        .catch((err) => {
+          if (cancelled) return;
+          if (err instanceof ApiError && err.status === 401) { setUser(null); setLoading(false); return; }
+          if (attempt === 1) toast.info(i18n.t('session.reconnecting'));
+          timer = setTimeout(check, Math.min(15_000, 2_000 * 2 ** attempt));
+          attempt += 1;
+        });
+    };
+    check();
+    return () => { cancelled = true; clearTimeout(timer); };
   }, []);
 
   const logout = useCallback(async () => {

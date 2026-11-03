@@ -2172,6 +2172,7 @@
   "session": {
     "idleLogout": "Sesión cerrada por inactividad.",
     "ended": "Tu sesión ha finalizado: inicia sesión de nuevo.",
+    "reconnecting": "No se puede conectar con nexum ahora mismo; seguimos intentándolo. Tu sesión sigue activa.",
     "lockedTitle": "En pausa",
     "lockedHint": "Estuviste inactivo, así que el mapa se pausó. Tu sesión sigue activa.",
     "resumeAs": "Continuar como {{name}}",
