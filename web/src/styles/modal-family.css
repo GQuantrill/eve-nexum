@@ -145,6 +145,19 @@
 
 .custom-label-dialog__add-text { display: flex; gap: 6px; }
 
+/* .sig-input is the signature table's borderless in-cell field. Inside a
+   dialog it sits on its own, so give it the panels' field look; otherwise
+   there is nothing to show where to type. */
+.modal .sig-input {
+  background: var(--surface-panel);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: var(--sp-6) var(--sp-8);
+
+  &::placeholder { color: var(--text-muted); }
+  &:focus { border-color: var(--border-accent); }
+}
+
 /* At the custom-label cap the whole add area dims; the title explains why. */
 .custom-label-dialog__add-area[aria-disabled='true'] { opacity: 0.55; cursor: not-allowed; }
 

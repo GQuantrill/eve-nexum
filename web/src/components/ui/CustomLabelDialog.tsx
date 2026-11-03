@@ -118,6 +118,8 @@ export function CustomLabelDialog({ customLabels, onChange, onClose }: Props) {
               value={text}
               maxLength={40}
               disabled={full}
+              // Opened to add a label, so start typing straight away.
+              autoFocus={!full}
               placeholder={t('labelsDialog.textPlaceholder')}
               onChange={(e) => setText(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter') addText(); if (e.key === 'Escape') onClose(); }}

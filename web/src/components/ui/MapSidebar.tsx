@@ -940,6 +940,7 @@ export function MapSidebar() {
   const maxMaps = useMapStore((s) => s.maxMaps);
   const snapToGrid = useMapStore((s) => s.snapToGrid);
   const setSnapToGrid = useMapStore((s) => s.setSnapToGrid);
+  const [snapGridStyle, setSnapGridStyle] = useUserSetting<"lines" | "dots">("nexum.snapGridStyle", "lines");
   const compactMode = useMapStore((s) => s.compactMode);
   const panelSideBySide = useMapStore((s) => s.panelSideBySide);
   const [exitsMinSec, setExitsMinSec] = useUserSetting<number>(EXITS_MIN_SECURITY_KEY, EXITS_MIN_SECURITY_DEFAULT);
@@ -2068,6 +2069,15 @@ export function MapSidebar() {
                       {snapToGrid ? t("actions.on") : t("actions.off")}
                     </button>
                   </div>
+                  {snapToGrid && (
+                    <div className="map-sidebar__row">
+                      <label className="map-sidebar__label" htmlFor="snap-grid-style">{t("mapSidebar.gridStyle")}</label>
+                      <Select id="snap-grid-style" value={snapGridStyle} onChange={(v) => setSnapGridStyle(v as "lines" | "dots")} options={[
+                        { value: "lines", label: t("mapSidebar.gridStyleLines") },
+                        { value: "dots", label: t("mapSidebar.gridStyleDots") },
+                      ]} />
+                    </div>
+                  )}
                   <div className="map-sidebar__row">
                     <label className="map-sidebar__label">{t("mapSidebar.minimap")}</label>
                     <button className={`toolbar__toggle${showMinimap ? " toolbar__toggle--on" : ""}`} onClick={() => setShowMinimap(!showMinimap)} aria-pressed={showMinimap}>
