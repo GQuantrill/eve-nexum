@@ -4,7 +4,7 @@
 // ourselves recently, zKill has always been counting.
 import { createLogger } from '../utils/logger.js';
 import { TtlCache } from '../utils/cache.js';
-import { ZKB_AGENT } from '../utils/zkill.js';
+import { ZKB_AGENT, zkillPaused, noteZkillFailure } from '../utils/zkill.js';
 
 const log = createLogger('zkillActivity');
 
@@ -54,6 +54,7 @@ export async function fetchZkillActivity(systemId: number): Promise<ActivityGrid
   if (fresh) return fresh.value;
   const running = inflight.get(systemId);
   if (running) return running;
+  if (zkillPaused()) return cache.peek(systemId)?.value ?? null;
 
   const p = (async () => {
     try {
@@ -72,6 +73,7 @@ export async function fetchZkillActivity(systemId: number): Promise<ActivityGrid
       cache.set(systemId, grid);
       return grid;
     } catch (err) {
+      noteZkillFailure(err);
       log.warn(`zKillboard stats failed for system ${systemId}:`, (err as Error).message);
       return cache.peek(systemId)?.value ?? null;
     } finally {
