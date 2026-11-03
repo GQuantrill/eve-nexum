@@ -2172,6 +2172,7 @@
   "session": {
     "idleLogout": "Uitgelogd wegens inactiviteit.",
     "ended": "Je sessie is beëindigd — log opnieuw in.",
+    "reconnecting": "nexum is nu niet bereikbaar — we blijven het proberen. Je bent nog ingelogd.",
     "lockedTitle": "Gepauzeerd",
     "lockedHint": "Je was inactief, dus het karteren is gepauzeerd. Je login is nog actief.",
     "resumeAs": "Doorgaan als {{name}}",

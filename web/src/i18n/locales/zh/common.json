@@ -2170,6 +2170,7 @@
   "session": {
     "idleLogout": "因长时间未操作已退出登录。",
     "ended": "您的会话已结束，请重新登录。",
+    "reconnecting": "暂时无法连接 nexum，正在重试。你的登录状态不受影响。",
     "lockedTitle": "已暂停",
     "lockedHint": "您处于空闲状态，地图已暂停。您的登录仍然有效。",
     "resumeAs": "以 {{name}} 继续",

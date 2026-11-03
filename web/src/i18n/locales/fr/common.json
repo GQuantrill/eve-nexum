@@ -2172,6 +2172,7 @@
   "session": {
     "idleLogout": "Déconnecté pour inactivité.",
     "ended": "Votre session a pris fin — veuillez vous reconnecter.",
+    "reconnecting": "Impossible de joindre nexum pour le moment — nouvelle tentative en cours. Votre connexion est conservée.",
     "lockedTitle": "En pause",
     "lockedHint": "Vous étiez inactif, la carte a donc été mise en pause. Votre connexion est toujours active.",
     "resumeAs": "Continuer en tant que {{name}}",
