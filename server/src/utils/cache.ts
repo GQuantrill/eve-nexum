@@ -80,24 +80,34 @@ export class TtlCache<K, V> {
 
 // Express handler for the "serve from a TtlValue, refresh on miss, fall back to
 // stale on error, else 502" shape that the incursions/insurgency/storms/scout
-// proxy routes all repeated verbatim.
+// proxy routes all repeated verbatim. After a failed refresh it waits
+// RETRY_AFTER_FAIL_MS before trying the upstream again, answering from stale
+// (or 502) meanwhile, so an unreachable site doesn't cost every request a wait.
+export const RETRY_AFTER_FAIL_MS = 60_000;
+
 export function cachedJsonHandler<V>(
   cache: TtlValue<V>,
   build: () => Promise<V>,
   opts: { log: { error: (msg: string, ...rest: unknown[]) => void }; logMsg: string; errorMsg: string },
 ) {
+  let failedAt = -Infinity;
+  const fallback = (res: Response) => {
+    const stale = cache.getStale();
+    if (stale) { res.json(stale); return; }
+    res.status(502).json({ error: opts.errorMsg });
+  };
   return async (_req: Request, res: Response): Promise<void> => {
     const fresh = cache.get();
     if (fresh) { res.json(fresh); return; }
+    if (Date.now() - failedAt < RETRY_AFTER_FAIL_MS) { fallback(res); return; }
     try {
       const data = await build();
       cache.set(data);
       res.json(data);
     } catch (err) {
+      failedAt = Date.now();
       opts.log.error(opts.logMsg, err);
-      const stale = cache.getStale();
-      if (stale) { res.json(stale); return; }
-      res.status(502).json({ error: opts.errorMsg });
+      fallback(res);
     }
   };
 }

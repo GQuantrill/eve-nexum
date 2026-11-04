@@ -12,9 +12,15 @@ export interface Logger {
 
 // Reduce Error args to "Name: message" so log lines never carry full stack
 // traces or other internal error properties (which can include query
-// fragments, tokens, etc.). Non-Error args pass through untouched.
-function safeArg(a: unknown): unknown {
-  return a instanceof Error ? `${a.name}: ${a.message}` : a;
+// fragments, tokens, etc.). Non-Error args pass through untouched. A wrapped
+// cause is appended the same way: fetch's bare "fetch failed" only says what
+// went wrong (DNS, refused, reset, connect timeout) in its cause.
+export function safeArg(a: unknown): unknown {
+  if (!(a instanceof Error)) return a;
+  const c = a.cause;
+  if (!(c instanceof Error)) return `${a.name}: ${a.message}`;
+  const code = (c as Error & { code?: unknown }).code;
+  return `${a.name}: ${a.message} (${typeof code === 'string' ? `${code}: ` : ''}${c.message})`;
 }
 
 function emit(level: Level, prefix: string, msg: string, rest: unknown[]) {
