@@ -2642,5 +2642,9 @@
   "orgLogos": {
     "alliance": "얼라이언스 로고",
     "corp": "코퍼레이션 로고"
+  },
+  "update": {
+    "available": "Nexum의 새 버전을 사용할 수 있습니다.",
+    "reload": "새로고침"
   }
 }

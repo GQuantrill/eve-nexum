@@ -157,6 +157,19 @@ server {
         access_log off;
     }
 
+    # Always revalidate the page itself and the build id, so a reload after a
+    # deploy picks up the new release instead of a heuristically cached copy.
+    # `expires -1` (not add_header) keeps the server-level security headers.
+    # Every SPA route lands here too: try_files' fallback is an internal
+    # redirect to /index.html.
+    location = /index.html {
+        expires -1;
+    }
+    location = /version.json {
+        expires -1;
+        access_log off;
+    }
+
     # SPA fallback
     location / {
         try_files $uri $uri/ /index.html;

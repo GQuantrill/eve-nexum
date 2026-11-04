@@ -2646,5 +2646,9 @@
   "orgLogos": {
     "alliance": "Allianzlogo",
     "corp": "Corp-Logo"
+  },
+  "update": {
+    "available": "Eine neue Version von Nexum ist verfügbar.",
+    "reload": "Neu laden"
   }
 }
