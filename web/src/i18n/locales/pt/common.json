@@ -15,6 +15,8 @@
     "shareSettings": "Partilhar definições entre personagens",
     "shareSettingsHint": "Quando ativo, todos os personagens desta conta usam as mesmas definições, exceto as perícias de salto. Ao ativar, as definições do personagem alterado mais recentemente são copiadas para os outros.",
     "shareSettingsFailed": "Não foi possível alterar a partilha de definições",
+    "installApp": "Instalar como aplicação",
+    "installAppHint": "Abrir o Nexum na sua própria janela, com o seu próprio ícone na dock ou na barra de tarefas.",
     "blocked": "bloqueado",
     "characterAdded": "{{name}} adicionado",
     "switchTo": "Mudar para {{name}}",

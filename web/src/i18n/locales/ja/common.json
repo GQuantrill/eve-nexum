@@ -15,6 +15,8 @@
     "shareSettings": "キャラクター間で設定を共有",
     "shareSettingsHint": "オンにすると、このアカウントのすべてのキャラクターがジャンプスキル以外の同じ設定を使用します。オンにした時点で、最後に設定を変更したキャラクターの設定が他のキャラクターにコピーされます。",
     "shareSettingsFailed": "設定の共有を変更できませんでした",
+    "installApp": "アプリとしてインストール",
+    "installAppHint": "Nexum を専用のウィンドウで開き、Dock やタスクバーに専用のアイコンを表示します。",
     "blocked": "ブロック中",
     "characterAdded": "{{name}} を追加しました",
     "switchTo": "{{name}} に切り替え",

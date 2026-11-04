@@ -15,6 +15,8 @@
     "shareSettings": "캐릭터 간 설정 공유",
     "shareSettingsHint": "켜면 이 계정의 모든 캐릭터가 점프 스킬을 제외한 같은 설정을 사용합니다. 켤 때 가장 최근에 설정을 바꾼 캐릭터의 설정이 다른 캐릭터에 복사됩니다.",
     "shareSettingsFailed": "설정 공유를 변경할 수 없습니다",
+    "installApp": "앱으로 설치",
+    "installAppHint": "Nexum을 별도의 창에서 열고 Dock 또는 작업 표시줄에 자체 아이콘을 표시합니다.",
     "blocked": "차단됨",
     "characterAdded": "{{name}} 추가됨",
     "switchTo": "{{name}}(으)로 전환",

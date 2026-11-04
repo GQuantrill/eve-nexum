@@ -11,6 +11,7 @@
 
 export type { Icon } from '@phosphor-icons/react/dist/lib/types';
 
+export { AppWindowIcon } from '@phosphor-icons/react/dist/csr/AppWindow';
 export { ArrowBendUpRightIcon } from '@phosphor-icons/react/dist/csr/ArrowBendUpRight';
 export { ArrowCounterClockwiseIcon } from '@phosphor-icons/react/dist/csr/ArrowCounterClockwise';
 export { ArrowDownIcon } from '@phosphor-icons/react/dist/csr/ArrowDown';

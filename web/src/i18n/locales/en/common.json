@@ -15,6 +15,8 @@
     "shareSettings": "Share settings across characters",
     "shareSettingsHint": "When on, every character on this account uses the same settings, except jump skills. Turning it on copies the most recently changed character's settings to the others.",
     "shareSettingsFailed": "Couldn't change setting sharing",
+    "installApp": "Install as app",
+    "installAppHint": "Open Nexum in its own window, with its own icon in your dock or taskbar.",
     "blocked": "blocked",
     "characterAdded": "Added {{name}}",
     "switchTo": "Switch to {{name}}",

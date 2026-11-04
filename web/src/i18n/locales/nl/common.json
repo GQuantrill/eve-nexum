@@ -15,6 +15,8 @@
     "shareSettings": "Instellingen delen tussen characters",
     "shareSettingsHint": "Indien aan gebruiken alle characters op dit account dezelfde instellingen, behalve jump skills. Bij inschakelen worden de laatst gewijzigde instellingen naar de andere characters gekopieerd.",
     "shareSettingsFailed": "Delen van instellingen kon niet worden gewijzigd",
+    "installApp": "Installeren als app",
+    "installAppHint": "Open Nexum in een eigen venster, met een eigen pictogram in je dock of taakbalk.",
     "blocked": "geblokkeerd",
     "characterAdded": "{{name}} toegevoegd",
     "switchTo": "Overschakelen naar {{name}}",

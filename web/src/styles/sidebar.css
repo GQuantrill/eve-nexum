@@ -496,6 +496,17 @@
   border-radius: 4px;
 }
 .character-switcher__share:hover { background: var(--surface-raised); }
+/* A button sharing the link's look: reset the button chrome. */
+.character-switcher__install {
+  width: 100%;
+  background: none;
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 0;
+  font: inherit;
+  font-size: calc(13px * var(--font-scale, 1));
+  cursor: pointer;
+}
 
 
 .toolbar__online-dot {
