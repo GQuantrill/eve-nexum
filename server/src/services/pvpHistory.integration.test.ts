@@ -28,7 +28,10 @@ const J_SPACE = 31000005;
 // That many days back, at the given UTC hour (ten minutes in), never in the future.
 function at(hourUtc: number, daysAgo = 0): number {
   const d = new Date();
-  d.setUTCHours(hourUtc, 10, 0, 0);
+  // On the hour, the same instant the kill is stored under. At :10 the "still
+  // in the future?" test below disagreed with the stored hour for the first ten
+  // minutes of every hour, putting the kill a day further back than intended.
+  d.setUTCHours(hourUtc, 0, 0, 0);
   return d.getTime() - daysAgo * DAY - (d.getTime() > Date.now() ? DAY : 0);
 }
 const dow = (ms: number) => new Date(ms).getUTCDay();
