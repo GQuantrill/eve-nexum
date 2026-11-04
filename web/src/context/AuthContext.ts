@@ -54,6 +54,8 @@ export interface AuthUser {
   ownerId: number | null;
   /** Every character linked to this account, for the switcher. */
   characters: AccountCharacter[];
+  /** The account's characters share one set of settings. */
+  shareSettings?: boolean;
   /** Where the pilot was last seen (updated as they jump). null until first ESI poll. */
   lastKnownSystem: LastKnownSystem | null;
   compactMode: boolean;

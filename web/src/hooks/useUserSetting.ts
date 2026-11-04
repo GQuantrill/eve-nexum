@@ -175,6 +175,20 @@ export function writeUserSetting<T>(key: string, value: T): void {
   writeSetting(key, value);
 }
 
+// Apply settings changed elsewhere -- another tab or device of this character,
+// or a linked character when the account shares settings (pushed over the map
+// event stream). Updates the cache and localStorage without sending them back.
+// A key with an unsent local edit is skipped: that edit is newer and is about
+// to be saved over this one.
+export function applyRemoteSettings(entries: Record<string, unknown>): void {
+  for (const [key, value] of Object.entries(entries)) {
+    if (key in pendingPatch) continue;
+    cache[key] = value;
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* quota / private mode */ }
+    emit(key);
+  }
+}
+
 // Internal: signals whether /auth/me has populated the cache.
 export function isHydrated(): boolean { return hydrated; }
 

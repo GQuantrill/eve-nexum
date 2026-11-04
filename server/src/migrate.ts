@@ -1023,6 +1023,15 @@ export async function migrate() {
     CREATE INDEX IF NOT EXISTS idx_users_owner ON users (owner_id);
     CREATE INDEX IF NOT EXISTS idx_maps_owner  ON maps  (owner_id);
 
+    -- Opt-in: an account's characters share one set of settings (ui_settings
+    -- and the preference columns), kept in step on every write. Off by default,
+    -- so each character keeps its own until the account turns it on.
+    ALTER TABLE owners ADD COLUMN IF NOT EXISTS share_settings BOOLEAN NOT NULL DEFAULT FALSE;
+    -- When this character last changed a setting. updated_at can't stand in for
+    -- it (token refreshes bump that); turning sharing on starts every character
+    -- from the most recently changed one.
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS settings_updated_at TIMESTAMPTZ;
+
     -- Account-scoped API keys for the external read API. A key acts as one
     -- owner (account) with one bound character supplying role/corp context, so
     -- a key request resolves to exactly what that character sees in the app.

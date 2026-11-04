@@ -12,6 +12,9 @@
   "account": {
     "switchCharacter": "切换角色",
     "addCharacter": "添加角色",
+    "shareSettings": "在角色间共享设置",
+    "shareSettingsHint": "开启后，此账号下的所有角色使用相同的设置（跳跃技能除外）。开启时会将最近修改过设置的角色的设置复制给其他角色。",
+    "shareSettingsFailed": "无法更改设置共享",
     "blocked": "已封禁",
     "characterAdded": "已添加 {{name}}",
     "switchTo": "切换到 {{name}}",

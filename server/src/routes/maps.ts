@@ -2642,7 +2642,7 @@ mapsRouter.get('/:mapId/events', async (req, res) => {
   const access = await getMapAccess(mapId, req);
   if (!access) { res.status(404).json({ error: 'Map not found' }); return; }
   // Shared with the API-key stream at /api/v1/maps/:id/events.
-  streamMapEvents(req, res, mapId);
+  streamMapEvents(req, res, mapId, req.session.userId);
 });
 
 // GET /api/maps/:mapId/kills/backfill — recent high-value kills in the map's

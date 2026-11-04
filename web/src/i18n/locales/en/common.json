@@ -12,6 +12,9 @@
   "account": {
     "switchCharacter": "Switch character",
     "addCharacter": "Add character",
+    "shareSettings": "Share settings across characters",
+    "shareSettingsHint": "When on, every character on this account uses the same settings, except jump skills. Turning it on copies the most recently changed character's settings to the others.",
+    "shareSettingsFailed": "Couldn't change setting sharing",
     "blocked": "blocked",
     "characterAdded": "Added {{name}}",
     "switchTo": "Switch to {{name}}",

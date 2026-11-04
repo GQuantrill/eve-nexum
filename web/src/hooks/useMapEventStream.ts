@@ -8,6 +8,8 @@ import { useRemoteActivity } from '../store/remoteActivityStore';
 import { apiUrl } from '../api/client';
 import { CLIENT_ID } from '../api/clientId';
 import { alertKill, alertConnectionEol } from '../utils/mapAlerts';
+import { onSettingsChanged, onPrefsChanged, resyncSettings } from '../utils/settingsSync';
+import { useAuth } from '../context/AuthContext';
 
 // Subscribes to the active map's live-edit SSE stream and applies incoming
 // edits from other clients to the store. One stream at a time — it follows
@@ -17,6 +19,10 @@ import { alertKill, alertConnectionEol } from '../utils/mapAlerts';
 export function useMapEventStream(): void {
   const activeMapId = useMapStore((s) => s.activeMapId);
   const openedOnce = useRef(false);
+  // Read through a ref so a new refresh identity doesn't reopen the stream.
+  const { refresh } = useAuth();
+  const refreshAuth = useRef(refresh);
+  useEffect(() => { refreshAuth.current = refresh; }, [refresh]);
 
   useEffect(() => {
     if (!activeMapId) return;
@@ -94,6 +100,19 @@ export function useMapEventStream(): void {
             return;
           case 'jump.cleared':
             useJumpLogStore.getState().clearConnection(data.connectionId as string);
+            return;
+          // Settings changed on another tab, device or linked character. Not
+          // map events: addressed to this character, riding this stream.
+          case 'settings.changed':
+            if (data.actor !== CLIENT_ID) onSettingsChanged((data.entries as Record<string, unknown>) ?? {});
+            return;
+          case 'prefs.changed':
+            if (data.actor !== CLIENT_ID) onPrefsChanged((data.prefs as Record<string, unknown>) ?? {});
+            return;
+          case 'settings.resync':
+            // Sharing was just turned on, so this tab's settings may all have
+            // changed, the tab that turned it on included.
+            void resyncSettings().then(() => refreshAuth.current()).catch(() => {});
             return;
         }
 

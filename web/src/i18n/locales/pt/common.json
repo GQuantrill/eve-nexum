@@ -12,6 +12,9 @@
   "account": {
     "switchCharacter": "Mudar de personagem",
     "addCharacter": "Adicionar personagem",
+    "shareSettings": "Partilhar definições entre personagens",
+    "shareSettingsHint": "Quando ativo, todos os personagens desta conta usam as mesmas definições, exceto as perícias de salto. Ao ativar, as definições do personagem alterado mais recentemente são copiadas para os outros.",
+    "shareSettingsFailed": "Não foi possível alterar a partilha de definições",
     "blocked": "bloqueado",
     "characterAdded": "{{name}} adicionado",
     "switchTo": "Mudar para {{name}}",

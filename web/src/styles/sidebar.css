@@ -484,6 +484,18 @@
   border-radius: 4px;
 }
 .character-switcher__add:hover { background: var(--surface-raised); color: var(--accent-light); }
+.character-switcher__share {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-8);
+  padding: var(--sp-6) var(--sp-8);
+  margin-top: 2px;
+  border-top: 1px solid var(--surface-hover);
+  font-size: calc(13px * var(--font-scale, 1));
+  cursor: pointer;
+  border-radius: 4px;
+}
+.character-switcher__share:hover { background: var(--surface-raised); }
 
 
 .toolbar__online-dot {

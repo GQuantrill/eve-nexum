@@ -12,6 +12,9 @@
   "account": {
     "switchCharacter": "Charakter wechseln",
     "addCharacter": "Charakter hinzufügen",
+    "shareSettings": "Einstellungen zwischen Charakteren teilen",
+    "shareSettingsHint": "Wenn aktiv, nutzen alle Charaktere dieses Kontos dieselben Einstellungen, außer Sprungfertigkeiten. Beim Einschalten werden die zuletzt geänderten Einstellungen auf die anderen Charaktere übertragen.",
+    "shareSettingsFailed": "Teilen der Einstellungen konnte nicht geändert werden",
     "blocked": "blockiert",
     "characterAdded": "{{name}} hinzugefügt",
     "switchTo": "Zu {{name}} wechseln",

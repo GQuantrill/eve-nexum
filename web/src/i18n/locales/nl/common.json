@@ -12,6 +12,9 @@
   "account": {
     "switchCharacter": "Character wisselen",
     "addCharacter": "Character toevoegen",
+    "shareSettings": "Instellingen delen tussen characters",
+    "shareSettingsHint": "Indien aan gebruiken alle characters op dit account dezelfde instellingen, behalve jump skills. Bij inschakelen worden de laatst gewijzigde instellingen naar de andere characters gekopieerd.",
+    "shareSettingsFailed": "Delen van instellingen kon niet worden gewijzigd",
     "blocked": "geblokkeerd",
     "characterAdded": "{{name}} toegevoegd",
     "switchTo": "Overschakelen naar {{name}}",

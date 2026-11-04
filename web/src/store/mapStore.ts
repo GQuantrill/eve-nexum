@@ -1580,11 +1580,17 @@ export const useMapStore = create<MapStore>()((set, get) => {
 // IS the store patch — its keys are store fields — so apply it directly, without
 // persisting or re-broadcasting (no echo). Compact-mode / statics changes also
 // need a uniform-size re-measure here, mirroring their own setters.
+// Apply a preferences change made elsewhere (a sibling tab, another device, or
+// a linked character sharing settings) without saving or re-broadcasting it.
+export function applyRemotePrefs(patch: Record<string, unknown>): void {
+  useMapStore.setState(patch as Partial<MapStore>);
+  if ('compactMode' in patch || 'showStatics' in patch) useMapStore.getState().resetUniformSizes();
+}
+
 if (prefsChannel) {
   prefsChannel.onmessage = (e: MessageEvent) => {
     const patch = e.data as Record<string, unknown> | null;
     if (!patch || typeof patch !== 'object') return;
-    useMapStore.setState(patch as Partial<MapStore>);
-    if ('compactMode' in patch || 'showStatics' in patch) useMapStore.getState().resetUniformSizes();
+    applyRemotePrefs(patch);
   };
 }
