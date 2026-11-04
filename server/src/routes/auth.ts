@@ -10,6 +10,8 @@ import { refreshStandingsForUser } from '../services/standings.js';
 import { syncCorpStructures } from '../services/structureSync.js';
 import { isLoginPermitted, standingsPermitLogin } from '../services/accessGrants.js';
 import { seedDemoMap } from '../services/demoMap.js';
+import { settingsSiblings, shareableEntries, setShareSettings } from '../services/sharedSettings.js';
+import { publishToUsers } from '../services/userEvents.js';
 import { applyPrefsToNewUser, orgScopeFor, readDefaults, resolveReadScope } from '../services/uiDefaults.js';
 
 const log = createLogger('auth');
@@ -579,13 +581,16 @@ authRouter.get('/me', async (req, res) => {
     return;
   }
 
-  // Hot path: prefs cached in session by login / PATCH. Only fall back to the
-  // DB for pre-existing sessions that predate this caching change.
+  // Prefs are read from the DB every time rather than from the session copy:
+  // with shared settings another character (another session) can change them,
+  // and the session copy would never hear about it. One primary-key read.
   let prefs = req.session.prefs;
   let role  = req.session.role ?? 'readonly';
-  if (!prefs) {
-    const { rows } = await db.query<{ compact_mode: boolean; snap_to_grid: boolean; show_minimap: boolean; uniform_size: boolean; show_statics: boolean; easy_connect: boolean; connection_thickness: string; route_mode: string; ui_zoom: string; ui_settings: Record<string, unknown>; panel_order: string[]; role: string }>(
-      `SELECT compact_mode, snap_to_grid, show_minimap, uniform_size, show_statics, easy_connect, connection_thickness, route_mode, ui_zoom, ui_settings, panel_order, role FROM users WHERE id = $1`,
+  let shareSettings = false;
+  {
+    const { rows } = await db.query<{ compact_mode: boolean; snap_to_grid: boolean; show_minimap: boolean; uniform_size: boolean; show_statics: boolean; easy_connect: boolean; connection_thickness: string; route_mode: string; ui_zoom: string; ui_settings: Record<string, unknown>; panel_order: string[]; role: string; share_settings: boolean | null }>(
+      `SELECT u.compact_mode, u.snap_to_grid, u.show_minimap, u.uniform_size, u.show_statics, u.easy_connect, u.connection_thickness, u.route_mode, u.ui_zoom, u.ui_settings, u.panel_order, u.role, o.share_settings
+         FROM users u LEFT JOIN owners o ON o.id = u.owner_id WHERE u.id = $1`,
       [req.session.userId],
     );
     const row = rows[0];
@@ -602,9 +607,12 @@ authRouter.get('/me', async (req, res) => {
       uiSettings:  row?.ui_settings ?? {},
       panelOrder:  row?.panel_order  ?? ['notes', 'signatures'],
     };
-    role = (row?.role as 'alliance_admin' | 'admin' | 'full' | 'edit' | 'contributor' | 'readonly') ?? 'readonly';
+    shareSettings = row?.share_settings ?? false;
+    if (!req.session.role) {
+      role = (row?.role as 'alliance_admin' | 'admin' | 'full' | 'edit' | 'contributor' | 'readonly') ?? 'readonly';
+      req.session.role = role;
+    }
     req.session.prefs = prefs;
-    req.session.role  = role;
   }
 
   // Last known system is dynamic (updated as the pilot jumps), so it's read
@@ -668,6 +676,8 @@ authRouter.get('/me', async (req, res) => {
       role,
       ownerId,
       characters,
+      // The account's characters share one set of settings.
+      shareSettings,
       lastKnownSystem,
       corpMode:      config.corpMode,
       allianceMode:  config.allianceMode,
@@ -738,9 +748,31 @@ authRouter.patch('/preferences', async (req, res) => {
   if (!sets.length) { res.status(400).json({ error: 'Nothing to update' }); return; }
 
   await db.query(
-    `UPDATE users SET ${sets.join(', ')}, updated_at = NOW() WHERE id = $${vals.length + 1}`,
+    `UPDATE users SET ${sets.join(', ')}, updated_at = NOW(), settings_updated_at = NOW() WHERE id = $${vals.length + 1}`,
     [...vals, req.session.userId],
   );
+  // Shared settings: the same change on every linked character, then pushed to
+  // their open tabs (and this character's other tabs and devices).
+  const siblings = await settingsSiblings(req.session.userId);
+  if (siblings.length) {
+    await db.query(
+      `UPDATE users SET ${sets.join(', ')}, updated_at = NOW() WHERE id = ANY($${vals.length + 1}::int[])`,
+      [...vals, siblings],
+    );
+  }
+  const applied: Record<string, unknown> = {};
+  if (typeof compactMode === 'boolean') applied.compactMode = compactMode;
+  if (typeof snapToGrid  === 'boolean') applied.snapToGrid  = snapToGrid;
+  if (typeof showMinimap === 'boolean') applied.showMinimap = showMinimap;
+  if (typeof uniformSize === 'boolean') applied.uniformSize = uniformSize;
+  if (typeof showStatics === 'boolean') applied.showStatics = showStatics;
+  if (typeof easyConnect === 'boolean') applied.easyConnect = easyConnect;
+  if (typeof connectionThickness === 'string' && VALID_THICKNESS.has(connectionThickness)) applied.connectionThickness = connectionThickness;
+  if (typeof routeMode === 'string' && VALID_ROUTE_MODE.has(routeMode)) applied.routeMode = routeMode;
+  if (typeof uiZoom === 'number' && Number.isFinite(uiZoom)) applied.uiZoom = Math.min(1.5, Math.max(0.8, uiZoom));
+  if (Array.isArray(panelOrder)) applied.panelOrder = panelOrder;
+  publishToUsers([req.session.userId, ...siblings],
+    { type: 'prefs.changed', prefs: applied, actor: req.get('x-client-id') ?? null });
 
   // Keep the session cache in sync so the next /auth/me reflects the change
   // without going back to the DB.
@@ -978,7 +1010,7 @@ authRouter.patch('/settings', async (req, res) => {
   // account out of its own settings.
   const capped = await db.query(
     `UPDATE users
-        SET ui_settings = ui_settings || $1::jsonb, updated_at = NOW()
+        SET ui_settings = ui_settings || $1::jsonb, updated_at = NOW(), settings_updated_at = NOW()
       WHERE id = $2
         AND (SELECT count(*) FROM jsonb_object_keys(ui_settings || $1::jsonb)) <= $3
         AND length((ui_settings || $1::jsonb)::text) <= $4
@@ -999,5 +1031,43 @@ authRouter.patch('/settings', async (req, res) => {
   if (req.session.prefs) {
     req.session.prefs.uiSettings = { ...(req.session.prefs.uiSettings ?? {}), ...filtered };
   }
+  // Shared settings: copy to every linked character (jump skills excepted),
+  // under the same caps -- a sibling already at the cap just misses the change.
+  // Then push to the open tabs: all of it to this character's other tabs, the
+  // shared part to the siblings'.
+  const actor = req.get('x-client-id') ?? null;
+  const siblings = await settingsSiblings(req.session.userId);
+  const shared = shareableEntries(filtered);
+  if (siblings.length && Object.keys(shared).length) {
+    await db.query(
+      `UPDATE users
+          SET ui_settings = ui_settings || $1::jsonb, updated_at = NOW()
+        WHERE id = ANY($2::int[])
+          AND (SELECT count(*) FROM jsonb_object_keys(ui_settings || $1::jsonb)) <= $3
+          AND length((ui_settings || $1::jsonb)::text) <= $4`,
+      [JSON.stringify(shared), siblings, MAX_SETTING_KEYS, MAX_SETTINGS_BYTES],
+    );
+    publishToUsers(siblings, { type: 'settings.changed', entries: shared, actor });
+  }
+  publishToUsers([req.session.userId], { type: 'settings.changed', entries: filtered, actor });
   res.json({ ok: true, applied: Object.keys(filtered).length });
+});
+
+// PUT /auth/share-settings -- turn shared settings on or off for the signed-in
+// account. Turning it on starts every linked character from the most recently
+// changed settings; every open tab of the account then reloads its settings.
+authRouter.put('/share-settings', async (req, res) => {
+  if (!req.session.userId) { res.status(401).json({ error: 'Not authenticated' }); return; }
+  const { enabled } = req.body as { enabled?: unknown };
+  if (typeof enabled !== 'boolean') { res.status(400).json({ error: 'enabled must be a boolean' }); return; }
+  const ownerId = await ensureOwnerId(req);
+  if (ownerId == null) { res.status(401).json({ error: 'Not authenticated' }); return; }
+  try {
+    const ids = await setShareSettings(ownerId, enabled);
+    if (enabled) publishToUsers(ids, { type: 'settings.resync', actor: req.get('x-client-id') ?? null });
+    res.json({ ok: true, enabled });
+  } catch (err) {
+    log.error('share-settings failed:', err);
+    res.status(500).json({ error: 'Failed to update' });
+  }
 });

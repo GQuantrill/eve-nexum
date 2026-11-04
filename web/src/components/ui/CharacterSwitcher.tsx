@@ -38,6 +38,22 @@ export function CharacterSwitcher() {
   if (!user) return null;
   const characters = user.characters ?? [];
 
+  // Share one set of settings across the account's characters. The server
+  // pushes a resync to every open tab, this one included, which reloads the
+  // settings; refresh() picks up the new flag here.
+  async function setShareSettings(enabled: boolean) {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await api('/auth/share-settings', { method: 'PUT', body: JSON.stringify({ enabled }) });
+      await refresh();
+    } catch {
+      toast.error(t('account.shareSettingsFailed'));
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function switchTo(userId: number) {
     if (busy) return;
     setBusy(true);
@@ -183,6 +199,17 @@ export function CharacterSwitcher() {
               </div>
             );
           })}
+          {characters.length > 1 && (
+            <label className="character-switcher__share" data-tooltip={t('account.shareSettingsHint')}>
+              <input
+                type="checkbox"
+                checked={!!user.shareSettings}
+                disabled={busy}
+                onChange={(e) => setShareSettings(e.target.checked)}
+              />
+              {t('account.shareSettings')}
+            </label>
+          )}
           <a className="character-switcher__add" href={apiUrl('/auth/add-character')}>
             <PlusIcon size={13} weight="bold" />
             {t('account.addCharacter')}
