@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, type Response } from 'express';
 import { config } from '../config.js';
 import { esiFetch } from '../utils/esi.js';
 import { db } from '../db.js';
@@ -53,7 +53,10 @@ function isReallyOnline(data: EsiOnlineResponse): boolean {
 type EsiLoc =
   | { status: 'offline' }
   | { status: 'online'; solarSystemId: number | null; docked?: boolean; expiresAt?: number }
-  | { status: 'error' };
+  // A failed ESI read: says nothing about where the character is.
+  | { status: 'error' }
+  // No usable token (revoked / expired refresh): treated as offline.
+  | { status: 'noToken' };
 // itemId is the ship's unique item id, not its type. It's what tells a flight
 // apart from a teleport: fly a hole and it's the same hull, die or clone-jump
 // and you wake in a DIFFERENT one — including pod to pod, where the type alone
@@ -70,8 +73,8 @@ const esiShipCache = new TtlCache<number, ShipInfo | null>(5_000, 60_000);
 const esiShipInflight = new Map<number, Promise<ShipInfo | null>>();
 
 // Online + current system for a character. Real 'online'/'offline' outcomes are
-// cached; a transient token/ESI failure returns 'error' and is NOT cached, so
-// recovery is immediate. Never throws.
+// cached; a transient ESI failure returns 'error' and is NOT cached, so recovery
+// is immediate. A network failure rejects.
 async function readEsiLocation(userId: number, characterId: number): Promise<EsiLoc> {
   const hit = esiLocCache.get(characterId);
   // Kept only until ESI's own copy expires, not a flat 5s on top of it: stacked,
@@ -82,7 +85,7 @@ async function readEsiLocation(userId: number, characterId: number): Promise<Esi
   if (existing) return existing;
   const p = (async (): Promise<EsiLoc> => {
     let token: string;
-    try { token = await getValidToken(userId); } catch { return { status: 'error' }; }
+    try { token = await getValidToken(userId); } catch { return { status: 'noToken' }; }
     let online = esiOnlineCache.get(characterId)?.value;
     if (online === undefined) {
       const onlineRes = await esiFetch(`https://esi.evetech.net/latest/characters/${characterId}/online/`,
@@ -94,7 +97,7 @@ async function readEsiLocation(userId: number, characterId: number): Promise<Esi
     if (!online) return { status: 'offline' };
     const locRes = await esiFetch(`https://esi.evetech.net/latest/characters/${characterId}/location/`,
       { headers: { Authorization: `Bearer ${token}` } });
-    if (!locRes.ok) return { status: 'online', solarSystemId: null };
+    if (!locRes.ok) return { status: 'error' };
     // station_id / structure_id are present only while docked. Kept because a
     // clone jump needs a station or structure at BOTH ends, and you cannot
     // traverse a wormhole docked — see the jump tracker, which uses this to
@@ -159,6 +162,13 @@ async function readEsiShip(userId: number, characterId: number): Promise<ShipInf
 // Read a character's live location (online + current system + ship) by Nexum
 // user id. Records a jump + persists last_known_system keyed by userId, so
 // reading any of an account's characters keeps its profile fresh.
+// Thrown when ESI couldn't be read. The routes answer 503 rather than
+// "offline": the jump tracker forgets the pilot's previous system on an offline
+// answer, so one failed read mid-trip used to drop the next jump (or, with
+// "don't track K-space", the whole K-space visit). On an error the client keeps
+// its last reading instead.
+class LocationUnavailable extends Error {}
+
 type LocationPayload =
   | { online: false }
   | { online: true; system: Record<string, unknown> | null; ship: ShipInfo | null;
@@ -173,7 +183,8 @@ async function getLocationPayload(userId: number): Promise<LocationPayload> {
   const characterId = userRows[0].character_id;
 
   const loc = await readEsiLocation(userId, characterId);
-  if (loc.status === 'error') return { online: false };
+  if (loc.status === 'error') throw new LocationUnavailable('ESI location unavailable');
+  if (loc.status === 'noToken') return { online: false };
   if (loc.status === 'offline') { lastSeenSystem.delete(userId); return { online: false }; }
 
   const ship = await readEsiShip(userId, characterId);
@@ -222,12 +233,26 @@ async function getLocationPayload(userId: number): Promise<LocationPayload> {
 }
 
 // GET /api/character/location — the active character's location.
+// ESI unreadable: an error answer, a network failure or a timeout.
+const isTransient = (err: unknown): boolean =>
+  err instanceof LocationUnavailable
+  || (err instanceof TypeError && err.message === 'fetch failed')
+  || (err instanceof Error && err.name === 'TimeoutError');
+
+function sendLocationError(res: Response, err: unknown, logMsg: string): void {
+  if (isTransient(err)) {
+    res.status(503).json({ error: 'Location unavailable' });
+    return;
+  }
+  log.error(logMsg, err);
+  res.status(500).json({ error: 'Failed to get location' });
+}
+
 characterRouter.get('/location', async (req, res) => {
   try {
     res.json(await getLocationPayload(req.session.userId!));
   } catch (err) {
-    log.error('Location check failed:', err);
-    res.status(500).json({ error: 'Failed to get location' });
+    sendLocationError(res, err, 'Location check failed:');
   }
 });
 
@@ -246,8 +271,7 @@ characterRouter.get('/:targetUserId/location', async (req, res) => {
     try {
       res.json(await getLocationPayload(targetUserId));
     } catch (err) {
-      log.error('Location check failed:', err);
-      res.status(500).json({ error: 'Failed to get location' });
+      sendLocationError(res, err, 'Location check failed:');
     }
     return;
   }
@@ -259,6 +283,7 @@ characterRouter.get('/:targetUserId/location', async (req, res) => {
   try {
     res.json(await getLocationPayload(targetUserId));
   } catch (err) {
+    if (isTransient(err)) { res.status(503).json({ error: 'Location unavailable' }); return; }
     log.error(`Location check failed for character ${targetUserId}:`, err);
     res.json({ online: false });
   }
