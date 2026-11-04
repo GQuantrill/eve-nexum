@@ -2642,5 +2642,9 @@
   "orgLogos": {
     "alliance": "联盟徽标",
     "corp": "军团徽标"
+  },
+  "update": {
+    "available": "Nexum 有新版本可用。",
+    "reload": "重新加载"
   }
 }

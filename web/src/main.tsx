@@ -22,6 +22,7 @@ import './styles/cards.css' // draggable info cards + floating panel
 import './styles/panels.css' // side panel, mass tracker, chain-effect summary (uses .btn from buttons.css)
 import './styles/landing.css' // public landing page + interactive demo
 import App from './App.tsx'
+import { startUpdateCheck } from './utils/updateCheck'
 
 // Wait for the detected language's strings before the first paint. Only
 // English ships with the app, so rendering immediately would show a frame of
@@ -35,4 +36,5 @@ void ensureLanguage(i18n.language).finally(() => {
       <App />
     </StrictMode>,
   )
+  startUpdateCheck()
 })
