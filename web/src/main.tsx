@@ -1,4 +1,5 @@
 import './debug'
+import './utils/installPrompt' // catch the browser's install offer, which fires early
 import i18n, { ensureLanguage } from './i18n' // initialise i18next before any component renders
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'

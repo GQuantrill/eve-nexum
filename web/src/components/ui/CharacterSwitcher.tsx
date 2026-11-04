@@ -2,12 +2,13 @@ import { useRef, useState } from 'react';
 import { useClickOutside } from '../../hooks/useClickOutside';
 import { charPortrait } from '../../utils/eveImages';
 import { useTranslation } from 'react-i18next';
-import { CaretDownIcon, PlusIcon, CheckIcon, MapPinIcon, TrashIcon } from '../../icons';
+import { CaretDownIcon, PlusIcon, CheckIcon, MapPinIcon, TrashIcon, AppWindowIcon } from '../../icons';
 import { useAuth } from '../../context/AuthContext';
 import { useMapStore } from '../../store/mapStore';
 import { api, apiUrl } from '../../api/client';
 import { toast } from '../../utils/toastStore';
 import { ConfirmModal } from './ConfirmModal';
+import { useCanInstallApp, installApp } from '../../utils/installPrompt';
 
 interface CharLocationResponse {
   online: boolean;
@@ -32,6 +33,7 @@ export function CharacterSwitcher() {
   const [busy, setBusy] = useState(false);
   const [pendingRemove, setPendingRemove] = useState<{ id: number; characterName: string } | null>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
+  const canInstall = useCanInstallApp();
 
   useClickOutside(open, wrapRef, () => setOpen(false));
 
@@ -214,6 +216,17 @@ export function CharacterSwitcher() {
             <PlusIcon size={13} weight="bold" />
             {t('account.addCharacter')}
           </a>
+          {canInstall && (
+            <button
+              type="button"
+              className="character-switcher__add character-switcher__install"
+              onClick={() => { setOpen(false); void installApp(); }}
+              data-tooltip={t('account.installAppHint')}
+            >
+              <AppWindowIcon size={13} weight="bold" />
+              {t('account.installApp')}
+            </button>
+          )}
         </div>
       )}
       {pendingRemove && (

@@ -149,6 +149,14 @@ server {
         access_log off;
     }
 
+    # Web app manifest (installing Nexum as an app). nginx's default mime.types
+    # has no .webmanifest mapping, so declare it here.
+    location = /manifest.webmanifest {
+        types { application/manifest+json webmanifest; }
+        expires 1d;
+        access_log off;
+    }
+
     # SPA fallback
     location / {
         try_files $uri $uri/ /index.html;

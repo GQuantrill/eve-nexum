@@ -15,6 +15,8 @@
     "shareSettings": "Compartir ajustes entre personajes",
     "shareSettingsHint": "Si está activado, todos los personajes de esta cuenta usan los mismos ajustes, salvo las habilidades de salto. Al activarlo se copian los ajustes del personaje modificado más recientemente a los demás.",
     "shareSettingsFailed": "No se pudo cambiar el uso compartido de ajustes",
+    "installApp": "Instalar como aplicación",
+    "installAppHint": "Abre Nexum en su propia ventana, con su propio icono en el Dock o la barra de tareas.",
     "blocked": "bloqueado",
     "characterAdded": "{{name}} añadido",
     "switchTo": "Cambiar a {{name}}",

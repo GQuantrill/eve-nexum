@@ -15,6 +15,8 @@
     "shareSettings": "Partager les paramètres entre personnages",
     "shareSettingsHint": "Si activé, tous les personnages de ce compte utilisent les mêmes paramètres, sauf les compétences de saut. L'activation copie les paramètres du personnage modifié le plus récemment vers les autres.",
     "shareSettingsFailed": "Impossible de modifier le partage des paramètres",
+    "installApp": "Installer comme application",
+    "installAppHint": "Ouvrir Nexum dans sa propre fenêtre, avec sa propre icône dans le Dock ou la barre des tâches.",
     "blocked": "bloqué",
     "characterAdded": "{{name}} ajouté",
     "switchTo": "Basculer vers {{name}}",
