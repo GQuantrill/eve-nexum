@@ -746,16 +746,18 @@ export function Toolbar() {
 
     server: (
       <div className="toolbar__server-status">
-        <div className="toolbar__server-row">
+        <div
+          className="toolbar__server-row"
+          data-tooltip={
+            eveStatus == null ? t('toolbar.checking') :
+            eveStatus.serverUp ? t('toolbar.tqOnline') : t('toolbar.tqOffline')
+          }
+        >
           <span
             className={`toolbar__status-dot${
               eveStatus == null ? '' :
               eveStatus.serverUp ? ' toolbar__status-dot--on' : ' toolbar__status-dot--off'
             }`}
-            data-tooltip={
-              eveStatus == null ? t('toolbar.checking') :
-              eveStatus.serverUp ? t('toolbar.tqOnline') : t('toolbar.tqOffline')
-            }
           />
           <span className="toolbar__server-label">TQ</span>
           {eveStatus?.serverUp && (
@@ -764,29 +766,33 @@ export function Toolbar() {
             </span>
           )}
         </div>
-        <div className="toolbar__server-row">
+        <div
+          className="toolbar__server-row"
+          data-tooltip={
+            eveStatus == null ? t('toolbar.checking') :
+            eveStatus.esiOnline ? withLatency(t, t('toolbar.esiOnline'), eveStatus.esiMs) : t('toolbar.esiOffline')
+          }
+        >
           <span
             className={`toolbar__status-dot${
               eveStatus == null ? '' :
               eveStatus.esiOnline ? ' toolbar__status-dot--on' : ' toolbar__status-dot--off'
             }`}
-            data-tooltip={
-              eveStatus == null ? t('toolbar.checking') :
-              eveStatus.esiOnline ? withLatency(t, t('toolbar.esiOnline'), eveStatus.esiMs) : t('toolbar.esiOffline')
-            }
           />
           <span className="toolbar__server-label">ESI</span>
         </div>
-        <div className="toolbar__server-row">
+        <div
+          className="toolbar__server-row"
+          data-tooltip={
+            eveStatus?.nexumUp == null ? t('toolbar.checking') :
+            eveStatus.nexumUp ? withLatency(t, t('toolbar.nexumOnline'), eveStatus.nexumMs) : t('toolbar.nexumOffline')
+          }
+        >
           <span
             className={`toolbar__status-dot${
               eveStatus?.nexumUp == null ? '' :
               eveStatus.nexumUp ? ' toolbar__status-dot--on' : ' toolbar__status-dot--off'
             }`}
-            data-tooltip={
-              eveStatus?.nexumUp == null ? t('toolbar.checking') :
-              eveStatus.nexumUp ? withLatency(t, t('toolbar.nexumOnline'), eveStatus.nexumMs) : t('toolbar.nexumOffline')
-            }
           />
           <span className="toolbar__server-label">Nexum</span>
         </div>

@@ -532,6 +532,9 @@
   display: flex;
   align-items: center;
   gap: var(--sp-6);
+  /* The whole line carries the status tooltip, so it shouldn't read as a drag
+     handle; dragging from it still reorders (6px activation distance). */
+  cursor: default;
 }
 
 .toolbar__status-dot {
