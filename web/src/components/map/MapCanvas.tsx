@@ -1747,7 +1747,11 @@ export function MapCanvas() {
         disabled: orphanIds.length === 0,
       },
       {
-        label: t('ctxMenu.removeStranded', { count: strandedIds.length }),
+        // Without a home there's nothing to be cut off from; say so rather
+        // than a bare 0 that reads as "nothing to clean up".
+        label: homeSystem
+          ? t('ctxMenu.removeStranded', { count: strandedIds.length })
+          : t('ctxMenu.removeStrandedNoHome'),
         icon: <BroomIcon size={15} weight="regular" color="#e25a5a" />,
         action: () => {
           if (strandedIds.length === 0 || !homeSystem) return;

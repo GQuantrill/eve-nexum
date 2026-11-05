@@ -910,6 +910,7 @@
     "removeOrphans": "Verweesde systemen verwijderen ({{count}})",
     "removeOrphansConfirm": "{{count}} verweesd(e) systeem(en) verwijderen? Deze hebben geen geldige verbinding (geen, of alleen verbroken verbindingen). Thuis- en vergrendelde systemen blijven staan. Dit kan ongedaan worden gemaakt.",
     "removeStranded": "Systemen zonder route naar thuis verwijderen ({{count}})",
+    "removeStrandedNoHome": "Systemen zonder route naar thuis verwijderen (stel eerst een thuis in)",
     "removeStrandedConfirm": "{{count}} systeem(en) zonder route terug naar {{home}} verwijderen? Thuis- en vergrendelde systemen blijven staan. Dit is een bulkverwijdering — ongedaan maken herstelt ze één voor één, en alleen de laatste 50 verwijderingen worden bewaard.",
     "addSystem": "Systeem toevoegen",
     "addAdjacent": "Aangrenzend toevoegen",
