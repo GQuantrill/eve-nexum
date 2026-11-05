@@ -3,6 +3,7 @@ import { api } from '../api/client';
 import { readXTab, writeXTab, xTabStorageKey } from './crossTabPoll';
 import { setPilotOnline, pilotIsOffline } from './pilotActivity';
 import { flushQueue } from '../store/pendingQueue';
+import { setWorkerTimeout, clearWorkerTimeout, type WorkerTimeout } from '../utils/workerTimer';
 import { useShareMode } from '../context/ShareModeContext';
 import { useMapStore } from '../store/mapStore';
 import { useAuth } from '../context/AuthContext';
@@ -79,7 +80,7 @@ let inflight: Promise<CharacterLocation> | null = null;
 // it's still the character we want, not a stale one.
 let inflightCharId: number | null = null;
 const subscribers = new Set<() => void>();
-let pollTimer: ReturnType<typeof setTimeout> | null = null;
+let pollTimer: WorkerTimeout | null = null;
 
 function notify() { subscribers.forEach((fn) => fn()); }
 
@@ -104,11 +105,12 @@ function onLocStorage(e: StorageEvent): void {
 // setTimeout rather than setInterval: the gap is re-read every tick, so the
 // cadence can change the moment the pilot logs in or out.
 function scheduleNext(): void {
-  if (pollTimer) clearTimeout(pollTimer);
+  clearWorkerTimeout(pollTimer);
   if (subscribers.size === 0) { pollTimer = null; return; }
   // Next tick is scheduled before this one runs, not after it settles — a
   // hung request must not be able to stop the poll (see load()'s timeout note).
-  pollTimer = setTimeout(() => { scheduleNext(); void load(); },
+  // A worker timer, so the poll keeps its pace in a hidden tab (workerTimer.ts).
+  pollTimer = setWorkerTimeout(() => { scheduleNext(); void load(); },
                          pilotIsOffline() ? OFFLINE_POLL_MS : POLL_MS);
 }
 
@@ -123,7 +125,7 @@ function subscribe(cb: () => void): () => void {
   return () => {
     subscribers.delete(cb);
     if (subscribers.size === 0 && pollTimer) {
-      clearTimeout(pollTimer); pollTimer = null;
+      clearWorkerTimeout(pollTimer); pollTimer = null;
       document.removeEventListener('visibilitychange', catchUp);
       window.removeEventListener('focus', catchUp);
       window.removeEventListener('storage', onLocStorage);
