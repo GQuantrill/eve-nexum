@@ -1522,15 +1522,15 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                         value: st,
                         text:  sigTypeLabel(st),
                         // Reuse the existing per-type colour classes so the value
-                        // stays tinted by type in the trigger and the list. In
-                        // icon mode the list keeps the words beside each icon;
-                        // only the trigger drops them (CSS, .sig-type-select--icons).
-                        label: typeIcons
-                          ? <span className={`sig-type-opt sig-select--type-${st}`}>
-                              <SigTypeIcon type={st} />
-                              <span className="sig-type-opt__text">{sigTypeLabel(st)}</span>
-                            </span>
-                          : <span className={`sig-select--type-${st}`}>{sigTypeLabel(st)}</span>,
+                        // stays tinted by type in the trigger and the list. The
+                        // list always shows icon + word; the trigger shows only
+                        // the word, or only the icon in icon mode (CSS).
+                        label: (
+                          <span className={`sig-type-opt sig-select--type-${st}`}>
+                            <SigTypeIcon type={st} />
+                            <span className="sig-type-opt__text">{sigTypeLabel(st)}</span>
+                          </span>
+                        ),
                       }))}
                     />
                   )}

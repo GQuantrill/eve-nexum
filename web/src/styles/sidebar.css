@@ -2354,11 +2354,12 @@ button.chain-exits-menu__exit:hover { background: var(--surface-hover); }
    labels reusing .sig-select--type-*, so this is layout only. */
 .sig-type-select { width: 100%; }
 
-/* "Group as icons": probe-scanner icon in place of the group name. The list
-   keeps icon + name; the trigger (inside the wrapper; the list is portalled
-   out of it) shows the icon alone. */
+/* Group picker options are icon + name in the list either way. The trigger
+   (inside the wrapper; the list is portalled out of it) shows just the name,
+   or just the icon with "Group as icons" on. */
 .sig-type-icon { flex-shrink: 0; vertical-align: middle; }
 .sig-type-opt { display: inline-flex; align-items: center; gap: var(--sp-4); }
+.sig-type-select:not(.sig-type-select--icons) .sig-type-opt > .sig-type-icon { display: none; }
 .sig-type-select--icons .sig-type-opt__text { display: none; }
 /* Icon + caret only, so the trigger shrinks to fit instead of filling the cell. */
 .sig-type-select--icons { width: auto; }
