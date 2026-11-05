@@ -1,0 +1,106 @@
+/* Map key: what each connection style means. Opens beside the zoom controls,
+   on whichever bottom corner they occupy. */
+
+.panel {
+  position: absolute;
+  bottom: 44px;
+  z-index: 5;
+  width: min(420px, calc(100% - 80px));
+  max-height: calc(100% - 64px);
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-well);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+  color: var(--text-default);
+}
+
+.left  { left: 56px; }
+.right { right: 56px; }
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-8) var(--sp-10);
+  border-bottom: 1px solid var(--border);
+}
+
+.title {
+  font-weight: 700;
+  color: var(--text-bright);
+}
+
+.close {
+  display: inline-flex;
+  padding: var(--sp-3);
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+
+  &:hover { color: var(--text-bright); }
+}
+
+.body {
+  overflow-y: auto;
+  padding: var(--sp-4) var(--sp-10) var(--sp-10);
+}
+
+.section {
+  margin: var(--sp-10) 0 var(--sp-6);
+  font-size: calc(12px * var(--font-scale, 1));
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 128px 1fr;
+  gap: var(--sp-10);
+  align-items: start;
+}
+
+.swatch {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-6);
+  min-height: 22px;
+}
+
+.line {
+  flex-shrink: 0;
+  width: 48px;
+  height: 12px;
+}
+
+.text {
+  font-size: calc(13px * var(--font-scale, 1));
+  line-height: 1.4;
+}
+
+/* The ✂ marker, without .connection-break's absolute positioning. */
+.scissors {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  font-size: 13px;
+  color: var(--cv-conn-expired);
+  background: color-mix(in srgb, var(--cv-conn-expired) 18%, var(--surface-sunken));
+  border: 1px solid color-mix(in srgb, var(--cv-conn-expired) 55%, var(--surface-sunken));
+  border-radius: 50%;
+}

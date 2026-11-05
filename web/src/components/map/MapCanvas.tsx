@@ -29,11 +29,12 @@ import { AddSystemModal } from '../ui/AddSystemModal';
 import { ContextMenu } from '../ui/ContextMenu';
 import type { ContextMenuItem } from '../ui/ContextMenu';
 import { ConfirmModal } from '../ui/ConfirmModal';
+import { MapKey } from './MapKey';
 import { shouldSkipConfirm } from '../../utils/confirmPref';
 import { systemDisplayName } from '../../utils/systemName';
 import {
   PathIcon, MapPinSimpleIcon, HouseIcon, LockIcon, LockOpenIcon,
-  XIcon, CheckIcon, PlusIcon, SelectionAllIcon, EyeIcon, CrosshairSimpleIcon,
+  XIcon, CheckIcon, PlusIcon, SelectionAllIcon, EyeIcon, CrosshairSimpleIcon, QuestionIcon,
   LinkSimpleIcon, LinkBreakIcon, ArrowsOutIcon, BookmarkSimpleIcon, TextAaIcon, TrashIcon,
   HashIcon, ProhibitIcon, BroomIcon,
   CopyIcon,
@@ -299,6 +300,9 @@ export function MapCanvas() {
   const setConnectSource = useMapStore((s) => s.setConnectSource);
   // Pending "remove orphan systems" sweep, held while the confirm modal is up.
   const [orphanConfirm, setOrphanConfirm]     = useState<{ ids: string[] } | null>(null);
+  // The connection key, opened from the zoom controls.
+  const [keyOpen, setKeyOpen]                 = useState(false);
+  const closeKey                              = useCallback(() => setKeyOpen(false), []);
   // Pending "remove systems with no route home" sweep, held while its confirm is up.
   const [strandedConfirm, setStrandedConfirm] = useState<{ ids: string[]; home: string } | null>(null);
   // Gate-adjacent systems per k-space eveSystemId, fetched lazily when a node's
@@ -1845,6 +1849,14 @@ export function MapCanvas() {
           >
             <CrosshairSimpleIcon size={14} weight="bold" />
           </ControlButton>
+          <ControlButton
+            onClick={() => setKeyOpen((o) => !o)}
+            title={t('mapKey.title')}
+            aria-label={t('mapKey.title')}
+            aria-expanded={keyOpen}
+          >
+            <QuestionIcon size={14} weight="bold" />
+          </ControlButton>
         </Controls>
         {showMinimap && (
           <MiniMap
@@ -1880,6 +1892,8 @@ export function MapCanvas() {
       </ReactFlow>
 
       {showCanvasHint && <div className="map-canvas__hint">{t('ctxMenu.canvasHint')}</div>}
+
+      {keyOpen && <MapKey onClose={closeKey} side={controlsPosition === 'bottom-right' ? 'right' : 'left'} />}
 
       {contextMenu && (
         <ContextMenu
