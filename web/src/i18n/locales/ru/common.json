@@ -258,6 +258,11 @@
       },
       "userFilters": {
         "all": "Все пользователи",
+        "active": "Активные",
+        "inactive": "Неактивные",
+        "new": "Новые пользователи",
+        "systemsAdded": "Систем добавлено",
+        "systemsDeleted": "Систем удалено",
         "logins": "Входы",
         "signatures": "Сигнатуры",
         "structures": "Структуры"

@@ -256,6 +256,11 @@
       },
       "userFilters": {
         "all": "Tous les utilisateurs",
+        "active": "Actifs",
+        "inactive": "Inactifs",
+        "new": "Nouveaux utilisateurs",
+        "systemsAdded": "Systèmes ajoutés",
+        "systemsDeleted": "Systèmes supprimés",
         "logins": "Connexions",
         "signatures": "Signatures",
         "structures": "Structures"

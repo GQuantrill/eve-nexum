@@ -268,6 +268,11 @@
       },
       "userFilters": {
         "all": "All users",
+        "active": "Active",
+        "inactive": "Inactive",
+        "new": "New users",
+        "systemsAdded": "Systems added",
+        "systemsDeleted": "Systems deleted",
         "logins": "Logins",
         "signatures": "Signatures",
         "structures": "Structures"

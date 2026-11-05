@@ -1308,12 +1308,18 @@ function chartTitleFor(t: TFunction, window: WindowKey): string {
   }
 }
 
-type UserFilterKey = 'all' | 'logins' | 'signatures' | 'structures';
+type UserFilterKey = 'all' | 'active' | 'inactive' | 'new' | 'logins' | 'signatures' | 'structures'
+  | 'systemsAdded' | 'systemsDeleted';
 const USER_FILTER_OPTIONS: { value: UserFilterKey }[] = [
-  { value: 'all'        },
-  { value: 'logins'     },
-  { value: 'signatures' },
-  { value: 'structures' },
+  { value: 'all'            },
+  { value: 'active'         },
+  { value: 'inactive'       },
+  { value: 'new'            },
+  { value: 'logins'         },
+  { value: 'signatures'     },
+  { value: 'structures'     },
+  { value: 'systemsAdded'   },
+  { value: 'systemsDeleted' },
 ];
 
 function ReportsTab() {
@@ -1539,7 +1545,6 @@ function UsersReport() {
         <Select
           value={window}
           onChange={(v) => setWindow(v as WindowKey)}
-          disabled={filter === 'all'}
           options={WINDOW_OPTIONS.map((o) => ({ value: o.value, label: t(`admin.reports.windowOptions.${o.value}`) }))}
         />
       </div>

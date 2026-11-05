@@ -256,6 +256,11 @@
       },
       "userFilters": {
         "all": "所有用户",
+        "active": "活跃",
+        "inactive": "不活跃",
+        "new": "新用户",
+        "systemsAdded": "添加的星系",
+        "systemsDeleted": "删除的星系",
         "logins": "登录",
         "signatures": "信号",
         "structures": "建筑"
