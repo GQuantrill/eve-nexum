@@ -1,9 +1,10 @@
-import { useEffect, type ReactNode } from 'react';
+import { type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMapStore } from '../../store/mapStore';
 import { hoursMins } from '../../i18n/format';
 import { FlagBannerIcon, XIcon } from '../../icons';
 import styles from './MapKey.module.css';
+import { useEscapeClose } from '../../hooks/useEscapeClose';
 
 // What every look a connection can take means. Swatches use the same colour
 // tokens, dashes and label classes as ConnectionEdge, so the key follows the
@@ -51,11 +52,7 @@ export function MapKey({ onClose, side }: { onClose: () => void; side: 'left' | 
   const lazyRemove = useMapStore((s) => !!s.map.lazyRemoveWormholes);
   const graceHours = useMapStore((s) => s.map.collapseGraceHours ?? 0.5);
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [onClose]);
+  useEscapeClose(onClose);
 
   // What happens next to an expired hole depends on this map's settings.
   const afterExpiry = !lazyRemove

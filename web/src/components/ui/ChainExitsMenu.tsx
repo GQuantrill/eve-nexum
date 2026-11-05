@@ -8,6 +8,7 @@ import { systemDisplayName } from '../../utils/systemName';
 import { jumps as jumpsLabel } from '../../i18n/format';
 import { SignOutIcon } from '../../icons';
 import type { SystemClass } from '../../types';
+import { useEscapeClose } from '../../hooks/useEscapeClose';
 
 // Where your chain lets you out, and which exit gets you nearest the places you
 // care about.
@@ -98,6 +99,7 @@ export function ChainExitsMenu() {
   const wrapRef = useRef<HTMLDivElement>(null);
 
   useClickOutside(open, wrapRef, () => setOpen(false));
+  useEscapeClose(() => setOpen(false), open);
 
   // K-space systems with a live wormhole on them -- where the chain actually
   // lets you out. A k-space system only reached by stargates (mapped while

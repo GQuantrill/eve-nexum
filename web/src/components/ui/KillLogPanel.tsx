@@ -7,6 +7,7 @@ import { useKillStore, useKillLog, type KillRow } from '../../store/killStore';
 import { useNow30s } from '../../hooks/useNow30s';
 import { charPortrait, corpLogo, typeRender } from '../../utils/eveImages';
 import { iskCompact } from '../../utils/isk';
+import { useEscapeClose } from '../../hooks/useEscapeClose';
 
 interface Props { onClose: () => void; }
 
@@ -77,6 +78,7 @@ function KillRowItem({ k, now, onShow }: { k: KillRow; now: number; onShow: (eve
 }
 
 export function KillLogPanel({ onClose }: Props) {
+  useEscapeClose(onClose);
   const { t } = useTranslation();
   const activeMapId = useMapStore((s) => s.activeMapId);
   const log = useKillLog();

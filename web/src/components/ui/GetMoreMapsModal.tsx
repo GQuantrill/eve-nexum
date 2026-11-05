@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { api } from '../../api/client';
 import { XIcon, CopyIcon, CheckIcon } from '../../icons';
+import { useEscapeClose } from '../../hooks/useEscapeClose';
 
 interface Donation { amount: string | number; occurredAt: string }
 
@@ -31,6 +32,7 @@ function isk(n: number, locale: string): string {
  * wallet hourly, so a promise of "immediately" would generate support tickets.
  */
 export function GetMoreMapsModal({ onClose }: { onClose: () => void }) {
+  useEscapeClose(onClose);
   const { t, i18n } = useTranslation();
   const [data, setData]   = useState<Allowance | null>(null);
   const [error, setError] = useState(false);

@@ -10,6 +10,7 @@ import { toast } from '../../utils/toastStore';
 import { ConfirmModal } from './ConfirmModal';
 import { Select } from './Select';
 import styles from './ApiKeysModal.module.css';
+import { useEscapeClose } from '../../hooks/useEscapeClose';
 
 const SCOPE_CLASS: Record<'read' | 'events' | 'write', string> = {
   read:   styles.scopeRead,
@@ -35,6 +36,7 @@ interface ApiKey {
 const EXPIRY_OPTIONS = [0, 30, 90, 365] as const;
 
 export function ApiKeysModal({ onClose }: { onClose: () => void }) {
+  useEscapeClose(onClose);
   const { t } = useTranslation();
   const { user } = useAuth();
   const characters = user?.characters ?? [];

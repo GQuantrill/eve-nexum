@@ -5,6 +5,7 @@ import { useUserSetting } from '../../hooks/useUserSetting';
 import { useClickOutside } from '../../hooks/useClickOutside';
 import { HEAT_METRICS, type HeatMetric } from '../../utils/heatmap';
 import { Select } from './Select';
+import { useEscapeClose } from '../../hooks/useEscapeClose';
 
 /**
  * Toolbar heatmap control: an icon button that opens a small horizontal popover
@@ -20,6 +21,7 @@ export function HeatmapMenu() {
   const wrapRef = useRef<HTMLDivElement>(null);
 
   useClickOutside(open, wrapRef, () => setOpen(false));
+  useEscapeClose(() => setOpen(false), open);
 
   const active = metric !== 'none';
 

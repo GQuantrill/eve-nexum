@@ -3,12 +3,14 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { XIcon } from '../../icons';
 import { buildSnippet, parseExtraSystems } from '../../utils/tripwireSnippet';
+import { useEscapeClose } from '../../hooks/useEscapeClose';
 
 
 export function TripwireImportModal({ onImport, onClose }: {
   onImport: (json: string) => Promise<void>;
   onClose:  () => void;
 }) {
+  useEscapeClose(onClose);
   const { t } = useTranslation();
   const [json, setJson] = useState('');
   const [extra, setExtra] = useState('');

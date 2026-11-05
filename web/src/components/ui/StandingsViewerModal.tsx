@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { XIcon } from '../../icons';
 import { api } from '../../api/client';
 import { corpLogo, allianceLogo } from '../../utils/eveImages';
+import { useEscapeClose } from '../../hooks/useEscapeClose';
 
 interface Contact {
   contactKind: 'corporation' | 'alliance';
@@ -61,12 +62,7 @@ export function StandingsViewerModal({ onClose }: Props) {
     return () => { alive = false; };
   }, []);
 
-  // Close on Escape, matching the other modals.
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [onClose]);
+  useEscapeClose(onClose);
 
   const hasCorp     = !!data?.corp;
   const hasAlliance = !!data?.alliance;

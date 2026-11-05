@@ -6,6 +6,7 @@ import { api } from '../../api/client';
 import { useMapStore } from '../../store/mapStore';
 import { useAuth, isAdminRole, isAllianceAdminRole } from '../../context/AuthContext';
 import { toast } from '../../utils/toastStore';
+import { useEscapeClose } from '../../hooks/useEscapeClose';
 
 type MapType = 'personal' | 'corp' | 'alliance';
 const TYPE_LABEL = { personal: 'copyMap.typePersonal', corp: 'copyMap.typeCorp', alliance: 'copyMap.typeAlliance' } as const;
@@ -18,6 +19,7 @@ const TYPE_LABEL = { personal: 'copyMap.typePersonal', corp: 'copyMap.typeCorp',
 // role/affiliation/quota. (Maps merely shared with the caller can't be copied at
 // all — the Copy action is hidden for them and the server 403s.)
 export function CopyMapModal({ onClose }: { onClose: () => void }) {
+  useEscapeClose(onClose);
   const { t } = useTranslation();
   const { user } = useAuth();
   const activeMapId    = useMapStore((s) => s.activeMapId);

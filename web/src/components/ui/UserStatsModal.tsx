@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { XIcon } from '../../icons';
 import { useStats, type StatPeriod, type SigBreakdown, type BucketUnit } from '../../hooks/useStats';
+import { useEscapeClose } from '../../hooks/useEscapeClose';
 
 const SPARK_VB_W = 600;
 const SPARK_VB_H = 80;
@@ -130,6 +131,7 @@ const SIG_ROWS: { key: keyof SigBreakdown }[] = [
 interface Props { onClose: () => void; }
 
 export function UserStatsModal({ onClose }: Props) {
+  useEscapeClose(onClose);
   const { t } = useTranslation();
   const [period, setPeriod] = useState<StatPeriod>('day');
   const { stats, loading, error } = useStats(true);

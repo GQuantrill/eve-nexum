@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { XIcon } from '../../icons';
 import { usePhosphorIcons } from '../../utils/phosphorIcons';
+import { useEscapeClose } from '../../hooks/useEscapeClose';
 
 interface Props {
   onPick:  (iconName: string) => void;
@@ -18,6 +19,7 @@ const ICON_RENDER_CAP = 120;
 // CustomLabelDialog and reuses its dialog/grid CSS so it looks consistent —
 // picking an icon calls onPick then closes.
 export function IconPickerDialog({ onPick, onClose, current }: Props) {
+  useEscapeClose(onClose);
   const { t } = useTranslation();
   const [iconQuery, setIconQuery] = useState('');
   // Phosphor is lazy-loaded on first open (it's a large chunk) — `names` fills in
@@ -48,7 +50,6 @@ export function IconPickerDialog({ onPick, onClose, current }: Props) {
             autoFocus
             placeholder={t('iconPicker.search')}
             onChange={(e) => setIconQuery(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Escape') onClose(); }}
             style={{ width: '100%' }}
           />
           {!ready && <p className="custom-label-dialog__hint">{t('iconPicker.loading')}</p>}

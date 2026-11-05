@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { XIcon } from '../../icons';
 import { useAuth } from '../../context/AuthContext';
@@ -7,6 +7,7 @@ import { setDestination, addWaypoint } from '../../api/waypoint';
 import { charPortrait } from '../../utils/eveImages';
 import { useSendToStore } from '../../store/sendToStore';
 import styles from './SendToCharactersModal.module.css';
+import { useEscapeClose } from '../../hooks/useEscapeClose';
 
 interface Row {
   charId:        number;   // users.id
@@ -50,11 +51,7 @@ function Picker({ eveSystemId, name, onClose }: { eveSystemId: number; name: str
   const [sending, setSending] = useState(false);
   const anyAltOnline = rows.some((r) => !r.self && r.online);
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [onClose]);
+  useEscapeClose(onClose);
 
   const toggle = (charId: number) => setPicked((cur) => {
     const next = new Set(cur);
