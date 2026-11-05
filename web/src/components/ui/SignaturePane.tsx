@@ -710,6 +710,13 @@ export function SignaturePane({ systemId }: { systemId: string }) {
     [colWidths, isShareMode, isColShown],
   );
 
+  // Name and Notes share any width the pane has beyond the columns' own
+  // widths. Their <col>s get no width (the table's min-width still covers
+  // theirs), so every other column stays the width it was set to instead of
+  // all of them stretching in step: that doubled the Group column in icon
+  // mode, leaving a wide empty cell around a small icon.
+  const colW = (c: ColKey) => (c === 'name' || c === 'notes' ? undefined : colWidths[c]);
+
   // Bumped when another client changes this system's sigs (live sync).
   const sigRev = useMapStore((s) => s.sigRev[systemId] ?? 0);
 
@@ -1373,9 +1380,9 @@ export function SignaturePane({ systemId }: { systemId: string }) {
             {isColShown('whstate') && <col style={{ width: colWidths.whstate }} />}
             {isColShown('leadsto') && <col style={{ width: colWidths.leadsto }} />}
             {!isShareMode && <col className="sig-col--bookmark" />}
-            {isColShown('name')    && <col style={{ width: colWidths.name }} />}
+            {isColShown('name')    && <col style={{ width: colW('name') }} />}
             {isColShown('safe')    && <col style={{ width: colWidths.safe }} />}
-            {isColShown('notes')   && <col style={{ width: colWidths.notes }} />}
+            {isColShown('notes')   && <col style={{ width: colW('notes') }} />}
             {isColShown('created') && <col style={{ width: colWidths.created }} />}
             {isColShown('updated') && <col style={{ width: colWidths.updated }} />}
             {!isShareMode && <col className="sig-col--actions" />}
@@ -1398,8 +1405,10 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                 {t('signatures.colId')}{sortInd('sigId')}
                 <div className="sig-th__resize" onMouseDown={(e) => startResize('id', e)} />
               </th>
-              <th className="sig-th sig-th--sortable" onClick={() => handleSort('sigType')}>
-                {t('signatures.colType')}{sortInd('sigType')}
+              <th className="sig-th sig-th--sortable" onClick={() => handleSort('sigType')}
+                data-tooltip={typeIcons ? t('signatures.colType') : undefined}>
+                {/* The word doesn't fit over an icon-wide column. */}
+                {!typeIcons && t('signatures.colType')}{sortInd('sigType')}
                 {!typeIcons && <div className="sig-th__resize" onMouseDown={(e) => startResize('type', e)} />}
               </th>
               {isColShown('whtype') && (
