@@ -1110,6 +1110,7 @@ const WINDOW_INTERVALS: Record<string, string | null> = {
   '24h':   '24 hours',
   'week':  '7 days',
   'month': '30 days',
+  'quarter': '90 days',
   'year':  '365 days',
   'all':   null,
 };
@@ -1119,15 +1120,18 @@ function parseWindow(raw: unknown): { key: string; interval: string | null } {
   return { key, interval: WINDOW_INTERVALS[key] };
 }
 
-const USER_FILTERS = new Set(['logins', 'signatures', 'structures']);
+const USER_FILTERS = new Set([
+  'signatures', 'structures', 'active', 'inactive', 'new', 'systemsAdded', 'systemsDeleted',
+]);
 
 // GET /api/admin/reports/users — per-user activity summary.
-//   ?filter=logins|signatures|structures (optional)
-//   ?window=24h|week|month|year|all       (default 'all')
+//   ?filter=signatures|structures|active|inactive|new|systemsAdded|systemsDeleted (optional)
+//   ?window=24h|week|month|quarter|year|all (default 'all')
 //
 // Filter narrows rows to users whose chosen activity falls inside the
-// window. With no filter (default) every user is returned. Numeric columns
-// stay lifetime — the filter is purely a row-inclusion criterion.
+// window. With no filter (default) every user is returned. A window also
+// bounds the count columns (systems added/deleted, signatures by type) to
+// activity inside it; the "last ..." timestamps stay lifetime.
 reportsRouter.get('/users', async (req, res) => {
   const scope = corpScopeFor(req);
   if (scope === null) { res.status(403).json({ error: 'No corp affiliation' }); return; }
@@ -1148,47 +1152,62 @@ reportsRouter.get('/users', async (req, res) => {
     ? (req.session.role === 'alliance_admin' ? `u.alliance_id = $1` : `u.corp_id = $1`)
     : null;
 
-  // Row-inclusion conditions (user-scope + filter EXISTS). Joined with AND.
+  // The window as a SQL predicate on a timestamp column. TRUE for 'all', so
+  // every activity check below reads the same with or without a window.
+  let intervalParam: string | null = null;
+  if (window.interval) {
+    params.push(window.interval);
+    intervalParam = `$${params.length}::interval`;
+  }
+  const inWindow = (col: string) => (intervalParam ? `${col} >= NOW() - ${intervalParam}` : 'TRUE');
+
+  // Did the user log an event of these types (scoped to the admin's maps when
+  // `scoped`; scan events are map-agnostic, as in the counts below)?
+  const hasEvent = (types: string[], scoped: boolean) => `EXISTS (
+    SELECT 1 FROM user_events e
+    ${scoped ? 'JOIN maps m ON m.id = e.map_id' : ''}
+    WHERE e.user_id = u.id
+      AND e.event_type IN (${types.map((ty) => `'${ty}'`).join(', ')})
+      ${scoped ? `AND ${corpSql}` : ''}
+      AND ${inWindow('e.created_at')}
+  )`;
+  const hasStructure = `EXISTS (
+    SELECT 1 FROM map_structures st
+    JOIN map_systems sys ON sys.id = st.system_id
+    JOIN maps        m   ON m.id   = sys.map_id
+    WHERE st.created_by_user_id = u.id
+      AND ${corpSql}
+      AND ${inWindow('st.created_at')}
+  )`;
+  const hasAnomaly = `EXISTS (
+    SELECT 1 FROM map_anomalies a
+    JOIN map_systems sys ON sys.id = a.system_id
+    JOIN maps        m   ON m.id   = sys.map_id
+    WHERE a.created_by_user_id = u.id
+      AND ${corpSql}
+      AND ${inWindow('GREATEST(a.created_at, a.updated_at)')}
+  )`;
+  // Anything at all: a login, a move between systems, a scan or jump, a system
+  // added or deleted, a structure or anomaly. Event types are fixed literals.
+  const isActive = `(
+    (u.last_login_at IS NOT NULL AND ${inWindow('u.last_login_at')})
+    OR (u.last_known_system_at IS NOT NULL AND ${inWindow('u.last_known_system_at')})
+    OR ${hasEvent(['signature', 'jump', 'system_add', 'system_delete'], false)}
+    OR ${hasStructure}
+    OR ${hasAnomaly}
+  )`;
+
+  // Row-inclusion conditions (user-scope + filter). Joined with AND.
   const conditions: string[] = [];
   if (userScope) conditions.push(userScope);
-  if (filter && window.interval) {
-    params.push(window.interval);
-    const intervalParam = `$${params.length}::interval`;
-    if (filter === 'logins') {
-      conditions.push(`u.updated_at >= NOW() - ${intervalParam}`);
-    } else if (filter === 'signatures') {
-      conditions.push(`EXISTS (
-        SELECT 1 FROM user_events e
-        WHERE e.user_id = u.id
-          AND e.event_type = 'signature'
-          AND e.created_at >= NOW() - ${intervalParam}
-      )`);
-    } else if (filter === 'structures') {
-      conditions.push(`EXISTS (
-        SELECT 1 FROM map_structures st
-        JOIN map_systems sys ON sys.id = st.system_id
-        JOIN maps        m   ON m.id   = sys.map_id
-        WHERE st.created_by_user_id = u.id
-          AND ${corpSql}
-          AND st.created_at >= NOW() - ${intervalParam}
-      )`);
-    }
-  } else if (filter && !window.interval) {
-    // filter + 'all' window → at least one such activity ever
-    if (filter === 'signatures') {
-      conditions.push(`EXISTS (
-        SELECT 1 FROM user_events e
-        WHERE e.user_id = u.id AND e.event_type = 'signature'
-      )`);
-    } else if (filter === 'structures') {
-      conditions.push(`EXISTS (
-        SELECT 1 FROM map_structures st
-        JOIN map_systems sys ON sys.id = st.system_id
-        JOIN maps        m   ON m.id   = sys.map_id
-        WHERE st.created_by_user_id = u.id AND ${corpSql}
-      )`);
-    }
-    // logins + all → no extra activity predicate (user-scope still applies)
+  switch (filter) {
+    case 'signatures':     conditions.push(hasEvent(['signature'], false)); break;
+    case 'structures':     conditions.push(hasStructure); break;
+    case 'systemsAdded':   conditions.push(hasEvent(['system_add'], true)); break;
+    case 'systemsDeleted': conditions.push(hasEvent(['system_delete'], true)); break;
+    case 'new':            conditions.push(inWindow('u.created_at')); break;
+    case 'active':         conditions.push(isActive); break;
+    case 'inactive':       conditions.push(`NOT ${isActive}`); break;
   }
   const inclusionWhere = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
@@ -1236,6 +1255,7 @@ reportsRouter.get('/users', async (req, res) => {
       SELECT user_id, sig_type, COUNT(*)::int AS cnt
       FROM user_events
       WHERE event_type = 'signature' AND sig_type IS NOT NULL
+        AND ${inWindow('created_at')}
       GROUP BY user_id, sig_type
     ),
     corp_system_events AS (
@@ -1244,6 +1264,7 @@ reportsRouter.get('/users', async (req, res) => {
       JOIN maps m ON m.id = e.map_id
       WHERE e.event_type IN ('system_add', 'system_delete')
         AND ${corpSql}
+        AND ${inWindow('e.created_at')}
       GROUP BY e.user_id, e.event_type
     )
     SELECT
@@ -1313,12 +1334,14 @@ const SYSTEMS_CHART_SPEC: Record<string, { trunc: string; step: string; count: n
   '24h':   { trunc: 'hour',  step: '1 hour',   count: 24, label: 'HH24:00' },
   'week':  { trunc: 'day',   step: '1 day',    count: 7,  label: 'DD-MM' },
   'month': { trunc: 'day',   step: '1 day',    count: 30, label: 'DD-MM' },
+  // Weekly: 90 daily bars would be too dense to read. Labelled by week start.
+  'quarter': { trunc: 'week', step: '1 week',  count: 13, label: 'DD-MM' },
   'year':  { trunc: 'month', step: '1 month',  count: 12, label: 'MM-YYYY' },
   'all':   'all',
 };
 
 // GET /api/admin/reports/systems — aggregate signatures across every map
-// (personal + corp), optionally constrained to ?window=24h|week|month|year|all
+// (personal + corp), optionally constrained to ?window=24h|week|month|quarter|year|all
 // (default 'all'). The chart-series bucketing adapts to the window: hourly for 24h,
 // daily for week/month, monthly for year, monthly-from-oldest for all.
 reportsRouter.get('/systems', async (req, res) => {

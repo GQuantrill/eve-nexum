@@ -252,11 +252,16 @@
         "24h": "Letzte 24 Stunden",
         "week": "Letzte Woche",
         "month": "Letzter Monat",
+        "quarter": "Letztes Quartal",
         "year": "Letztes Jahr"
       },
       "userFilters": {
         "all": "Alle Benutzer",
-        "logins": "Logins",
+        "active": "Aktiv",
+        "inactive": "Inaktiv",
+        "new": "Neue Benutzer",
+        "systemsAdded": "Systeme hinzugefügt",
+        "systemsDeleted": "Systeme gelöscht",
         "signatures": "Signaturen",
         "structures": "Strukturen"
       },
@@ -297,6 +302,7 @@
           "hour24": "Signaturen pro Stunde (letzte 24 Stunden)",
           "dayWeek": "Signaturen pro Tag (letzte Woche)",
           "dayMonth": "Signaturen pro Tag (letzter Monat)",
+          "weekQuarter": "Signaturen pro Woche (letztes Quartal)",
           "monthYear": "Signaturen pro Monat (letztes Jahr)",
           "monthAll": "Signaturen pro Monat (gesamte Zeit)"
         },

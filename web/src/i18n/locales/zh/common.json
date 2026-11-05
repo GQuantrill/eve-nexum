@@ -252,11 +252,16 @@
         "24h": "过去 24 小时",
         "week": "过去一周",
         "month": "过去一月",
+        "quarter": "过去一季",
         "year": "过去一年"
       },
       "userFilters": {
         "all": "所有用户",
-        "logins": "登录",
+        "active": "活跃",
+        "inactive": "不活跃",
+        "new": "新用户",
+        "systemsAdded": "添加的星系",
+        "systemsDeleted": "删除的星系",
         "signatures": "信号",
         "structures": "建筑"
       },
@@ -297,6 +302,7 @@
           "hour24": "每小时信号数（过去 24 小时）",
           "dayWeek": "每日信号数（过去一周）",
           "dayMonth": "每日信号数（过去一月）",
+          "weekQuarter": "每周信号数（过去一季）",
           "monthYear": "每月信号数（过去一年）",
           "monthAll": "每月信号数（全部时间）"
         },

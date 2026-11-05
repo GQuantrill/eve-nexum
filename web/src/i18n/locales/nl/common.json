@@ -264,11 +264,16 @@
         "24h": "Laatste 24 uur",
         "week": "Afgelopen week",
         "month": "Afgelopen maand",
+        "quarter": "Afgelopen kwartaal",
         "year": "Afgelopen jaar"
       },
       "userFilters": {
         "all": "Alle gebruikers",
-        "logins": "Logins",
+        "active": "Actief",
+        "inactive": "Inactief",
+        "new": "Nieuwe gebruikers",
+        "systemsAdded": "Systemen toegevoegd",
+        "systemsDeleted": "Systemen verwijderd",
         "signatures": "Signaturen",
         "structures": "Structures"
       },
@@ -309,6 +314,7 @@
           "hour24": "Signaturen per uur (laatste 24 uur)",
           "dayWeek": "Signaturen per dag (afgelopen week)",
           "dayMonth": "Signaturen per dag (afgelopen maand)",
+          "weekQuarter": "Signaturen per week (afgelopen kwartaal)",
           "monthYear": "Signaturen per maand (afgelopen jaar)",
           "monthAll": "Signaturen per maand (alle tijd)"
         },

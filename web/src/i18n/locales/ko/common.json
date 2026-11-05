@@ -252,11 +252,16 @@
         "24h": "지난 24시간",
         "week": "지난 한 주",
         "month": "지난 한 달",
+        "quarter": "지난 분기",
         "year": "지난 1년"
       },
       "userFilters": {
         "all": "모든 사용자",
-        "logins": "접속",
+        "active": "활동",
+        "inactive": "비활동",
+        "new": "신규 사용자",
+        "systemsAdded": "추가한 성계",
+        "systemsDeleted": "삭제한 성계",
         "signatures": "시그니처",
         "structures": "구조물"
       },
@@ -297,6 +302,7 @@
           "hour24": "시간당 시그니처 (지난 24시간)",
           "dayWeek": "일별 시그니처 (지난 한 주)",
           "dayMonth": "일별 시그니처 (지난 한 달)",
+          "weekQuarter": "주별 시그니처 (지난 분기)",
           "monthYear": "월별 시그니처 (지난 1년)",
           "monthAll": "월별 시그니처 (전체 기간)"
         },

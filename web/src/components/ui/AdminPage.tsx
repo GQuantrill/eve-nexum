@@ -1286,12 +1286,13 @@ const REPORT_TAB_KEY: Record<ReportKind, 'admin.reports.tabs.users' | 'admin.rep
   'ghost-sites': 'admin.reports.tabs.ghostSites',
 };
 
-type WindowKey = 'all' | '24h' | 'week' | 'month' | 'year';
+type WindowKey = 'all' | '24h' | 'week' | 'month' | 'quarter' | 'year';
 const WINDOW_OPTIONS: { value: WindowKey }[] = [
   { value: 'all'   },
   { value: '24h'   },
   { value: 'week'  },
   { value: 'month' },
+  { value: 'quarter' },
   { value: 'year'  },
 ];
 
@@ -1303,17 +1304,23 @@ function chartTitleFor(t: TFunction, window: WindowKey): string {
     case '24h':   return t('admin.reports.systems.chart.hour24');
     case 'week':  return t('admin.reports.systems.chart.dayWeek');
     case 'month': return t('admin.reports.systems.chart.dayMonth');
+    case 'quarter': return t('admin.reports.systems.chart.weekQuarter');
     case 'year':  return t('admin.reports.systems.chart.monthYear');
     case 'all':   return t('admin.reports.systems.chart.monthAll');
   }
 }
 
-type UserFilterKey = 'all' | 'logins' | 'signatures' | 'structures';
+type UserFilterKey = 'all' | 'active' | 'inactive' | 'new' | 'signatures' | 'structures'
+  | 'systemsAdded' | 'systemsDeleted';
 const USER_FILTER_OPTIONS: { value: UserFilterKey }[] = [
-  { value: 'all'        },
-  { value: 'logins'     },
-  { value: 'signatures' },
-  { value: 'structures' },
+  { value: 'all'            },
+  { value: 'active'         },
+  { value: 'inactive'       },
+  { value: 'new'            },
+  { value: 'signatures'     },
+  { value: 'structures'     },
+  { value: 'systemsAdded'   },
+  { value: 'systemsDeleted' },
 ];
 
 function ReportsTab() {
@@ -1539,7 +1546,6 @@ function UsersReport() {
         <Select
           value={window}
           onChange={(v) => setWindow(v as WindowKey)}
-          disabled={filter === 'all'}
           options={WINDOW_OPTIONS.map((o) => ({ value: o.value, label: t(`admin.reports.windowOptions.${o.value}`) }))}
         />
       </div>

@@ -252,11 +252,16 @@
         "24h": "Últimas 24 horas",
         "week": "Última semana",
         "month": "Último mes",
+        "quarter": "Último trimestre",
         "year": "Último año"
       },
       "userFilters": {
         "all": "Todos los usuarios",
-        "logins": "Accesos",
+        "active": "Activos",
+        "inactive": "Inactivos",
+        "new": "Usuarios nuevos",
+        "systemsAdded": "Sistemas añadidos",
+        "systemsDeleted": "Sistemas eliminados",
         "signatures": "Firmas",
         "structures": "Estructuras"
       },
@@ -297,6 +302,7 @@
           "hour24": "Firmas por hora (últimas 24 horas)",
           "dayWeek": "Firmas por día (última semana)",
           "dayMonth": "Firmas por día (último mes)",
+          "weekQuarter": "Firmas por semana (último trimestre)",
           "monthYear": "Firmas por mes (último año)",
           "monthAll": "Firmas por mes (todo el tiempo)"
         },
