@@ -503,14 +503,23 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   const [hiddenColsArr, setHiddenColsArr] = useUserSetting<ColKey[]>('nexum.sigPane.hiddenCols', []);
   const hiddenCols = useMemo(() => new Set(hiddenColsArr), [hiddenColsArr]);
   const isColVisible = useCallback((c: ColKey) => !hiddenCols.has(c), [hiddenCols]);
-  // What the table actually draws: the user's choice, narrowed further while a
-  // type filter is on to the columns the filtered types use. A column needed by
-  // any selected type stays. No filter = every column the user hasn't hidden.
+  // What the table actually draws: the user's choice, narrowed to the columns
+  // the listed types use. Those are the filtered types while a type filter is
+  // on, otherwise the types of the sigs in the list, so a system holding only
+  // relic and data sites drops Type / State / Leads to the same way filtering to
+  // them does. Re-evaluated with every paste or group change. An unknown sig
+  // could still turn out to be anything, so while one is listed every column
+  // stays, as it does for an empty list.
+  const listedTypes = useMemo((): Set<SigType> | null => {
+    if (typeFilter.size > 0) return typeFilter;
+    if (sigs.length === 0 || sigs.some((s) => s.sigType === 'unknown')) return null;
+    return new Set(sigs.map((s) => s.sigType));
+  }, [typeFilter, sigs]);
   const isColShown = useCallback((c: ColKey) => {
     if (!isColVisible(c)) return false;
     const only = COL_SIG_TYPES[c];
-    return !only || typeFilter.size === 0 || only.some((ty) => typeFilter.has(ty));
-  }, [isColVisible, typeFilter]);
+    return !only || !listedTypes || only.some((ty) => listedTypes.has(ty));
+  }, [isColVisible, listedTypes]);
   const toggleCol = (c: ColKey) =>
     setHiddenColsArr((prev) => (prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c]));
   // Portalled popover so the columns menu escapes the pane's overflow and stays
