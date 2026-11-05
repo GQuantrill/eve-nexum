@@ -206,8 +206,8 @@ export async function updateSignature(
   };
 }
 
-interface DeletedSig { sigId: string; name: string; whType: string; whLeadsTo: string }
-interface LinkRow {
+export interface DeletedSig { sigId: string; name: string; whType: string; whLeadsTo: string }
+export interface LinkRow {
   id: string; sourceId: string; type: string | null;
   sourceSigId: string | null; targetSigId: string | null;
   otherName: string; otherClass: string;
@@ -223,7 +223,7 @@ interface LinkRow {
  *  - otherwise a sig whose type labels the link and whose leads-to points at the
  *    other end breaks it when no remaining sig points there at all.
  */
-function linksLeftOrphaned(systemId: string, sigId: string, deleted: DeletedSig, links: LinkRow[], remaining: DeletedSig[]): string[] {
+export function linksLeftOrphaned(systemId: string, sigId: string, deleted: DeletedSig, links: LinkRow[], remaining: DeletedSig[]): string[] {
   const oldType = deleted.whType.toUpperCase();
   const oldLeads = deleted.whLeadsTo.toUpperCase();
   const out: string[] = [];

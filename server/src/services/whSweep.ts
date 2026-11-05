@@ -3,6 +3,7 @@ import { config } from '../config.js';
 import { createLogger } from '../utils/logger.js';
 import { publishToMap } from './mapEvents.js';
 import { whLifetimeHours } from '../data/whLifetimes.js';
+import { linksLeftOrphaned, type DeletedSig, type LinkRow } from './mapWrite.js';
 
 const log = createLogger('whSweep');
 
@@ -22,7 +23,10 @@ interface CandidateRow {
 }
 
 interface SysRow  { id: string; name: string; systemClass: string }
-interface ConnRow { id: string; sourceId: string; targetId: string; type: string | null; connectionType: string; broken: boolean }
+interface ConnRow {
+  id: string; sourceId: string; targetId: string; type: string | null; connectionType: string; broken: boolean;
+  sourceSigId: string | null; targetSigId: string | null;
+}
 interface SigRow  { systemId: string; whType: string; whLeadsTo: string }
 
 /**
@@ -97,9 +101,12 @@ async function sweepMap(mapId: string, expired: CandidateRow[]): Promise<void> {
     // are serialised by node-pg anyway and the parallel form is deprecated (pg@9).
     const sysRes = await client.query<SysRow>(
       `SELECT id, name, system_class AS "systemClass" FROM map_systems WHERE map_id = $1`, [mapId]);
+    // Read before the delete: the signature ids are ON DELETE SET NULL, so
+    // afterwards we couldn't tell which links the aged sigs were backing.
     const connRes = await client.query<ConnRow>(
       `SELECT id, source_id AS "sourceId", target_id AS "targetId", wh_type AS "type",
-              connection_type AS "connectionType", broken
+              connection_type AS "connectionType", broken,
+              source_signature_id AS "sourceSigId", target_signature_id AS "targetSigId"
          FROM map_connections WHERE map_id = $1`, [mapId]);
 
     await client.query(`DELETE FROM map_signatures WHERE id = ANY($1::uuid[])`, [expiredIds]);
@@ -118,9 +125,38 @@ async function sweepMap(mapId: string, expired: CandidateRow[]): Promise<void> {
       if (list) list.push(sig); else sigsBySystem.set(sig.systemId, [sig]);
     }
 
-    brokenIds = connRes.rows
-      .filter((c) => c.connectionType === 'standard' && !c.broken)
-      .filter((c) => wasBackedByDeleted(c, expired, systemsById))
+    // Every sig left in the systems that lost one, typed or not: a sig pinned
+    // to a system by name still holds that link open.
+    const affected = [...new Set(expired.map((e) => e.systemId))];
+    const leftRes = await client.query<DeletedSig & { systemId: string }>(
+      `SELECT system_id AS "systemId", sig_id AS "sigId", name,
+              COALESCE(wh_type, '') AS "whType", COALESCE(wh_leads_to, '') AS "whLeadsTo"
+         FROM map_signatures WHERE system_id = ANY($1::uuid[])`, [affected]);
+
+    const live = connRes.rows.filter((c) => c.connectionType === 'standard' && !c.broken);
+    // The type match alone missed untyped links: a hole whose code never made
+    // it onto the line kept showing live after its sig was swept. So also use
+    // the delete path's rules, which follow the link's own backing signature
+    // and a leads-to naming the far system.
+    const orphaned = new Set(live.filter((c) => wasBackedByDeleted(c, expired, systemsById)).map((c) => c.id));
+    for (const sysId of affected) {
+      const links: LinkRow[] = [];
+      for (const c of live) {
+        if (c.sourceId !== sysId && c.targetId !== sysId) continue;
+        const other = systemsById.get(c.sourceId === sysId ? c.targetId : c.sourceId);
+        links.push({ id: c.id, sourceId: c.sourceId, type: c.type, sourceSigId: c.sourceSigId, targetSigId: c.targetSigId,
+                     otherName: other?.name ?? '', otherClass: other?.systemClass ?? '' });
+      }
+      if (!links.length) continue;
+      const left = leftRes.rows.filter((r) => r.systemId === sysId);
+      for (const d of expired) {
+        if (d.systemId !== sysId) continue;
+        const gone: DeletedSig = { sigId: '', name: '', whType: d.whType ?? '', whLeadsTo: d.whLeadsTo ?? '' };
+        for (const id of linksLeftOrphaned(sysId, d.id, gone, links, left)) orphaned.add(id);
+      }
+    }
+    brokenIds = live
+      .filter((c) => orphaned.has(c.id))
       .filter((c) => !isBacked(c, sigsBySystem, systemsById))
       .map((c) => c.id);
 
