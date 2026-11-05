@@ -13,6 +13,7 @@ import { systemDisplayName } from '../../utils/systemName';
 import { useUserSetting } from '../../hooks/useUserSetting';
 import { usePopover } from '../../hooks/usePopover';
 import type { Signature, SigType, MapConnection, MassStatus, TimeStatus } from '../../types';
+import { SigTypeIcon } from './SigTypeIcon';
 import { connectionForSig, effectiveWhState, lifePatch, LIFE_CYCLE } from '../../utils/whState';
 import { leadsToForTypeChange } from '../../utils/whDest';
 import { ConfirmModal } from './ConfirmModal';
@@ -256,6 +257,11 @@ const DEFAULT_WIDTHS: Record<ColKey, number> = {
   updated: 80,
 };
 
+// Group column width with "Group as icons" on: the icon and the picker caret.
+// Not drag-resizable in that mode, so the text-mode width the user tuned is
+// kept for when they switch back.
+const TYPE_ICON_WIDTH = 44;
+
 // The leads-to cell holds the destination picker AND the copy-bookmark button
 // side by side; below this the picker can't show a full J-code (J######)
 // without the copy button spilling into the next column. Enforced as a floor
@@ -492,12 +498,15 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   // here, so a larger font widens the columns with it instead of the text
   // spilling under the next column (the ID slid under the Group picker at 130%).
   const uiZoom = useMapStore((s) => s.uiZoom);
+  // Show the Group column as the probe scanner's icons instead of words.
+  const [typeIcons, setTypeIcons] = useUserSetting<boolean>('nexum.sigPane.typeIcons', false);
   const colWidths = useMemo(() => {
     const merged = { ...DEFAULT_WIDTHS, ...savedColWidths } as Record<ColKey, number>;
     merged.leadsto = Math.max(LEADSTO_MIN_WIDTH, merged.leadsto);
+    if (typeIcons) merged.type = TYPE_ICON_WIDTH;
     for (const k of Object.keys(merged) as ColKey[]) merged[k] = Math.round(merged[k] * uiZoom);
     return merged;
-  }, [savedColWidths, uiZoom]);
+  }, [savedColWidths, uiZoom, typeIcons]);
 
   // Hidden columns, persisted per user (shared across every Signature pane).
   const [hiddenColsArr, setHiddenColsArr] = useUserSetting<ColKey[]>('nexum.sigPane.hiddenCols', []);
@@ -700,6 +709,13 @@ export function SignaturePane({ systemId }: { systemId: string }) {
       .reduce((a, [k, w]) => a + (isColShown(k) ? w : 0), 0) + (isShareMode ? 0 : 24 + 28),
     [colWidths, isShareMode, isColShown],
   );
+
+  // Name and Notes share any width the pane has beyond the columns' own
+  // widths. Their <col>s get no width (the table's min-width still covers
+  // theirs), so every other column stays the width it was set to instead of
+  // all of them stretching in step: that doubled the Group column in icon
+  // mode, leaving a wide empty cell around a small icon.
+  const colW = (c: ColKey) => (c === 'name' || c === 'notes' ? undefined : colWidths[c]);
 
   // Bumped when another client changes this system's sigs (live sync).
   const sigRev = useMapStore((s) => s.sigRev[systemId] ?? 0);
@@ -1325,6 +1341,15 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                     <span>{t(labelKey)}</span>
                   </label>
                 ))}
+                <div className="sig-col-menu__sep" />
+                <label className="sig-col-menu__item">
+                  <input
+                    type="checkbox"
+                    checked={typeIcons}
+                    onChange={() => setTypeIcons(!typeIcons)}
+                  />
+                  <span>{t('signatures.groupIcons')}</span>
+                </label>
               </div>,
               document.body,
             )}
@@ -1355,9 +1380,9 @@ export function SignaturePane({ systemId }: { systemId: string }) {
             {isColShown('whstate') && <col style={{ width: colWidths.whstate }} />}
             {isColShown('leadsto') && <col style={{ width: colWidths.leadsto }} />}
             {!isShareMode && <col className="sig-col--bookmark" />}
-            {isColShown('name')    && <col style={{ width: colWidths.name }} />}
+            {isColShown('name')    && <col style={{ width: colW('name') }} />}
             {isColShown('safe')    && <col style={{ width: colWidths.safe }} />}
-            {isColShown('notes')   && <col style={{ width: colWidths.notes }} />}
+            {isColShown('notes')   && <col style={{ width: colW('notes') }} />}
             {isColShown('created') && <col style={{ width: colWidths.created }} />}
             {isColShown('updated') && <col style={{ width: colWidths.updated }} />}
             {!isShareMode && <col className="sig-col--actions" />}
@@ -1380,9 +1405,11 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                 {t('signatures.colId')}{sortInd('sigId')}
                 <div className="sig-th__resize" onMouseDown={(e) => startResize('id', e)} />
               </th>
-              <th className="sig-th sig-th--sortable" onClick={() => handleSort('sigType')}>
-                {t('signatures.colType')}{sortInd('sigType')}
-                <div className="sig-th__resize" onMouseDown={(e) => startResize('type', e)} />
+              <th className="sig-th sig-th--sortable" onClick={() => handleSort('sigType')}
+                data-tooltip={typeIcons ? t('signatures.colType') : undefined}>
+                {/* The word doesn't fit over an icon-wide column. */}
+                {!typeIcons && t('signatures.colType')}{sortInd('sigType')}
+                {!typeIcons && <div className="sig-th__resize" onMouseDown={(e) => startResize('type', e)} />}
               </th>
               {isColShown('whtype') && (
                 <th className="sig-th sig-th--sortable" onClick={() => handleSort('whType')}>
@@ -1471,12 +1498,14 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                 </td>
                 <td>
                   {isShareMode ? (
-                    <span className={`sig-text sig-text--type sig-select--type-${sig.sigType}`}>
-                      {sigTypeLabel(sig.sigType)}
+                    <span className={`sig-text sig-text--type sig-select--type-${sig.sigType}`}
+                      data-tooltip={typeIcons ? sigTypeLabel(sig.sigType) : undefined}>
+                      {typeIcons ? <SigTypeIcon type={sig.sigType} /> : sigTypeLabel(sig.sigType)}
                     </span>
                   ) : (
                     <Select
-                      className="sig-type-select"
+                      className={`sig-type-select${typeIcons ? ' sig-type-select--icons' : ''}`}
+                      title={typeIcons ? sigTypeLabel(sig.sigType) : undefined}
                       value={sig.sigType}
                       onChange={(v) => {
                         const sigType = v as SigType;
@@ -1493,8 +1522,15 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                         value: st,
                         text:  sigTypeLabel(st),
                         // Reuse the existing per-type colour classes so the value
-                        // stays tinted by type in the trigger and the list.
-                        label: <span className={`sig-select--type-${st}`}>{sigTypeLabel(st)}</span>,
+                        // stays tinted by type in the trigger and the list. The
+                        // list always shows icon + word; the trigger shows only
+                        // the word, or only the icon in icon mode (CSS).
+                        label: (
+                          <span className={`sig-type-opt sig-select--type-${st}`}>
+                            <SigTypeIcon type={st} />
+                            <span className="sig-type-opt__text">{sigTypeLabel(st)}</span>
+                          </span>
+                        ),
                       }))}
                     />
                   )}
