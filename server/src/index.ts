@@ -185,6 +185,12 @@ app.use('/api/dscan',             appLimiter, dscanRouter);
 
 app.get('/health', (_req, res) => res.json({ ok: true }));
 
+// Round-trip probe for the toolbar's Nexum latency. Empty and never cached, so
+// the time measured is the network plus Express, nothing else.
+app.get('/api/ping', publicLimiter, (_req, res) => {
+  res.set('Cache-Control', 'no-store').status(204).end();
+});
+
 // Catch-all error middleware. Logs the failure with method+path for triage
 // and returns a generic 500 — stack traces stay in the server logs rather
 // than leaking through to a stray client. The 4-arg signature is what

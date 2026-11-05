@@ -70,6 +70,53 @@ interface EveStatus {
   players:    number;
   serverUp:   boolean; // 200 from status endpoint
   esiOnline:  boolean; // fetch reached ESI at all
+  nexumUp?:   boolean; // our own /api/ping answered
+  // Round trips in ms, each the median of the last few checks (see pushSample).
+  esiMs?:     number | null;
+  nexumMs?:   number | null;
+  esiSamples?:   number[];
+  nexumSamples?: number[];
+}
+
+// Latency shown is the median of the last few checks. A single reading jumps
+// around, and the first one after a quiet minute also pays for setting up the
+// connection again.
+const SAMPLES = 5;
+function pushSample(prev: number[] | undefined, ms: number | null): number[] {
+  return ms == null ? (prev ?? []) : [...(prev ?? []), Math.round(ms)].slice(-SAMPLES);
+}
+function median(xs: number[]): number | null {
+  if (xs.length === 0) return null;
+  const s = [...xs].sort((a, b) => a - b);
+  return Math.round(s[Math.floor(s.length / 2)]);
+}
+
+// Time one request. Null when it failed.
+//
+// Prefers the browser's own timing of the request: timing it ourselves also
+// counts however long the page took to get back to us, which on a busy page
+// (first load especially) can be more than the network. Same-origin requests
+// time request-sent to first byte, leaving out connection setup; ESI doesn't
+// allow that detail cross-origin, so it gets the whole fetch.
+// The body is read here because the browser only files its timing once the
+// response is complete.
+async function timed(url: string): Promise<{ ok: boolean; body: string; ms: number } | null> {
+  const start = performance.now();
+  try {
+    const res = await fetch(url, { cache: 'no-store', signal: AbortSignal.timeout(10_000) });
+    const fallback = performance.now() - start;
+    const body = await res.text();
+    const abs = new URL(url, location.href).href;
+    const entry = (performance.getEntriesByName(abs, 'resource') as PerformanceResourceTiming[])
+      .filter((e) => e.startTime >= start).pop();
+    const ms = !entry ? fallback
+      : entry.responseStart > 0 && entry.requestStart > 0 ? entry.responseStart - entry.requestStart
+      : entry.duration > 0 ? entry.duration
+      : fallback;
+    return { ok: res.ok, body, ms };
+  } catch {
+    return null;
+  }
 }
 
 // Cross-tab cache: when one tab polls ESI, the result is written to localStorage
@@ -110,23 +157,29 @@ function useEveServerStatus(): EveStatus | null {
         if (!cancelled) setStatus(cached.value);
         return;
       }
-      let esiOnline = false;
       let serverUp  = false;
       let players   = 0;
-      try {
-        const res = await fetch('https://esi.evetech.net/latest/status/?datasource=tranquility', {
-          signal: AbortSignal.timeout(10_000),
-        });
-        esiOnline = true;
-        if (res.ok) {
-          const data = await res.json() as { players?: number };
+      const [esi, nexum] = await Promise.all([
+        timed('https://esi.evetech.net/latest/status/?datasource=tranquility'),
+        timed('/api/ping'),
+      ]);
+      const esiOnline = esi != null;
+      if (esi?.ok) {
+        try {
+          const data = JSON.parse(esi.body) as { players?: number };
           serverUp = true;
           players  = data.players ?? 0;
-        }
-      } catch {
-        // esiOnline stays false
+        } catch { /* garbled body: TQ state unknown, ESI still answered */ }
       }
-      const value: EveStatus = { players, serverUp, esiOnline };
+      const nexumUp = nexum != null && nexum.ok;
+      const esiSamples   = pushSample(cached?.value.esiSamples, esi?.ms ?? null);
+      const nexumSamples = pushSample(cached?.value.nexumSamples, nexumUp ? nexum.ms : null);
+      const value: EveStatus = {
+        players, serverUp, esiOnline, nexumUp,
+        esiMs: esiOnline ? median(esiSamples) : null,
+        nexumMs: nexumUp ? median(nexumSamples) : null,
+        esiSamples, nexumSamples,
+      };
       writeCache(value);
       if (!cancelled) setStatus(value);
     }
@@ -152,6 +205,11 @@ function useEveServerStatus(): EveStatus | null {
   }, []);
 
   return status;
+}
+
+// "ESI: Online · 84 ms" -- the round trip from this browser, when we have one.
+function withLatency(t: TFunction, status: string, ms: number | null | undefined): string {
+  return ms == null ? status : `${status} · ${t('toolbar.latency', { ms })}`;
 }
 
 // Build the tooltip for the online-status dot. When ESI reports online we
@@ -714,10 +772,23 @@ export function Toolbar() {
             }`}
             data-tooltip={
               eveStatus == null ? t('toolbar.checking') :
-              eveStatus.esiOnline ? t('toolbar.esiOnline') : t('toolbar.esiOffline')
+              eveStatus.esiOnline ? withLatency(t, t('toolbar.esiOnline'), eveStatus.esiMs) : t('toolbar.esiOffline')
             }
           />
           <span className="toolbar__server-label">ESI</span>
+        </div>
+        <div className="toolbar__server-row">
+          <span
+            className={`toolbar__status-dot${
+              eveStatus?.nexumUp == null ? '' :
+              eveStatus.nexumUp ? ' toolbar__status-dot--on' : ' toolbar__status-dot--off'
+            }`}
+            data-tooltip={
+              eveStatus?.nexumUp == null ? t('toolbar.checking') :
+              eveStatus.nexumUp ? withLatency(t, t('toolbar.nexumOnline'), eveStatus.nexumMs) : t('toolbar.nexumOffline')
+            }
+          />
+          <span className="toolbar__server-label">Nexum</span>
         </div>
       </div>
     ),
