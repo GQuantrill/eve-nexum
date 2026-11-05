@@ -1310,14 +1310,13 @@ function chartTitleFor(t: TFunction, window: WindowKey): string {
   }
 }
 
-type UserFilterKey = 'all' | 'active' | 'inactive' | 'new' | 'logins' | 'signatures' | 'structures'
+type UserFilterKey = 'all' | 'active' | 'inactive' | 'new' | 'signatures' | 'structures'
   | 'systemsAdded' | 'systemsDeleted';
 const USER_FILTER_OPTIONS: { value: UserFilterKey }[] = [
   { value: 'all'            },
   { value: 'active'         },
   { value: 'inactive'       },
   { value: 'new'            },
-  { value: 'logins'         },
   { value: 'signatures'     },
   { value: 'structures'     },
   { value: 'systemsAdded'   },

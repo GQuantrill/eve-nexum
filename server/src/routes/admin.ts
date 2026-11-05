@@ -1121,11 +1121,11 @@ function parseWindow(raw: unknown): { key: string; interval: string | null } {
 }
 
 const USER_FILTERS = new Set([
-  'logins', 'signatures', 'structures', 'active', 'inactive', 'new', 'systemsAdded', 'systemsDeleted',
+  'signatures', 'structures', 'active', 'inactive', 'new', 'systemsAdded', 'systemsDeleted',
 ]);
 
 // GET /api/admin/reports/users — per-user activity summary.
-//   ?filter=logins|signatures|structures|active|inactive|new|systemsAdded|systemsDeleted (optional)
+//   ?filter=signatures|structures|active|inactive|new|systemsAdded|systemsDeleted (optional)
 //   ?window=24h|week|month|quarter|year|all (default 'all')
 //
 // Filter narrows rows to users whose chosen activity falls inside the
@@ -1201,8 +1201,6 @@ reportsRouter.get('/users', async (req, res) => {
   const conditions: string[] = [];
   if (userScope) conditions.push(userScope);
   switch (filter) {
-    // logins + 'all' → no extra predicate (user-scope still applies)
-    case 'logins':         if (intervalParam) conditions.push(inWindow('u.updated_at')); break;
     case 'signatures':     conditions.push(hasEvent(['signature'], false)); break;
     case 'structures':     conditions.push(hasStructure); break;
     case 'systemsAdded':   conditions.push(hasEvent(['system_add'], true)); break;
