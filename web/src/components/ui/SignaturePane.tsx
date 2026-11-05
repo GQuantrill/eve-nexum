@@ -260,7 +260,7 @@ const DEFAULT_WIDTHS: Record<ColKey, number> = {
 // Group column width with "Group as icons" on: the icon and the picker caret.
 // Not drag-resizable in that mode, so the text-mode width the user tuned is
 // kept for when they switch back.
-const TYPE_ICON_WIDTH = 48;
+const TYPE_ICON_WIDTH = 44;
 
 // The leads-to cell holds the destination picker AND the copy-bookmark button
 // side by side; below this the picker can't show a full J-code (J######)

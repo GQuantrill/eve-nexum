@@ -2360,6 +2360,9 @@ button.chain-exits-menu__exit:hover { background: var(--surface-hover); }
 .sig-type-icon { flex-shrink: 0; vertical-align: middle; }
 .sig-type-opt { display: inline-flex; align-items: center; gap: var(--sp-4); }
 .sig-type-select--icons .sig-type-opt__text { display: none; }
+/* Icon + caret only, so the trigger shrinks to fit instead of filling the cell. */
+.sig-type-select--icons { width: auto; }
+.sig-type-select--icons > button { gap: var(--sp-2); padding: var(--sp-4) var(--sp-3); }
 
 .sig-toolbar-btn {
   background: transparent;
