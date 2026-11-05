@@ -42,6 +42,20 @@ async function seedConn(mapId: string, srcSys: string, tgtSys: string, sigId: st
      VALUES ($1, $2, $3, $4, 'standard', 'D382', $5, $6)`,
     [crypto.randomUUID(), mapId, srcSys, tgtSys, sigId, lifetimeExpiresAt]);
 }
+// A link with no wormhole code on it, as a jump-tracked hole often stays.
+async function seedUntypedConn(mapId: string, srcSys: string, tgtSys: string, sigId: string | null): Promise<string> {
+  const id = crypto.randomUUID();
+  await db.query(
+    `INSERT INTO map_connections (id, map_id, source_id, target_id, connection_type, source_signature_id)
+     VALUES ($1, $2, $3, $4, 'standard', $5)`,
+    [id, mapId, srcSys, tgtSys, sigId]);
+  return id;
+}
+async function setLeadsTo(sigId: string, leadsTo: string): Promise<void> {
+  await db.query(`UPDATE map_signatures SET wh_leads_to = $2 WHERE id = $1`, [sigId, leadsTo]);
+}
+const isBroken = async (id: string): Promise<boolean> =>
+  (await db.query<{ broken: boolean }>(`SELECT broken FROM map_connections WHERE id = $1`, [id])).rows[0].broken;
 const sigExists = async (id: string): Promise<boolean> =>
   (await db.query(`SELECT 1 FROM map_signatures WHERE id = $1`, [id])).rows.length > 0;
 
@@ -85,6 +99,51 @@ describe.skipIf(!dbReady)('whSweep + connLifetime reconciliation (integration)',
 
     expect(await sigExists(autoSig)).toBe(false);
     expect(await sigExists(overriddenSig)).toBe(false); // no defer target → swept too
+  });
+
+  it('breaks an untyped link the swept sig was backing', async () => {
+    const mapId = await seedMap(ownerId);
+    const a = await seedSystem(mapId, 'A');
+    const b = await seedSystem(mapId, 'B');
+    const sig = await seedAgedSig(a, 20);
+    const conn = await seedUntypedConn(mapId, a, b, sig);
+    await sweepAll();
+    expect(await sigExists(sig)).toBe(false);
+    expect(await isBroken(conn)).toBe(true);
+  });
+
+  it('breaks an untyped link the swept sig named as its leads-to', async () => {
+    const mapId = await seedMap(ownerId);
+    const a = await seedSystem(mapId, 'A');
+    const b = await seedSystem(mapId, 'J123456');
+    const sig = await seedAgedSig(a, 20);
+    await setLeadsTo(sig, 'J123456');
+    const conn = await seedUntypedConn(mapId, a, b, null);
+    await sweepAll();
+    expect(await isBroken(conn)).toBe(true);
+  });
+
+  it('keeps an untyped link that another sig still leads to', async () => {
+    const mapId = await seedMap(ownerId);
+    const a = await seedSystem(mapId, 'A');
+    const b = await seedSystem(mapId, 'J123456');
+    const old = await seedAgedSig(a, 20);
+    const conn = await seedUntypedConn(mapId, a, b, old);
+    const fresh = await seedAgedSig(a, 2);
+    await setLeadsTo(fresh, 'J123456');
+    await sweepAll();
+    expect(await sigExists(old)).toBe(false);
+    expect(await isBroken(conn)).toBe(false);
+  });
+
+  it('leaves an untyped link alone when the swept sig had no tie to it', async () => {
+    const mapId = await seedMap(ownerId);
+    const a = await seedSystem(mapId, 'A');
+    const b = await seedSystem(mapId, 'B');
+    await seedAgedSig(a, 20);
+    const conn = await seedUntypedConn(mapId, a, b, null);
+    await sweepAll();
+    expect(await isBroken(conn)).toBe(false);
   });
 
   it('leaves a fresh hole alone', async () => {
