@@ -2071,6 +2071,7 @@ button.chain-exits-menu__exit:hover { background: var(--surface-hover); }
 }
 .sig-col-menu__item:hover { background: rgba(90, 154, 248, 0.12); }
 .sig-col-menu__item input { cursor: pointer; }
+.sig-col-menu__sep { height: 1px; margin: var(--sp-4) var(--sp-2); background: var(--border-strong); }
 
 .sig-pane__empty {
   font-size: calc(16px * var(--font-scale, 1));
@@ -2352,6 +2353,13 @@ button.chain-exits-menu__exit:hover { background: var(--surface-hover); }
    native .sig-select was width:100%). Type tinting now comes from the option
    labels reusing .sig-select--type-*, so this is layout only. */
 .sig-type-select { width: 100%; }
+
+/* "Group as icons": probe-scanner icon in place of the group name. The list
+   keeps icon + name; the trigger (inside the wrapper; the list is portalled
+   out of it) shows the icon alone. */
+.sig-type-icon { flex-shrink: 0; vertical-align: middle; }
+.sig-type-opt { display: inline-flex; align-items: center; gap: var(--sp-4); }
+.sig-type-select--icons .sig-type-opt__text { display: none; }
 
 .sig-toolbar-btn {
   background: transparent;

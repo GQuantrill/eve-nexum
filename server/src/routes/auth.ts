@@ -909,6 +909,7 @@ const SETTINGS_ALLOWLIST = new Set<string>([
   'nexum.floatingPanelsLast',
   'nexum.sigPane.hiddenCols',
   'nexum.sigPane.colWidths',
+  'nexum.sigPane.typeIcons',
   'nexum.anomPane.hiddenCols',
   'nexum.anomPane.colWidths',
   'nexum.watchlist.collapsedGroups',
