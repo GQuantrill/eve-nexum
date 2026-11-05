@@ -9,6 +9,7 @@ import { useJdcLevel } from '../../hooks/useJumpRange';
 import { useUserSetting } from '../../hooks/useUserSetting';
 import { JUMP_CLASSES, jumpRange, estimateFuel, computeFatigue, formatMinutes } from '../../data/jumpDrives';
 import { dockState } from '../../data/dockingRules';
+import { useEscapeClose } from '../../hooks/useEscapeClose';
 
 // Jump Planner. Pick source/dest, a ship class + skills (JDC / Jump Fuel
 // Conservation / Jump Freighters) and an objective (fewest jumps or least fuel),
@@ -21,6 +22,7 @@ interface CorpStructure { key: string; name: string; typeName: string; solarSyst
 type Picked = { id: number; name: string; structureType?: string | null } | null;
 
 export function JumpPlannerModal({ onClose }: { onClose: () => void }) {
+  useEscapeClose(onClose);
   const { t } = useTranslation();
   const [from, setFrom] = useState<Picked>(null);
   const [to, setTo]     = useState<Picked>(null);

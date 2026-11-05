@@ -8,6 +8,7 @@ import { DscanPaste, type ScanAttachTarget } from './DscanPaste';
 import { DscanResult, ScanLinkBar } from './DscanResult';
 import { useScan } from '../../hooks/useScan';
 import styles from './Dscan.module.css';
+import { useEscapeClose } from '../../hooks/useEscapeClose';
 
 /**
  * The analyser opened from the map toolbar. Same paste box and breakdown as
@@ -15,6 +16,7 @@ import styles from './Dscan.module.css';
  * it shows in that system's panel for everyone on the map.
  */
 export function DscanModal({ onClose }: { onClose: () => void }) {
+  useEscapeClose(onClose);
   const { t } = useTranslation();
   const [scanId, setScanId] = useState<string | null>(null);
   const canEdit = useCanEditContent();

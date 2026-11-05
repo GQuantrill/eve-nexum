@@ -7,6 +7,7 @@ import {
   parseCustomLabel, encodeTextLabel, encodeIconLabel, labelTextColor,
 } from '../../data/labels';
 import { usePhosphorIcons } from '../../utils/phosphorIcons';
+import { useEscapeClose } from '../../hooks/useEscapeClose';
 
 interface Props {
   customLabels: string[];                 // raw 't:'/'i:' entries
@@ -19,6 +20,7 @@ interface Props {
 const ICON_RENDER_CAP = 120;
 
 export function CustomLabelDialog({ customLabels, onChange, onClose }: Props) {
+  useEscapeClose(onClose);
   const { t } = useTranslation();
   const [labels, setLabels] = useState<string[]>(customLabels);
   const [text, setText]     = useState('');
@@ -122,7 +124,7 @@ export function CustomLabelDialog({ customLabels, onChange, onClose }: Props) {
               autoFocus={!full}
               placeholder={t('labelsDialog.textPlaceholder')}
               onChange={(e) => setText(e.target.value)}
-              onKeyDown={(e) => { if (e.key === 'Enter') addText(); if (e.key === 'Escape') onClose(); }}
+              onKeyDown={(e) => { if (e.key === 'Enter') addText(); }}
               style={{ flex: 1 }}
             />
             <button className="btn btn--primary" onClick={addText} disabled={full || !text.trim()}>

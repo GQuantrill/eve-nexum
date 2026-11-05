@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
+import { useEscapeClose } from '../../hooks/useEscapeClose';
 
 interface Props {
   title:         string;
@@ -15,6 +16,7 @@ interface Props {
 // Modal replacement for native prompt() — same purpose but composable with
 // the rest of the app's styling and z-index stacking.
 export function PromptModal({ title, message, defaultValue = '', placeholder, confirmLabel, onConfirm, onCancel }: Props) {
+  useEscapeClose(onCancel);
   const { t } = useTranslation();
   const [value, setValue] = useState(defaultValue);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -49,7 +51,6 @@ export function PromptModal({ title, message, defaultValue = '', placeholder, co
             onChange={(e) => setValue(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === 'Enter') submit();
-              if (e.key === 'Escape') onCancel();
             }}
             placeholder={placeholder}
             style={{ width: '100%', marginTop: 8 }}

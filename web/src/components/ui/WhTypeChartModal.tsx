@@ -10,6 +10,7 @@ import {
 } from '../../data/whTypeChart';
 import { shipSizeFromSde, totalMassFromSde, lifetimeFromSde } from '../../utils/whChartSde';
 import { useWormholeTypes } from '../../hooks/useWormholeTypes';
+import { useEscapeClose } from '../../hooks/useEscapeClose';
 
 // A Nexum take on whtype.info: hover ANY cell — a wormhole code OR an attribute
 // value — and lines connect a code to its values (or a value to every code that
@@ -68,6 +69,7 @@ function attrKeysFor(e: WhChartEntry): string[] {
 }
 
 export function WhTypeChartModal({ onClose }: { onClose: () => void }) {
+  useEscapeClose(onClose);
   const { t } = useTranslation();
   const whTypes = useWormholeTypes();
   // Override each entry's hardcoded ship size, total mass and lifetime with the

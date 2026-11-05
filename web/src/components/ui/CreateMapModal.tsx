@@ -8,6 +8,7 @@ import { useAuth, isAdminRole, isAllianceAdminRole } from '../../context/AuthCon
 import { toast } from '../../utils/toastStore';
 import { Select } from './Select';
 import { countPersonalMaps } from '../../utils/personalMaps';
+import { useEscapeClose } from '../../hooks/useEscapeClose';
 
 type MapScope = 'personal' | 'corp' | 'alliance';
 
@@ -26,6 +27,7 @@ const MAX_REGION_RESULTS = 8;
 // systems + stargates (POST /api/maps/from-region). Replaces the old dual
 // "+ Personal/Corp Map" buttons and the name PromptModal.
 export function CreateMapModal({ onClose }: { onClose: () => void }) {
+  useEscapeClose(onClose);
   const { t } = useTranslation();
   const maps             = useMapStore((s) => s.maps);
   const maxMaps          = useMapStore((s) => s.maxMaps);

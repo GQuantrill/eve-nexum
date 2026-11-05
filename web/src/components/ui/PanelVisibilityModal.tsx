@@ -1,6 +1,7 @@
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { XIcon } from '../../icons';
+import { useEscapeClose } from '../../hooks/useEscapeClose';
 
 /**
  * Chooses which panels are shown, for a stack of them. Hidden panels keep their
@@ -19,6 +20,7 @@ export function PanelVisibilityModal<Id extends string>({
   onToggle:  (id: Id) => void;
   onClose:   () => void;
 }) {
+  useEscapeClose(onClose);
   const { t } = useTranslation();
   const shownCount = panels.filter((p) => isVisible(p.id)).length;
 

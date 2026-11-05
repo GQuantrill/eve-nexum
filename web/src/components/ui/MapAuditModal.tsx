@@ -7,6 +7,7 @@ import { charPortrait } from '../../utils/eveImages';
 import { timeAgo, europeanDate } from '../../i18n/format';
 import { Select } from './Select';
 import styles from './MapAuditModal.module.css';
+import { useEscapeClose } from '../../hooks/useEscapeClose';
 
 interface AuditEntry {
   id:            string;
@@ -81,11 +82,7 @@ export function MapAuditModal({ mapId, mapName, onClose }: Props) {
 
   useEffect(() => { void load(null); }, [load]);
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [onClose]);
+  useEscapeClose(onClose);
 
   return (
     <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>

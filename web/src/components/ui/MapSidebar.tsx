@@ -43,6 +43,7 @@ import { ContentFilterBlock } from "./ContentFilterBlock";
 import { useIsMapOwner } from "../../hooks/useIsMapOwner";
 import type { WormholeMap } from "../../types";
 import { countPersonalMaps } from '../../utils/personalMaps';
+import { useEscapeClose } from '../../hooks/useEscapeClose';
 
 // Single labelled checkbox row backed by useUserSetting so the on/off
 // state syncs cross-device via users.ui_settings. Used by the Activity
@@ -966,6 +967,9 @@ export function MapSidebar() {
   const setEasyConnect = useMapStore((s) => s.setEasyConnect);
   const mapOptionsOpen = useMapStore((s) => s.mapOptionsOpen);
   const setMapOptionsOpen = useMapStore((s) => s.setMapOptionsOpen);
+  // Settings registers last, so with both open Escape closes the dialog first.
+  useEscapeClose(() => setMapOptionsOpen(false), mapOptionsOpen);
+  useEscapeClose(() => setSettingsOpen(false), settingsOpen);
   const edgeStyle = useMapStore((s) => s.edgeStyle);
   const setEdgeStyle = useMapStore((s) => s.setEdgeStyle);
   const connectionThickness = useMapStore((s) => s.connectionThickness);

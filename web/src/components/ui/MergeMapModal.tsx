@@ -8,6 +8,7 @@ import { useMapStore, type MapListItem } from '../../store/mapStore';
 import { useAuth, isAdminRole } from '../../context/AuthContext';
 import { toast } from '../../utils/toastStore';
 import { Select } from './Select';
+import { useEscapeClose } from '../../hooks/useEscapeClose';
 
 interface MergeResult {
   added:   { systems: number; connections: number; signatures: number; structures: number };
@@ -23,6 +24,7 @@ function mapLabel(t: TFunction, m: MapListItem): string {
 }
 
 export function MergeMapModal({ onClose }: { onClose: () => void }) {
+  useEscapeClose(onClose);
   const { t } = useTranslation();
   const maps        = useMapStore((s) => s.maps);
   const activeMapId = useMapStore((s) => s.activeMapId);

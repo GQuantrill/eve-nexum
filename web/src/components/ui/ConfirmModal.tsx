@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { setSkipConfirm } from '../../utils/confirmPref';
+import { useEscapeClose } from '../../hooks/useEscapeClose';
 
 interface Props {
   message: string;
@@ -15,6 +16,7 @@ interface Props {
 }
 
 export function ConfirmModal({ message, onConfirm, onCancel, confirmLabel, danger, showDontAskAgain = true }: Props) {
+  useEscapeClose(onCancel);
   const { t } = useTranslation();
   const [dontShowAgain, setDontShowAgain] = useState(false);
 

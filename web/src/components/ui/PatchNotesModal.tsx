@@ -5,6 +5,7 @@ import { XIcon } from '../../icons';
 import MDEditor from '@uiw/react-md-editor';
 import rehypeSanitize from 'rehype-sanitize';
 import { api } from '../../api/client';
+import { useEscapeClose } from '../../hooks/useEscapeClose';
 
 interface ReleaseNote {
   version:     string;
@@ -29,11 +30,7 @@ export function PatchNotesModal({ onClose }: { onClose: () => void }) {
     return () => { cancelled = true; };
   }, []);
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [onClose]);
+  useEscapeClose(onClose);
 
   const fmtDate = (iso: string | null): string => {
     if (!iso) return '';
