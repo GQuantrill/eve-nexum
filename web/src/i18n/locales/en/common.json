@@ -264,6 +264,7 @@
         "24h": "Past 24 hours",
         "week": "Past week",
         "month": "Past month",
+        "quarter": "Past quarter",
         "year": "Past year"
       },
       "userFilters": {
@@ -314,6 +315,7 @@
           "hour24": "Signatures per hour (past 24 hours)",
           "dayWeek": "Signatures per day (past week)",
           "dayMonth": "Signatures per day (past month)",
+          "weekQuarter": "Signatures per week (past quarter)",
           "monthYear": "Signatures per month (past year)",
           "monthAll": "Signatures per month (all time)"
         },

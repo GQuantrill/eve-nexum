@@ -1110,6 +1110,7 @@ const WINDOW_INTERVALS: Record<string, string | null> = {
   '24h':   '24 hours',
   'week':  '7 days',
   'month': '30 days',
+  'quarter': '90 days',
   'year':  '365 days',
   'all':   null,
 };
@@ -1125,7 +1126,7 @@ const USER_FILTERS = new Set([
 
 // GET /api/admin/reports/users — per-user activity summary.
 //   ?filter=logins|signatures|structures|active|inactive|new|systemsAdded|systemsDeleted (optional)
-//   ?window=24h|week|month|year|all       (default 'all')
+//   ?window=24h|week|month|quarter|year|all (default 'all')
 //
 // Filter narrows rows to users whose chosen activity falls inside the
 // window. With no filter (default) every user is returned. A window also
@@ -1335,12 +1336,14 @@ const SYSTEMS_CHART_SPEC: Record<string, { trunc: string; step: string; count: n
   '24h':   { trunc: 'hour',  step: '1 hour',   count: 24, label: 'HH24:00' },
   'week':  { trunc: 'day',   step: '1 day',    count: 7,  label: 'DD-MM' },
   'month': { trunc: 'day',   step: '1 day',    count: 30, label: 'DD-MM' },
+  // Weekly: 90 daily bars would be too dense to read. Labelled by week start.
+  'quarter': { trunc: 'week', step: '1 week',  count: 13, label: 'DD-MM' },
   'year':  { trunc: 'month', step: '1 month',  count: 12, label: 'MM-YYYY' },
   'all':   'all',
 };
 
 // GET /api/admin/reports/systems — aggregate signatures across every map
-// (personal + corp), optionally constrained to ?window=24h|week|month|year|all
+// (personal + corp), optionally constrained to ?window=24h|week|month|quarter|year|all
 // (default 'all'). The chart-series bucketing adapts to the window: hourly for 24h,
 // daily for week/month, monthly for year, monthly-from-oldest for all.
 reportsRouter.get('/systems', async (req, res) => {

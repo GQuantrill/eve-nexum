@@ -252,6 +252,7 @@
         "24h": "Últimas 24 horas",
         "week": "Última semana",
         "month": "Último mês",
+        "quarter": "Último trimestre",
         "year": "Último ano"
       },
       "userFilters": {
@@ -302,6 +303,7 @@
           "hour24": "Assinaturas por hora (últimas 24 horas)",
           "dayWeek": "Assinaturas por dia (última semana)",
           "dayMonth": "Assinaturas por dia (último mês)",
+          "weekQuarter": "Assinaturas por semana (último trimestre)",
           "monthYear": "Assinaturas por mês (último ano)",
           "monthAll": "Assinaturas por mês (todo o tempo)"
         },
