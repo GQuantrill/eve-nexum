@@ -910,6 +910,7 @@
     "removeOrphans": "Remove Orphan Systems ({{count}})",
     "removeOrphansConfirm": "Remove {{count}} orphan system(s)? These have no valid connection (none, or only broken ones). Home and locked systems are kept. This can be undone.",
     "removeStranded": "Remove Systems Cut Off From Home ({{count}})",
+    "removeStrandedNoHome": "Remove Systems Cut Off From Home (set a home first)",
     "removeStrandedConfirm": "Remove {{count}} system(s) with no route back to {{home}}? Home and locked systems are kept. This is a bulk delete — undo restores them one at a time, and only the last 50 removals are kept.",
     "addSystem": "Add System",
     "addAdjacent": "Add Adjacent",
