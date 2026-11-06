@@ -333,6 +333,7 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
         selectSystem(sys.id);
       }}
     >
+      {showHome && <span className="system-node__home-shape" aria-hidden><span /></span>}
       {/* Label pills, anchored just above the node's top-left (absolutely
           positioned so they sit outside the node body). Predefined coloured
           pills first, then custom text / icon pills. */}
