@@ -79,9 +79,27 @@ describe.skipIf(!dbReady)('deleting a sig breaks the link it held (integration)'
     expect((await link(c)).broken).toBe(false);
   });
 
-  it('keeps a typed link alive while another sig still leads to that class', async () => {
+  it('breaks a typed link even while another sig leads to that class', async () => {
+    // An overwrite paste: today's respawned static comes in as yesterday's goes.
+    // Same class, different hole.
     const sig = await seedSig(home, 'H296', 'C5');
-    await seedSig(home, 'H296', 'C5'); // the respawned static
+    await seedSig(home, 'H296', 'C5');
+    const c = await seedLink({ type: 'H296' });
+    await deleteSignature(mapId, home, sig, actor());
+    expect((await link(c)).broken).toBe(true);
+  });
+
+  it('keeps a typed link alive when another sig is its backing signature', async () => {
+    const sig = await seedSig(home, 'H296', 'C5');
+    const other = await seedSig(home, 'H296', 'C5');
+    const c = await seedLink({ type: 'H296', sourceSig: other });
+    await deleteSignature(mapId, home, sig, actor());
+    expect((await link(c)).broken).toBe(false);
+  });
+
+  it('keeps a typed link alive when another sig is pinned to the far system', async () => {
+    const sig = await seedSig(home, 'H296', 'C5');
+    await seedSig(home, 'H296', 'J200002');
     const c = await seedLink({ type: 'H296' });
     await deleteSignature(mapId, home, sig, actor());
     expect((await link(c)).broken).toBe(false);

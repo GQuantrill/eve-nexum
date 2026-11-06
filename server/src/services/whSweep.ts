@@ -30,25 +30,27 @@ interface ConnRow {
 interface SigRow  { systemId: string; whType: string; whLeadsTo: string }
 
 /**
- * Does any sig on either endpoint of `conn` back it — i.e. point at the
- * opposite system by class or name? Mirrors the client's heuristic in
- * utils/whAutoDetect.ts so live edits and the sweep agree on what "backs" a
- * connection.
+ * Is `conn` still tied to a sig that survived the sweep, on either end — its
+ * backing signature, or a sig pinned to the opposite system by name? Same rule
+ * as the delete path (linksLeftOrphaned).
+ *
+ * A sig that only leads to the opposite system's CLASS doesn't count: that's a
+ * different hole. The far end's own H296 -> C5 static kept a dead link between
+ * two C5s live.
  */
 function isBacked(
   conn: ConnRow,
   sigsBySystem: Map<string, SigRow[]>,
   systemsById: Map<string, SysRow>,
+  gone: ReadonlySet<string>,
 ): boolean {
+  if (conn.sourceSigId && !gone.has(conn.sourceSigId)) return true;
+  if (conn.targetSigId && !gone.has(conn.targetSigId)) return true;
   for (const [near, far] of [[conn.sourceId, conn.targetId], [conn.targetId, conn.sourceId]] as const) {
-    const other = systemsById.get(far);
-    if (!other) continue;
-    const oc = other.systemClass.toUpperCase();
-    const on = (other.name ?? '').toUpperCase();
+    const on = (systemsById.get(far)?.name ?? '').toUpperCase();
+    if (!on) continue;
     for (const sig of sigsBySystem.get(near) ?? []) {
-      if (!sig.whType || !sig.whLeadsTo) continue;
-      const target = sig.whLeadsTo.toUpperCase();
-      if (target === oc || target === on) return true;
+      if (sig.whType && sig.whLeadsTo.toUpperCase() === on) return true;
     }
   }
   return false;
@@ -133,6 +135,7 @@ async function sweepMap(mapId: string, expired: CandidateRow[]): Promise<void> {
               COALESCE(wh_type, '') AS "whType", COALESCE(wh_leads_to, '') AS "whLeadsTo"
          FROM map_signatures WHERE system_id = ANY($1::uuid[])`, [affected]);
 
+    const goneIds = new Set(expiredIds);
     const live = connRes.rows.filter((c) => c.connectionType === 'standard' && !c.broken);
     // The type match alone missed untyped links: a hole whose code never made
     // it onto the line kept showing live after its sig was swept. So also use
@@ -152,12 +155,12 @@ async function sweepMap(mapId: string, expired: CandidateRow[]): Promise<void> {
       for (const d of expired) {
         if (d.systemId !== sysId) continue;
         const gone: DeletedSig = { sigId: '', name: '', whType: d.whType ?? '', whLeadsTo: d.whLeadsTo ?? '' };
-        for (const id of linksLeftOrphaned(sysId, d.id, gone, links, left)) orphaned.add(id);
+        for (const id of linksLeftOrphaned(sysId, d.id, gone, links, left, goneIds)) orphaned.add(id);
       }
     }
     brokenIds = live
       .filter((c) => orphaned.has(c.id))
-      .filter((c) => !isBacked(c, sigsBySystem, systemsById))
+      .filter((c) => !isBacked(c, sigsBySystem, systemsById, goneIds))
       .map((c) => c.id);
 
     if (brokenIds.length > 0) {

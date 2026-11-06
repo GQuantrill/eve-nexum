@@ -108,13 +108,26 @@ export function reevaluateConnectionsForSystem(
       }
     }
 
+    // Still tied to a sig here: its backing signature, or one pinned to the
+    // connected system by name. A sig that only matches the CLASS is a
+    // different hole -- an overwrite paste brings today's H296 -> C5 in as it
+    // removes yesterday's -- so it can fill in a type but can't keep a link
+    // alive or bring a severed one back.
+    const tiedNow = backing.some((s) =>
+      s.id === conn[endField] || (!!on && (s.whLeadsTo ?? '').toUpperCase() === on));
+
+    if (breakOnOrphan && !conn.broken && oldBackedThis && !tiedNow) {
+      updateConnection(conn.id, { broken: true });
+      continue;
+    }
+
     const patch: Partial<Omit<MapConnection, 'id'>> = {};
 
     if (best) {
       if (conn.broken) {
-        // A sig backs this link again (e.g. it reappeared in a re-scan) —
+        // A sig tied to this link is back (e.g. it reappeared in a re-scan) —
         // un-quarantine it and restore the type.
-        patch.broken = false; patch.type = best;
+        if (tiedNow) { patch.broken = false; patch.type = best; }
       } else if (conn.type === null || (conn.type.toUpperCase() === 'K162' && best !== 'K162')) {
         // Empty, or a K162 placeholder being upgraded to a real code.
         patch.type = best;
@@ -131,7 +144,9 @@ export function reevaluateConnectionsForSystem(
       // system, or the sole backing hole on this end — and never overriding a
       // manual link. (A K162 twin pinned to the same system alongside the real
       // code is fine: the real code wins as the single non-K162 pinned hole.)
-      if (!conn[endField]) {
+      // Not on a severed link: a class match picked here would tie it and
+      // bring it straight back.
+      if (!conn[endField] && !conn.broken) {
         const pinned = backing.filter((s) => (s.whLeadsTo ?? '').toUpperCase() === on);
         const pinnedReal = pinned.filter((s) => (s.whType ?? '').toUpperCase() !== 'K162');
         const linkSig =
