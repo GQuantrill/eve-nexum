@@ -100,10 +100,18 @@ function median(xs: number[]): number | null {
 // allow that detail cross-origin, so it gets the whole fetch.
 // The body is read here because the browser only files its timing once the
 // response is complete.
+//
+// Only our own ping skips the cache. Safari turns a no-store fetch into extra
+// request headers, which makes the cross-origin ESI call need a CORS preflight;
+// ESI's status reply only lives 30s, so the minute poll never sees a stale one.
 async function timed(url: string): Promise<{ ok: boolean; body: string; ms: number } | null> {
   const start = performance.now();
   try {
-    const res = await fetch(url, { cache: 'no-store', signal: AbortSignal.timeout(10_000) });
+    const sameOrigin = url.startsWith('/');
+    const res = await fetch(url, {
+      cache: sameOrigin ? 'no-store' : 'default',
+      signal: AbortSignal.timeout(10_000),
+    });
     const fallback = performance.now() - start;
     const body = await res.text();
     const abs = new URL(url, location.href).href;
