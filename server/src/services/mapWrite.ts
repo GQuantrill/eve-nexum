@@ -221,9 +221,21 @@ export interface LinkRow {
  *    system by name, typed or not) breaks it unless another sig is pinned there
  *    by name;
  *  - otherwise a sig whose type labels the link and whose leads-to points at the
- *    other end breaks it when no remaining sig points there at all.
+ *    other end breaks it, unless the link is still tied to a sig here: its
+ *    backing signature is another sig that's still present, or a remaining sig
+ *    is pinned to the other end by name.
+ *
+ * A remaining sig that only leads to the other end's CLASS doesn't hold it. That
+ * is a different hole: an overwrite paste brings today's H296 -> C5 in as it
+ * removes yesterday's, and the new one kept every old H296 link to a C5 live.
+ *
+ * `alsoGone` lists other sig row ids deleted in the same pass (the sweep), so a
+ * link backed by one of those doesn't count as still tied.
  */
-export function linksLeftOrphaned(systemId: string, sigId: string, deleted: DeletedSig, links: LinkRow[], remaining: DeletedSig[]): string[] {
+export function linksLeftOrphaned(
+  systemId: string, sigId: string, deleted: DeletedSig, links: LinkRow[], remaining: DeletedSig[],
+  alsoGone: ReadonlySet<string> = new Set(),
+): string[] {
   const oldType = deleted.whType.toUpperCase();
   const oldLeads = deleted.whLeadsTo.toUpperCase();
   const out: string[] = [];
@@ -243,7 +255,10 @@ export function linksLeftOrphaned(systemId: string, sigId: string, deleted: Dele
       continue;
     }
     const labelledByOld = leadsHere(deleted) && !!c.type && c.type.toUpperCase() === oldType;
-    if (labelledByOld && !remaining.some(leadsHere)) out.push(c.id);
+    if (!labelledByOld) continue;
+    const backedByOther = !!endSig && !alsoGone.has(endSig);
+    const pinnedHere = remaining.some((s) => !!on && s.whLeadsTo.toUpperCase() === on);
+    if (!backedByOther && !pinnedHere) out.push(c.id);
   }
   return out;
 }

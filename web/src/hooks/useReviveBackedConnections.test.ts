@@ -17,9 +17,15 @@ const types = { H296: { dest: 'c5' } };
 const systems = [sys('home', 'J0'), sys('j1', 'J1'), sys('j2', 'J2')];
 
 describe('connectionsToRevive', () => {
-  it('revives a broken link scanned on both ends', () => {
-    const sigs = { home: [sig('s1', 'H296', '')], j2: [sig('s2', 'K162', 'C5')] };
+  it('revives a broken link pinned by name on both ends', () => {
+    const sigs = { home: [sig('s1', 'H296', 'J2')], j2: [sig('s2', 'K162', 'J0')] };
     expect(connectionsToRevive(systems, [conn('c2', 'home', 'j2')], sigs, types)).toEqual(['c2']);
+  });
+
+  it('does not count sigs that only match the class', () => {
+    // An overwrite paste's new H296 -> C5 is a different hole from the old one.
+    const sigs = { home: [sig('s1', 'H296', '')], j2: [sig('s2', 'K162', 'C5')] };
+    expect(connectionsToRevive(systems, [conn('c2', 'home', 'j2')], sigs, types)).toEqual([]);
   });
 
   it('does not count a sig pinned to another system', () => {

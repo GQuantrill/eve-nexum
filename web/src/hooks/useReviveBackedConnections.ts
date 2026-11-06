@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { useMapStore } from '../store/mapStore';
 import { useCanEdit } from './useCanEdit';
 import { useWormholeTypes } from './useWormholeTypes';
-import { whDestClass, leadsToClasses, isUnresolvedLeadsTo } from '../utils/whDest';
 import { collapseState } from '../utils/rolling';
 import type { MapConnection, MapSystem } from '../types';
 import type { WhSig } from '../utils/undivedWormholes';
@@ -44,24 +43,18 @@ export function connectionsToRevive(
     if (c.targetSignatureId) linkedTo.set(c.targetSignatureId, c.id);
   }
 
-  // Does `fromId` carry a wormhole sig that plausibly leads to `to` over
-  // `connId`? A sig linked to this connection does. A sig linked to another
-  // connection, or pinned to another system by name, doesn't: matching those
-  // by class revived holes that had really gone (home's H296 -> C5 to one C5
-  // "backed" a dead link to a different C5). Only an unresolved sig (blank,
-  // class or band) falls back to destination-class matching.
+  // Does `fromId` carry a wormhole sig tied to this connection -- linked to it,
+  // or pinned to `to` by name? A sig that only leads to `to`'s class doesn't
+  // count: matching by class revived holes that had really gone (home's
+  // H296 -> C5 to one C5 "backed" a dead link to a different C5, and an
+  // overwrite paste's new H296 -> C5 brought back the old ones it replaced).
   const backs = (fromId: string, to: MapSystem, connId: string): boolean => {
     const name = (to.name ?? '').trim().toUpperCase();
     for (const sig of whSigsBySystem[fromId] ?? []) {
       const linked = linkedTo.get(sig.id);
       if (linked === connId) return true;
       if (linked) continue;
-      if (!isUnresolvedLeadsTo(sig.leadsTo)) {
-        if (name && sig.leadsTo.trim().toUpperCase() === name) return true;
-        continue;
-      }
-      if (leadsToClasses(sig.leadsTo).includes(to.systemClass)) return true;
-      if (whDestClass(sig.whType, whTypes) === to.systemClass) return true;
+      if (name && sig.leadsTo.trim().toUpperCase() === name) return true;
     }
     return false;
   };
