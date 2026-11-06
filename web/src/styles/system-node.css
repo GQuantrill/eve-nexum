@@ -203,16 +203,32 @@
     outline-offset: 2px;
   }
 
+  /* Home: a gold outline with the corners cut off, drawn by
+     .system-node__home-shape behind the content. The node's own box goes
+     see-through so its rounded border doesn't show around the octagon. The
+     shape says "home" even where the gold can't be told apart. */
   &[data-home='true'] {
-    border-style: double;
+    background: transparent;
+    border-color: transparent !important;
+    box-shadow: none !important;
   }
 
-  /* The system you're currently in: white border + soft white glow. White so
-     it reads as "you" without colliding with the gold home border, the yellow
+  /* The system you're currently in: white border + soft white glow, and a
+     green ring pulsing out of it (::after) so it's found at a glance. White so
+     it reads as "you" without colliding with the gold home outline, the yellow
      A0 sun icon, or any class colour. */
   &[data-current='true'] {
     border-color: #ffffff;
     box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.55), 0 0 14px rgba(255, 255, 255, 0.4);
+  }
+
+  &[data-current='true']::after {
+    content: '';
+    position: absolute;
+    inset: -1.5px;
+    border-radius: inherit;
+    pointer-events: none;
+    animation: system-node-here 2s ease-out infinite;
   }
 
   &.system-node--connect-target {
@@ -1390,3 +1406,78 @@ div.system-node__easy-handle {
   text-transform: uppercase;
 }
 
+
+@keyframes system-node-here {
+  0%   { box-shadow: 0 0 0 0    color-mix(in srgb, var(--success) 80%, transparent); }
+  100% { box-shadow: 0 0 0 16px color-mix(in srgb, var(--success) 0%,  transparent); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .system-node[data-current='true']::after {
+    animation: none;
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--success) 70%, transparent);
+  }
+}
+
+/* The home outline: a gold octagon. The inner span is the edge, its ::after
+   the fill inset inside it. Behind the node's content, inside its box, so the
+   label pills above the node aren't clipped.
+
+   Glows go on the outer span as a drop-shadow, which follows the octagon; the
+   node's own heat halo and sov ring are box-shaped and would show the corners
+   the octagon cuts off. */
+.system-node__home-shape {
+  --cut: 12px;
+  position: absolute;
+  inset: -1.5px;
+  z-index: -1;
+  pointer-events: none;
+
+  & > span {
+    position: absolute;
+    inset: 0;
+    background: var(--warning-gold);
+    clip-path: polygon(var(--cut) 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% calc(100% - var(--cut)),
+                       calc(100% - var(--cut)) 100%, var(--cut) 100%, 0 calc(100% - var(--cut)), 0 var(--cut));
+  }
+
+  & > span::after {
+    --cut: 11px;
+    content: '';
+    position: absolute;
+    inset: 2px;
+    background: var(--surface-panel);
+    clip-path: polygon(var(--cut) 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% calc(100% - var(--cut)),
+                       calc(100% - var(--cut)) 100%, var(--cut) 100%, 0 calc(100% - var(--cut)), 0 var(--cut));
+  }
+}
+
+.system-node[data-home='true'][data-heat]::before { display: none; }
+.system-node--sov-hostile .system-node__home-shape {
+  filter: drop-shadow(0 0 4px var(--cv-stand-hostile));
+}
+.system-node--sov-blue .system-node__home-shape {
+  filter: drop-shadow(0 0 4px var(--cv-stand-friendly));
+}
+.system-node[data-heat] .system-node__home-shape {
+  filter:
+    drop-shadow(0 0 calc(4px + var(--heat, 0) * 14px)
+                color-mix(in srgb, var(--heat-color, #f97316) calc(30% + var(--heat, 0) * 70%), transparent));
+}
+
+/* Home and here at once: the box-shaped pulse ring would show the octagon's
+   cut corners, so pulse a green glow around the octagon instead. */
+.system-node[data-home='true'][data-current='true']::after { display: none; }
+.system-node[data-home='true'][data-current='true'] .system-node__home-shape {
+  animation: system-node-here-home 2s ease-out infinite;
+}
+@keyframes system-node-here-home {
+  0%   { filter: drop-shadow(0 0 1px var(--success)) drop-shadow(0 0 2px var(--success)); }
+  100% { filter: drop-shadow(0 0 14px transparent) drop-shadow(0 0 20px transparent); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .system-node[data-home='true'][data-current='true'] .system-node__home-shape {
+    animation: none;
+    filter: drop-shadow(0 0 2px var(--success)) drop-shadow(0 0 4px var(--success));
+  }
+}
