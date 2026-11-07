@@ -44,6 +44,7 @@ import { useIsMapOwner } from "../../hooks/useIsMapOwner";
 import type { WormholeMap } from "../../types";
 import { countPersonalMaps } from '../../utils/personalMaps';
 import { useEscapeClose } from '../../hooks/useEscapeClose';
+import { HOME_COLOR_KEY, HOME_COLOR_DEFAULT, HERE_COLOR_KEY, HERE_COLOR_DEFAULT, HERE_PULSE_KEY, HERE_PULSE_DEFAULT, HERE_PULSES, normalisePulse, safeColor } from '../../utils/mapMarkers';
 
 // Single labelled checkbox row backed by useUserSetting so the on/off
 // state syncs cross-device via users.ui_settings. Used by the Activity
@@ -954,6 +955,9 @@ export function MapSidebar() {
   const [minimapPosition, setMinimapPosition] = useMinimapPosition();
   const [placement, setPlacement] = useUserSetting<string>("nexum.map.placement", "east");
   const [colorVision, setColorVision] = useUserSetting<string>("nexum.a11y.colorVision", "off");
+  const [homeColor, setHomeColor] = useUserSetting<string>(HOME_COLOR_KEY, HOME_COLOR_DEFAULT);
+  const [hereColor, setHereColor] = useUserSetting<string>(HERE_COLOR_KEY, HERE_COLOR_DEFAULT);
+  const [herePulse, setHerePulse] = useUserSetting<string>(HERE_PULSE_KEY, HERE_PULSE_DEFAULT);
   const [sigBookmarkFmt, setSigBookmarkFmt] = useUserSetting<string>("nexum.sig.bookmarkFormat", DEFAULT_BOOKMARK_FORMAT);
   const [siteBookmarkFmt, setSiteBookmarkFmt] = useUserSetting<string>("nexum.sig.siteBookmarkFormat", DEFAULT_SITE_BOOKMARK_FORMAT);
   const [k162BookmarkFmt, setK162BookmarkFmt] = useUserSetting<string>(K162_BOOKMARK_FORMAT_KEY, "");
@@ -2136,6 +2140,32 @@ export function MapSidebar() {
                       { value: "protanopia", label: t("mapSidebar.colorVisionOptions.protanopia") },
                       { value: "tritanopia", label: t("mapSidebar.colorVisionOptions.tritanopia") },
                     ]} />
+                  </div>
+                  {([
+                    ["home-color", "mapSidebar.homeColor", homeColor, setHomeColor, HOME_COLOR_DEFAULT],
+                    ["here-color", "mapSidebar.hereColor", hereColor, setHereColor, HERE_COLOR_DEFAULT],
+                  ] as const).map(([id, label, value, set, def]) => {
+                    const color = safeColor(value, def);
+                    return (
+                      <div key={id} className="map-sidebar__row">
+                        <label className="map-sidebar__label" htmlFor={id}>{t(label)}</label>
+                        <div className="map-sidebar__color">
+                          {color !== def && (
+                            <button type="button" className="map-sidebar__zoom-value" onClick={() => set(def)}>
+                              {t("mapSidebar.resetColor")}
+                            </button>
+                          )}
+                          <label className="map-sidebar__swatch" style={{ background: color }}>
+                            <input id={id} type="color" value={color} onChange={(e) => set(e.target.value)} />
+                          </label>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  <div className="map-sidebar__row">
+                    <label className="map-sidebar__label" htmlFor="here-pulse">{t("mapSidebar.herePulse")}</label>
+                    <Select id="here-pulse" value={normalisePulse(herePulse)} onChange={(v) => setHerePulse(v)}
+                      options={HERE_PULSES.map((p) => ({ value: p, label: t(`mapSidebar.herePulseOptions.${p}`) }))} />
                   </div>
                 </>
               )}

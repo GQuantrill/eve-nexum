@@ -2743,3 +2743,33 @@ select.sig-toolbar-btn option {
 .map-sidebar__btn-group--inline {
   flex-direction: row;
 }
+
+/* Colour setting: a swatch that opens the OS picker, and Reset once changed.
+   The <input type="color"> is invisible over the swatch. */
+.map-sidebar__color {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-6);
+}
+
+.map-sidebar__swatch {
+  position: relative;
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+  cursor: pointer;
+  overflow: hidden;
+
+  & input[type="color"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: none;
+    cursor: pointer;
+  }
+}

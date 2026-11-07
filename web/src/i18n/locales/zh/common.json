@@ -2069,7 +2069,17 @@
     "wandererImported": "已从 Wanderer 导入：{{systems}} 个星系，{{connections}} 条连接（跳过 {{skipped}} 个）。",
     "working": "处理中…",
     "panelColumns": "面板列数",
-    "panelColumnsTooltip": "将面板中的各个窗格拆分为并排的栏，使笔记或击杀板显示在信号旁边而非下方。"
+    "panelColumnsTooltip": "将面板中的各个窗格拆分为并排的栏，使笔记或击杀板显示在信号旁边而非下方。",
+    "homeColor": "母星系颜色",
+    "hereColor": "“你在这里”颜色",
+    "herePulse": "“你在这里”脉动",
+    "herePulseOptions": {
+      "off": "关闭（静态光环）",
+      "subtle": "轻微",
+      "normal": "正常",
+      "strong": "强烈"
+    },
+    "resetColor": "重置"
   },
   "mass": {
     "billionKg": "{{value}} 十亿 kg",

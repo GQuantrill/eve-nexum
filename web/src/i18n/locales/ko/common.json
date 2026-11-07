@@ -2069,7 +2069,17 @@
     "wandererImported": "Wanderer에서 가져옴: 성계 {{systems}}개, 연결 {{connections}}개 ({{skipped}}개 건너뜀).",
     "working": "처리 중…",
     "panelColumns": "패널 열 수",
-    "panelColumnsTooltip": "패널의 창을 나란한 열로 나누어, 메모나 killboard가 시그니처 아래가 아니라 옆에 표시되도록 합니다."
+    "panelColumnsTooltip": "패널의 창을 나란한 열로 나누어, 메모나 killboard가 시그니처 아래가 아니라 옆에 표시되도록 합니다.",
+    "homeColor": "홈 시스템 색상",
+    "hereColor": "현재 위치 색상",
+    "herePulse": "현재 위치 펄스",
+    "herePulseOptions": {
+      "off": "끔 (고정 링)",
+      "subtle": "약하게",
+      "normal": "보통",
+      "strong": "강하게"
+    },
+    "resetColor": "초기화"
   },
   "mass": {
     "billionKg": "{{value}}십억 kg",

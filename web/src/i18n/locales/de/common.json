@@ -2069,7 +2069,17 @@
     "wandererImported": "Aus Wanderer importiert: {{systems}} Systeme, {{connections}} Verbindungen ({{skipped}} übersprungen).",
     "working": "Arbeitet…",
     "panelColumns": "Panel-Spalten",
-    "panelColumnsTooltip": "Teilt die Bereiche des Panels in nebeneinanderliegende Spalten, sodass Notizen oder das Killboard neben den Signaturen statt darunter stehen."
+    "panelColumnsTooltip": "Teilt die Bereiche des Panels in nebeneinanderliegende Spalten, sodass Notizen oder das Killboard neben den Signaturen statt darunter stehen.",
+    "homeColor": "Farbe des Heimatsystems",
+    "hereColor": "Farbe für „Du bist hier“",
+    "herePulse": "Pulsieren bei „Du bist hier“",
+    "herePulseOptions": {
+      "off": "Aus (fester Ring)",
+      "subtle": "Dezent",
+      "normal": "Normal",
+      "strong": "Stark"
+    },
+    "resetColor": "Zurücksetzen"
   },
   "mass": {
     "billionKg": "{{value}} Mrd. kg",

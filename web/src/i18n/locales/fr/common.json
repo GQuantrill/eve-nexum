@@ -2069,7 +2069,17 @@
     "wandererImported": "Importé depuis Wanderer : {{systems}} systèmes, {{connections}} connexions ({{skipped}} ignorés).",
     "working": "En cours…",
     "panelColumns": "Colonnes de panneaux",
-    "panelColumnsTooltip": "Répartit les volets du panneau en colonnes côte à côte, pour que les notes ou le killboard soient à côté des signatures plutôt qu'en dessous."
+    "panelColumnsTooltip": "Répartit les volets du panneau en colonnes côte à côte, pour que les notes ou le killboard soient à côté des signatures plutôt qu'en dessous.",
+    "homeColor": "Couleur du système d’origine",
+    "hereColor": "Couleur « Vous êtes ici »",
+    "herePulse": "Pulsation « Vous êtes ici »",
+    "herePulseOptions": {
+      "off": "Désactivée (anneau fixe)",
+      "subtle": "Discrète",
+      "normal": "Normale",
+      "strong": "Forte"
+    },
+    "resetColor": "Réinitialiser"
   },
   "mass": {
     "billionKg": "{{value}} Md kg",
