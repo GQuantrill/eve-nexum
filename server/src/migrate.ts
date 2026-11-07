@@ -706,6 +706,12 @@ export async function migrate() {
     -- survive even after the map is force-deleted.
     ALTER TABLE user_events ADD COLUMN IF NOT EXISTS map_id UUID;
 
+    -- The signature a 'signature' event was logged for, so the scan stats can
+    -- take its type once it's known: a sig pasted as unknown and typed later
+    -- otherwise stayed 'unknown' in the stats for good. No FK, same as map_id:
+    -- the event outlives the sig.
+    ALTER TABLE user_events ADD COLUMN IF NOT EXISTS signature_id UUID;
+
     -- Cluster-wide log of K-space systems where a Covert Research Facility
     -- signature ("Ghost site") has been observed. One row per system, with
     -- observation count + first/last seen for spawn-rate analysis. Static
@@ -829,6 +835,7 @@ export async function migrate() {
     CREATE INDEX IF NOT EXISTS idx_map_anomalies_system  ON map_anomalies (system_id);
     CREATE INDEX IF NOT EXISTS idx_map_anomalies_creator ON map_anomalies (created_by_user_id);
     CREATE INDEX IF NOT EXISTS idx_user_events_map         ON user_events (map_id);
+    CREATE INDEX IF NOT EXISTS idx_user_events_signature   ON user_events (signature_id) WHERE signature_id IS NOT NULL;
     CREATE INDEX IF NOT EXISTS idx_maps_corp               ON maps (corp_id);
     CREATE INDEX IF NOT EXISTS idx_maps_alliance           ON maps (alliance_id);
 
