@@ -111,10 +111,13 @@ export async function createSignature(mapId: string, systemId: string, d: Signat
   );
   const { inserted, ...row } = rows[0] as { inserted: boolean } & Record<string, unknown> & { id: string };
   // Scan stats count signatures found, so a create that merged into an
-  // existing row isn't another one.
+  // existing row isn't another one -- but the merge may have given an unknown
+  // sig its type.
   if (inserted) {
-    db.query(`INSERT INTO user_events (user_id, event_type, sig_type) VALUES ($1, 'signature', $2)`,
-      [actor.userId, d.sigType]).catch(console.error);
+    db.query(`INSERT INTO user_events (user_id, event_type, sig_type, signature_id) VALUES ($1, 'signature', $2, $3)`,
+      [actor.userId, d.sigType, row.id]).catch(console.error);
+  } else {
+    resolveScanType(row.id, row.sigType);
   }
   bumpActivity(systemId);
   recordGhostSiteIfMatch(systemId, d.name);
@@ -126,6 +129,22 @@ export async function createSignature(mapId: string, systemId: string, d: Signat
     });
   }
   return { row, inserted };
+}
+
+/**
+ * Give a sig's scan-stats event its type once the sig has one. The event is
+ * logged when the sig is first created, so a sig pasted as unknown and typed
+ * afterwards -- by hand, or by a later paste filling it in -- counted in the
+ * stats with no type. Only an unknown event changes: the count stays the same
+ * and the pilot who scanned it keeps the credit.
+ */
+function resolveScanType(sigRowId: string, sigType: unknown): void {
+  if (typeof sigType !== 'string' || !sigType || sigType === 'unknown') return;
+  db.query(
+    `UPDATE user_events SET sig_type = $2
+      WHERE signature_id = $1 AND event_type = 'signature' AND (sig_type IS NULL OR sig_type IN ('', 'unknown'))`,
+    [sigRowId, sigType],
+  ).catch(console.error);
 }
 
 // Signature fields whose new value goes in the audit entry (short codes);
@@ -189,6 +208,7 @@ export async function updateSignature(
     throw err;
   }
   bumpActivity(systemId);
+  if (updated.length) resolveScanType(sigId, updates.sigType);
   if (typeof updates.name === 'string') recordGhostSiteIfMatch(systemId, updates.name);
   publishToMap(mapId, { type: 'sig.changed', actor: actor.clientId, systemId });
   syncSignature(mapId, systemId, sigId, actor.userId);
