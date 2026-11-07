@@ -894,6 +894,9 @@ const SETTINGS_ALLOWLIST = new Set<string>([
   // how the announcer keys above got lost too, and how the presence bug below
   // survived.
   'nexum.a11y.colorVision',
+  'nexum.map.homeColor',
+  'nexum.map.hereColor',
+  'nexum.map.herePulse',
   'nexum.ui.density',
   'nexum.toolbar.order',
   'nexum.minimap.position',

@@ -2069,7 +2069,17 @@
     "wandererImported": "Geïmporteerd uit Wanderer: {{systems}} systemen, {{connections}} verbindingen ({{skipped}} overgeslagen).",
     "working": "Bezig…",
     "panelColumns": "Paneelkolommen",
-    "panelColumnsTooltip": "Splitst de panelen van het paneelgebied in kolommen naast elkaar, zodat notities of het killboard naast de signaturen kunnen staan in plaats van eronder."
+    "panelColumnsTooltip": "Splitst de panelen van het paneelgebied in kolommen naast elkaar, zodat notities of het killboard naast de signaturen kunnen staan in plaats van eronder.",
+    "homeColor": "Kleur thuissysteem",
+    "hereColor": "Kleur ‘Je bent hier’",
+    "herePulse": "Pulseren ‘Je bent hier’",
+    "herePulseOptions": {
+      "off": "Uit (vaste ring)",
+      "subtle": "Subtiel",
+      "normal": "Normaal",
+      "strong": "Sterk"
+    },
+    "resetColor": "Herstellen"
   },
   "mass": {
     "billionKg": "{{value}} mld kg",

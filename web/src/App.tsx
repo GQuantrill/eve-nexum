@@ -3,6 +3,7 @@ import { ReactFlowProvider } from '@xyflow/react';
 import { AuthProvider } from './context/AuthProvider';
 import { useAuth, isAdminRole } from './context/AuthContext';
 import { seedUserSettings, readUserSetting, useUserSetting } from './hooks/useUserSetting';
+import { applyMapMarkers, HOME_COLOR_KEY, HOME_COLOR_DEFAULT, HERE_COLOR_KEY, HERE_COLOR_DEFAULT, HERE_PULSE_KEY, HERE_PULSE_DEFAULT } from './utils/mapMarkers';
 import { MapCanvas } from './components/map/MapCanvas';
 import { SystemPanel } from './components/ui/SystemPanel';
 import { ConnectionPanel } from './components/ui/ConnectionPanel';
@@ -96,6 +97,14 @@ function MapApp() {
       delete document.documentElement.dataset.colorVision;
     }
   }, [colorVision]);
+
+  // Home / you-are-here marker colours and pulse strength → CSS variables.
+  const [homeColor] = useUserSetting<string>(HOME_COLOR_KEY, HOME_COLOR_DEFAULT);
+  const [hereColor] = useUserSetting<string>(HERE_COLOR_KEY, HERE_COLOR_DEFAULT);
+  const [herePulse] = useUserSetting<string>(HERE_PULSE_KEY, HERE_PULSE_DEFAULT);
+  useEffect(() => {
+    applyMapMarkers(homeColor, hereColor, herePulse);
+  }, [homeColor, hereColor, herePulse]);
 
   // Interface density → data attribute on <html>, same mechanism as the colour
   // palette above. This is the box metrics around the text; --font-scale above

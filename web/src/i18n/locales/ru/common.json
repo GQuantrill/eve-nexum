@@ -2089,7 +2089,17 @@
     "wandererImported": "Импортировано из Wanderer: {{systems}} систем, {{connections}} соединений ({{skipped}} пропущено).",
     "working": "Обработка…",
     "panelColumns": "Столбцы панелей",
-    "panelColumnsTooltip": "Разделяет панели на колонки, чтобы заметки или killboard располагались рядом с сигнатурами, а не под ними."
+    "panelColumnsTooltip": "Разделяет панели на колонки, чтобы заметки или killboard располагались рядом с сигнатурами, а не под ними.",
+    "homeColor": "Цвет домашней системы",
+    "hereColor": "Цвет «Вы здесь»",
+    "herePulse": "Пульсация «Вы здесь»",
+    "herePulseOptions": {
+      "off": "Выкл. (неподвижное кольцо)",
+      "subtle": "Слабая",
+      "normal": "Обычная",
+      "strong": "Сильная"
+    },
+    "resetColor": "Сбросить"
   },
   "mass": {
     "billionKg": "{{value}} млрд кг",

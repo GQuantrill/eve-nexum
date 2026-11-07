@@ -353,7 +353,7 @@
 }
 
 .system-node__home-icon {
-  color: var(--warning-gold);
+  color: var(--home-color, var(--warning-gold));
   margin-right: 4px;
   display: inline-flex;
   align-items: center;
@@ -373,8 +373,8 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--success);
-  box-shadow: 0 0 5px var(--success);
+  background: var(--here-color, var(--success));
+  box-shadow: 0 0 5px var(--here-color, var(--success));
   margin-right: 4px;
   flex-shrink: 0;
 }
@@ -1407,15 +1407,23 @@ div.system-node__easy-handle {
 }
 
 
+/* Colour and strength come from Settings > Display (utils/mapMarkers.ts):
+   --here-color, and --here-spread / --here-alpha for how far the ring travels
+   and how strong it starts. With the pulse off, or reduced motion, the ring
+   stays still. */
 @keyframes system-node-here {
-  0%   { box-shadow: 0 0 0 0    color-mix(in srgb, var(--success) 80%, transparent); }
-  100% { box-shadow: 0 0 0 16px color-mix(in srgb, var(--success) 0%,  transparent); }
+  0%   { box-shadow: 0 0 0 0 color-mix(in srgb, var(--here-color, #3ddc84) var(--here-alpha, 80%), transparent); }
+  100% { box-shadow: 0 0 0 var(--here-spread, 16px) color-mix(in srgb, var(--here-color, #3ddc84) 0%, transparent); }
 }
 
+:root[data-here-pulse='off'] .system-node[data-current='true']::after {
+  animation: none;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--here-color, #3ddc84) 70%, transparent);
+}
 @media (prefers-reduced-motion: reduce) {
   .system-node[data-current='true']::after {
     animation: none;
-    box-shadow: 0 0 0 4px color-mix(in srgb, var(--success) 70%, transparent);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--here-color, #3ddc84) 70%, transparent);
   }
 }
 
@@ -1436,7 +1444,7 @@ div.system-node__easy-handle {
   & > span {
     position: absolute;
     inset: 0;
-    background: var(--warning-gold);
+    background: var(--home-color, var(--warning-gold));
     clip-path: polygon(var(--cut) 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% calc(100% - var(--cut)),
                        calc(100% - var(--cut)) 100%, var(--cut) 100%, 0 calc(100% - var(--cut)), 0 var(--cut));
   }
@@ -1472,12 +1480,16 @@ div.system-node__easy-handle {
   animation: system-node-here-home 2s ease-out infinite;
 }
 @keyframes system-node-here-home {
-  0%   { filter: drop-shadow(0 0 1px var(--success)) drop-shadow(0 0 2px var(--success)); }
-  100% { filter: drop-shadow(0 0 14px transparent) drop-shadow(0 0 20px transparent); }
+  0%   { filter: drop-shadow(0 0 1px var(--here-color, #3ddc84)) drop-shadow(0 0 2px var(--here-color, #3ddc84)); }
+  100% { filter: drop-shadow(0 0 var(--here-spread, 16px) transparent) drop-shadow(0 0 var(--here-spread, 16px) transparent); }
+}
+:root[data-here-pulse='off'] .system-node[data-home='true'][data-current='true'] .system-node__home-shape {
+  animation: none;
+  filter: drop-shadow(0 0 2px var(--here-color, #3ddc84)) drop-shadow(0 0 4px var(--here-color, #3ddc84));
 }
 @media (prefers-reduced-motion: reduce) {
   .system-node[data-home='true'][data-current='true'] .system-node__home-shape {
     animation: none;
-    filter: drop-shadow(0 0 2px var(--success)) drop-shadow(0 0 4px var(--success));
+    filter: drop-shadow(0 0 2px var(--here-color, #3ddc84)) drop-shadow(0 0 4px var(--here-color, #3ddc84));
   }
 }

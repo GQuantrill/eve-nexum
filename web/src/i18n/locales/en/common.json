@@ -2069,7 +2069,17 @@
     "wandererImported": "Imported from Wanderer: {{systems}} systems, {{connections}} connections ({{skipped}} skipped).",
     "working": "Working…",
     "panelColumns": "Panel columns",
-    "panelColumnsTooltip": "Splits the panel's panes into side-by-side columns, so notes or the killboard can sit beside signatures instead of below them."
+    "panelColumnsTooltip": "Splits the panel's panes into side-by-side columns, so notes or the killboard can sit beside signatures instead of below them.",
+    "homeColor": "Home system colour",
+    "hereColor": "You-are-here colour",
+    "herePulse": "You-are-here pulse",
+    "herePulseOptions": {
+      "off": "Off (still ring)",
+      "subtle": "Subtle",
+      "normal": "Normal",
+      "strong": "Strong"
+    },
+    "resetColor": "Reset"
   },
   "mass": {
     "billionKg": "{{value}} B kg",

@@ -2069,7 +2069,17 @@
     "wandererImported": "Wanderer からインポート：{{systems}} システム、{{connections}} 接続（{{skipped}} 件スキップ）。",
     "working": "処理中…",
     "panelColumns": "パネルの列数",
-    "panelColumnsTooltip": "パネル内のペインを横並びの列に分割し、メモやキルボードをシグネチャの下ではなく横に表示します。"
+    "panelColumnsTooltip": "パネル内のペインを横並びの列に分割し、メモやキルボードをシグネチャの下ではなく横に表示します。",
+    "homeColor": "ホーム星系の色",
+    "hereColor": "現在地の色",
+    "herePulse": "現在地のパルス",
+    "herePulseOptions": {
+      "off": "オフ（固定リング）",
+      "subtle": "控えめ",
+      "normal": "標準",
+      "strong": "強め"
+    },
+    "resetColor": "リセット"
   },
   "mass": {
     "billionKg": "{{value}}十億 kg",
