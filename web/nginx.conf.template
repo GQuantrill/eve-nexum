@@ -95,6 +95,9 @@ server {
         proxy_buffering    off;
         proxy_cache        off;
         proxy_read_timeout 1h;
+        # Hand the server's X-Accel-Buffering: no on to any proxy in front of us
+        # (nginx strips X-Accel-* by default), so it doesn't buffer the stream.
+        proxy_pass_header  X-Accel-Buffering;
     }
 
     # Proxy API and auth calls to the server container. The upstream
@@ -109,6 +112,8 @@ server {
         proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header   Cookie $http_cookie;
         proxy_pass_header  Set-Cookie;
+        # Only the share-link event stream sends this (see the SSE block above).
+        proxy_pass_header  X-Accel-Buffering;
     }
 
     # Vendored third-party link icons (Dotlan favicon, zKillboard wreck),
