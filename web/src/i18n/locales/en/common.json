@@ -1817,6 +1817,7 @@
     "compact": "Compact",
     "connectionStyle": "Connection Style",
     "connectionThickness": "Connection Thickness",
+    "linkSigIds": "Sig IDs on links",
     "copyFailed": "Copy failed — select and copy manually",
     "copyLink": "Copy link",
     "corpSkipKspace": "Don't track K-space (corp/alliance)",

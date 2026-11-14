@@ -773,3 +773,30 @@
 .sig-td--scout .sig-td__scout {
   margin-right: 0;
 }
+
+/* Sig IDs above and below the label: the top/left system's first. The
+   type/mass/time stack keeps the label's own column layout. */
+.connection-label__sigs,
+.connection-label__stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+/* Quieter than the type badge so it still leads. */
+.connection-sig {
+  font-size: calc(11px * var(--font-scale, 1));
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text-default);
+  background: var(--surface-sunken);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 0 var(--sp-2);
+}
+/* Points at the system the sig is in, on a side-by-side link. */
+.connection-sig__dir {
+  color: var(--text-muted);
+  margin: 0 var(--sp-1);
+}

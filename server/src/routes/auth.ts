@@ -897,6 +897,7 @@ const SETTINGS_ALLOWLIST = new Set<string>([
   'nexum.map.homeColor',
   'nexum.map.hereColor',
   'nexum.map.herePulse',
+  'nexum.map.linkSigIds',
   'nexum.ui.density',
   'nexum.toolbar.order',
   'nexum.minimap.position',

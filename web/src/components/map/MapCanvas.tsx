@@ -60,6 +60,7 @@ import { isDefiniteWormholeHop, prefetchStargateNeighbors } from '../../utils/st
 import { api } from '../../api/client';
 import { truesecColor } from '../../utils/truesec';
 import { readUserSetting } from '../../hooks/useUserSetting';
+import { linkEndSigs, LINK_SIG_IDS_KEY } from '../../utils/linkSigIds';
 import { findFreePosition, normalizePlacement, PLACEMENT_GAP } from '../../hooks/useLocationTracking';
 import { CLASS_COLORS } from '../../data/wormholes';
 import { cssVarToHex } from '../../utils/cssVar';
@@ -202,6 +203,8 @@ export function MapCanvas() {
   const mapOptionsOpen       = useMapStore((s) => s.mapOptionsOpen);
   const edgeStyle            = useMapStore((s) => s.edgeStyle);
   const connectionThickness  = useMapStore((s) => s.connectionThickness);
+  const whSigsBySystem       = useMapStore((s) => s.whSigsBySystem);
+  const [linkSigIds]         = useUserSetting<boolean>(LINK_SIG_IDS_KEY, true);
   const addConnection        = useMapStore((s) => s.addConnection);
   const addSystem            = useMapStore((s) => s.addSystem);
   const moveSystem           = useMapStore((s) => s.moveSystem);
@@ -853,6 +856,17 @@ export function MapCanvas() {
     [canEdit, connections, systems],
   );
 
+  // System names for the link sig IDs, rebuilt only when a name changes rather
+  // than on every drag frame, which would re-render every edge.
+  const namesKey = systems.map((x) => `${x.id}:${x.name}`).join('|');
+  const systemNames = useMemo(
+    () => new Map(namesKey ? namesKey.split('|').map((e) => {
+      const i = e.indexOf(':');
+      return [e.slice(0, i), { name: e.slice(i + 1) }] as const;
+    }) : []),
+    [namesKey],
+  );
+
   // Base edges — everything EXCEPT the mouse-hover highlight. Kept off the
   // hover state so moving the mouse across nodes doesn't rebuild all E edge
   // objects (which would re-render every ConnectionEdge). `highlighted` here
@@ -890,12 +904,13 @@ export function MapCanvas() {
           data: {
             ...c, edgeStyle, connectionThickness, highlighted: inRoute, dimmed,
             parallelIndex: group.indexOf(c.id), parallelCount: group.length,
+            endSigs: linkSigIds ? linkEndSigs(c, systemNames, whSigsBySystem) : null,
           } as unknown as Record<string, unknown>,
           selected: c.id === selectedConnectionId,
         };
       });
     },
-    [connections, selectedConnectionId, edgeStyle, connectionThickness, dragHandles, routeHighlight],
+    [connections, systemNames, whSigsBySystem, linkSigIds, selectedConnectionId, edgeStyle, connectionThickness, dragHandles, routeHighlight],
   );
 
   // Layer the hover highlight on top of the base edges. Only edges touching the

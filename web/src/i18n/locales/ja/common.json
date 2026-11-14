@@ -1817,6 +1817,7 @@
     "compact": "コンパクト",
     "connectionStyle": "接続スタイル",
     "connectionThickness": "接続の太さ",
+    "linkSigIds": "接続にシグネチャIDを表示",
     "copyFailed": "コピーに失敗しました — 手動で選択してコピーしてください",
     "copyLink": "リンクをコピー",
     "corpSkipKspace": "K-スペースを追跡しない（コーポ/アライアンス）",
