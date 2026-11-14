@@ -19,6 +19,9 @@ export function streamMapEvents(req: Request, res: Response, mapId: string, user
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache, no-transform',
     Connection: 'keep-alive',
+    // An nginx in front of ours (self-hosted setups) would otherwise buffer
+    // the stream and hold updates back until a refresh.
+    'X-Accel-Buffering': 'no',
   });
   res.flushHeaders?.();
   res.write(': connected\n\n');
