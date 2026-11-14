@@ -44,6 +44,7 @@ import { useIsMapOwner } from "../../hooks/useIsMapOwner";
 import type { WormholeMap } from "../../types";
 import { countPersonalMaps } from '../../utils/personalMaps';
 import { useEscapeClose } from '../../hooks/useEscapeClose';
+import { LINK_SIG_IDS_KEY } from '../../utils/linkSigIds';
 import { HOME_COLOR_KEY, HOME_COLOR_DEFAULT, HERE_COLOR_KEY, HERE_COLOR_DEFAULT, HERE_PULSE_KEY, HERE_PULSE_DEFAULT, HERE_PULSES, normalisePulse, safeColor } from '../../utils/mapMarkers';
 
 // Single labelled checkbox row backed by useUserSetting so the on/off
@@ -1519,6 +1520,11 @@ export function MapSidebar() {
               ]}
             />
           </div>
+
+          <SettingToggle
+            settingKey={LINK_SIG_IDS_KEY}
+            label={t("mapSidebar.linkSigIds")}
+          />
 
           {!hideTopologyTools && (
             <>

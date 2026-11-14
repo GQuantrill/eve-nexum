@@ -1817,6 +1817,7 @@
     "compact": "Compact",
     "connectionStyle": "Style de connexion",
     "connectionThickness": "Épaisseur des connexions",
+    "linkSigIds": "ID de sig sur les liens",
     "copyFailed": "Échec de la copie — sélectionnez et copiez manuellement",
     "copyLink": "Copier le lien",
     "corpSkipKspace": "Ne pas suivre le K-space (corpo/alliance)",

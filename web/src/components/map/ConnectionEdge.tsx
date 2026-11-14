@@ -17,6 +17,7 @@ import { watchMarker } from '../../data/watchMarkers';
 import { effectiveExpiryMs, lifeBucket, type TimeBucket } from '../../utils/whLifetime';
 import { DynamicIcon } from '../DynamicIcon';
 import { hoursMins } from '../../i18n/format';
+import { shortSigId, type LinkEndSigs } from '../../utils/linkSigIds';
 import type { TFunction } from 'i18next';
 
 // CSS custom properties (resolved via the edge path's inline `style`) so the
@@ -79,6 +80,7 @@ export const ConnectionEdge = memo(({
     dimmed?: boolean;
     parallelIndex?: number;
     parallelCount?: number;
+    endSigs?: LinkEndSigs | null;
   };
   const selectConnection = useMapStore((s) => s.selectConnection);
   const whTypes = useWormholeTypes();
@@ -205,6 +207,27 @@ export const ConnectionEdge = memo(({
     : conn?.massStatus === 'destabilized' ? 'var(--cv-conn-1h)'
     : null
     : null;
+
+  // The sig to warp to at each end: the top/left system's above the label,
+  // the other's below. Short links leave no room either side, so a
+  // side-by-side link adds a chevron pointing at the system each sig is in.
+  const endSigs = !noLifetime && !broken ? conn?.endSigs ?? null : null;
+  const sideBySide = Math.abs(targetX - sourceX) >= Math.abs(targetY - sourceY);
+  const sourceFirst = sideBySide ? sourceX <= targetX : sourceY <= targetY;
+  const sigTag = (sigId: string | null, chevron: 'before' | 'after') => sigId
+    ? (
+      <span className="connection-sig" title={sigId}>
+        {sideBySide && chevron === 'before' && <span className="connection-sig__dir">{'\u2039'}</span>}
+        {shortSigId(sigId)}
+        {sideBySide && chevron === 'after' && <span className="connection-sig__dir">{'\u203a'}</span>}
+      </span>
+    )
+    : null;
+  const [firstId, lastId] = endSigs
+    ? sourceFirst ? [endSigs.source, endSigs.target] : [endSigs.target, endSigs.source]
+    : [null, null];
+  const firstSig = sigTag(firstId, 'before');
+  const lastSig = sigTag(lastId, 'after');
 
   // Prefer the live bucket label; fall back to the stored category label only
   // for a connection whose lifetime is unknown but which carries a legacy
@@ -335,12 +358,18 @@ export const ConnectionEdge = memo(({
               style={{ transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`, zIndex: highlighted ? 1001 : undefined }}
               onClick={() => selectConnection(id)}
             >
-              {count > 0 ? (
-                <>
-                  {(typeNode || flagNode) && <div className="connection-label__row">{typeNode}{flagNode}</div>}
-                  {massNode && <div className="connection-label__row">{massNode}</div>}
-                  {timeNode && <div className="connection-label__row">{timeNode}</div>}
-                </>
+              {count > 0 || firstSig || lastSig ? (
+                <div className="connection-label__sigs">
+                  {firstSig}
+                  {count > 0 && (
+                    <div className="connection-label__stack">
+                      {(typeNode || flagNode) && <div className="connection-label__row">{typeNode}{flagNode}</div>}
+                      {massNode && <div className="connection-label__row">{massNode}</div>}
+                      {timeNode && <div className="connection-label__row">{timeNode}</div>}
+                    </div>
+                  )}
+                  {lastSig}
+                </div>
               ) : null}
             </div>
           );

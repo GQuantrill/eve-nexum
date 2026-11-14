@@ -1817,6 +1817,7 @@
     "compact": "Compact",
     "connectionStyle": "Stijl van verbindingen",
     "connectionThickness": "Dikte van verbindingen",
+    "linkSigIds": "Sig-ID's op verbindingen",
     "copyFailed": "Kopiëren mislukt — selecteer en kopieer handmatig",
     "copyLink": "Link kopiëren",
     "corpSkipKspace": "K-space niet bijhouden (corp/alliance)",

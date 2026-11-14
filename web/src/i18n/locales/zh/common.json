@@ -1817,6 +1817,7 @@
     "compact": "紧凑",
     "connectionStyle": "连接样式",
     "connectionThickness": "连接粗细",
+    "linkSigIds": "连接上显示信号 ID",
     "copyFailed": "复制失败 — 请手动选择并复制",
     "copyLink": "复制链接",
     "corpSkipKspace": "不跟踪 K 空间（军团/联盟）",

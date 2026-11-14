@@ -1817,6 +1817,7 @@
     "compact": "Compacto",
     "connectionStyle": "Estilo de conexão",
     "connectionThickness": "Espessura das conexões",
+    "linkSigIds": "IDs de assinatura nas ligações",
     "copyFailed": "Falha ao copiar — seleciona e copia manualmente",
     "copyLink": "Copiar ligação",
     "corpSkipKspace": "Não rastrear o K-space (corp/aliança)",

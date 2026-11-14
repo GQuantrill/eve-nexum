@@ -1817,6 +1817,7 @@
     "compact": "간결",
     "connectionStyle": "연결 스타일",
     "connectionThickness": "연결 두께",
+    "linkSigIds": "연결에 시그니처 ID 표시",
     "copyFailed": "복사 실패 — 직접 선택하여 복사하세요",
     "copyLink": "링크 복사",
     "corpSkipKspace": "K-스페이스 추적 안 함 (군단/얼라이언스)",
