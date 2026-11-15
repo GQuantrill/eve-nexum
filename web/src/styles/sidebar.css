@@ -2773,3 +2773,28 @@ select.sig-toolbar-btn option {
     cursor: pointer;
   }
 }
+
+/* Route avoidance list (Route section). */
+.route-avoid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  margin-top: var(--sp-6);
+}
+/* In the flow, not floating: the sidebar scrolls and would clip it. */
+.route-avoid__results.search-results { position: static; }
+.route-avoid__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-4);
+}
+.route-avoid__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: var(--sp-1) var(--sp-2) var(--sp-1) var(--sp-6);
+  font-size: calc(12px * var(--font-scale, 1));
+  color: var(--text-default);
+}

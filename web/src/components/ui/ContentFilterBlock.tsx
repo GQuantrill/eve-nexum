@@ -42,6 +42,9 @@ export function ContentFilterBlock() {
             type="button"
             className={`sig-filter-chip${filter.sigTypes.includes(st) ? ' sig-filter-chip--active' : ''}`}
             aria-pressed={filter.sigTypes.includes(st)}
+            // "Wormhole" here is any hole sig, which nearly every chain system
+            // has; easy to mistake for "Unexplored" below, so say which is which.
+            data-tooltip={st === 'wormhole' ? t('contentFilter.wormholeTip') : undefined}
             onClick={() => toggle('sigTypes', st)}
           >
             {t(`sigType.${st}`)}
@@ -70,6 +73,7 @@ export function ContentFilterBlock() {
           type="button"
           className={`sig-filter-chip${filter.undivedWh ? ' sig-filter-chip--active' : ''}`}
           aria-pressed={filter.undivedWh}
+          data-tooltip={t('contentFilter.undivedWhTip')}
           onClick={() => setContentFilter({ undivedWh: !filter.undivedWh })}
         >
           {t('contentFilter.undivedWh')}

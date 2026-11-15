@@ -61,6 +61,7 @@ import { api } from '../../api/client';
 import { truesecColor } from '../../utils/truesec';
 import { readUserSetting } from '../../hooks/useUserSetting';
 import { linkEndSigs, LINK_SIG_IDS_KEY } from '../../utils/linkSigIds';
+import { CONFIRM_KEY_DELETE_KEY } from '../../utils/confirmPref';
 import { findFreePosition, normalizePlacement, PLACEMENT_GAP } from '../../hooks/useLocationTracking';
 import { CLASS_COLORS } from '../../data/wormholes';
 import { cssVarToHex } from '../../utils/cssVar';
@@ -524,6 +525,9 @@ export function MapCanvas() {
   // Preserve rubber-band selection when Shift is released before the mouse button.
   // React Flow clears the selection on Shift keyup, so we capture it just before.
   const shiftHeld        = useRef(false);
+  // Delete / Backspace removals waiting on the confirm, and whether to ask.
+  const [keyDeleteConfirm, setKeyDeleteConfirm] = useState<{ ids: string[]; name: string | null } | null>(null);
+  const [confirmKeyDelete, setConfirmKeyDelete] = useUserSetting<boolean>(CONFIRM_KEY_DELETE_KEY, true);
   const pendingSelection = useRef<string[]>([]);
 
   useEffect(() => {
@@ -548,23 +552,24 @@ export function MapCanvas() {
       if (e.key === 'Delete' || e.key === 'Backspace') {
         const target = e.target as HTMLElement;
         if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) return;
-        if (!canEdit) return;
+        if (!canEdit || keyDeleteConfirm) return;
 
-        // Multi-select: remove all RF-selected non-locked nodes
-        const rfSelected = nodes.filter((n) => n.selected);
-        if (rfSelected.length > 0) {
-          rfSelected.forEach((n) => {
-            const sys = systems.find((s) => s.id === n.id);
-            if (!sys?.locked) removeSystem(n.id);
-          });
-          return;
-        }
+        // Multi-select: every RF-selected node; else the single-click
+        // selection (panel open). Locked systems are never removed.
+        const rfSelected = nodes.filter((n) => n.selected).map((n) => n.id);
+        const picked = rfSelected.length > 0 ? rfSelected : selectedSystemId ? [selectedSystemId] : [];
+        const ids = picked.filter((id) => {
+          const sys = systems.find((s) => s.id === id);
+          return !!sys && !sys.locked;
+        });
+        if (ids.length === 0) return;
 
-        // Single-click selected (panel open)
-        if (selectedSystemId) {
-          const sys = systems.find((s) => s.id === selectedSystemId);
-          if (sys && !sys.locked) removeSystem(selectedSystemId);
-        }
+        // A stray Delete or Backspace is easy to hit, so ask first unless the
+        // user has said not to.
+        if (!confirmKeyDelete) { ids.forEach((id) => removeSystem(id)); return; }
+        const only = ids.length === 1 ? systems.find((s) => s.id === ids[0]) : undefined;
+        setKeyDeleteConfirm({ ids, name: only ? systemDisplayName(only) : null });
+        return;
       }
 
       if (e.key === 'h' || e.key === 'H') {
@@ -597,7 +602,7 @@ export function MapCanvas() {
       window.removeEventListener('keyup',   onKeyUp);
       window.removeEventListener('blur',    onBlur);
     };
-  }, [nodes, selectedSystemId, systems, removeSystem, undo, setNodes, canEdit, centerOnSystem]);
+  }, [nodes, selectedSystemId, systems, removeSystem, undo, setNodes, canEdit, centerOnSystem, confirmKeyDelete, keyDeleteConfirm]);
 
   const onSelectionChange = useCallback(({ nodes: sel }: { nodes: Node[] }) => {
     if (shiftHeld.current && sel.length > 0) pendingSelection.current = sel.map((n) => n.id);
@@ -1691,32 +1696,22 @@ export function MapCanvas() {
         !!heatFleet.bySystem.get(s.eveSystemId)?.length
       ));
 
-    // Orphans: systems with no *valid* connection — either no connection at all,
-    // or only broken (quarantined) ones. Home, locked and occupied systems are
-    // protected.
-    const orphanIds = systems
-      .filter((s) =>
-        !s.isHome && !s.locked && !occupied(s) &&
-        !connections.some((c) => !c.broken && (c.sourceId === s.id || c.targetId === s.id)),
-      )
-      .map((s) => s.id);
-
-    // Systems with no route back to home — a branch left behind when a chain
-    // collapsed, rather than anything still reachable.
     const homeSystem = systems.find((s) => s.isHome) ?? null;
-    const strandedIds = (() => {
-      if (!homeSystem) return [];
-      // Broken links still count as links here. "Broken" means re-scout, not
-      // gone, and this is a bulk delete — keeping a system that turns out to be
-      // reachable is far cheaper than wiping a live chain over one flagged hop.
+
+    // Systems reachable from home, over live links only or over every link.
+    const reachFromHome = (includeBroken: boolean): Set<string> => {
+      const reached = new Set<string>();
+      if (!homeSystem) return reached;
       const adj = new Map<string, string[]>();
       const link = (a: string, b: string) => {
         const list = adj.get(a);
         if (list) list.push(b); else adj.set(a, [b]);
       };
-      for (const c of connections) { link(c.sourceId, c.targetId); link(c.targetId, c.sourceId); }
-
-      const reached = new Set<string>([homeSystem.id]);
+      for (const c of connections) {
+        if (c.broken && !includeBroken) continue;
+        link(c.sourceId, c.targetId); link(c.targetId, c.sourceId);
+      }
+      reached.add(homeSystem.id);
       const queue = [homeSystem.id];
       for (let i = 0; i < queue.length; i++) {
         for (const next of adj.get(queue[i]) ?? []) {
@@ -1725,10 +1720,33 @@ export function MapCanvas() {
           queue.push(next);
         }
       }
-      // Locked and occupied systems are protected, same as the orphan sweep —
-      // locking one is how you say "leave this alone".
-      return systems.filter((sys) => !reached.has(sys.id) && !sys.locked && !occupied(sys)).map((sys) => sys.id);
-    })();
+      return reached;
+    };
+    const reachedLive = reachFromHome(false);
+    const reachedAny  = reachFromHome(true);
+
+    // Orphans: systems with no *valid* connection — none at all, or only
+    // broken (scissored) ones — and systems behind a scissor: home reaches
+    // them only through a broken link. Paste over home's sigs and the chain
+    // past the severed hole goes too, though its own links are still live
+    // because nobody has scanned out there. Home, locked and occupied systems
+    // are protected.
+    const orphanIds = systems
+      .filter((s) =>
+        !s.isHome && !s.locked && !occupied(s) && (
+          !connections.some((c) => !c.broken && (c.sourceId === s.id || c.targetId === s.id)) ||
+          (reachedAny.has(s.id) && !reachedLive.has(s.id))
+        ),
+      )
+      .map((s) => s.id);
+
+    // Systems with no route back to home at all, not even through a scissored
+    // link — a branch left behind once a collapsed chain's links were cleaned
+    // up. Locked and occupied systems are protected, same as the orphan sweep —
+    // locking one is how you say "leave this alone".
+    const strandedIds = homeSystem
+      ? systems.filter((sys) => !reachedAny.has(sys.id) && !sys.locked && !occupied(sys)).map((sys) => sys.id)
+      : [];
 
     return [
       {
@@ -1997,6 +2015,19 @@ export function MapCanvas() {
         />
       )}
 
+      {keyDeleteConfirm && (
+        <ConfirmModal
+          message={keyDeleteConfirm.name
+            ? t('ctxMenu.keyDeleteConfirmOne', { name: keyDeleteConfirm.name })
+            : t('ctxMenu.keyDeleteConfirmMany', { count: keyDeleteConfirm.ids.length })}
+          onConfirm={() => {
+            keyDeleteConfirm.ids.forEach((id) => removeSystem(id));
+            setKeyDeleteConfirm(null);
+          }}
+          onCancel={() => setKeyDeleteConfirm(null)}
+          onDontAskAgain={() => setConfirmKeyDelete(false)}
+        />
+      )}
       {orphanConfirm && (
         <ConfirmModal
           message={t('ctxMenu.removeOrphansConfirm', { count: orphanConfirm.ids.length })}
