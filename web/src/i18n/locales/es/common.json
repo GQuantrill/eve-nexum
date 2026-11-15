@@ -1978,6 +1978,7 @@
     "revokeShareFailed": "No se pudo revocar el enlace de compartir",
     "routeHint": "Más corta: menos saltos sin tener en cuenta la seguridad. Segura: prioriza high-sec, desvía por low/null solo cuando no hay ruta por high-sec disponible.",
     "routeIncludeAnsiblex": "Incluir puertas Ansiblex",
+    "routeAvoidEol": "Evitar agujeros al final de su vida",
     "routeIncludeThera": "Incluir conexiones de Thera",
     "routeIncludeTurnur": "Incluir conexiones de Turnur",
     "routeIncludeWormholes": "Incluir cadena de agujeros de gusano",

@@ -1978,6 +1978,7 @@
     "revokeShareFailed": "Falha ao revogar a ligação de partilha",
     "routeHint": "Mais curta: menos saltos independentemente da segurança. Segura: prioriza high-sec, desvia por low/null apenas quando não há rota por high-sec disponível.",
     "routeIncludeAnsiblex": "Incluir portões Ansiblex",
+    "routeAvoidEol": "Evitar buracos em fim de vida",
     "routeIncludeThera": "Incluir conexões de Thera",
     "routeIncludeTurnur": "Incluir conexões de Turnur",
     "routeIncludeWormholes": "Incluir cadeia de buracos de minhoca",

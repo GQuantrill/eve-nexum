@@ -1978,6 +1978,7 @@
     "revokeShareFailed": "撤销共享链接失败",
     "routeHint": "最短：不考虑安全等级、跳数最少。安全：优先高安，仅在没有高安路径时才绕行低安/零安。",
     "routeIncludeAnsiblex": "包含 Ansiblex 跳跃门",
+    "routeAvoidEol": "避开寿命将尽的虫洞",
     "routeIncludeThera": "包含 Thera 连接",
     "routeIncludeTurnur": "包含 Turnur 连接",
     "routeIncludeWormholes": "包含虫洞链",

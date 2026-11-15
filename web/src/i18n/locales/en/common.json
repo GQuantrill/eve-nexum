@@ -1978,6 +1978,7 @@
     "revokeShareFailed": "Failed to revoke share link",
     "routeHint": "Shortest: fewest jumps regardless of security. Secure: prefer high-sec, detour through low/null only when no high-sec path is available.",
     "routeIncludeAnsiblex": "Include Ansiblex jump gates",
+    "routeAvoidEol": "Avoid end-of-life holes",
     "routeIncludeThera": "Include Thera connections",
     "routeIncludeTurnur": "Include Turnur connections",
     "routeIncludeWormholes": "Include wormhole chain",

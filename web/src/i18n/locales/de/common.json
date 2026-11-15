@@ -1978,6 +1978,7 @@
     "revokeShareFailed": "Freigabe-Link konnte nicht widerrufen werden",
     "routeHint": "Kürzeste: wenigste Sprünge unabhängig von der Sicherheit. Sicher: bevorzugt High-Sec, Umweg über Low/Null nur wenn kein High-Sec-Pfad verfügbar ist.",
     "routeIncludeAnsiblex": "Ansiblex-Sprungtore einbeziehen",
+    "routeAvoidEol": "End-of-Life-Löcher meiden",
     "routeIncludeThera": "Thera-Verbindungen einbeziehen",
     "routeIncludeTurnur": "Turnur-Verbindungen einbeziehen",
     "routeIncludeWormholes": "Wurmlochkette einbeziehen",

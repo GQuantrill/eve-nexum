@@ -104,6 +104,7 @@ export function useRoute(
   const [inclTurnur]    = useUserSetting<boolean>('nexum.route.includeTurnur', false);
   const [inclWormholes] = useUserSetting<boolean>('nexum.route.includeWormholes', false);
   const [inclAnsiblex]  = useUserSetting<boolean>('nexum.route.includeAnsiblex', false);
+  const [avoidEol]      = useUserSetting<boolean>('nexum.route.avoidEol', false);
   const [avoided]       = useUserSetting<AvoidedSystem[]>(ROUTE_AVOID_KEY, []);
   const avoidKey = (Array.isArray(avoided) ? avoided : [])
     .map((a) => a.id).filter((n) => Number.isInteger(n) && n > 0).sort((a, b) => a - b).join(',');
@@ -138,13 +139,14 @@ export function useRoute(
     if (wantTurnur) url += '&includeTurnur=true';
     if (wantWh)     url += '&includeWormholes=true';
     if (wantAnsi)   url += '&includeAnsiblex=true';
+    if (avoidEol && (wantThera || wantTurnur || wantWh)) url += '&avoidEol=true';
     if (avoidKey)   url += `&avoid=${avoidKey}`;
     if (wantWh || wantAnsi) url += allScope ? '&whScope=all' : `&mapId=${activeMapId}`;
     api<Record<string, RouteEntry>>(url)
       .then(r => { if (!cancelled) setData(r); })
       .catch(() => { if (!cancelled) setData({}); });
     return () => { cancelled = true; };
-  }, [from, targetsKey, routeMode, wantThera, wantTurnur, wantWh, wantAnsi, allScope, activeMapId, flagRevision, avoidKey, chainRevision]);
+  }, [from, targetsKey, routeMode, wantThera, wantTurnur, wantWh, wantAnsi, allScope, activeMapId, flagRevision, avoidKey, chainRevision, avoidEol]);
 
   return data;
 }

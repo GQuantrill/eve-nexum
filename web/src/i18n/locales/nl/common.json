@@ -1978,6 +1978,7 @@
     "revokeShareFailed": "Sharelink intrekken mislukt",
     "routeHint": "Kortste: het minste aantal sprongen, ongeacht de beveiliging. Veiligste: voorkeur voor high-sec, met een omweg door low/null alleen als er geen high-sec-route is.",
     "routeIncludeAnsiblex": "Ansiblex jump gates meenemen",
+    "routeAvoidEol": "End-of-life-gaten vermijden",
     "routeIncludeThera": "Thera-verbindingen meenemen",
     "routeIncludeTurnur": "Turnur-verbindingen meenemen",
     "routeIncludeWormholes": "Wormgatketen meenemen",

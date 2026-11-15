@@ -1978,6 +1978,7 @@
     "revokeShareFailed": "Échec de la révocation du lien de partage",
     "routeHint": "Le plus court : le moins de sauts quelle que soit la sécurité. Sécurisé : privilégie le high-sec, ne passe par low/null que si aucun chemin high-sec n'est disponible.",
     "routeIncludeAnsiblex": "Inclure les portes Ansiblex",
+    "routeAvoidEol": "Éviter les trous en fin de vie",
     "routeIncludeThera": "Inclure les connexions Thera",
     "routeIncludeTurnur": "Inclure les connexions Turnur",
     "routeIncludeWormholes": "Inclure la chaîne de trous de ver",
