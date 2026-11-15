@@ -17,8 +17,10 @@ const log = createLogger('route');
 // hundreds for users with wide negative-standing contact lists.
 const MAX_TARGETS = 2000;
 const VALID_MODES = new Set<RouteMode>(['shortest', 'secure']);
+// The avoidance list rides on every route request, so keep it bounded.
+const MAX_AVOID = 200;
 
-// GET /api/route?from=<systemId>&to=<id1>,<id2>,...&mode=shortest|secure
+// GET /api/route?from=<systemId>&to=<id1>,<id2>,...&mode=shortest|secure[&avoid=<id>,...]
 // Returns { [targetId]: { jumps, path } } for each reachable target.
 router.get('/', async (req, res) => {
   const from = Number(req.query.from);
@@ -37,6 +39,14 @@ router.get('/', async (req, res) => {
   if (targets.length > MAX_TARGETS) {
     return res.status(400).json({ error: `Too many targets (max ${MAX_TARGETS})` });
   }
+
+  const avoidIds = String(req.query.avoid ?? '').split(',')
+    .map(s => Number(s.trim()))
+    .filter(n => Number.isInteger(n) && n > 0);
+  if (avoidIds.length > MAX_AVOID) {
+    return res.status(400).json({ error: `Too many avoided systems (max ${MAX_AVOID})` });
+  }
+  const avoid = avoidIds.length ? new Set(avoidIds) : undefined;
 
   const modeRaw = String(req.query.mode ?? 'shortest') as RouteMode;
   const mode: RouteMode = VALID_MODES.has(modeRaw) ? modeRaw : 'shortest';
@@ -77,7 +87,7 @@ router.get('/', async (req, res) => {
     const overlay = (includeThera || includeTurnur || includeWormholes || includeAnsiblex)
       ? await buildRouteOverlay({ thera: includeThera, turnur: includeTurnur, wormholes: includeWormholes, ansiblex: includeAnsiblex, mapIds, expiredScout })
       : undefined;
-    const result = await shortestRoutes(from, targets, mode, overlay);
+    const result = await shortestRoutes(from, targets, mode, overlay, avoid);
     return res.json(result);
   } catch (err) {
     log.error('Route compute failed:', err);
