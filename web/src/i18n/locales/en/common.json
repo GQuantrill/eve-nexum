@@ -914,7 +914,7 @@
     "connectToDone": "Connected {{from}} to {{to}}",
     "removeSystems": "Remove {{count}} Systems",
     "removeOrphans": "Remove Orphan Systems ({{count}})",
-    "removeOrphansConfirm": "Remove {{count}} orphan system(s)? These have no valid connection (none, or only broken ones). Home and locked systems are kept. This can be undone.",
+    "removeOrphansConfirm": "Remove {{count}} orphan system(s)? These have no valid connection (none, or only broken ones), or are cut off from home by a broken link. Home and locked systems are kept. This can be undone.",
     "removeStranded": "Remove Systems Cut Off From Home ({{count}})",
     "removeStrandedNoHome": "Remove Systems Cut Off From Home (set a home first)",
     "removeStrandedConfirm": "Remove {{count}} system(s) with no route back to {{home}}? Home and locked systems are kept. This is a bulk delete — undo restores them one at a time, and only the last 50 removals are kept.",
