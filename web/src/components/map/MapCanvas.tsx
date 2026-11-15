@@ -78,7 +78,7 @@ import { useUserSetting } from '../../hooks/useUserSetting';
 import { useCurrentHourKills } from '../../hooks/useCurrentHourKills';
 import { useFleet } from '../../hooks/useFleet';
 import { HeatmapContext } from '../../context/HeatmapContext';
-import { heatValue, type HeatMetric } from '../../utils/heatmap';
+import { heatValue, heatScale, type HeatMetric } from '../../utils/heatmap';
 import { resolveIntelColor } from '../../utils/intelColors';
 
 // Modifier keys that add a system to the current selection on click, alongside
@@ -250,8 +250,9 @@ export function MapCanvas() {
   // re-resolves class colours when the colour-vision mode changes.
   const [colorVision] = useUserSetting<string>('nexum.a11y.colorVision', 'off');
 
-  // Active heatmap. The per-map max is computed once here and shared via
-  // HeatmapContext so each node only divides its own value by it.
+  // Active heatmap. The per-map max (never below the metric's floor) is
+  // computed once here and shared via HeatmapContext so each node only divides
+  // its own value by it.
   const [heatMetric]    = useUserSetting<HeatMetric>('nexum.map.heatmap', 'none');
   const [heatIntensity] = useUserSetting<number>('nexum.map.heatIntensity', 1);
   const heatKills    = useCurrentHourKills();
@@ -264,7 +265,7 @@ export function MapCanvas() {
       const v = heatValue(heatMetric, s.eveSystemId, heatKills, heatFleet, selfCharId);
       if (v > max) max = v;
     }
-    return max;
+    return heatScale(heatMetric, max);
   }, [heatMetric, systems, heatKills, heatFleet, selfCharId]);
   const heatmapState = useMemo(
     () => ({ metric: heatMetric, max: heatMax, intensity: heatIntensity, colorVision }),
