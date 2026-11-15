@@ -42,3 +42,51 @@ describe('shortestRoutes avoidance', () => {
     expect(await shortestRoutes(1, [4], 'shortest', undefined, new Set([2, 6]))).toEqual({});
   });
 });
+
+describe('secure routes through Thera', () => {
+  // A (HS) - 20 HS jumps - Z, or A - B (HS) - Thera - C (HS) - Z. And a
+  // null-sec exit N off Thera that a secure route still keeps out of.
+  const THERA = 99;
+  beforeEach(() => {
+    const adj = new Map<number, number[]>();
+    const info = new Map<number, { name: string; security: number }>();
+    const link = (a: number, b: number) => {
+      adj.set(a, [...(adj.get(a) ?? []), b]);
+      adj.set(b, [...(adj.get(b) ?? []), a]);
+    };
+    for (let i = 1; i <= 21; i++) info.set(i, { name: `S${i}`, security: 0.9 });
+    for (let i = 1; i < 21; i++) link(i, i + 1);           // 1 .. 21, 20 jumps
+    info.set(30, { name: 'B', security: 0.9 }); link(1, 30);
+    info.set(31, { name: 'C', security: 0.9 }); link(31, 21);
+    info.set(40, { name: 'N', security: -0.3 });
+    adj.set(40, []);
+    setRouteGraphForTest(adj, info);
+  });
+  const overlay = (exits: number[]) => {
+    const o = { adj: new Map<number, number[]>(), info: new Map([[THERA, { name: 'Thera', security: -0.99 }]]), edgeMeta: new Map() };
+    for (const e of exits) {
+      o.adj.set(THERA, [...(o.adj.get(THERA) ?? []), e]);
+      o.adj.set(e, [...(o.adj.get(e) ?? []), THERA]);
+      o.edgeMeta.set(`${THERA}|${e}`, { kind: 'thera' });
+      o.edgeMeta.set(`${e}|${THERA}`, { kind: 'thera' });
+    }
+    return o;
+  };
+
+  it('takes a high-sec Thera route when it is shorter', async () => {
+    const r = await shortestRoutes(1, [21], 'secure', overlay([30, 31]));
+    expect(ids(r, 21)).toEqual([1, 30, THERA, 31, 21]);
+  });
+
+  it('keeps the gates when Thera is no shorter', async () => {
+    const r = await shortestRoutes(1, [3], 'secure', overlay([30, 31]));
+    expect(ids(r, 3)).toEqual([1, 2, 3]);
+  });
+
+  it('still keeps out of a null-sec exit', async () => {
+    const r = await shortestRoutes(30, [40], 'secure', overlay([30, 40]));
+    expect(ids(r, 40)).toEqual([30, THERA, 40]); // the only way, so taken
+    const r2 = await shortestRoutes(1, [21], 'secure', overlay([30, 40]));
+    expect(ids(r2, 21)).toHaveLength(21);         // no high-sec exit near Z
+  });
+});
