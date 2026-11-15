@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parseSigClipboard, pasteUpdatesFor } from './sigPaste';
+import { parseSigClipboard, pasteUpdatesFor, forScannedSystem } from './sigPaste';
 import type { Signature } from '../types';
 
 // Asked by a pilot: they scanned 48 sigs, marked the holes as wormholes by hand,
@@ -38,5 +38,23 @@ describe('re-pasting over sigs typed by hand', () => {
 
   it('keeps cosmic anomalies out of the signature list', () => {
     expect(parseSigClipboard(row('XYZ-789', 'Cosmic Anomaly', 'Combat Site', 'Perimeter Ambush Point', '100.0%', '2 AU'))).toEqual([]);
+  });
+});
+
+describe('pasting in a Drifter system', () => {
+  const paste = [
+    row('ABC-123', 'Cosmic Signature', 'Wormhole', 'Unidentified Wormhole', '100.0%', '2.1 AU'),
+    row('DEF-456', 'Cosmic Signature', 'Wormhole', 'Unstable Wormhole', '100.0%', '3.4 AU'),
+  ].join('\n');
+
+  it('elsewhere, an unidentified hole leads into Drifter space', () => {
+    expect(forScannedSystem(parseSigClipboard(paste), 'C3')[0].whLeadsTo).toBe('Drifter');
+  });
+
+  it('inside a Drifter hub, the unidentified holes lead out, so no leads-to is guessed', () => {
+    const [drifter, normal] = forScannedSystem(parseSigClipboard(paste), 'Drifter');
+    expect(drifter.whLeadsTo).toBe('');
+    expect(drifter.name).toBe('Unidentified Wormhole'); // still marks it a Drifter hole
+    expect(normal.whLeadsTo).toBe('');
   });
 });

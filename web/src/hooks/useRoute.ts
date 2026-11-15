@@ -4,6 +4,10 @@ import { useMapStore } from '../store/mapStore';
 import { useUserSetting } from './useUserSetting';
 import { useScoutFlagRevision } from './useScoutConnections';
 
+// The user's route avoidance list: systems no route of ours passes through.
+export const ROUTE_AVOID_KEY = 'nexum.route.avoid';
+export interface AvoidedSystem { id: number; name: string }
+
 // Metadata for a shortcut hop (wormhole chain link / Thera / Turnur scout
 // connection) — mirrors the server EdgeMeta, used to mark the gap between two
 // route squares and flag risky holes.
@@ -100,6 +104,9 @@ export function useRoute(
   const [inclTurnur]    = useUserSetting<boolean>('nexum.route.includeTurnur', false);
   const [inclWormholes] = useUserSetting<boolean>('nexum.route.includeWormholes', false);
   const [inclAnsiblex]  = useUserSetting<boolean>('nexum.route.includeAnsiblex', false);
+  const [avoided]       = useUserSetting<AvoidedSystem[]>(ROUTE_AVOID_KEY, []);
+  const avoidKey = (Array.isArray(avoided) ? avoided : [])
+    .map((a) => a.id).filter((n) => Number.isInteger(n) && n > 0).sort((a, b) => a - b).join(',');
   // Bumped when a scout connection is flagged/unflagged collapsed. The server
   // reads the flags, but they're invisible to this request's inputs, so without
   // this the stale route would stand.
@@ -131,12 +138,13 @@ export function useRoute(
     if (wantTurnur) url += '&includeTurnur=true';
     if (wantWh)     url += '&includeWormholes=true';
     if (wantAnsi)   url += '&includeAnsiblex=true';
+    if (avoidKey)   url += `&avoid=${avoidKey}`;
     if (wantWh || wantAnsi) url += allScope ? '&whScope=all' : `&mapId=${activeMapId}`;
     api<Record<string, RouteEntry>>(url)
       .then(r => { if (!cancelled) setData(r); })
       .catch(() => { if (!cancelled) setData({}); });
     return () => { cancelled = true; };
-  }, [from, targetsKey, routeMode, wantThera, wantTurnur, wantWh, wantAnsi, allScope, activeMapId, flagRevision, chainRevision]);
+  }, [from, targetsKey, routeMode, wantThera, wantTurnur, wantWh, wantAnsi, allScope, activeMapId, flagRevision, avoidKey, chainRevision]);
 
   return data;
 }

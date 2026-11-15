@@ -129,6 +129,12 @@ export function holeDisplay(
  */
 const UNIDENTIFIED_WH = /\bunidentified\s+wormhole\b/i;
 
+/** Is this a Drifter hole? Read from the scanned name, which is kept after the
+ *  hole is jumped and its leads-to becomes a system name. */
+export function isDrifterHole(sig: { sigType: string; name?: string | null }): boolean {
+  return sig.sigType === 'wormhole' && UNIDENTIFIED_WH.test(sig.name ?? '');
+}
+
 /** The leads-to a scanned name implies on its own, or '' when it implies none. */
 export function leadsToFromSigName(name: string): string {
   return UNIDENTIFIED_WH.test(name) ? 'Drifter' : '';
