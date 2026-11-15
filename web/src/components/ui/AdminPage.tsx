@@ -1383,6 +1383,7 @@ interface UserReportRow {
   systemsAdded:         number;
   systemsDeleted:       number;
   sigTypeCounts:        Record<string, number>;
+  activeInWindow:       boolean;
 }
 
 type SigTypeKey = 'data' | 'relic' | 'wormhole' | 'gas' | 'ore' | 'combat' | 'unknown';
@@ -1475,14 +1476,22 @@ function UsersReport() {
   // Headline counts over the currently-filtered set. Unique corps/alliances
   // count distinct non-null IDs, so users with no corp/alliance don't inflate.
   const summary = useMemo(() => {
-    if (!rows) return { users: 0, corps: 0, alliances: 0 };
+    const empty = { users: 0, corps: 0, alliances: 0, active: 0, sigs: 0, added: 0, deleted: 0 };
+    if (!rows) return empty;
     const corps = new Set<number>();
     const alliances = new Set<number>();
+    // The rest follow the window: "All users" lists everyone whatever the
+    // window, so the user/corp/alliance counts above never move with it.
+    let active = 0, sigs = 0, added = 0, deleted = 0;
     for (const u of rows) {
       if (u.corpId !== null) corps.add(u.corpId);
       if (u.allianceId !== null) alliances.add(u.allianceId);
+      if (u.activeInWindow) active++;
+      sigs    += Object.values(u.sigTypeCounts).reduce((a, b) => a + b, 0);
+      added   += u.systemsAdded;
+      deleted += u.systemsDeleted;
     }
-    return { users: rows.length, corps: corps.size, alliances: alliances.size };
+    return { ...empty, users: rows.length, corps: corps.size, alliances: alliances.size, active, sigs, added, deleted };
   }, [rows]);
 
   function handleSort(key: UserReportSortKey) {
@@ -1569,6 +1578,10 @@ function UsersReport() {
       <StatCard label={t('admin.reports.users.totalUsers')}      value={summary.users}     accent />
       <StatCard label={t('admin.reports.users.uniqueCorps')}     value={summary.corps} />
       <StatCard label={t('admin.reports.users.uniqueAlliances')} value={summary.alliances} />
+      <StatCard label={t('admin.reports.users.activeInWindow')}  value={summary.active} />
+      <StatCard label={t('admin.reports.users.sigsInWindow')}    value={summary.sigs} />
+      <StatCard label={t('admin.reports.users.addedInWindow')}   value={summary.added} />
+      <StatCard label={t('admin.reports.users.deletedInWindow')} value={summary.deleted} />
     </div>
     <table className={`${styles.mTable} admin-page__sortable`}>
       <thead>
