@@ -1,5 +1,13 @@
 import { useState, type KeyboardEvent } from 'react';
 
+// The highlighted row's class in each list that uses this hook. Only one
+// dropdown is open at a time, so after an arrow press the highlighted row is
+// found by class and scrolled into view -- a long list (wormhole types) would
+// otherwise move the highlight out of sight.
+const ACTIVE_ROW = '.search-results__item--active, .scout-pane__add-result--active, .wh-picker__option--kbd';
+const revealActive = () => requestAnimationFrame(() =>
+  document.querySelector<HTMLElement>(ACTIVE_ROW)?.scrollIntoView({ block: 'nearest' }));
+
 /**
  * Keyboard picking for a search box's results list: Arrow Up/Down move the
  * highlight and Enter picks it, so a typed name doesn't need a click to land.
@@ -12,6 +20,9 @@ import { useState, type KeyboardEvent } from 'react';
  *
  * `isDisabled` marks rows that show but can't be picked (already on the map,
  * already on the list): the highlight never lands on them.
+ *
+ * `startAt` is where the highlight sits before anything is typed -- a picker
+ * that opens on its current value starts there, like a native select.
  */
 export function useSearchKeys<T>(
   items: readonly T[],
@@ -19,12 +30,13 @@ export function useSearchKeys<T>(
   nameOf: (item: T) => string,
   onPick: (item: T) => void,
   isDisabled?: (item: T) => boolean,
+  startAt = -1,
 ): {
   active: number;
   setActive: (i: number) => void;
   /** Forget a moved highlight, for a list that reopens on the same query. */
   reset: () => void;
-  onKeyDown: (e: KeyboardEvent<HTMLInputElement>) => void;
+  onKeyDown: (e: KeyboardEvent<HTMLElement>) => void;
 } {
   const [moved, setMoved] = useState<{ query: string; index: number } | null>(null);
   const q = query.trim().toLowerCase();
@@ -33,7 +45,7 @@ export function useSearchKeys<T>(
   const first = items.findIndex((_, i) => ok(i));
   const active =
     moved && moved.query === query && ok(moved.index) ? moved.index
-    : q === '' ? -1
+    : q === '' ? (ok(startAt) ? startAt : -1)
     : exact >= 0 ? exact : first;
 
   // The next pickable row from `from` in direction `dir`, or `from` itself.
@@ -42,10 +54,10 @@ export function useSearchKeys<T>(
     return from;
   };
 
-  const onKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+  const onKeyDown = (e: KeyboardEvent<HTMLElement>) => {
     if (first < 0) return;
-    if (e.key === 'ArrowDown') { e.preventDefault(); setMoved({ query, index: step(active, 1) }); }
-    else if (e.key === 'ArrowUp') { e.preventDefault(); setMoved({ query, index: active < 0 ? first : step(active, -1) }); }
+    if (e.key === 'ArrowDown') { e.preventDefault(); setMoved({ query, index: step(active, 1) }); revealActive(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); setMoved({ query, index: active < 0 ? first : step(active, -1) }); revealActive(); }
     else if (e.key === 'Enter' && active >= 0) { e.preventDefault(); onPick(items[active]); }
   };
 
@@ -56,3 +68,4 @@ export function useSearchKeys<T>(
     onKeyDown,
   };
 }
+

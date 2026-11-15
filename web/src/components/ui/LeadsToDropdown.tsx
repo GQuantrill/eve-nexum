@@ -1,10 +1,11 @@
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowRightIcon, CaretDownIcon, CaretUpIcon } from '../../icons';
 import type { MapSystem, SystemClass } from '../../types';
 import { CLASS_COLORS, CLASS_LABELS } from '../../data/wormholes';
 import { LEADS_TO_BANDS } from '../../utils/whDest';
 import { usePopover } from '../../hooks/usePopover';
+import { useSearchKeys } from '../../hooks/useSearchKeys';
 import { useSystemAlias } from '../../hooks/useSystemAlias';
 
 interface Props {
@@ -55,6 +56,7 @@ export function LeadsToDropdown({ value, onChange, connectedSystems = [] }: Prop
 
   const openPicker = () => {
     setSearch('');
+    keys.reset();
     openAt();
     setTimeout(() => searchRef.current?.focus(), 0);
   };
@@ -79,6 +81,31 @@ export function LeadsToDropdown({ value, onChange, connectedSystems = [] }: Prop
     [q]);
 
   const select = (v: string) => { onChange(v); setOpen(false); };
+
+  // Every row in the order shown, as [value, label], so the arrows walk the
+  // list as it reads and Enter picks the highlighted one. Opens on the current
+  // value; typing moves to an exact label, else the first match ("Unknown"
+  // isn't a match, so the keys skip it while searching).
+  const rows = useMemo<Array<[string, string]>>(() => [
+    ['', ''],
+    ...filteredConnected.map((s): [string, string] => [s.name || s.id, s.name]),
+    ...filteredJSpace.map((o): [string, string] => [o.value, o.label]),
+    ...filteredKSpace.map((c): [string, string] => [c, CLASS_LABELS[c]]),
+    ...filteredJExact.map((o): [string, string] => [o.value, o.label]),
+  ], [filteredConnected, filteredJSpace, filteredKSpace, filteredJExact]);
+  const keys = useSearchKeys(
+    open ? rows : [], search, ([, label]) => label, ([v]) => select(v),
+    ([v]) => v === '' && q !== '', rows.findIndex(([v]) => v === value),
+  );
+  const onSearchKey = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Escape') { e.stopPropagation(); setOpen(false); btnRef.current?.focus(); return; }
+    keys.onKeyDown(e);
+  };
+  const rowProps = (i: number, current: boolean) => ({
+    className: `wh-picker__option${current ? ' wh-picker__option--active' : ''}${i === keys.active ? ' wh-picker__option--kbd' : ''}`,
+    onMouseEnter: () => keys.setActive(i),
+  });
+  let row = 1;
 
   // Resolve the button's label + colour for any stored value: a J-space band
   // (C1-C3 / C4-C5 / C6), an exact class (incl. legacy values like a plain C2),
@@ -124,12 +151,13 @@ export function LeadsToDropdown({ value, onChange, connectedSystems = [] }: Prop
             className="wh-picker__search"
             value={search}
             onChange={e => setSearch(e.target.value)}
+            onKeyDown={onSearchKey}
             placeholder={t('whPicker.searchPlaceholder')}
             spellCheck={false}
           />
           <div className="wh-picker__list">
             <div
-              className={`wh-picker__option${!value ? ' wh-picker__option--active' : ''}`}
+              {...rowProps(0, !value)}
               onMouseDown={() => select('')}
             >
               <span className="wh-picker__placeholder">{t('mapNode.unknown')}</span>
@@ -144,7 +172,7 @@ export function LeadsToDropdown({ value, onChange, connectedSystems = [] }: Prop
                 {filteredConnected.map(sys => (
                   <div
                     key={sys.id}
-                    className={`wh-picker__option${value === sys.name ? ' wh-picker__option--active' : ''}`}
+                    {...rowProps(row++, value === sys.name)}
                     onMouseDown={() => select(sys.name || sys.id)}
                   >
                     <span className="wh-picker__code" style={{ color: '#c0d0e8', minWidth: 'auto', marginRight: 4 }}>
@@ -168,7 +196,7 @@ export function LeadsToDropdown({ value, onChange, connectedSystems = [] }: Prop
                 {filteredJSpace.map(o => (
                   <div
                     key={o.value}
-                    className={`wh-picker__option${value === o.value ? ' wh-picker__option--active' : ''}`}
+                    {...rowProps(row++, value === o.value)}
                     onMouseDown={() => select(o.value)}
                   >
                     <span className="wh-picker__dest" style={{ color: o.color }}>
@@ -188,7 +216,7 @@ export function LeadsToDropdown({ value, onChange, connectedSystems = [] }: Prop
                 {filteredKSpace.map(cls => (
                   <div
                     key={cls}
-                    className={`wh-picker__option${value === cls ? ' wh-picker__option--active' : ''}`}
+                    {...rowProps(row++, value === cls)}
                     onMouseDown={() => select(cls)}
                   >
                     <span className="wh-picker__dest" style={{ color: CLASS_COLORS[cls] }}>
@@ -208,7 +236,7 @@ export function LeadsToDropdown({ value, onChange, connectedSystems = [] }: Prop
                 {filteredJExact.map(o => (
                   <div
                     key={o.value}
-                    className={`wh-picker__option${value === o.value ? ' wh-picker__option--active' : ''}`}
+                    {...rowProps(row++, value === o.value)}
                     onMouseDown={() => select(o.value)}
                   >
                     <span className="wh-picker__dest" style={{ color: o.color }}>

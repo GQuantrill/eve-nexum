@@ -2628,6 +2628,7 @@ select.sig-toolbar-btn option {
   font-size: calc(14px * var(--font-scale, 1));
 }
 .wh-picker__option:hover   { background: var(--border); }
+.wh-picker__option--kbd    { background: var(--border); box-shadow: inset 2px 0 0 var(--accent-light); }
 .wh-picker__option--active { background: #1e3555; }
 
 .wh-picker__code { font-family: 'Courier New', monospace; font-weight: 700; font-size: calc(14px * var(--font-scale, 1)); color: var(--accent-light); min-width: 34px; }

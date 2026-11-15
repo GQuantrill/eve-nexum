@@ -4,7 +4,7 @@ import type { KeyboardEvent } from 'react';
 import { useSearchKeys } from './useSearchKeys';
 
 const items = [{ name: 'Jita IV' }, { name: 'Jita' }, { name: 'Jitanai' }];
-const key = (k: string) => ({ key: k, preventDefault: () => {} }) as unknown as KeyboardEvent<HTMLInputElement>;
+const key = (k: string) => ({ key: k, preventDefault: () => {} }) as unknown as KeyboardEvent<HTMLElement>;
 
 describe('useSearchKeys', () => {
   it('Enter picks the exact name, wherever it is listed', () => {
@@ -58,5 +58,14 @@ describe('useSearchKeys', () => {
     act(() => result.current.onKeyDown(key('ArrowDown')));
     act(() => result.current.onKeyDown(key('Enter')));
     expect(onPick).toHaveBeenCalledWith({ name: 'Jita IV' });
+  });
+
+  it('opens on the current value before anything is typed', () => {
+    const onPick = vi.fn();
+    const { result } = renderHook(() => useSearchKeys(items, '', (i) => i.name, onPick, undefined, 1));
+    expect(result.current.active).toBe(1);
+    act(() => result.current.onKeyDown(key('ArrowDown')));
+    act(() => result.current.onKeyDown(key('Enter')));
+    expect(onPick).toHaveBeenCalledWith({ name: 'Jitanai' });
   });
 });
