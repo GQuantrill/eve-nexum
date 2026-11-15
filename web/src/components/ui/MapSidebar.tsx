@@ -45,6 +45,7 @@ import type { WormholeMap } from "../../types";
 import { countPersonalMaps } from '../../utils/personalMaps';
 import { useEscapeClose } from '../../hooks/useEscapeClose';
 import { LINK_SIG_IDS_KEY } from '../../utils/linkSigIds';
+import { RouteAvoidList } from './RouteAvoidList';
 import { CONFIRM_KEY_DELETE_KEY } from '../../utils/confirmPref';
 import { HOME_COLOR_KEY, HOME_COLOR_DEFAULT, HERE_COLOR_KEY, HERE_COLOR_DEFAULT, HERE_PULSE_KEY, HERE_PULSE_DEFAULT, HERE_PULSES, normalisePulse, safeColor } from '../../utils/mapMarkers';
 
@@ -1657,6 +1658,7 @@ export function MapSidebar() {
           <p className="map-sidebar__hint">
             {t("mapSidebar.routeShortcutNote")}
           </p>
+          <RouteAvoidList />
           {hasAlts && (
             <>
               <div className="map-sidebar__row">

@@ -75,6 +75,14 @@ let systemInfo: Map<number, { name: string; security: number }> | null = null;
  * { name, security } for every system that participates in the graph.
  * Called once at server startup.
  */
+/** Tests only: install a small graph instead of loading the SDE one. */
+export function setRouteGraphForTest(
+  adj: Map<number, number[]>, info: Map<number, { name: string; security: number }>,
+): void {
+  adjacency = adj;
+  systemInfo = info;
+}
+
 export async function loadRouteGraph(): Promise<void> {
   const [adjRows, sysRows] = await Promise.all([
     db.query<{ system_id: number; destination_system_id: number }>(
@@ -120,12 +128,17 @@ export async function loadRouteGraph(): Promise<void> {
  * `jumps` in the returned RouteEntry is always the literal hop count of
  * the path, not the weighted cost — that's what users care about and it
  * keeps the response shape stable across modes.
+ *
+ * `avoid` is the user's avoidance list: a route never passes through one of
+ * those systems, the same as EVE's own autopilot avoidance. Starting in one,
+ * or asking for a route TO one, still works -- only passing through is out.
  */
 export async function shortestRoutes(
   source: number,
   targets: number[],
   mode: RouteMode = 'shortest',
   overlay?: RouteOverlay,
+  avoid?: ReadonlySet<number>,
 ): Promise<Record<number, RouteEntry>> {
   if (!adjacency || !systemInfo) throw new Error('Route graph not loaded');
   const baseAdj  = adjacency;
@@ -139,9 +152,13 @@ export async function shortestRoutes(
 
   // Neighbours come from the static stargate graph plus any per-request overlay
   // edges; the base graph is never copied or mutated.
-  const neighborsOf = (node: number): number[] =>
+  const allNeighbors = (node: number): number[] =>
     overlay ? [...(baseAdj.get(node) ?? []), ...(overlay.adj.get(node) ?? [])]
             : (baseAdj.get(node) ?? []);
+  // An avoided system can be arrived at (when it's a target) but never left,
+  // so no route passes through it.
+  const neighborsOf = (node: number): number[] =>
+    avoid?.size && node !== source && avoid.has(node) ? [] : allNeighbors(node);
   const infoOf = (id: number) => overlay?.info.get(id) ?? baseInfo.get(id);
   const isSpecialEdge = (a: number, b: number): boolean =>
     overlay ? overlay.edgeMeta.has(edgeKey(a, b)) : false;
