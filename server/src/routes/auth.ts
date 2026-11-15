@@ -828,6 +828,7 @@ const SETTINGS_ALLOWLIST = new Set<string>([
   'nexum.route.includeTurnur',
   'nexum.route.includeWormholes',
   'nexum.route.includeAnsiblex',
+  'nexum.route.avoid',
   'nexum.mapSidebar.stale',
   'nexum.mapSidebar.systemOptions',
   'nexum.panel.collapsed.a0',
