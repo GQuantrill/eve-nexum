@@ -1655,6 +1655,11 @@ export function MapSidebar() {
             label={t("mapSidebar.routeIncludeAnsiblex")}
             defaultOn={false}
           />
+          <SettingToggle
+            settingKey="nexum.route.avoidEol"
+            label={t("mapSidebar.routeAvoidEol")}
+            defaultOn={false}
+          />
           <p className="map-sidebar__hint">
             {t("mapSidebar.routeShortcutNote")}
           </p>

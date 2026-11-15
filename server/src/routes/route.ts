@@ -56,6 +56,7 @@ router.get('/', async (req, res) => {
   const includeTurnur    = String(req.query.includeTurnur)    === 'true';
   const includeWormholes = String(req.query.includeWormholes) === 'true';
   const includeAnsiblex  = String(req.query.includeAnsiblex)  === 'true';
+  const skipEol          = String(req.query.avoidEol)         === 'true';
   const mapId = typeof req.query.mapId === 'string' ? req.query.mapId : undefined;
   // whScope=all unions the wormhole/Ansiblex chains of EVERY map the caller can
   // see (the Closest Systems pane is a per-user tool, so the chain they're
@@ -85,7 +86,7 @@ router.get('/', async (req, res) => {
     // Only worth the lookup when a scout hub is actually in play.
     const expiredScout = (includeThera || includeTurnur) ? await expiredScoutIds(req) : undefined;
     const overlay = (includeThera || includeTurnur || includeWormholes || includeAnsiblex)
-      ? await buildRouteOverlay({ thera: includeThera, turnur: includeTurnur, wormholes: includeWormholes, ansiblex: includeAnsiblex, mapIds, expiredScout })
+      ? await buildRouteOverlay({ thera: includeThera, turnur: includeTurnur, wormholes: includeWormholes, ansiblex: includeAnsiblex, mapIds, expiredScout, skipEol })
       : undefined;
     const result = await shortestRoutes(from, targets, mode, overlay, avoid);
     return res.json(result);

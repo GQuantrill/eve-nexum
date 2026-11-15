@@ -829,6 +829,7 @@ const SETTINGS_ALLOWLIST = new Set<string>([
   'nexum.route.includeWormholes',
   'nexum.route.includeAnsiblex',
   'nexum.route.avoid',
+  'nexum.route.avoidEol',
   'nexum.mapSidebar.stale',
   'nexum.mapSidebar.systemOptions',
   'nexum.panel.collapsed.a0',

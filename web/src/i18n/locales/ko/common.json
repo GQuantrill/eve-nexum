@@ -1978,6 +1978,7 @@
     "revokeShareFailed": "공유 링크 취소 실패",
     "routeHint": "최단: 보안 등급과 무관하게 점프 수가 가장 적은 경로. 안전: 하이섹을 우선하고, 하이섹 경로가 없을 때만 로우/널로 우회합니다.",
     "routeIncludeAnsiblex": "Ansiblex 점프 게이트 포함",
+    "routeAvoidEol": "수명이 다해가는 웜홀 피하기",
     "routeIncludeThera": "Thera 연결 포함",
     "routeIncludeTurnur": "Turnur 연결 포함",
     "routeIncludeWormholes": "웜홀 체인 포함",

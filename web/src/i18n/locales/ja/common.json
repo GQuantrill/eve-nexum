@@ -1978,6 +1978,7 @@
     "revokeShareFailed": "共有リンクの取り消しに失敗しました",
     "routeHint": "最短: セキュリティに関係なく最少ジャンプ。安全: ハイセクを優先し、ハイセクの経路がない場合のみロー/ヌルを迂回します。",
     "routeIncludeAnsiblex": "Ansiblex ジャンプゲートを含める",
+    "routeAvoidEol": "寿命間近のホールを避ける",
     "routeIncludeThera": "Thera 接続を含める",
     "routeIncludeTurnur": "Turnur 接続を含める",
     "routeIncludeWormholes": "ワームホールチェーンを含める",

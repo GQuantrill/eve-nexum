@@ -35,7 +35,7 @@ function addEdge(o: RouteOverlay, a: number, b: number, meta: EdgeMeta): void {
 
 // Thera/Turnur scout connections. Each connection touches its hub on one end and
 // a (usually k-space) exit on the other; add both if the hub is enabled.
-async function addScoutEdges(o: RouteOverlay, thera: boolean, turnur: boolean, expired: Set<string>): Promise<boolean> {
+async function addScoutEdges(o: RouteOverlay, thera: boolean, turnur: boolean, expired: Set<string>, skipEol: boolean): Promise<boolean> {
   const { thera: theraId, turnur: turnurId } = await getHubIds();
   const conns = await getScoutConnections();
   let added = false;
@@ -48,6 +48,7 @@ async function addScoutEdges(o: RouteOverlay, thera: boolean, turnur: boolean, e
     if (isThera  && !thera)  continue;
     if (isTurnur && !turnur) continue;
     if (!isThera && !isTurnur) continue;
+    if (skipEol && c.remainingHours <= 4) continue;
     addEdge(o, c.outSystemId, c.inSystemId, {
       kind:   isThera ? 'thera' : 'turnur',
       whType: c.whType || undefined,
@@ -66,7 +67,7 @@ async function addScoutEdges(o: RouteOverlay, thera: boolean, turnur: boolean, e
 // severs that chain path. Passing several map ids unions their chains (the
 // closest-systems pane routes across every map the user can see, so the chain
 // they're actually sitting in is used regardless of the active tab).
-async function addWormholeEdges(o: RouteOverlay, mapIds: string[]): Promise<boolean> {
+async function addWormholeEdges(o: RouteOverlay, mapIds: string[], skipEol: boolean): Promise<boolean> {
   if (mapIds.length === 0) return false;
   const { rows } = await db.query<{
     a: number; b: number; whType: string | null;
@@ -98,6 +99,7 @@ async function addWormholeEdges(o: RouteOverlay, mapIds: string[]): Promise<bool
   let added = 0;
   for (const r of rows) {
     if (isPastLife(r, now)) continue;
+    if (skipEol && r.eol) continue;
     added++;
     addEdge(o, r.a, r.b, {
       kind: 'wormhole',
@@ -189,13 +191,16 @@ export async function buildRouteOverlay(opts: {
   thera: boolean; turnur: boolean; wormholes: boolean; ansiblex: boolean; mapIds?: string[];
   /** Scout connections the requester has flagged collapsed; never routed through. */
   expiredScout?: Set<string>;
+  /** Leave out holes at end of life (scout: 4h or less left; mapped: marked EOL). */
+  skipEol?: boolean;
 }): Promise<RouteOverlay | undefined> {
   const o = emptyOverlay();
   const mapIds = opts.mapIds ?? [];
   const expired = opts.expiredScout ?? new Set<string>();
+  const skipEol = opts.skipEol ?? false;
   let any = false;
-  if (opts.thera || opts.turnur) any = (await addScoutEdges(o, opts.thera, opts.turnur, expired)) || any;
-  if (opts.wormholes && mapIds.length) any = (await addWormholeEdges(o, mapIds)) || any;
+  if (opts.thera || opts.turnur) any = (await addScoutEdges(o, opts.thera, opts.turnur, expired, skipEol)) || any;
+  if (opts.wormholes && mapIds.length) any = (await addWormholeEdges(o, mapIds, skipEol)) || any;
   if (opts.ansiblex && mapIds.length)  any = (await addAnsiblexEdges(o, mapIds)) || any;
   if (!any) return undefined;
   await fillInfo(o);
