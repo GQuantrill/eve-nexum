@@ -243,10 +243,12 @@
   padding: 3px 8px;
   border-radius: 4px;
   border: 1px solid;
-
-  &--ok  { color: var(--success); border-color: var(--success); }
-  &--err { color: var(--danger); border-color: var(--danger); }
 }
+
+/* Flat, not nested: `&--x` is Sass, not CSS nesting, so the browser dropped
+   these and they never applied. */
+.map-sidebar__status--ok  { color: var(--success); border-color: var(--success); }
+.map-sidebar__status--err { color: var(--danger); border-color: var(--danger); }
 
 .map-sidebar__title {
   font-size: calc(16px * var(--font-scale, 1));
