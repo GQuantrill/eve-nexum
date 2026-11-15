@@ -1691,32 +1691,22 @@ export function MapCanvas() {
         !!heatFleet.bySystem.get(s.eveSystemId)?.length
       ));
 
-    // Orphans: systems with no *valid* connection — either no connection at all,
-    // or only broken (quarantined) ones. Home, locked and occupied systems are
-    // protected.
-    const orphanIds = systems
-      .filter((s) =>
-        !s.isHome && !s.locked && !occupied(s) &&
-        !connections.some((c) => !c.broken && (c.sourceId === s.id || c.targetId === s.id)),
-      )
-      .map((s) => s.id);
-
-    // Systems with no route back to home — a branch left behind when a chain
-    // collapsed, rather than anything still reachable.
     const homeSystem = systems.find((s) => s.isHome) ?? null;
-    const strandedIds = (() => {
-      if (!homeSystem) return [];
-      // Broken links still count as links here. "Broken" means re-scout, not
-      // gone, and this is a bulk delete — keeping a system that turns out to be
-      // reachable is far cheaper than wiping a live chain over one flagged hop.
+
+    // Systems reachable from home, over live links only or over every link.
+    const reachFromHome = (includeBroken: boolean): Set<string> => {
+      const reached = new Set<string>();
+      if (!homeSystem) return reached;
       const adj = new Map<string, string[]>();
       const link = (a: string, b: string) => {
         const list = adj.get(a);
         if (list) list.push(b); else adj.set(a, [b]);
       };
-      for (const c of connections) { link(c.sourceId, c.targetId); link(c.targetId, c.sourceId); }
-
-      const reached = new Set<string>([homeSystem.id]);
+      for (const c of connections) {
+        if (c.broken && !includeBroken) continue;
+        link(c.sourceId, c.targetId); link(c.targetId, c.sourceId);
+      }
+      reached.add(homeSystem.id);
       const queue = [homeSystem.id];
       for (let i = 0; i < queue.length; i++) {
         for (const next of adj.get(queue[i]) ?? []) {
@@ -1725,10 +1715,33 @@ export function MapCanvas() {
           queue.push(next);
         }
       }
-      // Locked and occupied systems are protected, same as the orphan sweep —
-      // locking one is how you say "leave this alone".
-      return systems.filter((sys) => !reached.has(sys.id) && !sys.locked && !occupied(sys)).map((sys) => sys.id);
-    })();
+      return reached;
+    };
+    const reachedLive = reachFromHome(false);
+    const reachedAny  = reachFromHome(true);
+
+    // Orphans: systems with no *valid* connection — none at all, or only
+    // broken (scissored) ones — and systems behind a scissor: home reaches
+    // them only through a broken link. Paste over home's sigs and the chain
+    // past the severed hole goes too, though its own links are still live
+    // because nobody has scanned out there. Home, locked and occupied systems
+    // are protected.
+    const orphanIds = systems
+      .filter((s) =>
+        !s.isHome && !s.locked && !occupied(s) && (
+          !connections.some((c) => !c.broken && (c.sourceId === s.id || c.targetId === s.id)) ||
+          (reachedAny.has(s.id) && !reachedLive.has(s.id))
+        ),
+      )
+      .map((s) => s.id);
+
+    // Systems with no route back to home at all, not even through a scissored
+    // link — a branch left behind once a collapsed chain's links were cleaned
+    // up. Locked and occupied systems are protected, same as the orphan sweep —
+    // locking one is how you say "leave this alone".
+    const strandedIds = homeSystem
+      ? systems.filter((sys) => !reachedAny.has(sys.id) && !sys.locked && !occupied(sys)).map((sys) => sys.id)
+      : [];
 
     return [
       {
