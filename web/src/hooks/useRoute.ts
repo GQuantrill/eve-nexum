@@ -37,6 +37,34 @@ export interface RouteEntry {
                          // displayed route won't match EVE autopilot; a k-space destination is still settable)
 }
 
+// How long to wait after the map's links change before asking again. The
+// store changes first and the write reaches the server a moment later -- an
+// undone system delete puts the system back, then POSTs it and its links -- so
+// asking at once can read the chain from before the change and keep it.
+const CHAIN_SETTLE_MS = 1500;
+
+/**
+ * Changes, a moment after it settles, whenever the active map's links do. The
+ * server routes through the chain as it has it stored, which none of the
+ * request's inputs reflect, so without this a route kept whatever chain it
+ * first saw: a link added, cut or brought back by undo never reached it.
+ */
+function useChainRevision(enabled: boolean): string {
+  const chainKey = useMapStore((s) => (enabled
+    ? s.map.connections
+        .map((c) => `${c.id}:${c.connectionType}:${c.broken ? 1 : 0}:${c.massStatus ?? ''}:${c.timeStatus ?? ''}`)
+        .sort()
+        .join('|')
+    : ''));
+  const [settled, setSettled] = useState(chainKey);
+  useEffect(() => {
+    if (chainKey === settled) return;
+    const t = setTimeout(() => setSettled(chainKey), CHAIN_SETTLE_MS);
+    return () => clearTimeout(t);
+  }, [chainKey, settled]);
+  return settled;
+}
+
 /**
  * Fetch shortest-route jump count + path from `from` to each of `targets`.
  * Routing mode is read from the user prefs store ('shortest' for fewest jumps,
@@ -95,6 +123,7 @@ export function useRoute(
   // required — the chains still apply when routing from another region's tab.
   const wantWh   = inclWormholes && (allScope || !!activeMapId);
   const wantAnsi = inclAnsiblex  && (allScope || !!activeMapId);
+  const chainRevision = useChainRevision(wantWh || wantAnsi);
 
   useEffect(() => {
     if (!from || !targetsKey) {
@@ -115,7 +144,7 @@ export function useRoute(
       .then(r => { if (!cancelled) setData(r); })
       .catch(() => { if (!cancelled) setData({}); });
     return () => { cancelled = true; };
-  }, [from, targetsKey, routeMode, wantThera, wantTurnur, wantWh, wantAnsi, allScope, activeMapId, flagRevision, avoidKey]);
+  }, [from, targetsKey, routeMode, wantThera, wantTurnur, wantWh, wantAnsi, allScope, activeMapId, flagRevision, avoidKey, chainRevision]);
 
   return data;
 }
