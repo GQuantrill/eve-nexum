@@ -65,3 +65,13 @@ export function pasteUpdatesFor(match: Signature, p: ParsedSig): Partial<Signatu
   if (p.whLeadsTo && !match.whLeadsTo) updates.whLeadsTo = p.whLeadsTo;
   return updates;
 }
+
+/**
+ * Inside a Drifter system the "Unidentified Wormhole"s are the way OUT, to
+ * k-space, not into Drifter space -- so the name says nothing about where they
+ * lead and the leads-to it implied is dropped.
+ */
+export function forScannedSystem(parsed: ParsedSig[], systemClass: string | null | undefined): ParsedSig[] {
+  if (systemClass !== 'Drifter') return parsed;
+  return parsed.map((p) => (p.whLeadsTo === 'Drifter' ? { ...p, whLeadsTo: '' } : p));
+}

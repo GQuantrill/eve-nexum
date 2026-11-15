@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { leadsToFromSigName, isUnresolvedLeadsTo, leadsToClasses, leadsToForTypeChange } from './whDest';
+import { isDrifterHole, leadsToFromSigName, isUnresolvedLeadsTo, leadsToClasses, leadsToForTypeChange } from './whDest';
 
 describe('leadsToFromSigName', () => {
   // A Drifter hole is the only one the scanner calls "Unidentified"; every
@@ -93,5 +93,14 @@ describe('leadsToForTypeChange', () => {
   it('leaves an unchanged leads-to alone', () => {
     expect(leadsToForTypeChange('', 'K162', '', types)).toBeUndefined();
     expect(leadsToForTypeChange('D382', 'D382', 'C2', types)).toBeUndefined();
+  });
+});
+
+describe('isDrifterHole', () => {
+  it('is a wormhole the scanner called unidentified, whatever it now leads to', () => {
+    expect(isDrifterHole({ sigType: 'wormhole', name: 'Unidentified Wormhole' })).toBe(true);
+    expect(isDrifterHole({ sigType: 'wormhole', name: 'Unstable Wormhole' })).toBe(false);
+    expect(isDrifterHole({ sigType: 'wormhole', name: '' })).toBe(false);
+    expect(isDrifterHole({ sigType: 'data', name: 'Unidentified Wormhole' })).toBe(false);
   });
 });

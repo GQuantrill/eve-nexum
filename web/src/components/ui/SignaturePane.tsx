@@ -15,7 +15,7 @@ import { usePopover } from '../../hooks/usePopover';
 import type { Signature, SigType, MapConnection, MassStatus, TimeStatus } from '../../types';
 import { SigTypeIcon } from './SigTypeIcon';
 import { connectionForSig, effectiveWhState, lifePatch, LIFE_CYCLE } from '../../utils/whState';
-import { leadsToForTypeChange } from '../../utils/whDest';
+import { leadsToForTypeChange, isDrifterHole } from '../../utils/whDest';
 import { ConfirmModal } from './ConfirmModal';
 import { shouldSkipConfirm } from '../../utils/confirmPref';
 import { NotesEditor } from './NotesEditor';
@@ -26,7 +26,7 @@ import { LeadsToDropdown } from './LeadsToDropdown';
 import { loadStargateNeighbors, isKnownStargateAdjacent } from '../../utils/stargateAdjacency';
 import { toast } from '../../utils/toastStore';
 import { GHOST_TIERS, defaultGhostTier, ghostTier } from '../../utils/ghostSites';
-import { parseSigClipboard, pasteUpdatesFor, type ParsedSig } from '../../utils/sigPaste';
+import { parseSigClipboard, pasteUpdatesFor, forScannedSystem, type ParsedSig } from '../../utils/sigPaste';
 import { reevaluateConnectionsForSystem } from '../../utils/whAutoDetect';
 import { CLASS_COLORS } from '../../data/wormholes';
 import { alertInboundK162 } from '../../utils/k162Alert';
@@ -306,6 +306,13 @@ function formatDelay(sec: number): string {
 // Order the type-filter chips most-useful-first. Covers every SigType.
 const SIG_TYPE_FILTER_ORDER: SigType[] = ['wormhole', 'data', 'relic', 'gas', 'ore', 'combat', 'ghost', 'unknown'];
 
+// The filter chips: each sig group, plus Drifter holes as their own chip. A
+// Drifter hub lists dozens of them beside a handful of ordinary holes, so
+// "Wormhole" means the ordinary ones and the Drifter holes come and go with
+// their own chip.
+type SigFilterKey = SigType | 'drifter';
+const sigFilterKey = (s: Signature): SigFilterKey => (isDrifterHole(s) ? 'drifter' : s.sigType);
+
 // Signature-type Select options. Wormhole leads because it is far and away the
 // most common thing anyone picks here; the rest follow in label order (which
 // holds for English — the labels are translated, the order isn't). Used for
@@ -403,6 +410,10 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   const { t } = useTranslation();
   const sigTypeLabel = (type: SigType) =>
     type === 'unknown' ? t('sigType.unknown') : SIG_TYPE_LABELS[type];
+  // A Drifter hole says so in its Group, from the scanned name, so it still
+  // reads as one after the jump turns its leads-to into a system name.
+  const rowTypeLabel = (sig: Signature, type: SigType) =>
+    type === 'wormhole' && isDrifterHole(sig) ? t('signatures.drifterHole') : sigTypeLabel(type);
   const activeMapId     = useMapStore((s) => s.activeMapId);
   // Narrow slices instead of the whole `map`: the pane only reads systems +
   // connections, so it no longer re-renders on unrelated map mutations (rename,
@@ -472,9 +483,9 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   const [sortDir, setSortDir]         = useState<'asc' | 'desc'>('asc');
   // Multi-select type filter. Empty = show all; otherwise show only the
   // selected sig types. A view-only filter, so it isn't persisted.
-  const [typeFilter, setTypeFilter]   = useState<Set<SigType>>(new Set());
+  const [typeFilter, setTypeFilter]   = useState<Set<SigFilterKey>>(new Set());
 
-  const toggleTypeFilter = (type: SigType) => {
+  const toggleTypeFilter = (type: SigFilterKey) => {
     setTypeFilter((prev) => {
       const next = new Set(prev);
       if (next.has(type)) next.delete(type);
@@ -521,7 +532,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   // don't count: they have nothing to put in those columns until their group is
   // set, and the columns come back once it is. An empty list keeps every column.
   const listedTypes = useMemo((): Set<SigType> | null => {
-    if (typeFilter.size > 0) return typeFilter;
+    if (typeFilter.size > 0) return new Set([...typeFilter].map((k) => (k === 'drifter' ? 'wormhole' : k)));
     if (sigs.length === 0) return null;
     return new Set(sigs.map((s) => s.sigType).filter((ty) => ty !== 'unknown'));
   }, [typeFilter, sigs]);
@@ -1016,8 +1027,9 @@ export function SignaturePane({ systemId }: { systemId: string }) {
     scheduleSigRemoval(activeMapId, systemId, sig, delaySec);
   };
 
-  const processPaste = useCallback(async (parsed: ParsedSig[], overwrite: boolean, delaySec: number) => {
+  const processPaste = useCallback(async (pastedRows: ParsedSig[], overwrite: boolean, delaySec: number) => {
     if (!activeMapId) return;
+    const parsed = forScannedSystem(pastedRows, systemClass);
     // An empty draft was an "Add signature" click, most likely to focus the
     // pane for this paste; drop it rather than leave a blank row behind.
     for (const s of sigsRef.current) if (isDraft(s.id) && isContentlessSig(s)) deleteSig(s.id);
@@ -1080,7 +1092,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
       return [...byId.values()].sort((a, b) => a.sigId.localeCompare(b.sigId));
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeMapId, systemId]);
+  }, [activeMapId, systemId, systemClass]);
 
   useEffect(() => {
     if (!activeMapId) return;
@@ -1176,8 +1188,10 @@ export function SignaturePane({ systemId }: { systemId: string }) {
     }
   };
 
+  const hasDrifterHoles = sigs.some(isDrifterHole);
+
   const sortedSigs = useMemo(() => {
-    const base = typeFilter.size ? sigs.filter((s) => typeFilter.has(s.sigType)) : sigs;
+    const base = typeFilter.size ? sigs.filter((s) => typeFilter.has(sigFilterKey(s))) : sigs;
     if (!sortCol) return base;
     return [...base].sort((a, b) => {
       const av = sigSortKey(a, sortCol).toLowerCase();
@@ -1298,6 +1312,21 @@ export function SignaturePane({ systemId }: { systemId: string }) {
             >
               {t(`sigType.${type}`)}
             </button>
+          )).flatMap((chip, i) => (
+            SIG_TYPE_FILTER_ORDER[i] === 'wormhole' && hasDrifterHoles
+              ? [chip, (
+                <button
+                  key="drifter"
+                  type="button"
+                  className={`sig-filter-chip sig-filter-chip--wormhole${typeFilter.has('drifter') ? ' sig-filter-chip--active' : ''}`}
+                  aria-pressed={typeFilter.has('drifter')}
+                  data-tooltip={t('signatures.drifterChipHint')}
+                  onClick={() => toggleTypeFilter('drifter')}
+                >
+                  {t('signatures.drifterHoles')}
+                </button>
+              )]
+              : [chip]
           ))}
           {typeFilter.size > 0 && (
             <button type="button" className="sig-filter-clear" onClick={() => setTypeFilter(new Set())}>
@@ -1511,13 +1540,13 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                 <td>
                   {isShareMode ? (
                     <span className={`sig-text sig-text--type sig-select--type-${sig.sigType}`}
-                      data-tooltip={typeIcons ? sigTypeLabel(sig.sigType) : undefined}>
-                      {typeIcons ? <SigTypeIcon type={sig.sigType} /> : sigTypeLabel(sig.sigType)}
+                      data-tooltip={typeIcons ? rowTypeLabel(sig, sig.sigType) : undefined}>
+                      {typeIcons ? <SigTypeIcon type={sig.sigType} /> : rowTypeLabel(sig, sig.sigType)}
                     </span>
                   ) : (
                     <Select
                       className={`sig-type-select${typeIcons ? ' sig-type-select--icons' : ''}`}
-                      title={typeIcons ? sigTypeLabel(sig.sigType) : undefined}
+                      title={typeIcons ? rowTypeLabel(sig, sig.sigType) : undefined}
                       value={sig.sigType}
                       onChange={(v) => {
                         const sigType = v as SigType;
@@ -1532,7 +1561,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                       }}
                       options={SIG_TYPE_OPTIONS.map((st) => ({
                         value: st,
-                        text:  sigTypeLabel(st),
+                        text:  rowTypeLabel(sig, st),
                         // Reuse the existing per-type colour classes so the value
                         // stays tinted by type in the trigger and the list. The
                         // list always shows icon + word; the trigger shows only
@@ -1540,7 +1569,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                         label: (
                           <span className={`sig-type-opt sig-select--type-${st}`}>
                             <SigTypeIcon type={st} />
-                            <span className="sig-type-opt__text">{sigTypeLabel(st)}</span>
+                            <span className="sig-type-opt__text">{rowTypeLabel(sig, st)}</span>
                           </span>
                         ),
                       }))}
