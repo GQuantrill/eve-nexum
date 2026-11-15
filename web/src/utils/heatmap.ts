@@ -63,3 +63,24 @@ export function heatValue(
     default:          return 0;
   }
 }
+
+/**
+ * The smallest value that counts as full heat, per metric. Heat is relative to
+ * the busiest system on the map, so without a floor a map where one k-space
+ * system has any activity at all -- wormholes report none to ESI -- paints it
+ * full red over a single kill. A busy map's top system clears these anyway.
+ */
+const HEAT_FLOOR: Record<Exclude<HeatMetric, 'none'>, number> = {
+  fleet:     5,
+  shipKills: 10,
+  podKills:  10,
+  npcKills:  200,
+  jumps:     100,
+};
+
+/** The value that reads as full heat on this map: its busiest system, or the
+ *  metric's floor when nothing on the map reaches it. */
+export function heatScale(metric: HeatMetric, mapMax: number): number {
+  if (metric === 'none') return 0;
+  return Math.max(mapMax, HEAT_FLOOR[metric]);
+}
