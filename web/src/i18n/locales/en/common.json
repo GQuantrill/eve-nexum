@@ -814,6 +814,8 @@
     "anoms": "Anomalies",
     "holes": "Wormholes",
     "undivedWh": "Unexplored",
+    "wormholeTip": "Systems with any wormhole signature, scanned or not, jumped or not",
+    "undivedWhTip": "Systems with a hole nobody has gone through yet",
     "namePlaceholder": "Site name contains…",
     "matchCount_one": "{{count}} system matches",
     "matchCount_other": "{{count}} systems match",
