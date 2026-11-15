@@ -814,6 +814,8 @@
     "anoms": "Anomalieën",
     "holes": "Wormgaten",
     "undivedWh": "Onverkend",
+    "wormholeTip": "Systemen met een wormhole-signature, gescand of niet, doorgesprongen of niet",
+    "undivedWhTip": "Systemen met een gat waar nog niemand doorheen is gegaan",
     "namePlaceholder": "Sitenaam bevat…",
     "matchCount_one": "{{count}} systeem komt overeen",
     "matchCount_other": "{{count}} systemen komen overeen",

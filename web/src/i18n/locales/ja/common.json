@@ -817,7 +817,9 @@
     "matchCount_other": "{{count}} 件のシステムが一致",
     "clear": "フィルターをクリア",
     "holes": "ワームホール",
-    "undivedWh": "未探索"
+    "undivedWh": "未探索",
+    "wormholeTip": "ワームホールのシグネチャがある星系（スキャン済みか、ジャンプ済みかを問わない）",
+    "undivedWhTip": "まだ誰も通っていないホールがある星系"
   },
   "copyMap": {
     "title": "マップをコピー",

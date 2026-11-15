@@ -817,7 +817,9 @@
     "matchCount_other": "{{count}} Systeme passen",
     "clear": "Filter löschen",
     "holes": "Wurmlöcher",
-    "undivedWh": "Unerforscht"
+    "undivedWh": "Unerforscht",
+    "wormholeTip": "Systeme mit irgendeiner Wurmloch-Signatur, gescannt oder nicht, durchflogen oder nicht",
+    "undivedWhTip": "Systeme mit einem Loch, durch das noch niemand gesprungen ist"
   },
   "copyMap": {
     "title": "Karte kopieren",

@@ -817,7 +817,9 @@
     "matchCount_other": "{{count}} systèmes correspondent",
     "clear": "Effacer le filtre",
     "holes": "Trous de ver",
-    "undivedWh": "Inexploré"
+    "undivedWh": "Inexploré",
+    "wormholeTip": "Systèmes avec une signature de trou de ver, scannée ou non, franchie ou non",
+    "undivedWhTip": "Systèmes avec un trou que personne n'a encore franchi"
   },
   "copyMap": {
     "title": "Copier la carte",

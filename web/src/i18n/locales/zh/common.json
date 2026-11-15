@@ -817,7 +817,9 @@
     "matchCount_other": "{{count}} 个星系匹配",
     "clear": "清除筛选",
     "holes": "虫洞",
-    "undivedWh": "未探索"
+    "undivedWh": "未探索",
+    "wormholeTip": "有任意虫洞信号的星系，无论是否已扫描、是否已跳过",
+    "undivedWhTip": "有尚未有人穿过的虫洞的星系"
   },
   "copyMap": {
     "title": "复制地图",

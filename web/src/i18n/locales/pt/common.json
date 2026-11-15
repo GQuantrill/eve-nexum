@@ -817,7 +817,9 @@
     "matchCount_other": "{{count}} sistemas correspondem",
     "clear": "Limpar filtro",
     "holes": "Buracos de minhoca",
-    "undivedWh": "Inexplorado"
+    "undivedWh": "Inexplorado",
+    "wormholeTip": "Sistemas com qualquer assinatura de buraco de minhoca, escaneada ou não, atravessada ou não",
+    "undivedWhTip": "Sistemas com um buraco que ninguém atravessou ainda"
   },
   "copyMap": {
     "title": "Copiar mapa",

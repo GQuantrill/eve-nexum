@@ -817,7 +817,9 @@
     "matchCount_other": "{{count}} sistemas coinciden",
     "clear": "Limpiar filtro",
     "holes": "Agujeros de gusano",
-    "undivedWh": "Inexplorado"
+    "undivedWh": "Inexplorado",
+    "wormholeTip": "Sistemas con alguna firma de agujero de gusano, escaneada o no, cruzada o no",
+    "undivedWhTip": "Sistemas con un agujero que nadie ha cruzado todavía"
   },
   "copyMap": {
     "title": "Copiar mapa",
