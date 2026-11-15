@@ -1293,7 +1293,10 @@ reportsRouter.get('/users', async (req, res) => {
         (SELECT jsonb_object_agg(sb.sig_type, sb.cnt)
          FROM sig_breakdown sb WHERE sb.user_id = u.id),
         '{}'::jsonb
-      ) AS "sigTypeCounts"
+      ) AS "sigTypeCounts",
+      -- Did anything inside the window (lifetime for 'all'), for the headline
+      -- "active" count. The same test the Active filter uses.
+      ${isActive} AS "activeInWindow"
     FROM users u
     LEFT JOIN solar_systems    lks  ON lks.id       = u.last_known_system_id
     LEFT JOIN last_corp_sig    lcs  ON lcs.user_id  = u.id
