@@ -2,6 +2,7 @@ import { api } from './client';
 import { toast } from '../utils/toastStore';
 import i18n from '../i18n';
 import { readUserSetting } from '../hooks/useUserSetting';
+import { useMapStore } from '../store/mapStore';
 
 // Who a Set Destination / Add Waypoint goes to by default: just the character
 // you're signed in as, or every character on the account that's logged in.
@@ -47,9 +48,16 @@ export function describeWaypointResults(
 //
 // With targets (or the "all online characters" setting) it goes to several of
 // the account's characters at once and rejects only if none of them got it.
+//
+// "Just me" means the character this tab acts as: one pinned in the character
+// switcher, which the map's location, centring and routes all follow, else the
+// session's own. It used to always be the session's, so a destination set
+// while following an alt went to the main.
 function post(destinationId: number, clearOtherWaypoints: boolean, systemName: string, targets?: WaypointTargets) {
+  const pinned = useMapStore.getState().routeOrigin?.charId;
   const to = targets
-    ?? (readUserSetting<WaypointSendTo>(WAYPOINT_SEND_TO_KEY, 'me') === 'allOnline' ? 'allOnline' : undefined);
+    ?? (readUserSetting<WaypointSendTo>(WAYPOINT_SEND_TO_KEY, 'me') === 'allOnline' ? 'allOnline'
+      : pinned != null ? [pinned] : undefined);
 
   if (to === undefined) {
     return api('/api/character/waypoint', {
@@ -73,7 +81,14 @@ function post(destinationId: number, clearOtherWaypoints: boolean, systemName: s
   })
     .then(({ results }) => {
       const { ok, success, problems } = describeWaypointResults(results, clearOtherWaypoints, systemName);
-      if (success) toast.success(success);
+      // One character, the one this tab acts as: "Destination set to X", as
+      // for the session's own, rather than "... for 1 character".
+      const single = !targets && Array.isArray(to) && ok === 1;
+      if (single) {
+        toast.success(clearOtherWaypoints
+          ? i18n.t('routeToast.destinationSet', { system: systemName })
+          : i18n.t('routeToast.waypointAdded', { system: systemName }));
+      } else if (success) toast.success(success);
       if (problems) (ok === 0 ? toast.error : toast.info)(problems);
       if (ok === 0) throw new Error('No character received the waypoint');
     }, (err) => {
