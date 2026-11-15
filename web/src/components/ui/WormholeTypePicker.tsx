@@ -1,10 +1,11 @@
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowRightIcon, CaretDownIcon, CaretUpIcon } from '../../icons';
 import { CLASS_COLORS, CLASS_LABELS } from '../../data/wormholes';
 import { useWormholeTypes } from '../../hooks/useWormholeTypes';
 import { whDestClass, DEST_TO_CLASS } from '../../utils/whDest';
 import { usePopover } from '../../hooks/usePopover';
+import { useSearchKeys } from '../../hooks/useSearchKeys';
 import type { SystemClass } from '../../types';
 
 interface Props {
@@ -63,6 +64,7 @@ export function WormholeTypePicker({ value, onChange, statics = [], codeOnly = f
 
   const openPicker = () => {
     setSearch('');
+    keys.reset();
     openAt();
     setTimeout(() => searchRef.current?.focus(), 0);
   };
@@ -125,6 +127,26 @@ export function WormholeTypePicker({ value, onChange, statics = [], codeOnly = f
     return result;
   }, [types, statics, q]);
 
+  // Every row in the order shown ('' is "Unknown"), so the arrows walk the
+  // list as it reads and Enter picks the highlighted one. Opens on the
+  // current type; typing moves to the exact code, else the first match --
+  // "Unknown" isn't a match, so the keys skip it while searching.
+  const rows = useMemo(() => ['', ...groups.flatMap((g) => g.types)], [groups]);
+  const keys = useSearchKeys(
+    open ? rows : [], search, (code) => code,
+    (code) => { if (code) select(code); else { onChange('', ''); setOpen(false); } },
+    (code) => code === '' && q !== '', rows.indexOf(value),
+  );
+  const onSearchKey = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Escape') { e.stopPropagation(); setOpen(false); btnRef.current?.focus(); return; }
+    keys.onKeyDown(e);
+  };
+  const rowProps = (i: number, current: boolean) => ({
+    className: `wh-picker__option${current ? ' wh-picker__option--active' : ''}${i === keys.active ? ' wh-picker__option--kbd' : ''}`,
+    onMouseEnter: () => keys.setActive(i),
+  });
+  let row = 1;
+
   return (
     <div className="wh-picker">
       <button
@@ -157,12 +179,13 @@ export function WormholeTypePicker({ value, onChange, statics = [], codeOnly = f
             className="wh-picker__search"
             value={search}
             onChange={e => setSearch(e.target.value)}
+            onKeyDown={onSearchKey}
             placeholder={t('whPicker.searchPlaceholder')}
             spellCheck={false}
           />
           <div className="wh-picker__list">
             <div
-              className={`wh-picker__option${!value ? ' wh-picker__option--active' : ''}`}
+              {...rowProps(0, !value)}
               onMouseDown={() => { onChange('', ''); setOpen(false); }}
             >
               <span className="wh-picker__placeholder">{t('mapNode.unknown')}</span>
@@ -176,7 +199,7 @@ export function WormholeTypePicker({ value, onChange, statics = [], codeOnly = f
                 {group.types.map(code => (
                   <div
                     key={code}
-                    className={`wh-picker__option${value === code ? ' wh-picker__option--active' : ''}`}
+                    {...rowProps(row++, value === code)}
                     onMouseDown={() => select(code)}
                   >
                     <span className="wh-picker__code">{code}</span>

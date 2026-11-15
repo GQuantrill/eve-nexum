@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { XIcon } from '../../icons';
 import { useEsiSearch, systemResultLabel } from '../../hooks/useEsiSearch';
 import { useUserSetting } from '../../hooks/useUserSetting';
+import { useSearchKeys } from '../../hooks/useSearchKeys';
 import { ROUTE_AVOID_KEY, type AvoidedSystem } from '../../hooks/useRoute';
 
 const KSPACE = new Set(['HS', 'LS', 'NS']);
@@ -28,6 +29,7 @@ export function RouteAvoidList() {
     setAvoided([...avoided, s].sort((a, b) => a.name.localeCompare(b.name)));
     setQuery('');
   };
+  const keys = useSearchKeys(matches, query, (r) => r.name, (r) => add({ id: r.id, name: r.name }));
 
   return (
     <div className="route-avoid">
@@ -40,14 +42,16 @@ export function RouteAvoidList() {
         placeholder={t('mapSidebar.routeAvoidAdd')}
         aria-label={t('mapSidebar.routeAvoidAdd')}
         onChange={(e) => setQuery(e.target.value)}
+        onKeyDown={keys.onKeyDown}
       />
       {show && (
         <ul className="search-results route-avoid__results" role="listbox">
           {loading && matches.length === 0 && (
             <li className="search-results__item search-results__item--disabled">{t('jumpPlanner.searching')}</li>
           )}
-          {matches.map((r) => (
-            <li key={r.id} className="search-results__item" role="option" aria-selected={false}
+          {matches.map((r, i) => (
+            <li key={r.id} className={`search-results__item${i === keys.active ? ' search-results__item--active' : ''}`}
+              role="option" aria-selected={i === keys.active} onMouseEnter={() => keys.setActive(i)}
               onMouseDown={(e) => { e.preventDefault(); add({ id: r.id, name: r.name }); }}>
               <span>{r.name}</span>
               <span className="search-results__class">{systemResultLabel(r)}</span>

@@ -9,6 +9,7 @@ import { toast } from '../../utils/toastStore';
 import { Select } from './Select';
 import { countPersonalMaps } from '../../utils/personalMaps';
 import { useEscapeClose } from '../../hooks/useEscapeClose';
+import { useSearchKeys } from '../../hooks/useSearchKeys';
 
 type MapScope = 'personal' | 'corp' | 'alliance';
 
@@ -83,6 +84,9 @@ export function CreateMapModal({ onClose }: { onClose: () => void }) {
     // Default the map name to the region unless the user typed their own.
     if (!nameTouched) setName(r.name);
   }
+
+  // Enter picks the highlighted region rather than submitting the form under it.
+  const keys = useSearchKeys(results, query, (r) => r.name, selectRegion);
 
   function clearRegion() {
     setRegion(null);
@@ -174,6 +178,7 @@ export function CreateMapModal({ onClose }: { onClose: () => void }) {
                   autoComplete="off"
                   readOnly={!!region}
                   onChange={(e) => setQuery(e.target.value)}
+                  onKeyDown={keys.onKeyDown}
                 />
                 {region && (
                   <button type="button" className="search-field__clear" onClick={clearRegion} aria-label={t('createMap.clearRegion')}>
@@ -183,12 +188,13 @@ export function CreateMapModal({ onClose }: { onClose: () => void }) {
               </div>
               {results.length > 0 && (
                 <ul className="search-results" role="listbox">
-                  {results.map((r) => (
+                  {results.map((r, i) => (
                     <li
                       key={r.id}
-                      className="search-results__item"
+                      className={`search-results__item${i === keys.active ? ' search-results__item--active' : ''}`}
                       role="option"
-                      aria-selected={false}
+                      aria-selected={i === keys.active}
+                      onMouseEnter={() => keys.setActive(i)}
                       onMouseDown={(e) => { e.preventDefault(); selectRegion(r); }}
                     >
                       <span>{r.name}</span>

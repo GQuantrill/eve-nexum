@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { createPortal } from 'react-dom';
+import { useSearchKeys } from '../../hooks/useSearchKeys';
 
 export interface ComboboxOption {
   value:  string;
@@ -35,7 +36,6 @@ const norm = (s: string) => s.toLowerCase().replace(/[_/]+/g, ' ');
 export function Combobox({ options, value, onChange, placeholder, noMatchText, clearLabel, limit = 50, ariaLabel }: Props) {
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(-1);
   const wrapRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [pos, setPos] = useState<{ top: number; left: number; width: number } | null>(null);
@@ -85,22 +85,13 @@ export function Combobox({ options, value, onChange, placeholder, noMatchText, c
     onChange(next);
     setQuery('');
     setOpen(false);
-    setActiveIndex(-1);
   }
+  const keys = useSearchKeys(open ? matches : [], query, (o) => o.label, (o) => select(o.value));
 
   function onKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === 'Escape') { setOpen(false); inputRef.current?.blur(); return; }
     if (!open) { if (e.key === 'ArrowDown') setOpen(true); return; }
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      setActiveIndex((i) => Math.min(i + 1, matches.length - 1));
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      setActiveIndex((i) => Math.max(i - 1, 0));
-    } else if (e.key === 'Enter' && activeIndex >= 0) {
-      e.preventDefault();
-      select(matches[activeIndex].value);
-    }
+    keys.onKeyDown(e);
   }
 
   return (
@@ -118,8 +109,8 @@ export function Combobox({ options, value, onChange, placeholder, noMatchText, c
           aria-label={ariaLabel}
           aria-expanded={open}
           aria-autocomplete="list"
-          onFocus={() => { setOpen(true); setQuery(''); setActiveIndex(-1); }}
-          onChange={(e) => { setQuery(e.target.value); setOpen(true); setActiveIndex(-1); }}
+          onFocus={() => { setOpen(true); setQuery(''); keys.reset(); }}
+          onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
           onKeyDown={onKeyDown}
         />
         {clearLabel && value && (
@@ -146,11 +137,11 @@ export function Combobox({ options, value, onChange, placeholder, noMatchText, c
             matches.map((o, i) => (
               <li
                 key={o.value}
-                className={`search-results__item${i === activeIndex ? ' search-results__item--active' : ''}`}
+                className={`search-results__item${i === keys.active ? ' search-results__item--active' : ''}`}
                 role="option"
-                aria-selected={i === activeIndex}
+                aria-selected={i === keys.active}
                 onMouseDown={(e) => { e.preventDefault(); select(o.value); }}
-                onMouseEnter={() => setActiveIndex(i)}
+                onMouseEnter={() => keys.setActive(i)}
               >
                 <span>{o.label}</span>
                 {o.hint != null && <span className="search-results__class">{o.hint}</span>}

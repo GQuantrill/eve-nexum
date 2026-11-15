@@ -2,6 +2,7 @@ import { forwardRef, useEffect, useRef, useState } from 'react';
 import type { InputHTMLAttributes, KeyboardEvent } from 'react';
 import { createPortal } from 'react-dom';
 import { useEsiSearch, systemResultLabel } from '../../hooks/useEsiSearch';
+import { useSearchKeys } from '../../hooks/useSearchKeys';
 
 interface Props {
   value: string;
@@ -24,13 +25,10 @@ export const SystemSearchSelect = forwardRef<HTMLInputElement, Props>(function S
 ) {
   const { results, loading } = useEsiSearch(value);
   const [open, setOpen] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(-1);
   const wrapRef = useRef<HTMLDivElement>(null);
   const [pos, setPos] = useState<{ top: number; left: number; width: number } | null>(null);
 
   const showResults = open && results.length > 0 && value.trim().length >= 2;
-
-  useEffect(() => { setActiveIndex(-1); }, [results]);
 
   // Position the portalled dropdown under the input, re-measuring on scroll /
   // resize while open so the sidebar's scroll doesn't leave it stranded.
@@ -52,15 +50,12 @@ export const SystemSearchSelect = forwardRef<HTMLInputElement, Props>(function S
   function pick(name: string) {
     onChange(name);
     setOpen(false);
-    setActiveIndex(-1);
   }
+  const keys = useSearchKeys(showResults ? results : [], value, (r) => r.name, (r) => pick(r.name));
 
   function onKeyDown(e: KeyboardEvent<HTMLInputElement>) {
     if (e.key === 'Escape') { if (open) { e.stopPropagation(); setOpen(false); } return; }
-    if (!showResults) return;
-    if (e.key === 'ArrowDown') { e.preventDefault(); setActiveIndex((i) => Math.min(i + 1, results.length - 1)); }
-    else if (e.key === 'ArrowUp') { e.preventDefault(); setActiveIndex((i) => Math.max(i - 1, 0)); }
-    else if (e.key === 'Enter' && activeIndex >= 0) { e.preventDefault(); pick(results[activeIndex].name); }
+    keys.onKeyDown(e);
   }
 
   return (
@@ -93,11 +88,11 @@ export const SystemSearchSelect = forwardRef<HTMLInputElement, Props>(function S
           {results.map((r, i) => (
             <li
               key={r.id}
-              className={`search-results__item${i === activeIndex ? ' search-results__item--active' : ''}`}
+              className={`search-results__item${i === keys.active ? ' search-results__item--active' : ''}`}
               role="option"
-              aria-selected={i === activeIndex}
+              aria-selected={i === keys.active}
               onMouseDown={(e) => { e.preventDefault(); pick(r.name); }}
-              onMouseEnter={() => setActiveIndex(i)}
+              onMouseEnter={() => keys.setActive(i)}
             >
               <span>{r.name}</span>
               <span className="search-results__class">{systemResultLabel(r)}</span>

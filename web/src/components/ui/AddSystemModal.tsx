@@ -8,6 +8,7 @@ import { useMapStore } from '../../store/mapStore';
 import { useCharacterLocation } from '../../hooks/useCharacterLocation';
 import { useAuth } from '../../context/AuthContext';
 import { Select } from './Select';
+import { useSearchKeys } from '../../hooks/useSearchKeys';
 
 type SystemOpts = {
   eveSystemId?: number | null;
@@ -87,7 +88,6 @@ export function AddSystemModal({ position, onClose, onSubmit, title }: Props) {
   const [npcType, setNpcType] = useState<string | null>(null);
   const [systemName, setSystemName] = useState('');
   const [loadingDetail, setLoadingDetail] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
   const searchFieldRef = useRef<HTMLDivElement>(null);
   const [dropdownPos, setDropdownPos] = useState<{ top: number; left: number; width: number } | null>(null);
@@ -104,10 +104,6 @@ export function AddSystemModal({ position, onClose, onSubmit, title }: Props) {
     const t = setTimeout(() => inputRef.current?.focus(), 0);
     return () => clearTimeout(t);
   }, []);
-
-  // Deliberate: resets the highlighted row when the result list changes.
-  // eslint-disable-next-line react-hooks/set-state-in-effect
-  useEffect(() => { setActiveIndex(-1); }, [results]);
 
   useEffect(() => {
     const want = results.length > 0
@@ -156,11 +152,22 @@ export function AddSystemModal({ position, onClose, onSubmit, title }: Props) {
     onClose();
   }
 
+  // The rows the dropdown lists, in its order: the Unknown placeholder, then
+  // the search results. Systems already on the map show but can't be picked.
+  const listed: Array<{ id: number; name: string } | null> = isSelected ? []
+    : [...(showUnknown ? [null] : []), ...results];
+  const keys = useSearchKeys(
+    listed, query,
+    (r) => r?.name ?? 'Unknown',
+    (r) => { if (r) selectResult(r.id, r.name); else selectUnknown(); },
+    (r) => r != null && isOnMap(r.id, r.name),
+  );
+  const unknownOffset = showUnknown ? 1 : 0;
+
   function clearSelection() {
     setQuery('');
     setSystemName('');
     setSelectedId(null);
-    setActiveIndex(-1);
     setTimeout(() => inputRef.current?.focus(), 0);
   }
 
@@ -168,7 +175,6 @@ export function AddSystemModal({ position, onClose, onSubmit, title }: Props) {
     setQuery(e.target.value);
     setSystemName('');
     setSelectedId(null);
-    setActiveIndex(-1);
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
@@ -182,19 +188,7 @@ export function AddSystemModal({ position, onClose, onSubmit, title }: Props) {
       return;
     }
 
-    if (!showResults) return;
-
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      setActiveIndex(i => Math.min(i + 1, results.length - 1));
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      setActiveIndex(i => Math.max(i - 1, 0));
-    } else if (e.key === 'Enter' && activeIndex >= 0) {
-      e.preventDefault();
-      const r = results[activeIndex];
-      if (!isOnMap(r.id, r.name)) selectResult(r.id, r.name);
-    }
+    keys.onKeyDown(e);
   }
 
   function handleSubmit(e: React.FormEvent) {
@@ -338,8 +332,10 @@ export function AddSystemModal({ position, onClose, onSubmit, title }: Props) {
         style={{ position: 'fixed', top: dropdownPos.top, left: dropdownPos.left, width: dropdownPos.width, zIndex: 2000 }}
       >
         {showUnknown && (
-          <li className="search-results__item" role="option"
-            onMouseDown={(e) => { e.preventDefault(); selectUnknown(); }}>
+          <li className={`search-results__item${keys.active === 0 ? ' search-results__item--active' : ''}`} role="option"
+            aria-selected={keys.active === 0}
+            onMouseDown={(e) => { e.preventDefault(); selectUnknown(); }}
+            onMouseEnter={() => keys.setActive(0)}>
             <span>{t('addSystem.unknownOption')}</span>
             <span className="search-results__class">?</span>
           </li>
@@ -349,11 +345,12 @@ export function AddSystemModal({ position, onClose, onSubmit, title }: Props) {
           return (
             <li
               key={r.id}
-              className={`search-results__item${i === activeIndex && !alreadyOnMap ? ' search-results__item--active' : ''}${alreadyOnMap ? ' search-results__item--disabled' : ''}`}
+              className={`search-results__item${i + unknownOffset === keys.active ? ' search-results__item--active' : ''}${alreadyOnMap ? ' search-results__item--disabled' : ''}`}
               role="option"
               aria-disabled={alreadyOnMap}
               onMouseDown={(e) => { e.preventDefault(); selectResult(r.id, r.name); }}
-              onMouseEnter={() => !alreadyOnMap && setActiveIndex(i)}
+              aria-selected={i + unknownOffset === keys.active}
+              onMouseEnter={() => keys.setActive(i + unknownOffset)}
             >
               <span>{r.name}</span>
               <span className="search-results__class">

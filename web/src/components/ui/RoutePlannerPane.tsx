@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { api } from '../../api/client';
-import { useEsiSearch, systemResultLabel, type SystemSearchResult } from '../../hooks/useEsiSearch';
+import { useSearchKeys } from '../../hooks/useSearchKeys';
+import { useEsiSearch, systemResultLabel } from '../../hooks/useEsiSearch';
 import { useRoute } from '../../hooks/useRoute';
 import { useRouteOrigin } from '../../hooks/useRouteOrigin';
 import { useMapStore } from '../../store/mapStore';
@@ -99,7 +100,15 @@ function SystemSearchField({ label, value, onPick, extra }: {
 
   const open = query.trim().length >= 2 && (esiResults.length > 0 || aliasMatches.length > 0 || loading);
 
-  const pick = (r: SystemSearchResult) => { onPick({ id: r.id, name: r.name }); setQuery(''); };
+  const pick = (r: { id: number; name: string }) => { onPick({ id: r.id, name: r.name }); setQuery(''); };
+  // One list for the keys, in the order shown: alias matches, then ESI's. An
+  // alias row is matched on the alias, since that's what was typed.
+  const listed = [
+    ...aliasMatches.map((m) => ({ id: m.id, name: m.name, typed: m.alias })),
+    ...esiResults.map((r) => ({ id: r.id, name: r.name, typed: r.name })),
+  ];
+  const keys = useSearchKeys(listed, query, (r) => r.typed, pick);
+  const activeClass = (i: number) => `search-results__item${i === keys.active ? ' search-results__item--active' : ''}`;
 
   return (
     <div className="route-planner__field">
@@ -128,6 +137,7 @@ function SystemSearchField({ label, value, onPick, extra }: {
             value={query}
             placeholder={t('routePlanner.searchSystem')}
             onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={keys.onKeyDown}
             role="combobox"
             aria-expanded={open}
             aria-autocomplete="list"
@@ -135,13 +145,14 @@ function SystemSearchField({ label, value, onPick, extra }: {
           {extra}
           {open && (
             <ul className="search-results">
-              {aliasMatches.map((m) => (
+              {aliasMatches.map((m, i) => (
                 <li
                   key={`alias-${m.id}`}
-                  className="search-results__item"
+                  className={activeClass(i)}
                   role="option"
-                  aria-selected={false}
-                  onClick={() => { onPick({ id: m.id, name: m.name }); setQuery(''); }}
+                  aria-selected={i === keys.active}
+                  onMouseEnter={() => keys.setActive(i)}
+                  onClick={() => pick(m)}
                 >
                   {m.alias}
                   <span className="search-results__class">{m.name}</span>
@@ -150,12 +161,13 @@ function SystemSearchField({ label, value, onPick, extra }: {
               {loading && esiResults.length === 0 && aliasMatches.length === 0 && (
                 <li className="search-results__item route-planner__status">{t('routePlanner.searching')}</li>
               )}
-              {esiResults.map((r) => (
+              {esiResults.map((r, j) => (
                 <li
                   key={r.id}
-                  className="search-results__item"
+                  className={activeClass(aliasMatches.length + j)}
                   role="option"
-                  aria-selected={false}
+                  aria-selected={aliasMatches.length + j === keys.active}
+                  onMouseEnter={() => keys.setActive(aliasMatches.length + j)}
                   onClick={() => pick(r)}
                 >
                   {r.name}

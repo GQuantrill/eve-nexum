@@ -5,6 +5,7 @@ import { XIcon, CaretUpIcon, CaretDownIcon } from '../../icons';
 import { Select } from './Select';
 import { api } from '../../api/client';
 import { useEsiSearch, systemResultLabel } from '../../hooks/useEsiSearch';
+import { useSearchKeys } from '../../hooks/useSearchKeys';
 import { useJdcLevel } from '../../hooks/useJumpRange';
 import { useUserSetting } from '../../hooks/useUserSetting';
 import { JUMP_CLASSES, jumpRange, estimateFuel, computeFatigue, formatMinutes } from '../../data/jumpDrives';
@@ -358,16 +359,19 @@ function AddSystemSearch({ onAdd, placeholder }: { onAdd: (s: { id: number; name
   // to/through, so they're never valid jump points — exclude them.
   const kspace = results.filter((r) => (r.systemClass === 'LS' || r.systemClass === 'NS') && r.npcType !== 'Triglavian');
   const show = query.trim().length >= 2 && (kspace.length > 0 || loading);
+  const pick = (r: { id: number; name: string }) => { onAdd({ id: r.id, name: r.name }); setQuery(''); };
+  const keys = useSearchKeys(show ? kspace : [], query, (r) => r.name, pick);
   return (
     <div style={{ position: 'relative' }}>
       <input className="chains-new__name" style={{ width: '100%' }} type="text" value={query}
-        placeholder={placeholder} onChange={(e) => setQuery(e.target.value)} />
+        placeholder={placeholder} onChange={(e) => setQuery(e.target.value)} onKeyDown={keys.onKeyDown} />
       {show && (
         <ul className="search-results">
           {loading && <li className="search-results__item" style={{ cursor: 'default', opacity: 0.6 }}>{t('jumpPlanner.searching')}</li>}
-          {kspace.map((r) => (
-            <li key={r.id} className="search-results__item" role="option"
-              onMouseDown={(e) => { e.preventDefault(); onAdd({ id: r.id, name: r.name }); setQuery(''); }}>
+          {kspace.map((r, i) => (
+            <li key={r.id} className={`search-results__item${i === keys.active ? ' search-results__item--active' : ''}`}
+              role="option" aria-selected={i === keys.active} onMouseEnter={() => keys.setActive(i)}
+              onMouseDown={(e) => { e.preventDefault(); pick(r); }}>
               <span>{r.name}</span>
               <span className="search-results__class">{systemResultLabel(r)}</span>
             </li>
@@ -413,6 +417,21 @@ function Field({ label, value, onPick, structures }: { label: string; value: Pic
     return () => { off = true; };
   }, [kspaceIds]);
   const show = query.trim().length >= 2 && (structMatches.length > 0 || stationSys.length > 0 || kspace.length > 0 || loading);
+  // Every row in dropdown order, so arrows and Enter walk them as listed.
+  const listed: NonNullable<Picked>[] = value || !show ? [] : [
+    ...structMatches.map((s) => ({ id: s.solarSystemId!, name: s.name, structureType: s.typeName || null })),
+    ...stationSys.map((s) => ({ id: s.solarSystemId, name: s.systemName, structureType: 'station' })),
+    ...kspace.map((r) => ({ id: r.id, name: r.name })),
+  ];
+  const pick = (p: NonNullable<Picked>) => { onPick(p); setQuery(''); };
+  const keys = useSearchKeys(listed, query, (p) => p.name, pick);
+  const rowProps = (i: number, p: NonNullable<Picked>) => ({
+    className: `search-results__item${i === keys.active ? ' search-results__item--active' : ''}`,
+    role: 'option',
+    'aria-selected': i === keys.active,
+    onMouseEnter: () => keys.setActive(i),
+    onMouseDown: (e: React.MouseEvent) => { e.preventDefault(); pick(p); },
+  });
   return (
     <div style={{ position: 'relative' }}>
       <div style={{ fontSize: 12, color: 'var(--text-subtle)', marginBottom: 3 }}>{label}</div>
@@ -423,34 +442,34 @@ function Field({ label, value, onPick, structures }: { label: string; value: Pic
         </div>
       ) : (
         <input className="chains-new__name" style={{ width: '100%' }} type="text" value={query}
-          placeholder={t('jumpPlanner.searchSystem')} onChange={(e) => setQuery(e.target.value)} />
+          placeholder={t('jumpPlanner.searchSystem')} onChange={(e) => setQuery(e.target.value)} onKeyDown={keys.onKeyDown} />
       )}
       {!value && show && (
         // Same two-column layout as the map's Add System search: name left,
         // region (systemResultLabel) right — reuses the shared search-results CSS.
         <ul className="search-results">
-          {structMatches.map((s) => (
-            <li key={`st-${s.key}`} className="search-results__item" role="option"
-              onMouseDown={(e) => { e.preventDefault(); onPick({ id: s.solarSystemId!, name: s.name, structureType: s.typeName || null }); setQuery(''); }}>
+          {structMatches.map((s, i) => (
+            <li key={`st-${s.key}`} {...rowProps(i, listed[i])}>
               <span>{s.name}</span>
               <span className="search-results__class">{s.typeName || t('jumpPlanner.structureFallback')} · {s.systemName}</span>
             </li>
           ))}
-          {stationSys.map((s) => (
-            <li key={`sta-${s.solarSystemId}`} className="search-results__item" role="option"
-              onMouseDown={(e) => { e.preventDefault(); onPick({ id: s.solarSystemId, name: s.systemName, structureType: 'station' }); setQuery(''); }}>
+          {stationSys.map((s, i) => (
+            <li key={`sta-${s.solarSystemId}`} {...rowProps(structMatches.length + i, listed[structMatches.length + i])}>
               <span>{s.systemName}</span>
               <span className="search-results__class">{t('jumpPlanner.npcStation')}</span>
             </li>
           ))}
           {loading && <li className="search-results__item" style={{ cursor: 'default', opacity: 0.6 }}>{t('jumpPlanner.searching')}</li>}
-          {kspace.map((r) => (
-            <li key={r.id} className="search-results__item" role="option"
-              onMouseDown={(e) => { e.preventDefault(); onPick({ id: r.id, name: r.name }); setQuery(''); }}>
+          {kspace.map((r, i) => {
+            const at = structMatches.length + stationSys.length + i;
+            return (
+            <li key={r.id} {...rowProps(at, listed[at])}>
               <span>{r.name}</span>
               <span className="search-results__class">{systemResultLabel(r)}</span>
             </li>
-          ))}
+            );
+          })}
         </ul>
       )}
     </div>
