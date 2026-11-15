@@ -104,11 +104,13 @@
   text-align: left;
 
   &:hover { background: var(--border); color: var(--text-bright); }
-
-  &--active { color: var(--accent-alt); font-weight: 600; }
-  &--action  { color: var(--accent-alt); font-weight: 600; }
-  &--danger  { color: var(--danger); }
 }
+
+/* Flat, not nested: `&--x` is Sass, not CSS nesting, so the browser dropped
+   these and they never applied. */
+.map-dropdown__item--active { color: var(--accent-alt); font-weight: 600; }
+.map-dropdown__item--action  { color: var(--accent-alt); font-weight: 600; }
+.map-dropdown__item--danger  { color: var(--danger); }
 
 .map-dropdown__new-wrap {
   display: block;

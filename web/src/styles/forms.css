@@ -23,13 +23,15 @@
   box-sizing: border-box;
 
   &:focus { border-color: var(--border-accent); }
+}
 
-  &--selected {
-    border-color: #2e5a3a;
-    background: var(--surface-well);
-    color: #6adba0;
-    cursor: default;
-  }
+/* Flat, not nested: `&--x` is Sass, not CSS nesting, so the browser dropped
+   these and they never applied. */
+.search-field__input--selected {
+  border-color: #2e5a3a;
+  background: var(--surface-well);
+  color: #6adba0;
+  cursor: default;
 }
 
 .search-field__clear {

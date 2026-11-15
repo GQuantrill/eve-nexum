@@ -2306,14 +2306,17 @@ button.chain-exits-menu__exit:hover { background: var(--surface-hover); }
 
   &::placeholder { color: var(--border-strong); }
   &:focus { color: var(--text-bright); }
+}
 
-  &--id {
-    font-family: 'Courier New', monospace;
-    font-size: calc(13px * var(--font-scale, 1));
-    color: #7a9ac8;
-    font-weight: 600;
-    letter-spacing: 0.03em;
-  }
+/* Flat, not nested: `&--x` is Sass, not CSS nesting, so the browser dropped
+   these and they never applied. */
+/* The nested original also set 13px, left out to keep the size it has
+   always shown at. */
+.sig-input--id {
+  font-family: 'Courier New', monospace;
+  color: #7a9ac8;
+  font-weight: 600;
+  letter-spacing: 0.03em;
 }
 
 .sig-select {
@@ -2330,22 +2333,24 @@ button.chain-exits-menu__exit:hover { background: var(--surface-hover); }
 
   &:hover { border-color: var(--border-strong); }
   &:focus { border-color: #3a6aaa; color: var(--text-primary); }
-
-  &--type { font-size: calc(13px * var(--font-scale, 1)); }
-
-  &--type-unknown  { color: #c89a30; font-style: italic; }
-  &--type-wormhole { color: var(--accent); }
-  &--type-data     { color: #58b8e8; }
-  &--type-relic    { color: #c87840; }
-  &--type-combat   { color: var(--danger); }
-  &--type-gas      { color: #60c060; }
-  &--type-ore      { color: #b08040; }
-  /* Violet: the one unused hue here, and ghost sites are rare enough to
-     deserve a colour nothing else claims. */
-  &--type-ghost    { color: #b17df0; }
-
-  &--leadsto { color: #78a0c0; font-size: calc(13px * var(--font-scale, 1)); }
 }
+
+/* Flat, not nested: `&--x` is Sass, not CSS nesting, so the browser dropped
+   these and they never applied. */
+.sig-select--type { font-size: calc(13px * var(--font-scale, 1)); }
+
+.sig-select--type-unknown  { color: #c89a30; font-style: italic; }
+.sig-select--type-wormhole { color: var(--accent); }
+.sig-select--type-data     { color: #58b8e8; }
+.sig-select--type-relic    { color: #c87840; }
+.sig-select--type-combat   { color: var(--danger); }
+.sig-select--type-gas      { color: #60c060; }
+.sig-select--type-ore      { color: #b08040; }
+/* Violet: the one unused hue here, and ghost sites are rare enough to
+   deserve a colour nothing else claims. */
+.sig-select--type-ghost    { color: #b17df0; }
+
+.sig-select--leadsto { color: #78a0c0; font-size: calc(13px * var(--font-scale, 1)); }
 
 /* Ghost-site tier chip, shown beside the type. Muted and small: it qualifies
    the type rather than competing with it. */
@@ -2376,12 +2381,14 @@ button.chain-exits-menu__exit:hover { background: var(--surface-hover); }
   font-family: inherit;
 
   &:hover { border-color: var(--accent); color: var(--text-default); }
+}
 
-  &--danger {
-    border-color: #5a2a2a;
-    color: var(--danger);
-    &:hover { border-color: var(--danger); color: var(--danger-soft); }
-  }
+/* Flat, not nested: `&--x` is Sass, not CSS nesting, so the browser dropped
+   these and they never applied. */
+.sig-toolbar-btn--danger {
+  border-color: #5a2a2a;
+  color: var(--danger);
+  &:hover { border-color: var(--danger); color: var(--danger-soft); }
 }
 
 /* Overwrite-on-paste toggle: a labelled checkbox styled to sit inline with

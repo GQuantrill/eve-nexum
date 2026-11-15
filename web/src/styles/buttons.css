@@ -34,32 +34,35 @@
   font-weight: 600;
   padding: var(--sp-7) var(--sp-14);
   transition: background 0.15s;
+}
 
-  &--ghost {
-    background: transparent;
-    color: var(--text-secondary);
-    border: 1px solid var(--border);
+/* Flat, not nested: `&--x` is Sass, not CSS nesting, so the browser dropped
+   these and they never applied. */
+.btn--ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
 
-    &:hover { background: var(--surface-overlay); color: var(--text-default); }
-  }
+  &:hover { background: var(--surface-overlay); color: var(--text-default); }
+}
 
-  &--primary {
-    background: #1a3a6a;
-    color: var(--accent-light);
-    border: 1px solid var(--border-accent-strong);
+.btn--primary {
+  background: #1a3a6a;
+  color: var(--accent-light);
+  border: 1px solid var(--border-accent-strong);
 
-    &:hover:not(:disabled) { background: #1e4a8a; }
-    &:disabled { opacity: 0.5; cursor: not-allowed; }
-  }
+  &:hover:not(:disabled) { background: #1e4a8a; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
 
-  &--danger {
-    background: #2a1010;
-    color: var(--danger-strong);
-    border: 1px solid #5a2020;
-    margin-top: auto;
+/* The nested original also had margin-top: auto, left out so the buttons
+   stay where they've always sat. */
+.btn--danger {
+  background: #2a1010;
+  color: var(--danger-strong);
+  border: 1px solid #5a2020;
 
-    &:hover { background: #3a1515; }
-  }
+  &:hover { background: #3a1515; }
 }
 
 
