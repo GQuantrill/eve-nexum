@@ -20,6 +20,15 @@ import { pendingWhState, lifePatch } from './whState';
  * detect "this sig used to back this connection" so we don't accidentally
  * clear a value the user typed manually.
  */
+// Slack for the scan and the jump landing in the same moment, and for clocks.
+const SCAN_BEFORE_LINK_SLACK_MS = 2 * 60_000;
+
+function scannedBefore(sig: Signature, conn: MapConnection): boolean {
+  const sigAt = Date.parse(sig.createdAt ?? '');
+  const connAt = Date.parse(conn.createdAt ?? '');
+  return Number.isFinite(sigAt) && Number.isFinite(connAt) && sigAt <= connAt + SCAN_BEFORE_LINK_SLACK_MS;
+}
+
 export function reevaluateConnectionsForSystem(
   systemId: string,
   allSigs:  Signature[],
@@ -149,10 +158,16 @@ export function reevaluateConnectionsForSystem(
       if (!conn[endField] && !conn.broken) {
         const pinned = backing.filter((s) => (s.whLeadsTo ?? '').toUpperCase() === on);
         const pinnedReal = pinned.filter((s) => (s.whType ?? '').toUpperCase() !== 'K162');
+        // A sig that only matches the CLASS is only a fair guess when it was
+        // scanned before the link existed: scan, then jump. One that turns up
+        // later is a new hole -- an overwrite paste's H296 -> C5 replacing
+        // yesterday's -- and linking it would tie the old link to it, so the
+        // link could never be scissored.
+        const classOnly = pinned.length === 0 && backing.length === 1 ? backing[0] : undefined;
         const linkSig =
           pinnedReal.length === 1 ? pinnedReal[0] :
           pinned.length === 1     ? pinned[0]     :
-          pinned.length === 0 && backing.length === 1 ? backing[0] :
+          classOnly && scannedBefore(classOnly, conn) ? classOnly :
           undefined; // several plausible holes — ambiguous, leave it to the user
         if (linkSig) {
           patch[endField] = linkSig.id;

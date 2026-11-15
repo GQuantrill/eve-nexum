@@ -15,6 +15,10 @@ interface Props {
    *  columns like the watchlist where the destination badge would clip. The
    *  dropdown still shows the destination. */
   codeOnly?: boolean;
+  /** Where the hole goes when the code alone doesn't say: a K162 leads back
+   *  to wherever it was opened from. Shown on the button in place of the
+   *  fixed destination a typed code has. */
+  leadsToClass?: string | null;
 }
 
 // Display order for the picker's groups. Anything from the server whose
@@ -37,8 +41,8 @@ const GROUP_ORDER: { key: string; label: string; dest: SystemClass }[] = [
   { key: 'drifter', label: 'Drifter',  dest: 'Drifter' },
 ];
 
-function DestBadge({ code, types }: { code: string; types: ReturnType<typeof useWormholeTypes> }) {
-  const dest = whDestClass(code, types);
+function DestBadge({ code, types, fallback }: { code: string; types: ReturnType<typeof useWormholeTypes>; fallback?: string | null }) {
+  const dest = whDestClass(code, types) ?? (fallback as SystemClass | null | undefined) ?? null;
   if (!dest) return null;
   return (
     <>
@@ -50,7 +54,7 @@ function DestBadge({ code, types }: { code: string; types: ReturnType<typeof use
   );
 }
 
-export function WormholeTypePicker({ value, onChange, statics = [], codeOnly = false }: Props) {
+export function WormholeTypePicker({ value, onChange, statics = [], codeOnly = false, leadsToClass = null }: Props) {
   const { t } = useTranslation();
   const types = useWormholeTypes();
   const { open, setOpen, pos, btnRef, dropdownRef, openAt } = usePopover();
@@ -132,7 +136,7 @@ export function WormholeTypePicker({ value, onChange, statics = [], codeOnly = f
         {value ? (
           <span className="wh-picker__btn-inner">
             <span className="wh-picker__code">{value}</span>
-            {!codeOnly && <DestBadge code={value} types={types} />}
+            {!codeOnly && <DestBadge code={value} types={types} fallback={leadsToClass} />}
           </span>
         ) : (
           <span className="wh-picker__placeholder">{t('mapNode.unknown')}</span>
