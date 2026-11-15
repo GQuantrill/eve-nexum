@@ -28,6 +28,7 @@ import { toast } from '../../utils/toastStore';
 import { GHOST_TIERS, defaultGhostTier, ghostTier } from '../../utils/ghostSites';
 import { parseSigClipboard, pasteUpdatesFor, type ParsedSig } from '../../utils/sigPaste';
 import { reevaluateConnectionsForSystem } from '../../utils/whAutoDetect';
+import { CLASS_COLORS } from '../../data/wormholes';
 import { alertInboundK162 } from '../../utils/k162Alert';
 import {
   formatBookmarkName, DEFAULT_BOOKMARK_FORMAT, formatSiteBookmarkName, DEFAULT_SITE_BOOKMARK_FORMAT,
@@ -626,6 +627,17 @@ export function SignaturePane({ systemId }: { systemId: string }) {
     }
     return m;
   }, [mapSystems]);
+  // The class a sig's leads-to points at: a class token picked by hand ("C5"),
+  // or, once the hole is jumped and leads-to holds the system's name, that
+  // system's class. Lets a K162 show where it goes in the Type column.
+  const leadsToClass = useCallback((leadsTo: string | null | undefined): string | null => {
+    const v = (leadsTo ?? '').trim();
+    if (!v) return null;
+    const byName = classBySystemName.get(v.toUpperCase());
+    if (byName) return byName;
+    // 'unknown' is a real leads-to value (not scanned yet), not a class.
+    return Object.keys(CLASS_COLORS).find((c) => c !== 'unknown' && c.toUpperCase() === v.toUpperCase()) ?? null;
+  }, [classBySystemName]);
   // Same keying, for {leads_to}: a jumped hole names its system by alias.
   const aliasBySystemName = useMemo(() => {
     const m = new Map<string, string>();
@@ -1546,6 +1558,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                         : <WormholeTypePicker
                             value={sig.whType}
                             statics={systemStatics}
+                            leadsToClass={leadsToClass(sig.whLeadsTo)}
                             onChange={(whType) => {
                               const whLeadsTo = leadsToForTypeChange(sig.whType, whType, sig.whLeadsTo, whTypes);
                               updateSig(sig.id, { whType, ...(whLeadsTo !== undefined ? { whLeadsTo } : {}) });
