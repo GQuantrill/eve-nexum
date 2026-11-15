@@ -61,6 +61,7 @@ import { api } from '../../api/client';
 import { truesecColor } from '../../utils/truesec';
 import { readUserSetting } from '../../hooks/useUserSetting';
 import { linkEndSigs, LINK_SIG_IDS_KEY } from '../../utils/linkSigIds';
+import { CONFIRM_KEY_DELETE_KEY } from '../../utils/confirmPref';
 import { findFreePosition, normalizePlacement, PLACEMENT_GAP } from '../../hooks/useLocationTracking';
 import { CLASS_COLORS } from '../../data/wormholes';
 import { cssVarToHex } from '../../utils/cssVar';
@@ -524,6 +525,9 @@ export function MapCanvas() {
   // Preserve rubber-band selection when Shift is released before the mouse button.
   // React Flow clears the selection on Shift keyup, so we capture it just before.
   const shiftHeld        = useRef(false);
+  // Delete / Backspace removals waiting on the confirm, and whether to ask.
+  const [keyDeleteConfirm, setKeyDeleteConfirm] = useState<{ ids: string[]; name: string | null } | null>(null);
+  const [confirmKeyDelete, setConfirmKeyDelete] = useUserSetting<boolean>(CONFIRM_KEY_DELETE_KEY, true);
   const pendingSelection = useRef<string[]>([]);
 
   useEffect(() => {
@@ -548,23 +552,24 @@ export function MapCanvas() {
       if (e.key === 'Delete' || e.key === 'Backspace') {
         const target = e.target as HTMLElement;
         if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) return;
-        if (!canEdit) return;
+        if (!canEdit || keyDeleteConfirm) return;
 
-        // Multi-select: remove all RF-selected non-locked nodes
-        const rfSelected = nodes.filter((n) => n.selected);
-        if (rfSelected.length > 0) {
-          rfSelected.forEach((n) => {
-            const sys = systems.find((s) => s.id === n.id);
-            if (!sys?.locked) removeSystem(n.id);
-          });
-          return;
-        }
+        // Multi-select: every RF-selected node; else the single-click
+        // selection (panel open). Locked systems are never removed.
+        const rfSelected = nodes.filter((n) => n.selected).map((n) => n.id);
+        const picked = rfSelected.length > 0 ? rfSelected : selectedSystemId ? [selectedSystemId] : [];
+        const ids = picked.filter((id) => {
+          const sys = systems.find((s) => s.id === id);
+          return !!sys && !sys.locked;
+        });
+        if (ids.length === 0) return;
 
-        // Single-click selected (panel open)
-        if (selectedSystemId) {
-          const sys = systems.find((s) => s.id === selectedSystemId);
-          if (sys && !sys.locked) removeSystem(selectedSystemId);
-        }
+        // A stray Delete or Backspace is easy to hit, so ask first unless the
+        // user has said not to.
+        if (!confirmKeyDelete) { ids.forEach((id) => removeSystem(id)); return; }
+        const only = ids.length === 1 ? systems.find((s) => s.id === ids[0]) : undefined;
+        setKeyDeleteConfirm({ ids, name: only ? systemDisplayName(only) : null });
+        return;
       }
 
       if (e.key === 'h' || e.key === 'H') {
@@ -597,7 +602,7 @@ export function MapCanvas() {
       window.removeEventListener('keyup',   onKeyUp);
       window.removeEventListener('blur',    onBlur);
     };
-  }, [nodes, selectedSystemId, systems, removeSystem, undo, setNodes, canEdit, centerOnSystem]);
+  }, [nodes, selectedSystemId, systems, removeSystem, undo, setNodes, canEdit, centerOnSystem, confirmKeyDelete, keyDeleteConfirm]);
 
   const onSelectionChange = useCallback(({ nodes: sel }: { nodes: Node[] }) => {
     if (shiftHeld.current && sel.length > 0) pendingSelection.current = sel.map((n) => n.id);
@@ -2010,6 +2015,19 @@ export function MapCanvas() {
         />
       )}
 
+      {keyDeleteConfirm && (
+        <ConfirmModal
+          message={keyDeleteConfirm.name
+            ? t('ctxMenu.keyDeleteConfirmOne', { name: keyDeleteConfirm.name })
+            : t('ctxMenu.keyDeleteConfirmMany', { count: keyDeleteConfirm.ids.length })}
+          onConfirm={() => {
+            keyDeleteConfirm.ids.forEach((id) => removeSystem(id));
+            setKeyDeleteConfirm(null);
+          }}
+          onCancel={() => setKeyDeleteConfirm(null)}
+          onDontAskAgain={() => setConfirmKeyDelete(false)}
+        />
+      )}
       {orphanConfirm && (
         <ConfirmModal
           message={t('ctxMenu.removeOrphansConfirm', { count: orphanConfirm.ids.length })}
