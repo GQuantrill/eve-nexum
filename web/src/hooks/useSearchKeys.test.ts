@@ -39,4 +39,24 @@ describe('useSearchKeys', () => {
     expect(onPick).not.toHaveBeenCalled();
     expect(result.current.active).toBe(-1);
   });
+
+  it('skips rows that can\'t be picked', () => {
+    const onPick = vi.fn();
+    const taken = (i: { name: string }) => i.name === 'Jita IV' || i.name === 'Jita';
+    const { result } = renderHook(() => useSearchKeys(items, 'jita', (i) => i.name, onPick, taken));
+    expect(result.current.active).toBe(2);
+    act(() => result.current.onKeyDown(key('ArrowUp')));
+    act(() => result.current.onKeyDown(key('Enter')));
+    expect(onPick).toHaveBeenCalledWith({ name: 'Jitanai' });
+  });
+
+  it('picks nothing on Enter before anything is typed', () => {
+    const onPick = vi.fn();
+    const { result } = renderHook(() => useSearchKeys(items, '', (i) => i.name, onPick));
+    act(() => result.current.onKeyDown(key('Enter')));
+    expect(onPick).not.toHaveBeenCalled();
+    act(() => result.current.onKeyDown(key('ArrowDown')));
+    act(() => result.current.onKeyDown(key('Enter')));
+    expect(onPick).toHaveBeenCalledWith({ name: 'Jita IV' });
+  });
 });

@@ -8,6 +8,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { MapPinSimpleIcon, PathIcon, XIcon, PlusIcon, HouseIcon, TrashIcon } from '../../icons';
 import { useRoute, type RouteEntry } from '../../hooks/useRoute';
 import { useEsiSearch } from '../../hooks/useEsiSearch';
+import { useSearchKeys } from '../../hooks/useSearchKeys';
 import { useMapStore } from '../../store/mapStore';
 import { useAllMapHomes } from '../../hooks/useMapHomes';
 import { useUserSetting } from '../../hooks/useUserSetting';
@@ -180,16 +181,12 @@ export function ClosestSystemsPane() {
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
   const [adding, setAdding]     = useState(false);
   const [query, setQuery]       = useState('');
-  const [activeIndex, setActiveIndex] = useState(-1);
   const [dropdownPos, setDropdownPos] = useState<{ top: number; left: number; width: number } | null>(null);
   const { results, loading }    = useEsiSearch(query);
   const inputRef                = useRef<HTMLInputElement>(null);
   const addRowRef               = useRef<HTMLDivElement>(null);
 
   useEffect(() => { if (adding) inputRef.current?.focus(); }, [adding]);
-  // Deliberate: resets the highlighted row / dropdown for a new query.
-  // eslint-disable-next-line react-hooks/set-state-in-effect
-  useEffect(() => { setActiveIndex(-1); }, [results]);
 
   // Recompute the portal position any time the search row or results
   // shift. The portal lives on document.body so it escapes the info
@@ -288,6 +285,15 @@ export function ClosestSystemsPane() {
     setAdding(false);
   }
 
+  // Show already-added systems greyed out rather than hiding them — the
+  // user can see "yes I already have Jita" instead of wondering why it
+  // doesn't appear.
+  const existingIds = new Set(items.map((i) => i.id));
+  const showResults = adding && query.trim().length >= 2;
+  const showEmpty   = showResults && results.length === 0 && !loading;
+  const listed = showResults ? results.slice(0, 10) : [];
+  const keys = useSearchKeys(listed, query, (r) => r.name, (r) => addSystem(r.id, r.name), (r) => existingIds.has(r.id));
+
   if (!canRoute) {
     return (
       <div className="scout-pane__empty">
@@ -296,39 +302,12 @@ export function ClosestSystemsPane() {
     );
   }
 
-  // Show already-added systems greyed out rather than hiding them — the
-  // user can see "yes I already have Jita" instead of wondering why it
-  // doesn't appear.
-  const existingIds = new Set(items.map((i) => i.id));
-  const showResults = adding && query.trim().length >= 2;
-  const showEmpty   = showResults && results.length === 0 && !loading;
-
   function handleAddKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === 'Escape') {
-      setAdding(false); setQuery(''); setActiveIndex(-1);
+      setAdding(false); setQuery('');
       return;
     }
-    if (!showResults || results.length === 0) return;
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      setActiveIndex((i) => {
-        // Skip past already-added entries
-        let next = Math.min(i + 1, results.length - 1);
-        while (next < results.length && existingIds.has(results[next].id)) next++;
-        return next >= results.length ? i : next;
-      });
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      setActiveIndex((i) => {
-        let next = Math.max(i - 1, 0);
-        while (next >= 0 && existingIds.has(results[next].id)) next--;
-        return next < 0 ? i : next;
-      });
-    } else if (e.key === 'Enter' && activeIndex >= 0) {
-      e.preventDefault();
-      const r = results[activeIndex];
-      if (r && !existingIds.has(r.id)) addSystem(r.id, r.name);
-    }
+    keys.onKeyDown(e);
   }
 
   return (
@@ -402,20 +381,20 @@ export function ClosestSystemsPane() {
           role="listbox"
           style={{ position: 'fixed', top: dropdownPos.top, left: dropdownPos.left, width: dropdownPos.width }}
         >
-          {results.slice(0, 10).map((r, i) => {
+          {listed.map((r, i) => {
             const already = existingIds.has(r.id);
             const cls =
               'scout-pane__add-result' +
-              (i === activeIndex && !already ? ' scout-pane__add-result--active' : '') +
+              (i === keys.active ? ' scout-pane__add-result--active' : '') +
               (already ? ' scout-pane__add-result--disabled' : '');
             return (
               <li
                 key={r.id}
                 className={cls}
                 role="option"
-                aria-selected={i === activeIndex}
+                aria-selected={i === keys.active}
                 aria-disabled={already}
-                onMouseEnter={() => !already && setActiveIndex(i)}
+                onMouseEnter={() => keys.setActive(i)}
                 onMouseDown={(e) => { e.preventDefault(); if (!already) addSystem(r.id, r.name); }}
               >
                 <span className="scout-pane__add-result-name">{aliasName(r.name)}</span>
