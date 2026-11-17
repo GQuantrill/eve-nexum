@@ -1216,6 +1216,7 @@ export function MapCanvas() {
       const gateNeighbours = edgeSrc?.eveSystemId != null && edgeTgt?.eveSystemId != null
         && isKnownStargateAdjacent(edgeSrc.eveSystemId, edgeTgt.eveSystemId);
       const lockedGate = isProtectedGate(conn, { systems });
+      const lockedTip = lockedGate ? t('connPanel.gateProtected') : undefined;
       const timeStatus  = conn?.timeStatus  ?? 'fresh';
       const massStatus  = conn?.massStatus  ?? 'stable';
       const eid = contextMenu.edgeId;
@@ -1224,8 +1225,13 @@ export function MapCanvas() {
           label: t('ctxMenu.disconnect'),
           icon: <XIcon size={16} weight="regular" color="#e25a5a" />,
           disabled: lockedGate,
+          tooltip: lockedTip,
           action: () => removeConnection(eid),
         },
+        // A real stargate can't be changed, so its menu is only the greyed
+        // Disconnect and the reason. Lifetime and mass only mean anything on a
+        // wormhole, so a gate / Ansiblex / cyno link doesn't offer them.
+        ...(lockedGate ? [] : [
         { separator: true as const },
         {
           label: t('ctxMenu.jumpType'),
@@ -1234,6 +1240,7 @@ export function MapCanvas() {
               label: t('ctxMenu.jumpWormhole'),
               checked: connType === 'standard',
               disabled: lockedGate,
+              tooltip: lockedTip,
               action: () => updateConnection(eid, { connectionType: 'standard' }),
             },
             {
@@ -1246,16 +1253,20 @@ export function MapCanvas() {
               label: t('ctxMenu.jumpAnsiblex'),
               checked: connType === 'jumpgate',
               disabled: lockedGate || ((touchesJspace || gateNeighbours) && connType !== 'jumpgate'),
+              tooltip: lockedTip,
               action: () => updateConnection(eid, { connectionType: 'jumpgate' }),
             },
             {
               label: t('ctxMenu.jumpCyno'),
               checked: connType === 'cyno',
               disabled: lockedGate || (touchesJspace && connType !== 'cyno'),
+              tooltip: lockedTip,
               action: () => updateConnection(eid, { connectionType: 'cyno' }),
             },
           ],
         },
+        ]),
+        ...(connType !== 'standard' ? [] : [
         {
           label: t('ctxMenu.whLifetime'),
           submenu: (() => {
@@ -1340,6 +1351,7 @@ export function MapCanvas() {
             },
           ],
         },
+        ]),
       ];
     }
 
