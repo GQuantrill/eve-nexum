@@ -10,6 +10,10 @@ export type ContextMenuItem =
       icon?: ReactNode;
       action?: () => void;
       disabled?: boolean;
+      /** Hover text, e.g. why an item is disabled. Set on the row rather than
+       *  the button: browsers still send mouseover through a disabled button,
+       *  and TooltipLayer finds the nearest [data-tooltip] from there. */
+      tooltip?: string;
       checked?: boolean;
       submenu?: ContextMenuItem[];
       /** Custom flyout content shown in place of a list submenu (e.g. a grid
@@ -32,9 +36,9 @@ function SubMenu({ items, onClose }: { items: ContextMenuItem[]; onClose: () => 
         if ('separator' in item && item.separator) {
           return <li key={i} className="context-menu__separator" role="separator" />;
         }
-        const { label, icon, action, disabled, checked } = item;
+        const { label, icon, action, disabled, checked, tooltip } = item;
         return (
-          <li key={label}>
+          <li key={label} data-tooltip={tooltip}>
             <button
               className="context-menu__item"
               disabled={disabled}
@@ -107,10 +111,10 @@ export function ContextMenu({ x, y, items, onClose }: Props) {
         if ('separator' in item && item.separator) {
           return <li key={i} className="context-menu__separator" role="separator" />;
         }
-        const { label, icon, action, disabled, checked, submenu, flyout } = item;
+        const { label, icon, action, disabled, checked, submenu, flyout, tooltip } = item;
         const hasFlyout = !!submenu || !!flyout;
         return (
-          <li key={label} className="context-menu__li" onMouseEnter={() => setOpenSubmenu(hasFlyout ? i : null)}>
+          <li key={label} className="context-menu__li" data-tooltip={tooltip} onMouseEnter={() => setOpenSubmenu(hasFlyout ? i : null)}>
             <button
               className="context-menu__item"
               disabled={disabled}
