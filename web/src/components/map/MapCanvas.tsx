@@ -1228,6 +1228,10 @@ export function MapCanvas() {
           tooltip: lockedTip,
           action: () => removeConnection(eid),
         },
+        // A real stargate can't be changed, so its menu is only the greyed
+        // Disconnect and the reason. Lifetime and mass only mean anything on a
+        // wormhole, so a gate / Ansiblex / cyno link doesn't offer them.
+        ...(lockedGate ? [] : [
         { separator: true as const },
         {
           label: t('ctxMenu.jumpType'),
@@ -1261,6 +1265,8 @@ export function MapCanvas() {
             },
           ],
         },
+        ]),
+        ...(connType !== 'standard' ? [] : [
         {
           label: t('ctxMenu.whLifetime'),
           submenu: (() => {
@@ -1345,6 +1351,7 @@ export function MapCanvas() {
             },
           ],
         },
+        ]),
       ];
     }
 
