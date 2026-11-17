@@ -740,6 +740,7 @@
     "whType": "Wormgattype",
     "whTypePlaceholder": "K162, C247…",
     "gateNote": "Stargate in het spel — geen wormgatgegevens om bij te houden.",
+    "gateProtected": "Stargate-verbindingen bestaan in het spel en kunnen niet worden verwijderd of gewijzigd.",
     "jumpgateNote": "Ansiblex jump bridge — geen wormgatgegevens om bij te houden.",
     "sigLink": "Onderliggende signaturen",
     "sigInSystem": "Sig in {{system}}",

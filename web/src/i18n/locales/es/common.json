@@ -810,6 +810,7 @@
     "restore": "Restaurar",
     "restoreTitle": "Quitar la marca de rota y volver a tratarla como una conexión activa",
     "gateNote": "Stargate normal — sin datos de agujero de gusano.",
+    "gateProtected": "Las conexiones por stargate existen en el juego y no se pueden eliminar ni cambiar.",
     "jumpgateNote": "Puente Ansiblex — sin datos de agujero de gusano."
   },
   "contentFilter": {

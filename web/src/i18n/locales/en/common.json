@@ -740,6 +740,7 @@
     "whType": "Wormhole type",
     "whTypePlaceholder": "K162, C247…",
     "gateNote": "In-game stargate — no wormhole data to track.",
+    "gateProtected": "Stargate connections exist in game and can't be removed or changed.",
     "jumpgateNote": "Ansiblex jump bridge — no wormhole data to track.",
     "sigLink": "Backing signatures",
     "sigInSystem": "Sig in {{system}}",

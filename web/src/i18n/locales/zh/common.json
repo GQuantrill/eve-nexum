@@ -810,6 +810,7 @@
     "restore": "恢复",
     "restoreTitle": "清除断开标记，重新将其视为活动连接",
     "gateNote": "普通星门 — 无虫洞数据可追踪。",
+    "gateProtected": "星门连接在游戏中真实存在，无法删除或更改。",
     "jumpgateNote": "Ansiblex 跳桥 — 无虫洞数据可追踪。"
   },
   "contentFilter": {

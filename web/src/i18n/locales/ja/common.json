@@ -810,6 +810,7 @@
     "restore": "復元",
     "restoreTitle": "切断フラグを解除し、再び有効な接続として扱います",
     "gateNote": "通常のスターゲート — ワームホールデータはありません。",
+    "gateProtected": "スターゲート接続はゲーム内に実在するため、削除・変更できません。",
     "jumpgateNote": "Ansiblex ジャンプブリッジ — ワームホールデータはありません。"
   },
   "contentFilter": {

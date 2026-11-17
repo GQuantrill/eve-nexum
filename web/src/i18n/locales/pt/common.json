@@ -810,6 +810,7 @@
     "restore": "Restaurar",
     "restoreTitle": "Limpar a marca de quebrada e tratar novamente como uma conexão ativa",
     "gateNote": "Stargate normal — sem dados de buraco de minhoca.",
+    "gateProtected": "As conexões por stargate existem no jogo e não podem ser removidas nem alteradas.",
     "jumpgateNote": "Ponte Ansiblex — sem dados de buraco de minhoca."
   },
   "contentFilter": {

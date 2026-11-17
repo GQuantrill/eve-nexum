@@ -810,6 +810,7 @@
     "restore": "Wiederherstellen",
     "restoreTitle": "Die Unterbrochen-Markierung entfernen und dies wieder als aktive Verbindung behandeln",
     "gateNote": "Reguläres Stargate — keine Wurmloch-Daten.",
+    "gateProtected": "Stargate-Verbindungen existieren im Spiel und können nicht entfernt oder geändert werden.",
     "jumpgateNote": "Ansiblex-Sprungbrücke — keine Wurmloch-Daten."
   },
   "contentFilter": {

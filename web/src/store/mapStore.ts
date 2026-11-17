@@ -9,6 +9,10 @@ import { toast } from '../utils/toastStore';
 import type { WormholeMap, MapSystem, MapConnection, SavedRoute, SystemClass, WormholeEffect } from '../types';
 import type { WhSig, UndivedHole } from '../utils/undivedWormholes';
 import { pickHandles } from '../components/map/edgeUtils';
+import { isProtectedGate } from '../utils/gateProtection';
+// The i18next singleton (configured by ../i18n at app start). Imported bare so
+// the store doesn't pull in the React bindings.
+import i18n from 'i18next';
 
 // Another of the account's characters chosen as the route/centre origin.
 export interface RouteOriginOverride {
@@ -557,6 +561,12 @@ export const useMapStore = create<MapStore>()((set, get) => {
       }
 
       case 'add_connection': {
+        // A real stargate stays, even when it was just drawn.
+        const added = get().map.connections.find((c) => c.id === cmd.connectionId);
+        if (isProtectedGate(added, get().map)) {
+          toast.error(i18n.t('connPanel.gateProtected'));
+          break;
+        }
         set((s) => ({
           selectedConnectionId: s.selectedConnectionId === cmd.connectionId ? null : s.selectedConnectionId,
           map: {
@@ -1315,6 +1325,13 @@ export const useMapStore = create<MapStore>()((set, get) => {
       const { activeMapId, map } = get();
       const conn = map.connections.find((c) => c.id === id);
 
+      // Retyping a protected stargate removes it as surely as deleting it.
+      if (updates.connectionType !== undefined && updates.connectionType !== 'gate'
+          && isProtectedGate(conn, map)) {
+        toast.error(i18n.t('connPanel.gateProtected'));
+        return;
+      }
+
       // Size follows from the wormhole type, so derive it HERE rather than in
       // the connection panel. It used to be inferred only while that panel was
       // open, which is why a freshly jumped hole sat at the 'large' default
@@ -1355,9 +1372,18 @@ export const useMapStore = create<MapStore>()((set, get) => {
       if (activeMapId) {
         const url  = `/api/maps/${activeMapId}/connections/${id}`;
         const body = JSON.stringify(updates);
-        api(url, { method: 'PATCH', body }).catch(() =>
-          enqueue(`updateConnection:${id}`, url, 'PATCH', body),
-        );
+        api(url, { method: 'PATCH', body }).catch((err) => {
+          // A jump type the server won't accept (a protected stargate, or one
+          // the SDE rules out): show the type it really has, don't retry.
+          if (conn && updates.connectionType !== undefined && isPermanentRejection(err)) {
+            set((s) => ({
+              map: { ...s.map, connections: s.map.connections.map((c) =>
+                c.id === id ? { ...c, connectionType: conn.connectionType } : c) },
+            }));
+            return;
+          }
+          enqueue(`updateConnection:${id}`, url, 'PATCH', body);
+        });
       }
     },
 
@@ -1378,6 +1404,12 @@ export const useMapStore = create<MapStore>()((set, get) => {
     removeConnection: (id) => {
       const { activeMapId, map } = get();
       const conn = map.connections.find((c) => c.id === id);
+      // Every way of deleting an edge (menu, Delete key, panel) lands here, so
+      // the stargate guard lives here too. The server enforces the same rule.
+      if (isProtectedGate(conn, map)) {
+        toast.error(i18n.t('connPanel.gateProtected'));
+        return;
+      }
       if (conn) get().pushUndo({ type: 'remove_connection', connection: conn });
 
       set((s) => ({
@@ -1390,9 +1422,18 @@ export const useMapStore = create<MapStore>()((set, get) => {
       }));
       if (activeMapId) {
         const url = `/api/maps/${activeMapId}/connections/${id}`;
-        api(url, { method: 'DELETE' }).catch(() =>
-          enqueue(`removeConnection:${id}`, url, 'DELETE', ''),
-        );
+        api(url, { method: 'DELETE' }).catch((err) => {
+          // Refused (a protected stargate the client couldn't yet tell was
+          // one): put the edge back rather than queue a retry of a refusal.
+          if (isPermanentRejection(err)) {
+            if (conn) {
+              set((s) => ({ map: { ...s.map, connections: [...s.map.connections, conn] } }));
+              toast.error(i18n.t('connPanel.gateProtected'));
+            }
+            return;
+          }
+          enqueue(`removeConnection:${id}`, url, 'DELETE', '');
+        });
       }
     },
 

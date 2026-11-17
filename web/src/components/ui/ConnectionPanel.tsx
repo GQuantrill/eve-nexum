@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { mass, timeAgo } from '../../i18n/format';
+import { isProtectedGate } from '../../utils/gateProtection';
 import { useMapStore } from '../../store/mapStore';
 import { useConnectionJumps, useJumpLogStore, type JumpRow } from '../../store/jumpLogStore';
 import { useWormholeTypes } from '../../hooks/useWormholeTypes';
@@ -418,6 +419,8 @@ export function ConnectionPanel() {
   // Wormhole-only fields (type, sig link, mass / time / size, rolling calc)
   // don't apply to stargates or Ansiblex jump bridges — only 'standard' links.
   const isWormhole = conn.connectionType === 'standard';
+  // A real stargate can never be removed, so don't offer to.
+  const lockedGate = isProtectedGate(conn, map);
 
   // The backing sigs each end links to, as loaded for this panel.
   const linkedSigs = ([
@@ -998,6 +1001,9 @@ export function ConnectionPanel() {
       )}
       </>)}
 
+      {lockedGate ? (
+        <p className="conn-gate-note">{t('connPanel.gateProtected')}</p>
+      ) : (
       <div className="conn-remove">
         {/* Only offered when there is a linked sig to take with it. */}
         {linkedSigs.length > 0 && (
@@ -1025,6 +1031,7 @@ export function ConnectionPanel() {
           {t('connPanel.removeConnection')}
         </button>
       </div>
+      )}
     </aside>
   );
 

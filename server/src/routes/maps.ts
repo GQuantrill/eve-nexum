@@ -24,7 +24,9 @@ import { audit } from '../services/audit.js';
 import { publishToMap } from '../services/mapEvents.js';
 import { streamMapEvents } from '../services/mapStream.js';
 import { listVisibleMaps, loadFullMap, loadSystemSignatures, loadSystemAnomalies, loadSystemStructures, CONNECTION_COLS } from '../services/mapRead.js';
-import { connectionTypeError, connectionEndpointEveIds, systemEveIds } from '../services/connectionRules.js';
+import {
+  connectionTypeError, connectionEndpointEveIds, systemEveIds, isProtectedGate, PROTECTED_GATE_ERROR,
+} from '../services/connectionRules.js';
 import { sdeSystemFacts } from '../services/sdeFacts.js';
 import { contributorIsAtSystem, contributorMayLinkSystems } from '../services/contributorMovement.js';
 import { listConnectionJumps, recordConnectionJump, setConnectionJumpHot, clearConnectionJumps } from '../services/connectionJumps.js';
@@ -3890,6 +3892,10 @@ mapsRouter.patch('/:mapId/connections/:connectionId', async (req, res) => {
   if ('connectionType' in updates) {
     const next = updates.connectionType;
     if (typeof next !== 'string') { res.status(400).json({ error: 'invalid connectionType' }); return; }
+    // Retyping a protected stargate would remove it as surely as deleting it.
+    if (next !== 'gate' && await isProtectedGate(mapId, connectionId)) {
+      res.status(409).json({ error: PROTECTED_GATE_ERROR }); return;
+    }
     const ep = await connectionEndpointEveIds(mapId, connectionId);
     if (ep) {
       const err = await connectionTypeError(next, ep);
@@ -4044,6 +4050,10 @@ mapsRouter.delete('/:mapId/connections/:connectionId', async (req, res) => {
   const { mapId, connectionId } = req.params;
   const access = await requireMapWrite(res, mapId, req);
   if (!access) return;
+  // A real stargate is fixed in the game, so it is never removed.
+  if (await isProtectedGate(mapId, connectionId)) {
+    res.status(409).json({ error: PROTECTED_GATE_ERROR }); return;
+  }
   const { rows: removedConn } = await db.query<{ sourceId: string; targetId: string }>(
     `DELETE FROM map_connections WHERE id = $1 AND map_id = $2
      RETURNING source_id AS "sourceId", target_id AS "targetId"`,
