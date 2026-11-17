@@ -1,4 +1,5 @@
 import { db } from '../db.js';
+import { SCOPE, hasScope } from '../utils/esiScopes.js';
 import { config } from '../config.js';
 import { esiFetch } from '../utils/esi.js';
 import { createLogger } from '../utils/logger.js';
@@ -142,16 +143,20 @@ export async function refreshStandingsForUser(params: {
   corpId:      number | null;
   allianceId:  number | null;
   accessToken: string;
+  // The scopes the token holds (null = not recorded yet = all). A contacts list
+  // the character didn't grant is skipped rather than asked for and refused.
+  scopes?:     readonly string[] | null;
   scope?:      'all' | 'org';
 }): Promise<void> {
   const { userId, characterId, corpId, allianceId, accessToken } = params;
+  const granted = params.scopes ?? null;
   const scope = params.scope ?? 'all';
 
   const tasks: Promise<void>[] = [];
 
   // Personal — for the map tint only (never access control). Skipped for
   // org-scoped syncs.
-  if (scope !== 'org' && await shouldRefresh('character', characterId)) {
+  if (scope !== 'org' && hasScope(granted, SCOPE.charContacts) && await shouldRefresh('character', characterId)) {
     tasks.push((async () => {
       const r = await fetchAllContacts(
         `https://esi.evetech.net/v2/characters/${characterId}/contacts/`,
@@ -173,7 +178,8 @@ export async function refreshStandingsForUser(params: {
   // standings the access gate would ignore anyway. Reading ESI corp contacts
   // also requires the syncing character to be IN this corp with the Contact
   // Manager role, so in practice this only fires for a configured-corp member.
-  if (corpId !== null && config.corpIds.includes(corpId) && await shouldRefresh('corp', corpId)) {
+  if (corpId !== null && config.corpIds.includes(corpId) && hasScope(granted, SCOPE.corpContacts)
+      && await shouldRefresh('corp', corpId)) {
     tasks.push((async () => {
       const r = await fetchAllContacts(
         `https://esi.evetech.net/v2/corporations/${corpId}/contacts/`,
@@ -194,7 +200,8 @@ export async function refreshStandingsForUser(params: {
   // alliance(s), not the syncing user's own. Gated to config.allianceIds for the
   // same reason as corp above; reading ESI alliance contacts requires the
   // character be in the alliance with the appropriate role.
-  if (allianceId !== null && config.allianceIds.includes(allianceId) && await shouldRefresh('alliance', allianceId)) {
+  if (allianceId !== null && config.allianceIds.includes(allianceId) && hasScope(granted, SCOPE.allianceContacts)
+      && await shouldRefresh('alliance', allianceId)) {
     tasks.push((async () => {
       const r = await fetchAllContacts(
         `https://esi.evetech.net/v2/alliances/${allianceId}/contacts/`,

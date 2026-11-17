@@ -14,7 +14,8 @@ import { requireAuth } from '../middleware/requireAuth.js';
 import { authUser, isAdmin, isAllianceAdmin, canEditTopology } from '../middleware/authContext.js';
 import { config } from '../config.js';
 import { standingPermitsTarget, grantKindAllowedForInstall, requiresPositiveStanding } from '../services/accessGrants.js';
-import { decryptToken } from '../utils/tokenCrypto.js';
+import { getValidToken } from '../utils/eveToken.js';
+import { SCOPE } from '../utils/esiScopes.js';
 import { createLogger } from '../utils/logger.js';
 import { resolveOwnerId } from '../utils/owner.js';
 import { mapCapFor, countPersonalMaps, mapAllowanceFor } from '../services/mapAllowance.js';
@@ -79,11 +80,11 @@ export async function resolveStructureOwnerCorp(
   eveStructureId: number,
 ): Promise<number | null> {
   try {
-    const { rows } = await db.query<{ access_token: string }>(
-      `SELECT access_token FROM users WHERE id = $1`, [userId],
-    );
-    if (!rows.length) return null;
-    const token = decryptToken(rows[0].access_token);
+    // getValidToken rather than the stored token: that one may have expired.
+    // A character without the scope gets null without an ESI call.
+    let token: string;
+    try { token = await getValidToken(userId, [SCOPE.universeStructures]); }
+    catch { return null; }
     const r = await esiFetch(`https://esi.evetech.net/v2/universe/structures/${eveStructureId}/`, {
       headers: { Authorization: `Bearer ${token}` },
     });

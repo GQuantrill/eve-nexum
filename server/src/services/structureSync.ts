@@ -5,7 +5,8 @@
 // full corp set is replaced on each sync, so removed structures drop out.
 import { db } from '../db.js';
 import { esiFetch } from '../utils/esi.js';
-import { getValidToken } from '../utils/eveToken.js';
+import { getTokenAndScopes } from '../utils/eveToken.js';
+import { SCOPE, hasScope } from '../utils/esiScopes.js';
 import { createLogger } from '../utils/logger.js';
 
 const log = createLogger('structureSync');
@@ -52,9 +53,13 @@ export async function syncCorpStructures(userId: number, opts: { force?: boolean
   // Cheap DB gate before any ESI call: skip if a recent sync covers this corp.
   if (!opts.force && await structuresFresh(corpId)) return { status: 'skipped' };
 
+  // Both scopes are checked before any ESI call: a character that didn't grant
+  // them is told to log in again rather than spending two ESI errors finding out.
   let token: string;
-  try { token = await getValidToken(userId); }
+  let scopes: string[] | null;
+  try { ({ token, scopes } = await getTokenAndScopes(userId, [SCOPE.corpRoles, SCOPE.corpStructures])); }
   catch { return { status: 'needs_reauth' }; }
+  const canName = hasScope(scopes, SCOPE.universeStructures);
   const auth = { headers: { Authorization: `Bearer ${token}` } };
 
   // Gate on the EVE corp role first. read_corporation_roles is in the base scope
@@ -83,6 +88,7 @@ export async function syncCorpStructures(userId: number, opts: { force?: boolean
   // Resolve each structure's name (universe/structures — same token). Failures
   // leave the name blank rather than aborting the whole sync.
   const named = await Promise.all(all.map(async (s) => {
+    if (!canName) return { ...s, name: '' };
     try {
       const nres = await esiFetch(`${ESI}/universe/structures/${s.structure_id}/`, auth);
       if (nres.ok) return { ...s, name: ((await nres.json()) as { name?: string }).name ?? '' };

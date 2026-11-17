@@ -8,6 +8,7 @@ import { createLogger } from '../utils/logger.js';
 import { esiFetch } from '../utils/esi.js';
 import { refreshStandingsForUser } from '../services/standings.js';
 import { syncCorpStructures } from '../services/structureSync.js';
+import { scopesFromAccessToken } from '../utils/esiScopes.js';
 import { isLoginPermitted, standingsPermitLogin } from '../services/accessGrants.js';
 import { seedDemoMap } from '../services/demoMap.js';
 import { settingsSiblings, shareableEntries, setShareSettings } from '../services/sharedSettings.js';
@@ -307,6 +308,9 @@ authRouter.get('/callback', async (req, res) => {
     }
 
     const expiresAt = new Date(Date.now() + tokens.expires_in * 1000);
+    // What this login actually granted; replaces the stored list, so unticking
+    // a group and logging in again is how a pilot takes a scope back.
+    const grantedScopes = scopesFromAccessToken(tokens.access_token);
 
     // Role policy:
     //   - Solo mode (no CORP_ID / ALLIANCE_ID set): no admin tooling matters
@@ -334,13 +338,14 @@ authRouter.get('/callback', async (req, res) => {
       : (invitedRole ?? config.defaultUserRole);
 
     const { rows } = await db.query<{ id: number; role: string; blocked: boolean; inserted: boolean }>(
-      `INSERT INTO users (character_id, character_name, access_token, refresh_token, token_expires_at, role, corp_id, alliance_id, last_login_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $8, $10, NOW())
+      `INSERT INTO users (character_id, character_name, access_token, refresh_token, token_expires_at, role, corp_id, alliance_id, last_login_at, esi_scopes)
+       VALUES ($1, $2, $3, $4, $5, $6, $8, $10, NOW(), $12)
        ON CONFLICT (character_id) DO UPDATE SET
          character_name   = EXCLUDED.character_name,
          access_token     = EXCLUDED.access_token,
          refresh_token    = EXCLUDED.refresh_token,
          token_expires_at = EXCLUDED.token_expires_at,
+         esi_scopes       = COALESCE(EXCLUDED.esi_scopes, users.esi_scopes),
          last_login_at    = NOW(),
          corp_id          = COALESCE($8::int,  users.corp_id),
          alliance_id      = COALESCE($10::int, users.alliance_id),
@@ -359,7 +364,8 @@ authRouter.get('/callback', async (req, res) => {
        -- that already exists -- the same rule the invited role above follows).
        RETURNING id, role, blocked, (xmax = 0) AS inserted`,
       [characterId, jwtPayload.name, encryptToken(tokens.access_token), encryptToken(tokens.refresh_token), expiresAt,
-       defaultRole, config.adminCharId, userCorpId, !config.restrictedMode, userAllianceId, bootstrapRole],
+       defaultRole, config.adminCharId, userCorpId, !config.restrictedMode, userAllianceId, bootstrapRole,
+       grantedScopes],
     );
 
     const userId = rows[0].id;
@@ -380,6 +386,7 @@ authRouter.get('/callback', async (req, res) => {
     const kickStandings = () => refreshStandingsForUser({
       userId, characterId, corpId: userCorpId, allianceId: userAllianceId,
       accessToken: tokens.access_token,
+      scopes:      grantedScopes,
     }).catch((err) => log.error('standings refresh kickoff failed:', err));
 
     // Fire-and-forget corp-structures sync (TTL-gated, role- and scope-gated
