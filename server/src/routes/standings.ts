@@ -4,7 +4,7 @@ import { config } from '../config.js';
 import { requireAuth } from '../middleware/requireAuth.js';
 import { refreshStandingsForUser, loadOrgContacts } from '../services/standings.js';
 import { revalidateActiveSessions } from '../services/accessRevalidate.js';
-import { decryptToken } from '../utils/tokenCrypto.js';
+import { getTokenAndScopes } from '../utils/eveToken.js';
 import { createLogger } from '../utils/logger.js';
 
 const log = createLogger('standings');
@@ -16,8 +16,8 @@ type ContactKind = 'character' | 'corporation' | 'alliance' | 'faction';
 
 // GET /api/standings/me — returns the three standings buckets visible to
 // the logged-in character: their personal contacts, their corp's contacts
-// (if a corp Contact Manager has ever logged in), and their alliance's
-// contacts (likewise). Maps are keyed `"<kind>:<id>"` for fast lookup on
+// (once any member who granted the corp contacts scope has synced), and their
+// alliance's contacts (likewise). Maps are keyed `"<kind>:<id>"` for fast lookup on
 // the client.
 //
 // The frontend's useStandings hook compresses these into a single
@@ -88,13 +88,12 @@ standingsRouter.post('/refresh', async (req, res) => {
     character_id: number;
     corp_id:      number | null;
     alliance_id:  number | null;
-    access_token: string;
   }>(
-    `SELECT character_id, corp_id, alliance_id, access_token FROM users WHERE id = $1`,
+    `SELECT character_id, corp_id, alliance_id FROM users WHERE id = $1`,
     [userId],
   );
   if (!rows.length) { res.status(404).json({ error: 'User not found' }); return; }
-  const { character_id, corp_id, alliance_id, access_token } = rows[0];
+  const { character_id, corp_id, alliance_id } = rows[0];
 
   // Clear the throttle row(s) so refreshStandingsForUser doesn't skip. An
   // org-only sync leaves the personal throttle alone (it isn't refreshed).
@@ -111,10 +110,12 @@ standingsRouter.post('/refresh', async (req, res) => {
     [corp_id ?? 0, alliance_id ?? 0],
   );
 
+  // A fresh token (the stored one may have expired) and what it was granted.
   let token: string;
-  try { token = decryptToken(access_token); }
+  let scopes: string[] | null;
+  try { ({ token, scopes } = await getTokenAndScopes(userId)); }
   catch (err) {
-    log.error('failed to decrypt access token:', err);
+    log.error('failed to get access token:', err);
     res.status(500).json({ error: 'Cannot read stored token — log out and back in' });
     return;
   }
@@ -126,6 +127,7 @@ standingsRouter.post('/refresh', async (req, res) => {
       corpId:      corp_id,
       allianceId:  alliance_id,
       accessToken: token,
+      scopes,
       scope:       orgOnly ? 'org' : 'all',
     });
   } catch (err) {

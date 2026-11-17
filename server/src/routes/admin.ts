@@ -1,6 +1,7 @@
 import { Router, type Request } from 'express';
 import { esiFetch } from '../utils/esi.js';
-import { getValidToken } from '../utils/eveToken.js';
+import { getValidToken, isScopeMissing } from '../utils/eveToken.js';
+import { SCOPE } from '../utils/esiScopes.js';
 import { db } from '../db.js';
 import { requireAdmin } from '../middleware/requireAdmin.js';
 import { requireAdminRead } from '../middleware/requireAdminRead.js';
@@ -569,7 +570,16 @@ adminRouter.post('/access-grants/:id/invite-mail', async (req, res) => {
     : `${bodyRaw}\n\n${FRONTEND_URL}`;
 
   try {
-    const token = await getValidToken(req.session.userId!);
+    let token: string;
+    try { token = await getValidToken(req.session.userId!, [SCOPE.openWindow]); }
+    catch (err) {
+      // Same answer as ESI's own 403 below: a fresh login fixes it.
+      if (isScopeMissing(err)) {
+        res.status(502).json({ error: 'scope_missing', status: 403, message: 'ESI scope not granted' });
+        return;
+      }
+      throw err;
+    }
     const esiRes = await esiFetch('https://esi.evetech.net/latest/ui/openwindow/newmail/', {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },

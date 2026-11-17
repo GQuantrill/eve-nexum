@@ -1039,6 +1039,11 @@ export async function migrate() {
     -- from the most recently changed one.
     ALTER TABLE users ADD COLUMN IF NOT EXISTS settings_updated_at TIMESTAMPTZ;
 
+    -- The ESI scopes this character's token was granted, read from the token at
+    -- login and every refresh. NULL = not recorded yet (a token from before this
+    -- column), treated as holding every scope. See utils/esiScopes.ts.
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS esi_scopes TEXT[];
+
     -- Account-scoped API keys for the external read API. A key acts as one
     -- owner (account) with one bound character supplying role/corp context, so
     -- a key request resolves to exactly what that character sees in the app.

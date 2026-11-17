@@ -1,6 +1,7 @@
 import { db } from '../db.js';
 import { esiFetch } from '../utils/esi.js';
 import { getValidToken } from '../utils/eveToken.js';
+import { SCOPE } from '../utils/esiScopes.js';
 import { config } from '../config.js';
 import { createLogger } from '../utils/logger.js';
 
@@ -24,7 +25,9 @@ const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 // offline character keeps its existing last known system). No jump events:
 // background detection shouldn't inflate a pilot's activity stats.
 async function pollOne(userId: number, characterId: number): Promise<void> {
-  const token = await getValidToken(userId); // throws on a dead/revoked token
+  // Throws on a dead/revoked token, or (before any ESI call) when the character
+  // didn't grant location; either way the cycle counts it as skipped.
+  const token = await getValidToken(userId, [SCOPE.online, SCOPE.location]);
   const onlineRes = await esiFetch(
     `https://esi.evetech.net/latest/characters/${characterId}/online/`,
     { headers: { Authorization: `Bearer ${token}` } },
@@ -55,7 +58,9 @@ async function pollAll(): Promise<void> {
     const { rows } = await db.query<{ id: number; character_id: number }>(
       `SELECT id, character_id FROM users
         WHERE refresh_token IS NOT NULL AND updated_at > NOW() - interval '30 days'
+          AND (esi_scopes IS NULL OR esi_scopes @> $1::text[])
         ORDER BY id`,
+      [[SCOPE.online, SCOPE.location]],
     );
     let ok = 0, skipped = 0;
     for (const r of rows) {

@@ -3,7 +3,8 @@ import { config } from '../config.js';
 import { esiFetch } from '../utils/esi.js';
 import { db } from '../db.js';
 import { requireAuth } from '../middleware/requireAuth.js';
-import { getValidToken } from '../utils/eveToken.js';
+import { getValidToken, isScopeMissing } from '../utils/eveToken.js';
+import { SCOPE } from '../utils/esiScopes.js';
 import { createLogger } from '../utils/logger.js';
 import { TtlCache } from '../utils/cache.js';
 import { resolveEntityNames } from '../services/entityNames.js';
@@ -85,7 +86,8 @@ async function readEsiLocation(userId: number, characterId: number): Promise<Esi
   if (existing) return existing;
   const p = (async (): Promise<EsiLoc> => {
     let token: string;
-    try { token = await getValidToken(userId); } catch { return { status: 'noToken' }; }
+    try { token = await getValidToken(userId, [SCOPE.online, SCOPE.location]); }
+    catch { return { status: 'noToken' }; }
     let online = esiOnlineCache.get(characterId)?.value;
     if (online === undefined) {
       const onlineRes = await esiFetch(`https://esi.evetech.net/latest/characters/${characterId}/online/`,
@@ -133,7 +135,7 @@ async function readEsiShip(userId: number, characterId: number): Promise<ShipInf
   if (existing) return existing;
   const p = (async (): Promise<ShipInfo | null> => {
     let token: string;
-    try { token = await getValidToken(userId); } catch { return null; }
+    try { token = await getValidToken(userId, [SCOPE.ship]); } catch { return null; }
     const shipRes = await esiFetch(`https://esi.evetech.net/latest/characters/${characterId}/ship/`,
       { headers: { Authorization: `Bearer ${token}` } });
     if (!shipRes.ok) return null;
@@ -365,7 +367,7 @@ async function locationToSystemId(
       `SELECT solar_system_id AS s FROM structures WHERE structure_id = $1`, [locationId]);
     if (rows[0]?.s != null) return rows[0].s;
     try {
-      const token = await getValidToken(userId);
+      const token = await getValidToken(userId, [SCOPE.universeStructures]);
       const r = await esiFetch(`https://esi.evetech.net/latest/universe/structures/${locationId}/`,
         { headers: { Authorization: `Bearer ${token}` } });
       if (r.ok) return (await r.json() as { solar_system_id?: number }).solar_system_id ?? null;
@@ -396,7 +398,13 @@ characterRouter.get('/clones', async (req, res) => {
       `SELECT character_id FROM users WHERE id = $1`, [userId]);
     if (!userRows.length) { res.status(404).json({ error: 'User not found' }); return; }
 
-    const token = await getValidToken(userId);
+    let token: string;
+    try { token = await getValidToken(userId, [SCOPE.clones]); }
+    catch (err) {
+      // Same answer as ESI's own 403 below: the panel offers a fresh login.
+      if (isScopeMissing(err)) { res.status(403).json({ error: 'scope_missing', status: 403 }); return; }
+      throw err;
+    }
     const r = await esiFetch(
       `https://esi.evetech.net/latest/characters/${userRows[0].character_id}/clones/`,
       { headers: { Authorization: `Bearer ${token}` } });
@@ -548,7 +556,8 @@ async function sendWaypoint(
   userId: number, params: URLSearchParams,
 ): Promise<Exclude<WaypointOutcome, 'offline'>> {
   let token: string;
-  try { token = await getValidToken(userId); } catch { return 'token_expired'; }
+  try { token = await getValidToken(userId, [SCOPE.waypoint]); }
+  catch (err) { return isScopeMissing(err) ? 'no_scope' : 'token_expired'; }
   const esiRes = await esiFetch(
     `https://esi.evetech.net/latest/ui/autopilot/waypoint/?${params}`,
     { method: 'POST', headers: { Authorization: `Bearer ${token}` } },
@@ -659,7 +668,12 @@ characterRouter.get('/online', async (req, res) => {
     );
     if (!rows.length) { res.status(404).json({ error: 'User not found' }); return; }
 
-    const token = await getValidToken(req.session.userId!);
+    let token: string;
+    try { token = await getValidToken(req.session.userId!, [SCOPE.online]); }
+    catch (err) {
+      if (isScopeMissing(err)) { res.json({ online: null, scopeMissing: true }); return; }
+      throw err;
+    }
     const characterId = rows[0].character_id;
 
     const esiRes = await esiFetch(
@@ -732,7 +746,13 @@ characterRouter.get('/fleet', async (req, res) => {
     );
     if (!userRows.length) { res.status(404).json({ error: 'User not found' }); return; }
 
-    const token       = await getValidToken(req.session.userId!);
+    let token: string;
+    try { token = await getValidToken(req.session.userId!, [SCOPE.fleet]); }
+    catch (err) {
+      // Same as ESI's own 403 below: no fleet to show.
+      if (isScopeMissing(err)) { res.json({ inFleet: false, members: [] }); return; }
+      throw err;
+    }
     const characterId = userRows[0].character_id;
 
     // 1) Which fleet (if any) is this character in? ESI returns 404 when
