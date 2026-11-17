@@ -56,7 +56,8 @@ type AdjacentSystem = {
 import { CustomLabelDialog } from '../ui/CustomLabelDialog';
 import { PromptModal } from '../ui/PromptModal';
 import type { MapSystem, SystemIntel, SystemClass } from '../../types';
-import { isDefiniteWormholeHop, prefetchStargateNeighbors } from '../../utils/stargateAdjacency';
+import { isDefiniteWormholeHop, isKnownStargateAdjacent, prefetchStargateNeighbors } from '../../utils/stargateAdjacency';
+import { isProtectedGate } from '../../utils/gateProtection';
 import { api } from '../../api/client';
 import { truesecColor } from '../../utils/truesec';
 import { readUserSetting } from '../../hooks/useUserSetting';
@@ -181,6 +182,7 @@ export function MapCanvas() {
   useExitAlerts();
   const systems              = useMapStore((s) => s.map.systems);
   const connections          = useMapStore((s) => s.map.connections);
+  const protectGates         = useMapStore((s) => s.map.protectGates);
   const selectedSystemId     = useMapStore((s) => s.selectedSystemId);
   const selectSystem         = useMapStore((s) => s.selectSystem);
   const selectedConnectionId = useMapStore((s) => s.selectedConnectionId);
@@ -1210,6 +1212,11 @@ export function MapCanvas() {
         edgeSrc?.eveSystemId != null && edgeTgt?.eveSystemId != null
         && isDefiniteWormholeHop(edgeSrc.eveSystemId, edgeTgt.eveSystemId)
       );
+      // Stargate neighbours are joined by their gate, never an Ansiblex. And a
+      // stargate the map protects can be neither removed nor retyped.
+      const gateNeighbours = edgeSrc?.eveSystemId != null && edgeTgt?.eveSystemId != null
+        && isKnownStargateAdjacent(edgeSrc.eveSystemId, edgeTgt.eveSystemId);
+      const lockedGate = isProtectedGate(conn, { protectGates, systems });
       const timeStatus  = conn?.timeStatus  ?? 'fresh';
       const massStatus  = conn?.massStatus  ?? 'stable';
       const eid = contextMenu.edgeId;
@@ -1217,6 +1224,7 @@ export function MapCanvas() {
         {
           label: t('ctxMenu.disconnect'),
           icon: <XIcon size={16} weight="regular" color="#e25a5a" />,
+          disabled: lockedGate,
           action: () => removeConnection(eid),
         },
         { separator: true as const },
@@ -1226,6 +1234,7 @@ export function MapCanvas() {
             {
               label: t('ctxMenu.jumpWormhole'),
               checked: connType === 'standard',
+              disabled: lockedGate,
               action: () => updateConnection(eid, { connectionType: 'standard' }),
             },
             {
@@ -1237,13 +1246,13 @@ export function MapCanvas() {
             {
               label: t('ctxMenu.jumpAnsiblex'),
               checked: connType === 'jumpgate',
-              disabled: touchesJspace && connType !== 'jumpgate',
+              disabled: lockedGate || ((touchesJspace || gateNeighbours) && connType !== 'jumpgate'),
               action: () => updateConnection(eid, { connectionType: 'jumpgate' }),
             },
             {
               label: t('ctxMenu.jumpCyno'),
               checked: connType === 'cyno',
-              disabled: touchesJspace && connType !== 'cyno',
+              disabled: lockedGate || (touchesJspace && connType !== 'cyno'),
               action: () => updateConnection(eid, { connectionType: 'cyno' }),
             },
           ],

@@ -14,7 +14,8 @@ import { TtlValue } from '../utils/cache.js';
  * neighbours:
  *
  *   gate      — the two systems must be stargate neighbours in EVE
- *   jumpgate  — both ends k-space (an Ansiblex is a nullsec structure)
+ *   jumpgate  — both ends k-space (an Ansiblex is a nullsec structure), and
+ *               not already stargate neighbours (that pair is a gate)
  *   cyno      — both ends k-space (a cyno can't be lit in wormhole space)
  *   standard  — always allowed; a wormhole can join anything to anything
  *
@@ -72,6 +73,44 @@ export async function systemEveIds(sourceId: string, targetId: string): Promise<
   return { sourceEveId: byId.get(sourceId) ?? null, targetEveId: byId.get(targetId) ?? null };
 }
 
+/** True when a stargate joins the two systems (either direction). */
+async function stargateNeighbours(a: number, b: number): Promise<boolean> {
+  const { rowCount } = await db.query(
+    `SELECT 1 FROM map_stargates
+      WHERE (system_id = $1 AND destination_system_id = $2)
+         OR (system_id = $2 AND destination_system_id = $1)
+      LIMIT 1`,
+    [a, b],
+  );
+  return (rowCount ?? 0) > 0;
+}
+
+/**
+ * True when this connection is a stargate the map protects: the map has
+ * protect_gates on, the edge is typed 'gate', and its ends really are stargate
+ * neighbours. A 'gate' drawn between non-neighbours (from before the type was
+ * validated) is not protected, so it can still be cleaned up.
+ */
+export async function isProtectedGate(mapId: string, connectionId: string): Promise<boolean> {
+  const { rows } = await db.query<{ src: number | null; tgt: number | null }>(
+    `SELECT s.eve_system_id AS src, t.eve_system_id AS tgt
+       FROM map_connections c
+       JOIN maps m        ON m.id = c.map_id
+       JOIN map_systems s ON s.id = c.source_id
+       JOIN map_systems t ON t.id = c.target_id
+      WHERE c.id = $1 AND c.map_id = $2
+        AND c.connection_type = 'gate' AND m.protect_gates = TRUE`,
+    [connectionId, mapId],
+  );
+  if (!rows.length) return false;
+  const { src, tgt } = rows[0];
+  if (src == null || tgt == null) return false;
+  return stargateNeighbours(src, tgt);
+}
+
+export const PROTECTED_GATE_ERROR =
+  'Stargate connections exist in game and cannot be removed or changed on this map';
+
 /**
  * null when the type is allowed, else a human-readable reason for a 400.
  */
@@ -86,16 +125,15 @@ export async function connectionTypeError(
   if (!(await stargatesSeeded())) return null;                  // no SDE to check against
 
   if (connectionType === 'gate') {
-    const { rowCount } = await db.query(
-      `SELECT 1 FROM map_stargates
-        WHERE (system_id = $1 AND destination_system_id = $2)
-           OR (system_id = $2 AND destination_system_id = $1)
-        LIMIT 1`,
-      [sourceEveId, targetEveId],
-    );
-    return (rowCount ?? 0) > 0
+    return (await stargateNeighbours(sourceEveId, targetEveId))
       ? null
       : 'A stargate connection needs two systems that are stargate neighbours in EVE';
+  }
+
+  // Two systems a stargate already joins are travelled by that gate; an
+  // Ansiblex between them is a mislabelled stargate.
+  if (connectionType === 'jumpgate' && await stargateNeighbours(sourceEveId, targetEveId)) {
+    return 'These systems are joined by a stargate, so they cannot be linked by an Ansiblex';
   }
 
   // jumpgate / cyno: both ends must be k-space, i.e. have stargates of their own.

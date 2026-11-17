@@ -116,6 +116,7 @@ export async function loadFullMap(mapId: string) {
               lazy_remove_wormholes       AS "lazyRemoveWormholes",
               skip_kspace                 AS "skipKspace",
               cross_map_sync              AS "crossMapSync",
+              protect_gates               AS "protectGates",
               collapse_grace_hours        AS "collapseGraceHours",
               bookmark_format             AS "bookmarkFormat",
               site_bookmark_format        AS "siteBookmarkFormat",

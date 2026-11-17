@@ -810,6 +810,7 @@
     "restore": "Wiederherstellen",
     "restoreTitle": "Die Unterbrochen-Markierung entfernen und dies wieder als aktive Verbindung behandeln",
     "gateNote": "Reguläres Stargate — keine Wurmloch-Daten.",
+    "gateProtected": "Stargate-Verbindungen existieren im Spiel und können auf dieser Karte nicht entfernt oder geändert werden.",
     "jumpgateNote": "Ansiblex-Sprungbrücke — keine Wurmloch-Daten."
   },
   "contentFilter": {
@@ -1892,6 +1893,8 @@
     },
     "lazyRemoveWh": "Veraltete Wurmlöcher automatisch entfernen",
     "lazyRemoveWhHint": "Entfernt regelmäßig Wurmloch-Signaturen, die älter als die maximale Lebensdauer ihres Typs sind. Wenn die Sig eine Verbindung gestützt hat, die sonst nichts hält, wird die Verbindung als unterbrochen markiert (Quarantäne) statt gelöscht. Läuft serverseitig und greift daher auch, wenn die Karte nicht geöffnet ist.",
+    "protectGates": "Stargate-Verbindungen schützen",
+    "protectGatesHint": "Verhindert, dass eine Verbindung zwischen zwei im Spiel per Stargate verbundenen Systemen entfernt oder umtypisiert wird. Wird ein System entfernt, verschwinden seine Verbindungen trotzdem.",
     "linkCopied": "Live-Karten-Link kopiert",
     "linkExpiresAfter": "Link läuft ab nach",
     "mapBookmark": "Karten-Lesezeichenformat (geteilt)",

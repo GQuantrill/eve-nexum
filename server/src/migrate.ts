@@ -242,6 +242,12 @@ export async function migrate() {
     -- users fall back to their own nexum.sig.siteBookmarkFormat.
     ALTER TABLE maps ADD COLUMN IF NOT EXISTS site_bookmark_format TEXT;
 
+    -- Stargate links are fixed in the game, so by default a map won't let one
+    -- be deleted or retyped (services/connectionRules.ts). Only applies to a
+    -- 'gate' edge whose ends really are stargate neighbours. Removing a system
+    -- still takes its edges with it.
+    ALTER TABLE maps ADD COLUMN IF NOT EXISTS protect_gates BOOLEAN NOT NULL DEFAULT TRUE;
+
     -- Per-corp Discord notification settings (region filter). No row => the
     -- defaults below => notify for every region. The regions column holds
     -- region NAMES, matched directly against map_systems.region_name.

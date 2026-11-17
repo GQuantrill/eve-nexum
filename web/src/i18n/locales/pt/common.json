@@ -810,6 +810,7 @@
     "restore": "Restaurar",
     "restoreTitle": "Limpar a marca de quebrada e tratar novamente como uma conexão ativa",
     "gateNote": "Stargate normal — sem dados de buraco de minhoca.",
+    "gateProtected": "As conexões por stargate existem no jogo e não podem ser removidas nem alteradas neste mapa.",
     "jumpgateNote": "Ponte Ansiblex — sem dados de buraco de minhoca."
   },
   "contentFilter": {
@@ -1892,6 +1893,8 @@
     },
     "lazyRemoveWh": "Remover automaticamente buracos de minhoca expirados",
     "lazyRemoveWhHint": "Remove periodicamente assinaturas de buraco de minhoca mais antigas que a vida útil máxima do seu tipo. Se a assinatura sustentava uma conexão sem mais nada a segurá-la, a conexão é marcada como quebrada (em quarentena) em vez de eliminada. É executado no servidor, por isso aplica-se mesmo quando o mapa não está aberto.",
+    "protectGates": "Proteger conexões por stargate",
+    "protectGatesHint": "Impede remover ou mudar o tipo de uma conexão entre dois sistemas ligados por uma stargate no jogo. Remover um sistema continua a remover as suas conexões.",
     "linkCopied": "Ligação de mapa em direto copiada",
     "linkExpiresAfter": "A ligação expira após",
     "mapBookmark": "Formato de marcador do mapa (partilhado)",

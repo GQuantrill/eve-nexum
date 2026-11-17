@@ -24,7 +24,9 @@ import { audit } from '../services/audit.js';
 import { publishToMap } from '../services/mapEvents.js';
 import { streamMapEvents } from '../services/mapStream.js';
 import { listVisibleMaps, loadFullMap, loadSystemSignatures, loadSystemAnomalies, loadSystemStructures, CONNECTION_COLS } from '../services/mapRead.js';
-import { connectionTypeError, connectionEndpointEveIds, systemEveIds } from '../services/connectionRules.js';
+import {
+  connectionTypeError, connectionEndpointEveIds, systemEveIds, isProtectedGate, PROTECTED_GATE_ERROR,
+} from '../services/connectionRules.js';
 import { sdeSystemFacts } from '../services/sdeFacts.js';
 import { contributorIsAtSystem, contributorMayLinkSystems } from '../services/contributorMovement.js';
 import { listConnectionJumps, recordConnectionJump, setConnectionJumpHot, clearConnectionJumps } from '../services/connectionJumps.js';
@@ -2764,10 +2766,10 @@ mapsRouter.post('/:mapId/presence', async (req, res) => {
 // toggle merge-source eligibility (corp maps, full/admin only)
 mapsRouter.patch('/:mapId', async (req, res) => {
   const { mapId } = req.params;
-  const { name, locked, allowAsMergeSource, allowAsMergeDestination, lazyRemoveWormholes, collapseGraceHours, bookmarkFormat, siteBookmarkFormat, skipKspace, crossMapSync } = req.body as {
+  const { name, locked, allowAsMergeSource, allowAsMergeDestination, lazyRemoveWormholes, collapseGraceHours, bookmarkFormat, siteBookmarkFormat, skipKspace, crossMapSync, protectGates } = req.body as {
     name?: string; locked?: boolean; allowAsMergeSource?: boolean; allowAsMergeDestination?: boolean;
     lazyRemoveWormholes?: boolean; collapseGraceHours?: number; bookmarkFormat?: string | null; siteBookmarkFormat?: string | null; skipKspace?: boolean;
-    crossMapSync?: boolean;
+    crossMapSync?: boolean; protectGates?: boolean;
   };
 
   const access = await requireMapWrite(res, mapId, req);
@@ -2854,6 +2856,24 @@ mapsRouter.patch('/:mapId', async (req, res) => {
     }
     sets.push(`cross_map_sync = $${vals.length + 1}`); vals.push(crossMapSync === true);
   }
+  // Stargate protection -- a guard on everyone's edits, so whoever may set the
+  // map's shared policies may switch it: the owner of a personal map; on a corp
+  // map full or admin; on an alliance map full or alliance admin. Never a
+  // shared recipient.
+  if (protectGates !== undefined) {
+    if (access.accessKind === 'shared') {
+      res.status(403).json({ error: 'Only the map owner can change stargate protection' }); return;
+    }
+    if (access.corpId !== null || access.allianceId !== null) {
+      const role = req.session.role ?? 'readonly';
+      const allianceScoped = access.allianceId !== null;
+      const allowed = role === 'full' || (allianceScoped ? isAllianceAdmin(role) : isAdmin(role));
+      if (!allowed) {
+        res.status(403).json({ error: allianceScoped ? 'Full or alliance-admin access required' : 'Full or admin access required' }); return;
+      }
+    }
+    sets.push(`protect_gates = $${vals.length + 1}`); vals.push(protectGates === true);
+  }
   // Lazy WH-removal opt-in: a plain per-map behaviour toggle any editor can set
   // (no corp/admin gate). The sweep itself runs server-side on this cadence.
   if (lazyRemoveWormholes !== undefined) {
@@ -2923,6 +2943,7 @@ mapsRouter.patch('/:mapId', async (req, res) => {
       ...(allowAsMergeDestination !== undefined ? { allowAsMergeDestination: allowAsMergeDestination === true } : {}),
       ...(skipKspace !== undefined ? { skipKspace: skipKspace === true } : {}),
       ...(crossMapSync !== undefined ? { crossMapSync: crossMapSync === true } : {}),
+      ...(protectGates !== undefined ? { protectGates: protectGates === true } : {}),
       ...(lazyRemoveWormholes !== undefined ? { lazyRemoveWormholes: lazyRemoveWormholes === true } : {}),
       ...(normalizedGrace !== undefined ? { collapseGraceHours: normalizedGrace } : {}),
       ...(normalizedBookmarkFmt !== undefined ? { bookmarkFormat: normalizedBookmarkFmt } : {}),
@@ -2931,7 +2952,7 @@ mapsRouter.patch('/:mapId', async (req, res) => {
     const settings = {
       name, locked, allowAsMergeSource, allowAsMergeDestination, lazyRemoveWormholes,
       collapseGraceHours: normalizedGrace, bookmarkFormat: normalizedBookmarkFmt,
-      siteBookmarkFormat: normalizedSiteBookmarkFmt, skipKspace, crossMapSync,
+      siteBookmarkFormat: normalizedSiteBookmarkFmt, skipKspace, crossMapSync, protectGates,
     };
     const values = Object.fromEntries(Object.entries(settings).filter(([, v]) => v !== undefined));
     recordMapAudit(req, mapId, { action: 'map.update', targetId: mapId, details: { fields: Object.keys(values), values } });
@@ -3890,6 +3911,10 @@ mapsRouter.patch('/:mapId/connections/:connectionId', async (req, res) => {
   if ('connectionType' in updates) {
     const next = updates.connectionType;
     if (typeof next !== 'string') { res.status(400).json({ error: 'invalid connectionType' }); return; }
+    // Retyping a protected stargate would remove it as surely as deleting it.
+    if (next !== 'gate' && await isProtectedGate(mapId, connectionId)) {
+      res.status(409).json({ error: PROTECTED_GATE_ERROR }); return;
+    }
     const ep = await connectionEndpointEveIds(mapId, connectionId);
     if (ep) {
       const err = await connectionTypeError(next, ep);
@@ -4044,6 +4069,10 @@ mapsRouter.delete('/:mapId/connections/:connectionId', async (req, res) => {
   const { mapId, connectionId } = req.params;
   const access = await requireMapWrite(res, mapId, req);
   if (!access) return;
+  // A stargate is fixed in the game; on a map protecting them it stays drawn.
+  if (await isProtectedGate(mapId, connectionId)) {
+    res.status(409).json({ error: PROTECTED_GATE_ERROR }); return;
+  }
   const { rows: removedConn } = await db.query<{ sourceId: string; targetId: string }>(
     `DELETE FROM map_connections WHERE id = $1 AND map_id = $2
      RETURNING source_id AS "sourceId", target_id AS "targetId"`,

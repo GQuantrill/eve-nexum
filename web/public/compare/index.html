@@ -4,9 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>EVE Online Wormhole Mapper Comparison: Nexum vs Pathfinder vs Tripwire vs Wanderer (2026)</title>
-    <meta name="description" content="An honest, up-to-date comparison of the top EVE Online wormhole mapping tools — Nexum, Pathfinder, Tripwire and Wanderer. Compare open-source vs hosted, self-hosting, real-time sync, signatures, mass/rolling tracking, tech stack and cost." />
-    <meta name="keywords" content="EVE Online wormhole mapper comparison, best wormhole mapper, Pathfinder alternative, Tripwire alternative, Wanderer, Nexum, EVE mapping tool, wormhole mapping, J-space, self-hosted EVE tools" />
+    <title>EVE Online Wormhole Mapper Comparison: Nexum vs Pathfinder vs Tripwire vs Wanderer vs Wayfinder (2026)</title>
+    <meta name="description" content="An honest, up-to-date comparison of the top EVE Online wormhole mapping tools — Nexum, Pathfinder, Tripwire, Wanderer and Wayfinder. Compare open-source vs hosted, self-hosting, real-time sync, signatures, mass/rolling tracking, tech stack and cost." />
+    <meta name="keywords" content="EVE Online wormhole mapper comparison, best wormhole mapper, Pathfinder alternative, Tripwire alternative, Wanderer, Wayfinder, Nexum, EVE mapping tool, wormhole mapping, J-space, self-hosted EVE tools" />
     <meta name="author" content="Area 404" />
     <meta name="theme-color" content="#06080f" />
 
@@ -20,13 +20,13 @@
     <!-- Open Graph -->
     <meta property="og:type"        content="article" />
     <meta property="og:url"         content="https://eve-nexum.com/compare/" />
-    <meta property="og:title"       content="EVE Wormhole Mapper Comparison: Nexum vs Pathfinder vs Tripwire vs Wanderer" />
+    <meta property="og:title"       content="EVE Wormhole Mapper Comparison: Nexum vs Pathfinder vs Tripwire vs Wanderer vs Wayfinder" />
     <meta property="og:description" content="An honest comparison of the top EVE Online wormhole mapping tools — open-source vs hosted, real-time sync, signatures, mass/rolling tracking and cost." />
     <meta property="og:image"       content="https://eve-nexum.com/hero.png" />
     <meta property="og:site_name"   content="Nexum" />
     <meta property="og:locale"      content="en_GB" />
     <meta name="twitter:card"        content="summary_large_image" />
-    <meta name="twitter:title"       content="EVE Wormhole Mapper Comparison: Nexum vs Pathfinder vs Tripwire vs Wanderer" />
+    <meta name="twitter:title"       content="EVE Wormhole Mapper Comparison: Nexum vs Pathfinder vs Tripwire vs Wanderer vs Wayfinder" />
     <meta name="twitter:description" content="An honest comparison of the top EVE Online wormhole mapping tools." />
     <meta name="twitter:image"       content="https://eve-nexum.com/hero.png" />
 
@@ -34,8 +34,8 @@
     {
       "@context": "https://schema.org",
       "@type": "TechArticle",
-      "headline": "EVE Online Wormhole Mapper Comparison: Nexum vs Pathfinder vs Tripwire vs Wanderer",
-      "description": "An honest, up-to-date comparison of the top EVE Online wormhole mapping tools — Nexum, Pathfinder, Tripwire and Wanderer.",
+      "headline": "EVE Online Wormhole Mapper Comparison: Nexum vs Pathfinder vs Tripwire vs Wanderer vs Wayfinder",
+      "description": "An honest, up-to-date comparison of the top EVE Online wormhole mapping tools — Nexum, Pathfinder, Tripwire, Wanderer and Wayfinder.",
       "datePublished": "2026-05-27",
       "dateModified": "2026-05-27",
       "author": { "@type": "Organization", "name": "Area 404", "url": "https://area404.org" },
@@ -45,7 +45,8 @@
         { "@type": "SoftwareApplication", "name": "Nexum", "applicationCategory": "Utility", "url": "https://eve-nexum.com/" },
         { "@type": "SoftwareApplication", "name": "Pathfinder", "applicationCategory": "Utility", "url": "https://github.com/exodus4d/pathfinder" },
         { "@type": "SoftwareApplication", "name": "Tripwire", "applicationCategory": "Utility", "url": "https://bitbucket.org/daimian/tripwire" },
-        { "@type": "SoftwareApplication", "name": "Wanderer", "applicationCategory": "Utility", "url": "https://wanderer.ltd/" }
+        { "@type": "SoftwareApplication", "name": "Wanderer", "applicationCategory": "Utility", "url": "https://wanderer.ltd/" },
+        { "@type": "SoftwareApplication", "name": "Wayfinder", "applicationCategory": "Utility", "url": "https://evewayfinder.app/" }
       ]
     }
     </script>
@@ -128,6 +129,7 @@
       .card.pf { border-left-color: var(--amber); }
       .card.tw { border-left-color: var(--green); }
       .card.wd { border-left-color: #b07cff; }
+      .card.wf { border-left-color: #4fb3bf; }
       ul { padding-left: 20px; }
       li { margin: 4px 0; }
       .cta { background: var(--panel2); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; margin: 36px 0 0; text-align: center; }
@@ -152,10 +154,10 @@
 
       <header class="hero">
         <img class="logo" src="/screen.png" alt="Nexum" width="48" height="48" />
-        <h1 data-i18n="h1">EVE Online Wormhole Mapper Comparison:<br />Nexum vs Pathfinder vs Tripwire vs Wanderer</h1>
+        <h1 data-i18n="h1">EVE Online Wormhole Mapper Comparison:<br />Nexum vs Pathfinder vs Tripwire vs Wanderer vs Wayfinder</h1>
         <p class="sub" data-i18n="sub">How the leading EVE Online wormhole mappers compare — and why Nexum does the most out of the box.</p>
       </header>
-      <p class="updated" data-i18n="upd">Last updated 27 May 2026 · maintained by the Nexum team</p>
+      <p class="updated" data-i18n="upd">Last updated 17 November 2026 · maintained by the Nexum team</p>
 
       <p class="lede" data-i18n="lede">
         If you scout or live in J-space, a good wormhole mapper is essential.
@@ -164,8 +166,8 @@
         real-time chain mapping, signatures and mass tracking, and then goes
         further with a proper wormhole rolling calculator, whole-region map
         seeding, standings &amp; sov overlays and Discord alerts. Below it's compared with the other common choices —
-        <strong>Tripwire</strong>, <strong>Pathfinder</strong> and
-        <strong>Wanderer</strong>. We make Nexum, so naturally we think it's the
+        <strong>Tripwire</strong>, <strong>Pathfinder</strong>,
+        <strong>Wanderer</strong> and <strong>Wayfinder</strong>. We make Nexum, so naturally we think it's the
         strongest pick for most corps — but we've kept the competitor facts
         accurate and linked so you can judge for yourself.
       </p>
@@ -173,7 +175,7 @@
       <h2 data-i18n="h2Glance">At a glance</h2>
       <div class="table-scroll">
         <table>
-          <caption data-i18n="cap1">Core comparison. Verified May 2026 — competitor features change; follow the links to confirm.</caption>
+          <caption data-i18n="cap1">Core comparison. Verified May 2026 (Wayfinder November 2026) — competitor features change; follow the links to confirm.</caption>
           <thead>
             <tr>
               <th scope="col">&nbsp;</th>
@@ -181,6 +183,7 @@
               <th scope="col">Pathfinder</th>
               <th scope="col">Tripwire</th>
               <th scope="col">Wanderer</th>
+              <th scope="col">Wayfinder</th>
             </tr>
           </thead>
           <tbody>
@@ -190,6 +193,7 @@
               <td data-i18n="yes"><span class="yes">Yes</span></td>
               <td data-i18n="yes"><span class="yes">Yes</span></td>
               <td data-i18n="yesMit"><span class="yes">Yes</span> (MIT)</td>
+              <td data-i18n="wfOpen"><span class="no">No</span> — closed source</td>
             </tr>
             <tr>
               <th scope="row" data-i18n="gSelfHost">Self-hostable</th>
@@ -197,6 +201,7 @@
               <td data-i18n="yes"><span class="yes">Yes</span></td>
               <td data-i18n="yesDocker"><span class="yes">Yes</span> (Docker)</td>
               <td data-i18n="yesCe"><span class="yes">Yes</span> (Community Edition)</td>
+              <td data-i18n="wfSelf"><span class="no">No</span> — hosted only</td>
             </tr>
             <tr>
               <th scope="row" data-i18n="gCloud">Managed cloud option</th>
@@ -204,10 +209,12 @@
               <td data-i18n="gCloudP"><span class="meh">Community-run instances</span></td>
               <td data-i18n="gCloudT"><span class="meh">Public host closed 2024</span></td>
               <td data-i18n="gCloudW"><span class="meh">Paid</span> — “Wanderer Cloud” needs a map subscription</td>
+              <td data-i18n="wfCloud"><span class="yes">Yes</span> — the only way to use it; free tier, paid extras</td>
             </tr>
             <tr>
               <th scope="row" data-i18n="gSso">EVE SSO login</th>
               <td class="nexum" data-i18n="yes"><span class="yes">Yes</span></td>
+              <td data-i18n="yes"><span class="yes">Yes</span></td>
               <td data-i18n="yes"><span class="yes">Yes</span></td>
               <td data-i18n="yes"><span class="yes">Yes</span></td>
               <td data-i18n="yes"><span class="yes">Yes</span></td>
@@ -218,10 +225,12 @@
               <td data-i18n="yes"><span class="yes">Yes</span></td>
               <td data-i18n="yes"><span class="yes">Yes</span></td>
               <td data-i18n="yes"><span class="yes">Yes</span></td>
+              <td data-i18n="yes"><span class="yes">Yes</span></td>
             </tr>
             <tr>
               <th scope="row" data-i18n="gSigPaste">Signature paste &amp; tracking</th>
               <td class="nexum" data-i18n="yes"><span class="yes">Yes</span></td>
+              <td data-i18n="yes"><span class="yes">Yes</span></td>
               <td data-i18n="yes"><span class="yes">Yes</span></td>
               <td data-i18n="yes"><span class="yes">Yes</span></td>
               <td data-i18n="yes"><span class="yes">Yes</span></td>
@@ -232,6 +241,7 @@
               <td data-i18n="no"><span class="no">No</span></td>
               <td data-i18n="no"><span class="no">No</span></td>
               <td data-i18n="no"><span class="no">No</span></td>
+              <td data-i18n="yes"><span class="yes">Yes</span></td>
             </tr>
             <tr>
               <th scope="row" data-i18n="gKill">Live kill feed</th>
@@ -239,6 +249,7 @@
               <td data-i18n="no"><span class="no">No</span></td>
               <td data-i18n="no"><span class="no">No</span></td>
               <td data-i18n="no"><span class="no">No</span></td>
+              <td data-i18n="wfKill"><span class="yes">Yes</span> — server-side zKill feed + map killboard</td>
             </tr>
             <tr>
               <th scope="row" data-i18n="gMass">Wormhole mass / rolling</th>
@@ -246,6 +257,7 @@
               <td data-i18n="massStatus">Mass status tracking</td>
               <td data-i18n="massStatus">Mass status tracking</td>
               <td data-i18n="massStatus">Mass status tracking</td>
+              <td data-i18n="wfMass">Rolling calculator (±10% variance, stranding warnings)</td>
             </tr>
             <tr>
               <th scope="row" data-i18n="gMultiLingual">Multi-lingual</th>
@@ -253,6 +265,7 @@
               <td data-i18n="no"><span class="no">No</span></td>
               <td data-i18n="no"><span class="no">No</span></td>
               <td data-i18n="no"><span class="no">No</span></td>
+              <td data-i18n="wfLang"><span class="no">No</span> — English only</td>
             </tr>
             <tr>
               <th scope="row" data-i18n="gTech">Tech stack</th>
@@ -260,6 +273,7 @@
               <td>PHP · MySQL</td>
               <td>PHP · MySQL</td>
               <td>Elixir · React · Postgres</td>
+              <td data-i18n="wfTech">Not published</td>
             </tr>
             <tr>
               <th scope="row" data-i18n="gCost">Cost</th>
@@ -267,6 +281,7 @@
               <td data-i18n="free"><span class="yes">Free</span></td>
               <td data-i18n="free"><span class="yes">Free</span></td>
               <td data-i18n="freeBoth"><span class="yes">Free</span> self-host · <span class="meh">paid cloud</span></td>
+              <td data-i18n="wfCost"><span class="yes">Free</span> tier (one map, 50 systems) · <span class="meh">paid extras in ISK</span> — too small for most whole regions</td>
             </tr>
           </tbody>
         </table>
@@ -274,9 +289,10 @@
 
       <h2 data-i18n="h2Further">Where Nexum goes further</h2>
       <p data-i18n="furtherIntro">
-        All four handle the basics well. These are the capabilities Nexum builds
-        in that the others generally don't offer as documented, out-of-the-box
-        features — the reasons corps choose it:
+        All five handle the basics well. These are the capabilities Nexum builds
+        in that the others mostly don't offer as documented, out-of-the-box
+        features — the reasons corps choose it. Wayfinder, the newest, matches
+        several of them, so it gets its own column:
       </p>
       <div class="table-scroll">
         <table>
@@ -285,6 +301,7 @@
             <tr>
               <th scope="col" data-i18n="fFeature">Feature</th>
               <th scope="col" class="nexum">Nexum</th>
+              <th scope="col">Wayfinder</th>
               <th scope="col">Pathfinder · Tripwire · Wanderer</th>
             </tr>
           </thead>
@@ -292,56 +309,85 @@
             <tr>
               <th scope="row" data-i18n="f1h">Wormhole <strong>rolling calculator</strong> — models the ±10% mass variance, cold/hot roller with side tracking, and warns before a pass strands your roller or collapses the hole</th>
               <td class="nexum"><span class="yes">✓</span></td>
+              <td><span class="yes">✓</span></td>
               <td data-i18n="f1o">Basic mass-status tracking</td>
             </tr>
             <tr>
               <th scope="row" data-i18n="f2h"><strong>Seed a map from an entire EVE region</strong> — Dotlan-style auto-layout with every in-region stargate pre-drawn</th>
               <td class="nexum"><span class="yes">✓</span></td>
+              <td data-i18n="wfF2"><span class="meh">Paid</span> for most regions — 53 of 68 are over the free 50-system cap</td>
               <td>—</td>
             </tr>
             <tr>
               <th scope="row" data-i18n="f3h"><strong>Merge two maps</strong> into one, de-duplicating systems and folding in signatures, structures and notes</th>
               <td class="nexum"><span class="yes">✓</span></td>
               <td>—</td>
+              <td>—</td>
             </tr>
             <tr>
               <th scope="row" data-i18n="f9h"><strong>Cross-map sync</strong> — scanning a system on one map auto-fills its signatures and anomalies onto the same system on your other maps, non-destructively (personal maps with your personal maps, corp maps with the corp's)</th>
               <td class="nexum"><span class="yes">✓</span></td>
               <td>—</td>
+              <td>—</td>
             </tr>
             <tr>
               <th scope="row" data-i18n="f4h"><strong>Discord notifications</strong> — inbound K162 and new-connection alerts pushed to your channel, even when no one's watching the map</th>
               <td class="nexum"><span class="yes">✓</span></td>
+              <td><span class="yes">✓</span></td>
               <td>—</td>
             </tr>
             <tr>
               <th scope="row" data-i18n="f11h"><strong>Voice announcements</strong> — on-device text-to-speech reads live intel aloud (character connects, incursions, low/null-sec in range, kills, new chains), running entirely in your browser</th>
               <td class="nexum"><span class="yes">✓</span></td>
               <td>—</td>
+              <td>—</td>
             </tr>
             <tr>
               <th scope="row" data-i18n="f5h"><strong>Standings &amp; sovereignty overlay</strong> driven by your own EVE contacts — hostile/friendly tinting across the chain, killboard and sov halos</th>
               <td class="nexum"><span class="yes">✓</span></td>
+              <td><span class="yes">✓</span></td>
               <td>—</td>
             </tr>
             <tr>
               <th scope="row" data-i18n="f6h"><strong>Live map-viewer presence</strong> — a dot for everyone viewing the map, not just your fleet — plus fleet positions</th>
               <td class="nexum"><span class="yes">✓</span></td>
+              <td data-i18n="wfF6">Roster of pilots on the map</td>
               <td data-i18n="f6o">Fleet positions vary</td>
             </tr>
             <tr>
               <th scope="row" data-i18n="f7h"><strong>Environmental intel layers</strong> — null-sec storms, A0 suns, ice belts, chain wormhole effects, and incursion / insurgency proximity alerts</th>
               <td class="nexum"><span class="yes">✓</span></td>
+              <td data-i18n="wfF7">A0 suns and ice; no storms or incursions</td>
               <td>—</td>
             </tr>
             <tr>
               <th scope="row" data-i18n="f8h"><strong>Corp suite</strong> — roles, shared maps, admin dashboard, users &amp; systems reports, audit log, and per-character attribution</th>
               <td class="nexum"><span class="yes">✓</span></td>
+              <td data-i18n="wfF8">Roles and audit log</td>
               <td data-i18n="f8o">Varies</td>
             </tr>
             <tr>
               <th scope="row" data-i18n="f10h"><strong>Colour-blind modes</strong> — deuteranopia, protanopia and tritanopia palettes that re-map every status, class and standings colour across the whole app</th>
               <td class="nexum"><span class="yes">✓</span></td>
+              <td>—</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <th scope="row" data-i18n="f12h"><strong>Capital jump planner</strong> — multi-hop jump-drive routes between low/null systems for your ship class and skills, with light-years per hop, an isotope estimate, jump fatigue and saved plans</th>
+              <td class="nexum"><span class="yes">✓</span></td>
+              <td>—</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <th scope="row" data-i18n="f13h"><strong>Chain exits</strong> — every way out of your chain at a glance, and which exit gets you nearest each of your favourite systems</th>
+              <td class="nexum"><span class="yes">✓</span></td>
+              <td>—</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <th scope="row" data-i18n="f14h"><strong>Map heatmaps</strong> — tint every system on the map by ship kills, pod kills, NPC kills, jumps or fleet presence</th>
+              <td class="nexum"><span class="yes">✓</span></td>
+              <td>—</td>
               <td>—</td>
             </tr>
           </tbody>
@@ -367,7 +413,7 @@
         <p data-i18n="pfP">
           The most mature and feature-dense self-hosted mapper. It pioneered a lot
           of what wormholers expect — rich wormhole data, Thera connections via
-          EVE-Scout, a live zKillboard killstream, a plugin API and more. The
+          EVE-Scout, zKillboard kill statistics (an hourly feed, not live), a plugin API and more. The
           trade-off is operational weight: it's a PHP/MySQL stack that takes more
           effort to set up and keep updated than a single-container app.
         </p>
@@ -379,11 +425,29 @@
         <p data-i18n="wdP">
           The modern challenger, billed as a light, fast alternative to Pathfinder.
           Built on Elixir/Phoenix with a React front end and open-sourced under MIT,
-          it's the only one of the four with an <em>official managed cloud</em>
-          version — so a group can use it without running any infrastructure — while
-          still offering a free self-hosted Community Edition.
+          it offers an <em>official managed cloud</em> version — so a group can use
+          it without running any infrastructure — and, unlike the hosted-only
+          Wayfinder, a free self-hosted Community Edition too.
         </p>
         <p data-i18n="wdBest"><strong>Best for:</strong> groups who want a polished UI and the option to skip self-hosting entirely. <a href="https://wanderer.ltd/">Website &rarr;</a> · <a href="https://github.com/wanderer-industries/wanderer">GitHub &rarr;</a></p>
+      </div>
+
+      <div class="card wf">
+        <h3>Wayfinder</h3>
+        <p data-i18n="wfP">
+          The newest mapper here, and the only one that is hosted-only and closed
+          source by design: you log in and they run everything. It is built around
+          keeping the map faithful to the game — stargates come from the game data
+          and can't be faked or deleted, and jump bridges only link null-sec
+          systems. It also has a rolling calculator, region seeding, d-scan on the
+          map, standings and sov overlays, Discord alerts, and imports from other
+          mappers, Nexum included. The free tier covers one map of up to 50 systems
+          and your main character; extra maps, systems and tracked alts are paid
+          monthly in ISK. That cap matters for region seeding: 53 of EVE's 68
+          k-space regions have more than 50 systems, so seeding most of them
+          means paying. Checked November 2026.
+        </p>
+        <p data-i18n="wfBest"><strong>Best for:</strong> groups happy for someone else to run the mapper, and to pay ISK once they outgrow one small map. <a href="https://evewayfinder.app/">Website &rarr;</a></p>
       </div>
 
       <div class="card">
@@ -463,8 +527,8 @@
       </div>
 
       <footer>
-        <p data-i18n="footP1">Comparison maintained by the Nexum team · last verified May 2026. Competitor details change over time — follow the links above to confirm current features. Spotted an inaccuracy? <a href="https://github.com/GQuantrill/eve-nexum/issues">Open an issue</a>.</p>
-        <p data-i18n="footP2">EVE Online and the EVE logo are the registered trademarks of CCP hf. All rights reserved worldwide. Nexum is a third-party tool and is not affiliated with or endorsed by CCP hf., Pathfinder, Tripwire or Wanderer. See the full <a href="/license/">license &amp; EVE IP notice</a>.</p>
+        <p data-i18n="footP1">Comparison maintained by the Nexum team · last verified May 2026 (Wayfinder November 2026). Competitor details change over time — follow the links above to confirm current features. Spotted an inaccuracy? <a href="https://github.com/GQuantrill/eve-nexum/issues">Open an issue</a>.</p>
+        <p data-i18n="footP2">EVE Online and the EVE logo are the registered trademarks of CCP hf. All rights reserved worldwide. Nexum is a third-party tool and is not affiliated with or endorsed by CCP hf., Pathfinder, Tripwire, Wanderer or Wayfinder. See the full <a href="/license/">license &amp; EVE IP notice</a>.</p>
       </footer>
     </div>
 
@@ -496,15 +560,15 @@
 
           var DICTS = {};
           DICTS.de = {
-            __title: 'EVE Online Wurmloch-Mapper-Vergleich: Nexum vs Pathfinder vs Tripwire vs Wanderer (2026)',
+            __title: 'EVE Online Wurmloch-Mapper-Vergleich: Nexum vs Pathfinder vs Tripwire vs Wanderer vs Wayfinder (2026)',
             nav: '&larr; Nexum Startseite',
-            h1: 'EVE Online Wurmloch-Mapper-Vergleich:<br />Nexum vs Pathfinder vs Tripwire vs Wanderer',
+            h1: 'EVE Online Wurmloch-Mapper-Vergleich:<br />Nexum vs Pathfinder vs Tripwire vs Wanderer vs Wayfinder',
             sub: 'Wie sich die führenden Wurmloch-Mapper für EVE Online vergleichen — und warum Nexum von Haus aus am meisten kann.',
-            upd: 'Zuletzt aktualisiert am 27. Mai 2026 · gepflegt vom Nexum-Team',
-            lede: 'Wenn du in J-Space scoutest oder lebst, ist ein guter Wurmloch-Mapper unverzichtbar. <strong>Nexum</strong> ist ein moderner Open-Source-Mapper — nutze die kostenlose gehostete Version oder hoste selbst — der den gesamten Workflow abdeckt: Echtzeit-Kettenkartierung, Signaturen und Massenverfolgung, und dann geht er weiter mit einem echten Wurmloch-Rolling-Rechner, dem Seeding ganzer Regionen, Standings- &amp; Sov-Overlays und Discord-Alarmen. Unten wird er mit den anderen gängigen Optionen verglichen — <strong>Tripwire</strong>, <strong>Pathfinder</strong> und <strong>Wanderer</strong>. Wir entwickeln Nexum, also halten wir es natürlich für die stärkste Wahl für die meisten Corps — aber wir haben die Fakten zur Konkurrenz korrekt und verlinkt gehalten, damit du selbst urteilen kannst.',
+            upd: 'Zuletzt aktualisiert am 17. November 2026 · gepflegt vom Nexum-Team',
+            lede: 'Wenn du in J-Space scoutest oder lebst, ist ein guter Wurmloch-Mapper unverzichtbar. <strong>Nexum</strong> ist ein moderner Open-Source-Mapper — nutze die kostenlose gehostete Version oder hoste selbst — der den gesamten Workflow abdeckt: Echtzeit-Kettenkartierung, Signaturen und Massenverfolgung, und dann geht er weiter mit einem echten Wurmloch-Rolling-Rechner, dem Seeding ganzer Regionen, Standings- &amp; Sov-Overlays und Discord-Alarmen. Unten wird er mit den anderen gängigen Optionen verglichen — <strong>Tripwire</strong>, <strong>Pathfinder</strong>, <strong>Wanderer</strong> und <strong>Wayfinder</strong>. Wir entwickeln Nexum, also halten wir es natürlich für die stärkste Wahl für die meisten Corps — aber wir haben die Fakten zur Konkurrenz korrekt und verlinkt gehalten, damit du selbst urteilen kannst.',
 
             h2Glance: 'Auf einen Blick',
-            cap1: 'Kernvergleich. Verifiziert im Mai 2026 — die Funktionen der Konkurrenz ändern sich; folge den Links zur Bestätigung.',
+            cap1: 'Kernvergleich. Verifiziert im Mai 2026 (Wayfinder im November 2026) — die Funktionen der Konkurrenz ändern sich; folge den Links zur Bestätigung.',
             gOpenSource: 'Open Source',
             gSelfHost: 'Selbst hostbar',
             gCloud: 'Verwaltete Cloud-Option',
@@ -535,7 +599,7 @@
             gKillN: '<span class="yes">Ja</span> — Live-zKill-Feed + Kill-Log-Panel',
             f11h: '<strong>Sprachansagen</strong> — geräteinterne Sprachausgabe liest Live-Intel vor (Charakter-Logins, Inkursionen, Low-/Nullsec in Reichweite, Kills, neue Ketten) und läuft komplett im Browser',
             h2Further: 'Wo Nexum weiter geht',
-            furtherIntro: 'Alle vier beherrschen die Grundlagen gut. Dies sind die Fähigkeiten, die Nexum eingebaut hat und die die anderen in der Regel nicht als dokumentierte, sofort einsatzbereite Funktionen bieten — die Gründe, warum Corps es wählen:',
+            furtherIntro: 'Alle fünf beherrschen die Grundlagen gut. Dies sind die Fähigkeiten, die Nexum eingebaut hat und die die anderen meist nicht als dokumentierte, sofort einsatzbereite Funktionen bieten — die Gründe, warum Corps es wählen. Wayfinder, der neueste, hat einige davon, deshalb bekommt er eine eigene Spalte:',
             cap2: 'Nexums besondere Funktionen. „—“ bedeutet, dass es keine dokumentierte, eingebaute Kernfunktion dieser Tools ist (Funktionen ändern sich — nutze die Links unten zur Überprüfung).',
             fFeature: 'Funktion',
             f1h: 'Wurmloch-<strong>Rolling-Rechner</strong> — modelliert die ±10%-Massenvarianz, kalter/heißer Roller mit Seitenverfolgung und warnt, bevor ein Durchflug deinen Roller strandet oder das Loch schließt',
@@ -555,9 +619,9 @@
             h2Detail: 'Die Tools im Detail',
             twP: 'Der klassische, signaturorientierte Wurmloch-Mapper, mit dem ein großer Teil der J-Space-Spieler aufgewachsen ist. Er ist schnell, fokussiert, und der Workflow sitzt bei Veteranen im Muskelgedächtnis. Die langlebige öffentliche Instanz (tripwire.eve-apps.com) wurde Mitte 2024 abgeschaltet, aber Tripwire ist Open Source und lebt daher durch Selbst-Hosting und von der Community betriebene Instanzen weiter.',
             twBest: '<strong>Am besten für:</strong> Gruppen, die den vertrauten Tripwire-Signatur-Workflow wollen und bereit sind, selbst zu hosten. <a href="https://bitbucket.org/daimian/tripwire">Quelle &rarr;</a>',
-            pfP: 'Der ausgereifteste und funktionsreichste selbst gehostete Mapper. Er hat vieles geprägt, was Wurmlochbewohner erwarten — reichhaltige Wurmlochdaten, Thera-Verbindungen über EVE-Scout, einen Live-zKillboard-Killstream, eine Plugin-API und mehr. Der Kompromiss ist der Betriebsaufwand: Es ist ein PHP/MySQL-Stack, der mehr Aufwand zum Einrichten und Aktualisieren erfordert als eine Single-Container-App.',
+            pfP: 'Der ausgereifteste und funktionsreichste selbst gehostete Mapper. Er hat vieles geprägt, was Wurmlochbewohner erwarten — reichhaltige Wurmlochdaten, Thera-Verbindungen über EVE-Scout, zKillboard-Kill-Statistiken (stündlicher Feed, nicht live), eine Plugin-API und mehr. Der Kompromiss ist der Betriebsaufwand: Es ist ein PHP/MySQL-Stack, der mehr Aufwand zum Einrichten und Aktualisieren erfordert als eine Single-Container-App.',
             pfBest: '<strong>Am besten für:</strong> Gruppen, die maximale Funktionen wollen und nichts dagegen haben, einen schwereren Stack zu betreiben. <a href="https://github.com/exodus4d/pathfinder">GitHub &rarr;</a>',
-            wdP: 'Der moderne Herausforderer, angepriesen als leichte, schnelle Alternative zu Pathfinder. Gebaut auf Elixir/Phoenix mit einem React-Frontend und unter MIT quelloffen, ist er der einzige der vier mit einer <em>offiziellen verwalteten Cloud</em>-Version — sodass eine Gruppe ihn nutzen kann, ohne jegliche Infrastruktur zu betreiben — und bietet trotzdem eine kostenlose selbst gehostete Community Edition.',
+            wdP: 'Der moderne Herausforderer, angepriesen als leichte, schnelle Alternative zu Pathfinder. Gebaut auf Elixir/Phoenix mit einem React-Frontend und unter MIT quelloffen, bietet er eine <em>offizielle verwaltete Cloud</em>-Version — sodass eine Gruppe ihn nutzen kann, ohne jegliche Infrastruktur zu betreiben — und, anders als der nur gehostete Wayfinder, auch eine kostenlose selbst gehostete Community Edition.',
             wdBest: '<strong>Am besten für:</strong> Gruppen, die eine polierte Oberfläche wollen und die Option, das Selbst-Hosting ganz zu überspringen. <a href="https://wanderer.ltd/">Webseite &rarr;</a> · <a href="https://github.com/wanderer-industries/wanderer">GitHub &rarr;</a>',
             nxP: 'Ein moderner, quelloffener, selbst gehosteter Mapper, der zuerst für Corps gebaut wurde. Er deckt den Kern-Workflow ab — Echtzeit-Zusammenarbeit bei der Kartierung (Live-Änderungen für alle auf der Karte), Signatur-Einfügen mit Wurmloch-Alterung und Verbindungsverfolgung — und legt Extras obendrauf, die auf das Betreiben der Kette einer Corp abzielen:',
             nxLi1: '<strong>Wurmloch-Rolling-Rechner</strong>, der die ±10%-Massenvarianz modelliert, jeden Durchflug als sicher / könnte-schließen / wird-schließen prognostiziert und warnt, bevor ein Durchflug deinen Roller stranden würde.',
@@ -595,18 +659,35 @@
             ctaP: '<strong>Nexum ist kostenlos.</strong> Nutze die gehostete Version oder hoste die Kette deiner Corp in Minuten selbst.',
             ctaBtn: 'Jetzt loslegen',
             ctaGh: 'Auf GitHub holen',
-            footP1: 'Vergleich gepflegt vom Nexum-Team · zuletzt verifiziert im Mai 2026. Details der Konkurrenz ändern sich mit der Zeit — folge den Links oben, um die aktuellen Funktionen zu bestätigen. Eine Ungenauigkeit entdeckt? <a href="https://github.com/GQuantrill/eve-nexum/issues">Eröffne ein Issue</a>.',
-            footP2: 'EVE Online und das EVE-Logo sind eingetragene Marken von CCP hf. Alle Rechte weltweit vorbehalten. Nexum ist ein Drittanbieter-Tool und steht in keiner Verbindung zu CCP hf., Pathfinder, Tripwire oder Wanderer und wird von ihnen nicht unterstützt. Siehe den vollständigen <a href="/license/">Lizenz- &amp; EVE-IP-Hinweis</a>.'
+            wfOpen: '<span class="no">Nein</span> — Closed Source',
+            wfSelf: '<span class="no">Nein</span> — nur gehostet',
+            wfCloud: '<span class="yes">Ja</span> — die einzige Nutzungsmöglichkeit; kostenlose Stufe, kostenpflichtige Extras',
+            wfKill: '<span class="yes">Ja</span> — serverseitiger zKill-Feed + Killboard der Karte',
+            wfMass: 'Rolling-Rechner (±10 % Varianz, Stranding-Warnungen)',
+            wfLang: '<span class="no">Nein</span> — nur Englisch',
+            wfTech: 'Nicht veröffentlicht',
+            wfCost: '<span class="yes">Kostenlose</span> Stufe (eine Karte, 50 Systeme) · <span class="meh">kostenpflichtige Extras in ISK</span> — zu klein für die meisten ganzen Regionen',
+            wfF2: '<span class="meh">Kostenpflichtig</span> für die meisten Regionen — 53 von 68 liegen über der kostenlosen Grenze von 50 Systemen',
+            wfF6: 'Liste der Piloten auf der Karte',
+            wfF7: 'A0-Sonnen und Eis; keine Stürme oder Incursions',
+            wfF8: 'Rollen und Audit-Log',
+            f12h: '<strong>Capital-Sprungplaner</strong> — Sprungrouten über mehrere Hops zwischen Low-/Nullsec-Systemen für deine Schiffsklasse und Skills, mit Lichtjahren pro Hop, Isotopen-Schätzung, Sprungmüdigkeit und gespeicherten Plänen',
+            f13h: '<strong>Ketten-Ausgänge</strong> — jeder Weg aus deiner Kette auf einen Blick, und welcher Ausgang dich jeweils am nächsten an deine Lieblingssysteme bringt',
+            f14h: '<strong>Heatmaps auf der Karte</strong> — färbt jedes System nach Schiffs-Kills, Pod-Kills, NPC-Kills, Sprüngen oder Flottenpräsenz',
+            wfP: 'Der neueste Mapper hier und der einzige, der bewusst nur gehostet und Closed Source ist: Du meldest dich an, sie betreiben alles. Er ist darauf ausgelegt, die Karte spieltreu zu halten — Stargates kommen aus den Spieldaten und können weder gefälscht noch gelöscht werden, und Jump Bridges verbinden nur Nullsec-Systeme. Außerdem gibt es einen Rolling-Rechner, Regions-Seeding, D-Scan auf der Karte, Standings- und Sov-Overlays, Discord-Alarme und Importe aus anderen Mappern, Nexum eingeschlossen. Die kostenlose Stufe umfasst eine Karte mit bis zu 50 Systemen und deinen Hauptcharakter; weitere Karten, Systeme und verfolgte Alts kosten monatlich ISK. Diese Grenze zählt beim Regions-Seeding: 53 der 68 K-Space-Regionen in EVE haben mehr als 50 Systeme, die meisten zu seeden heißt also zu bezahlen. Geprüft im November 2026.',
+            wfBest: '<strong>Am besten für:</strong> Gruppen, die den Mapper gern von jemand anderem betreiben lassen und ISK zahlen, sobald eine kleine Karte nicht mehr reicht. <a href="https://evewayfinder.app/">Webseite &rarr;</a>',
+            footP1: 'Vergleich gepflegt vom Nexum-Team · zuletzt verifiziert im Mai 2026 (Wayfinder im November 2026). Details der Konkurrenz ändern sich mit der Zeit — folge den Links oben, um die aktuellen Funktionen zu bestätigen. Eine Ungenauigkeit entdeckt? <a href="https://github.com/GQuantrill/eve-nexum/issues">Eröffne ein Issue</a>.',
+            footP2: 'EVE Online und das EVE-Logo sind eingetragene Marken von CCP hf. Alle Rechte weltweit vorbehalten. Nexum ist ein Drittanbieter-Tool und steht in keiner Verbindung zu CCP hf., Pathfinder, Tripwire, Wanderer oder Wayfinder und wird von ihnen nicht unterstützt. Siehe den vollständigen <a href="/license/">Lizenz- &amp; EVE-IP-Hinweis</a>.'
           };
           DICTS.nl = {
-            __title: 'Vergelijking van EVE Online-wormgatmappers: Nexum vs Pathfinder vs Tripwire vs Wanderer (2026)',
+            __title: 'Vergelijking van EVE Online-wormgatmappers: Nexum vs Pathfinder vs Tripwire vs Wanderer vs Wayfinder (2026)',
             nav: '&larr; Nexum-startpagina',
-            h1: 'Vergelijking van EVE Online-wormgatmappers:<br />Nexum vs Pathfinder vs Tripwire vs Wanderer',
+            h1: 'Vergelijking van EVE Online-wormgatmappers:<br />Nexum vs Pathfinder vs Tripwire vs Wanderer vs Wayfinder',
             sub: 'Hoe de toonaangevende wormgatmappers voor EVE Online zich tot elkaar verhouden — en waarom Nexum standaard het meeste kan.',
-            upd: 'Laatst bijgewerkt op 27 mei 2026 · onderhouden door het Nexum-team',
-            lede: 'Scout of woon je in J-space, dan is een goede wormgatmapper onmisbaar. <strong>Nexum</strong> is een moderne open-source mapper — gebruik de gratis gehoste versie of host zelf — die de hele werkwijze afdekt: ketens karteren in realtime, signaturen en massa bijhouden, en daarbovenop een echte rolcalculator, hele regio\'s inladen, standings- en sov-lagen en Discord-meldingen. Hieronder vergelijken we hem met de andere gangbare opties — <strong>Tripwire</strong>, <strong>Pathfinder</strong> en <strong>Wanderer</strong>. Wij maken Nexum, dus uiteraard vinden wij het voor de meeste corps de sterkste keus — maar we houden de feiten over de concurrentie correct en voorzien van links, zodat je zelf kunt oordelen.',
+            upd: 'Laatst bijgewerkt op 17 november 2026 · onderhouden door het Nexum-team',
+            lede: 'Scout of woon je in J-space, dan is een goede wormgatmapper onmisbaar. <strong>Nexum</strong> is een moderne open-source mapper — gebruik de gratis gehoste versie of host zelf — die de hele werkwijze afdekt: ketens karteren in realtime, signaturen en massa bijhouden, en daarbovenop een echte rolcalculator, hele regio\'s inladen, standings- en sov-lagen en Discord-meldingen. Hieronder vergelijken we hem met de andere gangbare opties — <strong>Tripwire</strong>, <strong>Pathfinder</strong>, <strong>Wanderer</strong> en <strong>Wayfinder</strong>. Wij maken Nexum, dus uiteraard vinden wij het voor de meeste corps de sterkste keus — maar we houden de feiten over de concurrentie correct en voorzien van links, zodat je zelf kunt oordelen.',
             h2Glance: 'In één oogopslag',
-            cap1: 'Kernvergelijking. Geverifieerd in mei 2026 — de functies van de concurrentie veranderen; volg de links om het te bevestigen.',
+            cap1: 'Kernvergelijking. Geverifieerd in mei 2026 (Wayfinder in november 2026) — functies van concurrenten veranderen; volg de links om te bevestigen.',
             gOpenSource: 'Open source',
             gSelfHost: 'Zelf te hosten',
             gCloud: 'Beheerde cloudoptie',
@@ -636,7 +717,7 @@
             gKillN: '<span class="yes">Ja</span> — live zKill-feed + killlogboekpaneel',
             f11h: '<strong>Gesproken meldingen</strong> — een stem op je apparaat leest live informatie voor (characters die inloggen, incursions, low-/nullsec binnen bereik, kills, nieuwe ketens) en draait volledig in de browser',
             h2Further: 'Waar Nexum verder gaat',
-            furtherIntro: 'Alle vier beheersen de basis goed. Dit zijn de mogelijkheden die Nexum ingebouwd heeft en die de andere doorgaans niet als gedocumenteerde, meteen bruikbare functie bieden — de redenen waarom corps ervoor kiezen:',
+            furtherIntro: 'Alle vijf doen de basis goed. Dit zijn de mogelijkheden die Nexum ingebouwd heeft en die de anderen meestal niet als gedocumenteerde, kant-en-klare functies bieden — de redenen waarom corps ervoor kiezen. Wayfinder, de nieuwste, heeft er een aantal van, dus die krijgt een eigen kolom:',
             cap2: 'De bijzondere functies van Nexum. „—” betekent dat het geen gedocumenteerde, ingebouwde kernfunctie van die tools is (functies veranderen — gebruik de links hieronder om het te controleren).',
             fFeature: 'Functie',
             f1h: '<strong>Rolcalculator</strong> voor wormgaten — modelleert de massamarge van ±10%, met koude en warme roller inclusief zijkantregistratie, en waarschuwt voordat een passage je roller achterlaat of het gat sluit',
@@ -655,9 +736,9 @@
             h2Detail: 'De tools in detail',
             twP: 'De klassieke, op signaturen gerichte wormgatmapper waarmee een groot deel van de J-space-spelers is opgegroeid. Hij is snel en gefocust, en bij veteranen zit de werkwijze in het spiergeheugen. De langlopende openbare installatie (tripwire.eve-apps.com) ging halverwege 2024 dicht, maar Tripwire is open source en leeft dus voort via zelf hosten en installaties die de community draait.',
             twBest: '<strong>Het beste voor:</strong> groepen die de vertrouwde Tripwire-werkwijze met signaturen willen en bereid zijn zelf te hosten. <a href="https://bitbucket.org/daimian/tripwire">Broncode &rarr;</a>',
-            pfP: 'De meest uitgegroeide en functierijkste zelf gehoste mapper. Hij heeft veel bepaald van wat wormgatbewoners verwachten — rijke wormgatgegevens, Thera-verbindingen via EVE-Scout, een live zKillboard-killstream, een plugin-API en meer. De keerzijde is het onderhoud: het is een PHP/MySQL-stack die meer werk kost om op te zetten en bij te werken dan een app in één container.',
+            pfP: 'De meest uitgegroeide en functierijkste zelf gehoste mapper. Hij heeft veel bepaald van wat wormgatbewoners verwachten — rijke wormgatgegevens, Thera-verbindingen via EVE-Scout, zKillboard-killstatistieken (een feed per uur, niet live), een plugin-API en meer. De keerzijde is het onderhoud: het is een PHP/MySQL-stack die meer werk kost om op te zetten en bij te werken dan een app in één container.',
             pfBest: '<strong>Het beste voor:</strong> groepen die maximale functionaliteit willen en geen bezwaar hebben tegen een zwaardere stack. <a href="https://github.com/exodus4d/pathfinder">GitHub &rarr;</a>',
-            wdP: 'De moderne uitdager, gepresenteerd als een licht en snel alternatief voor Pathfinder. Gebouwd op Elixir/Phoenix met een React-frontend en open source onder MIT, is hij de enige van de vier met een <em>officiële beheerde cloud</em>-versie — zodat een groep hem kan gebruiken zonder zelf infrastructuur te draaien — en hij biedt daarnaast een gratis zelf gehoste Community Edition.',
+            wdP: 'De moderne uitdager, gepresenteerd als een licht en snel alternatief voor Pathfinder. Gebouwd op Elixir/Phoenix met een React-frontend en open source onder MIT, biedt hij een <em>officiële beheerde cloud</em>-versie — zodat een groep hem kan gebruiken zonder zelf infrastructuur te draaien — en, anders dan het alleen gehoste Wayfinder, ook een gratis zelf gehoste Community Edition.',
             wdBest: '<strong>Het beste voor:</strong> groepen die een gepolijste interface willen en de mogelijkheid om zelf hosten helemaal over te slaan. <a href="https://wanderer.ltd/">Website &rarr;</a> · <a href="https://github.com/wanderer-industries/wanderer">GitHub &rarr;</a>',
             nxP: 'Een moderne, open-source, zelf te hosten mapper die in de eerste plaats voor corps is gebouwd. Hij dekt de kernwerkwijze af — in realtime samen karteren (live wijzigingen voor iedereen op de kaart), signaturen plakken met verouderende wormgaten en het bijhouden van verbindingen — en legt daar extra\'s bovenop die gericht zijn op het runnen van de keten van een corp:',
             nxLi1: '<strong>Rolcalculator voor wormgaten</strong> die de massamarge van ±10% modelleert, elke passage voorspelt als veilig / kan sluiten / sluit zeker, en waarschuwt voordat een passage je roller zou achterlaten.',
@@ -692,23 +773,40 @@
             ctaP: '<strong>Nexum is gratis.</strong> Gebruik de gehoste versie of zet de keten van je corp in minuten zelf op.',
             ctaBtn: 'Begin nu',
             ctaGh: 'Haal het op GitHub',
-            footP1: 'Vergelijking onderhouden door het Nexum-team · laatst geverifieerd in mei 2026. Details over de concurrentie veranderen in de loop van de tijd — volg de links hierboven om de actuele functies te bevestigen. Een onnauwkeurigheid gevonden? <a href="https://github.com/GQuantrill/eve-nexum/issues">Open een issue</a>.',
-            footP2: 'EVE Online en het EVE-logo zijn geregistreerde handelsmerken van CCP hf. Alle rechten wereldwijd voorbehouden. Nexum is een tool van derden en is niet verbonden met of goedgekeurd door CCP hf., Pathfinder, Tripwire of Wanderer. Zie de volledige <a href="/license/">licentie- &amp; EVE IP-vermelding</a>.',
+            wfOpen: '<span class="no">Nee</span> — closed source',
+            wfSelf: '<span class="no">Nee</span> — alleen gehost',
+            wfCloud: '<span class="yes">Ja</span> — de enige manier om hem te gebruiken; gratis niveau, betaalde extra’s',
+            wfKill: '<span class="yes">Ja</span> — zKill-feed via de server + killboard van de kaart',
+            wfMass: 'Rolling-calculator (±10% variatie, waarschuwingen voor stranden)',
+            wfLang: '<span class="no">Nee</span> — alleen Engels',
+            wfTech: 'Niet gepubliceerd',
+            wfCost: '<span class="yes">Gratis</span> niveau (één kaart, 50 systemen) · <span class="meh">betaalde extra’s in ISK</span> — te klein voor de meeste hele regio’s',
+            wfF2: '<span class="meh">Betaald</span> voor de meeste regio’s — 53 van de 68 zitten boven de gratis limiet van 50 systemen',
+            wfF6: 'Overzicht van piloten op de kaart',
+            wfF7: 'A0-zonnen en ijs; geen stormen of incursions',
+            wfF8: 'Rollen en auditlog',
+            f12h: '<strong>Capital-sprongplanner</strong> — sprongroutes van meerdere hops tussen low-/nullsec-systemen voor jouw scheepsklasse en skills, met lichtjaren per hop, een isotopenschatting, jump fatigue en opgeslagen plannen',
+            f13h: '<strong>Ketenuitgangen</strong> — elke weg uit je keten in één oogopslag, en welke uitgang je het dichtst bij elk van je favoriete systemen brengt',
+            f14h: '<strong>Heatmaps op de kaart</strong> — kleurt elk systeem naar schip-kills, pod-kills, NPC-kills, sprongen of vlootaanwezigheid',
+            wfP: 'De nieuwste mapper hier, en de enige die bewust alleen gehost en closed source is: jij logt in en zij draaien alles. Hij is erop gebouwd de kaart trouw aan het spel te houden — stargates komen uit de spelgegevens en kunnen niet worden nagemaakt of verwijderd, en jump bridges verbinden alleen nullsec-systemen. Er is ook een rolling-calculator, regio-seeding, d-scan op de kaart, standings- en sov-overlays, Discord-meldingen en import uit andere mappers, waaronder Nexum. Het gratis niveau omvat één kaart van maximaal 50 systemen en je hoofdpersonage; extra kaarten, systemen en gevolgde alts kosten maandelijks ISK. Die limiet telt bij regio-seeding: 53 van de 68 k-space-regio’s in EVE hebben meer dan 50 systemen, dus de meeste seeden betekent betalen. Gecontroleerd in november 2026.',
+            wfBest: '<strong>Het beste voor:</strong> groepen die de mapper graag door een ander laten draaien en ISK betalen zodra één kleine kaart niet meer volstaat. <a href="https://evewayfinder.app/">Website &rarr;</a>',
+            footP1: 'Vergelijking onderhouden door het Nexum-team · laatst geverifieerd in mei 2026 (Wayfinder in november 2026). Details van concurrenten veranderen in de loop van de tijd — volg de links hierboven om de huidige functies te bevestigen. Een onjuistheid gezien? <a href="https://github.com/GQuantrill/eve-nexum/issues">Open een issue</a>.',
+            footP2: 'EVE Online en het EVE-logo zijn geregistreerde handelsmerken van CCP hf. Alle rechten wereldwijd voorbehouden. Nexum is een tool van derden en is niet verbonden met of goedgekeurd door CCP hf., Pathfinder, Tripwire, Wanderer of Wayfinder. Zie de volledige <a href="/license/">licentie- &amp; EVE IP-vermelding</a>.',
           };
 
 
           // French — apostrophes use the typographic ’ (U+2019) so they don’t
           // terminate these single-quoted strings.
           DICTS.fr = {
-            __title: 'Comparatif des mappers de trous de ver EVE Online : Nexum vs Pathfinder vs Tripwire vs Wanderer (2026)',
+            __title: 'Comparatif des mappers de trous de ver EVE Online : Nexum vs Pathfinder vs Tripwire vs Wanderer vs Wayfinder (2026)',
             nav: '&larr; Accueil Nexum',
-            h1: 'Comparatif des mappers de trous de ver EVE Online :<br />Nexum vs Pathfinder vs Tripwire vs Wanderer',
+            h1: 'Comparatif des mappers de trous de ver EVE Online :<br />Nexum vs Pathfinder vs Tripwire vs Wanderer vs Wayfinder',
             sub: 'Comment se comparent les principaux mappers de trous de ver pour EVE Online — et pourquoi Nexum en fait le plus dès le départ.',
-            upd: 'Dernière mise à jour le 27 mai 2026 · maintenu par l’équipe Nexum',
-            lede: 'Si vous scoutez ou vivez en J-space, un bon mapper de trous de ver est essentiel. <strong>Nexum</strong> est un mapper moderne et open source — utilisez la version hébergée gratuite ou auto-hébergez la vôtre — qui couvre tout le workflow : cartographie de chaîne en temps réel, signatures et suivi de masse, puis va plus loin avec un véritable calculateur de rolling, le seeding de régions entières, des surcouches de standings &amp; sov et des alertes Discord. Ci-dessous, il est comparé aux autres choix courants — <strong>Tripwire</strong>, <strong>Pathfinder</strong> et <strong>Wanderer</strong>. Nous développons Nexum, donc nous le considérons naturellement comme le meilleur choix pour la plupart des corps — mais nous avons gardé les faits sur la concurrence exacts et liés pour que vous puissiez juger par vous-même.',
+            upd: 'Dernière mise à jour le 17 novembre 2026 · maintenu par l’équipe Nexum',
+            lede: 'Si vous scoutez ou vivez en J-space, un bon mapper de trous de ver est essentiel. <strong>Nexum</strong> est un mapper moderne et open source — utilisez la version hébergée gratuite ou auto-hébergez la vôtre — qui couvre tout le workflow : cartographie de chaîne en temps réel, signatures et suivi de masse, puis va plus loin avec un véritable calculateur de rolling, le seeding de régions entières, des surcouches de standings &amp; sov et des alertes Discord. Ci-dessous, il est comparé aux autres choix courants — <strong>Tripwire</strong>, <strong>Pathfinder</strong>, <strong>Wanderer</strong> et <strong>Wayfinder</strong>. Nous développons Nexum, donc nous le considérons naturellement comme le meilleur choix pour la plupart des corps — mais nous avons gardé les faits sur la concurrence exacts et liés pour que vous puissiez juger par vous-même.',
 
             h2Glance: 'En un coup d’œil',
-            cap1: 'Comparatif de base. Vérifié en mai 2026 — les fonctionnalités de la concurrence changent ; suivez les liens pour confirmer.',
+            cap1: 'Comparaison principale. Vérifiée en mai 2026 (Wayfinder en novembre 2026) — les fonctionnalités des concurrents évoluent ; suivez les liens pour confirmer.',
             gOpenSource: 'Open source',
             gSelfHost: 'Auto-hébergeable',
             gCloud: 'Option cloud gérée',
@@ -739,7 +837,7 @@
             gKillN: '<span class="yes">Oui</span> — flux zKill en direct + panneau Kill Log',
             f11h: '<strong>Annonces vocales</strong> — une synthèse vocale sur l’appareil lit l’intel en direct (connexions de personnage, incursions, low/null-sec à portée, kills, nouvelles chaînes), entièrement dans le navigateur',
             h2Further: 'Là où Nexum va plus loin',
-            furtherIntro: 'Les quatre gèrent bien les bases. Voici les capacités que Nexum intègre et que les autres n’offrent généralement pas comme fonctionnalités documentées et prêtes à l’emploi — les raisons pour lesquelles les corps le choisissent :',
+            furtherIntro: 'Les cinq gèrent bien les bases. Voici les capacités que Nexum intègre et que les autres n’offrent généralement pas comme fonctionnalités documentées et prêtes à l’emploi — les raisons pour lesquelles les corps le choisissent. Wayfinder, le plus récent, en possède plusieurs, il a donc sa propre colonne :',
             cap2: 'Fonctionnalités distinctives de Nexum. « — » signifie que ce n’est pas une fonctionnalité phare documentée et intégrée de ces outils (les fonctionnalités changent — utilisez les liens ci-dessous pour vérifier).',
             fFeature: 'Fonctionnalité',
             f1h: 'Wormhole <strong>calculateur de rolling</strong> — modélise la variance de masse de ±10 %, roller froid/chaud avec suivi de côté, et avertit avant qu’un passage ne bloque votre roller ou n’effondre le trou',
@@ -759,9 +857,9 @@
             h2Detail: 'Les outils en détail',
             twP: 'Le mapper de trous de ver classique, axé signatures, avec lequel une grande partie des joueurs de J-space ont grandi. Il est rapide, ciblé, et le workflow est dans les réflexes des vétérans. L’instance publique de longue date (tripwire.eve-apps.com) a fermé mi-2024, mais Tripwire est open source, il survit donc via l’auto-hébergement et les instances gérées par la communauté.',
             twBest: '<strong>Idéal pour :</strong> les groupes qui veulent le workflow de signatures familier de Tripwire et sont prêts à auto-héberger. <a href="https://bitbucket.org/daimian/tripwire">Source &rarr;</a>',
-            pfP: 'Le mapper auto-hébergé le plus mature et le plus riche en fonctionnalités. Il a été pionnier de beaucoup de ce qu’attendent les wormholers — données riches de trous de ver, connexions Thera via EVE-Scout, un flux de kills zKillboard en direct, une API de plugins et plus encore. Le compromis, c’est le poids opérationnel : c’est une stack PHP/MySQL qui demande plus d’efforts à installer et à maintenir à jour qu’une appli mono-conteneur.',
+            pfP: 'Le mapper auto-hébergé le plus mature et le plus riche en fonctionnalités. Il a été pionnier de beaucoup de ce qu’attendent les wormholers — données riches de trous de ver, connexions Thera via EVE-Scout, des statistiques de kills zKillboard (flux horaire, pas en direct), une API de plugins et plus encore. Le compromis, c’est le poids opérationnel : c’est une stack PHP/MySQL qui demande plus d’efforts à installer et à maintenir à jour qu’une appli mono-conteneur.',
             pfBest: '<strong>Idéal pour :</strong> les groupes qui veulent un maximum de fonctionnalités et ne craignent pas d’exploiter une stack plus lourde. <a href="https://github.com/exodus4d/pathfinder">GitHub &rarr;</a>',
-            wdP: 'Le challenger moderne, présenté comme une alternative légère et rapide à Pathfinder. Construit sur Elixir/Phoenix avec un frontend React et open-sourcé sous MIT, c’est le seul des quatre avec une version <em>cloud gérée officielle</em> — pour qu’un groupe puisse l’utiliser sans exploiter aucune infrastructure — tout en proposant une Community Edition auto-hébergée gratuite.',
+            wdP: 'Le challenger moderne, présenté comme une alternative légère et rapide à Pathfinder. Construit sur Elixir/Phoenix avec un frontend React et open-sourcé sous MIT, c’propose une version <em>cloud gérée officielle</em> — pour qu’un groupe puisse l’utiliser sans exploiter aucune infrastructure — et, contrairement à Wayfinder, uniquement hébergé, une Community Edition auto-hébergée gratuite.',
             wdBest: '<strong>Idéal pour :</strong> les groupes qui veulent une interface soignée et l’option d’éviter complètement l’auto-hébergement. <a href="https://wanderer.ltd/">Site web &rarr;</a> · <a href="https://github.com/wanderer-industries/wanderer">GitHub &rarr;</a>',
             nxP: 'Un mapper moderne, open source et auto-hébergé, pensé corp d’abord. Il couvre le workflow de base — cartographie collaborative en temps réel (modifications en direct pour tous sur la carte), collage de signatures avec vieillissement des trous de ver, et suivi des connexions — et y ajoute des extras pour gérer la chaîne d’une corp :',
             nxLi1: '<strong>Calculateur de rolling</strong> qui modélise la variance de masse de ±10 %, prévoit chaque passage comme sûr / peut-effondrer / va-effondrer, et avertit avant qu’un passage ne bloque votre roller.',
@@ -799,22 +897,39 @@
             ctaP: '<strong>Nexum est gratuit.</strong> Utilisez la version hébergée ou auto-hébergez la chaîne de votre corp en quelques minutes.',
             ctaBtn: 'Commencer maintenant',
             ctaGh: 'L’obtenir sur GitHub',
-            footP1: 'Comparatif maintenu par l’équipe Nexum · dernière vérification en mai 2026. Les détails de la concurrence changent avec le temps — suivez les liens ci-dessus pour confirmer les fonctionnalités actuelles. Vous avez repéré une inexactitude ? <a href="https://github.com/GQuantrill/eve-nexum/issues">Ouvrez une issue</a>.',
-            footP2: 'EVE Online et le logo EVE sont des marques déposées de CCP hf. Tous droits réservés dans le monde entier. Nexum est un outil tiers et n’est ni affilié à CCP hf., Pathfinder, Tripwire ou Wanderer, ni approuvé par eux. Voir la <a href="/license/">mention de licence &amp; PI EVE</a> complète.'
+            wfOpen: '<span class="no">Non</span> — code fermé',
+            wfSelf: '<span class="no">Non</span> — hébergé uniquement',
+            wfCloud: '<span class="yes">Oui</span> — la seule façon de l’utiliser ; offre gratuite, options payantes',
+            wfKill: '<span class="yes">Oui</span> — flux zKill côté serveur + killboard de la carte',
+            wfMass: 'Calculateur de rolling (variance ±10 %, alertes d’échouage)',
+            wfLang: '<span class="no">Non</span> — anglais uniquement',
+            wfTech: 'Non publiée',
+            wfCost: 'Offre <span class="yes">gratuite</span> (une carte, 50 systèmes) · <span class="meh">options payantes en ISK</span> — trop petite pour la plupart des régions entières',
+            wfF2: '<span class="meh">Payant</span> pour la plupart des régions — 53 sur 68 dépassent la limite gratuite de 50 systèmes',
+            wfF6: 'Liste des pilotes sur la carte',
+            wfF7: 'Soleils A0 et glace ; pas de tempêtes ni d’incursions',
+            wfF8: 'Rôles et journal d’audit',
+            f12h: '<strong>Planificateur de sauts de capitaux</strong> — itinéraires de saut en plusieurs étapes entre systèmes low/null pour votre classe de vaisseau et vos compétences, avec les années-lumière par étape, une estimation des isotopes, la fatigue de saut et des plans sauvegardés',
+            f13h: '<strong>Sorties de chaîne</strong> — toutes les façons de sortir de votre chaîne d’un coup d’œil, et la sortie qui vous rapproche le plus de chacun de vos systèmes favoris',
+            f14h: '<strong>Cartes de chaleur</strong> — colore chaque système de la carte selon les kills de vaisseaux, de capsules, de NPC, les sauts ou la présence de la flotte',
+            wfP: 'Le mapper le plus récent ici, et le seul hébergé uniquement et à code fermé par choix : vous vous connectez, ils gèrent tout. Il est conçu pour garder la carte fidèle au jeu — les stargates viennent des données du jeu et ne peuvent être ni inventées ni supprimées, et les jump bridges ne relient que des systèmes nullsec. Il propose aussi un calculateur de rolling, l’ajout de régions entières, le d-scan sur la carte, des superpositions de standings et de souveraineté, des alertes Discord et l’import depuis d’autres mappers, Nexum compris. L’offre gratuite couvre une carte de 50 systèmes au plus et votre personnage principal ; cartes, systèmes et alts suivis supplémentaires se paient chaque mois en ISK. Cette limite compte pour l’ajout de régions : 53 des 68 régions de k-space d’EVE ont plus de 50 systèmes, donc ajouter la plupart d’entre elles est payant. Vérifié en novembre 2026.',
+            wfBest: '<strong>Idéal pour :</strong> les groupes qui préfèrent qu’un autre fasse tourner le mapper, et qui paieront en ISK dès qu’une petite carte ne suffit plus. <a href="https://evewayfinder.app/">Site web &rarr;</a>',
+            footP1: 'Comparaison maintenue par l’équipe Nexum · dernière vérification en mai 2026 (Wayfinder en novembre 2026). Les détails des concurrents évoluent avec le temps — suivez les liens ci-dessus pour confirmer les fonctionnalités actuelles. Vous avez repéré une inexactitude ? <a href="https://github.com/GQuantrill/eve-nexum/issues">Ouvrez un ticket</a>.',
+            footP2: 'EVE Online et le logo EVE sont des marques déposées de CCP hf. Tous droits réservés dans le monde entier. Nexum est un outil tiers et n’est ni affilié à CCP hf., Pathfinder, Tripwire, Wanderer ou Wayfinder, ni approuvé par eux. Voir la <a href="/license/">mention de licence &amp; PI EVE</a> complète.'
           };
 
           // Spanish — uses the typographic ’ (U+2019) so apostrophes (rare in
           // es, but e.g. in links) don’t terminate these single-quoted strings.
           DICTS.es = {
-            __title: 'Comparativa de mapeadores de agujeros de gusano de EVE Online: Nexum vs Pathfinder vs Tripwire vs Wanderer (2026)',
+            __title: 'Comparativa de mapeadores de agujeros de gusano de EVE Online: Nexum vs Pathfinder vs Tripwire vs Wanderer vs Wayfinder (2026)',
             nav: '&larr; Inicio de Nexum',
-            h1: 'Comparativa de mapeadores de agujeros de gusano de EVE Online:<br />Nexum vs Pathfinder vs Tripwire vs Wanderer',
+            h1: 'Comparativa de mapeadores de agujeros de gusano de EVE Online:<br />Nexum vs Pathfinder vs Tripwire vs Wanderer vs Wayfinder',
             sub: 'Cómo se comparan los principales mapeadores de agujeros de gusano de EVE Online — y por qué Nexum hace más de fábrica.',
-            upd: 'Última actualización el 27 de mayo de 2026 · mantenido por el equipo de Nexum',
-            lede: 'Si haces de scout o vives en J-space, un buen mapeador de agujeros de gusano es esencial. <strong>Nexum</strong> es un mapeador moderno y de código abierto — usa la versión alojada gratuita o autoaló­jalo — que cubre todo el flujo de trabajo: mapeo de cadenas en tiempo real, firmas y seguimiento de masa, y luego va más allá con una calculadora de rolling de verdad, el sembrado de regiones enteras, superposiciones de standings y sov y alertas de Discord. Abajo se compara con las otras opciones habituales — <strong>Tripwire</strong>, <strong>Pathfinder</strong> y <strong>Wanderer</strong>. Nosotros hacemos Nexum, así que naturalmente lo consideramos la mejor opción para la mayoría de las corps — pero hemos mantenido los datos sobre la competencia precisos y enlazados para que juzgues por ti mismo.',
+            upd: 'Última actualización: 17 de noviembre de 2026 · mantenido por el equipo de Nexum',
+            lede: 'Si haces de scout o vives en J-space, un buen mapeador de agujeros de gusano es esencial. <strong>Nexum</strong> es un mapeador moderno y de código abierto — usa la versión alojada gratuita o autoaló­jalo — que cubre todo el flujo de trabajo: mapeo de cadenas en tiempo real, firmas y seguimiento de masa, y luego va más allá con una calculadora de rolling de verdad, el sembrado de regiones enteras, superposiciones de standings y sov y alertas de Discord. Abajo se compara con las otras opciones habituales — <strong>Tripwire</strong>, <strong>Pathfinder</strong>, <strong>Wanderer</strong> y <strong>Wayfinder</strong>. Nosotros hacemos Nexum, así que naturalmente lo consideramos la mejor opción para la mayoría de las corps — pero hemos mantenido los datos sobre la competencia precisos y enlazados para que juzgues por ti mismo.',
 
             h2Glance: 'De un vistazo',
-            cap1: 'Comparativa básica. Verificada en mayo de 2026 — las funciones de la competencia cambian; sigue los enlaces para confirmar.',
+            cap1: 'Comparación principal. Verificada en mayo de 2026 (Wayfinder en noviembre de 2026) — las funciones de la competencia cambian; sigue los enlaces para confirmarlas.',
             gOpenSource: 'Código abierto',
             gSelfHost: 'Autoalojable',
             gCloud: 'Opción de nube gestionada',
@@ -845,7 +960,7 @@
             gKillN: '<span class="yes">Sí</span> — feed zKill en vivo + panel Kill Log',
             f11h: '<strong>Anuncios de voz</strong> — la síntesis de voz en el dispositivo lee la intel en vivo (conexiones de personaje, incursiones, low/null-sec al alcance, kills, cadenas nuevas), todo en el navegador',
             h2Further: 'Dónde Nexum va más allá',
-            furtherIntro: 'Los cuatro manejan bien lo básico. Estas son las capacidades que Nexum integra y que los demás generalmente no ofrecen como funciones documentadas y listas para usar — las razones por las que las corps lo eligen:',
+            furtherIntro: 'Los cinco resuelven bien lo básico. Estas son las capacidades que Nexum trae integradas y que los demás en su mayoría no ofrecen como funciones documentadas y listas para usar — las razones por las que las corps lo eligen. Wayfinder, el más nuevo, tiene varias, así que tiene su propia columna:',
             cap2: 'Funciones distintivas de Nexum. «—» significa que no es una función estrella documentada e integrada de esas herramientas (las funciones cambian — usa los enlaces de abajo para verificar).',
             fFeature: 'Función',
             f1h: 'Wormhole <strong>calculadora de rolling</strong> — modela la varianza de masa de ±10%, roller frío/caliente con seguimiento de lado, y avisa antes de que una pasada deje atrapado a tu roller o colapse el agujero',
@@ -865,9 +980,9 @@
             h2Detail: 'Las herramientas en detalle',
             twP: 'El mapeador de agujeros de gusano clásico, centrado en firmas, con el que creció una gran parte de los jugadores de J-space. Es rápido, enfocado, y el flujo de trabajo es memoria muscular para los veteranos. La longeva instancia pública (tripwire.eve-apps.com) cerró a mediados de 2024, pero Tripwire es de código abierto, así que sobrevive mediante el autoalojamiento y las instancias gestionadas por la comunidad.',
             twBest: '<strong>Ideal para:</strong> grupos que quieren el familiar flujo de firmas de Tripwire y están dispuestos a autoalojar. <a href="https://bitbucket.org/daimian/tripwire">Fuente &rarr;</a>',
-            pfP: 'El mapeador autoalojado más maduro y con más funciones. Fue pionero de mucho de lo que esperan los wormholers — datos ricos de agujeros de gusano, conexiones de Thera vía EVE-Scout, un killstream de zKillboard en vivo, una API de plugins y más. El compromiso es el peso operativo: es un stack PHP/MySQL que requiere más esfuerzo de instalar y mantener actualizado que una app de un solo contenedor.',
+            pfP: 'El mapeador autoalojado más maduro y con más funciones. Fue pionero de mucho de lo que esperan los wormholers — datos ricos de agujeros de gusano, conexiones de Thera vía EVE-Scout, estadísticas de kills de zKillboard (un feed horario, no en vivo), una API de plugins y más. El compromiso es el peso operativo: es un stack PHP/MySQL que requiere más esfuerzo de instalar y mantener actualizado que una app de un solo contenedor.',
             pfBest: '<strong>Ideal para:</strong> grupos que quieren el máximo de funciones y no les importa ejecutar un stack más pesado. <a href="https://github.com/exodus4d/pathfinder">GitHub &rarr;</a>',
-            wdP: 'El retador moderno, presentado como una alternativa ligera y rápida a Pathfinder. Construido sobre Elixir/Phoenix con un frontend en React y de código abierto bajo MIT, es el único de los cuatro con una versión <em>de nube gestionada oficial</em> — para que un grupo pueda usarlo sin ejecutar ninguna infraestructura — mientras sigue ofreciendo una Community Edition autoalojada gratuita.',
+            wdP: 'El retador moderno, presentado como una alternativa ligera y rápida a Pathfinder. Construido sobre Elixir/Phoenix con un frontend en React y de código abierto bajo MIT, es uno de los que ofrecen una versión <em>de nube gestionada oficial</em> — para que un grupo pueda usarlo sin ejecutar ninguna infraestructura — y, a diferencia de Wayfinder, que es solo alojado, también una Community Edition autoalojada gratuita.',
             wdBest: '<strong>Ideal para:</strong> grupos que quieren una interfaz pulida y la opción de saltarse por completo el autoalojamiento. <a href="https://wanderer.ltd/">Sitio web &rarr;</a> · <a href="https://github.com/wanderer-industries/wanderer">GitHub &rarr;</a>',
             nxP: 'Un mapeador moderno, de código abierto y autoalojado, pensado primero para corps. Cubre el flujo de trabajo básico — mapeo colaborativo en tiempo real (ediciones en vivo para todos en el mapa), pegado de firmas con envejecimiento de agujeros de gusano, y seguimiento de conexiones — y añade extras orientados a gestionar la cadena de una corp:',
             nxLi1: '<strong>Calculadora de rolling</strong> que modela la varianza de masa de ±10%, prevé cada pasada como segura / puede-colapsar / colapsará, y avisa antes de que una pasada deje atrapado a tu roller.',
@@ -905,22 +1020,39 @@
             ctaP: '<strong>Nexum es gratis.</strong> Usa la versión alojada o autoaloja la cadena de tu corp en minutos.',
             ctaBtn: 'Empieza ahora',
             ctaGh: 'Conseguirlo en GitHub',
-            footP1: 'Comparativa mantenida por el equipo de Nexum · última verificación en mayo de 2026. Los detalles de la competencia cambian con el tiempo — sigue los enlaces de arriba para confirmar las funciones actuales. ¿Detectaste una imprecisión? <a href="https://github.com/GQuantrill/eve-nexum/issues">Abre un issue</a>.',
-            footP2: 'EVE Online y el logotipo de EVE son marcas registradas de CCP hf. Todos los derechos reservados en todo el mundo. Nexum es una herramienta de terceros y no está afiliada a CCP hf., Pathfinder, Tripwire ni Wanderer, ni cuenta con su respaldo. Consulta el <a href="/license/">aviso de licencia y de PI de EVE</a> completo.'
+            wfOpen: '<span class="no">No</span> — código cerrado',
+            wfSelf: '<span class="no">No</span> — solo alojado',
+            wfCloud: '<span class="yes">Sí</span> — la única forma de usarlo; nivel gratuito, extras de pago',
+            wfKill: '<span class="yes">Sí</span> — feed de zKill en el servidor + killboard del mapa',
+            wfMass: 'Calculadora de rolling (variación de ±10 %, avisos de quedarse atrapado)',
+            wfLang: '<span class="no">No</span> — solo inglés',
+            wfTech: 'No publicado',
+            wfCost: 'Nivel <span class="yes">gratuito</span> (un mapa, 50 sistemas) · <span class="meh">extras de pago en ISK</span> — demasiado pequeño para la mayoría de regiones completas',
+            wfF2: '<span class="meh">De pago</span> para la mayoría de regiones — 53 de 68 superan el límite gratuito de 50 sistemas',
+            wfF6: 'Lista de pilotos en el mapa',
+            wfF7: 'Soles A0 y hielo; sin tormentas ni incursiones',
+            wfF8: 'Roles y registro de auditoría',
+            f12h: '<strong>Planificador de saltos de capitales</strong> — rutas de salto de varios tramos entre sistemas low/null para tu clase de nave y habilidades, con años luz por tramo, estimación de isótopos, fatiga de salto y planes guardados',
+            f13h: '<strong>Salidas de la cadena</strong> — todas las salidas de tu cadena de un vistazo, y qué salida te deja más cerca de cada uno de tus sistemas favoritos',
+            f14h: '<strong>Mapas de calor</strong> — colorea cada sistema del mapa según kills de naves, de cápsulas, de NPC, saltos o presencia de la flota',
+            wfP: 'El mapeador más nuevo de esta lista, y el único que es solo alojado y de código cerrado por diseño: inicias sesión y ellos lo gestionan todo. Está pensado para mantener el mapa fiel al juego — los stargates salen de los datos del juego y no se pueden inventar ni borrar, y los jump bridges solo unen sistemas nullsec. También tiene calculadora de rolling, sembrado de regiones, d-scan en el mapa, superposiciones de standings y soberanía, alertas de Discord e importación desde otros mapeadores, Nexum incluido. El nivel gratuito cubre un mapa de hasta 50 sistemas y tu personaje principal; los mapas, sistemas y alts rastreados adicionales se pagan cada mes en ISK. Ese límite importa al sembrar regiones: 53 de las 68 regiones de k-space de EVE tienen más de 50 sistemas, así que sembrar la mayoría significa pagar. Comprobado en noviembre de 2026.',
+            wfBest: '<strong>Ideal para:</strong> grupos a los que no les importa que otro gestione el mapeador, y que pagarán en ISK cuando un mapa pequeño se les quede corto. <a href="https://evewayfinder.app/">Sitio web &rarr;</a>',
+            footP1: 'Comparación mantenida por el equipo de Nexum · verificada por última vez en mayo de 2026 (Wayfinder en noviembre de 2026). Los detalles de la competencia cambian con el tiempo — sigue los enlaces de arriba para confirmar las funciones actuales. ¿Has visto una inexactitud? <a href="https://github.com/GQuantrill/eve-nexum/issues">Abre un issue</a>.',
+            footP2: 'EVE Online y el logotipo de EVE son marcas registradas de CCP hf. Todos los derechos reservados en todo el mundo. Nexum es una herramienta de terceros y no está afiliada a CCP hf., Pathfinder, Tripwire, Wanderer ni Wayfinder, ni cuenta con su respaldo. Consulta el <a href="/license/">aviso de licencia y de PI de EVE</a> completo.'
           };
 
           // Portuguese — uses the typographic ’ (U+2019) for apostrophes (rare
           // in pt, but kept consistent with the de/fr/es dictionaries).
           DICTS.pt = {
-            __title: 'Comparação de mapeadores de buracos de minhoca do EVE Online: Nexum vs Pathfinder vs Tripwire vs Wanderer (2026)',
+            __title: 'Comparação de mapeadores de buracos de minhoca do EVE Online: Nexum vs Pathfinder vs Tripwire vs Wanderer vs Wayfinder (2026)',
             nav: '&larr; Início do Nexum',
-            h1: 'Comparação de mapeadores de buracos de minhoca do EVE Online:<br />Nexum vs Pathfinder vs Tripwire vs Wanderer',
+            h1: 'Comparação de mapeadores de buracos de minhoca do EVE Online:<br />Nexum vs Pathfinder vs Tripwire vs Wanderer vs Wayfinder',
             sub: 'Como se comparam os principais mapeadores de buracos de minhoca do EVE Online — e porque o Nexum faz mais logo à partida.',
-            upd: 'Última atualização a 27 de maio de 2026 · mantido pela equipa do Nexum',
-            lede: 'Se fazes de scout ou vives em J-space, um bom mapeador de buracos de minhoca é essencial. O <strong>Nexum</strong> é um mapeador moderno e de código aberto — usa a versão alojada gratuita ou auto-aloja-o — que cobre todo o fluxo de trabalho: mapeamento de cadeias em tempo real, assinaturas e seguimento de massa, e depois vai mais além com uma calculadora de rolling a sério, a sementeira de regiões inteiras, sobreposições de standings e sov e alertas do Discord. Abaixo é comparado com as outras opções habituais — <strong>Tripwire</strong>, <strong>Pathfinder</strong> e <strong>Wanderer</strong>. Nós fazemos o Nexum, por isso naturalmente consideramo-lo a melhor escolha para a maioria das corps — mas mantivemos os dados sobre a concorrência precisos e ligados para que possas julgar por ti mesmo.',
+            upd: 'Atualizado pela última vez a 17 de novembro de 2026 · mantido pela equipa do Nexum',
+            lede: 'Se fazes de scout ou vives em J-space, um bom mapeador de buracos de minhoca é essencial. O <strong>Nexum</strong> é um mapeador moderno e de código aberto — usa a versão alojada gratuita ou auto-aloja-o — que cobre todo o fluxo de trabalho: mapeamento de cadeias em tempo real, assinaturas e seguimento de massa, e depois vai mais além com uma calculadora de rolling a sério, a sementeira de regiões inteiras, sobreposições de standings e sov e alertas do Discord. Abaixo é comparado com as outras opções habituais — <strong>Tripwire</strong>, <strong>Pathfinder</strong>, <strong>Wanderer</strong> e <strong>Wayfinder</strong>. Nós fazemos o Nexum, por isso naturalmente consideramo-lo a melhor escolha para a maioria das corps — mas mantivemos os dados sobre a concorrência precisos e ligados para que possas julgar por ti mesmo.',
 
             h2Glance: 'Num relance',
-            cap1: 'Comparação básica. Verificada em maio de 2026 — as funcionalidades da concorrência mudam; segue as ligações para confirmar.',
+            cap1: 'Comparação principal. Verificada em maio de 2026 (Wayfinder em novembro de 2026) — as funcionalidades da concorrência mudam; segue as ligações para confirmar.',
             gOpenSource: 'Código aberto',
             gSelfHost: 'Auto-alojável',
             gCloud: 'Opção de nuvem gerida',
@@ -951,7 +1083,7 @@
             gKillN: '<span class="yes">Sim</span> — feed zKill ao vivo + painel Kill Log',
             f11h: '<strong>Anúncios de voz</strong> — a síntese de voz no dispositivo lê a intel ao vivo (ligações de personagem, incursões, low/null-sec no alcance, kills, novas cadeias), tudo no navegador',
             h2Further: 'Onde o Nexum vai mais além',
-            furtherIntro: 'Os quatro lidam bem com o básico. Estas são as capacidades que o Nexum integra e que os outros geralmente não oferecem como funcionalidades documentadas e prontas a usar — as razões pelas quais as corps o escolhem:',
+            furtherIntro: 'Os cinco tratam bem do básico. Estas são as capacidades que o Nexum traz integradas e que os outros, na maioria, não oferecem como funcionalidades documentadas e prontas a usar — as razões pelas quais as corps o escolhem. O Wayfinder, o mais recente, tem várias, por isso tem a sua própria coluna:',
             cap2: 'Funcionalidades distintivas do Nexum. «—» significa que não é uma funcionalidade de destaque documentada e integrada dessas ferramentas (as funcionalidades mudam — usa as ligações abaixo para verificar).',
             fFeature: 'Funcionalidade',
             f1h: 'Wormhole <strong>calculadora de rolling</strong> — modela a variância de massa de ±10%, roller frio/quente com seguimento de lado, e avisa antes de uma passagem deixar o teu roller preso ou colapsar o buraco',
@@ -971,9 +1103,9 @@
             h2Detail: 'As ferramentas em detalhe',
             twP: 'O mapeador de buracos de minhoca clássico, centrado em assinaturas, com o qual uma grande parte dos jogadores de J-space cresceu. É rápido, focado, e o fluxo de trabalho é memória muscular para os veteranos. A longeva instância pública (tripwire.eve-apps.com) fechou em meados de 2024, mas o Tripwire é de código aberto, por isso sobrevive através do auto-alojamento e das instâncias geridas pela comunidade.',
             twBest: '<strong>Ideal para:</strong> grupos que querem o familiar fluxo de assinaturas do Tripwire e estão dispostos a auto-alojar. <a href="https://bitbucket.org/daimian/tripwire">Fonte &rarr;</a>',
-            pfP: 'O mapeador auto-alojado mais maduro e com mais funcionalidades. Foi pioneiro de muito do que os wormholers esperam — dados ricos de buracos de minhoca, conexões de Thera via EVE-Scout, um killstream do zKillboard em direto, uma API de plugins e mais. O compromisso é o peso operacional: é uma stack PHP/MySQL que exige mais esforço para instalar e manter atualizada do que uma app de um só contentor.',
+            pfP: 'O mapeador auto-alojado mais maduro e com mais funcionalidades. Foi pioneiro de muito do que os wormholers esperam — dados ricos de buracos de minhoca, conexões de Thera via EVE-Scout, estatísticas de kills do zKillboard (um feed horário, não em direto), uma API de plugins e mais. O compromisso é o peso operacional: é uma stack PHP/MySQL que exige mais esforço para instalar e manter atualizada do que uma app de um só contentor.',
             pfBest: '<strong>Ideal para:</strong> grupos que querem o máximo de funcionalidades e não se importam de executar uma stack mais pesada. <a href="https://github.com/exodus4d/pathfinder">GitHub &rarr;</a>',
-            wdP: 'O desafiante moderno, apresentado como uma alternativa leve e rápida ao Pathfinder. Construído sobre Elixir/Phoenix com um frontend em React e de código aberto sob MIT, é o único dos quatro com uma versão <em>de nuvem gerida oficial</em> — para que um grupo o possa usar sem executar qualquer infraestrutura — mantendo ainda uma Community Edition auto-alojada gratuita.',
+            wdP: 'O desafiante moderno, apresentado como uma alternativa leve e rápida ao Pathfinder. Construído sobre Elixir/Phoenix com um frontend em React e de código aberto sob MIT, oferece uma versão <em>de nuvem gerida oficial</em> — para que um grupo o possa usar sem executar qualquer infraestrutura — e, ao contrário do Wayfinder, apenas alojado, também uma Community Edition auto-alojada gratuita.',
             wdBest: '<strong>Ideal para:</strong> grupos que querem uma interface polida e a opção de saltar por completo o auto-alojamento. <a href="https://wanderer.ltd/">Site &rarr;</a> · <a href="https://github.com/wanderer-industries/wanderer">GitHub &rarr;</a>',
             nxP: 'Um mapeador moderno, de código aberto e auto-alojado, pensado primeiro para corps. Cobre o fluxo de trabalho básico — mapeamento colaborativo em tempo real (edições em direto para todos no mapa), colagem de assinaturas com envelhecimento de buracos de minhoca, e seguimento de conexões — e acrescenta extras orientados a gerir a cadeia de uma corp:',
             nxLi1: '<strong>Calculadora de rolling</strong> que modela a variância de massa de ±10%, prevê cada passagem como segura / pode-colapsar / vai-colapsar, e avisa antes de uma passagem deixar o teu roller preso.',
@@ -1011,21 +1143,38 @@
             ctaP: '<strong>O Nexum é grátis.</strong> Usa a versão alojada ou auto-aloja a cadeia da tua corp em minutos.',
             ctaBtn: 'Começa agora',
             ctaGh: 'Obtê-lo no GitHub',
-            footP1: 'Comparação mantida pela equipa do Nexum · última verificação em maio de 2026. Os detalhes da concorrência mudam com o tempo — segue as ligações acima para confirmar as funcionalidades atuais. Detetaste uma imprecisão? <a href="https://github.com/GQuantrill/eve-nexum/issues">Abre um issue</a>.',
-            footP2: 'EVE Online e o logótipo EVE são marcas registadas da CCP hf. Todos os direitos reservados em todo o mundo. O Nexum é uma ferramenta de terceiros e não está afiliada à CCP hf., Pathfinder, Tripwire ou Wanderer, nem conta com o seu apoio. Consulta o <a href="/license/">aviso de licença e de PI de EVE</a> completo.'
+            wfOpen: '<span class="no">Não</span> — código fechado',
+            wfSelf: '<span class="no">Não</span> — apenas alojado',
+            wfCloud: '<span class="yes">Sim</span> — a única forma de o usar; nível gratuito, extras pagos',
+            wfKill: '<span class="yes">Sim</span> — feed do zKill no servidor + killboard do mapa',
+            wfMass: 'Calculadora de rolling (variação de ±10%, avisos de ficar preso)',
+            wfLang: '<span class="no">Não</span> — apenas inglês',
+            wfTech: 'Não publicado',
+            wfCost: 'Nível <span class="yes">gratuito</span> (um mapa, 50 sistemas) · <span class="meh">extras pagos em ISK</span> — pequeno demais para a maioria das regiões inteiras',
+            wfF2: '<span class="meh">Pago</span> para a maioria das regiões — 53 de 68 ultrapassam o limite gratuito de 50 sistemas',
+            wfF6: 'Lista de pilotos no mapa',
+            wfF7: 'Sóis A0 e gelo; sem tempestades nem incursões',
+            wfF8: 'Funções e registo de auditoria',
+            f12h: '<strong>Planeador de saltos de capitais</strong> — rotas de salto com vários troços entre sistemas low/null para a tua classe de nave e skills, com anos-luz por troço, estimativa de isótopos, fadiga de salto e planos guardados',
+            f13h: '<strong>Saídas da cadeia</strong> — todas as saídas da tua cadeia num relance, e qual delas te deixa mais perto de cada um dos teus sistemas favoritos',
+            f14h: '<strong>Mapas de calor</strong> — colore cada sistema do mapa por kills de naves, de cápsulas, de NPC, saltos ou presença da frota',
+            wfP: 'O mapeador mais recente desta lista, e o único apenas alojado e de código fechado por opção: entras e eles tratam de tudo. Foi feito para manter o mapa fiel ao jogo — os stargates vêm dos dados do jogo e não podem ser inventados nem apagados, e as jump bridges só ligam sistemas nullsec. Tem também calculadora de rolling, semeadura de regiões, d-scan no mapa, sobreposições de standings e soberania, alertas no Discord e importação de outros mapeadores, incluindo o Nexum. O nível gratuito cobre um mapa com até 50 sistemas e a tua personagem principal; mapas, sistemas e alts seguidos adicionais pagam-se mensalmente em ISK. Esse limite pesa na semeadura de regiões: 53 das 68 regiões de k-space do EVE têm mais de 50 sistemas, por isso semear a maioria implica pagar. Verificado em novembro de 2026.',
+            wfBest: '<strong>Ideal para:</strong> grupos que preferem que outra pessoa trate do mapeador, e que pagam em ISK quando um mapa pequeno deixa de chegar. <a href="https://evewayfinder.app/">Site &rarr;</a>',
+            footP1: 'Comparação mantida pela equipa do Nexum · verificada pela última vez em maio de 2026 (Wayfinder em novembro de 2026). Os detalhes da concorrência mudam com o tempo — segue as ligações acima para confirmar as funcionalidades atuais. Encontraste uma imprecisão? <a href="https://github.com/GQuantrill/eve-nexum/issues">Abre um issue</a>.',
+            footP2: 'EVE Online e o logótipo EVE são marcas registadas da CCP hf. Todos os direitos reservados em todo o mundo. O Nexum é uma ferramenta de terceiros e não está afiliada à CCP hf., Pathfinder, Tripwire, Wanderer ou Wayfinder, nem conta com o seu apoio. Consulta o <a href="/license/">aviso de licença e de PI de EVE</a> completo.'
           };
 
           // Simplified Chinese.
           DICTS.zh = {
-            __title: 'EVE Online 虫洞绘图工具对比：Nexum vs Pathfinder vs Tripwire vs Wanderer（2026）',
+            __title: 'EVE Online 虫洞绘图工具对比：Nexum vs Pathfinder vs Tripwire vs Wanderer vs Wayfinder（2026）',
             nav: '&larr; Nexum 主页',
-            h1: 'EVE Online 虫洞绘图工具对比：<br />Nexum vs Pathfinder vs Tripwire vs Wanderer',
+            h1: 'EVE Online 虫洞绘图工具对比：<br />Nexum vs Pathfinder vs Tripwire vs Wanderer vs Wayfinder',
             sub: 'EVE Online 主流虫洞绘图工具的对比 — 以及为什么 Nexum 开箱即用做得最多。',
-            upd: '最后更新于 2026 年 5 月 27 日 · 由 Nexum 团队维护',
-            lede: '如果你在 J空间侦察或居住，一款好的虫洞绘图工具必不可少。<strong>Nexum</strong> 是一款现代的开源绘图工具 — 使用免费的托管版本或自行托管 — 它覆盖完整的工作流程：实时链路绘图、信号与质量跟踪，并进一步提供真正的关洞计算器、整星域地图生成、声望与主权叠加层以及 Discord 警报。下面将它与其他常见选择进行对比 — <strong>Tripwire</strong>、<strong>Pathfinder</strong> 和 <strong>Wanderer</strong>。Nexum 由我们制作，所以我们自然认为它是大多数军团的最强选择 — 但我们已让竞品的事实保持准确并附上链接，方便你自行判断。',
+            upd: '最后更新于 2026 年 11 月 17 日 · 由 Nexum 团队维护',
+            lede: '如果你在 J空间侦察或居住，一款好的虫洞绘图工具必不可少。<strong>Nexum</strong> 是一款现代的开源绘图工具 — 使用免费的托管版本或自行托管 — 它覆盖完整的工作流程：实时链路绘图、信号与质量跟踪，并进一步提供真正的关洞计算器、整星域地图生成、声望与主权叠加层以及 Discord 警报。下面将它与其他常见选择进行对比 — <strong>Tripwire</strong>、<strong>Pathfinder</strong>、<strong>Wanderer</strong> 和 <strong>Wayfinder</strong>。Nexum 由我们制作，所以我们自然认为它是大多数军团的最强选择 — 但我们已让竞品的事实保持准确并附上链接，方便你自行判断。',
 
             h2Glance: '一览',
-            cap1: '核心对比。验证于 2026 年 5 月 — 竞品功能会变化；请按链接确认。',
+            cap1: '核心对比。于 2026 年 5 月核实（Wayfinder 于 2026 年 11 月）— 竞品功能会变化；请点击链接确认。',
             gOpenSource: '开源',
             gSelfHost: '可自托管',
             gCloud: '托管云选项',
@@ -1056,7 +1205,7 @@
             gKillN: '<span class="yes">是</span> — 实时 zKill 信息流 + 击杀日志面板',
             f11h: '<strong>语音播报</strong> — 设备本地语音朗读实时情报（角色上线、入侵、范围内的低安/零安、击杀、新虫洞链），完全在浏览器中运行',
             h2Further: 'Nexum 更进一步之处',
-            furtherIntro: '四者都能很好地处理基础功能。以下是 Nexum 内置而其他工具通常不作为文档化、开箱即用功能提供的能力 — 也是军团选择它的原因：',
+            furtherIntro: '五者都能很好地处理基础功能。以下是 Nexum 内置、而其他工具大多不以文档化、开箱即用功能提供的能力 — 也是军团选择它的原因。最新的 Wayfinder 具备其中几项，因此单独列为一栏：',
             cap2: 'Nexum 的独特功能。「—」表示它并非那些工具文档化、内置的招牌功能（功能会变化 — 请用下方链接核实）。',
             fFeature: '功能',
             f1h: 'Wormhole <strong>关洞计算器</strong> — 建模 ±10% 质量方差、带侧别跟踪的冷/热关洞船，并在某次通过会困住你的关洞船或坍塌该洞之前发出警告',
@@ -1076,9 +1225,9 @@
             h2Detail: '工具详解',
             twP: '经典的、以信号为先的虫洞绘图工具，很大一部分 J空间玩家就是用它成长起来的。它快速、专注，其工作流程对老手而言已是肌肉记忆。长期运营的公共实例（tripwire.eve-apps.com）于 2024 年中关闭，但 Tripwire 是开源的，所以它通过自托管和社区运营的实例延续了下来。',
             twBest: '<strong>最适合：</strong>想要熟悉的 Tripwire 信号工作流程且愿意自托管的团队。<a href="https://bitbucket.org/daimian/tripwire">源码 &rarr;</a>',
-            pfP: '最成熟、功能最密集的自托管绘图工具。它开创了许多虫洞玩家所期待的东西 — 丰富的虫洞数据、经由 EVE-Scout 的 Thera 连接、实时 zKillboard 击杀流、插件 API 等。代价是运维负担：它是 PHP/MySQL 栈，比单容器应用更费力去搭建和保持更新。',
+            pfP: '最成熟、功能最密集的自托管绘图工具。它开创了许多虫洞玩家所期待的东西 — 丰富的虫洞数据、经由 EVE-Scout 的 Thera 连接、zKillboard 击杀统计（每小时更新，非实时）、插件 API 等。代价是运维负担：它是 PHP/MySQL 栈，比单容器应用更费力去搭建和保持更新。',
             pfBest: '<strong>最适合：</strong>想要最多功能且不介意运行更重栈的团队。<a href="https://github.com/exodus4d/pathfinder">GitHub &rarr;</a>',
-            wdP: '现代的挑战者，被宣传为 Pathfinder 的轻量、快速替代品。基于 Elixir/Phoenix 构建，配 React 前端，并以 MIT 开源，它是四者中唯一拥有<em>官方托管云</em>版本的 — 让团队无需运行任何基础设施即可使用 — 同时仍提供免费的自托管 Community Edition。',
+            wdP: '现代的挑战者，被宣传为 Pathfinder 的轻量、快速替代品。基于 Elixir/Phoenix 构建，配 React 前端，并以 MIT 开源，它提供<em>官方托管云</em>版本 — 让团队无需运行任何基础设施即可使用 — 而且与仅提供托管的 Wayfinder 不同，它还提供免费的自托管 Community Edition。',
             wdBest: '<strong>最适合：</strong>想要精致界面并希望完全省去自托管的团队。<a href="https://wanderer.ltd/">网站 &rarr;</a> · <a href="https://github.com/wanderer-industries/wanderer">GitHub &rarr;</a>',
             nxP: '一款现代、开源、自托管、以军团为先的绘图工具。它覆盖核心工作流程 — 实时协作绘图（地图上所有人实时编辑）、带虫洞老化的信号粘贴，以及连接跟踪 — 并叠加了面向运营军团链的额外功能：',
             nxLi1: '<strong>关洞计算器</strong>，建模 ±10% 质量方差，将每次通过预测为安全 / 可能坍塌 / 将会坍塌，并在某次通过会困住你的关洞船之前发出警告。',
@@ -1116,21 +1265,38 @@
             ctaP: '<strong>Nexum 免费。</strong>使用托管版本，或在几分钟内自托管你军团的链。',
             ctaBtn: '立即开始',
             ctaGh: '在 GitHub 上获取',
-            footP1: '对比由 Nexum 团队维护 · 最后核实于 2026 年 5 月。竞品细节会随时间变化 — 请按上方链接确认当前功能。发现不准确之处？<a href="https://github.com/GQuantrill/eve-nexum/issues">开一个 issue</a>。',
-            footP2: 'EVE Online 和 EVE 标志是 CCP hf. 的注册商标。保留全球所有权利。Nexum 是第三方工具，与 CCP hf.、Pathfinder、Tripwire 或 Wanderer 无关，也未获其认可。请查看完整的 <a href="/license/">许可证与 EVE 知识产权声明</a>。'
+            wfOpen: '<span class="no">否</span> — 闭源',
+            wfSelf: '<span class="no">否</span> — 仅托管',
+            wfCloud: '<span class="yes">是</span> — 唯一的使用方式；有免费档，额外功能收费',
+            wfKill: '<span class="yes">是</span> — 服务器端 zKill 推送 + 地图击杀榜',
+            wfMass: '滚洞计算器（±10% 浮动，困住警告）',
+            wfLang: '<span class="no">否</span> — 仅英语',
+            wfTech: '未公开',
+            wfCost: '<span class="yes">免费</span>档（一张地图，50 个星系）· <span class="meh">额外功能以 ISK 付费</span> — 不足以容纳大多数完整星域',
+            wfF2: '大多数星域需<span class="meh">付费</span> — 68 个中有 53 个超过免费的 50 星系上限',
+            wfF6: '地图上的飞行员名单',
+            wfF7: 'A0 恒星和冰矿；无风暴或入侵',
+            wfF8: '角色权限和审计日志',
+            f12h: '<strong>旗舰跳跃规划</strong> — 根据你的舰船级别和技能，在低安/00 星系之间规划多段跳跃路线，显示每段光年数、同位素估算、跳跃疲劳，并可保存方案',
+            f13h: '<strong>链路出口</strong> — 一眼看清离开你的链路的所有出口，以及哪个出口离你的每个常用星系最近',
+            f14h: '<strong>地图热力图</strong> — 按舰船击杀、太空舱击杀、NPC 击杀、跳跃次数或舰队存在为地图上的每个星系着色',
+            wfP: '这里最新的地图工具，也是唯一刻意只提供托管、闭源的一个：你登录，其余都由他们运行。它的设计重点是让地图忠实于游戏 — 星门来自游戏数据，无法伪造或删除，跳桥只连接 00 星系。它还有滚洞计算器、星域导入、地图上的 d-scan、声望和主权叠加层、Discord 提醒，以及从其他地图工具（包括 Nexum）导入。免费档包含一张最多 50 个星系的地图和你的主角色；额外的地图、星系和追踪小号按月以 ISK 付费。这个上限对星域导入影响很大：EVE 的 68 个 K 空间星域中有 53 个超过 50 个星系，所以导入大多数星域都需要付费。核实于 2026 年 11 月。',
+            wfBest: '<strong>最适合：</strong>乐意让别人运行地图工具、并在一张小地图不够用时用 ISK 付费的团队。<a href="https://evewayfinder.app/">网站 &rarr;</a>',
+            footP1: '对比由 Nexum 团队维护 · 最后核实于 2026 年 5 月（Wayfinder 于 2026 年 11 月）。竞品细节会随时间变化 — 请点击上方链接确认当前功能。发现不准确之处？<a href="https://github.com/GQuantrill/eve-nexum/issues">提交 issue</a>。',
+            footP2: 'EVE Online 和 EVE 标志是 CCP hf. 的注册商标。保留全球所有权利。Nexum 是第三方工具，与 CCP hf.、Pathfinder、Tripwire、Wanderer 或 Wayfinder 无关，也未获其认可。请查看完整的 <a href="/license/">许可证与 EVE 知识产权声明</a>。'
           };
 
           // Korean.
           DICTS.ko = {
-            __title: 'EVE Online 웜홀 지도 도구 비교: Nexum vs Pathfinder vs Tripwire vs Wanderer (2026)',
+            __title: 'EVE Online 웜홀 지도 도구 비교: Nexum vs Pathfinder vs Tripwire vs Wanderer vs Wayfinder (2026)',
             nav: '&larr; Nexum 홈',
-            h1: 'EVE Online 웜홀 지도 도구 비교:<br />Nexum vs Pathfinder vs Tripwire vs Wanderer',
+            h1: 'EVE Online 웜홀 지도 도구 비교:<br />Nexum vs Pathfinder vs Tripwire vs Wanderer vs Wayfinder',
             sub: 'EVE Online 주요 웜홀 지도 도구 비교 — 그리고 Nexum이 기본 상태에서 가장 많은 것을 하는 이유.',
-            upd: '최종 업데이트 2026년 5월 27일 · Nexum 팀 관리',
-            lede: 'J-스페이스에서 스카우트하거나 거주한다면 좋은 웜홀 지도 도구는 필수입니다. <strong>Nexum</strong>은 현대적인 오픈 소스 지도 도구로 — 무료 호스팅 버전을 쓰거나 직접 호스팅하세요 — 전체 워크플로를 다룹니다: 실시간 체인 지도, 시그니처 및 질량 추적, 그리고 더 나아가 제대로 된 롤링 계산기, 지역 전체 지도 생성, 스탠딩 및 주권 오버레이, Discord 경보까지. 아래에서 다른 흔한 선택지인 <strong>Tripwire</strong>, <strong>Pathfinder</strong>, <strong>Wanderer</strong>와 비교합니다. Nexum은 저희가 만들기에 당연히 대부분의 군단에게 가장 강력한 선택이라고 생각합니다 — 하지만 경쟁 제품의 사실을 정확하게 유지하고 링크해 두어 직접 판단할 수 있게 했습니다.',
+            upd: '최종 업데이트 2026년 11월 17일 · Nexum 팀이 관리',
+            lede: 'J-스페이스에서 스카우트하거나 거주한다면 좋은 웜홀 지도 도구는 필수입니다. <strong>Nexum</strong>은 현대적인 오픈 소스 지도 도구로 — 무료 호스팅 버전을 쓰거나 직접 호스팅하세요 — 전체 워크플로를 다룹니다: 실시간 체인 지도, 시그니처 및 질량 추적, 그리고 더 나아가 제대로 된 롤링 계산기, 지역 전체 지도 생성, 스탠딩 및 주권 오버레이, Discord 경보까지. 아래에서 다른 흔한 선택지인 <strong>Tripwire</strong>, <strong>Pathfinder</strong>, <strong>Wanderer</strong>, <strong>Wayfinder</strong>와 비교합니다. Nexum은 저희가 만들기에 당연히 대부분의 군단에게 가장 강력한 선택이라고 생각합니다 — 하지만 경쟁 제품의 사실을 정확하게 유지하고 링크해 두어 직접 판단할 수 있게 했습니다.',
 
             h2Glance: '한눈에 보기',
-            cap1: '핵심 비교. 2026년 5월 검증 — 경쟁 제품 기능은 변합니다; 링크를 따라가 확인하세요.',
+            cap1: '핵심 비교. 2026년 5월 확인(Wayfinder는 2026년 11월) — 경쟁 도구의 기능은 바뀝니다; 링크를 따라 확인하세요.',
             gOpenSource: '오픈 소스',
             gSelfHost: '자체 호스팅 가능',
             gCloud: '관리형 클라우드 옵션',
@@ -1161,7 +1327,7 @@
             gKillN: '<span class="yes">예</span> — 실시간 zKill 피드 + 킬 로그 패널',
             f11h: '<strong>음성 안내</strong> — 기기 내 음성 합성이 실시간 정보를 읽어줍니다(캐릭터 접속, 인커전, 범위 내 로우섹/널섹, 킬, 새 체인). 모두 브라우저에서 실행',
             h2Further: 'Nexum이 더 나아가는 지점',
-            furtherIntro: '네 가지 모두 기본은 잘 처리합니다. 다음은 Nexum이 내장하지만 다른 도구들은 일반적으로 문서화된 기본 제공 기능으로 제공하지 않는 능력들입니다 — 군단이 그것을 선택하는 이유입니다:',
+            furtherIntro: '다섯 모두 기본은 잘 해냅니다. 아래는 Nexum에 내장되어 있지만 다른 도구들은 대부분 문서화된 기본 기능으로 제공하지 않는 것들입니다 — 콥들이 Nexum을 선택하는 이유죠. 가장 새로운 Wayfinder는 그중 몇 가지를 갖추고 있어 별도 열로 표시합니다:',
             cap2: 'Nexum의 차별화된 기능. 「—」는 해당 도구들의 문서화된 내장 대표 기능이 아님을 뜻합니다 (기능은 변합니다 — 아래 링크로 확인하세요).',
             fFeature: '기능',
             f1h: 'Wormhole <strong>롤링 계산기</strong> — ±10% 질량 분산을 모델링하고, 사이드 추적이 있는 콜드/핫 롤러, 그리고 어떤 통과가 당신의 롤러를 고립시키거나 홀을 붕괴시키기 전에 경고',
@@ -1181,9 +1347,9 @@
             h2Detail: '도구 상세',
             twP: '엄청난 비율의 J-스페이스 플레이어가 함께 자란 고전적인, 시그니처 우선 웜홀 지도 도구. 빠르고, 집중적이며, 워크플로는 베테랑에게 근육 기억입니다. 오래 운영된 공개 인스턴스(tripwire.eve-apps.com)는 2024년 중반에 종료되었지만, Tripwire는 오픈 소스라 자체 호스팅과 커뮤니티 운영 인스턴스를 통해 살아 있습니다.',
             twBest: '<strong>가장 적합:</strong> 익숙한 Tripwire 시그니처 워크플로를 원하고 자체 호스팅할 의향이 있는 그룹. <a href="https://bitbucket.org/daimian/tripwire">소스 &rarr;</a>',
-            pfP: '가장 성숙하고 기능이 풍부한 자체 호스팅 지도 도구. 웜홀 유저가 기대하는 많은 것을 개척했습니다 — 풍부한 웜홀 데이터, EVE-Scout를 통한 Thera 연결, 실시간 zKillboard 킬스트림, 플러그인 API 등. 절충점은 운영 부담입니다: 단일 컨테이너 앱보다 설치하고 최신으로 유지하는 데 더 손이 가는 PHP/MySQL 스택입니다.',
+            pfP: '가장 성숙하고 기능이 풍부한 자체 호스팅 지도 도구. 웜홀 유저가 기대하는 많은 것을 개척했습니다 — 풍부한 웜홀 데이터, EVE-Scout를 통한 Thera 연결, zKillboard 킬 통계(실시간이 아닌 시간별 피드), 플러그인 API 등. 절충점은 운영 부담입니다: 단일 컨테이너 앱보다 설치하고 최신으로 유지하는 데 더 손이 가는 PHP/MySQL 스택입니다.',
             pfBest: '<strong>가장 적합:</strong> 최대한의 기능을 원하고 더 무거운 스택 운영을 꺼리지 않는 그룹. <a href="https://github.com/exodus4d/pathfinder">GitHub &rarr;</a>',
-            wdP: '현대의 도전자로, Pathfinder의 가볍고 빠른 대안으로 홍보됩니다. Elixir/Phoenix 위에 React 프론트엔드로 구축되고 MIT로 오픈 소스화되었으며, 넷 중 유일하게 <em>공식 관리형 클라우드</em> 버전을 갖춰 — 그룹이 어떤 인프라도 운영하지 않고 사용할 수 있게 합니다 — 동시에 무료 자체 호스팅 Community Edition도 제공합니다.',
+            wdP: '현대의 도전자로, Pathfinder의 가볍고 빠른 대안으로 홍보됩니다. Elixir/Phoenix 위에 React 프론트엔드로 구축되고 MIT로 오픈 소스화되었으며, <em>공식 관리형 클라우드</em> 버전을 갖춰 — 그룹이 어떤 인프라도 운영하지 않고 사용할 수 있게 합니다 — 호스팅 전용인 Wayfinder와 달리 무료 자체 호스팅 Community Edition도 제공합니다.',
             wdBest: '<strong>가장 적합:</strong> 세련된 UI와 자체 호스팅을 완전히 건너뛸 선택지를 원하는 그룹. <a href="https://wanderer.ltd/">웹사이트 &rarr;</a> · <a href="https://github.com/wanderer-industries/wanderer">GitHub &rarr;</a>',
             nxP: '군단 우선으로 만든 현대적인, 오픈 소스, 자체 호스팅 지도 도구. 핵심 워크플로를 다룹니다 — 실시간 협업 지도 작성(지도 위 모두에게 실시간 편집), 웜홀 노화가 포함된 시그니처 붙여넣기, 연결 추적 — 그리고 군단의 체인을 운영하기 위한 추가 기능을 더합니다:',
             nxLi1: '±10% 질량 분산을 모델링하고, 각 통과를 안전 / 붕괴 가능 / 붕괴 예정으로 예측하며, 어떤 통과가 당신의 롤러를 고립시키기 전에 경고하는 <strong>롤링 계산기</strong>.',
@@ -1221,21 +1387,38 @@
             ctaP: '<strong>Nexum은 무료입니다.</strong> 호스팅 버전을 쓰거나 몇 분 만에 군단의 체인을 직접 호스팅하세요.',
             ctaBtn: '지금 시작하기',
             ctaGh: 'GitHub에서 받기',
-            footP1: '비교는 Nexum 팀이 관리 · 최종 검증 2026년 5월. 경쟁 제품 세부 정보는 시간이 지나면 바뀝니다 — 위의 링크를 따라가 현재 기능을 확인하세요. 부정확한 점을 발견했나요? <a href="https://github.com/GQuantrill/eve-nexum/issues">이슈를 여세요</a>.',
-            footP2: 'EVE Online과 EVE 로고는 CCP hf.의 등록 상표입니다. 전 세계 모든 권리 보유. Nexum은 제3자 도구이며 CCP hf., Pathfinder, Tripwire 또는 Wanderer와 제휴하거나 그로부터 보증받지 않았습니다. 전체 <a href="/license/">라이선스 및 EVE IP 고지</a>를 참조하세요.'
+            wfOpen: '<span class="no">아니요</span> — 비공개 소스',
+            wfSelf: '<span class="no">아니요</span> — 호스팅 전용',
+            wfCloud: '<span class="yes">예</span> — 유일한 사용 방법; 무료 등급, 유료 추가 기능',
+            wfKill: '<span class="yes">예</span> — 서버 측 zKill 피드 + 맵 킬보드',
+            wfMass: '롤링 계산기(±10% 편차, 고립 경고)',
+            wfLang: '<span class="no">아니요</span> — 영어만',
+            wfTech: '공개되지 않음',
+            wfCost: '<span class="yes">무료</span> 등급(맵 1개, 성계 50개) · <span class="meh">ISK로 결제하는 추가 기능</span> — 대부분의 지역 전체를 담기엔 너무 작음',
+            wfF2: '대부분의 지역은 <span class="meh">유료</span> — 68개 중 53개가 무료 한도인 성계 50개를 넘음',
+            wfF6: '맵에 있는 파일럿 목록',
+            wfF7: 'A0 항성과 얼음; 폭풍이나 인커전 없음',
+            wfF8: '역할과 감사 로그',
+            f12h: '<strong>캐피탈 점프 플래너</strong> — 함선 등급과 스킬에 맞춰 로우/널 성계 사이의 다단계 점프 경로를 계획하고, 구간별 광년, 동위원소 추정치, 점프 피로도, 저장된 계획을 보여 줍니다',
+            f13h: '<strong>체인 출구</strong> — 체인에서 나가는 모든 길을 한눈에, 그리고 어느 출구가 각 즐겨찾는 성계에 가장 가까운지 보여 줍니다',
+            f14h: '<strong>맵 히트맵</strong> — 함선 킬, 포드 킬, NPC 킬, 점프 수 또는 함대 위치에 따라 맵의 모든 성계를 색칠합니다',
+            wfP: '여기서 가장 새로운 매퍼이자, 의도적으로 호스팅 전용·비공개 소스인 유일한 도구입니다: 로그인만 하면 나머지는 그들이 운영합니다. 맵을 게임과 일치하게 유지하는 데 중점을 둡니다 — 스타게이트는 게임 데이터에서 오며 꾸며 내거나 삭제할 수 없고, 점프 브리지는 널 성계끼리만 연결합니다. 롤링 계산기, 지역 시딩, 맵 위의 D-스캔, 스탠딩·소브 오버레이, Discord 알림, 그리고 Nexum을 포함한 다른 매퍼에서의 가져오기도 있습니다. 무료 등급은 성계 50개까지의 맵 하나와 본캐를 포함하며, 추가 맵·성계·추적 부캐는 매달 ISK로 결제합니다. 이 한도는 지역 시딩에서 중요합니다: EVE의 K-스페이스 지역 68개 중 53개가 성계 50개를 넘으므로, 대부분을 시딩하려면 결제해야 합니다. 2026년 11월 확인.',
+            wfBest: '<strong>가장 적합:</strong> 매퍼 운영을 다른 사람에게 맡기고, 작은 맵 하나로 부족해지면 ISK를 낼 의향이 있는 그룹. <a href="https://evewayfinder.app/">웹사이트 &rarr;</a>',
+            footP1: 'Nexum 팀이 관리하는 비교 · 최종 확인 2026년 5월(Wayfinder는 2026년 11월). 경쟁 도구의 세부 사항은 시간이 지나며 바뀝니다 — 위 링크를 따라 현재 기능을 확인하세요. 부정확한 부분을 발견하셨나요? <a href="https://github.com/GQuantrill/eve-nexum/issues">이슈를 열어 주세요</a>.',
+            footP2: 'EVE Online과 EVE 로고는 CCP hf.의 등록 상표입니다. 전 세계 모든 권리 보유. Nexum은 제3자 도구이며 CCP hf., Pathfinder, Tripwire, Wanderer 또는 Wayfinder와 제휴하거나 그로부터 보증받지 않았습니다. 전체 <a href="/license/">라이선스 및 EVE IP 고지</a>를 참조하세요.'
           };
 
           // Japanese.
           DICTS.ja = {
-            __title: 'EVE Online ワームホールマッパー比較: Nexum vs Pathfinder vs Tripwire vs Wanderer（2026）',
+            __title: 'EVE Online ワームホールマッパー比較: Nexum vs Pathfinder vs Tripwire vs Wanderer vs Wayfinder（2026）',
             nav: '&larr; Nexum ホーム',
-            h1: 'EVE Online ワームホールマッパー比較:<br />Nexum vs Pathfinder vs Tripwire vs Wanderer',
+            h1: 'EVE Online ワームホールマッパー比較:<br />Nexum vs Pathfinder vs Tripwire vs Wanderer vs Wayfinder',
             sub: 'EVE Online の主要なワームホールマッパーの比較 — そして Nexum が最初から最も多くをこなす理由。',
-            upd: '最終更新 2026年5月27日 · Nexum チームが管理',
-            lede: 'J-スペースでスカウトしたり住んだりするなら、良いワームホールマッパーは必須です。<strong>Nexum</strong> はモダンなオープンソースのマッパーで — 無料のホスティング版を使うか自分でホストできます — フルワークフローをカバーします: リアルタイムのチェーンマッピング、シグネチャと質量の追跡、さらに本格的なロール計算機、リージョン全体のマップ生成、スタンディングと主権のオーバーレイ、Discord アラートまで。以下では、他のよくある選択肢 — <strong>Tripwire</strong>、<strong>Pathfinder</strong>、<strong>Wanderer</strong> — と比較します。Nexum は私たちが作っているので、当然ほとんどのコーポにとって最強の選択だと考えていますが、競合の事実は正確かつリンク付きで保ち、ご自身で判断できるようにしています。',
+            upd: '最終更新 2026 年 11 月 17 日 · Nexum チームが管理',
+            lede: 'J-スペースでスカウトしたり住んだりするなら、良いワームホールマッパーは必須です。<strong>Nexum</strong> はモダンなオープンソースのマッパーで — 無料のホスティング版を使うか自分でホストできます — フルワークフローをカバーします: リアルタイムのチェーンマッピング、シグネチャと質量の追跡、さらに本格的なロール計算機、リージョン全体のマップ生成、スタンディングと主権のオーバーレイ、Discord アラートまで。以下では、他のよくある選択肢 — <strong>Tripwire</strong>、<strong>Pathfinder</strong>、<strong>Wanderer</strong>、<strong>Wayfinder</strong> — と比較します。Nexum は私たちが作っているので、当然ほとんどのコーポにとって最強の選択だと考えていますが、競合の事実は正確かつリンク付きで保ち、ご自身で判断できるようにしています。',
 
             h2Glance: '一目で',
-            cap1: '基本比較。2026年5月検証 — 競合の機能は変わります。リンクをたどって確認してください。',
+            cap1: '主要な比較。2026 年 5 月に確認（Wayfinder は 2026 年 11 月）— 競合の機能は変わります。リンクで確認してください。',
             gOpenSource: 'オープンソース',
             gSelfHost: 'セルフホスト可',
             gCloud: 'マネージドクラウドオプション',
@@ -1266,7 +1449,7 @@
             gKillN: '<span class="yes">はい</span> — ライブ zKill フィード + キルログパネル',
             f11h: '<strong>音声アナウンス</strong> — デバイス内の音声合成がライブ情報を読み上げます（キャラの接続、インカージョン、範囲内のローセク/ヌルセク、キル、新チェーン）。すべてブラウザ内で動作',
             h2Further: 'Nexum がさらに進んでいる点',
-            furtherIntro: '4 つとも基本はうまく扱います。以下は Nexum が組み込んでいて、他のツールが一般にドキュメント化された標準機能として提供していない能力です — コーポがそれを選ぶ理由です:',
+            furtherIntro: '5 つとも基本はしっかりこなします。以下は Nexum に組み込まれていて、他のツールはほとんど文書化された標準機能として提供していないものです — コープが Nexum を選ぶ理由です。最も新しい Wayfinder はそのいくつかを備えているので、独自の列を設けています:',
             cap2: 'Nexum の際立った機能。「—」は、それらのツールのドキュメント化された組み込みの目玉機能ではないことを意味します（機能は変わります — 下のリンクで確認してください）。',
             fFeature: '機能',
             f1h: 'Wormhole <strong>ロール計算機</strong> — ±10% の質量分散をモデル化し、サイド追跡付きのコールド/ホットローラー、そしてある通過があなたのローラーを座礁させたりホールを崩壊させたりする前に警告',
@@ -1286,9 +1469,9 @@
             h2Detail: 'ツールの詳細',
             twP: 'J-スペースのプレイヤーの大きな割合が共に育った、古典的でシグネチャ優先のワームホールマッパー。速く、集中していて、ワークフローはベテランには体に染みついています。長く運営されたパブリックインスタンス（tripwire.eve-apps.com）は 2024 年半ばに閉鎖されましたが、Tripwire はオープンソースなので、セルフホストとコミュニティ運営のインスタンスを通じて生き続けています。',
             twBest: '<strong>最適:</strong> 慣れた Tripwire のシグネチャワークフローを望み、セルフホストをいとわないグループ。<a href="https://bitbucket.org/daimian/tripwire">ソース &rarr;</a>',
-            pfP: '最も成熟し機能が豊富なセルフホストマッパー。ワームホール住民が期待する多くのことを切り開きました — 豊富なワームホールデータ、EVE-Scout 経由の Thera 接続、ライブの zKillboard キルストリーム、プラグイン API など。トレードオフは運用の重さです: 単一コンテナのアプリより、セットアップと更新の維持に手がかかる PHP/MySQL スタックです。',
+            pfP: '最も成熟し機能が豊富なセルフホストマッパー。ワームホール住民が期待する多くのことを切り開きました — 豊富なワームホールデータ、EVE-Scout 経由の Thera 接続、zKillboard のキル統計（ライブではなく 1 時間ごとのフィード）、プラグイン API など。トレードオフは運用の重さです: 単一コンテナのアプリより、セットアップと更新の維持に手がかかる PHP/MySQL スタックです。',
             pfBest: '<strong>最適:</strong> 最大限の機能を望み、より重いスタックの運用をいとわないグループ。<a href="https://github.com/exodus4d/pathfinder">GitHub &rarr;</a>',
-            wdP: 'モダンな挑戦者で、Pathfinder の軽量で高速な代替として宣伝されています。Elixir/Phoenix 上に React フロントエンドで構築され MIT でオープンソース化され、4 つの中で唯一<em>公式マネージドクラウド</em>版を持ち — グループがインフラを一切運用せずに使えるようにし — 同時に無料のセルフホスト Community Edition も提供します。',
+            wdP: 'モダンな挑戦者で、Pathfinder の軽量で高速な代替として宣伝されています。Elixir/Phoenix 上に React フロントエンドで構築され MIT でオープンソース化され、<em>公式マネージドクラウド</em>版を持ち — グループがインフラを一切運用せずに使えるようにし — ホスト版のみの Wayfinder と違い、無料のセルフホスト Community Edition も提供します。',
             wdBest: '<strong>最適:</strong> 洗練された UI と、セルフホストを完全に省く選択肢を望むグループ。<a href="https://wanderer.ltd/">ウェブサイト &rarr;</a> · <a href="https://github.com/wanderer-industries/wanderer">GitHub &rarr;</a>',
             nxP: 'コーポ優先で作られた、モダンでオープンソースのセルフホストマッパー。コアワークフローをカバーします — リアルタイム共同マッピング（マップ上の全員にライブ編集）、ワームホール経年付きのシグネチャ貼り付け、接続追跡 — そしてコーポのチェーン運用に向けた追加機能を重ねます:',
             nxLi1: '±10% の質量分散をモデル化し、各通過を安全 / 崩壊の可能性 / 崩壊確実として予測し、ある通過があなたのローラーを座礁させる前に警告する<strong>ロール計算機</strong>。',
@@ -1326,21 +1509,38 @@
             ctaP: '<strong>Nexum は無料です。</strong>ホスティング版を使うか、数分でコーポのチェーンをセルフホストしてください。',
             ctaBtn: '今すぐ始める',
             ctaGh: 'GitHub で入手',
-            footP1: '比較は Nexum チームが管理 · 最終確認 2026年5月。競合の詳細は時間とともに変わります — 上のリンクをたどって現在の機能を確認してください。不正確な点を見つけましたか？<a href="https://github.com/GQuantrill/eve-nexum/issues">issue を開いてください</a>。',
-            footP2: 'EVE Online と EVE ロゴは CCP hf. の登録商標です。世界中で全権利を留保します。Nexum はサードパーティのツールであり、CCP hf.、Pathfinder、Tripwire、Wanderer と提携しておらず、その承認も受けていません。完全な <a href="/license/">ライセンスおよび EVE 知的財産に関する注意</a>をご覧ください。'
+            wfOpen: '<span class="no">いいえ</span> — クローズドソース',
+            wfSelf: '<span class="no">いいえ</span> — ホスト版のみ',
+            wfCloud: '<span class="yes">はい</span> — 唯一の利用方法。無料枠あり、追加は有料',
+            wfKill: '<span class="yes">はい</span> — サーバー側の zKill フィード + マップのキルボード',
+            wfMass: 'ローリング計算機（±10% の変動、取り残し警告）',
+            wfLang: '<span class="no">いいえ</span> — 英語のみ',
+            wfTech: '非公開',
+            wfCost: '<span class="yes">無料</span>枠（マップ 1 つ、50 星系）· <span class="meh">追加は ISK で有料</span> — ほとんどのリージョン全体には小さすぎる',
+            wfF2: 'ほとんどのリージョンは<span class="meh">有料</span> — 68 のうち 53 が無料上限の 50 星系を超える',
+            wfF6: 'マップ上のパイロット一覧',
+            wfF7: 'A0 恒星と氷。ストームやインカージョンはなし',
+            wfF8: 'ロールと監査ログ',
+            f12h: '<strong>キャピタル ジャンププランナー</strong> — 艦種とスキルに合わせて low/null 星系間の複数ホップのジャンプルートを計画し、ホップごとの光年、アイソトープの見積もり、ジャンプ疲労、保存したプランを表示',
+            f13h: '<strong>チェーンの出口</strong> — チェーンから出るすべての道をひと目で、どの出口がお気に入りの各星系に最も近いかも表示',
+            f14h: '<strong>マップのヒートマップ</strong> — 艦船キル、ポッドキル、NPC キル、ジャンプ数、フリートの存在でマップ上の全星系を色分け',
+            wfP: 'ここで最も新しいマッパーで、意図的にホスト版のみ・クローズドソースである唯一のツールです: ログインすれば、あとはすべて運営側が動かします。マップをゲームに忠実に保つことを重視しており、スターゲートはゲームデータから作られ、捏造も削除もできず、ジャンプブリッジは null 星系同士しかつなげません。ローリング計算機、リージョンの一括追加、マップ上の D-Scan、スタンディングとソブのオーバーレイ、Discord 通知、Nexum を含む他のマッパーからのインポートもあります。無料枠は最大 50 星系のマップ 1 つとメインキャラクターまでで、追加のマップ・星系・追跡するサブキャラは毎月 ISK で支払います。この上限はリージョン追加で効いてきます: EVE の k-space リージョン 68 のうち 53 は 50 星系を超えるため、ほとんどを追加するには支払いが必要です。2026 年 11 月に確認。',
+            wfBest: '<strong>最適:</strong> マッパーの運用を他人に任せたい、そして小さなマップ 1 つで足りなくなったら ISK を払ってもよいグループ。<a href="https://evewayfinder.app/">ウェブサイト &rarr;</a>',
+            footP1: '比較は Nexum チームが管理 · 最終確認 2026 年 5 月（Wayfinder は 2026 年 11 月）。競合の詳細は時間とともに変わります — 上のリンクで現在の機能を確認してください。不正確な点を見つけましたか？ <a href="https://github.com/GQuantrill/eve-nexum/issues">Issue を作成</a>してください。',
+            footP2: 'EVE Online と EVE ロゴは CCP hf. の登録商標です。世界中で全権利を留保します。Nexum はサードパーティのツールであり、CCP hf.、Pathfinder、Tripwire、Wanderer、Wayfinder と提携しておらず、その承認も受けていません。完全な <a href="/license/">ライセンスおよび EVE 知的財産に関する注意</a>をご覧ください。'
           };
 
           // Russian.
           DICTS.ru = {
-            __title: 'Сравнение мапперов червоточин EVE Online: Nexum vs Pathfinder vs Tripwire vs Wanderer (2026)',
+            __title: 'Сравнение мапперов червоточин EVE Online: Nexum vs Pathfinder vs Tripwire vs Wanderer vs Wayfinder (2026)',
             nav: '&larr; Главная Nexum',
-            h1: 'Сравнение мапперов червоточин EVE Online:<br />Nexum vs Pathfinder vs Tripwire vs Wanderer',
+            h1: 'Сравнение мапперов червоточин EVE Online:<br />Nexum vs Pathfinder vs Tripwire vs Wanderer vs Wayfinder',
             sub: 'Как сравниваются ведущие мапперы червоточин для EVE Online — и почему Nexum из коробки делает больше всего.',
-            upd: 'Последнее обновление 27 мая 2026 · ведётся командой Nexum',
-            lede: 'Если вы скаутите или живёте в J-спейсе, хороший маппер червоточин необходим. <strong>Nexum</strong> — современный маппер с открытым исходным кодом — используйте бесплатную хостинг-версию или поднимите свою — покрывающий полный рабочий процесс: картирование цепочек в реальном времени, отслеживание сигнатур и массы, плюс полноценный калькулятор роллинга, генерация карт по целым регионам, оверлеи стендингов и суверенитета и оповещения в Discord. Ниже мы сравниваем его с другими частыми вариантами — <strong>Tripwire</strong>, <strong>Pathfinder</strong> и <strong>Wanderer</strong>. Nexum делаем мы, так что, естественно, считаем его сильнейшим выбором для большинства корпораций, но факты о конкурентах держим точными и со ссылками, чтобы вы могли судить сами.',
+            upd: 'Последнее обновление 17 ноября 2026 · поддерживается командой Nexum',
+            lede: 'Если вы скаутите или живёте в J-спейсе, хороший маппер червоточин необходим. <strong>Nexum</strong> — современный маппер с открытым исходным кодом — используйте бесплатную хостинг-версию или поднимите свою — покрывающий полный рабочий процесс: картирование цепочек в реальном времени, отслеживание сигнатур и массы, плюс полноценный калькулятор роллинга, генерация карт по целым регионам, оверлеи стендингов и суверенитета и оповещения в Discord. Ниже мы сравниваем его с другими частыми вариантами — <strong>Tripwire</strong>, <strong>Pathfinder</strong>, <strong>Wanderer</strong> и <strong>Wayfinder</strong>. Nexum делаем мы, так что, естественно, считаем его сильнейшим выбором для большинства корпораций, но факты о конкурентах держим точными и со ссылками, чтобы вы могли судить сами.',
 
             h2Glance: 'Кратко',
-            cap1: 'Базовое сравнение. Проверено в мае 2026 — функции конкурентов меняются. Переходите по ссылкам, чтобы убедиться.',
+            cap1: 'Основное сравнение. Проверено в мае 2026 (Wayfinder в ноябре 2026) — функции конкурентов меняются; переходите по ссылкам для проверки.',
             gOpenSource: 'Открытый код',
             gSelfHost: 'Самостоятельный хостинг',
             gCloud: 'Управляемый облачный вариант',
@@ -1371,7 +1571,7 @@
             gKillN: '<span class="yes">Да</span> — живая лента zKill + панель Kill Log',
             f11h: '<strong>Голосовые оповещения</strong> — синтез речи на устройстве зачитывает разведданные вслух (входы персонажей, инкурсии, лоусек/нулсек в радиусе, килы, новые цепочки), полностью в браузере',
             h2Further: 'Где Nexum идёт дальше',
-            furtherIntro: 'Все четыре хорошо справляются с основами. Ниже — возможности, которые Nexum имеет встроенными и которые другие инструменты обычно не предлагают как документированные стандартные функции — именно поэтому корпорации выбирают его:',
+            furtherIntro: 'Все пять хорошо справляются с основами. Вот возможности, встроенные в Nexum, которые остальные в основном не предлагают как задокументированные готовые функции, — причины, по которым корпорации его выбирают. У самого нового, Wayfinder, есть несколько из них, поэтому у него своя колонка:',
             cap2: 'Выделяющиеся функции Nexum. «—» означает, что это не документированная встроенная фишка тех инструментов (функции меняются — проверьте по ссылкам ниже).',
             fFeature: 'Функция',
             f1h: '<strong>Калькулятор роллинга</strong> червоточин — моделирует разброс массы ±10%, холодный/горячий роллер с отслеживанием сторон, и предупреждает, прежде чем проход оставит вашего роллера за бортом или схлопнет дыру',
@@ -1391,9 +1591,9 @@
             h2Detail: 'Инструменты подробнее',
             twP: 'Классический сигнатуро-ориентированный маппер червоточин, на котором выросла большая часть игроков J-спейса. Быстрый, сфокусированный, и его рабочий процесс намертво в мышечной памяти у ветеранов. Долго работавший публичный экземпляр (tripwire.eve-apps.com) закрылся в середине 2024 года, но Tripwire с открытым кодом, поэтому живёт через самостоятельный хостинг и экземпляры сообщества.',
             twBest: '<strong>Лучше всего для:</strong> групп, которым нужен привычный сигнатурный процесс Tripwire и которые не против самостоятельного хостинга. <a href="https://bitbucket.org/daimian/tripwire">Исходники &rarr;</a>',
-            pfP: 'Самый зрелый и функционально насыщенный самостоятельно хостируемый маппер. Он проложил дорогу многому, что ожидают жители червоточин — богатые данные о червоточинах, соединения Thera через EVE-Scout, живой поток киллов zKillboard, API плагинов и прочее. Компромисс — эксплуатационная тяжесть: это стек PHP/MySQL, который сложнее настраивать и обновлять, чем приложение в одном контейнере.',
+            pfP: 'Самый зрелый и функционально насыщенный самостоятельно хостируемый маппер. Он проложил дорогу многому, что ожидают жители червоточин — богатые данные о червоточинах, соединения Thera через EVE-Scout, статистика киллов zKillboard (ежечасный фид, не в реальном времени), API плагинов и прочее. Компромисс — эксплуатационная тяжесть: это стек PHP/MySQL, который сложнее настраивать и обновлять, чем приложение в одном контейнере.',
             pfBest: '<strong>Лучше всего для:</strong> групп, которым нужен максимум функций и которые не против эксплуатировать более тяжёлый стек. <a href="https://github.com/exodus4d/pathfinder">GitHub &rarr;</a>',
-            wdP: 'Современный претендент, позиционируемый как лёгкая и быстрая альтернатива Pathfinder. Построен на Elixir/Phoenix с фронтендом на React, открыт под MIT, и единственный из четырёх имеет <em>официальную управляемую облачную</em> версию — позволяя группам пользоваться без эксплуатации какой-либо инфраструктуры — а также бесплатную самостоятельно хостируемую Community Edition.',
+            wdP: 'Современный претендент, позиционируемый как лёгкая и быстрая альтернатива Pathfinder. Построен на Elixir/Phoenix с фронтендом на React, открыт под MIT, и имеет <em>официальную управляемую облачную</em> версию — позволяя группам пользоваться без эксплуатации какой-либо инфраструктуры — а также, в отличие от Wayfinder, доступного только как хостинг, бесплатную самостоятельно хостируемую Community Edition.',
             wdBest: '<strong>Лучше всего для:</strong> групп, которым нужен отполированный UI и возможность полностью отказаться от самостоятельного хостинга. <a href="https://wanderer.ltd/">Сайт &rarr;</a> · <a href="https://github.com/wanderer-industries/wanderer">GitHub &rarr;</a>',
             nxP: 'Современный, открытый, самостоятельно хостируемый маппер, созданный в первую очередь для корпораций. Покрывает основной рабочий процесс — совместное картирование в реальном времени (живое редактирование для всех на карте), вставку сигнатур с учётом возраста червоточин, отслеживание соединений — и наслаивает дополнительные функции для корп-операций по цепочке:',
             nxLi1: '<strong>Калькулятор роллинга</strong>, который моделирует разброс массы ±10%, прогнозирует каждый проход как безопасный / возможное схлопывание / точное схлопывание и предупреждает, прежде чем проход оставит вашего роллера за бортом.',
@@ -1431,8 +1631,25 @@
             ctaP: '<strong>Nexum бесплатен.</strong> Используйте хостинг-версию или поднимите цепочку своей корпорации самостоятельно за минуты.',
             ctaBtn: 'Начать сейчас',
             ctaGh: 'Взять на GitHub',
-            footP1: 'Сравнение ведётся командой Nexum · последняя проверка май 2026. Детали о конкурентах меняются со временем — переходите по ссылкам выше, чтобы проверить текущие функции. Нашли неточность? <a href="https://github.com/GQuantrill/eve-nexum/issues">Откройте issue</a>.',
-            footP2: 'EVE Online и логотип EVE — зарегистрированные товарные знаки CCP hf. Все права защищены по всему миру. Nexum — сторонний инструмент и не связан с CCP hf., Pathfinder, Tripwire или Wanderer и не одобрен ими. См. полное <a href="/license/">уведомление о лицензии и интеллектуальной собственности EVE</a>.'
+            wfOpen: '<span class="no">Нет</span> — закрытый код',
+            wfSelf: '<span class="no">Нет</span> — только хостинг',
+            wfCloud: '<span class="yes">Да</span> — единственный способ использования; бесплатный уровень, платные дополнения',
+            wfKill: '<span class="yes">Да</span> — серверный фид zKill + киллборд карты',
+            wfMass: 'Калькулятор роллинга (разброс ±10%, предупреждения о застревании)',
+            wfLang: '<span class="no">Нет</span> — только английский',
+            wfTech: 'Не опубликован',
+            wfCost: '<span class="yes">Бесплатный</span> уровень (одна карта, 50 систем) · <span class="meh">платные дополнения за ISK</span> — мало для большинства целых регионов',
+            wfF2: '<span class="meh">Платно</span> для большинства регионов — 53 из 68 больше бесплатного лимита в 50 систем',
+            wfF6: 'Список пилотов на карте',
+            wfF7: 'Солнца A0 и лёд; нет штормов и инкурсий',
+            wfF8: 'Роли и журнал аудита',
+            f12h: '<strong>Планировщик прыжков капиталов</strong> — многоходовые маршруты прыжковым двигателем между системами лоу/нуля для вашего класса корабля и навыков, со световыми годами на каждый прыжок, оценкой изотопов, усталостью от прыжков и сохранёнными планами',
+            f13h: '<strong>Выходы из цепочки</strong> — все пути из вашей цепочки с одного взгляда, и какой выход ближе всего к каждой из ваших избранных систем',
+            f14h: '<strong>Тепловые карты</strong> — окрашивают каждую систему на карте по убийствам кораблей, капсул, NPC, прыжкам или присутствию флота',
+            wfP: 'Самый новый маппер здесь и единственный, который намеренно доступен только как хостинг и с закрытым кодом: вы входите, а всё остальное работает у них. Он построен на том, чтобы карта соответствовала игре, — звёздные врата берутся из игровых данных, их нельзя выдумать или удалить, а джамп-бриджи соединяют только нулевые системы. Также есть калькулятор роллинга, добавление целых регионов, д-скан на карте, оверлеи стендингов и суверенитета, оповещения в Discord и импорт из других мапперов, включая Nexum. Бесплатный уровень включает одну карту до 50 систем и вашего основного персонажа; дополнительные карты, системы и отслеживаемые альты оплачиваются ежемесячно в ISK. Этот лимит важен для добавления регионов: в 53 из 68 регионов k-space в EVE больше 50 систем, так что добавить большинство из них можно только за плату. Проверено в ноябре 2026.',
+            wfBest: '<strong>Лучше всего для:</strong> групп, которые рады, что маппер держит кто-то другой, и готовы платить ISK, когда одной маленькой карты станет мало. <a href="https://evewayfinder.app/">Сайт &rarr;</a>',
+            footP1: 'Сравнение поддерживает команда Nexum · последняя проверка в мае 2026 (Wayfinder в ноябре 2026). Детали конкурентов со временем меняются — переходите по ссылкам выше, чтобы проверить текущие функции. Заметили неточность? <a href="https://github.com/GQuantrill/eve-nexum/issues">Откройте issue</a>.',
+            footP2: 'EVE Online и логотип EVE — зарегистрированные товарные знаки CCP hf. Все права защищены по всему миру. Nexum — сторонний инструмент и не связан с CCP hf., Pathfinder, Tripwire, Wanderer или Wayfinder и не одобрен ими. См. полное <a href="/license/">уведомление о лицензии и интеллектуальной собственности EVE</a>.'
           };
 
           var DICT = DICTS[lang];

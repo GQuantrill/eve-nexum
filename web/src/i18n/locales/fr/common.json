@@ -810,6 +810,7 @@
     "restore": "Rétablir",
     "restoreTitle": "Effacer le marqueur de rupture et traiter à nouveau comme une connexion active",
     "gateNote": "Stargate classique — aucune donnée de trou de ver.",
+    "gateProtected": "Les connexions par stargate existent en jeu et ne peuvent pas être supprimées ni modifiées sur cette carte.",
     "jumpgateNote": "Pont Ansiblex — aucune donnée de trou de ver."
   },
   "contentFilter": {
@@ -1892,6 +1893,8 @@
     },
     "lazyRemoveWh": "Supprimer auto les trous de ver expirés",
     "lazyRemoveWhHint": "Retire périodiquement les signatures de trou de ver plus anciennes que la durée de vie maximale de leur type. Si la sig soutenait une connexion que rien d'autre ne maintient, la connexion est marquée rompue (mise en quarantaine) au lieu d'être supprimée. S'exécute côté serveur, donc s'applique même quand la carte n'est pas ouverte.",
+    "protectGates": "Protéger les connexions par stargate",
+    "protectGatesHint": "Empêche de supprimer ou de changer le type d'une connexion entre deux systèmes reliés par une stargate en jeu. Supprimer un système supprime toujours ses connexions.",
     "linkCopied": "Lien de carte en direct copié",
     "linkExpiresAfter": "Le lien expire après",
     "mapBookmark": "Format de favori de la carte (partagé)",

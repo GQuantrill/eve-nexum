@@ -619,6 +619,55 @@ function canEditMapBookmark(
   return false;
 }
 
+// Stargate protection: on unless explicitly off. A guard on everyone's edits,
+// so it's gated like the other shared map policies (canEditMapBookmark); the
+// server applies the same rule. Others see the state read-only.
+function ProtectGatesToggle() {
+  const { t } = useTranslation();
+  const map = useMapStore((s) => s.map);
+  const { user } = useAuth();
+  const isMapOwner = useIsMapOwner();
+  const enabled = map.protectGates !== false;
+  const canEdit = canEditMapBookmark(map, user?.role ?? "readonly", isMapOwner);
+  const [saving, setSaving] = useState(false);
+
+  function setInStore(on: boolean) {
+    useMapStore.setState((s) => ({
+      map: { ...s.map, protectGates: on },
+      maps: s.maps.map((m) => (m.id === map.id ? { ...m, protectGates: on } : m)),
+    }));
+  }
+
+  async function persist(next: boolean) {
+    setSaving(true);
+    setInStore(next);
+    try {
+      await api(`/api/maps/${map.id}`, { method: "PATCH", body: JSON.stringify({ protectGates: next }) });
+    } catch (e) {
+      setInStore(!next);
+      toast.error(e instanceof Error ? e.message : t("mapSidebar.updateSettingFailed"));
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <>
+      <label className="map-sidebar__row map-sidebar__toggle-row">
+        <span className="map-sidebar__label">{t("mapSidebar.protectGates")}</span>
+        <input
+          type="checkbox"
+          className="map-sidebar__toggle-input"
+          checked={enabled}
+          disabled={saving || !canEdit}
+          onChange={(e) => persist(e.target.checked)}
+        />
+      </label>
+      <div className="map-sidebar__hint">{t("mapSidebar.protectGatesHint")}</div>
+    </>
+  );
+}
+
 // The shared bookmark section: only rendered for users who can edit it (so
 // non-editors don't get an empty collapsible). Wraps the format trigger + modal.
 function MapBookmarkSection({ sectionProps }: { sectionProps: { isOpen: boolean; onToggle: () => void } }) {
@@ -1574,6 +1623,7 @@ export function MapSidebar() {
                 {untangling ? t("mapSidebar.untangleLayoutBusy") : t("mapSidebar.untangleLayout")}
               </button>
               <LazyWhSweepToggle />
+              <ProtectGatesToggle />
             </>
           )}
 

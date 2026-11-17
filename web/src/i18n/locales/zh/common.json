@@ -810,6 +810,7 @@
     "restore": "恢复",
     "restoreTitle": "清除断开标记，重新将其视为活动连接",
     "gateNote": "普通星门 — 无虫洞数据可追踪。",
+    "gateProtected": "星门连接在游戏中真实存在，无法在此地图上删除或更改。",
     "jumpgateNote": "Ansiblex 跳桥 — 无虫洞数据可追踪。"
   },
   "contentFilter": {
@@ -1892,6 +1893,8 @@
     },
     "lazyRemoveWh": "自动移除过期虫洞",
     "lazyRemoveWhHint": "定期移除超过其类型最大寿命的虫洞信号。如果该信号支撑着一条没有其他东西维系的连接，该连接会被标记为断开（隔离）而非删除。在服务器端运行，因此即使地图未打开也会生效。",
+    "protectGates": "保护星门连接",
+    "protectGatesHint": "禁止删除或更改游戏中由星门相连的两个星系之间的连接类型。删除星系时仍会删除其连接。",
     "linkCopied": "已复制实时地图链接",
     "linkExpiresAfter": "链接过期时间",
     "mapBookmark": "地图书签格式（共享）",
