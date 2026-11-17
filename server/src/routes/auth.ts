@@ -42,9 +42,8 @@ const SSO_SCOPES = [
   'esi-characters.read_corporation_roles.v1',
   'esi-location.read_online.v1',
   // Read player standings (contacts) so the UI can colour-tag structures /
-  // killboard / sov by your standing toward each entity. Corp / alliance reads
-  // only succeed for characters with the Contact Manager role; reads gracefully
-  // no-op otherwise.
+  // killboard / sov by your standing toward each entity. Any member can read
+  // their corp's and alliance's contacts; no in-game role is needed.
   'esi-characters.read_contacts.v1',
   'esi-corporations.read_contacts.v1',
   'esi-alliances.read_contacts.v1',

@@ -16,8 +16,8 @@ type ContactKind = 'character' | 'corporation' | 'alliance' | 'faction';
 
 // GET /api/standings/me — returns the three standings buckets visible to
 // the logged-in character: their personal contacts, their corp's contacts
-// (if a corp Contact Manager has ever logged in), and their alliance's
-// contacts (likewise). Maps are keyed `"<kind>:<id>"` for fast lookup on
+// (once any member who granted the corp contacts scope has synced), and their
+// alliance's contacts (likewise). Maps are keyed `"<kind>:<id>"` for fast lookup on
 // the client.
 //
 // The frontend's useStandings hook compresses these into a single

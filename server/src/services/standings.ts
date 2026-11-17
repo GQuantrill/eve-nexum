@@ -1,6 +1,5 @@
 import { db } from '../db.js';
 import { SCOPE, hasScope } from '../utils/esiScopes.js';
-import { config } from '../config.js';
 import { esiFetch } from '../utils/esi.js';
 import { createLogger } from '../utils/logger.js';
 
@@ -15,7 +14,7 @@ const REFRESH_TTL_MS = 6 * 60 * 60 * 1000;
 
 // ── Corp/alliance contact-bucket read cache ──────────────────────────────────
 // The corp/alliance buckets are shared across every member and change only on a
-// Contact-Manager sync, but /api/standings/me is hit per map load/poll by every
+// member's sync, but /api/standings/me is hit per map load/poll by every
 // member — a big corp's thousands of contacts would otherwise be re-queried and
 // re-materialised for each member on each poll. Cache them briefly, keyed by
 // kind:id, invalidated on write (below) so a fresh sync is seen at once; the TTL
@@ -128,8 +127,8 @@ async function replaceStandings(
 }
 
 // Fire-and-forget standings refresh on login. Pulls personal, corp, and
-// alliance contacts in parallel; gracefully no-ops the corp/alliance reads
-// when the character lacks the Contact Manager role. Never throws — every
+// alliance contacts in parallel, skipping any list the character didn't grant
+// the scope for. Never throws — every
 // failure is logged so a transient ESI hiccup doesn't break login.
 //
 // scope: 'all' (default) refreshes all three buckets — used on login and by the
@@ -172,13 +171,14 @@ export async function refreshStandingsForUser(params: {
     })().catch((err) => log.error('character standings fetch errored:', err)));
   }
 
-  // Corp — access-control standings for the DEPLOYMENT'S configured corp(s), not
-  // the syncing user's own corp. Gated to config.corpIds so a member of an
-  // unrelated corp (e.g. whoever set the instance up) can never populate corp
-  // standings the access gate would ignore anyway. Reading ESI corp contacts
-  // also requires the syncing character to be IN this corp with the Contact
-  // Manager role, so in practice this only fires for a configured-corp member.
-  if (corpId !== null && config.corpIds.includes(corpId) && hasScope(granted, SCOPE.corpContacts)
+  // Corp — the syncing character's OWN corp, whichever it is, so every pilot gets
+  // their corp's friendly/hostile tint, not only the deployment's configured
+  // corp. One member's sync serves the whole corp. No in-game role is needed
+  // (ESI's spec lists none for this endpoint, unlike corp structures), but ESI
+  // only answers for a corp the character is in, so a pilot can only ever fill
+  // in their own corp's list. Access control is unaffected: it only reads the
+  // rows for config.corpIds (services/accessGrants.ts).
+  if (corpId !== null && hasScope(granted, SCOPE.corpContacts)
       && await shouldRefresh('corp', corpId)) {
     tasks.push((async () => {
       const r = await fetchAllContacts(
@@ -191,16 +191,15 @@ export async function refreshStandingsForUser(params: {
         invalidateOrgContacts('corp', corpId);
         await markRefreshed('corp', corpId);
       } else {
-        log.info(`corp ${corpId}: contacts fetch returned ${r.status} (${r.error}) — character ${characterId} likely lacks Contact Manager role or the read_contacts scope`);
+        log.info(`corp ${corpId}: contacts fetch returned ${r.status} (${r.error}) — character ${characterId} may have left the corp or revoked the scope`);
       }
     })().catch((err) => log.error('corp standings fetch errored:', err)));
   }
 
-  // Alliance — access-control standings for the DEPLOYMENT'S configured
-  // alliance(s), not the syncing user's own. Gated to config.allianceIds for the
-  // same reason as corp above; reading ESI alliance contacts requires the
-  // character be in the alliance with the appropriate role.
-  if (allianceId !== null && config.allianceIds.includes(allianceId) && hasScope(granted, SCOPE.allianceContacts)
+  // Alliance — the syncing character's own alliance, on the same terms as corp
+  // above: any member can read it, and access control only reads the rows for
+  // config.allianceIds.
+  if (allianceId !== null && hasScope(granted, SCOPE.allianceContacts)
       && await shouldRefresh('alliance', allianceId)) {
     tasks.push((async () => {
       const r = await fetchAllContacts(
@@ -213,7 +212,7 @@ export async function refreshStandingsForUser(params: {
         invalidateOrgContacts('alliance', allianceId);
         await markRefreshed('alliance', allianceId);
       } else {
-        log.info(`alliance ${allianceId}: contacts fetch returned ${r.status} (${r.error}) — character ${characterId} likely lacks alliance-executor role or the read_contacts scope`);
+        log.info(`alliance ${allianceId}: contacts fetch returned ${r.status} (${r.error}) — character ${characterId} may have left the alliance or revoked the scope`);
       }
     })().catch((err) => log.error('alliance standings fetch errored:', err)));
   }
