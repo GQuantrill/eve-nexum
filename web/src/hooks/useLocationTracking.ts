@@ -67,6 +67,25 @@ export function cloneJumpedBetween(dockedBefore: boolean, dockedNow: boolean): b
   return dockedBefore && dockedNow;
 }
 
+/**
+ * The pod-death check for a pilot whose ship nexum can't see (they didn't allow
+ * the Ship scope, so arrivedInPod above has no hull to compare).
+ *
+ * A pod death always ends DOCKED at your medical clone. Going from in space to
+ * docked in another system between two readings can't be flown: you would have
+ * to jump, warp to a station or citadel and dock inside one poll. So treat it
+ * like a clone jump: record the system, draw no connection.
+ *
+ * Only used when the ship is unknown, so a pilot who allows Ship keeps exactly
+ * the old behaviour. Blind spot (shared with the hull check when you board a
+ * new ship first): respawning and undocking before the next reading. Its own
+ * false alarm, jumping then docking inside one poll, loses a link, never
+ * invents one.
+ */
+export function respawnedDocked(shipKnown: boolean, dockedBefore: boolean, dockedNow: boolean): boolean {
+  return !shipKnown && !dockedBefore && dockedNow;
+}
+
 // Snap-grid size — must match MapCanvas's snapGrid ([20,20]) and mapStore's GRID.
 const GRID = 20;
 // Auto-placed systems always sit a consistent 3 grid squares clear of the
@@ -514,7 +533,8 @@ export function useLocationTracking(enabled: boolean) {
       && checkedAt - prevCheckedAt > MAX_TRACKING_GAP_MS;
 
     // Same treatment as a clone jump: record the system, draw no connection.
-    const teleported = cloneJumped || wokeInPod || unobserved;
+    const respawned = respawnedDocked(location.ship != null, dockedBefore, location.docked);
+    const teleported = cloneJumped || wokeInPod || respawned || unobserved;
 
     if (system.eveSystemId === lastEveSystemId.current) return;
 

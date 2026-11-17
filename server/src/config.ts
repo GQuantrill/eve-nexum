@@ -213,6 +213,20 @@ export const config = {
   // pre-existing behaviour while it's off.
   cloneScope: /^(1|true|yes|on)$/i.test(process.env.ESI_CLONES_SCOPE ?? ''),
 
+  // ── Which ESI scopes a login asks for ─────────────────────────────────────
+  // 'all' (the default, and anything unrecognised): every login asks for every
+  // scope, exactly as before this setting existed. 'choice': the login shows a
+  // picker and pilots untick the optional groups they don't want. See
+  // services/ssoScopes.ts.
+  ssoScopesMode: (process.env.SSO_SCOPES_MODE ?? '').trim().toLowerCase() === 'choice'
+    ? 'choice' as const : 'all' as const,
+  // In 'choice' mode, the groups pilots may untick (comma list of group ids).
+  // Unset = every optional group. A group not listed stays mandatory, e.g. a
+  // corp that relies on standings-based access keeps orgStandings required.
+  ssoOptionalGroups: process.env.SSO_OPTIONAL_GROUPS == null || process.env.SSO_OPTIONAL_GROUPS.trim() === ''
+    ? null
+    : process.env.SSO_OPTIONAL_GROUPS.split(',').map((g) => g.trim()).filter(Boolean),
+
   // ── ISK for extra maps (unrestricted installs only) ─────────────────────────
   // Lets a public deployment hand out extra PERSONAL maps in exchange for an
   // in-game ISK donation: the nominated corporation's wallet journal is polled,

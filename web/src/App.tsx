@@ -50,6 +50,7 @@ import { useHashRoute } from './hooks/useHashRoute';
 import { usePageviewTracking } from './hooks/usePageviewTracking';
 import { useIdleLock } from './hooks/useIdleLock';
 import { LockScreen } from './components/ui/LockScreen';
+import { ScopePickerModal } from './components/ui/ScopePickerModal';
 
 // Which signed-in user we've already hydrated prefs/settings for. MapApp
 // unmounts when you navigate away (e.g. to /admin) and re-mounts on return;
@@ -225,15 +226,19 @@ function AppShell() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const added = params.get('added');
+    // After "Change what nexum can access": the character re-authorised with its
+    // new set of scopes.
+    const accessUpdated = params.get('access_updated');
     const linkError = params.get('link_error');
     // The server adds ?login=success only on the redirect right after a real
     // EVE SSO login — so this fires once per login, not on every page load.
     const loggedIn = params.get('login') === 'success';
-    if (!added && !linkError && !loggedIn) return;
+    if (!added && !accessUpdated && !linkError && !loggedIn) return;
     // Strip the params synchronously so a refresh — or StrictMode's dev
     // re-run of this effect — doesn't repeat the toast / re-fire analytics.
     const url = new URL(window.location.href);
     url.searchParams.delete('added');
+    url.searchParams.delete('access_updated');
     url.searchParams.delete('link_error');
     url.searchParams.delete('login');
     window.history.replaceState({}, '', url.toString());
@@ -249,6 +254,7 @@ function AppShell() {
     // StrictMode's mount/unmount/remount would cancel it and nothing shows.
     setTimeout(() => {
       if (added) toast.success(i18n.t('account.characterAdded', { name: added }));
+      if (accessUpdated) toast.success(i18n.t('scopes.updated', { name: accessUpdated }));
       if (linkError) toast.error(i18n.t(linkError === 'not_in_corp' ? 'account.linkFailedNotInCorp' : 'account.linkFailed'));
     }, 0);
   }, []);
@@ -286,6 +292,7 @@ export default function App() {
     <AuthProvider>
       <AppShell />
       <Toaster />
+      <ScopePickerModal />
       <TooltipLayer />
     </AuthProvider>
   );

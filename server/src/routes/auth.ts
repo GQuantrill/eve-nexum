@@ -8,7 +8,8 @@ import { createLogger } from '../utils/logger.js';
 import { esiFetch } from '../utils/esi.js';
 import { refreshStandingsForUser } from '../services/standings.js';
 import { syncCorpStructures } from '../services/structureSync.js';
-import { scopesFromAccessToken } from '../utils/esiScopes.js';
+import { groupsHeld, scopesFromAccessToken } from '../utils/esiScopes.js';
+import { parseChosenGroups, requestedScopes, scopeOptions } from '../services/ssoScopes.js';
 import { isLoginPermitted, standingsPermitLogin } from '../services/accessGrants.js';
 import { seedDemoMap } from '../services/demoMap.js';
 import { settingsSiblings, shareableEntries, setShareSettings } from '../services/sharedSettings.js';
@@ -27,45 +28,12 @@ const FRONTEND_URL  = process.env.FRONTEND_URL ?? 'http://localhost:5174';
 const EVE_AUTH_URL  = 'https://login.eveonline.com/v2/oauth/authorize';
 const EVE_TOKEN_URL = 'https://login.eveonline.com/v2/oauth/token';
 
-// Base scopes: every one of these must be enabled on the deployment's EVE
-// application, or SSO refuses every login with invalid_scope. Nothing may be
-// added here without operators enabling it first — see OPTIONAL_SCOPES below
-// for how a new scope is introduced safely.
-const SSO_SCOPES = [
-  'esi-location.read_location.v1',
-  'esi-location.read_ship_type.v1',
-  'esi-universe.read_structures.v1',
-  'esi-corporations.read_structures.v1',
-  'esi-corporations.read_corporation_membership.v1',
-  'esi-ui.open_window.v1',
-  'esi-ui.write_waypoint.v1',
-  'esi-characters.read_corporation_roles.v1',
-  'esi-location.read_online.v1',
-  // Read player standings (contacts) so the UI can colour-tag structures /
-  // killboard / sov by your standing toward each entity. Any member can read
-  // their corp's and alliance's contacts; no in-game role is needed.
-  'esi-characters.read_contacts.v1',
-  'esi-corporations.read_contacts.v1',
-  'esi-alliances.read_contacts.v1',
-  // Fleet member tracking — show fleet-mate locations on the map as purple
-  // dots. Requires the character to be the fleet boss or a wing/squad
-  // commander; ESI returns 403 to everyone else and the UI degrades silently.
-  'esi-fleets.read_fleet.v1',
-];
-
-// Scopes a deployment opts into AFTER enabling them on its own EVE application.
-// They can never be added to the list above: requesting a scope the application
-// doesn't have makes SSO reject the entire authorize request with invalid_scope,
-// so an unconditional addition would lock every user out of every deployment on
-// upgrade — not degrade a feature, break the door. Off by default; each feature
-// behind one degrades to its pre-existing behaviour while it's off.
-function ssoScopes(): string {
-  const scopes = [...SSO_SCOPES];
-  if (config.cloneScope) scopes.push('esi-clones.read_clones.v1');
-  return scopes.join(' ');
-}
+// Which scopes a login asks for lives in services/ssoScopes.ts: every scope
+// by default, or the groups the pilot ticked when SSO_SCOPES_MODE=choice.
 
 // Build the SSO authorize redirect with a fresh CSRF state and send the user.
+// ?groups= carries the optional scope groups the pilot ticked in the picker;
+// without it the login asks for everything.
 function beginSso(req: Request, res: Response): void {
   const state = randomBytes(32).toString('hex');
   req.session.oauthState = state;
@@ -73,7 +41,7 @@ function beginSso(req: Request, res: Response): void {
     response_type: 'code',
     redirect_uri:  CALLBACK_URL,
     client_id:     CLIENT_ID,
-    scope:         ssoScopes(),
+    scope:         requestedScopes(parseChosenGroups(req.query.groups)).join(' '),
     state,
   });
   req.session.save((err) => {
@@ -99,7 +67,15 @@ async function ensureOwnerId(req: Request): Promise<number | null> {
 authRouter.get('/login', (req, res) => {
   // A normal login must never carry an add-character link from a stale session.
   delete req.session.addCharacterOwnerId;
+  delete req.session.scopeChange;
   beginSso(req, res);
+});
+
+// GET /auth/scope-options -- what the login picker draws: the mode, and each
+// scope group with whether pilots may untick it. Public: the landing page needs
+// it before anyone is signed in.
+authRouter.get('/scope-options', (_req, res) => {
+  res.json(scopeOptions());
 });
 
 // GET /auth/add-character — link another character to the current account.
@@ -112,12 +88,16 @@ authRouter.get('/add-character', async (req, res) => {
     return;
   }
   req.session.addCharacterOwnerId = ownerId;
+  // ?intent=change: re-authorising a character already on the account with a
+  // different set of scopes ("Change what nexum can access"). Same flow, but the
+  // app says "access updated" rather than "character added".
+  req.session.scopeChange = req.query.intent === 'change';
   beginSso(req, res);
 });
 
 // GET /auth/wallet-reader — admin-only authorisation of the corp wallet reader
 // used by ISK-for-maps. A separate errand from logging in: it asks for ONE extra
-// scope, and that scope stays out of ssoScopes() so no ordinary user is ever
+// scope, and that scope stays out of the login scopes so no ordinary user is ever
 // prompted for wallet access (and a deployment whose EVE application lacks the
 // scope can't have every login broken by it).
 authRouter.get('/wallet-reader', async (req, res) => {
@@ -214,7 +194,9 @@ authRouter.get('/callback', async (req, res) => {
   // Captured before any session.regenerate(): if set, this SSO round-trip is
   // an authenticated "add character" link, not a fresh login.
   const addCharacterOwnerId = req.session.addCharacterOwnerId;
+  const scopeChange = req.session.scopeChange === true;
   delete req.session.addCharacterOwnerId;
+  delete req.session.scopeChange;
 
   // Failure redirect target. For an add-character attempt the pilot is still
   // logged in (as their active character), so they land on the app, not the
@@ -408,7 +390,7 @@ authRouter.get('/callback', async (req, res) => {
       await new Promise<void>((resolve, reject) => { req.session.save((err) => err ? reject(err) : resolve()); });
       kickStandings();
       kickStructures();
-      res.redirect(`${FRONTEND_URL}?added=${encodeURIComponent(jwtPayload.name)}`);
+      res.redirect(`${FRONTEND_URL}?${scopeChange ? 'access_updated' : 'added'}=${encodeURIComponent(jwtPayload.name)}`);
       return;
     }
 
@@ -624,8 +606,9 @@ authRouter.get('/me', async (req, res) => {
   // Last known system is dynamic (updated as the pilot jumps), so it's read
   // fresh from the DB rather than the session prefs cache. Joined to
   // solar_systems for a ready-to-render name + class.
-  const { rows: lksRows } = await db.query<{ id: number | null; name: string | null; systemClass: string | null; at: string | null }>(
-    `SELECT u.last_known_system_id AS id, s.name, s.class AS "systemClass", u.last_known_system_at AS at
+  const { rows: lksRows } = await db.query<{ id: number | null; name: string | null; systemClass: string | null; at: string | null; esiScopes: string[] | null }>(
+    `SELECT u.last_known_system_id AS id, s.name, s.class AS "systemClass", u.last_known_system_at AS at,
+            u.esi_scopes AS "esiScopes"
      FROM users u LEFT JOIN solar_systems s ON s.id = u.last_known_system_id
      WHERE u.id = $1`,
     [req.session.userId],
@@ -640,9 +623,9 @@ authRouter.get('/me', async (req, res) => {
   // All characters linked to this account, for the character switcher.
   const ownerId = await ensureOwnerId(req);
   const { rows: charRows } = ownerId != null
-    ? await db.query<{ id: number; characterId: number; characterName: string; role: string; corpId: number | null; blocked: boolean; lksId: number | null; lksName: string | null; lksClass: string | null }>(
+    ? await db.query<{ id: number; characterId: number; characterName: string; role: string; corpId: number | null; blocked: boolean; lksId: number | null; lksName: string | null; lksClass: string | null; esiScopes: string[] | null }>(
         `SELECT u.id, u.character_id AS "characterId", u.character_name AS "characterName", u.role,
-                u.corp_id AS "corpId", u.blocked,
+                u.corp_id AS "corpId", u.blocked, u.esi_scopes AS "esiScopes",
                 u.last_known_system_id AS "lksId", s.name AS "lksName", s.class AS "lksClass"
          FROM users u LEFT JOIN solar_systems s ON s.id = u.last_known_system_id
          WHERE u.owner_id = $1 ORDER BY u.character_name`,
@@ -659,6 +642,9 @@ authRouter.get('/me', async (req, res) => {
     lastKnownSystemName: c.lksName,
     lastKnownSystemClass: c.lksClass,
     active:              c.id === req.session.userId,
+    // The scope groups this character has granted in full (all of them until
+    // its scopes are recorded). Drives the "Needs X. Enable" states.
+    scopeGroups:         groupsHeld(c.esiScopes),
   }));
 
   // Cheap: one indexed read on a two-column key, and only for a member who has
@@ -686,6 +672,10 @@ authRouter.get('/me', async (req, res) => {
       shareSettings,
       lastKnownSystem,
       corpMode:      config.corpMode,
+      // How logins choose scopes ('all' = no picker), and which scope groups
+      // the signed-in character holds.
+      scopeMode:     config.ssoScopesMode,
+      scopeGroups:   groupsHeld(lk?.esiScopes ?? null),
       allianceMode:  config.allianceMode,
       compactMode:   prefs.compactMode,
       snapToGrid:    prefs.snapToGrid,

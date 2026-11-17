@@ -608,6 +608,9 @@ characterRouter.post('/waypoint', async (req, res) => {
     try {
       const outcome = await sendWaypoint(req.session.userId!, params);
       if (outcome === 'token_expired') { res.status(500).json({ error: 'Failed to set waypoint' }); return; }
+      // The character hasn't allowed waypoints (or its token predates the
+      // scope): the app offers to enable it rather than a bare failure.
+      if (outcome === 'no_scope') { res.status(403).json({ error: 'scope_missing', group: 'waypoints' }); return; }
       if (outcome !== 'ok') { res.status(502).json({ error: 'ESI rejected the waypoint' }); return; }
       res.json({ ok: true });
     } catch (err) {

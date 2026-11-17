@@ -2206,7 +2206,7 @@
     "noneSent": "Voor geen enkel personage ingesteld: {{list}}",
     "reason": {
       "offline": "niet ingelogd",
-      "no_scope": "log opnieuw in om waypoints toe te staan",
+      "no_scope": "routepunten niet toegestaan",
       "token_expired": "log opnieuw in",
       "esi_error": "EVE reageerde niet"
     }
@@ -2717,5 +2717,70 @@
   "update": {
     "available": "Er is een nieuwe versie van Nexum beschikbaar.",
     "reload": "Herladen"
+  },
+  "scopes": {
+    "titleLogin": "Kies waar Nexum bij mag",
+    "titleAdd": "Kies waar Nexum bij mag voor je nieuwe character",
+    "titleChange": "Waar Nexum bij mag voor {{name}}",
+    "introChoice": "Nexum leest je character via de officiële EVE-login. Locatie is verplicht; de rest kies je zelf. Wat je uitzet, blijft zichtbaar in Nexum en vertelt je wat het nodig heeft als je het gebruikt.",
+    "introAll": "Deze server vraagt om alles, dus er valt hier niets te kiezen. Dit is wat Nexum leest en waar elk onderdeel voor dient. Opnieuw inloggen vernieuwt de toegang van dit character.",
+    "loading": "Laden…",
+    "required": "Verplicht",
+    "usedFor": "Gebruikt voor:",
+    "changeLater": "Je kunt dit altijd aanpassen met de sleutelknop naast elk character in het charactermenu.",
+    "continue": "Verder naar EVE-login",
+    "loginAgain": "Opnieuw inloggen",
+    "menuItem": "Aanpassen waar Nexum bij mag",
+    "updated": "Toegang bijgewerkt voor {{name}}.",
+    "needsSelf": "Hiervoor is \"{{group}}\" nodig, en dat heeft dit character niet toegestaan.",
+    "needsChar": "Hiervoor is \"{{group}}\" nodig, en dat heeft {{name}} niet toegestaan.",
+    "enable": "Inschakelen",
+    "groups": {
+      "location": {
+        "title": "Locatie",
+        "desc": "In welk systeem je character is en of je in EVE bent ingelogd. Nexum kijkt alleen zolang je bent ingelogd.",
+        "affects": "het tekenen van je chain terwijl je springt, jou en je corpgenoten op de kaart tonen, en de locaties van je alts."
+      },
+      "ship": {
+        "title": "Schip",
+        "desc": "Welk schip je vliegt.",
+        "affects": "je schip naast je naam op de kaart, je huidige schip in de massacalculator, de massa van elke sprong in het sprongenlogboek, en het verschil tussen een pod-dood en een echte sprong."
+      },
+      "waypoints": {
+        "title": "Routepunten",
+        "desc": "Laat Nexum een route in je EVE-autopiloot zetten. Nexum kan alleen routepunten zetten, niet je schip besturen.",
+        "affects": "Bestemming instellen en Routepunt toevoegen, voor dit character of al je ingelogde characters tegelijk."
+      },
+      "standings": {
+        "title": "Persoonlijke standings",
+        "desc": "Je persoonlijke contacts en de standings die je hebt ingesteld. Alleen jij ziet ze.",
+        "affects": "piloten, corps, systemen en structuren vriendelijk of vijandig kleuren op de kaart, het killboard en de soevereiniteitsweergave."
+      },
+      "orgStandings": {
+        "title": "Corp- en alliance-standings",
+        "desc": "De standings die je corp en alliance hebben ingesteld: dezelfde lijsten die elk lid in het spel ziet. De login van één lid houdt ze voor de hele corp bij.",
+        "affects": "in één oogopslag zien of je in vriendelijk of vijandig gebied bent, en toegang op basis van standing waar je admins dat gebruiken."
+      },
+      "citadels": {
+        "title": "Citadel-opzoekingen",
+        "desc": "Vraagt EVE in welk systeem een spelersstructuur staat en welke corp de eigenaar is. EVE antwoordt alleen voor structuren waar je character kan docken.",
+        "affects": "de eigenaar van citadels die je toevoegt (en dus hun standing-kleur), en waar je clones zijn als ze in een citadel staan."
+      },
+      "fleet": {
+        "title": "Fleet",
+        "desc": "Waar je fleetleden zijn. Werkt alleen als je fleet boss of wing- of squad-commander bent.",
+        "affects": "fleetleden op de kaart."
+      },
+      "clones": {
+        "title": "Clones",
+        "desc": "Waar je jump clones en medical clone zijn, en wanneer je voor het laatst een clone jump deed.",
+        "affects": "het Clones-paneel."
+      },
+      "director": {
+        "title": "Directortools",
+        "desc": "Doet alleen iets als je character in het spel Station Manager of Director is. Je login zet dan de citadels van je corp op de kaart voor iedereen in de corp.",
+        "affects": "de citadels van je corp in de sprongplanner en de structuurlijsten."
+      }
+    }
   }
 }

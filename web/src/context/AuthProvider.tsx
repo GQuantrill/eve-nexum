@@ -49,6 +49,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             localStorage.setItem('nexum.last_character', JSON.stringify({
               characterId:   d.user.characterId,
               characterName: d.user.characterName,
+              // So "Continue as X" asks for the same scope groups this
+              // character allowed, rather than everything again.
+              scopeGroups:   d.user.scopeGroups,
             }));
           }
           setLoading(false);

@@ -16,6 +16,10 @@ declare module 'express-session' {
     // OAuth callback links the returning character to this owner instead of
     // starting a fresh login. Cleared once consumed.
     addCharacterOwnerId?: number;
+    /** Set alongside addCharacterOwnerId when the round-trip re-authorises a
+     *  character with a different set of ESI scopes ("Change what nexum can
+     *  access"), so the callback reports "access updated", not "added". */
+    scopeChange?: boolean;
     /** True while an admin is authorising the ISK-donation wallet reader, so the
      *  shared SSO callback knows this round-trip is not a login. */
     walletReaderFlow?: boolean;

@@ -2206,7 +2206,7 @@
     "noneSent": "Impossible de la définir pour un personnage : {{list}}",
     "reason": {
       "offline": "non connecté",
-      "no_scope": "reconnectez-vous pour autoriser les points de passage",
+      "no_scope": "points de cheminement non autorisés",
       "token_expired": "reconnectez-vous",
       "esi_error": "EVE n’a pas répondu"
     }
@@ -2717,5 +2717,70 @@
   "update": {
     "available": "Une nouvelle version de Nexum est disponible.",
     "reload": "Recharger"
+  },
+  "scopes": {
+    "titleLogin": "Choisissez ce à quoi Nexum peut accéder",
+    "titleAdd": "Choisissez ce à quoi Nexum peut accéder pour votre nouveau personnage",
+    "titleChange": "Ce à quoi Nexum peut accéder pour {{name}}",
+    "introChoice": "Nexum lit votre personnage via la connexion officielle d'EVE. La position est obligatoire ; le reste est à vous de voir. Ce que vous désactivez reste visible dans Nexum et vous indique ce qu'il lui faut quand vous l'utilisez.",
+    "introAll": "Ce serveur demande tout, il n'y a donc rien à choisir. Voici ce que Nexum lit et à quoi sert chaque partie. Se reconnecter renouvelle l'accès de ce personnage.",
+    "loading": "Chargement…",
+    "required": "Obligatoire",
+    "usedFor": "Sert à :",
+    "changeLater": "Vous pouvez modifier cela à tout moment avec le bouton clé à côté de chaque personnage dans le menu des personnages.",
+    "continue": "Continuer vers la connexion EVE",
+    "loginAgain": "Se reconnecter",
+    "menuItem": "Modifier ce à quoi Nexum peut accéder",
+    "updated": "Accès mis à jour pour {{name}}.",
+    "needsSelf": "Il faut « {{group}} », que ce personnage n'a pas autorisé.",
+    "needsChar": "Il faut « {{group}} », que {{name}} n'a pas autorisé.",
+    "enable": "Activer",
+    "groups": {
+      "location": {
+        "title": "Position",
+        "desc": "Dans quel système se trouve votre personnage et si vous êtes connecté à EVE. Nexum ne vérifie que pendant que vous êtes connecté.",
+        "affects": "tracer votre chaîne au fil de vos sauts, vous afficher avec vos camarades de corpo sur la carte, et la position de vos alts."
+      },
+      "ship": {
+        "title": "Vaisseau",
+        "desc": "Le vaisseau que vous pilotez.",
+        "affects": "votre vaisseau à côté de votre nom sur la carte, votre vaisseau actuel dans le calculateur de masse, la masse de chaque saut dans le journal des sauts, et distinguer une mort en capsule d'un vrai saut."
+      },
+      "waypoints": {
+        "title": "Points de cheminement",
+        "desc": "Permet à Nexum de placer un itinéraire dans votre pilote automatique EVE. Nexum ne peut que poser des points de cheminement, pas piloter votre vaisseau.",
+        "affects": "Définir la destination et Ajouter un point de cheminement, pour ce personnage ou tous vos personnages connectés à la fois."
+      },
+      "standings": {
+        "title": "Standings personnels",
+        "desc": "Vos contacts personnels et les standings que vous avez définis. Vous seul les voyez.",
+        "affects": "colorer pilotes, corpos, systèmes et structures en ami ou hostile sur la carte, le killboard et la vue de souveraineté."
+      },
+      "orgStandings": {
+        "title": "Standings de corpo et d'alliance",
+        "desc": "Les standings définis par votre corpo et votre alliance : les mêmes listes que tout membre voit en jeu. La connexion d'un seul membre les tient à jour pour toute la corpo.",
+        "affects": "voir d'un coup d'œil si vous êtes en espace ami ou hostile, et l'accès par standing là où vos admins l'utilisent."
+      },
+      "citadels": {
+        "title": "Recherche de citadelles",
+        "desc": "Demande à EVE dans quel système se trouve une structure de joueur et quelle corpo la possède. EVE ne répond que pour les structures où votre personnage peut s'amarrer.",
+        "affects": "le propriétaire des citadelles que vous ajoutez (et donc leur couleur de standing), et l'emplacement de vos clones lorsqu'ils sont dans une citadelle."
+      },
+      "fleet": {
+        "title": "Flotte",
+        "desc": "Où sont les membres de votre flotte. Ne fonctionne que si vous êtes chef de flotte ou commandant d'escadre ou d'escouade.",
+        "affects": "les membres de la flotte affichés sur la carte."
+      },
+      "clones": {
+        "title": "Clones",
+        "desc": "Où sont vos clones de saut et votre clone médical, et quand vous avez fait votre dernier saut de clone.",
+        "affects": "le volet Clones."
+      },
+      "director": {
+        "title": "Outils de directeur",
+        "desc": "N'a d'effet que si votre personnage est Station Manager ou Director en jeu. Votre connexion charge alors les citadelles de votre corpo sur la carte pour toute la corpo.",
+        "affects": "les citadelles de votre corpo dans le planificateur de saut et les listes de structures."
+      }
+    }
   }
 }

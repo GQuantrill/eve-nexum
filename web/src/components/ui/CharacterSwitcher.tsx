@@ -2,13 +2,14 @@ import { useRef, useState } from 'react';
 import { useClickOutside } from '../../hooks/useClickOutside';
 import { charPortrait } from '../../utils/eveImages';
 import { useTranslation } from 'react-i18next';
-import { CaretDownIcon, PlusIcon, CheckIcon, MapPinIcon, TrashIcon, AppWindowIcon } from '../../icons';
+import { CaretDownIcon, PlusIcon, CheckIcon, MapPinIcon, TrashIcon, AppWindowIcon, KeyIcon } from '../../icons';
 import { useAuth } from '../../context/AuthContext';
 import { useMapStore } from '../../store/mapStore';
 import { api, apiUrl } from '../../api/client';
 import { toast } from '../../utils/toastStore';
 import { ConfirmModal } from './ConfirmModal';
 import { useCanInstallApp, installApp } from '../../utils/installPrompt';
+import { useScopePickerStore } from '../../store/scopePickerStore';
 
 interface CharLocationResponse {
   online: boolean;
@@ -30,6 +31,7 @@ export function CharacterSwitcher() {
   const setRouteOrigin = useMapStore((s) => s.setRouteOrigin);
   const requestCenter = useMapStore((s) => s.requestCenterOnEveSystem);
   const [open, setOpen] = useState(false);
+  const openPicker = useScopePickerStore((s) => s.open);
   const [busy, setBusy] = useState(false);
   const [pendingRemove, setPendingRemove] = useState<{ id: number; characterName: string } | null>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -190,6 +192,19 @@ export function CharacterSwitcher() {
                 )}
                 <button
                   type="button"
+                  className="character-switcher__focus"
+                  disabled={busy || c.blocked}
+                  onClick={() => {
+                    setOpen(false);
+                    openPicker({ kind: 'change', charId: c.id });
+                  }}
+                  data-tooltip={t('scopes.menuItem')}
+                  aria-label={`${t('scopes.menuItem')}: ${c.characterName}`}
+                >
+                  <KeyIcon size={14} />
+                </button>
+                <button
+                  type="button"
                   className={`character-switcher__focus${isOrigin ? ' character-switcher__focus--on' : ''}`}
                   disabled={busy || c.blocked}
                   onClick={() => focusOn(c)}
@@ -212,7 +227,17 @@ export function CharacterSwitcher() {
               {t('account.shareSettings')}
             </label>
           )}
-          <a className="character-switcher__add" href={apiUrl('/auth/add-character')}>
+          <a
+            className="character-switcher__add"
+            href={apiUrl('/auth/add-character')}
+            onClick={(e) => {
+              // SSO_SCOPES_MODE=choice: pick the new character's scopes first.
+              if (user.scopeMode !== 'choice') return;
+              e.preventDefault();
+              setOpen(false);
+              openPicker({ kind: 'add' });
+            }}
+          >
             <PlusIcon size={13} weight="bold" />
             {t('account.addCharacter')}
           </a>
