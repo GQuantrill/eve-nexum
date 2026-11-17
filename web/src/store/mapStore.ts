@@ -452,7 +452,7 @@ export type RemoteEvent =
   | { type: 'route.update';      id: string; updates: Partial<SavedRoute> }
   | { type: 'route.remove';      id: string }
   | { type: 'route.reorder';     orderedIds: string[] }
-  | { type: 'map.meta';          name?: string; locked?: boolean; allowAsMergeSource?: boolean; allowAsMergeDestination?: boolean; skipKspace?: boolean; crossMapSync?: boolean; protectGates?: boolean; lazyRemoveWormholes?: boolean; collapseGraceHours?: number; bookmarkFormat?: string | null; siteBookmarkFormat?: string | null }
+  | { type: 'map.meta';          name?: string; locked?: boolean; allowAsMergeSource?: boolean; allowAsMergeDestination?: boolean; skipKspace?: boolean; crossMapSync?: boolean; lazyRemoveWormholes?: boolean; collapseGraceHours?: number; bookmarkFormat?: string | null; siteBookmarkFormat?: string | null }
   | { type: 'map.resync' }
   | { type: 'sig.changed';       systemId: string }
   | { type: 'structure.changed'; systemId: string }
@@ -561,7 +561,7 @@ export const useMapStore = create<MapStore>()((set, get) => {
       }
 
       case 'add_connection': {
-        // A stargate the map protects stays, even when it was just drawn.
+        // A real stargate stays, even when it was just drawn.
         const added = get().map.connections.find((c) => c.id === cmd.connectionId);
         if (isProtectedGate(added, get().map)) {
           toast.error(i18n.t('connPanel.gateProtected'));
@@ -1579,7 +1579,6 @@ export const useMapStore = create<MapStore>()((set, get) => {
             ...(event.allowAsMergeDestination !== undefined ? { allowAsMergeDestination: event.allowAsMergeDestination } : {}),
             ...(event.skipKspace !== undefined ? { skipKspace: event.skipKspace } : {}),
             ...(event.crossMapSync !== undefined ? { crossMapSync: event.crossMapSync } : {}),
-            ...(event.protectGates !== undefined ? { protectGates: event.protectGates } : {}),
             ...(event.lazyRemoveWormholes !== undefined ? { lazyRemoveWormholes: event.lazyRemoveWormholes } : {}),
             ...(event.collapseGraceHours !== undefined ? { collapseGraceHours: event.collapseGraceHours } : {}),
             ...(event.bookmarkFormat !== undefined ? { bookmarkFormat: event.bookmarkFormat } : {}),

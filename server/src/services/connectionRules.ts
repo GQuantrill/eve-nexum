@@ -86,20 +86,20 @@ async function stargateNeighbours(a: number, b: number): Promise<boolean> {
 }
 
 /**
- * True when this connection is a stargate the map protects: the map has
- * protect_gates on, the edge is typed 'gate', and its ends really are stargate
- * neighbours. A 'gate' drawn between non-neighbours (from before the type was
- * validated) is not protected, so it can still be cleaned up.
+ * True when this connection is a real stargate: typed 'gate', with ends that
+ * really are stargate neighbours. A real stargate is fixed in the game, so it
+ * can never be deleted or retyped, on any map. A 'gate' drawn between
+ * non-neighbours (from before the type was validated) is not a real one, so it
+ * can still be cleaned up.
  */
 export async function isProtectedGate(mapId: string, connectionId: string): Promise<boolean> {
   const { rows } = await db.query<{ src: number | null; tgt: number | null }>(
     `SELECT s.eve_system_id AS src, t.eve_system_id AS tgt
        FROM map_connections c
-       JOIN maps m        ON m.id = c.map_id
        JOIN map_systems s ON s.id = c.source_id
        JOIN map_systems t ON t.id = c.target_id
       WHERE c.id = $1 AND c.map_id = $2
-        AND c.connection_type = 'gate' AND m.protect_gates = TRUE`,
+        AND c.connection_type = 'gate'`,
     [connectionId, mapId],
   );
   if (!rows.length) return false;
@@ -109,7 +109,7 @@ export async function isProtectedGate(mapId: string, connectionId: string): Prom
 }
 
 export const PROTECTED_GATE_ERROR =
-  'Stargate connections exist in game and cannot be removed or changed on this map';
+  'Stargate connections exist in game and cannot be removed or changed';
 
 /**
  * null when the type is allowed, else a human-readable reason for a 400.

@@ -419,7 +419,7 @@ export function ConnectionPanel() {
   // Wormhole-only fields (type, sig link, mass / time / size, rolling calc)
   // don't apply to stargates or Ansiblex jump bridges — only 'standard' links.
   const isWormhole = conn.connectionType === 'standard';
-  // A stargate the map protects can't be removed, so don't offer to.
+  // A real stargate can never be removed, so don't offer to.
   const lockedGate = isProtectedGate(conn, map);
 
   // The backing sigs each end links to, as loaded for this panel.

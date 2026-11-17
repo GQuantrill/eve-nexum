@@ -810,7 +810,7 @@
     "restore": "Restaurar",
     "restoreTitle": "Quitar la marca de rota y volver a tratarla como una conexión activa",
     "gateNote": "Stargate normal — sin datos de agujero de gusano.",
-    "gateProtected": "Las conexiones por stargate existen en el juego y no se pueden eliminar ni cambiar en este mapa.",
+    "gateProtected": "Las conexiones por stargate existen en el juego y no se pueden eliminar ni cambiar.",
     "jumpgateNote": "Puente Ansiblex — sin datos de agujero de gusano."
   },
   "contentFilter": {
@@ -1893,8 +1893,6 @@
     },
     "lazyRemoveWh": "Eliminar automáticamente agujeros de gusano caducados",
     "lazyRemoveWhHint": "Elimina periódicamente las firmas de agujero de gusano más antiguas que la vida útil máxima de su tipo. Si la firma sostenía una conexión sin nada más que la mantuviera, la conexión se marca como rota (en cuarentena) en lugar de eliminarse. Se ejecuta en el servidor, así que se aplica incluso cuando el mapa no está abierto.",
-    "protectGates": "Proteger conexiones por stargate",
-    "protectGatesHint": "Impide eliminar o cambiar el tipo de una conexión entre dos sistemas unidos por una stargate en el juego. Eliminar un sistema sigue eliminando sus conexiones.",
     "linkCopied": "Enlace de mapa en vivo copiado",
     "linkExpiresAfter": "El enlace caduca tras",
     "mapBookmark": "Formato de marcador del mapa (compartido)",

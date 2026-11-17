@@ -2766,10 +2766,10 @@ mapsRouter.post('/:mapId/presence', async (req, res) => {
 // toggle merge-source eligibility (corp maps, full/admin only)
 mapsRouter.patch('/:mapId', async (req, res) => {
   const { mapId } = req.params;
-  const { name, locked, allowAsMergeSource, allowAsMergeDestination, lazyRemoveWormholes, collapseGraceHours, bookmarkFormat, siteBookmarkFormat, skipKspace, crossMapSync, protectGates } = req.body as {
+  const { name, locked, allowAsMergeSource, allowAsMergeDestination, lazyRemoveWormholes, collapseGraceHours, bookmarkFormat, siteBookmarkFormat, skipKspace, crossMapSync } = req.body as {
     name?: string; locked?: boolean; allowAsMergeSource?: boolean; allowAsMergeDestination?: boolean;
     lazyRemoveWormholes?: boolean; collapseGraceHours?: number; bookmarkFormat?: string | null; siteBookmarkFormat?: string | null; skipKspace?: boolean;
-    crossMapSync?: boolean; protectGates?: boolean;
+    crossMapSync?: boolean;
   };
 
   const access = await requireMapWrite(res, mapId, req);
@@ -2856,24 +2856,6 @@ mapsRouter.patch('/:mapId', async (req, res) => {
     }
     sets.push(`cross_map_sync = $${vals.length + 1}`); vals.push(crossMapSync === true);
   }
-  // Stargate protection -- a guard on everyone's edits, so whoever may set the
-  // map's shared policies may switch it: the owner of a personal map; on a corp
-  // map full or admin; on an alliance map full or alliance admin. Never a
-  // shared recipient.
-  if (protectGates !== undefined) {
-    if (access.accessKind === 'shared') {
-      res.status(403).json({ error: 'Only the map owner can change stargate protection' }); return;
-    }
-    if (access.corpId !== null || access.allianceId !== null) {
-      const role = req.session.role ?? 'readonly';
-      const allianceScoped = access.allianceId !== null;
-      const allowed = role === 'full' || (allianceScoped ? isAllianceAdmin(role) : isAdmin(role));
-      if (!allowed) {
-        res.status(403).json({ error: allianceScoped ? 'Full or alliance-admin access required' : 'Full or admin access required' }); return;
-      }
-    }
-    sets.push(`protect_gates = $${vals.length + 1}`); vals.push(protectGates === true);
-  }
   // Lazy WH-removal opt-in: a plain per-map behaviour toggle any editor can set
   // (no corp/admin gate). The sweep itself runs server-side on this cadence.
   if (lazyRemoveWormholes !== undefined) {
@@ -2943,7 +2925,6 @@ mapsRouter.patch('/:mapId', async (req, res) => {
       ...(allowAsMergeDestination !== undefined ? { allowAsMergeDestination: allowAsMergeDestination === true } : {}),
       ...(skipKspace !== undefined ? { skipKspace: skipKspace === true } : {}),
       ...(crossMapSync !== undefined ? { crossMapSync: crossMapSync === true } : {}),
-      ...(protectGates !== undefined ? { protectGates: protectGates === true } : {}),
       ...(lazyRemoveWormholes !== undefined ? { lazyRemoveWormholes: lazyRemoveWormholes === true } : {}),
       ...(normalizedGrace !== undefined ? { collapseGraceHours: normalizedGrace } : {}),
       ...(normalizedBookmarkFmt !== undefined ? { bookmarkFormat: normalizedBookmarkFmt } : {}),
@@ -2952,7 +2933,7 @@ mapsRouter.patch('/:mapId', async (req, res) => {
     const settings = {
       name, locked, allowAsMergeSource, allowAsMergeDestination, lazyRemoveWormholes,
       collapseGraceHours: normalizedGrace, bookmarkFormat: normalizedBookmarkFmt,
-      siteBookmarkFormat: normalizedSiteBookmarkFmt, skipKspace, crossMapSync, protectGates,
+      siteBookmarkFormat: normalizedSiteBookmarkFmt, skipKspace, crossMapSync,
     };
     const values = Object.fromEntries(Object.entries(settings).filter(([, v]) => v !== undefined));
     recordMapAudit(req, mapId, { action: 'map.update', targetId: mapId, details: { fields: Object.keys(values), values } });
@@ -4069,7 +4050,7 @@ mapsRouter.delete('/:mapId/connections/:connectionId', async (req, res) => {
   const { mapId, connectionId } = req.params;
   const access = await requireMapWrite(res, mapId, req);
   if (!access) return;
-  // A stargate is fixed in the game; on a map protecting them it stays drawn.
+  // A real stargate is fixed in the game, so it is never removed.
   if (await isProtectedGate(mapId, connectionId)) {
     res.status(409).json({ error: PROTECTED_GATE_ERROR }); return;
   }

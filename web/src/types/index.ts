@@ -270,9 +270,6 @@ export interface WormholeMap {
    *  the same system on the org's other opted-in maps of the same kind. Only
    *  owner/admins can change it. */
   crossMapSync?: boolean;
-  /** Stargate connections can't be deleted or retyped (server-enforced).
-   *  On unless explicitly false. */
-  protectGates?: boolean;
   /** Lazy-removal maps only: hours an expired connection lingers before the
    *  lifetime sweep severs it and drops its backing sigs. Default 0.5 (30 min). */
   collapseGraceHours?: number;

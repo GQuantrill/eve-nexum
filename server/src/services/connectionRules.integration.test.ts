@@ -7,9 +7,9 @@ import { connectionTypeError, isProtectedGate } from './connectionRules.js';
 
 const dbReady = await ensureIntegrationDb();
 
-// Stargates are fixed in the game: an Ansiblex can't stand in for one, and on a
-// map protecting them a real gate can't be deleted or retyped. A 'gate' between
-// systems that aren't neighbours is not a real gate, so it stays removable.
+// Stargates are fixed in the game: an Ansiblex can't stand in for one, and a
+// real gate can never be deleted or retyped. A 'gate' between systems that
+// aren't neighbours is not a real gate, so it stays removable.
 
 // Jita (30000142) - Perimeter (30000144) are gate neighbours; Amarr (30002187)
 // is not adjacent to Jita.
@@ -61,15 +61,9 @@ describe.skipIf(!dbReady)('stargate connection rules (integration)', () => {
     expect(await connectionTypeError('jumpgate', { sourceEveId: JITA, targetEveId: AMARR })).toBeNull();
   });
 
-  it('protects a real stargate by default', async () => {
+  it('protects a real stargate', async () => {
     const c = await seedLink(await seedSystem('Jita', JITA), await seedSystem('Perimeter', PERIMETER), 'gate');
     expect(await isProtectedGate(mapId, c)).toBe(true);
-  });
-
-  it('does not protect a stargate when the map turns protection off', async () => {
-    const c = await seedLink(await seedSystem('Jita', JITA), await seedSystem('Perimeter', PERIMETER), 'gate');
-    await db.query(`UPDATE maps SET protect_gates = FALSE WHERE id = $1`, [mapId]);
-    expect(await isProtectedGate(mapId, c)).toBe(false);
   });
 
   it('does not protect a "gate" between systems that are not neighbours', async () => {

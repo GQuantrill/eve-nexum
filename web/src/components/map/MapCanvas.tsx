@@ -182,7 +182,6 @@ export function MapCanvas() {
   useExitAlerts();
   const systems              = useMapStore((s) => s.map.systems);
   const connections          = useMapStore((s) => s.map.connections);
-  const protectGates         = useMapStore((s) => s.map.protectGates);
   const selectedSystemId     = useMapStore((s) => s.selectedSystemId);
   const selectSystem         = useMapStore((s) => s.selectSystem);
   const selectedConnectionId = useMapStore((s) => s.selectedConnectionId);
@@ -1213,10 +1212,10 @@ export function MapCanvas() {
         && isDefiniteWormholeHop(edgeSrc.eveSystemId, edgeTgt.eveSystemId)
       );
       // Stargate neighbours are joined by their gate, never an Ansiblex. And a
-      // stargate the map protects can be neither removed nor retyped.
+      // real stargate can be neither removed nor retyped.
       const gateNeighbours = edgeSrc?.eveSystemId != null && edgeTgt?.eveSystemId != null
         && isKnownStargateAdjacent(edgeSrc.eveSystemId, edgeTgt.eveSystemId);
-      const lockedGate = isProtectedGate(conn, { protectGates, systems });
+      const lockedGate = isProtectedGate(conn, { systems });
       const timeStatus  = conn?.timeStatus  ?? 'fresh';
       const massStatus  = conn?.massStatus  ?? 'stable';
       const eid = contextMenu.edgeId;
