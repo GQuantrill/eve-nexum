@@ -2206,7 +2206,7 @@
     "noneSent": "No se pudo fijar para ningún personaje: {{list}}",
     "reason": {
       "offline": "no conectado",
-      "no_scope": "vuelve a iniciar sesión para permitir puntos de ruta",
+      "no_scope": "puntos de ruta no permitidos",
       "token_expired": "vuelve a iniciar sesión",
       "esi_error": "EVE no respondió"
     }
@@ -2717,5 +2717,70 @@
   "update": {
     "available": "Hay una nueva versión de Nexum disponible.",
     "reload": "Recargar"
+  },
+  "scopes": {
+    "titleLogin": "Elige a qué puede acceder Nexum",
+    "titleAdd": "Elige a qué puede acceder Nexum con tu nuevo personaje",
+    "titleChange": "A qué puede acceder Nexum con {{name}}",
+    "introChoice": "Nexum lee tu personaje mediante el inicio de sesión oficial de EVE. La ubicación es obligatoria; el resto lo decides tú. Lo que desactives sigue visible en Nexum y te dice qué necesita cuando intentes usarlo.",
+    "introAll": "Este servidor pide todo, así que aquí no hay nada que elegir. Esto es lo que lee Nexum y para qué sirve cada parte. Volver a iniciar sesión renueva el acceso de este personaje.",
+    "loading": "Cargando…",
+    "required": "Obligatorio",
+    "usedFor": "Se usa para:",
+    "changeLater": "Puedes cambiarlo cuando quieras con el botón de la llave junto a cada personaje en el menú de personajes.",
+    "continue": "Continuar al inicio de sesión de EVE",
+    "loginAgain": "Volver a iniciar sesión",
+    "menuItem": "Cambiar a qué puede acceder Nexum",
+    "updated": "Acceso actualizado para {{name}}.",
+    "needsSelf": "Esto necesita «{{group}}», que este personaje no ha permitido.",
+    "needsChar": "Esto necesita «{{group}}», que {{name}} no ha permitido.",
+    "enable": "Activar",
+    "groups": {
+      "location": {
+        "title": "Ubicación",
+        "desc": "En qué sistema está tu personaje y si has iniciado sesión en EVE. Nexum solo lo comprueba mientras estás conectado.",
+        "affects": "dibujar tu cadena mientras saltas, mostrarte a ti y a tus compañeros de corp en el mapa, y la ubicación de tus alts."
+      },
+      "ship": {
+        "title": "Nave",
+        "desc": "Qué nave pilotas.",
+        "affects": "tu nave junto a tu nombre en el mapa, tu nave actual en la calculadora de masa, la masa de cada salto en el registro de saltos, y distinguir una muerte en cápsula de un salto real."
+      },
+      "waypoints": {
+        "title": "Puntos de ruta",
+        "desc": "Permite a Nexum poner una ruta en tu piloto automático de EVE. Solo puede poner puntos de ruta; no puede pilotar tu nave.",
+        "affects": "Establecer destino y Añadir punto de ruta, para este personaje o todos tus personajes conectados a la vez."
+      },
+      "standings": {
+        "title": "Standings personales",
+        "desc": "Tus contactos personales y los standings que has puesto. Solo tú los ves.",
+        "affects": "colorear pilotos, corps, sistemas y estructuras como amigos u hostiles en el mapa, el killboard y la vista de soberanía."
+      },
+      "orgStandings": {
+        "title": "Standings de corp y alianza",
+        "desc": "Los standings que han puesto tu corp y tu alianza: las mismas listas que ve cualquier miembro en el juego. El inicio de sesión de un solo miembro las mantiene al día para toda la corp.",
+        "affects": "ver de un vistazo si estás en espacio amigo u hostil, y el acceso por standing donde lo usen tus administradores."
+      },
+      "citadels": {
+        "title": "Consulta de ciudadelas",
+        "desc": "Pregunta a EVE en qué sistema está una estructura de jugador y qué corp es su dueña. EVE solo responde para estructuras en las que tu personaje puede atracar.",
+        "affects": "el dueño de las ciudadelas que añadas (y por tanto su color de standing), y dónde están tus clones cuando están en una ciudadela."
+      },
+      "fleet": {
+        "title": "Flota",
+        "desc": "Dónde están los miembros de tu flota. Solo funciona si eres el jefe de flota o comandante de ala o escuadrón.",
+        "affects": "los miembros de la flota en el mapa."
+      },
+      "clones": {
+        "title": "Clones",
+        "desc": "Dónde están tus clones de salto y tu clon médico, y cuándo hiciste tu último salto de clon.",
+        "affects": "el panel de Clones."
+      },
+      "director": {
+        "title": "Herramientas de director",
+        "desc": "Solo tiene efecto si tu personaje es Station Manager o Director en el juego. Tu inicio de sesión carga entonces las ciudadelas de tu corp en el mapa para toda la corp.",
+        "affects": "las ciudadelas de tu corp en el planificador de saltos y las listas de estructuras."
+      }
+    }
   }
 }

@@ -3,6 +3,7 @@ import { toast } from '../utils/toastStore';
 import i18n from '../i18n';
 import { readUserSetting } from '../hooks/useUserSetting';
 import { useMapStore } from '../store/mapStore';
+import { isScopeMissing, promptForScope } from '../utils/scopePrompt';
 
 // Who a Set Destination / Add Waypoint goes to by default: just the character
 // you're signed in as, or every character on the account that's logged in.
@@ -70,7 +71,10 @@ function post(destinationId: number, clearOtherWaypoints: boolean, systemName: s
           : i18n.t('routeToast.waypointAdded', { system: systemName }));
       })
       .catch((err) => {
-        toast.error(i18n.t('routeToast.failed'));
+        // This character hasn't allowed waypoints: say so and offer to enable
+        // it, rather than suggesting it might be offline.
+        if (isScopeMissing(err)) promptForScope('waypoints');
+        else toast.error(i18n.t('routeToast.failed'));
         throw err;
       });
   }
@@ -90,6 +94,11 @@ function post(destinationId: number, clearOtherWaypoints: boolean, systemName: s
           : i18n.t('routeToast.waypointAdded', { system: systemName }));
       } else if (success) toast.success(success);
       if (problems) (ok === 0 ? toast.error : toast.info)(problems);
+      // Anyone it didn't reach because they haven't allowed waypoints gets the
+      // Enable prompt (one per character; the toasts stack).
+      for (const r of results) {
+        if (r.status === 'no_scope') promptForScope('waypoints', { charId: r.charId, characterName: r.characterName });
+      }
       if (ok === 0) throw new Error('No character received the waypoint');
     }, (err) => {
       toast.error(i18n.t('routeToast.failed'));

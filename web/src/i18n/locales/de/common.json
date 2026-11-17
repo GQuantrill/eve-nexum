@@ -2206,7 +2206,7 @@
     "noneSent": "Für keinen Charakter gesetzt: {{list}}",
     "reason": {
       "offline": "nicht eingeloggt",
-      "no_scope": "erneut einloggen, um Wegpunkte zu erlauben",
+      "no_scope": "Wegpunkte nicht erlaubt",
       "token_expired": "erneut einloggen",
       "esi_error": "EVE hat nicht geantwortet"
     }
@@ -2717,5 +2717,70 @@
   "update": {
     "available": "Eine neue Version von Nexum ist verfügbar.",
     "reload": "Neu laden"
+  },
+  "scopes": {
+    "titleLogin": "Wähle, worauf Nexum zugreifen darf",
+    "titleAdd": "Wähle, worauf Nexum bei deinem neuen Charakter zugreifen darf",
+    "titleChange": "Worauf Nexum bei {{name}} zugreifen darf",
+    "introChoice": "Nexum liest deinen Charakter über den offiziellen EVE-Login. Der Standort ist Pflicht, der Rest liegt bei dir. Was du abwählst, bleibt in Nexum sichtbar und sagt dir beim Benutzen, was es braucht.",
+    "introAll": "Dieser Server fragt nach allem, daher gibt es hier nichts auszuwählen. Hier siehst du, was Nexum liest und wofür jeder Teil genutzt wird. Ein erneuter Login erneuert den Zugriff dieses Charakters.",
+    "loading": "Lädt…",
+    "required": "Pflicht",
+    "usedFor": "Genutzt für:",
+    "changeLater": "Du kannst das jederzeit über den Schlüssel-Button neben jedem Charakter im Charaktermenü ändern.",
+    "continue": "Weiter zum EVE-Login",
+    "loginAgain": "Erneut anmelden",
+    "menuItem": "Ändern, worauf Nexum zugreifen darf",
+    "updated": "Zugriff für {{name}} aktualisiert.",
+    "needsSelf": "Dafür wird „{{group}}“ benötigt, was dieser Charakter nicht erlaubt hat.",
+    "needsChar": "Dafür wird „{{group}}“ benötigt, was {{name}} nicht erlaubt hat.",
+    "enable": "Aktivieren",
+    "groups": {
+      "location": {
+        "title": "Standort",
+        "desc": "In welchem System dein Charakter ist und ob du in EVE eingeloggt bist. Nexum prüft das nur, solange du eingeloggt bist.",
+        "affects": "das Zeichnen deiner Kette beim Springen, die Anzeige von dir und deinen Corp-Kameraden auf der Karte sowie die Standorte deiner Alts."
+      },
+      "ship": {
+        "title": "Schiff",
+        "desc": "Welches Schiff du fliegst.",
+        "affects": "dein Schiff neben deinem Namen auf der Karte, das aktuelle Schiff im Massenrechner, die Masse jedes Sprungs im Sprungprotokoll und die Unterscheidung zwischen Pod-Tod und echtem Sprung."
+      },
+      "waypoints": {
+        "title": "Wegpunkte",
+        "desc": "Erlaubt Nexum, eine Route in deinen EVE-Autopiloten zu setzen. Nexum kann nur Wegpunkte setzen, nicht dein Schiff fliegen.",
+        "affects": "Ziel festlegen und Wegpunkt hinzufügen, für diesen Charakter oder alle eingeloggten Charaktere auf einmal."
+      },
+      "standings": {
+        "title": "Persönliche Standings",
+        "desc": "Deine persönlichen Kontakte und die Standings, die du gesetzt hast. Nur du siehst sie.",
+        "affects": "die Freund-/Feind-Färbung von Piloten, Corps, Systemen und Strukturen auf der Karte, im Killboard und in der Souveränitätsansicht."
+      },
+      "orgStandings": {
+        "title": "Corp- und Allianz-Standings",
+        "desc": "Die Standings, die deine Corp und Allianz gesetzt haben: dieselben Listen, die jedes Mitglied im Spiel sieht. Der Login eines Mitglieds hält sie für die ganze Corp aktuell.",
+        "affects": "den schnellen Blick, ob du in freundlichem oder feindlichem Gebiet bist, und Standing-basierten Zugang, wo deine Admins ihn nutzen."
+      },
+      "citadels": {
+        "title": "Zitadellen-Abfragen",
+        "desc": "Fragt EVE, in welchem System eine Spielerstruktur steht und welcher Corp sie gehört. EVE antwortet nur für Strukturen, an denen dein Charakter docken kann.",
+        "affects": "den Besitzer von Zitadellen, die du hinzufügst (und damit ihre Standing-Färbung), und wo deine Klone sind, wenn sie in einer Zitadelle liegen."
+      },
+      "fleet": {
+        "title": "Flotte",
+        "desc": "Wo deine Flottenmitglieder sind. Funktioniert nur, wenn du Flottenboss oder Wing- bzw. Squad-Commander bist.",
+        "affects": "Flottenmitglieder auf der Karte."
+      },
+      "clones": {
+        "title": "Klone",
+        "desc": "Wo deine Sprungklone und dein Medizinklon sind und wann du zuletzt einen Klonsprung gemacht hast.",
+        "affects": "den Klone-Bereich."
+      },
+      "director": {
+        "title": "Direktoren-Werkzeuge",
+        "desc": "Wirkt nur, wenn dein Charakter im Spiel Station Manager oder Director ist. Dein Login lädt dann die Zitadellen deiner Corp für alle in der Corp auf die Karte.",
+        "affects": "die Zitadellen deiner Corp im Sprungplaner und in den Strukturlisten."
+      }
+    }
   }
 }

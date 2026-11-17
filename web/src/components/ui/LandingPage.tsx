@@ -17,6 +17,8 @@ import {
   MapPinSimpleIcon, ColumnsIcon,
 } from '../../icons';
 import { apiUrl } from '../../api/client';
+import { loginUrl, useScopeOptions } from '../../api/scopeOptions';
+import { useScopePickerStore } from '../../store/scopePickerStore';
 import { DISCORD_INVITE_URL } from '../../data/links';
 import { SUPPORTED_LANGUAGES, LANGUAGE_NAMES } from '../../i18n';
 import { DemoMap } from './DemoMap';
@@ -24,7 +26,7 @@ import { LanguageSwitcher } from './LanguageSwitcher';
 import { LangFlag } from './LangFlag';
 import { OrgLogos } from './OrgLogos';
 import portraitImg from '../../assets/portrait.jpeg';
-interface LastCharacter { characterId: number; characterName: string; }
+interface LastCharacter { characterId: number; characterName: string; scopeGroups?: string[] }
 
 // Categorised feature sections that mirror the README's Key features tree.
 // Cards still render through the same `landing__feature` template; each
@@ -321,6 +323,22 @@ export function LandingPage() {
 
   useShaderCanvas(canvasRef);
 
+  // SSO_SCOPES_MODE=choice: a fresh login goes through the picker first. A
+  // returning character asks again for the groups it allowed last time (so a
+  // group it turned off isn't quietly granted again), or gets the picker if
+  // that isn't known. In 'all' mode every link goes straight to EVE, as before.
+  const scopeOptions = useScopeOptions();
+  const openPicker = useScopePickerStore((s) => s.open);
+  const choice = scopeOptions?.mode === 'choice';
+  const pickFirst = (e: React.MouseEvent) => {
+    if (!choice) return;
+    e.preventDefault();
+    openPicker({ kind: 'login' });
+  };
+  const returningHref = choice && lastChar?.scopeGroups
+    ? loginUrl({ kind: 'login' }, scopeOptions, new Set(lastChar.scopeGroups))
+    : apiUrl('/auth/login');
+
   const errorParam = new URLSearchParams(window.location.search).get('error');
   const errorMessage = errorParam ? t(loginErrorKey(errorParam)) : null;
 
@@ -367,7 +385,11 @@ export function LandingPage() {
           <OrgLogos className="landing__org-logos" size={64} />
           {lastChar ? (
             <>
-              <a href={apiUrl('/auth/login')} className="landing__returning">
+              <a
+                href={returningHref}
+                className="landing__returning"
+                onClick={lastChar.scopeGroups ? undefined : pickFirst}
+              >
                 <img
                   src={charPortrait(lastChar.characterId, 128)}
                   alt={lastChar.characterName}
@@ -381,13 +403,13 @@ export function LandingPage() {
               <p className="landing__note">
                 {t('landing.cta.sessionExpired')}
               </p>
-              <a href={apiUrl('/auth/login')} className="landing__switch-link">
+              <a href={apiUrl('/auth/login')} className="landing__switch-link" onClick={pickFirst}>
                 {t('landing.cta.switchChar')}
               </a>
             </>
           ) : (
             <>
-              <a href={apiUrl('/auth/login')} className="landing__login-wrap">
+              <a href={apiUrl('/auth/login')} className="landing__login-wrap" onClick={pickFirst}>
                 <img
                   src="/vendor/eve-sso-login-white-large.png"
                   alt={t('landing.cta.loginAlt')}

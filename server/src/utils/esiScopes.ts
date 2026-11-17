@@ -49,3 +49,32 @@ export function missingScopes(
 ): EsiScope[] {
   return required.filter((s) => !hasScope(granted, s));
 }
+
+// The groups a pilot chooses between, by what they power. Location is always
+// required: tracking is what nexum is for. Everything else can be optional (see
+// services/ssoScopes.ts for which ones a deployment actually offers).
+export const SCOPE_GROUP_IDS = [
+  'location', 'ship', 'waypoints', 'standings', 'orgStandings', 'citadels', 'fleet', 'clones', 'director',
+] as const;
+export type ScopeGroupId = typeof SCOPE_GROUP_IDS[number];
+
+export const SCOPE_GROUPS: Record<ScopeGroupId, readonly EsiScope[]> = {
+  location:     [SCOPE.location, SCOPE.online],
+  ship:         [SCOPE.ship],
+  waypoints:    [SCOPE.waypoint],
+  standings:    [SCOPE.charContacts],
+  orgStandings: [SCOPE.corpContacts, SCOPE.allianceContacts],
+  citadels:     [SCOPE.universeStructures],
+  fleet:        [SCOPE.fleet],
+  clones:       [SCOPE.clones],
+  director:     [SCOPE.corpRoles, SCOPE.corpStructures],
+};
+
+export function isScopeGroupId(v: string): v is ScopeGroupId {
+  return (SCOPE_GROUP_IDS as readonly string[]).includes(v);
+}
+
+// The groups a character holds in full. Null (not recorded yet) holds them all.
+export function groupsHeld(granted: readonly string[] | null | undefined): ScopeGroupId[] {
+  return SCOPE_GROUP_IDS.filter((g) => SCOPE_GROUPS[g].every((s) => hasScope(granted, s)));
+}

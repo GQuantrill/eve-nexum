@@ -41,6 +41,8 @@ export interface AccountCharacter {
   lastKnownSystemName: string | null;
   lastKnownSystemClass: string | null;
   active: boolean;
+  /** ESI scope groups this character has granted in full. */
+  scopeGroups?: string[];
 }
 
 export interface AuthUser {
@@ -50,6 +52,10 @@ export interface AuthUser {
   role: Role;
   corpMode: boolean;
   allianceMode: boolean;
+  /** How logins choose ESI scopes: 'all' asks for everything, 'choice' shows the picker. */
+  scopeMode?: 'all' | 'choice';
+  /** ESI scope groups the signed-in character has granted in full. */
+  scopeGroups?: string[];
   /** Account (human) this character belongs to; groups all linked alts. */
   ownerId: number | null;
   /** Every character linked to this account, for the switcher. */

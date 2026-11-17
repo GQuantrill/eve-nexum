@@ -2206,7 +2206,7 @@
     "noneSent": "Couldn't set it for any character: {{list}}",
     "reason": {
       "offline": "not logged in",
-      "no_scope": "log in again to allow waypoints",
+      "no_scope": "waypoints not allowed",
       "token_expired": "log in again",
       "esi_error": "EVE didn't respond"
     }
@@ -2717,5 +2717,70 @@
   "update": {
     "available": "A new version of Nexum is available.",
     "reload": "Reload"
+  },
+  "scopes": {
+    "titleLogin": "Choose what Nexum can access",
+    "titleAdd": "Choose what Nexum can access for your new character",
+    "titleChange": "What Nexum can access for {{name}}",
+    "introChoice": "Nexum reads your character through EVE's official login. Location is required; the rest is up to you. Anything you leave off stays in Nexum and tells you what it needs when you try to use it.",
+    "introAll": "This server asks for everything, so there's nothing to choose. This is what Nexum reads and what each part is used for. Logging in again renews this character's access.",
+    "loading": "Loading…",
+    "required": "Required",
+    "usedFor": "Used for:",
+    "changeLater": "You can change this any time with the key button next to each character in the character menu.",
+    "continue": "Continue to EVE login",
+    "loginAgain": "Log in again",
+    "menuItem": "Change what Nexum can access",
+    "updated": "Access updated for {{name}}.",
+    "needsSelf": "This needs \"{{group}}\", which this character hasn't allowed.",
+    "needsChar": "This needs \"{{group}}\", which {{name}} hasn't allowed.",
+    "enable": "Enable",
+    "groups": {
+      "location": {
+        "title": "Location",
+        "desc": "Which system your character is in, and whether you're logged into EVE. Nexum only checks while you're logged in.",
+        "affects": "drawing your chain as you jump, showing you and your corp mates on the map, and your alts' locations."
+      },
+      "ship": {
+        "title": "Ship",
+        "desc": "What ship you're flying.",
+        "affects": "your ship next to your name on the map, \"ship I'm in\" on the mass roller, each jump's mass in the jump log, and telling a pod death from a real jump."
+      },
+      "waypoints": {
+        "title": "Waypoints",
+        "desc": "Lets Nexum put a route into your EVE autopilot. It can only set waypoints; it can't fly your ship.",
+        "affects": "Set Destination and Add Waypoint, for this character or all your logged-in characters at once."
+      },
+      "standings": {
+        "title": "Personal standings",
+        "desc": "Your personal contacts and the standings you've set. Only you see them.",
+        "affects": "tinting pilots, corps, systems and structures friendly or hostile on the map, killboard and sovereignty views."
+      },
+      "orgStandings": {
+        "title": "Corp and alliance standings",
+        "desc": "The standings your corp and alliance have set: the same lists every member sees in game. One member's login keeps them up to date for the whole corp.",
+        "affects": "seeing at a glance whether you're in friendly or hostile space, and standings-based access where your admins use it."
+      },
+      "citadels": {
+        "title": "Citadel lookups",
+        "desc": "Asks EVE which system a player structure is in and which corp owns it. EVE only answers for structures your character can dock at.",
+        "affects": "the owner of citadels you add (and so their standings tint), and where your clones are when they're in a citadel."
+      },
+      "fleet": {
+        "title": "Fleet",
+        "desc": "Where your fleet members are. Only works if you're the fleet boss or a wing or squad commander.",
+        "affects": "fleet members shown on the map."
+      },
+      "clones": {
+        "title": "Clones",
+        "desc": "Where your jump clones and medical clone are, and when you last clone jumped.",
+        "affects": "the Clones panel."
+      },
+      "director": {
+        "title": "Director tools",
+        "desc": "Only does anything if your character is a Station Manager or Director in game. Your login then loads your corp's citadels onto the map for everyone in the corp.",
+        "affects": "your corp's citadels in the jump planner and structure lists."
+      }
+    }
   }
 }

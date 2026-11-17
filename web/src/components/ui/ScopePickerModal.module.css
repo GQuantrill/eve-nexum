@@ -1,0 +1,99 @@
+/* ── "Choose what nexum can access" ─────────────────────────── */
+/* Two classes so it beats the base `.modal { width: 360px }`. */
+.modal.modal {
+  width: 560px;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 48px);
+  display: flex;
+  flex-direction: column;
+}
+
+.body {
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.intro,
+.note {
+  font-size: calc(13px * var(--font-scale, 1));
+  color: var(--text-secondary);
+  line-height: 1.45;
+  margin: 0 0 12px;
+}
+
+.note {
+  color: var(--text-subtle);
+  margin: 12px 0 0;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.group {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: var(--surface-sunken);
+}
+
+/* The group a feature just asked for. */
+.asked {
+  border-color: var(--border-accent-strong);
+}
+
+.off .desc,
+.off .affects,
+.off .name {
+  color: var(--text-faint);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.head:has(input:disabled) {
+  cursor: default;
+}
+
+.name {
+  font-size: calc(14px * var(--font-scale, 1));
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.badge {
+  margin-left: auto;
+  font-size: calc(11px * var(--font-scale, 1));
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 6px;
+}
+
+.desc {
+  font-size: calc(13px * var(--font-scale, 1));
+  color: var(--text-secondary);
+  line-height: 1.45;
+  margin: 6px 0 4px 26px;
+}
+
+.affects {
+  font-size: calc(12px * var(--font-scale, 1));
+  color: var(--text-subtle);
+  line-height: 1.4;
+  margin: 0 0 0 26px;
+}
+
+.affectsLabel {
+  color: var(--text-muted);
+  font-weight: 600;
+}

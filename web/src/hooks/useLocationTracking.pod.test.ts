@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { arrivedInPod, cloneJumpedBetween } from './useLocationTracking';
+import { arrivedInPod, cloneJumpedBetween, respawnedDocked } from './useLocationTracking';
 
 const CAPSULE    = 670;
 const GENOLUTION = 33328;   // the same pod, different type id
@@ -81,5 +81,29 @@ describe('cloneJumpedBetween', () => {
     // capsule-to-capsule no longer slips through.
     expect(cloneJumpedBetween(true, true)).toBe(true);
     expect(arrivedInPod(false, CAPSULE)).toBe(false);
+  });
+});
+
+// Without the Ship scope there's no hull to compare, so a pod death is spotted
+// from waking up docked: in space one reading, docked in another system the next.
+describe('respawnedDocked', () => {
+  it('in space, then docked elsewhere, with no ship info: a respawn, not a jump', () => {
+    expect(respawnedDocked(false, false, true)).toBe(true);
+  });
+
+  it('never applies when the ship is known: the hull check decides, as before', () => {
+    expect(respawnedDocked(true, false, true)).toBe(false);
+  });
+
+  it('flying in space to space is a real jump', () => {
+    expect(respawnedDocked(false, false, false)).toBe(false);
+  });
+
+  it('docked to docked is the clone-jump rule, not this one', () => {
+    expect(respawnedDocked(false, true, true)).toBe(false);
+  });
+
+  it('undocking into a new system is not a respawn', () => {
+    expect(respawnedDocked(false, true, false)).toBe(false);
   });
 });
