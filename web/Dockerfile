@@ -1,7 +1,7 @@
 FROM node:20-alpine AS builder
 RUN corepack enable && corepack prepare yarn@1.22.22 --activate
 WORKDIR /app
-COPY package.json yarn.lock ./
+COPY package.json yarn.lock .npmrc ./
 RUN yarn install --frozen-lockfile
 COPY . .
 # Optional Google Tag Manager container ID. Unset (the default) => no analytics
