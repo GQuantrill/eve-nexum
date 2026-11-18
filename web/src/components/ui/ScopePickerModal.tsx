@@ -12,7 +12,6 @@ import styles from './ScopePickerModal.module.css';
 // Ticked when the picker opens: everything for a new login or character; for a
 // change, what the character holds now plus the group a feature asked for.
 function initialTicks(target: ScopePickerTarget, held: readonly string[]): Set<string> {
-  if (target.kind === 'login' && target.ticked) return new Set(target.ticked);
   if (target.kind !== 'change') return new Set(SCOPE_GROUP_IDS);
   return new Set([...held, ...(target.require ? [target.require] : [])]);
 }
