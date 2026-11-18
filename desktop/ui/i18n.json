@@ -29,7 +29,10 @@
     "intelHint": "Channel names as in EVE's chat log files, e.g. east.imperium. The newest log of each is followed. When a line names a system on your map, it pulses red for 5 seconds.",
     "intelAdd": "Add",
     "intelRemove": "Remove",
-    "intelSound": "Play a sound for intel"
+    "intelSound": "Play a sound for intel",
+    "intelFollowing": "Following",
+    "intelLast": "last line",
+    "intelNoLog": "No log for this channel in the chat log folder yet"
   },
   "de": {
     "show": "Nexum anzeigen",
@@ -61,7 +64,10 @@
     "intelHint": "Kanalnamen wie in den Chatlog-Dateien von EVE, z. B. east.imperium. Das neueste Log jedes Kanals wird verfolgt. Nennt eine Zeile ein System auf deiner Karte, pulsiert es 5 Sekunden rot.",
     "intelAdd": "Hinzufügen",
     "intelRemove": "Entfernen",
-    "intelSound": "Ton bei Intel abspielen"
+    "intelSound": "Ton bei Intel abspielen",
+    "intelFollowing": "Verfolgt",
+    "intelLast": "letzte Zeile",
+    "intelNoLog": "Noch kein Log für diesen Kanal im Chatlog-Ordner"
   },
   "nl": {
     "show": "Nexum tonen",
@@ -93,7 +99,10 @@
     "intelHint": "Kanaalnamen zoals in de chatlogbestanden van EVE, bijv. east.imperium. Het nieuwste log van elk kanaal wordt gevolgd. Noemt een regel een systeem op je kaart, dan pulseert het 5 seconden rood.",
     "intelAdd": "Toevoegen",
     "intelRemove": "Verwijderen",
-    "intelSound": "Geluid afspelen bij intel"
+    "intelSound": "Geluid afspelen bij intel",
+    "intelFollowing": "Volgt",
+    "intelLast": "laatste regel",
+    "intelNoLog": "Nog geen log voor dit kanaal in de chatlogmap"
   },
   "fr": {
     "show": "Afficher Nexum",
@@ -125,7 +134,10 @@
     "intelHint": "Noms des canaux tels que dans les fichiers de logs de chat d'EVE, p. ex. east.imperium. Le log le plus récent de chaque canal est suivi. Quand une ligne cite un système de votre carte, il pulse en rouge pendant 5 secondes.",
     "intelAdd": "Ajouter",
     "intelRemove": "Retirer",
-    "intelSound": "Jouer un son pour l'intel"
+    "intelSound": "Jouer un son pour l'intel",
+    "intelFollowing": "Suivi",
+    "intelLast": "dernière ligne",
+    "intelNoLog": "Pas encore de log pour ce canal dans le dossier des logs"
   },
   "es": {
     "show": "Mostrar Nexum",
@@ -157,7 +169,10 @@
     "intelHint": "Nombres de canal como en los archivos de logs de chat de EVE, p. ej. east.imperium. Se sigue el log más reciente de cada uno. Cuando una línea nombra un sistema de tu mapa, parpadea en rojo durante 5 segundos.",
     "intelAdd": "Añadir",
     "intelRemove": "Quitar",
-    "intelSound": "Reproducir un sonido con la intel"
+    "intelSound": "Reproducir un sonido con la intel",
+    "intelFollowing": "Siguiendo",
+    "intelLast": "última línea",
+    "intelNoLog": "Aún no hay log de este canal en la carpeta de logs"
   },
   "pt": {
     "show": "Mostrar Nexum",
@@ -189,7 +204,10 @@
     "intelHint": "Nomes dos canais como nos arquivos de log de chat do EVE, ex.: east.imperium. O log mais recente de cada um é acompanhado. Quando uma linha cita um sistema do seu mapa, ele pulsa em vermelho por 5 segundos.",
     "intelAdd": "Adicionar",
     "intelRemove": "Remover",
-    "intelSound": "Tocar um som para intel"
+    "intelSound": "Tocar um som para intel",
+    "intelFollowing": "Acompanhando",
+    "intelLast": "última linha",
+    "intelNoLog": "Ainda não há log deste canal na pasta de logs"
   },
   "zh": {
     "show": "显示 Nexum",
@@ -221,7 +239,10 @@
     "intelHint": "与 EVE 聊天日志文件中一致的频道名，例如 east.imperium。会跟踪每个频道最新的日志。当某行提到你地图上的星系时，该星系会红色闪烁 5 秒。",
     "intelAdd": "添加",
     "intelRemove": "移除",
-    "intelSound": "收到情报时播放声音"
+    "intelSound": "收到情报时播放声音",
+    "intelFollowing": "正在跟踪",
+    "intelLast": "最后一行",
+    "intelNoLog": "聊天日志文件夹中尚无此频道的日志"
   },
   "ko": {
     "show": "Nexum 보기",
@@ -253,7 +274,10 @@
     "intelHint": "EVE 채팅 로그 파일에 나오는 채널 이름 (예: east.imperium). 채널마다 가장 최근 로그를 따라갑니다. 한 줄이 지도 위 성계를 언급하면 그 성계가 5초 동안 빨갛게 깜박입니다.",
     "intelAdd": "추가",
     "intelRemove": "제거",
-    "intelSound": "정보 알림 소리 재생"
+    "intelSound": "정보 알림 소리 재생",
+    "intelFollowing": "추적 중",
+    "intelLast": "마지막 줄",
+    "intelNoLog": "채팅 로그 폴더에 아직 이 채널의 로그가 없습니다"
   },
   "ja": {
     "show": "Nexum を表示",
@@ -285,7 +309,10 @@
     "intelHint": "EVE のチャットログファイルにあるチャンネル名（例: east.imperium）。各チャンネルの最新のログを追跡します。マップ上の星系名が書き込まれると、その星系が 5 秒間赤く点滅します。",
     "intelAdd": "追加",
     "intelRemove": "削除",
-    "intelSound": "インテルで音を鳴らす"
+    "intelSound": "インテルで音を鳴らす",
+    "intelFollowing": "追跡中",
+    "intelLast": "最終行",
+    "intelNoLog": "チャットログフォルダーにこのチャンネルのログはまだありません"
   },
   "ru": {
     "show": "Показать Nexum",
@@ -317,6 +344,9 @@
     "intelHint": "Названия каналов как в файлах логов чата EVE, например east.imperium. Отслеживается самый свежий лог каждого. Если строка называет систему с вашей карты, она 5 секунд пульсирует красным.",
     "intelAdd": "Добавить",
     "intelRemove": "Убрать",
-    "intelSound": "Звук при интеле"
+    "intelSound": "Звук при интеле",
+    "intelFollowing": "Отслеживается",
+    "intelLast": "последняя строка",
+    "intelNoLog": "В папке логов пока нет лога этого канала"
   }
 }

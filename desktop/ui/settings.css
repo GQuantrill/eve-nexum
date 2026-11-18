@@ -19,6 +19,8 @@ fieldset.intel legend { font-weight: 600; padding: 0 4px; }
 #intelList { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
 #intelList li { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
 #intelList li span { font-family: ui-monospace, monospace; }
+#intelList li div { display: flex; flex-direction: column; min-width: 0; }
+#intelList .status { font-size: 12px; word-break: break-all; }
 .row { display: flex; gap: 8px; }
 .row input { flex: 1; }
 #status.bad { color: var(--bad); }

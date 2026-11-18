@@ -27,6 +27,8 @@ pub struct AppState {
     pub settings: Mutex<Settings>,
     /// A newer version found by the update check, waiting to be installed.
     pub update_version: Mutex<Option<String>>,
+    /// Which log each intel channel is following, for the settings window.
+    pub intel_status: Mutex<Vec<intel::ChannelStatus>>,
 }
 
 /// Show/hide Nexum from anywhere, the EVE client included.
@@ -51,6 +53,11 @@ fn desktop_info(app: AppHandle) -> serde_json::Value {
 #[tauri::command]
 fn get_settings(state: tauri::State<AppState>) -> Settings {
     state.settings.lock().unwrap().clone()
+}
+
+#[tauri::command]
+fn intel_status(state: tauri::State<AppState>) -> Vec<intel::ChannelStatus> {
+    state.intel_status.lock().unwrap().clone()
 }
 
 #[tauri::command]
@@ -227,7 +234,8 @@ pub fn run() {
             desktop_info,
             get_settings,
             save_settings,
-            default_chatlog_dir
+            default_chatlog_dir,
+            intel_status
         ])
         .setup(|app| {
             let handle = app.handle().clone();
@@ -235,6 +243,7 @@ pub fn run() {
             app.manage(AppState {
                 settings: Mutex::new(s.clone()),
                 update_version: Mutex::new(None),
+                intel_status: Mutex::new(Vec::new()),
             });
 
             let server = url::Url::parse(&s.server_url)?;

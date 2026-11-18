@@ -25,8 +25,13 @@ async function strings() {
     const list = $('intelList');
     list.replaceChildren(...channels.map((c, i) => {
       const li = document.createElement('li');
-      const name = document.createElement('span');
-      name.textContent = c;
+      const name = document.createElement('div');
+      const label = document.createElement('span');
+      label.textContent = c;
+      const info = document.createElement('small');
+      info.className = 'status';
+      info.dataset.channel = c.toLowerCase();
+      name.append(label, info);
       const rm = document.createElement('button');
       rm.type = 'button'; rm.className = 'link'; rm.textContent = t.intelRemove;
       rm.addEventListener('click', () => { channels.splice(i, 1); drawChannels(); });
@@ -35,6 +40,21 @@ async function strings() {
     }));
   };
   drawChannels();
+
+  // Which file each saved channel is following, refreshed while open.
+  const showStatus = async () => {
+    let status = [];
+    try { status = await invoke('intel_status'); } catch { return; }
+    document.querySelectorAll('#intelList .status').forEach((el) => {
+      const st = status.find((x) => x.channel.toLowerCase() === el.dataset.channel);
+      if (!st) { el.textContent = ''; return; }
+      if (!st.file) { el.textContent = t.intelNoLog; return; }
+      const last = st.lastLineAt ? ` - ${t.intelLast} ${new Date(st.lastLineAt).toLocaleTimeString()}` : '';
+      el.textContent = `${t.intelFollowing} ${st.file}${last}`;
+    });
+  };
+  showStatus();
+  setInterval(showStatus, 2000);
   const addChannel = () => {
     // A pasted file name loses its date/time/character part here and again
     // in the app, which keeps only the channel name.

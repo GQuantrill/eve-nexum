@@ -9,6 +9,7 @@ fn main() {
             "get_settings",
             "save_settings",
             "default_chatlog_dir",
+            "intel_status",
         ]),
     ))
     .expect("failed to run tauri-build");

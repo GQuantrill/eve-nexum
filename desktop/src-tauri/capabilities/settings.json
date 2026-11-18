@@ -7,6 +7,7 @@
     "core:default",
     "allow-get-settings",
     "allow-save-settings",
-    "allow-default-chatlog-dir"
+    "allow-default-chatlog-dir",
+    "allow-intel-status"
   ]
 }

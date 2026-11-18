@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-intel-status"
+description = "Enables the intel_status command without any pre-configured scope."
+commands.allow = ["intel_status"]
+
+[[permission]]
+identifier = "deny-intel-status"
+description = "Denies the intel_status command without any pre-configured scope."
+commands.deny = ["intel_status"]

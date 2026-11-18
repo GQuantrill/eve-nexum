@@ -84,7 +84,10 @@ fn scan(dir: &Path, files: &mut HashMap<PathBuf, FileState>) -> Vec<LocalChange>
         if !name.starts_with("Local_") || !name.ends_with(".txt") {
             continue;
         }
-        let Ok(meta) = entry.metadata() else { continue };
+        // Ask the file itself, not the folder listing: on Windows the listing
+        // keeps a file's old size while EVE still has it open, so new jumps
+        // would go unseen until EVE closed the log.
+        let Ok(meta) = std::fs::metadata(&path) else { continue };
         let modified = meta.modified().unwrap_or(SystemTime::UNIX_EPOCH);
         let age = now.duration_since(modified).unwrap_or_default();
         // Only sessions still being written. A file nobody touched for six

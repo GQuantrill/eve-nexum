@@ -32,6 +32,18 @@ pub struct IntelLine {
 struct Followed {
     path: PathBuf,
     state: FileState,
+    last_at: Option<u64>,
+}
+
+/// What the settings window shows under each channel.
+#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ChannelStatus {
+    pub channel: String,
+    /// The log file being followed; None when none was found.
+    pub file: Option<String>,
+    /// When the newest line seen so far was written (epoch ms).
+    pub last_line_at: Option<u64>,
 }
 
 pub fn start(app: AppHandle) {
@@ -45,13 +57,20 @@ pub fn start(app: AppHandle) {
                 (s.intel_channels.clone(), s.intel_sound)
             };
             followed.retain(|k, _| channels.iter().any(|c| c.eq_ignore_ascii_case(k)));
-            if channels.is_empty() {
-                continue;
+            if let Some(dir) = eve_logs::log_dir(&app) {
+                for line in poll(&dir, &channels, &mut followed) {
+                    let _ = app.emit_to("main", "nexum://intel", IntelLine { sound, ..line });
+                }
             }
-            let Some(dir) = eve_logs::log_dir(&app) else { continue };
-            for line in poll(&dir, &channels, &mut followed) {
-                let _ = app.emit_to("main", "nexum://intel", IntelLine { sound, ..line });
-            }
+            let status = channels.iter().map(|c| {
+                let f = followed.get(&c.to_lowercase());
+                ChannelStatus {
+                    channel: c.clone(),
+                    file: f.and_then(|f| f.path.file_name()).map(|n| n.to_string_lossy().into_owned()),
+                    last_line_at: f.and_then(|f| f.last_at),
+                }
+            }).collect();
+            *app.state::<AppState>().intel_status.lock().unwrap() = status;
         }
     });
 }
@@ -64,7 +83,10 @@ fn poll(dir: &Path, channels: &[String], followed: &mut HashMap<String, Followed
         .filter_map(|e| e.file_name().to_str().map(str::to_string))
         .collect();
     for channel in channels {
-        let Some(newest) = newest_log(channel, &names) else { continue };
+        let Some(newest) = newest_log(channel, &names) else {
+            followed.remove(&channel.to_lowercase());
+            continue;
+        };
         let path = dir.join(&newest);
         let key = channel.to_lowercase();
         let Ok(len) = std::fs::metadata(&path).map(|m| m.len()) else { continue };
@@ -73,14 +95,14 @@ fn poll(dir: &Path, channels: &[String], followed: &mut HashMap<String, Followed
             Some(f) if f.path == path => {}
             // A newer session's file while running: read it from the start.
             Some(_) => {
-                followed.insert(key.clone(), Followed { path: path.clone(), state: FileState::default() });
+                followed.insert(key.clone(), Followed { path: path.clone(), state: FileState::default(), last_at: None });
             }
             // First sight (app just started, or channel just added): what's
             // already there is history, so start at the end.
             None => {
                 let mut state = FileState::default();
                 state.offset = len;
-                followed.insert(key.clone(), Followed { path: path.clone(), state });
+                followed.insert(key.clone(), Followed { path: path.clone(), state, last_at: None });
                 continue;
             }
         }
@@ -92,7 +114,11 @@ fn poll(dir: &Path, channels: &[String], followed: &mut HashMap<String, Followed
             continue;
         }
         let Some(text) = eve_logs::read_new(&f.path, &mut f.state, len) else { continue };
-        out.extend(parse_lines(channel, &text));
+        let lines = parse_lines(channel, &text);
+        if let Some(l) = lines.last() {
+            f.last_at = Some(l.at);
+        }
+        out.extend(lines);
     }
     out
 }
