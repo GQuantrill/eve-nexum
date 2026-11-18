@@ -1239,7 +1239,8 @@
       "about": "À propos de Nexum",
       "aboutMe": "À propos de moi",
       "techStack": "Stack technique",
-      "faqs": "FAQ"
+      "faqs": "FAQ",
+      "desktop": "Uniquement dans l'application de bureau"
     },
     "features": {
       "interactiveMap": {
@@ -1520,7 +1521,7 @@
       },
       "announcer": {
         "title": "Annonces vocales",
-        "desc": "Des alertes parlées pendant que vous volez, par une voix qui fonctionne sur votre propre appareil : low-sec et null-sec à portée, incursions, kills récents à proximité, personnages qui se connectent et nouvelles chaînes ajoutées par d'autres. Expérimental, en anglais uniquement."
+        "desc": "Des alertes parlées pendant que vous volez, par une voix qui fonctionne sur votre propre appareil : low-sec et null-sec à portée, incursions, kills récents à proximité, personnages qui se connectent et nouvelles chaînes ajoutées par d'autres. Expérimental, en anglais uniquement. Désactivé tant que vous ne l'activez pas."
       },
       "desktopAlerts": {
         "title": "Alertes de bureau et sonores",
@@ -1652,7 +1653,49 @@
         "a": "Je préférerais que non, vraiment. Je ne fais pas ça pour l'ISK, alors gardez-le et dépensez-le pour quelque chose dans quoi exploser ou faire exploser quelqu'un d'autre !"
       }
     },
-    "footer": "EVE Online et le logo EVE sont des marques déposées de CCP hf. Tous droits réservés dans le monde entier. Nexum est un outil tiers et n'est ni affilié à CCP hf ni approuvé par lui. · <license>Mention de licence & PI EVE</license>"
+    "footer": "EVE Online et le logo EVE sont des marques déposées de CCP hf. Tous droits réservés dans le monde entier. Nexum est un outil tiers et n'est ni affilié à CCP hf ni approuvé par lui. · <license>Mention de licence & PI EVE</license>",
+    "desktopBody": "Nexum existe aussi en application de bureau pour Windows et macOS. C'est le même Nexum, avec votre connexion, vos cartes et vos réglages, plus ce qu'un navigateur ne peut pas offrir : l'application lit les fichiers de logs d'EVE sur votre ordinateur et reste au-dessus du jeu. Tout ce qui figure dans cette section nécessite l'application ; tout ce qui précède fonctionne dans les deux.",
+    "desktopFeatures": {
+      "logJumps": {
+        "title": "Suivi instantané des sauts",
+        "desc": "Lit le log du chat Local d'EVE et vous déplace sur la carte dès votre saut, quelques secondes avant ESI. ESI confirme toujours chaque déplacement. Vos autres personnages connectés se déplacent de la même façon."
+      },
+      "intelMap": {
+        "title": "L'intel sur votre carte",
+        "desc": "Suivez vos canaux d'intel. Quand un signalement cite un système de votre carte, il pulse en rouge, avec un son. Choisissez l'intensité et la durée."
+      },
+      "intelFeed": {
+        "title": "Fil d'intel",
+        "desc": "Tous vos canaux d'intel dans un seul fil de la barre latérale, avec le nombre de sauts jusqu'à chaque système signalé. Activez ou masquez des canaux, cliquez sur un système pour le trouver sur la carte, ou clic droit pour en faire une destination ou un waypoint."
+      },
+      "threatReported": {
+        "title": "Menace signalée",
+        "desc": "L'intel dans votre portée de proximité déclenche une alerte, peut être lue à voix haute et fait clignoter Nexum dans la barre des tâches pendant que vous jouez. Un « clr » l'annule."
+      },
+      "scanPaste": {
+        "title": "Collage des scans",
+        "desc": "Copiez les résultats du scanner de sondes dans EVE : ils arrivent dans le système sélectionné ; copiez un d-scan et il s'ouvre dans l'analyseur. Sans alt-tab. Désactivé tant que vous ne l'activez pas."
+      },
+      "onTop": {
+        "title": "Toujours au premier plan",
+        "desc": "Gardez Nexum au-dessus du client EVE, et affichez-le ou masquez-le de partout avec Alt+Shift+N."
+      },
+      "native": {
+        "title": "Notifications système et zone de notification",
+        "desc": "Les alertes de Nexum arrivent comme notifications système, et l'application continue de tourner depuis la zone de notification."
+      },
+      "menuBar": {
+        "title": "Barre de menus",
+        "desc": "Réglages, zoom, plein écran et toutes les options de bureau dans une vraie barre de menus."
+      },
+      "anyServer": {
+        "title": "Votre serveur ou le nôtre",
+        "desc": "Utilise eve-nexum.com par défaut. Vous hébergez votre propre Nexum ? Indiquez-le dans les réglages."
+      }
+    },
+    "desktopSoon": "Bientôt",
+    "desktopSoonBody": "L'application de bureau Nexum pour Windows et macOS : suivi instantané des sauts grâce aux logs d'EVE, canaux d'intel sur votre carte, alertes de menace et plus encore.",
+    "desktopSoonLink": "Voir ce qu'elle apporte"
   },
   "language": {
     "label": "Langue"
@@ -1811,7 +1854,8 @@
       "evNewChain": "Nouvelle chaîne ajoutée par d’autres",
       "threshold": "« À portée » utilise le seuil des alertes de proximité.",
       "experimental": "Fonctionnalité expérimentale",
-      "delayNote": "La voix peut être retardée jusqu’à 5 secondes. La première exécution est plus longue."
+      "delayNote": "La voix peut être retardée jusqu’à 5 secondes. La première exécution est plus longue.",
+      "downloadSize": "La première utilisation télécharge la voix, environ {{mb}} Mo (une seule fois)."
     },
     "bookmarkHelp": "Sur la ligne d'une signature de trou de ver, cliquez sur l'icône de copie pour copier un nom de favori prêt à coller, puis collez-le dans le favori en jeu. Composez le nom avec ces variables :",
     "browserNotifications": "Notifications du navigateur",
@@ -2280,7 +2324,8 @@
     "panelsHint": "Choisissez les sections affichées dans la barre latérale. Celles masquées conservent leur place et y reviennent une fois réactivées.",
     "panelsAllHidden": "Toutes les sections sont masquées — la barre latérale sera vide.",
     "emptyTitle": "Aucune section n’est affichée. Choisissez ici celles que vous voulez.",
-    "routePlanner": "Planificateur d'itinéraire"
+    "routePlanner": "Planificateur d'itinéraire",
+    "intel": "Intel"
   },
   "sigType": {
     "combat": "Combat",
@@ -2509,7 +2554,14 @@
       "insurgency": "Insurrection",
       "hostileSov": "Sov hostile",
       "threat": "Menace",
-      "closest": "Système {{label}} le plus proche"
+      "closest": "Système {{label}} le plus proche",
+      "intel": "Menace signalée",
+      "intelHere": "Signalée dans votre système : {{system}}",
+      "intelNear_one": "{{system}} : à {{count}} saut de vous",
+      "intelNear_other": "{{system}} : à {{count}} sauts de vous",
+      "intelSpeakHere": "{{system}}, dans votre système",
+      "intelSpeak_one": "{{system}}, {{count}} saut",
+      "intelSpeak_other": "{{system}}, {{count}} sauts"
     },
     "resetLayout": "Réinitialiser la disposition de la barre d'outils",
     "role": "Rôle : {{role}}",
@@ -2788,5 +2840,22 @@
         "affects": "les citadelles de votre corpo dans le planificateur de saut et les listes de structures."
       }
     }
+  },
+  "intelFeed": {
+    "all": "Tous",
+    "settings": "Paramètres d'intel",
+    "noChannels": "Aucun canal d'intel pour l'instant. Ajoutez-en dans les paramètres de l'application de bureau.",
+    "empty": "Rien de signalé pour l'instant.",
+    "show": "Afficher {{channel}}",
+    "hide": "Masquer {{channel}}",
+    "selectSystem": "Montrer {{system}} sur la carte"
+  },
+  "announcerOptIn": {
+    "title": "Activer l'annonceur vocal ?",
+    "body": "Nexum peut annoncer des alertes à voix haute pendant que vous volez : espace dangereux et incursions à portée, kills récents à proximité, personnages qui se connectent et nouvelles chaînes ajoutées par d'autres. La voix fonctionne sur votre propre appareil. En anglais uniquement, expérimental.",
+    "download": "L'activer télécharge la voix une seule fois, environ {{mb}} Mo ; elle est ensuite mise en cache.",
+    "sub": "Vous pouvez modifier ce choix, choisir une voix et les événements annoncés à tout moment dans la section {{section}} de la barre latérale.",
+    "noThanks": "Non merci",
+    "enable": "Activer"
   }
 }

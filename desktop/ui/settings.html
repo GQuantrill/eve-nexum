@@ -1,0 +1,85 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nexum settings</title>
+<link rel="stylesheet" href="settings.css">
+<script src="settings.js" defer></script>
+</head>
+<body>
+<form id="form">
+  <h1 data-t="title"></h1>
+  <label class="field">
+    <span data-t="server"></span>
+    <input id="serverUrl" type="url" required spellcheck="false">
+    <small data-t="serverHint"></small>
+    <button type="button" id="resetServer" class="link" data-t="resetServer"></button>
+  </label>
+  <label class="check"><input id="alwaysOnTop" type="checkbox"> <span data-t="onTop"></span></label>
+  <label class="check"><input id="readLogs" type="checkbox"> <span data-t="logs"></span></label>
+  <small class="under" data-t="logsHint"></small>
+  <label class="check"><input id="watchClipboard" type="checkbox"> <span data-t="clip"></span></label>
+  <small class="under" data-t="clipHint"></small>
+  <label class="check"><input id="startAtLogin" type="checkbox"> <span data-t="startAtLogin"></span></label>
+  <small class="under" data-t="startAtLoginHint"></small>
+  <label class="field">
+    <span data-t="dir"></span>
+    <input id="chatlogDir" type="text" spellcheck="false">
+    <small><span data-t="dirHint"></span> <code id="defaultDir"></code></small>
+  </label>
+  <fieldset class="intel">
+    <legend data-t="intel"></legend>
+    <small data-t="intelHint"></small>
+    <ul id="intelList"></ul>
+    <div class="row">
+      <input id="intelNew" type="text" spellcheck="false" placeholder="my.intel">
+      <button type="button" id="intelAdd" data-t="intelAdd"></button>
+    </div>
+    <label class="check"><input id="intelSound" type="checkbox"> <span data-t="intelSound"></span></label>
+    <label class="check"><input id="intelSpeak" type="checkbox"> <span data-t="intelSpeak"></span></label>
+    <small class="under" data-t="intelSpeakHint"></small>
+    <div class="speech" id="speech">
+      <label class="slider"><span data-t="speakVolume"></span>
+        <input id="speakVolume" type="range" min="0" max="100" step="5">
+        <output id="speakVolumeOut"></output>
+      </label>
+      <div class="row pick">
+        <label><span data-t="speakVoice"></span>
+          <select id="speakVoice"><option value="" data-t="speakVoiceDefault"></option></select>
+        </label>
+        <label><span data-t="speakRate"></span>
+          <select id="speakRate">
+            <option value="slow" data-t="rateSlow"></option>
+            <option value="normal" data-t="rateNormal"></option>
+            <option value="fast" data-t="rateFast"></option>
+          </select>
+        </label>
+        <button type="button" id="speakTest" class="secondary" data-t="speakTest"></button>
+      </div>
+    </div>
+    <div class="row pick">
+      <label><span data-t="intelPulse"></span>
+        <select id="intelPulse">
+          <option value="off" data-t="pulseOff"></option>
+          <option value="subtle" data-t="pulseSubtle"></option>
+          <option value="normal" data-t="pulseNormal"></option>
+          <option value="strong" data-t="pulseStrong"></option>
+        </select>
+      </label>
+      <label><span data-t="intelPulseSecs"></span>
+        <select id="intelPulseSecs">
+          <option value="5"></option><option value="10"></option>
+          <option value="15"></option><option value="30"></option>
+        </select>
+      </label>
+    </div>
+  </fieldset>
+  <p class="shortcut" data-t="shortcut"></p>
+  <div class="actions">
+    <span id="status" role="status"></span>
+    <button type="submit" data-t="save"></button>
+  </div>
+</form>
+</body>
+</html>

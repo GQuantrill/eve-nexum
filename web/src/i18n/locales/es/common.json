@@ -1239,7 +1239,8 @@
       "about": "Acerca de Nexum",
       "aboutMe": "Sobre mí",
       "techStack": "Stack tecnológico",
-      "faqs": "Preguntas frecuentes"
+      "faqs": "Preguntas frecuentes",
+      "desktop": "Solo en la aplicación de escritorio"
     },
     "features": {
       "interactiveMap": {
@@ -1520,7 +1521,7 @@
       },
       "announcer": {
         "title": "Anunciador de voz",
-        "desc": "Alertas habladas mientras vuelas, con una voz que funciona en tu propio dispositivo: low-sec y null-sec dentro del alcance, incursiones, kills recientes cercanos, personajes que se conectan y nuevas cadenas añadidas por otros. Experimental, solo en inglés."
+        "desc": "Alertas habladas mientras vuelas, con una voz que funciona en tu propio dispositivo: low-sec y null-sec dentro del alcance, incursiones, kills recientes cercanos, personajes que se conectan y nuevas cadenas añadidas por otros. Experimental, solo en inglés. Desactivado hasta que lo actives."
       },
       "desktopAlerts": {
         "title": "Alertas de escritorio y sonido",
@@ -1652,7 +1653,49 @@
         "a": "Preferiría que no, de verdad. No hago esto por las ISK, así que guárdalas y gástalas en algo con lo que volar por los aires o hacer volar a otro."
       }
     },
-    "footer": "EVE Online y el logotipo de EVE son marcas registradas de CCP hf. Todos los derechos reservados en todo el mundo. Nexum es una herramienta de terceros y no está afiliada a CCP hf ni cuenta con su respaldo. · <license>Aviso de licencia y de PI de EVE</license>"
+    "footer": "EVE Online y el logotipo de EVE son marcas registradas de CCP hf. Todos los derechos reservados en todo el mundo. Nexum es una herramienta de terceros y no está afiliada a CCP hf ni cuenta con su respaldo. · <license>Aviso de licencia y de PI de EVE</license>",
+    "desktopBody": "Nexum también funciona como aplicación de escritorio para Windows y macOS. Es el mismo Nexum, con tu sesión, mapas y ajustes, más funciones que un navegador no puede ofrecer: la aplicación lee los archivos de log de EVE en tu ordenador y se mantiene por encima del juego. Todo lo de esta sección necesita la aplicación; todo lo anterior funciona en ambos.",
+    "desktopFeatures": {
+      "logJumps": {
+        "title": "Seguimiento de saltos al instante",
+        "desc": "Lee el log del chat Local de EVE y te mueve en el mapa en cuanto saltas, segundos antes de que ESI lo informe. ESI sigue confirmando cada movimiento. Tus otros personajes conectados se mueven igual."
+      },
+      "intelMap": {
+        "title": "Intel en tu mapa",
+        "desc": "Sigue tus canales de intel. Cuando un reporte nombra un sistema de tu mapa, parpadea en rojo, con sonido. Elige la intensidad y la duración."
+      },
+      "intelFeed": {
+        "title": "Feed de intel",
+        "desc": "Todos tus canales de intel en un solo feed de la barra lateral, con a cuántos saltos está cada sistema reportado. Activa o desactiva canales, haz clic en un sistema para encontrarlo en el mapa o clic derecho para fijar destino o waypoint."
+      },
+      "threatReported": {
+        "title": "Amenaza reportada",
+        "desc": "La intel dentro de tu alcance de proximidad lanza una alerta, puede leerse en voz alta y hace parpadear Nexum en la barra de tareas mientras juegas. Un \"clr\" la anula."
+      },
+      "scanPaste": {
+        "title": "Pegar escaneos",
+        "desc": "Copia resultados del escáner de sondas en EVE y llegan al sistema seleccionado; copia un d-scan y se abre en el analizador. Sin alt-tab. Desactivado hasta que lo actives."
+      },
+      "onTop": {
+        "title": "Siempre visible",
+        "desc": "Mantén Nexum por encima del cliente de EVE, y muéstralo u ocúltalo desde cualquier lugar con Alt+Shift+N."
+      },
+      "native": {
+        "title": "Notificaciones del sistema y bandeja",
+        "desc": "Las alertas de Nexum llegan como notificaciones del sistema, y sigue funcionando desde la bandeja del sistema."
+      },
+      "menuBar": {
+        "title": "Barra de menús",
+        "desc": "Ajustes, zoom, pantalla completa y todas las opciones de escritorio en una barra de menús de verdad."
+      },
+      "anyServer": {
+        "title": "Tu servidor o el nuestro",
+        "desc": "Usa eve-nexum.com por defecto. ¿Tienes tu propio Nexum? Indícalo en los ajustes."
+      }
+    },
+    "desktopSoon": "Próximamente",
+    "desktopSoonBody": "La aplicación de escritorio de Nexum para Windows y macOS: seguimiento de saltos al instante desde los logs de EVE, canales de intel en tu mapa, alertas de amenaza y más.",
+    "desktopSoonLink": "Ver lo que añade"
   },
   "language": {
     "label": "Idioma"
@@ -1811,7 +1854,8 @@
       "evNewChain": "Nueva cadena añadida por otros",
       "threshold": "«Dentro del alcance» usa el umbral de las alertas de proximidad.",
       "experimental": "Función experimental",
-      "delayNote": "La voz puede tardar hasta 5 segundos. La primera vez tarda más."
+      "delayNote": "La voz puede tardar hasta 5 segundos. La primera vez tarda más.",
+      "downloadSize": "El primer uso descarga la voz, unos {{mb}} MB (una sola vez)."
     },
     "bookmarkHelp": "En la fila de una firma de agujero de gusano, haz clic en el icono de copiar para copiar un nombre de marcador listo, y pégalo en el marcador del juego. Crea el nombre con estos tokens:",
     "browserNotifications": "Notificaciones del navegador",
@@ -2280,7 +2324,8 @@
     "panelsHint": "Elige qué secciones aparecen en la barra lateral. Las ocultas conservan su posición y vuelven a ella al reactivarlas.",
     "panelsAllHidden": "Todas las secciones están ocultas: la barra lateral quedará vacía.",
     "emptyTitle": "No se muestra ninguna sección. Elige aquí las que quieras.",
-    "routePlanner": "Planificador de rutas"
+    "routePlanner": "Planificador de rutas",
+    "intel": "Intel"
   },
   "sigType": {
     "combat": "Combate",
@@ -2509,7 +2554,14 @@
       "insurgency": "Insurgencia",
       "hostileSov": "Sov hostil",
       "threat": "Amenaza",
-      "closest": "Sistema {{label}} más cercano"
+      "closest": "Sistema {{label}} más cercano",
+      "intel": "Amenaza reportada",
+      "intelHere": "Reportada en tu sistema: {{system}}",
+      "intelNear_one": "{{system}}: a {{count}} salto de ti",
+      "intelNear_other": "{{system}}: a {{count}} saltos de ti",
+      "intelSpeakHere": "{{system}}, en tu sistema",
+      "intelSpeak_one": "{{system}}, {{count}} salto",
+      "intelSpeak_other": "{{system}}, {{count}} saltos"
     },
     "resetLayout": "Restablecer disposición de la barra de herramientas",
     "role": "Rol: {{role}}",
@@ -2788,5 +2840,22 @@
         "affects": "las ciudadelas de tu corp en el planificador de saltos y las listas de estructuras."
       }
     }
+  },
+  "intelFeed": {
+    "all": "Todos",
+    "settings": "Ajustes de intel",
+    "noChannels": "Aún no hay canales de intel. Añádelos en los ajustes de la aplicación de escritorio.",
+    "empty": "Nada reportado todavía.",
+    "show": "Mostrar {{channel}}",
+    "hide": "Ocultar {{channel}}",
+    "selectSystem": "Mostrar {{system}} en el mapa"
+  },
+  "announcerOptIn": {
+    "title": "¿Activar el anunciador de voz?",
+    "body": "Nexum puede anunciar alertas en voz alta mientras vuelas: espacio peligroso e incursiones al alcance, kills recientes cerca, personajes que se conectan y nuevas cadenas añadidas por otros. La voz funciona en tu propio dispositivo. Solo en inglés, experimental.",
+    "download": "Activarlo descarga la voz una sola vez, unos {{mb}} MB; después queda en caché.",
+    "sub": "Puedes cambiarlo, elegir una voz y decidir qué eventos se anuncian en cualquier momento en la sección {{section}} de la barra lateral.",
+    "noThanks": "No, gracias",
+    "enable": "Activar"
   }
 }

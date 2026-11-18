@@ -10,6 +10,18 @@ import { alertGain } from '../utils/notificationPrefs';
 
 type Status = 'idle' | 'loading' | 'ready' | 'error';
 
+// What the first use downloads (then cached by the browser): the voice model,
+// whose size depends on the precision baked in at build time (see the web
+// Dockerfile's ANNOUNCER_DTYPE), plus the ~21 MB ONNX WebAssembly runtime.
+// Shown to the user before they turn the announcer on. null = unknown dtype.
+const MODEL_MB: Record<string, number> = { q8: 86, fp16: 163, fp32: 326 };
+const RUNTIME_MB = 21;
+const BUILD_DTYPE = (import.meta.env.VITE_ANNOUNCER_DTYPE as string | undefined)
+  || (import.meta.env.VITE_ANNOUNCER_SELF_HOSTED === 'true' ? 'q8' : 'fp32');
+export const ANNOUNCER_DOWNLOAD_MB: number | null = BUILD_DTYPE in MODEL_MB
+  ? Math.round((MODEL_MB[BUILD_DTYPE] + RUNTIME_MB) / 10) * 10
+  : null;
+
 interface AnnouncerState {
   status:   Status;
   progress: number;        // 0..100 of the file currently downloading

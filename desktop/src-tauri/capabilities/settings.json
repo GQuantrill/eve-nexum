@@ -1,0 +1,13 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "settings",
+  "description": "The app's own local settings window. The Nexum site's window gets its (narrower) permissions at startup, for the configured server only: see lib.rs.",
+  "windows": ["settings"],
+  "permissions": [
+    "core:default",
+    "allow-get-settings",
+    "allow-save-settings",
+    "allow-default-chatlog-dir",
+    "allow-intel-status"
+  ]
+}

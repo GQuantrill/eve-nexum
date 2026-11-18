@@ -1239,7 +1239,8 @@
       "about": "About Nexum",
       "aboutMe": "About Me",
       "techStack": "Tech Stack",
-      "faqs": "FAQs"
+      "faqs": "FAQs",
+      "desktop": "Desktop app only"
     },
     "features": {
       "interactiveMap": {
@@ -1520,7 +1521,7 @@
       },
       "announcer": {
         "title": "Voice announcer",
-        "desc": "Spoken alerts while you fly, from a voice that runs on your own device: low-sec and null-sec coming into range, incursions, recent kills nearby, characters connecting, and new chains added by others. Experimental, English only."
+        "desc": "Spoken alerts while you fly, from a voice that runs on your own device: low-sec and null-sec coming into range, incursions, recent kills nearby, characters connecting, and new chains added by others. Experimental, English only. Off until you turn it on."
       },
       "desktopAlerts": {
         "title": "Desktop and sound alerts",
@@ -1652,7 +1653,49 @@
         "a": "I prefer it if you did not, no. I'm not doing this for ISK so keep it and spend it on something to blow up in or blow someone else up in!"
       }
     },
-    "footer": "EVE Online and the EVE logo are the registered trademarks of CCP hf. All rights reserved worldwide. Nexum is a third-party tool and is not affiliated with or endorsed by CCP hf. · <license>License & EVE IP notice</license>"
+    "footer": "EVE Online and the EVE logo are the registered trademarks of CCP hf. All rights reserved worldwide. Nexum is a third-party tool and is not affiliated with or endorsed by CCP hf. · <license>License & EVE IP notice</license>",
+    "desktopBody": "Nexum also runs as a desktop app for Windows and macOS. It's the same Nexum, with your login, maps and settings, plus features a browser can't offer: the app can read EVE's own log files on your computer and sit above the game. Everything in this section needs the desktop app; everything above works in both.",
+    "desktopFeatures": {
+      "logJumps": {
+        "title": "Instant jump tracking",
+        "desc": "Reads EVE's Local chat log and moves you on the map the moment you jump, seconds before ESI reports it. ESI still confirms every move. Your other logged-in characters move the same way."
+      },
+      "intelMap": {
+        "title": "Intel on your map",
+        "desc": "Follow your intel channels. When a report names a system on your map, it pulses red, with a sound. Choose how strongly and for how long."
+      },
+      "intelFeed": {
+        "title": "Intel feed",
+        "desc": "All your intel channels in one sidebar feed, with how many jumps each reported system is from you. Switch channels on and off, click a system to find it on the map, or right-click to set a destination or waypoint."
+      },
+      "threatReported": {
+        "title": "Threat reported",
+        "desc": "Intel within your proximity range raises an alert, can be read aloud, and flashes Nexum in the taskbar while you're in the game. A \"clr\" clears it."
+      },
+      "scanPaste": {
+        "title": "Scan paste",
+        "desc": "Copy probe-scanner results in EVE and they land on the selected system; copy a d-scan and it opens in the analyser. No alt-tab needed. Off until you turn it on."
+      },
+      "onTop": {
+        "title": "Always on top",
+        "desc": "Keep Nexum above the EVE client, and show or hide it from anywhere with Alt+Shift+N."
+      },
+      "native": {
+        "title": "Native notifications and tray",
+        "desc": "Nexum's alerts arrive as system notifications, and it keeps running from the system tray."
+      },
+      "menuBar": {
+        "title": "Menu bar",
+        "desc": "Settings, zoom, full screen and every desktop option in a proper menu bar."
+      },
+      "anyServer": {
+        "title": "Your server or ours",
+        "desc": "Uses eve-nexum.com by default. Running your own Nexum? Point the app at it in Settings."
+      }
+    },
+    "desktopSoon": "Coming soon",
+    "desktopSoonBody": "The Nexum desktop app for Windows and macOS: instant jump tracking from EVE's logs, intel channels on your map, threat alerts and more.",
+    "desktopSoonLink": "See what it adds"
   },
   "language": {
     "label": "Language"
@@ -1811,7 +1854,8 @@
       "evNewChain": "New chain added by others",
       "threshold": "\"In range\" uses the Proximity Alerts threshold.",
       "experimental": "Experimental Feature",
-      "delayNote": "Voice may be delayed by up to 5 seconds. The first run takes longer."
+      "delayNote": "Voice may be delayed by up to 5 seconds. The first run takes longer.",
+      "downloadSize": "First use downloads the voice, about {{mb}} MB (once)."
     },
     "bookmarkHelp": "On a wormhole signature row, click the copy icon to copy a paste-ready bookmark name, then paste it into the in-game bookmark. Build the name with these tokens:",
     "browserNotifications": "Browser Notifications",
@@ -2280,7 +2324,8 @@
     "panelsHint": "Choose which sections appear in the sidebar. Hidden ones keep their place, so switching one back on returns it to where you had it.",
     "panelsAllHidden": "Every section is hidden — the sidebar will be empty.",
     "emptyTitle": "No sections are showing. Choose which ones you want here.",
-    "routePlanner": "Route Planner"
+    "routePlanner": "Route Planner",
+    "intel": "Intel"
   },
   "sigType": {
     "combat": "Combat",
@@ -2509,7 +2554,14 @@
       "insurgency": "Insurgency",
       "hostileSov": "Hostile sov",
       "threat": "Threat",
-      "closest": "Closest {{label}} system"
+      "closest": "Closest {{label}} system",
+      "intel": "Threat reported",
+      "intelHere": "Reported in your system: {{system}}",
+      "intelNear_one": "{{system}}: {{count}} jump from you",
+      "intelNear_other": "{{system}}: {{count}} jumps from you",
+      "intelSpeakHere": "{{system}}, in your system",
+      "intelSpeak_one": "{{system}}, {{count}} jump",
+      "intelSpeak_other": "{{system}}, {{count}} jumps"
     },
     "resetLayout": "Reset toolbar layout",
     "role": "Role: {{role}}",
@@ -2788,5 +2840,22 @@
         "affects": "your corp's citadels in the jump planner and structure lists."
       }
     }
+  },
+  "intelFeed": {
+    "all": "All",
+    "settings": "Intel settings",
+    "noChannels": "No intel channels yet. Add them in the desktop app's settings.",
+    "empty": "Nothing reported yet.",
+    "show": "Show {{channel}}",
+    "hide": "Hide {{channel}}",
+    "selectSystem": "Show {{system}} on the map"
+  },
+  "announcerOptIn": {
+    "title": "Turn on the voice announcer?",
+    "body": "Nexum can speak alerts while you fly: dangerous space and incursions coming into range, recent kills nearby, characters connecting, and new chains added by others. The voice runs on your own device. English only, experimental.",
+    "download": "Turning it on downloads the voice once, about {{mb}} MB; after that it's cached.",
+    "sub": "You can change this, pick a voice and choose which events are spoken at any time in the {{section}} section of the sidebar.",
+    "noThanks": "No thanks",
+    "enable": "Turn on"
   }
 }

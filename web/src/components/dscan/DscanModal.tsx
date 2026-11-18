@@ -15,7 +15,11 @@ import { useEscapeClose } from '../../hooks/useEscapeClose';
  * the public page, plus the option to pin the scan to the selected system so
  * it shows in that system's panel for everyone on the map.
  */
-export function DscanModal({ onClose }: { onClose: () => void }) {
+export function DscanModal({ onClose, initialText }: {
+  onClose: () => void;
+  /** A scan to start with (copied in EVE, sent by the desktop app). */
+  initialText?: string;
+}) {
   useEscapeClose(onClose);
   const { t } = useTranslation();
   const [scanId, setScanId] = useState<string | null>(null);
@@ -55,7 +59,7 @@ export function DscanModal({ onClose }: { onClose: () => void }) {
               <LoadedResult id={scanId} />
             </>
           ) : (
-            <DscanPaste attach={attach} onCreated={onCreated} />
+            <DscanPaste attach={attach} onCreated={onCreated} initialText={initialText} />
           )}
         </div>
       </div>

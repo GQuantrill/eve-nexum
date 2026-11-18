@@ -1498,3 +1498,24 @@ div.system-node__easy-handle {
     filter: drop-shadow(0 0 2px var(--here-color, #3ddc84)) drop-shadow(0 0 4px var(--here-color, #3ddc84));
   }
 }
+
+/* Desktop app: an intel channel just named this system. A red ring pulses
+   for as long and as strongly as the pilot chose in the desktop settings
+   (desktop/intel.ts), in the colour-vision palette's hostile colour. The
+   strengths match the you-are-here pulse's (utils/mapMarkers.ts). */
+.system-node--intel-subtle { --intel-spread: 8px;  --intel-alpha: 45%; }
+.system-node--intel-normal { --intel-spread: 16px; --intel-alpha: 80%; }
+.system-node--intel-strong { --intel-spread: 26px; --intel-alpha: 100%; }
+@keyframes system-node-intel {
+  0%   { box-shadow: 0 0 0 0 color-mix(in srgb, var(--cv-stand-hostile) var(--intel-alpha, 80%), transparent); }
+  100% { box-shadow: 0 0 0 var(--intel-spread, 16px) color-mix(in srgb, var(--cv-stand-hostile) 0%, transparent); }
+}
+.system-node--intel {
+  animation: system-node-intel 1s ease-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .system-node--intel {
+    animation: none;
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--cv-stand-hostile) var(--intel-alpha, 80%), transparent);
+  }
+}

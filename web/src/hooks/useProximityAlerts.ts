@@ -8,8 +8,13 @@ import { ensureSovLoaded, getSovEntries } from './useSovData';
 import { useUserSetting, readUserSetting, writeUserSetting } from './useUserSetting';
 import { NOTIFY, notifyOn, alertGain } from '../utils/notificationPrefs';
 import { useDebugFlag } from '../utils/debugFlags';
+import { desktopNotify, desktopAttention } from '../desktop/bridge';
+import { useIntelReports } from '../desktop/intel';
+import type { IntelSpeech } from '../desktop/intel';
+import i18n from '../i18n';
 
-export type ThreatKind = 'incursion' | 'insurgency' | 'hostile-sov';
+/** 'intel': a system named in one of the pilot's intel channels (desktop app). */
+export type ThreatKind = 'incursion' | 'insurgency' | 'hostile-sov' | 'intel';
 
 export interface NearestThreat {
   kind:        ThreatKind;
@@ -67,14 +72,16 @@ function playBeep() {
 }
 
 function fireBrowserNotification(kind: ThreatKind, jumps: number, sysName: string) {
-  if (typeof Notification === 'undefined') return;
-  if (Notification.permission !== 'granted') return;
   const title =
     kind === 'incursion'   ? 'Incursion nearby' :
     kind === 'insurgency'  ? 'Insurgency nearby' :
     kind === 'hostile-sov' ? 'Hostile sov nearby' :
     'Threat nearby';
   const body  = jumps === 0 ? `You are in ${sysName}` : `${jumps} jump${jumps === 1 ? '' : 's'} from ${sysName}`;
+  // Inside the desktop app the system notification comes from the app itself.
+  if (desktopNotify(title, body)) return;
+  if (typeof Notification === 'undefined') return;
+  if (Notification.permission !== 'granted') return;
   try { new Notification(title, { body, tag: `nexum-${kind}-${sysName}` }); } catch { /* ignore */ }
 }
 
@@ -93,6 +100,7 @@ export function useProximityAlerts(): {
   const incursions = useIncursions();
   const insurgency = useInsurgency();
   const standings  = useStandings();
+  const intel      = useIntelReports();
   const [threshold] = useProximityThreshold();
   // nexumDebug.showThreats() flips this to surface the nearest threat in the
   // toolbar regardless of the alert threshold. Only affects what's DISPLAYED —
@@ -142,44 +150,62 @@ export function useProximityAlerts(): {
         }
       }
     }
+    // Intel reports (desktop app only; always empty on the web). The other
+    // kinds win a tie: they say more about what's there.
+    for (const r of intel.values()) {
+      if (ids.has(r.eveSystemId)) continue;
+      ids.add(r.eveSystemId);
+      kinds.set(r.eveSystemId, 'intel');
+      names.set(r.eveSystemId, r.name);
+    }
     return { targetIds: [...ids], kindMap: kinds, nameMap: names };
-  }, [incursions, insurgency, sovReady, standings]);
+  }, [incursions, insurgency, sovReady, standings, intel]);
 
   const routes = useRoute(location.system?.eveSystemId ?? null, targetIds);
 
-  const nearest = useMemo<NearestThreat | null>(() => {
-    let best: NearestThreat | null = null;
-    for (const [idStr, entry] of Object.entries(routes)) {
-      const id    = Number(idStr);
-      const kind  = kindMap.get(id);
-      if (!kind) continue;
-      if (!best || entry.jumps < best.jumps) {
-        best = { kind, jumps: entry.jumps, systemId: id };
-        // Capture name from the route path's last entry for the notification body
-        const last = entry.path[entry.path.length - 1];
-        if (last) nameMap.set(id, last.name);
-      }
-    }
-    return best;
-  }, [routes, kindMap, nameMap]);
+  // `nearest` (the toolbar chip) counts intel; `nearestFixed` (the alert on
+  // entering a threat's range) doesn't, because intel has its own alert below,
+  // per report, so a sighting nearby isn't announced twice.
+  const [nearest, nearestFixed] = useMemo(() => [
+    pickNearest(routes, kindMap, nameMap, false),
+    pickNearest(routes, kindMap, nameMap, true),
+  ], [routes, kindMap, nameMap]);
 
   // Fire-once-on-entry tracker
   const inZoneRef = useRef(false);
   useEffect(() => {
-    const inZone = !!nearest && nearest.jumps <= threshold;
-    if (inZone && !inZoneRef.current && nearest) {
-      const sysName = nameMap.get(nearest.systemId) ?? String(nearest.systemId);
-      if (notifyOn(NOTIFY.proximityDesktop)) fireBrowserNotification(nearest.kind, nearest.jumps, sysName);
+    const inZone = !!nearestFixed && nearestFixed.jumps <= threshold;
+    if (inZone && !inZoneRef.current && nearestFixed) {
+      const sysName = nameMap.get(nearestFixed.systemId) ?? String(nearestFixed.systemId);
+      if (notifyOn(NOTIFY.proximityDesktop)) fireBrowserNotification(nearestFixed.kind, nearestFixed.jumps, sysName);
       if (notifyOn(NOTIFY.proximitySound)) playBeep();
       inZoneRef.current = true;
-    } else if (!inZone && (nearest || targetIds.length === 0)) {
+    } else if (!inZone && (nearestFixed || targetIds.length === 0)) {
       // Only once we KNOW we're out of range: the nearest threat is beyond the
       // threshold, or there are none. No location yet, or a route lookup that
       // failed, says nothing either way — forgetting we'd alerted then would
       // re-alert the same threat the moment the next lookup succeeds.
       inZoneRef.current = false;
     }
-  }, [nearest, threshold, nameMap, targetIds.length]);
+  }, [nearestFixed, threshold, nameMap, targetIds.length]);
+
+  // Intel: "Threat reported" for each new report within range, once per
+  // report (a fresh sighting of the same system alerts again).
+  const alertedRef = useRef(new Set<string>());
+  useEffect(() => {
+    for (const r of intel.values()) {
+      const key = `${r.eveSystemId}:${r.at}`;
+      if (alertedRef.current.has(key)) continue;
+      const route = routes[r.eveSystemId];
+      if (!route) continue;              // not answered yet, or unreachable
+      alertedRef.current.add(key);
+      if (route.jumps > threshold) continue;
+      if (notifyOn(NOTIFY.proximityDesktop)) fireIntelNotification(r.name, route.jumps);
+      if (notifyOn(NOTIFY.proximitySound)) playBeep();
+      desktopAttention();
+      if (r.speech) speakIntel(r.name, route.jumps, r.speech);
+    }
+  }, [intel, routes, threshold]);
 
   // Debug: surface a threat regardless of the alert threshold. Show the real
   // nearest one if there is any (with real jumps), otherwise a demo stand-in so
@@ -189,4 +215,57 @@ export function useProximityAlerts(): {
     return { nearest: nearest ?? DEMO_THREAT, threshold: Number.MAX_SAFE_INTEGER };
   }
   return { nearest, threshold };
+}
+
+function fireIntelNotification(sysName: string, jumps: number) {
+  const title = i18n.t('toolbar.proximity.intel');
+  const body = jumps === 0
+    ? i18n.t('toolbar.proximity.intelHere', { system: sysName })
+    : i18n.t('toolbar.proximity.intelNear', { system: sysName, count: jumps });
+  if (desktopNotify(title, body)) return;
+  if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
+  try { new Notification(title, { body, tag: `nexum-intel-${sysName}` }); } catch { /* ignore */ }
+}
+
+const SPEECH_RATES: Record<string, number> = { slow: 0.8, normal: 1, fast: 1.3 };
+
+// Read a report aloud, in the site's language, at the pilot's volume, speed
+// and voice. A newer report cuts off one still being read: the latest is what
+// matters.
+function speakIntel(sysName: string, jumps: number, speech: IntelSpeech) {
+  if (typeof speechSynthesis === 'undefined') return;
+  const text = jumps === 0
+    ? i18n.t('toolbar.proximity.intelSpeakHere', { system: sysName })
+    : i18n.t('toolbar.proximity.intelSpeak', { system: sysName, count: jumps });
+  try {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = i18n.language;
+    u.volume = Math.min(100, Math.max(0, speech.volume)) / 100;
+    u.rate = SPEECH_RATES[speech.rate] ?? 1;
+    const voice = speech.voice ? speechSynthesis.getVoices().find((v) => v.voiceURI === speech.voice) : undefined;
+    if (voice) u.voice = voice;
+    speechSynthesis.speak(u);
+  } catch { /* no voices: stay silent */ }
+}
+
+function pickNearest(
+  routes: Record<string, { jumps: number; path: { name: string }[] }>,
+  kindMap: Map<number, ThreatKind>,
+  nameMap: Map<number, string>,
+  skipIntel: boolean,
+): NearestThreat | null {
+  let best: NearestThreat | null = null;
+  for (const [idStr, entry] of Object.entries(routes)) {
+    const id    = Number(idStr);
+    const kind  = kindMap.get(id);
+    if (!kind || (skipIntel && kind === 'intel')) continue;
+    if (!best || entry.jumps < best.jumps) {
+      best = { kind, jumps: entry.jumps, systemId: id };
+      // Capture name from the route path's last entry for the notification body
+      const last = entry.path[entry.path.length - 1];
+      if (last) nameMap.set(id, last.name);
+    }
+  }
+  return best;
 }

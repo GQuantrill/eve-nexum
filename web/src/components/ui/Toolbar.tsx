@@ -25,6 +25,7 @@ import { WhTypeChartModal } from './WhTypeChartModal';
 import { KillLogPanel } from './KillLogPanel';
 import { JumpPlannerModal } from './JumpPlannerModal';
 import { DscanModal } from '../dscan/DscanModal';
+import { useDscanRequest } from '../../desktop/scanPaste';
 import { useProximityAlerts } from '../../hooks/useProximityAlerts';
 import { useClickOutside } from '../../hooks/useClickOutside';
 import { useUserSetting } from '../../hooks/useUserSetting';
@@ -55,6 +56,7 @@ import {
   ShieldStarIcon,
   SignOutIcon,
   SkullIcon,
+  MegaphoneIcon,
   SlidersHorizontalIcon,
   WarningIcon,
   XCircleIcon,
@@ -422,6 +424,10 @@ export function Toolbar() {
   const [showKillLog, setShowKillLog] = useState(false);
   const [showJumpPlanner, setShowJumpPlanner] = useState(false);
   const [showDscan, setShowDscan] = useState(false);
+  // A d-scan copied in EVE (desktop app) opens the analyser with it filled in;
+  // a newer copy replaces it (the key remounts the modal).
+  const dscanReq = useDscanRequest();
+  const closeDscan = () => { setShowDscan(false); dscanReq.clear(); };
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [leaveConfirm, setLeaveConfirm] = useState(false);
   const mapSwitcherRef = useRef<HTMLDivElement>(null);
@@ -470,6 +476,7 @@ export function Toolbar() {
           nearestThreat.kind === 'incursion'   ? { label: t('toolbar.proximity.incursion'),  Icon: WarningIcon } :
           nearestThreat.kind === 'insurgency'  ? { label: t('toolbar.proximity.insurgency'), Icon: SkullIcon } :
           nearestThreat.kind === 'hostile-sov' ? { label: t('toolbar.proximity.hostileSov'), Icon: XCircleIcon } :
+          nearestThreat.kind === 'intel'       ? { label: t('toolbar.proximity.intel'),      Icon: MegaphoneIcon } :
           { label: t('toolbar.proximity.threat'), Icon: QuestionIcon };
         return (
           <span
@@ -1001,7 +1008,9 @@ export function Toolbar() {
     {showWhChart && <WhTypeChartModal onClose={() => setShowWhChart(false)} />}
     {showKillLog && <KillLogPanel onClose={() => setShowKillLog(false)} />}
     {showJumpPlanner && <JumpPlannerModal onClose={() => setShowJumpPlanner(false)} />}
-    {showDscan && <DscanModal onClose={() => setShowDscan(false)} />}
+    {(showDscan || dscanReq.text !== null) && (
+      <DscanModal key={dscanReq.seq} onClose={closeDscan} initialText={dscanReq.text ?? undefined} />
+    )}
     {deleteConfirm && (
       <ConfirmModal
         message={t('toolbar.deleteMapConfirm', { name: mapName })}

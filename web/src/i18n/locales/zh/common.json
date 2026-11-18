@@ -1239,7 +1239,8 @@
       "about": "关于 Nexum",
       "aboutMe": "关于我",
       "techStack": "技术栈",
-      "faqs": "常见问题"
+      "faqs": "常见问题",
+      "desktop": "仅限桌面应用"
     },
     "features": {
       "interactiveMap": {
@@ -1520,7 +1521,7 @@
       },
       "announcer": {
         "title": "语音播报",
-        "desc": "飞行时的语音警报，由在你自己设备上运行的语音播报：低安和零安进入范围、入侵、附近的最近击杀、角色连接，以及他人添加的新链条。实验性功能，仅支持英语。"
+        "desc": "飞行时的语音警报，由在你自己设备上运行的语音播报：低安和零安进入范围、入侵、附近的最近击杀、角色连接，以及他人添加的新链条。实验性功能，仅支持英语。 默认关闭，需手动开启。"
       },
       "desktopAlerts": {
         "title": "桌面与声音警报",
@@ -1652,7 +1653,49 @@
         "a": "我宁愿你别这么做，真的。我做这个不是为了 ISK，所以留着它，花在能让你炸飞或炸飞别人的东西上吧！"
       }
     },
-    "footer": "EVE Online 和 EVE 标志是 CCP hf. 的注册商标。保留全球所有权利。Nexum 是第三方工具，与 CCP hf. 无关，也未获其认可。· <license>许可证与 EVE 知识产权声明</license>"
+    "footer": "EVE Online 和 EVE 标志是 CCP hf. 的注册商标。保留全球所有权利。Nexum 是第三方工具，与 CCP hf. 无关，也未获其认可。· <license>许可证与 EVE 知识产权声明</license>",
+    "desktopBody": "Nexum 也有适用于 Windows 和 macOS 的桌面应用。它就是同一个 Nexum，保留你的登录、地图和设置，并加入浏览器做不到的功能：应用可以读取你电脑上 EVE 自己的日志文件，并置于游戏之上。本节中的所有功能都需要桌面应用；以上所有功能两者皆可使用。",
+    "desktopFeatures": {
+      "logJumps": {
+        "title": "即时跳跃跟踪",
+        "desc": "读取 EVE 本地频道日志，在你跳跃的瞬间更新你在地图上的位置，比 ESI 早几秒。每次移动仍由 ESI 确认。你其他已登录的角色也会同样移动。"
+      },
+      "intelMap": {
+        "title": "地图上的情报",
+        "desc": "关注你的情报频道。当报告提到你地图上的星系时，该星系会红色闪烁并发出声音。强度和时长可自行选择。"
+      },
+      "intelFeed": {
+        "title": "情报动态",
+        "desc": "所有情报频道汇总在侧边栏的一个动态中，并显示每个被报告星系距你几跳。可开关频道，点击星系在地图上找到它，或右键设为目的地或路径点。"
+      },
+      "threatReported": {
+        "title": "已报告威胁",
+        "desc": "接近警报范围内的情报会触发警报，可朗读出来，并在你游戏时让 Nexum 在任务栏闪烁。发送 \"clr\" 即可解除。"
+      },
+      "scanPaste": {
+        "title": "粘贴扫描",
+        "desc": "在 EVE 中复制探针扫描结果，会自动填入所选星系；复制定向扫描，会在分析器中打开。无需切换窗口。默认关闭，需手动开启。"
+      },
+      "onTop": {
+        "title": "窗口置顶",
+        "desc": "让 Nexum 保持在 EVE 客户端之上，并可随时用 Alt+Shift+N 显示或隐藏。"
+      },
+      "native": {
+        "title": "系统通知与托盘",
+        "desc": "Nexum 的警报以系统通知的形式送达，并可在系统托盘中持续运行。"
+      },
+      "menuBar": {
+        "title": "菜单栏",
+        "desc": "设置、缩放、全屏以及所有桌面选项，都在正式的菜单栏中。"
+      },
+      "anyServer": {
+        "title": "你的服务器或我们的",
+        "desc": "默认使用 eve-nexum.com。自建了 Nexum？在设置中指向它即可。"
+      }
+    },
+    "desktopSoon": "即将推出",
+    "desktopSoonBody": "适用于 Windows 和 macOS 的 Nexum 桌面应用：通过 EVE 日志即时跟踪跳跃、在地图上显示情报频道、威胁警报等。",
+    "desktopSoonLink": "查看新功能"
   },
   "language": {
     "label": "语言"
@@ -1811,7 +1854,8 @@
       "evNewChain": "他人新增的虫洞链",
       "threshold": "“范围内”使用接近警报的阈值。",
       "experimental": "实验性功能",
-      "delayNote": "语音可能会延迟最多 5 秒。首次运行会更久。"
+      "delayNote": "语音可能会延迟最多 5 秒。首次运行会更久。",
+      "downloadSize": "首次使用会下载语音，约 {{mb}} MB（仅一次）。"
     },
     "bookmarkHelp": "在虫洞信号行点击复制图标，即可复制可直接粘贴的书签名称，然后粘贴到游戏内书签中。使用以下变量构建名称：",
     "browserNotifications": "浏览器通知",
@@ -2278,7 +2322,8 @@
     "panelsHint": "选择侧边栏中显示的板块。隐藏的板块会保留位置，重新开启时回到原处。",
     "panelsAllHidden": "所有板块都已隐藏 — 侧边栏将是空的。",
     "emptyTitle": "当前没有显示任何板块。在此选择要显示的板块。",
-    "routePlanner": "路线规划器"
+    "routePlanner": "路线规划器",
+    "intel": "情报"
   },
   "sigType": {
     "combat": "战斗",
@@ -2507,7 +2552,14 @@
       "insurgency": "叛乱",
       "hostileSov": "敌对主权",
       "threat": "威胁",
-      "closest": "最近的{{label}}星系"
+      "closest": "最近的{{label}}星系",
+      "intel": "已报告威胁",
+      "intelHere": "你所在星系有报告：{{system}}",
+      "intelNear_one": "{{system}}：距你 {{count}} 跳",
+      "intelNear_other": "{{system}}：距你 {{count}} 跳",
+      "intelSpeakHere": "{{system}}，就在你所在星系",
+      "intelSpeak_one": "{{system}}，{{count}} 跳",
+      "intelSpeak_other": "{{system}}，{{count}} 跳"
     },
     "resetLayout": "重置工具栏布局",
     "role": "权限：{{role}}",
@@ -2784,5 +2836,22 @@
         "affects": "跳跃规划器和建筑列表中你军团的城堡。"
       }
     }
+  },
+  "intelFeed": {
+    "all": "全部",
+    "settings": "情报设置",
+    "noChannels": "还没有情报频道。请在桌面应用的设置中添加。",
+    "empty": "暂无报告。",
+    "show": "显示 {{channel}}",
+    "hide": "隐藏 {{channel}}",
+    "selectSystem": "在地图上显示 {{system}}"
+  },
+  "announcerOptIn": {
+    "title": "开启语音播报？",
+    "body": "Nexum 可以在你飞行时语音播报警报：危险星域和入侵进入范围、附近的最新击杀、角色上线，以及他人新增的链路。语音在你自己的设备上运行。仅限英语，实验性功能。",
+    "download": "开启后会一次性下载语音，约 {{mb}} MB；之后将被缓存。",
+    "sub": "你可以随时在侧边栏的 {{section}} 部分更改此设置、选择语音，并决定播报哪些事件。",
+    "noThanks": "不用了",
+    "enable": "开启"
   }
 }

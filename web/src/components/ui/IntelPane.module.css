@@ -1,0 +1,74 @@
+/* The sidebar's Intel pane (desktop app only). */
+.pane { display: flex; flex-direction: column; gap: 6px; }
+
+.chips { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.chip {
+  padding: 1px 7px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+.chip:hover { color: var(--text-default); }
+.chipOn {
+  border-color: var(--border-accent);
+  background: var(--surface-raised);
+  color: var(--text-bright);
+}
+.gear { margin-left: auto; }
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 320px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.line {
+  display: flex;
+  flex-direction: column;
+  padding: 3px 4px;
+  border-left: 2px solid var(--cv-stand-hostile);
+  background: var(--surface-sunken);
+  font-size: 12px;
+  line-height: 1.35;
+}
+/* A "clr" report: nothing there, so not drawn as a threat. */
+.clear { border-left-color: var(--border); color: var(--text-dim); }
+
+.meta { display: flex; gap: 6px; align-items: baseline; min-width: 0; }
+.time { color: var(--text-faint); font-variant-numeric: tabular-nums; font-size: 11px; }
+.channel { color: var(--text-faint); font-size: 11px; }
+.sender { color: var(--text-muted); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.text { color: var(--text-default); word-break: break-word; }
+
+.sys { color: var(--text-bright); font-weight: 600; }
+.onMap {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-weight: 600;
+  color: var(--cv-stand-hostile);
+  text-decoration: underline dotted;
+  cursor: pointer;
+}
+
+.jumps {
+  margin-left: 3px;
+  padding: 0 4px;
+  border-radius: 6px;
+  background: var(--surface-raised);
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.note { margin: 0; padding: 8px; color: var(--text-faint); text-align: center; display: flex; flex-direction: column; gap: 8px; align-items: center; }

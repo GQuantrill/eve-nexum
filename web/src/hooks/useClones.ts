@@ -69,6 +69,11 @@ export function useClones(): Clones {
   return store.use();
 }
 
+/** The latest clones without subscribing (for non-React callers). */
+export function peekClones(): Clones {
+  return store.peek();
+}
+
 /** Every system this character has a clone in — medical and jump. */
 export function cloneSystemIds(c: Clones): Set<number> {
   const ids = new Set<number>();

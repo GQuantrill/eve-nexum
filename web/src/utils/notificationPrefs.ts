@@ -1,4 +1,5 @@
 import { readUserSetting } from '../hooks/useUserSetting';
+import { desktopNotify } from '../desktop/bridge';
 
 // Per-event notification preferences. Each alertable event has two independent
 // channels — a desktop (browser) notification and a sound — that the user
@@ -144,6 +145,8 @@ export function notifyOn(key: string): boolean {
 
 /** Fire a desktop notification if the browser supports it and permission is granted. */
 export function fireDesktopNotification(title: string, body: string, tag: string): void {
+  // Inside the desktop app the system notification comes from the app itself.
+  if (desktopNotify(title, body)) return;
   if (typeof Notification === 'undefined') return;
   if (Notification.permission !== 'granted') return;
   try { new Notification(title, { body, tag }); } catch { /* ignore */ }

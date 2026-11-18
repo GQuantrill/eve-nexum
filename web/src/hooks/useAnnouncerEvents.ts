@@ -12,10 +12,13 @@ import { useKillLog } from '../store/killStore';
 import { useRemoteActivity } from '../store/remoteActivityStore';
 import { apiUrl } from '../api/client';
 
-// Settings keys (English-only demo branch — see AnnouncerSection). All default ON:
-// the announcer is on by default and the user opts out per-event.
+// Settings keys (English-only — see AnnouncerSection). The master switch is OFF
+// by default: the announcer is opt-in (it talks, and its first use downloads the
+// voice model), offered once by AnnouncerOptInModal. The per-event toggles
+// default ON, so turning the master on gets every event, each one opt-out.
 export const ANN = {
   enabled:    'nexum.announcer.enabled',
+  asked:      'nexum.announcer.asked',
   voice:      'nexum.announcer.voice',
   connect:    'nexum.announcer.ev.connect',
   incursions: 'nexum.announcer.ev.incursions',
@@ -41,7 +44,7 @@ function jumpWord(n: number): string {
  */
 export function useAnnouncerEvents(): void {
   const speak = useAnnouncer((s) => s.speak);
-  const [enabled]    = useUserSetting<boolean>(ANN.enabled, true);
+  const [enabled]    = useUserSetting<boolean>(ANN.enabled, false);
   const [voice]      = useUserSetting<string>(ANN.voice, 'af_nicole');
   const [evConnect]  = useUserSetting<boolean>(ANN.connect, true);
   const [evIncur]    = useUserSetting<boolean>(ANN.incursions, true);

@@ -9,6 +9,7 @@ import type { NodeProps } from '@xyflow/react';
 import type { MapSystem } from '../../types';
 import { CLASS_COLORS, CLASS_LABELS, EFFECT_ICONS, EFFECT_LABELS, EFFECT_MODIFIERS } from '../../data/wormholes';
 import { useMapStore } from '../../store/mapStore';
+import { useIntelPulse } from '../../desktop/intel';
 import { usePresenceStore } from '../../store/presenceStore';
 import { useSystemKill, RECENT_KILL_MS } from '../../store/killStore';
 import { useJumpRangeStore } from '../../store/jumpRangeStore';
@@ -244,6 +245,7 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
   // staged from the context menu and waiting for its target click. Both mean
   // "this node is a candidate", so they share the highlight.
   const connectSourceId = useMapStore((s) => s.connectSourceId);
+  const intelPulse      = useIntelPulse(sys.id);
   const isTarget        = (connection.inProgress && connection.fromNode?.id !== sys.id)
                           || (!!connectSourceId && connectSourceId !== sys.id);
   const isConnectSource = connectSourceId === sys.id;
@@ -308,7 +310,7 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
   return (
     <div
       ref={nodeRef}
-      className={`system-node${sys.locked ? ' nopan' : ''}${isTarget ? ' system-node--connect-target' : ''}${isConnectSource ? ' system-node--connect-source' : ''}${isStale ? ' system-node--stale' : ''}${isSovHostile ? ' system-node--sov-hostile' : ''}${isSovBlue ? ' system-node--sov-blue' : ''}${uniformSize ? ' system-node--uniform' : ''}${compactMode ? ' system-node--compact' : ''}${easyConnect ? ' system-node--easy' : ''}${watchDef ? ' system-node--watched' : ''}${filteredOut ? ' system-node--filtered-out' : ''}${contentMatch ? ' system-node--content-match' : ''}${sys.dimmed ? ' system-node--dimmed' : ''}${sys.routeHighlighted ? ' system-node--route' : ''}${sys.systemClass === 'unknown' ? ' system-node--unknown' : ''}`}
+      className={`system-node${sys.locked ? ' nopan' : ''}${isTarget ? ' system-node--connect-target' : ''}${isConnectSource ? ' system-node--connect-source' : ''}${isStale ? ' system-node--stale' : ''}${isSovHostile ? ' system-node--sov-hostile' : ''}${isSovBlue ? ' system-node--sov-blue' : ''}${uniformSize ? ' system-node--uniform' : ''}${compactMode ? ' system-node--compact' : ''}${easyConnect ? ' system-node--easy' : ''}${watchDef ? ' system-node--watched' : ''}${filteredOut ? ' system-node--filtered-out' : ''}${contentMatch ? ' system-node--content-match' : ''}${sys.dimmed ? ' system-node--dimmed' : ''}${sys.routeHighlighted ? ' system-node--route' : ''}${sys.systemClass === 'unknown' ? ' system-node--unknown' : ''}${intelPulse ? ` system-node--intel system-node--intel-${intelPulse}` : ''}`}
       style={{
         '--class-color': color,
         ...(intelColor ? { '--intel-color': intelColor } : null),

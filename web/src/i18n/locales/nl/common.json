@@ -1239,7 +1239,8 @@
       "about": "Over Nexum",
       "aboutMe": "Over mij",
       "techStack": "Techniek",
-      "faqs": "Veelgestelde vragen"
+      "faqs": "Veelgestelde vragen",
+      "desktop": "Alleen in de desktop-app"
     },
     "features": {
       "interactiveMap": {
@@ -1520,7 +1521,7 @@
       },
       "announcer": {
         "title": "Spraakomroeper",
-        "desc": "Gesproken meldingen terwijl je vliegt, van een stem die op je eigen apparaat draait: low-sec en null-sec binnen bereik, incursions, recente kills in de buurt, personages die verbinden, en nieuwe ketens die anderen hebben toegevoegd. Experimenteel, alleen in het Engels."
+        "desc": "Gesproken meldingen terwijl je vliegt, van een stem die op je eigen apparaat draait: low-sec en null-sec binnen bereik, incursions, recente kills in de buurt, personages die verbinden, en nieuwe ketens die anderen hebben toegevoegd. Experimenteel, alleen in het Engels. Uit tot je hem aanzet."
       },
       "desktopAlerts": {
         "title": "Bureaublad- en geluidsmeldingen",
@@ -1652,7 +1653,49 @@
         "a": "Liever niet, nee. Ik doe dit niet voor de ISK, dus hou het en koop er iets van om in opgeblazen te worden of om iemand anders mee op te blazen!"
       }
     },
-    "footer": "EVE Online en het EVE-logo zijn geregistreerde handelsmerken van CCP hf. Alle rechten wereldwijd voorbehouden. Nexum is een tool van derden en is niet verbonden met of goedgekeurd door CCP hf. · <license>Licentie en EVE IP-vermelding</license>"
+    "footer": "EVE Online en het EVE-logo zijn geregistreerde handelsmerken van CCP hf. Alle rechten wereldwijd voorbehouden. Nexum is een tool van derden en is niet verbonden met of goedgekeurd door CCP hf. · <license>Licentie en EVE IP-vermelding</license>",
+    "desktopBody": "Nexum bestaat ook als desktop-app voor Windows en macOS. Het is dezelfde Nexum, met je login, kaarten en instellingen, plus functies die een browser niet kan bieden: de app kan EVE's eigen logbestanden op je computer lezen en boven het spel blijven. Alles in dit deel vraagt de desktop-app; alles hierboven werkt in beide.",
+    "desktopFeatures": {
+      "logJumps": {
+        "title": "Directe sprongvolging",
+        "desc": "Leest het Local-chatlog van EVE en verplaatst je op de kaart zodra je springt, seconden voordat ESI het meldt. ESI bevestigt nog steeds elke stap. Je andere ingelogde karakters bewegen op dezelfde manier."
+      },
+      "intelMap": {
+        "title": "Intel op je kaart",
+        "desc": "Volg je intelkanalen. Noemt een melding een systeem op je kaart, dan pulseert het rood, met geluid. Kies zelf hoe sterk en hoe lang."
+      },
+      "intelFeed": {
+        "title": "Intelfeed",
+        "desc": "Al je intelkanalen in één feed in de zijbalk, met hoeveel sprongen elk gemeld systeem van je af is. Zet kanalen aan en uit, klik op een systeem om het op de kaart te vinden, of rechtsklik voor bestemming of waypoint."
+      },
+      "threatReported": {
+        "title": "Dreiging gemeld",
+        "desc": "Intel binnen je nabijheidsbereik geeft een waarschuwing, kan worden voorgelezen en laat Nexum knipperen in de taakbalk terwijl je speelt. Een \"clr\" heft hem op."
+      },
+      "scanPaste": {
+        "title": "Scans plakken",
+        "desc": "Kopieer probe-scannerresultaten in EVE en ze komen in het geselecteerde systeem; kopieer een d-scan en hij opent in de analyse. Zonder alt-tab. Uit tot je het aanzet."
+      },
+      "onTop": {
+        "title": "Altijd bovenop",
+        "desc": "Houd Nexum boven de EVE-client en toon of verberg het overal met Alt+Shift+N."
+      },
+      "native": {
+        "title": "Systeemmeldingen en systeemvak",
+        "desc": "De waarschuwingen van Nexum komen als systeemmeldingen, en de app blijft draaien vanuit het systeemvak."
+      },
+      "menuBar": {
+        "title": "Menubalk",
+        "desc": "Instellingen, zoom, volledig scherm en alle desktopopties in een echte menubalk."
+      },
+      "anyServer": {
+        "title": "Jouw server of de onze",
+        "desc": "Gebruikt standaard eve-nexum.com. Draai je je eigen Nexum? Stel het in bij Instellingen."
+      }
+    },
+    "desktopSoon": "Binnenkort",
+    "desktopSoonBody": "De Nexum-desktop-app voor Windows en macOS: directe sprongvolging uit de logs van EVE, intelkanalen op je kaart, dreigingswaarschuwingen en meer.",
+    "desktopSoonLink": "Bekijk wat hij toevoegt"
   },
   "language": {
     "label": "Taal"
@@ -1811,7 +1854,8 @@
       "evNewChain": "Nieuwe keten toegevoegd door anderen",
       "threshold": "\"Binnen bereik\" gebruikt de drempel van Nabijheidsmeldingen.",
       "experimental": "Experimentele functie",
-      "delayNote": "De stem kan tot 5 seconden achterlopen. De eerste keer duurt langer."
+      "delayNote": "De stem kan tot 5 seconden achterlopen. De eerste keer duurt langer.",
+      "downloadSize": "Bij het eerste gebruik wordt de stem gedownload, ongeveer {{mb}} MB (eenmalig)."
     },
     "bookmarkHelp": "Klik op een rij met een wormgat-signatuur op het kopieerpictogram voor een kant-en-klare bookmarknaam, en plak die in de bookmark in het spel. Stel de naam samen met deze tokens:",
     "browserNotifications": "Browsermeldingen",
@@ -2280,7 +2324,8 @@
     "panelsHint": "Kies welke secties in de zijbalk verschijnen. Verborgen secties houden hun plek, dus als je er een weer aanzet komt hij terug waar je hem had.",
     "panelsAllHidden": "Alle secties zijn verborgen — de zijbalk blijft leeg.",
     "emptyTitle": "Er worden geen secties getoond. Kies hier welke je wilt.",
-    "routePlanner": "Routeplanner"
+    "routePlanner": "Routeplanner",
+    "intel": "Intel"
   },
   "sigType": {
     "combat": "Gevecht",
@@ -2509,7 +2554,14 @@
       "insurgency": "Insurgency",
       "hostileSov": "Vijandige sov",
       "threat": "Dreiging",
-      "closest": "Dichtstbijzijnde {{label}}-systeem"
+      "closest": "Dichtstbijzijnde {{label}}-systeem",
+      "intel": "Dreiging gemeld",
+      "intelHere": "Gemeld in jouw systeem: {{system}}",
+      "intelNear_one": "{{system}}: {{count}} sprong van je",
+      "intelNear_other": "{{system}}: {{count}} sprongen van je",
+      "intelSpeakHere": "{{system}}, in jouw systeem",
+      "intelSpeak_one": "{{system}}, {{count}} sprong",
+      "intelSpeak_other": "{{system}}, {{count}} sprongen"
     },
     "resetLayout": "Werkbalkindeling herstellen",
     "role": "Rol: {{role}}",
@@ -2788,5 +2840,22 @@
         "affects": "de citadels van je corp in de sprongplanner en de structuurlijsten."
       }
     }
+  },
+  "intelFeed": {
+    "all": "Alle",
+    "settings": "Intelinstellingen",
+    "noChannels": "Nog geen intelkanalen. Voeg ze toe in de instellingen van de desktop-app.",
+    "empty": "Nog niets gemeld.",
+    "show": "{{channel}} tonen",
+    "hide": "{{channel}} verbergen",
+    "selectSystem": "{{system}} op de kaart tonen"
+  },
+  "announcerOptIn": {
+    "title": "Spraakomroeper aanzetten?",
+    "body": "Nexum kan meldingen uitspreken terwijl je vliegt: gevaarlijke ruimte en incursions binnen bereik, recente kills in de buurt, karakters die verbinden en nieuwe ketens die anderen hebben toegevoegd. De stem draait op je eigen apparaat. Alleen Engels, experimenteel.",
+    "download": "Aanzetten downloadt de stem één keer, ongeveer {{mb}} MB; daarna staat hij in de cache.",
+    "sub": "Je kunt dit altijd wijzigen, een stem kiezen en bepalen welke gebeurtenissen worden uitgesproken in het onderdeel {{section}} van de zijbalk.",
+    "noThanks": "Nee, bedankt",
+    "enable": "Aanzetten"
   }
 }
