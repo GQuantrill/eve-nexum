@@ -245,8 +245,28 @@ pub(crate) fn tr(key: &str) -> String {
         .to_string()
 }
 
+/// Linux: settle the windowing setup before GTK starts.
+/// - Under Wayland, an app can't keep itself on top or listen for a global
+///   shortcut, so run through XWayland (X11) when it's there. NEXUM_WAYLAND=1
+///   keeps native Wayland.
+/// - GTK's overlay scrollbars float over the page and cover controls at its
+///   right edge (the sidebar's switches): use classic scrollbars.
+/// A variable the pilot set themselves is left alone.
+#[cfg(target_os = "linux")]
+fn linux_env() {
+    let set = |k: &str| std::env::var_os(k).is_some_and(|v| !v.is_empty());
+    if set("WAYLAND_DISPLAY") && set("DISPLAY") && !set("GDK_BACKEND") && !set("NEXUM_WAYLAND") {
+        std::env::set_var("GDK_BACKEND", "x11");
+    }
+    if !set("GTK_OVERLAY_SCROLLING") {
+        std::env::set_var("GTK_OVERLAY_SCROLLING", "0");
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    #[cfg(target_os = "linux")]
+    linux_env();
     let builder = tauri::Builder::default();
     let builder = if STORE { builder } else { builder.plugin(tauri_plugin_updater::Builder::new().build()) };
     builder
