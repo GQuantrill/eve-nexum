@@ -522,7 +522,6 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
                 <span className="system-node__kill-tooltip-main">
                   {t('mapNode.kills24h', { count: kills24h })}
                 </span>
-                {hotKills && ' '}
                 {hotKills && (
                   <span className="system-node__kill-tooltip-main">
                     {t('mapNode.killsTooltip', {
