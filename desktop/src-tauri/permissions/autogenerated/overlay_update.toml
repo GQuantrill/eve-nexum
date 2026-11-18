@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-overlay-update"
+description = "Enables the overlay_update command without any pre-configured scope."
+commands.allow = ["overlay_update"]
+
+[[permission]]
+identifier = "deny-overlay-update"
+description = "Denies the overlay_update command without any pre-configured scope."
+commands.deny = ["overlay_update"]

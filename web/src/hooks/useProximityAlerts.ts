@@ -8,8 +8,9 @@ import { ensureSovLoaded, getSovEntries } from './useSovData';
 import { useUserSetting, readUserSetting, writeUserSetting } from './useUserSetting';
 import { NOTIFY, notifyOn, alertGain } from '../utils/notificationPrefs';
 import { useDebugFlag } from '../utils/debugFlags';
-import { desktopNotify, desktopAttention } from '../desktop/bridge';
-import { useIntelReports, playAlert } from '../desktop/intel';
+import { desktopNotify, desktopAttention, desktopInvoke, isDesktop } from '../desktop/bridge';
+import { useIntelReports } from '../desktop/intel';
+import { playIntelSound } from '../desktop/intelSounds';
 import type { IntelSpeech } from '../desktop/intel';
 import i18n from '../i18n';
 
@@ -213,10 +214,22 @@ export function useProximityAlerts(): {
       }
       const inRange = r.range === null ? r.onMap : jumps !== null && jumps <= r.range;
       if (!inRange) continue;
-      if (r.range !== null && r.sound) playAlert();
+      if (r.range !== null && r.sound) playIntelSound(r.soundName);
       if (r.speech) speakIntel(r.name, jumps, r.speech);
     }
   }, [intel, routes, threshold, located]);
+
+  // Desktop app: the intel overlay's list (overlay.rs), nearest first. An
+  // older app without the overlay just refuses the call.
+  const hereName = location.system?.name ?? null;
+  useEffect(() => {
+    if (!isDesktop()) return;
+    const reports = [...intel.values()]
+      .map((r) => ({ name: r.name, jumps: routes[r.eveSystemId]?.jumps ?? null, at: r.at }))
+      .sort((a, b) => (a.jumps ?? Infinity) - (b.jumps ?? Infinity) || b.at - a.at)
+      .slice(0, 12);
+    desktopInvoke('overlay_update', { data: { here: hereName, reports } }).catch(() => { /* older app */ });
+  }, [intel, routes, hereName]);
 
   // Debug: surface a threat regardless of the alert threshold. Show the real
   // nearest one if there is any (with real jumps), otherwise a demo stand-in so

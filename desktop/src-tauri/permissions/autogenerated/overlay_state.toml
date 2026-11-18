@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-overlay-state"
+description = "Enables the overlay_state command without any pre-configured scope."
+commands.allow = ["overlay_state"]
+
+[[permission]]
+identifier = "deny-overlay-state"
+description = "Denies the overlay_state command without any pre-configured scope."
+commands.deny = ["overlay_state"]

@@ -1654,7 +1654,7 @@
       }
     },
     "footer": "EVE Online and the EVE logo are the registered trademarks of CCP hf. All rights reserved worldwide. Nexum is a third-party tool and is not affiliated with or endorsed by CCP hf. · <license>License & EVE IP notice</license>",
-    "desktopBody": "Nexum also runs as a desktop app for Windows and macOS. It's the same Nexum, with your login, maps and settings, plus features a browser can't offer: the app can read EVE's own log files on your computer and sit above the game. Everything in this section needs the desktop app; everything above works in both.",
+    "desktopBody": "Nexum also runs as a desktop app for Windows, macOS and Linux. It's the same Nexum, with your login, maps and settings, plus features a browser can't offer: the app can read EVE's own log files on your computer and sit above the game. Everything in this section needs the desktop app; everything above works in both.",
     "desktopFeatures": {
       "logJumps": {
         "title": "Instant jump tracking",
@@ -1694,8 +1694,12 @@
       }
     },
     "desktopSoon": "Coming soon",
-    "desktopSoonBody": "The Nexum desktop app for Windows and macOS: instant jump tracking from EVE's logs, intel channels on your map, threat alerts and more.",
-    "desktopSoonLink": "See what it adds"
+    "desktopSoonBody": "The Nexum desktop app for Windows, macOS and Linux: instant jump tracking from EVE's logs, intel channels on your map, threat alerts and more.",
+    "desktopSoonLink": "See what it adds",
+    "desktopOut": "Out now",
+    "desktopDownloadLink": "Download",
+    "desktopMacNote": "macOS: the app isn't signed yet, so after installing it, run this once in Terminal:",
+    "desktopAllDownloads": "All downloads (.msi, .deb, .rpm) and release notes"
   },
   "language": {
     "label": "Language"
@@ -2325,7 +2329,10 @@
     "panelsAllHidden": "Every section is hidden — the sidebar will be empty.",
     "emptyTitle": "No sections are showing. Choose which ones you want here.",
     "routePlanner": "Route Planner",
-    "intel": "Intel"
+    "intel": "Intel",
+    "popOut": "Open in its own window",
+    "poppedOut": "Opened in its own window.",
+    "bringBack": "Bring back"
   },
   "sigType": {
     "combat": "Combat",

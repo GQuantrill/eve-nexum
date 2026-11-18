@@ -13,7 +13,7 @@ use std::io::{Read, Seek, SeekFrom};
 use std::path::{Path, PathBuf};
 use std::sync::OnceLock;
 use std::time::Duration;
-use tauri::{AppHandle, Emitter, Manager};
+use tauri::{AppHandle, Manager};
 
 use crate::eve_logs::{self, FileState};
 use crate::AppState;
@@ -40,6 +40,8 @@ pub struct IntelLine {
     /// Sound and voice only for reports within this many jumps of the pilot;
     /// None = for any system on the map (desktop settings).
     pub alert_range: Option<u32>,
+    /// Which sound (settings::INTEL_SOUNDS).
+    pub sound_name: String,
 }
 
 /// The pilot's intel options, stamped on every line sent to the window.
@@ -53,6 +55,7 @@ struct LineOptions {
     speak_rate: String,
     speak_voice: Option<String>,
     alert_range: Option<u32>,
+    sound_name: String,
 }
 
 impl LineOptions {
@@ -66,6 +69,7 @@ impl LineOptions {
             speak_rate: self.speak_rate.clone(),
             speak_voice: self.speak_voice.clone(),
             alert_range: self.alert_range,
+            sound_name: self.sound_name.clone(),
             ..l
         }
     }
@@ -111,6 +115,7 @@ pub fn start(app: AppHandle) {
                     speak_rate: s.intel_speak_rate.clone(),
                     speak_voice: s.intel_speak_voice.clone(),
                     alert_range: s.intel_alert_range,
+                    sound_name: s.intel_sound_name.clone(),
                 })
             };
             followed.retain(|k, _| channels.iter().any(|c| c.eq_ignore_ascii_case(k)));
@@ -129,7 +134,7 @@ pub fn start(app: AppHandle) {
                     }
                 }
                 for line in new {
-                    let _ = app.emit_to("main", "nexum://intel", line);
+                    crate::emit_to_site_windows(&app, "nexum://intel", line);
                 }
             }
             let status = channels.iter().map(|c| {
@@ -260,6 +265,7 @@ fn parse_lines(channel: &str, text: &str) -> Vec<IntelLine> {
                 speak_rate: "normal".to_string(),
                 speak_voice: None,
                 alert_range: None,
+                sound_name: "twoTone".to_string(),
             })
         })
         .collect()

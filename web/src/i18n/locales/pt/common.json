@@ -1654,7 +1654,7 @@
       }
     },
     "footer": "EVE Online e o logótipo EVE são marcas registadas da CCP hf. Todos os direitos reservados em todo o mundo. O Nexum é uma ferramenta de terceiros e não está afiliada à CCP hf nem conta com o seu apoio. · <license>Aviso de licença e de PI de EVE</license>",
-    "desktopBody": "O Nexum também roda como app para desktop no Windows e no macOS. É o mesmo Nexum, com seu login, mapas e configurações, mais recursos que um navegador não oferece: o app lê os arquivos de log do EVE no seu computador e fica acima do jogo. Tudo nesta seção precisa do app; tudo acima funciona nos dois.",
+    "desktopBody": "O Nexum também roda como app para desktop no Windows, no macOS e no Linux. É o mesmo Nexum, com seu login, mapas e configurações, mais recursos que um navegador não oferece: o app lê os arquivos de log do EVE no seu computador e fica acima do jogo. Tudo nesta seção precisa do app; tudo acima funciona nos dois.",
     "desktopFeatures": {
       "logJumps": {
         "title": "Rastreio de saltos instantâneo",
@@ -1694,8 +1694,12 @@
       }
     },
     "desktopSoon": "Em breve",
-    "desktopSoonBody": "O app para desktop do Nexum para Windows e macOS: rastreio de saltos instantâneo pelos logs do EVE, canais de intel no seu mapa, alertas de ameaça e mais.",
-    "desktopSoonLink": "Veja o que ele traz"
+    "desktopSoonBody": "O app para desktop do Nexum para Windows, macOS e Linux: rastreio de saltos instantâneo pelos logs do EVE, canais de intel no seu mapa, alertas de ameaça e mais.",
+    "desktopSoonLink": "Veja o que ele traz",
+    "desktopOut": "Já disponível",
+    "desktopDownloadLink": "Baixar",
+    "desktopMacNote": "macOS: o app ainda não é assinado; depois de instalar, rode isto uma vez no Terminal:",
+    "desktopAllDownloads": "Todos os downloads (.msi, .deb, .rpm) e notas da versão"
   },
   "language": {
     "label": "Idioma"
@@ -2325,7 +2329,10 @@
     "panelsAllHidden": "Todas as secções estão ocultas — a barra lateral ficará vazia.",
     "emptyTitle": "Não há secções visíveis. Escolha aqui as que pretende.",
     "routePlanner": "Planeador de rotas",
-    "intel": "Intel"
+    "intel": "Intel",
+    "popOut": "Abrir em janela própria",
+    "poppedOut": "Aberto em janela própria.",
+    "bringBack": "Trazer de volta"
   },
   "sigType": {
     "combat": "Combate",

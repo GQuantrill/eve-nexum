@@ -20,6 +20,7 @@ import { CaretLeftIcon, CaretRightIcon, ArrowLineLeftIcon, ArrowLineRightIcon, S
 import { PanelVisibilityModal } from './PanelVisibilityModal';
 import { useUserSetting } from '../../hooks/useUserSetting';
 import { useAuth } from '../../context/AuthContext';
+import { popOut, bringBack, usePoppedOut } from '../../utils/popout';
 
 const SIDE_KEY      = 'nexum.sidebar.side';
 const COLLAPSED_KEY = 'nexum.sidebar.collapsed';
@@ -61,10 +62,26 @@ function sanitiseOrder(raw: unknown): PanelId[] {
   return valid;
 }
 
-export function Sidebar() {
+/** Each pane's content: the same in the sidebar and in a pop-out window. */
+function cardFor(id: PanelId): ReactNode {
+  switch (id) {
+    case 'watchlist': return <WatchlistBlock />;
+    case 'intel': return <IntelPane />;
+    case 'routePlanner': return <RoutePlannerPane />;
+    case 'chains': return <ChainsPane />;
+    case 'thera': return <ScoutConnectionsPane scoutSystem="Thera" />;
+    case 'turnur': return <ScoutConnectionsPane scoutSystem="Turnur" />;
+    case 'a0': return <A0Pane />;
+    case 'closest': return <ClosestSystemsPane />;
+    case 'fleet': return <FleetPane />;
+    case 'pilotsOnline': return <PilotsOnlinePane />;
+    case 'clones': return <ClonesPane />;
+  }
+}
+
+function usePanelTitles(): Record<PanelId, string> {
   const { t } = useTranslation();
-  const { user } = useAuth();
-  const panelTitle: Record<PanelId, string> = {
+  return {
     watchlist: t('sidebar.watchlist'),
     intel: t('sidebar.intel'),
     routePlanner: t('sidebar.routePlanner'),
@@ -77,6 +94,35 @@ export function Sidebar() {
     pilotsOnline: t('pilotsOnline.title'),
     clones: t('clones.title'),
   };
+}
+
+/** A pane on its own, filling a pop-out window (utils/popout.ts). */
+export function PopoutView({ id }: { id: string }) {
+  const { t } = useTranslation();
+  const titles = usePanelTitles();
+  const valid = VALID_PANEL_IDS.has(id as PanelId);
+  const title = valid ? titles[id as PanelId] : '';
+  useEffect(() => { if (title) document.title = `${title} - Nexum`; }, [title]);
+  return (
+    <div className="popout">
+      <div className="popout__header">
+        <span className="popout__title">{title}</span>
+        {valid && (
+          <button type="button" className="btn btn--ghost popout__back" onClick={() => bringBack(id)}>
+            {t('sidebar.bringBack')}
+          </button>
+        )}
+      </div>
+      <div className="popout__body">{valid ? cardFor(id as PanelId) : null}</div>
+    </div>
+  );
+}
+
+export function Sidebar() {
+  const { t } = useTranslation();
+  const { user } = useAuth();
+  const poppedOut = usePoppedOut();
+  const panelTitle = usePanelTitles();
   // Cross-device prefs via useUserSetting (server-backed JSONB).
   const [sideRaw,      setSide]      = useUserSetting<Side>(SIDE_KEY, 'left');
   const side: Side = sideRaw === 'right' ? 'right' : 'left';
@@ -180,19 +226,6 @@ export function Sidebar() {
   // switching one back on returns it to where the user had it.
   const visibleOrder = available.filter((id) => !hidden.has(id));
 
-  const cards: Record<PanelId, ReactNode> = {
-    watchlist: <WatchlistBlock />,
-    intel: <IntelPane />,
-    routePlanner: <RoutePlannerPane />,
-    chains:  <ChainsPane />,
-    thera:   <ScoutConnectionsPane scoutSystem="Thera" />,
-    turnur:  <ScoutConnectionsPane scoutSystem="Turnur" />,
-    a0:      <A0Pane />,
-    closest: <ClosestSystemsPane />,
-    fleet:   <FleetPane />,
-    pilotsOnline: <PilotsOnlinePane />,
-    clones: <ClonesPane />,
-  };
 
   return (
     <aside className={`sidebar sidebar--${side}`} style={{ width }}>
@@ -251,9 +284,27 @@ export function Sidebar() {
                 </button>
               </div>
             ) : visibleOrder.map(id => (
-              <DraggableCard key={id} id={id} title={panelTitle[id]}>
-                {cards[id]}
-              </DraggableCard>
+              poppedOut.includes(id) ? (
+                // Open in a window of its own: a stub here, with the way back.
+                <DraggableCard key={id} id={id} title={panelTitle[id]}>
+                  <div className="sidebar__popped">
+                    <span>{t('sidebar.poppedOut')}</span>
+                    <button type="button" className="btn btn--ghost" onClick={() => bringBack(id)}>
+                      {t('sidebar.bringBack')}
+                    </button>
+                  </div>
+                </DraggableCard>
+              ) : (
+                <DraggableCard
+                  key={id}
+                  id={id}
+                  title={panelTitle[id]}
+                  onUndock={() => popOut(id, panelTitle[id])}
+                  undockLabel={t('sidebar.popOut')}
+                >
+                  {cardFor(id)}
+                </DraggableCard>
+              )
             ))}
           </div>
         </SortableContext>

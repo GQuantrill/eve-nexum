@@ -698,3 +698,32 @@
   white-space: nowrap;
 }
 .landing__soon-link:hover { text-decoration: underline; }
+
+/* Desktop app downloads (shown once DESKTOP_AVAILABLE is on). */
+.landing__downloads {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0 24px;
+}
+.landing__download-btns { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+.landing__download {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+}
+.landing__download:hover { filter: brightness(1.1); }
+.landing__download-note {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: calc(13px * var(--font-scale, 1));
+  text-align: center;
+}
+.landing__download-note code { user-select: all; }

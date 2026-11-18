@@ -1654,7 +1654,7 @@
       }
     },
     "footer": "EVE Online y el logotipo de EVE son marcas registradas de CCP hf. Todos los derechos reservados en todo el mundo. Nexum es una herramienta de terceros y no está afiliada a CCP hf ni cuenta con su respaldo. · <license>Aviso de licencia y de PI de EVE</license>",
-    "desktopBody": "Nexum también funciona como aplicación de escritorio para Windows y macOS. Es el mismo Nexum, con tu sesión, mapas y ajustes, más funciones que un navegador no puede ofrecer: la aplicación lee los archivos de log de EVE en tu ordenador y se mantiene por encima del juego. Todo lo de esta sección necesita la aplicación; todo lo anterior funciona en ambos.",
+    "desktopBody": "Nexum también funciona como aplicación de escritorio para Windows, macOS y Linux. Es el mismo Nexum, con tu sesión, mapas y ajustes, más funciones que un navegador no puede ofrecer: la aplicación lee los archivos de log de EVE en tu ordenador y se mantiene por encima del juego. Todo lo de esta sección necesita la aplicación; todo lo anterior funciona en ambos.",
     "desktopFeatures": {
       "logJumps": {
         "title": "Seguimiento de saltos al instante",
@@ -1694,8 +1694,12 @@
       }
     },
     "desktopSoon": "Próximamente",
-    "desktopSoonBody": "La aplicación de escritorio de Nexum para Windows y macOS: seguimiento de saltos al instante desde los logs de EVE, canales de intel en tu mapa, alertas de amenaza y más.",
-    "desktopSoonLink": "Ver lo que añade"
+    "desktopSoonBody": "La aplicación de escritorio de Nexum para Windows, macOS y Linux: seguimiento de saltos al instante desde los logs de EVE, canales de intel en tu mapa, alertas de amenaza y más.",
+    "desktopSoonLink": "Ver lo que añade",
+    "desktopOut": "Ya disponible",
+    "desktopDownloadLink": "Descargar",
+    "desktopMacNote": "macOS: la aplicación aún no está firmada; tras instalarla, ejecuta esto una vez en Terminal:",
+    "desktopAllDownloads": "Todas las descargas (.msi, .deb, .rpm) y notas de versión"
   },
   "language": {
     "label": "Idioma"
@@ -2325,7 +2329,10 @@
     "panelsAllHidden": "Todas las secciones están ocultas: la barra lateral quedará vacía.",
     "emptyTitle": "No se muestra ninguna sección. Elige aquí las que quieras.",
     "routePlanner": "Planificador de rutas",
-    "intel": "Intel"
+    "intel": "Intel",
+    "popOut": "Abrir en su propia ventana",
+    "poppedOut": "Abierto en su propia ventana.",
+    "bringBack": "Traer de vuelta"
   },
   "sigType": {
     "combat": "Combate",

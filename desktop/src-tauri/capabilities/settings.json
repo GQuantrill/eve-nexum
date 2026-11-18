@@ -9,6 +9,7 @@
     "allow-desktop-info",
     "allow-save-settings",
     "allow-default-chatlog-dir",
-    "allow-intel-status"
+    "allow-intel-status",
+    "allow-preview-intel-sound"
   ]
 }

@@ -2806,3 +2806,32 @@ select.sig-toolbar-btn option {
   font-size: calc(12px * var(--font-scale, 1));
   color: var(--text-default);
 }
+
+/* A sidebar pane opened in its own window (utils/popout.ts): the stub left
+   in the sidebar, and the pop-out window's own layout. */
+.sidebar__popped {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-10);
+  color: var(--text-dim);
+  font-size: calc(12px * var(--font-scale, 1));
+}
+
+.popout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--surface-base);
+  color: var(--text-default);
+}
+.popout__header {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-10);
+  padding: 8px var(--sp-16);
+  border-bottom: 1px solid var(--border);
+}
+.popout__title { font-weight: 700; font-size: calc(14px * var(--font-scale, 1)); }
+.popout__back { margin-left: auto; }
+.popout__body { flex: 1; overflow: auto; padding: 8px var(--sp-16); }

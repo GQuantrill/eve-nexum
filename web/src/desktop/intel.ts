@@ -1,7 +1,7 @@
 import { useSyncExternalStore } from 'react';
 import { onDesktopEvent, desktopInvoke, isDesktop } from './bridge';
 import { useMapStore } from '../store/mapStore';
-import { alertGain } from '../utils/notificationPrefs';
+import { playIntelSound } from './intelSounds';
 import { api } from '../api/client';
 
 // Desktop only: the app follows the pilot's chosen intel channels (EVE chat
@@ -27,6 +27,8 @@ export interface IntelLine {
   /** Sound and voice only within this many jumps of the pilot; null (or an
    *  older app that doesn't send it) = for any system on the open map. */
   alertRange?: number | null;
+  /** Which sound (intelSounds.ts); older apps don't send it: the default. */
+  soundName?: string;
 }
 
 /** How a report is read aloud (the pilot's desktop settings). */
@@ -69,27 +71,6 @@ export function systemsNamed(text: string, systems: { id: string; name: string }
     .map((s) => s.id);
 }
 
-// ── Sound ───────────────────────────────────────────────────────────────────
-let audioCtx: AudioContext | null = null;
-export function playAlert(): void {
-  try {
-    if (!audioCtx) audioCtx = new AudioContext();
-    const ctx = audioCtx;
-    // Two short low-high tones: distinct from the proximity beep.
-    [0, 0.18].forEach((delay, i) => {
-      const o = ctx.createOscillator();
-      const g = ctx.createGain();
-      o.frequency.value = i === 0 ? 660 : 990;
-      const t = ctx.currentTime + delay;
-      g.gain.setValueAtTime(0.0001, t);
-      g.gain.exponentialRampToValueAtTime(alertGain(0.25), t + 0.02);
-      g.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
-      o.connect(g); g.connect(ctx.destination);
-      o.start(t); o.stop(t + 0.16);
-    });
-  } catch { /* audio blocked or unavailable */ }
-}
-
 // ── Reports anywhere (for proximity alerts) ─────────────────────────────────
 // The pulse only needs the open map's systems, but a hostile two gates out is
 // usually NOT on a wormhole map. So every line's words are also looked up
@@ -107,8 +88,9 @@ export interface IntelReport {
   /** Read it aloud when it's within range, and how (desktop settings);
    *  null when not. */
   speech: IntelSpeech | null;
-  /** Whether the pilot wants a sound for intel. */
+  /** Whether the pilot wants a sound for intel, and which. */
   sound: boolean;
+  soundName: string | null;
   /** Sound and voice only within this many jumps; null = for any system on
    *  the open map (see onMap). */
   range: number | null;
@@ -178,6 +160,7 @@ async function flush(): Promise<void> {
           ? { volume: line.speakVolume ?? 100, rate: line.speakRate ?? 'normal', voice: line.speakVoice ?? null }
           : null,
         sound: line.sound,
+        soundName: line.soundName ?? null,
         range: typeof line.alertRange === 'number' ? line.alertRange : null,
         onMap: onMap.has(sys.name.toLowerCase()),
       });
@@ -250,9 +233,15 @@ export const isClearLine = (text: string): boolean => CLEAR.test(text);
 // ── Listener ────────────────────────────────────────────────────────────────
 const MAX_AGE_MS = 60_000;   // a line older than this is history, not intel
 
-export function startIntel(): () => void {
+/** `quiet`: a pop-out window keeps the feed but leaves the pulses and sounds
+ *  to the main window. */
+export function startIntel(quiet = false): () => void {
   const expiry = setInterval(expireReports, 15_000);
   refreshIntelFeed();
+  // "Preview" in the app's settings: play that sound here.
+  const offPreview = quiet
+    ? () => {}
+    : onDesktopEvent<string>('nexum://intel-sound-preview', (name) => playIntelSound(name));
   const offChannels = onDesktopEvent<string[]>('nexum://intel-channels', (channels) => {
     // Replaced, not merged: a channel the pilot removed goes from the list.
     setFeed({ ...feed, channels: [...channels] });
@@ -262,6 +251,7 @@ export function startIntel(): () => void {
     // Too old to alert on, but still worth highlighting in the feed.
     if (Date.now() - line.at > MAX_AGE_MS) { queueLookup(line, false); return; }
     queueLookup(line, true);
+    if (quiet) return;
     const ids = systemsNamed(line.text, useMapStore.getState().map.systems);
     if (ids.length === 0) return;
     const level = PULSES.includes(line.pulse as IntelPulse) ? line.pulse! : 'normal';
@@ -269,7 +259,7 @@ export function startIntel(): () => void {
     if (level !== 'off') ids.forEach((id) => pulse(id, secs * 1000, level));
     // With a jump range set, the proximity alerts play it once the distance
     // is known (hooks/useProximityAlerts).
-    if (line.sound && typeof line.alertRange !== 'number') playAlert();
+    if (line.sound && typeof line.alertRange !== 'number') playIntelSound(line.soundName);
   });
-  return () => { off(); offChannels(); clearInterval(expiry); };
+  return () => { off(); offChannels(); offPreview(); clearInterval(expiry); };
 }

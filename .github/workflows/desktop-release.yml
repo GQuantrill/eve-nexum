@@ -63,7 +63,7 @@ jobs:
             id=$(gh api -X POST "repos/$repo/releases" \
               -f tag_name="v$VERSION" -f target_commitish=main \
               -f name="Nexum desktop $VERSION" -F draft=true \
-              -f body="Windows: the .exe (setup). macOS: the .dmg. Linux: the .AppImage, .deb or .rpm." \
+              -f body="Windows: Nexum-Windows-setup.exe. macOS: Nexum-macOS.dmg (unsigned for now: after installing, run xattr -cr /Applications/Nexum.app once in Terminal). Linux: Nexum-Linux.AppImage (updates itself), or the .deb / .rpm." \
               --jq .id)
           fi
           echo "id=$id" >> "$GITHUB_OUTPUT"
@@ -125,5 +125,18 @@ jobs:
           GH_TOKEN: ${{ secrets.NEXUM_DESKTOP_TOKEN }}
           ID: ${{ needs.check.outputs.release_id }}
         run: |
-          gh api -X PATCH "repos/$RELEASE_OWNER/$RELEASE_REPO/releases/$ID" \
+          repo="$RELEASE_OWNER/$RELEASE_REPO"
+          tag=$(gh api "repos/$repo/releases/$ID" --jq .tag_name)
+          # Copies under fixed names, so the website's download buttons
+          # (web/src/data/links.ts) always fetch the newest version.
+          mkdir fixed && cd fixed
+          gh release download "$tag" --repo "$repo" \
+            -p '*-setup.exe' -p '*.dmg' -p '*.AppImage' -p '*.deb' -p '*.rpm'
+          mv *-setup.exe Nexum-Windows-setup.exe
+          mv *.dmg Nexum-macOS.dmg
+          mv *.AppImage Nexum-Linux.AppImage
+          mv *.deb Nexum-Linux.deb
+          mv *.rpm Nexum-Linux.rpm
+          gh release upload "$tag" --repo "$repo" --clobber Nexum-*
+          gh api -X PATCH "repos/$repo/releases/$ID" \
             -F draft=false -f make_latest=true --jq '.html_url'
