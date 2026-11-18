@@ -1692,7 +1692,10 @@
         "title": "Votre serveur ou le nôtre",
         "desc": "Utilise eve-nexum.com par défaut. Vous hébergez votre propre Nexum ? Indiquez-le dans les réglages."
       }
-    }
+    },
+    "desktopSoon": "Bientôt",
+    "desktopSoonBody": "L'application de bureau Nexum pour Windows et macOS : suivi instantané des sauts grâce aux logs d'EVE, canaux d'intel sur votre carte, alertes de menace et plus encore.",
+    "desktopSoonLink": "Voir ce qu'elle apporte"
   },
   "language": {
     "label": "Langue"

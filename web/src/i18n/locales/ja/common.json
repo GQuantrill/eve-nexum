@@ -1692,7 +1692,10 @@
         "title": "あなたのサーバーでも当方のサーバーでも",
         "desc": "既定では eve-nexum.com を使います。独自の Nexum を運用しているなら、設定で指定してください。"
       }
-    }
+    },
+    "desktopSoon": "近日公開",
+    "desktopSoonBody": "Windows と macOS 向けの Nexum デスクトップアプリ：EVE のログによる即時ジャンプ追跡、マップ上のインテルチャンネル、脅威アラートなど。",
+    "desktopSoonLink": "追加される機能を見る"
   },
   "language": {
     "label": "言語"

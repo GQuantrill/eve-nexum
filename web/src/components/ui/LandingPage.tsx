@@ -15,7 +15,7 @@ import {
   LinkSimpleIcon, ScanIcon, DiamondsFourIcon, SlidersHorizontalIcon, ShieldStarIcon, FootprintsIcon, ArrowSquareInIcon,
   ArrowSquareOutIcon, ClockCountdownIcon, CheckIcon, FireIcon, CrosshairSimpleIcon, ArrowBendUpRightIcon, CrosshairIcon,
   MapPinSimpleIcon, ColumnsIcon,
-  MegaphoneIcon, PushPinIcon, HardDrivesIcon, AppWindowIcon,
+  MegaphoneIcon, PushPinIcon, HardDrivesIcon, AppWindowIcon, DesktopIcon,
 } from '../../icons';
 import { apiUrl } from '../../api/client';
 import { loginUrl, useScopeOptions } from '../../api/scopeOptions';
@@ -399,6 +399,27 @@ export function LandingPage() {
       </header>
 
       <div className="landing__content">
+        {/* The desktop app isn't downloadable yet: say it's coming, and point
+            at the section listing what it adds. */}
+        <div className="landing__soon">
+          <span className="landing__soon-icon"><DesktopIcon size="1em" weight="duotone" /></span>
+          <span className="landing__soon-text">
+            <span className="landing__soon-tag">{t('landing.desktopSoon')}</span>
+            {t('landing.desktopSoonBody')}
+          </span>
+          <a
+            href="#desktop-app"
+            className="landing__soon-link"
+            onClick={(e) => {
+              // The app routes on the hash, so scroll instead of navigating.
+              e.preventDefault();
+              document.getElementById('desktop-app')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }}
+          >
+            {t('landing.desktopSoonLink')}
+          </a>
+        </div>
+
         <div className="landing__cta">
           {errorMessage && (
             <div className="landing__error">
@@ -485,7 +506,10 @@ export function LandingPage() {
 
         {/* ── Desktop app only ────────────────────────────────── */}
         <section className="landing__section landing__section--features" id="desktop-app">
-          <h2 className="landing__section-title">{t('landing.sections.desktop')}</h2>
+          <h2 className="landing__section-title">
+            {t('landing.sections.desktop')}
+            <span className="landing__soon-tag landing__soon-tag--title">{t('landing.desktopSoon')}</span>
+          </h2>
           <p className="landing__section-body">
             {t('landing.desktopBody')}
           </p>

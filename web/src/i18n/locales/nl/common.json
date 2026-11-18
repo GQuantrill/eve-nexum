@@ -1692,7 +1692,10 @@
         "title": "Jouw server of de onze",
         "desc": "Gebruikt standaard eve-nexum.com. Draai je je eigen Nexum? Stel het in bij Instellingen."
       }
-    }
+    },
+    "desktopSoon": "Binnenkort",
+    "desktopSoonBody": "De Nexum-desktop-app voor Windows en macOS: directe sprongvolging uit de logs van EVE, intelkanalen op je kaart, dreigingswaarschuwingen en meer.",
+    "desktopSoonLink": "Bekijk wat hij toevoegt"
   },
   "language": {
     "label": "Taal"

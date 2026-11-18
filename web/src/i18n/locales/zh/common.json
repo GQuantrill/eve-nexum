@@ -1692,7 +1692,10 @@
         "title": "你的服务器或我们的",
         "desc": "默认使用 eve-nexum.com。自建了 Nexum？在设置中指向它即可。"
       }
-    }
+    },
+    "desktopSoon": "即将推出",
+    "desktopSoonBody": "适用于 Windows 和 macOS 的 Nexum 桌面应用：通过 EVE 日志即时跟踪跳跃、在地图上显示情报频道、威胁警报等。",
+    "desktopSoonLink": "查看新功能"
   },
   "language": {
     "label": "语言"

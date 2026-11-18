@@ -1692,7 +1692,10 @@
         "title": "당신의 서버 또는 우리 서버",
         "desc": "기본은 eve-nexum.com입니다. 직접 Nexum을 운영한다면 설정에서 지정하세요."
       }
-    }
+    },
+    "desktopSoon": "출시 예정",
+    "desktopSoonBody": "Windows와 macOS용 Nexum 데스크톱 앱: EVE 로그로 즉시 점프 추적, 지도 위의 정보 채널, 위협 경보 등.",
+    "desktopSoonLink": "무엇이 추가되는지 보기"
   },
   "language": {
     "label": "언어"

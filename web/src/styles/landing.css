@@ -657,3 +657,44 @@
   text-align: center;
 }
 
+
+/* "Coming soon: desktop app" banner at the top of the page, and the same tag
+   on the Desktop section's heading. */
+.landing__soon {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px 14px;
+  max-width: 760px;
+  margin-bottom: 32px;
+  padding: 12px 18px;
+  border: 1px solid var(--border-accent);
+  border-radius: 10px;
+  background: var(--surface-raised);
+  color: var(--text-default);
+  font-size: calc(14px * var(--font-scale, 1));
+  line-height: 1.45;
+}
+.landing__soon-icon { display: inline-flex; color: var(--accent-bright); font-size: calc(26px * var(--font-scale, 1)); }
+.landing__soon-text { flex: 1 1 320px; }
+.landing__soon-tag {
+  display: inline-block;
+  margin-right: 8px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-size: calc(11px * var(--font-scale, 1));
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  vertical-align: 2px;
+}
+.landing__soon-tag--title { margin: 0 0 0 10px; vertical-align: 4px; }
+.landing__soon-link {
+  color: var(--accent-bright);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.landing__soon-link:hover { text-decoration: underline; }

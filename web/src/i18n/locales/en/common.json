@@ -1692,7 +1692,10 @@
         "title": "Your server or ours",
         "desc": "Uses eve-nexum.com by default. Running your own Nexum? Point the app at it in Settings."
       }
-    }
+    },
+    "desktopSoon": "Coming soon",
+    "desktopSoonBody": "The Nexum desktop app for Windows and macOS: instant jump tracking from EVE's logs, intel channels on your map, threat alerts and more.",
+    "desktopSoonLink": "See what it adds"
   },
   "language": {
     "label": "Language"

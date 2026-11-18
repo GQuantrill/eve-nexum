@@ -1692,7 +1692,10 @@
         "title": "Dein Server oder unserer",
         "desc": "Nutzt standardmäßig eve-nexum.com. Du betreibst dein eigenes Nexum? Trag es in den Einstellungen ein."
       }
-    }
+    },
+    "desktopSoon": "Demnächst",
+    "desktopSoonBody": "Die Nexum-Desktop-App für Windows und macOS: sofortige Sprungverfolgung aus EVEs Logs, Intel-Kanäle auf deiner Karte, Bedrohungswarnungen und mehr.",
+    "desktopSoonLink": "Was sie bietet"
   },
   "language": {
     "label": "Sprache"
