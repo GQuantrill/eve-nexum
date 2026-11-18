@@ -23,6 +23,15 @@ import './styles/panels.css' // side panel, mass tracker, chain-effect summary (
 import './styles/landing.css' // public landing page + interactive demo
 import App from './App.tsx'
 import { startUpdateCheck } from './utils/updateCheck'
+import { clearXTab } from './hooks/crossTabPoll'
+
+// Back from an EVE login (sign-in, added character, changed access): what the
+// character allows may have changed, so drop every shared poll value before
+// any panel starts and reuses one read under the old access.
+{
+  const p = new URLSearchParams(window.location.search)
+  if (p.has('access_updated') || p.has('added') || p.get('login') === 'success') clearXTab()
+}
 
 // Wait for the detected language's strings before the first paint. Only
 // English ships with the app, so rendering immediately would show a frame of
