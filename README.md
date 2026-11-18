@@ -360,7 +360,7 @@ Nexum no longer asks for `esi-corporations.read_corporation_membership.v1` (noth
 | `esi-location.read_location.v1` | Read character's current solar system |
 | `esi-location.read_ship_type.v1` | Read character's active ship |
 | `esi-location.read_online.v1` | Read character online status |
-| `esi-ui.open_window.v1` | Open windows in the EVE client |
+| `esi-ui.open_window.v1` | Open windows in the EVE client: the admin invite mail. With `SSO_SCOPES_MODE=choice`, only admins are asked for it, from the access page, the first time they send an invite |
 | `esi-ui.write_waypoint.v1` | Set destinations and add waypoints |
 | `esi-universe.read_structures.v1` | Read player-owned structure info |
 | `esi-corporations.read_structures.v1` | List the **corporation's** Upwell structures for use as jump-planner endpoints. Only succeeds for a character with the in-game **Station Manager** or **Director** role; the sync no-ops for anyone else. Any corp member can then read the structures a role-holder pulled. |

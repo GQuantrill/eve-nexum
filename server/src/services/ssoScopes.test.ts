@@ -1,7 +1,7 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { config } from '../config.js';
 import { SCOPE } from '../utils/esiScopes.js';
-import { optionalGroups, parseChosenGroups, requestedScopes, scopeOptions } from './ssoScopes.js';
+import { inviteMailScopes, optionalGroups, parseChosenGroups, requestedScopes, scopeOptions } from './ssoScopes.js';
 
 type Mutable = { ssoScopesMode: 'all' | 'choice'; ssoOptionalGroups: string[] | null; cloneScope: boolean };
 const cfg = config as unknown as Mutable;
@@ -50,19 +50,26 @@ describe('choice mode', () => {
   it('location is always asked for, and the ticked groups are added', () => {
     setup('choice');
     const s = requestedScopes(['waypoints']);
-    expect(s).toEqual(expect.arrayContaining([SCOPE.location, SCOPE.online, SCOPE.waypoint, SCOPE.openWindow]));
+    expect(s).toEqual(expect.arrayContaining([SCOPE.location, SCOPE.online, SCOPE.waypoint]));
+    expect(s).not.toContain(SCOPE.openWindow);
     expect(s).not.toContain(SCOPE.ship);
     expect(s).not.toContain(SCOPE.charContacts);
   });
 
-  it('nothing ticked is location (plus the ungrouped invite mail) only', () => {
+  it('nothing ticked is location only', () => {
     setup('choice');
-    expect(new Set(requestedScopes([]))).toEqual(new Set([SCOPE.location, SCOPE.online, SCOPE.openWindow]));
+    expect(new Set(requestedScopes([]))).toEqual(new Set([SCOPE.location, SCOPE.online]));
   });
 
-  it('no choice sent means everything, the same as all ticked', () => {
+  it('no choice sent means every group, but no invite mail', () => {
     setup('choice');
-    expect(new Set(requestedScopes(null))).toEqual(new Set(TODAY));
+    expect(new Set(requestedScopes(null))).toEqual(new Set(TODAY.filter((x) => x !== SCOPE.openWindow)));
+  });
+
+  it("the admin's invite-mail login keeps what the character allows and adds the mail window", () => {
+    setup('choice');
+    const s = inviteMailScopes(['location', 'waypoints']);
+    expect(new Set(s)).toEqual(new Set([SCOPE.location, SCOPE.online, SCOPE.waypoint, SCOPE.openWindow]));
   });
 
   it('a group the operator did not list as optional is always asked for', () => {

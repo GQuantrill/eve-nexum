@@ -177,7 +177,10 @@
       "inviteMailSubject": "Una invitación a Nexum",
       "inviteMailBody": "Ven a mapear con nosotros en Nexum, un mapeador de agujeros de gusano en tiempo real para EVE.\n\nTu acceso ya está preparado: inicia sesión con EVE SSO y los mapas estarán ahí.\n\n%URL%",
       "inviteMailNoClient": "EVE no pudo contactar con tu cliente. Abre EVE e inicia sesión con el mismo personaje con el que entraste en Nexum, y vuelve a intentarlo.",
-      "inviteMailScope": "Tu sesión de EVE es anterior al permiso necesario para abrir ventanas. Cierra sesión en Nexum, vuelve a entrar e inténtalo de nuevo."
+      "inviteMailScope": "Abrir un correo de EVE necesita un permiso más, que Nexum solo pide a los admins. Permítelo y vuelve a enviar la invitación.",
+      "inviteMailAllow": "Permitir correo de invitación",
+      "noOrgReadersCorp": "Nadie en tu corp ha permitido a Nexum leer los standings de corp y alianza, así que la lista de contactos de tu corp no puede mantenerse al día y el acceso por standings no dejará entrar a nadie nuevo. Cualquier miembro puede permitirlo con el botón de llave junto a su personaje.",
+      "noOrgReadersAlliance": "Nadie en tu alianza ha permitido a Nexum leer los standings de corp y alianza, así que la lista de contactos de tu alianza no puede mantenerse al día y el acceso por standings no dejará entrar a nadie nuevo. Cualquier miembro puede permitirlo con el botón de llave junto a su personaje."
     },
     "loading": "Cargando…",
     "exportCsv": "Exportar como CSV",

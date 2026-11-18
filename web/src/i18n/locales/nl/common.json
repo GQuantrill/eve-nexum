@@ -189,7 +189,10 @@
       "inviteMailSubject": "Een uitnodiging voor Nexum",
       "inviteMailBody": "Kom samen met ons karteren op Nexum — een live wormgatmapper voor EVE.\n\nJe toegang staat al klaar: log in met EVE SSO en de kaarten staan er.\n\n%URL%",
       "inviteMailNoClient": "EVE kon je gameclient niet bereiken. Open EVE, log in met hetzelfde character waarmee je in Nexum zit, en probeer het opnieuw.",
-      "inviteMailScope": "Je EVE-sessie is ouder dan de permissie die nodig is om vensters te openen. Log uit bij Nexum en weer in, en probeer het opnieuw."
+      "inviteMailScope": "Een EVE-mail openen vraagt nog één toestemming, die Nexum alleen aan admins vraagt. Sta het toe en stuur de uitnodiging daarna opnieuw.",
+      "inviteMailAllow": "Uitnodigingsmail toestaan",
+      "noOrgReadersCorp": "Niemand in je corp heeft Nexum toegestaan corp- en alliance-standings te lezen, dus de contactlijst van je corp kan niet worden bijgewerkt en toegang op basis van standings laat niemand nieuw binnen. Elk lid kan het toestaan met de sleutelknop naast zijn character.",
+      "noOrgReadersAlliance": "Niemand in je alliance heeft Nexum toegestaan corp- en alliance-standings te lezen, dus de contactlijst van je alliance kan niet worden bijgewerkt en toegang op basis van standings laat niemand nieuw binnen. Elk lid kan het toestaan met de sleutelknop naast zijn character."
     },
     "loading": "Laden…",
     "exportCsv": "Exporteren als CSV",

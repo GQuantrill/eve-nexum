@@ -9,7 +9,7 @@ import { esiFetch } from '../utils/esi.js';
 import { refreshStandingsForUser } from '../services/standings.js';
 import { syncCorpStructures } from '../services/structureSync.js';
 import { groupsHeld, scopesFromAccessToken } from '../utils/esiScopes.js';
-import { parseChosenGroups, requestedScopes, scopeOptions } from '../services/ssoScopes.js';
+import { inviteMailScopes, parseChosenGroups, requestedScopes, scopeOptions } from '../services/ssoScopes.js';
 import { isLoginPermitted, standingsPermitLogin } from '../services/accessGrants.js';
 import { seedDemoMap } from '../services/demoMap.js';
 import { settingsSiblings, shareableEntries, setShareSettings } from '../services/sharedSettings.js';
@@ -34,14 +34,14 @@ const EVE_TOKEN_URL = 'https://login.eveonline.com/v2/oauth/token';
 // Build the SSO authorize redirect with a fresh CSRF state and send the user.
 // ?groups= carries the optional scope groups the pilot ticked in the picker;
 // without it the login asks for everything.
-function beginSso(req: Request, res: Response): void {
+function beginSso(req: Request, res: Response, scopes?: readonly string[]): void {
   const state = randomBytes(32).toString('hex');
   req.session.oauthState = state;
   const params = new URLSearchParams({
     response_type: 'code',
     redirect_uri:  CALLBACK_URL,
     client_id:     CLIENT_ID,
-    scope:         requestedScopes(parseChosenGroups(req.query.groups)).join(' '),
+    scope:         (scopes ?? requestedScopes(parseChosenGroups(req.query.groups))).join(' '),
     state,
   });
   req.session.save((err) => {
@@ -68,6 +68,7 @@ authRouter.get('/login', (req, res) => {
   // A normal login must never carry an add-character link from a stale session.
   delete req.session.addCharacterOwnerId;
   delete req.session.scopeChange;
+  delete req.session.scopeReturn;
   beginSso(req, res);
 });
 
@@ -92,7 +93,29 @@ authRouter.get('/add-character', async (req, res) => {
   // different set of scopes ("Change what nexum can access"). Same flow, but the
   // app says "access updated" rather than "character added".
   req.session.scopeChange = req.query.intent === 'change';
+  delete req.session.scopeReturn;
   beginSso(req, res);
+});
+
+// GET /auth/invite-mail-access -- admin only. Re-authorises the signed-in
+// character with what it already allows plus opening an EVE mail window, for
+// the access page's invite mail. In 'choice' mode no ordinary login asks for
+// that, so an admin is asked here, once, when they first need it. Same flow as
+// "Change what nexum can access": the character's token is replaced in place,
+// and the pilot comes back to the admin page.
+authRouter.get('/invite-mail-access', async (req, res) => {
+  const role = req.session.role;
+  const ownerId = await ensureOwnerId(req);
+  if (!req.session.userId || ownerId == null || !(role === 'admin' || role === 'alliance_admin')) {
+    res.redirect(`${FRONTEND_URL}?error=not_authenticated`);
+    return;
+  }
+  const { rows } = await db.query<{ esi_scopes: string[] | null }>(
+    `SELECT esi_scopes FROM users WHERE id = $1`, [req.session.userId]);
+  req.session.addCharacterOwnerId = ownerId;
+  req.session.scopeChange = true;
+  req.session.scopeReturn = 'admin';
+  beginSso(req, res, inviteMailScopes(groupsHeld(rows[0]?.esi_scopes ?? null)));
 });
 
 // GET /auth/wallet-reader — admin-only authorisation of the corp wallet reader
@@ -195,8 +218,12 @@ authRouter.get('/callback', async (req, res) => {
   // an authenticated "add character" link, not a fresh login.
   const addCharacterOwnerId = req.session.addCharacterOwnerId;
   const scopeChange = req.session.scopeChange === true;
+  // Where a re-authorisation started, so the pilot goes back there: only the
+  // admin page's invite-mail access sets it.
+  const returnPath = req.session.scopeReturn === 'admin' ? '/admin/access' : '';
   delete req.session.addCharacterOwnerId;
   delete req.session.scopeChange;
+  delete req.session.scopeReturn;
 
   // Failure redirect target. For an add-character attempt the pilot is still
   // logged in (as their active character), so they land on the app, not the
@@ -390,7 +417,7 @@ authRouter.get('/callback', async (req, res) => {
       await new Promise<void>((resolve, reject) => { req.session.save((err) => err ? reject(err) : resolve()); });
       kickStandings();
       kickStructures();
-      res.redirect(`${FRONTEND_URL}?${scopeChange ? 'access_updated' : 'added'}=${encodeURIComponent(jwtPayload.name)}`);
+      res.redirect(`${FRONTEND_URL}${returnPath}?${scopeChange ? 'access_updated' : 'added'}=${encodeURIComponent(jwtPayload.name)}`);
       return;
     }
 

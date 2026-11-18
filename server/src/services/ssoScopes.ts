@@ -17,8 +17,10 @@ const log = createLogger('ssoScopes');
 // application has is always fine, which is why a pilot unticking a group, or a
 // scope being dropped from the list, can never break anyone's login.
 
-// Asked for on every login but not shown in the picker: the admin invite mail,
-// until it gets its own admin-only login like the corp wallet's.
+// Not in any group: opening an EVE mail window, used only by the admin invite
+// mail. In 'all' mode every login still asks for it, exactly as before. In
+// 'choice' mode no login does: an admin is asked for it on its own, from the
+// admin page, the first time they send an invite (see inviteMailScopes).
 const UNGROUPED: readonly EsiScope[] = [SCOPE.openWindow];
 
 // The groups this deployment has at all. Clones only exists where the operator
@@ -62,5 +64,13 @@ export function parseChosenGroups(raw: unknown): ScopeGroupId[] | null {
 export function requestedScopes(chosen: readonly ScopeGroupId[] | null): string[] {
   const optional = optionalGroups();
   const groups = availableGroups().filter((g) => !optional.has(g) || chosen == null || chosen.includes(g));
-  return [...new Set([...groups.flatMap((g) => SCOPE_GROUPS[g]), ...UNGROUPED])];
+  const ungrouped = config.ssoScopesMode === 'choice' ? [] : UNGROUPED;
+  return [...new Set([...groups.flatMap((g) => SCOPE_GROUPS[g]), ...ungrouped])];
+}
+
+// The admin's invite-mail login: what the character already allows, plus
+// opening a mail window. Built from the groups the server recorded, never from
+// the request, so it can't be used to widen anything else.
+export function inviteMailScopes(held: readonly ScopeGroupId[]): string[] {
+  return [...new Set([...requestedScopes(held), SCOPE.openWindow])];
 }

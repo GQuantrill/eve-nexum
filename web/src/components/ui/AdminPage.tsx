@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { charPortrait } from '../../utils/eveImages';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
-import { api, ApiError } from '../../api/client';
+import { api, apiUrl, ApiError } from '../../api/client';
 import { toast } from '../../utils/toastStore';
 import { useAuth, isAdminRole, isAllianceAdminRole, formatRole, ROLE_ORDER } from '../../context/AuthContext';
 import type { Role as AuthRole } from '../../context/AuthContext';
@@ -27,6 +27,7 @@ import { createPortal } from 'react-dom';
 import styles from './AdminPage.module.css';
 import { useScopeHeld } from '../../hooks/useScopeHeld';
 import { promptForScope } from '../../utils/scopePrompt';
+import { useScopePickerStore } from '../../store/scopePickerStore';
 
 // Register only the chart pieces we actually use — keeps the bundle lean.
 ChartJS.register(ArcElement, CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend, Filler);
@@ -228,6 +229,13 @@ function AccessTab() {
   // Standings auto-admit ("friends") settings — off by default.
   const [stdEnabled, setStdEnabled]     = useState(false);
   const [stdThreshold, setStdThreshold] = useState<5 | 10>(10);
+  // How many members have allowed reading the corp/alliance contacts the gate
+  // uses. 0 = the list can never refresh, so standings-based access lets nobody
+  // new in; the tab warns. null = an older server that doesn't say.
+  const [orgReaders, setOrgReaders] = useState<number | null>(null);
+  // The invite mail needs one more permission, asked for on its own (choice
+  // mode asks no ordinary login for it): set when ESI says it's missing.
+  const [inviteNeedsAccess, setInviteNeedsAccess] = useState(false);
 
   const saveStandingsSettings = async (patch: { enabled?: boolean; threshold?: 5 | 10 }) => {
     if (patch.enabled !== undefined) setStdEnabled(patch.enabled);
@@ -283,10 +291,11 @@ function AccessTab() {
     try {
       const [g, s] = await Promise.all([
         api<AccessGrant[]>('/api/admin/access-grants'),
-        api<{ standingsLoginEnabled: boolean; standingsLoginThreshold: number }>('/api/admin/access-settings'),
+        api<{ standingsLoginEnabled: boolean; standingsLoginThreshold: number; orgStandingsReaders?: number }>('/api/admin/access-settings'),
       ]);
       setGrants(g);
       setStdEnabled(s.standingsLoginEnabled);
+      setOrgReaders(s.orgStandingsReaders ?? null);
       setStdThreshold(s.standingsLoginThreshold === 5 ? 5 : 10);
     } catch (e) {
       setError(e instanceof Error ? e.message : t('admin.access.loadFailed'));
@@ -332,7 +341,7 @@ function AccessTab() {
   // %URL% for FRONTEND_URL, so the invite always points at this deployment.
   const [mailing, setMailing] = useState<string | null>(null);
   const mailInvite = async (g: AccessGrant) => {
-    setMailing(g.id); setError(null);
+    setMailing(g.id); setError(null); setInviteNeedsAccess(false);
     try {
       await api(`/api/admin/access-grants/${g.id}/invite-mail`, {
         method: 'POST',
@@ -346,9 +355,9 @@ function AccessTab() {
       // Say which failure it was rather than guessing at the commonest one —
       // "are you logged in?" is useless when the real answer is a stale token.
       const code = e instanceof ApiError ? e.code : undefined;
+      if (code === 'scope_missing') { setInviteNeedsAccess(true); return; }
       setError(
         code === 'client_unreachable' ? t('admin.access.inviteMailNoClient')
-        : code === 'scope_missing'    ? t('admin.access.inviteMailScope')
         : t('admin.access.inviteMailFailed', {
             detail: (e instanceof ApiError && e.serverMessage) || (e instanceof Error ? e.message : ''),
           }),
@@ -378,6 +387,16 @@ function AccessTab() {
           <span>{t('admin.access.standingsEnable')}</span>
         </label>
         <p className={styles.acHint}>{t('admin.access.standingsHint')}</p>
+        {stdEnabled && orgReaders === 0 && (
+          <div className={styles.acNote} role="alert">
+            <p>{t(user?.allianceMode ? 'admin.access.noOrgReadersAlliance' : 'admin.access.noOrgReadersCorp')}</p>
+            {!orgStandingsHeld && (
+              <button type="button" className="btn btn--primary btn--sm" onClick={() => useScopePickerStore.getState().open({ kind: 'change', require: 'orgStandings' })}>
+                {t('scopes.enable')}
+              </button>
+            )}
+          </div>
+        )}
         {stdEnabled && (
           <div className={styles.acThreshold}>
             <span className={styles.acThresholdLabel}>{t('admin.access.standingsMinLevel')}</span>
@@ -456,6 +475,14 @@ function AccessTab() {
         <p className={styles.acHint}>{t('admin.access.inviteRoleHint')}</p>
       )}
       {addError && <div className={styles.pgError}>{addError}</div>}
+      {inviteNeedsAccess && (
+        <div className={styles.acNote} role="alert">
+          <p>{t('admin.access.inviteMailScope')}</p>
+          <a className="btn btn--primary btn--sm" href={apiUrl('/auth/invite-mail-access')}>
+            {t('admin.access.inviteMailAllow')}
+          </a>
+        </div>
+      )}
 
       {loading ? <div className={styles.pgLoading}>{t('admin.access.loading')}</div>
         : error ? <div className={styles.pgError}>{error}</div>

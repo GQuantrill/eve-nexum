@@ -177,7 +177,10 @@
       "inviteMailSubject": "Eine Einladung zu Nexum",
       "inviteMailBody": "Kartografiere mit uns auf Nexum — ein Live-Wurmloch-Mapper für EVE.\n\nDein Zugang ist bereits eingerichtet: Melde dich mit EVE SSO an, und die Karten sind da.\n\n%URL%",
       "inviteMailNoClient": "EVE konnte deinen Client nicht erreichen. Öffne EVE und melde dich mit demselben Charakter an, mit dem du bei Nexum angemeldet bist, und versuche es erneut.",
-      "inviteMailScope": "Deine EVE-Sitzung stammt aus der Zeit vor der Berechtigung zum Öffnen von Fenstern. Melde dich bei Nexum ab und wieder an und versuche es erneut."
+      "inviteMailScope": "Zum Öffnen einer EVE-Mail braucht es eine weitere Berechtigung, die Nexum nur bei Admins anfragt. Erlaube sie und sende die Einladung dann erneut.",
+      "inviteMailAllow": "Einladungs-Mail erlauben",
+      "noOrgReadersCorp": "Niemand in deiner Corp hat Nexum erlaubt, Corp- und Allianz-Standings zu lesen. Die Kontaktliste deiner Corp kann daher nicht aktualisiert werden, und standingbasierter Zugang lässt niemanden Neues herein. Jedes Mitglied kann es über den Schlüssel-Button neben seinem Charakter erlauben.",
+      "noOrgReadersAlliance": "Niemand in deiner Allianz hat Nexum erlaubt, Corp- und Allianz-Standings zu lesen. Die Kontaktliste deiner Allianz kann daher nicht aktualisiert werden, und standingbasierter Zugang lässt niemanden Neues herein. Jedes Mitglied kann es über den Schlüssel-Button neben seinem Charakter erlauben."
     },
     "loading": "Lädt…",
     "exportCsv": "Als CSV exportieren",
