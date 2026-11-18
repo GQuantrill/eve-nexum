@@ -20,6 +20,9 @@ declare module 'express-session' {
      *  character with a different set of ESI scopes ("Change what nexum can
      *  access"), so the callback reports "access updated", not "added". */
     scopeChange?: boolean;
+    // 'admin': a re-authorisation started from the admin page (invite mail)
+    // returns there.
+    scopeReturn?: 'admin';
     /** True while an admin is authorising the ISK-donation wallet reader, so the
      *  shared SSO callback knows this round-trip is not a login. */
     walletReaderFlow?: boolean;

@@ -5,6 +5,7 @@
 import { db } from '../db.js';
 import { config } from '../config.js';
 import { getStandingsLoginSettings } from './appSettings.js';
+import { SCOPE } from '../utils/esiScopes.js';
 
 export type GrantKind = 'corp' | 'alliance' | 'character';
 
@@ -198,4 +199,25 @@ export async function pruneStandingDerivedGrants(): Promise<number> {
     [config.corpIds],
   );
   return rowCount ?? 0;
+}
+
+// How many members could keep the standings list the access gate reads up to
+// date: members of the deployment's alliance (alliance install) or corp
+// (otherwise) who have allowed reading that org's contacts. Zero means the list
+// can never refresh, so standings-based access silently admits nobody new, and
+// the admin page says so. A character whose scopes aren't recorded yet counts
+// as allowed, the same as everywhere else. Blocked users don't count.
+export async function orgStandingsReaders(): Promise<number> {
+  const alliance = config.allianceMode;
+  const ids   = alliance ? config.allianceIds : config.corpIds;
+  if (ids.length === 0) return 0;
+  const scope = alliance ? SCOPE.allianceContacts : SCOPE.corpContacts;
+  const { rows } = await db.query<{ n: number }>(
+    `SELECT COUNT(*)::int AS n FROM users
+     WHERE ${alliance ? 'alliance_id' : 'corp_id'} = ANY($1::bigint[])
+       AND NOT blocked
+       AND (esi_scopes IS NULL OR $2 = ANY(esi_scopes))`,
+    [ids, scope],
+  );
+  return rows[0].n;
 }

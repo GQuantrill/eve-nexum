@@ -177,7 +177,10 @@
       "inviteMailSubject": "Une invitation à Nexum",
       "inviteMailBody": "Viens cartographier avec nous sur Nexum — un mappeur de trous de ver en direct pour EVE.\n\nTon accès est déjà en place : connecte-toi avec EVE SSO et les cartes seront là.\n\n%URL%",
       "inviteMailNoClient": "EVE n'a pas pu joindre ton client. Ouvre EVE et connecte-toi avec le même personnage que sur Nexum, puis réessaie.",
-      "inviteMailScope": "Ta session EVE est antérieure à l'autorisation nécessaire pour ouvrir des fenêtres. Déconnecte-toi de Nexum puis reconnecte-toi et réessaie."
+      "inviteMailScope": "Ouvrir un mail EVE nécessite une autorisation de plus, que Nexum ne demande qu'aux admins. Autorisez-la, puis renvoyez l'invitation.",
+      "inviteMailAllow": "Autoriser le mail d'invitation",
+      "noOrgReadersCorp": "Personne dans votre corpo n'a autorisé Nexum à lire les standings de corpo et d'alliance : la liste de contacts de votre corpo ne peut donc pas être mise à jour, et l'accès basé sur les standings ne laisse entrer personne de nouveau. N'importe quel membre peut l'autoriser avec le bouton clé à côté de son personnage.",
+      "noOrgReadersAlliance": "Personne dans votre alliance n'a autorisé Nexum à lire les standings de corpo et d'alliance : la liste de contacts de votre alliance ne peut donc pas être mise à jour, et l'accès basé sur les standings ne laisse entrer personne de nouveau. N'importe quel membre peut l'autoriser avec le bouton clé à côté de son personnage."
     },
     "loading": "Chargement…",
     "exportCsv": "Exporter en CSV",

@@ -21,7 +21,7 @@ import { readDefaults, captureFrom, clearDefaults } from '../services/uiDefaults
 import { resolveEntityNames } from '../services/entityNames.js';
 import {
   standingPermitsTarget, grantKindAllowedForInstall,
-  requiresPositiveStanding, type GrantKind,
+  requiresPositiveStanding, orgStandingsReaders, type GrantKind,
 } from '../services/accessGrants.js';
 import {
   getStandingsLoginSettings, setSetting,
@@ -641,9 +641,11 @@ adminRouter.delete('/access-grants/:id', async (req, res) => {
 // ── Standings auto-admit ("friends") settings — Phase 3 ──────────────────────
 
 // GET /api/admin/access-settings — current standings auto-admit toggle + level.
+// orgStandingsReaders: how many members can keep the standings list the gate
+// reads up to date (0 = nobody has allowed it; the page warns).
 adminRouter.get('/access-settings', async (_req, res) => {
-  const s = await getStandingsLoginSettings();
-  res.json({ standingsLoginEnabled: s.enabled, standingsLoginThreshold: s.threshold });
+  const [s, orgStandingsReadersCount] = await Promise.all([getStandingsLoginSettings(), orgStandingsReaders()]);
+  res.json({ standingsLoginEnabled: s.enabled, standingsLoginThreshold: s.threshold, orgStandingsReaders: orgStandingsReadersCount });
 });
 
 // PATCH /api/admin/access-settings — update the standings auto-admit settings.

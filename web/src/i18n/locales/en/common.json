@@ -189,7 +189,10 @@
       "inviteMailSubject": "An invite to Nexum",
       "inviteMailBody": "Come and map with us on Nexum — a live wormhole mapper for EVE.\n\nYour access is already set up: sign in with EVE SSO and the maps will be there.\n\n%URL%",
       "inviteMailNoClient": "EVE couldn't reach your game client. Open EVE and log in as the same character you're signed into Nexum with, then try again.",
-      "inviteMailScope": "Your EVE session predates the permission needed to open windows. Sign out of Nexum and back in, then try again."
+      "inviteMailScope": "Opening an EVE mail needs one more permission, which Nexum only asks admins for. Allow it, then send the invite again.",
+      "inviteMailAllow": "Allow invite mail",
+      "noOrgReadersCorp": "Nobody in your corp has allowed Nexum to read corp and alliance standings, so your corp's contact list can't be kept up to date and standings-based access won't let anyone new in. Any member can allow it with the key button next to their character.",
+      "noOrgReadersAlliance": "Nobody in your alliance has allowed Nexum to read corp and alliance standings, so your alliance's contact list can't be kept up to date and standings-based access won't let anyone new in. Any member can allow it with the key button next to their character."
     },
     "loading": "Loading…",
     "exportCsv": "Export as CSV",

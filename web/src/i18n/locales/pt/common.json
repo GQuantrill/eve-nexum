@@ -177,7 +177,10 @@
       "inviteMailSubject": "Um convite para o Nexum",
       "inviteMailBody": "Vem mapear connosco no Nexum — um mapeador de wormholes em tempo real para EVE.\n\nO teu acesso já está preparado: inicia sessão com EVE SSO e os mapas estarão lá.\n\n%URL%",
       "inviteMailNoClient": "O EVE não conseguiu contactar o teu cliente. Abre o EVE e inicia sessão com a mesma personagem com que entraste no Nexum e tenta novamente.",
-      "inviteMailScope": "A tua sessão EVE é anterior à permissão necessária para abrir janelas. Termina sessão no Nexum, volta a entrar e tenta novamente."
+      "inviteMailScope": "Abrir um correio do EVE precisa de mais uma permissão, que o Nexum só pede aos admins. Permite-a e envia o convite de novo.",
+      "inviteMailAllow": "Permitir correio de convite",
+      "noOrgReadersCorp": "Ninguém na tua corp permitiu ao Nexum ler os standings de corp e aliança, por isso a lista de contactos da tua corp não pode ser atualizada e o acesso por standings não deixa entrar ninguém novo. Qualquer membro pode permiti-lo com o botão de chave ao lado da sua personagem.",
+      "noOrgReadersAlliance": "Ninguém na tua aliança permitiu ao Nexum ler os standings de corp e aliança, por isso a lista de contactos da tua aliança não pode ser atualizada e o acesso por standings não deixa entrar ninguém novo. Qualquer membro pode permiti-lo com o botão de chave ao lado da sua personagem."
     },
     "loading": "A carregar…",
     "exportCsv": "Exportar como CSV",
