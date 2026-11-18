@@ -1654,7 +1654,7 @@
       }
     },
     "footer": "EVE Online und das EVE-Logo sind eingetragene Marken von CCP hf. Alle Rechte weltweit vorbehalten. Nexum ist ein Drittanbieter-Tool und steht in keiner Verbindung zu CCP hf und wird von ihnen nicht unterstützt. · <license>Lizenz- & EVE-IP-Hinweis</license>",
-    "desktopBody": "Nexum gibt es auch als Desktop-App für Windows und macOS. Es ist dasselbe Nexum mit deinem Login, deinen Karten und Einstellungen, plus Funktionen, die ein Browser nicht bieten kann: Die App kann EVEs eigene Logdateien auf deinem Rechner lesen und über dem Spiel bleiben. Alles in diesem Abschnitt braucht die Desktop-App; alles darüber funktioniert in beiden.",
+    "desktopBody": "Nexum gibt es auch als Desktop-App für Windows, macOS und Linux. Es ist dasselbe Nexum mit deinem Login, deinen Karten und Einstellungen, plus Funktionen, die ein Browser nicht bieten kann: Die App kann EVEs eigene Logdateien auf deinem Rechner lesen und über dem Spiel bleiben. Alles in diesem Abschnitt braucht die Desktop-App; alles darüber funktioniert in beiden.",
     "desktopFeatures": {
       "logJumps": {
         "title": "Sofortige Sprungverfolgung",
@@ -1694,8 +1694,12 @@
       }
     },
     "desktopSoon": "Demnächst",
-    "desktopSoonBody": "Die Nexum-Desktop-App für Windows und macOS: sofortige Sprungverfolgung aus EVEs Logs, Intel-Kanäle auf deiner Karte, Bedrohungswarnungen und mehr.",
-    "desktopSoonLink": "Was sie bietet"
+    "desktopSoonBody": "Die Nexum-Desktop-App für Windows, macOS und Linux: sofortige Sprungverfolgung aus EVEs Logs, Intel-Kanäle auf deiner Karte, Bedrohungswarnungen und mehr.",
+    "desktopSoonLink": "Was sie bietet",
+    "desktopOut": "Jetzt verfügbar",
+    "desktopDownloadLink": "Herunterladen",
+    "desktopMacNote": "macOS: Die App ist noch nicht signiert. Führe nach der Installation einmal im Terminal aus:",
+    "desktopAllDownloads": "Alle Downloads (.msi, .deb, .rpm) und Versionshinweise"
   },
   "language": {
     "label": "Sprache"
@@ -2325,7 +2329,10 @@
     "panelsAllHidden": "Alle Abschnitte sind ausgeblendet — die Seitenleiste bleibt leer.",
     "emptyTitle": "Es werden keine Abschnitte angezeigt. Wähle hier aus, welche du möchtest.",
     "routePlanner": "Routenplaner",
-    "intel": "Intel"
+    "intel": "Intel",
+    "popOut": "In eigenem Fenster öffnen",
+    "poppedOut": "In eigenem Fenster geöffnet.",
+    "bringBack": "Zurückholen"
   },
   "sigType": {
     "combat": "Kampf",
@@ -2559,6 +2566,7 @@
       "intelHere": "In deinem System gemeldet: {{system}}",
       "intelNear_one": "{{system}}: {{count}} Sprung von dir",
       "intelNear_other": "{{system}}: {{count}} Sprünge von dir",
+      "intelSpeakReported": "{{system}}, gemeldet",
       "intelSpeakHere": "{{system}}, in deinem System",
       "intelSpeak_one": "{{system}}, {{count}} Sprung",
       "intelSpeak_other": "{{system}}, {{count}} Sprünge"

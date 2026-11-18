@@ -9,7 +9,7 @@ import { SystemPanel } from './components/ui/SystemPanel';
 import { ConnectionPanel } from './components/ui/ConnectionPanel';
 import { Toolbar } from './components/ui/Toolbar';
 import { MapSidebar } from './components/ui/MapSidebar';
-import { Sidebar } from './components/ui/Sidebar';
+import { Sidebar, PopoutView } from './components/ui/Sidebar';
 import { ProximityOptInModal } from './components/ui/ProximityOptInModal';
 import { AnnouncerOptInModal } from './components/ui/AnnouncerOptInModal';
 import { CommandPaletteModal } from './components/ui/CommandPaletteModal';
@@ -54,6 +54,7 @@ import { LockScreen } from './components/ui/LockScreen';
 import { ScopePickerModal } from './components/ui/ScopePickerModal';
 import { startScanPaste } from './desktop/scanPaste';
 import { startIntel } from './desktop/intel';
+import { POPOUT_PANE, startPopoutWindow } from './utils/popout';
 
 // Which signed-in user we've already hydrated prefs/settings for. MapApp
 // unmounts when you navigate away (e.g. to /admin) and re-mounts on return;
@@ -95,7 +96,9 @@ function MapApp() {
   // picks up from the clipboard arrive as a paste on the map.
   useEffect(() => startScanPaste(), []);
   // Desktop app only: intel-channel reports pulse the systems they name.
-  useEffect(() => startIntel(), []);
+  useEffect(() => startIntel(!!POPOUT_PANE), []);
+  // A pop-out window: close when its pane is brought back (utils/popout.ts).
+  useEffect(() => startPopoutWindow(), []);
 
   // Colour-vision mode → data attribute on <html>; the --cv-* palette
   // overrides in those sheets key off it. 'off' (or unset) leaves the defaults.
@@ -165,10 +168,20 @@ function MapApp() {
 
   const panelSideBySide = useMapStore((s) => s.panelSideBySide);
 
-  useLocationTracking(!!mapId);
+  // A pop-out window shows one pane. It loads the map like the main window,
+  // but tracks no jumps and speaks no announcements: the main window does.
+  useLocationTracking(!!mapId && !POPOUT_PANE);
   useMapEventStream();
-  useAnnouncerEvents();
+  useAnnouncerEvents(!POPOUT_PANE);
   useMapPresence();
+
+  if (POPOUT_PANE) {
+    return (
+      <ReactFlowProvider>
+        <PopoutView id={POPOUT_PANE} />
+      </ReactFlowProvider>
+    );
+  }
 
   return (
     <ReactFlowProvider>

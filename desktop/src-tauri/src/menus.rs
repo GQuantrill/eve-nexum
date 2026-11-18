@@ -60,6 +60,8 @@ pub fn build_bar(app: &AppHandle, s: &Settings) -> tauri::Result<Menu<Wry>> {
 
     let view = Submenu::with_items(app, tr("menuView"), true, &[
         &CheckMenuItem::with_id(app, "on_top", tr("onTop"), true, s.always_on_top, Some("CmdOrCtrl+Shift+T"))?,
+        &CheckMenuItem::with_id(app, "overlay", tr("overlay"), true, s.overlay, None::<&str>)?,
+        &CheckMenuItem::with_id(app, "overlay_lock", tr("overlayLock"), s.overlay, s.overlay_locked, None::<&str>)?,
         &PredefinedMenuItem::separator(app)?,
         &MenuItem::with_id(app, "reload", tr("reload"), true, Some("CmdOrCtrl+R"))?,
         &PredefinedMenuItem::separator(app)?,
@@ -73,6 +75,7 @@ pub fn build_bar(app: &AppHandle, s: &Settings) -> tauri::Result<Menu<Wry>> {
     let tools = Submenu::with_items(app, tr("menuTools"), true, &[
         &CheckMenuItem::with_id(app, "logs", tr("logs"), true, s.read_logs, None::<&str>)?,
         &CheckMenuItem::with_id(app, "clipboard", tr("clip"), true, s.watch_clipboard, None::<&str>)?,
+        &CheckMenuItem::with_id(app, "combat", tr("combatAlerts"), true, s.combat_alerts, None::<&str>)?,
         &PredefinedMenuItem::separator(app)?,
         &MenuItem::with_id(app, "intel", tr("intelChannelsMenu"), true, None::<&str>)?,
         &CheckMenuItem::with_id(app, "speak", tr("intelSpeak"), true, s.intel_speak, None::<&str>)?,
@@ -112,9 +115,12 @@ pub fn build_tray(app: &AppHandle, s: &Settings) -> tauri::Result<Menu<Wry>> {
         &MenuItem::with_id(app, "show", tr("show"), true, None::<&str>)?,
         &PredefinedMenuItem::separator(app)?,
         &CheckMenuItem::with_id(app, "on_top", tr("onTop"), true, s.always_on_top, None::<&str>)?,
+        &CheckMenuItem::with_id(app, "overlay", tr("overlay"), true, s.overlay, None::<&str>)?,
+        &CheckMenuItem::with_id(app, "overlay_lock", tr("overlayLock"), s.overlay, s.overlay_locked, None::<&str>)?,
         &CheckMenuItem::with_id(app, "logs", tr("logs"), true, s.read_logs, None::<&str>)?,
         &CheckMenuItem::with_id(app, "clipboard", tr("clip"), true, s.watch_clipboard, None::<&str>)?,
         &CheckMenuItem::with_id(app, "speak", tr("intelSpeak"), true, s.intel_speak, None::<&str>)?,
+        &CheckMenuItem::with_id(app, "combat", tr("combatAlerts"), true, s.combat_alerts, None::<&str>)?,
         &CheckMenuItem::with_id(app, "start_at_login", tr("startAtLogin"), true, s.start_at_login, None::<&str>)?,
         &PredefinedMenuItem::separator(app)?,
         &MenuItem::with_id(app, "settings", tr("settings"), true, None::<&str>)?,
@@ -165,6 +171,17 @@ pub fn handle(app: &AppHandle, id: &str) {
         "settings" | "intel" => open_settings(app),
         "on_top" => update(app, |s| s.always_on_top = !s.always_on_top),
         "logs" => update(app, |s| s.read_logs = !s.read_logs),
+        "combat" => update(app, |s| s.combat_alerts = !s.combat_alerts),
+        "overlay" => {
+            let on = !app.state::<AppState>().settings.lock().unwrap().overlay;
+            update(app, |s| s.overlay = on);
+            crate::overlay::show(app, on);
+        }
+        "overlay_lock" => {
+            let on = !app.state::<AppState>().settings.lock().unwrap().overlay_locked;
+            update(app, |s| s.overlay_locked = on);
+            crate::overlay::lock(app, on);
+        }
         "clipboard" => update(app, |s| s.watch_clipboard = !s.watch_clipboard),
         "speak" => update(app, |s| s.intel_speak = !s.intel_speak),
         "start_at_login" => {

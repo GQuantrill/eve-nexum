@@ -27,9 +27,9 @@
   },
   "plugins": {
     "updater": {
-      "pubkey": "REPLACE_WITH_UPDATER_PUBLIC_KEY",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEE4QzE2MkZEQjM0NkFDMTEKUldRUnJFYXovV0xCcUR4Y1o0MHpPNUFlMlU2VlFVd08zZnI0QU9rcTN3NVpQY2FyU2ViT25LTUEK",
       "endpoints": [
-        "https://raw.githubusercontent.com/GQuantrill/eve-nexum/main/desktop/latest.json"
+        "https://github.com/GQuantrill/nexum-desktop/releases/latest/download/latest.json"
       ]
     }
   }

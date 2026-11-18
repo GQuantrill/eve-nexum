@@ -1654,7 +1654,7 @@
       }
     },
     "footer": "EVE Online과 EVE 로고는 CCP hf.의 등록 상표입니다. 전 세계 모든 권리 보유. Nexum은 제3자 도구이며 CCP hf.와 제휴하거나 그로부터 보증받지 않았습니다. · <license>라이선스 및 EVE IP 고지</license>",
-    "desktopBody": "Nexum은 Windows와 macOS용 데스크톱 앱으로도 실행됩니다. 로그인, 지도, 설정이 그대로인 같은 Nexum에 브라우저로는 할 수 없는 기능이 더해집니다. 앱은 컴퓨터에 있는 EVE의 로그 파일을 읽고 게임 위에 떠 있을 수 있습니다. 이 섹션의 기능은 모두 데스크톱 앱이 필요하며, 위의 기능은 둘 다에서 작동합니다.",
+    "desktopBody": "Nexum은 Windows, macOS, Linux용 데스크톱 앱으로도 실행됩니다. 로그인, 지도, 설정이 그대로인 같은 Nexum에 브라우저로는 할 수 없는 기능이 더해집니다. 앱은 컴퓨터에 있는 EVE의 로그 파일을 읽고 게임 위에 떠 있을 수 있습니다. 이 섹션의 기능은 모두 데스크톱 앱이 필요하며, 위의 기능은 둘 다에서 작동합니다.",
     "desktopFeatures": {
       "logJumps": {
         "title": "즉시 점프 추적",
@@ -1694,8 +1694,12 @@
       }
     },
     "desktopSoon": "출시 예정",
-    "desktopSoonBody": "Windows와 macOS용 Nexum 데스크톱 앱: EVE 로그로 즉시 점프 추적, 지도 위의 정보 채널, 위협 경보 등.",
-    "desktopSoonLink": "무엇이 추가되는지 보기"
+    "desktopSoonBody": "Windows, macOS, Linux용 Nexum 데스크톱 앱: EVE 로그로 즉시 점프 추적, 지도 위의 정보 채널, 위협 경보 등.",
+    "desktopSoonLink": "무엇이 추가되는지 보기",
+    "desktopOut": "지금 이용 가능",
+    "desktopDownloadLink": "다운로드",
+    "desktopMacNote": "macOS: 앱이 아직 서명되지 않았으므로 설치 후 터미널에서 한 번 실행하세요:",
+    "desktopAllDownloads": "모든 다운로드(.msi, .deb, .rpm)와 릴리스 노트"
   },
   "language": {
     "label": "언어"
@@ -2323,7 +2327,10 @@
     "panelsAllHidden": "모든 섹션이 숨겨져 있습니다 — 사이드바가 비어 있게 됩니다.",
     "emptyTitle": "표시 중인 섹션이 없습니다. 여기에서 원하는 섹션을 선택하세요.",
     "routePlanner": "경로 플래너",
-    "intel": "정보"
+    "intel": "정보",
+    "popOut": "별도 창에서 열기",
+    "poppedOut": "별도 창에서 열려 있습니다.",
+    "bringBack": "다시 가져오기"
   },
   "sigType": {
     "combat": "전투",
@@ -2557,6 +2564,7 @@
       "intelHere": "현재 성계에 보고됨: {{system}}",
       "intelNear_one": "{{system}}: {{count}}점프 거리",
       "intelNear_other": "{{system}}: {{count}}점프 거리",
+      "intelSpeakReported": "{{system}}, 보고됨",
       "intelSpeakHere": "{{system}}, 현재 성계",
       "intelSpeak_one": "{{system}}, {{count}}점프",
       "intelSpeak_other": "{{system}}, {{count}}점프"

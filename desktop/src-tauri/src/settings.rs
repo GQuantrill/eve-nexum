@@ -32,6 +32,15 @@ pub struct Settings {
     pub intel_channels: Vec<String>,
     /// Play a sound when an intel report names a system on the map.
     pub intel_sound: bool,
+    /// Alerts when a player shoots or tackles you (EVE's game logs).
+    pub combat_alerts: bool,
+    /// The intel overlay is shown, and click-through (locked).
+    pub overlay: bool,
+    pub overlay_locked: bool,
+    /// Its place and size, logical pixels: x, y, width, height.
+    pub overlay_bounds: Option<[f64; 4]>,
+    /// Which intel sound (INTEL_SOUNDS).
+    pub intel_sound_name: String,
     /// How long a system named in intel pulses: 5, 10, 15 or 30 seconds.
     pub intel_pulse_secs: u32,
     /// How strongly it pulses: off (sound only), subtle, normal or strong.
@@ -45,6 +54,9 @@ pub struct Settings {
     /// The voice to use (its id on this computer); None = the default voice
     /// for the site's language.
     pub intel_speak_voice: Option<String>,
+    /// Intel sound and voice only within this many jumps of the pilot;
+    /// None = for any system on the map.
+    pub intel_alert_range: Option<u32>,
     /// Page zoom of the Nexum window (View > Zoom), 1.0 = 100%.
     pub zoom: f64,
 }
@@ -60,12 +72,18 @@ impl Default for Settings {
             chatlog_dir: None,
             intel_channels: Vec::new(),
             intel_sound: true,
+            combat_alerts: false,
+            overlay: false,
+            overlay_locked: false,
+            overlay_bounds: None,
+            intel_sound_name: "twoTone".to_string(),
             intel_pulse_secs: 5,
             intel_pulse: "normal".to_string(),
             intel_speak: false,
             intel_speak_volume: 100,
             intel_speak_rate: "normal".to_string(),
             intel_speak_voice: None,
+            intel_alert_range: None,
             zoom: 1.0,
         }
     }
@@ -128,7 +146,18 @@ pub fn normalise_pulse(s: &mut Settings) {
     if s.intel_speak_voice.as_deref().is_some_and(|v| v.trim().is_empty() || v.len() > 300) {
         s.intel_speak_voice = None;
     }
+    s.intel_alert_range = s.intel_alert_range.map(|n| n.min(MAX_ALERT_RANGE));
+    if !INTEL_SOUNDS.contains(&s.intel_sound_name.as_str()) {
+        s.intel_sound_name = "twoTone".to_string();
+    }
 }
+
+/// The intel sounds offered; the Nexum page makes them
+/// (web/src/desktop/intelSounds.ts, same ids).
+pub const INTEL_SOUNDS: [&str; 7] = ["twoTone", "chime", "ping", "bell", "blip", "alarm", "low"];
+
+/// The largest intel alert range offered, in jumps.
+pub const MAX_ALERT_RANGE: u32 = 50;
 
 /// The server as a bare origin ("https://host[:port]"), or None when it isn't
 /// one we'll open: https anywhere, or plain http only on this machine (for
@@ -145,6 +174,15 @@ pub fn normalise_server(raw: &str) -> Option<String> {
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn intel_sounds_match_the_page() {
+        // The Nexum page makes the sounds: every id offered here must be one it knows.
+        let page = include_str!("../../../web/src/desktop/intelSounds.ts");
+        for id in super::INTEL_SOUNDS {
+            assert!(page.contains(&format!("'{id}'")), "{id} missing from intelSounds.ts");
+        }
+    }
+
     use super::{normalise_channel, normalise_server};
 
     #[test]

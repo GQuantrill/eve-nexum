@@ -7,9 +7,11 @@
 // app, its login and its data are exactly what a browser gets. Only that
 // server's pages may talk to the app, and only through the few commands below.
 
+mod combat;
 mod eve_logs;
 mod intel;
 mod menus;
+mod overlay;
 mod scan_clip;
 mod settings;
 mod updater;
@@ -72,10 +74,82 @@ fn attention(app: AppHandle) {
     }
 }
 
+/// Pop-out windows (a sidebar pane on its own): labelled "popout-<pane>".
+const POPOUT_PREFIX: &str = "popout-";
+
+/// Send an event to the Nexum window and its pop-outs (the intel feed shows
+/// in both). Jumps, scans and sounds stay with the main window only.
+pub(crate) fn emit_to_site_windows<S: serde::Serialize + Clone>(app: &AppHandle, event: &str, payload: S) {
+    let _ = app.emit_filter(event, payload, |t| match t {
+        tauri::EventTarget::WebviewWindow { label } | tauri::EventTarget::Window { label } | tauri::EventTarget::Webview { label } => {
+            label == "main" || label.starts_with(POPOUT_PREFIX)
+        }
+        _ => false,
+    });
+}
+
+/// From the Nexum page: open a sidebar pane in a window of its own. The
+/// address must be this server's (with ?popout=<pane>); the window gets the
+/// same rules as the main one.
+#[tauri::command]
+fn open_popout(app: AppHandle, pane: String, title: String, url: String) -> Result<(), String> {
+    if pane.is_empty() || pane.len() > 32 || !pane.chars().all(|c| c.is_ascii_alphabetic()) {
+        return Err("bad pane".into());
+    }
+    let server = url::Url::parse(&app.state::<AppState>().settings.lock().unwrap().server_url)
+        .map_err(|e| e.to_string())?;
+    let target = url::Url::parse(&url).map_err(|e| e.to_string())?;
+    if target.origin() != server.origin() || !target.query_pairs().any(|(k, v)| k == "popout" && v == pane) {
+        return Err("not this server's pop-out".into());
+    }
+    let label = format!("{POPOUT_PREFIX}{pane}");
+    if let Some(w) = app.get_webview_window(&label) {
+        let _ = w.set_focus();
+        return Ok(());
+    }
+    let title: String = title.chars().take(60).collect();
+    let nav_app = app.clone();
+    let on_top = app.state::<AppState>().settings.lock().unwrap().always_on_top;
+    WebviewWindowBuilder::new(&app, label, WebviewUrl::External(target))
+        .title(format!("{title} - Nexum"))
+        .inner_size(420.0, 680.0)
+        .min_inner_size(260.0, 200.0)
+        .always_on_top(on_top)
+        .on_navigation(move |t| {
+            if allowed_in_window(t, &server) {
+                return true;
+            }
+            if matches!(t.scheme(), "http" | "https") {
+                let _ = nav_app.opener().open_url(t.as_str(), None::<&str>);
+            }
+            false
+        })
+        .build()
+        .map(|_| ())
+        .map_err(|e| e.to_string())
+}
+
+/// Close a pane's pop-out window (it was brought back to the sidebar).
+#[tauri::command]
+fn close_popout(app: AppHandle, pane: String) {
+    if let Some(w) = app.get_webview_window(&format!("{POPOUT_PREFIX}{pane}")) {
+        let _ = w.destroy();
+    }
+}
+
 /// Open the app's settings window (the intel feed's "Intel settings").
 #[tauri::command]
 fn open_settings_window(app: AppHandle) {
     open_settings(&app);
+}
+
+/// "Preview" next to the intel sound in the settings window: the Nexum page
+/// makes the sounds, so ask the main window to play it.
+#[tauri::command]
+fn preview_intel_sound(app: AppHandle, name: String) {
+    if settings::INTEL_SOUNDS.contains(&name.as_str()) {
+        let _ = app.emit_to("main", "nexum://intel-sound-preview", name);
+    }
 }
 
 #[tauri::command]
@@ -131,7 +205,7 @@ fn save_settings(app: AppHandle, state: tauri::State<AppState>, settings: Settin
     settings::save(&app, &next)?;
     apply(&app, &next);
     // The intel feed lists the channels: tell it they changed.
-    let _ = app.emit_to("main", "nexum://intel-channels", next.intel_channels.clone());
+    emit_to_site_windows(&app, "nexum://intel-channels", next.intel_channels.clone());
     // The site's permissions are tied to the server it was opened for, so a
     // new server means starting again.
     if server_changed {
@@ -181,6 +255,8 @@ pub(crate) fn update(app: &AppHandle, change: impl FnOnce(&mut Settings)) {
     };
     let _ = settings::save(app, &next);
     apply(app, &next);
+    // An open settings window shows the change (a menu or tray toggle).
+    let _ = app.emit_to("settings", "nexum://settings", next);
 }
 
 // ── Windows ───────────────────────────────────────────────────────────────
@@ -295,6 +371,11 @@ pub fn run() {
             save_settings,
             default_chatlog_dir,
             intel_status,
+            preview_intel_sound,
+            overlay::overlay_update,
+            open_popout,
+            close_popout,
+            overlay::overlay_state,
             intel_feed,
             open_settings_window,
             attention
@@ -323,13 +404,17 @@ pub fn run() {
                 CapabilityBuilder::new("nexum-site")
                     .remote(format!("{}/*", s.server_url))
                     .window("main")
+                    .window("popout-*")
                     .permission("core:event:allow-listen")
                     .permission("core:event:allow-unlisten")
                     .permission("allow-notify")
                     .permission("allow-desktop-info")
                     .permission("allow-intel-feed")
                     .permission("allow-open-settings-window")
-                    .permission("allow-attention"),
+                    .permission("allow-attention")
+                    .permission("allow-overlay-update")
+                    .permission("allow-open-popout")
+                    .permission("allow-close-popout"),
             )?;
 
             let nav_server = server.clone();
@@ -366,6 +451,10 @@ pub fn run() {
             let _ = handle.global_shortcut().register(TOGGLE_SHORTCUT);
 
             eve_logs::start(handle.clone());
+            combat::start(handle.clone());
+            if s.overlay {
+                overlay::show(&handle, true);
+            }
             scan_clip::start(handle.clone());
             intel::start(handle.clone());
             if !STORE {

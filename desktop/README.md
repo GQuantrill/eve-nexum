@@ -8,7 +8,11 @@ browser can't do:
 | Jump tracking from EVE logs | Reads EVE's Local chat log and moves you on the map the moment you jump, seconds before ESI. Your other logged-in characters (alts) move the same way. ESI still confirms each move. On by default. |
 | Scan paste | Probe-scanner results you copy in EVE paste themselves onto the selected system; a copied d-scan opens in the d-scan analyser, filled in (nothing is analysed or pinned until you say so). Off by default (it reads the clipboard); only text that looks like a probe scan or d-scan is ever sent to the page. |
 | Start at login | Optional: starts with Windows/macOS, hidden in the tray (the system runs it with `--minimised`). Also in the Nexum and tray menus. Off by default; the system's own setting is read at startup. |
-| Intel channels | Name the intel channels to follow (e.g. `my.intel`); the newest log of each is read. A line naming a system on your map (its full name, as EVE writes a dragged system) pulses it red (strength and 5-30 s duration in Settings), with a sound (on by default). "clr"/"clear" lines don't alert. A sidebar Intel feed shows all channels, with jumps from you. Intel within the proximity range raises "Threat reported" (optionally read aloud, taskbar flash). Words are sent to the server's system-name lookup only (not stored). |
+| Intel sounds | Seven sounds to pick from in Settings, with a Preview button. The Nexum page makes them (`web/src/desktop/intelSounds.ts`, ids shared with `settings.rs` INTEL_SOUNDS and checked by a test); Preview asks the main window to play one. |
+| Combat alerts | Opt-in (Settings, Tools and tray menus). Reads EVE's game logs (`Gamelogs`, next to `Chatlogs`): a hit from a player (name followed by `[TICKER](Ship)`; NPCs never alert) after a quiet minute, or a warp scramble/disruption attempt on you (once per attacker per 2 min), gives a notification and a taskbar flash. Parser tested on sample lines only, not real logs yet. |
+| Intel overlay | View > Intel overlay: a small always-on-top window with the intel near you, nearest first, and your system. The Nexum page sends the list (`overlay_update`). "Lock overlay" makes it click-through. Place and size remembered. Works over EVE in windowed or fixed-window mode, not exclusive fullscreen. |
+| Pop-out panes | A sidebar pane's window button opens it in a window of its own (`?popout=<pane>`; in a browser, a popup). That window loads the map but tracks no jumps, raises no alerts and speaks nothing. The sidebar keeps a stub with "Bring back". Intel lines go to pop-outs too. |
+| Intel channels | Name the intel channels to follow (e.g. `my.intel`); the newest log of each is read. A line naming a system on your map (its full name, as EVE writes a dragged system) pulses it red (strength and 5-30 s duration in Settings), with a sound (on by default). "clr"/"clear" lines don't alert. A sidebar Intel feed shows all channels, with jumps from you. Intel within the proximity range raises "Threat reported" (notification, taskbar flash). Sound and the optional read-aloud follow the intel range in Settings: anything on the map (default) or within N jumps of you (needs your location). Words are sent to the server's system-name lookup only (not stored). |
 | Always on top | Keep Nexum above the EVE client. |
 | Tray + global shortcut | `Alt+Shift+N` shows or hides Nexum from anywhere. |
 | System notifications | Nexum's alerts arrive as native notifications. |
@@ -85,25 +89,30 @@ builds come later.
 
 ## Updates
 
-The app checks `desktop/latest.json` on main
-(`raw.githubusercontent.com/GQuantrill/eve-nexum/main/desktop/latest.json`)
+Releases live in their own repository, **GQuantrill/nexum-desktop**, so they
+never post to the players' Discord or show as a new server version. The app
+checks that repository's `latest.json`
+(`github.com/GQuantrill/nexum-desktop/releases/latest/download/latest.json`)
 20 s after starting and every 6 hours. A newer version shows a notification
 and an "Install update" item at the top of the tray menu; "Check for updates"
-asks now. Updates must be signed with the updater key: the public half is in
-`tauri.conf.json` (`plugins.updater.pubkey`), the private half never goes in
-the repo. Every install updates from this one feed, whatever server it uses.
+asks now. Every install updates from this one feed, whatever server it uses.
+The Microsoft Store build has no updater: the Store updates it.
+
+Updates must be signed with the updater key. The public half is in
+`tauri.conf.json` (`plugins.updater.pubkey`); the private half is the
+`TAURI_SIGNING_PRIVATE_KEY` secret in GitHub Actions, with a backup kept
+off-line (`~/.tauri/nexum-desktop-updater.key`, no password). Lose it and
+installed apps can never be updated again; leak it and anyone could push an
+update, so a new key (and a reinstall for everyone) would be needed.
 
 To release version X.Y.Z:
 
 1. Bump `version` in `src-tauri/tauri.conf.json` (and `Cargo.toml`,
-   `package.json`).
-2. On each platform, build with the key:
-   ```sh
-   export TAURI_SIGNING_PRIVATE_KEY="$(cat ~/.tauri/nexum-desktop.key)"
-   export TAURI_SIGNING_PRIVATE_KEY_PASSWORD='...'
-   yarn build
-   node scripts/latest-json.mjs "What changed"
-   ```
-3. Create the GitHub release `desktop-vX.Y.Z`, attach the installers and
-   the bundle the script names.
-4. Commit `latest.json`; installed apps see it once it reaches main.
+   `package.json`) and commit.
+2. `git tag desktop-vX.Y.Z && git push origin desktop-vX.Y.Z`
+3. `.github/workflows/desktop-release.yml` builds Windows, macOS (universal)
+   and Linux, signs the update bundles, uploads everything plus `latest.json`
+   to a draft release, and publishes it once every platform is done.
+
+On Linux only the AppImage updates itself; .deb and .rpm installs are updated
+by installing the new package.

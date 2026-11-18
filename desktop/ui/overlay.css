@@ -1,0 +1,30 @@
+/* The overlay: small, dark and readable over the game. */
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  background: rgba(10, 13, 18, 0.92);
+  color: #e3e6ea;
+  font: 13px/1.35 system-ui, -apple-system, "Segoe UI", sans-serif;
+  overflow: hidden;
+  user-select: none;
+  cursor: default;
+}
+header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.title { font-weight: 700; color: #ef6b6b; }
+.here { margin-left: auto; color: #8d96a0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+ul { list-style: none; margin: 0; padding: 4px 0; overflow-y: auto; height: calc(100% - 32px); }
+li { display: flex; align-items: baseline; gap: 8px; padding: 3px 10px; }
+li .name { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+li .jumps { margin-left: auto; font-weight: 700; white-space: nowrap; }
+li .ago { color: #8d96a0; white-space: nowrap; min-width: 3.2em; text-align: right; }
+li.near .jumps { color: #ef6b6b; }
+li.mid .jumps { color: #f0b252; }
+li.far .jumps { color: #8d96a0; }
+.empty { margin: 0; padding: 10px; color: #8d96a0; }

@@ -12,6 +12,9 @@ interface Props {
   /** When provided, an "undock" button pops this card out into a floating
    *  window. Only the bottom dock passes it; the sidebar cards omit it. */
   onUndock?: () => void;
+  /** The undock button's tooltip, when it does something other than float
+   *  the card (the sidebar opens a window of its own). */
+  undockLabel?: string;
   /** Move this card to the neighbouring column. Optional because the Sidebar
    *  shares this component and has no columns; absent means no arrows. */
   onMoveColumn?: (dir: -1 | 1) => void;
@@ -34,7 +37,7 @@ interface Props {
 function storageKey(id: string) { return `nexum.panel.collapsed.${id}`; }
 
 export function DraggableCard({
-  id, title, children, onUndock, onMoveColumn, canMoveLeft, canMoveRight, keepMounted = false,
+  id, title, children, onUndock, undockLabel, onMoveColumn, canMoveLeft, canMoveRight, keepMounted = false,
 }: Props) {
   const { t } = useTranslation();
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
@@ -94,8 +97,8 @@ export function DraggableCard({
             type="button"
             className="info-card__undock-btn"
             onClick={(e) => { e.stopPropagation(); onUndock(); }}
-            title={t('panel.undock')}
-            aria-label={t('panel.undock')}
+            title={undockLabel ?? t('panel.undock')}
+            aria-label={undockLabel ?? t('panel.undock')}
           >
             <ArrowSquareOutIcon size={13} weight="regular" />
           </button>

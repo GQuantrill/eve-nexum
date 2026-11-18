@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-preview-intel-sound"
+description = "Enables the preview_intel_sound command without any pre-configured scope."
+commands.allow = ["preview_intel_sound"]
+
+[[permission]]
+identifier = "deny-preview-intel-sound"
+description = "Denies the preview_intel_sound command without any pre-configured scope."
+commands.deny = ["preview_intel_sound"]

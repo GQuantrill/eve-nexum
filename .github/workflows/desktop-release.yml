@@ -1,0 +1,142 @@
+name: Desktop release
+
+# Publishes a desktop app release to the GQuantrill/nexum-desktop repository:
+# the installers for Windows, macOS (one build for Apple silicon and Intel)
+# and Linux, the signed update bundles, and latest.json, the file installed
+# apps check for updates (tauri.conf.json, plugins.updater.endpoints).
+#
+# Kept out of this repository's releases on purpose: those post to the
+# players' Discord, build the server images and drive the admin "new
+# version" badge.
+#
+# To release: raise "version" in desktop/src-tauri/tauri.conf.json, commit,
+# then push a matching tag, e.g. desktop-v0.2.0:
+#   git tag desktop-v0.2.0 && git push origin desktop-v0.2.0
+#
+# Secrets:
+#   TAURI_SIGNING_PRIVATE_KEY  signs the update bundles (the app only installs
+#                              updates signed with it; never lose or leak it)
+#   NEXUM_DESKTOP_TOKEN        fine-grained token, Contents: read and write on
+#                              GQuantrill/nexum-desktop
+on:
+  push:
+    tags: ['desktop-v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  RELEASE_REPO: nexum-desktop
+  RELEASE_OWNER: GQuantrill
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+      release_id: ${{ steps.draft.outputs.id }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: v
+        env:
+          REF_NAME: ${{ github.ref_name }}
+          REF_TYPE: ${{ github.ref_type }}
+        run: |
+          version=$(jq -r .version desktop/src-tauri/tauri.conf.json)
+          if [ "$REF_TYPE" = tag ] && [ "$REF_NAME" != "desktop-v$version" ]; then
+            echo "::error::Tag $REF_NAME does not match tauri.conf.json version $version"
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+      # The draft release the builds upload to, made here (on the release
+      # repo's own main: it has none of this repo's commits). A re-run reuses
+      # it.
+      - id: draft
+        env:
+          GH_TOKEN: ${{ secrets.NEXUM_DESKTOP_TOKEN }}
+          VERSION: ${{ steps.v.outputs.version }}
+        run: |
+          repo="$RELEASE_OWNER/$RELEASE_REPO"
+          id=$(gh api "repos/$repo/releases" --jq ".[] | select(.tag_name == \"v$VERSION\") | .id" | head -1)
+          if [ -z "$id" ]; then
+            id=$(gh api -X POST "repos/$repo/releases" \
+              -f tag_name="v$VERSION" -f target_commitish=main \
+              -f name="Nexum desktop $VERSION" -F draft=true \
+              -f body="Windows: Nexum-Windows-setup.exe. Linux: Nexum-Linux.AppImage (updates itself), or the .deb / .rpm." \
+              --jq .id)
+          fi
+          echo "id=$id" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: check
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - os: windows-latest
+            args: ''
+          # macOS is on hold (no Apple developer account yet). To bring it
+          # back: - os: macos-latest / args: '--target universal-apple-darwin'
+          # and the .dmg lines in the publish job.
+          - os: ubuntu-22.04
+            args: ''
+    runs-on: ${{ matrix.os }}
+    # No build cache here: a release is built from scratch, so nothing cached
+    # by another branch's build can end up in a signed update.
+    # Third-party actions are pinned to a commit: this job holds the signing key.
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+          cache-dependency-path: desktop/yarn.lock
+      - uses: dtolnay/rust-toolchain@39008827e6b4319a349e9a42dfc90579dd25f1ca # stable
+        with:
+          targets: ${{ matrix.os == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+      - name: Linux build libraries
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential file \
+            libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev patchelf
+      - run: yarn install --frozen-lockfile
+        working-directory: desktop
+      - uses: tauri-apps/tauri-action@84b9d35b5fc46c1e45415bdb6144030364f7ebc5 # v0.6.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.NEXUM_DESKTOP_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ''
+        with:
+          projectPath: desktop
+          owner: ${{ env.RELEASE_OWNER }}
+          repo: ${{ env.RELEASE_REPO }}
+          releaseId: ${{ needs.check.outputs.release_id }}
+          includeUpdaterJson: true
+          args: ${{ matrix.args }}
+
+  # Only once every platform has built: make the draft public, so latest.json
+  # never points installed apps at a release that is still missing files.
+  publish:
+    needs: [check, build]
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          GH_TOKEN: ${{ secrets.NEXUM_DESKTOP_TOKEN }}
+          ID: ${{ needs.check.outputs.release_id }}
+        run: |
+          repo="$RELEASE_OWNER/$RELEASE_REPO"
+          tag=$(gh api "repos/$repo/releases/$ID" --jq .tag_name)
+          # Copies under fixed names, so the website's download buttons
+          # (web/src/data/links.ts) always fetch the newest version.
+          mkdir fixed && cd fixed
+          gh release download "$tag" --repo "$repo" \
+            -p '*-setup.exe' -p '*.AppImage' -p '*.deb' -p '*.rpm'
+          mv *-setup.exe Nexum-Windows-setup.exe
+          mv *.AppImage Nexum-Linux.AppImage
+          mv *.deb Nexum-Linux.deb
+          mv *.rpm Nexum-Linux.rpm
+          gh release upload "$tag" --repo "$repo" --clobber Nexum-*
+          gh api -X PATCH "repos/$repo/releases/$ID" \
+            -F draft=false -f make_latest=true --jq '.html_url'

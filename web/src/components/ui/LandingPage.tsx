@@ -16,11 +16,12 @@ import {
   ArrowSquareOutIcon, ClockCountdownIcon, CheckIcon, FireIcon, CrosshairSimpleIcon, ArrowBendUpRightIcon, CrosshairIcon,
   MapPinSimpleIcon, ColumnsIcon,
   MegaphoneIcon, PushPinIcon, HardDrivesIcon, AppWindowIcon, DesktopIcon,
+  WindowsLogoIcon, AppleLogoIcon, LinuxLogoIcon,
 } from '../../icons';
 import { apiUrl } from '../../api/client';
 import { loginUrl, useScopeOptions } from '../../api/scopeOptions';
 import { useScopePickerStore } from '../../store/scopePickerStore';
-import { DISCORD_INVITE_URL } from '../../data/links';
+import { DISCORD_INVITE_URL, DESKTOP_AVAILABLE, DESKTOP_MAC_AVAILABLE, DESKTOP_DOWNLOADS } from '../../data/links';
 import { SUPPORTED_LANGUAGES, LANGUAGE_NAMES } from '../../i18n';
 import { DemoMap } from './DemoMap';
 import { LanguageSwitcher } from './LanguageSwitcher';
@@ -399,12 +400,12 @@ export function LandingPage() {
       </header>
 
       <div className="landing__content">
-        {/* The desktop app isn't downloadable yet: say it's coming, and point
-            at the section listing what it adds. */}
+        {/* The desktop app: coming soon, or out now (DESKTOP_AVAILABLE).
+            Either way, point at the section listing what it adds. */}
         <div className="landing__soon">
           <span className="landing__soon-icon"><DesktopIcon size="1em" weight="duotone" /></span>
           <span className="landing__soon-text">
-            <span className="landing__soon-tag">{t('landing.desktopSoon')}</span>
+            <span className="landing__soon-tag">{t(DESKTOP_AVAILABLE ? 'landing.desktopOut' : 'landing.desktopSoon')}</span>
             {t('landing.desktopSoonBody')}
           </span>
           <a
@@ -416,7 +417,7 @@ export function LandingPage() {
               document.getElementById('desktop-app')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }}
           >
-            {t('landing.desktopSoonLink')}
+            {t(DESKTOP_AVAILABLE ? 'landing.desktopDownloadLink' : 'landing.desktopSoonLink')}
           </a>
         </div>
 
@@ -508,11 +509,45 @@ export function LandingPage() {
         <section className="landing__section landing__section--features" id="desktop-app">
           <h2 className="landing__section-title">
             {t('landing.sections.desktop')}
-            <span className="landing__soon-tag landing__soon-tag--title">{t('landing.desktopSoon')}</span>
+            {!DESKTOP_AVAILABLE && (
+              <span className="landing__soon-tag landing__soon-tag--title">{t('landing.desktopSoon')}</span>
+            )}
           </h2>
           <p className="landing__section-body">
             {t('landing.desktopBody')}
           </p>
+          {DESKTOP_AVAILABLE && (
+            <div className="landing__downloads">
+              <div className="landing__download-btns">
+                <a className="landing__download" href={DESKTOP_DOWNLOADS.windows}>
+                  <WindowsLogoIcon size="1.2em" weight="fill" /> Windows
+                </a>
+                {DESKTOP_MAC_AVAILABLE ? (
+                  <a className="landing__download" href={DESKTOP_DOWNLOADS.macos}>
+                    <AppleLogoIcon size="1.2em" weight="fill" /> macOS
+                  </a>
+                ) : (
+                  <span className="landing__download landing__download--soon" aria-disabled="true">
+                    <AppleLogoIcon size="1.2em" weight="fill" /> macOS: {t('landing.desktopSoon')}
+                  </span>
+                )}
+                <a className="landing__download" href={DESKTOP_DOWNLOADS.linux}>
+                  <LinuxLogoIcon size="1.2em" weight="fill" /> Linux
+                </a>
+              </div>
+              {DESKTOP_MAC_AVAILABLE && (
+                <p className="landing__download-note">
+                  {t('landing.desktopMacNote')}{' '}
+                  <code>xattr -cr /Applications/Nexum.app</code>
+                </p>
+              )}
+              <p className="landing__download-note">
+                <a href={DESKTOP_DOWNLOADS.all} target="_blank" rel="noopener noreferrer">
+                  {t('landing.desktopAllDownloads')}
+                </a>
+              </p>
+            </div>
+          )}
           <section className="landing__features">
             {DESKTOP_FEATURES.map((f) => {
               const Icon = f.icon;

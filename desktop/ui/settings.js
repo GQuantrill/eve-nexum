@@ -1,5 +1,6 @@
 // The app's own settings window. Local page, talks only to the app.
 const { invoke } = window.__TAURI__.core;
+const { listen } = window.__TAURI__.event;
 const $ = (id) => document.getElementById(id);
 
 async function strings() {
@@ -18,6 +19,7 @@ async function strings() {
   $('alwaysOnTop').checked = s.alwaysOnTop;
   $('readLogs').checked = s.readLogs;
   $('watchClipboard').checked = s.watchClipboard;
+  $('combatAlerts').checked = s.combatAlerts;
   $('startAtLogin').checked = s.startAtLogin;
   // The Store build has no "start at login" (see lib.rs, STORE).
   const info = await invoke('desktop_info');
@@ -26,7 +28,35 @@ async function strings() {
     $('startAtLogin').closest('label').nextElementSibling.style.display = 'none';
   }
   $('chatlogDir').value = s.chatlogDir || '';
+  // The toggles the menus and tray can change while this window is open.
+  listen('nexum://settings', ({ payload: n }) => {
+    $('alwaysOnTop').checked = n.alwaysOnTop;
+    $('readLogs').checked = n.readLogs;
+    $('watchClipboard').checked = n.watchClipboard;
+    $('combatAlerts').checked = n.combatAlerts;
+    $('intelSpeak').checked = n.intelSpeak;
+    $('startAtLogin').checked = n.startAtLogin;
+    $('intelSound').dispatchEvent(new Event('change'));
+  });
   $('intelSound').checked = s.intelSound;
+  // Which sound, and a preview (played by the Nexum window, which makes them).
+  $('intelSoundName').value = s.intelSoundName || 'twoTone';
+  const showSound = () => { $('soundRow').style.display = $('intelSound').checked ? '' : 'none'; };
+  $('intelSound').addEventListener('change', showSound);
+  showSound();
+  $('soundPreview').addEventListener('click', () => {
+    invoke('preview_intel_sound', { name: $('intelSoundName').value }).catch(() => {});
+  });
+  // Intel sound and voice: for anything on the map, or within N jumps.
+  const showRange = () => {
+    const jumps = $('alertRangeMode').value === 'jumps';
+    $('alertRangeJumps').style.display = jumps ? '' : 'none';
+    $('alertRangeUnit').style.display = jumps ? '' : 'none';
+  };
+  $('alertRangeMode').value = s.intelAlertRange == null ? 'map' : 'jumps';
+  $('alertRangeJumps').value = String(s.intelAlertRange ?? 5);
+  $('alertRangeMode').addEventListener('change', showRange);
+  showRange();
   $('intelSpeak').checked = s.intelSpeak;
 
   // Speech: volume, voice (the voices installed on this computer), speed,
@@ -138,6 +168,11 @@ async function strings() {
         chatlogDir: $('chatlogDir').value.trim() || null,
         intelChannels: channels,
         intelSound: $('intelSound').checked,
+        combatAlerts: $('combatAlerts').checked,
+        intelSoundName: $('intelSoundName').value,
+        intelAlertRange: $('alertRangeMode').value === 'jumps'
+          ? Math.min(50, Math.max(0, Math.round(Number($('alertRangeJumps').value) || 0)))
+          : null,
         intelSpeak: $('intelSpeak').checked,
         intelSpeakVolume: Number($('speakVolume').value),
         intelSpeakRate: $('speakRate').value,

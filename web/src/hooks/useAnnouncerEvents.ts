@@ -42,9 +42,11 @@ function jumpWord(n: number): string {
  * gated on the master enable + the per-event toggle. The model itself loads
  * lazily inside speak() on the first qualifying event.
  */
-export function useAnnouncerEvents(): void {
+export function useAnnouncerEvents(active = true): void {
   const speak = useAnnouncer((s) => s.speak);
-  const [enabled]    = useUserSetting<boolean>(ANN.enabled, false);
+  const [enabledSetting] = useUserSetting<boolean>(ANN.enabled, false);
+  // A pop-out window (utils/popout.ts) never speaks: the main window does.
+  const enabled = enabledSetting && active;
   const [voice]      = useUserSetting<string>(ANN.voice, 'af_nicole');
   const [evConnect]  = useUserSetting<boolean>(ANN.connect, true);
   const [evIncur]    = useUserSetting<boolean>(ANN.incursions, true);

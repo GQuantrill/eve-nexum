@@ -1654,7 +1654,7 @@
       }
     },
     "footer": "EVE Online et le logo EVE sont des marques déposées de CCP hf. Tous droits réservés dans le monde entier. Nexum est un outil tiers et n'est ni affilié à CCP hf ni approuvé par lui. · <license>Mention de licence & PI EVE</license>",
-    "desktopBody": "Nexum existe aussi en application de bureau pour Windows et macOS. C'est le même Nexum, avec votre connexion, vos cartes et vos réglages, plus ce qu'un navigateur ne peut pas offrir : l'application lit les fichiers de logs d'EVE sur votre ordinateur et reste au-dessus du jeu. Tout ce qui figure dans cette section nécessite l'application ; tout ce qui précède fonctionne dans les deux.",
+    "desktopBody": "Nexum existe aussi en application de bureau pour Windows, macOS et Linux. C'est le même Nexum, avec votre connexion, vos cartes et vos réglages, plus ce qu'un navigateur ne peut pas offrir : l'application lit les fichiers de logs d'EVE sur votre ordinateur et reste au-dessus du jeu. Tout ce qui figure dans cette section nécessite l'application ; tout ce qui précède fonctionne dans les deux.",
     "desktopFeatures": {
       "logJumps": {
         "title": "Suivi instantané des sauts",
@@ -1694,8 +1694,12 @@
       }
     },
     "desktopSoon": "Bientôt",
-    "desktopSoonBody": "L'application de bureau Nexum pour Windows et macOS : suivi instantané des sauts grâce aux logs d'EVE, canaux d'intel sur votre carte, alertes de menace et plus encore.",
-    "desktopSoonLink": "Voir ce qu'elle apporte"
+    "desktopSoonBody": "L'application de bureau Nexum pour Windows, macOS et Linux : suivi instantané des sauts grâce aux logs d'EVE, canaux d'intel sur votre carte, alertes de menace et plus encore.",
+    "desktopSoonLink": "Voir ce qu'elle apporte",
+    "desktopOut": "Disponible",
+    "desktopDownloadLink": "Télécharger",
+    "desktopMacNote": "macOS : l'application n'est pas encore signée ; après l'installation, lancez une fois dans le Terminal :",
+    "desktopAllDownloads": "Tous les téléchargements (.msi, .deb, .rpm) et notes de version"
   },
   "language": {
     "label": "Langue"
@@ -2325,7 +2329,10 @@
     "panelsAllHidden": "Toutes les sections sont masquées — la barre latérale sera vide.",
     "emptyTitle": "Aucune section n’est affichée. Choisissez ici celles que vous voulez.",
     "routePlanner": "Planificateur d'itinéraire",
-    "intel": "Intel"
+    "intel": "Intel",
+    "popOut": "Ouvrir dans sa propre fenêtre",
+    "poppedOut": "Ouvert dans sa propre fenêtre.",
+    "bringBack": "Ramener ici"
   },
   "sigType": {
     "combat": "Combat",
@@ -2559,6 +2566,7 @@
       "intelHere": "Signalée dans votre système : {{system}}",
       "intelNear_one": "{{system}} : à {{count}} saut de vous",
       "intelNear_other": "{{system}} : à {{count}} sauts de vous",
+      "intelSpeakReported": "{{system}}, signalé",
       "intelSpeakHere": "{{system}}, dans votre système",
       "intelSpeak_one": "{{system}}, {{count}} saut",
       "intelSpeak_other": "{{system}}, {{count}} sauts"

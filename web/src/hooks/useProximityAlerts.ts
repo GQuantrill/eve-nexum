@@ -8,8 +8,9 @@ import { ensureSovLoaded, getSovEntries } from './useSovData';
 import { useUserSetting, readUserSetting, writeUserSetting } from './useUserSetting';
 import { NOTIFY, notifyOn, alertGain } from '../utils/notificationPrefs';
 import { useDebugFlag } from '../utils/debugFlags';
-import { desktopNotify, desktopAttention } from '../desktop/bridge';
+import { desktopNotify, desktopAttention, desktopInvoke, isDesktop } from '../desktop/bridge';
 import { useIntelReports } from '../desktop/intel';
+import { playIntelSound } from '../desktop/intelSounds';
 import type { IntelSpeech } from '../desktop/intel';
 import i18n from '../i18n';
 
@@ -189,23 +190,46 @@ export function useProximityAlerts(): {
     }
   }, [nearestFixed, threshold, nameMap, targetIds.length]);
 
-  // Intel: "Threat reported" for each new report within range, once per
-  // report (a fresh sighting of the same system alerts again).
+  // Intel, once per report (a fresh sighting of the same system alerts again):
+  // - "Threat reported" (notification, taskbar flash) within the proximity
+  //   alert range;
+  // - sound and voice within the pilot's intel range (desktop settings): any
+  //   system on the open map, or within a number of jumps. On the map, the
+  //   sound has already played as the line arrived (desktop/intel.ts).
   const alertedRef = useRef(new Set<string>());
+  const located = location.system?.eveSystemId != null;
   useEffect(() => {
     for (const r of intel.values()) {
       const key = `${r.eveSystemId}:${r.at}`;
       if (alertedRef.current.has(key)) continue;
       const route = routes[r.eveSystemId];
-      if (!route) continue;              // not answered yet, or unreachable
+      // Wait for the distance while it's being looked up. Without a location
+      // there is none: only "anything on the map" can still alert.
+      if (!route && located) continue;
       alertedRef.current.add(key);
-      if (route.jumps > threshold) continue;
-      if (notifyOn(NOTIFY.proximityDesktop)) fireIntelNotification(r.name, route.jumps);
-      if (notifyOn(NOTIFY.proximitySound)) playBeep();
-      desktopAttention();
-      if (r.speech) speakIntel(r.name, route.jumps, r.speech);
+      const jumps = route?.jumps ?? null;
+      if (jumps !== null && jumps <= threshold) {
+        if (notifyOn(NOTIFY.proximityDesktop)) fireIntelNotification(r.name, jumps);
+        desktopAttention();
+      }
+      const inRange = r.range === null ? r.onMap : jumps !== null && jumps <= r.range;
+      if (!inRange) continue;
+      if (r.range !== null && r.sound) playIntelSound(r.soundName);
+      if (r.speech) speakIntel(r.name, jumps, r.speech);
     }
-  }, [intel, routes, threshold]);
+  }, [intel, routes, threshold, located]);
+
+  // Desktop app: the intel overlay's list (overlay.rs), nearest first. An
+  // older app without the overlay just refuses the call.
+  const hereName = location.system?.name ?? null;
+  useEffect(() => {
+    if (!isDesktop()) return;
+    const reports = [...intel.values()]
+      .map((r) => ({ name: r.name, jumps: routes[r.eveSystemId]?.jumps ?? null, at: r.at }))
+      .sort((a, b) => (a.jumps ?? Infinity) - (b.jumps ?? Infinity) || b.at - a.at)
+      .slice(0, 12);
+    desktopInvoke('overlay_update', { data: { here: hereName, reports } }).catch(() => { /* older app */ });
+  }, [intel, routes, hereName]);
 
   // Debug: surface a threat regardless of the alert threshold. Show the real
   // nearest one if there is any (with real jumps), otherwise a demo stand-in so
@@ -232,9 +256,11 @@ const SPEECH_RATES: Record<string, number> = { slow: 0.8, normal: 1, fast: 1.3 }
 // Read a report aloud, in the site's language, at the pilot's volume, speed
 // and voice. A newer report cuts off one still being read: the latest is what
 // matters.
-function speakIntel(sysName: string, jumps: number, speech: IntelSpeech) {
+function speakIntel(sysName: string, jumps: number | null, speech: IntelSpeech) {
   if (typeof speechSynthesis === 'undefined') return;
-  const text = jumps === 0
+  const text = jumps === null
+    ? i18n.t('toolbar.proximity.intelSpeakReported', { system: sysName })
+    : jumps === 0
     ? i18n.t('toolbar.proximity.intelSpeakHere', { system: sysName })
     : i18n.t('toolbar.proximity.intelSpeak', { system: sysName, count: jumps });
   try {

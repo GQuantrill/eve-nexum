@@ -35,3 +35,5 @@ select { padding: 5px 7px; border: 1px solid var(--line); border-radius: 6px; ba
 #speakVoice { max-width: 240px; }
 button.secondary { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
 #status.bad { color: var(--bad); }
+.row.range { align-items: center; flex-wrap: wrap; }
+.row.range input { flex: none; width: 5em; padding: 5px 7px; border: 1px solid var(--line); border-radius: 6px; background: transparent; color: inherit; font: inherit; }
