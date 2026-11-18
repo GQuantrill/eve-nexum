@@ -1,17 +1,21 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useIntelFeed, knownSystem, isClearLine, openDesktopSettings } from '../../desktop/intel';
 import type { IntelLine } from '../../desktop/intel';
 import { useMapStore } from '../../store/mapStore';
 import { useUserSetting } from '../../hooks/useUserSetting';
-import { GearIcon } from '../../icons';
+import { GearIcon, MapPinSimpleIcon, PathIcon } from '../../icons';
+import { ContextMenu } from './ContextMenu';
+import { setWaypoint, KSPACE_CLASSES } from '../../utils/routeActions';
+import type { MapSystem } from '../../types';
 import styles from './IntelPane.module.css';
 
 // Desktop app only (the sidebar hides it in a browser): the pilot's intel
 // channels as one feed, newest first. Each channel can be switched off;
 // "All" switches them all back on. System names are highlighted, and those on
-// the open map can be clicked to select them there.
+// the open map can be clicked to select them there, or right-clicked to set
+// them as the autopilot destination or add them as a waypoint.
 
 const HIDDEN_KEY = 'nexum.intel.feedHidden';
 const SHOW_MAX = 100;
@@ -26,7 +30,8 @@ export function IntelPane() {
   const selectSystem = useMapStore((s) => s.selectSystem);
   const [hiddenRaw, setHidden] = useUserSetting<string[]>(HIDDEN_KEY, []);
   const hidden = useMemo(() => new Set(Array.isArray(hiddenRaw) ? hiddenRaw : []), [hiddenRaw]);
-  const onMap = useMemo(() => new Map(systems.map((s) => [s.name.toLowerCase(), s.id])), [systems]);
+  const onMap = useMemo(() => new Map(systems.map((s) => [s.name.toLowerCase(), s])), [systems]);
+  const [menu, setMenu] = useState<{ x: number; y: number; sys: MapSystem } | null>(null);
 
   const isShown = (c: string) => !hidden.has(c.toLowerCase());
   const toggle = (c: string) => setHidden((prev) => {
@@ -40,12 +45,13 @@ export function IntelPane() {
   const renderText = (line: IntelLine): ReactNode[] =>
     line.text.split(/(\s+)/).map((part, i) => {
       const [, pre, core, post] = WORD.exec(part) ?? ['', '', part, ''];
-      const id = onMap.get(core.toLowerCase());
-      if (id) {
+      const sys = onMap.get(core.toLowerCase());
+      if (sys) {
         return (
           <span key={i}>{pre}
             <button type="button" className={`${styles.sys} ${styles.onMap}`}
-              onClick={() => selectSystem(id)}
+              onClick={() => selectSystem(sys.id)}
+              onContextMenu={(e) => { e.preventDefault(); setMenu({ x: e.clientX, y: e.clientY, sys }); }}
               data-tooltip={t('intelFeed.selectSystem', { system: core })}>{core}</button>{post}
           </span>
         );
@@ -98,6 +104,26 @@ export function IntelPane() {
           ))}
         </ul>
       )}
+      {menu && (() => {
+        // Autopilot only routes through k-space: a wormhole system can't be a
+        // destination or a waypoint.
+        const eveId = menu.sys.eveSystemId;
+        const ok = eveId != null && KSPACE_CLASSES.has(menu.sys.systemClass);
+        const why = ok ? undefined : t('route.jspaceNoWaypoint');
+        return (
+          <ContextMenu
+            x={menu.x}
+            y={menu.y}
+            items={[
+              { label: t('waypoint.setDestination'), icon: <MapPinSimpleIcon size={14} />, disabled: !ok, tooltip: why,
+                action: () => { if (eveId != null) setWaypoint(eveId, menu.sys.name, true); } },
+              { label: t('waypoint.addWaypoint'), icon: <PathIcon size={14} />, disabled: !ok, tooltip: why,
+                action: () => { if (eveId != null) setWaypoint(eveId, menu.sys.name, false); } },
+            ]}
+            onClose={() => setMenu(null)}
+          />
+        );
+      })()}
     </div>
   );
 }
