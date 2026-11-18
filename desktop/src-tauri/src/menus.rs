@@ -20,6 +20,9 @@ fn pending_update(app: &AppHandle) -> Option<String> {
     app.state::<AppState>().update_version.lock().unwrap().clone()
 }
 
+/// Items the Store build leaves out (see lib.rs, STORE).
+const STORE_HIDDEN: &[&str] = &["check_updates", "start_at_login"];
+
 /// The menu bar.
 pub fn build_bar(app: &AppHandle, s: &Settings) -> tauri::Result<Menu<Wry>> {
     let version = app.package_info().version.to_string();
@@ -41,6 +44,13 @@ pub fn build_bar(app: &AppHandle, s: &Settings) -> tauri::Result<Menu<Wry>> {
         &PredefinedMenuItem::separator(app)?,
         &MenuItem::with_id(app, "quit", tr("quit"), true, Some("CmdOrCtrl+Q"))?,
     ])?;
+    if crate::STORE {
+        for id in STORE_HIDDEN {
+            if let Some(item) = nexum.get(*id) {
+                let _ = nexum.remove(&item);
+            }
+        }
+    }
     if let Some(v) = pending_update(app) {
         nexum.insert_items(&[
             &MenuItem::with_id(app, "install_update", tr("installUpdate").replace("{v}", &v), true, None::<&str>)?,
@@ -113,6 +123,13 @@ pub fn build_tray(app: &AppHandle, s: &Settings) -> tauri::Result<Menu<Wry>> {
         &PredefinedMenuItem::separator(app)?,
         &MenuItem::with_id(app, "quit", tr("quit"), true, None::<&str>)?,
     ])?;
+    if crate::STORE {
+        for id in STORE_HIDDEN {
+            if let Some(item) = menu.get(*id) {
+                let _ = menu.remove(&item);
+            }
+        }
+    }
     if let Some(v) = pending_update(app) {
         menu.insert_items(&[
             &MenuItem::with_id(app, "install_update", tr("installUpdate").replace("{v}", &v), true, None::<&str>)?,

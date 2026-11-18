@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { alertGain } from '../utils/notificationPrefs';
+import { isDesktop } from '../desktop/bridge';
 
 // In-browser voice announcer (Kokoro-82M via kokoro-js + ONNX). The model and all
 // generation run in a Web Worker (ttsWorker.ts) so multi-second WASM/CPU inference
@@ -201,7 +202,10 @@ export const useAnnouncer = create<AnnouncerState>((set, get) => ({
     if (loadPromise) return loadPromise;
     set({ status: 'loading', progress: 0, error: null });
     loadPromise = new Promise<void>((resolve, reject) => { loadResolve = resolve; loadReject = reject; });
-    getWorker().postMessage({ type: 'load' });
+    // The Linux desktop app's web view (WebKitGTK) loads the voice but then
+    // never finishes the multi-threaded first run: use one thread there.
+    const singleThread = isDesktop() && /Linux/i.test(navigator.userAgent);
+    getWorker().postMessage({ type: 'load', singleThread });
     return loadPromise;
   },
 

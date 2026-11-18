@@ -66,8 +66,15 @@ Recorded so we come back to them:
   lines only. Still to check against real EVE logs: non-English clients'
   wording, several clients running at once, and Linux (Wine/Proton) paths.
 - **Distribution**: a download page / link on the site, and patch notes.
-- **Release**: the web side (bridge, lookup endpoint) must be on the live
-  site before the app is useful against eve-nexum.com.
+- **Linux, untested on a real install**: CI builds an AppImage, .deb and
+  .rpm. EVE runs under Proton/Wine there, so the log folder is looked for in
+  Steam's compatdata/8500 prefix (every Steam library), ~/.wine and
+  ~/Games/* (Lutris), then ~/Documents. Under Wayland the app runs through
+  XWayland (GDK_BACKEND=x11) so always-on-top and the global shortcut work;
+  NEXUM_WAYLAND=1 keeps native Wayland. GTK overlay scrollbars are turned
+  off (they covered the sidebar's switches). Known limits: no tray where the desktop has none (GNOME without an
+  extension), and no spoken intel where WebKitGTK has no speech (the
+  option is hidden then).
 
 ## Build
 
