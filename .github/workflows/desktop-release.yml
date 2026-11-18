@@ -35,6 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.v.outputs.version }}
+      release_id: ${{ steps.draft.outputs.id }}
     steps:
       - uses: actions/checkout@v4
       - id: v
@@ -48,6 +49,24 @@ jobs:
             exit 1
           fi
           echo "version=$version" >> "$GITHUB_OUTPUT"
+      # The draft release the builds upload to, made here (on the release
+      # repo's own main: it has none of this repo's commits). A re-run reuses
+      # it.
+      - id: draft
+        env:
+          GH_TOKEN: ${{ secrets.NEXUM_DESKTOP_TOKEN }}
+          VERSION: ${{ steps.v.outputs.version }}
+        run: |
+          repo="$RELEASE_OWNER/$RELEASE_REPO"
+          id=$(gh api "repos/$repo/releases" --jq ".[] | select(.tag_name == \"v$VERSION\") | .id" | head -1)
+          if [ -z "$id" ]; then
+            id=$(gh api -X POST "repos/$repo/releases" \
+              -f tag_name="v$VERSION" -f target_commitish=main \
+              -f name="Nexum desktop $VERSION" -F draft=true \
+              -f body="Windows: the .exe (setup). macOS: the .dmg. Linux: the .AppImage, .deb or .rpm." \
+              --jq .id)
+          fi
+          echo "id=$id" >> "$GITHUB_OUTPUT"
 
   build:
     needs: check
@@ -92,14 +111,7 @@ jobs:
           projectPath: desktop
           owner: ${{ env.RELEASE_OWNER }}
           repo: ${{ env.RELEASE_REPO }}
-          tagName: v${{ needs.check.outputs.version }}
-          # The tag goes on the release repo's own branch (it has none of
-          # this repo's commits).
-          commitish: main
-          releaseName: Nexum desktop ${{ needs.check.outputs.version }}
-          releaseBody: See the assets below. Windows - the .exe (setup); macOS - the .dmg; Linux - the .AppImage, .deb or .rpm.
-          releaseDraft: true
-          prerelease: false
+          releaseId: ${{ needs.check.outputs.release_id }}
           includeUpdaterJson: true
           args: ${{ matrix.args }}
 
@@ -111,6 +123,7 @@ jobs:
     steps:
       - env:
           GH_TOKEN: ${{ secrets.NEXUM_DESKTOP_TOKEN }}
-          TAG: v${{ needs.check.outputs.version }}
+          ID: ${{ needs.check.outputs.release_id }}
         run: |
-          gh release edit "$TAG" --repo "$RELEASE_OWNER/$RELEASE_REPO" --draft=false --latest
+          gh api -X PATCH "repos/$RELEASE_OWNER/$RELEASE_REPO/releases/$ID" \
+            -F draft=false -f make_latest=true --jq '.html_url'
