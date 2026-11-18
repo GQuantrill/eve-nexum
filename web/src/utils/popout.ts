@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from 'react';
-import { desktopInvoke, isDesktop } from '../desktop/bridge';
+import { desktopInvoke, isDesktop, onDesktopEvent } from '../desktop/bridge';
 
 // Pop-out panes: a sidebar pane opened in a window of its own (another
 // monitor, beside the game). The window loads this same app with ?popout=<id>
@@ -55,6 +55,36 @@ export function usePoppedOut(): string[] {
   );
 }
 
+// Browser popups this window opened, so "Bring back" can close them itself
+// and a popup closed any way at all (even one whose page never loaded) gives
+// its pane back.
+const popups = new Map<string, Window>();
+let watch: ReturnType<typeof setInterval> | null = null;
+function watchPopups(): void {
+  if (watch) return;
+  watch = setInterval(() => {
+    for (const [id, w] of popups) {
+      if (w.closed) {
+        popups.delete(id);
+        if (current.includes(id)) write(current.filter((x) => x !== id));
+      }
+    }
+    if (popups.size === 0 && watch) { clearInterval(watch); watch = null; }
+  }, 1000);
+}
+
+/** In the main window: give the pane back when the app says its pop-out
+ *  window closed (however it closed). */
+export function startPopoutHost(): () => void {
+  if (POPOUT_PANE) return () => {};
+  // The app's pop-out windows close with it, so a fresh start has none: drop
+  // any left listed (a crash, or the app quit with panes out).
+  if (isDesktop() && current.length) write([]);
+  return onDesktopEvent<string>('nexum://popout-closed', (id) => {
+    if (current.includes(id)) write(current.filter((x) => x !== id));
+  });
+}
+
 /** Open a pane in its own window. */
 export function popOut(id: string, title: string): void {
   const url = new URL(window.location.href);
@@ -66,13 +96,19 @@ export function popOut(id: string, title: string): void {
     return;
   }
   const w = window.open(url.toString(), `nexum-popout-${id}`, 'popup,width=420,height=680');
-  if (w && !current.includes(id)) write([...current, id]);
+  if (!w) return;
+  popups.set(id, w);
+  watchPopups();
+  if (!current.includes(id)) write([...current, id]);
 }
 
 /** Put a pane back in the sidebar (and close its window). */
 export function bringBack(id: string): void {
   write(current.filter((x) => x !== id));
   if (isDesktop()) void desktopInvoke('close_popout', { pane: id }).catch(() => {});
+  const w = popups.get(id);
+  popups.delete(id);
+  try { w?.close(); } catch { /* already gone */ }
 }
 
 /** In a pop-out window: when its pane is brought back from the main window,

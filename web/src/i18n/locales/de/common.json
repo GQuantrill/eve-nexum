@@ -1699,7 +1699,7 @@
     "desktopOut": "Jetzt verfügbar",
     "desktopDownloadLink": "Herunterladen",
     "desktopMacNote": "macOS: Die App ist noch nicht signiert. Führe nach der Installation einmal im Terminal aus:",
-    "desktopAllDownloads": "Alle Downloads (.msi, .deb, .rpm) und Versionshinweise"
+    "desktopAllDownloads": "Alle Downloads (.deb, .rpm) und Versionshinweise"
   },
   "language": {
     "label": "Sprache"

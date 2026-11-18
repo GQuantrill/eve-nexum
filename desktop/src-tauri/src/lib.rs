@@ -91,8 +91,12 @@ pub(crate) fn emit_to_site_windows<S: serde::Serialize + Clone>(app: &AppHandle,
 /// From the Nexum page: open a sidebar pane in a window of its own. The
 /// address must be this server's (with ?popout=<pane>); the window gets the
 /// same rules as the main one.
+///
+/// Async on purpose, like every command here that makes a window: on Windows
+/// a window built inside a synchronous command deadlocks (a blank window that
+/// won't respond or close; Tauri docs, wry#583).
 #[tauri::command]
-fn open_popout(app: AppHandle, pane: String, title: String, url: String) -> Result<(), String> {
+async fn open_popout(app: AppHandle, pane: String, title: String, url: String) -> Result<(), String> {
     if pane.is_empty() || pane.len() > 32 || !pane.chars().all(|c| c.is_ascii_alphabetic()) {
         return Err("bad pane".into());
     }
@@ -125,13 +129,22 @@ fn open_popout(app: AppHandle, pane: String, title: String, url: String) -> Resu
             false
         })
         .build()
-        .map(|_| ())
+        .map(|w| {
+            // However it closes (its X, a crash), give the pane back to the
+            // sidebar: the page in it may not get the chance to say so.
+            let closed_app = app.clone();
+            w.on_window_event(move |e| {
+                if matches!(e, tauri::WindowEvent::Destroyed) {
+                    let _ = closed_app.emit_to("main", "nexum://popout-closed", pane.clone());
+                }
+            });
+        })
         .map_err(|e| e.to_string())
 }
 
 /// Close a pane's pop-out window (it was brought back to the sidebar).
 #[tauri::command]
-fn close_popout(app: AppHandle, pane: String) {
+async fn close_popout(app: AppHandle, pane: String) {
     if let Some(w) = app.get_webview_window(&format!("{POPOUT_PREFIX}{pane}")) {
         let _ = w.destroy();
     }
@@ -139,7 +152,7 @@ fn close_popout(app: AppHandle, pane: String) {
 
 /// Open the app's settings window (the intel feed's "Intel settings").
 #[tauri::command]
-fn open_settings_window(app: AppHandle) {
+async fn open_settings_window(app: AppHandle) {
     open_settings(&app);
 }
 

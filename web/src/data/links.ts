@@ -15,6 +15,6 @@ export const DESKTOP_DOWNLOADS = {
   windows: `${DESKTOP_LATEST}/download/Nexum-Windows-setup.exe`,
   macos: `${DESKTOP_LATEST}/download/Nexum-macOS.dmg`,
   linux: `${DESKTOP_LATEST}/download/Nexum-Linux.AppImage`,
-  /** Every file (.msi, .deb, .rpm) and the release notes. */
+  /** Every file (.deb, .rpm) and the release notes. */
   all: DESKTOP_LATEST,
 };

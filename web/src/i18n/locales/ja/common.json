@@ -1699,7 +1699,7 @@
     "desktopOut": "提供開始",
     "desktopDownloadLink": "ダウンロード",
     "desktopMacNote": "macOS：アプリはまだ署名されていないため、インストール後にターミナルで一度実行してください：",
-    "desktopAllDownloads": "すべてのダウンロード（.msi、.deb、.rpm）とリリースノート"
+    "desktopAllDownloads": "すべてのダウンロード（.deb、.rpm）とリリースノート"
   },
   "language": {
     "label": "言語"

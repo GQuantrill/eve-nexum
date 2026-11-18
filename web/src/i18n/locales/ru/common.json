@@ -1709,7 +1709,7 @@
     "desktopOut": "Уже доступно",
     "desktopDownloadLink": "Скачать",
     "desktopMacNote": "macOS: приложение пока не подписано, поэтому после установки один раз выполните в Терминале:",
-    "desktopAllDownloads": "Все загрузки (.msi, .deb, .rpm) и примечания к выпуску"
+    "desktopAllDownloads": "Все загрузки (.deb, .rpm) и примечания к выпуску"
   },
   "language": {
     "label": "Язык"

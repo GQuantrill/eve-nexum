@@ -1699,7 +1699,7 @@
     "desktopOut": "Out now",
     "desktopDownloadLink": "Download",
     "desktopMacNote": "macOS: the app isn't signed yet, so after installing it, run this once in Terminal:",
-    "desktopAllDownloads": "All downloads (.msi, .deb, .rpm) and release notes"
+    "desktopAllDownloads": "All downloads (.deb, .rpm) and release notes"
   },
   "language": {
     "label": "Language"

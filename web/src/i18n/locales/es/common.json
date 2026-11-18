@@ -1699,7 +1699,7 @@
     "desktopOut": "Ya disponible",
     "desktopDownloadLink": "Descargar",
     "desktopMacNote": "macOS: la aplicación aún no está firmada; tras instalarla, ejecuta esto una vez en Terminal:",
-    "desktopAllDownloads": "Todas las descargas (.msi, .deb, .rpm) y notas de versión"
+    "desktopAllDownloads": "Todas las descargas (.deb, .rpm) y notas de versión"
   },
   "language": {
     "label": "Idioma"

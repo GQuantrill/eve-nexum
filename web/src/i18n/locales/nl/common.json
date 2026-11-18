@@ -1699,7 +1699,7 @@
     "desktopOut": "Nu beschikbaar",
     "desktopDownloadLink": "Downloaden",
     "desktopMacNote": "macOS: de app is nog niet ondertekend, dus voer na installatie één keer dit uit in Terminal:",
-    "desktopAllDownloads": "Alle downloads (.msi, .deb, .rpm) en release-opmerkingen"
+    "desktopAllDownloads": "Alle downloads (.deb, .rpm) en release-opmerkingen"
   },
   "language": {
     "label": "Taal"

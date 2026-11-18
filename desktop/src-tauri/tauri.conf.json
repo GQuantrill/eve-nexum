@@ -15,7 +15,14 @@
   },
   "bundle": {
     "active": true,
-    "targets": "all",
+    "targets": [
+      "nsis",
+      "appimage",
+      "deb",
+      "rpm",
+      "app",
+      "dmg"
+    ],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
@@ -23,7 +30,27 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "createUpdaterArtifacts": true
+    "createUpdaterArtifacts": true,
+    "windows": {
+      "nsis": {
+        "installerIcon": "icons/icon.ico",
+        "headerImage": "installer/header.bmp",
+        "sidebarImage": "installer/sidebar.bmp",
+        "languages": [
+          "English",
+          "German",
+          "Dutch",
+          "French",
+          "Spanish",
+          "Portuguese",
+          "SimpChinese",
+          "Korean",
+          "Japanese",
+          "Russian"
+        ],
+        "displayLanguageSelector": true
+      }
+    }
   },
   "plugins": {
     "updater": {

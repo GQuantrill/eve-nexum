@@ -1699,7 +1699,7 @@
     "desktopOut": "지금 이용 가능",
     "desktopDownloadLink": "다운로드",
     "desktopMacNote": "macOS: 앱이 아직 서명되지 않았으므로 설치 후 터미널에서 한 번 실행하세요:",
-    "desktopAllDownloads": "모든 다운로드(.msi, .deb, .rpm)와 릴리스 노트"
+    "desktopAllDownloads": "모든 다운로드(.deb, .rpm)와 릴리스 노트"
   },
   "language": {
     "label": "언어"

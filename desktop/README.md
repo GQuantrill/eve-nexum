@@ -87,6 +87,12 @@ Recorded so we come back to them:
 ask to confirm opening it, Windows SmartScreen will warn. Signing and CI
 builds come later.
 
+Windows gets one installer, the setup .exe (NSIS, no .msi). It is branded
+with `src-tauri/installer/sidebar.bmp` (164x314, welcome and finish pages)
+and `header.bmp` (150x57, the other pages), and asks for its language
+(the site's 10). Both images are drawn from `icons/icon.png` in the site's
+colours; redraw them at exactly those sizes as 24-bit BMP if the logo changes.
+
 ## Updates
 
 Releases live in their own repository, **GQuantrill/nexum-desktop**, so they
