@@ -7,7 +7,7 @@ name: Desktop build
 on:
   workflow_dispatch:
   push:
-    branches: [desktop-app]
+    branches: [desktop-app, qa-desktop]
     paths: ['desktop/**', '.github/workflows/desktop-build.yml']
 
 permissions:
