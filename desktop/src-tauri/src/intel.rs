@@ -37,6 +37,9 @@ pub struct IntelLine {
     pub speak_volume: u32,
     pub speak_rate: String,
     pub speak_voice: Option<String>,
+    /// Sound and voice only for reports within this many jumps of the pilot;
+    /// None = for any system on the map (desktop settings).
+    pub alert_range: Option<u32>,
 }
 
 /// The pilot's intel options, stamped on every line sent to the window.
@@ -49,6 +52,7 @@ struct LineOptions {
     speak_volume: u32,
     speak_rate: String,
     speak_voice: Option<String>,
+    alert_range: Option<u32>,
 }
 
 impl LineOptions {
@@ -61,6 +65,7 @@ impl LineOptions {
             speak_volume: self.speak_volume,
             speak_rate: self.speak_rate.clone(),
             speak_voice: self.speak_voice.clone(),
+            alert_range: self.alert_range,
             ..l
         }
     }
@@ -105,6 +110,7 @@ pub fn start(app: AppHandle) {
                     speak_volume: s.intel_speak_volume,
                     speak_rate: s.intel_speak_rate.clone(),
                     speak_voice: s.intel_speak_voice.clone(),
+                    alert_range: s.intel_alert_range,
                 })
             };
             followed.retain(|k, _| channels.iter().any(|c| c.eq_ignore_ascii_case(k)));
@@ -253,6 +259,7 @@ fn parse_lines(channel: &str, text: &str) -> Vec<IntelLine> {
                 speak_volume: 100,
                 speak_rate: "normal".to_string(),
                 speak_voice: None,
+                alert_range: None,
             })
         })
         .collect()

@@ -2559,6 +2559,7 @@
       "intelHere": "Gemeld in jouw systeem: {{system}}",
       "intelNear_one": "{{system}}: {{count}} sprong van je",
       "intelNear_other": "{{system}}: {{count}} sprongen van je",
+      "intelSpeakReported": "{{system}}, gemeld",
       "intelSpeakHere": "{{system}}, in jouw systeem",
       "intelSpeak_one": "{{system}}, {{count}} sprong",
       "intelSpeak_other": "{{system}}, {{count}} sprongen"

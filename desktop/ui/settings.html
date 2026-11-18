@@ -37,6 +37,16 @@
       <button type="button" id="intelAdd" data-t="intelAdd"></button>
     </div>
     <label class="check"><input id="intelSound" type="checkbox"> <span data-t="intelSound"></span></label>
+    <div class="row range">
+      <span data-t="alertRange"></span>
+      <select id="alertRangeMode">
+        <option value="map" data-t="alertRangeMap"></option>
+        <option value="jumps" data-t="alertRangeJumps"></option>
+      </select>
+      <input id="alertRangeJumps" type="number" min="0" max="50" step="1" inputmode="numeric">
+      <span id="alertRangeUnit" data-t="alertRangeUnit"></span>
+    </div>
+    <small class="under" data-t="alertRangeHint"></small>
     <label class="check"><input id="intelSpeak" type="checkbox"> <span data-t="intelSpeak"></span></label>
     <small class="under" data-t="intelSpeakHint"></small>
     <div class="speech" id="speech">

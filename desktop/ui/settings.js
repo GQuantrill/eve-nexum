@@ -27,6 +27,16 @@ async function strings() {
   }
   $('chatlogDir').value = s.chatlogDir || '';
   $('intelSound').checked = s.intelSound;
+  // Intel sound and voice: for anything on the map, or within N jumps.
+  const showRange = () => {
+    const jumps = $('alertRangeMode').value === 'jumps';
+    $('alertRangeJumps').style.display = jumps ? '' : 'none';
+    $('alertRangeUnit').style.display = jumps ? '' : 'none';
+  };
+  $('alertRangeMode').value = s.intelAlertRange == null ? 'map' : 'jumps';
+  $('alertRangeJumps').value = String(s.intelAlertRange ?? 5);
+  $('alertRangeMode').addEventListener('change', showRange);
+  showRange();
   $('intelSpeak').checked = s.intelSpeak;
 
   // Speech: volume, voice (the voices installed on this computer), speed,
@@ -138,6 +148,9 @@ async function strings() {
         chatlogDir: $('chatlogDir').value.trim() || null,
         intelChannels: channels,
         intelSound: $('intelSound').checked,
+        intelAlertRange: $('alertRangeMode').value === 'jumps'
+          ? Math.min(50, Math.max(0, Math.round(Number($('alertRangeJumps').value) || 0)))
+          : null,
         intelSpeak: $('intelSpeak').checked,
         intelSpeakVolume: Number($('speakVolume').value),
         intelSpeakRate: $('speakRate').value,

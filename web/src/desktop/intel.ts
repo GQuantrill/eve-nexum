@@ -24,6 +24,9 @@ export interface IntelLine {
   pulseSecs?: number; pulse?: IntelPulse; speak?: boolean;
   /** How to speak it: volume 0-100, slow/normal/fast, a voice id. */
   speakVolume?: number; speakRate?: string; speakVoice?: string | null;
+  /** Sound and voice only within this many jumps of the pilot; null (or an
+   *  older app that doesn't send it) = for any system on the open map. */
+  alertRange?: number | null;
 }
 
 /** How a report is read aloud (the pilot's desktop settings). */
@@ -68,7 +71,7 @@ export function systemsNamed(text: string, systems: { id: string; name: string }
 
 // ── Sound ───────────────────────────────────────────────────────────────────
 let audioCtx: AudioContext | null = null;
-function playAlert(): void {
+export function playAlert(): void {
   try {
     if (!audioCtx) audioCtx = new AudioContext();
     const ctx = audioCtx;
@@ -104,6 +107,13 @@ export interface IntelReport {
   /** Read it aloud when it's within range, and how (desktop settings);
    *  null when not. */
   speech: IntelSpeech | null;
+  /** Whether the pilot wants a sound for intel. */
+  sound: boolean;
+  /** Sound and voice only within this many jumps; null = for any system on
+   *  the open map (see onMap). */
+  range: number | null;
+  /** The system is on the open map. */
+  onMap: boolean;
 }
 
 let reports = new Map<number, IntelReport>();
@@ -154,6 +164,7 @@ async function flush(): Promise<void> {
     } catch { /* rate-limited or offline: try these words again next time */ }
   }
   const next = new Map(reports);
+  const onMap = new Set(useMapStore.getState().map.systems.map((s) => s.name.toLowerCase()));
   for (const { line } of items.filter((q) => q.report)) {
     const clear = CLEAR.test(line.text);
     for (const n of candidateNames(line.text)) {
@@ -166,6 +177,9 @@ async function flush(): Promise<void> {
         speech: line.speak
           ? { volume: line.speakVolume ?? 100, rate: line.speakRate ?? 'normal', voice: line.speakVoice ?? null }
           : null,
+        sound: line.sound,
+        range: typeof line.alertRange === 'number' ? line.alertRange : null,
+        onMap: onMap.has(sys.name.toLowerCase()),
       });
     }
   }
@@ -253,7 +267,9 @@ export function startIntel(): () => void {
     const level = PULSES.includes(line.pulse as IntelPulse) ? line.pulse! : 'normal';
     const secs = SECONDS.includes(line.pulseSecs ?? 0) ? line.pulseSecs! : 5;
     if (level !== 'off') ids.forEach((id) => pulse(id, secs * 1000, level));
-    if (line.sound) playAlert();
+    // With a jump range set, the proximity alerts play it once the distance
+    // is known (hooks/useProximityAlerts).
+    if (line.sound && typeof line.alertRange !== 'number') playAlert();
   });
   return () => { off(); offChannels(); clearInterval(expiry); };
 }

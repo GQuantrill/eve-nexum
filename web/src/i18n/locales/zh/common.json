@@ -2557,6 +2557,7 @@
       "intelHere": "你所在星系有报告：{{system}}",
       "intelNear_one": "{{system}}：距你 {{count}} 跳",
       "intelNear_other": "{{system}}：距你 {{count}} 跳",
+      "intelSpeakReported": "{{system}}，有情报",
       "intelSpeakHere": "{{system}}，就在你所在星系",
       "intelSpeak_one": "{{system}}，{{count}} 跳",
       "intelSpeak_other": "{{system}}，{{count}} 跳"

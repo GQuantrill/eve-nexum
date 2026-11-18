@@ -2559,6 +2559,7 @@
       "intelHere": "Signalée dans votre système : {{system}}",
       "intelNear_one": "{{system}} : à {{count}} saut de vous",
       "intelNear_other": "{{system}} : à {{count}} sauts de vous",
+      "intelSpeakReported": "{{system}}, signalé",
       "intelSpeakHere": "{{system}}, dans votre système",
       "intelSpeak_one": "{{system}}, {{count}} saut",
       "intelSpeak_other": "{{system}}, {{count}} sauts"

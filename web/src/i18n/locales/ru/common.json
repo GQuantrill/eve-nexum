@@ -2603,6 +2603,7 @@
       "intelNear_few": "{{system}}: {{count}} прыжка от вас",
       "intelNear_many": "{{system}}: {{count}} прыжков от вас",
       "intelNear_other": "{{system}}: {{count}} прыжка от вас",
+      "intelSpeakReported": "{{system}}, есть доклад",
       "intelSpeakHere": "{{system}}, в вашей системе",
       "intelSpeak_one": "{{system}}, {{count}} прыжок",
       "intelSpeak_few": "{{system}}, {{count}} прыжка",

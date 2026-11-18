@@ -45,6 +45,9 @@ pub struct Settings {
     /// The voice to use (its id on this computer); None = the default voice
     /// for the site's language.
     pub intel_speak_voice: Option<String>,
+    /// Intel sound and voice only within this many jumps of the pilot;
+    /// None = for any system on the map.
+    pub intel_alert_range: Option<u32>,
     /// Page zoom of the Nexum window (View > Zoom), 1.0 = 100%.
     pub zoom: f64,
 }
@@ -66,6 +69,7 @@ impl Default for Settings {
             intel_speak_volume: 100,
             intel_speak_rate: "normal".to_string(),
             intel_speak_voice: None,
+            intel_alert_range: None,
             zoom: 1.0,
         }
     }
@@ -128,7 +132,11 @@ pub fn normalise_pulse(s: &mut Settings) {
     if s.intel_speak_voice.as_deref().is_some_and(|v| v.trim().is_empty() || v.len() > 300) {
         s.intel_speak_voice = None;
     }
+    s.intel_alert_range = s.intel_alert_range.map(|n| n.min(MAX_ALERT_RANGE));
 }
+
+/// The largest intel alert range offered, in jumps.
+pub const MAX_ALERT_RANGE: u32 = 50;
 
 /// The server as a bare origin ("https://host[:port]"), or None when it isn't
 /// one we'll open: https anywhere, or plain http only on this machine (for
