@@ -9,6 +9,7 @@
 
 mod eve_logs;
 mod intel;
+mod menus;
 mod scan_clip;
 mod settings;
 mod updater;
@@ -16,7 +17,6 @@ mod updater;
 use settings::Settings;
 use std::sync::Mutex;
 use tauri::ipc::CapabilityBuilder;
-use tauri::menu::{CheckMenuItem, Menu, MenuItem, PredefinedMenuItem};
 use tauri::tray::TrayIconBuilder;
 use tauri::{AppHandle, Manager, WebviewUrl, WebviewWindowBuilder};
 use tauri_plugin_global_shortcut::{GlobalShortcutExt, ShortcutState};
@@ -69,7 +69,7 @@ fn default_chatlog_dir() -> Option<String> {
 fn save_settings(app: AppHandle, state: tauri::State<AppState>, settings: Settings) -> Result<(), String> {
     let server = settings::normalise_server(&settings.server_url)
         .ok_or("The server must be an https:// address (or http://localhost).")?;
-    let next = Settings {
+    let mut next = Settings {
         server_url: server,
         chatlog_dir: settings.chatlog_dir.filter(|d| !d.trim().is_empty()),
         intel_channels: {
@@ -83,6 +83,8 @@ fn save_settings(app: AppHandle, state: tauri::State<AppState>, settings: Settin
     };
     let server_changed = {
         let mut cur = state.settings.lock().unwrap();
+        // Not on the settings form: kept as it is.
+        next.zoom = cur.zoom;
         let changed = cur.server_url != next.server_url;
         *cur = next.clone();
         changed
@@ -101,10 +103,12 @@ fn save_settings(app: AppHandle, state: tauri::State<AppState>, settings: Settin
 fn apply(app: &AppHandle, s: &Settings) {
     if let Some(w) = app.get_webview_window("main") {
         let _ = w.set_always_on_top(s.always_on_top);
+        let _ = w.set_zoom(s.zoom);
     }
     if let Some(tray) = app.tray_by_id("main") {
-        let _ = tray.set_menu(build_menu(app, s).ok());
+        let _ = tray.set_menu(menus::build_tray(app, s).ok());
     }
+    menus::install_bar(app, s);
 }
 
 /// Rebuild the tray menu from the current state (after an update is found).
@@ -113,7 +117,7 @@ pub(crate) fn refresh_menu(app: &AppHandle) {
     apply(app, &s);
 }
 
-fn update(app: &AppHandle, change: impl FnOnce(&mut Settings)) {
+pub(crate) fn update(app: &AppHandle, change: impl FnOnce(&mut Settings)) {
     let state = app.state::<AppState>();
     let next = {
         let mut s = state.settings.lock().unwrap();
@@ -126,7 +130,7 @@ fn update(app: &AppHandle, change: impl FnOnce(&mut Settings)) {
 
 // ── Windows ───────────────────────────────────────────────────────────────
 
-fn show_main(app: &AppHandle) {
+pub(crate) fn show_main(app: &AppHandle) {
     if let Some(w) = app.get_webview_window("main") {
         let _ = w.unminimize();
         let _ = w.show();
@@ -146,7 +150,7 @@ fn toggle_main(app: &AppHandle) {
     }
 }
 
-fn open_settings(app: &AppHandle) {
+pub(crate) fn open_settings(app: &AppHandle) {
     if let Some(w) = app.get_webview_window("settings") {
         let _ = w.set_focus();
         return;
@@ -186,34 +190,11 @@ pub(crate) fn tr(key: &str) -> String {
         .to_string()
 }
 
-fn build_menu(app: &AppHandle, s: &Settings) -> tauri::Result<Menu<tauri::Wry>> {
-    let pending = app.state::<AppState>().update_version.lock().unwrap().clone();
-    let menu = Menu::with_items(app, &[
-        &MenuItem::with_id(app, "show", tr("show"), true, None::<&str>)?,
-        &PredefinedMenuItem::separator(app)?,
-        &CheckMenuItem::with_id(app, "on_top", tr("onTop"), true, s.always_on_top, None::<&str>)?,
-        &CheckMenuItem::with_id(app, "logs", tr("logs"), true, s.read_logs, None::<&str>)?,
-        &CheckMenuItem::with_id(app, "clipboard", tr("clip"), true, s.watch_clipboard, None::<&str>)?,
-        &PredefinedMenuItem::separator(app)?,
-        &MenuItem::with_id(app, "settings", tr("settings"), true, None::<&str>)?,
-        &MenuItem::with_id(app, "reload", tr("reload"), true, None::<&str>)?,
-        &MenuItem::with_id(app, "check_updates", tr("checkUpdates"), true, None::<&str>)?,
-        &PredefinedMenuItem::separator(app)?,
-        &MenuItem::with_id(app, "quit", tr("quit"), true, None::<&str>)?,
-    ])?;
-    // A waiting update goes at the very top, where it's seen.
-    if let Some(v) = pending {
-        menu.insert_items(&[
-            &MenuItem::with_id(app, "install_update", tr("installUpdate").replace("{v}", &v), true, None::<&str>)?,
-            &PredefinedMenuItem::separator(app)?,
-        ], 0)?;
-    }
-    Ok(menu)
-}
-
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        // Menu bar and tray items both land here (menus.rs).
+        .on_menu_event(|app, event| menus::handle(app, event.id().as_ref()))
         // A second launch just brings the first window forward.
         .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| show_main(app)))
         .plugin(tauri_plugin_clipboard_manager::init())
@@ -260,31 +241,6 @@ pub fn run() {
                     .permission("allow-desktop-info"),
             )?;
 
-            // macOS: Settings in the app menu (Nexum > Settings..., Cmd+,),
-            // where Mac users look for it. The menu-bar icon can be hidden by
-            // the notch or a crowded menu bar, so it can't be the only way in.
-            #[cfg(target_os = "macos")]
-            {
-                let menu = Menu::default(&handle)?;
-                if let Some(app_menu) = menu.items()?.first().and_then(|i| i.as_submenu().cloned()) {
-                    app_menu.insert_items(&[
-                        &PredefinedMenuItem::separator(&handle)?,
-                        &MenuItem::with_id(&handle, "app_settings", tr("settings"), true, Some("CmdOrCtrl+,"))?,
-                        &MenuItem::with_id(&handle, "app_check_updates", tr("checkUpdates"), true, None::<&str>)?,
-                    ], 1)?;
-                }
-                app.set_menu(menu)?;
-                // Own ids: tray clicks reach this handler too.
-                app.on_menu_event(|app, event| match event.id().as_ref() {
-                    "app_settings" => open_settings(app),
-                    "app_check_updates" => {
-                        let app = app.clone();
-                        tauri::async_runtime::spawn(async move { updater::check(&app, true).await });
-                    }
-                    _ => {}
-                });
-            }
-
             let nav_server = server.clone();
             let nav_app = handle.clone();
             WebviewWindowBuilder::new(app, "main", WebviewUrl::External(server.clone()))
@@ -304,33 +260,12 @@ pub fn run() {
                     false
                 })
                 .build()?;
+            apply(&handle, &s);
 
             TrayIconBuilder::with_id("main")
                 .icon(app.default_window_icon().cloned().expect("app icon"))
                 .tooltip("Nexum")
-                .menu(&build_menu(&handle, &s)?)
-                .on_menu_event(|app, event| match event.id().as_ref() {
-                    "show" => show_main(app),
-                    "on_top" => update(app, |s| s.always_on_top = !s.always_on_top),
-                    "logs" => update(app, |s| s.read_logs = !s.read_logs),
-                    "clipboard" => update(app, |s| s.watch_clipboard = !s.watch_clipboard),
-                    "settings" => open_settings(app),
-                    "reload" => {
-                        if let Some(w) = app.get_webview_window("main") {
-                            let _ = w.eval("location.reload()");
-                        }
-                    }
-                    "check_updates" => {
-                        let app = app.clone();
-                        tauri::async_runtime::spawn(async move { updater::check(&app, true).await });
-                    }
-                    "install_update" => {
-                        let app = app.clone();
-                        tauri::async_runtime::spawn(async move { updater::install(&app).await });
-                    }
-                    "quit" => app.exit(0),
-                    _ => {}
-                })
+                .menu(&menus::build_tray(&handle, &s)?)
                 .build(app)?;
 
             // Taken by another app: carry on without it.

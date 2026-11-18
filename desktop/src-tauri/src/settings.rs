@@ -28,6 +28,8 @@ pub struct Settings {
     pub intel_channels: Vec<String>,
     /// Play a sound when an intel report names a system on the map.
     pub intel_sound: bool,
+    /// Page zoom of the Nexum window (View > Zoom), 1.0 = 100%.
+    pub zoom: f64,
 }
 
 impl Default for Settings {
@@ -40,6 +42,7 @@ impl Default for Settings {
             chatlog_dir: None,
             intel_channels: Vec::new(),
             intel_sound: true,
+            zoom: 1.0,
         }
     }
 }
