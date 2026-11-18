@@ -1,7 +1,10 @@
-// Probe-scanner paste. Only while the pilot has turned it on: the clipboard is
-// checked a few times a second, and when it holds probe-scanner results copied
-// in EVE (lines starting with a signature id like "ABC-123" then a tab) they go
-// to the Nexum window, which treats them as a paste onto the selected system.
+// Scan paste. Only while the pilot has turned it on: the clipboard is checked a
+// few times a second, and when it holds a scan copied in EVE it goes to the
+// Nexum window:
+// - probe-scanner results (lines starting with a signature id like "ABC-123"
+//   then a tab), which the window pastes onto the selected system;
+// - a directional scan (lines of type id, name, type, distance, tab-separated),
+//   which the window opens in its d-scan analyser.
 // Nothing else on the clipboard is ever sent anywhere.
 
 use regex::Regex;
@@ -16,6 +19,17 @@ use crate::AppState;
 #[derive(Clone, Serialize)]
 struct Scan {
     text: String,
+}
+
+/// A d-scan: most non-blank lines are "<type id>\t<name>\t<type>\t<distance>".
+/// (The same "mostly" rule the server's parser uses, so a stray line doesn't
+/// sink a good scan.)
+pub fn looks_like_dscan(text: &str) -> bool {
+    static RE: OnceLock<Regex> = OnceLock::new();
+    let re = RE.get_or_init(|| Regex::new(r"^\d{1,10}\t[^\t]*\t[^\t]*\t").unwrap());
+    let lines: Vec<&str> = text.lines().filter(|l| !l.trim().is_empty()).collect();
+    let hits = lines.iter().filter(|l| re.is_match(l)).count();
+    hits > 0 && hits * 2 >= lines.len()
 }
 
 pub fn looks_like_probe_scan(text: &str) -> bool {
@@ -45,6 +59,8 @@ pub fn start(app: AppHandle) {
             last = Some(text.clone());
             if looks_like_probe_scan(&text) {
                 let _ = app.emit_to("main", "nexum://scan", Scan { text });
+            } else if looks_like_dscan(&text) {
+                let _ = app.emit_to("main", "nexum://dscan", Scan { text });
             }
         }
     });
@@ -52,7 +68,17 @@ pub fn start(app: AppHandle) {
 
 #[cfg(test)]
 mod tests {
-    use super::looks_like_probe_scan;
+    use super::{looks_like_dscan, looks_like_probe_scan};
+
+    #[test]
+    fn dscans() {
+        let scan = "35833\tFortizar\tFortizar\t1,234 km\n670\tCapsule\tCapsule\t-\n";
+        assert!(looks_like_dscan(scan));
+        assert!(!looks_like_probe_scan(scan));
+        assert!(!looks_like_dscan("ABC-123\tCosmic Signature\tWormhole\tUnstable Wormhole\t100.0%\t4.21 AU"));
+        assert!(!looks_like_dscan("o7 fly safe\n12 jumps to Jita"));
+        assert!(!looks_like_dscan("2026\tbudget"));
+    }
 
     #[test]
     fn probe_scans_only() {

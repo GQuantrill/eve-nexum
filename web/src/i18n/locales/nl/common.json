@@ -1658,7 +1658,7 @@
     "desktopFeatures": {
       "logJumps": {
         "title": "Directe sprongvolging",
-        "desc": "Leest het Local-chatlog van EVE en verplaatst je op de kaart zodra je springt, seconden voordat ESI het meldt. ESI bevestigt nog steeds elke stap."
+        "desc": "Leest het Local-chatlog van EVE en verplaatst je op de kaart zodra je springt, seconden voordat ESI het meldt. ESI bevestigt nog steeds elke stap. Je andere ingelogde karakters bewegen op dezelfde manier."
       },
       "intelMap": {
         "title": "Intel op je kaart",
@@ -1673,8 +1673,8 @@
         "desc": "Intel binnen je nabijheidsbereik geeft een waarschuwing, kan worden voorgelezen en laat Nexum knipperen in de taakbalk terwijl je speelt. Een \"clr\" heft hem op."
       },
       "scanPaste": {
-        "title": "Probe-scans plakken",
-        "desc": "Kopieer probe-scannerresultaten in EVE en ze komen in het geselecteerde systeem, zonder alt-tab. Uit tot je het aanzet."
+        "title": "Scans plakken",
+        "desc": "Kopieer probe-scannerresultaten in EVE en ze komen in het geselecteerde systeem; kopieer een d-scan en hij opent in de analyse. Zonder alt-tab. Uit tot je het aanzet."
       },
       "onTop": {
         "title": "Altijd bovenop",

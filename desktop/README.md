@@ -5,8 +5,9 @@ browser can't do:
 
 | Feature | What it does |
 |---|---|
-| Jump tracking from EVE logs | Reads EVE's Local chat log and moves you on the map the moment you jump, seconds before ESI. ESI still confirms each move. On by default. |
-| Probe-scan paste | Probe-scanner results you copy in EVE paste themselves onto the selected system. Off by default (it reads the clipboard); only text that looks like probe-scanner results is ever sent to the page. |
+| Jump tracking from EVE logs | Reads EVE's Local chat log and moves you on the map the moment you jump, seconds before ESI. Your other logged-in characters (alts) move the same way. ESI still confirms each move. On by default. |
+| Scan paste | Probe-scanner results you copy in EVE paste themselves onto the selected system; a copied d-scan opens in the d-scan analyser, filled in (nothing is analysed or pinned until you say so). Off by default (it reads the clipboard); only text that looks like a probe scan or d-scan is ever sent to the page. |
+| Start at login | Optional: starts with Windows/macOS, hidden in the tray (the system runs it with `--minimised`). Also in the Nexum and tray menus. Off by default; the system's own setting is read at startup. |
 | Intel channels | Name the intel channels to follow (e.g. `my.intel`); the newest log of each is read. A line naming a system on your map (its full name, as EVE writes a dragged system) pulses it red (strength and 5-30 s duration in Settings), with a sound (on by default). "clr"/"clear" lines don't alert. A sidebar Intel feed shows all channels, with jumps from you. Intel within the proximity range raises "Threat reported" (optionally read aloud, taskbar flash). Words are sent to the server's system-name lookup only (not stored). |
 | Always on top | Keep Nexum above the EVE client. |
 | Tray + global shortcut | `Alt+Shift+N` shows or hides Nexum from anywhere. |
@@ -28,8 +29,10 @@ unchanged without the desktop app.
   other links open in the system browser.
 - Events: `nexum://intel` (intel-channel lines, `web/src/desktop/intel.ts`),
   `nexum://local` (system change from the Local log, handled in
-  `useCharacterLocation.ts`) and `nexum://scan` (probe-scan paste,
-  `web/src/desktop/scanPaste.ts`).
+  `useCharacterLocation.ts` for the acting character and
+  `useAccountLocations.ts` for alts), `nexum://scan` (probe-scan paste) and
+  `nexum://dscan` (d-scan, opens the analyser), both in
+  `web/src/desktop/scanPaste.ts`.
 - Log readings only change what that window shows. The server never trusts
   them: anything it decides (contributor adds included) still uses ESI.
 
@@ -62,8 +65,6 @@ Recorded so we come back to them:
 - **Real-log testing**: the Local-log parser is unit-tested against sample
   lines only. Still to check against real EVE logs: non-English clients'
   wording, several clients running at once, and Linux (Wine/Proton) paths.
-- **D-scan paste**: clipboard watching only forwards probe-scanner results;
-  directional scans are not picked up yet.
 - **Distribution**: a download page / link on the site, and patch notes.
 - **Release**: the web side (bridge, lookup endpoint) must be on the live
   site before the app is useful against eve-nexum.com.

@@ -22,12 +22,14 @@ const ERROR_KEYS = {
  * The paste box. Posts the raw text; the server works out whether it is a
  * d-scan or a local list and hands back the new scan's id.
  */
-export function DscanPaste({ attach, onCreated }: {
+export function DscanPaste({ attach, onCreated, initialText }: {
   attach?: ScanAttachTarget | null;
   onCreated: (id: string, pinned: boolean) => void;
+  /** Pre-filled scan (the desktop app's clipboard watcher). */
+  initialText?: string;
 }) {
   const { t } = useTranslation();
-  const [text, setText] = useState('');
+  const [text, setText] = useState(initialText ?? '');
   const [pin, setPin] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);

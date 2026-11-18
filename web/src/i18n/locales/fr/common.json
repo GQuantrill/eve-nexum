@@ -1658,7 +1658,7 @@
     "desktopFeatures": {
       "logJumps": {
         "title": "Suivi instantané des sauts",
-        "desc": "Lit le log du chat Local d'EVE et vous déplace sur la carte dès votre saut, quelques secondes avant ESI. ESI confirme toujours chaque déplacement."
+        "desc": "Lit le log du chat Local d'EVE et vous déplace sur la carte dès votre saut, quelques secondes avant ESI. ESI confirme toujours chaque déplacement. Vos autres personnages connectés se déplacent de la même façon."
       },
       "intelMap": {
         "title": "L'intel sur votre carte",
@@ -1673,8 +1673,8 @@
         "desc": "L'intel dans votre portée de proximité déclenche une alerte, peut être lue à voix haute et fait clignoter Nexum dans la barre des tâches pendant que vous jouez. Un « clr » l'annule."
       },
       "scanPaste": {
-        "title": "Collage des scans de sondes",
-        "desc": "Copiez les résultats du scanner de sondes dans EVE : ils arrivent dans le système sélectionné, sans alt-tab. Désactivé tant que vous ne l'activez pas."
+        "title": "Collage des scans",
+        "desc": "Copiez les résultats du scanner de sondes dans EVE : ils arrivent dans le système sélectionné ; copiez un d-scan et il s'ouvre dans l'analyseur. Sans alt-tab. Désactivé tant que vous ne l'activez pas."
       },
       "onTop": {
         "title": "Toujours au premier plan",

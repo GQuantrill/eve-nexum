@@ -1658,7 +1658,7 @@
     "desktopFeatures": {
       "logJumps": {
         "title": "Instant jump tracking",
-        "desc": "Reads EVE's Local chat log and moves you on the map the moment you jump, seconds before ESI reports it. ESI still confirms every move."
+        "desc": "Reads EVE's Local chat log and moves you on the map the moment you jump, seconds before ESI reports it. ESI still confirms every move. Your other logged-in characters move the same way."
       },
       "intelMap": {
         "title": "Intel on your map",
@@ -1673,8 +1673,8 @@
         "desc": "Intel within your proximity range raises an alert, can be read aloud, and flashes Nexum in the taskbar while you're in the game. A \"clr\" clears it."
       },
       "scanPaste": {
-        "title": "Probe scan paste",
-        "desc": "Copy probe-scanner results in EVE and they land on the selected system, no alt-tab needed. Off until you turn it on."
+        "title": "Scan paste",
+        "desc": "Copy probe-scanner results in EVE and they land on the selected system; copy a d-scan and it opens in the analyser. No alt-tab needed. Off until you turn it on."
       },
       "onTop": {
         "title": "Always on top",

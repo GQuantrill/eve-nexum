@@ -18,6 +18,7 @@ async function strings() {
   $('alwaysOnTop').checked = s.alwaysOnTop;
   $('readLogs').checked = s.readLogs;
   $('watchClipboard').checked = s.watchClipboard;
+  $('startAtLogin').checked = s.startAtLogin;
   $('chatlogDir').value = s.chatlogDir || '';
   $('intelSound').checked = s.intelSound;
   $('intelSpeak').checked = s.intelSpeak;
@@ -121,6 +122,7 @@ async function strings() {
         alwaysOnTop: $('alwaysOnTop').checked,
         readLogs: $('readLogs').checked,
         watchClipboard: $('watchClipboard').checked,
+        startAtLogin: $('startAtLogin').checked,
         chatlogDir: $('chatlogDir').value.trim() || null,
         intelChannels: channels,
         intelSound: $('intelSound').checked,

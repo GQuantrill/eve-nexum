@@ -231,7 +231,7 @@ const LOG_MAX_AGE_MS = 2 * 60_000;    // ignore log lines older than this
 let logReading: { charId: number; fromSystemId: number | null; at: number } | null = null;
 const systemByName = new Map<string, CharacterLocationSystem | null>();
 
-async function lookupSystem(name: string): Promise<CharacterLocationSystem | null> {
+export async function lookupSystem(name: string): Promise<CharacterLocationSystem | null> {
   const key = name.toLowerCase();
   if (systemByName.has(key)) return systemByName.get(key) ?? null;
   const sys = await api<CharacterLocationSystem>(`/api/systems/lookup?name=${encodeURIComponent(name)}`)

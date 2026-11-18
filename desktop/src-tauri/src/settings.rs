@@ -17,9 +17,13 @@ pub struct Settings {
     pub always_on_top: bool,
     /// Move you on the map from EVE's Local chat log, the moment you jump.
     pub read_logs: bool,
-    /// Paste probe-scanner results copied in EVE onto the selected system.
-    /// Off until the pilot turns it on: it reads the clipboard.
+    /// Paste probe-scanner results copied in EVE onto the selected system,
+    /// and open copied d-scans in the analyser. Off until the pilot turns it
+    /// on: it reads the clipboard.
     pub watch_clipboard: bool,
+    /// Start Nexum when the pilot logs in to Windows/macOS, hidden in the
+    /// tray. Mirrors the system's own setting, which is read at startup.
+    pub start_at_login: bool,
     /// Where EVE writes its chat logs, when not the usual Documents folder
     /// (for example a Linux install under Wine or Proton).
     pub chatlog_dir: Option<String>,
@@ -52,6 +56,7 @@ impl Default for Settings {
             always_on_top: false,
             read_logs: true,
             watch_clipboard: false,
+            start_at_login: false,
             chatlog_dir: None,
             intel_channels: Vec::new(),
             intel_sound: true,

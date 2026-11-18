@@ -19,6 +19,7 @@ use std::sync::Mutex;
 use tauri::ipc::CapabilityBuilder;
 use tauri::tray::TrayIconBuilder;
 use tauri::{AppHandle, Emitter, Manager, WebviewUrl, WebviewWindowBuilder};
+use tauri_plugin_autostart::{MacosLauncher, ManagerExt};
 use tauri_plugin_global_shortcut::{GlobalShortcutExt, ShortcutState};
 use tauri_plugin_notification::NotificationExt;
 use tauri_plugin_opener::OpenerExt;
@@ -35,6 +36,8 @@ pub struct AppState {
 
 /// Show/hide Nexum from anywhere, the EVE client included.
 const TOGGLE_SHORTCUT: &str = "Alt+Shift+N";
+/// Passed by the system when it starts Nexum at login: start hidden in the tray.
+const START_HIDDEN_ARG: &str = "--minimised";
 /// EVE's login. The only other site the window may navigate to.
 const EVE_SSO_HOST: &str = "login.eveonline.com";
 
@@ -109,15 +112,18 @@ fn save_settings(app: AppHandle, state: tauri::State<AppState>, settings: Settin
         },
         ..settings
     };
-    let server_changed = {
+    let (server_changed, login_changed) = {
         let mut cur = state.settings.lock().unwrap();
         // Not on the settings form: kept as it is.
         next.zoom = cur.zoom;
         settings::normalise_pulse(&mut next);
-        let changed = cur.server_url != next.server_url;
+        let changed = (cur.server_url != next.server_url, cur.start_at_login != next.start_at_login);
         *cur = next.clone();
         changed
     };
+    if login_changed {
+        set_start_at_login(&app, next.start_at_login);
+    }
     settings::save(&app, &next)?;
     apply(&app, &next);
     // The intel feed lists the channels: tell it they changed.
@@ -128,6 +134,17 @@ fn save_settings(app: AppHandle, state: tauri::State<AppState>, settings: Settin
         app.restart();
     }
     Ok(())
+}
+
+/// Register (or remove) Nexum with the system's login items. A failure leaves
+/// the setting showing what the system really does.
+pub(crate) fn set_start_at_login(app: &AppHandle, on: bool) {
+    let launcher = app.autolaunch();
+    let _ = if on { launcher.enable() } else { launcher.disable() };
+    let actual = launcher.is_enabled().unwrap_or(false);
+    if actual != on {
+        update(app, |s| s.start_at_login = actual);
+    }
 }
 
 /// Apply settings that take effect without a restart.
@@ -229,6 +246,8 @@ pub fn run() {
         // A second launch just brings the first window forward.
         .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| show_main(app)))
         .plugin(tauri_plugin_clipboard_manager::init())
+        // Start at login: the system runs Nexum with START_HIDDEN_ARG.
+        .plugin(tauri_plugin_autostart::init(MacosLauncher::LaunchAgent, Some(vec![START_HIDDEN_ARG])))
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
@@ -254,7 +273,13 @@ pub fn run() {
         ])
         .setup(|app| {
             let handle = app.handle().clone();
-            let s = settings::load(&handle);
+            let mut s = settings::load(&handle);
+            // The pilot may have changed it in the system's own settings since.
+            if let Ok(on) = handle.autolaunch().is_enabled() {
+                s.start_at_login = on;
+            }
+            // Started by the system at login: stay in the tray until wanted.
+            let start_hidden = std::env::args().any(|a| a == START_HIDDEN_ARG);
             app.manage(AppState {
                 settings: Mutex::new(s.clone()),
                 update_version: Mutex::new(None),
@@ -286,6 +311,7 @@ pub fn run() {
                 .inner_size(1440.0, 900.0)
                 .min_inner_size(900.0, 600.0)
                 .always_on_top(s.always_on_top)
+                .visible(!start_hidden)
                 .on_navigation(move |target| {
                     if allowed_in_window(target, &nav_server) {
                         return true;
