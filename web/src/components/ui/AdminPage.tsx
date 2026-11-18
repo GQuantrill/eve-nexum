@@ -25,6 +25,8 @@ import { Doughnut, Line } from 'react-chartjs-2';
 import { CaretUpIcon, CaretDownIcon, XIcon, ArrowSquareOutIcon } from '../../icons';
 import { createPortal } from 'react-dom';
 import styles from './AdminPage.module.css';
+import { useScopeHeld } from '../../hooks/useScopeHeld';
+import { promptForScope } from '../../utils/scopePrompt';
 
 // Register only the chart pieces we actually use — keeps the bundle lean.
 ChartJS.register(ArcElement, CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend, Filler);
@@ -197,6 +199,7 @@ const SEARCH_ENDPOINT: Record<GrantPickKind, string> = {
 function AccessTab() {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const orgStandingsHeld = useScopeHeld('orgStandings');
   // Alliance targets are offered in any restricted deployment now (a corp install
   // can admit an alliance, gated on the corp's own standing toward it).
   const allowAlliance = !!user?.corpMode || !!user?.allianceMode;
@@ -244,6 +247,9 @@ function AccessTab() {
   // token (one call does character + corp + alliance). The positive-standing
   // gate reads whichever bucket matches the install type, so we report on that.
   const syncStandings = async () => {
+    // The sync reads the corp/alliance contact lists with this admin's own
+    // token; without that access it can't, so offer to enable it instead.
+    if (!orgStandingsHeld) { promptForScope('orgStandings'); return; }
     setSyncing(true); setSyncResult(null);
     try {
       // scope:'org' — access control only ever uses corp/alliance standings, so

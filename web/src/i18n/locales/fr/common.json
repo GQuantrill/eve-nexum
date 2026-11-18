@@ -694,7 +694,7 @@
     "title": "Clones",
     "medical": "Clone médical",
     "jumpClone": "Clone de saut",
-    "none": "Aucun clone trouvé. Si cela reste vide, déconnecte-toi et reconnecte-toi pour accorder la permission clones.",
+    "none": "Aucun clone trouvé.",
     "unknownLocation": "Emplacement indisponible",
     "implants": "{{count}} implant",
     "implants_other": "{{count}} implants",
@@ -2432,8 +2432,8 @@
     "personal": "Personnel",
     "refreshStandings": "Actualiser les standings depuis l'ESI maintenant (contourne le TTL de 6 h)",
     "standingsRefreshed": "Standings actualisés — {{personal}} perso · {{corp}} corp · {{alliance}} contacts d'alliance",
-    "noContactsRefreshed": "Aucun contact n'a pu être actualisé. Le token n'a peut-être pas le scope read_contacts — déconnectez-vous et reconnectez-vous.",
-    "standingsNotLoaded": "Standings pas encore chargés. Si cela persiste, déconnectez-vous et reconnectez-vous pour accorder les scopes read_contacts.",
+    "noContactsRefreshed": "Aucun contact n'a pu être actualisé.",
+    "standingsNotLoaded": "Standings pas encore chargés.",
     "standingNotInBucket": "{{label}} : vous n'êtes dans aucun",
     "standingNotSet": "{{label}} : aucun standing défini",
     "standingValue": "{{label}} : {{value}}",
@@ -2761,7 +2761,7 @@
         "affects": "voir d'un coup d'œil si vous êtes en espace ami ou hostile, et l'accès par standing là où vos admins l'utilisent."
       },
       "citadels": {
-        "title": "Recherche de citadelles",
+        "title": "Structures Upwell",
         "desc": "Demande à EVE dans quel système se trouve une structure de joueur et quelle corpo la possède. EVE ne répond que pour les structures où votre personnage peut s'amarrer.",
         "affects": "le propriétaire des citadelles que vous ajoutez (et donc leur couleur de standing), et l'emplacement de vos clones lorsqu'ils sont dans une citadelle."
       },

@@ -1,4 +1,5 @@
 import { api } from '../api/client';
+import { isScopeMissing } from '../utils/scopePrompt';
 import { createPolledStore } from './createPolledStore';
 
 export interface CloneSystem {
@@ -23,6 +24,8 @@ export interface Clones {
   /** False when this deployment hasn't opted into the clones scope, so no token
    *  has it and there is nothing to read. Distinct from "granted but empty". */
   enabled:           boolean;
+  /** The deployment asks for clones, but this character hasn't allowed it. */
+  scopeMissing?:     boolean;
   lastCloneJumpDate: string | null;
   home:              CloneSystem | null;
   jumpClones:        JumpClone[];
@@ -37,7 +40,7 @@ const EMPTY: Clones = { enabled: false, lastCloneJumpDate: null, home: null, jum
 const POLL_MS = 5 * 60 * 1000;
 
 function same(a: Clones, b: Clones): boolean {
-  if (a.enabled !== b.enabled) return false;
+  if (a.enabled !== b.enabled || !!a.scopeMissing !== !!b.scopeMissing) return false;
   if (a.lastCloneJumpDate !== b.lastCloneJumpDate) return false;
   if ((a.home?.eveSystemId ?? null) !== (b.home?.eveSystemId ?? null)) return false;
   if (a.jumpClones.length !== b.jumpClones.length) return false;
@@ -50,10 +53,11 @@ const store = createPolledStore<Clones>({
   pollMs: POLL_MS,
   empty: EMPTY,
   equals: same,
-  // A 403 means the session predates the clones scope. Treated as "no data"
-  // rather than an error: the pane says so, and the clone-jump check simply
-  // falls back to not suppressing anything.
-  fetch: () => api<Clones>('/api/character/clones').catch(() => EMPTY),
+  // A 403 scope_missing means the deployment asks for clones but this
+  // character hasn't allowed it: the pane offers to enable it. Anything else is
+  // "no data", and the clone-jump check falls back to not suppressing anything.
+  fetch: () => api<Clones>('/api/character/clones').catch((err) =>
+    isScopeMissing(err) ? { ...EMPTY, enabled: true, scopeMissing: true } : EMPTY),
   crossTab: {
     key: 'clones',
     serialize: (v) => v,

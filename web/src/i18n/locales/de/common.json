@@ -694,7 +694,7 @@
     "title": "Klone",
     "medical": "Medizinischer Klon",
     "jumpClone": "Sprungklon",
-    "none": "Keine Klone gefunden. Bleibt das leer, melde dich ab und wieder an, um die Klon-Berechtigung zu erteilen.",
+    "none": "Keine Klone gefunden.",
     "unknownLocation": "Ort nicht verfügbar",
     "implants": "{{count}} Implantat",
     "implants_other": "{{count}} Implantate",
@@ -2432,8 +2432,8 @@
     "personal": "Persönlich",
     "refreshStandings": "Standings jetzt von ESI aktualisieren (umgeht die 6h-TTL)",
     "standingsRefreshed": "Standings aktualisiert — {{personal}} persönlich · {{corp}} Corp · {{alliance}} Allianz-Kontakte",
-    "noContactsRefreshed": "Es konnten keine Kontakte aktualisiert werden. Dem Token fehlt möglicherweise der read_contacts-Scope — melde dich ab und wieder an.",
-    "standingsNotLoaded": "Standings noch nicht geladen. Wenn dies bestehen bleibt, melde dich ab und wieder an, um die read_contacts-Scopes zu gewähren.",
+    "noContactsRefreshed": "Es konnten keine Kontakte aktualisiert werden.",
+    "standingsNotLoaded": "Standings noch nicht geladen.",
     "standingNotInBucket": "{{label}}: du bist in keiner",
     "standingNotSet": "{{label}}: kein Standing gesetzt",
     "standingValue": "{{label}}: {{value}}",
@@ -2761,7 +2761,7 @@
         "affects": "den schnellen Blick, ob du in freundlichem oder feindlichem Gebiet bist, und Standing-basierten Zugang, wo deine Admins ihn nutzen."
       },
       "citadels": {
-        "title": "Zitadellen-Abfragen",
+        "title": "Upwell-Strukturen",
         "desc": "Fragt EVE, in welchem System eine Spielerstruktur steht und welcher Corp sie gehört. EVE antwortet nur für Strukturen, an denen dein Charakter docken kann.",
         "affects": "den Besitzer von Zitadellen, die du hinzufügst (und damit ihre Standing-Färbung), und wo deine Klone sind, wenn sie in einer Zitadelle liegen."
       },

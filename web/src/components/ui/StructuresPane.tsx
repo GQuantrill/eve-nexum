@@ -16,6 +16,8 @@ import { setDestination, addWaypoint } from '../../api/waypoint';
 import { toast } from '../../utils/toastStore';
 import { useCanEditContent } from '../../hooks/useCanEditContent';
 import { useStandings } from '../../hooks/useStandings';
+import { useScopeHeld } from '../../hooks/useScopeHeld';
+import { ScopeNeeded } from './ScopeNeeded';
 
 const STRUCTURE_TYPE_LABELS: Record<StructureType, string> = {
   unknown:   'Unknown',
@@ -70,6 +72,7 @@ function parseStructureClipboard(text: string): ParsedStructure[] {
 }
 
 export function StructuresPane({ systemId }: { systemId: string }) {
+  const citadelsHeld = useScopeHeld('citadels');
   const { t } = useTranslation();
   const typeLabel = (type: StructureType) =>
     type === 'unknown' ? t('structures.unknown') : STRUCTURE_TYPE_LABELS[type];
@@ -216,6 +219,9 @@ export function StructuresPane({ systemId }: { systemId: string }) {
         {!isShareMode && structures.length === 0 && (
           <p className="sig-pane__hint">{t('structures.pasteHint')}</p>
         )}
+        {/* Owner corp (and so the standings tint) comes from looking a
+            structure up, which needs Upwell Structures. */}
+        {canEdit && !isShareMode && !citadelsHeld && <ScopeNeeded group="citadels" />}
         {canEdit && !isShareMode && (
           <div className="sig-pane__toolbar">
             <button className="icon-btn" onClick={addStructure} title={t('structures.addStructure')}>+</button>

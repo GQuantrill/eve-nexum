@@ -7,6 +7,8 @@ import { useRoute } from '../../hooks/useRoute';
 import { useRouteOrigin } from '../../hooks/useRouteOrigin';
 import { useUserSetting } from '../../hooks/useUserSetting';
 import { useAuth } from '../../context/AuthContext';
+import { useScopeHeld } from '../../hooks/useScopeHeld';
+import { ScopeNeeded } from './ScopeNeeded';
 import { jumps as jumpsLabel } from '../../i18n/format';
 
 type SortBy  = 'distance' | 'name';
@@ -44,6 +46,7 @@ export function FleetPane() {
   const fleet  = useFleet();
   const origin = useRouteOrigin();
   const { user } = useAuth();
+  const fleetHeld = useScopeHeld('fleet');
   const [sortBy,  setSortBy]  = useUserSetting<SortBy>('nexum.fleet.sortBy', 'distance');
   const [sortDir, setSortDir] = useUserSetting<SortDir>('nexum.fleet.sortDir', 'asc');
 
@@ -102,6 +105,8 @@ export function FleetPane() {
   // Roster size before the search filter — distinguishes "no members" from
   // "no matches for the query" so the empty states don't lie.
   const total = simCount || fleet.members.length;
+  // Without the fleet scope nexum can't tell whether you're in one at all.
+  if (!simCount && !fleetHeld)     return <ScopeNeeded group="fleet" />;
   if (!simCount && !fleet.inFleet) return <div className="scout-pane__empty">{t('fleet.notInFleet')}</div>;
   if (total === 0)                 return <div className="scout-pane__empty">{t('fleet.noMembers')}</div>;
 

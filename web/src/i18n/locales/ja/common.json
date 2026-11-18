@@ -694,7 +694,7 @@
     "title": "クローン",
     "medical": "メディカルクローン",
     "jumpClone": "ジャンプクローン",
-    "none": "クローンが見つかりません。空のままの場合は、サインアウトして再度サインインし、クローンの権限を許可してください。",
+    "none": "クローンが見つかりません。",
     "unknownLocation": "場所を取得できません",
     "implants": "インプラント {{count}} 個",
     "implants_other": "インプラント {{count}} 個",
@@ -2430,8 +2430,8 @@
     "personal": "個人",
     "refreshStandings": "今すぐ ESI からスタンディングを更新（6時間 TTL を回避）",
     "standingsRefreshed": "スタンディングを更新しました — 個人 {{personal}} · コーポ {{corp}} · アライアンス連絡先 {{alliance}}",
-    "noContactsRefreshed": "連絡先を更新できませんでした。トークンに read_contacts スコープがない可能性があります — ログアウトして再ログインしてください。",
-    "standingsNotLoaded": "スタンディングがまだ読み込まれていません。これが続く場合は、ログアウトして再ログインし read_contacts スコープを付与してください。",
+    "noContactsRefreshed": "連絡先を更新できませんでした。",
+    "standingsNotLoaded": "スタンディングがまだ読み込まれていません。",
     "standingNotInBucket": "{{label}}: どれにも属していません",
     "standingNotSet": "{{label}}: スタンディング未設定",
     "standingValue": "{{label}}: {{value}}",
@@ -2757,7 +2757,7 @@
         "affects": "友好的な宙域か敵対的な宙域かの一目での確認、および管理者が使う場合のスタンディングによるアクセス。"
       },
       "citadels": {
-        "title": "シタデル照会",
+        "title": "Upwell ストラクチャー",
         "desc": "プレイヤーストラクチャーがどの星系にあり、どのコープが所有しているかを EVE に問い合わせます。EVE はキャラクターがドックできるストラクチャーについてのみ回答します。",
         "affects": "追加したシタデルの所有者（とそのスタンディングの色）、およびクローンがシタデルにある場合の位置。"
       },

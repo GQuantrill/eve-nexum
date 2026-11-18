@@ -694,7 +694,7 @@
     "title": "Clones",
     "medical": "Clone médico",
     "jumpClone": "Clone de salto",
-    "none": "Nenhum clone encontrado. Se continuar vazio, termina sessão e volta a entrar para conceder a permissão de clones.",
+    "none": "Nenhum clone encontrado.",
     "unknownLocation": "Localização indisponível",
     "implants": "{{count}} implante",
     "implants_other": "{{count}} implantes",
@@ -2432,8 +2432,8 @@
     "personal": "Pessoal",
     "refreshStandings": "Atualizar standings da ESI agora (ignora o TTL de 6 h)",
     "standingsRefreshed": "Standings atualizados — {{personal}} pessoais · {{corp}} corp · {{alliance}} contactos de aliança",
-    "noContactsRefreshed": "Não foi possível atualizar nenhum contacto. O token pode não ter o scope read_contacts — termina a sessão e volta a entrar.",
-    "standingsNotLoaded": "Standings ainda não carregados. Se isto persistir, termina a sessão e volta a entrar para conceder os scopes read_contacts.",
+    "noContactsRefreshed": "Não foi possível atualizar nenhum contacto.",
+    "standingsNotLoaded": "Standings ainda não carregados.",
     "standingNotInBucket": "{{label}}: não estás em nenhum",
     "standingNotSet": "{{label}}: sem standing definido",
     "standingValue": "{{label}}: {{value}}",
@@ -2761,7 +2761,7 @@
         "affects": "ver de relance se estás em espaço amigo ou hostil, e o acesso por standing onde os teus admins o usam."
       },
       "citadels": {
-        "title": "Consulta de cidadelas",
+        "title": "Estruturas Upwell",
         "desc": "Pergunta ao EVE em que sistema está uma estrutura de jogador e que corp é a dona. O EVE só responde para estruturas onde a tua personagem pode atracar.",
         "affects": "o dono das cidadelas que adicionares (e portanto a cor do standing), e onde estão os teus clones quando estão numa cidadela."
       },
