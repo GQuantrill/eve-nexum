@@ -6,35 +6,45 @@ import { alertGain } from '../utils/notificationPrefs';
 // Desktop only: the app follows the pilot's chosen intel channels (EVE chat
 // logs) and sends each new line here. A line naming a system on the open map
 // (its full name, as EVE writes a system dragged into chat) makes that node
-// pulse red for five seconds, with a sound unless the pilot turned it off in
-// the desktop settings. "clr"/"clear" lines are reports that a system is
+// pulse red, with a sound. How long it pulses (5-30 s), how strongly (or not
+// at all: sound only) and whether there's a sound are the pilot's choices in
+// the desktop settings, and arrive with each line. "clr"/"clear" lines are reports that a system is
 // empty, so they don't alert. Nothing here is sent to the server.
 
-const PULSE_MS = 5_000;
+export type IntelPulse = 'off' | 'subtle' | 'normal' | 'strong';
+const PULSES: IntelPulse[] = ['off', 'subtle', 'normal', 'strong'];
+const SECONDS = [5, 10, 15, 30];
 const CLEAR = /(^|[^a-z0-9])(clr|clear)([^a-z0-9]|$)/i;
 
-export interface IntelLine { channel: string; sender: string; text: string; at: number; sound: boolean }
+export interface IntelLine {
+  channel: string; sender: string; text: string; at: number; sound: boolean;
+  /** Older app versions don't send these: 5 s, normal. */
+  pulseSecs?: number; pulse?: IntelPulse;
+}
 
 // ── Which systems are pulsing ───────────────────────────────────────────────
-const pulsing = new Map<string, number>();   // map system id -> pulse end (ms)
+const pulsing = new Map<string, { until: number; level: IntelPulse }>();
 const subs = new Set<() => void>();
 const bump = () => { subs.forEach((f) => f()); };
 const subscribe = (cb: () => void) => { subs.add(cb); return () => { subs.delete(cb); }; };
 
-function pulse(systemId: string): void {
-  const until = Date.now() + PULSE_MS;
-  pulsing.set(systemId, until);
+function pulse(systemId: string, ms: number, level: IntelPulse): void {
+  pulsing.set(systemId, { until: Date.now() + ms, level });
   bump();
   setTimeout(() => {
     // A newer report about the same system extends the pulse.
-    if ((pulsing.get(systemId) ?? 0) <= Date.now()) { pulsing.delete(systemId); bump(); }
-  }, PULSE_MS + 50);
+    if ((pulsing.get(systemId)?.until ?? 0) <= Date.now()) { pulsing.delete(systemId); bump(); }
+  }, ms + 50);
 }
 
-/** True while an intel report about this map system is pulsing. */
-export function useIntelPulse(systemId: string): boolean {
-  // A boolean snapshot, so only nodes whose pulse starts or ends re-render.
-  return useSyncExternalStore(subscribe, () => pulsing.has(systemId), () => false);
+/** The pulse strength while an intel report about this map system is
+ *  pulsing, else null. */
+export function useIntelPulse(systemId: string): Exclude<IntelPulse, 'off'> | null {
+  // A plain-value snapshot, so only nodes whose pulse starts or ends re-render.
+  return useSyncExternalStore(subscribe, () => {
+    const level = pulsing.get(systemId)?.level;
+    return level && level !== 'off' ? level : null;
+  }, () => null);
 }
 
 // ── Matching ────────────────────────────────────────────────────────────────
@@ -78,7 +88,9 @@ export function startIntel(): () => void {
     if (Date.now() - line.at > MAX_AGE_MS) return;
     const ids = systemsNamed(line.text, useMapStore.getState().map.systems);
     if (ids.length === 0) return;
-    ids.forEach(pulse);
+    const level = PULSES.includes(line.pulse as IntelPulse) ? line.pulse! : 'normal';
+    const secs = SECONDS.includes(line.pulseSecs ?? 0) ? line.pulseSecs! : 5;
+    if (level !== 'off') ids.forEach((id) => pulse(id, secs * 1000, level));
     if (line.sound) playAlert();
   });
 }

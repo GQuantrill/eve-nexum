@@ -23,4 +23,7 @@ fieldset.intel legend { font-weight: 600; padding: 0 4px; }
 #intelList .status { font-size: 12px; word-break: break-all; }
 .row { display: flex; gap: 8px; }
 .row input { flex: 1; }
+select { padding: 5px 7px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: inherit; font: inherit; }
+.row.pick { gap: 16px; flex-wrap: wrap; }
+.row.pick label { display: flex; flex-direction: column; gap: 4px; font-weight: 600; }
 #status.bad { color: var(--bad); }

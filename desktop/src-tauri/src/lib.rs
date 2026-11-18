@@ -85,6 +85,7 @@ fn save_settings(app: AppHandle, state: tauri::State<AppState>, settings: Settin
         let mut cur = state.settings.lock().unwrap();
         // Not on the settings form: kept as it is.
         next.zoom = cur.zoom;
+        settings::normalise_pulse(&mut next);
         let changed = cur.server_url != next.server_url;
         *cur = next.clone();
         changed

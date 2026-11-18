@@ -20,6 +20,9 @@ async function strings() {
   $('watchClipboard').checked = s.watchClipboard;
   $('chatlogDir').value = s.chatlogDir || '';
   $('intelSound').checked = s.intelSound;
+  $('intelPulseSecs').querySelectorAll('option').forEach((o) => { o.textContent = t.seconds.replace('{n}', o.value); });
+  $('intelPulse').value = s.intelPulse;
+  $('intelPulseSecs').value = String(s.intelPulseSecs);
   let channels = [...(s.intelChannels || [])];
   const drawChannels = () => {
     const list = $('intelList');
@@ -83,6 +86,8 @@ async function strings() {
         chatlogDir: $('chatlogDir').value.trim() || null,
         intelChannels: channels,
         intelSound: $('intelSound').checked,
+        intelPulse: $('intelPulse').value,
+        intelPulseSecs: Number($('intelPulseSecs').value),
       } });
       status.textContent = t.saved;
     } catch {

@@ -26,6 +26,9 @@ pub struct IntelLine {
     pub at: u64,
     /// Whether the pilot wants a sound for intel (desktop settings).
     pub sound: bool,
+    /// How long and how strongly the system pulses (desktop settings).
+    pub pulse_secs: u32,
+    pub pulse: String,
 }
 
 /// The file being followed for one channel.
@@ -51,15 +54,15 @@ pub fn start(app: AppHandle) {
         let mut followed: HashMap<String, Followed> = HashMap::new();
         loop {
             std::thread::sleep(Duration::from_secs(1));
-            let (channels, sound) = {
+            let (channels, sound, pulse_secs, pulse) = {
                 let state = app.state::<AppState>();
                 let s = state.settings.lock().unwrap();
-                (s.intel_channels.clone(), s.intel_sound)
+                (s.intel_channels.clone(), s.intel_sound, s.intel_pulse_secs, s.intel_pulse.clone())
             };
             followed.retain(|k, _| channels.iter().any(|c| c.eq_ignore_ascii_case(k)));
             if let Some(dir) = eve_logs::log_dir(&app) {
                 for line in poll(&dir, &channels, &mut followed) {
-                    let _ = app.emit_to("main", "nexum://intel", IntelLine { sound, ..line });
+                    let _ = app.emit_to("main", "nexum://intel", IntelLine { sound, pulse_secs, pulse: pulse.clone(), ..line });
                 }
             }
             let status = channels.iter().map(|c| {
@@ -157,6 +160,8 @@ fn parse_lines(channel: &str, text: &str) -> Vec<IntelLine> {
                 text: c[8].trim().to_string(),
                 at: eve_logs::epoch_ms(n(1), n(2), n(3), n(4), n(5), n(6)),
                 sound: true,
+                pulse_secs: 5,
+                pulse: "normal".to_string(),
             })
         })
         .collect()

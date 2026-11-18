@@ -28,6 +28,10 @@ pub struct Settings {
     pub intel_channels: Vec<String>,
     /// Play a sound when an intel report names a system on the map.
     pub intel_sound: bool,
+    /// How long a system named in intel pulses: 5, 10, 15 or 30 seconds.
+    pub intel_pulse_secs: u32,
+    /// How strongly it pulses: off (sound only), subtle, normal or strong.
+    pub intel_pulse: String,
     /// Page zoom of the Nexum window (View > Zoom), 1.0 = 100%.
     pub zoom: f64,
 }
@@ -42,6 +46,8 @@ impl Default for Settings {
             chatlog_dir: None,
             intel_channels: Vec::new(),
             intel_sound: true,
+            intel_pulse_secs: 5,
+            intel_pulse: "normal".to_string(),
             zoom: 1.0,
         }
     }
@@ -58,10 +64,12 @@ pub fn load(app: &AppHandle) -> Settings {
         .unwrap_or_default();
     // A hand-edited file with a bad server falls back rather than opening
     // something that isn't a Nexum server.
-    match normalise_server(&loaded.server_url) {
+    let mut s = match normalise_server(&loaded.server_url) {
         Some(url) => Settings { server_url: url, ..loaded },
         None => Settings { server_url: DEFAULT_SERVER.to_string(), ..loaded },
-    }
+    };
+    normalise_pulse(&mut s);
+    s
 }
 
 pub fn save(app: &AppHandle, s: &Settings) -> Result<(), String> {
@@ -82,6 +90,19 @@ pub fn normalise_channel(raw: &str) -> String {
     let name = raw.trim();
     let name = name.rsplit(['/', '\\']).next().unwrap_or(name);
     re.replace(name, "").trim().to_string()
+}
+
+pub const PULSE_SECS: [u32; 4] = [5, 10, 15, 30];
+pub const PULSES: [&str; 4] = ["off", "subtle", "normal", "strong"];
+
+/// Intel pulse choices outside the offered ones fall back to the defaults.
+pub fn normalise_pulse(s: &mut Settings) {
+    if !PULSE_SECS.contains(&s.intel_pulse_secs) {
+        s.intel_pulse_secs = 5;
+    }
+    if !PULSES.contains(&s.intel_pulse.as_str()) {
+        s.intel_pulse = "normal".to_string();
+    }
 }
 
 /// The server as a bare origin ("https://host[:port]"), or None when it isn't

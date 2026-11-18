@@ -45,7 +45,14 @@
     "intelChannelsMenu": "Intel channels...",
     "openLogFolder": "Open chat log folder",
     "website": "Nexum website",
-    "aboutVersion": "Desktop app v{v}"
+    "aboutVersion": "Desktop app v{v}",
+    "intelPulse": "Pulse",
+    "intelPulseSecs": "Pulse for",
+    "seconds": "{n} seconds",
+    "pulseOff": "Off (sound only)",
+    "pulseSubtle": "Subtle",
+    "pulseNormal": "Normal",
+    "pulseStrong": "Strong"
   },
   "de": {
     "show": "Nexum anzeigen",
@@ -93,7 +100,14 @@
     "intelChannelsMenu": "Intel-Kanäle...",
     "openLogFolder": "Chatlog-Ordner öffnen",
     "website": "Nexum-Website",
-    "aboutVersion": "Desktop-App v{v}"
+    "aboutVersion": "Desktop-App v{v}",
+    "intelPulse": "Pulsieren",
+    "intelPulseSecs": "Pulsieren für",
+    "seconds": "{n} Sekunden",
+    "pulseOff": "Aus (nur Ton)",
+    "pulseSubtle": "Dezent",
+    "pulseNormal": "Normal",
+    "pulseStrong": "Stark"
   },
   "nl": {
     "show": "Nexum tonen",
@@ -141,7 +155,14 @@
     "intelChannelsMenu": "Intelkanalen...",
     "openLogFolder": "Chatlogmap openen",
     "website": "Nexum-website",
-    "aboutVersion": "Desktop-app v{v}"
+    "aboutVersion": "Desktop-app v{v}",
+    "intelPulse": "Pulseren",
+    "intelPulseSecs": "Pulseren gedurende",
+    "seconds": "{n} seconden",
+    "pulseOff": "Uit (alleen geluid)",
+    "pulseSubtle": "Subtiel",
+    "pulseNormal": "Normaal",
+    "pulseStrong": "Sterk"
   },
   "fr": {
     "show": "Afficher Nexum",
@@ -189,7 +210,14 @@
     "intelChannelsMenu": "Canaux d'intel...",
     "openLogFolder": "Ouvrir le dossier des logs de chat",
     "website": "Site de Nexum",
-    "aboutVersion": "Application de bureau v{v}"
+    "aboutVersion": "Application de bureau v{v}",
+    "intelPulse": "Pulsation",
+    "intelPulseSecs": "Pulser pendant",
+    "seconds": "{n} secondes",
+    "pulseOff": "Désactivée (son seul)",
+    "pulseSubtle": "Discrète",
+    "pulseNormal": "Normale",
+    "pulseStrong": "Forte"
   },
   "es": {
     "show": "Mostrar Nexum",
@@ -237,7 +265,14 @@
     "intelChannelsMenu": "Canales de intel...",
     "openLogFolder": "Abrir la carpeta de logs de chat",
     "website": "Sitio web de Nexum",
-    "aboutVersion": "Aplicación de escritorio v{v}"
+    "aboutVersion": "Aplicación de escritorio v{v}",
+    "intelPulse": "Pulso",
+    "intelPulseSecs": "Pulsar durante",
+    "seconds": "{n} segundos",
+    "pulseOff": "Apagado (solo sonido)",
+    "pulseSubtle": "Sutil",
+    "pulseNormal": "Normal",
+    "pulseStrong": "Fuerte"
   },
   "pt": {
     "show": "Mostrar Nexum",
@@ -285,7 +320,14 @@
     "intelChannelsMenu": "Canais de intel...",
     "openLogFolder": "Abrir a pasta de logs de chat",
     "website": "Site do Nexum",
-    "aboutVersion": "App para desktop v{v}"
+    "aboutVersion": "App para desktop v{v}",
+    "intelPulse": "Pulso",
+    "intelPulseSecs": "Pulsar por",
+    "seconds": "{n} segundos",
+    "pulseOff": "Desligado (só som)",
+    "pulseSubtle": "Sutil",
+    "pulseNormal": "Normal",
+    "pulseStrong": "Forte"
   },
   "zh": {
     "show": "显示 Nexum",
@@ -333,7 +375,14 @@
     "intelChannelsMenu": "情报频道...",
     "openLogFolder": "打开聊天日志文件夹",
     "website": "Nexum 网站",
-    "aboutVersion": "桌面应用 v{v}"
+    "aboutVersion": "桌面应用 v{v}",
+    "intelPulse": "闪烁",
+    "intelPulseSecs": "闪烁时长",
+    "seconds": "{n} 秒",
+    "pulseOff": "关闭（仅声音）",
+    "pulseSubtle": "轻微",
+    "pulseNormal": "正常",
+    "pulseStrong": "强烈"
   },
   "ko": {
     "show": "Nexum 보기",
@@ -381,7 +430,14 @@
     "intelChannelsMenu": "정보 채널...",
     "openLogFolder": "채팅 로그 폴더 열기",
     "website": "Nexum 웹사이트",
-    "aboutVersion": "데스크톱 앱 v{v}"
+    "aboutVersion": "데스크톱 앱 v{v}",
+    "intelPulse": "깜박임",
+    "intelPulseSecs": "깜박임 시간",
+    "seconds": "{n}초",
+    "pulseOff": "끄기 (소리만)",
+    "pulseSubtle": "약하게",
+    "pulseNormal": "보통",
+    "pulseStrong": "강하게"
   },
   "ja": {
     "show": "Nexum を表示",
@@ -429,7 +485,14 @@
     "intelChannelsMenu": "インテルチャンネル...",
     "openLogFolder": "チャットログフォルダーを開く",
     "website": "Nexum ウェブサイト",
-    "aboutVersion": "デスクトップアプリ v{v}"
+    "aboutVersion": "デスクトップアプリ v{v}",
+    "intelPulse": "点滅",
+    "intelPulseSecs": "点滅時間",
+    "seconds": "{n} 秒",
+    "pulseOff": "オフ（音のみ）",
+    "pulseSubtle": "控えめ",
+    "pulseNormal": "標準",
+    "pulseStrong": "強め"
   },
   "ru": {
     "show": "Показать Nexum",
@@ -477,6 +540,13 @@
     "intelChannelsMenu": "Интел-каналы...",
     "openLogFolder": "Открыть папку логов чата",
     "website": "Сайт Nexum",
-    "aboutVersion": "Приложение для ПК v{v}"
+    "aboutVersion": "Приложение для ПК v{v}",
+    "intelPulse": "Пульсация",
+    "intelPulseSecs": "Пульсировать",
+    "seconds": "{n} секунд",
+    "pulseOff": "Выкл. (только звук)",
+    "pulseSubtle": "Слабая",
+    "pulseNormal": "Обычная",
+    "pulseStrong": "Сильная"
   }
 }
