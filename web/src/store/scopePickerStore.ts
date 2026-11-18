@@ -12,7 +12,9 @@ export type ScopeGroupId = typeof SCOPE_GROUP_IDS[number];
 // what an existing character allows (optionally pointing at the group a feature
 // just found missing).
 export type ScopePickerTarget =
-  | { kind: 'login' }
+  // ticked: the groups to start with (a returning character's last choice);
+  // omitted = everything.
+  | { kind: 'login'; ticked?: readonly string[] }
   | { kind: 'add' }
   // charId is the account character (users.id); omitted = the signed-in one.
   | { kind: 'change'; charId?: number; require?: ScopeGroupId };
