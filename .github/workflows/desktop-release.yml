@@ -1,0 +1,116 @@
+name: Desktop release
+
+# Publishes a desktop app release to the GQuantrill/nexum-desktop repository:
+# the installers for Windows, macOS (one build for Apple silicon and Intel)
+# and Linux, the signed update bundles, and latest.json, the file installed
+# apps check for updates (tauri.conf.json, plugins.updater.endpoints).
+#
+# Kept out of this repository's releases on purpose: those post to the
+# players' Discord, build the server images and drive the admin "new
+# version" badge.
+#
+# To release: raise "version" in desktop/src-tauri/tauri.conf.json, commit,
+# then push a matching tag, e.g. desktop-v0.2.0:
+#   git tag desktop-v0.2.0 && git push origin desktop-v0.2.0
+#
+# Secrets:
+#   TAURI_SIGNING_PRIVATE_KEY  signs the update bundles (the app only installs
+#                              updates signed with it; never lose or leak it)
+#   NEXUM_DESKTOP_TOKEN        fine-grained token, Contents: read and write on
+#                              GQuantrill/nexum-desktop
+on:
+  push:
+    tags: ['desktop-v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  RELEASE_REPO: nexum-desktop
+  RELEASE_OWNER: GQuantrill
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: v
+        env:
+          REF_NAME: ${{ github.ref_name }}
+          REF_TYPE: ${{ github.ref_type }}
+        run: |
+          version=$(jq -r .version desktop/src-tauri/tauri.conf.json)
+          if [ "$REF_TYPE" = tag ] && [ "$REF_NAME" != "desktop-v$version" ]; then
+            echo "::error::Tag $REF_NAME does not match tauri.conf.json version $version"
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: check
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - os: windows-latest
+            args: ''
+          - os: macos-latest
+            args: '--target universal-apple-darwin'
+          - os: ubuntu-22.04
+            args: ''
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+          cache-dependency-path: desktop/yarn.lock
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.os == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: desktop/src-tauri
+      - name: Linux build libraries
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential file \
+            libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev patchelf
+      - run: yarn install --frozen-lockfile
+        working-directory: desktop
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.NEXUM_DESKTOP_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ''
+        with:
+          projectPath: desktop
+          owner: ${{ env.RELEASE_OWNER }}
+          repo: ${{ env.RELEASE_REPO }}
+          tagName: v${{ needs.check.outputs.version }}
+          # The tag goes on the release repo's own branch (it has none of
+          # this repo's commits).
+          commitish: main
+          releaseName: Nexum desktop ${{ needs.check.outputs.version }}
+          releaseBody: See the assets below. Windows - the .exe (setup); macOS - the .dmg; Linux - the .AppImage, .deb or .rpm.
+          releaseDraft: true
+          prerelease: false
+          includeUpdaterJson: true
+          args: ${{ matrix.args }}
+
+  # Only once every platform has built: make the draft public, so latest.json
+  # never points installed apps at a release that is still missing files.
+  publish:
+    needs: [check, build]
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          GH_TOKEN: ${{ secrets.NEXUM_DESKTOP_TOKEN }}
+          TAG: v${{ needs.check.outputs.version }}
+        run: |
+          gh release edit "$TAG" --repo "$RELEASE_OWNER/$RELEASE_REPO" --draft=false --latest

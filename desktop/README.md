@@ -85,25 +85,30 @@ builds come later.
 
 ## Updates
 
-The app checks `desktop/latest.json` on main
-(`raw.githubusercontent.com/GQuantrill/eve-nexum/main/desktop/latest.json`)
+Releases live in their own repository, **GQuantrill/nexum-desktop**, so they
+never post to the players' Discord or show as a new server version. The app
+checks that repository's `latest.json`
+(`github.com/GQuantrill/nexum-desktop/releases/latest/download/latest.json`)
 20 s after starting and every 6 hours. A newer version shows a notification
 and an "Install update" item at the top of the tray menu; "Check for updates"
-asks now. Updates must be signed with the updater key: the public half is in
-`tauri.conf.json` (`plugins.updater.pubkey`), the private half never goes in
-the repo. Every install updates from this one feed, whatever server it uses.
+asks now. Every install updates from this one feed, whatever server it uses.
+The Microsoft Store build has no updater: the Store updates it.
+
+Updates must be signed with the updater key. The public half is in
+`tauri.conf.json` (`plugins.updater.pubkey`); the private half is the
+`TAURI_SIGNING_PRIVATE_KEY` secret in GitHub Actions, with a backup kept
+off-line (`~/.tauri/nexum-desktop-updater.key`, no password). Lose it and
+installed apps can never be updated again; leak it and anyone could push an
+update, so a new key (and a reinstall for everyone) would be needed.
 
 To release version X.Y.Z:
 
 1. Bump `version` in `src-tauri/tauri.conf.json` (and `Cargo.toml`,
-   `package.json`).
-2. On each platform, build with the key:
-   ```sh
-   export TAURI_SIGNING_PRIVATE_KEY="$(cat ~/.tauri/nexum-desktop.key)"
-   export TAURI_SIGNING_PRIVATE_KEY_PASSWORD='...'
-   yarn build
-   node scripts/latest-json.mjs "What changed"
-   ```
-3. Create the GitHub release `desktop-vX.Y.Z`, attach the installers and
-   the bundle the script names.
-4. Commit `latest.json`; installed apps see it once it reaches main.
+   `package.json`) and commit.
+2. `git tag desktop-vX.Y.Z && git push origin desktop-vX.Y.Z`
+3. `.github/workflows/desktop-release.yml` builds Windows, macOS (universal)
+   and Linux, signs the update bundles, uploads everything plus `latest.json`
+   to a draft release, and publishes it once every platform is done.
+
+On Linux only the AppImage updates itself; .deb and .rpm installs are updated
+by installing the new package.
