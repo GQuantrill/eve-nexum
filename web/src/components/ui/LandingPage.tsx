@@ -17,7 +17,7 @@ import {
   MapPinSimpleIcon, ColumnsIcon,
 } from '../../icons';
 import { apiUrl } from '../../api/client';
-import { loginUrl, useScopeOptions } from '../../api/scopeOptions';
+import { useScopeOptions } from '../../api/scopeOptions';
 import { useScopePickerStore } from '../../store/scopePickerStore';
 import { DISCORD_INVITE_URL } from '../../data/links';
 import { SUPPORTED_LANGUAGES, LANGUAGE_NAMES } from '../../i18n';
@@ -323,21 +323,20 @@ export function LandingPage() {
 
   useShaderCanvas(canvasRef);
 
-  // SSO_SCOPES_MODE=choice: a fresh login goes through the picker first. A
-  // returning character asks again for the groups it allowed last time (so a
-  // group it turned off isn't quietly granted again), or gets the picker if
-  // that isn't known. In 'all' mode every link goes straight to EVE, as before.
+  // SSO_SCOPES_MODE=choice: every login goes through the picker first. EVE's
+  // login can't be told which character to use (it always shows character
+  // selection), so "Continue as X" can't promise it's X: it opens the picker
+  // too, pre-ticked with the groups X allowed last time, so whoever is picked
+  // on EVE's screen gets a choice they've seen. In 'all' mode every link goes
+  // straight to EVE, as before.
   const scopeOptions = useScopeOptions();
   const openPicker = useScopePickerStore((s) => s.open);
   const choice = scopeOptions?.mode === 'choice';
-  const pickFirst = (e: React.MouseEvent) => {
+  const pickFirst = (e: React.MouseEvent, ticked?: readonly string[]) => {
     if (!choice) return;
     e.preventDefault();
-    openPicker({ kind: 'login' });
+    openPicker({ kind: 'login', ticked });
   };
-  const returningHref = choice && lastChar?.scopeGroups
-    ? loginUrl({ kind: 'login' }, scopeOptions, new Set(lastChar.scopeGroups))
-    : apiUrl('/auth/login');
 
   const errorParam = new URLSearchParams(window.location.search).get('error');
   const errorMessage = errorParam ? t(loginErrorKey(errorParam)) : null;
@@ -386,9 +385,9 @@ export function LandingPage() {
           {lastChar ? (
             <>
               <a
-                href={returningHref}
+                href={apiUrl('/auth/login')}
                 className="landing__returning"
-                onClick={lastChar.scopeGroups ? undefined : pickFirst}
+                onClick={(e) => pickFirst(e, lastChar.scopeGroups)}
               >
                 <img
                   src={charPortrait(lastChar.characterId, 128)}
@@ -396,16 +395,13 @@ export function LandingPage() {
                   className="landing__returning-avatar"
                 />
                 <div className="landing__returning-info">
-                  <span className="landing__returning-label">{t('landing.cta.continueAs')}</span>
+                  <span className="landing__returning-label">{t('landing.cta.logBackIn')}</span>
                   <span className="landing__returning-name">{lastChar.characterName}</span>
                 </div>
               </a>
               <p className="landing__note">
                 {t('landing.cta.sessionExpired')}
               </p>
-              <a href={apiUrl('/auth/login')} className="landing__switch-link" onClick={pickFirst}>
-                {t('landing.cta.switchChar')}
-              </a>
             </>
           ) : (
             <>

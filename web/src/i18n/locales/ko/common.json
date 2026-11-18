@@ -1212,9 +1212,8 @@
     "tagline": "EVE Online을 위한 웜홀 체인 지도 작성",
     "demoNote": "◈ 인터랙티브 데모 — 단순화된 미리보기. 로그인하면 시그니처, 킬 피드, 연결 추적, 활동 기록 등을 사용할 수 있습니다.",
     "cta": {
-      "continueAs": "다음 계정으로 계속",
+      "logBackIn": "다시 로그인",
       "sessionExpired": "세션이 만료되었습니다 — 초상화를 클릭하여 EVE SSO로 다시 로그인하세요.",
-      "switchChar": "다른 캐릭터로 로그인",
       "secureLogin": "안전한 EVE SSO 로그인 — 비밀번호를 저장하지 않습니다. 캐릭터 신원만 사용합니다.",
       "loginAlt": "EVE Online으로 로그인",
       "joinDiscord": "Nexum Discord 참여"

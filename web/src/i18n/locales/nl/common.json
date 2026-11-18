@@ -1212,9 +1212,8 @@
     "tagline": "Wormgatketens karteren voor EVE Online",
     "demoNote": "◈ Interactieve demo — een vereenvoudigde voorvertoning. Log in voor signaturen, kill feeds, het bijhouden van verbindingen, activiteitsgeschiedenis en meer.",
     "cta": {
-      "continueAs": "Doorgaan als",
+      "logBackIn": "Opnieuw inloggen",
       "sessionExpired": "Sessie verlopen — klik op je portret om opnieuw in te loggen via EVE SSO.",
-      "switchChar": "Inloggen als een ander character",
       "secureLogin": "Veilige EVE SSO-login — er worden geen wachtwoorden opgeslagen. Alleen de identiteit van je character.",
       "loginAlt": "Inloggen met EVE Online",
       "joinDiscord": "Word lid van de Nexum-Discord"
