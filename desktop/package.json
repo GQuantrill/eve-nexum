@@ -1,0 +1,14 @@
+{
+  "name": "nexum-desktop",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Nexum desktop app: the Nexum website in its own window, plus EVE log jump tracking, probe-scan paste, notifications and an always-on-top mode.",
+  "scripts": {
+    "dev": "tauri dev",
+    "build": "tauri build",
+    "icons": "tauri icon ../web/public/icons/icon-512.png"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "2.12.5"
+  }
+}

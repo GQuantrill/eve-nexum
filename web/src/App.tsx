@@ -51,6 +51,8 @@ import { usePageviewTracking } from './hooks/usePageviewTracking';
 import { useIdleLock } from './hooks/useIdleLock';
 import { LockScreen } from './components/ui/LockScreen';
 import { ScopePickerModal } from './components/ui/ScopePickerModal';
+import { startScanPaste } from './desktop/scanPaste';
+import { startIntel } from './desktop/intel';
 
 // Which signed-in user we've already hydrated prefs/settings for. MapApp
 // unmounts when you navigate away (e.g. to /admin) and re-mounts on return;
@@ -87,6 +89,12 @@ function MapApp() {
     resetUniformSizes();
     return () => { document.documentElement.style.removeProperty('--font-scale'); };
   }, [uiZoom, resetUniformSizes]);
+
+  // Desktop app only (a no-op in a browser): probe-scanner results the app
+  // picks up from the clipboard arrive as a paste on the map.
+  useEffect(() => startScanPaste(), []);
+  // Desktop app only: intel-channel reports pulse the systems they name.
+  useEffect(() => startIntel(), []);
 
   // Colour-vision mode → data attribute on <html>; the --cv-* palette
   // overrides in those sheets key off it. 'off' (or unset) leaves the defaults.

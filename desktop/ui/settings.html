@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nexum settings</title>
+<link rel="stylesheet" href="settings.css">
+<script src="settings.js" defer></script>
+</head>
+<body>
+<form id="form">
+  <h1 data-t="title"></h1>
+  <label class="field">
+    <span data-t="server"></span>
+    <input id="serverUrl" type="url" required spellcheck="false">
+    <small data-t="serverHint"></small>
+    <button type="button" id="resetServer" class="link" data-t="resetServer"></button>
+  </label>
+  <label class="check"><input id="alwaysOnTop" type="checkbox"> <span data-t="onTop"></span></label>
+  <label class="check"><input id="readLogs" type="checkbox"> <span data-t="logs"></span></label>
+  <small class="under" data-t="logsHint"></small>
+  <label class="check"><input id="watchClipboard" type="checkbox"> <span data-t="clip"></span></label>
+  <small class="under" data-t="clipHint"></small>
+  <label class="field">
+    <span data-t="dir"></span>
+    <input id="chatlogDir" type="text" spellcheck="false">
+    <small><span data-t="dirHint"></span> <code id="defaultDir"></code></small>
+  </label>
+  <fieldset class="intel">
+    <legend data-t="intel"></legend>
+    <small data-t="intelHint"></small>
+    <ul id="intelList"></ul>
+    <div class="row">
+      <input id="intelNew" type="text" spellcheck="false" placeholder="east.imperium">
+      <button type="button" id="intelAdd" data-t="intelAdd"></button>
+    </div>
+    <label class="check"><input id="intelSound" type="checkbox"> <span data-t="intelSound"></span></label>
+  </fieldset>
+  <p class="shortcut" data-t="shortcut"></p>
+  <div class="actions">
+    <span id="status" role="status"></span>
+    <button type="submit" data-t="save"></button>
+  </div>
+</form>
+</body>
+</html>

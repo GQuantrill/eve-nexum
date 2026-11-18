@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-default-chatlog-dir"
+description = "Enables the default_chatlog_dir command without any pre-configured scope."
+commands.allow = ["default_chatlog_dir"]
+
+[[permission]]
+identifier = "deny-default-chatlog-dir"
+description = "Denies the default_chatlog_dir command without any pre-configured scope."
+commands.deny = ["default_chatlog_dir"]

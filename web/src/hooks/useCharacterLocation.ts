@@ -7,6 +7,8 @@ import { setWorkerTimeout, clearWorkerTimeout, type WorkerTimeout } from '../uti
 import { useShareMode } from '../context/ShareModeContext';
 import { useMapStore } from '../store/mapStore';
 import { useAuth } from '../context/AuthContext';
+import { onDesktopEvent } from '../desktop/bridge';
+import { cloneSystemIds, peekClones } from './useClones';
 
 export interface CharacterLocationSystem {
   eveSystemId: number;
@@ -73,6 +75,9 @@ const EMPTY: CharacterLocation = { online: false, system: null, ship: null, dock
 // — so a tab's location always matches the character it displays, even when
 // another tab has switched the session identity out from under it.
 let currentActingId: number | null = null;
+// The same character's EVE id and name, and whether its role is contributor:
+// the desktop app's Local-log events name the EVE character, not users.id.
+let currentActingEve: { id: number; name: string; contributor: boolean } | null = null;
 
 let moduleCache: { charId: number | null; data: CharacterLocation; fetchedAt: number } | null = null;
 let inflight: Promise<CharacterLocation> | null = null;
@@ -185,6 +190,16 @@ function load(): Promise<CharacterLocation> {
     .then(r => {
       const data: CharacterLocation = { online: r.online, system: r.system, ship: r.ship ?? null, docked: r.docked ?? false };
       inflight = null;
+      // A Local-log reading is newer than ESI for a few seconds after a jump:
+      // ESI still answering with the system the pilot just left is stale, not
+      // a jump back. Anything else from ESI (the new system, or somewhere
+      // else entirely) is the truth and ends the log reading's say.
+      if (logReading && logReading.charId === charId) {
+        const stale = Date.now() - logReading.at < LOG_TRUST_MS
+          && data.online && data.system?.eveSystemId === logReading.fromSystemId;
+        if (stale) return moduleCache?.data ?? data;
+        logReading = null;
+      }
       // Feeds the shared signal every other poller backs off on.
       setPilotOnline(r.online);
       // The acting character may have changed while this was in flight — if so,
@@ -201,6 +216,60 @@ function load(): Promise<CharacterLocation> {
       return moduleCache?.data ?? EMPTY;
     });
   return inflight;
+}
+
+// ── Desktop app: EVE's Local chat log ───────────────────────────────────────
+// The desktop app reads the game's Local chat log, which records the new
+// system the moment a pilot jumps, seconds before ESI reports it. That reading
+// moves the pilot on the map at once, and ESI is asked straight away to
+// confirm. It only ever changes what this browser shows and draws: the server
+// keeps checking location with ESI for anything it decides (a contributor's
+// adds included, so contributors wait for ESI as before). On the web none of
+// this runs.
+const LOG_TRUST_MS = 30_000;          // how long ESI's old answer counts as stale
+const LOG_MAX_AGE_MS = 2 * 60_000;    // ignore log lines older than this
+let logReading: { charId: number; fromSystemId: number | null; at: number } | null = null;
+const systemByName = new Map<string, CharacterLocationSystem | null>();
+
+async function lookupSystem(name: string): Promise<CharacterLocationSystem | null> {
+  const key = name.toLowerCase();
+  if (systemByName.has(key)) return systemByName.get(key) ?? null;
+  const sys = await api<CharacterLocationSystem>(`/api/systems/lookup?name=${encodeURIComponent(name)}`)
+    .catch(() => null);
+  systemByName.set(key, sys);
+  return sys;
+}
+
+interface LocalChange { characterId: number | null; characterName: string | null; system: string; at: number }
+
+async function onLocalChange(ev: LocalChange): Promise<void> {
+  const charId = currentActingId;
+  const eve = currentActingEve;
+  if (charId == null || !eve || eve.contributor) return;
+  const mine = ev.characterId != null ? ev.characterId === eve.id
+    : ev.characterName != null && ev.characterName.toLowerCase() === eve.name.toLowerCase();
+  if (!mine || Date.now() - ev.at > LOG_MAX_AGE_MS) return;
+  const prev = moduleCache?.charId === charId ? moduleCache.data : null;
+  if (!prev?.online) return;            // ESI hasn't placed them yet: let it
+  const sys = await lookupSystem(ev.system);
+  if (!sys || currentActingId !== charId) return;
+  if (prev.system?.eveSystemId === sys.eveSystemId) return;
+  // Waking up in a clone (pod death, clone jump) also changes Local. Those
+  // are ESI's to call: the jump tracker needs its docked/ship detail to know
+  // not to draw a link.
+  if (cloneSystemIds(peekClones()).has(sys.eveSystemId)) { void load(); return; }
+  logReading = { charId, fromSystemId: prev.system?.eveSystemId ?? null, at: Date.now() };
+  adopt(charId, { ...prev, system: sys, docked: false });
+  // Ask ESI now and again shortly, so the confirmation lands quickly.
+  setTimeout(() => { void load(); }, 1_500);
+  setTimeout(() => { void load(); }, 5_000);
+}
+
+let desktopStarted = false;
+function startDesktopLocal(): void {
+  if (desktopStarted) return;
+  desktopStarted = true;
+  onDesktopEvent<LocalChange>('nexum://local', (ev) => { void onLocalChange(ev); });
 }
 
 /**
@@ -223,6 +292,16 @@ export function useCharacterLocation(): CharacterLocation {
   // result for this character we skip the fetch; when it's a different character
   // the previous location lingers until the new one arrives (the store keeps
   // returning it), exactly as before.
+  const actingChar = user?.characters.find((c) => c.id === effective);
+  const actingEveId = actingChar?.characterId ?? (effective === user?.id ? user?.characterId : undefined);
+  const actingName = actingChar?.characterName ?? (effective === user?.id ? user?.characterName : undefined);
+  const contributor = user?.role === 'contributor';
+  useEffect(() => {
+    currentActingEve = actingEveId != null && actingName
+      ? { id: actingEveId, name: actingName, contributor } : null;
+  }, [actingEveId, actingName, contributor]);
+  useEffect(() => { if (enabled) startDesktopLocal(); }, [enabled]);
+
   useEffect(() => {
     if (!enabled) return;
     currentActingId = effective;

@@ -1498,3 +1498,20 @@ div.system-node__easy-handle {
     filter: drop-shadow(0 0 2px var(--here-color, #3ddc84)) drop-shadow(0 0 4px var(--here-color, #3ddc84));
   }
 }
+
+/* Desktop app: an intel channel just named this system. A red ring pulses
+   for five seconds (desktop/intel.ts), in the colour-vision palette's
+   hostile colour. */
+@keyframes system-node-intel {
+  0%   { box-shadow: 0 0 0 0 color-mix(in srgb, var(--cv-stand-hostile) 85%, transparent); }
+  100% { box-shadow: 0 0 0 16px color-mix(in srgb, var(--cv-stand-hostile) 0%, transparent); }
+}
+.system-node--intel {
+  animation: system-node-intel 1s ease-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .system-node--intel {
+    animation: none;
+    box-shadow: 0 0 0 4px var(--cv-stand-hostile);
+  }
+}

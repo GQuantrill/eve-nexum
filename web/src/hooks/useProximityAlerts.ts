@@ -8,6 +8,7 @@ import { ensureSovLoaded, getSovEntries } from './useSovData';
 import { useUserSetting, readUserSetting, writeUserSetting } from './useUserSetting';
 import { NOTIFY, notifyOn, alertGain } from '../utils/notificationPrefs';
 import { useDebugFlag } from '../utils/debugFlags';
+import { desktopNotify } from '../desktop/bridge';
 
 export type ThreatKind = 'incursion' | 'insurgency' | 'hostile-sov';
 
@@ -67,14 +68,16 @@ function playBeep() {
 }
 
 function fireBrowserNotification(kind: ThreatKind, jumps: number, sysName: string) {
-  if (typeof Notification === 'undefined') return;
-  if (Notification.permission !== 'granted') return;
   const title =
     kind === 'incursion'   ? 'Incursion nearby' :
     kind === 'insurgency'  ? 'Insurgency nearby' :
     kind === 'hostile-sov' ? 'Hostile sov nearby' :
     'Threat nearby';
   const body  = jumps === 0 ? `You are in ${sysName}` : `${jumps} jump${jumps === 1 ? '' : 's'} from ${sysName}`;
+  // Inside the desktop app the system notification comes from the app itself.
+  if (desktopNotify(title, body)) return;
+  if (typeof Notification === 'undefined') return;
+  if (Notification.permission !== 'granted') return;
   try { new Notification(title, { body, tag: `nexum-${kind}-${sysName}` }); } catch { /* ignore */ }
 }
 

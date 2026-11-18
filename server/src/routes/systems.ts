@@ -213,6 +213,33 @@ systemsRouter.get('/ice-belts', async (_req, res) => {
 });
 
 // GET /api/systems/search?q=<query>
+// GET /api/systems/lookup?name=Jita -- one system by its exact name (any
+// case), in the same shape the location endpoint returns. The desktop app reads
+// EVE's Local chat log, which names the system a pilot just entered; this turns
+// that name into a system the map can use. Read-only SDE data, nothing about
+// the caller is trusted or stored.
+systemsRouter.get('/lookup', async (req, res) => {
+  const name = String(req.query.name ?? '').trim();
+  if (name.length < 2 || name.length > 64) return res.status(400).json({ error: 'name required' });
+  try {
+    const { rows } = await db.query(
+      `SELECT s.id AS "eveSystemId", s.name, s.class AS "systemClass",
+              COALESCE(s.effect, 'none') AS effect, s.statics,
+              r.name AS "regionName", r.npc_type AS "npcType"
+       FROM solar_systems s
+       LEFT JOIN map_regions r ON r.id = s.region_id
+       WHERE LOWER(s.name) = LOWER($1)
+       LIMIT 1`,
+      [name],
+    );
+    if (!rows.length) return res.status(404).json({ error: 'not_found' });
+    return res.json(rows[0]);
+  } catch (err) {
+    log.error('Lookup failed:', err);
+    return res.status(500).json({ error: 'Database query failed' });
+  }
+});
+
 systemsRouter.get('/search', async (req, res) => {
   const q = String(req.query.q ?? '').trim();
   if (q.length < 2) return res.json([]);
