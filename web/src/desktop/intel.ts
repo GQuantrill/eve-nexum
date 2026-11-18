@@ -2,6 +2,7 @@ import { useSyncExternalStore } from 'react';
 import { onDesktopEvent } from './bridge';
 import { useMapStore } from '../store/mapStore';
 import { alertGain } from '../utils/notificationPrefs';
+import { api } from '../api/client';
 
 // Desktop only: the app follows the pilot's chosen intel channels (EVE chat
 // logs) and sends each new line here. A line naming a system on the open map
@@ -80,12 +81,91 @@ function playAlert(): void {
   } catch { /* audio blocked or unavailable */ }
 }
 
+// ── Reports anywhere (for proximity alerts) ─────────────────────────────────
+// The pulse only needs the open map's systems, but a hostile two gates out is
+// usually NOT on a wormhole map. So every line's words are also looked up
+// against all systems (batched every two seconds, each word cached whether or
+// not it was a system, to stay well inside the lookup's rate limit), and each
+// system reported is kept for five minutes, or until a "clr" for it. The
+// proximity alerts (hooks/useProximityAlerts) measure the jumps.
+
+export const REPORT_MS = 5 * 60_000;
+const BATCH_MS = 2_000;
+const BATCH_MAX = 60;
+
+export interface IntelReport { eveSystemId: number; name: string; at: number }
+
+let reports = new Map<number, IntelReport>();
+const reportSubs = new Set<() => void>();
+const publish = (next: Map<number, IntelReport>) => { reports = next; reportSubs.forEach((f) => f()); };
+const subscribeReports = (cb: () => void) => { reportSubs.add(cb); return () => { reportSubs.delete(cb); }; };
+
+/** Systems reported in intel in the last five minutes (and not cleared). */
+export function useIntelReports(): Map<number, IntelReport> {
+  return useSyncExternalStore(subscribeReports, () => reports, () => reports);
+}
+
+function expireReports(): void {
+  const now = Date.now();
+  if ([...reports.values()].some((r) => now - r.at > REPORT_MS)) {
+    publish(new Map([...reports].filter(([, r]) => now - r.at <= REPORT_MS)));
+  }
+}
+
+/** The words of a line that could be a system name: each word, and each pair
+ *  of words (for the few two-word names), without trailing marks like "*". */
+export function candidateNames(text: string): string[] {
+  const words = text.split(/\s+/)
+    .map((w) => w.replace(/^[^A-Za-z0-9]+|[^A-Za-z0-9]+$/g, ''))
+    .filter((w) => w.length >= 2 && w.length <= 32);
+  const pairs = words.slice(1).map((w, i) => `${words[i]} ${w}`);
+  return [...new Set([...words, ...pairs].map((w) => w.toLowerCase()))];
+}
+
+const known = new Map<string, { eveSystemId: number; name: string } | null>();
+let queued: IntelLine[] = [];
+let flushTimer: ReturnType<typeof setTimeout> | null = null;
+
+async function flush(): Promise<void> {
+  flushTimer = null;
+  const lines = queued;
+  queued = [];
+  const unknown = [...new Set(lines.flatMap((l) => candidateNames(l.text)))].filter((n) => !known.has(n));
+  for (let i = 0; i < unknown.length; i += BATCH_MAX) {
+    const batch = unknown.slice(i, i + BATCH_MAX);
+    try {
+      const found = await api<{ eveSystemId: number; name: string }[]>(
+        `/api/systems/lookup?names=${encodeURIComponent(batch.join(','))}`);
+      batch.forEach((n) => known.set(n, null));
+      found.forEach((s) => known.set(s.name.toLowerCase(), { eveSystemId: s.eveSystemId, name: s.name }));
+    } catch { /* rate-limited or offline: try these words again next time */ }
+  }
+  const next = new Map(reports);
+  for (const line of lines) {
+    const clear = CLEAR.test(line.text);
+    for (const n of candidateNames(line.text)) {
+      const sys = known.get(n);
+      if (!sys) continue;
+      if (clear) next.delete(sys.eveSystemId);
+      else next.set(sys.eveSystemId, { ...sys, at: line.at });
+    }
+  }
+  publish(next);
+}
+
+function queueReport(line: IntelLine): void {
+  queued.push(line);
+  flushTimer ??= setTimeout(() => { void flush(); }, BATCH_MS);
+}
+
 // ── Listener ────────────────────────────────────────────────────────────────
 const MAX_AGE_MS = 60_000;   // a line older than this is history, not intel
 
 export function startIntel(): () => void {
-  return onDesktopEvent<IntelLine>('nexum://intel', (line) => {
+  const expiry = setInterval(expireReports, 15_000);
+  const off = onDesktopEvent<IntelLine>('nexum://intel', (line) => {
     if (Date.now() - line.at > MAX_AGE_MS) return;
+    queueReport(line);
     const ids = systemsNamed(line.text, useMapStore.getState().map.systems);
     if (ids.length === 0) return;
     const level = PULSES.includes(line.pulse as IntelPulse) ? line.pulse! : 'normal';
@@ -93,4 +173,5 @@ export function startIntel(): () => void {
     if (level !== 'off') ids.forEach((id) => pulse(id, secs * 1000, level));
     if (line.sound) playAlert();
   });
+  return () => { off(); clearInterval(expiry); };
 }

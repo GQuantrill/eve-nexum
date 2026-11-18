@@ -218,6 +218,37 @@ systemsRouter.get('/ice-belts', async (_req, res) => {
 // EVE's Local chat log, which names the system a pilot just entered; this turns
 // that name into a system the map can use. Read-only SDE data, nothing about
 // the caller is trusted or stored.
+// GET /api/systems/lookup?names=A,B,... -- the same for up to 60 names at
+// once, answering only those that are systems (an array, in no set order).
+// The desktop app's intel channels name systems among pilots and chatter;
+// one request per batch of lines keeps a busy channel well inside the rate
+// limit.
+const LOOKUP_BATCH_MAX = 60;
+systemsRouter.get('/lookup', async (req, res, next) => {
+  if (req.query.names === undefined) return next();
+  const names = [...new Set(String(req.query.names).split(',')
+    .map((n) => n.trim().toLowerCase())
+    .filter((n) => n.length >= 2 && n.length <= 64))];
+  if (names.length === 0 || names.length > LOOKUP_BATCH_MAX) {
+    return res.status(400).json({ error: `1-${LOOKUP_BATCH_MAX} names required` });
+  }
+  try {
+    const { rows } = await db.query(
+      `SELECT s.id AS "eveSystemId", s.name, s.class AS "systemClass",
+              COALESCE(s.effect, 'none') AS effect, s.statics,
+              r.name AS "regionName", r.npc_type AS "npcType"
+       FROM solar_systems s
+       LEFT JOIN map_regions r ON r.id = s.region_id
+       WHERE LOWER(s.name) = ANY($1::text[])`,
+      [names],
+    );
+    return res.json(rows);
+  } catch (err) {
+    log.error('Batch lookup failed:', err);
+    return res.status(500).json({ error: 'Database query failed' });
+  }
+});
+
 systemsRouter.get('/lookup', async (req, res) => {
   const name = String(req.query.name ?? '').trim();
   if (name.length < 2 || name.length > 64) return res.status(400).json({ error: 'name required' });

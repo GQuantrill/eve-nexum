@@ -2509,7 +2509,11 @@
       "insurgency": "Aufstand",
       "hostileSov": "Feindliche Sov",
       "threat": "Bedrohung",
-      "closest": "Nächstes {{label}}-System"
+      "closest": "Nächstes {{label}}-System",
+      "intel": "Bedrohung gemeldet",
+      "intelHere": "In deinem System gemeldet: {{system}}",
+      "intelNear_one": "{{system}}: {{count}} Sprung von dir",
+      "intelNear_other": "{{system}}: {{count}} Sprünge von dir"
     },
     "resetLayout": "Symbolleisten-Layout zurücksetzen",
     "role": "Rolle: {{role}}",

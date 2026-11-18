@@ -2509,7 +2509,11 @@
       "insurgency": "Insurrection",
       "hostileSov": "Sov hostile",
       "threat": "Menace",
-      "closest": "Système {{label}} le plus proche"
+      "closest": "Système {{label}} le plus proche",
+      "intel": "Menace signalée",
+      "intelHere": "Signalée dans votre système : {{system}}",
+      "intelNear_one": "{{system}} : à {{count}} saut de vous",
+      "intelNear_other": "{{system}} : à {{count}} sauts de vous"
     },
     "resetLayout": "Réinitialiser la disposition de la barre d'outils",
     "role": "Rôle : {{role}}",

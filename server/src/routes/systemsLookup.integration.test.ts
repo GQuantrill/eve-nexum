@@ -32,6 +32,18 @@ describe.skipIf(!dbReady)('GET /api/systems/lookup', () => {
     expect(res.status).toBe(404);
   });
 
+  it('looks up a batch, answering only the systems', async () => {
+    const res = await request(makeApp()).get('/api/systems/lookup?names=Kihiro,JITA,thera,Shihari');
+    expect(res.status).toBe(200);
+    expect(res.body.map((s: { name: string }) => s.name).sort()).toEqual(['Jita', 'Thera']);
+  });
+
+  it('refuses an empty or oversized batch', async () => {
+    expect((await request(makeApp()).get('/api/systems/lookup?names=')).status).toBe(400);
+    const many = Array.from({ length: 61 }, (_, i) => `sys${i}`).join(',');
+    expect((await request(makeApp()).get(`/api/systems/lookup?names=${many}`)).status).toBe(400);
+  });
+
   it('refuses a missing or oversized name', async () => {
     expect((await request(makeApp()).get('/api/systems/lookup')).status).toBe(400);
     expect((await request(makeApp()).get(`/api/systems/lookup?name=${'x'.repeat(65)}`)).status).toBe(400);

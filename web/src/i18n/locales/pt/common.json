@@ -2509,7 +2509,11 @@
       "insurgency": "Insurgência",
       "hostileSov": "Sov hostil",
       "threat": "Ameaça",
-      "closest": "Sistema {{label}} mais próximo"
+      "closest": "Sistema {{label}} mais próximo",
+      "intel": "Ameaça reportada",
+      "intelHere": "Reportada no seu sistema: {{system}}",
+      "intelNear_one": "{{system}}: a {{count}} salto de você",
+      "intelNear_other": "{{system}}: a {{count}} saltos de você"
     },
     "resetLayout": "Repor disposição da barra de ferramentas",
     "role": "Função: {{role}}",

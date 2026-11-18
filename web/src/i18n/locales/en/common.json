@@ -2509,7 +2509,11 @@
       "insurgency": "Insurgency",
       "hostileSov": "Hostile sov",
       "threat": "Threat",
-      "closest": "Closest {{label}} system"
+      "closest": "Closest {{label}} system",
+      "intel": "Threat reported",
+      "intelHere": "Reported in your system: {{system}}",
+      "intelNear_one": "{{system}}: {{count}} jump from you",
+      "intelNear_other": "{{system}}: {{count}} jumps from you"
     },
     "resetLayout": "Reset toolbar layout",
     "role": "Role: {{role}}",

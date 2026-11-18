@@ -55,6 +55,7 @@ import {
   ShieldStarIcon,
   SignOutIcon,
   SkullIcon,
+  MegaphoneIcon,
   SlidersHorizontalIcon,
   WarningIcon,
   XCircleIcon,
@@ -470,6 +471,7 @@ export function Toolbar() {
           nearestThreat.kind === 'incursion'   ? { label: t('toolbar.proximity.incursion'),  Icon: WarningIcon } :
           nearestThreat.kind === 'insurgency'  ? { label: t('toolbar.proximity.insurgency'), Icon: SkullIcon } :
           nearestThreat.kind === 'hostile-sov' ? { label: t('toolbar.proximity.hostileSov'), Icon: XCircleIcon } :
+          nearestThreat.kind === 'intel'       ? { label: t('toolbar.proximity.intel'),      Icon: MegaphoneIcon } :
           { label: t('toolbar.proximity.threat'), Icon: QuestionIcon };
         return (
           <span

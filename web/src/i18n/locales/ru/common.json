@@ -2551,7 +2551,13 @@
       "insurgency": "Мятеж",
       "hostileSov": "Враждебный сув",
       "threat": "Угроза",
-      "closest": "Ближайшая система: {{label}}"
+      "closest": "Ближайшая система: {{label}}",
+      "intel": "Сообщение об угрозе",
+      "intelHere": "В вашей системе: {{system}}",
+      "intelNear_one": "{{system}}: {{count}} прыжок от вас",
+      "intelNear_few": "{{system}}: {{count}} прыжка от вас",
+      "intelNear_many": "{{system}}: {{count}} прыжков от вас",
+      "intelNear_other": "{{system}}: {{count}} прыжка от вас"
     },
     "resetLayout": "Сбросить раскладку панели инструментов",
     "role": "Роль: {{role}}",

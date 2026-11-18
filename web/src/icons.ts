@@ -78,6 +78,7 @@ export { MagnifyingGlassIcon } from '@phosphor-icons/react/dist/csr/MagnifyingGl
 export { MapPinIcon } from '@phosphor-icons/react/dist/csr/MapPin';
 export { MapPinSimpleIcon } from '@phosphor-icons/react/dist/csr/MapPinSimple';
 export { MapTrifoldIcon } from '@phosphor-icons/react/dist/csr/MapTrifold';
+export { MegaphoneIcon } from '@phosphor-icons/react/dist/csr/Megaphone';
 export { NavigationArrowIcon } from '@phosphor-icons/react/dist/csr/NavigationArrow';
 export { PathIcon } from '@phosphor-icons/react/dist/csr/Path';
 export { PlanetIcon } from '@phosphor-icons/react/dist/csr/Planet';

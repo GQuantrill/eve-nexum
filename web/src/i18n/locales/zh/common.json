@@ -2507,7 +2507,11 @@
       "insurgency": "叛乱",
       "hostileSov": "敌对主权",
       "threat": "威胁",
-      "closest": "最近的{{label}}星系"
+      "closest": "最近的{{label}}星系",
+      "intel": "已报告威胁",
+      "intelHere": "你所在星系有报告：{{system}}",
+      "intelNear_one": "{{system}}：距你 {{count}} 跳",
+      "intelNear_other": "{{system}}：距你 {{count}} 跳"
     },
     "resetLayout": "重置工具栏布局",
     "role": "权限：{{role}}",

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { systemsNamed } from './intel';
+import { systemsNamed, candidateNames } from './intel';
 
 const map = [
   { id: 'a', name: '1DQ1-A' },
@@ -23,5 +23,21 @@ describe('systemsNamed', () => {
   it('ignores clear reports', () => {
     expect(systemsNamed('1DQ1-A clr', map)).toEqual([]);
     expect(systemsNamed('Jita clear', map)).toEqual([]);
+  });
+});
+
+describe('candidateNames', () => {
+  it('takes each word without trailing marks, and word pairs', () => {
+    const c = candidateNames('2JT-3Q*  Kalemon Idora');
+    expect(c).toContain('2jt-3q');
+    expect(c).toContain('kalemon');
+    expect(c).toContain('kalemon idora');
+  });
+  it('finds two-word systems and strips brackets', () => {
+    expect(candidateNames('gang in New Caldari')).toContain('new caldari');
+    expect(candidateNames('shadow-00 (Magnate)  UCG4-B')).toEqual(expect.arrayContaining(['magnate', 'ucg4-b', 'shadow-00']));
+  });
+  it('skips single characters', () => {
+    expect(candidateNames('+ 5 x')).toEqual([]);
   });
 });

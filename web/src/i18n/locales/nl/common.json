@@ -2509,7 +2509,11 @@
       "insurgency": "Insurgency",
       "hostileSov": "Vijandige sov",
       "threat": "Dreiging",
-      "closest": "Dichtstbijzijnde {{label}}-systeem"
+      "closest": "Dichtstbijzijnde {{label}}-systeem",
+      "intel": "Dreiging gemeld",
+      "intelHere": "Gemeld in jouw systeem: {{system}}",
+      "intelNear_one": "{{system}}: {{count}} sprong van je",
+      "intelNear_other": "{{system}}: {{count}} sprongen van je"
     },
     "resetLayout": "Werkbalkindeling herstellen",
     "role": "Rol: {{role}}",

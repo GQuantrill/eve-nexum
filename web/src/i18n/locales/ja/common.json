@@ -2507,7 +2507,11 @@
       "insurgency": "反乱",
       "hostileSov": "敵対主権",
       "threat": "脅威",
-      "closest": "最も近い{{label}}星系"
+      "closest": "最も近い{{label}}星系",
+      "intel": "脅威の報告",
+      "intelHere": "現在の星系で報告: {{system}}",
+      "intelNear_one": "{{system}}：{{count}} ジャンプ先",
+      "intelNear_other": "{{system}}：{{count}} ジャンプ先"
     },
     "resetLayout": "ツールバーのレイアウトをリセット",
     "role": "権限: {{role}}",
