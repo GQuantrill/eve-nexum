@@ -1239,7 +1239,8 @@
       "about": "À propos de Nexum",
       "aboutMe": "À propos de moi",
       "techStack": "Stack technique",
-      "faqs": "FAQ"
+      "faqs": "FAQ",
+      "desktop": "Uniquement dans l'application de bureau"
     },
     "features": {
       "interactiveMap": {
@@ -1652,7 +1653,46 @@
         "a": "Je préférerais que non, vraiment. Je ne fais pas ça pour l'ISK, alors gardez-le et dépensez-le pour quelque chose dans quoi exploser ou faire exploser quelqu'un d'autre !"
       }
     },
-    "footer": "EVE Online et le logo EVE sont des marques déposées de CCP hf. Tous droits réservés dans le monde entier. Nexum est un outil tiers et n'est ni affilié à CCP hf ni approuvé par lui. · <license>Mention de licence & PI EVE</license>"
+    "footer": "EVE Online et le logo EVE sont des marques déposées de CCP hf. Tous droits réservés dans le monde entier. Nexum est un outil tiers et n'est ni affilié à CCP hf ni approuvé par lui. · <license>Mention de licence & PI EVE</license>",
+    "desktopBody": "Nexum existe aussi en application de bureau pour Windows et macOS. C'est le même Nexum, avec votre connexion, vos cartes et vos réglages, plus ce qu'un navigateur ne peut pas offrir : l'application lit les fichiers de logs d'EVE sur votre ordinateur et reste au-dessus du jeu. Tout ce qui figure dans cette section nécessite l'application ; tout ce qui précède fonctionne dans les deux.",
+    "desktopFeatures": {
+      "logJumps": {
+        "title": "Suivi instantané des sauts",
+        "desc": "Lit le log du chat Local d'EVE et vous déplace sur la carte dès votre saut, quelques secondes avant ESI. ESI confirme toujours chaque déplacement."
+      },
+      "intelMap": {
+        "title": "L'intel sur votre carte",
+        "desc": "Suivez vos canaux d'intel. Quand un signalement cite un système de votre carte, il pulse en rouge, avec un son. Choisissez l'intensité et la durée."
+      },
+      "intelFeed": {
+        "title": "Fil d'intel",
+        "desc": "Tous vos canaux d'intel dans un seul fil de la barre latérale, avec le nombre de sauts jusqu'à chaque système signalé. Activez ou masquez des canaux, cliquez sur un système pour le trouver sur la carte, ou clic droit pour en faire une destination ou un waypoint."
+      },
+      "threatReported": {
+        "title": "Menace signalée",
+        "desc": "L'intel dans votre portée de proximité déclenche une alerte, peut être lue à voix haute et fait clignoter Nexum dans la barre des tâches pendant que vous jouez. Un « clr » l'annule."
+      },
+      "scanPaste": {
+        "title": "Collage des scans de sondes",
+        "desc": "Copiez les résultats du scanner de sondes dans EVE : ils arrivent dans le système sélectionné, sans alt-tab. Désactivé tant que vous ne l'activez pas."
+      },
+      "onTop": {
+        "title": "Toujours au premier plan",
+        "desc": "Gardez Nexum au-dessus du client EVE, et affichez-le ou masquez-le de partout avec Alt+Shift+N."
+      },
+      "native": {
+        "title": "Notifications système et zone de notification",
+        "desc": "Les alertes de Nexum arrivent comme notifications système, et l'application continue de tourner depuis la zone de notification."
+      },
+      "menuBar": {
+        "title": "Barre de menus",
+        "desc": "Réglages, zoom, plein écran et toutes les options de bureau dans une vraie barre de menus."
+      },
+      "anyServer": {
+        "title": "Votre serveur ou le nôtre",
+        "desc": "Utilise eve-nexum.com par défaut. Vous hébergez votre propre Nexum ? Indiquez-le dans les réglages."
+      }
+    }
   },
   "language": {
     "label": "Langue"

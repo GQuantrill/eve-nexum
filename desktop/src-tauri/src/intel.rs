@@ -3,7 +3,8 @@
 // chat log folder, a new file per session. For each channel this follows the
 // newest file (by the date and time in its name) and sends every new line to
 // the Nexum window, which pulses any system on the map that the line names.
-// The lines go to that window only, never to the server.
+// The lines go to that window only. The web app sends their words to the
+// Nexum server's system-name lookup (not stored there), never the lines.
 
 use regex::Regex;
 use serde::Serialize;

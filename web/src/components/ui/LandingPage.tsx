@@ -15,6 +15,7 @@ import {
   LinkSimpleIcon, ScanIcon, DiamondsFourIcon, SlidersHorizontalIcon, ShieldStarIcon, FootprintsIcon, ArrowSquareInIcon,
   ArrowSquareOutIcon, ClockCountdownIcon, CheckIcon, FireIcon, CrosshairSimpleIcon, ArrowBendUpRightIcon, CrosshairIcon,
   MapPinSimpleIcon, ColumnsIcon,
+  MegaphoneIcon, PushPinIcon, HardDrivesIcon, AppWindowIcon,
 } from '../../icons';
 import { apiUrl } from '../../api/client';
 import { loginUrl, useScopeOptions } from '../../api/scopeOptions';
@@ -51,6 +52,10 @@ type CorpFeatureId =
   | 'multiCorp' | 'allianceMaps' | 'allianceRoles' | 'accessControl' | 'adminDash' | 'userMgmt' | 'mapMgmt' | 'usersReport'
   | 'systemsReport' | 'timeWindowed' | 'auditLog' | 'corpTicker' | 'perCharAttr'
   | 'invites' | 'orgDefaults' | 'orgBranding' | 'prebuiltImages';
+
+type DesktopFeatureId =
+  | 'logJumps' | 'intelMap' | 'intelFeed' | 'threatReported' | 'scanPaste'
+  | 'onTop' | 'native' | 'menuBar' | 'anyServer';
 
 interface FeatureItem { icon: Icon; id: FeatureId }
 interface FeatureSection { id: SectionId; items: FeatureItem[] }
@@ -154,6 +159,20 @@ const FEATURE_SECTIONS: FeatureSection[] = [
       { icon: EyeglassesIcon, id: 'colorVision' },
     ],
   },
+];
+
+// Desktop app only: what the app adds because it can read EVE's own files
+// and sit above the game. Everything else is the same site as in a browser.
+const DESKTOP_FEATURES: { icon: Icon; id: DesktopFeatureId }[] = [
+  { icon: FootprintsIcon,   id: 'logJumps'       },
+  { icon: BroadcastIcon,    id: 'intelMap'       },
+  { icon: SidebarIcon,      id: 'intelFeed'      },
+  { icon: MegaphoneIcon,    id: 'threatReported' },
+  { icon: ScanIcon,         id: 'scanPaste'      },
+  { icon: PushPinIcon,      id: 'onTop'          },
+  { icon: BellRingingIcon,  id: 'native'         },
+  { icon: AppWindowIcon,    id: 'menuBar'        },
+  { icon: HardDrivesIcon,   id: 'anyServer'      },
 ];
 
 // "For corporations" section in the README mirrored here. Hidden behind
@@ -463,6 +482,26 @@ export function LandingPage() {
             </section>
           </section>
         ))}
+
+        {/* ── Desktop app only ────────────────────────────────── */}
+        <section className="landing__section landing__section--features" id="desktop-app">
+          <h2 className="landing__section-title">{t('landing.sections.desktop')}</h2>
+          <p className="landing__section-body">
+            {t('landing.desktopBody')}
+          </p>
+          <section className="landing__features">
+            {DESKTOP_FEATURES.map((f) => {
+              const Icon = f.icon;
+              return (
+                <div key={f.id} className="landing__feature">
+                  <span className="landing__feature-icon"><Icon size="1em" weight="duotone" /></span>
+                  <h3 className="landing__feature-title">{t(`landing.desktopFeatures.${f.id}.title`)}</h3>
+                  <p className="landing__feature-desc">{t(`landing.desktopFeatures.${f.id}.desc`)}</p>
+                </div>
+              );
+            })}
+          </section>
+        </section>
 
         {/* ── Corp / alliance features ───────────────────────── */}
         <section className="landing__section landing__section--features" id="for-corporations">

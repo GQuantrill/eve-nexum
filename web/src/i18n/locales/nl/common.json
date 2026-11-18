@@ -1239,7 +1239,8 @@
       "about": "Over Nexum",
       "aboutMe": "Over mij",
       "techStack": "Techniek",
-      "faqs": "Veelgestelde vragen"
+      "faqs": "Veelgestelde vragen",
+      "desktop": "Alleen in de desktop-app"
     },
     "features": {
       "interactiveMap": {
@@ -1652,7 +1653,46 @@
         "a": "Liever niet, nee. Ik doe dit niet voor de ISK, dus hou het en koop er iets van om in opgeblazen te worden of om iemand anders mee op te blazen!"
       }
     },
-    "footer": "EVE Online en het EVE-logo zijn geregistreerde handelsmerken van CCP hf. Alle rechten wereldwijd voorbehouden. Nexum is een tool van derden en is niet verbonden met of goedgekeurd door CCP hf. · <license>Licentie en EVE IP-vermelding</license>"
+    "footer": "EVE Online en het EVE-logo zijn geregistreerde handelsmerken van CCP hf. Alle rechten wereldwijd voorbehouden. Nexum is een tool van derden en is niet verbonden met of goedgekeurd door CCP hf. · <license>Licentie en EVE IP-vermelding</license>",
+    "desktopBody": "Nexum bestaat ook als desktop-app voor Windows en macOS. Het is dezelfde Nexum, met je login, kaarten en instellingen, plus functies die een browser niet kan bieden: de app kan EVE's eigen logbestanden op je computer lezen en boven het spel blijven. Alles in dit deel vraagt de desktop-app; alles hierboven werkt in beide.",
+    "desktopFeatures": {
+      "logJumps": {
+        "title": "Directe sprongvolging",
+        "desc": "Leest het Local-chatlog van EVE en verplaatst je op de kaart zodra je springt, seconden voordat ESI het meldt. ESI bevestigt nog steeds elke stap."
+      },
+      "intelMap": {
+        "title": "Intel op je kaart",
+        "desc": "Volg je intelkanalen. Noemt een melding een systeem op je kaart, dan pulseert het rood, met geluid. Kies zelf hoe sterk en hoe lang."
+      },
+      "intelFeed": {
+        "title": "Intelfeed",
+        "desc": "Al je intelkanalen in één feed in de zijbalk, met hoeveel sprongen elk gemeld systeem van je af is. Zet kanalen aan en uit, klik op een systeem om het op de kaart te vinden, of rechtsklik voor bestemming of waypoint."
+      },
+      "threatReported": {
+        "title": "Dreiging gemeld",
+        "desc": "Intel binnen je nabijheidsbereik geeft een waarschuwing, kan worden voorgelezen en laat Nexum knipperen in de taakbalk terwijl je speelt. Een \"clr\" heft hem op."
+      },
+      "scanPaste": {
+        "title": "Probe-scans plakken",
+        "desc": "Kopieer probe-scannerresultaten in EVE en ze komen in het geselecteerde systeem, zonder alt-tab. Uit tot je het aanzet."
+      },
+      "onTop": {
+        "title": "Altijd bovenop",
+        "desc": "Houd Nexum boven de EVE-client en toon of verberg het overal met Alt+Shift+N."
+      },
+      "native": {
+        "title": "Systeemmeldingen en systeemvak",
+        "desc": "De waarschuwingen van Nexum komen als systeemmeldingen, en de app blijft draaien vanuit het systeemvak."
+      },
+      "menuBar": {
+        "title": "Menubalk",
+        "desc": "Instellingen, zoom, volledig scherm en alle desktopopties in een echte menubalk."
+      },
+      "anyServer": {
+        "title": "Jouw server of de onze",
+        "desc": "Gebruikt standaard eve-nexum.com. Draai je je eigen Nexum? Stel het in bij Instellingen."
+      }
+    }
   },
   "language": {
     "label": "Taal"

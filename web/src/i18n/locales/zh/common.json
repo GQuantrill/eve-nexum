@@ -1239,7 +1239,8 @@
       "about": "关于 Nexum",
       "aboutMe": "关于我",
       "techStack": "技术栈",
-      "faqs": "常见问题"
+      "faqs": "常见问题",
+      "desktop": "仅限桌面应用"
     },
     "features": {
       "interactiveMap": {
@@ -1652,7 +1653,46 @@
         "a": "我宁愿你别这么做，真的。我做这个不是为了 ISK，所以留着它，花在能让你炸飞或炸飞别人的东西上吧！"
       }
     },
-    "footer": "EVE Online 和 EVE 标志是 CCP hf. 的注册商标。保留全球所有权利。Nexum 是第三方工具，与 CCP hf. 无关，也未获其认可。· <license>许可证与 EVE 知识产权声明</license>"
+    "footer": "EVE Online 和 EVE 标志是 CCP hf. 的注册商标。保留全球所有权利。Nexum 是第三方工具，与 CCP hf. 无关，也未获其认可。· <license>许可证与 EVE 知识产权声明</license>",
+    "desktopBody": "Nexum 也有适用于 Windows 和 macOS 的桌面应用。它就是同一个 Nexum，保留你的登录、地图和设置，并加入浏览器做不到的功能：应用可以读取你电脑上 EVE 自己的日志文件，并置于游戏之上。本节中的所有功能都需要桌面应用；以上所有功能两者皆可使用。",
+    "desktopFeatures": {
+      "logJumps": {
+        "title": "即时跳跃跟踪",
+        "desc": "读取 EVE 本地频道日志，在你跳跃的瞬间更新你在地图上的位置，比 ESI 早几秒。每次移动仍由 ESI 确认。"
+      },
+      "intelMap": {
+        "title": "地图上的情报",
+        "desc": "关注你的情报频道。当报告提到你地图上的星系时，该星系会红色闪烁并发出声音。强度和时长可自行选择。"
+      },
+      "intelFeed": {
+        "title": "情报动态",
+        "desc": "所有情报频道汇总在侧边栏的一个动态中，并显示每个被报告星系距你几跳。可开关频道，点击星系在地图上找到它，或右键设为目的地或路径点。"
+      },
+      "threatReported": {
+        "title": "已报告威胁",
+        "desc": "接近警报范围内的情报会触发警报，可朗读出来，并在你游戏时让 Nexum 在任务栏闪烁。发送 \"clr\" 即可解除。"
+      },
+      "scanPaste": {
+        "title": "粘贴探针扫描",
+        "desc": "在 EVE 中复制探针扫描结果，就会自动填入所选星系，无需切换窗口。默认关闭，需手动开启。"
+      },
+      "onTop": {
+        "title": "窗口置顶",
+        "desc": "让 Nexum 保持在 EVE 客户端之上，并可随时用 Alt+Shift+N 显示或隐藏。"
+      },
+      "native": {
+        "title": "系统通知与托盘",
+        "desc": "Nexum 的警报以系统通知的形式送达，并可在系统托盘中持续运行。"
+      },
+      "menuBar": {
+        "title": "菜单栏",
+        "desc": "设置、缩放、全屏以及所有桌面选项，都在正式的菜单栏中。"
+      },
+      "anyServer": {
+        "title": "你的服务器或我们的",
+        "desc": "默认使用 eve-nexum.com。自建了 Nexum？在设置中指向它即可。"
+      }
+    }
   },
   "language": {
     "label": "语言"

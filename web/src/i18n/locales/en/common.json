@@ -1239,7 +1239,8 @@
       "about": "About Nexum",
       "aboutMe": "About Me",
       "techStack": "Tech Stack",
-      "faqs": "FAQs"
+      "faqs": "FAQs",
+      "desktop": "Desktop app only"
     },
     "features": {
       "interactiveMap": {
@@ -1652,7 +1653,46 @@
         "a": "I prefer it if you did not, no. I'm not doing this for ISK so keep it and spend it on something to blow up in or blow someone else up in!"
       }
     },
-    "footer": "EVE Online and the EVE logo are the registered trademarks of CCP hf. All rights reserved worldwide. Nexum is a third-party tool and is not affiliated with or endorsed by CCP hf. · <license>License & EVE IP notice</license>"
+    "footer": "EVE Online and the EVE logo are the registered trademarks of CCP hf. All rights reserved worldwide. Nexum is a third-party tool and is not affiliated with or endorsed by CCP hf. · <license>License & EVE IP notice</license>",
+    "desktopBody": "Nexum also runs as a desktop app for Windows and macOS. It's the same Nexum, with your login, maps and settings, plus features a browser can't offer: the app can read EVE's own log files on your computer and sit above the game. Everything in this section needs the desktop app; everything above works in both.",
+    "desktopFeatures": {
+      "logJumps": {
+        "title": "Instant jump tracking",
+        "desc": "Reads EVE's Local chat log and moves you on the map the moment you jump, seconds before ESI reports it. ESI still confirms every move."
+      },
+      "intelMap": {
+        "title": "Intel on your map",
+        "desc": "Follow your intel channels. When a report names a system on your map, it pulses red, with a sound. Choose how strongly and for how long."
+      },
+      "intelFeed": {
+        "title": "Intel feed",
+        "desc": "All your intel channels in one sidebar feed, with how many jumps each reported system is from you. Switch channels on and off, click a system to find it on the map, or right-click to set a destination or waypoint."
+      },
+      "threatReported": {
+        "title": "Threat reported",
+        "desc": "Intel within your proximity range raises an alert, can be read aloud, and flashes Nexum in the taskbar while you're in the game. A \"clr\" clears it."
+      },
+      "scanPaste": {
+        "title": "Probe scan paste",
+        "desc": "Copy probe-scanner results in EVE and they land on the selected system, no alt-tab needed. Off until you turn it on."
+      },
+      "onTop": {
+        "title": "Always on top",
+        "desc": "Keep Nexum above the EVE client, and show or hide it from anywhere with Alt+Shift+N."
+      },
+      "native": {
+        "title": "Native notifications and tray",
+        "desc": "Nexum's alerts arrive as system notifications, and it keeps running from the system tray."
+      },
+      "menuBar": {
+        "title": "Menu bar",
+        "desc": "Settings, zoom, full screen and every desktop option in a proper menu bar."
+      },
+      "anyServer": {
+        "title": "Your server or ours",
+        "desc": "Uses eve-nexum.com by default. Running your own Nexum? Point the app at it in Settings."
+      }
+    }
   },
   "language": {
     "label": "Language"

@@ -10,7 +10,8 @@ import { api } from '../api/client';
 // pulse red, with a sound. How long it pulses (5-30 s), how strongly (or not
 // at all: sound only) and whether there's a sound are the pilot's choices in
 // the desktop settings, and arrive with each line. "clr"/"clear" lines are reports that a system is
-// empty, so they don't alert. Nothing here is sent to the server.
+// empty, so they don't alert. The lines themselves are never sent to the
+// server; only their words go, in the system-name lookup below (not stored).
 
 export type IntelPulse = 'off' | 'subtle' | 'normal' | 'strong';
 const PULSES: IntelPulse[] = ['off', 'subtle', 'normal', 'strong'];
