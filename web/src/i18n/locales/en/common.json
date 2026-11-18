@@ -2280,7 +2280,8 @@
     "panelsHint": "Choose which sections appear in the sidebar. Hidden ones keep their place, so switching one back on returns it to where you had it.",
     "panelsAllHidden": "Every section is hidden — the sidebar will be empty.",
     "emptyTitle": "No sections are showing. Choose which ones you want here.",
-    "routePlanner": "Route Planner"
+    "routePlanner": "Route Planner",
+    "intel": "Intel"
   },
   "sigType": {
     "combat": "Combat",
@@ -2792,5 +2793,14 @@
         "affects": "your corp's citadels in the jump planner and structure lists."
       }
     }
+  },
+  "intelFeed": {
+    "all": "All",
+    "settings": "Intel settings",
+    "noChannels": "No intel channels yet. Add them in the desktop app's settings.",
+    "empty": "Nothing reported yet.",
+    "show": "Show {{channel}}",
+    "hide": "Hide {{channel}}",
+    "selectSystem": "Show {{system}} on the map"
   }
 }

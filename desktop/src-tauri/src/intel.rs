@@ -8,6 +8,7 @@
 use regex::Regex;
 use serde::Serialize;
 use std::collections::HashMap;
+use std::io::{Read, Seek, SeekFrom};
 use std::path::{Path, PathBuf};
 use std::sync::OnceLock;
 use std::time::Duration;
@@ -30,6 +31,11 @@ pub struct IntelLine {
     pub pulse_secs: u32,
     pub pulse: String,
 }
+
+/// Lines kept for the Nexum window's intel feed.
+pub const HISTORY_MAX: usize = 300;
+/// How far back into a log to read for the feed when it's first opened.
+const LOOKBACK_BYTES: u64 = 32 * 1024;
 
 /// The file being followed for one channel.
 struct Followed {
@@ -61,8 +67,21 @@ pub fn start(app: AppHandle) {
             };
             followed.retain(|k, _| channels.iter().any(|c| c.eq_ignore_ascii_case(k)));
             if let Some(dir) = eve_logs::log_dir(&app) {
-                for line in poll(&dir, &channels, &mut followed) {
-                    let _ = app.emit_to("main", "nexum://intel", IntelLine { sound, pulse_secs, pulse: pulse.clone(), ..line });
+                let mut history: Vec<IntelLine> = Vec::new();
+                let new = poll(&dir, &channels, &mut followed, &mut history);
+                let new: Vec<IntelLine> = new.into_iter()
+                    .map(|l| IntelLine { sound, pulse_secs, pulse: pulse.clone(), ..l })
+                    .collect();
+                if !history.is_empty() || !new.is_empty() {
+                    let state = app.state::<AppState>();
+                    let mut h = state.intel_history.lock().unwrap();
+                    h.extend(history.into_iter().chain(new.iter().cloned()));
+                    while h.len() > HISTORY_MAX {
+                        h.pop_front();
+                    }
+                }
+                for line in new {
+                    let _ = app.emit_to("main", "nexum://intel", line);
                 }
             }
             let status = channels.iter().map(|c| {
@@ -79,7 +98,14 @@ pub fn start(app: AppHandle) {
 }
 
 /// One pass: new lines in each channel's newest log.
-fn poll(dir: &Path, channels: &[String], followed: &mut HashMap<String, Followed>) -> Vec<IntelLine> {
+/// `history` receives the last lines already in a log when it's first opened:
+/// for the feed only, never alerted.
+fn poll(
+    dir: &Path,
+    channels: &[String],
+    followed: &mut HashMap<String, Followed>,
+    history: &mut Vec<IntelLine>,
+) -> Vec<IntelLine> {
     let mut out = Vec::new();
     let Ok(entries) = std::fs::read_dir(dir) else { return out };
     let names: Vec<String> = entries.flatten()
@@ -103,6 +129,7 @@ fn poll(dir: &Path, channels: &[String], followed: &mut HashMap<String, Followed
             // First sight (app just started, or channel just added): what's
             // already there is history, so start at the end.
             None => {
+                history.extend(tail_lines(channel, &path, len));
                 let mut state = FileState::default();
                 state.offset = len;
                 followed.insert(key.clone(), Followed { path: path.clone(), state, last_at: None });
@@ -124,6 +151,24 @@ fn poll(dir: &Path, channels: &[String], followed: &mut HashMap<String, Followed
         out.extend(lines);
     }
     out
+}
+
+/// The chat lines in the last few KB of a log (the first, probably cut-off,
+/// line dropped when it starts mid-file).
+fn tail_lines(channel: &str, path: &Path, len: u64) -> Vec<IntelLine> {
+    let start = len.saturating_sub(LOOKBACK_BYTES) & !1; // whole UTF-16 units
+    let mut buf = Vec::new();
+    let read = std::fs::File::open(path).and_then(|mut f| {
+        f.seek(SeekFrom::Start(start))?;
+        f.take(len - start).read_to_end(&mut buf)
+    });
+    if read.is_err() {
+        return Vec::new();
+    }
+    let units: Vec<u16> = buf.chunks_exact(2).map(|c| u16::from_le_bytes([c[0], c[1]])).collect();
+    let text = String::from_utf16_lossy(&units).replace('\u{feff}', "");
+    let text = if start > 0 { text.split_once('\n').map(|(_, rest)| rest).unwrap_or("") } else { &text };
+    parse_lines(channel, text)
 }
 
 /// The newest log file for a channel among the folder's file names. Matches
@@ -215,22 +260,25 @@ mod tests {
         std::fs::write(&old, utf16("[ 2026.10.26 12:10:00 ] A > old news Jita\r\n")).unwrap();
         let chans = vec!["east.imperium".to_string()];
         let mut followed = HashMap::new();
+        let mut history = Vec::new();
 
-        // History already in the file is not reported.
-        assert!(poll(&dir, &chans, &mut followed).is_empty());
+        // History already in the file is not reported, only kept for the feed.
+        assert!(poll(&dir, &chans, &mut followed, &mut history).is_empty());
+        assert_eq!(history.len(), 1);
+        assert_eq!(history[0].text, "old news Jita");
 
         // A new line is.
         use std::io::Write;
         std::fs::OpenOptions::new().append(true).open(&old).unwrap()
             .write_all(&utf16("[ 2026.10.26 12:11:00 ] B > hostile 1DQ1-A\r\n")).unwrap();
-        let got = poll(&dir, &chans, &mut followed);
+        let got = poll(&dir, &chans, &mut followed, &mut history);
         assert_eq!(got.len(), 1);
         assert_eq!(got[0].text, "hostile 1DQ1-A");
 
         // EVE restarts: a newer file appears and is read from its start.
         std::fs::write(dir.join("east.imperium_20261026_140000_42.txt"),
             utf16("[ 2026.10.26 14:00:01 ] C > neut J123456\r\n")).unwrap();
-        let got = poll(&dir, &chans, &mut followed);
+        let got = poll(&dir, &chans, &mut followed, &mut history);
         assert_eq!(got.len(), 1);
         assert_eq!(got[0].text, "neut J123456");
 

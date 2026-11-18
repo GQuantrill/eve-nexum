@@ -14,6 +14,8 @@ import { FleetPane } from './FleetPane';
 import { WatchlistBlock } from './WatchlistBlock';
 import { ChainsPane } from './ChainsPane';
 import { RoutePlannerPane } from './RoutePlannerPane';
+import { IntelPane } from './IntelPane';
+import { isDesktop } from '../../desktop/bridge';
 import { CaretLeftIcon, CaretRightIcon, ArrowLineLeftIcon, ArrowLineRightIcon, SquaresFourIcon } from '../../icons';
 import { PanelVisibilityModal } from './PanelVisibilityModal';
 import { useUserSetting } from '../../hooks/useUserSetting';
@@ -38,9 +40,9 @@ function loadWidth(): number {
 }
 
 type Side    = 'left' | 'right';
-type PanelId = 'watchlist' | 'routePlanner' | 'chains' | 'thera' | 'turnur' | 'a0' | 'closest' | 'fleet' | 'pilotsOnline' | 'clones';
+type PanelId = 'watchlist' | 'intel' | 'routePlanner' | 'chains' | 'thera' | 'turnur' | 'a0' | 'closest' | 'fleet' | 'pilotsOnline' | 'clones';
 
-const DEFAULT_ORDER: PanelId[] = ['watchlist', 'routePlanner', 'chains', 'closest', 'thera', 'turnur', 'fleet', 'pilotsOnline', 'clones', 'a0'];
+const DEFAULT_ORDER: PanelId[] = ['watchlist', 'intel', 'routePlanner', 'chains', 'closest', 'thera', 'turnur', 'fleet', 'pilotsOnline', 'clones', 'a0'];
 const VALID_PANEL_IDS: ReadonlySet<PanelId> = new Set(DEFAULT_ORDER);
 
 // The panels form a single vertical column, so a drag should only ever move a
@@ -64,6 +66,7 @@ export function Sidebar() {
   const { user } = useAuth();
   const panelTitle: Record<PanelId, string> = {
     watchlist: t('sidebar.watchlist'),
+    intel: t('sidebar.intel'),
     routePlanner: t('sidebar.routePlanner'),
     chains:  t('sidebar.chains'),
     thera:   t('sidebar.thera'),
@@ -169,13 +172,17 @@ export function Sidebar() {
   // in the position the user put it if the deployment later gains a corp or
   // alliance.
   const orgInstall = !!user?.corpMode || !!user?.allianceMode;
-  const available  = order.filter((id) => id !== 'pilotsOnline' || orgInstall);
+  // The intel feed reads the pilot's EVE chat logs, which only the desktop
+  // app can: in a browser it isn't offered at all.
+  const desktop    = isDesktop();
+  const available  = order.filter((id) => (id !== 'pilotsOnline' || orgInstall) && (id !== 'intel' || desktop));
   // Hidden sections are filtered at render and kept in the saved order, so
   // switching one back on returns it to where the user had it.
   const visibleOrder = available.filter((id) => !hidden.has(id));
 
   const cards: Record<PanelId, ReactNode> = {
     watchlist: <WatchlistBlock />,
+    intel: <IntelPane />,
     routePlanner: <RoutePlannerPane />,
     chains:  <ChainsPane />,
     thera:   <ScoutConnectionsPane scoutSystem="Thera" />,

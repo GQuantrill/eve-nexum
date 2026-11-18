@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from 'react';
-import { onDesktopEvent } from './bridge';
+import { onDesktopEvent, desktopInvoke, isDesktop } from './bridge';
 import { useMapStore } from '../store/mapStore';
 import { alertGain } from '../utils/notificationPrefs';
 import { api } from '../api/client';
@@ -123,14 +123,16 @@ export function candidateNames(text: string): string[] {
 }
 
 const known = new Map<string, { eveSystemId: number; name: string } | null>();
-let queued: IntelLine[] = [];
+// `report`: false for the feed's history, which is looked up only so its
+// system names can be highlighted. Old intel must never alert.
+let queued: { line: IntelLine; report: boolean }[] = [];
 let flushTimer: ReturnType<typeof setTimeout> | null = null;
 
 async function flush(): Promise<void> {
   flushTimer = null;
-  const lines = queued;
+  const items = queued;
   queued = [];
-  const unknown = [...new Set(lines.flatMap((l) => candidateNames(l.text)))].filter((n) => !known.has(n));
+  const unknown = [...new Set(items.flatMap((q) => candidateNames(q.line.text)))].filter((n) => !known.has(n));
   for (let i = 0; i < unknown.length; i += BATCH_MAX) {
     const batch = unknown.slice(i, i + BATCH_MAX);
     try {
@@ -141,7 +143,7 @@ async function flush(): Promise<void> {
     } catch { /* rate-limited or offline: try these words again next time */ }
   }
   const next = new Map(reports);
-  for (const line of lines) {
+  for (const { line } of items.filter((q) => q.report)) {
     const clear = CLEAR.test(line.text);
     for (const n of candidateNames(line.text)) {
       const sys = known.get(n);
@@ -151,21 +153,84 @@ async function flush(): Promise<void> {
     }
   }
   publish(next);
+  setFeed({ ...feed });   // re-render the feed with the newly known names
 }
 
-function queueReport(line: IntelLine): void {
-  queued.push(line);
+function queueLookup(line: IntelLine, report: boolean): void {
+  queued.push({ line, report });
   flushTimer ??= setTimeout(() => { void flush(); }, BATCH_MS);
 }
+
+// ── Feed (the sidebar's Intel pane) ─────────────────────────────────────────
+// Recent lines from every channel, newest last, and the pilot's channels. The
+// app keeps the last few hundred (and a look back into each log when it's
+// first opened), so the pane has something to show the moment it mounts.
+
+const FEED_MAX = 300;
+export interface IntelFeed { channels: string[]; lines: IntelLine[] }
+let feed: IntelFeed = { channels: [], lines: [] };
+const feedSubs = new Set<() => void>();
+const setFeed = (next: IntelFeed) => { feed = next; feedSubs.forEach((f) => f()); };
+const subscribeFeed = (cb: () => void) => { feedSubs.add(cb); return () => { feedSubs.delete(cb); }; };
+const lineKey = (l: IntelLine) => `${l.channel}|${l.at}|${l.sender}|${l.text}`;
+
+/** The intel feed: the pilot's channels and recent lines (desktop app). */
+export function useIntelFeed(): IntelFeed {
+  return useSyncExternalStore(subscribeFeed, () => feed, () => feed);
+}
+
+function addToFeed(lines: IntelLine[], channels?: string[]): void {
+  const seen = new Set(feed.lines.map(lineKey));
+  const merged = [...feed.lines, ...lines.filter((l) => !seen.has(lineKey(l)))]
+    .sort((a, b) => a.at - b.at)
+    .slice(-FEED_MAX);
+  // Channels: the pilot's list, plus any a line came from (an older app
+  // version doesn't send the list).
+  const names = [...(channels ?? feed.channels)];
+  for (const l of merged) if (!names.some((c) => c.toLowerCase() === l.channel.toLowerCase())) names.push(l.channel);
+  setFeed({ channels: names, lines: merged });
+}
+
+/** Load the app's recent lines and channels (again: cheap, deduplicated). */
+export function refreshIntelFeed(): void {
+  if (!isDesktop()) return;
+  desktopInvoke<IntelFeed>('intel_feed')
+    .then((f) => {
+      addToFeed(f.lines ?? [], f.channels ?? []);
+      (f.lines ?? []).forEach((l) => queueLookup(l, false));
+    })
+    .catch(() => { /* an older app without the feed: live lines only */ });
+}
+
+/** Open the desktop app's settings (where intel channels are set). */
+export function openDesktopSettings(): void {
+  void desktopInvoke('open_settings_window').catch(() => {});
+}
+
+/** The display name of a system a word names, if any word has been looked up
+ *  and found to be one (for highlighting in the feed). */
+export function knownSystem(word: string): string | null {
+  return known.get(word.toLowerCase())?.name ?? null;
+}
+
+/** Whether a line is a "clear" report. */
+export const isClearLine = (text: string): boolean => CLEAR.test(text);
 
 // ── Listener ────────────────────────────────────────────────────────────────
 const MAX_AGE_MS = 60_000;   // a line older than this is history, not intel
 
 export function startIntel(): () => void {
   const expiry = setInterval(expireReports, 15_000);
+  refreshIntelFeed();
+  const offChannels = onDesktopEvent<string[]>('nexum://intel-channels', (channels) => {
+    // Replaced, not merged: a channel the pilot removed goes from the list.
+    setFeed({ ...feed, channels: [...channels] });
+  });
   const off = onDesktopEvent<IntelLine>('nexum://intel', (line) => {
-    if (Date.now() - line.at > MAX_AGE_MS) return;
-    queueReport(line);
+    addToFeed([line]);
+    // Too old to alert on, but still worth highlighting in the feed.
+    if (Date.now() - line.at > MAX_AGE_MS) { queueLookup(line, false); return; }
+    queueLookup(line, true);
     const ids = systemsNamed(line.text, useMapStore.getState().map.systems);
     if (ids.length === 0) return;
     const level = PULSES.includes(line.pulse as IntelPulse) ? line.pulse! : 'normal';
@@ -173,5 +238,5 @@ export function startIntel(): () => void {
     if (level !== 'off') ids.forEach((id) => pulse(id, secs * 1000, level));
     if (line.sound) playAlert();
   });
-  return () => { off(); clearInterval(expiry); };
+  return () => { off(); offChannels(); clearInterval(expiry); };
 }

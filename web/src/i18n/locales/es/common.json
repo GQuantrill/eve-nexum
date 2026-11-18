@@ -2280,7 +2280,8 @@
     "panelsHint": "Elige qué secciones aparecen en la barra lateral. Las ocultas conservan su posición y vuelven a ella al reactivarlas.",
     "panelsAllHidden": "Todas las secciones están ocultas: la barra lateral quedará vacía.",
     "emptyTitle": "No se muestra ninguna sección. Elige aquí las que quieras.",
-    "routePlanner": "Planificador de rutas"
+    "routePlanner": "Planificador de rutas",
+    "intel": "Intel"
   },
   "sigType": {
     "combat": "Combate",
@@ -2792,5 +2793,14 @@
         "affects": "las ciudadelas de tu corp en el planificador de saltos y las listas de estructuras."
       }
     }
+  },
+  "intelFeed": {
+    "all": "Todos",
+    "settings": "Ajustes de intel",
+    "noChannels": "Aún no hay canales de intel. Añádelos en los ajustes de la aplicación de escritorio.",
+    "empty": "Nada reportado todavía.",
+    "show": "Mostrar {{channel}}",
+    "hide": "Ocultar {{channel}}",
+    "selectSystem": "Mostrar {{system}} en el mapa"
   }
 }

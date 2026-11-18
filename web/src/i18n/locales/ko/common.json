@@ -2278,7 +2278,8 @@
     "panelsHint": "사이드바에 표시할 섹션을 선택하세요. 숨긴 섹션도 위치를 유지하므로 다시 켜면 원래 자리로 돌아옵니다.",
     "panelsAllHidden": "모든 섹션이 숨겨져 있습니다 — 사이드바가 비어 있게 됩니다.",
     "emptyTitle": "표시 중인 섹션이 없습니다. 여기에서 원하는 섹션을 선택하세요.",
-    "routePlanner": "경로 플래너"
+    "routePlanner": "경로 플래너",
+    "intel": "정보"
   },
   "sigType": {
     "combat": "전투",
@@ -2788,5 +2789,14 @@
         "affects": "점프 플래너와 구조물 목록의 콥 시타델."
       }
     }
+  },
+  "intelFeed": {
+    "all": "전체",
+    "settings": "정보 설정",
+    "noChannels": "정보 채널이 아직 없습니다. 데스크톱 앱 설정에서 추가하세요.",
+    "empty": "아직 보고된 내용이 없습니다.",
+    "show": "{{channel}} 보기",
+    "hide": "{{channel}} 숨기기",
+    "selectSystem": "지도에서 {{system}} 보기"
   }
 }

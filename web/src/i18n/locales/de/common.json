@@ -2280,7 +2280,8 @@
     "panelsHint": "Wähle, welche Abschnitte in der Seitenleiste erscheinen. Ausgeblendete behalten ihren Platz und kehren beim Wiedereinschalten dorthin zurück.",
     "panelsAllHidden": "Alle Abschnitte sind ausgeblendet — die Seitenleiste bleibt leer.",
     "emptyTitle": "Es werden keine Abschnitte angezeigt. Wähle hier aus, welche du möchtest.",
-    "routePlanner": "Routenplaner"
+    "routePlanner": "Routenplaner",
+    "intel": "Intel"
   },
   "sigType": {
     "combat": "Kampf",
@@ -2792,5 +2793,14 @@
         "affects": "die Zitadellen deiner Corp im Sprungplaner und in den Strukturlisten."
       }
     }
+  },
+  "intelFeed": {
+    "all": "Alle",
+    "settings": "Intel-Einstellungen",
+    "noChannels": "Noch keine Intel-Kanäle. Füge sie in den Einstellungen der Desktop-App hinzu.",
+    "empty": "Noch nichts gemeldet.",
+    "show": "{{channel}} anzeigen",
+    "hide": "{{channel}} ausblenden",
+    "selectSystem": "{{system}} auf der Karte zeigen"
   }
 }

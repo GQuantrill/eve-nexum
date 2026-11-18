@@ -2280,7 +2280,8 @@
     "panelsHint": "Kies welke secties in de zijbalk verschijnen. Verborgen secties houden hun plek, dus als je er een weer aanzet komt hij terug waar je hem had.",
     "panelsAllHidden": "Alle secties zijn verborgen — de zijbalk blijft leeg.",
     "emptyTitle": "Er worden geen secties getoond. Kies hier welke je wilt.",
-    "routePlanner": "Routeplanner"
+    "routePlanner": "Routeplanner",
+    "intel": "Intel"
   },
   "sigType": {
     "combat": "Gevecht",
@@ -2792,5 +2793,14 @@
         "affects": "de citadels van je corp in de sprongplanner en de structuurlijsten."
       }
     }
+  },
+  "intelFeed": {
+    "all": "Alle",
+    "settings": "Intelinstellingen",
+    "noChannels": "Nog geen intelkanalen. Voeg ze toe in de instellingen van de desktop-app.",
+    "empty": "Nog niets gemeld.",
+    "show": "{{channel}} tonen",
+    "hide": "{{channel}} verbergen",
+    "selectSystem": "{{system}} op de kaart tonen"
   }
 }

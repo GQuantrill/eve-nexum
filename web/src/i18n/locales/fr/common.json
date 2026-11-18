@@ -2280,7 +2280,8 @@
     "panelsHint": "Choisissez les sections affichées dans la barre latérale. Celles masquées conservent leur place et y reviennent une fois réactivées.",
     "panelsAllHidden": "Toutes les sections sont masquées — la barre latérale sera vide.",
     "emptyTitle": "Aucune section n’est affichée. Choisissez ici celles que vous voulez.",
-    "routePlanner": "Planificateur d'itinéraire"
+    "routePlanner": "Planificateur d'itinéraire",
+    "intel": "Intel"
   },
   "sigType": {
     "combat": "Combat",
@@ -2792,5 +2793,14 @@
         "affects": "les citadelles de votre corpo dans le planificateur de saut et les listes de structures."
       }
     }
+  },
+  "intelFeed": {
+    "all": "Tous",
+    "settings": "Paramètres d'intel",
+    "noChannels": "Aucun canal d'intel pour l'instant. Ajoutez-en dans les paramètres de l'application de bureau.",
+    "empty": "Rien de signalé pour l'instant.",
+    "show": "Afficher {{channel}}",
+    "hide": "Masquer {{channel}}",
+    "selectSystem": "Montrer {{system}} sur la carte"
   }
 }

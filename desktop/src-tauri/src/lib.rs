@@ -18,7 +18,7 @@ use settings::Settings;
 use std::sync::Mutex;
 use tauri::ipc::CapabilityBuilder;
 use tauri::tray::TrayIconBuilder;
-use tauri::{AppHandle, Manager, WebviewUrl, WebviewWindowBuilder};
+use tauri::{AppHandle, Emitter, Manager, WebviewUrl, WebviewWindowBuilder};
 use tauri_plugin_global_shortcut::{GlobalShortcutExt, ShortcutState};
 use tauri_plugin_notification::NotificationExt;
 use tauri_plugin_opener::OpenerExt;
@@ -29,6 +29,8 @@ pub struct AppState {
     pub update_version: Mutex<Option<String>>,
     /// Which log each intel channel is following, for the settings window.
     pub intel_status: Mutex<Vec<intel::ChannelStatus>>,
+    /// Recent intel lines, for the Nexum window's intel feed.
+    pub intel_history: Mutex<std::collections::VecDeque<intel::IntelLine>>,
 }
 
 /// Show/hide Nexum from anywhere, the EVE client included.
@@ -41,6 +43,20 @@ const EVE_SSO_HOST: &str = "login.eveonline.com";
 #[tauri::command]
 fn notify(app: AppHandle, title: String, body: String) {
     let _ = app.notification().builder().title(title).body(body).show();
+}
+
+/// The intel feed for the Nexum window: the pilot's channels and recent lines.
+#[tauri::command]
+fn intel_feed(state: tauri::State<AppState>) -> serde_json::Value {
+    let channels = state.settings.lock().unwrap().intel_channels.clone();
+    let lines: Vec<intel::IntelLine> = state.intel_history.lock().unwrap().iter().cloned().collect();
+    serde_json::json!({ "channels": channels, "lines": lines })
+}
+
+/// Open the app's settings window (the intel feed's "Intel settings").
+#[tauri::command]
+fn open_settings_window(app: AppHandle) {
+    open_settings(&app);
 }
 
 #[tauri::command]
@@ -92,6 +108,8 @@ fn save_settings(app: AppHandle, state: tauri::State<AppState>, settings: Settin
     };
     settings::save(&app, &next)?;
     apply(&app, &next);
+    // The intel feed lists the channels: tell it they changed.
+    let _ = app.emit_to("main", "nexum://intel-channels", next.intel_channels.clone());
     // The site's permissions are tied to the server it was opened for, so a
     // new server means starting again.
     if server_changed {
@@ -217,7 +235,9 @@ pub fn run() {
             get_settings,
             save_settings,
             default_chatlog_dir,
-            intel_status
+            intel_status,
+            intel_feed,
+            open_settings_window
         ])
         .setup(|app| {
             let handle = app.handle().clone();
@@ -226,6 +246,7 @@ pub fn run() {
                 settings: Mutex::new(s.clone()),
                 update_version: Mutex::new(None),
                 intel_status: Mutex::new(Vec::new()),
+                intel_history: Mutex::new(std::collections::VecDeque::new()),
             });
 
             let server = url::Url::parse(&s.server_url)?;
@@ -239,7 +260,9 @@ pub fn run() {
                     .permission("core:event:allow-listen")
                     .permission("core:event:allow-unlisten")
                     .permission("allow-notify")
-                    .permission("allow-desktop-info"),
+                    .permission("allow-desktop-info")
+                    .permission("allow-intel-feed")
+                    .permission("allow-open-settings-window"),
             )?;
 
             let nav_server = server.clone();

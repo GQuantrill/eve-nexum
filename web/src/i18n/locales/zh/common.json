@@ -2278,7 +2278,8 @@
     "panelsHint": "选择侧边栏中显示的板块。隐藏的板块会保留位置，重新开启时回到原处。",
     "panelsAllHidden": "所有板块都已隐藏 — 侧边栏将是空的。",
     "emptyTitle": "当前没有显示任何板块。在此选择要显示的板块。",
-    "routePlanner": "路线规划器"
+    "routePlanner": "路线规划器",
+    "intel": "情报"
   },
   "sigType": {
     "combat": "战斗",
@@ -2788,5 +2789,14 @@
         "affects": "跳跃规划器和建筑列表中你军团的城堡。"
       }
     }
+  },
+  "intelFeed": {
+    "all": "全部",
+    "settings": "情报设置",
+    "noChannels": "还没有情报频道。请在桌面应用的设置中添加。",
+    "empty": "暂无报告。",
+    "show": "显示 {{channel}}",
+    "hide": "隐藏 {{channel}}",
+    "selectSystem": "在地图上显示 {{system}}"
   }
 }
