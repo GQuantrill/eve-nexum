@@ -12,23 +12,26 @@ Each new submission needs a higher version: raise `version` in
 
 ## nexum-test-msix: try it on a PC first
 
-The same package, signed with a throwaway certificate. Windows only installs
-it once that certificate is trusted, so this is a one-off step on your own
-test PC:
+The same package, signed with a throwaway certificate.
 
 1. Unzip the artifact.
-2. Open **PowerShell as administrator** in that folder and run:
+2. Double-click **Install-test.cmd** and say **Yes** to the admin prompt.
+   (If Windows says it protected your PC: **More info > Run anyway**.)
+   It trusts the certificate on this PC and installs the app.
+3. Find **Eve-Nexum** in the Start menu.
 
-   ```
-   Import-Certificate -FilePath .\nexum-test.cer `
-     -CertStoreLocation Cert:\LocalMachine\TrustedPeople
-   ```
+By hand instead, in PowerShell as administrator:
 
-3. Double-click the `_test.msix` file and choose **Install**.
+```
+Import-Certificate -FilePath .\nexum-test.cer `
+  -CertStoreLocation Cert:\LocalMachine\TrustedPeople
+Add-AppxPackage -Path .\<name>_test.msix
+```
 
 To remove the certificate afterwards: run `certlm.msc`, open
-**Trusted People > Certificates**, and delete the one issued to the
-Publisher value.
+**Trusted People > Certificates** and **Trusted Root Certification
+Authorities > Certificates**, and delete the one issued to the Publisher
+value (CN=B1C20CC8-...).
 
 Before installing the test copy, uninstall any Nexum you installed with the
 .exe/.msi installer, so you are testing the packaged one.

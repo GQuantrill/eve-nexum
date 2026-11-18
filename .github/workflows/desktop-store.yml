@@ -114,6 +114,7 @@ jobs:
           & "$env:SDKBIN\signtool.exe" sign /fd SHA256 /a /f test.pfx /p nexum-test $msix
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           Copy-Item msix/README.md out/test/README.md
+          Copy-Item msix/Install-test.cmd out/test/Install-test.cmd
           Remove-Item test.pfx
 
       - uses: actions/upload-artifact@v4
