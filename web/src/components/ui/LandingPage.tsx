@@ -17,7 +17,7 @@ import {
   MapPinSimpleIcon, ColumnsIcon,
 } from '../../icons';
 import { apiUrl } from '../../api/client';
-import { useScopeOptions } from '../../api/scopeOptions';
+import { loginUrl, useScopeOptions } from '../../api/scopeOptions';
 import { useScopePickerStore } from '../../store/scopePickerStore';
 import { DISCORD_INVITE_URL } from '../../data/links';
 import { SUPPORTED_LANGUAGES, LANGUAGE_NAMES } from '../../i18n';
@@ -323,20 +323,26 @@ export function LandingPage() {
 
   useShaderCanvas(canvasRef);
 
-  // SSO_SCOPES_MODE=choice: every login goes through the picker first. EVE's
-  // login can't be told which character to use (it always shows character
-  // selection), so "Continue as X" can't promise it's X: it opens the picker
-  // too, pre-ticked with the groups X allowed last time, so whoever is picked
-  // on EVE's screen gets a choice they've seen. In 'all' mode every link goes
+  // SSO_SCOPES_MODE=choice: the picker is asked once per browser. "Log back in"
+  // goes straight to EVE with the groups this browser's last login allowed;
+  // only a browser with nothing remembered (or the EVE button on a fresh
+  // landing page) shows the picker first. Changing them later is the key
+  // button next to each character. EVE's login can't be told which character
+  // to use, so a different character picked there gets the same choices: the
+  // same person's, from the same browser. In 'all' mode every link goes
   // straight to EVE, as before.
   const scopeOptions = useScopeOptions();
   const openPicker = useScopePickerStore((s) => s.open);
   const choice = scopeOptions?.mode === 'choice';
-  const pickFirst = (e: React.MouseEvent, ticked?: readonly string[]) => {
+  const pickFirst = (e: React.MouseEvent) => {
     if (!choice) return;
     e.preventDefault();
-    openPicker({ kind: 'login', ticked });
+    openPicker({ kind: 'login' });
   };
+  const remembered = lastChar?.scopeGroups;
+  const returningHref = choice && remembered
+    ? loginUrl({ kind: 'login' }, scopeOptions, new Set(remembered))
+    : apiUrl('/auth/login');
 
   const errorParam = new URLSearchParams(window.location.search).get('error');
   const errorMessage = errorParam ? t(loginErrorKey(errorParam)) : null;
@@ -385,9 +391,9 @@ export function LandingPage() {
           {lastChar ? (
             <>
               <a
-                href={apiUrl('/auth/login')}
+                href={returningHref}
                 className="landing__returning"
-                onClick={(e) => pickFirst(e, lastChar.scopeGroups)}
+                onClick={remembered ? undefined : pickFirst}
               >
                 <img
                   src={charPortrait(lastChar.characterId, 128)}
