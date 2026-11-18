@@ -7,7 +7,7 @@ browser can't do:
 |---|---|
 | Jump tracking from EVE logs | Reads EVE's Local chat log and moves you on the map the moment you jump, seconds before ESI. ESI still confirms each move. On by default. |
 | Probe-scan paste | Probe-scanner results you copy in EVE paste themselves onto the selected system. Off by default (it reads the clipboard); only text that looks like probe-scanner results is ever sent to the page. |
-| Intel channels | Name the intel channels to follow (e.g. `east.imperium`); the newest log of each is read. A line naming a system on your map (its full name, as EVE writes a dragged system) pulses it red for 5 seconds, with a sound (on by default). "clr"/"clear" lines don't alert. Stays on your machine. |
+| Intel channels | Name the intel channels to follow (e.g. `my.intel`); the newest log of each is read. A line naming a system on your map (its full name, as EVE writes a dragged system) pulses it red for 5 seconds, with a sound (on by default). "clr"/"clear" lines don't alert. Stays on your machine. |
 | Always on top | Keep Nexum above the EVE client. |
 | Tray + global shortcut | `Alt+Shift+N` shows or hides Nexum from anywhere. |
 | System notifications | Nexum's alerts arrive as native notifications. |

@@ -24,7 +24,7 @@ pub struct Settings {
     /// (for example a Linux install under Wine or Proton).
     pub chatlog_dir: Option<String>,
     /// Intel channels to follow, by name as in the log files
-    /// ("east.imperium"); the newest log of each is read.
+    /// ("my.intel"); the newest log of each is read.
     pub intel_channels: Vec<String>,
     /// Play a sound when an intel report names a system on the map.
     pub intel_sound: bool,

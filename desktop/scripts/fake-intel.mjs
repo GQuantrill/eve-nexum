@@ -1,7 +1,7 @@
 // Testing aid: write an intel line, stamped now, into a channel's chat log in
 // the EVE log folder, as EVE would. Creates the log if the channel has none.
 //
-//   node scripts/fake-intel.mjs east.imperium "Some Pilot  1DQ1-A"
+//   node scripts/fake-intel.mjs my.intel "Some Pilot  1DQ1-A"
 //
 // The app skips what's already in a log when it first sees it, so run this
 // once to create the log, then again for a line it will report.
