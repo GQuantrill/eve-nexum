@@ -163,10 +163,10 @@ function queueLookup(line: IntelLine, report: boolean): void {
 
 // ── Feed (the sidebar's Intel pane) ─────────────────────────────────────────
 // Recent lines from every channel, newest last, and the pilot's channels. The
-// app keeps the last few hundred (and a look back into each log when it's
+// app keeps the last 100 (and a look back into each log when it's
 // first opened), so the pane has something to show the moment it mounts.
 
-const FEED_MAX = 300;
+const FEED_MAX = 100;
 export interface IntelFeed { channels: string[]; lines: IntelLine[] }
 let feed: IntelFeed = { channels: [], lines: [] };
 const feedSubs = new Set<() => void>();

@@ -33,7 +33,7 @@ pub struct IntelLine {
 }
 
 /// Lines kept for the Nexum window's intel feed.
-pub const HISTORY_MAX: usize = 300;
+pub const HISTORY_MAX: usize = 100;
 /// How far back into a log to read for the feed when it's first opened.
 const LOOKBACK_BYTES: u64 = 32 * 1024;
 
