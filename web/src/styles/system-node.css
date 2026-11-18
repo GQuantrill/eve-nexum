@@ -1148,6 +1148,7 @@
   border: 1px solid var(--border-strong);
   border-radius: 6px;
   padding: 4px 10px;
+  text-align: center;
   font-size: calc(13px * var(--font-scale, 1));
   color: #ff6060;
   font-weight: 600;
@@ -1156,7 +1157,9 @@
   text-align: center;
 }
 
+/* One line each: the 24h count, then (while there's fighting) this hour's. */
 .system-node__kill-tooltip-main {
+  display: block;
   white-space: nowrap;
 }
 
