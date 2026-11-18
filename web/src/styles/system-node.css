@@ -1167,6 +1167,8 @@
   display: block;
   margin-top: 2px;
   max-width: 210px;
+  margin-inline: auto;
+  text-align: center;
   white-space: normal;
   font-size: calc(11px * var(--font-scale, 1));
   font-weight: 500;
