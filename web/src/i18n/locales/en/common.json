@@ -1214,7 +1214,6 @@
     "cta": {
       "logBackIn": "Log back in",
       "sessionExpired": "Session expired — click your portrait to log back in via EVE SSO.",
-      "switchChar": "Log in as a different character",
       "secureLogin": "Secure EVE SSO login — no passwords stored. Character identity only.",
       "loginAlt": "Log in with EVE Online",
       "joinDiscord": "Join the Nexum Discord"

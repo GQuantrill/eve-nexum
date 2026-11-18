@@ -402,9 +402,6 @@ export function LandingPage() {
               <p className="landing__note">
                 {t('landing.cta.sessionExpired')}
               </p>
-              <a href={apiUrl('/auth/login')} className="landing__switch-link" onClick={pickFirst}>
-                {t('landing.cta.switchChar')}
-              </a>
             </>
           ) : (
             <>

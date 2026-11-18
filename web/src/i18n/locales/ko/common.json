@@ -1214,7 +1214,6 @@
     "cta": {
       "logBackIn": "다시 로그인",
       "sessionExpired": "세션이 만료되었습니다 — 초상화를 클릭하여 EVE SSO로 다시 로그인하세요.",
-      "switchChar": "다른 캐릭터로 로그인",
       "secureLogin": "안전한 EVE SSO 로그인 — 비밀번호를 저장하지 않습니다. 캐릭터 신원만 사용합니다.",
       "loginAlt": "EVE Online으로 로그인",
       "joinDiscord": "Nexum Discord 참여"

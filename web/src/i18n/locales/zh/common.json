@@ -1214,7 +1214,6 @@
     "cta": {
       "logBackIn": "重新登录",
       "sessionExpired": "会话已过期 — 点击你的头像通过 EVE SSO 重新登录。",
-      "switchChar": "用其他角色登录",
       "secureLogin": "安全的 EVE SSO 登录 — 不存储任何密码。仅角色身份。",
       "loginAlt": "使用 EVE Online 登录",
       "joinDiscord": "加入 Nexum Discord"

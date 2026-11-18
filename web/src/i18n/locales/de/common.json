@@ -1214,7 +1214,6 @@
     "cta": {
       "logBackIn": "Erneut anmelden",
       "sessionExpired": "Sitzung abgelaufen — klicke auf dein Porträt, um dich erneut über EVE SSO anzumelden.",
-      "switchChar": "Mit einem anderen Charakter anmelden",
       "secureLogin": "Sichere EVE-SSO-Anmeldung — keine Passwörter gespeichert. Nur Charakteridentität.",
       "loginAlt": "Mit EVE Online anmelden",
       "joinDiscord": "Tritt dem Nexum-Discord bei"

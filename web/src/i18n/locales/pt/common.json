@@ -1214,7 +1214,6 @@
     "cta": {
       "logBackIn": "Iniciar sessão novamente",
       "sessionExpired": "Sessão expirada — clica no teu retrato para voltar a iniciar sessão via EVE SSO.",
-      "switchChar": "Iniciar sessão com outra personagem",
       "secureLogin": "Início de sessão seguro com EVE SSO — sem palavras-passe armazenadas. Apenas a identidade da personagem.",
       "loginAlt": "Iniciar sessão com EVE Online",
       "joinDiscord": "Junta-te ao Discord do Nexum"
