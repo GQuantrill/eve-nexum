@@ -2514,7 +2514,10 @@
       "intel": "Dreiging gemeld",
       "intelHere": "Gemeld in jouw systeem: {{system}}",
       "intelNear_one": "{{system}}: {{count}} sprong van je",
-      "intelNear_other": "{{system}}: {{count}} sprongen van je"
+      "intelNear_other": "{{system}}: {{count}} sprongen van je",
+      "intelSpeakHere": "{{system}}, in jouw systeem",
+      "intelSpeak_one": "{{system}}, {{count}} sprong",
+      "intelSpeak_other": "{{system}}, {{count}} sprongen"
     },
     "resetLayout": "Werkbalkindeling herstellen",
     "role": "Rol: {{role}}",

@@ -19,8 +19,8 @@ const CLEAR = /(^|[^a-z0-9])(clr|clear)([^a-z0-9]|$)/i;
 
 export interface IntelLine {
   channel: string; sender: string; text: string; at: number; sound: boolean;
-  /** Older app versions don't send these: 5 s, normal. */
-  pulseSecs?: number; pulse?: IntelPulse;
+  /** Older app versions don't send these: 5 s, normal, silent. */
+  pulseSecs?: number; pulse?: IntelPulse; speak?: boolean;
 }
 
 // ── Which systems are pulsing ───────────────────────────────────────────────
@@ -93,7 +93,11 @@ export const REPORT_MS = 5 * 60_000;
 const BATCH_MS = 2_000;
 const BATCH_MAX = 60;
 
-export interface IntelReport { eveSystemId: number; name: string; at: number }
+export interface IntelReport {
+  eveSystemId: number; name: string; at: number;
+  /** Read it aloud when it's within range (the pilot's desktop setting). */
+  speak: boolean;
+}
 
 let reports = new Map<number, IntelReport>();
 const reportSubs = new Set<() => void>();
@@ -149,7 +153,7 @@ async function flush(): Promise<void> {
       const sys = known.get(n);
       if (!sys) continue;
       if (clear) next.delete(sys.eveSystemId);
-      else next.set(sys.eveSystemId, { ...sys, at: line.at });
+      else next.set(sys.eveSystemId, { ...sys, at: line.at, speak: !!line.speak });
     }
   }
   publish(next);
@@ -207,10 +211,10 @@ export function openDesktopSettings(): void {
   void desktopInvoke('open_settings_window').catch(() => {});
 }
 
-/** The display name of a system a word names, if any word has been looked up
- *  and found to be one (for highlighting in the feed). */
-export function knownSystem(word: string): string | null {
-  return known.get(word.toLowerCase())?.name ?? null;
+/** The system a word names, once the word has been looked up and found to
+ *  be one (for highlighting in the feed). */
+export function knownSystem(word: string): { eveSystemId: number; name: string } | null {
+  return known.get(word.toLowerCase()) ?? null;
 }
 
 /** Whether a line is a "clear" report. */

@@ -30,6 +30,8 @@ pub struct IntelLine {
     /// How long and how strongly the system pulses (desktop settings).
     pub pulse_secs: u32,
     pub pulse: String,
+    /// Whether to read it aloud when it's within range (desktop settings).
+    pub speak: bool,
 }
 
 /// Lines kept for the Nexum window's intel feed.
@@ -60,17 +62,17 @@ pub fn start(app: AppHandle) {
         let mut followed: HashMap<String, Followed> = HashMap::new();
         loop {
             std::thread::sleep(Duration::from_secs(1));
-            let (channels, sound, pulse_secs, pulse) = {
+            let (channels, sound, pulse_secs, pulse, speak) = {
                 let state = app.state::<AppState>();
                 let s = state.settings.lock().unwrap();
-                (s.intel_channels.clone(), s.intel_sound, s.intel_pulse_secs, s.intel_pulse.clone())
+                (s.intel_channels.clone(), s.intel_sound, s.intel_pulse_secs, s.intel_pulse.clone(), s.intel_speak)
             };
             followed.retain(|k, _| channels.iter().any(|c| c.eq_ignore_ascii_case(k)));
             if let Some(dir) = eve_logs::log_dir(&app) {
                 let mut history: Vec<IntelLine> = Vec::new();
                 let new = poll(&dir, &channels, &mut followed, &mut history);
                 let new: Vec<IntelLine> = new.into_iter()
-                    .map(|l| IntelLine { sound, pulse_secs, pulse: pulse.clone(), ..l })
+                    .map(|l| IntelLine { sound, pulse_secs, pulse: pulse.clone(), speak, ..l })
                     .collect();
                 if !history.is_empty() || !new.is_empty() {
                     let state = app.state::<AppState>();
@@ -207,6 +209,7 @@ fn parse_lines(channel: &str, text: &str) -> Vec<IntelLine> {
                 sound: true,
                 pulse_secs: 5,
                 pulse: "normal".to_string(),
+                speak: false,
             })
         })
         .collect()

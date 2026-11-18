@@ -60,4 +60,15 @@
   cursor: pointer;
 }
 
+.jumps {
+  margin-left: 3px;
+  padding: 0 4px;
+  border-radius: 6px;
+  background: var(--surface-raised);
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 .note { margin: 0; padding: 8px; color: var(--text-faint); text-align: center; display: flex; flex-direction: column; gap: 8px; align-items: center; }

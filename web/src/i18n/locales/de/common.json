@@ -2514,7 +2514,10 @@
       "intel": "Bedrohung gemeldet",
       "intelHere": "In deinem System gemeldet: {{system}}",
       "intelNear_one": "{{system}}: {{count}} Sprung von dir",
-      "intelNear_other": "{{system}}: {{count}} Sprünge von dir"
+      "intelNear_other": "{{system}}: {{count}} Sprünge von dir",
+      "intelSpeakHere": "{{system}}, in deinem System",
+      "intelSpeak_one": "{{system}}, {{count}} Sprung",
+      "intelSpeak_other": "{{system}}, {{count}} Sprünge"
     },
     "resetLayout": "Symbolleisten-Layout zurücksetzen",
     "role": "Rolle: {{role}}",

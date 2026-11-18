@@ -32,6 +32,8 @@ pub struct Settings {
     pub intel_pulse_secs: u32,
     /// How strongly it pulses: off (sound only), subtle, normal or strong.
     pub intel_pulse: String,
+    /// Read intel within the proximity range aloud ("UALX-3, 2 jumps").
+    pub intel_speak: bool,
     /// Page zoom of the Nexum window (View > Zoom), 1.0 = 100%.
     pub zoom: f64,
 }
@@ -48,6 +50,7 @@ impl Default for Settings {
             intel_sound: true,
             intel_pulse_secs: 5,
             intel_pulse: "normal".to_string(),
+            intel_speak: false,
             zoom: 1.0,
         }
     }

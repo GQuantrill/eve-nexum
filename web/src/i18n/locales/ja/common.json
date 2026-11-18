@@ -2512,7 +2512,10 @@
       "intel": "脅威の報告",
       "intelHere": "現在の星系で報告: {{system}}",
       "intelNear_one": "{{system}}：{{count}} ジャンプ先",
-      "intelNear_other": "{{system}}：{{count}} ジャンプ先"
+      "intelNear_other": "{{system}}：{{count}} ジャンプ先",
+      "intelSpeakHere": "{{system}}、現在の星系",
+      "intelSpeak_one": "{{system}}、{{count}} ジャンプ",
+      "intelSpeak_other": "{{system}}、{{count}} ジャンプ"
     },
     "resetLayout": "ツールバーのレイアウトをリセット",
     "role": "権限: {{role}}",

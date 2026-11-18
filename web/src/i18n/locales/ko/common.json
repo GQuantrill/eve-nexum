@@ -2512,7 +2512,10 @@
       "intel": "위협 보고됨",
       "intelHere": "현재 성계에 보고됨: {{system}}",
       "intelNear_one": "{{system}}: {{count}}점프 거리",
-      "intelNear_other": "{{system}}: {{count}}점프 거리"
+      "intelNear_other": "{{system}}: {{count}}점프 거리",
+      "intelSpeakHere": "{{system}}, 현재 성계",
+      "intelSpeak_one": "{{system}}, {{count}}점프",
+      "intelSpeak_other": "{{system}}, {{count}}점프"
     },
     "resetLayout": "툴바 레이아웃 초기화",
     "role": "권한: {{role}}",

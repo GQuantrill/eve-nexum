@@ -52,7 +52,9 @@
     "pulseOff": "Off (sound only)",
     "pulseSubtle": "Subtle",
     "pulseNormal": "Normal",
-    "pulseStrong": "Strong"
+    "pulseStrong": "Strong",
+    "intelSpeak": "Read intel within range aloud",
+    "intelSpeakHint": "Says the system and how many jumps away it is, for reports within your proximity alert range."
   },
   "de": {
     "show": "Nexum anzeigen",
@@ -107,7 +109,9 @@
     "pulseOff": "Aus (nur Ton)",
     "pulseSubtle": "Dezent",
     "pulseNormal": "Normal",
-    "pulseStrong": "Stark"
+    "pulseStrong": "Stark",
+    "intelSpeak": "Intel in Reichweite vorlesen",
+    "intelSpeakHint": "Nennt das System und wie viele Sprünge entfernt es ist, für Meldungen innerhalb deiner Annäherungswarnungs-Reichweite."
   },
   "nl": {
     "show": "Nexum tonen",
@@ -162,7 +166,9 @@
     "pulseOff": "Uit (alleen geluid)",
     "pulseSubtle": "Subtiel",
     "pulseNormal": "Normaal",
-    "pulseStrong": "Sterk"
+    "pulseStrong": "Sterk",
+    "intelSpeak": "Intel binnen bereik voorlezen",
+    "intelSpeakHint": "Noemt het systeem en hoeveel sprongen het weg is, voor meldingen binnen het bereik van je nabijheidswaarschuwing."
   },
   "fr": {
     "show": "Afficher Nexum",
@@ -217,7 +223,9 @@
     "pulseOff": "Désactivée (son seul)",
     "pulseSubtle": "Discrète",
     "pulseNormal": "Normale",
-    "pulseStrong": "Forte"
+    "pulseStrong": "Forte",
+    "intelSpeak": "Lire à voix haute l'intel à portée",
+    "intelSpeakHint": "Annonce le système et à combien de sauts il se trouve, pour les signalements dans la portée de votre alerte de proximité."
   },
   "es": {
     "show": "Mostrar Nexum",
@@ -272,7 +280,9 @@
     "pulseOff": "Apagado (solo sonido)",
     "pulseSubtle": "Sutil",
     "pulseNormal": "Normal",
-    "pulseStrong": "Fuerte"
+    "pulseStrong": "Fuerte",
+    "intelSpeak": "Leer en voz alta la intel cercana",
+    "intelSpeakHint": "Dice el sistema y a cuántos saltos está, para los reportes dentro del alcance de tu alerta de proximidad."
   },
   "pt": {
     "show": "Mostrar Nexum",
@@ -327,7 +337,9 @@
     "pulseOff": "Desligado (só som)",
     "pulseSubtle": "Sutil",
     "pulseNormal": "Normal",
-    "pulseStrong": "Forte"
+    "pulseStrong": "Forte",
+    "intelSpeak": "Ler em voz alta a intel no alcance",
+    "intelSpeakHint": "Diz o sistema e a quantos saltos ele está, para reportes dentro do alcance do seu alerta de proximidade."
   },
   "zh": {
     "show": "显示 Nexum",
@@ -382,7 +394,9 @@
     "pulseOff": "关闭（仅声音）",
     "pulseSubtle": "轻微",
     "pulseNormal": "正常",
-    "pulseStrong": "强烈"
+    "pulseStrong": "强烈",
+    "intelSpeak": "朗读范围内的情报",
+    "intelSpeakHint": "对接近警报范围内的报告，读出星系名称和距离跳数。"
   },
   "ko": {
     "show": "Nexum 보기",
@@ -437,7 +451,9 @@
     "pulseOff": "끄기 (소리만)",
     "pulseSubtle": "약하게",
     "pulseNormal": "보통",
-    "pulseStrong": "강하게"
+    "pulseStrong": "강하게",
+    "intelSpeak": "범위 안의 정보를 소리로 읽기",
+    "intelSpeakHint": "근접 경보 범위 안의 보고에 대해 성계 이름과 몇 점프 거리인지 읽어 줍니다."
   },
   "ja": {
     "show": "Nexum を表示",
@@ -492,7 +508,9 @@
     "pulseOff": "オフ（音のみ）",
     "pulseSubtle": "控えめ",
     "pulseNormal": "標準",
-    "pulseStrong": "強め"
+    "pulseStrong": "強め",
+    "intelSpeak": "範囲内のインテルを読み上げる",
+    "intelSpeakHint": "接近アラートの範囲内の報告について、星系名と何ジャンプ先かを読み上げます。"
   },
   "ru": {
     "show": "Показать Nexum",
@@ -547,6 +565,8 @@
     "pulseOff": "Выкл. (только звук)",
     "pulseSubtle": "Слабая",
     "pulseNormal": "Обычная",
-    "pulseStrong": "Сильная"
+    "pulseStrong": "Сильная",
+    "intelSpeak": "Озвучивать интел в радиусе",
+    "intelSpeakHint": "Называет систему и сколько до неё прыжков — для сообщений в радиусе оповещения о близости."
   }
 }

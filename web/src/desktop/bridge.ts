@@ -36,6 +36,12 @@ export function onDesktopEvent<T>(event: string, cb: (payload: T) => void): () =
   return () => { cancelled = true; off?.(); };
 }
 
+/** Flash the taskbar button (Windows) or bounce the Dock icon (macOS) when
+ *  the app is in the background. Nothing on the web. */
+export function desktopAttention(): void {
+  if (isDesktop()) void desktopInvoke('attention').catch(() => {});
+}
+
 /**
  * Show a system notification through the desktop app (a remote page inside
  * the app's webview can't use the browser Notification API). Returns false

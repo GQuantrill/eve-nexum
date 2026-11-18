@@ -53,6 +53,18 @@ fn intel_feed(state: tauri::State<AppState>) -> serde_json::Value {
     serde_json::json!({ "channels": channels, "lines": lines })
 }
 
+/// Draw the pilot's eye to Nexum when it's in the background: the taskbar
+/// button flashes (Windows) or the Dock icon bounces (macOS). Nothing when
+/// the window already has focus.
+#[tauri::command]
+fn attention(app: AppHandle) {
+    if let Some(w) = app.get_webview_window("main") {
+        if !w.is_focused().unwrap_or(false) {
+            let _ = w.request_user_attention(Some(tauri::UserAttentionType::Informational));
+        }
+    }
+}
+
 /// Open the app's settings window (the intel feed's "Intel settings").
 #[tauri::command]
 fn open_settings_window(app: AppHandle) {
@@ -237,7 +249,8 @@ pub fn run() {
             default_chatlog_dir,
             intel_status,
             intel_feed,
-            open_settings_window
+            open_settings_window,
+            attention
         ])
         .setup(|app| {
             let handle = app.handle().clone();
@@ -262,7 +275,8 @@ pub fn run() {
                     .permission("allow-notify")
                     .permission("allow-desktop-info")
                     .permission("allow-intel-feed")
-                    .permission("allow-open-settings-window"),
+                    .permission("allow-open-settings-window")
+                    .permission("allow-attention"),
             )?;
 
             let nav_server = server.clone();

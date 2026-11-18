@@ -9,6 +9,9 @@ import { GearIcon, MapPinSimpleIcon, PathIcon } from '../../icons';
 import { ContextMenu } from './ContextMenu';
 import { setWaypoint, KSPACE_CLASSES } from '../../utils/routeActions';
 import type { MapSystem } from '../../types';
+import { useRoute } from '../../hooks/useRoute';
+import { useRouteOrigin } from '../../hooks/useRouteOrigin';
+import { jumps as jumpsLabel } from '../../i18n/format';
 import styles from './IntelPane.module.css';
 
 // Desktop app only (the sidebar hides it in a browser): the pilot's intel
@@ -42,6 +45,22 @@ export function IntelPane() {
   const shownChannels = channels.filter(isShown);
   const visible = lines.filter((l) => isShown(l.channel)).slice(-SHOW_MAX).reverse();
 
+  // How far each system named in the shown lines is from you, so the reports
+  // that matter stand out. One route request for all of them.
+  const origin = useRouteOrigin();
+  const sysIdOf = (word: string): number | null =>
+    onMap.get(word.toLowerCase())?.eveSystemId ?? knownSystem(word)?.eveSystemId ?? null;
+  // A fresh array each render is fine: useRoute keys on the ids themselves.
+  const targetIds = [...new Set(visible.flatMap((l) => l.text.split(/\s+/)
+    .map((part) => sysIdOf(WORD.exec(part)?.[2] ?? part))
+    .filter((id): id is number => id != null)))].sort((a, b) => a - b);
+  const routes = useRoute(origin.systemId, targetIds);
+  const distance = (core: string): ReactNode => {
+    const id = sysIdOf(core);
+    const route = id != null ? routes[id] : undefined;
+    return route ? <span className={styles.jumps}>{jumpsLabel(t, route.jumps)}</span> : null;
+  };
+
   const renderText = (line: IntelLine): ReactNode[] =>
     line.text.split(/(\s+)/).map((part, i) => {
       const [, pre, core, post] = WORD.exec(part) ?? ['', '', part, ''];
@@ -52,11 +71,13 @@ export function IntelPane() {
             <button type="button" className={`${styles.sys} ${styles.onMap}`}
               onClick={() => selectSystem(sys.id)}
               onContextMenu={(e) => { e.preventDefault(); setMenu({ x: e.clientX, y: e.clientY, sys }); }}
-              data-tooltip={t('intelFeed.selectSystem', { system: core })}>{core}</button>{post}
+              data-tooltip={t('intelFeed.selectSystem', { system: core })}>{core}</button>{distance(core)}{post}
           </span>
         );
       }
-      return knownSystem(core) ? <span key={i}>{pre}<span className={styles.sys}>{core}</span>{post}</span> : part;
+      return knownSystem(core)
+        ? <span key={i}>{pre}<span className={styles.sys}>{core}</span>{distance(core)}{post}</span>
+        : part;
     });
 
   if (channels.length === 0) {

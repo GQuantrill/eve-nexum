@@ -2512,7 +2512,10 @@
       "intel": "已报告威胁",
       "intelHere": "你所在星系有报告：{{system}}",
       "intelNear_one": "{{system}}：距你 {{count}} 跳",
-      "intelNear_other": "{{system}}：距你 {{count}} 跳"
+      "intelNear_other": "{{system}}：距你 {{count}} 跳",
+      "intelSpeakHere": "{{system}}，就在你所在星系",
+      "intelSpeak_one": "{{system}}，{{count}} 跳",
+      "intelSpeak_other": "{{system}}，{{count}} 跳"
     },
     "resetLayout": "重置工具栏布局",
     "role": "权限：{{role}}",

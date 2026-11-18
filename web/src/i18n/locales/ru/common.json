@@ -2558,7 +2558,12 @@
       "intelNear_one": "{{system}}: {{count}} прыжок от вас",
       "intelNear_few": "{{system}}: {{count}} прыжка от вас",
       "intelNear_many": "{{system}}: {{count}} прыжков от вас",
-      "intelNear_other": "{{system}}: {{count}} прыжка от вас"
+      "intelNear_other": "{{system}}: {{count}} прыжка от вас",
+      "intelSpeakHere": "{{system}}, в вашей системе",
+      "intelSpeak_one": "{{system}}, {{count}} прыжок",
+      "intelSpeak_few": "{{system}}, {{count}} прыжка",
+      "intelSpeak_many": "{{system}}, {{count}} прыжков",
+      "intelSpeak_other": "{{system}}, {{count}} прыжка"
     },
     "resetLayout": "Сбросить раскладку панели инструментов",
     "role": "Роль: {{role}}",

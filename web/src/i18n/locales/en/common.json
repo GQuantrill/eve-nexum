@@ -2514,7 +2514,10 @@
       "intel": "Threat reported",
       "intelHere": "Reported in your system: {{system}}",
       "intelNear_one": "{{system}}: {{count}} jump from you",
-      "intelNear_other": "{{system}}: {{count}} jumps from you"
+      "intelNear_other": "{{system}}: {{count}} jumps from you",
+      "intelSpeakHere": "{{system}}, in your system",
+      "intelSpeak_one": "{{system}}, {{count}} jump",
+      "intelSpeak_other": "{{system}}, {{count}} jumps"
     },
     "resetLayout": "Reset toolbar layout",
     "role": "Role: {{role}}",

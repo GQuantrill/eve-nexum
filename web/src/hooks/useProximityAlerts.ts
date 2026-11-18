@@ -8,7 +8,7 @@ import { ensureSovLoaded, getSovEntries } from './useSovData';
 import { useUserSetting, readUserSetting, writeUserSetting } from './useUserSetting';
 import { NOTIFY, notifyOn, alertGain } from '../utils/notificationPrefs';
 import { useDebugFlag } from '../utils/debugFlags';
-import { desktopNotify } from '../desktop/bridge';
+import { desktopNotify, desktopAttention } from '../desktop/bridge';
 import { useIntelReports } from '../desktop/intel';
 import i18n from '../i18n';
 
@@ -201,6 +201,8 @@ export function useProximityAlerts(): {
       if (route.jumps > threshold) continue;
       if (notifyOn(NOTIFY.proximityDesktop)) fireIntelNotification(r.name, route.jumps);
       if (notifyOn(NOTIFY.proximitySound)) playBeep();
+      desktopAttention();
+      if (r.speak) speakIntel(r.name, route.jumps);
     }
   }, [intel, routes, threshold]);
 
@@ -222,6 +224,21 @@ function fireIntelNotification(sysName: string, jumps: number) {
   if (desktopNotify(title, body)) return;
   if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
   try { new Notification(title, { body, tag: `nexum-intel-${sysName}` }); } catch { /* ignore */ }
+}
+
+// Read a report aloud, in the site's language. A newer report cuts off one
+// still being read: the latest is what matters.
+function speakIntel(sysName: string, jumps: number) {
+  if (typeof speechSynthesis === 'undefined') return;
+  const text = jumps === 0
+    ? i18n.t('toolbar.proximity.intelSpeakHere', { system: sysName })
+    : i18n.t('toolbar.proximity.intelSpeak', { system: sysName, count: jumps });
+  try {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = i18n.language;
+    speechSynthesis.speak(u);
+  } catch { /* no voices: stay silent */ }
 }
 
 function pickNearest(

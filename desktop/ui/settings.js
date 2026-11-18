@@ -20,6 +20,7 @@ async function strings() {
   $('watchClipboard').checked = s.watchClipboard;
   $('chatlogDir').value = s.chatlogDir || '';
   $('intelSound').checked = s.intelSound;
+  $('intelSpeak').checked = s.intelSpeak;
   $('intelPulseSecs').querySelectorAll('option').forEach((o) => { o.textContent = t.seconds.replace('{n}', o.value); });
   $('intelPulse').value = s.intelPulse;
   $('intelPulseSecs').value = String(s.intelPulseSecs);
@@ -86,6 +87,7 @@ async function strings() {
         chatlogDir: $('chatlogDir').value.trim() || null,
         intelChannels: channels,
         intelSound: $('intelSound').checked,
+        intelSpeak: $('intelSpeak').checked,
         intelPulse: $('intelPulse').value,
         intelPulseSecs: Number($('intelPulseSecs').value),
       } });
