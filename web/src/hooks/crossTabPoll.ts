@@ -28,6 +28,20 @@ export function readXTab(key: string, maxAgeMs: number): Entry | undefined {
   } catch { return undefined; }
 }
 
+/**
+ * Forget every shared poll value. Used when a character comes back from an EVE
+ * login, which can change what it allows: a value read before (clones, fleet,
+ * standings) mustn't be shown again just because it's under five minutes old.
+ */
+export function clearXTab(): void {
+  try {
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const k = localStorage.key(i);
+      if (k?.startsWith(PREFIX)) localStorage.removeItem(k);
+    }
+  } catch { /* storage unavailable: nothing was shared anyway */ }
+}
+
 /** Publish a fresh value so other tabs can skip their own fetch. */
 export function writeXTab(key: string, v: unknown): void {
   try { localStorage.setItem(PREFIX + key, JSON.stringify({ v, at: Date.now() } as Entry)); }

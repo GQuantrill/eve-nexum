@@ -6,9 +6,10 @@ import { WALLET_SCOPE } from '../services/iskDonations.js';
 import { encryptToken } from '../utils/tokenCrypto.js';
 import { createLogger } from '../utils/logger.js';
 import { esiFetch } from '../utils/esi.js';
-import { refreshStandingsForUser } from '../services/standings.js';
+import { forgetPersonalStandings, refreshStandingsForUser } from '../services/standings.js';
+import { forgetCharacterCaches } from './character.js';
 import { syncCorpStructures } from '../services/structureSync.js';
-import { groupsHeld, scopesFromAccessToken } from '../utils/esiScopes.js';
+import { SCOPE, groupsHeld, hasScope, scopesFromAccessToken } from '../utils/esiScopes.js';
 import { inviteMailScopes, parseChosenGroups, requestedScopes, scopeOptions } from '../services/ssoScopes.js';
 import { isLoginPermitted, standingsPermitLogin } from '../services/accessGrants.js';
 import { seedDemoMap } from '../services/demoMap.js';
@@ -386,6 +387,15 @@ authRouter.get('/callback', async (req, res) => {
     if (rows[0].blocked && characterId !== config.adminCharId) {
       res.redirect(failUrl('blocked'));
       return;
+    }
+
+    // A login can carry fewer scopes than before ("Change what nexum can
+    // access"). Whatever was read under the old ones goes: cached clones and
+    // ship, and stored personal contacts when those are no longer allowed.
+    forgetCharacterCaches(userId, characterId);
+    if (grantedScopes && !hasScope(grantedScopes, SCOPE.charContacts)) {
+      await forgetPersonalStandings(characterId)
+        .catch((err) => log.error('forgetting personal standings failed:', err));
     }
 
     // Fire-and-forget standings refresh. Raw access token (not the

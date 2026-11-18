@@ -348,6 +348,14 @@ interface EsiClones {
 
 const clonesCache = new TtlCache<number, unknown>(120_000, 600_000);  // ESI caches /clones/ ~2 min
 
+// Drop everything cached for a character read with its token. Called when a
+// login records a new set of scopes: a pilot who just took Clones (or Ship)
+// away must not keep seeing what was read while it was allowed.
+export function forgetCharacterCaches(userId: number, characterId: number): void {
+  clonesCache.delete(userId);
+  esiShipCache.delete(characterId);
+}
+
 async function locationToSystemId(
   userId: number, locationId: number | undefined, locationType: string | undefined,
 ): Promise<number | null> {

@@ -3,7 +3,8 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { ensureIntegrationDb, truncateAll, seedUser } from '../test/integrationDb.js';
 import { config } from '../config.js';
 import { SCOPE } from '../utils/esiScopes.js';
-import { refreshStandingsForUser, loadOrgContacts } from './standings.js';
+import { refreshStandingsForUser, loadOrgContacts, forgetPersonalStandings } from './standings.js';
+import { db } from '../db.js';
 
 const dbReady = await ensureIntegrationDb();
 
@@ -74,5 +75,20 @@ describe.skipIf(!dbReady)('corp and alliance standings refresh (integration)', (
 
     expect(calledFor('/characters/')).toBe(false);
     expect(calledFor(`/corporations/${CORP}/contacts/`)).toBe(true);
+  });
+
+  it('forgetting personal standings drops only that pilot\'s own contacts', async () => {
+    const OTHER = 2_100_000_002;
+    await db.query(
+      `INSERT INTO character_standings (character_id, contact_kind, contact_id, standing)
+       VALUES ($1, 'corporation', 1, 10), ($2, 'corporation', 1, -10)`, [CHAR, OTHER]);
+    await db.query(
+      `INSERT INTO corp_standings (corp_id, contact_kind, contact_id, standing) VALUES ($1, 'corporation', 1, 5)`, [CORP]);
+
+    await forgetPersonalStandings(CHAR);
+
+    const left = await db.query<{ character_id: number }>(`SELECT character_id FROM character_standings`);
+    expect(left.rows.map((r) => Number(r.character_id))).toEqual([OTHER]);
+    expect(await loadOrgContacts('corp', CORP)).toHaveLength(1);
   });
 });

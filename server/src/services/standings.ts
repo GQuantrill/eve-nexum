@@ -136,6 +136,15 @@ async function replaceStandings(
 // refreshes ONLY corp + alliance and never touches personal contacts — used by
 // the access-page sync, since access control only ever reads corp/alliance
 // standings (so it must not request the personal endpoint at all).
+// Forget a character's personal contacts: called when a login no longer
+// allows reading them, so the map stops tinting with a list the pilot took
+// back. (Corp and alliance lists are shared by the whole org and are kept.)
+export async function forgetPersonalStandings(characterId: number): Promise<void> {
+  await db.query(`DELETE FROM character_standings WHERE character_id = $1`, [characterId]);
+  await db.query(
+    `DELETE FROM standings_refresh WHERE owner_kind = 'character' AND owner_id = $1`, [characterId]);
+}
+
 export async function refreshStandingsForUser(params: {
   userId:      number;
   characterId: number;
