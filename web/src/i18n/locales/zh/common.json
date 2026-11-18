@@ -694,7 +694,7 @@
     "title": "克隆体",
     "medical": "医疗克隆",
     "jumpClone": "跳跃克隆",
-    "none": "未找到克隆体。如果一直为空，请退出并重新登录以授予克隆体权限。",
+    "none": "未找到克隆体。",
     "unknownLocation": "位置不可用",
     "implants": "{{count}} 个植入体",
     "implants_other": "{{count}} 个植入体",
@@ -2430,8 +2430,8 @@
     "personal": "个人",
     "refreshStandings": "立即从 ESI 刷新声望（绕过 6 小时 TTL）",
     "standingsRefreshed": "声望已刷新 — {{personal}} 个人 · {{corp}} 军团 · {{alliance}} 联盟联系人",
-    "noContactsRefreshed": "无法刷新任何联系人。令牌可能缺少 read_contacts 权限 — 请登出后重新登录。",
-    "standingsNotLoaded": "声望尚未加载。如果一直如此，请登出后重新登录以授予 read_contacts 权限。",
+    "noContactsRefreshed": "无法刷新任何联系人。",
+    "standingsNotLoaded": "声望尚未加载。",
     "standingNotInBucket": "{{label}}：你不属于任何一类",
     "standingNotSet": "{{label}}：未设置声望",
     "standingValue": "{{label}}：{{value}}",
@@ -2757,7 +2757,7 @@
         "affects": "一眼看出你是否身处友方或敌方空间，以及管理员启用时的基于声望的访问。"
       },
       "citadels": {
-        "title": "城堡查询",
+        "title": "Upwell 建筑",
         "desc": "向 EVE 查询玩家建筑位于哪个星系、归哪个军团所有。EVE 只会回答你的角色可以停靠的建筑。",
         "affects": "你添加的城堡的所有者（以及其声望颜色），以及你的克隆体位于城堡时的位置。"
       },

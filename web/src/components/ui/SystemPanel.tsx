@@ -38,6 +38,8 @@ import { ActivityPane } from './ActivityPane';
 import { PvpPane } from './PvpPane';
 import { useStandings, type ContactKind } from '../../hooks/useStandings';
 import { toast } from '../../utils/toastStore';
+import { useScopeHeld } from '../../hooks/useScopeHeld';
+import { promptForScope } from '../../utils/scopePrompt';
 import { truesecColor } from '../../utils/truesec';
 import { systemDisplayName } from '../../utils/systemName';
 import { useIncursions, findIncursion } from '../../hooks/useIncursions';
@@ -1143,8 +1145,12 @@ function StandingsRefreshButton({ standings }: { standings: ReturnType<typeof us
   const { t } = useTranslation();
   const [status, setStatus] = useState<'idle' | 'ok' | 'err'>('idle');
   const busy = standings.refreshing || status === 'idle' && false; // placeholder, see onClick
+  const personalHeld = useScopeHeld('standings');
+  const orgHeld      = useScopeHeld('orgStandings');
 
   async function onClick() {
+    // Nothing to refresh from: say which access is missing instead of trying.
+    if (!personalHeld && !orgHeld) { promptForScope('standings'); return; }
     const r = await standings.refresh();
     if (!r) { setStatus('err'); }
     else if (r.succeeded?.character || r.succeeded?.corp || r.succeeded?.alliance) {
@@ -1157,7 +1163,9 @@ function StandingsRefreshButton({ standings }: { standings: ReturnType<typeof us
       );
       setStatus('ok');
     } else {
-      toast.error(t('systemPanel.noContactsRefreshed'));
+      if (!personalHeld)  promptForScope('standings');
+      else if (!orgHeld)  promptForScope('orgStandings');
+      else                toast.error(t('systemPanel.noContactsRefreshed'));
       setStatus('err');
     }
     setTimeout(() => setStatus('idle'), 2000);

@@ -21,6 +21,8 @@ import { useUserSetting } from '../../hooks/useUserSetting';
 import { XIcon, TagIcon, ArrowSquareOutIcon } from '../../icons';
 import { DynamicIcon } from '../DynamicIcon';
 import { api } from '../../api/client';
+import { useScopeHeld } from '../../hooks/useScopeHeld';
+import { promptForScope } from '../../utils/scopePrompt';
 import { scheduleSigRemoval } from '../../store/sigRemovalQueue';
 import { useFlagPresets } from '../../hooks/useFlagPresets';
 import { useOrgFlagPresets } from '../../hooks/useOrgFlagPresets';
@@ -130,6 +132,9 @@ function MassInput({ valueM, onCommit }: { valueM: number; onCommit: (m: number)
 
 export function ConnectionPanel() {
   const { t } = useTranslation();
+  // Without the ship scope there is never a current ship: the button says so
+  // and offers to enable it, rather than looking like you're in no ship.
+  const shipHeld = useScopeHeld('ship');
   const fmtMass = (kg: number) => mass(t, kg);
   const collapseLabel: Record<string, string> = {
     open:      t('connPanel.collapse.open'),
@@ -806,9 +811,14 @@ export function ConnectionPanel() {
               <button
                 type="button"
                 className="sys-btn"
-                disabled={!canUseMyShip}
-                title={canUseMyShip ? t('connPanel.useMyShipTitle', { ship: myShip!.typeName, mass: fmtMass(myShip!.mass!) }) : t('connPanel.noCurrentShip')}
-                onClick={() => canUseMyShip && setRoller({ name: myShip!.typeName, coldKg: myShip!.mass!, hotKg: myShip!.mass! + PROP_MASS })}
+                disabled={shipHeld && !canUseMyShip}
+                title={!shipHeld
+                  ? t('scopes.needsSelf', { group: t('scopes.groups.ship.title') })
+                  : canUseMyShip ? t('connPanel.useMyShipTitle', { ship: myShip!.typeName, mass: fmtMass(myShip!.mass!) }) : t('connPanel.noCurrentShip')}
+                onClick={() => {
+                  if (!shipHeld) { promptForScope('ship'); return; }
+                  if (canUseMyShip) setRoller({ name: myShip!.typeName, coldKg: myShip!.mass!, hotKg: myShip!.mass! + PROP_MASS });
+                }}
               >
                 {t('connPanel.useMyShip')}
               </button>

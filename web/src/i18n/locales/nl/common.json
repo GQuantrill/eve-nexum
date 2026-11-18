@@ -694,7 +694,7 @@
     "title": "Clones",
     "medical": "Medical clone",
     "jumpClone": "Jump clone",
-    "none": "Geen clones gevonden. Blijft dit leeg, log dan uit en weer in om de clones-permissie te geven.",
+    "none": "Geen clones gevonden.",
     "unknownLocation": "Locatie niet beschikbaar",
     "implants": "{{count}} implant",
     "implants_other": "{{count}} implants",
@@ -2432,8 +2432,8 @@
     "personal": "Persoonlijk",
     "refreshStandings": "Standings nu vernieuwen vanuit ESI (negeert de TTL van 6 uur)",
     "standingsRefreshed": "Standings vernieuwd — {{personal}} persoonlijke · {{corp}} corp- · {{alliance}} alliance-contacts",
-    "noContactsRefreshed": "Er konden geen contacts worden vernieuwd. Het token mist mogelijk de read_contacts-scope — log uit en weer in.",
-    "standingsNotLoaded": "Standings zijn nog niet geladen. Blijft dit staan, log dan uit en weer in om de read_contacts-scopes te geven.",
+    "noContactsRefreshed": "Er konden geen contacts worden vernieuwd.",
+    "standingsNotLoaded": "Standings zijn nog niet geladen.",
     "standingNotInBucket": "{{label}}: je zit er niet in",
     "standingNotSet": "{{label}}: geen standing ingesteld",
     "standingValue": "{{label}}: {{value}}",
@@ -2761,7 +2761,7 @@
         "affects": "in één oogopslag zien of je in vriendelijk of vijandig gebied bent, en toegang op basis van standing waar je admins dat gebruiken."
       },
       "citadels": {
-        "title": "Citadel-opzoekingen",
+        "title": "Upwell-structuren",
         "desc": "Vraagt EVE in welk systeem een spelersstructuur staat en welke corp de eigenaar is. EVE antwoordt alleen voor structuren waar je character kan docken.",
         "affects": "de eigenaar van citadels die je toevoegt (en dus hun standing-kleur), en waar je clones zijn als ze in een citadel staan."
       },

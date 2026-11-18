@@ -11,6 +11,8 @@ import { DASH } from '../../i18n/format';
 import { setWaypoint, canSetAutopilot } from '../../utils/routeActions';
 import { MapPinSimpleIcon, PathIcon, CaretDownIcon, CaretRightIcon } from '../../icons';
 import type { Implant } from '../../hooks/useClones';
+import { useScopeHeld } from '../../hooks/useScopeHeld';
+import { ScopeNeeded } from './ScopeNeeded';
 
 // Where this pilot's clones are, and how far each is from where they're standing.
 // Medical clone first — it's the one that decides where you wake up — then jump
@@ -47,6 +49,9 @@ export function ClonesPane() {
     [rows],
   );
   const routes = useRoute(origin.systemId, targetIds);
+  // A clone in a citadel is only placed if this character can look the
+  // structure up.
+  const citadels = useScopeHeld('citadels');
 
   // Nothing to show for two different reasons, and they need different words:
   // the deployment never asked for the scope, versus it did and this character
@@ -54,6 +59,7 @@ export function ClonesPane() {
   if (!clones.enabled) {
     return <div className="scout-pane__empty">{t('clones.notEnabled')}</div>;
   }
+  if (clones.scopeMissing) return <ScopeNeeded group="clones" />;
   if (rows.length === 0) {
     return <div className="scout-pane__empty">{t('clones.none')}</div>;
   }
@@ -150,6 +156,7 @@ export function ClonesPane() {
           );
         })}
       </ul>
+      {!citadels && rows.some((r) => !r.system) && <ScopeNeeded group="citadels" />}
     </div>
   );
 }

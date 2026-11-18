@@ -694,7 +694,7 @@
     "title": "Clones",
     "medical": "Medical clone",
     "jumpClone": "Jump clone",
-    "none": "No clones found. If this stays empty, sign out and back in to grant the clones permission.",
+    "none": "No clones found.",
     "unknownLocation": "Location unavailable",
     "implants": "{{count}} implant",
     "implants_other": "{{count}} implants",
@@ -2432,8 +2432,8 @@
     "personal": "Personal",
     "refreshStandings": "Refresh standings from ESI now (bypasses the 6h TTL)",
     "standingsRefreshed": "Standings refreshed — {{personal}} personal · {{corp}} corp · {{alliance}} alliance contacts",
-    "noContactsRefreshed": "No contacts could be refreshed. Token may be missing the read_contacts scope — log out and back in.",
-    "standingsNotLoaded": "Standings not loaded yet. If this stays here, log out and back in to grant the read_contacts scopes.",
+    "noContactsRefreshed": "No contacts could be refreshed.",
+    "standingsNotLoaded": "Standings not loaded yet.",
     "standingNotInBucket": "{{label}}: you are not in one",
     "standingNotSet": "{{label}}: no standing set",
     "standingValue": "{{label}}: {{value}}",
@@ -2761,7 +2761,7 @@
         "affects": "seeing at a glance whether you're in friendly or hostile space, and standings-based access where your admins use it."
       },
       "citadels": {
-        "title": "Citadel lookups",
+        "title": "Upwell Structures",
         "desc": "Asks EVE which system a player structure is in and which corp owns it. EVE only answers for structures your character can dock at.",
         "affects": "the owner of citadels you add (and so their standings tint), and where your clones are when they're in a citadel."
       },

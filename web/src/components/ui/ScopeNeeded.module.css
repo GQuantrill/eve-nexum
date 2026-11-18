@@ -1,0 +1,11 @@
+/* The inline "Needs X. Enable" note a feature shows in place of what it would
+   show if the character had allowed the access. */
+.note {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  color: var(--text-faint);
+  text-align: center;
+}
