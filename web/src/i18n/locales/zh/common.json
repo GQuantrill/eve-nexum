@@ -1212,7 +1212,7 @@
     "tagline": "EVE Online 的虫洞链路绘图",
     "demoNote": "◈ 交互式演示 — 简化预览。登录以使用信号、击杀动态、连接跟踪、活动历史等更多功能。",
     "cta": {
-      "continueAs": "继续身份",
+      "logBackIn": "重新登录",
       "sessionExpired": "会话已过期 — 点击你的头像通过 EVE SSO 重新登录。",
       "switchChar": "用其他角色登录",
       "secureLogin": "安全的 EVE SSO 登录 — 不存储任何密码。仅角色身份。",

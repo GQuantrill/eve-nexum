@@ -1212,7 +1212,7 @@
     "tagline": "Cartografia de cadeias de buracos de minhoca para EVE Online",
     "demoNote": "◈ Demo interativa — uma pré-visualização simplificada. Inicia sessão para aceder a assinaturas, feeds de kills, seguimento de conexões, histórico de atividade e muito mais.",
     "cta": {
-      "continueAs": "Continuar como",
+      "logBackIn": "Iniciar sessão novamente",
       "sessionExpired": "Sessão expirada — clica no teu retrato para voltar a iniciar sessão via EVE SSO.",
       "switchChar": "Iniciar sessão com outra personagem",
       "secureLogin": "Início de sessão seguro com EVE SSO — sem palavras-passe armazenadas. Apenas a identidade da personagem.",

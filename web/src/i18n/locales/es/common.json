@@ -1212,7 +1212,7 @@
     "tagline": "Cartografía de cadenas de agujeros de gusano para EVE Online",
     "demoNote": "◈ Demo interactiva — una vista previa simplificada. Inicia sesión para acceder a firmas, feeds de kills, seguimiento de conexiones, historial de actividad y mucho más.",
     "cta": {
-      "continueAs": "Continuar como",
+      "logBackIn": "Volver a iniciar sesión",
       "sessionExpired": "Sesión caducada — haz clic en tu retrato para volver a iniciar sesión vía EVE SSO.",
       "switchChar": "Iniciar sesión con otro personaje",
       "secureLogin": "Inicio de sesión seguro con EVE SSO — sin contraseñas almacenadas. Solo identidad del personaje.",

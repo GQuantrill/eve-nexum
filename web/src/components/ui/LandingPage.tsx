@@ -395,7 +395,7 @@ export function LandingPage() {
                   className="landing__returning-avatar"
                 />
                 <div className="landing__returning-info">
-                  <span className="landing__returning-label">{t('landing.cta.continueAs')}</span>
+                  <span className="landing__returning-label">{t('landing.cta.logBackIn')}</span>
                   <span className="landing__returning-name">{lastChar.characterName}</span>
                 </div>
               </a>
