@@ -1521,7 +1521,7 @@
       },
       "announcer": {
         "title": "Annonces vocales",
-        "desc": "Des alertes parlées pendant que vous volez, par une voix qui fonctionne sur votre propre appareil : low-sec et null-sec à portée, incursions, kills récents à proximité, personnages qui se connectent et nouvelles chaînes ajoutées par d'autres. Expérimental, en anglais uniquement."
+        "desc": "Des alertes parlées pendant que vous volez, par une voix qui fonctionne sur votre propre appareil : low-sec et null-sec à portée, incursions, kills récents à proximité, personnages qui se connectent et nouvelles chaînes ajoutées par d'autres. Expérimental, en anglais uniquement. Désactivé tant que vous ne l'activez pas."
       },
       "desktopAlerts": {
         "title": "Alertes de bureau et sonores",
@@ -1854,7 +1854,8 @@
       "evNewChain": "Nouvelle chaîne ajoutée par d’autres",
       "threshold": "« À portée » utilise le seuil des alertes de proximité.",
       "experimental": "Fonctionnalité expérimentale",
-      "delayNote": "La voix peut être retardée jusqu’à 5 secondes. La première exécution est plus longue."
+      "delayNote": "La voix peut être retardée jusqu’à 5 secondes. La première exécution est plus longue.",
+      "downloadSize": "La première utilisation télécharge la voix, environ {{mb}} Mo (une seule fois)."
     },
     "bookmarkHelp": "Sur la ligne d'une signature de trou de ver, cliquez sur l'icône de copie pour copier un nom de favori prêt à coller, puis collez-le dans le favori en jeu. Composez le nom avec ces variables :",
     "browserNotifications": "Notifications du navigateur",
@@ -2848,5 +2849,13 @@
     "show": "Afficher {{channel}}",
     "hide": "Masquer {{channel}}",
     "selectSystem": "Montrer {{system}} sur la carte"
+  },
+  "announcerOptIn": {
+    "title": "Activer l'annonceur vocal ?",
+    "body": "Nexum peut annoncer des alertes à voix haute pendant que vous volez : espace dangereux et incursions à portée, kills récents à proximité, personnages qui se connectent et nouvelles chaînes ajoutées par d'autres. La voix fonctionne sur votre propre appareil. En anglais uniquement, expérimental.",
+    "download": "L'activer télécharge la voix une seule fois, environ {{mb}} Mo ; elle est ensuite mise en cache.",
+    "sub": "Vous pouvez modifier ce choix, choisir une voix et les événements annoncés à tout moment dans la section {{section}} de la barre latérale.",
+    "noThanks": "Non merci",
+    "enable": "Activer"
   }
 }

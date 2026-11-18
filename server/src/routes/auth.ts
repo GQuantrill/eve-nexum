@@ -917,6 +917,9 @@ const SETTINGS_ALLOWLIST = new Set<string>([
   'nexum.announcer.ev.lawless',
   'nexum.announcer.ev.kills',
   'nexum.announcer.ev.newChain',
+  // Whether the one-time "turn the announcer on?" prompt has been answered,
+  // so it isn't asked again on another device.
+  'nexum.announcer.asked',
   // Connection panel: docked strip vs floating window, and that window's
   // geometry.
   'nexum.connPanel.float',

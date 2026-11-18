@@ -1521,7 +1521,7 @@
       },
       "announcer": {
         "title": "Sprachansage",
-        "desc": "Gesprochene Hinweise während du fliegst, von einer Stimme, die auf deinem eigenen Gerät läuft: Low-Sec und Null-Sec in Reichweite, Incursions, aktuelle Kills in der Nähe, sich verbindende Charaktere und neue Ketten, die andere hinzugefügt haben. Experimentell, nur auf Englisch."
+        "desc": "Gesprochene Hinweise während du fliegst, von einer Stimme, die auf deinem eigenen Gerät läuft: Low-Sec und Null-Sec in Reichweite, Incursions, aktuelle Kills in der Nähe, sich verbindende Charaktere und neue Ketten, die andere hinzugefügt haben. Experimentell, nur auf Englisch. Aus, bis du sie einschaltest."
       },
       "desktopAlerts": {
         "title": "Desktop- und Tonbenachrichtigungen",
@@ -1854,7 +1854,8 @@
       "evNewChain": "Neue Kette von anderen hinzugefügt",
       "threshold": "„In Reichweite“ nutzt den Schwellenwert der Näherungswarnungen.",
       "experimental": "Experimentelle Funktion",
-      "delayNote": "Die Stimme kann sich um bis zu 5 Sekunden verzögern. Der erste Durchlauf dauert länger."
+      "delayNote": "Die Stimme kann sich um bis zu 5 Sekunden verzögern. Der erste Durchlauf dauert länger.",
+      "downloadSize": "Beim ersten Einsatz wird die Stimme geladen, etwa {{mb}} MB (einmalig)."
     },
     "bookmarkHelp": "Klicke in der Zeile einer Wurmloch-Signatur auf das Kopiersymbol, um einen fertigen Lesezeichennamen zu kopieren, und füge ihn in das Ingame-Lesezeichen ein. Erstelle den Namen mit diesen Tokens:",
     "browserNotifications": "Browser-Benachrichtigungen",
@@ -2848,5 +2849,13 @@
     "show": "{{channel}} anzeigen",
     "hide": "{{channel}} ausblenden",
     "selectSystem": "{{system}} auf der Karte zeigen"
+  },
+  "announcerOptIn": {
+    "title": "Sprachansage einschalten?",
+    "body": "Nexum kann dir während des Fliegens Hinweise ansagen: gefährlicher Raum und Incursions in Reichweite, aktuelle Kills in der Nähe, sich verbindende Charaktere und neue Ketten, die andere hinzugefügt haben. Die Stimme läuft auf deinem eigenen Gerät. Nur auf Englisch, experimentell.",
+    "download": "Beim Einschalten wird die Stimme einmalig geladen, etwa {{mb}} MB; danach liegt sie im Cache.",
+    "sub": "Du kannst das jederzeit im Bereich {{section}} der Seitenleiste ändern, eine Stimme wählen und festlegen, welche Ereignisse angesagt werden.",
+    "noThanks": "Nein danke",
+    "enable": "Einschalten"
   }
 }

@@ -1521,7 +1521,7 @@
       },
       "announcer": {
         "title": "Anunciador de voz",
-        "desc": "Alertas habladas mientras vuelas, con una voz que funciona en tu propio dispositivo: low-sec y null-sec dentro del alcance, incursiones, kills recientes cercanos, personajes que se conectan y nuevas cadenas añadidas por otros. Experimental, solo en inglés."
+        "desc": "Alertas habladas mientras vuelas, con una voz que funciona en tu propio dispositivo: low-sec y null-sec dentro del alcance, incursiones, kills recientes cercanos, personajes que se conectan y nuevas cadenas añadidas por otros. Experimental, solo en inglés. Desactivado hasta que lo actives."
       },
       "desktopAlerts": {
         "title": "Alertas de escritorio y sonido",
@@ -1854,7 +1854,8 @@
       "evNewChain": "Nueva cadena añadida por otros",
       "threshold": "«Dentro del alcance» usa el umbral de las alertas de proximidad.",
       "experimental": "Función experimental",
-      "delayNote": "La voz puede tardar hasta 5 segundos. La primera vez tarda más."
+      "delayNote": "La voz puede tardar hasta 5 segundos. La primera vez tarda más.",
+      "downloadSize": "El primer uso descarga la voz, unos {{mb}} MB (una sola vez)."
     },
     "bookmarkHelp": "En la fila de una firma de agujero de gusano, haz clic en el icono de copiar para copiar un nombre de marcador listo, y pégalo en el marcador del juego. Crea el nombre con estos tokens:",
     "browserNotifications": "Notificaciones del navegador",
@@ -2848,5 +2849,13 @@
     "show": "Mostrar {{channel}}",
     "hide": "Ocultar {{channel}}",
     "selectSystem": "Mostrar {{system}} en el mapa"
+  },
+  "announcerOptIn": {
+    "title": "¿Activar el anunciador de voz?",
+    "body": "Nexum puede anunciar alertas en voz alta mientras vuelas: espacio peligroso e incursiones al alcance, kills recientes cerca, personajes que se conectan y nuevas cadenas añadidas por otros. La voz funciona en tu propio dispositivo. Solo en inglés, experimental.",
+    "download": "Activarlo descarga la voz una sola vez, unos {{mb}} MB; después queda en caché.",
+    "sub": "Puedes cambiarlo, elegir una voz y decidir qué eventos se anuncian en cualquier momento en la sección {{section}} de la barra lateral.",
+    "noThanks": "No, gracias",
+    "enable": "Activar"
   }
 }

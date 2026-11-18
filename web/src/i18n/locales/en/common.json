@@ -1521,7 +1521,7 @@
       },
       "announcer": {
         "title": "Voice announcer",
-        "desc": "Spoken alerts while you fly, from a voice that runs on your own device: low-sec and null-sec coming into range, incursions, recent kills nearby, characters connecting, and new chains added by others. Experimental, English only."
+        "desc": "Spoken alerts while you fly, from a voice that runs on your own device: low-sec and null-sec coming into range, incursions, recent kills nearby, characters connecting, and new chains added by others. Experimental, English only. Off until you turn it on."
       },
       "desktopAlerts": {
         "title": "Desktop and sound alerts",
@@ -1854,7 +1854,8 @@
       "evNewChain": "New chain added by others",
       "threshold": "\"In range\" uses the Proximity Alerts threshold.",
       "experimental": "Experimental Feature",
-      "delayNote": "Voice may be delayed by up to 5 seconds. The first run takes longer."
+      "delayNote": "Voice may be delayed by up to 5 seconds. The first run takes longer.",
+      "downloadSize": "First use downloads the voice, about {{mb}} MB (once)."
     },
     "bookmarkHelp": "On a wormhole signature row, click the copy icon to copy a paste-ready bookmark name, then paste it into the in-game bookmark. Build the name with these tokens:",
     "browserNotifications": "Browser Notifications",
@@ -2848,5 +2849,13 @@
     "show": "Show {{channel}}",
     "hide": "Hide {{channel}}",
     "selectSystem": "Show {{system}} on the map"
+  },
+  "announcerOptIn": {
+    "title": "Turn on the voice announcer?",
+    "body": "Nexum can speak alerts while you fly: dangerous space and incursions coming into range, recent kills nearby, characters connecting, and new chains added by others. The voice runs on your own device. English only, experimental.",
+    "download": "Turning it on downloads the voice once, about {{mb}} MB; after that it's cached.",
+    "sub": "You can change this, pick a voice and choose which events are spoken at any time in the {{section}} section of the sidebar.",
+    "noThanks": "No thanks",
+    "enable": "Turn on"
   }
 }

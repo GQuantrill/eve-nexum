@@ -17,6 +17,11 @@ describe('settings allowlist', () => {
     }
   });
 
+  it('allows the announcer opt-in flag, so the prompt is asked once per user, not per device', () => {
+    expect(settingAllowed('nexum.announcer.asked')).toBe(true);
+    expect(settingAllowed('nexum.announcer.enabled')).toBe(true);
+  });
+
   it('allows the presence flag the server itself reads', () => {
     // routes/character.ts filters the presence list on
     // ui_settings->>'nexum.presence.hidden'. While this key was dropped here the

@@ -4,7 +4,7 @@ import { Trans, useTranslation } from 'react-i18next';
 import { notifyPermissionChanged } from '../../hooks/useNotificationPermission';
 import styles from './ProximityOptInModal.module.css';
 
-const ASKED_KEY = 'nexum.proximityOptInAsked';
+import { PROXIMITY_ASKED_KEY as ASKED_KEY } from '../../utils/firstRunPrompts';
 
 /**
  * One-time consent modal shown on first login asking whether to enable

@@ -1,13 +1,14 @@
 import { useTranslation } from "react-i18next";
 import { useUserSetting } from "../../hooks/useUserSetting";
-import { useAnnouncer, VOICES } from "../../audio/announcer";
+import { useAnnouncer, VOICES, ANNOUNCER_DOWNLOAD_MB } from "../../audio/announcer";
 import { ANN } from "../../hooks/useAnnouncerEvents";
 import { Select } from "./Select";
 
 // Body of the "Announcer" sidebar section. Master enable + voice picker/preview
-// + the five per-event toggles. Everything defaults ON: the announcer is on by
-// default and the user opts out. The model downloads lazily on the first spoken
-// event (or Preview), never eagerly. UI chrome is translated; the spoken phrases
+// + the five per-event toggles. The master switch defaults OFF (opt-in; see
+// AnnouncerOptInModal); the events default ON under it. The model downloads
+// lazily on the first spoken event (or Preview), never eagerly, and its size is
+// shown before turning it on. UI chrome is translated; the spoken phrases
 // stay English (Kokoro is English-only), as does the voice-picker label (voice
 // names + accents are proper nouns).
 
@@ -28,7 +29,7 @@ function EventToggle({ settingKey, label }: { settingKey: string; label: string 
 
 export function AnnouncerSection() {
   const { t } = useTranslation();
-  const [enabled, setEnabled] = useUserSetting<boolean>(ANN.enabled, true);
+  const [enabled, setEnabled] = useUserSetting<boolean>(ANN.enabled, false);
   const [voice, setVoice] = useUserSetting<string>(ANN.voice, "af_nicole");
   const { status, progress, error, speaking, setVoice: setAnnVoice, speak } = useAnnouncer();
 
@@ -59,6 +60,11 @@ export function AnnouncerSection() {
         {t("mapSidebar.announcer.experimental")}
       </div>
       <div className="map-sidebar__hint">{t("mapSidebar.announcer.hint")}</div>
+      {status !== "ready" && ANNOUNCER_DOWNLOAD_MB !== null && (
+        <div className="map-sidebar__hint">
+          {t("mapSidebar.announcer.downloadSize", { mb: ANNOUNCER_DOWNLOAD_MB })}
+        </div>
+      )}
 
       <label className="map-sidebar__row map-sidebar__toggle-row">
         <span className="map-sidebar__label">{t("mapSidebar.announcer.enable")}</span>

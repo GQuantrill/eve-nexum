@@ -11,6 +11,7 @@ import { Toolbar } from './components/ui/Toolbar';
 import { MapSidebar } from './components/ui/MapSidebar';
 import { Sidebar } from './components/ui/Sidebar';
 import { ProximityOptInModal } from './components/ui/ProximityOptInModal';
+import { AnnouncerOptInModal } from './components/ui/AnnouncerOptInModal';
 import { CommandPaletteModal } from './components/ui/CommandPaletteModal';
 import { Toaster } from './components/ui/Toaster';
 import { toast } from './utils/toastStore';
@@ -190,6 +191,7 @@ function MapApp() {
         </div>
       </div>
       <ProximityOptInModal />
+      <AnnouncerOptInModal />
       <CommandPaletteModal />
     </ReactFlowProvider>
   );

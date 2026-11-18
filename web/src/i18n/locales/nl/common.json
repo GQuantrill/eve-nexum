@@ -1521,7 +1521,7 @@
       },
       "announcer": {
         "title": "Spraakomroeper",
-        "desc": "Gesproken meldingen terwijl je vliegt, van een stem die op je eigen apparaat draait: low-sec en null-sec binnen bereik, incursions, recente kills in de buurt, personages die verbinden, en nieuwe ketens die anderen hebben toegevoegd. Experimenteel, alleen in het Engels."
+        "desc": "Gesproken meldingen terwijl je vliegt, van een stem die op je eigen apparaat draait: low-sec en null-sec binnen bereik, incursions, recente kills in de buurt, personages die verbinden, en nieuwe ketens die anderen hebben toegevoegd. Experimenteel, alleen in het Engels. Uit tot je hem aanzet."
       },
       "desktopAlerts": {
         "title": "Bureaublad- en geluidsmeldingen",
@@ -1854,7 +1854,8 @@
       "evNewChain": "Nieuwe keten toegevoegd door anderen",
       "threshold": "\"Binnen bereik\" gebruikt de drempel van Nabijheidsmeldingen.",
       "experimental": "Experimentele functie",
-      "delayNote": "De stem kan tot 5 seconden achterlopen. De eerste keer duurt langer."
+      "delayNote": "De stem kan tot 5 seconden achterlopen. De eerste keer duurt langer.",
+      "downloadSize": "Bij het eerste gebruik wordt de stem gedownload, ongeveer {{mb}} MB (eenmalig)."
     },
     "bookmarkHelp": "Klik op een rij met een wormgat-signatuur op het kopieerpictogram voor een kant-en-klare bookmarknaam, en plak die in de bookmark in het spel. Stel de naam samen met deze tokens:",
     "browserNotifications": "Browsermeldingen",
@@ -2848,5 +2849,13 @@
     "show": "{{channel}} tonen",
     "hide": "{{channel}} verbergen",
     "selectSystem": "{{system}} op de kaart tonen"
+  },
+  "announcerOptIn": {
+    "title": "Spraakomroeper aanzetten?",
+    "body": "Nexum kan meldingen uitspreken terwijl je vliegt: gevaarlijke ruimte en incursions binnen bereik, recente kills in de buurt, karakters die verbinden en nieuwe ketens die anderen hebben toegevoegd. De stem draait op je eigen apparaat. Alleen Engels, experimenteel.",
+    "download": "Aanzetten downloadt de stem één keer, ongeveer {{mb}} MB; daarna staat hij in de cache.",
+    "sub": "Je kunt dit altijd wijzigen, een stem kiezen en bepalen welke gebeurtenissen worden uitgesproken in het onderdeel {{section}} van de zijbalk.",
+    "noThanks": "Nee, bedankt",
+    "enable": "Aanzetten"
   }
 }

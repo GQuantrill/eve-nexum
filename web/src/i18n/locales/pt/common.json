@@ -1521,7 +1521,7 @@
       },
       "announcer": {
         "title": "Anunciador de voz",
-        "desc": "Alertas falados enquanto voas, com uma voz que corre no teu próprio dispositivo: low-sec e null-sec ao alcance, incursões, kills recentes nas proximidades, personagens a ligar-se e novas cadeias adicionadas por outros. Experimental, só em inglês."
+        "desc": "Alertas falados enquanto voas, com uma voz que corre no teu próprio dispositivo: low-sec e null-sec ao alcance, incursões, kills recentes nas proximidades, personagens a ligar-se e novas cadeias adicionadas por outros. Experimental, só em inglês. Desligado até você ativar."
       },
       "desktopAlerts": {
         "title": "Alertas de ambiente de trabalho e som",
@@ -1854,7 +1854,8 @@
       "evNewChain": "Nova cadeia adicionada por outros",
       "threshold": "«No alcance» usa o limiar dos alertas de proximidade.",
       "experimental": "Funcionalidade experimental",
-      "delayNote": "A voz pode demorar até 5 segundos. A primeira execução demora mais."
+      "delayNote": "A voz pode demorar até 5 segundos. A primeira execução demora mais.",
+      "downloadSize": "O primeiro uso baixa a voz, cerca de {{mb}} MB (uma única vez)."
     },
     "bookmarkHelp": "Na linha de uma assinatura de buraco de minhoca, clique no ícone de copiar para copiar um nome de marcador pronto e cole-o no marcador do jogo. Monte o nome com estes tokens:",
     "browserNotifications": "Notificações do navegador",
@@ -2848,5 +2849,13 @@
     "show": "Mostrar {{channel}}",
     "hide": "Ocultar {{channel}}",
     "selectSystem": "Mostrar {{system}} no mapa"
+  },
+  "announcerOptIn": {
+    "title": "Ativar o anunciador de voz?",
+    "body": "O Nexum pode falar alertas enquanto você voa: espaço perigoso e incursões ao alcance, kills recentes por perto, personagens se conectando e novas cadeias adicionadas por outros. A voz roda no seu próprio dispositivo. Só em inglês, experimental.",
+    "download": "Ativar baixa a voz uma única vez, cerca de {{mb}} MB; depois ela fica em cache.",
+    "sub": "Você pode mudar isso, escolher uma voz e definir quais eventos são falados a qualquer momento na seção {{section}} da barra lateral.",
+    "noThanks": "Não, obrigado",
+    "enable": "Ativar"
   }
 }
