@@ -10,6 +10,7 @@ import { NOTIFY, notifyOn, alertGain } from '../utils/notificationPrefs';
 import { useDebugFlag } from '../utils/debugFlags';
 import { desktopNotify, desktopAttention } from '../desktop/bridge';
 import { useIntelReports } from '../desktop/intel';
+import type { IntelSpeech } from '../desktop/intel';
 import i18n from '../i18n';
 
 /** 'intel': a system named in one of the pilot's intel channels (desktop app). */
@@ -202,7 +203,7 @@ export function useProximityAlerts(): {
       if (notifyOn(NOTIFY.proximityDesktop)) fireIntelNotification(r.name, route.jumps);
       if (notifyOn(NOTIFY.proximitySound)) playBeep();
       desktopAttention();
-      if (r.speak) speakIntel(r.name, route.jumps);
+      if (r.speech) speakIntel(r.name, route.jumps, r.speech);
     }
   }, [intel, routes, threshold]);
 
@@ -226,9 +227,12 @@ function fireIntelNotification(sysName: string, jumps: number) {
   try { new Notification(title, { body, tag: `nexum-intel-${sysName}` }); } catch { /* ignore */ }
 }
 
-// Read a report aloud, in the site's language. A newer report cuts off one
-// still being read: the latest is what matters.
-function speakIntel(sysName: string, jumps: number) {
+const SPEECH_RATES: Record<string, number> = { slow: 0.8, normal: 1, fast: 1.3 };
+
+// Read a report aloud, in the site's language, at the pilot's volume, speed
+// and voice. A newer report cuts off one still being read: the latest is what
+// matters.
+function speakIntel(sysName: string, jumps: number, speech: IntelSpeech) {
   if (typeof speechSynthesis === 'undefined') return;
   const text = jumps === 0
     ? i18n.t('toolbar.proximity.intelSpeakHere', { system: sysName })
@@ -237,6 +241,10 @@ function speakIntel(sysName: string, jumps: number) {
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
     u.lang = i18n.language;
+    u.volume = Math.min(100, Math.max(0, speech.volume)) / 100;
+    u.rate = SPEECH_RATES[speech.rate] ?? 1;
+    const voice = speech.voice ? speechSynthesis.getVoices().find((v) => v.voiceURI === speech.voice) : undefined;
+    if (voice) u.voice = voice;
     speechSynthesis.speak(u);
   } catch { /* no voices: stay silent */ }
 }

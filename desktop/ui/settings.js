@@ -21,6 +21,43 @@ async function strings() {
   $('chatlogDir').value = s.chatlogDir || '';
   $('intelSound').checked = s.intelSound;
   $('intelSpeak').checked = s.intelSpeak;
+
+  // Speech: volume, voice (the voices installed on this computer), speed,
+  // and a test that speaks with what's chosen right now, saved or not.
+  const RATES = { slow: 0.8, normal: 1, fast: 1.3 };
+  $('speakVolume').value = String(s.intelSpeakVolume ?? 100);
+  $('speakRate').value = s.intelSpeakRate || 'normal';
+  const showVolume = () => { $('speakVolumeOut').textContent = `${$('speakVolume').value}%`; };
+  showVolume();
+  $('speakVolume').addEventListener('input', showVolume);
+  const fillVoices = () => {
+    const sel = $('speakVoice');
+    const want = sel.value || s.intelSpeakVoice || '';
+    const voices = typeof speechSynthesis === 'undefined' ? [] : speechSynthesis.getVoices();
+    sel.replaceChildren(sel.options[0], ...voices.map((v) => {
+      const o = document.createElement('option');
+      o.value = v.voiceURI;
+      o.textContent = `${v.name} (${v.lang})`;
+      return o;
+    }));
+    sel.value = voices.some((v) => v.voiceURI === want) ? want : '';
+  };
+  fillVoices();
+  if (typeof speechSynthesis !== 'undefined') speechSynthesis.addEventListener('voiceschanged', fillVoices);
+  const speechOn = () => { $('speech').classList.toggle('off', !$('intelSpeak').checked); };
+  speechOn();
+  $('intelSpeak').addEventListener('change', speechOn);
+  $('speakTest').addEventListener('click', () => {
+    if (typeof speechSynthesis === 'undefined') return;
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(t.speakSample);
+    u.lang = navigator.language;
+    u.volume = Number($('speakVolume').value) / 100;
+    u.rate = RATES[$('speakRate').value] ?? 1;
+    const voice = speechSynthesis.getVoices().find((v) => v.voiceURI === $('speakVoice').value);
+    if (voice) u.voice = voice;
+    speechSynthesis.speak(u);
+  });
   $('intelPulseSecs').querySelectorAll('option').forEach((o) => { o.textContent = t.seconds.replace('{n}', o.value); });
   $('intelPulse').value = s.intelPulse;
   $('intelPulseSecs').value = String(s.intelPulseSecs);
@@ -88,6 +125,9 @@ async function strings() {
         intelChannels: channels,
         intelSound: $('intelSound').checked,
         intelSpeak: $('intelSpeak').checked,
+        intelSpeakVolume: Number($('speakVolume').value),
+        intelSpeakRate: $('speakRate').value,
+        intelSpeakVoice: $('speakVoice').value || null,
         intelPulse: $('intelPulse').value,
         intelPulseSecs: Number($('intelPulseSecs').value),
       } });

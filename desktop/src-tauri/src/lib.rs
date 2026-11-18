@@ -188,7 +188,7 @@ pub(crate) fn open_settings(app: &AppHandle) {
     }
     let _ = WebviewWindowBuilder::new(app, "settings", WebviewUrl::App("settings.html".into()))
         .title(tr("title"))
-        .inner_size(540.0, 760.0)
+        .inner_size(540.0, 880.0)
         .resizable(true)
         .build();
 }

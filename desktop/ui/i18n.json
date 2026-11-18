@@ -54,7 +54,16 @@
     "pulseNormal": "Normal",
     "pulseStrong": "Strong",
     "intelSpeak": "Read intel within range aloud",
-    "intelSpeakHint": "Says the system and how many jumps away it is, for reports within your proximity alert range."
+    "intelSpeakHint": "Says the system and how many jumps away it is, for reports within your proximity alert range.",
+    "speakVolume": "Volume",
+    "speakVoice": "Voice",
+    "speakVoiceDefault": "Default for your language",
+    "speakRate": "Speed",
+    "rateSlow": "Slower",
+    "rateNormal": "Normal",
+    "rateFast": "Faster",
+    "speakTest": "Test",
+    "speakSample": "UALX-3, 2 jumps"
   },
   "de": {
     "show": "Nexum anzeigen",
@@ -111,7 +120,16 @@
     "pulseNormal": "Normal",
     "pulseStrong": "Stark",
     "intelSpeak": "Intel in Reichweite vorlesen",
-    "intelSpeakHint": "Nennt das System und wie viele Sprünge entfernt es ist, für Meldungen innerhalb deiner Annäherungswarnungs-Reichweite."
+    "intelSpeakHint": "Nennt das System und wie viele Sprünge entfernt es ist, für Meldungen innerhalb deiner Annäherungswarnungs-Reichweite.",
+    "speakVolume": "Lautstärke",
+    "speakVoice": "Stimme",
+    "speakVoiceDefault": "Standard für deine Sprache",
+    "speakRate": "Tempo",
+    "rateSlow": "Langsamer",
+    "rateNormal": "Normal",
+    "rateFast": "Schneller",
+    "speakTest": "Testen",
+    "speakSample": "UALX-3, 2 Sprünge"
   },
   "nl": {
     "show": "Nexum tonen",
@@ -168,7 +186,16 @@
     "pulseNormal": "Normaal",
     "pulseStrong": "Sterk",
     "intelSpeak": "Intel binnen bereik voorlezen",
-    "intelSpeakHint": "Noemt het systeem en hoeveel sprongen het weg is, voor meldingen binnen het bereik van je nabijheidswaarschuwing."
+    "intelSpeakHint": "Noemt het systeem en hoeveel sprongen het weg is, voor meldingen binnen het bereik van je nabijheidswaarschuwing.",
+    "speakVolume": "Volume",
+    "speakVoice": "Stem",
+    "speakVoiceDefault": "Standaard voor je taal",
+    "speakRate": "Snelheid",
+    "rateSlow": "Langzamer",
+    "rateNormal": "Normaal",
+    "rateFast": "Sneller",
+    "speakTest": "Testen",
+    "speakSample": "UALX-3, 2 sprongen"
   },
   "fr": {
     "show": "Afficher Nexum",
@@ -225,7 +252,16 @@
     "pulseNormal": "Normale",
     "pulseStrong": "Forte",
     "intelSpeak": "Lire à voix haute l'intel à portée",
-    "intelSpeakHint": "Annonce le système et à combien de sauts il se trouve, pour les signalements dans la portée de votre alerte de proximité."
+    "intelSpeakHint": "Annonce le système et à combien de sauts il se trouve, pour les signalements dans la portée de votre alerte de proximité.",
+    "speakVolume": "Volume",
+    "speakVoice": "Voix",
+    "speakVoiceDefault": "Par défaut pour votre langue",
+    "speakRate": "Vitesse",
+    "rateSlow": "Plus lente",
+    "rateNormal": "Normale",
+    "rateFast": "Plus rapide",
+    "speakTest": "Tester",
+    "speakSample": "UALX-3, 2 sauts"
   },
   "es": {
     "show": "Mostrar Nexum",
@@ -282,7 +318,16 @@
     "pulseNormal": "Normal",
     "pulseStrong": "Fuerte",
     "intelSpeak": "Leer en voz alta la intel cercana",
-    "intelSpeakHint": "Dice el sistema y a cuántos saltos está, para los reportes dentro del alcance de tu alerta de proximidad."
+    "intelSpeakHint": "Dice el sistema y a cuántos saltos está, para los reportes dentro del alcance de tu alerta de proximidad.",
+    "speakVolume": "Volumen",
+    "speakVoice": "Voz",
+    "speakVoiceDefault": "Predeterminada para tu idioma",
+    "speakRate": "Velocidad",
+    "rateSlow": "Más lenta",
+    "rateNormal": "Normal",
+    "rateFast": "Más rápida",
+    "speakTest": "Probar",
+    "speakSample": "UALX-3, 2 saltos"
   },
   "pt": {
     "show": "Mostrar Nexum",
@@ -339,7 +384,16 @@
     "pulseNormal": "Normal",
     "pulseStrong": "Forte",
     "intelSpeak": "Ler em voz alta a intel no alcance",
-    "intelSpeakHint": "Diz o sistema e a quantos saltos ele está, para reportes dentro do alcance do seu alerta de proximidade."
+    "intelSpeakHint": "Diz o sistema e a quantos saltos ele está, para reportes dentro do alcance do seu alerta de proximidade.",
+    "speakVolume": "Volume",
+    "speakVoice": "Voz",
+    "speakVoiceDefault": "Padrão do seu idioma",
+    "speakRate": "Velocidade",
+    "rateSlow": "Mais lenta",
+    "rateNormal": "Normal",
+    "rateFast": "Mais rápida",
+    "speakTest": "Testar",
+    "speakSample": "UALX-3, 2 saltos"
   },
   "zh": {
     "show": "显示 Nexum",
@@ -396,7 +450,16 @@
     "pulseNormal": "正常",
     "pulseStrong": "强烈",
     "intelSpeak": "朗读范围内的情报",
-    "intelSpeakHint": "对接近警报范围内的报告，读出星系名称和距离跳数。"
+    "intelSpeakHint": "对接近警报范围内的报告，读出星系名称和距离跳数。",
+    "speakVolume": "音量",
+    "speakVoice": "语音",
+    "speakVoiceDefault": "你的语言的默认语音",
+    "speakRate": "语速",
+    "rateSlow": "较慢",
+    "rateNormal": "正常",
+    "rateFast": "较快",
+    "speakTest": "试听",
+    "speakSample": "UALX-3，2 跳"
   },
   "ko": {
     "show": "Nexum 보기",
@@ -453,7 +516,16 @@
     "pulseNormal": "보통",
     "pulseStrong": "강하게",
     "intelSpeak": "범위 안의 정보를 소리로 읽기",
-    "intelSpeakHint": "근접 경보 범위 안의 보고에 대해 성계 이름과 몇 점프 거리인지 읽어 줍니다."
+    "intelSpeakHint": "근접 경보 범위 안의 보고에 대해 성계 이름과 몇 점프 거리인지 읽어 줍니다.",
+    "speakVolume": "음량",
+    "speakVoice": "음성",
+    "speakVoiceDefault": "내 언어의 기본 음성",
+    "speakRate": "속도",
+    "rateSlow": "느리게",
+    "rateNormal": "보통",
+    "rateFast": "빠르게",
+    "speakTest": "테스트",
+    "speakSample": "UALX-3, 2점프"
   },
   "ja": {
     "show": "Nexum を表示",
@@ -510,7 +582,16 @@
     "pulseNormal": "標準",
     "pulseStrong": "強め",
     "intelSpeak": "範囲内のインテルを読み上げる",
-    "intelSpeakHint": "接近アラートの範囲内の報告について、星系名と何ジャンプ先かを読み上げます。"
+    "intelSpeakHint": "接近アラートの範囲内の報告について、星系名と何ジャンプ先かを読み上げます。",
+    "speakVolume": "音量",
+    "speakVoice": "音声",
+    "speakVoiceDefault": "言語の既定の音声",
+    "speakRate": "速さ",
+    "rateSlow": "遅め",
+    "rateNormal": "標準",
+    "rateFast": "速め",
+    "speakTest": "テスト",
+    "speakSample": "UALX-3、2 ジャンプ"
   },
   "ru": {
     "show": "Показать Nexum",
@@ -567,6 +648,15 @@
     "pulseNormal": "Обычная",
     "pulseStrong": "Сильная",
     "intelSpeak": "Озвучивать интел в радиусе",
-    "intelSpeakHint": "Называет систему и сколько до неё прыжков — для сообщений в радиусе оповещения о близости."
+    "intelSpeakHint": "Называет систему и сколько до неё прыжков — для сообщений в радиусе оповещения о близости.",
+    "speakVolume": "Громкость",
+    "speakVoice": "Голос",
+    "speakVoiceDefault": "По умолчанию для вашего языка",
+    "speakRate": "Скорость",
+    "rateSlow": "Медленнее",
+    "rateNormal": "Обычная",
+    "rateFast": "Быстрее",
+    "speakTest": "Проверить",
+    "speakSample": "UALX-3, 2 прыжка"
   }
 }

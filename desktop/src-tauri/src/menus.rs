@@ -64,6 +64,7 @@ pub fn build_bar(app: &AppHandle, s: &Settings) -> tauri::Result<Menu<Wry>> {
         &CheckMenuItem::with_id(app, "clipboard", tr("clip"), true, s.watch_clipboard, None::<&str>)?,
         &PredefinedMenuItem::separator(app)?,
         &MenuItem::with_id(app, "intel", tr("intelChannelsMenu"), true, None::<&str>)?,
+        &CheckMenuItem::with_id(app, "speak", tr("intelSpeak"), true, s.intel_speak, None::<&str>)?,
         &MenuItem::with_id(app, "log_folder", tr("openLogFolder"), true, None::<&str>)?,
     ])?;
 
@@ -102,6 +103,7 @@ pub fn build_tray(app: &AppHandle, s: &Settings) -> tauri::Result<Menu<Wry>> {
         &CheckMenuItem::with_id(app, "on_top", tr("onTop"), true, s.always_on_top, None::<&str>)?,
         &CheckMenuItem::with_id(app, "logs", tr("logs"), true, s.read_logs, None::<&str>)?,
         &CheckMenuItem::with_id(app, "clipboard", tr("clip"), true, s.watch_clipboard, None::<&str>)?,
+        &CheckMenuItem::with_id(app, "speak", tr("intelSpeak"), true, s.intel_speak, None::<&str>)?,
         &PredefinedMenuItem::separator(app)?,
         &MenuItem::with_id(app, "settings", tr("settings"), true, None::<&str>)?,
         &MenuItem::with_id(app, "reload", tr("reload"), true, None::<&str>)?,
@@ -145,6 +147,7 @@ pub fn handle(app: &AppHandle, id: &str) {
         "on_top" => update(app, |s| s.always_on_top = !s.always_on_top),
         "logs" => update(app, |s| s.read_logs = !s.read_logs),
         "clipboard" => update(app, |s| s.watch_clipboard = !s.watch_clipboard),
+        "speak" => update(app, |s| s.intel_speak = !s.intel_speak),
         "reload" => {
             if let Some(w) = main {
                 let _ = w.eval("location.reload()");

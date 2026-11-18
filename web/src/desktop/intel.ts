@@ -22,7 +22,12 @@ export interface IntelLine {
   channel: string; sender: string; text: string; at: number; sound: boolean;
   /** Older app versions don't send these: 5 s, normal, silent. */
   pulseSecs?: number; pulse?: IntelPulse; speak?: boolean;
+  /** How to speak it: volume 0-100, slow/normal/fast, a voice id. */
+  speakVolume?: number; speakRate?: string; speakVoice?: string | null;
 }
+
+/** How a report is read aloud (the pilot's desktop settings). */
+export interface IntelSpeech { volume: number; rate: string; voice: string | null }
 
 // ── Which systems are pulsing ───────────────────────────────────────────────
 const pulsing = new Map<string, { until: number; level: IntelPulse }>();
@@ -96,8 +101,9 @@ const BATCH_MAX = 60;
 
 export interface IntelReport {
   eveSystemId: number; name: string; at: number;
-  /** Read it aloud when it's within range (the pilot's desktop setting). */
-  speak: boolean;
+  /** Read it aloud when it's within range, and how (desktop settings);
+   *  null when not. */
+  speech: IntelSpeech | null;
 }
 
 let reports = new Map<number, IntelReport>();
@@ -154,7 +160,13 @@ async function flush(): Promise<void> {
       const sys = known.get(n);
       if (!sys) continue;
       if (clear) next.delete(sys.eveSystemId);
-      else next.set(sys.eveSystemId, { ...sys, at: line.at, speak: !!line.speak });
+      else next.set(sys.eveSystemId, {
+        ...sys,
+        at: line.at,
+        speech: line.speak
+          ? { volume: line.speakVolume ?? 100, rate: line.speakRate ?? 'normal', voice: line.speakVoice ?? null }
+          : null,
+      });
     }
   }
   publish(next);

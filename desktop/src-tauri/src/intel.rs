@@ -31,8 +31,39 @@ pub struct IntelLine {
     /// How long and how strongly the system pulses (desktop settings).
     pub pulse_secs: u32,
     pub pulse: String,
-    /// Whether to read it aloud when it's within range (desktop settings).
+    /// Whether to read it aloud when it's within range, and how (desktop
+    /// settings).
     pub speak: bool,
+    pub speak_volume: u32,
+    pub speak_rate: String,
+    pub speak_voice: Option<String>,
+}
+
+/// The pilot's intel options, stamped on every line sent to the window.
+#[derive(Clone)]
+struct LineOptions {
+    sound: bool,
+    pulse_secs: u32,
+    pulse: String,
+    speak: bool,
+    speak_volume: u32,
+    speak_rate: String,
+    speak_voice: Option<String>,
+}
+
+impl LineOptions {
+    fn apply(&self, l: IntelLine) -> IntelLine {
+        IntelLine {
+            sound: self.sound,
+            pulse_secs: self.pulse_secs,
+            pulse: self.pulse.clone(),
+            speak: self.speak,
+            speak_volume: self.speak_volume,
+            speak_rate: self.speak_rate.clone(),
+            speak_voice: self.speak_voice.clone(),
+            ..l
+        }
+    }
 }
 
 /// Lines kept for the Nexum window's intel feed.
@@ -63,17 +94,25 @@ pub fn start(app: AppHandle) {
         let mut followed: HashMap<String, Followed> = HashMap::new();
         loop {
             std::thread::sleep(Duration::from_secs(1));
-            let (channels, sound, pulse_secs, pulse, speak) = {
+            let (channels, opts) = {
                 let state = app.state::<AppState>();
                 let s = state.settings.lock().unwrap();
-                (s.intel_channels.clone(), s.intel_sound, s.intel_pulse_secs, s.intel_pulse.clone(), s.intel_speak)
+                (s.intel_channels.clone(), LineOptions {
+                    sound: s.intel_sound,
+                    pulse_secs: s.intel_pulse_secs,
+                    pulse: s.intel_pulse.clone(),
+                    speak: s.intel_speak,
+                    speak_volume: s.intel_speak_volume,
+                    speak_rate: s.intel_speak_rate.clone(),
+                    speak_voice: s.intel_speak_voice.clone(),
+                })
             };
             followed.retain(|k, _| channels.iter().any(|c| c.eq_ignore_ascii_case(k)));
             if let Some(dir) = eve_logs::log_dir(&app) {
                 let mut history: Vec<IntelLine> = Vec::new();
                 let new = poll(&dir, &channels, &mut followed, &mut history);
                 let new: Vec<IntelLine> = new.into_iter()
-                    .map(|l| IntelLine { sound, pulse_secs, pulse: pulse.clone(), speak, ..l })
+                    .map(|l| opts.apply(l))
                     .collect();
                 if !history.is_empty() || !new.is_empty() {
                     let state = app.state::<AppState>();
@@ -211,6 +250,9 @@ fn parse_lines(channel: &str, text: &str) -> Vec<IntelLine> {
                 pulse_secs: 5,
                 pulse: "normal".to_string(),
                 speak: false,
+                speak_volume: 100,
+                speak_rate: "normal".to_string(),
+                speak_voice: None,
             })
         })
         .collect()

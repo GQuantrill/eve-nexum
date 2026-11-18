@@ -34,6 +34,13 @@ pub struct Settings {
     pub intel_pulse: String,
     /// Read intel within the proximity range aloud ("UALX-3, 2 jumps").
     pub intel_speak: bool,
+    /// Speech volume, 0-100.
+    pub intel_speak_volume: u32,
+    /// Speech speed: slow, normal or fast.
+    pub intel_speak_rate: String,
+    /// The voice to use (its id on this computer); None = the default voice
+    /// for the site's language.
+    pub intel_speak_voice: Option<String>,
     /// Page zoom of the Nexum window (View > Zoom), 1.0 = 100%.
     pub zoom: f64,
 }
@@ -51,6 +58,9 @@ impl Default for Settings {
             intel_pulse_secs: 5,
             intel_pulse: "normal".to_string(),
             intel_speak: false,
+            intel_speak_volume: 100,
+            intel_speak_rate: "normal".to_string(),
+            intel_speak_voice: None,
             zoom: 1.0,
         }
     }
@@ -105,6 +115,13 @@ pub fn normalise_pulse(s: &mut Settings) {
     }
     if !PULSES.contains(&s.intel_pulse.as_str()) {
         s.intel_pulse = "normal".to_string();
+    }
+    s.intel_speak_volume = s.intel_speak_volume.min(100);
+    if !["slow", "normal", "fast"].contains(&s.intel_speak_rate.as_str()) {
+        s.intel_speak_rate = "normal".to_string();
+    }
+    if s.intel_speak_voice.as_deref().is_some_and(|v| v.trim().is_empty() || v.len() > 300) {
+        s.intel_speak_voice = None;
     }
 }
 
