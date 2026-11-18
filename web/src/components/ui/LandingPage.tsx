@@ -505,6 +505,26 @@ export function LandingPage() {
           </section>
         ))}
 
+        {/* ── Corp / alliance features ───────────────────────── */}
+        <section className="landing__section landing__section--features" id="for-corporations">
+          <h2 className="landing__section-title">{t('landing.sections.forCorps')}</h2>
+          <p className="landing__section-body">
+            {t('landing.forCorpsBody')}
+          </p>
+          <section className="landing__features">
+            {CORP_FEATURES.map((f) => {
+              const Icon = f.icon;
+              return (
+                <div key={f.id} className="landing__feature">
+                  <span className="landing__feature-icon"><Icon size="1em" weight="duotone" /></span>
+                  <h3 className="landing__feature-title">{t(`landing.corpFeatures.${f.id}.title`)}</h3>
+                  <p className="landing__feature-desc">{t(`landing.corpFeatures.${f.id}.desc`)}</p>
+                </div>
+              );
+            })}
+          </section>
+        </section>
+
         {/* ── Desktop app only ────────────────────────────────── */}
         <section className="landing__section landing__section--features" id="desktop-app">
           <h2 className="landing__section-title">
@@ -556,26 +576,6 @@ export function LandingPage() {
                   <span className="landing__feature-icon"><Icon size="1em" weight="duotone" /></span>
                   <h3 className="landing__feature-title">{t(`landing.desktopFeatures.${f.id}.title`)}</h3>
                   <p className="landing__feature-desc">{t(`landing.desktopFeatures.${f.id}.desc`)}</p>
-                </div>
-              );
-            })}
-          </section>
-        </section>
-
-        {/* ── Corp / alliance features ───────────────────────── */}
-        <section className="landing__section landing__section--features" id="for-corporations">
-          <h2 className="landing__section-title">{t('landing.sections.forCorps')}</h2>
-          <p className="landing__section-body">
-            {t('landing.forCorpsBody')}
-          </p>
-          <section className="landing__features">
-            {CORP_FEATURES.map((f) => {
-              const Icon = f.icon;
-              return (
-                <div key={f.id} className="landing__feature">
-                  <span className="landing__feature-icon"><Icon size="1em" weight="duotone" /></span>
-                  <h3 className="landing__feature-title">{t(`landing.corpFeatures.${f.id}.title`)}</h3>
-                  <p className="landing__feature-desc">{t(`landing.corpFeatures.${f.id}.desc`)}</p>
                 </div>
               );
             })}
