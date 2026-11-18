@@ -32,6 +32,12 @@ async function strings() {
   // Speech: volume, voice (the voices installed on this computer), speed,
   // and a test that speaks with what's chosen right now, saved or not.
   const RATES = { slow: 0.8, normal: 1, fast: 1.3 };
+  // Some Linux systems have no speech at all: don't offer it there.
+  if (typeof speechSynthesis === 'undefined') {
+    for (const el of [$('intelSpeak').closest('label'), $('intelSpeak').closest('label').nextElementSibling, $('speech')]) {
+      el.style.display = 'none';
+    }
+  }
   $('speakVolume').value = String(s.intelSpeakVolume ?? 100);
   $('speakRate').value = s.intelSpeakRate || 'normal';
   const showVolume = () => { $('speakVolumeOut').textContent = `${$('speakVolume').value}%`; };

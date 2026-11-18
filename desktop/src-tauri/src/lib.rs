@@ -334,11 +334,13 @@ pub fn run() {
                 .build()?;
             apply(&handle, &s);
 
-            TrayIconBuilder::with_id("main")
+            // Some Linux desktops have no tray (GNOME without an extension):
+            // carry on without one; the window's menu has the same items.
+            let _ = TrayIconBuilder::with_id("main")
                 .icon(app.default_window_icon().cloned().expect("app icon"))
                 .tooltip("Nexum")
                 .menu(&menus::build_tray(&handle, &s)?)
-                .build(app)?;
+                .build(app);
 
             // Taken by another app: carry on without it.
             let _ = handle.global_shortcut().register(TOGGLE_SHORTCUT);
