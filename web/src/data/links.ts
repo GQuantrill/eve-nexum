@@ -7,6 +7,9 @@ export const DISCORD_INVITE_URL = 'https://discord.gg/KG8SMXrhZ4';
 // (.github/workflows/desktop-release.yml) also uploads each installer under a
 // fixed name, so these links always fetch the newest version.
 export const DESKTOP_AVAILABLE = false;
+/** macOS builds are on hold: its button says "coming soon" until this is on
+ *  (and the macOS build is back in desktop-release.yml). */
+export const DESKTOP_MAC_AVAILABLE = false;
 const DESKTOP_LATEST = 'https://github.com/GQuantrill/nexum-desktop/releases/latest';
 export const DESKTOP_DOWNLOADS = {
   windows: `${DESKTOP_LATEST}/download/Nexum-Windows-setup.exe`,

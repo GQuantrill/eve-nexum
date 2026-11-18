@@ -21,7 +21,7 @@ import {
 import { apiUrl } from '../../api/client';
 import { loginUrl, useScopeOptions } from '../../api/scopeOptions';
 import { useScopePickerStore } from '../../store/scopePickerStore';
-import { DISCORD_INVITE_URL, DESKTOP_AVAILABLE, DESKTOP_DOWNLOADS } from '../../data/links';
+import { DISCORD_INVITE_URL, DESKTOP_AVAILABLE, DESKTOP_MAC_AVAILABLE, DESKTOP_DOWNLOADS } from '../../data/links';
 import { SUPPORTED_LANGUAGES, LANGUAGE_NAMES } from '../../i18n';
 import { DemoMap } from './DemoMap';
 import { LanguageSwitcher } from './LanguageSwitcher';
@@ -522,17 +522,25 @@ export function LandingPage() {
                 <a className="landing__download" href={DESKTOP_DOWNLOADS.windows}>
                   <WindowsLogoIcon size="1.2em" weight="fill" /> Windows
                 </a>
-                <a className="landing__download" href={DESKTOP_DOWNLOADS.macos}>
-                  <AppleLogoIcon size="1.2em" weight="fill" /> macOS
-                </a>
+                {DESKTOP_MAC_AVAILABLE ? (
+                  <a className="landing__download" href={DESKTOP_DOWNLOADS.macos}>
+                    <AppleLogoIcon size="1.2em" weight="fill" /> macOS
+                  </a>
+                ) : (
+                  <span className="landing__download landing__download--soon" aria-disabled="true">
+                    <AppleLogoIcon size="1.2em" weight="fill" /> macOS: {t('landing.desktopSoon')}
+                  </span>
+                )}
                 <a className="landing__download" href={DESKTOP_DOWNLOADS.linux}>
                   <LinuxLogoIcon size="1.2em" weight="fill" /> Linux
                 </a>
               </div>
-              <p className="landing__download-note">
-                {t('landing.desktopMacNote')}{' '}
-                <code>xattr -cr /Applications/Nexum.app</code>
-              </p>
+              {DESKTOP_MAC_AVAILABLE && (
+                <p className="landing__download-note">
+                  {t('landing.desktopMacNote')}{' '}
+                  <code>xattr -cr /Applications/Nexum.app</code>
+                </p>
+              )}
               <p className="landing__download-note">
                 <a href={DESKTOP_DOWNLOADS.all} target="_blank" rel="noopener noreferrer">
                   {t('landing.desktopAllDownloads')}

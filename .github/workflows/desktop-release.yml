@@ -63,7 +63,7 @@ jobs:
             id=$(gh api -X POST "repos/$repo/releases" \
               -f tag_name="v$VERSION" -f target_commitish=main \
               -f name="Nexum desktop $VERSION" -F draft=true \
-              -f body="Windows: Nexum-Windows-setup.exe. macOS: Nexum-macOS.dmg (unsigned for now: after installing, run xattr -cr /Applications/Nexum.app once in Terminal). Linux: Nexum-Linux.AppImage (updates itself), or the .deb / .rpm." \
+              -f body="Windows: Nexum-Windows-setup.exe. Linux: Nexum-Linux.AppImage (updates itself), or the .deb / .rpm." \
               --jq .id)
           fi
           echo "id=$id" >> "$GITHUB_OUTPUT"
@@ -76,8 +76,9 @@ jobs:
         include:
           - os: windows-latest
             args: ''
-          - os: macos-latest
-            args: '--target universal-apple-darwin'
+          # macOS is on hold (no Apple developer account yet). To bring it
+          # back: - os: macos-latest / args: '--target universal-apple-darwin'
+          # and the .dmg lines in the publish job.
           - os: ubuntu-22.04
             args: ''
     runs-on: ${{ matrix.os }}
@@ -131,9 +132,8 @@ jobs:
           # (web/src/data/links.ts) always fetch the newest version.
           mkdir fixed && cd fixed
           gh release download "$tag" --repo "$repo" \
-            -p '*-setup.exe' -p '*.dmg' -p '*.AppImage' -p '*.deb' -p '*.rpm'
+            -p '*-setup.exe' -p '*.AppImage' -p '*.deb' -p '*.rpm'
           mv *-setup.exe Nexum-Windows-setup.exe
-          mv *.dmg Nexum-macOS.dmg
           mv *.AppImage Nexum-Linux.AppImage
           mv *.deb Nexum-Linux.deb
           mv *.rpm Nexum-Linux.rpm

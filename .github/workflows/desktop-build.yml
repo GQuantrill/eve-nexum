@@ -21,8 +21,8 @@ jobs:
         include:
           - os: windows-latest
             name: windows
-          - os: macos-latest
-            name: macos
+          # macOS is on hold (no Apple developer account yet). To bring it
+          # back: - os: macos-latest / name: macos
           # 22.04: the oldest supported Ubuntu, so the AppImage and .deb run
           # on older distributions too.
           - os: ubuntu-22.04
