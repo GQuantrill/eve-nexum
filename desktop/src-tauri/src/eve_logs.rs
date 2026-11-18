@@ -43,7 +43,73 @@ pub(crate) struct FileState {
 }
 
 pub fn default_dir() -> Option<PathBuf> {
-    dirs::document_dir().map(|d| d.join("EVE").join("logs").join("Chatlogs"))
+    let documents = dirs::document_dir().map(|d| d.join("EVE").join("logs").join("Chatlogs"));
+    #[cfg(target_os = "linux")]
+    {
+        // EVE runs under Proton or Wine on Linux, so its Documents folder is
+        // inside the game's Windows prefix, not ~/Documents.
+        if let Some(found) = linux_candidates().into_iter().find(|d| d.is_dir()) {
+            return Some(found);
+        }
+    }
+    documents
+}
+
+/// EVE's Steam app id: Proton keeps its prefix in compatdata/8500.
+#[cfg(target_os = "linux")]
+const EVE_STEAM_APP: &str = "8500";
+
+/// Where EVE's chat logs usually are on Linux, most likely first: Steam
+/// (Proton) in any Steam library, then Wine and Lutris prefixes.
+#[cfg(target_os = "linux")]
+fn linux_candidates() -> Vec<PathBuf> {
+    let Some(home) = dirs::home_dir() else { return Vec::new() };
+    let tail = |user_docs: PathBuf| user_docs.join("EVE").join("logs").join("Chatlogs");
+    let mut out = Vec::new();
+
+    let steam_roots = [
+        home.join(".steam/steam"),
+        home.join(".local/share/Steam"),
+        home.join(".var/app/com.valvesoftware.Steam/.local/share/Steam"),
+    ];
+    let mut libraries: Vec<PathBuf> = steam_roots.to_vec();
+    for root in &steam_roots {
+        if let Ok(vdf) = std::fs::read_to_string(root.join("steamapps/libraryfolders.vdf")) {
+            libraries.extend(steam_library_paths(&vdf));
+        }
+    }
+    for lib in libraries {
+        out.push(tail(lib.join("steamapps/compatdata").join(EVE_STEAM_APP)
+            .join("pfx/drive_c/users/steamuser/Documents")));
+    }
+
+    // Wine / Lutris: ~/.wine and ~/Games/<game>, any Windows user name.
+    let mut prefixes = vec![home.join(".wine")];
+    if let Ok(games) = std::fs::read_dir(home.join("Games")) {
+        prefixes.extend(games.flatten().map(|e| e.path()));
+    }
+    for prefix in prefixes {
+        if let Ok(users) = std::fs::read_dir(prefix.join("drive_c/users")) {
+            for user in users.flatten() {
+                out.push(tail(user.path().join("Documents")));
+            }
+        }
+    }
+    out
+}
+
+/// The library folders listed in Steam's libraryfolders.vdf ("path" "...").
+#[cfg(any(target_os = "linux", test))]
+fn steam_library_paths(vdf: &str) -> Vec<PathBuf> {
+    vdf.lines()
+        .filter_map(|l| {
+            let parts: Vec<&str> = l.split('"').map(str::trim).filter(|p| !p.is_empty()).collect();
+            match parts.as_slice() {
+                ["path", p] => Some(PathBuf::from(p.replace("\\\\", "\\"))),
+                _ => None,
+            }
+        })
+        .collect()
 }
 
 /// The chat log folder in use: the pilot's override, else EVE's usual one.
@@ -191,6 +257,15 @@ pub(crate) fn epoch_ms(y: i64, m: i64, d: i64, hh: i64, mm: i64, ss: i64) -> u64
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn steam_libraries() {
+        let vdf = "\"libraryfolders\"\n{\n\t\"0\"\n\t{\n\t\t\"path\"\t\t\"/home/p/.local/share/Steam\"\n\t\t\"label\"\t\t\"\"\n\t}\n\t\"1\"\n\t{\n\t\t\"path\"\t\t\"/mnt/games/SteamLibrary\"\n\t}\n}\n";
+        assert_eq!(
+            super::steam_library_paths(vdf),
+            vec![std::path::PathBuf::from("/home/p/.local/share/Steam"), std::path::PathBuf::from("/mnt/games/SteamLibrary")]
+        );
+    }
+
     use super::*;
 
     fn utf16(s: &str) -> Vec<u8> {

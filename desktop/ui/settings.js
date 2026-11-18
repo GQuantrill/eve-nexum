@@ -19,6 +19,12 @@ async function strings() {
   $('readLogs').checked = s.readLogs;
   $('watchClipboard').checked = s.watchClipboard;
   $('startAtLogin').checked = s.startAtLogin;
+  // The Store build has no "start at login" (see lib.rs, STORE).
+  const info = await invoke('desktop_info');
+  if (info.store) {
+    $('startAtLogin').closest('label').style.display = 'none';
+    $('startAtLogin').closest('label').nextElementSibling.style.display = 'none';
+  }
   $('chatlogDir').value = s.chatlogDir || '';
   $('intelSound').checked = s.intelSound;
   $('intelSpeak').checked = s.intelSpeak;
@@ -26,6 +32,12 @@ async function strings() {
   // Speech: volume, voice (the voices installed on this computer), speed,
   // and a test that speaks with what's chosen right now, saved or not.
   const RATES = { slow: 0.8, normal: 1, fast: 1.3 };
+  // Some Linux systems have no speech at all: don't offer it there.
+  if (typeof speechSynthesis === 'undefined') {
+    for (const el of [$('intelSpeak').closest('label'), $('intelSpeak').closest('label').nextElementSibling, $('speech')]) {
+      el.style.display = 'none';
+    }
+  }
   $('speakVolume').value = String(s.intelSpeakVolume ?? 100);
   $('speakRate').value = s.intelSpeakRate || 'normal';
   const showVolume = () => { $('speakVolumeOut').textContent = `${$('speakVolume').value}%`; };

@@ -41,7 +41,7 @@ type DtypeOpt = NonNullable<Parameters<typeof KokoroTTS.from_pretrained>[1]>['dt
 const post = (msg: Record<string, unknown>, transfer?: Transferable[]) =>
   (self as unknown as Worker).postMessage(msg, transfer ?? []);
 
-function load(): Promise<void> {
+function load(singleThread = false): Promise<void> {
   if (loadPromise) return loadPromise;
   loadPromise = (async () => {
     const wasm = env.backends.onnx.wasm as { numThreads?: number; wasmPaths?: string };
@@ -50,7 +50,7 @@ function load(): Promise<void> {
     // time roughly with core count. Falls back to a single thread otherwise, so the
     // code is correct whether or not the isolation headers are deployed.
     const coi = (globalThis as { crossOriginIsolated?: boolean }).crossOriginIsolated === true;
-    threads = coi ? Math.min(navigator.hardwareConcurrency || 4, 8) : 1;
+    threads = coi && !singleThread ? Math.min(navigator.hardwareConcurrency || 4, 8) : 1;
     wasm.numThreads = threads;
     if (SELF_HOSTED) {
       wasm.wasmPaths = LOCAL_WASM_PATH;
@@ -80,9 +80,9 @@ function load(): Promise<void> {
 }
 
 self.onmessage = async (e: MessageEvent) => {
-  const msg = e.data as { type: string; id?: number; text?: string; voice?: string };
+  const msg = e.data as { type: string; id?: number; text?: string; voice?: string; singleThread?: boolean };
   if (msg.type === 'load') {
-    try { await load(); post({ type: 'ready', backend: `wasm/${DTYPE}${SELF_HOSTED ? '/self-hosted' : ''}/${threads}t` }); }
+    try { await load(msg.singleThread === true); post({ type: 'ready', backend: `wasm/${DTYPE}${SELF_HOSTED ? '/self-hosted' : ''}/${threads}t` }); }
     catch (err) { post({ type: 'loadError', error: err instanceof Error ? err.message : String(err) }); }
     return;
   }

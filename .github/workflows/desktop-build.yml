@@ -23,6 +23,10 @@ jobs:
             name: windows
           - os: macos-latest
             name: macos
+          # 22.04: the oldest supported Ubuntu, so the AppImage and .deb run
+          # on older distributions too.
+          - os: ubuntu-22.04
+            name: linux
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -38,6 +42,13 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: desktop/src-tauri
+      - name: Linux build libraries
+        if: runner.os == 'Linux'
+        working-directory: .
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential file \
+            libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev patchelf
       - run: yarn install --frozen-lockfile
       - run: cargo test --manifest-path src-tauri/Cargo.toml
       - run: yarn tauri build --config '{"bundle":{"createUpdaterArtifacts":false}}'
@@ -49,4 +60,7 @@ jobs:
             desktop/src-tauri/target/release/bundle/nsis/*.exe
             desktop/src-tauri/target/release/bundle/msi/*.msi
             desktop/src-tauri/target/release/bundle/dmg/*.dmg
+            desktop/src-tauri/target/release/bundle/appimage/*.AppImage
+            desktop/src-tauri/target/release/bundle/deb/*.deb
+            desktop/src-tauri/target/release/bundle/rpm/*.rpm
           if-no-files-found: error
