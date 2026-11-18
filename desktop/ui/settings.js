@@ -19,6 +19,12 @@ async function strings() {
   $('readLogs').checked = s.readLogs;
   $('watchClipboard').checked = s.watchClipboard;
   $('startAtLogin').checked = s.startAtLogin;
+  // The Store build has no "start at login" (see lib.rs, STORE).
+  const info = await invoke('desktop_info');
+  if (info.store) {
+    $('startAtLogin').closest('label').style.display = 'none';
+    $('startAtLogin').closest('label').nextElementSibling.style.display = 'none';
+  }
   $('chatlogDir').value = s.chatlogDir || '';
   $('intelSound').checked = s.intelSound;
   $('intelSpeak').checked = s.intelSpeak;

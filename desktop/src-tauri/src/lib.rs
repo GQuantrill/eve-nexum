@@ -38,6 +38,10 @@ pub struct AppState {
 const TOGGLE_SHORTCUT: &str = "Alt+Shift+N";
 /// Passed by the system when it starts Nexum at login: start hidden in the tray.
 const START_HIDDEN_ARG: &str = "--minimised";
+/// The Microsoft Store build (`--features store`): the Store installs updates,
+/// so the app's own updater is left out, and so is "Start at login" (a packaged
+/// app can't use the registry entry the plugin writes).
+pub(crate) const STORE: bool = cfg!(feature = "store");
 /// EVE's login. The only other site the window may navigate to.
 const EVE_SSO_HOST: &str = "login.eveonline.com";
 
@@ -76,7 +80,7 @@ fn open_settings_window(app: AppHandle) {
 
 #[tauri::command]
 fn desktop_info(app: AppHandle) -> serde_json::Value {
-    serde_json::json!({ "version": app.package_info().version.to_string() })
+    serde_json::json!({ "version": app.package_info().version.to_string(), "store": STORE })
 }
 
 // ── Commands for the app's own settings window ────────────────────────────
@@ -139,6 +143,9 @@ fn save_settings(app: AppHandle, state: tauri::State<AppState>, settings: Settin
 /// Register (or remove) Nexum with the system's login items. A failure leaves
 /// the setting showing what the system really does.
 pub(crate) fn set_start_at_login(app: &AppHandle, on: bool) {
+    if STORE {
+        return;
+    }
     let launcher = app.autolaunch();
     let _ = if on { launcher.enable() } else { launcher.disable() };
     let actual = launcher.is_enabled().unwrap_or(false);
@@ -240,7 +247,9 @@ pub(crate) fn tr(key: &str) -> String {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    tauri::Builder::default()
+    let builder = tauri::Builder::default();
+    let builder = if STORE { builder } else { builder.plugin(tauri_plugin_updater::Builder::new().build()) };
+    builder
         // Menu bar and tray items both land here (menus.rs).
         .on_menu_event(|app, event| menus::handle(app, event.id().as_ref()))
         // A second launch just brings the first window forward.
@@ -250,7 +259,6 @@ pub fn run() {
         .plugin(tauri_plugin_autostart::init(MacosLauncher::LaunchAgent, Some(vec![START_HIDDEN_ARG])))
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_opener::init())
-        .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(
             tauri_plugin_global_shortcut::Builder::new()
                 .with_handler(|app, _shortcut, event| {
@@ -276,7 +284,7 @@ pub fn run() {
             let mut s = settings::load(&handle);
             // The pilot may have changed it in the system's own settings since.
             if let Ok(on) = handle.autolaunch().is_enabled() {
-                s.start_at_login = on;
+                s.start_at_login = on && !STORE;
             }
             // Started by the system at login: stay in the tray until wanted.
             let start_hidden = std::env::args().any(|a| a == START_HIDDEN_ARG);
@@ -338,7 +346,9 @@ pub fn run() {
             eve_logs::start(handle.clone());
             scan_clip::start(handle.clone());
             intel::start(handle.clone());
-            updater::start(handle);
+            if !STORE {
+                updater::start(handle);
+            }
             Ok(())
         })
         .run(tauri::generate_context!())

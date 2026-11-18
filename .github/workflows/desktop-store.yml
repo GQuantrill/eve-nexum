@@ -1,0 +1,128 @@
+name: Desktop Store package
+
+# Builds the Microsoft Store package (MSIX) for the Windows desktop app.
+#
+# Artifacts:
+#   nexum-store-msix  Nexum_<version>_x64.msix, UNSIGNED. Upload this one to
+#                     Partner Center; the Store signs it.
+#   nexum-test-msix   The same package signed with a throwaway certificate,
+#                     plus that certificate (.cer), to install and try it on
+#                     a PC before submitting. See desktop/msix/README.md.
+#
+# The package identity comes from Partner Center > Product identity, set as
+# repository variables (Settings > Secrets and variables > Actions >
+# Variables): MSIX_IDENTITY_NAME, MSIX_PUBLISHER, MSIX_PUBLISHER_DISPLAY_NAME,
+# MSIX_DISPLAY_NAME. They are not secret: every installed copy shows them.
+on:
+  workflow_dispatch:
+  push:
+    branches: [qa-desktop]
+    paths: ['desktop/**', '.github/workflows/desktop-store.yml']
+
+permissions:
+  contents: read
+
+jobs:
+  msix:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: desktop
+        shell: pwsh
+    env:
+      IDENTITY_NAME: ${{ vars.MSIX_IDENTITY_NAME }}
+      PUBLISHER: ${{ vars.MSIX_PUBLISHER }}
+      PUBLISHER_DISPLAY_NAME: ${{ vars.MSIX_PUBLISHER_DISPLAY_NAME }}
+      DISPLAY_NAME: ${{ vars.MSIX_DISPLAY_NAME }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check the Partner Center values are set
+        run: |
+          foreach ($n in 'IDENTITY_NAME','PUBLISHER','PUBLISHER_DISPLAY_NAME','DISPLAY_NAME') {
+            if (-not [Environment]::GetEnvironmentVariable($n)) {
+              Write-Error "Repository variable MSIX_$n is not set (Partner Center > Product identity)."
+              exit 1
+            }
+          }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+          cache-dependency-path: desktop/yarn.lock
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: desktop/src-tauri
+          key: store
+      - run: yarn install --frozen-lockfile
+      # The app alone (no installer), built without its own updater.
+      - run: yarn tauri build --features store --no-bundle
+
+      - name: Lay out the package
+        run: |
+          $conf = Get-Content src-tauri/tauri.conf.json -Raw | ConvertFrom-Json
+          $version = "$($conf.version).0"
+          "VERSION=$version" >> $env:GITHUB_ENV
+
+          $exe = Get-ChildItem src-tauri/target/release -Filter *.exe |
+            Where-Object { $_.Name -notmatch 'build-script' } | Select-Object -First 1
+          if (-not $exe) { Write-Error 'No app .exe was built'; exit 1 }
+
+          New-Item -ItemType Directory -Force pkg/Assets | Out-Null
+          Copy-Item $exe.FullName pkg/Nexum.exe
+          foreach ($f in 'StoreLogo','Square44x44Logo','Square71x71Logo','Square150x150Logo','Square310x310Logo') {
+            Copy-Item "src-tauri/icons/$f.png" pkg/Assets/
+          }
+          Copy-Item msix/Wide310x150Logo.png pkg/Assets/
+
+          # XML-escape the values; then fill the manifest.
+          function esc($s) { [System.Security.SecurityElement]::Escape($s) }
+          $xml = Get-Content msix/Package.appxmanifest -Raw
+          $fill = [ordered]@{
+            '__PUBLISHER_DISPLAY_NAME__' = esc $env:PUBLISHER_DISPLAY_NAME
+            '__IDENTITY_NAME__'          = esc $env:IDENTITY_NAME
+            '__PUBLISHER__'              = esc $env:PUBLISHER
+            '__DISPLAY_NAME__'           = esc $env:DISPLAY_NAME
+            '__VERSION__'                = $version
+          }
+          foreach ($k in $fill.Keys) { $xml = $xml.Replace($k, $fill[$k]) }
+          Set-Content pkg/AppxManifest.xml $xml -Encoding utf8
+          Get-Content pkg/AppxManifest.xml | Select-String 'Identity|Version=|DisplayName' | Out-Host
+
+      - name: Pack (unsigned, for the Store)
+        run: |
+          $kit = Get-ChildItem 'C:\Program Files (x86)\Windows Kits\10\bin' -Directory |
+            Where-Object { Test-Path "$($_.FullName)\x64\makeappx.exe" } |
+            Sort-Object Name -Descending | Select-Object -First 1
+          "SDKBIN=$($kit.FullName)\x64" >> $env:GITHUB_ENV
+          New-Item -ItemType Directory -Force out/store, out/test | Out-Null
+          & "$($kit.FullName)\x64\makeappx.exe" pack /o /d pkg /p "out/store/Nexum_$($env:VERSION)_x64.msix"
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+
+      - name: Test copy, signed with a throwaway certificate
+        run: |
+          # Its subject must equal the manifest's Publisher.
+          $cert = New-SelfSignedCertificate -Type Custom -Subject $env:PUBLISHER `
+            -KeyUsage DigitalSignature -FriendlyName 'Nexum test package' `
+            -CertStoreLocation Cert:\CurrentUser\My `
+            -TextExtension @('2.5.29.37={text}1.3.6.1.5.5.7.3.3', '2.5.29.19={text}')
+          $pw = ConvertTo-SecureString -String 'nexum-test' -Force -AsPlainText
+          Export-PfxCertificate -Cert $cert -FilePath test.pfx -Password $pw | Out-Null
+          Export-Certificate -Cert $cert -FilePath out/test/nexum-test.cer | Out-Null
+          $msix = "out/test/Nexum_$($env:VERSION)_x64_test.msix"
+          Copy-Item "out/store/Nexum_$($env:VERSION)_x64.msix" $msix
+          & "$env:SDKBIN\signtool.exe" sign /fd SHA256 /a /f test.pfx /p nexum-test $msix
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          Copy-Item msix/README.md out/test/README.md
+          Remove-Item test.pfx
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nexum-store-msix
+          path: desktop/out/store/*.msix
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nexum-test-msix
+          path: desktop/out/test/*
+          if-no-files-found: error

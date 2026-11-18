@@ -27,3 +27,7 @@ sys-locale = "0.3"
 tauri-plugin-updater = "2"
 tokio = { version = "1", features = ["time"] }
 tauri-plugin-autostart = "2"
+
+[features]
+# Microsoft Store build: no self-updater, no registry "start at login".
+store = []
