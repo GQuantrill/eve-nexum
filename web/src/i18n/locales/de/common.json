@@ -1632,6 +1632,10 @@
         "q": "Sind meine Daten sicher?",
         "a": "Nexum sieht dein EVE-Passwort nie — die Authentifizierung wird vollständig von CCPs EVE SSO abgewickelt. Gespeichert wird nur deine Charakteridentität und die Karten, die du baust. Deine Kartendaten liegen in einer privaten Datenbank und werden mit niemandem geteilt. Nutze Nexum dennoch nicht für die streng geheime Invasionsroute deiner Allianz — kein Tool im Internet ersetzt gute Operationssicherheit."
       },
+      "clipboard": {
+        "q": "Liest die Desktop-App meine Zwischenablage?",
+        "a": "Nur wenn du in der Desktop-App „Scans aus der Zwischenablage einfügen“ einschaltest. Das ist standardmäßig aus, und die Website sieht immer nur, was du selbst dort einfügst. Selbst dann zählt nur, was in EVE kopiert wurde: Die App prüft, dass EVE das Fenster im Vordergrund war, daher wird nichts verwendet, was du in einem Browser, Chat-Programm oder Krypto-Wallet kopierst (unter Windows wird es nicht einmal gelesen). Aus einer Kopie in EVE nimmt sie nur Sondenscanner-Ergebnisse und D-Scans; alles andere wird sofort verworfen, nie gespeichert oder gesendet. Die App verändert deine Zwischenablage nie. Das Einzige, was Nexum dort ablegt, ist nach einem Sprung der neue Lesezeichen-Name eines Wurmlochs, bereit zum Einfügen im Spiel. Falls also eine eingefügte Wallet-Adresse je anders herauskommt, ist das Schadsoftware auf deinem PC, nicht Nexum: Lass ihn prüfen."
+      },
       "reportBugs": {
         "q": "Kann ich Bugs melden, Feedback geben und Features wünschen?",
         "a": "Absolut. Das Projekt ist Open Source auf <gh>GitHub</gh> — eröffne ein Issue für Bugs oder Feature-Wünsche oder reiche einen Pull Request ein, wenn du dich traust. Feedback per In-Game-Mail an den mit diesem Account verbundenen Charakter funktioniert auch, falls GitHub nicht dein Ding ist."

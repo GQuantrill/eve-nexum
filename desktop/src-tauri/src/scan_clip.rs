@@ -1,11 +1,15 @@
-// Scan paste. Only while the pilot has turned it on: the clipboard is checked a
-// few times a second, and when it holds a scan copied in EVE it goes to the
-// Nexum window:
-// - probe-scanner results (lines starting with a signature id like "ABC-123"
-//   then a tab), which the window pastes onto the selected system;
+// Scan paste. Only while the pilot has turned it on (off by default), and
+// only for something copied IN EVE: the clipboard is used only when EVE was
+// the window in front just before the copy (foreground.rs). A copy made in a
+// browser, a chat app or a wallet is never used; on Windows it isn't even
+// read. What's used:
+// - probe-scanner results (every line a signature id like "ABC-123" and the
+//   scanner's six columns), which the window pastes onto the selected system;
 // - a directional scan (lines of type id, name, type, distance, tab-separated),
 //   which the window opens in its d-scan analyser.
-// Nothing else on the clipboard is ever sent anywhere.
+// Anything else is dropped on the spot: nothing is kept (only a fingerprint
+// of the last copy, to spot the next one), logged or sent anywhere. The app
+// never changes the clipboard.
 
 use regex::Regex;
 use serde::Serialize;
@@ -14,7 +18,7 @@ use std::time::Duration;
 use tauri::{AppHandle, Emitter, Manager};
 use tauri_plugin_clipboard_manager::ClipboardExt;
 
-use crate::AppState;
+use crate::{foreground, AppState};
 
 #[derive(Clone, Serialize)]
 struct Scan {
@@ -32,31 +36,73 @@ pub fn looks_like_dscan(text: &str) -> bool {
     hits > 0 && hits * 2 >= lines.len()
 }
 
+/// Probe-scanner results: every non-blank line is a signature id then the
+/// scanner's other five columns (group, type, name, signal, distance).
 pub fn looks_like_probe_scan(text: &str) -> bool {
     static RE: OnceLock<Regex> = OnceLock::new();
-    let re = RE.get_or_init(|| Regex::new(r"^[A-Z]{3}-\d{3}\t").unwrap());
-    text.lines().any(|l| re.is_match(l))
+    let re = RE.get_or_init(|| Regex::new(r"^[A-Z]{3}-\d{3}\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*$").unwrap());
+    let mut lines = text.lines().map(|l| l.trim_end_matches('\r')).filter(|l| !l.trim().is_empty()).peekable();
+    lines.peek().is_some() && lines.all(|l| re.is_match(l))
+}
+
+/// No scan is anywhere near this big; anything larger isn't looked at.
+const MAX_SCAN_BYTES: usize = 256 * 1024;
+
+fn fingerprint(text: &str) -> u64 {
+    use std::hash::{Hash, Hasher};
+    let mut h = std::collections::hash_map::DefaultHasher::new();
+    text.hash(&mut h);
+    h.finish()
+}
+
+/// What says the clipboard changed: Windows' copy counter (no reading
+/// needed), else a fingerprint of the text (read, then only the fingerprint
+/// is kept).
+fn marker(app: &AppHandle) -> Option<(u64, Option<String>)> {
+    if let Some(seq) = foreground::clipboard_sequence() {
+        return Some((seq, None));
+    }
+    let text = app.clipboard().read_text().ok()?;
+    Some((fingerprint(&text), Some(text)))
 }
 
 pub fn start(app: AppHandle) {
     std::thread::spawn(move || {
-        // What was on the clipboard when watching started (or last time): only
-        // a change is a new scan, never what was already there.
-        let mut last: Option<String> = None;
+        let mut probe = foreground::Probe::default();
+        // EVE in front at the last check; the clipboard's marker then.
+        let mut eve_before = false;
+        let mut last: Option<u64> = None;
         loop {
-            std::thread::sleep(Duration::from_millis(750));
+            std::thread::sleep(Duration::from_millis(300));
             let enabled = app.state::<AppState>().settings.lock().unwrap().watch_clipboard;
             if !enabled {
+                eve_before = false;
                 last = None;
                 continue;
             }
-            let Ok(text) = app.clipboard().read_text() else { continue };
-            match &last {
-                None => { last = Some(text); continue; } // just armed: baseline
-                Some(prev) if *prev == text => continue,
-                _ => {}
+            let eve_now = probe.eve_in_front();
+            let was = std::mem::replace(&mut eve_before, eve_now);
+            if !was {
+                if eve_now {
+                    // EVE just came to the front: note what's there now (copied
+                    // elsewhere), so only a later copy counts. On Linux this is
+                    // a read whose text is dropped at once.
+                    last = marker(&app).map(|(m, _)| m);
+                }
+                continue;
             }
-            last = Some(text.clone());
+            // EVE was in front a moment ago, so a copy since then was made in
+            // EVE (this check runs even if you've just switched away, so a
+            // copy-then-Alt+Tab still counts).
+            let Some((m, text)) = marker(&app) else { continue };
+            if last == Some(m) {
+                continue;
+            }
+            last = Some(m);
+            let Some(text) = text.or_else(|| app.clipboard().read_text().ok()) else { continue };
+            if text.len() > MAX_SCAN_BYTES {
+                continue;
+            }
             if looks_like_probe_scan(&text) {
                 let _ = app.emit_to("main", "nexum://scan", Scan { text });
             } else if looks_like_dscan(&text) {
@@ -86,5 +132,10 @@ mod tests {
         assert!(!looks_like_probe_scan("o7 fly safe"));
         assert!(!looks_like_probe_scan("my password is hunter2"));
         assert!(!looks_like_probe_scan("abc-123\tlowercase is not EVE"));
+        // Every line must be a scanner row, not just one.
+        assert!(looks_like_probe_scan("ABC-123\tCosmic Signature\t\t\t0.0%\t12.3 AU\r\nDEF-456\tCosmic Anomaly\tCombat Site\tSansha Hideaway\t100.0%\t2.1 AU\n"));
+        assert!(!looks_like_probe_scan("ABC-123\tsomething\nmy seed phrase is ..."));
+        assert!(!looks_like_probe_scan("ABC-123\tonly two columns"));
+        assert!(!looks_like_probe_scan(""));
     }
 }

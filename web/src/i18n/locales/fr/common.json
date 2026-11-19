@@ -1632,6 +1632,10 @@
         "q": "Mes données sont-elles en sécurité ?",
         "a": "Nexum ne voit jamais votre mot de passe EVE — l'authentification est entièrement gérée par l'EVE SSO de CCP. La seule chose stockée est l'identité de votre personnage et les cartes que vous construisez. Les données de vos cartes vivent dans une base de données privée et ne sont partagées avec personne. Cela dit, n'utilisez pas Nexum pour la route d'invasion top secrète de votre alliance — aucun outil sur Internet ne remplace une bonne sécurité opérationnelle."
       },
+      "clipboard": {
+        "q": "L'application de bureau lit-elle mon presse-papiers ?",
+        "a": "Seulement si vous activez « Coller les scans depuis le presse-papiers » dans l'application de bureau. C'est désactivé par défaut, et le site ne voit que ce que vous y collez vous-même. Même alors, seule une copie faite dans EVE compte : l'application vérifie qu'EVE était la fenêtre au premier plan, donc rien de ce que vous copiez dans un navigateur, une messagerie ou un portefeuille crypto n'est utilisé (sous Windows, ce n'est même pas lu). D'une copie faite dans EVE, elle ne prend que les résultats du scanner de sondes et les d-scans ; le reste est écarté aussitôt, jamais conservé ni envoyé. L'application ne modifie jamais votre presse-papiers. La seule chose que Nexum y place est le nouveau nom de signet d'un trou de ver après un saut, prêt à coller en jeu. Si une adresse de portefeuille que vous collez ressort un jour différente, c'est un logiciel malveillant sur votre PC, pas Nexum : faites-le vérifier."
+      },
       "reportBugs": {
         "q": "Puis-je signaler des bugs, donner mon avis et demander des fonctionnalités ?",
         "a": "Absolument. Le projet est open source sur <gh>GitHub</gh> — ouvrez une issue pour les bugs ou les demandes de fonctionnalités, ou soumettez une pull request si vous êtes courageux. Les retours par mail en jeu au personnage lié à ce compte fonctionnent aussi si GitHub n'est pas votre truc."

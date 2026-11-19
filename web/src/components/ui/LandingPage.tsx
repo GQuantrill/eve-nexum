@@ -696,6 +696,13 @@ export function LandingPage() {
             </div>
 
             <div className="landing__faq-item">
+              <h3 className="landing__faq-q">{t('landing.faq.clipboard.q')}</h3>
+              <p className="landing__faq-a">
+                {t('landing.faq.clipboard.a')}
+              </p>
+            </div>
+
+            <div className="landing__faq-item">
               <h3 className="landing__faq-q">{t('landing.faq.reportBugs.q')}</h3>
               <p className="landing__faq-a">
                 <Trans

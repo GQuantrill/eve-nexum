@@ -1632,6 +1632,10 @@
         "q": "¿Están seguros mis datos?",
         "a": "Nexum nunca ve tu contraseña de EVE — la autenticación la gestiona por completo el EVE SSO de CCP. Lo único que se almacena es la identidad de tu personaje y los mapas que construyes. Los datos de tus mapas viven en una base de datos privada y no se comparten con nadie. Dicho esto, no uses Nexum para la ruta de invasión ultrasecreta de tu alianza — ninguna herramienta de internet sustituye a una buena seguridad operacional."
       },
+      "clipboard": {
+        "q": "¿La aplicación de escritorio lee mi portapapeles?",
+        "a": "Solo si activas «Pegar escaneos desde el portapapeles» en la aplicación de escritorio. Viene desactivado, y la web solo ve lo que tú mismo pegas en ella. Aun así, solo cuenta lo copiado en EVE: la aplicación comprueba que EVE era la ventana en primer plano, así que nunca se usa nada que copies en un navegador, una aplicación de chat o un monedero de criptomonedas (en Windows ni siquiera se lee). De una copia hecha en EVE solo toma resultados del escáner de sondas y d-scans; el resto se descarta al momento, sin guardarse ni enviarse. La aplicación nunca cambia tu portapapeles. Lo único que Nexum pone ahí es el nuevo nombre del marcador de un agujero de gusano tras un salto, listo para pegar en el juego. Así que si alguna vez una dirección de monedero que pegas sale distinta, es malware en tu PC, no Nexum: hazlo revisar."
+      },
       "reportBugs": {
         "q": "¿Puedo reportar bugs, dar comentarios y pedir funciones?",
         "a": "Por supuesto. El proyecto es de código abierto en <gh>GitHub</gh> — abre un issue para bugs o peticiones de funciones, o envía un pull request si te sientes valiente. Los comentarios por correo en el juego al personaje vinculado a esta cuenta también funcionan si GitHub no es lo tuyo."

@@ -1632,6 +1632,10 @@
         "q": "Os meus dados estão seguros?",
         "a": "O Nexum nunca vê a tua palavra-passe do EVE — a autenticação é gerida inteiramente pelo EVE SSO da CCP. A única coisa armazenada é a identidade da tua personagem e os mapas que constróis. Os dados dos teus mapas vivem numa base de dados privada e não são partilhados com ninguém. Dito isto, não uses o Nexum para a rota de invasão ultrassecreta da tua aliança — nenhuma ferramenta na internet substitui uma boa segurança operacional."
       },
+      "clipboard": {
+        "q": "O app de desktop lê minha área de transferência?",
+        "a": "Só se você ativar \"Colar scans da área de transferência\" no app de desktop. Vem desligado, e o site só vê o que você mesmo cola nele. Mesmo assim, só conta o que foi copiado no EVE: o app verifica se o EVE era a janela em primeiro plano, então nada que você copie num navegador, app de chat ou carteira de cripto é usado (no Windows nem chega a ser lido). De uma cópia feita no EVE ele pega só resultados do scanner de sondas e d-scans; o resto é descartado na hora, nunca guardado nem enviado. O app nunca altera sua área de transferência. A única coisa que o Nexum coloca lá é o novo nome do marcador de um wormhole depois de um salto, pronto para colar no jogo. Então, se um endereço de carteira que você cola sair diferente, é malware no seu PC, não o Nexum: mande verificar."
+      },
       "reportBugs": {
         "q": "Posso reportar bugs, dar comentários e pedir funcionalidades?",
         "a": "Sem dúvida. O projeto é de código aberto no <gh>GitHub</gh> — abre um issue para bugs ou pedidos de funcionalidades, ou envia um pull request se te sentires corajoso. Comentários por correio no jogo para a personagem associada a esta conta também funcionam se o GitHub não for a tua cena."

@@ -12,6 +12,7 @@ mod eve_logs;
 mod intel;
 mod menus;
 mod overlay;
+mod foreground;
 mod scan_clip;
 mod settings;
 mod updater;

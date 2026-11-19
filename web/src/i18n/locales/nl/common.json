@@ -1632,6 +1632,10 @@
         "q": "Zijn mijn gegevens veilig?",
         "a": "Nexum ziet je EVE-wachtwoord nooit — het inloggen gaat volledig via EVE SSO van CCP. Het enige dat wordt bewaard is de identiteit van je character en de kaarten die je maakt. Je kaartgegevens staan in een privédatabase en worden met niemand gedeeld. Dat gezegd: gebruik Nexum niet voor de topgeheime invasieroute van je alliance — geen enkele tool op het internet vervangt goede operationele veiligheid."
       },
+      "clipboard": {
+        "q": "Leest de desktop-app mijn klembord?",
+        "a": "Alleen als je in de desktop-app \"Scans plakken vanaf het klembord\" aanzet. Dat staat standaard uit, en de website ziet alleen wat je er zelf in plakt. Zelfs dan telt alleen een kopie uit EVE: de app controleert of EVE het venster op de voorgrond was, dus wat je in een browser, chat-app of cryptowallet kopieert wordt nooit gebruikt (op Windows wordt het niet eens gelezen). Uit een kopie in EVE neemt hij alleen probe-scannerresultaten en d-scans; de rest wordt meteen weggegooid, nooit bewaard of verstuurd. De app wijzigt je klembord nooit. Het enige wat Nexum er ooit op zet, is na een sprong de nieuwe bladwijzernaam van een wormhole, klaar om in het spel te plakken. Komt een walletadres dat je plakt ooit anders uit, dan is dat malware op je pc, niet Nexum: laat hem nakijken."
+      },
       "reportBugs": {
         "q": "Kan ik bugs melden, feedback geven en functies voorstellen?",
         "a": "Absoluut. Het project is open source op <gh>GitHub</gh> — open een issue voor bugs of ideeën, of stuur een pull request in als je je dapper voelt. Feedback via in-game mail naar het character achter dit account werkt ook, als GitHub niets voor je is."

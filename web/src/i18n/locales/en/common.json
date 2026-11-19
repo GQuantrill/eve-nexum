@@ -1632,6 +1632,10 @@
         "q": "Is my data safe?",
         "a": "Nexum never sees your EVE password — authentication is handled entirely by CCP's EVE SSO. The only thing stored is your character identity and the maps you build. Your map data lives in a private database and is not shared with anyone. That said, don't use Nexum for your alliance's top-secret invasion route — no tool on the internet is a substitute for good operational security."
       },
+      "clipboard": {
+        "q": "Does the desktop app read my clipboard?",
+        "a": "Only if you turn on \"Paste scans from the clipboard\" in the desktop app. It's off by default, and the website only ever sees what you paste into it yourself. Even then, only a copy made in EVE counts: the app checks that EVE was the window in front, so anything you copy in a browser, chat app or crypto wallet is never used (on Windows it isn't even read). From a copy made in EVE it takes probe-scanner results and d-scans and nothing else; the rest is dropped straight away, never stored or sent. The app never changes your clipboard. The one thing Nexum ever puts there is a wormhole's new bookmark name after you jump, ready to paste in game. So if a wallet address you paste ever comes out different, that's malware on your PC, not Nexum: get it checked."
+      },
       "reportBugs": {
         "q": "Can I report bugs, add feedback and request features?",
         "a": "Absolutely. The project is open source on <gh>GitHub</gh> — open an issue for bugs or feature requests, or submit a pull request if you're feeling brave. Feedback via in-game mail to the character tied to this account also works if GitHub isn't your thing."

@@ -2512,6 +2512,8 @@ dependencies = [
  "tauri-plugin-updater",
  "tokio",
  "url",
+ "windows-sys 0.61.2",
+ "x11rb",
 ]
 
 [[package]]
