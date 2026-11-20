@@ -10,6 +10,9 @@ export const DESKTOP_AVAILABLE = false;
 /** macOS builds are on hold: its button says "coming soon" until this is on
  *  (and the macOS build is back in desktop-release.yml). */
 export const DESKTOP_MAC_AVAILABLE = false;
+/** The Microsoft Store listing (product 9N2D377BG7KQ). The Store keeps it
+ *  up to date itself; the other downloads update through the app. */
+export const DESKTOP_STORE_URL = 'https://apps.microsoft.com/detail/9N2D377BG7KQ';
 const DESKTOP_LATEST = 'https://github.com/GQuantrill/nexum-desktop/releases/latest';
 export const DESKTOP_DOWNLOADS = {
   windows: `${DESKTOP_LATEST}/download/Nexum-Windows-setup.exe`,
