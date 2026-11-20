@@ -2869,5 +2869,15 @@
     "sub": "Je kunt dit altijd wijzigen, een stem kiezen en bepalen welke gebeurtenissen worden uitgesproken in het onderdeel {{section}} van de zijbalk.",
     "noThanks": "Nee, bedankt",
     "enable": "Aanzetten"
+  },
+  "offMap": {
+    "title": "{{system}} staat niet op deze kaart",
+    "kspaceMap": "De beheerders van deze kaart hebben ingesteld dat high-, low- en nullsec-systemen niet worden vastgelegd terwijl je vliegt.",
+    "kspaceYou": "Je instelling \"K-space niet bijhouden\" staat aan, dus high-, low- en nullsec-systemen worden niet vastgelegd.",
+    "trackingOff": "Sprongen volgen staat uit, dus systemen waar je heen vliegt worden niet toegevoegd.",
+    "readOnly": "Je kunt deze kaart bekijken maar er niets aan toevoegen.",
+    "locked": "Deze kaart is vergrendeld, dus er wordt niets aan toegevoegd.",
+    "add": "Aan kaart toevoegen",
+    "hide": "Verbergen"
   }
 }

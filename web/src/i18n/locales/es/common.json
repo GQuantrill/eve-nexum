@@ -2869,5 +2869,15 @@
     "sub": "Puedes cambiarlo, elegir una voz y decidir qué eventos se anuncian en cualquier momento en la sección {{section}} de la barra lateral.",
     "noThanks": "No, gracias",
     "enable": "Activar"
+  },
+  "offMap": {
+    "title": "{{system}} no está en este mapa",
+    "kspaceMap": "Los administradores de este mapa lo han configurado para no registrar sistemas de high, low o null-sec mientras vuelas.",
+    "kspaceYou": "Tu ajuste \"No seguir el K-space\" está activado, así que no se registran sistemas de high, low ni null-sec.",
+    "trackingOff": "El seguimiento de saltos está desactivado, así que los sistemas a los que vuelas no se añaden.",
+    "readOnly": "Puedes ver este mapa pero no añadir nada.",
+    "locked": "Este mapa está bloqueado, así que no se le añade nada.",
+    "add": "Añadir al mapa",
+    "hide": "Ocultar"
   }
 }

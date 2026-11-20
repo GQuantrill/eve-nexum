@@ -1,3 +1,4 @@
+import { useOffMapReason } from '../../hooks/useOffMapReason';
 import { useState, useEffect, useMemo, useRef, type ReactNode, type CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
@@ -413,6 +414,8 @@ export function Toolbar() {
   // Display-only: show the per-map alias when this system has one (real name
   // still drives centring via shownSystemEveId).
   const shownSystemDisplay = aliasName(shownSystem);
+  // Why your system isn't on this map, for the tooltip (the map shows it too).
+  const offMap = useOffMapReason();
   const eveStatus = useEveServerStatus();
   const [showMaps, setShowMaps]   = useState(false);
   const [showStats, setShowStats] = useState(false);
@@ -868,7 +871,9 @@ export function Toolbar() {
             ) : (
               <span
                 className="toolbar__char-system"
-                data-tooltip={shownSystemIsLast ? t('toolbar.lastKnownSystem') : t('toolbar.currentSystem')}
+                data-tooltip={shownSystemIsLast ? t('toolbar.lastKnownSystem')
+                  : offMap ? `${t('offMap.title', { system: offMap.system.name })} ${t(`offMap.${offMap.reason}`)}`
+                  : t('toolbar.currentSystem')}
               >
                 <MapPinIcon size={11} weight="fill" />
                 {shownSystemDisplay}

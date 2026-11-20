@@ -17,7 +17,7 @@ vi.mock('../../hooks/useCharacterLocation', () => ({
   useCharacterLocationCheckedAt: () => Date.now(),
 }));
 vi.mock('../../hooks/useSystemAlias', () => ({ useSystemAlias: () => (n: string) => n }));
-vi.mock('../../hooks/useCanEdit', () => ({ useCanEdit: () => true }));
+vi.mock('../../hooks/useCanEdit', () => ({ useCanEdit: () => true, useCanTrackJumps: () => true }));
 vi.mock('../../hooks/useCanEditContent', () => ({ useCanEditContent: () => true }));
 vi.mock('../../hooks/useIsMapOwner', () => ({ useIsMapOwner: () => true }));
 vi.mock('../../hooks/useCanCreateMaps', () => ({ useCanCreateMaps: () => false, useCanManageAllianceMaps: () => false }));

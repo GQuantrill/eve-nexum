@@ -2869,5 +2869,15 @@
     "sub": "Du kannst das jederzeit im Bereich {{section}} der Seitenleiste ändern, eine Stimme wählen und festlegen, welche Ereignisse angesagt werden.",
     "noThanks": "Nein danke",
     "enable": "Einschalten"
+  },
+  "offMap": {
+    "title": "{{system}} ist nicht auf dieser Karte",
+    "kspaceMap": "Die Admins dieser Karte haben eingestellt, dass Hi-, Low- und Nullsec-Systeme beim Fliegen nicht erfasst werden.",
+    "kspaceYou": "Deine Einstellung \"K-Space nicht verfolgen\" ist an, daher werden Hi-, Low- und Nullsec-Systeme nicht erfasst.",
+    "trackingOff": "Das Sprung-Tracking ist aus, daher werden angeflogene Systeme nicht hinzugefügt.",
+    "readOnly": "Du kannst diese Karte ansehen, aber nichts hinzufügen.",
+    "locked": "Diese Karte ist gesperrt, daher wird nichts hinzugefügt.",
+    "add": "Zur Karte hinzufügen",
+    "hide": "Ausblenden"
   }
 }

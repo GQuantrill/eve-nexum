@@ -245,3 +245,48 @@
   white-space: nowrap;
 }
 
+
+/* Your system isn't on this map (OffMapNotice): why, and "Add to map". */
+.off-map {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: calc(100% - 32px);
+  padding: 8px 10px 8px 12px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border-accent);
+  border-radius: 6px;
+  color: var(--text-default);
+  font-size: calc(13px * var(--font-scale, 1));
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+}
+.off-map__icon { color: var(--accent); flex-shrink: 0; }
+.off-map__text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.off-map__text strong { color: var(--text-bright); font-weight: 600; }
+.off-map__text span { color: var(--text-subtle); }
+.off-map__add {
+  flex-shrink: 0;
+  padding: 4px 10px;
+  background: var(--accent);
+  border: none;
+  border-radius: 4px;
+  color: var(--surface-base);
+  font-weight: 600;
+  cursor: pointer;
+}
+.off-map__add:hover { background: var(--accent-bright); }
+.off-map__close {
+  flex-shrink: 0;
+  display: flex;
+  padding: 4px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.off-map__close:hover { color: var(--text-bright); }

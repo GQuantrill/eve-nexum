@@ -2869,5 +2869,15 @@
     "sub": "You can change this, pick a voice and choose which events are spoken at any time in the {{section}} section of the sidebar.",
     "noThanks": "No thanks",
     "enable": "Turn on"
+  },
+  "offMap": {
+    "title": "{{system}} isn't on this map",
+    "kspaceMap": "This map's admins have set it not to record high, low or null-sec systems as you fly.",
+    "kspaceYou": "Your \"Don't track K-space\" setting is on, so high, low and null-sec systems aren't recorded.",
+    "trackingOff": "Jump tracking is switched off, so the systems you fly to aren't added.",
+    "readOnly": "You can view this map but not add to it.",
+    "locked": "This map is locked, so nothing is added to it.",
+    "add": "Add to map",
+    "hide": "Hide"
   }
 }

@@ -1,3 +1,4 @@
+import { OffMapNotice } from './components/map/OffMapNotice';
 import { lazy, Suspense, useEffect } from 'react';
 import { ReactFlowProvider } from '@xyflow/react';
 import { AuthProvider } from './context/AuthProvider';
@@ -198,6 +199,7 @@ function MapApp() {
             <div className="layout__map">
               <MapCanvas />
               <MapSidebar />
+              <OffMapNotice />
             </div>
             {selectedSystemId && <SystemPanel />}
             {selectedConnectionId && <ConnectionPanel />}

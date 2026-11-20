@@ -2869,5 +2869,15 @@
     "sub": "Vous pouvez modifier ce choix, choisir une voix et les événements annoncés à tout moment dans la section {{section}} de la barre latérale.",
     "noThanks": "Non merci",
     "enable": "Activer"
+  },
+  "offMap": {
+    "title": "{{system}} n'est pas sur cette carte",
+    "kspaceMap": "Les admins de cette carte l'ont réglée pour ne pas enregistrer les systèmes high, low ou null-sec pendant vos déplacements.",
+    "kspaceYou": "Votre réglage « Ne pas suivre le K-space » est activé, les systèmes high, low et null-sec ne sont donc pas enregistrés.",
+    "trackingOff": "Le suivi des sauts est désactivé, les systèmes où vous allez ne sont donc pas ajoutés.",
+    "readOnly": "Vous pouvez consulter cette carte mais pas y ajouter quoi que ce soit.",
+    "locked": "Cette carte est verrouillée, rien n'y est donc ajouté.",
+    "add": "Ajouter à la carte",
+    "hide": "Masquer"
   }
 }
