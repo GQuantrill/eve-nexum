@@ -554,12 +554,14 @@
       "system": {
         "add": "添加了 {{subject}}",
         "update": "修改了 {{subject}}",
-        "remove": "删除了 {{subject}}"
+        "remove": "删除了 {{subject}}",
+        "restore": "恢复了 {{subject}}"
       },
       "connection": {
         "add": "连接了 {{subject}}",
         "update": "修改了 {{subject}}",
-        "remove": "断开了 {{subject}}"
+        "remove": "断开了 {{subject}}",
+        "restore": "重新连接了 {{subject}}"
       },
       "signature": {
         "add": "添加了信号 {{subject}}",

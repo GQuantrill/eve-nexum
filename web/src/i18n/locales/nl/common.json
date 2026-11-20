@@ -554,12 +554,14 @@
       "system": {
         "add": "heeft {{subject}} toegevoegd",
         "update": "heeft {{subject}} gewijzigd",
-        "remove": "heeft {{subject}} verwijderd"
+        "remove": "heeft {{subject}} verwijderd",
+        "restore": "heeft {{subject}} hersteld"
       },
       "connection": {
         "add": "heeft {{subject}} verbonden",
         "update": "heeft {{subject}} gewijzigd",
-        "remove": "heeft {{subject}} losgekoppeld"
+        "remove": "heeft {{subject}} losgekoppeld",
+        "restore": "heeft {{subject}} opnieuw verbonden"
       },
       "signature": {
         "add": "heeft signatuur {{subject}} toegevoegd",

@@ -560,12 +560,14 @@
       "system": {
         "add": "добавил(а) {{subject}}",
         "update": "изменил(а) {{subject}}",
-        "remove": "удалил(а) {{subject}}"
+        "remove": "удалил(а) {{subject}}",
+        "restore": "восстановил(а) {{subject}}"
       },
       "connection": {
         "add": "соединил(а) {{subject}}",
         "update": "изменил(а) {{subject}}",
-        "remove": "разъединил(а) {{subject}}"
+        "remove": "разъединил(а) {{subject}}",
+        "restore": "снова соединил(а) {{subject}}"
       },
       "signature": {
         "add": "добавил(а) сигнатуру {{subject}}",

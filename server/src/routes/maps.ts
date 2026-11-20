@@ -24,6 +24,7 @@ import { resolveEntityNames } from '../services/entityNames.js';
 import { audit } from '../services/audit.js';
 import { publishToMap } from '../services/mapEvents.js';
 import { streamMapEvents } from '../services/mapStream.js';
+import { trashSystem, trashConnection, restoreSystem, restoreConnection } from '../services/mapTrash.js';
 import { listVisibleMaps, loadFullMap, loadSystemSignatures, loadSystemAnomalies, loadSystemStructures, CONNECTION_COLS } from '../services/mapRead.js';
 import {
   connectionTypeError, connectionEndpointEveIds, systemEveIds, isProtectedGate, PROTECTED_GATE_ERROR,
@@ -3218,9 +3219,23 @@ mapsRouter.delete('/:mapId/systems/:systemId', async (req, res) => {
   const { mapId, systemId } = req.params;
   const access = await requireMapWrite(res, mapId, req);
   if (!access) return;
-  const { rows: removed } = await db.query<{ name: string; alias: string | null }>(
-    `DELETE FROM map_systems WHERE id = $1 AND map_id = $2 RETURNING name, alias`, [systemId, mapId],
-  );
+  // Keep a copy of the system and everything the delete takes with it, so
+  // undo can put all of it back (services/mapTrash.ts).
+  let removed: { name: string; alias: string | null }[] = [];
+  const client = await db.connect();
+  try {
+    await client.query('BEGIN');
+    if (UUID_RE.test(systemId)) await trashSystem(client, mapId, systemId, req.session.userId ?? null);
+    ({ rows: removed } = await client.query<{ name: string; alias: string | null }>(
+      `DELETE FROM map_systems WHERE id = $1 AND map_id = $2 RETURNING name, alias`, [systemId, mapId],
+    ));
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
   if (removed.length > 0) {
     db.query(
       `INSERT INTO user_events (user_id, event_type, map_id) VALUES ($1, 'system_delete', $2)`,
@@ -3231,6 +3246,32 @@ mapsRouter.delete('/:mapId/systems/:systemId', async (req, res) => {
   }
   await touchMap(mapId);
   res.json({ ok: true });
+});
+
+// POST /api/maps/:mapId/systems/:systemId/restore
+// Undo of a delete: the system back with its signatures, anomalies, structures,
+// connections and jump logs. Only the pilot who deleted it, within the hour.
+mapsRouter.post('/:mapId/systems/:systemId/restore', async (req, res) => {
+  const { mapId, systemId } = req.params;
+  const access = await requireMapWrite(res, mapId, req);
+  if (!access) return;
+  if (!UUID_RE.test(systemId)) { res.status(404).json({ error: 'restore_unavailable' }); return; }
+  const restored = await restoreSystem(mapId, systemId, req.session.userId!);
+  if (!restored || !restored.system) { res.status(404).json({ error: 'restore_unavailable' }); return; }
+  const actor = req.get('x-client-id') ?? null;
+  // Into the same system someone has re-added meanwhile: it's already on
+  // everyone's map, so only its contents changed.
+  if (restored.systemId === systemId) publishToMap(mapId, { type: 'system.add', actor, system: restored.system });
+  for (const connection of restored.connections) publishToMap(mapId, { type: 'connection.add', actor, connection });
+  publishToMap(mapId, { type: 'sig.changed', actor: null, systemId: restored.systemId });
+  publishToMap(mapId, { type: 'anom.changed', actor: null, systemId: restored.systemId });
+  publishToMap(mapId, { type: 'structure.changed', actor: null, systemId: restored.systemId });
+  await touchMap(mapId);
+  recordMapAudit(req, mapId, {
+    action: 'system.restore', targetId: restored.systemId,
+    subject: systemLabel({ name: String(restored.system.name), alias: (restored.system.alias as string | null) ?? null }),
+  });
+  res.json(restored);
 });
 
 // ── Connections ───────────────────────────────────────────────────────────────
@@ -4055,11 +4096,24 @@ mapsRouter.delete('/:mapId/connections/:connectionId', async (req, res) => {
   if (await isProtectedGate(mapId, connectionId)) {
     res.status(409).json({ error: PROTECTED_GATE_ERROR }); return;
   }
-  const { rows: removedConn } = await db.query<{ sourceId: string; targetId: string }>(
-    `DELETE FROM map_connections WHERE id = $1 AND map_id = $2
-     RETURNING source_id AS "sourceId", target_id AS "targetId"`,
-    [connectionId, mapId],
-  );
+  // Keep a copy (with its jump log) so undo can put it back as it was.
+  let removedConn: { sourceId: string; targetId: string }[] = [];
+  const client = await db.connect();
+  try {
+    await client.query('BEGIN');
+    if (UUID_RE.test(connectionId)) await trashConnection(client, mapId, connectionId, req.session.userId ?? null);
+    ({ rows: removedConn } = await client.query<{ sourceId: string; targetId: string }>(
+      `DELETE FROM map_connections WHERE id = $1 AND map_id = $2
+       RETURNING source_id AS "sourceId", target_id AS "targetId"`,
+      [connectionId, mapId],
+    ));
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
   await touchMap(mapId);
   publishToMap(mapId, { type: 'connection.remove', actor: req.get('x-client-id') ?? null, id: connectionId });
   if (removedConn.length) {
@@ -4069,6 +4123,28 @@ mapsRouter.delete('/:mapId/connections/:connectionId', async (req, res) => {
       .catch(console.error);
   }
   res.json({ ok: true });
+});
+
+// POST /api/maps/:mapId/connections/:connectionId/restore
+// Undo of a connection delete, with its jump log. Only the pilot who deleted
+// it, within the hour.
+mapsRouter.post('/:mapId/connections/:connectionId/restore', async (req, res) => {
+  const { mapId, connectionId } = req.params;
+  const access = await requireMapWrite(res, mapId, req);
+  if (!access) return;
+  if (!UUID_RE.test(connectionId)) { res.status(404).json({ error: 'restore_unavailable' }); return; }
+  const restored = await restoreConnection(mapId, connectionId, req.session.userId!);
+  if (!restored) { res.status(404).json({ error: 'restore_unavailable' }); return; }
+  const actor = req.get('x-client-id') ?? null;
+  for (const connection of restored) publishToMap(mapId, { type: 'connection.add', actor, connection });
+  if (restored.length) {
+    await touchMap(mapId);
+    const c = restored[0] as { sourceId: string; targetId: string };
+    connectionLabel(mapId, c.sourceId, c.targetId)
+      .then((label) => recordMapAudit(req, mapId, { action: 'connection.restore', targetId: connectionId, subject: label }))
+      .catch(console.error);
+  }
+  res.json({ connections: restored });
 });
 
 // ── Connection jump log ─────────────────────────────────────────────────────────

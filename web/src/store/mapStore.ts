@@ -513,6 +513,28 @@ export const useMapStore = create<MapStore>()((set, get) => {
             },
           };
         });
+        // The server kept a copy of the system and everything its delete took
+        // (signatures, anomalies, structures, connections, jump logs): put that
+        // back. Its answer replaces the optimistic copy above, and may land in
+        // a different id when someone re-added the system meanwhile.
+        const restored = await api<{ systemId: string; system: MapSystem | null; connections: MapConnection[] }>(
+          `/api/maps/${activeMapId}/systems/${cmd.system.id}/restore`, { method: 'POST' },
+        ).catch(() => null);
+        if (restored?.system) {
+          const sys = restored.system;
+          const dropConn = new Set([...cmd.connections.map((c) => c.id), ...restored.connections.map((c) => c.id)]);
+          set((s) => ({
+            selectedSystemId: s.selectedSystemId === cmd.system.id ? sys.id : s.selectedSystemId,
+            map: {
+              ...s.map,
+              systems: [...s.map.systems.filter((x) => x.id !== cmd.system.id && x.id !== sys.id), sys],
+              connections: [...s.map.connections.filter((c) => !dropConn.has(c.id)), ...restored.connections],
+            },
+          }));
+          break;
+        }
+        // Nothing kept (over an hour ago, or an older server): re-create the
+        // system and its connections as they were drawn.
         // System has to land first so connection FKs resolve; the connections
         // themselves are independent and can race in parallel.
         await api(`/api/maps/${activeMapId}/systems`, {
@@ -585,6 +607,23 @@ export const useMapStore = create<MapStore>()((set, get) => {
             connections: [...s.map.connections, cmd.connection],
           },
         }));
+        // Put back the server's copy, jump log included; fall back to
+        // re-creating it as drawn when there is none.
+        const back = await api<{ connections: MapConnection[] }>(
+          `/api/maps/${activeMapId}/connections/${cmd.connection.id}/restore`, { method: 'POST' },
+        ).catch(() => null);
+        if (back) {
+          set((s) => ({
+            map: {
+              ...s.map,
+              connections: [
+                ...s.map.connections.filter((c) => c.id !== cmd.connection.id),
+                ...back.connections,
+              ],
+            },
+          }));
+          break;
+        }
         await api(`/api/maps/${activeMapId}/connections`, {
           method: 'POST',
           body: JSON.stringify({ ...cmd.connection }),

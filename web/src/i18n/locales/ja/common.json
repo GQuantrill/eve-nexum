@@ -554,12 +554,14 @@
       "system": {
         "add": "{{subject}} を追加",
         "update": "{{subject}} を変更",
-        "remove": "{{subject}} を削除"
+        "remove": "{{subject}} を削除",
+        "restore": "{{subject}} を復元"
       },
       "connection": {
         "add": "{{subject}} を接続",
         "update": "{{subject}} を変更",
-        "remove": "{{subject}} を切断"
+        "remove": "{{subject}} を切断",
+        "restore": "{{subject}} を再接続"
       },
       "signature": {
         "add": "シグネチャ {{subject}} を追加",

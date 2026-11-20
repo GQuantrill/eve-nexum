@@ -554,12 +554,14 @@
       "system": {
         "add": "añadió {{subject}}",
         "update": "cambió {{subject}}",
-        "remove": "eliminó {{subject}}"
+        "remove": "eliminó {{subject}}",
+        "restore": "restauró {{subject}}"
       },
       "connection": {
         "add": "conectó {{subject}}",
         "update": "cambió {{subject}}",
-        "remove": "desconectó {{subject}}"
+        "remove": "desconectó {{subject}}",
+        "restore": "volvió a conectar {{subject}}"
       },
       "signature": {
         "add": "añadió la firma {{subject}}",

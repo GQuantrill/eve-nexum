@@ -554,12 +554,14 @@
       "system": {
         "add": "hat {{subject}} hinzugefügt",
         "update": "hat {{subject}} geändert",
-        "remove": "hat {{subject}} entfernt"
+        "remove": "hat {{subject}} entfernt",
+        "restore": "hat {{subject}} wiederhergestellt"
       },
       "connection": {
         "add": "hat {{subject}} verbunden",
         "update": "hat {{subject}} geändert",
-        "remove": "hat {{subject}} getrennt"
+        "remove": "hat {{subject}} getrennt",
+        "restore": "hat {{subject}} wieder verbunden"
       },
       "signature": {
         "add": "hat Signatur {{subject}} hinzugefügt",

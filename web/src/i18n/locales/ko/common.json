@@ -554,12 +554,14 @@
       "system": {
         "add": "{{subject}} 추가",
         "update": "{{subject}} 변경",
-        "remove": "{{subject}} 삭제"
+        "remove": "{{subject}} 삭제",
+        "restore": "{{subject}} 복원"
       },
       "connection": {
         "add": "{{subject}} 연결",
         "update": "{{subject}} 변경",
-        "remove": "{{subject}} 연결 해제"
+        "remove": "{{subject}} 연결 해제",
+        "restore": "{{subject}} 다시 연결"
       },
       "signature": {
         "add": "시그니처 {{subject}} 추가",
