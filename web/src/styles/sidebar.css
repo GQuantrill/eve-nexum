@@ -2508,6 +2508,9 @@ select.sig-toolbar-btn option {
 
 /* Bookmark column: centre the copy button in its narrow fixed-width cell. */
 .sig-td--bookmark { text-align: center; }
+/* The copy icon is 16px: less side padding keeps the button inside the 28px
+   column. */
+.sig-td--bookmark .icon-btn { padding: var(--sp-2); }
 
 /* Age / Updated. Left-aligned so the values sit directly under their headings.
    They used to be right-aligned, but only the CELL carried padding-right, so
