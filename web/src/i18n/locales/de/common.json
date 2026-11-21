@@ -816,7 +816,9 @@
     "restoreTitle": "Die Unterbrochen-Markierung entfernen und dies wieder als aktive Verbindung behandeln",
     "gateNote": "Reguläres Stargate — keine Wurmloch-Daten.",
     "gateProtected": "Stargate-Verbindungen existieren im Spiel und können nicht entfernt oder geändert werden.",
-    "jumpgateNote": "Ansiblex-Sprungbrücke — keine Wurmloch-Daten."
+    "jumpgateNote": "Ansiblex-Sprungbrücke — keine Wurmloch-Daten.",
+    "massUsedLabel": "Verbraucht",
+    "massUsedTitle": "Masse, die schon durchgegangen ist, in Millionen kg. Trag sie ein, wenn du sie kennst (etwa aus dem Sprungprotokoll); der Rechner rechnet von dort weiter."
   },
   "contentFilter": {
     "hint": "Systeme nach gescanntem Inhalt hervorheben. Wähle Signatur- oder Anomalie-Typen oder suche einen Site-Namen; passende Systeme bleiben hell, der Rest wird ausgeblendet.",
@@ -1722,7 +1724,9 @@
     "lessThan24h": "< 24 Std",
     "lessThan4h": "< 4 Std",
     "lessThan1h": "< 1 Std",
-    "broken": "Verbindung unterbrochen — die Wurmloch-Sig wurde gelöscht (Loch kollabiert)"
+    "broken": "Verbindung unterbrochen — die Wurmloch-Sig wurde gelöscht (Loch kollabiert)",
+    "showInfo": "Infos zu dieser Verbindung anzeigen",
+    "hideInfo": "Zum Einklappen klicken"
   },
   "mapKey": {
     "title": "Kartenlegende",
@@ -2155,7 +2159,10 @@
       "normal": "Normal",
       "strong": "Stark"
     },
-    "resetColor": "Zurücksetzen"
+    "resetColor": "Zurücksetzen",
+    "connInfo": "Verbindungsinfos",
+    "connInfoFull": "Immer anzeigen",
+    "connInfoFolded": "Eingeklappt"
   },
   "mass": {
     "billionKg": "{{value}} Mrd. kg",
@@ -2884,5 +2891,29 @@
   },
   "scanPaste": {
     "otherCharacter": "Scan nicht eingefügt: Nur Scans aus dem EVE-Fenster von {{name}} werden verwendet (Einstellungen der Nexum-App)."
+  },
+  "rollPlan": {
+    "title": "Sprungplan",
+    "addShip": "Schiff hinzufügen",
+    "myRoller": "Mein Roller: {{name}} ({{cold}}/{{hot}})",
+    "removeShip": "{{name}} entfernen",
+    "ship": "Schiff",
+    "toggleHeat": "Zwischen kalt und heiß wechseln",
+    "out": "hin",
+    "back": "zurück",
+    "flown": "geflogen",
+    "removePass": "Diesen Sprung entfernen",
+    "outcome": {
+      "safe": "Verbrauchte Masse nach diesem Sprung. Das Loch kann dabei nicht kollabieren.",
+      "risky": "Verbrauchte Masse nach diesem Sprung. Das Loch könnte dabei kollabieren.",
+      "collapse": "Verbrauchte Masse nach diesem Sprung. Das Loch kollabiert dabei."
+    },
+    "strands": "Sprung {{n}} könnte das Loch schließen, während {{ship}} auf der anderen Seite ist.",
+    "addPass": "Sprung hinzufügen",
+    "flyNext": "Nächsten fliegen",
+    "flyNextTitle": "{{ship}} springt: {{mass}} kommen zur verbrauchten Masse hinzu",
+    "undoFlown": "Geflogenen zurücknehmen",
+    "clear": "Plan leeren",
+    "tooHeavy": "Zu schwer für dieses Loch (max. Sprungmasse {{max}})"
   }
 }

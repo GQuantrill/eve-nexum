@@ -88,7 +88,15 @@ export async function maybeConfirmWhJump(ctx: WhJumpContext): Promise<void> {
   // compatible with where we arrived. Unknowns (non-wormhole) are never touched.
   // Bail before the gate check when there's nothing to fill.
   const candidates = sigs.filter((s) => s.sigType === 'wormhole' && isCandidate(s.whLeadsTo, toClass));
-  if (candidates.length === 0) return;
+  // No scanned hole fits, but there are signatures nobody has identified yet
+  // (pasted before they were scanned down): one of them may be the hole just
+  // jumped. Ask, never guess -- they could as well be data or relic sites.
+  // Without this the hole was never tied to its link, so when it later
+  // vanished from a scan nothing was cut.
+  const unscanned = candidates.length === 0
+    ? sigs.filter((s) => s.sigType === 'unknown' && !s.whLeadsTo && !!s.sigId)
+    : [];
+  if (candidates.length === 0 && unscanned.length === 0) return;
 
   // Wormhole jump only. Use the connection's server gate classification — the
   // same map_stargates check that draws the 'G' badge, reliable now that gates
@@ -115,11 +123,15 @@ export async function maybeConfirmWhJump(ctx: WhJumpContext): Promise<void> {
   // preferred backing signature -- otherwise the auto-detect's K162 tie-break
   // can attribute the jump to the other hole leading to the same system.
   const writeLeadsTo = (s: Signature, value: string, oldSig: Signature): void => {
+    // An unidentified sig the pilot says they jumped is a wormhole.
+    const patch: Partial<Signature> = s.sigType === 'unknown'
+      ? { whLeadsTo: value, sigType: 'wormhole' }
+      : { whLeadsTo: value };
     api(`/api/maps/${mapId}/systems/${fromMapSystemId}/signatures/${s.id}`, {
       method: 'PATCH',
-      body:   JSON.stringify({ whLeadsTo: value }),
+      body:   JSON.stringify(patch),
     }).catch(() => { /* best-effort; the user can still set it by hand */ });
-    const updated = sigs.map((x) => (x.id === s.id ? { ...x, whLeadsTo: value } : x));
+    const updated = sigs.map((x) => (x.id === s.id ? { ...x, ...patch } : x));
     reevaluateConnectionsForSystem(fromMapSystemId, updated, oldSig, false, undefined, s.id);
   };
 
@@ -142,7 +154,7 @@ export async function maybeConfirmWhJump(ctx: WhJumpContext): Promise<void> {
   toast.show(t('whJump.confirmMany', { system: toName }), {
     kind: 'info', sticky: true, dedupeKey,
     actions: [
-      ...candidates.map((s) => ({ label: label(s), onClick: () => {
+      ...(candidates.length ? candidates : unscanned).map((s) => ({ label: label(s), onClick: () => {
         writeLeadsTo(s, toName, s);
         copyJumpedBookmark({ ...s, whLeadsTo: toName });
       } })),

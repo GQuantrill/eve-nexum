@@ -816,7 +816,9 @@
     "collapseConfirmHome": " Je roller eindigt aan de thuiszijde.",
     "rollIt": "Rollen",
     "removeConnection": "Alleen verbinding verwijderen",
-    "removeConnectionAndSigs": "Verbinding en signaturen verwijderen"
+    "removeConnectionAndSigs": "Verbinding en signaturen verwijderen",
+    "massUsedLabel": "Gebruikt",
+    "massUsedTitle": "Massa die er al doorheen is, in miljoenen kg. Vul hem in als je hem weet (bijvoorbeeld uit het sprongenlog); de rekenhulp rekent vanaf daar verder."
   },
   "contentFilter": {
     "hint": "Licht systemen uit op basis van wat er gescand is. Kies signatuur- of anomalietypes, of zoek op een sitenaam; overeenkomende systemen blijven licht en de rest vervaagt.",
@@ -1722,7 +1724,9 @@
     "lessThan24h": "< 24u",
     "lessThan4h": "< 4 uur",
     "lessThan1h": "< 1 uur",
-    "broken": "Verbinding verbroken — de wormgat-signatuur is verwijderd (gat ingestort)"
+    "broken": "Verbinding verbroken — de wormgat-signatuur is verwijderd (gat ingestort)",
+    "showInfo": "Info van deze verbinding tonen",
+    "hideInfo": "Klik om in te klappen"
   },
   "mapKey": {
     "title": "Kaartlegenda",
@@ -2155,7 +2159,10 @@
       "normal": "Normaal",
       "strong": "Sterk"
     },
-    "resetColor": "Herstellen"
+    "resetColor": "Herstellen",
+    "connInfo": "Verbindingsinfo",
+    "connInfoFull": "Altijd tonen",
+    "connInfoFolded": "Ingeklapt"
   },
   "mass": {
     "billionKg": "{{value}} mld kg",
@@ -2884,5 +2891,29 @@
   },
   "scanPaste": {
     "otherCharacter": "Scan niet geplakt: alleen scans uit het EVE-venster van {{name}} worden gebruikt (instellingen van de Nexum-app)."
+  },
+  "rollPlan": {
+    "title": "Sprongplan",
+    "addShip": "Schip toevoegen",
+    "myRoller": "Mijn roller: {{name}} ({{cold}}/{{hot}})",
+    "removeShip": "{{name}} verwijderen",
+    "ship": "Schip",
+    "toggleHeat": "Wisselen tussen koud en heet",
+    "out": "heen",
+    "back": "terug",
+    "flown": "gevlogen",
+    "removePass": "Deze sprong verwijderen",
+    "outcome": {
+      "safe": "Gebruikte massa na deze sprong. Het gat kan hierbij niet dichtgaan.",
+      "risky": "Gebruikte massa na deze sprong. Het gat kan hierbij dichtgaan.",
+      "collapse": "Gebruikte massa na deze sprong. Het gat gaat hierbij dicht."
+    },
+    "strands": "Sprong {{n}} kan het gat sluiten terwijl {{ship}} aan de overkant is.",
+    "addPass": "Sprong toevoegen",
+    "flyNext": "Volgende vliegen",
+    "flyNextTitle": "{{ship}} springt: {{mass}} erbij in de gebruikte massa",
+    "undoFlown": "Gevlogen ongedaan maken",
+    "clear": "Plan wissen",
+    "tooHeavy": "Te zwaar voor dit gat (max. sprongmassa {{max}})"
   }
 }

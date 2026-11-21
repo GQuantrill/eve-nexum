@@ -45,7 +45,7 @@ import { useIsMapOwner } from "../../hooks/useIsMapOwner";
 import type { WormholeMap } from "../../types";
 import { countPersonalMaps } from '../../utils/personalMaps';
 import { useEscapeClose } from '../../hooks/useEscapeClose';
-import { LINK_SIG_IDS_KEY } from '../../utils/linkSigIds';
+import { LINK_SIG_IDS_KEY, CONN_INFO_KEY, type ConnInfoMode } from '../../utils/linkSigIds';
 import { RouteAvoidList } from './RouteAvoidList';
 import { CONFIRM_KEY_DELETE_KEY } from '../../utils/confirmPref';
 import { HOME_COLOR_KEY, HOME_COLOR_DEFAULT, HERE_COLOR_KEY, HERE_COLOR_DEFAULT, HERE_PULSE_KEY, HERE_PULSE_DEFAULT, HERE_PULSES, normalisePulse, safeColor } from '../../utils/mapMarkers';
@@ -979,6 +979,7 @@ export function MapSidebar() {
   const edgeStyle = useMapStore((s) => s.edgeStyle);
   const setEdgeStyle = useMapStore((s) => s.setEdgeStyle);
   const connectionThickness = useMapStore((s) => s.connectionThickness);
+  const [connInfo, setConnInfo] = useUserSetting<ConnInfoMode>(CONN_INFO_KEY, "full");
   const setConnectionThickness = useMapStore((s) => s.setConnectionThickness);
   const routeMode = useMapStore((s) => s.routeMode);
   const setRouteMode = useMapStore((s) => s.setRouteMode);
@@ -1517,6 +1518,21 @@ export function MapSidebar() {
                 { value: "standard", label: t("mapSidebar.thickness.standard") },
                 { value: "thick", label: t("mapSidebar.thickness.thick") },
                 { value: "extra", label: t("mapSidebar.thickness.extra") },
+              ]}
+            />
+          </div>
+
+          <div className="map-sidebar__row">
+            <label className="map-sidebar__label" htmlFor="connection-info">
+              {t("mapSidebar.connInfo")}
+            </label>
+            <Select
+              id="connection-info"
+              value={connInfo}
+              onChange={(v) => setConnInfo(v as ConnInfoMode)}
+              options={[
+                { value: "full", label: t("mapSidebar.connInfoFull") },
+                { value: "folded", label: t("mapSidebar.connInfoFolded") },
               ]}
             />
           </div>

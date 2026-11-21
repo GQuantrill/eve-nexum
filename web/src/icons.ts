@@ -49,6 +49,7 @@ export { CopyIcon } from '@phosphor-icons/react/dist/csr/Copy';
 export { CrosshairIcon } from '@phosphor-icons/react/dist/csr/Crosshair';
 export { CrosshairSimpleIcon } from '@phosphor-icons/react/dist/csr/CrosshairSimple';
 export { DesktopIcon } from '@phosphor-icons/react/dist/csr/Desktop';
+export { InfoIcon } from '@phosphor-icons/react/dist/csr/Info';
 export { WindowsLogoIcon } from '@phosphor-icons/react/dist/csr/WindowsLogo';
 export { AppleLogoIcon } from '@phosphor-icons/react/dist/csr/AppleLogo';
 export { LinuxLogoIcon } from '@phosphor-icons/react/dist/csr/LinuxLogo';

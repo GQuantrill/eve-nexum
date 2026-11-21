@@ -816,7 +816,9 @@
     "restoreTitle": "Quitar la marca de rota y volver a tratarla como una conexión activa",
     "gateNote": "Stargate normal — sin datos de agujero de gusano.",
     "gateProtected": "Las conexiones por stargate existen en el juego y no se pueden eliminar ni cambiar.",
-    "jumpgateNote": "Puente Ansiblex — sin datos de agujero de gusano."
+    "jumpgateNote": "Puente Ansiblex — sin datos de agujero de gusano.",
+    "massUsedLabel": "Usada",
+    "massUsedTitle": "Masa que ya ha pasado, en millones de kg. Escríbela si la sabes (por ejemplo, por el registro de saltos); la calculadora sigue desde ahí."
   },
   "contentFilter": {
     "hint": "Resalta sistemas por su contenido escaneado. Elige tipos de firma o anomalía, o busca el nombre de un sitio; los sistemas que coinciden permanecen iluminados y el resto se atenúa.",
@@ -1722,7 +1724,9 @@
     "lessThan24h": "< 24h",
     "lessThan4h": "< 4 h",
     "lessThan1h": "< 1 h",
-    "broken": "Conexión rota — la firma de agujero de gusano fue eliminada (agujero colapsado)"
+    "broken": "Conexión rota — la firma de agujero de gusano fue eliminada (agujero colapsado)",
+    "showInfo": "Mostrar la info de esta conexión",
+    "hideInfo": "Clic para plegar"
   },
   "mapKey": {
     "title": "Leyenda del mapa",
@@ -2155,7 +2159,10 @@
       "normal": "Normal",
       "strong": "Fuerte"
     },
-    "resetColor": "Restablecer"
+    "resetColor": "Restablecer",
+    "connInfo": "Info de conexiones",
+    "connInfoFull": "Siempre visible",
+    "connInfoFolded": "Plegada"
   },
   "mass": {
     "billionKg": "{{value}} mil M kg",
@@ -2884,5 +2891,29 @@
   },
   "scanPaste": {
     "otherCharacter": "Escaneo no pegado: solo se usan los escaneos copiados en la ventana de EVE de {{name}} (ajustes de la aplicación Nexum)."
+  },
+  "rollPlan": {
+    "title": "Plan de pasadas",
+    "addShip": "Añadir una nave",
+    "myRoller": "Mi roller: {{name}} ({{cold}}/{{hot}})",
+    "removeShip": "Quitar {{name}}",
+    "ship": "Nave",
+    "toggleHeat": "Cambiar entre frío y caliente",
+    "out": "ida",
+    "back": "vuelta",
+    "flown": "hecha",
+    "removePass": "Quitar esta pasada",
+    "outcome": {
+      "safe": "Masa usada tras esta pasada. El agujero no puede cerrarse en ella.",
+      "risky": "Masa usada tras esta pasada. El agujero podría cerrarse en ella.",
+      "collapse": "Masa usada tras esta pasada. El agujero se cierra en ella."
+    },
+    "strands": "La pasada {{n}} podría cerrar el agujero con {{ship}} al otro lado.",
+    "addPass": "Añadir pasada",
+    "flyNext": "Hacer la siguiente",
+    "flyNextTitle": "{{ship}} pasa: suma {{mass}} a la masa usada",
+    "undoFlown": "Deshacer la hecha",
+    "clear": "Vaciar el plan",
+    "tooHeavy": "Demasiado pesada para este agujero (salto máx. {{max}})"
   }
 }

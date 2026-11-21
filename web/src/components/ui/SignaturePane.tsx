@@ -44,7 +44,9 @@ import {
 // it goes, or a connection lists it as its backing signature (which holds
 // even when nobody filled in the destination).
 function backsALink(sig: Signature): boolean {
-  if (sig.whType && sig.whLeadsTo) return true;
+  // A destination is enough: a hole jumped before its code was known still
+  // leads where it says (whAutoDetect decides which link, if any, is its).
+  if (sig.whLeadsTo) return true;
   return !!connectionForSig(sig.id, useMapStore.getState().map.connections);
 }
 

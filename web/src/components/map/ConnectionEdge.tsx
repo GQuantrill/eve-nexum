@@ -1,4 +1,4 @@
-import { memo, type CSSProperties } from 'react';
+import { memo, useState, type CSSProperties, type MouseEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   getBezierPath, getStraightPath, getSmoothStepPath,
@@ -17,7 +17,9 @@ import { watchMarker } from '../../data/watchMarkers';
 import { effectiveExpiryMs, lifeBucket, type TimeBucket } from '../../utils/whLifetime';
 import { DynamicIcon } from '../DynamicIcon';
 import { hoursMins } from '../../i18n/format';
-import { shortSigId, type LinkEndSigs } from '../../utils/linkSigIds';
+import { shortSigId, CONN_INFO_KEY, type ConnInfoMode, type LinkEndSigs } from '../../utils/linkSigIds';
+import { useUserSetting } from '../../hooks/useUserSetting';
+import { InfoIcon } from '../../icons';
 import type { TFunction } from 'i18next';
 
 // CSS custom properties (resolved via the edge path's inline `style`) so the
@@ -84,6 +86,10 @@ export const ConnectionEdge = memo(({
   };
   const selectConnection = useMapStore((s) => s.selectConnection);
   const whTypes = useWormholeTypes();
+  // Folded links show a marker until clicked open; click again to fold.
+  const [infoMode] = useUserSetting<ConnInfoMode>(CONN_INFO_KEY, 'full');
+  const [open, setOpen] = useState(false);
+  const folded = infoMode === 'folded' && !open;
   const now = useNow30s();
 
   // Lit because the hovered/selected system is one of its endpoints — these get
@@ -348,6 +354,34 @@ export const ConnectionEdge = memo(({
             )
             : null;
           const count = (typeNode ? 1 : 0) + (massNode ? 1 : 0) + (timeNode ? 1 : 0) + (flagNode ? 1 : 0);
+          const labelStyle: CSSProperties = {
+            transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
+            zIndex: highlighted ? 1001 : undefined,
+          };
+
+          // Folded: a marker in place of the label (nothing at all when there
+          // is nothing to show). A flag stays out: it was set to be seen.
+          if (folded && (count > 0 || firstSig || lastSig)) {
+            return (
+              <div className="connection-label" style={labelStyle}>
+                <div className="connection-label__row">
+                  <button
+                    type="button"
+                    className="connection-label__fold"
+                    aria-label={t('mapEdge.showInfo')}
+                    data-tooltip={t('mapEdge.showInfo')}
+                    onClick={(e) => { e.stopPropagation(); setOpen(true); }}
+                  >
+                    <InfoIcon size={12} weight="bold" />
+                  </button>
+                  {flagNode}
+                </div>
+              </div>
+            );
+          }
+          const onLabelClick = infoMode === 'folded'
+            ? (e: MouseEvent) => { e.stopPropagation(); setOpen(false); }
+            : () => selectConnection(id);
 
           return (
             <div
@@ -355,8 +389,9 @@ export const ConnectionEdge = memo(({
               // Lift above a highlighted edge (zIndex 10) — the edge-label
               // layer has no stacking context, so the label's own z-index wins
               // against the hover-elevated line and the badge stays readable.
-              style={{ transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`, zIndex: highlighted ? 1001 : undefined }}
-              onClick={() => selectConnection(id)}
+              style={labelStyle}
+              onClick={onLabelClick}
+              title={infoMode === 'folded' ? t('mapEdge.hideInfo') : undefined}
             >
               {count > 0 || firstSig || lastSig ? (
                 <div className="connection-label__sigs">

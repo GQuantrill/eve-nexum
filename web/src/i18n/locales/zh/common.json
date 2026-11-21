@@ -816,7 +816,9 @@
     "restoreTitle": "清除断开标记，重新将其视为活动连接",
     "gateNote": "普通星门 — 无虫洞数据可追踪。",
     "gateProtected": "星门连接在游戏中真实存在，无法删除或更改。",
-    "jumpgateNote": "Ansiblex 跳桥 — 无虫洞数据可追踪。"
+    "jumpgateNote": "Ansiblex 跳桥 — 无虫洞数据可追踪。",
+    "massUsedLabel": "已用",
+    "massUsedTitle": "已经通过的质量，单位为百万千克。如果你知道（例如从跳跃记录中），就填写进来，计算器会从这里继续算。"
   },
   "contentFilter": {
     "hint": "按扫描到的内容突出显示星系。选择信号或异常空间类型，或搜索地点名称；匹配的星系保持高亮，其余的淡出。",
@@ -1722,7 +1724,9 @@
     "lessThan24h": "< 24h",
     "lessThan4h": "< 4h",
     "lessThan1h": "< 1h",
-    "broken": "连接已断开——虫洞信号已被删除（虫洞坍塌）"
+    "broken": "连接已断开——虫洞信号已被删除（虫洞坍塌）",
+    "showInfo": "显示此连接的信息",
+    "hideInfo": "点击折叠"
   },
   "mapKey": {
     "title": "地图图例",
@@ -2155,7 +2159,10 @@
       "normal": "正常",
       "strong": "强烈"
     },
-    "resetColor": "重置"
+    "resetColor": "重置",
+    "connInfo": "连接信息",
+    "connInfoFull": "始终显示",
+    "connInfoFolded": "折叠"
   },
   "mass": {
     "billionKg": "{{value}} 十亿 kg",
@@ -2880,5 +2887,29 @@
   },
   "scanPaste": {
     "otherCharacter": "未粘贴扫描：只使用在 {{name}} 的 EVE 窗口中复制的扫描（Nexum 应用设置）。"
+  },
+  "rollPlan": {
+    "title": "通过计划",
+    "addShip": "添加舰船",
+    "myRoller": "我的滚洞船：{{name}}（{{cold}}/{{hot}}）",
+    "removeShip": "移除 {{name}}",
+    "ship": "舰船",
+    "toggleHeat": "在冷/热之间切换",
+    "out": "去",
+    "back": "回",
+    "flown": "已通过",
+    "removePass": "移除此次通过",
+    "outcome": {
+      "safe": "此次通过后的已用质量。洞不会在这次关闭。",
+      "risky": "此次通过后的已用质量。洞可能在这次关闭。",
+      "collapse": "此次通过后的已用质量。洞会在这次关闭。"
+    },
+    "strands": "第 {{n}} 次通过可能在 {{ship}} 位于对面时关闭洞。",
+    "addPass": "添加通过",
+    "flyNext": "执行下一次",
+    "flyNextTitle": "{{ship}} 通过：已用质量增加 {{mass}}",
+    "undoFlown": "撤销已通过",
+    "clear": "清空计划",
+    "tooHeavy": "对这个洞来说太重（最大跳跃质量 {{max}}）"
   }
 }

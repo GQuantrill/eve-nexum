@@ -108,11 +108,16 @@ export function reevaluateConnectionsForSystem(
     // And only another sig tied to the link just as tightly keeps it alive. A
     // sig that merely leads to the same CLASS is a different hole -- Thera has
     // dozens of "HS" exits -- and must not stand in for the one deleted.
+    //
+    // Pinned by name is enough without a type: a hole jumped before it was
+    // scanned (or whose code nobody typed in) leads to the system it names
+    // just the same, and its vanishing from a re-scan should cut the link.
     if (breakOnOrphan && !conn.broken && oldSig) {
       const linkedOld = conn[endField] === oldSig.id;
-      const pinnedOld = !!(oldSig.whType && on && oldLeads === on);
+      const pinnedOld = !!(on && oldLeads === on);
       if (linkedOld || pinnedOld) {
-        const tied = !!on && backing.some((s) => (s.whLeadsTo ?? '').toUpperCase() === on);
+        const tied = !!on && allSigs.some((s) =>
+          s.id !== oldSig.id && (s.whLeadsTo ?? '').toUpperCase() === on);
         if (!tied) { updateConnection(conn.id, { broken: true }); continue; }
       }
     }

@@ -3,6 +3,12 @@ import type { WhSig } from './undivedWormholes';
 
 export const LINK_SIG_IDS_KEY = 'nexum.map.linkSigIds';
 
+// How much each link shows on the map: everything (as always), or folded to a
+// small marker you click to open, for maps with dozens of links. The line's
+// own colour and core still carry life and mass when folded.
+export const CONN_INFO_KEY = 'nexum.map.connInfo';
+export type ConnInfoMode = 'full' | 'folded';
+
 export interface LinkEndSigs { source: string | null; target: string | null }
 
 // The sig you warp to at each end of a link: the one the link is backed by, or

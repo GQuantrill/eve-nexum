@@ -29,6 +29,21 @@
   padding: var(--sp-1) var(--sp-4);
 }
 
+/* Folded link info (map setting "Connection info"): a marker in the type
+   badge's colours, clicked to open the full label. */
+.connection-label__fold {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  background: var(--surface-panel);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  padding: var(--sp-2);
+  cursor: pointer;
+}
+.connection-label__fold:hover { color: var(--text-default); border-color: var(--border-strong); }
+
 /* Corp/alliance-shared flag badge — sits beside the type badge, amber-tinted
    to draw the eye. The note (if set) surfaces via the global [data-tooltip]. */
 .connection-label__flag {

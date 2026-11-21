@@ -816,7 +816,9 @@
     "restoreTitle": "Effacer le marqueur de rupture et traiter à nouveau comme une connexion active",
     "gateNote": "Stargate classique — aucune donnée de trou de ver.",
     "gateProtected": "Les connexions par stargate existent en jeu et ne peuvent être ni supprimées ni modifiées.",
-    "jumpgateNote": "Pont Ansiblex — aucune donnée de trou de ver."
+    "jumpgateNote": "Pont Ansiblex — aucune donnée de trou de ver.",
+    "massUsedLabel": "Utilisée",
+    "massUsedTitle": "Masse déjà passée, en millions de kg. Saisissez-la si vous la connaissez (par exemple d'après le journal des sauts) ; le calculateur repart de là."
   },
   "contentFilter": {
     "hint": "Mettez en évidence les systèmes selon leur contenu scanné. Choisissez des types de signature ou d'anomalie, ou recherchez un nom de site ; les systèmes correspondants restent éclairés et les autres s'estompent.",
@@ -1722,7 +1724,9 @@
     "lessThan24h": "< 24h",
     "lessThan4h": "< 4 h",
     "lessThan1h": "< 1 h",
-    "broken": "Connexion rompue — la sig de trou de ver a été supprimée (trou effondré)"
+    "broken": "Connexion rompue — la sig de trou de ver a été supprimée (trou effondré)",
+    "showInfo": "Afficher les infos de cette connexion",
+    "hideInfo": "Cliquer pour replier"
   },
   "mapKey": {
     "title": "Légende de la carte",
@@ -2155,7 +2159,10 @@
       "normal": "Normale",
       "strong": "Forte"
     },
-    "resetColor": "Réinitialiser"
+    "resetColor": "Réinitialiser",
+    "connInfo": "Infos des connexions",
+    "connInfoFull": "Toujours affichées",
+    "connInfoFolded": "Repliées"
   },
   "mass": {
     "billionKg": "{{value}} Md kg",
@@ -2884,5 +2891,29 @@
   },
   "scanPaste": {
     "otherCharacter": "Scan non collé : seuls les scans copiés dans la fenêtre EVE de {{name}} sont utilisés (paramètres de l'application Nexum)."
+  },
+  "rollPlan": {
+    "title": "Plan de passages",
+    "addShip": "Ajouter un vaisseau",
+    "myRoller": "Mon roller : {{name}} ({{cold}}/{{hot}})",
+    "removeShip": "Retirer {{name}}",
+    "ship": "Vaisseau",
+    "toggleHeat": "Basculer entre froid et chaud",
+    "out": "aller",
+    "back": "retour",
+    "flown": "fait",
+    "removePass": "Retirer ce passage",
+    "outcome": {
+      "safe": "Masse utilisée après ce passage. Le trou ne peut pas se fermer dessus.",
+      "risky": "Masse utilisée après ce passage. Le trou pourrait se fermer dessus.",
+      "collapse": "Masse utilisée après ce passage. Le trou se ferme dessus."
+    },
+    "strands": "Le passage {{n}} pourrait fermer le trou avec {{ship}} de l'autre côté.",
+    "addPass": "Ajouter un passage",
+    "flyNext": "Passer le suivant",
+    "flyNextTitle": "{{ship}} passe : ajoute {{mass}} à la masse utilisée",
+    "undoFlown": "Annuler le dernier passage",
+    "clear": "Vider le plan",
+    "tooHeavy": "Trop lourd pour ce trou (saut max. {{max}})"
   }
 }

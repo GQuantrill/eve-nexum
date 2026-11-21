@@ -816,7 +816,9 @@
     "collapseConfirmHome": " Your roller ends on the Home side.",
     "rollIt": "Roll it",
     "removeConnection": "Remove connection only",
-    "removeConnectionAndSigs": "Remove connection and signatures"
+    "removeConnectionAndSigs": "Remove connection and signatures",
+    "massUsedLabel": "Used",
+    "massUsedTitle": "Mass that has gone through, in millions of kg. Type it in if you know it (say, from the jump log); the calculator works on from there."
   },
   "contentFilter": {
     "hint": "Spotlight systems by their scanned content. Pick signature or anomaly types, or search a site name; matching systems stay lit and the rest fade out.",
@@ -1722,7 +1724,9 @@
     "lessThan24h": "< 24h",
     "lessThan4h": "< 4 hrs",
     "lessThan1h": "< 1 hr",
-    "broken": "Connection broken — the wormhole sig was deleted (hole collapsed)"
+    "broken": "Connection broken — the wormhole sig was deleted (hole collapsed)",
+    "showInfo": "Show this connection's info",
+    "hideInfo": "Click to fold"
   },
   "mapKey": {
     "title": "Map key",
@@ -2155,7 +2159,10 @@
       "normal": "Normal",
       "strong": "Strong"
     },
-    "resetColor": "Reset"
+    "resetColor": "Reset",
+    "connInfo": "Connection info",
+    "connInfoFull": "Always shown",
+    "connInfoFolded": "Folded"
   },
   "mass": {
     "billionKg": "{{value}} B kg",
@@ -2884,5 +2891,29 @@
   },
   "scanPaste": {
     "otherCharacter": "Scan not pasted: only scans copied in {{name}}'s EVE window are used (Nexum app settings)."
+  },
+  "rollPlan": {
+    "title": "Pass plan",
+    "addShip": "Add a ship",
+    "myRoller": "My roller: {{name}} ({{cold}}/{{hot}})",
+    "removeShip": "Remove {{name}}",
+    "ship": "Ship",
+    "toggleHeat": "Switch between cold and hot",
+    "out": "out",
+    "back": "back",
+    "flown": "flown",
+    "removePass": "Remove this pass",
+    "outcome": {
+      "safe": "Mass used after this pass. The hole can't close on it.",
+      "risky": "Mass used after this pass. The hole might close on it.",
+      "collapse": "Mass used after this pass. The hole closes on it."
+    },
+    "strands": "Pass {{n}} could close the hole with {{ship}} on the far side.",
+    "addPass": "Add pass",
+    "flyNext": "Fly next",
+    "flyNextTitle": "{{ship}} goes through: adds {{mass}} to the mass used",
+    "undoFlown": "Undo flown",
+    "clear": "Clear plan",
+    "tooHeavy": "Too heavy for this hole (max jump {{max}})"
   }
 }

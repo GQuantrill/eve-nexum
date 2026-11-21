@@ -530,6 +530,74 @@
   user-select: none;
 }
 
+/* Pass plan (RollPlanPanel): the fleet's ships, then one line per pass,
+   cold green and hot red, with the mass used after it. */
+.roll-plan__ships {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-4);
+  margin: var(--sp-4) 0;
+}
+.roll-plan__ship {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-3);
+  color: var(--text-subtle);
+  background: var(--surface-panel);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: var(--sp-1) var(--sp-4);
+}
+.roll-plan__muted { color: var(--text-faint); }
+.roll-plan__x {
+  display: inline-flex;
+  background: none;
+  border: none;
+  color: var(--text-faint);
+  cursor: pointer;
+  padding: 0;
+}
+.roll-plan__x:hover { color: var(--danger); }
+.roll-plan__lines {
+  list-style: none;
+  margin: 0 0 var(--sp-4);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+.roll-plan__line {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+}
+.roll-plan__line--done { opacity: 0.55; }
+.roll-plan__n { color: var(--text-faint); min-width: 1.4em; text-align: right; }
+.roll-plan__shipname { color: var(--text-subtle); }
+.roll-plan__heat {
+  border: 1px solid var(--border);
+  border-left-width: 3px;
+  border-radius: 3px;
+  background: var(--surface-panel);
+  cursor: pointer;
+  padding: var(--sp-1) var(--sp-4);
+  white-space: nowrap;
+}
+.roll-plan__heat--cold { color: var(--success); border-left-color: var(--success); }
+.roll-plan__heat--hot  { color: var(--danger);  border-left-color: var(--danger); }
+.roll-plan__heat:disabled { cursor: default; }
+.roll-plan__dir { color: var(--text-subtle); white-space: nowrap; }
+.roll-plan__after {
+  margin-left: auto;
+  border-left: 3px solid transparent;
+  padding-left: var(--sp-4);
+  color: var(--text-default);
+}
+.roll-plan__after--safe     { border-left-color: var(--success); }
+.roll-plan__after--risky    { border-left-color: var(--warning); }
+.roll-plan__after--collapse { border-left-color: var(--danger); }
+
 .field {
   display: flex;
   flex-direction: column;

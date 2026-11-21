@@ -816,7 +816,9 @@
     "restoreTitle": "切断フラグを解除し、再び有効な接続として扱います",
     "gateNote": "通常のスターゲート — ワームホールデータはありません。",
     "gateProtected": "スターゲート接続はゲーム内に実在するため、削除・変更できません。",
-    "jumpgateNote": "Ansiblex ジャンプブリッジ — ワームホールデータはありません。"
+    "jumpgateNote": "Ansiblex ジャンプブリッジ — ワームホールデータはありません。",
+    "massUsedLabel": "通過済み",
+    "massUsedTitle": "すでに通過した質量（百万 kg 単位）。分かっていれば入力してください（ジャンプログからなど）。計算機はそこから計算を続けます。"
   },
   "contentFilter": {
     "hint": "スキャンしたコンテンツでシステムを強調表示します。シグネチャやアノマリーのタイプを選ぶか、サイト名を検索します。一致するシステムは点灯したまま、それ以外は薄く表示されます。",
@@ -1722,7 +1724,9 @@
     "lessThan24h": "< 24h",
     "lessThan4h": "< 4h",
     "lessThan1h": "< 1h",
-    "broken": "接続が切断されました — ワームホールシグが削除されました（ホール崩壊）"
+    "broken": "接続が切断されました — ワームホールシグが削除されました（ホール崩壊）",
+    "showInfo": "この接続の情報を表示",
+    "hideInfo": "クリックで折りたたむ"
   },
   "mapKey": {
     "title": "マップの凡例",
@@ -2155,7 +2159,10 @@
       "normal": "標準",
       "strong": "強め"
     },
-    "resetColor": "リセット"
+    "resetColor": "リセット",
+    "connInfo": "接続の情報",
+    "connInfoFull": "常に表示",
+    "connInfoFolded": "折りたたむ"
   },
   "mass": {
     "billionKg": "{{value}}十億 kg",
@@ -2880,5 +2887,29 @@
   },
   "scanPaste": {
     "otherCharacter": "スキャンは貼り付けられませんでした：{{name}} の EVE ウィンドウでコピーしたスキャンのみ使用します（Nexum アプリの設定）。"
+  },
+  "rollPlan": {
+    "title": "通過プラン",
+    "addShip": "艦船を追加",
+    "myRoller": "自分のローラー：{{name}}（{{cold}}/{{hot}}）",
+    "removeShip": "{{name}} を削除",
+    "ship": "艦船",
+    "toggleHeat": "コールドとホットを切り替え",
+    "out": "往路",
+    "back": "復路",
+    "flown": "通過済み",
+    "removePass": "この通過を削除",
+    "outcome": {
+      "safe": "この通過後の使用質量。この通過でホールは閉じません。",
+      "risky": "この通過後の使用質量。この通過でホールが閉じる可能性があります。",
+      "collapse": "この通過後の使用質量。この通過でホールが閉じます。"
+    },
+    "strands": "{{n}} 番目の通過で、{{ship}} が向こう側にいるままホールが閉じる可能性があります。",
+    "addPass": "通過を追加",
+    "flyNext": "次を通過",
+    "flyNextTitle": "{{ship}} が通過：使用質量に {{mass}} を加算",
+    "undoFlown": "通過済みを取り消す",
+    "clear": "プランを消去",
+    "tooHeavy": "このホールには重すぎます（最大ジャンプ質量 {{max}}）"
   }
 }

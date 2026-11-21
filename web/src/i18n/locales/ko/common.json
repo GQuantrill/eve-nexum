@@ -816,7 +816,9 @@
     "restoreTitle": "끊김 플래그를 해제하고 다시 활성 연결로 처리합니다",
     "gateNote": "일반 스타게이트 — 추적할 웜홀 데이터 없음.",
     "gateProtected": "스타게이트 연결은 게임에 실제로 존재하므로 제거하거나 변경할 수 없습니다.",
-    "jumpgateNote": "Ansiblex 점프 브리지 — 추적할 웜홀 데이터 없음."
+    "jumpgateNote": "Ansiblex 점프 브리지 — 추적할 웜홀 데이터 없음.",
+    "massUsedLabel": "사용됨",
+    "massUsedTitle": "이미 통과한 질량(백만 kg 단위). 알고 있다면 입력하세요(예: 점프 기록에서). 계산기가 그 값부터 계산합니다."
   },
   "contentFilter": {
     "hint": "스캔한 콘텐츠로 시스템을 강조합니다. 시그니처나 어노말리 유형을 선택하거나 사이트 이름을 검색하세요. 일치하는 시스템은 밝게 유지되고 나머지는 흐려집니다.",
@@ -1722,7 +1724,9 @@
     "lessThan24h": "< 24h",
     "lessThan4h": "< 4h",
     "lessThan1h": "< 1h",
-    "broken": "연결 끊김 — 웜홀 시그니처가 삭제되었습니다(홀 붕괴)"
+    "broken": "연결 끊김 — 웜홀 시그니처가 삭제되었습니다(홀 붕괴)",
+    "showInfo": "이 연결의 정보 보기",
+    "hideInfo": "클릭해서 접기"
   },
   "mapKey": {
     "title": "지도 범례",
@@ -2155,7 +2159,10 @@
       "normal": "보통",
       "strong": "강하게"
     },
-    "resetColor": "초기화"
+    "resetColor": "초기화",
+    "connInfo": "연결 정보",
+    "connInfoFull": "항상 표시",
+    "connInfoFolded": "접기"
   },
   "mass": {
     "billionKg": "{{value}}십억 kg",
@@ -2880,5 +2887,29 @@
   },
   "scanPaste": {
     "otherCharacter": "스캔을 붙여넣지 않았습니다: {{name}}의 EVE 창에서 복사한 스캔만 사용합니다 (Nexum 앱 설정)."
+  },
+  "rollPlan": {
+    "title": "통과 계획",
+    "addShip": "함선 추가",
+    "myRoller": "내 롤러: {{name}} ({{cold}}/{{hot}})",
+    "removeShip": "{{name}} 제거",
+    "ship": "함선",
+    "toggleHeat": "콜드/핫 전환",
+    "out": "가기",
+    "back": "오기",
+    "flown": "완료",
+    "removePass": "이 통과 제거",
+    "outcome": {
+      "safe": "이 통과 후 사용된 질량. 이번에 구멍이 닫힐 수 없습니다.",
+      "risky": "이 통과 후 사용된 질량. 이번에 구멍이 닫힐 수 있습니다.",
+      "collapse": "이 통과 후 사용된 질량. 이번에 구멍이 닫힙니다."
+    },
+    "strands": "{{n}}번째 통과에서 {{ship}}이(가) 반대편에 있는 채로 구멍이 닫힐 수 있습니다.",
+    "addPass": "통과 추가",
+    "flyNext": "다음 통과",
+    "flyNextTitle": "{{ship}} 통과: 사용 질량에 {{mass}} 추가",
+    "undoFlown": "완료 취소",
+    "clear": "계획 비우기",
+    "tooHeavy": "이 구멍에는 너무 무겁습니다 (최대 점프 {{max}})"
   }
 }

@@ -816,7 +816,9 @@
     "restoreTitle": "Limpar a marca de quebrada e tratar novamente como uma conexão ativa",
     "gateNote": "Stargate normal — sem dados de buraco de minhoca.",
     "gateProtected": "As conexões por stargate existem no jogo e não podem ser removidas nem alteradas.",
-    "jumpgateNote": "Ponte Ansiblex — sem dados de buraco de minhoca."
+    "jumpgateNote": "Ponte Ansiblex — sem dados de buraco de minhoca.",
+    "massUsedLabel": "Usada",
+    "massUsedTitle": "Massa que já passou, em milhões de kg. Digite se souber (por exemplo, pelo registro de saltos); a calculadora segue a partir daí."
   },
   "contentFilter": {
     "hint": "Destaque sistemas pelo conteúdo escaneado. Escolha tipos de assinatura ou anomalia, ou pesquise o nome de um site; os sistemas correspondentes permanecem acesos e o resto desaparece.",
@@ -1722,7 +1724,9 @@
     "lessThan24h": "< 24h",
     "lessThan4h": "< 4 h",
     "lessThan1h": "< 1 h",
-    "broken": "Conexão quebrada — a assinatura de buraco de minhoca foi eliminada (buraco colapsou)"
+    "broken": "Conexão quebrada — a assinatura de buraco de minhoca foi eliminada (buraco colapsou)",
+    "showInfo": "Mostrar a info desta conexão",
+    "hideInfo": "Clique para recolher"
   },
   "mapKey": {
     "title": "Legenda do mapa",
@@ -2155,7 +2159,10 @@
       "normal": "Normal",
       "strong": "Forte"
     },
-    "resetColor": "Redefinir"
+    "resetColor": "Redefinir",
+    "connInfo": "Info das conexões",
+    "connInfoFull": "Sempre visível",
+    "connInfoFolded": "Recolhida"
   },
   "mass": {
     "billionKg": "{{value}} mil M kg",
@@ -2884,5 +2891,29 @@
   },
   "scanPaste": {
     "otherCharacter": "Scan não colado: só são usados scans copiados na janela do EVE de {{name}} (configurações do app Nexum)."
+  },
+  "rollPlan": {
+    "title": "Plano de passagens",
+    "addShip": "Adicionar uma nave",
+    "myRoller": "Meu roller: {{name}} ({{cold}}/{{hot}})",
+    "removeShip": "Remover {{name}}",
+    "ship": "Nave",
+    "toggleHeat": "Alternar entre frio e quente",
+    "out": "ida",
+    "back": "volta",
+    "flown": "feita",
+    "removePass": "Remover esta passagem",
+    "outcome": {
+      "safe": "Massa usada após esta passagem. O buraco não pode fechar nela.",
+      "risky": "Massa usada após esta passagem. O buraco pode fechar nela.",
+      "collapse": "Massa usada após esta passagem. O buraco fecha nela."
+    },
+    "strands": "A passagem {{n}} pode fechar o buraco com {{ship}} do outro lado.",
+    "addPass": "Adicionar passagem",
+    "flyNext": "Fazer a próxima",
+    "flyNextTitle": "{{ship}} passa: soma {{mass}} à massa usada",
+    "undoFlown": "Desfazer a feita",
+    "clear": "Limpar o plano",
+    "tooHeavy": "Pesada demais para este buraco (salto máx. {{max}})"
   }
 }
