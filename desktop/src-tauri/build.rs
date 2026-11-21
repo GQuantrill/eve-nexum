@@ -18,6 +18,7 @@ fn main() {
             "intel_feed",
             "open_settings_window",
             "attention",
+            "save_file",
         ]),
     ))
     .expect("failed to run tauri-build");

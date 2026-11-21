@@ -2881,5 +2881,8 @@
     "locked": "Este mapa está bloqueado, así que no se le añade nada.",
     "add": "Añadir al mapa",
     "hide": "Ocultar"
+  },
+  "scanPaste": {
+    "otherCharacter": "Escaneo no pegado: solo se usan los escaneos copiados en la ventana de EVE de {{name}} (ajustes de la aplicación Nexum)."
   }
 }

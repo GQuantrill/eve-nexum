@@ -75,6 +75,77 @@ fn attention(app: AppHandle) {
     }
 }
 
+/// From the Nexum page: save a file it made (a map export, an admin CSV)
+/// where the pilot chooses. The page's own download link does nothing in the
+/// Linux webview (a blob: address is never let into the window), so the page
+/// sends the bytes here instead. Only the name is suggested: the pilot picks
+/// the place in the system's save dialog, and nothing is written without it.
+/// Ok(false) when they cancel.
+#[tauri::command]
+async fn save_file(app: AppHandle, request: tauri::ipc::Request<'_>) -> Result<bool, String> {
+    use tauri_plugin_dialog::DialogExt;
+    let tauri::ipc::InvokeBody::Raw(bytes) = request.body() else {
+        return Err("expected file bytes".into());
+    };
+    let name = request
+        .headers()
+        .get("x-file-name")
+        .and_then(|v| v.to_str().ok())
+        .map(|v| percent_decode(v))
+        .unwrap_or_default();
+    let name = safe_file_name(&name);
+    let ext = name.rsplit_once('.').map(|(_, e)| e.to_string()).unwrap_or_default();
+    let mut dialog = app.dialog().file().set_file_name(&name);
+    if !ext.is_empty() {
+        dialog = dialog.add_filter(ext.to_uppercase(), &[ext.as_str()]);
+    }
+    if let Some(w) = app.get_webview_window("main") {
+        dialog = dialog.set_parent(&w);
+    }
+    let (tx, rx) = std::sync::mpsc::channel();
+    dialog.save_file(move |p| {
+        let _ = tx.send(p);
+    });
+    let bytes = bytes.clone();
+    tauri::async_runtime::spawn_blocking(move || {
+        let Some(path) = rx.recv().ok().flatten() else { return Ok(false) };
+        let path = path.into_path().map_err(|e| e.to_string())?;
+        std::fs::write(&path, &bytes).map_err(|e| e.to_string())?;
+        Ok(true)
+    })
+    .await
+    .map_err(|e| e.to_string())?
+}
+
+/// "%20"-style escapes, as the page's encodeURIComponent sends the name.
+fn percent_decode(s: &str) -> String {
+    url::form_urlencoded::parse(format!("n={}", s.replace('+', "%2B")).as_bytes())
+        .next()
+        .map(|(_, v)| v.into_owned())
+        .unwrap_or_default()
+}
+
+/// A plain file name to suggest: no folders, no control characters, not
+/// hidden, not too long.
+fn safe_file_name(name: &str) -> String {
+    let base = name.rsplit(['/', '\\']).next().unwrap_or("");
+    let clean: String = base
+        .chars()
+        .filter(|c| !c.is_control() && !matches!(c, ':' | '*' | '?' | '"' | '<' | '>' | '|'))
+        .take(120)
+        .collect();
+    let clean = clean.trim().trim_start_matches('.').to_string();
+    if clean.is_empty() { "nexum-export".into() } else { clean }
+}
+
+/// A web link the page wants opened outside the app: the system browser, for
+/// http(s) only. Nothing else (file:, custom app schemes) is handed to the OS.
+fn open_outside(app: &AppHandle, url: &url::Url) {
+    if matches!(url.scheme(), "http" | "https") {
+        let _ = app.opener().open_url(url.as_str(), None::<&str>);
+    }
+}
+
 /// Pop-out windows (a sidebar pane on its own): labelled "popout-<pane>".
 const POPOUT_PREFIX: &str = "popout-";
 
@@ -124,10 +195,15 @@ async fn open_popout(app: AppHandle, pane: String, title: String, url: String) -
             if allowed_in_window(t, &server) {
                 return true;
             }
-            if matches!(t.scheme(), "http" | "https") {
-                let _ = nav_app.opener().open_url(t.as_str(), None::<&str>);
-            }
+            open_outside(&nav_app, t);
             false
+        })
+        .on_new_window({
+            let app = app.clone();
+            move |t, _| {
+                open_outside(&app, &t);
+                tauri::webview::NewWindowResponse::Deny
+            }
         })
         .build()
         .map(|w| {
@@ -369,6 +445,9 @@ pub fn run() {
         .plugin(tauri_plugin_autostart::init(MacosLauncher::LaunchAgent, Some(vec![START_HIDDEN_ARG])))
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_opener::init())
+        // The save dialog for save_file. The site gets no dialog permissions
+        // of its own: only this app's code opens one.
+        .plugin(tauri_plugin_dialog::init())
         .plugin(
             tauri_plugin_global_shortcut::Builder::new()
                 .with_handler(|app, _shortcut, event| {
@@ -391,6 +470,7 @@ pub fn run() {
             close_popout,
             overlay::overlay_state,
             intel_feed,
+            save_file,
             open_settings_window,
             attention
         ])
@@ -428,7 +508,8 @@ pub fn run() {
                     .permission("allow-attention")
                     .permission("allow-overlay-update")
                     .permission("allow-open-popout")
-                    .permission("allow-close-popout"),
+                    .permission("allow-close-popout")
+                    .permission("allow-save-file"),
             )?;
 
             let nav_server = server.clone();
@@ -443,12 +524,19 @@ pub fn run() {
                     if allowed_in_window(target, &nav_server) {
                         return true;
                     }
-                    // Web links go to the system browser. Nothing else (file:,
-                    // custom app schemes) is ever handed to the OS.
-                    if matches!(target.scheme(), "http" | "https") {
-                        let _ = nav_app.opener().open_url(target.as_str(), None::<&str>);
-                    }
+                    // Web links go to the system browser.
+                    open_outside(&nav_app, target);
                     false
+                })
+                // A link that opens a new window (target="_blank": killmails,
+                // zKillboard, Dotlan) goes to the system browser too. Without
+                // this the webview dropped it and the click did nothing.
+                .on_new_window({
+                    let app = handle.clone();
+                    move |target, _| {
+                        open_outside(&app, &target);
+                        tauri::webview::NewWindowResponse::Deny
+                    }
                 })
                 .build()?;
             apply(&handle, &s);
@@ -482,7 +570,20 @@ pub fn run() {
 
 #[cfg(test)]
 mod tests {
-    use super::allowed_in_window;
+    use super::{allowed_in_window, percent_decode, safe_file_name};
+
+    #[test]
+    fn save_names() {
+        assert_eq!(safe_file_name("My_Map.json"), "My_Map.json");
+        assert_eq!(safe_file_name("../../.bashrc"), "bashrc");
+        assert_eq!(safe_file_name("C:\\Windows\\evil.exe"), "evil.exe");
+        assert_eq!(safe_file_name("a\nb:c?.png"), "abc.png");
+        assert_eq!(safe_file_name(""), "nexum-export");
+        assert_eq!(safe_file_name("..."), "nexum-export");
+        assert_eq!(safe_file_name(&"x".repeat(500)).len(), 120);
+        assert_eq!(percent_decode("nexum_Home_2026-11-21.png"), "nexum_Home_2026-11-21.png");
+        assert_eq!(percent_decode("a%20b%2Bc%26d.csv"), "a b+c&d.csv");
+    }
 
     #[test]
     fn navigation() {

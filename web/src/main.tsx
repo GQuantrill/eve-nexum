@@ -24,6 +24,7 @@ import './styles/landing.css' // public landing page + interactive demo
 import App from './App.tsx'
 import { startUpdateCheck } from './utils/updateCheck'
 import { clearXTab } from './hooks/crossTabPoll'
+import { isDesktop } from './desktop/bridge'
 
 // Back from an EVE login (sign-in, added character, changed access): what the
 // character allows may have changed, so drop every shared poll value before
@@ -32,6 +33,10 @@ import { clearXTab } from './hooks/crossTabPoll'
   const p = new URLSearchParams(window.location.search)
   if (p.has('access_updated') || p.has('added') || p.get('login') === 'success') clearXTab()
 }
+
+// The desktop app on Linux: its webview needs its own scrollbar rule
+// (index.css).
+if (isDesktop() && /Linux/.test(navigator.userAgent)) document.documentElement.dataset.desktopOs = 'linux'
 
 // Wait for the detected language's strings before the first paint. Only
 // English ships with the app, so rendering immediately would show a frame of

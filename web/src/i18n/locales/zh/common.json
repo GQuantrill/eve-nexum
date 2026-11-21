@@ -2877,5 +2877,8 @@
     "locked": "此地图已锁定，因此不会添加任何内容。",
     "add": "添加到地图",
     "hide": "隐藏"
+  },
+  "scanPaste": {
+    "otherCharacter": "未粘贴扫描：只使用在 {{name}} 的 EVE 窗口中复制的扫描（Nexum 应用设置）。"
   }
 }

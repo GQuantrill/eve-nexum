@@ -8,7 +8,8 @@
 // - a directional scan (lines of type id, name, type, distance, tab-separated),
 //   which the window opens in its d-scan analyser.
 // Anything else is dropped on the spot: nothing is kept (only a fingerprint
-// of the last copy, to spot the next one), logged or sent anywhere. The app
+// of the last copy where there's no copy counter, to spot the next one),
+// logged or sent anywhere. The app
 // never changes the clipboard.
 
 use regex::Regex;
@@ -21,8 +22,15 @@ use tauri_plugin_clipboard_manager::ClipboardExt;
 use crate::{foreground, AppState};
 
 #[derive(Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
 struct Scan {
     text: String,
+    /// The character in the EVE window it was copied in (its title), when
+    /// known.
+    character: Option<String>,
+    /// The pilot wants only scans copied by the character the map tracks.
+    /// The Nexum window knows which that is, so it decides.
+    tracked_only: bool,
 }
 
 /// A d-scan: most non-blank lines are "<type id>\t<name>\t<type>\t<distance>".
@@ -55,12 +63,12 @@ fn fingerprint(text: &str) -> u64 {
     h.finish()
 }
 
-/// What says the clipboard changed: Windows' copy counter (no reading
-/// needed), else a fingerprint of the text (read, then only the fingerprint
-/// is kept).
-fn marker(app: &AppHandle) -> Option<(u64, Option<String>)> {
-    if let Some(seq) = foreground::clipboard_sequence() {
-        return Some((seq, None));
+/// What says the clipboard changed: a count of copies (foreground.rs; no
+/// reading needed), else a fingerprint of the text (read, then only the
+/// fingerprint is kept).
+fn marker(app: &AppHandle, copies: &mut foreground::CopyCounter) -> Option<(u64, Option<String>)> {
+    if let Some(n) = copies.count() {
+        return Some((n, None));
     }
     let text = app.clipboard().read_text().ok()?;
     Some((fingerprint(&text), Some(text)))
@@ -69,12 +77,17 @@ fn marker(app: &AppHandle) -> Option<(u64, Option<String>)> {
 pub fn start(app: AppHandle) {
     std::thread::spawn(move || {
         let mut probe = foreground::Probe::default();
+        let mut copies = foreground::CopyCounter::default();
         // EVE in front at the last check; the clipboard's marker then.
         let mut eve_before = false;
         let mut last: Option<u64> = None;
         loop {
             std::thread::sleep(Duration::from_millis(300));
-            let enabled = app.state::<AppState>().settings.lock().unwrap().watch_clipboard;
+            let (enabled, tracked_only) = {
+                let s = app.state::<AppState>();
+                let s = s.settings.lock().unwrap();
+                (s.watch_clipboard, s.scan_tracked_only)
+            };
             if !enabled {
                 eve_before = false;
                 last = None;
@@ -87,14 +100,14 @@ pub fn start(app: AppHandle) {
                     // EVE just came to the front: note what's there now (copied
                     // elsewhere), so only a later copy counts. On Linux this is
                     // a read whose text is dropped at once.
-                    last = marker(&app).map(|(m, _)| m);
+                    last = marker(&app, &mut copies).map(|(m, _)| m);
                 }
                 continue;
             }
             // EVE was in front a moment ago, so a copy since then was made in
             // EVE (this check runs even if you've just switched away, so a
             // copy-then-Alt+Tab still counts).
-            let Some((m, text)) = marker(&app) else { continue };
+            let Some((m, text)) = marker(&app, &mut copies) else { continue };
             if last == Some(m) {
                 continue;
             }
@@ -103,11 +116,14 @@ pub fn start(app: AppHandle) {
             if text.len() > MAX_SCAN_BYTES {
                 continue;
             }
-            if looks_like_probe_scan(&text) {
-                let _ = app.emit_to("main", "nexum://scan", Scan { text });
+            let event = if looks_like_probe_scan(&text) {
+                "nexum://scan"
             } else if looks_like_dscan(&text) {
-                let _ = app.emit_to("main", "nexum://dscan", Scan { text });
-            }
+                "nexum://dscan"
+            } else {
+                continue;
+            };
+            let _ = app.emit_to("main", event, Scan { text, character: probe.character(), tracked_only });
         }
     });
 }

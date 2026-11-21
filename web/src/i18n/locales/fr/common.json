@@ -2881,5 +2881,8 @@
     "locked": "Cette carte est verrouillée, rien n'y est donc ajouté.",
     "add": "Ajouter à la carte",
     "hide": "Masquer"
+  },
+  "scanPaste": {
+    "otherCharacter": "Scan non collé : seuls les scans copiés dans la fenêtre EVE de {{name}} sont utilisés (paramètres de l'application Nexum)."
   }
 }

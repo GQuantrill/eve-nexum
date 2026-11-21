@@ -27,13 +27,14 @@ sys-locale = "0.3"
 tauri-plugin-updater = "2"
 tokio = { version = "1", features = ["time"] }
 tauri-plugin-autostart = "2"
+tauri-plugin-dialog = "2"
 
 # Is EVE the window in front (foreground.rs): only a copy made in EVE is used.
 [target.'cfg(windows)'.dependencies]
 windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_System_Threading", "Win32_System_DataExchange", "Win32_UI_WindowsAndMessaging"] }
 
 [target.'cfg(target_os = "linux")'.dependencies]
-x11rb = "0.13"
+x11rb = { version = "0.13", features = ["xfixes"] }
 
 [features]
 # Microsoft Store build: no self-updater, no registry "start at login".

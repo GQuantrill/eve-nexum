@@ -2881,5 +2881,8 @@
     "locked": "This map is locked, so nothing is added to it.",
     "add": "Add to map",
     "hide": "Hide"
+  },
+  "scanPaste": {
+    "otherCharacter": "Scan not pasted: only scans copied in {{name}}'s EVE window are used (Nexum app settings)."
   }
 }

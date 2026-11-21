@@ -26,7 +26,8 @@ import { NOTIFY, notifyDefault, previewAlertVolume, ALERT_VOLUME_KEY, ALERT_VOLU
 import { useResettableState } from "../../hooks/useResettableState";
 import { DEFAULT_BOOKMARK_FORMAT, BOOKMARK_TOKENS, DEFAULT_SITE_BOOKMARK_FORMAT, SITE_BOOKMARK_TOKENS, K162_BOOKMARK_FORMAT_KEY } from "../../utils/signatureBookmark";
 import { COPY_BOOKMARK_ON_JUMP } from "../../hooks/whJumpConfirm";
-import { toPng } from "html-to-image";
+import { toBlob } from "html-to-image";
+import { saveFile } from "../../utils/saveFile";
 import { CaretLeftIcon, CaretRightIcon, DiscordLogoIcon } from "@phosphor-icons/react";
 import { DISCORD_INVITE_URL } from "../../data/links";
 import { JumpRangePane } from "./JumpRangePane";
@@ -914,7 +915,7 @@ export function MapSidebar() {
       return;
     }
     try {
-      const dataUrl = await toPng(target, {
+      const blob = await toBlob(target, {
         backgroundColor: "#08101a",
         pixelRatio: 2,
         filter: (node) => {
@@ -928,12 +929,10 @@ export function MapSidebar() {
           );
         },
       });
-      const link = document.createElement("a");
+      if (!blob) throw new Error("empty image");
       const { map } = useMapStore.getState();
       const safeName = (map.name || "map").replace(/[^a-z0-9]/gi, "_");
-      link.download = `nexum_${safeName}_${new Date().toISOString().split("T")[0]}.png`;
-      link.href = dataUrl;
-      link.click();
+      await saveFile(`nexum_${safeName}_${new Date().toISOString().split("T")[0]}.png`, blob);
     } catch (err) {
       toast.error(
         t("mapSidebar.exportFailed", { error: err instanceof Error ? err.message : String(err) }),
@@ -1066,12 +1065,7 @@ export function MapSidebar() {
     try {
       const backup = await api<unknown>(`/api/maps/${map.id}/export`);
       const blob = new Blob([JSON.stringify(backup)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${map.name.replace(/[^a-z0-9]/gi, "_")}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
+      await saveFile(`${map.name.replace(/[^a-z0-9]/gi, "_")}.json`, blob);
     } catch (err) {
       toast.error(t("mapSidebar.exportFailed", { error: err instanceof Error ? err.message : String(err) }));
     }

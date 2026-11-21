@@ -4,7 +4,13 @@
 // may depend on the desktop being there -- each feature checks isDesktop().
 
 interface TauriGlobal {
-  core:  { invoke: <T>(cmd: string, args?: Record<string, unknown>) => Promise<T> };
+  core:  {
+    invoke: <T>(
+      cmd: string,
+      args?: Record<string, unknown> | Uint8Array,
+      options?: { headers?: Record<string, string> },
+    ) => Promise<T>;
+  };
   event: { listen: <T>(event: string, cb: (e: { payload: T }) => void) => Promise<() => void> };
 }
 
@@ -22,6 +28,13 @@ export function isDesktop(): boolean {
 export function desktopInvoke<T>(cmd: string, args?: Record<string, unknown>): Promise<T> {
   const t = tauri();
   return t ? t.core.invoke<T>(cmd, args) : Promise.reject(new Error('not desktop'));
+}
+
+/** Call a desktop command with raw bytes as its body (a file to save), plus
+ *  headers for anything else it needs. Rejects on the web. */
+export function desktopInvokeBytes<T>(cmd: string, bytes: Uint8Array, headers: Record<string, string>): Promise<T> {
+  const t = tauri();
+  return t ? t.core.invoke<T>(cmd, bytes, { headers }) : Promise.reject(new Error('not desktop'));
 }
 
 /** Listen to a desktop event. Returns an unsubscribe; a no-op on the web. */
