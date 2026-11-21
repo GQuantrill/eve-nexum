@@ -1638,7 +1638,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                       className="icon-btn"
                       onClick={() => (sig.sigType === 'wormhole' ? copyBookmark(sig) : copySiteBookmark(sig))}
                       title={t('signatures.copyBookmark')}
-                    ><CopyIcon size={16} weight="bold" /></button>
+                    ><CopyIcon size={20} weight="bold" /></button>
                   </td>
                 )}
                 {isColShown('name') && (
