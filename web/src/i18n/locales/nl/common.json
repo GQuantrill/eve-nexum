@@ -2915,5 +2915,11 @@
     "undoFlown": "Gevlogen ongedaan maken",
     "clear": "Plan wissen",
     "tooHeavy": "Te zwaar voor dit gat (max. sprongmassa {{max}})"
+  },
+  "errorScreen": {
+    "title": "Er ging iets mis",
+    "hint": "Nexum liep tegen een fout aan en is gestopt. Herlaad om verder te gaan. Kopieer de details en stuur ze ons om het te melden.",
+    "reload": "Herladen",
+    "copy": "Foutdetails kopiëren"
   }
 }

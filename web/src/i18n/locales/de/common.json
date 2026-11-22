@@ -2915,5 +2915,11 @@
     "undoFlown": "Geflogenen zurücknehmen",
     "clear": "Plan leeren",
     "tooHeavy": "Zu schwer für dieses Loch (max. Sprungmasse {{max}})"
+  },
+  "errorScreen": {
+    "title": "Etwas ist schiefgelaufen",
+    "hint": "Nexum ist auf einen Fehler gestoßen und hat angehalten. Neu laden, um weiterzumachen. Um ihn zu melden, kopiere die Details und schick sie uns.",
+    "reload": "Neu laden",
+    "copy": "Fehlerdetails kopieren"
   }
 }

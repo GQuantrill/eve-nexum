@@ -2915,5 +2915,11 @@
     "undoFlown": "Desfazer a feita",
     "clear": "Limpar o plano",
     "tooHeavy": "Pesada demais para este buraco (salto máx. {{max}})"
+  },
+  "errorScreen": {
+    "title": "Algo deu errado",
+    "hint": "O Nexum encontrou um erro e parou. Recarregue para continuar. Para relatar, copie os detalhes e envie-os para nós.",
+    "reload": "Recarregar",
+    "copy": "Copiar detalhes do erro"
   }
 }

@@ -2915,5 +2915,11 @@
     "undoFlown": "Annuler le dernier passage",
     "clear": "Vider le plan",
     "tooHeavy": "Trop lourd pour ce trou (saut max. {{max}})"
+  },
+  "errorScreen": {
+    "title": "Une erreur s'est produite",
+    "hint": "Nexum a rencontré une erreur et s'est arrêté. Rechargez pour continuer. Pour la signaler, copiez les détails et envoyez-les-nous.",
+    "reload": "Recharger",
+    "copy": "Copier les détails de l'erreur"
   }
 }

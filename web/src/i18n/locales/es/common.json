@@ -2915,5 +2915,11 @@
     "undoFlown": "Deshacer la hecha",
     "clear": "Vaciar el plan",
     "tooHeavy": "Demasiado pesada para este agujero (salto máx. {{max}})"
+  },
+  "errorScreen": {
+    "title": "Algo salió mal",
+    "hint": "Nexum encontró un error y se detuvo. Recarga para continuar. Para informarlo, copia los detalles y envíanoslos.",
+    "reload": "Recargar",
+    "copy": "Copiar detalles del error"
   }
 }

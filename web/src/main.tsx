@@ -22,6 +22,7 @@ import './styles/cards.css' // draggable info cards + floating panel
 import './styles/panels.css' // side panel, mass tracker, chain-effect summary (uses .btn from buttons.css)
 import './styles/landing.css' // public landing page + interactive demo
 import App from './App.tsx'
+import { ErrorBoundary } from './components/ErrorBoundary'
 import { startUpdateCheck } from './utils/updateCheck'
 import { clearXTab } from './hooks/crossTabPoll'
 import { isDesktop } from './desktop/bridge'
@@ -47,7 +48,9 @@ if (isDesktop() && /Linux/.test(navigator.userAgent)) document.documentElement.d
 void ensureLanguage(i18n.language).finally(() => {
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
-      <App />
+      <ErrorBoundary>
+        <App />
+      </ErrorBoundary>
     </StrictMode>,
   )
   startUpdateCheck()

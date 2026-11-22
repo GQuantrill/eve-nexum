@@ -29,6 +29,25 @@ export const ANN = {
 
 interface NearbyLawless { eveSystemId: number; name: string; security: number; jumps: number }
 
+// Incursions already announced, by system. An incursion sits in place for
+// days: a pilot living near one was told "Incursion 2 jumps out" every time
+// they came home. The voice now says it once per incursion (the proximity
+// beep still plays on each entry); it can speak again once that incursion
+// has ended and another spawns there. Kept across restarts.
+const SPOKEN_INCURSIONS_KEY = 'nexum.announcer.spokenIncursions';
+
+function loadSpokenIncursions(): Set<number> {
+  try {
+    const raw = localStorage.getItem(SPOKEN_INCURSIONS_KEY);
+    const list: unknown = raw ? JSON.parse(raw) : [];
+    return new Set(Array.isArray(list) ? list.filter((n): n is number => Number.isInteger(n)) : []);
+  } catch { return new Set(); }
+}
+
+function saveSpokenIncursions(ids: Set<number>): void {
+  try { localStorage.setItem(SPOKEN_INCURSIONS_KEY, JSON.stringify([...ids])); } catch { /* ignore */ }
+}
+
 function jumpWord(n: number): string {
   return n === 1 ? '1 jump' : `${n} jumps`;
 }
@@ -88,23 +107,37 @@ export function useAnnouncerEvents(active = true): void {
   const incursionIds = useMemo(() => incursions.map((i) => i.systemId), [incursions]);
   const incRoutes = useRoute(currentSys, incursionIds, 'active');
   const nearestIncursion = useMemo(() => {
-    let best: { jumps: number; name: string } | null = null;
+    let best: { systemId: number; jumps: number; name: string } | null = null;
     for (const [idStr, entry] of Object.entries(incRoutes)) {
       if (!incursionIds.includes(Number(idStr))) continue;
       if (!best || entry.jumps < best.jumps) {
         const last = entry.path[entry.path.length - 1];
-        best = { jumps: entry.jumps, name: last?.name ?? '' };
+        best = { systemId: Number(idStr), jumps: entry.jumps, name: last?.name ?? '' };
       }
     }
     return best;
   }, [incRoutes, incursionIds]);
+  const spokenIncursions = useRef<Set<number> | null>(null);
+  // Forget incursions that have ended. Only on a real list: it is empty until
+  // the first fetch, and forgetting everything then would repeat them all.
+  useEffect(() => {
+    if (!incursionIds.length) return;
+    const spoken = (spokenIncursions.current ??= loadSpokenIncursions());
+    const live = new Set(incursionIds);
+    let changed = false;
+    for (const id of spoken) if (!live.has(id)) { spoken.delete(id); changed = true; }
+    if (changed) saveSpokenIncursions(spoken);
+  }, [incursionIds]);
   const incInZone = useRef(false);
   useEffect(() => {
     const inZone = !!nearestIncursion && nearestIncursion.jumps <= threshold;
     if (inZone && !incInZone.current && nearestIncursion) {
-      if (enabled && evIncur) {
+      const spoken = (spokenIncursions.current ??= loadSpokenIncursions());
+      if (enabled && evIncur && !spoken.has(nearestIncursion.systemId)) {
         const { jumps, name } = nearestIncursion;
         say(jumps === 0 ? `Incursion in your system, ${name}.` : `Incursion ${jumpWord(jumps)} out, ${name}.`);
+        spoken.add(nearestIncursion.systemId);
+        saveSpokenIncursions(spoken);
       }
       incInZone.current = true;
     } else if (!inZone && (nearestIncursion || incursionIds.length === 0)) {

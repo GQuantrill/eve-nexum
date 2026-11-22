@@ -2915,5 +2915,11 @@
     "undoFlown": "Undo flown",
     "clear": "Clear plan",
     "tooHeavy": "Too heavy for this hole (max jump {{max}})"
+  },
+  "errorScreen": {
+    "title": "Something went wrong",
+    "hint": "Nexum hit an error and stopped. Reload to carry on. To report it, copy the details and send them to us.",
+    "reload": "Reload",
+    "copy": "Copy error details"
   }
 }
