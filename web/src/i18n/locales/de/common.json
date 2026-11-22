@@ -1662,7 +1662,7 @@
       }
     },
     "footer": "EVE Online und das EVE-Logo sind eingetragene Marken von CCP hf. Alle Rechte weltweit vorbehalten. Nexum ist ein Drittanbieter-Tool und steht in keiner Verbindung zu CCP hf und wird von ihnen nicht unterstützt. · <license>Lizenz- & EVE-IP-Hinweis</license>",
-    "desktopBody": "Nexum gibt es auch als Desktop-App für Windows, macOS und Linux. Es ist dasselbe Nexum mit deinem Login, deinen Karten und Einstellungen, plus Funktionen, die ein Browser nicht bieten kann: Die App kann EVEs eigene Logdateien auf deinem Rechner lesen und über dem Spiel bleiben. Alles in diesem Abschnitt braucht die Desktop-App; alles darüber funktioniert in beiden.",
+    "desktopBody": "Nexum gibt es auch als Desktop-App für Windows und Linux. Es ist dasselbe Nexum mit deinem Login, deinen Karten und Einstellungen, plus Funktionen, die ein Browser nicht bieten kann: Die App kann EVEs eigene Logdateien auf deinem Rechner lesen und über dem Spiel bleiben. Alles in diesem Abschnitt braucht die Desktop-App; alles darüber funktioniert in beiden.",
     "desktopFeatures": {
       "logJumps": {
         "title": "Sofortige Sprungverfolgung",
@@ -1702,12 +1702,13 @@
       }
     },
     "desktopSoon": "Demnächst",
-    "desktopSoonBody": "Die Nexum-Desktop-App für Windows, macOS und Linux: sofortige Sprungverfolgung aus EVEs Logs, Intel-Kanäle auf deiner Karte, Bedrohungswarnungen und mehr.",
+    "desktopSoonBody": "Die Nexum-Desktop-App für Windows und Linux: sofortige Sprungverfolgung aus EVEs Logs, Intel-Kanäle auf deiner Karte, Bedrohungswarnungen und mehr.",
     "desktopSoonLink": "Was sie bietet",
     "desktopOut": "Jetzt verfügbar",
     "desktopDownloadLink": "Herunterladen",
     "desktopMacNote": "macOS: Die App ist noch nicht signiert. Führe nach der Installation einmal im Terminal aus:",
-    "desktopAllDownloads": "Alle Downloads (.deb, .rpm) und Versionshinweise"
+    "desktopAllDownloads": "Alle Downloads (.deb, .rpm) und Versionshinweise",
+    "desktopWinNote": "Windows: Das Installationsprogramm ist noch nicht signiert, daher meldet Windows eventuell, dass es deinen PC geschützt hat. Wähle „Weitere Informationen“ und dann „Trotzdem ausführen“."
   },
   "language": {
     "label": "Sprache"

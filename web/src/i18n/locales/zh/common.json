@@ -1662,7 +1662,7 @@
       }
     },
     "footer": "EVE Online 和 EVE 标志是 CCP hf. 的注册商标。保留全球所有权利。Nexum 是第三方工具，与 CCP hf. 无关，也未获其认可。· <license>许可证与 EVE 知识产权声明</license>",
-    "desktopBody": "Nexum 也有适用于 Windows、macOS 和 Linux 的桌面应用。它就是同一个 Nexum，保留你的登录、地图和设置，并加入浏览器做不到的功能：应用可以读取你电脑上 EVE 自己的日志文件，并置于游戏之上。本节中的所有功能都需要桌面应用；以上所有功能两者皆可使用。",
+    "desktopBody": "Nexum 也有适用于 Windows 和 Linux 的桌面应用。它就是同一个 Nexum，保留你的登录、地图和设置，并加入浏览器做不到的功能：应用可以读取你电脑上 EVE 自己的日志文件，并置于游戏之上。本节中的所有功能都需要桌面应用；以上所有功能两者皆可使用。",
     "desktopFeatures": {
       "logJumps": {
         "title": "即时跳跃跟踪",
@@ -1702,12 +1702,13 @@
       }
     },
     "desktopSoon": "即将推出",
-    "desktopSoonBody": "适用于 Windows、macOS 和 Linux 的 Nexum 桌面应用：通过 EVE 日志即时跟踪跳跃、在地图上显示情报频道、威胁警报等。",
+    "desktopSoonBody": "适用于 Windows 和 Linux 的 Nexum 桌面应用：通过 EVE 日志即时跟踪跳跃、在地图上显示情报频道、威胁警报等。",
     "desktopSoonLink": "查看新功能",
     "desktopOut": "现已推出",
     "desktopDownloadLink": "下载",
     "desktopMacNote": "macOS：应用尚未签名，安装后请在终端运行一次：",
-    "desktopAllDownloads": "全部下载（.deb、.rpm）和更新说明"
+    "desktopAllDownloads": "全部下载（.deb、.rpm）和更新说明",
+    "desktopWinNote": "Windows：安装程序尚未签名，Windows 可能会提示“已保护你的电脑”。请选择“更多信息”，然后选择“仍要运行”。"
   },
   "language": {
     "label": "语言"

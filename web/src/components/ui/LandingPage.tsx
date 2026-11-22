@@ -542,19 +542,19 @@ export function LandingPage() {
                 <a className="landing__download" href={DESKTOP_DOWNLOADS.windows}>
                   <WindowsLogoIcon size="1.2em" weight="fill" /> Windows
                 </a>
-                {DESKTOP_MAC_AVAILABLE ? (
+                {/* No macOS button at all until there is a macOS build. */}
+                {DESKTOP_MAC_AVAILABLE && (
                   <a className="landing__download" href={DESKTOP_DOWNLOADS.macos}>
                     <AppleLogoIcon size="1.2em" weight="fill" /> macOS
                   </a>
-                ) : (
-                  <span className="landing__download landing__download--soon" aria-disabled="true">
-                    <AppleLogoIcon size="1.2em" weight="fill" /> macOS: {t('landing.desktopSoon')}
-                  </span>
                 )}
                 <a className="landing__download" href={DESKTOP_DOWNLOADS.linux}>
                   <LinuxLogoIcon size="1.2em" weight="fill" /> Linux
                 </a>
               </div>
+              {/* The direct Windows installer isn't code-signed (the Store copy
+                  will be), so SmartScreen warns on first run. */}
+              <p className="landing__download-note">{t('landing.desktopWinNote')}</p>
               {DESKTOP_MAC_AVAILABLE && (
                 <p className="landing__download-note">
                   {t('landing.desktopMacNote')}{' '}

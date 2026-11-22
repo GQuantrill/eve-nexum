@@ -1662,7 +1662,7 @@
       }
     },
     "footer": "EVE Online en het EVE-logo zijn geregistreerde handelsmerken van CCP hf. Alle rechten wereldwijd voorbehouden. Nexum is een tool van derden en is niet verbonden met of goedgekeurd door CCP hf. · <license>Licentie en EVE IP-vermelding</license>",
-    "desktopBody": "Nexum bestaat ook als desktop-app voor Windows, macOS en Linux. Het is dezelfde Nexum, met je login, kaarten en instellingen, plus functies die een browser niet kan bieden: de app kan EVE's eigen logbestanden op je computer lezen en boven het spel blijven. Alles in dit deel vraagt de desktop-app; alles hierboven werkt in beide.",
+    "desktopBody": "Nexum bestaat ook als desktop-app voor Windows en Linux. Het is dezelfde Nexum, met je login, kaarten en instellingen, plus functies die een browser niet kan bieden: de app kan EVE's eigen logbestanden op je computer lezen en boven het spel blijven. Alles in dit deel vraagt de desktop-app; alles hierboven werkt in beide.",
     "desktopFeatures": {
       "logJumps": {
         "title": "Directe sprongvolging",
@@ -1702,12 +1702,13 @@
       }
     },
     "desktopSoon": "Binnenkort",
-    "desktopSoonBody": "De Nexum-desktop-app voor Windows, macOS en Linux: directe sprongvolging uit de logs van EVE, intelkanalen op je kaart, dreigingswaarschuwingen en meer.",
+    "desktopSoonBody": "De Nexum-desktop-app voor Windows en Linux: directe sprongvolging uit de logs van EVE, intelkanalen op je kaart, dreigingswaarschuwingen en meer.",
     "desktopSoonLink": "Bekijk wat hij toevoegt",
     "desktopOut": "Nu beschikbaar",
     "desktopDownloadLink": "Downloaden",
     "desktopMacNote": "macOS: de app is nog niet ondertekend, dus voer na installatie één keer dit uit in Terminal:",
-    "desktopAllDownloads": "Alle downloads (.deb, .rpm) en release-opmerkingen"
+    "desktopAllDownloads": "Alle downloads (.deb, .rpm) en release-opmerkingen",
+    "desktopWinNote": "Windows: het installatieprogramma is nog niet ondertekend, dus Windows kan melden dat het je pc heeft beschermd. Kies Meer informatie en daarna Toch uitvoeren."
   },
   "language": {
     "label": "Taal"

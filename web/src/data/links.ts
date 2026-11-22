@@ -6,7 +6,7 @@ export const DISCORD_INVITE_URL = 'https://discord.gg/KG8SMXrhZ4';
 // soon" instead of offering downloads. The release workflow
 // (.github/workflows/desktop-release.yml) also uploads each installer under a
 // fixed name, so these links always fetch the newest version.
-export const DESKTOP_AVAILABLE = false;
+export const DESKTOP_AVAILABLE = true;
 /** macOS builds are on hold: its button says "coming soon" until this is on
  *  (and the macOS build is back in desktop-release.yml). */
 export const DESKTOP_MAC_AVAILABLE = false;
