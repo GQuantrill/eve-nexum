@@ -1682,7 +1682,7 @@
       },
       "scanPaste": {
         "title": "Scan paste",
-        "desc": "Copy probe-scanner results in EVE and they land on the selected system; copy a d-scan and it opens in the analyser. No alt-tab needed. Off until you turn it on."
+        "desc": "Copy probe-scanner results in EVE and they land on the selected system; copy a d-scan and it opens in the analyser. No alt-tab needed. Off until you turn it on. It only ever takes copies made in the EVE client: anything you copy in another app (browser, chat, password manager, wallet) is ignored, anything that isn't a scan is dropped without being stored or sent, and the app never changes your clipboard."
       },
       "onTop": {
         "title": "Always on top",

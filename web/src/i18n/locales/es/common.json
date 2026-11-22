@@ -1682,7 +1682,7 @@
       },
       "scanPaste": {
         "title": "Pegar escaneos",
-        "desc": "Copia resultados del escáner de sondas en EVE y llegan al sistema seleccionado; copia un d-scan y se abre en el analizador. Sin alt-tab. Desactivado hasta que lo actives."
+        "desc": "Copia resultados del escáner de sondas en EVE y llegan al sistema seleccionado; copia un d-scan y se abre en el analizador. Sin alt-tab. Desactivado hasta que lo actives. Solo toma lo que copias en el cliente de EVE: lo que copies en otra aplicación (navegador, chat, gestor de contraseñas, monedero) se ignora, lo que no sea un escaneo se descarta sin guardarse ni enviarse, y la aplicación nunca cambia tu portapapeles."
       },
       "onTop": {
         "title": "Siempre visible",

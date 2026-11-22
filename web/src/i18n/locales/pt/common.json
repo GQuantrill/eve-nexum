@@ -1682,7 +1682,7 @@
       },
       "scanPaste": {
         "title": "Colar scans",
-        "desc": "Copie resultados do scanner de sondas no EVE e eles vão para o sistema selecionado; copie um d-scan e ele abre no analisador. Sem alt-tab. Desligado até você ativar."
+        "desc": "Copie resultados do scanner de sondas no EVE e eles vão para o sistema selecionado; copie um d-scan e ele abre no analisador. Sem alt-tab. Desligado até você ativar. Só usa cópias feitas no cliente do EVE: o que você copiar em outro app (navegador, chat, gerenciador de senhas, carteira) é ignorado, o que não for um scan é descartado sem ser guardado nem enviado, e o app nunca altera sua área de transferência."
       },
       "onTop": {
         "title": "Sempre visível",

@@ -1682,7 +1682,7 @@
       },
       "scanPaste": {
         "title": "Scans einfügen",
-        "desc": "Kopiere Sondenscanner-Ergebnisse in EVE, und sie landen im ausgewählten System; kopiere einen D-Scan, und er öffnet sich im Analysator. Ganz ohne Alt-Tab. Aus, bis du es einschaltest."
+        "desc": "Kopiere Sondenscanner-Ergebnisse in EVE, und sie landen im ausgewählten System; kopiere einen D-Scan, und er öffnet sich im Analysator. Ganz ohne Alt-Tab. Aus, bis du es einschaltest. Es nimmt nur Kopien aus dem EVE-Client: Alles, was du in einer anderen App kopierst (Browser, Chat, Passwortmanager, Wallet), wird ignoriert, alles, was kein Scan ist, wird verworfen, ohne gespeichert oder gesendet zu werden, und die App verändert deine Zwischenablage nie."
       },
       "onTop": {
         "title": "Immer im Vordergrund",

@@ -1682,7 +1682,7 @@
       },
       "scanPaste": {
         "title": "Collage des scans",
-        "desc": "Copiez les résultats du scanner de sondes dans EVE : ils arrivent dans le système sélectionné ; copiez un d-scan et il s'ouvre dans l'analyseur. Sans alt-tab. Désactivé tant que vous ne l'activez pas."
+        "desc": "Copiez les résultats du scanner de sondes dans EVE : ils arrivent dans le système sélectionné ; copiez un d-scan et il s'ouvre dans l'analyseur. Sans alt-tab. Désactivé tant que vous ne l'activez pas. Seules les copies faites dans le client EVE sont prises : ce que vous copiez dans une autre application (navigateur, chat, gestionnaire de mots de passe, portefeuille) est ignoré, tout ce qui n'est pas un scan est abandonné sans être enregistré ni envoyé, et l'application ne modifie jamais votre presse-papiers."
       },
       "onTop": {
         "title": "Toujours au premier plan",

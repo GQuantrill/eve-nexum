@@ -98,8 +98,9 @@ pub fn start(app: AppHandle) {
             if !was {
                 if eve_now {
                     // EVE just came to the front: note what's there now (copied
-                    // elsewhere), so only a later copy counts. On Linux this is
-                    // a read whose text is dropped at once.
+                    // elsewhere), so only a later copy counts. With a copy
+                    // counter (Windows, Linux on X11) nothing is read; without
+                    // one this is a read whose text is dropped at once.
                     last = marker(&app, &mut copies).map(|(m, _)| m);
                 }
                 continue;

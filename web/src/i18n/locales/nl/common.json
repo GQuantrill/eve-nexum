@@ -1682,7 +1682,7 @@
       },
       "scanPaste": {
         "title": "Scans plakken",
-        "desc": "Kopieer probe-scannerresultaten in EVE en ze komen in het geselecteerde systeem; kopieer een d-scan en hij opent in de analyse. Zonder alt-tab. Uit tot je het aanzet."
+        "desc": "Kopieer probe-scannerresultaten in EVE en ze komen in het geselecteerde systeem; kopieer een d-scan en hij opent in de analyse. Zonder alt-tab. Uit tot je het aanzet. Het neemt alleen kopieën uit de EVE-client: wat je in een andere app kopieert (browser, chat, wachtwoordmanager, wallet) wordt genegeerd, alles wat geen scan is wordt weggegooid zonder opgeslagen of verstuurd te worden, en de app verandert je klembord nooit."
       },
       "onTop": {
         "title": "Altijd bovenop",
