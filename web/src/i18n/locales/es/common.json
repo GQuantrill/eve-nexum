@@ -958,7 +958,8 @@
     "pasteSystemsFailed": "No se pudieron pegar los sistemas.",
     "pasteSystemsNoRights": "Tu rol no puede añadir sistemas a este mapa.",
     "pasteUseKeys": "Tu navegador no deja que nexum lea el portapapeles. Pulsa Ctrl+V (Cmd+V en Mac) sobre el mapa.",
-    "pasteNoSystems": "No hay sistemas copiados en el portapapeles. Primero haz clic derecho en sistemas y elige Copiar sistemas."
+    "pasteNoSystems": "No hay sistemas copiados en el portapapeles. Primero haz clic derecho en sistemas y elige Copiar sistemas.",
+    "exportSystems": "Exportar sistemas ({{count}})…"
   },
   "customIntel": {
     "title": "Intel personalizada",
@@ -2936,5 +2937,22 @@
     "hint": "Nexum encontró un error y se detuvo. Recarga para continuar. Para informarlo, copia los detalles y envíanoslos.",
     "reload": "Recargar",
     "copy": "Copiar detalles del error"
+  },
+  "exportSystems": {
+    "title": "Exportar sistemas",
+    "format": "Formato",
+    "formats": {
+      "csv": "CSV",
+      "tsv": "Separado por tabulaciones",
+      "json": "JSON"
+    },
+    "skipLocked": "Excluir sistemas bloqueados ({{count}})",
+    "summary": "Sistemas: {{systems}}. Filas: {{rows}}, una por firma.",
+    "loading": "Cargando los sistemas…",
+    "loadFailed": "No se pudieron cargar los sistemas.",
+    "copy": "Copiar",
+    "save": "Guardar archivo",
+    "copied": "Copiado al portapapeles.",
+    "copyFailed": "No se pudo copiar al portapapeles."
   }
 }

@@ -958,7 +958,8 @@
     "pasteSystemsFailed": "Couldn't paste the systems.",
     "pasteSystemsNoRights": "Your role can't add systems to this map.",
     "pasteUseKeys": "Your browser won't let nexum read the clipboard. Press Ctrl+V (Cmd+V on a Mac) on the map instead.",
-    "pasteNoSystems": "No copied systems on the clipboard. Right-click systems and choose Copy systems first."
+    "pasteNoSystems": "No copied systems on the clipboard. Right-click systems and choose Copy systems first.",
+    "exportSystems": "Export systems ({{count}})…"
   },
   "customIntel": {
     "title": "Custom Intel",
@@ -2936,5 +2937,22 @@
     "hint": "Nexum hit an error and stopped. Reload to carry on. To report it, copy the details and send them to us.",
     "reload": "Reload",
     "copy": "Copy error details"
+  },
+  "exportSystems": {
+    "title": "Export systems",
+    "format": "Format",
+    "formats": {
+      "csv": "CSV",
+      "tsv": "Tab-separated",
+      "json": "JSON"
+    },
+    "skipLocked": "Leave out locked systems ({{count}})",
+    "summary": "Systems: {{systems}}. Rows: {{rows}}, one per signature.",
+    "loading": "Loading the systems…",
+    "loadFailed": "Couldn't load the systems.",
+    "copy": "Copy",
+    "save": "Save file",
+    "copied": "Copied to the clipboard.",
+    "copyFailed": "Couldn't copy to the clipboard."
   }
 }

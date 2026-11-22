@@ -958,7 +958,8 @@
     "pasteSystemsFailed": "성계를 붙여 넣지 못했습니다.",
     "pasteSystemsNoRights": "현재 역할로는 이 지도에 성계를 추가할 수 없습니다.",
     "pasteUseKeys": "브라우저가 nexum의 클립보드 읽기를 허용하지 않습니다. 대신 지도에서 Ctrl+V(Mac은 Cmd+V)를 누르세요.",
-    "pasteNoSystems": "클립보드에 복사한 성계가 없습니다. 먼저 성계를 우클릭하고 성계 복사를 선택하세요."
+    "pasteNoSystems": "클립보드에 복사한 성계가 없습니다. 먼저 성계를 우클릭하고 성계 복사를 선택하세요.",
+    "exportSystems": "성계 내보내기 ({{count}})…"
   },
   "customIntel": {
     "title": "사용자 지정 인텔",
@@ -2932,5 +2933,22 @@
     "hint": "Nexum에 오류가 발생해 멈췄습니다. 계속하려면 새로고침하세요. 신고하려면 세부 정보를 복사해 보내 주세요.",
     "reload": "새로고침",
     "copy": "오류 세부 정보 복사"
+  },
+  "exportSystems": {
+    "title": "성계 내보내기",
+    "format": "형식",
+    "formats": {
+      "csv": "CSV",
+      "tsv": "탭으로 구분",
+      "json": "JSON"
+    },
+    "skipLocked": "잠긴 성계 제외 ({{count}})",
+    "summary": "성계: {{systems}}. 행: {{rows}}, 시그니처마다 한 행.",
+    "loading": "성계를 불러오는 중…",
+    "loadFailed": "성계를 불러오지 못했습니다.",
+    "copy": "복사",
+    "save": "파일 저장",
+    "copied": "클립보드에 복사했습니다.",
+    "copyFailed": "클립보드에 복사하지 못했습니다."
   }
 }

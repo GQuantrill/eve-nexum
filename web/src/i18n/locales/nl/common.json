@@ -958,7 +958,8 @@
     "pasteSystemsFailed": "Kon de systemen niet plakken.",
     "pasteSystemsNoRights": "Je rol mag geen systemen aan deze kaart toevoegen.",
     "pasteUseKeys": "Je browser laat nexum het klembord niet lezen. Druk in plaats daarvan op Ctrl+V (Cmd+V op een Mac) op de kaart.",
-    "pasteNoSystems": "Geen gekopieerde systemen op het klembord. Klik eerst met rechts op systemen en kies Systemen kopiëren."
+    "pasteNoSystems": "Geen gekopieerde systemen op het klembord. Klik eerst met rechts op systemen en kies Systemen kopiëren.",
+    "exportSystems": "Systemen exporteren ({{count}})…"
   },
   "customIntel": {
     "title": "Eigen intel",
@@ -2936,5 +2937,22 @@
     "hint": "Nexum liep tegen een fout aan en is gestopt. Herlaad om verder te gaan. Kopieer de details en stuur ze ons om het te melden.",
     "reload": "Herladen",
     "copy": "Foutdetails kopiëren"
+  },
+  "exportSystems": {
+    "title": "Systemen exporteren",
+    "format": "Formaat",
+    "formats": {
+      "csv": "CSV",
+      "tsv": "Tab-gescheiden",
+      "json": "JSON"
+    },
+    "skipLocked": "Vergrendelde systemen weglaten ({{count}})",
+    "summary": "Systemen: {{systems}}. Rijen: {{rows}}, één per signature.",
+    "loading": "Systemen laden…",
+    "loadFailed": "Kon de systemen niet laden.",
+    "copy": "Kopiëren",
+    "save": "Bestand opslaan",
+    "copied": "Gekopieerd naar het klembord.",
+    "copyFailed": "Kon niet naar het klembord kopiëren."
   }
 }

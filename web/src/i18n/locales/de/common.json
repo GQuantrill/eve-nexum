@@ -958,7 +958,8 @@
     "pasteSystemsFailed": "Die Systeme konnten nicht eingefügt werden.",
     "pasteSystemsNoRights": "Deine Rolle darf dieser Karte keine Systeme hinzufügen.",
     "pasteUseKeys": "Dein Browser lässt nexum die Zwischenablage nicht lesen. Drücke stattdessen Strg+V (Cmd+V auf dem Mac) auf der Karte.",
-    "pasteNoSystems": "Keine kopierten Systeme in der Zwischenablage. Rechtsklicke zuerst auf Systeme und wähle Systeme kopieren."
+    "pasteNoSystems": "Keine kopierten Systeme in der Zwischenablage. Rechtsklicke zuerst auf Systeme und wähle Systeme kopieren.",
+    "exportSystems": "Systeme exportieren ({{count}})…"
   },
   "customIntel": {
     "title": "Eigene Intel",
@@ -2936,5 +2937,22 @@
     "hint": "Nexum ist auf einen Fehler gestoßen und hat angehalten. Neu laden, um weiterzumachen. Um ihn zu melden, kopiere die Details und schick sie uns.",
     "reload": "Neu laden",
     "copy": "Fehlerdetails kopieren"
+  },
+  "exportSystems": {
+    "title": "Systeme exportieren",
+    "format": "Format",
+    "formats": {
+      "csv": "CSV",
+      "tsv": "Tabulatorgetrennt",
+      "json": "JSON"
+    },
+    "skipLocked": "Gesperrte Systeme weglassen ({{count}})",
+    "summary": "Systeme: {{systems}}. Zeilen: {{rows}}, eine pro Signatur.",
+    "loading": "Systeme werden geladen…",
+    "loadFailed": "Die Systeme konnten nicht geladen werden.",
+    "copy": "Kopieren",
+    "save": "Datei speichern",
+    "copied": "In die Zwischenablage kopiert.",
+    "copyFailed": "Kopieren in die Zwischenablage fehlgeschlagen."
   }
 }

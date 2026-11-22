@@ -958,7 +958,8 @@
     "pasteSystemsFailed": "Impossible de coller les systèmes.",
     "pasteSystemsNoRights": "Votre rôle ne permet pas d'ajouter des systèmes à cette carte.",
     "pasteUseKeys": "Votre navigateur n'autorise pas nexum à lire le presse-papiers. Appuyez plutôt sur Ctrl+V (Cmd+V sur Mac) sur la carte.",
-    "pasteNoSystems": "Aucun système copié dans le presse-papiers. Faites d'abord un clic droit sur des systèmes et choisissez Copier les systèmes."
+    "pasteNoSystems": "Aucun système copié dans le presse-papiers. Faites d'abord un clic droit sur des systèmes et choisissez Copier les systèmes.",
+    "exportSystems": "Exporter les systèmes ({{count}})…"
   },
   "customIntel": {
     "title": "Intel personnalisée",
@@ -2936,5 +2937,22 @@
     "hint": "Nexum a rencontré une erreur et s'est arrêté. Rechargez pour continuer. Pour la signaler, copiez les détails et envoyez-les-nous.",
     "reload": "Recharger",
     "copy": "Copier les détails de l'erreur"
+  },
+  "exportSystems": {
+    "title": "Exporter les systèmes",
+    "format": "Format",
+    "formats": {
+      "csv": "CSV",
+      "tsv": "Séparé par tabulations",
+      "json": "JSON"
+    },
+    "skipLocked": "Exclure les systèmes verrouillés ({{count}})",
+    "summary": "Systèmes : {{systems}}. Lignes : {{rows}}, une par signature.",
+    "loading": "Chargement des systèmes…",
+    "loadFailed": "Impossible de charger les systèmes.",
+    "copy": "Copier",
+    "save": "Enregistrer le fichier",
+    "copied": "Copié dans le presse-papiers.",
+    "copyFailed": "Impossible de copier dans le presse-papiers."
   }
 }

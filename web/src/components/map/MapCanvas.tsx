@@ -39,6 +39,7 @@ import {
   HashIcon, ProhibitIcon, BroomIcon,
   CopyIcon,
   ClipboardTextIcon,
+  DownloadSimpleIcon,
   UsersThreeIcon,
 } from '../../icons';
 import { PREDEFINED_LABELS } from '../../data/labels';
@@ -76,6 +77,7 @@ import { useSendToStore } from '../../store/sendToStore';
 import { usePresenceStore } from '../../store/presenceStore';
 import { toast } from '../../utils/toastStore';
 import { copySystems, pasteSystems, parseClip } from '../../utils/mapClipboard';
+import { ExportSystemsModal } from '../ui/ExportSystemsModal';
 import i18n from '../../i18n';
 import { useCustomIntel } from '../../hooks/useCustomIntel';
 import { useUserSetting } from '../../hooks/useUserSetting';
@@ -531,6 +533,8 @@ export function MapCanvas() {
   const shiftHeld        = useRef(false);
   // Delete / Backspace removals waiting on the confirm, and whether to ask.
   const [keyDeleteConfirm, setKeyDeleteConfirm] = useState<{ ids: string[]; name: string | null } | null>(null);
+  // Systems picked for Export systems (ExportSystemsModal).
+  const [exportIds, setExportIds] = useState<string[] | null>(null);
   const [confirmKeyDelete, setConfirmKeyDelete] = useUserSetting<boolean>(CONFIRM_KEY_DELETE_KEY, true);
   const pendingSelection = useRef<string[]>([]);
 
@@ -1236,6 +1240,10 @@ export function MapCanvas() {
       label: t('ctxMenu.copySystems', { count: copyIds.length }),
       icon: <CopyIcon size={16} weight="regular" />,
       action: () => copySelectedSystems(copyIds),
+    }, {
+      label: t('ctxMenu.exportSystems', { count: copyIds.length }),
+      icon: <DownloadSimpleIcon size={16} weight="regular" />,
+      action: () => setExportIds(copyIds),
     }] : [];
 
     // Without topology permission, hide every menu item that would mutate
@@ -2134,6 +2142,9 @@ export function MapCanvas() {
         />
       )}
 
+      {exportIds && activeMapId && (
+        <ExportSystemsModal mapId={activeMapId} systemIds={exportIds} onClose={() => setExportIds(null)} />
+      )}
       {keyDeleteConfirm && (
         <ConfirmModal
           message={keyDeleteConfirm.name

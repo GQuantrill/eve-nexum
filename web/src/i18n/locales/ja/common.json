@@ -958,7 +958,8 @@
     "pasteSystemsFailed": "星系を貼り付けできませんでした。",
     "pasteSystemsNoRights": "あなたのロールではこのマップに星系を追加できません。",
     "pasteUseKeys": "ブラウザが nexum にクリップボードの読み取りを許可していません。代わりにマップ上で Ctrl+V（Mac では Cmd+V）を押してください。",
-    "pasteNoSystems": "クリップボードにコピーした星系がありません。先に星系を右クリックして「星系をコピー」を選んでください。"
+    "pasteNoSystems": "クリップボードにコピーした星系がありません。先に星系を右クリックして「星系をコピー」を選んでください。",
+    "exportSystems": "星系をエクスポート（{{count}}）…"
   },
   "customIntel": {
     "title": "カスタムインテル",
@@ -2932,5 +2933,22 @@
     "hint": "Nexum でエラーが発生し、停止しました。再読み込みすると続行できます。報告するには、詳細をコピーして送ってください。",
     "reload": "再読み込み",
     "copy": "エラーの詳細をコピー"
+  },
+  "exportSystems": {
+    "title": "星系をエクスポート",
+    "format": "形式",
+    "formats": {
+      "csv": "CSV",
+      "tsv": "タブ区切り",
+      "json": "JSON"
+    },
+    "skipLocked": "ロックした星系を除く（{{count}}）",
+    "summary": "星系：{{systems}}。行：{{rows}}（シグネチャごとに 1 行）。",
+    "loading": "星系を読み込み中…",
+    "loadFailed": "星系を読み込めませんでした。",
+    "copy": "コピー",
+    "save": "ファイルを保存",
+    "copied": "クリップボードにコピーしました。",
+    "copyFailed": "クリップボードにコピーできませんでした。"
   }
 }
