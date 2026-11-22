@@ -1708,7 +1708,7 @@
     "desktopDownloadLink": "Baixar",
     "desktopMacNote": "macOS: o app ainda não é assinado; depois de instalar, rode isto uma vez no Terminal:",
     "desktopAllDownloads": "Todos os downloads (.deb, .rpm) e notas da versão",
-    "desktopWinNote": "Windows: o instalador ainda não é assinado, então o Windows pode dizer que protegeu seu PC. Escolha Mais informações e depois Executar assim mesmo.",
+    "desktopWinNote": "Windows: o instalador ainda não é assinado, então o Windows pode dizer que protegeu seu PC. Escolha Mais informações e depois Executar assim mesmo. Uma versão na Microsoft Store chega muito em breve: ela está em certificação na Microsoft agora e instala sem esse aviso.",
     "desktopHeroTitle": "O Nexum agora é um app para desktop",
     "desktopHeroBody": "Um enorme salto para a exploração: seus saltos registrados na hora pelos próprios logs do EVE, seus canais de intel no mapa, alertas de ameaça com som e voz, um overlay por cima do jogo e scans colados assim que você os copia. Grátis, para Windows e Linux.",
     "desktopHeroMore": "Veja tudo o que ele traz"
