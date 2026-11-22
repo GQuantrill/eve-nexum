@@ -10,6 +10,16 @@ import type { WormholeMap, MapSystem, MapConnection, SavedRoute, SystemClass, Wo
 import type { WhSig, UndivedHole } from '../utils/undivedWormholes';
 import { pickHandles } from '../components/map/edgeUtils';
 import { isProtectedGate } from '../utils/gateProtection';
+import { collapseScoutFor, restoreScoutFor, type GoneLink } from '../utils/scoutCollapse';
+import { scoutConnectionsNow, setScoutExpired } from '../hooks/useScoutConnections';
+
+// A mapped Thera/Turnur link that goes also takes EVE Scout's copy of the same
+// hole out of routes (utils/scoutCollapse.ts).
+const scoutDeps = { list: scoutConnectionsNow, setExpired: setScoutExpired };
+function goneLinks(conns: MapConnection[], systems: MapSystem[]): GoneLink[] {
+  const eve = new Map(systems.map((s) => [s.id, s.eveSystemId] as const));
+  return conns.map((c) => ({ connId: c.id, a: eve.get(c.sourceId) ?? null, b: eve.get(c.targetId) ?? null }));
+}
 // The i18next singleton (configured by ../i18n at app start). Imported bare so
 // the store doesn't pull in the React bindings.
 import i18n from 'i18next';
@@ -497,6 +507,7 @@ export const useMapStore = create<MapStore>()((set, get) => {
       }
 
       case 'remove_system': {
+        void restoreScoutFor(cmd.connections.map((c) => c.id), scoutDeps);
         set((s) => {
           const restoredIds = new Set([...s.map.systems.map((sys) => sys.id), cmd.system.id]);
           const validConns = cmd.connections.filter(
@@ -601,6 +612,7 @@ export const useMapStore = create<MapStore>()((set, get) => {
       }
 
       case 'remove_connection': {
+        void restoreScoutFor([cmd.connection.id], scoutDeps);
         set((s) => ({
           map: {
             ...s.map,
@@ -632,6 +644,7 @@ export const useMapStore = create<MapStore>()((set, get) => {
       }
 
       case 'update_connection': {
+        if (cmd.prev.broken === false) void restoreScoutFor([cmd.connectionId], scoutDeps);
         set((s) => ({
           map: {
             ...s.map,
@@ -1236,6 +1249,7 @@ export const useMapStore = create<MapStore>()((set, get) => {
       const sys = map.systems.find((s) => s.id === id);
       const affectedConns = map.connections.filter((c) => c.sourceId === id || c.targetId === id);
       if (sys) get().pushUndo({ type: 'remove_system', system: sys, connections: affectedConns });
+      void collapseScoutFor(goneLinks(affectedConns, map.systems), scoutDeps);
 
       set((s) => ({
         selectedSystemId: s.selectedSystemId === id ? null : s.selectedSystemId,
@@ -1408,6 +1422,8 @@ export const useMapStore = create<MapStore>()((set, get) => {
           connections: s.map.connections.map((c) => (c.id === id ? { ...c, ...updates } : c)),
         },
       }));
+      if (conn && updates.broken === true && !conn.broken) void collapseScoutFor(goneLinks([conn], map.systems), scoutDeps);
+      if (conn && updates.broken === false && conn.broken) void restoreScoutFor([id], scoutDeps);
       if (activeMapId) {
         const url  = `/api/maps/${activeMapId}/connections/${id}`;
         const body = JSON.stringify(updates);
@@ -1450,6 +1466,7 @@ export const useMapStore = create<MapStore>()((set, get) => {
         return;
       }
       if (conn) get().pushUndo({ type: 'remove_connection', connection: conn });
+      if (conn) void collapseScoutFor(goneLinks([conn], map.systems), scoutDeps);
 
       set((s) => ({
         selectedConnectionId: s.selectedConnectionId === id ? null : s.selectedConnectionId,
