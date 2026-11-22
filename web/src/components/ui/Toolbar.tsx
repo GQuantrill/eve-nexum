@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { timeAgo, jumps } from '../../i18n/format';
 import { useMapStore } from '../../store/mapStore';
-import { useAuth, formatRole, isAdminRole } from '../../context/AuthContext';
+import { useAuth, formatRole, isAdminRole, isAllianceAdminRole } from '../../context/AuthContext';
 import { useOnlineStatus } from '../../hooks/useOnlineStatus';
 import { useCharacterLocation, useCharacterLocationCheckedAt } from '../../hooks/useCharacterLocation';
 import { useSystemAlias } from '../../hooks/useSystemAlias';
@@ -356,6 +356,17 @@ export function Toolbar() {
   // A map shared with this character specifically (not via corp/alliance) can be
   // dropped from their own list — gates the "Leave shared map" action below.
   const activeCanLeave = !!maps.find((m) => m.id === activeMapId)?.canLeaveShare;
+  // Who may delete the active map, the same rules as the server: your own solo
+  // maps whatever your role (anyone can make one), corp maps admins only,
+  // alliance maps alliance admins only. It used to need full or admin for
+  // everything, so pilots with lower roles could make solo maps but never
+  // delete them.
+  const activeMap = maps.find((m) => m.id === activeMapId);
+  const activeCanDelete = !!activeMap && !activeMap.sharedWithMe && (
+    activeMap.isAllianceMap ? (!!user && user.allianceMode && isAllianceAdminRole(user.role))
+      : activeMap.isCorpMap ? (!!user && isAdminRole(user.role))
+        : true
+  );
   // Leaving an org-shared map records an opt-out server-side rather than
   // deleting the grant (which belongs to the whole corp). The map keeps coming
   // back in the payload flagged hiddenByMe, which is what lets the switcher
@@ -613,7 +624,7 @@ export function Toolbar() {
                   </button>
                 </span>
               )}
-              {canManageMaps && maps.length > 1 && !maps.find((m) => m.id === activeMapId)?.sharedWithMe && (
+              {activeCanDelete && maps.length > 1 && (
                 <button className="map-dropdown__item map-dropdown__item--danger" onClick={() => { setShowMaps(false); setDeleteConfirm(true); }}>
                   {t('toolbar.deleteThisMap')}
                 </button>
