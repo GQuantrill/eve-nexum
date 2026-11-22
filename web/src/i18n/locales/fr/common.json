@@ -1708,7 +1708,10 @@
     "desktopDownloadLink": "Télécharger",
     "desktopMacNote": "macOS : l'application n'est pas encore signée ; après l'installation, lancez une fois dans le Terminal :",
     "desktopAllDownloads": "Tous les téléchargements (.deb, .rpm) et notes de version",
-    "desktopWinNote": "Windows : le programme d'installation n'est pas encore signé, Windows peut donc indiquer qu'il a protégé votre PC. Choisissez Informations complémentaires, puis Exécuter quand même."
+    "desktopWinNote": "Windows : le programme d'installation n'est pas encore signé, Windows peut donc indiquer qu'il a protégé votre PC. Choisissez Informations complémentaires, puis Exécuter quand même.",
+    "desktopHeroTitle": "Nexum existe maintenant en application de bureau",
+    "desktopHeroBody": "Un énorme pas en avant pour l'exploration : vos sauts suivis dès qu'ils ont lieu grâce aux logs d'EVE, vos canaux d'intel sur la carte, des alertes de menace avec son et voix, un overlay au-dessus du jeu, et vos scans collés dès que vous les copiez. Gratuit, pour Windows et Linux.",
+    "desktopHeroMore": "Voir tout ce qu'elle apporte"
   },
   "language": {
     "label": "Langue"

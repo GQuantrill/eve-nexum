@@ -1708,7 +1708,10 @@
     "desktopDownloadLink": "다운로드",
     "desktopMacNote": "macOS: 앱이 아직 서명되지 않았으므로 설치 후 터미널에서 한 번 실행하세요:",
     "desktopAllDownloads": "모든 다운로드(.deb, .rpm)와 릴리스 노트",
-    "desktopWinNote": "Windows: 설치 프로그램이 아직 서명되지 않아 Windows에서 PC를 보호했다고 표시할 수 있습니다. 추가 정보를 누른 다음 실행을 선택하세요."
+    "desktopWinNote": "Windows: 설치 프로그램이 아직 서명되지 않아 Windows에서 PC를 보호했다고 표시할 수 있습니다. 추가 정보를 누른 다음 실행을 선택하세요.",
+    "desktopHeroTitle": "Nexum이 이제 데스크톱 앱으로 나왔습니다",
+    "desktopHeroBody": "탐사의 큰 도약: EVE 자체 로그로 점프를 즉시 추적하고, 정보 채널을 지도에 표시하며, 소리와 음성으로 위협을 알리고, 게임 위에 오버레이를 띄우고, 스캔을 복사하는 즉시 붙여 넣습니다. Windows와 Linux용, 무료.",
+    "desktopHeroMore": "추가되는 기능 모두 보기"
   },
   "language": {
     "label": "언어"

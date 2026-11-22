@@ -1708,7 +1708,10 @@
     "desktopDownloadLink": "ダウンロード",
     "desktopMacNote": "macOS：アプリはまだ署名されていないため、インストール後にターミナルで一度実行してください：",
     "desktopAllDownloads": "すべてのダウンロード（.deb、.rpm）とリリースノート",
-    "desktopWinNote": "Windows: インストーラーはまだ署名されていないため、「PC が保護されました」と表示されることがあります。「詳細情報」を選び、「実行」を押してください。"
+    "desktopWinNote": "Windows: インストーラーはまだ署名されていないため、「PC が保護されました」と表示されることがあります。「詳細情報」を選び、「実行」を押してください。",
+    "desktopHeroTitle": "Nexum がデスクトップアプリになりました",
+    "desktopHeroBody": "探索の大きな飛躍：EVE 自身のログからジャンプを即座に記録、インテルチャンネルをマップに表示、音と音声による脅威アラート、ゲーム上のオーバーレイ、スキャンはコピーした瞬間に貼り付け。Windows と Linux 向け、無料。",
+    "desktopHeroMore": "追加される機能をすべて見る"
   },
   "language": {
     "label": "言語"

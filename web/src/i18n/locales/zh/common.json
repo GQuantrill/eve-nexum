@@ -1708,7 +1708,10 @@
     "desktopDownloadLink": "下载",
     "desktopMacNote": "macOS：应用尚未签名，安装后请在终端运行一次：",
     "desktopAllDownloads": "全部下载（.deb、.rpm）和更新说明",
-    "desktopWinNote": "Windows：安装程序尚未签名，Windows 可能会提示“已保护你的电脑”。请选择“更多信息”，然后选择“仍要运行”。"
+    "desktopWinNote": "Windows：安装程序尚未签名，Windows 可能会提示“已保护你的电脑”。请选择“更多信息”，然后选择“仍要运行”。",
+    "desktopHeroTitle": "Nexum 现已推出桌面应用",
+    "desktopHeroBody": "探索的一大飞跃：通过 EVE 自己的日志即时记录你的跳跃，情报频道显示在地图上，带声音和语音的威胁警报，游戏上方的悬浮窗，复制扫描结果即自动粘贴。免费，支持 Windows 和 Linux。",
+    "desktopHeroMore": "查看它的全部功能"
   },
   "language": {
     "label": "语言"

@@ -400,12 +400,46 @@ export function LandingPage() {
       </header>
 
       <div className="landing__content">
-        {/* The desktop app: coming soon, or out now (DESKTOP_AVAILABLE).
-            Either way, point at the section listing what it adds. */}
-        <div className="landing__soon">
+        {/* The desktop app, out now: the first thing on the page, with its
+            downloads right there. */}
+        {DESKTOP_AVAILABLE && (
+          <section className="landing__desktop-hero" aria-labelledby="desktop-hero-title">
+            <span className="landing__desktop-hero-icon"><DesktopIcon size="1em" weight="duotone" /></span>
+            <div className="landing__desktop-hero-text">
+              <span className="landing__soon-tag">{t('landing.desktopOut')}</span>
+              <h2 id="desktop-hero-title" className="landing__desktop-hero-title">{t('landing.desktopHeroTitle')}</h2>
+              <p className="landing__desktop-hero-body">{t('landing.desktopHeroBody')}</p>
+            </div>
+            <div className="landing__desktop-hero-actions">
+              <div className="landing__download-btns">
+                <a className="landing__download" href={DESKTOP_DOWNLOADS.windows}>
+                  <WindowsLogoIcon size="1.2em" weight="fill" /> Windows
+                </a>
+                <a className="landing__download" href={DESKTOP_DOWNLOADS.linux}>
+                  <LinuxLogoIcon size="1.2em" weight="fill" /> Linux
+                </a>
+              </div>
+              <a
+                href="#desktop-app"
+                className="landing__soon-link"
+                onClick={(e) => {
+                  // The app routes on the hash, so scroll instead of navigating.
+                  e.preventDefault();
+                  document.getElementById('desktop-app')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }}
+              >
+                {t('landing.desktopHeroMore')}
+              </a>
+            </div>
+          </section>
+        )}
+
+        {/* Before it's out: a small "coming soon" note pointing at the section
+            listing what it adds. */}
+        {!DESKTOP_AVAILABLE && <div className="landing__soon">
           <span className="landing__soon-icon"><DesktopIcon size="1em" weight="duotone" /></span>
           <span className="landing__soon-text">
-            <span className="landing__soon-tag">{t(DESKTOP_AVAILABLE ? 'landing.desktopOut' : 'landing.desktopSoon')}</span>
+            <span className="landing__soon-tag">{t('landing.desktopSoon')}</span>
             {t('landing.desktopSoonBody')}
           </span>
           <a
@@ -417,9 +451,9 @@ export function LandingPage() {
               document.getElementById('desktop-app')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }}
           >
-            {t(DESKTOP_AVAILABLE ? 'landing.desktopDownloadLink' : 'landing.desktopSoonLink')}
+            {t('landing.desktopSoonLink')}
           </a>
-        </div>
+        </div>}
 
         <div className="landing__cta">
           {errorMessage && (
