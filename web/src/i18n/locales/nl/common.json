@@ -586,7 +586,8 @@
       "map": {
         "update": "heeft de kaartinstellingen gewijzigd",
         "merge": "heeft {{subject}} samengevoegd",
-        "scoutCleanup": "heeft {{subject}}-gaten opgeruimd"
+        "scoutCleanup": "heeft {{subject}}-gaten opgeruimd",
+        "paste": "plakte systemen uit {{subject}}"
       },
       "share": {
         "add": "heeft de kaart gedeeld met {{subject}}",
@@ -947,7 +948,17 @@
     "jumpRangeFrom": "Sprongbereik vanaf hier",
     "jumpCyno": "Cyno-sprong",
     "jumpRangeClear": "Sprongbereik wissen",
-    "copyName": "Systeemnaam kopiëren"
+    "copyName": "Systeemnaam kopiëren",
+    "copySystems": "Systemen kopiëren ({{count}})",
+    "copiedSystems": "Systemen gekopieerd: {{count}}. Plak ze met Ctrl+V in een andere kaart.",
+    "copySystemsFailed": "Kon de systemen niet kopiëren.",
+    "pasteSystems": "Systemen plakken",
+    "pastedSystems": "Geplakt. Nieuwe systemen: {{systems}}, verbindingen: {{connections}}, signatures: {{signatures}}.",
+    "pastedNothing": "Niets toe te voegen: deze kaart heeft alles wat je plakte al.",
+    "pasteSystemsFailed": "Kon de systemen niet plakken.",
+    "pasteSystemsNoRights": "Je rol mag geen systemen aan deze kaart toevoegen.",
+    "pasteUseKeys": "Je browser laat nexum het klembord niet lezen. Druk in plaats daarvan op Ctrl+V (Cmd+V op een Mac) op de kaart.",
+    "pasteNoSystems": "Geen gekopieerde systemen op het klembord. Klik eerst met rechts op systemen en kies Systemen kopiëren."
   },
   "customIntel": {
     "title": "Eigen intel",

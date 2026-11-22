@@ -586,7 +586,8 @@
       "map": {
         "update": "hat die Karteneinstellungen geändert",
         "merge": "hat {{subject}} zusammengeführt",
-        "scoutCleanup": "hat {{subject}}-Löcher bereinigt"
+        "scoutCleanup": "hat {{subject}}-Löcher bereinigt",
+        "paste": "hat Systeme aus {{subject}} eingefügt"
       },
       "share": {
         "add": "hat die Karte mit {{subject}} geteilt",
@@ -947,7 +948,17 @@
     "jumpRangeFrom": "Sprungreichweite von hier",
     "jumpCyno": "Cyno-Sprung",
     "jumpRangeClear": "Sprungreichweite löschen",
-    "copyName": "Systemnamen kopieren"
+    "copyName": "Systemnamen kopieren",
+    "copySystems": "Systeme kopieren ({{count}})",
+    "copiedSystems": "Systeme kopiert: {{count}}. Füge sie mit Strg+V in eine andere Karte ein.",
+    "copySystemsFailed": "Die Systeme konnten nicht kopiert werden.",
+    "pasteSystems": "Systeme einfügen",
+    "pastedSystems": "Eingefügt. Neue Systeme: {{systems}}, Verbindungen: {{connections}}, Signaturen: {{signatures}}.",
+    "pastedNothing": "Nichts hinzuzufügen: Diese Karte hat bereits alles, was du eingefügt hast.",
+    "pasteSystemsFailed": "Die Systeme konnten nicht eingefügt werden.",
+    "pasteSystemsNoRights": "Deine Rolle darf dieser Karte keine Systeme hinzufügen.",
+    "pasteUseKeys": "Dein Browser lässt nexum die Zwischenablage nicht lesen. Drücke stattdessen Strg+V (Cmd+V auf dem Mac) auf der Karte.",
+    "pasteNoSystems": "Keine kopierten Systeme in der Zwischenablage. Rechtsklicke zuerst auf Systeme und wähle Systeme kopieren."
   },
   "customIntel": {
     "title": "Eigene Intel",

@@ -586,7 +586,8 @@
       "map": {
         "update": "a modifié les paramètres de la carte",
         "merge": "a fusionné {{subject}}",
-        "scoutCleanup": "a nettoyé les trous de {{subject}}"
+        "scoutCleanup": "a nettoyé les trous de {{subject}}",
+        "paste": "a collé des systèmes de {{subject}}"
       },
       "share": {
         "add": "a partagé la carte avec {{subject}}",
@@ -947,7 +948,17 @@
     "jumpRangeFrom": "Portée de saut d’ici",
     "jumpCyno": "Saut cyno",
     "jumpRangeClear": "Effacer la portée de saut",
-    "copyName": "Copier le nom du système"
+    "copyName": "Copier le nom du système",
+    "copySystems": "Copier les systèmes ({{count}})",
+    "copiedSystems": "Systèmes copiés : {{count}}. Collez-les dans une autre carte avec Ctrl+V.",
+    "copySystemsFailed": "Impossible de copier les systèmes.",
+    "pasteSystems": "Coller les systèmes",
+    "pastedSystems": "Collé. Systèmes ajoutés : {{systems}}, liaisons : {{connections}}, signatures : {{signatures}}.",
+    "pastedNothing": "Rien à ajouter : cette carte a déjà tout ce que vous avez collé.",
+    "pasteSystemsFailed": "Impossible de coller les systèmes.",
+    "pasteSystemsNoRights": "Votre rôle ne permet pas d'ajouter des systèmes à cette carte.",
+    "pasteUseKeys": "Votre navigateur n'autorise pas nexum à lire le presse-papiers. Appuyez plutôt sur Ctrl+V (Cmd+V sur Mac) sur la carte.",
+    "pasteNoSystems": "Aucun système copié dans le presse-papiers. Faites d'abord un clic droit sur des systèmes et choisissez Copier les systèmes."
   },
   "customIntel": {
     "title": "Intel personnalisée",

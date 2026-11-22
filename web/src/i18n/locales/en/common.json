@@ -586,7 +586,8 @@
       "map": {
         "update": "changed the map settings",
         "merge": "merged in {{subject}}",
-        "scoutCleanup": "cleaned up {{subject}} holes"
+        "scoutCleanup": "cleaned up {{subject}} holes",
+        "paste": "pasted systems from {{subject}}"
       },
       "share": {
         "add": "shared the map with {{subject}}",
@@ -947,7 +948,17 @@
     "jumpRangeFrom": "Jump range from here",
     "jumpCyno": "Cyno Jump",
     "jumpRangeClear": "Clear jump range",
-    "copyName": "Copy system name"
+    "copyName": "Copy system name",
+    "copySystems": "Copy systems ({{count}})",
+    "copiedSystems": "Systems copied: {{count}}. Paste them into another map with Ctrl+V.",
+    "copySystemsFailed": "Couldn't copy the systems.",
+    "pasteSystems": "Paste systems",
+    "pastedSystems": "Pasted. Added systems: {{systems}}, links: {{connections}}, signatures: {{signatures}}.",
+    "pastedNothing": "Nothing to add: this map already has everything you pasted.",
+    "pasteSystemsFailed": "Couldn't paste the systems.",
+    "pasteSystemsNoRights": "Your role can't add systems to this map.",
+    "pasteUseKeys": "Your browser won't let nexum read the clipboard. Press Ctrl+V (Cmd+V on a Mac) on the map instead.",
+    "pasteNoSystems": "No copied systems on the clipboard. Right-click systems and choose Copy systems first."
   },
   "customIntel": {
     "title": "Custom Intel",

@@ -586,7 +586,8 @@
       "map": {
         "update": "alterou as definições do mapa",
         "merge": "fundiu {{subject}}",
-        "scoutCleanup": "limpou os buracos de {{subject}}"
+        "scoutCleanup": "limpou os buracos de {{subject}}",
+        "paste": "colou sistemas de {{subject}}"
       },
       "share": {
         "add": "partilhou o mapa com {{subject}}",
@@ -947,7 +948,17 @@
     "jumpRangeFrom": "Alcance de salto a partir daqui",
     "jumpCyno": "Salto cyno",
     "jumpRangeClear": "Limpar alcance de salto",
-    "copyName": "Copiar nome do sistema"
+    "copyName": "Copiar nome do sistema",
+    "copySystems": "Copiar sistemas ({{count}})",
+    "copiedSystems": "Sistemas copiados: {{count}}. Cole-os noutro mapa com Ctrl+V.",
+    "copySystemsFailed": "Não foi possível copiar os sistemas.",
+    "pasteSystems": "Colar sistemas",
+    "pastedSystems": "Colado. Sistemas adicionados: {{systems}}, ligações: {{connections}}, assinaturas: {{signatures}}.",
+    "pastedNothing": "Nada a adicionar: este mapa já tem tudo o que colou.",
+    "pasteSystemsFailed": "Não foi possível colar os sistemas.",
+    "pasteSystemsNoRights": "A sua função não pode adicionar sistemas a este mapa.",
+    "pasteUseKeys": "O seu navegador não deixa o nexum ler a área de transferência. Prima Ctrl+V (Cmd+V no Mac) no mapa.",
+    "pasteNoSystems": "Não há sistemas copiados na área de transferência. Clique primeiro com o botão direito em sistemas e escolha Copiar sistemas."
   },
   "customIntel": {
     "title": "Intel personalizada",

@@ -19,7 +19,8 @@ import { SCOPE } from '../utils/esiScopes.js';
 import { createLogger } from '../utils/logger.js';
 import { resolveOwnerId } from '../utils/owner.js';
 import { mapCapFor, countPersonalMaps, mapAllowanceFor } from '../services/mapAllowance.js';
-import { parseMapBackup, restoreMapBackup, buildMapBackup, BackupError } from '../services/mapBackup.js';
+import { parseMapBackup, restoreMapBackup, buildMapBackup, BackupError, MAX_BACKUP_SYSTEMS } from '../services/mapBackup.js';
+import { selectClip, pasteIntoMap } from '../services/mapPaste.js';
 import { resolveEntityNames } from '../services/entityNames.js';
 import { audit } from '../services/audit.js';
 import { publishToMap } from '../services/mapEvents.js';
@@ -1612,6 +1613,76 @@ mapsRouter.get('/:mapId/export', async (req, res) => {
   const backup = await buildMapBackup(mapId);
   if (!backup) { res.status(404).json({ error: 'Map not found' }); return; }
   res.json(backup);
+});
+
+// POST /api/maps/:mapId/clip { systemIds } -- the selected systems as a clip
+// for the clipboard (services/mapPaste.ts). Read access, like the export it is
+// a slice of.
+mapsRouter.post('/:mapId/clip', async (req, res) => {
+  const { mapId } = req.params;
+  if (!UUID_RE.test(mapId)) { res.status(404).json({ error: 'Map not found' }); return; }
+  const raw = (req.body as { systemIds?: unknown }).systemIds;
+  if (!Array.isArray(raw) || raw.length === 0 || raw.length > MAX_BACKUP_SYSTEMS) {
+    res.status(400).json({ error: 'systemIds must list 1 to 500 systems' }); return;
+  }
+  const ids = new Set(raw.filter((v): v is string => typeof v === 'string' && UUID_RE.test(v)));
+  const access = await getMapAccess(mapId, req);
+  if (!access) { res.status(404).json({ error: 'Map not found' }); return; }
+  const backup = await buildMapBackup(mapId);
+  if (!backup) { res.status(404).json({ error: 'Map not found' }); return; }
+  const clip = selectClip(backup, ids);
+  if (!clip.systems.length) { res.status(400).json({ error: 'None of those systems are on this map' }); return; }
+  res.json(clip);
+});
+
+// POST /api/maps/:mapId/paste { clip, anchor? } -- fold a clip into this map:
+// only what it is missing is added, the map's own systems stay as they are.
+// The clip came off a clipboard, so it is parsed like an imported file. Needs
+// the same rights as adding systems by hand (topology, lock).
+mapsRouter.post('/:mapId/paste', async (req, res) => {
+  const { mapId } = req.params;
+  if (!UUID_RE.test(mapId)) { res.status(404).json({ error: 'Map not found' }); return; }
+  const access = await requireMapWrite(res, mapId, req);
+  if (!access) return;
+
+  const body = req.body as { clip?: unknown; anchor?: { x?: unknown; y?: unknown } };
+  let clip: ReturnType<typeof parseMapBackup>;
+  try {
+    clip = parseMapBackup(body.clip);
+  } catch (err) {
+    if (err instanceof BackupError) { res.status(err.status).json({ error: err.message }); return; }
+    throw err;
+  }
+  if (!clip.systems.length) { res.status(400).json({ error: 'Nothing to paste' }); return; }
+  const ax = Number(body.anchor?.x), ay = Number(body.anchor?.y);
+  const anchor = Number.isFinite(ax) && Number.isFinite(ay) && Math.abs(ax) < 1e6 && Math.abs(ay) < 1e6
+    ? { x: ax, y: ay } : null;
+
+  const client = await db.connect();
+  let counts: Awaited<ReturnType<typeof pasteIntoMap>>;
+  try {
+    await client.query('BEGIN');
+    counts = await pasteIntoMap(client, mapId, clip, req.session.userId!, anchor);
+    await client.query(`UPDATE maps SET updated_at = NOW() WHERE id = $1`, [mapId]);
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK');
+    log.error('map paste failed:', err);
+    throw err;
+  } finally {
+    client.release();
+  }
+
+  // Like a merge: other viewers re-fetch rather than take a stream of deltas.
+  publishToMap(mapId, { type: 'map.resync', actor: req.get('x-client-id') ?? null });
+  recordMapAudit(req, mapId, {
+    action: 'map.paste', subject: clip.name.slice(0, MAX_MAP_NAME_LEN),
+    details: { values: {
+      systems: counts.systems, connections: counts.connections, signatures: counts.signatures,
+      anomalies: counts.anomalies, structures: counts.structures,
+    } },
+  });
+  res.json(counts);
 });
 
 // ── Wanderer import ─────────────────────────────────────────────────────────

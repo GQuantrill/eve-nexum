@@ -586,7 +586,8 @@
       "map": {
         "update": "マップ設定を変更",
         "merge": "{{subject}} を統合",
-        "scoutCleanup": "{{subject}} のホールを整理"
+        "scoutCleanup": "{{subject}} のホールを整理",
+        "paste": "{{subject}} から星系を貼り付けました"
       },
       "share": {
         "add": "{{subject}} とマップを共有",
@@ -947,7 +948,17 @@
     "jumpRangeFrom": "ここからのジャンプ範囲",
     "jumpCyno": "サイノジャンプ",
     "jumpRangeClear": "ジャンプ範囲をクリア",
-    "copyName": "システム名をコピー"
+    "copyName": "システム名をコピー",
+    "copySystems": "星系をコピー（{{count}}）",
+    "copiedSystems": "コピーした星系：{{count}}。別のマップで Ctrl+V を押して貼り付けます。",
+    "copySystemsFailed": "星系をコピーできませんでした。",
+    "pasteSystems": "星系を貼り付け",
+    "pastedSystems": "貼り付けました。追加した星系：{{systems}}、接続：{{connections}}、シグネチャ：{{signatures}}。",
+    "pastedNothing": "追加するものはありません：貼り付けた内容はすべてこのマップにあります。",
+    "pasteSystemsFailed": "星系を貼り付けできませんでした。",
+    "pasteSystemsNoRights": "あなたのロールではこのマップに星系を追加できません。",
+    "pasteUseKeys": "ブラウザが nexum にクリップボードの読み取りを許可していません。代わりにマップ上で Ctrl+V（Mac では Cmd+V）を押してください。",
+    "pasteNoSystems": "クリップボードにコピーした星系がありません。先に星系を右クリックして「星系をコピー」を選んでください。"
   },
   "customIntel": {
     "title": "カスタムインテル",
