@@ -2513,6 +2513,7 @@ dependencies = [
  "tauri-plugin-updater",
  "tokio",
  "url",
+ "webkit2gtk",
  "windows-sys 0.61.2",
  "x11rb",
 ]

@@ -138,6 +138,36 @@ fn safe_file_name(name: &str) -> String {
     if clean.is_empty() { "nexum-export".into() } else { clean }
 }
 
+// Linux: WebKitGTK runs the page in its own process. When that process dies
+// (out of memory, a graphics driver fault) the window just goes blank and
+// only a restart brought it back. Load the page again instead, at most a few
+// times a minute so a page that crashes on load doesn't spin.
+#[cfg(target_os = "linux")]
+fn reload_on_crash(w: &tauri::WebviewWindow) {
+    use std::cell::RefCell;
+    use std::time::{Duration, Instant};
+    use webkit2gtk::WebViewExt;
+    let label = w.label().to_string();
+    let _ = w.with_webview(move |pv| {
+        let recent: RefCell<Vec<Instant>> = RefCell::new(Vec::new());
+        pv.inner().connect_web_process_terminated(move |view, reason| {
+            let now = Instant::now();
+            let mut r = recent.borrow_mut();
+            r.retain(|t| now.duration_since(*t) < Duration::from_secs(60));
+            if r.len() >= 3 {
+                eprintln!("[nexum] {label}: web process ended ({reason:?}) again; not reloading");
+                return;
+            }
+            r.push(now);
+            eprintln!("[nexum] {label}: web process ended ({reason:?}); reloading");
+            view.reload();
+        });
+    });
+}
+
+#[cfg(not(target_os = "linux"))]
+fn reload_on_crash(_w: &tauri::WebviewWindow) {}
+
 /// A web link the page wants opened outside the app: the system browser, for
 /// http(s) only. Nothing else (file:, custom app schemes) is handed to the OS.
 fn open_outside(app: &AppHandle, url: &url::Url) {
@@ -207,6 +237,7 @@ async fn open_popout(app: AppHandle, pane: String, title: String, url: String) -
         })
         .build()
         .map(|w| {
+            reload_on_crash(&w);
             // However it closes (its X, a crash), give the pane back to the
             // sidebar: the page in it may not get the chance to say so.
             let closed_app = app.clone();
@@ -514,7 +545,7 @@ pub fn run() {
 
             let nav_server = server.clone();
             let nav_app = handle.clone();
-            WebviewWindowBuilder::new(app, "main", WebviewUrl::External(server.clone()))
+            let main_window = WebviewWindowBuilder::new(app, "main", WebviewUrl::External(server.clone()))
                 .title("Nexum")
                 .inner_size(1440.0, 900.0)
                 .min_inner_size(900.0, 600.0)
@@ -539,6 +570,7 @@ pub fn run() {
                     }
                 })
                 .build()?;
+            reload_on_crash(&main_window);
             apply(&handle, &s);
 
             // Some Linux desktops have no tray (GNOME without an extension):
