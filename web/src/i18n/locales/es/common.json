@@ -3005,5 +3005,13 @@
     "failed": "No se pudieron importar los sistemas.",
     "fileTooBig": "Ese archivo es demasiado grande (2 MB como máximo).",
     "fileFailed": "No se pudo leer ese archivo."
+  },
+  "chainNumber": {
+    "toggle": "Numerar la cadena desde home (L+1)",
+    "hint": "Cada sistema recibe un número en el primer salto por agujero de gusano hacia él: 1, 2, 3 desde home, 51, 52 desde 5, etc. Los marcadores de agujeros empiezan por el número de su destino, así quedan en el orden de la cadena en EVE. Un número nunca cambia ni se repite.",
+    "set": "Poner número de cadena…",
+    "setTitle": "Número de cadena",
+    "setMessage": "Número de cadena para {{name}}. Déjalo vacío para quitarlo.",
+    "invalid": "Un número de cadena solo tiene dígitos, como 51, con un punto antes de cualquier parte mayor de 9, como 5.10."
   }
 }

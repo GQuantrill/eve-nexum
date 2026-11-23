@@ -3005,5 +3005,13 @@
     "failed": "Die Systeme konnten nicht importiert werden.",
     "fileTooBig": "Die Datei ist zu groß (höchstens 2 MB).",
     "fileFailed": "Die Datei konnte nicht gelesen werden."
+  },
+  "chainNumber": {
+    "toggle": "Kette ab Home nummerieren (L+1)",
+    "hint": "Jedes System bekommt beim ersten Wurmlochsprung hinein eine Nummer: 1, 2, 3 ab Home, 51, 52 ab 5 und so weiter. Loch-Lesezeichen beginnen mit der Nummer ihres Ziels und sind in EVE so nach der Kette sortiert. Eine Nummer ändert sich nie und wird nie zweimal vergeben.",
+    "set": "Kettennummer setzen…",
+    "setTitle": "Kettennummer",
+    "setMessage": "Kettennummer für {{name}}. Leer lassen, um sie zu entfernen.",
+    "invalid": "Eine Kettennummer besteht nur aus Ziffern, etwa 51, mit einem Punkt vor jedem Teil über 9, etwa 5.10."
   }
 }

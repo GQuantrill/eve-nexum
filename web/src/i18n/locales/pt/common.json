@@ -3005,5 +3005,13 @@
     "failed": "Não foi possível importar os sistemas.",
     "fileTooBig": "Esse ficheiro é demasiado grande (2 MB no máximo).",
     "fileFailed": "Não foi possível ler esse ficheiro."
+  },
+  "chainNumber": {
+    "toggle": "Numerar a cadeia a partir de home (L+1)",
+    "hint": "Cada sistema recebe um número no primeiro salto por buraco de minhoca para ele: 1, 2, 3 a partir de home, 51, 52 a partir de 5, etc. Os marcadores de buracos começam pelo número do destino, ficando pela ordem da cadeia no EVE. Um número nunca muda nem se repete.",
+    "set": "Definir número da cadeia…",
+    "setTitle": "Número da cadeia",
+    "setMessage": "Número da cadeia para {{name}}. Deixe vazio para o limpar.",
+    "invalid": "Um número da cadeia só tem algarismos, como 51, com um ponto antes de qualquer parte acima de 9, como 5.10."
   }
 }

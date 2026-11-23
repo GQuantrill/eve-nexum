@@ -115,6 +115,9 @@ export interface MapSystem {
   /** Single-character quick tag (A-Z / 0-9), shown as a badge before the name.
    *  null/undefined = untagged. */
   tag?: string | null;
+  /** Chain number ("L+1") when the map numbers its chain: the system's path
+   *  from home, e.g. 5162. utils/chainNumber.ts. */
+  chainLabel?: string | null;
   lastActivityAt: string; // ISO timestamp, updated when system or its sigs are touched
 }
 
@@ -281,6 +284,9 @@ export interface WormholeMap {
    *  bookmarkFormat (which is wormhole-only). Null/absent = each user falls back
    *  to their own nexum.sig.siteBookmarkFormat. */
   siteBookmarkFormat?: string | null;
+  /** Number the chain from home ("L+1"): systems get a number on the first
+   *  jump in, and hole bookmarks start with it. utils/chainNumber.ts. */
+  chainNumbering?: boolean;
   /** Present when the map has an active or expired share link. The token
    *  itself is in shareToken; shareExpiresAt is the cutoff. The owner UI
    *  treats an expired token as "no link" — regenerate to share again.

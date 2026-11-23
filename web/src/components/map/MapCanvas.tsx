@@ -80,6 +80,7 @@ import { toast } from '../../utils/toastStore';
 import { copySystems, pasteSystems, parseClip } from '../../utils/mapClipboard';
 import { ExportSystemsModal } from '../ui/ExportSystemsModal';
 import { ImportSystemsModal } from '../ui/ImportSystemsModal';
+import { CHAIN_LABEL_RE } from '../../utils/chainNumber';
 import i18n from '../../i18n';
 import { useCustomIntel } from '../../hooks/useCustomIntel';
 import { useUserSetting } from '../../hooks/useUserSetting';
@@ -537,6 +538,9 @@ export function MapCanvas() {
   const [keyDeleteConfirm, setKeyDeleteConfirm] = useState<{ ids: string[]; name: string | null } | null>(null);
   // Systems picked for Export systems (ExportSystemsModal).
   const [exportIds, setExportIds] = useState<string[] | null>(null);
+  // The system whose chain number is being set by hand (utils/chainNumber.ts).
+  const [chainDialogFor, setChainDialogFor] = useState<string | null>(null);
+  const chainNumbering = useMapStore((s) => !!s.map.chainNumbering);
   // Where Import systems was opened (ImportSystemsModal), in map coordinates.
   const [importAt, setImportAt] = useState<{ x: number; y: number } | null>(null);
   const [confirmKeyDelete, setConfirmKeyDelete] = useUserSetting<boolean>(CONFIRM_KEY_DELETE_KEY, true);
@@ -1562,6 +1566,14 @@ export function MapCanvas() {
 
       // Display-only alias — rename the node on this map. Toggles to "Clear alias"
       // (restoring the real name) once one is set. The real name is untouched.
+      // Chain number by hand: to fix one, or number a system reached before
+      // numbering was on. Home has none.
+      const chainItem = !multiSelected && chainNumbering && sys && !sys.isHome ? [{
+        label: t('chainNumber.set'),
+        icon:  <HashIcon size={16} weight="regular" />,
+        action: () => setChainDialogFor(contextMenu.nodeId!),
+      }] : [];
+
       const aliasItem = !multiSelected ? [
         sys?.alias
           ? {
@@ -1801,6 +1813,7 @@ export function MapCanvas() {
         ...homeItem,
         ...copyNameItem,
         ...copySystemsItem,
+        ...chainItem,
         ...aliasItem,
         ...tagItem,
         ...intelItem,
@@ -2117,6 +2130,27 @@ export function MapCanvas() {
             customLabels={sys.customLabels ?? []}
             onChange={(next) => updateSystem(labelDialogFor, { customLabels: next })}
             onClose={() => setLabelDialogFor(null)}
+          />
+        );
+      })()}
+
+      {chainDialogFor && (() => {
+        const sys = systems.find((s) => s.id === chainDialogFor);
+        if (!sys) return null;
+        return (
+          <PromptModal
+            title={t('chainNumber.setTitle')}
+            message={t('chainNumber.setMessage', { name: systemDisplayName(sys) })}
+            defaultValue={sys.chainLabel ?? ''}
+            placeholder="51"
+            confirmLabel={t('actions.save')}
+            onConfirm={(value) => {
+              const v = value.trim();
+              if (v && !CHAIN_LABEL_RE.test(v)) { toast.error(t('chainNumber.invalid')); return; }
+              updateSystem(chainDialogFor, { chainLabel: v || null });
+              setChainDialogFor(null);
+            }}
+            onCancel={() => setChainDialogFor(null)}
           />
         );
       })()}

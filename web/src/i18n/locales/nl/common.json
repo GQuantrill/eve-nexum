@@ -3005,5 +3005,13 @@
     "failed": "Kon de systemen niet importeren.",
     "fileTooBig": "Dat bestand is te groot (maximaal 2 MB).",
     "fileFailed": "Kon dat bestand niet lezen."
+  },
+  "chainNumber": {
+    "toggle": "Keten nummeren vanaf home (L+1)",
+    "hint": "Elk systeem krijgt een nummer bij de eerste wormhole-sprong erin: 1, 2, 3 vanaf home, 51, 52 vanaf 5, enzovoort. Bookmarks van gaten beginnen met het nummer van waar ze heen gaan, zodat ze in EVE op ketenvolgorde staan. Een nummer verandert nooit en wordt nooit twee keer gebruikt.",
+    "set": "Ketennummer instellen…",
+    "setTitle": "Ketennummer",
+    "setMessage": "Ketennummer voor {{name}}. Laat leeg om het te wissen.",
+    "invalid": "Een ketennummer bestaat alleen uit cijfers, zoals 51, met een punt voor elk deel boven 9, zoals 5.10."
   }
 }

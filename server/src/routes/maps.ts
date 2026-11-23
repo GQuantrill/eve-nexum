@@ -21,6 +21,7 @@ import { resolveOwnerId } from '../utils/owner.js';
 import { mapCapFor, countPersonalMaps, mapAllowanceFor } from '../services/mapAllowance.js';
 import { parseMapBackup, restoreMapBackup, buildMapBackup, BackupError, MAX_BACKUP_SYSTEMS } from '../services/mapBackup.js';
 import { selectClip, pasteIntoMap, MAX_PASTE_CHAINS } from '../services/mapPaste.js';
+import { assignChainNumber, CHAIN_LABEL_RE, MAX_CHAIN_LABEL_LEN } from '../services/chainNumber.js';
 import { resolveEntityNames } from '../services/entityNames.js';
 import { audit } from '../services/audit.js';
 import { publishToMap } from '../services/mapEvents.js';
@@ -2855,10 +2856,10 @@ mapsRouter.post('/:mapId/presence', async (req, res) => {
 // toggle merge-source eligibility (corp maps, full/admin only)
 mapsRouter.patch('/:mapId', async (req, res) => {
   const { mapId } = req.params;
-  const { name, locked, allowAsMergeSource, allowAsMergeDestination, lazyRemoveWormholes, collapseGraceHours, bookmarkFormat, siteBookmarkFormat, skipKspace, crossMapSync } = req.body as {
+  const { name, locked, allowAsMergeSource, allowAsMergeDestination, lazyRemoveWormholes, collapseGraceHours, bookmarkFormat, siteBookmarkFormat, skipKspace, crossMapSync, chainNumbering } = req.body as {
     name?: string; locked?: boolean; allowAsMergeSource?: boolean; allowAsMergeDestination?: boolean;
     lazyRemoveWormholes?: boolean; collapseGraceHours?: number; bookmarkFormat?: string | null; siteBookmarkFormat?: string | null; skipKspace?: boolean;
-    crossMapSync?: boolean;
+    crossMapSync?: boolean; chainNumbering?: boolean;
   };
 
   const access = await requireMapWrite(res, mapId, req);
@@ -2972,7 +2973,9 @@ mapsRouter.patch('/:mapId', async (req, res) => {
   let normalizedSiteBookmarkFmt: string | null | undefined;
   // Wormhole and site bookmark formats share the same owner/admin gate; check
   // it once, then apply whichever field(s) were sent.
-  if (bookmarkFormat !== undefined || siteBookmarkFormat !== undefined) {
+  // Chain numbers go into everyone's bookmarks, like the shared formats, so
+  // the same people may switch them on and off.
+  if (bookmarkFormat !== undefined || siteBookmarkFormat !== undefined || chainNumbering !== undefined) {
     const role = req.session.role ?? 'readonly';
     if (access.accessKind === 'shared') {
       res.status(403).json({ error: 'Only the map owner can change the shared bookmark format' }); return;
@@ -2996,6 +2999,9 @@ mapsRouter.patch('/:mapId', async (req, res) => {
       normalizedSiteBookmarkFmt = trimmed === '' ? null : trimmed;
       sets.push(`site_bookmark_format = $${vals.length + 1}`); vals.push(normalizedSiteBookmarkFmt);
     }
+    if (chainNumbering !== undefined) {
+      sets.push(`chain_numbering = $${vals.length + 1}`); vals.push(chainNumbering === true);
+    }
   }
 
   if (sets.length === 1) { res.status(400).json({ error: 'Nothing to update' }); return; }
@@ -3018,11 +3024,13 @@ mapsRouter.patch('/:mapId', async (req, res) => {
       ...(normalizedGrace !== undefined ? { collapseGraceHours: normalizedGrace } : {}),
       ...(normalizedBookmarkFmt !== undefined ? { bookmarkFormat: normalizedBookmarkFmt } : {}),
       ...(normalizedSiteBookmarkFmt !== undefined ? { siteBookmarkFormat: normalizedSiteBookmarkFmt } : {}),
+      ...(chainNumbering !== undefined ? { chainNumbering: chainNumbering === true } : {}),
     });
     const settings = {
       name, locked, allowAsMergeSource, allowAsMergeDestination, lazyRemoveWormholes,
       collapseGraceHours: normalizedGrace, bookmarkFormat: normalizedBookmarkFmt,
       siteBookmarkFormat: normalizedSiteBookmarkFmt, skipKspace, crossMapSync,
+      chainNumbering: chainNumbering === undefined ? undefined : chainNumbering === true,
     };
     const values = Object.fromEntries(Object.entries(settings).filter(([, v]) => v !== undefined));
     recordMapAudit(req, mapId, { action: 'map.update', targetId: mapId, details: { fields: Object.keys(values), values } });
@@ -3159,6 +3167,34 @@ mapsRouter.post('/:mapId/systems', async (req, res) => {
   res.status(201).json({ ok: true, system });
 });
 
+// POST /api/maps/:mapId/systems/:systemId/chain-number { fromSystemId } --
+// the pilot's client, on a wormhole jump from fromSystemId into this system:
+// give it the next chain number if the map numbers chains and it has none
+// (services/chainNumber.ts). Answers the system's number either way. Content
+// level, like logging the jump: anyone who can edit signatures may jump.
+mapsRouter.post('/:mapId/systems/:systemId/chain-number', async (req, res) => {
+  const { mapId, systemId } = req.params;
+  const fromId = (req.body as { fromSystemId?: unknown }).fromSystemId;
+  if (!UUID_RE.test(mapId) || !UUID_RE.test(systemId) || typeof fromId !== 'string' || !UUID_RE.test(fromId)) {
+    res.status(400).json({ error: 'invalid ids' }); return;
+  }
+  const access = await requireMapContentWrite(res, mapId, req);
+  if (!access) return;
+  // Only along a link the map has: a number says how you get there.
+  const { rowCount } = await db.query(
+    `SELECT 1 FROM map_connections WHERE map_id = $1
+        AND ((source_id = $2 AND target_id = $3) OR (source_id = $3 AND target_id = $2))`, [mapId, fromId, systemId]);
+  if (!rowCount) { res.status(400).json({ error: 'Those systems are not linked' }); return; }
+
+  const before = await db.query<{ label: string | null }>(
+    `SELECT chain_label AS label FROM map_systems WHERE id = $1 AND map_id = $2`, [systemId, mapId]);
+  const chainLabel = await assignChainNumber(mapId, fromId, systemId);
+  if (chainLabel && chainLabel !== before.rows[0]?.label) {
+    publishToMap(mapId, { type: 'system.update', actor: null, id: systemId, updates: { chainLabel } });
+  }
+  res.json({ chainLabel });
+});
+
 mapsRouter.patch('/:mapId/systems/:systemId', async (req, res) => {
   const { mapId, systemId } = req.params;
   const updates = { ...(req.body as Record<string, unknown>) };
@@ -3266,6 +3302,19 @@ mapsRouter.patch('/:mapId/systems/:systemId', async (req, res) => {
     }
     sets.push(`custom_labels = $${vals.length + 1}`);
     vals.push(v);
+  }
+
+  // Chain number set or cleared by hand (services/chainNumber.ts): digits,
+  // with dots between parts past 9; empty or null clears it.
+  if ('chainLabel' in updates) {
+    const v = updates.chainLabel;
+    const clean = typeof v === 'string' ? v.trim() : '';
+    if ((v !== null && typeof v !== 'string') || (clean && (clean.length > MAX_CHAIN_LABEL_LEN || !CHAIN_LABEL_RE.test(clean)))) {
+      res.status(400).json({ error: 'invalid chainLabel' }); return;
+    }
+    sets.push(`chain_label = $${vals.length + 1}`);
+    vals.push(clean || null);
+    updates.chainLabel = clean || null;
   }
 
   // handle position separately

@@ -462,7 +462,7 @@ export type RemoteEvent =
   | { type: 'route.update';      id: string; updates: Partial<SavedRoute> }
   | { type: 'route.remove';      id: string }
   | { type: 'route.reorder';     orderedIds: string[] }
-  | { type: 'map.meta';          name?: string; locked?: boolean; allowAsMergeSource?: boolean; allowAsMergeDestination?: boolean; skipKspace?: boolean; crossMapSync?: boolean; lazyRemoveWormholes?: boolean; collapseGraceHours?: number; bookmarkFormat?: string | null; siteBookmarkFormat?: string | null }
+  | { type: 'map.meta';          name?: string; locked?: boolean; allowAsMergeSource?: boolean; allowAsMergeDestination?: boolean; skipKspace?: boolean; crossMapSync?: boolean; lazyRemoveWormholes?: boolean; collapseGraceHours?: number; bookmarkFormat?: string | null; siteBookmarkFormat?: string | null; chainNumbering?: boolean }
   | { type: 'map.resync' }
   | { type: 'sig.changed';       systemId: string }
   | { type: 'structure.changed'; systemId: string }
@@ -1639,6 +1639,7 @@ export const useMapStore = create<MapStore>()((set, get) => {
             ...(event.collapseGraceHours !== undefined ? { collapseGraceHours: event.collapseGraceHours } : {}),
             ...(event.bookmarkFormat !== undefined ? { bookmarkFormat: event.bookmarkFormat } : {}),
             ...(event.siteBookmarkFormat !== undefined ? { siteBookmarkFormat: event.siteBookmarkFormat } : {}),
+            ...(event.chainNumbering !== undefined ? { chainNumbering: event.chainNumbering } : {}),
           };
           set((s) => ({
             map: { ...s.map, ...patch },

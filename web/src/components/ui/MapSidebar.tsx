@@ -631,7 +631,48 @@ function MapBookmarkSection({ sectionProps }: { sectionProps: { isOpen: boolean;
   return (
     <CollapsibleSection title={t("mapSidebar.sections.bookmarks")} {...sectionProps}>
       <MapBookmarkFormat />
+      <MapChainNumbering />
     </CollapsibleSection>
+  );
+}
+
+// Chain numbers ("L+1", utils/chainNumber.ts): a map setting, since the
+// numbers go into bookmarks the whole corp shares. Same people as the formats.
+function MapChainNumbering() {
+  const { t } = useTranslation();
+  const map = useMapStore((s) => s.map);
+  const on = !!map.chainNumbering;
+  const [saving, setSaving] = useState(false);
+
+  function setInStore(v: boolean) {
+    useMapStore.setState((s) => ({
+      map: { ...s.map, chainNumbering: v },
+      maps: s.maps.map((m) => (m.id === map.id ? { ...m, chainNumbering: v } : m)),
+    }));
+  }
+
+  async function toggle(next: boolean) {
+    setSaving(true);
+    setInStore(next);
+    try {
+      await api(`/api/maps/${map.id}`, { method: "PATCH", body: JSON.stringify({ chainNumbering: next }) });
+    } catch (e) {
+      setInStore(!next);
+      toast.error(e instanceof Error ? e.message : t("mapSidebar.updateSettingFailed"));
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <>
+      <label className="map-sidebar__row map-sidebar__toggle-row">
+        <span className="map-sidebar__label">{t("chainNumber.toggle")}</span>
+        <input type="checkbox" className="map-sidebar__toggle-input" checked={on} disabled={saving}
+          onChange={(e) => void toggle(e.target.checked)} />
+      </label>
+      <div className="map-sidebar__hint">{t("chainNumber.hint")}</div>
+    </>
   );
 }
 

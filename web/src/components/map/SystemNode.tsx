@@ -63,6 +63,8 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
   const selectSystem    = useMapStore((s) => s.selectSystem);
   const compactMode     = useMapStore((s) => s.compactMode);
   const uniformSize     = useMapStore((s) => s.uniformSize);
+  // Chain number (utils/chainNumber.ts): only while the map numbers its chain.
+  const chainNumbering  = useMapStore((s) => !!s.map.chainNumbering);
   const showStatics     = useMapStore((s) => s.showStatics);
   const uniformWidth    = useMapStore((s) => s.uniformWidth);
   const uniformHeight   = useMapStore((s) => s.uniformHeight);
@@ -339,8 +341,13 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
       {/* Label pills, anchored just above the node's top-left (absolutely
           positioned so they sit outside the node body). Predefined coloured
           pills first, then custom text / icon pills. */}
-      {(sys.labels?.length || sys.customLabels?.length) ? (
+      {(sys.labels?.length || sys.customLabels?.length || (chainNumbering && sys.chainLabel)) ? (
         <div className="system-node__labels">
+          {chainNumbering && sys.chainLabel && (
+            <span className="system-node__label system-node__label--custom system-node__label--chain">
+              {sys.chainLabel}
+            </span>
+          )}
           {PREDEFINED_LABELS.filter((l) => sys.labels?.includes(l.id)).map((l) => (
             <span key={l.id} className="system-node__label" style={{ background: l.color }}>{l.char}</span>
           ))}

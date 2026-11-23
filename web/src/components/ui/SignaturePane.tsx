@@ -1,3 +1,4 @@
+import { forwardChainLabel, withChain } from '../../utils/chainNumber';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
@@ -617,6 +618,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   const [userBookmarkFormat] = useUserSetting<string>('nexum.sig.bookmarkFormat', DEFAULT_BOOKMARK_FORMAT);
   const [userK162BookmarkFormat] = useUserSetting<string>(K162_BOOKMARK_FORMAT_KEY, '');
   const mapBookmarkFormat = useMapStore((s) => s.map.bookmarkFormat);
+  const chainNumbering    = useMapStore((s) => !!s.map.chainNumbering);
   // Same map-overrides-personal resolution for the relic/data/gas SITE format.
   const [userSiteBookmarkFormat] = useUserSetting<string>('nexum.sig.siteBookmarkFormat', DEFAULT_SITE_BOOKMARK_FORMAT);
   const mapSiteBookmarkFormat = useMapStore((s) => s.map.siteBookmarkFormat);
@@ -662,15 +664,23 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   }, [mapSystems]);
 
   const copyBookmark = useCallback((sig: Signature) => {
-    const format = wormholeBookmarkFormat(sig, mapBookmarkFormat, userBookmarkFormat, userK162BookmarkFormat);
+    const format = withChain(
+      wormholeBookmarkFormat(sig, mapBookmarkFormat, userBookmarkFormat, userK162BookmarkFormat), chainNumbering);
+    // The number of where the hole leads, when it's a step further from home.
+    const leadsTo = (sig.whLeadsTo ?? '').trim().toUpperCase();
+    const chain = chainNumbering
+      ? forwardChainLabel(mapSystems.find((x) => x.id === systemId),
+          leadsTo ? mapSystems.find((x) => x.name?.trim().toUpperCase() === leadsTo) : undefined)
+      : '';
     const name = formatBookmarkName(format, sig, whTypes, Date.now(),
       (n) => classBySystemName.get(n.trim().toUpperCase()) ?? null,
-      (n) => aliasBySystemName.get(n.trim().toUpperCase()) ?? null);
+      (n) => aliasBySystemName.get(n.trim().toUpperCase()) ?? null, chain);
     if (!name) return;
     navigator.clipboard.writeText(name)
       .then(() => toast.success(t('signatures.bookmarkCopied', { name })))
       .catch(() => toast.error(t('signatures.bookmarkCopyFailed')));
-  }, [mapBookmarkFormat, userBookmarkFormat, userK162BookmarkFormat, whTypes, classBySystemName, aliasBySystemName, t]);
+  }, [mapBookmarkFormat, userBookmarkFormat, userK162BookmarkFormat, whTypes, classBySystemName, aliasBySystemName, t,
+      chainNumbering, mapSystems, systemId]);
 
   const copySiteBookmark = useCallback((sig: Signature) => {
     const name = formatSiteBookmarkName(siteBookmarkFormat, sig);

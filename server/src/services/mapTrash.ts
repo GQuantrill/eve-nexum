@@ -174,7 +174,7 @@ async function canonicalSystem(client: PoolClient, mapId: string, id: string) {
     `SELECT id, eve_system_id AS "eveSystemId", name, system_class AS "systemClass", effect, statics,
             region_name AS "regionName", npc_type AS "npcType", position_x AS x, position_y AS y,
             status, intel, is_home AS "isHome", locked, notes,
-            labels, custom_labels AS "customLabels", tag, alias,
+            labels, custom_labels AS "customLabels", tag, alias, chain_label AS "chainLabel",
             (SELECT ss.security::float8 FROM solar_systems ss WHERE ss.id = map_systems.eve_system_id) AS "security",
             last_activity_at AS "lastActivityAt"
        FROM map_systems WHERE id = $1 AND map_id = $2`,

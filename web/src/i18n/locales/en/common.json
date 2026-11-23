@@ -3005,5 +3005,13 @@
     "failed": "Couldn't import the systems.",
     "fileTooBig": "That file is too big (2 MB at most).",
     "fileFailed": "Couldn't read that file."
+  },
+  "chainNumber": {
+    "toggle": "Number the chain from home (L+1)",
+    "hint": "Each system gets a number on the first wormhole jump into it: 1, 2, 3 out of home, 51, 52 out of 5, and so on. Hole bookmarks start with the number of where they lead, so they sort into chain order in EVE. A number never changes and is never used twice.",
+    "set": "Set chain number…",
+    "setTitle": "Chain number",
+    "setMessage": "Chain number for {{name}}. Leave it empty to clear it.",
+    "invalid": "A chain number is digits only, like 51, with a dot before any part over 9, like 5.10."
   }
 }

@@ -11,6 +11,7 @@ import {
   formatBookmarkName, DEFAULT_BOOKMARK_FORMAT, K162_BOOKMARK_FORMAT_KEY, wormholeBookmarkFormat,
 } from '../utils/signatureBookmark';
 import { copyWhenFocused } from '../utils/copyWhenFocused';
+import { chainNumberSettled, forwardChainLabel, withChain } from '../utils/chainNumber';
 
 export const COPY_BOOKMARK_ON_JUMP = 'nexum.sig.copyBookmarkOnJump';
 
@@ -18,16 +19,23 @@ export const COPY_BOOKMARK_ON_JUMP = 'nexum.sig.copyBookmarkOnJump';
 // clipboard -- the same name its row's copy button gives (map format over the
 // pilot's own), so they can rename the in-game bookmark without opening the
 // pane.
-function copyJumpedBookmark(sig: Signature): void {
+async function copyJumpedBookmark(sig: Signature, fromMapSystemId: string): Promise<void> {
   if (!readUserSetting<boolean>(COPY_BOOKMARK_ON_JUMP, true)) return;
+  const byName = (n: string) => useMapStore.getState().map.systems
+    .find((s) => s.name?.trim().toUpperCase() === n.trim().toUpperCase());
+  // A chain number for the system just reached may still be on its way.
+  const arrival = byName(sig.whLeadsTo ?? '');
+  if (arrival && useMapStore.getState().map.chainNumbering) await chainNumberSettled(arrival.id);
   const map = useMapStore.getState().map;
-  const format = wormholeBookmarkFormat(sig, map.bookmarkFormat,
+  const format = withChain(wormholeBookmarkFormat(sig, map.bookmarkFormat,
     readUserSetting<string>('nexum.sig.bookmarkFormat', DEFAULT_BOOKMARK_FORMAT),
-    readUserSetting<string>(K162_BOOKMARK_FORMAT_KEY, ''));
-  const byName = (n: string) => map.systems.find((s) => s.name?.trim().toUpperCase() === n.trim().toUpperCase());
+    readUserSetting<string>(K162_BOOKMARK_FORMAT_KEY, '')), map.chainNumbering);
+  const chain = map.chainNumbering
+    ? forwardChainLabel(map.systems.find((s) => s.id === fromMapSystemId), byName(sig.whLeadsTo ?? ''))
+    : '';
   const name = formatBookmarkName(format, sig, wormholeTypesSnapshot(), Date.now(),
     (n) => { const c = byName(n)?.systemClass; return c && c !== 'unknown' ? c : null; },
-    (n) => byName(n)?.alias?.trim() || null);
+    (n) => byName(n)?.alias?.trim() || null, chain);
   if (!name) return;
   void copyWhenFocused(name).then((ok) => {
     if (ok) toast.success(i18n.t('signatures.bookmarkCopied', { name }));
@@ -141,7 +149,7 @@ export async function maybeConfirmWhJump(ctx: WhJumpContext): Promise<void> {
     const sole = candidates[0];
     const prev = sole.whLeadsTo;
     writeLeadsTo(sole, toName, sole);
-    copyJumpedBookmark({ ...sole, whLeadsTo: toName });
+    void copyJumpedBookmark({ ...sole, whLeadsTo: toName }, fromMapSystemId);
     toast.show(t('whJump.filled', { sig: label(sole), system: toName }), {
       kind: 'success', dedupeKey, ttlMs: 8000,
       actions: [
@@ -156,7 +164,7 @@ export async function maybeConfirmWhJump(ctx: WhJumpContext): Promise<void> {
     actions: [
       ...(candidates.length ? candidates : unscanned).map((s) => ({ label: label(s), onClick: () => {
         writeLeadsTo(s, toName, s);
-        copyJumpedBookmark({ ...s, whLeadsTo: toName });
+        void copyJumpedBookmark({ ...s, whLeadsTo: toName }, fromMapSystemId);
       } })),
       { label: t('whJump.unmapped'), onClick: () => { /* skip */ } },
     ],
