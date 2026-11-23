@@ -2179,7 +2179,8 @@
     "resetColor": "Redefinir",
     "connInfo": "Info das conexões",
     "connInfoFull": "Sempre visível",
-    "connInfoFolded": "Recolhida"
+    "connInfoFolded": "Recolhida",
+    "importSystemsTitle": "Adicionar sistemas a este mapa a partir de linhas CSV ou separadas por tabulações"
   },
   "mass": {
     "billionKg": "{{value}} mil M kg",

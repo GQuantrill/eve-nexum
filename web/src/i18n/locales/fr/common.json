@@ -2179,7 +2179,8 @@
     "resetColor": "Réinitialiser",
     "connInfo": "Infos des connexions",
     "connInfoFull": "Toujours affichées",
-    "connInfoFolded": "Repliées"
+    "connInfoFolded": "Repliées",
+    "importSystemsTitle": "Ajouter des systèmes à cette carte depuis des lignes CSV ou séparées par des tabulations"
   },
   "mass": {
     "billionKg": "{{value}} Md kg",

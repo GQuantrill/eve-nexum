@@ -2203,7 +2203,8 @@
     "resetColor": "Сбросить",
     "connInfo": "Информация о связях",
     "connInfoFull": "Всегда показывать",
-    "connInfoFolded": "Свёрнута"
+    "connInfoFolded": "Свёрнута",
+    "importSystemsTitle": "Добавить системы на эту карту из строк CSV или с разделителями-табуляциями"
   },
   "mass": {
     "billionKg": "{{value}} млрд кг",

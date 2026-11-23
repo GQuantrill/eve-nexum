@@ -2179,7 +2179,8 @@
     "resetColor": "Reset",
     "connInfo": "Connection info",
     "connInfoFull": "Always shown",
-    "connInfoFolded": "Folded"
+    "connInfoFolded": "Folded",
+    "importSystemsTitle": "Add systems to this map from CSV or tab-separated rows"
   },
   "mass": {
     "billionKg": "{{value}} B kg",

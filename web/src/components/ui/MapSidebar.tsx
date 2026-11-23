@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { Trans, useTranslation } from "react-i18next";
 import { TripwireImportModal } from "./TripwireImportModal";
+import { ImportSystemsModal } from "./ImportSystemsModal";
 import type { TFunction } from "i18next";
 import {
   useNotificationPermission,
@@ -1167,6 +1168,8 @@ export function MapSidebar() {
   // Wanderer export this carries signatures and each hole's mass/life, so a
   // chain arrives with its scan data rather than just its shape.
   const [tripwireOpen, setTripwireOpen] = useState(false);
+  // Import systems into THIS map (also on the map's right-click menu).
+  const [importSystemsOpen, setImportSystemsOpen] = useState(false);
   async function handleImportTripwire(raw: string) {
     let parsed: { signatures?: unknown; wormholes?: unknown; notes?: unknown; origin?: unknown };
     try {
@@ -2019,6 +2022,16 @@ export function MapSidebar() {
                 </button>
               </div>
 
+              {/* Adds to the open map, so not held back by the map limit. */}
+              <button
+                type="button"
+                className="map-sidebar__action"
+                onClick={() => setImportSystemsOpen(true)}
+                title={t("mapSidebar.importSystemsTitle")}
+              >
+                {t("ctxMenu.importSystems")}
+              </button>
+
               <button className="map-sidebar__action" onClick={handleExport}>
                 {t("mapSidebar.exportJson")}
               </button>
@@ -2111,6 +2124,10 @@ export function MapSidebar() {
       {auditOpen && auditMapId && createPortal(
         <MapAuditModal mapId={auditMapId} mapName={auditMapName} onClose={() => setAuditOpen(false)} />,
         document.body,
+      )}
+
+      {importSystemsOpen && auditMapId && (
+        <ImportSystemsModal mapId={auditMapId} anchor={null} onClose={() => setImportSystemsOpen(false)} />
       )}
 
       {tripwireOpen && (

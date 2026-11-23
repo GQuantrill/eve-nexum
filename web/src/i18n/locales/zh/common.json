@@ -2179,7 +2179,8 @@
     "resetColor": "重置",
     "connInfo": "连接信息",
     "connInfoFull": "始终显示",
-    "connInfoFolded": "折叠"
+    "connInfoFolded": "折叠",
+    "importSystemsTitle": "从 CSV 或制表符分隔的行向此地图添加星系"
   },
   "mass": {
     "billionKg": "{{value}} 十亿 kg",

@@ -2179,7 +2179,8 @@
     "resetColor": "Zurücksetzen",
     "connInfo": "Verbindungsinfos",
     "connInfoFull": "Immer anzeigen",
-    "connInfoFolded": "Eingeklappt"
+    "connInfoFolded": "Eingeklappt",
+    "importSystemsTitle": "Systeme aus CSV- oder tabulatorgetrennten Zeilen zu dieser Karte hinzufügen"
   },
   "mass": {
     "billionKg": "{{value}} Mrd. kg",

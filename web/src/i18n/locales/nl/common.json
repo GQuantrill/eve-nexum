@@ -2179,7 +2179,8 @@
     "resetColor": "Herstellen",
     "connInfo": "Verbindingsinfo",
     "connInfoFull": "Altijd tonen",
-    "connInfoFolded": "Ingeklapt"
+    "connInfoFolded": "Ingeklapt",
+    "importSystemsTitle": "Systemen aan deze kaart toevoegen uit CSV- of tab-gescheiden regels"
   },
   "mass": {
     "billionKg": "{{value}} mld kg",
