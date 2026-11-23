@@ -9,8 +9,15 @@ import { api } from '../api/client';
 
 export const CLIP_FORMAT = 'nexum-systems';
 
+/** A saved chain as a path of clip system ids. */
+export interface ClipChain { name: string; systemIds: string[] }
+
+/** What an import adds to a paste (selectionImport.ts). */
+export interface PasteExtras { mergeLabels?: boolean; chains?: ClipChain[] }
+
 export interface PasteResult {
   systems: number; connections: number; signatures: number; anomalies: number; structures: number;
+  labels: number; chains: number;
   matched: number;
   focus: { x: number; y: number } | null;
 }
@@ -62,9 +69,9 @@ export async function copySystems(mapId: string, systemIds: string[]): Promise<n
 }
 
 export function pasteSystems(
-  mapId: string, clip: Record<string, unknown>, anchor: { x: number; y: number } | null,
+  mapId: string, clip: Record<string, unknown>, anchor: { x: number; y: number } | null, extras: PasteExtras = {},
 ): Promise<PasteResult> {
   return api<PasteResult>(`/api/maps/${mapId}/paste`, {
-    method: 'POST', body: JSON.stringify({ clip, anchor }),
+    method: 'POST', body: JSON.stringify({ clip, anchor, ...extras }),
   });
 }

@@ -47,6 +47,7 @@ export { ColumnsIcon } from '@phosphor-icons/react/dist/csr/Columns';
 export { CommandIcon } from '@phosphor-icons/react/dist/csr/Command';
 export { CopyIcon } from '@phosphor-icons/react/dist/csr/Copy';
 export { DownloadSimpleIcon } from '@phosphor-icons/react/dist/csr/DownloadSimple';
+export { UploadSimpleIcon } from '@phosphor-icons/react/dist/csr/UploadSimple';
 export { CrosshairIcon } from '@phosphor-icons/react/dist/csr/Crosshair';
 export { CrosshairSimpleIcon } from '@phosphor-icons/react/dist/csr/CrosshairSimple';
 export { DesktopIcon } from '@phosphor-icons/react/dist/csr/Desktop';

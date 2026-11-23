@@ -959,7 +959,8 @@
     "pasteSystemsNoRights": "Tu rol no puede añadir sistemas a este mapa.",
     "pasteUseKeys": "Tu navegador no deja que nexum lea el portapapeles. Pulsa Ctrl+V (Cmd+V en Mac) sobre el mapa.",
     "pasteNoSystems": "No hay sistemas copiados en el portapapeles. Primero haz clic derecho en sistemas y elige Copiar sistemas.",
-    "exportSystems": "Exportar sistemas ({{count}})…"
+    "exportSystems": "Exportar sistemas ({{count}})…",
+    "importSystems": "Importar sistemas…"
   },
   "customIntel": {
     "title": "Intel personalizada",
@@ -2954,5 +2955,55 @@
     "save": "Guardar archivo",
     "copied": "Copiado al portapapeles.",
     "copyFailed": "No se pudo copiar al portapapeles."
+  },
+  "groupMeaning": {
+    "map": "El mapa",
+    "chain": "Una cadena guardada",
+    "title": "El grupo es",
+    "label": "Una etiqueta"
+  },
+  "importSystems": {
+    "title": "Importar sistemas",
+    "intro": "Pega filas o abre un archivo CSV o separado por tabulaciones, con una línea de encabezado. Columnas: group, system, signature, sig-type, name, to-system, from-type, to-type, size, mass-remaining, life-remaining. Solo system es obligatoria. Los sistemas que este mapa ya tiene quedan como están; solo se añade lo que falta.",
+    "paste": "Filas",
+    "openFile": "Abrir un archivo…",
+    "meaningHint": {
+      "map": "El grupo es solo una nota: no se hace nada con él.",
+      "chain": "Cada grupo cuyos agujeros forman un solo camino se guarda como cadena con el nombre del grupo.",
+      "label": "Cada grupo se pone en sus sistemas como etiqueta de texto personalizada (hasta tres por sistema)."
+    },
+    "noHeader": "No hay línea de encabezado con una columna \"system\".",
+    "lookupFailed": "No se pudieron buscar los nombres de sistema. Inténtalo de nuevo.",
+    "checking": "Comprobando los nombres de sistema…",
+    "summary": "Listo: {{good}} filas. Excluidas por problemas: {{bad}}.",
+    "col": {
+      "system": "Sistema",
+      "signature": "Firma",
+      "toSystem": "Hacia sistema",
+      "check": "Comprobación"
+    },
+    "rowOk": "OK",
+    "error": {
+      "noSystem": "Sin sistema.",
+      "unknownSystem": "No es un sistema de EVE.",
+      "badSignature": "La firma debe tener la forma ABC-123.",
+      "badSigType": "Tipo de firma desconocido.",
+      "whOnly": "Datos de agujero en una firma que no es un agujero de gusano.",
+      "unknownToSystem": "El sistema de destino no es un sistema de EVE.",
+      "sameSystem": "Un agujero no puede llevar a su propio sistema.",
+      "badType": "No es un tipo de agujero de gusano.",
+      "bothK162": "Los dos extremos no pueden ser K162.",
+      "badSize": "El tamaño debe ser S, M, L o XL.",
+      "sizeMismatch": "Ese tamaño no encaja con el tipo de agujero.",
+      "badMass": "La masa debe ser 100, 50 o 10.",
+      "badLife": "La vida debe ser 48, 24, 4, 1 o 0."
+    },
+    "notPaths": "No se guardaron como cadenas porque sus agujeros no forman un solo camino: {{groups}}",
+    "import": "Importar ({{count}})",
+    "importing": "Importando…",
+    "done": "Importado. Sistemas añadidos: {{systems}}, conexiones: {{connections}}, firmas: {{signatures}}, etiquetas: {{labels}}, cadenas: {{chains}}.",
+    "failed": "No se pudieron importar los sistemas.",
+    "fileTooBig": "Ese archivo es demasiado grande (2 MB como máximo).",
+    "fileFailed": "No se pudo leer ese archivo."
   }
 }

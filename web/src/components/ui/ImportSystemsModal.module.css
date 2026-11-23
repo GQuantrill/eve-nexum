@@ -1,0 +1,61 @@
+/* Two classes so it beats the base `.modal { width }` whatever the order. */
+:global(.modal).wide {
+  width: min(760px, 94vw);
+}
+
+.input {
+  width: 100%;
+  resize: vertical;
+  font-family: var(--font-mono, monospace);
+  font-size: calc(12px * var(--font-scale, 1));
+}
+
+.fileRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.preview {
+  max-height: 260px;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: calc(12px * var(--font-scale, 1));
+}
+
+.table th,
+.table td {
+  padding: 3px 6px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.table th {
+  position: sticky;
+  top: 0;
+  background: var(--surface-well);
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.ok {
+  color: var(--success);
+}
+
+.bad {
+  color: var(--danger);
+  white-space: normal;
+}
+
+.notes {
+  margin: 0;
+  padding-left: 18px;
+}

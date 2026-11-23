@@ -959,7 +959,8 @@
     "pasteSystemsNoRights": "Your role can't add systems to this map.",
     "pasteUseKeys": "Your browser won't let nexum read the clipboard. Press Ctrl+V (Cmd+V on a Mac) on the map instead.",
     "pasteNoSystems": "No copied systems on the clipboard. Right-click systems and choose Copy systems first.",
-    "exportSystems": "Export systems ({{count}})…"
+    "exportSystems": "Export systems ({{count}})…",
+    "importSystems": "Import systems…"
   },
   "customIntel": {
     "title": "Custom Intel",
@@ -2954,5 +2955,55 @@
     "save": "Save file",
     "copied": "Copied to the clipboard.",
     "copyFailed": "Couldn't copy to the clipboard."
+  },
+  "groupMeaning": {
+    "map": "The map",
+    "chain": "A saved chain",
+    "title": "Group means",
+    "label": "A label"
+  },
+  "importSystems": {
+    "title": "Import systems",
+    "intro": "Paste rows, or open a CSV or tab-separated file, with a header line. Columns: group, system, signature, sig-type, name, to-system, from-type, to-type, size, mass-remaining, life-remaining. Only system is needed. Systems this map already has stay as they are; only what's missing is added.",
+    "paste": "Rows",
+    "openFile": "Open a file…",
+    "meaningHint": {
+      "map": "The group is only a note: nothing is done with it.",
+      "chain": "Each group whose holes make one path is saved as a chain with the group's name.",
+      "label": "Each group goes on its systems as a custom text label (up to three per system)."
+    },
+    "noHeader": "No header line with a \"system\" column.",
+    "lookupFailed": "Couldn't look up the system names. Try again.",
+    "checking": "Checking the system names…",
+    "summary": "Ready: {{good}} rows. Left out with problems: {{bad}}.",
+    "col": {
+      "system": "System",
+      "signature": "Signature",
+      "toSystem": "To system",
+      "check": "Check"
+    },
+    "rowOk": "OK",
+    "error": {
+      "noSystem": "No system.",
+      "unknownSystem": "Not an EVE system.",
+      "badSignature": "Signature must look like ABC-123.",
+      "badSigType": "Unknown signature type.",
+      "whOnly": "Hole details on a signature that isn't a wormhole.",
+      "unknownToSystem": "The to-system isn't an EVE system.",
+      "sameSystem": "A hole can't lead to its own system.",
+      "badType": "Not a wormhole type.",
+      "bothK162": "Both ends can't be K162.",
+      "badSize": "Size must be S, M, L or XL.",
+      "sizeMismatch": "That size doesn't fit the hole type.",
+      "badMass": "Mass must be 100, 50 or 10.",
+      "badLife": "Life must be 48, 24, 4, 1 or 0."
+    },
+    "notPaths": "Not saved as chains, because their holes don't make one path: {{groups}}",
+    "import": "Import ({{count}})",
+    "importing": "Importing…",
+    "done": "Imported. Added systems: {{systems}}, links: {{connections}}, signatures: {{signatures}}, labels: {{labels}}, chains: {{chains}}.",
+    "failed": "Couldn't import the systems.",
+    "fileTooBig": "That file is too big (2 MB at most).",
+    "fileFailed": "Couldn't read that file."
   }
 }

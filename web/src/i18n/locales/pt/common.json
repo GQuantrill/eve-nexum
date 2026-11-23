@@ -959,7 +959,8 @@
     "pasteSystemsNoRights": "A sua função não pode adicionar sistemas a este mapa.",
     "pasteUseKeys": "O seu navegador não deixa o nexum ler a área de transferência. Prima Ctrl+V (Cmd+V no Mac) no mapa.",
     "pasteNoSystems": "Não há sistemas copiados na área de transferência. Clique primeiro com o botão direito em sistemas e escolha Copiar sistemas.",
-    "exportSystems": "Exportar sistemas ({{count}})…"
+    "exportSystems": "Exportar sistemas ({{count}})…",
+    "importSystems": "Importar sistemas…"
   },
   "customIntel": {
     "title": "Intel personalizada",
@@ -2954,5 +2955,55 @@
     "save": "Guardar ficheiro",
     "copied": "Copiado para a área de transferência.",
     "copyFailed": "Não foi possível copiar para a área de transferência."
+  },
+  "groupMeaning": {
+    "map": "O mapa",
+    "chain": "Uma cadeia guardada",
+    "title": "O grupo é",
+    "label": "Uma etiqueta"
+  },
+  "importSystems": {
+    "title": "Importar sistemas",
+    "intro": "Cole linhas ou abra um ficheiro CSV ou separado por tabulações, com uma linha de cabeçalho. Colunas: group, system, signature, sig-type, name, to-system, from-type, to-type, size, mass-remaining, life-remaining. Só system é obrigatória. Os sistemas que este mapa já tem ficam como estão; só o que falta é adicionado.",
+    "paste": "Linhas",
+    "openFile": "Abrir um ficheiro…",
+    "meaningHint": {
+      "map": "O grupo é só uma nota: nada é feito com ele.",
+      "chain": "Cada grupo cujos buracos formam um só caminho é guardado como cadeia com o nome do grupo.",
+      "label": "Cada grupo é posto nos seus sistemas como etiqueta de texto personalizada (até três por sistema)."
+    },
+    "noHeader": "Não há linha de cabeçalho com uma coluna \"system\".",
+    "lookupFailed": "Não foi possível procurar os nomes dos sistemas. Tente novamente.",
+    "checking": "A verificar os nomes dos sistemas…",
+    "summary": "Pronto: {{good}} linhas. Excluídas com problemas: {{bad}}.",
+    "col": {
+      "system": "Sistema",
+      "signature": "Assinatura",
+      "toSystem": "Para sistema",
+      "check": "Verificação"
+    },
+    "rowOk": "OK",
+    "error": {
+      "noSystem": "Sem sistema.",
+      "unknownSystem": "Não é um sistema do EVE.",
+      "badSignature": "A assinatura deve ter a forma ABC-123.",
+      "badSigType": "Tipo de assinatura desconhecido.",
+      "whOnly": "Dados de buraco numa assinatura que não é um buraco de minhoca.",
+      "unknownToSystem": "O sistema de destino não é um sistema do EVE.",
+      "sameSystem": "Um buraco não pode levar ao seu próprio sistema.",
+      "badType": "Não é um tipo de buraco de minhoca.",
+      "bothK162": "As duas pontas não podem ser K162.",
+      "badSize": "O tamanho deve ser S, M, L ou XL.",
+      "sizeMismatch": "Esse tamanho não condiz com o tipo de buraco.",
+      "badMass": "A massa deve ser 100, 50 ou 10.",
+      "badLife": "A vida deve ser 48, 24, 4, 1 ou 0."
+    },
+    "notPaths": "Não guardados como cadeias, porque os seus buracos não formam um só caminho: {{groups}}",
+    "import": "Importar ({{count}})",
+    "importing": "A importar…",
+    "done": "Importado. Sistemas adicionados: {{systems}}, ligações: {{connections}}, assinaturas: {{signatures}}, etiquetas: {{labels}}, cadeias: {{chains}}.",
+    "failed": "Não foi possível importar os sistemas.",
+    "fileTooBig": "Esse ficheiro é demasiado grande (2 MB no máximo).",
+    "fileFailed": "Não foi possível ler esse ficheiro."
   }
 }

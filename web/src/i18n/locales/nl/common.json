@@ -959,7 +959,8 @@
     "pasteSystemsNoRights": "Je rol mag geen systemen aan deze kaart toevoegen.",
     "pasteUseKeys": "Je browser laat nexum het klembord niet lezen. Druk in plaats daarvan op Ctrl+V (Cmd+V op een Mac) op de kaart.",
     "pasteNoSystems": "Geen gekopieerde systemen op het klembord. Klik eerst met rechts op systemen en kies Systemen kopiëren.",
-    "exportSystems": "Systemen exporteren ({{count}})…"
+    "exportSystems": "Systemen exporteren ({{count}})…",
+    "importSystems": "Systemen importeren…"
   },
   "customIntel": {
     "title": "Eigen intel",
@@ -2954,5 +2955,55 @@
     "save": "Bestand opslaan",
     "copied": "Gekopieerd naar het klembord.",
     "copyFailed": "Kon niet naar het klembord kopiëren."
+  },
+  "groupMeaning": {
+    "map": "De kaart",
+    "chain": "Een opgeslagen keten",
+    "title": "Groep betekent",
+    "label": "Een label"
+  },
+  "importSystems": {
+    "title": "Systemen importeren",
+    "intro": "Plak rijen of open een CSV- of tab-gescheiden bestand met een kopregel. Kolommen: group, system, signature, sig-type, name, to-system, from-type, to-type, size, mass-remaining, life-remaining. Alleen system is nodig. Systemen die deze kaart al heeft blijven zoals ze zijn; alleen wat ontbreekt wordt toegevoegd.",
+    "paste": "Rijen",
+    "openFile": "Bestand openen…",
+    "meaningHint": {
+      "map": "De groep is alleen een notitie: er gebeurt niets mee.",
+      "chain": "Elke groep waarvan de gaten één pad vormen wordt opgeslagen als keten met de naam van de groep.",
+      "label": "Elke groep komt als eigen tekstlabel op zijn systemen (tot drie per systeem)."
+    },
+    "noHeader": "Geen kopregel met een kolom \"system\".",
+    "lookupFailed": "Kon de systeemnamen niet opzoeken. Probeer het opnieuw.",
+    "checking": "Systeemnamen controleren…",
+    "summary": "Klaar: {{good}} rijen. Weggelaten met problemen: {{bad}}.",
+    "col": {
+      "system": "Systeem",
+      "signature": "Signature",
+      "toSystem": "Naar systeem",
+      "check": "Controle"
+    },
+    "rowOk": "OK",
+    "error": {
+      "noSystem": "Geen systeem.",
+      "unknownSystem": "Geen EVE-systeem.",
+      "badSignature": "De signature moet eruitzien als ABC-123.",
+      "badSigType": "Onbekend signature-type.",
+      "whOnly": "Gatgegevens bij een signature die geen wormhole is.",
+      "unknownToSystem": "Het doelsysteem is geen EVE-systeem.",
+      "sameSystem": "Een gat kan niet naar zijn eigen systeem leiden.",
+      "badType": "Geen wormhole-type.",
+      "bothK162": "Beide uiteinden kunnen geen K162 zijn.",
+      "badSize": "Grootte moet S, M, L of XL zijn.",
+      "sizeMismatch": "Die grootte past niet bij het gattype.",
+      "badMass": "Massa moet 100, 50 of 10 zijn.",
+      "badLife": "Levensduur moet 48, 24, 4, 1 of 0 zijn."
+    },
+    "notPaths": "Niet als keten opgeslagen, omdat hun gaten geen pad vormen: {{groups}}",
+    "import": "Importeren ({{count}})",
+    "importing": "Importeren…",
+    "done": "Geïmporteerd. Nieuwe systemen: {{systems}}, verbindingen: {{connections}}, signatures: {{signatures}}, labels: {{labels}}, ketens: {{chains}}.",
+    "failed": "Kon de systemen niet importeren.",
+    "fileTooBig": "Dat bestand is te groot (maximaal 2 MB).",
+    "fileFailed": "Kon dat bestand niet lezen."
   }
 }

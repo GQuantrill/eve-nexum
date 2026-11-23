@@ -3,7 +3,9 @@
 // in from the link the signature backs. Built from the same clip that Copy
 // systems uses (mapClipboard.ts), so it sees exactly what Copy would.
 
-export interface ClipSystem { id: string; name: string; alias?: string | null; locked?: boolean }
+import type { GroupMeaning } from './selectionImport';
+
+export interface ClipSystem { id: string; name: string; alias?: string | null; locked?: boolean; customLabels?: string[] }
 export interface ClipSignature {
   id: string; systemId: string; sigId: string; sigType: string; name: string;
   whType: string; massStatus?: string; timeStatus?: string;
@@ -17,6 +19,7 @@ export interface Clip {
   systems: ClipSystem[];
   signatures: ClipSignature[];
   connections: ClipConnection[];
+  chains?: { name: string; systemIds: string[] }[];
 }
 
 export const EXPORT_COLUMNS = [
@@ -32,7 +35,18 @@ const LIFE: Record<string, string> = {
   fresh: '48', lessThan24h: '24', eol: '4', lessThan4h: '4', lessThan1h: '1', expired: '0',
 };
 
-export function exportRows(clip: Clip, skipLocked: boolean): ExportRow[] {
+// The text of a custom label: 't:<text>' or 't:#rrggbb:<text>'; icons have none.
+const labelText = (l: string) => (l.startsWith('t:') ? l.replace(/^t:(#[0-9a-fA-F]{6}:)?/, '') : '');
+
+export function exportRows(clip: Clip, skipLocked: boolean, meaning: GroupMeaning = 'map'): ExportRow[] {
+  // What goes in "group": the map's name, the saved chain the system is in,
+  // or its first text label.
+  const chainOf = new Map<string, string>();
+  for (const c of clip.chains ?? []) for (const id of c.systemIds) if (!chainOf.has(id)) chainOf.set(id, c.name);
+  const groupOf = (s: ClipSystem) => meaning === 'chain' ? chainOf.get(s.id) ?? ''
+    : meaning === 'label' ? (s.customLabels ?? []).map(labelText).find(Boolean) ?? ''
+      : clip.name;
+
   const systems = clip.systems.filter((s) => !(skipLocked && s.locked));
   const keep = new Set(systems.map((s) => s.id));
   const nameOf = new Map(clip.systems.map((s) => [s.id, s.name]));
@@ -44,17 +58,17 @@ export function exportRows(clip: Clip, skipLocked: boolean): ExportRow[] {
     if (c.targetSignatureId) linkOf.set(c.targetSignatureId, { c, other: c.sourceId, otherSig: c.sourceSignatureId });
   }
 
-  const empty = (system: string): ExportRow => ({
-    group: clip.name, system, signature: '', 'sig-type': '', name: '', 'to-system': '', 'from-type': '',
+  const empty = (s: ClipSystem): ExportRow => ({
+    group: groupOf(s), system: s.name, signature: '', 'sig-type': '', name: '', 'to-system': '', 'from-type': '',
     'to-type': '', size: '', 'mass-remaining': '', 'life-remaining': '',
   });
 
   const rows: ExportRow[] = [];
   for (const s of systems) {
     const sigs = clip.signatures.filter((g) => g.systemId === s.id && keep.has(g.systemId));
-    if (sigs.length === 0) { rows.push(empty(s.name)); continue; }
+    if (sigs.length === 0) { rows.push(empty(s)); continue; }
     for (const g of sigs) {
-      const row = { ...empty(s.name), signature: g.sigId, 'sig-type': g.sigType, name: g.name };
+      const row = { ...empty(s), signature: g.sigId, 'sig-type': g.sigType, name: g.name };
       if (g.sigType === 'wormhole') {
         const l = linkOf.get(g.id);
         const mass = l?.c.massStatus ?? g.massStatus ?? '';

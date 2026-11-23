@@ -40,6 +40,7 @@ import {
   CopyIcon,
   ClipboardTextIcon,
   DownloadSimpleIcon,
+  UploadSimpleIcon,
   UsersThreeIcon,
 } from '../../icons';
 import { PREDEFINED_LABELS } from '../../data/labels';
@@ -78,6 +79,7 @@ import { usePresenceStore } from '../../store/presenceStore';
 import { toast } from '../../utils/toastStore';
 import { copySystems, pasteSystems, parseClip } from '../../utils/mapClipboard';
 import { ExportSystemsModal } from '../ui/ExportSystemsModal';
+import { ImportSystemsModal } from '../ui/ImportSystemsModal';
 import i18n from '../../i18n';
 import { useCustomIntel } from '../../hooks/useCustomIntel';
 import { useUserSetting } from '../../hooks/useUserSetting';
@@ -535,6 +537,8 @@ export function MapCanvas() {
   const [keyDeleteConfirm, setKeyDeleteConfirm] = useState<{ ids: string[]; name: string | null } | null>(null);
   // Systems picked for Export systems (ExportSystemsModal).
   const [exportIds, setExportIds] = useState<string[] | null>(null);
+  // Where Import systems was opened (ImportSystemsModal), in map coordinates.
+  const [importAt, setImportAt] = useState<{ x: number; y: number } | null>(null);
   const [confirmKeyDelete, setConfirmKeyDelete] = useUserSetting<boolean>(CONFIRM_KEY_DELETE_KEY, true);
   const pendingSelection = useRef<string[]>([]);
 
@@ -1882,6 +1886,11 @@ export function MapCanvas() {
         action: () => pasteFromMenu({ x: contextMenu.flowX, y: contextMenu.flowY }),
       },
       {
+        label: t('ctxMenu.importSystems'),
+        icon: <UploadSimpleIcon size={16} weight="regular" />,
+        action: () => setImportAt({ x: contextMenu.flowX, y: contextMenu.flowY }),
+      },
+      {
         label: t('ctxMenu.selectAll'),
         icon: <SelectionAllIcon size={14} weight="regular" />,
         action: () => setNodes((ns) => ns.map((n) => ({ ...n, selected: true }))),
@@ -2142,6 +2151,9 @@ export function MapCanvas() {
         />
       )}
 
+      {importAt && activeMapId && (
+        <ImportSystemsModal mapId={activeMapId} anchor={importAt} onClose={() => setImportAt(null)} />
+      )}
       {exportIds && activeMapId && (
         <ExportSystemsModal mapId={activeMapId} systemIds={exportIds} onClose={() => setExportIds(null)} />
       )}

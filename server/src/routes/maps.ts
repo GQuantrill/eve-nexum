@@ -20,7 +20,7 @@ import { createLogger } from '../utils/logger.js';
 import { resolveOwnerId } from '../utils/owner.js';
 import { mapCapFor, countPersonalMaps, mapAllowanceFor } from '../services/mapAllowance.js';
 import { parseMapBackup, restoreMapBackup, buildMapBackup, BackupError, MAX_BACKUP_SYSTEMS } from '../services/mapBackup.js';
-import { selectClip, pasteIntoMap } from '../services/mapPaste.js';
+import { selectClip, pasteIntoMap, MAX_PASTE_CHAINS } from '../services/mapPaste.js';
 import { resolveEntityNames } from '../services/entityNames.js';
 import { audit } from '../services/audit.js';
 import { publishToMap } from '../services/mapEvents.js';
@@ -1630,7 +1630,9 @@ mapsRouter.post('/:mapId/clip', async (req, res) => {
   if (!access) { res.status(404).json({ error: 'Map not found' }); return; }
   const backup = await buildMapBackup(mapId);
   if (!backup) { res.status(404).json({ error: 'Map not found' }); return; }
-  const clip = selectClip(backup, ids);
+  const { rows: routes } = await db.query<{ name: string; systemIds: string[] }>(
+    `SELECT name, system_ids AS "systemIds" FROM map_routes WHERE map_id = $1 ORDER BY sort_order, created_at`, [mapId]);
+  const clip = selectClip(backup, ids, routes);
   if (!clip.systems.length) { res.status(400).json({ error: 'None of those systems are on this map' }); return; }
   res.json(clip);
 });
@@ -1645,7 +1647,9 @@ mapsRouter.post('/:mapId/paste', async (req, res) => {
   const access = await requireMapWrite(res, mapId, req);
   if (!access) return;
 
-  const body = req.body as { clip?: unknown; anchor?: { x?: unknown; y?: unknown } };
+  const body = req.body as {
+    clip?: unknown; anchor?: { x?: unknown; y?: unknown }; mergeLabels?: unknown; chains?: unknown;
+  };
   let clip: ReturnType<typeof parseMapBackup>;
   try {
     clip = parseMapBackup(body.clip);
@@ -1658,11 +1662,23 @@ mapsRouter.post('/:mapId/paste', async (req, res) => {
   const anchor = Number.isFinite(ax) && Number.isFinite(ay) && Math.abs(ax) < 1e6 && Math.abs(ay) < 1e6
     ? { x: ax, y: ay } : null;
 
+  // An import's extras (labels, chains): untrusted like the clip, so only
+  // well-formed chains of short names and known ids get through.
+  const chains = Array.isArray(body.chains)
+    ? body.chains.slice(0, MAX_PASTE_CHAINS).flatMap((c: unknown) => {
+      const o = c as { name?: unknown; systemIds?: unknown };
+      if (typeof o?.name !== 'string' || !Array.isArray(o.systemIds) || o.systemIds.length > MAX_BACKUP_SYSTEMS) return [];
+      const ids = o.systemIds.filter((v): v is string => typeof v === 'string' && v.length > 0 && v.length <= 64);
+      return ids.length === o.systemIds.length ? [{ name: o.name.slice(0, 100), systemIds: ids }] : [];
+    })
+    : [];
+  const extras = { mergeLabels: body.mergeLabels === true, chains };
+
   const client = await db.connect();
   let counts: Awaited<ReturnType<typeof pasteIntoMap>>;
   try {
     await client.query('BEGIN');
-    counts = await pasteIntoMap(client, mapId, clip, req.session.userId!, anchor);
+    counts = await pasteIntoMap(client, mapId, clip, req.session.userId!, anchor, extras);
     await client.query(`UPDATE maps SET updated_at = NOW() WHERE id = $1`, [mapId]);
     await client.query('COMMIT');
   } catch (err) {
@@ -1679,7 +1695,7 @@ mapsRouter.post('/:mapId/paste', async (req, res) => {
     action: 'map.paste', subject: clip.name.slice(0, MAX_MAP_NAME_LEN),
     details: { values: {
       systems: counts.systems, connections: counts.connections, signatures: counts.signatures,
-      anomalies: counts.anomalies, structures: counts.structures,
+      anomalies: counts.anomalies, structures: counts.structures, labels: counts.labels, chains: counts.chains,
     } },
   });
   res.json(counts);

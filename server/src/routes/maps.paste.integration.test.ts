@@ -122,4 +122,46 @@ describe.skipIf(!dbReady)('copy and paste systems (integration)', () => {
     expect((await request(app).post(`/api/maps/${mine}/paste`).send({ clip: 'nope' })).status).toBe(400);
     expect((await request(app).post(`/api/maps/${theirs}/clip`).send({ systemIds: [crypto.randomUUID()] })).status).toBe(404);
   });
+
+  it('an import can save chains and label systems the map already has', async () => {
+    const dest = await seedMap(me, 'Dest');
+    const da = await seedSystem(dest, A, 'J100001', 0, 0);
+    await db.query(`UPDATE map_systems SET custom_labels = ARRAY['t:Home'] WHERE id = $1`, [da]);
+    await db.query(`INSERT INTO map_routes (map_id, name) VALUES ($1, 'Taken')`, [dest]);
+    const clip = {
+      name: 'import',
+      systems: [
+        { id: 'sa', eveSystemId: A, name: 'J100001', customLabels: ['t:Alpha', 't:home'] },
+        { id: 'sb', eveSystemId: B, name: 'J100002', customLabels: ['t:Alpha'] },
+        { id: 'sc', eveSystemId: C, name: 'J100003' },
+      ],
+      connections: [{ sourceId: 'sa', targetId: 'sb' }, { sourceId: 'sb', targetId: 'sc' }],
+    };
+    const res = await request(app).post(`/api/maps/${dest}/paste`).send({
+      clip, mergeLabels: true,
+      chains: [
+        { name: 'Alpha', systemIds: ['sa', 'sb', 'sc'] },
+        { name: 'taken', systemIds: ['sa', 'sb'] },     // name in use
+        { name: 'Gap', systemIds: ['sa', 'sc'] },       // no link between them
+      ],
+    });
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({ systems: 2, connections: 2, labels: 1, chains: 1 });
+    const lab = await db.query<{ l: string[] }>(`SELECT custom_labels AS l FROM map_systems WHERE id = $1`, [da]);
+    expect(lab.rows[0].l).toEqual(['t:Home', 't:Alpha']);
+    const nb = await db.query<{ l: string[] }>(`SELECT custom_labels AS l FROM map_systems WHERE map_id = $1 AND eve_system_id = $2`, [dest, B]);
+    expect(nb.rows[0].l).toEqual(['t:Alpha']);
+    const r = await db.query<{ name: string; n: number; c: number }>(
+      `SELECT name, cardinality(system_ids) AS n, cardinality(connection_ids) AS c FROM map_routes WHERE map_id = $1 ORDER BY name`, [dest]);
+    expect(r.rows).toEqual([{ name: 'Alpha', n: 3, c: 2 }, { name: 'Taken', n: 0, c: 0 }]);
+  });
+
+  it('a copy says which saved chain each system is in', async () => {
+    const src = await seedMap(me, 'Source');
+    const a = await seedSystem(src, A, 'J100001', 0, 0);
+    const b = await seedSystem(src, B, 'J100002', 300, 0);
+    await db.query(`INSERT INTO map_routes (map_id, name, system_ids) VALUES ($1, 'Static', $2)`, [src, [a, b]]);
+    const res = await request(app).post(`/api/maps/${src}/clip`).send({ systemIds: [a] });
+    expect(res.body.chains).toEqual([{ name: 'Static', systemIds: [a] }]);
+  });
 });

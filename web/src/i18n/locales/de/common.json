@@ -959,7 +959,8 @@
     "pasteSystemsNoRights": "Deine Rolle darf dieser Karte keine Systeme hinzufügen.",
     "pasteUseKeys": "Dein Browser lässt nexum die Zwischenablage nicht lesen. Drücke stattdessen Strg+V (Cmd+V auf dem Mac) auf der Karte.",
     "pasteNoSystems": "Keine kopierten Systeme in der Zwischenablage. Rechtsklicke zuerst auf Systeme und wähle Systeme kopieren.",
-    "exportSystems": "Systeme exportieren ({{count}})…"
+    "exportSystems": "Systeme exportieren ({{count}})…",
+    "importSystems": "Systeme importieren…"
   },
   "customIntel": {
     "title": "Eigene Intel",
@@ -2954,5 +2955,55 @@
     "save": "Datei speichern",
     "copied": "In die Zwischenablage kopiert.",
     "copyFailed": "Kopieren in die Zwischenablage fehlgeschlagen."
+  },
+  "groupMeaning": {
+    "map": "Die Karte",
+    "chain": "Eine gespeicherte Kette",
+    "title": "Gruppe bedeutet",
+    "label": "Ein Label"
+  },
+  "importSystems": {
+    "title": "Systeme importieren",
+    "intro": "Füge Zeilen ein oder öffne eine CSV- oder tabulatorgetrennte Datei mit Kopfzeile. Spalten: group, system, signature, sig-type, name, to-system, from-type, to-type, size, mass-remaining, life-remaining. Nur system ist nötig. Systeme, die diese Karte schon hat, bleiben wie sie sind; nur Fehlendes wird ergänzt.",
+    "paste": "Zeilen",
+    "openFile": "Datei öffnen…",
+    "meaningHint": {
+      "map": "Die Gruppe ist nur eine Notiz: Es passiert nichts damit.",
+      "chain": "Jede Gruppe, deren Löcher einen Pfad bilden, wird als Kette mit dem Gruppennamen gespeichert.",
+      "label": "Jede Gruppe kommt als eigenes Text-Label an ihre Systeme (bis zu drei pro System)."
+    },
+    "noHeader": "Keine Kopfzeile mit einer Spalte \"system\".",
+    "lookupFailed": "Die Systemnamen konnten nicht nachgeschlagen werden. Versuche es erneut.",
+    "checking": "Systemnamen werden geprüft…",
+    "summary": "Bereit: {{good}} Zeilen. Wegen Problemen ausgelassen: {{bad}}.",
+    "col": {
+      "system": "System",
+      "signature": "Signatur",
+      "toSystem": "Nach System",
+      "check": "Prüfung"
+    },
+    "rowOk": "OK",
+    "error": {
+      "noSystem": "Kein System.",
+      "unknownSystem": "Kein EVE-System.",
+      "badSignature": "Die Signatur muss wie ABC-123 aussehen.",
+      "badSigType": "Unbekannter Signaturtyp.",
+      "whOnly": "Loch-Angaben bei einer Signatur, die kein Wurmloch ist.",
+      "unknownToSystem": "Das Zielsystem ist kein EVE-System.",
+      "sameSystem": "Ein Loch kann nicht in sein eigenes System führen.",
+      "badType": "Kein Wurmlochtyp.",
+      "bothK162": "Beide Enden können nicht K162 sein.",
+      "badSize": "Größe muss S, M, L oder XL sein.",
+      "sizeMismatch": "Diese Größe passt nicht zum Lochtyp.",
+      "badMass": "Masse muss 100, 50 oder 10 sein.",
+      "badLife": "Lebensdauer muss 48, 24, 4, 1 oder 0 sein."
+    },
+    "notPaths": "Nicht als Ketten gespeichert, weil ihre Löcher keinen Pfad bilden: {{groups}}",
+    "import": "Importieren ({{count}})",
+    "importing": "Wird importiert…",
+    "done": "Importiert. Neue Systeme: {{systems}}, Verbindungen: {{connections}}, Signaturen: {{signatures}}, Labels: {{labels}}, Ketten: {{chains}}.",
+    "failed": "Die Systeme konnten nicht importiert werden.",
+    "fileTooBig": "Die Datei ist zu groß (höchstens 2 MB).",
+    "fileFailed": "Die Datei konnte nicht gelesen werden."
   }
 }

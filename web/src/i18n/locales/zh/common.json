@@ -959,7 +959,8 @@
     "pasteSystemsNoRights": "你的角色不能向这张地图添加星系。",
     "pasteUseKeys": "你的浏览器不允许 nexum 读取剪贴板。请改为在地图上按 Ctrl+V（Mac 上为 Cmd+V）。",
     "pasteNoSystems": "剪贴板上没有复制的星系。请先右键点击星系并选择“复制星系”。",
-    "exportSystems": "导出星系（{{count}}）…"
+    "exportSystems": "导出星系（{{count}}）…",
+    "importSystems": "导入星系…"
   },
   "customIntel": {
     "title": "自定义情报",
@@ -2950,5 +2951,55 @@
     "save": "保存文件",
     "copied": "已复制到剪贴板。",
     "copyFailed": "无法复制到剪贴板。"
+  },
+  "groupMeaning": {
+    "map": "地图",
+    "chain": "已保存的链路",
+    "title": "分组表示",
+    "label": "标签"
+  },
+  "importSystems": {
+    "title": "导入星系",
+    "intro": "粘贴多行，或打开带表头行的 CSV 或制表符分隔文件。列：group, system, signature, sig-type, name, to-system, from-type, to-type, size, mass-remaining, life-remaining。只有 system 是必需的。这张地图已有的星系保持不变，只添加缺少的内容。",
+    "paste": "行",
+    "openFile": "打开文件…",
+    "meaningHint": {
+      "map": "分组只是备注，不做任何处理。",
+      "chain": "每个洞口连成一条路径的分组，会以分组名称保存为链路。",
+      "label": "每个分组会作为自定义文本标签加到其星系上（每个星系最多三个）。"
+    },
+    "noHeader": "没有含 \"system\" 列的表头行。",
+    "lookupFailed": "无法查询星系名称。请重试。",
+    "checking": "正在检查星系名称…",
+    "summary": "就绪：{{good}} 行。因问题而跳过：{{bad}}。",
+    "col": {
+      "system": "星系",
+      "signature": "信号",
+      "toSystem": "目标星系",
+      "check": "检查"
+    },
+    "rowOk": "正常",
+    "error": {
+      "noSystem": "没有星系。",
+      "unknownSystem": "不是 EVE 星系。",
+      "badSignature": "信号格式应为 ABC-123。",
+      "badSigType": "未知的信号类型。",
+      "whOnly": "非虫洞信号带有虫洞信息。",
+      "unknownToSystem": "目标星系不是 EVE 星系。",
+      "sameSystem": "虫洞不能通往自己所在的星系。",
+      "badType": "不是虫洞类型。",
+      "bothK162": "两端不能都是 K162。",
+      "badSize": "尺寸必须是 S、M、L 或 XL。",
+      "sizeMismatch": "该尺寸与虫洞类型不符。",
+      "badMass": "质量必须是 100、50 或 10。",
+      "badLife": "寿命必须是 48、24、4、1 或 0。"
+    },
+    "notPaths": "以下分组未保存为链路，因为其虫洞不能连成一条路径：{{groups}}",
+    "import": "导入（{{count}}）",
+    "importing": "正在导入…",
+    "done": "已导入。新增星系：{{systems}}，连接：{{connections}}，信号：{{signatures}}，标签：{{labels}}，链路：{{chains}}。",
+    "failed": "无法导入这些星系。",
+    "fileTooBig": "文件太大（最多 2 MB）。",
+    "fileFailed": "无法读取该文件。"
   }
 }

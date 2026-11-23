@@ -7,6 +7,8 @@ import { toast } from '../../utils/toastStore';
 import { saveFile } from '../../utils/saveFile';
 import { useEscapeClose } from '../../hooks/useEscapeClose';
 import { exportRows, toDelimited, toJson, type Clip } from '../../utils/selectionExport';
+import { GROUP_MEANINGS, GROUP_MEANING_KEY, type GroupMeaning } from '../../utils/selectionImport';
+import { useUserSetting } from '../../hooks/useUserSetting';
 
 // Export the selected systems as CSV, TSV or JSON rows (utils/selectionExport.ts),
 // to copy into a spreadsheet or another mapper, or to save as a file.
@@ -24,6 +26,7 @@ export function ExportSystemsModal({ mapId, systemIds, onClose }: Props) {
   const [error, setError] = useState(false);
   const [format, setFormat] = useState<Format>('csv');
   const [skipLocked, setSkipLocked] = useState(false);
+  const [meaning, setMeaning] = useUserSetting<GroupMeaning>(GROUP_MEANING_KEY, 'map');
 
   useEffect(() => {
     let live = true;
@@ -33,7 +36,7 @@ export function ExportSystemsModal({ mapId, systemIds, onClose }: Props) {
     return () => { live = false; };
   }, [mapId, systemIds]);
 
-  const rows = useMemo(() => (clip ? exportRows(clip, skipLocked) : []), [clip, skipLocked]);
+  const rows = useMemo(() => (clip ? exportRows(clip, skipLocked, meaning) : []), [clip, skipLocked, meaning]);
   const text = format === 'json' ? toJson(rows) : toDelimited(rows, format === 'csv' ? ',' : '\t');
   const lockedCount = clip?.systems.filter((s) => s.locked).length ?? 0;
 
@@ -67,6 +70,19 @@ export function ExportSystemsModal({ mapId, systemIds, onClose }: Props) {
                   className={`copymap__type-btn${format === f ? ' copymap__type-btn--active' : ''}`}
                   onClick={() => setFormat(f)}>
                   {t(`exportSystems.formats.${f}`)}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="field">
+            <span>{t('groupMeaning.title')}</span>
+            <div className="copymap__type-group">
+              {GROUP_MEANINGS.map((m) => (
+                <button key={m} type="button"
+                  className={`copymap__type-btn${meaning === m ? ' copymap__type-btn--active' : ''}`}
+                  onClick={() => setMeaning(m)}>
+                  {t(`groupMeaning.${m}`)}
                 </button>
               ))}
             </div>

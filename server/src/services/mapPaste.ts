@@ -23,9 +23,15 @@ export const CLIP_FORMAT = 'nexum-systems';
 type Parsed = ReturnType<typeof parseMapBackup>;
 
 /** The selected systems out of a full backup, with what belongs to them. */
-export type MapClip = Omit<MapBackup, 'format'> & { format: typeof CLIP_FORMAT };
+/** A saved chain, cut down to the copied systems: only its name is used, to
+ *  say which chain each system is in when the systems are exported. */
+export interface ClipChain { name: string; systemIds: string[] }
 
-export function selectClip(b: MapBackup, systemIds: ReadonlySet<string>): MapClip {
+export type MapClip = Omit<MapBackup, 'format'> & { format: typeof CLIP_FORMAT; chains: ClipChain[] };
+
+export function selectClip(
+  b: MapBackup, systemIds: ReadonlySet<string>, chains: ClipChain[] = [],
+): MapClip {
   const systems = b.systems.filter((s) => systemIds.has(s.id));
   const keep = new Set(systems.map((s) => s.id));
   const signatures = b.signatures.filter((g) => keep.has(g.systemId));
@@ -44,6 +50,9 @@ export function selectClip(b: MapBackup, systemIds: ReadonlySet<string>): MapCli
     signatures,
     anomalies: b.anomalies.filter((a) => keep.has(a.systemId)),
     structures: b.structures.filter((t) => keep.has(t.systemId)),
+    chains: chains
+      .map((c) => ({ name: c.name, systemIds: c.systemIds.filter((id) => keep.has(id)) }))
+      .filter((c) => c.systemIds.length > 0),
   };
 }
 
@@ -97,8 +106,21 @@ export function pasteOffset(
   };
 }
 
+/** What an import (selectionImport.ts on the client) asks for on top of a paste. */
+export interface PasteExtras {
+  /** Also put the pasted systems' custom labels on systems the map already
+   *  has (up to its three, never twice). A plain paste leaves those alone. */
+  mergeLabels?: boolean;
+  /** Save these as chains: each a path through the pasted systems, in order
+   *  (clip system ids). A chain with that name already on the map is left be. */
+  chains?: ClipChain[];
+}
+
+export const MAX_PASTE_CHAINS = 50;
+
 export interface PasteCounts {
   systems: number; connections: number; signatures: number; anomalies: number; structures: number;
+  labels: number; chains: number;
   /** Pasted systems the map already had. */
   matched: number;
   /** Where to look: the middle of the pasted group, in map coordinates. */
@@ -107,6 +129,7 @@ export interface PasteCounts {
 
 export async function pasteIntoMap(
   client: PoolClient, mapId: string, clip: Parsed, userId: number, anchor: { x: number; y: number } | null,
+  extras: PasteExtras = {},
 ): Promise<PasteCounts> {
   const { sde, byName } = await lookupSde(client, clip.systems);
 
@@ -119,6 +142,7 @@ export async function pasteIntoMap(
   const sysId = new Map<string, string>();
   const byEve = new Map<number, string>();
   const matched: { sx: number; sy: number; dx: number; dy: number }[] = [];
+  const labelsFor: { id: string; labels: string[] }[] = [];
   const fresh: { s: Parsed['systems'][number]; id: string; eve: number | null; x: number; y: number }[] = [];
   for (const s of clip.systems) {
     const eve = s.eveSystemId ?? (byName.get(s.name) ?? null);
@@ -126,6 +150,7 @@ export async function pasteIntoMap(
     const there = eve != null ? destByEve.get(eve) : undefined;
     if (there) {
       sysId.set(s.id, there.id);
+      if (extras.mergeLabels && s.customLabels.length) labelsFor.push({ id: there.id, labels: s.customLabels });
       matched.push({ sx: s.position.x, sy: s.position.y, dx: there.x, dy: there.y });
       continue;
     }
@@ -254,9 +279,65 @@ export async function pasteIntoMap(
       return [[sys, t.name, t.structureType, t.ownerCorp, t.eveId, t.notes, userId, t.ownerCorpId]];
     }));
 
+  // Labels onto systems the map already had: theirs first, then any new text,
+  // at most three, the same text never twice.
+  let labels = 0;
+  if (labelsFor.length) {
+    const cur = await client.query<{ id: string; customLabels: string[] | null }>(
+      `SELECT id, custom_labels AS "customLabels" FROM map_systems WHERE id = ANY($1::uuid[])`,
+      [labelsFor.map((l) => l.id)]);
+    const have = new Map(cur.rows.map((r) => [r.id, r.customLabels ?? []]));
+    const text = (l: string) => l.replace(/^t:(#[0-9a-fA-F]{6}:)?/, '').toLowerCase();
+    const ids: string[] = []; const vals: string[] = [];
+    for (const { id, labels: add } of labelsFor) {
+      const next = [...(have.get(id) ?? [])];
+      for (const l of add) {
+        if (next.length >= 3) break;
+        if (next.some((x) => x === l || (x.startsWith('t:') && l.startsWith('t:') && text(x) === text(l)))) continue;
+        next.push(l);
+        labels++;
+      }
+      have.set(id, next);
+      ids.push(id); vals.push(JSON.stringify(next));
+    }
+    await client.query(
+      `UPDATE map_systems AS m SET custom_labels = ARRAY(SELECT jsonb_array_elements_text(v.l::jsonb))
+         FROM unnest($1::uuid[], $2::text[]) AS v(id, l) WHERE m.id = v.id`, [ids, vals]);
+  }
+
+  // Chains: each a path along links the map now has. One that isn't (a gap, a
+  // system that didn't paste) is skipped, as is a name the map already uses.
+  let chains = 0;
+  const want = (extras.chains ?? []).slice(0, MAX_PASTE_CHAINS);
+  if (want.length) {
+    const links = await client.query<{ id: string; a: string; b: string }>(
+      `SELECT id, source_id AS a, target_id AS b FROM map_connections WHERE map_id = $1`, [mapId]);
+    const linkId = new Map(links.rows.map((c) => [pairKey(c.a, c.b), c.id]));
+    const named = await client.query<{ name: string }>(`SELECT name FROM map_routes WHERE map_id = $1`, [mapId]);
+    const taken = new Set(named.rows.map((r) => r.name.trim().toLowerCase()));
+    for (const c of want) {
+      const name = c.name.trim().slice(0, 100);
+      const path = c.systemIds.map((id) => sysId.get(id));
+      if (!name || taken.has(name.toLowerCase()) || path.length < 2 || path.some((p) => !p)) continue;
+      const conns: string[] = [];
+      for (let i = 1; i < path.length; i++) {
+        const l = linkId.get(pairKey(path[i - 1]!, path[i]!));
+        if (!l) break;
+        conns.push(l);
+      }
+      if (conns.length !== path.length - 1) continue;
+      taken.add(name.toLowerCase());
+      await client.query(
+        `INSERT INTO map_routes (id, map_id, name, system_ids, connection_ids, created_by_user_id, sort_order)
+         SELECT $1, $2, $3, $4, $5, $6, COALESCE(MAX(sort_order) + 1, 0) FROM map_routes WHERE map_id = $2`,
+        [crypto.randomUUID(), mapId, name, path, conns, userId]);
+      chains++;
+    }
+  }
+
   const focus = fresh.length
     ? { x: fresh.reduce((n, f) => n + f.x, 0) / fresh.length, y: fresh.reduce((n, f) => n + f.y, 0) / fresh.length }
     : matched.length ? { x: matched[0].dx, y: matched[0].dy } : null;
 
-  return { systems, connections, signatures, anomalies, structures, matched: matched.length, focus };
+  return { systems, connections, signatures, anomalies, structures, labels, chains, matched: matched.length, focus };
 }

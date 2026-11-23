@@ -959,7 +959,8 @@
     "pasteSystemsNoRights": "Votre rôle ne permet pas d'ajouter des systèmes à cette carte.",
     "pasteUseKeys": "Votre navigateur n'autorise pas nexum à lire le presse-papiers. Appuyez plutôt sur Ctrl+V (Cmd+V sur Mac) sur la carte.",
     "pasteNoSystems": "Aucun système copié dans le presse-papiers. Faites d'abord un clic droit sur des systèmes et choisissez Copier les systèmes.",
-    "exportSystems": "Exporter les systèmes ({{count}})…"
+    "exportSystems": "Exporter les systèmes ({{count}})…",
+    "importSystems": "Importer des systèmes…"
   },
   "customIntel": {
     "title": "Intel personnalisée",
@@ -2954,5 +2955,55 @@
     "save": "Enregistrer le fichier",
     "copied": "Copié dans le presse-papiers.",
     "copyFailed": "Impossible de copier dans le presse-papiers."
+  },
+  "groupMeaning": {
+    "map": "La carte",
+    "chain": "Une chaîne enregistrée",
+    "title": "Le groupe désigne",
+    "label": "Un label"
+  },
+  "importSystems": {
+    "title": "Importer des systèmes",
+    "intro": "Collez des lignes ou ouvrez un fichier CSV ou séparé par tabulations, avec une ligne d'en-tête. Colonnes : group, system, signature, sig-type, name, to-system, from-type, to-type, size, mass-remaining, life-remaining. Seule system est requise. Les systèmes déjà sur cette carte restent tels quels ; seul ce qui manque est ajouté.",
+    "paste": "Lignes",
+    "openFile": "Ouvrir un fichier…",
+    "meaningHint": {
+      "map": "Le groupe n'est qu'une note : rien n'en est fait.",
+      "chain": "Chaque groupe dont les trous forment un seul chemin est enregistré comme chaîne au nom du groupe.",
+      "label": "Chaque groupe est ajouté à ses systèmes comme label texte personnalisé (trois au plus par système)."
+    },
+    "noHeader": "Pas de ligne d'en-tête avec une colonne \"system\".",
+    "lookupFailed": "Impossible de rechercher les noms de systèmes. Réessayez.",
+    "checking": "Vérification des noms de systèmes…",
+    "summary": "Prêt : {{good}} lignes. Écartées pour problème : {{bad}}.",
+    "col": {
+      "system": "Système",
+      "signature": "Signature",
+      "toSystem": "Vers le système",
+      "check": "Vérification"
+    },
+    "rowOk": "OK",
+    "error": {
+      "noSystem": "Aucun système.",
+      "unknownSystem": "Ce n'est pas un système d'EVE.",
+      "badSignature": "La signature doit ressembler à ABC-123.",
+      "badSigType": "Type de signature inconnu.",
+      "whOnly": "Détails de trou sur une signature qui n'est pas un trou de ver.",
+      "unknownToSystem": "Le système de destination n'est pas un système d'EVE.",
+      "sameSystem": "Un trou ne peut pas mener à son propre système.",
+      "badType": "Ce n'est pas un type de trou de ver.",
+      "bothK162": "Les deux extrémités ne peuvent pas être K162.",
+      "badSize": "La taille doit être S, M, L ou XL.",
+      "sizeMismatch": "Cette taille ne correspond pas au type de trou.",
+      "badMass": "La masse doit être 100, 50 ou 10.",
+      "badLife": "La durée de vie doit être 48, 24, 4, 1 ou 0."
+    },
+    "notPaths": "Non enregistrés comme chaînes, car leurs trous ne forment pas un seul chemin : {{groups}}",
+    "import": "Importer ({{count}})",
+    "importing": "Importation…",
+    "done": "Importé. Systèmes ajoutés : {{systems}}, liaisons : {{connections}}, signatures : {{signatures}}, labels : {{labels}}, chaînes : {{chains}}.",
+    "failed": "Impossible d'importer les systèmes.",
+    "fileTooBig": "Ce fichier est trop volumineux (2 Mo au plus).",
+    "fileFailed": "Impossible de lire ce fichier."
   }
 }
