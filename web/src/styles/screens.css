@@ -12,6 +12,26 @@
 }
 
 
+/* ── Error screen (components/ErrorBoundary.tsx) ─────────── */
+.error-screen__card { width: min(560px, 92vw); }
+
+.error-screen__details {
+  width: 100%;
+  max-height: 30vh;
+  margin: 6px 0 0;
+  padding: 8px 10px;
+  overflow: auto;
+  background: var(--surface-sunken);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-subtle);
+  font-size: calc(11px * var(--font-scale, 1));
+  text-align: left;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+
 /* ── Idle-lock screen ────────────────────────────────────────── */
 .lock-screen {
   display: flex;

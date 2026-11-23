@@ -8,6 +8,7 @@ import { pickHandles } from '../components/map/edgeUtils';
 import { maybeConfirmWhJump } from './whJumpConfirm';
 import { prefetchStargateNeighbors, isDefiniteWormholeHop } from '../utils/stargateAdjacency';
 import { recordConnectionJump } from '../utils/recordConnectionJump';
+import { requestChainNumber } from '../utils/chainNumber';
 import type { SystemClass, WormholeEffect } from '../types';
 
 interface Box { position: { x: number; y: number } }
@@ -315,6 +316,8 @@ export function applyJump(
   // connection's gate classification), record where the source's hole leads.
   // Holes already pinned to a system are filtered out inside whJumpConfirm.
   if (jumpConnId && prevMapSystemId) {
+    // Number the arrival first, so a bookmark copied for this jump can wait for it.
+    requestChainNumber(map.id, prevMapSystemId, mapSystemId, jumpConnId);
     void maybeConfirmWhJump({
       mapId:           map.id,
       fromMapSystemId: prevMapSystemId,

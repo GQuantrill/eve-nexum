@@ -69,6 +69,14 @@ export function useScoutConnections() {
   return store.use();
 }
 
+/** The scout connections as last read, fetching them when nothing has yet
+ *  (no pane showing them). Empty when they can't be read. */
+export async function scoutConnectionsNow(): Promise<ScoutConnection[]> {
+  const have = store.peek();
+  if (have.length) return have;
+  try { return await api<ScoutConnection[]>('/api/scout'); } catch { return EMPTY; }
+}
+
 /**
  * Flag a scout connection as collapsed, or clear the flag. eve-scout keeps
  * listing a hole until someone reports it, so routing would otherwise keep

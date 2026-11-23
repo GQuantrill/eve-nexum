@@ -554,12 +554,14 @@
       "system": {
         "add": "added {{subject}}",
         "update": "changed {{subject}}",
-        "remove": "removed {{subject}}"
+        "remove": "removed {{subject}}",
+        "restore": "restored {{subject}}"
       },
       "connection": {
         "add": "connected {{subject}}",
         "update": "changed {{subject}}",
-        "remove": "disconnected {{subject}}"
+        "remove": "disconnected {{subject}}",
+        "restore": "reconnected {{subject}}"
       },
       "signature": {
         "add": "added signature {{subject}}",
@@ -584,7 +586,8 @@
       "map": {
         "update": "changed the map settings",
         "merge": "merged in {{subject}}",
-        "scoutCleanup": "cleaned up {{subject}} holes"
+        "scoutCleanup": "cleaned up {{subject}} holes",
+        "paste": "pasted systems from {{subject}}"
       },
       "share": {
         "add": "shared the map with {{subject}}",
@@ -814,7 +817,9 @@
     "collapseConfirmHome": " Your roller ends on the Home side.",
     "rollIt": "Roll it",
     "removeConnection": "Remove connection only",
-    "removeConnectionAndSigs": "Remove connection and signatures"
+    "removeConnectionAndSigs": "Remove connection and signatures",
+    "massUsedLabel": "Used",
+    "massUsedTitle": "Mass that has gone through, in millions of kg. Type it in if you know it (say, from the jump log); the calculator works on from there."
   },
   "contentFilter": {
     "hint": "Spotlight systems by their scanned content. Pick signature or anomaly types, or search a site name; matching systems stay lit and the rest fade out.",
@@ -943,7 +948,19 @@
     "jumpRangeFrom": "Jump range from here",
     "jumpCyno": "Cyno Jump",
     "jumpRangeClear": "Clear jump range",
-    "copyName": "Copy system name"
+    "copyName": "Copy system name",
+    "copySystems": "Copy systems ({{count}})",
+    "copiedSystems": "Systems copied: {{count}}. Paste them into another map with Ctrl+V.",
+    "copySystemsFailed": "Couldn't copy the systems.",
+    "pasteSystems": "Paste systems",
+    "pastedSystems": "Pasted. Added systems: {{systems}}, links: {{connections}}, signatures: {{signatures}}.",
+    "pastedNothing": "Nothing to add: this map already has everything you pasted.",
+    "pasteSystemsFailed": "Couldn't paste the systems.",
+    "pasteSystemsNoRights": "Your role can't add systems to this map.",
+    "pasteUseKeys": "Your browser won't let nexum read the clipboard. Press Ctrl+V (Cmd+V on a Mac) on the map instead.",
+    "pasteNoSystems": "No copied systems on the clipboard. Right-click systems and choose Copy systems first.",
+    "exportSystems": "Export systems ({{count}})…",
+    "importSystems": "Import systems…"
   },
   "customIntel": {
     "title": "Custom Intel",
@@ -1632,6 +1649,10 @@
         "q": "Is my data safe?",
         "a": "Nexum never sees your EVE password — authentication is handled entirely by CCP's EVE SSO. The only thing stored is your character identity and the maps you build. Your map data lives in a private database and is not shared with anyone. That said, don't use Nexum for your alliance's top-secret invasion route — no tool on the internet is a substitute for good operational security."
       },
+      "clipboard": {
+        "q": "Does the desktop app read my clipboard?",
+        "a": "Only if you turn on \"Paste scans from the clipboard\" in the desktop app. It's off by default, and the website only ever sees what you paste into it yourself. Even then, only a copy made in EVE counts: the app checks that EVE was the window in front, so anything you copy in a browser, chat app or crypto wallet is never used (on Windows it isn't even read). From a copy made in EVE it takes probe-scanner results and d-scans and nothing else; the rest is dropped straight away, never stored or sent. The app never changes your clipboard. The one thing Nexum ever puts there is a wormhole's new bookmark name after you jump, ready to paste in game. So if a wallet address you paste ever comes out different, that's malware on your PC, not Nexum: get it checked."
+      },
       "reportBugs": {
         "q": "Can I report bugs, add feedback and request features?",
         "a": "Absolutely. The project is open source on <gh>GitHub</gh> — open an issue for bugs or feature requests, or submit a pull request if you're feeling brave. Feedback via in-game mail to the character tied to this account also works if GitHub isn't your thing."
@@ -1654,7 +1675,7 @@
       }
     },
     "footer": "EVE Online and the EVE logo are the registered trademarks of CCP hf. All rights reserved worldwide. Nexum is a third-party tool and is not affiliated with or endorsed by CCP hf. · <license>License & EVE IP notice</license>",
-    "desktopBody": "Nexum also runs as a desktop app for Windows, macOS and Linux. It's the same Nexum, with your login, maps and settings, plus features a browser can't offer: the app can read EVE's own log files on your computer and sit above the game. Everything in this section needs the desktop app; everything above works in both.",
+    "desktopBody": "Nexum also runs as a desktop app for Windows and Linux. It's the same Nexum, with your login, maps and settings, plus features a browser can't offer: the app can read EVE's own log files on your computer and sit above the game. Everything in this section needs the desktop app; everything above works in both.",
     "desktopFeatures": {
       "logJumps": {
         "title": "Instant jump tracking",
@@ -1674,7 +1695,7 @@
       },
       "scanPaste": {
         "title": "Scan paste",
-        "desc": "Copy probe-scanner results in EVE and they land on the selected system; copy a d-scan and it opens in the analyser. No alt-tab needed. Off until you turn it on."
+        "desc": "Copy probe-scanner results in EVE and they land on the selected system; copy a d-scan and it opens in the analyser. No alt-tab needed. Off until you turn it on. It only ever takes copies made in the EVE client: anything you copy in another app (browser, chat, password manager, wallet) is ignored, anything that isn't a scan is dropped without being stored or sent, and the app never changes your clipboard."
       },
       "onTop": {
         "title": "Always on top",
@@ -1694,12 +1715,17 @@
       }
     },
     "desktopSoon": "Coming soon",
-    "desktopSoonBody": "The Nexum desktop app for Windows, macOS and Linux: instant jump tracking from EVE's logs, intel channels on your map, threat alerts and more.",
+    "desktopSoonBody": "The Nexum desktop app for Windows and Linux: instant jump tracking from EVE's logs, intel channels on your map, threat alerts and more.",
     "desktopSoonLink": "See what it adds",
     "desktopOut": "Out now",
     "desktopDownloadLink": "Download",
     "desktopMacNote": "macOS: the app isn't signed yet, so after installing it, run this once in Terminal:",
-    "desktopAllDownloads": "All downloads (.msi, .deb, .rpm) and release notes"
+    "desktopAllDownloads": "All downloads (.deb, .rpm) and release notes",
+    "desktopWinNote": "Windows: the button opens Nexum in the Microsoft Store, which installs it without a warning and keeps it up to date.",
+    "desktopHeroTitle": "Nexum is now a desktop app",
+    "desktopHeroBody": "A huge leap for exploration: your jumps tracked from EVE's own logs the moment they happen, your intel channels on the map, threat alerts with sound and voice, an overlay above the game, and scans pasted as you copy them. Free, for Windows and Linux.",
+    "desktopHeroMore": "See everything it adds",
+    "desktopWinInstaller": "Or download the installer (not signed: Windows may say it protected your PC; choose More info, then Run anyway)."
   },
   "language": {
     "label": "Language"
@@ -1716,7 +1742,9 @@
     "lessThan24h": "< 24h",
     "lessThan4h": "< 4 hrs",
     "lessThan1h": "< 1 hr",
-    "broken": "Connection broken — the wormhole sig was deleted (hole collapsed)"
+    "broken": "Connection broken — the wormhole sig was deleted (hole collapsed)",
+    "showInfo": "Show this connection's info",
+    "hideInfo": "Click to fold"
   },
   "mapKey": {
     "title": "Map key",
@@ -2149,7 +2177,12 @@
       "normal": "Normal",
       "strong": "Strong"
     },
-    "resetColor": "Reset"
+    "resetColor": "Reset",
+    "connInfo": "Connection info",
+    "connInfoFull": "Always shown",
+    "connInfoFolded": "Folded",
+    "importSystemsTitle": "Add systems to this map from CSV or tab-separated rows",
+    "importSystems": "↑ Import systems from CSV"
   },
   "mass": {
     "billionKg": "{{value}} B kg",
@@ -2865,5 +2898,123 @@
     "sub": "You can change this, pick a voice and choose which events are spoken at any time in the {{section}} section of the sidebar.",
     "noThanks": "No thanks",
     "enable": "Turn on"
+  },
+  "offMap": {
+    "title": "{{system}} isn't on this map",
+    "kspaceMap": "This map's admins have set it not to record high, low or null-sec systems as you fly.",
+    "kspaceYou": "Your \"Don't track K-space\" setting is on, so high, low and null-sec systems aren't recorded.",
+    "trackingOff": "Jump tracking is switched off, so the systems you fly to aren't added.",
+    "readOnly": "You can view this map but not add to it.",
+    "locked": "This map is locked, so nothing is added to it.",
+    "add": "Add to map",
+    "hide": "Hide"
+  },
+  "scanPaste": {
+    "otherCharacter": "Scan not pasted: only scans copied in {{name}}'s EVE window are used (Nexum app settings)."
+  },
+  "rollPlan": {
+    "title": "Pass plan",
+    "addShip": "Add a ship",
+    "myRoller": "My roller: {{name}} ({{cold}}/{{hot}})",
+    "removeShip": "Remove {{name}}",
+    "ship": "Ship",
+    "toggleHeat": "Switch between cold and hot",
+    "out": "out",
+    "back": "back",
+    "flown": "flown",
+    "removePass": "Remove this pass",
+    "outcome": {
+      "safe": "Mass used after this pass. The hole can't close on it.",
+      "risky": "Mass used after this pass. The hole might close on it.",
+      "collapse": "Mass used after this pass. The hole closes on it."
+    },
+    "strands": "Pass {{n}} could close the hole with {{ship}} on the far side.",
+    "addPass": "Add pass",
+    "flyNext": "Fly next",
+    "flyNextTitle": "{{ship}} goes through: adds {{mass}} to the mass used",
+    "undoFlown": "Undo flown",
+    "clear": "Clear plan",
+    "tooHeavy": "Too heavy for this hole (max jump {{max}})"
+  },
+  "errorScreen": {
+    "title": "Something went wrong",
+    "hint": "Nexum hit an error and stopped. Reload to carry on. To report it, copy the details and send them to us.",
+    "reload": "Reload",
+    "copy": "Copy error details"
+  },
+  "exportSystems": {
+    "title": "Export systems",
+    "format": "Format",
+    "formats": {
+      "csv": "CSV",
+      "tsv": "Tab-separated",
+      "json": "JSON"
+    },
+    "skipLocked": "Leave out locked systems ({{count}})",
+    "summary": "Systems: {{systems}}. Rows: {{rows}}, one per signature.",
+    "loading": "Loading the systems…",
+    "loadFailed": "Couldn't load the systems.",
+    "copy": "Copy",
+    "save": "Save file",
+    "copied": "Copied to the clipboard.",
+    "copyFailed": "Couldn't copy to the clipboard."
+  },
+  "groupMeaning": {
+    "map": "The map",
+    "chain": "A saved chain",
+    "title": "Group means",
+    "label": "A label"
+  },
+  "importSystems": {
+    "title": "Import systems",
+    "intro": "Paste rows, or open a CSV or tab-separated file, with a header line. Columns: group, system, signature, sig-type, name, to-system, from-type, to-type, size, mass-remaining, life-remaining. Only system is needed. Systems this map already has stay as they are; only what's missing is added.",
+    "paste": "Rows",
+    "openFile": "Open a file…",
+    "meaningHint": {
+      "map": "The group is only a note: nothing is done with it.",
+      "chain": "Each group whose holes make one path is saved as a chain with the group's name.",
+      "label": "Each group goes on its systems as a custom text label (up to three per system)."
+    },
+    "noHeader": "No header line with a \"system\" column.",
+    "lookupFailed": "Couldn't look up the system names. Try again.",
+    "checking": "Checking the system names…",
+    "summary": "Ready: {{good}} rows. Left out with problems: {{bad}}.",
+    "col": {
+      "system": "System",
+      "signature": "Signature",
+      "toSystem": "To system",
+      "check": "Check"
+    },
+    "rowOk": "OK",
+    "error": {
+      "noSystem": "No system.",
+      "unknownSystem": "Not an EVE system.",
+      "badSignature": "Signature must look like ABC-123.",
+      "badSigType": "Unknown signature type.",
+      "whOnly": "Hole details on a signature that isn't a wormhole.",
+      "unknownToSystem": "The to-system isn't an EVE system.",
+      "sameSystem": "A hole can't lead to its own system.",
+      "badType": "Not a wormhole type.",
+      "bothK162": "Both ends can't be K162.",
+      "badSize": "Size must be S, M, L or XL.",
+      "sizeMismatch": "That size doesn't fit the hole type.",
+      "badMass": "Mass must be 100, 50 or 10.",
+      "badLife": "Life must be 48, 24, 4, 1 or 0."
+    },
+    "notPaths": "Not saved as chains, because their holes don't make one path: {{groups}}",
+    "import": "Import ({{count}})",
+    "importing": "Importing…",
+    "done": "Imported. Added systems: {{systems}}, links: {{connections}}, signatures: {{signatures}}, labels: {{labels}}, chains: {{chains}}.",
+    "failed": "Couldn't import the systems.",
+    "fileTooBig": "That file is too big (2 MB at most).",
+    "fileFailed": "Couldn't read that file."
+  },
+  "chainNumber": {
+    "toggle": "Number the chain from home (L+1)",
+    "hint": "Each system gets a number on the first wormhole jump into it: 1, 2, 3 out of home, 51, 52 out of 5, and so on. Hole bookmarks start with the number of where they lead, so they sort into chain order in EVE. A number never changes and is never used twice.",
+    "set": "Set chain number…",
+    "setTitle": "Chain number",
+    "setMessage": "Chain number for {{name}}. Leave it empty to clear it.",
+    "invalid": "A chain number is digits only, like 51, with a dot before any part over 9, like 5.10."
   }
 }

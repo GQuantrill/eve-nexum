@@ -71,3 +71,31 @@ describe('copy the bookmark name after a jump', () => {
     expect(copy).not.toHaveBeenCalled();
   });
 });
+
+describe('a hole jumped before it was scanned', () => {
+  beforeEach(() => {
+    sigs.length = 0;
+    toastShow.mockReset();
+  });
+  const unknown = (sigId: string): Signature =>
+    ({ id: sigId, sigId, sigType: 'unknown', name: '', notes: '', whType: '', whLeadsTo: '' } as Signature);
+
+  it('asks which unscanned sig it was, and never picks one itself', async () => {
+    const { api } = await import('../api/client');
+    sigs.push(unknown('AAA-111'));
+    await maybeConfirmWhJump(ctx);
+    const actions = toastShow.mock.calls[0][1].actions as Array<{ label: string; onClick: () => void }>;
+    expect(actions.map((a) => a.label)).toContain('AAA-111');
+    expect(vi.mocked(api).mock.calls.some(([, init]) => (init as { method?: string } | undefined)?.method === 'PATCH')).toBe(false);
+    actions.find((a) => a.label === 'AAA-111')!.onClick();
+    const patch = vi.mocked(api).mock.calls.find(([, init]) => (init as { method?: string } | undefined)?.method === 'PATCH');
+    expect(JSON.parse((patch![1] as { body: string }).body)).toEqual({ whLeadsTo: 'J100001', sigType: 'wormhole' });
+  });
+
+  it('does not ask about unscanned sigs when a scanned hole fits', async () => {
+    sigs.push(hole({}), unknown('AAA-111'));
+    await maybeConfirmWhJump(ctx);
+    const opts = toastShow.mock.calls[0][1] as { actions?: Array<{ label: string }> };
+    expect((opts.actions ?? []).map((a) => a.label)).not.toContain('AAA-111');
+  });
+});

@@ -554,12 +554,14 @@
       "system": {
         "add": "{{subject}} 추가",
         "update": "{{subject}} 변경",
-        "remove": "{{subject}} 삭제"
+        "remove": "{{subject}} 삭제",
+        "restore": "{{subject}} 복원"
       },
       "connection": {
         "add": "{{subject}} 연결",
         "update": "{{subject}} 변경",
-        "remove": "{{subject}} 연결 해제"
+        "remove": "{{subject}} 연결 해제",
+        "restore": "{{subject}} 다시 연결"
       },
       "signature": {
         "add": "시그니처 {{subject}} 추가",
@@ -584,7 +586,8 @@
       "map": {
         "update": "맵 설정 변경",
         "merge": "{{subject}} 병합",
-        "scoutCleanup": "{{subject}} 홀 정리"
+        "scoutCleanup": "{{subject}} 홀 정리",
+        "paste": "{{subject}}에서 성계를 붙여 넣음"
       },
       "share": {
         "add": "{{subject}}와(과) 맵 공유",
@@ -814,7 +817,9 @@
     "restoreTitle": "끊김 플래그를 해제하고 다시 활성 연결로 처리합니다",
     "gateNote": "일반 스타게이트 — 추적할 웜홀 데이터 없음.",
     "gateProtected": "스타게이트 연결은 게임에 실제로 존재하므로 제거하거나 변경할 수 없습니다.",
-    "jumpgateNote": "Ansiblex 점프 브리지 — 추적할 웜홀 데이터 없음."
+    "jumpgateNote": "Ansiblex 점프 브리지 — 추적할 웜홀 데이터 없음.",
+    "massUsedLabel": "사용됨",
+    "massUsedTitle": "이미 통과한 질량(백만 kg 단위). 알고 있다면 입력하세요(예: 점프 기록에서). 계산기가 그 값부터 계산합니다."
   },
   "contentFilter": {
     "hint": "스캔한 콘텐츠로 시스템을 강조합니다. 시그니처나 어노말리 유형을 선택하거나 사이트 이름을 검색하세요. 일치하는 시스템은 밝게 유지되고 나머지는 흐려집니다.",
@@ -943,7 +948,19 @@
     "jumpRangeFrom": "여기서부터 점프 범위",
     "jumpCyno": "사이노 점프",
     "jumpRangeClear": "점프 범위 지우기",
-    "copyName": "시스템 이름 복사"
+    "copyName": "시스템 이름 복사",
+    "copySystems": "성계 복사 ({{count}})",
+    "copiedSystems": "복사한 성계: {{count}}. 다른 지도에서 Ctrl+V로 붙여 넣으세요.",
+    "copySystemsFailed": "성계를 복사하지 못했습니다.",
+    "pasteSystems": "성계 붙여넣기",
+    "pastedSystems": "붙여 넣었습니다. 추가된 성계: {{systems}}, 연결: {{connections}}, 시그니처: {{signatures}}.",
+    "pastedNothing": "추가할 것이 없습니다: 이 지도에 붙여 넣은 내용이 이미 모두 있습니다.",
+    "pasteSystemsFailed": "성계를 붙여 넣지 못했습니다.",
+    "pasteSystemsNoRights": "현재 역할로는 이 지도에 성계를 추가할 수 없습니다.",
+    "pasteUseKeys": "브라우저가 nexum의 클립보드 읽기를 허용하지 않습니다. 대신 지도에서 Ctrl+V(Mac은 Cmd+V)를 누르세요.",
+    "pasteNoSystems": "클립보드에 복사한 성계가 없습니다. 먼저 성계를 우클릭하고 성계 복사를 선택하세요.",
+    "exportSystems": "성계 내보내기 ({{count}})…",
+    "importSystems": "성계 가져오기…"
   },
   "customIntel": {
     "title": "사용자 지정 인텔",
@@ -1632,6 +1649,10 @@
         "q": "내 데이터는 안전한가요?",
         "a": "Nexum은 당신의 EVE 비밀번호를 절대 보지 않습니다 — 인증은 전적으로 CCP의 EVE SSO가 처리합니다. 저장되는 것은 당신의 캐릭터 신원과 당신이 만든 지도뿐입니다. 당신의 지도 데이터는 비공개 데이터베이스에 있으며 누구와도 공유되지 않습니다. 그렇긴 해도, 당신 연합의 극비 침공 경로에는 Nexum을 쓰지 마세요 — 인터넷의 어떤 도구도 좋은 작전 보안을 대신할 수 없습니다."
       },
+      "clipboard": {
+        "q": "데스크톱 앱이 제 클립보드를 읽나요?",
+        "a": "데스크톱 앱에서 \"클립보드에서 스캔 붙여넣기\"를 켠 경우에만 그렇습니다. 기본값은 꺼짐이며, 웹사이트는 직접 붙여넣은 내용만 볼 수 있습니다. 켜더라도 EVE에서 복사한 것만 사용됩니다. 앱은 EVE가 앞에 있는 창이었는지 확인하므로 브라우저, 채팅 앱, 암호화폐 지갑에서 복사한 내용은 절대 사용되지 않습니다(Windows에서는 읽지도 않습니다). EVE에서 복사한 내용 중에서도 프로브 스캐너 결과와 디스캔만 사용하며, 나머지는 즉시 버려지고 저장되거나 전송되지 않습니다. 앱은 클립보드를 절대 변경하지 않습니다. Nexum이 클립보드에 넣는 유일한 것은 점프 후 웜홀의 새 북마크 이름으로, 게임에 바로 붙여넣을 수 있습니다. 그러니 붙여넣은 지갑 주소가 달라졌다면 Nexum이 아니라 PC의 악성 코드입니다. PC를 점검하세요."
+      },
       "reportBugs": {
         "q": "버그를 보고하고, 피드백을 추가하고, 기능을 요청할 수 있나요?",
         "a": "물론입니다. 이 프로젝트는 <gh>GitHub</gh>에서 오픈 소스입니다 — 버그나 기능 요청은 이슈를 열거나, 용감하다면 풀 리퀘스트를 제출하세요. GitHub이 취향이 아니라면 이 계정에 연결된 캐릭터로 게임 내 메일을 통한 피드백도 됩니다."
@@ -1654,7 +1675,7 @@
       }
     },
     "footer": "EVE Online과 EVE 로고는 CCP hf.의 등록 상표입니다. 전 세계 모든 권리 보유. Nexum은 제3자 도구이며 CCP hf.와 제휴하거나 그로부터 보증받지 않았습니다. · <license>라이선스 및 EVE IP 고지</license>",
-    "desktopBody": "Nexum은 Windows, macOS, Linux용 데스크톱 앱으로도 실행됩니다. 로그인, 지도, 설정이 그대로인 같은 Nexum에 브라우저로는 할 수 없는 기능이 더해집니다. 앱은 컴퓨터에 있는 EVE의 로그 파일을 읽고 게임 위에 떠 있을 수 있습니다. 이 섹션의 기능은 모두 데스크톱 앱이 필요하며, 위의 기능은 둘 다에서 작동합니다.",
+    "desktopBody": "Nexum은 Windows, Linux용 데스크톱 앱으로도 실행됩니다. 로그인, 지도, 설정이 그대로인 같은 Nexum에 브라우저로는 할 수 없는 기능이 더해집니다. 앱은 컴퓨터에 있는 EVE의 로그 파일을 읽고 게임 위에 떠 있을 수 있습니다. 이 섹션의 기능은 모두 데스크톱 앱이 필요하며, 위의 기능은 둘 다에서 작동합니다.",
     "desktopFeatures": {
       "logJumps": {
         "title": "즉시 점프 추적",
@@ -1674,7 +1695,7 @@
       },
       "scanPaste": {
         "title": "스캔 붙여넣기",
-        "desc": "EVE에서 프로브 스캐너 결과를 복사하면 선택한 성계에 들어가고, 디스캔을 복사하면 분석기에서 열립니다. Alt-Tab이 필요 없습니다. 직접 켜기 전까지는 꺼져 있습니다."
+        "desc": "EVE에서 프로브 스캐너 결과를 복사하면 선택한 성계에 들어가고, 디스캔을 복사하면 분석기에서 열립니다. Alt-Tab이 필요 없습니다. 직접 켜기 전까지는 꺼져 있습니다. EVE 클라이언트에서 복사한 것만 가져옵니다. 다른 앱(브라우저, 채팅, 비밀번호 관리자, 지갑)에서 복사한 것은 무시하고, 스캔이 아닌 것은 저장하거나 전송하지 않고 바로 버리며, 앱이 클립보드를 바꾸는 일은 없습니다."
       },
       "onTop": {
         "title": "항상 위에",
@@ -1694,12 +1715,17 @@
       }
     },
     "desktopSoon": "출시 예정",
-    "desktopSoonBody": "Windows, macOS, Linux용 Nexum 데스크톱 앱: EVE 로그로 즉시 점프 추적, 지도 위의 정보 채널, 위협 경보 등.",
+    "desktopSoonBody": "Windows, Linux용 Nexum 데스크톱 앱: EVE 로그로 즉시 점프 추적, 지도 위의 정보 채널, 위협 경보 등.",
     "desktopSoonLink": "무엇이 추가되는지 보기",
     "desktopOut": "지금 이용 가능",
     "desktopDownloadLink": "다운로드",
     "desktopMacNote": "macOS: 앱이 아직 서명되지 않았으므로 설치 후 터미널에서 한 번 실행하세요:",
-    "desktopAllDownloads": "모든 다운로드(.msi, .deb, .rpm)와 릴리스 노트"
+    "desktopAllDownloads": "모든 다운로드(.deb, .rpm)와 릴리스 노트",
+    "desktopWinNote": "Windows: 버튼을 누르면 Microsoft Store에서 Nexum이 열리며, 경고 없이 설치되고 자동으로 최신 상태로 유지됩니다.",
+    "desktopHeroTitle": "Nexum이 이제 데스크톱 앱으로 나왔습니다",
+    "desktopHeroBody": "탐사의 큰 도약: EVE 자체 로그로 점프를 즉시 추적하고, 정보 채널을 지도에 표시하며, 소리와 음성으로 위협을 알리고, 게임 위에 오버레이를 띄우고, 스캔을 복사하는 즉시 붙여 넣습니다. Windows와 Linux용, 무료.",
+    "desktopHeroMore": "추가되는 기능 모두 보기",
+    "desktopWinInstaller": "또는 설치 프로그램 다운로드 (서명되지 않음: Windows가 PC를 보호했다고 표시할 수 있습니다. 추가 정보를 누른 다음 실행을 선택하세요)."
   },
   "language": {
     "label": "언어"
@@ -1716,7 +1742,9 @@
     "lessThan24h": "< 24h",
     "lessThan4h": "< 4h",
     "lessThan1h": "< 1h",
-    "broken": "연결 끊김 — 웜홀 시그니처가 삭제되었습니다(홀 붕괴)"
+    "broken": "연결 끊김 — 웜홀 시그니처가 삭제되었습니다(홀 붕괴)",
+    "showInfo": "이 연결의 정보 보기",
+    "hideInfo": "클릭해서 접기"
   },
   "mapKey": {
     "title": "지도 범례",
@@ -2149,7 +2177,12 @@
       "normal": "보통",
       "strong": "강하게"
     },
-    "resetColor": "초기화"
+    "resetColor": "초기화",
+    "connInfo": "연결 정보",
+    "connInfoFull": "항상 표시",
+    "connInfoFolded": "접기",
+    "importSystemsTitle": "CSV 또는 탭으로 구분된 행에서 이 지도에 성계 추가",
+    "importSystems": "↑ CSV에서 성계 가져오기"
   },
   "mass": {
     "billionKg": "{{value}}십억 kg",
@@ -2861,5 +2894,123 @@
     "sub": "사이드바의 {{section}} 섹션에서 언제든지 바꾸고, 음성을 고르고, 어떤 이벤트를 읽을지 정할 수 있습니다.",
     "noThanks": "괜찮습니다",
     "enable": "켜기"
+  },
+  "offMap": {
+    "title": "{{system}}은(는) 이 지도에 없습니다",
+    "kspaceMap": "이 지도의 관리자가 비행 중 하이섹, 로우섹, 널섹 성계를 기록하지 않도록 설정했습니다.",
+    "kspaceYou": "\"K-스페이스 추적 안 함\" 설정이 켜져 있어 하이섹, 로우섹, 널섹 성계가 기록되지 않습니다.",
+    "trackingOff": "점프 추적이 꺼져 있어 이동한 성계가 추가되지 않습니다.",
+    "readOnly": "이 지도를 볼 수는 있지만 추가할 수는 없습니다.",
+    "locked": "이 지도는 잠겨 있어 아무것도 추가되지 않습니다.",
+    "add": "지도에 추가",
+    "hide": "숨기기"
+  },
+  "scanPaste": {
+    "otherCharacter": "스캔을 붙여넣지 않았습니다: {{name}}의 EVE 창에서 복사한 스캔만 사용합니다 (Nexum 앱 설정)."
+  },
+  "rollPlan": {
+    "title": "통과 계획",
+    "addShip": "함선 추가",
+    "myRoller": "내 롤러: {{name}} ({{cold}}/{{hot}})",
+    "removeShip": "{{name}} 제거",
+    "ship": "함선",
+    "toggleHeat": "콜드/핫 전환",
+    "out": "가기",
+    "back": "오기",
+    "flown": "완료",
+    "removePass": "이 통과 제거",
+    "outcome": {
+      "safe": "이 통과 후 사용된 질량. 이번에 구멍이 닫힐 수 없습니다.",
+      "risky": "이 통과 후 사용된 질량. 이번에 구멍이 닫힐 수 있습니다.",
+      "collapse": "이 통과 후 사용된 질량. 이번에 구멍이 닫힙니다."
+    },
+    "strands": "{{n}}번째 통과에서 {{ship}}이(가) 반대편에 있는 채로 구멍이 닫힐 수 있습니다.",
+    "addPass": "통과 추가",
+    "flyNext": "다음 통과",
+    "flyNextTitle": "{{ship}} 통과: 사용 질량에 {{mass}} 추가",
+    "undoFlown": "완료 취소",
+    "clear": "계획 비우기",
+    "tooHeavy": "이 구멍에는 너무 무겁습니다 (최대 점프 {{max}})"
+  },
+  "errorScreen": {
+    "title": "문제가 발생했습니다",
+    "hint": "Nexum에 오류가 발생해 멈췄습니다. 계속하려면 새로고침하세요. 신고하려면 세부 정보를 복사해 보내 주세요.",
+    "reload": "새로고침",
+    "copy": "오류 세부 정보 복사"
+  },
+  "exportSystems": {
+    "title": "성계 내보내기",
+    "format": "형식",
+    "formats": {
+      "csv": "CSV",
+      "tsv": "탭으로 구분",
+      "json": "JSON"
+    },
+    "skipLocked": "잠긴 성계 제외 ({{count}})",
+    "summary": "성계: {{systems}}. 행: {{rows}}, 시그니처마다 한 행.",
+    "loading": "성계를 불러오는 중…",
+    "loadFailed": "성계를 불러오지 못했습니다.",
+    "copy": "복사",
+    "save": "파일 저장",
+    "copied": "클립보드에 복사했습니다.",
+    "copyFailed": "클립보드에 복사하지 못했습니다."
+  },
+  "groupMeaning": {
+    "map": "지도",
+    "chain": "저장된 체인",
+    "title": "그룹의 의미",
+    "label": "라벨"
+  },
+  "importSystems": {
+    "title": "성계 가져오기",
+    "intro": "행을 붙여 넣거나, 머리글 행이 있는 CSV 또는 탭 구분 파일을 여세요. 열: group, system, signature, sig-type, name, to-system, from-type, to-type, size, mass-remaining, life-remaining. system만 필수입니다. 이 지도에 이미 있는 성계는 그대로 두고, 없는 것만 추가합니다.",
+    "paste": "행",
+    "openFile": "파일 열기…",
+    "meaningHint": {
+      "map": "그룹은 메모일 뿐이며 아무것도 하지 않습니다.",
+      "chain": "웜홀이 하나의 경로를 이루는 그룹은 그룹 이름으로 체인에 저장됩니다.",
+      "label": "각 그룹은 해당 성계에 사용자 텍스트 라벨로 붙습니다(성계당 최대 3개)."
+    },
+    "noHeader": "\"system\" 열이 있는 머리글 행이 없습니다.",
+    "lookupFailed": "성계 이름을 조회하지 못했습니다. 다시 시도하세요.",
+    "checking": "성계 이름 확인 중…",
+    "summary": "준비: {{good}}행. 문제로 제외: {{bad}}.",
+    "col": {
+      "system": "성계",
+      "signature": "시그니처",
+      "toSystem": "도착 성계",
+      "check": "확인"
+    },
+    "rowOk": "정상",
+    "error": {
+      "noSystem": "성계가 없습니다.",
+      "unknownSystem": "EVE 성계가 아닙니다.",
+      "badSignature": "시그니처는 ABC-123 형식이어야 합니다.",
+      "badSigType": "알 수 없는 시그니처 유형입니다.",
+      "whOnly": "웜홀이 아닌 시그니처에 웜홀 정보가 있습니다.",
+      "unknownToSystem": "도착 성계가 EVE 성계가 아닙니다.",
+      "sameSystem": "웜홀은 자기 성계로 이어질 수 없습니다.",
+      "badType": "웜홀 유형이 아닙니다.",
+      "bothK162": "양쪽 끝이 모두 K162일 수는 없습니다.",
+      "badSize": "크기는 S, M, L 또는 XL이어야 합니다.",
+      "sizeMismatch": "그 크기는 웜홀 유형과 맞지 않습니다.",
+      "badMass": "질량은 100, 50 또는 10이어야 합니다.",
+      "badLife": "수명은 48, 24, 4, 1 또는 0이어야 합니다."
+    },
+    "notPaths": "웜홀이 하나의 경로를 이루지 않아 체인으로 저장하지 않음: {{groups}}",
+    "import": "가져오기 ({{count}})",
+    "importing": "가져오는 중…",
+    "done": "가져왔습니다. 추가된 성계: {{systems}}, 연결: {{connections}}, 시그니처: {{signatures}}, 라벨: {{labels}}, 체인: {{chains}}.",
+    "failed": "성계를 가져오지 못했습니다.",
+    "fileTooBig": "파일이 너무 큽니다(최대 2MB).",
+    "fileFailed": "파일을 읽지 못했습니다."
+  },
+  "chainNumber": {
+    "toggle": "홈부터 체인 번호 매기기 (L+1)",
+    "hint": "각 성계는 웜홀로 처음 점프해 들어갈 때 번호를 받습니다: 홈에서 1, 2, 3, 5에서 51, 52 등. 웜홀 북마크는 도착지 번호로 시작하므로 EVE에서 체인 순서대로 정렬됩니다. 번호는 바뀌지 않으며 두 번 쓰이지 않습니다.",
+    "set": "체인 번호 설정…",
+    "setTitle": "체인 번호",
+    "setMessage": "{{name}}의 체인 번호. 비워 두면 지워집니다.",
+    "invalid": "체인 번호는 51처럼 숫자만 쓰며, 9보다 큰 부분 앞에는 5.10처럼 점을 붙입니다."
   }
 }

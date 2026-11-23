@@ -554,12 +554,14 @@
       "system": {
         "add": "hat {{subject}} hinzugefügt",
         "update": "hat {{subject}} geändert",
-        "remove": "hat {{subject}} entfernt"
+        "remove": "hat {{subject}} entfernt",
+        "restore": "hat {{subject}} wiederhergestellt"
       },
       "connection": {
         "add": "hat {{subject}} verbunden",
         "update": "hat {{subject}} geändert",
-        "remove": "hat {{subject}} getrennt"
+        "remove": "hat {{subject}} getrennt",
+        "restore": "hat {{subject}} wieder verbunden"
       },
       "signature": {
         "add": "hat Signatur {{subject}} hinzugefügt",
@@ -584,7 +586,8 @@
       "map": {
         "update": "hat die Karteneinstellungen geändert",
         "merge": "hat {{subject}} zusammengeführt",
-        "scoutCleanup": "hat {{subject}}-Löcher bereinigt"
+        "scoutCleanup": "hat {{subject}}-Löcher bereinigt",
+        "paste": "hat Systeme aus {{subject}} eingefügt"
       },
       "share": {
         "add": "hat die Karte mit {{subject}} geteilt",
@@ -814,7 +817,9 @@
     "restoreTitle": "Die Unterbrochen-Markierung entfernen und dies wieder als aktive Verbindung behandeln",
     "gateNote": "Reguläres Stargate — keine Wurmloch-Daten.",
     "gateProtected": "Stargate-Verbindungen existieren im Spiel und können nicht entfernt oder geändert werden.",
-    "jumpgateNote": "Ansiblex-Sprungbrücke — keine Wurmloch-Daten."
+    "jumpgateNote": "Ansiblex-Sprungbrücke — keine Wurmloch-Daten.",
+    "massUsedLabel": "Verbraucht",
+    "massUsedTitle": "Masse, die schon durchgegangen ist, in Millionen kg. Trag sie ein, wenn du sie kennst (etwa aus dem Sprungprotokoll); der Rechner rechnet von dort weiter."
   },
   "contentFilter": {
     "hint": "Systeme nach gescanntem Inhalt hervorheben. Wähle Signatur- oder Anomalie-Typen oder suche einen Site-Namen; passende Systeme bleiben hell, der Rest wird ausgeblendet.",
@@ -943,7 +948,19 @@
     "jumpRangeFrom": "Sprungreichweite von hier",
     "jumpCyno": "Cyno-Sprung",
     "jumpRangeClear": "Sprungreichweite löschen",
-    "copyName": "Systemnamen kopieren"
+    "copyName": "Systemnamen kopieren",
+    "copySystems": "Systeme kopieren ({{count}})",
+    "copiedSystems": "Systeme kopiert: {{count}}. Füge sie mit Strg+V in eine andere Karte ein.",
+    "copySystemsFailed": "Die Systeme konnten nicht kopiert werden.",
+    "pasteSystems": "Systeme einfügen",
+    "pastedSystems": "Eingefügt. Neue Systeme: {{systems}}, Verbindungen: {{connections}}, Signaturen: {{signatures}}.",
+    "pastedNothing": "Nichts hinzuzufügen: Diese Karte hat bereits alles, was du eingefügt hast.",
+    "pasteSystemsFailed": "Die Systeme konnten nicht eingefügt werden.",
+    "pasteSystemsNoRights": "Deine Rolle darf dieser Karte keine Systeme hinzufügen.",
+    "pasteUseKeys": "Dein Browser lässt nexum die Zwischenablage nicht lesen. Drücke stattdessen Strg+V (Cmd+V auf dem Mac) auf der Karte.",
+    "pasteNoSystems": "Keine kopierten Systeme in der Zwischenablage. Rechtsklicke zuerst auf Systeme und wähle Systeme kopieren.",
+    "exportSystems": "Systeme exportieren ({{count}})…",
+    "importSystems": "Systeme importieren…"
   },
   "customIntel": {
     "title": "Eigene Intel",
@@ -1632,6 +1649,10 @@
         "q": "Sind meine Daten sicher?",
         "a": "Nexum sieht dein EVE-Passwort nie — die Authentifizierung wird vollständig von CCPs EVE SSO abgewickelt. Gespeichert wird nur deine Charakteridentität und die Karten, die du baust. Deine Kartendaten liegen in einer privaten Datenbank und werden mit niemandem geteilt. Nutze Nexum dennoch nicht für die streng geheime Invasionsroute deiner Allianz — kein Tool im Internet ersetzt gute Operationssicherheit."
       },
+      "clipboard": {
+        "q": "Liest die Desktop-App meine Zwischenablage?",
+        "a": "Nur wenn du in der Desktop-App „Scans aus der Zwischenablage einfügen“ einschaltest. Das ist standardmäßig aus, und die Website sieht immer nur, was du selbst dort einfügst. Selbst dann zählt nur, was in EVE kopiert wurde: Die App prüft, dass EVE das Fenster im Vordergrund war, daher wird nichts verwendet, was du in einem Browser, Chat-Programm oder Krypto-Wallet kopierst (unter Windows wird es nicht einmal gelesen). Aus einer Kopie in EVE nimmt sie nur Sondenscanner-Ergebnisse und D-Scans; alles andere wird sofort verworfen, nie gespeichert oder gesendet. Die App verändert deine Zwischenablage nie. Das Einzige, was Nexum dort ablegt, ist nach einem Sprung der neue Lesezeichen-Name eines Wurmlochs, bereit zum Einfügen im Spiel. Falls also eine eingefügte Wallet-Adresse je anders herauskommt, ist das Schadsoftware auf deinem PC, nicht Nexum: Lass ihn prüfen."
+      },
       "reportBugs": {
         "q": "Kann ich Bugs melden, Feedback geben und Features wünschen?",
         "a": "Absolut. Das Projekt ist Open Source auf <gh>GitHub</gh> — eröffne ein Issue für Bugs oder Feature-Wünsche oder reiche einen Pull Request ein, wenn du dich traust. Feedback per In-Game-Mail an den mit diesem Account verbundenen Charakter funktioniert auch, falls GitHub nicht dein Ding ist."
@@ -1654,7 +1675,7 @@
       }
     },
     "footer": "EVE Online und das EVE-Logo sind eingetragene Marken von CCP hf. Alle Rechte weltweit vorbehalten. Nexum ist ein Drittanbieter-Tool und steht in keiner Verbindung zu CCP hf und wird von ihnen nicht unterstützt. · <license>Lizenz- & EVE-IP-Hinweis</license>",
-    "desktopBody": "Nexum gibt es auch als Desktop-App für Windows, macOS und Linux. Es ist dasselbe Nexum mit deinem Login, deinen Karten und Einstellungen, plus Funktionen, die ein Browser nicht bieten kann: Die App kann EVEs eigene Logdateien auf deinem Rechner lesen und über dem Spiel bleiben. Alles in diesem Abschnitt braucht die Desktop-App; alles darüber funktioniert in beiden.",
+    "desktopBody": "Nexum gibt es auch als Desktop-App für Windows und Linux. Es ist dasselbe Nexum mit deinem Login, deinen Karten und Einstellungen, plus Funktionen, die ein Browser nicht bieten kann: Die App kann EVEs eigene Logdateien auf deinem Rechner lesen und über dem Spiel bleiben. Alles in diesem Abschnitt braucht die Desktop-App; alles darüber funktioniert in beiden.",
     "desktopFeatures": {
       "logJumps": {
         "title": "Sofortige Sprungverfolgung",
@@ -1674,7 +1695,7 @@
       },
       "scanPaste": {
         "title": "Scans einfügen",
-        "desc": "Kopiere Sondenscanner-Ergebnisse in EVE, und sie landen im ausgewählten System; kopiere einen D-Scan, und er öffnet sich im Analysator. Ganz ohne Alt-Tab. Aus, bis du es einschaltest."
+        "desc": "Kopiere Sondenscanner-Ergebnisse in EVE, und sie landen im ausgewählten System; kopiere einen D-Scan, und er öffnet sich im Analysator. Ganz ohne Alt-Tab. Aus, bis du es einschaltest. Es nimmt nur Kopien aus dem EVE-Client: Alles, was du in einer anderen App kopierst (Browser, Chat, Passwortmanager, Wallet), wird ignoriert, alles, was kein Scan ist, wird verworfen, ohne gespeichert oder gesendet zu werden, und die App verändert deine Zwischenablage nie."
       },
       "onTop": {
         "title": "Immer im Vordergrund",
@@ -1694,12 +1715,17 @@
       }
     },
     "desktopSoon": "Demnächst",
-    "desktopSoonBody": "Die Nexum-Desktop-App für Windows, macOS und Linux: sofortige Sprungverfolgung aus EVEs Logs, Intel-Kanäle auf deiner Karte, Bedrohungswarnungen und mehr.",
+    "desktopSoonBody": "Die Nexum-Desktop-App für Windows und Linux: sofortige Sprungverfolgung aus EVEs Logs, Intel-Kanäle auf deiner Karte, Bedrohungswarnungen und mehr.",
     "desktopSoonLink": "Was sie bietet",
     "desktopOut": "Jetzt verfügbar",
     "desktopDownloadLink": "Herunterladen",
     "desktopMacNote": "macOS: Die App ist noch nicht signiert. Führe nach der Installation einmal im Terminal aus:",
-    "desktopAllDownloads": "Alle Downloads (.msi, .deb, .rpm) und Versionshinweise"
+    "desktopAllDownloads": "Alle Downloads (.deb, .rpm) und Versionshinweise",
+    "desktopWinNote": "Windows: Der Button öffnet Nexum im Microsoft Store, der es ohne Warnung installiert und aktuell hält.",
+    "desktopHeroTitle": "Nexum gibt es jetzt als Desktop-App",
+    "desktopHeroBody": "Ein riesiger Schritt für die Erkundung: deine Sprünge in dem Moment aus EVEs eigenen Logs erfasst, deine Intel-Kanäle auf der Karte, Bedrohungsalarme mit Ton und Stimme, ein Overlay über dem Spiel und Scans, die eingefügt werden, sobald du sie kopierst. Kostenlos, für Windows und Linux.",
+    "desktopHeroMore": "Alles, was sie kann",
+    "desktopWinInstaller": "Oder lade das Installationsprogramm herunter (nicht signiert: Windows meldet eventuell, dass es deinen PC geschützt hat; wähle Weitere Informationen, dann Trotzdem ausführen)."
   },
   "language": {
     "label": "Sprache"
@@ -1716,7 +1742,9 @@
     "lessThan24h": "< 24 Std",
     "lessThan4h": "< 4 Std",
     "lessThan1h": "< 1 Std",
-    "broken": "Verbindung unterbrochen — die Wurmloch-Sig wurde gelöscht (Loch kollabiert)"
+    "broken": "Verbindung unterbrochen — die Wurmloch-Sig wurde gelöscht (Loch kollabiert)",
+    "showInfo": "Infos zu dieser Verbindung anzeigen",
+    "hideInfo": "Zum Einklappen klicken"
   },
   "mapKey": {
     "title": "Kartenlegende",
@@ -2149,7 +2177,12 @@
       "normal": "Normal",
       "strong": "Stark"
     },
-    "resetColor": "Zurücksetzen"
+    "resetColor": "Zurücksetzen",
+    "connInfo": "Verbindungsinfos",
+    "connInfoFull": "Immer anzeigen",
+    "connInfoFolded": "Eingeklappt",
+    "importSystemsTitle": "Systeme aus CSV- oder tabulatorgetrennten Zeilen zu dieser Karte hinzufügen",
+    "importSystems": "↑ Systeme aus CSV importieren"
   },
   "mass": {
     "billionKg": "{{value}} Mrd. kg",
@@ -2865,5 +2898,123 @@
     "sub": "Du kannst das jederzeit im Bereich {{section}} der Seitenleiste ändern, eine Stimme wählen und festlegen, welche Ereignisse angesagt werden.",
     "noThanks": "Nein danke",
     "enable": "Einschalten"
+  },
+  "offMap": {
+    "title": "{{system}} ist nicht auf dieser Karte",
+    "kspaceMap": "Die Admins dieser Karte haben eingestellt, dass Hi-, Low- und Nullsec-Systeme beim Fliegen nicht erfasst werden.",
+    "kspaceYou": "Deine Einstellung \"K-Space nicht verfolgen\" ist an, daher werden Hi-, Low- und Nullsec-Systeme nicht erfasst.",
+    "trackingOff": "Das Sprung-Tracking ist aus, daher werden angeflogene Systeme nicht hinzugefügt.",
+    "readOnly": "Du kannst diese Karte ansehen, aber nichts hinzufügen.",
+    "locked": "Diese Karte ist gesperrt, daher wird nichts hinzugefügt.",
+    "add": "Zur Karte hinzufügen",
+    "hide": "Ausblenden"
+  },
+  "scanPaste": {
+    "otherCharacter": "Scan nicht eingefügt: Nur Scans aus dem EVE-Fenster von {{name}} werden verwendet (Einstellungen der Nexum-App)."
+  },
+  "rollPlan": {
+    "title": "Sprungplan",
+    "addShip": "Schiff hinzufügen",
+    "myRoller": "Mein Roller: {{name}} ({{cold}}/{{hot}})",
+    "removeShip": "{{name}} entfernen",
+    "ship": "Schiff",
+    "toggleHeat": "Zwischen kalt und heiß wechseln",
+    "out": "hin",
+    "back": "zurück",
+    "flown": "geflogen",
+    "removePass": "Diesen Sprung entfernen",
+    "outcome": {
+      "safe": "Verbrauchte Masse nach diesem Sprung. Das Loch kann dabei nicht kollabieren.",
+      "risky": "Verbrauchte Masse nach diesem Sprung. Das Loch könnte dabei kollabieren.",
+      "collapse": "Verbrauchte Masse nach diesem Sprung. Das Loch kollabiert dabei."
+    },
+    "strands": "Sprung {{n}} könnte das Loch schließen, während {{ship}} auf der anderen Seite ist.",
+    "addPass": "Sprung hinzufügen",
+    "flyNext": "Nächsten fliegen",
+    "flyNextTitle": "{{ship}} springt: {{mass}} kommen zur verbrauchten Masse hinzu",
+    "undoFlown": "Geflogenen zurücknehmen",
+    "clear": "Plan leeren",
+    "tooHeavy": "Zu schwer für dieses Loch (max. Sprungmasse {{max}})"
+  },
+  "errorScreen": {
+    "title": "Etwas ist schiefgelaufen",
+    "hint": "Nexum ist auf einen Fehler gestoßen und hat angehalten. Neu laden, um weiterzumachen. Um ihn zu melden, kopiere die Details und schick sie uns.",
+    "reload": "Neu laden",
+    "copy": "Fehlerdetails kopieren"
+  },
+  "exportSystems": {
+    "title": "Systeme exportieren",
+    "format": "Format",
+    "formats": {
+      "csv": "CSV",
+      "tsv": "Tabulatorgetrennt",
+      "json": "JSON"
+    },
+    "skipLocked": "Gesperrte Systeme weglassen ({{count}})",
+    "summary": "Systeme: {{systems}}. Zeilen: {{rows}}, eine pro Signatur.",
+    "loading": "Systeme werden geladen…",
+    "loadFailed": "Die Systeme konnten nicht geladen werden.",
+    "copy": "Kopieren",
+    "save": "Datei speichern",
+    "copied": "In die Zwischenablage kopiert.",
+    "copyFailed": "Kopieren in die Zwischenablage fehlgeschlagen."
+  },
+  "groupMeaning": {
+    "map": "Die Karte",
+    "chain": "Eine gespeicherte Kette",
+    "title": "Gruppe bedeutet",
+    "label": "Ein Label"
+  },
+  "importSystems": {
+    "title": "Systeme importieren",
+    "intro": "Füge Zeilen ein oder öffne eine CSV- oder tabulatorgetrennte Datei mit Kopfzeile. Spalten: group, system, signature, sig-type, name, to-system, from-type, to-type, size, mass-remaining, life-remaining. Nur system ist nötig. Systeme, die diese Karte schon hat, bleiben wie sie sind; nur Fehlendes wird ergänzt.",
+    "paste": "Zeilen",
+    "openFile": "Datei öffnen…",
+    "meaningHint": {
+      "map": "Die Gruppe ist nur eine Notiz: Es passiert nichts damit.",
+      "chain": "Jede Gruppe, deren Löcher einen Pfad bilden, wird als Kette mit dem Gruppennamen gespeichert.",
+      "label": "Jede Gruppe kommt als eigenes Text-Label an ihre Systeme (bis zu drei pro System)."
+    },
+    "noHeader": "Keine Kopfzeile mit einer Spalte \"system\".",
+    "lookupFailed": "Die Systemnamen konnten nicht nachgeschlagen werden. Versuche es erneut.",
+    "checking": "Systemnamen werden geprüft…",
+    "summary": "Bereit: {{good}} Zeilen. Wegen Problemen ausgelassen: {{bad}}.",
+    "col": {
+      "system": "System",
+      "signature": "Signatur",
+      "toSystem": "Nach System",
+      "check": "Prüfung"
+    },
+    "rowOk": "OK",
+    "error": {
+      "noSystem": "Kein System.",
+      "unknownSystem": "Kein EVE-System.",
+      "badSignature": "Die Signatur muss wie ABC-123 aussehen.",
+      "badSigType": "Unbekannter Signaturtyp.",
+      "whOnly": "Loch-Angaben bei einer Signatur, die kein Wurmloch ist.",
+      "unknownToSystem": "Das Zielsystem ist kein EVE-System.",
+      "sameSystem": "Ein Loch kann nicht in sein eigenes System führen.",
+      "badType": "Kein Wurmlochtyp.",
+      "bothK162": "Beide Enden können nicht K162 sein.",
+      "badSize": "Größe muss S, M, L oder XL sein.",
+      "sizeMismatch": "Diese Größe passt nicht zum Lochtyp.",
+      "badMass": "Masse muss 100, 50 oder 10 sein.",
+      "badLife": "Lebensdauer muss 48, 24, 4, 1 oder 0 sein."
+    },
+    "notPaths": "Nicht als Ketten gespeichert, weil ihre Löcher keinen Pfad bilden: {{groups}}",
+    "import": "Importieren ({{count}})",
+    "importing": "Wird importiert…",
+    "done": "Importiert. Neue Systeme: {{systems}}, Verbindungen: {{connections}}, Signaturen: {{signatures}}, Labels: {{labels}}, Ketten: {{chains}}.",
+    "failed": "Die Systeme konnten nicht importiert werden.",
+    "fileTooBig": "Die Datei ist zu groß (höchstens 2 MB).",
+    "fileFailed": "Die Datei konnte nicht gelesen werden."
+  },
+  "chainNumber": {
+    "toggle": "Kette ab Home nummerieren (L+1)",
+    "hint": "Jedes System bekommt beim ersten Wurmlochsprung hinein eine Nummer: 1, 2, 3 ab Home, 51, 52 ab 5 und so weiter. Loch-Lesezeichen beginnen mit der Nummer ihres Ziels und sind in EVE so nach der Kette sortiert. Eine Nummer ändert sich nie und wird nie zweimal vergeben.",
+    "set": "Kettennummer setzen…",
+    "setTitle": "Kettennummer",
+    "setMessage": "Kettennummer für {{name}}. Leer lassen, um sie zu entfernen.",
+    "invalid": "Eine Kettennummer besteht nur aus Ziffern, etwa 51, mit einem Punkt vor jedem Teil über 9, etwa 5.10."
   }
 }

@@ -1464,6 +1464,35 @@ export async function migrate() {
     );
     CREATE INDEX IF NOT EXISTS idx_map_audit_map_time ON map_audit (map_id, created_at DESC);
     CREATE INDEX IF NOT EXISTS idx_map_audit_time ON map_audit (created_at);
+
+    -- Recently deleted systems and connections, so undo can put back what the
+    -- delete took with it (signatures, anomalies, structures, connections and
+    -- their jump logs), not just the box. services/mapTrash.ts; kept an hour.
+    CREATE TABLE IF NOT EXISTS map_trash (
+      id          BIGSERIAL   PRIMARY KEY,
+      map_id      UUID        NOT NULL REFERENCES maps(id) ON DELETE CASCADE,
+      kind        TEXT        NOT NULL,          -- 'system' | 'connection'
+      target_id   UUID        NOT NULL,          -- the deleted system / connection id
+      deleted_by  INTEGER     REFERENCES users(id) ON DELETE CASCADE,
+      payload     JSONB       NOT NULL,
+      deleted_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+    CREATE INDEX IF NOT EXISTS idx_map_trash_target ON map_trash (map_id, kind, target_id);
+    CREATE INDEX IF NOT EXISTS idx_map_trash_time ON map_trash (deleted_at);
+
+    -- Chain numbers ("L+1", services/chainNumber.ts): off unless a map turns
+    -- them on. A system's number is its path from home (5162 = hole 5, then 1,
+    -- then 6, then 2), handed out on the first jump into it. The counter per
+    -- parent number means a number is never handed out twice, even after the
+    -- system that had it is gone: someone's in-game bookmark may still use it.
+    ALTER TABLE maps ADD COLUMN IF NOT EXISTS chain_numbering BOOLEAN NOT NULL DEFAULT FALSE;
+    ALTER TABLE map_systems ADD COLUMN IF NOT EXISTS chain_label TEXT;
+    CREATE TABLE IF NOT EXISTS map_chain_counters (
+      map_id     UUID    NOT NULL REFERENCES maps(id) ON DELETE CASCADE,
+      parent     TEXT    NOT NULL,
+      last_index INTEGER NOT NULL,
+      PRIMARY KEY (map_id, parent)
+    );
   `);
 
   await encryptLegacyTokens();

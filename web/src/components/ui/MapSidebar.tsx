@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { Trans, useTranslation } from "react-i18next";
 import { TripwireImportModal } from "./TripwireImportModal";
+import { ImportSystemsModal } from "./ImportSystemsModal";
 import type { TFunction } from "i18next";
 import {
   useNotificationPermission,
@@ -26,7 +27,8 @@ import { NOTIFY, notifyDefault, previewAlertVolume, ALERT_VOLUME_KEY, ALERT_VOLU
 import { useResettableState } from "../../hooks/useResettableState";
 import { DEFAULT_BOOKMARK_FORMAT, BOOKMARK_TOKENS, DEFAULT_SITE_BOOKMARK_FORMAT, SITE_BOOKMARK_TOKENS, K162_BOOKMARK_FORMAT_KEY } from "../../utils/signatureBookmark";
 import { COPY_BOOKMARK_ON_JUMP } from "../../hooks/whJumpConfirm";
-import { toPng } from "html-to-image";
+import { toBlob } from "html-to-image";
+import { saveFile } from "../../utils/saveFile";
 import { CaretLeftIcon, CaretRightIcon, DiscordLogoIcon } from "@phosphor-icons/react";
 import { DISCORD_INVITE_URL } from "../../data/links";
 import { JumpRangePane } from "./JumpRangePane";
@@ -44,7 +46,7 @@ import { useIsMapOwner } from "../../hooks/useIsMapOwner";
 import type { WormholeMap } from "../../types";
 import { countPersonalMaps } from '../../utils/personalMaps';
 import { useEscapeClose } from '../../hooks/useEscapeClose';
-import { LINK_SIG_IDS_KEY } from '../../utils/linkSigIds';
+import { LINK_SIG_IDS_KEY, CONN_INFO_KEY, type ConnInfoMode } from '../../utils/linkSigIds';
 import { RouteAvoidList } from './RouteAvoidList';
 import { CONFIRM_KEY_DELETE_KEY } from '../../utils/confirmPref';
 import { HOME_COLOR_KEY, HOME_COLOR_DEFAULT, HERE_COLOR_KEY, HERE_COLOR_DEFAULT, HERE_PULSE_KEY, HERE_PULSE_DEFAULT, HERE_PULSES, normalisePulse, safeColor } from '../../utils/mapMarkers';
@@ -630,7 +632,48 @@ function MapBookmarkSection({ sectionProps }: { sectionProps: { isOpen: boolean;
   return (
     <CollapsibleSection title={t("mapSidebar.sections.bookmarks")} {...sectionProps}>
       <MapBookmarkFormat />
+      <MapChainNumbering />
     </CollapsibleSection>
+  );
+}
+
+// Chain numbers ("L+1", utils/chainNumber.ts): a map setting, since the
+// numbers go into bookmarks the whole corp shares. Same people as the formats.
+function MapChainNumbering() {
+  const { t } = useTranslation();
+  const map = useMapStore((s) => s.map);
+  const on = !!map.chainNumbering;
+  const [saving, setSaving] = useState(false);
+
+  function setInStore(v: boolean) {
+    useMapStore.setState((s) => ({
+      map: { ...s.map, chainNumbering: v },
+      maps: s.maps.map((m) => (m.id === map.id ? { ...m, chainNumbering: v } : m)),
+    }));
+  }
+
+  async function toggle(next: boolean) {
+    setSaving(true);
+    setInStore(next);
+    try {
+      await api(`/api/maps/${map.id}`, { method: "PATCH", body: JSON.stringify({ chainNumbering: next }) });
+    } catch (e) {
+      setInStore(!next);
+      toast.error(e instanceof Error ? e.message : t("mapSidebar.updateSettingFailed"));
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <>
+      <label className="map-sidebar__row map-sidebar__toggle-row">
+        <span className="map-sidebar__label">{t("chainNumber.toggle")}</span>
+        <input type="checkbox" className="map-sidebar__toggle-input" checked={on} disabled={saving}
+          onChange={(e) => void toggle(e.target.checked)} />
+      </label>
+      <div className="map-sidebar__hint">{t("chainNumber.hint")}</div>
+    </>
   );
 }
 
@@ -914,7 +957,7 @@ export function MapSidebar() {
       return;
     }
     try {
-      const dataUrl = await toPng(target, {
+      const blob = await toBlob(target, {
         backgroundColor: "#08101a",
         pixelRatio: 2,
         filter: (node) => {
@@ -928,12 +971,10 @@ export function MapSidebar() {
           );
         },
       });
-      const link = document.createElement("a");
+      if (!blob) throw new Error("empty image");
       const { map } = useMapStore.getState();
       const safeName = (map.name || "map").replace(/[^a-z0-9]/gi, "_");
-      link.download = `nexum_${safeName}_${new Date().toISOString().split("T")[0]}.png`;
-      link.href = dataUrl;
-      link.click();
+      await saveFile(`nexum_${safeName}_${new Date().toISOString().split("T")[0]}.png`, blob);
     } catch (err) {
       toast.error(
         t("mapSidebar.exportFailed", { error: err instanceof Error ? err.message : String(err) }),
@@ -980,6 +1021,7 @@ export function MapSidebar() {
   const edgeStyle = useMapStore((s) => s.edgeStyle);
   const setEdgeStyle = useMapStore((s) => s.setEdgeStyle);
   const connectionThickness = useMapStore((s) => s.connectionThickness);
+  const [connInfo, setConnInfo] = useUserSetting<ConnInfoMode>(CONN_INFO_KEY, "full");
   const setConnectionThickness = useMapStore((s) => s.setConnectionThickness);
   const routeMode = useMapStore((s) => s.routeMode);
   const setRouteMode = useMapStore((s) => s.setRouteMode);
@@ -1066,12 +1108,7 @@ export function MapSidebar() {
     try {
       const backup = await api<unknown>(`/api/maps/${map.id}/export`);
       const blob = new Blob([JSON.stringify(backup)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${map.name.replace(/[^a-z0-9]/gi, "_")}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
+      await saveFile(`${map.name.replace(/[^a-z0-9]/gi, "_")}.json`, blob);
     } catch (err) {
       toast.error(t("mapSidebar.exportFailed", { error: err instanceof Error ? err.message : String(err) }));
     }
@@ -1131,6 +1168,8 @@ export function MapSidebar() {
   // Wanderer export this carries signatures and each hole's mass/life, so a
   // chain arrives with its scan data rather than just its shape.
   const [tripwireOpen, setTripwireOpen] = useState(false);
+  // Import systems into THIS map (also on the map's right-click menu).
+  const [importSystemsOpen, setImportSystemsOpen] = useState(false);
   async function handleImportTripwire(raw: string) {
     let parsed: { signatures?: unknown; wormholes?: unknown; notes?: unknown; origin?: unknown };
     try {
@@ -1523,6 +1562,21 @@ export function MapSidebar() {
                 { value: "standard", label: t("mapSidebar.thickness.standard") },
                 { value: "thick", label: t("mapSidebar.thickness.thick") },
                 { value: "extra", label: t("mapSidebar.thickness.extra") },
+              ]}
+            />
+          </div>
+
+          <div className="map-sidebar__row">
+            <label className="map-sidebar__label" htmlFor="connection-info">
+              {t("mapSidebar.connInfo")}
+            </label>
+            <Select
+              id="connection-info"
+              value={connInfo}
+              onChange={(v) => setConnInfo(v as ConnInfoMode)}
+              options={[
+                { value: "full", label: t("mapSidebar.connInfoFull") },
+                { value: "folded", label: t("mapSidebar.connInfoFolded") },
               ]}
             />
           </div>
@@ -1968,6 +2022,16 @@ export function MapSidebar() {
                 </button>
               </div>
 
+              {/* Adds to the open map, so not held back by the map limit. */}
+              <button
+                type="button"
+                className="map-sidebar__action"
+                onClick={() => setImportSystemsOpen(true)}
+                title={t("mapSidebar.importSystemsTitle")}
+              >
+                {t("mapSidebar.importSystems")}
+              </button>
+
               <button className="map-sidebar__action" onClick={handleExport}>
                 {t("mapSidebar.exportJson")}
               </button>
@@ -2060,6 +2124,10 @@ export function MapSidebar() {
       {auditOpen && auditMapId && createPortal(
         <MapAuditModal mapId={auditMapId} mapName={auditMapName} onClose={() => setAuditOpen(false)} />,
         document.body,
+      )}
+
+      {importSystemsOpen && auditMapId && (
+        <ImportSystemsModal mapId={auditMapId} anchor={null} onClose={() => setImportSystemsOpen(false)} />
       )}
 
       {tripwireOpen && (

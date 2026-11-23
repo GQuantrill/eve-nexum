@@ -1,3 +1,4 @@
+import { forwardChainLabel, withChain } from '../../utils/chainNumber';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
@@ -44,7 +45,9 @@ import {
 // it goes, or a connection lists it as its backing signature (which holds
 // even when nobody filled in the destination).
 function backsALink(sig: Signature): boolean {
-  if (sig.whType && sig.whLeadsTo) return true;
+  // A destination is enough: a hole jumped before its code was known still
+  // leads where it says (whAutoDetect decides which link, if any, is its).
+  if (sig.whLeadsTo) return true;
   return !!connectionForSig(sig.id, useMapStore.getState().map.connections);
 }
 
@@ -615,6 +618,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   const [userBookmarkFormat] = useUserSetting<string>('nexum.sig.bookmarkFormat', DEFAULT_BOOKMARK_FORMAT);
   const [userK162BookmarkFormat] = useUserSetting<string>(K162_BOOKMARK_FORMAT_KEY, '');
   const mapBookmarkFormat = useMapStore((s) => s.map.bookmarkFormat);
+  const chainNumbering    = useMapStore((s) => !!s.map.chainNumbering);
   // Same map-overrides-personal resolution for the relic/data/gas SITE format.
   const [userSiteBookmarkFormat] = useUserSetting<string>('nexum.sig.siteBookmarkFormat', DEFAULT_SITE_BOOKMARK_FORMAT);
   const mapSiteBookmarkFormat = useMapStore((s) => s.map.siteBookmarkFormat);
@@ -660,15 +664,23 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   }, [mapSystems]);
 
   const copyBookmark = useCallback((sig: Signature) => {
-    const format = wormholeBookmarkFormat(sig, mapBookmarkFormat, userBookmarkFormat, userK162BookmarkFormat);
+    const format = withChain(
+      wormholeBookmarkFormat(sig, mapBookmarkFormat, userBookmarkFormat, userK162BookmarkFormat), chainNumbering);
+    // The number of where the hole leads, when it's a step further from home.
+    const leadsTo = (sig.whLeadsTo ?? '').trim().toUpperCase();
+    const chain = chainNumbering
+      ? forwardChainLabel(mapSystems.find((x) => x.id === systemId),
+          leadsTo ? mapSystems.find((x) => x.name?.trim().toUpperCase() === leadsTo) : undefined)
+      : '';
     const name = formatBookmarkName(format, sig, whTypes, Date.now(),
       (n) => classBySystemName.get(n.trim().toUpperCase()) ?? null,
-      (n) => aliasBySystemName.get(n.trim().toUpperCase()) ?? null);
+      (n) => aliasBySystemName.get(n.trim().toUpperCase()) ?? null, chain);
     if (!name) return;
     navigator.clipboard.writeText(name)
       .then(() => toast.success(t('signatures.bookmarkCopied', { name })))
       .catch(() => toast.error(t('signatures.bookmarkCopyFailed')));
-  }, [mapBookmarkFormat, userBookmarkFormat, userK162BookmarkFormat, whTypes, classBySystemName, aliasBySystemName, t]);
+  }, [mapBookmarkFormat, userBookmarkFormat, userK162BookmarkFormat, whTypes, classBySystemName, aliasBySystemName, t,
+      chainNumbering, mapSystems, systemId]);
 
   const copySiteBookmark = useCallback((sig: Signature) => {
     const name = formatSiteBookmarkName(siteBookmarkFormat, sig);
@@ -1636,7 +1648,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                       className="icon-btn"
                       onClick={() => (sig.sigType === 'wormhole' ? copyBookmark(sig) : copySiteBookmark(sig))}
                       title={t('signatures.copyBookmark')}
-                    ><CopyIcon size={12} weight="bold" /></button>
+                    ><CopyIcon size={20} weight="bold" /></button>
                   </td>
                 )}
                 {isColShown('name') && (

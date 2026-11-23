@@ -119,6 +119,7 @@ export async function loadFullMap(mapId: string) {
               collapse_grace_hours        AS "collapseGraceHours",
               bookmark_format             AS "bookmarkFormat",
               site_bookmark_format        AS "siteBookmarkFormat",
+              chain_numbering             AS "chainNumbering",
               share_token              AS "shareToken",
               share_expires_at         AS "shareExpiresAt",
               share_include_sigs       AS "shareIncludeSigs",
@@ -135,6 +136,7 @@ export async function loadFullMap(mapId: string) {
               ms.position_x AS x, ms.position_y AS y,
               ms.status, ms.intel, ms.is_home AS "isHome", ms.locked, ms.notes,
               ms.labels, ms.custom_labels AS "customLabels", ms.tag, ms.alias,
+              ms.chain_label AS "chainLabel",
               ss.security::float8 AS "security",
               ms.last_activity_at AS "lastActivityAt"
        FROM map_systems ms

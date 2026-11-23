@@ -6,7 +6,7 @@ browser can't do:
 | Feature | What it does |
 |---|---|
 | Jump tracking from EVE logs | Reads EVE's Local chat log and moves you on the map the moment you jump, seconds before ESI. Your other logged-in characters (alts) move the same way. ESI still confirms each move. On by default. |
-| Scan paste | Probe-scanner results you copy in EVE paste themselves onto the selected system; a copied d-scan opens in the d-scan analyser, filled in (nothing is analysed or pinned until you say so). Off by default (it reads the clipboard); only text that looks like a probe scan or d-scan is ever sent to the page. |
+| Scan paste | Probe-scanner results you copy in EVE paste themselves onto the selected system; a copied d-scan opens in the d-scan analyser, filled in (nothing is analysed or pinned until you say so). Off by default. Only a copy made in EVE counts: the clipboard is used only if EVE (`exefile.exe`; under Wine/Proton the X11 window class) was the window in front just before the copy (`foreground.rs`), so copies from browsers, chat apps or wallets are never used, and on Windows not even read (the copy counter says when something new arrives). Probe scans must be whole scanner rows; anything else is dropped, only a fingerprint of the last copy is kept, and the app never writes to the clipboard. |
 | Start at login | Optional: starts with Windows/macOS, hidden in the tray (the system runs it with `--minimised`). Also in the Nexum and tray menus. Off by default; the system's own setting is read at startup. |
 | Intel sounds | Seven sounds to pick from in Settings, with a Preview button. The Nexum page makes them (`web/src/desktop/intelSounds.ts`, ids shared with `settings.rs` INTEL_SOUNDS and checked by a test); Preview asks the main window to play one. |
 | Combat alerts | Opt-in (Settings, Tools and tray menus). Reads EVE's game logs (`Gamelogs`, next to `Chatlogs`): a hit from a player (name followed by `[TICKER](Ship)`; NPCs never alert) after a quiet minute, or a warp scramble/disruption attempt on you (once per attacker per 2 min), gives a notification and a taskbar flash. Parser tested on sample lines only, not real logs yet. |
@@ -86,6 +86,12 @@ Recorded so we come back to them:
 `src-tauri/target/release/bundle/`. Builds are unsigned for now: macOS will
 ask to confirm opening it, Windows SmartScreen will warn. Signing and CI
 builds come later.
+
+Windows gets one installer, the setup .exe (NSIS, no .msi). It is branded
+with `src-tauri/installer/sidebar.bmp` (164x314, welcome and finish pages)
+and `header.bmp` (150x57, the other pages), and asks for its language
+(the site's 10). Both images are drawn from `icons/icon.png` in the site's
+colours; redraw them at exactly those sizes as 24-bit BMP if the logo changes.
 
 ## Updates
 

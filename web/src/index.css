@@ -32,6 +32,16 @@ body {
 ::-webkit-scrollbar-thumb:hover { background: var(--border-strong); }
 ::-webkit-scrollbar-corner { background: transparent; }
 
+/* The desktop app on Linux (WebKitGTK): with scrollbar-width set it draws GTK
+   overlay scrollbars, which float over the right edge and cover what's there
+   (the sidebar's switches). Without it the ::-webkit-scrollbar rules above
+   apply, and the scrollbar takes its own room as it does everywhere else. */
+:root[data-desktop-os="linux"],
+:root[data-desktop-os="linux"] * {
+  scrollbar-width: auto !important;
+  scrollbar-color: auto !important;
+}
+
 #root {
   width: 100%;
   height: 100vh;

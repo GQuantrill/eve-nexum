@@ -6,6 +6,7 @@ import { whDestClass, isUnresolvedLeadsTo } from './whDest';
 // Tokens the bookmark-name format understands. Also drives the legend shown
 // next to the format setting.
 export const BOOKMARK_TOKENS: { token: string; desc: string }[] = [
+  { token: '{chain}',       desc: 'Chain number of where it leads (5162), when the map numbers its chain' },
   { token: '{sig}',         desc: 'Full signature ID (ABC-123)' },
   { token: '{sig_letters}', desc: 'First 3 chars (ABC)' },
   { token: '{type}',        desc: 'Wormhole type code (D382)' },
@@ -57,7 +58,7 @@ function sizeLetter(jumpMassKg: number): string {
 }
 
 // Matches the longest tokens first so {sig_letters} isn't eaten by {sig}.
-const TOKEN_RE = /\{sig_letters\}|\{sig\}|\{type\}|\{dest_type\}|\{leads_to\}|\{size\}|\{mass\}|\{age\}|\{name\}|\{notes\}/g;
+const TOKEN_RE = /\{chain\}|\{sig_letters\}|\{sig\}|\{type\}|\{dest_type\}|\{leads_to\}|\{size\}|\{mass\}|\{age\}|\{name\}|\{notes\}/g;
 
 /**
  * Build an in-game bookmark name for a wormhole signature from a token format
@@ -76,6 +77,8 @@ export function formatBookmarkName(
    *  pinned system the way the pilot calls it; everything else keeps the real
    *  name (the class lookup above needs it). */
   aliasOfSystem?: (name: string) => string | null | undefined,
+  /** The chain number of where the hole leads (utils/chainNumber.ts), or ''. */
+  chain = '',
 ): string {
   // The full wormhole catalog (useWormholeTypes) keyed by type code — the small
   // static map only covers k-space statics, so most holes (e.g. A641) miss it.
@@ -100,6 +103,7 @@ export function formatBookmarkName(
     : null;
 
   const subs: Record<string, string> = {
+    '{chain}':       chain,
     '{sig}':         sig.sigId ?? '',
     '{sig_letters}': (sig.sigId ?? '').slice(0, 3).toUpperCase(),
     '{type}':        sig.whType ?? '',

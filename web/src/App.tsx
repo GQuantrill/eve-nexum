@@ -1,3 +1,4 @@
+import { OffMapNotice } from './components/map/OffMapNotice';
 import { lazy, Suspense, useEffect } from 'react';
 import { ReactFlowProvider } from '@xyflow/react';
 import { AuthProvider } from './context/AuthProvider';
@@ -54,7 +55,7 @@ import { LockScreen } from './components/ui/LockScreen';
 import { ScopePickerModal } from './components/ui/ScopePickerModal';
 import { startScanPaste } from './desktop/scanPaste';
 import { startIntel } from './desktop/intel';
-import { POPOUT_PANE, startPopoutWindow } from './utils/popout';
+import { POPOUT_PANE, startPopoutHost, startPopoutWindow } from './utils/popout';
 
 // Which signed-in user we've already hydrated prefs/settings for. MapApp
 // unmounts when you navigate away (e.g. to /admin) and re-mounts on return;
@@ -99,6 +100,7 @@ function MapApp() {
   useEffect(() => startIntel(!!POPOUT_PANE), []);
   // A pop-out window: close when its pane is brought back (utils/popout.ts).
   useEffect(() => startPopoutWindow(), []);
+  useEffect(() => startPopoutHost(), []);
 
   // Colour-vision mode → data attribute on <html>; the --cv-* palette
   // overrides in those sheets key off it. 'off' (or unset) leaves the defaults.
@@ -197,6 +199,7 @@ function MapApp() {
             <div className="layout__map">
               <MapCanvas />
               <MapSidebar />
+              <OffMapNotice />
             </div>
             {selectedSystemId && <SystemPanel />}
             {selectedConnectionId && <ConnectionPanel />}

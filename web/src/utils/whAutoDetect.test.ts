@@ -134,6 +134,20 @@ describe('deleting a sig severs the hole it backed', () => {
     expect(broken()).toBe(false);
   });
 
+  it('breaks the link of a hole pinned by name with no type filled in', () => {
+    // Jumped before it was scanned: the pilot said which sig, so it leads to
+    // Thera, but nobody typed its code. It vanishing must still cut the link.
+    seedTheraLink();
+    reevaluateConnectionsForSystem('far', [], sig('X-1', '', 'Thera'), true);
+    expect(broken()).toBe(true);
+  });
+
+  it('keeps it while another sig, typed or not, is pinned to that system', () => {
+    seedTheraLink();
+    reevaluateConnectionsForSystem('far', [sig('X-2', '', 'Thera')], sig('X-1', '', 'Thera'), true);
+    expect(broken()).toBe(false);
+  });
+
   it('only clears, never breaks, on an edit', () => {
     seedTheraLink();
     reevaluateConnectionsForSystem('far', [], sig('K-1', 'K162', 'Thera'), false);

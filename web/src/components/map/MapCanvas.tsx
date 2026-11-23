@@ -38,6 +38,9 @@ import {
   LinkSimpleIcon, LinkBreakIcon, ArrowsOutIcon, BookmarkSimpleIcon, TextAaIcon, TrashIcon,
   HashIcon, ProhibitIcon, BroomIcon,
   CopyIcon,
+  ClipboardTextIcon,
+  DownloadSimpleIcon,
+  UploadSimpleIcon,
   UsersThreeIcon,
 } from '../../icons';
 import { PREDEFINED_LABELS } from '../../data/labels';
@@ -74,6 +77,10 @@ import { SendToCharactersModal } from '../ui/SendToCharactersModal';
 import { useSendToStore } from '../../store/sendToStore';
 import { usePresenceStore } from '../../store/presenceStore';
 import { toast } from '../../utils/toastStore';
+import { copySystems, pasteSystems, parseClip } from '../../utils/mapClipboard';
+import { ExportSystemsModal } from '../ui/ExportSystemsModal';
+import { ImportSystemsModal } from '../ui/ImportSystemsModal';
+import { CHAIN_LABEL_RE } from '../../utils/chainNumber';
 import i18n from '../../i18n';
 import { useCustomIntel } from '../../hooks/useCustomIntel';
 import { useUserSetting } from '../../hooks/useUserSetting';
@@ -239,7 +246,7 @@ export function MapCanvas() {
   const presenceBySystem     = usePresenceStore((s) => s.bySystem);
   const pushUndo            = useMapStore((s) => s.pushUndo);
   const canEdit              = useCanEdit();
-  const { screenToFlowPosition, setViewport, getViewport, getNode, getNodes, getZoom, fitView } = useReactFlow();
+  const { screenToFlowPosition, setViewport, getViewport, getNode, getNodes, getZoom, fitView, setCenter } = useReactFlow();
   // Invert mouse-wheel / trackpad zoom (per-user, cross-device). Off by default.
   const [invertZoom] = useUserSetting<boolean>('nexum.map.invertZoom', false);
   // Re-centre the map on the system you JUMP into, and on the system you
@@ -529,6 +536,13 @@ export function MapCanvas() {
   const shiftHeld        = useRef(false);
   // Delete / Backspace removals waiting on the confirm, and whether to ask.
   const [keyDeleteConfirm, setKeyDeleteConfirm] = useState<{ ids: string[]; name: string | null } | null>(null);
+  // Systems picked for Export systems (ExportSystemsModal).
+  const [exportIds, setExportIds] = useState<string[] | null>(null);
+  // The system whose chain number is being set by hand (utils/chainNumber.ts).
+  const [chainDialogFor, setChainDialogFor] = useState<string | null>(null);
+  const chainNumbering = useMapStore((s) => !!s.map.chainNumbering);
+  // Where Import systems was opened (ImportSystemsModal), in map coordinates.
+  const [importAt, setImportAt] = useState<{ x: number; y: number } | null>(null);
   const [confirmKeyDelete, setConfirmKeyDelete] = useUserSetting<boolean>(CONFIRM_KEY_DELETE_KEY, true);
   const pendingSelection = useRef<string[]>([]);
 
@@ -1053,6 +1067,85 @@ export function MapCanvas() {
     [nodes, isShareMode, systems, canEdit, adjacent],
   );
 
+  // ── Copy and paste systems between maps (utils/mapClipboard.ts) ──────────
+  const copySelectedSystems = useCallback((ids: string[]) => {
+    if (!activeMapId || ids.length === 0) return;
+    copySystems(activeMapId, ids)
+      .then((n) => toast.success(i18n.t('ctxMenu.copiedSystems', { count: n })))
+      .catch(() => toast.error(i18n.t('ctxMenu.copySystemsFailed')));
+  }, [activeMapId]);
+
+  const pasteClip = useCallback((clip: Record<string, unknown>, anchor: { x: number; y: number } | null) => {
+    const mapId = activeMapId;
+    if (!mapId) return;
+    if (!canEdit) { toast.error(i18n.t('ctxMenu.pasteSystemsNoRights')); return; }
+    pasteSystems(mapId, clip, anchor)
+      .then(async (r) => {
+        if (r.systems + r.connections + r.signatures + r.anomalies + r.structures === 0) {
+          toast.info(i18n.t('ctxMenu.pastedNothing'));
+          return;
+        }
+        toast.success(i18n.t('ctxMenu.pastedSystems', {
+          systems: r.systems, connections: r.connections, signatures: r.signatures,
+        }));
+        await useMapStore.getState().switchMap(mapId);
+        // Nodes are placed by their top-left corner; aim at the middle.
+        if (r.focus) setCenter(r.focus.x + 100, r.focus.y + 40, { zoom: getZoom(), duration: 300 });
+      })
+      .catch(() => toast.error(i18n.t('ctxMenu.pasteSystemsFailed')));
+  }, [activeMapId, canEdit, setCenter, getZoom]);
+
+  // The middle of what's on screen, in map coordinates: where a Ctrl+V lands.
+  const viewCentre = useCallback(() => {
+    const r = wrapperRef.current?.getBoundingClientRect();
+    return r ? screenToFlowPosition({ x: r.left + r.width / 2, y: r.top + r.height / 2 }) : null;
+  }, [screenToFlowPosition]);
+
+  // Ctrl+C with systems selected copies them; Ctrl+V of a copy pastes it. Both
+  // leave text fields, and Ctrl+C with text selected, alone.
+  useEffect(() => {
+    if (isShareMode) return;
+    const typing = (el: EventTarget | null) => {
+      const t = el as HTMLElement | null;
+      return !!t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (!(e.ctrlKey || e.metaKey) || e.shiftKey || e.altKey || (e.key !== 'c' && e.key !== 'C')) return;
+      if (typing(e.target) || (window.getSelection()?.toString() ?? '') !== '') return;
+      const ids = nodes.filter((n) => n.selected).map((n) => n.id);
+      if (ids.length === 0) return;
+      e.preventDefault();
+      copySelectedSystems(ids);
+    };
+    const onPaste = (e: ClipboardEvent) => {
+      if (typing(e.target)) return;
+      const clip = parseClip(e.clipboardData?.getData('text') ?? '');
+      if (!clip) return;
+      e.preventDefault();
+      pasteClip(clip, viewCentre());
+    };
+    window.addEventListener('keydown', onKey);
+    window.addEventListener('paste', onPaste);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      window.removeEventListener('paste', onPaste);
+    };
+  }, [isShareMode, nodes, copySelectedSystems, pasteClip, viewCentre]);
+
+  // The pane menu's Paste reads the clipboard itself; a browser that won't
+  // allow that is told to press Ctrl+V instead.
+  const pasteFromMenu = useCallback((anchor: { x: number; y: number }) => {
+    const read = navigator.clipboard?.readText;
+    if (!read) { toast.info(i18n.t('ctxMenu.pasteUseKeys')); return; }
+    navigator.clipboard.readText()
+      .then((text) => {
+        const clip = parseClip(text);
+        if (clip) pasteClip(clip, anchor);
+        else toast.info(i18n.t('ctxMenu.pasteNoSystems'));
+      })
+      .catch(() => toast.info(i18n.t('ctxMenu.pasteUseKeys')));
+  }, [pasteClip]);
+
   const onPaneContextMenu = useCallback(
     (e: React.MouseEvent | MouseEvent) => {
       if (isShareMode) return;
@@ -1147,6 +1240,20 @@ export function MapCanvas() {
   const ctxItems = (() => {
     if (!contextMenu) return [];
 
+    // "Copy systems": the selection if the menu was opened on it, else the one
+    // system clicked. Read access is enough, so it's offered either way.
+    const copyIds = contextMenu.selectedNodeIds?.length ? contextMenu.selectedNodeIds
+      : contextMenu.nodeId ? [contextMenu.nodeId] : [];
+    const copySystemsItem: ContextMenuItem[] = copyIds.length && !contextMenu.edgeId ? [{
+      label: t('ctxMenu.copySystems', { count: copyIds.length }),
+      icon: <CopyIcon size={16} weight="regular" />,
+      action: () => copySelectedSystems(copyIds),
+    }, {
+      label: t('ctxMenu.exportSystems', { count: copyIds.length }),
+      icon: <DownloadSimpleIcon size={16} weight="regular" />,
+      action: () => setExportIds(copyIds),
+    }] : [];
+
     // Without topology permission, hide every menu item that would mutate
     // systems or connections. Edges have no read-safe actions, so the menu
     // collapses entirely; nodes keep only the EVE waypoint actions.
@@ -1166,6 +1273,7 @@ export function MapCanvas() {
             icon: <PathIcon size={16} weight="regular" color="#5a9af8" />,
             action: () => { addWaypoint(sys.eveSystemId!, sys.name).catch(() => {}); },
           },
+          ...copySystemsItem,
           ...sendToItem(sys.eveSystemId, sys.name),
           {
             label: t('ctxMenu.jumpRangeFrom'),
@@ -1458,6 +1566,14 @@ export function MapCanvas() {
 
       // Display-only alias — rename the node on this map. Toggles to "Clear alias"
       // (restoring the real name) once one is set. The real name is untouched.
+      // Chain number by hand: to fix one, or number a system reached before
+      // numbering was on. Home has none.
+      const chainItem = !multiSelected && chainNumbering && sys && !sys.isHome ? [{
+        label: t('chainNumber.set'),
+        icon:  <HashIcon size={16} weight="regular" />,
+        action: () => setChainDialogFor(contextMenu.nodeId!),
+      }] : [];
+
       const aliasItem = !multiSelected ? [
         sys?.alias
           ? {
@@ -1696,6 +1812,8 @@ export function MapCanvas() {
         ...addConnectedItem,
         ...homeItem,
         ...copyNameItem,
+        ...copySystemsItem,
+        ...chainItem,
         ...aliasItem,
         ...tagItem,
         ...intelItem,
@@ -1774,6 +1892,16 @@ export function MapCanvas() {
         label: t('ctxMenu.addSystem'),
         icon: <PlusIcon size={16} weight="regular" />,
         action: () => setPendingPosition({ x: contextMenu.flowX - 75, y: contextMenu.flowY - 40 }),
+      },
+      {
+        label: t('ctxMenu.pasteSystems'),
+        icon: <ClipboardTextIcon size={16} weight="regular" />,
+        action: () => pasteFromMenu({ x: contextMenu.flowX, y: contextMenu.flowY }),
+      },
+      {
+        label: t('ctxMenu.importSystems'),
+        icon: <UploadSimpleIcon size={16} weight="regular" />,
+        action: () => setImportAt({ x: contextMenu.flowX, y: contextMenu.flowY }),
       },
       {
         label: t('ctxMenu.selectAll'),
@@ -2006,6 +2134,27 @@ export function MapCanvas() {
         );
       })()}
 
+      {chainDialogFor && (() => {
+        const sys = systems.find((s) => s.id === chainDialogFor);
+        if (!sys) return null;
+        return (
+          <PromptModal
+            title={t('chainNumber.setTitle')}
+            message={t('chainNumber.setMessage', { name: systemDisplayName(sys) })}
+            defaultValue={sys.chainLabel ?? ''}
+            placeholder="51"
+            confirmLabel={t('actions.save')}
+            onConfirm={(value) => {
+              const v = value.trim();
+              if (v && !CHAIN_LABEL_RE.test(v)) { toast.error(t('chainNumber.invalid')); return; }
+              updateSystem(chainDialogFor, { chainLabel: v || null });
+              setChainDialogFor(null);
+            }}
+            onCancel={() => setChainDialogFor(null)}
+          />
+        );
+      })()}
+
       {aliasDialogFor && (() => {
         const sys = systems.find((s) => s.id === aliasDialogFor);
         if (!sys) return null;
@@ -2036,6 +2185,12 @@ export function MapCanvas() {
         />
       )}
 
+      {importAt && activeMapId && (
+        <ImportSystemsModal mapId={activeMapId} anchor={importAt} onClose={() => setImportAt(null)} />
+      )}
+      {exportIds && activeMapId && (
+        <ExportSystemsModal mapId={activeMapId} systemIds={exportIds} onClose={() => setExportIds(null)} />
+      )}
       {keyDeleteConfirm && (
         <ConfirmModal
           message={keyDeleteConfirm.name

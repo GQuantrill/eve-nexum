@@ -1,5 +1,8 @@
 import { create } from 'zustand';
 import { onDesktopEvent } from './bridge';
+import i18n from 'i18next';
+import { toast } from '../utils/toastStore';
+import { trackedCharacterName } from '../hooks/useCharacterLocation';
 
 // Desktop only: the app watches the clipboard (when the pilot turns that on)
 // and sends scans copied in EVE here. Nothing else on the clipboard is ever
@@ -26,17 +29,43 @@ export const useDscanRequest = create<DscanRequest>((set) => ({
   clear: () => set({ text: null }),
 }));
 
+interface Scan {
+  text: string;
+  /** The character in the EVE window it was copied in, when the app could
+   *  tell (app 0.1.2+). */
+  character?: string | null;
+  /** The pilot's "only the tracked character's scans" setting. */
+  trackedOnly?: boolean;
+}
+
+/** With "tracked character only" on, a scan copied in another character's
+ *  EVE window (or one the app couldn't name) is not used. Says so, so it
+ *  doesn't look broken. */
+export function scanAllowed(scan: Scan, tracked: string | null): boolean {
+  if (!scan.trackedOnly || !tracked) return true;
+  return !!scan.character && scan.character.toLowerCase() === tracked.toLowerCase();
+}
+
+function allowed(scan: Scan): boolean {
+  const tracked = trackedCharacterName();
+  if (scanAllowed(scan, tracked)) return true;
+  toast.info(i18n.t('scanPaste.otherCharacter', { name: tracked }));
+  return false;
+}
+
 export function startScanPaste(): () => void {
-  const offProbe = onDesktopEvent<{ text: string }>('nexum://scan', ({ text }) => {
-    if (!text) return;
+  const offProbe = onDesktopEvent<Scan>('nexum://scan', (scan) => {
+    const { text } = scan;
+    if (!text || !allowed(scan)) return;
     try {
       const data = new DataTransfer();
       data.setData('text/plain', text);
       document.body.dispatchEvent(new ClipboardEvent('paste', { clipboardData: data, bubbles: true }));
     } catch { /* an old webview without DataTransfer: skip */ }
   });
-  const offDscan = onDesktopEvent<{ text: string }>('nexum://dscan', ({ text }) => {
-    if (!text) return;
+  const offDscan = onDesktopEvent<Scan>('nexum://dscan', (scan) => {
+    const { text } = scan;
+    if (!text || !allowed(scan)) return;
     useDscanRequest.setState((s) => ({ text, seq: s.seq + 1 }));
   });
   return () => { offProbe(); offDscan(); };

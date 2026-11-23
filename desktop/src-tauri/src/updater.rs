@@ -55,9 +55,10 @@ pub async fn check(app: &AppHandle, asked: bool) {
                 notify(app, &tr("upToDate"), &format!("v{}", app.package_info().version));
             }
         }
-        Err(_) => {
+        Err(e) => {
+            eprintln!("update check failed: {e}");
             if asked {
-                notify(app, &tr("updateFailed"), "");
+                notify(app, &tr("updateFailed"), &reason(&e));
             }
         }
     }
@@ -72,8 +73,17 @@ pub async fn install(app: &AppHandle) {
     .await;
     match result {
         Ok(()) => app.restart(),
-        Err(_) => notify(app, &tr("updateFailed"), ""),
+        Err(e) => {
+            eprintln!("update install failed: {e}");
+            notify(app, &tr("updateFailed"), &reason(&e));
+        }
     }
+}
+
+/// Why it failed, for the notification: the updater's own words (English,
+/// technical), so a pilot reporting it can say what went wrong. Kept short.
+fn reason(e: &tauri_plugin_updater::Error) -> String {
+    e.to_string().chars().take(160).collect()
 }
 
 fn notify(app: &AppHandle, title: &str, body: &str) {

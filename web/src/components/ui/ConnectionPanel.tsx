@@ -11,6 +11,7 @@ import { systemDisplayName } from '../../utils/systemName';
 import { useCharacterLocation } from '../../hooks/useCharacterLocation';
 import { WHTypeInfo } from './WHTypeInfo';
 import { Select } from './Select';
+import { RollPlanPanel } from './RollPlanPanel';
 import { inferredSize } from '../../utils/wormholeSize';
 import { SIDE_KEY, clampSide, readSideWidth } from '../../utils/panelSideWidth';
 import { effectiveExpiryMs, lifeBucket, knownMaxLifeHours } from '../../utils/whLifetime';
@@ -127,6 +128,33 @@ function MassInput({ valueM, onCommit }: { valueM: number; onCommit: (m: number)
         if (!isNaN(m)) onCommit(m);
       }}
       onBlur={() => setDraft(null)} />
+  );
+}
+
+// Mass used so far, in millions of kg, typed in by the pilot. Unlike the roller
+// fields it's shared (it goes to the server), so it's only sent once they're
+// done: Enter or leaving the field, not on every keystroke.
+function UsedMassInput({ valueM, disabled, onCommit }: {
+  valueM: number; disabled: boolean; onCommit: (m: number) => void;
+}) {
+  const [draft, setDraft] = useState<string | null>(null);
+  const shown = String(Math.round(valueM * 10) / 10);
+  const commit = () => {
+    if (draft === null) return;
+    const m = parseFloat(draft);
+    setDraft(null);
+    if (!isNaN(m) && m >= 0 && String(m) !== shown) onCommit(m);
+  };
+  return (
+    <input type="number" min={0} step={10} disabled={disabled}
+      value={draft ?? shown}
+      onFocus={(e) => e.currentTarget.select()}
+      onChange={(e) => setDraft(e.target.value)}
+      onBlur={commit}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') commit();
+        if (e.key === 'Escape') { e.stopPropagation(); setDraft(null); }
+      }} />
   );
 }
 
@@ -342,9 +370,12 @@ export function ConnectionPanel() {
   const whSpec = rawSpec && rawSpec.totalMass > 0 ? rawSpec : undefined;
   const massUsed = conn.massUsed ?? 0;
 
-  const addMass = (kg: number) => {
+  const addMass = (kg: number) => setMassUsed(massUsed + kg);
+
+  // The mass that has gone through, from a pass or typed in by the pilot.
+  const setMassUsed = (kg: number) => {
     if (!whSpec) return;
-    const next = Math.max(0, massUsed + kg);
+    const next = Math.max(0, kg);
     // Derive the status from the WORST-case remaining — the same basis as the
     // calculator's fill bar and pass warnings — so a pass that pushes the hole
     // into the critical band flags Critical, not just Destabilized. Deriving
@@ -398,6 +429,17 @@ export function ConnectionPanel() {
     setSide(newSide);
     saveSession(conn.id, { side: newSide, stack: newStack });
     addMass(-last);
+  };
+
+  // Typed in: what's known to have gone through (the jump log, the fleet's own
+  // count). The passes on the undo stack no longer add up to it, so they go.
+  const enterMassUsed = (kg: number) => {
+    if (!conn) return;
+    if (stack.length) {
+      setStack([]);
+      saveSession(conn.id, { side, stack: [] });
+    }
+    setMassUsed(kg);
   };
 
   const resetRoll = () => {
@@ -792,6 +834,14 @@ export function ConnectionPanel() {
               max: fmtMass(whSpec.maxJumpMass),
             })}
           </div>
+          {/* Known how much has been through? Say so, rather than picking a
+              mass status, which only puts it on that band's edge. */}
+          <label className="roller__mass" title={t('connPanel.massUsedTitle')}>
+            <span>{t('connPanel.massUsedLabel')}</span>
+            <UsedMassInput valueM={massUsed / 1_000_000} disabled={!canEdit}
+              onCommit={(m) => enterMassUsed(Math.round(m * 1_000_000))} />
+            <span className="roller__unit">M</span>
+          </label>
 
           {/* Roller ship config (per-pilot, persisted) */}
           <div className="roller">
@@ -901,6 +951,18 @@ export function ConnectionPanel() {
                 ))}
             </div>
           </details>
+
+          {/* Plan several ships' passes, in order, hot or cold. */}
+          <RollPlanPanel
+            connId={conn.id}
+            totalMass={whSpec.totalMass}
+            maxJumpMass={whSpec.maxJumpMass}
+            massUsed={massUsed}
+            roller={roller}
+            canEdit={canEdit}
+            addMass={addMass}
+            massShort={massShort}
+          />
         </div>
         );
       })() : conn.type ? (

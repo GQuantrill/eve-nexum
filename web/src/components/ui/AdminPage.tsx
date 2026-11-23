@@ -28,6 +28,7 @@ import styles from './AdminPage.module.css';
 import { useScopeHeld } from '../../hooks/useScopeHeld';
 import { promptForScope } from '../../utils/scopePrompt';
 import { useScopePickerStore } from '../../store/scopePickerStore';
+import { saveFile } from '../../utils/saveFile';
 
 // Register only the chart pieces we actually use — keeps the bundle lean.
 ChartJS.register(ArcElement, CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend, Filler);
@@ -1565,12 +1566,7 @@ function UsersReport() {
     });
     const csv = [header, ...rows].map((r) => r.map(csvEscape).join(',')).join('\r\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement('a');
-    a.href     = url;
-    a.download = `nexum_users_report_${new Date().toISOString().split('T')[0]}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+    void saveFile(`nexum_users_report_${new Date().toISOString().split('T')[0]}.csv`, blob);
   }
 
   const controls = (
@@ -2083,12 +2079,7 @@ function AuditTab() {
     ]);
     const csv = [header, ...rows].map((r) => r.map(csvEscape).join(',')).join('\r\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement('a');
-    a.href     = url;
-    a.download = `nexum_audit_${new Date().toISOString().split('T')[0]}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+    void saveFile(`nexum_audit_${new Date().toISOString().split('T')[0]}.csv`, blob);
   }
 
   return (

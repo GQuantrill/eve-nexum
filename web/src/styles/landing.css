@@ -699,6 +699,56 @@
 }
 .landing__soon-link:hover { text-decoration: underline; }
 
+/* The desktop app, out now: the top of the page. Wider and louder than the
+   "coming soon" note it replaces, with the downloads inside it. */
+.landing__desktop-hero {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px 24px;
+  width: 100%;
+  max-width: 960px;
+  margin-bottom: 36px;
+  padding: 22px 26px;
+  border: 1px solid var(--accent);
+  border-radius: 14px;
+  background:
+    radial-gradient(120% 140% at 0% 0%, color-mix(in srgb, var(--accent) 28%, transparent), transparent 60%),
+    var(--surface-raised);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 25%, transparent), 0 14px 40px color-mix(in srgb, var(--accent) 22%, transparent);
+  color: var(--text-default);
+  text-align: left;
+}
+.landing__desktop-hero-icon {
+  display: inline-flex;
+  color: var(--accent-bright);
+  font-size: calc(54px * var(--font-scale, 1));
+}
+.landing__desktop-hero-text { flex: 1 1 340px; min-width: 0; }
+.landing__desktop-hero-title {
+  margin: 8px 0 6px;
+  color: var(--text-bright);
+  font-size: calc(24px * var(--font-scale, 1));
+  line-height: 1.25;
+}
+.landing__desktop-hero-body {
+  margin: 0;
+  color: var(--text-default);
+  font-size: calc(15px * var(--font-scale, 1));
+  line-height: 1.5;
+}
+.landing__desktop-hero-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  flex: 0 0 auto;
+}
+@media (max-width: 640px) {
+  .landing__desktop-hero { padding: 18px; text-align: center; justify-content: center; }
+  .landing__desktop-hero-actions { flex: 1 1 100%; }
+}
+
 /* Desktop app downloads (shown once DESKTOP_AVAILABLE is on). */
 .landing__downloads {
   display: flex;

@@ -554,12 +554,14 @@
       "system": {
         "add": "a ajouté {{subject}}",
         "update": "a modifié {{subject}}",
-        "remove": "a supprimé {{subject}}"
+        "remove": "a supprimé {{subject}}",
+        "restore": "a restauré {{subject}}"
       },
       "connection": {
         "add": "a connecté {{subject}}",
         "update": "a modifié {{subject}}",
-        "remove": "a déconnecté {{subject}}"
+        "remove": "a déconnecté {{subject}}",
+        "restore": "a reconnecté {{subject}}"
       },
       "signature": {
         "add": "a ajouté la signature {{subject}}",
@@ -584,7 +586,8 @@
       "map": {
         "update": "a modifié les paramètres de la carte",
         "merge": "a fusionné {{subject}}",
-        "scoutCleanup": "a nettoyé les trous de {{subject}}"
+        "scoutCleanup": "a nettoyé les trous de {{subject}}",
+        "paste": "a collé des systèmes de {{subject}}"
       },
       "share": {
         "add": "a partagé la carte avec {{subject}}",
@@ -814,7 +817,9 @@
     "restoreTitle": "Effacer le marqueur de rupture et traiter à nouveau comme une connexion active",
     "gateNote": "Stargate classique — aucune donnée de trou de ver.",
     "gateProtected": "Les connexions par stargate existent en jeu et ne peuvent être ni supprimées ni modifiées.",
-    "jumpgateNote": "Pont Ansiblex — aucune donnée de trou de ver."
+    "jumpgateNote": "Pont Ansiblex — aucune donnée de trou de ver.",
+    "massUsedLabel": "Utilisée",
+    "massUsedTitle": "Masse déjà passée, en millions de kg. Saisissez-la si vous la connaissez (par exemple d'après le journal des sauts) ; le calculateur repart de là."
   },
   "contentFilter": {
     "hint": "Mettez en évidence les systèmes selon leur contenu scanné. Choisissez des types de signature ou d'anomalie, ou recherchez un nom de site ; les systèmes correspondants restent éclairés et les autres s'estompent.",
@@ -943,7 +948,19 @@
     "jumpRangeFrom": "Portée de saut d’ici",
     "jumpCyno": "Saut cyno",
     "jumpRangeClear": "Effacer la portée de saut",
-    "copyName": "Copier le nom du système"
+    "copyName": "Copier le nom du système",
+    "copySystems": "Copier les systèmes ({{count}})",
+    "copiedSystems": "Systèmes copiés : {{count}}. Collez-les dans une autre carte avec Ctrl+V.",
+    "copySystemsFailed": "Impossible de copier les systèmes.",
+    "pasteSystems": "Coller les systèmes",
+    "pastedSystems": "Collé. Systèmes ajoutés : {{systems}}, liaisons : {{connections}}, signatures : {{signatures}}.",
+    "pastedNothing": "Rien à ajouter : cette carte a déjà tout ce que vous avez collé.",
+    "pasteSystemsFailed": "Impossible de coller les systèmes.",
+    "pasteSystemsNoRights": "Votre rôle ne permet pas d'ajouter des systèmes à cette carte.",
+    "pasteUseKeys": "Votre navigateur n'autorise pas nexum à lire le presse-papiers. Appuyez plutôt sur Ctrl+V (Cmd+V sur Mac) sur la carte.",
+    "pasteNoSystems": "Aucun système copié dans le presse-papiers. Faites d'abord un clic droit sur des systèmes et choisissez Copier les systèmes.",
+    "exportSystems": "Exporter les systèmes ({{count}})…",
+    "importSystems": "Importer des systèmes…"
   },
   "customIntel": {
     "title": "Intel personnalisée",
@@ -1632,6 +1649,10 @@
         "q": "Mes données sont-elles en sécurité ?",
         "a": "Nexum ne voit jamais votre mot de passe EVE — l'authentification est entièrement gérée par l'EVE SSO de CCP. La seule chose stockée est l'identité de votre personnage et les cartes que vous construisez. Les données de vos cartes vivent dans une base de données privée et ne sont partagées avec personne. Cela dit, n'utilisez pas Nexum pour la route d'invasion top secrète de votre alliance — aucun outil sur Internet ne remplace une bonne sécurité opérationnelle."
       },
+      "clipboard": {
+        "q": "L'application de bureau lit-elle mon presse-papiers ?",
+        "a": "Seulement si vous activez « Coller les scans depuis le presse-papiers » dans l'application de bureau. C'est désactivé par défaut, et le site ne voit que ce que vous y collez vous-même. Même alors, seule une copie faite dans EVE compte : l'application vérifie qu'EVE était la fenêtre au premier plan, donc rien de ce que vous copiez dans un navigateur, une messagerie ou un portefeuille crypto n'est utilisé (sous Windows, ce n'est même pas lu). D'une copie faite dans EVE, elle ne prend que les résultats du scanner de sondes et les d-scans ; le reste est écarté aussitôt, jamais conservé ni envoyé. L'application ne modifie jamais votre presse-papiers. La seule chose que Nexum y place est le nouveau nom de signet d'un trou de ver après un saut, prêt à coller en jeu. Si une adresse de portefeuille que vous collez ressort un jour différente, c'est un logiciel malveillant sur votre PC, pas Nexum : faites-le vérifier."
+      },
       "reportBugs": {
         "q": "Puis-je signaler des bugs, donner mon avis et demander des fonctionnalités ?",
         "a": "Absolument. Le projet est open source sur <gh>GitHub</gh> — ouvrez une issue pour les bugs ou les demandes de fonctionnalités, ou soumettez une pull request si vous êtes courageux. Les retours par mail en jeu au personnage lié à ce compte fonctionnent aussi si GitHub n'est pas votre truc."
@@ -1654,7 +1675,7 @@
       }
     },
     "footer": "EVE Online et le logo EVE sont des marques déposées de CCP hf. Tous droits réservés dans le monde entier. Nexum est un outil tiers et n'est ni affilié à CCP hf ni approuvé par lui. · <license>Mention de licence & PI EVE</license>",
-    "desktopBody": "Nexum existe aussi en application de bureau pour Windows, macOS et Linux. C'est le même Nexum, avec votre connexion, vos cartes et vos réglages, plus ce qu'un navigateur ne peut pas offrir : l'application lit les fichiers de logs d'EVE sur votre ordinateur et reste au-dessus du jeu. Tout ce qui figure dans cette section nécessite l'application ; tout ce qui précède fonctionne dans les deux.",
+    "desktopBody": "Nexum existe aussi en application de bureau pour Windows et Linux. C'est le même Nexum, avec votre connexion, vos cartes et vos réglages, plus ce qu'un navigateur ne peut pas offrir : l'application lit les fichiers de logs d'EVE sur votre ordinateur et reste au-dessus du jeu. Tout ce qui figure dans cette section nécessite l'application ; tout ce qui précède fonctionne dans les deux.",
     "desktopFeatures": {
       "logJumps": {
         "title": "Suivi instantané des sauts",
@@ -1674,7 +1695,7 @@
       },
       "scanPaste": {
         "title": "Collage des scans",
-        "desc": "Copiez les résultats du scanner de sondes dans EVE : ils arrivent dans le système sélectionné ; copiez un d-scan et il s'ouvre dans l'analyseur. Sans alt-tab. Désactivé tant que vous ne l'activez pas."
+        "desc": "Copiez les résultats du scanner de sondes dans EVE : ils arrivent dans le système sélectionné ; copiez un d-scan et il s'ouvre dans l'analyseur. Sans alt-tab. Désactivé tant que vous ne l'activez pas. Seules les copies faites dans le client EVE sont prises : ce que vous copiez dans une autre application (navigateur, chat, gestionnaire de mots de passe, portefeuille) est ignoré, tout ce qui n'est pas un scan est abandonné sans être enregistré ni envoyé, et l'application ne modifie jamais votre presse-papiers."
       },
       "onTop": {
         "title": "Toujours au premier plan",
@@ -1694,12 +1715,17 @@
       }
     },
     "desktopSoon": "Bientôt",
-    "desktopSoonBody": "L'application de bureau Nexum pour Windows, macOS et Linux : suivi instantané des sauts grâce aux logs d'EVE, canaux d'intel sur votre carte, alertes de menace et plus encore.",
+    "desktopSoonBody": "L'application de bureau Nexum pour Windows et Linux : suivi instantané des sauts grâce aux logs d'EVE, canaux d'intel sur votre carte, alertes de menace et plus encore.",
     "desktopSoonLink": "Voir ce qu'elle apporte",
     "desktopOut": "Disponible",
     "desktopDownloadLink": "Télécharger",
     "desktopMacNote": "macOS : l'application n'est pas encore signée ; après l'installation, lancez une fois dans le Terminal :",
-    "desktopAllDownloads": "Tous les téléchargements (.msi, .deb, .rpm) et notes de version"
+    "desktopAllDownloads": "Tous les téléchargements (.deb, .rpm) et notes de version",
+    "desktopWinNote": "Windows : le bouton ouvre Nexum dans le Microsoft Store, qui l'installe sans avertissement et le tient à jour.",
+    "desktopHeroTitle": "Nexum existe maintenant en application de bureau",
+    "desktopHeroBody": "Un énorme pas en avant pour l'exploration : vos sauts suivis dès qu'ils ont lieu grâce aux logs d'EVE, vos canaux d'intel sur la carte, des alertes de menace avec son et voix, un overlay au-dessus du jeu, et vos scans collés dès que vous les copiez. Gratuit, pour Windows et Linux.",
+    "desktopHeroMore": "Voir tout ce qu'elle apporte",
+    "desktopWinInstaller": "Ou téléchargez l'installateur (non signé : Windows peut dire qu'il a protégé votre PC ; choisissez Informations complémentaires, puis Exécuter quand même)."
   },
   "language": {
     "label": "Langue"
@@ -1716,7 +1742,9 @@
     "lessThan24h": "< 24h",
     "lessThan4h": "< 4 h",
     "lessThan1h": "< 1 h",
-    "broken": "Connexion rompue — la sig de trou de ver a été supprimée (trou effondré)"
+    "broken": "Connexion rompue — la sig de trou de ver a été supprimée (trou effondré)",
+    "showInfo": "Afficher les infos de cette connexion",
+    "hideInfo": "Cliquer pour replier"
   },
   "mapKey": {
     "title": "Légende de la carte",
@@ -2149,7 +2177,12 @@
       "normal": "Normale",
       "strong": "Forte"
     },
-    "resetColor": "Réinitialiser"
+    "resetColor": "Réinitialiser",
+    "connInfo": "Infos des connexions",
+    "connInfoFull": "Toujours affichées",
+    "connInfoFolded": "Repliées",
+    "importSystemsTitle": "Ajouter des systèmes à cette carte depuis des lignes CSV ou séparées par des tabulations",
+    "importSystems": "↑ Importer des systèmes depuis CSV"
   },
   "mass": {
     "billionKg": "{{value}} Md kg",
@@ -2865,5 +2898,123 @@
     "sub": "Vous pouvez modifier ce choix, choisir une voix et les événements annoncés à tout moment dans la section {{section}} de la barre latérale.",
     "noThanks": "Non merci",
     "enable": "Activer"
+  },
+  "offMap": {
+    "title": "{{system}} n'est pas sur cette carte",
+    "kspaceMap": "Les admins de cette carte l'ont réglée pour ne pas enregistrer les systèmes high, low ou null-sec pendant vos déplacements.",
+    "kspaceYou": "Votre réglage « Ne pas suivre le K-space » est activé, les systèmes high, low et null-sec ne sont donc pas enregistrés.",
+    "trackingOff": "Le suivi des sauts est désactivé, les systèmes où vous allez ne sont donc pas ajoutés.",
+    "readOnly": "Vous pouvez consulter cette carte mais pas y ajouter quoi que ce soit.",
+    "locked": "Cette carte est verrouillée, rien n'y est donc ajouté.",
+    "add": "Ajouter à la carte",
+    "hide": "Masquer"
+  },
+  "scanPaste": {
+    "otherCharacter": "Scan non collé : seuls les scans copiés dans la fenêtre EVE de {{name}} sont utilisés (paramètres de l'application Nexum)."
+  },
+  "rollPlan": {
+    "title": "Plan de passages",
+    "addShip": "Ajouter un vaisseau",
+    "myRoller": "Mon roller : {{name}} ({{cold}}/{{hot}})",
+    "removeShip": "Retirer {{name}}",
+    "ship": "Vaisseau",
+    "toggleHeat": "Basculer entre froid et chaud",
+    "out": "aller",
+    "back": "retour",
+    "flown": "fait",
+    "removePass": "Retirer ce passage",
+    "outcome": {
+      "safe": "Masse utilisée après ce passage. Le trou ne peut pas se fermer dessus.",
+      "risky": "Masse utilisée après ce passage. Le trou pourrait se fermer dessus.",
+      "collapse": "Masse utilisée après ce passage. Le trou se ferme dessus."
+    },
+    "strands": "Le passage {{n}} pourrait fermer le trou avec {{ship}} de l'autre côté.",
+    "addPass": "Ajouter un passage",
+    "flyNext": "Passer le suivant",
+    "flyNextTitle": "{{ship}} passe : ajoute {{mass}} à la masse utilisée",
+    "undoFlown": "Annuler le dernier passage",
+    "clear": "Vider le plan",
+    "tooHeavy": "Trop lourd pour ce trou (saut max. {{max}})"
+  },
+  "errorScreen": {
+    "title": "Une erreur s'est produite",
+    "hint": "Nexum a rencontré une erreur et s'est arrêté. Rechargez pour continuer. Pour la signaler, copiez les détails et envoyez-les-nous.",
+    "reload": "Recharger",
+    "copy": "Copier les détails de l'erreur"
+  },
+  "exportSystems": {
+    "title": "Exporter les systèmes",
+    "format": "Format",
+    "formats": {
+      "csv": "CSV",
+      "tsv": "Séparé par tabulations",
+      "json": "JSON"
+    },
+    "skipLocked": "Exclure les systèmes verrouillés ({{count}})",
+    "summary": "Systèmes : {{systems}}. Lignes : {{rows}}, une par signature.",
+    "loading": "Chargement des systèmes…",
+    "loadFailed": "Impossible de charger les systèmes.",
+    "copy": "Copier",
+    "save": "Enregistrer le fichier",
+    "copied": "Copié dans le presse-papiers.",
+    "copyFailed": "Impossible de copier dans le presse-papiers."
+  },
+  "groupMeaning": {
+    "map": "La carte",
+    "chain": "Une chaîne enregistrée",
+    "title": "Le groupe désigne",
+    "label": "Un label"
+  },
+  "importSystems": {
+    "title": "Importer des systèmes",
+    "intro": "Collez des lignes ou ouvrez un fichier CSV ou séparé par tabulations, avec une ligne d'en-tête. Colonnes : group, system, signature, sig-type, name, to-system, from-type, to-type, size, mass-remaining, life-remaining. Seule system est requise. Les systèmes déjà sur cette carte restent tels quels ; seul ce qui manque est ajouté.",
+    "paste": "Lignes",
+    "openFile": "Ouvrir un fichier…",
+    "meaningHint": {
+      "map": "Le groupe n'est qu'une note : rien n'en est fait.",
+      "chain": "Chaque groupe dont les trous forment un seul chemin est enregistré comme chaîne au nom du groupe.",
+      "label": "Chaque groupe est ajouté à ses systèmes comme label texte personnalisé (trois au plus par système)."
+    },
+    "noHeader": "Pas de ligne d'en-tête avec une colonne \"system\".",
+    "lookupFailed": "Impossible de rechercher les noms de systèmes. Réessayez.",
+    "checking": "Vérification des noms de systèmes…",
+    "summary": "Prêt : {{good}} lignes. Écartées pour problème : {{bad}}.",
+    "col": {
+      "system": "Système",
+      "signature": "Signature",
+      "toSystem": "Vers le système",
+      "check": "Vérification"
+    },
+    "rowOk": "OK",
+    "error": {
+      "noSystem": "Aucun système.",
+      "unknownSystem": "Ce n'est pas un système d'EVE.",
+      "badSignature": "La signature doit ressembler à ABC-123.",
+      "badSigType": "Type de signature inconnu.",
+      "whOnly": "Détails de trou sur une signature qui n'est pas un trou de ver.",
+      "unknownToSystem": "Le système de destination n'est pas un système d'EVE.",
+      "sameSystem": "Un trou ne peut pas mener à son propre système.",
+      "badType": "Ce n'est pas un type de trou de ver.",
+      "bothK162": "Les deux extrémités ne peuvent pas être K162.",
+      "badSize": "La taille doit être S, M, L ou XL.",
+      "sizeMismatch": "Cette taille ne correspond pas au type de trou.",
+      "badMass": "La masse doit être 100, 50 ou 10.",
+      "badLife": "La durée de vie doit être 48, 24, 4, 1 ou 0."
+    },
+    "notPaths": "Non enregistrés comme chaînes, car leurs trous ne forment pas un seul chemin : {{groups}}",
+    "import": "Importer ({{count}})",
+    "importing": "Importation…",
+    "done": "Importé. Systèmes ajoutés : {{systems}}, liaisons : {{connections}}, signatures : {{signatures}}, labels : {{labels}}, chaînes : {{chains}}.",
+    "failed": "Impossible d'importer les systèmes.",
+    "fileTooBig": "Ce fichier est trop volumineux (2 Mo au plus).",
+    "fileFailed": "Impossible de lire ce fichier."
+  },
+  "chainNumber": {
+    "toggle": "Numéroter la chaîne depuis home (L+1)",
+    "hint": "Chaque système reçoit un numéro au premier saut de trou de ver vers lui : 1, 2, 3 depuis home, 51, 52 depuis 5, etc. Les signets de trous commencent par le numéro de leur destination, pour être classés dans l'ordre de la chaîne dans EVE. Un numéro ne change jamais et n'est jamais réutilisé.",
+    "set": "Définir le numéro de chaîne…",
+    "setTitle": "Numéro de chaîne",
+    "setMessage": "Numéro de chaîne pour {{name}}. Laissez vide pour l'effacer.",
+    "invalid": "Un numéro de chaîne ne contient que des chiffres, comme 51, avec un point avant toute partie au-delà de 9, comme 5.10."
   }
 }

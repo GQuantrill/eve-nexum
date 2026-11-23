@@ -19,11 +19,14 @@ import { SCOPE } from '../utils/esiScopes.js';
 import { createLogger } from '../utils/logger.js';
 import { resolveOwnerId } from '../utils/owner.js';
 import { mapCapFor, countPersonalMaps, mapAllowanceFor } from '../services/mapAllowance.js';
-import { parseMapBackup, restoreMapBackup, buildMapBackup, BackupError } from '../services/mapBackup.js';
+import { parseMapBackup, restoreMapBackup, buildMapBackup, BackupError, MAX_BACKUP_SYSTEMS } from '../services/mapBackup.js';
+import { selectClip, pasteIntoMap, MAX_PASTE_CHAINS } from '../services/mapPaste.js';
+import { assignChainNumber, CHAIN_LABEL_RE, MAX_CHAIN_LABEL_LEN } from '../services/chainNumber.js';
 import { resolveEntityNames } from '../services/entityNames.js';
 import { audit } from '../services/audit.js';
 import { publishToMap } from '../services/mapEvents.js';
 import { streamMapEvents } from '../services/mapStream.js';
+import { trashSystem, trashConnection, restoreSystem, restoreConnection } from '../services/mapTrash.js';
 import { listVisibleMaps, loadFullMap, loadSystemSignatures, loadSystemAnomalies, loadSystemStructures, CONNECTION_COLS } from '../services/mapRead.js';
 import {
   connectionTypeError, connectionEndpointEveIds, systemEveIds, isProtectedGate, PROTECTED_GATE_ERROR,
@@ -1613,6 +1616,92 @@ mapsRouter.get('/:mapId/export', async (req, res) => {
   res.json(backup);
 });
 
+// POST /api/maps/:mapId/clip { systemIds } -- the selected systems as a clip
+// for the clipboard (services/mapPaste.ts). Read access, like the export it is
+// a slice of.
+mapsRouter.post('/:mapId/clip', async (req, res) => {
+  const { mapId } = req.params;
+  if (!UUID_RE.test(mapId)) { res.status(404).json({ error: 'Map not found' }); return; }
+  const raw = (req.body as { systemIds?: unknown }).systemIds;
+  if (!Array.isArray(raw) || raw.length === 0 || raw.length > MAX_BACKUP_SYSTEMS) {
+    res.status(400).json({ error: 'systemIds must list 1 to 500 systems' }); return;
+  }
+  const ids = new Set(raw.filter((v): v is string => typeof v === 'string' && UUID_RE.test(v)));
+  const access = await getMapAccess(mapId, req);
+  if (!access) { res.status(404).json({ error: 'Map not found' }); return; }
+  const backup = await buildMapBackup(mapId);
+  if (!backup) { res.status(404).json({ error: 'Map not found' }); return; }
+  const { rows: routes } = await db.query<{ name: string; systemIds: string[] }>(
+    `SELECT name, system_ids AS "systemIds" FROM map_routes WHERE map_id = $1 ORDER BY sort_order, created_at`, [mapId]);
+  const clip = selectClip(backup, ids, routes);
+  if (!clip.systems.length) { res.status(400).json({ error: 'None of those systems are on this map' }); return; }
+  res.json(clip);
+});
+
+// POST /api/maps/:mapId/paste { clip, anchor? } -- fold a clip into this map:
+// only what it is missing is added, the map's own systems stay as they are.
+// The clip came off a clipboard, so it is parsed like an imported file. Needs
+// the same rights as adding systems by hand (topology, lock).
+mapsRouter.post('/:mapId/paste', async (req, res) => {
+  const { mapId } = req.params;
+  if (!UUID_RE.test(mapId)) { res.status(404).json({ error: 'Map not found' }); return; }
+  const access = await requireMapWrite(res, mapId, req);
+  if (!access) return;
+
+  const body = req.body as {
+    clip?: unknown; anchor?: { x?: unknown; y?: unknown }; mergeLabels?: unknown; chains?: unknown;
+  };
+  let clip: ReturnType<typeof parseMapBackup>;
+  try {
+    clip = parseMapBackup(body.clip);
+  } catch (err) {
+    if (err instanceof BackupError) { res.status(err.status).json({ error: err.message }); return; }
+    throw err;
+  }
+  if (!clip.systems.length) { res.status(400).json({ error: 'Nothing to paste' }); return; }
+  const ax = Number(body.anchor?.x), ay = Number(body.anchor?.y);
+  const anchor = Number.isFinite(ax) && Number.isFinite(ay) && Math.abs(ax) < 1e6 && Math.abs(ay) < 1e6
+    ? { x: ax, y: ay } : null;
+
+  // An import's extras (labels, chains): untrusted like the clip, so only
+  // well-formed chains of short names and known ids get through.
+  const chains = Array.isArray(body.chains)
+    ? body.chains.slice(0, MAX_PASTE_CHAINS).flatMap((c: unknown) => {
+      const o = c as { name?: unknown; systemIds?: unknown };
+      if (typeof o?.name !== 'string' || !Array.isArray(o.systemIds) || o.systemIds.length > MAX_BACKUP_SYSTEMS) return [];
+      const ids = o.systemIds.filter((v): v is string => typeof v === 'string' && v.length > 0 && v.length <= 64);
+      return ids.length === o.systemIds.length ? [{ name: o.name.slice(0, 100), systemIds: ids }] : [];
+    })
+    : [];
+  const extras = { mergeLabels: body.mergeLabels === true, chains };
+
+  const client = await db.connect();
+  let counts: Awaited<ReturnType<typeof pasteIntoMap>>;
+  try {
+    await client.query('BEGIN');
+    counts = await pasteIntoMap(client, mapId, clip, req.session.userId!, anchor, extras);
+    await client.query(`UPDATE maps SET updated_at = NOW() WHERE id = $1`, [mapId]);
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK');
+    log.error('map paste failed:', err);
+    throw err;
+  } finally {
+    client.release();
+  }
+
+  // Like a merge: other viewers re-fetch rather than take a stream of deltas.
+  publishToMap(mapId, { type: 'map.resync', actor: req.get('x-client-id') ?? null });
+  recordMapAudit(req, mapId, {
+    action: 'map.paste', subject: clip.name.slice(0, MAX_MAP_NAME_LEN),
+    details: { values: {
+      systems: counts.systems, connections: counts.connections, signatures: counts.signatures,
+      anomalies: counts.anomalies, structures: counts.structures, labels: counts.labels, chains: counts.chains,
+    } },
+  });
+  res.json(counts);
+});
+
 // ── Wanderer import ─────────────────────────────────────────────────────────
 // Import a map exported from Wanderer (the other EVE wormhole mapper). Its export
 // gives only EVE system ids + a coarse layout + numeric mass/time/size codes. We
@@ -2767,10 +2856,10 @@ mapsRouter.post('/:mapId/presence', async (req, res) => {
 // toggle merge-source eligibility (corp maps, full/admin only)
 mapsRouter.patch('/:mapId', async (req, res) => {
   const { mapId } = req.params;
-  const { name, locked, allowAsMergeSource, allowAsMergeDestination, lazyRemoveWormholes, collapseGraceHours, bookmarkFormat, siteBookmarkFormat, skipKspace, crossMapSync } = req.body as {
+  const { name, locked, allowAsMergeSource, allowAsMergeDestination, lazyRemoveWormholes, collapseGraceHours, bookmarkFormat, siteBookmarkFormat, skipKspace, crossMapSync, chainNumbering } = req.body as {
     name?: string; locked?: boolean; allowAsMergeSource?: boolean; allowAsMergeDestination?: boolean;
     lazyRemoveWormholes?: boolean; collapseGraceHours?: number; bookmarkFormat?: string | null; siteBookmarkFormat?: string | null; skipKspace?: boolean;
-    crossMapSync?: boolean;
+    crossMapSync?: boolean; chainNumbering?: boolean;
   };
 
   const access = await requireMapWrite(res, mapId, req);
@@ -2884,7 +2973,9 @@ mapsRouter.patch('/:mapId', async (req, res) => {
   let normalizedSiteBookmarkFmt: string | null | undefined;
   // Wormhole and site bookmark formats share the same owner/admin gate; check
   // it once, then apply whichever field(s) were sent.
-  if (bookmarkFormat !== undefined || siteBookmarkFormat !== undefined) {
+  // Chain numbers go into everyone's bookmarks, like the shared formats, so
+  // the same people may switch them on and off.
+  if (bookmarkFormat !== undefined || siteBookmarkFormat !== undefined || chainNumbering !== undefined) {
     const role = req.session.role ?? 'readonly';
     if (access.accessKind === 'shared') {
       res.status(403).json({ error: 'Only the map owner can change the shared bookmark format' }); return;
@@ -2908,6 +2999,9 @@ mapsRouter.patch('/:mapId', async (req, res) => {
       normalizedSiteBookmarkFmt = trimmed === '' ? null : trimmed;
       sets.push(`site_bookmark_format = $${vals.length + 1}`); vals.push(normalizedSiteBookmarkFmt);
     }
+    if (chainNumbering !== undefined) {
+      sets.push(`chain_numbering = $${vals.length + 1}`); vals.push(chainNumbering === true);
+    }
   }
 
   if (sets.length === 1) { res.status(400).json({ error: 'Nothing to update' }); return; }
@@ -2930,11 +3024,13 @@ mapsRouter.patch('/:mapId', async (req, res) => {
       ...(normalizedGrace !== undefined ? { collapseGraceHours: normalizedGrace } : {}),
       ...(normalizedBookmarkFmt !== undefined ? { bookmarkFormat: normalizedBookmarkFmt } : {}),
       ...(normalizedSiteBookmarkFmt !== undefined ? { siteBookmarkFormat: normalizedSiteBookmarkFmt } : {}),
+      ...(chainNumbering !== undefined ? { chainNumbering: chainNumbering === true } : {}),
     });
     const settings = {
       name, locked, allowAsMergeSource, allowAsMergeDestination, lazyRemoveWormholes,
       collapseGraceHours: normalizedGrace, bookmarkFormat: normalizedBookmarkFmt,
       siteBookmarkFormat: normalizedSiteBookmarkFmt, skipKspace, crossMapSync,
+      chainNumbering: chainNumbering === undefined ? undefined : chainNumbering === true,
     };
     const values = Object.fromEntries(Object.entries(settings).filter(([, v]) => v !== undefined));
     recordMapAudit(req, mapId, { action: 'map.update', targetId: mapId, details: { fields: Object.keys(values), values } });
@@ -3071,6 +3167,34 @@ mapsRouter.post('/:mapId/systems', async (req, res) => {
   res.status(201).json({ ok: true, system });
 });
 
+// POST /api/maps/:mapId/systems/:systemId/chain-number { fromSystemId } --
+// the pilot's client, on a wormhole jump from fromSystemId into this system:
+// give it the next chain number if the map numbers chains and it has none
+// (services/chainNumber.ts). Answers the system's number either way. Content
+// level, like logging the jump: anyone who can edit signatures may jump.
+mapsRouter.post('/:mapId/systems/:systemId/chain-number', async (req, res) => {
+  const { mapId, systemId } = req.params;
+  const fromId = (req.body as { fromSystemId?: unknown }).fromSystemId;
+  if (!UUID_RE.test(mapId) || !UUID_RE.test(systemId) || typeof fromId !== 'string' || !UUID_RE.test(fromId)) {
+    res.status(400).json({ error: 'invalid ids' }); return;
+  }
+  const access = await requireMapContentWrite(res, mapId, req);
+  if (!access) return;
+  // Only along a link the map has: a number says how you get there.
+  const { rowCount } = await db.query(
+    `SELECT 1 FROM map_connections WHERE map_id = $1
+        AND ((source_id = $2 AND target_id = $3) OR (source_id = $3 AND target_id = $2))`, [mapId, fromId, systemId]);
+  if (!rowCount) { res.status(400).json({ error: 'Those systems are not linked' }); return; }
+
+  const before = await db.query<{ label: string | null }>(
+    `SELECT chain_label AS label FROM map_systems WHERE id = $1 AND map_id = $2`, [systemId, mapId]);
+  const chainLabel = await assignChainNumber(mapId, fromId, systemId);
+  if (chainLabel && chainLabel !== before.rows[0]?.label) {
+    publishToMap(mapId, { type: 'system.update', actor: null, id: systemId, updates: { chainLabel } });
+  }
+  res.json({ chainLabel });
+});
+
 mapsRouter.patch('/:mapId/systems/:systemId', async (req, res) => {
   const { mapId, systemId } = req.params;
   const updates = { ...(req.body as Record<string, unknown>) };
@@ -3180,6 +3304,19 @@ mapsRouter.patch('/:mapId/systems/:systemId', async (req, res) => {
     vals.push(v);
   }
 
+  // Chain number set or cleared by hand (services/chainNumber.ts): digits,
+  // with dots between parts past 9; empty or null clears it.
+  if ('chainLabel' in updates) {
+    const v = updates.chainLabel;
+    const clean = typeof v === 'string' ? v.trim() : '';
+    if ((v !== null && typeof v !== 'string') || (clean && (clean.length > MAX_CHAIN_LABEL_LEN || !CHAIN_LABEL_RE.test(clean)))) {
+      res.status(400).json({ error: 'invalid chainLabel' }); return;
+    }
+    sets.push(`chain_label = $${vals.length + 1}`);
+    vals.push(clean || null);
+    updates.chainLabel = clean || null;
+  }
+
   // handle position separately
   if (updates.position && typeof updates.position === 'object') {
     const pos = updates.position as { x?: number; y?: number };
@@ -3218,9 +3355,23 @@ mapsRouter.delete('/:mapId/systems/:systemId', async (req, res) => {
   const { mapId, systemId } = req.params;
   const access = await requireMapWrite(res, mapId, req);
   if (!access) return;
-  const { rows: removed } = await db.query<{ name: string; alias: string | null }>(
-    `DELETE FROM map_systems WHERE id = $1 AND map_id = $2 RETURNING name, alias`, [systemId, mapId],
-  );
+  // Keep a copy of the system and everything the delete takes with it, so
+  // undo can put all of it back (services/mapTrash.ts).
+  let removed: { name: string; alias: string | null }[] = [];
+  const client = await db.connect();
+  try {
+    await client.query('BEGIN');
+    if (UUID_RE.test(systemId)) await trashSystem(client, mapId, systemId, req.session.userId ?? null);
+    ({ rows: removed } = await client.query<{ name: string; alias: string | null }>(
+      `DELETE FROM map_systems WHERE id = $1 AND map_id = $2 RETURNING name, alias`, [systemId, mapId],
+    ));
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
   if (removed.length > 0) {
     db.query(
       `INSERT INTO user_events (user_id, event_type, map_id) VALUES ($1, 'system_delete', $2)`,
@@ -3231,6 +3382,32 @@ mapsRouter.delete('/:mapId/systems/:systemId', async (req, res) => {
   }
   await touchMap(mapId);
   res.json({ ok: true });
+});
+
+// POST /api/maps/:mapId/systems/:systemId/restore
+// Undo of a delete: the system back with its signatures, anomalies, structures,
+// connections and jump logs. Only the pilot who deleted it, within the hour.
+mapsRouter.post('/:mapId/systems/:systemId/restore', async (req, res) => {
+  const { mapId, systemId } = req.params;
+  const access = await requireMapWrite(res, mapId, req);
+  if (!access) return;
+  if (!UUID_RE.test(systemId)) { res.status(404).json({ error: 'restore_unavailable' }); return; }
+  const restored = await restoreSystem(mapId, systemId, req.session.userId!);
+  if (!restored || !restored.system) { res.status(404).json({ error: 'restore_unavailable' }); return; }
+  const actor = req.get('x-client-id') ?? null;
+  // Into the same system someone has re-added meanwhile: it's already on
+  // everyone's map, so only its contents changed.
+  if (restored.systemId === systemId) publishToMap(mapId, { type: 'system.add', actor, system: restored.system });
+  for (const connection of restored.connections) publishToMap(mapId, { type: 'connection.add', actor, connection });
+  publishToMap(mapId, { type: 'sig.changed', actor: null, systemId: restored.systemId });
+  publishToMap(mapId, { type: 'anom.changed', actor: null, systemId: restored.systemId });
+  publishToMap(mapId, { type: 'structure.changed', actor: null, systemId: restored.systemId });
+  await touchMap(mapId);
+  recordMapAudit(req, mapId, {
+    action: 'system.restore', targetId: restored.systemId,
+    subject: systemLabel({ name: String(restored.system.name), alias: (restored.system.alias as string | null) ?? null }),
+  });
+  res.json(restored);
 });
 
 // ── Connections ───────────────────────────────────────────────────────────────
@@ -4055,11 +4232,24 @@ mapsRouter.delete('/:mapId/connections/:connectionId', async (req, res) => {
   if (await isProtectedGate(mapId, connectionId)) {
     res.status(409).json({ error: PROTECTED_GATE_ERROR }); return;
   }
-  const { rows: removedConn } = await db.query<{ sourceId: string; targetId: string }>(
-    `DELETE FROM map_connections WHERE id = $1 AND map_id = $2
-     RETURNING source_id AS "sourceId", target_id AS "targetId"`,
-    [connectionId, mapId],
-  );
+  // Keep a copy (with its jump log) so undo can put it back as it was.
+  let removedConn: { sourceId: string; targetId: string }[] = [];
+  const client = await db.connect();
+  try {
+    await client.query('BEGIN');
+    if (UUID_RE.test(connectionId)) await trashConnection(client, mapId, connectionId, req.session.userId ?? null);
+    ({ rows: removedConn } = await client.query<{ sourceId: string; targetId: string }>(
+      `DELETE FROM map_connections WHERE id = $1 AND map_id = $2
+       RETURNING source_id AS "sourceId", target_id AS "targetId"`,
+      [connectionId, mapId],
+    ));
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
   await touchMap(mapId);
   publishToMap(mapId, { type: 'connection.remove', actor: req.get('x-client-id') ?? null, id: connectionId });
   if (removedConn.length) {
@@ -4069,6 +4259,28 @@ mapsRouter.delete('/:mapId/connections/:connectionId', async (req, res) => {
       .catch(console.error);
   }
   res.json({ ok: true });
+});
+
+// POST /api/maps/:mapId/connections/:connectionId/restore
+// Undo of a connection delete, with its jump log. Only the pilot who deleted
+// it, within the hour.
+mapsRouter.post('/:mapId/connections/:connectionId/restore', async (req, res) => {
+  const { mapId, connectionId } = req.params;
+  const access = await requireMapWrite(res, mapId, req);
+  if (!access) return;
+  if (!UUID_RE.test(connectionId)) { res.status(404).json({ error: 'restore_unavailable' }); return; }
+  const restored = await restoreConnection(mapId, connectionId, req.session.userId!);
+  if (!restored) { res.status(404).json({ error: 'restore_unavailable' }); return; }
+  const actor = req.get('x-client-id') ?? null;
+  for (const connection of restored) publishToMap(mapId, { type: 'connection.add', actor, connection });
+  if (restored.length) {
+    await touchMap(mapId);
+    const c = restored[0] as { sourceId: string; targetId: string };
+    connectionLabel(mapId, c.sourceId, c.targetId)
+      .then((label) => recordMapAudit(req, mapId, { action: 'connection.restore', targetId: connectionId, subject: label }))
+      .catch(console.error);
+  }
+  res.json({ connections: restored });
 });
 
 // ── Connection jump log ─────────────────────────────────────────────────────────

@@ -11,6 +11,7 @@ import {
   formatBookmarkName, DEFAULT_BOOKMARK_FORMAT, K162_BOOKMARK_FORMAT_KEY, wormholeBookmarkFormat,
 } from '../utils/signatureBookmark';
 import { copyWhenFocused } from '../utils/copyWhenFocused';
+import { chainNumberSettled, forwardChainLabel, withChain } from '../utils/chainNumber';
 
 export const COPY_BOOKMARK_ON_JUMP = 'nexum.sig.copyBookmarkOnJump';
 
@@ -18,16 +19,23 @@ export const COPY_BOOKMARK_ON_JUMP = 'nexum.sig.copyBookmarkOnJump';
 // clipboard -- the same name its row's copy button gives (map format over the
 // pilot's own), so they can rename the in-game bookmark without opening the
 // pane.
-function copyJumpedBookmark(sig: Signature): void {
+async function copyJumpedBookmark(sig: Signature, fromMapSystemId: string): Promise<void> {
   if (!readUserSetting<boolean>(COPY_BOOKMARK_ON_JUMP, true)) return;
+  const byName = (n: string) => useMapStore.getState().map.systems
+    .find((s) => s.name?.trim().toUpperCase() === n.trim().toUpperCase());
+  // A chain number for the system just reached may still be on its way.
+  const arrival = byName(sig.whLeadsTo ?? '');
+  if (arrival && useMapStore.getState().map.chainNumbering) await chainNumberSettled(arrival.id);
   const map = useMapStore.getState().map;
-  const format = wormholeBookmarkFormat(sig, map.bookmarkFormat,
+  const format = withChain(wormholeBookmarkFormat(sig, map.bookmarkFormat,
     readUserSetting<string>('nexum.sig.bookmarkFormat', DEFAULT_BOOKMARK_FORMAT),
-    readUserSetting<string>(K162_BOOKMARK_FORMAT_KEY, ''));
-  const byName = (n: string) => map.systems.find((s) => s.name?.trim().toUpperCase() === n.trim().toUpperCase());
+    readUserSetting<string>(K162_BOOKMARK_FORMAT_KEY, '')), map.chainNumbering);
+  const chain = map.chainNumbering
+    ? forwardChainLabel(map.systems.find((s) => s.id === fromMapSystemId), byName(sig.whLeadsTo ?? ''))
+    : '';
   const name = formatBookmarkName(format, sig, wormholeTypesSnapshot(), Date.now(),
     (n) => { const c = byName(n)?.systemClass; return c && c !== 'unknown' ? c : null; },
-    (n) => byName(n)?.alias?.trim() || null);
+    (n) => byName(n)?.alias?.trim() || null, chain);
   if (!name) return;
   void copyWhenFocused(name).then((ok) => {
     if (ok) toast.success(i18n.t('signatures.bookmarkCopied', { name }));
@@ -88,7 +96,15 @@ export async function maybeConfirmWhJump(ctx: WhJumpContext): Promise<void> {
   // compatible with where we arrived. Unknowns (non-wormhole) are never touched.
   // Bail before the gate check when there's nothing to fill.
   const candidates = sigs.filter((s) => s.sigType === 'wormhole' && isCandidate(s.whLeadsTo, toClass));
-  if (candidates.length === 0) return;
+  // No scanned hole fits, but there are signatures nobody has identified yet
+  // (pasted before they were scanned down): one of them may be the hole just
+  // jumped. Ask, never guess -- they could as well be data or relic sites.
+  // Without this the hole was never tied to its link, so when it later
+  // vanished from a scan nothing was cut.
+  const unscanned = candidates.length === 0
+    ? sigs.filter((s) => s.sigType === 'unknown' && !s.whLeadsTo && !!s.sigId)
+    : [];
+  if (candidates.length === 0 && unscanned.length === 0) return;
 
   // Wormhole jump only. Use the connection's server gate classification — the
   // same map_stargates check that draws the 'G' badge, reliable now that gates
@@ -115,11 +131,15 @@ export async function maybeConfirmWhJump(ctx: WhJumpContext): Promise<void> {
   // preferred backing signature -- otherwise the auto-detect's K162 tie-break
   // can attribute the jump to the other hole leading to the same system.
   const writeLeadsTo = (s: Signature, value: string, oldSig: Signature): void => {
+    // An unidentified sig the pilot says they jumped is a wormhole.
+    const patch: Partial<Signature> = s.sigType === 'unknown'
+      ? { whLeadsTo: value, sigType: 'wormhole' }
+      : { whLeadsTo: value };
     api(`/api/maps/${mapId}/systems/${fromMapSystemId}/signatures/${s.id}`, {
       method: 'PATCH',
-      body:   JSON.stringify({ whLeadsTo: value }),
+      body:   JSON.stringify(patch),
     }).catch(() => { /* best-effort; the user can still set it by hand */ });
-    const updated = sigs.map((x) => (x.id === s.id ? { ...x, whLeadsTo: value } : x));
+    const updated = sigs.map((x) => (x.id === s.id ? { ...x, ...patch } : x));
     reevaluateConnectionsForSystem(fromMapSystemId, updated, oldSig, false, undefined, s.id);
   };
 
@@ -129,7 +149,7 @@ export async function maybeConfirmWhJump(ctx: WhJumpContext): Promise<void> {
     const sole = candidates[0];
     const prev = sole.whLeadsTo;
     writeLeadsTo(sole, toName, sole);
-    copyJumpedBookmark({ ...sole, whLeadsTo: toName });
+    void copyJumpedBookmark({ ...sole, whLeadsTo: toName }, fromMapSystemId);
     toast.show(t('whJump.filled', { sig: label(sole), system: toName }), {
       kind: 'success', dedupeKey, ttlMs: 8000,
       actions: [
@@ -142,9 +162,9 @@ export async function maybeConfirmWhJump(ctx: WhJumpContext): Promise<void> {
   toast.show(t('whJump.confirmMany', { system: toName }), {
     kind: 'info', sticky: true, dedupeKey,
     actions: [
-      ...candidates.map((s) => ({ label: label(s), onClick: () => {
+      ...(candidates.length ? candidates : unscanned).map((s) => ({ label: label(s), onClick: () => {
         writeLeadsTo(s, toName, s);
-        copyJumpedBookmark({ ...s, whLeadsTo: toName });
+        void copyJumpedBookmark({ ...s, whLeadsTo: toName }, fromMapSystemId);
       } })),
       { label: t('whJump.unmapped'), onClick: () => { /* skip */ } },
     ],

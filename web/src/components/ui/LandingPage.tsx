@@ -21,7 +21,7 @@ import {
 import { apiUrl } from '../../api/client';
 import { loginUrl, useScopeOptions } from '../../api/scopeOptions';
 import { useScopePickerStore } from '../../store/scopePickerStore';
-import { DISCORD_INVITE_URL, DESKTOP_AVAILABLE, DESKTOP_MAC_AVAILABLE, DESKTOP_DOWNLOADS } from '../../data/links';
+import { DISCORD_INVITE_URL, DESKTOP_AVAILABLE, DESKTOP_MAC_AVAILABLE, DESKTOP_DOWNLOADS, DESKTOP_STORE_URL } from '../../data/links';
 import { SUPPORTED_LANGUAGES, LANGUAGE_NAMES } from '../../i18n';
 import { DemoMap } from './DemoMap';
 import { LanguageSwitcher } from './LanguageSwitcher';
@@ -400,12 +400,46 @@ export function LandingPage() {
       </header>
 
       <div className="landing__content">
-        {/* The desktop app: coming soon, or out now (DESKTOP_AVAILABLE).
-            Either way, point at the section listing what it adds. */}
-        <div className="landing__soon">
+        {/* The desktop app, out now: the first thing on the page, with its
+            downloads right there. */}
+        {DESKTOP_AVAILABLE && (
+          <section className="landing__desktop-hero" aria-labelledby="desktop-hero-title">
+            <span className="landing__desktop-hero-icon"><DesktopIcon size="1em" weight="duotone" /></span>
+            <div className="landing__desktop-hero-text">
+              <span className="landing__soon-tag">{t('landing.desktopOut')}</span>
+              <h2 id="desktop-hero-title" className="landing__desktop-hero-title">{t('landing.desktopHeroTitle')}</h2>
+              <p className="landing__desktop-hero-body">{t('landing.desktopHeroBody')}</p>
+            </div>
+            <div className="landing__desktop-hero-actions">
+              <div className="landing__download-btns">
+                <a className="landing__download" href={DESKTOP_STORE_URL} target="_blank" rel="noopener noreferrer">
+                  <WindowsLogoIcon size="1.2em" weight="fill" /> Windows
+                </a>
+                <a className="landing__download" href={DESKTOP_DOWNLOADS.linux}>
+                  <LinuxLogoIcon size="1.2em" weight="fill" /> Linux
+                </a>
+              </div>
+              <a
+                href="#desktop-app"
+                className="landing__soon-link"
+                onClick={(e) => {
+                  // The app routes on the hash, so scroll instead of navigating.
+                  e.preventDefault();
+                  document.getElementById('desktop-app')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }}
+              >
+                {t('landing.desktopHeroMore')}
+              </a>
+            </div>
+          </section>
+        )}
+
+        {/* Before it's out: a small "coming soon" note pointing at the section
+            listing what it adds. */}
+        {!DESKTOP_AVAILABLE && <div className="landing__soon">
           <span className="landing__soon-icon"><DesktopIcon size="1em" weight="duotone" /></span>
           <span className="landing__soon-text">
-            <span className="landing__soon-tag">{t(DESKTOP_AVAILABLE ? 'landing.desktopOut' : 'landing.desktopSoon')}</span>
+            <span className="landing__soon-tag">{t('landing.desktopSoon')}</span>
             {t('landing.desktopSoonBody')}
           </span>
           <a
@@ -417,9 +451,9 @@ export function LandingPage() {
               document.getElementById('desktop-app')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }}
           >
-            {t(DESKTOP_AVAILABLE ? 'landing.desktopDownloadLink' : 'landing.desktopSoonLink')}
+            {t('landing.desktopSoonLink')}
           </a>
-        </div>
+        </div>}
 
         <div className="landing__cta">
           {errorMessage && (
@@ -505,6 +539,26 @@ export function LandingPage() {
           </section>
         ))}
 
+        {/* ── Corp / alliance features ───────────────────────── */}
+        <section className="landing__section landing__section--features" id="for-corporations">
+          <h2 className="landing__section-title">{t('landing.sections.forCorps')}</h2>
+          <p className="landing__section-body">
+            {t('landing.forCorpsBody')}
+          </p>
+          <section className="landing__features">
+            {CORP_FEATURES.map((f) => {
+              const Icon = f.icon;
+              return (
+                <div key={f.id} className="landing__feature">
+                  <span className="landing__feature-icon"><Icon size="1em" weight="duotone" /></span>
+                  <h3 className="landing__feature-title">{t(`landing.corpFeatures.${f.id}.title`)}</h3>
+                  <p className="landing__feature-desc">{t(`landing.corpFeatures.${f.id}.desc`)}</p>
+                </div>
+              );
+            })}
+          </section>
+        </section>
+
         {/* ── Desktop app only ────────────────────────────────── */}
         <section className="landing__section landing__section--features" id="desktop-app">
           <h2 className="landing__section-title">
@@ -519,22 +573,26 @@ export function LandingPage() {
           {DESKTOP_AVAILABLE && (
             <div className="landing__downloads">
               <div className="landing__download-btns">
-                <a className="landing__download" href={DESKTOP_DOWNLOADS.windows}>
+                <a className="landing__download" href={DESKTOP_STORE_URL} target="_blank" rel="noopener noreferrer">
                   <WindowsLogoIcon size="1.2em" weight="fill" /> Windows
                 </a>
-                {DESKTOP_MAC_AVAILABLE ? (
+                {/* No macOS button at all until there is a macOS build. */}
+                {DESKTOP_MAC_AVAILABLE && (
                   <a className="landing__download" href={DESKTOP_DOWNLOADS.macos}>
                     <AppleLogoIcon size="1.2em" weight="fill" /> macOS
                   </a>
-                ) : (
-                  <span className="landing__download landing__download--soon" aria-disabled="true">
-                    <AppleLogoIcon size="1.2em" weight="fill" /> macOS: {t('landing.desktopSoon')}
-                  </span>
                 )}
                 <a className="landing__download" href={DESKTOP_DOWNLOADS.linux}>
                   <LinuxLogoIcon size="1.2em" weight="fill" /> Linux
                 </a>
               </div>
+              {/* Windows goes to the Microsoft Store (signed, updated by the
+                  Store). The direct installer stays for those without the
+                  Store; it isn't code-signed, so SmartScreen warns on first run. */}
+              <p className="landing__download-note">
+                {t('landing.desktopWinNote')}{' '}
+                <a href={DESKTOP_DOWNLOADS.windows}>{t('landing.desktopWinInstaller')}</a>
+              </p>
               {DESKTOP_MAC_AVAILABLE && (
                 <p className="landing__download-note">
                   {t('landing.desktopMacNote')}{' '}
@@ -556,26 +614,6 @@ export function LandingPage() {
                   <span className="landing__feature-icon"><Icon size="1em" weight="duotone" /></span>
                   <h3 className="landing__feature-title">{t(`landing.desktopFeatures.${f.id}.title`)}</h3>
                   <p className="landing__feature-desc">{t(`landing.desktopFeatures.${f.id}.desc`)}</p>
-                </div>
-              );
-            })}
-          </section>
-        </section>
-
-        {/* ── Corp / alliance features ───────────────────────── */}
-        <section className="landing__section landing__section--features" id="for-corporations">
-          <h2 className="landing__section-title">{t('landing.sections.forCorps')}</h2>
-          <p className="landing__section-body">
-            {t('landing.forCorpsBody')}
-          </p>
-          <section className="landing__features">
-            {CORP_FEATURES.map((f) => {
-              const Icon = f.icon;
-              return (
-                <div key={f.id} className="landing__feature">
-                  <span className="landing__feature-icon"><Icon size="1em" weight="duotone" /></span>
-                  <h3 className="landing__feature-title">{t(`landing.corpFeatures.${f.id}.title`)}</h3>
-                  <p className="landing__feature-desc">{t(`landing.corpFeatures.${f.id}.desc`)}</p>
                 </div>
               );
             })}
@@ -692,6 +730,13 @@ export function LandingPage() {
               <h3 className="landing__faq-q">{t('landing.faq.dataSafe.q')}</h3>
               <p className="landing__faq-a">
                 {t('landing.faq.dataSafe.a')}
+              </p>
+            </div>
+
+            <div className="landing__faq-item">
+              <h3 className="landing__faq-q">{t('landing.faq.clipboard.q')}</h3>
+              <p className="landing__faq-a">
+                {t('landing.faq.clipboard.a')}
               </p>
             </div>
 

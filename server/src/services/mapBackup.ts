@@ -372,7 +372,7 @@ export function parseMapBackup(raw: unknown, now = Date.now()): Omit<MapBackup, 
 
 // ── Restore ──────────────────────────────────────────────────────────────────
 
-async function insertBatch(client: PoolClient, table: string, cols: string[], rows: unknown[][], suffix = ''): Promise<number> {
+export async function insertBatch(client: PoolClient, table: string, cols: string[], rows: unknown[][], suffix = ''): Promise<number> {
   if (rows.length === 0) return 0;
   const chunkSize = Math.max(1, Math.floor(60_000 / cols.length));
   let n = 0;
@@ -390,6 +390,34 @@ async function insertBatch(client: PoolClient, table: string, cols: string[], ro
   return n;
 }
 
+export interface SdeSystem { id: number; name: string; cls: string | null; effect: string | null; statics: string[]; region: string | null }
+
+/**
+ * A system with an EVE id is that system: its name, class, effect, statics and
+ * region come from the SDE, not from the file. One without an id is a
+ * placeholder for an unmapped hole; a legacy row with only a name is looked up
+ * by name.
+ */
+export async function lookupSde(
+  client: PoolClient, systems: BackupSystem[],
+): Promise<{ sde: Map<number, SdeSystem>; byName: Map<string, number> }> {
+  const ids = [...new Set(systems.map((s) => s.eveSystemId).filter((x): x is number => x != null))];
+  const names = [...new Set(systems.filter((s) => s.eveSystemId == null).map((s) => s.name))];
+  const sde = new Map<number, SdeSystem>();
+  const byName = new Map<string, number>();
+  if (ids.length || names.length) {
+    const { rows } = await client.query<{ id: number; name: string; cls: string | null; effect: string | null; statics: string[] | null; region: string | null }>(
+      `SELECT s.id, s.name, s.class AS cls, s.effect, s.statics, r.name AS region
+         FROM solar_systems s LEFT JOIN map_regions r ON r.id = s.region_id
+        WHERE s.id = ANY($1::int[]) OR s.name = ANY($2::text[])`, [ids, names]);
+    for (const r of rows) {
+      sde.set(r.id, { ...r, statics: r.statics ?? [] });
+      byName.set(r.name, r.id);
+    }
+  }
+  return { sde, byName };
+}
+
 export interface RestoreCounts {
   systems: number; connections: number; signatures: number; anomalies: number; structures: number;
 }
@@ -402,24 +430,7 @@ export interface RestoreCounts {
 export async function restoreMapBackup(
   client: PoolClient, mapId: string, b: ReturnType<typeof parseMapBackup>, userId: number,
 ): Promise<RestoreCounts> {
-  // A system with an EVE id is that system: take its name, class, effect,
-  // statics and region from the SDE, not from the file. One without an id is a
-  // placeholder for an unmapped hole; a legacy row with only a name is looked
-  // up by name.
-  const ids = [...new Set(b.systems.map((s) => s.eveSystemId).filter((x): x is number => x != null))];
-  const names = [...new Set(b.systems.filter((s) => s.eveSystemId == null).map((s) => s.name))];
-  const sde = new Map<number, { id: number; name: string; cls: string | null; effect: string | null; statics: string[]; region: string | null }>();
-  const byName = new Map<string, number>();
-  if (ids.length || names.length) {
-    const { rows } = await client.query<{ id: number; name: string; cls: string | null; effect: string | null; statics: string[] | null; region: string | null }>(
-      `SELECT s.id, s.name, s.class AS cls, s.effect, s.statics, r.name AS region
-         FROM solar_systems s LEFT JOIN map_regions r ON r.id = s.region_id
-        WHERE s.id = ANY($1::int[]) OR s.name = ANY($2::text[])`, [ids, names]);
-    for (const r of rows) {
-      sde.set(r.id, { ...r, statics: r.statics ?? [] });
-      byName.set(r.name, r.id);
-    }
-  }
+  const { sde, byName } = await lookupSde(client, b.systems);
 
   // Old system id -> new id. One node per EVE system per map: a second row for
   // the same system becomes an alias of the first.

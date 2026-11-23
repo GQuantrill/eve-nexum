@@ -1391,6 +1391,11 @@ div.system-node__easy-handle {
   border: 1px solid var(--border-strong);
 }
 
+/* Chain number ("L+1"): monospaced digits so a column of them lines up. */
+.system-node__label--chain {
+  font-variant-numeric: tabular-nums;
+}
+
 
 /* ── Single-character quick tag badge (inline, before the system name) ── */
 .system-node__tag {

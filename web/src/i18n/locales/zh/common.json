@@ -554,12 +554,14 @@
       "system": {
         "add": "添加了 {{subject}}",
         "update": "修改了 {{subject}}",
-        "remove": "删除了 {{subject}}"
+        "remove": "删除了 {{subject}}",
+        "restore": "恢复了 {{subject}}"
       },
       "connection": {
         "add": "连接了 {{subject}}",
         "update": "修改了 {{subject}}",
-        "remove": "断开了 {{subject}}"
+        "remove": "断开了 {{subject}}",
+        "restore": "重新连接了 {{subject}}"
       },
       "signature": {
         "add": "添加了信号 {{subject}}",
@@ -584,7 +586,8 @@
       "map": {
         "update": "修改了地图设置",
         "merge": "合并了 {{subject}}",
-        "scoutCleanup": "清理了 {{subject}} 虫洞"
+        "scoutCleanup": "清理了 {{subject}} 虫洞",
+        "paste": "从 {{subject}} 粘贴了星系"
       },
       "share": {
         "add": "与 {{subject}} 共享了地图",
@@ -814,7 +817,9 @@
     "restoreTitle": "清除断开标记，重新将其视为活动连接",
     "gateNote": "普通星门 — 无虫洞数据可追踪。",
     "gateProtected": "星门连接在游戏中真实存在，无法删除或更改。",
-    "jumpgateNote": "Ansiblex 跳桥 — 无虫洞数据可追踪。"
+    "jumpgateNote": "Ansiblex 跳桥 — 无虫洞数据可追踪。",
+    "massUsedLabel": "已用",
+    "massUsedTitle": "已经通过的质量，单位为百万千克。如果你知道（例如从跳跃记录中），就填写进来，计算器会从这里继续算。"
   },
   "contentFilter": {
     "hint": "按扫描到的内容突出显示星系。选择信号或异常空间类型，或搜索地点名称；匹配的星系保持高亮，其余的淡出。",
@@ -943,7 +948,19 @@
     "jumpRangeFrom": "从此处的跳跃范围",
     "jumpCyno": "Cyno 跳跃",
     "jumpRangeClear": "清除跳跃范围",
-    "copyName": "复制星系名称"
+    "copyName": "复制星系名称",
+    "copySystems": "复制星系（{{count}}）",
+    "copiedSystems": "已复制星系：{{count}}。在另一张地图上按 Ctrl+V 粘贴。",
+    "copySystemsFailed": "无法复制这些星系。",
+    "pasteSystems": "粘贴星系",
+    "pastedSystems": "已粘贴。新增星系：{{systems}}，连接：{{connections}}，信号：{{signatures}}。",
+    "pastedNothing": "没有可添加的内容：这张地图已包含你粘贴的全部内容。",
+    "pasteSystemsFailed": "无法粘贴这些星系。",
+    "pasteSystemsNoRights": "你的角色不能向这张地图添加星系。",
+    "pasteUseKeys": "你的浏览器不允许 nexum 读取剪贴板。请改为在地图上按 Ctrl+V（Mac 上为 Cmd+V）。",
+    "pasteNoSystems": "剪贴板上没有复制的星系。请先右键点击星系并选择“复制星系”。",
+    "exportSystems": "导出星系（{{count}}）…",
+    "importSystems": "导入星系…"
   },
   "customIntel": {
     "title": "自定义情报",
@@ -1632,6 +1649,10 @@
         "q": "我的数据安全吗？",
         "a": "Nexum 从不会看到你的 EVE 密码 — 认证完全由 CCP 的 EVE SSO 处理。唯一存储的是你的角色身份和你构建的地图。你的地图数据存放在私有数据库中，不会与任何人共享。话虽如此，别用 Nexum 来记你联盟绝密的入侵路线 — 互联网上没有任何工具能替代良好的行动安全。"
       },
+      "clipboard": {
+        "q": "桌面应用会读取我的剪贴板吗？",
+        "a": "只有在你于桌面应用中开启“从剪贴板粘贴扫描结果”时才会。该选项默认关闭，而网站只能看到你自己粘贴进去的内容。即使开启，也只使用在 EVE 中复制的内容：应用会确认当时位于前台的窗口是 EVE，因此你在浏览器、聊天软件或加密货币钱包中复制的内容绝不会被使用（在 Windows 上甚至不会被读取）。对于在 EVE 中复制的内容，它只取探针扫描结果和定向扫描，其他内容会被立即丢弃，绝不保存或发送。应用绝不会修改你的剪贴板。Nexum 唯一会放入剪贴板的，是你跳跃后虫洞的新书签名称，方便在游戏中粘贴。所以，如果你粘贴的钱包地址变了，那是你电脑上的恶意软件，而不是 Nexum：请检查你的电脑。"
+      },
       "reportBugs": {
         "q": "我可以报告 bug、提交反馈和请求功能吗？",
         "a": "当然可以。该项目在 <gh>GitHub</gh> 上开源 — 为 bug 或功能请求开一个 issue，或者如果你够大胆就提交一个 pull request。如果 GitHub 不是你的菜，向与此账号关联的角色发送游戏内邮件反馈同样有效。"
@@ -1654,7 +1675,7 @@
       }
     },
     "footer": "EVE Online 和 EVE 标志是 CCP hf. 的注册商标。保留全球所有权利。Nexum 是第三方工具，与 CCP hf. 无关，也未获其认可。· <license>许可证与 EVE 知识产权声明</license>",
-    "desktopBody": "Nexum 也有适用于 Windows、macOS 和 Linux 的桌面应用。它就是同一个 Nexum，保留你的登录、地图和设置，并加入浏览器做不到的功能：应用可以读取你电脑上 EVE 自己的日志文件，并置于游戏之上。本节中的所有功能都需要桌面应用；以上所有功能两者皆可使用。",
+    "desktopBody": "Nexum 也有适用于 Windows 和 Linux 的桌面应用。它就是同一个 Nexum，保留你的登录、地图和设置，并加入浏览器做不到的功能：应用可以读取你电脑上 EVE 自己的日志文件，并置于游戏之上。本节中的所有功能都需要桌面应用；以上所有功能两者皆可使用。",
     "desktopFeatures": {
       "logJumps": {
         "title": "即时跳跃跟踪",
@@ -1674,7 +1695,7 @@
       },
       "scanPaste": {
         "title": "粘贴扫描",
-        "desc": "在 EVE 中复制探针扫描结果，会自动填入所选星系；复制定向扫描，会在分析器中打开。无需切换窗口。默认关闭，需手动开启。"
+        "desc": "在 EVE 中复制探针扫描结果，会自动填入所选星系；复制定向扫描，会在分析器中打开。无需切换窗口。默认关闭，需手动开启。它只接收在 EVE 客户端中复制的内容：在其他应用（浏览器、聊天、密码管理器、钱包）中复制的内容一律忽略，不是扫描结果的内容直接丢弃，既不保存也不发送，应用也从不修改你的剪贴板。"
       },
       "onTop": {
         "title": "窗口置顶",
@@ -1694,12 +1715,17 @@
       }
     },
     "desktopSoon": "即将推出",
-    "desktopSoonBody": "适用于 Windows、macOS 和 Linux 的 Nexum 桌面应用：通过 EVE 日志即时跟踪跳跃、在地图上显示情报频道、威胁警报等。",
+    "desktopSoonBody": "适用于 Windows 和 Linux 的 Nexum 桌面应用：通过 EVE 日志即时跟踪跳跃、在地图上显示情报频道、威胁警报等。",
     "desktopSoonLink": "查看新功能",
     "desktopOut": "现已推出",
     "desktopDownloadLink": "下载",
     "desktopMacNote": "macOS：应用尚未签名，安装后请在终端运行一次：",
-    "desktopAllDownloads": "全部下载（.msi、.deb、.rpm）和更新说明"
+    "desktopAllDownloads": "全部下载（.deb、.rpm）和更新说明",
+    "desktopWinNote": "Windows：按钮会在 Microsoft Store 中打开 Nexum，安装时不会出现警告，并会自动保持更新。",
+    "desktopHeroTitle": "Nexum 现已推出桌面应用",
+    "desktopHeroBody": "探索的一大飞跃：通过 EVE 自己的日志即时记录你的跳跃，情报频道显示在地图上，带声音和语音的威胁警报，游戏上方的悬浮窗，复制扫描结果即自动粘贴。免费，支持 Windows 和 Linux。",
+    "desktopHeroMore": "查看它的全部功能",
+    "desktopWinInstaller": "或下载安装程序（未签名：Windows 可能提示已保护你的电脑；请选择“更多信息”，然后选择“仍要运行”）。"
   },
   "language": {
     "label": "语言"
@@ -1716,7 +1742,9 @@
     "lessThan24h": "< 24h",
     "lessThan4h": "< 4h",
     "lessThan1h": "< 1h",
-    "broken": "连接已断开——虫洞信号已被删除（虫洞坍塌）"
+    "broken": "连接已断开——虫洞信号已被删除（虫洞坍塌）",
+    "showInfo": "显示此连接的信息",
+    "hideInfo": "点击折叠"
   },
   "mapKey": {
     "title": "地图图例",
@@ -2149,7 +2177,12 @@
       "normal": "正常",
       "strong": "强烈"
     },
-    "resetColor": "重置"
+    "resetColor": "重置",
+    "connInfo": "连接信息",
+    "connInfoFull": "始终显示",
+    "connInfoFolded": "折叠",
+    "importSystemsTitle": "从 CSV 或制表符分隔的行向此地图添加星系",
+    "importSystems": "↑ 从 CSV 导入星系"
   },
   "mass": {
     "billionKg": "{{value}} 十亿 kg",
@@ -2861,5 +2894,123 @@
     "sub": "你可以随时在侧边栏的 {{section}} 部分更改此设置、选择语音，并决定播报哪些事件。",
     "noThanks": "不用了",
     "enable": "开启"
+  },
+  "offMap": {
+    "title": "{{system}} 不在此地图上",
+    "kspaceMap": "此地图的管理员已设置为飞行时不记录高安、低安或00星系。",
+    "kspaceYou": "你的\"不跟踪 K 空间\"设置已开启，因此不会记录高安、低安和00星系。",
+    "trackingOff": "跳跃追踪已关闭，因此你飞往的星系不会被添加。",
+    "readOnly": "你可以查看此地图，但不能添加内容。",
+    "locked": "此地图已锁定，因此不会添加任何内容。",
+    "add": "添加到地图",
+    "hide": "隐藏"
+  },
+  "scanPaste": {
+    "otherCharacter": "未粘贴扫描：只使用在 {{name}} 的 EVE 窗口中复制的扫描（Nexum 应用设置）。"
+  },
+  "rollPlan": {
+    "title": "通过计划",
+    "addShip": "添加舰船",
+    "myRoller": "我的滚洞船：{{name}}（{{cold}}/{{hot}}）",
+    "removeShip": "移除 {{name}}",
+    "ship": "舰船",
+    "toggleHeat": "在冷/热之间切换",
+    "out": "去",
+    "back": "回",
+    "flown": "已通过",
+    "removePass": "移除此次通过",
+    "outcome": {
+      "safe": "此次通过后的已用质量。洞不会在这次关闭。",
+      "risky": "此次通过后的已用质量。洞可能在这次关闭。",
+      "collapse": "此次通过后的已用质量。洞会在这次关闭。"
+    },
+    "strands": "第 {{n}} 次通过可能在 {{ship}} 位于对面时关闭洞。",
+    "addPass": "添加通过",
+    "flyNext": "执行下一次",
+    "flyNextTitle": "{{ship}} 通过：已用质量增加 {{mass}}",
+    "undoFlown": "撤销已通过",
+    "clear": "清空计划",
+    "tooHeavy": "对这个洞来说太重（最大跳跃质量 {{max}}）"
+  },
+  "errorScreen": {
+    "title": "出错了",
+    "hint": "Nexum 遇到错误并已停止。重新加载即可继续。如需报告，请复制详细信息并发送给我们。",
+    "reload": "重新加载",
+    "copy": "复制错误详情"
+  },
+  "exportSystems": {
+    "title": "导出星系",
+    "format": "格式",
+    "formats": {
+      "csv": "CSV",
+      "tsv": "制表符分隔",
+      "json": "JSON"
+    },
+    "skipLocked": "排除已锁定的星系（{{count}}）",
+    "summary": "星系：{{systems}}。行数：{{rows}}，每个信号一行。",
+    "loading": "正在加载星系…",
+    "loadFailed": "无法加载这些星系。",
+    "copy": "复制",
+    "save": "保存文件",
+    "copied": "已复制到剪贴板。",
+    "copyFailed": "无法复制到剪贴板。"
+  },
+  "groupMeaning": {
+    "map": "地图",
+    "chain": "已保存的链路",
+    "title": "分组表示",
+    "label": "标签"
+  },
+  "importSystems": {
+    "title": "导入星系",
+    "intro": "粘贴多行，或打开带表头行的 CSV 或制表符分隔文件。列：group, system, signature, sig-type, name, to-system, from-type, to-type, size, mass-remaining, life-remaining。只有 system 是必需的。这张地图已有的星系保持不变，只添加缺少的内容。",
+    "paste": "行",
+    "openFile": "打开文件…",
+    "meaningHint": {
+      "map": "分组只是备注，不做任何处理。",
+      "chain": "每个洞口连成一条路径的分组，会以分组名称保存为链路。",
+      "label": "每个分组会作为自定义文本标签加到其星系上（每个星系最多三个）。"
+    },
+    "noHeader": "没有含 \"system\" 列的表头行。",
+    "lookupFailed": "无法查询星系名称。请重试。",
+    "checking": "正在检查星系名称…",
+    "summary": "就绪：{{good}} 行。因问题而跳过：{{bad}}。",
+    "col": {
+      "system": "星系",
+      "signature": "信号",
+      "toSystem": "目标星系",
+      "check": "检查"
+    },
+    "rowOk": "正常",
+    "error": {
+      "noSystem": "没有星系。",
+      "unknownSystem": "不是 EVE 星系。",
+      "badSignature": "信号格式应为 ABC-123。",
+      "badSigType": "未知的信号类型。",
+      "whOnly": "非虫洞信号带有虫洞信息。",
+      "unknownToSystem": "目标星系不是 EVE 星系。",
+      "sameSystem": "虫洞不能通往自己所在的星系。",
+      "badType": "不是虫洞类型。",
+      "bothK162": "两端不能都是 K162。",
+      "badSize": "尺寸必须是 S、M、L 或 XL。",
+      "sizeMismatch": "该尺寸与虫洞类型不符。",
+      "badMass": "质量必须是 100、50 或 10。",
+      "badLife": "寿命必须是 48、24、4、1 或 0。"
+    },
+    "notPaths": "以下分组未保存为链路，因为其虫洞不能连成一条路径：{{groups}}",
+    "import": "导入（{{count}}）",
+    "importing": "正在导入…",
+    "done": "已导入。新增星系：{{systems}}，连接：{{connections}}，信号：{{signatures}}，标签：{{labels}}，链路：{{chains}}。",
+    "failed": "无法导入这些星系。",
+    "fileTooBig": "文件太大（最多 2 MB）。",
+    "fileFailed": "无法读取该文件。"
+  },
+  "chainNumber": {
+    "toggle": "从家开始为链路编号（L+1）",
+    "hint": "每个星系在第一次经虫洞跳入时获得编号：从家出发为 1、2、3，从 5 出发为 51、52，依此类推。虫洞书签以其通往星系的编号开头，因此在 EVE 中按链路顺序排列。编号永不改变，也不会重复使用。",
+    "set": "设置链路编号…",
+    "setTitle": "链路编号",
+    "setMessage": "{{name}} 的链路编号。留空即清除。",
+    "invalid": "链路编号只能是数字，如 51；大于 9 的部分前加一个点，如 5.10。"
   }
 }

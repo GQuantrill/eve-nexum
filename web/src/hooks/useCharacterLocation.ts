@@ -265,6 +265,11 @@ async function onLocalChange(ev: LocalChange): Promise<void> {
   setTimeout(() => { void load(); }, 5_000);
 }
 
+/** The character this tab tracks (pinned, else the session's), by name. */
+export function trackedCharacterName(): string | null {
+  return currentActingEve?.name ?? null;
+}
+
 let desktopStarted = false;
 function startDesktopLocal(): void {
   if (desktopStarted) return;

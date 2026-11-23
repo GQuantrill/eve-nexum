@@ -554,12 +554,14 @@
       "system": {
         "add": "heeft {{subject}} toegevoegd",
         "update": "heeft {{subject}} gewijzigd",
-        "remove": "heeft {{subject}} verwijderd"
+        "remove": "heeft {{subject}} verwijderd",
+        "restore": "heeft {{subject}} hersteld"
       },
       "connection": {
         "add": "heeft {{subject}} verbonden",
         "update": "heeft {{subject}} gewijzigd",
-        "remove": "heeft {{subject}} losgekoppeld"
+        "remove": "heeft {{subject}} losgekoppeld",
+        "restore": "heeft {{subject}} opnieuw verbonden"
       },
       "signature": {
         "add": "heeft signatuur {{subject}} toegevoegd",
@@ -584,7 +586,8 @@
       "map": {
         "update": "heeft de kaartinstellingen gewijzigd",
         "merge": "heeft {{subject}} samengevoegd",
-        "scoutCleanup": "heeft {{subject}}-gaten opgeruimd"
+        "scoutCleanup": "heeft {{subject}}-gaten opgeruimd",
+        "paste": "plakte systemen uit {{subject}}"
       },
       "share": {
         "add": "heeft de kaart gedeeld met {{subject}}",
@@ -814,7 +817,9 @@
     "collapseConfirmHome": " Je roller eindigt aan de thuiszijde.",
     "rollIt": "Rollen",
     "removeConnection": "Alleen verbinding verwijderen",
-    "removeConnectionAndSigs": "Verbinding en signaturen verwijderen"
+    "removeConnectionAndSigs": "Verbinding en signaturen verwijderen",
+    "massUsedLabel": "Gebruikt",
+    "massUsedTitle": "Massa die er al doorheen is, in miljoenen kg. Vul hem in als je hem weet (bijvoorbeeld uit het sprongenlog); de rekenhulp rekent vanaf daar verder."
   },
   "contentFilter": {
     "hint": "Licht systemen uit op basis van wat er gescand is. Kies signatuur- of anomalietypes, of zoek op een sitenaam; overeenkomende systemen blijven licht en de rest vervaagt.",
@@ -943,7 +948,19 @@
     "jumpRangeFrom": "Sprongbereik vanaf hier",
     "jumpCyno": "Cyno-sprong",
     "jumpRangeClear": "Sprongbereik wissen",
-    "copyName": "Systeemnaam kopiëren"
+    "copyName": "Systeemnaam kopiëren",
+    "copySystems": "Systemen kopiëren ({{count}})",
+    "copiedSystems": "Systemen gekopieerd: {{count}}. Plak ze met Ctrl+V in een andere kaart.",
+    "copySystemsFailed": "Kon de systemen niet kopiëren.",
+    "pasteSystems": "Systemen plakken",
+    "pastedSystems": "Geplakt. Nieuwe systemen: {{systems}}, verbindingen: {{connections}}, signatures: {{signatures}}.",
+    "pastedNothing": "Niets toe te voegen: deze kaart heeft alles wat je plakte al.",
+    "pasteSystemsFailed": "Kon de systemen niet plakken.",
+    "pasteSystemsNoRights": "Je rol mag geen systemen aan deze kaart toevoegen.",
+    "pasteUseKeys": "Je browser laat nexum het klembord niet lezen. Druk in plaats daarvan op Ctrl+V (Cmd+V op een Mac) op de kaart.",
+    "pasteNoSystems": "Geen gekopieerde systemen op het klembord. Klik eerst met rechts op systemen en kies Systemen kopiëren.",
+    "exportSystems": "Systemen exporteren ({{count}})…",
+    "importSystems": "Systemen importeren…"
   },
   "customIntel": {
     "title": "Eigen intel",
@@ -1632,6 +1649,10 @@
         "q": "Zijn mijn gegevens veilig?",
         "a": "Nexum ziet je EVE-wachtwoord nooit — het inloggen gaat volledig via EVE SSO van CCP. Het enige dat wordt bewaard is de identiteit van je character en de kaarten die je maakt. Je kaartgegevens staan in een privédatabase en worden met niemand gedeeld. Dat gezegd: gebruik Nexum niet voor de topgeheime invasieroute van je alliance — geen enkele tool op het internet vervangt goede operationele veiligheid."
       },
+      "clipboard": {
+        "q": "Leest de desktop-app mijn klembord?",
+        "a": "Alleen als je in de desktop-app \"Scans plakken vanaf het klembord\" aanzet. Dat staat standaard uit, en de website ziet alleen wat je er zelf in plakt. Zelfs dan telt alleen een kopie uit EVE: de app controleert of EVE het venster op de voorgrond was, dus wat je in een browser, chat-app of cryptowallet kopieert wordt nooit gebruikt (op Windows wordt het niet eens gelezen). Uit een kopie in EVE neemt hij alleen probe-scannerresultaten en d-scans; de rest wordt meteen weggegooid, nooit bewaard of verstuurd. De app wijzigt je klembord nooit. Het enige wat Nexum er ooit op zet, is na een sprong de nieuwe bladwijzernaam van een wormhole, klaar om in het spel te plakken. Komt een walletadres dat je plakt ooit anders uit, dan is dat malware op je pc, niet Nexum: laat hem nakijken."
+      },
       "reportBugs": {
         "q": "Kan ik bugs melden, feedback geven en functies voorstellen?",
         "a": "Absoluut. Het project is open source op <gh>GitHub</gh> — open een issue voor bugs of ideeën, of stuur een pull request in als je je dapper voelt. Feedback via in-game mail naar het character achter dit account werkt ook, als GitHub niets voor je is."
@@ -1654,7 +1675,7 @@
       }
     },
     "footer": "EVE Online en het EVE-logo zijn geregistreerde handelsmerken van CCP hf. Alle rechten wereldwijd voorbehouden. Nexum is een tool van derden en is niet verbonden met of goedgekeurd door CCP hf. · <license>Licentie en EVE IP-vermelding</license>",
-    "desktopBody": "Nexum bestaat ook als desktop-app voor Windows, macOS en Linux. Het is dezelfde Nexum, met je login, kaarten en instellingen, plus functies die een browser niet kan bieden: de app kan EVE's eigen logbestanden op je computer lezen en boven het spel blijven. Alles in dit deel vraagt de desktop-app; alles hierboven werkt in beide.",
+    "desktopBody": "Nexum bestaat ook als desktop-app voor Windows en Linux. Het is dezelfde Nexum, met je login, kaarten en instellingen, plus functies die een browser niet kan bieden: de app kan EVE's eigen logbestanden op je computer lezen en boven het spel blijven. Alles in dit deel vraagt de desktop-app; alles hierboven werkt in beide.",
     "desktopFeatures": {
       "logJumps": {
         "title": "Directe sprongvolging",
@@ -1674,7 +1695,7 @@
       },
       "scanPaste": {
         "title": "Scans plakken",
-        "desc": "Kopieer probe-scannerresultaten in EVE en ze komen in het geselecteerde systeem; kopieer een d-scan en hij opent in de analyse. Zonder alt-tab. Uit tot je het aanzet."
+        "desc": "Kopieer probe-scannerresultaten in EVE en ze komen in het geselecteerde systeem; kopieer een d-scan en hij opent in de analyse. Zonder alt-tab. Uit tot je het aanzet. Het neemt alleen kopieën uit de EVE-client: wat je in een andere app kopieert (browser, chat, wachtwoordmanager, wallet) wordt genegeerd, alles wat geen scan is wordt weggegooid zonder opgeslagen of verstuurd te worden, en de app verandert je klembord nooit."
       },
       "onTop": {
         "title": "Altijd bovenop",
@@ -1694,12 +1715,17 @@
       }
     },
     "desktopSoon": "Binnenkort",
-    "desktopSoonBody": "De Nexum-desktop-app voor Windows, macOS en Linux: directe sprongvolging uit de logs van EVE, intelkanalen op je kaart, dreigingswaarschuwingen en meer.",
+    "desktopSoonBody": "De Nexum-desktop-app voor Windows en Linux: directe sprongvolging uit de logs van EVE, intelkanalen op je kaart, dreigingswaarschuwingen en meer.",
     "desktopSoonLink": "Bekijk wat hij toevoegt",
     "desktopOut": "Nu beschikbaar",
     "desktopDownloadLink": "Downloaden",
     "desktopMacNote": "macOS: de app is nog niet ondertekend, dus voer na installatie één keer dit uit in Terminal:",
-    "desktopAllDownloads": "Alle downloads (.msi, .deb, .rpm) en release-opmerkingen"
+    "desktopAllDownloads": "Alle downloads (.deb, .rpm) en release-opmerkingen",
+    "desktopWinNote": "Windows: de knop opent Nexum in de Microsoft Store, die het zonder waarschuwing installeert en up-to-date houdt.",
+    "desktopHeroTitle": "Nexum is nu een desktop-app",
+    "desktopHeroBody": "Een enorme stap voor verkenning: je sprongen vastgelegd uit de eigen logs van EVE zodra ze gebeuren, je intelkanalen op de kaart, dreigingsmeldingen met geluid en stem, een overlay boven het spel, en scans die geplakt worden zodra je ze kopieert. Gratis, voor Windows en Linux.",
+    "desktopHeroMore": "Bekijk alles wat ze toevoegt",
+    "desktopWinInstaller": "Of download het installatieprogramma (niet ondertekend: Windows kan zeggen dat het je pc heeft beschermd; kies Meer informatie, dan Toch uitvoeren)."
   },
   "language": {
     "label": "Taal"
@@ -1716,7 +1742,9 @@
     "lessThan24h": "< 24u",
     "lessThan4h": "< 4 uur",
     "lessThan1h": "< 1 uur",
-    "broken": "Verbinding verbroken — de wormgat-signatuur is verwijderd (gat ingestort)"
+    "broken": "Verbinding verbroken — de wormgat-signatuur is verwijderd (gat ingestort)",
+    "showInfo": "Info van deze verbinding tonen",
+    "hideInfo": "Klik om in te klappen"
   },
   "mapKey": {
     "title": "Kaartlegenda",
@@ -2149,7 +2177,12 @@
       "normal": "Normaal",
       "strong": "Sterk"
     },
-    "resetColor": "Herstellen"
+    "resetColor": "Herstellen",
+    "connInfo": "Verbindingsinfo",
+    "connInfoFull": "Altijd tonen",
+    "connInfoFolded": "Ingeklapt",
+    "importSystemsTitle": "Systemen aan deze kaart toevoegen uit CSV- of tab-gescheiden regels",
+    "importSystems": "↑ Systemen importeren uit CSV"
   },
   "mass": {
     "billionKg": "{{value}} mld kg",
@@ -2865,5 +2898,123 @@
     "sub": "Je kunt dit altijd wijzigen, een stem kiezen en bepalen welke gebeurtenissen worden uitgesproken in het onderdeel {{section}} van de zijbalk.",
     "noThanks": "Nee, bedankt",
     "enable": "Aanzetten"
+  },
+  "offMap": {
+    "title": "{{system}} staat niet op deze kaart",
+    "kspaceMap": "De beheerders van deze kaart hebben ingesteld dat high-, low- en nullsec-systemen niet worden vastgelegd terwijl je vliegt.",
+    "kspaceYou": "Je instelling \"K-space niet bijhouden\" staat aan, dus high-, low- en nullsec-systemen worden niet vastgelegd.",
+    "trackingOff": "Sprongen volgen staat uit, dus systemen waar je heen vliegt worden niet toegevoegd.",
+    "readOnly": "Je kunt deze kaart bekijken maar er niets aan toevoegen.",
+    "locked": "Deze kaart is vergrendeld, dus er wordt niets aan toegevoegd.",
+    "add": "Aan kaart toevoegen",
+    "hide": "Verbergen"
+  },
+  "scanPaste": {
+    "otherCharacter": "Scan niet geplakt: alleen scans uit het EVE-venster van {{name}} worden gebruikt (instellingen van de Nexum-app)."
+  },
+  "rollPlan": {
+    "title": "Sprongplan",
+    "addShip": "Schip toevoegen",
+    "myRoller": "Mijn roller: {{name}} ({{cold}}/{{hot}})",
+    "removeShip": "{{name}} verwijderen",
+    "ship": "Schip",
+    "toggleHeat": "Wisselen tussen koud en heet",
+    "out": "heen",
+    "back": "terug",
+    "flown": "gevlogen",
+    "removePass": "Deze sprong verwijderen",
+    "outcome": {
+      "safe": "Gebruikte massa na deze sprong. Het gat kan hierbij niet dichtgaan.",
+      "risky": "Gebruikte massa na deze sprong. Het gat kan hierbij dichtgaan.",
+      "collapse": "Gebruikte massa na deze sprong. Het gat gaat hierbij dicht."
+    },
+    "strands": "Sprong {{n}} kan het gat sluiten terwijl {{ship}} aan de overkant is.",
+    "addPass": "Sprong toevoegen",
+    "flyNext": "Volgende vliegen",
+    "flyNextTitle": "{{ship}} springt: {{mass}} erbij in de gebruikte massa",
+    "undoFlown": "Gevlogen ongedaan maken",
+    "clear": "Plan wissen",
+    "tooHeavy": "Te zwaar voor dit gat (max. sprongmassa {{max}})"
+  },
+  "errorScreen": {
+    "title": "Er ging iets mis",
+    "hint": "Nexum liep tegen een fout aan en is gestopt. Herlaad om verder te gaan. Kopieer de details en stuur ze ons om het te melden.",
+    "reload": "Herladen",
+    "copy": "Foutdetails kopiëren"
+  },
+  "exportSystems": {
+    "title": "Systemen exporteren",
+    "format": "Formaat",
+    "formats": {
+      "csv": "CSV",
+      "tsv": "Tab-gescheiden",
+      "json": "JSON"
+    },
+    "skipLocked": "Vergrendelde systemen weglaten ({{count}})",
+    "summary": "Systemen: {{systems}}. Rijen: {{rows}}, één per signature.",
+    "loading": "Systemen laden…",
+    "loadFailed": "Kon de systemen niet laden.",
+    "copy": "Kopiëren",
+    "save": "Bestand opslaan",
+    "copied": "Gekopieerd naar het klembord.",
+    "copyFailed": "Kon niet naar het klembord kopiëren."
+  },
+  "groupMeaning": {
+    "map": "De kaart",
+    "chain": "Een opgeslagen keten",
+    "title": "Groep betekent",
+    "label": "Een label"
+  },
+  "importSystems": {
+    "title": "Systemen importeren",
+    "intro": "Plak rijen of open een CSV- of tab-gescheiden bestand met een kopregel. Kolommen: group, system, signature, sig-type, name, to-system, from-type, to-type, size, mass-remaining, life-remaining. Alleen system is nodig. Systemen die deze kaart al heeft blijven zoals ze zijn; alleen wat ontbreekt wordt toegevoegd.",
+    "paste": "Rijen",
+    "openFile": "Bestand openen…",
+    "meaningHint": {
+      "map": "De groep is alleen een notitie: er gebeurt niets mee.",
+      "chain": "Elke groep waarvan de gaten één pad vormen wordt opgeslagen als keten met de naam van de groep.",
+      "label": "Elke groep komt als eigen tekstlabel op zijn systemen (tot drie per systeem)."
+    },
+    "noHeader": "Geen kopregel met een kolom \"system\".",
+    "lookupFailed": "Kon de systeemnamen niet opzoeken. Probeer het opnieuw.",
+    "checking": "Systeemnamen controleren…",
+    "summary": "Klaar: {{good}} rijen. Weggelaten met problemen: {{bad}}.",
+    "col": {
+      "system": "Systeem",
+      "signature": "Signature",
+      "toSystem": "Naar systeem",
+      "check": "Controle"
+    },
+    "rowOk": "OK",
+    "error": {
+      "noSystem": "Geen systeem.",
+      "unknownSystem": "Geen EVE-systeem.",
+      "badSignature": "De signature moet eruitzien als ABC-123.",
+      "badSigType": "Onbekend signature-type.",
+      "whOnly": "Gatgegevens bij een signature die geen wormhole is.",
+      "unknownToSystem": "Het doelsysteem is geen EVE-systeem.",
+      "sameSystem": "Een gat kan niet naar zijn eigen systeem leiden.",
+      "badType": "Geen wormhole-type.",
+      "bothK162": "Beide uiteinden kunnen geen K162 zijn.",
+      "badSize": "Grootte moet S, M, L of XL zijn.",
+      "sizeMismatch": "Die grootte past niet bij het gattype.",
+      "badMass": "Massa moet 100, 50 of 10 zijn.",
+      "badLife": "Levensduur moet 48, 24, 4, 1 of 0 zijn."
+    },
+    "notPaths": "Niet als keten opgeslagen, omdat hun gaten geen pad vormen: {{groups}}",
+    "import": "Importeren ({{count}})",
+    "importing": "Importeren…",
+    "done": "Geïmporteerd. Nieuwe systemen: {{systems}}, verbindingen: {{connections}}, signatures: {{signatures}}, labels: {{labels}}, ketens: {{chains}}.",
+    "failed": "Kon de systemen niet importeren.",
+    "fileTooBig": "Dat bestand is te groot (maximaal 2 MB).",
+    "fileFailed": "Kon dat bestand niet lezen."
+  },
+  "chainNumber": {
+    "toggle": "Keten nummeren vanaf home (L+1)",
+    "hint": "Elk systeem krijgt een nummer bij de eerste wormhole-sprong erin: 1, 2, 3 vanaf home, 51, 52 vanaf 5, enzovoort. Bookmarks van gaten beginnen met het nummer van waar ze heen gaan, zodat ze in EVE op ketenvolgorde staan. Een nummer verandert nooit en wordt nooit twee keer gebruikt.",
+    "set": "Ketennummer instellen…",
+    "setTitle": "Ketennummer",
+    "setMessage": "Ketennummer voor {{name}}. Laat leeg om het te wissen.",
+    "invalid": "Een ketennummer bestaat alleen uit cijfers, zoals 51, met een punt voor elk deel boven 9, zoals 5.10."
   }
 }

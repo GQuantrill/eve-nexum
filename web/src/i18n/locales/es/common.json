@@ -554,12 +554,14 @@
       "system": {
         "add": "añadió {{subject}}",
         "update": "cambió {{subject}}",
-        "remove": "eliminó {{subject}}"
+        "remove": "eliminó {{subject}}",
+        "restore": "restauró {{subject}}"
       },
       "connection": {
         "add": "conectó {{subject}}",
         "update": "cambió {{subject}}",
-        "remove": "desconectó {{subject}}"
+        "remove": "desconectó {{subject}}",
+        "restore": "volvió a conectar {{subject}}"
       },
       "signature": {
         "add": "añadió la firma {{subject}}",
@@ -584,7 +586,8 @@
       "map": {
         "update": "cambió los ajustes del mapa",
         "merge": "fusionó {{subject}}",
-        "scoutCleanup": "limpió los agujeros de {{subject}}"
+        "scoutCleanup": "limpió los agujeros de {{subject}}",
+        "paste": "pegó sistemas de {{subject}}"
       },
       "share": {
         "add": "compartió el mapa con {{subject}}",
@@ -814,7 +817,9 @@
     "restoreTitle": "Quitar la marca de rota y volver a tratarla como una conexión activa",
     "gateNote": "Stargate normal — sin datos de agujero de gusano.",
     "gateProtected": "Las conexiones por stargate existen en el juego y no se pueden eliminar ni cambiar.",
-    "jumpgateNote": "Puente Ansiblex — sin datos de agujero de gusano."
+    "jumpgateNote": "Puente Ansiblex — sin datos de agujero de gusano.",
+    "massUsedLabel": "Usada",
+    "massUsedTitle": "Masa que ya ha pasado, en millones de kg. Escríbela si la sabes (por ejemplo, por el registro de saltos); la calculadora sigue desde ahí."
   },
   "contentFilter": {
     "hint": "Resalta sistemas por su contenido escaneado. Elige tipos de firma o anomalía, o busca el nombre de un sitio; los sistemas que coinciden permanecen iluminados y el resto se atenúa.",
@@ -943,7 +948,19 @@
     "jumpRangeFrom": "Alcance de salto desde aquí",
     "jumpCyno": "Salto cyno",
     "jumpRangeClear": "Borrar alcance de salto",
-    "copyName": "Copiar nombre del sistema"
+    "copyName": "Copiar nombre del sistema",
+    "copySystems": "Copiar sistemas ({{count}})",
+    "copiedSystems": "Sistemas copiados: {{count}}. Pégalos en otro mapa con Ctrl+V.",
+    "copySystemsFailed": "No se pudieron copiar los sistemas.",
+    "pasteSystems": "Pegar sistemas",
+    "pastedSystems": "Pegado. Sistemas añadidos: {{systems}}, conexiones: {{connections}}, firmas: {{signatures}}.",
+    "pastedNothing": "Nada que añadir: este mapa ya tiene todo lo que pegaste.",
+    "pasteSystemsFailed": "No se pudieron pegar los sistemas.",
+    "pasteSystemsNoRights": "Tu rol no puede añadir sistemas a este mapa.",
+    "pasteUseKeys": "Tu navegador no deja que nexum lea el portapapeles. Pulsa Ctrl+V (Cmd+V en Mac) sobre el mapa.",
+    "pasteNoSystems": "No hay sistemas copiados en el portapapeles. Primero haz clic derecho en sistemas y elige Copiar sistemas.",
+    "exportSystems": "Exportar sistemas ({{count}})…",
+    "importSystems": "Importar sistemas…"
   },
   "customIntel": {
     "title": "Intel personalizada",
@@ -1632,6 +1649,10 @@
         "q": "¿Están seguros mis datos?",
         "a": "Nexum nunca ve tu contraseña de EVE — la autenticación la gestiona por completo el EVE SSO de CCP. Lo único que se almacena es la identidad de tu personaje y los mapas que construyes. Los datos de tus mapas viven en una base de datos privada y no se comparten con nadie. Dicho esto, no uses Nexum para la ruta de invasión ultrasecreta de tu alianza — ninguna herramienta de internet sustituye a una buena seguridad operacional."
       },
+      "clipboard": {
+        "q": "¿La aplicación de escritorio lee mi portapapeles?",
+        "a": "Solo si activas «Pegar escaneos desde el portapapeles» en la aplicación de escritorio. Viene desactivado, y la web solo ve lo que tú mismo pegas en ella. Aun así, solo cuenta lo copiado en EVE: la aplicación comprueba que EVE era la ventana en primer plano, así que nunca se usa nada que copies en un navegador, una aplicación de chat o un monedero de criptomonedas (en Windows ni siquiera se lee). De una copia hecha en EVE solo toma resultados del escáner de sondas y d-scans; el resto se descarta al momento, sin guardarse ni enviarse. La aplicación nunca cambia tu portapapeles. Lo único que Nexum pone ahí es el nuevo nombre del marcador de un agujero de gusano tras un salto, listo para pegar en el juego. Así que si alguna vez una dirección de monedero que pegas sale distinta, es malware en tu PC, no Nexum: hazlo revisar."
+      },
       "reportBugs": {
         "q": "¿Puedo reportar bugs, dar comentarios y pedir funciones?",
         "a": "Por supuesto. El proyecto es de código abierto en <gh>GitHub</gh> — abre un issue para bugs o peticiones de funciones, o envía un pull request si te sientes valiente. Los comentarios por correo en el juego al personaje vinculado a esta cuenta también funcionan si GitHub no es lo tuyo."
@@ -1654,7 +1675,7 @@
       }
     },
     "footer": "EVE Online y el logotipo de EVE son marcas registradas de CCP hf. Todos los derechos reservados en todo el mundo. Nexum es una herramienta de terceros y no está afiliada a CCP hf ni cuenta con su respaldo. · <license>Aviso de licencia y de PI de EVE</license>",
-    "desktopBody": "Nexum también funciona como aplicación de escritorio para Windows, macOS y Linux. Es el mismo Nexum, con tu sesión, mapas y ajustes, más funciones que un navegador no puede ofrecer: la aplicación lee los archivos de log de EVE en tu ordenador y se mantiene por encima del juego. Todo lo de esta sección necesita la aplicación; todo lo anterior funciona en ambos.",
+    "desktopBody": "Nexum también funciona como aplicación de escritorio para Windows y Linux. Es el mismo Nexum, con tu sesión, mapas y ajustes, más funciones que un navegador no puede ofrecer: la aplicación lee los archivos de log de EVE en tu ordenador y se mantiene por encima del juego. Todo lo de esta sección necesita la aplicación; todo lo anterior funciona en ambos.",
     "desktopFeatures": {
       "logJumps": {
         "title": "Seguimiento de saltos al instante",
@@ -1674,7 +1695,7 @@
       },
       "scanPaste": {
         "title": "Pegar escaneos",
-        "desc": "Copia resultados del escáner de sondas en EVE y llegan al sistema seleccionado; copia un d-scan y se abre en el analizador. Sin alt-tab. Desactivado hasta que lo actives."
+        "desc": "Copia resultados del escáner de sondas en EVE y llegan al sistema seleccionado; copia un d-scan y se abre en el analizador. Sin alt-tab. Desactivado hasta que lo actives. Solo toma lo que copias en el cliente de EVE: lo que copies en otra aplicación (navegador, chat, gestor de contraseñas, monedero) se ignora, lo que no sea un escaneo se descarta sin guardarse ni enviarse, y la aplicación nunca cambia tu portapapeles."
       },
       "onTop": {
         "title": "Siempre visible",
@@ -1694,12 +1715,17 @@
       }
     },
     "desktopSoon": "Próximamente",
-    "desktopSoonBody": "La aplicación de escritorio de Nexum para Windows, macOS y Linux: seguimiento de saltos al instante desde los logs de EVE, canales de intel en tu mapa, alertas de amenaza y más.",
+    "desktopSoonBody": "La aplicación de escritorio de Nexum para Windows y Linux: seguimiento de saltos al instante desde los logs de EVE, canales de intel en tu mapa, alertas de amenaza y más.",
     "desktopSoonLink": "Ver lo que añade",
     "desktopOut": "Ya disponible",
     "desktopDownloadLink": "Descargar",
     "desktopMacNote": "macOS: la aplicación aún no está firmada; tras instalarla, ejecuta esto una vez en Terminal:",
-    "desktopAllDownloads": "Todas las descargas (.msi, .deb, .rpm) y notas de versión"
+    "desktopAllDownloads": "Todas las descargas (.deb, .rpm) y notas de versión",
+    "desktopWinNote": "Windows: el botón abre Nexum en Microsoft Store, que lo instala sin avisos y lo mantiene al día.",
+    "desktopHeroTitle": "Nexum ya es una aplicación de escritorio",
+    "desktopHeroBody": "Un gran salto para la exploración: tus saltos registrados al instante desde los propios logs de EVE, tus canales de intel en el mapa, alertas de amenazas con sonido y voz, un overlay sobre el juego y los escaneos pegados en cuanto los copias. Gratis, para Windows y Linux.",
+    "desktopHeroMore": "Ver todo lo que añade",
+    "desktopWinInstaller": "O descarga el instalador (sin firmar: Windows puede decir que protegió tu PC; elige Más información y luego Ejecutar de todas formas)."
   },
   "language": {
     "label": "Idioma"
@@ -1716,7 +1742,9 @@
     "lessThan24h": "< 24h",
     "lessThan4h": "< 4 h",
     "lessThan1h": "< 1 h",
-    "broken": "Conexión rota — la firma de agujero de gusano fue eliminada (agujero colapsado)"
+    "broken": "Conexión rota — la firma de agujero de gusano fue eliminada (agujero colapsado)",
+    "showInfo": "Mostrar la info de esta conexión",
+    "hideInfo": "Clic para plegar"
   },
   "mapKey": {
     "title": "Leyenda del mapa",
@@ -2149,7 +2177,12 @@
       "normal": "Normal",
       "strong": "Fuerte"
     },
-    "resetColor": "Restablecer"
+    "resetColor": "Restablecer",
+    "connInfo": "Info de conexiones",
+    "connInfoFull": "Siempre visible",
+    "connInfoFolded": "Plegada",
+    "importSystemsTitle": "Añadir sistemas a este mapa desde filas CSV o separadas por tabulaciones",
+    "importSystems": "↑ Importar sistemas desde CSV"
   },
   "mass": {
     "billionKg": "{{value}} mil M kg",
@@ -2865,5 +2898,123 @@
     "sub": "Puedes cambiarlo, elegir una voz y decidir qué eventos se anuncian en cualquier momento en la sección {{section}} de la barra lateral.",
     "noThanks": "No, gracias",
     "enable": "Activar"
+  },
+  "offMap": {
+    "title": "{{system}} no está en este mapa",
+    "kspaceMap": "Los administradores de este mapa lo han configurado para no registrar sistemas de high, low o null-sec mientras vuelas.",
+    "kspaceYou": "Tu ajuste \"No seguir el K-space\" está activado, así que no se registran sistemas de high, low ni null-sec.",
+    "trackingOff": "El seguimiento de saltos está desactivado, así que los sistemas a los que vuelas no se añaden.",
+    "readOnly": "Puedes ver este mapa pero no añadir nada.",
+    "locked": "Este mapa está bloqueado, así que no se le añade nada.",
+    "add": "Añadir al mapa",
+    "hide": "Ocultar"
+  },
+  "scanPaste": {
+    "otherCharacter": "Escaneo no pegado: solo se usan los escaneos copiados en la ventana de EVE de {{name}} (ajustes de la aplicación Nexum)."
+  },
+  "rollPlan": {
+    "title": "Plan de pasadas",
+    "addShip": "Añadir una nave",
+    "myRoller": "Mi roller: {{name}} ({{cold}}/{{hot}})",
+    "removeShip": "Quitar {{name}}",
+    "ship": "Nave",
+    "toggleHeat": "Cambiar entre frío y caliente",
+    "out": "ida",
+    "back": "vuelta",
+    "flown": "hecha",
+    "removePass": "Quitar esta pasada",
+    "outcome": {
+      "safe": "Masa usada tras esta pasada. El agujero no puede cerrarse en ella.",
+      "risky": "Masa usada tras esta pasada. El agujero podría cerrarse en ella.",
+      "collapse": "Masa usada tras esta pasada. El agujero se cierra en ella."
+    },
+    "strands": "La pasada {{n}} podría cerrar el agujero con {{ship}} al otro lado.",
+    "addPass": "Añadir pasada",
+    "flyNext": "Hacer la siguiente",
+    "flyNextTitle": "{{ship}} pasa: suma {{mass}} a la masa usada",
+    "undoFlown": "Deshacer la hecha",
+    "clear": "Vaciar el plan",
+    "tooHeavy": "Demasiado pesada para este agujero (salto máx. {{max}})"
+  },
+  "errorScreen": {
+    "title": "Algo salió mal",
+    "hint": "Nexum encontró un error y se detuvo. Recarga para continuar. Para informarlo, copia los detalles y envíanoslos.",
+    "reload": "Recargar",
+    "copy": "Copiar detalles del error"
+  },
+  "exportSystems": {
+    "title": "Exportar sistemas",
+    "format": "Formato",
+    "formats": {
+      "csv": "CSV",
+      "tsv": "Separado por tabulaciones",
+      "json": "JSON"
+    },
+    "skipLocked": "Excluir sistemas bloqueados ({{count}})",
+    "summary": "Sistemas: {{systems}}. Filas: {{rows}}, una por firma.",
+    "loading": "Cargando los sistemas…",
+    "loadFailed": "No se pudieron cargar los sistemas.",
+    "copy": "Copiar",
+    "save": "Guardar archivo",
+    "copied": "Copiado al portapapeles.",
+    "copyFailed": "No se pudo copiar al portapapeles."
+  },
+  "groupMeaning": {
+    "map": "El mapa",
+    "chain": "Una cadena guardada",
+    "title": "El grupo es",
+    "label": "Una etiqueta"
+  },
+  "importSystems": {
+    "title": "Importar sistemas",
+    "intro": "Pega filas o abre un archivo CSV o separado por tabulaciones, con una línea de encabezado. Columnas: group, system, signature, sig-type, name, to-system, from-type, to-type, size, mass-remaining, life-remaining. Solo system es obligatoria. Los sistemas que este mapa ya tiene quedan como están; solo se añade lo que falta.",
+    "paste": "Filas",
+    "openFile": "Abrir un archivo…",
+    "meaningHint": {
+      "map": "El grupo es solo una nota: no se hace nada con él.",
+      "chain": "Cada grupo cuyos agujeros forman un solo camino se guarda como cadena con el nombre del grupo.",
+      "label": "Cada grupo se pone en sus sistemas como etiqueta de texto personalizada (hasta tres por sistema)."
+    },
+    "noHeader": "No hay línea de encabezado con una columna \"system\".",
+    "lookupFailed": "No se pudieron buscar los nombres de sistema. Inténtalo de nuevo.",
+    "checking": "Comprobando los nombres de sistema…",
+    "summary": "Listo: {{good}} filas. Excluidas por problemas: {{bad}}.",
+    "col": {
+      "system": "Sistema",
+      "signature": "Firma",
+      "toSystem": "Hacia sistema",
+      "check": "Comprobación"
+    },
+    "rowOk": "OK",
+    "error": {
+      "noSystem": "Sin sistema.",
+      "unknownSystem": "No es un sistema de EVE.",
+      "badSignature": "La firma debe tener la forma ABC-123.",
+      "badSigType": "Tipo de firma desconocido.",
+      "whOnly": "Datos de agujero en una firma que no es un agujero de gusano.",
+      "unknownToSystem": "El sistema de destino no es un sistema de EVE.",
+      "sameSystem": "Un agujero no puede llevar a su propio sistema.",
+      "badType": "No es un tipo de agujero de gusano.",
+      "bothK162": "Los dos extremos no pueden ser K162.",
+      "badSize": "El tamaño debe ser S, M, L o XL.",
+      "sizeMismatch": "Ese tamaño no encaja con el tipo de agujero.",
+      "badMass": "La masa debe ser 100, 50 o 10.",
+      "badLife": "La vida debe ser 48, 24, 4, 1 o 0."
+    },
+    "notPaths": "No se guardaron como cadenas porque sus agujeros no forman un solo camino: {{groups}}",
+    "import": "Importar ({{count}})",
+    "importing": "Importando…",
+    "done": "Importado. Sistemas añadidos: {{systems}}, conexiones: {{connections}}, firmas: {{signatures}}, etiquetas: {{labels}}, cadenas: {{chains}}.",
+    "failed": "No se pudieron importar los sistemas.",
+    "fileTooBig": "Ese archivo es demasiado grande (2 MB como máximo).",
+    "fileFailed": "No se pudo leer ese archivo."
+  },
+  "chainNumber": {
+    "toggle": "Numerar la cadena desde home (L+1)",
+    "hint": "Cada sistema recibe un número en el primer salto por agujero de gusano hacia él: 1, 2, 3 desde home, 51, 52 desde 5, etc. Los marcadores de agujeros empiezan por el número de su destino, así quedan en el orden de la cadena en EVE. Un número nunca cambia ni se repite.",
+    "set": "Poner número de cadena…",
+    "setTitle": "Número de cadena",
+    "setMessage": "Número de cadena para {{name}}. Déjalo vacío para quitarlo.",
+    "invalid": "Un número de cadena solo tiene dígitos, como 51, con un punto antes de cualquier parte mayor de 9, como 5.10."
   }
 }
