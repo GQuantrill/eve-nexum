@@ -21,7 +21,7 @@ import {
 import { apiUrl } from '../../api/client';
 import { loginUrl, useScopeOptions } from '../../api/scopeOptions';
 import { useScopePickerStore } from '../../store/scopePickerStore';
-import { DISCORD_INVITE_URL, DESKTOP_AVAILABLE, DESKTOP_MAC_AVAILABLE, DESKTOP_DOWNLOADS } from '../../data/links';
+import { DISCORD_INVITE_URL, DESKTOP_AVAILABLE, DESKTOP_MAC_AVAILABLE, DESKTOP_DOWNLOADS, DESKTOP_STORE_URL } from '../../data/links';
 import { SUPPORTED_LANGUAGES, LANGUAGE_NAMES } from '../../i18n';
 import { DemoMap } from './DemoMap';
 import { LanguageSwitcher } from './LanguageSwitcher';
@@ -412,7 +412,7 @@ export function LandingPage() {
             </div>
             <div className="landing__desktop-hero-actions">
               <div className="landing__download-btns">
-                <a className="landing__download" href={DESKTOP_DOWNLOADS.windows}>
+                <a className="landing__download" href={DESKTOP_STORE_URL} target="_blank" rel="noopener noreferrer">
                   <WindowsLogoIcon size="1.2em" weight="fill" /> Windows
                 </a>
                 <a className="landing__download" href={DESKTOP_DOWNLOADS.linux}>
@@ -573,7 +573,7 @@ export function LandingPage() {
           {DESKTOP_AVAILABLE && (
             <div className="landing__downloads">
               <div className="landing__download-btns">
-                <a className="landing__download" href={DESKTOP_DOWNLOADS.windows}>
+                <a className="landing__download" href={DESKTOP_STORE_URL} target="_blank" rel="noopener noreferrer">
                   <WindowsLogoIcon size="1.2em" weight="fill" /> Windows
                 </a>
                 {/* No macOS button at all until there is a macOS build. */}
@@ -586,9 +586,13 @@ export function LandingPage() {
                   <LinuxLogoIcon size="1.2em" weight="fill" /> Linux
                 </a>
               </div>
-              {/* The direct Windows installer isn't code-signed (the Store copy
-                  will be), so SmartScreen warns on first run. */}
-              <p className="landing__download-note">{t('landing.desktopWinNote')}</p>
+              {/* Windows goes to the Microsoft Store (signed, updated by the
+                  Store). The direct installer stays for those without the
+                  Store; it isn't code-signed, so SmartScreen warns on first run. */}
+              <p className="landing__download-note">
+                {t('landing.desktopWinNote')}{' '}
+                <a href={DESKTOP_DOWNLOADS.windows}>{t('landing.desktopWinInstaller')}</a>
+              </p>
               {DESKTOP_MAC_AVAILABLE && (
                 <p className="landing__download-note">
                   {t('landing.desktopMacNote')}{' '}

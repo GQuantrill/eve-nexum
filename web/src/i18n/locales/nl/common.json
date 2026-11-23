@@ -1721,10 +1721,11 @@
     "desktopDownloadLink": "Downloaden",
     "desktopMacNote": "macOS: de app is nog niet ondertekend, dus voer na installatie één keer dit uit in Terminal:",
     "desktopAllDownloads": "Alle downloads (.deb, .rpm) en release-opmerkingen",
-    "desktopWinNote": "Windows: het installatieprogramma is nog niet ondertekend, dus Windows kan melden dat het je pc heeft beschermd. Kies Meer informatie en daarna Toch uitvoeren. Een versie in de Microsoft Store komt heel binnenkort: die ligt nu bij Microsoft ter certificering en installeert zonder deze waarschuwing.",
+    "desktopWinNote": "Windows: de knop opent Nexum in de Microsoft Store, die het zonder waarschuwing installeert en up-to-date houdt.",
     "desktopHeroTitle": "Nexum is nu een desktop-app",
     "desktopHeroBody": "Een enorme stap voor verkenning: je sprongen vastgelegd uit de eigen logs van EVE zodra ze gebeuren, je intelkanalen op de kaart, dreigingsmeldingen met geluid en stem, een overlay boven het spel, en scans die geplakt worden zodra je ze kopieert. Gratis, voor Windows en Linux.",
-    "desktopHeroMore": "Bekijk alles wat ze toevoegt"
+    "desktopHeroMore": "Bekijk alles wat ze toevoegt",
+    "desktopWinInstaller": "Of download het installatieprogramma (niet ondertekend: Windows kan zeggen dat het je pc heeft beschermd; kies Meer informatie, dan Toch uitvoeren)."
   },
   "language": {
     "label": "Taal"
