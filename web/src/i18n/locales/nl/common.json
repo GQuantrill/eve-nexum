@@ -2180,7 +2180,8 @@
     "connInfo": "Verbindingsinfo",
     "connInfoFull": "Altijd tonen",
     "connInfoFolded": "Ingeklapt",
-    "importSystemsTitle": "Systemen aan deze kaart toevoegen uit CSV- of tab-gescheiden regels"
+    "importSystemsTitle": "Systemen aan deze kaart toevoegen uit CSV- of tab-gescheiden regels",
+    "importSystems": "↑ Systemen importeren uit CSV"
   },
   "mass": {
     "billionKg": "{{value}} mld kg",

@@ -2180,7 +2180,8 @@
     "connInfo": "Infos des connexions",
     "connInfoFull": "Toujours affichées",
     "connInfoFolded": "Repliées",
-    "importSystemsTitle": "Ajouter des systèmes à cette carte depuis des lignes CSV ou séparées par des tabulations"
+    "importSystemsTitle": "Ajouter des systèmes à cette carte depuis des lignes CSV ou séparées par des tabulations",
+    "importSystems": "↑ Importer des systèmes depuis CSV"
   },
   "mass": {
     "billionKg": "{{value}} Md kg",

@@ -2180,7 +2180,8 @@
     "connInfo": "Connection info",
     "connInfoFull": "Always shown",
     "connInfoFolded": "Folded",
-    "importSystemsTitle": "Add systems to this map from CSV or tab-separated rows"
+    "importSystemsTitle": "Add systems to this map from CSV or tab-separated rows",
+    "importSystems": "↑ Import systems from CSV"
   },
   "mass": {
     "billionKg": "{{value}} B kg",

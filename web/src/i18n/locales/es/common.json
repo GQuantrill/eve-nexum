@@ -2180,7 +2180,8 @@
     "connInfo": "Info de conexiones",
     "connInfoFull": "Siempre visible",
     "connInfoFolded": "Plegada",
-    "importSystemsTitle": "Añadir sistemas a este mapa desde filas CSV o separadas por tabulaciones"
+    "importSystemsTitle": "Añadir sistemas a este mapa desde filas CSV o separadas por tabulaciones",
+    "importSystems": "↑ Importar sistemas desde CSV"
   },
   "mass": {
     "billionKg": "{{value}} mil M kg",

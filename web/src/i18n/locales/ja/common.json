@@ -2180,7 +2180,8 @@
     "connInfo": "接続の情報",
     "connInfoFull": "常に表示",
     "connInfoFolded": "折りたたむ",
-    "importSystemsTitle": "CSV またはタブ区切りの行からこのマップに星系を追加"
+    "importSystemsTitle": "CSV またはタブ区切りの行からこのマップに星系を追加",
+    "importSystems": "↑ CSV から星系をインポート"
   },
   "mass": {
     "billionKg": "{{value}}十億 kg",

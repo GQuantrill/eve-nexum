@@ -2029,7 +2029,7 @@ export function MapSidebar() {
                 onClick={() => setImportSystemsOpen(true)}
                 title={t("mapSidebar.importSystemsTitle")}
               >
-                {t("ctxMenu.importSystems")}
+                {t("mapSidebar.importSystems")}
               </button>
 
               <button className="map-sidebar__action" onClick={handleExport}>

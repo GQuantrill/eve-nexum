@@ -2180,7 +2180,8 @@
     "connInfo": "연결 정보",
     "connInfoFull": "항상 표시",
     "connInfoFolded": "접기",
-    "importSystemsTitle": "CSV 또는 탭으로 구분된 행에서 이 지도에 성계 추가"
+    "importSystemsTitle": "CSV 또는 탭으로 구분된 행에서 이 지도에 성계 추가",
+    "importSystems": "↑ CSV에서 성계 가져오기"
   },
   "mass": {
     "billionKg": "{{value}}십억 kg",

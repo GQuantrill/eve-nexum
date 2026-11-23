@@ -2204,7 +2204,8 @@
     "connInfo": "Информация о связях",
     "connInfoFull": "Всегда показывать",
     "connInfoFolded": "Свёрнута",
-    "importSystemsTitle": "Добавить системы на эту карту из строк CSV или с разделителями-табуляциями"
+    "importSystemsTitle": "Добавить системы на эту карту из строк CSV или с разделителями-табуляциями",
+    "importSystems": "↑ Импорт систем из CSV"
   },
   "mass": {
     "billionKg": "{{value}} млрд кг",

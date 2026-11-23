@@ -2180,7 +2180,8 @@
     "connInfo": "Verbindungsinfos",
     "connInfoFull": "Immer anzeigen",
     "connInfoFolded": "Eingeklappt",
-    "importSystemsTitle": "Systeme aus CSV- oder tabulatorgetrennten Zeilen zu dieser Karte hinzufügen"
+    "importSystemsTitle": "Systeme aus CSV- oder tabulatorgetrennten Zeilen zu dieser Karte hinzufügen",
+    "importSystems": "↑ Systeme aus CSV importieren"
   },
   "mass": {
     "billionKg": "{{value}} Mrd. kg",
