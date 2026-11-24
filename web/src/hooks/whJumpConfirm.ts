@@ -11,7 +11,9 @@ import {
   formatBookmarkName, DEFAULT_BOOKMARK_FORMAT, K162_BOOKMARK_FORMAT_KEY, wormholeBookmarkFormat,
 } from '../utils/signatureBookmark';
 import { copyWhenFocused } from '../utils/copyWhenFocused';
-import { chainNumberSettled, forwardChainLabel, withChain } from '../utils/chainNumber';
+import {
+  chainNumberSettled, forwardChainLabel, withChain, settleChainNumber, parentLabel, isChildLabel,
+} from '../utils/chainNumber';
 
 export const COPY_BOOKMARK_ON_JUMP = 'nexum.sig.copyBookmarkOnJump';
 
@@ -23,16 +25,19 @@ async function copyJumpedBookmark(sig: Signature, fromMapSystemId: string): Prom
   if (!readUserSetting<boolean>(COPY_BOOKMARK_ON_JUMP, true)) return;
   const byName = (n: string) => useMapStore.getState().map.systems
     .find((s) => s.name?.trim().toUpperCase() === n.trim().toUpperCase());
-  // A chain number for the system just reached may still be on its way.
+  // A number reserved on this hole before the jump is the arrival's number.
+  const from = useMapStore.getState().map.systems.find((s) => s.id === fromMapSystemId);
+  const parent = parentLabel(from);
+  const reserved = sig.chainLabel && parent != null && isChildLabel(parent, sig.chainLabel) ? sig.chainLabel : '';
+  // Otherwise a chain number for the system just reached may still be on its way.
   const arrival = byName(sig.whLeadsTo ?? '');
-  if (arrival && useMapStore.getState().map.chainNumbering) await chainNumberSettled(arrival.id);
+  if (!reserved && arrival && useMapStore.getState().map.chainNumbering) await chainNumberSettled(arrival.id);
   const map = useMapStore.getState().map;
   const format = withChain(wormholeBookmarkFormat(sig, map.bookmarkFormat,
     readUserSetting<string>('nexum.sig.bookmarkFormat', DEFAULT_BOOKMARK_FORMAT),
     readUserSetting<string>(K162_BOOKMARK_FORMAT_KEY, '')), map.chainNumbering);
-  const chain = map.chainNumbering
-    ? forwardChainLabel(map.systems.find((s) => s.id === fromMapSystemId), byName(sig.whLeadsTo ?? ''))
-    : '';
+  const chain = !map.chainNumbering ? ''
+    : reserved || forwardChainLabel(map.systems.find((s) => s.id === fromMapSystemId), byName(sig.whLeadsTo ?? ''));
   const name = formatBookmarkName(format, sig, wormholeTypesSnapshot(), Date.now(),
     (n) => { const c = byName(n)?.systemClass; return c && c !== 'unknown' ? c : null; },
     (n) => byName(n)?.alias?.trim() || null, chain);
@@ -72,16 +77,29 @@ export interface WhJumpContext {
   toClass:         string;        // arrival system's class, e.g. 'C3'
   toName:          string;        // arrival system's name, e.g. 'J203753' — what we pin the hole to
   connId:          string | null; // the connection the jump traversed
+  /** The arrival's map system id: its chain number may wait for the hole
+   *  jumped to be known (utils/chainNumber.ts settleChainNumber). */
+  toMapSystemId?:  string;
 }
 
 export async function maybeConfirmWhJump(ctx: WhJumpContext): Promise<void> {
+  // Nothing filled or asked: the jumped hole won't be known, so a chain number
+  // waiting for it goes ahead now.
+  const settle = () => { if (ctx.toMapSystemId) settleChainNumber(ctx.toMapSystemId); };
+  const asked = await confirmWhJump(ctx, settle).catch(() => false);
+  if (!asked) settle();
+}
+
+// True when it filled a hole or asked the pilot which one; those settle the
+// chain number themselves, once the answer is written.
+async function confirmWhJump(ctx: WhJumpContext, settle: () => void): Promise<boolean> {
   const { mapId, fromMapSystemId, toEveSystemId, toClass, toName, connId } = ctx;
 
   let sigs: Signature[];
   try {
     sigs = await api<Signature[]>(`/api/maps/${mapId}/systems/${fromMapSystemId}/signatures`);
   } catch {
-    return;
+    return false;
   }
 
   // Already accounted for: a wormhole sig here is pinned to exactly where we
@@ -90,7 +108,7 @@ export async function maybeConfirmWhJump(ctx: WhJumpContext): Promise<void> {
   // is the "asked which sig on the way back even though one already leads home"
   // case.
   const arrived = toName.toUpperCase();
-  if (sigs.some((s) => s.sigType === 'wormhole' && (s.whLeadsTo || '').toUpperCase() === arrived)) return;
+  if (sigs.some((s) => s.sigType === 'wormhole' && (s.whLeadsTo || '').toUpperCase() === arrived)) return false;
 
   // Eligible = known wormhole sigs not yet pinned to a system, whose class is
   // compatible with where we arrived. Unknowns (non-wormhole) are never touched.
@@ -104,7 +122,7 @@ export async function maybeConfirmWhJump(ctx: WhJumpContext): Promise<void> {
   const unscanned = candidates.length === 0
     ? sigs.filter((s) => s.sigType === 'unknown' && !s.whLeadsTo && !!s.sigId)
     : [];
-  if (candidates.length === 0 && unscanned.length === 0) return;
+  if (candidates.length === 0 && unscanned.length === 0) return false;
 
   // Wormhole jump only. Use the connection's server gate classification — the
   // same map_stargates check that draws the 'G' badge, reliable now that gates
@@ -117,7 +135,7 @@ export async function maybeConfirmWhJump(ctx: WhJumpContext): Promise<void> {
     const ct = pending
       ? await pending
       : useMapStore.getState().map.connections.find((c) => c.id === connId)?.connectionType ?? 'standard';
-    if (ct !== 'standard') return;
+    if (ct !== 'standard') return false;
   }
 
   const t = i18n.t.bind(i18n);
@@ -138,7 +156,10 @@ export async function maybeConfirmWhJump(ctx: WhJumpContext): Promise<void> {
     api(`/api/maps/${mapId}/systems/${fromMapSystemId}/signatures/${s.id}`, {
       method: 'PATCH',
       body:   JSON.stringify(patch),
-    }).catch(() => { /* best-effort; the user can still set it by hand */ });
+    }).catch(() => { /* best-effort; the user can still set it by hand */ })
+      // The hole jumped is known now: number the arrival (a reserved number
+      // is already taken by the write above).
+      .finally(() => { if (value === toName) settle(); });
     const updated = sigs.map((x) => (x.id === s.id ? { ...x, ...patch } : x));
     reevaluateConnectionsForSystem(fromMapSystemId, updated, oldSig, false, undefined, s.id);
   };
@@ -156,7 +177,7 @@ export async function maybeConfirmWhJump(ctx: WhJumpContext): Promise<void> {
         { label: t('whJump.undo'), onClick: () => writeLeadsTo(sole, prev, { ...sole, whLeadsTo: toName }) },
       ],
     });
-    return;
+    return true;
   }
 
   toast.show(t('whJump.confirmMany', { system: toName }), {
@@ -166,7 +187,8 @@ export async function maybeConfirmWhJump(ctx: WhJumpContext): Promise<void> {
         writeLeadsTo(s, toName, s);
         void copyJumpedBookmark({ ...s, whLeadsTo: toName }, fromMapSystemId);
       } })),
-      { label: t('whJump.unmapped'), onClick: () => { /* skip */ } },
+      { label: t('whJump.unmapped'), onClick: settle },
     ],
   });
+  return true;
 }

@@ -1493,6 +1493,13 @@ export async function migrate() {
       last_index INTEGER NOT NULL,
       PRIMARY KEY (map_id, parent)
     );
+
+    -- A chain number reserved on a wormhole signature before anyone jumps it
+    -- (services/chainNumber.ts): the system it leads to takes this number when
+    -- it is jumped. Drawn from map_chain_counters, so never handed out twice.
+    -- Live for 48 hours; the full label, not just the index.
+    ALTER TABLE map_signatures ADD COLUMN IF NOT EXISTS chain_label       TEXT;
+    ALTER TABLE map_signatures ADD COLUMN IF NOT EXISTS chain_reserved_at TIMESTAMPTZ;
   `);
 
   await encryptLegacyTokens();

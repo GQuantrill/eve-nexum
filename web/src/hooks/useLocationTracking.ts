@@ -325,6 +325,7 @@ export function applyJump(
       toClass:         system.systemClass,
       toName:          system.name,
       connId:          jumpConnId,
+      toMapSystemId:   mapSystemId,
     });
     // Log this crossing for the jump log (wormhole connections only — the callback
     // itself gates on the connection's gate classification). Intel only.

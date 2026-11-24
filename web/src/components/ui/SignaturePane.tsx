@@ -1,4 +1,6 @@
-import { forwardChainLabel, withChain } from '../../utils/chainNumber';
+import {
+  withChain, sigChainState, numberAllOrder, reserveChainNumbers, clearChainReservation, type SigChainState,
+} from '../../utils/chainNumber';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
@@ -663,15 +665,20 @@ export function SignaturePane({ systemId }: { systemId: string }) {
     return m;
   }, [mapSystems]);
 
+  // L+1: what a wormhole row's bookmark button shows. The number of where the
+  // hole leads when it's a step further from home; else a number reserved on
+  // the hole before the jump; else +1 to reserve one (utils/chainNumber.ts).
+  const chainStateOf = useCallback((sig: Signature): SigChainState => {
+    const leadsTo = (sig.whLeadsTo ?? '').trim().toUpperCase();
+    return sigChainState(sig, mapSystems.find((x) => x.id === systemId),
+      leadsTo ? mapSystems.find((x) => x.name?.trim().toUpperCase() === leadsTo) : undefined, chainNumbering);
+  }, [mapSystems, systemId, chainNumbering]);
+
   const copyBookmark = useCallback((sig: Signature) => {
     const format = withChain(
       wormholeBookmarkFormat(sig, mapBookmarkFormat, userBookmarkFormat, userK162BookmarkFormat), chainNumbering);
-    // The number of where the hole leads, when it's a step further from home.
-    const leadsTo = (sig.whLeadsTo ?? '').trim().toUpperCase();
-    const chain = chainNumbering
-      ? forwardChainLabel(mapSystems.find((x) => x.id === systemId),
-          leadsTo ? mapSystems.find((x) => x.name?.trim().toUpperCase() === leadsTo) : undefined)
-      : '';
+    const state = chainStateOf(sig);
+    const chain = state.kind === 'number' ? state.label : '';
     const name = formatBookmarkName(format, sig, whTypes, Date.now(),
       (n) => classBySystemName.get(n.trim().toUpperCase()) ?? null,
       (n) => aliasBySystemName.get(n.trim().toUpperCase()) ?? null, chain);
@@ -680,7 +687,39 @@ export function SignaturePane({ systemId }: { systemId: string }) {
       .then(() => toast.success(t('signatures.bookmarkCopied', { name })))
       .catch(() => toast.error(t('signatures.bookmarkCopyFailed')));
   }, [mapBookmarkFormat, userBookmarkFormat, userK162BookmarkFormat, whTypes, classBySystemName, aliasBySystemName, t,
-      chainNumbering, mapSystems, systemId]);
+      chainNumbering, chainStateOf]);
+
+  // Put reserved numbers on the rows now; everyone else gets them by sig.changed.
+  const applyReserved = useCallback((reserved: { id: string; chainLabel: string | null }[]) => {
+    const by = new Map(reserved.map((r) => [r.id, r.chainLabel]));
+    setSigs((prev) => prev.map((s) => (by.has(s.id) ? { ...s, chainLabel: by.get(s.id) ?? null } : s)));
+  }, []);
+
+  // +1: reserve the next number on this hole, then copy its bookmark with it.
+  const reserveAndCopy = useCallback(async (sig: Signature) => {
+    if (!activeMapId) return;
+    try {
+      const reserved = await reserveChainNumbers(activeMapId, systemId, [sig.id]);
+      const mine = reserved.find((r) => r.id === sig.id);
+      if (!mine) { toast.error(t('signatures.chainReserveFailed')); return; }
+      applyReserved(reserved);
+      copyBookmark({ ...sig, chainLabel: mine.chainLabel });
+    } catch {
+      toast.error(t('signatures.chainReserveFailed'));
+    }
+  }, [activeMapId, systemId, applyReserved, copyBookmark, t]);
+
+  // Right-click a reserved number: give it back (the number isn't reused).
+  const clearReserved = useCallback(async (sig: Signature) => {
+    if (!activeMapId) return;
+    try {
+      await clearChainReservation(activeMapId, systemId, sig.id);
+      applyReserved([{ id: sig.id, chainLabel: null }]);
+      toast.success(t('signatures.chainCleared', { label: sig.chainLabel ?? '' }));
+    } catch {
+      toast.error(t('signatures.chainClearFailed'));
+    }
+  }, [activeMapId, systemId, applyReserved, t]);
 
   const copySiteBookmark = useCallback((sig: Signature) => {
     const name = formatSiteBookmarkName(siteBookmarkFormat, sig);
@@ -1174,6 +1213,25 @@ export function SignaturePane({ systemId }: { systemId: string }) {
     for (const id of selected) updateSig(id, { sigType: type });
   };
 
+  // Holes that can still take a reserved number (drafts aren't saved yet).
+  const unnumbered = useMemo(
+    () => sigs.filter((s) => !isDraft(s.id) && chainStateOf(s).kind === 'reserve'),
+    [sigs, chainStateOf]);
+
+  // Number all: every hole without a number, statics first, then by sig ID.
+  const numberAll = async () => {
+    if (!activeMapId || !unnumbered.length) return;
+    try {
+      const order = numberAllOrder(unnumbered, systemStatics).map((s) => s.id);
+      const reserved = await reserveChainNumbers(activeMapId, systemId, order);
+      applyReserved(reserved);
+      const fresh = reserved.filter((r) => order.includes(r.id)).length;
+      toast.success(t('signatures.chainNumberedAll', { count: fresh }));
+    } catch {
+      toast.error(t('signatures.chainReserveFailed'));
+    }
+  };
+
   const deleteAll = () => confirm(
     t('signatures.deleteAllConfirm', { count: sigsRef.current.length }),
     () => { for (const sig of sigsRef.current) deleteSig(sig.id); },
@@ -1263,6 +1321,11 @@ export function SignaturePane({ systemId }: { systemId: string }) {
       {canEdit && !isShareMode && (
         <div className="sig-pane__toolbar">
           <button className="sig-toolbar-btn" onClick={addSig} title={t('signatures.addSignature')}>{t('signatures.addSignature')}</button>
+          {unnumbered.length > 0 && (
+            <button className="sig-toolbar-btn" onClick={() => void numberAll()} data-tooltip={t('signatures.chainNumberAllHint')}>
+              {t('signatures.chainNumberAll')}
+            </button>
+          )}
           <label
             className={`sig-overwrite-toggle${overwriteOnPaste ? ' sig-overwrite-toggle--active' : ''}`}
             data-tooltip={t('signatures.overwriteTooltip')}
@@ -1642,15 +1705,44 @@ export function SignaturePane({ systemId }: { systemId: string }) {
                 {/* Dedicated bookmark column so the button aligns for every sig
                     type: wormholes use the WH format, all other sigs the site
                     format. */}
-                {!isShareMode && (
-                  <td className="sig-td--bookmark">
-                    <button
-                      className="icon-btn"
-                      onClick={() => (sig.sigType === 'wormhole' ? copyBookmark(sig) : copySiteBookmark(sig))}
-                      title={t('signatures.copyBookmark')}
-                    ><CopyIcon size={20} weight="bold" /></button>
-                  </td>
-                )}
+                {!isShareMode && (() => {
+                  // L+1 on: a wormhole row shows its chain number, or +1 to
+                  // reserve one before anyone jumps it.
+                  const chain = sig.sigType === 'wormhole' ? chainStateOf(sig) : { kind: 'none' as const };
+                  if (chain.kind === 'reserve' && canEdit && !isDraft(sig.id)) {
+                    return (
+                      <td className="sig-td--bookmark">
+                        <button
+                          className="icon-btn sig-chain-btn sig-chain-btn--reserve"
+                          onClick={() => void reserveAndCopy(sig)}
+                          data-tooltip={t('signatures.chainReserve')}
+                        >+1</button>
+                      </td>
+                    );
+                  }
+                  if (chain.kind === 'number') {
+                    const clearable = chain.reserved && canEdit;
+                    return (
+                      <td className="sig-td--bookmark">
+                        <button
+                          className="icon-btn sig-chain-btn"
+                          onClick={() => copyBookmark(sig)}
+                          onContextMenu={clearable ? (e) => { e.preventDefault(); void clearReserved(sig); } : undefined}
+                          data-tooltip={t(clearable ? 'signatures.chainReservedClear' : 'signatures.chainNumbered', { label: chain.label })}
+                        >{chain.label}</button>
+                      </td>
+                    );
+                  }
+                  return (
+                    <td className="sig-td--bookmark">
+                      <button
+                        className="icon-btn"
+                        onClick={() => (sig.sigType === 'wormhole' ? copyBookmark(sig) : copySiteBookmark(sig))}
+                        title={t('signatures.copyBookmark')}
+                      ><CopyIcon size={20} weight="bold" /></button>
+                    </td>
+                  );
+                })()}
                 {isColShown('name') && (
                   <td>
                     {isShareMode ? (
