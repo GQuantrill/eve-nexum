@@ -22,7 +22,7 @@ import { mapCapFor, countPersonalMaps, mapAllowanceFor } from '../services/mapAl
 import { parseMapBackup, restoreMapBackup, buildMapBackup, BackupError, MAX_BACKUP_SYSTEMS } from '../services/mapBackup.js';
 import { selectClip, pasteIntoMap, MAX_PASTE_CHAINS } from '../services/mapPaste.js';
 import {
-  assignChainNumber, reserveChainNumbers, clearChainReservation, dropStaleReservations,
+  assignChainNumber, reserveChainNumbers, clearChainReservation, dropStaleReservations, dropOrphanedChainNumbers,
   CHAIN_LABEL_RE, MAX_CHAIN_LABEL_LEN,
 } from '../services/chainNumber.js';
 import { resolveEntityNames } from '../services/entityNames.js';
@@ -3380,6 +3380,12 @@ mapsRouter.patch('/:mapId/systems/:systemId', async (req, res) => {
     : await requireMapWrite(res, mapId, req);
   if (!access) return;
 
+  // The number before a hand edit: what was beneath it goes if it changes.
+  const oldChain = 'chainLabel' in updates
+    ? (await db.query<{ label: string | null }>(
+        `SELECT chain_label AS label FROM map_systems WHERE id = $1 AND map_id = $2`, [systemId, mapId])).rows[0]?.label ?? null
+    : null;
+
   // Append last_activity_at = NOW() to mark this system as active.
   const { rows: updated } = await db.query<{ name: string; alias: string | null }>(
     `UPDATE map_systems SET ${sets.join(', ')}, last_activity_at = NOW() WHERE id = $${vals.length + 1} AND map_id = $${vals.length + 2}
@@ -3392,6 +3398,9 @@ mapsRouter.patch('/:mapId/systems/:systemId', async (req, res) => {
   if ('chainLabel' in updates && updated.length && (await dropStaleReservations(mapId, systemId))) {
     publishToMap(mapId, { type: 'sig.changed', actor: null, systemId });
   }
+  if ('chainLabel' in updates && updated.length && oldChain !== updates.chainLabel) {
+    await publishOrphanDrop(mapId, oldChain);
+  }
   // Moving a node isn't a change worth auditing; anything else on the row is.
   const changed = Object.keys(updates).filter((k) => k !== 'position');
   if (updated.length && changed.length) {
@@ -3400,19 +3409,26 @@ mapsRouter.patch('/:mapId/systems/:systemId', async (req, res) => {
   res.json({ ok: true });
 });
 
+/** Drop the chain numbers beneath one that's gone, and tell the map. */
+async function publishOrphanDrop(mapId: string, label: string | null): Promise<void> {
+  const { systems, sigSystems } = await dropOrphanedChainNumbers(mapId, label);
+  for (const id of systems) publishToMap(mapId, { type: 'system.update', actor: null, id, updates: { chainLabel: null } });
+  for (const systemId of sigSystems) publishToMap(mapId, { type: 'sig.changed', actor: null, systemId });
+}
+
 mapsRouter.delete('/:mapId/systems/:systemId', async (req, res) => {
   const { mapId, systemId } = req.params;
   const access = await requireMapWrite(res, mapId, req);
   if (!access) return;
   // Keep a copy of the system and everything the delete takes with it, so
   // undo can put all of it back (services/mapTrash.ts).
-  let removed: { name: string; alias: string | null }[] = [];
+  let removed: { name: string; alias: string | null; chainLabel: string | null }[] = [];
   const client = await db.connect();
   try {
     await client.query('BEGIN');
     if (UUID_RE.test(systemId)) await trashSystem(client, mapId, systemId, req.session.userId ?? null);
-    ({ rows: removed } = await client.query<{ name: string; alias: string | null }>(
-      `DELETE FROM map_systems WHERE id = $1 AND map_id = $2 RETURNING name, alias`, [systemId, mapId],
+    ({ rows: removed } = await client.query<{ name: string; alias: string | null; chainLabel: string | null }>(
+      `DELETE FROM map_systems WHERE id = $1 AND map_id = $2 RETURNING name, alias, chain_label AS "chainLabel"`, [systemId, mapId],
     ));
     await client.query('COMMIT');
   } catch (err) {
@@ -3427,6 +3443,7 @@ mapsRouter.delete('/:mapId/systems/:systemId', async (req, res) => {
       [req.session.userId, mapId],
     ).catch(console.error);
     publishToMap(mapId, { type: 'system.remove', actor: req.get('x-client-id') ?? null, id: systemId });
+    await publishOrphanDrop(mapId, removed[0].chainLabel);
     recordMapAudit(req, mapId, { action: 'system.remove', targetId: systemId, subject: systemLabel(removed[0]) });
   }
   await touchMap(mapId);

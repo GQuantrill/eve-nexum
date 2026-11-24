@@ -1,6 +1,7 @@
 import type { PoolClient } from 'pg';
 import { db } from '../db.js';
 import { CONNECTION_COLS } from './mapRead.js';
+import { RESERVATION_HOURS } from './chainNumber.js';
 
 // Recently deleted systems and connections.
 //
@@ -207,6 +208,29 @@ async function inTransaction<T>(fn: (client: PoolClient) => Promise<T>): Promise
   }
 }
 
+/** A chain number frees up once its system is gone (services/chainNumber.ts),
+ *  so while a system was in the trash its number, or one reserved on its
+ *  signatures, may have gone to another. The one put back loses it then, so
+ *  no two holes share a number. */
+async function dropReusedChainNumbers(client: PoolClient, mapId: string, systemId: string): Promise<void> {
+  await client.query(
+    `UPDATE map_systems y SET chain_label = NULL
+      WHERE y.id = $2 AND y.chain_label IS NOT NULL
+        AND EXISTS (SELECT 1 FROM map_systems z
+                     WHERE z.map_id = $1 AND z.id <> y.id AND z.chain_label = y.chain_label)`,
+    [mapId, systemId]);
+  await client.query(
+    `UPDATE map_signatures s SET chain_label = NULL, chain_reserved_at = NULL
+      WHERE s.system_id = $2 AND s.chain_label IS NOT NULL
+        AND (EXISTS (SELECT 1 FROM map_signatures t JOIN map_systems ty ON ty.id = t.system_id
+                      WHERE ty.map_id = $1 AND t.id <> s.id AND t.chain_label = s.chain_label
+                        AND t.chain_reserved_at > NOW() - interval '${RESERVATION_HOURS} hours')
+          OR EXISTS (SELECT 1 FROM map_systems z
+                      WHERE z.map_id = $1 AND z.chain_label = s.chain_label
+                        AND upper(trim(z.name)) IS DISTINCT FROM upper(trim(s.wh_leads_to))))`,
+    [mapId, systemId]);
+}
+
 /** Put a deleted system back with everything that went with it. Null when
  *  there's nothing to restore (expired, or not this pilot's deletion). */
 export function restoreSystem(mapId: string, systemId: string, userId: number): Promise<RestoredSystem | null> {
@@ -231,6 +255,7 @@ export function restoreSystem(mapId: string, systemId: string, userId: number): 
     await insertRows(client, 'map_structures', payload.structures.map(move));
     const connIds = await restoreConnections(client, mapId, payload.connections, payload.jumps,
       (id) => (id === systemId ? target : id));
+    await dropReusedChainNumbers(client, mapId, target);
 
     return {
       systemId: target,
