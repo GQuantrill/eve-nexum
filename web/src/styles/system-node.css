@@ -45,6 +45,13 @@
   transition: opacity 0.15s ease, filter 0.15s ease;
 }
 
+/* The Linux desktop app (WebKitGTK) draws a filtered node at 100% and scales
+   that picture with the map's zoom, so a faded system turned to a pixelated
+   blur. There the fade is opacity alone. */
+:root[data-desktop-os='linux'] :is(.system-node--stale, .system-node--filtered-out, .system-node--dimmed) {
+  filter: none;
+}
+
 /* A system that IS on the hovered chain's route — lift it with a glow ring. */
 .system-node--route {
   box-shadow: 0 0 0 2px var(--cv-conn-highlight),
