@@ -65,10 +65,13 @@ describe.skipIf(!dbReady)('chain numbers (integration)', () => {
     // 2 is gone: the next hole out of home is 2 again.
     await db.query(`DELETE FROM map_systems WHERE id = $1`, [b]);
     expect((await jump(home, c)).body.chainLabel).toBe('2');
-    // 1 is gone but 11 is still on the map: 1 stays taken.
+    // 1 is gone, 11 left behind: 1 is free again, and a hole out of the
+    // new 1 skips the 11 still on the map.
     await db.query(`DELETE FROM map_systems WHERE id = $1`, [a]);
     const d = await system(); await link(home, d);
-    expect((await jump(home, d)).body.chainLabel).toBe('3');
+    expect((await jump(home, d)).body.chainLabel).toBe('1');
+    const dd = await system(); await link(d, dd);
+    expect((await jump(d, dd)).body.chainLabel).toBe('12');
   });
 
   it('does nothing when the map does not number chains, or the systems are not linked', async () => {

@@ -54,9 +54,10 @@ const LIVE = `s.chain_label IS NOT NULL AND s.chain_reserved_at > NOW() - interv
 
 /**
  * The lowest index out of `parent` that nothing on the map holds: no system
- * and no live reservation has that number, or a number below it (1 is in
- * use while 11 is still on the map). A hole that dies or is cleared gives its
- * number back, so a static rolled every day stays 1. The counter row is only
+ * and no live reservation has that number. A hole that dies or is cleared
+ * gives its number back, so a static rolled every day stays 1. Systems left
+ * behind it don't hold it (with 1 gone, 11 is cut off), and they can't clash:
+ * a hole out of the new 1 skips the 11 still on the map. The counter row is only
  * a lock, so two pilots numbering at once get different numbers. Run inside a
  * transaction.
  */
@@ -73,12 +74,7 @@ async function nextIndex(client: PoolClient, mapId: string, parent: string): Pro
      SELECT s.chain_label FROM map_signatures s JOIN map_systems y ON y.id = s.system_id
       WHERE y.map_id = $1 AND ${LIVE} AND left(s.chain_label, length($2)) = $2`,
     [mapId, parent]);
-  const p = parent === '' ? [] : labelParts(parent);
-  const used = new Set<number>();
-  for (const k of kids) {
-    const c = labelParts(k.label);
-    if (c.length > p.length && p.every((v, i) => c[i] === v)) used.add(c[p.length]);
-  }
+  const used = new Set(kids.map((k) => childIndex(parent, k.label)).filter((i): i is number => i != null));
   let n = 1;
   while (used.has(n)) n++;
   return n;
