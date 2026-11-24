@@ -3,6 +3,7 @@ import { publishToMap } from './mapEvents.js';
 import { syncSignature, syncAnomaly } from './crossMapSync.js';
 import { recordGhostSiteIfMatch } from './ghostSites.js';
 import { createLogger } from '../utils/logger.js';
+import { claimReservedNumber } from './chainNumber.js';
 import { recordMapAudit, inSystemLabel, type AuditActor, type AuditEntry } from './mapAudit.js';
 
 const log = createLogger('map-write');
@@ -212,6 +213,15 @@ export async function updateSignature(
   if (typeof updates.name === 'string') recordGhostSiteIfMatch(systemId, updates.name);
   publishToMap(mapId, { type: 'sig.changed', actor: actor.clientId, systemId });
   syncSignature(mapId, systemId, sigId, actor.userId);
+  // A hole with a reserved chain number now says where it leads: that system
+  // takes the number, if it has none yet.
+  if (updated.length && typeof updates.whLeadsTo === 'string' && updates.whLeadsTo.trim()) {
+    claimReservedNumber(mapId, systemId, sigId)
+      .then((got) => {
+        if (got) publishToMap(mapId, { type: 'system.update', actor: null, id: got.id, updates: { chainLabel: got.label } });
+      })
+      .catch((err) => log.warn(`chain number claim failed: ${(err as Error).message}`));
+  }
   const changed = Object.keys(updates).filter((k) => k in SIG_COLS && k !== 'scoutConnectionId');
   if (updated.length && changed.length) {
     const values: Record<string, unknown> = {};

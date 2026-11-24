@@ -83,10 +83,10 @@ pub fn start(app: AppHandle) {
         let mut last: Option<u64> = None;
         loop {
             std::thread::sleep(Duration::from_millis(300));
-            let (enabled, tracked_only) = {
+            let (enabled, tracked_only, dscan) = {
                 let s = app.state::<AppState>();
                 let s = s.settings.lock().unwrap();
-                (s.watch_clipboard, s.scan_tracked_only)
+                (s.watch_clipboard, s.scan_tracked_only, s.scan_dscan)
             };
             if !enabled {
                 eve_before = false;
@@ -119,7 +119,7 @@ pub fn start(app: AppHandle) {
             }
             let event = if looks_like_probe_scan(&text) {
                 "nexum://scan"
-            } else if looks_like_dscan(&text) {
+            } else if dscan && looks_like_dscan(&text) {
                 "nexum://dscan"
             } else {
                 continue;

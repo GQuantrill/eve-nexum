@@ -2520,6 +2520,15 @@ select.sig-toolbar-btn option {
   min-height: 28px;
   padding: 0;
 }
+/* L+1: the chain number in place of the copy icon, and +1 to reserve one. */
+.sig-td--bookmark .sig-chain-btn {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+}
+.sig-td--bookmark .sig-chain-btn--reserve {
+  color: var(--warning-gold);
+}
 
 /* Age / Updated. Left-aligned so the values sit directly under their headings.
    They used to be right-aligned, but only the CELL carried padding-right, so

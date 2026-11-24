@@ -1,5 +1,6 @@
 import { db } from '../db.js';
 import { config } from '../config.js';
+import { RESERVATION_HOURS } from './chainNumber.js';
 
 // Shared map READ queries — the single source of truth behind both the
 // cookie-authed map routes and the external /api/v1 key-authed routes. Pure
@@ -185,6 +186,8 @@ export async function loadSystemSignatures(systemId: string) {
     `SELECT s.id, s.sig_id AS "sigId", s.sig_type AS "sigType", s.name, s.notes,
             s.wh_type AS "whType", s.wh_leads_to AS "whLeadsTo", s.ghost_type AS "ghostType",
             s.mass_status AS "massStatus", s.time_status AS "timeStatus",
+            CASE WHEN s.chain_reserved_at > NOW() - interval '${RESERVATION_HOURS} hours'
+                 THEN s.chain_label END AS "chainLabel",
             s.created_at AS "createdAt", s.updated_at AS "updatedAt",
             u.character_name AS "createdByName", u.character_id AS "createdByCharId"
        FROM map_signatures s

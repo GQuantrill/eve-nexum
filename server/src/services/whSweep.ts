@@ -1,4 +1,5 @@
 import { db } from '../db.js';
+import { clearExpiredReservations } from './chainNumber.js';
 import { config } from '../config.js';
 import { createLogger } from '../utils/logger.js';
 import { publishToMap } from './mapEvents.js';
@@ -359,6 +360,8 @@ export function startWhSweeper(): void {
       await sweepAll();
       await quarantineOrphans();
       await removeStaleBrokenConnections();
+      // Chain numbers reserved on holes nobody jumped within 48 hours.
+      await clearExpiredReservations().catch((err) => log.warn(`reservation sweep failed: ${(err as Error).message}`));
     })();
   };
   setTimeout(tick, 60_000);
