@@ -249,4 +249,38 @@ describe.skipIf(!dbReady)('chain numbers (integration)', () => {
     expect(await sysLabel(a)).toBeNull();
     expect(await sysLabel(b)).toBe('1');
   });
+
+  it('deleting or renumbering a system drops the numbers beneath it', async () => {
+    const home = await system(true);
+    const a = await system(), b = await system();
+    await link(home, a); await link(home, b);
+    const aa = await system(), aaa = await system(), ab = await system();
+    await link(a, aa); await link(aa, aaa); await link(a, ab);
+    await jump(home, a); await jump(home, b);        // 1, 2
+    await jump(a, aa); await jump(aa, aaa);          // 11, 111
+    await jump(a, ab);                               // 12
+    const r = await sig(aa);
+    await reserve(aa, [r]);                          // 112
+    // 11 renumbered by hand: 111 and the reserved 112 go, 12 stays.
+    await request(app).patch(`/api/maps/${mapId}/systems/${aa}`).send({ chainLabel: '' });
+    expect(await sysLabel(aaa)).toBeNull();
+    expect(await sigLabel(r)).toBeNull();
+    expect(await sysLabel(ab)).toBe('12');
+    // 1 deleted: 12 goes too, 2 stays.
+    await request(app).delete(`/api/maps/${mapId}/systems/${a}`);
+    expect(await sysLabel(ab)).toBeNull();
+    expect(await sysLabel(b)).toBe('2');
+  });
+
+  it('dots keep a deep number apart from a wider one', async () => {
+    const home = await system(true);
+    const x = await system(), y = await system(), z = await system();
+    await db.query(`UPDATE map_systems SET chain_label = $2 WHERE id = $1`, [x, '.11']);
+    await db.query(`UPDATE map_systems SET chain_label = $2 WHERE id = $1`, [y, '.11.2']);
+    await db.query(`UPDATE map_systems SET chain_label = $2 WHERE id = $1`, [z, '.110']);
+    void home;
+    await request(app).delete(`/api/maps/${mapId}/systems/${x}`);
+    expect(await sysLabel(y)).toBeNull();
+    expect(await sysLabel(z)).toBe('.110');
+  });
 });

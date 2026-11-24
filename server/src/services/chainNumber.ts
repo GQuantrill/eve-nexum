@@ -55,9 +55,9 @@ const LIVE = `s.chain_label IS NOT NULL AND s.chain_reserved_at > NOW() - interv
 /**
  * The lowest index out of `parent` that nothing on the map holds: no system
  * and no live reservation has that number. A hole that dies or is cleared
- * gives its number back, so a static rolled every day stays 1. Systems left
- * behind it don't hold it (with 1 gone, 11 is cut off), and they can't clash:
- * a hole out of the new 1 skips the 11 still on the map. The counter row is only
+ * gives its number back, so a static rolled every day stays 1. The numbers
+ * beneath one that goes are dropped (dropOrphanedChainNumbers); should one be
+ * left anyway, a hole out of the new 1 skips the 11 still on the map. The counter row is only
  * a lock, so two pilots numbering at once get different numbers. Run inside a
  * transaction.
  */
@@ -295,4 +295,37 @@ export async function clearExpiredReservations(): Promise<void> {
     `UPDATE map_signatures SET chain_label = NULL, chain_reserved_at = NULL
       WHERE chain_label IS NOT NULL
         AND (chain_reserved_at IS NULL OR chain_reserved_at <= NOW() - interval '${RESERVATION_HOURS} hours')`);
+}
+
+/**
+ * `label` is gone from the map (its system deleted, or renumbered or cleared
+ * by hand): the numbers beneath it go too, on systems and reservations, since
+ * a number is a path from home and that path is broken. With 1 gone, 11, 112
+ * and 1.10 lose theirs; with 11 gone, 112 does. Nothing happens while another
+ * system still has `label`. Returns the systems that lost their number and the
+ * systems whose signatures lost a reservation, for live updates.
+ */
+export async function dropOrphanedChainNumbers(
+  mapId: string, label: string | null,
+): Promise<{ systems: string[]; sigSystems: string[] }> {
+  const none = { systems: [], sigSystems: [] };
+  if (!label) return none;
+  const { rowCount: held } = await db.query(
+    `SELECT 1 FROM map_systems WHERE map_id = $1 AND chain_label = $2`, [mapId, label]);
+  if (held) return none;
+  // Beneath `label`: it's a prefix and more follows. Past a dot every part is
+  // dotted, so .11 has .11.2 beneath it but not .110 (the 110th out of home).
+  const under = (col: string) =>
+    `left(${col}, length($2)) = $2 AND length(${col}) > length($2)
+     AND (strpos($2, '.') = 0 OR substr(${col}, length($2) + 1, 1) = '.')`;
+  const { rows: systems } = await db.query<{ id: string }>(
+    `UPDATE map_systems SET chain_label = NULL
+      WHERE map_id = $1 AND chain_label IS NOT NULL AND ${under('chain_label')}
+      RETURNING id`, [mapId, label]);
+  const { rows: sigs } = await db.query<{ systemId: string }>(
+    `UPDATE map_signatures s SET chain_label = NULL, chain_reserved_at = NULL
+       FROM map_systems y
+      WHERE y.id = s.system_id AND y.map_id = $1 AND s.chain_label IS NOT NULL AND ${under('s.chain_label')}
+      RETURNING s.system_id AS "systemId"`, [mapId, label]);
+  return { systems: systems.map((r) => r.id), sigSystems: [...new Set(sigs.map((r) => r.systemId))] };
 }
