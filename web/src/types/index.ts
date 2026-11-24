@@ -141,6 +141,9 @@ export interface Signature {
    *  See utils/whState.ts. */
   massStatus: MassStatus | '';
   timeStatus: TimeStatus | '';
+  /** A chain number reserved on this hole before anyone jumped it (L+1): the
+   *  system it leads to takes it when jumped. Null when none, or expired. */
+  chainLabel?: string | null;
   createdAt: string;
   updatedAt: string;
   /** Who scanned it. Null for rows created before attribution existed, and for

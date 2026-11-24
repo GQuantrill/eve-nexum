@@ -46,6 +46,18 @@ export function withChain(format: string, on: boolean | undefined): string {
 // waits for its system's number rather than going out without it.
 const pending = new Map<string, Promise<string | null>>();
 
+// A jump out of a system with reserved holes isn't numbered until we know
+// which signature was jumped: the server answers "deferred", and the number is
+// asked for again (settle) once whJumpConfirm has matched the signature, or
+// found there is none to match. Keyed by the arrival's map system id.
+const settleGates = new Map<string, () => void>();
+
+/** Which signature was jumped into `toId` is now known (or never will be):
+ *  finish numbering it, if that was waiting. */
+export function settleChainNumber(toId: string): void {
+  settleGates.get(toId)?.();
+}
+
 /**
  * After a jump from one map system to another: ask the server to number the
  * arrival, when the map numbers chains and the link is a wormhole.
@@ -55,27 +67,103 @@ export function requestChainNumber(mapId: string, fromId: string, toId: string, 
   if (!map.chainNumbering || map.id !== mapId) return;
   const to = map.systems.find((s) => s.id === toId);
   if (!to || to.isHome || to.chainLabel) return;
+  // Made now, before whJumpConfirm runs, so an early settle isn't missed.
+  let release = () => {};
+  const gate = new Promise<void>((r) => { release = r; });
+  settleGates.set(toId, release);
+  const ask = (settle: boolean) => api<{ chainLabel: string | null; deferred?: boolean }>(
+    `/api/maps/${mapId}/systems/${toId}/chain-number`,
+    { method: 'POST', body: JSON.stringify(settle ? { fromSystemId: fromId, settle: true } : { fromSystemId: fromId }) });
   const p = (async () => {
     try {
       const ct = await (awaitConnectionType(connId)
         ?? Promise.resolve(useMapStore.getState().map.connections.find((c) => c.id === connId)?.connectionType ?? 'standard'));
       if (ct !== 'standard') return null;
-      const r = await api<{ chainLabel: string | null }>(`/api/maps/${mapId}/systems/${toId}/chain-number`, {
-        method: 'POST', body: JSON.stringify({ fromSystemId: fromId }),
-      });
-      if (r.chainLabel && useMapStore.getState().map.id === mapId) {
-        useMapStore.setState((s) => ({
-          map: { ...s.map, systems: s.map.systems.map((x) => (x.id === toId ? { ...x, chainLabel: r.chainLabel } : x)) },
-        }));
+      let r = await ask(false);
+      if (r.deferred) {
+        await gate;
+        r = await ask(true);
       }
+      if (r.chainLabel && useMapStore.getState().map.id === mapId) setSystemLabel(toId, r.chainLabel);
       return r.chainLabel;
     } catch {
       return null; // best-effort: a missed number can be set by hand
     } finally {
       pending.delete(toId);
+      if (settleGates.get(toId) === release) settleGates.delete(toId);
     }
   })();
   pending.set(toId, p);
+}
+
+function setSystemLabel(id: string, chainLabel: string): void {
+  useMapStore.setState((s) => ({
+    map: { ...s.map, systems: s.map.systems.map((x) => (x.id === id ? { ...x, chainLabel } : x)) },
+  }));
+}
+
+/** The number for a system one step out of `here`, or null when `here` has
+ *  none to number from (not home, not numbered). */
+export function parentLabel(here: { isHome?: boolean; chainLabel?: string | null } | undefined): string | null {
+  if (!here) return null;
+  return here.isHome ? '' : here.chainLabel ?? null;
+}
+
+/** Is `label` the number of a hole straight out of `parent`? */
+export function isChildLabel(parent: string, label: string): boolean {
+  const a = parent === '' ? [] : labelParts(parent), b = labelParts(label);
+  return b.length === a.length + 1 && a.every((p, i) => p === b[i]);
+}
+
+/** What the signature pane's bookmark button shows for a wormhole signature. */
+export type SigChainState =
+  | { kind: 'number'; label: string; reserved: boolean } // copy the bookmark (reserved: can be cleared)
+  | { kind: 'reserve' }                                  // +1
+  | { kind: 'none' };                                    // a plain copy button
+
+export function sigChainState(
+  sig: { sigType: string; chainLabel?: string | null },
+  here: { isHome?: boolean; chainLabel?: string | null } | undefined,
+  there: { isHome?: boolean; chainLabel?: string | null } | undefined,
+  on: boolean,
+): SigChainState {
+  if (!on || sig.sigType !== 'wormhole') return { kind: 'none' };
+  const parent = parentLabel(here);
+  if (parent == null) return { kind: 'none' };
+  if (there) {
+    const f = forwardChainLabel(here, there);
+    if (f) return { kind: 'number', label: f, reserved: false };
+    if (there.isHome || there.chainLabel) return { kind: 'none' }; // the way back, or a side link
+  }
+  if (sig.chainLabel && isChildLabel(parent, sig.chainLabel)) {
+    return { kind: 'number', label: sig.chainLabel, reserved: true };
+  }
+  return { kind: 'reserve' };
+}
+
+/** Number all: the holes to number, statics first, then by signature ID. */
+export function numberAllOrder<T extends { id: string; sigId: string; whType: string }>(
+  sigs: T[], statics: string[],
+): T[] {
+  const isStatic = (s: T) => statics.some((x) => x.toUpperCase() === (s.whType || '').toUpperCase());
+  return [...sigs].sort((a, b) =>
+    Number(isStatic(b)) - Number(isStatic(a)) || (a.sigId || '').localeCompare(b.sigId || ''));
+}
+
+/** Reserve chain numbers on these signatures, in order. Answers each one that
+ *  holds a number afterwards. */
+export async function reserveChainNumbers(
+  mapId: string, systemId: string, sigIds: string[],
+): Promise<{ id: string; chainLabel: string }[]> {
+  const r = await api<{ reserved: { id: string; chainLabel: string }[] }>(
+    `/api/maps/${mapId}/systems/${systemId}/chain-numbers`,
+    { method: 'POST', body: JSON.stringify({ sigIds }) });
+  return r.reserved;
+}
+
+/** Clear a reserved number on an unjumped hole. */
+export async function clearChainReservation(mapId: string, systemId: string, sigRowId: string): Promise<void> {
+  await api(`/api/maps/${mapId}/systems/${systemId}/signatures/${sigRowId}/chain-number`, { method: 'DELETE' });
 }
 
 /** Wait (briefly) for a number being asked for, then answer the system's number. */

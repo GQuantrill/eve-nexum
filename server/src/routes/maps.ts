@@ -21,7 +21,10 @@ import { resolveOwnerId } from '../utils/owner.js';
 import { mapCapFor, countPersonalMaps, mapAllowanceFor } from '../services/mapAllowance.js';
 import { parseMapBackup, restoreMapBackup, buildMapBackup, BackupError, MAX_BACKUP_SYSTEMS } from '../services/mapBackup.js';
 import { selectClip, pasteIntoMap, MAX_PASTE_CHAINS } from '../services/mapPaste.js';
-import { assignChainNumber, CHAIN_LABEL_RE, MAX_CHAIN_LABEL_LEN } from '../services/chainNumber.js';
+import {
+  assignChainNumber, reserveChainNumbers, clearChainReservation, dropStaleReservations,
+  CHAIN_LABEL_RE, MAX_CHAIN_LABEL_LEN,
+} from '../services/chainNumber.js';
 import { resolveEntityNames } from '../services/entityNames.js';
 import { audit } from '../services/audit.js';
 import { publishToMap } from '../services/mapEvents.js';
@@ -3167,14 +3170,17 @@ mapsRouter.post('/:mapId/systems', async (req, res) => {
   res.status(201).json({ ok: true, system });
 });
 
-// POST /api/maps/:mapId/systems/:systemId/chain-number { fromSystemId } --
+// POST /api/maps/:mapId/systems/:systemId/chain-number { fromSystemId, settle? } --
 // the pilot's client, on a wormhole jump from fromSystemId into this system:
-// give it the next chain number if the map numbers chains and it has none
-// (services/chainNumber.ts). Answers the system's number either way. Content
+// give it a chain number if the map numbers chains and it has none
+// (services/chainNumber.ts). When fromSystemId has reserved holes the answer
+// can be { deferred: true }: the client asks again with settle once it knows
+// which signature was jumped. Answers the system's number either way. Content
 // level, like logging the jump: anyone who can edit signatures may jump.
 mapsRouter.post('/:mapId/systems/:systemId/chain-number', async (req, res) => {
   const { mapId, systemId } = req.params;
   const fromId = (req.body as { fromSystemId?: unknown }).fromSystemId;
+  const settle = (req.body as { settle?: unknown }).settle === true;
   if (!UUID_RE.test(mapId) || !UUID_RE.test(systemId) || typeof fromId !== 'string' || !UUID_RE.test(fromId)) {
     res.status(400).json({ error: 'invalid ids' }); return;
   }
@@ -3188,11 +3194,50 @@ mapsRouter.post('/:mapId/systems/:systemId/chain-number', async (req, res) => {
 
   const before = await db.query<{ label: string | null }>(
     `SELECT chain_label AS label FROM map_systems WHERE id = $1 AND map_id = $2`, [systemId, mapId]);
-  const chainLabel = await assignChainNumber(mapId, fromId, systemId);
+  const { label: chainLabel, deferred } = await assignChainNumber(mapId, fromId, systemId, settle);
   if (chainLabel && chainLabel !== before.rows[0]?.label) {
     publishToMap(mapId, { type: 'system.update', actor: null, id: systemId, updates: { chainLabel } });
   }
-  res.json({ chainLabel });
+  res.json({ chainLabel, deferred });
+});
+
+// POST /api/maps/:mapId/systems/:systemId/chain-numbers { sigIds } -- reserve
+// chain numbers on this system's wormhole signatures before anyone jumps them,
+// in the order given (services/chainNumber.ts reserveChainNumbers). One id from
+// the +1 button, several from Number all. Answers { reserved: [{ id,
+// chainLabel }] } for every signature that holds a number afterwards.
+mapsRouter.post('/:mapId/systems/:systemId/chain-numbers', async (req, res) => {
+  const { mapId, systemId } = req.params;
+  const sigIds = (req.body as { sigIds?: unknown }).sigIds;
+  if (!UUID_RE.test(mapId) || !UUID_RE.test(systemId) || !Array.isArray(sigIds) || !sigIds.length
+      || sigIds.length > 100 || sigIds.some((x) => typeof x !== 'string' || !UUID_RE.test(x))) {
+    res.status(400).json({ error: 'invalid ids' }); return;
+  }
+  const access = await requireMapContentWrite(res, mapId, req);
+  if (!access) return;
+  if (!(await verifySystemInMap(res, systemId, mapId))) return;
+  const reserved = await reserveChainNumbers(mapId, systemId, [...new Set(sigIds as string[])]);
+  if (reserved.length) publishToMap(mapId, { type: 'sig.changed', actor: null, systemId });
+  for (const r of reserved) {
+    if (r.systemId) publishToMap(mapId, { type: 'system.update', actor: null, id: r.systemId, updates: { chainLabel: r.chainLabel } });
+  }
+  res.json({ reserved: reserved.map(({ id, chainLabel }) => ({ id, chainLabel })) });
+});
+
+// DELETE /api/maps/:mapId/systems/:systemId/signatures/:sigId/chain-number --
+// clear a reserved number while its hole is unjumped. The number is not
+// handed out again.
+mapsRouter.delete('/:mapId/systems/:systemId/signatures/:sigId/chain-number', async (req, res) => {
+  const { mapId, systemId, sigId } = req.params;
+  if (!UUID_RE.test(mapId) || !UUID_RE.test(systemId) || !UUID_RE.test(sigId)) {
+    res.status(400).json({ error: 'invalid ids' }); return;
+  }
+  const access = await requireMapContentWrite(res, mapId, req);
+  if (!access) return;
+  if (!(await verifySystemInMap(res, systemId, mapId))) return;
+  const cleared = await clearChainReservation(mapId, systemId, sigId);
+  if (cleared) publishToMap(mapId, { type: 'sig.changed', actor: null, systemId });
+  res.status(cleared ? 200 : 409).json({ ok: cleared });
 });
 
 mapsRouter.patch('/:mapId/systems/:systemId', async (req, res) => {
@@ -3343,6 +3388,10 @@ mapsRouter.patch('/:mapId/systems/:systemId', async (req, res) => {
   );
   await touchMap(mapId);
   publishToMap(mapId, { type: 'system.update', actor: req.get('x-client-id') ?? null, id: systemId, updates });
+  // Its number changed by hand: holes reserved under the old number lose it.
+  if ('chainLabel' in updates && updated.length && (await dropStaleReservations(mapId, systemId))) {
+    publishToMap(mapId, { type: 'sig.changed', actor: null, systemId });
+  }
   // Moving a node isn't a change worth auditing; anything else on the row is.
   const changed = Object.keys(updates).filter((k) => k !== 'position');
   if (updated.length && changed.length) {
