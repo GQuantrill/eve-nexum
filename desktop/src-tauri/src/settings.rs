@@ -24,6 +24,10 @@ pub struct Settings {
     /// Only scans copied in the EVE window of the character the map is
     /// tracking (its title names the character); others are not pasted.
     pub scan_tracked_only: bool,
+    /// Open a d-scan copied in EVE in the d-scan analyser. On by default (as
+    /// before it was a setting); a pilot who only wants probe scans pasted
+    /// turns it off.
+    pub scan_dscan: bool,
     /// Start Nexum when the pilot logs in to Windows/macOS, hidden in the
     /// tray. Mirrors the system's own setting, which is read at startup.
     pub start_at_login: bool,
@@ -72,6 +76,7 @@ impl Default for Settings {
             read_logs: true,
             watch_clipboard: false,
             scan_tracked_only: false,
+            scan_dscan: true,
             start_at_login: false,
             chatlog_dir: None,
             intel_channels: Vec::new(),

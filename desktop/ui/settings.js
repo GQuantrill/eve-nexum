@@ -20,6 +20,7 @@ async function strings() {
   $('readLogs').checked = s.readLogs;
   $('watchClipboard').checked = s.watchClipboard;
   $('scanTrackedOnly').checked = s.scanTrackedOnly;
+  $('scanDscan').checked = s.scanDscan;
   $('combatAlerts').checked = s.combatAlerts;
   $('startAtLogin').checked = s.startAtLogin;
   // The Store build has no "start at login" (see lib.rs, STORE).
@@ -166,6 +167,7 @@ async function strings() {
         readLogs: $('readLogs').checked,
         watchClipboard: $('watchClipboard').checked,
         scanTrackedOnly: $('scanTrackedOnly').checked,
+        scanDscan: $('scanDscan').checked,
         startAtLogin: $('startAtLogin').checked,
         chatlogDir: $('chatlogDir').value.trim() || null,
         intelChannels: channels,
