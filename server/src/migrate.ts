@@ -1482,9 +1482,10 @@ export async function migrate() {
 
     -- Chain numbers ("L+1", services/chainNumber.ts): off unless a map turns
     -- them on. A system's number is its path from home (5162 = hole 5, then 1,
-    -- then 6, then 2), handed out on the first jump into it. The counter per
-    -- parent number means a number is never handed out twice, even after the
-    -- system that had it is gone: someone's in-game bookmark may still use it.
+    -- then 6, then 2), handed out on the first jump into it: the lowest number
+    -- nothing on the map holds, so one frees up once its system is gone. The
+    -- row per parent number in map_chain_counters is the lock that keeps two
+    -- pilots numbering at once apart (last_index is no longer used).
     ALTER TABLE maps ADD COLUMN IF NOT EXISTS chain_numbering BOOLEAN NOT NULL DEFAULT FALSE;
     ALTER TABLE map_systems ADD COLUMN IF NOT EXISTS chain_label TEXT;
     CREATE TABLE IF NOT EXISTS map_chain_counters (
@@ -1496,7 +1497,7 @@ export async function migrate() {
 
     -- A chain number reserved on a wormhole signature before anyone jumps it
     -- (services/chainNumber.ts): the system it leads to takes this number when
-    -- it is jumped. Drawn from map_chain_counters, so never handed out twice.
+    -- it is jumped. Held like a system's number until it is taken or cleared.
     -- Live for 48 hours; the full label, not just the index.
     ALTER TABLE map_signatures ADD COLUMN IF NOT EXISTS chain_label       TEXT;
     ALTER TABLE map_signatures ADD COLUMN IF NOT EXISTS chain_reserved_at TIMESTAMPTZ;

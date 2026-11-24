@@ -49,7 +49,7 @@ describe.skipIf(!dbReady)('chain numbers (integration)', () => {
     mapId = rows[0].id;
   });
 
-  it('numbers holes in the order they are first jumped, and never twice', async () => {
+  it('numbers holes in the order they are first jumped, lowest free number first', async () => {
     const home = await system(true);
     const a = await system(), b = await system(), c = await system();
     for (const s of [a, b, c]) await link(home, s);
@@ -62,9 +62,13 @@ describe.skipIf(!dbReady)('chain numbers (integration)', () => {
     expect((await jump(home, a)).body.chainLabel).toBe('1');
     expect((await jump(a, home)).body.chainLabel).toBeNull();
 
-    // 2 is gone: the next hole out of home is 3, not 2 again.
+    // 2 is gone: the next hole out of home is 2 again.
     await db.query(`DELETE FROM map_systems WHERE id = $1`, [b]);
-    expect((await jump(home, c)).body.chainLabel).toBe('3');
+    expect((await jump(home, c)).body.chainLabel).toBe('2');
+    // 1 is gone but 11 is still on the map: 1 stays taken.
+    await db.query(`DELETE FROM map_systems WHERE id = $1`, [a]);
+    const d = await system(); await link(home, d);
+    expect((await jump(home, d)).body.chainLabel).toBe('3');
   });
 
   it('does nothing when the map does not number chains, or the systems are not linked', async () => {
@@ -194,7 +198,7 @@ describe.skipIf(!dbReady)('chain numbers (integration)', () => {
     expect((await reserve(a, [y, x])).body.reserved.map((r: { chainLabel: string }) => r.chainLabel)).toEqual(['11', '12']);
   });
 
-  it('a reservation can be cleared until the hole is jumped, and its number is not reused', async () => {
+  it('a reservation can be cleared until the hole is jumped, and its number is free again', async () => {
     const home = await system(true);
     const a = await system();
     await link(home, a);
@@ -203,10 +207,10 @@ describe.skipIf(!dbReady)('chain numbers (integration)', () => {
     const del = (id: string) => request(app).delete(`/api/maps/${mapId}/systems/${home}/signatures/${id}/chain-number`);
     expect((await del(s1)).status).toBe(200);
     expect(await sigLabel(s1)).toBeNull();
-    expect((await reserve(home, [s2])).body.reserved[0].chainLabel).toBe('2');
+    expect((await reserve(home, [s2])).body.reserved[0].chainLabel).toBe('1');
     await leadTo(s2, home, a);
     await new Promise((r) => setTimeout(r, 100));
-    expect(await sysLabel(a)).toBe('2');
+    expect(await sysLabel(a)).toBe('1');
     expect((await del(s2)).status).toBe(409);
   });
 
@@ -217,7 +221,7 @@ describe.skipIf(!dbReady)('chain numbers (integration)', () => {
     const s1 = await sig(home);
     await reserve(home, [s1]);
     await db.query(`UPDATE map_signatures SET chain_reserved_at = NOW() - interval '49 hours' WHERE id = $1`, [s1]);
-    expect((await jump(home, a)).body).toEqual({ chainLabel: '2', deferred: false });
+    expect((await jump(home, a)).body).toEqual({ chainLabel: '1', deferred: false });
   });
 
   it('a hand-edited number drops reservations made under the old one', async () => {
@@ -229,5 +233,17 @@ describe.skipIf(!dbReady)('chain numbers (integration)', () => {
     await reserve(a, [x]); // 11
     await request(app).patch(`/api/maps/${mapId}/systems/${a}`).send({ chainLabel: '5' });
     expect(await sigLabel(x)).toBeNull();
+  });
+
+  it('a deleted system put back loses its number if it went to another meanwhile', async () => {
+    const home = await system(true);
+    const a = await system(), b = await system();
+    await link(home, a); await link(home, b);
+    await jump(home, a); // 1
+    expect((await request(app).delete(`/api/maps/${mapId}/systems/${a}`)).status).toBeLessThan(300);
+    expect((await jump(home, b)).body.chainLabel).toBe('1');
+    expect((await request(app).post(`/api/maps/${mapId}/systems/${a}/restore`)).status).toBe(200);
+    expect(await sysLabel(a)).toBeNull();
+    expect(await sysLabel(b)).toBe('1');
   });
 });

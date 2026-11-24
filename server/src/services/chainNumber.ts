@@ -4,9 +4,10 @@
 // 5161, 5162. The number goes in front of the hole's bookmark name ({chain}),
 // so the bookmarks sort into chain order in the EVE client.
 //
-// - A number is handed out once, on the first jump into a system, and never
-//   changes or comes round again (map_chain_counters): pilots' in-game
-//   bookmarks still carry it after the hole is gone.
+// - A number is handed out on the first jump into a system and never changes
+//   while the system is on the map. The lowest free number goes first: once a
+//   system and any reservation with that number are gone, it is free again,
+//   so a static rolled every day stays 1.
 // - Past 9 a dot separates the parts, so a tenth hole is never mistaken for a
 //   deeper one: the tenth hole out of 5 is 5.10, and its holes 5.10.1 and on.
 //   From home, the tenth is .10.
@@ -14,7 +15,8 @@
 // - A scout can reserve numbers on the wormhole signatures of home or a
 //   numbered system before anyone jumps them (reserveChainNumbers). The system
 //   a reserved hole leads to takes that number when it is jumped. Reservations
-//   come from the same counter, live 48 hours, and go with their signature.
+//   hold their number like a system does, live 48 hours, and go with their
+//   signature.
 import type { PoolClient } from 'pg';
 import { db } from '../db.js';
 
@@ -51,25 +53,35 @@ export const RESERVATION_HOURS = 48;
 const LIVE = `s.chain_label IS NOT NULL AND s.chain_reserved_at > NOW() - interval '${RESERVATION_HOURS} hours'`;
 
 /**
- * The next index out of `parent`, from its counter. Never below a number
- * already on the map (one set by hand, say), on a system or reserved on a
- * signature. Run inside a transaction.
+ * The lowest index out of `parent` that nothing on the map holds: no system
+ * and no live reservation has that number, or a number below it (1 is in
+ * use while 11 is still on the map). A hole that dies or is cleared gives its
+ * number back, so a static rolled every day stays 1. The counter row is only
+ * a lock, so two pilots numbering at once get different numbers. Run inside a
+ * transaction.
  */
 async function nextIndex(client: PoolClient, mapId: string, parent: string): Promise<number> {
+  await client.query(
+    `INSERT INTO map_chain_counters (map_id, parent, last_index) VALUES ($1, $2, 0)
+     ON CONFLICT (map_id, parent) DO NOTHING`, [mapId, parent]);
+  await client.query(
+    `SELECT 1 FROM map_chain_counters WHERE map_id = $1 AND parent = $2 FOR UPDATE`, [mapId, parent]);
   const { rows: kids } = await client.query<{ label: string }>(
     `SELECT chain_label AS label FROM map_systems
       WHERE map_id = $1 AND chain_label IS NOT NULL AND left(chain_label, length($2)) = $2
      UNION ALL
      SELECT s.chain_label FROM map_signatures s JOIN map_systems y ON y.id = s.system_id
-      WHERE y.map_id = $1 AND s.chain_label IS NOT NULL AND left(s.chain_label, length($2)) = $2`,
+      WHERE y.map_id = $1 AND ${LIVE} AND left(s.chain_label, length($2)) = $2`,
     [mapId, parent]);
-  const highest = Math.max(0, ...kids.map((k) => childIndex(parent, k.label) ?? 0));
-  const { rows: [counter] } = await client.query<{ n: number }>(
-    `INSERT INTO map_chain_counters (map_id, parent, last_index) VALUES ($1, $2, $3)
-     ON CONFLICT (map_id, parent) DO UPDATE
-       SET last_index = GREATEST(map_chain_counters.last_index + 1, EXCLUDED.last_index)
-     RETURNING last_index AS n`, [mapId, parent, highest + 1]);
-  return counter.n;
+  const p = parent === '' ? [] : labelParts(parent);
+  const used = new Set<number>();
+  for (const k of kids) {
+    const c = labelParts(k.label);
+    if (c.length > p.length && p.every((v, i) => c[i] === v)) used.add(c[p.length]);
+  }
+  let n = 1;
+  while (used.has(n)) n++;
+  return n;
 }
 
 /** Is `label` already some system's number on this map? */
@@ -109,7 +121,7 @@ export interface ChainNumberResult {
  * - A reserved signature in `fromId` that leads to `toId`: its number.
  * - Else, when `fromId` has live reservations and `settle` is false: nothing
  *   yet (deferred), so a reserved number isn't skipped past.
- * - Else the next number from the counter.
+ * - Else the lowest free number.
  */
 export async function assignChainNumber(
   mapId: string, fromId: string, toId: string, settle = false,
@@ -221,7 +233,7 @@ export async function reserveChainNumbers(mapId: string, systemId: string, sigId
 
 /**
  * Clear a reservation on a signature, while no system has taken its number.
- * The number is not handed out again. True if one was cleared.
+ * The number is free again. True if one was cleared.
  */
 export async function clearChainReservation(mapId: string, systemId: string, sigRowId: string): Promise<boolean> {
   const { rowCount } = await db.query(
