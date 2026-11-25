@@ -17,7 +17,8 @@ export interface CustomTheme { id: string; name: string; seeds: ThemeSeeds }
 
 export const SEED_KEYS: (keyof ThemeSeeds)[] = ['primary', 'highlight', 'bg', 'accent'];
 
-export const THEMES: { id: string; seeds: ThemeSeeds }[] = [
+export type PresetThemeId = 'nexum' | 'amarr' | 'caldari' | 'gallente' | 'minmatar' | 'carbon' | 'photon';
+export const THEMES: { id: PresetThemeId; seeds: ThemeSeeds }[] = [
   { id: 'nexum',    seeds: { primary: '#3a4a6a', highlight: '#5a9af8', bg: '#0a0e1a', accent: '#5a9af8' } },
   { id: 'amarr',    seeds: { primary: '#a8916f', highlight: '#e8c872', bg: '#0c0b09', accent: '#e8955a' } },
   { id: 'caldari',  seeds: { primary: '#8fbfd8', highlight: '#5cc0b5', bg: '#090c0e', accent: '#d9953f' } },

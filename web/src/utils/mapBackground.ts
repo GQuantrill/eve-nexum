@@ -119,7 +119,8 @@ export function setBgDim(dim: number): void {
 
 /** Too big, or not a picture the browser can read. */
 export class BgImageError extends Error {
-  constructor(readonly reason: 'tooBig' | 'unreadable') { super(reason); }
+  readonly reason: 'tooBig' | 'unreadable';
+  constructor(reason: 'tooBig' | 'unreadable') { super(reason); this.reason = reason; }
 }
 
 async function readPicture(file: File): Promise<ImageBitmap> {

@@ -1260,12 +1260,12 @@ function BackgroundsTab() {
 
   // Every change reloads this list and the member-side one, so the admin's own
   // map shows it straight away.
-  const run = async (fn: () => Promise<unknown>, failKey = 'admin.backgrounds.saveFailed') => {
+  const run = async (fn: () => Promise<unknown>) => {
     setBusy(true); setError(null);
     try { await fn(); }
     catch (err) {
       setError(t(err instanceof BgImageError && err.reason === 'tooBig' ? 'admin.backgrounds.tooBig'
-        : err instanceof BgImageError ? 'admin.backgrounds.unreadable' : failKey));
+        : err instanceof BgImageError ? 'admin.backgrounds.unreadable' : 'admin.backgrounds.saveFailed'));
     }
     finally { await load(); void reloadOrgBackgrounds(); setBusy(false); }
   };

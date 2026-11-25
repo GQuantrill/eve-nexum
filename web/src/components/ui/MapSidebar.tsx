@@ -2267,7 +2267,7 @@ export function MapSidebar() {
                     ]} />
                   </div>
                   {(() => {
-                    const markerColor = (id: string, label: string, value: string, set: (v: string) => void, def: string) => {
+                    const markerColor = (id: string, label: 'mapSidebar.homeColor' | 'mapSidebar.hereColor', value: string, set: (v: string) => void, def: string) => {
                       const color = safeColor(value, def);
                       return (
                         <div className="map-sidebar__row">
