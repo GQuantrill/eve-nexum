@@ -2242,6 +2242,11 @@ export function MapSidebar() {
                       { value: "north", label: t("mapSidebar.placementOptions.north") },
                     ]} />
                   </div>
+                </>
+              )}
+
+              {settingsTab === "appearance" && (
+                <>
                   <div className="map-sidebar__row">
                     <label className="map-sidebar__label" htmlFor="color-vision">{t("mapSidebar.colorVision")}</label>
                     <Select id="color-vision" value={colorVision} onChange={(v) => setColorVision(v)} options={[
@@ -2277,11 +2282,6 @@ export function MapSidebar() {
                     <Select id="here-pulse" value={normalisePulse(herePulse)} onChange={(v) => setHerePulse(v)}
                       options={HERE_PULSES.map((p) => ({ value: p, label: t(`mapSidebar.herePulseOptions.${p}`) }))} />
                   </div>
-                </>
-              )}
-
-              {settingsTab === "appearance" && (
-                <>
                   {([
                     ["map-bg-color", "mapSidebar.mapBgColor", mapBgColor, setMapBgColor, MAP_BG_COLOR_DEFAULT, MAP_BG_COLOR_DEFAULT],
                     // Grid: '' follows the grid style's own colour; Reset goes back to that.
