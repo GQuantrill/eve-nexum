@@ -2265,7 +2265,8 @@
       "rounded": "圆角",
       "shield": "盾牌",
       "fortress": "堡垒",
-      "hexagon": "六边形"
+      "hexagon": "六边形",
+      "spiked": "尖刺"
     }
   },
   "mass": {

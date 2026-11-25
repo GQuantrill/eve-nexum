@@ -1519,6 +1519,58 @@ div.system-node__easy-handle {
   }
 }
 
+/* Spiked: gold teeth all round a plain box, the box's edge 2px inside them. */
+:root[data-home-shape='spiked'] .system-node__home-shape {
+  inset: -9px;
+  & > span {
+    clip-path: polygon(0 0,
+                       calc(8px + 6.25% - 1.00px) 8px,
+                       calc(8px + 12.50% - 2.00px) 0,
+                       calc(8px + 18.75% - 3.00px) 8px,
+                       calc(8px + 25.00% - 4.00px) 0,
+                       calc(8px + 31.25% - 5.00px) 8px,
+                       calc(8px + 37.50% - 6.00px) 0,
+                       calc(8px + 43.75% - 7.00px) 8px,
+                       calc(8px + 50.00% - 8.00px) 0,
+                       calc(8px + 56.25% - 9.00px) 8px,
+                       calc(8px + 62.50% - 10.00px) 0,
+                       calc(8px + 68.75% - 11.00px) 8px,
+                       calc(8px + 75.00% - 12.00px) 0,
+                       calc(8px + 81.25% - 13.00px) 8px,
+                       calc(8px + 87.50% - 14.00px) 0,
+                       calc(8px + 93.75% - 15.00px) 8px,
+                       100% 0,
+                       calc(100% - 8px) calc(8px + 16.67% - 2.67px),
+                       100% calc(8px + 33.33% - 5.33px),
+                       calc(100% - 8px) calc(8px + 50.00% - 8.00px),
+                       100% calc(8px + 66.67% - 10.67px),
+                       calc(100% - 8px) calc(8px + 83.33% - 13.33px),
+                       100% 100%,
+                       calc(8px + 93.75% - 15.00px) calc(100% - 8px),
+                       calc(8px + 87.50% - 14.00px) 100%,
+                       calc(8px + 81.25% - 13.00px) calc(100% - 8px),
+                       calc(8px + 75.00% - 12.00px) 100%,
+                       calc(8px + 68.75% - 11.00px) calc(100% - 8px),
+                       calc(8px + 62.50% - 10.00px) 100%,
+                       calc(8px + 56.25% - 9.00px) calc(100% - 8px),
+                       calc(8px + 50.00% - 8.00px) 100%,
+                       calc(8px + 43.75% - 7.00px) calc(100% - 8px),
+                       calc(8px + 37.50% - 6.00px) 100%,
+                       calc(8px + 31.25% - 5.00px) calc(100% - 8px),
+                       calc(8px + 25.00% - 4.00px) 100%,
+                       calc(8px + 18.75% - 3.00px) calc(100% - 8px),
+                       calc(8px + 12.50% - 2.00px) 100%,
+                       calc(8px + 6.25% - 1.00px) calc(100% - 8px),
+                       0 100%,
+                       8px calc(8px + 83.33% - 13.33px),
+                       0 calc(8px + 66.67% - 10.67px),
+                       8px calc(8px + 50.00% - 8.00px),
+                       0 calc(8px + 33.33% - 5.33px),
+                       8px calc(8px + 16.67% - 2.67px));
+  }
+  & > span::after { clip-path: inset(8px round 2px); }
+}
+
 .system-node[data-home='true'][data-heat]::before { display: none; }
 .system-node--sov-hostile .system-node__home-shape {
   filter: drop-shadow(0 0 4px var(--cv-stand-hostile));

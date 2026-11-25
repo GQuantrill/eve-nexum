@@ -2265,7 +2265,8 @@
       "rounded": "Rounded",
       "shield": "Shield",
       "fortress": "Fortress",
-      "hexagon": "Hexagon"
+      "hexagon": "Hexagon",
+      "spiked": "Spiked"
     }
   },
   "mass": {

@@ -2265,7 +2265,8 @@
       "rounded": "둥근 모서리",
       "shield": "방패",
       "fortress": "요새",
-      "hexagon": "육각형"
+      "hexagon": "육각형",
+      "spiked": "가시"
     }
   },
   "mass": {

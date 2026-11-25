@@ -2265,7 +2265,8 @@
       "rounded": "角丸",
       "shield": "盾",
       "fortress": "要塞",
-      "hexagon": "六角形"
+      "hexagon": "六角形",
+      "spiked": "トゲトゲ"
     }
   },
   "mass": {

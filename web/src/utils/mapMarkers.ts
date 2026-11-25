@@ -15,8 +15,8 @@ export const HERE_PULSES: HerePulse[] = ['off', 'subtle', 'normal', 'strong'];
 export const HERE_PULSE_DEFAULT: HerePulse = 'normal';
 
 /** The outline drawn round the home system (styles/system-node.css). */
-export type HomeShape = 'octagon' | 'rounded' | 'shield' | 'fortress' | 'hexagon';
-export const HOME_SHAPES: HomeShape[] = ['octagon', 'rounded', 'shield', 'fortress', 'hexagon'];
+export type HomeShape = 'octagon' | 'rounded' | 'shield' | 'fortress' | 'hexagon' | 'spiked';
+export const HOME_SHAPES: HomeShape[] = ['octagon', 'rounded', 'shield', 'fortress', 'hexagon', 'spiked'];
 export const HOME_SHAPE_DEFAULT: HomeShape = 'octagon';
 
 export function normaliseHomeShape(v: unknown): HomeShape {

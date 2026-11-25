@@ -2265,7 +2265,8 @@
       "rounded": "Afgerond",
       "shield": "Schild",
       "fortress": "Vesting",
-      "hexagon": "Zeshoek"
+      "hexagon": "Zeshoek",
+      "spiked": "Stekelig"
     }
   },
   "mass": {

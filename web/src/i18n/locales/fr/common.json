@@ -2265,7 +2265,8 @@
       "rounded": "Arrondi",
       "shield": "Bouclier",
       "fortress": "Forteresse",
-      "hexagon": "Hexagone"
+      "hexagon": "Hexagone",
+      "spiked": "Hérissé"
     }
   },
   "mass": {
