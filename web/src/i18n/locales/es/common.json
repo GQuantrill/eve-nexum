@@ -3020,10 +3020,12 @@
   },
   "chainNumber": {
     "toggle": "Numerar la cadena desde home (L+1)",
-    "hint": "Cada sistema recibe un número en el primer salto por agujero de gusano hacia él: 1, 2, 3 desde home, 51, 52 desde 5, etc. Los marcadores de agujeros empiezan por el número de su destino, así quedan en el orden de la cadena en EVE. Un número nunca cambia ni se repite.",
+    "hint": "Cada sistema recibe un número en el primer salto por agujero de gusano hacia él: 1, 2, 3 desde home, 51, 52 desde 5, etc. Los marcadores de agujeros empiezan por el número de su destino, así quedan en el orden de la cadena en EVE. Un número pertenece a su sistema mientras está en el mapa; cuando el sistema desaparece, el número queda libre para el siguiente agujero.",
     "set": "Poner número de cadena…",
     "setTitle": "Número de cadena",
-    "setMessage": "Número de cadena para {{name}}. Déjalo vacío para quitarlo.",
-    "invalid": "Un número de cadena solo tiene dígitos, como 51, con un punto antes de cualquier parte mayor de 9, como 5.10."
+    "setMessage": "Número de cadena para {{name}}. Los números por debajo cambian con él (de 7 a 3, el 71 pasa a 31). Déjalo vacío para borrarlo junto con los números por debajo.",
+    "invalid": "Un número de cadena solo tiene dígitos, como 51, con un punto antes de cualquier parte mayor de 9, como 5.10.",
+    "inUse": "{{label}} ya está en uso en este mapa, o algún número por debajo.",
+    "saveFailed": "No se pudo guardar el número de cadena."
   }
 }

@@ -3020,10 +3020,12 @@
   },
   "chainNumber": {
     "toggle": "Number the chain from home (L+1)",
-    "hint": "Each system gets a number on the first wormhole jump into it: 1, 2, 3 out of home, 51, 52 out of 5, and so on. Hole bookmarks start with the number of where they lead, so they sort into chain order in EVE. A number never changes and is never used twice.",
+    "hint": "Each system gets a number on the first wormhole jump into it: 1, 2, 3 out of home, 51, 52 out of 5, and so on. Hole bookmarks start with the number of where they lead, so they sort into chain order in EVE. A number belongs to its system while it is on the map; once the system is gone, the number is free for the next hole.",
     "set": "Set chain number…",
     "setTitle": "Chain number",
-    "setMessage": "Chain number for {{name}}. Leave it empty to clear it.",
-    "invalid": "A chain number is digits only, like 51, with a dot before any part over 9, like 5.10."
+    "setMessage": "Chain number for {{name}}. The numbers beneath it change with it (7 to 3 makes 71 into 31). Leave it empty to clear it and the numbers beneath it.",
+    "invalid": "A chain number is digits only, like 51, with a dot before any part over 9, like 5.10.",
+    "inUse": "{{label}} is already in use on this map, or something beneath it is.",
+    "saveFailed": "Couldn't save the chain number."
   }
 }

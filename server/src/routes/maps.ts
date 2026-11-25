@@ -23,6 +23,7 @@ import { parseMapBackup, restoreMapBackup, buildMapBackup, BackupError, MAX_BACK
 import { selectClip, pasteIntoMap, MAX_PASTE_CHAINS } from '../services/mapPaste.js';
 import {
   assignChainNumber, reserveChainNumbers, clearChainReservation, dropStaleReservations, dropOrphanedChainNumbers,
+  chainLabelFree, moveChainNumbers,
   CHAIN_LABEL_RE, MAX_CHAIN_LABEL_LEN,
 } from '../services/chainNumber.js';
 import { resolveEntityNames } from '../services/entityNames.js';
@@ -3385,6 +3386,12 @@ mapsRouter.patch('/:mapId/systems/:systemId', async (req, res) => {
     ? (await db.query<{ label: string | null }>(
         `SELECT chain_label AS label FROM map_systems WHERE id = $1 AND map_id = $2`, [systemId, mapId])).rows[0]?.label ?? null
     : null;
+  // A number someone else has, or with numbers beneath it still on the map:
+  // refused, so no two holes ever share a number.
+  if (typeof updates.chainLabel === 'string' && updates.chainLabel !== oldChain
+      && !(await chainLabelFree(mapId, systemId, oldChain, updates.chainLabel))) {
+    res.status(409).json({ error: 'chain_label_in_use' }); return;
+  }
 
   // Append last_activity_at = NOW() to mark this system as active.
   const { rows: updated } = await db.query<{ name: string; alias: string | null }>(
@@ -3394,12 +3401,20 @@ mapsRouter.patch('/:mapId/systems/:systemId', async (req, res) => {
   );
   await touchMap(mapId);
   publishToMap(mapId, { type: 'system.update', actor: req.get('x-client-id') ?? null, id: systemId, updates });
-  // Its number changed by hand: holes reserved under the old number lose it.
+  // Renumbered by hand: the numbers beneath it move with it (7 to 3 takes 71
+  // to 31). Cleared: they go.
+  if ('chainLabel' in updates && updated.length && oldChain && oldChain !== updates.chainLabel) {
+    if (typeof updates.chainLabel === 'string') {
+      const moved = await moveChainNumbers(mapId, oldChain, updates.chainLabel);
+      for (const m of moved.systems) publishToMap(mapId, { type: 'system.update', actor: null, id: m.id, updates: { chainLabel: m.label } });
+      for (const id of moved.sigSystems) publishToMap(mapId, { type: 'sig.changed', actor: null, systemId: id });
+    } else {
+      await publishOrphanDrop(mapId, oldChain);
+    }
+  }
+  // Holes reserved here that still don't fit its number lose it.
   if ('chainLabel' in updates && updated.length && (await dropStaleReservations(mapId, systemId))) {
     publishToMap(mapId, { type: 'sig.changed', actor: null, systemId });
-  }
-  if ('chainLabel' in updates && updated.length && oldChain !== updates.chainLabel) {
-    await publishOrphanDrop(mapId, oldChain);
   }
   // Moving a node isn't a change worth auditing; anything else on the row is.
   const changed = Object.keys(updates).filter((k) => k !== 'position');

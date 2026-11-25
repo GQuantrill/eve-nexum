@@ -3020,10 +3020,12 @@
   },
   "chainNumber": {
     "toggle": "Numéroter la chaîne depuis home (L+1)",
-    "hint": "Chaque système reçoit un numéro au premier saut de trou de ver vers lui : 1, 2, 3 depuis home, 51, 52 depuis 5, etc. Les signets de trous commencent par le numéro de leur destination, pour être classés dans l'ordre de la chaîne dans EVE. Un numéro ne change jamais et n'est jamais réutilisé.",
+    "hint": "Chaque système reçoit un numéro au premier saut de trou de ver vers lui : 1, 2, 3 depuis home, 51, 52 depuis 5, etc. Les signets de trous commencent par le numéro de leur destination, pour être classés dans l'ordre de la chaîne dans EVE. Un numéro appartient à son système tant qu'il est sur la carte ; une fois le système parti, le numéro est libre pour le trou suivant.",
     "set": "Définir le numéro de chaîne…",
     "setTitle": "Numéro de chaîne",
-    "setMessage": "Numéro de chaîne pour {{name}}. Laissez vide pour l'effacer.",
-    "invalid": "Un numéro de chaîne ne contient que des chiffres, comme 51, avec un point avant toute partie au-delà de 9, comme 5.10."
+    "setMessage": "Numéro de chaîne pour {{name}}. Les numéros en dessous suivent (7 en 3 fait de 71 un 31). Laissez vide pour l'effacer, ainsi que les numéros en dessous.",
+    "invalid": "Un numéro de chaîne ne contient que des chiffres, comme 51, avec un point avant toute partie au-delà de 9, comme 5.10.",
+    "inUse": "{{label}} est déjà utilisé sur cette carte, ou un numéro en dessous.",
+    "saveFailed": "Impossible d'enregistrer le numéro de chaîne."
   }
 }

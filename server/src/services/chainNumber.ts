@@ -329,3 +329,67 @@ export async function dropOrphanedChainNumbers(
       RETURNING s.system_id AS "systemId"`, [mapId, label]);
   return { systems: systems.map((r) => r.id), sigSystems: [...new Set(sigs.map((r) => r.systemId))] };
 }
+
+/** Is `label` beneath `above` (11, 112 and 1.10 are beneath 1; .110 isn't
+ *  beneath .11)? Compared part by part. */
+export function isBeneath(label: string, above: string): boolean {
+  const a = labelParts(above), c = labelParts(label);
+  return c.length > a.length && a.every((v, i) => c[i] === v);
+}
+
+/** `label`, beneath `from`, moved to beneath `to`: 712 from 7 to 3 is 312. */
+export function moveLabel(label: string, from: string, to: string): string {
+  const parts = [...labelParts(to), ...labelParts(label).slice(labelParts(from).length)];
+  return parts.reduce((acc, p) => childLabel(acc, p), '');
+}
+
+/** Every number on the map, on systems and live reservations. */
+async function mapLabels(mapId: string) {
+  const { rows } = await db.query<{ id: string; systemId: string; label: string; sig: boolean }>(
+    `SELECT id, id AS "systemId", chain_label AS label, FALSE AS sig FROM map_systems
+      WHERE map_id = $1 AND chain_label IS NOT NULL
+     UNION ALL
+     SELECT s.id, s.system_id, s.chain_label, TRUE FROM map_signatures s JOIN map_systems y ON y.id = s.system_id
+      WHERE y.map_id = $1 AND ${LIVE}`, [mapId]);
+  return rows;
+}
+
+/**
+ * Can `systemId` be renumbered from `from` to `to` by hand? Not when another
+ * system or reservation has `to` or a number beneath it (outside what moves
+ * with it), and not to a number beneath its own.
+ */
+export async function chainLabelFree(mapId: string, systemId: string, from: string | null, to: string): Promise<boolean> {
+  if (from && isBeneath(to, from)) return false;
+  for (const r of await mapLabels(mapId)) {
+    if (!r.sig && r.id === systemId) continue;
+    if (from && (r.label === from || isBeneath(r.label, from))) continue; // moves with it
+    if (r.label === to || isBeneath(r.label, to)) return false;
+  }
+  return true;
+}
+
+/**
+ * A system renumbered by hand from `from` to `to`: the numbers beneath it move
+ * with it, on systems and reservations (7 to 3 takes 71 to 31 and 737 to 337).
+ * Returns what moved, for live updates.
+ */
+export async function moveChainNumbers(
+  mapId: string, from: string, to: string,
+): Promise<{ systems: { id: string; label: string }[]; sigSystems: string[] }> {
+  const rows = (await mapLabels(mapId)).filter((r) => isBeneath(r.label, from));
+  const systems: { id: string; label: string }[] = [];
+  const sigSystems = new Set<string>();
+  for (const r of rows) {
+    const label = moveLabel(r.label, from, to);
+    if (label.length > MAX_CHAIN_LABEL_LEN) continue;
+    if (r.sig) {
+      await db.query(`UPDATE map_signatures SET chain_label = $1 WHERE id = $2`, [label, r.id]);
+      sigSystems.add(r.systemId);
+    } else {
+      await db.query(`UPDATE map_systems SET chain_label = $1 WHERE id = $2`, [label, r.id]);
+      systems.push({ id: r.id, label });
+    }
+  }
+  return { systems, sigSystems: [...sigSystems] };
+}
