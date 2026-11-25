@@ -2266,37 +2266,42 @@ export function MapSidebar() {
                       { value: "tritanopia", label: t("mapSidebar.colorVisionOptions.tritanopia") },
                     ]} />
                   </div>
-                  {([
-                    ["home-color", "mapSidebar.homeColor", homeColor, setHomeColor, HOME_COLOR_DEFAULT, HOME_COLOR_DEFAULT],
-                    ["here-color", "mapSidebar.hereColor", hereColor, setHereColor, HERE_COLOR_DEFAULT, HERE_COLOR_DEFAULT],
-                  ] as const).map(([id, label, value, set, def, reset]) => {
-                    const color = safeColor(value, def);
-                    return (
-                      <div key={id} className="map-sidebar__row">
-                        <label className="map-sidebar__label" htmlFor={id}>{t(label)}</label>
-                        <div className="map-sidebar__color">
-                          {value !== reset && (
-                            <button type="button" className="map-sidebar__zoom-value" onClick={() => set(reset)}>
-                              {t("mapSidebar.resetColor")}
-                            </button>
-                          )}
-                          <label className="map-sidebar__swatch" style={{ background: color }}>
-                            <input id={id} type="color" value={color} onChange={(e) => set(e.target.value)} />
-                          </label>
+                  {(() => {
+                    const markerColor = (id: string, label: string, value: string, set: (v: string) => void, def: string) => {
+                      const color = safeColor(value, def);
+                      return (
+                        <div className="map-sidebar__row">
+                          <label className="map-sidebar__label" htmlFor={id}>{t(label)}</label>
+                          <div className="map-sidebar__color">
+                            {value !== def && (
+                              <button type="button" className="map-sidebar__zoom-value" onClick={() => set(def)}>
+                                {t("mapSidebar.resetColor")}
+                              </button>
+                            )}
+                            <label className="map-sidebar__swatch" style={{ background: color }}>
+                              <input id={id} type="color" value={color} onChange={(e) => set(e.target.value)} />
+                            </label>
+                          </div>
                         </div>
-                      </div>
+                      );
+                    };
+                    return (
+                      <>
+                        {markerColor("home-color", "mapSidebar.homeColor", homeColor, setHomeColor, HOME_COLOR_DEFAULT)}
+                        <div className="map-sidebar__row">
+                          <label className="map-sidebar__label" htmlFor="home-shape">{t("mapSidebar.homeShape")}</label>
+                          <Select id="home-shape" value={normaliseHomeShape(homeShape)} onChange={(v) => setHomeShape(v)}
+                            options={HOME_SHAPES.map((sh) => ({ value: sh, label: t(`mapSidebar.homeShapes.${sh}`) }))} />
+                        </div>
+                        {markerColor("here-color", "mapSidebar.hereColor", hereColor, setHereColor, HERE_COLOR_DEFAULT)}
+                        <div className="map-sidebar__row">
+                          <label className="map-sidebar__label" htmlFor="here-pulse">{t("mapSidebar.herePulse")}</label>
+                          <Select id="here-pulse" value={normalisePulse(herePulse)} onChange={(v) => setHerePulse(v)}
+                            options={HERE_PULSES.map((p) => ({ value: p, label: t(`mapSidebar.herePulseOptions.${p}`) }))} />
+                        </div>
+                      </>
                     );
-                  })}
-                  <div className="map-sidebar__row">
-                    <label className="map-sidebar__label" htmlFor="home-shape">{t("mapSidebar.homeShape")}</label>
-                    <Select id="home-shape" value={normaliseHomeShape(homeShape)} onChange={(v) => setHomeShape(v)}
-                      options={HOME_SHAPES.map((sh) => ({ value: sh, label: t(`mapSidebar.homeShapes.${sh}`) }))} />
-                  </div>
-                  <div className="map-sidebar__row">
-                    <label className="map-sidebar__label" htmlFor="here-pulse">{t("mapSidebar.herePulse")}</label>
-                    <Select id="here-pulse" value={normalisePulse(herePulse)} onChange={(v) => setHerePulse(v)}
-                      options={HERE_PULSES.map((p) => ({ value: p, label: t(`mapSidebar.herePulseOptions.${p}`) }))} />
-                  </div>
+                  })()}
                   {([
                     // '' follows the theme; Reset goes back to that.
                     ["map-bg-color", "mapSidebar.mapBgColor", mapBgColor, setMapBgColor, MAP_BG_THEME, MAP_BG_COLOR_DEFAULT],
