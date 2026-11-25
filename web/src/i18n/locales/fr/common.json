@@ -2238,6 +2238,25 @@
       "minmatar": "Minmatar",
       "carbon": "Carbon",
       "photon": "Photon"
+    },
+    "themeEditor": {
+      "create": "Créer un thème",
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "name": "Nom",
+      "untitled": "Mon thème",
+      "custom": "Vos thèmes",
+      "hint": "Toute l'application prévisualise vos couleurs pendant l'édition. Les couleurs de la carte, les icônes et les alertes ne changent pas.",
+      "tooLight": "Choisissez un fond plus sombre : le texte de nexum est clair et serait difficile à lire.",
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "limit": "Jusqu'à {{max}} thèmes personnels. Supprimez-en un pour en créer un autre.",
+      "seeds": {
+        "primary": "Fenêtres et bordures",
+        "highlight": "Surbrillance",
+        "bg": "Fond",
+        "accent": "Accent"
+      }
     }
   },
   "mass": {

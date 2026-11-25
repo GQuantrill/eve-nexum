@@ -2238,6 +2238,25 @@
       "minmatar": "Minmatar",
       "carbon": "Carbon",
       "photon": "Photon"
+    },
+    "themeEditor": {
+      "create": "新建主题",
+      "edit": "编辑",
+      "delete": "删除",
+      "name": "名称",
+      "untitled": "我的主题",
+      "custom": "你的主题",
+      "hint": "编辑时整个应用会实时预览你的颜色。地图颜色、图标和警报不会改变。",
+      "tooLight": "请选择更深的背景：nexum 的文字是浅色的，否则难以阅读。",
+      "save": "保存",
+      "cancel": "取消",
+      "limit": "最多 {{max}} 个自定义主题。删除一个才能新建。",
+      "seeds": {
+        "primary": "窗口和边框",
+        "highlight": "高亮",
+        "bg": "背景",
+        "accent": "强调"
+      }
     }
   },
   "mass": {

@@ -2238,6 +2238,25 @@
       "minmatar": "Minmatar",
       "carbon": "Carbon",
       "photon": "Photon"
+    },
+    "themeEditor": {
+      "create": "Crear tema",
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "name": "Nombre",
+      "untitled": "Mi tema",
+      "custom": "Tus temas",
+      "hint": "Toda la app muestra tus colores mientras editas. Los colores del mapa, los iconos y las alertas no cambian.",
+      "tooLight": "Elige un fondo más oscuro: el texto de nexum es claro y costaría leerlo.",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "limit": "Hasta {{max}} temas propios. Elimina uno para crear otro.",
+      "seeds": {
+        "primary": "Ventanas y bordes",
+        "highlight": "Resaltado",
+        "bg": "Fondo",
+        "accent": "Acento"
+      }
     }
   },
   "mass": {

@@ -2238,6 +2238,25 @@
       "minmatar": "Minmatar",
       "carbon": "Carbon",
       "photon": "Photon"
+    },
+    "themeEditor": {
+      "create": "Neues Farbschema",
+      "edit": "Bearbeiten",
+      "delete": "Löschen",
+      "name": "Name",
+      "untitled": "Mein Farbschema",
+      "custom": "Deine Farbschemata",
+      "hint": "Die ganze App zeigt deine Farben schon beim Bearbeiten. Kartenfarben, Symbole und Alarme bleiben gleich.",
+      "tooLight": "Wähle einen dunkleren Hintergrund: Die Schrift in nexum ist hell und wäre sonst schwer lesbar.",
+      "save": "Speichern",
+      "cancel": "Abbrechen",
+      "limit": "Bis zu {{max}} eigene Farbschemata. Lösche eines, um ein neues anzulegen.",
+      "seeds": {
+        "primary": "Fenster und Rahmen",
+        "highlight": "Hervorhebung",
+        "bg": "Hintergrund",
+        "accent": "Akzent"
+      }
     }
   },
   "mass": {

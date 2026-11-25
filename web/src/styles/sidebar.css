@@ -2890,3 +2890,33 @@ select.sig-toolbar-btn option {
   border-radius: 2px;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
 }
+.theme-picker__heading {
+  margin: 8px 0 2px;
+  color: var(--text-faint);
+  font-size: calc(11px * var(--font-scale, 1));
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.theme-picker__row--custom { padding: 2px 4px 2px 0; cursor: default; }
+.theme-picker__pick {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 10px;
+  padding: 3px 8px;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.theme-picker__create { margin-top: 8px; align-self: flex-start; }
+.theme-editor {
+  margin-top: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  background: var(--surface-well);
+}
+.theme-editor__actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px; }

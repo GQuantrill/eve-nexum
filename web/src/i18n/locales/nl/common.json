@@ -2238,6 +2238,25 @@
       "minmatar": "Minmatar",
       "carbon": "Carbon",
       "photon": "Photon"
+    },
+    "themeEditor": {
+      "create": "Nieuw thema maken",
+      "edit": "Bewerken",
+      "delete": "Verwijderen",
+      "name": "Naam",
+      "untitled": "Mijn thema",
+      "custom": "Jouw thema's",
+      "hint": "De hele app toont je kleuren al tijdens het bewerken. Kaartkleuren, iconen en meldingen veranderen niet.",
+      "tooLight": "Kies een donkerdere achtergrond: de tekst in nexum is licht en zou slecht leesbaar zijn.",
+      "save": "Opslaan",
+      "cancel": "Annuleren",
+      "limit": "Tot {{max}} eigen thema's. Verwijder er een om een nieuw te maken.",
+      "seeds": {
+        "primary": "Vensters en randen",
+        "highlight": "Markering",
+        "bg": "Achtergrond",
+        "accent": "Accent"
+      }
     }
   },
   "mass": {

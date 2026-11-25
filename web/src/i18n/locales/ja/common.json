@@ -2238,6 +2238,25 @@
       "minmatar": "Minmatar",
       "carbon": "Carbon",
       "photon": "Photon"
+    },
+    "themeEditor": {
+      "create": "新しいテーマを作成",
+      "edit": "編集",
+      "delete": "削除",
+      "name": "名前",
+      "untitled": "マイテーマ",
+      "custom": "あなたのテーマ",
+      "hint": "編集中はアプリ全体で色をプレビューします。マップの色、アイコン、アラートは変わりません。",
+      "tooLight": "もっと暗い背景を選んでください。nexum の文字は明るいので読みにくくなります。",
+      "save": "保存",
+      "cancel": "キャンセル",
+      "limit": "自分のテーマは最大 {{max}} 個まで。新しく作るには 1 つ削除してください。",
+      "seeds": {
+        "primary": "ウィンドウと枠",
+        "highlight": "ハイライト",
+        "bg": "背景",
+        "accent": "アクセント"
+      }
     }
   },
   "mass": {

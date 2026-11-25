@@ -2238,6 +2238,25 @@
       "minmatar": "Minmatar",
       "carbon": "Carbon",
       "photon": "Photon"
+    },
+    "themeEditor": {
+      "create": "새 테마 만들기",
+      "edit": "편집",
+      "delete": "삭제",
+      "name": "이름",
+      "untitled": "내 테마",
+      "custom": "내 테마 목록",
+      "hint": "편집하는 동안 앱 전체에 색이 미리 적용됩니다. 지도 색, 아이콘, 알림은 바뀌지 않습니다.",
+      "tooLight": "더 어두운 배경을 고르세요. nexum의 글자는 밝은색이라 읽기 어려워집니다.",
+      "save": "저장",
+      "cancel": "취소",
+      "limit": "나만의 테마는 최대 {{max}}개입니다. 새로 만들려면 하나를 삭제하세요.",
+      "seeds": {
+        "primary": "창과 테두리",
+        "highlight": "강조",
+        "bg": "배경",
+        "accent": "포인트"
+      }
     }
   },
   "mass": {
